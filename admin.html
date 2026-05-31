@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>관리자 패널 — 한공간</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="admin.css"/>
+</head>
+<body>
+
+  <!-- LOGIN -->
+  <div id="loginScreen" class="login">
+    <div class="login__box">
+      <p class="login__logo">한공간</p>
+      <h1 class="login__title">관리자 로그인</h1>
+      <div class="field">
+        <label>비밀번호</label>
+        <input type="password" id="pwInput" placeholder="비밀번호를 입력하세요" autocomplete="current-password"/>
+      </div>
+      <button class="btn-primary" id="loginBtn">로그인</button>
+      <p class="login__error" id="loginError"></p>
+    </div>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <div id="adminPanel" class="admin hidden">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar__brand">
+        <p class="sidebar__logo">한공간</p>
+        <p class="sidebar__sub">관리자 패널</p>
+      </div>
+      <nav class="sidebar__nav">
+        <button class="sidebar__item active" data-section="basic">기본 정보</button>
+        <button class="sidebar__item" data-section="hours">영업시간</button>
+        <button class="sidebar__item" data-section="menu">메뉴 관리</button>
+        <button class="sidebar__item" data-section="theme">테마 설정</button>
+        <button class="sidebar__item" data-section="password">비밀번호 변경</button>
+      </nav>
+      <div class="sidebar__footer">
+        <a href="index.html" target="_blank" class="btn-outline">웹사이트 보기 ↗</a>
+        <button class="sidebar__logout" id="logoutBtn">로그아웃</button>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="admin__main">
+
+      <!-- Toast -->
+      <div class="toast" id="toast">저장되었습니다 ✓</div>
+
+      <!-- ===== 기본 정보 ===== -->
+      <section class="section-panel active" id="sec-basic">
+        <div class="panel-header">
+          <h2>기본 정보</h2>
+          <p>레스토랑의 기본 정보를 수정합니다.</p>
+        </div>
+        <div class="card">
+          <div class="field-group">
+            <div class="field">
+              <label>상호명</label>
+              <input type="text" id="f-name" placeholder="한공간"/>
+            </div>
+            <div class="field">
+              <label>영문 상호명</label>
+              <input type="text" id="f-nameEn" placeholder="Han Gong-gan"/>
+            </div>
+            <div class="field">
+              <label>서브타이틀 <span class="hint">네비게이션 하단에 표시</span></label>
+              <input type="text" id="f-tagline" placeholder="연남동 퓨전 파스타 바"/>
+            </div>
+            <div class="field">
+              <label>히어로 문구</label>
+              <input type="text" id="f-hero" placeholder="낯선 재료의 조합, 익숙한 온기"/>
+            </div>
+            <div class="field">
+              <label>인용구 <span class="hint">중간 배너에 표시</span></label>
+              <input type="text" id="f-quote"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>소개 문구</h3>
+          <div class="field-group">
+            <div class="field">
+              <label>소개 첫 번째 단락</label>
+              <textarea id="f-about1" rows="3"></textarea>
+            </div>
+            <div class="field">
+              <label>소개 두 번째 단락</label>
+              <textarea id="f-about2" rows="3"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>연락처 & 위치</h3>
+          <div class="field-group">
+            <div class="field">
+              <label>전화번호</label>
+              <input type="text" id="f-phone" placeholder="010-0000-0000"/>
+            </div>
+            <div class="field">
+              <label>주소 (첫 줄)</label>
+              <input type="text" id="f-addr1"/>
+            </div>
+            <div class="field">
+              <label>주소 (둘째 줄)</label>
+              <input type="text" id="f-addr2"/>
+            </div>
+            <div class="field">
+              <label>공지사항 <span class="hint">영업시간 하단 메모</span></label>
+              <input type="text" id="f-notice"/>
+            </div>
+          </div>
+        </div>
+        <button class="btn-primary btn-save" onclick="saveBasic()">저장하기</button>
+      </section>
+
+      <!-- ===== 영업시간 ===== -->
+      <section class="section-panel" id="sec-hours">
+        <div class="panel-header">
+          <h2>영업시간</h2>
+          <p>요일별 영업시간을 설정합니다.</p>
+        </div>
+        <div class="card">
+          <div id="hoursEditor"></div>
+        </div>
+        <button class="btn-primary btn-save" onclick="saveHours()">저장하기</button>
+      </section>
+
+      <!-- ===== 메뉴 ===== -->
+      <section class="section-panel" id="sec-menu">
+        <div class="panel-header">
+          <h2>메뉴 관리</h2>
+          <p>메뉴 이름, 가격, 설명을 수정합니다.</p>
+        </div>
+
+        <div class="menu-tabs">
+          <button class="menu-tab active" data-mtab="signature">시그니처</button>
+          <button class="menu-tab" data-mtab="pasta">파스타</button>
+          <button class="menu-tab" data-mtab="side">사이드</button>
+        </div>
+
+        <div class="menu-panel active" id="mp-signature"></div>
+        <div class="menu-panel" id="mp-pasta"></div>
+        <div class="menu-panel" id="mp-side"></div>
+
+        <div class="btn-row">
+          <button class="btn-outline" onclick="addMenuItem()">+ 메뉴 추가</button>
+          <button class="btn-primary btn-save" onclick="saveMenu()">저장하기</button>
+        </div>
+      </section>
+
+      <!-- ===== 테마 ===== -->
+      <section class="section-panel" id="sec-theme">
+        <div class="panel-header">
+          <h2>테마 설정</h2>
+          <p>웹사이트의 색상을 변경합니다.</p>
+        </div>
+        <div class="card">
+          <div class="field-group">
+            <div class="field field--color">
+              <label>포인트 색상 <span class="hint">골드 컬러 등</span></label>
+              <div class="color-row">
+                <input type="color" id="f-gold" value="#c9a96e"/>
+                <input type="text"  id="f-gold-hex" placeholder="#c9a96e" maxlength="7"/>
+              </div>
+            </div>
+            <div class="field field--color">
+              <label>배경 색상</label>
+              <div class="color-row">
+                <input type="color" id="f-bg" value="#080807"/>
+                <input type="text"  id="f-bg-hex" placeholder="#080807" maxlength="7"/>
+              </div>
+            </div>
+            <div class="field field--color">
+              <label>서피스 색상 <span class="hint">카드·섹션 배경</span></label>
+              <div class="color-row">
+                <input type="color" id="f-surface" value="#111110"/>
+                <input type="text"  id="f-surface-hex" placeholder="#111110" maxlength="7"/>
+              </div>
+            </div>
+          </div>
+          <div class="theme-preview" id="themePreview">
+            <div class="preview-card">
+              <span class="preview-label">미리보기</span>
+              <p class="preview-title">한공간</p>
+              <p class="preview-sub">연남동 퓨전 파스타 바</p>
+              <button class="preview-btn">메뉴 보기</button>
+            </div>
+          </div>
+        </div>
+        <button class="btn-primary btn-save" onclick="saveTheme()">저장하기</button>
+      </section>
+
+      <!-- ===== 비밀번호 ===== -->
+      <section class="section-panel" id="sec-password">
+        <div class="panel-header">
+          <h2>비밀번호 변경</h2>
+          <p>관리자 패널 비밀번호를 변경합니다.</p>
+        </div>
+        <div class="card">
+          <div class="field-group" style="max-width:400px">
+            <div class="field">
+              <label>현재 비밀번호</label>
+              <input type="password" id="pw-current"/>
+            </div>
+            <div class="field">
+              <label>새 비밀번호</label>
+              <input type="password" id="pw-new"/>
+            </div>
+            <div class="field">
+              <label>새 비밀번호 확인</label>
+              <input type="password" id="pw-confirm"/>
+            </div>
+            <p class="pw-error" id="pw-error"></p>
+          </div>
+        </div>
+        <button class="btn-primary btn-save" onclick="changePassword()">변경하기</button>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
