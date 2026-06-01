@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>관리자 — 공간 GONGGAN</title>
+  <meta name="robots" content="noindex, nofollow" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500&family=Noto+Serif+KR:wght@300;400&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg:        #3D1F2B;
+      --bg-2:      #341926;
+      --bg-3:      #2B1420;
+      --bg-4:      #201018;
+      --text:      #F5EFE8;
+      --muted:     rgba(245,239,232,.55);
+      --dim:       rgba(245,239,232,.28);
+      --accent:    #B07A86;
+      --accent-lt: #C99AA4;
+      --border:    rgba(176,122,134,.14);
+      --brd-mid:   rgba(176,122,134,.3);
+      --success:   #6dbf8a;
+      --danger:    #c97a7a;
+      --ff: 'Noto Sans KR', sans-serif;
+      --ease: cubic-bezier(0.16,1,.3,1);
+    }
+    html[data-theme="light"] {
+      --bg:    #F5EFE8; --bg-2: #EDE4D9; --bg-3: #E2D6C9; --bg-4: #D5C8B8;
+      --text:  #3D1F2B; --muted: rgba(61,31,43,.55); --dim: rgba(61,31,43,.3);
+      --border: rgba(176,122,134,.18); --brd-mid: rgba(176,122,134,.36);
+    }
+
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    html { font-size:16px; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--ff);
+      font-weight: 300;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+    a { text-decoration:none; color:inherit; }
+    ul { list-style:none; }
+    button { cursor:pointer; font-family:var(--ff); }
+
+    /* ── LOGIN SCREEN ── */
+    #loginScreen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .login-card {
+      width: 100%;
+      max-width: 380px;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2.8rem 2.4rem;
+    }
+    .login-logo {
+      display: flex;
+      align-items: baseline;
+      gap: .35rem;
+      margin-bottom: 2.2rem;
+      justify-content: center;
+    }
+    .login-logo-kr { font-family: 'Noto Serif KR', serif; font-size:1.2rem; font-weight:300; }
+    .login-logo-sep { color: var(--accent); }
+    .login-logo-en { font-size:.62rem; letter-spacing:.32em; color:var(--muted); text-transform:uppercase; }
+    .login-label { font-size:.6rem; letter-spacing:.2em; text-transform:uppercase; color:var(--dim); text-align:center; margin-bottom:2rem; display:block; }
+
+    .f-group { margin-bottom:1rem; }
+    .f-lbl { display:block; font-size:.65rem; letter-spacing:.15em; text-transform:uppercase; color:var(--dim); margin-bottom:.5rem; }
+    .f-inp {
+      width:100%; background:var(--bg-3); border:1px solid var(--border);
+      border-radius:8px; padding:.8rem 1rem; font-family:var(--ff); font-size:.88rem;
+      font-weight:300; color:var(--text); outline:none; transition:border-color .25s;
+      appearance:none; -webkit-appearance:none;
+    }
+    .f-inp:focus { border-color:var(--accent); }
+    .f-inp::placeholder { color:var(--dim); }
+
+    .btn-primary {
+      width:100%; background:var(--accent); color:var(--bg-4); border:none;
+      border-radius:999px; padding:.9rem; font-size:.78rem; letter-spacing:.12em;
+      font-weight:500; transition:background .25s, transform .3s var(--ease);
+      margin-top:.5rem;
+    }
+    .btn-primary:hover { background:var(--accent-lt); transform:translateY(-2px); }
+    .btn-primary:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+    .login-err { font-size:.78rem; color:var(--danger); margin-top:.8rem; text-align:center; min-height:1.2em; }
+
+    /* ── DASHBOARD ── */
+    #dashboard { display:none; min-height:100vh; flex-direction:column; }
+    #dashboard.visible { display:flex; }
+
+    .dash-nav {
+      position:sticky; top:0; z-index:100;
+      background:rgba(32,16,24,.92);
+      backdrop-filter:blur(20px);
+      -webkit-backdrop-filter:blur(20px);
+      border-bottom:1px solid var(--border);
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0 2rem; height:60px;
+    }
+    html[data-theme="light"] .dash-nav { background:rgba(245,239,232,.92); }
+    .dash-nav-logo { display:flex; align-items:baseline; gap:.3rem; }
+    .dash-nav-logo span:first-child { font-family:'Noto Serif KR',serif; font-size:1rem; }
+    .dash-nav-logo span:nth-child(2) { color:var(--accent); }
+    .dash-nav-logo span:last-child { font-size:.58rem; letter-spacing:.3em; color:var(--muted); text-transform:uppercase; }
+    .dash-nav-right { display:flex; align-items:center; gap:1rem; }
+    .dash-nav-user { font-size:.72rem; color:var(--muted); }
+    .btn-logout {
+      font-size:.7rem; letter-spacing:.1em; color:var(--muted); border:1px solid var(--border);
+      border-radius:999px; padding:.4rem 1rem; background:none; transition:all .25s;
+    }
+    .btn-logout:hover { color:var(--accent); border-color:var(--brd-mid); }
+
+    /* Tabs */
+    .dash-tabs {
+      display:flex; gap:0;
+      border-bottom:1px solid var(--border);
+      background:var(--bg-2);
+      padding:0 2rem;
+    }
+    .tab-btn {
+      font-size:.75rem; letter-spacing:.1em; color:var(--muted);
+      background:none; border:none; border-bottom:2px solid transparent;
+      padding:1rem 1.5rem 1rem; margin-bottom:-1px;
+      transition:color .25s, border-color .25s;
+    }
+    .tab-btn.active { color:var(--accent); border-color:var(--accent); }
+    .tab-btn:hover { color:var(--text); }
+
+    /* Panels */
+    .dash-body { flex:1; padding:2.5rem 2rem; }
+    .tab-panel { display:none; max-width:760px; }
+    .tab-panel.active { display:block; }
+
+    .panel-title { font-family:'Noto Serif KR',serif; font-size:1.15rem; font-weight:300; margin-bottom:2rem; color:var(--text); }
+
+    /* Form rows in panels */
+    .field { margin-bottom:1.4rem; }
+    .field label { display:block; font-size:.62rem; letter-spacing:.18em; text-transform:uppercase; color:var(--dim); margin-bottom:.5rem; }
+    .field input, .field textarea {
+      width:100%; background:var(--bg-3); border:1px solid var(--border); border-radius:8px;
+      padding:.8rem 1rem; font-family:var(--ff); font-size:.88rem; font-weight:300;
+      color:var(--text); outline:none; transition:border-color .25s;
+      appearance:none; -webkit-appearance:none;
+    }
+    .field input:focus, .field textarea:focus { border-color:var(--accent); }
+    .field input::placeholder, .field textarea::placeholder { color:var(--dim); }
+    .field textarea { resize:vertical; min-height:80px; }
+
+    .btn-save {
+      background:var(--accent); color:var(--bg-4); border:none;
+      border-radius:999px; padding:.75rem 2rem; font-size:.75rem; letter-spacing:.12em;
+      font-weight:500; transition:background .25s, transform .3s var(--ease);
+    }
+    .btn-save:hover { background:var(--accent-lt); transform:translateY(-2px); }
+    .btn-save:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+
+    .save-status { display:inline-block; font-size:.75rem; margin-left:1rem; color:var(--success); opacity:0; transition:opacity .4s; }
+    .save-status.show { opacity:1; }
+
+    /* Section divider inside panel */
+    .panel-section { margin-bottom:2.4rem; padding-bottom:2.4rem; border-bottom:1px solid var(--border); }
+    .panel-section:last-child { border-bottom:none; padding-bottom:0; }
+    .panel-section-title { font-size:.65rem; letter-spacing:.25em; text-transform:uppercase; color:var(--accent); margin-bottom:1.4rem; }
+
+    /* Portfolio list */
+    .portfolio-list { display:flex; flex-direction:column; gap:1rem; margin-bottom:1.5rem; }
+    .portfolio-item {
+      background:var(--bg-2); border:1px solid var(--border); border-radius:10px;
+      padding:1.2rem 1.4rem; display:flex; gap:1.2rem; align-items:flex-start;
+    }
+    .portfolio-item-img {
+      width:60px; height:45px; border-radius:6px; overflow:hidden; flex-shrink:0;
+      background:var(--bg-3);
+    }
+    .portfolio-item-img img { width:100%; height:100%; object-fit:cover; }
+    .portfolio-item-body { flex:1; min-width:0; }
+    .portfolio-item-title { font-size:.9rem; color:var(--text); margin-bottom:.25rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .portfolio-item-cat { font-size:.7rem; color:var(--muted); }
+    .portfolio-item-actions { display:flex; gap:.5rem; flex-shrink:0; }
+    .btn-icon {
+      width:32px; height:32px; border-radius:6px; border:1px solid var(--border);
+      background:none; color:var(--muted); display:flex; align-items:center; justify-content:center;
+      transition:all .25s;
+    }
+    .btn-icon:hover { border-color:var(--brd-mid); color:var(--text); }
+    .btn-icon.danger:hover { border-color:var(--danger); color:var(--danger); }
+
+    .btn-add {
+      display:flex; align-items:center; gap:.5rem;
+      background:none; border:1px solid var(--border); border-radius:8px;
+      padding:.7rem 1.2rem; font-size:.78rem; color:var(--muted);
+      transition:all .25s;
+    }
+    .btn-add:hover { border-color:var(--accent); color:var(--accent); }
+
+    /* Modal for portfolio editing */
+    .modal-backdrop {
+      position:fixed; inset:0; z-index:900;
+      background:rgba(0,0,0,.7); backdrop-filter:blur(4px);
+      display:flex; align-items:center; justify-content:center; padding:2rem;
+      opacity:0; pointer-events:none; transition:opacity .3s ease;
+    }
+    .modal-backdrop.open { opacity:1; pointer-events:all; }
+    .modal {
+      background:var(--bg-2); border:1px solid var(--brd-mid); border-radius:16px;
+      padding:2.4rem; width:100%; max-width:520px; max-height:90vh; overflow-y:auto;
+      transform:translateY(12px) scale(.98);
+      transition:transform .4s var(--ease);
+    }
+    .modal-backdrop.open .modal { transform:none; }
+    .modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.8rem; }
+    .modal-title { font-family:'Noto Serif KR',serif; font-size:1rem; font-weight:300; }
+    .btn-close { width:32px; height:32px; border-radius:50%; border:1px solid var(--border); background:none; color:var(--muted); display:flex; align-items:center; justify-content:center; transition:all .25s; }
+    .btn-close:hover { border-color:var(--brd-mid); color:var(--text); }
+    .modal-actions { display:flex; gap:.8rem; margin-top:1.5rem; }
+    .btn-ghost-sm { background:none; border:1px solid var(--border); border-radius:999px; padding:.65rem 1.4rem; font-size:.75rem; color:var(--muted); transition:all .25s; }
+    .btn-ghost-sm:hover { border-color:var(--brd-mid); color:var(--text); }
+
+    /* Inquiries */
+    .inquiry-list { display:flex; flex-direction:column; gap:0; }
+    .inquiry-item {
+      padding:1.3rem 0; border-bottom:1px solid var(--border);
+      display:grid; grid-template-columns:1fr auto; gap:1rem; align-items:start;
+    }
+    .inquiry-item:first-child { border-top:1px solid var(--border); }
+    .inquiry-meta { display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:.5rem; }
+    .inquiry-name { font-size:.88rem; color:var(--text); font-weight:400; }
+    .inquiry-phone { font-size:.82rem; color:var(--muted); }
+    .inquiry-biz { font-size:.72rem; color:var(--dim); background:var(--bg-3); border-radius:999px; padding:.15rem .65rem; }
+    .inquiry-msg { font-size:.82rem; color:var(--muted); line-height:1.6; }
+    .inquiry-time { font-size:.68rem; color:var(--dim); white-space:nowrap; margin-top:.3rem; }
+    .inquiry-actions { display:flex; gap:.5rem; align-items:flex-start; }
+    .unread-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); margin-top:.6rem; flex-shrink:0; }
+
+    .empty-state { text-align:center; padding:3rem 0; color:var(--dim); font-size:.85rem; }
+
+    /* Loading spinner */
+    .spinner {
+      width:20px; height:20px; border-radius:50%;
+      border:2px solid var(--border); border-top-color:var(--accent);
+      animation:spin .7s linear infinite; display:inline-block; vertical-align:middle;
+    }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    .loading-row { padding:2rem 0; text-align:center; color:var(--muted); display:flex; align-items:center; justify-content:center; gap:.8rem; font-size:.85rem; }
+
+    /* Config note */
+    .config-banner {
+      background:linear-gradient(135deg, rgba(176,122,134,.08) 0%, transparent 80%);
+      border:1px solid var(--brd-mid);
+      border-radius:10px;
+      padding:1.4rem 1.6rem;
+      margin-bottom:2rem;
+      font-size:.82rem;
+      color:var(--muted);
+      line-height:1.75;
+    }
+    .config-banner strong { color:var(--accent); font-weight:500; }
+    .config-banner code {
+      background:var(--bg-3); border-radius:4px; padding:.1em .4em;
+      font-size:.82em; color:var(--accent-lt);
+    }
+
+    @media(max-width:640px){
+      .dash-body { padding:1.5rem 1rem; }
+      .dash-tabs { padding:0 1rem; }
+      .dash-nav { padding:0 1rem; }
+      .portfolio-item { flex-wrap:wrap; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ LOGIN SCREEN ══ -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <span class="login-logo-kr">공간</span>
+      <span class="login-logo-sep">/</span>
+      <span class="login-logo-en">GONGGAN</span>
+    </div>
+    <span class="login-label">관리자 로그인</span>
+
+    <form id="loginForm">
+      <div class="f-group">
+        <label class="f-lbl" for="loginEmail">이메일</label>
+        <input class="f-inp" type="email" id="loginEmail" required autocomplete="email" />
+      </div>
+      <div class="f-group">
+        <label class="f-lbl" for="loginPw">비밀번호</label>
+        <input class="f-inp" type="password" id="loginPw" required autocomplete="current-password" />
+      </div>
+      <button class="btn-primary" type="submit" id="loginBtn">로그인</button>
+      <p class="login-err" id="loginErr"></p>
+    </form>
+  </div>
+</div>
+
+<!-- ══ DASHBOARD ══ -->
+<div id="dashboard">
+
+  <nav class="dash-nav">
+    <div class="dash-nav-logo">
+      <span>공간</span><span>/</span><span>GONGGAN</span>
+      <span style="font-size:.6rem;letter-spacing:.2em;color:var(--dim);margin-left:.6rem;text-transform:uppercase;">관리자</span>
+    </div>
+    <div class="dash-nav-right">
+      <span class="dash-nav-user" id="dashUser"></span>
+      <a href="index.html" class="btn-logout">← 사이트로</a>
+      <button class="btn-logout" id="logoutBtn">로그아웃</button>
+    </div>
+  </nav>
+
+  <div class="dash-tabs">
+    <button class="tab-btn active" data-tab="settings">사이트 설정</button>
+    <button class="tab-btn"        data-tab="portfolio">포트폴리오</button>
+    <button class="tab-btn"        data-tab="inquiries">문의 내역</button>
+  </div>
+
+  <div class="dash-body">
+
+    <!-- ── TAB: 설정 ── -->
+    <div class="tab-panel active" id="tab-settings">
+      <p class="panel-title">사이트 설정</p>
+
+      <div id="sbBanner" class="config-banner" hidden>
+        <strong>Supabase 연결 필요.</strong>
+        <code>supabase-config.js</code>에 프로젝트 URL과 Anon Key를 입력하면 변경 사항이 즉시 데이터베이스에 저장되고 모든 기기에 반영됩니다.
+        자세한 설정은 해당 파일의 주석을 참고하세요.
+      </div>
+
+      <form id="settingsForm">
+        <div class="panel-section">
+          <p class="panel-section-title">히어로 헤드라인</p>
+          <div class="field">
+            <label>첫 줄 (한국어)</label>
+            <input type="text" id="cfg_hero_h1_ko" placeholder="당신의 공간을," />
+          </div>
+          <div class="field">
+            <label>둘째 줄 (한국어)</label>
+            <input type="text" id="cfg_hero_h2_ko" placeholder="온라인에" />
+          </div>
+          <div class="field">
+            <label>First line (English)</label>
+            <input type="text" id="cfg_hero_h1_en" placeholder="Your Space," />
+          </div>
+          <div class="field">
+            <label>Second line (English)</label>
+            <input type="text" id="cfg_hero_h2_en" placeholder="Online." />
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <p class="panel-section-title">슬로건</p>
+          <div class="field">
+            <label>슬로건 (한국어)</label>
+            <input type="text" id="cfg_slogan_ko" placeholder="당신의 공간을, 온라인에" />
+          </div>
+          <div class="field">
+            <label>Slogan (English)</label>
+            <input type="text" id="cfg_slogan_en" placeholder="Your Space, Online." />
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <p class="panel-section-title">연락처</p>
+          <div class="field">
+            <label>전화번호</label>
+            <input type="tel" id="cfg_contact_phone" placeholder="010-4856-5543" />
+          </div>
+          <div class="field">
+            <label>이메일</label>
+            <input type="email" id="cfg_contact_email" placeholder="seonju5543@gmail.com" />
+          </div>
+        </div>
+
+        <button class="btn-save" type="submit" id="settingsBtn">저장하기</button>
+        <span class="save-status" id="settingsStatus">✓ 저장됨</span>
+      </form>
+    </div>
+
+    <!-- ── TAB: 포트폴리오 ── -->
+    <div class="tab-panel" id="tab-portfolio">
+      <p class="panel-title">포트폴리오</p>
+
+      <div class="portfolio-list" id="portfolioList">
+        <div class="loading-row"><div class="spinner"></div> 불러오는 중…</div>
+      </div>
+
+      <button class="btn-add" id="btnAddPortfolio">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        새 항목 추가
+      </button>
+    </div>
+
+    <!-- ── TAB: 문의 내역 ── -->
+    <div class="tab-panel" id="tab-inquiries">
+      <p class="panel-title">문의 내역</p>
+      <div class="inquiry-list" id="inquiryList">
+        <div class="loading-row"><div class="spinner"></div> 불러오는 중…</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ PORTFOLIO MODAL ══ -->
+<div class="modal-backdrop" id="portfolioModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">포트폴리오 항목</span>
+      <button class="btn-close" id="btnCloseModal" aria-label="닫기">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <form id="portfolioForm">
+      <input type="hidden" id="pf_id" />
+      <div class="field"><label>제목 (한국어)</label><input type="text" id="pf_title_ko" required /></div>
+      <div class="field"><label>Title (English)</label><input type="text" id="pf_title_en" /></div>
+      <div class="field"><label>카테고리 (한국어)</label><input type="text" id="pf_cat_ko" placeholder="식당 / 카페 / 펜션…" /></div>
+      <div class="field"><label>Category (English)</label><input type="text" id="pf_cat_en" /></div>
+      <div class="field"><label>특징 (한국어) — 쉼표로 구분</label><input type="text" id="pf_feat_ko" placeholder="풀사이트 · 예약 기능" /></div>
+      <div class="field"><label>Features (English)</label><input type="text" id="pf_feat_en" /></div>
+      <div class="field"><label>이미지 URL</label><input type="url" id="pf_image" placeholder="https://…" /></div>
+      <div class="field"><label>설명 (한국어)</label><textarea id="pf_desc_ko" rows="2"></textarea></div>
+      <div class="field"><label>Description (English)</label><textarea id="pf_desc_en" rows="2"></textarea></div>
+      <div class="modal-actions">
+        <button class="btn-save" type="submit" id="pfSaveBtn">저장</button>
+        <button class="btn-ghost-sm" type="button" id="btnCancelModal">취소</button>
+        <span class="save-status" id="pfStatus">✓ 저장됨</span>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Supabase CDN + config + admin script -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

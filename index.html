@@ -1,366 +1,572 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>한공간 — 연남동 퓨전 파스타 바</title>
+  <title>공간 (GONGGAN) — 당신의 공간을, 온라인에</title>
+
+  <!-- SEO -->
+  <meta name="description" content="AI 기반 소상공인 맞춤 웹사이트 제작. 풀사이트 + 코드 없는 관리자 페이지 + 도메인 소유권 이전. 서울." />
+  <meta name="keywords" content="소상공인 웹사이트, AI 웹제작, 홈페이지 제작, 관리자페이지, 공간, GONGGAN" />
+  <meta property="og:title" content="공간 (GONGGAN) — 당신의 공간을, 온라인에" />
+  <meta property="og:description" content="AI 기반 소상공인 맞춤 웹사이트. 관리자 페이지 + 완전한 소유권 이전." />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="ko_KR" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="canonical" href="https://gonggan.kr/" />
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400;600&family=Noto+Sans+KR:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Noto+Serif+KR:wght@200;300;400;600&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet" />
+
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+<body class="loading">
 
-  <!-- LOADER -->
-  <div class="loader" id="loader">
-    <div class="loader__inner">
-      <span class="loader__text">한공간</span>
-      <div class="loader__bar"><div class="loader__fill"></div></div>
+<!-- ══ LOADER ══ -->
+<div class="loader" id="loader" aria-hidden="true">
+  <div class="loader__inner">
+    <div class="loader__mark">
+      <span class="loader__kr">공간</span>
+      <span class="loader__sep">/</span>
+      <span class="loader__en">GONGGAN</span>
     </div>
+    <div class="loader__bar"><div class="loader__fill"></div></div>
+    <span class="loader__sub">당신의 공간을, 온라인에</span>
   </div>
+</div>
 
-  <!-- NAV -->
-  <nav class="nav" id="nav">
-    <a class="nav__logo" href="#hero">
-      <span class="nav__logo-kr">한공간</span>
-      <span class="nav__logo-en">Han Gong-gan</span>
-    </a>
-    <ul class="nav__links" id="navLinks">
-      <li><a href="#about" class="nav__link">소개</a></li>
-      <li><a href="#menu" class="nav__link">메뉴</a></li>
-      <li><a href="#info" class="nav__link">방문안내</a></li>
+<!-- ══ NAV ══ -->
+<header class="nav" id="nav">
+  <a class="nav__logo" href="#hero" aria-label="공간 홈으로">
+    <span class="nav__logo-kr">공간</span>
+    <span class="nav__logo-sep">/</span>
+    <span class="nav__logo-en">GONGGAN</span>
+  </a>
+
+  <nav class="nav__center" id="navCenter" aria-label="주 탐색">
+    <ul class="nav__list">
+      <li><a href="#services"  class="nav__link" data-section="services"  data-i18n="nav.services">서비스</a></li>
+      <li><a href="#process"   class="nav__link" data-section="process"   data-i18n="nav.process">프로세스</a></li>
+      <li><a href="#portfolio" class="nav__link" data-section="portfolio" data-i18n="nav.portfolio">포트폴리오</a></li>
+      <li><a href="#pricing"   class="nav__link" data-section="pricing"   data-i18n="nav.pricing">가격</a></li>
+      <li><a href="#contact"   class="nav__link" data-section="contact"   data-i18n="nav.contact">문의</a></li>
     </ul>
-    <a href="tel:01072234247" class="nav__cta">예약 문의</a>
-    <button class="nav__toggle" id="navToggle" aria-label="메뉴">
-      <span></span><span></span><span></span>
-    </button>
   </nav>
 
-  <!-- HERO -->
-  <section id="hero" class="hero">
-    <div class="hero__bg" id="heroBg"></div>
-    <div class="hero__overlay"></div>
+  <div class="nav__right">
+    <button class="nav__lang" id="langToggle" aria-label="Switch language">
+      <span class="lang-kr active">KR</span>
+      <span class="lang-dot">·</span>
+      <span class="lang-en">EN</span>
+    </button>
+    <button class="nav__theme" id="themeToggle" aria-label="테마 전환">
+      <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+    <a href="#contact" class="nav__cta" data-i18n="nav.cta">상담 신청</a>
+    <button class="nav__hamburger" id="navToggle" aria-label="메뉴 열기" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
 
-    <div class="hero__content">
-      <p class="hero__eyebrow reveal-line">연남동 퓨전 파스타 바</p>
-      <h1 class="hero__title">
-        <span class="hero__title-line reveal-word">한</span>
-        <span class="hero__title-line reveal-word">공간</span>
-      </h1>
-      <div class="hero__divider reveal-line"></div>
-      <p class="hero__desc reveal-fade">낯선 재료의 조합, 익숙한 온기</p>
-      <div class="hero__actions reveal-fade">
-        <a href="#menu" class="btn btn--primary">메뉴 보기</a>
-        <a href="#info" class="btn btn--ghost">오시는 길</a>
-      </div>
+<!-- ══ HERO ══ -->
+<section id="hero" class="hero">
+  <canvas class="hero__canvas" id="heroCanvas" aria-hidden="true"></canvas>
+  <div class="hero__glow hero__glow--1" aria-hidden="true"></div>
+  <div class="hero__glow hero__glow--2" aria-hidden="true"></div>
+  <div class="hero__glow hero__glow--3" aria-hidden="true"></div>
+  <div class="hero__grain" aria-hidden="true"></div>
+
+  <div class="hero__content">
+    <div class="hero__kicker reveal-fade">
+      <span class="hero__est">EST. 2026</span>
+      <span class="hero__divider-dot" aria-hidden="true">·</span>
+      <span class="hero__coords">37°33′N&nbsp;&nbsp;126°58′E</span>
     </div>
 
-    <div class="hero__scroll reveal-fade">
-      <span>Scroll</span>
-      <div class="hero__scroll-line"></div>
+    <div class="hero__brand reveal-up">
+      <span class="hero__brand-kr">공간</span>
+      <span class="hero__brand-sep">/</span>
+      <span class="hero__brand-en">GONGGAN</span>
     </div>
 
-    <div class="hero__badge reveal-fade">
-      <svg viewBox="0 0 120 120" class="hero__badge-ring">
-        <path id="circlePath" d="M 60,60 m -45,0 a 45,45 0 1,1 90,0 a 45,45 0 1,1 -90,0"/>
-        <text><textPath href="#circlePath" startOffset="0%">한공간 · YEONNAM-DONG · FUSION · PASTA BAR · </textPath></text>
-      </svg>
-      <span class="hero__badge-year">2022</span>
-    </div>
-  </section>
+    <h1 class="hero__headline">
+      <span class="hero__line reveal-line"     data-i18n="hero.h1">당신의 공간을,</span>
+      <span class="hero__line reveal-line d1"  data-i18n="hero.h2">온라인에</span>
+    </h1>
 
-  <!-- MARQUEE -->
-  <div class="marquee" aria-hidden="true">
-    <div class="marquee__track">
-      <span>유자 유린기</span><span class="dot">·</span>
-      <span>양고기 전병 플레이트</span><span class="dot">·</span>
-      <span>달래 된장 크림파스타</span><span class="dot">·</span>
-      <span>돌김 성게 로제</span><span class="dot">·</span>
-      <span>호박고지 앤쵸비 오일파스타</span><span class="dot">·</span>
-      <span>음메헤 양고기 파스틴</span><span class="dot">·</span>
-      <span>온통초록 부라타</span><span class="dot">·</span>
-      <span>문어감자 사장님</span><span class="dot">·</span>
-      <!-- duplicate for seamless loop -->
-      <span>유자 유린기</span><span class="dot">·</span>
-      <span>양고기 전병 플레이트</span><span class="dot">·</span>
-      <span>달래 된장 크림파스타</span><span class="dot">·</span>
-      <span>돌김 성게 로제</span><span class="dot">·</span>
-      <span>호박고지 앤쵸비 오일파스타</span><span class="dot">·</span>
-      <span>음메헤 양고기 파스틴</span><span class="dot">·</span>
-      <span>온통초록 부라타</span><span class="dot">·</span>
-      <span>문어감자 사장님</span><span class="dot">·</span>
+    <p class="hero__desc reveal-fade d2" data-i18n="hero.desc">AI로 제작하는 소상공인 전용 웹사이트. 관리자 페이지와 소유권까지.</p>
+
+    <div class="hero__actions reveal-fade d3">
+      <a href="#contact"   class="btn btn--primary"  data-i18n="hero.cta1">상담 신청</a>
+      <a href="#portfolio" class="btn btn--ghost"     data-i18n="hero.cta2">포트폴리오 보기</a>
     </div>
   </div>
 
-  <!-- ABOUT -->
-  <section id="about" class="about section">
-    <div class="container">
-      <div class="about__grid">
-        <div class="about__left">
-          <span class="label reveal-up">About Us</span>
-          <h2 class="about__heading reveal-up delay-1">
-            낯선 조합이<br/>
-            <em>새로운 미식</em>이 되다
-          </h2>
-          <p class="about__body reveal-up delay-2">
-            연남동 골목 깊숙이 자리한 <strong>한공간</strong>은 한국적 식재료와
-            유럽 파스타·이탈리안 감성이 만나는 퓨전 다이닝 바입니다.
-          </p>
-          <p class="about__body reveal-up delay-3">
-            달래된장 크림파스타, 돌김 성게 로제, 양고기 전병 플레이트처럼
-            낯선 듯 친숙한 메뉴들로 새로운 미식 경험을 선사합니다.
-            저녁 5시부터 자정까지, 한 잔과 함께 천천히 즐기세요.
-          </p>
-          <div class="about__stats reveal-up delay-4">
-            <div class="stat">
-              <span class="stat__num" data-count="50">0</span><span class="stat__unit">+</span>
-              <p>메뉴</p>
-            </div>
-            <div class="stat__sep"></div>
-            <div class="stat">
-              <span class="stat__num" data-count="2022">0</span>
-              <p>오픈연도</p>
-            </div>
-            <div class="stat__sep"></div>
-            <div class="stat">
-              <span class="stat__num" data-count="7">0</span><span class="stat__unit">h</span>
-              <p>영업시간</p>
-            </div>
-          </div>
+  <div class="hero__scroll reveal-fade d4" aria-hidden="true">
+    <span>Scroll</span>
+    <div class="hero__scroll-line"></div>
+  </div>
+</section>
+
+<!-- ══ 01 / 서비스 ══ -->
+<section id="services" class="services section">
+  <div class="container">
+    <header class="section__hd">
+      <span class="label reveal-up" data-i18n="s01.label">01 / 서비스</span>
+      <h2 class="section__title reveal-up d1" data-i18n="s01.title">우리가 하는 일.</h2>
+    </header>
+
+    <div class="services__grid">
+
+      <article class="svc-card reveal-up d1">
+        <div class="svc-card__num" aria-hidden="true">01</div>
+        <div class="svc-card__body">
+          <h3 class="svc-card__name" data-i18n="s01.s1.name">웹사이트 제작</h3>
+          <p  class="svc-card__desc" data-i18n="s01.s1.desc">업종과 분위기에 맞춘 풀사이트를 AI로 정교하게 설계합니다.</p>
         </div>
-
-        <div class="about__right reveal-right">
-          <div class="about__img-wrap">
-            <div class="about__img about__img--main">
-              <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&q=80" alt="한공간 내부" />
-            </div>
-            <div class="about__img about__img--sub">
-              <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=500&q=80" alt="한공간 요리" />
-            </div>
-            <div class="about__img-tag">Yeonnam-dong, Seoul</div>
-          </div>
+        <div class="svc-card__icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
         </div>
-      </div>
-    </div>
-  </section>
+      </article>
 
-  <!-- MENU -->
-  <section id="menu" class="menu section">
-    <div class="container">
-      <div class="menu__header">
-        <span class="label label--gold reveal-up">Our Menu</span>
-        <h2 class="menu__title reveal-up delay-1">오늘의 메뉴</h2>
-        <p class="menu__subtitle reveal-up delay-2">제철 식재료와 정성으로 만든 퓨전 다이닝</p>
-      </div>
-
-      <div class="menu__tabs reveal-up delay-3">
-        <button class="tab active" data-tab="signature">
-          <span class="tab__kr">시그니처</span>
-          <span class="tab__en">Signature</span>
-        </button>
-        <button class="tab" data-tab="pasta">
-          <span class="tab__kr">파스타</span>
-          <span class="tab__en">Pasta</span>
-        </button>
-        <button class="tab" data-tab="side">
-          <span class="tab__kr">사이드</span>
-          <span class="tab__en">Side</span>
-        </button>
-      </div>
-
-      <!-- 시그니처 -->
-      <div class="menu__panel active" data-panel="signature">
-        <div class="menu__featured">
-          <div class="menu__card menu__card--large stagger">
-            <div class="menu__card-inner">
-              <div class="menu__card-tag">대표 메뉴</div>
-              <div class="menu__card-body">
-                <h3>유자 유린기</h3>
-                <p>상큼한 유자 소스와 촉촉한 닭고기의 완벽한 조화.<br/>한공간의 가장 사랑받는 시그니처 안주</p>
-              </div>
-              <div class="menu__card-footer">
-                <span class="menu__price">24,000<em>원</em></span>
-              </div>
-            </div>
-          </div>
-          <div class="menu__card menu__card--large stagger">
-            <div class="menu__card-inner">
-              <div class="menu__card-tag">대표 메뉴</div>
-              <div class="menu__card-body">
-                <h3>양고기 전병 플레이트</h3>
-                <p>부드러운 전병에 향긋한 양고기를 감싼 이색 플레이트.<br/>한 입 베어 물면 펼쳐지는 이국적인 맛</p>
-              </div>
-              <div class="menu__card-footer">
-                <span class="menu__price">21,000<em>원</em></span>
-              </div>
-            </div>
-          </div>
+      <article class="svc-card reveal-up d2">
+        <div class="svc-card__num" aria-hidden="true">02</div>
+        <div class="svc-card__body">
+          <h3 class="svc-card__name" data-i18n="s01.s2.name">코드 없는 관리자 페이지</h3>
+          <p  class="svc-card__desc" data-i18n="s01.s2.desc">사장님이 직접 글자·사진·가격을 수정하는 전용 관리자 페이지를 함께 제공합니다.</p>
         </div>
-        <div class="menu__list">
-          <div class="menu__row stagger">
-            <div class="menu__row-info">
-              <h3>온통초록 부라타</h3>
-              <p>신선한 부라타 치즈와 초록 채소의 상큼한 조화</p>
-            </div>
-            <span class="menu__row-price">15,000원</span>
-          </div>
-          <div class="menu__row stagger">
-            <div class="menu__row-info">
-              <h3>문어감자 사장님</h3>
-              <p>쫄깃한 문어와 포슬포슬 감자의 든든한 안주</p>
-            </div>
-            <span class="menu__row-price">18,000원</span>
-          </div>
+        <div class="svc-card__icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
         </div>
-      </div>
+      </article>
 
-      <!-- 파스타 -->
-      <div class="menu__panel" data-panel="pasta">
-        <div class="menu__list">
-          <div class="menu__row stagger">
-            <div class="menu__row-info">
-              <h3>달래 된장 크림파스타</h3>
-              <p>향긋한 달래와 깊은 된장의 풍미가 어우러진 크림 파스타</p>
-            </div>
-            <span class="menu__row-price">19,000원</span>
-          </div>
-          <div class="menu__row stagger">
-            <div class="menu__row-info">
-              <h3>호박고지 앤쵸비 오일파스타</h3>
-              <p>말린 호박고지와 앤쵸비의 고소하고 깊은 오일 파스타</p>
-            </div>
-            <span class="menu__row-price">20,000원</span>
-          </div>
-          <div class="menu__row stagger">
-            <div class="menu__row-info">
-              <h3>음메헤 양고기 파스틴</h3>
-              <p>양고기의 깊은 맛을 파스타에 담은 시그니처 메뉴</p>
-            </div>
-            <span class="menu__row-price">21,000원</span>
-          </div>
-          <div class="menu__row stagger">
-            <div class="menu__row-info">
-              <h3>돌김 성게 로제파스타</h3>
-              <p>국산 돌김과 성게알이 만든 바다향 가득한 로제 파스타</p>
-            </div>
-            <span class="menu__row-price">22,000원</span>
-          </div>
+      <article class="svc-card reveal-up d3">
+        <div class="svc-card__num" aria-hidden="true">03</div>
+        <div class="svc-card__body">
+          <h3 class="svc-card__name" data-i18n="s01.s3.name">도메인 연결 · 소유권 이전</h3>
+          <p  class="svc-card__desc" data-i18n="s01.s3.desc">도메인을 연결하고, 인계 후 사이트의 모든 권한은 사장님에게 있습니다.</p>
         </div>
-      </div>
-
-      <!-- 사이드 -->
-      <div class="menu__panel" data-panel="side">
-        <div class="menu__list">
-          <div class="menu__row stagger">
-            <div class="menu__row-info">
-              <h3>마라 만두</h3>
-              <p>얼얼한 마라 소스와 바삭한 만두의 중독적인 조합</p>
-            </div>
-            <span class="menu__row-price menu__row-price--inquiry">문의</span>
-          </div>
-          <div class="menu__row stagger">
-            <div class="menu__row-info">
-              <h3>감자 디쉬</h3>
-              <p>시즈닝 가득한 바삭한 감자 플레이트</p>
-            </div>
-            <span class="menu__row-price menu__row-price--inquiry">문의</span>
-          </div>
-          <div class="menu__row stagger">
-            <div class="menu__row-info">
-              <h3>허니갈릭 치킨</h3>
-              <p>달콤한 허니갈릭 소스를 곁들인 바삭한 치킨</p>
-            </div>
-            <span class="menu__row-price menu__row-price--inquiry">문의</span>
-          </div>
-          <div class="menu__row stagger">
-            <div class="menu__row-info">
-              <h3>볶음우동</h3>
-              <p>감칠맛 넘치는 소스의 쫄깃한 볶음우동</p>
-            </div>
-            <span class="menu__row-price menu__row-price--inquiry">문의</span>
-          </div>
+        <div class="svc-card__icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
         </div>
-        <p class="menu__note">* 사이드 메뉴 가격은 매장에 직접 문의해 주세요.</p>
-      </div>
-    </div>
-  </section>
+      </article>
 
-  <!-- DIVIDER QUOTE -->
-  <div class="quote-band">
-    <div class="container">
-      <blockquote class="quote reveal-up">
-        <p>"한국의 맛, 유럽의 방식으로 재해석하다"</p>
-      </blockquote>
     </div>
   </div>
+</section>
 
-  <!-- INFO -->
-  <section id="info" class="info section">
-    <div class="container">
-      <div class="info__top">
-        <span class="label reveal-up">Visit Us</span>
-        <h2 class="reveal-up delay-1">방문안내</h2>
-      </div>
-      <div class="info__grid">
-        <div class="info__hours reveal-up delay-2">
-          <h3>영업시간</h3>
-          <ul class="hours">
-            <li class="stagger"><span class="hours__day">월요일</span><span class="hours__sep"></span><span class="hours__time">17:00 – 00:00</span></li>
-            <li class="stagger hours--closed"><span class="hours__day">화요일</span><span class="hours__sep"></span><span class="hours__time">휴무</span></li>
-            <li class="stagger"><span class="hours__day">수요일</span><span class="hours__sep"></span><span class="hours__time">17:00 – 00:00</span></li>
-            <li class="stagger"><span class="hours__day">목요일</span><span class="hours__sep"></span><span class="hours__time">17:00 – 00:00</span></li>
-            <li class="stagger"><span class="hours__day">금요일</span><span class="hours__sep"></span><span class="hours__time">17:00 – 00:00</span></li>
-            <li class="stagger"><span class="hours__day">토요일</span><span class="hours__sep"></span><span class="hours__time">17:00 – 00:00</span></li>
-            <li class="stagger"><span class="hours__day">일요일</span><span class="hours__sep"></span><span class="hours__time">17:00 – 00:00</span></li>
-          </ul>
-          <p class="info__note">※ 공휴일 영업시간은 다를 수 있습니다.</p>
+<!-- ══ 02 / 프로세스 ══ -->
+<section id="process" class="process section">
+  <div class="container">
+    <header class="section__hd">
+      <span class="label reveal-up" data-i18n="s02.label">02 / 프로세스</span>
+      <h2 class="section__title reveal-up d1" data-i18n="s02.title">상담부터 인계까지,<br>보통 2주.</h2>
+    </header>
+
+    <div class="process__track reveal-up d2">
+
+      <div class="process__step">
+        <div class="process__step-num">01</div>
+        <div class="process__step-connector" aria-hidden="true"></div>
+        <div class="process__step-body">
+          <h3 data-i18n="s02.p1.name">상담</h3>
+          <p  data-i18n="s02.p1.desc">업종, 분위기, 필요한 페이지를 이야기합니다.</p>
         </div>
+      </div>
 
-        <div class="info__location reveal-up delay-3">
-          <h3>오시는 길</h3>
-          <address>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-            서울특별시 마포구 연남동 561-4<br/>동교로27길 78
-          </address>
-          <a class="info__tel" href="tel:01072234247">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.63a19.79 19.79 0 01-3.07-8.67A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
-            010-7223-4247
+      <div class="process__step">
+        <div class="process__step-num">02</div>
+        <div class="process__step-connector" aria-hidden="true"></div>
+        <div class="process__step-body">
+          <h3 data-i18n="s02.p2.name">제작</h3>
+          <p  data-i18n="s02.p2.desc">AI로 사이트 전체를 빠르게 설계하고 구현합니다.</p>
+        </div>
+      </div>
+
+      <div class="process__step">
+        <div class="process__step-num">03</div>
+        <div class="process__step-connector" aria-hidden="true"></div>
+        <div class="process__step-body">
+          <h3 data-i18n="s02.p3.name">검수</h3>
+          <p  data-i18n="s02.p3.desc">사장님이 직접 확인하고 무상 수정을 진행합니다.</p>
+        </div>
+      </div>
+
+      <div class="process__step">
+        <div class="process__step-num">04</div>
+        <div class="process__step-body">
+          <h3 data-i18n="s02.p4.name">인계</h3>
+          <p  data-i18n="s02.p4.desc">도메인과 사이트를 사장님께 이전합니다.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ 03 / 포트폴리오 ══ -->
+<section id="portfolio" class="portfolio section">
+  <div class="container">
+    <header class="section__hd">
+      <span class="label reveal-up" data-i18n="s03.label">03 / 포트폴리오</span>
+      <h2 class="section__title reveal-up d1" data-i18n="s03.title">선보인 공간들.</h2>
+    </header>
+
+    <div class="portfolio__grid">
+
+      <article class="port-card reveal-up d1">
+        <div class="port-card__visual port-card__visual--restaurant" aria-hidden="true">
+          <div class="port-card__overlay"></div>
+          <span class="port-card__cat" data-i18n="s03.p1.cat">식당</span>
+        </div>
+        <div class="port-card__meta">
+          <div>
+            <h3 class="port-card__name" data-i18n="s03.p1.name">연남동 이탈리안</h3>
+            <p  class="port-card__feat" data-i18n="s03.p1.feat">풀사이트 · 예약 기능 · 갤러리</p>
+          </div>
+          <span class="port-card__year">2026</span>
+        </div>
+      </article>
+
+      <article class="port-card reveal-up d2">
+        <div class="port-card__visual port-card__visual--cafe" aria-hidden="true">
+          <div class="port-card__overlay"></div>
+          <span class="port-card__cat" data-i18n="s03.p2.cat">카페</span>
+        </div>
+        <div class="port-card__meta">
+          <div>
+            <h3 class="port-card__name" data-i18n="s03.p2.name">성수 스페셜티 카페</h3>
+            <p  class="port-card__feat" data-i18n="s03.p2.feat">풀사이트 · 포토 갤러리</p>
+          </div>
+          <span class="port-card__year">2026</span>
+        </div>
+      </article>
+
+      <article class="port-card reveal-up d3">
+        <div class="port-card__visual port-card__visual--pension" aria-hidden="true">
+          <div class="port-card__overlay"></div>
+          <span class="port-card__cat" data-i18n="s03.p3.cat">펜션</span>
+        </div>
+        <div class="port-card__meta">
+          <div>
+            <h3 class="port-card__name" data-i18n="s03.p3.name">강원 독채 펜션</h3>
+            <p  class="port-card__feat" data-i18n="s03.p3.feat">풀사이트 · 객실 안내 · 예약</p>
+          </div>
+          <span class="port-card__year">2026</span>
+        </div>
+      </article>
+
+    </div>
+
+    <p class="portfolio__note reveal-up d4" data-i18n="s03.note">샘플 작업물 · 2026</p>
+  </div>
+</section>
+
+<!-- ══ 04 / 공간을 선택하는 이유 ══ -->
+<section id="why" class="why section">
+  <div class="container">
+    <header class="section__hd">
+      <span class="label reveal-up" data-i18n="s04.label">04 / 공간을 선택하는 이유</span>
+      <h2 class="section__title reveal-up d1" data-i18n="s04.title">기술이 아니라, 결과.</h2>
+    </header>
+
+    <div class="why__grid">
+
+      <div class="why__item reveal-up d1">
+        <div class="why__icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <h3 data-i18n="s04.p1.name">AI 기반 빠른 제작</h3>
+        <p  data-i18n="s04.p1.desc">기존 에이전시보다 훨씬 빠르게, 퀄리티는 그대로.</p>
+      </div>
+
+      <div class="why__item reveal-up d2">
+        <div class="why__icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        </div>
+        <h3 data-i18n="s04.p2.name">합리적 가격</h3>
+        <p  data-i18n="s04.p2.desc">일반 에이전시 대비 최대 1/10 수준의 비용.</p>
+      </div>
+
+      <div class="why__item reveal-up d3">
+        <div class="why__icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <h3 data-i18n="s04.p3.name">코드 없이 직접 운영</h3>
+        <p  data-i18n="s04.p3.desc">전용 관리자 페이지로 사장님이 직접 수정합니다.</p>
+      </div>
+
+      <div class="why__item reveal-up d4">
+        <div class="why__icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3 data-i18n="s04.p4.name">완전한 소유권 이전</h3>
+        <p  data-i18n="s04.p4.desc">인계 후 사이트와 도메인의 모든 권한은 사장님 것.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ 05 / 가격 ══ -->
+<section id="pricing" class="pricing section">
+  <div class="container">
+    <header class="section__hd">
+      <span class="label reveal-up" data-i18n="s05.label">05 / 가격</span>
+      <h2 class="section__title reveal-up d1" data-i18n="s05.title">투명한 세 가지 플랜.</h2>
+      <p class="pricing__incl reveal-up d2" data-i18n="s05.incl">모든 플랜 포함: 도메인 연결 + 소유권 이전 + 최초 1년분 도메인 등록비 + 최초 1개월분 운영 플랫폼 비용.</p>
+    </header>
+
+    <div class="pricing__grid">
+
+      <!-- 베이직 -->
+      <div class="plan-card reveal-up d1">
+        <div class="plan-card__top">
+          <span class="plan-card__tier" data-i18n="s05.basic.tier">베이직</span>
+        </div>
+        <div class="plan-card__price">
+          <span class="plan-card__amount">490,000</span>
+          <span class="plan-card__won" data-i18n="s05.won">원</span>
+        </div>
+        <ul class="plan-card__feats">
+          <li data-i18n="s05.basic.f1">단일 페이지</li>
+          <li data-i18n="s05.basic.f2">기본 관리자 페이지 (메뉴·정보·시간)</li>
+          <li data-i18n="s05.basic.f3">템플릿 기반 디자인</li>
+          <li data-i18n="s05.basic.f4">무상 수정 7일</li>
+        </ul>
+        <a href="#contact" class="btn btn--ghost btn--full" data-i18n="s05.cta">문의하기</a>
+      </div>
+
+      <!-- 스탠다드 (featured) -->
+      <div class="plan-card plan-card--featured reveal-up d2">
+        <div class="plan-card__badge" data-i18n="s05.standard.badge">가장 인기 · 7만원 할인</div>
+        <div class="plan-card__top">
+          <span class="plan-card__tier">스탠다드</span>
+          <span class="plan-card__star" aria-hidden="true">⭐</span>
+        </div>
+        <div class="plan-card__price">
+          <span class="plan-card__original">690,000<span data-i18n="s05.won">원</span></span>
+          <span class="plan-card__amount">620,000</span>
+          <span class="plan-card__won" data-i18n="s05.won">원</span>
+        </div>
+        <ul class="plan-card__feats">
+          <li data-i18n="s05.standard.f1">멀티 섹션 풀사이트</li>
+          <li data-i18n="s05.standard.f2">관리자 페이지 + 포토 갤러리</li>
+          <li data-i18n="s05.standard.f3">업종 맞춤 디자인</li>
+          <li data-i18n="s05.standard.f4">무상 수정 14일</li>
+        </ul>
+        <a href="#contact" class="btn btn--primary btn--full" data-i18n="s05.cta">문의하기</a>
+      </div>
+
+      <!-- 프리미엄 -->
+      <div class="plan-card reveal-up d3">
+        <div class="plan-card__top">
+          <span class="plan-card__tier" data-i18n="s05.premium.tier">프리미엄</span>
+        </div>
+        <div class="plan-card__price">
+          <span class="plan-card__amount">800,000</span>
+          <span class="plan-card__won" data-i18n="s05.won">원~</span>
+        </div>
+        <ul class="plan-card__feats">
+          <li data-i18n="s05.premium.f1">풀사이트 + 맞춤 기능</li>
+          <li data-i18n="s05.premium.f2">전체 관리자 페이지 + 문의 접수·관리</li>
+          <li data-i18n="s05.premium.f3">완전 커스텀 디자인 + 고급 애니메이션</li>
+          <li data-i18n="s05.premium.f4">무상 수정 30일</li>
+        </ul>
+        <a href="#contact" class="btn btn--ghost btn--full" data-i18n="s05.cta">문의하기</a>
+      </div>
+
+    </div>
+
+    <div class="pricing__compare reveal-up d4">
+      <p data-i18n="s05.compare">일반 웹에이전시 맞춤 제작은 보통 150만~1,000만원+, 제작 후 글자 수정도 건당 유료. 공간은 AI 기반으로 비용을 최대 1/10 수준으로 낮추고, 코드 없이 직접 수정하는 관리자 페이지까지 제공합니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 06 / FAQ ══ -->
+<section id="faq" class="faq section">
+  <div class="container">
+    <header class="section__hd">
+      <span class="label reveal-up" data-i18n="s06.label">06 / 자주 묻는 질문</span>
+      <h2 class="section__title reveal-up d1" data-i18n="s06.title">자주 묻는 질문.</h2>
+    </header>
+
+    <div class="faq__list reveal-up d2">
+
+      <div class="faq__item">
+        <button class="faq__q" aria-expanded="false">
+          <span data-i18n="s06.q1">코드를 몰라도 운영 가능한가요?</span>
+          <svg class="faq__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="faq__a">
+          <p data-i18n="s06.a1">네. 전용 관리자 페이지에서 텍스트·사진·가격을 직접 수정하실 수 있습니다. 코드나 개발 지식이 전혀 없어도 됩니다.</p>
+        </div>
+      </div>
+
+      <div class="faq__item">
+        <button class="faq__q" aria-expanded="false">
+          <span data-i18n="s06.q2">수정은 어떻게 하나요?</span>
+          <svg class="faq__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="faq__a">
+          <p data-i18n="s06.a2">플랜별 무상 수정 기간 내에는 요청 시 당일~익일 처리합니다. 이후에는 건당 별도 비용이 발생합니다.</p>
+        </div>
+      </div>
+
+      <div class="faq__item">
+        <button class="faq__q" aria-expanded="false">
+          <span data-i18n="s06.q3">도메인은 어떻게 처리되나요?</span>
+          <svg class="faq__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="faq__a">
+          <p data-i18n="s06.a3">원하시는 도메인을 공간이 등록해 최초 1년 비용을 부담합니다. 인계 후 도메인 소유권은 사장님께 이전됩니다.</p>
+        </div>
+      </div>
+
+      <div class="faq__item">
+        <button class="faq__q" aria-expanded="false">
+          <span data-i18n="s06.q4">월 운영비는 누가 부담하나요?</span>
+          <svg class="faq__chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="faq__a">
+          <p data-i18n="s06.a4">최초 1개월 운영 플랫폼 비용은 공간이 부담합니다. 이후 월 비용은 플랜 및 플랫폼에 따라 다르며, 상담 시 안내드립니다.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ STATS ══ -->
+<section class="stats-band" aria-label="주요 지표">
+  <div class="container">
+    <div class="stats__grid">
+
+      <div class="stats__item reveal-up d1">
+        <div class="stats__num" data-target="24" data-suffix="+">0</div>
+        <p class="stats__label" data-i18n="stats.s1">제작 사이트 수</p>
+      </div>
+
+      <div class="stats__item reveal-up d2">
+        <div class="stats__num" data-target="11" data-suffix="일">0</div>
+        <p class="stats__label" data-i18n="stats.s2">평균 제작 기간</p>
+      </div>
+
+      <div class="stats__item reveal-up d3">
+        <div class="stats__num" data-target="94" data-suffix="%">0</div>
+        <p class="stats__label" data-i18n="stats.s3">재계약 의향</p>
+      </div>
+
+      <div class="stats__item reveal-up d4">
+        <div class="stats__num stats__num--static">1<span class="stats__frac">/10</span></div>
+        <p class="stats__label" data-i18n="stats.s4">에이전시 대비 비용</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ 07 / 문의 ══ -->
+<section id="contact" class="contact section">
+  <div class="container">
+    <div class="contact__inner">
+
+      <div class="contact__left">
+        <span class="label reveal-up" data-i18n="s07.label">07 / 문의</span>
+        <h2 class="section__title reveal-up d1" data-i18n="s07.title">당신의 공간을<br>이야기해 주세요.</h2>
+        <div class="contact__details reveal-up d2">
+          <a href="tel:01048565543" class="contact__detail-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.63a19.79 19.79 0 01-3.07-8.67A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+            010-4856-5543
           </a>
-          <div class="map-wrap">
-            <iframe
-              src="https://maps.google.com/maps?q=37.5637,126.9270&z=16&output=embed"
-              width="100%" height="280"
-              style="border:0;" allowfullscreen loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade">
-            </iframe>
-          </div>
+          <a href="mailto:seonju5543@gmail.com" class="contact__detail-item">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            seonju5543@gmail.com
+          </a>
         </div>
       </div>
-    </div>
-  </section>
 
-  <!-- FOOTER -->
-  <footer class="footer">
-    <div class="container footer__inner">
-      <div class="footer__brand">
-        <p class="footer__logo">한공간</p>
-        <p class="footer__tagline">연남동 퓨전 파스타 바</p>
-      </div>
-      <div class="footer__links">
-        <a href="#about">소개</a>
-        <a href="#menu">메뉴</a>
-        <a href="#info">방문안내</a>
-      </div>
-      <div class="footer__contact">
-        <p>서울 마포구 연남동 561-4</p>
-        <p>010-7223-4247</p>
-      </div>
-    </div>
-    <div class="footer__bottom">
-      <p>© 2025 한공간. All rights reserved.</p>
-    </div>
-  </footer>
+      <form class="contact__form reveal-up d2" id="contactForm" novalidate>
+        <div class="form__row">
+          <div class="form__group">
+            <label class="form__label" for="fname" data-i18n="s07.f.name">이름 *</label>
+            <input class="form__input" type="text" id="fname" name="name" required autocomplete="name" />
+          </div>
+          <div class="form__group">
+            <label class="form__label" for="fphone" data-i18n="s07.f.phone">연락처 *</label>
+            <input class="form__input" type="tel"  id="fphone" name="phone" required autocomplete="tel" />
+          </div>
+        </div>
+        <div class="form__group">
+          <label class="form__label" for="fbusiness" data-i18n="s07.f.biz">업종</label>
+          <input class="form__input" type="text" id="fbusiness" name="business" />
+        </div>
+        <div class="form__group">
+          <label class="form__label" for="fmsg" data-i18n="s07.f.msg">문의 내용</label>
+          <textarea class="form__input form__textarea" id="fmsg" name="message" rows="4"></textarea>
+        </div>
+        <p class="form__privacy" data-i18n="s07.f.privacy">개인정보는 상담 목적 외 사용되지 않습니다.</p>
+        <button type="submit" class="btn btn--primary btn--full form__submit" data-i18n="s07.f.submit">보내기</button>
+        <div class="form__success" id="formSuccess" aria-live="polite" hidden>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <span data-i18n="s07.f.sent">보내주셨습니다. 곧 연락드리겠습니다.</span>
+        </div>
+      </form>
 
-  <script src="main.js"></script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer">
+  <div class="container footer__inner">
+
+    <div class="footer__brand">
+      <p class="footer__logo">공간 <span class="footer__logo-sep">/</span> GONGGAN</p>
+      <p class="footer__slogan" data-i18n="meta.tagline">당신의 공간을, 온라인에</p>
+    </div>
+
+    <nav class="footer__nav" aria-label="푸터 탐색">
+      <p class="footer__nav-label" data-i18n="footer.nav">탐색</p>
+      <ul>
+        <li><a href="#services"  data-i18n="nav.services">서비스</a></li>
+        <li><a href="#process"   data-i18n="nav.process">프로세스</a></li>
+        <li><a href="#portfolio" data-i18n="nav.portfolio">포트폴리오</a></li>
+        <li><a href="#pricing"   data-i18n="nav.pricing">가격</a></li>
+        <li><a href="#contact"   data-i18n="nav.contact">문의</a></li>
+      </ul>
+    </nav>
+
+    <div class="footer__contact-col">
+      <p class="footer__nav-label" data-i18n="footer.contact">연락</p>
+      <a href="tel:01048565543">010-4856-5543</a>
+      <a href="mailto:seonju5543@gmail.com">seonju5543@gmail.com</a>
+    </div>
+
+    <div class="footer__policy-col">
+      <p class="footer__nav-label" data-i18n="footer.policy">정책</p>
+      <a href="operations.html" data-i18n="footer.p1">운영 안내</a>
+      <a href="admin.html" data-i18n="footer.p2">관리자</a>
+    </div>
+
+  </div>
+  <div class="footer__bottom">
+    <p>© 2026 GONGGAN · 서울 KR</p>
+  </div>
+</footer>
+
+<!-- ══ BACK TO TOP ══ -->
+<button class="back-top" id="backTop" aria-label="맨 위로" hidden>
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 15l-6-6-6 6"/></svg>
+</button>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="main.js"></script>
 </body>
 </html>

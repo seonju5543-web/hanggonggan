@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>운영 안내 — 공간 (GONGGAN)</title>
+  <meta name="description" content="공간(GONGGAN) 웹사이트 운영 구조, 비용, 소유권, 인계 후 추가 작업에 관한 안내." />
+  <meta name="robots" content="noindex" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=Noto+Serif+KR:wght@200;300;400;600&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    .ops-page { padding-top: calc(var(--nav-h) + 4rem); }
+    .ops-hero {
+      padding: 5rem 0 4rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .ops-hero .label { display:block; margin-bottom:1rem; }
+    .ops-hero h1 {
+      font-family: var(--ff-display);
+      font-weight: 300;
+      font-size: clamp(2.4rem, 5vw, 3.8rem);
+      line-height: 1.1;
+      margin-bottom: 1rem;
+    }
+    .ops-hero p {
+      font-size: .9rem;
+      color: var(--text-muted);
+      max-width: 500px;
+      line-height: 1.8;
+    }
+
+    .ops-section {
+      padding: 5rem 0;
+      border-bottom: 1px solid var(--border);
+      max-width: 760px;
+    }
+    .ops-section:last-of-type { border-bottom: none; }
+
+    .ops-section h2 {
+      font-family: var(--ff-serif);
+      font-size: 1.2rem;
+      font-weight: 400;
+      margin-bottom: 1.8rem;
+      color: var(--text);
+      letter-spacing: .01em;
+    }
+    .ops-section p {
+      font-size: .88rem;
+      color: var(--text-muted);
+      line-height: 1.9;
+      margin-bottom: 1.1rem;
+    }
+    .ops-section p:last-child { margin-bottom: 0; }
+
+    /* Platform callout */
+    .ops-platform {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 10px;
+      padding: 1.6rem 1.8rem;
+      margin: 2rem 0;
+    }
+    .ops-platform p {
+      margin: 0;
+      font-size: .85rem;
+      color: var(--text-muted);
+      line-height: 1.9;
+    }
+    .ops-platform strong { color: var(--text); font-weight: 400; }
+
+    .ops-platform-items {
+      margin-top: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: .55rem;
+    }
+    .ops-platform-item {
+      font-size: .82rem;
+      color: var(--text-muted);
+      padding-left: 1.2rem;
+      position: relative;
+      line-height: 1.6;
+    }
+    .ops-platform-item::before {
+      content: '';
+      position: absolute;
+      left: 0; top: .6em;
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--accent-dk);
+    }
+
+    .ops-analogy {
+      font-style: italic;
+      color: var(--text-dim) !important;
+      font-size: .82rem !important;
+      margin-top: 1.4rem !important;
+      padding-top: 1.4rem;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Cost table */
+    .ops-table-wrap {
+      overflow-x: auto;
+      margin: 2rem 0;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    .ops-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .84rem;
+    }
+    .ops-table th {
+      background: var(--bg-3);
+      color: var(--text-dim);
+      font-weight: 400;
+      font-size: .66rem;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      text-align: left;
+      padding: .9rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .ops-table td {
+      padding: 1.1rem 1.2rem;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      line-height: 1.6;
+    }
+    .ops-table tr:last-child td { border-bottom: none; }
+    .ops-table td:first-child { color: var(--text); font-weight: 400; }
+
+    .ops-table-note {
+      font-size: .75rem;
+      color: var(--text-dim);
+      line-height: 1.7;
+      margin-top: 1.2rem;
+    }
+
+    /* Traffic footnote */
+    .ops-footnote {
+      font-size: .72rem !important;
+      color: var(--text-dim) !important;
+      border-top: 1px solid var(--border);
+      padding-top: 1.2rem;
+      margin-top: 1.5rem !important;
+      line-height: 1.8 !important;
+    }
+
+    /* Non-payment list */
+    .ops-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      margin: 1.8rem 0;
+    }
+    .ops-list-item {
+      padding: 1.2rem 1.4rem;
+      background: var(--bg-2);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .ops-list-item h4 {
+      font-size: .8rem;
+      font-weight: 500;
+      letter-spacing: .08em;
+      color: var(--accent);
+      margin-bottom: .55rem;
+    }
+    .ops-list-item p {
+      margin: 0;
+      font-size: .83rem;
+      color: var(--text-muted);
+      line-height: 1.75;
+    }
+
+    .ops-warning {
+      font-size: .82rem;
+      color: var(--text-muted);
+      border: 1px solid var(--border-mid);
+      border-radius: 8px;
+      padding: 1.1rem 1.4rem;
+      margin-top: 1.4rem;
+      line-height: 1.8;
+    }
+    .ops-warning strong { color: var(--text); font-weight: 500; }
+
+    /* Post-handover work */
+    .ops-free-tag {
+      display: inline-block;
+      font-size: .65rem;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--bg-4);
+      background: var(--accent);
+      border-radius: 999px;
+      padding: .25rem .9rem;
+      margin-bottom: 1.2rem;
+      font-weight: 500;
+    }
+    .ops-paid-table {
+      width: 100%;
+      margin-top: 1.8rem;
+      border-collapse: collapse;
+    }
+    .ops-paid-table td {
+      padding: .85rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: .84rem;
+      vertical-align: top;
+    }
+    .ops-paid-table td:first-child { color: var(--text); padding-right: 2rem; white-space: nowrap; }
+    .ops-paid-table td:last-child { color: var(--accent); text-align: right; white-space: nowrap; }
+    .ops-paid-table tr:last-child td { border-bottom: none; }
+
+    @media (max-width:768px) {
+      .ops-section { padding: 3rem 0; }
+      .ops-table { font-size: .78rem; }
+      .ops-table th, .ops-table td { padding: .75rem .9rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV (simplified) -->
+<header class="nav scrolled" id="nav">
+  <a class="nav__logo" href="index.html">
+    <span class="nav__logo-kr">공간</span>
+    <span class="nav__logo-sep">/</span>
+    <span class="nav__logo-en">GONGGAN</span>
+  </a>
+  <div class="nav__right">
+    <a href="index.html#contact" class="nav__cta">상담 신청</a>
+  </div>
+</header>
+
+<main class="ops-page">
+  <div class="container">
+
+    <!-- Page header -->
+    <div class="ops-hero">
+      <span class="label">운영 안내</span>
+      <h1>홈페이지 운영 구조와<br>비용에 대해.</h1>
+      <p>공간이 제작하는 웹사이트는 어떤 인프라 위에서 작동하는지, 비용은 어떻게 구성되는지 명확하게 안내드립니다.</p>
+    </div>
+
+    <!-- Section 1: Infrastructure -->
+    <div class="ops-section">
+      <h2>홈페이지는 무엇 위에서 작동하나요?</h2>
+      <p>공간이 제작하는 모든 웹사이트는 클라우드 애플리케이션 플랫폼인 <strong style="color:var(--text)">Lovable Cloud</strong> 위에서 운영됩니다.</p>
+
+      <div class="ops-platform">
+        <p>Lovable Cloud가 처리하는 것:</p>
+        <div class="ops-platform-items">
+          <div class="ops-platform-item"><strong>호스팅</strong> — 24시간 접속 가능한 서버 운영</div>
+          <div class="ops-platform-item"><strong>데이터베이스</strong> — 콘텐츠 저장 및 전 기기 즉시 반영</div>
+          <div class="ops-platform-item"><strong>보안 · SSL</strong> — HTTPS 암호화 및 보안 인증서 자동 갱신</div>
+          <div class="ops-platform-item"><strong>백엔드 인프라</strong> — 서버 설정·유지·모니터링 일체</div>
+        </div>
+        <p class="ops-analogy">전기 없이 가게 문을 열 수 없듯, 홈페이지도 이 플랫폼 없이는 켜질 수 없습니다.</p>
+      </div>
+    </div>
+
+    <!-- Section 2: Costs -->
+    <div class="ops-section">
+      <h2>제가 내는 돈은 정확히 무엇인가요?</h2>
+      <p>제작비 외에 사이트를 유지하기 위한 두 가지 정기 비용이 있습니다. 아래 표에 구조를 정리했습니다.</p>
+
+      <div class="ops-table-wrap">
+        <table class="ops-table">
+          <thead>
+            <tr>
+              <th>항목</th>
+              <th>무엇인가</th>
+              <th>주기</th>
+              <th>부담 주체</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>운영 플랫폼<br><small style="color:var(--text-dim);font-size:.75rem">Lovable Cloud</small></td>
+              <td>서버·DB·보안 유지</td>
+              <td>월</td>
+              <td>2개월차부터 고객</td>
+            </tr>
+            <tr>
+              <td>도메인</td>
+              <td>인터넷 주소 사용권</td>
+              <td>연 1회</td>
+              <td>2년차부터 고객</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="ops-table-note">최초 1개월 운영비와 최초 1년 도메인 등록비는 제작비에 포함됩니다. 이 비용은 고객 명의 계정으로 등록되며, 공간이 중간에서 수취하는 수수료가 아닙니다. 소유권은 100% 고객에게 있습니다.</p>
+
+      <p class="ops-footnote">※ 트래픽 급증 등으로 클라우드 사용량이 크게 증가할 경우 인프라 제공사 정책에 따라 추가 비용이 발생할 수 있으며, 이는 클라우드 인프라 비용으로 '공간'과 무관합니다.</p>
+    </div>
+
+    <!-- Section 3: Non-payment -->
+    <div class="ops-section">
+      <h2>비용 미납 시 안내 및 책임 범위</h2>
+
+      <div class="ops-list">
+        <div class="ops-list-item">
+          <h4>운영 플랫폼 (월) 미납 시</h4>
+          <p>홈페이지 일시 중단 및 접속 불가가 발생할 수 있습니다. 미납 기간이 길어지면 서버 상의 데이터가 영구 삭제될 수 있으며, 이 경우 복구가 불가능합니다.</p>
+        </div>
+        <div class="ops-list-item">
+          <h4>도메인 (연) 미납 시</h4>
+          <p>주소 접속이 불가능해지며, 일정 기간 이후에는 제3자가 해당 도메인을 선점할 수 있습니다. 타인이 선점하면 복구가 불가능합니다.</p>
+        </div>
+      </div>
+
+      <div class="ops-warning">
+        <strong>책임 범위 안내.</strong> 공간은 완성·인계까지 책임지는 일회성 제작 서비스입니다. 인계 이후 비용 납부 및 관리는 전적으로 고객의 책임입니다. 비용 미납으로 인한 서비스 중단·데이터 손실·도메인 상실·영업상 손해에 대해 공간은 어떠한 법적·금전적 책임도 지지 않습니다.<br><br>
+        <strong>권고:</strong> 자동 결제 수단을 유효하게 유지하시고, 도메인 갱신 알림을 정기적으로 확인하시기 바랍니다.
+      </div>
+    </div>
+
+    <!-- Section 4: Post-handover -->
+    <div class="ops-section">
+      <h2>인계 후 추가 작업</h2>
+
+      <span class="ops-free-tag">관리자 페이지 수정 — 항상 무료</span>
+      <p>인계된 관리자 페이지를 통해 직접 수정하실 수 있는 모든 작업(텍스트·사진·가격·메뉴 등)은 언제나 무료입니다. 별도 연락이나 비용 없이 사장님이 직접 처리하실 수 있습니다.</p>
+
+      <p>관리자 페이지 범위를 넘는 작업은 별도 견적으로 진행됩니다.</p>
+
+      <table class="ops-paid-table">
+        <tbody>
+          <tr>
+            <td>디자인 변경</td>
+            <td>— </td>
+            <td>80,000원~</td>
+          </tr>
+          <tr>
+            <td>페이지 · 섹션 추가</td>
+            <td>— </td>
+            <td>150,000원~</td>
+          </tr>
+          <tr>
+            <td>신규 기능 개발</td>
+            <td>— </td>
+            <td>별도 견적</td>
+          </tr>
+          <tr>
+            <td>전면 리뉴얼</td>
+            <td>— </td>
+            <td>별도 견적</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container footer__inner" style="grid-template-columns:1fr 1fr; gap:2rem; padding:3rem 2rem 2rem;">
+    <div class="footer__brand">
+      <p class="footer__logo">공간 <span class="footer__logo-sep">/</span> GONGGAN</p>
+      <p class="footer__slogan">당신의 공간을, 온라인에</p>
+    </div>
+    <div class="footer__contact-col">
+      <p class="footer__nav-label">연락</p>
+      <a href="tel:01048565543">010-4856-5543</a>
+      <a href="mailto:seonju5543@gmail.com">seonju5543@gmail.com</a>
+    </div>
+  </div>
+  <div class="footer__bottom"><p>© 2026 GONGGAN · 서울 KR</p></div>
+</footer>
+
+<script>
+  // Nav scroll state
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 0);
+  }, { passive: true });
+
+  // Theme persistence
+  const savedTheme = localStorage.getItem('gg-theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+</script>
+</body>
+</html>
