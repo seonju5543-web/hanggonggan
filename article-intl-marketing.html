@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>역시는 역시, 이준원·이선주 국마 TOP 10 공동 기재 — 캠퍼스 뉴스</title>
+  <meta property="og:title" content="역시는 역시, 이준원·이선주 국마 TOP 10 공동 기재" />
+  <meta property="og:description" content="국제마케팅 최종 성적에서 이준원과 이선주가 나란히 상위 10위권에 이름을 올렸다." />
+  <meta property="og:image" content="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200&q=80" />
+  <meta property="og:type" content="article" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600;700&family=Noto+Sans+KR:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #faf9f7;
+      --surface:  #ffffff;
+      --ink:      #1a1916;
+      --ink-mid:  #4a4843;
+      --ink-lt:   #7a776f;
+      --gold:     #b8882a;
+      --gold-lt:  #d4a84b;
+      --red:      #c0392b;
+      --border:   #e8e4de;
+      --ff-serif: 'Noto Serif KR', serif;
+      --ff-sans:  'Noto Sans KR', sans-serif;
+      --ff-disp:  'Cormorant Garamond', serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--ff-serif);
+      font-weight: 300;
+      line-height: 1.8;
+    }
+    a { text-decoration: none; color: inherit; }
+    img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+    /* ── HEADER ── */
+    .site-header {
+      background: var(--surface);
+      border-bottom: 3px solid var(--ink);
+      padding: 1rem 0 0;
+    }
+    .site-header__inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+    .site-header__top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: .8rem;
+    }
+    .site-logo {
+      font-family: var(--ff-sans);
+      font-size: .65rem;
+      font-weight: 500;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--ink-lt);
+    }
+    .site-logo strong {
+      display: block;
+      font-family: var(--ff-serif);
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: 0;
+      color: var(--ink);
+      line-height: 1;
+      margin-top: .1rem;
+    }
+    .site-date {
+      font-family: var(--ff-sans);
+      font-size: .72rem;
+      color: var(--ink-lt);
+      text-align: right;
+    }
+    .site-nav {
+      border-top: 1px solid var(--border);
+      padding: .55rem 0;
+      display: flex;
+      gap: 2rem;
+    }
+    .site-nav a {
+      font-family: var(--ff-sans);
+      font-size: .75rem;
+      font-weight: 500;
+      letter-spacing: .05em;
+      color: var(--ink-mid);
+      transition: color .2s;
+    }
+    .site-nav a:hover { color: var(--gold); }
+    .site-nav a.active { color: var(--red); font-weight: 700; }
+
+    /* ── ARTICLE LAYOUT ── */
+    .article-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem 5rem;
+    }
+
+    /* category */
+    .article-category {
+      display: inline-block;
+      font-family: var(--ff-sans);
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--surface);
+      background: var(--red);
+      padding: .25rem .75rem;
+      margin-bottom: 1.2rem;
+    }
+
+    /* headline */
+    .article-headline {
+      font-family: var(--ff-serif);
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      font-weight: 700;
+      line-height: 1.25;
+      letter-spacing: -.01em;
+      color: var(--ink);
+      margin-bottom: 1rem;
+      border-left: 5px solid var(--gold);
+      padding-left: 1rem;
+    }
+
+    /* deck */
+    .article-deck {
+      font-family: var(--ff-serif);
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var(--ink-mid);
+      line-height: 1.7;
+      margin-bottom: 1.8rem;
+    }
+
+    /* meta */
+    .article-meta {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 1rem 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2rem;
+      font-family: var(--ff-sans);
+      font-size: .78rem;
+      color: var(--ink-lt);
+      flex-wrap: wrap;
+    }
+    .article-meta__author strong { color: var(--ink); font-weight: 600; }
+    .article-meta__sep { color: var(--border); }
+    .article-meta__tag {
+      background: #f0ece5;
+      border-radius: 3px;
+      padding: .15rem .55rem;
+      font-size: .65rem;
+      letter-spacing: .1em;
+      font-weight: 600;
+      color: var(--ink-mid);
+    }
+
+    /* thumbnail */
+    .article-thumb {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 8;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: .8rem;
+      background: #e8e4de;
+    }
+    .article-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform .5s ease;
+    }
+    .article-thumb:hover img { transform: scale(1.02); }
+    .article-thumb__caption {
+      font-family: var(--ff-sans);
+      font-size: .7rem;
+      color: var(--ink-lt);
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    /* body */
+    .article-body {
+      font-family: var(--ff-serif);
+      font-size: 1.05rem;
+      line-height: 2;
+      color: var(--ink);
+    }
+    .article-body p { margin-bottom: 1.5rem; }
+    .article-body p:first-child::first-letter {
+      font-family: var(--ff-disp);
+      font-size: 4rem;
+      font-weight: 400;
+      line-height: .8;
+      float: left;
+      margin-right: .1em;
+      color: var(--gold);
+    }
+
+    .article-body strong { font-weight: 700; color: var(--ink); }
+
+    /* pull quote */
+    .pull-quote {
+      margin: 2.5rem 0;
+      padding: 1.5rem 2rem;
+      border-left: 4px solid var(--gold);
+      background: #fdf7ed;
+      border-radius: 0 4px 4px 0;
+    }
+    .pull-quote p {
+      font-family: var(--ff-serif);
+      font-size: 1.15rem;
+      font-style: italic;
+      color: var(--ink-mid);
+      margin-bottom: .5rem !important;
+    }
+    .pull-quote cite {
+      font-family: var(--ff-sans);
+      font-size: .75rem;
+      color: var(--ink-lt);
+      font-style: normal;
+      letter-spacing: .05em;
+    }
+
+    /* highlight box */
+    .highlight-box {
+      margin: 2.5rem 0;
+      padding: 1.5rem 2rem;
+      background: var(--ink);
+      color: #fdf7ed;
+      border-radius: 4px;
+    }
+    .highlight-box__label {
+      font-family: var(--ff-sans);
+      font-size: .6rem;
+      font-weight: 700;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: var(--gold-lt);
+      margin-bottom: .8rem;
+    }
+    .highlight-box p {
+      font-family: var(--ff-serif);
+      font-size: .95rem;
+      color: #e8e4de;
+      margin-bottom: 0 !important;
+      line-height: 1.9;
+    }
+
+    /* divider */
+    .article-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2.5rem 0;
+    }
+
+    /* tags footer */
+    .article-tags {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 2px solid var(--ink);
+      display: flex;
+      gap: .5rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .article-tags__label {
+      font-family: var(--ff-sans);
+      font-size: .7rem;
+      font-weight: 700;
+      color: var(--ink-mid);
+      letter-spacing: .1em;
+      margin-right: .3rem;
+    }
+    .tag {
+      font-family: var(--ff-sans);
+      font-size: .7rem;
+      padding: .25rem .75rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--ink-mid);
+      transition: all .2s;
+      cursor: default;
+    }
+    .tag:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* share */
+    .article-share {
+      margin-top: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-family: var(--ff-sans);
+      font-size: .72rem;
+      color: var(--ink-lt);
+    }
+    .share-btn {
+      padding: .4rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: .68rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      color: var(--ink-mid);
+      background: var(--surface);
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .share-btn:hover { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+
+    /* footer */
+    .site-footer {
+      background: var(--ink);
+      color: #7a776f;
+      text-align: center;
+      padding: 2rem;
+      font-family: var(--ff-sans);
+      font-size: .72rem;
+      letter-spacing: .05em;
+    }
+    .site-footer a { color: var(--gold-lt); }
+
+    @media (max-width: 600px) {
+      .article-headline { font-size: 1.6rem; }
+      .site-nav { gap: 1rem; overflow-x: auto; white-space: nowrap; padding-bottom: .5rem; }
+      .pull-quote { padding: 1.2rem 1.2rem; }
+      .article-body p:first-child::first-letter { font-size: 3rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SITE HEADER -->
+  <header class="site-header">
+    <div class="site-header__inner">
+      <div class="site-header__top">
+        <div class="site-logo">
+          Campus Press
+          <strong>캠퍼스 프레스</strong>
+        </div>
+        <div class="site-date">
+          <div>2026년 6월 22일 (월)</div>
+          <div>학사 뉴스 · 성적 특보</div>
+        </div>
+      </div>
+      <nav class="site-nav">
+        <a href="#">홈</a>
+        <a href="#" class="active">학사 뉴스</a>
+        <a href="#">캠퍼스 라이프</a>
+        <a href="#">취업·진로</a>
+        <a href="#">오피니언</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ARTICLE -->
+  <main class="article-wrap">
+
+    <span class="article-category">학사 뉴스</span>
+
+    <h1 class="article-headline">
+      역시는 역시, 이준원·이선주<br/>국마 TOP 10에 공동 기재
+    </h1>
+
+    <p class="article-deck">
+      국제마케팅 최종 성적이 공개된 가운데, 이준원과 이선주가 상위 10위권에 나란히 이름을 올려 화제다. 주변 학우들은 "예상했던 결과"라며 담담한 반응을 보였다.
+    </p>
+
+    <div class="article-meta">
+      <span class="article-meta__author">기자 <strong>캠퍼스 프레스 편집부</strong></span>
+      <span class="article-meta__sep">|</span>
+      <span>2026. 06. 22</span>
+      <span class="article-meta__sep">|</span>
+      <span class="article-meta__tag">국제마케팅</span>
+      <span class="article-meta__tag">TOP 10</span>
+      <span class="article-meta__tag">성적 특보</span>
+    </div>
+
+    <!-- THUMBNAIL -->
+    <figure class="article-thumb">
+      <img
+        src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200&q=80"
+        alt="대학 강의실 — 국제마케팅 수업 이미지"
+        loading="eager"
+      />
+    </figure>
+    <p class="article-thumb__caption">▲ 대학 강의실에서 수업에 집중하는 학생들. (이미지: Unsplash)</p>
+
+    <!-- BODY -->
+    <article class="article-body">
+
+      <p>
+        국제마케팅(이하 <strong>'국마'</strong>) 수업의 최종 성적이 공개된 가운데,
+        <strong>이준원</strong>과 <strong>이선주</strong>가 상위 10위권에 나란히 이름을 올려
+        학내 커뮤니티의 이목을 집중시키고 있다. 두 사람은 국마 수강생 전체 중 단 10명에게만
+        주어지는 영예로운 TOP 10 명단에 공동으로 이름을 새겼다.
+      </p>
+
+      <div class="pull-quote">
+        <p>"이준원이랑 이선주가 TOP 10이라고 해서 솔직히 놀랍지도 않았어요. 그냥 '아, 역시' 했죠."</p>
+        <cite>— 같은 수업을 들은 동기 A씨</cite>
+      </div>
+
+      <p>
+        국제마케팅 수업은 글로벌 시장 분석, 소비자 행동 이론, 해외 진출 전략 수립 등
+        높은 수준의 분석력과 창의적 사고를 동시에 요구하는 과목으로, 매 학기 학점 취득에
+        어려움을 겪는 수강생이 상당수인 것으로 알려져 있다. 이런 환경에서 두 사람이 나란히
+        최상위권에 안착했다는 점에서, 이번 결과는 결코 가볍게 볼 수 없다는 평가다.
+      </p>
+
+      <hr class="article-divider" />
+
+      <p>
+        주변 동기들의 반응은 놀라움보다 <strong>"역시는 역시"</strong>라는 공감 어린 탄성에
+        가까웠다. 이준원은 평소에도 수업 참여도가 높고 발표 때마다 날카로운 시장 분석을
+        선보인 것으로 알려져 있으며, 이선주 역시 팀 프로젝트에서 전략 기획을 주도하며
+        교수진으로부터 긍정적인 평가를 받아 온 것으로 전해진다.
+      </p>
+
+      <div class="highlight-box">
+        <div class="highlight-box__label">이번 학기 국제마케팅 주요 평가 항목</div>
+        <p>
+          · 글로벌 시장 진출 전략 보고서 (30%)<br/>
+          · 중간·기말 필기 시험 (40%)<br/>
+          · 팀 프레젠테이션 및 동료 평가 (20%)<br/>
+          · 출석 및 수업 참여도 (10%)
+        </p>
+      </div>
+
+      <p>
+        이번 TOP 10 공동 기재 소식이 학내에 퍼지자, 학우들 사이에서는 두 사람을 향한
+        축하 메시지가 이어졌다. 한 동기는 "함께 팀 과제할 때 방향을 잘 잡아준 덕분에
+        우리 팀도 좋은 점수를 받았다"고 전하기도 했다.
+      </p>
+
+      <div class="pull-quote">
+        <p>"국마는 확실히 재미있는 과목이에요. 같이 열심히 한 것 같아서 기쁘네요."</p>
+        <cite>— 이선주 (본인 코멘트)</cite>
+      </div>
+
+      <p>
+        이준원 역시 "생각보다 결과가 좋아서 기쁘다"면서도 "같이 수업 들은 학우들 모두 열심히
+        한 결과라고 생각한다"며 겸손한 소감을 밝혔다.
+      </p>
+
+      <p>
+        두 사람의 이번 성과는 앞으로 진로 탐색 과정에서도 유의미한 포트폴리오가 될 것으로
+        기대된다. 국제마케팅 분야는 글로벌 기업들이 지속적으로 인재를 찾는 영역인 만큼,
+        학업 성취도와 실무 역량을 함께 갖춘 두 사람에게 더욱 넓은 기회의 문이 열릴 전망이다.
+      </p>
+
+      <p>
+        <strong>역시는 역시</strong> — 이번 국마 TOP 10 공동 기재는 단순한 성적 공개를 넘어,
+        두 사람의 노력과 실력이 공식적으로 인정받는 순간이 되었다. 캠퍼스 프레스는 두 사람의
+        다음 행보를 응원한다.
+      </p>
+
+    </article>
+
+    <!-- TAGS & SHARE -->
+    <div class="article-tags">
+      <span class="article-tags__label">태그</span>
+      <span class="tag">#이준원</span>
+      <span class="tag">#이선주</span>
+      <span class="tag">#국제마케팅</span>
+      <span class="tag">#TOP10</span>
+      <span class="tag">#성적특보</span>
+      <span class="tag">#역시는역시</span>
+    </div>
+
+    <div class="article-share">
+      <span>공유하기</span>
+      <button class="share-btn" onclick="navigator.clipboard.writeText(location.href).then(()=>alert('링크가 복사되었습니다!'))">🔗 링크 복사</button>
+    </div>
+
+  </main>
+
+  <!-- SITE FOOTER -->
+  <footer class="site-footer">
+    <p>© 2026 캠퍼스 프레스 · 학내 뉴스 미디어</p>
+    <p style="margin-top:.4rem;">무단 전재 및 재배포를 금합니다.</p>
+  </footer>
+
+</body>
+</html>
