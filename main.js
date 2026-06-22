@@ -156,3 +156,120 @@ document.querySelectorAll('.menu__row').forEach(row => {
     row.style.paddingLeft = '';
   });
 });
+
+/* =====================
+   GALLERY LIGHTBOX
+===================== */
+const lightbox     = document.getElementById('lightbox');
+const lightboxImg  = document.getElementById('lightboxImg');
+const lightboxClose= document.getElementById('lightboxClose');
+const lightboxPrev = document.getElementById('lightboxPrev');
+const lightboxNext = document.getElementById('lightboxNext');
+const galleryItems = Array.from(document.querySelectorAll('.gallery__item'));
+let currentLightbox = 0;
+
+function openLightbox(index) {
+  currentLightbox = index;
+  lightboxImg.src = galleryItems[index].dataset.src;
+  lightboxImg.alt = galleryItems[index].querySelector('img').alt;
+  lightbox.classList.add('open');
+  lightbox.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  lightbox.classList.remove('open');
+  lightbox.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  setTimeout(() => { lightboxImg.src = ''; }, 350);
+}
+
+function shiftLightbox(dir) {
+  currentLightbox = (currentLightbox + dir + galleryItems.length) % galleryItems.length;
+  lightboxImg.style.opacity = '0';
+  setTimeout(() => {
+    lightboxImg.src = galleryItems[currentLightbox].dataset.src;
+    lightboxImg.alt = galleryItems[currentLightbox].querySelector('img').alt;
+    lightboxImg.style.opacity = '1';
+  }, 150);
+}
+
+lightboxImg.style.transition = 'opacity .15s ease';
+
+galleryItems.forEach((item, i) => {
+  item.addEventListener('click', () => openLightbox(i));
+});
+lightboxClose.addEventListener('click', closeLightbox);
+lightboxPrev.addEventListener('click', () => shiftLightbox(-1));
+lightboxNext.addEventListener('click', () => shiftLightbox(1));
+lightbox.addEventListener('click', (e) => {
+  if (e.target === lightbox) closeLightbox();
+});
+document.addEventListener('keydown', (e) => {
+  if (!lightbox.classList.contains('open')) return;
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowLeft')  shiftLightbox(-1);
+  if (e.key === 'ArrowRight') shiftLightbox(1);
+});
+
+/* Register gallery stagger with the main observer */
+const galleryGrid = document.querySelector('.gallery__grid');
+if (galleryGrid) staggerObserver.observe(galleryGrid);
+
+/* =====================
+   RESERVATION FORM
+===================== */
+const form        = document.getElementById('reservationForm');
+const formSuccess = document.getElementById('formSuccess');
+const formSubmit  = document.getElementById('formSubmit');
+let guestCount    = 2;
+
+document.getElementById('guestsMinus').addEventListener('click', () => {
+  if (guestCount <= 1) return;
+  guestCount--;
+  document.getElementById('guestsCount').textContent = guestCount;
+  document.getElementById('res-guests').value = guestCount;
+});
+document.getElementById('guestsPlus').addEventListener('click', () => {
+  if (guestCount >= 8) return;
+  guestCount++;
+  document.getElementById('guestsCount').textContent = guestCount;
+  document.getElementById('res-guests').value = guestCount;
+});
+
+/* Set min date to today */
+const dateInput = document.getElementById('res-date');
+if (dateInput) {
+  const today = new Date().toISOString().split('T')[0];
+  dateInput.min = today;
+}
+
+function validateField(el) {
+  const valid = el.value.trim() !== '';
+  el.classList.toggle('invalid', !valid);
+  return valid;
+}
+
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const fields = form.querySelectorAll('[required]');
+  let allValid = true;
+  fields.forEach(f => { if (!validateField(f)) allValid = false; });
+  if (!allValid) return;
+
+  formSubmit.disabled = true;
+  formSubmit.querySelector('.form__submit-text').textContent = '전송 중…';
+
+  setTimeout(() => {
+    form.querySelectorAll('.form__field, .form__row, .form__notice').forEach(el => {
+      el.style.display = 'none';
+    });
+    formSubmit.style.display = 'none';
+    formSuccess.classList.add('show');
+  }, 900);
+});
+
+form.querySelectorAll('[required]').forEach(el => {
+  el.addEventListener('blur', () => validateField(el));
+  el.addEventListener('input', () => el.classList.remove('invalid'));
+});
