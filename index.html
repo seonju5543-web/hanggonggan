@@ -3,9 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>한장 — 한국외대 장학금, 한 번에</title>
-  <meta name="description" content="한국외국어대학교 학생을 위한 맞춤 장학금 매칭 · 원클릭 신청 서비스" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>" />
+  <title>한장 — 대학 장학금, 한 번에</title>
+  <meta name="description" content="전국 대학생을 위한 맞춤 장학금 매칭 · 원클릭 신청 서비스" />
+  <meta name="theme-color" content="#101d3d" />
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -18,9 +22,11 @@
       <!-- Step 0: 인트로 -->
       <div class="onboard-step" data-step="0">
         <div class="onboard-hero">
-          <div class="onboard-logo">🎓</div>
+          <div class="onboard-logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/><path d="M22 10v6"/></svg>
+          </div>
           <h1>한장</h1>
-          <p class="onboard-tagline">한국외대 장학금,<br /><strong>한 번에 찾고 한 번에 신청</strong>하세요</p>
+          <p class="onboard-tagline">대학 장학금,<br /><strong>한 번에 찾고 한 번에 신청</strong>하세요</p>
           <ul class="onboard-points">
             <li><span class="pt-icon">🔍</span> 교내·교외 장학금을 내 조건으로 자동 매칭</li>
             <li><span class="pt-icon">⚡</span> 증명서 자동 첨부로 원클릭 신청</li>
@@ -37,18 +43,23 @@
       <div class="onboard-step" data-step="1" hidden>
         <div class="onboard-body">
           <h2>학적 정보를 알려주세요</h2>
-          <p class="onboard-sub">한국외국어대학교 재학 기준으로 매칭해요</p>
+          <p class="onboard-sub">전국 모든 대학을 지원해요</p>
           <label class="field">
-            <span class="field-label">이름 (선택)</span>
-            <input type="text" id="in-name" placeholder="예: 김외대" maxlength="12" />
+            <span class="field-label">학교</span>
+            <input type="text" id="in-school" list="univ-list" placeholder="학교명을 검색하세요" maxlength="30" />
+            <datalist id="univ-list"></datalist>
           </label>
-          <label class="field">
-            <span class="field-label">단과대학</span>
-            <select id="in-college"></select>
-          </label>
+          <div class="field">
+            <span class="field-label">전공 계열</span>
+            <div class="chip-group" id="in-track"></div>
+          </div>
           <label class="field">
             <span class="field-label">학과 / 전공 (선택)</span>
-            <input type="text" id="in-major" placeholder="예: 영어학과" maxlength="30" />
+            <input type="text" id="in-major" placeholder="예: 컴퓨터공학과" maxlength="30" />
+          </label>
+          <label class="field">
+            <span class="field-label">이름 (선택)</span>
+            <input type="text" id="in-name" placeholder="예: 김한장" maxlength="12" />
           </label>
           <div class="field">
             <span class="field-label">학년</span>
@@ -135,11 +146,16 @@
     <!-- ============ 홈 ============ -->
     <section id="screen-home" class="screen" hidden>
       <header class="home-header">
-        <div>
-          <p class="home-greet" id="home-greet">안녕하세요!</p>
-          <p class="home-school">한국외국어대학교</p>
+        <div class="home-id">
+          <div class="avatar" id="home-avatar">학</div>
+          <div>
+            <p class="home-greet" id="home-greet">안녕하세요!</p>
+            <p class="home-school" id="home-school">대학 미설정</p>
+          </div>
         </div>
-        <button class="icon-btn" id="btn-edit-profile" title="프로필 수정">⚙️</button>
+        <button class="icon-btn" id="btn-edit-profile" title="프로필 수정" aria-label="프로필 수정">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33h.01a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51h.01a1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82v.01a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        </button>
       </header>
 
       <div class="hero-card">
@@ -190,15 +206,27 @@
         <button class="my-menu-item" id="btn-my-edit">프로필 수정</button>
         <button class="my-menu-item danger" id="btn-reset">데이터 초기화</button>
       </div>
-      <p class="data-note">한장 v0.1 (MVP) · 한국외국어대학교 우선 지원<br />추후 대학 확대 예정</p>
+      <p class="data-note">한장 v0.2 (MVP) · 전국 대학 지원</p>
     </section>
 
     <!-- ============ 하단 내비게이션 ============ -->
     <nav id="bottom-nav" class="bottom-nav" hidden>
-      <button class="nav-item active" data-nav="home"><span class="nav-icon">🏠</span>홈</button>
-      <button class="nav-item" data-nav="explore"><span class="nav-icon">🎓</span>장학금</button>
-      <button class="nav-item" data-nav="applications"><span class="nav-icon">📋</span>신청내역</button>
-      <button class="nav-item" data-nav="my"><span class="nav-icon">👤</span>MY</button>
+      <button class="nav-item active" data-nav="home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>
+        홈
+      </button>
+      <button class="nav-item" data-nav="explore">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg>
+        장학금
+      </button>
+      <button class="nav-item" data-nav="applications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>
+        신청내역
+      </button>
+      <button class="nav-item" data-nav="my">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
+        MY
+      </button>
     </nav>
 
     <!-- ============ 상세 바텀시트 ============ -->

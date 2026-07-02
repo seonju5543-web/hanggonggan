@@ -2,7 +2,7 @@
    한장 — 앱 로직 (매칭 엔진 · 화면 · 신청 플로우)
    ============================================================ */
 
-const STORAGE_KEY = 'hanjang.v1';
+const STORAGE_KEY = 'hanjang.v2';
 const TODAY = new Date();
 
 /* ---------------- 상태 ---------------- */
@@ -19,6 +19,20 @@ function loadState() {
 }
 function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+/* ---------------- 장학금 목록 (교외 공통 + 재학 대학 교내) ---------------- */
+let campusCache = { school: null, list: [] };
+function allScholarships() {
+  const school = state.profile ? state.profile.school : null;
+  if (!school) return NATIONAL_SCHOLARSHIPS;
+  if (campusCache.school !== school) {
+    campusCache = { school, list: buildCampusScholarships(school) };
+  }
+  return NATIONAL_SCHOLARSHIPS.concat(campusCache.list);
+}
+function findSch(id) {
+  return allScholarships().find((s) => s.id === id) || null;
 }
 
 /* ---------------- 매칭 엔진 ----------------
@@ -52,10 +66,10 @@ function evaluate(sch, p) {
     ok = false; reasons.push('신입학 첫 학기 학생만 지원 가능');
   }
 
-  if (e.colleges && !e.colleges.includes(p.college)) {
-    ok = false; reasons.push('지원 대상 계열(단과대학)이 아니에요');
-  } else if (e.colleges) {
-    reasons.push('지원 대상 계열 충족');
+  if (e.tracks && !e.tracks.includes(p.track)) {
+    ok = false; reasons.push('지원 대상 전공 계열이 아니에요');
+  } else if (e.tracks) {
+    reasons.push('전공 계열 요건 충족');
   }
 
   if (e.flagsAny) {
@@ -87,7 +101,7 @@ function evaluate(sch, p) {
 
 function getMatches() {
   const p = state.profile;
-  return SCHOLARSHIPS.map((s) => ({ sch: s, result: evaluate(s, p) }));
+  return allScholarships().map((s) => ({ sch: s, result: evaluate(s, p) }));
 }
 
 /* ---------------- 유틸 ---------------- */
@@ -128,6 +142,18 @@ function toast(msg) {
   }, 2200);
 }
 
+/* 숫자 카운트업 애니메이션 */
+function countUp(el, target, formatter, duration = 900) {
+  const start = performance.now();
+  function tick(now) {
+    const t = Math.min(1, (now - start) / duration);
+    const eased = 1 - Math.pow(1 - t, 3);
+    el.textContent = formatter(Math.round(target * eased));
+    if (t < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
 /* ---------------- 화면 전환 ---------------- */
 function showScreen(name) {
   ['onboarding', 'home', 'explore', 'applications', 'my'].forEach((n) => {
@@ -154,24 +180,28 @@ function renderOnboardStep() {
 }
 
 function initOnboarding() {
-  const sel = $('#in-college');
-  sel.innerHTML = COLLEGES.map((c) => `<option value="${c}">${c}</option>`).join('');
+  $('#univ-list').innerHTML = UNIVERSITIES.map((u) => `<option value="${u}">`).join('');
+  $('#in-track').innerHTML = TRACKS.map(
+    (t) => `<button class="chip" data-value="${t.id}">${t.label}</button>`
+  ).join('');
 
   // 기존 프로필이 있으면 값 채우기 (프로필 수정 진입)
   const p = state.profile;
   if (p) {
     $('#in-name').value = p.name || '';
-    sel.value = p.college;
+    $('#in-school').value = p.school || '';
     $('#in-major').value = p.major || '';
     $('#in-gpa').value = p.gpa != null ? p.gpa : '';
     $('#in-bracket').value = p.bracket != null ? String(p.bracket) : '';
     $('#in-cert').checked = !!p.cert;
     $('#in-exchange').checked = !!p.exchange;
+    setChip('#in-track', p.track);
     setChip('#in-year', String(p.year));
     setChip('#in-status', p.status);
     setChip('#in-region', p.region);
     $$('#in-flags input').forEach((c) => (c.checked = p.flags.includes(c.value)));
   } else {
+    setChip('#in-track', 'humanities');
     setChip('#in-year', '1');
     setChip('#in-status', 'enrolled');
     setChip('#in-region', 'seoul');
@@ -195,7 +225,8 @@ function collectProfile() {
   const bracketRaw = $('#in-bracket').value;
   return {
     name: $('#in-name').value.trim(),
-    college: $('#in-college').value,
+    school: $('#in-school').value.trim(),
+    track: getChip('#in-track'),
     major: $('#in-major').value.trim(),
     year: Number(getChip('#in-year')),
     status: getChip('#in-status'),
@@ -231,18 +262,20 @@ function schCard(sch, result, { compact = false } = {}) {
 function renderHome() {
   const p = state.profile;
   $('#home-greet').textContent = p.name ? `${p.name}님, 안녕하세요!` : '안녕하세요!';
+  $('#home-school').textContent = p.school || '대학 미설정';
+  $('#home-avatar').textContent = (p.name || '학').charAt(0);
 
   const matches = getMatches();
   const applyable = matches.filter((m) => ['eligible', 'selective'].includes(m.result.status));
   const notApplied = applyable.filter((m) => !state.applications.some((a) => a.id === m.sch.id) && dday(m.sch.deadline).days >= 0);
   const total = applyable.reduce((sum, m) => sum + m.sch.amountValue, 0);
 
-  $('#hero-amount').textContent = `최대 ${won(total)}`;
+  countUp($('#hero-amount'), total, (v) => `최대 ${won(v)}`);
   $('#hero-count').textContent = `신청 가능 ${applyable.filter((m) => m.result.status === 'eligible').length}건 · 선발 심사 ${applyable.filter((m) => m.result.status === 'selective').length}건`;
 
   const btn = $('#btn-apply-all');
   btn.disabled = notApplied.length === 0;
-  btn.textContent = notApplied.length ? `⚡ ${notApplied.length}건 한 번에 신청하기` : '✅ 가능한 장학금을 모두 신청했어요';
+  btn.textContent = notApplied.length ? `⚡ ${notApplied.length}건 한 번에 신청하기` : '✓ 가능한 장학금을 모두 신청했어요';
 
   // 마감 임박 (신청 가능한 것 중 마감 가까운 순 3개)
   const upcoming = applyable
@@ -254,7 +287,7 @@ function renderHome() {
     : '<p class="empty">지금 신청 가능한 장학금이 없어요. 프로필을 업데이트해 보세요.</p>';
 
   // 신청 현황 미리보기
-  const recent = state.applications.slice(-2).reverse();
+  const recent = state.applications.slice(-2).reverse().filter((a) => findSch(a.id));
   $('#home-apps').innerHTML = recent.length
     ? recent.map(appCard).join('')
     : '<p class="empty">아직 신청한 장학금이 없어요.</p>';
@@ -281,7 +314,8 @@ function renderExplore() {
 
 /* ---------------- 상세 바텀시트 ---------------- */
 function openDetail(id) {
-  const sch = SCHOLARSHIPS.find((s) => s.id === id);
+  const sch = findSch(id);
+  if (!sch) return;
   const result = evaluate(sch, state.profile);
   const meta = STATUS_META[result.status];
   const d = dday(sch.deadline);
@@ -331,7 +365,7 @@ function openDetail(id) {
         <p class="applied-at">${app.appliedAt} 신청 완료</p>` : ''}
 
       <button class="btn btn-primary btn-lg" id="btn-apply-one" ${canApply ? '' : 'disabled'}>
-        ${app ? '✅ 신청 완료됨' : d.days < 0 ? '마감된 장학금이에요' : canApply ? '⚡ 원클릭 신청하기' : '요건 미충족으로 신청할 수 없어요'}
+        ${app ? '✓ 신청 완료됨' : d.days < 0 ? '마감된 장학금이에요' : canApply ? '⚡ 원클릭 신청하기' : '요건 미충족으로 신청할 수 없어요'}
       </button>
     </div>`;
 
@@ -396,7 +430,8 @@ function applyAll() {
 
 /* ---------------- 신청 내역 ---------------- */
 function appCard(app) {
-  const sch = SCHOLARSHIPS.find((s) => s.id === app.id);
+  const sch = findSch(app.id);
+  if (!sch) return '';
   return `
     <button class="sch-card" data-detail="${sch.id}">
       <div class="sch-top">
@@ -410,11 +445,8 @@ function appCard(app) {
 }
 
 function renderApplications() {
-  const apps = state.applications.slice().reverse();
-  const totalExpected = apps.reduce((sum, a) => {
-    const sch = SCHOLARSHIPS.find((s) => s.id === a.id);
-    return sum + (sch ? sch.amountValue : 0);
-  }, 0);
+  const apps = state.applications.slice().reverse().filter((a) => findSch(a.id));
+  const totalExpected = apps.reduce((sum, a) => sum + findSch(a.id).amountValue, 0);
 
   $('#apps-summary').innerHTML = apps.length
     ? `<div class="summary-card">
@@ -432,9 +464,10 @@ function renderApplications() {
 function renderMy() {
   const p = state.profile;
   const flagText = p.flags.length ? p.flags.map((f) => FLAG_LABELS[f]).join(', ') : '해당 없음';
+  const trackLabel = (TRACKS.find((t) => t.id === p.track) || {}).label || '-';
   $('#my-profile').innerHTML = `
-    <p class="my-name">${p.name || '외대생'} 님</p>
-    <p class="my-line">한국외국어대학교 · ${p.college}${p.major ? ' ' + p.major : ''}</p>
+    <p class="my-name">${p.name || '대학생'} 님</p>
+    <p class="my-line">${p.school || '대학 미설정'} · ${trackLabel}${p.major ? ' · ' + p.major : ''}</p>
     <div class="my-grid">
       <div><span>학년</span><strong>${p.year}학년 (${{ enrolled: '재학', freshman: '신입', returning: '복학' }[p.status]})</strong></div>
       <div><span>직전학기 평점</span><strong>${p.gpa != null ? p.gpa.toFixed(2) : '미입력'}</strong></div>
@@ -449,7 +482,10 @@ function bindEvents() {
   // 온보딩 진행
   $$('.onboard-step [data-next]').forEach((btn) =>
     btn.addEventListener('click', () => {
-      if (onboardStep === 1 && !getChip('#in-year')) { toast('학년을 선택해 주세요'); return; }
+      if (onboardStep === 1) {
+        if (!$('#in-school').value.trim()) { toast('학교명을 입력해 주세요'); return; }
+        if (!getChip('#in-year')) { toast('학년을 선택해 주세요'); return; }
+      }
       onboardStep += 1;
       renderOnboardStep();
     })
@@ -533,6 +569,13 @@ function simulateProgress() {
     a.step = Math.min(APP_STEPS.length - 1, Math.max(a.step, Math.floor(daysSince / 2)));
   });
   saveState();
+}
+
+/* ---------------- PWA ---------------- */
+if ('serviceWorker' in navigator && location.protocol === 'https:') {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => { /* 오프라인 캐시는 선택 기능 */ });
+  });
 }
 
 /* ---------------- 시작 ---------------- */
