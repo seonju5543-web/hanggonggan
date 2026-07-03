@@ -1,28 +1,132 @@
 {
   "_comment": "장학공고 수집 대상 학교. boardUrl이 null이면 게시판 주소 확인이 필요한 상태이며, 로봇이 매 실행마다 상태 리포트에 표시한다. 주소는 첫 실행 리포트를 보고 하나씩 확정한다.",
   "schools": [
-    { "school": "서울대학교",       "campus": "",                  "boardUrl": "https://www.snu.ac.kr/snunow/notice/scholarship" },
-    { "school": "연세대학교",       "campus": "신촌캠퍼스",         "boardUrl": "https://www.yonsei.ac.kr/sc/support/notice.jsp" },
-    { "school": "연세대학교",       "campus": "미래캠퍼스(원주)",    "boardUrl": null },
-    { "school": "고려대학교",       "campus": "서울캠퍼스(안암)",    "boardUrl": null },
-    { "school": "고려대학교",       "campus": "세종캠퍼스",         "boardUrl": null },
-    { "school": "서강대학교",       "campus": "",                  "boardUrl": null },
-    { "school": "성균관대학교",     "campus": "공통",              "boardUrl": "https://www.skku.edu/skku/campus/skk_comm/notice06.do" },
-    { "school": "한양대학교",       "campus": "서울캠퍼스",         "boardUrl": null },
-    { "school": "한양대학교",       "campus": "ERICA캠퍼스(안산)",  "boardUrl": null },
-    { "school": "중앙대학교",       "campus": "공통",              "boardUrl": null },
-    { "school": "경희대학교",       "campus": "공통",              "boardUrl": null },
-    { "school": "한국외국어대학교", "campus": "공통",              "boardUrl": "https://www.hufs.ac.kr/hufs/11281/subview.do" },
-    { "school": "서울시립대학교",   "campus": "",                  "boardUrl": "https://www.uos.ac.kr/korNotice/list.do?list_id=FA2" },
-    { "school": "건국대학교",       "campus": "서울캠퍼스",         "boardUrl": null },
-    { "school": "건국대학교",       "campus": "글로컬캠퍼스(충주)",  "boardUrl": null },
-    { "school": "동국대학교",       "campus": "서울캠퍼스",         "boardUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/list" },
-    { "school": "동국대학교",       "campus": "WISE캠퍼스(경주)",   "boardUrl": null },
-    { "school": "홍익대학교",       "campus": "공통",              "boardUrl": null },
-    { "school": "숙명여자대학교",   "campus": "",                  "boardUrl": null },
-    { "school": "광운대학교",       "campus": "",                  "boardUrl": null },
-    { "school": "명지대학교",       "campus": "공통",              "boardUrl": null },
-    { "school": "상명대학교",       "campus": "서울캠퍼스",         "boardUrl": null },
-    { "school": "가천대학교",       "campus": "",                  "boardUrl": null }
+    {
+      "school": "서울대학교",
+      "campus": "",
+      "boardUrl": "https://www.snu.ac.kr/snunow/notice/scholarship",
+      "note": "자동 탐색 실패(봇 차단·동적 페이지 추정) — 개발자가 장학공지 주소 제공 필요"
+    },
+    {
+      "school": "연세대학교",
+      "campus": "신촌캠퍼스",
+      "boardUrl": "https://www.yonsei.ac.kr/sc/support/notice.jsp",
+      "note": "자동 탐색 실패(봇 차단·동적 페이지 추정) — 개발자가 장학공지 주소 제공 필요"
+    },
+    {
+      "school": "연세대학교",
+      "campus": "미래캠퍼스(원주)",
+      "boardUrl": null,
+      "note": "자동 탐색 실패(봇 차단·동적 페이지 추정) — 개발자가 장학공지 주소 제공 필요"
+    },
+    {
+      "school": "고려대학교",
+      "campus": "서울캠퍼스(안암)",
+      "boardUrl": "https://scholarship.korea.ac.kr"
+    },
+    {
+      "school": "고려대학교",
+      "campus": "세종캠퍼스",
+      "boardUrl": null,
+      "note": "자동 탐색 실패(봇 차단·동적 페이지 추정) — 개발자가 장학공지 주소 제공 필요"
+    },
+    {
+      "school": "서강대학교",
+      "campus": "",
+      "boardUrl": null,
+      "note": "자동 탐색 실패(봇 차단·동적 페이지 추정) — 개발자가 장학공지 주소 제공 필요"
+    },
+    {
+      "school": "성균관대학교",
+      "campus": "공통",
+      "boardUrl": "https://www.skku.edu/skku/campus/skk_comm/notice06.do"
+    },
+    {
+      "school": "한양대학교",
+      "campus": "서울캠퍼스",
+      "boardUrl": "https://www.hanyang.ac.kr/web/www/notice_all"
+    },
+    {
+      "school": "한양대학교",
+      "campus": "ERICA캠퍼스(안산)",
+      "boardUrl": null,
+      "note": "자동 탐색 실패(봇 차단·동적 페이지 추정) — 개발자가 장학공지 주소 제공 필요"
+    },
+    {
+      "school": "중앙대학교",
+      "campus": "공통",
+      "boardUrl": null,
+      "note": "자동 탐색 실패(봇 차단·동적 페이지 추정) — 개발자가 장학공지 주소 제공 필요"
+    },
+    {
+      "school": "경희대학교",
+      "campus": "공통",
+      "boardUrl": "https://janghak.khu.ac.kr"
+    },
+    {
+      "school": "한국외국어대학교",
+      "campus": "공통",
+      "boardUrl": "https://www.hufs.ac.kr/hufs/11281/subview.do"
+    },
+    {
+      "school": "서울시립대학교",
+      "campus": "",
+      "boardUrl": "https://www.uos.ac.kr/korNotice/list.do?list_id=FA2",
+      "note": "자동 탐색 실패(봇 차단·동적 페이지 추정) — 개발자가 장학공지 주소 제공 필요"
+    },
+    {
+      "school": "건국대학교",
+      "campus": "서울캠퍼스",
+      "boardUrl": "https://www.konkuk.ac.kr/konkuk/2096/subview.do"
+    },
+    {
+      "school": "건국대학교",
+      "campus": "글로컬캠퍼스(충주)",
+      "boardUrl": null,
+      "note": "자동 탐색 실패(봇 차단·동적 페이지 추정) — 개발자가 장학공지 주소 제공 필요"
+    },
+    {
+      "school": "동국대학교",
+      "campus": "서울캠퍼스",
+      "boardUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/list"
+    },
+    {
+      "school": "동국대학교",
+      "campus": "WISE캠퍼스(경주)",
+      "boardUrl": null,
+      "note": "자동 탐색 실패(봇 차단·동적 페이지 추정) — 개발자가 장학공지 주소 제공 필요"
+    },
+    {
+      "school": "홍익대학교",
+      "campus": "공통",
+      "boardUrl": "https://www.hongik.ac.kr/kr/newscenter/notice.do"
+    },
+    {
+      "school": "숙명여자대학교",
+      "campus": "",
+      "boardUrl": null,
+      "note": "자동 탐색 실패(봇 차단·동적 페이지 추정) — 개발자가 장학공지 주소 제공 필요"
+    },
+    {
+      "school": "광운대학교",
+      "campus": "",
+      "boardUrl": "https://www.kw.ac.kr/ko/life/notice.jsp"
+    },
+    {
+      "school": "명지대학교",
+      "campus": "공통",
+      "boardUrl": "https://www.mju.ac.kr/mjukr/255/subview.do"
+    },
+    {
+      "school": "상명대학교",
+      "campus": "서울캠퍼스",
+      "boardUrl": "https://www.smu.ac.kr/kor/life/notice.do"
+    },
+    {
+      "school": "가천대학교",
+      "campus": "",
+      "boardUrl": null,
+      "note": "자동 탐색 실패(봇 차단·동적 페이지 추정) — 개발자가 장학공지 주소 제공 필요"
+    }
   ]
 }
