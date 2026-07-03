@@ -750,7 +750,7 @@ function liveNoticesHtml() {
         ${(n.attachments || []).length ? `<span class="badge badge-applied">양식 ${n.attachments.length}</span>` : ''}
       </div>
       <p class="sch-name">${esc(n.title)}</p>
-      ${n.deadlineHint ? `<p class="sch-provider">${esc(n.deadlineHint)}</p>` : ''}
+      ${n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? `<p class="sch-provider">⏰ ${esc(n.deadlineHint)}</p>` : ''}
       <p class="sch-provider">${esc(n.school)}${n.campus ? ' ' + esc(n.campus) : ''} · ${esc(n.foundAt || '')} 수집 · 원문 보기 ↗</p>
     </a>`).join('') + `</div>`;
 }

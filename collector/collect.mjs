@@ -64,7 +64,7 @@ async function fetchDetail(item) {
       }
       if (attachments.length >= 8) break;
     }
-    const text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+    const text = html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
     const dm = text.match(DEADLINE_RE);
     const uniq = new Map();
     attachments.forEach((a) => { if (!uniq.has(a.url)) uniq.set(a.url, a); });
