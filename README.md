@@ -25,9 +25,9 @@ python3 -m http.server 8000
 # http://localhost:8000 접속 (모바일 뷰 권장, max-width 480px)
 ```
 
-**GitHub Pages 배포**: `.github/workflows/deploy-pages.yml`이 push마다 자동 배포합니다.
-저장소 Settings → Pages → Source를 **GitHub Actions**로 한 번만 설정하면
-`https://<계정>.github.io/hanggonggan/` 에서 접속할 수 있습니다.
+**GitHub Pages 배포**: 이 저장소는 Pages가 `main` 브랜치 배포 모드로 설정되어 있어
+**`main`에 push하면 자동 배포**됩니다 (별도 워크플로 불필요).
+접속 주소: `https://seonju5543-web.github.io/hanggonggan/`
 
 **앱스토어 진출 경로**:
 1. (현재) PWA — 브라우저에서 "홈 화면에 추가"로 설치
