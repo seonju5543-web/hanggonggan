@@ -1,1 +1,694 @@
-{"updatedAt":null,"items":[]}
+{
+ "updatedAt": "2026-07-04",
+ "items": [
+  {
+   "title": "국가장학금 및 학자금대출",
+   "url": "https://scholarship.korea.ac.kr/scholarship/guide/national.do",
+   "attachments": [],
+   "deadlineHint": "까지 - 개인정보 동의 거부권리 안내 : 신청인은 본 개인정보 수집에 대한 동의를 거부하실 수 있으며, 이 경우",
+   "school": "고려대학교",
+   "campus": "서울캠퍼스(안암)",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "국제화장학금",
+   "url": "https://scholarship.korea.ac.kr/scholarship/type/ty02_03.do",
+   "attachments": [],
+   "deadlineHint": "까지 - 개인정보 동의 거부권리 안내 : 신청인은 본 개인정보 수집에 대한 동의를 거부하실 수 있으며, 이 경우",
+   "school": "고려대학교",
+   "campus": "서울캠퍼스(안암)",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "교외장학재단",
+   "url": "https://scholarship.korea.ac.kr/scholarship/type/ty03_01.do",
+   "attachments": [],
+   "deadlineHint": "까지 - 개인정보 동의 거부권리 안내 : 신청인은 본 개인정보 수집에 대한 동의를 거부하실 수 있으며, 이 경우",
+   "school": "고려대학교",
+   "campus": "서울캠퍼스(안암)",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "장학금 신청",
+   "url": "https://scholarship.korea.ac.kr/scholarship/application/notice.do",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "고려대학교",
+   "campus": "서울캠퍼스(안암)",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "장학금 신청",
+   "url": "https://portal.korea.ac.kr/front/Intro.kpd?gb=sch",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "고려대학교",
+   "campus": "서울캠퍼스(안암)",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "2026년 2학기 삼일장학회 희망/동행 장학생 모집안내(~7/12 (일)까지)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=138165&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "부속기관",
+     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+    },
+    {
+     "name": "2026년 2학기 삼일장학회 지원자 제출서류 양식.zip",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138165&attachNo=115657"
+    }
+   ],
+   "deadlineHint": "까지 ) ) | 성균관대학교 window.dataLayer = window.dataLayer || []; fun",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "2026년 2학기 조병두장학금 선발 안내 (~2026년 7월 31일(금) AM 09:00까지 ★기한엄수)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=138195&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "부속기관",
+     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+    },
+    {
+     "name": "(붙임1) 조병두장학금 신청서(2026).hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138195&attachNo=115690"
+    },
+    {
+     "name": "(붙임2) 조병두 장학금 자기소개서.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138195&attachNo=115691"
+    },
+    {
+     "name": "(붙임3)_장학금_추천서_양식.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138195&attachNo=115692"
+    },
+    {
+     "name": "(붙임4) 개인정보 수집 및 이용동의서(성균관대학교.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138195&attachNo=115693"
+    }
+   ],
+   "deadlineHint": "까지 ★ 기한엄수 ) ) | 성균관대학교 window.dataLayer = window.dataLayer ||",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "[한국장학재단] 2026년 대학생 청소년 AI교육지원 사업 멘토 모집",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=138156&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "부속기관",
+     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+    },
+    {
+     "name": "붙임1. AI멘토링 대상 학교(공지용).xlsx",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138156&attachNo=115640"
+    },
+    {
+     "name": "붙임2. 대학생 멘토 신청 관련 매뉴얼.pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138156&attachNo=115641"
+    },
+    {
+     "name": "붙임3. 멘토 활동계획서 양식.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138156&attachNo=115642"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026.7.2.(목) ~ 7.12.(일) 2) 신청방법 : 한국장학재단 홈페이지/모바일 신청(붙임 2",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "2026년 2학기 한국농어촌희망재단 「청년창업농장학금」장학생 선발 안내(6/1 13:00 ~ 7/6 17:00)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=137275&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "부속기관",
+     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026.6.1.(월) 13시~2026.7.6.(월) 17시 □ 신청방법 : 한국농어촌희망재단 홈페이지",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "2026년도 2학기 보건장학회 &#039;학업지원&#039; 장학생 선발 안내(~ 07.12. 일요일)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=138153&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "부속기관",
+     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+    },
+    {
+     "name": "2026-2 (재)보건장학회 학업지원 장학생 선발 공고 상세안내.pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138153&attachNo=115635"
+    },
+    {
+     "name": "2026-2 (재)보건장학회 학업지원 장학생 지원자용 제출 서류.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138153&attachNo=115636"
+    }
+   ],
+   "deadlineHint": "신청기간은 위와 같습니다. 해당 장학회는 학교 추천자 선발 후 재단에 제출해야 되는 서류가 많아 해당 기간 이외 신",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "2026년도 2학기 보건장학회 &#039;다문화가정&#039; 장학생 선발 안내(1학년,~ 07.12. 일요일)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=138157&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "부속기관",
+     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+    },
+    {
+     "name": "2026-2 (재)보건장학회 다문화가정 장학생 선발 공고 상세 안내.pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138157&attachNo=115644"
+    },
+    {
+     "name": "2026-2 (재)보건장학회 다문화가정 장학생 지원자용 제출 서류.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138157&attachNo=115645"
+    }
+   ],
+   "deadlineHint": "신청기간은 위와 같습니다. 해당 장학회는 학교 추천자 선발 후 재단에 제출해야 되는 서류가 많아 해당 기간 이외 신",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "2026년도 산학협동재단『국내 외국인 근로자 자녀 장학생』선발 안내(~ 07.09.(목) 오전 9시)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=138134&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "부속기관",
+     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+    },
+    {
+     "name": "산학재단 국내 외국인 근로자 자녀 장학생 신청서류 양식.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138134&attachNo=115623"
+    }
+   ],
+   "deadlineHint": "신청기간 및 방법 :2026년 7월 8일 (수) 09:00 ~ 7월 9일 (목) 09:00, GLS 신청 GLS-[",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "내 업무 시간을 아껴주는 AI 툴 활용 &amp; 우리 회사를 지켜주는 안전한 계약서 작성법 교육 * HY창업장학금 마일리지 부여",
+   "url": "https://www.hanyang.ac.kr/web/www/notice_all?p_p_id=kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_action=view_message&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_entryId=111502",
+   "attachments": [],
+   "deadlineHint": "까지 &nbsp;구글 폼 / 이메일로 정보 제출 &nbsp;ㆍ구글 &nbsp;폼 :&nbsp; https://f",
+   "school": "한양대학교",
+   "campus": "서울캠퍼스",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "장학금안내(서울)",
+   "url": "https://www.hanyang.ac.kr/web/www/sc_s",
+   "attachments": [],
+   "deadlineHint": "신청기간 국가장학금 1, 2유형 소득 9분위 이하 가정 한국장학재단의 각 장학금 종류별 공지를 따름 (www.kos",
+   "school": "한양대학교",
+   "campus": "서울캠퍼스",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "장학금안내(ERICA)",
+   "url": "https://esc.hanyang.ac.kr/-20",
+   "attachments": [],
+   "deadlineHint": "신청기간에만 신청 가능 3) 교내 장학은 이중수혜 불가 4) 장학금은 정규 8학기(공학대학 건축학전공 10학기, 약",
+   "school": "한양대학교",
+   "campus": "서울캠퍼스",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "장학금 종류",
+   "url": "https://janghak.khu.ac.kr/janghak/user/contents/view.do?menuNo=12300018",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "경희대학교",
+   "campus": "",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "국가/국가근로장학",
+   "url": "https://www.hufs.ac.kr/hufs/11394/subview.do",
+   "attachments": [],
+   "deadlineHint": "신청기간에 신청 원칙 지원금액 지원구간별 상이, 최소 50만원~최대 수업료 전액 성적기준 직전학기 취득학점 12학점",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "학자금 대출",
+   "url": "https://www.konkuk.ac.kr/konkuk/2079/subview.do",
+   "attachments": [
+    {
+     "name": "신입생용(2026학번)",
+     "url": "https://www.konkuk.ac.kr/sites/konkuk/down/konkuk_guide_freshman_2026.pdf"
+    },
+    {
+     "name": "재학생용(~2025학번)",
+     "url": "https://www.konkuk.ac.kr/sites/konkuk/down/konkuk_guide_students_2026.pdf"
+    },
+    {
+     "name": "For New Students(ENG)",
+     "url": "https://www.konkuk.ac.kr/sites/konkuk/down/konkuk_guide_freshman_2026_eng.pdf"
+    },
+    {
+     "name": "성평등계획",
+     "url": "https://www.konkuk.ac.kr/sites/konkuk/down/Konkuk_University_Gender_Equality_Plan_2025_2030.pdf"
+    }
+   ],
+   "deadlineHint": "까지 무이자 학자금지원 8구간 이내, 만35세 이하 다자녀(3자녀)이상: 소득구간 무관 개인신용도, 학제에 따른",
+   "school": "건국대학교",
+   "campus": "서울캠퍼스",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "[제주평생교육장학진흥원] 2026년 미래이음 장학금 장학생 선발 계획 재공고",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=153770&article.offset=0&articleLimit=10&noCat=501",
+   "attachments": [
+    {
+     "name": "(붙임1) 2026년 미래이음 장학금 신청 제출(구비) 서류-재공고.zip",
+     "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=download&articleNo=153770&attachNo=89835"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "홍익대학교",
+   "campus": "",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "RISE사업단 산학협력 및 RISE 사업 지원 근로장학생 모집",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=153769&article.offset=0&articleLimit=10&noCat=32",
+   "attachments": [],
+   "deadlineHint": "신청기간 : 2026년 6월1일(월)~2026년7월31일(금) 기간 중 수시 모집 - 지원방법 : 포스터 QR 참조",
+   "school": "홍익대학교",
+   "campus": "",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "[등록/장학] 2026년 2학기 농림축산식품부 청년창업농장학금 신청 안내[기간연장] 신규게시글",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52751&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [
+    {
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "부설연구기관",
+     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    }
+   ],
+   "deadlineHint": "신청기간이 아래와 같이 연장되었습니다. - 신청기간 : ~2026.7.6.(화) 17:00까지 ※ 신청기간이 6일",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "[등록/장학] 2026년도 호반 이노베이션 하반기 장학생 선발 안내 신규게시글 Attachment",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52824&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [
+    {
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "부설연구기관",
+     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    }
+   ],
+   "deadlineHint": "접수기간 : 2026. 6. 15.(월) ~ 2026. 7. 17.(금) 17:00 에 접수된 건에 한함. &nbs",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "[등록/장학] 2026학년도 2학기 한국장학재단 농촌출신대학생 학자금대출 신청 안내 신규게시글",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52817&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [
+    {
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "부설연구기관",
+     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    }
+   ],
+   "deadlineHint": "까지&nbsp; &nbsp; &nbsp;대출실행기간 연장 &nbsp; * 대출을 실행하면 학생의 등록금고지서에",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "[등록/장학] 2026학년도 2학기 한국장학재단 학자금대출 신청안내 신규게시글",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52815&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [
+    {
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "부설연구기관",
+     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    }
+   ],
+   "deadlineHint": "까지 포함 ) 󰋼 좌동 &nbsp; &nbsp; 󰋼 자립지원대상 ① 󰋼 의무상환 개시 전 ( 졸업 전까지",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "[등록/장학] 2026학년도 2학기 국가고시 장학금 신청 안내 Attachment",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52808&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [
+    {
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "부설연구기관",
+     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    }
+   ],
+   "deadlineHint": "까지 국가고시 장학금 (2 종 ) ① 세무사 , 관세사 , 공인노무사 , 감정평가사 시험의 합격자 ② 직전학기",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "[등록/장학] 2026학년도 2학기 보훈장학금 신청 안내 Attachment",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52807&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [
+    {
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "부설연구기관",
+     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    }
+   ],
+   "deadlineHint": "신청기간 구 분 신청기간 재학생 / 복학예정자 2026. 7. 6.( 월 ) ~ 7. 17.( 금 ), 10 시 ~",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "[등록/장학] 2026년 하반기 종근당고촌재단 무상기숙사 장학생 모집 공고 Attachment",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52752&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [
+    {
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "부설연구기관",
+     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    }
+   ],
+   "deadlineHint": "접수기간 : 2026. 6. 22.(월) 09:00 ~ 2026. 7. 24.(금) 15:00까지 &nbsp; 3.",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "[외부] [전북특별자치도평생교육장학진흥원] 2026년 참가팀 모집 안내 Attachment",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52804&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [
+    {
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "부설연구기관",
+     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    }
+   ],
+   "deadlineHint": "까지 가능) 수료/졸업요건 안내 입학연도별 졸업학점 안내 학적변동 구분 특별프로그램 안내 --> 병무 안내 수강",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "장학/학자금공지",
+   "url": "https://www.mju.ac.kr/mjukr/259/subview.do",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "명지대학교",
+   "campus": "",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "2026학년도 1학기 고시장학금 신청 안내 (2026. 7. 1. 재공고) 새글",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/141/233236/artclView.do",
+   "attachments": [
+    {
+     "name": "2. 2026-1학기 고시장학금 신청서(양식).hwp",
+     "url": "https://www.mju.ac.kr/bbs/mjukr/141/178492/download.do"
+    }
+   ],
+   "deadlineHint": "까지 등록금 전액 2 종 공무원 5 급 , 변리사 , 회계사 시험의 1 차 합격자 및 3 종에 해당하는 시험의",
+   "school": "명지대학교",
+   "campus": "",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "교내 장학금",
+   "url": "https://www.smu.ac.kr/kor/life/scholarships.do",
+   "attachments": [],
+   "deadlineHint": "까지 등록금의 60%, 25학번부터 등록금의 50% 8개 학기 지급조건 참조 감면 정원외 신입생 편입생 재학생",
+   "school": "상명대학교",
+   "campus": "서울캠퍼스",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "교외 장학금",
+   "url": "https://www.smu.ac.kr/kor/life/suburbs.do",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "상명대학교",
+   "campus": "서울캠퍼스",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "서울 [등록/장학]",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=766904&article.offset=0&articleLimit=10",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "상명대학교",
+   "campus": "서울캠퍼스",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "서울 [등록/장학]",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=766903&article.offset=0&articleLimit=10",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "상명대학교",
+   "campus": "서울캠퍼스",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "서울 [등록/장학]",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=766863&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "2027년 일본어학연수 학비지원 장학생 운영계획서.pdf",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=766863&attachNo=559429"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "상명대학교",
+   "campus": "서울캠퍼스",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "2027년 일본어학연수 학비지원 장학생 운영계획서.pdf",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=766863&attachNo=559429",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "상명대학교",
+   "campus": "서울캠퍼스",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "서울 [등록/장학]",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=766753&article.offset=0&articleLimit=10",
+   "attachments": [],
+   "deadlineHint": "까지(상호 협의 하 연장 가능) 7. 근무시간 : 주당 14시간 근무(월 최대 60시간), 평일 09:00~17",
+   "school": "상명대학교",
+   "campus": "서울캠퍼스",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "상명 [등록/장학]",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=766715&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "[붙임] 하반기 종근당고촌학사 모집 공고(FAQ 포함).pdf",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=766715&attachNo=559279"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "상명대학교",
+   "campus": "서울캠퍼스",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "서울 [등록/장학]",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=766712&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "2026년 2학기 농림축산식품부 청년창업농장학금 포스터.pdf",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=766712&attachNo=559276"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "상명대학교",
+   "campus": "서울캠퍼스",
+   "foundAt": "2026-07-03"
+  },
+  {
+   "title": "2026년 2학기 농림축산식품부 청년창업농장학금 포스터.pdf",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=766712&attachNo=559276",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "상명대학교",
+   "campus": "서울캠퍼스",
+   "foundAt": "2026-07-03"
+  }
+ ]
+}
