@@ -340,6 +340,11 @@ input::placeholder { color: var(--text-weak); }
 .badge-dday.urgent { background: var(--red-weak); color: var(--red); }
 .badge-dday.closed { background: rgba(18, 22, 31, 0.07); color: var(--text-weak); }
 .badge-applied { background: var(--primary-weak); color: var(--primary); }
+.badge-fit {
+  background: linear-gradient(120deg, #2f6bff, #5e8dff);
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
 
 .sch-name { font-size: 16px; font-weight: 700; letter-spacing: -0.015em; }
 .sch-amount { font-size: 15px; font-weight: 700; color: var(--primary); margin-top: 3px; font-variant-numeric: tabular-nums; }

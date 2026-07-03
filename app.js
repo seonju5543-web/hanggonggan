@@ -99,9 +99,32 @@ function evaluate(sch, p) {
   return { status: 'eligible', reasons, missing };
 }
 
+/* ---------------- 적합도 점수 (0~99) ----------------
+   자격 충족을 전제로 '나에게 얼마나 맞춤인가'를 서열화한다.
+   - 나를 특정하는 조건이 많을수록(계열·자격 등) 맞춤형 공고
+   - 성적·소득 요건 대비 여유 마진이 클수록 선정 가능성 높음
+   - 선발 심사·정보 미입력은 불확실성 감점 */
+function fitScore(sch, result, p) {
+  if (result.status === 'ineligible') return 0;
+  const e = sch.eligibility || {};
+  let score = 62;
+  const condCount = ['minGpa', 'maxBracket', 'years', 'tracks', 'flagsAny', 'seoulOnly', 'needCert', 'exchange', 'freshmanOnly']
+    .filter((k) => e[k] != null && e[k] !== false).length;
+  score += Math.min(15, condCount * 3);
+  if (result.status === 'selective') score -= 8;
+  if (result.status === 'unknown') score -= 22;
+  if (e.minGpa != null && p.gpa != null) score += Math.min(12, Math.max(0, Math.round((p.gpa - e.minGpa) * 10)));
+  if (e.maxBracket != null && p.bracket != null) score += Math.min(6, e.maxBracket - p.bracket);
+  if (e.flagsAny) score += 6;
+  return Math.max(5, Math.min(99, score));
+}
+
 function getMatches() {
   const p = state.profile;
-  return allScholarships().map((s) => ({ sch: s, result: evaluate(s, p) }));
+  return allScholarships().map((s) => {
+    const result = evaluate(s, p);
+    return { sch: s, result, fit: fitScore(s, result, p) };
+  });
 }
 
 /* ---------------- 유틸 ---------------- */
@@ -240,7 +263,7 @@ function collectProfile() {
 }
 
 /* ---------------- 카드 렌더링 ---------------- */
-function schCard(sch, result, { compact = false } = {}) {
+function schCard(sch, result, { compact = false, fit = 0 } = {}) {
   const meta = STATUS_META[result.status];
   const d = dday(sch.deadline);
   const applied = state.applications.some((a) => a.id === sch.id);
@@ -250,6 +273,7 @@ function schCard(sch, result, { compact = false } = {}) {
         <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${sch.type}</span>
         <span class="badge badge-dday ${d.cls}">${d.label}</span>
         ${applied ? '<span class="badge badge-applied">신청함</span>' : ''}
+        ${fit > 0 ? `<span class="badge badge-fit">적합도 ${fit}%</span>` : ''}
       </div>
       <p class="sch-name">${sch.name}</p>
       <p class="sch-amount">${sch.amount}</p>
@@ -283,7 +307,7 @@ function renderHome() {
     .sort((a, b) => new Date(a.sch.deadline) - new Date(b.sch.deadline))
     .slice(0, 3);
   $('#home-deadline-list').innerHTML = upcoming.length
-    ? upcoming.map((m) => schCard(m.sch, m.result, { compact: true })).join('')
+    ? upcoming.map((m) => schCard(m.sch, m.result, { compact: true, fit: m.fit })).join('')
     : '<p class="empty">지금 신청 가능한 장학금이 없어요. 프로필을 업데이트해 보세요.</p>';
 
   // 신청 현황 미리보기
@@ -298,9 +322,10 @@ let exploreFilter = 'all';
 
 function renderExplore() {
   const matches = getMatches();
-  const order = { eligible: 0, selective: 1, unknown: 2, ineligible: 3 };
+  const order = { eligible: 0, selective: 0, unknown: 1, ineligible: 2 };
   let list = matches.slice().sort((a, b) =>
     order[a.result.status] - order[b.result.status] ||
+    b.fit - a.fit ||
     new Date(a.sch.deadline) - new Date(b.sch.deadline)
   );
 
@@ -308,7 +333,7 @@ function renderExplore() {
   if (exploreFilter === 'eligible') list = list.filter((m) => ['eligible', 'selective'].includes(m.result.status));
 
   $('#explore-list').innerHTML = list.length
-    ? list.map((m) => schCard(m.sch, m.result)).join('')
+    ? list.map((m) => schCard(m.sch, m.result, { fit: m.fit })).join('')
     : '<p class="empty">조건에 맞는 장학금이 없어요.</p>';
 }
 
@@ -317,6 +342,7 @@ function openDetail(id) {
   const sch = findSch(id);
   if (!sch) return;
   const result = evaluate(sch, state.profile);
+  const fit = fitScore(sch, result, state.profile);
   const meta = STATUS_META[result.status];
   const d = dday(sch.deadline);
   const app = state.applications.find((a) => a.id === id);
@@ -334,6 +360,7 @@ function openDetail(id) {
       <div class="sch-top">
         <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${sch.type}</span>
         <span class="badge badge-dday ${d.cls}">${d.label}</span>
+        ${fit > 0 ? `<span class="badge badge-fit">적합도 ${fit}%</span>` : ''}
         <span class="status-pill pill-${meta.cls}">${meta.label}</span>
       </div>
       <h3 class="sheet-title">${sch.name}</h3>

@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - claude/nice-heisenberg-WESq5   # 저장소 기본 브랜치 (Pages 배포 허용 브랜치)
       - claude/korean-scholarship-app-8posyu
   workflow_dispatch:
 
