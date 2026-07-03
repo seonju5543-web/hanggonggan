@@ -2,365 +2,242 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>한공간 — 연남동 퓨전 파스타 바</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400;600&family=Noto+Sans+KR:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>한장 — 대학 장학금, 한 번에</title>
+  <meta name="description" content="전국 대학생을 위한 맞춤 장학금 매칭 · 원클릭 신청 서비스" />
+  <meta name="theme-color" content="#101d3d" />
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div id="app" class="app">
 
-  <!-- LOADER -->
-  <div class="loader" id="loader">
-    <div class="loader__inner">
-      <span class="loader__text">한공간</span>
-      <div class="loader__bar"><div class="loader__fill"></div></div>
-    </div>
-  </div>
+    <!-- ============ 온보딩 ============ -->
+    <section id="screen-onboarding" class="screen">
+      <div class="onboard-progress"><div id="onboard-bar" class="onboard-bar"></div></div>
 
-  <!-- NAV -->
-  <nav class="nav" id="nav">
-    <a class="nav__logo" href="#hero">
-      <span class="nav__logo-kr">한공간</span>
-      <span class="nav__logo-en">Han Gong-gan</span>
-    </a>
-    <ul class="nav__links" id="navLinks">
-      <li><a href="#about" class="nav__link">소개</a></li>
-      <li><a href="#menu" class="nav__link">메뉴</a></li>
-      <li><a href="#info" class="nav__link">방문안내</a></li>
-    </ul>
-    <a href="tel:01072234247" class="nav__cta">예약 문의</a>
-    <button class="nav__toggle" id="navToggle" aria-label="메뉴">
-      <span></span><span></span><span></span>
-    </button>
-  </nav>
-
-  <!-- HERO -->
-  <section id="hero" class="hero">
-    <div class="hero__bg" id="heroBg"></div>
-    <div class="hero__overlay"></div>
-
-    <div class="hero__content">
-      <p class="hero__eyebrow reveal-line">연남동 퓨전 파스타 바</p>
-      <h1 class="hero__title">
-        <span class="hero__title-line reveal-word">한</span>
-        <span class="hero__title-line reveal-word">공간</span>
-      </h1>
-      <div class="hero__divider reveal-line"></div>
-      <p class="hero__desc reveal-fade">낯선 재료의 조합, 익숙한 온기</p>
-      <div class="hero__actions reveal-fade">
-        <a href="#menu" class="btn btn--primary">메뉴 보기</a>
-        <a href="#info" class="btn btn--ghost">오시는 길</a>
-      </div>
-    </div>
-
-    <div class="hero__scroll reveal-fade">
-      <span>Scroll</span>
-      <div class="hero__scroll-line"></div>
-    </div>
-
-    <div class="hero__badge reveal-fade">
-      <svg viewBox="0 0 120 120" class="hero__badge-ring">
-        <path id="circlePath" d="M 60,60 m -45,0 a 45,45 0 1,1 90,0 a 45,45 0 1,1 -90,0"/>
-        <text><textPath href="#circlePath" startOffset="0%">한공간 · YEONNAM-DONG · FUSION · PASTA BAR · </textPath></text>
-      </svg>
-      <span class="hero__badge-year">2022</span>
-    </div>
-  </section>
-
-  <!-- MARQUEE -->
-  <div class="marquee" aria-hidden="true">
-    <div class="marquee__track">
-      <span>유자 유린기</span><span class="dot">·</span>
-      <span>양고기 전병 플레이트</span><span class="dot">·</span>
-      <span>달래 된장 크림파스타</span><span class="dot">·</span>
-      <span>돌김 성게 로제</span><span class="dot">·</span>
-      <span>호박고지 앤쵸비 오일파스타</span><span class="dot">·</span>
-      <span>음메헤 양고기 파스틴</span><span class="dot">·</span>
-      <span>온통초록 부라타</span><span class="dot">·</span>
-      <span>문어감자 사장님</span><span class="dot">·</span>
-      <!-- duplicate for seamless loop -->
-      <span>유자 유린기</span><span class="dot">·</span>
-      <span>양고기 전병 플레이트</span><span class="dot">·</span>
-      <span>달래 된장 크림파스타</span><span class="dot">·</span>
-      <span>돌김 성게 로제</span><span class="dot">·</span>
-      <span>호박고지 앤쵸비 오일파스타</span><span class="dot">·</span>
-      <span>음메헤 양고기 파스틴</span><span class="dot">·</span>
-      <span>온통초록 부라타</span><span class="dot">·</span>
-      <span>문어감자 사장님</span><span class="dot">·</span>
-    </div>
-  </div>
-
-  <!-- ABOUT -->
-  <section id="about" class="about section">
-    <div class="container">
-      <div class="about__grid">
-        <div class="about__left">
-          <span class="label reveal-up">About Us</span>
-          <h2 class="about__heading reveal-up delay-1">
-            낯선 조합이<br/>
-            <em>새로운 미식</em>이 되다
-          </h2>
-          <p class="about__body reveal-up delay-2">
-            연남동 골목 깊숙이 자리한 <strong>한공간</strong>은 한국적 식재료와
-            유럽 파스타·이탈리안 감성이 만나는 퓨전 다이닝 바입니다.
-          </p>
-          <p class="about__body reveal-up delay-3">
-            달래된장 크림파스타, 돌김 성게 로제, 양고기 전병 플레이트처럼
-            낯선 듯 친숙한 메뉴들로 새로운 미식 경험을 선사합니다.
-            저녁 5시부터 자정까지, 한 잔과 함께 천천히 즐기세요.
-          </p>
-          <div class="about__stats reveal-up delay-4">
-            <div class="stat">
-              <span class="stat__num" data-count="50">0</span><span class="stat__unit">+</span>
-              <p>메뉴</p>
-            </div>
-            <div class="stat__sep"></div>
-            <div class="stat">
-              <span class="stat__num" data-count="2022">0</span>
-              <p>오픈연도</p>
-            </div>
-            <div class="stat__sep"></div>
-            <div class="stat">
-              <span class="stat__num" data-count="7">0</span><span class="stat__unit">h</span>
-              <p>영업시간</p>
-            </div>
+      <!-- Step 0: 인트로 -->
+      <div class="onboard-step" data-step="0">
+        <div class="onboard-hero">
+          <div class="onboard-logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/><path d="M22 10v6"/></svg>
           </div>
-        </div>
-
-        <div class="about__right reveal-right">
-          <div class="about__img-wrap">
-            <div class="about__img about__img--main">
-              <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&q=80" alt="한공간 내부" />
-            </div>
-            <div class="about__img about__img--sub">
-              <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=500&q=80" alt="한공간 요리" />
-            </div>
-            <div class="about__img-tag">Yeonnam-dong, Seoul</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- MENU -->
-  <section id="menu" class="menu section">
-    <div class="container">
-      <div class="menu__header">
-        <span class="label label--gold reveal-up">Our Menu</span>
-        <h2 class="menu__title reveal-up delay-1">오늘의 메뉴</h2>
-        <p class="menu__subtitle reveal-up delay-2">제철 식재료와 정성으로 만든 퓨전 다이닝</p>
-      </div>
-
-      <div class="menu__tabs reveal-up delay-3">
-        <button class="tab active" data-tab="signature">
-          <span class="tab__kr">시그니처</span>
-          <span class="tab__en">Signature</span>
-        </button>
-        <button class="tab" data-tab="pasta">
-          <span class="tab__kr">파스타</span>
-          <span class="tab__en">Pasta</span>
-        </button>
-        <button class="tab" data-tab="side">
-          <span class="tab__kr">사이드</span>
-          <span class="tab__en">Side</span>
-        </button>
-      </div>
-
-      <!-- 시그니처 -->
-      <div class="menu__panel active" data-panel="signature">
-        <div class="menu__featured">
-          <div class="menu__card menu__card--large stagger">
-            <div class="menu__card-inner">
-              <div class="menu__card-tag">대표 메뉴</div>
-              <div class="menu__card-body">
-                <h3>유자 유린기</h3>
-                <p>상큼한 유자 소스와 촉촉한 닭고기의 완벽한 조화.<br/>한공간의 가장 사랑받는 시그니처 안주</p>
-              </div>
-              <div class="menu__card-footer">
-                <span class="menu__price">24,000<em>원</em></span>
-              </div>
-            </div>
-          </div>
-          <div class="menu__card menu__card--large stagger">
-            <div class="menu__card-inner">
-              <div class="menu__card-tag">대표 메뉴</div>
-              <div class="menu__card-body">
-                <h3>양고기 전병 플레이트</h3>
-                <p>부드러운 전병에 향긋한 양고기를 감싼 이색 플레이트.<br/>한 입 베어 물면 펼쳐지는 이국적인 맛</p>
-              </div>
-              <div class="menu__card-footer">
-                <span class="menu__price">21,000<em>원</em></span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="menu__list">
-          <div class="menu__row stagger">
-            <div class="menu__row-info">
-              <h3>온통초록 부라타</h3>
-              <p>신선한 부라타 치즈와 초록 채소의 상큼한 조화</p>
-            </div>
-            <span class="menu__row-price">15,000원</span>
-          </div>
-          <div class="menu__row stagger">
-            <div class="menu__row-info">
-              <h3>문어감자 사장님</h3>
-              <p>쫄깃한 문어와 포슬포슬 감자의 든든한 안주</p>
-            </div>
-            <span class="menu__row-price">18,000원</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- 파스타 -->
-      <div class="menu__panel" data-panel="pasta">
-        <div class="menu__list">
-          <div class="menu__row stagger">
-            <div class="menu__row-info">
-              <h3>달래 된장 크림파스타</h3>
-              <p>향긋한 달래와 깊은 된장의 풍미가 어우러진 크림 파스타</p>
-            </div>
-            <span class="menu__row-price">19,000원</span>
-          </div>
-          <div class="menu__row stagger">
-            <div class="menu__row-info">
-              <h3>호박고지 앤쵸비 오일파스타</h3>
-              <p>말린 호박고지와 앤쵸비의 고소하고 깊은 오일 파스타</p>
-            </div>
-            <span class="menu__row-price">20,000원</span>
-          </div>
-          <div class="menu__row stagger">
-            <div class="menu__row-info">
-              <h3>음메헤 양고기 파스틴</h3>
-              <p>양고기의 깊은 맛을 파스타에 담은 시그니처 메뉴</p>
-            </div>
-            <span class="menu__row-price">21,000원</span>
-          </div>
-          <div class="menu__row stagger">
-            <div class="menu__row-info">
-              <h3>돌김 성게 로제파스타</h3>
-              <p>국산 돌김과 성게알이 만든 바다향 가득한 로제 파스타</p>
-            </div>
-            <span class="menu__row-price">22,000원</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- 사이드 -->
-      <div class="menu__panel" data-panel="side">
-        <div class="menu__list">
-          <div class="menu__row stagger">
-            <div class="menu__row-info">
-              <h3>마라 만두</h3>
-              <p>얼얼한 마라 소스와 바삭한 만두의 중독적인 조합</p>
-            </div>
-            <span class="menu__row-price menu__row-price--inquiry">문의</span>
-          </div>
-          <div class="menu__row stagger">
-            <div class="menu__row-info">
-              <h3>감자 디쉬</h3>
-              <p>시즈닝 가득한 바삭한 감자 플레이트</p>
-            </div>
-            <span class="menu__row-price menu__row-price--inquiry">문의</span>
-          </div>
-          <div class="menu__row stagger">
-            <div class="menu__row-info">
-              <h3>허니갈릭 치킨</h3>
-              <p>달콤한 허니갈릭 소스를 곁들인 바삭한 치킨</p>
-            </div>
-            <span class="menu__row-price menu__row-price--inquiry">문의</span>
-          </div>
-          <div class="menu__row stagger">
-            <div class="menu__row-info">
-              <h3>볶음우동</h3>
-              <p>감칠맛 넘치는 소스의 쫄깃한 볶음우동</p>
-            </div>
-            <span class="menu__row-price menu__row-price--inquiry">문의</span>
-          </div>
-        </div>
-        <p class="menu__note">* 사이드 메뉴 가격은 매장에 직접 문의해 주세요.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- DIVIDER QUOTE -->
-  <div class="quote-band">
-    <div class="container">
-      <blockquote class="quote reveal-up">
-        <p>"한국의 맛, 유럽의 방식으로 재해석하다"</p>
-      </blockquote>
-    </div>
-  </div>
-
-  <!-- INFO -->
-  <section id="info" class="info section">
-    <div class="container">
-      <div class="info__top">
-        <span class="label reveal-up">Visit Us</span>
-        <h2 class="reveal-up delay-1">방문안내</h2>
-      </div>
-      <div class="info__grid">
-        <div class="info__hours reveal-up delay-2">
-          <h3>영업시간</h3>
-          <ul class="hours">
-            <li class="stagger"><span class="hours__day">월요일</span><span class="hours__sep"></span><span class="hours__time">17:00 – 00:00</span></li>
-            <li class="stagger hours--closed"><span class="hours__day">화요일</span><span class="hours__sep"></span><span class="hours__time">휴무</span></li>
-            <li class="stagger"><span class="hours__day">수요일</span><span class="hours__sep"></span><span class="hours__time">17:00 – 00:00</span></li>
-            <li class="stagger"><span class="hours__day">목요일</span><span class="hours__sep"></span><span class="hours__time">17:00 – 00:00</span></li>
-            <li class="stagger"><span class="hours__day">금요일</span><span class="hours__sep"></span><span class="hours__time">17:00 – 00:00</span></li>
-            <li class="stagger"><span class="hours__day">토요일</span><span class="hours__sep"></span><span class="hours__time">17:00 – 00:00</span></li>
-            <li class="stagger"><span class="hours__day">일요일</span><span class="hours__sep"></span><span class="hours__time">17:00 – 00:00</span></li>
+          <h1>한장</h1>
+          <p class="onboard-tagline">대학 장학금,<br /><strong>한 번에 찾고 한 번에 신청</strong>하세요</p>
+          <ul class="onboard-points">
+            <li><span class="pt-icon">🔍</span> 교내·교외 장학금을 내 조건으로 자동 매칭</li>
+            <li><span class="pt-icon">⚡</span> 증명서 자동 첨부로 원클릭 신청</li>
+            <li><span class="pt-icon">🔔</span> 마감일 관리와 신청 현황 추적</li>
           </ul>
-          <p class="info__note">※ 공휴일 영업시간은 다를 수 있습니다.</p>
         </div>
+        <div class="onboard-actions">
+          <button class="btn btn-primary btn-lg" data-next>시작하기</button>
+          <p class="onboard-note">1분이면 내가 받을 수 있는 장학금을 알 수 있어요</p>
+        </div>
+      </div>
 
-        <div class="info__location reveal-up delay-3">
-          <h3>오시는 길</h3>
-          <address>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-            서울특별시 마포구 연남동 561-4<br/>동교로27길 78
-          </address>
-          <a class="info__tel" href="tel:01072234247">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.63a19.79 19.79 0 01-3.07-8.67A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
-            010-7223-4247
-          </a>
-          <div class="map-wrap">
-            <iframe
-              src="https://maps.google.com/maps?q=37.5637,126.9270&z=16&output=embed"
-              width="100%" height="280"
-              style="border:0;" allowfullscreen loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade">
-            </iframe>
+      <!-- Step 1: 학적 -->
+      <div class="onboard-step" data-step="1" hidden>
+        <div class="onboard-body">
+          <h2>학적 정보를 알려주세요</h2>
+          <p class="onboard-sub">전국 모든 대학을 지원해요</p>
+          <label class="field">
+            <span class="field-label">학교</span>
+            <input type="text" id="in-school" list="univ-list" placeholder="학교명을 검색하세요" maxlength="30" />
+            <datalist id="univ-list"></datalist>
+          </label>
+          <div class="field">
+            <span class="field-label">전공 계열</span>
+            <div class="chip-group" id="in-track"></div>
+          </div>
+          <label class="field">
+            <span class="field-label">학과 / 전공 (선택)</span>
+            <input type="text" id="in-major" placeholder="예: 컴퓨터공학과" maxlength="30" />
+          </label>
+          <label class="field">
+            <span class="field-label">이름 (선택)</span>
+            <input type="text" id="in-name" placeholder="예: 김한장" maxlength="12" />
+          </label>
+          <div class="field">
+            <span class="field-label">학년</span>
+            <div class="chip-group" id="in-year">
+              <button class="chip" data-value="1">1학년</button>
+              <button class="chip" data-value="2">2학년</button>
+              <button class="chip" data-value="3">3학년</button>
+              <button class="chip" data-value="4">4학년</button>
+            </div>
+          </div>
+          <div class="field">
+            <span class="field-label">학적 상태</span>
+            <div class="chip-group" id="in-status">
+              <button class="chip" data-value="enrolled">재학</button>
+              <button class="chip" data-value="freshman">신입학 첫 학기</button>
+              <button class="chip" data-value="returning">복학</button>
+            </div>
           </div>
         </div>
+        <div class="onboard-actions">
+          <button class="btn btn-primary btn-lg" data-next>다음</button>
+        </div>
       </div>
-    </div>
-  </section>
 
-  <!-- FOOTER -->
-  <footer class="footer">
-    <div class="container footer__inner">
-      <div class="footer__brand">
-        <p class="footer__logo">한공간</p>
-        <p class="footer__tagline">연남동 퓨전 파스타 바</p>
+      <!-- Step 2: 성적/소득 -->
+      <div class="onboard-step" data-step="2" hidden>
+        <div class="onboard-body">
+          <h2>성적과 소득 정보를 알려주세요</h2>
+          <p class="onboard-sub">장학금 자격 판단의 핵심 기준이에요</p>
+          <label class="field">
+            <span class="field-label">직전학기 평점 (4.5 만점)</span>
+            <input type="number" id="in-gpa" placeholder="예: 3.85" min="0" max="4.5" step="0.01" inputmode="decimal" />
+            <span class="field-hint">신입학 첫 학기는 성적 요건이 면제 처리돼요 (비워두어도 괜찮아요)</span>
+          </label>
+          <label class="field">
+            <span class="field-label">학자금 지원구간 (소득구간)</span>
+            <select id="in-bracket">
+              <option value="">모름 / 미산정</option>
+              <option value="1">1구간</option><option value="2">2구간</option>
+              <option value="3">3구간</option><option value="4">4구간</option>
+              <option value="5">5구간</option><option value="6">6구간</option>
+              <option value="7">7구간</option><option value="8">8구간</option>
+              <option value="9">9구간</option><option value="10">10구간</option>
+            </select>
+            <span class="field-hint">한국장학재단에서 산정한 구간이에요. 모르면 '모름'을 선택해도 매칭돼요.</span>
+          </label>
+          <div class="field">
+            <span class="field-label">거주 지역</span>
+            <div class="chip-group" id="in-region">
+              <button class="chip" data-value="seoul">서울</button>
+              <button class="chip" data-value="gyeonggi">경기/인천</button>
+              <button class="chip" data-value="etc">그 외</button>
+            </div>
+          </div>
+        </div>
+        <div class="onboard-actions">
+          <button class="btn btn-primary btn-lg" data-next>다음</button>
+        </div>
       </div>
-      <div class="footer__links">
-        <a href="#about">소개</a>
-        <a href="#menu">메뉴</a>
-        <a href="#info">방문안내</a>
-      </div>
-      <div class="footer__contact">
-        <p>서울 마포구 연남동 561-4</p>
-        <p>010-7223-4247</p>
-      </div>
-    </div>
-    <div class="footer__bottom">
-      <p>© 2025 한공간. All rights reserved.</p>
-    </div>
-  </footer>
 
-  <script src="main.js"></script>
+      <!-- Step 3: 특별자격 -->
+      <div class="onboard-step" data-step="3" hidden>
+        <div class="onboard-body">
+          <h2>해당하는 항목을 모두 선택하세요</h2>
+          <p class="onboard-sub">해당 사항이 없으면 바로 완료를 눌러도 돼요</p>
+          <div class="check-list" id="in-flags">
+            <label class="check-item"><input type="checkbox" value="basicLiving" /><span>기초생활수급자</span></label>
+            <label class="check-item"><input type="checkbox" value="nearPoverty" /><span>차상위계층</span></label>
+            <label class="check-item"><input type="checkbox" value="multiChild" /><span>다자녀 가구 (3자녀 이상)</span></label>
+            <label class="check-item"><input type="checkbox" value="merit" /><span>국가유공자 (본인/자녀)</span></label>
+            <label class="check-item"><input type="checkbox" value="disabled" /><span>장애 학생</span></label>
+          </div>
+          <div class="check-list" id="in-extra">
+            <label class="check-item"><input type="checkbox" id="in-cert" /><span>공인 외국어성적 보유 (FLEX, TOEFL, HSK 등)</span></label>
+            <label class="check-item"><input type="checkbox" id="in-exchange" /><span>해외 교환학생 파견 예정</span></label>
+          </div>
+        </div>
+        <div class="onboard-actions">
+          <button class="btn btn-primary btn-lg" id="btn-finish-onboard">내 장학금 찾기</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 홈 ============ -->
+    <section id="screen-home" class="screen" hidden>
+      <header class="home-header">
+        <div class="home-id">
+          <div class="avatar" id="home-avatar">학</div>
+          <div>
+            <p class="home-greet" id="home-greet">안녕하세요!</p>
+            <p class="home-school" id="home-school">대학 미설정</p>
+          </div>
+        </div>
+        <button class="icon-btn" id="btn-edit-profile" title="프로필 수정" aria-label="프로필 수정">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33h.01a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51h.01a1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82v.01a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        </button>
+      </header>
+
+      <div class="hero-card">
+        <p class="hero-label">지금 받을 수 있는 장학금</p>
+        <p class="hero-amount" id="hero-amount">0원</p>
+        <p class="hero-count" id="hero-count"></p>
+        <button class="btn btn-white btn-lg" id="btn-apply-all">⚡ 한 번에 모두 신청하기</button>
+      </div>
+
+      <div class="section-head">
+        <h3>마감 임박</h3>
+        <button class="link-btn" data-goto="explore">전체 보기</button>
+      </div>
+      <div id="home-deadline-list" class="card-list"></div>
+
+      <div class="section-head">
+        <h3>신청 현황</h3>
+        <button class="link-btn" data-goto="applications">전체 보기</button>
+      </div>
+      <div id="home-apps" class="card-list"></div>
+    </section>
+
+    <!-- ============ 장학금 탐색 ============ -->
+    <section id="screen-explore" class="screen" hidden>
+      <header class="page-header"><h2>장학금 찾기</h2></header>
+      <div class="filter-row" id="explore-filters">
+        <button class="filter-chip active" data-filter="all">전체</button>
+        <button class="filter-chip" data-filter="교내">교내</button>
+        <button class="filter-chip" data-filter="교외">교외</button>
+        <button class="filter-chip" data-filter="eligible">신청 가능만</button>
+      </div>
+      <div id="explore-list" class="card-list"></div>
+      <p class="data-note">※ 본 화면의 장학금 정보는 시연용 예시 데이터입니다. 실제 공고는 학교 홈페이지와 한국장학재단을 확인하세요.</p>
+    </section>
+
+    <!-- ============ 신청 내역 ============ -->
+    <section id="screen-applications" class="screen" hidden>
+      <header class="page-header"><h2>신청 내역</h2></header>
+      <div id="apps-summary" class="apps-summary"></div>
+      <div id="apps-list" class="card-list"></div>
+    </section>
+
+    <!-- ============ MY ============ -->
+    <section id="screen-my" class="screen" hidden>
+      <header class="page-header"><h2>MY</h2></header>
+      <div id="my-profile" class="my-card"></div>
+      <div class="my-menu">
+        <button class="my-menu-item" id="btn-my-edit">프로필 수정</button>
+        <button class="my-menu-item danger" id="btn-reset">데이터 초기화</button>
+      </div>
+      <p class="data-note">한장 v0.2 (MVP) · 전국 대학 지원</p>
+    </section>
+
+    <!-- ============ 하단 내비게이션 ============ -->
+    <nav id="bottom-nav" class="bottom-nav" hidden>
+      <button class="nav-item active" data-nav="home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>
+        홈
+      </button>
+      <button class="nav-item" data-nav="explore">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg>
+        장학금
+      </button>
+      <button class="nav-item" data-nav="applications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>
+        신청내역
+      </button>
+      <button class="nav-item" data-nav="my">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
+        MY
+      </button>
+    </nav>
+
+    <!-- ============ 상세 바텀시트 ============ -->
+    <div id="sheet-backdrop" class="sheet-backdrop" hidden></div>
+    <div id="detail-sheet" class="sheet" hidden></div>
+
+    <!-- ============ 토스트 ============ -->
+    <div id="toast" class="toast" hidden></div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
