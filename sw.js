@@ -1,5 +1,5 @@
-/* 한장 서비스워커 — 오프라인 캐시 (PWA) */
-const CACHE = 'hanjang-v2';
+/* 한대장 서비스워커 — 오프라인 캐시 (PWA) */
+const CACHE = 'handaejang-v1';
 const ASSETS = ['.', 'index.html', 'style.css', 'app.js', 'data.js', 'manifest.json', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {

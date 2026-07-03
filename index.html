@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>한장 — 대학 장학금, 한 번에</title>
+  <title>한대장 — 한국 대학교 장학금, 한 번에</title>
   <meta name="description" content="전국 대학생을 위한 맞춤 장학금 매칭 · 원클릭 신청 서비스" />
   <meta name="theme-color" content="#101d3d" />
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
@@ -25,8 +25,8 @@
           <div class="onboard-logo">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/><path d="M22 10v6"/></svg>
           </div>
-          <h1>한장</h1>
-          <p class="onboard-tagline">대학 장학금,<br /><strong>한 번에 찾고 한 번에 신청</strong>하세요</p>
+          <h1>한대장</h1>
+          <p class="onboard-tagline">한국 대학교 장학금,<br /><strong>한 번에 찾고 한 번에 신청</strong>하세요</p>
           <ul class="onboard-points">
             <li><span class="pt-icon">🔍</span> 교내·교외 장학금을 내 조건으로 자동 매칭</li>
             <li><span class="pt-icon">⚡</span> 증명서 자동 첨부로 원클릭 신청</li>
@@ -44,18 +44,19 @@
         <div class="onboard-body">
           <h2>학적 정보를 알려주세요</h2>
           <p class="onboard-sub">전국 모든 대학을 지원해요</p>
-          <label class="field">
+          <label class="field ac-wrap">
             <span class="field-label">학교</span>
-            <input type="text" id="in-school" list="univ-list" placeholder="학교명을 검색하세요" maxlength="30" />
-            <datalist id="univ-list"></datalist>
+            <input type="text" id="in-school" placeholder="학교명을 검색하세요 (예: 외대, 서울)" maxlength="30" autocomplete="off" />
+            <div class="ac-list" hidden></div>
           </label>
           <div class="field">
             <span class="field-label">전공 계열</span>
             <div class="chip-group" id="in-track"></div>
           </div>
-          <label class="field">
+          <label class="field ac-wrap">
             <span class="field-label">학과 / 전공 (선택)</span>
-            <input type="text" id="in-major" placeholder="예: 컴퓨터공학과" maxlength="30" />
+            <input type="text" id="in-major" placeholder="예: 컴퓨터공학과" maxlength="30" autocomplete="off" />
+            <div class="ac-list" hidden></div>
           </label>
           <label class="field">
             <span class="field-label">이름 (선택)</span>
@@ -138,6 +139,38 @@
           </div>
         </div>
         <div class="onboard-actions">
+          <button class="btn btn-primary btn-lg" data-next>다음</button>
+        </div>
+      </div>
+
+      <!-- Step 4: 공통 서류 정보 -->
+      <div class="onboard-step" data-step="4" hidden>
+        <div class="onboard-body">
+          <h2>서류에 자동으로 채울<br />기본 정보를 알려주세요</h2>
+          <p class="onboard-sub">거의 모든 장학금 신청서가 공통으로 요구하는 정보예요.<br />모두 선택 사항이고, 이 기기에만 저장돼요.</p>
+          <label class="field">
+            <span class="field-label">학번 (선택)</span>
+            <input type="text" id="in-sid" placeholder="예: 202512345" maxlength="12" inputmode="numeric" autocomplete="off" />
+          </label>
+          <label class="field">
+            <span class="field-label">생년월일 (선택)</span>
+            <input type="text" id="in-birth" placeholder="예: 2005.03.14" maxlength="10" autocomplete="off" />
+          </label>
+          <label class="field">
+            <span class="field-label">휴대폰 번호 (선택)</span>
+            <input type="tel" id="in-phone" placeholder="예: 010-1234-5678" maxlength="13" autocomplete="off" />
+          </label>
+          <label class="field">
+            <span class="field-label">이메일 (선택)</span>
+            <input type="email" id="in-email" placeholder="예: hello@example.com" maxlength="40" autocomplete="off" />
+          </label>
+          <label class="field">
+            <span class="field-label">장학금 수령 계좌 (선택)</span>
+            <input type="text" id="in-bank" placeholder="은행명 (예: 국민은행)" maxlength="12" autocomplete="off" style="margin-bottom:8px" />
+            <input type="text" id="in-account" placeholder="계좌번호" maxlength="20" inputmode="numeric" autocomplete="off" />
+          </label>
+        </div>
+        <div class="onboard-actions">
           <button class="btn btn-primary btn-lg" id="btn-finish-onboard">내 장학금 찾기</button>
         </div>
       </div>
@@ -206,7 +239,7 @@
         <button class="my-menu-item" id="btn-my-edit">프로필 수정</button>
         <button class="my-menu-item danger" id="btn-reset">데이터 초기화</button>
       </div>
-      <p class="data-note">한장 v0.2 (MVP) · 전국 대학 지원</p>
+      <p class="data-note">한대장 v0.3 (MVP) · 전국 대학 지원</p>
     </section>
 
     <!-- ============ 하단 내비게이션 ============ -->

@@ -233,12 +233,53 @@ input::placeholder { color: var(--text-weak); }
   background: var(--primary-weak);
   box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.10);
 }
+/* 커스텀 체크박스 — appearance:none 전역 규칙 때문에 iOS에서
+   기본 체크 표시가 사라지므로 체크 아이콘을 직접 그린다 */
 .check-item input {
-  width: 20px; height: 20px;
-  accent-color: var(--primary);
+  width: 24px; height: 24px;
   padding: 0;
   flex-shrink: 0;
+  border: 1.5px solid rgba(18, 22, 31, 0.22);
+  border-radius: 50%;
+  background: #fff center / 62% no-repeat;
+  transition: all 0.15s;
+  cursor: pointer;
 }
+.check-item input:checked {
+  border-color: var(--primary);
+  background-color: var(--primary);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-6.5' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  box-shadow: 0 3px 8px rgba(47, 107, 255, 0.35);
+}
+
+/* ---------------- 자동추천 드롭다운 ---------------- */
+.ac-wrap { position: relative; }
+.ac-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 6px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lift);
+  overflow: hidden;
+  z-index: 60;
+}
+.ac-list[hidden] { display: none; }
+.ac-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 13px 16px;
+  font-size: 15px;
+  font-weight: 500;
+  border-bottom: 1px solid var(--line);
+  transition: background 0.12s;
+}
+.ac-item:last-child { border-bottom: none; }
+.ac-item:hover, .ac-item:active { background: var(--primary-weak); color: var(--primary); }
 
 /* ---------------- 홈 ---------------- */
 .home-header {
@@ -345,6 +386,7 @@ input::placeholder { color: var(--text-weak); }
   color: #fff;
   font-variant-numeric: tabular-nums;
 }
+.badge-pending { background: var(--orange-weak); color: var(--orange); }
 
 .sch-name { font-size: 16px; font-weight: 700; letter-spacing: -0.015em; }
 .sch-amount { font-size: 15px; font-weight: 700; color: var(--primary); margin-top: 3px; font-variant-numeric: tabular-nums; }
@@ -643,6 +685,58 @@ input::placeholder { color: var(--text-weak); }
 .applied-at { font-size: 12px; color: var(--text-weak); text-align: center; margin-bottom: 14px; }
 
 #btn-apply-one { margin-top: 12px; }
+
+/* ---------------- 서류 작성 도우미 ---------------- */
+textarea {
+  font: inherit;
+  color: var(--text);
+  width: 100%;
+  padding: 13px 15px;
+  border: 1.5px solid rgba(18, 22, 31, 0.10);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  outline: none;
+  resize: vertical;
+  line-height: 1.65;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.12);
+}
+.dp-block { margin-bottom: 22px; }
+.dp-block > h4 { margin-top: 0 !important; }
+.dp-text { font-size: 14px; }
+.dp-note {
+  font-size: 12px;
+  color: var(--text-weak);
+  text-align: center;
+  margin-top: 10px;
+  line-height: 1.6;
+}
+.doc-legend {
+  font-size: 12px;
+  color: var(--text-weak);
+  margin-top: 8px;
+  line-height: 1.6;
+}
+.dp-saved {
+  margin: 10px 0 14px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-size: 14px;
+}
+.dp-saved summary { font-weight: 700; cursor: pointer; }
+.dp-saved pre {
+  white-space: pre-wrap;
+  font: inherit;
+  font-size: 13px;
+  color: var(--text-sub);
+  margin: 8px 0;
+}
+.summary-note { font-size: 12px; opacity: 0.75; margin-top: 8px; }
+.applied-at a { color: var(--primary); font-weight: 700; }
 
 /* ---------------- 토스트 ---------------- */
 .toast {
