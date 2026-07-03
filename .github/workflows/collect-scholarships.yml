@@ -1,0 +1,48 @@
+name: 장학공고 수집 로봇
+
+on:
+  schedule:
+    - cron: '0 0 * * *'   # 매일 09:00 KST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: collector
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - id: run
+        name: 게시판 수집
+        run: node collector/collect.mjs
+
+      - name: 수집 상태 저장 (중복 방지 기록)
+        run: |
+          git config user.name "handaejang-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add collector/seen.json
+          if ! git diff --cached --quiet; then
+            git commit -m "collector: seen state update"
+            git push
+          fi
+
+      - name: 컨펌용 리포트 이슈 생성
+        if: steps.run.outputs.new_count != '0' || github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --title "🤖 장학공고 수집 리포트 $(TZ=Asia/Seoul date +%Y-%m-%d) (새 공고 ${{ steps.run.outputs.new_count }}건)" \
+            --body-file collector/report.md \
+            --repo "${{ github.repository }}"

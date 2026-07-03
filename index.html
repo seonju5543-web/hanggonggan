@@ -49,6 +49,10 @@
             <input type="text" id="in-school" placeholder="학교명을 검색하세요 (예: 외대, 서울)" maxlength="30" autocomplete="off" />
             <div class="ac-list" hidden></div>
           </label>
+          <div class="field" id="campus-field" hidden>
+            <span class="field-label">캠퍼스</span>
+            <div class="chip-group" id="in-campus"></div>
+          </div>
           <div class="field">
             <span class="field-label">전공 계열</span>
             <div class="chip-group" id="in-track"></div>
@@ -235,6 +239,7 @@
     <section id="screen-my" class="screen" hidden>
       <header class="page-header"><h2>MY</h2></header>
       <div id="my-profile" class="my-card"></div>
+      <div id="my-wallet" class="my-card"></div>
       <div class="my-menu">
         <button class="my-menu-item" id="btn-my-edit">프로필 수정</button>
         <button class="my-menu-item danger" id="btn-reset">데이터 초기화</button>

@@ -184,8 +184,8 @@ const NATIONAL_SCHOLARSHIPS = [
   },
 ];
 
-/* ---------------- 교내 장학금 템플릿 (재학 대학 기준 생성) ---------------- */
-function buildCampusScholarships(school) {
+/* ---------------- 교내 장학금 템플릿 (재학 대학·캠퍼스 기준 생성) ---------------- */
+function buildCampusScholarships(school, campus) {
   const list = [
     {
       id: 'campus-merit',
@@ -280,7 +280,7 @@ function buildCampusScholarships(school) {
   return list.map((s) => ({
     ...s,
     type: '교내',
-    provider: school,
+    provider: campus ? `${school} ${campus}` : school,
     period: '2026학년도 2학기',
   }));
 }
@@ -338,6 +338,38 @@ const MAJORS_BY_SCHOOL = {
   ],
 };
 
+/* 이원화·분교 캠퍼스 (캠퍼스별로 장학 공고가 다를 수 있음) */
+const CAMPUSES_BY_SCHOOL = {
+  '연세대학교': ['신촌캠퍼스', '미래캠퍼스(원주)'],
+  '고려대학교': ['서울캠퍼스(안암)', '세종캠퍼스'],
+  '한국외국어대학교': ['서울캠퍼스', '글로벌캠퍼스(용인)'],
+  '성균관대학교': ['인문사회과학캠퍼스(서울)', '자연과학캠퍼스(수원)'],
+  '경희대학교': ['서울캠퍼스', '국제캠퍼스(용인)'],
+  '중앙대학교': ['서울캠퍼스', '다빈치캠퍼스(안성)'],
+  '한양대학교': ['서울캠퍼스', 'ERICA캠퍼스(안산)'],
+  '건국대학교': ['서울캠퍼스', '글로컬캠퍼스(충주)'],
+  '동국대학교': ['서울캠퍼스', 'WISE캠퍼스(경주)'],
+  '홍익대학교': ['서울캠퍼스', '세종캠퍼스'],
+  '단국대학교': ['죽전캠퍼스', '천안캠퍼스'],
+  '상명대학교': ['서울캠퍼스', '천안캠퍼스'],
+  '명지대학교': ['인문캠퍼스(서울)', '자연캠퍼스(용인)'],
+};
+
+/* 서류 보관함 슬롯 — 요구 서류명과 자동 매칭 */
+const DOC_SLOTS = [
+  { slot: 'gradeCert',  label: '성적증명서',        match: /성적증명서/,   issue: '학교 포털 증명발급 또는 웹민원센터 (인터넷 즉시 발급)' },
+  { slot: 'enrollCert', label: '재학증명서',        match: /재학증명서/,   issue: '학교 포털 증명발급 (인터넷 즉시 발급)' },
+  { slot: 'family',     label: '가족관계증명서',     match: /가족관계증명서/, issue: '정부24 (gov.kr) 무료 발급' },
+  { slot: 'resident',   label: '주민등록등본',       match: /주민등록등본/,  issue: '정부24 (gov.kr) 무료 발급' },
+  { slot: 'welfare',    label: '수급·차상위 등 자격 증명', match: /자격 증명서/, issue: '정부24 또는 주민센터' },
+  { slot: 'langCert',   label: '공인 외국어성적표',   match: /외국어성적표/,  issue: '각 시험 주관사 홈페이지에서 성적표 발급' },
+  { slot: 'exchange',   label: '교환학생 파견 확인서', match: /파견 확인서/,  issue: '학교 국제교류팀 발급' },
+  { slot: 'recommend',  label: '추천서',            match: /추천서/,       issue: '지도교수님께 요청 (양식은 공고 첨부 확인)' },
+];
+function slotForDoc(doc) {
+  return DOC_SLOTS.find((s) => s.match.test(doc)) || null;
+}
+
 /* 공식 확인·최종 제출 채널 (신청 준비 완료 후 안내) */
 const OFFICIAL_CHANNELS = {
   'kosaf-type1':      { label: '한국장학재단', url: 'https://www.kosaf.go.kr' },
@@ -350,8 +382,33 @@ const OFFICIAL_CHANNELS = {
   'kwanjeong':        { label: '관정이종환교육재단', url: 'https://www.ikef.or.kr' },
   'mirae-exchange':   { label: '미래에셋희망재단 홈페이지' },
 };
+/* 접수 채널별 최종 제출 단계 가이드 */
+const SUBMIT_GUIDES = {
+  kosaf: [
+    '한국장학재단 홈페이지(kosaf.go.kr) 또는 앱에 접속해요',
+    '통합신청 기간에 로그인(본인 인증)하고 신청서를 작성해요',
+    '가구원 정보제공 동의를 진행해요 (부모님 인증 필요)',
+    '이 앱에서 준비한 내용은 [복사] 버튼으로 붙여넣을 수 있어요',
+  ],
+  foundation: [
+    '재단 공고에서 접수 방법(이메일·온라인 접수·우편)을 확인해요',
+    '이메일 접수라면 [파일과 함께 공유]로 서류를 한 번에 보낼 수 있어요',
+    '온라인 접수라면 [복사] 버튼으로 작성한 내용을 붙여넣어요',
+  ],
+  campus: [
+    '학교 포털 장학 메뉴 또는 장학팀 공지에서 접수 방법을 확인해요',
+    '이메일 접수라면 [파일과 함께 공유]로 서류를 한 번에 보낼 수 있어요',
+    '포털 입력형이라면 [복사] 버튼으로 내용을 붙여넣어요',
+  ],
+};
+
 function officialChannel(sch) {
-  return OFFICIAL_CHANNELS[sch.id] || { label: `${sch.provider} 장학공지 (학교 포털)` };
+  const ch = OFFICIAL_CHANNELS[sch.id];
+  if (ch) {
+    const kind = sch.id.startsWith('kosaf') ? 'kosaf' : 'foundation';
+    return { ...ch, guide: SUBMIT_GUIDES[kind] };
+  }
+  return { label: `${sch.provider} 장학공지 (학교 포털)`, guide: SUBMIT_GUIDES.campus };
 }
 
 const FLAG_LABELS = {

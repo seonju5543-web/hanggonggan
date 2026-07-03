@@ -764,3 +764,59 @@ textarea:focus {
   body { background: linear-gradient(180deg, #eceff4, #e4e8ef); }
   .app { box-shadow: 0 0 60px rgba(16, 24, 40, 0.10); }
 }
+
+/* ---------------- 서류 보관함 ---------------- */
+.wallet-title { font-size: 17px; font-weight: 800; }
+.wallet-sub { font-size: 12.5px; color: var(--text-weak); margin: 4px 0 14px; line-height: 1.6; }
+.wallet-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+.wallet-info { min-width: 0; }
+.wallet-label { font-size: 14.5px; font-weight: 700; }
+.wallet-status {
+  font-size: 12px;
+  color: var(--text-weak);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 200px;
+}
+.wallet-btns { display: flex; gap: 6px; flex-shrink: 0; }
+.wallet-btn {
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 7px 11px;
+  border-radius: 9px;
+  background: var(--bg);
+  color: var(--text-sub);
+  cursor: pointer;
+}
+.wallet-btn.primary { background: var(--primary-weak); color: var(--primary); }
+.wallet-btn.danger { color: var(--red); }
+
+/* ---------------- 제출 가이드 · 액션 ---------------- */
+.guide-list {
+  margin: 4px 0 14px 20px;
+  font-size: 14px;
+  color: var(--text-sub);
+  display: grid;
+  gap: 6px;
+}
+.submit-actions { display: flex; gap: 8px; margin-bottom: 14px; }
+.btn-outline {
+  flex: 1;
+  padding: 13px 8px;
+  font-size: 14px;
+  border: 1.5px solid rgba(47, 107, 255, 0.35);
+  color: var(--primary);
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+}
+.doc-ok { color: var(--green); }
+.doc-miss { color: var(--orange); }

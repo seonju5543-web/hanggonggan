@@ -24,12 +24,13 @@ function saveState() {
 }
 
 /* ---------------- 장학금 목록 (교외 공통 + 재학 대학 교내) ---------------- */
-let campusCache = { school: null, list: [] };
+let campusCache = { key: null, list: [] };
 function allScholarships() {
-  const school = state.profile ? state.profile.school : null;
-  if (!school) return NATIONAL_SCHOLARSHIPS;
-  if (campusCache.school !== school) {
-    campusCache = { school, list: buildCampusScholarships(school) };
+  const p = state.profile;
+  if (!p || !p.school) return NATIONAL_SCHOLARSHIPS;
+  const key = p.school + '|' + (p.campus || '');
+  if (campusCache.key !== key) {
+    campusCache = { key, list: buildCampusScholarships(p.school, p.campus) };
   }
   return NATIONAL_SCHOLARSHIPS.concat(campusCache.list);
 }
@@ -176,6 +177,57 @@ function esc(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+/* ---------------- 서류 보관함 (기기 내 저장 · 브라우저 내장 금고) ----------------
+   파일은 서버로 전송되지 않고 사용자 기기 안에만 저장된다. */
+let walletCache = {}; // slot -> { name, type, savedAt }
+
+function dbOpen() {
+  return new Promise((res, rej) => {
+    const rq = indexedDB.open('handaejang-docs', 1);
+    rq.onupgradeneeded = () => rq.result.createObjectStore('files', { keyPath: 'slot' });
+    rq.onsuccess = () => res(rq.result);
+    rq.onerror = () => rej(rq.error);
+  });
+}
+function walletTx(mode, fn) {
+  return dbOpen().then((db) => new Promise((res, rej) => {
+    const tx = db.transaction('files', mode);
+    const out = fn(tx.objectStore('files'));
+    tx.oncomplete = () => res(out && out.result);
+    tx.onerror = () => rej(tx.error);
+  }));
+}
+async function walletPut(slot, file) {
+  await walletTx('readwrite', (st) => st.put({
+    slot, name: file.name, type: file.type, blob: file, savedAt: nowStamp(),
+  }));
+  await walletRefresh();
+}
+function walletGetRec(slot) {
+  return walletTx('readonly', (st) => st.get(slot));
+}
+async function walletDeleteSlot(slot) {
+  await walletTx('readwrite', (st) => st.delete(slot));
+  await walletRefresh();
+}
+async function walletRefresh() {
+  try {
+    const all = await walletTx('readonly', (st) => st.getAll());
+    walletCache = {};
+    (all || []).forEach((r) => { walletCache[r.slot] = { name: r.name, type: r.type, savedAt: r.savedAt }; });
+  } catch (e) { walletCache = {}; }
+}
+
+/* 요구 서류의 보관함 상태 한 줄 */
+function docWalletStatus(doc) {
+  const s = slotForDoc(doc);
+  if (!s) return null;
+  const rec = walletCache[s.slot];
+  return rec
+    ? { ok: true, slot: s, text: `보관함에서 자동 첨부 ✓ (${rec.name})` }
+    : { ok: false, slot: s, text: `보관함에 없음 · 발급처: ${s.issue}` };
+}
+
 /* ---------------- 자동추천 (autocomplete) ---------------- */
 function attachAutocomplete(input, getItems) {
   const list = input.parentElement.querySelector('.ac-list');
@@ -283,8 +335,26 @@ function initOnboarding() {
     setChip('#in-region', 'seoul');
   }
 
+  renderCampusChips(p ? p.campus : null);
+
   onboardStep = p ? 1 : 0;
   renderOnboardStep();
+}
+
+/* 학교에 캠퍼스가 있으면 캠퍼스 선택을 보여준다.
+   같은 학교에서 반복 호출되면(포커스 이동으로 인한 change 등) 기존 선택을 유지한다. */
+let campusChipsSchool = null;
+function renderCampusChips(selected) {
+  const school = $('#in-school').value.trim();
+  if (selected == null && school === campusChipsSchool) return;
+  campusChipsSchool = school;
+  const campuses = CAMPUSES_BY_SCHOOL[school];
+  const field = $('#campus-field');
+  if (!campuses) { field.hidden = true; $('#in-campus').innerHTML = ''; return; }
+  field.hidden = false;
+  $('#in-campus').innerHTML = campuses.map((c, i) =>
+    `<button class="chip ${(selected ? c === selected : i === 0) ? 'active' : ''}" data-value="${esc(c)}">${esc(c)}</button>`
+  ).join('');
 }
 
 function setChip(groupSel, value) {
@@ -308,6 +378,7 @@ function collectProfile() {
     status: getChip('#in-status'),
     gpa: Number.isNaN(gpa) ? null : gpa,
     bracket: bracketRaw === '' ? null : Number(bracketRaw),
+    campus: $('#campus-field').hidden ? '' : (getChip('#in-campus') || ''),
     region: getChip('#in-region'),
     flags: $$('#in-flags input:checked').map((c) => c.value),
     cert: $('#in-cert').checked,
@@ -347,7 +418,7 @@ function schCard(sch, result, { compact = false, fit = 0 } = {}) {
 function renderHome() {
   const p = state.profile;
   $('#home-greet').textContent = p.name ? `${p.name}님, 안녕하세요!` : '안녕하세요!';
-  $('#home-school').textContent = p.school || '대학 미설정';
+  $('#home-school').textContent = (p.school || '대학 미설정') + (p.campus ? ' · ' + p.campus : '');
   $('#home-avatar').textContent = (p.name || '학').charAt(0);
 
   const matches = getMatches();
@@ -459,6 +530,22 @@ function autoDocs(sch) {
   return sch.documents.filter((doc) => /자동/.test(doc));
 }
 
+/* 증명서류(작성형 제외)의 보관함 상태 목록 HTML */
+function certStatusListHtml(sch) {
+  const certDocs = sch.documents.filter((doc) => !ESSAY_DEFS.some((e) => e.match.test(doc)));
+  if (!certDocs.length) return '';
+  const rows = certDocs.map((doc) => {
+    const st = docWalletStatus(doc);
+    const name = doc.replace(/\s*\(.*\)$/, '');
+    if (st && st.ok) return `<li class="doc-ok">✓ ${name} — ${st.text}</li>`;
+    if (st) return `<li class="doc-miss">□ ${name} — ${st.text}</li>`;
+    if (/자동/.test(doc)) return `<li>△ ${name} — 학교·재단 연동 후 자동 첨부 (또는 보관함에 올려두세요)</li>`;
+    return `<li>□ ${doc} — 공식 제출 시 함께 준비하세요</li>`;
+  }).join('');
+  return `<h4>증명서류 체크리스트</h4><ul class="doc-list">${rows}</ul>
+    <p class="dp-note">보관함(MY 탭)에 올려둔 서류는 다음 신청부터 자동으로 함께 준비돼요.</p>`;
+}
+
 function personLine(p) {
   const c = p.common || {};
   const bits = [p.school, p.major, `${p.year}학년`, p.name].filter(Boolean).join(' ');
@@ -545,7 +632,6 @@ function renderDocPrep() {
       renderDocPrep();
     });
   } else {
-    const others = otherManualDocs(sch);
     sheet.innerHTML = `
       <div class="sheet-handle"></div>
       <div class="sheet-body">
@@ -556,10 +642,7 @@ function renderDocPrep() {
             <h4>${t.doc}</h4>
             <textarea class="dp-text" data-i="${i}" rows="10">${esc(t.text)}</textarea>
           </div>`).join('')}
-        ${autoDocs(sch).length ? `<h4>자동 첨부 예정</h4>
-          <ul class="doc-list">${autoDocs(sch).map((doc) => `<li><span class="doc-auto">자동</span> ${doc.replace('(자동 제출)', '')} — 학교·재단 연동 후 자동 첨부</li>`).join('')}</ul>` : ''}
-        ${others.length ? `<h4>별도 준비 서류</h4>
-          <ul class="doc-list">${others.map((doc) => `<li><span class="doc-manual">직접</span> ${doc} — 공식 제출 시 함께 준비하세요</li>`).join('')}</ul>` : ''}
+        ${certStatusListHtml(sch)}
         <button class="btn btn-primary btn-lg" id="btn-dp-confirm">✓ 이대로 신청 준비 완료</button>
         <p class="dp-note">완료하면 작성한 서류가 저장되고, 최종 제출처를 안내해 드려요.</p>
       </div>`;
@@ -574,6 +657,53 @@ function renderDocPrep() {
     });
   }
   sheet.scrollTop = 0;
+}
+
+/* ---------------- 제출: 복사 · 파일 공유 ---------------- */
+function buildSubmissionText(sch, app) {
+  const p = state.profile;
+  const parts = [`[${sch.name} 지원서류]`, personLine(p)];
+  if (app && app.docs) app.docs.forEach((t) => parts.push(`\n■ ${t.doc}\n${t.text}`));
+  return parts.join('\n');
+}
+
+function copyText(text, okMsg) {
+  const done = () => toast(okMsg || '복사했어요. 공식 신청 페이지에 붙여넣으세요');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+  } else fallbackCopy(text, done);
+}
+function fallbackCopy(text, done) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); done(); } catch (e) { toast('복사에 실패했어요'); }
+  ta.remove();
+}
+
+async function shareApplication(sch, app) {
+  const text = buildSubmissionText(sch, app);
+  const files = [];
+  for (const doc of sch.documents) {
+    const s = slotForDoc(doc);
+    if (!s) continue;
+    const rec = await walletGetRec(s.slot);
+    if (rec && rec.blob) files.push(new File([rec.blob], rec.name, { type: rec.type }));
+  }
+  try {
+    if (files.length && navigator.canShare && navigator.canShare({ files })) {
+      await navigator.share({ title: `${sch.name} 신청 서류`, text, files });
+      toast('서류와 함께 공유했어요 (메일 앱에서 바로 접수 가능)');
+      return;
+    }
+    if (navigator.share) {
+      await navigator.share({ title: `${sch.name} 신청 서류`, text });
+      toast('내용을 공유했어요. 파일은 보관함에서 따로 첨부하세요');
+      return;
+    }
+  } catch (e) { /* 사용자가 공유를 취소한 경우 */ return; }
+  copyText(text);
 }
 
 /* ---------------- 신청 준비 ---------------- */
@@ -702,7 +832,14 @@ function openDetail(id) {
         ${app.docs && app.docs.length ? `
           <details class="dp-saved"><summary>작성한 서류 보기 (${app.docs.length})</summary>
             ${app.docs.map((t) => `<h4>${esc(t.doc)}</h4><pre>${esc(t.text)}</pre>`).join('')}
-          </details>` : ''}` : ''}
+          </details>` : ''}
+        ${certStatusListHtml(sch)}
+        <h4>최종 제출 방법</h4>
+        <ol class="guide-list">${ch.guide.map((g) => `<li>${g}</li>`).join('')}</ol>
+        <div class="submit-actions">
+          <button class="btn btn-outline" id="btn-copy-docs">📋 서류 내용 복사</button>
+          <button class="btn btn-outline" id="btn-share-docs">📤 파일과 함께 공유</button>
+        </div>` : ''}
 
       <button class="btn btn-primary btn-lg" id="btn-apply-one" ${canApply ? '' : 'disabled'}>${btnLabel}</button>
       ${canApply ? `<p class="dp-note">준비 완료 후 최종 제출처(${ch.label})를 안내해 드려요.</p>` : ''}
@@ -719,6 +856,10 @@ function openDetail(id) {
   if (canApply) {
     $('#btn-apply-one').addEventListener('click', () => applyTo(sch));
   }
+  const copyBtn = $('#btn-copy-docs');
+  if (copyBtn) copyBtn.addEventListener('click', () => copyText(buildSubmissionText(sch, app)));
+  const shareBtn = $('#btn-share-docs');
+  if (shareBtn) shareBtn.addEventListener('click', () => shareApplication(sch, app));
 }
 
 function closeSheet() {
@@ -787,6 +928,55 @@ function renderMy() {
     </div>
     <p class="my-flags">특별자격: ${flagText}</p>
     <p class="my-flags">공통 서류정보(학번·연락처·계좌 등)는 이 기기에만 저장되고 서류 초안에 자동 기입돼요.</p>`;
+  renderWallet();
+}
+
+function renderWallet() {
+  const el = $('#my-wallet');
+  el.innerHTML = `
+    <p class="wallet-title">서류 보관함</p>
+    <p class="wallet-sub">한 번 올려두면 모든 신청에 자동으로 함께 준비돼요. 파일은 휴대폰 안에만 저장돼요.</p>
+    ${DOC_SLOTS.map((s) => {
+      const rec = walletCache[s.slot];
+      return `
+        <div class="wallet-row">
+          <div class="wallet-info">
+            <p class="wallet-label">${s.label}</p>
+            <p class="wallet-status">${rec ? `✓ ${esc(rec.name)} · ${rec.savedAt}` : `없음 · ${s.issue}`}</p>
+          </div>
+          <div class="wallet-btns">
+            ${rec ? `<button class="wallet-btn" data-view="${s.slot}">보기</button>
+                     <button class="wallet-btn danger" data-del="${s.slot}">삭제</button>` : ''}
+            <label class="wallet-btn primary">${rec ? '교체' : '올리기'}
+              <input type="file" data-slot="${s.slot}" accept="image/*,application/pdf" hidden />
+            </label>
+          </div>
+        </div>`;
+    }).join('')}`;
+
+  $$('#my-wallet input[type=file]').forEach((inp) =>
+    inp.addEventListener('change', async () => {
+      const file = inp.files[0];
+      if (!file) return;
+      if (file.size > 10 * 1024 * 1024) { toast('10MB 이하 파일만 올릴 수 있어요'); return; }
+      await walletPut(inp.dataset.slot, file);
+      toast('보관함에 저장했어요');
+      renderWallet();
+    })
+  );
+  $$('#my-wallet [data-view]').forEach((btn) =>
+    btn.addEventListener('click', async () => {
+      const rec = await walletGetRec(btn.dataset.view);
+      if (rec && rec.blob) window.open(URL.createObjectURL(rec.blob), '_blank');
+    })
+  );
+  $$('#my-wallet [data-del]').forEach((btn) =>
+    btn.addEventListener('click', async () => {
+      if (!confirm('이 서류를 보관함에서 삭제할까요?')) return;
+      await walletDeleteSlot(btn.dataset.del);
+      renderWallet();
+    })
+  );
 }
 
 /* ---------------- 이벤트 바인딩 ---------------- */
@@ -870,6 +1060,9 @@ function bindEvents() {
   // 자동추천
   attachAutocomplete($('#in-school'), schoolSuggestions);
   attachAutocomplete($('#in-major'), majorSuggestions);
+  ['change', 'input'].forEach((ev) =>
+    $('#in-school').addEventListener(ev, () => renderCampusChips(null))
+  );
 }
 
 /* ---------------- PWA ---------------- */
@@ -883,6 +1076,9 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 loadState();
 bindEvents();
 initOnboarding();
+walletRefresh().then(() => {
+  if (!$('#screen-my').hidden) renderMy();
+});
 if (state.profile) {
   saveState(); // 레거시 키 → 새 키 이관
   showScreen('home');
