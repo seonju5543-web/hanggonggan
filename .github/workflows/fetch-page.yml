@@ -1,0 +1,49 @@
+name: 페이지 원격 열람
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: '가져올 페이지 주소'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 페이지와 첨부 다운로드
+        run: |
+          mkdir -p out
+          curl -sL --max-time 30 -A "Mozilla/5.0 (compatible; HandaejangBot/0.2)" "${{ inputs.url }}" -o out/page.html || echo "FETCH FAILED" > out/page.html
+          # 첨부파일 링크 최대 5개 다운로드
+          node -e '
+            const fs = require("fs");
+            const html = fs.readFileSync("out/page.html", "utf8");
+            const base = process.argv[1];
+            const re = /<a\b[^>]*href\s*=\s*["'"'"']([^"'"'"'#][^"'"'"']*)["'"'"']/gi;
+            const seen = new Set(); let m, n = 0;
+            const list = [];
+            while ((m = re.exec(html)) && n < 5) {
+              let u; try { u = new URL(m[1].replace(/&amp;/g, "&"), base).href; } catch { continue; }
+              if (!/\.(hwp|hwpx|doc|docx|pdf)(\?|$)/i.test(u) && !/mode=download|download\.do|fileDown/i.test(u)) continue;
+              if (seen.has(u)) continue; seen.add(u); n++;
+              list.push(u);
+            }
+            fs.writeFileSync("out/attachments.txt", list.join("\n"));
+          ' "${{ inputs.url }}"
+          i=0
+          while read -r u; do
+            [ -z "$u" ] && continue
+            i=$((i+1))
+            curl -sL --max-time 30 -A "Mozilla/5.0" "$u" -o "out/attach-$i" || true
+          done < out/attachments.txt
+          ls -la out/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fetched-page
+          path: out/
+          retention-days: 3

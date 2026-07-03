@@ -184,6 +184,26 @@ const NATIONAL_SCHOLARSHIPS = [
   },
 ];
 
+/* ▼ 실제 공고 (수집 로봇 확보 · 개발자 컨펌 완료) — 양식까지 앱에서 작성 가능 */
+NATIONAL_SCHOLARSHIPS.push({
+  id: 'kosaf-ai-mentor',
+  name: '대학생 청소년 AI 교육지원 장학금 (멘토)',
+  type: '교외',
+  provider: '한국장학재단',
+  amount: '멘토링 활동 장학금 (활동 시간 기준 지급)',
+  amountValue: 1500000,
+  deadline: '2026-07-31',
+  period: '2026년 하반기',
+  summary: '대학생 멘토가 초·중·고 청소년에게 AI 활용 교육을 제공하고 장학금을 받는 실제 모집 공고입니다. 활동계획서 양식을 앱에서 그대로 작성할 수 있어요.',
+  eligibility: { selective: true },
+  documents: ['활동계획서 (앱에서 실제 양식 작성)', '재학증명서 (자동 제출)'],
+  duplicable: true,
+  note: '실제 공고 기반 — 정확한 접수 마감·세부 요건은 아래 원문 공고에서 최종 확인하세요.',
+  formId: 'kosaf-ai-mentor',
+  sourceUrl: 'https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=138156',
+  sourceKind: 'official',
+});
+
 /* ---------------- 교내 장학금 템플릿 (재학 대학·캠퍼스 기준 생성) ---------------- */
 function buildCampusScholarships(school, campus) {
   const list = [
@@ -378,6 +398,7 @@ const OFFICIAL_CHANNELS = {
   'kosaf-work':       { label: '한국장학재단', url: 'https://www.kosaf.go.kr' },
   'kosaf-humanities': { label: '한국장학재단', url: 'https://www.kosaf.go.kr' },
   'kosaf-science':    { label: '한국장학재단', url: 'https://www.kosaf.go.kr' },
+  'kosaf-ai-mentor':  { label: '한국장학재단', url: 'https://www.kosaf.go.kr' },
   'seoul-hope':       { label: '서울장학재단', url: 'https://www.hissf.or.kr' },
   'kwanjeong':        { label: '관정이종환교육재단', url: 'https://www.ikef.or.kr' },
   'mirae-exchange':   { label: '미래에셋희망재단 홈페이지' },

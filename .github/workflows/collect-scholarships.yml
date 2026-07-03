@@ -31,7 +31,7 @@ jobs:
         run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add collector/seen.json
+          git add collector/seen.json data/notices.json
           if ! git diff --cached --quiet; then
             git commit -m "collector: seen state update"
             git push

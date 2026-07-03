@@ -462,6 +462,7 @@ function renderExplore() {
   if (exploreFilter === '교내' || exploreFilter === '교외') list = list.filter((m) => m.sch.type === exploreFilter);
   if (exploreFilter === 'eligible') list = list.filter((m) => ['eligible', 'selective'].includes(m.result.status));
 
+  $('#live-notices').innerHTML = exploreFilter === 'all' ? liveNoticesHtml() : '';
   $('#explore-list').innerHTML = list.length
     ? list.map((m) => schCard(m.sch, m.result, { fit: m.fit })).join('')
     : '<p class="empty">조건에 맞는 장학금이 없어요.</p>';
@@ -659,6 +660,101 @@ function renderDocPrep() {
   sheet.scrollTop = 0;
 }
 
+/* ---------------- 실제 양식 채움 플로우 ---------------- */
+let formFill = null; // { schId, stage:'q'|'preview', ans }
+
+function startFormFill(sch) {
+  formFill = { schId: sch.id, stage: 'q', ans: null };
+  renderFormFill();
+}
+
+function renderFormFill() {
+  const sch = findSch(formFill.schId);
+  const tpl = FORM_TEMPLATES[sch.formId];
+  const sheet = $('#detail-sheet');
+
+  if (formFill.stage === 'q') {
+    sheet.innerHTML = `
+      <div class="sheet-handle"></div>
+      <div class="sheet-body">
+        <h3 class="sheet-title">양식 작성 도우미</h3>
+        <p class="sheet-provider">${esc(tpl.title)} · 실제 공고 양식과 동일한 문서가 만들어져요</p>
+        ${formQuestionsHtml(tpl)}
+        <button class="btn btn-primary btn-lg" id="btn-ff-generate">양식 문서 만들기</button>
+        <p class="dp-note">기본정보(학교·이름·학번·연락처)는 프로필에서 자동으로 채워져요.</p>
+      </div>`;
+    $('#btn-ff-generate').addEventListener('click', () => {
+      formFill.ans = collectFormAnswers(tpl);
+      formFill.stage = 'preview';
+      renderFormFill();
+    });
+  } else {
+    sheet.innerHTML = `
+      <div class="sheet-handle"></div>
+      <div class="sheet-body">
+        <h3 class="sheet-title">이대로 제출 준비할까요?</h3>
+        <p class="sheet-provider">칸을 눌러 직접 수정할 수 있어요 · 실제 공고 양식과 동일한 구조</p>
+        <div class="fd-wrap" id="ff-doc">${renderFormDoc(tpl, state.profile, formFill.ans, { editable: true })}</div>
+        <button class="btn btn-primary btn-lg" id="btn-ff-confirm">✓ 이대로 신청 준비 완료</button>
+        <div class="submit-actions" style="margin-top:8px">
+          <button class="btn btn-outline" id="btn-ff-back">← 질문 다시</button>
+          <button class="btn btn-outline" id="btn-ff-doc">📄 .doc 저장</button>
+        </div>
+      </div>`;
+    $('#btn-ff-back').addEventListener('click', () => { formFill.stage = 'q'; renderFormFill(); });
+    $('#btn-ff-doc').addEventListener('click', () => downloadFormDoc(tpl, state.profile, formFill.ans));
+    $('#btn-ff-confirm').addEventListener('click', () => {
+      const existing = state.applications.find((a) => a.id === sch.id);
+      if (existing) { existing.pending = false; existing.formAns = formFill.ans; existing.appliedAt = nowStamp(); }
+      else state.applications.push({ id: sch.id, appliedAt: nowStamp(), step: 0, formAns: formFill.ans, pending: false });
+      saveState();
+      const ch = officialChannel(sch);
+      toast(`양식 작성 완료! 문서를 저장해 ${ch.label}에 제출하세요`);
+      formFill = null;
+      closeSheet();
+      const current = $$('.screen').find((s) => !s.hidden);
+      if (current) showScreen(current.id.replace('screen-', ''));
+    });
+    sheet.scrollTop = 0;
+  }
+}
+
+/* ---------------- 실시간 공고 (수집 로봇 발행) ---------------- */
+let liveNotices = null;
+function loadNotices() {
+  fetch('data/notices.json', { cache: 'no-store' })
+    .then((r) => (r.ok ? r.json() : null))
+    .then((d) => {
+      liveNotices = d;
+      if (!$('#screen-explore').hidden) renderExplore();
+    })
+    .catch(() => { /* 오프라인 등 — 조용히 무시 */ });
+}
+
+function liveNoticesHtml() {
+  const p = state.profile;
+  if (!liveNotices || !p) return '';
+  const mine = (liveNotices.items || []).filter((n) =>
+    n.school === p.school && (!n.campus || !p.campus || n.campus === p.campus)
+  ).slice(0, 10);
+  const head = `<div class="section-head" style="margin-top:4px"><h3>우리 학교 실시간 공고</h3>
+    <span class="link-btn">매일 아침 자동 갱신${liveNotices.updatedAt ? ' · ' + liveNotices.updatedAt : ''}</span></div>`;
+  if (!mine.length) {
+    return head + `<p class="empty" style="margin-bottom:16px">아직 ${esc(p.school)} 게시판이 연결 전이거나 새 공고가 없어요.<br />연결되면 실제 공고가 여기에 자동으로 떠요.</p>`;
+  }
+  return head + `<div class="card-list" style="margin-bottom:18px">` + mine.map((n) => `
+    <a class="sch-card notice-card" href="${esc(n.url)}" target="_blank" rel="noopener">
+      <div class="sch-top">
+        <span class="badge badge-in">교내 공고</span>
+        ${n.deadlineHint ? `<span class="badge badge-dday urgent">⏰</span>` : ''}
+        ${(n.attachments || []).length ? `<span class="badge badge-applied">양식 ${n.attachments.length}</span>` : ''}
+      </div>
+      <p class="sch-name">${esc(n.title)}</p>
+      ${n.deadlineHint ? `<p class="sch-provider">${esc(n.deadlineHint)}</p>` : ''}
+      <p class="sch-provider">${esc(n.school)}${n.campus ? ' ' + esc(n.campus) : ''} · ${esc(n.foundAt || '')} 수집 · 원문 보기 ↗</p>
+    </a>`).join('') + `</div>`;
+}
+
 /* ---------------- 제출: 복사 · 파일 공유 ---------------- */
 function buildSubmissionText(sch, app) {
   const p = state.profile;
@@ -729,6 +825,10 @@ function finalizeApply(sch, docs) {
 }
 
 function applyTo(sch) {
+  if (sch.formId && typeof FORM_TEMPLATES !== 'undefined' && FORM_TEMPLATES[sch.formId]) {
+    startFormFill(sch);
+    return;
+  }
   if (essayDefsFor(sch).length) {
     startDocPrep(sch);
     return;
@@ -746,12 +846,13 @@ function applyAll() {
     .map((m) => m.sch);
   if (!targets.length) { toast('준비할 수 있는 장학금이 없어요'); return; }
 
-  const ready = targets.filter((s) => !essayDefsFor(s).length);
-  const needsDocs = targets.filter((s) => essayDefsFor(s).length);
+  const needsWork = (s) => essayDefsFor(s).length || (s.formId && typeof FORM_TEMPLATES !== 'undefined' && FORM_TEMPLATES[s.formId]);
+  const ready = targets.filter((s) => !needsWork(s));
+  const needsDocs = targets.filter(needsWork);
 
   const ok = confirm(
     `아래 ${targets.length}건을 한 번에 신청 준비할까요?\n\n` +
-    targets.map((s) => `· [${s.type}] ${s.name}${essayDefsFor(s).length ? ' (서류 작성 필요)' : ''}`).join('\n') +
+    targets.map((s) => `· [${s.type}] ${s.name}${needsWork(s) ? ' (서류 작성 필요)' : ''}`).join('\n') +
     `\n\n${ready.length}건은 바로 준비되고, ${needsDocs.length}건은 서류 작성 도우미로 이어서 완성할 수 있어요.` +
     '\n※ 최종 제출은 한국장학재단·학교 등 공식 채널에서 이루어져요.'
   );
@@ -819,7 +920,7 @@ function openDetail(id) {
       '직접' 서류 중 자기소개서·계획서·사유서는 아래 도우미로 앱에서 바로 작성할 수 있어요.</p>
 
       <p class="sheet-note">💡 ${sch.note}</p>
-      <p class="sheet-deadline">마감일 ${sch.deadline} · ${sch.duplicable ? '타 장학금과 중복 수혜 가능' : '중복 수혜 제한 있음'}</p>
+      <p class="sheet-deadline">마감일 ${sch.deadline} · ${sch.duplicable ? '타 장학금과 중복 수혜 가능' : '중복 수혜 제한 있음'}${sch.sourceUrl ? ` · <a href="${sch.sourceUrl}" target="_blank" rel="noopener" style="color:var(--primary);font-weight:700">원문 공고 ↗</a>` : ''}</p>
 
       ${app && !app.pending ? `
         <div class="app-progress">
@@ -833,13 +934,22 @@ function openDetail(id) {
           <details class="dp-saved"><summary>작성한 서류 보기 (${app.docs.length})</summary>
             ${app.docs.map((t) => `<h4>${esc(t.doc)}</h4><pre>${esc(t.text)}</pre>`).join('')}
           </details>` : ''}
+        ${app.formAns && sch.formId ? `
+          <h4>작성한 양식 문서</h4>
+          <div class="submit-actions">
+            <button class="btn btn-outline" id="btn-form-save">📄 .doc 저장</button>
+            <button class="btn btn-outline" id="btn-form-print">🖨 인쇄/PDF</button>
+            <button class="btn btn-outline" id="btn-form-share">📤 공유</button>
+          </div>
+          <button class="btn btn-outline" id="btn-form-edit" style="width:100%;margin-bottom:14px">✏️ 양식 다시 작성</button>` : ''}
         ${certStatusListHtml(sch)}
         <h4>최종 제출 방법</h4>
         <ol class="guide-list">${ch.guide.map((g) => `<li>${g}</li>`).join('')}</ol>
         <div class="submit-actions">
           <button class="btn btn-outline" id="btn-copy-docs">📋 서류 내용 복사</button>
           <button class="btn btn-outline" id="btn-share-docs">📤 파일과 함께 공유</button>
-        </div>` : ''}
+        </div>
+        ${sch.applyEmail ? `<button class="btn btn-primary btn-lg" id="btn-mail-apply" style="margin-bottom:14px">📧 접수 메일 열기 (내용 자동 완성)</button>` : ''}` : ''}
 
       <button class="btn btn-primary btn-lg" id="btn-apply-one" ${canApply ? '' : 'disabled'}>${btnLabel}</button>
       ${canApply ? `<p class="dp-note">준비 완료 후 최종 제출처(${ch.label})를 안내해 드려요.</p>` : ''}
@@ -856,10 +966,24 @@ function openDetail(id) {
   if (canApply) {
     $('#btn-apply-one').addEventListener('click', () => applyTo(sch));
   }
+  if (app && app.formAns && sch.formId) {
+    const tpl = FORM_TEMPLATES[sch.formId];
+    $('#btn-form-save').addEventListener('click', () => downloadFormDoc(tpl, state.profile, app.formAns));
+    $('#btn-form-print').addEventListener('click', () => printFormDoc(tpl, state.profile, app.formAns));
+    $('#btn-form-share').addEventListener('click', () => shareFormDoc(tpl, state.profile, app.formAns, sch));
+    $('#btn-form-edit').addEventListener('click', () => { startFormFill(sch); formFill.ans = app.formAns; formFill.stage = 'preview'; renderFormFill(); });
+  }
   const copyBtn = $('#btn-copy-docs');
   if (copyBtn) copyBtn.addEventListener('click', () => copyText(buildSubmissionText(sch, app)));
   const shareBtn = $('#btn-share-docs');
   if (shareBtn) shareBtn.addEventListener('click', () => shareApplication(sch, app));
+  const mailBtn = $('#btn-mail-apply');
+  if (mailBtn) mailBtn.addEventListener('click', () => {
+    const p = state.profile;
+    const subject = `[장학금 신청] ${sch.name} - ${p.school} ${p.name || ''}`;
+    const body = buildSubmissionText(sch, app) + '\n\n(첨부: 앱 보관함의 증명서류와 작성한 양식 문서를 함께 첨부해 주세요)';
+    location.href = `mailto:${sch.applyEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  });
 }
 
 function closeSheet() {
@@ -1009,6 +1133,10 @@ function bindEvents() {
   );
   // 서류 도우미의 동적 칩 그룹 (이벤트 위임)
   document.addEventListener('click', (e) => {
+    const fill = e.target.closest('[data-fill]');
+    if (fill) { const ta = $('#' + fill.dataset.fill); if (ta) { ta.value = fill.dataset.text; } return; }
+    const multi = e.target.closest('.fq-checks .chip');
+    if (multi) { multi.classList.toggle('active'); return; }
     const chip = e.target.closest('.dp-q .chip');
     if (!chip) return;
     chip.parentElement.querySelectorAll('.chip').forEach((c) => c.classList.remove('active'));
@@ -1076,6 +1204,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 loadState();
 bindEvents();
 initOnboarding();
+loadNotices();
 walletRefresh().then(() => {
   if (!$('#screen-my').hidden) renderMy();
 });
