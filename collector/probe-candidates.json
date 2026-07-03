@@ -1,0 +1,96 @@
+{
+  "_comment": "학교별 장학공지 게시판 후보 주소. probe.mjs가 전부 접속해 상태를 리포트하면 승자를 schools.json에 확정한다.",
+  "candidates": [
+    { "school": "서울대학교", "urls": [
+      "https://www.snu.ac.kr/snunow/notice/genl",
+      "https://www.snu.ac.kr/snunow/notice",
+      "https://www.snu.ac.kr/community/notice"
+    ]},
+    { "school": "연세대학교 신촌", "urls": [
+      "https://www.yonsei.ac.kr/sc/support/scholarship.jsp",
+      "https://www.yonsei.ac.kr/sc/intro/scholarship.jsp",
+      "https://www.yonsei.ac.kr/sc/notice.jsp"
+    ]},
+    { "school": "연세대학교 미래(원주)", "urls": [
+      "https://www.yonsei.ac.kr/wj/support/notice.jsp",
+      "https://www.yonsei.ac.kr/wj/notice.jsp"
+    ]},
+    { "school": "고려대학교 안암", "urls": [
+      "https://scholarship.korea.ac.kr",
+      "https://www.korea.ac.kr/user/boardList.do?boardId=825&siteId=university",
+      "https://portal.korea.ac.kr"
+    ]},
+    { "school": "고려대학교 세종", "urls": [
+      "https://sejong.korea.ac.kr"
+    ]},
+    { "school": "서강대학교", "urls": [
+      "https://www.sogang.ac.kr/ko/notice",
+      "https://www.sogang.ac.kr/bbs/board.do?bbsConfigFK=4",
+      "https://www.sogang.ac.kr/ko/scholarship"
+    ]},
+    { "school": "한양대학교 서울", "urls": [
+      "https://www.hanyang.ac.kr/web/www/notice_all",
+      "https://www.hanyang.ac.kr/web/www/-235"
+    ]},
+    { "school": "한양대학교 ERICA", "urls": [
+      "https://www.hanyang.ac.kr/web/erica/notice"
+    ]},
+    { "school": "중앙대학교", "urls": [
+      "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100",
+      "https://www.cau.ac.kr/cms/FR_BBS/list.do?MENU_ID=100"
+    ]},
+    { "school": "경희대학교", "urls": [
+      "https://www.khu.ac.kr/kor/notice/list.do",
+      "https://janghak.khu.ac.kr"
+    ]},
+    { "school": "한국외국어대학교", "urls": [
+      "https://www.hufs.ac.kr/hufs/11281/subview.do",
+      "https://www.hufs.ac.kr/hufs/11282/subview.do",
+      "https://www.hufs.ac.kr/hufs/11319/subview.do",
+      "https://www.hufs.ac.kr/bbs/hufs/2181/artclList.do"
+    ]},
+    { "school": "서울시립대학교", "urls": [
+      "https://www.uos.ac.kr/korNotice/list.do?list_id=FA1",
+      "https://www.uos.ac.kr/korNotice/list.do?list_id=FA2",
+      "https://www.uos.ac.kr/korNotice/list.do?list_id=SCHOLARSHIP"
+    ]},
+    { "school": "건국대학교 서울", "urls": [
+      "https://www.konkuk.ac.kr/konkuk/2096/subview.do",
+      "https://www.konkuk.ac.kr/bbs/konkuk/232/artclList.do"
+    ]},
+    { "school": "건국대학교 글로컬(충주)", "urls": [
+      "https://www.kku.ac.kr"
+    ]},
+    { "school": "동국대학교 서울", "urls": [
+      "https://www.dongguk.edu/article/JANGHAKNOTICE/list",
+      "https://www.dongguk.edu/article/HAKSANOTICE/list"
+    ]},
+    { "school": "동국대학교 WISE(경주)", "urls": [
+      "https://www.dongguk.ac.kr"
+    ]},
+    { "school": "홍익대학교", "urls": [
+      "https://www.hongik.ac.kr/kr/newscenter/notice.do",
+      "https://www.hongik.ac.kr/front/boardlist.do?bbsConfigFK=143"
+    ]},
+    { "school": "숙명여자대학교", "urls": [
+      "https://www.sookmyung.ac.kr/kr/news/notice.do",
+      "https://www.sookmyung.ac.kr/bbs/kr/58/artclList.do"
+    ]},
+    { "school": "광운대학교", "urls": [
+      "https://www.kw.ac.kr/ko/life/notice.jsp",
+      "https://www.kw.ac.kr/ko/life/notice.jsp?tabs=2"
+    ]},
+    { "school": "명지대학교", "urls": [
+      "https://www.mju.ac.kr/mjukr/255/subview.do",
+      "https://www.mju.ac.kr/mjukr/4450/subview.do"
+    ]},
+    { "school": "상명대학교", "urls": [
+      "https://www.smu.ac.kr/kor/life/notice.do",
+      "https://www.smu.ac.kr/ko/life/scholarshipNotice.do"
+    ]},
+    { "school": "가천대학교", "urls": [
+      "https://www.gachon.ac.kr/kor/7986/subview.do",
+      "https://www.gachon.ac.kr/bbs/kor/475/artclList.do"
+    ]}
+  ]
+}

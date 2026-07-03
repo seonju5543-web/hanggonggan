@@ -1,0 +1,25 @@
+name: 게시판 후보 정찰
+
+on:
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node collector/probe.mjs
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --title "🔍 게시판 후보 정찰 리포트 $(TZ=Asia/Seoul date +%Y-%m-%d\ %H:%M)" \
+            --body-file collector/probe-report.md \
+            --repo "${{ github.repository }}"
