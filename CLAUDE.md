@@ -46,6 +46,7 @@
 - Claude 실행 샌드박스는 학교 사이트·github.io 접속 차단 → 외부 확인은 GitHub Actions(로봇/정찰/fetch-page)로.
 - iOS Safari는 datalist 미지원(커스텀 자동추천 구현됨), 전역 appearance:none이 체크박스 지움(커스텀 체크 구현됨).
 - 검증: `python3 -m http.server 8123` + scratchpad의 Playwright 드라이버(chromium: /opt/pw-browsers/chromium-1194/chrome-linux/chrome). 한글 파일명 setInputFiles 실패함(ASCII 사용).
+- **데이터 수명 규칙**: 실시간 공고는 수집일+60일 후 자동 삭제(collect.mjs), 정식 등록 장학금은 마감+30일 후 목록 자동 숨김(app.js renderExplore). 매일 09:00 KST 수집으로 유입 — 순환 구조.
 
 ## 전체 현황 (2026-07-04 기준 — 3단 정리)
 
