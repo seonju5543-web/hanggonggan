@@ -459,6 +459,7 @@ function renderExplore() {
     new Date(a.sch.deadline) - new Date(b.sch.deadline)
   );
 
+  list = list.filter((m) => dday(m.sch.deadline).days >= -30); // 마감 30일 경과 시 자동 숨김
   if (exploreFilter === '교내' || exploreFilter === '교외') list = list.filter((m) => m.sch.type === exploreFilter);
   if (exploreFilter === 'eligible') list = list.filter((m) => ['eligible', 'selective'].includes(m.result.status));
 

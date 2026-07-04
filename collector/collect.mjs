@@ -120,6 +120,9 @@ fs.writeFileSync(seenPath, JSON.stringify(seen, null, 1));
 
 /* 앱 발행: 최신 공고를 학교별로 병합, 학교당 최대 15건·전체 200건 유지 */
 notices.items = freshAll.concat(notices.items || []);
+/* 수집일로부터 60일 지난 공고는 자동 삭제 (마감 공고 정리) */
+const cutoff = new Date(Date.now() - 60 * 86400000).toISOString().slice(0, 10);
+notices.items = notices.items.filter((n) => (n.foundAt || '9999') >= cutoff);
 const perSchool = {};
 notices.items = notices.items.filter((n) => {
   const k = n.school + '|' + (n.campus || '');
