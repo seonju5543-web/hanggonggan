@@ -45,4 +45,5 @@ jobs:
           gh issue create \
             --title "🤖 장학공고 수집 리포트 $(TZ=Asia/Seoul date +%Y-%m-%d) (새 공고 ${{ steps.run.outputs.new_count }}건)" \
             --body-file collector/report.md \
-            --repo "${{ github.repository }}"
+            --repo "${{ github.repository }}" \
+            --assignee "${{ github.repository_owner }}"

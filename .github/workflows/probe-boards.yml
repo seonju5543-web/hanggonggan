@@ -22,4 +22,5 @@ jobs:
           gh issue create \
             --title "🔍 게시판 후보 정찰 리포트 $(TZ=Asia/Seoul date +%Y-%m-%d\ %H:%M)" \
             --body-file collector/probe-report.md \
-            --repo "${{ github.repository }}"
+            --repo "${{ github.repository }}" \
+            --assignee "${{ github.repository_owner }}"
