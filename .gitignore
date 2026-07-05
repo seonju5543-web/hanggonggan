@@ -1,0 +1,4 @@
+verify/node_modules/
+verify/package.json
+verify/package-lock.json
+verify/shot-*.png
