@@ -16,7 +16,7 @@ let notices = { updatedAt: null, items: [] };
 try { notices = JSON.parse(fs.readFileSync(noticesPath, 'utf8')); } catch { /* 첫 실행 */ }
 
 const KEYWORDS = /장학|학자금|등록금 감면|학업장려|근로장학/;
-const MENU_NOISE = /안내$|규정$|제도|구분$|바로가기|메뉴|홈페이지$|가이드북|증명서$|융자|^학사\/|장학안내|예우|로그인|사이트맵/;
+const MENU_NOISE = /안내$|규정$|제도|구분$|바로가기|메뉴|홈페이지$|가이드북|증명서$|융자|^학사\/|장학안내|예우|로그인|사이트맵|^장학\/|장학금·학자금|^학자금 ?대출$|경력개발|비교과|DONATION|기탁/;
 const DEADLINE_RE = /(마감|까지|기한|접수기간|신청기간)[^\n<]{0,60}/;
 
 const browser = await chromium.launch({

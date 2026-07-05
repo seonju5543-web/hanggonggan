@@ -2,56 +2,6 @@
  "updatedAt": "2026-07-05",
  "items": [
   {
-   "title": "장학금·학자금",
-   "url": "https://student.snu.ac.kr/%eb%8c%80%ed%95%99%ec%83%9d%ed%99%9c/%ec%9e%a5%ed%95%99/%ec%9e%a5%ed%95%99%ec%86%8c%ea%b0%9c/",
-   "attachments": [
-    {
-     "name": "일정표 다운로드",
-     "url": "https://student.snu.ac.kr/wp-content/uploads/sites/361/2026/02/%EC%9E%A5%ED%95%99%EB%B3%B5%EC%A7%80%EA%B3%BC-2026%ED%95%99%EB%85%84%EB%8F%84-%EC%97%B0%EA%B0%84-%EC%9E%A5%ED%95%99%EC%97%85%EB%AC%B4-%EC%9D%BC%EC%A0%95%ED%91%9C.pdf"
-    }
-   ],
-   "deadlineHint": null,
-   "school": "서울대학교",
-   "campus": "",
-   "foundAt": "2026-07-05"
-  },
-  {
-   "title": "장학/학자금대출",
-   "url": "https://www.uos.ac.kr/kor/html/life/support/scholarship.do?menuid=2000005003002000000",
-   "attachments": [],
-   "deadlineHint": null,
-   "school": "서울시립대학교",
-   "campus": "",
-   "foundAt": "2026-07-05"
-  },
-  {
-   "title": "학자금 대출",
-   "url": "https://www.sookmyung.ac.kr/kr/university-life/studentloan.do",
-   "attachments": [],
-   "deadlineHint": "까지 한국장학재단의 학자금(장학금 및 대출) 수혜 불가 학자금 중복지원 해소 방법 - 중복지원 학생의 경우 등록",
-   "school": "숙명여자대학교",
-   "campus": "",
-   "foundAt": "2026-07-05"
-  },
-  {
-   "title": "장학/경력개발/비교과",
-   "url": "https://www.sookmyung.ac.kr/kr/university-life/scholarship.do",
-   "attachments": [],
-   "deadlineHint": "까지) 기숙사비 지원 신청자격 5급 공채(행정,기술,외무), 외교관후보자, 공인회계사 및 변리사 1차 시험 합격",
-   "school": "숙명여자대학교",
-   "campus": "",
-   "foundAt": "2026-07-05"
-  },
-  {
-   "title": "DONATION 만리현교회 장학회, 숙명여대 창학 120주년 장학금 1억원 기탁",
-   "url": "https://www.sookmyung.ac.kr/kr/news/sm-news.do?mode=view&articleNo=93869",
-   "attachments": [],
-   "deadlineHint": null,
-   "school": "숙명여자대학교",
-   "campus": "",
-   "foundAt": "2026-07-05"
-  },
-  {
    "title": "장학 2026-1 점프업 장학금 안내 (성적경고생 성적향상장학금)",
    "url": "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=93779",
    "attachments": [
@@ -361,32 +311,6 @@
    "deadlineHint": "신청기간에 신청 원칙 지원금액 지원구간별 상이, 최소 50만원~최대 수업료 전액 성적기준 직전학기 취득학점 12학점",
    "school": "한국외국어대학교",
    "campus": "",
-   "foundAt": "2026-07-03"
-  },
-  {
-   "title": "학자금 대출",
-   "url": "https://www.konkuk.ac.kr/konkuk/2079/subview.do",
-   "attachments": [
-    {
-     "name": "신입생용(2026학번)",
-     "url": "https://www.konkuk.ac.kr/sites/konkuk/down/konkuk_guide_freshman_2026.pdf"
-    },
-    {
-     "name": "재학생용(~2025학번)",
-     "url": "https://www.konkuk.ac.kr/sites/konkuk/down/konkuk_guide_students_2026.pdf"
-    },
-    {
-     "name": "For New Students(ENG)",
-     "url": "https://www.konkuk.ac.kr/sites/konkuk/down/konkuk_guide_freshman_2026_eng.pdf"
-    },
-    {
-     "name": "성평등계획",
-     "url": "https://www.konkuk.ac.kr/sites/konkuk/down/Konkuk_University_Gender_Equality_Plan_2025_2030.pdf"
-    }
-   ],
-   "deadlineHint": "까지 무이자 학자금지원 8구간 이내, 만35세 이하 다자녀(3자녀)이상: 소득구간 무관 개인신용도, 학제에 따른",
-   "school": "건국대학교",
-   "campus": "서울캠퍼스",
    "foundAt": "2026-07-03"
   },
   {
