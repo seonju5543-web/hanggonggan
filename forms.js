@@ -168,6 +168,9 @@ function formAutoVal(key) {
     case 'name': return p.name || '';
     case 'studentId': return c.studentId || '';
     case 'major': return p.major || '';
+    case 'school': return p.school || '';
+    case 'phone': return c.phone || '';
+    case 'email': return c.email || '';
     case 'bracket': return p.bracket != null ? `${p.bracket}구간` : '';
     case 'yearRemain': return p.year ? `${p.year}학년 (잔여  학기)` : '';
     case 'gpaLast': return p.gpa != null ? `  /  / ${p.gpa} /4.5` : '';
@@ -181,7 +184,7 @@ const FORM_DAYS = ['월', '화', '수', '목', '금', '토', '일'];
 function formQuestionsHtml(tpl) {
   let html = '';
   tpl.sections.forEach((sec, si) => {
-    if (!sec.fields) return;
+    if (!sec.fields || !sec.fields.length) return; // 안내 전용 섹션(추천서·동의서 등)은 질문 없음
     html += `<div class="dp-block"><h4>${esc(sec.heading)}</h4>`;
     sec.fields.forEach((f) => {
       const fid = `fq-${f.id}`;
@@ -261,6 +264,7 @@ function renderFormDoc(tpl, p, ans, { editable = false } = {}) {
       html += '</table>';
       return;
     }
+    if (!sec.fields || !sec.fields.length) return; // 안내 전용 섹션 — 제목·주석만 출력
     html += '<table class="fd-table">';
     (sec.fields || []).forEach((f) => {
       const a = ans[f.id];

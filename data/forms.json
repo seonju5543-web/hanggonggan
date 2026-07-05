@@ -321,6 +321,770 @@
      ]
     }
    ]
+  },
+  "samil-apply": {
+   "title": "재단법인 삼일장학회 장학금 지원 신청서",
+   "docName": "삼일장학회_지원신청서",
+   "org": "재단법인 삼일장학회",
+   "signLabel": "신 청 인",
+   "photoNote": "※ 원본 양식의 사진란은 인쇄 후 우측 상단에 사진을 부착해 주세요.",
+   "pledge": "재단법인 삼일장학회 장학금 지원을 위와 같이 신청하며 위 기재내용이 사실과 다른 경우에는 선발 취소 등 어떤 조치에도 이의를 제기치 않겠습니다.",
+   "sections": [
+    {
+     "heading": "인적사항",
+     "fields": [
+      {
+       "id": "name",
+       "label": "성   명",
+       "type": "text",
+       "auto": "name",
+       "q": "성명(한글)"
+      },
+      {
+       "id": "birth",
+       "label": "생년월일",
+       "type": "text",
+       "q": "생년월일",
+       "placeholder": "YYYY-MM-DD"
+      },
+      {
+       "id": "age",
+       "label": "나    이",
+       "type": "text",
+       "q": "나이",
+       "placeholder": "예: 22"
+      },
+      {
+       "id": "addr",
+       "label": "주   소 ※학기 중 거주지",
+       "type": "text",
+       "q": "학기 중 거주지 주소 (우편번호 포함)",
+       "placeholder": "(우편 : 03016) 서울시 ○○구 ○○로 12"
+      },
+      {
+       "id": "phoneSelf",
+       "label": "휴대전화 (본인)",
+       "type": "text",
+       "auto": "phone",
+       "q": "본인 휴대전화"
+      },
+      {
+       "id": "phoneGuardian",
+       "label": "휴대전화 (보호자)",
+       "type": "text",
+       "q": "보호자 휴대전화",
+       "placeholder": "010-0000-0000"
+      },
+      {
+       "id": "email",
+       "label": "E-mail",
+       "type": "text",
+       "auto": "email",
+       "q": "이메일 주소"
+      }
+     ]
+    },
+    {
+     "heading": "지 원 분 야",
+     "note": "※ 해당란 체크",
+     "fields": [
+      {
+       "id": "field",
+       "label": "지원 분야",
+       "type": "checks+text",
+       "q": "지원 분야를 고르세요 (충의/희망/동행 中)",
+       "options": [
+        "충의(忠義)삼일장학생",
+        "희망(希望)삼일장학생",
+        "동행(同行)삼일장학생"
+       ],
+       "textLabel": "지원내용",
+       "tq": "해당 사유 (예: 기초생활수급자, 한부모가정 등)",
+       "sugg": [
+        "기초생활수급자 가정으로 학업과 생계를 병행하고 있습니다.",
+        "한부모가정으로 등록금 마련에 어려움이 있습니다."
+       ]
+      }
+     ]
+    },
+    {
+     "heading": "재학정보 (신청학기 기준)",
+     "fields": [
+      {
+       "id": "school",
+       "label": "대학교명",
+       "type": "text",
+       "auto": "school",
+       "q": "대학교명"
+      },
+      {
+       "id": "campus",
+       "label": "소 재 지",
+       "type": "text",
+       "q": "학교 소재지 / 캠퍼스",
+       "placeholder": "00시 / 00캠퍼스"
+      },
+      {
+       "id": "yearSem",
+       "label": "학   년 / 학기",
+       "type": "text",
+       "auto": "yearRemain",
+       "q": "학년과 학기",
+       "placeholder": "예: 3학년 / 2학기"
+      },
+      {
+       "id": "major",
+       "label": "전   공",
+       "type": "text",
+       "auto": "major",
+       "q": "전공"
+      }
+     ]
+    },
+    {
+     "heading": "소득기준 [평가기준1순위]",
+     "fields": [
+      {
+       "id": "bracket",
+       "label": "최근 1년 내 국가장학금 소득분위",
+       "type": "text",
+       "auto": "bracket",
+       "q": "최근 1년 내 국가장학금 소득분위",
+       "placeholder": "신청이력 없을 시 ‘없음’으로 기재"
+      }
+     ]
+    },
+    {
+     "heading": "학업성적 [평가기준2순위]",
+     "fields": [
+      {
+       "id": "creditsAll",
+       "label": "이수학점 (전체학기)",
+       "type": "text",
+       "q": "전체학기 이수학점",
+       "placeholder": "예: 18학점"
+      },
+      {
+       "id": "creditsLast",
+       "label": "이수학점 (직전학기)",
+       "type": "text",
+       "q": "직전학기 이수학점",
+       "placeholder": "예: 18학점"
+      },
+      {
+       "id": "gpaAll",
+       "label": "평균평점 (전체학기)",
+       "type": "text",
+       "q": "전체학기 평균평점",
+       "placeholder": "예: 3.75/4.50"
+      },
+      {
+       "id": "gpaLast",
+       "label": "평균평점 (직전학기)",
+       "type": "text",
+       "q": "직전학기 평균평점",
+       "placeholder": "예: 3.75/4.50"
+      }
+     ]
+    },
+    {
+     "heading": "사회공헌 [평가기준3순위]",
+     "fields": [
+      {
+       "id": "volunteer",
+       "label": "사회봉사 활동내역 (최근 1년)\n봉사기관 · 봉사일자 · 봉사시간 · 봉사내용",
+       "type": "textarea",
+       "q": "최근 1년 봉사활동 내역 (기관 / 일자 / 시간 / 내용 순으로 한 줄씩)",
+       "sugg": [
+        "○○지역아동센터 / 2026.03.~2026.06. / 24시간 / 초등학생 학습 멘토링"
+       ]
+      }
+     ]
+    },
+    {
+     "heading": "장학증서 수여식 참석여부",
+     "note": "※ 해당사항 체크",
+     "fields": [
+      {
+       "id": "ceremony",
+       "label": "참석 여부",
+       "type": "checks+text",
+       "q": "장학증서 수여식에 참석할 수 있나요?",
+       "options": [
+        "참  석",
+        "미참석"
+       ],
+       "textLabel": "미참석 사유 및 대리참석자",
+       "tq": "미참석이라면 사유와 대리참석자 (참석이면 비워두세요)",
+       "emptyText": ""
+      }
+     ]
+    },
+    {
+     "heading": "계좌번호",
+     "note": "※ 신청자 명의의 보통예금 계좌 · 인쇄 후 신청인·보호자가 각각 서명해 주세요",
+     "fields": [
+      {
+       "id": "bank",
+       "label": "은행명",
+       "type": "text",
+       "q": "은행명",
+       "placeholder": "예: 국민은행"
+      },
+      {
+       "id": "account",
+       "label": "계좌 번호",
+       "type": "text",
+       "q": "계좌번호 (본인 명의 보통예금)"
+      },
+      {
+       "id": "holder",
+       "label": "예금주",
+       "type": "text",
+       "auto": "name",
+       "q": "예금주"
+      }
+     ]
+    }
+   ]
+  },
+  "bogun-study-apply": {
+   "title": "재단법인 보건장학회 2026년도 2학기 지원신청서",
+   "docName": "보건장학회_학업지원_지원신청서",
+   "org": "재 단 법 인  보 건 장 학 회  귀 중",
+   "signLabel": "지원자",
+   "photoNote": "※ 원본 안내: 표 안의 회색 안내 문구는 모두 삭제한 후 작성해 주시기를 바랍니다.",
+   "pledge": "본인(지원자)은 2026년도 2학기에 재학하여 학업을 성실히 지속할 것을 약속합니다. 만일 해당 학기에 미등록하거나 중도에 휴학할 경우, 귀 재단의 관련 규정에 따라 장학금 전액을 반납하겠습니다.",
+   "sections": [
+    {
+     "heading": "",
+     "fields": [
+      {
+       "id": "name",
+       "label": "성  명",
+       "type": "text",
+       "auto": "name",
+       "q": "성명"
+      },
+      {
+       "id": "birth",
+       "label": "생년월일",
+       "type": "text",
+       "q": "생년월일",
+       "placeholder": "0000.00.00."
+      },
+      {
+       "id": "addr",
+       "label": "주  소",
+       "type": "text",
+       "q": "주소"
+      },
+      {
+       "id": "email",
+       "label": "이메일",
+       "type": "text",
+       "auto": "email",
+       "q": "이메일"
+      },
+      {
+       "id": "phone",
+       "label": "휴대전화",
+       "type": "text",
+       "auto": "phone",
+       "q": "휴대전화",
+       "placeholder": "010-0000-0000"
+      },
+      {
+       "id": "school",
+       "label": "소  속 — 학  교",
+       "type": "text",
+       "auto": "school",
+       "q": "학교"
+      },
+      {
+       "id": "college",
+       "label": "소  속 — 단과대학",
+       "type": "text",
+       "q": "단과대학",
+       "placeholder": "예: 소프트웨어융합대학"
+      },
+      {
+       "id": "major",
+       "label": "소  속 — 학  과",
+       "type": "text",
+       "auto": "major",
+       "q": "학과"
+      },
+      {
+       "id": "year",
+       "label": "소  속 — 학  년",
+       "type": "text",
+       "q": "학년",
+       "placeholder": "예: 3학년"
+      },
+      {
+       "id": "enroll",
+       "label": "2026-2학기 등록 예정",
+       "type": "text",
+       "q": "2026-2학기 등록 예정인가요?",
+       "placeholder": "O 또는 X",
+       "preset": "O"
+      },
+      {
+       "id": "bracket",
+       "label": "2026-1학기 학자금 지원구간",
+       "type": "text",
+       "auto": "bracket",
+       "q": "2026-1학기 학자금 지원구간",
+       "placeholder": "1~5구간 또는 복지자격"
+      },
+      {
+       "id": "gpa",
+       "label": "성  적 — 평균 학점",
+       "type": "text",
+       "q": "평균 학점",
+       "placeholder": "0.0 / 4.5 또는 0.0 / 4.3"
+      },
+      {
+       "id": "credits",
+       "label": "성  적 — 이수학점",
+       "type": "text",
+       "q": "이수학점",
+       "placeholder": "예: 18"
+      },
+      {
+       "id": "altSem",
+       "label": "성적 대체 학기·사유 (해당자만)",
+       "type": "checks+text",
+       "q": "2026-1학기 성적을 제출할 수 없는 경우만 — 사유를 고르세요 (해당 없으면 건너뛰기)",
+       "options": [
+        "2026학년도 1학기 휴학",
+        "학년제로 운영됨",
+        "2026년도 1학기가 P/F로만 운영됨"
+       ],
+       "textLabel": "심사받고자 하는 학기",
+       "tq": "예: 2025학년도 2학기 (해당 없으면 비워두세요)",
+       "emptyText": ""
+      },
+      {
+       "id": "certLater",
+       "label": "성적증명서 제출 예정일 (해당자만)",
+       "type": "text",
+       "q": "접수 기간 내 성적증명서 제출이 어려운 경우만 — 제출 예정일",
+       "placeholder": "추후 제출(  월  일)"
+      }
+     ]
+    },
+    {
+     "heading": "학과장 추천서 (별지)",
+     "note": "※ 학과장 추천서는 원본 첨부 파일을 내려받아 학과 사무실에 요청하세요. 작성 공간이 부족한 경우 별지로 추가 작성이 가능합니다.",
+     "fields": []
+    }
+   ]
+  },
+  "bogun-multi-apply": {
+   "title": "재단법인 보건장학회 2026년도 2학기 다문화가정 장학생 지원신청서",
+   "docName": "보건장학회_다문화가정_지원신청서",
+   "org": "재 단 법 인  보 건 장 학 회  귀 중",
+   "signLabel": "지원자",
+   "photoNote": "※ 원본 안내: 표 안의 회색 안내 문구는 모두 삭제한 후 작성해 주시기를 바랍니다.",
+   "pledge": "본인(지원자)은 2026년도 2학기에 1학년 2학기로 재학하여 학업을 성실히 지속할 것을 약속합니다. 만일 해당 학기에 미등록하거나 중도에 휴학할 경우, 귀 재단의 관련 규정에 따라 장학금 전액을 반납하겠습니다.",
+   "sections": [
+    {
+     "heading": "",
+     "fields": [
+      {
+       "id": "name",
+       "label": "성  명",
+       "type": "text",
+       "auto": "name",
+       "q": "성명"
+      },
+      {
+       "id": "birth",
+       "label": "생년월일",
+       "type": "text",
+       "q": "생년월일",
+       "placeholder": "0000.00.00."
+      },
+      {
+       "id": "addr",
+       "label": "주  소",
+       "type": "text",
+       "q": "주소"
+      },
+      {
+       "id": "email",
+       "label": "이메일",
+       "type": "text",
+       "auto": "email",
+       "q": "이메일"
+      },
+      {
+       "id": "phone",
+       "label": "휴대전화",
+       "type": "text",
+       "auto": "phone",
+       "q": "휴대전화",
+       "placeholder": "010-0000-0000"
+      },
+      {
+       "id": "school",
+       "label": "소  속 — 학  교",
+       "type": "text",
+       "auto": "school",
+       "q": "학교"
+      },
+      {
+       "id": "college",
+       "label": "소  속 — 단과대학",
+       "type": "text",
+       "q": "단과대학"
+      },
+      {
+       "id": "major",
+       "label": "소  속 — 학  과",
+       "type": "text",
+       "auto": "major",
+       "q": "학과"
+      },
+      {
+       "id": "year",
+       "label": "소  속 — 학  년",
+       "type": "text",
+       "q": "학년",
+       "preset": "1학년"
+      },
+      {
+       "id": "enroll",
+       "label": "2026-2학기에 1학년 2학기로 등록 예정",
+       "type": "text",
+       "q": "2026-2학기에 1학년 2학기로 등록 예정인가요?",
+       "placeholder": "O 또는 X",
+       "preset": "O"
+      },
+      {
+       "id": "multi",
+       "label": "다문화가정 해당 사항",
+       "type": "checks",
+       "q": "해당하는 항목을 고르세요",
+       "options": [
+        "⑴ 부모 중 한 명이 현재 외국인인 경우",
+        "⑵ 부모 중 적어도 한 명이 대한민국 국적을 취득한 경우"
+       ]
+      },
+      {
+       "id": "gpa",
+       "label": "2026-1학기 평균 학점",
+       "type": "text",
+       "q": "2026-1학기 평균 학점",
+       "placeholder": "0.0 / 4.5 또는 0.0 / 4.3"
+      },
+      {
+       "id": "credits",
+       "label": "2026-1학기 이수학점",
+       "type": "text",
+       "q": "2026-1학기 이수학점"
+      },
+      {
+       "id": "certLater",
+       "label": "성적증명서 제출 예정일 (해당자만)",
+       "type": "text",
+       "q": "접수 기간 내 성적증명서 제출이 어려운 경우만 — 제출 예정일",
+       "placeholder": "추후 제출(  월  일)"
+      }
+     ]
+    },
+    {
+     "heading": "학과장 추천서 (별지) · 개인정보 동의서",
+     "note": "※ 추천서·개인정보 수집·이용·제공 동의서는 원본 첨부 파일을 내려받아 각각 작성(서명)하세요.",
+     "fields": []
+    }
+   ]
+  },
+  "sanhak-foreign-apply": {
+   "title": "산학재단 『국내 외국인 근로자 자녀』 장학금 신청서",
+   "docName": "산학재단_외국인근로자자녀_신청서",
+   "org": "재단법인 산학협동재단 이사장 귀하",
+   "signLabel": "신청인",
+   "tag": "<서식Ⅰ>",
+   "photoNote": "※ 원본 양식의 증명사진란은 인쇄 후 원본(컬러) 증명사진을 부착해 주세요. 관리번호란은 재단이 작성합니다.",
+   "pledge": "본인은 상기 기재한 사실과 같이 산학협동재단의 국내 외국인 근로자 자녀 장학생이 되고자 신청하며, 신청서에 기재한 내용 및 제출 서류는 틀림이 없음을 알려드립니다. 제출 서류의 오류 및 사실과 다른 내용이 발견될 경우, 장학생 선정과 관련된 모든 결과에 대한 책임은 신청자인 본인에게 있습니다.",
+   "sections": [
+    {
+     "heading": "학적사항",
+     "fields": [
+      {
+       "id": "school",
+       "label": "대학",
+       "type": "text",
+       "auto": "school",
+       "q": "대학"
+      },
+      {
+       "id": "major",
+       "label": "학과(부)",
+       "type": "text",
+       "auto": "major",
+       "q": "학과(부)"
+      },
+      {
+       "id": "studentId",
+       "label": "학번",
+       "type": "text",
+       "auto": "studentId",
+       "q": "학번"
+      },
+      {
+       "id": "nameKo",
+       "label": "성    명 (한글)",
+       "type": "text",
+       "auto": "name",
+       "q": "성명(한글)"
+      },
+      {
+       "id": "nameEn",
+       "label": "성    명 (영문)",
+       "type": "text",
+       "q": "성명(영문)",
+       "placeholder": "HONG GILDONG"
+      },
+      {
+       "id": "gender",
+       "label": "성  별",
+       "type": "checks",
+       "q": "성별",
+       "options": [
+        "남",
+        "여"
+       ]
+      },
+      {
+       "id": "alienNo",
+       "label": "외국인 등록번호",
+       "type": "text",
+       "q": "외국인등록번호 (반드시 13자리를 숫자로 기입)",
+       "placeholder": "000000-0000000"
+      }
+     ]
+    },
+    {
+     "heading": "가족사항",
+     "fields": [
+      {
+       "id": "father",
+       "label": "부 — (국적) · 성명 · (직장명)",
+       "type": "text",
+       "q": "아버지 국적 / 성명 / 직장명",
+       "placeholder": "예: 베트남 / NGUYEN ○○ / ○○산업"
+      },
+      {
+       "id": "mother",
+       "label": "모 — (국적) · 성명 · (직장명)",
+       "type": "text",
+       "q": "어머니 국적 / 성명 / 직장명",
+       "placeholder": "예: 베트남 / TRAN ○○ / ○○식품"
+      },
+      {
+       "id": "addrSelf",
+       "label": "거 주 지 (본인)",
+       "type": "text",
+       "q": "본인 거주지"
+      },
+      {
+       "id": "addrFather",
+       "label": "거 주 지 (부)",
+       "type": "text",
+       "q": "아버지 거주지 (본인과 같으면 ‘상동’)",
+       "placeholder": "상동"
+      },
+      {
+       "id": "addrMother",
+       "label": "거 주 지 (모)",
+       "type": "text",
+       "q": "어머니 거주지 (본인과 같으면 ‘상동’)",
+       "placeholder": "상동"
+      },
+      {
+       "id": "phone",
+       "label": "연 락 처 (휴대폰)",
+       "type": "text",
+       "auto": "phone",
+       "q": "휴대폰"
+      },
+      {
+       "id": "phoneGuardian",
+       "label": "연 락 처 (보호자)",
+       "type": "text",
+       "q": "보호자 연락처"
+      },
+      {
+       "id": "email",
+       "label": "연 락 처 (E-mail)",
+       "type": "text",
+       "auto": "email",
+       "q": "E-mail"
+      }
+     ]
+    },
+    {
+     "heading": "<서식Ⅱ> 자 기 소 개 서",
+     "note": "※ 글자 크기 및 분량 : A4용지 1매 이내, 글자 크기 11 Point로 작성",
+     "fields": [
+      {
+       "id": "motive",
+       "label": "1. 장학금 신청 동기 (필요성 및 배경 등)",
+       "type": "textarea",
+       "q": "장학금이 필요한 이유와 배경",
+       "sugg": [
+        "부모님께서 국내에서 일하시며 학비를 지원해 주고 계시지만, 등록금과 생활비 부담이 커 학업에 온전히 집중하기 어려운 상황입니다."
+       ]
+      },
+      {
+       "id": "activity",
+       "label": "2. 교내‧외 활동 내역 (구체적으로 기재 및 증명서류 별첨)",
+       "type": "textarea",
+       "q": "교내외 활동 내역 (동아리·봉사·수상 등)",
+       "sugg": [
+        "교내 다문화 교류 동아리에서 2년간 활동하며 신입 유학생 정착 멘토링을 맡았습니다."
+       ]
+      },
+      {
+       "id": "plan",
+       "label": "3. 학업 및 진로 계획",
+       "type": "textarea",
+       "q": "앞으로의 학업·진로 계획",
+       "sugg": [
+        "전공 심화 과목을 이수하고 관련 자격증을 취득해 졸업 후 전공 분야 기업에 취업하는 것이 목표입니다."
+       ]
+      },
+      {
+       "id": "sharing",
+       "label": "4. 나눔에 대한 본인의 생각이나 의지",
+       "type": "textarea",
+       "q": "나눔에 대한 생각·의지",
+       "sugg": [
+        "제가 받은 도움을 기억하며, 졸업 후 저와 같은 외국인 근로자 가정 학생들을 돕는 멘토가 되고 싶습니다."
+       ]
+      }
+     ]
+    },
+    {
+     "heading": "<서식Ⅲ> 개인(신용)정보 수집·이용·제공 및 조회 동의서",
+     "note": "※ 동의서는 원본 첨부 파일을 내려받아 인쇄 후 직접 서명하세요.",
+     "fields": []
+    }
+   ]
+  },
+  "mju-gosi-apply": {
+   "title": "고시장학금  신청서",
+   "docName": "명지대_고시장학금_신청서",
+   "org": "명지대학교",
+   "signLabel": "신청인",
+   "tag": "(제 1 호 서식)",
+   "photoNote": "※ 인쇄 후 상단 추천란에 지도교수·학부(과)장 서명(날인)을 받아 제출하세요. 첨부: 시험합격확인서 1부.",
+   "pledge": "명지대학교 장학금규정에 따라 위와 같이 장학금을 받고자 신청서를 제출합니다.",
+   "sections": [
+    {
+     "heading": "",
+     "fields": [
+      {
+       "id": "semester",
+       "label": "신청학기",
+       "type": "text",
+       "q": "신청학기",
+       "preset": "2026학년도   제 1학기"
+      },
+      {
+       "id": "kind",
+       "label": "장학종별",
+       "type": "text",
+       "q": "고시장학금 종 (공고문 참조: 1~3종)",
+       "placeholder": "고시장학금 ( 1 종)",
+       "preset": "고시장학금 (   종)"
+      },
+      {
+       "id": "gpaLast",
+       "label": "신청근거 — 직전학기 평균평점",
+       "type": "text",
+       "q": "직전학기 평균평점",
+       "placeholder": "예: 4.02"
+      },
+      {
+       "id": "creditsLast",
+       "label": "신청근거 — 직전학기 취득학점",
+       "type": "text",
+       "q": "직전학기 취득학점",
+       "placeholder": "예: 18"
+      }
+     ]
+    },
+    {
+     "heading": "신 청 제 한 기 준",
+     "note": "1. 성적기준 : 직전학기 평균평점 2.5 이상, 취득학점 12학점 이상 / 2. 제한사항 : 직전학기 또는 장학금지급 학기에 유기정학 이상의 징계중이거나 징계처분을 받은 자는 장학금 신청 불가 / 3. 동일 수혜기간 내에 1종류를 초과하여 수혜 불가 ※다만, 근로, 자치활동, 대여(2종), 총장특별, 세계화(재학생), 문학․예술․체육(재학생), 기독도우미, 장애학생도우미, 명지다움, 그린캠퍼스, 자원봉사, 해외문화 탐방, 사회진출지원장학금은 제외",
+     "fields": []
+    },
+    {
+     "heading": "신 청 자 인적사항",
+     "fields": [
+      {
+       "id": "collegeMajor",
+       "label": "대학 · 학부(과) · 학년",
+       "type": "text",
+       "auto": "major",
+       "q": "소속 대학·학부(과)·학년",
+       "placeholder": "예: ICT융합대학 융합소프트웨어학부 3학년"
+      },
+      {
+       "id": "name",
+       "label": "성    명",
+       "type": "text",
+       "auto": "name",
+       "q": "성명"
+      },
+      {
+       "id": "studentId",
+       "label": "학    번",
+       "type": "text",
+       "auto": "studentId",
+       "q": "학번"
+      },
+      {
+       "id": "rrn",
+       "label": "주민번호",
+       "type": "text",
+       "q": "주민등록번호 (제출용 문서에만 들어가요 — 서버로 전송되지 않아요)",
+       "placeholder": "000000-0000000"
+      },
+      {
+       "id": "account",
+       "label": "계좌번호",
+       "type": "text",
+       "q": "계좌번호 (※ myiweb과 동일한 본인의 계좌번호)",
+       "placeholder": "은행명 000-000-000000"
+      },
+      {
+       "id": "addr",
+       "label": "연 락 처 — 주    소",
+       "type": "text",
+       "q": "주소"
+      },
+      {
+       "id": "tel",
+       "label": "연 락 처 — 전화번호",
+       "type": "text",
+       "q": "전화번호 (없으면 비워두세요)"
+      },
+      {
+       "id": "phone",
+       "label": "연 락 처 — 핸 드 폰",
+       "type": "text",
+       "auto": "phone",
+       "q": "핸드폰"
+      }
+     ]
+    }
+   ]
   }
  }
 }

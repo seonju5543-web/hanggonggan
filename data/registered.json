@@ -29,7 +29,8 @@
      "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138165&attachNo=115657"
     }
    ],
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "formId": "samil-apply"
   },
   {
    "id": "reg-skku-jobyungdu",
@@ -141,7 +142,8 @@
      "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138153&attachNo=115636"
     }
    ],
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "formId": "bogun-study-apply"
   },
   {
    "id": "reg-skku-bogun-multi",
@@ -182,7 +184,8 @@
      "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138157&attachNo=115645"
     }
    ],
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "formId": "bogun-multi-apply"
   },
   {
    "id": "reg-skku-sanhak-foreign",
@@ -212,7 +215,8 @@
      "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138134&attachNo=115623"
     }
    ],
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "formId": "sanhak-foreign-apply"
   },
   {
    "id": "reg-kw-cheongchang",
@@ -409,7 +413,8 @@
      "url": "https://www.mju.ac.kr/bbs/mjukr/141/178492/download.do"
     }
    ],
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "formId": "mju-gosi-apply"
   },
   {
    "id": "reg-hi-jeju",
