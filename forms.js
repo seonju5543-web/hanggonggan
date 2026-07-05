@@ -2,8 +2,13 @@
    한대장 — 실제 장학금 양식 엔진
    실제 공고에 첨부된 신청 양식을 스키마로 옮겨,
    질문으로 정보를 모으고 원본과 동일한 구조의 문서를 생성한다.
+
+   양식 원본(single source of truth)은 data/forms.json.
+   새 양식은 forms.json에만 추가하면 설치된 앱에도 재설치 없이
+   자동 반영된다(서비스워커가 data/*.json은 네트워크 우선).
+   아래 내장 2종은 오프라인·첫 화면용 폴백 — forms.json과 동일 내용 유지.
    (새 양식 추가 절차: 수집 로봇이 첨부를 리포트 → 개발자 컨펌 →
-    양식을 스키마화해 이 파일에 등록)
+    deep-fetch로 원본 확보 → 스키마화해 data/forms.json에 등록)
    ============================================================ */
 
 const FORM_TEMPLATES = {
@@ -142,6 +147,17 @@ const FORM_TEMPLATES = {
     ],
   },
 };
+
+/* 정식 등록 양식 로딩 — data/forms.json을 내려받아 내장 폴백 위에 병합.
+   덕분에 새 양식 등록·기존 양식 수정이 앱 업데이트 없이 즉시 반영된다. */
+function loadFormTemplates() {
+  return fetch('data/forms.json', { cache: 'no-store' })
+    .then((r) => (r.ok ? r.json() : null))
+    .then((d) => {
+      if (d && d.templates) Object.assign(FORM_TEMPLATES, d.templates);
+    })
+    .catch(() => { /* 오프라인 등 — 내장 폴백으로 동작 */ });
+}
 
 /* 질문 입력칸 자동 채움 — 프로필에서 가져올 수 있는 값 */
 function formAutoVal(key) {

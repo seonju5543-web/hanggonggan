@@ -24,8 +24,12 @@ jobs:
         with:
           node-version: 20
       - env:
-          FORM_TARGETS: ${{ inputs.form_targets || '조병두' }}
+          FORM_TARGETS: ${{ inputs.form_targets || '' }}   # 비우면 run-deepfetch.txt의 targets: 줄 사용
         run: node collector/deepfetch.mjs
+      - name: HWP 미리보기 텍스트 추출 (양식 스키마화 원천 자료)
+        run: |
+          pip install olefile --quiet
+          python3 collector/hwp-prvtext.py
       - run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

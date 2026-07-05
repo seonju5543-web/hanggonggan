@@ -9,8 +9,18 @@ fs.mkdirSync(OUT, { recursive: true });
 const notices = JSON.parse(fs.readFileSync(new URL('../data/notices.json', HERE), 'utf8'));
 const UA = { 'User-Agent': 'Mozilla/5.0 (compatible; HandaejangBot/0.2)' };
 
-/* 첨부 원본까지 내려받을 공고 (제목 부분일치) */
-const DOWNLOAD_FORMS_FOR = (process.env.FORM_TARGETS || '조병두').split(',');
+/* 첨부 원본까지 내려받을 공고 (제목 부분일치).
+   우선순위: 환경변수 FORM_TARGETS > run-deepfetch.txt의 "targets: a,b,c" 줄 > 기본값.
+   (GitHub MCP 없는 세션도 run-deepfetch.txt만 고쳐 push하면 대상 지정 가능) */
+function readTargetsFromTrigger() {
+  try {
+    const txt = fs.readFileSync(new URL('run-deepfetch.txt', HERE), 'utf8');
+    const m = txt.match(/^targets:\s*(.+)$/m);
+    return m ? m[1].trim() : '';
+  } catch { return ''; }
+}
+const DOWNLOAD_FORMS_FOR = (process.env.FORM_TARGETS || readTargetsFromTrigger() || '조병두')
+  .split(',').map((s) => s.trim()).filter(Boolean);
 
 function clean(html) {
   return html
@@ -39,7 +49,10 @@ for (const n of notices.items) {
 }
 fs.writeFileSync(new URL('notices-text.json', OUT), JSON.stringify(texts, null, 1));
 
-/* 지정 공고의 첨부 원본 다운로드 */
+/* 지정 공고의 첨부 원본 다운로드 (이전 실행의 form-* 파일·색인은 지우고 새로 채움) */
+for (const f of fs.readdirSync(OUT)) {
+  if (/^form-/.test(f) || f === 'forms-index.txt') fs.unlinkSync(new URL(f, OUT));
+}
 let fi = 0;
 for (const n of notices.items) {
   if (!DOWNLOAD_FORMS_FOR.some((k) => n.title.includes(k))) continue;

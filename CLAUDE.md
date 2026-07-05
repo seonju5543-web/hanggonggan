@@ -17,9 +17,13 @@
    실시간 공고 피드(제목+링크)는 컨펌 없이 자동 게재 — 이건 합의된 예외.
 3. **선조치후보고**: 방향 결정이 필요하면 최적안으로 먼저 조치하고 "어떤 상황에서 어떤 조치"를 보고.
 4. **양식의 정의**: 공고에 첨부된 실제 신청서 파일(HWP 등)과 **동일한 구조**의 문서를 생성해야 한다.
-   자유 서식 텍스트로 대체하면 안 됨. 신규 양식은 스키마화(`forms.js`) 후 등록.
-5. **양식 확보 절차 (개발자 컨펌 이후)**: ① 공고 상세의 첨부 양식 원본을 fetch-page 워크플로로 확보
-   ② 원본 항목·문구·체크옵션 그대로 스키마화 ③ 검증 후 배포.
+   자유 서식 텍스트로 대체하면 안 됨. 신규 양식은 스키마화 후 `data/forms.json`에 등록.
+5. **양식 확보 절차 (개발자 컨펌 이후 — 정식 등록의 기본 절차)**: 정식 등록할 때 첨부에 신청서
+   양식 파일이 있으면 **양식 등록까지가 한 세트**다.
+   ① `collector/run-deepfetch.txt`에 `targets: 공고키워드1,키워드2` 줄을 적어 기본 브랜치에 push(push-to-run)
+   → 첨부 원본 + HWP 미리보기 텍스트(.hwp.txt)가 `collector/extracted/`에 자동 커밋됨
+   ② 원본 항목·문구·체크옵션 그대로 `data/forms.json`에 스키마화, registered.json 항목에 `formId` 연결
+   ③ `verify/verify-registered.js`·`verify-forms-data.js`로 검증 후 배포 (앱 파일 무변경 — 자동 반영).
    제출 방식이 양식 제출이 아니거나(포털 입력형 등) 양식 확인에 문제가 있으면,
    **모든 수단(공고 상세, 첨부, 주관 재단 홈페이지, fetch-page 원격 열람, 정찰 도구)을 동원해 찾아본 뒤**
    그래도 못 찾을 때만 개발자에게 필요한 정보를 정리해 문의한다.
@@ -30,10 +34,11 @@
 | `index.html` `style.css` | 화면. 5단계 온보딩(학교 자동추천+별칭, 캠퍼스, 계열, 특별자격, 공통 서류정보) |
 | `data.js` | 장학금 데이터(교외 9 샘플 + **kosaf-ai-mentor 실공고 1** + 교내 템플릿), 대학/별칭/학과/캠퍼스/서류슬롯/제출채널 |
 | `app.js` | 매칭엔진(12신호+적합도점수 — schoolOnly 포함), 서류보관함(기기내 저장), 신청 플로우, 실시간 공고 렌더, 정식 등록 로더(loadRegistered) |
-| `forms.js` | **양식 엔진**: FORM_TEMPLATES 스키마 → 질문 → 원본 동일 문서(.doc 저장/인쇄/공유). 등록 2종: kosaf-ai-mentor, **jobyungdu-apply(조병두 신청서)** |
+| `forms.js` | **양식 엔진**: 스키마 → 질문 → 원본 동일 문서(.doc 저장/인쇄/공유). 내장 2종은 오프라인 폴백일 뿐 — **양식 원본은 `data/forms.json`** |
+| `data/forms.json` | **양식 스키마 원본(single source of truth)** — 여기에만 추가하면 설치된 앱에도 자동 반영. 등록 2종: kosaf-ai-mentor, **jobyungdu-apply(조병두 신청서)** |
 | `data/notices.json` | 수집 로봇이 발행하는 실시간 공고 (앱이 fetch) |
 | `data/registered.json` | **정식 등록 공고 17건** (실공고 큐레이션 — 학교한정 매칭 schoolOnly/campusOnly, 마감·금액 파싱, 원본 첨부 링크, 불명확분은 '원문 확인' 정직 표기) |
-| `collector/deepfetch.mjs` + `.github/workflows/deep-fetch.yml` | 공고 본문 전문+지정 공고 첨부 원본을 `collector/extracted/`에 커밋 — 차단 샌드박스가 읽는 통로 |
+| `collector/deepfetch.mjs` + `.github/workflows/deep-fetch.yml` | 공고 본문 전문+지정 공고 첨부 원본을 `collector/extracted/`에 커밋 — 차단 샌드박스가 읽는 통로. **HWP는 미리보기 텍스트(.hwp.txt)까지 자동 추출**(`hwp-prvtext.py`, zip 내부 hwp 포함). 대상은 `run-deepfetch.txt`의 `targets:` 줄로 지정 |
 | `collector/browser-collect.mjs` + `browser-targets.json` + `.github/workflows/browser-collect.yml` | **브라우저형 수집기**(진짜 Chromium) — 봇차단·동적 게시판 8개교, 매일 09:20 KST |
 | `collector/collect.mjs` | 매일 09:00 KST 게시판 수집 + 공고 상세·첨부양식 수집 + notices.json 발행 + 리포트 이슈 |
 | `collector/schools.json` | 대상 23개 캠퍼스 게시판 주소 (null = 미확보) |
@@ -48,9 +53,11 @@
   세 브랜치를 모두 같은 내용으로 push하는 것이 관례 (main push 전 `git fetch origin main` — 봇이 커밋함).
 - Claude 실행 샌드박스는 학교 사이트·github.io 접속 차단 → 외부 확인은 GitHub Actions(로봇/정찰/fetch-page)로.
 - **GitHub MCP 연결이 없는 세션에서도 워크플로 실행 가능**: deep-fetch/browser-collect는 `collector/run-deepfetch.txt` / `collector/run-browser-collect.txt`를 수정해 기본 브랜치에 push하면 자동 실행된다(push-to-run). 결과는 봇이 기본 브랜치에 커밋 → `git fetch` 후 merge로 읽는다.
-- **서비스워커는 data/*.json을 네트워크 우선으로** 가져온다(sw.js, 캐시 v3) — 캐시 우선이면 설치형 앱에서 매일 갱신이 멈추기 때문. 앱 파일을 바꾸면 CACHE 버전을 올릴 것.
+- **자동 업데이트 체계 (2026-07-05 구축)**: ① 데이터(`data/*.json` — 공고·정식등록·양식)는 서비스워커가 네트워크 우선으로 받고, 앱을 열 때마다 + 화면 복귀 때마다(5분 간격 제한) 다시 읽는다 → **재설치 없이 자동 반영**. ② 앱 코드(html/js/css)를 바꾸면 CACHE 버전(sw.js, 현재 v4)을 올릴 것 — 새 서비스워커가 활성화되면 화면이 자동으로 한 번 새로고침돼 즉시 적용된다(app.js controllerchange). **장학금·양식 추가는 데이터 파일만 바꾸므로 CACHE 버전 인상 불필요.**
+- **새 양식 등록은 `data/forms.json`에만 추가**하면 된다(forms.js·app.js 무변경). registered.json 항목에 `formId`를 연결하면 신청 플로우에 양식 작성이 자동으로 붙는다. 이 경로의 검증 드라이버: `verify/verify-forms-data.js`.
+- **수집 로봇이 새 공고 0건이면 새 리포트 이슈를 만들지 않고** 최근 리포트 이슈에 "정상 실행 — 0건" 코멘트만 남긴다(2026-07-05 추가). GitHub 예약 실행은 지연될 수 있음(오늘 09:00 예약이 12:44 실행된 사례).
 - iOS Safari는 datalist 미지원(커스텀 자동추천 구현됨), 전역 appearance:none이 체크박스 지움(커스텀 체크 구현됨).
-- 검증: **`verify/` 폴더에 Playwright 드라이버 커밋되어 있음** (`verify/README.md` 절차대로 실행 — drive.js 전체 회귀, verify-registered.js 정식등록·조병두 양식). 한글 파일명 setInputFiles 실패함(ASCII 사용).
+- 검증: **`verify/` 폴더에 Playwright 드라이버 커밋되어 있음** (`verify/README.md` 절차대로 실행 — drive.js 전체 회귀, verify-registered.js 정식등록·조병두 양식, verify-forms-data.js 데이터 주도 양식 반영). 한글 파일명 setInputFiles 실패함(ASCII 사용).
 - HWP 원본 해석: `olefile`로 열어 `PrvText` 스트림을 UTF-16LE로 읽으면 양식 전문이 나온다 (조병두 스키마화에 사용한 방법).
 - 광운·상명 게시판은 본문을 자바스크립트로 그려서 일반 fetch에는 메뉴만 보임 → 1차 수집 때 저장된 deadlineHint를 활용하거나 브라우저형 로봇 사용.
 - **데이터 수명 규칙**: 실시간 공고는 수집일+60일 후 자동 삭제(collect.mjs), 정식 등록 장학금은 마감+30일 후 목록 자동 숨김(app.js renderExplore). 매일 09:00 KST 수집으로 유입 — 순환 구조.
@@ -98,11 +105,15 @@
 2. **표준화 접수(파일럿)**: 장학팀이 지정 장학금의 이메일 접수를 공식 인정 → 앱 생성 원본양식+보관함 서류가 버튼 하나로 접수 → 이때부터 "신청 완료" 표기가 정직하게 가능 = 진짜 원클릭
 3. **학사 연동**: 성적·재학 정보 연동 → 증명서 발급 자체가 소멸 → 문자 그대로 클릭 한 번
 
-## 마지막 세션 상태 (2026-07-05 종료 시점)
-- 모든 작업 완료·3브랜치 배포 완료·작업 트리 깨끗함. 진행 중이던 미완 작업 없음.
-- 자동으로 돌아가는 것: 매일 09:00 일반 수집 → 09:20 브라우저 수집 → notices.json 갱신 → 60일 경과 자동 삭제. 리포트는 GitHub 이슈(개발자 담당 지정) + collector/browser-report.md.
+## 마지막 세션 상태 (2026-07-05 2차 세션 종료 시점)
+- 이번 세션 작업: ① 자동 업데이트 체계 구축(재설치 없이 데이터·앱 갱신) ② 양식 엔진 데이터 주도화(data/forms.json)
+  + 양식 확보 파이프라인 자동화(deep-fetch가 HWP 텍스트까지 추출) ③ 수집 로봇 0건 실행 알림 추가. 전부 검증 통과.
+- run-deepfetch.txt에 `targets: 조병두,삼일장학회,보건장학회,산학협동재단,고시장학금`을 지정해 push함 —
+  봇이 양식 첨부 원본+텍스트를 기본 브랜치에 커밋하면, **다음 세션이 그 텍스트로 나머지 양식들을 스키마화**하면 된다
+  (정식 등록 17건 중 양식 파일이 확인된 후보: 삼일장학회 zip, 보건장학회 2종 hwp, 산학협동재단 hwp, 명지 고시장학금 hwp).
+- 자동으로 돌아가는 것: 매일 09:00 일반 수집 → 09:20 브라우저 수집 → notices.json 갱신 → 60일 경과 자동 삭제. 리포트는 GitHub 이슈(개발자 담당 지정) + collector/browser-report.md. 0건이면 이슈 코멘트만.
 - 개발자 답변 대기 항목: 게시판 주소들(위 2번 표의 ①·③), Resend 키(②), 제안서 인적사항 확인(④), 스토어 결정(⑤).
-- 다음 세션이 이어서 할 만한 것: 개발자가 주소를 주면 schools.json/browser-targets.json에 등록, 새 수집 공고 중 개별 공고를 채팅 컨펌 받아 registered.json에 추가, 양식 첨부가 있는 공고의 스키마화(조병두 방식 반복).
+- 다음 세션이 이어서 할 만한 것: 위 양식 후보 스키마화, 개발자가 주소를 주면 schools.json/browser-targets.json에 등록, 새 수집 공고 중 개별 공고를 채팅 컨펌 받아 registered.json에 추가.
 
 ## 커밋 규칙
 - 커밋 끝에 Claude-Session 링크 추가 관례 유지. PR은 요청 시에만.

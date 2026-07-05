@@ -47,3 +47,18 @@ jobs:
             --body-file collector/report.md \
             --repo "${{ github.repository }}" \
             --assignee "${{ github.repository_owner }}"
+
+      # 새 공고가 0건이라 리포트를 생략할 때도, 로봇이 정상 실행됐다는 사실은
+      # 최근 리포트 이슈에 한 줄 코멘트로 남긴다 (매일 새 이슈를 만들면 소음이라서)
+      - name: 0건 실행 알림 (최근 리포트 이슈에 코멘트)
+        if: steps.run.outputs.new_count == '0' && github.event_name != 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          last=$(gh issue list --repo "${{ github.repository }}" \
+            --search '"장학공고 수집 리포트" in:title' --state open \
+            --limit 1 --json number --jq '.[0].number' || true)
+          if [ -n "$last" ] && [ "$last" != "null" ]; then
+            gh issue comment "$last" --repo "${{ github.repository }}" \
+              --body "🤖 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 수집 로봇 정상 실행 — 새 공고 0건이라 새 리포트는 만들지 않았어요."
+          fi

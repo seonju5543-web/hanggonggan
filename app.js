@@ -1235,12 +1235,37 @@ function bindEvents() {
   );
 }
 
-/* ---------------- PWA ---------------- */
+/* ---------------- PWA + 자동 업데이트 ----------------
+   설치된 앱을 지우고 다시 깔지 않아도:
+   1) 장학금·양식 데이터(data/*.json)는 앱을 열 때마다 + 화면에 돌아올 때마다 새로 받고
+   2) 앱 코드 자체가 바뀌면 새 서비스워커가 설치된 뒤 화면을 한 번 새로 고쳐 즉시 적용한다. */
+let swReg = null;
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
+  const hadController = !!navigator.serviceWorker.controller; // 최초 설치와 업데이트를 구분
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(() => { /* 오프라인 캐시는 선택 기능 */ });
+    navigator.serviceWorker.register('sw.js')
+      .then((reg) => { swReg = reg; reg.update().catch(() => {}); })
+      .catch(() => { /* 오프라인 캐시는 선택 기능 */ });
+  });
+  let reloadedForUpdate = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hadController || reloadedForUpdate) return; // 첫 설치 때는 새로고침 불필요
+    reloadedForUpdate = true;
+    location.reload();
   });
 }
+
+/* 화면 복귀(설치형 앱을 다시 열 때 포함) 시 데이터 갱신 + 새 버전 확인 — 5분 간격 제한 */
+let lastFgRefresh = Date.now();
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible') return;
+  if (Date.now() - lastFgRefresh < 5 * 60 * 1000) return;
+  lastFgRefresh = Date.now();
+  loadNotices();
+  loadRegistered();
+  if (typeof loadFormTemplates === 'function') loadFormTemplates();
+  if (swReg) swReg.update().catch(() => {});
+});
 
 /* ---------------- 시작 ---------------- */
 loadState();
@@ -1248,6 +1273,7 @@ bindEvents();
 initOnboarding();
 loadNotices();
 loadRegistered();
+if (typeof loadFormTemplates === 'function') loadFormTemplates(); // 정식 등록 양식 최신화
 walletRefresh().then(() => {
   if (!$('#screen-my').hidden) renderMy();
 });
