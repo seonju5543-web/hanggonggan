@@ -1,0 +1,40 @@
+{
+  "_comment": "브라우저형 수집기 대상 — 일반 로봇이 차단되거나(403/404) 화면을 나중에 그리는(동적) 학교. 후보를 순서대로 시도해 첫 성공 주소에서 수집한다.",
+  "targets": [
+    { "school": "서울대학교", "campus": "", "candidates": [
+      "https://www.snu.ac.kr/snunow/notice/genl",
+      "https://www.snu.ac.kr/snunow/notice",
+      "https://www.snu.ac.kr/"
+    ]},
+    { "school": "연세대학교", "campus": "신촌캠퍼스", "candidates": [
+      "https://www.yonsei.ac.kr/sc/support/notice.jsp",
+      "https://www.yonsei.ac.kr/sc/",
+      "https://www.yonsei.ac.kr/"
+    ]},
+    { "school": "서강대학교", "campus": "", "candidates": [
+      "https://www.sogang.ac.kr/ko/scholarship",
+      "https://www.sogang.ac.kr/ko/notice",
+      "https://www.sogang.ac.kr/"
+    ]},
+    { "school": "서울시립대학교", "campus": "", "candidates": [
+      "https://www.uos.ac.kr/korNotice/list.do?list_id=FA2",
+      "https://www.uos.ac.kr/korNotice/list.do?list_id=FA1"
+    ]},
+    { "school": "중앙대학교", "campus": "공통", "candidates": [
+      "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100",
+      "https://www.cau.ac.kr/"
+    ]},
+    { "school": "숙명여자대학교", "campus": "", "candidates": [
+      "https://www.sookmyung.ac.kr/kr/life/scholarship-notice.do",
+      "https://www.sookmyung.ac.kr/kr/index.do"
+    ]},
+    { "school": "가천대학교", "campus": "", "candidates": [
+      "https://www.gachon.ac.kr/bbs/kor/475/artclList.do",
+      "https://www.gachon.ac.kr/kor/7986/subview.do",
+      "https://www.gachon.ac.kr/"
+    ]},
+    { "school": "동국대학교", "campus": "서울캠퍼스", "candidates": [
+      "https://www.dongguk.edu/article/JANGHAKNOTICE/list"
+    ]}
+  ]
+}

@@ -1,0 +1,32 @@
+name: 공고 원문 심층 수집
+
+on:
+  workflow_dispatch:
+    inputs:
+      form_targets:
+        description: '첨부 원본까지 받을 공고 (쉼표 구분, 제목 부분일치)'
+        default: '조병두'
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  deepfetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - env:
+          FORM_TARGETS: ${{ inputs.form_targets }}
+        run: node collector/deepfetch.mjs
+      - run: |
+          git config user.name "handaejang-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add collector/extracted
+          if ! git diff --cached --quiet; then
+            git commit -m "deepfetch: notice texts + form originals"
+            git push
+          fi

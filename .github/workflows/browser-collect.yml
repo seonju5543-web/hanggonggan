@@ -1,0 +1,46 @@
+name: 브라우저형 수집 로봇
+
+on:
+  schedule:
+    - cron: '20 0 * * *'   # 매일 09:20 KST (일반 수집 후)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: collector
+  cancel-in-progress: false
+
+jobs:
+  browse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm init -y >/dev/null && npm i playwright@1 --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - id: run
+        run: node collector/browser-collect.mjs
+      - name: 결과 저장
+        run: |
+          git config user.name "handaejang-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add collector/seen.json data/notices.json
+          if ! git diff --cached --quiet; then
+            git commit -m "browser-collector: harvest update"
+            git push
+          fi
+      - name: 리포트 이슈
+        if: github.event_name == 'workflow_dispatch' || steps.run.outputs.new_count != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --title "🖥 브라우저형 수집 리포트 $(TZ=Asia/Seoul date +%Y-%m-%d) (신규 ${{ steps.run.outputs.new_count }}건)" \
+            --body-file collector/browser-report.md \
+            --repo "${{ github.repository }}" \
+            --assignee "${{ github.repository_owner }}"
