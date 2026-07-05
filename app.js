@@ -186,7 +186,7 @@ function recordSubmitted(sch) {
   app.submittedAt = nowStamp();
   saveState();
   toast('공식 제출로 기록했어요. 접수 마감 후에는 자동으로 심사 단계로 표시돼요');
-  openDetail(sch.id);
+  refreshProgressViews(sch.id);
 }
 
 function recordResult(sch, won) {
@@ -196,7 +196,7 @@ function recordResult(sch, won) {
   app.resultAt = nowStamp();
   saveState();
   toast(won ? '🎉 선정 축하드려요! 결과를 기록했어요' : '결과를 기록했어요. 다음 기회를 함께 찾아봐요');
-  openDetail(sch.id);
+  refreshProgressViews(sch.id);
 }
 
 function undoProgress(sch) {
@@ -205,7 +205,14 @@ function undoProgress(sch) {
   if (app.result) { app.result = null; app.resultAt = null; }
   else if (app.submittedAt) { app.submittedAt = null; }
   saveState();
-  openDetail(sch.id);
+  refreshProgressViews(sch.id);
+}
+
+/* 진척도 기록 후 시트와 뒤 화면(내역·홈)을 함께 갱신 */
+function refreshProgressViews(id) {
+  const current = $$('.screen').find((s) => !s.hidden);
+  if (current) showScreen(current.id.replace('screen-', ''));
+  openDetail(id);
 }
 
 function toast(msg) {
@@ -807,9 +814,14 @@ function loadRegistered() {
 function liveNoticesHtml() {
   const p = state.profile;
   if (!liveNotices || !p) return '';
-  const regUrls = new Set(registeredList.map((s) => s.sourceUrl)); // 정식 등록된 공고는 카드로 노출되므로 피드에서 제외
+  // 정식 등록된 공고(registered.json + data.js 실공고)는 카드로 노출되므로 피드에서 제외
+  // URL 뒤에 목록 파라미터가 붙는 경우가 있어 전방일치로 비교한다
+  const regUrls = registeredList.map((s) => s.sourceUrl)
+    .concat(NATIONAL_SCHOLARSHIPS.filter((s) => s.sourceKind === 'official' && s.sourceUrl).map((s) => s.sourceUrl))
+    .filter(Boolean);
+  const isRegistered = (url) => regUrls.some((u) => url.startsWith(u) || u.startsWith(url));
   const mine = (liveNotices.items || []).filter((n) =>
-    n.school === p.school && (!n.campus || !p.campus || n.campus === p.campus) && !regUrls.has(n.url)
+    n.school === p.school && (!n.campus || !p.campus || n.campus === p.campus) && !isRegistered(n.url)
   ).slice(0, 10);
   const head = `<div class="section-head" style="margin-top:4px"><h3>우리 학교 실시간 공고</h3>
     <span class="link-btn">매일 아침 자동 갱신${liveNotices.updatedAt ? ' · ' + liveNotices.updatedAt : ''}</span></div>`;
@@ -954,11 +966,14 @@ function openDetail(id) {
   const canApply = ['eligible', 'selective'].includes(result.status) && (!app || app.pending) && d.days >= 0;
   const ch = officialChannel(sch);
 
-  const reasonRows = result.reasons.map((r) => {
+  let reasonRows = result.reasons.map((r) => {
     const bad = /필요|아니에요|가능$/.test(r) && !/충족|확인/.test(r);
     return `<li class="${bad ? 'r-bad' : 'r-ok'}">${bad ? '✕' : '✓'} ${r}</li>`;
   }).join('');
   const missingRows = result.missing.map((m) => `<li class="r-unk">? ${m} 정보를 입력하면 정확히 판단할 수 있어요</li>`).join('');
+  if (!reasonRows && !missingRows) {
+    reasonRows = `<li class="r-ok">✓ 별도 자격 제한이 없는 공고예요${result.status === 'selective' ? ' — 지원자 중 선발 심사로 결정돼요' : ''}</li>`;
+  }
 
   let btnLabel = '⚡ 원클릭 신청 준비하기';
   if (app && !app.pending) btnLabel = '✓ 신청 준비 완료됨';
@@ -990,8 +1005,9 @@ function openDetail(id) {
           return `<li>${auto ? '<span class="doc-auto">자동</span>' : '<span class="doc-manual">직접</span>'} ${doc}</li>`;
         }).join('')}
       </ul>
-      <p class="doc-legend">'자동' 서류는 학교·재단 연동 후 자동 첨부되는 항목이에요 (현재 시연 단계 — 실제 발급·제출 전).
-      '직접' 서류 중 자기소개서·계획서·사유서는 아래 도우미로 앱에서 바로 작성할 수 있어요.</p>
+      <p class="doc-legend">${sch.documents.some((doc) => /자동/.test(doc))
+        ? `'자동' 서류는 학교·재단 연동 후 자동 첨부되는 항목이에요 (현재 시연 단계 — 실제 발급·제출 전). `
+        : ''}'직접' 서류 중 자기소개서·계획서·사유서·신청 양식은 앱에서 바로 작성할 수 있어요.</p>
 
       <p class="sheet-note">💡 ${sch.note}</p>
       ${(sch.attachments && sch.attachments.length) ? `
@@ -1042,8 +1058,10 @@ function openDetail(id) {
           </div>
           <button class="btn btn-outline" id="btn-form-edit" style="width:100%;margin-bottom:14px">✏️ 양식 다시 작성</button>` : ''}
         ${certStatusListHtml(sch)}
-        <h4>최종 제출 방법</h4>
+        <h4>최종 제출 방법 <span class="channel-tag">${submitChannelLabel(sch)}</span></h4>
         <ol class="guide-list">${ch.guide.map((g) => `<li>${g}</li>`).join('')}</ol>
+        ${(ch.url || sch.sourceUrl) && step < 1 ? `
+        <button class="btn btn-primary" id="btn-go-submit" style="width:100%;margin-bottom:8px">⚡ 내용 복사하고 제출처 열기 ↗</button>` : ''}
         <div class="submit-actions">
           <button class="btn btn-outline" id="btn-copy-docs">📋 서류 내용 복사</button>
           <button class="btn btn-outline" id="btn-share-docs">📤 파일과 함께 공유</button>
@@ -1075,6 +1093,12 @@ function openDetail(id) {
   if (lostBtn) lostBtn.addEventListener('click', () => recordResult(sch, false));
   const undoBtn = $('#btn-undo-progress');
   if (undoBtn) undoBtn.addEventListener('click', () => undoProgress(sch));
+  const goBtn = $('#btn-go-submit');
+  if (goBtn) goBtn.addEventListener('click', () => {
+    copyText(buildSubmissionText(sch, app));
+    const url = ch.url || sch.sourceUrl;
+    if (url) window.open(url, '_blank', 'noopener');
+  });
   if (app && app.formAns && sch.formId) {
     const tpl = FORM_TEMPLATES[sch.formId];
     $('#btn-form-save').addEventListener('click', () => downloadFormDoc(tpl, state.profile, app.formAns));

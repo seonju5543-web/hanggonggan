@@ -293,6 +293,14 @@ const SUBMIT_GUIDES = {
   ],
 };
 
+/* 접수 채널 분류 — 실제 공고의 접수 방식 4종 (정직 표기: 앱이 대신 못 누르는 채널은 명시) */
+function submitChannelLabel(sch) {
+  if (sch.applyEmail) return '📧 이메일 접수 — 앱에서 메일 자동 완성';
+  if (sch.program || /한국장학재단/.test(sch.provider || '')) return '🏛 한국장학재단 — 본인 인증 후 직접 신청';
+  if (sch.formId) return '📄 양식 제출형 — 앱에서 원본 양식 작성';
+  return '🖥 온라인·포털 입력형 — 복사해서 붙여넣기';
+}
+
 function officialChannel(sch) {
   const ch = OFFICIAL_CHANNELS[sch.id];
   if (ch) {
