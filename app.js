@@ -472,9 +472,9 @@ function schCard(sch, result, { compact = false, fit = 0 } = {}) {
         ${applied ? '<span class="badge badge-applied">신청함</span>' : ''}
         ${fit > 0 ? `<span class="badge badge-fit">적합도 ${fit}%</span>` : ''}
       </div>
-      <p class="sch-name">${sch.name}</p>
-      <p class="sch-amount">${sch.amount}</p>
-      ${compact ? '' : `<p class="sch-provider">${sch.provider}</p>`}
+      <p class="sch-name">${esc(sch.name)}</p>
+      <p class="sch-amount">${esc(sch.amount)}</p>
+      ${compact ? '' : `<p class="sch-provider">${esc(sch.provider)}</p>`}
       <span class="status-pill pill-${meta.cls}">${meta.label}</span>
     </button>`;
 }
@@ -990,10 +990,10 @@ function openDetail(id) {
         ${fit > 0 ? `<span class="badge badge-fit">적합도 ${fit}%</span>` : ''}
         <span class="status-pill pill-${meta.cls}">${meta.label}</span>
       </div>
-      <h3 class="sheet-title">${sch.name}</h3>
-      <p class="sheet-provider">${sch.provider} · ${sch.period}</p>
-      <p class="sheet-amount">${sch.amount}</p>
-      <p class="sheet-summary">${sch.summary}</p>
+      <h3 class="sheet-title">${esc(sch.name)}</h3>
+      <p class="sheet-provider">${esc(sch.provider)} · ${esc(sch.period)}</p>
+      <p class="sheet-amount">${esc(sch.amount)}</p>
+      <p class="sheet-summary">${esc(sch.summary)}</p>
 
       <h4>자격 진단</h4>
       <ul class="reason-list">${reasonRows}${missingRows || ''}</ul>
@@ -1009,7 +1009,7 @@ function openDetail(id) {
         ? `'자동' 서류는 학교·재단 연동 후 자동 첨부되는 항목이에요 (현재 시연 단계 — 실제 발급·제출 전). `
         : ''}'직접' 서류 중 자기소개서·계획서·사유서·신청 양식은 앱에서 바로 작성할 수 있어요.</p>
 
-      <p class="sheet-note">💡 ${sch.note}</p>
+      <p class="sheet-note">💡 ${esc(sch.note)}</p>
       ${(sch.attachments && sch.attachments.length) ? `
       <h4>공고 원본 첨부 양식</h4>
       <ul class="doc-list">
@@ -1144,8 +1144,8 @@ function appCard(app) {
         <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${sch.type}</span>
         ${statusBadge}
       </div>
-      <p class="sch-name">${sch.name}</p>
-      <p class="sch-provider">${app.appliedAt} ${app.pending ? '담아둠' : '준비 완료'} · 제출처 ${officialChannel(sch).label}</p>
+      <p class="sch-name">${esc(sch.name)}</p>
+      <p class="sch-provider">${app.appliedAt} ${app.pending ? '담아둠' : '준비 완료'} · 제출처 ${esc(officialChannel(sch).label)}</p>
       <div class="mini-progress"><div style="width:${app.pending ? 6 : ((step + 1) / APP_STEPS.length) * 100}%"></div></div>
     </button>`;
 }

@@ -21,8 +21,30 @@ export default {
     if (req.method === 'OPTIONS') return new Response(null, { headers: cors });
     if (req.method !== 'POST') return new Response('POST only', { status: 405, headers: cors });
 
+    /* 남용 방지 ① — 앱에서 온 요청만 (Origin 검사: curl 등 직접 호출 차단) */
+    const origin = req.headers.get('Origin') || '';
+    if (origin !== 'https://seonju5543-web.github.io') {
+      return new Response('forbidden', { status: 403, headers: cors });
+    }
+
     const { to, subject, text, replyTo, attachments } = await req.json();
     if (!to || !subject || !text) return new Response('bad request', { status: 400, headers: cors });
+
+    /* 남용 방지 ② — 수신자는 학교(.ac.kr)·장학재단 등 접수처 도메인만 (스팸 릴레이 차단) */
+    const ALLOWED_TO = /@([a-z0-9-]+\.)*(ac\.kr|or\.kr|go\.kr|re\.kr)$/i;
+    if (typeof to !== 'string' || !ALLOWED_TO.test(to.trim())) {
+      return new Response('recipient not allowed', { status: 403, headers: cors });
+    }
+
+    /* 남용 방지 ③ — 크기 제한 (본문 100KB · 첨부 5개 각 5MB base64) */
+    if (String(subject).length > 300 || String(text).length > 100_000) {
+      return new Response('too large', { status: 413, headers: cors });
+    }
+    for (const a of (attachments || []).slice(0, 5)) {
+      if (!a || typeof a.content !== 'string' || a.content.length > 7_000_000) {
+        return new Response('attachment too large', { status: 413, headers: cors });
+      }
+    }
 
     const r = await fetch('https://api.resend.com/emails', {
       method: 'POST',
