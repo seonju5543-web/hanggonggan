@@ -12,7 +12,9 @@ cd verify && npm init -y >/dev/null && npm i playwright-core --no-audit --no-fun
 # 3) 실행
 node drive.js               # 전체 회귀: 외대 프로필 온보딩→매칭→보관함→신청 플로우
 node verify-registered.js   # 정식 등록 검증: 성균관 프로필→등록 공고 노출→조병두 양식 생성
+node verify-new-forms.js    # 신규 양식 5종: 스키마 렌더링 + 삼일·명지 UI 문서 생성
 node verify-forms-data.js   # 데이터 주도 양식: forms.json에만 더미 양식을 넣은 앱 복사본(8124 포트)으로 검증
+node audit-data.js          # 소급 감사: 기존 데이터 전체가 현재 엔진 기준을 충족하는지 (엔진 변경 후 필수)
 ```
 
 `verify-forms-data.js` 사전 준비: 저장소를 스크래치 폴더에 복사 → 복사본의 data/forms.json에
