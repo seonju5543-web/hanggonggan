@@ -7,6 +7,10 @@ on:
         description: '첨부 원본까지 받을 공고 (쉼표 구분, 제목 부분일치)'
         default: '조병두'
         type: string
+  push:
+    branches: ['claude/nice-heisenberg-WESq5']
+    paths:
+      - 'collector/run-deepfetch.txt'   # 이 파일을 수정해 push하면 자동 실행
 
 permissions:
   contents: write
@@ -20,7 +24,7 @@ jobs:
         with:
           node-version: 20
       - env:
-          FORM_TARGETS: ${{ inputs.form_targets }}
+          FORM_TARGETS: ${{ inputs.form_targets || '조병두' }}
         run: node collector/deepfetch.mjs
       - run: |
           git config user.name "handaejang-bot"

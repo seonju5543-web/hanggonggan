@@ -4,6 +4,10 @@ on:
   schedule:
     - cron: '20 0 * * *'   # 매일 09:20 KST (일반 수집 후)
   workflow_dispatch:
+  push:
+    branches: ['claude/nice-heisenberg-WESq5']
+    paths:
+      - 'collector/run-browser-collect.txt'   # 이 파일을 수정해 push하면 자동 실행
 
 permissions:
   contents: write
