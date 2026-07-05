@@ -429,6 +429,9 @@ function officialChannel(sch) {
     const kind = sch.id.startsWith('kosaf') ? 'kosaf' : 'foundation';
     return { ...ch, guide: SUBMIT_GUIDES[kind] };
   }
+  if (sch.sourceUrl) {
+    return { label: `${sch.provider} (원문 공고의 접수 방법)`, url: sch.sourceUrl, guide: SUBMIT_GUIDES.campus };
+  }
   return { label: `${sch.provider} 장학공지 (학교 포털)`, guide: SUBMIT_GUIDES.campus };
 }
 

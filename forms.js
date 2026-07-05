@@ -89,7 +89,75 @@ const FORM_TEMPLATES = {
       },
     ],
   },
+
+  /* 출처: 성균관대 '2026-2학기 조병두장학금 선발 안내' 공고 첨부
+     (붙임1) 조병두장학금 신청서(2026).hwp — 원본 HWP의 13개 항목·문구·체크옵션·자필 서약문을 그대로 반영 */
+  'jobyungdu-apply': {
+    title: '조병두 장학금 신청서',
+    docName: '조병두장학금_신청서',
+    org: '학생처장 귀하',
+    signLabel: '지원자',
+    tag: '(붙임1)',
+    photoNote: '※ 원본 양식의 사진란은 인쇄 후 우측 상단에 사진을 부착해 주세요.',
+    handwriteNote: '※ 다음의 문구를 하단에 자필로 기재, 서명하시기 바랍니다. (미기재시 서류접수 불가)',
+    handwriteText: '본인은 장학금 수혜자로 선정될 경우 “받은 만큼 후배들에게 돌려주라”는 故조병두 동문의 뜻에 따라 재학 중 및 졸업 후에도 받은 혜택을 후배들을 위한 조병두 장학회 기금으로 환원할 것을 서약합니다.',
+    pledge: '상기 신청내용이 틀림없고 허위 기재일 경우 장학생 자격이 박탈될 수 있음을 확인하였습니다.',
+    sections: [
+      {
+        heading: '',
+        fields: [
+          { id: 'nameLine', label: '1. 성       명', type: 'text', auto: 'name',
+            q: '성명 — 한자가 있으면 함께 적어주세요', placeholder: '(한글) 홍길동   (한자) 洪吉童' },
+          { id: 'studentId', label: '2. 학       번', type: 'text', auto: 'studentId', q: '학번' },
+          { id: 'majorLine', label: '3. 학부 / 전공', type: 'text', auto: 'major',
+            q: '소속 대학·학과 (원본 표기: ___대학 ___학과)', placeholder: '예: 소프트웨어융합대학 소프트웨어학과' },
+          { id: 'birth', label: '4. 생년월일', type: 'text', q: '생년월일', placeholder: '예: 2004. 3. 15.' },
+          { id: 'yearRemain', label: '5. 학       년  (잔여학기)', type: 'text', auto: 'yearRemain',
+            q: '학년과 잔여학기', placeholder: '예: 3학년 (잔여 3학기)' },
+          { id: 'gender', label: '6. 성 별', type: 'checks', q: '성별', options: ['남', '여'] },
+          { id: 'addrSelf', label: '7. 주       소 (본인) · 전화', type: 'text',
+            q: '본인 주소(우편번호 포함)와 전화번호', placeholder: '서울시 ○○구 ○○로 12 (03016) / 010-0000-0000' },
+          { id: 'addrGuardian', label: '7. 주       소 (보호자) · 전화', type: 'text',
+            q: '보호자 주소와 전화번호', placeholder: '주소 (우편번호) / 전화번호' },
+          { id: 'bracket', label: '8. 한국장학재단 소득분위', type: 'text', auto: 'bracket',
+            q: '한국장학재단 소득분위(지원구간)', placeholder: '예: 4구간' },
+          { id: 'lastSem', label: '9. 직전학기성적 — 신청학점 / 이수학점 / 평점평균( /4.5)', type: 'text', auto: 'gpaLast',
+            q: '직전학기 신청학점·이수학점·평점평균', placeholder: '예: 18 / 18 / 4.02 /4.5' },
+          { id: 'totalGpa', label: '10. 전학년성적 — 이수학점 / 평점평균( /4.5)', type: 'text',
+            q: '전학년 이수학점과 평점평균', placeholder: '예: 98 / 3.95 /4.5' },
+          { id: 'renew', label: '11. 계속자여부', type: 'checks', q: '처음 신청하나요, 계속 장학생인가요?', options: ['신규', '계속'] },
+          { id: 'applyType', label: '12. 신청유형', type: 'checks', q: '신청 유형을 고르세요 (택1)',
+            options: ['① 등록금 전액', '② 생활비 장학금'], suffix: '中 택1 *세부사항은 공고문 참조' },
+        ],
+      },
+      {
+        heading: '별첨. 타장학금 수혜 여부 확인서',
+        note: '(*해당자에 한함 — 기간: 2026년 1학기, 2학기(예정), 2027년 1학기, 2학기(예정))',
+        fields: [
+          { id: 'otherSch', label: '장학금 종류/(지급기관 및 단체) · 수혜 연도 · 수혜 학기/수혜학년 · 장학금액(원)', type: 'textarea',
+            q: '타장학금 수혜(예정) 내역 — 해당 없으면 비워두세요',
+            sugg: ['국가장학금 I유형 / 한국장학재단 — 2026년 / 1학기(3학년) / 2,600,000원'] },
+        ],
+      },
+    ],
+  },
 };
+
+/* 질문 입력칸 자동 채움 — 프로필에서 가져올 수 있는 값 */
+function formAutoVal(key) {
+  const p = (typeof state !== 'undefined' && state.profile) || null;
+  if (!p || !key) return '';
+  const c = p.common || {};
+  switch (key) {
+    case 'name': return p.name || '';
+    case 'studentId': return c.studentId || '';
+    case 'major': return p.major || '';
+    case 'bracket': return p.bracket != null ? `${p.bracket}구간` : '';
+    case 'yearRemain': return p.year ? `${p.year}학년 (잔여  학기)` : '';
+    case 'gpaLast': return p.gpa != null ? `  /  / ${p.gpa} /4.5` : '';
+    default: return '';
+  }
+}
 
 const FORM_DAYS = ['월', '화', '수', '목', '금', '토', '일'];
 
@@ -112,7 +180,7 @@ function formQuestionsHtml(tpl) {
         html += `<textarea id="${fid}-t" rows="2" placeholder="${esc(f.tq || '')}" style="margin-top:8px"></textarea>`;
       }
       if (f.type === 'text') {
-        html += `<input type="text" id="${fid}" placeholder="${esc(f.placeholder || '')}" value="${esc(f.preset || '')}" autocomplete="off" />`;
+        html += `<input type="text" id="${fid}" placeholder="${esc(f.placeholder || '')}" value="${esc(f.preset || formAutoVal(f.auto) || '')}" autocomplete="off" />`;
       }
       if (f.type === 'textarea') {
         html += `<div class="fq-sugg">${(f.sugg || []).map((s) => `<button type="button" class="chip chip-sm" data-fill="${fid}" data-text="${esc(s)}">${esc(s.slice(0, 26))}…</button>`).join('')}</div>`;
@@ -162,11 +230,12 @@ function renderFormDoc(tpl, p, ans, { editable = false } = {}) {
   const ed = editable ? ' contenteditable="true"' : '';
   const box = (checked) => (checked ? '☑' : '□');
 
-  let html = `<div class="form-doc"><p class="fd-tag">&lt;별첨&gt;</p>
+  let html = `<div class="form-doc"><p class="fd-tag">${esc(tpl.tag || '<별첨>')}</p>
     <h2 class="fd-title">${esc(tpl.title)}</h2>`;
+  if (tpl.photoNote) html += `<p class="fd-note">${esc(tpl.photoNote)}</p>`;
 
   tpl.sections.forEach((sec) => {
-    html += `<p class="fd-sec">${esc(sec.heading)}${sec.note ? ` <span class="fd-note">${esc(sec.note)}</span>` : ''}</p>`;
+    if (sec.heading || sec.note) html += `<p class="fd-sec">${esc(sec.heading)}${sec.note ? ` <span class="fd-note">${esc(sec.note)}</span>` : ''}</p>`;
     if (sec.info) {
       html += '<table class="fd-table">';
       sec.info.forEach((row) => {
@@ -204,9 +273,14 @@ function renderFormDoc(tpl, p, ans, { editable = false } = {}) {
   });
 
   const now = new Date();
+  if (tpl.handwriteNote) {
+    html += `<p class="fd-note" style="margin-top:14px">${esc(tpl.handwriteNote)}</p>
+      <p class="fd-pledge" style="border:1px dashed #666;padding:10px 12px;text-align:left">${esc(tpl.handwriteText || '')}</p>
+      <p class="fd-note" style="text-align:center">↑ 인쇄 후 이 문구를 하단 여백에 자필로 옮겨 적고 서명하세요</p>`;
+  }
   html += `<p class="fd-pledge">${esc(tpl.pledge)}</p>
     <p class="fd-sign">작성일: ${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일&nbsp;&nbsp;&nbsp;
-    신청인: ${esc(p.name || '')} (서명 또는 날인)</p>
+    ${esc(tpl.signLabel || '신청인')}: ${esc(p.name || '')} (서명 또는 날인)</p>
     <p class="fd-org">${esc(tpl.org)}</p></div>`;
   return html;
 }

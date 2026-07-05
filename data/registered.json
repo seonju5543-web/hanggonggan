@@ -1,0 +1,491 @@
+{
+ "updatedAt": "2026-07-05",
+ "items": [
+  {
+   "id": "reg-skku-samil",
+   "name": "삼일장학회 희망/동행 장학생",
+   "type": "교외",
+   "provider": "재단법인 삼일장학회 (성균관대 추천)",
+   "amount": "생활비성 장학금 250만원",
+   "amountValue": 2500000,
+   "deadline": "2026-07-12",
+   "period": "신청 2026.7.8(수) 09:00 ~ 7.12(일)",
+   "summary": "삼일장학회가 희망(가계곤란) 2명·동행(장애 학생) 1명을 학교 추천으로 선발합니다. 등록금성 장학금과 중복 수혜가 가능한 생활비성 장학금입니다.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "성균관대학교"
+   },
+   "documents": [
+    "장학금 지원 신청서 (공고 첨부 양식)",
+    "분야별 자격 증빙서류 (2026년 7월 이후 발급본)",
+    "제출 서류 전체는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "GLS-[장학영역]-[장학금보기]-[장학금모아보기]에서 장학금명 클릭 후 신청. 서류는 직인 있는 원본을 PDF로 업로드.",
+   "sourceUrl": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=138165&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "2026년 2학기 삼일장학회 지원자 제출서류 양식.zip",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138165&attachNo=115657"
+    }
+   ],
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-skku-jobyungdu",
+   "name": "조병두장학금 (2026-2학기)",
+   "type": "교내",
+   "provider": "성균관대 조병두장학회",
+   "amount": "등록금 전액 또는 생활비 장학금 400만원/학기 (택1)",
+   "amountValue": 4000000,
+   "deadline": "2026-07-31",
+   "period": "접수 ~ 2026.7.31(금) 오전 9:00 ★기한엄수",
+   "summary": "\"받은 만큼 후배들에게 돌려주라\"는 故조병두 동문의 뜻으로 운영되는 장학금입니다. 등록금 전액 또는 학기당 생활비 400만원 중 선택해 지원하며, 신청서 양식을 앱에서 원본과 동일한 구조로 작성할 수 있어요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "성균관대학교",
+    "years": [
+     3,
+     4
+    ]
+   },
+   "documents": [
+    "장학금 신청서 (앱에서 원본 양식 작성)",
+    "한국장학재단 소득분위 증명서 (국가장학금 증명서 아님)",
+    "자기소개서 — A4 2매 이내 (공고 첨부 양식)",
+    "전체 학년 성적증명서 (2026-1학기 성적 포함)",
+    "존경하는 교수님 추천서 (공고 첨부 양식)",
+    "개인정보 수집·이용 동의서 (공고 첨부 양식)",
+    "전체 학년 장학금 수혜확인서"
+   ],
+   "duplicable": true,
+   "note": "신규 대상: 2026-2학기 기준 3-1·3-2·4-1 재학 예정자(잔여 2학기 이상). 생활비형 선택 시 타 장학금과 중복 수혜 가능. 모든 서류는 2026년 7월 이후 발급본만 인정. GLS 장학 공고 탭에서 접수.",
+   "formId": "jobyungdu-apply",
+   "sourceUrl": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=138195&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "(붙임1) 조병두장학금 신청서(2026).hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138195&attachNo=115690"
+    },
+    {
+     "name": "(붙임2) 조병두 장학금 자기소개서.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138195&attachNo=115691"
+    },
+    {
+     "name": "(붙임3)_장학금_추천서_양식.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138195&attachNo=115692"
+    },
+    {
+     "name": "(붙임4) 개인정보 수집 및 이용동의서(성균관대학교.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138195&attachNo=115693"
+    }
+   ],
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-skku-cheongchang",
+   "name": "한국농어촌희망재단 청년창업농장학금",
+   "type": "교외",
+   "provider": "한국농어촌희망재단",
+   "amount": "등록금 + 영농정착 지원 (세부 원문 확인)",
+   "amountValue": 3000000,
+   "deadline": "2026-07-06",
+   "period": "신청 2026.6.1(월) 13:00 ~ 7.6(월) 17:00",
+   "summary": "졸업 후 영농 분야 창업·정착을 계획하는 학생을 지원하는 농림축산식품부 장학금입니다. 재단 홈페이지에서 직접 온라인 신청해요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "성균관대학교"
+   },
+   "documents": [
+    "온라인 신청 (rhof.or.kr)",
+    "영농 계획서 등 — 선발안내문 확인"
+   ],
+   "duplicable": false,
+   "note": "의무 영농 종사 조건이 있는 장학금이에요. 신청 전 선발안내문의 요건을 꼭 확인하세요. 결과 발표 2026.7.28 예정.",
+   "sourceUrl": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=137275&article.offset=0&articleLimit=10",
+   "attachments": [],
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-skku-bogun-study",
+   "name": "보건장학회 '학업지원' 장학생",
+   "type": "교외",
+   "provider": "재단법인 보건장학회 (성균관대 추천)",
+   "amount": "장학금 (세부 원문 확인)",
+   "amountValue": 2000000,
+   "deadline": "2026-07-12",
+   "period": "학교 신청 2026.7.8(수) ~ 7.12(일)",
+   "summary": "의학과·약학과 고학년 재학생을 학교 추천으로 선발하는 보건장학회 장학금입니다. 의학과(본과 3~4학년) 2명, 약학과(5~6학년) 2명 추천.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "성균관대학교",
+    "tracks": [
+     "medical"
+    ]
+   },
+   "documents": [
+    "지원자용 제출 서류 (학과장 추천 필수, 공고 첨부 양식)",
+    "주민등록표 초본 (선택 발급 항목 전체 미선택)",
+    "제출 서류 전체는 원문 공고에서 확인"
+   ],
+   "duplicable": false,
+   "note": "GLS로 신청 (재단 개별 접수 불가). 모든 서류는 2026년 7월 이후 발급본만 인정. 파일명 [장학금명_성명_학번_서류명] 기입.",
+   "sourceUrl": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=138153&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "2026-2 (재)보건장학회 학업지원 장학생 선발 공고 상세안내.pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138153&attachNo=115635"
+    },
+    {
+     "name": "2026-2 (재)보건장학회 학업지원 장학생 지원자용 제출 서류.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138153&attachNo=115636"
+    }
+   ],
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-skku-bogun-multi",
+   "name": "보건장학회 '다문화가정' 장학생",
+   "type": "교외",
+   "provider": "재단법인 보건장학회 (성균관대 추천)",
+   "amount": "장학금 (세부 원문 확인)",
+   "amountValue": 2000000,
+   "deadline": "2026-07-12",
+   "period": "학교 신청 2026.7.8(수) ~ 7.12(일)",
+   "summary": "의학과·약학과 소속 다문화가정 1학년(2026-2학기 기준) 학생을 위한 보건장학회 장학금입니다. 추천 인원 제한이 없어요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "성균관대학교",
+    "tracks": [
+     "medical"
+    ],
+    "years": [
+     1
+    ]
+   },
+   "documents": [
+    "지원자용 제출 서류 (학과장 추천 필수, 공고 첨부 양식)",
+    "가족관계증명서 (상세)",
+    "직인 날인된 2026-1학기 성적증명서",
+    "제출 서류 전체는 원문 공고에서 확인"
+   ],
+   "duplicable": false,
+   "note": "대한민국 국적 + 다문화가정 요건 충족 필요 (세부 기준 원문 확인). GLS로 신청, 2026년 7월 이후 발급 서류만 인정.",
+   "sourceUrl": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=138157&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "2026-2 (재)보건장학회 다문화가정 장학생 선발 공고 상세 안내.pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138157&attachNo=115644"
+    },
+    {
+     "name": "2026-2 (재)보건장학회 다문화가정 장학생 지원자용 제출 서류.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138157&attachNo=115645"
+    }
+   ],
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-skku-sanhak-foreign",
+   "name": "산학협동재단 국내 외국인 근로자 자녀 장학생",
+   "type": "교외",
+   "provider": "산학협동재단 (성균관대 추천 1명)",
+   "amount": "2026-2학기 등록금",
+   "amountValue": 4000000,
+   "deadline": "2026-07-09",
+   "period": "신청 2026.7.8(수) 09:00 ~ 7.9(목) 09:00",
+   "summary": "부모가 국내에서 근로 중인 외국인인 학생의 등록금을 지원합니다. 학교 추천 1명 후 재단 심사로 확정돼요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "성균관대학교"
+   },
+   "documents": [
+    "장학금 신청서 (공고 첨부 양식)",
+    "부모 재직증명서 등 증빙 (직인 원본, PDF 업로드)",
+    "제출 서류 전체는 원문 공고에서 확인"
+   ],
+   "duplicable": false,
+   "note": "타 민간재단·부모 직장 학비 장학금과 이중 수혜 불가. 서명은 반드시 자필. 신청 시간이 단 하루이니 미리 준비하세요!",
+   "sourceUrl": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=138134&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "산학재단 국내 외국인 근로자 자녀 장학생 신청서류 양식.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138134&attachNo=115623"
+    }
+   ],
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-kw-cheongchang",
+   "name": "농림축산식품부 청년창업농장학금 [기간연장]",
+   "type": "교외",
+   "provider": "한국농어촌희망재단",
+   "amount": "등록금 + 영농정착 지원 (세부 원문 확인)",
+   "amountValue": 3000000,
+   "deadline": "2026-07-06",
+   "period": "연장된 신청기간 ~ 2026.7.6(화) 17:00",
+   "summary": "졸업 후 영농 창업을 계획하는 학생을 위한 장학금 — 신청 기간이 7월 6일까지 연장됐어요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "광운대학교"
+   },
+   "documents": [
+    "온라인 신청 (rhof.or.kr)",
+    "제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": false,
+   "note": "의무 영농 종사 조건이 있으니 선발안내문을 꼭 확인하세요.",
+   "sourceUrl": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52751&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [],
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-kw-hoban",
+   "name": "호반 이노베이션 하반기 장학생",
+   "type": "교외",
+   "provider": "호반그룹 (호반장학재단)",
+   "amount": "장학금 (세부 금액 원문 확인)",
+   "amountValue": 0,
+   "deadline": "2026-07-17",
+   "period": "접수 2026.6.15(월) ~ 7.17(금) 17:00",
+   "summary": "호반그룹이 혁신 인재를 지원하는 하반기 장학생 선발입니다. 마감 시각(17:00)까지 접수된 건만 인정돼요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "광운대학교"
+   },
+   "documents": [
+    "제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "지원 자격·금액·제출처는 원문 공고에서 최종 확인하세요.",
+   "sourceUrl": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52824&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [],
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-kw-nongchon-loan",
+   "name": "[학자금대출] 농촌출신대학생 학자금대출 (2026-2학기)",
+   "type": "교외",
+   "provider": "한국장학재단",
+   "amount": "등록금 전액 무이자 대출 (상환 필요 — 장학금 아님)",
+   "amountValue": 0,
+   "deadline": null,
+   "period": "2026-2학기 신청 — 기간 원문 확인",
+   "summary": "농어촌 지역 출신 학생에게 등록금 전액을 무이자로 빌려주는 제도예요. 장학금이 아니라 대출이라 갚아야 하지만, 이자가 없어 부담이 적어요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "광운대학교"
+   },
+   "documents": [
+    "한국장학재단 홈페이지에서 신청",
+    "농어촌 거주 확인 서류 등 — 원문 확인"
+   ],
+   "duplicable": true,
+   "note": "대출 실행 기간이 연장 운영 중입니다. 정확한 일정은 원문 공고와 한국장학재단에서 확인하세요.",
+   "sourceUrl": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52817&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [],
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-kw-kosaf-loan",
+   "name": "[학자금대출] 한국장학재단 학자금대출 (2026-2학기)",
+   "type": "교외",
+   "provider": "한국장학재단",
+   "amount": "등록금·생활비 대출 (상환 필요 — 장학금 아님)",
+   "amountValue": 0,
+   "deadline": null,
+   "period": "2026-2학기 신청 — 기간 원문 확인",
+   "summary": "등록금과 생활비를 낮은 금리로 빌릴 수 있는 한국장학재단 학자금대출 안내입니다. 취업 후 상환·일반 상환 등 유형별 조건이 달라요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "광운대학교"
+   },
+   "documents": [
+    "한국장학재단 홈페이지에서 신청"
+   ],
+   "duplicable": true,
+   "note": "자립지원대상 등 유형별 조건은 원문 공고에서 확인하세요.",
+   "sourceUrl": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52815&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [],
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-kw-gukgagosi",
+   "name": "국가고시 장학금 (2026-2학기)",
+   "type": "교내",
+   "provider": "광운대학교",
+   "amount": "장학금 (세부 원문 확인)",
+   "amountValue": 2000000,
+   "deadline": null,
+   "period": "2026-2학기 신청 — 기간 원문 확인",
+   "summary": "세무사·관세사·공인노무사·감정평가사 등 국가고시 합격자(1·2차)를 지원하는 교내 장학금입니다.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "광운대학교"
+   },
+   "documents": [
+    "합격 증빙 서류",
+    "제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "직전학기 성적 요건이 있을 수 있어요 — 원문 공고에서 확인하세요.",
+   "sourceUrl": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52808&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [],
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-kw-bohun",
+   "name": "보훈장학금 (2026-2학기)",
+   "type": "교내",
+   "provider": "광운대학교",
+   "amount": "장학금 (세부 원문 확인)",
+   "amountValue": 2000000,
+   "deadline": "2026-07-17",
+   "period": "재학생·복학예정자 2026.7.6(월) ~ 7.17(금)",
+   "summary": "국가유공자 본인·자녀 등 보훈 대상 학생을 위한 교내 장학금입니다.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "광운대학교",
+    "flagsAny": [
+     "merit"
+    ]
+   },
+   "documents": [
+    "보훈 관련 증빙 서류",
+    "제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "신분(재학생/복학예정자)에 따라 신청 기간이 달라요 — 원문 공고에서 확인하세요.",
+   "sourceUrl": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52807&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [],
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-kw-jonggeundang",
+   "name": "종근당고촌재단 무상기숙사 장학생 (2026 하반기)",
+   "type": "교외",
+   "provider": "종근당고촌재단",
+   "amount": "무상 기숙사 제공 (주거비 지원)",
+   "amountValue": 3000000,
+   "deadline": "2026-07-24",
+   "period": "접수 2026.6.22(월) 09:00 ~ 7.24(금) 15:00",
+   "summary": "지방 출신 수도권 대학생에게 무상 기숙사를 제공하는 종근당고촌재단 장학 프로그램입니다. 주거비 부담을 크게 덜 수 있어요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "광운대학교"
+   },
+   "documents": [
+    "제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "마감 시각이 15:00이니 여유 있게 접수하세요.",
+   "sourceUrl": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52752&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [],
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-mj-gosi",
+   "name": "고시장학금 (2026-1학기 재공고)",
+   "type": "교내",
+   "provider": "명지대학교",
+   "amount": "등록금 전액 (종별 최대 8학기)",
+   "amountValue": 4000000,
+   "deadline": "2026-07-20",
+   "period": "신청 2026.6.11(목) ~ 7.20(월)",
+   "summary": "공무원 5급·변리사·회계사 등 시험 합격자(1·2차)에게 등록금 전액을 지원하는 교내 장학금입니다. 법무사·보험계리사 자격이 추가됐어요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "명지대학교"
+   },
+   "documents": [
+    "장학금 신청서 및 개인정보 제공동의서 (공고 첨부 양식)",
+    "합격 증빙 서류"
+   ],
+   "duplicable": false,
+   "note": "2026-1학기(3.1~8.31) 중 합격한 학생 대상. 신청 기간 이후 합격자는 제출처에 즉시 문의 후 신청.",
+   "sourceUrl": "https://www.mju.ac.kr/bbs/mjukr/141/233236/artclView.do",
+   "attachments": [
+    {
+     "name": "2. 2026-1학기 고시장학금 신청서(양식).hwp",
+     "url": "https://www.mju.ac.kr/bbs/mjukr/141/178492/download.do"
+    }
+   ],
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-hi-jeju",
+   "name": "제주평생교육장학진흥원 미래이음 장학금 (재공고)",
+   "type": "교외",
+   "provider": "제주평생교육장학진흥원",
+   "amount": "장학금 (세부 원문 확인)",
+   "amountValue": 0,
+   "deadline": null,
+   "period": "재공고 — 기간 원문 확인",
+   "summary": "제주 지역 연고 학생을 지원하는 미래이음 장학금의 재공고입니다. 자격·기간은 첨부된 모집 계획에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "홍익대학교"
+   },
+   "documents": [
+    "신청 제출(구비) 서류 (공고 첨부 압축파일)",
+    "제출 서류 전체는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "제주 출신·거주 요건이 있을 수 있어요 — 원문 공고에서 확인하세요.",
+   "sourceUrl": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=153770&article.offset=0&articleLimit=10&noCat=501",
+   "attachments": [
+    {
+     "name": "(붙임1) 2026년 미래이음 장학금 신청 제출(구비) 서류-재공고.zip",
+     "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=download&articleNo=153770&attachNo=89835"
+    }
+   ],
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-hi-rise",
+   "name": "RISE사업단 산학협력 지원 근로장학생",
+   "type": "교내",
+   "provider": "홍익대학교 RISE사업단",
+   "amount": "근로장학금 (활동 시간 기준)",
+   "amountValue": 1500000,
+   "deadline": "2026-07-31",
+   "period": "모집 2026.6.1(월) ~ 7.31(금) 기간 중",
+   "summary": "RISE 사업 운영을 돕는 근로장학생 모집입니다. 산학협력 실무를 경험하며 장학금을 받을 수 있어요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "홍익대학교"
+   },
+   "documents": [
+    "제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "근무 부서·시간 등 세부 조건은 원문 공고에서 확인하세요.",
+   "sourceUrl": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=153769&article.offset=0&articleLimit=10&noCat=32",
+   "attachments": [],
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-sm-dure",
+   "name": "[대학원생 대상] 두레장학생 (취업진로지원팀 근로)",
+   "type": "교내",
+   "provider": "상명대학교 취업진로지원팀",
+   "amount": "두레장학금 (교내 근로 규정 기준)",
+   "amountValue": 1000000,
+   "deadline": null,
+   "period": "채용 시 마감 — 근무는 채용일 ~ 학기 종료",
+   "summary": "본교 대학원 재학생이 취업진로지원팀에서 주당 14시간(월 최대 60시간) 근무하며 장학금을 받는 근로장학입니다. 학부생은 지원할 수 없어요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "상명대학교",
+    "campusOnly": "서울캠퍼스"
+   },
+   "documents": [
+    "제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "대학원 재학생(2026-2학기 기준)만 지원 가능해요. 엑셀·한글 활용 가능자 우대.",
+   "sourceUrl": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=766753&article.offset=0&articleLimit=10",
+   "attachments": [],
+   "sourceKind": "official"
+  }
+ ]
+}

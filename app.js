@@ -23,8 +23,19 @@ function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
-/* ---------------- 장학금 목록 (교외 공통 + 재학 대학 교내) ---------------- */
+/* ---------------- 장학금 목록 (교외 공통 + 재학 대학 교내 + 정식 등록 공고) ---------------- */
 let campusCache = { key: null, list: [] };
+let registeredList = []; // data/registered.json — 수집 로봇이 확보한 실공고를 큐레이션해 정식 등록한 목록
+
+function registeredFor(p) {
+  return registeredList.filter((s) => {
+    const e = s.eligibility || {};
+    if (e.schoolOnly && e.schoolOnly !== p.school) return false;
+    if (e.campusOnly && p.campus && e.campusOnly !== p.campus) return false;
+    return true;
+  });
+}
+
 function allScholarships() {
   const p = state.profile;
   if (!p || !p.school) return NATIONAL_SCHOLARSHIPS;
@@ -32,7 +43,7 @@ function allScholarships() {
   if (campusCache.key !== key) {
     campusCache = { key, list: buildCampusScholarships(p.school, p.campus) };
   }
-  return NATIONAL_SCHOLARSHIPS.concat(campusCache.list);
+  return NATIONAL_SCHOLARSHIPS.concat(campusCache.list, registeredFor(p));
 }
 function findSch(id) {
   return allScholarships().find((s) => s.id === id) || null;
@@ -94,6 +105,11 @@ function evaluate(sch, p) {
     else reasons.push('교환학생 요건 충족');
   }
 
+  if (e.schoolOnly) {
+    if (p.school !== e.schoolOnly) { ok = false; reasons.push(`${e.schoolOnly} 재학생만 지원 가능`); }
+    else reasons.push(`재학 대학 공고 (${e.schoolOnly})`);
+  }
+
   if (!ok) return { status: 'ineligible', reasons, missing };
   if (missing.length) return { status: 'unknown', reasons, missing };
   if (e.selective) return { status: 'selective', reasons, missing };
@@ -105,7 +121,7 @@ function fitScore(sch, result, p) {
   if (result.status === 'ineligible') return 0;
   const e = sch.eligibility || {};
   let score = 62;
-  const condCount = ['minGpa', 'maxBracket', 'years', 'tracks', 'flagsAny', 'seoulOnly', 'needCert', 'exchange', 'freshmanOnly']
+  const condCount = ['minGpa', 'maxBracket', 'years', 'tracks', 'flagsAny', 'seoulOnly', 'needCert', 'exchange', 'freshmanOnly', 'schoolOnly']
     .filter((k) => e[k] != null && e[k] !== false).length;
   score += Math.min(15, condCount * 3);
   if (result.status === 'selective') score -= 8;
@@ -133,7 +149,12 @@ function won(n) {
   return `${n.toLocaleString()}원`;
 }
 
+function deadlineTs(sch) {
+  return sch.deadline ? new Date(sch.deadline).getTime() : Infinity; // 기한 미확정은 뒤로 정렬
+}
+
 function dday(dateStr) {
+  if (!dateStr) return { label: '기한 원문 확인', cls: '', days: 14 }; // 마감을 확정 못 한 공고 — 목록에 유지
   const d = Math.ceil((new Date(dateStr + 'T23:59:59') - TODAY) / 86400000);
   if (d < 0) return { label: '마감', cls: 'closed', days: d };
   if (d === 0) return { label: 'D-DAY', cls: 'urgent', days: d };
@@ -435,7 +456,7 @@ function renderHome() {
 
   const upcoming = applyable
     .filter((m) => dday(m.sch.deadline).days >= 0)
-    .sort((a, b) => new Date(a.sch.deadline) - new Date(b.sch.deadline))
+    .sort((a, b) => deadlineTs(a.sch) - deadlineTs(b.sch))
     .slice(0, 3);
   $('#home-deadline-list').innerHTML = upcoming.length
     ? upcoming.map((m) => schCard(m.sch, m.result, { compact: true, fit: m.fit })).join('')
@@ -456,7 +477,7 @@ function renderExplore() {
   let list = matches.slice().sort((a, b) =>
     order[a.result.status] - order[b.result.status] ||
     b.fit - a.fit ||
-    new Date(a.sch.deadline) - new Date(b.sch.deadline)
+    deadlineTs(a.sch) - deadlineTs(b.sch)
   );
 
   list = list.filter((m) => dday(m.sch.deadline).days >= -30); // 마감 30일 경과 시 자동 숨김
@@ -732,11 +753,26 @@ function loadNotices() {
     .catch(() => { /* 오프라인 등 — 조용히 무시 */ });
 }
 
+/* 정식 등록 공고 (수집 → 큐레이션 → 매칭·신청 지원) */
+function loadRegistered() {
+  fetch('data/registered.json', { cache: 'no-store' })
+    .then((r) => (r.ok ? r.json() : null))
+    .then((d) => {
+      registeredList = (d && d.items) || [];
+      if (state.profile) {
+        if (!$('#screen-home').hidden) renderHome();
+        if (!$('#screen-explore').hidden) renderExplore();
+      }
+    })
+    .catch(() => { /* 오프라인 등 — 조용히 무시 */ });
+}
+
 function liveNoticesHtml() {
   const p = state.profile;
   if (!liveNotices || !p) return '';
+  const regUrls = new Set(registeredList.map((s) => s.sourceUrl)); // 정식 등록된 공고는 카드로 노출되므로 피드에서 제외
   const mine = (liveNotices.items || []).filter((n) =>
-    n.school === p.school && (!n.campus || !p.campus || n.campus === p.campus)
+    n.school === p.school && (!n.campus || !p.campus || n.campus === p.campus) && !regUrls.has(n.url)
   ).slice(0, 10);
   const head = `<div class="section-head" style="margin-top:4px"><h3>우리 학교 실시간 공고</h3>
     <span class="link-btn">매일 아침 자동 갱신${liveNotices.updatedAt ? ' · ' + liveNotices.updatedAt : ''}</span></div>`;
@@ -921,7 +957,12 @@ function openDetail(id) {
       '직접' 서류 중 자기소개서·계획서·사유서는 아래 도우미로 앱에서 바로 작성할 수 있어요.</p>
 
       <p class="sheet-note">💡 ${sch.note}</p>
-      <p class="sheet-deadline">마감일 ${sch.deadline} · ${sch.duplicable ? '타 장학금과 중복 수혜 가능' : '중복 수혜 제한 있음'}${sch.sourceUrl ? ` · <a href="${sch.sourceUrl}" target="_blank" rel="noopener" style="color:var(--primary);font-weight:700">원문 공고 ↗</a>` : ''}</p>
+      ${(sch.attachments && sch.attachments.length) ? `
+      <h4>공고 원본 첨부 양식</h4>
+      <ul class="doc-list">
+        ${sch.attachments.map((a) => `<li>📎 <a href="${esc(a.url)}" target="_blank" rel="noopener" style="color:var(--primary)">${esc(a.name)}</a></li>`).join('')}
+      </ul>` : ''}
+      <p class="sheet-deadline">마감일 ${sch.deadline || '원문 공고 확인'} · ${sch.duplicable ? '타 장학금과 중복 수혜 가능' : '중복 수혜 제한 있음'}${sch.sourceUrl ? ` · <a href="${sch.sourceUrl}" target="_blank" rel="noopener" style="color:var(--primary);font-weight:700">원문 공고 ↗</a>` : ''}</p>
 
       ${app && !app.pending ? `
         <div class="app-progress">
@@ -1206,6 +1247,7 @@ loadState();
 bindEvents();
 initOnboarding();
 loadNotices();
+loadRegistered();
 walletRefresh().then(() => {
   if (!$('#screen-my').hidden) renderMy();
 });
