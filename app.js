@@ -23,8 +23,7 @@ function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
-/* ---------------- 장학금 목록 (교외 공통 + 재학 대학 교내 + 정식 등록 공고) ---------------- */
-let campusCache = { key: null, list: [] };
+/* ---------------- 장학금 목록 (한국장학재단 상시 제도 + 정식 등록 실공고) ---------------- */
 let registeredList = []; // data/registered.json — 수집 로봇이 확보한 실공고를 큐레이션해 정식 등록한 목록
 
 function registeredFor(p) {
@@ -39,11 +38,7 @@ function registeredFor(p) {
 function allScholarships() {
   const p = state.profile;
   if (!p || !p.school) return NATIONAL_SCHOLARSHIPS;
-  const key = p.school + '|' + (p.campus || '');
-  if (campusCache.key !== key) {
-    campusCache = { key, list: buildCampusScholarships(p.school, p.campus) };
-  }
-  return NATIONAL_SCHOLARSHIPS.concat(campusCache.list, registeredFor(p));
+  return NATIONAL_SCHOLARSHIPS.concat(registeredFor(p));
 }
 function findSch(id) {
   return allScholarships().find((s) => s.id === id) || null;
@@ -170,6 +165,48 @@ const STATUS_META = {
 };
 
 const APP_STEPS = ['신청 준비 완료', '공식 제출', '심사', '선정 발표'];
+
+/* 진척도 판정 — 앱이 학교·재단 시스템을 들여다볼 수 없으므로(정직 원칙)
+   '공식 제출'과 '발표 결과'는 사용자가 직접 기록하고,
+   '심사'만 객관적 사실(제출 기록 + 접수 마감 경과)로 자동 표시한다. */
+function effectiveStep(app, sch) {
+  if (app.result) return 3;                                   // 발표 결과 기록됨
+  if (app.submittedAt) {
+    const d = sch && sch.deadline ? dday(sch.deadline) : null;
+    if (d && d.days < 0) return 2;                            // 제출함 + 접수 마감 → 심사 진행 중
+    return 1;                                                 // 제출함
+  }
+  return 0;                                                   // 준비 완료
+}
+
+function recordSubmitted(sch) {
+  const app = state.applications.find((a) => a.id === sch.id);
+  if (!app) return;
+  if (!confirm(`${officialChannel(sch).label}에서 공식 제출을 마치셨나요?\n\n제출 완료로 기록하면 진행 단계가 '공식 제출'로 넘어가요.`)) return;
+  app.submittedAt = nowStamp();
+  saveState();
+  toast('공식 제출로 기록했어요. 접수 마감 후에는 자동으로 심사 단계로 표시돼요');
+  openDetail(sch.id);
+}
+
+function recordResult(sch, won) {
+  const app = state.applications.find((a) => a.id === sch.id);
+  if (!app) return;
+  app.result = won ? 'won' : 'lost';
+  app.resultAt = nowStamp();
+  saveState();
+  toast(won ? '🎉 선정 축하드려요! 결과를 기록했어요' : '결과를 기록했어요. 다음 기회를 함께 찾아봐요');
+  openDetail(sch.id);
+}
+
+function undoProgress(sch) {
+  const app = state.applications.find((a) => a.id === sch.id);
+  if (!app) return;
+  if (app.result) { app.result = null; app.resultAt = null; }
+  else if (app.submittedAt) { app.submittedAt = null; }
+  saveState();
+  openDetail(sch.id);
+}
 
 function toast(msg) {
   const el = $('#toast');
@@ -424,7 +461,7 @@ function schCard(sch, result, { compact = false, fit = 0 } = {}) {
     <button class="sch-card" data-detail="${sch.id}">
       <div class="sch-top">
         <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${sch.type}</span>
-        <span class="badge badge-dday ${d.cls}">${d.label}</span>
+        ${sch.program ? '<span class="badge badge-program">상시 제도</span>' : `<span class="badge badge-dday ${d.cls}">${d.label}</span>`}
         ${applied ? '<span class="badge badge-applied">신청함</span>' : ''}
         ${fit > 0 ? `<span class="badge badge-fit">적합도 ${fit}%</span>` : ''}
       </div>
@@ -934,7 +971,7 @@ function openDetail(id) {
     <div class="sheet-body">
       <div class="sch-top">
         <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${sch.type}</span>
-        <span class="badge badge-dday ${d.cls}">${d.label}</span>
+        ${sch.program ? '<span class="badge badge-program">상시 제도</span>' : `<span class="badge badge-dday ${d.cls}">${d.label}</span>`}
         ${fit > 0 ? `<span class="badge badge-fit">적합도 ${fit}%</span>` : ''}
         <span class="status-pill pill-${meta.cls}">${meta.label}</span>
       </div>
@@ -962,16 +999,36 @@ function openDetail(id) {
       <ul class="doc-list">
         ${sch.attachments.map((a) => `<li>📎 <a href="${esc(a.url)}" target="_blank" rel="noopener" style="color:var(--primary)">${esc(a.name)}</a></li>`).join('')}
       </ul>` : ''}
-      <p class="sheet-deadline">마감일 ${sch.deadline || '원문 공고 확인'} · ${sch.duplicable ? '타 장학금과 중복 수혜 가능' : '중복 수혜 제한 있음'}${sch.sourceUrl ? ` · <a href="${sch.sourceUrl}" target="_blank" rel="noopener" style="color:var(--primary);font-weight:700">원문 공고 ↗</a>` : ''}</p>
+      <p class="sheet-deadline">${sch.program ? '신청 기간: 한국장학재단 공지 확인' : `마감일 ${sch.deadline || '원문 공고 확인'}`} · ${sch.duplicable ? '타 장학금과 중복 수혜 가능' : '중복 수혜 제한 있음'}${sch.sourceUrl ? ` · <a href="${sch.sourceUrl}" target="_blank" rel="noopener" style="color:var(--primary);font-weight:700">${sch.program ? '한국장학재단 ↗' : '원문 공고 ↗'}</a>` : ''}</p>
 
-      ${app && !app.pending ? `
+      ${app && !app.pending ? (() => {
+        const step = effectiveStep(app, sch);
+        const stepLabels = APP_STEPS.map((s, i) => (i === 3 && app.result === 'lost') ? '결과 확인' : s);
+        return `
         <div class="app-progress">
-          ${APP_STEPS.map((s, i) => `
-            <div class="ap-step ${i <= app.step ? 'done' : ''}">
+          ${stepLabels.map((s, i) => `
+            <div class="ap-step ${i <= step ? 'done' : ''}">
               <span class="ap-dot"></span><span class="ap-label">${s}</span>
             </div>`).join('')}
         </div>
         <p class="applied-at">${app.appliedAt} 준비 완료 · 최종 제출처: ${ch.url ? `<a href="${ch.url}" target="_blank" rel="noopener">${ch.label}</a>` : ch.label}</p>
+        ${step === 0 ? `
+          <button class="btn btn-outline" id="btn-mark-submitted" style="width:100%;margin-bottom:6px">✅ 공식 제출을 마쳤어요 — 제출 완료로 기록</button>
+          <p class="dp-note">최종 제출은 ${ch.label}에서 이루어져요. 제출을 마친 뒤 눌러 주시면 진행 단계가 넘어가요.</p>` : ''}
+        ${step === 1 ? `
+          <p class="progress-note">📮 ${app.submittedAt} 공식 제출 기록됨${sch.deadline ? ` · 접수 마감(${sch.deadline}) 후 자동으로 심사 단계로 표시돼요` : ''}</p>
+          <button class="link-btn" id="btn-undo-progress" style="margin-bottom:10px">제출 기록 취소</button>` : ''}
+        ${step === 2 ? `
+          <p class="progress-note">🔍 접수가 마감되어 심사가 진행 중이에요. 발표 결과가 나오면 아래에 기록해 주세요 — 발표 확인은 ${ch.label}${sch.sourceUrl ? ' 또는 원문 공고' : ''}에서 할 수 있어요.</p>
+          <div class="submit-actions" style="margin-bottom:12px">
+            <button class="btn btn-outline" id="btn-result-won">🎉 선정됐어요</button>
+            <button class="btn btn-outline" id="btn-result-lost">아쉽게 미선정</button>
+          </div>` : ''}
+        ${step === 3 ? `
+          <p class="progress-note ${app.result === 'won' ? 'progress-won' : ''}">${app.result === 'won'
+            ? `🎉 ${app.resultAt} 선정! 축하드려요 — ${sch.amount}`
+            : `${app.resultAt} 미선정으로 기록했어요. 아래 탐색 탭에서 다음 장학금을 함께 찾아봐요.`}</p>
+          <button class="link-btn" id="btn-undo-progress" style="margin-bottom:10px">결과 기록 취소</button>` : ''}
         ${app.docs && app.docs.length ? `
           <details class="dp-saved"><summary>작성한 서류 보기 (${app.docs.length})</summary>
             ${app.docs.map((t) => `<h4>${esc(t.doc)}</h4><pre>${esc(t.text)}</pre>`).join('')}
@@ -991,7 +1048,8 @@ function openDetail(id) {
           <button class="btn btn-outline" id="btn-copy-docs">📋 서류 내용 복사</button>
           <button class="btn btn-outline" id="btn-share-docs">📤 파일과 함께 공유</button>
         </div>
-        ${sch.applyEmail ? `<button class="btn btn-primary btn-lg" id="btn-mail-apply" style="margin-bottom:14px">📧 접수 메일 열기 (내용 자동 완성)</button>` : ''}` : ''}
+        ${sch.applyEmail ? `<button class="btn btn-primary btn-lg" id="btn-mail-apply" style="margin-bottom:14px">📧 접수 메일 열기 (내용 자동 완성)</button>` : ''}`;
+      })() : ''}
 
       <button class="btn btn-primary btn-lg" id="btn-apply-one" ${canApply ? '' : 'disabled'}>${btnLabel}</button>
       ${canApply ? `<p class="dp-note">준비 완료 후 최종 제출처(${ch.label})를 안내해 드려요.</p>` : ''}
@@ -1008,6 +1066,15 @@ function openDetail(id) {
   if (canApply) {
     $('#btn-apply-one').addEventListener('click', () => applyTo(sch));
   }
+  /* 진척도 기록 버튼 (있을 때만) */
+  const markBtn = $('#btn-mark-submitted');
+  if (markBtn) markBtn.addEventListener('click', () => recordSubmitted(sch));
+  const wonBtn = $('#btn-result-won');
+  if (wonBtn) wonBtn.addEventListener('click', () => recordResult(sch, true));
+  const lostBtn = $('#btn-result-lost');
+  if (lostBtn) lostBtn.addEventListener('click', () => recordResult(sch, false));
+  const undoBtn = $('#btn-undo-progress');
+  if (undoBtn) undoBtn.addEventListener('click', () => undoProgress(sch));
   if (app && app.formAns && sch.formId) {
     const tpl = FORM_TEMPLATES[sch.formId];
     $('#btn-form-save').addEventListener('click', () => downloadFormDoc(tpl, state.profile, app.formAns));
@@ -1042,9 +1109,11 @@ function closeSheet() {
 function appCard(app) {
   const sch = findSch(app.id);
   if (!sch) return '';
+  const step = effectiveStep(app, sch);
+  const stepLabel = step === 3 ? (app.result === 'won' ? '🎉 선정' : '결과 확인') : APP_STEPS[step];
   const statusBadge = app.pending
     ? '<span class="badge badge-pending">서류 작성 필요</span>'
-    : `<span class="badge badge-applied">${APP_STEPS[app.step]}</span>`;
+    : `<span class="badge badge-applied">${stepLabel}</span>`;
   return `
     <button class="sch-card" data-detail="${sch.id}">
       <div class="sch-top">
@@ -1053,7 +1122,7 @@ function appCard(app) {
       </div>
       <p class="sch-name">${sch.name}</p>
       <p class="sch-provider">${app.appliedAt} ${app.pending ? '담아둠' : '준비 완료'} · 제출처 ${officialChannel(sch).label}</p>
-      <div class="mini-progress"><div style="width:${app.pending ? 6 : ((app.step + 1) / APP_STEPS.length) * 100}%"></div></div>
+      <div class="mini-progress"><div style="width:${app.pending ? 6 : ((step + 1) / APP_STEPS.length) * 100}%"></div></div>
     </button>`;
 }
 
@@ -1061,13 +1130,16 @@ function renderApplications() {
   const apps = state.applications.slice().reverse().filter((a) => findSch(a.id));
   const prepared = apps.filter((a) => !a.pending);
   const pending = apps.filter((a) => a.pending);
+  const submitted = prepared.filter((a) => a.submittedAt && !a.result);
+  const wonApps = prepared.filter((a) => a.result === 'won');
   const totalExpected = apps.reduce((sum, a) => sum + findSch(a.id).amountValue, 0);
+  const wonAmount = wonApps.reduce((sum, a) => sum + findSch(a.id).amountValue, 0);
 
   $('#apps-summary').innerHTML = apps.length
     ? `<div class="summary-card">
-         <p>준비 완료 ${prepared.length}건${pending.length ? ` · 서류 작성 필요 ${pending.length}건` : ''} · 예상 최대 수혜액</p>
-         <p class="summary-amount">${won(totalExpected)}</p>
-         <p class="summary-note">최종 제출은 각 공식 채널(한국장학재단·학교 포털 등)에서 이루어져요</p>
+         <p>준비 완료 ${prepared.length}건${submitted.length ? ` · 제출·심사 중 ${submitted.length}건` : ''}${wonApps.length ? ` · 🎉 선정 ${wonApps.length}건` : ''}${pending.length ? ` · 서류 작성 필요 ${pending.length}건` : ''} · ${wonApps.length ? '선정된 장학금' : '예상 최대 수혜액'}</p>
+         <p class="summary-amount">${won(wonApps.length ? wonAmount : totalExpected)}</p>
+         <p class="summary-note">제출·발표 단계는 각 장학금 상세에서 직접 기록할 수 있어요 · 최종 제출은 각 공식 채널에서 이루어져요</p>
        </div>`
     : '';
 

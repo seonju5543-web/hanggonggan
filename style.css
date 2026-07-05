@@ -381,6 +381,17 @@ input::placeholder { color: var(--text-weak); }
 .badge-dday.urgent { background: var(--red-weak); color: var(--red); }
 .badge-dday.closed { background: rgba(18, 22, 31, 0.07); color: var(--text-weak); }
 .badge-applied { background: var(--primary-weak); color: var(--primary); }
+.badge-program { background: var(--primary-weak); color: var(--primary); }
+.progress-note {
+  font-size: 13px;
+  color: var(--text-sub);
+  background: rgba(18, 22, 31, 0.04);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 0 0 10px;
+  line-height: 1.55;
+}
+.progress-note.progress-won { background: var(--green-weak); color: var(--green); font-weight: 700; }
 .badge-fit {
   background: linear-gradient(120deg, #2f6bff, #5e8dff);
   color: #fff;

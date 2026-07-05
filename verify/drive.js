@@ -88,9 +88,9 @@ const SHOT = (n) => `${__dirname}/shot-${n}.png`;
   console.log('STEP wallet saved:', walletStatus);
   await page.screenshot({ path: SHOT('21-wallet') });
 
-  // ── 단건 신청: 서류 도우미 플로우 (관정 — 자기소개서 필요)
+  // ── 단건 신청: 서류 도우미 플로우 (인문100년 — 자기소개서·학업계획서 필요)
   await page.click('.nav-item[data-nav="explore"]');
-  await page.click('[data-detail="kwanjeong"]');
+  await page.click('#explore-list [data-detail="kosaf-humanities"]');
   await page.waitForSelector('#detail-sheet.show');
   await page.waitForTimeout(350);
   await page.click('#btn-apply-one');
@@ -148,10 +148,21 @@ const SHOT = (n) => `${__dirname}/shot-${n}.png`;
     await page.waitForTimeout(350);
     console.log('STEP pending detail btn:', (await page.textContent('#btn-apply-one')).trim());
     await page.click('#btn-apply-one');
-    await page.waitForSelector('#btn-dp-generate');
-    await page.click('#btn-dp-generate');
-    await page.waitForSelector('#btn-dp-confirm');
-    await page.click('#btn-dp-confirm');
+    // 서류 도우미(dp) 또는 양식 엔진(ff) 중 어느 쪽이 떠도 완주
+    const gen = await Promise.race([
+      page.waitForSelector('#btn-dp-generate', { timeout: 8000 }).then(() => 'dp').catch(() => null),
+      page.waitForSelector('#btn-ff-generate', { timeout: 8000 }).then(() => 'ff').catch(() => null),
+    ]);
+    console.log('STEP pending flow kind:', gen);
+    if (gen === 'dp') {
+      await page.click('#btn-dp-generate');
+      await page.waitForSelector('#btn-dp-confirm');
+      await page.click('#btn-dp-confirm');
+    } else if (gen === 'ff') {
+      await page.click('#btn-ff-generate');
+      await page.waitForSelector('#btn-ff-confirm', { timeout: 8000 });
+      await page.click('#btn-ff-confirm');
+    }
     await page.waitForTimeout(400);
     console.log('STEP pending resolved, remaining pending:', await page.locator('.badge-pending').count());
   }
