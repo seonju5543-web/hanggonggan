@@ -1,6 +1,86 @@
 {
- "updatedAt": "2026-07-06",
+ "updatedAt": "2026-07-07",
  "items": [
+  {
+   "title": "[공지] 장학생 추천서 총장 직인 날인 신청 안내 (GLS 신청)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=135615&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "부속기관",
+     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+    }
+   ],
+   "deadlineHint": "마감 일정을 고려하여 여유있게 신청하시기 바랍니다. ※ 모든 내용 기재 ※ 하단 성균관대학교 총장 기재 ※ 파일",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-07-06"
+  },
+  {
+   "title": "네오르네상스장학",
+   "url": "https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200191",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "경희대학교",
+   "campus": "",
+   "foundAt": "2026-07-06"
+  },
+  {
+   "title": "서울 [등록/장학]",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=766922&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "(공고문) 2026년 미래이음 장학금 장학생 선발 계획 재공고-2026.07.01.pdf",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=766922&attachNo=559491"
+    },
+    {
+     "name": "(붙임1) 2026년 미래이음 장학금 신청 제출(구비) 서류-재공고.pdf",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=766922&attachNo=559492"
+    },
+    {
+     "name": "(붙임2) 성적등급 및 평점평균 환산기준표-재공고.pdf",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=766922&attachNo=559493"
+    },
+    {
+     "name": "(신청서식) 2026년 미래이음 장학금-개인정보 제공 동의서-재공고.hwp",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=766922&attachNo=559494"
+    },
+    {
+     "name": "(참고) 임대차계약 묵시적 갱신 관련 안내-재공고.pdf",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=766922&attachNo=559495"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "상명대학교",
+   "campus": "서울캠퍼스",
+   "foundAt": "2026-07-06"
+  },
+  {
+   "title": "(공고문) 2026년 미래이음 장학금 장학생 선발 계획 재공고-2026.07.01.pdf",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=766922&attachNo=559491",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "상명대학교",
+   "campus": "서울캠퍼스",
+   "foundAt": "2026-07-06"
+  },
+  {
+   "title": "(붙임1) 2026년 미래이음 장학금 신청 제출(구비) 서류-재공고.pdf",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=766922&attachNo=559492",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "상명대학교",
+   "campus": "서울캠퍼스",
+   "foundAt": "2026-07-06"
+  },
+  {
+   "title": "(신청서식) 2026년 미래이음 장학금-개인정보 제공 동의서-재공고.hwp",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=766922&attachNo=559494",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "상명대학교",
+   "campus": "서울캠퍼스",
+   "foundAt": "2026-07-06"
+  },
   {
    "title": "[공통][대출] 2026-2 한국장학재단 학자금 대출 신청 안내 새글",
    "url": "https://dep.hufs.ac.kr/bbs/student/2431/259060/artclView.do",
