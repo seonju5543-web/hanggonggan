@@ -32,6 +32,7 @@ const ctx = await browser.newContext({
 
 async function loadPage(url) {
   const page = await ctx.newPage();
+  const clickDetails = {}; // 클릭 수집 시 상세 화면에서 미리 채집한 마감·첨부
   try {
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
     await page.waitForTimeout(4000); // 동적 목록이 그려질 시간 (XHR 목록 포함)
@@ -68,7 +69,9 @@ async function loadPage(url) {
         .map((e, i) => ({ i, t: (e.textContent || '').replace(/\s+/g, ' ').trim() }))
         .filter((x) => /장학|학자금/.test(x.t) && x.t.length >= 10 && x.t.length <= 120)
         .slice(0, 10).map((x) => [x.i, x.t])).catch(() => []);
+      let ci = 0;
       for (const [idx, title] of clickRows) {
+        ci += 1;
         try {
           const els = await page.$$(CLICKABLE);
           if (!els[idx]) continue;
@@ -76,18 +79,31 @@ async function loadPage(url) {
           const navP = page.waitForNavigation({ timeout: 6000 }).catch(() => null);
           await els[idx].click({ timeout: 4000 });
           const popup = await popupP;
-          if (popup) {
-            await popup.waitForLoadState('domcontentloaded').catch(() => {});
-            if (popup.url() !== 'about:blank') links.push({ title, url: popup.url() });
-            await popup.close().catch(() => {});
-          } else {
-            await navP;
-            if (page.url() !== url) {
-              links.push({ title, url: page.url() });
-              await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 });
-              await page.waitForTimeout(2000);
-            }
-          }
+          const detailPage = popup || page;
+          if (popup) await popup.waitForLoadState('domcontentloaded').catch(() => {});
+          else { await navP; await page.waitForTimeout(1800); }
+          // 클릭으로 열린 상세 화면에서 마감 단서·첨부를 즉시 채집
+          //  (주소가 안 바뀌는 내부 전송형 게시판 대응 — 이때 링크는 목록 주소로 연결)
+          const dHtml = await detailPage.content().catch(() => '');
+          const dText = dHtml.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ')
+            .replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+          const dm = dText.match(DEADLINE_RE);
+          const atts = (await detailPage.$$eval('a[href]', (as) => as.map((a) => ({
+            title: (a.textContent || '').replace(/\s+/g, ' ').trim(), url: a.href,
+          }))).catch(() => []))
+            .filter((l) => /\.(hwp|hwpx|doc|docx|pdf|xls|xlsx)(\?|$)/i.test(l.url) || /download|fileDown/i.test(l.url))
+            .filter((l) => l.title.length >= 4 && l.title.length <= 120)
+            .slice(0, 6).map((l) => ({ name: l.title.slice(0, 100), url: l.url }));
+          const navigated = detailPage.url() !== url && detailPage.url() !== 'about:blank';
+          const recUrl = navigated ? detailPage.url() : `${url}#notice-${ci}`;
+          links.push({ title, url: recUrl });
+          clickDetails[title] = { deadlineHint: dm ? dm[0].trim().slice(0, 80) : null, attachments: atts };
+          if (popup) await popup.close().catch(() => {});
+          else if (page.url() !== url) await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 }).catch(() => {});
+          else { await page.goBack({ waitUntil: 'domcontentloaded', timeout: 10000 }).catch(() => {}); }
+          await page.waitForTimeout(1800);
+          // 목록으로 못 돌아왔으면 강제로 다시 연다
+          if (page.url() !== url) { await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 }).catch(() => {}); await page.waitForTimeout(1800); }
         } catch { /* 행 하나 실패는 건너뜀 */ }
       }
     }
@@ -99,7 +115,7 @@ async function loadPage(url) {
     ).catch(() => []);
     const frameCount = page.frames().length;
     await page.close();
-    return { links, html, textLines, frameCount };
+    return { links, html, textLines, frameCount, clickDetails };
   } catch (e) {
     await page.close().catch(() => {});
     return { error: e.message ? e.message.slice(0, 80) : String(e) };
@@ -135,10 +151,16 @@ for (const t of cfg.targets) {
     harvested = true;
     const fresh = uniq.filter((i) => !seen[i.url]).slice(0, 10);
     for (const it of fresh) {
-      // 상세 페이지도 브라우저로 방문해 마감 단서·첨부 수집
-      const d = await loadPage(it.url);
       let deadlineHint = null;
       let attachments = [];
+      // 클릭 수집 때 상세 화면에서 이미 채집했으면 재방문 없이 그대로 사용
+      const cd = r.clickDetails && r.clickDetails[it.title];
+      if (cd) {
+        deadlineHint = cd.deadlineHint;
+        attachments = cd.attachments || [];
+      } else {
+      // 상세 페이지도 브라우저로 방문해 마감 단서·첨부 수집
+      const d = await loadPage(it.url);
       if (!d.error) {
         const text = d.html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ')
           .replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
@@ -149,6 +171,7 @@ for (const t of cfg.targets) {
           .filter((l) => l.title.length >= 4 && l.title.length <= 120)
           .slice(0, 6)
           .map((l) => ({ name: l.title.slice(0, 100), url: l.url }));
+      }
       }
       const rec = {
         title: it.title, url: it.url, attachments, deadlineHint,
