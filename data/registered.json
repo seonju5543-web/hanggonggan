@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-07-05",
+ "updatedAt": "2026-07-06",
  "items": [
   {
    "id": "reg-skku-samil",
@@ -491,6 +491,166 @@
    "note": "대학원 재학생(2026-2학기 기준)만 지원 가능해요. 엑셀·한글 활용 가능자 우대.",
    "sourceUrl": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=766753&article.offset=0&articleLimit=10",
    "attachments": [],
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-hufs-samil",
+   "name": "삼일장학회 희망/동행 장학생 (한국외대 접수)",
+   "type": "교외",
+   "provider": "재단법인 삼일장학회 (한국외대 장학팀 접수)",
+   "amount": "생활비성 장학금 250만원 (1회)",
+   "amountValue": 2500000,
+   "deadline": "2026-07-27",
+   "period": "접수 ~2026.7.27(월) 13:00 · 등기우편(익일특급) 또는 방문접수",
+   "summary": "삼일장학회가 희망(가계곤란)·동행(장애 학생) 분야 장학생을 선발합니다. 4년제 재학 중이고 1개 학기 이상 이수한 학생이 대상이며, 등록금성 장학금과 중복 수혜가 가능한 생활비성 장학금입니다. 신청서를 앱에서 원본과 동일한 구조로 작성할 수 있어요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교"
+   },
+   "documents": [
+    "장학금 지원 신청서 (앱에서 실제 양식 작성)",
+    "학교(과)장/기관장 추천서 (별지3)",
+    "자기소개서 (별지2)",
+    "장학생 서약서 (별지4)",
+    "개인정보 동의서 (별지5)",
+    "기타 분야별 자격 증빙서류 (공고 확인)"
+   ],
+   "duplicable": true,
+   "note": "모든 제출서류는 원본 제출 원칙 · 주민등록번호 뒷자리 미공개 발급. 제출처: 서울캠퍼스 장학팀 (02-2173-2136). 성균관대 접수분(~7/12)과는 별개의 학교 접수 일정이에요.",
+   "formId": "samil-apply",
+   "attachments": [
+    {
+     "name": "별지1. [삼일장학회] 장학금 지원 신청서(2026)_희망동행.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/145115/download.do"
+    },
+    {
+     "name": "별지2. [삼일장학회] 자기소개서(2026).hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/145116/download.do"
+    },
+    {
+     "name": "별지3. [삼일장학회] 추천서(2026).hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/145117/download.do"
+    },
+    {
+     "name": "별지4. [삼일장학회] 장학생 서약서(2026).hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/145118/download.do"
+    },
+    {
+     "name": "별지5. [삼일장학회] 개인정보 수집·이용·제공 동의서(2026).hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/145119/download.do"
+    }
+   ],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/259298/artclView.do",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-hufs-workstudy-summer",
+   "name": "하계방학 국가근로장학생 추가 모집 (교내)",
+   "type": "교내",
+   "provider": "한국외국어대학교 서울캠퍼스 장학팀",
+   "amount": "국가근로장학금 (시급제 · 근로 기간 최대 2026.8.31까지)",
+   "amountValue": 1000000,
+   "deadline": "2026-07-06",
+   "period": "신청 ~2026.7.6(월) 13:00 · 이메일 접수",
+   "summary": "교내 원스톱서비스센터 등에서 근로하는 하계방학 국가근로장학생 추가 모집입니다. 지원서를 이메일로 제출하는 공고라, 앱에서 양식을 작성해 접수 메일까지 바로 이어갈 수 있어요.",
+   "eligibility": {
+    "selective": true,
+    "maxBracket": 8,
+    "schoolOnly": "한국외국어대학교",
+    "campusOnly": "서울캠퍼스"
+   },
+   "documents": [
+    "국가근로 지원서 (앱에서 실제 양식 작성 · 한글/워드/PDF 제출)"
+   ],
+   "duplicable": true,
+   "note": "메일 제목은 \"2026학년도 1학기 하계방학 국가근로 지원서 홍길동(이름)\" 형식으로 보내야 해요. 선발 기준: 소득구간·성적 등 고려. 문의 02-2173-2136.",
+   "formId": "hufs-workstudy-apply",
+   "applyEmail": "scholarship@hufs.ac.kr",
+   "attachments": [
+    {
+     "name": "2026학년도 국가근로 지원서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/144872/download.do"
+    },
+    {
+     "name": "2026학년도 국가근로 지원서.docx",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/144871/download.do"
+    }
+   ],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/258915/artclView.do",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-yunsegyoung",
+   "name": "윤세영 스칼라십 신규 장학생 (2026)",
+   "type": "교외",
+   "provider": "서암 윤세영 재단",
+   "amount": "등록금 전액 + 학업보조금 월 50만원 (1-2학기~4-2학기, 총 7학기)",
+   "amountValue": 10000000,
+   "deadline": "2026-07-15",
+   "period": "온라인 접수 2026.7.1(수) 10:00 ~ 7.15(수) 16:00",
+   "summary": "국내 4년제 대학 1학년(2026년 신입생) 중 1학기 성적 4.0(4.5 만점) 이상인 학생을 선발해 4학년까지 등록금 전액과 월 50만원 학업보조금을 지원하는 대형 장학금입니다. 재단 홈페이지에서 온라인 접수해요.",
+   "eligibility": {
+    "selective": true,
+    "years": [
+     1
+    ],
+    "minGpa": 4
+   },
+   "documents": [
+    "자기소개서 (자유 양식 — 상단에 학교·학과·이름, 장래 포부·목표 포함 · 앱 도우미로 작성 가능)",
+    "1학년 1학기 성적증명서",
+    "가족관계증명서 (부 또는 모)",
+    "주민등록등본",
+    "전년도 부/모 소득금액증명원"
+   ],
+   "duplicable": false,
+   "note": "부모 직장의 학자금 지원을 받지 않는 학생 대상 · 2학기 휴학 예정자 지원 불가 · 모든 서류를 1개 PDF로 변환해 온라인 접수 시 업로드. 소득 제한은 없으나 동일 점수면 가구 소득이 낮은 학생 우대.",
+   "noForm": "첨부 전수 확인(2026-07-06): 채울 신청서 양식 없음 — 재단 홈페이지 온라인 접수이며 자기소개서는 자유 양식(공고 안내 PDF 다운로드 제공)",
+   "attachments": [
+    {
+     "name": "2026년도 윤세영 스칼라십 신규 장학생 선발 안내(공지).pdf",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/144892/download.do"
+    }
+   ],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/258962/artclView.do",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-sejong-didim",
+   "name": "세종이도인재장학금 디딤돌장학사업 (학자금대출 원금·이자지원)",
+   "type": "교외",
+   "provider": "재단법인 세종연구원 · 세종시",
+   "amount": "학자금대출 원금 또는 이자 상환 지원 (인당 최대 100만원)",
+   "amountValue": 1000000,
+   "deadline": "2026-08-31",
+   "period": "신청 2026.7.6(월) ~ 8.31(월) 18:00",
+   "summary": "공고일 기준 1년 이상 세종시에 계속 거주(본인 또는 부·모)한 대학(원)생의 한국장학재단 학자금대출 원금·이자 상환을 지원합니다. 별지 제1호 신청서를 앱에서 원본과 동일한 구조로 작성할 수 있어요.",
+   "eligibility": {
+    "selective": true
+   },
+   "documents": [
+    "장학금 지원 신청서 별지 제1호 (앱에서 실제 양식 작성)",
+    "개인정보 동의서 별지 제2호 (원본 다운로드 후 서명)",
+    "학자금대출 관련 증빙 (공고 확인)"
+   ],
+   "duplicable": true,
+   "note": "자격: 공고일 기준 1년 이상 세종시 계속 거주자(본인 또는 부·모) — 해당 여부를 먼저 확인하세요. 세부 증빙 서류는 공고 원문·Q&A 첨부를 확인해 주세요.",
+   "formId": "sejong-didim-apply",
+   "attachments": [
+    {
+     "name": "1. 2026년도 세종이도인재장학금 디딤돌장학사업 학자금대출 관련분야 신청 공고.pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138212&attachNo=115706"
+    },
+    {
+     "name": "2. 학자금대출 이자지원 Q&A.pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138212&attachNo=115707"
+    },
+    {
+     "name": "3. 별지 서식 제출 서류(학자금대출 관련)_최종.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138212&attachNo=115708"
+    }
+   ],
+   "sourceUrl": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=138212&article.offset=0&articleLimit=10",
    "sourceKind": "official"
   }
  ]

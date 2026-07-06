@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-07-05",
+ "updatedAt": "2026-07-06",
  "templates": {
   "kosaf-ai-mentor": {
    "title": "대학생 청소년 AI 교육지원장학금 활동계획서",
@@ -1083,6 +1083,174 @@
        "q": "핸드폰"
       }
      ]
+    }
+   ]
+  },
+  "hufs-workstudy-apply": {
+   "title": "국가근로장학 추가 모집 지원서",
+   "docName": "국가근로_추가모집_지원서",
+   "org": "한국외국어대학교 서울캠퍼스 장학팀",
+   "signLabel": "신청인",
+   "pledge": "위와 같이 국가근로장학 추가 모집에 지원합니다.",
+   "sections": [
+    {
+     "heading": "",
+     "fields": [
+      {
+       "id": "dept",
+       "label": "소속",
+       "type": "text",
+       "auto": "major",
+       "q": "소속 학(부)과",
+       "placeholder": "한국외국어대학교(서울/글로벌) ○○학부"
+      },
+      {
+       "id": "name",
+       "label": "성명",
+       "type": "text",
+       "auto": "name",
+       "q": "성명"
+      },
+      {
+       "id": "studentId",
+       "label": "학번",
+       "type": "text",
+       "auto": "studentId",
+       "q": "학번"
+      },
+      {
+       "id": "phone",
+       "label": "연락처",
+       "type": "text",
+       "auto": "phone",
+       "q": "연락처"
+      },
+      {
+       "id": "email",
+       "label": "이메일",
+       "type": "text",
+       "auto": "email",
+       "q": "이메일"
+      },
+      {
+       "id": "target",
+       "label": "지원부서/기관",
+       "type": "text",
+       "q": "지원할 근로지 (공고의 모집부서 중 1곳)",
+       "placeholder": "예: 원스톱서비스센터"
+      },
+      {
+       "id": "motive",
+       "label": "지원 동기\n* 지원동기, 보유 자격증(토익, 오픽, 컴활 등), 근로가능 요일, 시간 작성 가능\n(형식 및 글자 수 제한 없음(간략하게))",
+       "type": "textarea",
+       "q": "지원 동기 — 보유 자격증, 근로 가능 요일·시간을 함께 적어주세요",
+       "sugg": [
+        "증명서 발급 등 행정 업무를 꼼꼼히 처리할 자신이 있습니다. 컴퓨터활용능력 2급 보유, 월·수·금 09:00~15:00 근로 가능합니다."
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "sejong-didim-apply": {
+   "title": "장학금 지원 신청서",
+   "docName": "세종이도_디딤돌_지원신청서",
+   "org": "재단법인 세종연구원장 귀하",
+   "signLabel": "신청인",
+   "tag": "[별지 제1호 서식]",
+   "pledge": "본인은 2026년도 재단법인 세종연구원 장학금을 신청합니다.",
+   "sections": [
+    {
+     "heading": "1. 장학금 신청 분야",
+     "note": "(해당란에 ☑ 표기)",
+     "fields": [
+      {
+       "id": "field",
+       "label": "장학금명 — 디딤돌 학자금대출",
+       "type": "checks",
+       "q": "신청 분야를 고르세요",
+       "options": [
+        "원금상환",
+        "이자지원"
+       ]
+      },
+      {
+       "id": "kind",
+       "label": "대상구분",
+       "type": "checks",
+       "q": "대상 구분",
+       "options": [
+        "대학생",
+        "대학원생",
+        "기타"
+       ]
+      }
+     ]
+    },
+    {
+     "heading": "2. 신 청 인",
+     "fields": [
+      {
+       "id": "name",
+       "label": "성    명",
+       "type": "text",
+       "auto": "name",
+       "q": "성명"
+      },
+      {
+       "id": "birth",
+       "label": "생년월일",
+       "type": "text",
+       "q": "생년월일",
+       "placeholder": "예: 2004. 3. 15."
+      },
+      {
+       "id": "school",
+       "label": "학 교 명",
+       "type": "text",
+       "auto": "school",
+       "q": "학교명"
+      },
+      {
+       "id": "yearMajor",
+       "label": "학년(학과)",
+       "type": "text",
+       "auto": "major",
+       "q": "학년과 학과",
+       "placeholder": "예: 3학년(소프트웨어학과)"
+      },
+      {
+       "id": "kosafId",
+       "label": "한국장학재단 ID",
+       "type": "text",
+       "q": "한국장학재단 ID"
+      },
+      {
+       "id": "studentId",
+       "label": "학   번",
+       "type": "text",
+       "auto": "studentId",
+       "q": "학번"
+      },
+      {
+       "id": "addr",
+       "label": "주   소",
+       "type": "text",
+       "q": "주소 (세종시 거주지)"
+      },
+      {
+       "id": "phone",
+       "label": "연 락 처",
+       "type": "text",
+       "auto": "phone",
+       "q": "연락처"
+      }
+     ]
+    },
+    {
+     "heading": "[별지 제2호 서식] 개인정보 수집·이용·제공 및 조회 동의서",
+     "note": "※ 동의서는 원본 첨부 파일을 내려받아 인쇄 후 직접 체크·서명하세요.",
+     "fields": []
     }
    ]
   }
