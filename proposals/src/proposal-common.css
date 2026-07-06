@@ -1,0 +1,83 @@
+/* 한대장 제안서 공통 스타일 — A4 인쇄용 (참고: 과제 보고서 양식) */
+@page { size: A4; margin: 22mm 18mm 20mm 18mm; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body {
+  font-family: 'NanumGothic', 'Nanum Gothic', sans-serif;
+  font-size: 10.5pt; line-height: 1.72; color: #1c1c1c;
+  word-break: keep-all;
+}
+
+/* ── 표지 ── */
+.cover { page-break-after: always; padding-top: 52mm; }
+.cover-banner {
+  background: var(--theme); color: #fff; text-align: center;
+  padding: 34px 24px 36px; margin: 0 2mm;
+}
+.cover-kicker { font-size: 9pt; letter-spacing: 4.5px; opacity: .85; margin-bottom: 14px; }
+.cover-title { font-size: 24pt; font-weight: 800; letter-spacing: -.5px; }
+.cover-sub { font-size: 11pt; margin-top: 14px; opacity: .95; }
+.cover-sub2 { font-size: 9.5pt; margin-top: 7px; opacity: .8; }
+.cover-meta { margin: 26mm 2mm 0; }
+.cover-meta .row {
+  border-top: 1.6px solid var(--theme); border-bottom: 1.6px solid var(--theme);
+  padding: 11px 0; text-align: center; font-size: 11pt;
+}
+.cover-meta .row b { margin-left: 6px; }
+.cover-meta .row span + span { margin-left: 26px; }
+.cover-meta .sub { text-align: center; font-size: 9.5pt; color: #555; padding-top: 9px; }
+
+/* ── 목차 ── */
+.toc { page-break-after: always; }
+h1.doc {
+  font-size: 16pt; font-weight: 800; padding-bottom: 10px; margin-bottom: 18px;
+  border-bottom: 2px solid var(--theme);
+}
+.toc ol { list-style: none; }
+.toc li { display: flex; align-items: baseline; font-size: 10.5pt; margin: 7px 0; }
+.toc li.lv1 { font-weight: 700; font-size: 11pt; margin-top: 12px; }
+.toc li.lv2 { padding-left: 18px; }
+.toc .dots { flex: 1; border-bottom: 1.4px dotted #999; margin: 0 6px; transform: translateY(-3px); }
+
+/* ── 본문 ── */
+h2 {
+  font-size: 13pt; font-weight: 800; color: var(--theme-dark);
+  border-bottom: 1.6px solid var(--theme);
+  padding-bottom: 6px; margin: 26px 0 12px;
+}
+h3 { font-size: 11pt; font-weight: 700; color: var(--theme-dark); margin: 18px 0 8px; }
+p { margin: 8px 0; text-align: justify; }
+.summary-box {
+  background: var(--theme-weak); border-left: 4px solid var(--theme);
+  padding: 14px 16px; margin: 12px 0 16px;
+}
+.summary-box p { margin: 7px 0; }
+.summary-box .key { font-weight: 800; color: var(--theme-dark); }
+table { width: 100%; border-collapse: collapse; margin: 10px 0 4px; font-size: 9.8pt; }
+caption { caption-side: top; text-align: left; font-weight: 700; font-size: 9.5pt; margin-bottom: 5px; color: #333; }
+th { background: var(--theme); color: #fff; font-weight: 700; padding: 7px 9px; border: .8px solid var(--theme-dark); text-align: center; }
+td { border: .8px solid #b9b9b9; padding: 7px 9px; vertical-align: top; }
+tr:nth-child(even) td { background: #fafaf7; }
+.tbl-note { font-size: 8.5pt; color: #777; margin: 2px 0 12px; }
+.fig { text-align: center; margin: 16px 0; }
+.fig-cap { font-size: 9pt; color: var(--theme-dark); font-weight: 700; margin-top: 8px; }
+
+/* 단계 다이어그램 (CSS) */
+.flow { display: flex; align-items: stretch; justify-content: center; gap: 0; margin: 14px 0 4px; }
+.flow .step {
+  background: var(--theme-weak); border: 1.4px solid var(--theme);
+  border-radius: 8px; padding: 10px 12px; width: 31%; font-size: 9.2pt; text-align: center;
+}
+.flow .step b { display: block; color: var(--theme-dark); font-size: 10pt; margin-bottom: 4px; }
+.flow .arrow { align-self: center; font-size: 14pt; color: var(--theme); padding: 0 7px; font-weight: 800; }
+
+/* 요청 사항 강조 */
+.ask { border: 2px solid var(--theme); padding: 14px 16px; margin: 12px 0; page-break-inside: avoid; }
+.ask h4 { font-size: 11pt; color: var(--theme-dark); margin-bottom: 6px; }
+.ask p { margin: 5px 0; }
+.ask .what { font-weight: 800; }
+ul.tight { margin: 6px 0 6px 18px; }
+ul.tight li { margin: 4px 0; }
+.footnote { font-size: 8.5pt; color: #666; border-top: 1px solid #999; margin-top: 26px; padding-top: 6px; }
+.pagebreak { page-break-before: always; }
+strong.th { color: var(--theme-dark); }
