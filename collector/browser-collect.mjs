@@ -57,7 +57,10 @@ async function loadPage(url) {
     }
     /* 클릭형 게시판(행에 onclick만 있는 목록): 장학 키워드가 든 행을 실제로 클릭해
        이동한 상세 주소를 기록한다 — 스크립트 인자를 추측하지 않는 확실한 방법 */
-    const kwAnchors = links.filter((l) => /장학|학자금/.test(l.title) && /view|View|artcl|ntt/.test(l.url)).length;
+    // 서로 다른 상세 주소가 3개 미만이면(스크립트 주소가 전부 같은 값으로 뭉개진 경우 포함) 클릭 수집 가동
+    const kwAnchors = new Set(links
+      .filter((l) => /장학|학자금/.test(l.title) && /view|View|artcl|ntt/.test(l.url))
+      .map((l) => l.url)).size;
     if (kwAnchors < 3) {
       const clickRows = await page.$$eval('[onclick]', (els) => els
         .map((e, i) => ({ i, t: (e.textContent || '').replace(/\s+/g, ' ').trim() }))
