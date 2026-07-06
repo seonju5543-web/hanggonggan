@@ -72,13 +72,14 @@ async function loadPage(url) {
         .slice(0, 10).map((x) => [x.i, x.t])).catch(() => []);
       let ci = 0;
       clickTried = clickRows.length;
+      const usedUrls = new Set(); // 상세 주소가 전부 같은 게시판(내부 전송형) 대응
       for (const [idx, title] of clickRows) {
         ci += 1;
         try {
           const els = await page.$$(CLICKABLE);
           if (!els[idx]) continue;
-          const popupP = ctx.waitForEvent('page', { timeout: 6000 }).catch(() => null);
-          const navP = page.waitForNavigation({ timeout: 6000 }).catch(() => null);
+          const popupP = ctx.waitForEvent('page', { timeout: 3500 }).catch(() => null);
+          const navP = page.waitForNavigation({ timeout: 5000 }).catch(() => null);
           await els[idx].click({ timeout: 4000 });
           const popup = await popupP;
           const detailPage = popup || page;
@@ -97,7 +98,13 @@ async function loadPage(url) {
             .filter((l) => l.title.length >= 4 && l.title.length <= 120)
             .slice(0, 6).map((l) => ({ name: l.title.slice(0, 100), url: l.url }));
           const navigated = detailPage.url() !== url && detailPage.url() !== 'about:blank';
-          const recUrl = navigated ? detailPage.url() : `${url}#notice-${ci}`;
+          let recUrl = navigated ? detailPage.url() : url;
+          // 상세 주소에 공고 구분자가 없거나(물음표 없는 view.do 등) 이미 쓴 주소면
+          // 목록 주소 + 고유 표식으로 기록 — 사용자는 목록에서 해당 공고를 볼 수 있다
+          if (!/\?.+/.test(recUrl) || usedUrls.has(recUrl)) {
+            recUrl = `${url}#n-${encodeURIComponent(title.slice(0, 40))}`; // 제목 기반 — 재실행 시 중복 방지
+          }
+          usedUrls.add(recUrl);
           links.push({ title, url: recUrl });
           clickDetails[title] = { deadlineHint: dm ? dm[0].trim().slice(0, 80) : null, attachments: atts };
           if (popup) await popup.close().catch(() => {});
