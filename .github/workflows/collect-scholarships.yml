@@ -42,7 +42,11 @@ jobs:
           git add collector/seen.json data/notices.json
           if ! git diff --cached --quiet; then
             git commit -m "collector: seen state update"
-            git push
+            # 다른 로봇이 먼저 push했을 수 있음 — 받아서 얹은 뒤 재시도 (수집분 유실 방지)
+            for i in 1 2 3; do
+              git push && break
+              git pull --rebase origin "${GITHUB_REF_NAME}"
+            done
           fi
 
       - name: 컨펌용 리포트 이슈 생성

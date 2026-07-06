@@ -38,7 +38,11 @@ jobs:
           git add collector/seen.json collector/browser-report.md data/notices.json
           if ! git diff --cached --quiet; then
             git commit -m "browser-collector: harvest update"
-            git push
+            # 다른 로봇이 먼저 push했을 수 있음 — 받아서 얹은 뒤 재시도 (수집분 유실 방지)
+            for i in 1 2 3; do
+              git push && break
+              git pull --rebase origin "${GITHUB_REF_NAME}"
+            done
           fi
       - name: 리포트 이슈
         if: github.event_name == 'workflow_dispatch' || steps.run.outputs.new_count != '0'
