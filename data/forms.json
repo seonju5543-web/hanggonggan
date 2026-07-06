@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-07-06",
+ "updatedAt": "2026-07-07",
  "templates": {
   "kosaf-ai-mentor": {
    "title": "대학생 청소년 AI 교육지원장학금 활동계획서",
@@ -1303,6 +1303,220 @@
        ]
       }
      ]
+    }
+   ]
+  },
+  "yangcheon-apply": {
+   "title": "재단법인 양천장학회 장학생 선발원서",
+   "docName": "양천장학회_선발원서",
+   "org": "재단법인 양천장학회 귀중",
+   "signLabel": "신청인",
+   "photoNote": "※ 원본 양식의 사진란은 인쇄 후 좌측 상단에 사진을 부착해 주세요.",
+   "pledge": "본인은 귀 장학생이 되고자 보호자 연서로 신청합니다. (인쇄 후 신청인·보호자가 각각 서명·날인)",
+   "sections": [
+    {
+     "heading": "인적사항",
+     "fields": [
+      {
+       "id": "nameKo",
+       "label": "성 명 (한글)",
+       "type": "text",
+       "auto": "name",
+       "q": "성명(한글)"
+      },
+      {
+       "id": "nameHan",
+       "label": "성 명 (한문)",
+       "type": "text",
+       "q": "성명(한문) — 없으면 비워두세요"
+      },
+      {
+       "id": "rrn",
+       "label": "주민등록번호",
+       "type": "text",
+       "q": "주민등록번호 (제출용 문서에만 들어가요 — 서버로 전송되지 않아요)",
+       "placeholder": "000000-0000000"
+      },
+      {
+       "id": "school",
+       "label": "재적학교 (학교·대학·과·학년)",
+       "type": "text",
+       "auto": "major",
+       "q": "재적학교/대학/과/학년",
+       "placeholder": "예: ○○대학교 소프트웨어융합대학 소프트웨어학과 3학년"
+      },
+      {
+       "id": "origin",
+       "label": "본 적",
+       "type": "text",
+       "q": "본적 (없으면 비워두세요)"
+      },
+      {
+       "id": "addr",
+       "label": "주 소",
+       "type": "text",
+       "q": "주소"
+      },
+      {
+       "id": "phone",
+       "label": "연 락 처",
+       "type": "text",
+       "auto": "phone",
+       "q": "연락처"
+      },
+      {
+       "id": "recommender",
+       "label": "추 천 인 / 추 천 학 교",
+       "type": "text",
+       "q": "추천인 또는 추천 학교"
+      }
+     ]
+    },
+    {
+     "heading": "병역사항",
+     "fields": [
+      {
+       "id": "military",
+       "label": "병역구분 · 복무기간 · 전역유형 · 군별 · 계급",
+       "type": "text",
+       "q": "병역사항 (해당 없으면 \"해당없음\")",
+       "placeholder": "예: 만기전역 / 2022.3~2023.9 / 병장 / 육군"
+      }
+     ]
+    },
+    {
+     "heading": "학력사항",
+     "fields": [
+      {
+       "id": "education",
+       "label": "학력사항 (연월일 · 학교명 · 비고)",
+       "type": "textarea",
+       "q": "학력사항을 한 줄씩 (졸업연월 / 학교명 / 비고)",
+       "sugg": [
+        "2023.02 / ○○고등학교 졸업",
+        "2023.03 / ○○대학교 입학"
+       ]
+      }
+     ]
+    },
+    {
+     "heading": "보호자",
+     "fields": [
+      {
+       "id": "guardianName",
+       "label": "성명 (한글·한문)",
+       "type": "text",
+       "q": "보호자 성명"
+      },
+      {
+       "id": "guardianRrn",
+       "label": "주민등록번호",
+       "type": "text",
+       "q": "보호자 주민등록번호 (제출용 문서에만)",
+       "placeholder": "000000-0000000"
+      },
+      {
+       "id": "guardianRel",
+       "label": "학생과의 관계",
+       "type": "text",
+       "q": "학생과의 관계",
+       "placeholder": "예: 부 / 모"
+      },
+      {
+       "id": "guardianPhone",
+       "label": "연락처 (자택·핸드폰)",
+       "type": "text",
+       "q": "보호자 연락처"
+      }
+     ]
+    }
+   ]
+  },
+  "sm-yugong-apply": {
+   "title": "유공자(국가/독립) 및 교육보호대상자(탈북대학생) 장학금 신청서",
+   "docName": "숙명_유공자탈북_장학금신청서",
+   "org": "숙명여자대학교 학생지원센터 귀중",
+   "signLabel": "신청인",
+   "pledge": "상기와 같이 유공자(국가/독립) 및 교육보호대상자 장학금을 신청합니다.",
+   "sections": [
+    {
+     "heading": "",
+     "note": "※ 반드시 학생 본인 명의 계좌번호를 숙명포털(학사>학적>학적정보>계좌정보입력)에 입력 후 신청하세요.",
+     "fields": [
+      {
+       "id": "major",
+       "label": "학부(학과)",
+       "type": "text",
+       "auto": "major",
+       "q": "학부(학과)"
+      },
+      {
+       "id": "examNo",
+       "label": "수험번호",
+       "type": "text",
+       "q": "수험번호 (신입생)"
+      },
+      {
+       "id": "name",
+       "label": "성명",
+       "type": "text",
+       "auto": "name",
+       "q": "성명"
+      },
+      {
+       "id": "phone",
+       "label": "연락처 (휴대폰)",
+       "type": "text",
+       "auto": "phone",
+       "q": "휴대폰"
+      },
+      {
+       "id": "email",
+       "label": "연락처 (이메일)",
+       "type": "text",
+       "auto": "email",
+       "q": "이메일"
+      },
+      {
+       "id": "kind",
+       "label": "신청장학금",
+       "type": "checks",
+       "q": "신청할 장학금을 고르세요",
+       "options": [
+        "유공자(국가/독립) 장학금",
+        "교육보호대상자(탈북대학생) 장학금"
+       ]
+      },
+      {
+       "id": "yugongRel",
+       "label": "유공자와의 관계",
+       "type": "checks+text",
+       "q": "유공자 장학금이면 관계를 고르고 보훈번호를 적어주세요",
+       "options": [
+        "본인",
+        "자녀",
+        "손자"
+       ],
+       "textLabel": "보훈번호",
+       "tq": "보훈번호 (증빙서류 확인)",
+       "emptyText": ""
+      },
+      {
+       "id": "talbukRel",
+       "label": "북한이탈주민 구분",
+       "type": "checks",
+       "q": "탈북대학생 장학금이면 구분을 고르세요 (해당 없으면 건너뛰기)",
+       "options": [
+        "본인",
+        "자녀"
+       ]
+      }
+     ]
+    },
+    {
+     "heading": "첨부 서류 안내",
+     "note": "※ 유공자: 대학 수업료 등 면제 대상자증명서 1부 / 탈북: 교육보호대상자증명서 또는 북한이탈주민등록확인서 — 원문 공고 확인.",
+     "fields": []
     }
    ]
   }

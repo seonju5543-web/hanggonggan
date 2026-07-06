@@ -1186,7 +1186,6 @@
    ],
    "duplicable": true,
    "note": "첨부된 신청 서류양식(hwp)을 내려받아 작성하세요. 세부 자격은 원문 확인.",
-   "noForm": "신청 서류양식(hwp) 다운로드 제공 — 스키마화 예정(다음 수집분에서 반영)",
    "attachments": [
     {
      "name": "(재)양천장학회 2026학년도 후기 장학생 장학금 신청 서류양식.hwp",
@@ -1198,7 +1197,8 @@
     }
    ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EC%84%9C%EC%9A%B8%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EC%96%91%EC%B2%9C%EC%9E%A5%ED%95%99%ED%9A%8C%20%EC%8B%A0%EA%B7%9C%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EC%95%88%EB%82%B4(7%EC%9B%94%2022%EA%B9%8C",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "formId": "yangcheon-apply"
   },
   {
    "id": "reg-cau-samil",
@@ -1299,7 +1299,6 @@
    ],
    "duplicable": true,
    "note": "신입생 대상이에요. 첨부된 신청서 양식(hwp)을 내려받아 작성하세요.",
-   "noForm": "신청서 양식(hwp) 다운로드 제공 — 스키마화 예정(다음 수집분에서 반영)",
    "attachments": [
     {
      "name": "(양식) 유공자 및 탈북대학생장학금_신청서.hwp",
@@ -1307,7 +1306,8 @@
     }
    ],
    "sourceUrl": "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=91697",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "formId": "sm-yugong-apply"
   },
   {
    "id": "reg-uos-career",
