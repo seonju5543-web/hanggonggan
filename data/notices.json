@@ -945,6 +945,38 @@
    "school": "상명대학교",
    "campus": "서울캠퍼스",
    "foundAt": "2026-07-03"
+  },
+  {
+   "school": "광운대학교",
+   "campus": "",
+   "title": "[등록/장학] 2026학년도 2학기 화도 및 동해장학금 1차 신청 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52803&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "foundAt": "2026-07-04",
+   "attachments": []
+  },
+  {
+   "school": "명지대학교",
+   "campus": "",
+   "title": "2026학년도 1학기 『경기 RISE G7 (AI 분야) 특성화 장학금』 신청 안내",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/141/233101/artclView.do",
+   "foundAt": "2026-07-04",
+   "attachments": []
+  },
+  {
+   "school": "성균관대학교",
+   "campus": "",
+   "title": "2026년도 2학기 (재)불광장학회 장학생 모집 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=138197&article.offset=0&articleLimit=10",
+   "foundAt": "2026-07-03",
+   "attachments": []
+  },
+  {
+   "school": "성균관대학교",
+   "campus": "",
+   "title": "2026년 하반기 호반장학재단 장학생 선발 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=138171&article.offset=0&articleLimit=10",
+   "foundAt": "2026-07-03",
+   "attachments": []
   }
  ]
 }
