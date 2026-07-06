@@ -246,24 +246,30 @@
    "id": "reg-kw-hoban",
    "name": "호반 이노베이션 하반기 장학생",
    "type": "교외",
-   "provider": "호반그룹 (호반장학재단)",
-   "amount": "장학금 (세부 금액 원문 확인)",
-   "amountValue": 0,
+   "provider": "호반장학재단",
+   "amount": "3년간 매학기 300만원 (총 5학기 이내 1,500만원) + 방학 기업 인턴십",
+   "amountValue": 15000000,
    "deadline": "2026-07-17",
-   "period": "접수 2026.6.15(월) ~ 7.17(금) 17:00",
-   "summary": "호반그룹이 혁신 인재를 지원하는 하반기 장학생 선발입니다. 마감 시각(17:00)까지 접수된 건만 인정돼요.",
+   "period": "접수 2026.6.15(월) ~ 7.17(금) 17:00 · 재단 이메일 접수",
+   "summary": "혁신적 아이디어와 도전정신을 가진 2·3학년(2026-2학기 기준)에게 3년간 매학기 300만원과 기업 인턴십 기회를 지원합니다. 학교 관계없이 재단 이메일로 직접 접수하는 전국 공고예요.",
    "eligibility": {
     "selective": true,
-    "schoolOnly": "광운대학교"
+    "years": [
+     2,
+     3
+    ],
+    "minGpa": 3
    },
    "documents": [
-    "제출 서류는 원문 공고에서 확인"
+    "제출서류 PDF (파일 제목: 성명_대학교_학과) — 목록은 원문 공고·재단 안내문 확인"
    ],
    "duplicable": true,
-   "note": "지원 자격·금액·제출처는 원문 공고에서 최종 확인하세요.",
+   "note": "메일 제목은 \"이노베이션_성명_대학교_학과\" 형식. 이공계열·창의적 프로젝트 경험 우대. 1차 서류 후 면접 진행.",
    "sourceUrl": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52824&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "attachments": [],
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "noForm": "공고 첨부에 채울 신청서 양식 미확보(2026-07-06) — 재단 안내문(원문 공고 첨부)에서 확인",
+   "applyEmail": "hobansf@hobanf.com"
   },
   {
    "id": "reg-kw-nongchon-loan",
@@ -651,6 +657,141 @@
     }
    ],
    "sourceUrl": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=138212&article.offset=0&articleLimit=10",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-hufs-yunsungwon",
+   "name": "윤성원 장학금 (부산지역 고교 졸업자)",
+   "type": "교내",
+   "provider": "한국외국어대학교 학생·인재개발처",
+   "amount": "생활비 장학금 200만원 (5명)",
+   "amountValue": 2000000,
+   "deadline": "2026-07-13",
+   "period": "신청 2026.7.6(월) ~ 7.13(월) 15:00",
+   "summary": "부산지역 고등학교를 졸업한 서울·글로벌캠퍼스 재학생(초과학기 제외) 중 평점 3.0 이상, 가정형편이 어려운 학생을 지원합니다. 신청서를 앱에서 원본과 동일한 구조로 작성할 수 있어요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교",
+    "minGpa": 3
+   },
+   "documents": [
+    "장학금 지원서 (앱에서 실제 양식 작성)",
+    "성적증명서 1부",
+    "2026-1학기 학자금 지원구간 확인 서류 (원문 확인)"
+   ],
+   "duplicable": true,
+   "note": "HUFS Ability(학생핵심역량통합시스템) 로그인 → 교과/비교과 → 장학신청에서 온라인 신청 — 모든 서류를 반드시 PDF 1개 파일로 업로드하세요.",
+   "formId": "yunsungwon-apply",
+   "attachments": [
+    {
+     "name": "2026-1학기 장학금 신청서(양식).hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/145105/download.do"
+    },
+    {
+     "name": "(서식) 개인정보수집이용동의서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/145106/download.do"
+    }
+   ],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/259294/artclView.do",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-skku-bulkwang",
+   "name": "불광장학회 장학생 (2026-2학기)",
+   "type": "교외",
+   "provider": "재단법인 불광장학회",
+   "amount": "장학금 (세부 원문 확인)",
+   "amountValue": 1500000,
+   "deadline": "2026-07-10",
+   "period": "신청 2026.6.29(월) ~ 7.10(금) · 이메일 접수",
+   "summary": "국내 4년제 대학생 중 장학회 설립취지에 부합하는 학생(불교 신도 아니어도 지원 가능)을 선발합니다. 성적은 전체·직전학기 모두 백분위 환산 80점(100점 만점) 이상이어야 해요. 재단에 이메일로 직접 접수하는 공고입니다.",
+   "eligibility": {
+    "selective": true
+   },
+   "documents": [
+    "제출 서류는 원문 공고에서 확인 (이메일 접수)"
+   ],
+   "duplicable": true,
+   "note": "온라인 이메일 접수만 가능(우편 접수 불가) · 문의 051-466-2829. 성적 기준(백분위 80/100)은 앱이 자동 판정하지 못하니 직접 확인하세요.",
+   "noForm": "공고 첨부에 채울 신청서 양식 없음(2026-07-06 확인) — 제출 서류·양식은 원문 공고 및 재단 문의로 확인",
+   "applyEmail": "bulkwang7@daum.net",
+   "attachments": [],
+   "sourceUrl": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=138197&article.offset=0&articleLimit=10",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-mj-riseg7",
+   "name": "경기 RISE G7 (AI 분야) 특성화 장학금",
+   "type": "교내",
+   "provider": "명지대학교 (경기 RISE 사업)",
+   "amount": "장학금 (구분별 차등 — 세부 원문 확인)",
+   "amountValue": 1500000,
+   "deadline": "2026-07-13",
+   "period": "신청 2026.6.25(목) ~ 7.13(월)",
+   "summary": "경기 RISE G7(AI 분야) 참여 학과 학부 재학생을 지원하는 특성화 장학금입니다. 직전학기 평점 2.5 이상이면 신청할 수 있어요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "명지대학교",
+    "minGpa": 2.5
+   },
+   "documents": [
+    "제출 서류·신청 방법은 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "AI 분야 참여 전공·학과 소속 학부생만 지원 대상이에요 — 본인 학과의 참여 여부를 원문에서 확인하세요.",
+   "noForm": "공고 첨부에 채울 신청서 양식 없음(2026-07-06 확인) — 신청 방법은 원문 공고 확인",
+   "attachments": [],
+   "sourceUrl": "https://www.mju.ac.kr/bbs/mjukr/141/233101/artclView.do",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-kw-hwado",
+   "name": "화도 및 동해장학금 1차 신청 (2026-2학기)",
+   "type": "교내",
+   "provider": "광운대학교",
+   "amount": "장학금 (세부 원문 확인)",
+   "amountValue": 2000000,
+   "deadline": null,
+   "period": "2026-2학기 1차 신청 — 기간 원문 확인",
+   "summary": "광운대 교내 화도·동해장학금의 2학기 1차 신청 안내입니다. 자격·기간·서류는 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "광운대학교"
+   },
+   "documents": [
+    "제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "게시판 특성상 세부 내용 자동 수집이 안 되는 공고예요 — 원문에서 신청 기간을 꼭 확인하세요.",
+   "noForm": "공고 본문·첨부 자동 수집 불가(동적 게시판) — 양식 유무는 원문 공고 확인",
+   "attachments": [],
+   "sourceUrl": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52803&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-dg-sanhak-foreign",
+   "name": "산학협동재단 국내 외국인 근로자 자녀 장학생 (동국대 접수)",
+   "type": "교외",
+   "provider": "산학협동재단 (동국대 서울캠퍼스 게시)",
+   "amount": "2026-2학기 등록금",
+   "amountValue": 4000000,
+   "deadline": "2026-07-09",
+   "period": "동일 사업 재단 일정 기준 ~2026.7.9(목) — 학교 접수 일정은 원문 확인",
+   "summary": "부모가 국내에서 근로 중인 외국인인 학생의 등록금을 지원하는 산학협동재단 사업의 동국대 게시분입니다. 신청서 양식(재단 공통)을 앱에서 원본과 동일한 구조로 작성할 수 있어요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "동국대학교",
+    "campusOnly": "서울캠퍼스"
+   },
+   "documents": [
+    "장학금 신청서 서식Ⅰ + 자기소개서 서식Ⅱ (앱에서 실제 양식 작성)",
+    "부모 재직증명서 등 증빙 (원문 확인)"
+   ],
+   "duplicable": false,
+   "note": "동국대 장학공지 게시판(공고 번호 2640)에서 학교 접수 방법·마감을 확인하세요. 재단 양식은 대학 공통이에요.",
+   "formId": "sanhak-foreign-apply",
+   "attachments": [],
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/list",
    "sourceKind": "official"
   }
  ]
