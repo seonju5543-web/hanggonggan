@@ -1253,6 +1253,58 @@
      "fields": []
     }
    ]
+  },
+  "yunsungwon-apply": {
+   "title": "2026-1학기 윤성원 장학금 신청서",
+   "docName": "윤성원장학금_신청서",
+   "org": "한국외국어대학교 학생 ‧ 인재개발처장 귀하",
+   "signLabel": "신청인",
+   "pledge": "본인은 위와 같이 2026-1학기 윤성원 장학금을 신청합니다.",
+   "sections": [
+    {
+     "heading": "",
+     "fields": [
+      {
+       "id": "yearSem",
+       "label": "학년(학기)",
+       "type": "text",
+       "auto": "yearRemain",
+       "q": "학년과 이수 학기",
+       "placeholder": "ex)3학년(6학기)"
+      },
+      {
+       "id": "major",
+       "label": "학과",
+       "type": "text",
+       "auto": "major",
+       "q": "학과"
+      },
+      {
+       "id": "highschool",
+       "label": "출신 고등학교",
+       "type": "text",
+       "q": "출신 고등학교 (부산지역)",
+       "placeholder": "예: 부산○○고등학교"
+      },
+      {
+       "id": "name",
+       "label": "이름",
+       "type": "text",
+       "auto": "name",
+       "q": "이름"
+      },
+      {
+       "id": "reason",
+       "label": "장학금 신청사유(자기소개서)\n□ 작성분량 및 방법 11 point / 줄 간격 160 / A4 2장 내외",
+       "type": "textarea",
+       "q": "신청 사유 (가정 형편·학업 계획 등 — A4 2장 내외)",
+       "sugg": [
+        "부산에서 상경해 자취 중으로 생활비 부담이 커, 장학금이 학업 지속에 큰 힘이 됩니다. 지난 학기 평점 ○.○을 유지했고, 이번 학기에는 전공 심화와 어학 자격 취득을 계획하고 있습니다."
+       ]
+      }
+     ]
+    }
+   ]
   }
  }
 }
