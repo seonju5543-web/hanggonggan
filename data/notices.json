@@ -1,6 +1,128 @@
 {
- "updatedAt": "2026-07-05",
+ "updatedAt": "2026-07-06",
  "items": [
+  {
+   "title": "학생지원팀・장학팀",
+   "url": "https://dep.hufs.ac.kr/sites/student/index.do",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-07-06"
+  },
+  {
+   "title": "장학 및 학자금 대출",
+   "url": "https://dep.hufs.ac.kr/student/12742/subview.do",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-07-06"
+  },
+  {
+   "title": "국가근로장학",
+   "url": "https://dep.hufs.ac.kr/student/12762/subview.do",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-07-06"
+  },
+  {
+   "title": "학자금 중복지원 방지",
+   "url": "https://dep.hufs.ac.kr/student/12764/subview.do",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-07-06"
+  },
+  {
+   "title": "장학(공지)",
+   "url": "https://dep.hufs.ac.kr/student/12767/subview.do",
+   "attachments": [],
+   "deadlineHint": "마감 안내 새글 장학팀 2026.06.30 21 0 2054 [공통][국가근로] 2026학년도 1학기 6월 국가",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-07-06"
+  },
+  {
+   "title": "[서울] 2026년 대학생 청소년 AI교육지원장학금 대학생 멘토 모집 안내(~7/13) 새글",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/259177/artclView.do",
+   "attachments": [
+    {
+     "name": "멘토 활동계획서 양식.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/145026/download.do"
+    },
+    {
+     "name": "(공지)AI 대청교 활동기관 파일.xlsx",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/145036/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026. 7. 3( 금 ) ~ 2026. 7. 13( 월 ) 15:00 &nbsp; 3. 신청방법 :",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-07-06"
+  },
+  {
+   "title": "[서울][국가근로] 2026년 하계방학 국가근로장학생 추가 모집(교내,~7/6) 새글",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/258915/artclView.do",
+   "attachments": [
+    {
+     "name": "2026학년도+국가근로+지원서.docx",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/144871/download.do"
+    },
+    {
+     "name": "2026학년도+국가근로+지원서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/144872/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간 :&nbsp; ~ 2026. 7. 6 (월 ) 13:00&nbsp; &nbsp; &nbsp; &nbsp;",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-07-06"
+  },
+  {
+   "title": "[공통][교외] 외부장학재단 장학생 지원 전 국가장학금 신청",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/212178/artclView.do",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-07-06"
+  },
+  {
+   "title": "[공통][교외]2026-1학기 윤성원 장학금 장학생 모집안내 (~7/13) 새글",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/259294/artclView.do",
+   "attachments": [
+    {
+     "name": "2026-1학기 장학금+신청서(양식).hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/145105/download.do"
+    },
+    {
+     "name": "(서식) 개인정보수집이용동의서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/145106/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026. 7. 6( 월 ) ~ 7. 13( 월 ) 15:00 까지 &nbsp; 5. 제출서류 &nbs",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-07-06"
+  },
+  {
+   "title": "[글로벌] 2026년 대학생 청소년 AI교육지원장학금 대학생 멘토 모집 안내 새글",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/259164/artclView.do",
+   "attachments": [
+    {
+     "name": "붙임. 멘토 활동계획서 양식.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/145019/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026. 7. 3( 금 ) ~ 2026. 7. 13( 월 ) 15:00 &nbsp; 3. 신청방법 :",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-07-06"
+  },
   {
    "title": "장학 2026-1 점프업 장학금 안내 (성적경고생 성적향상장학금)",
    "url": "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=93779",
