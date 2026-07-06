@@ -31,14 +31,36 @@ async function loadPage(url) {
   const page = await ctx.newPage();
   try {
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
-    await page.waitForTimeout(2500); // 동적 목록이 그려질 시간
-    const links = await page.$$eval('a[href]', (as) => as.map((a) => ({
-      title: (a.textContent || '').replace(/\s+/g, ' ').trim(),
-      url: a.href,
-    })));
+    await page.waitForTimeout(4000); // 동적 목록이 그려질 시간 (XHR 목록 포함)
+    // 본문 프레임(iframe) 안까지 포함해 링크를 모은다 — 일부 학교는 목록을 프레임에 그림
+    let links = [];
+    for (const f of page.frames()) {
+      const ls = await f.$$eval('a[href]', (as) => as.map((a) => ({
+        title: (a.textContent || '').replace(/\s+/g, ' ').trim(),
+        url: a.href,
+      }))).catch(() => []);
+      links = links.concat(ls);
+      // 링크가 아닌 클릭형 목록(onclick)도 수집 — location.href='...' / view.do 패턴에서 주소 복원
+      const clicks = await f.$$eval('[onclick]', (els) => els.map((e) => ({
+        title: (e.textContent || '').replace(/\s+/g, ' ').trim(),
+        onclick: e.getAttribute('onclick') || '',
+      }))).catch(() => []);
+      for (const c of clicks) {
+        const m = c.onclick.match(/['"]((?:https?:\/\/|\/)[^'"]*(?:view|View|artcl|nttId)[^'"]*)['"]/);
+        if (m && c.title) {
+          try { links.push({ title: c.title, url: new URL(m[1], url).href }); } catch { /* skip */ }
+        }
+      }
+    }
     const html = await page.content();
+    // 진단용: 화면 글자 중 장학 키워드가 든 줄 (링크로 안 잡히는 목록 탐지)
+    const textLines = await page.evaluate(() =>
+      (document.body.innerText || '').split('\n').map((s) => s.trim())
+        .filter((s) => /장학|학자금/.test(s) && s.length >= 8 && s.length <= 90).slice(0, 10)
+    ).catch(() => []);
+    const frameCount = page.frames().length;
     await page.close();
-    return { links, html };
+    return { links, html, textLines, frameCount };
   } catch (e) {
     await page.close().catch(() => {});
     return { error: e.message ? e.message.slice(0, 80) : String(e) };
@@ -60,11 +82,13 @@ for (const t of cfg.targets) {
       .filter((l) => KEYWORDS.test(l.title) && !MENU_NOISE.test(l.title));
     const uniq = [...new Map(items.map((i) => [i.url, i])).values()];
     report.push(`- ${uniq.length ? '✅' : '⚪'} 링크 ${r.links.length} · 장학 공고 ${uniq.length} · ${url}`);
-    // 진단: 공고를 거의 못 알아본 게시판은 실제로 본 링크 제목을 남겨 원인 파악을 돕는다
+    // 진단: 공고를 거의 못 알아본 게시판은 화면에서 본 것을 남겨 원인 파악을 돕는다
     if (uniq.length <= 1 && r.links.length > 5) {
+      report.push(`  - (프레임 ${r.frameCount || 1}개)`);
+      (r.textLines || []).forEach((s) => report.push(`  - (본 글자) ${s.slice(0, 66)}`));
       const sample = [...new Map(r.links
-        .filter((l) => l.title.length >= 8 && l.title.length <= 90)
-        .map((l) => [l.title, l])).values()].slice(0, 14);
+        .filter((l) => l.title.length >= 10 && l.title.length <= 90 && /장학|학자금|\d{4}/.test(l.title))
+        .map((l) => [l.title, l])).values()].slice(0, 10);
       sample.forEach((s) => report.push(`  - (본 링크) ${s.title.slice(0, 66)}`));
     }
     if (!uniq.length || harvested) continue;
