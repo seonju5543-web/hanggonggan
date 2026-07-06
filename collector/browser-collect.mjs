@@ -60,6 +60,13 @@ for (const t of cfg.targets) {
       .filter((l) => KEYWORDS.test(l.title) && !MENU_NOISE.test(l.title));
     const uniq = [...new Map(items.map((i) => [i.url, i])).values()];
     report.push(`- ${uniq.length ? '✅' : '⚪'} 링크 ${r.links.length} · 장학 공고 ${uniq.length} · ${url}`);
+    // 진단: 공고를 거의 못 알아본 게시판은 실제로 본 링크 제목을 남겨 원인 파악을 돕는다
+    if (uniq.length <= 1 && r.links.length > 5) {
+      const sample = [...new Map(r.links
+        .filter((l) => l.title.length >= 8 && l.title.length <= 90)
+        .map((l) => [l.title, l])).values()].slice(0, 14);
+      sample.forEach((s) => report.push(`  - (본 링크) ${s.title.slice(0, 66)}`));
+    }
     if (!uniq.length || harvested) continue;
 
     harvested = true;
