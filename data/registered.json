@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-07-06",
+ "updatedAt": "2026-07-07",
  "items": [
   {
    "id": "reg-skku-samil",
@@ -792,6 +792,559 @@
    "formId": "sanhak-foreign-apply",
    "attachments": [],
    "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/list",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-dg-injae",
+   "name": "동국인재육성장학 (2026-2학기)",
+   "type": "교내",
+   "provider": "동국대학교 서울캠퍼스",
+   "amount": "교내장학 (세부 원문 확인)",
+   "amountValue": 2000000,
+   "deadline": null,
+   "period": "2026-2학기 신청 — 기간 원문 확인",
+   "summary": "학업·활동 우수 학생 대상 동국대 대표 교내장학입니다. 학과·기준별 선발돼요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "동국대학교",
+    "campusOnly": "서울캠퍼스"
+   },
+   "documents": [
+    "학교 포털(uDRIMS) 온라인 신청 — 제출 서류는 원문 확인"
+   ],
+   "duplicable": true,
+   "note": "동국대 장학공지에서 온라인 신청해요. 유형별 자격·서류는 원문 공고를 꼭 확인하세요.",
+   "noForm": "학교 포털 입력형 — 채울 신청서 양식 없음(2026-07-07 확인). 세부는 원문 공고 확인",
+   "attachments": [],
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765145",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-dg-gyonae",
+   "name": "교내장학(전체) 신청 (2026-2학기)",
+   "type": "교내",
+   "provider": "동국대학교 서울캠퍼스",
+   "amount": "교내장학 (세부 원문 확인)",
+   "amountValue": 2000000,
+   "deadline": null,
+   "period": "2026-2학기 신청 — 기간 원문 확인",
+   "summary": "2026-2학기 교내장학 통합 신청 안내입니다. 유형별 세부 요건은 원문에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "동국대학교",
+    "campusOnly": "서울캠퍼스"
+   },
+   "documents": [
+    "학교 포털(uDRIMS) 온라인 신청 — 제출 서류는 원문 확인"
+   ],
+   "duplicable": true,
+   "note": "동국대 장학공지에서 온라인 신청해요. 유형별 자격·서류는 원문 공고를 꼭 확인하세요.",
+   "noForm": "학교 포털 입력형 — 채울 신청서 양식 없음(2026-07-07 확인). 세부는 원문 공고 확인",
+   "attachments": [],
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764960",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-dg-jongdan",
+   "name": "종단추천장학 (2026-2학기)",
+   "type": "교내",
+   "provider": "동국대학교 서울캠퍼스",
+   "amount": "교내장학 (세부 원문 확인)",
+   "amountValue": 2000000,
+   "deadline": null,
+   "period": "2026-2학기 신청 — 기간 원문 확인",
+   "summary": "불교 종단 추천을 받는 학생을 위한 교내장학입니다.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "동국대학교",
+    "campusOnly": "서울캠퍼스"
+   },
+   "documents": [
+    "학교 포털(uDRIMS) 온라인 신청 — 제출 서류는 원문 확인"
+   ],
+   "duplicable": true,
+   "note": "동국대 장학공지에서 온라인 신청해요. 유형별 자격·서류는 원문 공고를 꼭 확인하세요.",
+   "noForm": "학교 포털 입력형 — 채울 신청서 양식 없음(2026-07-07 확인). 세부는 원문 공고 확인",
+   "attachments": [],
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764951",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-dg-jeonmun",
+   "name": "전문자격장학 (2026-2학기)",
+   "type": "교내",
+   "provider": "동국대학교 서울캠퍼스",
+   "amount": "교내장학 (세부 원문 확인)",
+   "amountValue": 2000000,
+   "deadline": null,
+   "period": "2026-2학기 신청 — 기간 원문 확인",
+   "summary": "전문자격시험 합격자 등을 지원하는 교내장학입니다.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "동국대학교",
+    "campusOnly": "서울캠퍼스"
+   },
+   "documents": [
+    "학교 포털(uDRIMS) 온라인 신청 — 제출 서류는 원문 확인"
+   ],
+   "duplicable": true,
+   "note": "동국대 장학공지에서 온라인 신청해요. 유형별 자격·서류는 원문 공고를 꼭 확인하세요.",
+   "noForm": "학교 포털 입력형 — 채울 신청서 양식 없음(2026-07-07 확인). 세부는 원문 공고 확인",
+   "attachments": [],
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764950",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-dg-bokji2b",
+   "name": "복지장학2(부분) (2026-2학기)",
+   "type": "교내",
+   "provider": "동국대학교 서울캠퍼스",
+   "amount": "교내장학 (세부 원문 확인)",
+   "amountValue": 2000000,
+   "deadline": null,
+   "period": "2026-2학기 신청 — 기간 원문 확인",
+   "summary": "가계 사정에 따라 부분 지원하는 복지장학입니다.",
+   "eligibility": {
+    "selective": true,
+    "maxBracket": 6,
+    "schoolOnly": "동국대학교",
+    "campusOnly": "서울캠퍼스"
+   },
+   "documents": [
+    "학교 포털(uDRIMS) 온라인 신청 — 제출 서류는 원문 확인"
+   ],
+   "duplicable": true,
+   "note": "동국대 장학공지에서 온라인 신청해요. 유형별 자격·서류는 원문 공고를 꼭 확인하세요.",
+   "noForm": "학교 포털 입력형 — 채울 신청서 양식 없음(2026-07-07 확인). 세부는 원문 공고 확인",
+   "attachments": [],
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764949",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-dg-bokji2k",
+   "name": "복지장학2(기초생활수급자) (2026-2학기)",
+   "type": "교내",
+   "provider": "동국대학교 서울캠퍼스",
+   "amount": "교내장학 (세부 원문 확인)",
+   "amountValue": 2000000,
+   "deadline": null,
+   "period": "2026-2학기 신청 — 기간 원문 확인",
+   "summary": "기초생활수급 가정 학생을 위한 복지장학입니다.",
+   "eligibility": {
+    "selective": true,
+    "flagsAny": [
+     "basicLiving"
+    ],
+    "schoolOnly": "동국대학교",
+    "campusOnly": "서울캠퍼스"
+   },
+   "documents": [
+    "학교 포털(uDRIMS) 온라인 신청 — 제출 서류는 원문 확인"
+   ],
+   "duplicable": true,
+   "note": "동국대 장학공지에서 온라인 신청해요. 유형별 자격·서류는 원문 공고를 꼭 확인하세요.",
+   "noForm": "학교 포털 입력형 — 채울 신청서 양식 없음(2026-07-07 확인). 세부는 원문 공고 확인",
+   "attachments": [],
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764946",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-dg-bokji2m",
+   "name": "복지장학2(면학) 지급 안내 (2026-1학기)",
+   "type": "교내",
+   "provider": "동국대학교 서울캠퍼스",
+   "amount": "교내장학 (세부 원문 확인)",
+   "amountValue": 2000000,
+   "deadline": null,
+   "period": "2026-2학기 신청 — 기간 원문 확인",
+   "summary": "면학 복지장학 지급 안내입니다.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "동국대학교",
+    "campusOnly": "서울캠퍼스"
+   },
+   "documents": [
+    "학교 포털(uDRIMS) 온라인 신청 — 제출 서류는 원문 확인"
+   ],
+   "duplicable": true,
+   "note": "동국대 장학공지에서 온라인 신청해요. 유형별 자격·서류는 원문 공고를 꼭 확인하세요.",
+   "noForm": "학교 포털 입력형 — 채울 신청서 양식 없음(2026-07-07 확인). 세부는 원문 공고 확인",
+   "attachments": [],
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-%EA%B3%B5%EC%A7%80%20%EA%B3%B5%EC%A7%80%202026-1%ED%95%99%EA%B8%B0%20%EB%B3%B5%EC%A7%80%EC%9E%A5%ED%95%992(%EB%A9%B4%ED%95%99)%20%EC%A7%80%EA%B8%89%20%EC%95%88%EB%82%B4%202026.06.2",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-dg-bokji1",
+   "name": "복지장학1(본인장애) (2026-2학기)",
+   "type": "교내",
+   "provider": "동국대학교 서울캠퍼스",
+   "amount": "교내장학 (세부 원문 확인)",
+   "amountValue": 2000000,
+   "deadline": null,
+   "period": "2026-2학기 신청 — 기간 원문 확인",
+   "summary": "장애 학생 본인을 위한 복지장학입니다.",
+   "eligibility": {
+    "selective": true,
+    "flagsAny": [
+     "disabled"
+    ],
+    "schoolOnly": "동국대학교",
+    "campusOnly": "서울캠퍼스"
+   },
+   "documents": [
+    "학교 포털(uDRIMS) 온라인 신청 — 제출 서류는 원문 확인"
+   ],
+   "duplicable": true,
+   "note": "동국대 장학공지에서 온라인 신청해요. 유형별 자격·서류는 원문 공고를 꼭 확인하세요.",
+   "noForm": "학교 포털 입력형 — 채울 신청서 양식 없음(2026-07-07 확인). 세부는 원문 공고 확인",
+   "attachments": [],
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-%EA%B3%B5%EC%A7%80%20%EA%B3%B5%EC%A7%80%202026-2%ED%95%99%EA%B8%B0%20%EB%B3%B5%EC%A7%80%EC%9E%A5%ED%95%991(%EB%B3%B8%EC%9D%B8%EC%9E%A5%EC%95%A0)%20%EC%8B%A0%EC%B2%AD%EC%95%88%EB%82%B4%202026.06.",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-dg-bohun",
+   "name": "보훈장학(본인·(손)자녀) (2026-2학기)",
+   "type": "교내",
+   "provider": "동국대학교 서울캠퍼스",
+   "amount": "교내장학 (세부 원문 확인)",
+   "amountValue": 2000000,
+   "deadline": null,
+   "period": "2026-2학기 신청 — 기간 원문 확인",
+   "summary": "국가유공자 본인·(손)자녀를 위한 보훈장학입니다.",
+   "eligibility": {
+    "selective": true,
+    "flagsAny": [
+     "merit"
+    ],
+    "schoolOnly": "동국대학교",
+    "campusOnly": "서울캠퍼스"
+   },
+   "documents": [
+    "학교 포털(uDRIMS) 온라인 신청 — 제출 서류는 원문 확인"
+   ],
+   "duplicable": true,
+   "note": "동국대 장학공지에서 온라인 신청해요. 유형별 자격·서류는 원문 공고를 꼭 확인하세요.",
+   "noForm": "학교 포털 입력형 — 채울 신청서 양식 없음(2026-07-07 확인). 세부는 원문 공고 확인",
+   "attachments": [],
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-%EA%B3%B5%EC%A7%80%20%EA%B3%B5%EC%A7%80%202026-2%ED%95%99%EA%B8%B0%20%EB%B3%B4%ED%9B%88%EC%9E%A5%ED%95%99(%EB%B3%B8%EC%9D%B8%2C%20(%EC%86%90)%EC%9E%90%EB%85%80)%20%EC%8B%A0%EC%B2%AD%EC%95%88%EB%82%B4%202026",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-dg-gyoyukboho",
+   "name": "교육보호장학(새터민·새터민 자녀) (2026-2학기)",
+   "type": "교내",
+   "provider": "동국대학교 서울캠퍼스",
+   "amount": "교내장학 (세부 원문 확인)",
+   "amountValue": 2000000,
+   "deadline": null,
+   "period": "2026-2학기 신청 — 기간 원문 확인",
+   "summary": "새터민 및 새터민 자녀를 위한 교육보호장학입니다.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "동국대학교",
+    "campusOnly": "서울캠퍼스"
+   },
+   "documents": [
+    "학교 포털(uDRIMS) 온라인 신청 — 제출 서류는 원문 확인"
+   ],
+   "duplicable": true,
+   "note": "동국대 장학공지에서 온라인 신청해요. 유형별 자격·서류는 원문 공고를 꼭 확인하세요.",
+   "noForm": "학교 포털 입력형 — 채울 신청서 양식 없음(2026-07-07 확인). 세부는 원문 공고 확인",
+   "attachments": [],
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764943",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-khu-samil",
+   "name": "삼일장학회 희망/동행 장학생 (경희대 접수)",
+   "type": "교외",
+   "provider": "재단법인 삼일장학회 (경희대 접수)",
+   "amount": "생활비성 장학금 250만원 (1회)",
+   "amountValue": 2500000,
+   "deadline": "2026-07-22",
+   "period": "접수 ~2026.7.22(수) · 경희대 학생지원센터",
+   "summary": "삼일장학회가 희망(가계곤란)·동행(장애 학생) 분야 장학생을 선발합니다. 4년제 재학·1개 학기 이상 이수 학생 대상이며 등록금성 장학금과 중복 수혜가 가능해요. 신청서를 앱에서 원본과 동일한 구조로 작성할 수 있어요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경희대학교"
+   },
+   "documents": [
+    "장학금 지원 신청서 (앱에서 실제 양식 작성)",
+    "자기소개서·추천서·서약서·개인정보 동의서 (별지)",
+    "분야별 자격 증빙 (원문 확인)"
+   ],
+   "duplicable": true,
+   "note": "경희대 접수 일정(~7/22)이에요. 성균관·외대 접수분과는 학교별 마감이 달라요. 원본 제출 원칙.",
+   "formId": "samil-apply",
+   "attachments": [
+    {
+     "name": "추천서(2026).hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=e14b13bcc7294adda68554cc893a4058&fileSn=1&bbsId=BMSR00040"
+    },
+    {
+     "name": "장학생 서약서(2026).hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=e14b13bcc7294adda68554cc893a4058&fileSn=2&bbsId=BMSR00040"
+    },
+    {
+     "name": "장학금 지원 신청서(2026)_희망동행.hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=e14b13bcc7294adda68554cc893a4058&fileSn=3&bbsId=BMSR00040"
+    },
+    {
+     "name": "자기소개서(2026).hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=e14b13bcc7294adda68554cc893a4058&fileSn=4&bbsId=BMSR00040"
+    },
+    {
+     "name": "개인정보 수집·이용·제공 동의서(2026).hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=e14b13bcc7294adda68554cc893a4058&fileSn=5&bbsId=BMSR00040"
+    }
+   ],
+   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EC%82%BC%EC%9D%BC%EC%9E%A5%ED%95%99%ED%9A%8C%20%ED%9D%AC%EB%A7%9D%2F%EB%8F%99%ED%96%89%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4(7%2F2",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-khu-uiam",
+   "name": "의암 손병희 우수논문 장학생 (2026)",
+   "type": "교외",
+   "provider": "경희대학교 (의암 손병희 장학)",
+   "amount": "우수논문 장학금 (세부 원문 확인)",
+   "amountValue": 2000000,
+   "deadline": null,
+   "period": "2026년 선발 — 기간 원문 확인",
+   "summary": "우수 논문을 제출한 학생을 선발하는 장학금입니다. 서식·작성요령 양식을 내려받아 제출해요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경희대학교"
+   },
+   "documents": [
+    "논문 및 서식(작성요령) — 공고 첨부 양식",
+    "제출 서류는 원문 확인"
+   ],
+   "duplicable": true,
+   "note": "논문 제출형 장학이에요. 서식과 작성요령을 첨부에서 내려받아 준비하세요.",
+   "noForm": "논문 제출형 — 자유 양식(서식·작성요령 hwp 다운로드 제공)",
+   "attachments": [
+    {
+     "name": "서식 및 작성요령.hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=54322ebc08a749c18bbe90470d99d2b2&fileSn=1&bbsId=BMSR00040"
+    }
+   ],
+   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%202026%20%EC%9D%98%EC%95%94%20%EC%86%90%EB%B3%91%ED%9D%AC%20%EC%9A%B0%EC%88%98%EB%85%BC%EB%AC%B8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EA%B3%B5%EA%B3%A0",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-khu-lotte",
+   "name": "신격호 롯데장학관 입주생 모집 (2026-2학기)",
+   "type": "교내",
+   "provider": "경희대학교",
+   "amount": "기숙사(장학관) 입주 지원 (주거비 지원)",
+   "amountValue": 3000000,
+   "deadline": "2026-07-10",
+   "period": "신청 ~2026.7.10",
+   "summary": "신격호 롯데장학관 입주생을 모집합니다. 주거비 부담을 크게 덜 수 있는 기숙 장학이에요. 입소지원서·개인정보동의서를 첨부에서 내려받아 준비하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경희대학교",
+    "campusOnly": "서울캠퍼스"
+   },
+   "documents": [
+    "입소지원서 (공고 첨부 양식)",
+    "개인정보 동의서 (공고 첨부 양식)"
+   ],
+   "duplicable": true,
+   "note": "마감(~7/10)이 임박했으니 서둘러 준비하세요. 첨부 양식(docx)을 내려받아 작성해요.",
+   "noForm": "입소지원서(docx) 다운로드 제공 — 워드 양식이라 앱 스키마 미대상",
+   "attachments": [
+    {
+     "name": "개인정보동의서(이름).docx",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=3601df1cd21d40c1bd3e05289c64b85d&fileSn=1&bbsId=BMSR00040"
+    },
+    {
+     "name": "입소지원서 양식(이름)docx.docx",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=3601df1cd21d40c1bd3e05289c64b85d&fileSn=2&bbsId=BMSR00040"
+    }
+   ],
+   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EC%84%9C%EC%9A%B8%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EC%8B%A0%EA%B2%A9%ED%98%B8%20%EB%A1%AF%EB%8D%B0%EC%9E%A5%ED%95%99%EA%B4%80%20%EC%9E%85%EC%A3%BC%EC%83%9D%20%EB%AA%A8%EC%A7%91(~7%2F10%EA%B9%8C%EC%A7%80%20",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-khu-yangcheon",
+   "name": "양천장학회 신규 장학생 (2026 후기)",
+   "type": "교외",
+   "provider": "재단법인 양천장학회 (경희대 게시)",
+   "amount": "장학금 (세부 원문 확인)",
+   "amountValue": 2000000,
+   "deadline": "2026-07-22",
+   "period": "신청 ~2026.7.22",
+   "summary": "양천장학회가 후기 신규 장학생을 선발합니다. 신청 서류양식(hwp)을 내려받아 준비하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경희대학교"
+   },
+   "documents": [
+    "장학금 신청 서류양식 (공고 첨부 hwp)",
+    "개인정보 동의서 (공고 첨부)"
+   ],
+   "duplicable": true,
+   "note": "첨부된 신청 서류양식(hwp)을 내려받아 작성하세요. 세부 자격은 원문 확인.",
+   "noForm": "신청 서류양식(hwp) 다운로드 제공 — 스키마화 예정(다음 수집분에서 반영)",
+   "attachments": [
+    {
+     "name": "(재)양천장학회 2026학년도 후기 장학생 장학금 신청 서류양식.hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=ad384f5ed35a4d77810d72dc396b8f66&fileSn=1&bbsId=BMSR00040"
+    },
+    {
+     "name": "(재)양천장학회 개인정보 수집·이용·제공·조회 동의서.pdf",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=ad384f5ed35a4d77810d72dc396b8f66&fileSn=2&bbsId=BMSR00040"
+    }
+   ],
+   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EC%84%9C%EC%9A%B8%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EC%96%91%EC%B2%9C%EC%9E%A5%ED%95%99%ED%9A%8C%20%EC%8B%A0%EA%B7%9C%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EC%95%88%EB%82%B4(7%EC%9B%94%2022%EA%B9%8C",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-cau-samil",
+   "name": "삼일장학회 희망/동행 장학생 (중앙대 접수)",
+   "type": "교외",
+   "provider": "재단법인 삼일장학회 (중앙대 접수)",
+   "amount": "생활비성 장학금 250만원 (1회)",
+   "amountValue": 2500000,
+   "deadline": null,
+   "period": "2026-2학기 접수 — 기간 원문 확인 (학교 접수)",
+   "summary": "삼일장학회가 희망(가계곤란)·동행(장애 학생) 분야 장학생을 선발합니다. 신청서를 앱에서 원본과 동일한 구조로 작성할 수 있어요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "중앙대학교"
+   },
+   "documents": [
+    "장학금 지원 신청서 (앱에서 실제 양식 작성)",
+    "자기소개서·추천서·서약서·개인정보 동의서 (별지)",
+    "분야별 자격 증빙 (원문 확인)"
+   ],
+   "duplicable": true,
+   "note": "중앙대 학교 접수분이에요. 접수 마감은 원문 공고에서 확인하세요. 재단 양식은 대학 공통.",
+   "formId": "samil-apply",
+   "attachments": [],
+   "sourceUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=29987&pageNo=1",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-cau-geunro-out",
+   "name": "하계방학 교외 근로지 국가근로장학생 추가 모집 (다빈치)",
+   "type": "교내",
+   "provider": "중앙대학교 다빈치캠퍼스",
+   "amount": "국가근로장학금 (시급제)",
+   "amountValue": 1000000,
+   "deadline": null,
+   "period": "2026 하계방학 추가 모집 — 기간 원문 확인",
+   "summary": "중앙대 다빈치캠퍼스의 하계방학 교외 근로지 국가근로장학생 추가 모집입니다. 근로하며 장학금을 받아요.",
+   "eligibility": {
+    "selective": true,
+    "maxBracket": 8,
+    "schoolOnly": "중앙대학교"
+   },
+   "documents": [
+    "지원서 등 — 제출 서류는 원문 확인"
+   ],
+   "duplicable": true,
+   "note": "다빈치캠퍼스 근로 공고예요. 근로지·시간은 원문 공고에서 확인하세요.",
+   "noForm": "학교 접수 — 세부 양식은 원문 공고 확인",
+   "attachments": [],
+   "sourceUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=29982&pageNo=1",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-cau-geunro-in",
+   "name": "하계방학 국가근로장학금(교내·교외) 추가 선발 (다빈치)",
+   "type": "교내",
+   "provider": "중앙대학교 다빈치캠퍼스",
+   "amount": "국가근로장학금 (시급제)",
+   "amountValue": 1000000,
+   "deadline": null,
+   "period": "2026 하계방학 추가 선발 — 기간 원문 확인",
+   "summary": "중앙대 다빈치캠퍼스의 하계방학 교내·교외 국가근로장학금 추가 선발입니다.",
+   "eligibility": {
+    "selective": true,
+    "maxBracket": 8,
+    "schoolOnly": "중앙대학교"
+   },
+   "documents": [
+    "지원서 등 — 제출 서류는 원문 확인"
+   ],
+   "duplicable": true,
+   "note": "다빈치캠퍼스 근로 공고예요. 세부는 원문 공고에서 확인하세요.",
+   "noForm": "학교 접수 — 세부 양식은 원문 공고 확인",
+   "attachments": [],
+   "sourceUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=29980&pageNo=1",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-sm-yugong",
+   "name": "신입생 국가유공자 자녀·새터민 장학금 (2026)",
+   "type": "교내",
+   "provider": "숙명여자대학교",
+   "amount": "장학금 (세부 원문 확인)",
+   "amountValue": 2000000,
+   "deadline": null,
+   "period": "2026학년도 신입생 대상 — 기간 원문 확인",
+   "summary": "국가유공자 자녀 또는 새터민(탈북) 신입생을 위한 장학금입니다. 신청서 양식(hwp)을 내려받아 준비하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "숙명여자대학교",
+    "flagsAny": [
+     "merit"
+    ]
+   },
+   "documents": [
+    "유공자·탈북대학생 장학금 신청서 (공고 첨부 hwp)",
+    "자격 증빙 (원문 확인)"
+   ],
+   "duplicable": true,
+   "note": "신입생 대상이에요. 첨부된 신청서 양식(hwp)을 내려받아 작성하세요.",
+   "noForm": "신청서 양식(hwp) 다운로드 제공 — 스키마화 예정(다음 수집분에서 반영)",
+   "attachments": [
+    {
+     "name": "(양식) 유공자 및 탈북대학생장학금_신청서.hwp",
+     "url": "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=download&articleNo=91697&attachNo=44072"
+    }
+   ],
+   "sourceUrl": "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=91697",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-uos-career",
+   "name": "UOS커리어원정대 4기 (약 450만원 장학금)",
+   "type": "교내",
+   "provider": "서울시립대학교 인재개발실",
+   "amount": "장학금 약 450만원 지급 (프로그램 참여)",
+   "amountValue": 4500000,
+   "deadline": null,
+   "period": "2026 모집 — 기간 원문 확인",
+   "summary": "진로·커리어 개발 프로그램에 참여하며 약 450만원의 장학금을 받는 서울시립대 인재개발실 공모입니다. 모집 공고·붙임 양식을 내려받아 준비하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서울시립대학교"
+   },
+   "documents": [
+    "모집 공고·붙임 양식 (공고 첨부)",
+    "지원서 등 — 원문 확인"
+   ],
+   "duplicable": true,
+   "note": "프로그램 참여형 장학이에요. 첨부(공고·포스터·붙임)를 확인해 준비하세요.",
+   "noForm": "프로그램 참여형 — 붙임 양식(zip) 다운로드 제공, 원문 확인",
+   "attachments": [
+    {
+     "name": "2026학년도 UOS커리어원정대 모집 공고 안내.pdf",
+     "url": "https://www.uos.ac.kr/common/board-download.do?listId=FA1&seq=31041&fSeq=1"
+    },
+    {
+     "name": "포스터.png",
+     "url": "https://www.uos.ac.kr/common/board-download.do?listId=FA1&seq=31041&fSeq=3"
+    },
+    {
+     "name": "붙임파일(1~4).zip",
+     "url": "https://www.uos.ac.kr/common/board-download.do?listId=FA1&seq=31041&fSeq=4"
+    }
+   ],
+   "sourceUrl": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31041&sort=10&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
    "sourceKind": "official"
   }
  ]
