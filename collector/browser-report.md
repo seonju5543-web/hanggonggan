@@ -1,4 +1,4 @@
-## 🖥 브라우저형 수집 리포트 (2026-07-06 16:20 KST)
+## 🖥 브라우저형 수집 리포트 (2026-07-07 01:11 KST)
 
 ### 서울대학교
 - ⚪ 링크 1 · 장학 공고 0 · https://www.snu.ac.kr/snunow/notice/genl
@@ -16,8 +16,8 @@
 - ⚪ 링크 61 · 장학 공고 0 · https://www.sogang.ac.kr/
 
 ### 서울시립대학교
-- ⚪ 링크 280 · 장학 공고 0 · https://www.uos.ac.kr/korNotice/list.do?list_id=FA2
-- ⚪ 링크 279 · 장학 공고 0 · https://www.uos.ac.kr/korNotice/list.do?list_id=FA1
+- ⚪ 링크 0 · 장학 공고 0 · https://www.uos.ac.kr/korNotice/list.do?list_id=FA2
+- ⚪ 링크 278 · 장학 공고 0 · https://www.uos.ac.kr/korNotice/list.do?list_id=FA1
 
 ### 중앙대학교
 - ⚪ 링크 655 · 장학 공고 0 · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100
@@ -36,9 +36,10 @@
 - ✅ 링크 281 · 장학 공고 1 · https://www.dongguk.edu/article/JANGHAKNOTICE/list
 
 ### 한국외국어대학교
-- ✅ 링크 81 · 장학 공고 15 · https://dep.hufs.ac.kr/student/12767/subview.do
-  - [수집] [공통][대출] 2026-2 한국장학재단 학자금 대출 신청 안내 새글
-  - [수집] [공통][대출] 2026-2 농촌출신대학생 학자금대출 신청 안내 새글
+- ✅ 링크 80 · 장학 공고 14 · https://dep.hufs.ac.kr/student/12767/subview.do
+
+### 경희대학교
+- ✅ 링크 291 · 장학 공고 1 · https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318
 
 ---
-이번 실행 신규 수집: **2건** · 브라우저로도 수집 실패한 학교는 게시판 주소 확인이 필요합니다.
+이번 실행 신규 수집: **0건** · 브라우저로도 수집 실패한 학교는 게시판 주소 확인이 필요합니다.
