@@ -58,10 +58,11 @@ async function loadPage(url) {
     }
     /* 클릭형 게시판(행에 onclick만 있는 목록): 장학 키워드가 든 행을 실제로 클릭해
        이동한 상세 주소를 기록한다 — 스크립트 인자를 추측하지 않는 확실한 방법 */
-    // 서로 다른 상세 주소가 3개 미만이면(스크립트 주소가 전부 같은 값으로 뭉개진 경우 포함) 클릭 수집 가동
+    // 진짜(https) 상세 주소가 3개 미만이면 클릭 수집 가동 — javascript: 가짜 주소는 세지 않는다
     const kwAnchors = new Set(links
-      .filter((l) => /장학|학자금/.test(l.title) && /view|View|artcl|ntt/.test(l.url))
+      .filter((l) => /^https?:/.test(l.url) && /장학|학자금/.test(l.title) && /view|View|artcl|ntt/.test(l.url))
       .map((l) => l.url)).size;
+    let clickTried = 0;
     if (kwAnchors < 3) {
       // 클릭 대상: onclick 속성 행 + javascript: 가짜 주소 링크 (학교 게시판 양대 유형)
       const CLICKABLE = '[onclick], a[href^="javascript"]';
@@ -70,6 +71,7 @@ async function loadPage(url) {
         .filter((x) => /장학|학자금/.test(x.t) && x.t.length >= 10 && x.t.length <= 120)
         .slice(0, 10).map((x) => [x.i, x.t])).catch(() => []);
       let ci = 0;
+      clickTried = clickRows.length;
       for (const [idx, title] of clickRows) {
         ci += 1;
         try {
@@ -115,7 +117,7 @@ async function loadPage(url) {
     ).catch(() => []);
     const frameCount = page.frames().length;
     await page.close();
-    return { links, html, textLines, frameCount, clickDetails };
+    return { links, html, textLines, frameCount, clickDetails, clickTried };
   } catch (e) {
     await page.close().catch(() => {});
     return { error: e.message ? e.message.slice(0, 80) : String(e) };
@@ -139,7 +141,7 @@ for (const t of cfg.targets) {
     report.push(`- ${uniq.length ? '✅' : '⚪'} 링크 ${r.links.length} · 장학 공고 ${uniq.length} · ${url}`);
     // 진단: 공고를 거의 못 알아본 게시판은 화면에서 본 것을 남겨 원인 파악을 돕는다
     if (uniq.length <= 1 && r.links.length > 5) {
-      report.push(`  - (프레임 ${r.frameCount || 1}개)`);
+      report.push(`  - (프레임 ${r.frameCount || 1}개 · 클릭 시도 ${r.clickTried || 0}건)`);
       (r.textLines || []).forEach((s) => report.push(`  - (본 글자) ${s.slice(0, 66)}`));
       const sample = [...new Map(r.links
         .filter((l) => l.title.length >= 10 && l.title.length <= 90 && /장학|학자금|\d{4}/.test(l.title))
