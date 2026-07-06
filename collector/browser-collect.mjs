@@ -62,13 +62,15 @@ async function loadPage(url) {
       .filter((l) => /장학|학자금/.test(l.title) && /view|View|artcl|ntt/.test(l.url))
       .map((l) => l.url)).size;
     if (kwAnchors < 3) {
-      const clickRows = await page.$$eval('[onclick]', (els) => els
+      // 클릭 대상: onclick 속성 행 + javascript: 가짜 주소 링크 (학교 게시판 양대 유형)
+      const CLICKABLE = '[onclick], a[href^="javascript"]';
+      const clickRows = await page.$$eval(CLICKABLE, (els) => els
         .map((e, i) => ({ i, t: (e.textContent || '').replace(/\s+/g, ' ').trim() }))
         .filter((x) => /장학|학자금/.test(x.t) && x.t.length >= 10 && x.t.length <= 120)
         .slice(0, 10).map((x) => [x.i, x.t])).catch(() => []);
       for (const [idx, title] of clickRows) {
         try {
-          const els = await page.$$('[onclick]');
+          const els = await page.$$(CLICKABLE);
           if (!els[idx]) continue;
           const popupP = ctx.waitForEvent('page', { timeout: 6000 }).catch(() => null);
           const navP = page.waitForNavigation({ timeout: 6000 }).catch(() => null);
