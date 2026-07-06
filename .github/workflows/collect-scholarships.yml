@@ -2,8 +2,16 @@ name: 장학공고 수집 로봇
 
 on:
   schedule:
-    - cron: '0 0 * * *'   # 매일 09:00 KST
+    # GitHub는 혼잡 시간대(특히 UTC 정각·자정) 예약을 지연·생략할 수 있다 —
+    # 2026-07-06 아침 수집 누락의 원인. 홀수 분으로 하루 2회(아침+낮 백업) 예약.
+    # 중복 실행은 seen.json이 걸러서 무해 (0건이면 이슈 코멘트만 남음).
+    - cron: '41 22 * * *'   # 매일 07:41 KST
+    - cron: '41 2 * * *'    # 매일 11:41 KST (아침 실행이 생략됐을 때 백업)
   workflow_dispatch:
+  push:
+    branches: ['claude/nice-heisenberg-WESq5']
+    paths:
+      - 'collector/run-collect.txt'   # 이 파일을 수정해 push하면 즉시 수집 (push-to-run)
 
 permissions:
   contents: write

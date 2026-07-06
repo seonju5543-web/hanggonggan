@@ -2,7 +2,9 @@ name: 브라우저형 수집 로봇
 
 on:
   schedule:
-    - cron: '20 0 * * *'   # 매일 09:20 KST (일반 수집 후)
+    # UTC 자정 부근 혼잡 슬롯은 예약이 생략될 수 있어(2026-07-06 누락) 홀수 분 2회로 분산
+    - cron: '7 23 * * *'   # 매일 08:07 KST
+    - cron: '7 3 * * *'    # 매일 12:07 KST (아침 실행이 생략됐을 때 백업)
   workflow_dispatch:
   push:
     branches: ['claude/nice-heisenberg-WESq5']
