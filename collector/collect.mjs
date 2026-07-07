@@ -93,7 +93,7 @@ for (const s of cfg.schools) {
     const items = extractLinks(html, s.boardUrl)
       .filter((i) => KEYWORDS.test(i.title))
       .filter((i) => !MENU_NOISE.test(i.title)); // 메뉴성 링크 제외, 실공고 위주
-    const fresh = items.filter((i) => !seen[i.url]).slice(0, 25);
+    const fresh = items.filter((i) => !seen[i.url]).slice(0, 40);
 
     // 상세 페이지 방문: 첨부양식·마감 단서 수집
     for (const it of fresh) {
@@ -127,7 +127,7 @@ const perSchool = {};
 notices.items = notices.items.filter((n) => {
   const k = n.school + '|' + (n.campus || '');
   perSchool[k] = (perSchool[k] || 0) + 1;
-  return perSchool[k] <= 30;
+  return perSchool[k] <= 40;
 }).slice(0, 200);
 notices.updatedAt = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
 fs.mkdirSync(new URL('../data/', HERE), { recursive: true });
