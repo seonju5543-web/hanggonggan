@@ -69,11 +69,15 @@ async function loadPage(url) {
       const clickRows = await page.$$eval(CLICKABLE, (els) => els
         .map((e, i) => ({ i, t: (e.textContent || '').replace(/\s+/g, ' ').trim() }))
         .filter((x) => /장학|학자금/.test(x.t) && x.t.length >= 10 && x.t.length <= 120)
-        .slice(0, 25).map((x) => [x.i, x.t])).catch(() => []);
+        .slice(0, 40).map((x) => [x.i, x.t])).catch(() => []);
       let ci = 0;
       clickTried = clickRows.length;
       const usedUrls = new Set(); // 상세 주소가 전부 같은 게시판(내부 전송형) 대응
+      // 선조치: 클릭 수집은 행마다 클릭·대기가 있어 40건이면 오래 걸릴 수 있다.
+      // 게시판당 클릭 예산(180초)을 두어 초과하면 그때까지 채집분만 남기고 넘어간다(런 전체 지연 방지).
+      const clickBudgetMs = 180000; const clickStart = Date.now();
       for (const [idx, title] of clickRows) {
+        if (Date.now() - clickStart > clickBudgetMs) { report.push(`  - (클릭 예산 초과 — ${ci}/${clickRows.length}건까지 채집)`); break; }
         ci += 1;
         try {
           const els = await page.$$(CLICKABLE);
@@ -158,7 +162,7 @@ for (const t of cfg.targets) {
     if (!uniq.length || harvested) continue;
 
     harvested = true;
-    const fresh = uniq.filter((i) => !seen[i.url]).slice(0, 25);
+    const fresh = uniq.filter((i) => !seen[i.url]).slice(0, 40);
     for (const it of fresh) {
       let deadlineHint = null;
       let attachments = [];
@@ -204,7 +208,7 @@ const perSchool = {};
 notices.items = notices.items.filter((n) => {
   const k = n.school + '|' + (n.campus || '');
   perSchool[k] = (perSchool[k] || 0) + 1;
-  return perSchool[k] <= 30;
+  return perSchool[k] <= 40;
 }).slice(0, 200);
 notices.updatedAt = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
 fs.writeFileSync(seenPath, JSON.stringify(seen, null, 1));
