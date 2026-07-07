@@ -433,15 +433,14 @@
    "period": "재공고 — 기간 원문 확인",
    "summary": "제주 지역 연고 학생을 지원하는 미래이음 장학금의 재공고입니다. 자격·기간은 첨부된 모집 계획에서 확인하세요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "홍익대학교"
+    "selective": true
    },
    "documents": [
     "신청 제출(구비) 서류 (공고 첨부 압축파일)",
     "제출 서류 전체는 원문 공고에서 확인"
    ],
    "duplicable": true,
-   "note": "제주 출신·거주 요건이 있을 수 있어요 — 원문 공고에서 확인하세요.",
+   "note": "제주 연고(제주 출신·거주 등) 요건이 있어요 — 해당 여부를 원문 공고에서 꼭 확인하세요. 학교 무관 전국 대상.",
    "sourceUrl": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=153770&article.offset=0&articleLimit=10&noCat=501",
    "attachments": [
     {
