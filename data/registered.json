@@ -1370,23 +1370,23 @@
    ],
    "duplicable": true,
    "note": "장애 학생 대상 재단 장학금이에요. 첨부 신청서(hwp)를 내려받아 작성하세요. 마감(~7/14 09:00) 임박.",
-   "noForm": "지원신청서 hwp 다운로드 제공 — 스키마화 예정(다음 수집분에서 반영)",
    "attachments": [
     {
      "name": "붙임1. 2026년도 쌍용곰두리장학생 지원신청 안내.pdf",
-     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138255&attachNo=1"
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138255&attachNo=115748"
     },
     {
-     "name": "붙임2. 2026년도 쌍용곰두리장학생 지원신청서 및 개인정보제공동의서.hwp",
-     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138255&attachNo=2"
+     "name": "붙임2. 지원신청서 및 개인정보제공동의서.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138255&attachNo=115749"
     },
     {
-     "name": "붙임3. 2026년도 쌍용곰두리장학생 FAQ.hwp",
-     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138255&attachNo=3"
+     "name": "붙임3. FAQ.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138255&attachNo=115750"
     }
    ],
    "sourceUrl": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=138255&article.offset=0&articleLimit=10",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "formId": "gomduri-apply"
   },
   {
    "id": "reg-kw-gomduri",
