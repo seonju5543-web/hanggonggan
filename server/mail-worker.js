@@ -30,9 +30,11 @@ export default {
     const { to, subject, text, replyTo, attachments } = await req.json();
     if (!to || !subject || !text) return new Response('bad request', { status: 400, headers: cors });
 
-    /* 남용 방지 ② — 수신자는 학교(.ac.kr)·장학재단 등 접수처 도메인만 (스팸 릴레이 차단) */
-    const ALLOWED_TO = /@([a-z0-9-]+\.)*(ac\.kr|or\.kr|go\.kr|re\.kr)$/i;
-    if (typeof to !== 'string' || !ALLOWED_TO.test(to.trim())) {
+    /* 남용 방지 ② — 수신자는 학교(.ac.kr)·장학재단 등 접수처 도메인만 (스팸 릴레이 차단).
+       검사한 값(trim)과 실제 전송 값을 일치시켜 공백·개행이 낀 우회를 막는다. */
+    const ALLOWED_TO = /^[^\s@]+@([a-z0-9-]+\.)*(ac\.kr|or\.kr|go\.kr|re\.kr)$/i;
+    const toClean = typeof to === 'string' ? to.trim() : '';
+    if (!ALLOWED_TO.test(toClean)) {
       return new Response('recipient not allowed', { status: 403, headers: cors });
     }
 
@@ -51,7 +53,7 @@ export default {
       headers: { Authorization: `Bearer ${env.RESEND_KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         from: '한대장 접수대행 <apply@handaejang.app>', // Resend에서 발신 도메인 인증 필요
-        to: [to],
+        to: [toClean],
         reply_to: replyTo,
         subject,
         text,

@@ -242,6 +242,18 @@ function esc(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+/* 외부 링크 안전화 — http(s)·mailto만 허용한다. 수집 로봇이 받아 온 데이터가 오염되거나
+   정식 등록에 오타가 있어도 javascript:·data: 같은 위험한 스킴이 href나 window.open으로
+   들어가지 못하게 막는 2차 방어선(CSP가 뚫리거나 완화돼도 안전). 허용 안 되면 빈 문자열. */
+function safeUrl(u) {
+  if (!u) return '';
+  try {
+    const parsed = new URL(String(u), location.origin);
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:' || parsed.protocol === 'mailto:') return parsed.href;
+  } catch (e) { /* 잘못된 URL */ }
+  return '';
+}
+
 /* ---------------- 서류 보관함 (기기 내 저장 · 브라우저 내장 금고) ----------------
    파일은 서버로 전송되지 않고 사용자 기기 안에만 저장된다. */
 let walletCache = {}; // slot -> { name, type, savedAt }
@@ -297,25 +309,43 @@ function docWalletStatus(doc) {
 function attachAutocomplete(input, getItems) {
   const list = input.parentElement.querySelector('.ac-list');
   let items = [];
-  const close = () => { list.hidden = true; };
+  let sel = -1; // 키보드로 하이라이트한 항목
+  const close = () => { list.hidden = true; sel = -1; };
+  const highlight = () => {
+    Array.from(list.querySelectorAll('.ac-item')).forEach((b, i) => b.classList.toggle('ac-active', i === sel));
+    if (sel >= 0) { const el = list.children[sel]; if (el) el.scrollIntoView({ block: 'nearest' }); }
+  };
+  const pick = (i) => {
+    if (i < 0 || i >= items.length) return;
+    input.value = items[i];
+    close();
+    input.dispatchEvent(new Event('change'));
+  };
   const render = () => {
     items = getItems(input.value.trim()).slice(0, 6);
+    sel = -1;
     if (!items.length) { close(); return; }
     list.innerHTML = items.map((it, i) =>
-      `<button type="button" class="ac-item" data-i="${i}">${esc(it)}</button>`).join('');
+      `<button type="button" class="ac-item" role="option" data-i="${i}">${esc(it)}</button>`).join('');
     list.hidden = false;
   };
   input.addEventListener('input', render);
   input.addEventListener('focus', render);
+  // 키보드 접근성: ↑/↓ 이동, Enter 선택, Esc 닫기 (데스크톱·보조기기 지원)
+  input.addEventListener('keydown', (e) => {
+    if (list.hidden || !items.length) return;
+    if (e.key === 'ArrowDown') { e.preventDefault(); sel = (sel + 1) % items.length; highlight(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); sel = (sel - 1 + items.length) % items.length; highlight(); }
+    else if (e.key === 'Enter' && sel >= 0) { e.preventDefault(); pick(sel); }
+    else if (e.key === 'Escape') { close(); }
+  });
   // mousedown/touchstart는 blur보다 먼저 발생 → 클릭이 씹히지 않음
   ['mousedown', 'touchstart'].forEach((ev) =>
     list.addEventListener(ev, (e) => {
       const b = e.target.closest('.ac-item');
       if (!b) return;
       e.preventDefault();
-      input.value = items[Number(b.dataset.i)];
-      close();
-      input.dispatchEvent(new Event('change'));
+      pick(Number(b.dataset.i));
     })
   );
   input.addEventListener('blur', () => setTimeout(close, 150));
@@ -829,7 +859,7 @@ function liveNoticesHtml() {
     return head + `<p class="empty" style="margin-bottom:16px">아직 ${esc(p.school)} 게시판이 연결 전이거나 새 공고가 없어요.<br />연결되면 실제 공고가 여기에 자동으로 떠요.</p>`;
   }
   return head + `<div class="card-list" style="margin-bottom:18px">` + mine.map((n) => `
-    <a class="sch-card notice-card" href="${esc(n.url)}" target="_blank" rel="noopener">
+    <a class="sch-card notice-card" href="${esc(safeUrl(n.url))}" target="_blank" rel="noopener">
       <div class="sch-top">
         <span class="badge badge-in">교내 공고</span>
         ${n.deadlineHint ? `<span class="badge badge-dday urgent">⏰</span>` : ''}
@@ -1013,9 +1043,9 @@ function openDetail(id) {
       ${(sch.attachments && sch.attachments.length) ? `
       <h4>공고 원본 첨부 양식</h4>
       <ul class="doc-list">
-        ${sch.attachments.map((a) => `<li>📎 <a href="${esc(a.url)}" target="_blank" rel="noopener" style="color:var(--primary)">${esc(a.name)}</a></li>`).join('')}
+        ${sch.attachments.map((a) => `<li>📎 <a href="${esc(safeUrl(a.url))}" target="_blank" rel="noopener" style="color:var(--primary)">${esc(a.name)}</a></li>`).join('')}
       </ul>` : ''}
-      <p class="sheet-deadline">${sch.program ? '신청 기간: 한국장학재단 공지 확인' : `마감일 ${sch.deadline || '원문 공고 확인'}`} · ${sch.duplicable ? '타 장학금과 중복 수혜 가능' : '중복 수혜 제한 있음'}${sch.sourceUrl ? ` · <a href="${sch.sourceUrl}" target="_blank" rel="noopener" style="color:var(--primary);font-weight:700">${sch.program ? '한국장학재단 ↗' : '원문 공고 ↗'}</a>` : ''}</p>
+      <p class="sheet-deadline">${sch.program ? '신청 기간: 한국장학재단 공지 확인' : `마감일 ${sch.deadline || '원문 공고 확인'}`} · ${sch.duplicable ? '타 장학금과 중복 수혜 가능' : '중복 수혜 제한 있음'}${sch.sourceUrl ? ` · <a href="${esc(safeUrl(sch.sourceUrl))}" target="_blank" rel="noopener" style="color:var(--primary);font-weight:700">${sch.program ? '한국장학재단 ↗' : '원문 공고 ↗'}</a>` : ''}</p>
 
       ${app && !app.pending ? (() => {
         const step = effectiveStep(app, sch);
@@ -1027,7 +1057,7 @@ function openDetail(id) {
               <span class="ap-dot"></span><span class="ap-label">${s}</span>
             </div>`).join('')}
         </div>
-        <p class="applied-at">${app.appliedAt} 준비 완료 · 최종 제출처: ${ch.url ? `<a href="${ch.url}" target="_blank" rel="noopener">${ch.label}</a>` : ch.label}</p>
+        <p class="applied-at">${app.appliedAt} 준비 완료 · 최종 제출처: ${ch.url ? `<a href="${esc(safeUrl(ch.url))}" target="_blank" rel="noopener">${esc(ch.label)}</a>` : esc(ch.label)}</p>
         ${step === 0 ? `
           <button class="btn btn-outline" id="btn-mark-submitted" style="width:100%;margin-bottom:6px">✅ 공식 제출을 마쳤어요 — 제출 완료로 기록</button>
           <p class="dp-note">최종 제출은 ${ch.label}에서 이루어져요. 제출을 마친 뒤 눌러 주시면 진행 단계가 넘어가요.</p>` : ''}
@@ -1096,7 +1126,7 @@ function openDetail(id) {
   const goBtn = $('#btn-go-submit');
   if (goBtn) goBtn.addEventListener('click', () => {
     copyText(buildSubmissionText(sch, app));
-    const url = ch.url || sch.sourceUrl;
+    const url = safeUrl(ch.url || sch.sourceUrl);
     if (url) window.open(url, '_blank', 'noopener');
   });
   if (app && app.formAns && sch.formId) {

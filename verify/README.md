@@ -15,7 +15,16 @@ node verify-registered.js   # 정식 등록 검증: 성균관 프로필→등록
 node verify-new-forms.js    # 신규 양식 5종: 스키마 렌더링 + 삼일·명지 UI 문서 생성
 node verify-forms-data.js   # 데이터 주도 양식: forms.json에만 더미 양식을 넣은 앱 복사본(8124 포트)으로 검증
 node audit-data.js          # 소급 감사: 기존 데이터 전체가 현재 엔진 기준을 충족하는지 (엔진 변경 후 필수)
+node personas.js            # 페르소나 스윕: 120종 사용자 조합으로 홈·탐색·상세를 훑어 크래시·빈 상태·콘솔 오류 탐지
 ```
+
+## 개발자 도우미 (서버 불필요 — data/*.json만 읽음)
+
+```bash
+node verify/list-unregistered.js         # 수집됐지만 미등록인 공고를 학교별로 추림 (컨펌 대상 후보)
+node verify/list-unregistered.js --all    # 제외분(중복·메뉴·대출·행사·마감경과) 사유까지 전부 표시
+```
+정식 등록 컨펌 작업을 시작할 때 먼저 실행하면, 124건 피드에서 실제 등록 후보만 골라준다.
 
 `verify-forms-data.js` 사전 준비: 저장소를 스크래치 폴더에 복사 → 복사본의 data/forms.json에
 더미 양식(test-dummy) 추가 + registered.json 한 항목에 formId 연결 → 복사본 루트에서 8124 포트로 서빙.

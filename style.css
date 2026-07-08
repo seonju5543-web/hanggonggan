@@ -279,7 +279,7 @@ input::placeholder { color: var(--text-weak); }
   transition: background 0.12s;
 }
 .ac-item:last-child { border-bottom: none; }
-.ac-item:hover, .ac-item:active { background: var(--primary-weak); color: var(--primary); }
+.ac-item:hover, .ac-item:active, .ac-item.ac-active { background: var(--primary-weak); color: var(--primary); }
 
 /* ---------------- 홈 ---------------- */
 .home-header {

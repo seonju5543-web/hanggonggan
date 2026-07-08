@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-07-07",
+ "updatedAt": "2026-07-08",
  "items": [
   {
    "id": "reg-skku-samil",
@@ -1415,6 +1415,33 @@
    "attachments": [],
    "sourceUrl": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52845&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "sourceKind": "official"
+  },
+  {
+   "id": "reg-cau-bogun-multi",
+   "name": "보건장학회 다문화가정 장학생 (중앙대 접수)",
+   "type": "교외",
+   "provider": "재단법인 보건장학회 (중앙대 접수)",
+   "amount": "장학금 (세부 원문 확인)",
+   "amountValue": 2000000,
+   "deadline": null,
+   "period": "2026-2학기 접수 — 재단 도착분 마감(원문 확인)",
+   "summary": "재단법인 보건장학회가 다문화가정 대학생을 선발하는 장학금의 중앙대 접수분입니다. 다문화가정·보건계열 등 세부 자격은 원문 공고에서 확인하세요. 신청서를 앱에서 원본과 동일한 구조로 작성할 수 있어요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "중앙대학교"
+   },
+   "documents": [
+    "지원자용 제출 서류 (학과장 추천 필수, 앱에서 실제 양식 작성)",
+    "가족관계증명서 (상세)",
+    "직인 날인된 성적증명서",
+    "제출 서류 전체는 원문 공고에서 확인"
+   ],
+   "duplicable": false,
+   "note": "중앙대 학교 접수분이에요. 다문화가정 요건·접수 마감(재단 도착분 기준)은 원문 공고에서 확인하세요. 재단 양식은 대학 공통이라 앱에서 그대로 작성돼요.",
+   "sourceUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BBS_SEQ=29992&pageNo=1",
+   "attachments": [],
+   "sourceKind": "official",
+   "formId": "bogun-multi-apply"
   }
  ]
 }
