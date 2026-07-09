@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-07-08",
+ "updatedAt": "2026-07-09",
  "items": [
   {
    "id": "reg-skku-samil",
@@ -1442,6 +1442,316 @@
    "attachments": [],
    "sourceKind": "official",
    "formId": "bogun-multi-apply"
+  },
+  {
+   "id": "reg-cau-gomduri",
+   "name": "쌍용곰두리장학생 (중앙대 접수)",
+   "type": "교외",
+   "provider": "한국장애인개발원 (중앙대 접수)",
+   "amount": "장학금 (세부 원문 확인)",
+   "amountValue": 2000000,
+   "deadline": null,
+   "period": "2026-2학기 접수 — 재단 도착분 마감(원문 확인)",
+   "summary": "한국장애인개발원이 장애 대학생을 지원하는 쌍용곰두리장학금의 중앙대 접수분입니다. 지원신청서를 앱에서 원본과 동일한 구조로 작성할 수 있어요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "중앙대학교",
+    "flagsAny": [
+     "disabled"
+    ]
+   },
+   "documents": [
+    "지원신청서 및 개인정보동의서 (앱에서 실제 양식 작성)",
+    "장애 증빙 (원문 확인)"
+   ],
+   "duplicable": true,
+   "note": "장애 학생 대상 재단 장학금이에요. 중앙대 접수분 — 재단 도착 마감(29일 도착분 기준)은 원문 공고에서 확인하세요.",
+   "sourceUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&BOARD_SEQ=4&BBS_SEQ=29996&pageNo=1",
+   "attachments": [],
+   "sourceKind": "official",
+   "formId": "gomduri-apply"
+  },
+  {
+   "id": "reg-dg-gomduri",
+   "name": "쌍용곰두리장학생 (동국대 접수)",
+   "type": "교외",
+   "provider": "한국장애인개발원 (동국대 접수)",
+   "amount": "장학금 (세부 원문 확인)",
+   "amountValue": 2000000,
+   "deadline": "2026-07-20",
+   "period": "접수 ~2026.7.20(월) 17시까지",
+   "summary": "한국장애인개발원이 장애 대학생을 지원하는 쌍용곰두리장학금의 동국대 접수분입니다. 지원신청서를 앱에서 원본과 동일한 구조로 작성할 수 있어요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "동국대학교",
+    "flagsAny": [
+     "disabled"
+    ]
+   },
+   "documents": [
+    "지원신청서 및 개인정보동의서 (앱에서 실제 양식 작성)",
+    "장애 증빙 (원문 확인)"
+   ],
+   "duplicable": true,
+   "note": "장애 학생 대상 재단 장학금이에요. 동국대 본관 접수, 접수 마감 ~7/20 17시(기한엄수). 세부는 원문 공고 확인.",
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/list",
+   "attachments": [],
+   "sourceKind": "official",
+   "formId": "gomduri-apply"
+  },
+  {
+   "id": "reg-hufs-gomduri",
+   "name": "쌍용곰두리장학생 (한국외대 접수)",
+   "type": "교외",
+   "provider": "한국장애인개발원 (한국외대 접수)",
+   "amount": "장학금 (세부 원문 확인)",
+   "amountValue": 2000000,
+   "deadline": "2026-07-27",
+   "period": "접수 2026.7.8(수) ~ 7.27(월)",
+   "summary": "한국장애인개발원이 장애 대학생을 지원하는 쌍용곰두리장학금의 한국외대 접수분입니다. 지원신청서를 앱에서 원본과 동일한 구조로 작성할 수 있어요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교",
+    "flagsAny": [
+     "disabled"
+    ]
+   },
+   "documents": [
+    "지원신청서 및 개인정보제공동의서 (앱에서 실제 양식 작성)",
+    "장애 증빙 (원문 확인)"
+   ],
+   "duplicable": true,
+   "note": "장애 학생 대상 재단 장학금이에요. 접수 ~7/27. 붙임 안내·FAQ 원본을 함께 확인하세요.",
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/259439/artclView.do",
+   "attachments": [
+    {
+     "name": "붙임1. 2026년도 쌍용곰두리장학생 지원신청 안내.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/145206/download.do"
+    },
+    {
+     "name": "붙임3. 2026년도 쌍용곰두리장학생 FAQ.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/145208/download.do"
+    }
+   ],
+   "sourceKind": "official",
+   "formId": "gomduri-apply"
+  },
+  {
+   "id": "reg-skku-lotte",
+   "name": "롯데장학재단 롯데장학관 신규 입주생 (성균관대)",
+   "type": "교내",
+   "provider": "롯데장학재단 (성균관대)",
+   "amount": "롯데장학관 입주 지원 (주거비 지원)",
+   "amountValue": 3000000,
+   "deadline": "2026-07-10",
+   "period": "신청 ~2026.7.10(목) 09:00까지",
+   "summary": "롯데장학재단이 운영하는 롯데장학관(생활관) 신규 입주생을 모집합니다. 주거비 부담을 크게 덜 수 있는 기숙 지원이에요. 입소지원서·개인정보동의서(워드 양식)를 내려받아 작성하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "성균관대학교"
+   },
+   "documents": [
+    "입소지원서 (워드 양식 다운로드)",
+    "개인정보 동의서 (워드 양식 다운로드)",
+    "자격 증빙 (원문 확인)"
+   ],
+   "duplicable": true,
+   "note": "장학관(생활관) 입주 지원이에요. 신청 마감 ~7/10 09:00. 지원서는 워드(.docx) 양식이라 내려받아 작성 후 제출하세요.",
+   "noForm": "입소지원서·동의서(docx) 다운로드 제공 — 워드 양식이라 앱 스키마 미대상",
+   "sourceUrl": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=138128&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "입소지원서 양식(이름).docx",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138128&attachNo=115631"
+    },
+    {
+     "name": "개인정보동의서(이름).docx",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138128&attachNo=115632"
+    }
+   ],
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-skku-sanhak-didim",
+   "name": "산학협동재단 디딤돌 장학생 (성균관대, 1학년)",
+   "type": "교외",
+   "provider": "산학협동재단 (성균관대 추천)",
+   "amount": "장학금 (세부 원문 확인)",
+   "amountValue": 2500000,
+   "deadline": "2026-07-12",
+   "period": "신청 2026.7.8(수) 09:00 ~ 7.12(일) · GLS 신청 (연장)",
+   "summary": "산학협동재단이 1학년 대학생을 지원하는 디딤돌 장학금입니다(신청기간 연장). 신청서류 양식(HWP)을 내려받아 작성해 GLS로 신청하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "성균관대학교",
+    "years": [
+     1
+    ]
+   },
+   "documents": [
+    "산학재단 디딤돌 장학생 신청서류 양식 (공고 첨부 HWP)",
+    "결격사유·의무사항 확인",
+    "제출 서류 전체는 원문 공고 확인"
+   ],
+   "duplicable": true,
+   "note": "1학년 대상이에요(신청기간 연장 ~7/12). GLS로 신청, 신청서류 양식은 원문 첨부(HWP)를 내려받아 작성하세요.",
+   "noForm": "원문 첨부 신청서 양식(HWP) — deep-fetch로 원본 확보 후 앱 스키마화 예정(2026-07-08). 현재는 첨부 원본을 내려받아 작성",
+   "sourceUrl": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=138131&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "산학재단 디딤돌 장학생 신청서류 양식.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138131&attachNo=115637"
+    }
+   ],
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-hufs-namjung",
+   "name": "남정장학재단 장학생 (한국외대)",
+   "type": "교외",
+   "provider": "남정장학재단 (한국외대 추천)",
+   "amount": "장학금 (세부 원문 확인)",
+   "amountValue": 2000000,
+   "deadline": "2026-07-14",
+   "period": "신청 ~2026.7.14(화) 13시까지 (방문접수)",
+   "summary": "남정장학재단이 한국외대 재학생을 대상으로 선발하는 교외 장학금입니다. 신청서·추천서·개인정보 동의서(HWP)를 내려받아 작성해 방문 접수하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교"
+   },
+   "documents": [
+    "남정장학재단 신청서 (공고 첨부 HWP)",
+    "추천서 (공고 첨부 HWP)",
+    "개인정보 수집·이용·제공 동의서 (공고 첨부 HWP)"
+   ],
+   "duplicable": true,
+   "note": "방문접수예요. 마감 ~7/14 13시. 신청서·추천서·동의서 원본(HWP)을 내려받아 작성하세요.",
+   "noForm": "원문 첨부 신청서 양식(HWP) — deep-fetch로 원본 확보 후 앱 스키마화 예정(2026-07-08). 현재는 첨부 원본을 내려받아 작성",
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/259415/artclView.do",
+   "attachments": [
+    {
+     "name": "2026-2학기 남정장학재단 신청서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/145196/download.do"
+    },
+    {
+     "name": "2026-2학기 남정장학재단 추천서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/145197/download.do"
+    },
+    {
+     "name": "개인정보 수집·이용·제공 동의서(양식).hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/145198/download.do"
+    }
+   ],
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-hufs-yuheungsu",
+   "name": "유흥수 장학금 (한국외대 융합일본지역학부)",
+   "type": "교외",
+   "provider": "유흥수 장학재단 (한국외대)",
+   "amount": "장학금 (세부 원문 확인)",
+   "amountValue": 2000000,
+   "deadline": null,
+   "period": "2026-2학기 선발 (1차 선발 8월 — 접수 기간 원문 확인)",
+   "summary": "한국외대 융합일본지역학부 재학생을 대상으로 하는 교외 장학금입니다. 대상 학부가 한정되어 있으니 원문 공고에서 자격·접수 방법을 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교"
+   },
+   "documents": [
+    "신청 서류·접수 방법은 원문 공고 확인"
+   ],
+   "duplicable": true,
+   "note": "융합일본지역학부 재학생 대상 장학금이에요. 접수 기간·신청서는 원문 공고에서 확인하세요(1차 선발 8월).",
+   "noForm": "융합일본지역학부 재학생 한정 — 신청서·접수 방법은 원문 공고 확인(2026-07-08)",
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/259399/artclView.do",
+   "attachments": [],
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-hufs-gosi",
+   "name": "고시장학금 (한국외대 교내)",
+   "type": "교내",
+   "provider": "한국외국어대학교",
+   "amount": "고시장학금 (세부 원문 확인)",
+   "amountValue": 1500000,
+   "deadline": "2026-07-31",
+   "period": "신청 2026.7.9(목) 10:00 ~ 7.31(금) 14:00",
+   "summary": "각종 국가고시·전문자격 시험을 준비하는 한국외대 재학생을 위한 교내 고시장학금입니다. 장학금 신청서(HWP)를 내려받아 작성해 신청하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교"
+   },
+   "documents": [
+    "장학금 신청서 (공고 첨부 HWP 서식)",
+    "고시 준비 증빙 (원문 확인)"
+   ],
+   "duplicable": false,
+   "note": "고시·전문자격 준비생 대상 교내 장학이에요. 신청 7/9~7/31. 신청서 서식(HWP)을 내려받아 작성하세요.",
+   "noForm": "원문 첨부 신청서 양식(HWP) — deep-fetch로 원본 확보 후 앱 스키마화 예정(2026-07-08). 현재는 첨부 원본을 내려받아 작성",
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/259474/artclView.do",
+   "attachments": [
+    {
+     "name": "(서식)장학금신청서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/145226/download.do"
+    }
+   ],
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-hufs-myeonhak",
+   "name": "면학장학금 (한국외대 교내)",
+   "type": "교내",
+   "provider": "한국외국어대학교",
+   "amount": "면학장학금 (세부 원문 확인)",
+   "amountValue": 1000000,
+   "deadline": null,
+   "period": "2026-2학기 신청 (기간 원문 확인)",
+   "summary": "한국외대 교내 면학장학금입니다. 종합정보시스템(포털)에서 신청하는 방식이라 앱에서 작성할 신청서 양식은 없어요. 자격·기간은 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교"
+   },
+   "documents": [
+    "종합정보시스템(포털)에서 온라인 신청",
+    "세부 서류는 원문 공고 확인"
+   ],
+   "duplicable": false,
+   "note": "종합정보시스템 로그인 → 등록/장학정보 → 면학장학 신청. 자격·기간·금액은 원문 공고에서 확인하세요.",
+   "noForm": "종합정보시스템(포털) 입력형 — 채울 신청서 양식 없음(2026-07-08). 신청 방법은 원문 공고 확인",
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/259473/artclView.do",
+   "attachments": [],
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-uos-module",
+   "name": "차세대통신혁신융합대학 성적우수 장학금 (마이크로디그리)",
+   "type": "교내",
+   "provider": "서울시립대학교 차세대통신혁신융합대학사업단",
+   "amount": "성적우수 장학금 (세부 원문 확인)",
+   "amountValue": 1000000,
+   "deadline": null,
+   "period": "2026-1학기 성과형 장학 신청 (마감 원문 확인)",
+   "summary": "서울시립대 차세대통신혁신융합대학사업단의 마이크로디그리(모듈형 교육과정) 우수 이수생을 위한 성적우수 장학금입니다. 사업단 참여·이수생 대상이니 원문에서 자격을 확인하세요. 신청서(HWP)를 내려받아 작성하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서울시립대학교"
+   },
+   "documents": [
+    "장학금 신청서 (붙임2 HWP 양식)",
+    "마이크로디그리 이수 증빙 (원문 확인)"
+   ],
+   "duplicable": true,
+   "note": "차세대통신혁신융합대학사업단 마이크로디그리 이수생 대상이에요. 신청서 양식(붙임2 HWP)을 내려받아 작성하세요. 마감은 원문 확인.",
+   "noForm": "원문 첨부 신청서 양식(HWP) — deep-fetch로 원본 확보 후 앱 스키마화 예정(2026-07-08). 현재는 첨부 원본을 내려받아 작성",
+   "sourceUrl": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=30932&menuid=2000005009002000000",
+   "attachments": [
+    {
+     "name": "붙임2 마이크로디그리 우수 이수 장학금 신청서_양식.hwp",
+     "url": "https://www.uos.ac.kr/common/board-download.do?listId=FA1&seq=30932&fSeq=2"
+    }
+   ],
+   "sourceKind": "official"
   }
  ]
 }
