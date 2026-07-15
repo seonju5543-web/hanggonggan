@@ -42,13 +42,13 @@ const SHOT = (n) => `${__dirname}/shot-${n}.png`;
   const regCards = cards.filter((c) => /조병두|삼일|보건|산학협동|청년창업농/.test(c));
   console.log('explore total cards:', cards.length, '| SKKU registered visible:', regCards.length);
   regCards.forEach((c) => console.log('  •', c));
-  // 광운대 정식 등록 공고의 실제 제목으로만 검사 (교내 템플릿 샘플 '보훈·복지 장학금'과 구분)
-  const kwLeak = cards.filter((c) => /호반 이노베이션|보훈장학금 신청|종근당고촌/.test(c));
-  console.log('타 학교(광운) 공고 미노출 확인:', kwLeak.length === 0 ? 'OK' : 'LEAK! ' + kwLeak);
+  // 광운대 '학교한정' 공고가 새어나오지 않는지 검사 (호반은 전국 승격돼 정상 노출 → 카나리에서 제외)
+  const kwLeak = cards.filter((c) => /보훈장학금 신청|종근당고촌|화도·동해/.test(c));
+  console.log('타 학교(광운 학교한정) 공고 미노출 확인:', kwLeak.length === 0 ? 'OK' : 'LEAK! ' + kwLeak);
   await page.screenshot({ path: SHOT('30-explore-registered') });
 
-  // 조병두 상세: 첨부 양식 링크 + 마감 배지
-  await page.click('[data-detail="reg-skku-jobyungdu"]');
+  // 조병두 상세: 첨부 양식 링크 + 마감 배지 (홈 마감임박 목록에도 같은 카드가 있어 explore로 범위 한정)
+  await page.click('#explore-list [data-detail="reg-skku-jobyungdu"]');
   await page.waitForSelector('#detail-sheet.show');
   await page.waitForTimeout(400);
   const badge = await page.$eval('#detail-sheet .badge-dday', (el) => el.textContent);

@@ -294,11 +294,19 @@ const SUBMIT_GUIDES = {
   ],
 };
 
-/* 접수 채널 분류 — 실제 공고의 접수 방식 4종 (정직 표기: 앱이 대신 못 누르는 채널은 명시) */
+/* 첨부에 실제 신청서·양식 파일(HWP/DOC/HWPX/ZIP)이 있는지 — '원본 양식 다운로드형' 판별 */
+function hasFormAttachment(sch) {
+  return (sch.attachments || []).some((a) =>
+    /신청서|지원서|양식|서식|서류/.test(a.name) && /\.(hwp|hwpx|docx?|zip)/i.test(a.name));
+}
+
+/* 접수 채널 분류 — 실제 공고의 접수 방식 (정직 표기: 앱이 대신 못 누르는 채널은 명시).
+   앱 내 작성(formId) > 원본 양식 다운로드(첨부 양식 有) > 포털 입력 순으로 정확히 안내한다. */
 function submitChannelLabel(sch) {
   if (sch.applyEmail) return '📧 이메일 접수 — 앱에서 메일 자동 완성';
   if (sch.program || /한국장학재단/.test(sch.provider || '')) return '🏛 한국장학재단 — 본인 인증 후 직접 신청';
   if (sch.formId) return '📄 양식 제출형 — 앱에서 원본 양식 작성';
+  if (hasFormAttachment(sch)) return '📎 원본 양식 다운로드형 — 첨부 양식을 내려받아 작성';
   return '🖥 온라인·포털 입력형 — 복사해서 붙여넣기';
 }
 
