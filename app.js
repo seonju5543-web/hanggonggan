@@ -150,7 +150,9 @@ function deadlineTs(sch) {
 
 function dday(dateStr) {
   if (!dateStr) return { label: '기한 원문 확인', cls: '', days: 14 }; // 마감을 확정 못 한 공고 — 목록에 유지
-  const d = Math.ceil((new Date(dateStr + 'T23:59:59') - TODAY) / 86400000);
+  // 날짜끼리 비교해야 마감 다음 날 새벽에 D-DAY로 잘못 뜨지 않는다 (마감 당일=D-DAY, 지난 날=마감)
+  const startOfToday = new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate());
+  const d = Math.round((new Date(dateStr + 'T00:00:00') - startOfToday) / 86400000);
   if (d < 0) return { label: '마감', cls: 'closed', days: d };
   if (d === 0) return { label: 'D-DAY', cls: 'urgent', days: d };
   if (d <= 7) return { label: `D-${d}`, cls: 'urgent', days: d };
@@ -499,6 +501,7 @@ function schCard(sch, result, { compact = false, fit = 0 } = {}) {
       <div class="sch-top">
         <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${sch.type}</span>
         ${sch.program ? '<span class="badge badge-program">상시 제도</span>' : `<span class="badge badge-dday ${d.cls}">${d.label}</span>`}
+        ${sch.auto ? '<span class="badge badge-auto">자동 등록 · 검수 전</span>' : ''}
         ${applied ? '<span class="badge badge-applied">신청함</span>' : ''}
         ${fit > 0 ? `<span class="badge badge-fit">적합도 ${fit}%</span>` : ''}
       </div>
@@ -522,7 +525,7 @@ function renderHome() {
   const total = applyable.reduce((sum, m) => sum + m.sch.amountValue, 0);
 
   countUp($('#hero-amount'), total, (v) => `최대 ${won(v)}`);
-  $('#hero-count').textContent = `신청 가능 ${applyable.filter((m) => m.result.status === 'eligible').length}건 · 선발 심사 ${applyable.filter((m) => m.result.status === 'selective').length}건`;
+  $('#hero-count').textContent = `바로 신청 ${applyable.filter((m) => m.result.status === 'eligible').length}건 · 선발 심사형 ${applyable.filter((m) => m.result.status === 'selective').length}건`;
 
   const btn = $('#btn-apply-all');
   btn.disabled = notApplied.length === 0;
@@ -852,7 +855,10 @@ function liveNoticesHtml() {
   const isRegistered = (url) => regUrls.some((u) => url.startsWith(u) || u.startsWith(url));
   const mine = (liveNotices.items || []).filter((n) =>
     n.school === p.school && (!n.campus || !p.campus || n.campus === p.campus) && !isRegistered(n.url)
-  ).slice(0, 10);
+  )
+    // 학자금 대출·융자 공고는 장학금이 아니므로 뒤로 보낸다 (피드에는 정직하게 유지)
+    .sort((a, b) => (/대출|융자/.test(a.title) ? 1 : 0) - (/대출|융자/.test(b.title) ? 1 : 0))
+    .slice(0, 10);
   const head = `<div class="section-head" style="margin-top:4px"><h3>우리 학교 실시간 공고</h3>
     <span class="link-btn">매일 아침 자동 갱신${liveNotices.updatedAt ? ' · ' + liveNotices.updatedAt : ''}</span></div>`;
   if (!mine.length) {
@@ -1017,6 +1023,7 @@ function openDetail(id) {
       <div class="sch-top">
         <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${sch.type}</span>
         ${sch.program ? '<span class="badge badge-program">상시 제도</span>' : `<span class="badge badge-dday ${d.cls}">${d.label}</span>`}
+        ${sch.auto ? '<span class="badge badge-auto">자동 등록 · 검수 전</span>' : ''}
         ${fit > 0 ? `<span class="badge badge-fit">적합도 ${fit}%</span>` : ''}
         <span class="status-pill pill-${meta.cls}">${meta.label}</span>
       </div>
@@ -1036,7 +1043,7 @@ function openDetail(id) {
         }).join('')}
       </ul>
       <p class="doc-legend">${sch.documents.some((doc) => /자동/.test(doc))
-        ? `'자동' 서류는 학교·재단 연동 후 자동 첨부되는 항목이에요 (현재 시연 단계 — 실제 발급·제출 전). `
+        ? `'자동' 표시 서류는 한국장학재단 등 제출처가 신청 과정에서 전산으로 확인하는 항목이에요 — 따로 준비해야 하는지는 공고 원문에서 확인하세요. `
         : ''}'직접' 서류 중 자기소개서·계획서·사유서·신청 양식은 앱에서 바로 작성할 수 있어요.</p>
 
       <p class="sheet-note">💡 ${esc(sch.note)}</p>

@@ -262,7 +262,8 @@ function renderFormDoc(tpl, p, ans, { editable = false } = {}) {
                  <th>${esc(row[2])}</th><td${ed}>${esc(autoVal[row[3]] || '')}</td></tr>`;
       });
       html += '</table>';
-      return;
+      // 여기서 끝내면 안 된다 — info와 fields가 같은 섹션에 있으면(산학디딤돌 등)
+      // 성별·주민번호 같은 원본 항목이 통째로 빠진 문서가 생성된다 (2026-07-15 수정)
     }
     if (!sec.fields || !sec.fields.length) return; // 안내 전용 섹션 — 제목·주석만 출력
     html += '<table class="fd-table">';

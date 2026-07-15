@@ -10,6 +10,9 @@ async function onboard(page, school, major) {
   await page.fill('#in-school', school);
   await page.waitForTimeout(250);
   await page.click('.ac-list:not([hidden]) .ac-item');
+  // 이원화 캠퍼스 학교면 첫 캠퍼스 선택 (외대 등)
+  const campusVisible = await page.$('#campus-field:not([hidden])');
+  if (campusVisible) await page.click('#in-campus .chip:first-child');
   await page.click('#in-track .chip[data-value="engineering"]');
   await page.fill('#in-major', major);
   await page.fill('#in-name', '김검증');
@@ -65,9 +68,18 @@ async function onboard(page, school, major) {
   for (const [k, v] of Object.entries(smoke)) console.log(' ', k, JSON.stringify(v));
 
   // ③ 삼일장학회: UI로 질문→문서 생성
+  // (성균관 접수분은 7/12 마감돼 버튼이 비활성 — 마감 전인 외대 접수분으로 같은 양식을 구동.
+  //  접수분이 모두 마감되면 마감 전 다른 접수분으로 대상을 바꿀 것)
+  const samilPage = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  samilPage.on('pageerror', (e) => errors.push('PAGEERROR-SAMIL: ' + e.message));
+  samilPage.on('dialog', async (d) => { await d.accept(); });
+  await samilPage.goto('http://localhost:8123/', { waitUntil: 'domcontentloaded' });
+  await onboard(samilPage, '외대', '컴퓨터공학부');
+  {
+    const page = samilPage; // 아래 단언들은 기존 그대로 재사용
   await page.click('.nav-item[data-nav="explore"]');
   await page.waitForTimeout(600);
-  await page.click('[data-detail="reg-skku-samil"]');
+  await page.click('#explore-list [data-detail="reg-hufs-samil"]');
   await page.waitForSelector('#detail-sheet.show');
   await page.waitForTimeout(400);
   await page.click('#btn-apply-one');
@@ -87,6 +99,7 @@ async function onboard(page, school, major) {
     '| ☑ 참석:', doc.includes('☑ 참  석'),
     '| 서약문:', doc.includes('선발 취소 등 어떤 조치에도 이의를 제기치 않겠습니다'));
   await page.screenshot({ path: `${__dirname}/shot-40-samil-doc.png` });
+  }
 
   // ④ 명지 프로필 → 고시장학금 양식
   const page2 = await browser.newPage({ viewport: { width: 390, height: 844 } });

@@ -31,11 +31,13 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - id: run
         run: node collector/browser-collect.mjs
+      - name: 정식 등록 자동화 (선조치후보고 — collector/auto-register-config.json으로 on/off)
+        run: node collector/auto-register.mjs collector/browser-report.md
       - name: 결과 저장
         run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add collector/seen.json collector/browser-report.md data/notices.json
+          git add collector/seen.json collector/browser-report.md data/notices.json data/registered.json
           if ! git diff --cached --quiet; then
             git commit -m "browser-collector: harvest update"
             # 다른 로봇이 먼저 push했을 수 있음 — 받아서 얹은 뒤 재시도 (수집분 유실 방지)

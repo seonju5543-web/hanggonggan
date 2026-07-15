@@ -19,8 +19,22 @@ const registered = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/registered.j
 const showAll = process.argv.includes('--all');
 const TODAY = new Date().toISOString().slice(0, 10);
 
-const regKeys = registered.items.map((i) => (i.sourceUrl || '').split('#')[0].split('&article.offset')[0]).filter(Boolean);
-const isRegistered = (url) => regKeys.some((u) => url.startsWith(u) || u.startsWith(url.split('#')[0]));
+/* URL 정규화 — collector/auto-register.mjs의 canonUrl과 같은 규칙.
+   목록 파라미터(sort·페이지)는 떼고 글 식별자만 남기되, 클릭형 게시판의
+   #n-제목 표식은 글의 정체성이므로 유지한다 (떼면 게시판 전체가 중복으로 뭉개짐) */
+const ID_PARAMS = /^(seq|articleno|bbs_seq|duid|list_id|entryid|bbsidx|menu_id|contents_no|site_no|board_seq|menuno|no|ntt|nttsn|idx|wr_id|bidx)$/i;
+function canonUrl(raw) {
+  try {
+    const u = new URL(raw);
+    const keep = [];
+    for (const [k, v] of u.searchParams) if (ID_PARAMS.test(k) && v) keep.push(`${k.toLowerCase()}=${v}`);
+    keep.sort();
+    const marker = u.hash && u.hash.startsWith('#n-') ? u.hash : '';
+    return u.origin + u.pathname + (keep.length ? '?' + keep.join('&') : '') + marker;
+  } catch { return (raw || '').split('#')[0]; }
+}
+const regKeys = new Set(registered.items.map((i) => canonUrl(i.sourceUrl || '')).filter(Boolean));
+const isRegistered = (url) => regKeys.has(canonUrl(url));
 
 // 메뉴/비공고/대출/행사 신호 — 개별 장학 공고가 아님
 const NON_NOTICE = /^(장학금 종류|장학금 신청|장학\/?학자금|장학 및 학자금|학자금 대출|장학금·학자금|국가장학금 및 학자금대출|국제화장학금|교외장학재단|근로장학공고게시판|네오르네상스장학|장학금안내|장학\(공지\)|학생지원팀|학생지원센터|장학 및 학자금 대출|학자금 중복지원)/;

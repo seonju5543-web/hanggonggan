@@ -44,9 +44,13 @@ const PORT = process.env.PORT || 8124;
   console.log('내장 양식 유지:', builtins);
 
   // 3) formId만 연결된 등록 공고에서 양식 질문 → 문서 생성까지 작동하는지
+  // (특정 공고 하드코딩 금지 — 마감이 지나면 버튼이 비활성돼 검증이 깨진다.
+  //  test-dummy가 연결된 항목을 동적으로 찾는다. 주입 시 마감 전 항목을 고를 것)
   await page.click('.nav-item[data-nav="explore"]');
   await page.waitForTimeout(600);
-  await page.click('[data-detail="reg-skku-samil"]');
+  const targetId = await page.evaluate(() => (registeredList.find((s) => s.formId === 'test-dummy') || {}).id);
+  console.log('test-dummy 연결 공고:', targetId);
+  await page.click(`#explore-list [data-detail="${targetId}"]`); // 홈 화면의 같은 카드와 겹치지 않게 탐색 목록으로 한정
   await page.waitForSelector('#detail-sheet.show');
   await page.waitForTimeout(400);
   await page.click('#btn-apply-one');

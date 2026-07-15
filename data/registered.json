@@ -555,8 +555,8 @@
    "provider": "한국외국어대학교 서울캠퍼스 장학팀",
    "amount": "국가근로장학금 (시급제 · 근로 기간 최대 2026.8.31까지)",
    "amountValue": 1000000,
-   "deadline": "2026-07-06",
-   "period": "신청 ~2026.7.6(월) 13:00 · 이메일 접수",
+   "deadline": "2026-07-16",
+   "period": "신청 ~2026.7.16(목) 13:00 · 이메일 접수 (7월 재공고)",
    "summary": "교내 원스톱서비스센터 등에서 근로하는 하계방학 국가근로장학생 추가 모집입니다. 지원서를 이메일로 제출하는 공고라, 앱에서 양식을 작성해 접수 메일까지 바로 이어갈 수 있어요.",
    "eligibility": {
     "selective": true,
@@ -568,20 +568,20 @@
     "국가근로 지원서 (앱에서 실제 양식 작성 · 한글/워드/PDF 제출)"
    ],
    "duplicable": true,
-   "note": "메일 제목은 \"2026학년도 1학기 하계방학 국가근로 지원서 홍길동(이름)\" 형식으로 보내야 해요. 선발 기준: 소득구간·성적 등 고려. 문의 02-2173-2136.",
+   "note": "메일 제목은 \"2026학년도 1학기 하계방학 국가근로 지원서 홍길동(이름)\" 형식으로 보내야 해요. 선발 기준: 소득구간·성적 등 고려. 문의 02-2173-2136. 7월 추가 모집 재공고(~7/16 13:00) 기준으로 갱신됨.",
    "formId": "hufs-workstudy-apply",
    "applyEmail": "scholarship@hufs.ac.kr",
    "attachments": [
     {
      "name": "2026학년도 국가근로 지원서.hwp",
-     "url": "https://dep.hufs.ac.kr/bbs/student/2431/144872/download.do"
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/145375/download.do"
     },
     {
      "name": "2026학년도 국가근로 지원서.docx",
-     "url": "https://dep.hufs.ac.kr/bbs/student/2431/144871/download.do"
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/145374/download.do"
     }
    ],
-   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/258915/artclView.do",
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/259753/artclView.do",
    "sourceKind": "official"
   },
   {
@@ -1406,15 +1406,15 @@
     ]
    },
    "documents": [
-    "지원신청서 및 개인정보동의서 (재단 양식)",
+    "지원신청서 및 개인정보동의서 (앱에서 재단 공통 양식 작성)",
     "장애 증빙 (원문 확인)"
    ],
    "duplicable": true,
-   "note": "장애 학생 대상 재단 장학금이에요. 광운대 접수 마감은 ~7/24. 세부 서류·양식은 원문 공고를 확인하세요.",
-   "noForm": "광운 게시판 특성상 첨부 자동 수집 불가 — 재단 신청서는 원문 공고에서 다운로드",
+   "note": "장애 학생 대상 재단 장학금이에요. 광운대 접수 마감은 ~7/24. 신청서는 앱에서 재단 공통 양식으로 작성할 수 있어요.",
    "attachments": [],
    "sourceUrl": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52845&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "formId": "gomduri-apply"
   },
   {
    "id": "reg-cau-bogun-multi",
@@ -1816,26 +1816,37 @@
   },
   {
    "id": "reg-hi-jeongeup",
-   "name": "정읍시민장학재단 우수인재장학금 (홍익대)",
+   "name": "정읍시민장학재단 우수인재장학금 (2026)",
    "type": "교외",
-   "provider": "정읍시민장학재단 (홍익대)",
-   "amount": "우수인재장학금 (세부 원문 확인)",
+   "provider": "정읍시민장학재단",
+   "amount": "우수인재장학금 (4년제·전문대 차등 — 원문 확인)",
    "amountValue": 2000000,
    "deadline": null,
-   "period": "2026년도 선발 (기간 원문 확인)",
-   "summary": "정읍시민장학재단이 정읍시 연고 대학생을 지원하는 우수인재장학금의 홍익대 게시분입니다. 지역 연고·자격 요건은 원문 공고에서 확인하세요.",
+   "period": "2026년도 선발 (2026.7.8 공고 — 접수기간 원문 확인)",
+   "summary": "부모(부 또는 모)가 정읍시에 주소를 둔 국내 대학 재학생이면 학교와 관계없이 지원할 수 있는 지역 장학금입니다. 접수는 부모 주민등록지 읍면동 주민센터에 방문 제출해요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "홍익대학교"
+    "selective": true
    },
    "documents": [
-    "신청 서류·양식은 원문 공고 확인"
+    "장학생지원서·개인정보제공활용동의서 (공고 첨부 서식)",
+    "성적증명서·재학증명서 각 1부",
+    "주민등록초본·가족관계증명서 (정읍 거주 부/모 기준)",
+    "통장사본 (부모 명의)·건강보험료 납부확인서"
    ],
    "duplicable": true,
-   "note": "정읍시 연고(출신 등) 학생 대상 지역 장학이에요. 자격·신청서·기간은 원문 공고에서 확인하세요.",
-   "noForm": "정읍시 연고 학생 대상 지역 장학 — 신청서·자격은 원문 공고 확인(2026-07-14)",
-   "sourceUrl": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=154087&article.offset=0&articleLimit=10&noCat=501",
-   "attachments": [],
+   "note": "자격: 부 또는 모가 정읍시에 3년 이상 주소 + 성적 백분율 85점 이상. 접수는 부모 주민등록지 주민센터 방문 제출(문의 063-539-5577). 접수기간은 원문 공고에서 확인하세요.",
+   "noForm": "지원서 서식(HWPX) 원본 확보됨 — 한글 프로그램 전용 포맷이라 다운로드 제공, 스키마화는 추후 검토(2026-07-15)",
+   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%202026%EB%85%84%EB%8F%84%20%EC%A0%95%EC%9D%8D%EC%8B%9C%EB%AF%BC%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EC%9A%B0%EC%88%98%EC%9D%B8%EC%9E%AC%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4",
+   "attachments": [
+    {
+     "name": "2026년 우수인재장학금 장학생 선발 공고.pdf",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=18bbcd5c8f294d34b725db7aa7d05422&fileSn=1&bbsId=BMSR00040"
+    },
+    {
+     "name": "우수인재 장학금 지원서(서식).hwpx",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=18bbcd5c8f294d34b725db7aa7d05422&fileSn=2&bbsId=BMSR00040"
+    }
+   ],
    "sourceKind": "official"
   },
   {
@@ -1891,6 +1902,280 @@
      "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138332&attachNo=115832"
     }
    ],
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-uos-bigdata-cert",
+   "name": "빅데이터혁신융합대학 성과형 장학금(자격증)",
+   "type": "교내",
+   "provider": "서울시립대 빅데이터혁신융합대학사업단",
+   "amount": "자격증 취득 성과형 장학금 (세부 원문 확인)",
+   "amountValue": 500000,
+   "deadline": "2026-08-21",
+   "period": "신청 2026.7.20(월) ~ 8.21",
+   "summary": "빅데이터혁신융합대학사업단이 자격증 취득 성과를 기준으로 지급하는 성과형 장학금입니다. 신청서·개인정보활용동의서(HWP)를 작성해 제출하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서울시립대학교"
+   },
+   "documents": [
+    "성과형 장학금(자격증) 신청서·개인정보동의 (앱에서 원본 양식 작성)",
+    "자격증 취득 증빙 (원문 확인)"
+   ],
+   "duplicable": true,
+   "note": "빅데이터 마이크로디그리 이수·수강생 대상일 수 있어요(첨부 안내 PDF 참조). 신청 7/20~8/21.",
+   "attachments": [
+    {
+     "name": "성과형 장학금(자격증) 신청서 및 개인정보활용서.hwp",
+     "url": "https://www.uos.ac.kr/common/board-download.do?listId=FA1&seq=31133&fSeq=1"
+    },
+    {
+     "name": "빅데이터 마이크로디그리 및 26-1 개설 교과목 안내.pdf",
+     "url": "https://www.uos.ac.kr/common/board-download.do?listId=FA1&seq=31133&fSeq=2"
+    }
+   ],
+   "sourceUrl": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31133&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "sourceKind": "official",
+   "formId": "uos-bigdata-cert-apply"
+  },
+  {
+   "id": "reg-skku-merit",
+   "name": "학사과정 성적우수장학금 (2026-2학기)",
+   "type": "교내",
+   "provider": "성균관대학교 학생지원팀",
+   "amount": "성적우수장학금 (학과별 상이 · 원문 확인)",
+   "amountValue": 2000000,
+   "deadline": null,
+   "period": "2026-2학기 신청 (학과별 일정 상이 — 원문 확인)",
+   "summary": "성균관대 학사과정 성적우수장학금 신청 안내입니다. 학과별 신청 여부·서류가 다르니 붙임1(학과별 안내)을 확인하고 GLS에서 신청하세요.",
+   "eligibility": {
+    "selective": true,
+    "minGpa": 3.5,
+    "schoolOnly": "성균관대학교"
+   },
+   "documents": [
+    "학과별 신청 여부·첨부서류 확인 (붙임1·붙임2)",
+    "GLS 신청"
+   ],
+   "duplicable": false,
+   "note": "직전 학기 성적 기준 학과별 선발이에요. 신청 대상·서류가 학과마다 달라 붙임1을 꼭 확인하세요.",
+   "noForm": "학교 포털(GLS) 직접 신청형 — 별도 신청서 양식 없음(붙임은 첨부서류 안내)",
+   "attachments": [
+    {
+     "name": "[붙임2] 성적우수 장학금 신청 첨부서류(공지용).hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138336&attachNo=115839"
+    },
+    {
+     "name": "[붙임1] 학과별 안내사항.xlsx",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138336&attachNo=115914"
+    }
+   ],
+   "sourceUrl": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=138336&article.offset=0&articleLimit=10",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-skku-gasong",
+   "name": "(재)가송재단 장학생 (2026-2학기)",
+   "type": "교외",
+   "provider": "가송재단 (성균관대 접수)",
+   "amount": "장학금 (세부 원문 확인)",
+   "amountValue": 2000000,
+   "deadline": "2026-07-21",
+   "period": "신청 2026.7.15(수) 09:00 ~ 7.21(화) 09:00",
+   "summary": "가송재단 장학생 선발의 성균관대 접수분입니다. 지원서류 양식(HWP)을 작성해 기한 내 제출하세요. 마감이 화요일 오전 9시로 이른 편이니 주의하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "성균관대학교"
+   },
+   "documents": [
+    "가송재단 장학지원서·자기소개서 (앱에서 원본 양식 작성)",
+    "장학생 추천서 (지도교수 등 작성 — 원문 첨부 양식 이용)",
+    "제출 서류는 원문 공고 확인"
+   ],
+   "duplicable": true,
+   "note": "마감이 7/21(화) 오전 9시예요 — 전날까지 준비를 끝내두세요. 추천서는 추천인이 직접 작성하는 서식이라 원문 첨부(HWP)를 내려받아 전달하세요.",
+   "attachments": [
+    {
+     "name": "가송재단 지원서류 양식(공지용).hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138391&attachNo=115904"
+    }
+   ],
+   "sourceUrl": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=138391&article.offset=0&articleLimit=10",
+   "sourceKind": "official",
+   "formId": "gasong-apply"
+  },
+  {
+   "id": "reg-hufs-seed",
+   "name": "외대재직직원장학금(씨앗) (2026-1)",
+   "type": "교내",
+   "provider": "한국외국어대학교 장학팀",
+   "amount": "장학금 (세부 원문 확인)",
+   "amountValue": 1000000,
+   "deadline": "2026-08-05",
+   "period": "모집 ~2026.8.5 · 선발 발표 8.26(수)",
+   "summary": "외대 재직 직원들의 기부로 조성된 교내 장학금(씨앗)입니다. HUFS Ability 등 학교 시스템으로 신청하는 공고예요 — 자격·방법은 원문에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교"
+   },
+   "documents": [
+    "신청 방법·서류는 원문 공고 확인"
+   ],
+   "duplicable": true,
+   "note": "선발 결과는 8/26(수) HUFS Ability에서 확인해요. 세부 자격은 원문 공고를 확인하세요.",
+   "noForm": "학교 시스템(HUFS Ability) 신청형으로 확인됨 — 첨부 신청서 없음",
+   "attachments": [],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/259826/artclView.do",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-hufs-ambassador",
+   "name": "한국외대 동문홍보대사 장학금 (2026-2)",
+   "type": "교외",
+   "provider": "한국외대 동문회 (동문홍보대사)",
+   "amount": "장학금 (세부 원문 확인)",
+   "amountValue": 1000000,
+   "deadline": "2026-08-12",
+   "period": "신청 2026.8.3(월) ~ 8.12(수) 15:00",
+   "summary": "한국외대 동문홍보대사 장학금 장학생 모집입니다. 신청 기간이 8월 초라 미리 준비해두면 좋아요. 자격·서류는 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교"
+   },
+   "documents": [
+    "신청 방법·서류는 원문 공고 확인"
+   ],
+   "duplicable": true,
+   "note": "신청은 8/3부터 시작돼요(마감 8/12 15:00). 자격 요건은 원문 공고 확인.",
+   "noForm": "첨부 신청서 없음 — 신청 방법은 원문 공고 확인(2026-07-15)",
+   "attachments": [],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/259734/artclView.do",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-posco-vision",
+   "name": "포스코청암재단 포스코비전장학생 (2026)",
+   "type": "교외",
+   "provider": "포스코청암재단",
+   "amount": "생활장학금 (세부 원문 확인)",
+   "amountValue": 3000000,
+   "deadline": null,
+   "period": "2026년도 선발 (기간 원문 확인)",
+   "summary": "포스코청암재단의 포스코비전장학생 선발 공고입니다. 광운대·경희대·동국대 등 여러 대학에 게시된 재단 장학이에요. 자격·기간·신청 방법은 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true
+   },
+   "documents": [
+    "신청 서류·양식은 원문 공고 확인"
+   ],
+   "duplicable": true,
+   "note": "여러 대학에 동시에 게시된 재단 장학이에요(생활장학금 지원). 자격·마감은 원문 공고를 꼭 확인하세요.",
+   "noForm": "원본 공고·양식 확보 대기(deep-fetch 2026-07-15 예약) — 세부는 원문 확인",
+   "attachments": [],
+   "sourceUrl": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52884&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-kosaf-daecheonggyo",
+   "name": "대학생 청소년교육지원장학금(대청교) 멘토 (2026)",
+   "type": "교외",
+   "provider": "한국장학재단",
+   "amount": "멘토링 활동 장학금 (활동 시간 기준 · 원문 확인)",
+   "amountValue": 1000000,
+   "deadline": "2026-08-31",
+   "period": "상시 모집 (외대 서울캠 기준 ~2026.8.31 · 학교별 마감 상이)",
+   "summary": "초·중·고 청소년 교육활동을 지원하고 활동 장학금을 받는 한국장학재단 대청교 멘토 모집입니다. 한국장학재단 홈페이지에서 본인 인증 후 직접 신청해요.",
+   "eligibility": {
+    "selective": true
+   },
+   "documents": [
+    "한국장학재단 홈페이지 신청 (본인 인증 필요)",
+    "학교별 세부 마감은 소속 대학 공지 확인"
+   ],
+   "duplicable": true,
+   "note": "서울시립대·한국외대 등 여러 대학에 게시된 재단 공통 사업이에요. 학교별 마감이 달라요(외대 서울캠 8/31). AI교육지원 멘토(별도 등록)와는 다른 사업입니다.",
+   "noForm": "한국장학재단 포털 직접 신청형 — 첨부는 활동용 양식(신청서 아님)",
+   "attachments": [
+    {
+     "name": "2026년도 대청교 업무처리기준.pdf",
+     "url": "https://www.uos.ac.kr/common/board-download.do?listId=FA1&seq=30511&fSeq=1"
+    }
+   ],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/249627/artclView.do",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-dg-jindam",
+   "name": "진담거사 지역미래불자육성장학 (동국대)",
+   "type": "교내",
+   "provider": "동국대학교 (진담거사 지역미래불자육성장학)",
+   "amount": "장학금 (세부 원문 확인)",
+   "amountValue": 500000,
+   "deadline": "2026-07-21",
+   "period": "접수 ~2026-07-21",
+   "summary": "동국대학교 게시판에 게시된 수집된 실공고예요. 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "동국대학교",
+    "campusOnly": "서울캠퍼스"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "세부 자격·금액·서류는 원문 공고에서 확인하세요.",
+   "noForm": "첨부·신청서는 원문 공고 확인(2026-07-15 등록)",
+   "attachments": [],
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-%EA%B3%B5%EC%A7%80%20%EA%B3%B5%EC%A7%80%20%EC%A7%84%EB%8B%B4%EA%B1%B0%EC%82%AC%20%EC%A7%80%EC%97%AD%EB%AF%B8%EB%9E%98%EB%B6%88%EC%9E%90%EC%9C%A1%EC%84%B1%EC%9E%A5%ED%95%99%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4%202026.07.",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-khu-chungnam",
+   "name": "충남평생교육진흥원 재능키움 장학생 2차 (경희대 게시)",
+   "type": "교내",
+   "provider": "충남평생교육진흥원",
+   "amount": "장학금 (세부 원문 확인)",
+   "amountValue": 500000,
+   "deadline": null,
+   "period": "접수 기간 원문 확인",
+   "summary": "경희대학교 게시판에 게시된 수집된 실공고예요. 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경희대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "세부 자격·금액·서류는 원문 공고에서 확인하세요.",
+   "noForm": "첨부·신청서는 원문 공고 확인(2026-07-15 등록)",
+   "attachments": [],
+   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%202026%EB%85%84%20%EC%B6%A9%EB%82%A8%ED%8F%89%EC%83%9D%EA%B5%90%EC%9C%A1%EC%A7%84%ED%9D%A5%EC%9B%90%20%EC%9E%AC%EB%8A%A5%ED%82%A4%EC%9B%80%20%EC%9E%A5%ED%95%99%EC%83%9D%202%EC%B0%A8%20%EB%AA%A8%EC%A7%91%20%EC%95%88%EB%82%B4",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-dg-bunam",
+   "name": "부남장학생 (동국대, 2026-2학기)",
+   "type": "교내",
+   "provider": "부남장학회 (동국대 접수)",
+   "amount": "장학금 (세부 원문 확인)",
+   "amountValue": 500000,
+   "deadline": null,
+   "period": "접수 기간 원문 확인",
+   "summary": "동국대학교 게시판에 게시된 수집된 실공고예요. 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "동국대학교",
+    "campusOnly": "서울캠퍼스"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "세부 자격·금액·서류는 원문 공고에서 확인하세요.",
+   "noForm": "첨부·신청서는 원문 공고 확인(2026-07-15 등록)",
+   "attachments": [],
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2651%202026-2%ED%95%99%EA%B8%B0%20%EB%B6%80%EB%82%A8%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4%202026.07.06.%20%EC%A1%B0%ED%9A%8C",
    "sourceKind": "official"
   }
  ]

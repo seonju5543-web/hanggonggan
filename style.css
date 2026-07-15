@@ -881,3 +881,6 @@ textarea:focus {
 
 /* 실시간 공고 카드 */
 .notice-card { text-decoration: none; color: inherit; display: block; }
+
+/* 자동 등록(검수 전) 배지 — 수집 로봇이 자동 등록한 공고임을 정직하게 표시 */
+.badge-auto { background: var(--orange-weak, #fff3e6); color: var(--orange, #c2620a); }
