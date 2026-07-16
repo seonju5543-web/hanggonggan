@@ -2211,6 +2211,61 @@
    ],
    "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/259908/artclView.do",
    "sourceKind": "auto"
+  },
+  {
+   "id": "auto-tentsno1menuid100siteno2",
+   "name": "2026학년도 하반기 성림교회 대학장학생 공개 선발 안내",
+   "type": "교내",
+   "provider": "중앙대학교 게시 공고",
+   "amount": "장학금 (세부 원문 확인)",
+   "amountValue": 500000,
+   "deadline": null,
+   "period": "접수 기간 원문 확인",
+   "summary": "중앙대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "중앙대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-07-16 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30009&pageNo=1",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-ec849cec9ab8ecbaa0ed8dbc",
+   "name": "서울 2026학년도 2학기 경희인턴(교내장학) 장학생 모집 공고[서울캠퍼스 총무관리처 관재팀]",
+   "type": "교내",
+   "provider": "경희대학교 게시 공고",
+   "amount": "장학금 (세부 원문 확인)",
+   "amountValue": 500000,
+   "deadline": null,
+   "period": "접수 기간 원문 확인",
+   "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경희대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-07-16 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "첨부03_경희인턴장학생 신청서.hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=537260e493944ecca014b459686f4384&fileSn=1&bbsId=BMSR00040"
+    }
+   ],
+   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EC%84%9C%EC%9A%B8%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EA%B2%BD%ED%9D%AC%EC%9D%B8%ED%84%B4(%EA%B5%90%EB%82%B4%EC%9E%A5%ED%95%99)%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EA%B3%B5%EA%B3%A0%5B%EC%84%9C%EC%9A%B8%EC%BA%A0%ED%8D%BC",
+   "sourceKind": "auto"
   }
  ]
 }
