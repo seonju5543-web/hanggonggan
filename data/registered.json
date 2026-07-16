@@ -2199,11 +2199,12 @@
     "schoolOnly": "한국외국어대학교"
    },
    "documents": [
-    "지원 자격·제출 서류는 원문 공고에서 확인"
+    "총동문회 장학금 신청서 (앱에서 원본 양식 작성)",
+    "개인정보 수집·이용 동의서 (원본 첨부 HWP 다운로드)",
+    "제출 서류는 원문 공고 확인"
    ],
    "duplicable": true,
    "note": "선발 확정 8/28(금) 예정, 지급 9월. 신청서 양식 원본 확보 예약됨 — 확보되면 앱에서 바로 작성으로 전환.",
-   "noForm": "신청서 HWP 원본 확보 대기(deep-fetch 2026-07-15 2차 예약) — 확보 시 스키마화",
    "attachments": [
     {
      "name": "2026-2학기 총동문회 장학금+신청서.hwp",
@@ -2215,7 +2216,8 @@
     }
    ],
    "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/259908/artclView.do",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "formId": "hufs-alumni-apply"
   },
   {
    "id": "reg-cau-sunglim",
@@ -2257,11 +2259,11 @@
     "campusOnly": "서울캠퍼스"
    },
    "documents": [
-    "지원 자격·제출 서류는 원문 공고에서 확인"
+    "경희인턴장학생 신청서 (앱에서 원본 양식 작성 — 근무 시간표 포함)",
+    "제출 서류는 원문 공고 확인"
    ],
    "duplicable": true,
    "note": "서울캠퍼스 대상 교내 근로형 장학이에요. 접수 7/20~8/9. 신청서 양식 원본 확보 예약됨.",
-   "noForm": "신청서 HWP 원본 확보 대기(deep-fetch 2026-07-15 2차 예약) — 확보 시 스키마화",
    "attachments": [
     {
      "name": "첨부03_경희인턴장학생 신청서.hwp",
@@ -2269,7 +2271,8 @@
     }
    ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EC%84%9C%EC%9A%B8%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EA%B2%BD%ED%9D%AC%EC%9D%B8%ED%84%B4(%EA%B5%90%EB%82%B4%EC%9E%A5%ED%95%99)%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EA%B3%B5%EA%B3%A0%5B%EC%84%9C%EC%9A%B8%EC%BA%A0%ED%8D%BC",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "formId": "khu-intern-apply"
   }
  ]
 }
