@@ -769,15 +769,15 @@ function startFormFill(sch) {
 
 function renderFormFill() {
   const sch = findSch(formFill.schId);
-  const tpl = FORM_TEMPLATES[sch.formId];
+  const tpl = FORM_TEMPLATES[formTplIdFor(sch)];
   const sheet = $('#detail-sheet');
 
   if (formFill.stage === 'q') {
     sheet.innerHTML = `
       <div class="sheet-handle"></div>
       <div class="sheet-body">
-        <h3 class="sheet-title">양식 작성 도우미</h3>
-        <p class="sheet-provider">${esc(tpl.title)} · 실제 공고 양식과 동일한 문서가 만들어져요</p>
+        <h3 class="sheet-title">${tpl.unofficial ? '지원문서 작성 도우미' : '양식 작성 도우미'}</h3>
+        <p class="sheet-provider">${esc(tpl.title)} · ${tpl.unofficial ? '준비용 문서예요 (공고 지정 공식 양식 아님)' : '실제 공고 양식과 동일한 문서가 만들어져요'}</p>
         ${formQuestionsHtml(tpl)}
         <button class="btn btn-primary btn-lg" id="btn-ff-generate">양식 문서 만들기</button>
         <p class="dp-note">기본정보(학교·이름·학번·연락처)는 프로필에서 자동으로 채워져요.</p>
@@ -792,7 +792,7 @@ function renderFormFill() {
       <div class="sheet-handle"></div>
       <div class="sheet-body">
         <h3 class="sheet-title">이대로 제출 준비할까요?</h3>
-        <p class="sheet-provider">칸을 눌러 직접 수정할 수 있어요 · 실제 공고 양식과 동일한 구조</p>
+        <p class="sheet-provider">칸을 눌러 직접 수정할 수 있어요 · ${tpl.unofficial ? '준비용 문서 (공식 양식 아님)' : '실제 공고 양식과 동일한 구조'}</p>
         <div class="fd-wrap" id="ff-doc">${renderFormDoc(tpl, state.profile, formFill.ans, { editable: true })}</div>
         <button class="btn btn-primary btn-lg" id="btn-ff-confirm">✓ 이대로 신청 준비 완료</button>
         <div class="submit-actions" style="margin-top:8px">
@@ -830,12 +830,34 @@ function loadNotices() {
     .catch(() => { /* 오프라인 등 — 조용히 무시 */ });
 }
 
+/* 준비용 지원문서 연결 (2026-07-15): 지정 양식이 없는 정식 등록 공고에
+   질문형 문서 작성 흐름을 붙인다. 한국장학재단 제도(전산 신청)는 제외.
+   공식 양식(formId)과 구분되도록 prepFormId로만 연결 — 채널 라벨은 그대로 유지. */
+function attachPrepTemplates(list) {
+  if (typeof FORM_TEMPLATES === 'undefined' || typeof buildPrepTemplate !== 'function') return;
+  for (const s of list) {
+    if (s.formId || s.program || /한국장학재단/.test(s.provider || '')) continue;
+    const pid = 'prep:' + s.id;
+    FORM_TEMPLATES[pid] = buildPrepTemplate(s);
+    s.prepFormId = pid;
+  }
+}
+
+/* 이 공고에서 쓸 양식 템플릿 id — 공식 양식이 우선, 없으면 준비용 문서 */
+function formTplIdFor(sch) {
+  if (typeof FORM_TEMPLATES === 'undefined') return null;
+  if (sch.formId && FORM_TEMPLATES[sch.formId]) return sch.formId;
+  if (sch.prepFormId && FORM_TEMPLATES[sch.prepFormId]) return sch.prepFormId;
+  return null;
+}
+
 /* 정식 등록 공고 (수집 → 큐레이션 → 매칭·신청 지원) */
 function loadRegistered() {
   fetch('data/registered.json', { cache: 'no-store' })
     .then((r) => (r.ok ? r.json() : null))
     .then((d) => {
       registeredList = (d && d.items) || [];
+      attachPrepTemplates(registeredList);
       if (state.profile) {
         if (!$('#screen-home').hidden) renderHome();
         if (!$('#screen-explore').hidden) renderExplore();
@@ -947,7 +969,7 @@ function finalizeApply(sch, docs) {
 }
 
 function applyTo(sch) {
-  if (sch.formId && typeof FORM_TEMPLATES !== 'undefined' && FORM_TEMPLATES[sch.formId]) {
+  if (formTplIdFor(sch)) { // 공식 양식 또는 준비용 지원문서
     startFormFill(sch);
     return;
   }
@@ -1086,7 +1108,7 @@ function openDetail(id) {
           <details class="dp-saved"><summary>작성한 서류 보기 (${app.docs.length})</summary>
             ${app.docs.map((t) => `<h4>${esc(t.doc)}</h4><pre>${esc(t.text)}</pre>`).join('')}
           </details>` : ''}
-        ${app.formAns && sch.formId ? `
+        ${app.formAns && formTplIdFor(sch) ? `
           <h4>작성한 양식 문서</h4>
           <div class="submit-actions">
             <button class="btn btn-outline" id="btn-form-save">📄 .doc 저장</button>
@@ -1107,7 +1129,7 @@ function openDetail(id) {
       })() : ''}
 
       <button class="btn btn-primary btn-lg" id="btn-apply-one" ${canApply ? '' : 'disabled'}>${btnLabel}</button>
-      ${canApply ? `<p class="dp-note">준비 완료 후 최종 제출처(${ch.label})를 안내해 드려요.</p>` : ''}
+      ${canApply ? `<p class="dp-note">준비 완료 후 최종 제출처(${ch.label})를 안내해 드려요.${(!sch.formId && sch.prepFormId) ? ' 이 공고는 지정 신청서 양식이 없어, 준비용 지원문서(공식 양식 아님) 작성을 도와드려요.' : ''}</p>` : ''}
     </div>`;
 
   $('#sheet-backdrop').hidden = false;
@@ -1136,8 +1158,8 @@ function openDetail(id) {
     const url = safeUrl(ch.url || sch.sourceUrl);
     if (url) window.open(url, '_blank', 'noopener');
   });
-  if (app && app.formAns && sch.formId) {
-    const tpl = FORM_TEMPLATES[sch.formId];
+  if (app && app.formAns && formTplIdFor(sch)) {
+    const tpl = FORM_TEMPLATES[formTplIdFor(sch)];
     $('#btn-form-save').addEventListener('click', () => downloadFormDoc(tpl, state.profile, app.formAns));
     $('#btn-form-print').addEventListener('click', () => printFormDoc(tpl, state.profile, app.formAns));
     $('#btn-form-share').addEventListener('click', () => shareFormDoc(tpl, state.profile, app.formAns, sch));

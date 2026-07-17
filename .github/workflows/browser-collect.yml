@@ -33,11 +33,20 @@ jobs:
         run: node collector/browser-collect.mjs
       - name: 정식 등록 자동화 (선조치후보고 — collector/auto-register-config.json으로 on/off)
         run: node collector/auto-register.mjs collector/browser-report.md
+      - name: 신규 등록분 양식 원본 자동 확보 (스키마화 대기 큐)
+        run: |
+          targets=$(node -e "let q;try{q=require('./collector/pending-forms.json')}catch(e){q={items:[]}};console.log(q.items.filter(i=>!i.fetched).map(i=>i.target).join(','))")
+          if [ -n "$targets" ]; then
+            FORM_TARGETS="$targets" node collector/deepfetch.mjs
+            pip install olefile --quiet
+            python3 collector/hwp-prvtext.py
+            node -e "const fs=require('fs');const p='./collector/pending-forms.json';const q=JSON.parse(fs.readFileSync(p,'utf8'));q.items.forEach(i=>{i.fetched=true});fs.writeFileSync(p,JSON.stringify(q,null,1)+'\n')"
+          fi
       - name: 결과 저장
         run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add collector/seen.json collector/browser-report.md data/notices.json data/registered.json
+          git add collector/seen.json collector/browser-report.md data/notices.json data/registered.json collector/pending-forms.json collector/extracted
           if ! git diff --cached --quiet; then
             git commit -m "browser-collector: harvest update"
             # 다른 로봇이 먼저 push했을 수 있음 — 받아서 얹은 뒤 재시도 (수집분 유실 방지)
