@@ -203,6 +203,28 @@ if (!cfg.enabled) {
     fs.writeFileSync(registeredPath, JSON.stringify(registered, null, 1) + '\n');
   }
 
+  // 스키마화 대기 큐: 신청서 첨부가 있는 자동 등록분은 워크플로가 곧바로 원본을
+  // 내려받고(pending-forms.json → deepfetch), 다음 Claude 세션이 스키마화한다.
+  // 목표: '원본 양식 다운로드형' 채널이 하루 이상 남아 있지 않게 한다.
+  const queuePath = new URL('pending-forms.json', HERE);
+  let queue = { items: [] };
+  try { queue = JSON.parse(fs.readFileSync(queuePath, 'utf8')); } catch { /* 첫 실행 */ }
+  let queued = 0;
+  for (const e of added) {
+    if (!(e.attachments || []).some((a) => /신청서|지원서|서식|양식/.test(a.name))) continue;
+    if (queue.items.some((q) => q.id === e.id)) continue;
+    // deepfetch가 제목 부분일치로 대상을 찾으므로, 부스러기 없는 제목 앞부분을 표적으로 쓴다
+    const target = cleanTitle(e.name).replace(/\[[^\]]*\]/g, '').trim().slice(0, 12);
+    queue.items.push({ id: e.id, name: e.name, target, added: TODAY, fetched: false, schematized: false });
+    queued++;
+  }
+  if (queued) {
+    fs.writeFileSync(queuePath, JSON.stringify(queue, null, 1) + '\n');
+    report.push('', `**🧩 양식 원본 자동 확보 예약 ${queued}건** — 원본은 이 실행에서 바로 내려받고, 스키마화(앱 내 작성 전환)는 다음 Claude 세션이 처리해요.`);
+  }
+  const waiting = queue.items.filter((q) => q.fetched && !q.schematized).length;
+  if (waiting) report.push('', `**⏳ 스키마화 대기 중 ${waiting}건** (원본 확보됨 — collector/pending-forms.json)`);
+
   report.push('', `### 🤖 자동 등록 (선조치후보고) — ${added.length}건 등록${removed ? ` · ${removed}건 제거(blockIds)` : ''}`);
   if (added.length) {
     report.push('', '자동 등록분은 앱에 **자동 등록 · 검수 전** 배지로 표시돼요. 잘못 등록된 건이 있으면 채팅으로 알려주시거나 `collector/auto-register-config.json`의 `blockIds`에 id를 넣어주세요.', '');

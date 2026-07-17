@@ -358,3 +358,65 @@ async function shareFormDoc(tpl, p, ans, sch) {
   } catch (e) { return; }
   downloadFormDoc(tpl, p, ans);
 }
+
+/* ---------- 준비용 지원문서 (2026-07-15 개발자 지시) ----------
+   지정 신청서 양식이 없는 공고(포털 입력형·자유형식 이메일 등)에서
+   같은 질문형 흐름으로 '준비용 지원문서'를 만들어 준다.
+   정직 원칙: 공식 양식이 아님을 문서 상단(tag)과 화면에 반드시 표시. */
+function buildPrepTemplate(sch) {
+  return {
+    title: `${sch.name} — 지원문서`,
+    docName: `지원문서_${(sch.name || '').replace(/[^가-힣a-zA-Z0-9]/g, '').slice(0, 24) || '장학금'}`,
+    org: sch.provider || '',
+    tag: '※ 준비용 문서 — 공고가 지정한 공식 양식이 아닙니다. 지정 양식·포털 입력 방식이 있으면 그쪽을 따르세요.',
+    unofficial: true,
+    pledge: '위 내용은 사실과 다름이 없습니다.',
+    signLabel: '지원자',
+    sections: [
+      {
+        heading: '신청 개요',
+        info: [
+          ['성 명', 'name', '학 교', 'school'],
+          ['학 과', 'major', '학 번', 'studentId'],
+          ['연락처', 'phone', '이메일', 'email']
+        ],
+        fields: [
+          { id: 'grade', label: '학년 (학기)', type: 'text', q: '학년(학기)', placeholder: '예: 3학년(6학기)' }
+        ]
+      },
+      {
+        heading: '지원 동기 및 신청 사유',
+        fields: [
+          { id: 'reason', label: '지원 동기 및 신청 사유', type: 'textarea', q: '이 장학금에 지원하는 동기와 신청 사유', sugg: [
+            '등록금 부담을 덜고 학업에 온전히 집중하고 싶어 지원합니다. 가계 형편상 장학 지원이 학업을 이어가는 데 큰 힘이 됩니다.',
+            '전공 심화와 진로 준비에 필요한 비용을 마련하고자 지원합니다. 성실히 쌓아온 성적으로 그 의지를 증명하겠습니다.'
+          ] }
+        ]
+      },
+      {
+        heading: '학업 및 활동 요약',
+        fields: [
+          { id: 'study', label: '학업 성취 (성적·이수 현황)', type: 'textarea', q: '직전 학기 성적과 학업 성취를 요약해 주세요', sugg: [
+            '직전 학기 평점 4.0 이상을 유지하며 전공 필수 과목을 성실히 이수했습니다.'
+          ] },
+          { id: 'activity', label: '교내·외 활동', type: 'textarea', q: '교내·외 활동 내역 (동아리·봉사·프로젝트 등)', sugg: [
+            '전공 학회와 봉사 동아리에서 꾸준히 활동하며 협업과 책임감을 길렀습니다.'
+          ] }
+        ]
+      },
+      {
+        heading: '향후 계획',
+        fields: [
+          { id: 'plan', label: '학업·진로 계획', type: 'textarea', q: '남은 학기 학업 계획과 진로 목표', sugg: [
+            '남은 학기 동안 전공 심화 과목을 집중 이수하고, 졸업 후에는 전공을 살려 사회에 기여하겠습니다.'
+          ] }
+        ]
+      },
+      {
+        heading: '제출 서류 확인',
+        note: (sch.documents || []).join(' · ') || '제출 서류는 원문 공고에서 확인하세요.',
+        fields: []
+      }
+    ]
+  };
+}
