@@ -48,6 +48,9 @@ jobs:
             node -e "const fs=require('fs');const p='./collector/pending-forms.json';const q=JSON.parse(fs.readFileSync(p,'utf8'));q.items.forEach(i=>{i.fetched=true});fs.writeFileSync(p,JSON.stringify(q,null,1)+'\n')"
           fi
 
+      - name: 공고 원문 발췌 갱신 (정직 원칙 — 추론 대신 원문 그대로)
+        run: node collector/extract-excerpts.mjs --write
+
       - name: 수집 상태 저장 (중복 방지 기록)
         run: |
           git config user.name "handaejang-bot"

@@ -522,10 +522,11 @@ function renderHome() {
   const matches = getMatches();
   const applyable = matches.filter((m) => ['eligible', 'selective'].includes(m.result.status));
   const notApplied = applyable.filter((m) => !state.applications.some((a) => a.id === m.sch.id) && dday(m.sch.deadline).days >= 0);
-  const total = applyable.reduce((sum, m) => sum + m.sch.amountValue, 0);
+  const total = applyable.reduce((sum, m) => sum + (m.sch.amountValue || 0), 0);
+  const unknownAmt = applyable.filter((m) => !m.sch.amountValue).length;
 
   countUp($('#hero-amount'), total, (v) => `최대 ${won(v)}`);
-  $('#hero-count').textContent = `바로 신청 ${applyable.filter((m) => m.result.status === 'eligible').length}건 · 선발 심사형 ${applyable.filter((m) => m.result.status === 'selective').length}건`;
+  $('#hero-count').textContent = `바로 신청 ${applyable.filter((m) => m.result.status === 'eligible').length}건 · 선발 심사형 ${applyable.filter((m) => m.result.status === 'selective').length}건${unknownAmt ? ` · 금액 미확인 ${unknownAmt}건 제외` : ''}`;
 
   const btn = $('#btn-apply-all');
   btn.disabled = notApplied.length === 0;
@@ -777,7 +778,7 @@ function renderFormFill() {
       <div class="sheet-handle"></div>
       <div class="sheet-body">
         <h3 class="sheet-title">${tpl.unofficial ? '지원문서 작성 도우미' : '양식 작성 도우미'}</h3>
-        <p class="sheet-provider">${esc(tpl.title)} · ${tpl.unofficial ? '준비용 문서예요 (공고 지정 공식 양식 아님)' : '실제 공고 양식과 동일한 문서가 만들어져요'}</p>
+        <p class="sheet-provider">${esc(tpl.title)} · ${tpl.unofficial ? '자유 형식 제출 공고라 이 문서를 그대로 제출할 수 있어요' : '실제 공고 양식과 동일한 문서가 만들어져요'}</p>
         ${formQuestionsHtml(tpl)}
         <button class="btn btn-primary btn-lg" id="btn-ff-generate">양식 문서 만들기</button>
         <p class="dp-note">기본정보(학교·이름·학번·연락처)는 프로필에서 자동으로 채워져요.</p>
@@ -792,7 +793,7 @@ function renderFormFill() {
       <div class="sheet-handle"></div>
       <div class="sheet-body">
         <h3 class="sheet-title">이대로 제출 준비할까요?</h3>
-        <p class="sheet-provider">칸을 눌러 직접 수정할 수 있어요 · ${tpl.unofficial ? '준비용 문서 (공식 양식 아님)' : '실제 공고 양식과 동일한 구조'}</p>
+        <p class="sheet-provider">칸을 눌러 직접 수정할 수 있어요 · ${tpl.unofficial ? '자유 형식 제출용 지원문서' : '실제 공고 양식과 동일한 구조'}</p>
         <div class="fd-wrap" id="ff-doc">${renderFormDoc(tpl, state.profile, formFill.ans, { editable: true })}</div>
         <button class="btn btn-primary btn-lg" id="btn-ff-confirm">✓ 이대로 신청 준비 완료</button>
         <div class="submit-actions" style="margin-top:8px">
@@ -830,13 +831,15 @@ function loadNotices() {
     .catch(() => { /* 오프라인 등 — 조용히 무시 */ });
 }
 
-/* 준비용 지원문서 연결 (2026-07-15): 지정 양식이 없는 정식 등록 공고에
-   질문형 문서 작성 흐름을 붙인다. 한국장학재단 제도(전산 신청)는 제외.
+/* 자유 형식 지원문서 연결 (2026-07-15): 공고가 별도 양식 없이 자유 형식 제출을
+   받는다고 '원문으로 확인된' 공고(prepDoc)에만 질문형 문서 작성 흐름을 붙인다.
    공식 양식(formId)과 구분되도록 prepFormId로만 연결 — 채널 라벨은 그대로 유지. */
 function attachPrepTemplates(list) {
   if (typeof FORM_TEMPLATES === 'undefined' || typeof buildPrepTemplate !== 'function') return;
   for (const s of list) {
-    if (s.formId || s.program || /한국장학재단/.test(s.provider || '')) continue;
+    // 개발자 지시(2026-07-15): 앱 제작 지원문서는 '문서 제출이 실제로 가능하다고
+    // 원문으로 확인된 공고(prepDoc: true)'에만 붙인다 — 나머지는 원문 발췌·링크만.
+    if (!s.prepDoc || s.formId || s.program) continue;
     const pid = 'prep:' + s.id;
     FORM_TEMPLATES[pid] = buildPrepTemplate(s);
     s.prepFormId = pid;
@@ -1068,6 +1071,10 @@ function openDetail(id) {
         ? `'자동' 표시 서류는 한국장학재단 등 제출처가 신청 과정에서 전산으로 확인하는 항목이에요 — 따로 준비해야 하는지는 공고 원문에서 확인하세요. `
         : ''}'직접' 서류 중 자기소개서·계획서·사유서·신청 양식은 앱에서 바로 작성할 수 있어요.</p>
 
+      ${(sch.excerpts && sch.excerpts.length) ? `
+      <h4>공고 원문 안내 <span class="channel-tag">원문 그대로</span></h4>
+      <ul class="doc-list">${sch.excerpts.map((e) => `<li>${esc(e)}</li>`).join('')}</ul>
+      <p class="doc-legend">공고 본문에서 자동으로 그대로 가져온 문장이에요 — 전체 내용은 원문 공고 ↗에서 확인하세요.</p>` : ''}
       <p class="sheet-note">💡 ${esc(sch.note)}</p>
       ${(sch.attachments && sch.attachments.length) ? `
       <h4>공고 원본 첨부 양식</h4>
@@ -1129,7 +1136,7 @@ function openDetail(id) {
       })() : ''}
 
       <button class="btn btn-primary btn-lg" id="btn-apply-one" ${canApply ? '' : 'disabled'}>${btnLabel}</button>
-      ${canApply ? `<p class="dp-note">준비 완료 후 최종 제출처(${ch.label})를 안내해 드려요.${(!sch.formId && sch.prepFormId) ? ' 이 공고는 지정 신청서 양식이 없어, 준비용 지원문서(공식 양식 아님) 작성을 도와드려요.' : ''}</p>` : ''}
+      ${canApply ? `<p class="dp-note">준비 완료 후 최종 제출처(${ch.label})를 안내해 드려요.${(!sch.formId && sch.prepFormId) ? ' 이 공고는 별도 양식 없이 자유 형식 제출을 받는 공고라, 앱이 제출용 지원문서 작성을 도와드려요.' : ''}</p>` : ''}
     </div>`;
 
   $('#sheet-backdrop').hidden = false;
