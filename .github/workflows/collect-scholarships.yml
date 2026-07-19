@@ -55,7 +55,10 @@ jobs:
         run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add collector/seen.json data/notices.json data/registered.json collector/pending-forms.json collector/extracted
+          git add collector/seen.json data/notices.json data/registered.json
+          [ -f collector/pending-forms.json ] && git add collector/pending-forms.json
+          [ -d collector/extracted ] && git add collector/extracted
+          true  # 위 선택 파일이 없어도 저장 단계는 계속된다 (2026-07-19 8회 연속 실패 원인 수정)
           if ! git diff --cached --quiet; then
             git commit -m "collector: seen state update"
             # 다른 로봇이 먼저 push했을 수 있음 — 받아서 얹은 뒤 재시도 (수집분 유실 방지)
@@ -89,4 +92,19 @@ jobs:
           if [ -n "$last" ] && [ "$last" != "null" ]; then
             gh issue comment "$last" --repo "${{ github.repository }}" \
               --body "🤖 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 수집 로봇 정상 실행 — 새 공고 0건이라 새 리포트는 만들지 않았어요."
+          fi
+
+      # 로봇이 어떤 단계에서든 실패하면 조용히 멈추지 않고 즉시 알린다
+      # (2026-07-17~19 이틀간 8회 연속 실패를 아무도 몰랐던 사고의 재발 방지)
+      - name: 🚨 실패 알림 (최근 리포트 이슈에 코멘트)
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          last=$(gh issue list --repo "${{ github.repository }}" \
+            --search '"장학공고 수집 리포트" in:title' --state open \
+            --limit 1 --json number --jq '.[0].number' || true)
+          if [ -n "$last" ] && [ "$last" != "null" ]; then
+            gh issue comment "$last" --repo "${{ github.repository }}" \
+              --body "🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **수집 로봇 실행 실패** — 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · 반복되면 Claude 세션에 '로봇 실패 확인해줘'라고 지시하세요."
           fi
