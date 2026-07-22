@@ -2,6 +2,28 @@
  "updatedAt": "2026-07-22",
  "items": [
   {
+   "title": "[한국장학재단] 2026년 대학생 청소년교육지원장학금 사업(대청교) 멘토 상시 모집",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=30511&sort=8&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "attachments": [
+    {
+     "name": "2026년도 대학생 청소년교육지원장학금 업무처리기준.pdf",
+     "url": "https://www.uos.ac.kr/common/board-download.do?listId=FA1&seq=30511&fSeq=1"
+    },
+    {
+     "name": "(양식) 멘토링 활동 관련 주요 양식 모음.zip",
+     "url": "https://www.uos.ac.kr/common/board-download.do?listId=FA1&seq=30511&fSeq=2"
+    },
+    {
+     "name": "2026년 활동기관별 멘토 수요 현황.xlsx",
+     "url": "https://www.uos.ac.kr/common/board-download.do?listId=FA1&seq=30511&fSeq=3"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "서울시립대학교",
+   "campus": "",
+   "foundAt": "2026-07-22"
+  },
+  {
    "title": "[리더십센터] 2026년도 2학기 장학조교 채용 공고",
    "url": "https://www.hanyang.ac.kr/notice_all?p_p_id=kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_action=view_message&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_entryId=111901",
    "attachments": [
@@ -2843,40 +2865,6 @@
     }
    ],
    "deadlineHint": "접수기간 : 2026. 6. 15.(월) ~ 2026. 7. 17.(금) 17:00 에 접수된 건에 한함. &nbs",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-07-03"
-  },
-  {
-   "title": "[등록/장학] 2026학년도 2학기 한국장학재단 농촌출신대학생 학자금대출 신청 안내 신규게시글",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52817&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "attachments": [
-    {
-     "name": "부설기관",
-     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
-    },
-    {
-     "name": "부설연구기관",
-     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
-    },
-    {
-     "name": "연구지원팀",
-     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
-    },
-    {
-     "name": "연구진흥팀",
-     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
-    },
-    {
-     "name": "경영관리팀",
-     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
-    },
-    {
-     "name": "기술지주회사",
-     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
-    }
-   ],
-   "deadlineHint": "까지&nbsp; &nbsp; &nbsp;대출실행기간 연장 &nbsp; * 대출을 실행하면 학생의 등록금고지서에",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-07-03"
