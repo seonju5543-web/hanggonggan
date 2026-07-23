@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-07-23",
+ "updatedAt": "2026-07-24",
  "items": [
   {
    "id": "reg-skku-samil",
@@ -2612,6 +2612,31 @@
    "auto": true,
    "attachments": [],
    "sourceUrl": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=767359&attachNo=560141",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-otice06doarticleno138662",
+   "name": "GR 인재양성 플랫폼 2차 장학생 모집 (~7일(금))",
+   "type": "교내",
+   "provider": "성균관대학교 게시 공고",
+   "amount": "장학금 (세부 원문 확인)",
+   "amountValue": 500000,
+   "deadline": null,
+   "period": "접수 기간 원문 확인",
+   "summary": "성균관대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "성균관대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-07-24 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=138662&article.offset=0&articleLimit=10",
    "sourceKind": "auto"
   }
  ]
