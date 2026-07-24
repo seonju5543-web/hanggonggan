@@ -2,6 +2,74 @@
  "updatedAt": "2026-07-24",
  "items": [
   {
+   "title": "[일반] 2026학년도 2학기 문주장학재단 신규장학생 선발 안내 신규게시글 Attachment",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52933&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [
+    {
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "부설연구기관",
+     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    }
+   ],
+   "deadlineHint": "까지 학생복지팀 ( 복지관 202 호 ) 방문접수 나 . 선정 방법 : 지원서류 법인 심사 후 추천 진행 &nb",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-07-24"
+  },
+  {
+   "title": "[등록/장학] 2026학년도 가송재단 장학생 선발 안내 신규게시글 Attachment",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52932&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [
+    {
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "부설연구기관",
+     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    }
+   ],
+   "deadlineHint": "기한 : 2026. 8. 10.(월 ) 15 시 까지 ② 제출장소 : 학생복지팀 ( 복지관 202 호 ) &nb",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-07-24"
+  },
+  {
    "title": "[빅데이터혁신융합대학사업단] 2026학년도 1학기 성과형 장학금(자격증) 신청 안내",
    "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31133&sort=7&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
    "attachments": [
@@ -2795,33 +2863,6 @@
     }
    ],
    "deadlineHint": "신청기간 : 2026. 7. 3( 금 ) ~ 2026. 7. 13( 월 ) 15:00 &nbsp; 3. 신청방법 :",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "foundAt": "2026-07-06"
-  },
-  {
-   "title": "[서울][국가근로] 2026년 하계방학 국가근로장학생 추가 모집(교내,~7/6) 새글",
-   "url": "https://dep.hufs.ac.kr/bbs/student/2431/258915/artclView.do",
-   "attachments": [
-    {
-     "name": "2026학년도+국가근로+지원서.docx",
-     "url": "https://dep.hufs.ac.kr/bbs/student/2431/144871/download.do"
-    },
-    {
-     "name": "2026학년도+국가근로+지원서.hwp",
-     "url": "https://dep.hufs.ac.kr/bbs/student/2431/144872/download.do"
-    }
-   ],
-   "deadlineHint": "신청기간 :&nbsp; ~ 2026. 7. 6 (월 ) 13:00&nbsp; &nbsp; &nbsp; &nbsp;",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "foundAt": "2026-07-06"
-  },
-  {
-   "title": "[공통][교외] 외부장학재단 장학생 지원 전 국가장학금 신청",
-   "url": "https://dep.hufs.ac.kr/bbs/student/2431/212178/artclView.do",
-   "attachments": [],
-   "deadlineHint": null,
    "school": "한국외국어대학교",
    "campus": "",
    "foundAt": "2026-07-06"
