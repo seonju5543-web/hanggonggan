@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-07-24",
+ "updatedAt": "2026-07-27",
  "items": [
   {
    "id": "reg-skku-samil",
@@ -547,15 +547,7 @@
     }
    ],
    "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/259298/artclView.do",
-   "sourceKind": "official",
-   "excerpts": [
-    "선발인원 : 희망 , 동행 O 명씩 선발",
-    "장학생 접수 : 모든 제출서류는 원본 제출이 원칙임 .",
-    "필수제출 서류 ( 모든 제출서류는 주민등록번호 뒷자리 미공개로 발급 .",
-    "선택요건 증빙서류 ( 해당 사항만 제출 ) - 모든 제출서류는 주민등록번호 뒷자리 미공개로 발급",
-    "접수방법 및 접수처 : 등기우편 ( 익일특급 ) 또는 방문접수"
-   ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "sourceKind": "official"
   },
   {
    "id": "reg-hufs-workstudy-summer",
@@ -671,11 +663,7 @@
     }
    ],
    "sourceUrl": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=138212&article.offset=0&articleLimit=10",
-   "sourceKind": "official",
-   "excerpts": [
-    "별지 서식 제출 서류(학자금대출 관련)_최종.hwp"
-   ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "sourceKind": "official"
   },
   {
    "id": "reg-hufs-yunsungwon",
@@ -1095,7 +1083,12 @@
    "noForm": "학교 포털 입력형 — 채울 신청서 양식 없음(2026-07-07 확인). 세부는 원문 공고 확인",
    "attachments": [],
    "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764943",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "excerpts": [
+    "신청방법 : nDRIMS &rarr; 대표 - 학사행정 &rarr; 【 학생신청 】 신청함",
+    "신청방법 : 아래 서류 모두 제출 / 최근 1 개월 이내 발급서류만 인정"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   },
   {
    "id": "reg-khu-samil",
@@ -2672,6 +2665,78 @@
    ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%202026%EB%85%84%20%ED%99%94%EC%84%B1%EC%8B%9C%EC%9D%B8%EC%9E%AC%EC%9C%A1%EC%84%B1%EC%9E%AC%EB%8B%A8%20%EC%86%8C%EC%83%81%EA%B3%B5%EC%9D%B8%20%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EC%95%88%EB%82%B4",
    "sourceKind": "auto"
+  },
+  {
+   "id": "auto-otice06doarticleno138713",
+   "name": "(공과대학)2026학년도 2학기 한국도레이과학진흥재단 장학생 선발안내(~2026년 7월 31일(금) AM 09:00까지)",
+   "type": "교외",
+   "provider": "성균관대학교 게시 공고",
+   "amount": "장학금 (세부 원문 확인)",
+   "amountValue": 500000,
+   "deadline": null,
+   "period": "접수 기간 원문 확인",
+   "summary": "성균관대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "성균관대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-07-27 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2. 장학후원_추천 양식.docx",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138713&attachNo=116182"
+    }
+   ],
+   "sourceUrl": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=138713&article.offset=0&articleLimit=10",
+   "sourceKind": "auto",
+   "excerpts": [
+    "제출서류 → 모든 서류는 2026년도 7월 이후에 발급한 서류만 인정합니다.",
+    "장학금액 및 수혜학기 : 수업료성 최대 3,300,000원 / 2026-2학기",
+    "신청 기한 : 2026년 7월 27일 (월) ~ 7월 31일(금) 오전 9시까지 (기한 엄수)",
+    "제출방법: GLS-[장학영역]-[장학금보기]-[장학금모아보기]에서 장학금명 클릭 후 신청",
+    "★각 파일명[장학금명_성명_학번]을 꼭 기입하여 제출 서류 모두를 하나의 PDF파일로 병합하여 제출 ★"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-ent2431260146artclviewdo",
+   "name": "[글로벌][교외]2026-2학기 염곡문화재단 장학생 선발 안내(~8/3)",
+   "type": "교외",
+   "provider": "한국외국어대학교 게시 공고",
+   "amount": "장학금 (세부 원문 확인)",
+   "amountValue": 500000,
+   "deadline": "2026-08-03",
+   "period": "접수 ~2026-08-03",
+   "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-07-27 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "(서식) 개인정보수집이용동의서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/145661/download.do"
+    }
+   ],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/260146/artclView.do",
+   "sourceKind": "auto",
+   "excerpts": [
+    "장학금액 : 등록금 전액 ( 등록금범위 장학금 )"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   }
  ]
 }
