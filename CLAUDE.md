@@ -296,5 +296,12 @@
   Resend 키 오면 mail-worker 배포 + data.js mailEndpoint 연결, 스토어 결정 시 TWA 패키징.
   **작업 후 반드시 `node verify/audit-data.js` + 회귀 드라이버(verify/) 실행 후 3브랜치 배포.**
 
+## 공동 개발 진척도 문서 (PROGRESS.md) — 세션 시작 시 필독 (2026-07-28 신설)
+- 두 개발자 공용 진척도 문서. **정본은 항상 `main`의 `PROGRESS.md`** (열람: https://github.com/seonju5543-web/hanggonggan/blob/main/PROGRESS.md).
+  개발자별 작업 브랜치: 선주=`claude/work-seonju`, 공동작업자(Josehyeon)=`claude/work-josehyeon`.
+- **새 세션 시작 시**: `git show origin/main:PROGRESS.md`로 최신본을 읽고, 두 개발자의 완료/개발중/구상중 상태를 사용자에게 먼저 요약 보고한다.
+- **작업 종료 시**: 자기 담당 칸(완료/개발중/구상중)만 수정해 **`main`에 커밋**한다. 상대 칸은 건드리지 않는다(충돌 방지).
+  '🤖 활동 로그'(AUTO-ACTIVITY 마커 사이)는 매일 08:07·22:07 KST `update-progress.yml` 워크플로가 브랜치별 커밋으로 자동 갱신하므로 **손대지 않는다**.
+
 ## 커밋 규칙
 - 커밋 끝에 Claude-Session 링크 추가 관례 유지. PR은 요청 시에만.
