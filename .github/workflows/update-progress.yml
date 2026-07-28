@@ -66,33 +66,20 @@ jobs:
           git commit -m "PROGRESS: 활동 로그 자동 갱신 (매일 08:07·22:07 KST)"
           git push origin HEAD:main
 
-      # 문서가 실제로 갱신됐을 때만 두 개발자에게 메일 발송 (직접 링크 포함).
-      # 메일 자격증명(Secrets)이 없으면 이 스텝만 건너뛰고 실행은 계속된다.
-      - name: Email notify (문서 확인 링크)
+      # 문서가 실제로 갱신됐을 때만, 수집 리포트와 '동일한 방식'(이슈 배정 → GitHub이
+      # 두 개발자에게 자동 메일)으로 알린다. 별도 메일 비밀번호(Secrets) 불필요.
+      - name: 진척도 갱신 알림 (이슈 배정 → 두 개발자에게 자동 메일)
         if: steps.build.outputs.changed == 'true'
-        continue-on-error: true
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          secure: true
-          username: ${{ secrets.MAIL_USERNAME }}
-          password: ${{ secrets.MAIL_PASSWORD }}
-          from: 한대장 진척도봇 <${{ secrets.MAIL_USERNAME }}>
-          to: ${{ secrets.MAIL_TO }}
-          subject: "[한대장] 개발 진척도 문서가 갱신되었습니다"
-          html_body: |
-            <div style="font-family:sans-serif;max-width:520px">
-              <h2>한대장 · 개발 진척도 문서가 갱신되었어요</h2>
-              <p>두 개발자의 최신 진척도(완료 / 개발중 / 구상중)가 업데이트되었습니다.</p>
-              <p style="margin:24px 0">
-                <a href="https://github.com/seonju5543-web/hanggonggan/blob/main/PROGRESS.md"
-                   style="display:inline-block;padding:12px 22px;background:#22aa66;color:#fff;border-radius:8px;text-decoration:none;font-weight:bold">
-                   📄 진척도 문서 바로 확인하기
-                </a>
-              </p>
-              <p style="color:#666;font-size:13px">
-                링크가 안 눌리면 아래 주소를 복사해 여세요:<br>
-                https://github.com/seonju5543-web/hanggonggan/blob/main/PROGRESS.md
-              </p>
-            </div>
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --title "📄 개발 진척도 문서 갱신 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST" \
+            --repo "${{ github.repository }}" \
+            --assignee "${{ github.repository_owner }}" \
+            --assignee "Se-Hyeon-Jo" \
+            --body "두 개발자의 개발 진척도(완료 / 개발중 / 구상중)가 갱신되었습니다.
+
+          📄 **문서 바로 확인**: https://github.com/${{ github.repository }}/blob/main/PROGRESS.md
+
+          확인 후 이 이슈는 닫으셔도 됩니다."
