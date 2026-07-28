@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-07-27",
+ "updatedAt": "2026-07-28",
  "items": [
   {
    "id": "reg-skku-samil",
@@ -1083,12 +1083,7 @@
    "noForm": "학교 포털 입력형 — 채울 신청서 양식 없음(2026-07-07 확인). 세부는 원문 공고 확인",
    "attachments": [],
    "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764943",
-   "sourceKind": "official",
-   "excerpts": [
-    "신청방법 : nDRIMS &rarr; 대표 - 학사행정 &rarr; 【 학생신청 】 신청함",
-    "신청방법 : 아래 서류 모두 제출 / 최근 1 개월 이내 발급서류만 인정"
-   ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "sourceKind": "official"
   },
   {
    "id": "reg-khu-samil",
@@ -2697,10 +2692,10 @@
    "sourceKind": "auto",
    "excerpts": [
     "제출서류 → 모든 서류는 2026년도 7월 이후에 발급한 서류만 인정합니다.",
+    "※ 지도교수 추천서는 지원자 본인이 직접 의뢰한 후 신청기간 내에 GLS를 통해 신청하셔야 합니다.",
     "장학금액 및 수혜학기 : 수업료성 최대 3,300,000원 / 2026-2학기",
     "신청 기한 : 2026년 7월 27일 (월) ~ 7월 31일(금) 오전 9시까지 (기한 엄수)",
-    "제출방법: GLS-[장학영역]-[장학금보기]-[장학금모아보기]에서 장학금명 클릭 후 신청",
-    "★각 파일명[장학금명_성명_학번]을 꼭 기입하여 제출 서류 모두를 하나의 PDF파일로 병합하여 제출 ★"
+    "제출방법: GLS-[장학영역]-[장학금보기]-[장학금모아보기]에서 장학금명 클릭 후 신청"
    ],
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   },
@@ -2737,6 +2732,68 @@
     "장학금액 : 등록금 전액 ( 등록금범위 장학금 )"
    ],
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-ent2431260214artclviewdo",
+   "name": "[서울][교외] 2026년도 2학기 연재장학재단 32기 장학생 선발안내(~8/10)",
+   "type": "교외",
+   "provider": "한국외국어대학교 게시 공고",
+   "amount": "장학금 (세부 원문 확인)",
+   "amountValue": 500000,
+   "deadline": "2026-08-10",
+   "period": "접수 ~2026-08-10",
+   "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-07-28 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "장학생 추천서(양식).pdf",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/145733/download.do"
+    }
+   ],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/260214/artclView.do",
+   "sourceKind": "auto",
+   "excerpts": [
+    "장학금액: 한학기 2,500,000원 등록금 한도내",
+    "제출기한: 2026 .",
+    "제출방법: 등기우편 ( 익일특급 ) 또는 방문접수",
+    "문의처: 서울캠퍼스 장학팀(02-2173-2136)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-ent2431260269artclviewdo",
+   "name": "[공통][국가근로] 2026-2학기 국가근로장학생 희망근로지 신청 안내",
+   "type": "교내",
+   "provider": "한국외국어대학교 게시 공고",
+   "amount": "장학금 (세부 원문 확인)",
+   "amountValue": 500000,
+   "deadline": null,
+   "period": "접수 기간 원문 확인",
+   "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-07-28 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/260269/artclView.do",
+   "sourceKind": "auto"
   }
  ]
 }
