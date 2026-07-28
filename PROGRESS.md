@@ -67,7 +67,52 @@
 ## 🤖 활동 로그 (매일 아침 로봇이 자동 갱신 — 손대지 마세요)
 
 <!-- AUTO-ACTIVITY-START -->
-*(아직 자동 갱신 전 — 일일 워크플로가 연결되면 여기 브랜치별 최근 커밋이 채워집니다.)*
+*(자동 갱신: 2026-07-28 23:33 KST · 최근 7일)*
+
+**🟦 선주** (`claude/work-seonju`) — main 대비 34커밋
+- 07-28 14:32 · 진척도 자동화: 세션시작 규칙(CLAUDE.md) + 매일 2회 활동로그 갱신 워크플로
+- 07-28 06:01 · browser-collector: harvest update
+- 07-28 05:42 · collector: seen state update
+- 07-28 00:17 · browser-collector: harvest update
+- 07-27 23:41 · collector: seen state update
+- 07-27 06:45 · browser-collector: harvest update
+- 07-27 06:16 · collector: seen state update
+- 07-27 00:18 · browser-collector: harvest update
+- 07-26 23:36 · collector: seen state update
+- 07-26 06:20 · browser-collector: harvest update
+- 07-26 00:17 · browser-collector: harvest update
+- 07-25 23:37 · collector: seen state update
+- 07-25 05:57 · browser-collector: harvest update
+- 07-25 00:21 · browser-collector: harvest update
+- 07-24 23:38 · collector: seen state update
+- 07-24 06:11 · browser-collector: harvest update
+- 07-24 05:37 · collector: seen state update
+- 07-24 00:15 · browser-collector: harvest update
+- 07-23 23:33 · collector: seen state update
+- 07-23 06:15 · browser-collector: harvest update
+
+**🟩 공동작업자** (`claude/work-josehyeon`) — main 대비 34커밋
+- 07-28 14:32 · 진척도 자동화: 세션시작 규칙(CLAUDE.md) + 매일 2회 활동로그 갱신 워크플로
+- 07-28 06:01 · browser-collector: harvest update
+- 07-28 05:42 · collector: seen state update
+- 07-28 00:17 · browser-collector: harvest update
+- 07-27 23:41 · collector: seen state update
+- 07-27 06:45 · browser-collector: harvest update
+- 07-27 06:16 · collector: seen state update
+- 07-27 00:18 · browser-collector: harvest update
+- 07-26 23:36 · collector: seen state update
+- 07-26 06:20 · browser-collector: harvest update
+- 07-26 00:17 · browser-collector: harvest update
+- 07-25 23:37 · collector: seen state update
+- 07-25 05:57 · browser-collector: harvest update
+- 07-25 00:21 · browser-collector: harvest update
+- 07-24 23:38 · collector: seen state update
+- 07-24 06:11 · browser-collector: harvest update
+- 07-24 05:37 · collector: seen state update
+- 07-24 00:15 · browser-collector: harvest update
+- 07-23 23:33 · collector: seen state update
+- 07-23 06:15 · browser-collector: harvest update
+
 <!-- AUTO-ACTIVITY-END -->
 
 ---
