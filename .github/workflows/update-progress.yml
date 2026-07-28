@@ -1,6 +1,7 @@
 name: Update PROGRESS doc
 
-# 공동 개발 진척도 문서(main의 PROGRESS.md)의 '활동 로그'를 매일 2회 자동 갱신.
+# 공동 개발 진척도 문서(main의 PROGRESS.md)의 '활동 로그'를 매일 2회 자동 갱신하고,
+# 실제 활동 변화가 있을 때만 두 개발자에게 메일로 알린다.
 # 예약 워크플로는 기본 브랜치(claude/nice-heisenberg-WESq5)에 있어야 작동한다.
 on:
   schedule:
@@ -21,19 +22,19 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Fetch work branches
-        run: git fetch origin claude/work-seonju claude/work-josehyeon 2>/dev/null || true
+      - name: Fetch branches
+        run: git fetch origin claude/work-seonju claude/work-josehyeon claude/nice-heisenberg-WESq5 2>/dev/null || true
 
-      - name: Rebuild activity section
+      - name: Rebuild activity section (실제 변화 있을 때만)
+        id: build
         run: |
           cat > /tmp/upd.mjs <<'EOF'
           import { execSync } from 'node:child_process';
           import fs from 'node:fs';
           const P = 'PROGRESS.md';
-          if (!fs.existsSync(P)) { console.log('PROGRESS.md 없음 — 건너뜀'); process.exit(0); }
+          if (!fs.existsSync(P)) { console.log('PROGRESS.md 없음'); process.exit(0); }
           let doc = fs.readFileSync(P, 'utf8');
-          function sh(cmd){ try { return execSync(cmd,{encoding:'utf8'}).trim(); } catch(e){ return ''; } }
-          // 로봇 공용 베이스(기본 브랜치) 대비 '각자 추가한 커밋'만 = 개발자 본인 작업
+          const sh = c => { try { return execSync(c, {encoding:'utf8'}).trim(); } catch { return ''; } };
           const BASE = 'origin/claude/nice-heisenberg-WESq5';
           function section(branch, label){
             const range = `${BASE}..origin/${branch}`;
@@ -41,23 +42,57 @@ jobs:
             const ahead = sh(`git rev-list --count ${range}`) || '0';
             return `**${label}** (\`${branch}\`) — 본인 작업 ${ahead}커밋\n${log || '- 아직 이 브랜치의 개별 작업 없음'}\n`;
           }
+          const activity = `${section('claude/work-seonju','🟦 선주')}\n${section('claude/work-josehyeon','🟩 공동작업자')}`;
+          // 타임스탬프 줄을 뺀 '내용'만 비교 — 실제 활동 변화가 없으면 갱신·메일 생략(스팸 방지)
+          const cur = (doc.match(/<!-- AUTO-ACTIVITY-START -->([\s\S]*?)<!-- AUTO-ACTIVITY-END -->/) || [,''])[1]
+                        .replace(/\*\(자동 갱신[^\n]*\n/, '').trim();
+          if (cur === activity.trim()) { console.log('활동 변화 없음 — 갱신 생략'); process.exit(0); }
           const kst = new Date(Date.now() + 9*3600*1000).toISOString().replace('T',' ').slice(0,16);
-          const block = `*(자동 갱신: ${kst} KST · 최근 7일)*\n\n${section('claude/work-seonju','🟦 선주')}\n${section('claude/work-josehyeon','🟩 공동작업자')}`;
+          const block = `*(자동 갱신: ${kst} KST · 최근 14일)*\n\n${activity}`;
           doc = doc.replace(/<!-- AUTO-ACTIVITY-START -->[\s\S]*?<!-- AUTO-ACTIVITY-END -->/,
             `<!-- AUTO-ACTIVITY-START -->\n${block}\n<!-- AUTO-ACTIVITY-END -->`);
           fs.writeFileSync(P, doc);
-          console.log('활동 로그 갱신 완료');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, 'changed=true\n');
+          console.log('활동 로그 갱신됨');
           EOF
           node /tmp/upd.mjs
 
       - name: Commit & push to main
+        if: steps.build.outputs.changed == 'true'
         run: |
           git config user.name "hanjang-progress-bot"
           git config user.email "actions@github.com"
           git add PROGRESS.md
-          if git diff --cached --quiet; then
-            echo "변경 없음 — 커밋 생략"
-          else
-            git commit -m "PROGRESS: 활동 로그 자동 갱신 (매일 08:07·22:07 KST)"
-            git push origin HEAD:main
-          fi
+          git commit -m "PROGRESS: 활동 로그 자동 갱신 (매일 08:07·22:07 KST)"
+          git push origin HEAD:main
+
+      # 문서가 실제로 갱신됐을 때만 두 개발자에게 메일 발송 (직접 링크 포함).
+      # 메일 자격증명(Secrets)이 없으면 이 스텝만 건너뛰고 실행은 계속된다.
+      - name: Email notify (문서 확인 링크)
+        if: steps.build.outputs.changed == 'true'
+        continue-on-error: true
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          from: 한대장 진척도봇 <${{ secrets.MAIL_USERNAME }}>
+          to: ${{ secrets.MAIL_TO }}
+          subject: "[한대장] 개발 진척도 문서가 갱신되었습니다"
+          html_body: |
+            <div style="font-family:sans-serif;max-width:520px">
+              <h2>한대장 · 개발 진척도 문서가 갱신되었어요</h2>
+              <p>두 개발자의 최신 진척도(완료 / 개발중 / 구상중)가 업데이트되었습니다.</p>
+              <p style="margin:24px 0">
+                <a href="https://github.com/seonju5543-web/hanggonggan/blob/main/PROGRESS.md"
+                   style="display:inline-block;padding:12px 22px;background:#22aa66;color:#fff;border-radius:8px;text-decoration:none;font-weight:bold">
+                   📄 진척도 문서 바로 확인하기
+                </a>
+              </p>
+              <p style="color:#666;font-size:13px">
+                링크가 안 눌리면 아래 주소를 복사해 여세요:<br>
+                https://github.com/seonju5543-web/hanggonggan/blob/main/PROGRESS.md
+              </p>
+            </div>
