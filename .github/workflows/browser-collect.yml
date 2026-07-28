@@ -70,7 +70,8 @@ jobs:
             --title "🖥 브라우저형 수집 리포트 $(TZ=Asia/Seoul date +%Y-%m-%d) (신규 ${{ steps.run.outputs.new_count }}건)" \
             --body-file collector/browser-report.md \
             --repo "${{ github.repository }}" \
-            --assignee "${{ github.repository_owner }}"
+            --assignee "${{ github.repository_owner }}" \
+            --assignee "Se-Hyeon-Jo"
 
       # 실패 시 즉시 알림 (조용한 중단 방지 — 2026-07-19 도입)
       - name: 🚨 실패 알림 (최근 리포트 이슈에 코멘트)
