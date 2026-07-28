@@ -33,10 +33,13 @@ jobs:
           if (!fs.existsSync(P)) { console.log('PROGRESS.md 없음 — 건너뜀'); process.exit(0); }
           let doc = fs.readFileSync(P, 'utf8');
           function sh(cmd){ try { return execSync(cmd,{encoding:'utf8'}).trim(); } catch(e){ return ''; } }
+          // 로봇 공용 베이스(기본 브랜치) 대비 '각자 추가한 커밋'만 = 개발자 본인 작업
+          const BASE = 'origin/claude/nice-heisenberg-WESq5';
           function section(branch, label){
-            const log = sh(`git log origin/${branch} --since="7 days ago" --no-merges --pretty=format:"- %ad · %s" --date=format:"%m-%d %H:%M" -n 20`);
-            const ahead = sh(`git rev-list --count origin/main..origin/${branch}`) || '0';
-            return `**${label}** (\`${branch}\`) — main 대비 ${ahead}커밋\n${log || '- 최근 7일 활동 없음'}\n`;
+            const range = `${BASE}..origin/${branch}`;
+            const log = sh(`git log ${range} --since="14 days ago" --no-merges --pretty=format:"- %ad · %s" --date=format:"%m-%d %H:%M" -n 20`);
+            const ahead = sh(`git rev-list --count ${range}`) || '0';
+            return `**${label}** (\`${branch}\`) — 본인 작업 ${ahead}커밋\n${log || '- 아직 이 브랜치의 개별 작업 없음'}\n`;
           }
           const kst = new Date(Date.now() + 9*3600*1000).toISOString().replace('T',' ').slice(0,16);
           const block = `*(자동 갱신: ${kst} KST · 최근 7일)*\n\n${section('claude/work-seonju','🟦 선주')}\n${section('claude/work-josehyeon','🟩 공동작업자')}`;
