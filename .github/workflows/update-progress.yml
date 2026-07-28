@@ -1,0 +1,60 @@
+name: Update PROGRESS doc
+
+# 공동 개발 진척도 문서(main의 PROGRESS.md)의 '활동 로그'를 매일 2회 자동 갱신.
+# 예약 워크플로는 기본 브랜치(claude/nice-heisenberg-WESq5)에 있어야 작동한다.
+on:
+  schedule:
+    - cron: '7 23 * * *'   # 08:07 KST (UTC+9)
+    - cron: '7 13 * * *'   # 22:07 KST (UTC+9)
+  workflow_dispatch:        # 수동 실행 버튼
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Fetch work branches
+        run: git fetch origin claude/work-seonju claude/work-josehyeon 2>/dev/null || true
+
+      - name: Rebuild activity section
+        run: |
+          cat > /tmp/upd.mjs <<'EOF'
+          import { execSync } from 'node:child_process';
+          import fs from 'node:fs';
+          const P = 'PROGRESS.md';
+          if (!fs.existsSync(P)) { console.log('PROGRESS.md 없음 — 건너뜀'); process.exit(0); }
+          let doc = fs.readFileSync(P, 'utf8');
+          function sh(cmd){ try { return execSync(cmd,{encoding:'utf8'}).trim(); } catch(e){ return ''; } }
+          function section(branch, label){
+            const log = sh(`git log origin/${branch} --since="7 days ago" --no-merges --pretty=format:"- %ad · %s" --date=format:"%m-%d %H:%M" -n 20`);
+            const ahead = sh(`git rev-list --count origin/main..origin/${branch}`) || '0';
+            return `**${label}** (\`${branch}\`) — main 대비 ${ahead}커밋\n${log || '- 최근 7일 활동 없음'}\n`;
+          }
+          const kst = new Date(Date.now() + 9*3600*1000).toISOString().replace('T',' ').slice(0,16);
+          const block = `*(자동 갱신: ${kst} KST · 최근 7일)*\n\n${section('claude/work-seonju','🟦 선주')}\n${section('claude/work-josehyeon','🟩 공동작업자')}`;
+          doc = doc.replace(/<!-- AUTO-ACTIVITY-START -->[\s\S]*?<!-- AUTO-ACTIVITY-END -->/,
+            `<!-- AUTO-ACTIVITY-START -->\n${block}\n<!-- AUTO-ACTIVITY-END -->`);
+          fs.writeFileSync(P, doc);
+          console.log('활동 로그 갱신 완료');
+          EOF
+          node /tmp/upd.mjs
+
+      - name: Commit & push to main
+        run: |
+          git config user.name "hanjang-progress-bot"
+          git config user.email "actions@github.com"
+          git add PROGRESS.md
+          if git diff --cached --quiet; then
+            echo "변경 없음 — 커밋 생략"
+          else
+            git commit -m "PROGRESS: 활동 로그 자동 갱신 (매일 08:07·22:07 KST)"
+            git push origin HEAD:main
+          fi
