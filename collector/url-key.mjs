@@ -44,4 +44,47 @@ export function urlKey(raw) {
   return base + (kept.length ? `?${kept.join('&')}` : '') + hash;
 }
 
+/* 같은 공고가 '진짜 링크'와 '클릭형 표식(#n-제목)' 두 형태로 들어오는 경우가 있다.
+   같은 게시판을 일반 수집기와 브라우저 수집기가 각각 훑거나, 브라우저 수집기가 링크와
+   클릭 수집을 모두 성공했을 때 생긴다. 주소가 아예 다르므로 urlKey로는 못 걸러진다.
+   그래서 '학교 + 제목'을 두 번째 열쇠로 쓴다. */
+export function titleKey(item) {
+  const t = (item.title || '')
+    .replace(/^\d{3,5}\s+/, '')                 // 목록 행 번호
+    .replace(/\s*20\d{2}\.\d{1,2}\.\d{1,2}\.?\s*조회\s*\d+\s*$/, '')
+    .replace(/신규게시글|Attachment|새글|공지/g, '')
+    .replace(/[\s\[\]()·ㆍ~〜.,'"“”‘’!⭐★]/g, '')
+    .toLowerCase();
+  if (!t) return '';
+  return `${item.school || ''}|${item.campus || ''}|${t}`;
+}
+
+/* 두 항목 중 사용자에게 더 나은 쪽 — 공고로 바로 가는 진짜 주소를 남긴다
+   (클릭형 표식은 게시판 목록까지만 열린다) */
+export function preferNotice(a, b) {
+  const marker = (n) => (n.url || '').includes('#n-');
+  if (marker(a) !== marker(b)) return marker(a) ? b : a;
+  const score = (n) => (n.deadlineHint ? 1 : 0) + ((n.attachments || []).length ? 1 : 0);
+  return score(b) > score(a) ? b : a;
+}
+
+/* 발행 직전 중복 정리 — 두 열쇠(정규화 주소 · 학교+제목)로 같은 공고를 하나로 합친다.
+   먼저 들어온 순서(최신 수집분이 앞)를 유지하되, 남길 항목은 preferNotice로 고른다. */
+export function dedupeNotices(items) {
+  const out = [];
+  const idx = new Map(); // 열쇠 → out에서의 위치
+  for (const n of items || []) {
+    const keys = [`u:${urlKey(n.url)}`, titleKey(n) ? `t:${titleKey(n)}` : null].filter(Boolean);
+    const hit = keys.map((k) => idx.get(k)).find((v) => v !== undefined);
+    if (hit === undefined) {
+      const pos = out.push(n) - 1;
+      keys.forEach((k) => idx.set(k, pos));
+    } else {
+      out[hit] = preferNotice(out[hit], n);
+      keys.forEach((k) => { if (!idx.has(k)) idx.set(k, hit); });
+    }
+  }
+  return out;
+}
+
 export default urlKey;

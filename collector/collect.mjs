@@ -7,7 +7,7 @@
    4) 컨펌용 리포트 이슈 생성 (양식 스키마화·정식 등록은 개발자 컨펌 후)
    ============================================================ */
 import fs from 'node:fs';
-import { urlKey } from './url-key.mjs';
+import { urlKey, dedupeNotices } from './url-key.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const cfg = JSON.parse(fs.readFileSync(new URL('schools.json', HERE), 'utf8'));
@@ -125,15 +125,7 @@ notices.items = freshAll.concat(notices.items || []);
 /* 수집일로부터 60일 지난 공고는 자동 삭제 (마감 공고 정리) */
 const cutoff = new Date(Date.now() - 60 * 86400000).toISOString().slice(0, 10);
 notices.items = notices.items.filter((n) => (n.foundAt || '9999') >= cutoff);
-/* 같은 공고가 다른 주소로 여러 번 들어와 있으면 최신 1건만 남긴다
-   (정렬 순번이 붙는 게시판 대응 — 소급 정리도 겸한다) */
-const seenKeys = new Set();
-notices.items = notices.items.filter((n) => {
-  const k = urlKey(n.url);
-  if (seenKeys.has(k)) return false;
-  seenKeys.add(k);
-  return true;
-});
+notices.items = dedupeNotices(notices.items);
 const perSchool = {};
 notices.items = notices.items.filter((n) => {
   const k = n.school + '|' + (n.campus || '');

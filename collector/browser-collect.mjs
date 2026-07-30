@@ -3,7 +3,7 @@
    결과는 일반 수집기와 같은 data/notices.json에 합쳐진다. */
 import fs from 'node:fs';
 import { chromium } from 'playwright';
-import { urlKey } from './url-key.mjs';
+import { urlKey, dedupeNotices } from './url-key.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const cfg = JSON.parse(fs.readFileSync(new URL('browser-targets.json', HERE), 'utf8'));
@@ -251,14 +251,8 @@ await browser.close();
 notices.items = freshAll.concat(notices.items || []);
 const cutoff = new Date(Date.now() - 60 * 86400000).toISOString().slice(0, 10);
 notices.items = notices.items.filter((n) => (n.foundAt || '9999') >= cutoff);
-/* 같은 공고가 다른 주소로 여러 번 들어와 있으면 최신 1건만 남긴다 (정렬 순번 게시판 대응 + 소급 정리) */
-const seenKeys = new Set();
-notices.items = notices.items.filter((n) => {
-  const k = urlKey(n.url);
-  if (seenKeys.has(k)) return false;
-  seenKeys.add(k);
-  return true;
-});
+/* 같은 공고가 다른 주소(정렬 순번·클릭형 표식)로 여러 번 들어와 있으면 하나로 합친다 */
+notices.items = dedupeNotices(notices.items);
 const perSchool = {};
 notices.items = notices.items.filter((n) => {
   const k = n.school + '|' + (n.campus || '');

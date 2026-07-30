@@ -49,13 +49,33 @@ for (const n of notices.items) {
 }
 fs.writeFileSync(new URL('notices-text.json', OUT), JSON.stringify(texts, null, 1));
 
-/* 지정 공고의 첨부 원본 다운로드 (이전 실행의 form-* 파일·색인은 지우고 새로 채움) */
+/* 지정 공고의 첨부 원본 다운로드.
+   예전에는 실행할 때마다 form-* 파일을 전부 지우고 1번부터 다시 채웠다. 그 바람에
+   '스키마화 대기'로 큐에 남아 있던 공고의 원본이 다음 수집 때 사라져, 다음 세션이 양식을
+   만들 수 없었다(2026-07-30 발견 — 도레이·염곡·시립대 원본이 이렇게 유실됨).
+   그래서 파일 이름에 공고별 표식을 넣고, 이번에 다시 받는 공고의 파일만 갈아끼운다. */
+const slugOf = (title) => {
+  let h = 0;
+  for (let i = 0; i < title.length; i++) h = (h * 31 + title.charCodeAt(i)) >>> 0;
+  return h.toString(36).slice(0, 6);
+};
+const targets = notices.items.filter((n) => DOWNLOAD_FORMS_FOR.some((k) => n.title.includes(k)));
+const refreshing = new Set(targets.map((n) => slugOf(n.title)));
+// 이번에 다시 받는 공고의 예전 파일만 지운다 (다른 공고의 대기 중 원본은 보존)
 for (const f of fs.readdirSync(OUT)) {
-  if (/^form-/.test(f) || f === 'forms-index.txt') fs.unlinkSync(new URL(f, OUT));
+  const m = f.match(/^form-([a-z0-9]{1,6})-/);
+  if (m && refreshing.has(m[1])) fs.unlinkSync(new URL(f, OUT));
 }
+const indexPath = new URL('forms-index.txt', OUT);
+let indexLines = [];
+try {
+  indexLines = fs.readFileSync(indexPath, 'utf8').split('\n').filter(Boolean)
+    .filter((line) => { const m = line.split('\t')[0].match(/^form-([a-z0-9]{1,6})-/); return m && !refreshing.has(m[1]); });
+} catch { /* 첫 실행 */ }
 let fi = 0;
-for (const n of notices.items) {
-  if (!DOWNLOAD_FORMS_FOR.some((k) => n.title.includes(k))) continue;
+for (const n of targets) {
+  const slug = slugOf(n.title);
+  let ai = 0;
   for (const a of n.attachments || []) {
     if (/부속기관|부설/.test(a.name)) continue; // 사이트 공통 링크 제외
     try {
@@ -63,12 +83,14 @@ for (const n of notices.items) {
       if (!res.ok) { console.log('attach fail', res.status, a.name); continue; }
       const buf = Buffer.from(await res.arrayBuffer());
       if (buf.length < 1000 || buf.length > 15 * 1024 * 1024) continue;
-      fi += 1;
-      const ext = (a.name.match(/\.(hwp|hwpx|doc|docx|pdf|xls|xlsx|zip)$/i) || [,'bin'])[1];
-      fs.writeFileSync(new URL(`form-${fi}.${ext}`, OUT), buf);
-      fs.appendFileSync(new URL('forms-index.txt', OUT), `form-${fi}.${ext}\t${n.title}\t${a.name}\t${buf.length}\n`);
+      fi += 1; ai += 1;
+      const ext = (a.name.match(/\.(hwp|hwpx|doc|docx|pdf|xls|xlsx|zip)$/i) || [, 'bin'])[1];
+      const fname = `form-${slug}-${ai}.${ext}`;
+      fs.writeFileSync(new URL(fname, OUT), buf);
+      indexLines.push(`${fname}\t${n.title}\t${a.name}\t${buf.length}`);
       console.log('attach ok:', a.name, buf.length);
     } catch (e) { console.log('attach err', a.name, e.name || e.message); }
   }
 }
+fs.writeFileSync(indexPath, indexLines.join('\n') + (indexLines.length ? '\n' : ''));
 console.log(`done: ${texts.length} texts, ${fi} attachments`);
