@@ -71,8 +71,8 @@
     {
       "school": "서울시립대학교",
       "campus": "",
-      "boardUrl": "https://www.uos.ac.kr/korNotice/list.do?list_id=FA2",
-      "note": "자동 탐색 실패(봇 차단·동적 페이지 추정) — 개발자가 장학공지 주소 제공 필요"
+      "boardUrl": "https://www.uos.ac.kr/korNotice/list.do?list_id=FA1",
+      "note": "FA1=장학공지 (FA2는 학사공지라 장학 0건이었음 — 2026-07-30 교정). 목록을 스크립트로 그려 브라우저형 수집기가 주력"
     },
     {
       "school": "건국대학교",

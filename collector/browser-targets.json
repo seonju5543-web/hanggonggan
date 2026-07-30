@@ -31,9 +31,10 @@
     {
       "school": "서울시립대학교",
       "campus": "",
+      "_note": "FA1이 장학공지(수집 실적 전부 여기), FA2는 학사공지라 장학 0건 — 2026-07-30 순서 교정",
       "candidates": [
-        "https://www.uos.ac.kr/korNotice/list.do?list_id=FA2",
-        "https://www.uos.ac.kr/korNotice/list.do?list_id=FA1"
+        "https://www.uos.ac.kr/korNotice/list.do?list_id=FA1",
+        "https://www.uos.ac.kr/korNotice/list.do?list_id=FA2"
       ]
     },
     {
