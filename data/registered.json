@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-07-29",
+ "updatedAt": "2026-07-30",
  "items": [
   {
    "id": "reg-skku-samil",
@@ -2843,6 +2843,32 @@
    "auto": true,
    "attachments": [],
    "sourceUrl": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52964&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-c839d20ec84a0ebb09c20202",
+   "name": "[홍보] 2026년 하반기 서울인재대학장학금 장학생 선발",
+   "type": "교내",
+   "provider": "동국대학교 서울캠퍼스 게시 공고",
+   "amount": "장학금 (세부 원문 확인)",
+   "amountValue": 500000,
+   "deadline": null,
+   "period": "접수 기간 원문 확인",
+   "summary": "동국대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "동국대학교",
+    "campusOnly": "서울캠퍼스"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-07-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2666%20%5B%ED%99%8D%EB%B3%B4%5D%202026%EB%85%84%20%ED%95%98%EB%B0%98%EA%B8%B0%20%EC%84%9C%EC%9A%B8%EC%9D%B8%EC%9E%AC%EB%8C%80%ED%95%99%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20202",
    "sourceKind": "auto"
   }
  ]
