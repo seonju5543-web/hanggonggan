@@ -26,7 +26,32 @@ const MODEL = 'claude-opus-5';
 /* 학생이 직접 채우는 문서가 아닌 서식 — 스키마화 대상에서 제외한다 */
 const THIRD_PARTY = /추천서|추천\s*양식|소견서|확인서\(기관|재직증명/;
 
+/* 줄글로 펴면 배치가 무너져 '원본과 동일한 문서'를 장담할 수 없는 서식들.
+   이런 건 API가 원본 파일을 직접 보게 한다 (운영 원칙 4 — 양식의 정의). */
+const COMPLEX_LAYOUT = /시간표|원고지|주\s*간\s*계\s*획|월\s*\|?\s*화\s*\|?\s*수\s*\|?\s*목\s*\|?\s*금|별지\s*제?\s*\d+\s*호\s*서식.*표/;
+
+const cfgPath = new URL('schematize-config.json', HERE);
+let cfg = { enabled: true, maxApiCallsPerRun: 2, minTextChars: 400, maxManualChars: 6000, alwaysApiIds: [], neverApiIds: [] };
+try { cfg = { ...cfg, ...JSON.parse(fs.readFileSync(cfgPath, 'utf8')) }; } catch { /* 기본값 */ }
+
 function log(msg) { console.log(`[schematize] ${msg}`); }
+
+/* ---------- 어떤 길로 보낼지 판단 (돈 아끼는 장치) ----------
+   무료 경로 = 다음 Claude 세션이 채팅에서 손으로 옮긴다 (추가 비용 0).
+   API 경로  = 유료 호출. 무료 경로로는 원본과 동일한 문서를 만들 수 없는 건만 보낸다.  */
+function triage(item, row, text) {
+  if (THIRD_PARTY.test(row.attachment)) return { route: 'skip', why: '제3자 작성 서식 — 원본 다운로드 안내 유지' };
+  if ((cfg.neverApiIds || []).includes(item.id)) return { route: 'manual', why: '개발자 지정(neverApiIds) — 무료 경로' };
+  if ((cfg.alwaysApiIds || []).includes(item.id)) return { route: 'api', why: '개발자 지정(alwaysApiIds)' };
+
+  const isPdf = /\.pdf$/i.test(row.file);
+  if (isPdf) return { route: 'api', why: 'PDF — 글자를 뽑을 수 없어 원본을 직접 봐야 함' };
+  if (!text || text.length < 40) return { route: 'api', why: '원본에서 글자를 읽지 못함 — 원본을 직접 봐야 함' };
+  if (text.length < cfg.minTextChars) return { route: 'api', why: '뽑힌 글자가 너무 적음 — 항목이 빠졌을 수 있음' };
+  if (COMPLEX_LAYOUT.test(text)) return { route: 'api', why: '표·시간표 등 복잡한 배치 — 줄글만으론 동일 문서 보장 불가' };
+  if (text.length > cfg.maxManualChars) return { route: 'api', why: '항목이 많아 손으로 옮기면 누락 위험' };
+  return { route: 'manual', why: '글자가 깨끗하게 나와 다음 세션이 무료로 옮길 수 있음' };
+}
 
 /* ---------- 원본에서 텍스트 뽑기 ---------- */
 function unzipEntries(buf) {
@@ -211,10 +236,8 @@ function finish() {
   if (report.length) fs.appendFileSync(reportPath, '\n' + report.join('\n') + '\n');
 }
 
-if (!process.env.ANTHROPIC_API_KEY) {
-  log('ANTHROPIC_API_KEY 없음 — 스키마화를 건너뜁니다 (다음 Claude 세션이 수동 처리).');
-  process.exit(0);
-}
+const hasKey = !!process.env.ANTHROPIC_API_KEY;
+if (!cfg.enabled) { log('schematize-config.json enabled:false — 건너뜁니다.'); process.exit(0); }
 
 let queue;
 try { queue = JSON.parse(fs.readFileSync(queuePath, 'utf8')); } catch { log('대기 큐 없음'); process.exit(0); }
@@ -231,11 +254,19 @@ try {
 const forms = JSON.parse(fs.readFileSync(formsPath, 'utf8'));
 const registered = JSON.parse(fs.readFileSync(registeredPath, 'utf8'));
 
-const { default: Anthropic } = await import('@anthropic-ai/sdk');
-const client = new Anthropic();
+let client = null;
+async function getClient() {
+  if (!client) {
+    const { default: Anthropic } = await import('@anthropic-ai/sdk');
+    client = new Anthropic();
+  }
+  return client;
+}
 
-const done = [];
+const done = [];      /* API로 스키마화 완료 */
+const manual = [];    /* 무료 경로 — 다음 세션이 손으로 (비용 0) */
 const skipped = [];
+let apiCalls = 0;
 
 for (const item of pending) {
   const rows = index.filter((r) => r.notice && item.target && r.notice.includes(item.target.trim()));
@@ -245,25 +276,50 @@ for (const item of pending) {
   if (!entry) { skipped.push([item.name, 'registered.json에 항목 없음']); continue; }
 
   let linked = false;
+  let leftForManual = false;
+
   for (const row of rows) {
-    if (THIRD_PARTY.test(row.attachment)) { skipped.push([row.attachment, '제3자 작성 서식 — 원본 다운로드 안내 유지']); continue; }
     const text = extractText(row.file).trim();
-    if (text.length < 40) { skipped.push([row.attachment, '원본에서 글자를 읽지 못함']); continue; }
+    const { route, why } = triage(item, row, text);
+
+    if (route === 'skip') { skipped.push([row.attachment, why]); continue; }
+
+    /* 무료 경로: 지금 방식(다음 세션이 손으로)으로 원본과 동일한 문서를 만들 수 있는 건
+       API를 부르지 않는다. 큐에 남겨 두면 다음 채팅 세션이 처리한다. */
+    if (route === 'manual') { manual.push([item.name, row.attachment, why]); leftForManual = true; continue; }
+
+    if (!hasKey) { manual.push([item.name, row.attachment, 'API 키 없음 — 다음 세션이 수동 처리']); leftForManual = true; continue; }
+    /* ?? 를 쓴다 — 0(“절대 부르지 마”)을 || 가 기본값으로 되돌려 버리는 사고 방지 */
+    const cap = cfg.maxApiCallsPerRun ?? 2;
+    if (apiCalls >= cap) {
+      manual.push([item.name, row.attachment, `이번 실행 API 한도(${cap}건) 도달 — 다음 실행으로 미룸`]);
+      leftForManual = true;
+      continue;
+    }
+
+    /* 유료 경로: 무료 경로로는 동일 문서를 장담할 수 없는 것만 여기로 온다 */
+    const isPdf = /\.pdf$/i.test(row.file);
+    const ask = `공고: ${row.notice}\n첨부 파일명: ${row.attachment}\n\n학생이 직접 채우는 신청서가 맞으면 스키마로 옮기고, 학생이 채우는 문서가 아니거나 내용이 불충분하면 usable을 false로 하고 reason에 이유를 적어 주세요.`;
+    const content = isPdf
+      ? [
+          { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: fs.readFileSync(new URL(row.file, OUT)).toString('base64') } },
+          { type: 'text', text: ask + '\n\n첨부된 PDF가 신청서 원본입니다. 배치와 항목을 그대로 옮겨 주세요.' }
+        ]
+      : [{ type: 'text', text: `${ask}\n\n----- 원본 -----\n${text.slice(0, 40000)}` }];
 
     let parsed;
     try {
+      apiCalls++;
+      const c = await getClient();
       /* fallbacks: 안전 분류기가 요청을 거절하면 다른 모델로 자동 재시도 (같은 호출 안에서) */
-      const stream = client.beta.messages.stream({
+      const stream = c.beta.messages.stream({
         model: MODEL,
         max_tokens: 32000,
         system: SYSTEM,
         betas: ['server-side-fallback-2026-07-01'],
         fallbacks: 'default',
         output_config: { format: { type: 'json_schema', schema: SCHEMA } },
-        messages: [{
-          role: 'user',
-          content: `공고: ${row.notice}\n첨부 파일명: ${row.attachment}\n\n아래는 이 신청서 원본의 전문입니다. 학생이 직접 채우는 신청서가 맞으면 스키마로 옮기고, 학생이 채우는 문서가 아니거나 내용이 불충분하면 usable을 false로 하고 reason에 이유를 적어 주세요.\n\n----- 원본 -----\n${text.slice(0, 40000)}`
-        }]
+        messages: [{ role: 'user', content }]
       });
       const msg = await stream.finalMessage();
       if (msg.stop_reason === 'refusal') { skipped.push([row.attachment, 'API가 처리를 거부함']); continue; }
@@ -289,10 +345,11 @@ for (const item of pending) {
       delete entry.noForm;
       linked = true;
     }
-    done.push([item.name, row.attachment, fid]);
+    done.push([item.name, row.attachment, fid, why]);
   }
 
-  item.schematized = true;
+  /* 무료 경로로 남긴 첨부가 있으면 큐에 계속 둔다 (다음 세션이 처리) */
+  if (!leftForManual) item.schematized = true;
 }
 
 if (done.length) {
@@ -302,14 +359,18 @@ if (done.length) {
 }
 fs.writeFileSync(queuePath, JSON.stringify(queue, null, 1) + '\n');
 
-report.push('', `### 🧩 양식 자동 스키마화 — ${done.length}건 등록`);
+report.push('', `### 🧩 양식 스키마화 — API ${done.length}건 · 무료 대기 ${manual.length}건`);
 if (done.length) {
-  report.push('', '자동 스키마화된 양식이에요. 원본과 다른 곳이 없는지 다음 세션에서 눈으로 확인해 주세요.', '');
-  for (const [name, att, fid] of done) report.push(`- \`${fid}\` — ${att} (${name.slice(0, 40)})`);
+  report.push('', `**유료 API로 처리 (${apiCalls}회 호출)** — 무료 경로로는 원본과 동일한 문서를 장담할 수 없는 것만 보냈어요. 원본과 다른 곳이 없는지 눈으로 확인해 주세요.`, '');
+  for (const [name, att, fid, why] of done) report.push(`- \`${fid}\` — ${att} (${name.slice(0, 36)}) · 사유: ${why}`);
+}
+if (manual.length) {
+  report.push('', `**무료 경로 대기 (${manual.length}건 · 비용 0)** — 다음 Claude 채팅 세션에서 손으로 옮기면 돼요. "대기 중인 양식 스키마화해줘"라고 지시하세요.`, '');
+  for (const [name, att, why] of manual.slice(0, 12)) report.push(`- ${att} (${name.slice(0, 36)}) · ${why}`);
 }
 if (skipped.length) {
   report.push('', `**건너뜀 ${skipped.length}건**`, '');
   for (const [what, why] of skipped.slice(0, 12)) report.push(`- ${String(what).slice(0, 50)} — ${why}`);
 }
 finish();
-log(`완료: 등록 ${done.length}건 · 건너뜀 ${skipped.length}건`);
+log(`완료: API ${done.length}건(${apiCalls}회 호출) · 무료 대기 ${manual.length}건 · 건너뜀 ${skipped.length}건`);

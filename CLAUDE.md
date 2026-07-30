@@ -65,7 +65,7 @@
 | `collector/browser-collect.mjs` + `browser-targets.json` + `.github/workflows/browser-collect.yml` | **브라우저형 수집기**(진짜 Chromium) — 봇차단·동적 게시판 8개교, 매일 09:20 KST |
 | `collector/collect.mjs` | 매일 09:00 KST 게시판 수집 + 공고 상세·첨부양식 수집 + notices.json 발행 + 리포트 이슈 |
 | `collector/auto-register.mjs` + `auto-register-config.json` | **정식 등록 자동화 (2026-07-15)** — 수집 직후 보수적 규칙 통과분만 registered.json에 자동 등록(auto:true, 앱에 '자동 등록·검수 전' 배지). 애매한 건 '컨펌 대기'로 리포트에만. 킬스위치 enabled:false, 오등록 제거 blockIds |
-| `collector/schematize-forms.mjs` + `mark-fetched.mjs` | **양식 스키마화 무인화 (2026-07-30)** — 확보된 신청서 원본을 Claude API(claude-opus-5)로 읽어 forms.json 스키마 생성 + formId 연결. 수집 워크플로 2종에 연결(`ANTHROPIC_API_KEY` 시크릿). 원본이 매 실행 갈아엎히므로 **같은 실행 안에서** 돌아야 함. 키 없으면 통과 |
+| `collector/schematize-forms.mjs` + `schematize-config.json` + `mark-fetched.mjs` | **양식 스키마화 (2026-07-30)** — **무료 우선 분류기**: 글자가 깨끗이 뽑히는 원본은 API를 부르지 않고 큐에 남겨 다음 채팅 세션이 무료로 처리. PDF·글자 추출 실패·표/시간표 등 **무료 경로로 동일 문서를 장담할 수 없는 것만** Claude API(claude-opus-5, PDF는 원본 첨부) 호출. 실행당 한도 `maxApiCallsPerRun`(기본 2, **0이면 완전 정지**), 킬스위치 `enabled:false`. 원본이 매 실행 갈아엎히므로 **같은 실행 안에서** 돌아야 함 |
 | `collector/schools.json` | 대상 23개 캠퍼스 게시판 주소 (null = 미확보) |
 | `collector/probe.mjs` + `.github/workflows/probe-boards.yml` | 게시판 후보 주소 일괄 정찰 |
 | `.github/workflows/fetch-page.yml` | 임의 페이지+첨부를 원격으로 받아 artifact로 — 차단 환경 우회용 |
@@ -208,12 +208,20 @@
 - **② `fetched` 표시 버그 수정**: 워크플로가 deepfetch 직후 큐 **전체**를 `fetched:true`로 찍어서,
   원본을 못 받은 항목도 확보 완료로 기록 → 다시 시도되지 않고 영구 대기. 큐 4건 중 3건이 이 상태였다.
   `collector/mark-fetched.mjs` 신설 — forms-index에 실제로 들어온 항목만 표시.
-- **③ Claude API 스키마화 자동화**: `collector/schematize-forms.mjs` — 대기 큐의 원본(hwp 미리보기·
-  docx·hwpx zip 파싱)을 읽어 claude-opus-5로 `data/forms.json` 스키마 생성 → `registered.json`에
-  formId 연결 → `schematized:true`. **원본은 deepfetch가 매 실행마다 갈아엎으므로 같은 실행 안에서
-  돌아야 한다** (수집 워크플로 2종에 연결됨, `secrets.ANTHROPIC_API_KEY`). 키가 없으면 조용히 통과.
-  구조화 출력(json_schema)으로 파싱 보장 + 자체 검증(info 키 화이트리스트·필드 id·체크 선택지) 후 등록.
-  제3자 작성 서식(추천서 등)은 자동 제외 — 원본 다운로드 안내 유지.
+- **③ Claude API 스키마화 (무료 우선 · 개발자 지시로 비용 최소화)**: `collector/schematize-forms.mjs`.
+  **핵심은 분류기(triage)** — 돈이 드는 API는 "무료 경로로는 원본과 100% 동일한 문서를 만들 수 없는 것"
+  에만 쓴다.
+  · **무료 경로(비용 0)**: 글자가 깨끗하게 뽑히는 hwp/docx/hwpx → API 호출 없이 큐에 남겨 두고,
+    다음 채팅 세션이 손으로 옮긴다(지금까지 하던 방식 그대로). 이번 세션의 연재 동의서가 이 경우.
+  · **유료 경로(API)**: ⓐ PDF(글자 추출 불가 — 원본 파일을 document 블록으로 첨부해 배치까지 보게 함)
+    ⓑ 글자가 거의 안 뽑힘(`minTextChars` 미만) ⓒ 표·시간표·원고지 등 줄글로 펴면 배치가 무너지는 서식
+    ⓓ 항목이 너무 많아 손으로 옮기면 누락 위험(`maxManualChars` 초과).
+  · **비용 안전장치**: `collector/schematize-config.json` — `maxApiCallsPerRun`(기본 2, **0이면 완전 정지**),
+    `enabled:false` 킬스위치, `alwaysApiIds`/`neverApiIds`로 건별 지정. 리포트에 호출 횟수와 사유가 남는다.
+  · 구조화 출력(json_schema) + 자체 검증(info 키 화이트리스트·필드 id·체크 선택지) 통과분만 등록.
+    제3자 작성 서식(추천서 등)은 무료/유료 판정 전에 제외 — 원본 다운로드 안내 유지.
+  · **함정 주의**: `maxApiCallsPerRun`은 반드시 `??`로 읽을 것. `|| 2`로 읽으면 0(절대 호출 금지)이
+    기본값 2로 되돌아가 돈이 나간다 — 실제로 이 버그를 만들었다가 테스트에서 잡았다.
 - **④ 큐 처리**: UOS 빅데이터 성과형은 기존 `reg-uos-bigdata-cert`와 **중복**(같은 seq·마감)이라
   blockIds로 제거. 연재장학재단 개인정보동의서 **스키마화 완료**(`yeonjae-consent-apply`, 양식 29종).
   염곡·도레이는 원본 미확보라 `fetched:false`로 되돌려 다음 수집 때 재확보 예약.
