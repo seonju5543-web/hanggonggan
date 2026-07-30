@@ -84,7 +84,8 @@ jobs:
             --title "🤖 장학공고 수집 리포트 $(TZ=Asia/Seoul date +%Y-%m-%d) (새 공고 ${{ steps.run.outputs.new_count }}건)" \
             --body-file collector/report.md \
             --repo "${{ github.repository }}" \
-            --assignee "${{ github.repository_owner }}"
+            --assignee "${{ github.repository_owner }}" \
+            --assignee "Se-Hyeon-Jo"
 
       # 새 공고가 0건이라 리포트를 생략할 때도, 로봇이 정상 실행됐다는 사실은
       # 최근 리포트 이슈에 한 줄 코멘트로 남긴다 (매일 새 이슈를 만들면 소음이라서)

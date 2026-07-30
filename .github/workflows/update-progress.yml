@@ -1,0 +1,85 @@
+name: Update PROGRESS doc
+
+# 공동 개발 진척도 문서(main의 PROGRESS.md)의 '활동 로그'를 매일 2회 자동 갱신하고,
+# 실제 활동 변화가 있을 때만 두 개발자에게 메일로 알린다.
+# 예약 워크플로는 기본 브랜치(claude/nice-heisenberg-WESq5)에 있어야 작동한다.
+on:
+  schedule:
+    - cron: '7 23 * * *'   # 08:07 KST (UTC+9)
+    - cron: '7 13 * * *'   # 22:07 KST (UTC+9)
+  workflow_dispatch:        # 수동 실행 버튼
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Fetch branches
+        run: git fetch origin claude/work-seonju claude/work-josehyeon claude/nice-heisenberg-WESq5 2>/dev/null || true
+
+      - name: Rebuild activity section (실제 변화 있을 때만)
+        id: build
+        run: |
+          cat > /tmp/upd.mjs <<'EOF'
+          import { execSync } from 'node:child_process';
+          import fs from 'node:fs';
+          const P = 'PROGRESS.md';
+          if (!fs.existsSync(P)) { console.log('PROGRESS.md 없음'); process.exit(0); }
+          let doc = fs.readFileSync(P, 'utf8');
+          const sh = c => { try { return execSync(c, {encoding:'utf8'}).trim(); } catch { return ''; } };
+          const BASE = 'origin/claude/nice-heisenberg-WESq5';
+          function section(branch, label){
+            const range = `${BASE}..origin/${branch}`;
+            const log = sh(`git log ${range} --since="14 days ago" --no-merges --pretty=format:"- %ad · %s" --date=format:"%m-%d %H:%M" -n 20`);
+            const ahead = sh(`git rev-list --count ${range}`) || '0';
+            return `**${label}** (\`${branch}\`) — 본인 작업 ${ahead}커밋\n${log || '- 아직 이 브랜치의 개별 작업 없음'}\n`;
+          }
+          const activity = `${section('claude/work-seonju','🟦 선주')}\n${section('claude/work-josehyeon','🟩 공동작업자')}`;
+          // 타임스탬프 줄을 뺀 '내용'만 비교 — 실제 활동 변화가 없으면 갱신·메일 생략(스팸 방지)
+          const cur = (doc.match(/<!-- AUTO-ACTIVITY-START -->([\s\S]*?)<!-- AUTO-ACTIVITY-END -->/) || [,''])[1]
+                        .replace(/\*\(자동 갱신[^\n]*\n/, '').trim();
+          if (cur === activity.trim()) { console.log('활동 변화 없음 — 갱신 생략'); process.exit(0); }
+          const kst = new Date(Date.now() + 9*3600*1000).toISOString().replace('T',' ').slice(0,16);
+          const block = `*(자동 갱신: ${kst} KST · 최근 14일)*\n\n${activity}`;
+          doc = doc.replace(/<!-- AUTO-ACTIVITY-START -->[\s\S]*?<!-- AUTO-ACTIVITY-END -->/,
+            `<!-- AUTO-ACTIVITY-START -->\n${block}\n<!-- AUTO-ACTIVITY-END -->`);
+          fs.writeFileSync(P, doc);
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, 'changed=true\n');
+          console.log('활동 로그 갱신됨');
+          EOF
+          node /tmp/upd.mjs
+
+      - name: Commit & push to main
+        if: steps.build.outputs.changed == 'true'
+        run: |
+          git config user.name "hanjang-progress-bot"
+          git config user.email "actions@github.com"
+          git add PROGRESS.md
+          git commit -m "PROGRESS: 활동 로그 자동 갱신 (매일 08:07·22:07 KST)"
+          git push origin HEAD:main
+
+      # 문서가 실제로 갱신됐을 때만, 수집 리포트와 '동일한 방식'(이슈 배정 → GitHub이
+      # 두 개발자에게 자동 메일)으로 알린다. 별도 메일 비밀번호(Secrets) 불필요.
+      - name: 진척도 갱신 알림 (이슈 배정 → 두 개발자에게 자동 메일)
+        if: steps.build.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --title "📄 개발 진척도 문서 갱신 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST" \
+            --repo "${{ github.repository }}" \
+            --assignee "${{ github.repository_owner }}" \
+            --assignee "Se-Hyeon-Jo" \
+            --body "두 개발자의 개발 진척도(완료 / 개발중 / 구상중)가 갱신되었습니다.
+
+          📄 **문서 바로 확인**: https://github.com/${{ github.repository }}/blob/main/PROGRESS.md
+
+          확인 후 이 이슈는 닫으셔도 됩니다."
