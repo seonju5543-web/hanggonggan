@@ -45,8 +45,9 @@ jobs:
       - name: 감사 실패 시 자동 등록분 되돌리기
         if: steps.audit.outcome == 'failure'
         run: |
-          echo "감사 실패 — 이번 실행이 바꾼 data/registered.json을 되돌립니다"
-          git checkout -- data/registered.json || true
+          # 파일 전체가 아니라 '이번 실행이 새로 자동 등록한 공고'만 골라서 뺀다
+          # (같은 실행의 원문 발췌 갱신 같은 정상 작업까지 버리지 않도록)
+          node collector/revert-auto.mjs || git checkout -- data/registered.json
       - name: 신규 등록분 양식 원본 자동 확보 (스키마화 대기 큐)
         run: |
           targets=$(node -e "let q;try{q=require('./collector/pending-forms.json')}catch(e){q={items:[]}};console.log(q.items.filter(i=>!i.fetched).map(i=>i.target).join(','))")

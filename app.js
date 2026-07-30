@@ -892,12 +892,16 @@ function liveNoticesHtml() {
     .concat(NATIONAL_SCHOLARSHIPS.filter((s) => s.sourceKind === 'official' && s.sourceUrl).map((s) => s.sourceUrl))
     .filter(Boolean);
   const isRegistered = (url) => regUrls.some((u) => url.startsWith(u) || u.startsWith(url));
-  const mine = (liveNotices.items || []).filter((n) =>
+  const forMe = (liveNotices.items || []).filter((n) =>
     n.school === p.school && (!n.campus || !p.campus || n.campus === p.campus) && !isRegistered(n.url)
-  )
-    // 학자금 대출·융자 공고는 장학금이 아니므로 뒤로 보낸다 (피드에는 정직하게 유지)
-    .sort((a, b) => (/대출|융자/.test(a.title) ? 1 : 0) - (/대출|융자/.test(b.title) ? 1 : 0))
-    .slice(0, 10);
+  );
+  /* 학자금 대출·융자는 장학금이 아니라서 매칭 카드로는 만들지 않는다(정직 원칙).
+     그렇다고 피드에서까지 밀려 잘리면 학생이 대출 정보를 아예 볼 곳이 없어지므로,
+     장학 공고를 앞에 두되 대출 공고 자리 2칸을 따로 남겨 둔다 (2026-07-30 조정). */
+  const isLoan = (n) => /대출|융자/.test(n.title);
+  const scholarships = forMe.filter((n) => !isLoan(n));
+  const loans = forMe.filter(isLoan);
+  const mine = scholarships.slice(0, loans.length ? 8 : 10).concat(loans.slice(0, 2));
   const head = `<div class="section-head" style="margin-top:4px"><h3>우리 학교 실시간 공고</h3>
     <span class="link-btn">매일 아침 자동 갱신${liveNotices.updatedAt ? ' · ' + liveNotices.updatedAt : ''}</span></div>`;
   if (!mine.length) {
