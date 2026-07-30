@@ -57,9 +57,9 @@
 | `data.js` | **한국장학재단 상시 제도 6종**(실존 제도 — program:true, 임의 마감일 없음) + kosaf-ai-mentor 실공고 1 + 대학/별칭/학과/캠퍼스/서류슬롯/제출채널. **가상 샘플·교내 템플릿은 2026-07-05 전량 삭제됨** |
 | `app.js` | 매칭엔진(12신호+적합도점수 — schoolOnly 포함), 서류보관함(기기내 저장), 신청 플로우, **진척도 4단계 트래커**(effectiveStep — 제출·결과는 사용자 기록), 실시간 공고 렌더(정식 등록분 URL 전방일치 중복 제거), 정식 등록 로더 |
 | `forms.js` | **양식 엔진**: 스키마 → 질문 → 원본 동일 문서(.doc 저장/인쇄/공유). 내장 2종은 오프라인 폴백일 뿐 — **양식 원본은 `data/forms.json`** |
-| `data/forms.json` | **양식 스키마 원본(single source of truth)** — 여기에만 추가하면 설치된 앱에도 자동 반영. **등록 28종**: …+ uos-bigdata-cert-apply, gasong-apply + **다운로드형 전량 승격분 9종**(jeongeup·uos-fund·ihanae·lotte-dorm·uiam·jeju-consent·skku-merit-plan·khu-intern·hufs-alumni — 2026-07-15) |
+| `data/forms.json` | **양식 스키마 원본(single source of truth)** — 여기에만 추가하면 설치된 앱에도 자동 반영. **등록 29종**: …+ uos-bigdata-cert-apply, gasong-apply + **다운로드형 전량 승격분 9종**(jeongeup·uos-fund·ihanae·lotte-dorm·uiam·jeju-consent·skku-merit-plan·khu-intern·hufs-alumni — 2026-07-15) |
 | `data/notices.json` | 수집 로봇이 발행하는 실시간 공고 (앱이 fetch) |
-| `data/registered.json` | **정식 등록 공고 76건** (실공고 큐레이션 — 학교한정 매칭 schoolOnly/campusOnly, 마감·금액 파싱, 원본 첨부 링크, formId 36건 연결·이메일 접수 3건, 양식 없는 공고는 noForm 사유, 불명확분은 '원문 확인' 정직 표기) |
+| `data/registered.json` | **정식 등록 공고 89건** (실공고 큐레이션 — 학교한정 매칭 schoolOnly/campusOnly, 마감·금액 파싱, 원본 첨부 링크, formId 36건 연결·이메일 접수 3건, 양식 없는 공고는 noForm 사유, 불명확분은 '원문 확인' 정직 표기) |
 | `verify/audit-data.js` | **소급 감사 도구** — 정식 등록·양식 전수가 현재 엔진 기준을 충족하는지 검사. 엔진·정책 업데이트 후 필수 실행 (운영 원칙 7) |
 | `collector/deepfetch.mjs` + `.github/workflows/deep-fetch.yml` | 공고 본문 전문+지정 공고 첨부 원본을 `collector/extracted/`에 커밋 — 차단 샌드박스가 읽는 통로. **HWP는 미리보기 텍스트(.hwp.txt)까지 자동 추출**(`hwp-prvtext.py`, zip 내부 hwp 포함). 대상은 `run-deepfetch.txt`의 `targets:` 줄로 지정 |
 | `collector/browser-collect.mjs` + `browser-targets.json` + `.github/workflows/browser-collect.yml` | **브라우저형 수집기**(진짜 Chromium) — 봇차단·동적 게시판 8개교, 매일 09:20 KST |
