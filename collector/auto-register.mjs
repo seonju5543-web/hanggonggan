@@ -13,6 +13,7 @@
    실행: node collector/auto-register.mjs   (collect.mjs 직후, 워크플로에서 자동 실행)
    ============================================================ */
 import fs from 'node:fs';
+import { cleanTitle } from './clean-title.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const cfgPath = new URL('auto-register-config.json', HERE);
@@ -54,16 +55,8 @@ function titleSim(a, b) {
   return hit / small.size;
 }
 
-/* ---------- 제목 청소: 클릭형 게시판이 목록에서 그대로 읽어온 부스러기 제거 ---------- */
-export function cleanTitle(t) {
-  return (t || '')
-    .replace(/^(공지\s*)+/, '')                       // "공지 공지 " 접두
-    .replace(/^\d{3,5}\s+/, '')                        // 목록 행 번호 "2653 "
-    .replace(/\s*20\d{2}\.\d{1,2}\.\d{1,2}\.?\s*조회\s*\d+\s*$/, '') // 꼬리 "2026.07.08. 조회 136"
-    .replace(/\s*조회\s*\d+\s*$/, '')
-    .replace(/신규게시글|Attachment|새글/g, '')
-    .replace(/\s+/g, ' ').trim();
-}
+/* 제목 청소는 공용 모듈에 있다 (수집기와 같은 규칙을 써야 중복 판정이 어긋나지 않는다) */
+export { cleanTitle } from './clean-title.mjs';
 
 /* ---------- 제목 정규화: 학교별 재게시·꼬리표 차이를 흡수 ---------- */
 const normTitle = (t) => cleanTitle(t).replace(/\[[^\]]*\]/g, '').replace(/[\s·ㆍ()~〜.,'"“”‘’!⭐★]/g, '').replace(/공지/g, '').toLowerCase();

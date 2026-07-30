@@ -67,6 +67,7 @@
 | `collector/auto-register.mjs` + `auto-register-config.json` | **정식 등록 자동화 (2026-07-15)** — 수집 직후 보수적 규칙 통과분만 registered.json에 자동 등록(auto:true, 앱에 '자동 등록·검수 전' 배지). 애매한 건 '컨펌 대기'로 리포트에만. 킬스위치 enabled:false, 오등록 제거 blockIds |
 | `collector/schematize-forms.mjs` + `schematize-config.json` + `mark-fetched.mjs` | **양식 스키마화 (2026-07-30)** — **무료 우선 분류기**: 글자가 깨끗이 뽑히는 원본은 API를 부르지 않고 큐에 남겨 다음 채팅 세션이 무료로 처리. PDF·글자 추출 실패·표/시간표 등 **무료 경로로 동일 문서를 장담할 수 없는 것만** Claude API(claude-opus-5, PDF는 원본 첨부) 호출. 실행당 한도 `maxApiCallsPerRun`(기본 2, **0이면 완전 정지**), 킬스위치 `enabled:false`. 원본이 매 실행 갈아엎히므로 **같은 실행 안에서** 돌아야 함 |
 | `collector/schools.json` | 대상 23개 캠퍼스 게시판 주소 (null = 미확보) |
+| `collector/clean-title.mjs` | **제목 청소 공용 모듈 (2026-07-30)** — 게시판이 `<a>` 안에 번호·분류·조회수·작성일·기간을 함께 넣는 유형에서 부스러기 제거. 수집기(collect.mjs)와 자동 등록(auto-register.mjs)이 **같은 규칙**을 써야 중복 판정이 어긋나지 않는다 |
 | `collector/probe.mjs` + `.github/workflows/probe-boards.yml` | 게시판 후보 주소 일괄 정찰 |
 | `.github/workflows/fetch-page.yml` | 임의 페이지+첨부를 원격으로 받아 artifact로 — 차단 환경 우회용 |
 | `server/mail-worker.js` | 완전 자동 접수 메일 서버(배포 대기 — Resend 키 필요) |
@@ -326,6 +327,11 @@
 - **진행 중 대화의 맥락 (다음 세션 필독)**: 개발자는 사용자 입장에서 앱을 눌러보며 관찰·컨펌을 계속 전달하는 방식.
   게시판 주소를 채팅으로 주면 그 자리에서 schools.json/browser-targets.json에 등록·수집 확인까지 한 세트로 처리해 왔다.
   "진짜 원클릭"(버튼=신청 완료)은 이메일 접수(Resend 키 대기)·장학팀 파일럿으로만 정직하게 가능 — '제안서 → 진짜 원클릭' 절 참조.
+- **주소가 `subview.do?enc=...` 형태면 해독할 것 (2026-07-30 연세대 연결로 확인)**: 개발자가 주는 주소는
+  브라우저 주소창 것이라 겉포장인 경우가 많다. `enc` 값은 base64이고, 풀면
+  `fnct1|@@|%2Fbbs%2Fsc%2F58%2FartclList.do%3FfindClSeq%3D257%26` 처럼 **진짜 게시판 경로**가 들어 있다.
+  URL 디코드해서 그 경로를 등록하는 편이 안정적이다(연세 신촌 = 외대와 같은 artclList.do 계열).
+  낡은 주소가 이미 박혀 있을 수 있으니(연세는 notice.jsp였음) 교체 여부도 확인할 것.
 - **새 게시판 연결 절차 (반복 패턴)**: ① 개발자가 채팅으로 장학공지 목록 주소 제공 →
   ② schools.json(일반) + browser-targets.json(클릭·동적)에 등록 → ③ run-collect.txt/run-browser-collect.txt push로 즉시 수집 →
   ④ 리포트 확인 후 개별 실공고를 컨펌받아 registered.json 등록(+양식 있으면 원칙 5로 스키마화).
