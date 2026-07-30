@@ -13,6 +13,9 @@
    실행: node collector/auto-register.mjs   (collect.mjs 직후, 워크플로에서 자동 실행)
    ============================================================ */
 import fs from 'node:fs';
+import { createRequire } from 'node:module';
+// 등록 규칙은 감사 도구와 같은 파일을 쓴다 (verify/entry-rules.cjs) — 규칙이 갈라지지 않게
+const { checkEntry } = createRequire(import.meta.url)('../verify/entry-rules.cjs');
 
 const HERE = new URL('.', import.meta.url);
 const cfgPath = new URL('auto-register-config.json', HERE);
@@ -25,6 +28,8 @@ const registeredPath = new URL('../data/registered.json', HERE);
 const reportPath = process.argv[2] ? new URL(process.argv[2], new URL('..', HERE)) : new URL('report.md', HERE);
 const notices = JSON.parse(fs.readFileSync(noticesPath, 'utf8'));
 const registered = JSON.parse(fs.readFileSync(registeredPath, 'utf8'));
+let forms = { templates: {} };
+try { forms = JSON.parse(fs.readFileSync(new URL('../data/forms.json', HERE), 'utf8')); } catch { /* 없어도 진행 */ }
 
 const TODAY = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10); // KST
 
@@ -218,6 +223,15 @@ if (!cfg.enabled) {
       sourceUrl: n.url,
       sourceKind: 'auto'
     };
+    /* 마지막 관문: 감사 도구와 '똑같은 규칙'으로 자기 결과를 스스로 검사한다.
+       규칙에 걸리면 등록하지 않고 컨펌 대기로 넘긴다 — 잘못된 항목이 앱에 나가지 않게
+       (2026-07-30: PNG 파일·대출·대학원 공고가 자동 등록됐던 사고의 재발 방지) */
+    const problems = checkEntry(entry, { formIds: new Set(Object.keys(forms.templates || {})) })
+      .filter((p) => p.level === 'error');
+    if (problems.length) {
+      held.push({ n, why: `등록 규칙 위반으로 자동 등록 보류 — ${problems[0].msg}` });
+      continue;
+    }
     registered.items.push(entry);
     regUrlSet.add(cu);
     regEntries.push({ name: title, nt: normTitle(title), ntFull: normTitleFull(title), school: n.school });

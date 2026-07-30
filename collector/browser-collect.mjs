@@ -266,10 +266,36 @@ fs.writeFileSync(noticesPath, JSON.stringify(notices, null, 1));
 report.push('---');
 report.push(`이번 실행 신규 수집: **${freshAll.length}건** · 브라우저로도 수집 실패한 학교는 게시판 주소 확인이 필요합니다.`);
 /* 접속 자체가 안 된 학교는 요약에 따로 적는다 — 리포트 중간의 ❌ 한 줄은 놓치기 쉬웠다.
-   (재시도까지 실패해도 다음 실행에서 다시 수집되므로 공고가 영구히 사라지지는 않는다) */
+   (재시도까지 실패해도 다음 실행에서 다시 수집되므로 공고가 영구히 사라지지는 않는다)
+
+   그리고 '몇 번 연속 실패했는지'를 기록해 둔다. 한 번 실패는 학교 서버가 잠깐 느린 것이라
+   다음 실행에서 저절로 복구되지만, 연속으로 실패하면 게시판 주소가 바뀐 것이므로
+   사람이 손을 대야 한다. 이 구분이 없어서 시립대가 며칠씩 조용히 빠져 있었다 (2026-07-30). */
+const healthPath = new URL('health.json', HERE);
+let health = {};
+try { health = JSON.parse(fs.readFileSync(healthPath, 'utf8')); } catch { /* 첫 실행 */ }
+const runDate = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
+const chronic = [];
+for (const t of cfg.targets) {
+  const name = t.campus && t.campus !== '공통' ? `${t.school} ${t.campus}` : t.school;
+  const h = health[name] || { fails: 0, lastOk: null };
+  if (stillFailed.includes(name)) {
+    h.fails += 1;
+    if (h.fails >= 3) chronic.push(`${name}(${h.fails}회 연속)`);
+  } else {
+    h.fails = 0; h.lastOk = runDate;
+  }
+  health[name] = h;
+}
+fs.writeFileSync(healthPath, JSON.stringify(health, null, 1));
+
 if (stillFailed.length) {
   report.push('');
-  report.push(`⚠️ **이번 실행에 접속 실패한 학교: ${stillFailed.join(', ')}** — 학교 서버가 응답하지 않아 이번 회차만 건너뛰었어요. 다음 실행(약 12시간 뒤)에 자동으로 다시 수집합니다. 며칠 연속 같은 학교가 뜨면 게시판 주소 확인이 필요합니다.`);
+  report.push(`⚠️ **이번 실행에 접속 실패한 학교: ${stillFailed.join(', ')}** — 학교 서버가 응답하지 않아 이번 회차만 건너뛰었어요. 다음 실행(약 12시간 뒤)에 자동으로 다시 수집합니다.`);
+}
+if (chronic.length) {
+  report.push('');
+  report.push(`🚨 **여러 번 연속 실패한 학교: ${chronic.join(', ')}** — 일시 장애가 아니라 게시판 주소가 바뀌었을 가능성이 큽니다. 해당 학교 학생에게 새 공고가 나가지 않고 있으니 주소 확인이 필요해요(Claude 세션에 "○○대 게시판 주소 확인해줘"라고 지시하면 정찰 도구로 후보를 찾아드려요).`);
 }
 fs.writeFileSync(new URL('browser-report.md', HERE), report.join('\n'));
 console.log(`browser-collect: ${freshAll.length} new items`);
