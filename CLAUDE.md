@@ -65,6 +65,7 @@
 | `collector/browser-collect.mjs` + `browser-targets.json` + `.github/workflows/browser-collect.yml` | **브라우저형 수집기**(진짜 Chromium) — 봇차단·동적 게시판 8개교, 매일 09:20 KST |
 | `collector/collect.mjs` | 매일 09:00 KST 게시판 수집 + 공고 상세·첨부양식 수집 + notices.json 발행 + 리포트 이슈 |
 | `collector/auto-register.mjs` + `auto-register-config.json` | **정식 등록 자동화 (2026-07-15)** — 수집 직후 보수적 규칙 통과분만 registered.json에 자동 등록(auto:true, 앱에 '자동 등록·검수 전' 배지). 애매한 건 '컨펌 대기'로 리포트에만. 킬스위치 enabled:false, 오등록 제거 blockIds |
+| `collector/schematize-forms.mjs` + `mark-fetched.mjs` | **양식 스키마화 무인화 (2026-07-30)** — 확보된 신청서 원본을 Claude API(claude-opus-5)로 읽어 forms.json 스키마 생성 + formId 연결. 수집 워크플로 2종에 연결(`ANTHROPIC_API_KEY` 시크릿). 원본이 매 실행 갈아엎히므로 **같은 실행 안에서** 돌아야 함. 키 없으면 통과 |
 | `collector/schools.json` | 대상 23개 캠퍼스 게시판 주소 (null = 미확보) |
 | `collector/probe.mjs` + `.github/workflows/probe-boards.yml` | 게시판 후보 주소 일괄 정찰 |
 | `.github/workflows/fetch-page.yml` | 임의 페이지+첨부를 원격으로 받아 artifact로 — 차단 환경 우회용 |
@@ -197,7 +198,31 @@
 2. **표준화 접수(파일럿)**: 장학팀이 지정 장학금의 이메일 접수를 공식 인정 → 앱 생성 원본양식+보관함 서류가 버튼 하나로 접수 → 이때부터 "신청 완료" 표기가 정직하게 가능 = 진짜 원클릭
 3. **학사 연동**: 성적·재학 정보 연동 → 증명서 발급 자체가 소멸 → 문자 그대로 클릭 한 번
 
-## 마지막 세션 상태 (2026-07-15 8차 세션 후속3 — 정직 페이스리프트: 추론 삭제·원문 발췌)
+## 마지막 세션 상태 (2026-07-30 9차 세션 — 양식 스키마화 무인화 + 첨부 누락 버그)
+- **개발자 지시**: "Claude API 키 발급받았다 → 스키마화부터 진행" → API 자동화 구축 + 큐 4건 처리.
+- **① 첨부 필터 구멍 발견·수정 (가장 중요)**: `auto-register.mjs`의 첨부 수집 조건이
+  `신청서|지원서|서식|양식|공고`뿐이라 **"원서"·"동의서"·"서약서"·"추천서" 이름의 파일이 통째로
+  버려지고 있었다**. 하필 진짜 신청서인 "장학금지급**원서**"가 걸려 염곡은 첨부 3건 중 1건만,
+  연재는 2건 중 1건만 잡혔다. 필터 보강 + **소급 적용**으로 기존 등록분 6건의 누락 첨부 복원
+  (곰두리·롯데장학관·산학디딤돌·대청교·염곡·연재).
+- **② `fetched` 표시 버그 수정**: 워크플로가 deepfetch 직후 큐 **전체**를 `fetched:true`로 찍어서,
+  원본을 못 받은 항목도 확보 완료로 기록 → 다시 시도되지 않고 영구 대기. 큐 4건 중 3건이 이 상태였다.
+  `collector/mark-fetched.mjs` 신설 — forms-index에 실제로 들어온 항목만 표시.
+- **③ Claude API 스키마화 자동화**: `collector/schematize-forms.mjs` — 대기 큐의 원본(hwp 미리보기·
+  docx·hwpx zip 파싱)을 읽어 claude-opus-5로 `data/forms.json` 스키마 생성 → `registered.json`에
+  formId 연결 → `schematized:true`. **원본은 deepfetch가 매 실행마다 갈아엎으므로 같은 실행 안에서
+  돌아야 한다** (수집 워크플로 2종에 연결됨, `secrets.ANTHROPIC_API_KEY`). 키가 없으면 조용히 통과.
+  구조화 출력(json_schema)으로 파싱 보장 + 자체 검증(info 키 화이트리스트·필드 id·체크 선택지) 후 등록.
+  제3자 작성 서식(추천서 등)은 자동 제외 — 원본 다운로드 안내 유지.
+- **④ 큐 처리**: UOS 빅데이터 성과형은 기존 `reg-uos-bigdata-cert`와 **중복**(같은 seq·마감)이라
+  blockIds로 제거. 연재장학재단 개인정보동의서 **스키마화 완료**(`yeonjae-consent-apply`, 양식 29종).
+  염곡·도레이는 원본 미확보라 `fetched:false`로 되돌려 다음 수집 때 재확보 예약.
+- 검증: audit-data + drive + verify-registered + verify-forms-data + personas(120, 이상 0) 전부 통과.
+  앱 코드 무변경이라 sw CACHE 인상 불필요.
+- **개발자 확인 필요**: 자동 스키마화가 켜진 상태로 배포됨. 매 수집마다 새 첨부가 있으면 API 비용이
+  발생한다(공고 1건당 수천 원 미만). 끄려면 워크플로에서 `ANTHROPIC_API_KEY` 시크릿을 지우면 된다.
+
+## 이전 세션 상태 (2026-07-15 8차 세션 후속3 — 정직 페이스리프트: 추론 삭제·원문 발췌)
 - **개발자 지시**: "추론해 제시된 내용 전부 삭제, 원문이 요구하는 내용을 앱이 찾아 제시, 앱 제작 문서는
   실제 제출 가능한 경우로 한정" → 전면 반영(위 원칙 8-1·8-2 신설). 구체 조치:
   ① **원문 발췌 시스템**: `collector/extract-excerpts.mjs` — 확보된 공고 전문(200건)에서 신청기간·
