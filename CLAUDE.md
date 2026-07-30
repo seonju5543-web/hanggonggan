@@ -57,15 +57,17 @@
 | `data.js` | **한국장학재단 상시 제도 6종**(실존 제도 — program:true, 임의 마감일 없음) + kosaf-ai-mentor 실공고 1 + 대학/별칭/학과/캠퍼스/서류슬롯/제출채널. **가상 샘플·교내 템플릿은 2026-07-05 전량 삭제됨** |
 | `app.js` | 매칭엔진(12신호+적합도점수 — schoolOnly 포함), 서류보관함(기기내 저장), 신청 플로우, **진척도 4단계 트래커**(effectiveStep — 제출·결과는 사용자 기록), 실시간 공고 렌더(정식 등록분 URL 전방일치 중복 제거), 정식 등록 로더 |
 | `forms.js` | **양식 엔진**: 스키마 → 질문 → 원본 동일 문서(.doc 저장/인쇄/공유). 내장 2종은 오프라인 폴백일 뿐 — **양식 원본은 `data/forms.json`** |
-| `data/forms.json` | **양식 스키마 원본(single source of truth)** — 여기에만 추가하면 설치된 앱에도 자동 반영. **등록 28종**: …+ uos-bigdata-cert-apply, gasong-apply + **다운로드형 전량 승격분 9종**(jeongeup·uos-fund·ihanae·lotte-dorm·uiam·jeju-consent·skku-merit-plan·khu-intern·hufs-alumni — 2026-07-15) |
+| `data/forms.json` | **양식 스키마 원본(single source of truth)** — 여기에만 추가하면 설치된 앱에도 자동 반영. **등록 29종**: …+ uos-bigdata-cert-apply, gasong-apply + **다운로드형 전량 승격분 9종**(jeongeup·uos-fund·ihanae·lotte-dorm·uiam·jeju-consent·skku-merit-plan·khu-intern·hufs-alumni — 2026-07-15) |
 | `data/notices.json` | 수집 로봇이 발행하는 실시간 공고 (앱이 fetch) |
-| `data/registered.json` | **정식 등록 공고 76건** (실공고 큐레이션 — 학교한정 매칭 schoolOnly/campusOnly, 마감·금액 파싱, 원본 첨부 링크, formId 36건 연결·이메일 접수 3건, 양식 없는 공고는 noForm 사유, 불명확분은 '원문 확인' 정직 표기) |
+| `data/registered.json` | **정식 등록 공고 89건** (실공고 큐레이션 — 학교한정 매칭 schoolOnly/campusOnly, 마감·금액 파싱, 원본 첨부 링크, formId 36건 연결·이메일 접수 3건, 양식 없는 공고는 noForm 사유, 불명확분은 '원문 확인' 정직 표기) |
 | `verify/audit-data.js` | **소급 감사 도구** — 정식 등록·양식 전수가 현재 엔진 기준을 충족하는지 검사. 엔진·정책 업데이트 후 필수 실행 (운영 원칙 7) |
 | `collector/deepfetch.mjs` + `.github/workflows/deep-fetch.yml` | 공고 본문 전문+지정 공고 첨부 원본을 `collector/extracted/`에 커밋 — 차단 샌드박스가 읽는 통로. **HWP는 미리보기 텍스트(.hwp.txt)까지 자동 추출**(`hwp-prvtext.py`, zip 내부 hwp 포함). 대상은 `run-deepfetch.txt`의 `targets:` 줄로 지정 |
 | `collector/browser-collect.mjs` + `browser-targets.json` + `.github/workflows/browser-collect.yml` | **브라우저형 수집기**(진짜 Chromium) — 봇차단·동적 게시판 8개교, 매일 09:20 KST |
 | `collector/collect.mjs` | 매일 09:00 KST 게시판 수집 + 공고 상세·첨부양식 수집 + notices.json 발행 + 리포트 이슈 |
 | `collector/auto-register.mjs` + `auto-register-config.json` | **정식 등록 자동화 (2026-07-15)** — 수집 직후 보수적 규칙 통과분만 registered.json에 자동 등록(auto:true, 앱에 '자동 등록·검수 전' 배지). 애매한 건 '컨펌 대기'로 리포트에만. 킬스위치 enabled:false, 오등록 제거 blockIds |
+| `collector/schematize-forms.mjs` + `schematize-config.json` + `mark-fetched.mjs` | **양식 스키마화 (2026-07-30)** — **무료 우선 분류기**: 글자가 깨끗이 뽑히는 원본은 API를 부르지 않고 큐에 남겨 다음 채팅 세션이 무료로 처리. PDF·글자 추출 실패·표/시간표 등 **무료 경로로 동일 문서를 장담할 수 없는 것만** Claude API(claude-opus-5, PDF는 원본 첨부) 호출. 실행당 한도 `maxApiCallsPerRun`(기본 2, **0이면 완전 정지**), 킬스위치 `enabled:false`. 원본이 매 실행 갈아엎히므로 **같은 실행 안에서** 돌아야 함 |
 | `collector/schools.json` | 대상 23개 캠퍼스 게시판 주소 (null = 미확보) |
+| `collector/clean-title.mjs` | **제목 청소 공용 모듈 (2026-07-30)** — 게시판이 `<a>` 안에 번호·분류·조회수·작성일·기간을 함께 넣는 유형에서 부스러기 제거. 수집기(collect.mjs)와 자동 등록(auto-register.mjs)이 **같은 규칙**을 써야 중복 판정이 어긋나지 않는다 |
 | `collector/probe.mjs` + `.github/workflows/probe-boards.yml` | 게시판 후보 주소 일괄 정찰 |
 | `.github/workflows/fetch-page.yml` | 임의 페이지+첨부를 원격으로 받아 artifact로 — 차단 환경 우회용 |
 | `server/mail-worker.js` | 완전 자동 접수 메일 서버(배포 대기 — Resend 키 필요) |
@@ -255,7 +257,44 @@
 2. **표준화 접수(파일럿)**: 장학팀이 지정 장학금의 이메일 접수를 공식 인정 → 앱 생성 원본양식+보관함 서류가 버튼 하나로 접수 → 이때부터 "신청 완료" 표기가 정직하게 가능 = 진짜 원클릭
 3. **학사 연동**: 성적·재학 정보 연동 → 증명서 발급 자체가 소멸 → 문자 그대로 클릭 한 번
 
-## 마지막 세션 상태 (2026-07-15 8차 세션 후속3 — 정직 페이스리프트: 추론 삭제·원문 발췌)
+## 마지막 세션 상태 (2026-07-30 9차 세션 — 양식 스키마화 무인화 + 첨부 누락 버그)
+- **개발자 지시**: "Claude API 키 발급받았다 → 스키마화부터 진행" → API 자동화 구축 + 큐 4건 처리.
+- **① 첨부 필터 구멍 발견·수정 (가장 중요)**: `auto-register.mjs`의 첨부 수집 조건이
+  `신청서|지원서|서식|양식|공고`뿐이라 **"원서"·"동의서"·"서약서"·"추천서" 이름의 파일이 통째로
+  버려지고 있었다**. 하필 진짜 신청서인 "장학금지급**원서**"가 걸려 염곡은 첨부 3건 중 1건만,
+  연재는 2건 중 1건만 잡혔다. 필터 보강 + **소급 적용**으로 기존 등록분 6건의 누락 첨부 복원
+  (곰두리·롯데장학관·산학디딤돌·대청교·염곡·연재).
+- **② `fetched` 표시 버그 수정**: 워크플로가 deepfetch 직후 큐 **전체**를 `fetched:true`로 찍어서,
+  원본을 못 받은 항목도 확보 완료로 기록 → 다시 시도되지 않고 영구 대기. 큐 4건 중 3건이 이 상태였다.
+  `collector/mark-fetched.mjs` 신설 — forms-index에 실제로 들어온 항목만 표시.
+- **③ Claude API 스키마화 (무료 우선 · 개발자 지시로 비용 최소화)**: `collector/schematize-forms.mjs`.
+  **핵심은 분류기(triage)** — 돈이 드는 API는 "무료 경로로는 원본과 100% 동일한 문서를 만들 수 없는 것"
+  에만 쓴다.
+  · **무료 경로(비용 0)**: 글자가 깨끗하게 뽑히는 hwp/docx/hwpx → API 호출 없이 큐에 남겨 두고,
+    다음 채팅 세션이 손으로 옮긴다(지금까지 하던 방식 그대로). 이번 세션의 연재 동의서가 이 경우.
+  · **PDF도 공짜로 읽는다 (`collector/pdf-text.mjs`, 2026-07-30 추가)**: PDF는 두 종류 —
+    ① 글자층 있는 PDF(한글·워드 '내보내기') → 자체 추출기로 무료 처리. 한글은 CID 폰트라 바이트가
+    글자가 아니어서 폰트의 `/ToUnicode` CMap(bfchar·bfrange)을 읽어 되돌린다. 외부 라이브러리 없음.
+    ② 스캔 PDF(종이 사진 — `/Font` 자체가 없음) → 글자가 없어 눈으로 봐야 하므로 API.
+    판별은 자동: 추출 글자가 없거나 읽을 수 있는 글자 30자 미만이면 스캔으로 본다.
+  · **유료 경로(API)**: ⓐ 스캔 PDF(원본 파일을 document 블록으로 첨부해 배치까지 보게 함)
+    ⓑ 글자가 거의 안 뽑힘(`minTextChars` 미만) ⓒ 표·시간표·원고지 등 줄글로 펴면 배치가 무너지는 서식
+    ⓓ 항목이 너무 많아 손으로 옮기면 누락 위험(`maxManualChars` 초과).
+  · **비용 안전장치**: `collector/schematize-config.json` — `maxApiCallsPerRun`(기본 2, **0이면 완전 정지**),
+    `enabled:false` 킬스위치, `alwaysApiIds`/`neverApiIds`로 건별 지정. 리포트에 호출 횟수와 사유가 남는다.
+  · 구조화 출력(json_schema) + 자체 검증(info 키 화이트리스트·필드 id·체크 선택지) 통과분만 등록.
+    제3자 작성 서식(추천서 등)은 무료/유료 판정 전에 제외 — 원본 다운로드 안내 유지.
+  · **함정 주의**: `maxApiCallsPerRun`은 반드시 `??`로 읽을 것. `|| 2`로 읽으면 0(절대 호출 금지)이
+    기본값 2로 되돌아가 돈이 나간다 — 실제로 이 버그를 만들었다가 테스트에서 잡았다.
+- **④ 큐 처리**: UOS 빅데이터 성과형은 기존 `reg-uos-bigdata-cert`와 **중복**(같은 seq·마감)이라
+  blockIds로 제거. 연재장학재단 개인정보동의서 **스키마화 완료**(`yeonjae-consent-apply`, 양식 29종).
+  염곡·도레이는 원본 미확보라 `fetched:false`로 되돌려 다음 수집 때 재확보 예약.
+- 검증: audit-data + drive + verify-registered + verify-forms-data + personas(120, 이상 0) 전부 통과.
+  앱 코드 무변경이라 sw CACHE 인상 불필요.
+- **개발자 확인 필요**: 자동 스키마화가 켜진 상태로 배포됨. 매 수집마다 새 첨부가 있으면 API 비용이
+  발생한다(공고 1건당 수천 원 미만). 끄려면 워크플로에서 `ANTHROPIC_API_KEY` 시크릿을 지우면 된다.
+
+## 이전 세션 상태 (2026-07-15 8차 세션 후속3 — 정직 페이스리프트: 추론 삭제·원문 발췌)
 - **개발자 지시**: "추론해 제시된 내용 전부 삭제, 원문이 요구하는 내용을 앱이 찾아 제시, 앱 제작 문서는
   실제 제출 가능한 경우로 한정" → 전면 반영(위 원칙 8-1·8-2 신설). 구체 조치:
   ① **원문 발췌 시스템**: `collector/extract-excerpts.mjs` — 확보된 공고 전문(200건)에서 신청기간·
@@ -346,6 +385,11 @@
 - **진행 중 대화의 맥락 (다음 세션 필독)**: 개발자는 사용자 입장에서 앱을 눌러보며 관찰·컨펌을 계속 전달하는 방식.
   게시판 주소를 채팅으로 주면 그 자리에서 schools.json/browser-targets.json에 등록·수집 확인까지 한 세트로 처리해 왔다.
   "진짜 원클릭"(버튼=신청 완료)은 이메일 접수(Resend 키 대기)·장학팀 파일럿으로만 정직하게 가능 — '제안서 → 진짜 원클릭' 절 참조.
+- **주소가 `subview.do?enc=...` 형태면 해독할 것 (2026-07-30 연세대 연결로 확인)**: 개발자가 주는 주소는
+  브라우저 주소창 것이라 겉포장인 경우가 많다. `enc` 값은 base64이고, 풀면
+  `fnct1|@@|%2Fbbs%2Fsc%2F58%2FartclList.do%3FfindClSeq%3D257%26` 처럼 **진짜 게시판 경로**가 들어 있다.
+  URL 디코드해서 그 경로를 등록하는 편이 안정적이다(연세 신촌 = 외대와 같은 artclList.do 계열).
+  낡은 주소가 이미 박혀 있을 수 있으니(연세는 notice.jsp였음) 교체 여부도 확인할 것.
 - **새 게시판 연결 절차 (반복 패턴)**: ① 개발자가 채팅으로 장학공지 목록 주소 제공 →
   ② schools.json(일반) + browser-targets.json(클릭·동적)에 등록 → ③ run-collect.txt/run-browser-collect.txt push로 즉시 수집 →
   ④ 리포트 확인 후 개별 실공고를 컨펌받아 registered.json 등록(+양식 있으면 원칙 5로 스키마화).

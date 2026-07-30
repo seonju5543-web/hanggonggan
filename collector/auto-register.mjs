@@ -14,6 +14,7 @@
    ============================================================ */
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
+import { cleanTitle } from './clean-title.mjs';
 // 등록 규칙은 감사 도구와 같은 파일을 쓴다 (verify/entry-rules.cjs) — 규칙이 갈라지지 않게
 const { checkEntry } = createRequire(import.meta.url)('../verify/entry-rules.cjs');
 
@@ -59,16 +60,8 @@ function titleSim(a, b) {
   return hit / small.size;
 }
 
-/* ---------- 제목 청소: 클릭형 게시판이 목록에서 그대로 읽어온 부스러기 제거 ---------- */
-export function cleanTitle(t) {
-  return (t || '')
-    .replace(/^(공지\s*)+/, '')                       // "공지 공지 " 접두
-    .replace(/^\d{3,5}\s+/, '')                        // 목록 행 번호 "2653 "
-    .replace(/\s*20\d{2}\.\d{1,2}\.\d{1,2}\.?\s*조회\s*\d+\s*$/, '') // 꼬리 "2026.07.08. 조회 136"
-    .replace(/\s*조회\s*\d+\s*$/, '')
-    .replace(/신규게시글|Attachment|새글/g, '')
-    .replace(/\s+/g, ' ').trim();
-}
+/* 제목 청소는 공용 모듈에 있다 (수집기와 같은 규칙을 써야 중복 판정이 어긋나지 않는다) */
+export { cleanTitle } from './clean-title.mjs';
 
 /* ---------- 제목 정규화: 학교별 재게시·꼬리표 차이를 흡수 ---------- */
 const stripPunct = (t) => t.replace(/[\s·ㆍ()~〜.,'"“”‘’!⭐★]/g, '').replace(/공지/g, '').toLowerCase();
@@ -192,9 +185,11 @@ if (!cfg.enabled) {
     batchSeen.add(cu);
     batchSeen.add(n.school + '|' + normTitle(n.title));
     // 첨부는 신청서·공고문류만 (게시판 메뉴 링크 오염 방지)
+    // '원서·동의서·서약서·추천서'가 빠져 있어 진짜 신청서(예: 장학금지급원서)가 통째로
+    // 버려지던 것을 2026-07-30에 보강 — 염곡 3건 중 1건만 잡히던 실사례
     const atts = (n.attachments || [])
-      .filter((a) => /신청서|지원서|서식|양식|공고/.test(a.name) && /\.(hwp|hwpx|doc|docx|pdf|zip|xlsx?)(\?|$)?/i.test(a.name + a.url))
-      .slice(0, 4);
+      .filter((a) => /신청서|지원서|신청양식|원서|서식|양식|동의서|서약서|추천서|공고/.test(a.name) && /\.(hwp|hwpx|doc|docx|pdf|zip|xlsx?)(\?|$)?/i.test(a.name + a.url))
+      .slice(0, 6);
     const id = 'auto-' + cu.replace(/[^a-z0-9]/gi, '').slice(-24).toLowerCase();
     if (registered.items.some((i) => i.id === id)) continue;
     const title = cleanTitle(n.title).slice(0, 70);
@@ -251,7 +246,7 @@ if (!cfg.enabled) {
   try { queue = JSON.parse(fs.readFileSync(queuePath, 'utf8')); } catch { /* 첫 실행 */ }
   let queued = 0;
   for (const e of added) {
-    if (!(e.attachments || []).some((a) => /신청서|지원서|서식|양식/.test(a.name))) continue;
+    if (!(e.attachments || []).some((a) => /신청서|지원서|신청양식|원서|서식|양식|동의서|서약서/.test(a.name))) continue;
     if (queue.items.some((q) => q.id === e.id)) continue;
     // deepfetch가 제목 부분일치로 대상을 찾으므로, 부스러기 없는 제목 앞부분을 표적으로 쓴다
     const target = cleanTitle(e.name).replace(/\[[^\]]*\]/g, '').trim().slice(0, 12);

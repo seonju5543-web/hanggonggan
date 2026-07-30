@@ -8,6 +8,7 @@
    ============================================================ */
 import fs from 'node:fs';
 import { urlKey, dedupeNotices } from './url-key.mjs';
+import { cleanTitle } from './clean-title.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const cfg = JSON.parse(fs.readFileSync(new URL('schools.json', HERE), 'utf8'));
@@ -32,7 +33,7 @@ function extractLinks(html, base) {
   const re = /<a\b[^>]*href\s*=\s*["']([^"'#][^"']*)["'][^>]*>([\s\S]*?)<\/a>/gi;
   let m;
   while ((m = re.exec(html)) !== null) {
-    const title = m[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    const title = cleanTitle(m[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim());
     if (title.length < 6 || title.length > 140) continue;
     let url;
     try { url = new URL(m[1].replace(/&amp;/g, '&'), base).href; } catch { continue; }

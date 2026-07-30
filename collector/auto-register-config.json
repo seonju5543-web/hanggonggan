@@ -1,5 +1,7 @@
 {
  "enabled": true,
  "maxPerRun": 8,
- "blockIds": []
+ "blockIds": [
+  "auto-eab888ec9e90eab2a9eca69d"
+ ]
 }

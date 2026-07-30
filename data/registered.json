@@ -296,8 +296,8 @@
    "sourceUrl": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52808&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "attachments": [],
    "sourceKind": "official",
-   "noForm": "공고에 첨부된 신청서 양식 없음 — 학교 포털(KLAS)에서 신청",
-   "listedAt": "2026-07-16"
+   "listedAt": "2026-07-16",
+   "noForm": "공고에 첨부된 신청서 양식 없음 — 학교 포털(KLAS)에서 신청"
   },
   {
    "id": "reg-kw-bohun",
@@ -763,11 +763,6 @@
    "attachments": [],
    "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765145",
    "sourceKind": "official",
-   "excerpts": [
-    "● 장학금별 자격 기준 및 선발 인원",
-    "※ 마일리지 제출기한 : 자격증 , 어학성적 등은 위 제출 기한 내에 제출"
-   ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
    "listedAt": "2026-07-16"
   },
   {
@@ -820,11 +815,6 @@
    "attachments": [],
    "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764951",
    "sourceKind": "official",
-   "excerpts": [
-    "신청 방법 : nDRIMS &rarr; 대표 - 학사행정 &rarr; 【 학생신청 】 신청함",
-    "신청방법 : 아래 두 서류 모두 제출"
-   ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
    "listedAt": "2026-07-16"
   },
   {
@@ -851,11 +841,6 @@
    "attachments": [],
    "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764950",
    "sourceKind": "official",
-   "excerpts": [
-    "제출서류 : 아래 두 서류 모두 제출",
-    "② 단 , 신청기간 이후 합격 발표자가 있는 경우에 한하여 다음"
-   ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
    "listedAt": "2026-07-16"
   },
   {
@@ -883,11 +868,6 @@
    "attachments": [],
    "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764949",
    "sourceKind": "official",
-   "excerpts": [
-    "추가제출서류 ( ① , ② 모두제출 )",
-    "※ 제출서류상 한부모 증빙이 안될시 인정 불가"
-   ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
    "listedAt": "2026-07-16"
   },
   {
@@ -917,10 +897,6 @@
    "attachments": [],
    "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764946",
    "sourceKind": "official",
-   "excerpts": [
-    "※ 신청방법 및 제출서류 : 재학생 ① , ② 서류 제출 ( 최근 1 개월이내 발급서류만 인정 )"
-   ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
    "listedAt": "2026-07-16"
   },
   {
@@ -1290,14 +1266,6 @@
    "sourceUrl": "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=91697",
    "sourceKind": "official",
    "formId": "sm-yugong-apply",
-   "excerpts": [
-    "제출서류: 서류 순대로 1개의 PDF파일로 파일명/메일제목 : 국가유공자_성명_생년월일로 제출",
-    "제출방법 : 학생지원센터 이메일 제출( scholarship@sookmyung.ac.kr )",
-    "문의: 학생지원센터(학생회관 306호, ☎ 02-710-9033)",
-    "제출서류: 서류 순대로 1개의 PDF파일로 파일명/메일제목 : 새터민_성명_생년월일로 제출",
-    "제출방법 : 학생지원센터 이메일 제출 ( scholarship@sookmyung.ac.kr )"
-   ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
    "listedAt": "2026-07-16"
   },
   {
@@ -1539,6 +1507,10 @@
     {
      "name": "붙임3. 2026년도 쌍용곰두리장학생 FAQ.hwp",
      "url": "https://dep.hufs.ac.kr/bbs/student/2431/145208/download.do"
+    },
+    {
+     "name": "붙임2. 2026년도 쌍용곰두리장학생 지원신청서 및 개인정보제공동의서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/145207/download.do"
     }
    ],
    "sourceKind": "official",
@@ -1582,6 +1554,14 @@
     {
      "name": "개인정보동의서(이름).docx",
      "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138128&attachNo=115632"
+    },
+    {
+     "name": "입소지원서 양식(이름).docx",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138128&attachNo=115610"
+    },
+    {
+     "name": "개인정보동의서(이름).docx",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138128&attachNo=115611"
     }
    ],
    "sourceKind": "official",
@@ -1621,6 +1601,10 @@
     {
      "name": "산학재단 디딤돌 장학생 신청서류 양식.hwp",
      "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138131&attachNo=115637"
+    },
+    {
+     "name": "산학재단 디딤돌 장학생 신청서류 양식.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=138131&attachNo=115619"
     }
    ],
    "sourceKind": "official",
@@ -2205,15 +2189,14 @@
     {
      "name": "2026년도 대청교 업무처리기준.pdf",
      "url": "https://www.uos.ac.kr/common/board-download.do?listId=FA1&seq=30511&fSeq=1"
+    },
+    {
+     "name": "2026년 대청교 모집공고 안내문.pdf",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/138879/download.do"
     }
    ],
    "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/249627/artclView.do",
-   "sourceKind": "official",
-   "excerpts": [
-    "신청방법 : 우리 대학은 멘토발굴형으로 직접 기관을 발굴하여 활동해야 하오니 사전에 연간",
-    "선발 인원 : 한국장학재단에서 배정되는 예산범위 내에서 정함"
-   ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "sourceKind": "official"
   },
   {
    "id": "reg-dg-jindam",
@@ -2641,6 +2624,14 @@
     {
      "name": "(서식) 개인정보수집이용동의서.hwp",
      "url": "https://dep.hufs.ac.kr/bbs/student/2431/145661/download.do"
+    },
+    {
+     "name": "2026염곡문화재단 서약서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/145659/download.do"
+    },
+    {
+     "name": "2026염곡문화재단 장학금지급원서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/145660/download.do"
     }
    ],
    "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/260146/artclView.do",
@@ -2668,12 +2659,16 @@
     "지원 자격·제출 서류는 원문 공고에서 확인"
    ],
    "duplicable": true,
-   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요. 공고 첨부 중 개인정보 수집·이용 동의서는 앱에서 원본과 같은 구조로 작성할 수 있어요. 장학생 추천서는 추천인(교수 등)이 작성하는 서식이라 원본 파일을 내려받아 사용하세요.",
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 앱에서 작성할 수 있는 건 개인정보 수집·이용 동의서예요. 장학생 추천서는 추천인이 작성하는 서식이라 원본을 내려받아 사용하세요.",
    "auto": true,
    "attachments": [
     {
      "name": "장학생 추천서(양식).pdf",
      "url": "https://dep.hufs.ac.kr/bbs/student/2431/145733/download.do"
+    },
+    {
+     "name": "개인정보수집이용동의서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/145734/download.do"
     }
    ],
    "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/260214/artclView.do",
@@ -2712,6 +2707,84 @@
    "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/260269/artclView.do",
    "sourceKind": "auto",
    "listedAt": "2026-07-28"
+  },
+  {
+   "id": "auto-rnoticedoarticleno154660",
+   "name": "학생처 2025학년도 후기 학위수여식(8월 졸업식) 단기근무 교내봉사장학생 모집",
+   "type": "교내",
+   "provider": "홍익대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-08-10",
+   "period": "접수 ~2026-08-10",
+   "summary": "홍익대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "홍익대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-07-29 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=154660&article.offset=0&articleLimit=10&noCat=35",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-kolifenoticejspduid52964",
+   "name": "[등록/장학] 2026년 5·18희망장학생 모집 안내",
+   "type": "교내",
+   "provider": "광운대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "period": "접수 기간 원문 확인",
+   "summary": "광운대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "광운대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-07-29 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52964&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "sourceKind": "auto",
+   "listedAt": "2026-07-30"
+  },
+  {
+   "id": "auto-c839d20ec84a0ebb09c20202",
+   "name": "[홍보] 2026년 하반기 서울인재대학장학금 장학생 선발",
+   "type": "교내",
+   "provider": "동국대학교 서울캠퍼스 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "period": "접수 기간 원문 확인",
+   "summary": "동국대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "동국대학교",
+    "campusOnly": "서울캠퍼스"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-07-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2666%20%5B%ED%99%8D%EB%B3%B4%5D%202026%EB%85%84%20%ED%95%98%EB%B0%98%EA%B8%B0%20%EC%84%9C%EC%9A%B8%EC%9D%B8%EC%9E%AC%EB%8C%80%ED%95%99%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20202",
+   "sourceKind": "auto",
+   "listedAt": "2026-07-30"
   },
   {
    "type": "교외",
