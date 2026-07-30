@@ -7,6 +7,8 @@
    4) 컨펌용 리포트 이슈 생성 (양식 스키마화·정식 등록은 개발자 컨펌 후)
    ============================================================ */
 import fs from 'node:fs';
+import { urlKey, dedupeNotices } from './url-key.mjs';
+import { cleanTitle } from './clean-title.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const cfg = JSON.parse(fs.readFileSync(new URL('schools.json', HERE), 'utf8'));
@@ -31,7 +33,7 @@ function extractLinks(html, base) {
   const re = /<a\b[^>]*href\s*=\s*["']([^"'#][^"']*)["'][^>]*>([\s\S]*?)<\/a>/gi;
   let m;
   while ((m = re.exec(html)) !== null) {
-    const title = m[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    const title = cleanTitle(m[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim());
     if (title.length < 6 || title.length > 140) continue;
     let url;
     try { url = new URL(m[1].replace(/&amp;/g, '&'), base).href; } catch { continue; }
@@ -93,7 +95,8 @@ for (const s of cfg.schools) {
     const items = extractLinks(html, s.boardUrl)
       .filter((i) => KEYWORDS.test(i.title))
       .filter((i) => !MENU_NOISE.test(i.title)); // 메뉴성 링크 제외, 실공고 위주
-    const fresh = items.filter((i) => !seen[i.url]).slice(0, 40);
+    // 이미 본 글인지는 정규화한 주소로 판정 — 정렬 순번만 바뀐 같은 글을 '신규'로 담지 않기 위해
+    const fresh = items.filter((i) => !seen[i.url] && !seen[urlKey(i.url)]).slice(0, 40);
 
     // 상세 페이지 방문: 첨부양식·마감 단서 수집
     for (const it of fresh) {
@@ -103,7 +106,7 @@ for (const s of cfg.schools) {
       it.school = s.school;
       it.campus = s.campus === '공통' ? '' : s.campus;
       it.foundAt = new Date().toISOString().slice(0, 10);
-      seen[it.url] = it.foundAt;
+      seen[urlKey(it.url)] = it.foundAt;
       freshAll.push(it);
     }
     results.push({
@@ -123,6 +126,7 @@ notices.items = freshAll.concat(notices.items || []);
 /* 수집일로부터 60일 지난 공고는 자동 삭제 (마감 공고 정리) */
 const cutoff = new Date(Date.now() - 60 * 86400000).toISOString().slice(0, 10);
 notices.items = notices.items.filter((n) => (n.foundAt || '9999') >= cutoff);
+notices.items = dedupeNotices(notices.items);
 const perSchool = {};
 notices.items = notices.items.filter((n) => {
   const k = n.school + '|' + (n.campus || '');

@@ -159,6 +159,19 @@ function dday(dateStr) {
   return { label: `D-${d}`, cls: '', days: d };
 }
 
+/* 마감일을 확정하지 못한 공고(원문에 마감이 없거나 못 읽은 경우)는 dday가 '기한 원문 확인'이라
+   목록에서 영영 사라지지 않는다 — 지난 학기 공고가 계속 떠 있는 문제가 있었다(2026-07-30 발견).
+   그래서 등록일(listedAt)로부터 60일이 지나면 숨긴다. 실시간 공고의 60일 규칙과 같은 기준이다.
+   마감이 있는 공고는 기존대로 '마감 + 30일' 규칙만 적용된다. */
+const STALE_DAYS = 60;
+function notStale(sch) {
+  if (sch.deadline || !sch.listedAt) return true;
+  const listed = new Date(sch.listedAt + 'T00:00:00');
+  if (Number.isNaN(listed.getTime())) return true;
+  const startOfToday = new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate());
+  return Math.round((startOfToday - listed) / 86400000) <= STALE_DAYS;
+}
+
 const STATUS_META = {
   eligible:   { label: '신청 가능',        cls: 'ok' },
   selective:  { label: '지원 가능 · 선발 심사', cls: 'sel' },
@@ -521,7 +534,7 @@ function renderHome() {
 
   const matches = getMatches();
   const applyable = matches.filter((m) => ['eligible', 'selective'].includes(m.result.status));
-  const notApplied = applyable.filter((m) => !state.applications.some((a) => a.id === m.sch.id) && dday(m.sch.deadline).days >= 0);
+  const notApplied = applyable.filter((m) => !state.applications.some((a) => a.id === m.sch.id) && dday(m.sch.deadline).days >= 0 && notStale(m.sch));
   const total = applyable.reduce((sum, m) => sum + (m.sch.amountValue || 0), 0);
   const unknownAmt = applyable.filter((m) => !m.sch.amountValue).length;
 
@@ -533,7 +546,7 @@ function renderHome() {
   btn.textContent = notApplied.length ? `⚡ ${notApplied.length}건 한 번에 신청 준비하기` : '✓ 가능한 장학금을 모두 준비했어요';
 
   const upcoming = applyable
-    .filter((m) => dday(m.sch.deadline).days >= 0)
+    .filter((m) => dday(m.sch.deadline).days >= 0 && notStale(m.sch))
     .sort((a, b) => deadlineTs(a.sch) - deadlineTs(b.sch))
     .slice(0, 3);
   $('#home-deadline-list').innerHTML = upcoming.length
@@ -559,6 +572,7 @@ function renderExplore() {
   );
 
   list = list.filter((m) => dday(m.sch.deadline).days >= -30); // 마감 30일 경과 시 자동 숨김
+  list = list.filter((m) => notStale(m.sch)); // 마감을 확정 못 한 공고는 등록 후 60일까지만 노출
   if (exploreFilter === '교내' || exploreFilter === '교외') list = list.filter((m) => m.sch.type === exploreFilter);
   if (exploreFilter === 'eligible') list = list.filter((m) => ['eligible', 'selective'].includes(m.result.status));
 
@@ -878,12 +892,16 @@ function liveNoticesHtml() {
     .concat(NATIONAL_SCHOLARSHIPS.filter((s) => s.sourceKind === 'official' && s.sourceUrl).map((s) => s.sourceUrl))
     .filter(Boolean);
   const isRegistered = (url) => regUrls.some((u) => url.startsWith(u) || u.startsWith(url));
-  const mine = (liveNotices.items || []).filter((n) =>
+  const forMe = (liveNotices.items || []).filter((n) =>
     n.school === p.school && (!n.campus || !p.campus || n.campus === p.campus) && !isRegistered(n.url)
-  )
-    // 학자금 대출·융자 공고는 장학금이 아니므로 뒤로 보낸다 (피드에는 정직하게 유지)
-    .sort((a, b) => (/대출|융자/.test(a.title) ? 1 : 0) - (/대출|융자/.test(b.title) ? 1 : 0))
-    .slice(0, 10);
+  );
+  /* 학자금 대출·융자는 장학금이 아니라서 매칭 카드로는 만들지 않는다(정직 원칙).
+     그렇다고 피드에서까지 밀려 잘리면 학생이 대출 정보를 아예 볼 곳이 없어지므로,
+     장학 공고를 앞에 두되 대출 공고 자리 2칸을 따로 남겨 둔다 (2026-07-30 조정). */
+  const isLoan = (n) => /대출|융자/.test(n.title);
+  const scholarships = forMe.filter((n) => !isLoan(n));
+  const loans = forMe.filter(isLoan);
+  const mine = scholarships.slice(0, loans.length ? 8 : 10).concat(loans.slice(0, 2));
   const head = `<div class="section-head" style="margin-top:4px"><h3>우리 학교 실시간 공고</h3>
     <span class="link-btn">매일 아침 자동 갱신${liveNotices.updatedAt ? ' · ' + liveNotices.updatedAt : ''}</span></div>`;
   if (!mine.length) {
@@ -989,7 +1007,7 @@ function applyAll() {
   const targets = matches
     .filter((m) => ['eligible', 'selective'].includes(m.result.status))
     .filter((m) => !state.applications.some((a) => a.id === m.sch.id))
-    .filter((m) => dday(m.sch.deadline).days >= 0)
+    .filter((m) => dday(m.sch.deadline).days >= 0 && notStale(m.sch))
     .map((m) => m.sch);
   if (!targets.length) { toast('준비할 수 있는 장학금이 없어요'); return; }
 

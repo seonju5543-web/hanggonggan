@@ -13,6 +13,10 @@
    실행: node collector/auto-register.mjs   (collect.mjs 직후, 워크플로에서 자동 실행)
    ============================================================ */
 import fs from 'node:fs';
+import { createRequire } from 'node:module';
+import { cleanTitle } from './clean-title.mjs';
+// 등록 규칙은 감사 도구와 같은 파일을 쓴다 (verify/entry-rules.cjs) — 규칙이 갈라지지 않게
+const { checkEntry } = createRequire(import.meta.url)('../verify/entry-rules.cjs');
 
 const HERE = new URL('.', import.meta.url);
 const cfgPath = new URL('auto-register-config.json', HERE);
@@ -25,6 +29,8 @@ const registeredPath = new URL('../data/registered.json', HERE);
 const reportPath = process.argv[2] ? new URL(process.argv[2], new URL('..', HERE)) : new URL('report.md', HERE);
 const notices = JSON.parse(fs.readFileSync(noticesPath, 'utf8'));
 const registered = JSON.parse(fs.readFileSync(registeredPath, 'utf8'));
+let forms = { templates: {} };
+try { forms = JSON.parse(fs.readFileSync(new URL('../data/forms.json', HERE), 'utf8')); } catch { /* 없어도 진행 */ }
 
 const TODAY = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10); // KST
 
@@ -54,19 +60,16 @@ function titleSim(a, b) {
   return hit / small.size;
 }
 
-/* ---------- 제목 청소: 클릭형 게시판이 목록에서 그대로 읽어온 부스러기 제거 ---------- */
-export function cleanTitle(t) {
-  return (t || '')
-    .replace(/^(공지\s*)+/, '')                       // "공지 공지 " 접두
-    .replace(/^\d{3,5}\s+/, '')                        // 목록 행 번호 "2653 "
-    .replace(/\s*20\d{2}\.\d{1,2}\.\d{1,2}\.?\s*조회\s*\d+\s*$/, '') // 꼬리 "2026.07.08. 조회 136"
-    .replace(/\s*조회\s*\d+\s*$/, '')
-    .replace(/신규게시글|Attachment|새글/g, '')
-    .replace(/\s+/g, ' ').trim();
-}
+/* 제목 청소는 공용 모듈에 있다 (수집기와 같은 규칙을 써야 중복 판정이 어긋나지 않는다) */
+export { cleanTitle } from './clean-title.mjs';
 
 /* ---------- 제목 정규화: 학교별 재게시·꼬리표 차이를 흡수 ---------- */
-const normTitle = (t) => cleanTitle(t).replace(/\[[^\]]*\]/g, '').replace(/[\s·ㆍ()~〜.,'"“”‘’!⭐★]/g, '').replace(/공지/g, '').toLowerCase();
+const stripPunct = (t) => t.replace(/[\s·ㆍ()~〜.,'"“”‘’!⭐★]/g, '').replace(/공지/g, '').toLowerCase();
+const normTitle = (t) => stripPunct(cleanTitle(t).replace(/\[[^\]]*\]/g, ''));
+/* 대괄호를 살린 판 — 대괄호 안에 사업단·재단 이름이 든 공고가 있어서
+   (예: "[빅데이터혁신융합대학사업단] … 성과형 장학금") 대괄호를 떼면 정작 이름이 사라져
+   같은 공고를 못 알아본다. 2026-07-30 시립대 이중 등록의 원인이었다. */
+const normTitleFull = (t) => stripPunct(cleanTitle(t));
 
 /* ---------- 재단명 추출: 같은 재단 사업의 학교별 재게시를 식별 ---------- */
 const GENERIC_FOUNDATION = /^(한국|국가|대학|교내|교외|학교|서울|재단)$/;
@@ -80,7 +83,12 @@ export function foundationKey(t) {
 const NON_NOTICE = /^(장학금 종류|장학금 신청|장학\/?학자금|장학 및 학자금|학자금 대출|장학금·학자금|국가장학금 및 학자금대출|국제화장학금|교외장학재단|근로장학공고게시판|네오르네상스장학|장학금안내|장학\(공지\)|학생지원팀|학생지원센터|장학 및 학자금 대출|학자금 중복지원)/;
 const LOAN = /학자금\s?대출|학자금융자|무이자|이자지원|대출 신청|대출 안내|대출 관련/;
 const EVENT = /교육\s*\*|참가팀 모집|참가자 선발|운영계획서|포스터$|Q&amp;A|Q&A|설명회|박람회|공모전|연수|탐방/;
-const MENU_TAIL = /\[등록\/장학\]\s*$|^\d+\.\s|^\(붙임|^\(신청서식|^\(공고문|\.pdf$|\.hwp$|\.zip$/i;
+/* 파일 이름이 그대로 제목으로 잡힌 것 — 확장자 전부 차단.
+   예전에는 pdf·hwp·zip만 걸러 '코나아이_소상공인_장학생_모집_포스터.png'가 장학금으로
+   등록됐다(원문 보기를 누르면 이미지가 내려받아짐). 2026-07-30 교정 */
+const MENU_TAIL = /\[등록\/장학\]\s*$|^\d+\.\s|^\(붙임|^\(신청서식|^\(공고문|\.[a-z]{2,5}$/i;
+/* 첨부 내려받기 주소는 공고가 아니다 — 원문 보기를 누르면 파일이 내려받아진다 */
+const DOWNLOAD_URL = /mode=download|attachNo=|fileDown|\/download\b|\.(png|jpe?g|gif|hwpx?|pdf|docx?|zip|xlsx?)(\?|$)/i;
 const EMPLOYMENT = /채용|조교(?!.*장학금)|근무자 모집|직원 모집/;
 const NOT_UNDERGRAD = /대학원생?\s|석사|박사|수련의|졸업(생|자)\s*대상|T\/AS|강의보조/;
 const ADMIN_NOTICE = /출근부|지급\s*안내|지급일|계좌\s*등록|서류\s*보완|유의사항\s*안내|중복지원|반환|환수|추천서\s*(총장|직인)|안내\s*및\s*FAQ/;
@@ -92,6 +100,9 @@ const ACTION = /(선발|모집|신청|추천|접수)/;
 function parseDeadline(n) {
   const hay = `${n.title} ${n.deadlineHint || ''}`;
   const m = hay.match(/~\s*(\d{4})[.\-\/\s]+(\d{1,2})[.\-\/\s]+(\d{1,2})/) ||
+            // 한글 날짜 "~2026년 7월 31일" (도레이재단 공고가 이 형태라 마감이 비어 있었다 — 2026-07-30 추가)
+            hay.match(/~\s*(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일/) ||
+            hay.match(/(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일\s*[^\d]{0,8}(까지|마감)/) ||
             hay.match(/(\d{4})[.\-\/\s]+(\d{1,2})[.\-\/\s]+(\d{1,2})\s*[^\d]{0,6}(까지|마감)/);
   if (m) return `${m[1]}-${String(m[2]).padStart(2, '0')}-${String(m[3]).padStart(2, '0')}`;
   // 연도 없는 "~7.03"·"~7/19" — 올해로 해석 (마감 경과 거르기용)
@@ -107,6 +118,7 @@ function classify(n, regUrlSet, regEntries, batchSeen) {
   if (regUrlSet.has(cu)) return { verdict: 'skip', why: '이미 등록(원문 동일)' };
   if (batchSeen.has(cu) || batchSeen.has(n.school + '|' + nt)) return { verdict: 'skip', why: '이번 실행 내 중복' };
   if (t.length < 8) return { verdict: 'skip', why: '제목 파편' };
+  if (DOWNLOAD_URL.test(n.url || '')) return { verdict: 'skip', why: '첨부 내려받기 주소(공고 원문 아님)' };
   if (/\[?마감\]/.test(t)) return { verdict: 'skip', why: '게시판에 마감 표시됨' };
   if (NON_NOTICE.test(t) || MENU_TAIL.test(t)) return { verdict: 'skip', why: '메뉴·안내 페이지' };
   if (LOAN.test(t)) return { verdict: 'skip', why: '학자금 대출·융자(장학금 아님)' };
@@ -123,7 +135,13 @@ function classify(n, regUrlSet, regEntries, batchSeen) {
   // 같은 재단·같은 사업 감지: ① 제목 유사도(4-gram) ② 재단명 일치
   // 같은 학교(또는 전국 등록분)와 겹치면 = 재게시 중복(스킵), 다른 학교와 겹치면 = 타교 접수분일 수 있음(컨펌 대기)
   const fk = foundationKey(t);
-  const similars = regEntries.filter((r) => titleSim(nt, r.nt) >= 0.55 || (fk && r.name.includes(fk)));
+  // 대괄호를 뗀 판·살린 판을 모두 대조해 가장 높은 유사도를 쓴다 (한쪽만 보면 놓친다)
+  const ntFull = normTitleFull(t);
+  const bestSim = (r) => Math.max(
+    titleSim(nt, r.nt), titleSim(ntFull, r.ntFull || r.nt),
+    titleSim(nt, r.ntFull || r.nt), titleSim(ntFull, r.nt),
+  );
+  const similars = regEntries.filter((r) => bestSim(r) >= 0.55 || (fk && r.name.includes(fk)));
   if (similars.length) {
     // 같은 학교(또는 전국) 등록분이 하나라도 있으면 재게시 중복 — 타교뿐이면 접수분일 수 있어 컨펌 대기
     const same = similars.find((r) => !r.school || r.school === n.school);
@@ -146,6 +164,7 @@ if (!cfg.enabled) {
     name: i.name || '',
     // "(동국대 접수)" 같은 꼬리표는 떼고 사업명만 비교
     nt: normTitle((i.name || '').replace(/\([^)]*\)/g, '')),
+    ntFull: normTitleFull((i.name || '').replace(/\([^)]*\)/g, '')),
     school: (i.eligibility && i.eligibility.schoolOnly) || '',
   }));
   const batchSeen = new Set();
@@ -166,9 +185,11 @@ if (!cfg.enabled) {
     batchSeen.add(cu);
     batchSeen.add(n.school + '|' + normTitle(n.title));
     // 첨부는 신청서·공고문류만 (게시판 메뉴 링크 오염 방지)
+    // '원서·동의서·서약서·추천서'가 빠져 있어 진짜 신청서(예: 장학금지급원서)가 통째로
+    // 버려지던 것을 2026-07-30에 보강 — 염곡 3건 중 1건만 잡히던 실사례
     const atts = (n.attachments || [])
-      .filter((a) => /신청서|지원서|서식|양식|공고/.test(a.name) && /\.(hwp|hwpx|doc|docx|pdf|zip|xlsx?)(\?|$)?/i.test(a.name + a.url))
-      .slice(0, 4);
+      .filter((a) => /신청서|지원서|신청양식|원서|서식|양식|동의서|서약서|추천서|공고/.test(a.name) && /\.(hwp|hwpx|doc|docx|pdf|zip|xlsx?)(\?|$)?/i.test(a.name + a.url))
+      .slice(0, 6);
     const id = 'auto-' + cu.replace(/[^a-z0-9]/gi, '').slice(-24).toLowerCase();
     if (registered.items.some((i) => i.id === id)) continue;
     const title = cleanTitle(n.title).slice(0, 70);
@@ -177,9 +198,14 @@ if (!cfg.enabled) {
       name: title,
       type: /교외|재단|장학회|재청|시민|청암|문화재단/.test(title) ? '교외' : '교내',
       provider: `${n.school}${n.campus ? ' ' + n.campus : ''} 게시 공고`,
-      amount: '장학금 (세부 원문 확인)',
-      amountValue: 500000,
+      amount: '금액 원문 확인',
+      // 금액을 모르면 0 — 지어낸 숫자를 합계에 섞지 않는다 (운영 원칙 8-1 추론 금지).
+      // 예전에는 50만원을 넣어 홈 화면 합계가 부풀려져 있었다 (2026-07-30 교정)
+      amountValue: 0,
       deadline: r.deadline || null,
+      // 마감을 못 읽은 공고는 등록일을 남긴다 — 앱이 등록 후 60일이 지나면 자동으로 감춘다
+      // (마감이 없으면 목록에서 영영 안 사라지던 문제, 2026-07-30 교정)
+      ...(r.deadline ? {} : { listedAt: TODAY }),
       period: r.deadline ? `접수 ~${r.deadline}` : '접수 기간 원문 확인',
       summary: `${n.school} 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.`,
       eligibility: { selective: true, schoolOnly: n.school, ...(n.campus ? { campusOnly: n.campus } : {}) },
@@ -192,9 +218,18 @@ if (!cfg.enabled) {
       sourceUrl: n.url,
       sourceKind: 'auto'
     };
+    /* 마지막 관문: 감사 도구와 '똑같은 규칙'으로 자기 결과를 스스로 검사한다.
+       규칙에 걸리면 등록하지 않고 컨펌 대기로 넘긴다 — 잘못된 항목이 앱에 나가지 않게
+       (2026-07-30: PNG 파일·대출·대학원 공고가 자동 등록됐던 사고의 재발 방지) */
+    const problems = checkEntry(entry, { formIds: new Set(Object.keys(forms.templates || {})) })
+      .filter((p) => p.level === 'error');
+    if (problems.length) {
+      held.push({ n, why: `등록 규칙 위반으로 자동 등록 보류 — ${problems[0].msg}` });
+      continue;
+    }
     registered.items.push(entry);
     regUrlSet.add(cu);
-    regEntries.push({ name: title, nt: normTitle(title), school: n.school });
+    regEntries.push({ name: title, nt: normTitle(title), ntFull: normTitleFull(title), school: n.school });
     added.push(entry);
   }
 
@@ -211,7 +246,7 @@ if (!cfg.enabled) {
   try { queue = JSON.parse(fs.readFileSync(queuePath, 'utf8')); } catch { /* 첫 실행 */ }
   let queued = 0;
   for (const e of added) {
-    if (!(e.attachments || []).some((a) => /신청서|지원서|서식|양식/.test(a.name))) continue;
+    if (!(e.attachments || []).some((a) => /신청서|지원서|신청양식|원서|서식|양식|동의서|서약서/.test(a.name))) continue;
     if (queue.items.some((q) => q.id === e.id)) continue;
     // deepfetch가 제목 부분일치로 대상을 찾으므로, 부스러기 없는 제목 앞부분을 표적으로 쓴다
     const target = cleanTitle(e.name).replace(/\[[^\]]*\]/g, '').trim().slice(0, 12);

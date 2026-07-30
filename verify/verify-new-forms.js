@@ -5,6 +5,19 @@ const { chromium } = require('playwright-core');
 
 const NEW_KEYS = ['samil-apply', 'bogun-study-apply', 'bogun-multi-apply', 'sanhak-foreign-apply', 'mju-gosi-apply'];
 
+/* 구동 대상은 고정하지 않고 그때그때 고른다 — 공고는 마감되면 신청 버튼이 잠기므로,
+   특정 공고 id를 박아두면 시간이 지나 검증이 저절로 깨진다(2026-07-30 실제 발생).
+   같은 양식을 쓰면서 아직 마감되지 않은 접수분을 찾아 구동한다. */
+const REG = require('../data/registered.json');
+const TODAY = new Date().toISOString().slice(0, 10);
+function pickTarget(formId) {
+  const live = REG.items.filter((i) => i.formId === formId && (!i.deadline || i.deadline >= TODAY));
+  if (!live.length) return null;
+  // 학교 한정 공고여야 온보딩 학교를 정해 구동할 수 있다
+  return live.find((i) => (i.eligibility || {}).schoolOnly) || live[0];
+}
+const SCHOOL_ALIAS = { 한국외국어대학교: '외대', 서울시립대학교: '서울시립', 성균관대학교: '성균관', 중앙대학교: '중앙', 명지대학교: '명지', 광운대학교: '광운', 동국대학교: '동국', 경희대학교: '경희' };
+
 async function onboard(page, school, major) {
   await page.click('.onboard-step[data-step="0"] [data-next]');
   await page.fill('#in-school', school);
@@ -67,19 +80,22 @@ async function onboard(page, school, major) {
   }, NEW_KEYS);
   for (const [k, v] of Object.entries(smoke)) console.log(' ', k, JSON.stringify(v));
 
-  // ③ 삼일장학회: UI로 질문→문서 생성
-  // (성균관 접수분은 7/12 마감돼 버튼이 비활성 — 마감 전인 외대 접수분으로 같은 양식을 구동.
-  //  접수분이 모두 마감되면 마감 전 다른 접수분으로 대상을 바꿀 것)
+  // ③ 삼일장학회: UI로 질문→문서 생성 (마감 안 지난 접수분을 자동으로 골라 구동)
+  const samilTarget = pickTarget('samil-apply');
+  if (!samilTarget) {
+    console.log('삼일 UI 구동 건너뜀 — samil-apply를 쓰는 공고가 전부 마감됨 (양식 자체는 ②에서 검증됨)');
+  } else {
+  console.log('삼일 UI 구동 대상:', samilTarget.id, '|', samilTarget.name.slice(0, 40));
   const samilPage = await browser.newPage({ viewport: { width: 390, height: 844 } });
   samilPage.on('pageerror', (e) => errors.push('PAGEERROR-SAMIL: ' + e.message));
   samilPage.on('dialog', async (d) => { await d.accept(); });
   await samilPage.goto('http://localhost:8123/', { waitUntil: 'domcontentloaded' });
-  await onboard(samilPage, '외대', '컴퓨터공학부');
+  await onboard(samilPage, SCHOOL_ALIAS[samilTarget.eligibility.schoolOnly] || samilTarget.eligibility.schoolOnly, '컴퓨터공학부');
   {
     const page = samilPage; // 아래 단언들은 기존 그대로 재사용
   await page.click('.nav-item[data-nav="explore"]');
   await page.waitForTimeout(600);
-  await page.click('#explore-list [data-detail="reg-hufs-samil"]');
+  await page.click(`#explore-list [data-detail="${samilTarget.id}"]`);
   await page.waitForSelector('#detail-sheet.show');
   await page.waitForTimeout(400);
   await page.click('#btn-apply-one');
@@ -100,16 +116,21 @@ async function onboard(page, school, major) {
     '| 서약문:', doc.includes('선발 취소 등 어떤 조치에도 이의를 제기치 않겠습니다'));
   await page.screenshot({ path: `${__dirname}/shot-40-samil-doc.png` });
   }
+  }
 
-  // ④ 명지 프로필 → 고시장학금 양식
+  // ④ 명지 프로필 → 고시장학금 양식 (마감 안 지난 접수분이 있을 때만)
+  const gosiTarget = pickTarget('mju-gosi-apply');
+  if (!gosiTarget) {
+    console.log('명지 고시 UI 구동 건너뜀 — mju-gosi-apply를 쓰는 공고가 마감됨 (양식 자체는 ②에서 검증됨)');
+  } else {
   const page2 = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page2.on('pageerror', (e) => errors.push('PAGEERROR2: ' + e.message));
   page2.on('dialog', async (d) => { await d.accept(); });
   await page2.goto('http://localhost:8123/', { waitUntil: 'domcontentloaded' });
-  await onboard(page2, '명지', '융합소프트웨어학부');
+  await onboard(page2, SCHOOL_ALIAS[gosiTarget.eligibility.schoolOnly] || gosiTarget.eligibility.schoolOnly, '융합소프트웨어학부');
   await page2.click('.nav-item[data-nav="explore"]');
   await page2.waitForTimeout(600);
-  await page2.click('#explore-list [data-detail="reg-mj-gosi"]');
+  await page2.click(`#explore-list [data-detail="${gosiTarget.id}"]`);
   await page2.waitForSelector('#detail-sheet.show');
   await page2.waitForTimeout(400);
   await page2.click('#btn-apply-one');
@@ -123,6 +144,7 @@ async function onboard(page, school, major) {
     '| 제한기준 명시:', doc2.includes('직전학기 평균평점 2.5 이상'),
     '| 서약문:', doc2.includes('명지대학교 장학금규정에 따라'));
   await page2.screenshot({ path: `${__dirname}/shot-41-mjugosi-doc.png` });
+  }
 
   console.log('ERRORS:', errors.length ? errors.join(' ; ') : 'none');
   await browser.close();

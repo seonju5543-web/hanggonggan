@@ -33,15 +33,37 @@ jobs:
         run: node collector/browser-collect.mjs
       - name: 정식 등록 자동화 (선조치후보고 — collector/auto-register-config.json으로 on/off)
         run: node collector/auto-register.mjs collector/browser-report.md
-      - name: 신규 등록분 양식 원본 자동 확보 (스키마화 대기 큐)
+      # 데이터 관문 (2026-07-30 도입): 로봇이 바꾼 데이터가 규칙을 어기면 저장하지 않고 되돌린다.
+      # 잘못된 공고가 앱에 하루라도 노출되는 일을 막는 장치 — 사람이 감사를 기억해서 돌릴 필요가 없다.
+      - name: 데이터 관문 (수집기 규칙 테스트 + 데이터 감사)
+        id: audit
+        continue-on-error: true
+        run: |
+          node verify/test-collector.mjs
+          node verify/audit-data.js
+      - name: 감사 실패 시 자동 등록분 되돌리기
+        if: steps.audit.outcome == 'failure'
+        run: |
+          # 파일 전체가 아니라 '이번 실행이 새로 자동 등록한 공고'만 골라서 뺀다
+          # (같은 실행의 원문 발췌 갱신 같은 정상 작업까지 버리지 않도록)
+          node collector/revert-auto.mjs || git checkout -- data/registered.json
+
+      - name: 신규 등록분 양식 원본 자동 확보 + 스키마화 (같은 실행 안에서 끝낸다)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           targets=$(node -e "let q;try{q=require('./collector/pending-forms.json')}catch(e){q={items:[]}};console.log(q.items.filter(i=>!i.fetched).map(i=>i.target).join(','))")
           if [ -n "$targets" ]; then
             FORM_TARGETS="$targets" node collector/deepfetch.mjs
             pip install olefile --quiet
             python3 collector/hwp-prvtext.py
-            node -e "const fs=require('fs');const p='./collector/pending-forms.json';const q=JSON.parse(fs.readFileSync(p,'utf8'));q.items.forEach(i=>{i.fetched=true});fs.writeFileSync(p,JSON.stringify(q,null,1)+'\n')"
+            # 실제로 원본이 내려온 항목만 fetched로 표시한다 (전부 true로 찍어 원본 없는 항목이
+            # 영원히 대기하던 버그 수정 — 2026-07-30)
+            node collector/mark-fetched.mjs
           fi
+          # 원본은 deepfetch가 매 실행마다 갈아엎으므로 스키마화는 반드시 같은 실행에서
+          npm i @anthropic-ai/sdk --no-audit --no-fund --silent
+          node collector/schematize-forms.mjs collector/browser-report.md
 
       - name: 공고 원문 발췌 갱신 (정직 원칙 — 추론 대신 원문 그대로)
         run: node collector/extract-excerpts.mjs --write
@@ -50,6 +72,7 @@ jobs:
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add collector/seen.json collector/browser-report.md data/notices.json data/registered.json
+          [ -f collector/health.json ] && git add collector/health.json
           [ -f collector/pending-forms.json ] && git add collector/pending-forms.json
           [ -d collector/extracted ] && git add collector/extracted
           true  # 위 선택 파일이 없어도 저장 단계는 계속된다 (2026-07-19 8회 연속 실패 원인 수정)
@@ -74,6 +97,19 @@ jobs:
             --assignee "Se-Hyeon-Jo"
 
       # 실패 시 즉시 알림 (조용한 중단 방지 — 2026-07-19 도입)
+      - name: 🚨 데이터 감사 실패 알림
+        if: steps.audit.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          last=$(gh issue list --repo "${{ github.repository }}" \
+            --search '"수집 리포트" in:title' --state open \
+            --limit 1 --json number --jq '.[0].number' || true)
+          if [ -n "$last" ] && [ "$last" != "null" ]; then
+            gh issue comment "$last" --repo "${{ github.repository }}" \
+              --body "🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **데이터 감사 실패 — 이번 자동 등록분은 되돌렸습니다.** 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · 수집된 공고 자체는 실시간 피드에 그대로 남아 있어요. Claude 세션에 '감사 실패 확인해줘'라고 지시하세요."
+          fi
+
       - name: 🚨 실패 알림 (최근 리포트 이슈에 코멘트)
         if: failure()
         env:

@@ -1,20 +1,12 @@
 {
  "items": [
   {
-   "id": "auto-eab888ec9e90eab2a9eca69d",
-   "name": "[빅데이터혁신융합대학사업단] 2026학년도 1학기 성과형 장학금(자격증) 신청 안내",
-   "target": "2026학년도 1학기 ",
-   "added": "2026-07-24",
-   "fetched": true,
-   "schematized": false
-  },
-  {
    "id": "auto-otice06doarticleno138713",
    "name": "(공과대학)2026학년도 2학기 한국도레이과학진흥재단 장학생 선발안내(~2026년 7월 31일(금) AM 09:00까지)",
    "target": "(공과대학)2026학년",
    "added": "2026-07-27",
    "fetched": true,
-   "schematized": false
+   "schematized": true
   },
   {
    "id": "auto-ent2431260146artclviewdo",
@@ -30,6 +22,38 @@
    "target": "2026년도 2학기 연",
    "added": "2026-07-28",
    "fetched": true,
+   "schematized": true
+  },
+  {
+   "id": "reg-hufs-namgaju",
+   "name": "남가주동문장학회 장학생 선발",
+   "target": "남가주동문",
+   "added": "2026-07-30",
+   "fetched": false,
+   "schematized": false
+  },
+  {
+   "id": "reg-hufs-gasong",
+   "name": "2026-2 가송재단 장학생 모집(외대)",
+   "target": "가송재단",
+   "added": "2026-07-30",
+   "fetched": false,
+   "schematized": false
+  },
+  {
+   "id": "reg-hufs-yangcheon",
+   "name": "양천장학회 장학금 신청 안내(외대 후기)",
+   "target": "양천장학회",
+   "added": "2026-07-30",
+   "fetched": false,
+   "schematized": false
+  },
+  {
+   "id": "reg-kw-gasong",
+   "name": "가송재단 장학생 선발 안내(광운)",
+   "target": "가송재단",
+   "added": "2026-07-30",
+   "fetched": false,
    "schematized": false
   }
  ]
