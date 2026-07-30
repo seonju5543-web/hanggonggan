@@ -14,6 +14,7 @@
    ============================================================ */
 import fs from 'node:fs';
 import zlib from 'node:zlib';
+import { pdfText } from './pdf-text.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const OUT = new URL('extracted/', HERE);
@@ -45,7 +46,9 @@ function triage(item, row, text) {
   if ((cfg.alwaysApiIds || []).includes(item.id)) return { route: 'api', why: '개발자 지정(alwaysApiIds)' };
 
   const isPdf = /\.pdf$/i.test(row.file);
-  if (isPdf) return { route: 'api', why: 'PDF — 글자를 뽑을 수 없어 원본을 직접 봐야 함' };
+  /* PDF도 글자층이 있으면(text가 나오면) 무료 경로로 간다. 아래 공통 규칙을 그대로 탄다.
+     글자가 안 나온 PDF = 스캔본이라 눈으로 봐야 하므로 API. */
+  if (isPdf && !text) return { route: 'api', why: '스캔 PDF(글자층 없음) — 원본을 직접 봐야 함' };
   if (!text || text.length < 40) return { route: 'api', why: '원본에서 글자를 읽지 못함 — 원본을 직접 봐야 함' };
   if (text.length < cfg.minTextChars) return { route: 'api', why: '뽑힌 글자가 너무 적음 — 항목이 빠졌을 수 있음' };
   if (COMPLEX_LAYOUT.test(text)) return { route: 'api', why: '표·시간표 등 복잡한 배치 — 줄글만으론 동일 문서 보장 불가' };
@@ -111,7 +114,11 @@ function extractText(file) {
       .map((k) => xmlText(entries[k].toString('utf8'), /<hp:t[^>]*>([\s\S]*?)<\/hp:t>/g))
       .join('\n');
   }
-  return ''; /* pdf 등 — 텍스트 추출 불가, 다음 세션이 눈으로 확인 */
+  if (lower.endsWith('.pdf')) {
+    /* 글자층이 있는 PDF는 여기서 공짜로 읽힌다. 스캔 PDF면 ''가 나와 API 경로로 간다. */
+    try { return pdfText(fs.readFileSync(url)); } catch { return ''; }
+  }
+  return ''; /* 그 밖의 형식 — 원본을 직접 봐야 한다 */
 }
 
 /* ---------- Claude에게 넘길 지시 ---------- */
