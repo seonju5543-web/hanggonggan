@@ -64,7 +64,15 @@ jobs:
           git config user.email "actions@github.com"
           git add PROGRESS.md
           git commit -m "PROGRESS: 활동 로그 자동 갱신 (매일 08:07·22:07 KST)"
-          git push origin HEAD:main
+          # PROGRESS.md는 두 개발자와 이 로봇이 함께 쓰는 문서라, 그 사이 main이 움직여
+          # push가 튕기는 일이 잦다. 예전엔 그러면 그냥 실패했다(활동 로그가 하루 비었다).
+          # 이제 최신 main을 받아 얹은 뒤 최대 3회 다시 시도한다.
+          for i in 1 2 3; do
+            if git push origin HEAD:main; then exit 0; fi
+            git fetch origin main && git rebase origin/main || { git rebase --abort || true; exit 1; }
+          done
+          echo "::error::PROGRESS 활동 로그 push 실패 — 3회 재시도 모두 실패."
+          exit 1
 
       # 문서가 실제로 갱신됐을 때만, 수집 리포트와 '동일한 방식'(이슈 배정 → GitHub이
       # 두 개발자에게 자동 메일)으로 알린다. 별도 메일 비밀번호(Secrets) 불필요.

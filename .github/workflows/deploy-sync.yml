@@ -39,6 +39,11 @@ jobs:
           ref: main
           fetch-depth: 0
 
+      # 로봇 기록장(공고 목록·본 공고 장부 등)이 양쪽에서 달라졌을 때 자동으로 합쳐 준다.
+      # 이게 없으면 아래 병합이 충돌로 멈추고 🚨 이슈만 남는다 (COLLAB.md 참조).
+      - name: 협업 병합기 등록 (충돌 자동 해소 — COLLAB.md)
+        run: bash tools/setup-collab.sh
+
       - name: 기본 브랜치 내용을 main에 반영 (= 앱 배포)
         id: sync
         env:
