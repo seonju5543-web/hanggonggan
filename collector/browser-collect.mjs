@@ -4,6 +4,7 @@
 import fs from 'node:fs';
 import { chromium } from 'playwright';
 import { urlKey, dedupeNotices } from './url-key.mjs';
+import { isAttachmentEntry } from './attachment-link.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const cfg = JSON.parse(fs.readFileSync(new URL('browser-targets.json', HERE), 'utf8'));
@@ -169,7 +170,9 @@ async function harvestTarget(t) {
     loadedAny = true;
     const items = r.links
       .filter((l) => l.title.length >= 6 && l.title.length <= 140 && /^https?:/.test(l.url))
-      .filter((l) => KEYWORDS.test(l.title) && (NOTICE_SIGNAL.test(l.title) || !MENU_NOISE.test(l.title)));
+      .filter((l) => KEYWORDS.test(l.title) && (NOTICE_SIGNAL.test(l.title) || !MENU_NOISE.test(l.title)))
+      // 첨부파일 내려받기 링크 제외 — 안 막으면 '…포스터.png' 같은 파일 이름이 공고로 뜬다
+      .filter((l) => !isAttachmentEntry(l));
     // 중복 판정은 정규화 주소로 — 시립대처럼 정렬 순번(sort=)이 주소에 붙는 게시판 대응
     const uniq = [...new Map(items.map((i) => [urlKey(i.url), i])).values()];
     report.push(`- ${uniq.length ? '✅' : '⚪'} 링크 ${r.links.length} · 장학 공고 ${uniq.length} · ${url}`);
@@ -251,6 +254,8 @@ await browser.close();
 notices.items = freshAll.concat(notices.items || []);
 const cutoff = new Date(Date.now() - 60 * 86400000).toISOString().slice(0, 10);
 notices.items = notices.items.filter((n) => (n.foundAt || '9999') >= cutoff);
+/* 예전에 담긴 첨부파일 링크도 매 실행 걷어낸다 (소급 적용 — 운영 원칙 7) */
+notices.items = notices.items.filter((n) => !isAttachmentEntry(n));
 /* 같은 공고가 다른 주소(정렬 순번·클릭형 표식)로 여러 번 들어와 있으면 하나로 합친다 */
 notices.items = dedupeNotices(notices.items);
 const perSchool = {};

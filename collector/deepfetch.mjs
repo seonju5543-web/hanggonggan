@@ -1,6 +1,7 @@
 /* 심층 수집: notices.json의 모든 공고 본문 전문 + 지정 공고의 첨부파일 원본을
    저장소(collector/extracted/)에 저장한다. 정식 등록 큐레이션의 원천 자료. */
 import fs from 'node:fs';
+import { isHtmlPayload } from './attachment-link.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const OUT = new URL('extracted/', HERE);
@@ -83,6 +84,9 @@ for (const n of targets) {
       if (!res.ok) { console.log('attach fail', res.status, a.name); continue; }
       const buf = Buffer.from(await res.arrayBuffer());
       if (buf.length < 1000 || buf.length > 15 * 1024 * 1024) continue;
+      // 받아 보니 문서가 아니라 웹페이지면 버린다 — 게시판 하단 메뉴(부서 링크 등)를 첨부로
+      // 착각해 받아 두면 스키마화가 매번 그걸 붙들고 실패한다(연구지원팀·연구진흥팀 사례).
+      if (isHtmlPayload(buf)) { console.log('attach skip (웹페이지였음):', a.name); continue; }
       fi += 1; ai += 1;
       const ext = (a.name.match(/\.(hwp|hwpx|doc|docx|pdf|xls|xlsx|zip)$/i) || [, 'bin'])[1];
       const fname = `form-${slug}-${ai}.${ext}`;
