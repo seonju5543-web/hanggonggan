@@ -171,6 +171,34 @@ export function detailCandidates(dom) {
   for (const raw of dom.rowIds || []) {
     if (looksLikeId(raw)) ids.push([dom.idParam || 'nttId', String(raw).trim()]);
   }
+  /* 가장 확실한 재료: **게시판이 스스로 쓰는 폼**.
+     주소를 짐작하지 말고, 클릭이 실제로 보내는 폼의 action과 기본 필드를 그대로 쓰고
+     빈 칸에만 글 번호를 넣는다.
+     경희 news.khu.ac.kr에서 이게 왜 필요했나 (2026-07-31):
+       행 = `javascript:view('322635','')`
+       view = function(boardId, catId){ form.elements["boardId"].value = boardId; form.submit(); }
+       폼   = action=/kor/user/contents/view.do · menuNo=200226&boardId=
+     즉 원문 주소는 `/kor/user/contents/view.do?menuNo=200226&boardId=322635`다.
+     목록 주소(`/kor/user/bbs/BMSR00040/list.do?menuNo=200318`)에서 이름을 유추하면
+     경로도 파라미터 이름도 메뉴 번호도 전부 틀린다 — 실제로 세 번 틀렸다. */
+  const DETAILISH_ACTION = /(view|detail|read|artclView)(\.do|\.jsp|\.php)?$/i;
+  for (const f of dom.forms || []) {
+    if (!f || !DETAILISH_ACTION.test(String(f.action || '').split('?')[0])) continue;
+    const pairs = String(f.fields || '').split('&').filter(Boolean)
+      .map((kv) => { const i = kv.indexOf('='); return i < 0 ? [kv, ''] : [kv.slice(0, i), kv.slice(i + 1)]; });
+    const blanks = pairs.filter(([, v]) => v === '').map(([k]) => k);
+    for (const idVal of (dom.rowIds || []).filter(looksLikeId)) {
+      for (const slot of blanks) {
+        try {
+          const v = new URL(f.action, dom.url || dom.listUrl);
+          for (const [k, val] of pairs) if (val !== '') v.searchParams.set(k, val);
+          v.searchParams.set(slot, idVal);
+          push(v.href);
+        } catch { /* 조립 실패는 건너뛴다 */ }
+      }
+    }
+  }
+
   for (const [idKey, idVal] of ids) {
     if (!dom.listUrl) break;
     try {

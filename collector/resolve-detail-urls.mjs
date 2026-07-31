@@ -53,7 +53,7 @@ for (const t of targets) {
 }
 
 const report = [`## 🔗 원문 링크 복구 리포트 (${new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 16).replace('T', ' ')} KST)`, ''];
-report.push(`판: 6차(재검사 안전장치) · 커밋 ${process.env.GITHUB_SHA ? process.env.GITHUB_SHA.slice(0, 7) : 'local'}`);
+report.push(`판: 7차(게시판 폼으로 원문 주소 조립) · 커밋 ${process.env.GITHUB_SHA ? process.env.GITHUB_SHA.slice(0, 7) : 'local'}`);
 report.push(`고칠 대상: **${targets.length}건** (실시간 공고 ${targets.filter((t) => t.kind === 'notice').length} · 정식 등록 ${targets.filter((t) => t.kind === 'registered').length}) · 게시판 ${boards.size}곳`);
 report.push('');
 
@@ -198,6 +198,13 @@ async function scrapeRows(page) {
 
 /* 게시판을 여러 페이지 훑는다 — 앱에 담긴 공고 중에는 이미 1페이지에서 밀려난 것이 많다
    (1차 실행에서 '목록에서 못 찾음'이 68건 중 다수였던 이유). */
+async function scrapeForms(page) {
+  return page.evaluate(() => [...document.querySelectorAll('form')].slice(0, 4).map((f) => ({
+    action: f.getAttribute('action') || '',
+    fields: [...f.querySelectorAll('input,select')].map((i) => `${i.name}=${i.value}`).filter((x) => !x.startsWith('=')).slice(0, 16).join('&'),
+  }))).catch(() => []);
+}
+
 async function scanBoard(page, listUrl, maxPages) {
   const seenTitles = new Set();
   const all = [];
@@ -254,6 +261,7 @@ for (const [listUrl, group] of boards) {
 
   /* 목록을 여러 페이지 훑어 '누를 수 있는 행'을 모은다 */
   const rows = await scanBoard(page, listUrl, Number(process.env.RESOLVE_MAX_PAGES || 6));
+  const boardForms = await scrapeForms(page);   // 게시판이 스스로 쓰는 폼 — 원문 주소의 정답지
   const pagesSeen = Math.max(...rows.map((r) => r.pageNo), 1);
   report.push(`- 목록 ${pagesSeen}페이지에서 행 ${rows.length}개`);
 
@@ -279,7 +287,7 @@ for (const [listUrl, group] of boards) {
        ② 행의 클릭 스크립트가 넘기는 글 번호로 조립 (경희 view.do?nttId=…) */
     const cands = [];
     if (isDetailUrl(row.abs, listUrl)) cands.push(row.abs);
-    for (const c of detailCandidates({ listUrl, url: listUrl, rowIds: idsFromSource(row.src), hiddenInputs: {} })) {
+    for (const c of detailCandidates({ listUrl, url: listUrl, rowIds: idsFromSource(row.src), hiddenInputs: {}, forms: boardForms })) {
       if (isDetailUrl(c, listUrl) && !cands.includes(c)) cands.push(c);
     }
 
@@ -308,7 +316,7 @@ for (const [listUrl, group] of boards) {
         if (popup) await popup.waitForLoadState('domcontentloaded').catch(() => {});
         else { await navP; await page.waitForTimeout(2500); }
         const dom = await readDom(detail, listUrl);
-        const more = detailCandidates({ ...dom, rowIds: idsFromSource(row.src) })
+        const more = detailCandidates({ ...dom, rowIds: idsFromSource(row.src), forms: boardForms })
           .filter((c) => isDetailUrl(c, listUrl) && !cands.includes(c));
         for (const c of more) {
           cands.push(c);

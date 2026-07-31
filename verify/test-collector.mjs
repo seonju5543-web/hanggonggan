@@ -80,6 +80,23 @@ eq('목록 행의 클릭 스크립트 인자에서 글 번호를 뽑아 원문 �
   detailCandidates({ url: khuList, listUrl: khuList, rowIds: ['1078712'] })
     .includes('https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&nttId=1078712'), true);
 eq('안내 페이지(/page/533)는 공고 원문이 아니다', isDetailUrl('https://www.dongguk.edu/page/533', dgList), false);
+/* 경희 news.khu.ac.kr 실제 구조 (2026-07-31 클릭 함수를 떠서 확인):
+     행  = javascript:view('322635','')
+     view = function(boardId, catId){ form.elements["boardId"].value = boardId; form.submit(); }
+     폼   = action=/kor/user/contents/view.do · menuNo=200226&boardId=&catId=
+   목록 주소에서 이름을 유추하면 경로·파라미터·메뉴 번호가 전부 틀린다(실제로 세 번 틀렸다).
+   게시판이 스스로 쓰는 폼을 그대로 쓰는 이 규칙이 되돌아가면 경희대가 다시 목록으로 간다. */
+eq('게시판이 쓰는 폼의 빈 칸에 글 번호를 넣어 원문 주소를 만든다 (경희 실제 구조)',
+  detailCandidates({
+    listUrl: khuList, url: khuList, rowIds: ['322635'],
+    forms: [{ action: '/kor/user/search/list.do', fields: 'searchWord=' },
+      { action: '/kor/user/contents/view.do', fields: 'menuNo=200226&boardId=&catId=' }],
+  })[0],
+  'https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322635');
+eq('상세와 무관한 폼(검색창)으로는 주소를 만들지 않는다',
+  detailCandidates({ listUrl: khuList, url: khuList, rowIds: ['322635'],
+    forms: [{ action: '/kor/user/search/list.do', fields: 'searchWord=' }] })
+    .some((u) => u.includes('search')), false);
 eq('목록 제목과 상세 제목이 같은 글인지 알아본다',
   sameTitle('공통 2026년 충남평생교육진흥원 재능키움 장학생 2차 모집 안내',
     '[공지] 2026년 충남평생교육진흥원 재능키움 장학생 2차 모집 안내'), true);

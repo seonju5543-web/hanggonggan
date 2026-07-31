@@ -23,3 +23,11 @@ run: 2026-07-31 6차 — 재검사 안전장치(카나리아·실패 비율)
   5차 재검사가 동국대 원문 링크 17건을 HTTP 404를 이유로 되돌렸는데, 40분 전에 통과했던
   주소들이었다. 주소가 틀린 게 아니라 많이 두드려서 막힌 것. 되돌린 것은 복원했고,
   이제 게시판 목록이 안 열리거나(카나리아) 실패가 30%를 넘으면 아무것도 되돌리지 않는다.
+run: 2026-07-31 7차 — 경희만 (RESOLVE_ONLY_BOARD=news.khu.ac.kr)
+  경희 클릭 함수를 떠서 원문 주소 규칙을 알아냈다:
+    행  = javascript:view('322635','')
+    view = function(boardId, catId){ form.elements["boardId"].value = boardId; form.submit(); }
+    폼   = action=/kor/user/contents/view.do · menuNo=200226&boardId=
+  → 원문은 /kor/user/contents/view.do?menuNo=200226&boardId=322635
+  목록 주소에서 이름을 유추하면 경로·파라미터·메뉴 번호가 전부 틀린다. 이제 게시판이
+  스스로 쓰는 폼을 그대로 쓴다. 동국대는 오늘 많이 두드려 막혔으므로 이번엔 건드리지 않는다.
