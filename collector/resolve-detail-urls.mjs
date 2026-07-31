@@ -53,7 +53,7 @@ for (const t of targets) {
 }
 
 const report = [`## 🔗 원문 링크 복구 리포트 (${new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 16).replace('T', ' ')} KST)`, ''];
-report.push(`판: 4차(클릭 함수 진단) · 커밋 ${process.env.GITHUB_SHA ? process.env.GITHUB_SHA.slice(0, 7) : 'local'}`);
+report.push(`판: 5차(목록/상세 구분 + 클릭 함수 진단) · 커밋 ${process.env.GITHUB_SHA ? process.env.GITHUB_SHA.slice(0, 7) : 'local'}`);
 report.push(`고칠 대상: **${targets.length}건** (실시간 공고 ${targets.filter((t) => t.kind === 'notice').length} · 정식 등록 ${targets.filter((t) => t.kind === 'registered').length}) · 게시판 ${boards.size}곳`);
 report.push('');
 
@@ -120,7 +120,24 @@ function titleMatches(title, docTitle, text) {
   return t.length >= 24 && body.includes(t.slice(0, 24));
 }
 
-async function verifyCandidate(url, title, attempt = 0) {
+/* '이 화면이 목록인가 상세인가'를 가른다.
+   제목이 화면에 있다는 것만으로는 부족하다 — **게시판 목록에도 그 제목이 있다**.
+   실제로 3차 실행이 동국 진담거사 공고에 `view?nttId=533`(안내 페이지 번호)을 붙였고,
+   그 화면에 제목이 보였다는 이유로 통과시켰다. 상세 화면에는 그 글 하나만 있고
+   목록에는 다른 글 제목이 잔뜩 있으므로, 다른 글 제목이 여럿 보이면 목록으로 본다. */
+function looksLikeList(text, otherTitles) {
+  const fp = (s) => String(s).replace(/[\s .,·ㆍ~〜'"“”‘’!?()[\]{}<>:;|/\\_+\-*&#%]/g, '').toLowerCase();
+  const body = fp(text);
+  let hits = 0;
+  for (const t of otherTitles) {
+    const k = fp(String(t).replace(/^\s*\d{1,5}\s+/, '').replace(/^\s*(공통|서울|글로벌|국제|공지|홍보)\s+/, '').replace(/\[[^\]]{0,20}\]/g, ''));
+    if (k.length >= 10 && body.includes(k)) hits += 1;
+    if (hits >= 3) return true;
+  }
+  return false;
+}
+
+async function verifyCandidate(url, title, attempt = 0, otherTitles = []) {
   const c = await verifyContext();
   const p = await c.newPage();
   try {
@@ -135,7 +152,9 @@ async function verifyCandidate(url, title, attempt = 0) {
     await p.waitForTimeout(800);
     const text = await p.evaluate(() => (document.body.innerText || '').slice(0, 12000)).catch(() => '');
     const docTitle = await p.title().catch(() => '');
-    if (!titleMatches(title, docTitle, text)) return { ok: false, why: '제목 불일치(목록이나 다른 글이 열림)' };
+    if (!titleMatches(title, docTitle, text)) return { ok: false, why: '제목 불일치(다른 글이 열림)' };
+    // 제목이 보여도 다른 글 제목이 여럿 같이 보이면 그건 상세가 아니라 목록이다
+    if (looksLikeList(text, otherTitles)) return { ok: false, why: '목록 화면(다른 공고 제목이 여럿 보임)' };
     return { ok: true };
   } catch (e) {
     const msg = (e.message || String(e)).split('\n')[0].slice(0, 60);
@@ -143,7 +162,7 @@ async function verifyCandidate(url, title, attempt = 0) {
     if (attempt < 1 && /ERR_CONNECTION|ERR_NETWORK|Timeout|ERR_EMPTY/i.test(msg)) {
       await p.close().catch(() => {});
       await new Promise((r) => setTimeout(r, 4000));
-      return verifyCandidate(url, title, attempt + 1);
+      return verifyCandidate(url, title, attempt + 1, otherTitles);
     }
     return { ok: false, why: msg };
   } finally {
@@ -237,6 +256,9 @@ for (const [listUrl, group] of boards) {
   const provenKind = (c, row) => (c === row.abs ? 'row' : 'built');
   let provenAs = null;
 
+  /* 같은 게시판의 다른 공고 제목 — '이 화면이 목록인가' 판정에 쓴다 */
+  const otherTitlesOf = (want) => rows.map((r) => r.t).filter((x) => !sameTitle(want, x)).slice(0, 40);
+
   let boardCandidateTotal = 0;
   for (const t of group) {
     if (outOfTime()) { report.push('  - (시간 상한 도달 — 나머지는 다음 실행에서 이어서 고칩니다)'); break; }
@@ -259,7 +281,7 @@ for (const [listUrl, group] of boards) {
       found = cands.find((c) => provenKind(c, row) === provenAs) || null;
     }
     for (const c of (found ? [] : cands)) {
-      const v = await verifyCandidate(c, want);
+      const v = await verifyCandidate(c, want, 0, otherTitlesOf(want));
       if (v.ok) { found = c; boardProven += 1; provenAs = provenKind(c, row); break; }
       report.push(`    · 탈락(${v.why}) ${c.slice(0, 100)}`);
     }
@@ -282,7 +304,7 @@ for (const [listUrl, group] of boards) {
           .filter((c) => isDetailUrl(c, listUrl) && !cands.includes(c));
         for (const c of more) {
           cands.push(c);
-          const v = await verifyCandidate(c, want);
+          const v = await verifyCandidate(c, want, 0, otherTitlesOf(want));
           if (v.ok) { found = c; break; }
           report.push(`    · 탈락(${v.why}) ${c.slice(0, 100)}`);
         }
@@ -336,18 +358,56 @@ for (const [listUrl, group] of boards) {
   report.push('');
 }
 
+/* ── 소급 재검사 (운영 원칙 7) ────────────────────────────────
+   이미 원문 주소로 바꿔 둔 항목도 다시 열어 본다. 3차 실행까지의 확인 방법은
+   '제목이 화면에 보이면 통과'였는데, **게시판 목록에도 그 제목이 있어서** 목록 주소를
+   원문으로 오인할 수 있었다(동국 진담거사에 안내 페이지 번호가 붙은 사례).
+   지금 규칙으로 다시 재서, 목록이거나 다른 글이면 표식으로 되돌린다 —
+   그러면 앱이 '게시판 목록 ↗'으로 정직하게 알리고 다음 실행이 다시 고친다. */
+let rechecked = 0; let reverted = 0;
+if (!outOfTime()) {
+  report.push('### 소급 재검사 (이미 고쳐 둔 주소가 정말 그 공고로 가는가)');
+  const boardKeys = [...boards.keys()].map((l) => { try { const u = new URL(l); return u.origin + '/' + (u.pathname.split('/').filter(Boolean)[0] || ''); } catch { return null; } }).filter(Boolean);
+  const done = [];
+  for (const n of notices.items || []) {
+    if (!isMarkerUrl(n.url) && boardKeys.some((k) => (n.url || '').startsWith(k))) {
+      done.push({ ref: n, urlField: 'url', title: n.title, board: listUrlOf(n.url) });
+    }
+  }
+  for (const r of registered.items || []) {
+    if (!isMarkerUrl(r.sourceUrl) && boardKeys.some((k) => (r.sourceUrl || '').startsWith(k))) {
+      done.push({ ref: r, urlField: 'sourceUrl', title: r.name, id: r.id });
+    }
+  }
+  const otherAll = (want) => done.map((d) => d.title).filter((x) => !sameTitle(want, x)).slice(0, 40);
+  for (const d of done) {
+    if (outOfTime()) { report.push('- (시간 상한 — 나머지 재검사는 다음 실행에서)'); break; }
+    rechecked += 1;
+    const v = await verifyCandidate(d.ref[d.urlField], d.title, 0, otherAll(d.title));
+    if (v.ok) continue;
+    // 되돌리기 — 이 게시판의 목록 주소 + 제목 표식
+    const list = [...boards.keys()].find((l) => { try { return d.ref[d.urlField].startsWith(new URL(l).origin); } catch { return false; } });
+    if (!list) { report.push(`- ⚠️ ${d.id || d.title.slice(0, 30)} 확인 실패(${v.why})이지만 되돌릴 목록 주소를 몰라 그대로 둡니다`); continue; }
+    if (!DRY) d.ref[d.urlField] = `${list}#n-${encodeURIComponent(String(d.title).slice(0, 40))}`;
+    reverted += 1;
+    report.push(`- ↩️ 되돌림(${v.why}): ${d.id || ''} ${String(d.title).slice(0, 40)}`);
+  }
+  report.push(`- 재검사 ${rechecked}건 · 되돌림 ${reverted}건`);
+  report.push('');
+}
+
 await verifyCtx?.close().catch(() => {});
 await browser.close();
 
-if (!DRY && fixed) {
+if (!DRY && (fixed || reverted)) {
   fs.writeFileSync(noticesPath, JSON.stringify(notices, null, 1));
   fs.writeFileSync(registeredPath, JSON.stringify(registered, null, 1));
 }
 fs.writeFileSync(new URL('resolved-urls.json', HERE), JSON.stringify({ updatedAt: new Date().toISOString().slice(0, 10), map: resolvedMap }, null, 1));
 
 report.push('---');
-report.push(`복구 **${fixed}건** · 실패 ${failed}건${DRY ? ' (모의 실행 — 저장 안 함)' : ''}`);
+report.push(`복구 **${fixed}건** · 실패 ${failed}건 · 소급 재검사 ${rechecked}건 중 되돌림 ${reverted}건${DRY ? ' (모의 실행 — 저장 안 함)' : ''}`);
 if (failed) report.push('실패분은 목록 주소를 그대로 두었습니다 — 앱은 이 경우 "게시판 목록이 열려요"라고 정직하게 알립니다.');
 fs.writeFileSync(new URL('resolve-report.md', HERE), report.join('\n'));
 console.log(report.join('\n'));
-if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT, `fixed=${fixed}\nfailed=${failed}\n`);
+if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT, `fixed=${fixed}\nfailed=${failed}\nreverted=${reverted}\n`);

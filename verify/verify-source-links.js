@@ -17,6 +17,8 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const SHOT = (n) => `${__dirname}/shot-${n}.png`;
 const isMarker = (u) => /#n-/.test(String(u || ''));
+// 검사할 학교 — 기본 경희대(문제가 처음 보고된 학교). LINKCHECK_SCHOOL로 바꿀 수 있다.
+const SCHOOL = process.env.LINKCHECK_SCHOOL || '경희';
 
 (async () => {
   let fail = 0;
@@ -38,7 +40,7 @@ const isMarker = (u) => /#n-/.test(String(u || ''));
   else ok('sourceUrl이 첨부 내려받기 주소인 항목 없음');
 
   /* ── ② 브라우저 검사 ─────────────────────────────── */
-  console.log('■ 브라우저 — 경희대 학생으로 실제 카드를 열어 링크 확인');
+  console.log(`■ 브라우저 — ${SCHOOL} 학생으로 실제 카드를 열어 링크 확인`);
   const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.setDefaultTimeout(8000);   // 없는 요소를 30초씩 기다리다 검사가 멈추지 않게
@@ -49,7 +51,7 @@ const isMarker = (u) => /#n-/.test(String(u || ''));
 
   await page.goto('http://localhost:8123/', { waitUntil: 'domcontentloaded' });
   await page.click('.onboard-step[data-step="0"] [data-next]');
-  await page.fill('#in-school', '경희');
+  await page.fill('#in-school', SCHOOL);
   await page.waitForTimeout(300);
   await page.click('.ac-list:not([hidden]) .ac-item');
   // 경희대는 이원화 캠퍼스라 캠퍼스 선택이 뜰 수 있다
@@ -57,7 +59,7 @@ const isMarker = (u) => /#n-/.test(String(u || ''));
   if (campusChip) await campusChip.click();
   await page.click('#in-track .chip[data-value="engineering"]');
   await page.fill('#in-major', '컴퓨터공학과');
-  await page.fill('#in-name', '김경희');
+  await page.fill('#in-name', '홍길동');
   await page.click('#in-year .chip[data-value="3"]');
   await page.click('#in-status .chip[data-value="enrolled"]');
   await page.click('.onboard-step[data-step="1"] [data-next]');
@@ -68,15 +70,19 @@ const isMarker = (u) => /#n-/.test(String(u || ''));
   await page.click('.onboard-step[data-step="3"] [data-next]');
   await page.fill('#in-sid', '2023100123');
   await page.fill('#in-phone', '010-1234-5678');
-  await page.fill('#in-email', 'test@khu.ac.kr');
+  await page.fill('#in-email', 'test@univ.ac.kr');
   await page.click('#btn-finish-onboard');
   await page.waitForSelector('#screen-home:not([hidden])');
   await page.waitForTimeout(1500);
   await page.click('.nav-item[data-nav="explore"]');
   await page.waitForTimeout(800);
 
-  /* 경희대 카드를 하나씩 열어 '원문 공고' 링크의 실제 href를 읽는다 */
-  const khuIds = reg.filter((r) => /khu|경희/.test(r.id) || /경희/.test(r.name)).map((r) => r.id);
+  /* 그 학교 학생에게 보이는 카드를 하나씩 열어 '원문 공고' 링크의 실제 href를 읽는다.
+     학교 판정은 매칭 엔진이 쓰는 것과 같은 필드(eligibility.schoolOnly)로 — 제목에 학교 이름이
+     안 들어간 교내 공고('복지장학2(면학) 지급 안내')를 놓치지 않기 위해. */
+  const khuIds = reg
+    .filter((r) => new RegExp(SCHOOL).test((r.eligibility && r.eligibility.schoolOnly) || ''))
+    .map((r) => r.id);
   const checked = [];
   for (const id of khuIds) {
     const cardSel = `#explore-list [data-detail="${id}"]`;
@@ -95,7 +101,7 @@ const isMarker = (u) => /#n-/.test(String(u || ''));
     await page.keyboard.press('Escape');
     await page.waitForTimeout(350);
   }
-  console.log(`  경희대 카드 ${checked.length}건의 링크를 실제로 읽음`);
+  console.log(`  ${SCHOOL} 카드 ${checked.length}건의 링크를 실제로 읽음`);
   for (const c of checked) {
     const marker = isMarker(c.href);
     const labelOk = marker ? /게시판 목록/.test(c.label) : /원문 공고/.test(c.label);
@@ -104,7 +110,7 @@ const isMarker = (u) => /#n-/.test(String(u || ''));
     else if (marker && !c.hasGuide) bad(`목록 링크인데 '목록에서 찾으세요' 안내가 없습니다 — ${line}`);
     else ok(line);
   }
-  if (!checked.length) bad('경희대 카드를 한 건도 열지 못했습니다 (온보딩·매칭 확인 필요)');
+  if (!checked.length) bad(`${SCHOOL} 카드를 한 건도 열지 못했습니다 (온보딩·매칭 확인 필요)`);
 
   /* 실시간 공고 피드의 라벨도 같은 규칙인지 */
   const feed = await page.$$eval('#explore-list .notice-card', (els) => els.map((e) => ({
