@@ -6,9 +6,9 @@
    - 그림·아이콘은 자주 바뀌지 않으므로 캐시 우선(빠른 실행).
    - 네트워크가 느리거나 끊기면 캐시로 즉시 폴백 — 오프라인 실행은 그대로 보장된다.
    - 아래쪽 '알림' 절: 앱이 닫혀 있을 때의 확인, 알림 클릭 처리, (미래) 서버 푸시 수신구. */
-const CACHE = 'handaejang-v15';
+const CACHE = 'handaejang-v16';
 const ASSETS = ['.', 'index.html', 'style.css', 'app.js', 'data.js', 'forms.js',
-  'match-engine.js', 'notify-rules.js', 'notify.js',
+  'match-engine.js', 'notify-rules.js', 'notify.js', 'push-config.js',
   'manifest.json', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png'];
 const NET_TIMEOUT = 3500; /* 이 시간 안에 응답이 없으면 캐시부터 보여주고, 받아온 최신본은 다음 실행에 쓴다 */
 
@@ -180,19 +180,55 @@ self.addEventListener('sync', (e) => {
   e.waitUntil(backgroundCheck().catch(() => {}));
 });
 
-/* 서버 푸시 수신구 — 발송 서버(VAPID)가 붙는 날 그대로 동작하도록 미리 열어 둔다.
-   지금은 서버가 없어 실제로 호출되지 않는다(화면 문구도 그렇게 정직하게 안내). */
+/* ── 서버 푸시 수신구 ─────────────────────────────────────────
+   앱을 켜지 않아도, 화면이 꺼져 있어도 여기가 깨어난다.
+   발송 서버(server/push/)는 **내용 없는 '깨우기' 푸시**만 보낸다. 무엇을 알릴지는
+   여기서 **기기 안 프로필**로 판단한다 — 그래서 개인정보가 서버로 나가지 않는다.
+   브라우저 규칙상 푸시를 받으면 반드시 눈에 보이는 알림을 하나는 띄워야 하므로,
+   규칙상 알릴 것이 없으면 조용한 안내 1건으로 대신한다. */
 self.addEventListener('push', (e) => {
-  let p = {};
-  try { p = e.data ? e.data.json() : {}; } catch (err) { p = { title: '한대장', body: e.data ? e.data.text() : '' }; }
-  e.waitUntil(self.registration.showNotification(p.title || '한대장', {
-    body: p.body || '',
-    tag: p.tag || 'handaejang-push',
-    icon: 'icons/icon-192.png',
-    badge: 'icons/icon-192.png',
-    lang: 'ko',
-    data: { url: p.url || './', schId: p.schId || null, type: p.type || null },
-  }));
+  e.waitUntil((async () => {
+    let p = {};
+    try { p = e.data ? e.data.json() : {}; } catch (err) { p = {}; }
+
+    // 서버가 문구까지 실어 보낸 경우 (지금 발송 서버는 쓰지 않지만, 나중을 위해 남겨 둔다)
+    if (p && p.title) {
+      await self.registration.showNotification(p.title, {
+        body: p.body || '',
+        tag: p.tag || 'handaejang-push',
+        icon: 'icons/icon-192.png',
+        badge: 'icons/icon-192.png',
+        lang: 'ko',
+        data: { url: p.url || './', schId: p.schId || null, type: p.type || null },
+      });
+      return;
+    }
+
+    // 사용자가 알림을 꺼 뒀는데도 깨워졌다면(해지 요청이 서버에 안 닿은 경우 등)
+    // 구독을 스스로 정리하고 조용히 끝낸다 — 끈 사람에게 알림을 띄우지 않는다
+    const ledger = NOTIFY_RULES ? NOTIFY_RULES.normalizeLedger(await nfGet('ledger').catch(() => null)) : null;
+    if (ledger && !ledger.enabled) {
+      try {
+        const sub = await self.registration.pushManager.getSubscription();
+        if (sub) await sub.unsubscribe();
+      } catch (err) { /* 무시 */ }
+      return;
+    }
+
+    // 내용 없는 깨우기 푸시 — 기기 안에서 판단해 정확한 알림을 만든다
+    let shown = 0;
+    try { shown = await backgroundCheck(); } catch (err) { shown = 0; }
+    if (shown > 0) return;
+
+    await self.registration.showNotification('한대장 · 새 장학 소식', {
+      body: '우리 학교와 내 조건에 맞는 공고를 확인해 보세요.',
+      tag: 'handaejang-wake',
+      icon: 'icons/icon-192.png',
+      badge: 'icons/icon-192.png',
+      lang: 'ko',
+      data: { url: './?screen=explore', schId: null, type: 'wake' },
+    });
+  })());
 });
 
 /* 알림을 누르면: 이미 열려 있는 앱이 있으면 그 화면으로, 없으면 앱을 새로 연다 */

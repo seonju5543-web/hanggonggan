@@ -1,0 +1,19 @@
+name = "handaejang-push"
+main = "worker.js"
+compatibility_date = "2026-01-01"
+
+# 앱 주소 — 공고 데이터를 여기서 읽고, 이 주소에서 오는 요청만 받는다
+[vars]
+APP_ORIGIN = "https://seonju5543-web.github.io/hanggonggan"
+ALLOW_ORIGIN = "https://seonju5543-web.github.io"
+
+# 구독(폰 주소·학교) 저장소 — 무료 등급으로 충분하다
+# 만들기: npx wrangler kv namespace create SUBS  → 나온 id를 아래에 붙여넣기
+[[kv_namespaces]]
+binding = "SUBS"
+id = "여기에_KV_ID_붙여넣기"
+
+# 예약 실행 — UTC 기준. 아래는 매일 08:10 / 20:10 KST (전날 23:10 / 당일 11:10 UTC)
+# 수집 로봇이 아침에 새 공고를 올린 뒤에 깨우도록 시간을 잡았다.
+[triggers]
+crons = ["10 23 * * *", "10 11 * * *"]
