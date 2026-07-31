@@ -81,6 +81,15 @@
    "candidates": [
     "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318"
    ]
+  },
+  {
+   "school": "상명대학교",
+   "campus": "서울캠퍼스",
+   "candidates": [
+    "https://www.smu.ac.kr/kor/life/notice.do",
+    "https://www.smu.ac.kr/kor/life/notice.do?srCategoryId=8",
+    "https://www.smu.ac.kr/kor/life/scholarship.do"
+   ]
   }
  ]
 }

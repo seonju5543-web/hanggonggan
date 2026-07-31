@@ -5,7 +5,7 @@
       않았다. 사람 기억에 의존하던 이 구멍을 2026-07-31에 막았다.)
    - 그림·아이콘은 자주 바뀌지 않으므로 캐시 우선(빠른 실행).
    - 네트워크가 느리거나 끊기면 캐시로 즉시 폴백 — 오프라인 실행은 그대로 보장된다. */
-const CACHE = 'handaejang-v13';
+const CACHE = 'handaejang-v14';
 const ASSETS = ['.', 'index.html', 'style.css', 'app.js', 'data.js', 'forms.js', 'manifest.json', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png'];
 const NET_TIMEOUT = 3500; /* 이 시간 안에 응답이 없으면 캐시부터 보여주고, 받아온 최신본은 다음 실행에 쓴다 */
 

@@ -15,6 +15,7 @@
 import fs from 'node:fs';
 import zlib from 'node:zlib';
 import { pdfText } from './pdf-text.mjs';
+import { schemaFromText } from './schema-from-text.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const OUT = new URL('extracted/', HERE);
@@ -229,6 +230,13 @@ function validate(t) {
   return null;
 }
 
+function newFormId(item, forms) {
+  let fid = `auto-${slug(item.target)}-apply`;
+  let n = 2;
+  while (forms.templates[fid]) fid = `auto-${slug(item.target)}-apply-${n++}`;
+  return fid;
+}
+
 function slug(name) {
   return (name || 'form')
     .replace(/[^a-zA-Z0-9가-힣]+/g, '-')
@@ -271,7 +279,8 @@ async function getClient() {
 }
 
 const done = [];      /* API로 스키마화 완료 */
-const manual = [];    /* 무료 경로 — 다음 세션이 손으로 (비용 0) */
+const freeDone = [];  /* 무료 변환기로 그 자리에서 승격 (비용 0) */
+const manual = [];    /* 무료 변환기가 자신 없어 남긴 것 — 다음 세션이 손으로 */
 const skipped = [];
 let apiCalls = 0;
 
@@ -284,6 +293,7 @@ for (const item of pending) {
 
   let linked = false;
   let leftForManual = false;
+  const freeParts = [];
 
   for (const row of rows) {
     const text = extractText(row.file).trim();
@@ -291,9 +301,20 @@ for (const item of pending) {
 
     if (route === 'skip') { skipped.push([row.attachment, why]); continue; }
 
-    /* 무료 경로: 지금 방식(다음 세션이 손으로)으로 원본과 동일한 문서를 만들 수 있는 건
-       API를 부르지 않는다. 큐에 남겨 두면 다음 채팅 세션이 처리한다. */
-    if (route === 'manual') { manual.push([item.name, row.attachment, why]); leftForManual = true; continue; }
+    /* 무료 경로: 기다리지 않고 **그 자리에서** 규칙 변환기로 옮긴다 (2026-07-31 개발자 지시).
+       변환기가 자신 없으면(공고문·항목 부족) 그때만 큐에 남겨 다음 세션이 처리한다. */
+    if (route === 'manual') {
+      const conv = schemaFromText(text, { notice: row.notice, attachment: row.attachment, org: entry.provider || '' });
+      if (conv.ok) {
+        /* 같은 공고의 첨부는 '한 벌'로 합친다 — 신청서·자소서·동의서를 각각 다른 양식으로
+           만들면 공고에는 하나만 연결돼 나머지가 앱에서 열리지 않는다 */
+        freeParts.push({ tpl: conv.tpl, attachment: row.attachment });
+        continue;
+      }
+      manual.push([item.name, row.attachment, `자동 변환 보류: ${conv.why}`]);
+      leftForManual = true;
+      continue;
+    }
 
     if (!hasKey) { manual.push([item.name, row.attachment, 'API 키 없음 — 다음 세션이 수동 처리']); leftForManual = true; continue; }
     /* ?? 를 쓴다 — 0(“절대 부르지 마”)을 || 가 기본값으로 되돌려 버리는 사고 방지 */
@@ -342,9 +363,7 @@ for (const item of pending) {
     const bad = validate(tpl);
     if (bad) { skipped.push([row.attachment, `검증 실패: ${bad}`]); continue; }
 
-    let fid = `auto-${slug(item.target)}-apply`;
-    let n = 2;
-    while (forms.templates[fid]) fid = `auto-${slug(item.target)}-apply-${n++}`;
+    const fid = newFormId(item, forms);
     forms.templates[fid] = tpl;
 
     if (!linked) {
@@ -355,24 +374,72 @@ for (const item of pending) {
     done.push([item.name, row.attachment, fid, why]);
   }
 
+  if (freeParts.length) {
+    const secs = freeParts.flatMap((p) => p.tpl.sections);
+    /* 첨부마다 따로 만든 항목을 한 벌로 합치면 id가 겹칠 수 있다 — 합친 뒤 다시 고유하게 만든다
+       (겹치면 앞 항목에 적은 답이 뒤 항목에 그대로 들어간다) */
+    const seenIds = new Set();
+    for (const sec of secs) {
+      for (const f of sec.fields) {
+        if (!seenIds.has(f.id)) { seenIds.add(f.id); continue; }
+        let n = 2, id = `${f.id}_${n}`;
+        while (seenIds.has(id)) id = `${f.id}_${++n}`;
+        f.id = id; seenIds.add(id);
+      }
+    }
+    const head = freeParts[0].tpl;
+    const merged = {
+      title: freeParts.length > 1 ? `${head.title} 외 ${freeParts.length - 1}종` : head.title,
+      docName: head.docName,
+      org: head.org || entry.provider || '',
+      sections: secs,
+    };
+    const pl = freeParts.find((p) => p.tpl.pledge);
+    /* 원본에 서약 문구가 없으면 지어내지 않고 그 사실을 적는다 (원칙 8-1 — 추론 금지) */
+    merged.pledge = pl ? pl.tpl.pledge : '원본 서식에는 별도의 서약 문구가 없어요. 제출 전 원본을 한 번 확인해 주세요.';
+    const bad0 = validate(merged);
+    if (bad0) {
+      manual.push([item.name, freeParts.map((p) => p.attachment).join(', '), `자동 변환 결과가 검증을 통과하지 못함(${bad0})`]);
+      leftForManual = true;
+    } else {
+      const fid0 = newFormId(item, forms);
+      forms.templates[fid0] = merged;
+      if (!linked) { entry.formId = fid0; delete entry.noForm; linked = true; }
+      freeDone.push([item.name, freeParts.map((p) => p.attachment).join(' + '), fid0, merged,
+        { info: secs.reduce((n, x) => n + (x.info ? x.info[0].length / 2 : 0), 0), fields: secs.reduce((n, x) => n + x.fields.length, 0) }]);
+    }
+  }
+
   /* 무료 경로로 남긴 첨부가 있으면 큐에 계속 둔다 (다음 세션이 처리) */
   if (!leftForManual) item.schematized = true;
 }
 
-if (done.length) {
+if (done.length || freeDone.length) {
   forms.updatedAt = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
   fs.writeFileSync(formsPath, JSON.stringify(forms, null, 1) + '\n');
   fs.writeFileSync(registeredPath, JSON.stringify(registered, null, 1) + '\n');
 }
 fs.writeFileSync(queuePath, JSON.stringify(queue, null, 1) + '\n');
 
-report.push('', `### 🧩 양식 스키마화 — API ${done.length}건 · 무료 대기 ${manual.length}건`);
+report.push('', `### 🧩 양식 스키마화 — 무료 자동 ${freeDone.length}건 · API ${done.length}건 · 보류 ${manual.length}건`);
+if (freeDone.length) {
+  report.push('', `**무료 변환기가 앱 양식으로 바로 만들었어요 (${freeDone.length}건 · 비용 0)** — 학생이 앱 안에서 바로 작성할 수 있습니다. 아래 항목이 원본과 같은지 확인해 주세요.`, '');
+  for (const [name, att, fid, tpl, stats] of freeDone) {
+    report.push(`- \`${fid}\` — **${tpl.title}** (원본: ${att})`);
+    report.push(`  · 공고: ${String(name).slice(0, 40)} · 자동 채움 ${stats.info}칸 · 입력 항목 ${stats.fields}개`);
+    for (const sec of tpl.sections) {
+      const auto = sec.info ? sec.info[0].filter((_, i) => i % 2 === 0).join('·') : '';
+      report.push(`  · [${sec.heading}]${auto ? ` 프로필 자동 채움: ${auto} /` : ''} ${sec.fields.map((f) => f.label + (f.options ? `(${f.options.join('/')})` : '')).join(', ').slice(0, 200)}`);
+    }
+    if (tpl.pledge) report.push(`  · 서약문: ${tpl.pledge.slice(0, 80)}…`);
+  }
+}
 if (done.length) {
   report.push('', `**유료 API로 처리 (${apiCalls}회 호출)** — 무료 경로로는 원본과 동일한 문서를 장담할 수 없는 것만 보냈어요. 원본과 다른 곳이 없는지 눈으로 확인해 주세요.`, '');
   for (const [name, att, fid, why] of done) report.push(`- \`${fid}\` — ${att} (${name.slice(0, 36)}) · 사유: ${why}`);
 }
 if (manual.length) {
-  report.push('', `**무료 경로 대기 (${manual.length}건 · 비용 0)** — 다음 Claude 채팅 세션에서 손으로 옮기면 돼요. "대기 중인 양식 스키마화해줘"라고 지시하세요.`, '');
+  report.push('', `**보류 ${manual.length}건** — 자동 변환기가 원본과 같은 문서를 장담하지 못한 것들이에요. 원본 다운로드 안내는 그대로 유지됩니다.`, '');
   for (const [name, att, why] of manual.slice(0, 12)) report.push(`- ${att} (${name.slice(0, 36)}) · ${why}`);
 }
 if (skipped.length) {
@@ -380,4 +447,4 @@ if (skipped.length) {
   for (const [what, why] of skipped.slice(0, 12)) report.push(`- ${String(what).slice(0, 50)} — ${why}`);
 }
 finish();
-log(`완료: API ${done.length}건(${apiCalls}회 호출) · 무료 대기 ${manual.length}건 · 건너뜀 ${skipped.length}건`);
+log(`완료: 무료 자동 ${freeDone.length}건 · API ${done.length}건(${apiCalls}회 호출) · 보류 ${manual.length}건 · 건너뜀 ${skipped.length}건`);

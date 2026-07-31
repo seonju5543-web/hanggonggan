@@ -14,7 +14,7 @@
    "target": "2026-2학기 염곡문",
    "added": "2026-07-27",
    "fetched": true,
-   "schematized": false
+   "schematized": true
   },
   {
    "id": "auto-ent2431260214artclviewdo",
@@ -38,7 +38,7 @@
    "target": "가송재단",
    "added": "2026-07-30",
    "fetched": true,
-   "schematized": false
+   "schematized": true
   },
   {
    "id": "reg-hufs-yangcheon",
@@ -46,7 +46,7 @@
    "target": "양천장학회",
    "added": "2026-07-30",
    "fetched": true,
-   "schematized": false
+   "schematized": true
   },
   {
    "id": "reg-kw-gasong",
@@ -54,7 +54,7 @@
    "target": "가송재단",
    "added": "2026-07-30",
    "fetched": true,
-   "schematized": false
+   "schematized": true
   }
  ]
 }
