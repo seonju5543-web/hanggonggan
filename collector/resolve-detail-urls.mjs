@@ -53,7 +53,7 @@ for (const t of targets) {
 }
 
 const report = [`## 🔗 원문 링크 복구 리포트 (${new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 16).replace('T', ' ')} KST)`, ''];
-report.push(`판: 5차(목록/상세 구분 + 클릭 함수 진단) · 커밋 ${process.env.GITHUB_SHA ? process.env.GITHUB_SHA.slice(0, 7) : 'local'}`);
+report.push(`판: 6차(재검사 안전장치) · 커밋 ${process.env.GITHUB_SHA ? process.env.GITHUB_SHA.slice(0, 7) : 'local'}`);
 report.push(`고칠 대상: **${targets.length}건** (실시간 공고 ${targets.filter((t) => t.kind === 'notice').length} · 정식 등록 ${targets.filter((t) => t.kind === 'registered').length}) · 게시판 ${boards.size}곳`);
 report.push('');
 
@@ -142,7 +142,15 @@ async function verifyCandidate(url, title, attempt = 0, otherTitles = []) {
   const p = await c.newPage();
   try {
     const res = await p.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 });
-    if (res && res.status() >= 400) return { ok: false, why: `HTTP ${res.status()}` };
+    if (res && res.status() >= 400) {
+      // 404도 한 번은 쉬었다 다시 본다 — 많이 두드리면 학교 서버가 404를 돌려주기도 한다
+      if (attempt < 1) {
+        await p.close().catch(() => {});
+        await new Promise((r) => setTimeout(r, 5000));
+        return verifyCandidate(url, title, attempt + 1, otherTitles);
+      }
+      return { ok: false, why: `HTTP ${res.status()}` };
+    }
     // 제목이 화면에 나타날 때까지 기다린다 (동적으로 그리는 상세 화면 대응)
     const probe = String(title).replace(/^\s*\d{1,5}\s+/, '').replace(/^\s*(공통|서울|글로벌|국제|공지|홍보)\s+/, '').slice(0, 12).trim();
     if (probe.length >= 4) {
@@ -380,19 +388,46 @@ if (!outOfTime()) {
     }
   }
   const otherAll = (want) => done.map((d) => d.title).filter((x) => !sameTitle(want, x)).slice(0, 40);
+  /* 먼저 판정을 모으기만 하고, 되돌리기는 맨 마지막에 한꺼번에 결정한다.
+     그래야 '학교 서버가 우리를 막고 있는 상황'을 알아보고 통째로 취소할 수 있다.
+
+     왜 필요한가 (2026-07-31 실제로 당했다): 동국대 주소 17건이 40분 전 확인에 통과했는데
+     재검사에서 전부 HTTP 404가 났다. 주소가 틀린 게 아니라 많이 두드려서 막힌 것이었고,
+     그대로 뒀으면 멀쩡한 원문 링크 17건을 목록 주소로 되돌릴 뻔했다.
+     그래서 ① 카나리아(게시판 목록이 아직 열리나) ② 실패 비율(너무 많으면 우리 쪽 문제)
+     두 가지로 막는다. 되돌리기는 '확신할 때만' 한다 — 애매하면 그대로 둔다. */
+  const verdicts = [];
   for (const d of done) {
     if (outOfTime()) { report.push('- (시간 상한 — 나머지 재검사는 다음 실행에서)'); break; }
     rechecked += 1;
     const v = await verifyCandidate(d.ref[d.urlField], d.title, 0, otherAll(d.title));
-    if (v.ok) continue;
-    // 되돌리기 — 이 게시판의 목록 주소 + 제목 표식
-    const list = [...boards.keys()].find((l) => { try { return d.ref[d.urlField].startsWith(new URL(l).origin); } catch { return false; } });
-    if (!list) { report.push(`- ⚠️ ${d.id || d.title.slice(0, 30)} 확인 실패(${v.why})이지만 되돌릴 목록 주소를 몰라 그대로 둡니다`); continue; }
-    if (!DRY) d.ref[d.urlField] = `${list}#n-${encodeURIComponent(String(d.title).slice(0, 40))}`;
-    reverted += 1;
-    report.push(`- ↩️ 되돌림(${v.why}): ${d.id || ''} ${String(d.title).slice(0, 40)}`);
+    verdicts.push({ d, v });
+    await new Promise((r) => setTimeout(r, 700));  // 학교 서버를 몰아치지 않는다
   }
-  report.push(`- 재검사 ${rechecked}건 · 되돌림 ${reverted}건`);
+  const failures = verdicts.filter((x) => !x.v.ok);
+  // 카나리아: 게시판 목록 자체가 아직 열리는가 (안 열리면 학교 서버가 우리를 막은 것)
+  let canaryOk = true;
+  for (const list of boards.keys()) {
+    const c = await verifyContext();
+    const p = await c.newPage();
+    try {
+      const res = await p.goto(list, { waitUntil: 'domcontentloaded', timeout: 20000 });
+      if (!res || res.status() >= 400) canaryOk = false;
+    } catch { canaryOk = false; } finally { await p.close().catch(() => {}); }
+  }
+  const tooMany = verdicts.length >= 5 && failures.length / verdicts.length > 0.3;
+  if (!canaryOk || tooMany) {
+    report.push(`- ⏸ 되돌리기 취소 — ${!canaryOk ? '게시판 목록조차 안 열립니다' : `실패 비율이 너무 높습니다(${failures.length}/${verdicts.length})`}. 주소가 틀린 게 아니라 학교 서버가 우리를 막고 있는 상황으로 보고 아무것도 되돌리지 않습니다.`);
+  } else {
+    for (const { d, v } of failures) {
+      const list = [...boards.keys()].find((l) => { try { return d.ref[d.urlField].startsWith(new URL(l).origin); } catch { return false; } });
+      if (!list) { report.push(`- ⚠️ ${d.id || d.title.slice(0, 30)} 확인 실패(${v.why})이지만 되돌릴 목록 주소를 몰라 그대로 둡니다`); continue; }
+      if (!DRY) d.ref[d.urlField] = `${list}#n-${encodeURIComponent(String(d.title).slice(0, 40))}`;
+      reverted += 1;
+      report.push(`- ↩️ 되돌림(${v.why}): ${d.id || ''} ${String(d.title).slice(0, 40)}`);
+    }
+  }
+  report.push(`- 재검사 ${rechecked}건 · 확인 실패 ${failures.length}건 · 실제 되돌림 ${reverted}건`);
   report.push('');
 }
 
