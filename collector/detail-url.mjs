@@ -212,10 +212,15 @@ export function detailCandidates(dom) {
       for (const extra of ['bbsId', 'bbs_id', 'menuNo', 'key', 'boardId']) {
         if (looksLikeId(hid[extra]) && !v.searchParams.get(extra)) v.searchParams.set(extra, String(hid[extra]));
       }
-      push(v.href);
-      // 경로형 상세(동국 …/detail/26765595)를 쓰는 게시판도 있으므로 그 형태도 후보에 넣는다
+      /* 순서가 중요하다 (2026-08-01에 값을 치르고 배운 것).
+         경로형(…/detail/26765595)을 **조립형(view?nttId=…)보다 먼저** 놓는다.
+         예전엔 조립형이 앞이라 동국대에서 그게 먼저 채택됐는데, 동국대에는 그런 주소가
+         아예 없어서 **33건이 전부 404**였다(경로형 5건은 전부 통과). 조립형은 '이름을
+         유추한' 주소라 틀릴 수 있고, 경로형은 게시판이 실제로 쓰는 모양이다.
+         조립형은 마지막 수단으로만 남긴다. */
       const listPath = l.pathname.replace(/\/(list|artclList|index)(\.do|\.jsp|\.php)?\/?$/i, '');
       if (listPath && listPath !== l.pathname) push(`${l.origin}${listPath}/detail/${idVal}`);
+      push(v.href);
     } catch { /* 조립 실패는 그냥 건너뛴다 */ }
   }
   return out;

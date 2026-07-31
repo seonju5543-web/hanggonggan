@@ -921,7 +921,7 @@
    "note": "동국대 장학공지에서 온라인 신청해요. 유형별 자격·서류는 원문 공고를 꼭 확인하세요.",
    "noForm": "학교 포털 입력형 — 채울 신청서 양식 없음(2026-07-07 확인). 세부는 원문 공고 확인",
    "attachments": [],
-   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?nttId=26765245",
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765245",
    "sourceKind": "official",
    "listedAt": "2026-07-16"
   },
@@ -950,7 +950,7 @@
    "note": "동국대 장학공지에서 온라인 신청해요. 유형별 자격·서류는 원문 공고를 꼭 확인하세요.",
    "noForm": "학교 포털 입력형 — 채울 신청서 양식 없음(2026-07-07 확인). 세부는 원문 공고 확인",
    "attachments": [],
-   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?nttId=26764945",
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764945",
    "sourceKind": "official",
    "listedAt": "2026-07-16"
   },
@@ -979,7 +979,7 @@
    "note": "동국대 장학공지에서 온라인 신청해요. 유형별 자격·서류는 원문 공고를 꼭 확인하세요.",
    "noForm": "학교 포털 입력형 — 채울 신청서 양식 없음(2026-07-07 확인). 세부는 원문 공고 확인",
    "attachments": [],
-   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?nttId=26764944",
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764944",
    "sourceKind": "official",
    "listedAt": "2026-07-16"
   },
@@ -1470,7 +1470,7 @@
    ],
    "duplicable": true,
    "note": "장애 학생 대상 재단 장학금이에요. 동국대 본관 접수, 접수 마감 ~7/20 17시(기한엄수). 세부는 원문 공고 확인.",
-   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?nttId=26765358",
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765358",
    "attachments": [],
    "sourceKind": "official",
    "formId": "gomduri-apply"
@@ -2270,7 +2270,7 @@
    "note": "세부 자격·금액·서류는 원문 공고에서 확인하세요.",
    "noForm": "첨부·신청서는 원문 공고 확인(2026-07-15 등록)",
    "attachments": [],
-   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?nttId=26765338",
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765338",
    "sourceKind": "official",
    "listedAt": "2026-07-16"
   },
@@ -2720,7 +2720,7 @@
    "noForm": "자동 등록(검수 전) 2026-07-30 — 양식 스키마화는 검수 후 진행",
    "auto": true,
    "attachments": [],
-   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?nttId=26765586",
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765586",
    "sourceKind": "auto",
    "listedAt": "2026-07-30"
   },
@@ -2936,7 +2936,7 @@
     "제출 서류 전체는 원문 공고에서 확인"
    ],
    "note": "성적증명서는 재단 이메일(yh1963828@naver.com)로 개별 제출해야 해요 — 기간 내 미제출 시 선발에서 제외될 수 있어요.",
-   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?nttId=26765312",
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765312",
    "formId": "bogun-multi-apply"
   },
   {
@@ -2960,7 +2960,7 @@
     "지원자 제출서류는 원문 공고에서 확인"
    ],
    "note": "공고에 필수 참석 일정이 있어요 — 원문 공고의 일정을 꼭 확인하세요.",
-   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?nttId=26765316",
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765316",
    "formId": "lotte-dorm-apply"
   },
   {
@@ -3101,7 +3101,7 @@
    "noForm": "자동 등록(검수 전) 2026-07-31 — 양식 스키마화는 검수 후 진행",
    "auto": true,
    "attachments": [],
-   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?nttId=26765589",
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765589",
    "sourceKind": "auto"
   }
  ]

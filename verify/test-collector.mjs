@@ -80,6 +80,12 @@ eq('목록 행의 클릭 스크립트 인자에서 글 번호를 뽑아 원문 �
   detailCandidates({ url: khuList, listUrl: khuList, rowIds: ['1078712'] })
     .includes('https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&nttId=1078712'), true);
 eq('안내 페이지(/page/533)는 공고 원문이 아니다', isDetailUrl('https://www.dongguk.edu/page/533', dgList), false);
+/* 후보 순서: 게시판이 실제로 쓰는 경로형이 먼저, 이름을 유추한 조립형이 나중.
+   순서가 뒤집혀 있어서 동국대에 없는 `view?nttId=…`가 채택됐고 33건이 전부 404였다
+   (경로형 `detail/…` 5건은 전부 통과). 이 순서가 되돌아가면 같은 일이 되풀이된다. */
+eq('경로형 상세를 조립형보다 먼저 시도한다 (동국대 33건 404의 원인)',
+  detailCandidates({ listUrl: dgList, url: dgList, rowIds: ['26765595'] })[0],
+  'https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765595');
 /* 경희 news.khu.ac.kr 실제 구조 (2026-07-31 클릭 함수를 떠서 확인):
      행  = javascript:view('322635','')
      view = function(boardId, catId){ form.elements["boardId"].value = boardId; form.submit(); }
