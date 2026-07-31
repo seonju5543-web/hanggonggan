@@ -80,8 +80,30 @@ for (const r of registered.items || []) {
    게시판 행("공지 공지 2026-2학기 전문자격장학 신청안내 …")과 안 맞아 못 찾는다.
    표식(#n-)에 든 제목이 원래 제목이고, boardTitle 필드가 있으면 그게 더 정확하다. */
 function huntTitle(t) {
-  return (t.ref.boardTitle || '').trim() || markerTitle(t.ref[t.field]) || String(t.title);
+  const stored = (t.ref.boardTitle || '').trim();
+  if (stored) return stored;
+  const fromMarker = markerTitle(t.ref[t.field]);
+  if (fromMarker) return fromMarker;
+  return String(t.title);
 }
+
+const report0 = [];
+
+/* 정식 등록 항목에 게시판 원래 제목이 없으면, 같은 글이 실시간 공고로도 수집돼 있는지 보고
+   거기서 가져온다. 정식 등록의 name은 사람이 다듬은 이름이라 게시판 행과 안 맞기 때문.
+   (제목이 없으면 그 공고는 게시판에서 영영 못 찾는 미아가 된다 — 2026-08-01에 15건이 그랬다) */
+function backfillBoardTitles() {
+  let n = 0;
+  for (const t of targets) {
+    if (t.field !== 'sourceUrl' || (t.ref.boardTitle || '').trim()) continue;
+    const list = listUrlOf(t.ref[t.field]);
+    const mate = (notices.items || []).find((x) => listUrlOf(x.url) === list && sameTitle(markerTitle(t.ref[t.field]) || t.title, x.title));
+    if (mate) { t.ref.boardTitle = mate.title; n += 1; }
+  }
+  return n;
+}
+const backfilled = backfillBoardTitles();
+if (backfilled) report0.push(`- 게시판 원래 제목을 실시간 공고에서 보강: ${backfilled}건`);
 
 /* 이미 포기한 건은 건너뛴다 (하지만 리포트에는 남긴다) */
 const skipped = [];
@@ -101,6 +123,7 @@ for (const t of active) {
 
 const report = [`## 🎯 링크 사냥꾼 리포트 (${new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 16).replace('T', ' ')} KST)`, ''];
 report.push(`사냥 대상 **${active.length}건** (게시판 ${boards.size}곳) · 포기 처리된 건 ${skipped.length}건`);
+report0.forEach((l) => report.push(l));
 report.push('');
 
 const browser = await chromium.launch({ args: ['--no-sandbox'] });
