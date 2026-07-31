@@ -25,3 +25,6 @@ collector/extracted/**       -diff
 # 사람이 큐레이션하는 data/registered.json·data/forms.json은 일부러 넣지 않았다.
 # 거기서는 '삭제'가 의미를 가지므로(잘못 등록분 제거) 합집합이 지운 항목을 되살릴 수 있다.
 # 그 파일들은 사람이 직접 보고 합쳐야 한다.
+
+# 링크 사냥꾼 기록장 — 로봇이 매 실행 갱신하므로 합집합 병합
+collector/link-hunt.json merge=jsonunion

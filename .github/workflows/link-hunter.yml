@@ -1,0 +1,125 @@
+name: 링크 사냥꾼 (까다로운 원문 주소 전담)
+
+# 앱에 담긴 공고 중 아직 '게시판 목록 + 제목 표식(#n-…)'으로 남아 있는 것을 골라,
+# 게시판에서 그 행을 실제로 **눌러서** 원문 주소를 알아낸다.
+# 수집 로봇과 따로 두는 이유: 수집은 매일 12개 캠퍼스를 훑어야 해서 빨라야 하고,
+# 이 일은 느려도 정확해야 하기 때문. 대상이 '남은 어려운 것'뿐이라 느려도 괜찮다.
+#
+# 실행 방법
+#   · collector/run-link-hunt.txt 를 고쳐 push (push-to-run)
+#   · Actions 화면에서 수동 실행
+#   · 매일 새벽 (수집 로봇과 시간을 벌려 같은 학교를 연달아 두드리지 않게)
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry:
+        description: '모의 실행(저장하지 않고 결과만 확인)'
+        type: boolean
+        default: false
+      only_board:
+        description: '게시판 하나만 (주소 조각 — 예: dongguk.edu)'
+        type: string
+        default: ''
+  push:
+    paths:
+      - 'collector/run-link-hunt.txt'
+  schedule:
+    # 06:37 KST — 일반 수집(07:41)·브라우저 수집(08:07)보다 앞서고 충분히 떨어져 있다.
+    # 같은 학교를 연달아 두드리면 서버가 막는다(2026-07-31 동국대 사례).
+    - cron: '37 21 * * *'
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: link-hunter
+  cancel-in-progress: true
+
+jobs:
+  hunt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 협업 병합기 등록 (충돌 자동 해소 — COLLAB.md)
+        run: bash tools/setup-collab.sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm init -y >/dev/null && npm i playwright@1 --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+
+      - id: hunt
+        env:
+          HUNT_BUDGET_MS: '1500000'      # 25분 — 못 끝낸 것은 다음 실행이 이어서 한다
+          HUNT_ONLY_BOARD: ${{ inputs.only_board }}
+        run: node collector/link-hunter.mjs ${{ inputs.dry && '--dry' || '' }}
+
+      # 데이터 관문 — 사냥해 온 주소가 규칙을 어기면 저장하지 않는다
+      - name: 데이터 감사
+        id: audit
+        continue-on-error: true
+        run: |
+          node verify/test-collector.mjs
+          node verify/audit-data.js
+
+      - name: 감사 실패 시 되돌리기
+        if: steps.audit.outcome == 'failure'
+        run: git checkout -- data/registered.json data/notices.json
+
+      - name: 결과 저장 (기본 브랜치에 저장 → deploy-sync가 main으로 자동 배포)
+        if: steps.audit.outcome == 'success'
+        run: |
+          git config user.name "handaejang-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/notices.json data/registered.json collector/link-hunt.json collector/link-hunt-report.md
+          if ! git diff --cached --quiet; then
+            git commit -m "링크 사냥꾼: 원문 주소 ${{ steps.hunt.outputs.found }}건 확보"
+            pushed=0
+            for i in 1 2 3; do
+              if git push; then pushed=1; break; fi
+              git pull --rebase origin "${GITHUB_REF_NAME}"
+            done
+            if [ "$pushed" != "1" ]; then
+              echo "::error::링크 사냥 결과 push 실패 — 3회 재시도 모두 실패."
+              exit 1
+            fi
+          fi
+
+      - name: 리포트 출력
+        if: always()
+        run: cat collector/link-hunt-report.md || true
+
+      # 사람이 봐야 하는 건이 생겼을 때만 알린다 (조용한 방치 방지)
+      - name: 🔧 사람 확인 필요 건 알림
+        if: steps.hunt.outputs.stuck != '' && steps.hunt.outputs.stuck != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --title "🔧 원문 주소를 못 찾은 공고 ${{ steps.hunt.outputs.stuck }}건 (링크 사냥꾼)" \
+            --body-file collector/link-hunt-report.md \
+            --repo "${{ github.repository }}" \
+            --label "link-hunter" \
+            --assignee "${{ github.repository_owner }}" || \
+          gh issue create \
+            --title "🔧 원문 주소를 못 찾은 공고 ${{ steps.hunt.outputs.stuck }}건 (링크 사냥꾼)" \
+            --body-file collector/link-hunt-report.md \
+            --repo "${{ github.repository }}"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: link-hunt-report
+          path: |
+            collector/link-hunt-report.md
+            collector/link-hunt.json
+          retention-days: 7
+
+      - name: 🚨 실패 알림
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "::warning::링크 사냥꾼 실행 실패 — ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

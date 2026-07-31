@@ -99,8 +99,24 @@ function mergeHealth(ours, theirs) {
   return out;
 }
 
+/* 링크 사냥꾼 기록장 — 공고별 시도 횟수·마지막 사유. 두 판이 갈리면 '더 많이 안 사람'을 남긴다.
+   (시도 횟수는 큰 쪽, 판정이 난 쪽(resolved/gone/stuck)이 아직 판정 안 난 쪽을 이긴다) */
+function mergeLinkHunt(o, t) {
+  const rank = (s) => (s === 'resolved' ? 3 : s === 'gone' || s === 'stuck' ? 2 : 1);
+  const out = { updatedAt: (o.updatedAt || '') > (t.updatedAt || '') ? o.updatedAt : t.updatedAt, items: { ...(t.items || {}) } };
+  for (const [k, ov] of Object.entries(o.items || {})) {
+    const tv = out.items[k];
+    if (!tv) { out.items[k] = ov; continue; }
+    const win = rank(ov.status) >= rank(tv.status) ? ov : tv;
+    const lose = win === ov ? tv : ov;
+    out.items[k] = { ...lose, ...win, attempts: Math.max(ov.attempts || 0, tv.attempts || 0) };
+  }
+  return out;
+}
+
 const RULES = [
   { match: /(^|\/)notices\.json$/, merge: mergeNotices },
+  { match: /(^|\/)link-hunt\.json$/, merge: mergeLinkHunt },
   { match: /(^|\/)seen\.json$/, merge: mergeSeen },
   { match: /(^|\/)pending-forms\.json$/, merge: mergePendingForms },
   { match: /(^|\/)health\.json$/, merge: mergeHealth },
