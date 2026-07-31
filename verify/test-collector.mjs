@@ -6,6 +6,7 @@
    실행: node verify/test-collector.mjs   (실패하면 exit 1) */
 import { urlKey, titleKey, dedupeNotices, preferNotice } from '../collector/url-key.mjs';
 import { isAttachmentEntry, isHtmlPayload } from '../collector/attachment-link.mjs';
+import { isDetailUrl, isMarkerUrl, markerTitle, sameTitle, detailCandidates } from '../collector/detail-url.mjs';
 
 let fail = 0;
 const eq = (label, got, want) => {
@@ -55,6 +56,35 @@ eq('첨부가 실제로는 웹페이지면 양식 아님',
   isHtmlPayload(Buffer.from('<!DOCTYPE html>\n<html lang="ko"><head>')), true);
 eq('진짜 HWP 원본은 양식으로 인정',
   isHtmlPayload(Buffer.from([0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1])), false);
+
+/* 2026-07-31 — 앱에서 '원문 공고 ↗'를 눌렀을 때 학교 장학 공지 목록 전체가 열리던 문제.
+   원인은 수집기가 '진짜 상세 주소인가'를 물음표(?) 유무로만 판정한 것이었다.
+   그 판정이 되돌아가면 같은 문제가 그대로 재발하므로 여기서 못 박아 둔다. */
+console.log('■ 공고 원문 주소 판정 (목록이 아니라 그 공고 하나가 열려야 한다)');
+const khuList = 'https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318';
+const dgList = 'https://www.dongguk.edu/article/JANGHAKNOTICE/list';
+eq('물음표 없는 경로형 상세도 원문이다 (동국대 /detail/2666 — 예전엔 이걸 버렸다)',
+  isDetailUrl('https://www.dongguk.edu/article/JANGHAKNOTICE/detail/2666', dgList), true);
+eq('글 번호가 붙은 view 주소는 원문', isDetailUrl(khuList.replace('list.do', 'view.do') + '&nttId=1078712', khuList), true);
+eq('게시판 목록 주소는 원문이 아니다', isDetailUrl(khuList, khuList), false);
+eq('목록 + 제목 표식(#n-)은 원문이 아니다', isDetailUrl(khuList + '#n-%EA%B3%B5%ED%86%B5', khuList), false);
+eq('목록 주소 자체는 상세로 오인하지 않는다', isDetailUrl(dgList, dgList), false);
+eq('표식 판정', isMarkerUrl(khuList + '#n-abc') && !isMarkerUrl(khuList), true);
+eq('표식에서 제목 되찾기', markerTitle('https://x/list.do#n-%EC%9E%A5%ED%95%99%EA%B8%88'), '장학금');
+eq('클릭이 POST라 주소가 안 바뀌는 게시판은 숨은 글 번호로 view 주소를 조립한다',
+  detailCandidates({ url: khuList, listUrl: khuList, hiddenInputs: { nttId: '1078712', menuNo: '200318' } })[0],
+  'https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&nttId=1078712');
+eq('식별자처럼 생기지 않은 값으로는 주소를 만들지 않는다 (동국 상세의 name="no" value="dongguk.edu")',
+  detailCandidates({ url: dgList, listUrl: dgList, hiddenInputs: { no: 'dongguk.edu' } }).length, 0);
+eq('목록 행의 클릭 스크립트 인자에서 글 번호를 뽑아 원문 주소를 만든다',
+  detailCandidates({ url: khuList, listUrl: khuList, rowIds: ['1078712'] })
+    .includes('https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&nttId=1078712'), true);
+eq('안내 페이지(/page/533)는 공고 원문이 아니다', isDetailUrl('https://www.dongguk.edu/page/533', dgList), false);
+eq('목록 제목과 상세 제목이 같은 글인지 알아본다',
+  sameTitle('공통 2026년 충남평생교육진흥원 재능키움 장학생 2차 모집 안내',
+    '[공지] 2026년 충남평생교육진흥원 재능키움 장학생 2차 모집 안내'), true);
+eq('다른 공고를 같은 글로 착각하지 않는다',
+  sameTitle('2026년 충남평생교육진흥원 재능키움 장학생 2차 모집 안내', '2026년 롯데장학관 입주생 모집 안내'), false);
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);

@@ -269,6 +269,22 @@ function safeUrl(u) {
   return '';
 }
 
+/* 원문 링크의 정직한 표기 (2026-07-31)
+   수집 로봇이 공고 원문 주소를 끝내 못 찾은 경우에만, 주소가 '게시판 목록 + 제목 표식'
+   (…/list.do#n-제목) 형태로 남는다. 이 링크를 누르면 그 장학금 공고가 아니라 학교
+   장학 공지 목록이 열리므로, '원문 공고 ↗'라고 적으면 거짓말이 된다.
+   그래서 이럴 때만 라벨을 '게시판 목록 ↗'으로 바꾸고, 목록에서 찾을 제목을 함께 알려준다.
+   (대부분의 공고는 복구 로봇 resolve-detail-urls가 진짜 원문 주소로 바꿔 둔다.) */
+function isBoardListLink(u) {
+  return /#n-/.test(String(u || ''));
+}
+function boardListTitle(u) {
+  const s = String(u || '');
+  const i = s.indexOf('#n-');
+  if (i < 0) return '';
+  try { return decodeURIComponent(s.slice(i + 3)); } catch (e) { return s.slice(i + 3); }
+}
+
 /* ---------------- 서류 보관함 (기기 내 저장 · 브라우저 내장 금고) ----------------
    파일은 서버로 전송되지 않고 사용자 기기 안에만 저장된다. */
 let walletCache = {}; // slot -> { name, type, savedAt }
@@ -916,7 +932,7 @@ function liveNoticesHtml() {
       </div>
       <p class="sch-name">${esc(n.title)}</p>
       ${n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? `<p class="sch-provider">⏰ ${esc(n.deadlineHint)}</p>` : ''}
-      <p class="sch-provider">${esc(n.school)}${n.campus ? ' ' + esc(n.campus) : ''} · ${esc(n.foundAt || '')} 수집 · 원문 보기 ↗</p>
+      <p class="sch-provider">${esc(n.school)}${n.campus ? ' ' + esc(n.campus) : ''} · ${esc(n.foundAt || '')} 수집 · ${isBoardListLink(n.url) ? '게시판 목록에서 보기 ↗' : '원문 보기 ↗'}</p>
     </a>`).join('') + `</div>`;
 }
 
@@ -1099,7 +1115,8 @@ function openDetail(id) {
       <ul class="doc-list">
         ${sch.attachments.map((a) => `<li>📎 <a href="${esc(safeUrl(a.url))}" target="_blank" rel="noopener" style="color:var(--primary)">${esc(a.name)}</a></li>`).join('')}
       </ul>` : ''}
-      <p class="sheet-deadline">${sch.program ? '신청 기간: 한국장학재단 공지 확인' : `마감일 ${sch.deadline || '원문 공고 확인'}`} · ${sch.duplicable ? '타 장학금과 중복 수혜 가능' : '중복 수혜 제한 있음'}${sch.sourceUrl ? ` · <a href="${esc(safeUrl(sch.sourceUrl))}" target="_blank" rel="noopener" style="color:var(--primary);font-weight:700">${sch.program ? '한국장학재단 ↗' : '원문 공고 ↗'}</a>` : ''}</p>
+      <p class="sheet-deadline">${sch.program ? '신청 기간: 한국장학재단 공지 확인' : `마감일 ${sch.deadline || '원문 공고 확인'}`} · ${sch.duplicable ? '타 장학금과 중복 수혜 가능' : '중복 수혜 제한 있음'}${sch.sourceUrl ? ` · <a href="${esc(safeUrl(sch.sourceUrl))}" target="_blank" rel="noopener" style="color:var(--primary);font-weight:700">${sch.program ? '한국장학재단 ↗' : (isBoardListLink(sch.sourceUrl) ? '게시판 목록 ↗' : '원문 공고 ↗')}</a>` : ''}</p>
+      ${(!sch.program && isBoardListLink(sch.sourceUrl)) ? `<p class="doc-legend">이 학교 게시판은 목록에서 글을 눌러야 열리는 방식이라 공고 하나로 바로 가는 주소를 확인하지 못했어요. 열리는 목록에서 <strong>${esc(boardListTitle(sch.sourceUrl))}</strong>을(를) 찾아 눌러 주세요.</p>` : ''}
 
       ${app && !app.pending ? (() => {
         const step = effectiveStep(app, sch);

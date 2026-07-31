@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import { chromium } from 'playwright';
 import { urlKey, dedupeNotices } from './url-key.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
+import { isDetailUrl, detailCandidates, sameTitle } from './detail-url.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const cfg = JSON.parse(fs.readFileSync(new URL('browser-targets.json', HERE), 'utf8'));
@@ -49,6 +50,35 @@ async function gotoWithRetry(page, url, attempts) {
     }
   }
   throw lastErr;
+}
+
+/* 공고 원문 주소가 '세션 없이도 열리는지' 한 번 확인한다.
+   앱 사용자는 로그인도 리퍼러도 없이 링크를 누르므로, 그 조건 그대로 열어 봐야 한다.
+   게시판마다 처음 한 번만 확인하고(주소 만드는 규칙은 게시판 안에서 같다) 결과를 재사용해,
+   매일 수집이 느려지지 않게 한다. */
+const patternOk = new Map(); // 게시판 목록 주소 → true/false
+async function verifyDetailUrl(candidate, title) {
+  const fresh = await browser.newContext({
+    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36',
+    locale: 'ko-KR',
+  });
+  const p = await fresh.newPage();
+  try {
+    const res = await p.goto(candidate, { waitUntil: 'domcontentloaded', timeout: 25000 });
+    if (res && res.status() >= 400) return false;
+    await p.waitForTimeout(1200);
+    const docTitle = await p.title().catch(() => '');
+    const text = await p.evaluate(() => (document.body.innerText || '').slice(0, 6000)).catch(() => '');
+    if (sameTitle(title, docTitle)) return true;
+    const fp = (s) => String(s).replace(/[\s .,·ㆍ~〜'"“”‘’!?()[\]{}<>:;|/\\_+\-*&#%]/g, '').toLowerCase();
+    const t = fp(String(title).replace(/^\s*\d{1,5}\s+/, '').replace(/^\s*(공통|서울|글로벌|국제|공지)\s+/, ''));
+    return t.length >= 8 && fp(text).includes(t);
+  } catch {
+    return false;
+  } finally {
+    await p.close().catch(() => {});
+    await fresh.close().catch(() => {});
+  }
 }
 
 async function loadPage(url, { attempts = 3 } = {}) {
@@ -122,11 +152,41 @@ async function loadPage(url, { attempts = 3 } = {}) {
             .filter((l) => /\.(hwp|hwpx|doc|docx|pdf|xls|xlsx)(\?|$)/i.test(l.url) || /download|fileDown/i.test(l.url))
             .filter((l) => l.title.length >= 4 && l.title.length <= 120)
             .slice(0, 6).map((l) => ({ name: l.title.slice(0, 100), url: l.url }));
-          const navigated = detailPage.url() !== url && detailPage.url() !== 'about:blank';
-          let recUrl = navigated ? detailPage.url() : url;
-          // 상세 주소에 공고 구분자가 없거나(물음표 없는 view.do 등) 이미 쓴 주소면
-          // 목록 주소 + 고유 표식으로 기록 — 사용자는 목록에서 해당 공고를 볼 수 있다
-          if (!/\?.+/.test(recUrl) || usedUrls.has(recUrl)) {
+          /* 공고 원문 주소 정하기 (2026-07-31 전면 수정 — detail-url.mjs 규칙 사용).
+             예전에는 '물음표가 있는가'로만 판정해서 두 가지를 놓쳤다:
+               · 동국대처럼 주소가 `/article/JANGHAKNOTICE/detail/2666`(경로형)인 게시판 →
+                 물음표가 없어 멀쩡한 상세 주소를 버리고 목록 주소로 대체했다.
+               · 경희대처럼 클릭이 form POST라 주소창이 안 바뀌는 게시판 → 상세 화면 안에
+                 GET으로도 열리는 주소(canonical·og:url·숨은 글 번호)가 있는데 안 찾아봤다.
+             그 결과 앱에서 '원문 공고 ↗'를 누르면 학교 장학 공지 목록 전체가 열렸다. */
+          const dom = await detailPage.evaluate(() => {
+            const hidden = {};
+            document.querySelectorAll('input[name]').forEach((i) => { if (i.name && i.value) hidden[i.name] = i.value; });
+            const can = document.querySelector('link[rel=canonical]');
+            const og = document.querySelector('meta[property="og:url"]');
+            return {
+              canonical: can ? can.getAttribute('href') : null,
+              ogUrl: og ? og.getAttribute('content') : null,
+              hiddenInputs: hidden,
+            };
+          }).catch(() => ({ hiddenInputs: {} }));
+          const cands = detailCandidates({ ...dom, url: detailPage.url(), listUrl: url })
+            .filter((c) => isDetailUrl(c, url) && !usedUrls.has(c));
+          let recUrl = null;
+          if (cands.length) {
+            if (!patternOk.has(url)) {
+              // 이 게시판에서 처음 만든 주소 — 실제로 열어 그 공고가 맞는지 확인한다.
+              // 통과하면 같은 게시판의 나머지 공고는 같은 규칙으로 만들어지므로 다시 확인하지 않는다.
+              for (const c of cands.slice(0, 2)) {
+                if (await verifyDetailUrl(c, title)) { patternOk.set(url, true); recUrl = c; break; }
+              }
+              if (!patternOk.has(url)) patternOk.set(url, false);
+            } else if (patternOk.get(url)) {
+              [recUrl] = cands;
+            }
+          }
+          if (!recUrl) {
+            // 원문으로 바로 가는 주소를 못 찾았을 때만 목록 주소 + 표식 (앱이 정직하게 안내한다)
             recUrl = `${url}#n-${encodeURIComponent(title.slice(0, 40))}`; // 제목 기반 — 재실행 시 중복 방지
           }
           usedUrls.add(recUrl);

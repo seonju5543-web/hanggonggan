@@ -2,3 +2,6 @@ verify/node_modules/
 verify/package.json
 verify/package-lock.json
 verify/shot-*.png
+node_modules/
+package-lock.json
+package.json

@@ -44,8 +44,14 @@ function checkEntry(it, opts = {}) {
   if (!it.deadline && !it.listedAt) warn('마감일이 없으면 listedAt(등록일)이 있어야 60일 뒤 자동으로 감춰집니다');
   // 원문 주소
   if (RULES.DOWNLOAD_URL.test(url)) err('sourceUrl이 첨부 내려받기 주소 — 공고 원문 주소로 바꾸세요');
-  else if (RULES.BOARD_LIST.test(url) && !url.includes('#n-')) {
-    warn('sourceUrl이 게시판 목록 주소 — 개별 공고 주소나 공고 표식(#n-제목)이 필요합니다');
+  else if (url.includes('#n-')) {
+    /* 2026-07-31: 예전에는 표식(#n-제목)이 있으면 통과시켰는데, 이 주소를 누르면 그 장학금
+       공고가 아니라 **학교 장학 공지 목록 전체**가 열린다(사용자가 목록에서 다시 찾아야 하고,
+       글이 뒤로 밀리면 아예 못 찾는다). 표식은 '아직 원문 주소를 못 찾았다'는 임시 표시일 뿐이므로
+       감사에 남긴다 — 복구 로봇(collector/resolve-detail-urls.mjs)이 원문 주소로 바꿔 준다. */
+    warn('sourceUrl이 게시판 목록 주소(#n- 표식) — 원문 공고로 바로 못 갑니다. 복구 로봇 실행: collector/run-resolve-urls.txt 수정 후 push');
+  } else if (RULES.BOARD_LIST.test(url)) {
+    warn('sourceUrl이 게시판 목록 주소 — 개별 공고 주소가 필요합니다');
   }
   // 장학금이 아닌 것
   if (RULES.FILENAME_TITLE.test(name)) err(`제목이 첨부 파일 이름입니다: '${name.slice(0, 36)}'`);

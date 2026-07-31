@@ -81,35 +81,126 @@ async function readDom(page, listUrl) {
   return { ...info, url: page.url(), listUrl };
 }
 
-/* 후보 주소를 '깨끗한 새 탭'에서 열어 정말 그 공고가 나오는지 확인한다.
-   앱 사용자는 세션도 리퍼러도 없이 링크를 누르므로, 그 조건 그대로 확인해야 한다. */
-async function verifyCandidate(url, title) {
-  const fresh = await browser.newContext({
-    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36',
-    locale: 'ko-KR',
-  });
-  const p = await fresh.newPage();
+/* 후보 주소를 '깨끗한 탭'에서 열어 정말 그 공고가 나오는지 확인한다.
+   앱 사용자는 세션도 리퍼러도 없이 링크를 누르므로, 그 조건 그대로 확인해야 한다.
+
+   1차 실행에서 배운 것 (2026-07-31):
+   · 후보마다 새 브라우저 컨텍스트를 만들었더니 학교 서버가 연결을 끊었다(ERR_CONNECTION_CLOSED).
+     → 확인용 컨텍스트를 하나만 만들어 재사용하고, 쿠키만 비워 '처음 온 사람' 상태를 유지한다.
+   · 동국대 상세 화면은 자바스크립트로 나중에 그려져, 1.5초 뒤에 읽으면 제목이 아직 없었다.
+     → 제목이 보일 때까지 기다렸다가 판정하고, 네트워크 오류는 '틀린 주소'가 아니라 '다시 시도'로 다룬다. */
+let verifyCtx = null;
+async function verifyContext() {
+  if (!verifyCtx) {
+    verifyCtx = await browser.newContext({
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36',
+      locale: 'ko-KR',
+    });
+  }
+  await verifyCtx.clearCookies().catch(() => {});
+  return verifyCtx;
+}
+
+function titleMatches(title, docTitle, text) {
+  if (sameTitle(title, docTitle)) return true;
+  const fp = (s) => String(s).replace(/[\s .,·ㆍ~〜'"“”‘’!?()[\]{}<>:;|/\\_+\-*&#%]/g, '').toLowerCase();
+  const t = fp(String(title).replace(/^\s*\d{1,5}\s+/, '').replace(/^\s*(공통|서울|글로벌|국제|공지|홍보)\s+/, '').replace(/\[[^\]]{0,20}\]/g, ''));
+  if (t.length < 8) return false;
+  const body = fp(text);
+  if (body.includes(t)) return true;
+  // 제목이 길면 앞부분만으로도 판정 (상세 화면에서 제목이 줄바꿈·말줄임되는 경우)
+  return t.length >= 24 && body.includes(t.slice(0, 24));
+}
+
+async function verifyCandidate(url, title, attempt = 0) {
+  const c = await verifyContext();
+  const p = await c.newPage();
   try {
     const res = await p.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
     if (res && res.status() >= 400) return { ok: false, why: `HTTP ${res.status()}` };
-    await p.waitForTimeout(1500);
-    const text = await p.evaluate(() => (document.body.innerText || '').slice(0, 6000)).catch(() => '');
+    // 제목이 화면에 나타날 때까지 기다린다 (동적으로 그리는 상세 화면 대응)
+    const probe = String(title).replace(/^\s*\d{1,5}\s+/, '').replace(/^\s*(공통|서울|글로벌|국제|공지|홍보)\s+/, '').slice(0, 12).trim();
+    if (probe.length >= 4) {
+      await p.waitForFunction((needle) => (document.body && document.body.innerText || '').includes(needle),
+        probe, { timeout: 9000 }).catch(() => {});
+    }
+    await p.waitForTimeout(800);
+    const text = await p.evaluate(() => (document.body.innerText || '').slice(0, 12000)).catch(() => '');
     const docTitle = await p.title().catch(() => '');
-    // 제목이 화면 안에 있어야 그 공고 원문이다
-    const hit = sameTitle(title, docTitle) || (() => {
-      // 본문 어딘가에 제목이 통째로 들어 있는지 (지문 비교)
-      const fp = (s) => String(s).replace(/[\s .,·ㆍ~〜'"“”‘’!?()[\]{}<>:;|/\\_+\-*&#%]/g, '').toLowerCase();
-      const t = fp(title.replace(/^\s*\d{1,5}\s+/, '').replace(/^\s*(공통|서울|글로벌|국제|공지)\s+/, ''));
-      return t.length >= 8 && fp(text).includes(t);
-    })();
-    if (!hit) return { ok: false, why: '제목 불일치(목록이나 다른 글이 열림)' };
+    if (!titleMatches(title, docTitle, text)) return { ok: false, why: '제목 불일치(목록이나 다른 글이 열림)' };
     return { ok: true };
   } catch (e) {
-    return { ok: false, why: (e.message || String(e)).split('\n')[0].slice(0, 60) };
+    const msg = (e.message || String(e)).split('\n')[0].slice(0, 60);
+    // 학교 서버가 잠깐 연결을 끊은 것은 '주소가 틀렸다'는 뜻이 아니다 — 쉬었다 한 번 더
+    if (attempt < 1 && /ERR_CONNECTION|ERR_NETWORK|Timeout|ERR_EMPTY/i.test(msg)) {
+      await p.close().catch(() => {});
+      await new Promise((r) => setTimeout(r, 4000));
+      return verifyCandidate(url, title, attempt + 1);
+    }
+    return { ok: false, why: msg };
   } finally {
     await p.close().catch(() => {});
-    await fresh.close().catch(() => {});
   }
+}
+
+/* 목록 한 페이지의 '누를 수 있는 행'을 걷는다.
+   행마다 클릭 스크립트가 넘기는 글 번호까지 뽑아 둔다 — 경희처럼 클릭이 form POST라
+   주소창이 안 바뀌는 게시판은 이 번호가 원문 주소를 만드는 유일한 재료다. */
+const ROW_SEL = 'a[href], [onclick]';
+async function scrapeRows(page) {
+  return page.$$eval('a[href], [onclick]', (els) => els.map((e, i) => {
+    const src = [e.getAttribute('onclick') || '', e.getAttribute('href') || '',
+      e.getAttribute('data-id') || '', e.getAttribute('data-seq') || ''].join('|');
+    return {
+      i,
+      t: (e.textContent || '').replace(/\s+/g, ' ').trim(),
+      abs: e.tagName === 'A' ? (e.href || '') : '',
+      src,
+      html: (e.outerHTML || '').slice(0, 300),
+    };
+  }).filter((x) => x.t.length >= 6 && x.t.length <= 160)).catch(() => []);
+}
+
+/* 클릭 스크립트 인자에서 글 번호 후보 뽑기 — fn_view('1078712') · goDetail(1078712,'BMSR00040') 등 */
+function idsFromSource(src) {
+  const out = [];
+  for (const m of String(src || '').matchAll(/['"]?(\d{3,20})['"]?/g)) {
+    if (!out.includes(m[1])) out.push(m[1]);
+  }
+  return out.slice(0, 4);
+}
+
+/* 게시판을 여러 페이지 훑는다 — 앱에 담긴 공고 중에는 이미 1페이지에서 밀려난 것이 많다
+   (1차 실행에서 '목록에서 못 찾음'이 68건 중 다수였던 이유). */
+async function scanBoard(page, listUrl, maxPages) {
+  const seenTitles = new Set();
+  const all = [];
+  const addRows = (rows, pageNo) => {
+    for (const r of rows) {
+      const k = r.t + '|' + r.abs;
+      if (seenTitles.has(k)) continue;
+      seenTitles.add(k);
+      all.push({ ...r, pageNo });
+    }
+  };
+  addRows(await scrapeRows(page), 1);
+  for (let p = 2; p <= maxPages; p += 1) {
+    // 페이지 번호 링크를 찾아 누른다 (주소로 넘기는 게시판·스크립트로 넘기는 게시판 모두 대응)
+    const clicked = await page.evaluate((n) => {
+      const cands = [...document.querySelectorAll('a, button, [onclick]')]
+        .filter((e) => (e.textContent || '').trim() === String(n));
+      const el = cands.find((e) => /pag|page|num/i.test(e.className + ' ' + (e.parentElement || {}).className)) || cands[0];
+      if (!el) return false;
+      el.click();
+      return true;
+    }, p).catch(() => false);
+    if (!clicked) break;
+    await page.waitForTimeout(3000);
+    const rows = await scrapeRows(page);
+    if (!rows.length) break;
+    addRows(rows, p);
+  }
+  return all;
 }
 
 let fixed = 0; let failed = 0;
@@ -135,30 +226,35 @@ for (const [listUrl, group] of boards) {
   if (!opened) { await page.close().catch(() => {}); report.push(''); continue; }
   await page.waitForTimeout(4000);
 
-  /* 목록의 '누를 수 있는 행'을 모은다 — 진짜 링크 · onclick 행 · javascript: 링크 모두 */
-  const ROW_SEL = 'a[href], [onclick]';
-  const rows = await page.$$eval(ROW_SEL, (els) => els.map((e, i) => ({
-    i,
-    t: (e.textContent || '').replace(/\s+/g, ' ').trim(),
-    href: e.tagName === 'A' ? (e.getAttribute('href') || '') : '',
-    abs: e.tagName === 'A' ? (e.href || '') : '',
-  })).filter((x) => x.t.length >= 6 && x.t.length <= 160)).catch(() => []);
-  report.push(`- 목록에서 본 행 ${rows.length}개`);
+  /* 목록을 여러 페이지 훑어 '누를 수 있는 행'을 모은다 */
+  const rows = await scanBoard(page, listUrl, Number(process.env.RESOLVE_MAX_PAGES || 6));
+  const pagesSeen = Math.max(...rows.map((r) => r.pageNo), 1);
+  report.push(`- 목록 ${pagesSeen}페이지에서 행 ${rows.length}개`);
 
+  let boardCandidateTotal = 0;
   for (const t of group) {
     const want = markerTitle(t.url);
-    // 1) 목록 안에 이미 진짜 상세 링크가 있으면 클릭 없이 채택 (동국대 경로형 상세 등)
-    const direct = rows.find((r) => sameTitle(want, r.t) && isDetailUrl(r.abs, listUrl));
-    let found = null;
-    if (direct) {
-      const v = await verifyCandidate(direct.abs, want);
-      if (v.ok) found = direct.abs;
-      else report.push(`  - (링크 후보 탈락: ${v.why}) ${direct.abs.slice(0, 90)}`);
+    const row = rows.find((r) => sameTitle(want, r.t));
+    if (!row) { report.push(`  - ⚠️ 목록에서 못 찾음(내려갔거나 제목 변경): ${want.slice(0, 50)}`); failed += 1; continue; }
+
+    /* 후보 주소 만들기 — 대부분은 클릭 없이 목록 정보만으로 만들어진다.
+       ① 행의 링크가 이미 상세 주소인 경우 (동국 …/detail/26765595)
+       ② 행의 클릭 스크립트가 넘기는 글 번호로 조립 (경희 view.do?nttId=…) */
+    const cands = [];
+    if (isDetailUrl(row.abs, listUrl)) cands.push(row.abs);
+    for (const c of detailCandidates({ listUrl, url: listUrl, rowIds: idsFromSource(row.src), hiddenInputs: {} })) {
+      if (isDetailUrl(c, listUrl) && !cands.includes(c)) cands.push(c);
     }
-    // 2) 행을 실제로 눌러 상세를 열고, GET으로 열리는 주소 후보를 확인한다
-    if (!found) {
-      const row = rows.find((r) => sameTitle(want, r.t));
-      if (!row) { report.push(`  - ⚠️ 목록에서 못 찾음(내려갔거나 제목 변경): ${want.slice(0, 50)}`); failed += 1; continue; }
+
+    let found = null;
+    for (const c of cands) {
+      const v = await verifyCandidate(c, want);
+      if (v.ok) { found = c; break; }
+      report.push(`    · 탈락(${v.why}) ${c.slice(0, 100)}`);
+    }
+
+    /* ③ 그래도 못 찾으면 행을 실제로 눌러 상세 화면 안에서 재료를 더 찾는다 (마지막 수단) */
+    if (!found && row.pageNo === 1) {
       try {
         const els = await page.$$(ROW_SEL);
         const el = els[row.i];
@@ -169,17 +265,17 @@ for (const [listUrl, group] of boards) {
         const popup = await popupP;
         const detail = popup || page;
         if (popup) await popup.waitForLoadState('domcontentloaded').catch(() => {});
-        else { await navP; await page.waitForTimeout(2000); }
+        else { await navP; await page.waitForTimeout(2500); }
         const dom = await readDom(detail, listUrl);
-        const cands = detailCandidates(dom);
-        report.push(`  - 후보 ${cands.length}개 · ${want.slice(0, 40)}`);
-        for (const c of cands) {
+        const more = detailCandidates({ ...dom, rowIds: idsFromSource(row.src) })
+          .filter((c) => isDetailUrl(c, listUrl) && !cands.includes(c));
+        for (const c of more) {
+          cands.push(c);
           const v = await verifyCandidate(c, want);
           if (v.ok) { found = c; break; }
           report.push(`    · 탈락(${v.why}) ${c.slice(0, 100)}`);
         }
         if (popup) await popup.close().catch(() => {});
-        // 목록으로 복귀
         if (page.url() !== listUrl) await page.goto(listUrl, { waitUntil: 'domcontentloaded', timeout: 25000 }).catch(() => {});
         await page.waitForTimeout(1500);
       } catch (e) {
@@ -188,6 +284,7 @@ for (const [listUrl, group] of boards) {
         await page.waitForTimeout(1500);
       }
     }
+    boardCandidateTotal += cands.length;
 
     if (found) {
       resolvedMap[t.url] = found;
@@ -199,10 +296,18 @@ for (const [listUrl, group] of boards) {
       report.push(`  - ⚠️ 원문 주소 확인 실패(표식 유지): ${want.slice(0, 50)}`);
     }
   }
+  /* 진단: 이 게시판에서 후보 주소를 하나도 못 만들었다면 게시판 구조를 그대로 남긴다.
+     다음 세션이 '왜 안 되나'를 추측하지 않고 실제 HTML을 보고 규칙을 더할 수 있게. */
+  if (!boardCandidateTotal && rows.length) {
+    report.push('  - (진단) 후보를 하나도 못 만든 게시판 — 목록 행 생김새:');
+    rows.filter((r) => /장학/.test(r.t)).slice(0, 3)
+      .forEach((r) => report.push(`      ${r.html.replace(/\s+/g, ' ').slice(0, 240)}`));
+  }
   await page.close().catch(() => {});
   report.push('');
 }
 
+await verifyCtx?.close().catch(() => {});
 await browser.close();
 
 if (!DRY && fixed) {

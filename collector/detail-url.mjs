@@ -38,6 +38,17 @@ export function listUrlOf(raw) {
 /* 글 하나를 가리키는 식별자로 쓰이는 파라미터 이름들 (학교 게시판 공통) */
 const ID_PARAMS = /^(ntt_?id|nttSn|bbs_?seq|seq|article_?no|articleNo|artcl_?seq|idx|no|num|board_?no|bidx|wr_id|DUID|list_id|b_idx|boardSeq|postId|id)$/i;
 
+/* 식별자 '값'이 진짜 글 번호처럼 생겼는지 — 이름만 보고 믿으면 안 된다.
+   실제로 동국대 상세 화면에는 name="no" value="dongguk.edu" 같은 칸이 있어서,
+   그대로 조립하면 `…/detail/dongguk.edu` 라는 없는 주소가 만들어졌다 (2026-07-31 1차 실행에서 발견). */
+function looksLikeId(v) {
+  const s = String(v == null ? '' : v).trim();
+  if (!s || s.length > 24) return false;
+  if (/[.@/\\:\s]/.test(s)) return false;          // 도메인·경로·메일 주소 모양은 글 번호가 아니다
+  if (!/\d/.test(s)) return false;                 // 숫자가 하나도 없으면 글 번호로 보지 않는다
+  return /^[A-Za-z0-9_-]+$/.test(s);
+}
+
 /* 목록 화면임을 드러내는 경로 조각 */
 const LIST_PATH = /(^|\/)(list|artclList|notice|board|bbs|index)(\.do|\.jsp|\.php|\.asp[x]?)?\/?$/i;
 
@@ -68,6 +79,9 @@ export function isDetailUrl(raw, listUrl) {
   for (const [k, v] of u.searchParams) {
     if (ID_PARAMS.test(k) && String(v).trim() !== '') return true;
   }
+
+  // 목록으로 보이는 경로는 (식별자 파라미터가 없는 한) 상세가 아니다 — /page/533 같은 안내 페이지 포함
+  if (/(^|\/)page\/\d+\/?$/i.test(u.pathname)) return false;
 
   const segs = u.pathname.split('/').filter(Boolean);
   const last = segs[segs.length - 1] || '';
@@ -133,22 +147,36 @@ export function detailCandidates(dom) {
   push(dom.canonical);
   push(dom.ogUrl);
 
-  // 3순위: 숨은 입력칸의 글 번호로 view 주소를 조립한다
-  //   (경희 유형: list.do 옆에 view.do가 있고 nttId·menuNo·bbsId를 GET으로 받는다)
+  // 3순위: 글 번호로 view 주소를 조립한다
+  //   (경희 유형: 목록에서 클릭이 form POST라 주소창이 안 바뀐다. list.do 옆에 view.do가 있고
+  //    nttId·menuNo·bbsId를 GET으로도 받으므로, 글 번호만 알아내면 원문 주소를 만들 수 있다.)
+  //   글 번호의 출처는 두 곳: 상세 화면의 숨은 입력칸, 그리고 목록 행의 클릭 스크립트 인자.
   const hid = dom.hiddenInputs || {};
-  const idKey = Object.keys(hid).find((k) => ID_PARAMS.test(k) && String(hid[k]).trim() !== '');
-  if (idKey && dom.listUrl) {
+  const ids = [];
+  for (const k of Object.keys(hid)) {
+    if (ID_PARAMS.test(k) && looksLikeId(hid[k])) ids.push([k, String(hid[k]).trim()]);
+  }
+  // 목록 행의 onclick/href가 넘겨주는 인자 (예: fn_view('1078712') · goDetail(1078712,'BMSR00040'))
+  for (const raw of dom.rowIds || []) {
+    if (looksLikeId(raw)) ids.push([dom.idParam || 'nttId', String(raw).trim()]);
+  }
+  for (const [idKey, idVal] of ids) {
+    if (!dom.listUrl) break;
     try {
       const l = new URL(dom.listUrl);
-      const base = l.pathname.replace(/\/(list|artclList|index)(\.do|\.jsp|\.php)?$/i, (m) => m.replace(/(list|artclList|index)/i, 'view'));
+      const base = l.pathname.replace(/\/(list|artclList|index)(\.do|\.jsp|\.php)?$/i,
+        (m) => m.replace(/(list|artclList|index)/i, 'view'));
       const v = new URL(l.origin + base);
       // 목록 주소가 지니고 있던 메뉴·게시판 파라미터를 그대로 이어붙인다
       for (const [k, val] of l.searchParams) v.searchParams.set(k, val);
-      v.searchParams.set(idKey, String(hid[idKey]));
+      v.searchParams.set(idKey, idVal);
       for (const extra of ['bbsId', 'bbs_id', 'menuNo', 'key', 'boardId']) {
-        if (hid[extra] && !v.searchParams.get(extra)) v.searchParams.set(extra, String(hid[extra]));
+        if (looksLikeId(hid[extra]) && !v.searchParams.get(extra)) v.searchParams.set(extra, String(hid[extra]));
       }
       push(v.href);
+      // 경로형 상세(동국 …/detail/26765595)를 쓰는 게시판도 있으므로 그 형태도 후보에 넣는다
+      const listPath = l.pathname.replace(/\/(list|artclList|index)(\.do|\.jsp|\.php)?\/?$/i, '');
+      if (listPath && listPath !== l.pathname) push(`${l.origin}${listPath}/detail/${idVal}`);
     } catch { /* 조립 실패는 그냥 건너뛴다 */ }
   }
   return out;
