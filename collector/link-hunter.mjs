@@ -293,7 +293,11 @@ for (const [listUrl, group] of boards) {
             if (v.ok) { url = c; break; }
             lastWhy = v.why;
             report.push(`    · 탈락(${v.why}) ${c.slice(0, 96)}`);
-            if (v.net) break;                       // 못 읽는 상황이면 더 두드리지 않는다
+            /* 404는 '이 주소가 틀렸다'는 뜻이므로 **다음 후보를 시도해야 한다**.
+               멈춰야 하는 건 시간초과·연결끊김처럼 '학교 서버에 닿지 못하는' 상황뿐이다.
+               예전엔 둘을 뭉뚱그려 404에서도 멈췄고, 그래서 첫 후보가 404면 정답일 수도 있는
+               두 번째 후보(경로형)를 아예 안 열어 봤다 — 동국 5건이 이 이유로 실패했다. */
+            if (v.net && !/^HTTP /.test(v.why)) break;
           }
           if (popup) await popup.close().catch(() => {});
         }
