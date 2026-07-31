@@ -1,6 +1,6 @@
-## 🎯 링크 사냥꾼 리포트 (2026-08-01 01:57 KST)
+## 🎯 링크 사냥꾼 리포트 (2026-08-01 02:08 KST)
 
-사냥 대상 **13건** (게시판 1곳) · 포기 처리된 건 2건
+사냥 대상 **11건** (게시판 1곳) · 포기 처리된 건 2건
 
 ### https://www.dongguk.edu/article/JANGHAKNOTICE/list
     · 탈락(제목 불일치(다른 글이 열림)) https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765593
@@ -12,12 +12,10 @@
     · 탈락(제목 불일치(다른 글이 열림)) https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765584
     · 탈락(HTTP 404) https://www.dongguk.edu/article/JANGHAKNOTICE/view?nttId=26765584
   - ⚠️ 실패(HTTP 404): 2665 [홍보] 2026년 5·18희망장학생 모집 안내 2026.07.
-  - ✅ 2662 [홍보] 2026 상반기 사랑나눔장학생 모집 2026.07.22 → https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765506
     · 탈락(제목 불일치(다른 글이 열림)) https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765479
     · 탈락(HTTP 404) https://www.dongguk.edu/article/JANGHAKNOTICE/view?nttId=26765479
   - ⚠️ 실패(HTTP 404): 2661 [홍보] 2026년 화성시인재육성재단 소상공인 장학금 안내 20
   - ⚠️ 실패(클릭 실패: elementHandle.click: Timeout 5000ms exce): 진담거사 지역미래불자육성장학 장학생 선발 안내
-  - ✅ 공지 공지 2026-1학기 복지장학2(면학) 지급 안내 2026.06.2 → https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765245
     · 탈락(제목 불일치(다른 글이 열림)) https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764945
     · 탈락(HTTP 404) https://www.dongguk.edu/article/JANGHAKNOTICE/view?nttId=26764945
   - ⚠️ 실패(HTTP 404): 공지 공지 2026-2학기 복지장학1(본인장애) 신청안내 2026.06.
@@ -34,6 +32,6 @@
 - 🗑 내려간 공고 — 산학협동재단 국내 외국인 근로자 자녀 장학생 (동국대 접수) (목록에서 못 찾음)
 
 ---
-원문 주소 확보 **2건** · 실패 9건 · 이번에 포기 처리 0건(내려감 0 · 사람 확인 0)
+원문 주소 확보 **0건** · 실패 9건 · 이번에 포기 처리 0건(내려감 0 · 사람 확인 0)
 
 실패해도 앱은 지어내지 않습니다 — 원문 주소를 못 찾은 공고는 "게시판 목록 ↗"으로 정직하게 안내합니다.
