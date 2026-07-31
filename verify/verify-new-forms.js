@@ -32,6 +32,43 @@ async function onboard(page, school, major) {
   await page.waitForTimeout(1300);
 }
 
+
+/* 마감 전 양식 공고를 앱에서 직접 찾아 "질문 → 문서 생성"까지 UI로 구동한다.
+   하드코딩한 공고는 마감되면 신청 버튼이 비활성이라 드라이버가 깨지므로,
+   특정 공고가 마감이면 이 함수로 **다른 살아 있는 양식 공고**를 대신 눌러 UI 경로를 계속 지킨다.
+   (양식 스키마 자체의 정확성은 ②의 전수 렌더링 검사가 담당) */
+async function driveAnyLiveForm(page, label, errors) {
+  const target = await page.evaluate(() => {
+    const t = new Date();
+    const today = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
+    const hit = allScholarships().find((s) => {
+      if (!s.formId || !s.deadline || s.deadline < today) return false;
+      if (state.applications.some((a) => a.id === s.id)) return false;
+      const st = evaluate(s, state.profile).status;
+      return st === 'eligible' || st === 'selective';
+    });
+    return hit ? { id: hit.id, name: hit.name, formId: hit.formId } : null;
+  });
+  if (!target) { console.log(`  ${label}: 이 프로필에 마감 전 양식 공고가 없어 UI 구동 생략`); return; }
+
+  await page.click('.nav-item[data-nav="explore"]');
+  await page.waitForTimeout(600);
+  await page.click(`#explore-list [data-detail="${target.id}"]`);
+  await page.waitForSelector('#detail-sheet.show');
+  await page.waitForTimeout(400);
+  await page.click('#btn-apply-one');
+  await page.waitForSelector('#btn-ff-generate', { timeout: 8000 });
+  const qCount = await page.$$eval('#detail-sheet input, #detail-sheet textarea, #detail-sheet .fq-checks', (els) => els.length);
+  await page.click('#btn-ff-generate');
+  await page.waitForSelector('.form-doc', { timeout: 8000 });
+  const doc = await page.$eval('.form-doc', (el) => el.textContent);
+  const okDoc = doc.length > 200;
+  console.log(`  ${label}: ${target.name} (${target.formId}) — 질문칸 ${qCount}개 · 문서 ${doc.length}자 생성 ${okDoc ? 'OK' : 'FAIL'}`);
+  if (!okDoc) errors.push(`${label}: 문서가 비정상적으로 짧음(${doc.length}자)`);
+  await page.click('.sheet-handle');
+  await page.waitForTimeout(400);
+}
+
 (async () => {
   const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -82,7 +119,11 @@ async function onboard(page, school, major) {
     const hit = allScholarships().find((s) => s.formId === 'samil-apply' && s.deadline && s.deadline >= today);
     return hit ? hit.id : null;
   });
-  if (!samilLive) console.log('삼일 UI 구동 건너뜀 — 외대 프로필에 마감 전 삼일 접수분이 없음(양식 스키마는 ②에서 검증됨)');
+  if (!samilLive) {
+    console.log('삼일 UI 구동 불가 — 외대 프로필에 마감 전 삼일 접수분이 없음(접수분 전체 마감)');
+    console.log('→ 대신 마감 전 양식 공고로 같은 UI 경로(질문→문서 생성)를 구동한다');
+    await driveAnyLiveForm(samilPage, '외대 프로필 대체 구동', errors);
+  }
   if (samilLive) {
     const page = samilPage; // 아래 단언들은 기존 그대로 재사용
   await page.click('.nav-item[data-nav="explore"]');
@@ -123,7 +164,9 @@ async function onboard(page, school, major) {
     return !!(s && s.deadline && s.deadline >= today);
   });
   if (!gosiLive) {
-    console.log('명지 고시 UI 구동 건너뜀 — reg-mj-gosi 접수 마감(양식 스키마는 ②에서 검증됨)');
+    console.log('명지 고시 UI 구동 불가 — reg-mj-gosi 접수 마감');
+    console.log('→ 대신 마감 전 양식 공고로 같은 UI 경로(질문→문서 생성)를 구동한다');
+    await driveAnyLiveForm(page2, '명지 프로필 대체 구동', errors);
   } else {
   await page2.click('.nav-item[data-nav="explore"]');
   await page2.waitForTimeout(600);
@@ -145,6 +188,6 @@ async function onboard(page, school, major) {
 
   console.log('ERRORS:', errors.length ? errors.join(' ; ') : 'none');
   await browser.close();
-  const bad = Object.values(smoke).some((v) => v.error) || keys.length !== NEW_KEYS.length;
+  const bad = Object.values(smoke).some((v) => v.error) || keys.length !== NEW_KEYS.length || errors.length > 0;
   if (bad) process.exit(1);
 })().catch((e) => { console.error('FAIL', e.message); process.exit(1); });
