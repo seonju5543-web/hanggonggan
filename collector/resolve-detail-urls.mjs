@@ -447,11 +447,22 @@ if (!outOfTime()) {
       if (!res || res.status() >= 400) canaryOk = false;
     } catch { canaryOk = false; } finally { await p.close().catch(() => {}); }
   }
-  const tooMany = verdicts.length >= 5 && failures.length / verdicts.length > 0.3;
+  /* '막힌 것'과 '틀린 주소'는 실패 모양이 다르다 — 이걸 구분해야 한다 (2026-08-01).
+     · 못 읽음(404·시간초과·연결끊김) = 학교 서버에 닿지 못한 것 → 막혔을 수 있으니 손대지 않는다.
+     · 읽었는데 다른 화면(제목 불일치·목록 화면) = 페이지를 멀쩡히 받아 봤는데 그 공고가 아닌 것
+       → 이건 주소가 틀렸다는 뜻이므로 되돌리는 게 맞다.
+     예전엔 둘을 뭉뚱그려 '실패 비율'로만 봐서, 내용이 틀린 게 확실한 17건까지 '막힌 것 같다'며
+     그대로 뒀다. 그러면 사용자는 '원문 공고 ↗'를 눌러 엉뚱한 글을 보게 된다. */
+  const NETWORK_FAIL = /^HTTP |Timeout|ERR_|net::/i;
+  const netFails = failures.filter((x) => NETWORK_FAIL.test(x.v.why));
+  const tooMany = verdicts.length >= 5 && netFails.length / verdicts.length > 0.3;
+  report.push(`- 실패 성격: 못 읽음 ${netFails.length}건(막힘 신호) · 읽었지만 다른 화면 ${failures.length - netFails.length}건(주소 문제)`);
   if (!canaryOk || tooMany) {
-    report.push(`- ⏸ 되돌리기 취소 — ${!canaryOk ? '게시판 목록조차 안 열립니다' : `실패 비율이 너무 높습니다(${failures.length}/${verdicts.length})`}. 주소가 틀린 게 아니라 학교 서버가 우리를 막고 있는 상황으로 보고 아무것도 되돌리지 않습니다.`);
+    report.push(`- ⏸ 되돌리기 취소 — ${!canaryOk ? '게시판 목록조차 안 열립니다' : `못 읽은 건이 너무 많습니다(${netFails.length}/${verdicts.length})`}. 학교 서버에 닿지 못하는 상황으로 보고 아무것도 되돌리지 않습니다.`);
   } else {
-    for (const { d, v } of failures) {
+    // '못 읽음'은 닿지 못한 것뿐이라 판정할 수 없다 — 다음 실행에서 다시 본다.
+    // 되돌리는 건 '읽었는데 그 공고가 아니었던' 것만.
+    for (const { d, v } of failures.filter((x) => !NETWORK_FAIL.test(x.v.why))) {
       const list = [...boards.keys()].find((l) => { try { return d.ref[d.urlField].startsWith(new URL(l).origin); } catch { return false; } });
       if (!list) { report.push(`- ⚠️ ${d.id || d.title.slice(0, 30)} 확인 실패(${v.why})이지만 되돌릴 목록 주소를 몰라 그대로 둡니다`); continue; }
       if (!DRY) d.ref[d.urlField] = `${list}#n-${encodeURIComponent(String(d.title).slice(0, 40))}`;
