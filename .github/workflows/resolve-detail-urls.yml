@@ -1,0 +1,89 @@
+name: 원문 링크 복구 로봇
+
+# 앱에 담긴 공고 중 주소가 '게시판 목록 + 제목 표식'(#n-…)으로 남아 있는 것을 찾아
+# 진짜 공고 원문 주소로 바꾼다. 사용자가 '원문 공고 ↗'를 눌렀을 때 학교 장학 공지
+# 목록 전체가 아니라 그 장학금 공고 하나가 열리게 하는 것이 목적이다.
+#
+# 실행 방법:
+#   · collector/run-resolve-urls.txt 를 고쳐 push (push-to-run — GitHub MCP 없는 세션도 가능)
+#   · Actions 화면에서 수동 실행 (기본 브랜치에 올라간 뒤부터 가능)
+#   · 매주 월요일 새벽 — 게시판 개편으로 주소가 바뀌어도 스스로 다시 맞춘다
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry:
+        description: '모의 실행(저장하지 않고 결과만 확인)'
+        type: boolean
+        default: false
+  push:
+    paths:
+      - 'collector/run-resolve-urls.txt'
+  schedule:
+    - cron: '13 20 * * 1'   # 매주 월요일 05:13 KST
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: resolve-detail-urls
+  cancel-in-progress: false
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 협업 병합기 등록 (충돌 자동 해소 — COLLAB.md)
+        run: bash tools/setup-collab.sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm init -y >/dev/null && npm i playwright@1 --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+
+      - id: run
+        run: node collector/resolve-detail-urls.mjs ${{ inputs.dry && '--dry' || '' }}
+
+      # 데이터 관문 — 고친 주소가 규칙을 어기면 저장하지 않는다
+      - name: 데이터 감사
+        id: audit
+        continue-on-error: true
+        run: node verify/audit-data.js
+
+      - name: 감사 실패 시 되돌리기
+        if: steps.audit.outcome == 'failure'
+        run: git checkout -- data/registered.json data/notices.json
+
+      - name: 결과 저장
+        if: steps.audit.outcome == 'success'
+        run: |
+          git config user.name "handaejang-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/notices.json data/registered.json collector/resolve-report.md collector/resolved-urls.json
+          if ! git diff --cached --quiet; then
+            git commit -m "원문 링크 복구 — 목록 주소를 공고 원문 주소로 (${{ steps.run.outputs.fixed }}건)"
+            pushed=0
+            for i in 1 2 3; do
+              if git push; then pushed=1; break; fi
+              git pull --rebase origin "${GITHUB_REF_NAME}"
+            done
+            if [ "$pushed" != "1" ]; then
+              echo "::error::복구 결과 push 실패 — 3회 재시도 모두 실패."
+              exit 1
+            fi
+          fi
+
+      - name: 리포트 출력 (로그로도 확인 가능하게)
+        if: always()
+        run: cat collector/resolve-report.md || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: resolve-report
+          path: |
+            collector/resolve-report.md
+            collector/resolved-urls.json
+          retention-days: 7
