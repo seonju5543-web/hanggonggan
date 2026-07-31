@@ -67,23 +67,48 @@ jobs:
 
       - name: 공고 원문 발췌 갱신 (정직 원칙 — 추론 대신 원문 그대로)
         run: node collector/extract-excerpts.mjs --write
-      - name: 결과 저장
+      -       - name: 결과 저장 (main에 직접 반영 — 사람 작업 브랜치와 완전히 분리)
         run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add collector/seen.json collector/browser-report.md data/notices.json data/registered.json
-          [ -f collector/health.json ] && git add collector/health.json
-          [ -f collector/pending-forms.json ] && git add collector/pending-forms.json
-          [ -d collector/extracted ] && git add collector/extracted
-          true  # 위 선택 파일이 없어도 저장 단계는 계속된다 (2026-07-19 8회 연속 실패 원인 수정)
+
+          # 이번 실행에서 새로 만들어진 데이터 파일들을 임시 보관
+          # (현재 체크아웃된 브랜치가 사람 작업 브랜치든 뭐든 상관없이 결과물만 챙긴다)
+          mkdir -p /tmp/bot-data/collector/extracted
+          for f in collector/seen.json collector/browser-report.md data/notices.json data/registered.json collector/health.json collector/pending-forms.json; do
+            [ -f "$f" ] && mkdir -p "/tmp/bot-data/$(dirname "$f")" && cp "$f" "/tmp/bot-data/$f"
+          done
+          [ -d collector/extracted ] && cp -r collector/extracted/. /tmp/bot-data/collector/extracted/
+
+          apply_data() {
+            for f in collector/seen.json collector/browser-report.md data/notices.json data/registered.json collector/health.json collector/pending-forms.json; do
+              [ -f "/tmp/bot-data/$f" ] && cp "/tmp/bot-data/$f" "$f" && git add "$f"
+            done
+            if [ -d /tmp/bot-data/collector/extracted ]; then
+              mkdir -p collector/extracted
+              cp -r /tmp/bot-data/collector/extracted/. collector/extracted/
+              git add collector/extracted
+            fi
+          }
+
+          # 사람 작업 브랜치는 건드리지 않고, main을 최신으로 받아서 그 위에 데이터만 얹는다
+          git fetch origin main
+          git checkout -B main origin/main
+          apply_data
+
           if ! git diff --cached --quiet; then
             git commit -m "browser-collector: harvest update"
-            # 다른 로봇이 먼저 push했을 수 있음 — 받아서 얹은 뒤 재시도 (수집분 유실 방지)
             for i in 1 2 3; do
-              git push && break
-              git pull --rebase origin "${GITHUB_REF_NAME}"
+              git push origin main && break
+              # push 실패 시: 병합하지 않고, main 최신 위에 방금 만든 데이터를 다시 그대로 덮어써서 재시도
+              # (수집 데이터는 "누적 병합"이 아니라 "최신 재수집"이 맞는 방식 — 충돌 마커가 안 뜨게)
+              git fetch origin main
+              git reset --hard origin/main
+              apply_data
+              git diff --cached --quiet || git commit -m "browser-collector: harvest update"
             done
           fi
+
       - name: 리포트 이슈
         if: github.event_name == 'workflow_dispatch' || steps.run.outputs.new_count != '0'
         env:
