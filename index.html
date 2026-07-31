@@ -193,9 +193,15 @@
             <p class="home-school" id="home-school">대학 미설정</p>
           </div>
         </div>
+        <div class="home-actions">
+        <button class="icon-btn bell-btn" id="btn-notify" title="알림" aria-label="알림">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>
+          <span class="bell-badge" id="notify-badge" hidden></span>
+        </button>
         <button class="icon-btn" id="btn-edit-profile" title="프로필 수정" aria-label="프로필 수정">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33h.01a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51h.01a1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82v.01a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
         </button>
+        </div>
       </header>
 
       <div class="hero-card">
@@ -243,6 +249,7 @@
     <section id="screen-my" class="screen" hidden>
       <header class="page-header"><h2>MY</h2></header>
       <div id="my-profile" class="my-card"></div>
+      <div id="my-notify" class="my-card" hidden></div>
       <div id="my-wallet" class="my-card"></div>
       <div class="my-menu">
         <button class="my-menu-item" id="btn-my-edit">프로필 수정</button>
@@ -275,12 +282,19 @@
     <div id="sheet-backdrop" class="sheet-backdrop" hidden></div>
     <div id="detail-sheet" class="sheet" hidden></div>
 
+    <!-- ============ 알림 시트 (동의 안내 · 알림함) ============ -->
+    <div id="notify-backdrop" class="sheet-backdrop" hidden></div>
+    <div id="notify-sheet" class="sheet" hidden></div>
+
     <!-- ============ 토스트 ============ -->
     <div id="toast" class="toast" hidden></div>
   </div>
 
   <script src="data.js"></script>
+  <script src="match-engine.js"></script>
+  <script src="notify-rules.js"></script>
   <script src="forms.js"></script>
+  <script src="notify.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

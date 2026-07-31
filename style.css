@@ -884,3 +884,108 @@ textarea:focus {
 
 /* 자동 등록(검수 전) 배지 — 수집 로봇이 자동 등록한 공고임을 정직하게 표시 */
 .badge-auto { background: var(--orange-weak, #fff3e6); color: var(--orange, #c2620a); }
+
+/* ============================================================
+   알림 (동의 안내 · 알림함 · 설정)
+   ============================================================ */
+.home-actions { display: flex; align-items: center; gap: 2px; }
+.bell-btn { position: relative; }
+.bell-badge {
+  position: absolute;
+  top: 3px;
+  right: 2px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: var(--red);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 800;
+  line-height: 17px;
+  text-align: center;
+  box-shadow: 0 0 0 2px var(--bg);
+}
+.bell-badge[hidden] { display: none; }
+
+/* 동의 안내 시트 */
+.nf-consent-hero { text-align: center; padding-top: 8px; }
+.nf-bell {
+  width: 62px; height: 62px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: var(--primary-weak);
+  font-size: 30px;
+  display: flex; align-items: center; justify-content: center;
+}
+.nf-type-list { list-style: none; display: grid; gap: 12px; margin: 4px 0 18px; }
+.nf-type-list li {
+  display: flex; gap: 11px; align-items: flex-start;
+  font-size: 14px;
+  background: rgba(18, 22, 31, 0.025);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+}
+.nf-ico { font-size: 17px; flex-shrink: 0; }
+.nf-desc { font-size: 12.5px; color: var(--text-weak); line-height: 1.55; }
+
+/* 알림함 */
+.nf-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; }
+.nf-list { display: grid; gap: 8px; margin-top: 14px; }
+.nf-item {
+  display: flex; gap: 11px; align-items: flex-start;
+  width: 100%;
+  text-align: left;
+  padding: 13px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  transition: background 0.15s;
+}
+.nf-item:hover { background: rgba(18, 22, 31, 0.02); }
+.nf-item.nf-unread { background: var(--primary-weak); border-color: rgba(47, 107, 255, 0.18); }
+.nf-text { display: grid; gap: 3px; min-width: 0; }
+.nf-title { font-size: 14.5px; font-weight: 700; letter-spacing: -0.015em; }
+.nf-body { font-size: 13px; color: var(--text-sub); line-height: 1.5; }
+.nf-time { font-size: 11.5px; color: var(--text-weak); font-weight: 600; }
+
+/* MY 화면 알림 설정 */
+.nf-set-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+.nf-status { font-size: 12.5px; font-weight: 600; margin-top: 3px; }
+.nf-status-on { color: var(--green); }
+.nf-status-off { color: var(--text-weak); }
+.nf-prefs { display: grid; gap: 2px; }
+.nf-pref {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+}
+.nf-pref:last-child { border-bottom: none; }
+.nf-pref-text { display: grid; gap: 2px; font-size: 14px; min-width: 0; }
+/* 스위치 — 전역 appearance:none 때문에 체크박스를 직접 그린다 */
+.nf-switch {
+  appearance: none; -webkit-appearance: none;
+  width: 44px; height: 26px;
+  flex-shrink: 0;
+  padding: 0;
+  border-radius: 13px;
+  border: none;
+  background: rgba(18, 22, 31, 0.14);
+  position: relative;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+.nf-switch::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.25);
+  transition: transform 0.2s;
+}
+.nf-switch:checked { background: var(--primary); }
+.nf-switch:checked::after { transform: translateX(18px); }
+.nf-set-actions { display: flex; gap: 6px; margin-top: 14px; flex-wrap: wrap; }

@@ -68,18 +68,26 @@ async function onboard(page, school, major) {
   for (const [k, v] of Object.entries(smoke)) console.log(' ', k, JSON.stringify(v));
 
   // ③ 삼일장학회: UI로 질문→문서 생성
-  // (성균관 접수분은 7/12 마감돼 버튼이 비활성 — 마감 전인 외대 접수분으로 같은 양식을 구동.
-  //  접수분이 모두 마감되면 마감 전 다른 접수분으로 대상을 바꿀 것)
+  // 접수분(성균관·외대·경희·중앙)은 해마다 마감된다. 마감된 공고는 신청 버튼이 비활성이라
+  // 하드코딩한 대상으로는 드라이버가 깨진다 → **마감 전 접수분을 앱에서 직접 찾아** 구동하고,
+  // 전부 마감이면 이 UI 구간만 건너뛴다(양식 스키마 검사는 위 ②에서 이미 끝났다).
   const samilPage = await browser.newPage({ viewport: { width: 390, height: 844 } });
   samilPage.on('pageerror', (e) => errors.push('PAGEERROR-SAMIL: ' + e.message));
   samilPage.on('dialog', async (d) => { await d.accept(); });
   await samilPage.goto('http://localhost:8123/', { waitUntil: 'domcontentloaded' });
   await onboard(samilPage, '외대', '컴퓨터공학부');
-  {
+  const samilLive = await samilPage.evaluate(() => {
+    const t = new Date();
+    const today = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
+    const hit = allScholarships().find((s) => s.formId === 'samil-apply' && s.deadline && s.deadline >= today);
+    return hit ? hit.id : null;
+  });
+  if (!samilLive) console.log('삼일 UI 구동 건너뜀 — 외대 프로필에 마감 전 삼일 접수분이 없음(양식 스키마는 ②에서 검증됨)');
+  if (samilLive) {
     const page = samilPage; // 아래 단언들은 기존 그대로 재사용
   await page.click('.nav-item[data-nav="explore"]');
   await page.waitForTimeout(600);
-  await page.click('#explore-list [data-detail="reg-hufs-samil"]');
+  await page.click(`#explore-list [data-detail="${samilLive}"]`);
   await page.waitForSelector('#detail-sheet.show');
   await page.waitForTimeout(400);
   await page.click('#btn-apply-one');
@@ -107,6 +115,16 @@ async function onboard(page, school, major) {
   page2.on('dialog', async (d) => { await d.accept(); });
   await page2.goto('http://localhost:8123/', { waitUntil: 'domcontentloaded' });
   await onboard(page2, '명지', '융합소프트웨어학부');
+  // 삼일과 같은 이유로 마감 여부를 먼저 확인한다 (마감되면 신청 버튼이 비활성이라 클릭이 실패)
+  const gosiLive = await page2.evaluate(() => {
+    const t = new Date();
+    const today = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
+    const s = allScholarships().find((x) => x.id === 'reg-mj-gosi');
+    return !!(s && s.deadline && s.deadline >= today);
+  });
+  if (!gosiLive) {
+    console.log('명지 고시 UI 구동 건너뜀 — reg-mj-gosi 접수 마감(양식 스키마는 ②에서 검증됨)');
+  } else {
   await page2.click('.nav-item[data-nav="explore"]');
   await page2.waitForTimeout(600);
   await page2.click('#explore-list [data-detail="reg-mj-gosi"]');
@@ -123,6 +141,7 @@ async function onboard(page, school, major) {
     '| 제한기준 명시:', doc2.includes('직전학기 평균평점 2.5 이상'),
     '| 서약문:', doc2.includes('명지대학교 장학금규정에 따라'));
   await page2.screenshot({ path: `${__dirname}/shot-41-mjugosi-doc.png` });
+  }
 
   console.log('ERRORS:', errors.length ? errors.join(' ; ') : 'none');
   await browser.close();
