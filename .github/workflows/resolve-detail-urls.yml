@@ -16,6 +16,10 @@ on:
         description: '모의 실행(저장하지 않고 결과만 확인)'
         type: boolean
         default: false
+      recheck_only:
+        description: '이미 고친 주소 점검만 (게시판을 덜 두드린다)'
+        type: boolean
+        default: false
   push:
     paths:
       - 'collector/run-resolve-urls.txt'
@@ -52,7 +56,7 @@ jobs:
           # 같은 학교를 하루에 여러 번 두드리면 서버가 막으므로(2026-07-31 동국대), 고칠 게
           # 남은 학교만 골라 도는 데 쓴다.
           RESOLVE_ONLY_BOARD: ${{ vars.RESOLVE_ONLY_BOARD }}
-        run: node collector/resolve-detail-urls.mjs ${{ inputs.dry && '--dry' || '' }}
+        run: node collector/resolve-detail-urls.mjs ${{ inputs.dry && '--dry' || '' }} ${{ inputs.recheck_only && '--recheck-only' || '' }}
 
       # 데이터 관문 — 고친 주소가 규칙을 어기면 저장하지 않는다
       - name: 데이터 감사

@@ -21,6 +21,7 @@ import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, detailCand
 
 const HERE = new URL('.', import.meta.url);
 const DRY = process.argv.includes('--dry');
+
 const LIMIT_BOARDS = Number(process.env.RESOLVE_MAX_BOARDS || 20);
 /* 실행 시간 상한 — 2차 실행이 40분을 넘겼다. 매주 도는 로봇이므로 한 번에 다 못 고쳐도
    다음 주에 이어서 고치면 된다. 시간을 넘기면 그때까지 고친 것만 저장하고 끝낸다. */
@@ -47,14 +48,16 @@ for (const r of registered.items || []) {
    (2026-07-31 동국대: 7번 돌린 뒤 멀쩡한 주소가 전부 404), 고칠 게 남은 학교만 골라 돈다.
    지정 방법 두 가지: 저장소 변수 RESOLVE_ONLY_BOARD, 또는 실행 트리거 파일의 `onlyBoard:` 줄
    (GitHub 설정에 손댈 수 없는 세션도 push만으로 지정할 수 있게 — deepfetch의 `targets:`와 같은 방식). */
-function onlyBoardFromRunFile() {
+function runFileSetting(key) {
   try {
     const txt = fs.readFileSync(new URL('run-resolve-urls.txt', HERE), 'utf8');
-    const m = txt.match(/^\s*onlyBoard:\s*(.+)$/m);
+    const m = txt.match(new RegExp('^\\s*' + key + ':\\s*(.+)$', 'm'));
     return m ? m[1].trim() : '';
   } catch { return ''; }
 }
-const ONLY = process.env.RESOLVE_ONLY_BOARD || onlyBoardFromRunFile();
+const ONLY = process.env.RESOLVE_ONLY_BOARD || runFileSetting('onlyBoard');
+// 이미 고친 주소 점검만 (게시판을 덜 두드린다) — 트리거 파일 `recheckOnly: true` 로도 지정 가능
+const RECHECK_ONLY = process.argv.includes('--recheck-only') || runFileSetting('recheckOnly') === 'true';
 const boards = new Map();
 for (const t of targets) {
   const list = listUrlOf(t.url);
@@ -287,7 +290,7 @@ for (const [listUrl, group] of boards) {
   const otherTitlesOf = (want) => rows.map((r) => r.t).filter((x) => !sameTitle(want, x)).slice(0, 40);
 
   let boardCandidateTotal = 0;
-  for (const t of group) {
+  for (const t of (RECHECK_ONLY ? [] : group)) {
     if (outOfTime()) { report.push('  - (시간 상한 도달 — 나머지는 다음 실행에서 이어서 고칩니다)'); break; }
     const want = markerTitle(t.url);
     const row = rows.find((r) => sameTitle(want, r.t));
@@ -424,6 +427,16 @@ if (!outOfTime()) {
     await new Promise((r) => setTimeout(r, 700));  // 학교 서버를 몰아치지 않는다
   }
   const failures = verdicts.filter((x) => !x.v.ok);
+  /* 실패 사유를 **되돌리든 말든 전부** 남긴다.
+     예전에는 되돌린 항목만 적어서, 되돌리기가 취소되면 '무엇이 왜 실패했는지'가 통째로
+     사라졌다. 그러면 '학교가 우리를 막은 것'인지 '앱에 넣어둔 링크가 진짜 깨진 것'인지
+     구분할 수 없다 — 후자라면 사용자가 '원문 공고 ↗'를 눌러 404를 보게 되므로 훨씬 나쁘다. */
+  const byWhy = {};
+  for (const f of failures) byWhy[f.v.why] = (byWhy[f.v.why] || 0) + 1;
+  report.push(`- 실패 사유 분포: ${Object.entries(byWhy).map(([k, v]) => `${k} ${v}건`).join(' · ') || '없음'}`);
+  failures.slice(0, 12).forEach((f) => report.push(`    · ${f.v.why} — ${String(f.d.title).slice(0, 34)} → ${String(f.d.ref[f.d.urlField]).slice(0, 76)}`));
+  const passed = verdicts.filter((x) => x.v.ok);
+  passed.slice(0, 5).forEach((x) => report.push(`    · ✅ 통과 — ${String(x.d.title).slice(0, 34)} → ${String(x.d.ref[x.d.urlField]).slice(0, 76)}`));
   // 카나리아: 게시판 목록 자체가 아직 열리는가 (안 열리면 학교 서버가 우리를 막은 것)
   let canaryOk = true;
   for (const list of boards.keys()) {
