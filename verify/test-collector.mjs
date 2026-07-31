@@ -105,6 +105,15 @@ eq('상세와 무관한 폼(검색창)으로는 주소를 만들지 않는다',
   detailCandidates({ listUrl: khuList, url: khuList, rowIds: ['322635'],
     forms: [{ action: '/kor/user/search/list.do', fields: 'searchWord=' }] })
     .some((u) => u.includes('search')), false);
+/* 되돌릴 때 게시판 원래 제목을 앱의 정리된 이름으로 덮으면, 나중에 그 행을 게시판에서
+   못 찾는다 — 2026-08-01에 실제로 정식 등록 8건이 이렇게 미아가 됐다.
+   ('전문자격장학 (2026-2학기)'로 덮여서 '공지 공지 2026-2학기 전문자격장학 신청안내'를 못 찾음) */
+eq('게시판 원래 제목과 앱의 정리된 이름은 서로 못 찾는다 (덮어쓰면 안 되는 이유)',
+  sameTitle('공지 공지 2026-2학기 전문자격장학 신청안내 2026.06.01. 조회 55', '전문자격장학 (2026-2학기)'), false);
+eq('게시판 원래 제목끼리는 찾아진다',
+  sameTitle('공지 공지 2026-2학기 전문자격장학 신청안내 2026.06.01. 조회 55', '2026-2학기 전문자격장학 신청안내'), true);
+eq('글 번호가 아닌 조각으로 만든 상세 주소는 거른다 (…/detail/dongguk.edu)',
+  isDetailUrl('https://www.dongguk.edu/article/JANGHAKNOTICE/detail/dongguk.edu', dgList), false);
 eq('목록 제목과 상세 제목이 같은 글인지 알아본다',
   sameTitle('공통 2026년 충남평생교육진흥원 재능키움 장학생 2차 모집 안내',
     '[공지] 2026년 충남평생교육진흥원 재능키움 장학생 2차 모집 안내'), true);

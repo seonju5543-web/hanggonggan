@@ -94,7 +94,10 @@ export function isDetailUrl(raw, listUrl) {
 
   // ② 목록 경로 뒤에 식별자 조각이 더 붙은 경로형 상세 (동국대 …/detail/2666)
   if (/^\d{1,12}$/.test(last) && segs.length >= 2) return true;
-  if (/^(detail|view|read)$/i.test(prev)) return true;
+  /* `…/detail/<조각>` 형태는 조각이 **글 번호처럼 생겼을 때만** 상세로 본다.
+     동국 상세 화면의 name="no" value="dongguk.edu" 때문에 `…/detail/dongguk.edu` 라는
+     없는 주소가 계속 후보로 새어 나왔다 — 이름 검사만으로는 못 막아 여기서도 막는다. */
+  if (/^(detail|view|read)$/i.test(prev)) return looksLikeId(last);
 
   // 목록으로 보이는 경로는 상세가 아니다
   if (LIST_PATH.test(u.pathname) && !u.search) return false;

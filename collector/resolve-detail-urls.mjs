@@ -465,7 +465,10 @@ if (!outOfTime()) {
     for (const { d, v } of failures.filter((x) => !NETWORK_FAIL.test(x.v.why))) {
       const list = [...boards.keys()].find((l) => { try { return d.ref[d.urlField].startsWith(new URL(l).origin); } catch { return false; } });
       if (!list) { report.push(`- ⚠️ ${d.id || d.title.slice(0, 30)} 확인 실패(${v.why})이지만 되돌릴 목록 주소를 몰라 그대로 둡니다`); continue; }
-      if (!DRY) d.ref[d.urlField] = `${list}#n-${encodeURIComponent(String(d.title).slice(0, 40))}`;
+      /* 되돌릴 때는 **게시판에 적힌 원래 제목**을 써야 한다. 앱에 보여주는 이름으로 덮으면
+         나중에 그 행을 게시판에서 못 찾는다 (2026-08-01에 실제로 8건이 이렇게 미아가 됐다). */
+      const back = (d.ref.boardTitle || '').trim() || String(d.title);
+      if (!DRY) d.ref[d.urlField] = `${list}#n-${encodeURIComponent(back.slice(0, 40))}`;
       reverted += 1;
       report.push(`- ↩️ 되돌림(${v.why}): ${d.id || ''} ${String(d.title).slice(0, 40)}`);
     }

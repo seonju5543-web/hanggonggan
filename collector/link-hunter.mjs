@@ -75,6 +75,13 @@ for (const n of notices.items || []) {
 for (const r of registered.items || []) {
   if (isMarkerUrl(r.sourceUrl)) targets.push({ ref: r, field: 'sourceUrl', title: r.name, key: `r:${r.id}`, id: r.id, school: (r.eligibility || {}).schoolOnly });
 }
+/* 게시판에서 행을 찾을 때 쓰는 제목은 **게시판에 적힌 원래 제목**이어야 한다.
+   앱에 보여주는 이름(r.name)은 사람이 다듬은 것이라("전문자격장학 (2026-2학기)")
+   게시판 행("공지 공지 2026-2학기 전문자격장학 신청안내 …")과 안 맞아 못 찾는다.
+   표식(#n-)에 든 제목이 원래 제목이고, boardTitle 필드가 있으면 그게 더 정확하다. */
+function huntTitle(t) {
+  return (t.ref.boardTitle || '').trim() || markerTitle(t.ref[t.field]) || String(t.title);
+}
 
 /* 이미 포기한 건은 건너뛴다 (하지만 리포트에는 남긴다) */
 const skipped = [];
@@ -225,7 +232,7 @@ for (const [listUrl, group] of boards) {
 
     for (const t of [...remaining.values()]) {
       if (outOfTime()) break;
-      const want = markerTitle(t.ref[t.field]);
+      const want = huntTitle(t);
       const others = rows.map((r) => r.t).filter((x) => !sameTitle(want, x)).slice(0, 40);
       const idx = rows.findIndex((r) => sameTitle(want, r.t));
       if (idx < 0) continue;                       // 이 페이지엔 없다 — 다음 페이지에서 찾는다
@@ -276,7 +283,7 @@ for (const [listUrl, group] of boards) {
       rows = await scrapeRows(page);
 
       if (url) {
-        if (!DRY) t.ref[t.field] = url;
+        if (!DRY) { t.ref[t.field] = url; if (!t.ref.boardTitle) t.ref.boardTitle = want; }
         found += 1;
         record(t, 'ok');
         report.push(`  - ✅ ${want.slice(0, 42)} → ${url.slice(0, 104)}`);
@@ -293,7 +300,7 @@ for (const [listUrl, group] of boards) {
     failed += 1;
     record(t, 'bad', '목록에서 못 찾음');
     const st = state.items[t.key];
-    report.push(`  - ⚠️ 목록에서 못 찾음 (${st.attempts}/${GIVE_UP_AFTER}회): ${markerTitle(t.ref[t.field]).slice(0, 46)}`);
+    report.push(`  - ⚠️ 목록에서 못 찾음 (${st.attempts}/${GIVE_UP_AFTER}회): ${huntTitle(t).slice(0, 46)}`);
   }
   await page.close().catch(() => {});
   report.push('');
