@@ -21,6 +21,7 @@ node personas.js            # 페르소나 스윕: 120종 사용자 조합으로
 ## 개발자 도우미 (서버 불필요 — data/*.json만 읽음)
 
 ```bash
+node verify/check-deploy-sync.js         # 배포 반영 확인: 지금 작업분이 실제로 앱(main)에 나가 있는지 대조
 node verify/list-unregistered.js         # 수집됐지만 미등록인 공고를 학교별로 추림 (컨펌 대상 후보)
 node verify/list-unregistered.js --all    # 제외분(중복·메뉴·대출·행사·마감경과) 사유까지 전부 표시
 ```
