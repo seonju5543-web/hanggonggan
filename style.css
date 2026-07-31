@@ -989,3 +989,17 @@ textarea:focus {
 .nf-switch:checked { background: var(--primary); }
 .nf-switch:checked::after { transform: translateX(18px); }
 .nf-set-actions { display: flex; gap: 6px; margin-top: 14px; flex-wrap: wrap; }
+
+/* 진짜 푸시(앱을 켜지 않아도 받기) 설정 블록 */
+.nf-push {
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  background: rgba(18, 22, 31, 0.03);
+  border: 1px solid var(--line);
+}
+.nf-push.nf-push-on { background: var(--green-weak); border-color: rgba(15, 157, 99, 0.2); }
+.nf-push.nf-push-off { opacity: 0.85; }
+.nf-push-title { font-size: 14.5px; font-weight: 700; letter-spacing: -0.015em; }
+.nf-push .nf-desc { display: block; margin-top: 5px; }
+.nf-push .wallet-btn[disabled] { opacity: 0.45; cursor: default; }

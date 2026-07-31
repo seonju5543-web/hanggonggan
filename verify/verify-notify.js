@@ -84,7 +84,8 @@ async function onboard(page) {
     const typeCount = await page.$$eval('#notify-sheet .nf-type-list li', (els) => els.length);
     ok(typeCount === 5, '알림 종류 5가지를 미리 안내', typeCount);
     const honesty = await page.textContent('#notify-sheet .sheet-note');
-    ok(/발송 서버 없이/.test(honesty), '전달 방식을 정직하게 안내(서버 없음)', honesty.slice(0, 40));
+    // 발송 서버가 붙기 전/후로 문구가 달라진다 — 어느 쪽이든 '전달 시점'을 정직하게 밝혀야 한다
+    ok(/발송 서버가 없어요|앱을 켜지 않아도/.test(honesty), '전달 방식을 정직하게 안내', honesty.slice(0, 40));
     await page.screenshot({ path: SHOT('01-consent') });
 
     await page.click('#btn-nf-later');

@@ -19,6 +19,8 @@ node personas.js            # 페르소나 스윕: 120종 사용자 조합으로
 node verify-source-links.js # 원문 링크 검증: '원문 공고 ↗'가 정말 그 공고로 가는지 (아래 설명)
 node verify-notify-rules.js # 알림 규칙 단위 검증 (서버·브라우저 불필요 — 언제 알림이 가고 안 가는지 고정)
 node verify-notify.js       # 알림 시스템 브라우저 검증: 최초 1회 동의 → 조건별 발송 → 알림함 → 설정 → 딥링크
+node verify-push-server.mjs # 진짜 푸시 서버 검증: VAPID 서명을 실제로 검증 · 깨울 학교 판정 · 구독 저장 (서버 불필요)
+node verify-push-client.js  # 진짜 푸시 앱 검증: 미설정/설정 두 상태 · 개인정보가 서버로 새지 않는지 요청 본문 전수 검사
 ```
 
 `verify-source-links.js` — 2026-07-31 신설. 앱에서 장학 공고를 열고 원문 링크를 눌렀을 때

@@ -295,7 +295,9 @@ function notifyConsentSheet() {
       <p class="sheet-summary" style="margin-top:6px">마감을 놓쳐서 못 받는 장학금이 가장 아까워요.<br />꼭 필요한 것만 골라서 알려드릴게요.</p>
     </div>
     <ul class="nf-type-list">${typeRows}</ul>
-    <p class="sheet-note">💡 한대장은 발송 서버 없이 동작해요. 알림은 <strong>앱을 열 때</strong>와 <strong>앱을 열어 둔 동안</strong>, 그리고 휴대폰이 지원하면 백그라운드 자동 확인 시점에 전달돼요. 언제든 MY에서 끄고 켤 수 있어요.</p>
+    <p class="sheet-note">💡 ${pushConfigured()
+      ? '알림은 <strong>앱을 켜지 않아도</strong> 폰으로 도착해요. 알림 내용은 이 기기 안에서 만들어지고, 서버에는 폰 주소와 학교만 저장돼요.'
+      : '한대장은 아직 발송 서버가 없어요. 알림은 <strong>앱을 열 때</strong>와 <strong>앱을 열어 둔 동안</strong>, 그리고 휴대폰이 지원하면 백그라운드 자동 확인 시점에 전달돼요.'} 언제든 MY에서 끄고 켤 수 있어요.</p>
     ${sup.iosNeedsInstall ? '<p class="sheet-note">📱 iPhone은 사파리 공유 → <strong>홈 화면에 추가</strong>로 앱을 설치하면 알림을 받을 수 있어요.</p>' : ''}
     <button class="btn btn-primary btn-lg" id="btn-nf-allow" style="margin-top:16px">알림 받기</button>
     <button class="btn btn-outline" id="btn-nf-later" style="margin-top:8px">나중에 할게요</button>
@@ -310,7 +312,10 @@ function notifyConsentSheet() {
     closeNotifyPanel();
     if (perm === 'granted') {
       notifyRegisterBackground();
-      toast('알림을 켰어요. 새 공고와 마감을 챙겨드릴게요');
+      const p = await pushSubscribe(); // 발송 서버가 있으면 '앱을 안 켜도 오는 알림'까지 한 번에 켠다
+      toast(p.ok
+        ? '알림을 켰어요. 앱을 켜지 않아도 폰으로 알려드릴게요'
+        : '알림을 켰어요. 새 공고와 마감을 챙겨드릴게요');
     } else if (perm === 'denied') {
       toast('브라우저에서 알림이 차단돼 있어요. 앱 안 알림함으로 계속 알려드릴게요');
     } else {
@@ -361,6 +366,28 @@ function notifySettingsHtml() {
       <input type="checkbox" class="nf-switch" data-nf-pref="${t.id}" ${notifyLedger.prefs[t.id] ? 'checked' : ''} />
     </label>`).join('');
 
+  /* 진짜 푸시(앱을 안 켜도 오는 알림) — 발송 서버가 배포된 경우에만 보여준다 */
+  const canPush = pushConfigured();
+  const pushOn = pushActive();
+  const iosNotInstalled = /iPad|iPhone|iPod/.test(navigator.userAgent) && !sup.standalone;
+  const pushBlock = !canPush ? `
+    <div class="nf-push nf-push-off">
+      <p class="nf-push-title">📴 앱을 켜지 않아도 받기 — 준비 중</p>
+      <p class="nf-desc">지금은 <strong>앱을 열 때</strong> 알림을 확인해요. 발송 서버가 연결되면 앱을 켜지 않아도 폰으로 바로 도착해요.</p>
+    </div>`
+    : `
+    <div class="nf-push${pushOn ? ' nf-push-on' : ''}">
+      <div class="nf-set-head" style="margin-bottom:6px">
+        <p class="nf-push-title">${pushOn ? '📲 앱을 켜지 않아도 받는 중' : '📴 앱을 켜지 않아도 받기'}</p>
+        <button class="wallet-btn ${pushOn ? '' : 'primary'}" id="btn-nf-push" ${on ? '' : 'disabled'}>${pushOn ? '끄기' : '켜기'}</button>
+      </div>
+      <p class="nf-desc">${pushOn
+        ? '앱을 닫아 두거나 화면이 꺼져 있어도 마감·새 공고 알림이 폰으로 도착해요.'
+        : (on ? '켜면 앱을 실행하지 않아도 폰으로 알림이 도착해요.' : '먼저 위에서 알림을 켜 주세요.')}</p>
+      ${iosNotInstalled ? '<p class="nf-desc">📱 iPhone은 사파리 <strong>공유 → 홈 화면에 추가</strong>로 설치해야 이 기능을 쓸 수 있어요.</p>' : ''}
+      <p class="nf-desc">서버에는 <strong>폰 주소와 학교</strong>만 저장돼요 — 이름·성적·소득·서류는 이 기기 밖으로 나가지 않아요.</p>
+    </div>`;
+
   return `
     <div class="nf-set-head">
       <div>
@@ -370,7 +397,10 @@ function notifySettingsHtml() {
       <button class="wallet-btn ${on ? '' : 'primary'}" id="btn-nf-toggle">${on ? '끄기' : '켜기'}</button>
     </div>
     <div class="nf-prefs">${rows}</div>
-    <p class="wallet-sub" style="margin-top:12px">한대장은 발송 서버가 없어서, 알림은 <strong>앱을 열 때 · 열어 둔 동안</strong> 확인해 보내드려요(안드로이드 설치형은 백그라운드 확인도 지원). 알림 내용은 이 기기 안에서만 만들어지고 밖으로 나가지 않아요.</p>
+    ${pushBlock}
+    <p class="wallet-sub" style="margin-top:12px">${canPush && pushOn
+      ? '알림 내용은 이 기기 안에서 만들어져요 — 서버는 "확인해 보라"고 폰을 깨우기만 해요.'
+      : '지금은 <strong>앱을 열 때 · 열어 둔 동안</strong> 확인해 알려드려요(안드로이드 설치형은 백그라운드 확인도 지원). 알림 내용은 이 기기 안에서만 만들어지고 밖으로 나가지 않아요.'}</p>
     <div class="nf-set-actions">
       <button class="wallet-btn" id="btn-nf-inbox">알림함 열기</button>
       <button class="wallet-btn" id="btn-nf-test">테스트 알림</button>
@@ -387,6 +417,7 @@ function bindNotifySettings() {
     if (notifyLedger.enabled && sup.permission === 'granted') {
       notifyLedger.enabled = false;
       await notifySaveLedger();
+      await pushUnsubscribe(); // 알림을 끄면 서버가 폰을 깨우는 것도 함께 멈춘다
       toast('휴대폰 알림을 껐어요. 앱 안 알림함에는 계속 쌓여요');
     } else {
       const perm = await notifyRequestPermission();
@@ -395,6 +426,22 @@ function bindNotifySettings() {
       await notifySaveLedger();
       if (perm === 'granted') { notifyRegisterBackground(); toast('알림을 켰어요'); }
       else if (perm === 'denied') toast('브라우저 사이트 설정에서 알림을 허용해 주세요');
+    }
+    renderMy();
+  });
+
+  const pushBtn = $('#btn-nf-push');
+  if (pushBtn) pushBtn.addEventListener('click', async () => {
+    pushBtn.disabled = true;
+    if (pushActive()) {
+      await pushUnsubscribe();
+      toast('앱을 켜야 알림을 확인할 수 있게 됐어요');
+    } else {
+      const r = await pushSubscribe();
+      if (r.ok) toast('이제 앱을 켜지 않아도 폰으로 알림이 도착해요');
+      else if (r.reason === 'permission') toast('먼저 위에서 알림을 켜 주세요');
+      else if (r.reason === 'unsupported') toast('이 브라우저는 아직 지원하지 않아요 (iPhone은 홈 화면에 추가해 주세요)');
+      else toast('연결에 실패했어요. 잠시 후 다시 시도해 주세요');
     }
     renderMy();
   });
@@ -426,6 +473,103 @@ function bindNotifySettings() {
       ? '테스트 알림을 보냈어요'
       : '알림함에 테스트 알림을 넣었어요 (휴대폰 알림은 꺼져 있어요)');
   });
+}
+
+/* ============================================================
+   진짜 푸시 (앱을 켜지 않아도 폰에 오는 알림)
+   ------------------------------------------------------------
+   발송 서버(server/push/)가 "확인해 봐"라고 폰을 깨우면, 서비스워커가 **기기 안 프로필로**
+   판단해 알림을 띄운다. 그래서 이름·성적·소득 같은 개인정보는 서버로 나가지 않고
+   **폰 주소와 학교만** 등록된다.
+   push-config.js가 비어 있으면(=서버 미배포) 이 절은 통째로 잠들어 아무 일도 하지 않는다.
+   ============================================================ */
+
+/* 브라우저가 진짜 푸시를 지원하는지 (iOS는 홈 화면에 설치해야 지원한다) */
+function pushSupported() {
+  return typeof PushManager !== 'undefined' && 'serviceWorker' in navigator && typeof Notification !== 'undefined';
+}
+
+function urlB64ToUint8(base64) {
+  const padded = (base64 + '='.repeat((4 - (base64.length % 4)) % 4)).replace(/-/g, '+').replace(/_/g, '/');
+  const raw = atob(padded);
+  return Uint8Array.from(raw, (c) => c.charCodeAt(0));
+}
+
+async function pushRegistration() {
+  if (typeof swReg !== 'undefined' && swReg) return swReg;
+  try { return await navigator.serviceWorker.ready; } catch (e) { return null; }
+}
+
+/* 폰을 발송 서버에 등록 — 성공하면 앱을 안 켜도 알림이 온다 */
+async function pushSubscribe() {
+  if (!pushConfigured()) return { ok: false, reason: 'unconfigured' };
+  if (!pushSupported()) return { ok: false, reason: 'unsupported' };
+  if (Notification.permission !== 'granted') return { ok: false, reason: 'permission' };
+
+  const reg = await pushRegistration();
+  if (!reg || !reg.pushManager) return { ok: false, reason: 'unsupported' };
+
+  let sub;
+  try {
+    sub = await reg.pushManager.getSubscription();
+    if (!sub) {
+      sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true, // 받은 푸시는 반드시 눈에 보이는 알림으로 띄운다는 약속
+        applicationServerKey: urlB64ToUint8(PUSH_CONFIG.publicKey),
+      });
+    }
+  } catch (e) { return { ok: false, reason: 'subscribe-failed' }; }
+
+  const p = (typeof state !== 'undefined' && state.profile) || {};
+  try {
+    const res = await fetch(PUSH_CONFIG.endpoint.replace(/\/+$/, '') + '/subscribe', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      // 서버로 나가는 것은 이 세 가지뿐이다 — 이름·성적·소득·서류는 기기 밖으로 나가지 않는다
+      body: JSON.stringify({ endpoint: sub.endpoint, school: p.school || '', campus: p.campus || '' }),
+    });
+    if (!res.ok) return { ok: false, reason: 'server' };
+  } catch (e) { return { ok: false, reason: 'network' }; }
+
+  notifyLedger.pushEndpoint = sub.endpoint;
+  notifyLedger.pushSchool = p.school || '';
+  await notifySaveLedger();
+  return { ok: true };
+}
+
+/* 등록 해제 — 서버에서도 지우고 브라우저 구독도 끊는다 */
+async function pushUnsubscribe() {
+  const endpoint = notifyLedger && notifyLedger.pushEndpoint;
+  try {
+    const reg = await pushRegistration();
+    const sub = reg && reg.pushManager ? await reg.pushManager.getSubscription() : null;
+    if (sub) await sub.unsubscribe();
+  } catch (e) { /* 이미 끊겼으면 무시 */ }
+  if (endpoint && pushConfigured()) {
+    try {
+      await fetch(PUSH_CONFIG.endpoint.replace(/\/+$/, '') + '/unsubscribe', {
+        method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ endpoint }),
+      });
+    } catch (e) { /* 서버가 잠깐 죽어도 앱 쪽은 끊긴다 */ }
+  }
+  if (notifyLedger) {
+    notifyLedger.pushEndpoint = null;
+    notifyLedger.pushSchool = '';
+    await notifySaveLedger();
+  }
+}
+
+function pushActive() {
+  return !!(notifyLedger && notifyLedger.pushEndpoint && pushConfigured());
+}
+
+/* 학교를 바꾸면 서버에 등록된 학교도 따라가야 한다 (안 그러면 남의 학교 공고로 깨워진다) */
+async function pushSyncSchool() {
+  if (!pushActive()) return;
+  const p = (typeof state !== 'undefined' && state.profile) || {};
+  if ((p.school || '') === (notifyLedger.pushSchool || '')) return;
+  await pushSubscribe();
 }
 
 /* 데이터 초기화와 함께 알림 설정·알림함도 지운다 (MY → 데이터 초기화) */
@@ -491,6 +635,9 @@ async function notifyInit() {
     });
   }
 
-  if (notifyLedger.enabled) notifyRegisterBackground();
+  if (notifyLedger.enabled) {
+    notifyRegisterBackground();
+    pushSyncSchool().catch(() => {});   // 학교를 바꿨으면 서버 등록도 따라간다
+  }
   notifyMaybeAskConsent(1800);
 }
