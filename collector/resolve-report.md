@@ -1,7 +1,7 @@
-## 🔗 원문 링크 복구 리포트 (2026-07-31 21:54 KST)
+## 🔗 원문 링크 복구 리포트 (2026-08-01 00:38 KST)
 
-판: 7차(게시판 폼으로 원문 주소 조립) · 커밋 7eed770
-고칠 대상: **33건** (실시간 공고 24 · 정식 등록 9) · 게시판 2곳
+판: 7차(게시판 폼으로 원문 주소 조립) · 커밋 264430f
+고칠 대상: **10건** (실시간 공고 8 · 정식 등록 2) · 게시판 1곳
 
 ### https://www.dongguk.edu/article/JANGHAKNOTICE/list
 - 대상 8건
@@ -40,48 +40,10 @@
       (폼) action=https://search.dongguk.edu/search.do method=get · kwd=&lang=ko
       (폼) action=/article/JANGHAKNOTICE/list method=post · category_cd=&article_seq=&flag=&pageIndex=1&searchCondition=TA.SUBJECT&searchKeyword=
 
-### https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318
-- 대상 25건
-- 목록 6페이지에서 행 172개
-    · 탈락(제목 불일치(다른 글이 열림)) https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322635
-  - ✅ 공통 2026년 화성시인재육성재단 소상공인 장학금 장학생 모집 안내 → https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322635
-    · 탈락(제목 불일치(다른 글이 열림)) https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322634
-  - ✅ 공통 2026년 (재)김해시미래인재장학재단 제3회 장학수기 공모전 공고 → https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322634
-  - ✅ 공통 2026년 상반기 사랑나눔장학생 모집 공고 → https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322606
-  - ✅ 서울 2026학년도 2학기 가송재단 장학생 모집 안내(~7/27까지 신청 → https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322581
-  - ✅ 국제 2026년도 2학기 쌍용곰두리장학생 모집 안내(국제C 7/21까지  → https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322564
-  - ✅ 서울 2026학년도 2학기 경희인턴(교내장학) 장학생 모집 공고[서울캠퍼 → https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322541
-  - ✅ 공통 2026년도 포스코청암재단 포스코비전장학생 선발 안내 → https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322536
-  - ✅ 공통 2026년 충남평생교육진흥원 재능키움 장학생 2차 모집 안내 → https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322535
-  - ✅ 공통 2026년도 정읍시민장학재단 우수인재장학금 장학생 선발 안내 → https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322469
-  - ✅ 서울 2026년 자생한방병원 일반수련의 장학생 모집 → https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322436
-  - ✅ 공통 2026년도 2학기 쌍용곰두리장학생 모집 안내(~7/19까지 신청) → https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322427
-  - ✅ 공통 2026년도 세종이도인재장학금 디딤돌 장학사업 학자금 대출 관련분야 → https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322416
-  - ✅ 공통 2026 의암 손병희 우수논문 장학생 선발 공고 → https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322415
-  - ✅ 공통 2026학년도 2학기 삼일장학회 희망/동행 장학생 선발 안내(7/2 → https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322385
-  - ⚠️ 목록에서 못 찾음(내려갔거나 제목 변경): 공통 2026-2학기 한국장학재단 농촌출신대학생 학자금대출 신청 안내(2
-  - ⚠️ 목록에서 못 찾음(내려갔거나 제목 변경): 공통 2026-2학기 한국장학재단 학자금대출(일반/취업후) 신청 안내(2
-  - ✅ 서울 2026학년도 2학기 신격호 롯데장학관 입주생 모집(~7/10까지  → https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322346
-  - ✅ 공통 2026년도 윤세영 스칼라십 신규 장학생 선발 안내 → https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322348
-  - ✅ 공통 2026학년도 2학기 삼일장학회 희망/동행 장학생 선발 안내(7/2 → https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322385
-  - ✅ 공통 2026 의암 손병희 우수논문 장학생 선발 공고 → https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322415
-  - ✅ 서울 2026학년도 2학기 신격호 롯데장학관 입주생 모집(~7/10까지  → https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322346
-  - ✅ 서울 2026학년도 2학기 양천장학회 신규 장학생 모집 안내(7월 22까 → https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322298
-  - ✅ 공통 2026년도 정읍시민장학재단 우수인재장학금 장학생 선발 안내 → https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322469
-  - ✅ 공통 2026년 충남평생교육진흥원 재능키움 장학생 2차 모집 안내 → https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322535
-  - ✅ 서울 2026학년도 2학기 경희인턴(교내장학) 장학생 모집 공고[서울캠퍼 → https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322541
-  - (진단) 후보 주소 207개 생성 · 목록 행 생김새:
-      <a href="/kor/user/contents/view.do?menuNo=200191"> 네오르네상스장학</a>
-      <a href="javascript:view('322635','');"> 
-      <a href="javascript:view('322634','');"> 
-      (클릭 함수) view = function view(boardId, catId) { var form = document.item; form.elements["boardId"].value = boardId; form.elements["catId"].value = catId; form.elements["pageIndex"].value = $(".pager a.active").text(); form.submit(); }
-      (폼) action=/kor/user/search/list.do method=get · searchWord=
-      (폼) action=/kor/user/contents/view.do method=post · menuNo=200226&boardId=
-
 ### 소급 재검사 (이미 고쳐 둔 주소가 정말 그 공고로 가는가)
-- ⏸ 되돌리기 취소 — 실패 비율이 너무 높습니다(61/68). 주소가 틀린 게 아니라 학교 서버가 우리를 막고 있는 상황으로 보고 아무것도 되돌리지 않습니다.
-- 재검사 68건 · 확인 실패 61건 · 실제 되돌림 0건
+- ⏸ 되돌리기 취소 — 실패 비율이 너무 높습니다(40/45). 주소가 틀린 게 아니라 학교 서버가 우리를 막고 있는 상황으로 보고 아무것도 되돌리지 않습니다.
+- 재검사 45건 · 확인 실패 40건 · 실제 되돌림 0건
 
 ---
-복구 **23건** · 실패 10건 · 소급 재검사 68건 중 되돌림 0건
+복구 **0건** · 실패 8건 · 소급 재검사 45건 중 되돌림 0건
 실패분은 목록 주소를 그대로 두었습니다 — 앱은 이 경우 "게시판 목록이 열려요"라고 정직하게 알립니다.
