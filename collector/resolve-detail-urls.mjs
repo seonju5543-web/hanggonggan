@@ -43,15 +43,17 @@ for (const r of registered.items || []) {
 }
 
 /* 게시판별로 묶는다 — 게시판 하나를 한 번만 열기 위해 */
+const ONLY = process.env.RESOLVE_ONLY_BOARD || '';   // 게시판 하나만 빠르게 돌려 볼 때
 const boards = new Map();
 for (const t of targets) {
   const list = listUrlOf(t.url);
+  if (ONLY && !list.includes(ONLY)) continue;
   if (!boards.has(list)) boards.set(list, []);
   boards.get(list).push(t);
 }
 
 const report = [`## 🔗 원문 링크 복구 리포트 (${new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 16).replace('T', ' ')} KST)`, ''];
-report.push(`판: 3차(진단 상시) · 커밋 ${process.env.GITHUB_SHA ? process.env.GITHUB_SHA.slice(0, 7) : 'local'}`);
+report.push(`판: 4차(클릭 함수 진단) · 커밋 ${process.env.GITHUB_SHA ? process.env.GITHUB_SHA.slice(0, 7) : 'local'}`);
 report.push(`고칠 대상: **${targets.length}건** (실시간 공고 ${targets.filter((t) => t.kind === 'notice').length} · 정식 등록 ${targets.filter((t) => t.kind === 'registered').length}) · 게시판 ${boards.size}곳`);
 report.push('');
 
@@ -311,6 +313,25 @@ for (const [listUrl, group] of boards) {
   report.push(`  - (진단) 후보 주소 ${boardCandidateTotal}개 생성 · 목록 행 생김새:`);
   rows.filter((r) => /장학/.test(r.t)).slice(0, 3)
     .forEach((r) => report.push(`      ${r.html.replace(/\s+/g, ' ').slice(0, 260)}`));
+  /* 클릭 함수가 '실제로 무엇을 어디로 보내는지'를 그대로 뜬다.
+     경희대는 행이 `javascript:view('322635','')`인데, 글 번호만 알고 조립한
+     `view.do?menuNo=…&nttId=…`는 그 글이 아닌 화면을 돌려줬다. 이름을 짐작하지 말고
+     함수 본문과 폼(주소·필드)을 봐야 어떤 파라미터가 필요한지 알 수 있다. */
+  const clickFn = await page.evaluate(() => {
+    const out = {};
+    for (const name of ['view', 'fn_view', 'goView', 'doView', 'fnView', 'go_view']) {
+      try { if (typeof window[name] === 'function') out[name] = String(window[name]).replace(/\s+/g, ' ').slice(0, 400); } catch { /* 접근 불가 */ }
+    }
+    const forms = [...document.querySelectorAll('form')].slice(0, 2).map((f) => ({
+      action: f.getAttribute('action') || '', method: f.getAttribute('method') || '',
+      fields: [...f.querySelectorAll('input,select')].map((i) => `${i.name}=${i.value}`).slice(0, 14).join('&'),
+    }));
+    return { fns: out, forms };
+  }).catch(() => null);
+  if (clickFn) {
+    for (const [k, v] of Object.entries(clickFn.fns || {})) report.push(`      (클릭 함수) ${k} = ${v}`);
+    (clickFn.forms || []).forEach((f) => report.push(`      (폼) action=${f.action} method=${f.method} · ${f.fields.slice(0, 220)}`));
+  }
   await page.close().catch(() => {});
   report.push('');
 }

@@ -48,6 +48,7 @@ jobs:
       - id: run
         env:
           RESOLVE_BUDGET_MS: '1500000'   # 25분 — 못 끝낸 것은 다음 주 실행이 이어서 고친다
+          RESOLVE_ONLY_BOARD: ${{ vars.RESOLVE_ONLY_BOARD }}   # 비어 있으면 전체 게시판 (진단할 때만 씀)
         run: node collector/resolve-detail-urls.mjs ${{ inputs.dry && '--dry' || '' }}
 
       # 데이터 관문 — 고친 주소가 규칙을 어기면 저장하지 않는다
