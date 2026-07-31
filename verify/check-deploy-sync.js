@@ -40,7 +40,31 @@ for (const f of COLLECTORS) {
     wfBad++;
   }
 }
-if (wfBad === 0) console.log('✅ 수집 로봇 3종: 저장 위치·실패 알림 정상\n');
+if (wfBad === 0) console.log('✅ 수집 로봇 3종: 저장 위치·실패 알림 정상');
+
+/* ── 배포 동기화가 '데이터를 고치는 로봇'을 전부 알고 있나 (2026-08-01 추가) ─────────
+   로봇이 기본 브랜치에 커밋해도, deploy-sync의 workflow_run 목록에 그 로봇 이름이 없으면
+   앱까지 밀어 올려지지 않는다 — '하루 2회 보정'에 걸릴 때까지 최대 12시간 안 나간다.
+   (로봇의 push는 GitHub 규칙상 push 트리거를 못 깨우기 때문.)
+   새 로봇을 만들고 이 목록에 추가하는 걸 잊는 실수를 여기서 잡는다. */
+let syncBad = 0;
+try {
+  const sync = fs.readFileSync('.github/workflows/deploy-sync.yml', 'utf8');
+  const watched = (sync.match(/workflows:\s*\[([\s\S]*?)\]/) || [])[1] || '';
+  for (const f of fs.readdirSync('.github/workflows')) {
+    if (!/\.ya?ml$/.test(f) || /deploy-sync|main-guard|update-progress|check-live|probe-boards|fetch-page/.test(f)) continue;
+    const y = fs.readFileSync(`.github/workflows/${f}`, 'utf8');
+    // 데이터 파일을 커밋하는 워크플로만 대상
+    if (!/git add[^\n]*data\/(notices|registered)\.json/.test(y)) continue;
+    const name = (y.match(/^name:\s*(.+)$/m) || [])[1]?.trim();
+    if (name && !watched.includes(name)) {
+      console.log(`❌ deploy-sync가 '${name}'(${f})를 모릅니다 — 이 로봇이 고친 데이터는 최대 12시간 앱에 안 나갑니다.`);
+      console.log("   → .github/workflows/deploy-sync.yml 의 workflow_run.workflows 목록에 이름을 추가하세요.");
+      syncBad++;
+    }
+  }
+} catch { /* 파일이 없으면 검사 생략 */ }
+if (!syncBad) console.log('✅ 배포 동기화가 데이터 로봇 전부를 감시 중\n');
 
 /* 앱이 실제로 읽어가는 파일들 — 이것만 main에 있으면 사용자 화면이 최신이다 */
 const APP_PATHS = ['index.html', 'app.js', 'style.css', 'forms.js', 'data.js', 'sw.js', 'manifest.json', 'data', 'icons'];
