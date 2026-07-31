@@ -29,7 +29,7 @@
    "name": "남가주동문장학회 장학생 선발",
    "target": "남가주동문",
    "added": "2026-07-30",
-   "fetched": false,
+   "fetched": true,
    "schematized": false
   },
   {
@@ -37,7 +37,7 @@
    "name": "2026-2 가송재단 장학생 모집(외대)",
    "target": "가송재단",
    "added": "2026-07-30",
-   "fetched": false,
+   "fetched": true,
    "schematized": false
   },
   {
@@ -45,7 +45,7 @@
    "name": "양천장학회 장학금 신청 안내(외대 후기)",
    "target": "양천장학회",
    "added": "2026-07-30",
-   "fetched": false,
+   "fetched": true,
    "schematized": false
   },
   {
@@ -53,7 +53,7 @@
    "name": "가송재단 장학생 선발 안내(광운)",
    "target": "가송재단",
    "added": "2026-07-30",
-   "fetched": false,
+   "fetched": true,
    "schematized": false
   }
  ]
