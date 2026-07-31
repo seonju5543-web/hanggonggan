@@ -77,18 +77,8 @@ function dday(dateStr) {
   return { label: `D-${d}`, cls: '', days: d };
 }
 
-/* 마감일을 확정하지 못한 공고(원문에 마감이 없거나 못 읽은 경우)는 dday가 '기한 원문 확인'이라
-   목록에서 영영 사라지지 않는다 — 지난 학기 공고가 계속 떠 있는 문제가 있었다(2026-07-30 발견).
-   그래서 등록일(listedAt)로부터 60일이 지나면 숨긴다. 실시간 공고의 60일 규칙과 같은 기준이다.
-   마감이 있는 공고는 기존대로 '마감 + 30일' 규칙만 적용된다. */
-const STALE_DAYS = 60;
-function notStale(sch) {
-  if (sch.deadline || !sch.listedAt) return true;
-  const listed = new Date(sch.listedAt + 'T00:00:00');
-  if (Number.isNaN(listed.getTime())) return true;
-  const startOfToday = new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate());
-  return Math.round((startOfToday - listed) / 86400000) <= STALE_DAYS;
-}
+/* notStale(오래된 공고 숨김)은 match-engine.js에 있다 — 화면에서 숨긴 공고를
+   알림으로는 알리는 모순이 생기지 않도록 알림 규칙도 같은 함수를 쓴다. */
 
 const STATUS_META = {
   eligible:   { label: '신청 가능',        cls: 'ok' },

@@ -121,6 +121,7 @@ async function notifyCheck({ quiet = false } = {}) {
     notices,
     ledger: notifyLedger,
     matchStatus: (sch) => evaluate(sch, state.profile).status,
+    notStale: (sch) => notStale(sch),   // 화면이 숨긴 오래된 공고는 알림도 하지 않는다
   });
   notifyLedger = out.ledger;
 

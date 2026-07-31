@@ -115,6 +115,17 @@ var NOTIFY_RULES = (function () {
     var statusOf = typeof ctx.matchStatus === 'function'
       ? ctx.matchStatus
       : function () { return 'unknown'; };
+    /* 화면에서 숨겨진 오래된 공고는 알림도 하지 않는다 — 눌러도 찾을 수 없는 공고를
+       알리면 사용자만 혼란스럽다. 판정은 match-engine.js의 notStale 하나로 통일한다.
+       (호출자가 넘겨주지 않으면 전역에 실린 notStale을 쓰고, 그마저 없으면 거르지 않는다) */
+    var isFresh = ctx.notStale;
+    if (typeof isFresh !== 'function') {
+      isFresh = (typeof notStale === 'function')
+        ? function (s) { return notStale(s, now); }
+        : function () { return true; };
+    }
+    list = list.filter(isFresh);
+
     var byId = {};
     list.forEach(function (s) { byId[s.id] = s; });
 

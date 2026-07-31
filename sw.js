@@ -148,6 +148,7 @@ async function backgroundCheck() {
     notices: (notices && notices.items) || [],
     ledger,
     matchStatus: (sch) => evaluate(sch, profile).status,
+    notStale: (sch) => notStale(sch),
   });
 
   if (out.events.length) {

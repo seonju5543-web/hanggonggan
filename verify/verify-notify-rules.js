@@ -4,7 +4,7 @@
 const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const RULES = require(path.join(ROOT, 'notify-rules.js'));
-const { evaluate: matchEval, scopedToProfile } = require(path.join(ROOT, 'match-engine.js'));
+const { evaluate: matchEval, scopedToProfile, notStale } = require(path.join(ROOT, 'match-engine.js'));
 
 let fail = 0;
 function ok(cond, label, extra) {
@@ -31,6 +31,7 @@ const mk = (id, over = {}) => Object.assign({
 const run = (ctx) => RULES.evaluate(Object.assign({
   now: NOW, profile, applications: [], scholarships: [], notices: [],
   matchStatus: (s) => matchEval(s, profile).status,
+  notStale: (s) => notStale(s, NOW),
 }, ctx));
 
 console.log('\n[1] 첫 실행(baseline) — 기존 공고를 새 공고라며 쏟아내지 않는다');

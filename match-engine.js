@@ -89,6 +89,21 @@ function fitScore(sch, result, p) {
   return Math.max(5, Math.min(99, score));
 }
 
+/* 마감일을 확정하지 못한 공고(원문에 마감이 없거나 못 읽은 경우)는 dday가 '기한 원문 확인'이라
+   목록에서 영영 사라지지 않는다 — 지난 학기 공고가 계속 떠 있는 문제가 있었다(2026-07-30 발견).
+   그래서 등록일(listedAt)로부터 60일이 지나면 숨긴다. 실시간 공고의 60일 규칙과 같은 기준이다.
+   마감이 있는 공고는 기존대로 '마감 + 30일' 규칙만 적용된다.
+   **알림도 이 함수를 쓴다** — 화면에서 숨긴 공고를 알림으로 알리면 사용자는 눌러도 찾을 수 없다. */
+const STALE_DAYS = 60;
+function notStale(sch, now) {
+  if (!sch || sch.deadline || !sch.listedAt) return true;
+  const listed = new Date(sch.listedAt + 'T00:00:00');
+  if (Number.isNaN(listed.getTime())) return true;
+  const t = new Date(now || Date.now());
+  const startOfToday = new Date(t.getFullYear(), t.getMonth(), t.getDate());
+  return Math.round((startOfToday - listed) / 86400000) <= STALE_DAYS;
+}
+
 /* 학교·캠퍼스 한정 공고 걸러내기 — 다른 학교 공고가 목록·알림에 섞이지 않게 */
 function scopedToProfile(list, p) {
   if (!p) return [];
@@ -102,5 +117,5 @@ function scopedToProfile(list, p) {
 
 /* Node(검증 스크립트)에서도 같은 엔진을 불러 쓸 수 있게 — 브라우저·서비스워커에는 영향 없음 */
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { evaluate, fitScore, scopedToProfile };
+  module.exports = { evaluate, fitScore, scopedToProfile, notStale, STALE_DAYS };
 }
