@@ -21,6 +21,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: 협업 병합기 등록 (충돌 자동 해소 — COLLAB.md)
+        run: bash tools/setup-collab.sh
       - uses: actions/setup-node@v4
         with:
           node-version: 20
