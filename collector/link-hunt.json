@@ -68,52 +68,66 @@
    "lastWhy": "클릭 실패: elementHandle.click: Timeout 5000ms exce"
   },
   "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2650%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EC%82%BC%EC%9D%BC%EC%9E%A5%ED%95%99%ED%9A%8C%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4%202026.07": {
-   "attempts": 2,
+   "attempts": 3,
    "title": "2026학년도 2학기 삼일장학회 장학생 선발 안내",
    "lastTried": "2026-08-01",
-   "lastWhy": "목록에서 못 찾음"
+   "lastWhy": "목록에서 못 찾음",
+   "status": "gone"
   },
   "r:reg-dg-sanhak-foreign": {
-   "attempts": 2,
+   "attempts": 3,
    "title": "산학협동재단 국내 외국인 근로자 자녀 장학생 (동국대 접수)",
    "lastTried": "2026-08-01",
-   "lastWhy": "목록에서 못 찾음"
+   "lastWhy": "목록에서 못 찾음",
+   "status": "gone"
   },
   "r:reg-dg-injae": {
-   "attempts": 2,
+   "attempts": 0,
    "title": "동국인재육성장학 (2026-2학기)",
    "lastTried": "2026-08-01",
-   "lastWhy": "목록에서 못 찾음"
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765145"
   },
   "r:reg-dg-gyonae": {
-   "attempts": 2,
+   "attempts": 0,
    "title": "교내장학(전체) 신청 (2026-2학기)",
    "lastTried": "2026-08-01",
-   "lastWhy": "목록에서 못 찾음"
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764960"
   },
   "r:reg-dg-jongdan": {
-   "attempts": 2,
+   "attempts": 0,
    "title": "종단추천장학 (2026-2학기)",
    "lastTried": "2026-08-01",
-   "lastWhy": "목록에서 못 찾음"
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764951"
   },
   "r:reg-dg-jeonmun": {
-   "attempts": 2,
+   "attempts": 0,
    "title": "전문자격장학 (2026-2학기)",
    "lastTried": "2026-08-01",
-   "lastWhy": "목록에서 못 찾음"
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764950"
   },
   "r:reg-dg-bokji2b": {
-   "attempts": 2,
+   "attempts": 0,
    "title": "복지장학2(부분) (2026-2학기)",
    "lastTried": "2026-08-01",
-   "lastWhy": "목록에서 못 찾음"
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764949"
   },
   "r:reg-dg-bokji2k": {
-   "attempts": 2,
+   "attempts": 0,
    "title": "복지장학2(기초생활수급자) (2026-2학기)",
    "lastTried": "2026-08-01",
-   "lastWhy": "목록에서 못 찾음"
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764946"
   },
   "r:reg-dg-bokji2m": {
    "attempts": 1,
@@ -134,10 +148,12 @@
    "lastWhy": "HTTP 404"
   },
   "r:reg-dg-gyoyukboho": {
-   "attempts": 2,
+   "attempts": 0,
    "title": "교육보호장학(새터민·새터민 자녀) (2026-2학기)",
    "lastTried": "2026-08-01",
-   "lastWhy": "목록에서 못 찾음"
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764943"
   },
   "r:reg-dg-gomduri": {
    "attempts": 0,
