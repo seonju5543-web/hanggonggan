@@ -64,6 +64,7 @@
 | `verify/check-deploy-sync.js` | **배포 반영 확인 (2026-07-31)** — 작업한 내용이 실제로 앱(main)에 나가 있는지 대조. 세션 종료 전 실행 |
 | `.github/workflows/deploy-sync.yml` | **배포 동기화 로봇 (2026-07-31)** — 기본 브랜치(로봇이 커밋) → main(앱이 배포) 자동 병합. 이게 없어서 수집분이 앱에 안 나갔다 |
 | `COLLAB.md` + `tools/merge-json-union.mjs` + `tools/setup-collab.sh` + `verify/check-collab.js` + `.gitattributes` + `.claude/` | **협업 충돌 해소 체계 (2026-07-31 11차 세션)** — 로봇 기록장은 자동 합집합 병합, 사람끼리 겹치면 세션 시작 때 경고. 규칙·경위는 `COLLAB.md` |
+| `.github/workflows/main-guard.yml` | **main 직접 수정 되가져오기 (2026-07-31)** — main에 사람이 올린 변경을 기본 브랜치로 자동 병합. deploy-sync(기본→main)의 **짝**이자 반대 방향. 브랜치 보호를 못 쓰는 이유는 아래 기술 사실 참조 |
 | `collector/deepfetch.mjs` + `.github/workflows/deep-fetch.yml` | 공고 본문 전문+지정 공고 첨부 원본을 `collector/extracted/`에 커밋 — 차단 샌드박스가 읽는 통로. **HWP는 미리보기 텍스트(.hwp.txt)까지 자동 추출**(`hwp-prvtext.py`, zip 내부 hwp 포함). 대상은 `run-deepfetch.txt`의 `targets:` 줄로 지정 |
 | `collector/browser-collect.mjs` + `browser-targets.json` + `.github/workflows/browser-collect.yml` | **브라우저형 수집기**(진짜 Chromium) — 봇차단·동적 게시판 8개교, 매일 09:20 KST |
 | `collector/collect.mjs` | 매일 09:00 KST 게시판 수집 + 공고 상세·첨부양식 수집 + notices.json 발행 + 리포트 이슈 |
@@ -96,6 +97,18 @@
     뜻을 가지므로(잘못 등록분 제거) 합집합이 지운 항목을 되살린다. 사람이 봐야 한다.
   · 겹침 조기 경보: `node verify/check-collab.js` — 상대의 아직 못 받은 작업과 같은 파일을 고치고
     있는지, main에만 있는 직접 수정이 있는지 알려준다. 세션 시작 훅이 `--brief`로 자동 실행.
+- **main에 브랜치 보호를 걸면 앱 배포가 멈춘다 (2026-07-31 판단 — 절대 켜지 말 것)**: 이 저장소는
+  deploy-sync·update-progress 로봇이 **main에 직접 push**해서 앱을 내보낸다. 그래서 브랜치 보호에서
+  흔히 켜는 **"Require a pull request before merging"을 걸면 로봇이 함께 막혀 앱 업데이트가 통째로
+  멈춘다**(7/31에 겨우 고친 문제가 되살아난다). 켠다면 `Block force pushes`·`Restrict deletions`까지만.
+  main 직접 수정 문제는 **막는 대신 고치는** `main-guard.yml`(되가져오기)로 푼다 — 관리자 권한도
+  필요 없다. 참고: 공동작업자 계정 권한은 `write`라 애초에 보호 메뉴가 보이지 않는다(소유자만 admin).
+- **되가져오기 로봇의 안전장치 (2026-07-31 — 실패 가능성 11가지를 먼저 세고 막았다, COLLAB.md 부록)**:
+  무한 루프(로봇 push는 다른 워크플로를 못 깨움 + 최악의 경우도 2라운드 수렴 — 실증), 충돌 시 즉시
+  되돌리고 이슈, push 경합 3회 재시도, **진짜 병합일 때만 audit 관문**(빨리 감기는 main과 내용이
+  같으니 불필요), 되가져올 게 없으면 조용히 종료(정상 세션에 소음 0), 라벨로 이슈 중복 방지
+  (제목 검색은 이모지·한글에서 놓친다), **배포 동기화와 다른 concurrency 그룹**(같은 줄에 넣으면
+  GitHub이 오래된 대기분을 취소해 되가져오기가 조용히 사라진다).
 - **두 개발자의 커밋은 작성자로 구분되지 않는다 (2026-07-31 확인)**: 둘 다 Claude 세션으로 작업해
   커밋 작성자가 똑같이 `Claude <noreply@anthropic.com>`로 찍힌다. 누가 한 작업인지 알려면
   **브랜치를 봐야 한다**(선주 `claude/work-seonju` / Josehyeon `claude/work-josehyeon`).
@@ -317,9 +330,14 @@
   장치 없이는 notices.json·seen.json 둘 다 충돌, 장치 후 **충돌 0건**(양쪽 공고 보존·중복 1건으로 정리·
   seen 이른 날짜 유지·JSON 서식 그대로). registered.json은 의도대로 여전히 충돌(사람이 봐야 함).
   `merge=ours`가 내장이 아니라는 것도 이 실험에서 잡아 `setup-collab.sh`에 등록 추가.
-- **개발자 액션 2건 (두 분 합의 필요 — COLLAB.md 6절)**: ⓐ GitHub 설정에서 **main 브랜치 보호**
-  (직접 수정 차단 — 관리자 권한 필요) ⓑ **담당 영역 분담**(예: 선주=데이터·공고 등록 / Josehyeon=수집
-  로봇·인프라). 자동 병합은 데이터만 해결하고, 같은 코드를 서로 다르게 고치는 건 분담만이 막는다.
+- **후속(같은 세션): main 직접 수정 되가져오기 로봇** — 개발자가 브랜치 보호를 켜려 했으나 계정 권한이
+  `write`라 메뉴 자체가 안 보였고(소유자만 admin), **켰다면 앱 배포가 멈출 뻔했다**(PR 필수를 걸면
+  배포 로봇이 막힌다 — 위 기술 사실). 개발자 지시로 **만들기 전에 실패 가능성 11가지를 먼저 분석**하고
+  각각을 막은 뒤 `main-guard.yml`을 만들었다. 6가지 상황(정상·직접수정·양쪽갈라짐·충돌·데이터오염·
+  push경합)을 실제 저장소로 재현해 전부 의도대로 동작 확인. 분석표는 COLLAB.md 부록.
+- **개발자 액션 (COLLAB.md 6절)**: **담당 영역 분담**(예: 선주=데이터·공고 등록 / Josehyeon=수집
+  로봇·인프라)이 유일하게 남은 사람 몫이다. 자동 병합은 데이터만 해결하고, 같은 코드를 서로 다르게
+  고치는 건 분담만이 막는다. (브랜치 보호는 위 이유로 권장하지 않게 바뀌었다.)
 
 ## 이전 세션 상태 (2026-07-31 10차 세션 — 앱 자동 반영 점검·수리)
 - **개발자 지시**: "작업 후 앱에 업데이트나 재설치 없이 바로 반영되고 있는지 확인 후 조치."
