@@ -51,6 +51,7 @@ for (const t of targets) {
 }
 
 const report = [`## 🔗 원문 링크 복구 리포트 (${new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 16).replace('T', ' ')} KST)`, ''];
+report.push(`판: 3차(진단 상시) · 커밋 ${process.env.GITHUB_SHA ? process.env.GITHUB_SHA.slice(0, 7) : 'local'}`);
 report.push(`고칠 대상: **${targets.length}건** (실시간 공고 ${targets.filter((t) => t.kind === 'notice').length} · 정식 등록 ${targets.filter((t) => t.kind === 'registered').length}) · 게시판 ${boards.size}곳`);
 report.push('');
 
@@ -304,13 +305,12 @@ for (const [listUrl, group] of boards) {
       report.push(`  - ⚠️ 원문 주소 확인 실패(표식 유지): ${want.slice(0, 50)}`);
     }
   }
-  /* 진단: 이 게시판에서 후보 주소를 하나도 못 만들었다면 게시판 구조를 그대로 남긴다.
-     다음 세션이 '왜 안 되나'를 추측하지 않고 실제 HTML을 보고 규칙을 더할 수 있게. */
-  if (!boardCandidateTotal && rows.length) {
-    report.push('  - (진단) 후보를 하나도 못 만든 게시판 — 목록 행 생김새:');
-    rows.filter((r) => /장학/.test(r.t)).slice(0, 3)
-      .forEach((r) => report.push(`      ${r.html.replace(/\s+/g, ' ').slice(0, 240)}`));
-  }
+  /* 진단: 게시판마다 목록 행이 실제로 어떻게 생겼는지 남긴다.
+     다음 세션이 '왜 안 되나'를 추측하지 않고 진짜 HTML을 보고 규칙을 더할 수 있게 —
+     경희대가 두 번 연속 '후보 0개'로 끝난 원인을 눈으로 확인하지 못한 것이 이 진단을 늘 남기게 된 이유다. */
+  report.push(`  - (진단) 후보 주소 ${boardCandidateTotal}개 생성 · 목록 행 생김새:`);
+  rows.filter((r) => /장학/.test(r.t)).slice(0, 3)
+    .forEach((r) => report.push(`      ${r.html.replace(/\s+/g, ' ').slice(0, 260)}`));
   await page.close().catch(() => {});
   report.push('');
 }
