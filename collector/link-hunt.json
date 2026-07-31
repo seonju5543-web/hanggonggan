@@ -23,7 +23,9 @@
    "attempts": 0,
    "title": "[홍보] 2026 상반기 사랑나눔장학생 모집",
    "lastTried": "2026-08-01",
-   "lastWhy": "HTTP 404"
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765506"
   },
   "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2661%20%5B%ED%99%8D%EB%B3%B4%5D%202026%EB%85%84%20%ED%99%94%EC%84%B1%EC%8B%9C%EC%9D%B8%EC%9E%AC%EC%9C%A1%EC%84%B1%EC%9E%AC%EB%8B%A8%20%EC%86%8C%EC%83%81%EA%B3%B5%EC%9D%B8%20%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%95%88%EB%82%B4%2020": {
    "attempts": 0,
@@ -130,10 +132,12 @@
    "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764946"
   },
   "r:reg-dg-bokji2m": {
-   "attempts": 1,
+   "attempts": 0,
    "title": "복지장학2(면학) 지급 안내 (2026-1학기)",
    "lastTried": "2026-08-01",
-   "lastWhy": "HTTP 404"
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765245"
   },
   "r:reg-dg-bokji1": {
    "attempts": 1,
