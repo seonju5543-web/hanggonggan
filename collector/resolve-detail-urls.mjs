@@ -43,7 +43,18 @@ for (const r of registered.items || []) {
 }
 
 /* 게시판별로 묶는다 — 게시판 하나를 한 번만 열기 위해 */
-const ONLY = process.env.RESOLVE_ONLY_BOARD || '';   // 게시판 하나만 빠르게 돌려 볼 때
+/* 게시판 하나만 돌리기 — 같은 학교를 하루에 여러 번 두드리면 서버가 막으므로
+   (2026-07-31 동국대: 7번 돌린 뒤 멀쩡한 주소가 전부 404), 고칠 게 남은 학교만 골라 돈다.
+   지정 방법 두 가지: 저장소 변수 RESOLVE_ONLY_BOARD, 또는 실행 트리거 파일의 `onlyBoard:` 줄
+   (GitHub 설정에 손댈 수 없는 세션도 push만으로 지정할 수 있게 — deepfetch의 `targets:`와 같은 방식). */
+function onlyBoardFromRunFile() {
+  try {
+    const txt = fs.readFileSync(new URL('run-resolve-urls.txt', HERE), 'utf8');
+    const m = txt.match(/^\s*onlyBoard:\s*(.+)$/m);
+    return m ? m[1].trim() : '';
+  } catch { return ''; }
+}
+const ONLY = process.env.RESOLVE_ONLY_BOARD || onlyBoardFromRunFile();
 const boards = new Map();
 for (const t of targets) {
   const list = listUrlOf(t.url);
