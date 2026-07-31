@@ -17,18 +17,25 @@ node verify-forms-data.js   # 데이터 주도 양식: forms.json에만 더미 �
 node audit-data.js          # 소급 감사: 기존 데이터 전체가 현재 엔진 기준을 충족하는지 (엔진 변경 후 필수)
 node personas.js            # 페르소나 스윕: 120종 사용자 조합으로 홈·탐색·상세를 훑어 크래시·빈 상태·콘솔 오류 탐지
 node verify-source-links.js # 원문 링크 검증: '원문 공고 ↗'가 정말 그 공고로 가는지 (아래 설명)
+node verify-notify-rules.js # 알림 규칙 단위 검증 (서버·브라우저 불필요 — 언제 알림이 가고 안 가는지 고정)
+node verify-notify.js       # 알림 시스템 브라우저 검증: 최초 1회 동의 → 조건별 발송 → 알림함 → 설정 → 딥링크
 ```
 
 `verify-source-links.js` — 2026-07-31 신설. 앱에서 장학 공고를 열고 원문 링크를 눌렀을 때
 **학교 장학 공지 목록 전체가 아니라 그 장학금 공고**로 가는지 본다. 3단으로 검사한다:
 ① 데이터 전수 — registered.json·notices.json에 목록 주소(`#n-` 표식)가 몇 건 남아 있나
-② 브라우저 — 경희대 학생으로 온보딩해 실제 카드를 열고 링크 href를 읽는다
+② 브라우저 — 학교 학생으로 온보딩해 실제 카드를 열고 링크 href를 읽는다(LINKCHECK_SCHOOL로 학교 지정)
 ③ 정직성 — 아직 원문 주소를 못 찾은 공고는 '게시판 목록 ↗'으로 표기되고 안내가 붙는가
 (라벨과 실제 링크가 어긋나면 실패한다. 목록 주소가 남아 있는 것 자체는 실패가 아니다 —
  원문 주소를 못 찾는 게시판이 있을 수 있고, 그때는 정직하게 표기하는 것이 맞는 동작이다.)
 
-목록 주소가 남아 있으면 복구 로봇을 돌린다: `collector/run-resolve-urls.txt`를 고쳐 push
-(→ `.github/workflows/resolve-detail-urls.yml`이 게시판을 열어 원문 주소를 찾아 고쳐 커밋).
+목록 주소가 남아 있으면 링크 사냥꾼 로봇이 처리한다 — `collector/run-link-hunt.txt`를 고쳐 push
+(→ `.github/workflows/link-hunter.yml`). 자세한 것은 아래 '링크 사냥꾼' 절.
+
+`verify-notify.js`는 브라우저 두 개(권한 거절 사용자 / 허용 사용자)를 각각 돌린다.
+헤드리스에선 휴대폰 알림 UI가 보이지 않으므로 `Notification`·`showNotification`을
+가로채(스파이) **실제로 호출됐는지**를 확인한다. 알림 종류·문구를 바꾸면 이 드라이버의
+기대 문구도 함께 손볼 것.
 
 ## 개발자 도우미 (서버 불필요 — data/*.json만 읽음)
 
@@ -45,6 +52,12 @@ node verify/list-unregistered.js --all    # 제외분(중복·메뉴·대출·�
 더미 양식(test-dummy, **필드 id는 반드시 'memo'**) 추가 + registered.json에서 **마감이 지나지 않은** 항목에
 formId 연결(마감 지난 항목이면 신청 버튼이 비활성이라 검증이 깨짐) → 복사본 루트에서 8124 포트로 서빙.
 드라이버는 test-dummy가 연결된 항목을 동적으로 찾아 구동한다(2026-07-15).
+
+**마감된 공고를 대상으로 삼지 말 것**: 마감 공고는 신청 버튼이 비활성이라 클릭이 30초 타임아웃으로
+깨진다. `verify-new-forms.js`의 삼일·명지 구간이 이 이유로 깨져 있던 것을 2026-07-31에 고쳤다 —
+마감 여부를 먼저 확인하고, 마감이면 **`driveAnyLiveForm()`이 앱에서 마감 전 양식 공고를 스스로 찾아
+같은 UI 경로(질문 → 문서 생성)를 대신 구동**한다. 그래서 공고가 마감돼도 **검사가 사라지지 않는다**.
+새 드라이버를 쓸 때도 대상은 하드코딩하지 말고 이렇게 앱에서 마감 전 항목을 찾아 쓸 것.
 
 - 크로미움 경로: `/opt/pw-browsers/chromium-1194/chrome-linux/chrome` (드라이버 안에 하드코딩됨)
 - 파일 업로드 테스트는 한글 파일명이 실패하므로 `grade-cert.png`(ASCII)를 쓴다.

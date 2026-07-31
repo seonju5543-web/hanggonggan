@@ -21,18 +21,15 @@ function loadState() {
 }
 function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  // 알림 판단에 쓰는 프로필·신청내역 사본을 갱신한다 (서비스워커는 localStorage를 못 읽는다)
+  if (typeof notifySyncContext === 'function') notifySyncContext();
 }
 
 /* ---------------- 장학금 목록 (한국장학재단 상시 제도 + 정식 등록 실공고) ---------------- */
 let registeredList = []; // data/registered.json — 수집 로봇이 확보한 실공고를 큐레이션해 정식 등록한 목록
 
 function registeredFor(p) {
-  return registeredList.filter((s) => {
-    const e = s.eligibility || {};
-    if (e.schoolOnly && e.schoolOnly !== p.school) return false;
-    if (e.campusOnly && p.campus && e.campusOnly !== p.campus) return false;
-    return true;
-  });
+  return scopedToProfile(registeredList, p); // match-engine.js — 알림도 같은 기준을 쓴다
 }
 
 function allScholarships() {
@@ -44,88 +41,9 @@ function findSch(id) {
   return allScholarships().find((s) => s.id === id) || null;
 }
 
-/* ---------------- 매칭 엔진 ---------------- */
-function evaluate(sch, p) {
-  const e = sch.eligibility || {};
-  const reasons = [];
-  const missing = [];
-  let ok = true;
-
-  const gpaExempt = p.status === 'freshman';
-
-  if (e.minGpa != null && !gpaExempt) {
-    if (p.gpa == null) missing.push('직전학기 평점');
-    else if (p.gpa < e.minGpa) { ok = false; reasons.push(`평점 ${e.minGpa} 이상 필요 (현재 ${p.gpa})`); }
-    else reasons.push(`성적 요건 충족 (${e.minGpa} 이상)`);
-  }
-
-  if (e.maxBracket != null) {
-    if (p.bracket == null) missing.push('학자금 지원구간');
-    else if (p.bracket > e.maxBracket) { ok = false; reasons.push(`지원구간 ${e.maxBracket}구간 이내 필요 (현재 ${p.bracket}구간)`); }
-    else reasons.push(`소득 요건 충족 (${e.maxBracket}구간 이내)`);
-  }
-
-  if (e.years && !e.years.includes(p.year)) {
-    ok = false; reasons.push(`${e.years.join('·')}학년만 지원 가능`);
-  }
-
-  if (e.freshmanOnly && p.status !== 'freshman') {
-    ok = false; reasons.push('신입학 첫 학기 학생만 지원 가능');
-  }
-
-  if (e.tracks && !e.tracks.includes(p.track)) {
-    ok = false; reasons.push('지원 대상 전공 계열이 아니에요');
-  } else if (e.tracks) {
-    reasons.push('전공 계열 요건 충족');
-  }
-
-  if (e.flagsAny) {
-    const has = e.flagsAny.some((f) => p.flags.includes(f));
-    if (!has) { ok = false; reasons.push('해당 특별자격(수급자·다자녀·보훈 등)이 필요해요'); }
-    else reasons.push('특별자격 요건 충족');
-  }
-
-  if (e.seoulOnly) {
-    if (p.region !== 'seoul') { ok = false; reasons.push('서울 거주자만 지원 가능'); }
-    else reasons.push('거주지 요건 충족 (서울)');
-  }
-
-  if (e.needCert) {
-    if (!p.cert) { ok = false; reasons.push('공인 외국어성적 보유가 필요해요'); }
-    else reasons.push('외국어성적 보유 확인');
-  }
-
-  if (e.exchange) {
-    if (!p.exchange) { ok = false; reasons.push('교환학생 파견 예정자만 지원 가능'); }
-    else reasons.push('교환학생 요건 충족');
-  }
-
-  if (e.schoolOnly) {
-    if (p.school !== e.schoolOnly) { ok = false; reasons.push(`${e.schoolOnly} 재학생만 지원 가능`); }
-    else reasons.push(`재학 대학 공고 (${e.schoolOnly})`);
-  }
-
-  if (!ok) return { status: 'ineligible', reasons, missing };
-  if (missing.length) return { status: 'unknown', reasons, missing };
-  if (e.selective) return { status: 'selective', reasons, missing };
-  return { status: 'eligible', reasons, missing };
-}
-
-/* ---------------- 적합도 점수 (0~99) ---------------- */
-function fitScore(sch, result, p) {
-  if (result.status === 'ineligible') return 0;
-  const e = sch.eligibility || {};
-  let score = 62;
-  const condCount = ['minGpa', 'maxBracket', 'years', 'tracks', 'flagsAny', 'seoulOnly', 'needCert', 'exchange', 'freshmanOnly', 'schoolOnly']
-    .filter((k) => e[k] != null && e[k] !== false).length;
-  score += Math.min(15, condCount * 3);
-  if (result.status === 'selective') score -= 8;
-  if (result.status === 'unknown') score -= 22;
-  if (e.minGpa != null && p.gpa != null) score += Math.min(12, Math.max(0, Math.round((p.gpa - e.minGpa) * 10)));
-  if (e.maxBracket != null && p.bracket != null) score += Math.min(6, e.maxBracket - p.bracket);
-  if (e.flagsAny) score += 6;
-  return Math.max(5, Math.min(99, score));
-}
+/* ---------------- 매칭 엔진 ----------------
+   자격 판정(evaluate)·적합도(fitScore)·학교 한정 필터(scopedToProfile)는 match-engine.js에 있다.
+   서비스워커(백그라운드 알림)도 같은 파일을 읽어, 화면과 알림의 기준이 갈라지지 않는다. */
 
 function getMatches() {
   const p = state.profile;
@@ -159,18 +77,8 @@ function dday(dateStr) {
   return { label: `D-${d}`, cls: '', days: d };
 }
 
-/* 마감일을 확정하지 못한 공고(원문에 마감이 없거나 못 읽은 경우)는 dday가 '기한 원문 확인'이라
-   목록에서 영영 사라지지 않는다 — 지난 학기 공고가 계속 떠 있는 문제가 있었다(2026-07-30 발견).
-   그래서 등록일(listedAt)로부터 60일이 지나면 숨긴다. 실시간 공고의 60일 규칙과 같은 기준이다.
-   마감이 있는 공고는 기존대로 '마감 + 30일' 규칙만 적용된다. */
-const STALE_DAYS = 60;
-function notStale(sch) {
-  if (sch.deadline || !sch.listedAt) return true;
-  const listed = new Date(sch.listedAt + 'T00:00:00');
-  if (Number.isNaN(listed.getTime())) return true;
-  const startOfToday = new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate());
-  return Math.round((startOfToday - listed) / 86400000) <= STALE_DAYS;
-}
+/* notStale(오래된 공고 숨김)은 match-engine.js에 있다 — 화면에서 숨긴 공고를
+   알림으로는 알리는 모순이 생기지 않도록 알림 규칙도 같은 함수를 쓴다. */
 
 const STATUS_META = {
   eligible:   { label: '신청 가능',        cls: 'ok' },
@@ -1291,7 +1199,18 @@ function renderMy() {
     </div>
     <p class="my-flags">특별자격: ${flagText}</p>
     <p class="my-flags">공통 서류정보(학번·연락처·계좌 등)는 이 기기에만 저장되고 서류 초안에 자동 기입돼요.</p>`;
+  renderNotifyCard();
   renderWallet();
+}
+
+/* 알림 설정 카드 (notify.js가 내용을 만든다) */
+function renderNotifyCard() {
+  const el = $('#my-notify');
+  if (!el) return;
+  if (typeof notifySettingsHtml !== 'function' || !notifyReady) { el.hidden = true; return; }
+  el.hidden = false;
+  el.innerHTML = notifySettingsHtml();
+  bindNotifySettings();
 }
 
 function renderWallet() {
@@ -1356,10 +1275,22 @@ function bindEvents() {
   );
 
   $('#btn-finish-onboard').addEventListener('click', () => {
+    const isFirstTime = !state.profile;
     state.profile = collectProfile();
     saveState();
     toast('프로필이 저장됐어요. 맞춤 장학금을 찾았어요!');
     showScreen('home');
+    // 프로필을 처음 만든 직후에 알림 동의를 딱 한 번 묻는다 (이후에는 MY 화면에서만)
+    // 저장 완료 토스트가 사라진 뒤에 물어본다 (문구가 겹치지 않게)
+    if (isFirstTime && typeof notifyMaybeAskConsent === 'function') notifyMaybeAskConsent(2900);
+  });
+
+  $('#btn-notify').addEventListener('click', () => {
+    if (typeof openNotifyInbox === 'function') openNotifyInbox();
+  });
+  $('#notify-backdrop').addEventListener('click', () => closeNotifyPanel());
+  $('#notify-sheet').addEventListener('click', (e) => {
+    if (e.target.classList.contains('sheet-handle')) closeNotifyPanel();
   });
 
   $$('.chip-group').forEach((group) =>
@@ -1407,7 +1338,9 @@ function bindEvents() {
     if (e.target.classList.contains('sheet-handle')) closeSheet();
   });
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !$('#detail-sheet').hidden) closeSheet();
+    if (e.key !== 'Escape') return;
+    if (!$('#notify-sheet').hidden) closeNotifyPanel();
+    else if (!$('#detail-sheet').hidden) closeSheet();
   });
 
   $('#btn-apply-all').addEventListener('click', applyAll);
@@ -1420,6 +1353,7 @@ function bindEvents() {
     if (!confirm('프로필과 신청 내역을 모두 삭제할까요?')) return;
     [STORAGE_KEY, ...LEGACY_KEYS].forEach((k) => localStorage.removeItem(k));
     state = { profile: null, applications: [] };
+    if (typeof notifyReset === 'function') notifyReset(); // 알림 설정·알림함도 함께 초기화
     initOnboarding();
     showScreen('onboarding');
   });
@@ -1437,7 +1371,8 @@ function bindEvents() {
    1) 장학금·양식 데이터(data/*.json)는 앱을 열 때마다 + 화면에 돌아올 때마다 새로 받고
    2) 앱 코드 자체가 바뀌면 새 서비스워커가 설치된 뒤 화면을 한 번 새로 고쳐 즉시 적용한다. */
 let swReg = null;
-if ('serviceWorker' in navigator && location.protocol === 'https:') {
+// localhost도 허용 — 검증 드라이버가 알림·백그라운드 경로까지 실제로 눌러볼 수 있어야 한다
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
   const hadController = !!navigator.serviceWorker.controller; // 최초 설치와 업데이트를 구분
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js')
@@ -1474,6 +1409,9 @@ if (typeof loadFormTemplates === 'function') loadFormTemplates(); // 정식 등�
 walletRefresh().then(() => {
   if (!$('#screen-my').hidden) renderMy();
 });
+if (typeof notifyInit === 'function') {
+  notifyInit().then(() => { if (!$('#screen-my').hidden) renderMy(); }).catch(() => {});
+}
 if (state.profile) {
   saveState(); // 레거시 키 → 새 키 이관
   showScreen('home');
