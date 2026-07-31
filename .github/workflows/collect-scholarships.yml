@@ -83,15 +83,22 @@ jobs:
           true  # 위 선택 파일이 없어도 저장 단계는 계속된다 (2026-07-19 8회 연속 실패 원인 수정)
           if ! git diff --cached --quiet; then
             git commit -m "collector: seen state update"
+            pushed=0
             # 다른 로봇이 먼저 push했을 수 있음 — 받아서 얹은 뒤 재시도 (수집분 유실 방지)
             for i in 1 2 3; do
-              git push && break
+              if git push; then pushed=1; break; fi
               git pull --rebase origin "${GITHUB_REF_NAME}"
             done
+            # 3번 다 실패하면 조용히 넘어가지 않는다 — 빨간불로 죽고 아래 실패 알림이 이슈에 붙는다
+            if [ "$pushed" != "1" ]; then
+              echo "::error::수집 데이터 push 실패 — 3회 재시도 모두 실패. 이번 수집분이 저장되지 않았습니다."
+              exit 1
+            fi
           fi
 
       - name: 컨펌용 리포트 이슈 생성
-        if: steps.run.outputs.new_count != '0' || github.event_name == 'workflow_dispatch'
+        # 수집 스텝이 값을 못 남긴 경우('')엔 리포트를 만들지 않는다 — 건수 없는 빈 이슈 방지
+        if: github.event_name == 'workflow_dispatch' || (steps.run.outputs.new_count != '' && steps.run.outputs.new_count != '0')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

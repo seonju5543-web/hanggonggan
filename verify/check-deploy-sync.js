@@ -9,11 +9,38 @@
  * 종료 코드: 0 = 앱에 다 반영됨 / 1 = 아직 배포 안 된 변경 있음
  */
 const { execSync } = require('node:child_process');
+const fs = require('node:fs');
 
 const sh = (cmd, allowFail = false) => {
   try { return execSync(cmd, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim(); }
   catch (e) { if (allowFail) return ''; throw e; }
 };
+
+/* ── 수집 로봇의 '저장 위치' 점검 (2026-07-31 추가) ───────────────────────────────
+   로봇은 자기가 읽은 브랜치에만 저장해야 한다. 읽는 곳과 쓰는 곳이 갈리면
+   '이미 본 공고' 기록(seen.json)이 안 늘어 매일 같은 공고를 새 공고로 다시 담는다.
+   실제로 그런 판이 만들어진 적이 있어(7/31), 되살아나면 여기서 바로 잡는다. */
+const COLLECTORS = [
+  '.github/workflows/collect-scholarships.yml',
+  '.github/workflows/browser-collect.yml',
+  '.github/workflows/deep-fetch.yml',
+];
+let wfBad = 0;
+for (const f of COLLECTORS) {
+  let y; try { y = fs.readFileSync(f, 'utf8'); } catch { continue; }
+  if (/checkout\s+(-f\s+)?-B\s+main|push\s+origin\s+(HEAD:)?main/.test(y)) {
+    console.log(`❌ ${f}: 로봇이 main에 직접 저장하도록 돼 있어요.`);
+    console.log('   → 읽는 곳(기본 브랜치)과 쓰는 곳이 달라져 "이미 본 공고" 기록이 안 늘고,');
+    console.log('     매일 같은 공고가 새 공고로 다시 담깁니다. 저장은 기본 브랜치에 하고,');
+    console.log('     앱 배포는 deploy-sync.yml에 맡기세요.');
+    wfBad++;
+  }
+  if (!/pushed=1|pushed" != "1/.test(y)) {
+    console.log(`⚠️  ${f}: push 3회 실패해도 조용히 넘어갑니다 (실패를 알리는 장치 없음).`);
+    wfBad++;
+  }
+}
+if (wfBad === 0) console.log('✅ 수집 로봇 3종: 저장 위치·실패 알림 정상\n');
 
 /* 앱이 실제로 읽어가는 파일들 — 이것만 main에 있으면 사용자 화면이 최신이다 */
 const APP_PATHS = ['index.html', 'app.js', 'style.css', 'forms.js', 'data.js', 'sw.js', 'manifest.json', 'data', 'icons'];

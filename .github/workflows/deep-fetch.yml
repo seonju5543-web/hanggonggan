@@ -14,6 +14,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   deepfetch:
@@ -36,9 +37,30 @@ jobs:
           git add collector/extracted
           if ! git diff --cached --quiet; then
             git commit -m "deepfetch: notice texts + form originals"
+            pushed=0
             # 다른 로봇이 먼저 push했을 수 있음 — 받아서 얹은 뒤 재시도
             for i in 1 2 3; do
-              git push && break
+              if git push; then pushed=1; break; fi
               git pull --rebase origin "${GITHUB_REF_NAME}"
             done
+            # 3번 다 실패하면 조용히 넘어가지 않는다 (양식 원본은 다음 수집 때 갈아엎히므로 유실됨)
+            if [ "$pushed" != "1" ]; then
+              echo "::error::심층 수집 결과 push 실패 — 3회 재시도 모두 실패. 받은 원본이 저장되지 않았습니다."
+              exit 1
+            fi
+          fi
+
+      # 조용한 중단 방지 — 심층 수집에도 실패 알림을 붙인다(2026-07-31).
+      # 이게 없으면 양식 원본을 기다리던 다음 세션이 "왜 안 왔지"만 반복하게 된다.
+      - name: 🚨 실패 알림 (최근 리포트 이슈에 코멘트)
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          last=$(gh issue list --repo "${{ github.repository }}" \
+            --search '"수집 리포트" in:title' --state open \
+            --limit 1 --json number --jq '.[0].number' || true)
+          if [ -n "$last" ] && [ "$last" != "null" ]; then
+            gh issue comment "$last" --repo "${{ github.repository }}" \
+              --body "🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **공고 원문 심층 수집 실패** — 양식 원본이 확보되지 않았습니다. 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · Claude 세션에 '심층 수집 실패 확인해줘'라고 지시하세요."
           fi

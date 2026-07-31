@@ -67,49 +67,33 @@ jobs:
 
       - name: 공고 원문 발췌 갱신 (정직 원칙 — 추론 대신 원문 그대로)
         run: node collector/extract-excerpts.mjs --write
-      - name: 결과 저장 (main에 직접 반영 — 사람 작업 브랜치와 완전히 분리)
+      # 저장 위치 원칙 (2026-07-31 두 개발자 판 통합 — 여기를 바꾸기 전에 반드시 읽을 것):
+      #   로봇은 **자기가 읽은 브랜치(= 실행된 브랜치, 기본 브랜치)에만** 저장한다.
+      #   '이미 본 공고' 기록(collector/seen.json)과 공고 목록을 읽은 곳과 쓰는 곳이 다르면,
+      #   기록이 영영 안 늘어 **매일 같은 공고를 새 공고로 다시 담게 된다**(이슈 #75와 같은 유형).
+      #   앱 배포(main)는 deploy-sync.yml이 이 실행 직후 자동으로 옮겨 주므로, 여기서 main을
+      #   건드릴 필요가 없다. 사람 작업 브랜치(claude/work-*)는 이 워크플로가 아예 실행되지
+      #   않으므로(트리거가 기본 브랜치 한정) 오염될 일이 없다.
+      - name: 결과 저장 (기본 브랜치에 저장 → deploy-sync가 main으로 자동 배포)
         run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          # 이번 실행에서 새로 만들어진 데이터 파일들을 임시 보관
-          # (현재 체크아웃된 브랜치가 사람 작업 브랜치든 뭐든 상관없이 결과물만 챙긴다)
-          mkdir -p /tmp/bot-data/collector/extracted
-          for f in collector/seen.json collector/browser-report.md data/notices.json data/registered.json collector/health.json collector/pending-forms.json; do
-            [ -f "$f" ] && mkdir -p "/tmp/bot-data/$(dirname "$f")" && cp "$f" "/tmp/bot-data/$f"
-          done
-          [ -d collector/extracted ] && cp -r collector/extracted/. /tmp/bot-data/collector/extracted/
-
-          apply_data() {
-            for f in collector/seen.json collector/browser-report.md data/notices.json data/registered.json collector/health.json collector/pending-forms.json; do
-              [ -f "/tmp/bot-data/$f" ] && cp "/tmp/bot-data/$f" "$f" && git add "$f"
-            done
-            if [ -d /tmp/bot-data/collector/extracted ]; then
-              mkdir -p collector/extracted
-              cp -r /tmp/bot-data/collector/extracted/. collector/extracted/
-              git add collector/extracted
-            fi
-          }
-
-          # 사람 작업 브랜치는 건드리지 않고, main을 최신으로 받아서 그 위에 데이터만 얹는다
-          git fetch origin main
-          git checkout -f -B main origin/main
-          apply_data
-
+          git add collector/seen.json collector/browser-report.md data/notices.json data/registered.json
+          [ -f collector/health.json ] && git add collector/health.json
+          [ -f collector/pending-forms.json ] && git add collector/pending-forms.json
+          [ -d collector/extracted ] && git add collector/extracted
+          true  # 위 선택 파일이 없어도 저장 단계는 계속된다 (2026-07-19 8회 연속 실패 원인 수정)
           if ! git diff --cached --quiet; then
             git commit -m "browser-collector: harvest update"
             pushed=0
+            # 다른 로봇이 먼저 push했을 수 있음 — 받아서 얹은 뒤 재시도 (수집분 유실 방지)
             for i in 1 2 3; do
-              if git push origin main; then pushed=1; break; fi
-              # push 실패 시: 병합하지 않고, main 최신 위에 방금 만든 데이터를 다시 그대로 덮어써서 재시도
-              # (수집 데이터는 "누적 병합"이 아니라 "최신 재수집"이 맞는 방식 — 충돌 마커가 안 뜨게)
-              git fetch origin main
-              git reset --hard origin/main
-              apply_data
-              git diff --cached --quiet || git commit -m "browser-collector: harvest update"
+              if git push; then pushed=1; break; fi
+              git pull --rebase origin "${GITHUB_REF_NAME}"
             done
+            # 3번 다 실패하면 조용히 넘어가지 않는다 — 빨간불로 죽고 아래 실패 알림이 이슈에 붙는다
             if [ "$pushed" != "1" ]; then
-              echo "::error::main에 수집 데이터 push 실패 — 3회 재시도 모두 실패. 이번 수집분이 저장되지 않았습니다."
+              echo "::error::수집 데이터 push 실패 — 3회 재시도 모두 실패. 이번 수집분이 저장되지 않았습니다."
               exit 1
             fi
           fi
