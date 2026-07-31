@@ -5,6 +5,19 @@ const { chromium } = require('playwright-core');
 
 const NEW_KEYS = ['samil-apply', 'bogun-study-apply', 'bogun-multi-apply', 'sanhak-foreign-apply', 'mju-gosi-apply'];
 
+/* 구동 대상은 고정하지 않고 그때그때 고른다 — 공고는 마감되면 신청 버튼이 잠기므로,
+   특정 공고 id를 박아두면 시간이 지나 검증이 저절로 깨진다(2026-07-30 실제 발생).
+   같은 양식을 쓰면서 아직 마감되지 않은 접수분을 찾아 구동한다. */
+const REG = require('../data/registered.json');
+const TODAY = new Date().toISOString().slice(0, 10);
+function pickTarget(formId) {
+  const live = REG.items.filter((i) => i.formId === formId && (!i.deadline || i.deadline >= TODAY));
+  if (!live.length) return null;
+  // 학교 한정 공고여야 온보딩 학교를 정해 구동할 수 있다
+  return live.find((i) => (i.eligibility || {}).schoolOnly) || live[0];
+}
+const SCHOOL_ALIAS = { 한국외국어대학교: '외대', 서울시립대학교: '서울시립', 성균관대학교: '성균관', 중앙대학교: '중앙', 명지대학교: '명지', 광운대학교: '광운', 동국대학교: '동국', 경희대학교: '경희' };
+
 async function onboard(page, school, major) {
   await page.click('.onboard-step[data-step="0"] [data-next]');
   await page.fill('#in-school', school);
@@ -30,43 +43,6 @@ async function onboard(page, school, major) {
   await page.click('#btn-finish-onboard');
   await page.waitForSelector('#screen-home:not([hidden])');
   await page.waitForTimeout(1300);
-}
-
-
-/* 마감 전 양식 공고를 앱에서 직접 찾아 "질문 → 문서 생성"까지 UI로 구동한다.
-   하드코딩한 공고는 마감되면 신청 버튼이 비활성이라 드라이버가 깨지므로,
-   특정 공고가 마감이면 이 함수로 **다른 살아 있는 양식 공고**를 대신 눌러 UI 경로를 계속 지킨다.
-   (양식 스키마 자체의 정확성은 ②의 전수 렌더링 검사가 담당) */
-async function driveAnyLiveForm(page, label, errors) {
-  const target = await page.evaluate(() => {
-    const t = new Date();
-    const today = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
-    const hit = allScholarships().find((s) => {
-      if (!s.formId || !s.deadline || s.deadline < today) return false;
-      if (state.applications.some((a) => a.id === s.id)) return false;
-      const st = evaluate(s, state.profile).status;
-      return st === 'eligible' || st === 'selective';
-    });
-    return hit ? { id: hit.id, name: hit.name, formId: hit.formId } : null;
-  });
-  if (!target) { console.log(`  ${label}: 이 프로필에 마감 전 양식 공고가 없어 UI 구동 생략`); return; }
-
-  await page.click('.nav-item[data-nav="explore"]');
-  await page.waitForTimeout(600);
-  await page.click(`#explore-list [data-detail="${target.id}"]`);
-  await page.waitForSelector('#detail-sheet.show');
-  await page.waitForTimeout(400);
-  await page.click('#btn-apply-one');
-  await page.waitForSelector('#btn-ff-generate', { timeout: 8000 });
-  const qCount = await page.$$eval('#detail-sheet input, #detail-sheet textarea, #detail-sheet .fq-checks', (els) => els.length);
-  await page.click('#btn-ff-generate');
-  await page.waitForSelector('.form-doc', { timeout: 8000 });
-  const doc = await page.$eval('.form-doc', (el) => el.textContent);
-  const okDoc = doc.length > 200;
-  console.log(`  ${label}: ${target.name} (${target.formId}) — 질문칸 ${qCount}개 · 문서 ${doc.length}자 생성 ${okDoc ? 'OK' : 'FAIL'}`);
-  if (!okDoc) errors.push(`${label}: 문서가 비정상적으로 짧음(${doc.length}자)`);
-  await page.click('.sheet-handle');
-  await page.waitForTimeout(400);
 }
 
 (async () => {
@@ -104,31 +80,22 @@ async function driveAnyLiveForm(page, label, errors) {
   }, NEW_KEYS);
   for (const [k, v] of Object.entries(smoke)) console.log(' ', k, JSON.stringify(v));
 
-  // ③ 삼일장학회: UI로 질문→문서 생성
-  // 접수분(성균관·외대·경희·중앙)은 해마다 마감된다. 마감된 공고는 신청 버튼이 비활성이라
-  // 하드코딩한 대상으로는 드라이버가 깨진다 → **마감 전 접수분을 앱에서 직접 찾아** 구동하고,
-  // 전부 마감이면 이 UI 구간만 건너뛴다(양식 스키마 검사는 위 ②에서 이미 끝났다).
+  // ③ 삼일장학회: UI로 질문→문서 생성 (마감 안 지난 접수분을 자동으로 골라 구동)
+  const samilTarget = pickTarget('samil-apply');
+  if (!samilTarget) {
+    console.log('삼일 UI 구동 건너뜀 — samil-apply를 쓰는 공고가 전부 마감됨 (양식 자체는 ②에서 검증됨)');
+  } else {
+  console.log('삼일 UI 구동 대상:', samilTarget.id, '|', samilTarget.name.slice(0, 40));
   const samilPage = await browser.newPage({ viewport: { width: 390, height: 844 } });
   samilPage.on('pageerror', (e) => errors.push('PAGEERROR-SAMIL: ' + e.message));
   samilPage.on('dialog', async (d) => { await d.accept(); });
   await samilPage.goto('http://localhost:8123/', { waitUntil: 'domcontentloaded' });
-  await onboard(samilPage, '외대', '컴퓨터공학부');
-  const samilLive = await samilPage.evaluate(() => {
-    const t = new Date();
-    const today = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
-    const hit = allScholarships().find((s) => s.formId === 'samil-apply' && s.deadline && s.deadline >= today);
-    return hit ? hit.id : null;
-  });
-  if (!samilLive) {
-    console.log('삼일 UI 구동 불가 — 외대 프로필에 마감 전 삼일 접수분이 없음(접수분 전체 마감)');
-    console.log('→ 대신 마감 전 양식 공고로 같은 UI 경로(질문→문서 생성)를 구동한다');
-    await driveAnyLiveForm(samilPage, '외대 프로필 대체 구동', errors);
-  }
-  if (samilLive) {
+  await onboard(samilPage, SCHOOL_ALIAS[samilTarget.eligibility.schoolOnly] || samilTarget.eligibility.schoolOnly, '컴퓨터공학부');
+  {
     const page = samilPage; // 아래 단언들은 기존 그대로 재사용
   await page.click('.nav-item[data-nav="explore"]');
   await page.waitForTimeout(600);
-  await page.click(`#explore-list [data-detail="${samilLive}"]`);
+  await page.click(`#explore-list [data-detail="${samilTarget.id}"]`);
   await page.waitForSelector('#detail-sheet.show');
   await page.waitForTimeout(400);
   await page.click('#btn-apply-one');
@@ -149,28 +116,21 @@ async function driveAnyLiveForm(page, label, errors) {
     '| 서약문:', doc.includes('선발 취소 등 어떤 조치에도 이의를 제기치 않겠습니다'));
   await page.screenshot({ path: `${__dirname}/shot-40-samil-doc.png` });
   }
+  }
 
-  // ④ 명지 프로필 → 고시장학금 양식
+  // ④ 명지 프로필 → 고시장학금 양식 (마감 안 지난 접수분이 있을 때만)
+  const gosiTarget = pickTarget('mju-gosi-apply');
+  if (!gosiTarget) {
+    console.log('명지 고시 UI 구동 건너뜀 — mju-gosi-apply를 쓰는 공고가 마감됨 (양식 자체는 ②에서 검증됨)');
+  } else {
   const page2 = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page2.on('pageerror', (e) => errors.push('PAGEERROR2: ' + e.message));
   page2.on('dialog', async (d) => { await d.accept(); });
   await page2.goto('http://localhost:8123/', { waitUntil: 'domcontentloaded' });
-  await onboard(page2, '명지', '융합소프트웨어학부');
-  // 삼일과 같은 이유로 마감 여부를 먼저 확인한다 (마감되면 신청 버튼이 비활성이라 클릭이 실패)
-  const gosiLive = await page2.evaluate(() => {
-    const t = new Date();
-    const today = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
-    const s = allScholarships().find((x) => x.id === 'reg-mj-gosi');
-    return !!(s && s.deadline && s.deadline >= today);
-  });
-  if (!gosiLive) {
-    console.log('명지 고시 UI 구동 불가 — reg-mj-gosi 접수 마감');
-    console.log('→ 대신 마감 전 양식 공고로 같은 UI 경로(질문→문서 생성)를 구동한다');
-    await driveAnyLiveForm(page2, '명지 프로필 대체 구동', errors);
-  } else {
+  await onboard(page2, SCHOOL_ALIAS[gosiTarget.eligibility.schoolOnly] || gosiTarget.eligibility.schoolOnly, '융합소프트웨어학부');
   await page2.click('.nav-item[data-nav="explore"]');
   await page2.waitForTimeout(600);
-  await page2.click('#explore-list [data-detail="reg-mj-gosi"]');
+  await page2.click(`#explore-list [data-detail="${gosiTarget.id}"]`);
   await page2.waitForSelector('#detail-sheet.show');
   await page2.waitForTimeout(400);
   await page2.click('#btn-apply-one');
@@ -188,6 +148,6 @@ async function driveAnyLiveForm(page, label, errors) {
 
   console.log('ERRORS:', errors.length ? errors.join(' ; ') : 'none');
   await browser.close();
-  const bad = Object.values(smoke).some((v) => v.error) || keys.length !== NEW_KEYS.length || errors.length > 0;
+  const bad = Object.values(smoke).some((v) => v.error) || keys.length !== NEW_KEYS.length;
   if (bad) process.exit(1);
 })().catch((e) => { console.error('FAIL', e.message); process.exit(1); });

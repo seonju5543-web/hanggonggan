@@ -3,6 +3,8 @@
    결과는 일반 수집기와 같은 data/notices.json에 합쳐진다. */
 import fs from 'node:fs';
 import { chromium } from 'playwright';
+import { urlKey, dedupeNotices } from './url-key.mjs';
+import { isAttachmentEntry } from './attachment-link.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const cfg = JSON.parse(fs.readFileSync(new URL('browser-targets.json', HERE), 'utf8'));
@@ -30,11 +32,30 @@ const ctx = await browser.newContext({
   locale: 'ko-KR',
 });
 
-async function loadPage(url) {
+/* 게시판 열기 — 학교 서버가 잠깐 느릴 때 한 번의 시간초과로 그 학교를 통째로
+   놓치지 않도록 단계적으로 재시도한다 (2026-07-30 시립대 유실 사례로 도입).
+   1차: 기본 30초 → 2차: 45초 → 3차: 45초 + '응답이 오면 통과'(commit) 완화 조건.
+   상세 화면 방문은 attempts:1 — 실패해도 마감·첨부만 비고 목록은 남기 때문. */
+async function gotoWithRetry(page, url, attempts) {
+  let lastErr;
+  for (let i = 0; i < attempts; i += 1) {
+    try {
+      const waitUntil = i >= 2 ? 'commit' : 'domcontentloaded';
+      await page.goto(url, { waitUntil, timeout: i === 0 ? 30000 : 45000 });
+      return;
+    } catch (e) {
+      lastErr = e;
+      if (i < attempts - 1) await page.waitForTimeout(3000 * (i + 1)); // 3초 → 6초 쉬고 재시도
+    }
+  }
+  throw lastErr;
+}
+
+async function loadPage(url, { attempts = 3 } = {}) {
   const page = await ctx.newPage();
   const clickDetails = {}; // 클릭 수집 시 상세 화면에서 미리 채집한 마감·첨부
   try {
-    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await gotoWithRetry(page, url, attempts);
     await page.waitForTimeout(4000); // 동적 목록이 그려질 시간 (XHR 목록 포함)
     // 본문 프레임(iframe) 안까지 포함해 링크를 모은다 — 일부 학교는 목록을 프레임에 그림
     let links = [];
@@ -131,24 +152,29 @@ async function loadPage(url) {
     return { links, html, textLines, frameCount, clickDetails, clickTried };
   } catch (e) {
     await page.close().catch(() => {});
-    return { error: e.message ? e.message.slice(0, 80) : String(e) };
+    // 오류 문구는 한 줄로 (Playwright의 'Call log:' 여러 줄이 리포트를 깨뜨리던 것 정리)
+    const msg = (e.message || String(e)).split('\n')[0].trim();
+    return { error: msg.slice(0, 100) };
   }
 }
 
 const report = [`## 🖥 브라우저형 수집 리포트 (${new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 16).replace('T', ' ')} KST)`, ''];
 const freshAll = [];
 
-for (const t of cfg.targets) {
-  const name = t.campus && t.campus !== '공통' ? `${t.school} ${t.campus}` : t.school;
-  report.push(`### ${name}`);
+async function harvestTarget(t) {
   let harvested = false;
+  let loadedAny = false; // 후보 주소 중 하나라도 열렸는지 (전부 실패 = 그 학교 이번 실행 누락)
   for (const url of t.candidates) {
     const r = await loadPage(url);
     if (r.error) { report.push(`- ❌ 오류(${r.error}) · ${url}`); continue; }
+    loadedAny = true;
     const items = r.links
       .filter((l) => l.title.length >= 6 && l.title.length <= 140 && /^https?:/.test(l.url))
-      .filter((l) => KEYWORDS.test(l.title) && (NOTICE_SIGNAL.test(l.title) || !MENU_NOISE.test(l.title)));
-    const uniq = [...new Map(items.map((i) => [i.url, i])).values()];
+      .filter((l) => KEYWORDS.test(l.title) && (NOTICE_SIGNAL.test(l.title) || !MENU_NOISE.test(l.title)))
+      // 첨부파일 내려받기 링크 제외 — 안 막으면 '…포스터.png' 같은 파일 이름이 공고로 뜬다
+      .filter((l) => !isAttachmentEntry(l));
+    // 중복 판정은 정규화 주소로 — 시립대처럼 정렬 순번(sort=)이 주소에 붙는 게시판 대응
+    const uniq = [...new Map(items.map((i) => [urlKey(i.url), i])).values()];
     report.push(`- ${uniq.length ? '✅' : '⚪'} 링크 ${r.links.length} · 장학 공고 ${uniq.length} · ${url}`);
     // 진단: 공고를 거의 못 알아본 게시판은 화면에서 본 것을 남겨 원인 파악을 돕는다
     if (uniq.length <= 1 && r.links.length > 5) {
@@ -162,7 +188,7 @@ for (const t of cfg.targets) {
     if (!uniq.length || harvested) continue;
 
     harvested = true;
-    const fresh = uniq.filter((i) => !seen[i.url]).slice(0, 40);
+    const fresh = uniq.filter((i) => !seen[i.url] && !seen[urlKey(i.url)]).slice(0, 40);
     for (const it of fresh) {
       let deadlineHint = null;
       let attachments = [];
@@ -173,7 +199,7 @@ for (const t of cfg.targets) {
         attachments = cd.attachments || [];
       } else {
       // 상세 페이지도 브라우저로 방문해 마감 단서·첨부 수집
-      const d = await loadPage(it.url);
+      const d = await loadPage(it.url, { attempts: 1 }); // 실패해도 목록은 남으므로 재시도 없음
       if (!d.error) {
         const text = d.html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ')
           .replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
@@ -191,12 +217,36 @@ for (const t of cfg.targets) {
         school: t.school, campus: t.campus === '공통' ? '' : t.campus,
         foundAt: new Date().toISOString().slice(0, 10),
       };
-      seen[it.url] = rec.foundAt;
+      seen[urlKey(it.url)] = rec.foundAt;
       freshAll.push(rec);
       report.push(`  - [수집] ${it.title.slice(0, 70)}`);
     }
   }
+  return loadedAny;
+}
+
+const failedTargets = [];
+for (const t of cfg.targets) {
+  const name = t.campus && t.campus !== '공통' ? `${t.school} ${t.campus}` : t.school;
+  report.push(`### ${name}`);
+  const ok = await harvestTarget(t);
+  if (!ok) failedTargets.push({ t, name });
   report.push('');
+}
+
+/* 후보 주소가 전부 실패한 학교(= 학교 서버 일시 장애)는 다른 학교를 다 돈 뒤 한 번 더 시도한다.
+   몇 분 뒤면 대개 회복되므로, 그날 그 학교 공고를 통째로 놓치는 일을 줄인다. */
+const stillFailed = failedTargets.map((f) => f.name);
+/* 단, 절반 넘는 학교가 실패했다면 로봇 쪽 네트워크 장애이므로 재시도해도 소용없다 — 실행만 길어진다 */
+if (failedTargets.length && failedTargets.length <= Math.max(1, Math.floor(cfg.targets.length / 2))) {
+  stillFailed.length = 0;
+  report.push('### 🔁 실패 학교 재시도 (몇 분 뒤 재접속)');
+  for (const f of failedTargets) {
+    report.push(`**${f.name}**`);
+    const ok = await harvestTarget(f.t);
+    if (!ok) stillFailed.push(f.name);
+    report.push('');
+  }
 }
 await browser.close();
 
@@ -204,6 +254,10 @@ await browser.close();
 notices.items = freshAll.concat(notices.items || []);
 const cutoff = new Date(Date.now() - 60 * 86400000).toISOString().slice(0, 10);
 notices.items = notices.items.filter((n) => (n.foundAt || '9999') >= cutoff);
+/* 예전에 담긴 첨부파일 링크도 매 실행 걷어낸다 (소급 적용 — 운영 원칙 7) */
+notices.items = notices.items.filter((n) => !isAttachmentEntry(n));
+/* 같은 공고가 다른 주소(정렬 순번·클릭형 표식)로 여러 번 들어와 있으면 하나로 합친다 */
+notices.items = dedupeNotices(notices.items);
 const perSchool = {};
 notices.items = notices.items.filter((n) => {
   const k = n.school + '|' + (n.campus || '');
@@ -216,6 +270,38 @@ fs.writeFileSync(noticesPath, JSON.stringify(notices, null, 1));
 
 report.push('---');
 report.push(`이번 실행 신규 수집: **${freshAll.length}건** · 브라우저로도 수집 실패한 학교는 게시판 주소 확인이 필요합니다.`);
+/* 접속 자체가 안 된 학교는 요약에 따로 적는다 — 리포트 중간의 ❌ 한 줄은 놓치기 쉬웠다.
+   (재시도까지 실패해도 다음 실행에서 다시 수집되므로 공고가 영구히 사라지지는 않는다)
+
+   그리고 '몇 번 연속 실패했는지'를 기록해 둔다. 한 번 실패는 학교 서버가 잠깐 느린 것이라
+   다음 실행에서 저절로 복구되지만, 연속으로 실패하면 게시판 주소가 바뀐 것이므로
+   사람이 손을 대야 한다. 이 구분이 없어서 시립대가 며칠씩 조용히 빠져 있었다 (2026-07-30). */
+const healthPath = new URL('health.json', HERE);
+let health = {};
+try { health = JSON.parse(fs.readFileSync(healthPath, 'utf8')); } catch { /* 첫 실행 */ }
+const runDate = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
+const chronic = [];
+for (const t of cfg.targets) {
+  const name = t.campus && t.campus !== '공통' ? `${t.school} ${t.campus}` : t.school;
+  const h = health[name] || { fails: 0, lastOk: null };
+  if (stillFailed.includes(name)) {
+    h.fails += 1;
+    if (h.fails >= 3) chronic.push(`${name}(${h.fails}회 연속)`);
+  } else {
+    h.fails = 0; h.lastOk = runDate;
+  }
+  health[name] = h;
+}
+fs.writeFileSync(healthPath, JSON.stringify(health, null, 1));
+
+if (stillFailed.length) {
+  report.push('');
+  report.push(`⚠️ **이번 실행에 접속 실패한 학교: ${stillFailed.join(', ')}** — 학교 서버가 응답하지 않아 이번 회차만 건너뛰었어요. 다음 실행(약 12시간 뒤)에 자동으로 다시 수집합니다.`);
+}
+if (chronic.length) {
+  report.push('');
+  report.push(`🚨 **여러 번 연속 실패한 학교: ${chronic.join(', ')}** — 일시 장애가 아니라 게시판 주소가 바뀌었을 가능성이 큽니다. 해당 학교 학생에게 새 공고가 나가지 않고 있으니 주소 확인이 필요해요(Claude 세션에 "○○대 게시판 주소 확인해줘"라고 지시하면 정찰 도구로 후보를 찾아드려요).`);
+}
 fs.writeFileSync(new URL('browser-report.md', HERE), report.join('\n'));
 console.log(`browser-collect: ${freshAll.length} new items`);
 if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT, `new_count=${freshAll.length}\n`);

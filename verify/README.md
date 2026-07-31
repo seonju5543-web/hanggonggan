@@ -28,6 +28,9 @@ node verify-notify.js       # 알림 시스템 브라우저 검증: 최초 1회 
 ## 개발자 도우미 (서버 불필요 — data/*.json만 읽음)
 
 ```bash
+node verify/check-deploy-sync.js         # 배포 반영 확인: 지금 작업분이 실제로 앱(main)에 나가 있는지 대조
+node verify/check-collab.js              # 협업 겹침 점검: 상대 작업과 부딪힐 곳이 있는지 (규칙: COLLAB.md)
+node verify/check-collab.js --brief      #   └ 문제가 있을 때만 짧게 (세션 시작 훅이 쓰는 모드)
 node verify/list-unregistered.js         # 수집됐지만 미등록인 공고를 학교별로 추림 (컨펌 대상 후보)
 node verify/list-unregistered.js --all    # 제외분(중복·메뉴·대출·행사·마감경과) 사유까지 전부 표시
 ```

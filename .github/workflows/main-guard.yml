@@ -1,0 +1,193 @@
+name: main 직접 수정 되가져오기
+
+# 왜 필요한가 (2026-07-31 11차 세션):
+#   앱이 배포되는 main을 GitHub 화면에서 직접 고치는 일이 실제로 있었다(7/31 18:34~18:59,
+#   browser-collect.yml 3회). 그 변경은 **기본 브랜치에 없으므로**:
+#     ① 다음 세션이 기본 브랜치에서 작업하면 그 변경이 없는 옛 판 위에 얹어 '판 통합'이 필요해지고
+#     ② 배포 동기화 로봇이 매번 그 지점에서 부딪힌다.
+#   브랜치 보호(Settings → Rules)로 막는 방법도 있지만, 이 저장소는 배포 로봇·진척도 로봇이
+#   main에 **직접 push**해서 앱을 내보내므로 'PR 필수'를 걸면 앱 배포가 통째로 멈춘다.
+#   그래서 **막는 대신 자동으로 고친다** — main에 사람이 올린 변경을 기본 브랜치로 되가져온다.
+#   (저장소 관리자 권한이 필요 없다는 것도 이 방식의 장점)
+#
+# 방향 주의: 이 워크플로는 main → 기본 브랜치 (되가져오기).
+#            반대 방향(기본 브랜치 → main, 앱 배포)은 deploy-sync.yml이 맡는다. 둘은 짝이다.
+
+on:
+  push:
+    branches: ['main']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+# 배포 동기화와 **다른** 그룹을 쓴다. 같은 그룹에 넣으면 줄이 서서 안전해 보이지만,
+# GitHub은 대기 중인 실행이 둘 이상이면 오래된 쪽을 취소한다 — 그러면 되가져오기가
+# 조용히 사라진다. 경합은 아래 push 재시도(3회)가 처리하므로 그쪽이 안전하다.
+concurrency:
+  group: main-guard
+  cancel-in-progress: false
+
+jobs:
+  backmerge:
+    # 브랜치 삭제 push에는 돌지 않는다
+    if: github.event.deleted != true
+    runs-on: ubuntu-latest
+    steps:
+      - name: 기본 브랜치 체크아웃
+        uses: actions/checkout@v4
+        with:
+          ref: claude/nice-heisenberg-WESq5
+          fetch-depth: 0        # 병합 판단에 전체 이력이 필요하다
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # 로봇 기록장(공고 목록·본 공고 장부)이 양쪽에서 달라졌을 때 자동으로 합쳐 준다.
+      # 이게 없으면 아래 병합이 사소한 데이터 차이로도 멈춘다 (COLLAB.md 참조).
+      - name: 협업 병합기 등록
+        run: bash tools/setup-collab.sh
+
+      - name: main의 변경을 기본 브랜치로 되가져오기
+        id: back
+        env:
+          BASE: claude/nice-heisenberg-WESq5
+        run: |
+          set -u
+          git config user.name "handaejang-guard-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin "$BASE" main
+
+          # ── 되가져올 게 있나 ────────────────────────────────────────────
+          # 정상적인 세션은 기본 브랜치와 main에 같은 내용을 올리므로 여기서 조용히 끝난다.
+          # (배포 로봇의 push는 GitHub 규칙상 이 워크플로를 깨우지 못하므로 애초에 안 돈다)
+          if git merge-base --is-ancestor origin/main HEAD; then
+            echo "기본 브랜치가 이미 main을 포함 — 되가져올 것 없음"
+            echo "state=uptodate" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # 빨리 감기인지(= 기본 브랜치에 새 커밋이 없어 그냥 따라잡으면 되는지) 미리 본다.
+          # 빨리 감기면 파일 내용이 main과 똑같아지므로 데이터 검사가 필요 없다.
+          if git merge-base --is-ancestor HEAD origin/main; then
+            FF=1
+          else
+            FF=0
+          fi
+          echo "ff=$FF" >> "$GITHUB_OUTPUT"
+
+          if ! git merge --no-edit origin/main -m "되가져오기: main 직접 수정분을 기본 브랜치에 반영 (자동)"; then
+            git merge --abort || true
+            echo "충돌로 되가져오지 못함"
+            echo "state=conflict" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # ── 진짜 병합이 일어났을 때만 데이터 관문 ────────────────────────
+          # 빨리 감기가 아니면 로봇 기록장이 자동 병합기로 합쳐졌을 수 있다.
+          # 그 결과가 깨졌으면 push하지 않는다 — 기본 브랜치가 잠깐 뒤쳐지는 건 되돌릴 수 있지만,
+          # 깨진 데이터가 기본 브랜치에 들어가면 다음 수집 로봇이 그걸 읽는다.
+          if [ "$FF" = "0" ]; then
+            if ! node verify/audit-data.js; then
+              git merge --abort 2>/dev/null || git reset --hard "origin/$BASE"
+              echo "병합 결과가 데이터 검사를 통과하지 못함"
+              echo "state=auditfail" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
+
+          # ── 저장 (그 사이 수집 로봇이 먼저 썼을 수 있으므로 최대 3회) ──────
+          for i in 1 2 3; do
+            if git push origin "HEAD:$BASE"; then
+              echo "state=pushed" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            git fetch origin "$BASE" || true
+            if ! git merge --no-edit "origin/$BASE" -m "되가져오기: 그 사이 들어온 수집분과 병합"; then
+              git merge --abort || true
+              echo "state=conflict" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          done
+          echo "state=pushfail" >> "$GITHUB_OUTPUT"
+
+      - name: 되가져온 내용 요약
+        if: steps.back.outputs.state == 'pushed'
+        run: |
+          echo "✅ main 직접 수정분을 기본 브랜치에 반영했습니다."
+          echo "   다음 세션은 이 내용이 포함된 상태에서 작업하게 됩니다."
+          git log --oneline -5
+
+      # 조용히 멈추지 않는다. 다만 알림이 쌓이지 않게, 열려 있는 같은 이슈가 있으면 코멘트만 단다.
+      - name: 🚨 되가져오기 실패 알림
+        if: >
+          failure() ||
+          steps.back.outputs.state == 'conflict' ||
+          steps.back.outputs.state == 'auditfail' ||
+          steps.back.outputs.state == 'pushfail'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          STATE: ${{ steps.back.outputs.state }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -u
+          reason="${STATE:-error}"
+          case "$reason" in
+            conflict)  detail="양쪽이 같은 곳을 서로 다르게 고쳐서 자동으로 합칠 수 없습니다." ;;
+            auditfail) detail="합치는 것까지는 됐지만 결과가 데이터 검사를 통과하지 못해 저장하지 않았습니다." ;;
+            pushfail)  detail="저장(push)이 3회 모두 실패했습니다." ;;
+            *)         detail="실행 중 오류가 났습니다." ;;
+          esac
+
+          body="앱 배포 브랜치(\`main\`)에 직접 올라온 변경을 **기본 브랜치로 되가져오지 못했습니다.**
+          사유: \`$reason\` — $detail
+
+          이대로 두면 그 변경이 기본 브랜치에 없어서, 다음 세션이 그 내용이 빠진 판 위에서
+          작업하게 되고 배포 동기화 로봇도 계속 같은 지점에서 부딪힙니다.
+
+          다음 Claude 세션에서 아래를 실행해 손으로 합쳐 주세요.
+
+          \`\`\`
+          git fetch origin main claude/nice-heisenberg-WESq5
+          git checkout -B backmerge origin/claude/nice-heisenberg-WESq5
+          bash tools/setup-collab.sh
+          git merge origin/main
+          # 충돌이 있으면 해결한 뒤
+          node verify/audit-data.js
+          git push origin HEAD:claude/nice-heisenberg-WESq5
+          \`\`\`
+
+          규칙 문서: [COLLAB.md](https://github.com/$REPO/blob/main/COLLAB.md)
+          실행 기록: $RUN_URL
+
+          ---
+          _Generated by [Claude Code](https://claude.ai/code)_"
+
+          # 같은 문제로 이슈가 쌓이지 않게, 열려 있는 게 있으면 코멘트만 단다.
+          # 찾는 열쇠는 제목 검색이 아니라 **라벨**을 쓴다 — 제목에는 이모지·한글이 들어가고,
+          # GitHub 제목 검색은 그런 문자열에서 놓치는 경우가 있어 이슈가 중복 생성된다.
+          LABEL="main-backmerge"
+          gh label create "$LABEL" --repo "$REPO" --color D93F0B \
+             --description "main 직접 수정분을 기본 브랜치로 되가져오지 못함" 2>/dev/null || true
+
+          # 결과가 비면 '.[0].number'는 null을 찍는다 — 그대로 쓰면 '#null'에 코멘트를 시도한다.
+          # '// empty'로 빈 문자열이 되게 한다.
+          existing=$(gh issue list --repo "$REPO" --state open --label "$LABEL" \
+                       --json number --jq '.[0].number // empty' 2>/dev/null || echo "")
+
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --repo "$REPO" --body "$body"
+            echo "기존 이슈 #$existing 에 코멘트를 남겼습니다 (알림 중복 방지)."
+          else
+            gh issue create --repo "$REPO" \
+              --title "🚨 main 직접 수정 되가져오기 실패 ($(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST)" \
+              --label "$LABEL" \
+              --assignee "${{ github.repository_owner }}" \
+              --body "$body" \
+            || gh issue create --repo "$REPO" \
+              --title "🚨 main 직접 수정 되가져오기 실패 ($(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST)" \
+              --body "$body"
+          fi

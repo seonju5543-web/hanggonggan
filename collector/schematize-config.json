@@ -1,0 +1,8 @@
+{
+ "enabled": true,
+ "maxApiCallsPerRun": 2,
+ "minTextChars": 400,
+ "maxManualChars": 6000,
+ "alwaysApiIds": [],
+ "neverApiIds": []
+}

@@ -258,8 +258,9 @@ function renderFormDoc(tpl, p, ans, { editable = false } = {}) {
     if (sec.info) {
       html += '<table class="fd-table">';
       sec.info.forEach((row) => {
+        /* 한 줄에 칸이 하나뿐인 서식도 있다 — 없는 칸을 그리면 'undefined'가 찍힌다 */
         html += `<tr><th>${esc(row[0])}</th><td${ed}>${esc(autoVal[row[1]] || '')}</td>
-                 <th>${esc(row[2])}</th><td${ed}>${esc(autoVal[row[3]] || '')}</td></tr>`;
+                 <th>${esc(row[2] || '')}</th><td${ed}>${esc(autoVal[row[3]] || '')}</td></tr>`;
       });
       html += '</table>';
       // 여기서 끝내면 안 된다 — info와 fields가 같은 섹션에 있으면(산학디딤돌 등)
