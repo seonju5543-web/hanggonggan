@@ -39,7 +39,7 @@
          (워크플로 link-hunter.yml · collector/run-link-hunt.txt 를 고쳐 push해도 실행) */
 import fs from 'node:fs';
 import { chromium } from 'playwright';
-import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, detailCandidates, idsFromSource } from './detail-url.mjs';
+import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, titleFingerprint, detailCandidates, idsFromSource } from './detail-url.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const DRY = process.argv.includes('--dry');
@@ -146,7 +146,12 @@ async function freshPage() {
 }
 
 const fp = (s) => String(s || '').replace(/[\s .,·ㆍ~〜'"“”‘’!?()[\]{}<>:;|/\\_+\-*&#%]/g, '').toLowerCase();
-const coreTitle = (t) => fp(String(t).replace(/^\s*\d{1,5}\s+/, '').replace(/^\s*(공통|서울|글로벌|국제|공지|홍보|일반)\s+/, '').replace(/\[[^\]]{0,20}\]/g, ''));
+/* 제목 정규화는 **공용 규칙(titleFingerprint)을 그대로 쓴다.**
+   여기에 복사본을 두었다가 규칙이 갈라져 크게 손해를 봤다 (2026-08-01):
+   복사본은 날짜·조회수를 안 떼서 '…안내 2026.07.30. 조회 104'가 지문에 그대로 남았고,
+   상세 화면 본문엔 그런 글자가 없으니 **멀쩡한 주소가 전부 '제목 불일치'로 떨어졌다.**
+   규칙은 한 곳에만 둔다 — 이 저장소가 entry-rules·url-key에서 이미 지키는 원칙이다. */
+const coreTitle = titleFingerprint;
 
 function looksLikeList(text, others) {
   const body = fp(text);
@@ -164,7 +169,14 @@ async function verify(url, title, others) {
   try {
     const res = await p.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 });
     if (res && res.status() >= 400) return { ok: false, why: `HTTP ${res.status()}`, net: true };
-    const probe = String(title).replace(/^\s*\d{1,5}\s+/, '').replace(/^\s*(공통|서울|국제|공지|홍보)\s+/, '').slice(0, 12).trim();
+    /* 화면에 제목이 그려질 때까지 기다릴 때 쓰는 조각.
+       말머리([홍보]·공지)와 앞머리 번호를 떼야 상세 화면 본문과 맞는다 —
+       안 떼면 매번 7초를 헛되이 기다린 뒤 판정으로 넘어간다. */
+    const probe = String(title)
+      .replace(/^\s*\d{1,5}\s+/, '')
+      .replace(/\[[^\]]{0,20}\]/g, '')
+      .replace(/^\s*(공통|서울|글로벌|국제|공지|홍보|일반)\s+/g, '')
+      .trim().slice(0, 12).trim();
     if (probe.length >= 4) {
       await p.waitForFunction((n) => (document.body && document.body.innerText || '').includes(n), probe, { timeout: 7000 }).catch(() => {});
     }
