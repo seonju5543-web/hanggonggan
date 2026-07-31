@@ -67,7 +67,7 @@ jobs:
 
       - name: 공고 원문 발췌 갱신 (정직 원칙 — 추론 대신 원문 그대로)
         run: node collector/extract-excerpts.mjs --write
-      -       - name: 결과 저장 (main에 직접 반영 — 사람 작업 브랜치와 완전히 분리)
+      - name: 결과 저장 (main에 직접 반영 — 사람 작업 브랜치와 완전히 분리)
         run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
