@@ -17,11 +17,16 @@
    실행: node collector/resolve-detail-urls.mjs [--dry]  (워크플로 resolve-detail-urls.yml) */
 import fs from 'node:fs';
 import { chromium } from 'playwright';
-import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, detailCandidates } from './detail-url.mjs';
+import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, detailCandidates, idsFromSource } from './detail-url.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const DRY = process.argv.includes('--dry');
 const LIMIT_BOARDS = Number(process.env.RESOLVE_MAX_BOARDS || 20);
+/* 실행 시간 상한 — 2차 실행이 40분을 넘겼다. 매주 도는 로봇이므로 한 번에 다 못 고쳐도
+   다음 주에 이어서 고치면 된다. 시간을 넘기면 그때까지 고친 것만 저장하고 끝낸다. */
+const BUDGET_MS = Number(process.env.RESOLVE_BUDGET_MS || 25 * 60000);
+const startedAt = Date.now();
+const outOfTime = () => Date.now() - startedAt > BUDGET_MS;
 
 const noticesPath = new URL('../data/notices.json', HERE);
 const registeredPath = new URL('../data/registered.json', HERE);
@@ -116,13 +121,13 @@ async function verifyCandidate(url, title, attempt = 0) {
   const c = await verifyContext();
   const p = await c.newPage();
   try {
-    const res = await p.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    const res = await p.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 });
     if (res && res.status() >= 400) return { ok: false, why: `HTTP ${res.status()}` };
     // 제목이 화면에 나타날 때까지 기다린다 (동적으로 그리는 상세 화면 대응)
     const probe = String(title).replace(/^\s*\d{1,5}\s+/, '').replace(/^\s*(공통|서울|글로벌|국제|공지|홍보)\s+/, '').slice(0, 12).trim();
     if (probe.length >= 4) {
       await p.waitForFunction((needle) => (document.body && document.body.innerText || '').includes(needle),
-        probe, { timeout: 9000 }).catch(() => {});
+        probe, { timeout: 6000 }).catch(() => {});
     }
     await p.waitForTimeout(800);
     const text = await p.evaluate(() => (document.body.innerText || '').slice(0, 12000)).catch(() => '');
@@ -159,15 +164,6 @@ async function scrapeRows(page) {
       html: (e.outerHTML || '').slice(0, 300),
     };
   }).filter((x) => x.t.length >= 6 && x.t.length <= 160)).catch(() => []);
-}
-
-/* 클릭 스크립트 인자에서 글 번호 후보 뽑기 — fn_view('1078712') · goDetail(1078712,'BMSR00040') 등 */
-function idsFromSource(src) {
-  const out = [];
-  for (const m of String(src || '').matchAll(/['"]?(\d{3,20})['"]?/g)) {
-    if (!out.includes(m[1])) out.push(m[1]);
-  }
-  return out.slice(0, 4);
 }
 
 /* 게시판을 여러 페이지 훑는다 — 앱에 담긴 공고 중에는 이미 1페이지에서 밀려난 것이 많다
@@ -231,8 +227,16 @@ for (const [listUrl, group] of boards) {
   const pagesSeen = Math.max(...rows.map((r) => r.pageNo), 1);
   report.push(`- 목록 ${pagesSeen}페이지에서 행 ${rows.length}개`);
 
+  /* 이 게시판에서 '어떤 후보가 통했는지'를 기억해 둔다. 같은 게시판 안에서는 주소를 만드는
+     규칙이 같으므로, 두 번 확인에 성공하면 그 뒤로는 확인 없이 믿는다 — 2차 실행이 40분을
+     넘긴 주된 이유가 공고마다 매번 열어 본 것이었다. (규칙이 통한다는 근거는 이미 두 번 있다.) */
+  let boardProven = 0;
+  const provenKind = (c, row) => (c === row.abs ? 'row' : 'built');
+  let provenAs = null;
+
   let boardCandidateTotal = 0;
   for (const t of group) {
+    if (outOfTime()) { report.push('  - (시간 상한 도달 — 나머지는 다음 실행에서 이어서 고칩니다)'); break; }
     const want = markerTitle(t.url);
     const row = rows.find((r) => sameTitle(want, r.t));
     if (!row) { report.push(`  - ⚠️ 목록에서 못 찾음(내려갔거나 제목 변경): ${want.slice(0, 50)}`); failed += 1; continue; }
@@ -247,9 +251,13 @@ for (const [listUrl, group] of boards) {
     }
 
     let found = null;
-    for (const c of cands) {
+    // 규칙이 이미 두 번 통한 게시판이면 같은 종류의 후보를 확인 없이 채택한다
+    if (boardProven >= 2 && provenAs) {
+      found = cands.find((c) => provenKind(c, row) === provenAs) || null;
+    }
+    for (const c of (found ? [] : cands)) {
       const v = await verifyCandidate(c, want);
-      if (v.ok) { found = c; break; }
+      if (v.ok) { found = c; boardProven += 1; provenAs = provenKind(c, row); break; }
       report.push(`    · 탈락(${v.why}) ${c.slice(0, 100)}`);
     }
 

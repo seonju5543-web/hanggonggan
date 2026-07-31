@@ -102,6 +102,17 @@ export function isDetailUrl(raw, listUrl) {
   return false;
 }
 
+/* 목록 행의 클릭 스크립트 인자에서 글 번호 후보 뽑기.
+   경희 news.khu.ac.kr 유형: 행이 `fn_view('1078712')` 같은 스크립트를 부르고 form을 POST 전송해
+   주소창이 안 바뀐다. 이때 인자에 든 글 번호가 원문 주소를 만드는 유일한 재료다. */
+export function idsFromSource(src) {
+  const out = [];
+  for (const m of String(src || '').matchAll(/['"]?(\d{3,20})['"]?/g)) {
+    if (!out.includes(m[1])) out.push(m[1]);
+  }
+  return out.slice(0, 4);
+}
+
 /* 제목 비교용 정규화 — 게시판 목록 행에는 번호·분류·조회수가 섞여 들어오므로
    글자만 남겨 비교한다 (clean-title.mjs와 목적이 다르다: 저쪽은 '보여줄 제목' 다듬기,
    여기는 '같은 글인가' 판정용이라 더 과감하게 지운다). */
@@ -182,4 +193,4 @@ export function detailCandidates(dom) {
   return out;
 }
 
-export default { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, titleFingerprint, sameTitle, detailCandidates };
+export default { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, titleFingerprint, sameTitle, detailCandidates, idsFromSource };

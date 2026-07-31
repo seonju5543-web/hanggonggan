@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import { chromium } from 'playwright';
 import { urlKey, dedupeNotices } from './url-key.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
-import { isDetailUrl, detailCandidates, sameTitle } from './detail-url.mjs';
+import { isDetailUrl, detailCandidates, sameTitle, idsFromSource } from './detail-url.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const cfg = JSON.parse(fs.readFileSync(new URL('browser-targets.json', HERE), 'utf8'));
@@ -117,17 +117,23 @@ async function loadPage(url, { attempts = 3 } = {}) {
     if (kwAnchors < 3) {
       // 클릭 대상: onclick 속성 행 + javascript: 가짜 주소 링크 (학교 게시판 양대 유형)
       const CLICKABLE = '[onclick], a[href^="javascript"]';
+      // 클릭 스크립트가 넘기는 글 번호(src)도 함께 받아 둔다 — 경희처럼 클릭이 form POST라
+      // 주소창이 안 바뀌는 게시판은 이 번호가 원문 주소를 만드는 유일한 재료다 (2026-07-31)
       const clickRows = await page.$$eval(CLICKABLE, (els) => els
-        .map((e, i) => ({ i, t: (e.textContent || '').replace(/\s+/g, ' ').trim() }))
+        .map((e, i) => ({
+          i,
+          t: (e.textContent || '').replace(/\s+/g, ' ').trim(),
+          src: [e.getAttribute('onclick') || '', e.getAttribute('href') || '', e.getAttribute('data-id') || ''].join('|'),
+        }))
         .filter((x) => /장학|학자금/.test(x.t) && x.t.length >= 10 && x.t.length <= 120)
-        .slice(0, 40).map((x) => [x.i, x.t])).catch(() => []);
+        .slice(0, 40).map((x) => [x.i, x.t, x.src])).catch(() => []);
       let ci = 0;
       clickTried = clickRows.length;
       const usedUrls = new Set(); // 상세 주소가 전부 같은 게시판(내부 전송형) 대응
       // 선조치: 클릭 수집은 행마다 클릭·대기가 있어 40건이면 오래 걸릴 수 있다.
       // 게시판당 클릭 예산(180초)을 두어 초과하면 그때까지 채집분만 남기고 넘어간다(런 전체 지연 방지).
       const clickBudgetMs = 180000; const clickStart = Date.now();
-      for (const [idx, title] of clickRows) {
+      for (const [idx, title, rowSrc] of clickRows) {
         if (Date.now() - clickStart > clickBudgetMs) { report.push(`  - (클릭 예산 초과 — ${ci}/${clickRows.length}건까지 채집)`); break; }
         ci += 1;
         try {
@@ -170,7 +176,7 @@ async function loadPage(url, { attempts = 3 } = {}) {
               hiddenInputs: hidden,
             };
           }).catch(() => ({ hiddenInputs: {} }));
-          const cands = detailCandidates({ ...dom, url: detailPage.url(), listUrl: url })
+          const cands = detailCandidates({ ...dom, url: detailPage.url(), listUrl: url, rowIds: idsFromSource(rowSrc) })
             .filter((c) => isDetailUrl(c, url) && !usedUrls.has(c));
           let recUrl = null;
           if (cands.length) {
