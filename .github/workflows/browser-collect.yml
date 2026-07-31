@@ -93,13 +93,14 @@ jobs:
 
           # 사람 작업 브랜치는 건드리지 않고, main을 최신으로 받아서 그 위에 데이터만 얹는다
           git fetch origin main
-          git checkout -B main origin/main
+          git checkout -f -B main origin/main
           apply_data
 
           if ! git diff --cached --quiet; then
             git commit -m "browser-collector: harvest update"
+            pushed=0
             for i in 1 2 3; do
-              git push origin main && break
+              if git push origin main; then pushed=1; break; fi
               # push 실패 시: 병합하지 않고, main 최신 위에 방금 만든 데이터를 다시 그대로 덮어써서 재시도
               # (수집 데이터는 "누적 병합"이 아니라 "최신 재수집"이 맞는 방식 — 충돌 마커가 안 뜨게)
               git fetch origin main
@@ -107,10 +108,14 @@ jobs:
               apply_data
               git diff --cached --quiet || git commit -m "browser-collector: harvest update"
             done
+            if [ "$pushed" != "1" ]; then
+              echo "::error::main에 수집 데이터 push 실패 — 3회 재시도 모두 실패. 이번 수집분이 저장되지 않았습니다."
+              exit 1
+            fi
           fi
 
       - name: 리포트 이슈
-        if: github.event_name == 'workflow_dispatch' || steps.run.outputs.new_count != '0'
+        if: github.event_name == 'workflow_dispatch' || (steps.run.outputs.new_count != '' && steps.run.outputs.new_count != '0')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
