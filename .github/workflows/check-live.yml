@@ -39,7 +39,17 @@ jobs:
 
           node - <<'EOF'
           const fs = require('fs');
-          const count = (p) => { try { const j = JSON.parse(fs.readFileSync(p, 'utf8')); return (j.items || j).length; } catch { return null; } };
+          /* 파일마다 담는 모양이 달라서(공고=items 배열, 양식=templates 목록) 개수를 각각 센다.
+             모양을 못 읽으면 '읽기실패'로 남겨 두 쪽 다 undefined라 통과해 버리는 일이 없게 한다. */
+          const count = (p) => {
+            try {
+              const j = JSON.parse(fs.readFileSync(p, 'utf8'));
+              const box = j.items || j.templates || j;
+              if (Array.isArray(box)) return box.length;
+              if (box && typeof box === 'object') return Object.keys(box).length;
+              return '읽기실패';
+            } catch { return '읽기실패'; }
+          };
           const cache = (p) => { try { return (fs.readFileSync(p, 'utf8').match(/const CACHE = '([^']+)'/) || [,'?'])[1]; } catch { return '?'; } };
           const rows = [
             ['서비스워커 버전', cache('sw.js'), cache('live/sw.js')],
