@@ -328,7 +328,12 @@ for (const [listUrl, group] of boards) {
         report.push(`  - ✅ ${want.slice(0, 42)} → ${url.slice(0, 104)}`);
       } else {
         failed += 1;
-        record(t, /HTTP|Timeout|ERR_|net::/i.test(lastWhy) ? 'net' : 'bad', lastWhy || '주소를 못 만듦');
+        /* '못 읽음'으로 셀 것은 **학교 서버에 닿지 못한 경우만**이다.
+           HTTP 404는 닿았는데 그 주소가 없다는 뜻이라 판정이 난 것이므로 횟수에 센다.
+           안 그러면 404만 나는 공고는 시도 횟수가 영영 안 올라가 escalate가 되지 않고,
+           매일 조용히 같은 실패를 반복한다 — '조용한 방치 불가' 설계가 무력해진다. */
+        const unreachable = /Timeout|ERR_|net::|클릭 실패/i.test(lastWhy);
+        record(t, unreachable ? 'net' : 'bad', lastWhy || '주소를 못 만듦');
         report.push(`  - ⚠️ 실패(${lastWhy || '주소를 못 만듦'}): ${want.slice(0, 42)}`);
       }
       await new Promise((r) => setTimeout(r, 900));   // 학교 서버를 몰아치지 않는다
