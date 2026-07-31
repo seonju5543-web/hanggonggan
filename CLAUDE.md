@@ -375,9 +375,24 @@
   뒀으므로 그 버전을 채택하고 내 중복 수정은 버렸다.
 - **알림도 notStale을 쓴다**: main이 추가한 '마감 미확정 공고 60일 후 숨김'을 match-engine.js로 옮겨
   화면·알림이 같이 쓰게 했다. 안 그러면 **화면에는 없는 공고를 알림으로 알려** 눌러도 찾을 수 없다.
-- **배포 상태**: 이 알림 시스템은 아직 **main에 반영되지 않았다** = 사용자 앱에 안 보인다.
-  PROGRESS.md(선주 칸)에는 '개발 완료 · 배포 대기'로 기재해 main에 올려 뒀다.
-  배포하려면 개발자가 "알림 시스템 main에 반영·배포해줘"라고 지시해야 한다(협업 규칙 4).
+- **배포 완료 (2026-07-31, 개발자 지시)**: main에 병합해 배포했다(충돌 0건). `check-deploy-sync.js`
+  통과 · sw CACHE **v15**. 배포 직전에 전 검사를 배포될 내용 그대로 재실행해 통과 확인
+  (audit-data · test-collector · verify-notify-rules · verify-notify · drive · verify-registered ·
+  personas 120명 이상 0건).
+
+### ⚠️ 아직 안 합쳐진 브랜치와의 충돌 — 해법을 미리 검증해 뒀다 (2026-07-31)
+`claude/scholarship-notice-link-fix-ef4lk2`(원문 링크 복구, 20커밋)가 아직 main에 없다.
+그 브랜치를 main에 합칠 때 **딱 2곳이 충돌한다**. 별도 클론에서 실제로 합쳐 보고 해법까지
+검증했으니, 다음 세션은 그대로 적용하면 된다(추측 아님 — 양쪽 검사 전부 통과 확인):
+
+| 충돌 파일 | 원인 | 해법 |
+|---|---|---|
+| `sw.js` | 양쪽 다 CACHE를 **v15로 올려** 같은 줄에서 부딪힌다. 알림 쪽은 ASSETS에 파일 3개(match-engine·notify-rules·notify)를 추가했다 | **알림 쪽(HEAD) 블록을 채택**하고 CACHE만 **v16으로 올린다**. 내용이 달라졌는데 버전이 같으면 옛 캐시가 안 지워진다 |
+| `verify/README.md` | 양쪽이 같은 실행 목록에 드라이버를 한 줄씩 추가 | **둘 다 남긴다**(verify-notify* 3줄 + verify-source-links 1줄) |
+
+`app.js`·`CLAUDE.md`·`data/*`는 **자동 병합된다**(손댈 것 없음).
+합친 뒤 검증: `verify-notify.js`(알림) + `verify-source-links.js`(원문 링크) **둘 다** 돌릴 것 —
+별도 클론에서 이 조합으로 audit-data · drive · test-collector 까지 전부 통과하는 것을 확인했다.
 
 ## 같은 날 병행 세션 (2026-07-31 협업 세션 — 충돌 해소 체계 · 공동작업자 Josehyeon)
 
