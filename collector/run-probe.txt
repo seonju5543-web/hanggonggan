@@ -3,19 +3,10 @@
 # checkUrl:  이 주소를 로그인 없는 새 탭에서 열어 그대로 보고 (로그인 벽인지 포함)
 # findBoard: <학교 홈> | <메뉴 > 메뉴>
 
-# 2026-08-01(2차) — 1차 정찰로 **동국대 주소는 처음부터 맞았다**는 것이 확인됐다.
-#   …/detail/26765625 → 200 · 로그인 불필요 · 본문에 "2026-2학기 가송재단 장학생 선발 안내(~8/9)"
-#   …/detail/26765586 → 200 · 로그인 불필요 · 본문에 "[홍보] 2026년 하반기 서울인재대학장학금"
-# 즉 사냥꾼의 '제목 불일치(다른 글이 열림)' 판정이 틀렸던 것이다.
-# (동국대는 짧은 시간에 여러 번 두드리면 응답을 막는다 — 1차 정찰도 주소 3개 뒤 4번째가
-#  연결 끊김. 그때 오는 껍데기 화면을 로봇이 '다른 글'로 오해했다.)
-#
-# 이번엔 남은 글 번호를 하나씩(사이 2.5초) 열어 **어느 공고인지 눈으로 받아 적는다.**
-# 여기서 확인된 것만 앱 데이터에 넣는다 — 확인 안 된 것은 절대 넣지 않는다.
-
-checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765593
-checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765584
-checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765479
-checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764945
-checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764944
-checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765338
+# 2026-08-01(3차) — 남은 정식 등록 2건의 원문 주소를 찾는다.
+#   · 진담거사 지역미래불자육성장학  (사냥에서 '클릭 실패'로 떨어졌다)
+#   · 산학협동재단 국내 외국인 근로자 자녀 장학생 (동국대 접수) ('목록에서 못 찾음' 4회)
+# 게시판 목록을 열어 **각 행이 실제로 가리키는 주소를 그대로 받아 적는다.**
+# (1차 정찰 때는 이 단계가 연결 끊김으로 실패했다 — 확인용 브라우저를 주소마다
+#  새로 만든 것이 원인이라 하나만 재사용하도록 고쳤다. 이번엔 열릴 것이다.)
+findBoard: https://www.dongguk.edu/article/JANGHAKNOTICE/list |
