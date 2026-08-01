@@ -1,6 +1,41 @@
 const { chromium } = require('playwright-core');
 const SHOT = (n) => `${__dirname}/shot-${n}.png`;
 
+/* 앱에서 '아직 마감되지 않은 + 양식이 연결된' 공고를 스스로 찾아 질문 → 문서 생성까지 구동한다.
+   대상 공고를 코드에 박아두면 그 공고가 마감되는 순간 검증이 저절로 깨지므로(2026-08-01 조병두),
+   양식 종류와 무관하게 굴러가도록 만들었다: 빈 칸은 아무 값으로 채우고 체크는 첫 항목을 고른다. */
+async function driveAnyLiveForm(page) {
+  const id = await page.evaluate(() => {
+    const today = new Date().toISOString().slice(0, 10);
+    const live = (typeof registeredList !== 'undefined' ? registeredList : [])
+      .filter((s) => s.formId && FORM_TEMPLATES[s.formId] && (!s.deadline || s.deadline >= today));
+    return live.length ? live[0].id : null;
+  });
+  if (!id) return { id: null, ok: false };
+  await page.click('.nav-item[data-nav="explore"]');
+  await page.waitForTimeout(500);
+  const card = await page.$(`#explore-list [data-detail="${id}"]`);
+  if (!card) return { id, ok: false };
+  await card.click();
+  await page.waitForSelector('#detail-sheet.show');
+  await page.waitForTimeout(300);
+  if (await page.$eval('#btn-apply-one', (el) => el.disabled)) return { id, ok: false };
+  await page.click('#btn-apply-one');
+  await page.waitForSelector('#btn-ff-generate', { timeout: 8000 });
+  /* 빈 칸 채우기 — 자동 채움된 칸은 건드리지 않는다 */
+  for (const inp of await page.$$('.form-q input[type="text"], .form-q textarea')) {
+    if (!(await inp.inputValue())) await inp.fill('검증 입력');
+  }
+  for (const grp of await page.$$('.fq-checks')) {
+    const chip = await grp.$('.chip');
+    if (chip) await chip.click();
+  }
+  await page.click('#btn-ff-generate');
+  await page.waitForSelector('.form-doc', { timeout: 8000 });
+  const doc = await page.$eval('.form-doc', (el) => el.textContent);
+  return { id, ok: doc.includes('검증 입력') || doc.length > 200 };
+}
+
 (async () => {
   const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -58,6 +93,20 @@ const SHOT = (n) => `${__dirname}/shot-${n}.png`;
   await page.screenshot({ path: SHOT('31-jobyungdu-detail') });
 
   // 원클릭 신청 준비 → 양식 질문 화면
+  // 마감된 공고는 신청 버튼이 잠겨 있어 클릭하면 30초 타임아웃으로 깨진다 (README '마감된 공고를
+  // 대상으로 삼지 말 것'). 조병두는 2026-07-31 마감 — 마감이면 이 구간은 정직하게 건너뛰고,
+  // 대신 아직 마감 전인 양식 공고를 앱에서 스스로 찾아 같은 경로(질문 → 문서 생성)를 구동한다.
+  // 그래서 공고가 마감돼도 '양식 작성이 되는가'라는 검사 자체는 사라지지 않는다. (2026-08-01)
+  const applyLocked = await page.$eval('#btn-apply-one', (el) => el.disabled);
+  if (applyLocked) {
+    console.log('조병두 양식 UI 구동 건너뜀 — 이 공고는 마감됨(신청 버튼 잠김). 마감 전 양식 공고로 대체 구동합니다.');
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(300);
+    const drove = await driveAnyLiveForm(page);
+    console.log('대체 구동(마감 전 양식 공고):', drove.id || '없음', '| 문서 생성:', drove.ok);
+    if (!drove.ok) errors.push('마감 전 양식 공고를 하나도 구동하지 못했습니다');
+    await page.screenshot({ path: SHOT('32-live-form-doc') });
+  } else {
   await page.click('#btn-apply-one');
   await page.waitForSelector('#btn-ff-generate', { timeout: 8000 });
   const autoName = await page.inputValue('#fq-nameLine');
@@ -79,6 +128,7 @@ const SHOT = (n) => `${__dirname}/shot-${n}.png`;
   console.log('학생처장 귀하:', doc.includes('학생처장 귀하'));
   console.log('별첨 확인서 포함:', doc.includes('타장학금 수혜 여부 확인서'));
   await page.screenshot({ path: SHOT('33-jobyungdu-doc'), fullPage: false });
+  }
 
   // 실시간 피드에서 등록 공고 중복 제거 확인
   await page.keyboard.press('Escape');
