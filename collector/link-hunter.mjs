@@ -50,7 +50,7 @@
          (워크플로 link-hunter.yml · collector/run-link-hunt.txt 를 고쳐 push해도 실행) */
 import fs from 'node:fs';
 import { chromium } from 'playwright';
-import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, titleFingerprint, detailCandidates, idsFromSource, looksLikeLoginWall } from './detail-url.mjs';
+import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, titleFingerprint, detailCandidates, idsFromSource, looksLikeLoginWall, rowDetailCandidates } from './detail-url.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const DRY = process.argv.includes('--dry');
@@ -277,7 +277,27 @@ async function verify(url, title, others) {
     const docTitle = await p.title().catch(() => '');
     const t = coreTitle(title);
     const hit = sameTitle(title, docTitle) || (t.length >= 8 && (fp(text).includes(t) || (t.length >= 24 && fp(text).includes(t.slice(0, 24)))));
-    if (!hit) return { ok: false, why: '제목 불일치(다른 글이 열림)' };
+    /* ⭐ '못 읽은 것'을 '다른 글'이라고 부르지 않는다 (2026-08-01 정찰로 확인).
+       동국대 12건이 전부 '제목 불일치(다른 글이 열림)'로 떨어졌는데, 정찰로 그 주소들을
+       직접 열어 보니 **전부 맞는 공고**였다(가송재단·서울인재대학장학금 등 200 응답,
+       로그인도 필요 없음). 무슨 일이 있었나: 동국대는 우리가 짧은 시간에 여러 번
+       두드리면 응답을 막는다(정찰에서도 주소 3개 뒤 4번째가 연결 끊김). 그때 오는 것은
+       404가 아니라 **본문이 안 그려진 껍데기 화면**이고, 로봇은 그걸 보고 '다른 글'이라
+       단정해 멀쩡한 주소를 버렸다.
+       화면에 글이 거의 없으면 '판정 불가'다 — 판정하지 말고 다음에 다시 본다.
+       (저장소가 이미 지키는 원칙: '못 읽음'과 '읽었는데 다른 화면'을 뭉뚱그리지 말 것) */
+    if (!hit) {
+      // 한 번 더 기다렸다 다시 본다 — 늦게 그려지는 화면을 성급히 '다른 글'로 몰지 않는다
+      await p.waitForTimeout(4000);
+      const text2 = await p.evaluate(() => (document.body.innerText || '').slice(0, 14000)).catch(() => '');
+      const hit2 = t.length >= 8 && (fp(text2).includes(t) || (t.length >= 24 && fp(text2).includes(t.slice(0, 24))));
+      if (hit2) return { ok: true };
+      // 메뉴만 있고 본문이 없는 화면(막혔을 때 오는 껍데기)이면 판정하지 않는다
+      if (!/등록일|작성일|조회수|첨부|담당|이전글|다음글/.test(text2)) {
+        return { ok: false, why: '본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)', net: true };
+      }
+      return { ok: false, why: '제목 불일치(다른 글이 열림)' };
+    }
     if (looksLikeList(text, others)) return { ok: false, why: '목록 화면(다른 공고 제목이 여럿 보임)' };
     return { ok: true };
   } catch (e) {
@@ -464,8 +484,6 @@ for (const [listUrl, group] of boards) {
           else { await navP; await page.waitForTimeout(2500); }
 
           const landed = detail.url();
-          const cands = [];
-          if (isDetailUrl(landed, listUrl)) cands.push(landed);       // 눌러서 간 진짜 주소
           const dom = await detail.evaluate(() => {
             const hidden = {};
             document.querySelectorAll('input[name]').forEach((i) => { if (i.name && i.value) hidden[i.name] = i.value; });
@@ -473,9 +491,10 @@ for (const [listUrl, group] of boards) {
             const og = document.querySelector('meta[property="og:url"]');
             return { canonical: can ? can.getAttribute('href') : null, ogUrl: og ? og.getAttribute('content') : null, hiddenInputs: hidden };
           }).catch(() => ({ hiddenInputs: {} }));
-          for (const c of detailCandidates({ ...dom, url: landed, listUrl, forms, rowIds: idsFromSource(rows[idx].src) })) {
-            if (isDetailUrl(c, listUrl) && !cands.includes(c)) cands.push(c);
-          }
+          /* 후보 만들기는 **공용 규칙 한 곳**에서만 한다 (detail-url.mjs).
+             예전엔 여기에 따로 적어 두었다가 '행에 적힌 주소'를 통째로 빠뜨렸고,
+             그래서 동국대 12건이 전부 떨어졌다 — 규칙이 두 벌이면 반드시 갈라진다. */
+          const cands = rowDetailCandidates({ row: rows[idx], listUrl, forms, landed, dom });
           for (const c of cands) {
             const v = await verify(c, want, others);
             if (v.ok) { url = c; break; }
@@ -512,7 +531,10 @@ for (const [listUrl, group] of boards) {
         record(t, unreachable ? 'net' : 'bad', lastWhy || '주소를 못 만듦');
         report.push(`  - ⚠️ 실패(${lastWhy || '주소를 못 만듦'}): ${want.slice(0, 42)}`);
       }
-      await new Promise((r) => setTimeout(r, 900));   // 학교 서버를 몰아치지 않는다
+      /* 학교 서버를 몰아치지 않는다. 900ms는 동국대에 너무 빨랐다 — 짧은 시간에 여러 번
+         두드리자 응답이 막혀 껍데기 화면이 왔고, 로봇은 그걸 '다른 글'로 오해했다.
+         대상이 몇 건뿐인 로봇이라 느려도 된다(25분 예산). */
+      await new Promise((r) => setTimeout(r, 2500));
     }
   }
   // 모든 페이지를 봐도 못 찾은 것 = 게시판에서 내려갔을 가능성

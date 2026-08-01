@@ -319,4 +319,30 @@ export function detailCandidates(dom) {
   return out;
 }
 
-export default { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, titleFingerprint, sameTitle, detailCandidates, idsFromSource, looksLikeLoginWall };
+/* 목록의 '한 행'에서 원문 주소 후보를 순서대로 만든다 — 두 로봇(링크 사냥꾼·복구 로봇)이
+   **같은 규칙**을 쓰게 하려고 여기에 둔다.
+
+   순서가 전부다: ① 눌러서 브라우저가 실제로 간 주소 ② **행에 원래 적혀 있던 주소**
+   ③ 그래도 없으면 조립한 주소. 앞의 둘은 게시판이 스스로 알려 준 것이라 틀릴 수가 없고,
+   조립은 우리가 짐작하는 것이라 틀릴 수 있다.
+
+   왜 규칙을 한 곳으로 모았나 (2026-08-01): 링크 사냥꾼이 이 규칙을 따로 갖고 있다가
+   ②를 통째로 빠뜨렸다. 행에 `…/article/JANGHAKNOTICE/detail/26765625`라고 **적혀 있는데도**
+   그걸 안 쓰고 매번 주소를 조립했고, 그래서 동국대 12건이 전부 떨어졌다.
+   복구 로봇에는 처음부터 있던 규칙이다 — 규칙이 두 벌이면 반드시 이렇게 갈라진다. */
+export function rowDetailCandidates({ row, listUrl, forms, landed, dom }) {
+  const out = [];
+  const add = (u) => { if (u && isDetailUrl(u, listUrl) && !out.includes(u)) out.push(u); };
+  add(landed);
+  add(row && row.abs);
+  for (const c of detailCandidates({
+    ...(dom || {}),
+    url: landed || listUrl,
+    listUrl,
+    forms,
+    rowIds: idsFromSource((row && row.src) || ''),
+  })) add(c);
+  return out;
+}
+
+export default { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, titleFingerprint, sameTitle, detailCandidates, idsFromSource, looksLikeLoginWall, rowDetailCandidates };

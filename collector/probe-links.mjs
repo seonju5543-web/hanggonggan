@@ -32,9 +32,15 @@ const report = [`## 🔎 링크 정찰 리포트 (${new Date(Date.now() + 9 * 36
 const browser = await chromium.launch({ args: ['--no-sandbox'] });
 const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
 
+/* 확인용 브라우저는 **하나만 만들어 재사용**하고 쿠키만 비운다.
+   주소마다 새로 만들면 학교 서버가 연결을 끊는다(ERR_CONNECTION_CLOSED) —
+   저장소에 이미 적혀 있던 규칙인데 이 도구만 지키지 않고 있었다. 실제로 2026-08-01
+   정찰에서 주소 3개를 연달아 열자 4번째가 그대로 끊겼다. */
+let sharedCtx = null;
 async function freshPage() {
-  const c = await browser.newContext({ userAgent: UA, locale: 'ko-KR' });
-  return { page: await c.newPage(), ctx: c };
+  if (!sharedCtx) sharedCtx = await browser.newContext({ userAgent: UA, locale: 'ko-KR' });
+  await sharedCtx.clearCookies().catch(() => {});
+  return { page: await sharedCtx.newPage(), ctx: null };
 }
 
 /* ── ① 주소 하나를 학생 눈으로 열어 본다 ── */
@@ -61,7 +67,7 @@ async function checkUrl(url) {
     report.push(`### 🔗 ${url}`);
     report.push(`- ❌ 열기 실패: ${(e.message || '').split('\n')[0].slice(0, 90)}`);
     report.push('');
-  } finally { await ctx.close().catch(() => {}); }
+  } finally { await page.close().catch(() => {}); await ctx?.close().catch(() => {}); }
 }
 
 /* ── ② 학교 홈에서 메뉴를 따라 들어가 '학생이 보는 게시판'을 찾는다 ── */
@@ -112,10 +118,11 @@ async function findBoard(spec) {
   } catch (e) {
     report.push(`- ❌ 실패: ${(e.message || '').split('\n')[0].slice(0, 90)}`);
     report.push('');
-  } finally { await ctx.close().catch(() => {}); }
+  } finally { await page.close().catch(() => {}); await ctx?.close().catch(() => {}); }
 }
 
-for (const u of lines('checkUrl')) await checkUrl(u);
+// 같은 학교를 몰아치지 않는다 — 사이를 두고 하나씩 연다
+for (const u of lines('checkUrl')) { await checkUrl(u); await new Promise((r) => setTimeout(r, 2500)); }
 for (const s of lines('findBoard')) await findBoard(s);
 
 await browser.close();

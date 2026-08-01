@@ -17,7 +17,7 @@
    실행: node collector/resolve-detail-urls.mjs [--dry]  (워크플로 resolve-detail-urls.yml) */
 import fs from 'node:fs';
 import { chromium } from 'playwright';
-import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, detailCandidates, idsFromSource, looksLikeLoginWall } from './detail-url.mjs';
+import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, detailCandidates, idsFromSource, looksLikeLoginWall, rowDetailCandidates } from './detail-url.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const DRY = process.argv.includes('--dry');
@@ -321,11 +321,7 @@ for (const [listUrl, group] of boards) {
     /* 후보 주소 만들기 — 대부분은 클릭 없이 목록 정보만으로 만들어진다.
        ① 행의 링크가 이미 상세 주소인 경우 (동국 …/detail/26765595)
        ② 행의 클릭 스크립트가 넘기는 글 번호로 조립 (경희 view.do?nttId=…) */
-    const cands = [];
-    if (isDetailUrl(row.abs, listUrl)) cands.push(row.abs);
-    for (const c of detailCandidates({ listUrl, url: listUrl, rowIds: idsFromSource(row.src), hiddenInputs: {}, forms: boardForms })) {
-      if (isDetailUrl(c, listUrl) && !cands.includes(c)) cands.push(c);
-    }
+    const cands = rowDetailCandidates({ row, listUrl, forms: boardForms, dom: { hiddenInputs: {} } });
 
     let found = null;
     // 규칙이 이미 두 번 통한 게시판이면 같은 종류의 후보를 확인 없이 채택한다

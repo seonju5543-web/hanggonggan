@@ -3,24 +3,19 @@
 # checkUrl:  이 주소를 로그인 없는 새 탭에서 열어 그대로 보고 (로그인 벽인지 포함)
 # findBoard: <학교 홈> | <메뉴 > 메뉴>
 
-# 2026-08-01 — 동국대 12건이 전부 같은 방식으로 실패한다.
-#   · 탈락(제목 불일치(다른 글이 열림))  …/detail/26765625
-#   · 탈락(HTTP 404)                    …/view?nttId=26765625
-# 12건이 전부 같은 모양이면 우연이 아니라 규칙 문제다. 짐작으로 고치지 않고 눈으로 본다.
-# 셋 중 무엇인지 가른다:
-#   ⓐ 글 번호를 엉뚱한 행에서 가져온다 (그래서 다른 글이 열린다)
-#   ⓑ 주소는 맞는데 화면이 늦게 그려져 로봇이 빈 화면을 보고 '다른 글'로 판정한다
-#   ⓒ 그 글이 실제로 내려갔다
+# 2026-08-01(2차) — 1차 정찰로 **동국대 주소는 처음부터 맞았다**는 것이 확인됐다.
+#   …/detail/26765625 → 200 · 로그인 불필요 · 본문에 "2026-2학기 가송재단 장학생 선발 안내(~8/9)"
+#   …/detail/26765586 → 200 · 로그인 불필요 · 본문에 "[홍보] 2026년 하반기 서울인재대학장학금"
+# 즉 사냥꾼의 '제목 불일치(다른 글이 열림)' 판정이 틀렸던 것이다.
+# (동국대는 짧은 시간에 여러 번 두드리면 응답을 막는다 — 1차 정찰도 주소 3개 뒤 4번째가
+#  연결 끊김. 그때 오는 껍데기 화면을 로봇이 '다른 글'로 오해했다.)
+#
+# 이번엔 남은 글 번호를 하나씩(사이 2.5초) 열어 **어느 공고인지 눈으로 받아 적는다.**
+# 여기서 확인된 것만 앱 데이터에 넣는다 — 확인 안 된 것은 절대 넣지 않는다.
 
-# ① 실패한 주소 — 가송재단(~8/9)이 나와야 맞다
-checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765625
-
-# ② 또 다른 실패 주소 — 서울인재대학장학금이 나와야 맞다
-checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765586
-
-# ③ 대조군 — 지난 실행에서 통과한 주소(복지장학2 면학). 이건 제대로 열려야 한다.
-checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765245
-
-# ④ 게시판 목록에서 각 행이 실제로 가리키는 주소를 그대로 받아 적는다.
-#    로봇이 '만든' 주소와 게시판이 '쓰는' 주소가 같은지 여기서 대조한다.
-findBoard: https://www.dongguk.edu/article/JANGHAKNOTICE/list |
+checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765593
+checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765584
+checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765479
+checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764945
+checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764944
+checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765338

@@ -7,7 +7,7 @@
 import fs from 'node:fs';
 import { urlKey, titleKey, dedupeNotices, preferNotice } from '../collector/url-key.mjs';
 import { isAttachmentEntry, isHtmlPayload } from '../collector/attachment-link.mjs';
-import { isDetailUrl, isMarkerUrl, markerTitle, sameTitle, detailCandidates, looksLikeLoginWall } from '../collector/detail-url.mjs';
+import { isDetailUrl, isMarkerUrl, markerTitle, sameTitle, detailCandidates, looksLikeLoginWall, rowDetailCandidates } from '../collector/detail-url.mjs';
 
 let fail = 0;
 const eq = (label, got, want) => {
@@ -139,6 +139,32 @@ eq('목록 제목과 상세 제목이 같은 글인지 알아본다',
     '[공지] 2026년 충남평생교육진흥원 재능키움 장학생 2차 모집 안내'), true);
 eq('다른 공고를 같은 글로 착각하지 않는다',
   sameTitle('2026년 충남평생교육진흥원 재능키움 장학생 2차 모집 안내', '2026년 롯데장학관 입주생 모집 안내'), false);
+
+/* ── 게시판이 이미 알려 준 주소를 버리고 '조립'하지 않는다 (2026-08-01) ──────────
+   링크 사냥꾼이 동국대 12건을 전부 놓쳤다. 원인은 행에
+   `…/article/JANGHAKNOTICE/detail/26765625`라고 **적혀 있는데도** 그걸 후보에 넣지 않고
+   매번 주소를 조립한 것이었다(복구 로봇에는 있던 규칙인데 사냥꾼에만 없었다).
+   그래서 규칙을 detail-url.mjs 한 곳으로 모았다 — 여기서 순서까지 못박아 둔다. */
+console.log('\n■ 원문 주소 후보 순서 (게시판이 쓰는 것 먼저, 조립은 마지막)');
+{
+  const dgList = 'https://www.dongguk.edu/article/JANGHAKNOTICE/list';
+  const real = 'https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765625';
+  const c1 = rowDetailCandidates({
+    row: { abs: real, src: '|/article/JANGHAKNOTICE/detail/26765625|' },
+    listUrl: dgList, forms: [],
+  });
+  eq('행에 적힌 상세 주소가 1순위로 들어간다 (동국대 12건이 이걸 빠뜨려 실패했다)', c1[0], real);
+  const c2 = rowDetailCandidates({
+    row: { abs: real, src: '|/article/JANGHAKNOTICE/detail/26765625|' },
+    listUrl: dgList, forms: [], landed: 'https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765625?from=list',
+  });
+  eq('눌러서 실제로 간 주소가 있으면 그게 맨 앞', c2[0].includes('from=list'), true);
+  eq('행 주소도 후보에 남는다', c2.includes(real), true);
+  // 목록 주소는 후보가 될 수 없다 (원문이 아니라 게시판 전체가 열린다)
+  eq('목록 주소는 후보로 안 넣는다', rowDetailCandidates({
+    row: { abs: dgList, src: `|${dgList}|` }, listUrl: dgList, forms: [],
+  }).includes(dgList), false);
+}
 
 /* ── 로봇이 '시작은 하는데 도중에 넘어지는' 사고 막기 (2026-08-01) ────────────
    링크 사냥꾼이 4분 동안 원문 주소 13건을 찾아 놓고, **리포트 마지막 줄에서** 옛 이름
