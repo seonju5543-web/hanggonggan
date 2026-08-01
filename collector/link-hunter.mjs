@@ -59,6 +59,30 @@ const DRY = process.argv.includes('--dry');
    아래에 남아, 로봇이 시작하자마자 죽는 상태였다(const는 선언 전에 못 쓴다). */
 const today = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
 
+/* 집계 — 맨 위에 둔다. 아래 '넘어져도 저장' 장치가 언제 불려도 읽을 수 있어야 하기 때문. */
+let found = 0; let failed = 0; let gone = 0; let stuck = 0;
+
+/* ── 넘어져도 그때까지 찾은 것은 반드시 저장한다 (2026-08-01) ──────────────
+   왜 만들었나: 리포트 마지막 줄의 낱말 하나가 틀려(옛 이름 GIVE_UP_AFTER) 로봇이
+   마지막에 넘어졌는데, 그 바람에 **4분 동안 실제로 찾아낸 원문 주소 13건이 통째로
+   버려졌다**(저장 단계가 통째로 건너뛰어졌다). 사냥은 오래 걸리는 일이라
+   '다 되거나 아니면 전부 버리거나'는 너무 비싸다. 그래서 넘어지면
+   ① 그때까지의 결과를 저장하고 ② 리포트에 넘어진 자리를 적고 ③ 그래도 실패는
+   실패라고 알린다(종료 코드 1 → 워크플로가 🚨 알림). 저장 단계는 실패해도 돌도록
+   link-hunter.yml에서 always()로 바꿔 두었다. */
+let crashed = false;
+const onCrash = (err) => {
+  if (crashed) return;             // 두 번 저장하지 않는다
+  crashed = true;
+  console.error('\n🚨 사냥 도중 넘어졌습니다 — 그때까지 찾은 것은 저장합니다:\n', err);
+  try { saveAll(String((err && err.stack) || err).split('\n').slice(0, 3).join(' · ')); } catch (e) {
+    console.error('저장까지 실패했습니다:', e);
+  }
+  process.exit(1);
+};
+process.on('uncaughtException', onCrash);
+process.on('unhandledRejection', onCrash);
+
 function runSetting(key) {
   try {
     const txt = fs.readFileSync(new URL('run-link-hunt.txt', HERE), 'utf8');
@@ -373,8 +397,6 @@ if (PATROL_PER_RUN > 0 && !outOfTime()) {
 
 report.push('## 2단계 · 사냥 (원문 주소 찾기)');
 
-let found = 0; let failed = 0; let gone = 0; let stuck = 0;
-
 function record(t, outcome, why) {
   const st = state.items[t.key] || { attempts: 0, title: String(t.title).slice(0, 80) };
   st.lastTried = today;
@@ -498,7 +520,7 @@ for (const [listUrl, group] of boards) {
     failed += 1;
     record(t, 'bad', '목록에서 못 찾음');
     const st = state.items[t.key];
-    report.push(`  - ⚠️ 목록에서 못 찾음 (${st.attempts}/${GIVE_UP_AFTER}회): ${huntTitle(t).slice(0, 46)}`);
+    report.push(`  - ⚠️ 목록에서 못 찾음 (${st.attempts}회째 · 계속 다시 찾습니다): ${huntTitle(t).slice(0, 46)}`);
   }
   await page.close().catch(() => {});
   report.push('');
@@ -601,31 +623,40 @@ if (stillLost.length && !outOfTime()) {
   report.push('');
 }
 
+/* 저장·리포트를 한 곳에 모아 둔다 — 정상 종료도, 넘어졌을 때도 **같은 길로** 저장한다.
+   (위 onCrash가 이 함수를 부른다. 그래서 중간에 넘어져도 찾아낸 주소는 살아남는다.) */
+function saveAll(crashNote) {
+  state.updatedAt = today;
+  if (!DRY) {
+    if (found) {
+      fs.writeFileSync(noticesPath, JSON.stringify(notices, null, 1));
+      fs.writeFileSync(registeredPath, JSON.stringify(registered, null, 1));
+    }
+    fs.writeFileSync(statePath, JSON.stringify(state, null, 1));
+  }
+
+  if (skipped.length) {
+    report.push('### 이번 회차는 쉬는 건 (간격을 두고 다시 시도합니다)');
+    skipped.forEach(({ t, st }) => report.push(`- ⏳ ${st.nextTryAt} 에 다시 시도 (${st.attempts || 0}회 실패${st.likelyGone ? ' · 게시판에서 내려간 듯' : ''}) — ${String(t.title).slice(0, 44)} (${st.lastWhy || ''})`));
+    report.push('');
+  }
+  report.push('---');
+  if (crashNote) {
+    report.push(`🚨 **로봇이 도중에 넘어졌습니다** — 여기까지 찾은 것은 저장했습니다. 넘어진 자리: \`${crashNote}\``);
+    report.push('');
+  }
+  report.push(`원문 주소 확보 **${found}건** · 아직 못 찾음 ${failed}건 · 사람에게 알릴 건 ${stuck}건${DRY ? ' — 모의 실행' : ''}`);
+  report.push('');
+  report.push('**포기하는 건 없습니다** — 못 찾은 공고는 간격을 늘려 가며(1일→3일→7일→14일→30일) 계속 다시 찾습니다.');
+  report.push('');
+  report.push('실패해도 앱은 지어내지 않습니다 — 원문 주소를 못 찾은 공고는 "게시판 목록 ↗"으로 정직하게 안내합니다.');
+  fs.writeFileSync(new URL('link-hunt-report.md', HERE), report.join('\n'));
+  console.log(report.join('\n'));
+  if (process.env.GITHUB_OUTPUT) {
+    fs.appendFileSync(process.env.GITHUB_OUTPUT, `found=${found}\nfailed=${failed}\nstuck=${stuck}\n`);
+  }
+}
+
 await verifyCtx?.close().catch(() => {});
 await browser.close();
-
-state.updatedAt = today;
-if (!DRY) {
-  if (found) {
-    fs.writeFileSync(noticesPath, JSON.stringify(notices, null, 1));
-    fs.writeFileSync(registeredPath, JSON.stringify(registered, null, 1));
-  }
-  fs.writeFileSync(statePath, JSON.stringify(state, null, 1));
-}
-
-if (skipped.length) {
-  report.push('### 이번 회차는 쉬는 건 (간격을 두고 다시 시도합니다)');
-  skipped.forEach(({ t, st }) => report.push(`- ⏳ ${st.nextTryAt} 에 다시 시도 (${st.attempts || 0}회 실패${st.likelyGone ? ' · 게시판에서 내려간 듯' : ''}) — ${String(t.title).slice(0, 44)} (${st.lastWhy || ''})`));
-  report.push('');
-}
-report.push('---');
-report.push(`원문 주소 확보 **${found}건** · 아직 못 찾음 ${failed}건 · 사람에게 알릴 건 ${stuck}건${DRY ? ' — 모의 실행' : ''}`);
-report.push('');
-report.push('**포기하는 건 없습니다** — 못 찾은 공고는 간격을 늘려 가며(1일→3일→7일→14일→30일) 계속 다시 찾습니다.');
-report.push('');
-report.push('실패해도 앱은 지어내지 않습니다 — 원문 주소를 못 찾은 공고는 "게시판 목록 ↗"으로 정직하게 안내합니다.');
-fs.writeFileSync(new URL('link-hunt-report.md', HERE), report.join('\n'));
-console.log(report.join('\n'));
-if (process.env.GITHUB_OUTPUT) {
-  fs.appendFileSync(process.env.GITHUB_OUTPUT, `found=${found}\nfailed=${failed}\nstuck=${stuck}\n`);
-}
+saveAll(null);

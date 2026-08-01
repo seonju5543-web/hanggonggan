@@ -57,19 +57,27 @@ jobs:
         run: node collector/link-hunter.mjs ${{ inputs.dry && '--dry' || '' }}
 
       # 데이터 관문 — 사냥해 온 주소가 규칙을 어기면 저장하지 않는다
+      #
+      # ⚠️ always() 인 이유 (2026-08-01): 예전에는 사냥 단계가 실패하면 이 아래가 통째로
+      # 건너뛰어져, **4분 동안 실제로 찾아낸 원문 주소 13건이 그대로 버려졌다**
+      # (리포트 마지막 줄의 낱말 하나 때문에 로봇이 넘어진 사고). 사냥은 오래 걸리는
+      # 일이라 '다 되거나 아니면 전부 버리거나'는 너무 비싸다. 로봇도 넘어지기 전에
+      # 저장하도록 고쳤고(link-hunter.mjs), 워크플로도 저장까지는 가도록 바꿨다.
+      # 실행 자체는 여전히 빨간불로 남는다 — 아래 '🚨 실패 알림'이 그대로 뜬다.
       - name: 데이터 감사
         id: audit
+        if: always()
         continue-on-error: true
         run: |
           node verify/test-collector.mjs
           node verify/audit-data.js
 
       - name: 감사 실패 시 되돌리기
-        if: steps.audit.outcome == 'failure'
+        if: always() && steps.audit.outcome == 'failure'
         run: git checkout -- data/registered.json data/notices.json
 
       - name: 결과 저장 (기본 브랜치에 저장 → deploy-sync가 main으로 자동 배포)
-        if: steps.audit.outcome == 'success'
+        if: always() && steps.audit.outcome == 'success'
         run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
