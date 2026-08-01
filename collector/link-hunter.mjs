@@ -1,4 +1,13 @@
-/* 링크 사냥꾼 — 까다로운 원문 주소 읽기만 맡는 전담 로봇 (2026-08-01)
+/* 링크 사냥꾼 — '원문 공고로 못 가는 링크'를 계속 찾아 고치는 전담 로봇 (2026-08-01)
+
+   ⭐ 목적을 좁히지 말 것 (2026-08-01 개발자 지적으로 바로잡음)
+   이 로봇은 '동국대 고치기'가 아니다. **어느 학교든, 어떤 이유로든 학생이 원문 공고에
+   못 가는 링크를 계속 찾아 고치는 것**이 목적이다. 처음 만들 때 내가 두 가지로 목적을
+   좁혀 놨고, 그 바람에 경희대 로그인 벽 7건을 놓쳤다:
+     ① onlyBoard로 한 학교에 묶음  → 이제 기본이 전체 학교다.
+     ② 표식(#n-)이 붙은 것만 대상  → '주소는 멀쩡해 보이는데 눌러 보면 로그인 벽/다른 글'인
+        경우는 표식이 없어 눈에 안 띄었다(그런 사각지대가 229건 있었다).
+        → **순찰 단계**를 앞에 둬서 기존 링크도 돌아가며 다시 열어 본다.
 
    왜 따로 두나
    ─────────────────────────────────────────────────────────────────
@@ -14,11 +23,13 @@
 
    조립은 게시판이 폼을 안 내주고 클릭도 실패했을 때의 마지막 수단이다.
 
-   무엇을 하나
+   무엇을 하나 — 2단계
    ─────────────────────────────────────────────────────────────────
-   ① 앱 데이터에서 아직 '게시판 목록 + 제목 표식(#n-…)'인 공고를 전부 모은다
-      (학교를 가리지 않는다 — 동국대뿐 아니라 앞으로 어느 학교에서 같은 문제가 생겨도
-       이 로봇이 자동으로 집어 든다).
+   [1단계 순찰] 이미 주소가 있는 링크를 오래 안 본 것부터 돌아가며 열어 본다.
+      학생이 그 공고를 못 보는 링크(로그인 벽·다른 글·목록)면 표식으로 되돌려
+      2단계 사냥 대상으로 넘긴다. 되돌리기는 카나리아·실패비율·'못 읽음 제외'로 보호한다.
+   [2단계 사냥]
+   ① 표식(#n-…)인 공고를 전부 모은다 — **학교를 가리지 않는다.**
    ② 게시판을 페이지별로 넘기며 그 제목의 행을 찾는다.
    ③ 행을 **클릭**해 브라우저가 실제로 이동한 주소를 받는다.
       주소가 안 바뀌는 게시판(form POST)이면 상세 화면과 목록 폼에서 재료를 모아 조립한다.
@@ -89,6 +100,34 @@ function huntTitle(t) {
 
 const report0 = [];
 
+/* 되돌릴 때 쓸 '그 공고가 있던 게시판 목록 주소'를 찾는다.
+   같은 호스트의 다른 공고가 이미 표식(#n-)을 달고 있으면 그 목록 주소를 쓰고,
+   없으면 수집 설정(browser-targets.json·schools.json)에서 그 학교 게시판을 찾는다.
+   못 찾으면 되돌리지 않는다 — 엉뚱한 목록으로 보내느니 그대로 두는 게 낫다. */
+let BOARD_HINTS = [];
+try {
+  const bt = JSON.parse(fs.readFileSync(new URL('browser-targets.json', HERE), 'utf8'));
+  BOARD_HINTS = BOARD_HINTS.concat((bt.targets || []).flatMap((t) => t.candidates || []));
+} catch { /* 없으면 생략 */ }
+try {
+  const sc = JSON.parse(fs.readFileSync(new URL('schools.json', HERE), 'utf8'));
+  BOARD_HINTS = BOARD_HINTS.concat((sc.schools || []).map((x) => x.boardUrl).filter(Boolean));
+} catch { /* 없으면 생략 */ }
+
+function boardListFor(t) {
+  const url = String(t.ref[t.field] || '');
+  let origin = '';
+  try { origin = new URL(url).origin; } catch { return null; }
+  // ① 같은 호스트의 다른 공고가 이미 쓰고 있는 목록 주소
+  const mate = [...(notices.items || []), ...(registered.items || [])]
+    .map((x) => x.url || x.sourceUrl || '')
+    .find((u) => u.startsWith(origin) && isMarkerUrl(u));
+  if (mate) return listUrlOf(mate);
+  // ② 수집 설정에 적힌 그 학교 게시판 주소
+  const hint = BOARD_HINTS.find((h) => { try { return new URL(h).origin === origin; } catch { return false; } });
+  return hint || null;
+}
+
 /* 정식 등록 항목에 게시판 원래 제목이 없으면, 같은 글이 실시간 공고로도 수집돼 있는지 보고
    거기서 가져온다. 정식 등록의 name은 사람이 다듬은 이름이라 게시판 행과 안 맞기 때문.
    (제목이 없으면 그 공고는 게시판에서 영영 못 찾는 미아가 된다 — 2026-08-01에 15건이 그랬다) */
@@ -104,6 +143,21 @@ function backfillBoardTitles() {
 }
 const backfilled = backfillBoardTitles();
 if (backfilled) report0.push(`- 게시판 원래 제목을 실시간 공고에서 보강: ${backfilled}건`);
+
+/* ── 순찰 대상: **이미 주소가 있는 링크**도 다시 열어 본다 (2026-08-01 개발자 지적) ──
+   이 로봇을 만든 목적은 '동국대 고치기'가 아니라 **원문 공고로 못 가는 링크를 계속 찾아
+   고치는 것**이다. 그런데 표식(#n-)이 붙은 것만 집어 들고 있었다. 경희대처럼
+   '주소는 멀쩡해 보이는데 눌러 보면 로그인 벽'인 경우는 표식이 없어 로봇 눈에 안 띄었다
+   — 229건이 그렇게 사각지대에 있었다.
+   그래서 순찰 단계를 앞에 둔다: 기존 링크를 돌아가며 열어 보고, 학생이 그 공고를 못 보는
+   링크(로그인 벽·다른 글·목록)면 표식으로 되돌려 사냥 대상으로 넘긴다. */
+const patrol = [];
+for (const n of notices.items || []) {
+  if (n.url && !isMarkerUrl(n.url)) patrol.push({ ref: n, field: 'url', title: n.title, key: `n:${n.url}` });
+}
+for (const r of registered.items || []) {
+  if (r.sourceUrl && !isMarkerUrl(r.sourceUrl)) patrol.push({ ref: r, field: 'sourceUrl', title: r.boardTitle || r.name, key: `r:${r.id}`, id: r.id });
+}
 
 /* 이미 포기한 건은 건너뛴다 (하지만 리포트에는 남긴다) */
 const skipped = [];
@@ -224,6 +278,90 @@ async function gotoPage(page, n) {
     return true;
   }, n).catch(() => false);
 }
+
+
+/* ── 1단계: 순찰 ─────────────────────────────────────────────────
+   기존 링크를 돌아가며 열어 보고, 학생이 그 공고를 못 보는 링크를 찾아낸다.
+   한 번에 다 보지 않고 **오래 안 본 것부터 조금씩** 돈다(학교 서버를 몰아치지 않게).
+
+   되돌리기는 조심스럽게 — 예전에 안전장치가 없어 멀쩡한 링크 17건을 되돌릴 뻔했다:
+   · 게시판 목록조차 안 열리면(카나리아) 그 게시판은 통째로 건너뛴다.
+   · '못 읽음'(404·시간초과)은 판정할 수 없으니 되돌리지 않는다.
+     되돌리는 건 '읽었는데 그 공고가 아니었던 것'(로그인 벽·다른 글·목록)뿐이다.
+   · 한 게시판에서 절반 넘게 실패하면 우리 쪽 문제로 보고 아무것도 되돌리지 않는다. */
+const PATROL_PER_RUN = Number(process.env.HUNT_PATROL || runSetting('patrol') || 40);
+let patrolled = 0; let demoted = 0;
+if (PATROL_PER_RUN > 0 && !outOfTime()) {
+  report.push('## 1단계 · 순찰 (기존 링크가 아직 그 공고로 가는가)');
+  const due = patrol
+    .filter((t) => !ONLY || String(t.ref[t.field]).includes(ONLY))
+    .sort((a, b) => {
+      const A = (state.items[a.key] || {}).patrolledAt || '';
+      const B = (state.items[b.key] || {}).patrolledAt || '';
+      return A < B ? -1 : A > B ? 1 : 0;          // 오래 안 본 것 먼저
+    })
+    .slice(0, PATROL_PER_RUN);
+
+  const byBoard = new Map();
+  for (const t of due) {
+    const host = (() => { try { return new URL(t.ref[t.field]).origin; } catch { return '?'; } })();
+    if (!byBoard.has(host)) byBoard.set(host, []);
+    byBoard.get(host).push(t);
+  }
+
+  for (const [host, group] of byBoard) {
+    if (outOfTime()) { report.push('- (시간 상한 — 순찰 나머지는 다음 실행)'); break; }
+    const verdicts = [];
+    for (const t of group) {
+      if (outOfTime()) break;
+      patrolled += 1;
+      const v = await verify(t.ref[t.field], huntTitle(t), []);
+      const st = state.items[t.key] || {};
+      st.patrolledAt = today; st.lastWhy = v.ok ? '' : v.why;
+      state.items[t.key] = st;
+      verdicts.push({ t, v });
+      await new Promise((r) => setTimeout(r, 700));
+    }
+    const fails = verdicts.filter((x) => !x.v.ok);
+    const netFails = fails.filter((x) => x.v.net);
+    const realFails = fails.filter((x) => !x.v.net);   // 읽었는데 그 공고가 아니었던 것
+
+    // 카나리아 — 이 학교 서버가 지금 우리를 받아 주는가
+    let canaryOk = true;
+    if (realFails.length) {
+      const p = await freshPage();
+      try {
+        const res = await p.goto(host, { waitUntil: 'domcontentloaded', timeout: 20000 });
+        if (!res || res.status() >= 400) canaryOk = false;
+      } catch { canaryOk = false; } finally { await p.close().catch(() => {}); }
+    }
+    const tooMany = verdicts.length >= 4 && fails.length / verdicts.length > 0.5;
+    report.push(`### ${host}`);
+    report.push(`- 순찰 ${verdicts.length}건 · 통과 ${verdicts.length - fails.length} · 못 읽음 ${netFails.length} · **학생이 못 보는 링크 ${realFails.length}**`);
+
+    if (!canaryOk || tooMany) {
+      report.push(`- ⏸ 되돌리기 취소 — ${!canaryOk ? '학교 서버가 지금 응답하지 않습니다' : '실패가 너무 많아 우리 쪽 문제로 보입니다'}. 다음 실행에서 다시 봅니다.`);
+      continue;
+    }
+    for (const { t, v } of realFails) {
+      const list = boardListFor(t);
+      if (!list) { report.push(`  - ⚠️ ${t.id || String(t.title).slice(0, 30)} (${v.why}) — 되돌릴 게시판 주소를 몰라 그대로 둡니다`); continue; }
+      const back = (t.ref.boardTitle || '').trim() || String(t.title);
+      if (!t.ref.boardTitle) t.ref.boardTitle = back;      // 게시판 원래 제목을 잃지 않게
+      if (!DRY) t.ref[t.field] = `${list}#n-${encodeURIComponent(back.slice(0, 40))}`;
+      demoted += 1;
+      report.push(`  - ↩️ 표식으로 되돌림(${v.why}): ${String(t.title).slice(0, 44)}`);
+      // 되돌린 것은 이번 실행의 사냥 대상에 바로 넣는다
+      const listKey = list;
+      if (!boards.has(listKey)) boards.set(listKey, []);
+      boards.get(listKey).push({ ref: t.ref, field: t.field, title: t.title, key: t.key, id: t.id });
+    }
+  }
+  report.push(`- 순찰 합계: ${patrolled}건 확인 · ${demoted}건을 사냥 대상으로 넘김`);
+  report.push('');
+}
+
+report.push('## 2단계 · 사냥 (원문 주소 찾기)');
 
 let found = 0; let failed = 0; let gone = 0; let stuck = 0;
 const today = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
