@@ -22,10 +22,9 @@
    "school": "서강대학교",
    "campus": "",
    "candidates": [
-    "https://www.sogang.ac.kr/ko/scholarship",
-    "https://www.sogang.ac.kr/ko/notice",
-    "https://www.sogang.ac.kr/"
-   ]
+    "https://www.sogang.ac.kr/ko/scholarship-notice"
+   ],
+   "_note": "정찰로 확인(2026-08-02) — 전용 장학공지 2481건. 예전 후보 3개(/ko/scholarship 등)는 전부 404거나 엉뚱한 페이지였다. 사이트가 Nuxt SPA라 fetch로는 빈 껍데기만 오고 목록은 자바스크립트가 그린다. 막히면 내부 API를 직접 볼 것: /api/api/v1/mainKo/BbsData/boardList?pageNum=1&pageSize=30&bbsConfigFk=141 (141=장학공지, JSON으로 제목·pkId가 그대로 온다)"
   },
   {
    "school": "서울시립대학교",
@@ -40,9 +39,10 @@
    "school": "중앙대학교",
    "campus": "공통",
    "candidates": [
-    "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100",
-    "https://www.cau.ac.kr/"
-   ]
+    "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5",
+    "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100"
+   ],
+   "_note": "정찰로 확인(2026-08-02) — P_TAB_NO=5가 CAU Notice의 '장학' 분류 탭이다(장학만 485건). 탭 없는 주소는 전체공지라 장학이 1건으로 묻혀 있었다. 행은 href=\"javascript:fn_goDetail('30031','N','','N')\" 클릭형이라 반드시 눌러야 한다. 서울·다빈치·외부가 한 목록에 함께 올라와 캠퍼스는 공통"
   },
   {
    "school": "숙명여자대학교",
@@ -106,6 +106,14 @@
     "https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=145&"
    ],
    "_note": "개발자 제공(2026-08-02). 장학 공고 제목은 잘 보이는데(23건) 상세 링크가 HTML에 없어 일반 수집기로는 0건 — 클릭형으로 추정"
+  },
+  {
+   "school": "부산대학교",
+   "campus": "",
+   "candidates": [
+    "https://onestop.pusan.ac.kr/page?menuCD=000000000000062"
+   ],
+   "_note": "개발자 제공(2026-08-02). 브라우저로 열면 전용 장학 공지 511건이 정상으로 보인다 — 처음에 '장학 0건'으로 잘못 판정했던 것은 목록을 자바스크립트가 그리기 때문이다. 행은 href=\"#popup\"이라 눌러야 열린다"
   },
   {
    "school": "서울교육대학교",

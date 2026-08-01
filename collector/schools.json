@@ -35,7 +35,7 @@
    "school": "서강대학교",
    "campus": "",
    "boardUrl": null,
-   "note": "자동 탐색 실패(봇 차단·동적 페이지 추정) — 개발자가 장학공지 주소 제공 필요"
+   "note": "주소는 확보했다(2026-08-02) — /ko/scholarship-notice, 장학공지 2481건. 다만 Nuxt SPA라 일반 fetch로는 빈 껍데기만 오므로 browser-targets.json이 담당한다"
   },
   {
    "school": "성균관대학교",
@@ -52,7 +52,7 @@
    "school": "중앙대학교",
    "campus": "공통",
    "boardUrl": null,
-   "note": "자동 탐색 실패(봇 차단·동적 페이지 추정) — 개발자가 장학공지 주소 제공 필요"
+   "note": "주소는 확보했다(2026-08-02) — CAU Notice의 장학 탭(P_TAB_NO=5), 485건. 행이 클릭형(fn_goDetail)이라 browser-targets.json이 담당한다"
   },
   {
    "school": "경희대학교",
@@ -155,6 +155,12 @@
    "campus": "",
    "boardUrl": "https://www.inha.ac.kr/bbs/kr/8/artclList.do?bbsClSeq=215",
    "note": "개발자 제공 주소의 enc를 풀어낸 진짜 게시판 주소(2026-08-02). 겉주소(kr/950/subview.do?enc=…)는 학생이 브라우저로 누르면 로그인 없이 잘 열린다 — 앱 링크로 써도 문제없다. 다만 SSO가 자바스크립트 자동제출 폼으로 한 번 튕겼다 돌아오는 구조라 자바스크립트를 실행하지 않는 수집 로봇(fetch)에는 596바이트 중간 페이지만 잡힌다. 그래서 로봇용으로는 이 풀어낸 주소를 쓴다. 검증: 로봇 방식(fetch) 장학 링크 15건·상세형 15건 + 브라우저로도 목록 정상 표시"
+  },
+  {
+   "school": "부산대학교",
+   "campus": "",
+   "boardUrl": null,
+   "note": "주소는 확보했다(2026-08-02) — onestop.pusan.ac.kr 장학 공지 511건. 목록을 자바스크립트가 그리고 행이 href=\"#popup\"이라 browser-targets.json이 담당한다"
   },
   {
    "school": "한국방송통신대학교",
