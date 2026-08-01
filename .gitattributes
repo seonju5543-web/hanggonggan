@@ -15,9 +15,13 @@ collector/pending-forms.json merge=jsonunion
 collector/health.json        merge=jsonunion
 
 # ── 매 실행 새로 쓰이는 리포트: 내 쪽을 남긴다(다음 수집이 어차피 덮어쓴다) ──
+# ⚠️ 리포트를 쓰는 로봇을 새로 만들면 **여기에 반드시 한 줄 추가할 것**.
+#    빠뜨리면 그 리포트가 양쪽에서 달라질 때 배포 동기화가 충돌로 멈춘다 —
+#    2026-08-01에 link-hunt-report.md가 이 목록에 없어서 실제로 그랬다(이슈 #85·#86).
 collector/report.md          merge=ours
 collector/browser-report.md  merge=ours
 collector/deepfetch-report.md merge=ours
+collector/link-hunt-report.md merge=ours
 
 # ── 수집된 원본 첨부: 내용 비교가 의미 없는 이진 파일로 취급 ──────────
 collector/extracted/**       -diff
