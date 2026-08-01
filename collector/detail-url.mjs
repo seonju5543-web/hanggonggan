@@ -105,6 +105,31 @@ export function isDetailUrl(raw, listUrl) {
   return false;
 }
 
+/* 로그인 벽 판정 (2026-08-01 개발자 지적으로 도입)
+   경희대 링크가 '로그인하세요'로 뜨는데도 확인을 통과했다. 확인 기준이
+   '제목이 보이나 / 목록이 아닌가' 둘뿐이라 **로그인 벽은 아예 검사 항목에 없었기 때문**이다.
+   학생은 로그인 없이 링크를 누른다 — 로그인을 요구하면 그 링크는 쓸모가 없다.
+   그러니 '제목이 보여도' 로그인 화면이면 떨어뜨려야 한다.
+
+   주의: 공고 본문에 '로그인'이라는 낱말이 지나가듯 나올 수 있으므로,
+   **로그인을 요구하는 화면의 특징**(아이디/비밀번호 입력칸, 로그인 안내 문구가 화면 주인공)
+   으로 판정한다. text는 화면 글자, hasPasswordField는 비밀번호 입력칸 유무. */
+export function looksLikeLoginWall(text, hasPasswordField) {
+  const t = String(text || '');
+  if (hasPasswordField) return true;                       // 비밀번호 칸이 있으면 로그인 화면
+  const short = t.slice(0, 1500);                          // 화면 앞부분 = 주인공 영역
+  const signals = [
+    /로그인\s*(이|을|후|하신|해\s*주|이\s*필요)/,
+    /로그인\s*후\s*이용/, /권한이\s*없습니다/, /접근\s*권한/,
+    /통합\s*로그인/, /portal\s*login/i, /sign\s*in/i,
+    /아이디.{0,6}비밀번호/,
+  ];
+  const hits = signals.filter((re) => re.test(short)).length;
+  // 글자가 거의 없는 화면(로그인 폼만 있는 페이지)에서 신호가 하나라도 있으면 로그인 벽
+  if (short.replace(/\s/g, '').length < 400 && hits >= 1) return true;
+  return hits >= 2;
+}
+
 /* 목록 행의 클릭 스크립트 인자에서 글 번호 후보 뽑기.
    경희 news.khu.ac.kr 유형: 행이 `fn_view('1078712')` 같은 스크립트를 부르고 form을 POST 전송해
    주소창이 안 바뀐다. 이때 인자에 든 글 번호가 원문 주소를 만드는 유일한 재료다. */
@@ -229,4 +254,4 @@ export function detailCandidates(dom) {
   return out;
 }
 
-export default { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, titleFingerprint, sameTitle, detailCandidates, idsFromSource };
+export default { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, titleFingerprint, sameTitle, detailCandidates, idsFromSource, looksLikeLoginWall };

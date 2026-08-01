@@ -1,0 +1,12 @@
+# 링크 정찰 실행 트리거 (push-to-run)
+#
+# checkUrl:  이 주소를 로그인 없는 새 탭에서 열어 보고 그대로 보고 (로그인 벽인지 포함)
+# findBoard: <학교 홈> | <메뉴 > 메뉴>  — 메뉴를 따라 들어가 학생이 보는 게시판을 찾는다
+
+# ① 지금 앱에 들어있는 경희대 링크가 정말 로그인을 요구하는지 확인
+checkUrl: https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322535
+checkUrl: https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318
+
+# ② 개발자가 실제로 공고를 보는 경로: 대학생활 → 장학
+findBoard: https://www.khu.ac.kr/kor/main/index.do | 대학생활 > 장학
+findBoard: https://www.khu.ac.kr/ | 대학생활 > 장학

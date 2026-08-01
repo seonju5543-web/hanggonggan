@@ -1,0 +1,32 @@
+name: 링크 정찰
+
+# '이 주소가 학생에게 실제로 어떻게 보이는가'를 눈으로 확인하는 도구.
+# 로그인 벽인지, 학생이 보는 게시판이 맞는지 확인할 때 쓴다.
+# 실행: collector/run-probe.txt 를 고쳐 push
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'collector/run-probe.txt'
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm init -y >/dev/null && npm i playwright@1 --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - run: node collector/probe-links.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: probe-report
+          path: collector/probe-report.md
+          retention-days: 7

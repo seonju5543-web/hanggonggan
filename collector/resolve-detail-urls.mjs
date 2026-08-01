@@ -17,7 +17,7 @@
    실행: node collector/resolve-detail-urls.mjs [--dry]  (워크플로 resolve-detail-urls.yml) */
 import fs from 'node:fs';
 import { chromium } from 'playwright';
-import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, detailCandidates, idsFromSource } from './detail-url.mjs';
+import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, detailCandidates, idsFromSource, looksLikeLoginWall } from './detail-url.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const DRY = process.argv.includes('--dry');
@@ -174,6 +174,8 @@ async function verifyCandidate(url, title, attempt = 0, otherTitles = []) {
     await p.waitForTimeout(800);
     const text = await p.evaluate(() => (document.body.innerText || '').slice(0, 12000)).catch(() => '');
     const docTitle = await p.title().catch(() => '');
+    const hasPw = await p.evaluate(() => !!document.querySelector('input[type=password]')).catch(() => false);
+    if (looksLikeLoginWall(text, hasPw)) return { ok: false, why: '로그인 요구(학생이 못 봄)' };
     if (!titleMatches(title, docTitle, text)) return { ok: false, why: '제목 불일치(다른 글이 열림)' };
     // 제목이 보여도 다른 글 제목이 여럿 같이 보이면 그건 상세가 아니라 목록이다
     if (looksLikeList(text, otherTitles)) return { ok: false, why: '목록 화면(다른 공고 제목이 여럿 보임)' };

@@ -39,7 +39,7 @@
          (워크플로 link-hunter.yml · collector/run-link-hunt.txt 를 고쳐 push해도 실행) */
 import fs from 'node:fs';
 import { chromium } from 'playwright';
-import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, titleFingerprint, detailCandidates, idsFromSource } from './detail-url.mjs';
+import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, titleFingerprint, detailCandidates, idsFromSource, looksLikeLoginWall } from './detail-url.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const DRY = process.argv.includes('--dry');
@@ -182,6 +182,10 @@ async function verify(url, title, others) {
     }
     await p.waitForTimeout(700);
     const text = await p.evaluate(() => (document.body.innerText || '').slice(0, 14000)).catch(() => '');
+    /* 로그인 벽이면 제목이 보여도 떨어뜨린다 — 학생은 로그인 없이 링크를 누르므로
+       로그인을 요구하는 주소는 그 학생에게 '안 열리는 링크'다 (2026-08-01 개발자 지적) */
+    const hasPw = await p.evaluate(() => !!document.querySelector('input[type=password]')).catch(() => false);
+    if (looksLikeLoginWall(text, hasPw)) return { ok: false, why: '로그인 요구(학생이 못 봄)' };
     const docTitle = await p.title().catch(() => '');
     const t = coreTitle(title);
     const hit = sameTitle(title, docTitle) || (t.length >= 8 && (fp(text).includes(t) || (t.length >= 24 && fp(text).includes(t.slice(0, 24)))));
