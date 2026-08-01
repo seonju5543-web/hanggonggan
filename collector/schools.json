@@ -163,6 +163,30 @@
    "note": "주소는 확보했다(2026-08-02) — onestop.pusan.ac.kr 장학 공지 511건. 목록을 자바스크립트가 그리고 행이 href=\"#popup\"이라 browser-targets.json이 담당한다"
   },
   {
+   "school": "가톨릭대학교",
+   "campus": "",
+   "boardUrl": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=list&srCategoryId=22",
+   "note": "개발자 제공(2026-08-02) — 공지사항의 '장학' 분류 필터(srCategoryId=22). 검증: 장학 12건·상세형 12건(mode=view&articleNo=). 빈 검색 파라미터(srSearchKey·srSearchVal)는 없어도 같은 목록이라 뺐다"
+  },
+  {
+   "school": "한국항공대학교",
+   "campus": "",
+   "boardUrl": "https://kau.ac.kr/kaulife/scholnoti.php",
+   "note": "개발자 제공(2026-08-02) — 전용 장학/대출공지. 검증: 장학 23건·상세형 20건(scholnoti.php?mode=read&seq=)"
+  },
+  {
+   "school": "경기대학교",
+   "campus": "",
+   "boardUrl": "https://www.kyonggi.ac.kr/www/selectBbsNttList.do?key=7520&bbsNo=1073&pageUnit=10&sf.pnos=1073&sf.pnos=888&searchCnd=WRTER&searchKrwd=%EC%9E%A5%ED%95%99",
+   "note": "개발자 제공(2026-08-02) — 통합 공지사항에서 작성자(WRTER)에 '장학'이 든 글만 거른 검색 결과다. 전용 장학 게시판이 아니라 검색이라, 장학팀이 아닌 부서가 올린 장학 공고는 빠질 수 있다. 검증: 장학 10건·상세형 10건. 상세 주소에 ;jsessionid=…가 붙지만 떼어내도 정상으로 열리는 것을 확인했다"
+  },
+  {
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "boardUrl": "https://www.seoultech.ac.kr/service/info/janghak/",
+   "note": "개발자 제공(2026-08-02) — 전용 장학공지. 검증: 장학 24건·상세형 19건(?do=commonview&bidx=)"
+  },
+  {
    "school": "계명대학교",
    "campus": "",
    "boardUrl": null,

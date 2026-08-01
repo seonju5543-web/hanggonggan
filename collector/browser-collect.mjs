@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import { chromium } from 'playwright';
 import { urlKey, dedupeNotices, capNotices } from './url-key.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
+import { isMenuEntry } from './clean-title.mjs';
 import { isDetailUrl, detailCandidates, sameTitle, idsFromSource } from './detail-url.mjs';
 
 const HERE = new URL('.', import.meta.url);
@@ -19,10 +20,8 @@ let notices = { updatedAt: null, items: [] };
 try { notices = JSON.parse(fs.readFileSync(noticesPath, 'utf8')); } catch { /* 첫 실행 */ }
 
 const KEYWORDS = /장학|학자금|등록금 감면|학업장려|근로장학/;
-const MENU_NOISE = /안내$|규정$|제도|구분$|바로가기|메뉴|홈페이지$|가이드북|증명서$|융자|^학사\/|장학안내|예우|로그인|사이트맵|^장학\/|장학금·학자금|^학자금 ?대출$|경력개발|비교과|DONATION|기탁/;
-/* 실공고 신호 — 연도·날짜·물결(~)·모집/선발/마감이 있으면 제목이 '안내'로 끝나도 공고로 본다
-   (예: 경희대 "2026년도 ○○장학금 신청 안내" — 메뉴가 아니라 실공고) */
-const NOTICE_SIGNAL = /\d{4}|\d{1,2}[./]\d{1,2}|~|모집|선발|마감/;
+/* 메뉴/공고 판정은 clean-title.mjs의 isMenuEntry 한 곳에만 둔다 — 여기 있던 MENU_NOISE·NOTICE_SIGNAL을
+   그 모듈로 옮겼다. 일반 수집기와 갈라져 있어서 사고가 났다(2026-08-02 '…안내' 공고 대량 유실) */
 const DEADLINE_RE = /(마감|까지|기한|접수기간|신청기간)[^\n<]{0,60}/;
 
 const browser = await chromium.launch({
@@ -236,7 +235,8 @@ async function harvestTarget(t, report) {
     loadedAny = true;
     const items = r.links
       .filter((l) => l.title.length >= 6 && l.title.length <= 140 && /^https?:/.test(l.url))
-      .filter((l) => KEYWORDS.test(l.title) && (NOTICE_SIGNAL.test(l.title) || !MENU_NOISE.test(l.title)))
+      // 메뉴 제외 — 일반 수집기와 같은 모듈을 써서 판정이 갈라지지 않게 한다
+      .filter((l) => KEYWORDS.test(l.title) && !isMenuEntry(l.title))
       // 첨부파일 내려받기 링크 제외 — 안 막으면 '…포스터.png' 같은 파일 이름이 공고로 뜬다
       .filter((l) => !isAttachmentEntry(l));
     // 중복 판정은 정규화 주소로 — 시립대처럼 정렬 순번(sort=)이 주소에 붙는 게시판 대응

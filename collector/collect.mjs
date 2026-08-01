@@ -8,7 +8,7 @@
    ============================================================ */
 import fs from 'node:fs';
 import { urlKey, dedupeNotices, capNotices } from './url-key.mjs';
-import { cleanTitle } from './clean-title.mjs';
+import { cleanTitle, isMenuEntry } from './clean-title.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 
 const HERE = new URL('.', import.meta.url);
@@ -23,7 +23,8 @@ let notices = { updatedAt: null, items: [] };
 try { notices = JSON.parse(fs.readFileSync(noticesPath, 'utf8')); } catch { /* 첫 실행 */ }
 
 const KEYWORDS = /장학|학자금|등록금 감면|학업장려|근로장학/;
-const MENU_NOISE = /안내$|규정$|제도|구분$|바로가기|메뉴|홈페이지$|가이드북|증명서$|융자|^학사\/|장학안내|예우/;
+/* 메뉴/공고 판정은 clean-title.mjs의 isMenuEntry 한 곳에만 둔다 — 브라우저 수집기와 갈라지면
+   같은 게시판을 두 로봇이 다르게 읽는다(2026-08-02 '…안내' 공고 대량 유실 사고) */
 const ATTACH_RE = /\.(hwp|hwpx|doc|docx|pdf|xls|xlsx)(\?|$)/i;
 const DEADLINE_RE = /(마감|까지|기한|접수기간|신청기간)[^\n<]{0,60}/;
 
@@ -95,7 +96,7 @@ for (const s of cfg.schools) {
     const html = await res.text();
     const items = extractLinks(html, s.boardUrl)
       .filter((i) => KEYWORDS.test(i.title))
-      .filter((i) => !MENU_NOISE.test(i.title)) // 메뉴성 링크 제외, 실공고 위주
+      .filter((i) => !isMenuEntry(i.title))     // 옆 메뉴 제외 (실공고 신호가 있으면 남긴다)
       // 첨부파일 내려받기 링크 제외 — 안 막으면 '…포스터.png' 같은 파일 이름이 공고로 뜬다
       .filter((i) => !isAttachmentEntry(i));
     // 이미 본 글인지는 정규화한 주소로 판정 — 정렬 순번만 바뀐 같은 글을 '신규'로 담지 않기 위해
