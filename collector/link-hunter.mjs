@@ -477,7 +477,24 @@ for (const [listUrl, group] of boards) {
         if (el) {
           const popupP = ctx.waitForEvent('page', { timeout: 4000 }).catch(() => null);
           const navP = page.waitForNavigation({ timeout: 8000 }).catch(() => null);
-          await el.click({ timeout: 5000 });
+          /* 클릭이 막히는 게시판이 있다 (2026-08-01 동국대 — 정찰로 확인).
+             동국대 목록에는 '디지털 역사관 … 오늘 하루 보지 않기 X' 팝업이 화면을 덮고 있어
+             평범한 클릭이 5초를 기다리다 실패했다(진담거사 등이 이 이유로 떨어졌다).
+             ① 먼저 팝업을 닫아 보고 ② 그래도 막히면 화면 위치를 따지지 않는 방식으로 누른다.
+             (동국대 행은 href가 '#none'이라 '행에 적힌 주소'가 아예 없다 — 반드시 눌러야 한다.) */
+          await page.evaluate(() => {
+            const hit = [...document.querySelectorAll('a,button,span,div')].filter((e) => {
+              const s = (e.textContent || '').trim();
+              return s === 'X' || s === '닫기' || /오늘 하루 보지 않기/.test(s);
+            });
+            hit.slice(0, 6).forEach((e) => { try { e.click(); } catch { /* 무시 */ } });
+          }).catch(() => {});
+          try {
+            await el.click({ timeout: 5000 });
+          } catch {
+            // 화면이 가려져 못 누르면 요소에게 직접 누르라고 시킨다 (위치를 따지지 않는다)
+            await el.evaluate((e) => e.click());
+          }
           const popup = await popupP;
           const detail = popup || page;
           if (popup) await popup.waitForLoadState('domcontentloaded').catch(() => {});
