@@ -59,17 +59,21 @@ jobs:
         run: node collector/resolve-detail-urls.mjs ${{ inputs.dry && '--dry' || '' }} ${{ inputs.recheck_only && '--recheck-only' || '' }}
 
       # 데이터 관문 — 고친 주소가 규칙을 어기면 저장하지 않는다
+      # always() 인 이유: 복구 로봇이 도중에 넘어져도 **그때까지 고친 주소는 저장한다**
+      # (2026-08-01 링크 사냥꾼 사고 — 찾아 놓은 13건이 저장 단계 건너뜀으로 통째로 버려졌다).
+      # 실행은 여전히 빨간불로 남는다.
       - name: 데이터 감사
         id: audit
+        if: always()
         continue-on-error: true
         run: node verify/audit-data.js
 
       - name: 감사 실패 시 되돌리기
-        if: steps.audit.outcome == 'failure'
+        if: always() && steps.audit.outcome == 'failure'
         run: git checkout -- data/registered.json data/notices.json
 
       - name: 결과 저장
-        if: steps.audit.outcome == 'success'
+        if: always() && steps.audit.outcome == 'success'
         run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

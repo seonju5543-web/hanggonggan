@@ -22,6 +22,28 @@ import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, detailCand
 const HERE = new URL('.', import.meta.url);
 const DRY = process.argv.includes('--dry');
 
+/* 집계 — 맨 위에 둔다. 아래 '넘어져도 저장' 장치가 언제 불려도 읽을 수 있어야 한다. */
+let fixed = 0; let failed = 0;
+let rechecked = 0; let reverted = 0;
+const resolvedMap = {}; // 표식 주소 → 진짜 원문 주소 (기록용)
+
+/* ── 넘어져도 그때까지 고친 것은 반드시 저장한다 (2026-08-01, 링크 사냥꾼과 같은 장치) ──
+   사냥꾼이 원문 주소 13건을 찾아 놓고 리포트 마지막 줄에서 넘어져 전부 버린 사고가 있었다.
+   이 로봇도 25분짜리 긴 일이라 같은 사고가 나면 같은 손해를 본다. 그래서 넘어지면
+   ① 그때까지의 결과를 저장하고 ② 리포트에 넘어진 자리를 적고 ③ 실패는 실패라고 알린다. */
+let crashed = false;
+const onCrash = (err) => {
+  if (crashed) return;
+  crashed = true;
+  console.error('\n🚨 복구 도중 넘어졌습니다 — 그때까지 고친 것은 저장합니다:\n', err);
+  try { saveAll(String((err && err.stack) || err).split('\n').slice(0, 3).join(' · ')); } catch (e) {
+    console.error('저장까지 실패했습니다:', e);
+  }
+  process.exit(1);
+};
+process.on('uncaughtException', onCrash);
+process.on('unhandledRejection', onCrash);
+
 const LIMIT_BOARDS = Number(process.env.RESOLVE_MAX_BOARDS || 20);
 /* 실행 시간 상한 — 2차 실행이 40분을 넘겼다. 매주 도는 로봇이므로 한 번에 다 못 고쳐도
    다음 주에 이어서 고치면 된다. 시간을 넘기면 그때까지 고친 것만 저장하고 끝낸다. */
@@ -252,8 +274,6 @@ async function scanBoard(page, listUrl, maxPages) {
   return all;
 }
 
-let fixed = 0; let failed = 0;
-const resolvedMap = {}; // 표식 주소 → 진짜 원문 주소 (기록용)
 
 let boardCount = 0;
 for (const [listUrl, group] of boards) {
@@ -396,7 +416,6 @@ for (const [listUrl, group] of boards) {
    원문으로 오인할 수 있었다(동국 진담거사에 안내 페이지 번호가 붙은 사례).
    지금 규칙으로 다시 재서, 목록이거나 다른 글이면 표식으로 되돌린다 —
    그러면 앱이 '게시판 목록 ↗'으로 정직하게 알리고 다음 실행이 다시 고친다. */
-let rechecked = 0; let reverted = 0;
 if (!outOfTime()) {
   report.push('### 소급 재검사 (이미 고쳐 둔 주소가 정말 그 공고로 가는가)');
   const boardKeys = [...boards.keys()].map((l) => { try { const u = new URL(l); return u.origin + '/' + (u.pathname.split('/').filter(Boolean)[0] || ''); } catch { return null; } }).filter(Boolean);
@@ -479,18 +498,26 @@ if (!outOfTime()) {
   report.push('');
 }
 
+/* 저장·리포트를 한 곳에 모아 둔다 — 정상 종료도, 넘어졌을 때도 같은 길로 저장한다. */
+function saveAll(crashNote) {
+  if (!DRY && (fixed || reverted)) {
+    fs.writeFileSync(noticesPath, JSON.stringify(notices, null, 1));
+    fs.writeFileSync(registeredPath, JSON.stringify(registered, null, 1));
+  }
+  fs.writeFileSync(new URL('resolved-urls.json', HERE), JSON.stringify({ updatedAt: new Date().toISOString().slice(0, 10), map: resolvedMap }, null, 1));
+
+  report.push('---');
+  if (crashNote) {
+    report.push(`🚨 **로봇이 도중에 넘어졌습니다** — 여기까지 고친 것은 저장했습니다. 넘어진 자리: \`${crashNote}\``);
+    report.push('');
+  }
+  report.push(`복구 **${fixed}건** · 실패 ${failed}건 · 소급 재검사 ${rechecked}건 중 되돌림 ${reverted}건${DRY ? ' (모의 실행 — 저장 안 함)' : ''}`);
+  if (failed) report.push('실패분은 목록 주소를 그대로 두었습니다 — 앱은 이 경우 "게시판 목록이 열려요"라고 정직하게 알립니다.');
+  fs.writeFileSync(new URL('resolve-report.md', HERE), report.join('\n'));
+  console.log(report.join('\n'));
+  if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT, `fixed=${fixed}\nfailed=${failed}\nreverted=${reverted}\n`);
+}
+
 await verifyCtx?.close().catch(() => {});
 await browser.close();
-
-if (!DRY && (fixed || reverted)) {
-  fs.writeFileSync(noticesPath, JSON.stringify(notices, null, 1));
-  fs.writeFileSync(registeredPath, JSON.stringify(registered, null, 1));
-}
-fs.writeFileSync(new URL('resolved-urls.json', HERE), JSON.stringify({ updatedAt: new Date().toISOString().slice(0, 10), map: resolvedMap }, null, 1));
-
-report.push('---');
-report.push(`복구 **${fixed}건** · 실패 ${failed}건 · 소급 재검사 ${rechecked}건 중 되돌림 ${reverted}건${DRY ? ' (모의 실행 — 저장 안 함)' : ''}`);
-if (failed) report.push('실패분은 목록 주소를 그대로 두었습니다 — 앱은 이 경우 "게시판 목록이 열려요"라고 정직하게 알립니다.');
-fs.writeFileSync(new URL('resolve-report.md', HERE), report.join('\n'));
-console.log(report.join('\n'));
-if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT, `fixed=${fixed}\nfailed=${failed}\nreverted=${reverted}\n`);
+saveAll(null);
