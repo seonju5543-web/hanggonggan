@@ -116,9 +116,24 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          # 이슈 본문 한도(65,536자) — 일반 수집 로봇이 2026-08-02에 실제로 넘겨 실패했다.
+          # 여기도 학교가 늘면 같은 자리라 미리 막는다.
+          BODY=collector/browser-report.md
+          LIMIT=60000
+          if [ "$(wc -c < "$BODY")" -gt "$LIMIT" ]; then
+            RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            head -c "$LIMIT" "$BODY" > /tmp/report-cut.md
+            {
+              printf '\n\n---\n\n'
+              printf '> ⚠️ **리포트가 길어 여기서 잘렸습니다.** 이슈 본문 한도(65,536자)를 넘었습니다.\n'
+              printf '> 전문은 저장소의 `collector/browser-report.md`에서 보거나 [이 실행 로그](%s)를 여세요.\n' "$RUN_URL"
+            } >> /tmp/report-cut.md
+            BODY=/tmp/report-cut.md
+            echo "리포트가 한도를 넘어 잘랐습니다 — 전문은 collector/browser-report.md"
+          fi
           gh issue create \
             --title "🖥 브라우저형 수집 리포트 $(TZ=Asia/Seoul date +%Y-%m-%d) (신규 ${{ steps.run.outputs.new_count }}건)" \
-            --body-file collector/browser-report.md \
+            --body-file "$BODY" \
             --repo "${{ github.repository }}" \
             --assignee "${{ github.repository_owner }}" \
             --assignee "Se-Hyeon-Jo"

@@ -115,9 +115,25 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          # GitHub 이슈 본문은 65,536자가 한도다. 학교를 16곳 늘린 2026-08-02 첫 수집에서
+          # 새 공고가 265건 나오며 이 한도를 넘어 이슈 생성이 실패했다(수집·저장은 다 성공한 뒤였다).
+          # 학교를 붙일수록 다시 터질 자리라, 넘치면 잘라내고 어디서 전문을 볼지 안내한다.
+          BODY=collector/report.md
+          LIMIT=60000   # 한도 65536에서 아래 안내문과 여유분을 뺀 값
+          if [ "$(wc -c < "$BODY")" -gt "$LIMIT" ]; then
+            RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            head -c "$LIMIT" "$BODY" > /tmp/report-cut.md
+            {
+              printf '\n\n---\n\n'
+              printf '> ⚠️ **리포트가 길어 여기서 잘렸습니다.** 이슈 본문 한도(65,536자)를 넘었습니다.\n'
+              printf '> 전문은 저장소의 `collector/report.md`에서 보거나 [이 실행 로그](%s)를 여세요.\n' "$RUN_URL"
+            } >> /tmp/report-cut.md
+            BODY=/tmp/report-cut.md
+            echo "리포트가 한도를 넘어 잘랐습니다 — 전문은 collector/report.md"
+          fi
           gh issue create \
             --title "🤖 장학공고 수집 리포트 $(TZ=Asia/Seoul date +%Y-%m-%d) (새 공고 ${{ steps.run.outputs.new_count }}건)" \
-            --body-file collector/report.md \
+            --body-file "$BODY" \
             --repo "${{ github.repository }}" \
             --assignee "${{ github.repository_owner }}" \
             --assignee "Se-Hyeon-Jo"
