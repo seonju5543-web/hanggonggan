@@ -230,10 +230,24 @@ function validate(t) {
   return null;
 }
 
-function newFormId(item, forms) {
-  let fid = `auto-${slug(item.target)}-apply`;
+/* 이번 실행에서 이미 발급한 키 — 한 공고에 첨부가 여럿이면 서로 덮어쓰지 않게 한다 */
+const mintedThisRun = new Set();
+
+/* 같은 공고를 다시 스키마화할 때 **같은 키를 다시 쓴다**(그 자리에 덮어쓰기).
+   예전에는 이미 있는 키를 피해 -2, -3… 을 계속 새로 만들었는데,
+   보류된 첨부가 하나라도 있으면 그 공고는 매 실행마다 다시 처리되므로
+   실행할 때마다 새 키가 생기고 등록 항목의 연결도 그 새 키로 갈아탔다.
+   (2026-08-01 감사 실패: reg-hufs-namgaju → auto-남가주동문-apply-2)
+   번호를 붙이는 건 '다른 공고가 이미 그 키를 쓰고 있을 때'뿐이다. */
+function newFormId(item, forms, registered, entry) {
+  const base = `auto-${slug(item.target)}-apply`;
+  const takenByOther = (fid) =>
+    mintedThisRun.has(fid) ||
+    (registered.items || []).some((i) => i.formId === fid && i.id !== entry.id);
+  let fid = base;
   let n = 2;
-  while (forms.templates[fid]) fid = `auto-${slug(item.target)}-apply-${n++}`;
+  while (takenByOther(fid)) fid = `${base}-${n++}`;
+  mintedThisRun.add(fid);
   return fid;
 }
 
@@ -363,7 +377,7 @@ for (const item of pending) {
     const bad = validate(tpl);
     if (bad) { skipped.push([row.attachment, `검증 실패: ${bad}`]); continue; }
 
-    const fid = newFormId(item, forms);
+    const fid = newFormId(item, forms, registered, entry);
     forms.templates[fid] = tpl;
 
     if (!linked) {
@@ -402,7 +416,7 @@ for (const item of pending) {
       manual.push([item.name, freeParts.map((p) => p.attachment).join(', '), `자동 변환 결과가 검증을 통과하지 못함(${bad0})`]);
       leftForManual = true;
     } else {
-      const fid0 = newFormId(item, forms);
+      const fid0 = newFormId(item, forms, registered, entry);
       forms.templates[fid0] = merged;
       if (!linked) { entry.formId = fid0; delete entry.noForm; linked = true; }
       freeDone.push([item.name, freeParts.map((p) => p.attachment).join(' + '), fid0, merged,
@@ -414,9 +428,22 @@ for (const item of pending) {
   if (!leftForManual) item.schematized = true;
 }
 
+/* 마지막 안전장치 (2026-08-01) — '있지도 않은 양식을 가리키는 연결'은 저장 전에 끊는다.
+   앱은 이런 연결을 만나면 양식 작성 버튼을 아예 안 보여주므로, 끊어 두는 편이 정직하고
+   감사도 통과한다. 원본 첨부 다운로드 안내는 그대로 남는다. */
+const healed = [];
+for (const it of registered.items || []) {
+  if (it.formId && !forms.templates[it.formId]) {
+    healed.push([it.id, it.formId]);
+    delete it.formId;
+  }
+}
+
 if (done.length || freeDone.length) {
   forms.updatedAt = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
   fs.writeFileSync(formsPath, JSON.stringify(forms, null, 1) + '\n');
+}
+if (done.length || freeDone.length || healed.length) {
   fs.writeFileSync(registeredPath, JSON.stringify(registered, null, 1) + '\n');
 }
 fs.writeFileSync(queuePath, JSON.stringify(queue, null, 1) + '\n');
@@ -446,5 +473,9 @@ if (skipped.length) {
   report.push('', `**건너뜀 ${skipped.length}건**`, '');
   for (const [what, why] of skipped.slice(0, 12)) report.push(`- ${String(what).slice(0, 50)} — ${why}`);
 }
+if (healed.length) {
+  report.push('', `**끊어진 양식 연결 ${healed.length}건 정리** — 없는 양식을 가리키고 있어서 연결을 끊었어요(원본 첨부 안내는 유지).`, '');
+  for (const [id, fid] of healed) report.push(`- ${id} → \`${fid}\` (data/forms.json에 없음)`);
+}
 finish();
-log(`완료: 무료 자동 ${freeDone.length}건 · API ${done.length}건(${apiCalls}회 호출) · 보류 ${manual.length}건 · 건너뜀 ${skipped.length}건`);
+log(`완료: 무료 자동 ${freeDone.length}건 · API ${done.length}건(${apiCalls}회 호출) · 보류 ${manual.length}건 · 건너뜀 ${skipped.length}건${healed.length ? ` · 끊어진 연결 정리 ${healed.length}건` : ''}`);

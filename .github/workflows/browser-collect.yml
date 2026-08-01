@@ -36,21 +36,6 @@ jobs:
         run: node collector/browser-collect.mjs
       - name: 정식 등록 자동화 (선조치후보고 — collector/auto-register-config.json으로 on/off)
         run: node collector/auto-register.mjs collector/browser-report.md
-      # 데이터 관문 (2026-07-30 도입): 로봇이 바꾼 데이터가 규칙을 어기면 저장하지 않고 되돌린다.
-      # 잘못된 공고가 앱에 하루라도 노출되는 일을 막는 장치 — 사람이 감사를 기억해서 돌릴 필요가 없다.
-      - name: 데이터 관문 (수집기 규칙 테스트 + 데이터 감사)
-        id: audit
-        continue-on-error: true
-        run: |
-          node verify/test-collector.mjs
-          node verify/audit-data.js
-      - name: 감사 실패 시 자동 등록분 되돌리기
-        if: steps.audit.outcome == 'failure'
-        run: |
-          # 파일 전체가 아니라 '이번 실행이 새로 자동 등록한 공고'만 골라서 뺀다
-          # (같은 실행의 원문 발췌 갱신 같은 정상 작업까지 버리지 않도록)
-          node collector/revert-auto.mjs || git checkout -- data/registered.json
-
       - name: 신규 등록분 양식 원본 자동 확보 + 스키마화 (같은 실행 안에서 끝낸다)
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -70,6 +55,23 @@ jobs:
 
       - name: 공고 원문 발췌 갱신 (정직 원칙 — 추론 대신 원문 그대로)
         run: node collector/extract-excerpts.mjs --write
+
+      # 데이터 관문 (2026-07-30 도입): 로봇이 바꾼 데이터가 규칙을 어기면 저장하지 않고 되돌린다.
+      # 잘못된 공고가 앱에 하루라도 노출되는 일을 막는 장치 — 사람이 감사를 기억해서 돌릴 필요가 없다.
+      # 위치 규칙 (2026-08-01): 관문은 **저장 직전**에 둔다. 예전엔 양식 스키마화보다 앞에 있어서
+      # 스키마화가 만든 잘못된 연결이 그 실행에서는 안 잡히고 다음 날 실행에서 터졌다(이슈 #79).
+      - name: 데이터 관문 (수집기 규칙 테스트 + 데이터 감사)
+        id: audit
+        continue-on-error: true
+        run: |
+          node verify/test-collector.mjs
+          node verify/audit-data.js
+      - name: 감사 실패 시 자동 등록분 되돌리기
+        if: steps.audit.outcome == 'failure'
+        run: |
+          # 파일 전체가 아니라 '이번 실행이 새로 자동 등록한 공고'만 골라서 뺀다
+          # (같은 실행의 원문 발췌 갱신 같은 정상 작업까지 버리지 않도록)
+          node collector/revert-auto.mjs || git checkout -- data/registered.json
       # 저장 위치 원칙 (2026-07-31 두 개발자 판 통합 — 여기를 바꾸기 전에 반드시 읽을 것):
       #   로봇은 **자기가 읽은 브랜치(= 실행된 브랜치, 기본 브랜치)에만** 저장한다.
       #   '이미 본 공고' 기록(collector/seen.json)과 공고 목록을 읽은 곳과 쓰는 곳이 다르면,
@@ -81,7 +83,10 @@ jobs:
         run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add collector/seen.json collector/browser-report.md data/notices.json data/registered.json
+          # data/forms.json 반드시 포함 — 스키마화가 만든 양식 원본이 여기 들어 있다.
+          # 빠뜨리면 registered.json의 formId만 저장되고 양식은 버려져 '없는 양식을 가리키는
+          # 연결'이 생긴다 (2026-08-01 감사 실패의 원인 — 이슈 #79).
+          git add collector/seen.json collector/browser-report.md data/notices.json data/registered.json data/forms.json
           [ -f collector/health.json ] && git add collector/health.json
           [ -f collector/pending-forms.json ] && git add collector/pending-forms.json
           [ -d collector/extracted ] && git add collector/extracted
