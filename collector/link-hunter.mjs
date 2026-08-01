@@ -54,6 +54,10 @@ import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, titleFinge
 
 const HERE = new URL('.', import.meta.url);
 const DRY = process.argv.includes('--dry');
+/* 오늘 날짜(KST) — 순찰·재시도 간격 판단에 쓴다.
+   ⚠️ 반드시 맨 위에 둘 것: 2026-08-01에 순찰 단계를 넣으면서 이 선언이 사용처보다
+   아래에 남아, 로봇이 시작하자마자 죽는 상태였다(const는 선언 전에 못 쓴다). */
+const today = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
 
 function runSetting(key) {
   try {
@@ -370,7 +374,6 @@ if (PATROL_PER_RUN > 0 && !outOfTime()) {
 report.push('## 2단계 · 사냥 (원문 주소 찾기)');
 
 let found = 0; let failed = 0; let gone = 0; let stuck = 0;
-const today = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
 
 function record(t, outcome, why) {
   const st = state.items[t.key] || { attempts: 0, title: String(t.title).slice(0, 80) };
