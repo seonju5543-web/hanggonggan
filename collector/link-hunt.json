@@ -74,14 +74,20 @@
    "title": "2026학년도 2학기 삼일장학회 장학생 선발 안내",
    "lastTried": "2026-08-01",
    "lastWhy": "목록에서 못 찾음",
-   "status": "gone"
+   "status": "",
+   "likelyGone": true,
+   "nextTryAt": "",
+   "escalated": true
   },
   "r:reg-dg-sanhak-foreign": {
    "attempts": 3,
    "title": "산학협동재단 국내 외국인 근로자 자녀 장학생 (동국대 접수)",
    "lastTried": "2026-08-01",
    "lastWhy": "목록에서 못 찾음",
-   "status": "gone"
+   "status": "",
+   "likelyGone": true,
+   "nextTryAt": "",
+   "escalated": true
   },
   "r:reg-dg-injae": {
    "attempts": 0,

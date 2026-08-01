@@ -65,7 +65,12 @@ function runSetting(key) {
 const ONLY = process.env.HUNT_ONLY_BOARD || runSetting('onlyBoard');
 const MAX_PAGES = Number(process.env.HUNT_MAX_PAGES || runSetting('maxPages') || 10);
 const BUDGET_MS = Number(process.env.HUNT_BUDGET_MS || 25 * 60000);
-const GIVE_UP_AFTER = 3;           // 같은 사유로 이만큼 실패하면 더 두드리지 않는다
+/* 끈질김의 규칙 (2026-08-01 개발자 지시: "어떻게든 원문을 찾아서 올려둬라")
+   실패해도 **영영 포기하지 않는다.** 다만 같은 것을 매일 두드리면 학교 서버에 무례하고
+   시간도 낭비하므로, 실패가 쌓일수록 **간격을 늘려 가며 계속 시도한다.**
+   3회째에 사람에게 알리지만(이슈), 그 뒤로도 로봇은 계속 찾아본다. */
+const ESCALATE_AT = 3;                       // 이 횟수에서 사람에게 알린다 (중단이 아니다)
+const BACKOFF_DAYS = [0, 1, 1, 3, 7, 14, 30]; // 실패 n회 뒤 며칠 있다 다시 볼지 (마지막 값이 상한)
 const startedAt = Date.now();
 const outOfTime = () => Date.now() - startedAt > BUDGET_MS;
 
@@ -163,7 +168,8 @@ for (const r of registered.items || []) {
 const skipped = [];
 const active = targets.filter((t) => {
   const st = state.items[t.key];
-  if (st && (st.status === 'gone' || st.status === 'stuck')) { skipped.push({ t, st }); return false; }
+  // 영구 포기는 없다 — '아직 다시 볼 날이 안 된 것'만 이번 회차에서 쉰다
+  if (st && st.nextTryAt && st.nextTryAt > today) { skipped.push({ t, st }); return false; }
   return true;
 });
 
@@ -374,10 +380,13 @@ function record(t, outcome, why) {
   else if (outcome === 'net') { st.lastWhy = why; }          // 못 읽음은 횟수에 안 센다
   else {
     st.attempts = (st.attempts || 0) + 1;
-    if (st.attempts >= GIVE_UP_AFTER) {
-      st.status = why === '목록에서 못 찾음' ? 'gone' : 'stuck';
-      if (st.status === 'gone') gone += 1; else stuck += 1;
-    }
+    // 다음에 언제 다시 볼지 — 실패가 쌓일수록 간격을 늘린다 (그래도 계속 본다)
+    const wait = BACKOFF_DAYS[Math.min(st.attempts, BACKOFF_DAYS.length - 1)];
+    const d = new Date(Date.now() + 9 * 3600000 + wait * 86400000);
+    st.nextTryAt = d.toISOString().slice(0, 10);
+    st.status = '';                                   // 영구 포기 상태를 두지 않는다
+    if (st.attempts === ESCALATE_AT) { st.escalated = true; stuck += 1; }  // 사람에게 한 번 알림
+    if (why === '목록에서 못 찾음' && st.attempts >= ESCALATE_AT) st.likelyGone = true;
   }
   state.items[t.key] = st;
 }
@@ -492,6 +501,103 @@ for (const [listUrl, group] of boards) {
   report.push('');
 }
 
+
+/* ── 3단계 · 끈질기게 (2026-08-01 개발자 지시) ─────────────────────────────
+   "다른 수집 로봇이 못 잡은 원문을 어떻게든 찾아서 올려둬라."
+
+   1·2단계는 **그 공고가 기록된 게시판 한 곳**만 뒤진다. 그런데 공고가 거기 없을 수 있다:
+   경희대가 그랬다 — 우리는 news.khu.ac.kr을 보는데 학생은 대학생활>장학에서 본다.
+   그래서 여기서는 같은 학교의 **다른 게시판**과 **학교 사이트 검색**까지 동원한다.
+   사람이 공고를 찾을 때 하는 행동 그대로다. */
+const stillLost = [];
+for (const [, group] of boards) {
+  for (const t of group) {
+    const st = state.items[t.key] || {};
+    if (st.status === 'resolved') continue;
+    if (isMarkerUrl(t.ref[t.field])) stillLost.push(t);
+  }
+}
+let extraFound = 0;
+if (stillLost.length && !outOfTime()) {
+  report.push('## 3단계 · 끈질기게 (다른 게시판 · 학교 사이트 검색)');
+  report.push(`- 아직 못 찾은 ${stillLost.length}건에 대해 다른 방법을 시도합니다`);
+
+  /* 학교 사이트 검색창에 제목을 넣어 결과에서 그 공고를 찾는다 */
+  async function siteSearch(origin, title) {
+    const p = await freshPage();
+    try {
+      await p.goto(origin, { waitUntil: 'domcontentloaded', timeout: 25000 });
+      await p.waitForTimeout(2000);
+      const q = String(title).replace(/^\s*\d{1,5}\s+/, '').replace(/\[[^\]]{0,20}\]/g, '')
+        .replace(/20\d{2}[.\-/]\d{1,2}[.\-/]\d{1,2}.*$/, '').trim().slice(0, 30);
+      if (q.length < 6) return null;
+      // 검색창 찾아 입력 (이름이 학교마다 달라 여러 후보를 본다)
+      const typed = await p.evaluate((kw) => {
+        const sel = 'input[type=search], input[name*=search i], input[name*=keyword i], input[name*=query i], input[name*=kwd i], input[id*=search i], input[placeholder*="검색"]';
+        const el = [...document.querySelectorAll(sel)].find((e) => e.offsetParent !== null) || document.querySelector(sel);
+        if (!el) return false;
+        el.focus(); el.value = kw;
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        return true;
+      }, q).catch(() => false);
+      if (!typed) return null;
+      await p.keyboard.press('Enter').catch(() => {});
+      await p.waitForTimeout(4000);
+      // 결과 화면에서 제목이 맞는 링크를 고른다
+      const hit = await p.evaluate(() => [...document.querySelectorAll('a[href]')].map((a) => ({
+        t: (a.textContent || '').replace(/\s+/g, ' ').trim(), u: a.href,
+      })).filter((x) => x.t.length >= 8), []).catch(() => []);
+      const match = (hit || []).find((x) => sameTitle(title, x.t) && /^https?:/.test(x.u));
+      return match ? match.u : null;
+    } catch { return null; } finally { await p.close().catch(() => {}); }
+  }
+
+  for (const t of stillLost) {
+    if (outOfTime()) { report.push('- (시간 상한 — 나머지는 다음 실행)'); break; }
+    const want = huntTitle(t);
+    let origin = '';
+    try { origin = new URL(t.ref[t.field]).origin; } catch { /* 무시 */ }
+    const others = [];
+    // ① 같은 학교의 다른 게시판 후보
+    for (const h of BOARD_HINTS) {
+      try { if (new URL(h).origin === origin && listUrlOf(t.ref[t.field]) !== h) others.push(h); } catch { /* skip */ }
+    }
+    let got = null; const tried = [];
+    for (const board of others.slice(0, 3)) {
+      if (outOfTime()) break;
+      tried.push(board);
+      const p = await freshPage();
+      try {
+        await p.goto(board, { waitUntil: 'domcontentloaded', timeout: 25000 });
+        await p.waitForTimeout(3000);
+        const rows = await p.$$eval('a[href]', (els) => els.map((e) => ({
+          t: (e.textContent || '').replace(/\s+/g, ' ').trim(), u: e.href,
+        })).filter((x) => x.t.length >= 8)).catch(() => []);
+        const row = rows.find((r) => sameTitle(want, r.t) && isDetailUrl(r.u, board));
+        if (row) { const v = await verify(row.u, want, []); if (v.ok) got = row.u; }
+      } catch { /* 다음 후보 */ } finally { await p.close().catch(() => {}); }
+      if (got) break;
+    }
+    // ② 학교 사이트 검색
+    if (!got && origin && !outOfTime()) {
+      tried.push(`${origin} (사이트 검색)`);
+      const u = await siteSearch(origin, want);
+      if (u) { const v = await verify(u, want, []); if (v.ok) got = u; }
+    }
+    if (got) {
+      if (!DRY) { t.ref[t.field] = got; if (!t.ref.boardTitle) t.ref.boardTitle = want; }
+      extraFound += 1; found += 1;
+      record(t, 'ok');
+      report.push(`  - ✅ 다른 경로에서 찾음: ${want.slice(0, 40)} → ${got.slice(0, 100)}`);
+    } else {
+      report.push(`  - ⚠️ 다른 경로에서도 못 찾음 (${tried.length}곳 시도): ${want.slice(0, 40)}`);
+    }
+    await new Promise((r) => setTimeout(r, 900));
+  }
+  report.push(`- 3단계 추가 확보: ${extraFound}건`);
+  report.push('');
+}
+
 await verifyCtx?.close().catch(() => {});
 await browser.close();
 
@@ -505,12 +611,14 @@ if (!DRY) {
 }
 
 if (skipped.length) {
-  report.push('### 더는 두드리지 않는 건 (포기 처리)');
-  skipped.forEach(({ t, st }) => report.push(`- ${st.status === 'gone' ? '🗑 내려간 공고' : '🔧 사람 확인 필요'} — ${String(t.title).slice(0, 46)} (${st.lastWhy || ''})`));
+  report.push('### 이번 회차는 쉬는 건 (간격을 두고 다시 시도합니다)');
+  skipped.forEach(({ t, st }) => report.push(`- ⏳ ${st.nextTryAt} 에 다시 시도 (${st.attempts || 0}회 실패${st.likelyGone ? ' · 게시판에서 내려간 듯' : ''}) — ${String(t.title).slice(0, 44)} (${st.lastWhy || ''})`));
   report.push('');
 }
 report.push('---');
-report.push(`원문 주소 확보 **${found}건** · 실패 ${failed}건 · 이번에 포기 처리 ${gone + stuck}건(내려감 ${gone} · 사람 확인 ${stuck})${DRY ? ' — 모의 실행' : ''}`);
+report.push(`원문 주소 확보 **${found}건** · 아직 못 찾음 ${failed}건 · 사람에게 알릴 건 ${stuck}건${DRY ? ' — 모의 실행' : ''}`);
+report.push('');
+report.push('**포기하는 건 없습니다** — 못 찾은 공고는 간격을 늘려 가며(1일→3일→7일→14일→30일) 계속 다시 찾습니다.');
 report.push('');
 report.push('실패해도 앱은 지어내지 않습니다 — 원문 주소를 못 찾은 공고는 "게시판 목록 ↗"으로 정직하게 안내합니다.');
 fs.writeFileSync(new URL('link-hunt-report.md', HERE), report.join('\n'));
