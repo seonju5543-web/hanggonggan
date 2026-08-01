@@ -36,7 +36,9 @@ export function listUrlOf(raw) {
 }
 
 /* 글 하나를 가리키는 식별자로 쓰이는 파라미터 이름들 (학교 게시판 공통) */
-const ID_PARAMS = /^(ntt_?id|nttSn|bbs_?seq|seq|article_?no|articleNo|artcl_?seq|idx|no|num|board_?no|bidx|wr_id|DUID|list_id|b_idx|boardSeq|postId|id)$/i;
+const ID_PARAMS = /^(ntt_?id|nttSn|bbs_?seq|seq|article_?no|articleNo|artcl_?seq|idx|no|num|board_?no|board_?id|bidx|wr_id|DUID|list_id|b_idx|boardSeq|postId|id)$/i;
+/* boardId는 2026-08-01에 추가했다 — 경희대가 쓰는 이름인데 목록에 없어서, 폼에서
+   'boardId=' 빈 칸을 보고도 글 번호 자리로 알아보지 못하고 엉뚱한 이름(nttId)을 썼다. */
 
 /* 식별자 '값'이 진짜 글 번호처럼 생겼는지 — 이름만 보고 믿으면 안 된다.
    실제로 동국대 상세 화면에는 name="no" value="dongguk.edu" 같은 칸이 있어서,
@@ -190,6 +192,57 @@ export function detailCandidates(dom) {
   //   (경희 유형: 목록에서 클릭이 form POST라 주소창이 안 바뀐다. list.do 옆에 view.do가 있고
   //    nttId·menuNo·bbsId를 GET으로도 받으므로, 글 번호만 알아내면 원문 주소를 만들 수 있다.)
   //   글 번호의 출처는 두 곳: 상세 화면의 숨은 입력칸, 그리고 목록 행의 클릭 스크립트 인자.
+  /* 상세 주소를 조립할 때 **어느 형태를 먼저 시도할지는 목록 주소의 생김새로 정한다.**
+     학교마다 정답이 달랐고, 순서를 잘못 잡으면 통째로 실패한다 (둘 다 실제로 겪었다):
+       · 동국대 목록 `…/JANGHAKNOTICE/list`      (물음표 없는 경로형)
+         → 상세도 경로형 `…/JANGHAKNOTICE/detail/26765595`  ✅
+           조립형을 먼저 놨더니 33건이 전부 404였다.
+       · 경희대 목록 `…/BMSR00040/list.do?menuNo=200318`  (물음표 있는 쿼리형)
+         → 상세도 쿼리형 `…/BMSR00040/view.do?menuNo=200318&boardId=322535`  ✅
+           경로형을 먼저 놨더니 404, 폼에서 가져온 메뉴는 로그인 화면이었다.
+     즉 **게시판이 쓰는 주소 생김새를 그대로 따라가면 된다.** 둘 다 후보로는 남기되
+     순서만 이 규칙으로 정하고, 최종 판단은 언제나 '열어서 확인'이 한다. */
+  if (dom.listUrl) {
+    const mkPath = (idVal) => {
+      try {
+        const l = new URL(dom.listUrl);
+        const base = l.pathname.replace(/\/(list|artclList|index)(\.do|\.jsp|\.php)?\/?$/i, '');
+        return base && base !== l.pathname ? `${l.origin}${base}/detail/${idVal}` : null;
+      } catch { return null; }
+    };
+    const mkQuery = (idVal) => {
+      // 글 번호의 '이름'은 게시판 폼에서 빌려 온다 (경희=boardId, 다른 곳=nttId 등)
+      const names = new Set();
+      for (const f of dom.forms || []) {
+        for (const kv of String(f.fields || '').split('&')) {
+          const [k, v] = kv.split('=');
+          if (k && v === '' && ID_PARAMS.test(k)) names.add(k);
+        }
+      }
+      if (!names.size) names.add('nttId');
+      const out2 = [];
+      for (const nm of names) {
+        try {
+          const l = new URL(dom.listUrl);
+          const v = new URL(l.origin + l.pathname.replace(/\/(list|artclList|index)(\.do|\.jsp|\.php)?$/i,
+            (m) => m.replace(/(list|artclList|index)/i, 'view')));
+          for (const [k, val] of l.searchParams) v.searchParams.set(k, val);   // menuNo 등 그대로 유지
+          v.searchParams.set(nm, idVal);
+          out2.push(v.href);
+        } catch { /* 조립 실패는 건너뛴다 */ }
+      }
+      return out2;
+    };
+    let listHasQuery = false;
+    try { listHasQuery = !!new URL(dom.listUrl).search; } catch { /* 무시 */ }
+    for (const idVal of (dom.rowIds || []).filter(looksLikeId)) {
+      const pathForm = mkPath(idVal);
+      const queryForms = mkQuery(idVal);
+      if (listHasQuery) { queryForms.forEach(push); push(pathForm); }
+      else { push(pathForm); queryForms.forEach(push); }
+    }
+  }
+
   const hid = dom.hiddenInputs || {};
   const ids = [];
   for (const k of Object.keys(hid)) {
@@ -210,8 +263,20 @@ export function detailCandidates(dom) {
      목록 주소(`/kor/user/bbs/BMSR00040/list.do?menuNo=200318`)에서 이름을 유추하면
      경로도 파라미터 이름도 메뉴 번호도 전부 틀린다 — 실제로 세 번 틀렸다. */
   const DETAILISH_ACTION = /(view|detail|read|artclView)(\.do|\.jsp|\.php)?$/i;
+  /* ⛔ 2026-08-01 경희대 사고에서 배운 것 — **겉모습으로는 못 가려낸다**
+     경희 목록 화면에는 `action=/kor/user/contents/view.do · menuNo=200226` 폼이 있는데,
+     이건 공고를 여는 폼이 아니라 **로그인 페이지 폼**이었다. 그런데 action에도 필드에도
+     'login' 같은 글자가 하나도 없어서, 마크업만 봐서는 구분할 방법이 없다.
+     → 그래서 '어느 폼이 로그인 폼인지 알아맞히려' 하지 않는다. 대신 두 가지로 푼다:
+        ① 목록의 경로·메뉴를 유지한 형태를 **맨 먼저** 시도한다(위 블록) — 학생이 보고 있는
+           그 메뉴 안에서 여는 것이라 엉뚱한 화면으로 갈 일이 적다.
+        ② 만든 주소는 **열어 보고 로그인 벽이면 떨어뜨린다**(looksLikeLoginWall).
+           결국 '열어서 확인한다'가 유일하게 믿을 수 있는 방법이다.
+     비밀번호 칸이 명시된 폼만 명백하므로 그것만 여기서 뺀다. */
+  const LOGIN_FORM = /(^|&)(passwd|password|pwd|userPw)=/i;
   for (const f of dom.forms || []) {
     if (!f || !DETAILISH_ACTION.test(String(f.action || '').split('?')[0])) continue;
+    if (LOGIN_FORM.test(String(f.fields || ''))) continue;
     const pairs = String(f.fields || '').split('&').filter(Boolean)
       .map((kv) => { const i = kv.indexOf('='); return i < 0 ? [kv, ''] : [kv.slice(0, i), kv.slice(i + 1)]; });
     const blanks = pairs.filter(([, v]) => v === '').map(([k]) => k);

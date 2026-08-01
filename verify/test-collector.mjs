@@ -6,7 +6,7 @@
    실행: node verify/test-collector.mjs   (실패하면 exit 1) */
 import { urlKey, titleKey, dedupeNotices, preferNotice } from '../collector/url-key.mjs';
 import { isAttachmentEntry, isHtmlPayload } from '../collector/attachment-link.mjs';
-import { isDetailUrl, isMarkerUrl, markerTitle, sameTitle, detailCandidates } from '../collector/detail-url.mjs';
+import { isDetailUrl, isMarkerUrl, markerTitle, sameTitle, detailCandidates, looksLikeLoginWall } from '../collector/detail-url.mjs';
 
 let fail = 0;
 const eq = (label, got, want) => {
@@ -94,13 +94,32 @@ eq('경로형 상세를 조립형보다 먼저 시도한다 (동국대 33건 404
      폼   = action=/kor/user/contents/view.do · menuNo=200226&boardId=&catId=
    목록 주소에서 이름을 유추하면 경로·파라미터·메뉴 번호가 전부 틀린다(실제로 세 번 틀렸다).
    게시판이 스스로 쓰는 폼을 그대로 쓰는 이 규칙이 되돌아가면 경희대가 다시 목록으로 간다. */
-eq('게시판이 쓰는 폼의 빈 칸에 글 번호를 넣어 원문 주소를 만든다 (경희 실제 구조)',
+/* 폼에서 만든 주소는 여전히 후보로 남긴다 — 다만 **1순위는 아니다.**
+   '폼이 1순위'라는 전제가 바로 경희대 로그인 벽 사고의 원인이었다(그 폼이 로그인 폼이었다). */
+eq('게시판이 쓰는 폼의 빈 칸에 글 번호를 넣은 주소도 후보로 남긴다 (경희 실제 구조)',
   detailCandidates({
     listUrl: khuList, url: khuList, rowIds: ['322635'],
     forms: [{ action: '/kor/user/search/list.do', fields: 'searchWord=' },
       { action: '/kor/user/contents/view.do', fields: 'menuNo=200226&boardId=&catId=' }],
+  }).includes('https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322635'), true);
+/* 2026-08-01 경희대 사고: 목록 화면의 폼(menuNo=200226)이 사실 **로그인 페이지 폼**이었다.
+   그걸 그대로 써서 만든 주소 7건이 전부 '아이디/비밀번호를 입력하세요' 화면으로 갔다.
+   마크업만으로는 로그인 폼인지 알 수 없으므로(action에도 필드에도 login 글자가 없다),
+   **목록이 쓰는 경로·메뉴를 그대로 유지한 형태를 맨 먼저** 시도해야 한다.
+   이 순서가 되돌아가면 경희대가 다시 로그인 화면으로 간다. */
+eq('목록의 경로·메뉴를 유지한 주소를 1순위로 만든다 (경희대 로그인 벽 사고)',
+  detailCandidates({
+    listUrl: khuList, url: khuList, rowIds: ['322535'],
+    forms: [{ action: '/kor/user/search/list.do', fields: 'searchWord=' },
+      { action: '/kor/user/contents/view.do', fields: 'menuNo=200226&boardId=&catId=' }],
   })[0],
-  'https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322635');
+  'https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322535');
+eq('boardId도 글 번호 이름으로 알아본다 (경희대가 쓰는 이름)',
+  detailCandidates({ listUrl: khuList, url: khuList, rowIds: ['322535'],
+    forms: [{ action: '/kor/user/contents/view.do', fields: 'menuNo=200226&boardId=' }] })
+    .some((u) => u.includes('boardId=322535')), true);
+eq('로그인 화면은 제목이 보여도 원문으로 인정하지 않는다',
+  looksLikeLoginWall('홈 사이트안내 로그인 로그인 아이디를 입력하세요 비밀번호를 입력하세요 아이디저장 로그인', true), true);
 eq('상세와 무관한 폼(검색창)으로는 주소를 만들지 않는다',
   detailCandidates({ listUrl: khuList, url: khuList, rowIds: ['322635'],
     forms: [{ action: '/kor/user/search/list.do', fields: 'searchWord=' }] })
