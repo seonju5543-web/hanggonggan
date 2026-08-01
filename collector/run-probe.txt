@@ -1,12 +1,21 @@
 # 링크 정찰 실행 트리거 (push-to-run)
 #
-# checkUrl:  이 주소를 로그인 없는 새 탭에서 열어 보고 그대로 보고 (로그인 벽인지 포함)
-# findBoard: <학교 홈> | <메뉴 > 메뉴>  — 메뉴를 따라 들어가 학생이 보는 게시판을 찾는다
+# checkUrl:  이 주소를 로그인 없는 새 탭에서 열어 그대로 보고 (로그인 벽인지 포함)
+# findBoard: <학교 홈> | <메뉴 > 메뉴>
 
-# ① 지금 앱에 들어있는 경희대 링크가 정말 로그인을 요구하는지 확인
+# 같은 공고(boardId=322535 충남 재능키움)를 두 가지 주소 형태로 열어 비교한다.
+# 개발자 스크린샷으로 게시판 자체는 맞다는 것이 확인됐다(news.khu.ac.kr 공지사항 > 장학).
+# 남은 의문은 '상세 주소 형태' 하나뿐이다.
+
+# ① 지금 앱에 저장된 형태 — 다른 메뉴(200226) · 로그인 벽으로 의심
 checkUrl: https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322535
-checkUrl: https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318
 
-# ② 개발자가 실제로 공고를 보는 경로: 대학생활 → 장학
-findBoard: https://www.khu.ac.kr/kor/main/index.do | 대학생활 > 장학
-findBoard: https://www.khu.ac.kr/ | 대학생활 > 장학
+# ② 목록과 같은 메뉴(200318)를 유지한 형태 — 이게 정답일 것으로 추정
+checkUrl: https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322535
+
+# ③ 다른 공고로도 같은 비교 (경희인턴)
+checkUrl: https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322541
+checkUrl: https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322541
+
+# ④ 장학 탭 목록 자체도 확인
+checkUrl: https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318
