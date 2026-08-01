@@ -53,7 +53,10 @@ for (let a = 0; a < reg.items.length; a++) {
 /* ④ — 양식 스키마 */
 for (const [key, tpl] of Object.entries(forms.templates)) {
   const where = `forms:${key}`;
-  for (const f of ['title', 'docName', 'org', 'pledge', 'sections']) {
+  // pledge(서약문)는 필수가 아니다 — 원본에 서약 문구가 아예 없는 양식이 있다.
+  // (2026-08-02: 사랑나눔 자기소개서. 서약은 별개 문서인 개인정보 동의서에 들어 있어,
+  //  없는 것을 지어내면 원문 그대로 원칙에 어긋난다. forms.js는 없으면 그 줄을 안 그린다.)
+  for (const f of ['title', 'docName', 'org', 'sections']) {
     if (tpl[f] == null) errors.push(`${where} — 필수 필드 누락: ${f}`);
   }
   const ids = new Set();

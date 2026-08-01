@@ -300,8 +300,11 @@ function renderFormDoc(tpl, p, ans, { editable = false } = {}) {
       <p class="fd-pledge" style="border:1px dashed #666;padding:10px 12px;text-align:left">${esc(tpl.handwriteText || '')}</p>
       <p class="fd-note" style="text-align:center">↑ 인쇄 후 이 문구를 하단 여백에 자필로 옮겨 적고 서명하세요</p>`;
   }
-  html += `<p class="fd-pledge">${esc(tpl.pledge)}</p>
-    <p class="fd-sign">작성일: ${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일&nbsp;&nbsp;&nbsp;
+  // 서약문이 없는 양식도 있다 — 원본에 서약 문구가 아예 없는 자기소개서 등(2026-08-02 확인:
+  // 사랑나눔 자기소개서는 서약이 별개 문서인 개인정보 동의서에 있다). 없는데 그대로 그리면
+  // esc(undefined)가 "undefined"라 문서에 그 글자가 찍힌다.
+  if (tpl.pledge) html += `<p class="fd-pledge">${esc(tpl.pledge)}</p>`;
+  html += `<p class="fd-sign">작성일: ${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일&nbsp;&nbsp;&nbsp;
     ${esc(tpl.signLabel || '신청인')}: ${esc(p.name || '')} (서명 또는 날인)</p>
     <p class="fd-org">${esc(tpl.org)}</p></div>`;
   return html;
