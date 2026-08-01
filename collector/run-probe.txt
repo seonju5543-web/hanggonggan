@@ -3,19 +3,24 @@
 # checkUrl:  이 주소를 로그인 없는 새 탭에서 열어 그대로 보고 (로그인 벽인지 포함)
 # findBoard: <학교 홈> | <메뉴 > 메뉴>
 
-# 같은 공고(boardId=322535 충남 재능키움)를 두 가지 주소 형태로 열어 비교한다.
-# 개발자 스크린샷으로 게시판 자체는 맞다는 것이 확인됐다(news.khu.ac.kr 공지사항 > 장학).
-# 남은 의문은 '상세 주소 형태' 하나뿐이다.
+# 2026-08-01 — 동국대 12건이 전부 같은 방식으로 실패한다.
+#   · 탈락(제목 불일치(다른 글이 열림))  …/detail/26765625
+#   · 탈락(HTTP 404)                    …/view?nttId=26765625
+# 12건이 전부 같은 모양이면 우연이 아니라 규칙 문제다. 짐작으로 고치지 않고 눈으로 본다.
+# 셋 중 무엇인지 가른다:
+#   ⓐ 글 번호를 엉뚱한 행에서 가져온다 (그래서 다른 글이 열린다)
+#   ⓑ 주소는 맞는데 화면이 늦게 그려져 로봇이 빈 화면을 보고 '다른 글'로 판정한다
+#   ⓒ 그 글이 실제로 내려갔다
 
-# ① 지금 앱에 저장된 형태 — 다른 메뉴(200226) · 로그인 벽으로 의심
-checkUrl: https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322535
+# ① 실패한 주소 — 가송재단(~8/9)이 나와야 맞다
+checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765625
 
-# ② 목록과 같은 메뉴(200318)를 유지한 형태 — 이게 정답일 것으로 추정
-checkUrl: https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322535
+# ② 또 다른 실패 주소 — 서울인재대학장학금이 나와야 맞다
+checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765586
 
-# ③ 다른 공고로도 같은 비교 (경희인턴)
-checkUrl: https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200226&boardId=322541
-checkUrl: https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322541
+# ③ 대조군 — 지난 실행에서 통과한 주소(복지장학2 면학). 이건 제대로 열려야 한다.
+checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765245
 
-# ④ 장학 탭 목록 자체도 확인
-checkUrl: https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318
+# ④ 게시판 목록에서 각 행이 실제로 가리키는 주소를 그대로 받아 적는다.
+#    로봇이 '만든' 주소와 게시판이 '쓰는' 주소가 같은지 여기서 대조한다.
+findBoard: https://www.dongguk.edu/article/JANGHAKNOTICE/list |
