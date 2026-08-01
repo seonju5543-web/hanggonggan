@@ -260,6 +260,26 @@ function attachAutocomplete(input, getItems) {
     close();
     input.dispatchEvent(new Event('change'));
   };
+  /* 목록 높이를 '키보드 위에 실제로 남은 공간'에 맞춘다.
+     휴대폰은 키보드가 올라와도 화면 높이(innerHeight·vh)가 그대로라, 높이를 고정값으로 두면
+     목록이 키보드 뒤로 뻗어 아래쪽 학교를 아예 못 고른다(2026-08-02 개발자 제보 — '서울'을 치면
+     서울과학기술대학교 다음 항목이 키보드에 가렸다). visualViewport가 키보드를 뺀 실제 보이는
+     영역을 알려주므로 그걸로 잰다. 지원하지 않는 브라우저는 예전처럼 innerHeight로 넘어간다. */
+  const fit = () => {
+    if (list.hidden) return;
+    const vv = window.visualViewport;
+    const bottom = vv ? vv.offsetTop + vv.height : window.innerHeight;
+    // 입력창 아래로 실제 남은 공간에 딱 맞춘다 — 목록은 항상 입력창 아래에 두고,
+    // 넘치는 항목은 목록 안에서 스크롤해 고른다(개발자 지시: 위로 띄우지 말 것).
+    const below = bottom - input.getBoundingClientRect().bottom - 18; // 18px = 화면 끝 여백
+    // 최소값은 1줄(44px)만 둔다 — 이보다 크게 잡으면 남은 공간이 좁을 때 그만큼 키보드에 가린다.
+    // 실제로는 브라우저가 입력창을 키보드 위로 밀어 올려 주므로 보통 넉넉하다.
+    list.style.maxHeight = Math.max(44, below) + 'px';
+  };
+  if (window.visualViewport) {
+    ['resize', 'scroll'].forEach((ev) => window.visualViewport.addEventListener(ev, fit));
+  }
+
   const render = () => {
     // 예전엔 6개까지만 보여줘서 나머지는 스크롤해도 안 나왔다 — '교육'을 치면 교대 10곳 중
     // 전주·진주·청주·춘천교대가 아예 없어 그 학교 학생은 자기 학교를 찾을 수 없었다.
@@ -270,6 +290,9 @@ function attachAutocomplete(input, getItems) {
     list.innerHTML = items.map((it, i) =>
       `<button type="button" class="ac-item" role="option" data-i="${i}">${esc(it)}</button>`).join('');
     list.hidden = false;
+    fit();
+    // 키보드는 focus 직후 조금 늦게 올라온다 — 그때 다시 한 번 맞춘다
+    setTimeout(fit, 300);
   };
   input.addEventListener('input', render);
   input.addEventListener('focus', render);

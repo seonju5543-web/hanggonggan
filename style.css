@@ -267,15 +267,23 @@ input::placeholder { color: var(--text-weak); }
   /* 후보가 많을 때 스크롤로 아래쪽까지 고를 수 있어야 한다.
      예전엔 overflow:hidden이라 목록이 화면 밖으로 뻗었고, 휴대폰에서는 키보드가 아랫부분을
      덮어 서울시립대 같은 항목을 아예 못 골랐다(2026-08-02 개발자 제보).
-     높이는 vh가 아니라 px로 고정한다 — 휴대폰에서 키보드가 올라와도 vh 값은 그대로라
-     vh로 잡으면 여전히 키보드에 가린다. 240px ≈ 5줄. */
+     실제 높이는 app.js의 fit()이 '키보드 위에 남은 공간'을 재서 정한다 —
+     vh나 고정 px로는 안 된다(휴대폰은 키보드가 올라와도 화면 높이가 그대로라 뒤로 뻗는다).
+     아래 240px은 그 계산이 돌기 전·미지원 브라우저용 기본값이다. */
   max-height: 240px;
   overflow-y: auto;
+  /* 스크롤 막대를 항상 보이게 — 안 보이면 '더 있다'는 걸 알 수가 없다 */
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
   overscroll-behavior: contain;      /* 목록 끝에서 배경까지 같이 스크롤되지 않게 */
   -webkit-overflow-scrolling: touch; /* iOS에서 손가락 스크롤이 부드럽게 */
   z-index: 60;
 }
 .ac-list[hidden] { display: none; }
+/* iOS·크롬은 스크롤 막대를 평소에 감춰서 '더 있다'는 걸 알 수 없다 — 항상 보이게 그린다 */
+.ac-list::-webkit-scrollbar { width: 6px; }
+.ac-list::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
+.ac-list::-webkit-scrollbar-track { background: transparent; }
 .ac-item {
   display: block;
   width: 100%;
