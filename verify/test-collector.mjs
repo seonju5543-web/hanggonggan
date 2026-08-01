@@ -5,7 +5,7 @@
 
    실행: node verify/test-collector.mjs   (실패하면 exit 1) */
 import fs from 'node:fs';
-import { urlKey, titleKey, dedupeNotices, preferNotice } from '../collector/url-key.mjs';
+import { urlKey, titleKey, dedupeNotices, preferNotice, capNotices } from '../collector/url-key.mjs';
 import { isAttachmentEntry, isHtmlPayload } from '../collector/attachment-link.mjs';
 import { isDetailUrl, isMarkerUrl, markerTitle, sameTitle, detailCandidates, looksLikeLoginWall, rowDetailCandidates } from '../collector/detail-url.mjs';
 
@@ -139,6 +139,24 @@ eq('목록 제목과 상세 제목이 같은 글인지 알아본다',
     '[공지] 2026년 충남평생교육진흥원 재능키움 장학생 2차 모집 안내'), true);
 eq('다른 공고를 같은 글로 착각하지 않는다',
   sameTitle('2026년 충남평생교육진흥원 재능키움 장학생 2차 모집 안내', '2026년 롯데장학관 입주생 모집 안내'), false);
+
+/* ── 학교를 더 붙여도 공고가 조용히 사라지지 않는다 (2026-08-01) ────────────────
+   예전엔 전체 상한이 200건 고정이라, 게시판을 10곳쯤 더 붙이면 넘친 만큼 오래된 공고가
+   말없이 잘려 나갔다(오류도 리포트도 없다). 지금은 학교 수에 비례해 늘어난다. */
+console.log('\n■ 공고 상한 (학교를 더 붙여도 특정 학교가 통째로 사라지면 안 된다)');
+{
+  const mk = (school, n) => Array.from({ length: n }, (_, i) => ({ school, campus: '', title: `${school}${i}` }));
+  const now13 = [].concat(...['동국', '외대', '경희', '광운', '홍익', '중앙', '성균관', '연세', '시립', '한양', '상명', '서강', '서울']
+    .map((s, i) => mk(s, [35, 23, 19, 14, 11, 11, 11, 10, 7, 2, 1, 1, 1][i])));
+  eq('지금 규모(13개교 146건)는 그대로 유지', capNotices(now13).length, 146);
+  const many = [].concat(...Array.from({ length: 30 }, (_, i) => mk(`학교${i}`, 20)));
+  eq('30개교로 늘려도 200건에서 잘리지 않는다', capNotices(many).length > 200, true);
+  eq('30개교 전부 공고가 남는다 (한 곳도 0건이 되면 안 된다)',
+    new Set(capNotices(many).map((x) => x.school)).size, 30);
+  const hog = [].concat(mk('동국', 300), ...Array.from({ length: 20 }, (_, i) => mk(`학교${i}`, 10)));
+  eq('공고 많은 학교 하나가 목록을 독차지하지 못한다 (학교당 40건)',
+    capNotices(hog).filter((x) => x.school === '동국').length, 40);
+}
 
 /* ── 게시판이 이미 알려 준 주소를 버리고 '조립'하지 않는다 (2026-08-01) ──────────
    링크 사냥꾼이 동국대 12건을 전부 놓쳤다. 원인은 행에

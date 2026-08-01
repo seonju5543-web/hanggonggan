@@ -3,7 +3,7 @@
    결과는 일반 수집기와 같은 data/notices.json에 합쳐진다. */
 import fs from 'node:fs';
 import { chromium } from 'playwright';
-import { urlKey, dedupeNotices } from './url-key.mjs';
+import { urlKey, dedupeNotices, capNotices } from './url-key.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { isDetailUrl, detailCandidates, sameTitle, idsFromSource } from './detail-url.mjs';
 
@@ -81,7 +81,7 @@ async function verifyDetailUrl(candidate, title) {
   }
 }
 
-async function loadPage(url, { attempts = 3 } = {}) {
+async function loadPage(url, { attempts = 3, lines = report } = {}) {
   const page = await ctx.newPage();
   const clickDetails = {}; // 클릭 수집 시 상세 화면에서 미리 채집한 마감·첨부
   try {
@@ -134,7 +134,7 @@ async function loadPage(url, { attempts = 3 } = {}) {
       // 게시판당 클릭 예산(180초)을 두어 초과하면 그때까지 채집분만 남기고 넘어간다(런 전체 지연 방지).
       const clickBudgetMs = 180000; const clickStart = Date.now();
       for (const [idx, title, rowSrc] of clickRows) {
-        if (Date.now() - clickStart > clickBudgetMs) { report.push(`  - (클릭 예산 초과 — ${ci}/${clickRows.length}건까지 채집)`); break; }
+        if (Date.now() - clickStart > clickBudgetMs) { lines.push(`  - (클릭 예산 초과 — ${ci}/${clickRows.length}건까지 채집)`); break; }
         ci += 1;
         try {
           const els = await page.$$(CLICKABLE);
@@ -227,11 +227,11 @@ async function loadPage(url, { attempts = 3 } = {}) {
 const report = [`## 🖥 브라우저형 수집 리포트 (${new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 16).replace('T', ' ')} KST)`, ''];
 const freshAll = [];
 
-async function harvestTarget(t) {
+async function harvestTarget(t, report) {
   let harvested = false;
   let loadedAny = false; // 후보 주소 중 하나라도 열렸는지 (전부 실패 = 그 학교 이번 실행 누락)
   for (const url of t.candidates) {
-    const r = await loadPage(url);
+    const r = await loadPage(url, { lines: report });
     if (r.error) { report.push(`- ❌ 오류(${r.error}) · ${url}`); continue; }
     loadedAny = true;
     const items = r.links
@@ -265,7 +265,7 @@ async function harvestTarget(t) {
         attachments = cd.attachments || [];
       } else {
       // 상세 페이지도 브라우저로 방문해 마감 단서·첨부 수집
-      const d = await loadPage(it.url, { attempts: 1 }); // 실패해도 목록은 남으므로 재시도 없음
+      const d = await loadPage(it.url, { attempts: 1, lines: report }); // 실패해도 목록은 남으므로 재시도 없음
       if (!d.error) {
         const text = d.html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ')
           .replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
@@ -291,14 +291,38 @@ async function harvestTarget(t) {
   return loadedAny;
 }
 
-const failedTargets = [];
-for (const t of cfg.targets) {
-  const name = t.campus && t.campus !== '공통' ? `${t.school} ${t.campus}` : t.school;
-  report.push(`### ${name}`);
-  const ok = await harvestTarget(t);
-  if (!ok) failedTargets.push({ t, name });
-  report.push('');
+/* 학교를 몇 곳씩 **동시에** 본다 (2026-08-01).
+   예전엔 한 곳씩 차례로 봐서, 학교가 늘수록 뒤쪽 학교는 한참 뒤에나 차례가 왔고
+   그 사이 장애가 나면 그 학교만 계속 빠졌다(11곳에 8분 — 30곳이면 20분).
+   동시에 보는 건 **서로 다른 학교**뿐이라 한 학교를 몰아치는 일은 없다
+   (같은 학교를 연달아 두드리면 서버가 막는다 — 2026-07-31 동국대).
+   BROWSER_PARALLEL로 조절, 기본 3. 1로 두면 예전처럼 한 곳씩. */
+const PARALLEL = Math.max(1, Number(process.env.BROWSER_PARALLEL || 3));
+
+async function runPool(list, worker, size) {
+  const queue = list.map((item, i) => ({ item, i }));
+  const runners = Array.from({ length: Math.min(size, queue.length) }, async () => {
+    for (;;) {
+      const job = queue.shift();
+      if (!job) return;
+      await worker(job.item, job.i);
+    }
+  });
+  await Promise.all(runners);
 }
+
+const failedTargets = [];
+const targetLines = cfg.targets.map(() => []);   // 학교별 리포트 줄 (원래 순서대로 되돌리려고)
+await runPool(cfg.targets, async (t, i) => {
+  const name = t.campus && t.campus !== '공통' ? `${t.school} ${t.campus}` : t.school;
+  const lines = targetLines[i];
+  lines.push(`### ${name}`);
+  const ok = await harvestTarget(t, lines);
+  if (!ok) failedTargets.push({ t, name });
+  lines.push('');
+}, PARALLEL);
+// 동시에 돌았어도 리포트는 **설정 파일 순서 그대로** 보이게 되돌린다
+targetLines.forEach((lines) => lines.forEach((l) => report.push(l)));
 
 /* 후보 주소가 전부 실패한 학교(= 학교 서버 일시 장애)는 다른 학교를 다 돈 뒤 한 번 더 시도한다.
    몇 분 뒤면 대개 회복되므로, 그날 그 학교 공고를 통째로 놓치는 일을 줄인다. */
@@ -309,7 +333,7 @@ if (failedTargets.length && failedTargets.length <= Math.max(1, Math.floor(cfg.t
   report.push('### 🔁 실패 학교 재시도 (몇 분 뒤 재접속)');
   for (const f of failedTargets) {
     report.push(`**${f.name}**`);
-    const ok = await harvestTarget(f.t);
+    const ok = await harvestTarget(f.t, report);
     if (!ok) stillFailed.push(f.name);
     report.push('');
   }
@@ -324,12 +348,9 @@ notices.items = notices.items.filter((n) => (n.foundAt || '9999') >= cutoff);
 notices.items = notices.items.filter((n) => !isAttachmentEntry(n));
 /* 같은 공고가 다른 주소(정렬 순번·클릭형 표식)로 여러 번 들어와 있으면 하나로 합친다 */
 notices.items = dedupeNotices(notices.items);
-const perSchool = {};
-notices.items = notices.items.filter((n) => {
-  const k = n.school + '|' + (n.campus || '');
-  perSchool[k] = (perSchool[k] || 0) + 1;
-  return perSchool[k] <= 40;
-}).slice(0, 200);
+/* 학교당 40건 · 전체는 학교 수에 비례 (학교 수 × 15건, 최소 200건).
+   상한이 200건 고정이던 시절엔 학교를 더 붙이면 오래된 공고가 조용히 잘려 나갔다. */
+notices.items = capNotices(notices.items);
 notices.updatedAt = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
 fs.writeFileSync(seenPath, JSON.stringify(seen, null, 1));
 fs.writeFileSync(noticesPath, JSON.stringify(notices, null, 1));

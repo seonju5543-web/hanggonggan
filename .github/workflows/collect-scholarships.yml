@@ -24,6 +24,11 @@ concurrency:
 jobs:
   collect:
     runs-on: ubuntu-latest
+    # 시간 상한 (2026-08-01) — 없으면 GitHub 기본값인 **6시간**까지 매달린다.
+    # 실제로 7/31 브라우저 수집이 360분을 돌다 취소됐고, 수집 로봇 2종이 같은
+    # 대기줄(concurrency: collector)을 쓰기 때문에 그동안 다음 수집이 줄을 섰다.
+    # 학교를 더 붙일수록 '한 곳이 안 열려 멈추는' 확률도 같이 오른다.
+    timeout-minutes: 25   # 실측 0.9~7.7분
     steps:
       - uses: actions/checkout@v4
 

@@ -7,7 +7,7 @@
    4) 컨펌용 리포트 이슈 생성 (양식 스키마화·정식 등록은 개발자 컨펌 후)
    ============================================================ */
 import fs from 'node:fs';
-import { urlKey, dedupeNotices } from './url-key.mjs';
+import { urlKey, dedupeNotices, capNotices } from './url-key.mjs';
 import { cleanTitle } from './clean-title.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 
@@ -132,12 +132,9 @@ notices.items = notices.items.filter((n) => (n.foundAt || '9999') >= cutoff);
 /* 예전에 담긴 첨부파일 링크도 매 실행 걷어낸다 (소급 적용 — 운영 원칙 7) */
 notices.items = notices.items.filter((n) => !isAttachmentEntry(n));
 notices.items = dedupeNotices(notices.items);
-const perSchool = {};
-notices.items = notices.items.filter((n) => {
-  const k = n.school + '|' + (n.campus || '');
-  perSchool[k] = (perSchool[k] || 0) + 1;
-  return perSchool[k] <= 40;
-}).slice(0, 200);
+/* 학교당 40건 · 전체는 학교 수에 비례 (학교 수 × 15건, 최소 200건).
+   상한이 200건 고정이던 시절엔 학교를 더 붙이면 오래된 공고가 조용히 잘려 나갔다. */
+notices.items = capNotices(notices.items);
 notices.updatedAt = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
 fs.mkdirSync(new URL('../data/', HERE), { recursive: true });
 fs.writeFileSync(noticesPath, JSON.stringify(notices, null, 1));

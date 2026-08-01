@@ -87,4 +87,39 @@ export function dedupeNotices(items) {
   return out;
 }
 
+/* 앱에 실을 공고 수 상한 — 학교 수에 비례해 늘어난다 (2026-08-01)
+
+   왜 고쳤나: 예전엔 전체 상한이 **200건 고정**이었다. 게시판을 12곳 볼 때는 넉넉했지만
+   (2026-08-01 기준 146건), 학교를 10곳쯤 더 붙이면 200을 넘고 **넘친 만큼 오래된 공고가
+   조용히 사라진다.** 오류도 안 나고 리포트에도 안 남아 아무도 모른다.
+   그래서 상한을 '학교 수 × 15건'으로 두되, 지금까지의 200건을 밑바닥으로 보장한다.
+   학교를 30곳까지 늘려도 학교마다 15건씩은 자리가 남는다.
+
+   학교당 40건 상한은 그대로 둔다 — 공고가 많은 학교 하나가 목록을 통째로 차지하지
+   못하게 막는 장치라 성격이 다르다. */
+export function capNotices(items, opts = {}) {
+  const perSchool = opts.perSchool ?? 40;
+  const perSchoolShare = opts.perSchoolShare ?? 15;
+  const minTotal = opts.minTotal ?? 200;
+  const keyOf = (n) => `${n.school}|${n.campus || ''}`;
+  const total = Math.max(minTotal, new Set(items.map(keyOf)).size * perSchoolShare);
+
+  const take = (limit) => {
+    const count = {};
+    return items.filter((n) => {
+      const k = keyOf(n);
+      count[k] = (count[k] || 0) + 1;
+      return count[k] <= limit;
+    });
+  };
+
+  /* 그래도 전체 상한을 넘으면, 뒤에서부터 뭉텅이로 자르지 않고 **학교당 몫을 함께 줄인다.**
+     그냥 잘라 내면 목록 뒤쪽 학교가 통째로 사라진다(30개교로 시험했더니 7개교가 0건이 됐다).
+     학생 입장에서는 '우리 학교 공고가 아예 없는' 것이 최악이므로, 많이 가진 학교부터
+     양보하게 한다. */
+  let picked = take(perSchool);
+  for (let limit = perSchool - 1; picked.length > total && limit >= 1; limit -= 1) picked = take(limit);
+  return picked.slice(0, total);
+}
+
 export default urlKey;
