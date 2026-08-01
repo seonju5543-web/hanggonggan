@@ -55,6 +55,38 @@
    "added": "2026-07-30",
    "fetched": true,
    "schematized": true
+  },
+  {
+   "id": "auto-otice06doarticleno138629",
+   "name": "2026년 서울사회복지공동모금회 상반기 바로바로론 사랑나눔장학생 모집 안내",
+   "target": "2026년 서울사회복지",
+   "added": "2026-08-02",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-swwwhanyangackrnoticeall",
+   "name": "[총무인사팀]우편물실 근로장학생 모집(화요일)",
+   "target": "우편물실 근로장학생 모",
+   "added": "2026-08-02",
+   "fetched": true,
+   "schematized": true
+  },
+  {
+   "id": "auto-kuk2351167943artclviewdo",
+   "name": "★[국가근로] 2026-1학기 국가근로장학생 선발자 관련 안내",
+   "target": "★ 2026-1학기 국",
+   "added": "2026-08-02",
+   "fetched": false,
+   "schematized": false
+  },
+  {
+   "id": "auto-jukr145233626artclviewdo",
+   "name": "[인문] 가송재단 2026년 2학기 장학생 선발",
+   "target": "가송재단 2026년 2",
+   "added": "2026-08-02",
+   "fetched": true,
+   "schematized": true
   }
  ]
 }
