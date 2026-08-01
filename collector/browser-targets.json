@@ -106,6 +106,14 @@
     "https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=145&"
    ],
    "_note": "개발자 제공(2026-08-02). 장학 공고 제목은 잘 보이는데(23건) 상세 링크가 HTML에 없어 일반 수집기로는 0건 — 클릭형으로 추정"
+  },
+  {
+   "school": "서울교육대학교",
+   "campus": "",
+   "candidates": [
+    "https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083"
+   ],
+   "_note": "개발자 제공(2026-08-02). 목록 행이 <a href=\"javascript:\" data-id=\"54165\" class=\"nttInfoBtn\">라 일반 수집기는 0건. 상세 주소 규칙은 실제로 열어서 확인해 뒀다: /snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=<data-id> (nttSn이 맞고 nttNo는 안 된다). 로봇이 못 잡으면 이 규칙을 쓸 것"
   }
  ]
 }

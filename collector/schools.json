@@ -149,6 +149,24 @@
    "campus": "",
    "boardUrl": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do",
    "note": "개발자 제공(2026-08-02) — 전용 장학 공지. 검증: 장학 링크 43건·상세형 37건(mode=view&articleNo=)"
+  },
+  {
+   "school": "인하대학교",
+   "campus": "",
+   "boardUrl": "https://www.inha.ac.kr/bbs/kr/8/artclList.do?bbsClSeq=215",
+   "note": "개발자 제공 주소의 enc를 풀어낸 진짜 게시판 주소(2026-08-02). 겉주소(kr/950/subview.do?enc=…)로 열면 로그인 안 한 방문자는 ssologin.do로 튕겨 596바이트 빈 응답만 온다 — 개발자 브라우저는 이미 로그인돼 있어 멀쩡해 보였던 것. 풀어낸 주소는 로그인 없이 열린다. 검증: 장학 링크 15건·상세형 15건(artclView.do)"
+  },
+  {
+   "school": "한국방송통신대학교",
+   "campus": "",
+   "boardUrl": "https://www.knou.ac.kr/bbs/knou/51/artclList.do?bbsClSeq=&bbsOpenWrdSeq=25&isViewMine=false&srchColumn=sj&srchWrd=",
+   "note": "개발자 제공 주소의 enc를 풀어낸 진짜 게시판 주소(2026-08-02). bbsOpenWrdSeq=25가 '장학' 말머리 필터라 반드시 붙여야 한다 — 뺐더니 11건이 5건으로 줄었다. 검증: 장학 링크 11건·상세형 11건(artclView.do)"
+  },
+  {
+   "school": "경북대학교",
+   "campus": "",
+   "boardUrl": "https://home.knu.ac.kr/HOME/knussw/index.htm",
+   "note": "개발자 제공 주소(ssw.knu.ac.kr)의 frameset 안쪽 진짜 주소(2026-08-02). 겉주소는 <frameset>만 든 905바이트 껍데기라 막힌 것처럼 보였다. 검증: 장학 링크 17건. 상세는 ./sub.htm?mode=view&mv_data=<base64> 형태라 상세형 판정이 4건으로 낮게 잡히니 첫 수집 리포트에서 실제 건수를 확인할 것"
   }
  ]
 }
