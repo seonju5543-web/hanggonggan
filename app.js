@@ -261,7 +261,10 @@ function attachAutocomplete(input, getItems) {
     input.dispatchEvent(new Event('change'));
   };
   const render = () => {
-    items = getItems(input.value.trim()).slice(0, 6);
+    // 예전엔 6개까지만 보여줘서 나머지는 스크롤해도 안 나왔다 — '교육'을 치면 교대 10곳 중
+    // 전주·진주·청주·춘천교대가 아예 없어 그 학교 학생은 자기 학교를 찾을 수 없었다.
+    // 목록이 스크롤되도록 고쳤으니(style.css .ac-list) 넉넉히 보여준다.
+    items = getItems(input.value.trim()).slice(0, 30);
     sel = -1;
     if (!items.length) { close(); return; }
     list.innerHTML = items.map((it, i) =>
