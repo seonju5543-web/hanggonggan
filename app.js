@@ -321,15 +321,33 @@ function attachAutocomplete(input, getItems) {
     else if (e.key === 'Enter' && sel >= 0) { e.preventDefault(); pick(sel); }
     else if (e.key === 'Escape') { close(); }
   });
-  // mousedown/touchstart는 blur보다 먼저 발생 → 클릭이 씹히지 않음
-  ['mousedown', 'touchstart'].forEach((ev) =>
-    list.addEventListener(ev, (e) => {
-      const b = e.target.closest('.ac-item');
-      if (!b) return;
-      e.preventDefault();
-      pick(Number(b.dataset.i));
-    })
-  );
+  // 마우스는 누르는 즉시 고른다 (mousedown이 blur보다 먼저라 클릭이 씹히지 않음)
+  list.addEventListener('mousedown', (e) => {
+    const b = e.target.closest('.ac-item');
+    if (!b) return;
+    e.preventDefault();
+    pick(Number(b.dataset.i));
+  });
+  /* 손가락은 '누름'과 '끌기'를 구분해야 한다.
+     예전엔 touchstart에서 바로 preventDefault + 선택이라 목록을 끌어 내릴 수가 없었다 —
+     닿는 순간 스크롤이 막히고 그 항목이 선택돼 버렸다. 2026-08-02 '스크롤이 안 된다'는
+     제보의 진짜 원인이 이것이었다(높이·키보드 문제가 아니었다. 마우스로만 검사해서 놓쳤다). */
+  let touchFrom = null;
+  list.addEventListener('touchstart', (e) => {
+    const t = e.touches[0];
+    touchFrom = t ? { x: t.clientX, y: t.clientY } : null;
+  }, { passive: true });            // passive = 스크롤을 막지 않겠다는 선언
+  list.addEventListener('touchend', (e) => {
+    const b = e.target.closest('.ac-item');
+    const from = touchFrom;
+    touchFrom = null;
+    if (!b || !from) return;
+    const t = e.changedTouches[0];
+    // 10px 넘게 움직였으면 고르려던 게 아니라 목록을 스크롤한 것이다
+    if (t && Math.hypot(t.clientX - from.x, t.clientY - from.y) > 10) return;
+    e.preventDefault();
+    pick(Number(b.dataset.i));
+  });
   input.addEventListener('blur', () => setTimeout(close, 150));
 }
 
