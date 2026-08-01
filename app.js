@@ -271,9 +271,17 @@ function attachAutocomplete(input, getItems) {
     const bottom = vv ? vv.offsetTop + vv.height : window.innerHeight;
     // 입력창 아래로 실제 남은 공간에 딱 맞춘다 — 목록은 항상 입력창 아래에 두고,
     // 넘치는 항목은 목록 안에서 스크롤해 고른다(개발자 지시: 위로 띄우지 말 것).
-    const below = bottom - input.getBoundingClientRect().bottom - 18; // 18px = 화면 끝 여백
+    let below = bottom - input.getBoundingClientRect().bottom - 18; // 18px = 화면 끝 여백
+    /* 카카오톡·인스타 같은 앱 안 브라우저는 키보드가 올라와도 visualViewport 높이를 안 줄여 준다.
+       그러면 below가 실제보다 훨씬 크게 나와 목록이 다시 키보드 뒤로 뻗는다.
+       키보드가 올라온 것으로 보이는데(터치 기기 + 입력창에 커서) 높이가 안 줄었으면,
+       화면의 45%쯤을 키보드가 먹는다고 보고 그만큼 뺀다 — 못 재는 상황의 안전판이다. */
+    const 키보드안잼 = vv && Math.abs(vv.height - window.innerHeight) < 2;
+    if ((!vv || 키보드안잼) && matchMedia('(pointer: coarse)').matches && document.activeElement === input) {
+      const 보이는한계 = window.innerHeight * 0.55;   // 키보드가 아래 45%를 먹는다고 본다
+      below = Math.min(below, 보이는한계 - input.getBoundingClientRect().bottom - 18);
+    }
     // 최소값은 1줄(44px)만 둔다 — 이보다 크게 잡으면 남은 공간이 좁을 때 그만큼 키보드에 가린다.
-    // 실제로는 브라우저가 입력창을 키보드 위로 밀어 올려 주므로 보통 넉넉하다.
     list.style.maxHeight = Math.max(44, below) + 'px';
   };
   if (window.visualViewport) {
@@ -295,7 +303,16 @@ function attachAutocomplete(input, getItems) {
     setTimeout(fit, 300);
   };
   input.addEventListener('input', render);
-  input.addEventListener('focus', render);
+  input.addEventListener('focus', () => {
+    render();
+    /* 입력창을 화면 위쪽으로 밀어 올려 목록이 펼쳐질 자리를 만든다.
+       이게 근본 해법이다 — 키보드 크기를 못 재는 브라우저(카카오톡 등)에서도,
+       입력창이 위에 있으면 아래 공간이 넉넉해 목록이 키보드에 안 걸린다.
+       키보드가 올라온 뒤에 해야 하므로 조금 기다렸다 실행한다. */
+    setTimeout(() => {
+      if (!list.hidden) { input.scrollIntoView({ block: 'start', behavior: 'smooth' }); setTimeout(fit, 350); }
+    }, 320);
+  });
   // 키보드 접근성: ↑/↓ 이동, Enter 선택, Esc 닫기 (데스크톱·보조기기 지원)
   input.addEventListener('keydown', (e) => {
     if (list.hidden || !items.length) return;
