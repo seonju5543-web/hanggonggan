@@ -163,6 +163,18 @@
    "note": "주소는 확보했다(2026-08-02) — onestop.pusan.ac.kr 장학 공지 511건. 목록을 자바스크립트가 그리고 행이 href=\"#popup\"이라 browser-targets.json이 담당한다"
   },
   {
+   "school": "계명대학교",
+   "campus": "",
+   "boardUrl": null,
+   "note": "주소는 확보했다(2026-08-02) — kmu.ac.kr 장학 공고 23건 보임. 상세 링크가 HTML에 없어 browser-targets.json이 담당한다"
+  },
+  {
+   "school": "서울교육대학교",
+   "campus": "",
+   "boardUrl": null,
+   "note": "주소는 확보했다(2026-08-02) — 목록 행이 <a href=\"javascript:\" data-id=\"…\"> 클릭형이라 browser-targets.json이 담당한다. 상세 주소 규칙은 확인해 뒀다(selectNttInfo.do?…&nttSn=<data-id>)"
+  },
+  {
    "school": "한국방송통신대학교",
    "campus": "",
    "boardUrl": "https://www.knou.ac.kr/bbs/knou/51/artclList.do?bbsClSeq=&bbsOpenWrdSeq=25&isViewMine=false&srchColumn=sj&srchWrd=",
