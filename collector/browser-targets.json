@@ -90,6 +90,22 @@
     "https://www.smu.ac.kr/kor/life/notice.do?srCategoryId=8",
     "https://www.smu.ac.kr/kor/life/scholarship.do"
    ]
+  },
+  {
+   "school": "고려대학교",
+   "campus": "서울캠퍼스(안암)",
+   "candidates": [
+    "https://www.korea.ac.kr/ko/568/subview.do"
+   ],
+   "_note": "개발자 제공(2026-08-02). 목록 행이 href=\"#1\" + onclick=jf_view('000100000000003716','3','ko') 클릭형이라 일반 수집기는 0건 — 반드시 눌러야 한다. 폼은 /portalBoard/ko/3/portalBoardList.do. 주소를 유추하지 말고 로봇이 눌러서 받아 적게 할 것(동국대 선례)"
+  },
+  {
+   "school": "계명대학교",
+   "campus": "",
+   "candidates": [
+    "https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=145&"
+   ],
+   "_note": "개발자 제공(2026-08-02). 장학 공고 제목은 잘 보이는데(23건) 상세 링크가 HTML에 없어 일반 수집기로는 0건 — 클릭형으로 추정"
   }
  ]
 }

@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-08-01",
+ "updatedAt": "2026-08-02",
  "items": {
   "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2668%20%5B%ED%99%8D%EB%B3%B4%5D%20%ED%95%9C%EA%B5%AD%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EA%B3%B5%EA%B3%B5%EB%8D%B0%EC%9D%B4%ED%84%B0%20%EA%B0%9C%EB%B0%A9%20%EB%B0%8F%20%ED%99%9C%EC%9A%A9%20%EC%95%88%EB%82%B4%202026.0": {
    "attempts": 3,
@@ -80,10 +80,10 @@
   "r:reg-dg-jindam": {
    "attempts": 1,
    "title": "진담거사 지역미래불자육성장학 (동국대)",
-   "lastTried": "2026-08-01",
-   "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)",
-   "nextTryAt": "2026-08-02",
-   "status": ""
+   "lastTried": "2026-08-02",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765437"
   },
   "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2650%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EC%82%BC%EC%9D%BC%EC%9E%A5%ED%95%99%ED%9A%8C%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4%202026.07": {
    "attempts": 4,
@@ -98,12 +98,10 @@
   "r:reg-dg-sanhak-foreign": {
    "attempts": 4,
    "title": "산학협동재단 국내 외국인 근로자 자녀 장학생 (동국대 접수)",
-   "lastTried": "2026-08-01",
-   "lastWhy": "목록에서 못 찾음",
-   "status": "",
-   "likelyGone": true,
-   "nextTryAt": "2026-08-08",
-   "escalated": true
+   "lastTried": "2026-08-02",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765220"
   },
   "r:reg-dg-injae": {
    "attempts": 0,

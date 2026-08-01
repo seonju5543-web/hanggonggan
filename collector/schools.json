@@ -22,7 +22,8 @@
   {
    "school": "고려대학교",
    "campus": "서울캠퍼스(안암)",
-   "boardUrl": "https://scholarship.korea.ac.kr"
+   "boardUrl": null,
+   "note": "개발자가 준 장학금공지 주소(korea.ac.kr/ko/568/subview.do)는 목록 행이 href=\"#1\" + jf_view() 클릭 스크립트라 일반 fetch로는 링크가 하나도 안 나온다(2026-08-02 확인 — 옛 주소 scholarship.korea.ac.kr도 안내 홈페이지라 0건이었다). 동국대·경희대와 같은 클릭형이라 browser-targets.json으로 옮겼다"
   },
   {
    "school": "고려대학교",
@@ -43,14 +44,9 @@
   },
   {
    "school": "한양대학교",
-   "campus": "서울캠퍼스",
-   "boardUrl": "https://www.hanyang.ac.kr/web/www/notice_all"
-  },
-  {
-   "school": "한양대학교",
-   "campus": "ERICA캠퍼스(안산)",
-   "boardUrl": null,
-   "note": "자동 탐색 실패(봇 차단·동적 페이지 추정) — 개발자가 장학공지 주소 제공 필요"
+   "campus": "공통",
+   "boardUrl": "https://www.hanyang.ac.kr/notice_all?p_p_id=kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_action=view&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_sCategoryId=224311300",
+   "note": "개발자 제공(2026-08-02) — 전체공지의 '장학' 분류 필터. 서울·ERICA 공고가 [서울]/[ERICA] 표시로 함께 올라와 캠퍼스를 공통으로 합쳤다(같은 주소를 두 줄에 넣으면 seen 장부를 공유해 뒤쪽 캠퍼스가 0건이 된다). 검증: 장학 링크 20건·상세형 18건"
   },
   {
    "school": "중앙대학교",
@@ -76,14 +72,9 @@
   },
   {
    "school": "건국대학교",
-   "campus": "서울캠퍼스",
-   "boardUrl": "https://www.konkuk.ac.kr/konkuk/2096/subview.do"
-  },
-  {
-   "school": "건국대학교",
-   "campus": "글로컬캠퍼스(충주)",
-   "boardUrl": null,
-   "note": "자동 탐색 실패(봇 차단·동적 페이지 추정) — 개발자가 장학공지 주소 제공 필요"
+   "campus": "공통",
+   "boardUrl": "https://www.konkuk.ac.kr/konkuk/2239/subview.do",
+   "note": "개발자 제공(2026-08-02) — 옛 주소 2096은 'NEWS' 페이지라 장학 공고가 0건이었다. 2239가 진짜 장학 게시판. 서울·글로컬 공고가 함께 올라와 캠퍼스 공통으로 합침. 검증: 장학 링크 36건·상세형 33건(artclView.do)"
   },
   {
    "school": "동국대학교",
@@ -104,8 +95,8 @@
   {
    "school": "숙명여자대학교",
    "campus": "",
-   "boardUrl": null,
-   "note": "자동 탐색 실패(봇 차단·동적 페이지 추정) — 개발자가 장학공지 주소 제공 필요"
+   "boardUrl": "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=list&srCategoryId=46",
+   "note": "정찰로 확인(2026-08-02) — 주요공지 게시판의 '장학' 카테고리 필터(srCategoryId=46). 서버 렌더라 fetch로도 그대로 열림"
   },
   {
    "school": "광운대학교",
@@ -115,7 +106,8 @@
   {
    "school": "명지대학교",
    "campus": "공통",
-   "boardUrl": "https://www.mju.ac.kr/mjukr/255/subview.do"
+   "boardUrl": "https://www.mju.ac.kr/mjukr/259/subview.do",
+   "note": "개발자 제공(2026-08-02) — 옛 주소 255는 '일반공지'라 장학이 묻혔다. 259가 '장학/학자금공지'. 인문·자연 두 캠퍼스가 함께 올라온다. 검증: 장학 링크 10건·상세형 9건(artclView.do)"
   },
   {
    "school": "상명대학교",
@@ -125,8 +117,38 @@
   {
    "school": "가천대학교",
    "campus": "",
-   "boardUrl": null,
-   "note": "자동 탐색 실패(봇 차단·동적 페이지 추정) — 개발자가 장학공지 주소 제공 필요"
+   "boardUrl": "https://www.gachon.ac.kr/kor/1146/subview.do",
+   "note": "정찰로 확인(2026-08-02) — 전용 장학공지 게시판(subview.do 계열이지만 이건 진짜 장학 목록). 서버 렌더라 fetch로도 그대로 열림"
+  },
+  {
+   "school": "아주대학교",
+   "campus": "",
+   "boardUrl": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do",
+   "note": "개발자 제공(2026-08-02) — 전용 장학 공지사항 게시판. 검증: 장학 링크 31건·상세형 27건(mode=view&articleNo=)"
+  },
+  {
+   "school": "국민대학교",
+   "campus": "",
+   "boardUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/index.do",
+   "note": "개발자 제공(2026-08-02) — 전용 장학공지. 검증: 장학 링크 22건·상세형 19건(/view.do)"
+  },
+  {
+   "school": "숭실대학교",
+   "campus": "",
+   "boardUrl": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&keyword=%EC%9E%A5%ED%95%99",
+   "note": "개발자 제공(2026-08-02) — 공지사항의 '장학' 분류 필터. 워드프레스라 상세가 별도 경로가 아니라 목록 주소에 slug=공고제목이 붙는 형태다(주소만 보면 목록처럼 보이지만 실제로 그 공고 하나가 열리는 것을 확인). 검증: 장학 링크 15건·상세 본문 열림"
+  },
+  {
+   "school": "세종대학교",
+   "campus": "",
+   "boardUrl": "https://www.sejong.ac.kr/kor/intro/notice7.do?mode=list&article.offset=0",
+   "note": "개발자 제공(2026-08-02) — 전용 장학 게시판. 검증: 장학 링크 18건·상세형 10건(mode=view&articleNo=)"
+  },
+  {
+   "school": "이화여자대학교",
+   "campus": "",
+   "boardUrl": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do",
+   "note": "개발자 제공(2026-08-02) — 전용 장학 공지. 검증: 장학 링크 43건·상세형 37건(mode=view&articleNo=)"
   }
  ]
 }
