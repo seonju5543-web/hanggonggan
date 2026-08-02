@@ -115,7 +115,47 @@ function scopedToProfile(list, p) {
   });
 }
 
+/* ---------------- 실시간 공고가 이 학생 것인가 ----------------
+   화면(app.js)과 알림(notify-rules.js)이 **같은 함수**를 쓴다. 갈라지면 화면에 없는 공고를
+   알림으로 알리게 된다(match-engine을 만든 이유와 같다). data.js는 서비스워커가 안 읽으므로
+   분교 관련 판정은 반드시 여기 있어야 한다. */
+
+/* 본교와 게시판을 함께 쓰는 분교 → 본교.
+   연세 미래·고려 세종·동국 WISE·상명 천안은 자기 게시판이 따로 있어 여기 없다
+   (그쪽은 공고의 school 이름이 이미 분교다). */
+const SHARED_BOARD_BRANCH = {
+  '한양대학교 ERICA캠퍼스': '한양대학교',
+  '건국대학교 글로컬캠퍼스': '건국대학교',
+  '홍익대학교 세종캠퍼스': '홍익대학교',
+};
+
+/* 제목 앞 [표시]로 캠퍼스를 가르는 게시판 — 한양대가 실제로 [서울]·[ERICA]를 붙인다.
+   건국([교외]·[교내]·[국가])·홍익([단과대]·[재단명])의 대괄호는 캠퍼스가 아니라 분류라 넣지 않는다. */
+const TITLE_CAMPUS = {
+  '한양대학교': [
+    [/^\s*[\[(]\s*서울\s*[\])]/, '한양대학교'],
+    [/^\s*[\[(]\s*(ERICA|에리카)\s*[\])]/i, '한양대학교 ERICA캠퍼스'],
+  ],
+};
+
+/* 제목이 캠퍼스를 밝혔으면 그 학교, 아니면 null */
+function taggedSchool(n) {
+  for (const [re, school] of TITLE_CAMPUS[n && n.school] || []) if (re.test(n.title || '')) return school;
+  return null;
+}
+
+function noticeForProfile(n, p) {
+  if (!p || !p.school || !n) return false;
+  const tagged = taggedSchool(n);
+  const school = tagged || n.school;
+  if (school === p.school) return !(n.campus && p.campus && n.campus !== p.campus);
+  // 공용 게시판의 공고 — 제목이 캠퍼스를 밝히지 않은 것만 분교 학생에게도 보여 준다
+  if (!tagged && !n.campus && SHARED_BOARD_BRANCH[p.school] === school) return true;
+  return false;
+}
+
 /* Node(검증 스크립트)에서도 같은 엔진을 불러 쓸 수 있게 — 브라우저·서비스워커에는 영향 없음 */
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { evaluate, fitScore, scopedToProfile, notStale, STALE_DAYS };
+  module.exports = { evaluate, fitScore, scopedToProfile, notStale, STALE_DAYS,
+                     noticeForProfile, taggedSchool, SHARED_BOARD_BRANCH };
 }

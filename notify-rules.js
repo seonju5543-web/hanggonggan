@@ -126,6 +126,17 @@ var NOTIFY_RULES = (function () {
     }
     list = list.filter(isFresh);
 
+    /* 실시간 공고가 내 학교 것인가 — 판정은 match-engine.js의 noticeForProfile 하나로 통일한다.
+       분교(한양 ERICA 등)와 제목의 [서울]·[ERICA] 표시를 여기서 함께 처리하므로,
+       화면과 갈라져 '화면에 없는 공고를 알리는' 일이 없다.
+       (호출자가 안 넘기면 전역, 그마저 없으면 학교 이름이 같은 것만 — notStale과 같은 방식) */
+    var noticeMine = ctx.noticeForProfile;
+    if (typeof noticeMine !== 'function') {
+      noticeMine = (typeof noticeForProfile === 'function')
+        ? noticeForProfile
+        : function (n, p) { return n.school === p.school && !(n.campus && p.campus && n.campus !== p.campus); };
+    }
+
     var byId = {};
     list.forEach(function (s) { byId[s.id] = s; });
 
@@ -226,8 +237,9 @@ var NOTIFY_RULES = (function () {
     var freshNotices = [];
     notices.forEach(function (n) {
       if (!n || !n.url) return;
-      if (n.school !== profile.school) return;
-      if (n.campus && profile.campus && n.campus !== profile.campus) return;
+      // 내 학교 공고인지는 match-engine이 정한다 — 화면(app.js)과 같은 판정이어야
+      // 화면에 없는 공고를 알림으로 알리는 일이 없다. 분교(한양 ERICA 등)도 여기서 처리된다.
+      if (!noticeMine(n, profile)) return;
       if (seenNotice[n.url]) return;
       seenNotice[n.url] = 1;
       if (isLoan(n.title)) return;                    // 대출·융자는 장학금이 아니다

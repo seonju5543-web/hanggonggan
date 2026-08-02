@@ -900,14 +900,8 @@ function liveNoticesHtml() {
     .concat(NATIONAL_SCHOLARSHIPS.filter((s) => s.sourceKind === 'official' && s.sourceUrl).map((s) => s.sourceUrl))
     .filter(Boolean);
   const isRegistered = (url) => regUrls.some((u) => url.startsWith(u) || u.startsWith(url));
-  /* 분교는 본교와 별개 학교지만 게시판을 함께 쓰는 곳이 있다(한양·건국·홍익).
-     그런 공고는 캠퍼스 표시가 없으므로 '캠퍼스 구분이 없는 본교 공고'만 분교 학생에게도 보여 준다.
-     본교 캠퍼스가 찍힌 공고(연세 신촌·고려 안암·동국 서울)는 본교 것이라 넘어오지 않는다. */
-  const parentSchool = BRANCH_OF[p.school];
-  const mySchool = (n) => n.school === p.school || (parentSchool && n.school === parentSchool && !n.campus);
-  const forMe = (liveNotices.items || []).filter((n) =>
-    mySchool(n) && (!n.campus || !p.campus || n.campus === p.campus) && !isRegistered(n.url)
-  );
+  /* 내 학교 공고인지는 match-engine이 정한다 — 알림(notify-rules)도 같은 함수를 쓴다 */
+  const forMe = (liveNotices.items || []).filter((n) => noticeForProfile(n, p) && !isRegistered(n.url));
   /* 학자금 대출·융자는 장학금이 아니라서 매칭 카드로는 만들지 않는다(정직 원칙).
      그렇다고 피드에서까지 밀려 잘리면 학생이 대출 정보를 아예 볼 곳이 없어지므로,
      장학 공고를 앞에 두되 대출 공고 자리 2칸을 따로 남겨 둔다 (2026-07-30 조정). */
