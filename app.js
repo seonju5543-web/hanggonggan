@@ -1083,7 +1083,13 @@ function openDetail(id) {
   }).join('');
   const missingRows = result.missing.map((m) => `<li class="r-unk">? ${m} 정보를 입력하면 정확히 판단할 수 있어요</li>`).join('');
   if (!reasonRows && !missingRows) {
-    reasonRows = `<li class="r-ok">✓ 별도 자격 제한이 없는 공고예요${result.status === 'selective' ? ' — 지원자 중 선발 심사로 결정돼요' : ''}</li>`;
+    /* 판정할 조건이 하나도 없다는 건 '제한이 없다'가 아니라 **우리가 아직 모른다**는 뜻이다
+       (2026-08-02 개발자 지적). 실제로 5·18희망장학생은 원문에 '민주화운동·국가폭력 피해자
+       유자녀' 같은 요건이 있는데 앱이 '제한 없음'이라고 말하고 있었다 — 원칙 8-1(추론 금지) 위반.
+       원문에서 '제한 없음'을 확인한 공고만 eligibilityVerified로 표시하고, 나머지는 모른다고 말한다. */
+    reasonRows = sch.eligibilityVerified
+      ? `<li class="r-ok">✓ 별도 자격 제한이 없는 공고예요${result.status === 'selective' ? ' — 지원자 중 선발 심사로 결정돼요' : ''}</li>`
+      : `<li class="r-unk">? 지원 자격은 <strong>공고 원문에서 확인</strong>하세요 — 앱이 아직 요건을 읽지 못했어요${result.status === 'selective' ? ' (지원자 중 선발 심사로 결정돼요)' : ''}</li>`;
   }
 
   let btnLabel = '⚡ 원클릭 신청 준비하기';
