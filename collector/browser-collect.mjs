@@ -32,6 +32,9 @@ const ctx = await browser.newContext({
   locale: 'ko-KR',
 });
 
+/* 페이지가 살아 있든 죽었든 그냥 쉬는 대기 — page.waitForTimeout과 달리 페이지에 의존하지 않는다 */
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
 /* 게시판 열기 — 학교 서버가 잠깐 느릴 때 한 번의 시간초과로 그 학교를 통째로
    놓치지 않도록 단계적으로 재시도한다 (2026-07-30 시립대 유실 사례로 도입).
    1차: 기본 30초 → 2차: 45초 → 3차: 45초 + '응답이 오면 통과'(commit) 완화 조건.
@@ -39,16 +42,22 @@ const ctx = await browser.newContext({
 async function gotoWithRetry(page, url, attempts) {
   let lastErr;
   for (let i = 0; i < attempts; i += 1) {
+    // 페이지가 죽었으면 이 페이지로는 더 해 볼 수 없다 — 진짜 원인을 들고 나간다
+    if (page.isClosed()) break;
     try {
       const waitUntil = i >= 2 ? 'commit' : 'domcontentloaded';
       await page.goto(url, { waitUntil, timeout: i === 0 ? 30000 : 45000 });
       return;
     } catch (e) {
       lastErr = e;
-      if (i < attempts - 1) await page.waitForTimeout(3000 * (i + 1)); // 3초 → 6초 쉬고 재시도
+      // 쉬는 데 page.waitForTimeout을 쓰면 안 된다 (2026-08-02 이슈 #89):
+      // 페이지가 닫혀서 goto가 실패한 경우 이 대기가 스스로 예외를 던져
+      // **진짜 실패 원인을 덮어쓰고 남은 재시도까지 통째로 건너뛴다.**
+      // 서울대·가천대·외대·상명대가 전부 이 경로로 '재시도 없이' 죽고 있었다.
+      if (i < attempts - 1) await sleep(3000 * (i + 1)); // 페이지와 무관한 대기
     }
   }
-  throw lastErr;
+  throw lastErr || new Error('페이지를 열지 못했습니다');
 }
 
 /* 공고 원문 주소가 '세션 없이도 열리는지' 한 번 확인한다.
@@ -80,7 +89,7 @@ async function verifyDetailUrl(candidate, title) {
   }
 }
 
-async function loadPage(url, { attempts = 3, lines = report } = {}) {
+async function loadPage(url, { attempts = 3, lines = report, retryClosed = 1 } = {}) {
   const page = await ctx.newPage();
   const clickDetails = {}; // 클릭 수집 시 상세 화면에서 미리 채집한 마감·첨부
   try {
@@ -219,6 +228,12 @@ async function loadPage(url, { attempts = 3, lines = report } = {}) {
     await page.close().catch(() => {});
     // 오류 문구는 한 줄로 (Playwright의 'Call log:' 여러 줄이 리포트를 깨뜨리던 것 정리)
     const msg = (e.message || String(e)).split('\n')[0].trim();
+    // 페이지가 닫히거나 렌더러가 죽은 것은 '이 주소가 나쁘다'는 뜻이 아니라 '못 읽었다'는 뜻이다.
+    // 죽은 페이지로는 재시도해도 소용없으니 **새 페이지로** 한 번 더 열어 본다 (이슈 #89).
+    if (retryClosed > 0 && /has been closed|Target crashed|Session closed/i.test(msg)) {
+      await sleep(2000);
+      return loadPage(url, { attempts, lines, retryClosed: retryClosed - 1 });
+    }
     return { error: msg.slice(0, 100) };
   }
 }
