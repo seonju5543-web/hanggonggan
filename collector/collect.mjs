@@ -78,6 +78,38 @@ async function fetchDetail(item) {
   }
 }
 
+/* fetch의 네트워크 실패는 전부 'TypeError: fetch failed'로 뭉뚱그려져 온다.
+   **진짜 이유는 e.cause에 들어 있다**(ENOTFOUND=주소가 없음 / UND_ERR_CONNECT_TIMEOUT=연결 지연 /
+   CERT=인증서). 이걸 안 펴 줘서 홍익대·서울과기대가 며칠째 '⚠️ 오류 (TypeError)'로만 남아
+   **주소가 틀린 건지 학교가 잠깐 느린 건지 구분할 수 없었다** (2026-08-02).
+   동국대에서 얻은 '못 읽음과 틀림을 뭉뚱그리지 말 것'과 같은 계열의 문제다. */
+function netReason(e) {
+  const seen = [];
+  for (let c = e; c && seen.length < 4; c = c.cause) {
+    if (c.code) seen.push(c.code);
+    else if (c.message && c !== e) seen.push(String(c.message).slice(0, 60));
+  }
+  return seen.length ? `${e.name}: ${seen.join(' ← ')}` : (e.name || e.message);
+}
+
+/* 연결이 잠깐 안 되는 것과 주소가 틀린 것은 다르다 — 일시 장애는 한 번 더 두드려 본다.
+   (브라우저 수집기는 이미 3단계 재시도가 있는데 일반 수집기에는 없어서, 학교가 잠시
+   느린 날 통째로 빠지고 그게 리포트에는 '오류'로만 남았다.) */
+const TRANSIENT = /TIMEOUT|ECONNRESET|ECONNREFUSED|EAI_AGAIN|ETIMEDOUT|UND_ERR/i;
+async function fetchBoard(url) {
+  let lastErr;
+  for (let i = 0; i < 3; i += 1) {
+    try {
+      return await fetch(url, { redirect: 'follow', headers: UA, signal: AbortSignal.timeout(i === 0 ? 20000 : 45000) });
+    } catch (e) {
+      lastErr = e;
+      if (!TRANSIENT.test(netReason(e)) || i === 2) break;   // 주소가 없는 것(ENOTFOUND)은 다시 해도 같다
+      await new Promise((r) => setTimeout(r, 3000 * (i + 1)));
+    }
+  }
+  throw lastErr;
+}
+
 const results = [];
 const freshAll = [];
 
@@ -88,7 +120,7 @@ for (const s of cfg.schools) {
     continue;
   }
   try {
-    const res = await fetch(s.boardUrl, { redirect: 'follow', headers: UA, signal: AbortSignal.timeout(20000) });
+    const res = await fetchBoard(s.boardUrl);
     if (!res.ok) {
       results.push({ name, status: `⚠️ 접속 실패 (HTTP ${res.status}) — 주소 수정 필요`, items: [] });
       continue;
@@ -119,7 +151,9 @@ for (const s of cfg.schools) {
       items: fresh,
     });
   } catch (e) {
-    results.push({ name, status: `⚠️ 오류 (${e.name || e.message}) — 주소 확인 필요`, items: [] });
+    // 이유를 그대로 적는다 — ENOTFOUND면 주소가 없는 것이고, TIMEOUT이면 학교가 느린 것이라
+    // 해야 할 일이 정반대다. 'TypeError'만 적으면 둘을 구분할 수 없다.
+    results.push({ name, status: `⚠️ 오류 (${netReason(e)}) — 주소 확인 필요`, items: [] });
   }
 }
 

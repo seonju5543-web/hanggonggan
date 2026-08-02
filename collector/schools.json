@@ -4,8 +4,8 @@
   {
    "school": "서울대학교",
    "campus": "",
-   "boardUrl": "https://www.snu.ac.kr/snunow/notice/scholarship",
-   "note": "자동 탐색 실패(봇 차단·동적 페이지 추정) — 개발자가 장학공지 주소 제공 필요"
+   "boardUrl": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=list&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80",
+   "note": "개발자 제공(2026-08-02). 학생지원 사이트의 장학공지 분류. 예전 www.snu.ac.kr/snunow/notice*는 전부 404였다(확인). 검증: 200 · 장학 링크 18건"
   },
   {
    "school": "연세대학교",

@@ -5,10 +5,10 @@
    "school": "서울대학교",
    "campus": "",
    "candidates": [
-    "https://www.snu.ac.kr/snunow/notice/genl",
-    "https://www.snu.ac.kr/snunow/notice",
-    "https://www.snu.ac.kr/"
-   ]
+    "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=list&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80",
+    "https://www.snu.ac.kr/snunow/notice/genl"
+   ],
+   "_note": "개발자 제공(2026-08-02) — student.snu.ac.kr 장학공지. 옛 www.snu.ac.kr/snunow/notice*는 404"
   },
   {
    "school": "연세대학교",
@@ -122,6 +122,23 @@
     "https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083"
    ],
    "_note": "개발자 제공(2026-08-02). 목록 행이 <a href=\"javascript:\" data-id=\"54165\" class=\"nttInfoBtn\">라 일반 수집기는 0건. 상세 주소 규칙은 실제로 열어서 확인해 뒀다: /snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=<data-id> (nttSn이 맞고 nttNo는 안 된다). 로봇이 못 잡으면 이 규칙을 쓸 것"
+  },
+  {
+   "school": "홍익대학교",
+   "campus": "",
+   "candidates": [
+    "https://www.hongik.ac.kr/kr/newscenter/notice.do",
+    "https://www.hongik.ac.kr/index.do"
+   ],
+   "_note": "일반 수집기가 2026-08-02 fetch 실패(TypeError). 원인 문구를 펴 보니 ENOTFOUND(내 샌드박스 기준)라 주소 자체 문제인지 환경 문제인지 아직 못 가린다 — 브라우저 로봇이 실제로 열어 보게 해서 판정한다. 브라우저로도 안 되면 개발자에게 주소 재확인 요청."
+  },
+  {
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "candidates": [
+    "https://www.seoultech.ac.kr/service/info/janghak/"
+   ],
+   "_note": "일반 수집기가 연결 시간초과(UND_ERR_CONNECT_TIMEOUT)로 실패. 주소가 틀린 게 아니라 느린 쪽이라 브라우저 로봇(대기 시간이 길다)이 더 잘 맞는다. 개발자 제공 주소 — 장학 24건·상세형 19건 확인된 곳."
   }
  ]
 }
