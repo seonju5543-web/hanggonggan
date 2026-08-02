@@ -2043,12 +2043,7 @@
    "auto": true,
    "attachments": [],
    "sourceUrl": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do;jsessionid=B04808AE2A58777C5FF93A8FE229084D?key=7520&bbsNo=1073&nttNo=625019&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888",
-   "sourceKind": "auto",
-   "excerpts": [
-    "- 신청방법: 학교장 명의에 의한 정식 공문으로 신청&#40;개인 신청 절대 불가&#41;",
-    "→ 학부생은 제출서류 준비하여 장학지원팀으로 2026."
-   ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "sourceKind": "auto"
   },
   {
    "id": "auto-otice06doarticleno138819",
@@ -2495,7 +2490,11 @@
     }
    ],
    "sourceUrl": "https://www.gachon.ac.kr/bbs/kor/478/121041/artclView.do",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "excerpts": [
+    "신청기간 : 2026.6.15.(월)~ 9.11.(금)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   },
   {
    "id": "reg-konkuk-alumni",
@@ -2551,7 +2550,12 @@
     }
    ],
    "sourceUrl": "https://www.konkuk.ac.kr/bbs/konkuk/235/1201751/artclView.do",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "excerpts": [
+    "장학금액: 1백만원 ~ 2백만원(1인당)",
+    "제출서류: 장학금신청서 / 재학증명서 / 가족관계증명서 / 주민등록등본 / 성적증명서(신입생의 경우 합격통지서와 고교성적증명서) / 의료보험료납입증명서(본인과 부모의 1년간 영수증) / 의사소견서(가족 중 환자 증명용) 각 1통"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   },
   {
    "id": "reg-konkuk-uiam",
@@ -2615,7 +2619,13 @@
     }
    ],
    "sourceUrl": "https://www.konkuk.ac.kr/bbs/konkuk/235/1173101/artclView.do",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "excerpts": [
+    "- 지원방법: 원본 제출서류 대사관으로 우편 제출",
+    "제출서류 등 지원 세부사항: 첨부파일 참고",
+    "문의처: 주한불가리아대사관( embassy.seoul@mfa.bg /유선문의 불가)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   },
   {
    "id": "reg-gachon-seongjeok",
@@ -2642,7 +2652,13 @@
     }
    ],
    "sourceUrl": "https://www.gachon.ac.kr/bbs/kor/478/122578/artclView.do",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "excerpts": [
+    "장학금액 : 생활비 성격의 학업장려금으로 등록금 범위 초과 지급",
+    "신청기간 : 2026.07.30(목) - 08.12(수) [기한엄수]",
+    "신청방법 : 이메일 제출 (jimi0814@gachon.ac.kr)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   },
   {
    "id": "reg-dongsan",
@@ -2674,7 +2690,12 @@
     }
    ],
    "sourceUrl": "https://www.gachon.ac.kr/bbs/kor/478/122594/artclView.do",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "formId": "auto-동산장학회-장학생-선발-apply",
+   "excerpts": [
+    "1) 장학생 선발인원: ○명"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   },
   {
    "id": "reg-ssu-saemunan",
@@ -2702,7 +2723,8 @@
     }
    ],
    "sourceUrl": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=2026%ED%95%99%EB%85%84%EB%8F%84-2%ED%95%99%EA%B8%B0-%EC%83%88%EB%AC%B8%EC%95%88%EA%B5%90%ED%9A%8C-%EC%9E%A5%ED%95%99%EC%83%9D-%EB%AA%A8%EC%A7%91-%EC%95%88%EB%82%B4&keyword=%EC%9E%A5%ED%95%99",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "formId": "auto-새문안교회-장학생-apply"
   },
   {
    "id": "reg-ssu-dept-workstudy",
@@ -2990,7 +3012,8 @@
     }
    ],
    "sourceUrl": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=273659&article.offset=0&articleLimit=10&srCategoryId=22",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "formId": "auto-이원길-장학금-apply"
   },
   {
    "id": "reg-inha-cheongchang",
@@ -3025,7 +3048,14 @@
     }
    ],
    "sourceUrl": "https://www.inha.ac.kr/bbs/kr/8/44619/artclView.do",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "excerpts": [
+    "연 장 신청&middot;접수 기간 : 2026.6.1.(월) 10:00 ~ 7.6(월) 17:00 까지",
+    "신청 방법 : 재단 홈페이지 (www.rhof.or.kr)를 통해 신청",
+    "구비 서류 및 일정 등 자세한 내용은 붙임 파일 및 재단 홈페이지를 참고하시기 바랍니다",
+    "2026년 2학기 청창농 신청·접수기간 변경안내 공고문.pdf"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   },
   {
    "id": "reg-gachon-workstudy-summer3",
@@ -3054,7 +3084,11 @@
     }
    ],
    "sourceUrl": "https://www.gachon.ac.kr/bbs/kor/478/122106/artclView.do",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "excerpts": [
+    "신청기간 : 07.14( 화 ) 15:00 까지 [ 기한엄수 ]"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   },
   {
    "id": "reg-kau-workstudy",
@@ -3083,7 +3117,11 @@
     }
    ],
    "sourceUrl": "https://kau.ac.kr/kaulife/scholnoti.php?searchkey=&searchvalue=&code=s1301&page=&mode=read&seq=10914",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "excerpts": [
+    "문의처 : 학생지원팀 ( ☎ 02-300-0025 ), 한국장학재단 학생상담센터 ( ☎ 1599-2000 )"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   },
   {
    "id": "reg-seoultech-workstudy-swap",
@@ -3158,7 +3196,15 @@
     }
    ],
    "sourceUrl": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31158&sort=12&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "formId": "auto-청소년교육지원장학금-활동도우미-apply",
+   "excerpts": [
+    "◎ 선발인원: 2명",
+    "◎ 신청방법: 활동 도우미 신청서 1부, 사회문제 해결 제안서 1부 각각 제출",
+    "※ 관련 문의: damdami8@uos.ac.kr",
+    "전화 : 02-6490-6114 / 서울시통합문의 : 02-120"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   },
   {
    "id": "auto-munewsnotice712163viewdo",
@@ -3329,6 +3375,238 @@
    "attachments": [],
    "sourceUrl": "https://www.sejong.ac.kr/kor/intro/notice7.do?mode=view&articleNo=886181&article.offset=0&articleLimit=10",
    "sourceKind": "auto"
+  },
+  {
+   "id": "auto-sogangackrkodetail550601",
+   "name": "[교외] 한국산업기술진흥원 한미 첨단분야 청년교류 교환학생 장학생 선발 안내(9/18 마감, 생활비 최대 24,840천원)",
+   "type": "교외",
+   "provider": "서강대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-02",
+   "period": "접수 기간 원문 확인",
+   "summary": "서강대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서강대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-02 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.sogang.ac.kr/ko/detail/550601?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "sourceKind": "auto",
+   "excerpts": [
+    "제출서류: 첨부의 모집 요강 반드시 참조",
+    "문의: 한국산업기술진흥원(02-6009-3224/3228, naye9822@kiat.or.kr )"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-sogangackrkodetail550536",
+   "name": "[교외] 화성시인재육성재단 소상공인 장학생 선발 안내(8/11 마감, 지역화폐 100만원)",
+   "type": "교외",
+   "provider": "서강대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-02",
+   "period": "접수 기간 원문 확인",
+   "summary": "서강대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서강대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-02 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.sogang.ac.kr/ko/detail/550536?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-sogangackrkodetail550553",
+   "name": "[교외] 사랑의 열매 바로바로론 사랑나눔 장학생 모집 안내(7/30 마감, 학업장려금 100만원)",
+   "type": "교외",
+   "provider": "서강대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-02",
+   "period": "접수 기간 원문 확인",
+   "summary": "서강대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서강대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-02 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.sogang.ac.kr/ko/detail/550553?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-sogangackrkodetail550408",
+   "name": "[교외] 위드다문화 장학생 선발 안내(7/22 마감, 등록금 최대 150만원)",
+   "type": "교외",
+   "provider": "서강대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-02",
+   "period": "접수 기간 원문 확인",
+   "summary": "서강대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서강대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-02 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.sogang.ac.kr/ko/detail/550408?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-sogangackrkodetail550406",
+   "name": "[주거지원] 종근당고촌학사 무상기숙사 장학생 모집 안내(7/24 마감, 거주비 전액 무료)",
+   "type": "교내",
+   "provider": "서강대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-02",
+   "period": "접수 기간 원문 확인",
+   "summary": "서강대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서강대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-02 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.sogang.ac.kr/ko/detail/550406?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "sourceKind": "auto",
+   "excerpts": [
+    "2) 선발인원: 〇〇명",
+    "1) 접수기간: 2026년 6월 22일(월) 09:00 ~ 7월 28일(금) 15:00",
+    "2) 접수방법: 종근당고촌재단 홈페이지 내 온라인 접수 http://www.kochon.org",
+    "4) 지원서 작성 및 제출서류에 관한 세부사항은 재단 홈페이지 공지사항(고촌학사 지원 FAQ) 참고"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-sogangackrkodetail550318",
+   "name": "[교외] 부마민주항쟁기념재단 장학생 모집(7/17 마감, 생활비 150만원)",
+   "type": "교외",
+   "provider": "서강대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-02",
+   "period": "접수 기간 원문 확인",
+   "summary": "서강대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서강대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-02 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.sogang.ac.kr/ko/detail/550318?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-kuk2351201750artclviewdo",
+   "name": "[교외][생활비] 2026년 충남평생교육진흥원 재능키움 장학사업 장학생 2차 모집 안내(7. 13. ~ 7. 27.)",
+   "type": "교외",
+   "provider": "건국대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-02",
+   "period": "접수 기간 원문 확인",
+   "summary": "건국대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "건국대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-02 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.konkuk.ac.kr/bbs/konkuk/235/1201750/artclView.do",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-jukr145232985artclviewdo",
+   "name": "[종근당고촌재단] 2026년 하반기 무상기숙사 장학생 모집 안내",
+   "type": "교외",
+   "provider": "명지대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-02",
+   "period": "접수 기간 원문 확인",
+   "summary": "명지대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "명지대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-02 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "[붙임] 하반기 종근당고촌학사 모집 공고(FAQ 포함).pdf",
+     "url": "https://www.mju.ac.kr/bbs/mjukr/145/178315/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.mju.ac.kr/bbs/mjukr/145/232985/artclView.do",
+   "sourceKind": "auto",
+   "excerpts": [
+    "접수기간 : '26.",
+    "접수방법 : 종근당고촌재단 홈페이지 내 온라인 접수",
+    "증빙서류는 원본으로 제출해야 하며, 신청 기간 1개월 이내 발급분부터 유효함",
+    "지원서 작성 및 제출서류에 관한 세부사항은 재단 홈페이지 공지사항(교육봉사 지원 FAQ) 참고"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   }
  ]
 }
