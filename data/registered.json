@@ -3773,6 +3773,697 @@
    "attachments": [],
    "sourceUrl": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=372992&article.offset=0&articleLimit=10",
    "sourceKind": "auto"
+  },
+  {
+   "id": "reg-diabetes-hope",
+   "name": "소아·청소년 당뇨인 푸른빛 희망 장학금 (2027학년도)",
+   "type": "교외",
+   "provider": "한국소아당뇨인협회",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-09-11",
+   "period": "신청 2026.6.15(월) ~ 9.11(금)",
+   "summary": "소아·청소년 당뇨인·췌장장애인을 위한 학비 지원 장학금입니다. 가천대·건국대·이화여대·한국항공대 등 여러 대학이 함께 게시한 전국 대상 공고예요.",
+   "eligibility": {
+    "selective": true
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "여러 대학이 함께 게시한 전국 대상 공고예요. 세부 지원액·서류는 원문 공고에서 확인하세요.",
+   "noForm": "공고 첨부에 신청서 양식 없음(포스터만 첨부) — 협회 안내 또는 학교 장학팀 확인",
+   "attachments": [
+    {
+     "name": "2027학년도 소아청소년 푸른빛 희망 장학금 지원사업 포스터.jpg",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/148647/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.gachon.ac.kr/bbs/kor/478/121041/artclView.do",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-konkuk-alumni",
+   "name": "총동문회 장학생 (건국대, 2026-2학기)",
+   "type": "교외",
+   "provider": "건국대학교 총동문회",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-08-05",
+   "period": "신청 ~2026.8.5(수) 18:00",
+   "summary": "건국대학교 총동문회가 선발하는 2026학년도 2학기 장학생입니다. 세부 지원액·서류는 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "건국대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "noForm": "공고 첨부에 신청서 양식 없음(홍보 이미지만 첨부) — 원문 공고 확인",
+   "attachments": [
+    {
+     "name": "2026-2학기 총동문회.jpg",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1221897/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.konkuk.ac.kr/bbs/konkuk/235/1201830/artclView.do",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-konkuk-sunglim",
+   "name": "성림교회 대학장학생 (건국대, 2026 하반기)",
+   "type": "교내",
+   "provider": "성림교회 (건국대 게시)",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-08-19",
+   "period": "신청 2026.7.28 ~ 8.19(수) 17:00 · 성림교회 제출",
+   "summary": "성림교회가 선발하는 하반기 대학장학생입니다. 신청서는 성림교회에 직접 제출해요. 자격·서류는 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "건국대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "noForm": "교회 방문/우편 제출형 — 신청서식·자격은 원문 공고 확인",
+   "attachments": [
+    {
+     "name": "2026 하반기 대학 장학생 공개선발 안내.docx",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1221829/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.konkuk.ac.kr/bbs/konkuk/235/1201751/artclView.do",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-konkuk-uiam",
+   "name": "의암 손병희 우수논문 장학생 (건국대, 2026)",
+   "type": "교외",
+   "provider": "건국대학교 (의암 손병희 장학)",
+   "amount": "우수논문 장학금 (세부 원문 확인)",
+   "amountValue": 0,
+   "deadline": "2026-09-11",
+   "period": "참여의향서 제출 ~2026.9.11",
+   "summary": "우수 논문을 제출한 학생을 선발하는 장학금입니다. 다른 대학에도 같은 재단이 공고 중이며, 건국대는 자체 접수창구로 신청해요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "건국대학교"
+   },
+   "documents": [
+    "참여의향서 및 논문 계획서 (첨부 양식 참고)",
+    "제출 서류 전체는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "attachments": [
+    {
+     "name": "1. 2026 의암 손병희 우수 논문 장학생 선발.hwp",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1221155/download.do"
+    },
+    {
+     "name": "2. 의암 손병희 우수논문 장학생 선발 홍보물.jpg",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1221156/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.konkuk.ac.kr/bbs/konkuk/235/1200997/artclView.do",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-konkuk-bulgaria",
+   "name": "불가리아 정부초청 장학생 (건국대, 2026-2027)",
+   "type": "교외",
+   "provider": "주한불가리아대사관",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-09-01",
+   "period": "신청 ~2026.9.1 · 원본 서류 대사관 우편 제출",
+   "summary": "불가리아 정부초청으로 현지 대학에서 수학할 장학생을 선발합니다. 원본 제출서류를 주한불가리아대사관으로 우편 제출해야 해요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "건국대학교"
+   },
+   "documents": [
+    "지원서(Application Form) — 첨부 양식",
+    "제출 서류 전체는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "attachments": [
+    {
+     "name": "Scholarship Requirements.pdf",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1211786/download.do"
+    },
+    {
+     "name": "지원서(Application Form).docx",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1211787/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.konkuk.ac.kr/bbs/konkuk/235/1173101/artclView.do",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-gachon-seongjeok",
+   "name": "성적향상 장학금 신청 (가천대, 2026-1학기)",
+   "type": "교내",
+   "provider": "가천대학교",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-08-12",
+   "period": "신청 2026.7.30(목) ~ 8.12(수) · 이메일 접수",
+   "summary": "성적이 향상된 학생을 위한 교내 장학금입니다. 이메일로 신청서를 접수해요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "가천대학교"
+   },
+   "documents": [
+    "성적향상 장학금 신청서 (첨부 양식)"
+   ],
+   "duplicable": true,
+   "attachments": [
+    {
+     "name": "성적향상 장학금 신청서.hwp",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/151756/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.gachon.ac.kr/bbs/kor/478/122578/artclView.do",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-dongsan",
+   "name": "동산장학회 장학생 (이공계 새터민 대상)",
+   "type": "교외",
+   "provider": "동산장학회",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-10-02",
+   "period": "신청 ~2026.10.2(금) · 우편 접수(도착분 한함)",
+   "summary": "이공계 전공 새터민(북한이탈주민) 대학생을 지원하는 장학회입니다. 가천대·가톨릭대 등 여러 대학이 함께 게시한 전국 대상 장학금이에요.",
+   "eligibility": {
+    "selective": true
+   },
+   "documents": [
+    "장학지원서 및 자기소개서 (첨부 양식)",
+    "학(과)장 추천서 (첨부 양식)"
+   ],
+   "duplicable": true,
+   "note": "여러 대학(가천대·가톨릭대 등)이 함께 게시한 전국 대상 공고예요.",
+   "attachments": [
+    {
+     "name": "동산장학회-장학지원서 및 자기소개서(양식).hwp",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/151794/download.do"
+    },
+    {
+     "name": "동산장학회-학(과)장 장학생 추천서(양식).hwp",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/151793/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.gachon.ac.kr/bbs/kor/478/122594/artclView.do",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-ssu-saemunan",
+   "name": "새문안교회 장학생 (숭실대, 2026-2학기)",
+   "type": "교내",
+   "provider": "새문안교회 (숭실대 게시)",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-02",
+   "period": "접수 기간 원문 확인 · 학원선교팀(한경직기념관 114호) 방문 또는 우편 접수",
+   "summary": "새문안교회가 선발하는 2026학년도 2학기 장학생입니다. 방문 또는 우편으로 접수해요. 세부 신청기간·자격은 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "숭실대학교"
+   },
+   "documents": [
+    "새문안교회 장학생 지원서 (첨부 양식)"
+   ],
+   "duplicable": true,
+   "attachments": [
+    {
+     "name": "2026학년도-2학기-새문안교회-장학생-지원서.hwp",
+     "url": "https://scatch.ssu.ac.kr/download.php?data=1iZBAEYP01G24N2v6wVl9s5jGa0smQ8%2B8HVba1YhOwKiKp0Ym%2FP%2FpR0dBOZOTbHzGy%2BTusAioC15PqvrQTvbs9TrTaxIQwKinMW87JwNK2%2BvP49ClXoWm%2FQnJBVNKkGtcMcDu6zInmQDtbPuQNCfHd%2BuI9BV25tExOcCPAkRU8ZfiFQQeu2Gr7jvg7NjEKXmGtBTL5i6FzvkJLz9jAZSU%2F7ZAT75Gdms61Su3eCTjaSzbxwrA1vPypFM3IY48Za61eL122rMr9s9ah2EEf66KQ%3D%3D"
+    }
+   ],
+   "sourceUrl": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=2026%ED%95%99%EB%85%84%EB%8F%84-2%ED%95%99%EA%B8%B0-%EC%83%88%EB%AC%B8%EC%95%88%EA%B5%90%ED%9A%8C-%EC%9E%A5%ED%95%99%EC%83%9D-%EB%AA%A8%EC%A7%91-%EC%95%88%EB%82%B4&keyword=%EC%9E%A5%ED%95%99",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-ssu-dept-workstudy",
+   "name": "학과근로장학생 신청 (숭실대, 2026-2학기)",
+   "type": "교내",
+   "provider": "숭실대학교",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-02",
+   "period": "접수 기간 원문 확인 · 학과사무실 근무",
+   "summary": "학과사무실에서 근무하는 교내 근로장학생을 모집합니다. 신청 방법·기간은 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "숭실대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "noForm": "신청 방법 원문 확인 필요 — 첨부 양식 없음",
+   "attachments": [],
+   "sourceUrl": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=%E2%98%85-2026%ED%95%99%EB%85%84%EB%8F%84-2%ED%95%99%EA%B8%B0-%ED%95%99%EA%B3%BC%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EC%83%9D-%EC%8B%A0%EC%B2%AD-%EC%95%88%EB%82%B4%ED%95%99%EA%B3%BC%EC%82%AC%EB%AC%B4&keyword=%EC%9E%A5%ED%95%99",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-ssu-sunglim",
+   "name": "성림교회 대학장학생 (숭실대, 2026 하반기)",
+   "type": "교내",
+   "provider": "성림교회 (숭실대 게시)",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-08-19",
+   "period": "신청 2026.7.28 ~ 8.19(수) 17:00 · 성림교회 제출",
+   "summary": "성림교회가 선발하는 하반기 대학장학생입니다. 신청서는 성림교회에 직접 제출해요. 자격·서류는 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "숭실대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "noForm": "교회 방문/우편 제출형 — 신청서식·자격은 원문 공고 확인",
+   "attachments": [
+    {
+     "name": "2026-하반기-대학-장학생-공개선발-안내.docx",
+     "url": "https://scatch.ssu.ac.kr/download.php?data=1iZBAEYP01G24N2v6wVl9s5jGa0smQ8%2B8HVba1YhOwKiKp0Ym%2FP%2FpR0dBOZOTbHzGy%2BTusAioC15PqvrQTvbs7Veaf48v0l9Qawg7N6DC6gssSZmeO2%2Bb%2F1Na0rTQqIqmp8E9Y5x%2BoiiTJkcFoeba9%2FwdaYB2pT%2FLvw7hLcrZ5hppcuyiJxDStSLQ2UBqtTWyIOSmDS%2BTdxqk0wsuTYiPua8Nh36b0RhqBZVus%2FchN%2FUDYTWJ6wEfUq5q7nOD6ju"
+    }
+   ],
+   "sourceUrl": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=2026%ED%95%99%EB%85%84%EB%8F%84-%ED%95%98%EB%B0%98%EA%B8%B0-%EC%84%B1%EB%A6%BC%EA%B5%90%ED%9A%8C-%EB%8C%80%ED%95%99%EC%9E%A5%ED%95%99%EC%83%9D-%EA%B3%B5%EA%B0%9C%EC%84%A0%EB%B0%9C-%EC%95%88%EB%82%B47&keyword=%EC%9E%A5%ED%95%99",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-sejong-haetbit",
+   "name": "햇빛장학금 신청 (세종대, 2026-1학기)",
+   "type": "교내",
+   "provider": "세종대학교",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-02",
+   "period": "접수 기간 원문 확인",
+   "summary": "다문화가정 자녀·북한이탈주민 등 신입생을 위한 교내 장학금입니다. 신청 방법·기간은 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "세종대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "noForm": "신청 방법 원문 확인 필요 — 첨부 양식 없음",
+   "attachments": [],
+   "sourceUrl": "https://www.sejong.ac.kr/kor/intro/notice7.do?mode=view&articleNo=866780&article.offset=0&articleLimit=10",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-sejong-seongjeok",
+   "name": "성적향상장학금 신청 (세종대, 2026-1학기)",
+   "type": "교내",
+   "provider": "세종대학교",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-02",
+   "period": "접수 기간 원문 확인",
+   "summary": "성적이 향상된 학생을 위한 교내 장학금입니다. 첨부된 신청서를 작성해 제출해요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "세종대학교"
+   },
+   "documents": [
+    "성적향상장학금 신청서 (첨부 양식)"
+   ],
+   "duplicable": true,
+   "attachments": [
+    {
+     "name": "(양식)성적향상장학금 신청서.hwp",
+     "url": "https://www.sejong.ac.kr/kor/intro/notice7.do?mode=download&articleNo=866189&attachNo=233281"
+    }
+   ],
+   "sourceUrl": "https://www.sejong.ac.kr/kor/intro/notice7.do?mode=view&articleNo=866189&article.offset=0&articleLimit=10",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-sejong-samsung",
+   "name": "푸른등대 삼성기부장학금 신규장학생 (세종대)",
+   "type": "교외",
+   "provider": "삼성기부장학금(푸른등대)",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-02",
+   "period": "접수 기간 원문 확인",
+   "summary": "삼성이 기부한 재원으로 운영되는 세종대 신규 장학생 선발입니다. 학생 포털에서 온라인으로 신청해요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "세종대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "noForm": "온라인 포털 신청형 — 첨부는 사업계획·신청 매뉴얼일 뿐 별도 서식 없음",
+   "attachments": [
+    {
+     "name": "(붙임) 사업계획 및 업무처리기준.pdf",
+     "url": "https://www.sejong.ac.kr/kor/intro/notice7.do?mode=download&articleNo=865237&attachNo=232968"
+    },
+    {
+     "name": "붙임3_ 2026년 푸른등대 삼성기부장학금 학생 신청 매뉴얼.pdf",
+     "url": "https://www.sejong.ac.kr/kor/intro/notice7.do?mode=download&articleNo=865237&attachNo=232969"
+    }
+   ],
+   "sourceUrl": "https://www.sejong.ac.kr/kor/intro/notice7.do?mode=view&articleNo=865237&article.offset=0&articleLimit=10",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-ewha-ombudsman",
+   "name": "옴부즈만 장학금 신청 (이화여대, 2026-2학기)",
+   "type": "교내",
+   "provider": "이화여자대학교",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-08-20",
+   "period": "신청 2026.8.13 ~ 8.20",
+   "summary": "가계곤란 학생을 지원하는 이화여대 교내 장학금입니다. 온라인으로 신청해요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "이화여자대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "noForm": "온라인 포털 신청형 — 첨부는 증빙서류·신청방법 안내일 뿐 별도 서식 없음",
+   "attachments": [
+    {
+     "name": "붙임1.가계곤란 증빙서류 제출안내.pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=365898&attachNo=352079"
+    },
+    {
+     "name": "붙임2.옴부즈만 장학금 온라인 신청방법 안내.pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=365898&attachNo=352080"
+    }
+   ],
+   "sourceUrl": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=365898&article.offset=0&articleLimit=10",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-partner-foundation",
+   "name": "미래의동반자재단 장학생 선발 (주한미국상공회의소)",
+   "type": "교외",
+   "provider": "미래의동반자재단 (주한미국상공회의소)",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-08-04",
+   "period": "신청 2026.7.29 ~ 8.4 (학교별 상이할 수 있음, 원문 확인)",
+   "summary": "주한미국상공회의소 산하 미래의동반자재단이 선발하는 장학금입니다. 이화여대·인하대 등 여러 대학이 함께 공고 중인 전국 대상 장학금이에요.",
+   "eligibility": {
+    "selective": true
+   },
+   "documents": [
+    "장학금 신청서(학생용) — 첨부 양식"
+   ],
+   "duplicable": true,
+   "note": "여러 대학(이화여대·인하대 등)이 함께 게시한 전국 대상 공고예요. 학교별로 신청기간이 다를 수 있으니 원문 공고를 확인하세요.",
+   "attachments": [
+    {
+     "name": "미래의동반자재단 장학금 신청서(학생용) 2026-2 골드만삭스.docx",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=365948&attachNo=352129"
+    }
+   ],
+   "sourceUrl": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=365948&article.offset=0&articleLimit=10",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-ewha-yangyoung",
+   "name": "양영재단 장학생 선발 (이화여대, 2026-2학기)",
+   "type": "교외",
+   "provider": "양영재단",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-08-03",
+   "period": "신청 2026.7.28 ~ 8.3 (기간연장)",
+   "summary": "양영재단이 선발하는 장학생입니다. 학과 추천을 통한 선발로, 학생이 직접 작성할 신청서는 없어요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "이화여자대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "noForm": "학과 추천을 통한 선발 — 학생이 직접 제출할 신청서 없음(추천서는 지도교수·학과 작성)",
+   "attachments": [
+    {
+     "name": "양영재단 추천서양식.hwp",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=365911&attachNo=352102"
+    },
+    {
+     "name": "양영재단 선발안내.pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=365911&attachNo=352103"
+    }
+   ],
+   "sourceUrl": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=365911&article.offset=0&articleLimit=10",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-catholic-alumni",
+   "name": "동문장학금 신청 (가톨릭대, 2026-2학기)",
+   "type": "교내",
+   "provider": "가톨릭대학교",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-02",
+   "period": "접수 기간 원문 확인",
+   "summary": "가톨릭대학교 동문 기금으로 운영되는 교내 장학금입니다. 첨부된 신청서를 작성해 제출해요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "가톨릭대학교"
+   },
+   "documents": [
+    "장학금 신청서 (첨부 양식)"
+   ],
+   "duplicable": true,
+   "attachments": [
+    {
+     "name": "[첨부파일] 장학금 신청서(이름).hwp",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=273983&attachNo=223769"
+    }
+   ],
+   "sourceUrl": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=273983&article.offset=0&articleLimit=10&srCategoryId=22",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-catholic-lee",
+   "name": "이원길 장학금 (가톨릭대, 2026-2학기)",
+   "type": "교내",
+   "provider": "가톨릭대학교 학부대학운영팀",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-09-20",
+   "period": "신청 ~2026.9.20",
+   "summary": "학술·실현(창업) 두 부문으로 대상자를 선발하는 가톨릭대 교내 장학금입니다. 부문별 신청서를 작성해 제출해요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "가톨릭대학교"
+   },
+   "documents": [
+    "학술부문 장학금 신청서 (첨부 양식)",
+    "실현(창업)부문 창업사업계획서 (첨부 양식)"
+   ],
+   "duplicable": true,
+   "attachments": [
+    {
+     "name": "붙임1. 학술부문 장학금 신청서 1부.hwp",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=273659&attachNo=223445"
+    },
+    {
+     "name": "붙임2. 실현(창업)부문 창업사업계획서 양식.hwp",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=273659&attachNo=223446"
+    }
+   ],
+   "sourceUrl": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=273659&article.offset=0&articleLimit=10&srCategoryId=22",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-inha-cheongchang",
+   "name": "청년창업농장학금 (인하대, 2026년 2학기)",
+   "type": "교외",
+   "provider": "한국농어촌희망재단",
+   "amount": "등록금 + 영농정착 지원 (세부 원문 확인)",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-02",
+   "period": "접수 기간 원문 확인(기간연장 공고) · 재단 홈페이지 온라인 신청",
+   "summary": "졸업 후 영농 분야 창업·정착을 계획하는 학생을 지원하는 농림축산식품부 장학금입니다. 재단 홈페이지에서 온라인 신청해요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "인하대학교"
+   },
+   "documents": [
+    "온라인 신청 (rhof.or.kr)",
+    "영농 계획서 등 — 선발안내문 확인"
+   ],
+   "duplicable": false,
+   "note": "의무 영농 종사 조건이 있는 장학금이에요. 신청 전 선발안내문의 요건을 꼭 확인하세요.",
+   "noForm": "한국농어촌희망재단 누리집(rhof.or.kr)에서 온라인 신청 — 별도 첨부 양식 없음",
+   "attachments": [
+    {
+     "name": "2026년 2학기 청창농 신청·접수기간 변경안내 공고문.pdf",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/40385/download.do"
+    },
+    {
+     "name": "2026년 청년창업농장학금 선발안내.pdf",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/40387/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.inha.ac.kr/bbs/kr/8/44619/artclView.do",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-gachon-workstudy-summer3",
+   "name": "하계방학 국가근로장학생 추가모집 3차 (가천대, 2026-1학기)",
+   "type": "교내",
+   "provider": "가천대학교",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-02",
+   "period": "접수 기간 원문 확인",
+   "summary": "하계방학 기간 교내·교외 국가근로장학생 3차 추가모집입니다. 신청 방법·기간은 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "가천대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "noForm": "신청 방법 원문 확인 필요 — 첨부는 모집 인원 현황일 뿐 별도 서식 없음",
+   "attachments": [
+    {
+     "name": "26-1 하계방학 일반근로(교내, 교외) 추가모집(3차) 인원 현황.pdf",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/150869/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.gachon.ac.kr/bbs/kor/478/122106/artclView.do",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-kau-workstudy",
+   "name": "국가근로장학금 교내 신청 (한국항공대, 2026-2학기)",
+   "type": "교내",
+   "provider": "한국항공대학교",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-02",
+   "period": "접수 기간 원문 확인 · 종합정보시스템 신청",
+   "summary": "종합정보시스템을 통해 신청하는 국가근로장학금 교내 모집입니다. 근로지 목록은 첨부에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국항공대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "noForm": "종합정보시스템(포털) 신청형 — 첨부는 근로지 목록일 뿐 별도 서식 없음",
+   "attachments": [
+    {
+     "name": "2026-2 국가근로 근로지 목록(공고용).xlsx",
+     "url": "https://kau.ac.kr/upfile/2026/07/20/20260720112151-7867.xlsx"
+    }
+   ],
+   "sourceUrl": "https://kau.ac.kr/kaulife/scholnoti.php?searchkey=&searchvalue=&code=s1301&page=&mode=read&seq=10914",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-seoultech-workstudy-swap",
+   "name": "국가근로장학생 모집(교체) 차오름지역아동센터 (서울과기대)",
+   "type": "교내",
+   "provider": "서울과학기술대학교",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-02",
+   "period": "접수 기간 원문 확인",
+   "summary": "차오름지역아동센터 근로지의 국가근로장학생 결원을 채우는 교체 모집입니다. 지원서를 작성해 제출해요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서울과학기술대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "noForm": "국가근로장학생 지원서(서식1)가 첨부돼 있으나 자동 수집이 다운로드 주소를 확보하지 못함(자바스크립트 링크) — 원문 공고에서 직접 내려받아야 함",
+   "attachments": [],
+   "sourceUrl": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=57138&bidx=892245&qidx=57138&cate=0&allboard=true&nowpage=1",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-seoultech-tutor",
+   "name": "튜터 장학생 모집 (서울과기대, 2026-2학기)",
+   "type": "교내",
+   "provider": "서울과학기술대학교",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-08-10",
+   "period": "신청 ~2026.8.10(일)",
+   "summary": "동료 학습을 지원하는 교내 튜터 장학생을 모집합니다. 신청 방법은 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서울과학기술대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "noForm": "신청 방법 원문 확인 필요 — 첨부 양식 없음",
+   "attachments": [],
+   "sourceUrl": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=892751&qidx=5233&cate=0&allboard=true&nowpage=1",
+   "sourceKind": "official"
+  },
+  {
+   "id": "reg-uos-daecheonggyo-helper",
+   "name": "청소년교육지원장학금 활동도우미 모집 (서울시립대)",
+   "type": "교외",
+   "provider": "한국장학재단(대청교) · 서울시립대 게시",
+   "amount": "시급 12,790원 (활동 시간 기준 지급)",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-02",
+   "period": "2026.8.6(목)부터 근무 시작 · 마감은 원문 확인",
+   "summary": "대학생 청소년교육지원장학금(대청교) 멘토 활동을 보조하는 활동도우미(근로)를 모집합니다. 첨부 신청서를 작성해 제출해요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서울시립대학교"
+   },
+   "documents": [
+    "활동도우미 신청서 (첨부 양식)"
+   ],
+   "duplicable": true,
+   "attachments": [
+    {
+     "name": "대학생 청소년교육지원장학금 활동도우미 신청서_이름.hwp",
+     "url": "https://www.uos.ac.kr/common/board-download.do?listId=FA1&seq=31158&fSeq=1"
+    }
+   ],
+   "sourceUrl": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31158&sort=12&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "sourceKind": "official"
   }
  ]
 }

@@ -95,6 +95,86 @@
    "added": "2026-08-02",
    "fetched": true,
    "schematized": false
+  },
+  {
+   "id": "reg-konkuk-uiam",
+   "name": "의암 손병희 우수논문 장학생 (건국대, 2026)",
+   "target": "의암 손병희 우수 논문",
+   "added": "2026-08-02",
+   "fetched": false,
+   "schematized": false
+  },
+  {
+   "id": "reg-konkuk-bulgaria",
+   "name": "불가리아 정부초청 장학생 (건국대, 2026-2027)",
+   "target": "불가리아 정부초청 장학생",
+   "added": "2026-08-02",
+   "fetched": false,
+   "schematized": false
+  },
+  {
+   "id": "reg-gachon-seongjeok",
+   "name": "성적향상 장학금 신청 (가천대, 2026-1학기)",
+   "target": "가천대 2026-1학기 성적향상 장학금",
+   "added": "2026-08-02",
+   "fetched": false,
+   "schematized": false
+  },
+  {
+   "id": "reg-dongsan",
+   "name": "동산장학회 장학생 (이공계 새터민 대상)",
+   "target": "동산장학회 장학생 선발",
+   "added": "2026-08-02",
+   "fetched": false,
+   "schematized": false
+  },
+  {
+   "id": "reg-ssu-saemunan",
+   "name": "새문안교회 장학생 (숭실대, 2026-2학기)",
+   "target": "새문안교회 장학생",
+   "added": "2026-08-02",
+   "fetched": false,
+   "schematized": false
+  },
+  {
+   "id": "reg-sejong-seongjeok",
+   "name": "성적향상장학금 신청 (세종대, 2026-1학기)",
+   "target": "세종대 2026-1 성적향상장학금",
+   "added": "2026-08-02",
+   "fetched": false,
+   "schematized": false
+  },
+  {
+   "id": "reg-partner-foundation",
+   "name": "미래의동반자재단 장학생 선발 (주한미국상공회의소)",
+   "target": "미래의동반자재단 장학생",
+   "added": "2026-08-02",
+   "fetched": false,
+   "schematized": false
+  },
+  {
+   "id": "reg-catholic-alumni",
+   "name": "동문장학금 신청 (가톨릭대, 2026-2학기)",
+   "target": "가톨릭대 동문장학금",
+   "added": "2026-08-02",
+   "fetched": false,
+   "schematized": false
+  },
+  {
+   "id": "reg-catholic-lee",
+   "name": "이원길 장학금 (가톨릭대, 2026-2학기)",
+   "target": "이원길 장학금",
+   "added": "2026-08-02",
+   "fetched": false,
+   "schematized": false
+  },
+  {
+   "id": "reg-uos-daecheonggyo-helper",
+   "name": "청소년교육지원장학금 활동도우미 모집 (서울시립대)",
+   "target": "청소년교육지원장학금 활동도우미",
+   "added": "2026-08-02",
+   "fetched": false,
+   "schematized": false
   }
  ]
 }
