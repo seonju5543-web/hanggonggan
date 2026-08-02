@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-08-02",
+ "updatedAt": "2026-08-03",
  "items": [
   {
    "id": "reg-kw-gukgagosi",
@@ -630,14 +630,6 @@
    ],
    "sourceUrl": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31041&sort=10&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
    "sourceKind": "official",
-   "excerpts": [
-    "※ 첨부파일의 참가신청서 및 관련 제출서류 작성 후 업로드",
-    "※ 첨부파일의 참가신청서 및 관련 제출서류 작성 후 업로드",
-    "◆ 기타 문의 : ☎ 02-6490-6287",
-    "※ 세부 신청자격 , 제출서류 , 선발일정 , 활동내용 등은 반드시 첨부된 모집 공고문을 확인해 주시기 바랍니다",
-    "전화 : 02-6490-6114 / 서울시통합문의 : 02-120"
-   ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
    "listedAt": "2026-07-16"
   },
   {
@@ -785,14 +777,6 @@
    ],
    "sourceKind": "official",
    "formId": "uos-module-apply",
-   "excerpts": [
-    "☆ 필수 서류 미제출 및 제출 서류에 오류가 있을 시 별도의 안내 없이 장학금이 미지급될 수 있습니다",
-    "* 차세대통신 성과형 장학금은 본인이 속한 학과의 등록금을 초과하여 장학금 지급이 불가하므로, 장학금액이 등록금을 초과하는 경우 일부 마이크로디그리를 다음학기에 이수인증하는 것을 고려 바랍니다.",
-    "제출 방법: 첨부된 장학금 신청서 양식을 작성 후, 하나의 파일로 제출",
-    "문의: nccoss@uos.ac.kr 이메일 문의",
-    "전화 : 02-6490-6114 / 서울시통합문의 : 02-120"
-   ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
    "listedAt": "2026-07-16"
   },
   {
@@ -926,11 +910,7 @@
    ],
    "sourceUrl": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31133&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
    "sourceKind": "official",
-   "formId": "uos-bigdata-cert-apply",
-   "excerpts": [
-    "전화 : 02-6490-6114 / 서울시통합문의 : 02-120"
-   ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "formId": "uos-bigdata-cert-apply"
   },
   {
    "id": "reg-skku-merit",
@@ -3103,7 +3083,11 @@
    "noForm": "국가근로장학생 지원서(서식1)가 첨부돼 있으나 자동 수집이 다운로드 주소를 확보하지 못함(자바스크립트 링크) — 원문 공고에서 직접 내려받아야 함",
    "attachments": [],
    "sourceUrl": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=57138&bidx=892245&qidx=57138&cate=0&allboard=true&nowpage=1",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "excerpts": [
+    "지급금액 : 시간당 12,790원"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   },
   {
    "id": "reg-seoultech-tutor",
@@ -3126,7 +3110,13 @@
    "noForm": "신청 방법 원문 확인 필요 — 첨부 양식 없음",
    "attachments": [],
    "sourceUrl": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=892751&qidx=5233&cate=0&allboard=true&nowpage=1",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "excerpts": [
+    "(선발인원 : 00 명)",
+    "□ 근로신청 기간: ~ 2026.",
+    "(통정시 신청, 7.13.~7.19.) 2026-1학기 마일리지장학금 지급 신청기간 안내(8월 졸업예정자 신청필요)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   },
   {
    "id": "reg-uos-daecheonggyo-helper",
@@ -3155,14 +3145,7 @@
    ],
    "sourceUrl": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31158&sort=12&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
    "sourceKind": "official",
-   "formId": "auto-청소년교육지원장학금-활동도우미-apply",
-   "excerpts": [
-    "◎ 선발인원: 2명",
-    "◎ 신청방법: 활동 도우미 신청서 1부, 사회문제 해결 제안서 1부 각각 제출",
-    "※ 관련 문의: damdami8@uos.ac.kr",
-    "전화 : 02-6490-6114 / 서울시통합문의 : 02-120"
-   ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "formId": "auto-청소년교육지원장학금-활동도우미-apply"
   },
   {
    "id": "auto-munewsnotice712161viewdo",
@@ -3579,7 +3562,8 @@
     "문의처 : 장학복지팀 교외장학 담당 (032-860-7076)",
     "구비 서류 및 일정 등 자세한 내용은 붙임 파일을 참고하시기 바랍니다"
    ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "formId": "auto-학부-교외장학-2026학년도-2학기-가송-apply"
   },
   {
    "type": "교외",
@@ -3653,7 +3637,8 @@
    ],
    "note": "2026-2학기 정규 등록 예정자(휴학 예정자 불가), 경제적 이유로 학업 지속이 어려운 학생, 직전학기 평점 B학점(80점) 이상. 타 장학재단 중복 수혜 금지 · 가송재단 기수혜자 지원 불가. 장학팀 방문·등기우편·이메일(ser@ssu.ac.kr) 중 하나로 제출해요. 장학증서 수여식(8/31) 불참 시 결격이에요.",
    "sourceUrl": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=%E2%98%85-2026%ED%95%99%EB%85%84%EB%8F%84-2%ED%95%99%EA%B8%B0-%EA%B0%80%EC%86%A1%EC%9E%AC%EB%8B%A8-%EC%9E%A5%ED%95%99%EC%83%9D-%EC%B6%94%EC%B2%9C%EC%9E%90-%EC%84%A0%EB%B0%9C-%EA%B3%B5%EA%B3%A08-3&keyword=%EC%9E%A5%ED%95%99",
-   "listedAt": "2026-08-02"
+   "listedAt": "2026-08-02",
+   "formId": "auto-장학-2026학년도-2학기-가송재단-장학-apply"
   },
   {
    "type": "교내",
@@ -3780,6 +3765,258 @@
    "sourceUrl": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=365886&article.offset=0&articleLimit=10",
    "noForm": "한국장학재단 전산으로 본인 인증 후 신청하는 제도라, 앱이 채워 낼 신청서 양식이 없어요.",
    "listedAt": "2026-08-02"
+  },
+  {
+   "id": "auto-pwebhomcomboardboardaspx",
+   "name": "[장학안내] 2026학년도 1학기 도전장학생(비상) 최종 선발 공고",
+   "type": "교내",
+   "provider": "전남대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-03",
+   "period": "접수 기간 원문 확인",
+   "summary": "전남대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "전남대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-03 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=69747&cate=8",
+   "sourceKind": "auto",
+   "excerpts": [
+    "장학금액: 등록금 전액 (국가장학금 Ⅰ유형, 교내외장학금 등으로 등록금 전액 수혜 내 역이 있을 경우 미지급, 등록금 차액만 지급 )",
+    "지원제외: 국가장학금 신청기간 미준수자, 수혜횟수 초과, 중복지원, 이연자 등 사유로 한국장학재단 심사를 탈락한 학생, 장학금액 10만원 미만자, 교내외 장학금 전액 수혜자",
+    "문의: 전남대 학생과 장학팀(062-530-1086)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-scho332280089artclviewdo",
+   "name": "2026-2학기 국가우수(이공계) 장학금 중간평가대상자 학생신청 및 서류제출 안내",
+   "type": "교내",
+   "provider": "조선대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-03",
+   "period": "접수 기간 원문 확인",
+   "summary": "조선대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "조선대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-03 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www3.chosun.ac.kr/bbs/scho/332/280089/artclView.do",
+   "sourceKind": "auto",
+   "excerpts": [
+    "제출기한 : ~ 2026."
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-scho332279981artclviewdo",
+   "name": "2026-2 교내장학금 신청 안내(신/편입생, 재학생)",
+   "type": "교내",
+   "provider": "조선대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-03",
+   "period": "접수 기간 원문 확인",
+   "summary": "조선대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "조선대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-03 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "개인정보수집이용제공동의서(2024.12.26수정).pdf",
+     "url": "https://www3.chosun.ac.kr/bbs/scho/332/376742/download.do"
+    }
+   ],
+   "sourceUrl": "https://www3.chosun.ac.kr/bbs/scho/332/279981/artclView.do",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-scho332278300artclviewdo",
+   "name": "[장학금 접수] [한국장학재단] 2026학년도 하계방학집중근로 희망근로지 신청 안내",
+   "type": "교외",
+   "provider": "조선대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-03",
+   "period": "접수 기간 원문 확인",
+   "summary": "조선대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "조선대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-03 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www3.chosun.ac.kr/bbs/scho/332/278300/artclView.do",
+   "sourceKind": "auto",
+   "excerpts": [
+    "2026 학년도 한국장학재단 국가근로장학사업 하계방학집중근로 희망근로지 신청기간을 공지하오니 참여를 희망하시는 학생분들은 해당 기간 내에 신청하여 주시기 바랍니다",
+    "신청방법 : 붙임 1 매뉴얼 참고 후 희망근로지 최소 3 개 선택 필수 (1 인당 최대 5 개까지 신청가능 )"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-scho332278055artclviewdo",
+   "name": "[장학금 접수] 2026-1학기 교내 외국어 JUMP 장학생 선발 공고",
+   "type": "교내",
+   "provider": "조선대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-03",
+   "period": "접수 기간 원문 확인",
+   "summary": "조선대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "조선대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-03 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www3.chosun.ac.kr/bbs/scho/332/278055/artclView.do",
+   "sourceKind": "auto",
+   "excerpts": [
+    "장학금액 : 1인당 50만원(학업보조비)",
+    "신청 방법: &#9312; &rarr; &#9313; 순서로 진행 완료 시 신청 완료",
+    "제출서류: 신청서 1부, 성적표 사본(최고점, 최저점 각 1부), 전체성적 캡쳐본 1부",
+    "문의처: 장학팀 062-230-6999"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-scho332277925artclviewdo",
+   "name": "[장학금 접수] 2026학년도 지역인재(특성화) 신규장학생 신청안내",
+   "type": "교내",
+   "provider": "조선대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-03",
+   "period": "접수 기간 원문 확인",
+   "summary": "조선대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "조선대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-03 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www3.chosun.ac.kr/bbs/scho/332/277925/artclView.do",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-scho332277911artclviewdo",
+   "name": "[장학금 접수] 2026학년도 국가우수장학금(이공계) 신규장학생 선발 공고",
+   "type": "교내",
+   "provider": "조선대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-03",
+   "period": "접수 기간 원문 확인",
+   "summary": "조선대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "조선대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2. 제출서류 양식.hwp",
+     "url": "https://www3.chosun.ac.kr/bbs/scho/332/374690/download.do"
+    }
+   ],
+   "sourceUrl": "https://www3.chosun.ac.kr/bbs/scho/332/277911/artclView.do",
+   "sourceKind": "auto",
+   "formId": "auto-2026학년도-국가우수-apply",
+   "excerpts": [
+    "선발대상 ( 붙임 1 참고 )",
+    "신청방법 : 종합정보시스템 [ 장학 ] - [ 신청 ] - [ 장학신청 ] - [ 국가우수장학금 ( 이공계 )] 에 PDF 파일 업로드",
+    "- 장학금액 : 등록금 전액 지원 ( 기초생활수급자는 250 만원 추가 지급 )",
+    "대학 선발 문의 : 장학팀 (062-230-6999 / 6124)",
+    "장학재단 시스템 문의 : 장학재단 (1599-2000)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-scho332277863artclviewdo",
+   "name": "[장학금 접수] 2026학년도 1학기 대학혁신지원사업 'CSU Pride 청송장학금' 장",
+   "type": "교내",
+   "provider": "조선대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-03",
+   "period": "접수 기간 원문 확인",
+   "summary": "조선대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "조선대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-03 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www3.chosun.ac.kr/bbs/scho/332/277863/artclView.do",
+   "sourceKind": "auto",
+   "excerpts": [
+    "1인당 장학금액 : 500,000원"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   }
  ]
 }
