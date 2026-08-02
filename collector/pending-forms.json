@@ -175,6 +175,22 @@
    "added": "2026-08-02",
    "fetched": false,
    "schematized": false
+  },
+  {
+   "id": "auto-eab3b5eca780ec82aced95ad",
+   "name": "장학 2026년 서울미래인재재단 서울인재대학장학금 선발 안내(1학년 대상, 8.3.월 10시~8.10.월 15시)",
+   "target": "장학 2026년 서울미",
+   "added": "2026-08-02",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-notice7doarticleno866189",
+   "name": "2026-1 성적향상장학금 신청안내",
+   "target": "2026-1 성적향상장",
+   "added": "2026-08-02",
+   "fetched": true,
+   "schematized": true
   }
  ]
 }
