@@ -110,6 +110,55 @@ async function fetchBoard(url) {
   throw lastErr;
 }
 
+/* 목록 행이 진짜 링크가 아닌 게시판 — 주소를 유추하지 말고 **게시판이 실제로 쓰는 것**만 쓴다
+   (경희대에서 세 번 틀린 뒤 세운 규칙). 두 형태 다 실제로 열어서 확인해 둔 것이다.
+   · json : 화면은 SPA라 껍데기만 오지만 목록을 주는 내부 API가 따로 있다.
+   · dataId: 행이 <a href="javascript:" data-id="…">라 평범한 fetch로도 번호는 뽑힌다. */
+const BOARD_RULES = {
+  '서강대학교': {
+    kind: 'json',
+    api: 'https://www.sogang.ac.kr/api/api/v1/mainKo/BbsData/boardList?pageNum=1&pageSize=30&bbsConfigFk=141',
+    // 상세 주소는 목록 행을 실제로 눌러서 받아 적었다 (2026-08-02): /ko/detail/<pkId>?bbsConfigFk=141
+    detail: (id) => `https://www.sogang.ac.kr/ko/detail/${id}?bbsConfigFk=141&namepage=ScholarshipNotice`,
+  },
+  '서울교육대학교': {
+    kind: 'dataId',
+    detail: (id) => `https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=${id}`,
+  },
+};
+
+async function rowsByRule(rule, boardUrl) {
+  if (rule.kind === 'json') {
+    const r = await fetchBoard(rule.api);
+    if (!r.ok) throw new Error(`API HTTP ${r.status}`);
+    const j = await r.json();
+    // 목록이 어디 있는지는 학교마다 다르다 — 서강은 data.list 처럼 한 겹 더 들어가 있다.
+    // 배열이 나올 때까지 흔한 이름을 두 겹까지 따라간다.
+    const dig = (o, d = 0) => {
+      if (Array.isArray(o)) return o;
+      if (!o || typeof o !== 'object' || d > 2) return null;
+      for (const k of ['list', 'data', 'content', 'result', 'items', 'rows']) {
+        const hit = dig(o[k], d + 1);
+        if (hit) return hit;
+      }
+      return null;
+    };
+    const rows = dig(j) || [];
+    return rows.map((x) => ({
+      title: String(x.title || x.subject || '').replace(/\s+/g, ' ').trim(),
+      url: rule.detail(x.pkId ?? x.id ?? x.seq),
+    })).filter((x) => x.title && !/undefined|null/.test(x.url));
+  }
+  // dataId — 목록 HTML에서 번호와 제목을 짝지어 뽑는다
+  const r = await fetchBoard(boardUrl);
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  const html = await r.text();
+  return [...html.matchAll(/data-id=["'](\d+)["'][^>]*>([\s\S]{0,300}?)<\/a>/g)].map((m) => ({
+    title: m[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
+    url: rule.detail(m[1]),
+  })).filter((x) => x.title);
+}
+
 const results = [];
 const freshAll = [];
 
@@ -120,13 +169,19 @@ for (const s of cfg.schools) {
     continue;
   }
   try {
-    const res = await fetchBoard(s.boardUrl);
-    if (!res.ok) {
-      results.push({ name, status: `⚠️ 접속 실패 (HTTP ${res.status}) — 주소 수정 필요`, items: [] });
-      continue;
+    const rule = BOARD_RULES[s.school];
+    let rawLinks;
+    if (rule) {
+      rawLinks = await rowsByRule(rule, s.boardUrl);   // 링크가 아닌 행을 쓰는 게시판
+    } else {
+      const res = await fetchBoard(s.boardUrl);
+      if (!res.ok) {
+        results.push({ name, status: `⚠️ 접속 실패 (HTTP ${res.status}) — 주소 수정 필요`, items: [] });
+        continue;
+      }
+      rawLinks = extractLinks(await res.text(), s.boardUrl);
     }
-    const html = await res.text();
-    const items = extractLinks(html, s.boardUrl)
+    const items = rawLinks
       .filter((i) => KEYWORDS.test(i.title))
       .filter((i) => !isMenuEntry(i.title))     // 옆 메뉴 제외 (실공고 신호가 있으면 남긴다)
       // 첨부파일 내려받기 링크 제외 — 안 막으면 '…포스터.png' 같은 파일 이름이 공고로 뜬다

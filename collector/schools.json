@@ -34,8 +34,8 @@
   {
    "school": "서강대학교",
    "campus": "",
-   "boardUrl": null,
-   "note": "주소는 확보했다(2026-08-02) — /ko/scholarship-notice, 장학공지 2481건. 다만 Nuxt SPA라 일반 fetch로는 빈 껍데기만 오므로 browser-targets.json이 담당한다"
+   "boardUrl": "https://www.sogang.ac.kr/ko/scholarship-notice",
+   "note": "개발자 제공 주소. 화면은 Nuxt SPA라 fetch로는 껍데기만 오므로 collect.mjs의 BOARD_RULES가 내부 API(bbsConfigFk=141)로 목록을 받는다. 상세 주소는 목록 행을 실제로 눌러 확인(/ko/detail/<pkId>?bbsConfigFk=141) — 유추 아님"
   },
   {
    "school": "성균관대학교",
@@ -195,8 +195,8 @@
   {
    "school": "서울교육대학교",
    "campus": "",
-   "boardUrl": null,
-   "note": "주소는 확보했다(2026-08-02) — 목록 행이 <a href=\"javascript:\" data-id=\"…\"> 클릭형이라 browser-targets.json이 담당한다. 상세 주소 규칙은 확인해 뒀다(selectNttInfo.do?…&nttSn=<data-id>)"
+   "boardUrl": "https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083",
+   "note": "행이 <a href=\"javascript:\" data-id=\"…\">라 일반 링크 추출로는 0건. BOARD_RULES(dataId)가 data-id로 상세 주소를 만든다(selectNttInfo.do?…&nttSn=<id>)"
   },
   {
    "school": "한국방송통신대학교",
