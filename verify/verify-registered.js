@@ -83,6 +83,19 @@ async function driveAnyLiveForm(page) {
   await page.screenshot({ path: SHOT('30-explore-registered') });
 
   // 조병두 상세: 첨부 양식 링크 + 마감 배지 (홈 마감임박 목록에도 같은 카드가 있어 explore로 범위 한정)
+  // 마감이 한참 지난 공고는 목록에서 지워지므로(2026-08-02 마감 36건 정리 때 실제로 사라졌다)
+  // 카드가 없으면 이 구간을 통째로 건너뛰고 마감 전 양식 공고로 같은 경로를 구동한다.
+  // 검증 대상을 코드에 박아 두면 데이터가 정리될 때마다 검사가 깨진다 — README의 규칙과 같은 이유다.
+  if (!(await page.$('#explore-list [data-detail="reg-skku-jobyungdu"]'))) {
+    console.log('조병두 구간 건너뜀 — 마감돼 목록에서 내려간 공고입니다. 마감 전 양식 공고로 대체 구동합니다.');
+    const drove = await driveAnyLiveForm(page);
+    console.log('대체 구동(마감 전 양식 공고):', drove.id || '없음', '| 문서 생성:', drove.ok);
+    if (!drove.ok) errors.push('마감 전 양식 공고를 하나도 구동하지 못했습니다');
+    await page.screenshot({ path: SHOT('32-live-form-doc') });
+    console.log('ERRORS:', errors.length ? errors.join(' ; ') : 'none');
+    await browser.close();
+    process.exit(errors.length ? 1 : 0);
+  }
   await page.click('#explore-list [data-detail="reg-skku-jobyungdu"]');
   await page.waitForSelector('#detail-sheet.show');
   await page.waitForTimeout(400);

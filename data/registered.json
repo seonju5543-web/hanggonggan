@@ -1492,7 +1492,7 @@
    "provider": "광운대학교 게시 공고",
    "amount": "금액 원문 확인",
    "amountValue": 0,
-   "deadline": null,
+   "deadline": "2026-08-12",
    "period": "접수 기간 원문 확인",
    "summary": "광운대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
@@ -1928,42 +1928,6 @@
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   },
   {
-   "id": "auto-r00040viewdomenuno200318",
-   "name": "공통 2026년 화성시인재육성재단 소상공인 장학금 장학생 모집 안내",
-   "type": "교외",
-   "provider": "경희대학교 게시 공고",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
-   "deadline": null,
-   "listedAt": "2026-08-01",
-   "period": "접수 기간 원문 확인",
-   "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
-   "eligibility": {
-    "selective": true,
-    "schoolOnly": "경희대학교"
-   },
-   "documents": [
-    "지원 자격·제출 서류는 원문 공고에서 확인"
-   ],
-   "duplicable": true,
-   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
-   "noForm": "자동 등록(검수 전) 2026-08-01 — 양식 스키마화는 검수 후 진행",
-   "auto": true,
-   "attachments": [
-    {
-     "name": "[공고문] 2026년 (주)코나아이 소상공인 장학금 장학생 선발 공고.pdf",
-     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=aa4c500da3d84d2d8dc3c398220b6f15&fileSn=1&bbsId=BMSR00040"
-    }
-   ],
-   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322635",
-   "sourceKind": "auto",
-   "excerpts": [
-    "※ 접수 기간 내에 접수 확인 및 수정 가능 .",
-    "2) 문의처 : 서암 윤세영 재단 (http://foundation.sbs.co.kr/seoam) 홈페이지 內 윤세영 스칼라십 문의 게시판 >"
-   ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
-  },
-  {
    "id": "auto-skor478122452artclviewdo",
    "name": "[공통] └ RE:2026-2학기 (재)봉은재단 장학생 선발 결과 안내 N",
    "type": "교외",
@@ -2052,7 +2016,7 @@
    "provider": "성균관대학교 게시 공고",
    "amount": "금액 원문 확인",
    "amountValue": 0,
-   "deadline": null,
+   "deadline": "2026-09-18",
    "listedAt": "2026-08-02",
    "period": "접수 기간 원문 확인",
    "summary": "성균관대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
@@ -2152,32 +2116,6 @@
     }
    ],
    "sourceUrl": "https://www.hanyang.ac.kr/notice_all?p_p_id=kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_action=view_message&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_sCategoryId=224311300&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_entryId=104201",
-   "sourceKind": "auto"
-  },
-  {
-   "id": "auto-kuk2351174254artclviewdo",
-   "name": "[교외] 2026학년도 세종특별자치시 세종연구원 세종이도인재 장학금 장학생 모집( ~ 9. 30.)",
-   "type": "교외",
-   "provider": "건국대학교 게시 공고",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
-   "deadline": null,
-   "listedAt": "2026-08-02",
-   "period": "접수 기간 원문 확인",
-   "summary": "건국대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
-   "eligibility": {
-    "selective": true,
-    "schoolOnly": "건국대학교"
-   },
-   "documents": [
-    "지원 자격·제출 서류는 원문 공고에서 확인"
-   ],
-   "duplicable": true,
-   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
-   "noForm": "자동 등록(검수 전) 2026-08-02 — 양식 스키마화는 검수 후 진행",
-   "auto": true,
-   "attachments": [],
-   "sourceUrl": "https://www.konkuk.ac.kr/bbs/konkuk/235/1174254/artclView.do",
    "sourceKind": "auto"
   },
   {
@@ -3207,32 +3145,6 @@
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   },
   {
-   "id": "auto-munewsnotice712163viewdo",
-   "name": "5·18 기념재단 5·18 희망장학생 모집",
-   "type": "교외",
-   "provider": "국민대학교 게시 공고",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
-   "deadline": null,
-   "listedAt": "2026-08-02",
-   "period": "접수 기간 원문 확인",
-   "summary": "국민대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
-   "eligibility": {
-    "selective": true,
-    "schoolOnly": "국민대학교"
-   },
-   "documents": [
-    "지원 자격·제출 서류는 원문 공고에서 확인"
-   ],
-   "duplicable": true,
-   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
-   "noForm": "자동 등록(검수 전) 2026-08-02 — 양식 스키마화는 검수 후 진행",
-   "auto": true,
-   "attachments": [],
-   "sourceUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12163/view.do?currentPageNo=1",
-   "sourceKind": "auto"
-  },
-  {
    "id": "auto-munewsnotice712161viewdo",
    "name": "2026-1 국민대학교-한국스카우트연합 청소년지도자훈련캠프 참가자 모집(이수자 장학금 30만원 지급)",
    "type": "교내",
@@ -3289,40 +3201,6 @@
    "attachments": [],
    "sourceUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12160/view.do?currentPageNo=1",
    "sourceKind": "auto"
-  },
-  {
-   "id": "auto-eab3b5eca780ec82aced95ad",
-   "name": "장학 2026년 서울미래인재재단 서울인재대학장학금 선발 안내(1학년 대상, 8.3.월 10시~8.10.월 15시)",
-   "type": "교외",
-   "provider": "숭실대학교 게시 공고",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
-   "deadline": "2026-08-10",
-   "period": "접수 ~2026-08-10",
-   "summary": "숭실대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
-   "eligibility": {
-    "selective": true,
-    "schoolOnly": "숭실대학교"
-   },
-   "documents": [
-    "지원 자격·제출 서류는 원문 공고에서 확인"
-   ],
-   "duplicable": true,
-   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
-   "auto": true,
-   "attachments": [
-    {
-     "name": "★-붙임-1.-공고문-2026년-하반기-서울인재대학장학금-선발-공고.hwp",
-     "url": "https://scatch.ssu.ac.kr/download.php?data=1iZBAEYP01G24N2v6wVl9s5jGa0smQ8%2B8HVba1YhOwKiKp0Ym%2FP%2FpR0dBOZOTbHzGy%2BTusAioC15PqvrQTvbs22jVP294ctLe5M9wmCD5rQt%2FNrK0Yh0fgpcgLxU9x2qNWCsPC4Deb18RZHIVy2DkiDB3G311nz%2Fpg0rhWZkZcuqjbEdnOutK1Db28%2BKIxuuQyaTBCZXlhkBFJzCtxB%2BVboE54PUgaYHvbsezlLo8SCJ%2FkO2nmkBdbR2NMskt4e%2FSiORUOPxDD%2BhMpLkZ1e7q%2Fn54IzO9raYbJkVuD%2BnYjjAOVQY9JO%2FG0ah3xBjvpjMJkSIGSKvTBBj7GZOtfx1Ew%3D%3D"
-    },
-    {
-     "name": "붙임-2.-서식-2026년-상반기-서울인재대학장학금-자기소개서.hwp",
-     "url": "https://scatch.ssu.ac.kr/download.php?data=1iZBAEYP01G24N2v6wVl9s5jGa0smQ8%2B8HVba1YhOwKiKp0Ym%2FP%2FpR0dBOZOTbHzGy%2BTusAioC15PqvrQTvbs%2BI7DUOJDENh5hMFSLimCpacd2XcstxOKx4Gzn78WJx8DrSJFyVmRIxPINYcnJ5ciMwWiQzWIdhRz2Be1tRPEmcxAusHzuOIHWrPJeYStc6USihDgJBS0ij3wwhWao6S%2Fj38HnKGRp0DuEIWgy8Uwzz81N0L%2BWI7I5%2Bh5GVmvf0YIWWetcNcJVB9XuhjOX3EsTeBBOWyeHRCdZJ2CrxxfoIhXu1GZuLiIZDRfEx7cE37"
-    }
-   ],
-   "sourceUrl": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=2026%EB%85%84-%EC%84%9C%EC%9A%B8%EB%AF%B8%EB%9E%98%EC%9D%B8%EC%9E%AC%EC%9E%AC%EB%8B%A8-%EC%84%9C%EC%9A%B8%EC%9D%B8%EC%9E%AC%EB%8C%80%ED%95%99%EC%9E%A5%ED%95%99%EA%B8%88-%EC%84%A0%EB%B0%9C-%EC%95%88&keyword=%EC%9E%A5%ED%95%99",
-   "sourceKind": "auto",
-   "formId": "auto-장학-2026년-서울미-apply"
   },
   {
    "id": "auto-notice7doarticleno886382",
@@ -3607,6 +3485,167 @@
     "지원서 작성 및 제출서류에 관한 세부사항은 재단 홈페이지 공지사항(교육봉사 지원 FAQ) 참고"
    ],
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "type": "교외",
+   "amount": "500만원 (학업지원비·생활비성)",
+   "amountValue": 5000000,
+   "deadline": "2026-08-05",
+   "duplicable": true,
+   "attachments": [
+    {
+     "name": "2026 가송재단 장학생 선발 안내 및 지원서식.hwp",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=365989&attachNo=352186"
+    }
+   ],
+   "sourceKind": "official",
+   "id": "reg-ewha-gasong",
+   "name": "(재)가송재단 장학생 (이화여대 접수, 2026-2학기)",
+   "provider": "(재)가송재단 (이화여대 접수)",
+   "period": "신청기간 2026.07.30 ~ 2026.08.05",
+   "summary": "학교가 추천자를 선발해 재단이 최종 심사하는 장학금입니다. 학업지원비(생활비) 500만원을 지급하며 타 대외 장학금과 이중수혜가 금지됩니다.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "이화여자대학교"
+   },
+   "documents": [
+    "장학 지원서 (재단 양식)",
+    "자기소개서 (재단 양식)",
+    "장학생 추천서 (재단 양식 · 지도교수 서명/도장)",
+    "성적증명서 1부",
+    "재학(예정)증명서 1부",
+    "2026-2학기 학자금 지원구간 확인서 1부"
+   ],
+   "note": "2026-2학기 정규 등록 예정자(휴학 예정자 불가), 경제적 이유로 학업 지속이 어려운 학생, 직전학기 평점 B학점(80점) 이상. 타 장학재단 중복 수혜 금지 · 가송재단 기수혜자 지원 불가.",
+   "sourceUrl": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=365989&article.offset=0&articleLimit=10",
+   "listedAt": "2026-08-02"
+  },
+  {
+   "type": "교외",
+   "amount": "500만원 (학업지원비·생활비성)",
+   "amountValue": 5000000,
+   "deadline": "2026-08-07",
+   "duplicable": true,
+   "attachments": [
+    {
+     "name": "가송재단 장학생 신청 서류.hwp",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/40476/download.do"
+    }
+   ],
+   "sourceKind": "official",
+   "id": "reg-inha-gasong",
+   "name": "(재)가송재단 장학생 (인하대 접수, 2026-2학기)",
+   "provider": "(재)가송재단 (인하대 접수)",
+   "period": "제출기한 2026. 8. 7.(목) 16:00",
+   "summary": "학교 접수 → 학교 추천 → 재단 심사로 선발합니다. 학업지원비(생활비) 500만원을 지급하며 타 장학재단 중복 수혜가 금지됩니다.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "인하대학교"
+   },
+   "documents": [
+    "장학 지원서 (재단 양식)",
+    "자기소개서 (재단 양식)",
+    "장학생 추천서 (재단 양식 · 지도교수 서명/도장)",
+    "성적증명서 1부",
+    "재학(예정)증명서 1부",
+    "2026-2학기 학자금 지원구간 확인서 1부"
+   ],
+   "note": "2026-2학기 정규 등록 예정자(휴학 예정자 불가), 경제적 이유로 학업 지속이 어려운 학생, 직전학기 평점 B학점(80점) 이상. 타 장학재단 중복 수혜 금지 · 가송재단 기수혜자 지원 불가. 모든 서류는 원본으로 학생회관 343호 장학복지팀에 제출해요.",
+   "sourceUrl": "https://www.inha.ac.kr/bbs/kr/8/44703/artclView.do",
+   "listedAt": "2026-08-02"
+  },
+  {
+   "type": "교외",
+   "amount": "500만원 (학업지원비·생활비성)",
+   "amountValue": 5000000,
+   "deadline": "2026-08-09",
+   "duplicable": true,
+   "attachments": [],
+   "sourceKind": "official",
+   "id": "reg-dg-gasong",
+   "name": "(재)가송재단 장학생 (동국대 접수, 2026-2학기)",
+   "provider": "(재)가송재단 (동국대 접수)",
+   "period": "신청기간 ~ 2026. 8. 9.(일) (기한엄수)",
+   "summary": "단과대학 학장 추천을 받아 재단이 최종 선발합니다. 학업지원비(생활비) 500만원을 지급하며 타 대외 장학금과 이중수혜가 금지됩니다.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "동국대학교"
+   },
+   "documents": [
+    "장학 지원서 (재단 양식)",
+    "자기소개서 (재단 양식)",
+    "장학생 추천서 (재단 양식 · 지도교수 서명/도장)",
+    "성적증명서 1부",
+    "재학(예정)증명서 1부",
+    "2026-2학기 학자금 지원구간 확인서 1부"
+   ],
+   "note": "2026-2학기 정규 등록 예정자(휴학 예정자 불가), 경제적 이유로 학업 지속이 어려운 학생, 직전학기 평점 B학점(80점) 이상. 타 장학재단 중복 수혜 금지 · 가송재단 기수혜자 지원 불가. nDRIMS(엔드림스)로 신청하고 서류는 원본으로 제출해요.",
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765625",
+   "listedAt": "2026-08-02",
+   "noForm": "동국대는 nDRIMS(엔드림스)로 신청하고 서류 원본을 제출하는 방식이라, 공고에 채워 낼 신청서 파일이 첨부돼 있지 않아요. 재단 양식은 학교 안내에 따라 받으세요."
+  },
+  {
+   "type": "교외",
+   "amount": "500만원 (학업지원비·생활비성)",
+   "amountValue": 5000000,
+   "deadline": "2026-08-03",
+   "duplicable": true,
+   "attachments": [
+    {
+     "name": "2026_장학지원서_가송재단.hwp",
+     "url": "https://scatch.ssu.ac.kr/download.php?data=1iZBAEYP01G24N2v6wVl9s5jGa0smQ8%2B8HVba1YhOwKiKp0Ym%2FP%2FpR0dBOZOTbHzGy%2BTusAioC15PqvrQTvbs6BWqCOB9DkwqSQ5X%2FcZCvn44ZdwQgqaRO2OYfM6hHGJyQhyrzzsp%2FvC72ssrsOhKzF2oPsQ2ZnmVACALjt4Ew2DRT%2F0P0bhJWDVpiOEGLUs%2BGxeY7%2BUXMVZbsfxcMUxrw%3D%3D"
+    },
+    {
+     "name": "개인정보-수집·이용-및-제3자-제공-동의서_숭실대.hwp",
+     "url": "https://scatch.ssu.ac.kr/download.php?data=1iZBAEYP01G24N2v6wVl9s5jGa0smQ8%2B8HVba1YhOwKiKp0Ym%2FP%2FpR0dBOZOTbHzGy%2BTusAioC15PqvrQTvbs7xZa3crnELf0PfER3UdiAOegEavfUDBtpblioOdnd5SUIe0VEPjf3dXX2fAQ0NbUgOGMQljy%2BKr91D7UR9LwPaPijBeXQ4EhNoy5hp8%2FrSXeuXgBolzzgmAqKG%2FnOD3Pd4HbDULeO%2Bx5MMs5n2mDZKLtZluvWOP5RjlE57IDJxGyIgVbnBvqR5Eauv4WMhgQ4whqNBf1goSV7Gar2BGkWg%3D"
+    }
+   ],
+   "sourceKind": "official",
+   "id": "reg-ssu-gasong",
+   "name": "(재)가송재단 장학생 (숭실대 접수, 2026-2학기)",
+   "provider": "(재)가송재단 (숭실대 접수)",
+   "period": "제출기한 2026. 8. 3.(월) 15:00",
+   "summary": "학교가 1명을 추천해 재단이 최종 선발합니다(최종합격 통보 8/21). 학업장려비(생활비) 500만원을 지급합니다.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "숭실대학교"
+   },
+   "documents": [
+    "장학 지원서 (재단 양식)",
+    "자기소개서 (재단 양식)",
+    "장학생 추천서 (재단 양식 · 지도교수 서명/도장)",
+    "성적증명서 1부",
+    "재학(예정)증명서 1부",
+    "2026-2학기 학자금 지원구간 확인서 1부"
+   ],
+   "note": "2026-2학기 정규 등록 예정자(휴학 예정자 불가), 경제적 이유로 학업 지속이 어려운 학생, 직전학기 평점 B학점(80점) 이상. 타 장학재단 중복 수혜 금지 · 가송재단 기수혜자 지원 불가. 장학팀 방문·등기우편·이메일(ser@ssu.ac.kr) 중 하나로 제출해요. 장학증서 수여식(8/31) 불참 시 결격이에요.",
+   "sourceUrl": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=%E2%98%85-2026%ED%95%99%EB%85%84%EB%8F%84-2%ED%95%99%EA%B8%B0-%EA%B0%80%EC%86%A1%EC%9E%AC%EB%8B%A8-%EC%9E%A5%ED%95%99%EC%83%9D-%EC%B6%94%EC%B2%9C%EC%9E%90-%EC%84%A0%EB%B0%9C-%EA%B3%B5%EA%B3%A08-3&keyword=%EC%9E%A5%ED%95%99",
+   "listedAt": "2026-08-02"
+  },
+  {
+   "type": "교내",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-08-31",
+   "duplicable": true,
+   "attachments": [],
+   "sourceKind": "official",
+   "id": "reg-ewha-merit-carry",
+   "name": "성적우수장학금 이월수혜 신청 (이화여대, 2026-2학기)",
+   "provider": "이화여자대학교",
+   "period": "신청기간 2026.07.01 ~ 2026.08.31",
+   "summary": "이전 학기에 받은 성적우수장학금을 이번 학기로 이월해 수혜받기 위한 신청입니다.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "이화여자대학교"
+   },
+   "documents": [
+    "공고 원문에서 확인해 주세요"
+   ],
+   "note": "",
+   "sourceUrl": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=365300&article.offset=0&articleLimit=10",
+   "listedAt": "2026-08-02",
+   "noForm": "학교 포털에서 신청하는 공고로, 채워 낼 신청서 양식이 첨부돼 있지 않아요."
   }
  ]
 }

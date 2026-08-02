@@ -191,6 +191,27 @@
    "added": "2026-08-02",
    "fetched": true,
    "schematized": true
+  },
+  {
+   "id": "reg-ewha-gasong",
+   "name": "(재)가송재단 장학생 (이화여대 접수, 2026-2학기)",
+   "target": "[학부] 2026학년도 2학기 가송재단 장학",
+   "fetched": false,
+   "schematized": false
+  },
+  {
+   "id": "reg-inha-gasong",
+   "name": "(재)가송재단 장학생 (인하대 접수, 2026-2학기)",
+   "target": "[학부-교외장학] 2026학년도 2학기 가송",
+   "fetched": false,
+   "schematized": false
+  },
+  {
+   "id": "reg-ssu-gasong",
+   "name": "(재)가송재단 장학생 (숭실대 접수, 2026-2학기)",
+   "target": "장학 ★ 2026학년도 2학기 가송재단 장학",
+   "fetched": false,
+   "schematized": false
   }
  ]
 }
