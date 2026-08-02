@@ -12,11 +12,34 @@ let state = {
   applications: [],       // { id, appliedAt, step, docs?, pending? }
 };
 
+/* 분교를 별개 학교로 나누기 전에 저장된 프로필 고치기 (2026-08-02).
+   예전엔 '한양대학교 + ERICA캠퍼스(안산)'처럼 캠퍼스로 골랐는데 이제 학교 자체가 다르다.
+   그대로 두면 캠퍼스 값이 갈 곳을 잃고 **분교 학생이 본교 학생으로 취급돼** 남의 학교
+   공고를 받게 되므로, 옛 캠퍼스 이름을 새 학교 이름으로 한 번 옮겨 준다. */
+const LEGACY_BRANCH_CAMPUS = {
+  '연세대학교': { '미래캠퍼스(원주)': '연세대학교 미래캠퍼스' },
+  '고려대학교': { '세종캠퍼스': '고려대학교 세종캠퍼스' },
+  '한양대학교': { 'ERICA캠퍼스(안산)': '한양대학교 ERICA캠퍼스' },
+  '건국대학교': { '글로컬캠퍼스(충주)': '건국대학교 글로컬캠퍼스' },
+  '동국대학교': { 'WISE캠퍼스(경주)': '동국대학교 WISE캠퍼스' },
+  '홍익대학교': { '세종캠퍼스': '홍익대학교 세종캠퍼스' },
+  '상명대학교': { '천안캠퍼스': '상명대학교 천안캠퍼스' },
+};
+function migrateBranchCampus(p) {
+  if (!p || !p.school) return p;
+  const moved = (LEGACY_BRANCH_CAMPUS[p.school] || {})[p.campus];
+  if (moved) { p.school = moved; p.campus = null; }
+  // 본교로 남은 학교는 이제 캠퍼스가 하나뿐 — 남아 있던 캠퍼스 값을 지운다
+  else if (LEGACY_BRANCH_CAMPUS[p.school] && !CAMPUSES_BY_SCHOOL[p.school]) p.campus = null;
+  return p;
+}
+
 function loadState() {
   try {
     let raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) for (const k of LEGACY_KEYS) { raw = localStorage.getItem(k); if (raw) break; }
     if (raw) state = Object.assign(state, JSON.parse(raw));
+    if (state.profile) migrateBranchCampus(state.profile);
   } catch (e) { /* 손상된 데이터는 무시 */ }
 }
 function saveState() {
@@ -877,8 +900,13 @@ function liveNoticesHtml() {
     .concat(NATIONAL_SCHOLARSHIPS.filter((s) => s.sourceKind === 'official' && s.sourceUrl).map((s) => s.sourceUrl))
     .filter(Boolean);
   const isRegistered = (url) => regUrls.some((u) => url.startsWith(u) || u.startsWith(url));
+  /* 분교는 본교와 별개 학교지만 게시판을 함께 쓰는 곳이 있다(한양·건국·홍익).
+     그런 공고는 캠퍼스 표시가 없으므로 '캠퍼스 구분이 없는 본교 공고'만 분교 학생에게도 보여 준다.
+     본교 캠퍼스가 찍힌 공고(연세 신촌·고려 안암·동국 서울)는 본교 것이라 넘어오지 않는다. */
+  const parentSchool = BRANCH_OF[p.school];
+  const mySchool = (n) => n.school === p.school || (parentSchool && n.school === parentSchool && !n.campus);
   const forMe = (liveNotices.items || []).filter((n) =>
-    n.school === p.school && (!n.campus || !p.campus || n.campus === p.campus) && !isRegistered(n.url)
+    mySchool(n) && (!n.campus || !p.campus || n.campus === p.campus) && !isRegistered(n.url)
   );
   /* 학자금 대출·융자는 장학금이 아니라서 매칭 카드로는 만들지 않는다(정직 원칙).
      그렇다고 피드에서까지 밀려 잘리면 학생이 대출 정보를 아예 볼 곳이 없어지므로,

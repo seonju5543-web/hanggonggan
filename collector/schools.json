@@ -9,25 +9,25 @@
   },
   {
    "school": "연세대학교",
-   "campus": "신촌캠퍼스",
+   "campus": "",
    "boardUrl": "https://www.yonsei.ac.kr/bbs/sc/58/artclList.do?findClSeq=257",
    "note": "개발자 제공(2026-07-30). subview.do의 enc 파라미터를 해독한 실제 게시판 주소 — 외대와 같은 artclList.do 계열"
   },
   {
-   "school": "연세대학교",
-   "campus": "미래캠퍼스(원주)",
+   "school": "연세대학교 미래캠퍼스",
+   "campus": "",
    "boardUrl": null,
    "note": "자동 탐색 실패(봇 차단·동적 페이지 추정) — 개발자가 장학공지 주소 제공 필요"
   },
   {
    "school": "고려대학교",
-   "campus": "서울캠퍼스(안암)",
+   "campus": "",
    "boardUrl": null,
    "note": "개발자가 준 장학금공지 주소(korea.ac.kr/ko/568/subview.do)는 목록 행이 href=\"#1\" + jf_view() 클릭 스크립트라 일반 fetch로는 링크가 하나도 안 나온다(2026-08-02 확인 — 옛 주소 scholarship.korea.ac.kr도 안내 홈페이지라 0건이었다). 동국대·경희대와 같은 클릭형이라 browser-targets.json으로 옮겼다"
   },
   {
-   "school": "고려대학교",
-   "campus": "세종캠퍼스",
+   "school": "고려대학교 세종캠퍼스",
+   "campus": "",
    "boardUrl": null,
    "note": "자동 탐색 실패(봇 차단·동적 페이지 추정) — 개발자가 장학공지 주소 제공 필요"
   },
@@ -44,7 +44,7 @@
   },
   {
    "school": "한양대학교",
-   "campus": "공통",
+   "campus": "",
    "boardUrl": "https://www.hanyang.ac.kr/notice_all?p_p_id=kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_action=view&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_sCategoryId=224311300",
    "note": "개발자 제공(2026-08-02) — 전체공지의 '장학' 분류 필터. 서울·ERICA 공고가 [서울]/[ERICA] 표시로 함께 올라와 캠퍼스를 공통으로 합쳤다(같은 주소를 두 줄에 넣으면 seen 장부를 공유해 뒤쪽 캠퍼스가 0건이 된다). 검증: 장학 링크 20건·상세형 18건"
   },
@@ -72,24 +72,24 @@
   },
   {
    "school": "건국대학교",
-   "campus": "공통",
+   "campus": "",
    "boardUrl": "https://www.konkuk.ac.kr/konkuk/2239/subview.do",
    "note": "개발자 제공(2026-08-02) — 옛 주소 2096은 'NEWS' 페이지라 장학 공고가 0건이었다. 2239가 진짜 장학 게시판. 서울·글로컬 공고가 함께 올라와 캠퍼스 공통으로 합침. 검증: 장학 링크 36건·상세형 33건(artclView.do)"
   },
   {
    "school": "동국대학교",
-   "campus": "서울캠퍼스",
+   "campus": "",
    "boardUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/list"
   },
   {
-   "school": "동국대학교",
-   "campus": "WISE캠퍼스(경주)",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
    "boardUrl": null,
    "note": "자동 탐색 실패(봇 차단·동적 페이지 추정) — 개발자가 장학공지 주소 제공 필요"
   },
   {
    "school": "홍익대학교",
-   "campus": "공통",
+   "campus": "",
    "boardUrl": "https://www.hongik.ac.kr/kr/newscenter/notice.do"
   },
   {
@@ -111,7 +111,7 @@
   },
   {
    "school": "상명대학교",
-   "campus": "서울캠퍼스",
+   "campus": "",
    "boardUrl": "https://www.smu.ac.kr/kor/life/notice.do"
   },
   {

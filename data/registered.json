@@ -725,8 +725,7 @@
    "summary": "부모가 국내에서 근로 중인 외국인인 학생의 등록금을 지원하는 산학협동재단 사업의 동국대 게시분입니다. 신청서 양식(재단 공통)을 앱에서 원본과 동일한 구조로 작성할 수 있어요.",
    "eligibility": {
     "selective": true,
-    "schoolOnly": "동국대학교",
-    "campusOnly": "서울캠퍼스"
+    "schoolOnly": "동국대학교"
    },
    "documents": [
     "장학금 신청서 서식Ⅰ + 자기소개서 서식Ⅱ (앱에서 실제 양식 작성)",
@@ -752,8 +751,7 @@
    "summary": "학업·활동 우수 학생 대상 동국대 대표 교내장학입니다. 학과·기준별 선발돼요.",
    "eligibility": {
     "selective": true,
-    "schoolOnly": "동국대학교",
-    "campusOnly": "서울캠퍼스"
+    "schoolOnly": "동국대학교"
    },
    "documents": [
     "학교 포털(uDRIMS) 온라인 신청 — 제출 서류는 원문 확인"
@@ -784,8 +782,7 @@
    "summary": "2026-2학기 교내장학 통합 신청 안내입니다. 유형별 세부 요건은 원문에서 확인하세요.",
    "eligibility": {
     "selective": true,
-    "schoolOnly": "동국대학교",
-    "campusOnly": "서울캠퍼스"
+    "schoolOnly": "동국대학교"
    },
    "documents": [
     "학교 포털(uDRIMS) 온라인 신청 — 제출 서류는 원문 확인"
@@ -811,8 +808,7 @@
    "summary": "불교 종단 추천을 받는 학생을 위한 교내장학입니다.",
    "eligibility": {
     "selective": true,
-    "schoolOnly": "동국대학교",
-    "campusOnly": "서울캠퍼스"
+    "schoolOnly": "동국대학교"
    },
    "documents": [
     "학교 포털(uDRIMS) 온라인 신청 — 제출 서류는 원문 확인"
@@ -843,8 +839,7 @@
    "summary": "전문자격시험 합격자 등을 지원하는 교내장학입니다.",
    "eligibility": {
     "selective": true,
-    "schoolOnly": "동국대학교",
-    "campusOnly": "서울캠퍼스"
+    "schoolOnly": "동국대학교"
    },
    "documents": [
     "학교 포털(uDRIMS) 온라인 신청 — 제출 서류는 원문 확인"
@@ -876,8 +871,7 @@
    "eligibility": {
     "selective": true,
     "maxBracket": 6,
-    "schoolOnly": "동국대학교",
-    "campusOnly": "서울캠퍼스"
+    "schoolOnly": "동국대학교"
    },
    "documents": [
     "학교 포털(uDRIMS) 온라인 신청 — 제출 서류는 원문 확인"
@@ -911,8 +905,7 @@
     "flagsAny": [
      "basicLiving"
     ],
-    "schoolOnly": "동국대학교",
-    "campusOnly": "서울캠퍼스"
+    "schoolOnly": "동국대학교"
    },
    "documents": [
     "학교 포털(uDRIMS) 온라인 신청 — 제출 서류는 원문 확인"
@@ -942,8 +935,7 @@
    "summary": "면학 복지장학 지급 안내입니다.",
    "eligibility": {
     "selective": true,
-    "schoolOnly": "동국대학교",
-    "campusOnly": "서울캠퍼스"
+    "schoolOnly": "동국대학교"
    },
    "documents": [
     "학교 포털(uDRIMS) 온라인 신청 — 제출 서류는 원문 확인"
@@ -976,8 +968,7 @@
     "flagsAny": [
      "disabled"
     ],
-    "schoolOnly": "동국대학교",
-    "campusOnly": "서울캠퍼스"
+    "schoolOnly": "동국대학교"
    },
    "documents": [
     "학교 포털(uDRIMS) 온라인 신청 — 제출 서류는 원문 확인"
@@ -1010,8 +1001,7 @@
     "flagsAny": [
      "merit"
     ],
-    "schoolOnly": "동국대학교",
-    "campusOnly": "서울캠퍼스"
+    "schoolOnly": "동국대학교"
    },
    "documents": [
     "학교 포털(uDRIMS) 온라인 신청 — 제출 서류는 원문 확인"
@@ -1043,8 +1033,7 @@
    "summary": "새터민 및 새터민 자녀를 위한 교육보호장학입니다.",
    "eligibility": {
     "selective": true,
-    "schoolOnly": "동국대학교",
-    "campusOnly": "서울캠퍼스"
+    "schoolOnly": "동국대학교"
    },
    "documents": [
     "학교 포털(uDRIMS) 온라인 신청 — 제출 서류는 원문 확인"
@@ -2305,8 +2294,7 @@
    "summary": "동국대학교 게시판에 게시된 수집된 실공고예요. 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true,
-    "schoolOnly": "동국대학교",
-    "campusOnly": "서울캠퍼스"
+    "schoolOnly": "동국대학교"
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -2361,8 +2349,7 @@
    "summary": "동국대학교 게시판에 게시된 수집된 실공고예요. 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true,
-    "schoolOnly": "동국대학교",
-    "campusOnly": "서울캠퍼스"
+    "schoolOnly": "동국대학교"
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -3099,8 +3086,7 @@
    "summary": "연세대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true,
-    "schoolOnly": "연세대학교",
-    "campusOnly": "신촌캠퍼스"
+    "schoolOnly": "연세대학교"
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -3131,8 +3117,7 @@
    "summary": "연세대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true,
-    "schoolOnly": "연세대학교",
-    "campusOnly": "신촌캠퍼스"
+    "schoolOnly": "연세대학교"
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -3187,8 +3172,7 @@
    "summary": "동국대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true,
-    "schoolOnly": "동국대학교",
-    "campusOnly": "서울캠퍼스"
+    "schoolOnly": "동국대학교"
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -3213,8 +3197,7 @@
    "summary": "동국대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true,
-    "schoolOnly": "동국대학교",
-    "campusOnly": "서울캠퍼스"
+    "schoolOnly": "동국대학교"
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -3563,8 +3546,7 @@
    "summary": "고려대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true,
-    "schoolOnly": "고려대학교",
-    "campusOnly": "서울캠퍼스(안암)"
+    "schoolOnly": "고려대학교"
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
