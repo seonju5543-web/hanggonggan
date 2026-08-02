@@ -1026,3 +1026,13 @@ textarea:focus {
 .nf-push-title { font-size: 14.5px; font-weight: 700; letter-spacing: -0.015em; }
 .nf-push .nf-desc { display: block; margin-top: 5px; }
 .nf-push .wallet-btn[disabled] { opacity: 0.45; cursor: default; }
+
+/* 공고 원문에서 그대로 옮긴 자격 문장 — 앱이 판정한 게 아니라 원문이라는 걸 보이게 (2026-08-02) */
+.r-quote {
+  color: var(--text-sub);
+  font-size: 13px;
+  line-height: 1.55;
+  padding-left: 18px;
+  border-left: 2px solid var(--line);
+  margin: 4px 0 4px 6px;
+}

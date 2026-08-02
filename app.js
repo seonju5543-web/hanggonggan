@@ -1077,6 +1077,17 @@ function openDetail(id) {
   const canApply = ['eligible', 'selective'].includes(result.status) && (!app || app.pending) && d.days >= 0;
   const ch = officialChannel(sch);
 
+  /* 공고 원문에 적힌 자격 문장을 **그대로** 덧붙인다 (2026-08-02 개발자 지시).
+     소득·학년 같은 구조화된 조건이 일부 있어도 그게 요건의 전부가 아니다 — 5·18희망장학생의
+     '민주화운동·국가폭력 피해자 유자녀' 같은 항목은 기계 조건으로 잡히지 않는다.
+     그래서 조건 유무와 상관없이 **항상** 보여 준다. 추론이 아니라 원문 발췌라 원칙 8-1을 지킨다. */
+  const QUALIFY_RE = /(신청\s?자격|지원\s?자격|응모\s?자격|자격\s?요건|지원\s?대상|신청\s?대상|모집\s?대상|선발\s?대상|추천\s?대상)/;
+  const qLines = (sch.excerpts || []).filter((e) => QUALIFY_RE.test(e));
+  const qualifyRows = qLines.length
+    ? `<li class="r-unk">? 공고 원문에 적힌 자격 — 해당되는지 직접 확인하세요</li>`
+      + qLines.map((e) => `<li class="r-quote">“${esc(e)}”</li>`).join('')
+    : '';
+
   let reasonRows = result.reasons.map((r) => {
     const bad = /필요|아니에요|가능$/.test(r) && !/충족|확인/.test(r);
     return `<li class="${bad ? 'r-bad' : 'r-ok'}">${bad ? '✕' : '✓'} ${r}</li>`;
@@ -1087,6 +1098,9 @@ function openDetail(id) {
        (2026-08-02 개발자 지적). 실제로 5·18희망장학생은 원문에 '민주화운동·국가폭력 피해자
        유자녀' 같은 요건이 있는데 앱이 '제한 없음'이라고 말하고 있었다 — 원칙 8-1(추론 금지) 위반.
        원문에서 '제한 없음'을 확인한 공고만 eligibilityVerified로 표시하고, 나머지는 모른다고 말한다. */
+    /* 구조화된 조건이 없어도, 공고 원문에 자격 문장이 있으면 **그대로** 보여 준다
+       (2026-08-02 개발자 지시). 앱이 판정하지는 못해도 학생이 진짜 요건을 읽을 수는 있어야 한다.
+       추론이 아니라 원문 발췌라 원칙 8-1을 지킨다. */
     reasonRows = sch.eligibilityVerified
       ? `<li class="r-ok">✓ 별도 자격 제한이 없는 공고예요${result.status === 'selective' ? ' — 지원자 중 선발 심사로 결정돼요' : ''}</li>`
       : `<li class="r-unk">? 지원 자격은 <strong>공고 원문에서 확인</strong>하세요 — 앱이 아직 요건을 읽지 못했어요${result.status === 'selective' ? ' (지원자 중 선발 심사로 결정돼요)' : ''}</li>`;
@@ -1114,7 +1128,7 @@ function openDetail(id) {
       <p class="sheet-summary">${esc(sch.summary)}</p>
 
       <h4>자격 진단</h4>
-      <ul class="reason-list">${reasonRows}${missingRows || ''}</ul>
+      <ul class="reason-list">${reasonRows}${missingRows || ''}${qualifyRows}</ul>
 
       <h4>제출 서류</h4>
       <ul class="doc-list">

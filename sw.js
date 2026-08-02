@@ -10,7 +10,7 @@
    같은 번호로 올리는 일이 반복된다. v15도 v16도 양쪽이 따로 올려 '내용이 다른 같은 버전'이
    됐다. 합칠 때는 **둘 다보다 큰 번호로** 올려야 설치된 앱의 옛 캐시가 확실히 청소된다.
    v17 = 알림·진짜 푸시(선주) + 원문 링크 정직 표기(Josehyeon)를 합친 판. */
-const CACHE = 'handaejang-v34';
+const CACHE = 'handaejang-v35';
 const ASSETS = ['.', 'index.html', 'style.css', 'app.js', 'data.js', 'forms.js',
   'match-engine.js', 'notify-rules.js', 'notify.js', 'push-config.js',
   'manifest.json', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png'];
