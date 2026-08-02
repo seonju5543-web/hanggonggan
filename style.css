@@ -305,6 +305,11 @@ input::placeholder { color: var(--text-weak); }
   margin-bottom: 20px;
 }
 .home-id { display: flex; align-items: center; gap: 12px; }
+
+/* 눌러서 넘어가는 영역 — 눌리는 것처럼 보여야 누른다 */
+.tappable { cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform 0.12s, opacity 0.12s; }
+.tappable:active { transform: scale(0.985); opacity: 0.9; }
+.tappable:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; border-radius: 14px; }
 .avatar {
   width: 44px; height: 44px;
   border-radius: 50%;
@@ -534,7 +539,8 @@ input::placeholder { color: var(--text-weak); }
   box-shadow: var(--shadow);
   margin-bottom: 16px;
 }
-.my-name { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; }
+.my-name { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.my-edit-hint { font-size: 13px; font-weight: 700; color: var(--primary); white-space: nowrap; }
 .my-line { font-size: 14px; color: var(--text-sub); margin: 4px 0 18px; }
 .my-grid {
   display: grid;
