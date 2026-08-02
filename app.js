@@ -1189,6 +1189,37 @@ function openDetail(id) {
   });
 }
 
+/* 바텀시트를 아래로 쓸어내려 닫기 — 두 시트(#detail-sheet·#notify-sheet)가 같은 규칙을 쓴다.
+   시트가 맨 위에 있을 때 아래로 끄는 동작만 '닫기'로 본다. 그래야 안쪽 내용 스크롤을 뺏지 않는다
+   (학교 목록에서 손가락이 닿는 순간 선택돼 버리던 것과 같은 계열의 실수를 막는 조건). */
+function enableSheetSwipe(sheet, close) {
+  let startY = 0, dy = 0, dragging = false;
+  sheet.addEventListener('touchstart', (e) => {
+    if (e.touches.length !== 1) return;
+    startY = e.touches[0].clientY;
+    dy = 0;
+    dragging = sheet.scrollTop <= 0;
+  }, { passive: true });
+
+  sheet.addEventListener('touchmove', (e) => {
+    if (!dragging) return;
+    dy = e.touches[0].clientY - startY;
+    if (dy <= 0) { dragging = false; sheet.style.transition = ''; sheet.style.transform = ''; return; }
+    e.preventDefault();
+    sheet.style.transition = 'none';
+    sheet.style.transform = `translate(-50%, ${dy}px)`;
+  }, { passive: false });
+
+  sheet.addEventListener('touchend', () => {
+    if (!dragging) return;
+    dragging = false;
+    sheet.style.transition = '';
+    void sheet.offsetHeight;          // transition을 되살린 뒤에 transform을 바꿔야 튀지 않는다
+    sheet.style.transform = '';
+    if (dy > 90) close();
+  }, { passive: true });
+}
+
 function closeSheet() {
   docPrep = null;
   $('#sheet-backdrop').classList.remove('show');
@@ -1353,6 +1384,7 @@ function bindEvents() {
   $('#notify-sheet').addEventListener('click', (e) => {
     if (e.target.classList.contains('sheet-handle')) closeNotifyPanel();
   });
+  enableSheetSwipe($('#notify-sheet'), closeNotifyPanel);
 
   $$('.chip-group').forEach((group) =>
     group.addEventListener('click', (e) => {
@@ -1398,6 +1430,7 @@ function bindEvents() {
   $('#detail-sheet').addEventListener('click', (e) => {
     if (e.target.classList.contains('sheet-handle')) closeSheet();
   });
+  enableSheetSwipe($('#detail-sheet'), closeSheet);
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     if (!$('#notify-sheet').hidden) closeNotifyPanel();

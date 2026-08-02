@@ -627,6 +627,7 @@ input::placeholder { color: var(--text-weak); }
   border-radius: 26px 26px 0 0;
   z-index: 100;
   overflow-y: auto;
+  overscroll-behavior: contain;      /* 시트 끝에서 뒤 화면까지 같이 끌려가지 않게 */
   transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
   box-shadow: 0 -18px 50px rgba(10, 14, 24, 0.28);
 }
