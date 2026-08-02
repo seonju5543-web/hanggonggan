@@ -209,6 +209,54 @@
    "campus": "",
    "boardUrl": "https://home.knu.ac.kr/HOME/knussw/index.htm",
    "note": "개발자 제공 주소(ssw.knu.ac.kr)의 frameset 안쪽 진짜 주소(2026-08-02). 겉주소는 막힌 게 아니라 옛날 <frameset>이라 학생 브라우저에서는 정상으로 보인다 — 다만 프레임을 따라 들어가지 않는 수집 로봇에는 905바이트 껍데기만 잡힌다. 그래서 로봇용으로 안쪽 주소를 쓴다. 검증: 장학 링크 17건. 상세는 ./sub.htm?mode=view&mv_data=<base64> 형태라 상세형 판정이 4건으로 낮게 잡히니 첫 수집 리포트에서 실제 건수를 확인할 것"
+  },
+  {
+   "school": "영남대학교",
+   "campus": "",
+   "boardUrl": "https://www.yu.ac.kr/scholar/notice/notice.do",
+   "note": "개발자 제공(2026-08-02). 검증: 실공고 15건"
+  },
+  {
+   "school": "전북대학교",
+   "campus": "",
+   "boardUrl": "https://www.jbnu.ac.kr/web/news/notice/sub01.do?category=6",
+   "note": "개발자 제공(2026-08-02). 검증: 실공고 1건뿐 — 대부분 메뉴라 전용 장학공지 주소가 따로 있을 가능성. 더 나은 주소가 있으면 교체"
+  },
+  {
+   "school": "충남대학교",
+   "campus": "",
+   "boardUrl": "https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713",
+   "note": "개발자 제공(2026-08-02). 검증: 실공고 10건"
+  },
+  {
+   "school": "전남대학교",
+   "campus": "",
+   "boardUrl": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&cate=8",
+   "note": "개발자 제공(2026-08-02). 검증: 실공고 18건"
+  },
+  {
+   "school": "조선대학교",
+   "campus": "",
+   "boardUrl": "https://www3.chosun.ac.kr/bbs/scho/332/artclList.do?bbsClSeq=365",
+   "note": "개발자가 준 주소는 subview.do?enc=... 겉포장이라 base64를 풀어 진짜 게시판 경로를 등록했다(연세대 선례). 검증: 실공고 5건"
+  },
+  {
+   "school": "충북대학교",
+   "campus": "",
+   "boardUrl": "https://www.cbnu.ac.kr/www/selectBbsNttList.do?bbsNo=8&key=815&searchCtgry=%ED%95%99%EC%82%AC/%EC%9E%A5%ED%95%99",
+   "note": "개발자 제공(2026-08-02). 검증: 실공고 0건 — 목록을 자바스크립트가 그리는 것으로 보인다. 브라우저 로봇 후보"
+  },
+  {
+   "school": "부경대학교",
+   "campus": "",
+   "boardUrl": "https://nano.pknu.ac.kr/nano/2432",
+   "note": "개발자 제공(2026-08-02). 검증: 실공고 17건"
+  },
+  {
+   "school": "강원대학교",
+   "campus": "",
+   "boardUrl": "https://kangwon.ac.kr/ko/bbs/750/list.do",
+   "note": "개발자 제공(2026-08-02). 제목에 구글 아이콘 글자(check_circle)가 섞여 와 cleanTitle에서 제거하도록 보강했다"
   }
  ]
 }

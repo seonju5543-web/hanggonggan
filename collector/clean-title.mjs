@@ -58,6 +58,10 @@ export function cleanTitle(t) {
     .replace(/\s*작성일\s*20\d{2}\.[\s\S]*$/, '')
     .replace(/\s*기간\s*20\d{2}\.[\s\S]*$/, '')
     .replace(/신규게시글|Attachment|새글/g, '')
+    // 구글 머티리얼 아이콘은 글자(check_circle·open_in_new…)로 그려져 제목에 딸려 온다.
+    // 강원대에서 '맞춤장학 조회 check_circle'처럼 들어와 메뉴가 공고로 새던 것을 막는다 (2026-08-02).
+    // 한글 공고 제목에 snake_case 영문이 들어갈 일은 없으므로 통째로 뗀다.
+    .replace(/\b[a-z]{2,}(?:_[a-z]{2,})+\b/g, '')
     .replace(/\s+(장학|학사|일반|공지)\s*$/, '')         // 잘라낸 뒤 홀로 남는 분류 꼬리표
     .replace(/\s+/g, ' ').trim();
 }
