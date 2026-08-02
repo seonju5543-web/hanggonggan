@@ -273,5 +273,40 @@ function undeclaredNames(src) {
     badBackoff('try { a(); } catch (e) {\n  await page.waitForTimeout(3000);\n}'), ['catch']);
 }
 
+/* 로봇이 쓰는 파일은 워크플로 저장 단계의 git add 목록에 반드시 있어야 한다.
+   이 유형이 두 번 터졌다 — 2026-08-01 data/forms.json(이슈 #79), 2026-08-02 collector/health.json.
+   빠뜨리면 ① 그 파일 변경이 저장되지 않고 ② 추적 중인 파일이 스테이지 안 된 채 남아
+   재시도의 git pull --rebase가 "unstaged changes"로 죽어 **실행 전체가 날아간다**(24분 수집 유실). */
+{
+  const pairs = [
+    ['collector/collect.mjs', '.github/workflows/collect-scholarships.yml'],
+    ['collector/browser-collect.mjs', '.github/workflows/browser-collect.yml'],
+  ];
+  const root = new URL('../', import.meta.url);
+  for (const [robot, flow] of pairs) {
+    const src = fs.readFileSync(new URL(robot, root), 'utf8');
+    const yml = fs.readFileSync(new URL(flow, root), 'utf8');
+    // writeFileSync(new URL('X', HERE) …) 와 writeFileSync('X' …) 에서 파일 이름을 뽑는다
+    const written = [...src.matchAll(/writeFileSync\(\s*(?:new URL\(\s*)?['"]([\w./-]+\.(?:json|md))['"]/g)]
+      .map((m) => m[1].split('/').pop());
+    const missing = [...new Set(written)].filter((f) => !yml.includes(f));
+    // report.md류(추적 안 하는 산출물)는 저장 목록에 없어도 되지만, .json 장부는 반드시 있어야 한다
+    const missingLedgers = missing.filter((f) => f.endsWith('.json'));
+    eq(`${robot.split('/').pop()}가 쓰는 장부가 저장 목록에 다 있다`, missingLedgers, []);
+  }
+}
+
+/* 저장 재시도는 남은 파일이 있어도 죽지 않아야 한다 (위와 같은 사고의 2차 방어) */
+{
+  const root = new URL('../', import.meta.url);
+  for (const f of ['collect-scholarships', 'browser-collect', 'deep-fetch', 'resolve-detail-urls', 'link-hunter']) {
+    // 주석은 걷어내고 본다 — '이렇게 쓰지 말라'고 적어 둔 설명 자체를 잡는다(두 번째 겪음)
+    const yml = fs.readFileSync(new URL(`.github/workflows/${f}.yml`, root), 'utf8')
+      .split('\n').filter((l) => !/^\s*#/.test(l)).join('\n');
+    const plain = (yml.match(/git pull --rebase(?! --autostash)/g) || []).length;
+    eq(`${f}: 맨몸 git pull --rebase 없음(--autostash 필수)`, plain, 0);
+  }
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);

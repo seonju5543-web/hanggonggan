@@ -49,7 +49,9 @@ jobs:
             # 다른 로봇이 먼저 push했을 수 있음 — 받아서 얹은 뒤 재시도
             for i in 1 2 3; do
               if git push; then pushed=1; break; fi
-              git pull --rebase origin "${GITHUB_REF_NAME}"
+              # --autostash: 저장 목록에 안 든 파일이 남아 있어도 재시도가 죽지 않게 (2026-08-02).
+              # 이게 없으면 "cannot pull with rebase: You have unstaged changes"로 실행 전체가 날아간다.
+              git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
             done
             # 3번 다 실패하면 조용히 넘어가지 않는다 (양식 원본은 다음 수집 때 갈아엎히므로 유실됨)
             if [ "$pushed" != "1" ]; then
