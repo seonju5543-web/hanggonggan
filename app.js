@@ -95,6 +95,10 @@ function deadlineTs(sch) {
   return sch.deadline ? new Date(sch.deadline).getTime() : Infinity; // 기한 미확정은 뒤로 정렬
 }
 
+/* 마감된 공고를 목록에 며칠 더 남겨 둘지 (2026-08-02 개발자 지시로 30 → 7).
+   0으로 두면 마감 당일 사라져 '내가 신청한 그 공고'를 못 찾으므로 짧게 남긴다. */
+const CLOSED_KEEP_DAYS = 7;
+
 function dday(dateStr) {
   if (!dateStr) return { label: '기한 원문 확인', cls: '', days: 14 }; // 마감을 확정 못 한 공고 — 목록에 유지
   // 날짜끼리 비교해야 마감 다음 날 새벽에 D-DAY로 잘못 뜨지 않는다 (마감 당일=D-DAY, 지난 날=마감)
@@ -553,8 +557,12 @@ function renderHome() {
   $('#home-avatar').textContent = (p.name || '학').charAt(0);
 
   const matches = getMatches();
-  const applyable = matches.filter((m) => ['eligible', 'selective'].includes(m.result.status));
-  const notApplied = applyable.filter((m) => !state.applications.some((a) => a.id === m.sch.id) && dday(m.sch.deadline).days >= 0 && notStale(m.sch));
+  /* '지금 받을 수 있는' 이라고 말하려면 **정말 지금 신청할 수 있어야** 한다 (2026-08-02 개발자 지적).
+     예전엔 자격 판정만 보고 마감을 안 봐서, 히어로의 금액 합계와 '바로 신청 n건'에
+     **이미 마감된 공고가 섞여** 실제보다 부풀려져 있었다. */
+  const applyable = matches.filter((m) =>
+    ['eligible', 'selective'].includes(m.result.status) && dday(m.sch.deadline).days >= 0 && notStale(m.sch));
+  const notApplied = applyable.filter((m) => !state.applications.some((a) => a.id === m.sch.id));
   const total = applyable.reduce((sum, m) => sum + (m.sch.amountValue || 0), 0);
   const unknownAmt = applyable.filter((m) => !m.sch.amountValue).length;
 
@@ -591,10 +599,15 @@ function renderExplore() {
     deadlineTs(a.sch) - deadlineTs(b.sch)
   );
 
-  list = list.filter((m) => dday(m.sch.deadline).days >= -30); // 마감 30일 경과 시 자동 숨김
+  list = list.filter((m) => dday(m.sch.deadline).days >= -CLOSED_KEEP_DAYS); // 마감 1주일 경과 시 자동 숨김
   list = list.filter((m) => notStale(m.sch)); // 마감을 확정 못 한 공고는 등록 후 60일까지만 노출
   if (exploreFilter === '교내' || exploreFilter === '교외') list = list.filter((m) => m.sch.type === exploreFilter);
-  if (exploreFilter === 'eligible') list = list.filter((m) => ['eligible', 'selective'].includes(m.result.status));
+  /* '신청 가능만'은 **정말 지금 신청할 수 있는 것**만 보여야 한다 (2026-08-02 개발자 지적).
+     예전엔 자격 판정(status)만 보고 마감을 안 봐서, 자격이 맞으면 **이미 마감된 공고도** 떴다.
+     상시 제도(마감일 없음)는 dday가 days:14를 주므로 그대로 남는다 — 실제로 상시 신청 가능하다. */
+  if (exploreFilter === 'eligible') {
+    list = list.filter((m) => ['eligible', 'selective'].includes(m.result.status) && dday(m.sch.deadline).days >= 0);
+  }
 
   $('#live-notices').innerHTML = exploreFilter === 'all' ? liveNoticesHtml() : '';
   $('#explore-list').innerHTML = list.length
