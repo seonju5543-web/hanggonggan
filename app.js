@@ -1303,7 +1303,7 @@ function renderMy() {
   const trackLabel = (TRACKS.find((t) => t.id === p.track) || {}).label || '-';
   const commonFilled = ['studentId', 'birth', 'phone', 'email', 'account'].filter((k) => c[k]).length;
   $('#my-profile').innerHTML = `
-    <p class="my-name">${p.name || '대학생'} 님</p>
+    <p class="my-name">${p.name || '대학생'} 님<span class="my-edit-hint">수정하기 ›</span></p>
     <p class="my-line">${p.school || '대학 미설정'} · ${trackLabel}${p.major ? ' · ' + p.major : ''}</p>
     <div class="my-grid">
       <div><span>학년</span><strong>${p.year}학년 (${{ enrolled: '재학', freshman: '신입', returning: '복학' }[p.status]})</strong></div>
@@ -1464,6 +1464,21 @@ function bindEvents() {
   const editProfile = () => { initOnboarding(); showScreen('onboarding'); };
   $('#btn-edit-profile').addEventListener('click', editProfile);
   $('#btn-my-edit').addEventListener('click', editProfile);
+
+  /* 눌러서 넘어가는 영역 — 마우스·손가락뿐 아니라 키보드로도 되어야 한다
+     (div라 버튼과 달리 Enter·스페이스가 저절로 먹지 않는다) */
+  const onTap = (sel, run) => {
+    const el = $(sel);
+    if (!el) return;
+    el.addEventListener('click', run);
+    el.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();          // 스페이스로 화면이 스크롤되지 않게
+      run();
+    });
+  };
+  onTap('#btn-home-profile', () => showScreen('my'));   // 홈 왼쪽 위 프로필 → MY
+  onTap('#my-profile', editProfile);                     // MY 맨 위 카드 → 프로필 수정
 
   $('#btn-reset').addEventListener('click', () => {
     if (!confirm('프로필과 신청 내역을 모두 삭제할까요?')) return;
