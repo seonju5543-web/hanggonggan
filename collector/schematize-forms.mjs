@@ -270,15 +270,31 @@ if (!cfg.enabled) { log('schematize-config.json enabled:false — 건너뜁니�
 
 let queue;
 try { queue = JSON.parse(fs.readFileSync(queuePath, 'utf8')); } catch { log('대기 큐 없음'); process.exit(0); }
+
+/* 원본을 여러 번 시도해도 못 받은 공고를 리포트에 올린다 (2026-08-02 추가).
+   여기서 알리지 않으면 감사는 경고만 남기고(실패가 아니라 메일도 안 온다) 그 공고는
+   앱에서 영영 '양식 없음' 상태로 남는다 — 학생 눈엔 그냥 기능이 빠진 것처럼 보인다.
+   3회는 '일시 장애'와 '주소가 바뀌었거나 로그인이 필요한 첨부'를 가르는 선(학교 연속 실패 감지와 같은 기준). */
+const STALL_AT = 3;
+const stalled = (queue.items || []).filter((q) => !q.fetched && (q.tries || 0) >= STALL_AT);
+if (stalled.length) {
+  report.push('', `### 🚨 양식 원본을 못 받고 있는 공고 ${stalled.length}건 (${STALL_AT}회 이상 시도)`, '',
+    '자동으로는 더 못 가져옵니다. 첨부 주소가 바뀌었거나 로그인이 필요한 경우예요.',
+    '이 공고들은 앱에서 양식 작성이 안 되고 원본 다운로드 안내만 나갑니다.', '');
+  for (const s of stalled.slice(0, 12)) {
+    report.push(`- ${String(s.name || s.id).slice(0, 50)} — ${s.tries}회 실패 (마지막 시도 ${s.lastTryAt || '기록 없음'})`);
+  }
+}
+
 const pending = (queue.items || []).filter((q) => q.fetched && !q.schematized);
-if (!pending.length) { log('스키마화할 항목 없음'); process.exit(0); }
+if (!pending.length) { log('스키마화할 항목 없음'); finish(); process.exit(0); }
 
 let index = [];
 try {
   index = fs.readFileSync(new URL('forms-index.txt', OUT), 'utf8')
     .split('\n').filter(Boolean)
     .map((line) => { const [file, notice, attachment] = line.split('\t'); return { file, notice, attachment }; });
-} catch { log('원본 색인 없음 — 이번 실행에서 받은 첨부가 없습니다.'); process.exit(0); }
+} catch { log('원본 색인 없음 — 이번 실행에서 받은 첨부가 없습니다.'); finish(); process.exit(0); }
 
 const forms = JSON.parse(fs.readFileSync(formsPath, 'utf8'));
 const registered = JSON.parse(fs.readFileSync(registeredPath, 'utf8'));
