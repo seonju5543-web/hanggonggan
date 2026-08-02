@@ -252,6 +252,34 @@ for (const r of results) {
   }
   lines.push('');
 }
+/* 연속 실패 감시 — 브라우저 수집기에만 있고 여기엔 없었다 (2026-08-02).
+   그래서 일반 수집기 담당 학교(홍익대)가 며칠째 '⚠️ 오류' 한 줄로 조용히 빠져 있어도
+   아무도 몰랐다. 한 번 실패는 학교가 잠깐 느린 것이라 저절로 복구되지만,
+   **연속 실패는 주소가 바뀐 것**이라 사람이 손을 대야 한다 — 그 구분을 여기서도 한다.
+   장부는 브라우저 수집기와 같은 health.json을 쓴다(학교 이름이 열쇠라 섞이지 않는다). */
+const healthPath = new URL('health.json', HERE);
+let health = {};
+try { health = JSON.parse(fs.readFileSync(healthPath, 'utf8')); } catch { /* 첫 실행 */ }
+const chronic = [];
+for (const r of results) {
+  if (/게시판 주소 미설정/.test(r.status)) continue;   // 아직 주소가 없는 곳은 실패가 아니다
+  const h = health[r.name] || { fails: 0, lastOk: null };
+  if (/⚠️/.test(r.status)) {
+    h.fails += 1;
+    if (h.fails >= 3) chronic.push(`${r.name} (${h.fails}회 연속) — ${r.status.replace(/^⚠️\s*/, '')}`);
+  } else {
+    h.fails = 0; h.lastOk = today;
+  }
+  health[r.name] = h;
+}
+fs.writeFileSync(healthPath, JSON.stringify(health, null, 1));
+if (chronic.length) {
+  lines.push('### 🚨 연속 실패 — 게시판 주소 확인 필요');
+  lines.push('한 번은 일시 장애지만 3회 연속이면 주소가 바뀐 것입니다. 해당 학교 학생 화면에 새 공고가 안 들어옵니다.');
+  chronic.forEach((c) => lines.push(`- ${c}`));
+  lines.push('');
+}
+
 lines.push('---');
 lines.push('⚙️ 설정: `collector/schools.json` · 발행: `data/notices.json` · 로봇: `collector/collect.mjs`');
 fs.writeFileSync(new URL('report.md', HERE), lines.join('\n'));
