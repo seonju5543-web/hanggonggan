@@ -3646,6 +3646,99 @@
    "sourceUrl": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=365300&article.offset=0&articleLimit=10",
    "listedAt": "2026-08-02",
    "noForm": "학교 포털에서 신청하는 공고로, 채워 낼 신청서 양식이 첨부돼 있지 않아요."
+  },
+  {
+   "type": "교내",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-08-31",
+   "duplicable": true,
+   "attachments": [],
+   "sourceKind": "official",
+   "id": "reg-sogang-huseng",
+   "name": "후생복지장학금 (서강대, 2026-2학기)",
+   "provider": "서강대학교",
+   "period": "신청기간 2026년 8월 1일(토) ~ 8월 31일",
+   "summary": "SAINT(학사관리 → 등록/장학 → 장학금신청)에서 신청하는 교내 장학금입니다. 별도의 서류 제출 없이 온라인으로 신청합니다.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서강대학교"
+   },
+   "documents": [
+    "별도 제출 서류 없음 (SAINT 온라인 신청)"
+   ],
+   "note": "2026-2학기 다산장학금을 신청한 학생은 후생복지장학금을 따로 신청할 필요가 없어요(중복수혜 불가).",
+   "sourceUrl": "https://www.sogang.ac.kr/ko/detail/550541?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "noForm": "SAINT 포털에서 온라인으로만 신청하고 별도 제출 서류가 없어, 채워 낼 신청서 양식이 없어요.",
+   "listedAt": "2026-08-02"
+  },
+  {
+   "type": "교외",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-08-17",
+   "duplicable": true,
+   "attachments": [
+    {
+     "name": "2026년도 2학기 희망근로지 신청 매뉴얼_홈페이지.pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=365893&attachNo=352075"
+    },
+    {
+     "name": "2026년도 2학기 희망근로지 신청 매뉴얼_모바일앱.pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=365893&attachNo=352076"
+    }
+   ],
+   "sourceKind": "official",
+   "id": "reg-ewha-geunro-1",
+   "name": "국가근로장학금 희망근로지 신청 1차 (이화여대, 2026-2학기)",
+   "provider": "한국장학재단 (이화여대 접수)",
+   "period": "신청기간 2026.08.10 ~ 2026.08.17",
+   "summary": "국가근로장학생으로 선발된 학생이 근로할 기관(희망근로지)을 고르는 1차 신청입니다.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "이화여자대학교"
+   },
+   "documents": [
+    "공고 원문의 희망근로지 신청 매뉴얼 참고"
+   ],
+   "note": "",
+   "sourceUrl": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=365893&article.offset=0&articleLimit=10",
+   "noForm": "학교 포털에서 근로지를 고르는 신청이라, 채워 낼 신청서 양식이 없어요.",
+   "listedAt": "2026-08-02"
+  },
+  {
+   "type": "교외",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-09-09",
+   "duplicable": true,
+   "attachments": [
+    {
+     "name": "2026년 2학기 국가근로장학금 2차 학생신청 매뉴얼(홈페이지).pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=365886&attachNo=352066"
+    },
+    {
+     "name": "2026년 2학기 국가근로장학금 2차 학생신청 매뉴얼(모바일).pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=365886&attachNo=352067"
+    }
+   ],
+   "sourceKind": "official",
+   "id": "reg-ewha-geunro-2",
+   "name": "국가근로장학금 학생 신청 2차 (이화여대, 2026-2학기)",
+   "provider": "한국장학재단 (이화여대 접수)",
+   "period": "신청기간 2026.08.12 ~ 2026.09.09",
+   "summary": "한국장학재단 국가근로장학금 2학기 2차 학생 신청입니다. 한국장학재단 홈페이지에서 신청합니다.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "이화여자대학교"
+   },
+   "documents": [
+    "공고 원문의 학생신청 매뉴얼 참고"
+   ],
+   "note": "",
+   "sourceUrl": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=365886&article.offset=0&articleLimit=10",
+   "noForm": "한국장학재단 전산으로 본인 인증 후 신청하는 제도라, 앱이 채워 낼 신청서 양식이 없어요.",
+   "listedAt": "2026-08-02"
   }
  ]
 }
