@@ -3523,6 +3523,256 @@
    ],
    "sourceUrl": "https://www.konkuk.ac.kr/bbs/konkuk/235/1167943/artclView.do",
    "sourceKind": "auto"
+  },
+  {
+   "id": "auto-wwwkmuackrunimainpagejsp",
+   "name": "[교외]2026년 (재)서구인재육성재단 장학생 선발 안내 및 홍보",
+   "type": "교외",
+   "provider": "계명대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-02",
+   "period": "접수 기간 원문 확인",
+   "summary": "계명대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "계명대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-02 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269475&pageOrder=0&cmd=2&parm_bod_uid=269438&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-wkoreaackrko568subviewdo",
+   "name": "[교외-7/30]2026년 상반기 서울 사랑의열매 사랑나눔장학생 모집 안내(재단지원)",
+   "type": "교외",
+   "provider": "고려대학교 서울캠퍼스(안암) 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-02",
+   "period": "접수 기간 원문 확인",
+   "summary": "고려대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "고려대학교",
+    "campusOnly": "서울캠퍼스(안암)"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-02 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.korea.ac.kr/ko/568/subview.do?nttId=000100000000003798",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-jukr145233626artclviewdo",
+   "name": "[인문] 가송재단 2026년 2학기 장학생 선발",
+   "type": "교외",
+   "provider": "명지대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-02",
+   "period": "접수 기간 원문 확인",
+   "summary": "명지대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "명지대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-02 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "가송재단 장학금 신청 양식.hwp",
+     "url": "https://www.mju.ac.kr/bbs/mjukr/145/178804/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.mju.ac.kr/bbs/mjukr/145/233626/artclView.do",
+   "sourceKind": "auto",
+   "excerpts": [
+    "선발인원: 1명 (명지대학교 인문캠퍼스 기준- 선발된 학생은 추천 대상자로 선정됨)",
+    "장학금액: 학업지원비(생활비) 장학 5,000,000원 (1인 기준) - 타 대외 장학금과는 이중수혜 금지",
+    "제출서류 (2026.07.15.",
+    "제출기한: 20 26.07.24(금)."
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-jukr145233613artclviewdo",
+   "name": "2026년 하반기 월정김용복장학금 장학생 모집 안내",
+   "type": "교내",
+   "provider": "명지대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-02",
+   "period": "접수 기간 원문 확인",
+   "summary": "명지대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "명지대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-02 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.mju.ac.kr/bbs/mjukr/145/233613/artclView.do",
+   "sourceKind": "auto",
+   "excerpts": [
+    "접수방법 : 등기우편 ( 마감일 소인분 유효 )"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-jukr145233439artclviewdo",
+   "name": "[한국고등교육재단] 2026년 제5기 동아시아연구장학생 모집 안내",
+   "type": "교외",
+   "provider": "명지대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-02",
+   "period": "접수 기간 원문 확인",
+   "summary": "명지대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "명지대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-02 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.mju.ac.kr/bbs/mjukr/145/233439/artclView.do",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-skor478122532artclviewdo",
+   "name": "[공통] 2026년 2학기 국가근로장학금 2차 학생 신청기간 안내 N",
+   "type": "교내",
+   "provider": "가천대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-02",
+   "period": "접수 기간 원문 확인",
+   "summary": "가천대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "가천대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-02 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.gachon.ac.kr/bbs/kor/478/122532/artclView.do",
+   "sourceKind": "auto",
+   "excerpts": [
+    "2026년 2학기 국가근로장학금 2차 학생 신청기간 안내",
+    "학생복지처 장학복지팀에서는 2026년 2학기 국가근로장학금 2차 학생 신청기간을 아래와 같이 안내합니다.",
+    "□ 2026년 2학기 국가근로장학금 2차 학생 신청기간 안내",
+    "- 신청방법: 한국장학재단 홈페이지 및 모바일 앱을 이용하여 신청 (붙임1, 2 참조)",
+    "- 2026년 동계방학 집중근로 참여를 희망하는 학생은 반드시 2026년 2학기 국가근로장학금 1, 2차 학생 신청기간에 신청하시기 바랍니다."
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-skor478122193artclviewdo",
+   "name": "[글로벌] 긴급-등록금전액)2026-2학기 (재)봉은재단 장학생 추가선발 안내(화공생명, 바이오나노, 생명과학, 물리,",
+   "type": "교외",
+   "provider": "가천대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-02",
+   "period": "접수 기간 원문 확인",
+   "summary": "가천대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "가천대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-02 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "봉은재단(개인정보 수집.이용.제공 동의서).pdf",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/150967/download.do"
+    },
+    {
+     "name": "봉은재단(동의서).pdf",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/150968/download.do"
+    },
+    {
+     "name": "봉은재단(추천서).hwp",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/150969/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.gachon.ac.kr/bbs/kor/478/122193/artclView.do",
+   "sourceKind": "auto",
+   "excerpts": [
+    "신청기한 : 2026.7.15.(수).12:0 0까지 장학복지팀에 직접 제출"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-larshipdoarticleno372992",
+   "name": "[국가근로] 2026학년도 2학기 한국장학재단 2차 국가근로장학금 신청 안내",
+   "type": "교외",
+   "provider": "아주대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-02",
+   "period": "접수 기간 원문 확인",
+   "summary": "아주대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "아주대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-02 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=372992&article.offset=0&articleLimit=10",
+   "sourceKind": "auto"
   }
  ]
 }

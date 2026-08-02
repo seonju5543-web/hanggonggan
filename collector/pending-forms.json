@@ -87,6 +87,14 @@
    "added": "2026-08-02",
    "fetched": true,
    "schematized": true
+  },
+  {
+   "id": "auto-skor478122193artclviewdo",
+   "name": "[글로벌] 긴급-등록금전액)2026-2학기 (재)봉은재단 장학생 추가선발 안내(화공생명, 바이오나노, 생명과학, 물리,",
+   "target": "긴급-등록금전액)202",
+   "added": "2026-08-02",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }
