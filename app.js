@@ -25,8 +25,14 @@ const LEGACY_BRANCH_CAMPUS = {
   '홍익대학교': { '세종캠퍼스': '홍익대학교 세종캠퍼스' },
   '상명대학교': { '천안캠퍼스': '상명대학교 천안캠퍼스' },
 };
+/* 학교 이름이 바뀌면 저장된 프로필도 함께 옮긴다 — 안 그러면 목록에 없는 이름이 남아
+   그 학생만 매칭이 통째로 비게 된다 (2026-08-02 켄텍 표기 변경). */
+const RENAMED_SCHOOLS = {
+  '한국에너지공과대학교': '한국에너지공과대학교(KENTECH)',
+};
 function migrateBranchCampus(p) {
   if (!p || !p.school) return p;
+  if (RENAMED_SCHOOLS[p.school]) p.school = RENAMED_SCHOOLS[p.school];
   const moved = (LEGACY_BRANCH_CAMPUS[p.school] || {})[p.campus];
   if (moved) { p.school = moved; p.campus = null; }
   // 본교로 남은 학교는 이제 캠퍼스가 하나뿐 — 남아 있던 캠퍼스 값을 지운다
