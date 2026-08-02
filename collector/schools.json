@@ -220,7 +220,7 @@
    "school": "전북대학교",
    "campus": "",
    "boardUrl": "https://www.jbnu.ac.kr/web/news/notice/sub01.do?category=6",
-   "note": "개발자 제공(2026-08-02). 검증: 실공고 1건뿐 — 대부분 메뉴라 전용 장학공지 주소가 따로 있을 가능성. 더 나은 주소가 있으면 교체"
+   "note": "개발자 제공(2026-08-02). 행이 <a href=\"javascript:;\" onclick=\"pf_DetailMove(번호)\"> 클릭형이라 일반 링크 추출로는 0건 — collect.mjs의 BOARD_RULES(onclick)가 처리한다. 상세 주소는 페이지의 pf_DetailMove 함수를 그대로 읽었다(/web/Board/<번호>/detailView.do). 검증: 실공고 12건"
   },
   {
    "school": "충남대학교",
@@ -244,7 +244,7 @@
    "school": "충북대학교",
    "campus": "",
    "boardUrl": "https://www.cbnu.ac.kr/www/selectBbsNttList.do?bbsNo=8&key=815&searchCtgry=%ED%95%99%EC%82%AC/%EC%9E%A5%ED%95%99",
-   "note": "개발자 제공(2026-08-02). 검증: 실공고 0건 — 목록을 자바스크립트가 그리는 것으로 보인다. 브라우저 로봇 후보"
+   "note": "개발자 제공(2026-08-02). 평범한 링크지만 주소에 ;JSESSIONID=…가 붙어 와 접속마다 값이 달라진다 — stripSessionId로 떼어낸다(안 떼면 매일 같은 공고를 새 공고로 다시 담는다). 검증: 실공고 5건"
   },
   {
    "school": "부경대학교",

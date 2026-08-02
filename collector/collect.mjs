@@ -40,7 +40,7 @@ function extractLinks(html, base) {
     let url;
     try { url = new URL(m[1].replace(/&amp;/g, '&'), base).href; } catch { continue; }
     if (!/^https?:/.test(url)) continue;
-    out.push({ title, url });
+    out.push({ title, url: stripSessionId(url) });
   }
   const uniq = new Map();
   out.forEach((i) => { if (!uniq.has(i.url)) uniq.set(i.url, i); });
@@ -125,7 +125,24 @@ const BOARD_RULES = {
     kind: 'dataId',
     detail: (id) => `https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=${id}`,
   },
+  /* 전북대: 행이 <a href="javascript:;" onclick="pf_DetailMove('215647')">.
+     상세 주소는 유추하지 않고 페이지의 함수를 그대로 읽었다 —
+     pf_DetailMove는 action을 '/web/Board/<번호>/detailView.do'로 놓고 폼을 보낸다.
+     실제로 열어 제목이 맞는지 확인했다(200·일치). */
+  '전북대학교': {
+    kind: 'onclick',
+    fn: /pf_DetailMove\(\s*['"](\d+)['"]/,
+    detail: (id) => `https://www.jbnu.ac.kr/web/Board/${id}/detailView.do?category=6`,
+  },
 };
+
+/* 자바 게시판이 주소 경로에 끼워 넣는 세션 값(;JSESSIONID=…)을 뗀다.
+   접속할 때마다 값이 달라서 그대로 두면 **매일 같은 공고를 새 공고로 다시 담고**
+   (이슈 #75와 같은 병), 남의 세션이 박힌 주소를 학생에게 보여 주게 된다.
+   충북대에서 실제로 이 형태가 왔고, 떼고 열어도 정상인 것을 확인했다 (2026-08-02). */
+function stripSessionId(u) {
+  return String(u || '').replace(/;jsessionid=[^?#/]*/i, '');
+}
 
 async function rowsByRule(rule, boardUrl) {
   if (rule.kind === 'json') {
@@ -149,10 +166,19 @@ async function rowsByRule(rule, boardUrl) {
       url: rule.detail(x.pkId ?? x.id ?? x.seq),
     })).filter((x) => x.title && !/undefined|null/.test(x.url));
   }
-  // dataId — 목록 HTML에서 번호와 제목을 짝지어 뽑는다
   const r = await fetchBoard(boardUrl);
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   const html = await r.text();
+  if (rule.kind === 'onclick') {
+    // 행 전체를 잡아 클릭 스크립트의 글 번호와 제목을 짝짓는다
+    // 따옴표 종류를 역참조로 맞춘다 — onclick="pf_DetailMove('215647')"처럼
+    // 큰따옴표 안에 작은따옴표가 들어 있어 [^"']로는 거기서 끊긴다(전북대에서 실제로 겪음)
+    return [...html.matchAll(/<a\b[^>]*onclick\s*=\s*(["'])((?:(?!\1)[\s\S])*)\1[^>]*>([\s\S]*?)<\/a>/gi)].map((m) => {
+      const id = (m[2].match(rule.fn) || [])[1];
+      return id ? { title: m[3].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(), url: rule.detail(id) } : null;
+    }).filter((x) => x && x.title);
+  }
+  // dataId — 목록 HTML에서 번호와 제목을 짝지어 뽑는다
   return [...html.matchAll(/data-id=["'](\d+)["'][^>]*>([\s\S]{0,300}?)<\/a>/g)].map((m) => ({
     title: m[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
     url: rule.detail(m[1]),
