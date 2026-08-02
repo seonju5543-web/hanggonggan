@@ -397,7 +397,13 @@ function majorSuggestions(q) {
   const n = q.replace(/\s/g, '');
   if (!n) return [];
   const school = $('#in-school').value.trim();
-  const pool = [...new Set((MAJORS_BY_SCHOOL[school] || []).concat(MAJORS_COMMON))];
+  const campus = getChip('#in-campus');
+  /* 그 학교에 실제로 있는 학과 목록을 확보한 곳은 **그 목록만** 쓴다.
+     예전엔 전국 공통 목록을 뒤에 붙여서, 외대에서 '일'을 치면 학교에 없는
+     '일어일문학과'가 같이 떴다(2026-08-02 개발자 지적 — 경희대 사례).
+     캠퍼스별로 학과가 다른 학교는 '학교 캠퍼스' 열쇠를 먼저 본다. */
+  const own = MAJORS_BY_SCHOOL[`${school} ${campus}`] || MAJORS_BY_SCHOOL[school];
+  const pool = own || MAJORS_COMMON;   // 확보 못 한 학교는 전국 공통 목록을 힌트로
   return pool.filter((m) => m.replace(/\s/g, '').includes(n));
 }
 
