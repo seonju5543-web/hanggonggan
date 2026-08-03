@@ -69,7 +69,10 @@ const NEXT_SECTION = /^\s*(?:\d+\s*[.)]\s*)?(지원\s?내용|지원\s?금액|장
    &amp;는 반드시 마지막 — 먼저 풀면 이중 해제된다(clean-title.mjs와 같은 규칙). */
 const ENT = [[/&lt;/g, '<'], [/&gt;/g, '>'], [/&quot;/g, '"'], [/&#39;|&apos;/g, "'"],
   [/&ldquo;/g, '“'], [/&rdquo;/g, '”'], [/&lsquo;/g, '‘'], [/&rsquo;/g, '’'],
-  [/&nbsp;/g, ' '], [/&middot;/g, '·'], [/&hellip;/g, '…'], [/&amp;/g, '&']];
+  [/&nbsp;/g, ' '], [/&middot;/g, '·'], [/&hellip;/g, '…'],
+  [/&times;/g, '×'], [/&sdot;/g, '·'], [/&deg;/g, '°'], [/&ndash;/g, '–'], [/&mdash;/g, '—'],
+  [/&#(\d+);/g, (_, n) => String.fromCharCode(+n)],   // 숫자 표기(&#39; 등)도 함께
+  [/&amp;/g, '&']];
 const unent = (s) => ENT.reduce((t, [re, ch]) => t.replace(re, ch), s);
 
 function extractQualifyLines(text) {
