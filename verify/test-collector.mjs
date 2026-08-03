@@ -9,6 +9,7 @@ import { urlKey, titleKey, dedupeNotices, preferNotice, capNotices } from '../co
 import { isAttachmentEntry, isHtmlPayload } from '../collector/attachment-link.mjs';
 import { isDetailUrl, isMarkerUrl, markerTitle, sameTitle, detailCandidates, looksLikeLoginWall, rowDetailCandidates } from '../collector/detail-url.mjs';
 import { cleanTitle, isMenuEntry } from '../collector/clean-title.mjs';
+import { makeBudget, rotateOrder, nextCursor } from '../collector/harvest-budget.mjs';
 
 let fail = 0;
 const eq = (label, got, want) => {
@@ -306,6 +307,55 @@ function undeclaredNames(src) {
     const plain = (yml.match(/git pull --rebase(?! --autostash)/g) || []).length;
     eq(`${f}: 맨몸 git pull --rebase 없음(--autostash 필수)`, plain, 0);
   }
+}
+
+/* ── 시간 예산 · 학교 순서 회전 (2026-08-03 시간초과 사고 회귀) ──────────────
+   학교가 13→29곳으로 늘자 브라우저 수집이 워크플로 상한(40분)에 걸려 4회 연속 **취소**됐고,
+   취소는 저장 단계까지 죽여서 그날 수집분이 전부 버려졌다.
+   크래시가 아니라 강제 종료라 '넘어져도 저장'으로는 못 막는다 — 스스로 예산 안에 끝내야 한다.
+   가짜 시계를 써서 진짜로 기다리지 않고 검사한다. */
+console.log('■ 수집 시간 예산 (예산을 넘기면 남은 학교를 건너뛰고 저장까지 간다)');
+{
+  let clock = 0;
+  const b = makeBudget(1000, () => clock);
+  eq('시작 직후는 예산이 남아 있다', b.expired(), false);
+  clock = 400;
+  eq('40% 지점에서 학교 하나(300ms)를 더 시작할 여유가 있다', b.hasRoom(300), true);
+  clock = 800;
+  eq('80% 지점에서는 300ms짜리를 새로 시작하지 않는다', b.hasRoom(300), false);
+  eq('아직 예산 자체가 끝난 것은 아니다', b.expired(), false);
+  clock = 1000;
+  eq('예산을 다 쓰면 만료', b.expired(), true);
+  eq('경과 시간을 리포트에 쓸 수 있다', b.elapsed(), 1000);
+}
+
+console.log('■ 학교 순서 회전 (잘리는 학교가 매번 같으면 그 학교는 영영 안 돈다)');
+{
+  eq('커서 0이면 설정 파일 순서 그대로', rotateOrder(5, 0), [0, 1, 2, 3, 4]);
+  eq('커서 3이면 3번 학교부터 돌아 한 바퀴', rotateOrder(5, 3), [3, 4, 0, 1, 2]);
+  eq('커서가 목록 끝을 넘어도 안전하게 되돌아온다', rotateOrder(5, 7), [2, 3, 4, 0, 1]);
+  eq('음수 커서도 안전', rotateOrder(5, -1), [4, 0, 1, 2, 3]);
+  eq('학교가 없으면 빈 목록', rotateOrder(0, 3), []);
+  // 17곳 중 10곳만 돌고 잘린 상황 → 다음 실행은 못 돈 11번째 학교부터
+  eq('건너뛴 학교가 다음 실행의 시작점이 된다', nextCursor(17, 0, 10), 10);
+  eq('전부 돌면 시작점이 앞으로 나아가 순서가 고정되지 않는다', nextCursor(17, 0, 17), 0);
+  eq('커서가 있는 상태에서 잘려도 이어서 계산된다', nextCursor(17, 10, 5), 15);
+  eq('한 바퀴를 넘어가면 되돌아온다', nextCursor(17, 15, 5), 3);
+}
+
+console.log('■ 예산 장치가 실제로 배선돼 있나 (되돌아가면 같은 사고가 난다)');
+{
+  const root = new URL('../', import.meta.url);
+  const src = fs.readFileSync(new URL('collector/browser-collect.mjs', root), 'utf8');
+  eq('브라우저 수집기가 예산 모듈을 쓴다', /from '\.\/harvest-budget\.mjs'/.test(src), true);
+  eq('학교를 새로 시작하기 전에 남은 시간을 본다', /budget\.hasRoom\(MIN_PER_TARGET_MS\)/.test(src), true);
+  eq('상세 방문에도 예산이 있다 (한 학교가 20분을 먹던 자리)', /detailBudgetMs/.test(src), true);
+  eq('회전 커서를 저장한다 (안 하면 매번 같은 학교가 잘린다)', /nextCursor\(/.test(src) && /cursorPath/.test(src), true);
+  const yml = fs.readFileSync(new URL('.github/workflows/browser-collect.yml', root), 'utf8');
+  eq('워크플로 저장 목록에 회전 커서가 있다', /browser-cursor\.json/.test(yml), true);
+  const limit = Number((yml.match(/timeout-minutes:\s*(\d+)/) || [])[1]);
+  // 예산(22분)보다 넉넉히 커야 저장·감사·리포트 단계가 돌 시간이 남는다
+  eq('워크플로 상한이 예산보다 크다', limit > 22, true);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
