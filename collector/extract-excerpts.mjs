@@ -111,8 +111,25 @@ const unent = (s) => ENT.reduce((t, [re, ch]) => t.replace(re, ch), s);
 function extractQualifyLines(text) {
   if (!text) return [];
   const lines = text.split(/\n+/).map((l) => unent(l).replace(/[ \t　]+/g, ' ').trim()).filter(Boolean);
-  const start = lines.findIndex((l) => QUALIFY_HEAD.test(l));
-  if (start < 0) return [];
+  /* 자격처럼 보이는 곳이 여러 군데일 수 있다. **첫 번째를 잡으면 안 된다** —
+     교육보호장학은 "교육보호장학 대상자는 반드시…"라는 평범한 문장이 앞에 있어서
+     거기서 시작해 엉뚱한 '변경내용' 표를 자격으로 읽었다(2026-08-03 개발자 지적).
+     그래서 **제목처럼 생긴 줄**(짧고, 그 낱말로 시작하거나 콜론이 붙은 줄)을 고른다. */
+  const cands = [];
+  lines.forEach((l, i) => { if (QUALIFY_HEAD.test(l)) cands.push(i); });
+  if (!cands.length) return [];
+  const headScore = (l) => {
+    const t = l.replace(/^[\s\-–—•▪▶◆◇○●·ㆍ*]+/, '').replace(/^(?:[가-힣]\s*[.)]|\d+\s*[.)])\s*/, '');
+    let s = 0;
+    if (QUALIFY_HEAD.test(t.slice(0, 12))) s += 3;      // 낱말이 앞머리에 있다
+    if (t.length <= 12) s += 3;                          // 제목처럼 짧다
+    else if (t.length <= 30) s += 1;
+    if (/[:：]/.test(t.slice(0, 16))) s += 2;            // "신청자격 : …"
+    if (/(는|은|이|가)\s|바랍니다|하시어|합니다/.test(t)) s -= 3;   // 서술 문장이다
+    return s;
+  };
+  let start = cands[0], best = -99;
+  for (const i of cands) { const s = headScore(lines[i]); if (s > best) { best = s; start = i; } }
   const out = [];
   for (let i = start; i < lines.length && out.length < 8; i += 1) {
     const l = lines[i];
