@@ -66,7 +66,7 @@ function extractFrom(text) {
 /* 자격 절의 제목으로 실제 쓰이는 표현 (2026-08-02 미확보 80건을 세어 보고 추가).
    **그냥 '자격'이나 '대상'은 넣지 않는다** — 세어 보니 가장 많이 나온 것이
    '교원자격'·'평생교육사자격'처럼 **자격증 이름**이라, 넣으면 엉뚱한 줄이 요건으로 들어온다. */
-const QUALIFY_HEAD = /(신청\s?자격|지원\s?자격|응모\s?자격|자격\s?요건|자격\s?기준|지원\s?조건|신청\s?조건|지원\s?대상|신청\s?대상|모집\s?대상|선발\s?대상|추천\s?대상|수혜\s?대상|장학\s?대상|지급\s?대상|지원\s?가능\s?대상)/;
+const QUALIFY_HEAD = /(신청\s?자격|지원\s?자격|응모\s?자격|자격\s?요건|자격\s?기준|지원\s?조건|신청\s?조건|지원\s?대상|신청\s?대상|모집\s?대상|선발\s?대상|추천\s?대상|수혜\s?대상|장학\s?대상|지급\s?대상|지원\s?가능\s?대상|선발\s?기준|심사\s?기준)/;
 /* 자격 블록의 끝 — **확실한 다음 절**에서만 끊는다.
    예전엔 '장학금액' 같은 낱말에서도 끊었는데, 자격이 표로 적힌 공고에서는 그게
    표의 머리글이라 거기서 잘려 정작 중요한 요건 줄(장애의 정도가 심한 장애인 등)을
@@ -108,6 +108,29 @@ const ENT = [[/&lt;/g, '<'], [/&gt;/g, '>'], [/&quot;/g, '"'], [/&#39;|&apos;/g,
   [/&amp;/g, '&']];
 const unent = (s) => ENT.reduce((t, [re, ch]) => t.replace(re, ch), s);
 
+/* 장학 제외 대상 — "※ 장학제외 대상자" 아래의 항목들을 원문 그대로 모은다.
+   자격 절과 같은 방식으로 다음 절 머리글을 만나면 끊는다. */
+const EXCLUDE_HEAD = /(제외\s?대상|장학\s?제외|지원\s?제외|신청\s?제외|제외자)/;
+function extractExcludeLines(text) {
+  if (!text) return [];
+  const lines = text.split(/\n+/).map((l) => unent(l).replace(/[ \t　]+/g, ' ').trim()).filter(Boolean);
+  const start = lines.findIndex((l) => EXCLUDE_HEAD.test(l) && l.length <= 30);
+  if (start < 0) return [];
+  const out = [];
+  for (let i = start + 1; i < lines.length && out.length < 6; i += 1) {
+    const l = lines[i];
+    if (NEXT_SECTION.test(l)) break;
+    if (SECTION_HEAD.test(l)) {
+      const body = l.replace(/^\s*(?:[가-힣]\s*[.)]|\d+\s*\.)\s*/, '');
+      if (body.length <= 20) break;
+    }
+    if (/^[●▶◆■]/.test(l)) break;              // 다음 큰 항목
+    if (TABLE_NOISE.test(l) || l.length < 4 || l.length > 120) continue;
+    out.push(l);
+  }
+  return out;
+}
+
 function extractQualifyLines(text) {
   if (!text) return [];
   const lines = text.split(/\n+/).map((l) => unent(l).replace(/[ \t　]+/g, ' ').trim()).filter(Boolean);
@@ -126,6 +149,9 @@ function extractQualifyLines(text) {
     else if (t.length <= 30) s += 1;
     if (/[:：]/.test(t.slice(0, 16))) s += 2;            // "신청자격 : …"
     if (/(는|은|이|가)\s|바랍니다|하시어|합니다/.test(t)) s -= 3;   // 서술 문장이다
+    /* '자격 기준 및 선발 인원'처럼 **인원·금액 배정표**의 제목은 자격 절이 아니다
+       (동국인재육성장학 — 여기서 시작해 학과별 배정 인원표를 자격으로 읽었다, 2026-08-03). */
+    if (/인원|금액|지급액|배정/.test(t)) s -= 4;
     return s;
   };
   let start = cands[0], best = -99;
@@ -168,6 +194,12 @@ for (const it of reg.items) {
   if (WRITE) {
     if (qual.length) it.eligibilityLines = qual;
     else delete it.eligibilityLines;   // 원문이 바뀌어 못 뽑게 되면 옛 값을 남기지 않는다
+
+    /* '제외 대상'도 자격 정보다 (2026-08-03 개발자 지적 — 동국인재육성장학).
+       "누가 받을 수 있나"만큼 "누가 못 받나"도 학생이 알아야 한다. 원문 그대로 뽑는다. */
+    const excl = src ? extractExcludeLines(src.text) : [];
+    if (excl.length) it.eligibilityExcludes = excl;
+    else delete it.eligibilityExcludes;
   }
   if (ex.length) {
     hit++;
