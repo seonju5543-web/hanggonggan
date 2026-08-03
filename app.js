@@ -1082,10 +1082,13 @@ function openDetail(id) {
      '민주화운동·국가폭력 피해자 유자녀' 같은 항목은 기계 조건으로 잡히지 않는다.
      그래서 조건 유무와 상관없이 **항상** 보여 준다. 추론이 아니라 원문 발췌라 원칙 8-1을 지킨다. */
   const QUALIFY_RE = /(신청\s?자격|지원\s?자격|응모\s?자격|자격\s?요건|지원\s?대상|신청\s?대상|모집\s?대상|선발\s?대상|추천\s?대상)/;
-  const qLines = (sch.excerpts || []).filter((e) => QUALIFY_RE.test(e));
+  /* eligibilityLines = 공고의 자격 항목을 **블록째** 뽑아 둔 것(1) 2) …).
+     없으면 자격 낱말이 든 발췌 문장이라도 보여 준다. */
+  const qBlock = (sch.eligibilityLines || []).filter((l) => !QUALIFY_RE.test(l) || l.length > 14);
+  const qLines = qBlock.length ? qBlock : (sch.excerpts || []).filter((e) => QUALIFY_RE.test(e));
   const qualifyRows = qLines.length
     ? `<li class="r-unk">? 공고 원문에 적힌 자격 — 해당되는지 직접 확인하세요</li>`
-      + qLines.map((e) => `<li class="r-quote">“${esc(e)}”</li>`).join('')
+      + qLines.map((e) => `<li class="r-quote">${esc(e)}</li>`).join('')
     : '';
 
   let reasonRows = result.reasons.map((r) => {

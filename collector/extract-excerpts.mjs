@@ -57,6 +57,39 @@ function extractFrom(text) {
   return out;
 }
 
+/* 자격 항목 블록 뽑기 (2026-08-02 개발자 지시).
+   "지원자격" 한 문장만 뽑으면 정작 중요한 '1) 4년제 대학생 2) 5·18 (유)자녀' 같은
+   **딸린 항목들**이 빠진다. 제목 줄부터 다음 항목(2. 지원내용 …)이 나오기 전까지를
+   통째로 잘라 줄 단위로 담는다. 한 글자도 바꾸지 않는다 — 추론이 아니라 발췌다. */
+const QUALIFY_HEAD = /(신청\s?자격|지원\s?자격|응모\s?자격|자격\s?요건|지원\s?대상|신청\s?대상|모집\s?대상|선발\s?대상|추천\s?대상)/;
+/* 다음 절이 시작되면 자격 블록이 끝난 것으로 본다 */
+const NEXT_SECTION = /^\s*(?:\d+\s*[.)]\s*)?(지원\s?내용|지원\s?금액|장학\s?금액|선발\s?인원|선발\s?분야|신청\s?기간|접수\s?기간|신청\s?접수|신청\s?방법|접수\s?방법|제출\s?서류|구비\s?서류|제출\s?방법|선발\s?방법|선발\s?기준|유의\s?사항|기타|문의)/;
+
+/* 원문에 남아 있는 HTML 기호를 사람이 읽는 글자로 (&ldquo; → “). 뜻은 바꾸지 않는다.
+   &amp;는 반드시 마지막 — 먼저 풀면 이중 해제된다(clean-title.mjs와 같은 규칙). */
+const ENT = [[/&lt;/g, '<'], [/&gt;/g, '>'], [/&quot;/g, '"'], [/&#39;|&apos;/g, "'"],
+  [/&ldquo;/g, '“'], [/&rdquo;/g, '”'], [/&lsquo;/g, '‘'], [/&rsquo;/g, '’'],
+  [/&nbsp;/g, ' '], [/&middot;/g, '·'], [/&hellip;/g, '…'], [/&amp;/g, '&']];
+const unent = (s) => ENT.reduce((t, [re, ch]) => t.replace(re, ch), s);
+
+function extractQualifyLines(text) {
+  if (!text) return [];
+  const lines = text.split(/\n+/).map((l) => unent(l).replace(/[ \t　]+/g, ' ').trim()).filter(Boolean);
+  const start = lines.findIndex((l) => QUALIFY_HEAD.test(l));
+  if (start < 0) return [];
+  const out = [];
+  for (let i = start; i < lines.length && out.length < 8; i += 1) {
+    const l = lines[i];
+    if (i > start && NEXT_SECTION.test(l)) break;      // 다음 절 시작 — 여기서 끊는다
+    if (JUNK.test(l)) continue;
+    if (l.length < 4 || l.length > 200) continue;
+    if (!/[0-9가-힣]/.test(l)) continue;
+    out.push(l);
+  }
+  // 제목 줄 하나만 남았고 내용이 없으면 쓸모없다
+  return out.length >= 1 && out.join('').length >= 10 ? out : [];
+}
+
 const byUrl = new Map();
 const byTitle = new Map();
 for (const v of Object.values(texts)) {
@@ -69,12 +102,18 @@ for (const it of reg.items) {
   if (it.program) continue;
   const src = byUrl.get(canonUrl(it.sourceUrl || '')) || byTitle.get(norm(it.name)) || null;
   const ex = src ? extractFrom(src.text) : [];
+  const qual = src ? extractQualifyLines(src.text) : [];
+  if (WRITE) {
+    if (qual.length) it.eligibilityLines = qual;
+    else delete it.eligibilityLines;   // 원문이 바뀌어 못 뽑게 되면 옛 값을 남기지 않는다
+  }
   if (ex.length) {
     hit++;
     if (WRITE) { it.excerpts = ex; it.excerptNote = '공고 원문에서 그대로 발췌 (자동)'; }
     if (!WRITE) {
       console.log(`\n■ ${it.id} | ${it.name.slice(0, 40)}`);
       ex.forEach((e) => console.log('   →', e.slice(0, 110)));
+      if (qual.length) { console.log('   [자격 블록]'); qual.forEach((q) => console.log('      ·', q.slice(0, 100))); }
     }
   } else {
     none++;
