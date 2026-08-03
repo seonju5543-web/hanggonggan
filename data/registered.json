@@ -145,29 +145,7 @@
    "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765145",
    "sourceKind": "official",
    "listedAt": "2026-07-16",
-   "boardTitle": "2026-2학기 동국인재육성장학 시행 안내",
-   "excerpts": [
-    "● 장학금별 자격 기준 및 선발 인원",
-    "※ 마일리지 제출기한 : 자격증 , 어학성적 등은 위 제출 기한 내에 제출"
-   ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
-   "eligibilityLines": [
-    "● 선발기준 : 총점 순으로 선발",
-    "1) 성적 (70%)",
-    "- 직전학기 취득학점 15 학점 이상 , 평균평점 3.5 이상",
-    "( 정규 마지막학기 등록생은 직전학기 취득학점 12 학점 이상 가능 )",
-    "- P/F 과목을 제외한 과목의 취득학점이 12 학점 이상인 경우만 성적 인",
-    "( P/F 과목을 제외한 과목의 취득 학점이 12 학점 미만인 경우 장학 대상자에서 제외 )",
-    "※ P/F 과목 : 평점환산에 포함되지 않는 과목 ( 예 : 학부 P/F 과목 , 대학원 선수과목 등 )",
-    "2) 비교과프로그램참여 (30%)"
-   ],
-   "eligibilityExcludes": [
-    "- 2026-1 학기 국외대학 파견 교환학생",
-    "- 불교대학 재학생",
-    "- 체육특기생 : 체육특기생으로 입학한자 및 2026-1 학기 체육장학 수혜자",
-    "- 외국인 : 외국인전형으로 입학한 외국인",
-    "- 2026-2 학기 초과학기생"
-   ]
+   "boardTitle": "2026-2학기 동국인재육성장학 시행 안내"
   },
   {
    "id": "reg-dg-gyonae",
@@ -219,22 +197,7 @@
    "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764951",
    "sourceKind": "official",
    "listedAt": "2026-07-16",
-   "boardTitle": "2026-2학기 종단추천장학 신청안내",
-   "excerpts": [
-    "신청 방법 : nDRIMS → 대표 - 학사행정 → 【 학생신청 】 신청함",
-    "신청방법 : 아래 두 서류 모두 제출"
-   ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
-   "eligibilityLines": [
-    "대한불교조계종 스님 ( 학부 정규학기 재학생 )",
-    "( 계속장학생 )",
-    "2026-1 학기 종단추천장학 기수혜자",
-    "2026-2 학기 재학 및 복학예정자 ( 정규학기까지 )",
-    "( 신규자 )",
-    "대한불교조계종 교육원의 장학추천 가능자",
-    "추천관련 작업은 장학팀에서 일괄 진행하므로 , 별도 추천서 제출필요 없음",
-    "직전학기 평점평균 3.0/4.5, 취득학점 15 학점 이상 취득자"
-   ]
+   "boardTitle": "2026-2학기 종단추천장학 신청안내"
   },
   {
    "id": "reg-dg-jeonmun",
@@ -425,16 +388,7 @@
    "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764945",
    "sourceKind": "official",
    "listedAt": "2026-07-16",
-   "boardTitle": "공지 공지 2026-2학기 복지장학1(본인장애) 신청안내 2026.06.",
-   "excerpts": [
-    "- 신청 : 위 재학생 ( 계속자 ) 신청방법과 동일"
-   ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
-   "eligibilityLines": [
-    "-2026-2 학기 정규학기 학부 재학생 및 복학예정자",
-    "장애의 정도가 심한 장애인 ( 본인 )",
-    "장애의 정도가 심하지 않은 장애인 ( 본인 )"
-   ]
+   "boardTitle": "공지 공지 2026-2학기 복지장학1(본인장애) 신청안내 2026.06."
   },
   {
    "id": "reg-dg-bohun",
@@ -463,17 +417,7 @@
    "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764944",
    "sourceKind": "official",
    "listedAt": "2026-07-16",
-   "boardTitle": "공지 공지 2026-2학기 보훈장학(본인, (손)자녀) 신청안내 2026",
-   "excerpts": [
-    "신청방법 : nDRIMS → 대표 - 학사행정 → 【 학생신청 】 신청함",
-    "신청방법 : 아래 서류 모두 제출 ( 보훈본인의 경우 ① , ② 번만 제출 )",
-    "① [ 재학생 ] nDRIMS 신청 ( 위 재학생 계속자 신청방법과 동일 )"
-   ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
-   "eligibilityLines": [
-    "- 2026-2 학기 정규학기 학부 재학생 및 복학예정자 중 보훈대상자",
-    "- ( 재학생 ) 직전학기 성적 평점평균 1.88 점 이상인 자"
-   ]
+   "boardTitle": "공지 공지 2026-2학기 보훈장학(본인, (손)자녀) 신청안내 2026"
   },
   {
    "id": "reg-dg-gyoyukboho",
@@ -3329,15 +3273,7 @@
     }
    ],
    "sourceUrl": "https://www.gachon.ac.kr/bbs/kor/478/122106/artclView.do",
-   "sourceKind": "official",
-   "excerpts": [
-    "신청대상 : 26-1 학기 한국장학재단 국가근로장학금 신청 학생 중 , 소득 9 구간 이내인 재학생",
-    "신청기간 : 07.14( 화 ) 15:00 까지 [ 기한엄수 ]"
-   ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
-   "eligibilityLines": [
-    "3. 신청대상 : 26-1 학기 한국장학재단 국가근로장학금 신청 학생 중 , 소득 9 구간 이내인 재학생"
-   ]
+   "sourceKind": "official"
   },
   {
    "id": "reg-kau-workstudy",
@@ -4714,6 +4650,265 @@
     "비밀번호 입력",
     "비밀번호 확인이 필요합니다."
    ]
+  },
+  {
+   "id": "auto-tentsno5menuid100siteno2",
+   "name": "[학부] 2026-2학기 교내장학금(보훈/국가시험지원/가족/중앙나래) 신청 안내",
+   "type": "교내",
+   "provider": "중앙대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-03",
+   "period": "접수 기간 원문 확인",
+   "summary": "중앙대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "중앙대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-03 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30000&pageNo=1",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-knuackrnano2432no9910975",
+   "name": "(재)부경대학교발전기금 정효택장학생 선발 안내",
+   "type": "교내",
+   "provider": "부경대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-03",
+   "period": "접수 기간 원문 확인",
+   "summary": "부경대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "부경대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-03 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://nano.pknu.ac.kr/nano/2432?action=view&no=9910975",
+   "sourceKind": "auto",
+   "excerpts": [
+    "선발인원: 5명 내외 2.",
+    "서류접수기간: 2020.11.6.(금) 16:00까지(본관 1층 102호 학생복지과 장학지원팀) 자세한 사항은 학교 홈페이지 공지사항을 참조하기 바랍니다."
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-knuackrnano2432no9910970",
+   "name": "농어촌희망재단 2016-2학기 농업인자녀 및 농업후계인력, 수산후계인력 대학장학생 선발 안내",
+   "type": "교외",
+   "provider": "부경대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-03",
+   "period": "접수 기간 원문 확인",
+   "summary": "부경대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "부경대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-03 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://nano.pknu.ac.kr/nano/2432?action=view&no=9910970",
+   "sourceKind": "auto",
+   "excerpts": [
+    "신청기간 : 2016 년 7 월 1 일 ( 월 ) 09:00 ∼ 7 월 13( 수 ) 17:00",
+    "제출서류 (2016 년 2 학기 농어촌희망재단 대학장학생 선발요강 참조 )",
+    "2) 세부 장학생 선발요건 및 신청방법 ( 구비서류 ) 등은 반드시 붙임 선발요강을 반드시 참조 바람"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-knuackrnano2432no9910969",
+   "name": "2016학년도 (재)동원학술연구재단‘내 자서전 미리 쓰고 받는’섬김의 리더십 장학생 선발 안내",
+   "type": "교외",
+   "provider": "부경대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-03",
+   "period": "접수 기간 원문 확인",
+   "summary": "부경대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "부경대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "붙임1) 장학생지원서.hwp",
+     "url": "https://nano.pknu.ac.kr/boardDownload.do?no=7912409"
+    }
+   ],
+   "sourceUrl": "https://nano.pknu.ac.kr/nano/2432?action=view&no=9910969",
+   "sourceKind": "auto",
+   "formId": "auto-2016학년도-재-동-apply",
+   "eligibilityLines": [
+    "5. 계속지급자 선발 기준",
+    "- 본교에서 다음 학기 수학 가능한 자",
+    "- 직전학기 15학점이상 이수하고, 평점평균 3.5이상인 자",
+    "- 4학년의 경우에는 12학점이상 이수하고 직전학기 평점평균이 3.5이상인 자",
+    "※ 평점평균 3.5미만 ∼ 3.0이상인 자는 재단 선발위원회에서 계속 지급 여부 결정",
+    "- 학기별 장학생 봉사활동에 성실히 참여(월 6시간 및 학기당 40시간 이상 실적)한 자",
+    "- 학기별 장학생 자치 활동에 성실히 참여한 자",
+    "- 학기별 장학생 보고서를 성실히 작성하여 제출한 자"
+   ],
+   "eligibilityExcludes": [
+    "- 징계처분을 받은 자 또는 징계의결 중인 자",
+    "- 직전학기 14학점이하 이수하거나 평균평점이 3.5미만인 자",
+    "- 장학생으로서의 품위를 손상한 자(재단 선발위원회에서 심의)",
+    "- 교내 성적우수장학금 수혜자(단, 2016학년도 1학기 선발자는 제외)",
+    "- 기타 부경대학교 장학금 관리 및 운용계획에 따름"
+   ],
+   "excerpts": [
+    "선발인원: 6명(3학년)",
+    "지급금액: 학기당 최대 4,000천원(등록금 지원금+ 생활보조금)",
+    "- 추가생활보조금: 국가장학(Ⅰ유형)으로 지원받은 경우에만 국가장학금액(1유형)의 50% 추가 지원",
+    "서류심사는 서류심사위원이 피평가자별로 평가한 성적을 합산(평균)하여 고득점자순으로 장학생 선발인원수의 2배수를 선발하여 면접대상자로 선정",
+    "1차: 서류전형 후 선발인원의 2배수 선정"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-knuackrnano2432no9910966",
+   "name": "2014-2학기 사랑드림장학사업(삼성) 장학금 신청 안내",
+   "type": "교내",
+   "provider": "부경대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-03",
+   "period": "접수 기간 원문 확인",
+   "summary": "부경대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "부경대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "관련서류양식.hwp",
+     "url": "https://nano.pknu.ac.kr/boardDownload.do?no=7912406"
+    }
+   ],
+   "sourceUrl": "https://nano.pknu.ac.kr/nano/2432?action=view&no=9910966",
+   "sourceKind": "auto",
+   "formId": "auto-2014-2학기-사랑드-apply"
+  },
+  {
+   "id": "auto-gwonackrkobbs750detaildo",
+   "name": "[한국농어촌희망재단] 2026년 2학기 청년창업어업인장학생 선발 안내",
+   "type": "교외",
+   "provider": "강원대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-03",
+   "period": "접수 기간 원문 확인",
+   "summary": "강원대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "강원대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-03 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026년 2학기 해양수산부 청년창업어업인장학생 선발공고문(수정).pdf chevron_forward",
+     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20260728053301006.pdf&path=/bbs/34&fn=2026%EB%85%84%202%ED%95%99%EA%B8%B0%20%ED%95%B4%EC%96%91%EC%88%98%EC%82%B0%EB%B6%80%20%EC%B2%AD%EB%85%84%EC%B0%BD%EC%97%85%EC%96%B4%EC%97%85%EC%9D%B8%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%EA%B3%B5%EA%B3%A0%EB%AC%B8(%EC%88%98%EC%A0%95).pdf"
+    }
+   ],
+   "sourceUrl": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2443&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-eab3b5eca780ec82aced95ad",
+   "name": "Qualcomm Innovation Fellowship Korea 우수논문 장학금 선발 안내",
+   "type": "교내",
+   "provider": "서울대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-03",
+   "period": "접수 기간 원문 확인",
+   "summary": "서울대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서울대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&#038;category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&#038;uid=311",
+   "sourceKind": "auto",
+   "formId": "auto-장학-2026년-서울미-apply"
+  },
+  {
+   "id": "auto-kuk2351174254artclviewdo",
+   "name": "[교외] 2026학년도 세종특별자치시 세종연구원 세종이도인재 장학금 장학생 모집( ~ 9. 30.)",
+   "type": "교외",
+   "provider": "건국대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-03",
+   "period": "접수 기간 원문 확인",
+   "summary": "건국대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "건국대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-03 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.konkuk.ac.kr/bbs/konkuk/235/1174254/artclView.do",
+   "sourceKind": "auto"
   }
  ]
 }
