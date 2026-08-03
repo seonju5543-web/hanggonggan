@@ -1036,3 +1036,11 @@ textarea:focus {
   border-left: 2px solid var(--line);
   margin: 4px 0 4px 6px;
 }
+
+/* 자격 진단 안의 '지원 자격' 머리말 — 판정 항목(✓/✕/?)이 아니라 원문 인용의 제목이라 표시가 없다 */
+.reason-list .r-head {
+  font-weight: 800;
+  color: var(--text);
+  margin-top: 10px;
+  list-style: none;
+}

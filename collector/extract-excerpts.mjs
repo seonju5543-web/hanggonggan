@@ -40,8 +40,10 @@ const JUNK = /바로가기|사이트맵|SITEMAP|로그인|회원가입|검색어
 
 function extractFrom(text) {
   if (!text) return [];
-  // 문장 단위로 자르되 원문 표기를 보존한다
-  const parts = text.split(/(?<=[.다요함음])\s+|\n+/).map((s) => s.trim()).filter(Boolean);
+  // 문장 단위로 자르되 원문 표기를 보존한다.
+  // HTML 기호는 사람이 읽는 글자로 바꾼다 — 안 하면 앱에 'nDRIMS &rarr; 대표'처럼 그대로 보인다
+  // (2026-08-02: 자격 블록에만 적용하고 여기엔 안 걸어서 실제로 노출됐다).
+  const parts = text.split(/(?<=[.다요함음])\s+|\n+/).map((s) => unent(s).trim()).filter(Boolean);
   const out = [];
   for (const p of parts) {
     if (!MARK.test(p)) continue;
@@ -71,6 +73,7 @@ const ENT = [[/&lt;/g, '<'], [/&gt;/g, '>'], [/&quot;/g, '"'], [/&#39;|&apos;/g,
   [/&ldquo;/g, '“'], [/&rdquo;/g, '”'], [/&lsquo;/g, '‘'], [/&rsquo;/g, '’'],
   [/&nbsp;/g, ' '], [/&middot;/g, '·'], [/&hellip;/g, '…'],
   [/&times;/g, '×'], [/&sdot;/g, '·'], [/&deg;/g, '°'], [/&ndash;/g, '–'], [/&mdash;/g, '—'],
+  [/&rarr;/g, '→'], [/&larr;/g, '←'], [/&harr;/g, '↔'], [/&bull;/g, '•'], [/&prime;/g, '′'],
   [/&#(\d+);/g, (_, n) => String.fromCharCode(+n)],   // 숫자 표기(&#39; 등)도 함께
   [/&amp;/g, '&']];
 const unent = (s) => ENT.reduce((t, [re, ch]) => t.replace(re, ch), s);

@@ -1087,7 +1087,7 @@ function openDetail(id) {
   const qBlock = (sch.eligibilityLines || []).filter((l) => !QUALIFY_RE.test(l) || l.length > 14);
   const qLines = qBlock.length ? qBlock : (sch.excerpts || []).filter((e) => QUALIFY_RE.test(e));
   const qualifyRows = qLines.length
-    ? `<li class="r-unk">? 공고 원문에 적힌 자격 — 해당되는지 직접 확인하세요</li>`
+    ? `<li class="r-head">지원 자격</li>`
       + qLines.map((e) => `<li class="r-quote">${esc(e)}</li>`).join('')
     : '';
 
@@ -1132,6 +1132,9 @@ function openDetail(id) {
 
       <h4>자격 진단</h4>
       <ul class="reason-list">${reasonRows}${missingRows || ''}${qualifyRows}</ul>
+      <p class="doc-legend">지원 요건은 바뀔 수 있어요 — 신청 전에 ${sch.sourceUrl
+        ? `<a href="${esc(safeUrl(sch.sourceUrl))}" target="_blank" rel="noopener" style="color:var(--primary);font-weight:700">${sch.program ? '한국장학재단 ↗' : (isBoardListLink(sch.sourceUrl) ? '게시판 목록 ↗' : '원문 공고 ↗')}</a>에서`
+        : '공고 원문에서'} 다시 확인하세요.</p>
 
       <h4>제출 서류</h4>
       <ul class="doc-list">
