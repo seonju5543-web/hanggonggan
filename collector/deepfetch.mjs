@@ -76,7 +76,7 @@ for (const it of registered.items) {
   if (!/^https?:\/\//.test(url) || url.includes('#n-')) continue;
   const key = canonUrl(url);
   if (wanted.has(key)) continue;
-  if (!needsFetch(sourceFor(it, prevIdx))) continue;
+  if (!needsFetch(sourceFor(it, prevIdx), LIMIT)) continue;
   wanted.set(key, { title: it.boardTitle || it.name, school: it.provider || '', url,
     attachments: it.attachments || [], foundAt: it.listedAt });
   extra += 1;
@@ -85,9 +85,20 @@ for (const it of registered.items) {
    평소엔 그날 새로 들어온 공고 몇 건뿐이라 상한에 닿지 않는다. 다만 게시판이 한꺼번에
    쏟아지는 날 이 단계가 시간을 다 먹으면 수집분이 통째로 버려지므로(2026-08-03 브라우저
    수집 시간초과 사고와 같은 계열), 남은 건 다음 실행이 마저 받게 한다. */
+/* 계속 실패하는 주소는 증분 모드에서 물러선다.
+   실측: 15건이 매 실행 20초씩 시간초과를 기다려 **한 번에 5분**을 먹고 있었다. 수집 워크플로
+   예산 안에서 도는 단계라 그냥 두면 정작 받아야 할 공고를 못 받는다.
+   포기하는 게 아니다 — 심층 수집 본편(수동 실행)은 여전히 전부 다시 시도한다(link-hunter와 같은 방침). */
+const GIVE_UP_AFTER = 3;
+const tooManyFails = (src) => FILL && (src?.fails ?? 0) >= GIVE_UP_AFTER;
+
 const FILL_CAP = 120;
 let todo = [...wanted.values()]
-  .filter((n) => !FILL || needsFetch(prevIdx.byUrl.get(canonUrl(n.url))));
+  .filter((n) => {
+    const src = prevIdx.byUrl.get(canonUrl(n.url));
+    if (tooManyFails(src)) return false;
+    return !FILL || needsFetch(src, LIMIT);
+  });
 if (FILL && todo.length > FILL_CAP) {
   console.log(`보충 대상 ${todo.length}건 중 ${FILL_CAP}건만 이번에 받는다 (나머지는 다음 실행)`);
   todo = todo.slice(0, FILL_CAP);
@@ -97,19 +108,29 @@ console.log(`원문 수집 대상 ${todo.length}건 (수집 목록 ${notices.ite
 const fresh = new Map();
 for (const n of todo) {
   try {
-    const res = await fetch(n.url, { redirect: 'follow', headers: UA, signal: AbortSignal.timeout(20000) });
+    /* 증분 모드는 매일 수집 워크플로의 예산 안에서 돈다. 안 열리는 학교 하나가 20초씩 붙들면
+       상한(120건)에 곱해져 예산을 다 먹고, 그러면 그 실행의 수집분이 통째로 버려진다
+       (2026-08-03 브라우저 수집 시간초과 사고와 같은 계열). 그래서 증분 모드는 더 짧게 기다린다 —
+       못 받은 건 다음 실행이 다시 받으므로 잃는 것이 없다. */
+    const res = await fetch(n.url, { redirect: 'follow', headers: UA,
+      signal: AbortSignal.timeout(FILL ? 8000 : 20000) });
     let entry;
     if (res.ok) {
       const full = clean(await res.text());
-      entry = { text: full.slice(0, LIMIT) };
-      if (full.length > LIMIT) entry.cut = true;   // 잘린 것만 표시 — 다음 실행이 다시 받는다
-    } else entry = { text: `FETCH_FAIL HTTP ${res.status}` };
+      /* cut은 **항상** 남긴다(true/false 둘 다).
+         처음엔 잘렸을 때만 true를 붙였는데, 그러면 잘리지 않은 긴 원문(6,800자 등)이
+         cut 표시가 없는 채로 남아 "옛날 5,000자 컷에 걸린 것"으로 오인돼 **매 실행 다시
+         받는 무한 반복**이 됐다(2026-08-03, 두 번째 실행이 또 120건을 받아서 발견).
+         false를 명시해야 '이건 온전히 받은 것'이라고 다음 실행이 알 수 있다. */
+      entry = { text: full.slice(0, LIMIT), cut: full.length > LIMIT, limit: LIMIT };
+    } else entry = { text: `FETCH_FAIL HTTP ${res.status}`, fails: (prevIdx.byUrl.get(canonUrl(n.url))?.fails ?? 0) + 1 };
     fresh.set(canonUrl(n.url), { title: n.title, school: n.school, campus: n.campus, url: n.url,
       attachments: n.attachments || [], foundAt: n.foundAt, ...entry });
     console.log('text ok:', n.title.slice(0, 40));
   } catch (e) {
     fresh.set(canonUrl(n.url), { title: n.title, school: n.school, url: n.url,
-      text: 'FETCH_ERROR ' + (e.name || e.message) });
+      text: 'FETCH_ERROR ' + (e.name || e.message),
+      fails: (prevIdx.byUrl.get(canonUrl(n.url))?.fails ?? 0) + 1 });
   }
 }
 

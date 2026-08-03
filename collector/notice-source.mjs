@@ -56,9 +56,17 @@ export function sourceFor(item, idx) {
 export const hasText = (src) => !!(src && src.text && !/^FETCH_(FAIL|ERROR)/.test(src.text));
 
 /* 원문이 중간에 잘렸는가.
-   지금은 deepfetch가 잘랐을 때 cut:true를 남긴다. 그 표시가 생기기 전(2026-08-03 이전)에
-   저장된 것은 5,000자에서 잘려 있으므로 길이로 알아본다 — 한 번 다시 받으면 표시가 붙는다. */
+   deepfetch는 받을 때마다 cut(true/false)과 그때 쓴 한도(limit)를 함께 남긴다.
+   그 표시가 생기기 전(2026-08-03 이전)에 저장된 것은 5,000자에서 잘려 있으므로 길이로 알아본다 —
+   한 번 다시 받으면 표시가 붙어 더는 길이로 짐작하지 않는다. */
 export const isCut = (src) => !!(hasText(src) && (src.cut === true || (src.cut === undefined && src.text.length >= 4990)));
 
-/* 다시 받아야 하는가 = 없거나 · 실패했거나 · 잘렸거나 */
-export const needsFetch = (src) => !hasText(src) || isCut(src);
+/* 다시 받아야 하는가 = 없거나 · 실패했거나 · **지금보다 짧은 한도로** 잘렸거나.
+   지금 한도로 이미 잘린 것은 다시 받아도 똑같으므로 건너뛴다 — 안 그러면 아주 긴 공고
+   몇 건을 매 실행 영원히 다시 받는다(2026-08-03 실측 3건). 한도를 올리면 그때 다시 받는다. */
+export const needsFetch = (src, limit) => {
+  if (!hasText(src)) return true;
+  if (!isCut(src)) return false;
+  if (limit === undefined) return true;
+  return (src.limit ?? 5000) < limit;      // 옛 항목은 5,000자 한도였다
+};
