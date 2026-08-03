@@ -23,8 +23,16 @@ const WF_COLLECT = 'collect-scholarships.yml';
 const WF_BROWSER = 'browser-collect.yml';
 const KEY_NAME = 'handaejang.admin.key';
 
-const raw = (path, branch = BRANCH) =>
-  `https://raw.githubusercontent.com/${OWNER}/${REPO}/${branch}/${path}?t=${Date.now()}`;
+/* 저장소 파일 읽기 — **Contents API로만** 읽는다.
+   raw.githubusercontent.com은 인증 헤더를 받아 주지 않아서, 저장소를 비공개로 돌리는
+   순간 모든 요청이 404가 되고 관리자 화면 6개가 통째로 빈 화면이 된다(2026-08-03 확인).
+   Contents API는 열쇠로 읽으므로 공개·비공개 어느 쪽에서도 똑같이 동작한다.
+   열쇠에 이미 있는 Contents 읽기전용 권한만 쓰므로 권한을 더 줄 필요는 없다.
+   ※ 경로에 슬래시가 있으므로 칸별로 인코딩한다(슬래시 자체는 살려야 API가 경로로 읽는다). */
+const fileUrl = (path, branch = BRANCH) =>
+  `${API}/repos/${OWNER}/${REPO}/contents/` +
+  `${path.split('/').map(encodeURIComponent).join('/')}` +
+  `?ref=${encodeURIComponent(branch)}`;
 
 /* 오늘 (한국 시간 기준 — 마감 판정이 하루 어긋나지 않게) */
 const today = () => new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
@@ -80,6 +88,8 @@ const ghHeaders = (tk = TOKEN) => ({
   Accept: 'application/vnd.github+json',
   'X-GitHub-Api-Version': '2022-11-28',
 });
+/* 저장소 파일을 원문 그대로 받을 때 (fileUrl과 짝) — Accept만 다르다 */
+const rawHeaders = (tk = TOKEN) => ({ ...ghHeaders(tk), Accept: 'application/vnd.github.raw' });
 function readStoredKey() {
   return sessionStorage.getItem(KEY_NAME) || localStorage.getItem(KEY_NAME) || '';
 }
@@ -112,21 +122,33 @@ const D = {
   updatedAt: '', deployAhead: null,
 };
 
+/* 못 읽은 파일 장부 — 읽기가 조용히 실패하면 화면이 '텅 빈 정상'으로 보인다.
+   그 상태가 가장 위험하므로(공고 0건을 진짜 0건으로 오해한다) 원인을 남겨 알린다. */
+let READ_FAIL = [];
+
 async function readJson(path, fallback) {
   try {
-    const r = await fetch(raw(path), { cache: 'no-store' });
-    if (!r.ok) return fallback;
+    const r = await fetch(fileUrl(path), { headers: rawHeaders(), cache: 'no-store' });
+    if (!r.ok) { READ_FAIL.push({ path, why: `GitHub 응답 ${r.status}` }); return fallback; }
     return await r.json();
-  } catch (e) { return fallback; }
+  } catch (e) { READ_FAIL.push({ path, why: '네트워크 오류' }); return fallback; }
 }
 async function readText(path) {
   try {
-    const r = await fetch(raw(path), { cache: 'no-store' });
-    return r.ok ? await r.text() : '';
-  } catch (e) { return ''; }
+    const r = await fetch(fileUrl(path), { headers: rawHeaders(), cache: 'no-store' });
+    if (!r.ok) { READ_FAIL.push({ path, why: `GitHub 응답 ${r.status}` }); return ''; }
+    return await r.text();
+  } catch (e) { READ_FAIL.push({ path, why: '네트워크 오류' }); return ''; }
+}
+
+/* 데이터를 읽을 수 없는 상태인지 — 읽기의 뼈대인 등록 공고가 실패했으면 화면을 열지 않는다.
+   가장 흔한 원인은 열쇠에 Contents 읽기 권한이 없는 것이다(Actions 권한만 준 경우). */
+function readBlocked() {
+  return READ_FAIL.find((f) => f.path === 'data/registered.json') || null;
 }
 
 async function loadAll() {
+  READ_FAIL = [];
   const [reg, notices, forms, health, schools, targets, linkHunt, pending, autoCfg, log] =
     await Promise.all([
       readJson('data/registered.json', { items: [] }),
@@ -1250,6 +1272,16 @@ async function enter(key, remember) {
     await loadAll();
   } catch (e) {
     msg.className = 'gate-msg'; msg.textContent = '데이터를 읽지 못했습니다. 잠시 후 다시 시도해 주세요.';
+    btn.disabled = false;
+    return;
+  }
+  /* 읽기가 막혔으면 빈 화면을 열지 않고 원인을 말한다 —
+     '공고 0건'처럼 보이는 화면이 가장 위험하다. */
+  const blocked = readBlocked();
+  if (blocked) {
+    msg.className = 'gate-msg';
+    msg.textContent = `저장소 파일을 읽지 못했습니다 (${blocked.why}). `
+      + '열쇠에 이 저장소의 Contents 읽기 권한이 있는지 확인해 주세요.';
     btn.disabled = false;
     return;
   }

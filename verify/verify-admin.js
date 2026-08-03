@@ -60,27 +60,39 @@ function serve() {
   page.on('console', (m) => { if (m.type() === 'error') errors.push(`CONSOLE: ${m.text()}`); });
   page.on('dialog', async (d) => { await d.accept(); });
 
-  /* 바깥 요청 가로채기 — 저장소의 진짜 파일로 응답한다 */
+  /* 바깥 요청 가로채기 — 저장소의 진짜 파일로 응답한다.
+     파일 읽기도 api.github.com의 Contents API를 쓴다(비공개 저장소에서도 열리도록
+     raw.githubusercontent.com을 버렸다 — 2026-08-03). 그래서 가로채기도 한 곳뿐이다. */
   let apiCalls = 0;
+  const CONTENTS_PREFIX = '/repos/seonju5543-web/hanggonggan/contents/';
+  let rawAuthed = 0, rawUnauthed = 0;
   await page.route('https://api.github.com/**', async (route) => {
     apiCalls += 1;
-    const u = route.request().url();
-    if (u.includes('/compare/')) {
+    const req = route.request();
+    const u = new URL(req.url());
+
+    /* 파일 읽기 — 저장소의 진짜 파일로 응답 */
+    if (u.pathname.startsWith(CONTENTS_PREFIX)) {
+      const rel = decodeURIComponent(u.pathname.slice(CONTENTS_PREFIX.length));
+      /* 열쇠를 실제로 보내는지 센다 — 안 보내면 비공개 저장소에서 404가 된다 */
+      const h = await req.allHeaders();
+      if (h.authorization) rawAuthed += 1; else rawUnauthed += 1;
+      const f = path.join(ROOT, rel);
+      if (!f.startsWith(ROOT) || !fs.existsSync(f)) return route.fulfill({ status: 404, body: '' });
+      return route.fulfill({ status: 200, contentType: 'application/json', body: fs.readFileSync(f, 'utf8') });
+    }
+
+    if (u.pathname.includes('/compare/')) {
       return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ahead_by: 3 }) });
     }
     return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ full_name: 'seonju5543-web/hanggonggan' }) });
   });
-  /* /owner/repo/<브랜치>/<경로> → 저장소의 그 파일.
-     기본 브랜치 이름에 슬래시가 들어 있어(claude/nice-…) 칸 수로 자르면 안 된다. */
-  const RAW_PREFIX = '/seonju5543-web/hanggonggan/claude/nice-heisenberg-WESq5/';
+  /* raw.githubusercontent.com으로 새는 요청이 하나라도 있으면 잡는다 —
+     그 주소는 인증 헤더를 안 받아서 저장소를 비공개로 돌리는 순간 전부 404가 된다. */
+  let rawLeaks = 0;
   await page.route('https://raw.githubusercontent.com/**', async (route) => {
-    const u = new URL(route.request().url());
-    const rel = u.pathname.startsWith(RAW_PREFIX)
-      ? u.pathname.slice(RAW_PREFIX.length)
-      : u.pathname.split('/').slice(4).join('/');
-    const f = path.join(ROOT, rel);
-    if (!f.startsWith(ROOT) || !fs.existsSync(f)) return route.fulfill({ status: 404, body: '' });
-    return route.fulfill({ status: 200, contentType: 'application/json', body: fs.readFileSync(f, 'utf8') });
+    rawLeaks += 1;
+    return route.fulfill({ status: 404, body: '' });
   });
 
   await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
@@ -102,12 +114,34 @@ function serve() {
     (await page.textContent('#gate-msg')).trim());
   errors.length = 0;   // 위에서 일부러 낸 401은 오류로 세지 않는다
 
+  /* 열쇠는 맞는데 파일을 못 읽는 경우(예: Contents 권한 없는 열쇠·비공개 전환 사고) —
+     '공고 0건'인 척하는 빈 화면을 열지 않고 원인을 말해야 한다. 이게 가장 위험한 실패다. */
+  await page.route('https://api.github.com/repos/seonju5543-web/hanggonggan/contents/**',
+    (r) => r.fulfill({ status: 403, body: '' }), { times: 30 });
+  await page.fill('#gate-key', 'github_pat_testtoken');
+  await page.click('#gate-enter');
+  await page.waitForTimeout(1200);
+  ok(await page.isVisible('#gate'), '파일을 못 읽으면 빈 화면을 열지 않는다');
+  ok(/Contents/.test((await page.textContent('#gate-msg')) || ''),
+    '못 읽는 이유(열쇠 권한)를 화면에 알려 준다',
+    ((await page.textContent('#gate-msg')) || '').trim());
+  await page.unroute('https://api.github.com/repos/seonju5543-web/hanggonggan/contents/**');
+  errors.length = 0;   // 일부러 낸 403은 오류로 세지 않는다
+  rawAuthed = 0; rawUnauthed = 0;
+
   /* ② 올바른 열쇠로 입장 */
   await page.fill('#gate-key', 'github_pat_testtoken');
   await page.click('#gate-enter');
   await page.waitForSelector('#app:not([hidden])', { timeout: 15000 });
   ok(true, '올바른 열쇠로 입장');
   ok(apiCalls > 0, '열쇠를 GitHub에 실제로 확인한다 (흉내가 아님)');
+  /* 비공개 전환 대비 — 저장소를 잠가도 화면이 살아 있으려면 이 둘이 동시에 성립해야 한다 */
+  ok(rawLeaks === 0,
+    'raw.githubusercontent.com을 하나도 쓰지 않는다 (비공개 저장소에서 404가 되는 주소)',
+    `샌 요청 ${rawLeaks}건`);
+  ok(rawAuthed > 0 && rawUnauthed === 0,
+    '저장소 파일을 전부 열쇠를 붙여 읽는다',
+    `열쇠 붙음 ${rawAuthed}건 · 안 붙음 ${rawUnauthed}건`);
 
   const reg = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/registered.json'), 'utf8'));
   const forms = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/forms.json'), 'utf8'));
