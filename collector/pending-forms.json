@@ -79,7 +79,7 @@
    "added": "2026-08-02",
    "fetched": false,
    "schematized": false,
-   "tries": 1,
+   "tries": 2,
    "lastTryAt": "2026-08-03"
   },
   {
@@ -105,7 +105,7 @@
    "added": "2026-08-02",
    "fetched": false,
    "schematized": false,
-   "tries": 1,
+   "tries": 2,
    "lastTryAt": "2026-08-03"
   },
   {
@@ -123,7 +123,7 @@
    "added": "2026-08-02",
    "fetched": false,
    "schematized": false,
-   "tries": 1,
+   "tries": 2,
    "lastTryAt": "2026-08-03"
   },
   {
@@ -149,7 +149,7 @@
    "added": "2026-08-02",
    "fetched": false,
    "schematized": false,
-   "tries": 1,
+   "tries": 2,
    "lastTryAt": "2026-08-03"
   },
   {
@@ -167,7 +167,7 @@
    "added": "2026-08-02",
    "fetched": false,
    "schematized": false,
-   "tries": 1,
+   "tries": 2,
    "lastTryAt": "2026-08-03"
   },
   {
@@ -206,9 +206,8 @@
    "id": "reg-ewha-gasong",
    "name": "(재)가송재단 장학생 (이화여대 접수, 2026-2학기)",
    "target": "[학부] 2026학년도 2학기 가송재단 장학",
-   "fetched": false,
-   "schematized": false,
-   "tries": 1,
+   "fetched": true,
+   "schematized": true,
    "lastTryAt": "2026-08-03"
   },
   {
@@ -237,6 +236,14 @@
    "id": "auto-scho332277911artclviewdo",
    "name": "[장학금 접수] 2026학년도 국가우수장학금(이공계) 신규장학생 선발 공고",
    "target": "2026학년도 국가우수",
+   "added": "2026-08-03",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-knuackrnano2432no9979955",
+   "name": "2026학년도 (재)운해장학재단 장학생 신청 안내",
+   "target": "2026학년도 (재)운",
    "added": "2026-08-03",
    "fetched": true,
    "schematized": false
