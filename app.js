@@ -1117,10 +1117,10 @@ function openDetail(id) {
         const mark = m === 'ok' ? '✓ ' : m === 'no' ? '✕ ' : '';
         return `<li class="${cls}">${mark}${esc(e)}</li>`;
       }).join('');
-  } else if (qLines.length) {
-    // 다듬을 요건 줄이 없으면 발췌 문장이라도 원문 그대로
-    reasonRows += `<li class="r-head">공고에 적힌 요건</li>`
-      + qLines.map((e) => `<li class="r-quote">${esc(e)}</li>`).join('');
+  } else if (requirementLines(sch, qLines).length) {
+    // 자격 줄이 없으면 발췌 문장으로 물러나되, **같은 정리를 거쳐** 보여 준다
+    reasonRows += requirementLines(sch, qLines)
+      .map((e) => `<li class="r-req">${esc(e)}</li>`).join('');
   }
   if (checkRows) {
     reasonRows += `<li class="r-head">내 정보로 확인한 것</li>` + checkRows;

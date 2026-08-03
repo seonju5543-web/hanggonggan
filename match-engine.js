@@ -174,7 +174,9 @@ const REQ_NOISE = new RegExp([
   '^(선발|모집)\\s?인원',                      // 선발 인원 : 1명
   '^금\\s*액|^장학\\s*금액|^지원\\s*금액|^지급\\s*액',   // 금 액 : 250만원
   '^(수여식|시상식|일정|장소|기간)\\s*[:：]',
-  '^[가-힣]\\s*\\.\\s',                        // "나 . 장학생 선발" 같은 항목 머리
+  // '가./나./다.'로 시작한다고 버리면 안 된다 — 그건 자격 절 안의 **진짜 요건 줄**이기도 하다
+  // (면학장학금: "가. 2026-2학기 등록자…"). 접두어는 tidyRequirement가 이미 떼고,
+  // "나. 장학생 선발" 같은 제목 줄은 아래 '이름표만 남은 제목' 규칙이 잡는다.
   '^(선발\\s?기준|선발\\s?방법|장학생\\s?선발)\\s*$',
   // 이름표만 남은 제목 줄 ("선발 대상", "지원자격" 등) — 내용이 없으면 요건이 아니다
   '^(신청|지원|응모|선발|모집|추천)?\\s*(자격|대상|요건|기준)\\s*[:：]?\\s*$',
@@ -203,8 +205,10 @@ function tidyRequirement(line) {
     .trim();
 }
 
-function requirementLines(sch) {
-  const raw = (sch && sch.eligibilityLines) || [];
+/* lines를 따로 넘기면 그 줄들을 정리한다 — 자격 줄이 없어 원문 발췌로 물러날 때도
+   같은 정리를 거치게 하기 위해서다(안 그러면 그 경로로만 ※ 부연이 새어 나온다). */
+function requirementLines(sch, lines) {
+  const raw = lines || (sch && sch.eligibilityLines) || [];
   const out = [];
   for (const l of raw) {
     const t = tidyRequirement(l);
