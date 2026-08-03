@@ -1086,28 +1086,38 @@ function openDetail(id) {
      없으면 자격 낱말이 든 발췌 문장이라도 보여 준다. */
   const qBlock = (sch.eligibilityLines || []).filter((l) => !QUALIFY_RE.test(l) || l.length > 14);
   const qLines = qBlock.length ? qBlock : (sch.excerpts || []).filter((e) => QUALIFY_RE.test(e));
-  const qualifyRows = qLines.length
-    ? `<li class="r-head">지원 자격</li>`
-      + qLines.map((e) => `<li class="r-quote">${esc(e)}</li>`).join('')
-    : '';
 
-  let reasonRows = result.reasons.map((r) => {
+  /* '재학 대학 공고 (○○대)'는 자격이 아니라 **이 공고가 우리 학교 것**이라는 범위 표시다.
+     초록 체크로 띄우면 "자격이 된다"로 읽혀 모순이 된다(2026-08-02 개발자 지적) — 카드 자체가
+     이미 그 학교 학생에게만 보이므로 통과 쪽은 아예 빼고, 학교가 다른 경우(✕)만 남긴다. */
+  const isScopeOk = (r) => /^재학 대학 공고/.test(r);
+  const judged = result.reasons.filter((r) => !isScopeOk(r));
+
+  const checkRows = judged.map((r) => {
     const bad = /필요|아니에요|가능$/.test(r) && !/충족|확인/.test(r);
-    return `<li class="${bad ? 'r-bad' : 'r-ok'}">${bad ? '✕' : '✓'} ${r}</li>`;
-  }).join('');
-  const missingRows = result.missing.map((m) => `<li class="r-unk">? ${m} 정보를 입력하면 정확히 판단할 수 있어요</li>`).join('');
-  if (!reasonRows && !missingRows) {
-    /* 판정할 조건이 하나도 없다는 건 '제한이 없다'가 아니라 **우리가 아직 모른다**는 뜻이다
-       (2026-08-02 개발자 지적). 실제로 5·18희망장학생은 원문에 '민주화운동·국가폭력 피해자
-       유자녀' 같은 요건이 있는데 앱이 '제한 없음'이라고 말하고 있었다 — 원칙 8-1(추론 금지) 위반.
-       원문에서 '제한 없음'을 확인한 공고만 eligibilityVerified로 표시하고, 나머지는 모른다고 말한다. */
-    /* 구조화된 조건이 없어도, 공고 원문에 자격 문장이 있으면 **그대로** 보여 준다
-       (2026-08-02 개발자 지시). 앱이 판정하지는 못해도 학생이 진짜 요건을 읽을 수는 있어야 한다.
-       추론이 아니라 원문 발췌라 원칙 8-1을 지킨다. */
+    return `<li class="${bad ? 'r-bad' : 'r-ok'}">${bad ? '✕' : '✓'} ${esc(r)}</li>`;
+  }).join('')
+    + result.missing.map((m) => `<li class="r-unk">? ${esc(m)} 정보를 입력하면 정확히 판단할 수 있어요</li>`).join('');
+
+  /* 지원 자격 한 덩어리 — 원문 요건을 먼저 보여 주고, 그 아래에 '내 정보로 확인한 것'을 붙인다.
+     앱이 판정할 수 있는 건 성적·소득구간·학년 같은 숫자 조건뿐이고, 원문의 '유자녀' 같은 항목은
+     판정할 수 없다. 그래서 두 묶음을 **구분해서** 보여 준다 — 섞으면 앱이 다 판정한 것처럼 읽힌다. */
+  let reasonRows = '';
+  if (qLines.length) {
+    reasonRows += `<li class="r-head">공고에 적힌 요건</li>`
+      + qLines.map((e) => `<li class="r-quote">${esc(e)}</li>`).join('');
+  }
+  if (checkRows) {
+    reasonRows += `<li class="r-head">내 정보로 확인한 것</li>` + checkRows;
+  }
+  if (!reasonRows) {
+    /* 원문 요건도 못 읽었고 판정할 조건도 없는 경우 — '제한이 없다'가 아니라 **모른다**는 뜻이다.
+       원문에서 '제한 없음'을 확인한 공고만 eligibilityVerified로 확신 문구를 낸다. */
     reasonRows = sch.eligibilityVerified
       ? `<li class="r-ok">✓ 별도 자격 제한이 없는 공고예요${result.status === 'selective' ? ' — 지원자 중 선발 심사로 결정돼요' : ''}</li>`
-      : `<li class="r-unk">? 지원 자격은 <strong>공고 원문에서 확인</strong>하세요 — 앱이 아직 요건을 읽지 못했어요${result.status === 'selective' ? ' (지원자 중 선발 심사로 결정돼요)' : ''}</li>`;
+      : `<li class="r-unk">? 지원 자격을 아직 읽지 못했어요 — 아래 원문에서 확인해 주세요${result.status === 'selective' ? ' (지원자 중 선발 심사로 결정돼요)' : ''}</li>`;
   }
+  const missingRows = '';
 
   let btnLabel = '⚡ 원클릭 신청 준비하기';
   if (app && !app.pending) btnLabel = '✓ 신청 준비 완료됨';
@@ -1130,9 +1140,9 @@ function openDetail(id) {
       <p class="sheet-amount">${esc(sch.amount)}</p>
       <p class="sheet-summary">${esc(sch.summary)}</p>
 
-      <h4>자격 진단</h4>
-      <ul class="reason-list">${reasonRows}${missingRows || ''}${qualifyRows}</ul>
-      <p class="doc-legend">지원 요건은 바뀔 수 있어요 — 신청 전에 ${sch.sourceUrl
+      <h4>지원 자격</h4>
+      <ul class="reason-list">${reasonRows}${missingRows}</ul>
+      <p class="doc-legend">앱이 확인할 수 있는 건 성적·소득구간·학년처럼 프로필에 있는 항목뿐이에요. 나머지 요건과 최신 내용은 ${sch.sourceUrl
         ? `<a href="${esc(safeUrl(sch.sourceUrl))}" target="_blank" rel="noopener" style="color:var(--primary);font-weight:700">${sch.program ? '한국장학재단 ↗' : (isBoardListLink(sch.sourceUrl) ? '게시판 목록 ↗' : '원문 공고 ↗')}</a>에서`
         : '공고 원문에서'} 다시 확인하세요.</p>
 
