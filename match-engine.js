@@ -42,9 +42,15 @@ function evaluate(sch, p) {
   }
 
   if (e.flagsAny) {
-    const has = e.flagsAny.some((f) => flags.includes(f));
-    if (!has) { ok = false; reasons.push('해당 특별자격(수급자·다자녀·보훈 등)이 필요해요'); }
-    else reasons.push('특별자격 요건 충족');
+    /* 어떤 자격으로 충족됐는지 괄호로 밝힌다 (2026-08-02 개발자 요청) —
+       '특별자격 요건 충족'만으로는 무엇 때문에 통과했는지 알 수 없다.
+       라벨은 data.js의 FLAG_LABELS를 쓰되, 서비스워커에는 그 파일이 없으므로 없으면 키를 쓴다. */
+    const matched = e.flagsAny.filter((f) => flags.includes(f));
+    if (!matched.length) { ok = false; reasons.push('해당 특별자격(수급자·다자녀·보훈 등)이 필요해요'); }
+    else {
+      const L = (typeof FLAG_LABELS !== 'undefined' && FLAG_LABELS) || {};
+      reasons.push(`특별자격 요건 충족 (${matched.map((f) => L[f] || f).join(', ')})`);
+    }
   }
 
   if (e.seoulOnly) {
@@ -170,12 +176,21 @@ const REQ_NOISE = new RegExp([
   '^(수여식|시상식|일정|장소|기간)\\s*[:：]',
   '^[가-힣]\\s*\\.\\s',                        // "나 . 장학생 선발" 같은 항목 머리
   '^(선발\\s?기준|선발\\s?방법|장학생\\s?선발)\\s*$',
+  // 이름표만 남은 제목 줄 ("선발 대상", "지원자격" 등) — 내용이 없으면 요건이 아니다
+  '^(신청|지원|응모|선발|모집|추천)?\\s*(자격|대상|요건|기준)\\s*[:：]?\\s*$',
+  '^서류\\s?접수|^제출\\s?서류',                    // 서류 안내
+  '\\.(hwp|hwpx|pdf|docx?|xlsx?|zip|png|jpg)$',    // 첨부 파일 이름이 섞여 들어온 것
+  '신청\\s?(일정|안내)\\s*$',                       // "…국가장학금 1차 신청 안내"
+  '지급\\s*$|근무 기준 월|원 지급',                  // 금액·지급 안내
 ].join('|'));
 
 function tidyRequirement(line) {
   return String(line || '')
     .replace(/^[\s\-–—•▪▶◆◇○●·ㆍ*]+/, '')            // 앞머리 기호
-    .replace(/^\(?\s*\d+\s*\)|^[①-⑳]|^[가-힣]\s*\.\s/, '')   // 앞머리 번호 ("3 )"처럼 띈 것도)
+    // 앞머리 번호 — "3 )" "1." "가." "①" 모두
+    .replace(/^\(?\s*\d+\s*[).]|^[①-⑳]|^[가-힣]\s*[.)]\s/, '')
+    // "지원자격 : 내용" 처럼 이름표가 앞에 붙은 경우 이름표만 뗀다 (내용은 살린다)
+    .replace(/^\s*(신청|지원|응모|선발|모집|추천)?\s*(자격|대상|요건|기준)\s*[:：]\s*/, '')
     .replace(/^[\s.)\]]+/, '')
     .replace(/\s*★\s*/g, '')
     .replace(/\s+/g, ' ')

@@ -68,7 +68,19 @@ const QUALIFY_HEAD = /(신청\s?자격|지원\s?자격|응모\s?자격|자격\s?
    예전엔 '장학금액' 같은 낱말에서도 끊었는데, 자격이 표로 적힌 공고에서는 그게
    표의 머리글이라 거기서 잘려 정작 중요한 요건 줄(장애의 정도가 심한 장애인 등)을
    통째로 놓쳤다(2026-08-02 복지장학1 사례). 표 머리글은 아래 TABLE_NOISE로 걸러낸다. */
-const NEXT_SECTION = /^\s*(?:\d+\s*[.)]\s*)?(신청\s?기간|접수\s?기간|신청\s?접수|신청\s?방법|접수\s?방법|제출\s?서류|구비\s?서류|제출\s?방법|선발\s?방법|유의\s?사항|문의)/;
+const SECT_PREFIX = '^\\s*(?:[가-힣]\\s*[.)]\\s*|\\d+\\s*[.)]\\s*|[①-⑳]\\s*)?';
+const NEXT_SECTION = new RegExp(SECT_PREFIX +
+  '(신청\\s?기간|접수\\s?기간|신청\\s?접수|신청\\s?방법|접수\\s?방법|제출\\s?서류|구비\\s?서류|제출\\s?방법|선발\\s?방법|유의\\s?사항|문의|지급|장학금\\s?지급|안내|일정|기타|참고)');
+
+/* 자격 절이 끝났는지 판단하는 **구조적** 기준 (2026-08-02 해성문화재단 사례).
+   공고는 보통 '가. / 나. / 다. / 라.' 또는 '1. / 2. / 3.'으로 절이 나뉜다.
+   자격 절 다음에 오는 **다른 절 머리글**을 만나면 거기서 끝이다 — 낱말을 일일이
+   나열하는 방식은 '장학금 지급 관련 안내'처럼 처음 보는 제목에 계속 뚫린다.
+   단, 그 머리글 자체가 자격을 뜻하면(선발 대상 등) 이어서 읽는다. */
+const SECTION_HEAD = /^\s*(?:[가-힣]\s*[.)]|\d+\s*\.)\s*\S/;
+/* 이 절 머리글이 여전히 '누가 받을 수 있나'를 말하면 이어서 읽는다.
+   '나. 장학생 선발' / '1) 선발기준' 아래에 실제 요건이 이어지는 공고가 있다(유흥수 장학금). */
+const STILL_QUALIFY = /(자격|대상자?|요건|기준)\s*$|(신청|지원|선발|모집|추천)\s?(자격|대상)|장학생\s?선발|선발\s?기준/;
 
 /* 표 머리글·표 안의 값 — 요건이 아니라 표를 이루는 부속이라 버린다 */
 const TABLE_NOISE = new RegExp([
@@ -102,6 +114,8 @@ function extractQualifyLines(text) {
   for (let i = start; i < lines.length && out.length < 8; i += 1) {
     const l = lines[i];
     if (i > start && NEXT_SECTION.test(l)) break;      // 다음 절 시작 — 여기서 끊는다
+    // 다른 절 머리글(다. / 라. / 3.)을 만나면 자격 절이 끝난 것이다
+    if (i > start && SECTION_HEAD.test(l) && !STILL_QUALIFY.test(l)) break;
     if (JUNK.test(l)) continue;
     if (TABLE_NOISE.test(l.replace(/\s+/g, ' ').trim())) continue;   // 표 머리글·표 값
     if (l.length < 4 || l.length > 200) continue;
