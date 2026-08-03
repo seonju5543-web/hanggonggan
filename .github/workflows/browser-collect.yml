@@ -58,6 +58,11 @@ jobs:
           npm i @anthropic-ai/sdk --no-audit --no-fund --silent
           node collector/schematize-forms.mjs collector/browser-report.md
 
+      # 원문 보충 (2026-08-03 도입) — 자격 요건이 사라지던 두 원인을 막는 단계.
+      # 자세한 경위는 collect-scholarships.yml의 같은 단계 주석 참조. 증분이라 시간 부담 없음.
+      - name: 공고 원문 보충 수집 (빠진 것·잘린 것만)
+        run: node collector/deepfetch.mjs --fill
+
       - name: 공고 원문 발췌 갱신 (정직 원칙 — 추론 대신 원문 그대로)
         run: node collector/extract-excerpts.mjs --write
 

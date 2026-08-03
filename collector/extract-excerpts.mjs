@@ -10,6 +10,9 @@
          node collector/extract-excerpts.mjs --write (registered.json 반영)
    ============================================================ */
 import fs from 'node:fs';
+/* 원문 찾기 규칙은 notice-source.mjs 한 곳에 있다 — 수집기·재채점 도구와 같은 방법을
+   써야 "발췌기는 찾았는데 수집기는 못 찾는" 어긋남이 안 생긴다 (2026-08-03 분리). */
+import { indexTexts, sourceFor, hasText } from './notice-source.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const texts = JSON.parse(fs.readFileSync(new URL('extracted/notices-text.json', HERE), 'utf8'));
@@ -17,26 +20,13 @@ const regPath = new URL('../data/registered.json', HERE);
 const reg = JSON.parse(fs.readFileSync(regPath, 'utf8'));
 const WRITE = process.argv.includes('--write');
 
-const ID_PARAMS = /^(seq|articleno|bbs_seq|duid|list_id|entryid|bbsidx|menu_id|contents_no|site_no|board_seq|menuno|no|ntt|nttsn|idx|wr_id|bidx)$/i;
-function canonUrl(raw) {
-  try {
-    const u = new URL(raw);
-    const keep = [];
-    for (const [k, v] of u.searchParams) if (ID_PARAMS.test(k) && v) keep.push(`${k.toLowerCase()}=${v}`);
-    keep.sort();
-    const marker = u.hash && u.hash.startsWith('#n-') ? u.hash : '';
-    return u.origin + u.pathname + (keep.length ? '?' + keep.join('&') : '') + marker;
-  } catch { return (raw || '').split('#')[0]; }
-}
-const norm = (t) => (t || '').replace(/\[[^\]]*\]/g, '').replace(/[\s·ㆍ()~〜.,'"“”‘’!⭐★]/g, '').toLowerCase();
-
 /* 발췌 규칙: 신청 안내 신호가 있는 문장만, 메뉴·잡음 문장은 제외, 원문 그대로 */
 const MARK = /(신청\s?기간|접수\s?기간|신청\s?방법|접수\s?방법|제출\s?서류|구비\s?서류|제출\s?방법|제출\s?기한|신청\s?기한|선발\s?인원|지급\s?금액|장학금액|문의처|문의\s?:|신청\s?자격|지원\s?자격|응모\s?자격|자격\s?요건|지원\s?대상|신청\s?대상|모집\s?대상|선발\s?대상|추천\s?대상)/;
 /* 자격 신호(2026-08-02 개발자 지시로 추가) — 앞으로 들어오는 공고는 자격 요건 문장도 함께 발췌한다.
    예전엔 신청기간·서류만 뽑아서, 앱이 자격을 "별도 제한 없음"으로 단정하는 원인이 됐다.
    추론이 아니라 **원문 문장 그대로**이므로 원칙 8-1을 지킨다. */
 const QUALIFY = /(신청\s?자격|지원\s?자격|응모\s?자격|자격\s?요건|지원\s?대상|신청\s?대상|모집\s?대상|선발\s?대상|추천\s?대상)/;
-const JUNK = /바로가기|사이트맵|SITEMAP|로그인|회원가입|검색어|메뉴|팝업|카드뉴스|이전글|다음글|목록으로|저작권|개인정보처리방침|instagram|facebook/i;
+const JUNK = /바로가기|사이트맵|SITEMAP|로그인|회원가입|검색어|메뉴|팝업|카드뉴스|이전글|다음글|목록으로|목록보기|첨부파일\s*$|저작권|개인정보처리방침|instagram|facebook/i;
 
 function extractFrom(text) {
   if (!text) return [];
@@ -71,9 +61,13 @@ const QUALIFY_HEAD = /(신청\s?자격|지원\s?자격|응모\s?자격|자격\s?
    예전엔 '장학금액' 같은 낱말에서도 끊었는데, 자격이 표로 적힌 공고에서는 그게
    표의 머리글이라 거기서 잘려 정작 중요한 요건 줄(장애의 정도가 심한 장애인 등)을
    통째로 놓쳤다(2026-08-02 복지장학1 사례). 표 머리글은 아래 TABLE_NOISE로 걸러낸다. */
-const SECT_PREFIX = '^\\s*(?:[가-힣]\\s*[.)]\\s*|\\d+\\s*[.)]\\s*|[①-⑳]\\s*)?';
+/* 절 머리글 앞에 붙는 것들. **■ □ ▣ 같은 네모 기호를 빠뜨리면 안 된다**
+   (2026-08-03 전수 재채점에서 발견 — 의심 줄 22개 중 12개가 이 하나 때문이었다).
+   세종대·서울과기대처럼 절을 '■ 자격요건 / ■ 장학금액 / ■ 유의사항'으로 나누는 공고에서
+   기호를 못 알아봐 자격 절을 지나 금액·문의·유의사항까지 통째로 자격으로 읽고 있었다. */
+const SECT_PREFIX = '^\\s*(?:[■□▣●▶◆◇○★]\\s*|[가-힣]\\s*[.)]\\s*|\\d+\\s*[.)]\\s*|[①-⑳]\\s*)?';
 const NEXT_SECTION = new RegExp(SECT_PREFIX +
-  '(신청\\s?기간|접수\\s?기간|신청\\s?접수|신청\\s?방법|접수\\s?방법|제출\\s?서류|구비\\s?서류|제출\\s?방법|선발\\s?방법|유의\\s?사항|문의|지급|장학금\\s?지급|안내|일정|기타|참고)');
+  '(신청\\s?기간|접수\\s?기간|지원\\s?기간|신청\\s?접수|신청\\s?방법|접수\\s?방법|제출\\s?서류|구비\\s?서류|제출\\s?방법|선발\\s?방법|유의\\s?사항|문의|지급|장학금\\s?지급|장학\\s?금액|안내|일정|기타|참고|제외\\s?대상|선발\\s?제외|지원\\s?내용|장학\\s?내용|혜택)');
 
 /* 자격 절이 끝났는지 판단하는 **구조적** 기준 (2026-08-02 해성문화재단 사례).
    공고는 보통 '가. / 나. / 다. / 라.' 또는 '1. / 2. / 3.'으로 절이 나뉜다.
@@ -178,26 +172,71 @@ function extractQualifyLines(text) {
   return out.length >= 1 && out.join('').length >= 10 ? out : [];
 }
 
-const byUrl = new Map();
-const byTitle = new Map();
-for (const v of Object.values(texts)) {
-  if (v.url) byUrl.set(canonUrl(v.url), v);
-  if (v.title) byTitle.set(norm(v.title), v);
+/* ── 2차 경로: 자격 절 제목이 아예 없는 공고 (2026-08-03) ──────────────
+   전수 재채점 결과, 못 뽑은 84건 중 **35건은 원문에 '지원자격' 같은 제목이 없었다**.
+   자격이 줄글이나 표 안에 섞여 있는 유형이라, 제목 낱말을 아무리 늘려도 잡히지 않는다.
+
+   그래서 제목을 못 찾았을 때만 **줄 단위로 줍는다.** 단, 넓게 주우면 제출서류·문의처가
+   자격으로 둔갑하므로(시제품에서 실제로 그랬다) 아주 보수적으로 간다:
+     · '누가 받을 수 있나'를 말하는 **분명한 신호**가 있는 줄만
+     · 기간·서류·금액·인원 줄은 제외
+     · **2줄 이상 모였을 때만** 채택 — 한 줄만 걸린 건 대개 오탐이다
+   이래도 못 뽑으면 지어내지 않고 비워 둔다(원칙 8-1). */
+const STRONG = /(평점\s?\d|평균\s?\d|\d\.\d+\s?이상|\d+\s?학점\s?이상|소득\s?분위|\d\s?분위|기초\s?생활|수급자|차상위|한부모|다자녀|유자녀|국가유공|독립유공|보훈|장애\s?(학생|인|정도)|다문화|북한이탈|새터민|미혼모)/;
+const WHO = /(재학생|재학\s?중|복학생|신입생|편입생|\d\s?학년|학부생|4\s?년제|대학생)/;
+const TAIL = /(이상인?\s?자|이하인?\s?자|해당하는\s?자|가능한\s?자|갖춘\s?자|인\s?자$|학생$|대상자$)/;
+/* 요건이 아닌 것이 분명한 줄 — 여기 걸리면 신호가 있어도 버린다 */
+const NOT_REQ = /(신청\s?기간|접수\s?기간|지원\s?기간|신청\s?기한|제출\s?기한|제출\s?서류|구비\s?서류|문의|담당자|전화|이메일|@|팩스|첨부|다운로드|바로가기|클릭|홈페이지|www\.|http|지급\s?(일정|방법|시기)|지원\s?내용|장학\s?금액|선발\s?인원|모집\s?인원|\d+\s?명\s?(내외|이내)|만\s?원|\d{3,}\s?원|붙임|별첨|공고합니다|바랍니다|하시기|메일\s?제목|파일\s?명)/;
+/* 요건처럼 생겼지만 요건이 아닌 세 가지 — 2026-08-03 2차 경로를 켜고 눈으로 확인해 잡은 것들
+   ① 브라우저 제목줄("… 신청 안내 | 숙명여자대학교")  ② 부서·기관 이름만 있는 줄("장애학생지원센터")
+   ③ 증명서 발급 안내("… 증명서 1부(보훈청에서 발급)") — 이건 제출서류지 자격이 아니다 */
+const NOT_REQ2 = /\s\|\s|^.{0,16}(센터|팀|실)$|증명서\s*\d*\s*부|발급\s*\)|에서\s?발급/;
+
+function scoopQualifyLines(text) {
+  if (!text) return [];
+  const lines = text.split(/\n+/).map((l) => unent(l).replace(/[ \t　]+/g, ' ').trim()).filter(Boolean);
+  const out = [];
+  for (const l of lines) {
+    if (l.length < 6 || l.length > 110) continue;
+    if (JUNK.test(l) || NOT_REQ.test(l) || NOT_REQ2.test(l)) continue;
+    if (TABLE_NOISE.test(l)) continue;
+    if (!/[가-힣]/.test(l)) continue;
+    if (/^\d{4}[.\-]\d/.test(l)) continue;                 // 날짜 줄
+    const strong = STRONG.test(l);
+    if (!strong && !(WHO.test(l) && TAIL.test(l))) continue;
+    if (!out.includes(l)) out.push(l);
+    if (out.length >= 6) break;
+  }
+  return out.length >= 2 ? out : [];      // 한 줄짜리는 믿지 않는다
 }
 
-let hit = 0, none = 0;
+const idx = indexTexts(texts);
+
+let hit = 0, none = 0, kept = 0;
 for (const it of reg.items) {
   if (it.program) continue;
-  const src = byUrl.get(canonUrl(it.sourceUrl || '')) || byTitle.get(norm(it.name)) || null;
-  const ex = src ? extractFrom(src.text) : [];
-  const qual = src ? extractQualifyLines(src.text) : [];
+  const src = sourceFor(it, idx);
+
+  /* 원문이 없으면 **아무 판단도 하지 않는다** (2026-08-03 수정).
+     예전엔 원문을 못 찾으면 이미 뽑아 둔 자격·발췌를 지웠다. 그런데 원문 파일은 수집 목록이
+     60일마다 갈리면서 통째로 다시 만들어져, 등록 공고의 원문이 정상적으로 사라진다.
+     그래서 **멀쩡하던 자격이 두 달 뒤 저절로 없어지고 있었다**(원문 미확보 17건이 그 결과).
+     "원문이 없다"는 "자격이 없다"가 아니라 "모른다"이므로, 이전 값을 그대로 둔다.
+     — 원칙 8-1(모르는 것을 단정하지 않는다)과 같은 정신. */
+  if (!hasText(src)) { kept += 1; continue; }
+
+  const ex = extractFrom(src.text);
+  // 자격 절을 못 찾았을 때만 2차 경로로 물러난다 (절이 있으면 그쪽이 언제나 정확하다)
+  const qual = extractQualifyLines(src.text).length
+    ? extractQualifyLines(src.text)
+    : scoopQualifyLines(src.text);
   if (WRITE) {
     if (qual.length) it.eligibilityLines = qual;
-    else delete it.eligibilityLines;   // 원문이 바뀌어 못 뽑게 되면 옛 값을 남기지 않는다
+    else delete it.eligibilityLines;   // 원문은 읽었는데 못 뽑았다 → 옛 값을 남기지 않는다
 
     /* '제외 대상'도 자격 정보다 (2026-08-03 개발자 지적 — 동국인재육성장학).
        "누가 받을 수 있나"만큼 "누가 못 받나"도 학생이 알아야 한다. 원문 그대로 뽑는다. */
-    const excl = src ? extractExcludeLines(src.text) : [];
+    const excl = extractExcludeLines(src.text);
     if (excl.length) it.eligibilityExcludes = excl;
     else delete it.eligibilityExcludes;
   }
@@ -214,7 +253,7 @@ for (const it of reg.items) {
     if (WRITE && it.excerpts) { delete it.excerpts; delete it.excerptNote; }
   }
 }
-console.log(`\n발췌 성공 ${hit}건 · 원문 미확보/발췌 불가 ${none}건 (이 경우 앱은 '원문 보기' 링크만 표시)`);
+console.log(`\n발췌 성공 ${hit}건 · 원문은 읽었으나 발췌 불가 ${none}건 · 원문 미확보라 손대지 않음 ${kept}건`);
 if (WRITE) {
   fs.writeFileSync(regPath, JSON.stringify(reg, null, 1) + '\n');
   console.log('registered.json 반영 완료');

@@ -308,5 +308,32 @@ function undeclaredNames(src) {
   }
 }
 
+/* 원문을 짧게 자르면 자격 절이 통째로 날아간다 (2026-08-03 도입).
+   deepfetch가 본문을 5,000자에서 자르고 있었다. 학교 홈페이지는 본문 앞에 메뉴·배너 글자가
+   길게 붙어서, 잘린 공고 12건을 다시 받아 보니 **5건이 자격 절을 5,302~6,213자 지점**에
+   두고 있었다. 저장된 615건 중 247건이 이 컷에 걸려 있었고, 그게 '자격 미확보' 84건 중
+   32건의 원인이었다. 작은 컷이 되살아나면 같은 일이 조용히 반복된다. */
+console.log('\n■ 원문 자르는 길이 (자격 절이 날아가지 않을 만큼 길어야 한다)');
+{
+  const root = new URL('../', import.meta.url);
+  const cutLimit = (text) => {
+    // 주석은 걷어내고 본다 — 설명에 적힌 옛 숫자를 코드로 착각하지 않도록
+    const code = text.replace(/^\s*\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
+    const m = code.match(/slice\(\s*0\s*,\s*(?:LIMIT|(\d+))\s*\)/);
+    if (!m) return null;
+    if (m[1] === undefined) {                      // slice(0, LIMIT) — 상수 값을 찾는다
+      const c = code.match(/const\s+LIMIT\s*=\s*(\d+)/);
+      return c ? Number(c[1]) : null;
+    }
+    return Number(m[1]);
+  };
+  const src = fs.readFileSync(new URL('collector/deepfetch.mjs', root), 'utf8');
+  const lim = cutLimit(src);
+  eq('deepfetch: 본문 컷이 10,000자 이상', lim !== null && lim >= 10000, true);
+  // 검사가 잠들면 없느니만 못하다 — 옛날 코드를 넣어 보고 정말 잡는지 확인한다
+  eq('  (자기검증) 옛 5000자 컷은 잡아낸다', cutLimit('const x = clean(t).slice(0, 5000);') >= 10000, false);
+  eq('  (자기검증) LIMIT 상수 형태도 읽어낸다', cutLimit('const LIMIT = 15000;\nx.slice(0, LIMIT)'), 15000);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);

@@ -2,6 +2,7 @@
    저장소(collector/extracted/)에 저장한다. 정식 등록 큐레이션의 원천 자료. */
 import fs from 'node:fs';
 import { isHtmlPayload } from './attachment-link.mjs';
+import { canonUrl, normTitle, indexTexts, sourceFor, needsFetch } from './notice-source.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const OUT = new URL('extracted/', HERE);
@@ -36,19 +37,98 @@ function clean(html) {
     .trim();
 }
 
-const texts = [];
-for (const n of notices.items) {
+/* ── 원문 본문 수집 ───────────────────────────────────────────
+   2026-08-03에 두 가지를 고쳤다. 둘 다 **자격 요건이 통째로 사라지던 원인**이다.
+
+   ① 본문을 5,000자에서 잘랐다.
+      학교 홈페이지는 본문 앞에 메뉴·배너 글자가 길게 붙는다. 그래서 정작 '지원자격' 절이
+      컷 뒤로 밀렸다. 실측: 잘린 공고 12건을 다시 받아 보니 **5건이 자격 절을 5,302~6,213자
+      지점에 두고 있었다**(전체 길이 5,617~9,699자). 저장된 615건 중 247건이 이 컷에 걸려 있었다.
+      → 15,000자로 늘리고, 실제로 잘랐을 때만 cut:true를 남긴다(다음 실행이 다시 받도록).
+
+   ② 실행할 때마다 원문 파일을 통째로 새로 만들었다.
+      원문은 '지금 수집 목록에 있는 공고'만 받는데, 실시간 공고는 60일 뒤 목록에서 지워진다.
+      그래서 **정식 등록된 장학금도 60일이 지나면 원문이 사라졌다**. 그러면 extract-excerpts가
+      "원문이 바뀌었나 보다" 하고 이미 뽑아 둔 자격까지 지웠다(원문 미확보 17건이 이렇게 생겼다).
+      → 등록 공고가 참조하는 원문은 목록에서 밀려나도 **보존**하고, 없거나 잘린 것은 **보충 수집**한다.
+
+   --fill : 이미 온전히 받아 둔 것은 건너뛰고 빠진 것만 받는다(매일 수집에 얹기 위한 증분 모드).
+            첨부 원본은 받지 않는다 — 그건 양식 확보용이라 심층 수집 본편에서만 한다.
+   ───────────────────────────────────────────────────────────── */
+const LIMIT = 15000;
+const FILL = process.argv.includes('--fill');
+
+let prev = [];
+try { prev = JSON.parse(fs.readFileSync(new URL('notices-text.json', OUT), 'utf8')); } catch { /* 첫 실행 */ }
+const prevIdx = indexTexts(prev);
+
+let registered = { items: [] };
+try { registered = JSON.parse(fs.readFileSync(new URL('../data/registered.json', HERE), 'utf8')); } catch { /* 없어도 진행 */ }
+
+// 받을 대상 = 수집 목록 전체 + 원문이 없거나 잘린 등록 공고
+const wanted = new Map();
+for (const n of notices.items) wanted.set(canonUrl(n.url), n);
+let extra = 0;
+for (const it of registered.items) {
+  if (it.program) continue;                                  // 상시 제도는 공고가 아니다
+  const url = it.sourceUrl || '';
+  // '#n-' 표식은 원문 주소를 못 찾아 게시판 목록으로 남겨 둔 것이라 받아도 그 공고가 아니다
+  if (!/^https?:\/\//.test(url) || url.includes('#n-')) continue;
+  const key = canonUrl(url);
+  if (wanted.has(key)) continue;
+  if (!needsFetch(sourceFor(it, prevIdx))) continue;
+  wanted.set(key, { title: it.boardTitle || it.name, school: it.provider || '', url,
+    attachments: it.attachments || [], foundAt: it.listedAt });
+  extra += 1;
+}
+const todo = [...wanted.values()]
+  .filter((n) => !FILL || needsFetch(prevIdx.byUrl.get(canonUrl(n.url))));
+console.log(`원문 수집 대상 ${todo.length}건 (수집 목록 ${notices.items.length} + 등록 공고 보충 ${extra}${FILL ? ', 증분 모드' : ''})`);
+
+const fresh = new Map();
+for (const n of todo) {
   try {
     const res = await fetch(n.url, { redirect: 'follow', headers: UA, signal: AbortSignal.timeout(20000) });
-    const body = res.ok ? clean(await res.text()).slice(0, 5000) : `FETCH_FAIL HTTP ${res.status}`;
-    texts.push({ title: n.title, school: n.school, campus: n.campus, url: n.url,
-      attachments: n.attachments || [], foundAt: n.foundAt, text: body });
+    let entry;
+    if (res.ok) {
+      const full = clean(await res.text());
+      entry = { text: full.slice(0, LIMIT) };
+      if (full.length > LIMIT) entry.cut = true;   // 잘린 것만 표시 — 다음 실행이 다시 받는다
+    } else entry = { text: `FETCH_FAIL HTTP ${res.status}` };
+    fresh.set(canonUrl(n.url), { title: n.title, school: n.school, campus: n.campus, url: n.url,
+      attachments: n.attachments || [], foundAt: n.foundAt, ...entry });
     console.log('text ok:', n.title.slice(0, 40));
   } catch (e) {
-    texts.push({ title: n.title, school: n.school, url: n.url, text: 'FETCH_ERROR ' + (e.name || e.message) });
+    fresh.set(canonUrl(n.url), { title: n.title, school: n.school, url: n.url,
+      text: 'FETCH_ERROR ' + (e.name || e.message) });
   }
 }
+
+/* 저장 = 살려 둘 이전 원문 + 이번에 받은 것.
+   '살려 둘 것'은 지금 수집 목록에 있거나 등록 공고가 참조하는 원문이다. 그 밖의 옛 원문은
+   버린다(안 버리면 파일이 무한정 커진다). 등록 공고는 주소가 아니라 제목으로 이어진 것도
+   있어서 제목 집합도 함께 본다. */
+const liveKeys = new Set(wanted.keys());
+const liveTitles = new Set();
+for (const it of registered.items) {
+  if (it.sourceUrl) liveKeys.add(canonUrl(it.sourceUrl));
+  liveTitles.add(normTitle(it.name));
+}
+const out = new Map();
+for (const v of prev) {
+  const k = v.url ? canonUrl(v.url) : `t:${v.title}`;
+  if (liveKeys.has(k) || liveTitles.has(normTitle(v.title))) out.set(k, v);
+}
+let kept = out.size;
+for (const [k, v] of fresh) out.set(k, v);
+const texts = [...out.values()];
 fs.writeFileSync(new URL('notices-text.json', OUT), JSON.stringify(texts, null, 1));
+console.log(`원문 저장 ${texts.length}건 (새로 받음 ${fresh.size} · 이전 것 보존 ${kept} · 버림 ${prev.length - kept})`);
+
+if (FILL) {   // 증분 모드는 본문만 — 첨부 원본은 심층 수집 본편의 일이다
+  console.log(`done(fill): ${texts.length} texts`);
+  process.exit(0);
+}
 
 /* 지정 공고의 첨부 원본 다운로드.
    예전에는 실행할 때마다 form-* 파일을 전부 지우고 1번부터 다시 채웠다. 그 바람에
