@@ -81,8 +81,17 @@ for (const it of registered.items) {
     attachments: it.attachments || [], foundAt: it.listedAt });
   extra += 1;
 }
-const todo = [...wanted.values()]
+/* 증분 모드는 매일 수집 워크플로 안에서 도니 **한 실행에 받는 양을 묶어 둔다.**
+   평소엔 그날 새로 들어온 공고 몇 건뿐이라 상한에 닿지 않는다. 다만 게시판이 한꺼번에
+   쏟아지는 날 이 단계가 시간을 다 먹으면 수집분이 통째로 버려지므로(2026-08-03 브라우저
+   수집 시간초과 사고와 같은 계열), 남은 건 다음 실행이 마저 받게 한다. */
+const FILL_CAP = 120;
+let todo = [...wanted.values()]
   .filter((n) => !FILL || needsFetch(prevIdx.byUrl.get(canonUrl(n.url))));
+if (FILL && todo.length > FILL_CAP) {
+  console.log(`보충 대상 ${todo.length}건 중 ${FILL_CAP}건만 이번에 받는다 (나머지는 다음 실행)`);
+  todo = todo.slice(0, FILL_CAP);
+}
 console.log(`원문 수집 대상 ${todo.length}건 (수집 목록 ${notices.items.length} + 등록 공고 보충 ${extra}${FILL ? ', 증분 모드' : ''})`);
 
 const fresh = new Map();

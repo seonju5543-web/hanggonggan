@@ -26,7 +26,11 @@ jobs:
     # 실제로 7/31 브라우저 수집이 360분을 돌다 취소됐고, 수집 로봇 2종이 같은
     # 대기줄(concurrency: collector)을 쓰기 때문에 그동안 다음 수집이 줄을 섰다.
     # 학교를 더 붙일수록 '한 곳이 안 열려 멈추는' 확률도 같이 오른다.
-    timeout-minutes: 40   # 실측 8분 · 학교가 늘어날 여유 포함
+    # 시간 상한: 스크립트가 스스로 22분 예산에 맞춰 끝내므로(HARVEST_BUDGET_MS) 30분이면 충분하다.
+    # ⚠️ 40분이던 시절 학교가 17곳으로 늘자 4회 연속 이 상한에 걸려 **취소**됐고,
+    #    취소는 아래 저장 단계까지 통째로 죽여서 그날 수집분이 전부 버려졌다(2026-08-02~03).
+    #    상한을 올리는 것은 해법이 아니다 — 예산(HARVEST_BUDGET_MS)을 조절할 것.
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
@@ -97,6 +101,9 @@ jobs:
           # 빠뜨리면 registered.json의 formId만 저장되고 양식은 버려져 '없는 양식을 가리키는
           # 연결'이 생긴다 (2026-08-01 감사 실패의 원인 — 이슈 #79).
           git add collector/seen.json collector/browser-report.md data/notices.json data/registered.json data/forms.json
+          # 학교 순서 회전 커서 — 예산에 걸려 건너뛴 학교가 다음 실행의 맨 앞이 된다.
+          # 이게 저장 안 되면 매 실행 같은 학교(설정 파일 뒤쪽)만 계속 잘린다.
+          [ -f collector/browser-cursor.json ] && git add collector/browser-cursor.json
           [ -f collector/health.json ] && git add collector/health.json
           [ -f collector/pending-forms.json ] && git add collector/pending-forms.json
           [ -d collector/extracted ] && git add collector/extracted

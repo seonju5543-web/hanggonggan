@@ -7,9 +7,24 @@ import { urlKey, dedupeNotices, capNotices } from './url-key.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { isMenuEntry } from './clean-title.mjs';
 import { isDetailUrl, detailCandidates, sameTitle, idsFromSource } from './detail-url.mjs';
+import { makeBudget, rotateOrder, nextCursor } from './harvest-budget.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const cfg = JSON.parse(fs.readFileSync(new URL('browser-targets.json', HERE), 'utf8'));
+
+/* ── 시간 예산 (2026-08-03 시간초과 사고로 도입) ────────────────────────────
+   워크플로의 timeout-minutes에 걸려 **취소**되면 그 아래 저장 단계가 통째로 죽어서
+   그때까지 모은 공고가 전부 버려진다. 크래시와 달리 자바스크립트가 손쓸 틈이 없으므로
+   (프로세스 강제 종료) 해법은 저장이 아니라 **스스로 예산 안에 끝내기**다.
+   워크플로 상한(30분)보다 넉넉히 앞서 끝내 저장·감사·리포트 단계가 돌 시간을 남긴다. */
+const BUDGET_MS = Number(process.env.HARVEST_BUDGET_MS || 22 * 60000);        // 기본 22분
+const MIN_PER_TARGET_MS = Number(process.env.MIN_PER_TARGET_MS || 45000);     // 학교 하나를 새로 시작할 최소 여유
+const budget = makeBudget(BUDGET_MS);
+
+/* 이번 실행이 어느 학교부터 돌지 — 예산에 걸려 잘리는 학교가 매번 같지 않게 회전시킨다 */
+const cursorPath = new URL('browser-cursor.json', HERE);
+let cursor = { next: 0 };
+try { cursor = JSON.parse(fs.readFileSync(cursorPath, 'utf8')); } catch { /* 첫 실행 */ }
 
 const seenPath = new URL('seen.json', HERE);
 let seen = {};
@@ -245,6 +260,8 @@ async function harvestTarget(t, report) {
   let harvested = false;
   let loadedAny = false; // 후보 주소 중 하나라도 열렸는지 (전부 실패 = 그 학교 이번 실행 누락)
   for (const url of t.candidates) {
+    // 전역 예산이 다 됐으면 남은 후보 주소는 포기 — 여기서 멈춰야 저장 단계까지 갈 수 있다
+    if (budget.expired()) { report.push('- ⏱ 시간 예산 초과 — 남은 후보 주소 건너뜀'); break; }
     const r = await loadPage(url, { lines: report });
     if (r.error) { report.push(`- ❌ 오류(${r.error}) · ${url}`); continue; }
     loadedAny = true;
@@ -270,7 +287,15 @@ async function harvestTarget(t, report) {
 
     harvested = true;
     const fresh = uniq.filter((i) => !seen[i.url] && !seen[urlKey(i.url)]).slice(0, 40);
+    /* 상세 방문은 학교당 최대 40건 × 최대 30초라 **한 학교가 20분을 먹을 수 있었다**
+       (2026-08-03 시간초과의 가장 큰 원인 — 클릭 채집에만 예산이 있고 여기엔 없었다).
+       잘려도 공고 자체는 목록에서 이미 확보돼 저장되고, 마감·첨부만 다음 실행에서 채워진다. */
+    const detailBudgetMs = Number(process.env.DETAIL_BUDGET_MS || 240000);   // 학교당 4분
+    const detailStart = Date.now();
+    let di = 0;
+    let detailSkipped = false;
     for (const it of fresh) {
+      di += 1;
       let deadlineHint = null;
       let attachments = [];
       // 클릭 수집 때 상세 화면에서 이미 채집했으면 재방문 없이 그대로 사용
@@ -278,6 +303,10 @@ async function harvestTarget(t, report) {
       if (cd) {
         deadlineHint = cd.deadlineHint;
         attachments = cd.attachments || [];
+      } else if (Date.now() - detailStart > detailBudgetMs || budget.expired()) {
+      // 예산 초과 — 마감·첨부 없이 목록 정보만으로 담는다 (공고를 놓치는 것보다 낫다)
+      if (di === 1 || !detailSkipped) report.push(`  - (상세 방문 예산 초과 — ${di}/${fresh.length}건부터 목록 정보만)`);
+      detailSkipped = true;
       } else {
       // 상세 페이지도 브라우저로 방문해 마감 단서·첨부 수집
       const d = await loadPage(it.url, { attempts: 1, lines: report }); // 실패해도 목록은 남으므로 재시도 없음
@@ -328,12 +357,27 @@ async function runPool(list, worker, size) {
 
 const failedTargets = [];
 const targetLines = cfg.targets.map(() => []);   // 학교별 리포트 줄 (원래 순서대로 되돌리려고)
-await runPool(cfg.targets, async (t, i) => {
+const skipped = [];
+
+/* 이번 실행은 커서 자리부터 시작한다 — 예산에 걸려 잘리는 학교가 매번 같지 않도록 */
+const order = rotateOrder(cfg.targets.length, cursor.next || 0);
+let doneCount = 0;
+
+await runPool(order, async (idx) => {
+  const t = cfg.targets[idx];
   const name = t.campus && t.campus !== '공통' ? `${t.school} ${t.campus}` : t.school;
-  const lines = targetLines[i];
+  const lines = targetLines[idx];
+  /* 한 학교를 새로 시작하려면 최소한의 여유가 있어야 한다 —
+     30초 남았는데 시작하면 어차피 중간에 잘리고 저장 단계도 못 간다 */
+  if (!budget.hasRoom(MIN_PER_TARGET_MS)) {
+    skipped.push(name);
+    lines.push(`### ${name}`, '- ⏱ 시간 예산 초과 — 이번 실행은 건너뜀 (다음 실행이 여기서부터 시작)', '');
+    return;
+  }
   lines.push(`### ${name}`);
   const ok = await harvestTarget(t, lines);
   if (!ok) failedTargets.push({ t, name });
+  doneCount += 1;
   lines.push('');
 }, PARALLEL);
 // 동시에 돌았어도 리포트는 **설정 파일 순서 그대로** 보이게 되돌린다
@@ -343,15 +387,29 @@ targetLines.forEach((lines) => lines.forEach((l) => report.push(l)));
    몇 분 뒤면 대개 회복되므로, 그날 그 학교 공고를 통째로 놓치는 일을 줄인다. */
 const stillFailed = failedTargets.map((f) => f.name);
 /* 단, 절반 넘는 학교가 실패했다면 로봇 쪽 네트워크 장애이므로 재시도해도 소용없다 — 실행만 길어진다 */
-if (failedTargets.length && failedTargets.length <= Math.max(1, Math.floor(cfg.targets.length / 2))) {
+if (failedTargets.length && failedTargets.length <= Math.max(1, Math.floor(cfg.targets.length / 2))
+    && budget.hasRoom(MIN_PER_TARGET_MS)) {
   stillFailed.length = 0;
   report.push('### 🔁 실패 학교 재시도 (몇 분 뒤 재접속)');
-  for (const f of failedTargets) {
-    report.push(`**${f.name}**`);
-    const ok = await harvestTarget(f.t, report);
+  /* 예전엔 순차(for)라 8곳이 실패하면 학교 하나씩 처음부터 다시 돌아 실행이 통째로 길어졌다
+     — 2026-08-03 시간초과의 두 번째 원인. 본 수집과 같은 병렬 풀을 쓴다. */
+  const retryLines = failedTargets.map(() => []);
+  await runPool(failedTargets.map((_, i) => i), async (i) => {
+    const f = failedTargets[i];
+    const lines = retryLines[i];
+    lines.push(`**${f.name}**`);
+    if (!budget.hasRoom(MIN_PER_TARGET_MS)) {
+      lines.push('- ⏱ 시간 예산 초과 — 재시도 생략', '');
+      stillFailed.push(f.name);
+      return;
+    }
+    const ok = await harvestTarget(f.t, lines);
     if (!ok) stillFailed.push(f.name);
-    report.push('');
-  }
+    lines.push('');
+  }, PARALLEL);
+  retryLines.forEach((lines) => lines.forEach((l) => report.push(l)));
+} else if (failedTargets.length && !budget.hasRoom(MIN_PER_TARGET_MS)) {
+  report.push('### 🔁 실패 학교 재시도 — ⏱ 시간 예산이 없어 생략 (다음 실행에서 다시 시도)', '');
 }
 await browser.close();
 
@@ -370,8 +428,18 @@ notices.updatedAt = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10
 fs.writeFileSync(seenPath, JSON.stringify(seen, null, 1));
 fs.writeFileSync(noticesPath, JSON.stringify(notices, null, 1));
 
+/* 다음 실행 시작 자리 저장 — 이번에 못 돈 학교가 다음 실행의 맨 앞이 된다 */
+cursor.next = nextCursor(cfg.targets.length, cursor.next || 0, doneCount);
+cursor.updatedAt = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 16).replace('T', ' ');
+fs.writeFileSync(cursorPath, JSON.stringify(cursor, null, 1));
+
 report.push('---');
 report.push(`이번 실행 신규 수집: **${freshAll.length}건** · 브라우저로도 수집 실패한 학교는 게시판 주소 확인이 필요합니다.`);
+report.push(`⏱ 소요 ${Math.round(budget.elapsed() / 60000)}분 / 예산 ${Math.round(BUDGET_MS / 60000)}분 · 학교 ${doneCount}/${cfg.targets.length}곳 처리`);
+if (skipped.length) {
+  report.push(`⏱ **시간 예산으로 건너뛴 학교 ${skipped.length}곳**: ${skipped.join(' · ')}`);
+  report.push(`  → 다음 실행은 **${cfg.targets[cursor.next] ? (cfg.targets[cursor.next].school) : '처음'}**부터 시작합니다(하루 2회 실행이라 모든 학교가 하루 안에 한 번은 돕니다).`);
+}
 /* 접속 자체가 안 된 학교는 요약에 따로 적는다 — 리포트 중간의 ❌ 한 줄은 놓치기 쉬웠다.
    (재시도까지 실패해도 다음 실행에서 다시 수집되므로 공고가 영구히 사라지지는 않는다)
 
