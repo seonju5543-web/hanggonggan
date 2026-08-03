@@ -132,6 +132,19 @@ function serve() {
   const revRows = await page.locator('#screen-review .row[data-id]').count();
   ok(revRows === autoN, '③ 컨펌 작업대에 검수 전 공고만 온다', `${revRows}건`);
 
+  /* 미등록 피드 — 이미 등록한 공고가 '아직 등록 안 함'으로 다시 올라오면 안 된다
+     (주소 정규화가 수집기와 갈라지면 같은 공고를 두 번 등록하게 된다) */
+  const unreg = await page.evaluate(() => {
+    const api = window.__admin;
+    const regKeys = new Set(api.D.reg.map((x) => x.sourceUrl).filter(Boolean));
+    const list = [...document.querySelectorAll('#screen-review a.btn[href]')].map((a) => a.href);
+    return { shown: list.length, overlap: list.filter((u) => regKeys.has(u)).length };
+  });
+  ok(/수집됐지만 아직 등록 안 한 공고/.test(await page.textContent('#screen-review')),
+    '③ 미등록 피드가 함께 보인다');
+  ok(unreg.overlap === 0, '③ 이미 등록한 공고가 미등록으로 다시 올라오지 않는다',
+    `표시 ${unreg.shown}건 · 중복 ${unreg.overlap}건`);
+
   await page.click('.tab[data-tab="forms"]');
   await page.waitForSelector('#screen-forms:not([hidden])');
   const formRows = await page.locator('#screen-forms tr[data-form]').count();

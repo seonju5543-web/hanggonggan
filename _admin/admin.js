@@ -10,7 +10,7 @@
    ③ 열쇠가 없으면 아무것도 그리지 않는다 — 열쇠는 GitHub에 실제로 확인한다.
    ============================================================ */
 
-import { urlKey, titleKey } from './vendor/url-key.mjs';
+import { urlKey } from './vendor/url-key.mjs';
 
 /* ---------------- 설정 ---------------- */
 const OWNER = 'seonju5543-web';
@@ -227,7 +227,9 @@ function problemsOf(it, formIds) {
   return checkEntry(it, { formIds }) || [];
 }
 
-/* 미등록 피드 — 수집됐지만 등록되지 않은 공고 (주소·제목 두 열쇠로 대조) */
+/* 미등록 피드 — 수집됐지만 등록되지 않은 공고 (주소·제목 두 열쇠로 대조).
+   수집기와 **같은 주소 정규화**(url-key.mjs)를 쓴다 — 규칙이 갈라지면 이미 등록한 공고가
+   '미등록'으로 다시 올라와 같은 것을 두 번 등록하게 된다. */
 function unregisteredNotices() {
   const keys = new Set();
   D.reg.forEach((it) => { if (it.sourceUrl) keys.add(`u:${urlKey(it.sourceUrl)}`); });
@@ -235,6 +237,18 @@ function unregisteredNotices() {
     if (keys.has(`u:${urlKey(n.url)}`)) return false;
     return !D.reg.some((it) => (it.name || '').trim() && (n.title || '').includes((it.name || '').slice(0, 12)));
   });
+}
+
+/* 등록 대상이 아닌 것 — 로봇이 거르는 규칙과 같은 기준으로 흐리게 표시해 눈이 덜 가게 한다.
+   (지우지는 않는다. 규칙이 틀렸을 때 사람이 발견할 수 있어야 하므로) */
+function skipReason(n) {
+  const t = n.title || '';
+  if (RULES.LOAN && RULES.LOAN.test(t) && !(RULES.LOAN_EXCEPT && RULES.LOAN_EXCEPT.test(t))) return '학자금 대출';
+  if (RULES.GRAD_ONLY && RULES.GRAD_ONLY.test(t)) return '대학원 전용';
+  if (RULES.FILENAME_TITLE && RULES.FILENAME_TITLE.test(t)) return '첨부 파일명';
+  if (RULES.DOWNLOAD_URL && RULES.DOWNLOAD_URL.test(n.url || '')) return '첨부 내려받기 주소';
+  if (t.replace(/\s/g, '').length < 8) return '제목이 너무 짧음';
+  return '';
 }
 
 /* 중복 의심 쌍 */
@@ -552,6 +566,50 @@ function renderList() {
   `;
 }
 
+/* 수집됐지만 아직 등록하지 않은 공고 — '앞으로 무엇이 남아 있나'를 보는 곳.
+   등록 버튼은 아직 없다(2단계). 지금은 원문을 열어 눈으로 확인하는 데까지. */
+function unregHtml() {
+  const all = unregisteredNotices()
+    .map((n) => ({ n, why: skipReason(n) }))
+    .sort((a, b) => (b.n.foundAt || '').localeCompare(a.n.foundAt || ''));
+  const cand = all.filter((x) => !x.why);
+  const skipped = all.filter((x) => x.why);
+
+  const row = (x) => {
+    const u = safeUrl(x.n.url);
+    return `<div class="row" style="cursor:default${x.why ? ';opacity:.55' : ''}">
+      <div>
+        <div class="t">${esc(x.n.title)}</div>
+        <div class="m">
+          <span>${esc(x.n.school || '')}${x.n.campus ? ` ${esc(x.n.campus)}` : ''}</span>
+          ${x.n.deadlineHint ? `<span>${esc(String(x.n.deadlineHint).slice(0, 40))}</span>` : ''}
+          ${(x.n.attachments || []).length ? `<span>첨부 ${x.n.attachments.length}건</span>` : ''}
+        </div>
+        ${x.why ? `<div class="badges"><span class="pill">${esc(x.why)}</span></div>` : ''}
+      </div>
+      <div>${u ? `<a class="btn btn-sm" href="${esc(u)}" target="_blank" rel="noreferrer noopener">원문 ↗</a>` : ''}</div>
+      <div><span class="dd none">${esc(x.n.foundAt || '')}</span></div>
+    </div>`;
+  };
+
+  return `
+    <div class="sec-head" style="margin-top:12px">
+      <h2>수집됐지만 아직 등록 안 한 공고 ${cand.length}건</h2>
+      <p>로봇이 게시판에서 가져왔지만 정식 등록에는 들어가지 않은 것들입니다.
+         원문을 열어 보고 등록할 만한 것이 있으면 알려 주세요 — 등록 버튼은 다음 단계에 붙습니다.</p>
+    </div>
+    ${cand.length ? `<div class="rows">${cand.slice(0, 80).map(row).join('')}</div>`
+    : '<p class="empty">등록 후보가 없습니다.</p>'}
+    ${cand.length > 80 ? `<p class="muted">앞의 80건만 보입니다 (전체 ${cand.length}건).</p>` : ''}
+
+    ${skipped.length ? `<details style="margin-top:8px">
+      <summary class="muted" style="cursor:pointer">등록 대상이 아닌 것 ${skipped.length}건 — 대출·대학원·파일명 등 (펼쳐 보기)</summary>
+      <div class="rows" style="margin-top:8px">${skipped.slice(0, 60).map(row).join('')}</div>
+      <p class="muted">규칙이 잘못 걸렀다고 보이면 알려 주세요 — 규칙은 <code class="mono">verify/entry-rules.cjs</code> 한 곳에 있습니다.</p>
+    </details>` : ''}
+  `;
+}
+
 /* ---------------- ③ 컨펌 작업대 ---------------- */
 function renderReview() {
   const unrev = D.reg.filter((it) => statusOf(it) === 'unreviewed')
@@ -588,6 +646,8 @@ function renderReview() {
 
     ${unrev.length ? `<div class="rows">${unrev.map(rowHtml).join('')}</div>`
     : '<p class="empty">검수 전 공고가 없습니다. 모두 확인되었습니다.</p>'}
+
+    ${unregHtml()}
 
     <div class="sec-head" style="margin-top:12px">
       <h2>중복 의심 ${dups.length}쌍</h2>

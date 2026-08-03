@@ -40,13 +40,18 @@
 
     <details class="gate-help">
       <summary>열쇠 만드는 방법</summary>
+      <p><b>저장소 주인(선주님)</b> — GitHub → Settings → Developer settings →
+        <b>Fine-grained tokens</b> → Generate new token</p>
       <ol>
-        <li>GitHub → Settings → Developer settings → <b>Fine-grained tokens</b> → Generate new token</li>
         <li>Repository access: <b>Only select repositories</b> → <code>hanggonggan</code> 하나만</li>
         <li>Permissions —
           <b>Actions: Read and write</b> · <b>Contents: Read-only</b> · Metadata: Read-only</li>
         <li>만료일은 30~90일로 두세요. 지나면 새로 만들면 됩니다.</li>
       </ol>
+      <p><b>공동작업자</b> — 위 방식은 <b>안 됩니다.</b> 세밀 권한 열쇠는 자기가 가진 저장소에만
+        붙어서, 남의 저장소에는 만들 수 없습니다. 대신 → Developer settings →
+        <b>Tokens (classic)</b> → Generate new token → 범위 <code>repo</code>와
+        <code>workflow</code> 두 개만 체크.</p>
       <p class="gate-note">파일 쓰기 권한을 주지 않는 이유: 이 열쇠가 새어도 남이 저장소 내용을
         마음대로 바꿀 수 없게 하기 위해서입니다. 관리자 화면의 변경은 <b>검사를 통과해야만
         저장되는 정해진 절차</b>를 통해서만 이루어집니다.</p>
