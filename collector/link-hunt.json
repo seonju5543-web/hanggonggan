@@ -1,12 +1,12 @@
 {
- "updatedAt": "2026-08-03",
+ "updatedAt": "2026-08-04",
  "items": {
   "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2668%20%5B%ED%99%8D%EB%B3%B4%5D%20%ED%95%9C%EA%B5%AD%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EA%B3%B5%EA%B3%B5%EB%8D%B0%EC%9D%B4%ED%84%B0%20%EA%B0%9C%EB%B0%A9%20%EB%B0%8F%20%ED%99%9C%EC%9A%A9%20%EC%95%88%EB%82%B4%202026.0": {
-   "attempts": 3,
+   "attempts": 4,
    "title": "2668 [홍보] 한국장학재단 공공데이터 개방 및 활용 안내 2026.07.30. 조회 104",
-   "lastTried": "2026-08-01",
+   "lastTried": "2026-08-04",
    "lastWhy": "HTTP 404",
-   "nextTryAt": "2026-08-04",
+   "nextTryAt": "2026-08-11",
    "status": "",
    "escalated": true
   },
@@ -107,7 +107,7 @@
   "r:reg-dg-injae": {
    "attempts": 0,
    "title": "동국인재육성장학 (2026-2학기)",
-   "lastTried": "2026-08-01",
+   "lastTried": "2026-08-04",
    "lastWhy": "",
    "status": "resolved",
    "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765145"
@@ -115,7 +115,7 @@
   "r:reg-dg-gyonae": {
    "attempts": 0,
    "title": "교내장학(전체) 신청 (2026-2학기)",
-   "lastTried": "2026-08-01",
+   "lastTried": "2026-08-04",
    "lastWhy": "",
    "status": "resolved",
    "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764960"
@@ -139,7 +139,7 @@
   "r:reg-dg-bokji2b": {
    "attempts": 0,
    "title": "복지장학2(부분) (2026-2학기)",
-   "lastTried": "2026-08-01",
+   "lastTried": "2026-08-04",
    "lastWhy": "",
    "status": "resolved",
    "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764949"
@@ -147,7 +147,7 @@
   "r:reg-dg-bokji2k": {
    "attempts": 0,
    "title": "복지장학2(기초생활수급자) (2026-2학기)",
-   "lastTried": "2026-08-01",
+   "lastTried": "2026-08-04",
    "lastWhy": "",
    "status": "resolved",
    "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764946"
@@ -155,7 +155,7 @@
   "r:reg-dg-bokji2m": {
    "attempts": 0,
    "title": "복지장학2(면학) 지급 안내 (2026-1학기)",
-   "lastTried": "2026-08-01",
+   "lastTried": "2026-08-04",
    "lastWhy": "",
    "status": "resolved",
    "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765245"
@@ -179,7 +179,7 @@
   "r:reg-dg-gyoyukboho": {
    "attempts": 0,
    "title": "교육보호장학(새터민·새터민 자녀) (2026-2학기)",
-   "lastTried": "2026-08-01",
+   "lastTried": "2026-08-04",
    "lastWhy": "",
    "status": "resolved",
    "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764943"
@@ -203,7 +203,7 @@
   "r:reg-dg-bogun-multi": {
    "attempts": 0,
    "title": "(재)보건장학회 다문화가정 장학생 (동국대 접수, 2026-2학기)",
-   "lastTried": "2026-08-01",
+   "lastTried": "2026-08-04",
    "lastWhy": "",
    "status": "resolved",
    "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765312"
@@ -211,7 +211,7 @@
   "r:reg-dg-lotte": {
    "attempts": 0,
    "title": "롯데장학관 입주생 선발 (동국대 접수, 2026년)",
-   "lastTried": "2026-08-01",
+   "lastTried": "2026-08-04",
    "lastWhy": "",
    "status": "resolved",
    "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765316"
@@ -493,12 +493,13 @@
    "likelyGone": true
   },
   "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2670%202026-2%ED%95%99%EA%B8%B0%20%EA%B0%80%EC%86%A1%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4(~8%2F9)%202026.": {
-   "attempts": 1,
+   "attempts": 0,
    "title": "2670 2026-2학기 가송재단 장학생 선발 안내(~8/9) 2026.07.31. 조회 167",
-   "lastTried": "2026-08-01",
-   "lastWhy": "HTTP 404",
+   "lastTried": "2026-08-04",
+   "lastWhy": "",
    "nextTryAt": "2026-08-02",
-   "status": ""
+   "status": "resolved",
+   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765625"
   },
   "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322647": {
    "patrolledAt": "2026-08-01",
@@ -1006,6 +1007,102 @@
   },
   "n:https://www.sogang.ac.kr/ko/detail/550536?bbsConfigFk=141&namepage=ScholarshipNotice": {
    "patrolledAt": "2026-08-03",
+   "lastWhy": ""
+  },
+  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-%5B%ED%99%8D%EB%B3%B4%5D%202026%EB%85%84%205%C2%B718%ED%9D%AC%EB%A7%9D%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EC%95%88%EB%82%B4": {
+   "attempts": 0,
+   "title": "[홍보] 2026년 5·18희망장학생 모집 안내",
+   "lastTried": "2026-08-04",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765584"
+  },
+  "r:reg-dg-gasong": {
+   "attempts": 1,
+   "title": "(재)가송재단 장학생 (동국대 접수, 2026-2학기)",
+   "lastTried": "2026-08-04",
+   "lastWhy": "목록에서 못 찾음",
+   "nextTryAt": "2026-08-05",
+   "status": ""
+  },
+  "n:https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=326": {
+   "patrolledAt": "2026-08-04",
+   "lastWhy": ""
+  },
+  "n:https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=325": {
+   "patrolledAt": "2026-08-04",
+   "lastWhy": ""
+  },
+  "n:https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=324": {
+   "patrolledAt": "2026-08-04",
+   "lastWhy": ""
+  },
+  "n:https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=323": {
+   "patrolledAt": "2026-08-04",
+   "lastWhy": ""
+  },
+  "n:https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=317": {
+   "patrolledAt": "2026-08-04",
+   "lastWhy": ""
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30049&pageNo=1": {
+   "patrolledAt": "2026-08-04",
+   "lastWhy": ""
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/view.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5&nttId=30044": {
+   "patrolledAt": "2026-08-04",
+   "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)"
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/view.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5&nttId=30043": {
+   "patrolledAt": "2026-08-04",
+   "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)"
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30031&pageNo=1": {
+   "patrolledAt": "2026-08-04",
+   "lastWhy": ""
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/view.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5&nttId=30024": {
+   "patrolledAt": "2026-08-04",
+   "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)"
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30018&pageNo=1": {
+   "patrolledAt": "2026-08-04",
+   "lastWhy": ""
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30016&pageNo=1": {
+   "patrolledAt": "2026-08-04",
+   "lastWhy": ""
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30009&pageNo=1": {
+   "patrolledAt": "2026-08-04",
+   "lastWhy": ""
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30000&pageNo=1": {
+   "patrolledAt": "2026-08-04",
+   "lastWhy": ""
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=29993&pageNo=1": {
+   "patrolledAt": "2026-08-04",
+   "lastWhy": ""
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=29981&pageNo=1": {
+   "patrolledAt": "2026-08-04",
+   "lastWhy": ""
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=29979&pageNo=1": {
+   "patrolledAt": "2026-08-04",
+   "lastWhy": ""
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=29970&pageNo=1": {
+   "patrolledAt": "2026-08-04",
+   "lastWhy": ""
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=29856&pageNo=1": {
+   "patrolledAt": "2026-08-04",
+   "lastWhy": ""
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=29764&pageNo=1": {
+   "patrolledAt": "2026-08-04",
    "lastWhy": ""
   }
  }
