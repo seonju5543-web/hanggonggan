@@ -1,0 +1,14 @@
+# Cloudflare Pages 응답 헤더 — GitHub Pages에서는 못 하던 것들.
+#
+# index.html의 CSP 메타 태그는 그대로 두고, **메타로는 걸 수 없는 것만** 여기서 건다.
+# frame-ancestors: 다른 사이트가 이 화면을 액자(iframe)처럼 품어 클릭을 가로채는 것을 막는다.
+#   (메타 태그로 쓰면 브라우저가 무시한다 — 2026-08-03 검증에서 경고로 확인)
+# no-store: 관리자 화면이 공용 캐시나 뒤로가기 기록에 남지 않게 한다.
+
+/*
+  Content-Security-Policy: frame-ancestors 'none'
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+  Cache-Control: no-store
+  Permissions-Policy: geolocation=(), microphone=(), camera=()

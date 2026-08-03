@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>한대장 관리자</title>
+
+  <!-- 앱1과 같은 수준의 보안 설정.
+       외부 스크립트를 원천 차단하고(수집 데이터가 오염돼도 코드 실행 불가),
+       바깥으로 나가는 통신은 GitHub 두 곳으로만 제한한다. -->
+  <!-- frame-ancestors(다른 사이트가 이 화면을 액자처럼 품는 것 막기)는 메타 태그로는 무시된다.
+       그건 _headers 파일로 Cloudflare가 진짜 응답 헤더에 실어 보낸다. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com; object-src 'none'; base-uri 'self'; form-action 'none'" />
+  <meta name="referrer" content="no-referrer" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#141a2b" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+
+<!-- ══════════ 입장 화면 ══════════
+     열쇠가 GitHub에서 실제로 확인돼야 안으로 들어간다.
+     (Cloudflare Access가 앞단에서 한 번 더 막지만, 그것과 무관하게 이 문 자체가 진짜 잠금이다) -->
+<div id="gate" class="gate">
+  <div class="gate-box">
+    <h1>한대장 관리자</h1>
+    <p class="gate-lede">GitHub 열쇠를 넣어야 화면이 열립니다. 열쇠가 없으면 아무 내용도 표시되지 않습니다.</p>
+
+    <label class="gate-label" for="gate-key">GitHub 개인 열쇠 (fine-grained token)</label>
+    <input id="gate-key" type="password" autocomplete="off" spellcheck="false"
+           placeholder="github_pat_..." />
+
+    <label class="gate-check">
+      <input id="gate-remember" type="checkbox" />
+      <span>이 기기에 기억하기 <em>(체크하지 않으면 탭을 닫을 때 지워집니다)</em></span>
+    </label>
+
+    <button id="gate-enter" class="btn btn-primary btn-lg">들어가기</button>
+    <p id="gate-msg" class="gate-msg" hidden></p>
+
+    <details class="gate-help">
+      <summary>열쇠 만드는 방법</summary>
+      <ol>
+        <li>GitHub → Settings → Developer settings → <b>Fine-grained tokens</b> → Generate new token</li>
+        <li>Repository access: <b>Only select repositories</b> → <code>hanggonggan</code> 하나만</li>
+        <li>Permissions —
+          <b>Actions: Read and write</b> · <b>Contents: Read-only</b> · Metadata: Read-only</li>
+        <li>만료일은 30~90일로 두세요. 지나면 새로 만들면 됩니다.</li>
+      </ol>
+      <p class="gate-note">파일 쓰기 권한을 주지 않는 이유: 이 열쇠가 새어도 남이 저장소 내용을
+        마음대로 바꿀 수 없게 하기 위해서입니다. 관리자 화면의 변경은 <b>검사를 통과해야만
+        저장되는 정해진 절차</b>를 통해서만 이루어집니다.</p>
+    </details>
+  </div>
+</div>
+
+<!-- ══════════ 본 화면 ══════════ -->
+<div id="app" hidden>
+
+  <header class="topbar">
+    <div class="topbar-in">
+      <div class="brand">
+        <span class="brand-mark">한대장</span>
+        <span class="brand-sub">관리자</span>
+      </div>
+      <div class="topbar-actions">
+        <span id="deploy-state" class="deploy-state" title="앱1(학생 앱) 반영 상태"></span>
+        <button id="btn-reload" class="btn btn-ghost btn-sm">새로고침</button>
+        <button id="btn-logout" class="btn btn-ghost btn-sm danger">열쇠 지우기</button>
+      </div>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button class="tab active" data-tab="todo">오늘 할 일 <span class="tab-n" id="n-todo"></span></button>
+      <button class="tab" data-tab="list">공고 전체 <span class="tab-n" id="n-list"></span></button>
+      <button class="tab" data-tab="review">컨펌 작업대 <span class="tab-n" id="n-review"></span></button>
+      <button class="tab" data-tab="forms">양식 <span class="tab-n" id="n-forms"></span></button>
+      <button class="tab" data-tab="network">수집망 <span class="tab-n" id="n-network"></span></button>
+      <button class="tab" data-tab="quality">데이터 품질 <span class="tab-n" id="n-quality"></span></button>
+    </nav>
+  </header>
+
+  <!-- 작업 진행 표시 (변경 요청 → 검사 → 반영) -->
+  <div id="job" class="job" hidden>
+    <span class="job-dot"></span>
+    <span id="job-text"></span>
+    <a id="job-link" href="#" target="_blank" rel="noreferrer noopener" hidden>실행 기록 보기 ↗</a>
+    <button id="job-close" class="job-close" aria-label="닫기">×</button>
+  </div>
+
+  <main class="wrap">
+    <section id="screen-todo"    class="screen"></section>
+    <section id="screen-list"    class="screen" hidden></section>
+    <section id="screen-review"  class="screen" hidden></section>
+    <section id="screen-forms"   class="screen" hidden></section>
+    <section id="screen-network" class="screen" hidden></section>
+    <section id="screen-quality" class="screen" hidden></section>
+  </main>
+
+  <footer class="foot">
+    <span id="foot-info"></span>
+  </footer>
+</div>
+
+<!-- 상세·편집 시트 -->
+<div id="sheet-back" class="sheet-back" hidden></div>
+<aside id="sheet" class="sheet" hidden aria-label="상세"></aside>
+
+<div id="toast" class="toast" hidden></div>
+
+<!-- 앱1과 공유하는 원본 코드 (build.sh가 복사 — 규칙을 두 벌로 두지 않기 위해) -->
+<script src="vendor/data.js"></script>
+<script src="vendor/forms.js"></script>
+<script src="vendor/entry-rules.js"></script>
+<script type="module" src="admin.js"></script>
+</body>
+</html>

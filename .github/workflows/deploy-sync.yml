@@ -17,7 +17,7 @@ name: 배포 동기화 (기본 브랜치 → main)
 on:
   workflow_run:
     workflows: ['장학공고 수집 로봇', '브라우저형 수집 로봇', '공고 원문 심층 수집',
-      '링크 사냥꾼 (까다로운 원문 주소 전담)', '원문 링크 복구 로봇']
+      '링크 사냥꾼 (까다로운 원문 주소 전담)', '원문 링크 복구 로봇', '관리자 조정']
     types: [completed]
   push:
     branches: ['claude/nice-heisenberg-WESq5']

@@ -21,7 +21,24 @@ node verify-notify-rules.js # 알림 규칙 단위 검증 (서버·브라우저 
 node verify-notify.js       # 알림 시스템 브라우저 검증: 최초 1회 동의 → 조건별 발송 → 알림함 → 설정 → 딥링크
 node verify-push-server.mjs # 진짜 푸시 서버 검증: VAPID 서명을 실제로 검증 · 깨울 학교 판정 · 구독 저장 (서버 불필요)
 node verify-push-client.js  # 진짜 푸시 앱 검증: 미설정/설정 두 상태 · 개인정보가 서버로 새지 않는지 요청 본문 전수 검사
+node verify-admin.js        # 관리자 페이지 검증 (아래 설명 — 서버 불필요, 스스로 띄운다)
 ```
+
+`verify-admin.js` — 2026-08-03 신설. 관리자 페이지(`_admin/`)를 검사한다.
+관리자 화면은 Cloudflare에 있고 데이터는 GitHub에서 읽어 오므로, 검사할 때마다 진짜 열쇠를
+쓸 수 없다. 그래서 **바깥으로 나가는 요청을 가로채 저장소의 실제 파일로 응답**해 준다
+(= 진짜 우리 데이터로 화면이 그려지는지를 본다). 보는 것:
+① 열쇠 전에는 운영 현황이 한 글자도 안 보이는가 · 틀린 열쇠로는 못 들어가는가
+② 6개 화면이 실제 건수대로 그려지는가 · 콘솔 오류 0
+③ 원문 대조 화면에 앱1 내용과 공고 원문 발췌가 함께 뜨는가
+④ **등록된 양식 전부가 오류 없이 문서를 만들어 내는가** (앱1의 renderFormDoc 재사용 검증 —
+   양식을 새로 넣었을 때 앱1보다 여기서 먼저 깨진다)
+⑤ 상태·학교 분류가 실제로 걸러 내는가
+사전 준비는 `bash _admin/build.sh` 하나뿐이다(서버는 드라이버가 스스로 띄운다).
+
+> 쓰기 경로(`tools/admin-apply.mjs`)는 브라우저 없이 확인한다:
+> `ACTION=confirm PAYLOAD='{"ids":["…"]}' ACTOR=me node tools/admin-apply.mjs` 뒤
+> `node verify/audit-data.js`로 관문이 도는지 보고 `git checkout -- data collector`로 되돌린다.
 
 `verify-source-links.js` — 2026-07-31 신설. 앱에서 장학 공고를 열고 원문 링크를 눌렀을 때
 **학교 장학 공지 목록 전체가 아니라 그 장학금 공고**로 가는지 본다. 3단으로 검사한다:
