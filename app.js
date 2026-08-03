@@ -1108,12 +1108,14 @@ function openDetail(id) {
      (2026-08-02 개발자 지시). 판정 규칙은 match-engine에 있어 알림과 갈라지지 않는다. */
   const reqLines = requirementLines(sch);
   if (reqLines.length) {
-    reasonRows += `<li class="r-head">지원 자격</li>`
-      + reqLines.map((e, i) => {
+    // 소제목을 달지 않는다 — 바깥 <h4>가 이미 '지원 자격'이라 두 번 나온다
+    reasonRows += reqLines.map((e) => {
         const m = requirementMatch(e, state.profile);
-        const mark = m === 'ok' ? '✓' : m === 'no' ? '✕' : `${i + 1})`;
+        /* 번호(1) 2) 3))는 붙이지 않는다 — 요건은 순서가 아니라 목록이고,
+           판정 못 한 줄에 번호만 달면 체크된 줄과 뒤섞여 어수선하다(2026-08-02 개발자 지시). */
         const cls = m === 'ok' ? 'r-ok' : m === 'no' ? 'r-bad' : 'r-req';
-        return `<li class="${cls}">${mark} ${esc(e)}</li>`;
+        const mark = m === 'ok' ? '✓ ' : m === 'no' ? '✕ ' : '';
+        return `<li class="${cls}">${mark}${esc(e)}</li>`;
       }).join('');
   } else if (qLines.length) {
     // 다듬을 요건 줄이 없으면 발췌 문장이라도 원문 그대로
