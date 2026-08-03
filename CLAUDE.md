@@ -272,6 +272,22 @@
   `forms.js`(양식 문서 생성)·`verify/entry-rules.cjs`(등록 규칙)·`collector/url-key.mjs`(주소 정규화)를
   `dist/vendor/`로 복사한다. **원본은 한 곳뿐이고 관리자 화면은 그걸 그대로 쓴다** — 베껴 두면 로봇·감사·
   관리자 화면이 서로 다른 규칙으로 판단하게 된다. entry-rules는 Node용이라 build.sh가 앞뒤만 감싼다.
+- **관리자 버튼이 작동하려면 워크플로가 기본 브랜치에 있어야 한다 (2026-08-03)**: GitHub의
+  `workflow_dispatch`는 **워크플로 파일이 기본 브랜치에 있을 때만** 실행을 받아 준다. 작업 브랜치에만
+  올려 두면 관리자 화면의 컨펌·수정·되돌리기가 **전부 404로 죽는다**(실제로 그 상태였다).
+  관리자 쪽 워크플로를 새로 만들거나 이름을 바꾸면 **반드시 기본 브랜치까지 push할 것.**
+  확인: `git ls-tree origin/claude/nice-heisenberg-WESq5 -- .github/workflows/admin-apply.yml`
+- **공동작업자는 fine-grained 토큰을 만들 수 없다 (2026-08-03)**: 세밀 권한 토큰은 **자기가 소유한
+  저장소에만** 붙는다. 이 저장소 소유자는 선주님이므로 Josehyeon은 **classic 토큰(`repo`+`workflow`)**을
+  써야 한다. 둘 다 `Authorization: Bearer`로 동작해 화면 코드는 같다.
+- **Cloudflare Pages에 빌드 감시 경로를 꼭 넣을 것 (2026-08-03)**: 수집 로봇이 기본 브랜치에 하루
+  10번쯤 커밋하는데, 그대로 두면 그때마다 관리자 화면을 다시 빌드해 **무료 한도(월 500회)를 며칠 만에
+  쓴다.** Settings → Build → Build watch paths 에 `_admin/*` + 공용 원본 4개만 넣는다.
+  Access는 **Subdomain 칸에 `*`** 를 넣어야 운영 주소까지 잠긴다(빼면 미리보기 주소만 잠긴다).
+  일회용 코드 메일은 `noreply@notify.cloudflare.com` — **Gmail 스팸함·프로모션 탭으로 자주 간다.**
+- **Cloudflare 없이 화면을 먼저 보는 법**: `node tools/build-admin-preview.mjs` → `_admin/preview.html`.
+  데이터를 파일 안에 넣은 한 장짜리 사본이라 인터넷·열쇠·서버 없이 열린다. **화면 코드는 진짜 화면과
+  같은 파일을 쓴다**(따로 만들면 서로 달라지므로) — 바깥 통신 0건·저장 버튼 차단을 검사로 확인했다.
 - **관리자 열쇠 권한 (설계 의도)**: fine-grained PAT · 이 저장소만 · **Actions 읽기·쓰기 + Contents 읽기전용**.
   파일 쓰기 권한을 일부러 주지 않는다 — 열쇠가 새어도 남이 할 수 있는 일은 '정해진 워크플로를 한 번 돌리는 것'
   뿐이고, 임의의 코드·데이터를 넣을 수 없다. 그래서 조작은 전부 `admin-apply.yml`을 경유한다.
