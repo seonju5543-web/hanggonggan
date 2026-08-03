@@ -1044,3 +1044,6 @@ textarea:focus {
   margin-top: 10px;
   list-style: none;
 }
+
+/* 판정할 수 없는 요건 — 번호만 붙이고 색을 칠하지 않는다 (틀린 초록 체크보다 낫다) */
+.reason-list .r-req { color: var(--text-sub); }

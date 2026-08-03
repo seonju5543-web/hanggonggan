@@ -1103,7 +1103,20 @@ function openDetail(id) {
      앱이 판정할 수 있는 건 성적·소득구간·학년 같은 숫자 조건뿐이고, 원문의 '유자녀' 같은 항목은
      판정할 수 없다. 그래서 두 묶음을 **구분해서** 보여 준다 — 섞으면 앱이 다 판정한 것처럼 읽힌다. */
   let reasonRows = '';
-  if (qLines.length) {
+  /* 요건은 원문을 통째로 붙이지 않고 **짧게 다듬어 번호를 매겨** 보여 준다.
+     프로필과 확실히 맞으면 ✓, 확실히 안 맞으면 ✕, 판정할 수 없으면 색 없이 둔다
+     (2026-08-02 개발자 지시). 판정 규칙은 match-engine에 있어 알림과 갈라지지 않는다. */
+  const reqLines = requirementLines(sch);
+  if (reqLines.length) {
+    reasonRows += `<li class="r-head">지원 자격</li>`
+      + reqLines.map((e, i) => {
+        const m = requirementMatch(e, state.profile);
+        const mark = m === 'ok' ? '✓' : m === 'no' ? '✕' : `${i + 1})`;
+        const cls = m === 'ok' ? 'r-ok' : m === 'no' ? 'r-bad' : 'r-req';
+        return `<li class="${cls}">${mark} ${esc(e)}</li>`;
+      }).join('');
+  } else if (qLines.length) {
+    // 다듬을 요건 줄이 없으면 발췌 문장이라도 원문 그대로
     reasonRows += `<li class="r-head">공고에 적힌 요건</li>`
       + qLines.map((e) => `<li class="r-quote">${esc(e)}</li>`).join('');
   }

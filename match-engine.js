@@ -154,8 +154,87 @@ function noticeForProfile(n, p) {
   return false;
 }
 
+/* ---------------- 공고의 자격 요건을 짧게 정리하고 프로필과 대조 ----------------
+   원문을 통째로 붙이면 ※ 부연설명까지 섞여 지저분하다(2026-08-02 개발자 지적).
+   여기서는 **요건 줄만 골라 다듬어** '1) 4년제 대학생 2) 한부모 가정'처럼 짧게 만든다.
+   다듬기는 표기 정리일 뿐 내용을 지어내지 않는다 — 원문에 없는 요건은 절대 만들지 않는다. */
+
+/* 요건이 아니라 부연·안내인 줄 (버린다) */
+const REQ_NOISE = /^(※|상세내역|참고|유의|비고|문의|첨부|붙임)|미신청시|확대 적용|바랍니다|참고하시기|공고문을 확인|일괄 진행|제출필요 없음|담당자|안내드립니다/;
+
+function tidyRequirement(line) {
+  return String(line || '')
+    .replace(/^[\s\-–—•▪▶◆◇○●·ㆍ*]+/, '')            // 앞머리 기호
+    .replace(/^\(?\d+\)|^[①-⑳]|^[가-힣]\.\s/, '')      // 앞머리 번호 (우리가 새로 매긴다)
+    .replace(/^[\s.)\]]+/, '')
+    .replace(/\s*★\s*/g, '')
+    .replace(/\s+/g, ' ')
+    // 수집 과정에서 벌어진 한글/숫자 사이 공백 되붙이기 ("1 유형"→"1유형", "9 분위"→"9분위")
+    .replace(/(\d)\s+(유형|분위|구간|학년|학기|학점|명|년|개월)/g, '$1$2')
+    .replace(/\s+([,.)%】」』])/g, '$1')
+    .replace(/([(【「『])\s+/g, '$1')
+    .replace(/([“‘])\s+/g, '$1').replace(/\s+([”’])/g, '$1')   // 따옴표 안쪽 공백
+    .replace(/([”’])\s*(로|으로|이|가|는|은|을|를)\b/g, '$1 $2')
+    .trim();
+}
+
+function requirementLines(sch) {
+  const raw = (sch && sch.eligibilityLines) || [];
+  const out = [];
+  for (const l of raw) {
+    if (REQ_NOISE.test(l.trim())) continue;
+    const t = tidyRequirement(l);
+    if (t.length < 4 || t.length > 120) continue;
+    if (/^(신청\s?자격|지원\s?자격|지원\s?대상|신청\s?대상|모집\s?대상|선발\s?대상|자격\s?요건)$/.test(t)) continue;
+    if (!out.includes(t)) out.push(t);
+    if (out.length >= 6) break;
+  }
+  return out;
+}
+
+/* 요건 한 줄이 이 학생에게 맞는지 — **확실할 때만** 판정한다.
+   틀린 초록 체크는 '모른다'보다 나쁘다(자격도 안 되는 학생이 서류를 준비하게 된다).
+   그래서 숫자·낱말이 명확한 것만 보고, 조금이라도 애매하면 null(판정 안 함)을 낸다. */
+function requirementMatch(text, p) {
+  if (!p) return null;
+  const t = String(text || '');
+  const flags = p.flags || [];
+  const has = (f) => flags.includes(f);
+
+  // 소득분위/구간 — "1~9분위", "8분위 이내", "0분위"
+  const band = t.match(/(\d)\s*[~∼-]\s*(\d)\s*(?:분위|구간)/) || t.match(/(\d)\s*(?:분위|구간)\s*(이내|이하|까지)/);
+  if (band && p.bracket != null && /분위|구간/.test(t)) {
+    const lo = band[3] ? 0 : Number(band[1]);
+    const hi = band[3] ? Number(band[1]) : Number(band[2]);
+    return p.bracket >= lo && p.bracket <= hi ? 'ok' : 'no';
+  }
+  // 평점 — "평점 3.0 이상", "평균평점 2.75/4.5 이상"
+  const gpa = t.match(/(?:평점|평균평점|성적)[^0-9]{0,8}(\d\.\d{1,2})\s*(?:\/\s*4\.5)?\s*이상/);
+  if (gpa && p.gpa != null) return p.gpa >= Number(gpa[1]) ? 'ok' : 'no';
+  // 특별자격 — 낱말이 그대로 있을 때만
+  if (/한부모/.test(t)) return has('basicLiving') || has('nearPoverty') ? null : null; // 프로필에 한부모 항목이 없다 — 판정하지 않는다
+  if (/기초\s?생활|수급자/.test(t)) return has('basicLiving') ? 'ok' : 'no';
+  if (/차상위/.test(t)) return has('nearPoverty') ? 'ok' : 'no';
+  if (/다자녀|3자녀|세자녀/.test(t)) return has('multiChild') ? 'ok' : 'no';
+  if (/국가유공|보훈/.test(t)) return has('merit') ? 'ok' : 'no';
+  if (/장애\s?(학생|인)/.test(t)) return has('disabled') ? 'ok' : 'no';
+  // 학년 — "1학년만", "2~3학년"
+  const yr = t.match(/(\d)\s*[~∼-]\s*(\d)\s*학년/);
+  if (yr && p.year != null) return p.year >= +yr[1] && p.year <= +yr[2] ? 'ok' : 'no';
+  const yr1 = t.match(/(\d)\s*학년\s*(?:만|대상|재학생)/);
+  if (yr1 && p.year != null) return p.year === +yr1[1] ? 'ok' : 'no';
+  // 재학 상태 — "재학생 및 복학예정자"
+  if (/재학생/.test(t) && !/대학원|졸업생/.test(t)) {
+    if (p.status === 'enrolled' || p.status === 'returning') return 'ok';
+    if (p.status === 'freshman' && /신입/.test(t)) return 'ok';
+  }
+  if (/4\s?년제|대학생|학부생/.test(t) && !/대학원/.test(t)) return 'ok';
+  return null;   // 판정 불가 — 색을 칠하지 않는다
+}
+
 /* Node(검증 스크립트)에서도 같은 엔진을 불러 쓸 수 있게 — 브라우저·서비스워커에는 영향 없음 */
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { evaluate, fitScore, scopedToProfile, notStale, STALE_DAYS,
+                     requirementLines, requirementMatch, tidyRequirement,
                      noticeForProfile, taggedSchool, SHARED_BOARD_BRANCH };
 }
