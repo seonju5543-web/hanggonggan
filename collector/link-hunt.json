@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-08-04",
+ "updatedAt": "2026-08-05",
  "items": {
   "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2668%20%5B%ED%99%8D%EB%B3%B4%5D%20%ED%95%9C%EA%B5%AD%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EA%B3%B5%EA%B3%B5%EB%8D%B0%EC%9D%B4%ED%84%B0%20%EA%B0%9C%EB%B0%A9%20%EB%B0%8F%20%ED%99%9C%EC%9A%A9%20%EC%95%88%EB%82%B4%202026.0": {
    "attempts": 4,
@@ -1018,11 +1018,11 @@
    "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765584"
   },
   "r:reg-dg-gasong": {
-   "attempts": 1,
+   "attempts": 2,
    "title": "(재)가송재단 장학생 (동국대 접수, 2026-2학기)",
-   "lastTried": "2026-08-04",
+   "lastTried": "2026-08-05",
    "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-08-05",
+   "nextTryAt": "2026-08-06",
    "status": ""
   },
   "n:https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=326": {
@@ -1103,6 +1103,102 @@
   },
   "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=29764&pageNo=1": {
    "patrolledAt": "2026-08-04",
+   "lastWhy": ""
+  },
+  "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EC%84%9C%EC%9A%B8%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EC%9A%B4%EC%97%B0%EC%9E%A5%ED%95%99%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4(~8%2F14%EA%B9%8C%EC%A7%80)": {
+   "attempts": 0,
+   "title": "서울 2026학년도 2학기 운연장학 신청 안내(~8/14까지)",
+   "lastTried": "2026-08-05",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322666"
+  },
+  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2671%20%5B%ED%99%8D%EB%B3%B4%5D%202026%EB%85%84%20%EC%A0%9C2%EC%B0%A8%20%EC%84%9C%EC%9A%B8%EC%8B%9C%20%ED%95%99%EC%9E%90%EA%B8%88%EB%8C%80%EC%B6%9C%EC%9D%B4%EC%9E%90%20%EC%A7%80%EC%9B%90%20%EC%82%AC%EC%97%85%20%EC%8B%A0%EC%B2%AD": {
+   "attempts": 0,
+   "title": "2671 [홍보] 2026년 제2차 서울시 학자금대출이자 지원 사업 신청 안내 2026.08.04. 조회 82",
+   "lastTried": "2026-08-05",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765670"
+  },
+  "n:https://www.yonsei.ac.kr/bbs/sc/58/943803/artclView.do": {
+   "patrolledAt": "2026-08-05",
+   "lastWhy": ""
+  },
+  "n:https://www.yonsei.ac.kr/bbs/sc/58/943806/artclView.do": {
+   "patrolledAt": "2026-08-05",
+   "lastWhy": ""
+  },
+  "n:https://www.yonsei.ac.kr/bbs/sc/58/943805/artclView.do": {
+   "patrolledAt": "2026-08-05",
+   "lastWhy": ""
+  },
+  "n:https://www.yonsei.ac.kr/bbs/sc/58/943804/artclView.do": {
+   "patrolledAt": "2026-08-05",
+   "lastWhy": ""
+  },
+  "n:https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=335": {
+   "patrolledAt": "2026-08-05",
+   "lastWhy": ""
+  },
+  "n:https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=334": {
+   "patrolledAt": "2026-08-05",
+   "lastWhy": ""
+  },
+  "n:https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=333": {
+   "patrolledAt": "2026-08-05",
+   "lastWhy": ""
+  },
+  "n:https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&#038;category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&#038;uid=331": {
+   "patrolledAt": "2026-08-05",
+   "lastWhy": ""
+  },
+  "n:https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767493&article.offset=0&articleLimit=10": {
+   "patrolledAt": "2026-08-05",
+   "lastWhy": ""
+  },
+  "n:https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767490&article.offset=0&articleLimit=10": {
+   "patrolledAt": "2026-08-05",
+   "lastWhy": ""
+  },
+  "n:https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767487&article.offset=0&articleLimit=10": {
+   "patrolledAt": "2026-08-05",
+   "lastWhy": ""
+  },
+  "n:https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767484&article.offset=0&articleLimit=10": {
+   "patrolledAt": "2026-08-05",
+   "lastWhy": ""
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30050&pageNo=1": {
+   "patrolledAt": "2026-08-05",
+   "lastWhy": ""
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30044&pageNo=1": {
+   "patrolledAt": "2026-08-05",
+   "lastWhy": ""
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30043&pageNo=1": {
+   "patrolledAt": "2026-08-05",
+   "lastWhy": ""
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30024&pageNo=1": {
+   "patrolledAt": "2026-08-05",
+   "lastWhy": ""
+  },
+  "n:https://www.sogang.ac.kr/ko/detail/550660?bbsConfigFk=141&namepage=ScholarshipNotice": {
+   "patrolledAt": "2026-08-05",
+   "lastWhy": ""
+  },
+  "n:https://www.sogang.ac.kr/ko/detail/550659?bbsConfigFk=141&namepage=ScholarshipNotice": {
+   "patrolledAt": "2026-08-05",
+   "lastWhy": ""
+  },
+  "n:https://www.sogang.ac.kr/ko/detail/550657?bbsConfigFk=141&namepage=ScholarshipNotice": {
+   "patrolledAt": "2026-08-05",
+   "lastWhy": ""
+  },
+  "n:https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=138910&article.offset=0&articleLimit=10": {
+   "patrolledAt": "2026-08-05",
    "lastWhy": ""
   }
  }
