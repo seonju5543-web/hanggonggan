@@ -46,13 +46,23 @@ jobs:
       - name: 정식 등록 자동화 (선조치후보고 — collector/auto-register-config.json으로 on/off)
         run: node collector/auto-register.mjs
 
+      # 이 단계는 '있으면 좋은' 보강 작업이다 — 수집 자체가 아니다.
+      # 그래서 2026-08-04부터 **자기 시간 상한**과 continue-on-error를 달았다.
+      # 그날 사고: 이 단계가 심층 수집 본편(공고 614건 본문 재수집, 19분)을 돌리는 바람에
+      # 작업 전체 상한 25분을 넘겨 **취소**됐고, 취소는 뒤 단계를 전부 건너뛰므로
+      # 수집분 저장·리포트 이슈가 통째로 버려졌다(8/3 밤·8/4 아침 연속 — 리포트 미도착의 원인).
+      # 이제 여기서 무슨 일이 생기든 수집분은 저장되고 리포트는 나간다.
+      # 예산 배분(합이 작업 상한 25분 안에 들어와야 한다): 수집 ≤8 + 이 단계 6 + 보충 5 + 나머지 ≈2 = 21
       - name: 신규 등록분 양식 원본 자동 확보 + 스키마화 (같은 실행 안에서 끝낸다)
+        timeout-minutes: 6
+        continue-on-error: true
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          targets=$(node -e "let q;try{q=require('./collector/pending-forms.json')}catch(e){q={items:[]}};console.log(q.items.filter(i=>!i.fetched).map(i=>i.target).join(','))")
+          targets=$(node collector/pending-targets.mjs)
           if [ -n "$targets" ]; then
-            FORM_TARGETS="$targets" node collector/deepfetch.mjs
+            # --forms-only : 첨부 원본만 받는다. 본문은 바로 아래 증분 수집(--fill)의 일이다.
+            FORM_TARGETS="$targets" node collector/deepfetch.mjs --forms-only
             pip install olefile --quiet
             python3 collector/hwp-prvtext.py
             # 실제로 원본이 내려온 항목만 fetched로 표시한다 (전부 true로 찍어 원본 없는 항목이
@@ -68,7 +78,12 @@ jobs:
       #   ② 예전엔 본문을 5,000자에서 잘라 자격 절이 컷 뒤로 밀렸다.
       # --fill 은 **빠진 것·잘린 것만** 받는 증분 모드라 평소엔 몇 건 안 받는다(시간 부담 없음).
       # 반드시 발췌 갱신 '앞'에 둘 것 — 원문이 있어야 자격을 뽑는다.
+      # 여기도 보강 작업이라 시간 상한을 건다 (2026-08-04). 상한 120건 × 8초면 최악의 날
+      # 16분까지 갈 수 있는데, 그것 때문에 그날 수집분을 버리는 건 밑지는 장사다.
+      # 못 받은 원문은 다음 실행이 마저 받는다.
       - name: 공고 원문 보충 수집 (빠진 것·잘린 것만)
+        timeout-minutes: 5
+        continue-on-error: true
         run: node collector/deepfetch.mjs --fill
 
       - name: 공고 원문 발췌 갱신 (정직 원칙 — 추론 대신 원문 그대로)
@@ -182,8 +197,12 @@ jobs:
               --body "🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **데이터 감사 실패 — 이번 자동 등록분은 되돌렸습니다.** 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · 수집된 공고 자체는 실시간 피드에 그대로 남아 있어요. Claude 세션에 '감사 실패 확인해줘'라고 지시하세요."
           fi
 
-      - name: 🚨 실패 알림 (최근 리포트 이슈에 코멘트)
-        if: failure()
+      # cancelled()가 반드시 있어야 한다 (2026-08-04에 뚫린 구멍).
+      # 작업이 시간 상한을 넘기면 GitHub는 '실패'가 아니라 '취소'로 끝내는데,
+      # failure() 하나만 보고 있으면 이 알림 단계까지 건너뛴다 —
+      # 그래서 8/3 밤·8/4 아침 두 번 연속으로 수집이 죽었는데도 아무 데도 알림이 안 갔다.
+      - name: 🚨 실패·시간초과 알림 (최근 리포트 이슈에 코멘트)
+        if: failure() || cancelled()
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -192,5 +211,5 @@ jobs:
             --limit 1 --json number --jq '.[0].number' || true)
           if [ -n "$last" ] && [ "$last" != "null" ]; then
             gh issue comment "$last" --repo "${{ github.repository }}" \
-              --body "🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **수집 로봇 실행 실패** — 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · 반복되면 Claude 세션에 '로봇 실패 확인해줘'라고 지시하세요."
+              --body "🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **수집 로봇이 끝까지 못 갔어요** (실패 또는 시간 초과로 취소) — 이번 수집분은 저장되지 않았습니다. 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · 반복되면 Claude 세션에 '로봇 실패 확인해줘'라고 지시하세요."
           fi

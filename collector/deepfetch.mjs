@@ -24,6 +24,15 @@ function readTargetsFromTrigger() {
 const DOWNLOAD_FORMS_FOR = (process.env.FORM_TARGETS || readTargetsFromTrigger() || '조병두')
   .split(',').map((s) => s.trim()).filter(Boolean);
 
+/* --forms-only : 첨부 원본만 받고 본문 전문 수집은 건너뛴다 (2026-08-04 사고 대책).
+   매일 수집 워크플로의 '양식 원본 확보' 단계가 이 모드로 돈다. 예전엔 그 단계가
+   심층 수집 본편(=수집 목록 전체의 본문을 다시 받는 일)을 통째로 실행했다.
+   공고가 614건으로 늘자 그 재수집만 **19분**이 걸려 25분 예산을 먹어치웠고,
+   그 실행은 시간 초과로 취소돼 **수집분 저장·리포트가 통째로 버려졌다**
+   (8/3 밤·8/4 아침 두 번 연속 — 개발자 두 명에게 리포트가 안 간 원인).
+   본문은 바로 다음 단계의 증분 수집(--fill)이 어차피 받으므로 여기서는 중복이다. */
+const FORMS_ONLY = process.argv.includes('--forms-only');
+
 function clean(html) {
   return html
     .replace(/<script[\s\S]*?<\/script>/gi, ' ')
@@ -35,6 +44,13 @@ function clean(html) {
     .replace(/[ \t]+/g, ' ')
     .replace(/\n\s*\n+/g, '\n')
     .trim();
+}
+
+// 첨부 원본만 필요한 실행은 여기서 끝낸다 — 본문 재수집(19분짜리)을 아예 시작하지 않는다
+if (FORMS_ONLY) {
+  const n = await downloadForms();
+  console.log(`done(forms-only): ${n} attachments`);
+  process.exit(0);
 }
 
 /* ── 원문 본문 수집 ───────────────────────────────────────────
@@ -160,51 +176,79 @@ if (FILL) {   // 증분 모드는 본문만 — 첨부 원본은 심층 수집 �
   process.exit(0);
 }
 
+const fi = await downloadForms();
+console.log(`done: ${texts.length} texts, ${fi} attachments`);
+
 /* 지정 공고의 첨부 원본 다운로드.
    예전에는 실행할 때마다 form-* 파일을 전부 지우고 1번부터 다시 채웠다. 그 바람에
    '스키마화 대기'로 큐에 남아 있던 공고의 원본이 다음 수집 때 사라져, 다음 세션이 양식을
    만들 수 없었다(2026-07-30 발견 — 도레이·염곡·시립대 원본이 이렇게 유실됨).
    그래서 파일 이름에 공고별 표식을 넣고, 이번에 다시 받는 공고의 파일만 갈아끼운다. */
-const slugOf = (title) => {
-  let h = 0;
-  for (let i = 0; i < title.length; i++) h = (h * 31 + title.charCodeAt(i)) >>> 0;
-  return h.toString(36).slice(0, 6);
-};
-const targets = notices.items.filter((n) => DOWNLOAD_FORMS_FOR.some((k) => n.title.includes(k)));
-const refreshing = new Set(targets.map((n) => slugOf(n.title)));
-// 이번에 다시 받는 공고의 예전 파일만 지운다 (다른 공고의 대기 중 원본은 보존)
-for (const f of fs.readdirSync(OUT)) {
-  const m = f.match(/^form-([a-z0-9]{1,6})-/);
-  if (m && refreshing.has(m[1])) fs.unlinkSync(new URL(f, OUT));
-}
-const indexPath = new URL('forms-index.txt', OUT);
-let indexLines = [];
-try {
-  indexLines = fs.readFileSync(indexPath, 'utf8').split('\n').filter(Boolean)
-    .filter((line) => { const m = line.split('\t')[0].match(/^form-([a-z0-9]{1,6})-/); return m && !refreshing.has(m[1]); });
-} catch { /* 첫 실행 */ }
-let fi = 0;
-for (const n of targets) {
-  const slug = slugOf(n.title);
-  let ai = 0;
-  for (const a of n.attachments || []) {
-    if (/부속기관|부설/.test(a.name)) continue; // 사이트 공통 링크 제외
-    try {
-      const res = await fetch(a.url, { redirect: 'follow', headers: UA, signal: AbortSignal.timeout(30000) });
-      if (!res.ok) { console.log('attach fail', res.status, a.name); continue; }
-      const buf = Buffer.from(await res.arrayBuffer());
-      if (buf.length < 1000 || buf.length > 15 * 1024 * 1024) continue;
-      // 받아 보니 문서가 아니라 웹페이지면 버린다 — 게시판 하단 메뉴(부서 링크 등)를 첨부로
-      // 착각해 받아 두면 스키마화가 매번 그걸 붙들고 실패한다(연구지원팀·연구진흥팀 사례).
-      if (isHtmlPayload(buf)) { console.log('attach skip (웹페이지였음):', a.name); continue; }
-      fi += 1; ai += 1;
-      const ext = (a.name.match(/\.(hwp|hwpx|doc|docx|pdf|xls|xlsx|zip)$/i) || [, 'bin'])[1];
-      const fname = `form-${slug}-${ai}.${ext}`;
-      fs.writeFileSync(new URL(fname, OUT), buf);
-      indexLines.push(`${fname}\t${n.title}\t${a.name}\t${buf.length}`);
-      console.log('attach ok:', a.name, buf.length);
-    } catch (e) { console.log('attach err', a.name, e.name || e.message); }
+async function downloadForms() {
+  const slugOf = (title) => {
+    let h = 0;
+    for (let i = 0; i < title.length; i++) h = (h * 31 + title.charCodeAt(i)) >>> 0;
+    return h.toString(36).slice(0, 6);
+  };
+  /* 표적은 '제목 앞부분'이라 짧으면 엉뚱한 공고까지 몽땅 걸린다.
+     실제로 대기 큐가 제목을 12자로 잘라 넣는 바람에 "2026학년도 2학기 " 같은 조각이
+     수십 건에 걸렸고, 학자금대출·캠퍼스 투어 같은 공고의 첨부(3.9MB zip 등)까지 받다가
+     예산을 넘겼다 (2026-08-04). 그래서 ① 너무 짧은 표적은 무시하고 ② 표적당·전체
+     공고 수와 ③ 시간까지 묶는다. 남은 건 다음 실행이 마저 받으므로 잃는 것은 없다. */
+  const MIN_KEY = 6;          // 이보다 짧은 표적은 제목 조각으로 보고 건너뛴다
+  const PER_KEY = 3;          // 표적 하나가 걸어 올 수 있는 공고 수
+  const MAX_NOTICES = 12;     // 한 실행에서 첨부를 받을 공고 수
+  const BUDGET_MS = Number(process.env.FORMS_BUDGET_MS || 6 * 60 * 1000);
+  const startedAt = Date.now();
+
+  const targets = [];
+  for (const k of DOWNLOAD_FORMS_FOR) {
+    if (k.replace(/\s/g, '').length < MIN_KEY) { console.log(`표적 건너뜀 (너무 짧음): ${JSON.stringify(k)}`); continue; }
+    const hit = notices.items.filter((n) => n.title.includes(k));
+    if (hit.length > PER_KEY) console.log(`표적 "${k}" 이 ${hit.length}건에 걸림 — 앞 ${PER_KEY}건만 받는다`);
+    for (const n of hit.slice(0, PER_KEY)) if (!targets.includes(n)) targets.push(n);
   }
+  const capped = targets.slice(0, MAX_NOTICES);
+  if (targets.length > capped.length) console.log(`첨부 대상 ${targets.length}건 중 ${capped.length}건만 이번에 받는다 (나머지는 다음 실행)`);
+  console.log(`첨부 원본 수집 대상 ${capped.length}건 (표적 ${DOWNLOAD_FORMS_FOR.length}개)`);
+
+  const refreshing = new Set(capped.map((n) => slugOf(n.title)));
+  // 이번에 다시 받는 공고의 예전 파일만 지운다 (다른 공고의 대기 중 원본은 보존)
+  for (const f of fs.readdirSync(OUT)) {
+    const m = f.match(/^form-([a-z0-9]{1,6})-/);
+    if (m && refreshing.has(m[1])) fs.unlinkSync(new URL(f, OUT));
+  }
+  const indexPath = new URL('forms-index.txt', OUT);
+  let indexLines = [];
+  try {
+    indexLines = fs.readFileSync(indexPath, 'utf8').split('\n').filter(Boolean)
+      .filter((line) => { const m = line.split('\t')[0].match(/^form-([a-z0-9]{1,6})-/); return m && !refreshing.has(m[1]); });
+  } catch { /* 첫 실행 */ }
+  let fi = 0;
+  for (const n of capped) {
+    if (Date.now() - startedAt > BUDGET_MS) { console.log('첨부 수집 시간 상한 도달 — 나머지는 다음 실행이 받는다'); break; }
+    const slug = slugOf(n.title);
+    let ai = 0;
+    for (const a of n.attachments || []) {
+      if (/부속기관|부설/.test(a.name)) continue; // 사이트 공통 링크 제외
+      if (Date.now() - startedAt > BUDGET_MS) break;
+      try {
+        const res = await fetch(a.url, { redirect: 'follow', headers: UA, signal: AbortSignal.timeout(30000) });
+        if (!res.ok) { console.log('attach fail', res.status, a.name); continue; }
+        const buf = Buffer.from(await res.arrayBuffer());
+        if (buf.length < 1000 || buf.length > 15 * 1024 * 1024) continue;
+        // 받아 보니 문서가 아니라 웹페이지면 버린다 — 게시판 하단 메뉴(부서 링크 등)를 첨부로
+        // 착각해 받아 두면 스키마화가 매번 그걸 붙들고 실패한다(연구지원팀·연구진흥팀 사례).
+        if (isHtmlPayload(buf)) { console.log('attach skip (웹페이지였음):', a.name); continue; }
+        fi += 1; ai += 1;
+        const ext = (a.name.match(/\.(hwp|hwpx|doc|docx|pdf|xls|xlsx|zip)$/i) || [, 'bin'])[1];
+        const fname = `form-${slug}-${ai}.${ext}`;
+        fs.writeFileSync(new URL(fname, OUT), buf);
+        indexLines.push(`${fname}\t${n.title}\t${a.name}\t${buf.length}`);
+        console.log('attach ok:', a.name, buf.length);
+      } catch (e) { console.log('attach err', a.name, e.name || e.message); }
+    }
+  }
+  fs.writeFileSync(indexPath, indexLines.join('\n') + (indexLines.length ? '\n' : ''));
+  return fi;
 }
-fs.writeFileSync(indexPath, indexLines.join('\n') + (indexLines.length ? '\n' : ''));
-console.log(`done: ${texts.length} texts, ${fi} attachments`);

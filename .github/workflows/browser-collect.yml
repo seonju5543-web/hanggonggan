@@ -26,11 +26,16 @@ jobs:
     # 실제로 7/31 브라우저 수집이 360분을 돌다 취소됐고, 수집 로봇 2종이 같은
     # 대기줄(concurrency: collector)을 쓰기 때문에 그동안 다음 수집이 줄을 섰다.
     # 학교를 더 붙일수록 '한 곳이 안 열려 멈추는' 확률도 같이 오른다.
-    # 시간 상한: 스크립트가 스스로 22분 예산에 맞춰 끝내므로(HARVEST_BUDGET_MS) 30분이면 충분하다.
+    # 시간 상한 = 각 단계 예산의 합 (2026-08-04부터 이렇게 계산한다):
+    #   수집 22(HARVEST_BUDGET_MS) + 양식 원본 4 + 원문 보충 3 + 준비·저장·리포트 ≈3 = 32 → 34분.
+    # 상한을 '넉넉히' 잡는 것과는 다르다 — 모든 단계가 자기 예산을 갖고 있고, 그 합보다
+    # 상한이 커야 취소(=그날 수집분 전량 폐기)가 구조적으로 불가능해진다.
     # ⚠️ 40분이던 시절 학교가 17곳으로 늘자 4회 연속 이 상한에 걸려 **취소**됐고,
     #    취소는 아래 저장 단계까지 통째로 죽여서 그날 수집분이 전부 버려졌다(2026-08-02~03).
-    #    상한을 올리는 것은 해법이 아니다 — 예산(HARVEST_BUDGET_MS)을 조절할 것.
-    timeout-minutes: 30
+    #    그때의 교훈은 그대로다 — **상한을 키우는 것으로 때우지 말 것**. 단계가 오래 걸리면
+    #    그 단계의 예산(HARVEST_BUDGET_MS, 아래 timeout-minutes)을 줄이고, 상한은 그 합을
+    #    담는 그릇으로만 쓴다. verify/test-collector.mjs가 이 대소관계를 검사한다.
+    timeout-minutes: 34
     steps:
       - uses: actions/checkout@v4
 
@@ -45,13 +50,19 @@ jobs:
         run: node collector/browser-collect.mjs
       - name: 정식 등록 자동화 (선조치후보고 — collector/auto-register-config.json으로 on/off)
         run: node collector/auto-register.mjs collector/browser-report.md
+      # 보강 작업이라 자기 시간 상한 + continue-on-error를 단다 (2026-08-04).
+      # 경위는 collect-scholarships.yml의 같은 단계 주석 참조 — 이 단계가 예산을 다 먹어
+      # 작업이 취소되면서 8/4 두 로봇의 수집분과 리포트가 통째로 버려졌다.
       - name: 신규 등록분 양식 원본 자동 확보 + 스키마화 (같은 실행 안에서 끝낸다)
+        timeout-minutes: 4
+        continue-on-error: true
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          targets=$(node -e "let q;try{q=require('./collector/pending-forms.json')}catch(e){q={items:[]}};console.log(q.items.filter(i=>!i.fetched).map(i=>i.target).join(','))")
+          targets=$(node collector/pending-targets.mjs)
           if [ -n "$targets" ]; then
-            FORM_TARGETS="$targets" node collector/deepfetch.mjs
+            # --forms-only : 첨부 원본만 받는다. 본문은 바로 아래 증분 수집(--fill)의 일이다.
+            FORM_TARGETS="$targets" node collector/deepfetch.mjs --forms-only
             pip install olefile --quiet
             python3 collector/hwp-prvtext.py
             # 실제로 원본이 내려온 항목만 fetched로 표시한다 (전부 true로 찍어 원본 없는 항목이
@@ -65,6 +76,8 @@ jobs:
       # 원문 보충 (2026-08-03 도입) — 자격 요건이 사라지던 두 원인을 막는 단계.
       # 자세한 경위는 collect-scholarships.yml의 같은 단계 주석 참조. 증분이라 시간 부담 없음.
       - name: 공고 원문 보충 수집 (빠진 것·잘린 것만)
+        timeout-minutes: 3
+        continue-on-error: true
         run: node collector/deepfetch.mjs --fill
 
       - name: 공고 원문 발췌 갱신 (정직 원칙 — 추론 대신 원문 그대로)
@@ -166,8 +179,10 @@ jobs:
               --body "🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **데이터 감사 실패 — 이번 자동 등록분은 되돌렸습니다.** 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · 수집된 공고 자체는 실시간 피드에 그대로 남아 있어요. Claude 세션에 '감사 실패 확인해줘'라고 지시하세요."
           fi
 
-      - name: 🚨 실패 알림 (최근 리포트 이슈에 코멘트)
-        if: failure()
+      # cancelled() 필수 — 시간 상한을 넘긴 작업은 '실패'가 아니라 '취소'로 끝나서
+      # failure()만 보면 이 알림까지 건너뛴다 (2026-08-04에 실제로 뚫린 구멍).
+      - name: 🚨 실패·시간초과 알림 (최근 리포트 이슈에 코멘트)
+        if: failure() || cancelled()
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -176,5 +191,5 @@ jobs:
             --limit 1 --json number --jq '.[0].number' || true)
           if [ -n "$last" ] && [ "$last" != "null" ]; then
             gh issue comment "$last" --repo "${{ github.repository }}" \
-              --body "🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **브라우저형 수집 로봇 실행 실패** — 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · 반복되면 Claude 세션에 '로봇 실패 확인해줘'라고 지시하세요."
+              --body "🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **브라우저형 수집 로봇이 끝까지 못 갔어요** (실패 또는 시간 초과로 취소) — 이번 수집분은 저장되지 않았습니다. 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · 반복되면 Claude 세션에 '로봇 실패 확인해줘'라고 지시하세요."
           fi

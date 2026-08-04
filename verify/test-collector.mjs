@@ -353,9 +353,18 @@ console.log('■ 예산 장치가 실제로 배선돼 있나 (되돌아가면 �
   eq('회전 커서를 저장한다 (안 하면 매번 같은 학교가 잘린다)', /nextCursor\(/.test(src) && /cursorPath/.test(src), true);
   const yml = fs.readFileSync(new URL('.github/workflows/browser-collect.yml', root), 'utf8');
   eq('워크플로 저장 목록에 회전 커서가 있다', /browser-cursor\.json/.test(yml), true);
-  const limit = Number((yml.match(/timeout-minutes:\s*(\d+)/) || [])[1]);
+  /* 작업(job) 상한은 들여쓰기 4칸, 단계(step) 상한은 8칸이다. 2026-08-04에 단계별 상한이
+     생기면서 예전 정규식(`timeout-minutes` 첫 등장)이 단계 상한을 작업 상한으로 잘못 읽을
+     수 있게 됐다 — 순서만 바뀌어도 검사가 통과해 버린다. 그래서 둘을 나눠서 읽는다. */
+  const limit = Number((yml.match(/^ {4}timeout-minutes:\s*(\d+)/m) || [])[1]);
+  const stepCaps = [...yml.matchAll(/^ {8}timeout-minutes:\s*(\d+)/gm)].map((m) => Number(m[1]));
   // 예산(22분)보다 넉넉히 커야 저장·감사·리포트 단계가 돌 시간이 남는다
   eq('워크플로 상한이 예산보다 크다', limit > 22, true);
+  /* 그리고 상한은 '모든 단계 예산의 합'을 담아야 한다. 이게 깨지면 마지막 단계들
+     (저장·리포트)이 시작도 못 하고 작업이 취소되고, 취소는 그날 수집분을 통째로 버린다
+     — 2026-08-04에 실제로 이렇게 이틀치 리포트가 사라졌다. */
+  eq('작업 상한이 수집 예산 + 단계 예산의 합보다 크다',
+    limit > 22 + stepCaps.reduce((a, b) => a + b, 0), true);
 }
 
 /* 원문을 짧게 자르면 자격 절이 통째로 날아간다 (2026-08-03 도입).

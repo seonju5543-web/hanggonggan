@@ -248,8 +248,13 @@ if (!cfg.enabled) {
   for (const e of added) {
     if (!(e.attachments || []).some((a) => /신청서|지원서|신청양식|원서|서식|양식|동의서|서약서/.test(a.name))) continue;
     if (queue.items.some((q) => q.id === e.id)) continue;
-    // deepfetch가 제목 부분일치로 대상을 찾으므로, 부스러기 없는 제목 앞부분을 표적으로 쓴다
-    const target = cleanTitle(e.name).replace(/\[[^\]]*\]/g, '').trim().slice(0, 12);
+    /* deepfetch가 제목 부분일치로 대상을 찾으므로, 부스러기 없는 제목 앞부분을 표적으로 쓴다.
+       길이 12자 → 30자 (2026-08-04). 12자는 "2026학년도 2학기 " 처럼 어느 공고에나 있는
+       조각이 되기 쉬워서, 표적 하나가 수십 건에 걸렸다. 그 바람에 학자금대출·캠퍼스 안내
+       같은 공고의 첨부(3.9MB zip 등)까지 받다가 수집 예산을 넘겨 그날 수집이 통째로
+       버려졌다. 머리쪽 대괄호만 떼는 것도 같은 이유다 — 가운데 대괄호까지 지우면 표적이
+       원래 제목의 '이어진 한 토막'이 아니게 돼서 아무 공고에도 안 걸린다. */
+    const target = cleanTitle(e.name).replace(/^(\s*\[[^\]]*\])+/, '').trim().slice(0, 30);
     queue.items.push({ id: e.id, name: e.name, target, added: TODAY, fetched: false, schematized: false });
     queued++;
   }
