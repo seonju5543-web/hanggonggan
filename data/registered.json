@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-08-03",
+ "updatedAt": "2026-08-04",
  "items": [
   {
    "id": "reg-kw-gukgagosi",
@@ -5129,7 +5129,11 @@
     "제출서류 (2016 년 2 학기 농어촌희망재단 대학장학생 선발요강 참조 )",
     "2) 세부 장학생 선발요건 및 신청방법 ( 구비서류 ) 등은 반드시 붙임 선발요강을 반드시 참조 바람"
    ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "eligibilityLines": [
+    "○ 농업계대학이 있는 농식품계열 재학생",
+    "○ 해양수산계 대학이 있는 해양수산계열 재학생"
+   ]
   },
   {
    "id": "auto-knuackrnano2432no9910969",
@@ -5250,40 +5254,45 @@
    "sourceKind": "auto"
   },
   {
-   "id": "auto-eab3b5eca780ec82aced95ad",
-   "name": "Qualcomm Innovation Fellowship Korea 우수논문 장학금 선발 안내",
+   "id": "auto-otice06doarticleno138910",
+   "name": "2026학년도 1학기 성적우수장학생 선발 결과 안내",
    "type": "교내",
-   "provider": "서울대학교 게시 공고",
+   "provider": "성균관대학교 게시 공고",
    "amount": "금액 원문 확인",
    "amountValue": 0,
    "deadline": null,
-   "listedAt": "2026-08-03",
+   "listedAt": "2026-08-04",
    "period": "접수 기간 원문 확인",
-   "summary": "서울대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "summary": "성균관대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true,
-    "schoolOnly": "서울대학교"
+    "schoolOnly": "성균관대학교"
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
    ],
    "duplicable": true,
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-04 — 양식 스키마화는 검수 후 진행",
    "auto": true,
    "attachments": [],
-   "sourceUrl": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&#038;category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&#038;uid=311",
+   "sourceUrl": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=138910&article.offset=0&articleLimit=10",
    "sourceKind": "auto",
-   "formId": "auto-장학-2026년-서울미-apply"
+   "excerpts": [
+    "* 개인정보 보호를 위해 장학생으로 선발된 학생들에게 등록 절차 및 지급금액 등을 개별적으로 안내 예정입니다.",
+    "* 문의 : 의료인공지능융합인재양성사업단(medicalai@skku.edu)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   },
   {
-   "id": "auto-kuk2351174254artclviewdo",
-   "name": "[교외] 2026학년도 세종특별자치시 세종연구원 세종이도인재 장학금 장학생 모집( ~ 9. 30.)",
+   "id": "auto-kuk2351202780artclviewdo",
+   "name": "[교외] 2026학년도 2학기 충북인재평생교육진흥원 장학생 선발공고(8. 4. ~ 8. 27.)",
    "type": "교외",
    "provider": "건국대학교 게시 공고",
    "amount": "금액 원문 확인",
    "amountValue": 0,
    "deadline": null,
-   "listedAt": "2026-08-03",
+   "listedAt": "2026-08-04",
    "period": "접수 기간 원문 확인",
    "summary": "건국대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
@@ -5295,11 +5304,239 @@
    ],
    "duplicable": true,
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
-   "noForm": "자동 등록(검수 전) 2026-08-03 — 양식 스키마화는 검수 후 진행",
+   "noForm": "자동 등록(검수 전) 2026-08-04 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "공문_붙임) 2026년 하반기 장학생 선발 공고문.pdf",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1222846/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.konkuk.ac.kr/bbs/konkuk/235/1202780/artclView.do",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-kolifenoticejspduid53000",
+   "name": "[등록/장학] 2026학년도 재단법인 심명문화재단 장학생 추가 선발 안내",
+   "type": "교외",
+   "provider": "광운대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-04",
+   "period": "접수 기간 원문 확인",
+   "summary": "광운대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "광운대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-04 — 양식 스키마화는 검수 후 진행",
    "auto": true,
    "attachments": [],
-   "sourceUrl": "https://www.konkuk.ac.kr/bbs/konkuk/235/1174254/artclView.do",
+   "sourceUrl": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53000&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "1. 선발기준자격",
+    "① 학업성적이 우수하고 타에 모범이 되는 자 ( 생활비성 전형 )",
+    "② 국가와 사회발전에 이바지할 우수한 인재",
+    "③ 2026 학년도 2 학기 재학생 ( 정규 학기 기준 , 휴학생 제외 )",
+    "④ 경제적인 사정으로 어려움을 겪고 있는 자",
+    "( 한국장학재단 산정 학자금 지원구간 : 5 분위 이내 )",
+    "⑤ 학업성적 전학기 성적 평점 3.0/4.5 이상 (1 학년 학생은 1 학기 성적 )"
+   ],
+   "excerpts": [
+    "- 장학금 지급규정에 따라 지원 대상자 중 재단 심사규정에 의거하여 사무국",
+    "접수방법 : 우편접수 ( 등기원칙 ) 또는 방문접수"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-jukr145233953artclviewdo",
+   "name": "5.18 기념재단-5.18 희망장학생 모집 공고",
+   "type": "교외",
+   "provider": "명지대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-04",
+   "period": "접수 기간 원문 확인",
+   "summary": "명지대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "명지대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-04 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026년 5·18희망장학생 모집 공고문.hwp",
+     "url": "https://www.mju.ac.kr/bbs/mjukr/145/179079/download.do"
+    },
+    {
+     "name": "2026년 5·18희망장학생 모집공고 지원 서식(1~6).hwp",
+     "url": "https://www.mju.ac.kr/bbs/mjukr/145/179080/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.mju.ac.kr/bbs/mjukr/145/233953/artclView.do",
    "sourceKind": "auto"
+  },
+  {
+   "id": "auto-enoticedoarticleno273597",
+   "name": "[학생지원팀] 2026년도 산학협동재단 국내 외국인 근로자 자녀 장학생 선발 신청 안내 (~7월 13일(월)까지)",
+   "type": "교외",
+   "provider": "가톨릭대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-04",
+   "period": "접수 기간 원문 확인",
+   "summary": "가톨릭대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "가톨릭대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "붙임1. 국내 외국인 근로자 자녀 장학생 신청서류.hwp",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=273597&attachNo=223341"
+    }
+   ],
+   "sourceUrl": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=273597&article.offset=0&articleLimit=10&srCategoryId=22",
+   "sourceKind": "auto",
+   "formId": "auto-2026년도-산학협동재단-국내-외국인-근로자-apply",
+   "eligibilityLines": [
+    "장애학생지원",
+    "[학생지원팀] [한국장애인개발원] 2026년도 쌍용곰두리장학생 신청 안내(2026.07.13~20까지)"
+   ],
+   "excerpts": [
+    "제출서류 *각1부씩 원본 제출, 공고일(5/18) 이후 발급분만 인정",
+    "신청기간 : ~ 7.",
+    "제출방법 : 이메일 제출 ( sakim77@catholic.ac.kr )",
+    "제출 유의사항 ※ 제출서류는 순서대로 정리하여 하나의 PDF 파일로 제출하여 주시기 바랍니다.",
+    "모든 제출서류는 공고일 이후 발급분 및 원본서류만 인정됩니다."
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-nuackrprogboardno2514559",
+   "name": "2026학년도 제2학기 교내 장학생(재학생) 선발 계획 안내",
+   "type": "교내",
+   "provider": "충남대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-04",
+   "period": "접수 기간 원문 확인",
+   "summary": "충남대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "충남대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-04 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "붙임4. 장학금 신청서 및 추천서 서식.hwp",
+     "url": "https://plus.cnu.ac.kr/_prog/_board/common/download.php?code=sub07_0713&ntt_no=2514559&atch_no=3"
+    }
+   ],
+   "sourceUrl": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2514559&code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-nuackrprogboardno2514520",
+   "name": "2026학년도 제2학기 국가근로장학생(장애대학생 봉사유형) 모집 안내",
+   "type": "교내",
+   "provider": "충남대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-04",
+   "period": "접수 기간 원문 확인",
+   "summary": "충남대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "충남대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-04 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2514520&code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "3. 지원자격",
+    "□ 우리대학 재학생(휴학생 제외), 직전학기 성적 70점(100점 만점) 이상",
+    "□ 소득분위 적용 없으며, 한국장학재단 국가근로장학금 신청 필수"
+   ],
+   "excerpts": [
+    "2026학년도 1학기 교육활동동반자 신청방법 안내.pdf",
+    "신청방법 : 포털-통합정보시스템에 입력하여 신청"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-pnoticedoarticleno365933",
+   "name": "[학부]2026 5.18 희망장학생 선발 안내",
+   "type": "교내",
+   "provider": "이화여자대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-08-12",
+   "period": "접수 ~2026-08-12",
+   "summary": "이화여자대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "이화여자대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-04 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026년 5·18희망장학생 모집 공고문.hwp",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=365933&attachNo=352122"
+    },
+    {
+     "name": "2026년 5·18희망장학생 모집공고 지원 서식(1~6).hwp",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=365933&attachNo=352123"
+    }
+   ],
+   "sourceUrl": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=365933&article.offset=0&articleLimit=10",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "장애학생지원",
+    "북한이탈주민학생지원"
+   ]
   }
  ]
 }

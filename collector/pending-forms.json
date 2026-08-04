@@ -79,8 +79,8 @@
    "added": "2026-08-02",
    "fetched": false,
    "schematized": false,
-   "tries": 3,
-   "lastTryAt": "2026-08-03"
+   "tries": 4,
+   "lastTryAt": "2026-08-04"
   },
   {
    "id": "auto-jukr145233626artclviewdo",
@@ -105,8 +105,8 @@
    "added": "2026-08-02",
    "fetched": false,
    "schematized": false,
-   "tries": 3,
-   "lastTryAt": "2026-08-03"
+   "tries": 4,
+   "lastTryAt": "2026-08-04"
   },
   {
    "id": "reg-konkuk-bulgaria",
@@ -123,8 +123,8 @@
    "added": "2026-08-02",
    "fetched": false,
    "schematized": false,
-   "tries": 3,
-   "lastTryAt": "2026-08-03"
+   "tries": 4,
+   "lastTryAt": "2026-08-04"
   },
   {
    "id": "reg-dongsan",
@@ -149,8 +149,8 @@
    "added": "2026-08-02",
    "fetched": false,
    "schematized": false,
-   "tries": 3,
-   "lastTryAt": "2026-08-03"
+   "tries": 4,
+   "lastTryAt": "2026-08-04"
   },
   {
    "id": "reg-partner-foundation",
@@ -167,8 +167,8 @@
    "added": "2026-08-02",
    "fetched": false,
    "schematized": false,
-   "tries": 3,
-   "lastTryAt": "2026-08-03"
+   "tries": 4,
+   "lastTryAt": "2026-08-04"
   },
   {
    "id": "reg-catholic-lee",
@@ -261,6 +261,38 @@
    "name": "2014-2학기 사랑드림장학사업(삼성) 장학금 신청 안내",
    "target": "2014-2학기 사랑드",
    "added": "2026-08-03",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-jukr145233953artclviewdo",
+   "name": "5.18 기념재단-5.18 희망장학생 모집 공고",
+   "target": "5.18 기념재단-5.18 희망장학생 모집 공고",
+   "added": "2026-08-04",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-enoticedoarticleno273597",
+   "name": "[학생지원팀] 2026년도 산학협동재단 국내 외국인 근로자 자녀 장학생 선발 신청 안내 (~7월 13일(월)까지)",
+   "target": "2026년도 산학협동재단 국내 외국인 근로자 자녀 장학",
+   "added": "2026-08-04",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-nuackrprogboardno2514559",
+   "name": "2026학년도 제2학기 교내 장학생(재학생) 선발 계획 안내",
+   "target": "2026학년도 제2학기 교내 장학생(재학생) 선발 계획",
+   "added": "2026-08-04",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-pnoticedoarticleno365933",
+   "name": "[학부]2026 5.18 희망장학생 선발 안내",
+   "target": "2026 5.18 희망장학생 선발 안내",
+   "added": "2026-08-04",
    "fetched": true,
    "schematized": false
   }
