@@ -79,8 +79,10 @@
    "added": "2026-08-02",
    "fetched": false,
    "schematized": false,
-   "tries": 5,
-   "lastTryAt": "2026-08-04"
+   "tries": 6,
+   "lastTryAt": "2026-08-05",
+   "retired": true,
+   "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
   },
   {
    "id": "auto-jukr145233626artclviewdo",
@@ -105,8 +107,10 @@
    "added": "2026-08-02",
    "fetched": false,
    "schematized": false,
-   "tries": 5,
-   "lastTryAt": "2026-08-04"
+   "tries": 6,
+   "lastTryAt": "2026-08-05",
+   "retired": true,
+   "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
   },
   {
    "id": "reg-konkuk-bulgaria",
@@ -123,8 +127,10 @@
    "added": "2026-08-02",
    "fetched": false,
    "schematized": false,
-   "tries": 5,
-   "lastTryAt": "2026-08-04"
+   "tries": 6,
+   "lastTryAt": "2026-08-05",
+   "retired": true,
+   "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
   },
   {
    "id": "reg-dongsan",
@@ -149,8 +155,10 @@
    "added": "2026-08-02",
    "fetched": false,
    "schematized": false,
-   "tries": 5,
-   "lastTryAt": "2026-08-04"
+   "tries": 6,
+   "lastTryAt": "2026-08-05",
+   "retired": true,
+   "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
   },
   {
    "id": "reg-partner-foundation",
@@ -167,8 +175,10 @@
    "added": "2026-08-02",
    "fetched": false,
    "schematized": false,
-   "tries": 5,
-   "lastTryAt": "2026-08-04"
+   "tries": 6,
+   "lastTryAt": "2026-08-05",
+   "retired": true,
+   "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
   },
   {
    "id": "reg-catholic-lee",
