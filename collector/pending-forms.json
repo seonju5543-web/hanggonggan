@@ -79,7 +79,7 @@
    "added": "2026-08-02",
    "fetched": false,
    "schematized": false,
-   "tries": 4,
+   "tries": 5,
    "lastTryAt": "2026-08-04"
   },
   {
@@ -105,7 +105,7 @@
    "added": "2026-08-02",
    "fetched": false,
    "schematized": false,
-   "tries": 4,
+   "tries": 5,
    "lastTryAt": "2026-08-04"
   },
   {
@@ -123,7 +123,7 @@
    "added": "2026-08-02",
    "fetched": false,
    "schematized": false,
-   "tries": 4,
+   "tries": 5,
    "lastTryAt": "2026-08-04"
   },
   {
@@ -149,7 +149,7 @@
    "added": "2026-08-02",
    "fetched": false,
    "schematized": false,
-   "tries": 4,
+   "tries": 5,
    "lastTryAt": "2026-08-04"
   },
   {
@@ -167,7 +167,7 @@
    "added": "2026-08-02",
    "fetched": false,
    "schematized": false,
-   "tries": 4,
+   "tries": 5,
    "lastTryAt": "2026-08-04"
   },
   {
@@ -295,6 +295,14 @@
    "added": "2026-08-04",
    "fetched": true,
    "schematized": false
+  },
+  {
+   "id": "auto-krbbskr844732artclviewdo",
+   "name": "[학부-교외장학] 2026학년도 2학기 사회적협동조합 신협사회공헌재단 소외계층 장학생 선발 안내",
+   "target": "2026학년도 2학기 사회적협동조합 신협사회공헌재단 소",
+   "added": "2026-08-04",
+   "fetched": true,
+   "schematized": true
   }
  ]
 }
