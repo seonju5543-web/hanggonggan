@@ -221,20 +221,24 @@ async function onboard(page, school = '외대') {
   ok(/폰 주소와 학교/.test(privacyNote), '무엇이 서버로 가는지 화면에 밝힘');
   await page.screenshot({ path: `${__dirname}/shot-push-03-on.png` });
 
-  /* ④ 끄기 */
-  received.length = 0;
-  await page.click('#btn-nf-push');
-  await page.waitForTimeout(900);
-  ok(received.some((r) => r.path === '/unsubscribe'), '끄면 서버에서 해지 요청', received.map((r) => r.path));
-  ok(await page.evaluate(() => window.__pushUnsubscribed), '브라우저 구독도 함께 끊김');
-  const offTitle = await page.textContent('.nf-push-title');
-  ok(!/받는 중/.test(offTitle), 'MY 표시가 꺼짐 상태로 바뀜', offTitle);
+  /* ④ 별도 스위치는 없앴다 (2026-08-06 개발자 지시) — 알림을 켜면 곧 기본값 */
+  ok(await page.$('#btn-nf-push') === null,
+    "'앱을 켜지 않아도 받기' 스위치가 사라짐 — 알림을 켜면 자동으로 켜진다");
 
-  /* 다시 켜기 */
+  /* ⑤ 회귀 — 이미 알림을 켜 둔 사람도 앱을 다시 열면 자동으로 등록된다.
+     예전에는 등록이 '최초 1회 동의 시트'에서만 일어나, 그 시트를 이미 지나친 사용자는
+     영영 등록되지 않았다. 실제로 이것 때문에 등록된 폰이 0대였다(2026-08-06).
+     이 검사를 지우면 그 상태로 되돌아간다. */
   received.length = 0;
-  await page.click('#btn-nf-push');
-  await page.waitForTimeout(900);
-  ok(received.some((r) => r.path === '/subscribe'), '다시 켜면 재등록됨');
+  await page.evaluate(async () => { notifyLedger.pushEndpoint = null; await notifySaveLedger(); });
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.waitForTimeout(2600);
+  ok(received.some((r) => r.path === '/subscribe'),
+    '등록이 비어 있으면 앱을 열 때 자동으로 등록됨 (pushEnsure)', received.map((r) => r.path));
+
+  // 새로고침으로 홈으로 돌아왔으므로 아래 검사를 위해 MY 화면으로 다시 들어간다
+  await page.click('.nav-item[data-nav="my"]');
+  await page.waitForSelector('#my-notify:not([hidden])');
 
   /* ④ 학교를 바꾸면 서버 등록도 따라간다 */
   received.length = 0;

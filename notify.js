@@ -313,7 +313,7 @@ function notifyConsentSheet() {
     closeNotifyPanel();
     if (perm === 'granted') {
       notifyRegisterBackground();
-      const p = await pushSubscribe(); // 발송 서버가 있으면 '앱을 안 켜도 오는 알림'까지 한 번에 켠다
+      const p = await pushEnsure(); // 발송 서버가 있으면 '앱을 안 켜도 오는 알림'까지 한 번에 켠다
       toast(p.ok
         ? '알림을 켰어요. 앱을 켜지 않아도 폰으로 알려드릴게요'
         : '알림을 켰어요. 새 공고와 마감을 챙겨드릴게요');
@@ -367,7 +367,10 @@ function notifySettingsHtml() {
       <input type="checkbox" class="nf-switch" data-nf-pref="${t.id}" ${notifyLedger.prefs[t.id] ? 'checked' : ''} />
     </label>`).join('');
 
-  /* 진짜 푸시(앱을 안 켜도 오는 알림) — 발송 서버가 배포된 경우에만 보여준다 */
+  /* 진짜 푸시(앱을 안 켜도 오는 알림) — 2026-08-06 개발자 지시로 **기본값**이 됐다.
+     예전에는 별도 스위치로 사용자가 한 번 더 켜야 했는데, 그 스위치를 눌러 본 사람이 아무도 없어
+     실제로 등록된 폰이 0대였다. 이제 알림을 켜면 자동으로 연결되고(pushEnsure),
+     여기서는 **상태만 보여준다**(끄려면 위의 알림 끄기 하나로 충분하다). */
   const canPush = pushConfigured();
   const pushOn = pushActive();
   const iosNotInstalled = /iPad|iPhone|iPod/.test(navigator.userAgent) && !sup.standalone;
@@ -376,16 +379,15 @@ function notifySettingsHtml() {
       <p class="nf-push-title">📴 앱을 켜지 않아도 받기 — 준비 중</p>
       <p class="nf-desc">지금은 <strong>앱을 열 때</strong> 알림을 확인해요. 발송 서버가 연결되면 앱을 켜지 않아도 폰으로 바로 도착해요.</p>
     </div>`
-    : `
+    : !on ? '' : `
     <div class="nf-push${pushOn ? ' nf-push-on' : ''}">
-      <div class="nf-set-head" style="margin-bottom:6px">
-        <p class="nf-push-title">${pushOn ? '📲 앱을 켜지 않아도 받는 중' : '📴 앱을 켜지 않아도 받기'}</p>
-        <button class="wallet-btn ${pushOn ? '' : 'primary'}" id="btn-nf-push" ${on ? '' : 'disabled'}>${pushOn ? '끄기' : '켜기'}</button>
-      </div>
+      <p class="nf-push-title">${pushOn ? '📲 앱을 켜지 않아도 받는 중' : '⏳ 연결하는 중'}</p>
       <p class="nf-desc">${pushOn
         ? '앱을 닫아 두거나 화면이 꺼져 있어도 마감·새 공고 알림이 폰으로 도착해요.'
-        : (on ? '켜면 앱을 실행하지 않아도 폰으로 알림이 도착해요.' : '먼저 위에서 알림을 켜 주세요.')}</p>
-      ${iosNotInstalled ? '<p class="nf-desc">📱 iPhone은 사파리 <strong>공유 → 홈 화면에 추가</strong>로 설치해야 이 기능을 쓸 수 있어요.</p>' : ''}
+        : (iosNotInstalled
+          ? '아직 이 기기에 연결되지 않았어요.'
+          : '곧 자동으로 연결돼요. 앱을 껐다 켜면 바로 반영돼요.')}</p>
+      ${iosNotInstalled ? '<p class="nf-desc">📱 iPhone은 사파리 <strong>공유 → 홈 화면에 추가</strong>로 설치해야 앱을 켜지 않아도 알림을 받을 수 있어요.</p>' : ''}
       <p class="nf-desc">서버에는 <strong>폰 주소와 학교</strong>만 저장돼요 — 이름·성적·소득·서류는 이 기기 밖으로 나가지 않아요.</p>
     </div>`;
 
@@ -425,24 +427,15 @@ function bindNotifySettings() {
       notifyLedger.askedAt = notifyLedger.askedAt || Date.now();
       notifyLedger.enabled = perm === 'granted';
       await notifySaveLedger();
-      if (perm === 'granted') { notifyRegisterBackground(); toast('알림을 켰어요'); }
+      if (perm === 'granted') {
+        notifyRegisterBackground();
+        // 알림을 켜면 '앱을 안 켜도 오는 알림'까지 함께 켠다 (별도 스위치 없음 — 2026-08-06)
+        const p = await pushEnsure();
+        toast(p && p.ok
+          ? '알림을 켰어요. 앱을 켜지 않아도 폰으로 알려드릴게요'
+          : '알림을 켰어요');
+      }
       else if (perm === 'denied') toast('브라우저 사이트 설정에서 알림을 허용해 주세요');
-    }
-    renderMy();
-  });
-
-  const pushBtn = $('#btn-nf-push');
-  if (pushBtn) pushBtn.addEventListener('click', async () => {
-    pushBtn.disabled = true;
-    if (pushActive()) {
-      await pushUnsubscribe();
-      toast('앱을 켜야 알림을 확인할 수 있게 됐어요');
-    } else {
-      const r = await pushSubscribe();
-      if (r.ok) toast('이제 앱을 켜지 않아도 폰으로 알림이 도착해요');
-      else if (r.reason === 'permission') toast('먼저 위에서 알림을 켜 주세요');
-      else if (r.reason === 'unsupported') toast('이 브라우저는 아직 지원하지 않아요 (iPhone은 홈 화면에 추가해 주세요)');
-      else toast('연결에 실패했어요. 잠시 후 다시 시도해 주세요');
     }
     renderMy();
   });
@@ -573,6 +566,22 @@ async function pushSyncSchool() {
   await pushSubscribe();
 }
 
+/* 알림이 켜져 있으면 **자동으로** 발송 서버에 등록한다 (2026-08-06 — 이게 없어서 등록된 폰이 0대였다)
+   ------------------------------------------------------------
+   예전에는 등록이 '최초 1회 동의 시트'에서만 일어났다. 그런데 그 시트는 사람당 딱 한 번만 뜨므로,
+   **알림을 이미 켜 둔 사용자**(= 발송 서버가 생기기 전에 켠 모든 사람)는 영영 등록되지 않았다.
+   MY 화면에서 알림을 켜는 경로에도 등록이 빠져 있었다. 그래서 앱을 열 때마다 여기서 메꾼다.
+   이미 등록돼 있으면 학교만 맞춰 보고 끝나므로 서버를 괴롭히지 않는다. */
+async function pushEnsure() {
+  if (!notifyLedger || !notifyLedger.enabled) return { ok: false, reason: 'off' };
+  if (!pushConfigured() || !pushSupported()) return { ok: false, reason: 'unsupported' };
+  if (typeof Notification === 'undefined' || Notification.permission !== 'granted') {
+    return { ok: false, reason: 'permission' };
+  }
+  if (pushActive()) { await pushSyncSchool(); return { ok: true, reason: 'already' }; }
+  return pushSubscribe();
+}
+
 /* 데이터 초기화와 함께 알림 설정·알림함도 지운다 (MY → 데이터 초기화) */
 async function notifyReset() {
   notifyLedger = NOTIFY_RULES.newLedger();
@@ -621,7 +630,10 @@ async function notifyInit() {
 
   // 다른 화면 갔다 돌아왔을 때도 확인
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') setTimeout(() => notifyCheck({ quiet: false }), 1500);
+    if (document.visibilityState !== 'visible') return;
+    setTimeout(() => notifyCheck({ quiet: false }), 1500);
+    // 브라우저 설정에서 알림을 뒤늦게 허용한 경우에도 여기서 등록이 메꿔진다
+    pushEnsure().catch(() => {});
   });
 
   // 서비스워커에서 알림을 눌렀다는 신호가 오면 해당 화면을 연다
@@ -638,7 +650,8 @@ async function notifyInit() {
 
   if (notifyLedger.enabled) {
     notifyRegisterBackground();
-    pushSyncSchool().catch(() => {});   // 학교를 바꿨으면 서버 등록도 따라간다
+    // 아직 발송 서버에 등록되지 않았으면 지금 등록하고, 이미 됐으면 학교만 맞춘다
+    pushEnsure().catch(() => {});
   }
   notifyMaybeAskConsent(1800);
 }
