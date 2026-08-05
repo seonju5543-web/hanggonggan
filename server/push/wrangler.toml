@@ -8,10 +8,12 @@ APP_ORIGIN = "https://seonju5543-web.github.io/hanggonggan"
 ALLOW_ORIGIN = "https://seonju5543-web.github.io"
 
 # 구독(폰 주소·학교) 저장소 — 무료 등급으로 충분하다
-# 만들기: npx wrangler kv namespace create SUBS  → 나온 id를 아래에 붙여넣기
+# 2026-08-06에 Cloudflare 대시보드에서 만든 SUBS 네임스페이스의 번호.
+# (비밀이 아니다 — 이 번호만으로는 아무것도 열 수 없다. 계정 로그인이 있어야 접근된다.)
+# ⚠️ GitHub 연결 배포에서는 화면에서 KV를 연결하면 안 된다 — 배포 때마다 이 파일 내용으로 덮어써진다.
 [[kv_namespaces]]
 binding = "SUBS"
-id = "여기에_KV_ID_붙여넣기"
+id = "b2eb1c8f30814fad91249e2f08334fbf"
 
 # 예약 실행 — **2분마다 한 걸음씩.**
 #
