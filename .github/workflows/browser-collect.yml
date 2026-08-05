@@ -26,11 +26,17 @@ jobs:
     # 실제로 7/31 브라우저 수집이 360분을 돌다 취소됐고, 수집 로봇 2종이 같은
     # 대기줄(concurrency: collector)을 쓰기 때문에 그동안 다음 수집이 줄을 섰다.
     # 학교를 더 붙일수록 '한 곳이 안 열려 멈추는' 확률도 같이 오른다.
-    # 시간 상한: 스크립트가 스스로 22분 예산에 맞춰 끝내므로(HARVEST_BUDGET_MS) 30분이면 충분하다.
+    # 시간 상한 = 각 단계 상한의 합 (2026-08-04부터 이렇게 계산한다):
+    #   수집 26(예산 22 + 마무리 4) + 양식 원본 4 + 원문 보충 3 + 준비·저장·리포트 ≈3 = 36 → 38분.
+    #   2026-08-05에 수집 단계에 자체 상한 26이 생기면서 이 합이 34 → 38로 늘었다.
+    # 상한을 '넉넉히' 잡는 것과는 다르다 — 모든 단계가 자기 예산을 갖고 있고, 그 합보다
+    # 상한이 커야 취소(=그날 수집분 전량 폐기)가 구조적으로 불가능해진다.
     # ⚠️ 40분이던 시절 학교가 17곳으로 늘자 4회 연속 이 상한에 걸려 **취소**됐고,
     #    취소는 아래 저장 단계까지 통째로 죽여서 그날 수집분이 전부 버려졌다(2026-08-02~03).
-    #    상한을 올리는 것은 해법이 아니다 — 예산(HARVEST_BUDGET_MS)을 조절할 것.
-    timeout-minutes: 30
+    #    그때의 교훈은 그대로다 — **상한을 키우는 것으로 때우지 말 것**. 단계가 오래 걸리면
+    #    그 단계의 예산(HARVEST_BUDGET_MS, 아래 timeout-minutes)을 줄이고, 상한은 그 합을
+    #    담는 그릇으로만 쓴다. verify/test-collector.mjs가 이 대소관계를 검사한다.
+    timeout-minutes: 38
     steps:
       - uses: actions/checkout@v4
 
@@ -41,17 +47,30 @@ jobs:
           node-version: 20
       - run: npm init -y >/dev/null && npm i playwright@1 --no-audit --no-fund
       - run: npx playwright install --with-deps chromium
+      # 안전망 (2026-08-05) — 스크립트는 22분 예산에 맞춰 스스로 끝내야 하지만,
+      # 예산을 안 보는 구간이 하나라도 남아 있으면 그만큼 흘러넘친다(8/5 05:52: 33분 42초).
+      # 여기서 끊어 두면 흘러넘쳐도 **작업 전체가 취소되는 일은 없어** 감사·저장·알림 단계가 돈다.
+      # 26분 = 예산 22 + 마무리 여유 4. 이 상한에 닿는다는 것 자체가 '어딘가 안 멈췄다'는 신호다.
       - id: run
+        name: 게시판 수집 (브라우저)
+        timeout-minutes: 26
+        continue-on-error: true
         run: node collector/browser-collect.mjs
       - name: 정식 등록 자동화 (선조치후보고 — collector/auto-register-config.json으로 on/off)
         run: node collector/auto-register.mjs collector/browser-report.md
+      # 보강 작업이라 자기 시간 상한 + continue-on-error를 단다 (2026-08-04).
+      # 경위는 collect-scholarships.yml의 같은 단계 주석 참조 — 이 단계가 예산을 다 먹어
+      # 작업이 취소되면서 8/4 두 로봇의 수집분과 리포트가 통째로 버려졌다.
       - name: 신규 등록분 양식 원본 자동 확보 + 스키마화 (같은 실행 안에서 끝낸다)
+        timeout-minutes: 4
+        continue-on-error: true
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          targets=$(node -e "let q;try{q=require('./collector/pending-forms.json')}catch(e){q={items:[]}};console.log(q.items.filter(i=>!i.fetched).map(i=>i.target).join(','))")
+          targets=$(node collector/pending-targets.mjs)
           if [ -n "$targets" ]; then
-            FORM_TARGETS="$targets" node collector/deepfetch.mjs
+            # --forms-only : 첨부 원본만 받는다. 본문은 바로 아래 증분 수집(--fill)의 일이다.
+            FORM_TARGETS="$targets" node collector/deepfetch.mjs --forms-only
             pip install olefile --quiet
             python3 collector/hwp-prvtext.py
             # 실제로 원본이 내려온 항목만 fetched로 표시한다 (전부 true로 찍어 원본 없는 항목이
@@ -65,6 +84,8 @@ jobs:
       # 원문 보충 (2026-08-03 도입) — 자격 요건이 사라지던 두 원인을 막는 단계.
       # 자세한 경위는 collect-scholarships.yml의 같은 단계 주석 참조. 증분이라 시간 부담 없음.
       - name: 공고 원문 보충 수집 (빠진 것·잘린 것만)
+        timeout-minutes: 3
+        continue-on-error: true
         run: node collector/deepfetch.mjs --fill
 
       - name: 공고 원문 발췌 갱신 (정직 원칙 — 추론 대신 원문 그대로)
@@ -125,8 +146,13 @@ jobs:
             fi
           fi
 
+      # steps.run.outcome == 'success'가 맨 앞에 있어야 한다 (2026-08-05).
+      # 수집 단계에 continue-on-error가 붙으면서, 수집이 상한에 걸려 죽어도 뒤 단계가 돈다.
+      # 그런데 이 조건은 workflow_dispatch면 무조건 통과라, 수동 실행에서 수집이 죽었는데도
+      # **건수가 빈 '(신규 건)' 리포트 이슈**가 만들어졌다(#99 — 실제로 겪었다).
+      # 리포트는 수집이 끝까지 갔을 때만 낸다. 안 그러면 실패를 성공처럼 보이게 한다.
       - name: 리포트 이슈
-        if: github.event_name == 'workflow_dispatch' || (steps.run.outputs.new_count != '' && steps.run.outputs.new_count != '0')
+        if: steps.run.outcome == 'success' && (github.event_name == 'workflow_dispatch' || (steps.run.outputs.new_count != '' && steps.run.outputs.new_count != '0'))
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -166,8 +192,13 @@ jobs:
               --body "🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **데이터 감사 실패 — 이번 자동 등록분은 되돌렸습니다.** 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · 수집된 공고 자체는 실시간 피드에 그대로 남아 있어요. Claude 세션에 '감사 실패 확인해줘'라고 지시하세요."
           fi
 
-      - name: 🚨 실패 알림 (최근 리포트 이슈에 코멘트)
-        if: failure()
+      # cancelled() 필수 — 시간 상한을 넘긴 작업은 '실패'가 아니라 '취소'로 끝나서
+      # failure()만 보면 이 알림까지 건너뛴다 (2026-08-04에 실제로 뚫린 구멍).
+      # steps.run.outcome도 필수 — 수집 단계에 continue-on-error를 달았으므로(2026-08-05),
+      # 그 단계가 상한에 걸려도 작업은 '성공'으로 끝난다. 이것까지 보지 않으면
+      # **수집이 통째로 실패했는데 아무 알림도 안 가는** 더 나쁜 조용한 실패가 된다.
+      - name: 🚨 실패·시간초과 알림 (최근 리포트 이슈에 코멘트)
+        if: failure() || cancelled() || steps.run.outcome == 'failure'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -176,5 +207,5 @@ jobs:
             --limit 1 --json number --jq '.[0].number' || true)
           if [ -n "$last" ] && [ "$last" != "null" ]; then
             gh issue comment "$last" --repo "${{ github.repository }}" \
-              --body "🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **브라우저형 수집 로봇 실행 실패** — 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · 반복되면 Claude 세션에 '로봇 실패 확인해줘'라고 지시하세요."
+              --body "🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **브라우저형 수집 로봇이 끝까지 못 갔어요** (실패 또는 시간 초과) — 이번 실행의 **게시판 수집분은 저장되지 않았습니다**(양식·원문 보충 같은 나머지 작업 결과는 저장됐을 수 있어요). 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · 반복되면 Claude 세션에 '로봇 실패 확인해줘'라고 지시하세요."
           fi

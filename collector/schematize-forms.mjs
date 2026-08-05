@@ -282,7 +282,7 @@ if (stalled.length) {
     '자동으로는 더 못 가져옵니다. 첨부 주소가 바뀌었거나 로그인이 필요한 경우예요.',
     '이 공고들은 앱에서 양식 작성이 안 되고 원본 다운로드 안내만 나갑니다.', '');
   for (const s of stalled.slice(0, 12)) {
-    report.push(`- ${String(s.name || s.id).slice(0, 50)} — ${s.tries}회 실패 (마지막 시도 ${s.lastTryAt || '기록 없음'})`);
+    report.push(`- ${String(s.name || s.id).slice(0, 50)} — ${s.tries}회 실패 (마지막 시도 ${s.lastTryAt || '기록 없음'})${s.retired ? ' · **자동 재시도 중단**(매일 시간만 버려서). 다시 받으려면 pending-forms.json에서 retired를 지우세요' : ''}`);
   }
 }
 

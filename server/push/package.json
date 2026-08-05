@@ -1,0 +1,12 @@
+{
+  "//": "GitHub 연결 배포(Workers Builds)가 쓰는 파일. Cloudflare가 이 폴더에서 npm install 후 deploy를 실행한다. wrangler 판을 고정해 두면 나중에 wrangler가 크게 바뀌어도 배포가 갑자기 깨지지 않는다.",
+  "name": "handaejang-push",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.119.0"
+  }
+}
