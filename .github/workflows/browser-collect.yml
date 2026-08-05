@@ -26,8 +26,9 @@ jobs:
     # 실제로 7/31 브라우저 수집이 360분을 돌다 취소됐고, 수집 로봇 2종이 같은
     # 대기줄(concurrency: collector)을 쓰기 때문에 그동안 다음 수집이 줄을 섰다.
     # 학교를 더 붙일수록 '한 곳이 안 열려 멈추는' 확률도 같이 오른다.
-    # 시간 상한 = 각 단계 예산의 합 (2026-08-04부터 이렇게 계산한다):
-    #   수집 22(HARVEST_BUDGET_MS) + 양식 원본 4 + 원문 보충 3 + 준비·저장·리포트 ≈3 = 32 → 34분.
+    # 시간 상한 = 각 단계 상한의 합 (2026-08-04부터 이렇게 계산한다):
+    #   수집 26(예산 22 + 마무리 4) + 양식 원본 4 + 원문 보충 3 + 준비·저장·리포트 ≈3 = 36 → 38분.
+    #   2026-08-05에 수집 단계에 자체 상한 26이 생기면서 이 합이 34 → 38로 늘었다.
     # 상한을 '넉넉히' 잡는 것과는 다르다 — 모든 단계가 자기 예산을 갖고 있고, 그 합보다
     # 상한이 커야 취소(=그날 수집분 전량 폐기)가 구조적으로 불가능해진다.
     # ⚠️ 40분이던 시절 학교가 17곳으로 늘자 4회 연속 이 상한에 걸려 **취소**됐고,
@@ -35,7 +36,7 @@ jobs:
     #    그때의 교훈은 그대로다 — **상한을 키우는 것으로 때우지 말 것**. 단계가 오래 걸리면
     #    그 단계의 예산(HARVEST_BUDGET_MS, 아래 timeout-minutes)을 줄이고, 상한은 그 합을
     #    담는 그릇으로만 쓴다. verify/test-collector.mjs가 이 대소관계를 검사한다.
-    timeout-minutes: 34
+    timeout-minutes: 38
     steps:
       - uses: actions/checkout@v4
 
@@ -46,7 +47,14 @@ jobs:
           node-version: 20
       - run: npm init -y >/dev/null && npm i playwright@1 --no-audit --no-fund
       - run: npx playwright install --with-deps chromium
+      # 안전망 (2026-08-05) — 스크립트는 22분 예산에 맞춰 스스로 끝내야 하지만,
+      # 예산을 안 보는 구간이 하나라도 남아 있으면 그만큼 흘러넘친다(8/5 05:52: 33분 42초).
+      # 여기서 끊어 두면 흘러넘쳐도 **작업 전체가 취소되는 일은 없어** 감사·저장·알림 단계가 돈다.
+      # 26분 = 예산 22 + 마무리 여유 4. 이 상한에 닿는다는 것 자체가 '어딘가 안 멈췄다'는 신호다.
       - id: run
+        name: 게시판 수집 (브라우저)
+        timeout-minutes: 26
+        continue-on-error: true
         run: node collector/browser-collect.mjs
       - name: 정식 등록 자동화 (선조치후보고 — collector/auto-register-config.json으로 on/off)
         run: node collector/auto-register.mjs collector/browser-report.md
@@ -181,8 +189,11 @@ jobs:
 
       # cancelled() 필수 — 시간 상한을 넘긴 작업은 '실패'가 아니라 '취소'로 끝나서
       # failure()만 보면 이 알림까지 건너뛴다 (2026-08-04에 실제로 뚫린 구멍).
+      # steps.run.outcome도 필수 — 수집 단계에 continue-on-error를 달았으므로(2026-08-05),
+      # 그 단계가 상한에 걸려도 작업은 '성공'으로 끝난다. 이것까지 보지 않으면
+      # **수집이 통째로 실패했는데 아무 알림도 안 가는** 더 나쁜 조용한 실패가 된다.
       - name: 🚨 실패·시간초과 알림 (최근 리포트 이슈에 코멘트)
-        if: failure() || cancelled()
+        if: failure() || cancelled() || steps.run.outcome == 'failure'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
