@@ -313,6 +313,22 @@
    "added": "2026-08-04",
    "fetched": true,
    "schematized": true
+  },
+  {
+   "id": "auto-rnoticedoarticleno154854",
+   "name": "[서울캠퍼스] 2026년도 2학기 국가근로 및 교내봉사 장학생 선발안내",
+   "target": "2026년도 2학기 국가근로 및 교내봉사 장학생 선발안",
+   "added": "2026-08-05",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-skor478122799artclviewdo",
+   "name": "[글로벌] (생활비)2026-2학기 (재)하림장학재단 하림장학생 선발 안내 N",
+   "target": "(생활비)2026-2학기 (재)하림장학재단 하림장학생 ",
+   "added": "2026-08-05",
+   "fetched": true,
+   "schematized": true
   }
  ]
 }
