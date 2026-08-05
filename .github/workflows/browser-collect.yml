@@ -146,8 +146,13 @@ jobs:
             fi
           fi
 
+      # steps.run.outcome == 'success'가 맨 앞에 있어야 한다 (2026-08-05).
+      # 수집 단계에 continue-on-error가 붙으면서, 수집이 상한에 걸려 죽어도 뒤 단계가 돈다.
+      # 그런데 이 조건은 workflow_dispatch면 무조건 통과라, 수동 실행에서 수집이 죽었는데도
+      # **건수가 빈 '(신규 건)' 리포트 이슈**가 만들어졌다(#99 — 실제로 겪었다).
+      # 리포트는 수집이 끝까지 갔을 때만 낸다. 안 그러면 실패를 성공처럼 보이게 한다.
       - name: 리포트 이슈
-        if: github.event_name == 'workflow_dispatch' || (steps.run.outputs.new_count != '' && steps.run.outputs.new_count != '0')
+        if: steps.run.outcome == 'success' && (github.event_name == 'workflow_dispatch' || (steps.run.outputs.new_count != '' && steps.run.outputs.new_count != '0'))
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -202,5 +207,5 @@ jobs:
             --limit 1 --json number --jq '.[0].number' || true)
           if [ -n "$last" ] && [ "$last" != "null" ]; then
             gh issue comment "$last" --repo "${{ github.repository }}" \
-              --body "🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **브라우저형 수집 로봇이 끝까지 못 갔어요** (실패 또는 시간 초과로 취소) — 이번 수집분은 저장되지 않았습니다. 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · 반복되면 Claude 세션에 '로봇 실패 확인해줘'라고 지시하세요."
+              --body "🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **브라우저형 수집 로봇이 끝까지 못 갔어요** (실패 또는 시간 초과) — 이번 실행의 **게시판 수집분은 저장되지 않았습니다**(양식·원문 보충 같은 나머지 작업 결과는 저장됐을 수 있어요). 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · 반복되면 Claude 세션에 '로봇 실패 확인해줘'라고 지시하세요."
           fi
