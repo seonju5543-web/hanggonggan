@@ -1,0 +1,46 @@
+# 학교별 학과 목록 갱신 (2026-08-06)
+# 커리어넷 오픈API에서 학교별 개설 학과를 수확해 data/majors.json으로 발행한다.
+# 학과 개편은 학기 단위라 예약 실행은 두지 않았다 — 학기 시작 무렵 Actions에서 수동 실행.
+# 키는 저장소 Secret CAREERNET_API_KEY (없으면 스크립트가 아무것도 안 하고 조용히 종료).
+# 저장은 기본 브랜치(로봇 저장 위치 원칙) — deploy-sync가 main으로 자동 배포한다.
+name: 학과 목록 갱신 (커리어넷)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: collector
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/nice-heisenberg-WESq5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 학과 수확
+        env:
+          CAREERNET_API_KEY: ${{ secrets.CAREERNET_API_KEY }}
+        run: node collector/majors.mjs
+
+      - name: 저장
+        run: |
+          git config user.name "handaejang-bot"
+          git config user.email "bot@handaejang.local"
+          git add data/majors.json
+          git diff --cached --quiet && { echo "변경 없음"; exit 0; }
+          git commit -m "majors: 학교별 학과 목록 갱신 (커리어넷 API)"
+          for i in 1 2 3; do
+            git pull --rebase --autostash origin claude/nice-heisenberg-WESq5 && git push origin HEAD:claude/nice-heisenberg-WESq5 && exit 0
+            sleep 5
+          done
+          echo "::error::push 3회 실패"; exit 1

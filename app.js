@@ -901,6 +901,22 @@ function formTplIdFor(sch) {
   return null;
 }
 
+/* 학교별 학과 목록 (2026-08-06 — 커리어넷 오픈API에서 수확, collector/majors.mjs가 발행).
+   MAJORS_BY_SCHOOL에 합쳐서 학과 자동추천이 '그 학교에 실제로 있는 학과'만 보여 주게 한다
+   (경희대에서 '일'을 치면 없는 일어일문학과가 뜨던 문제 — 2026-08-02 개발자 지적).
+   손으로 검수해 둔 목록(외대)이 이미 있으면 그쪽을 지키고 덮어쓰지 않는다. */
+function loadMajors() {
+  fetch('data/majors.json', { cache: 'no-store' })
+    .then((r) => (r.ok ? r.json() : null))
+    .then((d) => {
+      if (!d || !d.bySchool) return;
+      for (const [school, majors] of Object.entries(d.bySchool)) {
+        if (!MAJORS_BY_SCHOOL[school]) MAJORS_BY_SCHOOL[school] = majors;
+      }
+    })
+    .catch(() => { /* 오프라인 등 — 전국 공통 목록으로 동작 */ });
+}
+
 /* 정식 등록 공고 (수집 → 큐레이션 → 매칭·신청 지원) */
 function loadRegistered() {
   fetch('data/registered.json', { cache: 'no-store' })
@@ -1619,6 +1635,7 @@ bindEvents();
 initOnboarding();
 loadNotices();
 loadRegistered();
+loadMajors();   // 학교별 학과 목록 — 온보딩 학과 자동추천이 그 학교 것만 보게
 if (typeof loadFormTemplates === 'function') loadFormTemplates(); // 정식 등록 양식 최신화
 walletRefresh().then(() => {
   if (!$('#screen-my').hidden) renderMy();
