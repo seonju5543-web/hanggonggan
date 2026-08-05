@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-08-05",
+ "updatedAt": "2026-08-06",
  "items": [
   {
    "id": "reg-kw-gukgagosi",
@@ -5800,63 +5800,6 @@
     "국가근로장학금 2차 신청기간 : 2026.08.12.(수) 09:00 ~ 09.09.(수) 18:00 까지"
    ],
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
-  },
-  {
-   "id": "auto-eab3b5eca780ec82aced95ad",
-   "name": "2026학년도 대학생 청소년 AI 교육지원장학생 선발 안내",
-   "type": "교내",
-   "provider": "서울대학교 게시 공고",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
-   "deadline": null,
-   "listedAt": "2026-08-05",
-   "period": "접수 기간 원문 확인",
-   "summary": "서울대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
-   "eligibility": {
-    "selective": true,
-    "schoolOnly": "서울대학교"
-   },
-   "documents": [
-    "지원 자격·제출 서류는 원문 공고에서 확인"
-   ],
-   "duplicable": true,
-   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
-   "auto": true,
-   "attachments": [
-    {
-     "name": "3.-대학생-청소년-AI-교육지원장학금-활동계획서양식.hwp",
-     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=335#n-3.-%EB%8C%80%ED%95%99%EC%83%9D-%EC%B2%AD%EC%86%8C%EB%85%84-AI-%EA%B5%90%EC%9C%A1%EC%A7%80%EC%9B%90%EC%9E%A5%ED%95%99%EA%B8%88-%ED%99%9C%EB%8F%99%EA%B3%84%ED%9A%8D%EC%84%9C%EC%96%91%EC%8B%9D.hwp"
-    }
-   ],
-   "sourceUrl": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=335",
-   "sourceKind": "auto",
-   "formId": "auto-장학-2026년-서울미-apply"
-  },
-  {
-   "id": "auto-kuk2351174254artclviewdo",
-   "name": "[교외] 2026학년도 세종특별자치시 세종연구원 세종이도인재 장학금 장학생 모집( ~ 9. 30.)",
-   "type": "교외",
-   "provider": "건국대학교 게시 공고",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
-   "deadline": null,
-   "listedAt": "2026-08-05",
-   "period": "접수 기간 원문 확인",
-   "summary": "건국대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
-   "eligibility": {
-    "selective": true,
-    "schoolOnly": "건국대학교"
-   },
-   "documents": [
-    "지원 자격·제출 서류는 원문 공고에서 확인"
-   ],
-   "duplicable": true,
-   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
-   "noForm": "자동 등록(검수 전) 2026-08-05 — 양식 스키마화는 검수 후 진행",
-   "auto": true,
-   "attachments": [],
-   "sourceUrl": "https://www.konkuk.ac.kr/bbs/konkuk/235/1174254/artclView.do",
-   "sourceKind": "auto"
   }
  ]
 }
