@@ -33,11 +33,19 @@ function fakeKV() {
     get: async (k) => (m.has(k) ? m.get(k) : null),
     put: async (k, v) => { m.set(k, v); },
     delete: async (k) => { m.delete(k); },
-    list: async ({ prefix = '', cursor } = {}) => ({
-      keys: Array.from(m.keys()).filter((k) => k.startsWith(prefix)).map((name) => ({ name })),
-      list_complete: true,
-      cursor: null,
-    }),
+    /* 진짜 KV처럼 한 번에 다 주지 않고 커서로 나눠 준다 (나눠 보내기 검사에 필요) */
+    list: async ({ prefix = '', cursor, limit = 20 } = {}) => {
+      const all = Array.from(m.keys()).filter((k) => k.startsWith(prefix)).sort();
+      const start = cursor ? Math.max(0, all.indexOf(cursor)) : 0;
+      const page = all.slice(start, start + limit);
+      const next = start + page.length;
+      const complete = next >= all.length;
+      return {
+        keys: page.map((name) => ({ name })),
+        list_complete: complete,
+        cursor: complete ? null : all[next],
+      };
+    },
     _map: m,
   };
 }
@@ -57,15 +65,31 @@ function makeEnv(overrides = {}) {
   }, overrides);
 }
 
-/* 데이터 파일 요청만 가짜로 받아준다 */
+/* 데이터 파일 요청만 가짜로 받아준다. 밖으로 나간 요청 수도 센다(무료 등급 50건/실행 검사용). */
+let outboundCount = 0;
 function stubFetch(regItems, noticeItems, onPush) {
+  outboundCount = 0;
   globalThis.fetch = async (url, init) => {
+    outboundCount++;
     const u = String(url && url.url ? url.url : url);
     if (u.endsWith('registered.json')) return new Response(JSON.stringify({ items: regItems }), { status: 200 });
     if (u.endsWith('notices.json')) return new Response(JSON.stringify({ items: noticeItems }), { status: 200 });
     if (onPush) return onPush(u, init);
     return new Response('', { status: 404 });
   };
+}
+
+/* 한 회차를 끝까지 굴린다 — 이제 예약 실행은 '한 걸음'만 하므로 테스트가 대신 걸음을 이어 준다.
+   각 걸음의 바깥 요청 수도 함께 돌려준다(무료 등급 검사). */
+async function driveAll(env, max = 40) {
+  const steps = [];
+  for (let i = 0; i < max; i++) {
+    const before = outboundCount;
+    const r = await worker.tick(env, i === 0 ? { force: true } : {});
+    steps.push(Object.assign({ outbound: outboundCount - before }, r));
+    if (!(await env.SUBS.get('state:run'))) break;   // 이번 회차 끝
+  }
+  return steps;
 }
 
 /* ============ ① VAPID 서명 검증 (핵심) ============ */
@@ -84,8 +108,7 @@ console.log('\n[1] VAPID 서명 — 푸시 서비스가 실제로 검사하는 �
     [],
     async (u, init) => { captured = { u, init }; return new Response('', { status: 201 }); }
   );
-  const res = await worker.default.scheduled({}, env, { waitUntil: (p) => p });
-  await new Promise((r) => setTimeout(r, 50));
+  await driveAll(env);
 
   ok(!!captured, '푸시가 실제로 발송 시도됨', captured ? captured.u : null);
   const auth = captured && captured.init.headers.Authorization;
@@ -227,8 +250,7 @@ console.log('\n[5] 앱을 지운 폰 정리');
     [{ id: 'fresh', eligibility: { schoolOnly: '광운대학교' }, deadline: later }], [],
     async () => new Response('', { status: 410 })  // 푸시 서비스가 '이 폰 없음'이라고 답함
   );
-  await worker.default.scheduled({}, env, { waitUntil: (p) => p });
-  await new Promise((r) => setTimeout(r, 50));
+  await driveAll(env);
   ok(!(await env.SUBS.get(worker.subKey(dead))), '410(사라진 폰)이 오면 구독을 자동 삭제');
 }
 
@@ -245,6 +267,83 @@ console.log('\n[6] 실제 공고 데이터로 실행');
   r = await worker.schoolsToWake(env);
   const todayDue = REG.items.filter((s) => s.deadline === today || s.deadline === tomorrow).length;
   ok(true, `두 번째 실행: 깨울 학교 ${r.schools.size}곳 · 전국 ${r.wakeAll} (오늘·내일 마감 ${todayDue}건 기준)`);
+}
+
+/* ============ ⑦ 무료 등급의 두 벽 (2026-08-05) ============
+   Cloudflare 무료 등급은 한 번 실행마다 ① 바깥 요청 50건 ② 계산 시간 10ms만 허용한다.
+   예전 구조는 둘 다 넘겨서 사용자가 0명이어도 실패했다. 아래가 그 재발 방지 검사다. */
+console.log('\n[7] 무료 등급 제한 — 바깥 요청 50건 · 계산 시간 10ms');
+{
+  const env = makeEnv();
+  const N = 60;
+  for (let i = 0; i < N; i++) {
+    const ep = `https://fcm.googleapis.com/fcm/send/U${i}`;
+    await env.SUBS.put(worker.subKey(ep), JSON.stringify({ endpoint: ep, school: '광운대학교' }));
+  }
+  await env.SUBS.put('state:seen', JSON.stringify(['x']));
+
+  let pushes = 0;
+  const auths = new Set();
+  stubFetch([{ id: 'f7', eligibility: { schoolOnly: '광운대학교' }, deadline: later }], [],
+    async (u, init) => { pushes++; auths.add(init.headers.Authorization); return new Response('', { status: 201 }); });
+
+  const steps = await driveAll(env);
+  const worst = Math.max(...steps.map((s) => s.outbound));
+  ok(worst <= 50, `어떤 걸음도 바깥 요청 50건을 넘지 않음 (최대 ${worst}건)`, steps.map((s) => `${s.step}:${s.outbound}`));
+  ok(pushes === N, `구독자 ${N}명 전원이 결국 깨워짐 (나눠 보내기)`, pushes);
+  ok(steps.filter((s) => s.step === 'send').length >= 3, '발송이 여러 걸음으로 나뉘어 이어짐',
+    steps.filter((s) => s.step === 'send').length);
+  ok(steps.filter((s) => s.step === 'reg').length === 1 && steps.filter((s) => s.step === 'notices').length === 1,
+    '무거운 데이터 해석은 걸음을 나눠 한 번씩만 (계산 시간 보호)');
+  ok(auths.size === 1, '같은 푸시 서비스에는 서명을 한 번만 만들어 재사용 (계산 시간 보호)', auths.size);
+  ok(steps[steps.length - 1].finished === true, '마지막 걸음에서 회차가 정상 종료됨');
+}
+
+/* 예약 시각 판정 — 하루 두 번만, 너무 늦게 지나친 시각은 건너뛴다 */
+{
+  const kst = (h, m) => Date.UTC(2026, 7, 5, h - 9, m);
+  ok(!worker.dueSlot(kst(7, 0)), '깨울 시각(08:10) 전에는 시작하지 않음');
+  ok(!!worker.dueSlot(kst(8, 10)), '08:10 KST에 시작');
+  ok(!!worker.dueSlot(kst(9, 30)), '조금 늦게 깨어나도(1시간 20분) 시작 — 예약이 밀려도 거른 날이 없게');
+  ok(!worker.dueSlot(kst(12, 0)), '너무 늦게 지나친 시각은 건너뜀 (한밤중 몰아보내기 방지)');
+  ok(!!worker.dueSlot(kst(20, 10)), '20:10 KST에 시작');
+  ok(!worker.dueSlot(kst(23, 59)), '밤늦게는 깨우지 않음');
+}
+
+/* 같은 걸음을 계속 실패하면 — 조용히 멈추지 않고 사유를 남긴다 */
+{
+  const env = makeEnv();
+  outboundCount = 0;
+  globalThis.fetch = async () => { outboundCount++; return new Response('', { status: 500 }); };
+  let r;
+  for (let i = 0; i < 6; i++) r = await worker.tick(env, { force: true });
+  ok(r && r.aborted === true, '같은 걸음을 5회 실패하면 이번 회차를 포기하고');
+  let le = null;
+  try { le = JSON.parse(await env.SUBS.get('state:lastError')); } catch (e) { le = null; }
+  ok(le && le.step === 'reg', '사유를 남긴다 (/health에서 보임 — 조용한 중단 불가)', le);
+
+  stubFetch([], []);
+  const res = await worker.default.fetch(new Request('https://push.test/health'), env);
+  const body = await res.json();
+  ok(body.step === 'idle' && body.lastError && body.lastError.step === 'reg',
+    '/health가 현재 걸음과 마지막 오류를 보여줌', body);
+}
+
+/* 시험 발송 — 조건을 따지지 않고 즉시 깨운다 (개발자가 자기 폰으로 확인할 때) */
+{
+  const env = makeEnv();
+  const ep = 'https://fcm.googleapis.com/fcm/send/TEST1';
+  await env.SUBS.put(worker.subKey(ep), JSON.stringify({ endpoint: ep, school: '아무학교' }));
+  let pushed = 0;
+  stubFetch([], [], async () => { pushed++; return new Response('', { status: 201 }); });
+  let res = await worker.default.fetch(new Request('https://push.test/test', { method: 'POST' }), env);
+  ok(res.status === 401, '시험 발송도 관리자 열쇠 없이는 불가', res.status);
+  res = await worker.default.fetch(new Request('https://push.test/test', {
+    method: 'POST', headers: { 'x-admin-key': 'test-admin' },
+  }), env);
+  const body = await res.json();
+  ok(res.status === 200 && pushed === 1 && body.woke === 1, '열쇠가 맞으면 등록된 폰을 즉시 깨움', body);
+  ok(outboundCount <= 50, '시험 발송도 바깥 요청 50건 이내', outboundCount);
 }
 
 console.log(fail ? `\n❌ 실패 ${fail}건\n` : '\n✅ 푸시 발송 서버 검증 전부 통과\n');

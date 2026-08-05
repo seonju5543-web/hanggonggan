@@ -342,8 +342,17 @@
   · **푸시 알림은 배포 이전과 무관하다** — 막힌 건 ⓐ `server/push/` 미배포 ⓑ `push-config.js` 빈 칸
     둘뿐이고, **앱을 GitHub Pages에 둔 채로도 켤 수 있다.** 다만 구독은 **주소에 묶이므로** 나중에
     앱 주소를 바꾸면 기존 구독이 전부 무효가 된다(사용자 0명인 지금이 가장 싸다).
-    Workers 무료는 **호출당 외부 연락 50건** 상한이라 `MAX_SUBS_PER_RUN = 800`은 **유료($5/월) 전제 값** —
-    무료로 쓰려면 50으로 낮춰 나눠 보내야 하고, 안 그러면 51번째부터 **조용히 누락**된다.
+    Workers 무료 등급은 **한 번 실행마다** ⓐ 바깥 요청 **50건** ⓑ 계산 시간 **10밀리초**를 건다.
+    옛 구조(`MAX_SUBS_PER_RUN = 800` 한 방에 처리)는 **둘 다** 넘겼다 — ⓐ는 51번째 폰부터 조용히 누락,
+    ⓑ는 공고 데이터 해석(registered 291KB + notices 468KB = 실측 6~9ms)만으로 **사용자가 0명이어도**
+    실행이 강제 종료. **2026-08-05에 '한 걸음씩' 구조로 고쳤다**(`server/push/worker.js` 첫머리 주석):
+    2분마다 cron → reg→notices→plan→send(25대씩) 한 걸음, KV `state:run`에 진행 기록,
+    걸음이 5회 실패하면 포기하고 `state:lastError`에 사유(→ `/health`에 노출, 조용한 중단 불가),
+    VAPID 서명은 푸시 서비스별로 1회만 만들어 재사용. 검증: `node verify/verify-push-server.mjs`(74항목).
+    ⚠️ **남은 위험**: 데이터 해석 걸음이 계산 시간에 가장 가깝다(Node 실측 4~12ms, Workers는 더 빠를
+    것으로 보이나 미검증). 배포 후 `/health`의 `lastError`에 `step:"reg"`나 `"notices"`가 뜨면 그게 이것이다.
+    그때의 해법은 **GitHub Actions가 작은 요약 파일(`data/push-digest.json`)을 만들어 두고 Worker는
+    그것만 읽게 하는 것** — 해석 비용이 0에 수렴한다. 데이터가 더 커지면 선제적으로 해도 된다.
   · **앱1을 옮길 때 `_admin` 명시적 제외 필수** — 지금 관리자 화면이 학생 눈에 안 보이는 근거는
     **GitHub이 밑줄 폴더를 배포 안 하는 것 하나뿐**이다(위 항목). Cloudflare엔 그 규칙이 없다.
   · **앱 주소가 박힌 곳 8군데**: `server/mail-worker.js`(CORS 2) · `server/push/worker.js`(APP_ORIGIN) ·
