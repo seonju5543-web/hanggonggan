@@ -13,8 +13,9 @@
      절대 이 파일이나 저장소에 넣지 않는다.
    ============================================================ */
 const PUSH_CONFIG = {
-  endpoint: '',
-  publicKey: '',
+  /* 2026-08-06 켬 — Cloudflare Workers 무료 등급에 올린 발송 서버 (server/push/) */
+  endpoint: 'https://handaejang-push.seonju5543.workers.dev',
+  publicKey: 'BJMGCfswqdi9diGUsfOGyMTyi1bwNDt5uTh0i0OUeTGMiovXJpSvIRVHig7wxi_5ov3uviZtrAfbkrUckEHhpc4',
 };
 
 /* 설정이 끝났는지 — 앱 곳곳에서 이 함수로 판단한다 */
