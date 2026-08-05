@@ -5,6 +5,9 @@ verify/shot-*.png
 node_modules/
 package-lock.json
 package.json
+# 예외 — 이건 저장소에 있어야 한다.
+# Cloudflare가 저장소를 보고 푸시 서버를 배포할 때(Workers Builds) 이 파일을 읽는다.
+!server/push/package.json
 
 # 관리자 페이지 빌드 결과 (Cloudflare가 빌드할 때마다 새로 만든다)
 _admin/dist/
