@@ -22,8 +22,17 @@
 
 ## 1단계 — Cloudflare에 화면 올리기 (15분)
 
-1. https://dash.cloudflare.com/sign-up 에서 무료 가입 (이메일만 있으면 됩니다)
-2. 왼쪽 메뉴 **Workers & Pages** → **Create** → **Pages** → **Connect to Git**
+> **푸시 서버를 올릴 때 쓰신 그 계정 그대로** 쓰시면 됩니다 (새로 가입할 필요 없음).
+
+1. https://dash.cloudflare.com 에 로그인 (계정이 없으면 이메일만으로 무료 가입)
+2. 왼쪽 메뉴 **Compute** → **Workers & Pages** → **Create** → 위쪽 **Pages** 탭 →
+   **Connect to Git**
+   > **메뉴 이름 주의**: 새 대시보드에서는 예전의 `Workers & Pages`가 **`Compute`** 안으로
+   > 들어갔습니다(2026-08-06 푸시 서버 올릴 때 실측). `Workers & Pages`가 안 보이면
+   > **Compute**부터 눌러 보세요.
+   >
+   > 그리고 **위쪽 `Pages` 탭을 꼭 누르세요.** 그냥 Create를 누르면 Workers(서버) 쪽으로
+   > 만들어져서 화면이 안 뜹니다. 우리가 올리는 건 서버가 아니라 **화면**입니다.
 3. `seonju5543-web/hanggonggan` 저장소를 고릅니다
 4. 설정을 이렇게 넣습니다
 
@@ -154,6 +163,8 @@ collector/url-key.mjs
 | 증상 | 원인 · 해결 |
 |---|---|
 | 빌드가 실패한다 | 출력 폴더를 `_admin/dist`로, 명령을 `bash _admin/build.sh`로 정확히 넣었는지 확인. 프로덕션 브랜치는 `claude/nice-heisenberg-WESq5` (슬래시 포함) |
+| 메뉴에 **Workers & Pages**가 없다 | 새 대시보드는 **Compute** 안에 들어 있습니다 |
+| **Pages 탭**이 안 보인다 / Worker가 만들어졌다 | Create를 누른 뒤 **위쪽 `Pages` 탭**을 먼저 눌러야 합니다. 잘못 만들어졌으면 그 프로젝트를 지우고 다시 하세요 (푸시 서버 `handaejang-push`는 건드리지 마세요) |
 | 화면은 뜨는데 **버튼이 "실행 요청이 거부됐습니다 (404)"** | 워크플로 파일이 **기본 브랜치**에 있어야 GitHub이 실행을 받아 줍니다. Claude에게 "관리자 워크플로 기본 브랜치에 올려줘"라고 하세요 |
 | 버튼이 **401/403** | 열쇠가 만료됐거나 권한이 모자랍니다. Actions가 **Read and write**인지 확인 (공동작업자는 classic + `workflow`) |
 | 로그인 코드 메일이 안 온다 | **스팸함·프로모션 탭**을 보세요 (`noreply@notify.cloudflare.com`). 코드는 10분 뒤 만료됩니다 |
