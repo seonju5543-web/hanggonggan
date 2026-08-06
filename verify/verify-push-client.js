@@ -46,18 +46,37 @@ function startPushServer() {
   });
 }
 
-/* 앱 복사본을 만들어 push-config.js만 채운다 (원본 저장소는 건드리지 않는다) */
+/* 앱 복사본을 만들어 push-config.js만 채운다 (원본 저장소는 건드리지 않는다)
+
+   ⚠️ 두 칸을 **항상 덮어쓴다** — 저장소에 무엇이 적혀 있든 상관없이.
+   예전에는 빈 칸(`endpoint: ''`)을 찾아 바꿨는데, 2026-08-06에 진짜 발송 서버 주소가
+   채워지자 그 문구가 사라져 ⓐ '설정됨' 검사는 가짜 서버 대신 **진짜 workers.dev로**
+   등록을 보내 아무것도 못 받았고 ⓑ '미설정' 검사는 채워진 주소 때문에 설정된 상태로
+   돌아, 멀쩡한 앱을 두고 검사만 실패했다. 검사 도구가 저장소의 현재 값에 흔들리면 안 된다. */
+const setCfg = (src, key, val) =>
+  src.replace(new RegExp(`(\\b${key}:\\s*)'[^']*'`), `$1'${val}'`);
+
 function makeAppCopy(configured) {
   const dir = fs.mkdtempSync('/tmp/handaejang-push-');
   for (const f of fs.readdirSync(ROOT)) {
     if (['.git', 'node_modules', 'verify', 'proposals', 'collector'].includes(f)) continue;
     fs.cpSync(path.join(ROOT, f), path.join(dir, f), { recursive: true });
   }
+  const cfgPath = path.join(dir, 'push-config.js');
+  let cfg = fs.readFileSync(cfgPath, 'utf8');
+  cfg = setCfg(cfg, 'endpoint', configured ? `http://localhost:${PUSH_PORT}` : '');
+  cfg = setCfg(cfg, 'publicKey', configured
+    ? 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U'
+    : '');
+  fs.writeFileSync(cfgPath, cfg);
+
+  /* 바꿔 넣은 값이 실제로 들어갔는지 확인한다 — 이 검사가 없어서 위 사고를 못 잡았다 */
+  const want = configured ? `http://localhost:${PUSH_PORT}` : '';
+  if (!new RegExp(`endpoint:\\s*'${want}'`).test(cfg)) {
+    throw new Error(`push-config.js의 endpoint를 '${want}'로 바꾸지 못했습니다 — 파일 모양이 바뀐 것 같습니다`);
+  }
+
   if (configured) {
-    let cfg = fs.readFileSync(path.join(dir, 'push-config.js'), 'utf8');
-    cfg = cfg.replace("endpoint: ''", `endpoint: 'http://localhost:${PUSH_PORT}'`)
-             .replace("publicKey: ''", "publicKey: 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U'");
-    fs.writeFileSync(path.join(dir, 'push-config.js'), cfg);
     // 로컬 시험 서버는 .workers.dev가 아니므로 CSP에 시험 주소를 허용해 준다(실서비스는 CSP 그대로)
     let html = fs.readFileSync(path.join(dir, 'index.html'), 'utf8');
     html = html.replace('https://*.workers.dev', `https://*.workers.dev http://localhost:${PUSH_PORT}`);
