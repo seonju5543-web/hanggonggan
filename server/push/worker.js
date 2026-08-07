@@ -388,11 +388,20 @@ export default {
       const run = await getRun(env);
       let lastError = null;
       try { lastError = JSON.parse((await env.SUBS.get('state:lastError')) || 'null'); } catch (e) { lastError = null; }
+      /* 등록된 폰 수 — KV 화면을 눈으로 세지 않아도 되게 여기서 알려준다 (2026-08-07).
+         ⚠️ 이 숫자는 '등록 기록'이지 '살아 있는 폰'이 아니다. 폰 쪽에서 구독이 죽어도
+         기록은 남아 있다가 다음 발송 때 404로 정리된다. 살아 있는지는 /test로만 확인된다. */
+      let subs = 0; let subsMore = false;
+      try {
+        const l = await env.SUBS.list({ prefix: 'sub:', limit: 1000 });
+        subs = l.keys.length; subsMore = !l.list_complete;
+      } catch (e) { subs = -1; } // -1 = 세지 못함 (KV 오류)
       return json({
         ok: true,
         configured: !!(env.VAPID_JWK && env.VAPID_PUBLIC),
         step: run ? run.step : 'idle',      // 지금 어느 걸음인지 (idle = 할 일 없음 · 정상)
         sent: run ? run.sent : 0,
+        subs: subsMore ? `${subs}+` : subs,  // 등록 기록 수 (살아 있는 폰 수와 다를 수 있음)
         lastError,                           // 다섯 번 실패해 포기한 적이 있으면 여기 남는다
       }, 200, cors);
     }
