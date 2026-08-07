@@ -60,6 +60,24 @@ var NOTIFY_RULES = (function () {
     return l;
   }
 
+  /* 깨우기 푸시를 받았을 때 **구독을 스스로 끊어야 하는가** (2026-08-07 사고로 신설)
+     ------------------------------------------------------------
+     알림을 끈 사람에게는 알림을 띄우지 않아야 하므로, 그런 폰은 구독을 정리하는 것이 맞다.
+     문제는 **'껐다'와 '못 읽었다'를 구분하지 않은 것**이었다. 서비스워커가 장부를 못 읽으면
+     normalizeLedger(null)이 enabled:false인 **기본 장부**를 만들어 돌려주는데, 예전 코드는
+     그걸 "사용자가 껐다"로 읽고 구독을 끊었다. 그래서 알림을 켜 둔 폰이 발송 서버에서
+     조용히 사라졌다(2026-08-07 공동개발자 폰이 실제로 이렇게 없어졌다 — KV에 두 대가
+     있다가 한 대가 됐다).
+     그래서 **확실히 읽었고, 확실히 꺼져 있을 때만** 끊는다. 못 읽었으면 아무것도 하지 않는다
+     (조용한 안내 알림 1건이 뜰 뿐이고, 그게 구독을 잃는 것보다 훨씬 가볍다).
+       readOk : 장부 읽기가 오류 없이 끝났는가
+       raw    : 실제로 저장돼 있던 장부 (없으면 null/undefined) */
+  function shouldSelfUnsubscribe(raw, readOk) {
+    if (!readOk) return false;                       // 못 읽었다 = 모른다
+    if (!raw || typeof raw !== 'object') return false; // 장부 자체가 없다 = 모른다
+    return normalizeLedger(raw).enabled === false;   // 읽었고, 꺼져 있다
+  }
+
   /* 날짜 단위로만 비교한다 — 시각까지 섞으면 마감 다음 날 새벽에 'D-DAY'가 뜬다 */
   function daysUntil(dateStr, now) {
     if (!dateStr) return null;
@@ -307,6 +325,7 @@ var NOTIFY_RULES = (function () {
     DEFAULT_PREFS: DEFAULT_PREFS,
     newLedger: newLedger,
     normalizeLedger: normalizeLedger,
+    shouldSelfUnsubscribe: shouldSelfUnsubscribe,
     evaluate: evaluate,
     pushToInbox: pushToInbox,
     unreadCount: unreadCount,

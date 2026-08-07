@@ -151,5 +151,24 @@ console.log(`      (첫 동기화에서 나온 시간 기반 알림: ${r.events.
 r = run({ scholarships: mine, ledger: JSON.parse(JSON.stringify(r.ledger)) });
 ok(r.events.length === 0, '같은 상태로 다시 실행하면 0건(중복 없음)', r.events.map((e) => e.key));
 
+console.log('\n[14] 깨우기 푸시를 받았을 때 구독을 스스로 끊는 조건 (2026-08-07 사고 회귀)');
+/* 발송 서버 KV에 두 대가 있다가 한 대가 사라진 사고의 원인. 서비스워커가 장부를 못 읽으면
+   normalizeLedger(null)이 enabled:false인 기본 장부를 만들어 주는데, 그걸 "사용자가 껐다"로
+   읽고 구독을 끊었다. '모른다'를 '껐다'로 단정하면 알림을 켜 둔 폰이 조용히 사라진다.
+   이 절을 지우거나 판정을 되돌리면 그 사고가 재발한다. */
+ok(RULES.shouldSelfUnsubscribe({ enabled: false }, true) === true,
+  '알림을 껐다고 장부에 적혀 있으면 구독을 정리한다');
+ok(RULES.shouldSelfUnsubscribe({ enabled: true }, true) === false,
+  '알림을 켜 둔 폰의 구독은 건드리지 않는다');
+ok(RULES.shouldSelfUnsubscribe(null, false) === false,
+  '장부를 못 읽었으면 끊지 않는다 (못 읽음 ≠ 껐음)');
+ok(RULES.shouldSelfUnsubscribe(null, true) === false,
+  '장부가 아예 없어도 끊지 않는다 (모르는 것을 단정하지 않음)');
+ok(RULES.shouldSelfUnsubscribe(undefined, true) === false,
+  '빈 값이 와도 끊지 않는다');
+// 사고 당시 코드가 실제로 어떻게 판정했는지 — 이 줄이 위 판정과 갈라져야 수리가 유효하다
+ok(RULES.normalizeLedger(null).enabled === false,
+  '(원인 확인) 못 읽은 장부는 여전히 enabled:false로 채워진다 — 그래서 위 구분이 필요하다');
+
 console.log(fail ? `\n❌ 실패 ${fail}건\n` : '\n✅ 알림 규칙 전부 통과\n');
 process.exit(fail ? 1 : 0);
