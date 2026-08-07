@@ -137,14 +137,24 @@ async function loadPage(url, { attempts = 3, lines = report, retryClosed = 1 } =
     }
     /* 클릭형 게시판(행에 onclick만 있는 목록): 장학 키워드가 든 행을 실제로 클릭해
        이동한 상세 주소를 기록한다 — 스크립트 인자를 추측하지 않는 확실한 방법 */
-    // 진짜(https) 상세 주소가 3개 미만이면 클릭 수집 가동 — javascript: 가짜 주소는 세지 않는다
+    /* 진짜(https) 상세 주소가 3개 미만이면 클릭 수집 가동 — javascript: 가짜 주소는 세지 않는다.
+       ⚠️ 메뉴 링크를 세면 안 된다 (2026-08-07 서울교대에서 실제로 샜다): 옆 메뉴의
+       '장학제도'·'장학'·'학자금대출' 세 링크가 조건을 통과해 "이 게시판은 이미 잘 읽히는군"으로
+       판정됐고, 그래서 클릭 수집이 아예 안 돌아 **공고 0건**이었다. 공고 제목인지 메뉴인지는
+       수집 본체와 **같은 모듈**(isMenuEntry)로 판정해야 판정이 갈라지지 않는다. */
     const kwAnchors = new Set(links
       .filter((l) => /^https?:/.test(l.url) && /장학|학자금/.test(l.title) && /view|View|artcl|ntt/.test(l.url))
+      .filter((l) => !isMenuEntry(l.title))
       .map((l) => l.url)).size;
     let clickTried = 0;
     if (kwAnchors < 3) {
-      // 클릭 대상: onclick 속성 행 + javascript: 가짜 주소 링크 (학교 게시판 양대 유형)
-      const CLICKABLE = '[onclick], a[href^="javascript"]';
+      /* 클릭 대상: onclick 속성 행 + javascript: 가짜 주소 링크 + 해시(#) 가짜 주소 링크.
+         셋째는 2026-08-07 추가 — 부산대 onestop은 행이 `<a href="#popup">`이고 클릭 처리는
+         스크립트로 붙어 있어(onclick 속성 없음) 앞의 둘에 하나도 안 걸렸다. 그래서 46개 링크가
+         전부 목록 주소로 접혀 **장학 공고 1건**(그마저 목록 주소)이었다. 눌러 보면
+         `?mode=DETAIL&seq=685`로 제대로 넘어간다 — 로그인 없이 열리는 것까지 확인.
+         '#'만으로는 '본문 바로가기' 같은 앵커도 걸리지만, 아래 제목 조건(장학 키워드 + 10~120자)이 거른다. */
+      const CLICKABLE = '[onclick], a[href^="javascript"], a[href^="#"]';
       // 클릭 스크립트가 넘기는 글 번호(src)도 함께 받아 둔다 — 경희처럼 클릭이 form POST라
       // 주소창이 안 바뀌는 게시판은 이 번호가 원문 주소를 만드는 유일한 재료다 (2026-07-31)
       const clickRows = await page.$$eval(CLICKABLE, (els) => els
