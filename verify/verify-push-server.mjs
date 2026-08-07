@@ -329,6 +329,19 @@ console.log('\n[7] 무료 등급 제한 — 바깥 요청 50건 · 계산 시간
     '/health가 현재 걸음과 마지막 오류를 보여줌', body);
 }
 
+/* /health의 등록 폰 수 — KV 화면을 눈으로 세지 않아도 되게 (2026-08-07)
+   공동개발자 폰 조사에서 KV 항목 수를 사람이 세며 헤맸다. 이제 /health가 세 준다. */
+{
+  const env = makeEnv();
+  let body = await (await worker.default.fetch(new Request('https://push.test/health'), env)).json();
+  ok(body.subs === 0, '/health가 등록 0대를 보여줌', body.subs);
+  await env.SUBS.put(worker.subKey('https://web.push.apple.com/PHONE-A'), JSON.stringify({ endpoint: 'https://web.push.apple.com/PHONE-A', school: '외대' }));
+  await env.SUBS.put(worker.subKey('https://web.push.apple.com/PHONE-B'), JSON.stringify({ endpoint: 'https://web.push.apple.com/PHONE-B', school: '경희' }));
+  await env.SUBS.put('state:seen', JSON.stringify(['x'])); // state 키는 세지 않아야 한다
+  body = await (await worker.default.fetch(new Request('https://push.test/health'), env)).json();
+  ok(body.subs === 2, '/health가 등록 2대를 보여줌 (state 키는 제외)', body.subs);
+}
+
 /* 시험 발송 — 조건을 따지지 않고 즉시 깨운다 (개발자가 자기 폰으로 확인할 때) */
 {
   const env = makeEnv();

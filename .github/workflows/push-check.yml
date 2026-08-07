@@ -1,0 +1,44 @@
+name: 푸시 알림 검사 (상태 + 시험 발송)
+
+# 푸시 발송 서버가 정말 폰을 깨울 수 있는지 확인하는 버튼.
+#   ① /health — 서버 상태 · 등록된 폰 수 · 마지막 오류 (열쇠 불필요)
+#   ② /test  — 등록된 모든 폰에 시험 알림 발송 (저장소 시크릿 PUSH_ADMIN_KEY 필요)
+#      tried=깨우려 한 폰 수 · woke=성공 · dropped=죽은 등록 정리(정상 동작)
+# 만든 이유(2026-08-07): Claude 실행 환경은 workers.dev 접속이 막혀 있고, KV 화면의
+# 등록 기록은 '살아 있는 폰'과 다를 수 있다(폰 쪽에서 구독이 죽어도 기록은 남는다).
+# 실제로 받는지는 발송해 보는 것만이 증명이다 — 그걸 원클릭으로 만들었다.
+# 실행: Actions 탭 → 이 워크플로 → Run workflow (또는 Claude 세션이 원격 실행)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: ① 서버 상태 (/health)
+        run: |
+          echo "— 발송 서버 상태 —"
+          curl -sS --max-time 20 https://handaejang-push.seonju5543.workers.dev/health || echo "(접속 실패)"
+          echo
+
+      - name: ② 시험 발송 (/test)
+        env:
+          KEY: ${{ secrets.PUSH_ADMIN_KEY }}
+        run: |
+          if [ -z "$KEY" ]; then
+            echo "시크릿 PUSH_ADMIN_KEY가 없어 시험 발송은 건너뜁니다."
+            echo "등록: GitHub 저장소 → Settings → Secrets and variables → Actions → New repository secret"
+            echo "      이름 PUSH_ADMIN_KEY · 값은 Cloudflare handaejang-push의 ADMIN_KEY와 같게"
+            exit 0
+          fi
+          echo "— 시험 발송 결과 —"
+          curl -sS --max-time 30 -X POST \
+            -H "x-admin-key: $KEY" \
+            https://handaejang-push.seonju5543.workers.dev/test
+          echo
+          echo "위 tried/woke가 등록된 폰 수와 같으면 정상입니다. dropped는 죽은 등록을 정리한 것(정상)."

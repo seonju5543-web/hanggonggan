@@ -274,6 +274,13 @@ async function onboard(page, school = '외대') {
   const healed = await page.evaluate(() => notifyLedger.pushEndpoint);
   ok(healed && !/DEAD-ENDPOINT/.test(healed),
     '죽은 주소가 살아 있는 주소로 교체된다', healed);
+  /* ⑤-3 회귀 — 갈아탈 때 **옛 주소를 서버에서도 지운다** (2026-08-07)
+     안 지우면 서버 KV에 죽은 등록이 산 것처럼 쌓인다. 실제로 KV에 2개가 보이는데 받는
+     폰은 1대뿐인 상태가 이렇게 생겼다. 사용자가 늘면 죽은 등록이 발송 예산(실행당
+     바깥 요청 50건)을 갉아먹으므로 갈아타는 즉시 치워야 한다. */
+  const unsubs = received.filter((r) => r.path === '/unsubscribe').map((r) => r.body && r.body.endpoint);
+  ok(unsubs.some((e) => /DEAD-ENDPOINT/.test(e)),
+    '갈아탄 옛 주소를 서버에서 지운다 (죽은 등록이 쌓이지 않음)', unsubs);
 
   // 새로고침으로 홈으로 돌아왔으므로 아래 검사를 위해 MY 화면으로 다시 들어간다
   await page.click('.nav-item[data-nav="my"]');

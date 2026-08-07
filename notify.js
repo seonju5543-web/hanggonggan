@@ -493,10 +493,17 @@ async function pushRegistration() {
 }
 
 /* 폰을 발송 서버에 등록 — 성공하면 앱을 안 켜도 알림이 온다 */
-async function pushSubscribe() {
+async function pushSubscribe(replacingEndpoint) {
   if (!pushConfigured()) return { ok: false, reason: 'unconfigured' };
   if (!pushSupported()) return { ok: false, reason: 'unsupported' };
   if (Notification.permission !== 'granted') return { ok: false, reason: 'permission' };
+
+  /* 갈아타기 전의 옛 주소 — 등록에 성공하면 서버에서 지워 달라고 알린다 (2026-08-07).
+     폰 주소는 폰이 앱을 정리하거나 저장 공간을 비우면 바뀌는데, 예전에는 새 주소만
+     등록하고 옛 주소를 그대로 둬서 서버에 **죽은 등록이 산 것처럼 쌓였다**(KV에 2개가
+     보여도 실제로 받는 폰은 1대이던 상태). 사용자가 늘수록 이 껍데기가 발송 예산을
+     갉아먹으므로, 갈아탈 때 바로 치운다. 못 지워도 다음 발송이 404로 정리한다(2중 안전망). */
+  const oldEndpoint = replacingEndpoint || (notifyLedger && notifyLedger.pushEndpoint) || null;
 
   const reg = await pushRegistration();
   if (!reg || !reg.pushManager) return { ok: false, reason: 'unsupported' };
@@ -527,6 +534,17 @@ async function pushSubscribe() {
   notifyLedger.pushSchool = p.school || '';
   notifyLedger.pushSyncedAt = Date.now();   // 하루 뒤 다시 알리기 위한 기준
   await notifySaveLedger();
+
+  // 주소를 갈아탔으면 옛 등록을 서버에서 지운다 (실패해도 등록 자체는 성공 — 다음 발송이 정리)
+  if (oldEndpoint && oldEndpoint !== sub.endpoint) {
+    try {
+      await fetch(PUSH_CONFIG.endpoint.replace(/\/+$/, '') + '/unsubscribe', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ endpoint: oldEndpoint }),
+      });
+    } catch (e) { /* 다음 발송의 404 정리에 맡긴다 */ }
+  }
   return { ok: true };
 }
 
@@ -607,13 +625,15 @@ async function pushEnsure() {
 
   const real = await pushRealEndpoint();
   if (!real) {
-    // 브라우저에 구독이 없다 — 메모가 남아 있어도 그건 죽은 기록이다
+    // 브라우저에 구독이 없다 — 메모가 남아 있어도 그건 죽은 기록이다.
+    // 메모를 지우기 전에 옛 주소를 붙잡아 둔다: 새로 등록할 때 서버의 죽은 등록도 함께 지우기 위해
+    const deadEndpoint = notifyLedger.pushEndpoint || null;
     if (notifyLedger.pushEndpoint) {
       notifyLedger.pushEndpoint = null;
       notifyLedger.pushSchool = '';
       await notifySaveLedger();
     }
-    return pushRemember(await pushSubscribe());
+    return pushRemember(await pushSubscribe(deadEndpoint));
   }
   if (real !== notifyLedger.pushEndpoint) return pushRemember(await pushSubscribe());
 
