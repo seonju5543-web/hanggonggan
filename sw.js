@@ -10,7 +10,7 @@
    같은 번호로 올리는 일이 반복된다. v15도 v16도 양쪽이 따로 올려 '내용이 다른 같은 버전'이
    됐다. 합칠 때는 **둘 다보다 큰 번호로** 올려야 설치된 앱의 옛 캐시가 확실히 청소된다.
    v17 = 알림·진짜 푸시(선주) + 원문 링크 정직 표기(Josehyeon)를 합친 판. */
-const CACHE = 'handaejang-v49';
+const CACHE = 'handaejang-v50';
 const ASSETS = ['.', 'index.html', 'style.css', 'app.js', 'data.js', 'forms.js',
   'match-engine.js', 'notify-rules.js', 'notify.js', 'push-config.js',
   'manifest.json', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png'];
@@ -210,9 +210,14 @@ self.addEventListener('push', (e) => {
     }
 
     // 사용자가 알림을 꺼 뒀는데도 깨워졌다면(해지 요청이 서버에 안 닿은 경우 등)
-    // 구독을 스스로 정리하고 조용히 끝낸다 — 끈 사람에게 알림을 띄우지 않는다
-    const ledger = NOTIFY_RULES ? NOTIFY_RULES.normalizeLedger(await nfGet('ledger').catch(() => null)) : null;
-    if (ledger && !ledger.enabled) {
+    // 구독을 스스로 정리하고 조용히 끝낸다 — 끈 사람에게 알림을 띄우지 않는다.
+    // ⚠️ 단, **'껐다'와 '못 읽었다'는 다르다.** 예전에는 장부 읽기에 실패해도 기본 장부
+    //    (enabled:false)를 만들어 "껐다"로 단정하고 구독을 끊어, 알림을 켜 둔 폰이 발송
+    //    서버에서 조용히 사라졌다. 판정은 notify-rules.js 한 곳에 있다(화면·검사와 공유).
+    let rawLedger = null;
+    let ledgerRead = true;
+    try { rawLedger = await nfGet('ledger'); } catch (err) { ledgerRead = false; }
+    if (NOTIFY_RULES && NOTIFY_RULES.shouldSelfUnsubscribe(rawLedger, ledgerRead)) {
       try {
         const sub = await self.registration.pushManager.getSubscription();
         if (sub) await sub.unsubscribe();
