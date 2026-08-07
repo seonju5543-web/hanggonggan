@@ -343,6 +343,32 @@ console.log('■ 학교 순서 회전 (잘리는 학교가 매번 같으면 그 
   eq('한 바퀴를 넘어가면 되돌아온다', nextCursor(17, 15, 5), 3);
 }
 
+/* 클릭 수집이 도는 조건 (2026-08-07 — 학교 두 곳이 이것 때문에 통째로 비어 있었다)
+
+   ① 부산대 onestop: 공고 행이 `<a href="#popup">`이고 클릭 처리는 스크립트로 붙어 있어
+      onclick 속성도 javascript: 주소도 없다. 클릭 대상 선택자가 그 둘뿐이라 **클릭 시도 0건**,
+      46개 링크가 전부 목록 주소로 접혀 장학 공고 1건(그마저 목록 주소)이었다.
+   ② 서울교대: 옆 메뉴의 '장학제도'·'장학'·'학자금대출' 링크 3개가 "이미 상세 주소가 3개 있다"로
+      세어져 클릭 수집이 **아예 안 돌았다**. 공고 행 15개는 멀쩡히 클릭 가능한 상태였는데도 0건.
+
+   두 조건 모두 되돌리면 그 학교 학생 화면이 다시 빈다. */
+console.log('■ 클릭 수집이 도는 조건');
+{
+  const src = fs.readFileSync(new URL('../collector/browser-collect.mjs', import.meta.url), 'utf8');
+  const clickable = (src.match(/const CLICKABLE = '([^']+)'/) || [])[1] || '';
+  eq('클릭 대상에 해시(#) 가짜 주소 행이 있다 (부산대 유형)', /a\[href\^="#"\]/.test(clickable), true);
+  eq('클릭 대상에 onclick·javascript 행도 그대로 있다',
+    /\[onclick\]/.test(clickable) && /a\[href\^="javascript"\]/.test(clickable), true);
+  // 가동 조건을 세는 곳에서 메뉴를 걸러야 한다 — 판정은 수집 본체와 같은 모듈로
+  const gate = (src.match(/const kwAnchors = new Set\(links[\s\S]*?\)\)\.size;/) || [''])[0];
+  eq('가동 조건에서 메뉴 링크를 뺀다 (서울교대 유형)', /isMenuEntry\(/.test(gate), true);
+  // 그 판정이 실제로 서울교대 메뉴를 걸러 내고 진짜 공고는 살리는지 (모듈이 바뀌면 여기서 걸린다)
+  eq('메뉴 판정이 서울교대 옆 메뉴를 걸러 낸다',
+    ['장학제도', '장학', '학자금대출'].filter((t) => !isMenuEntry(t)), []);
+  eq('메뉴 판정이 진짜 공고 제목은 살린다',
+    isMenuEntry('2026학년도 2학기 학부 재학생 우선선발장학금(형제자매장학 등) 신청 안내'), false);
+}
+
 console.log('■ 예산 장치가 실제로 배선돼 있나 (되돌아가면 같은 사고가 난다)');
 {
   const root = new URL('../', import.meta.url);
