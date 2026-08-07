@@ -329,6 +329,30 @@
    "added": "2026-08-05",
    "fetched": true,
    "schematized": true
+  },
+  {
+   "id": "auto-sknou51808271artclviewdo",
+   "name": "[장학] 2026학년도 2학기 중앙도서관 국가근로장학생 모집(~8.14.)",
+   "target": "2026학년도 2학기 중앙도서관 국가근로장학생 모집(~",
+   "added": "2026-08-08",
+   "fetched": true,
+   "schematized": true
+  },
+  {
+   "id": "auto-sknou51808214artclviewdo",
+   "name": "[장학] (교외근로) 2026학년도 2학기 출판문화원 국가근로장학생 모집 (~08.21.)",
+   "target": "(교외근로) 2026학년도 2학기 출판문화원 국가근로장",
+   "added": "2026-08-08",
+   "fetched": true,
+   "schematized": true
+  },
+  {
+   "id": "auto-nuackrprogboardno2514606",
+   "name": "2026학년도 대학생 청소년 AI 교육지원사업 장학생 추천 안내",
+   "target": "2026학년도 대학생 청소년 AI 교육지원사업 장학생 ",
+   "added": "2026-08-08",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }
