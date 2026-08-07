@@ -384,9 +384,7 @@ function notifySettingsHtml() {
       <p class="nf-push-title">${pushOn ? '📲 앱을 켜지 않아도 받는 중' : '⏳ 연결하는 중'}</p>
       <p class="nf-desc">${pushOn
         ? '앱을 닫아 두거나 화면이 꺼져 있어도 마감·새 공고 알림이 폰으로 도착해요.'
-        : (iosNotInstalled
-          ? '아직 이 기기에 연결되지 않았어요.'
-          : '곧 자동으로 연결돼요. 앱을 껐다 켜면 바로 반영돼요.')}</p>
+        : esc(pushReasonText(pushLastReason, iosNotInstalled))}</p>
       ${iosNotInstalled ? '<p class="nf-desc">📱 iPhone은 사파리 <strong>공유 → 홈 화면에 추가</strong>로 설치해야 앱을 켜지 않아도 알림을 받을 수 있어요.</p>' : ''}
       <p class="nf-desc">서버에는 <strong>폰 주소와 학교</strong>만 저장돼요 — 이름·성적·소득·서류는 이 기기 밖으로 나가지 않아요.</p>
     </div>`;
@@ -527,6 +525,7 @@ async function pushSubscribe() {
 
   notifyLedger.pushEndpoint = sub.endpoint;
   notifyLedger.pushSchool = p.school || '';
+  notifyLedger.pushSyncedAt = Date.now();   // 하루 뒤 다시 알리기 위한 기준
   await notifySaveLedger();
   return { ok: true };
 }
@@ -558,6 +557,29 @@ function pushActive() {
   return !!(notifyLedger && notifyLedger.pushEndpoint && pushConfigured());
 }
 
+/* 브라우저에 **실제로 살아 있는** 구독 주소 (없으면 null)
+   ------------------------------------------------------------
+   pushActive()는 앱이 적어 둔 메모만 본다. 그런데 구독은 앱이 모르는 사이에 사라진다 —
+   iPhone이 안 쓰는 앱을 정리할 때, 사용자가 저장 공간을 지울 때, 브라우저가 주소를 바꿀 때.
+   그때 메모만 믿으면 앱은 영영 "등록돼 있다"고 착각하고 다시 등록하지 않는다
+   (2026-08-06 공동개발자 폰이 정확히 이 상태였다 — 앱을 켤 때만 알림이 보였다). */
+async function pushRealEndpoint() {
+  try {
+    const reg = await pushRegistration();
+    if (!reg || !reg.pushManager) return null;
+    const sub = await reg.pushManager.getSubscription();
+    return sub ? sub.endpoint : null;
+  } catch (e) { return null; }
+}
+
+/* 서버가 죽은 구독으로 오해해 지웠을 수도 있으므로 하루에 한 번은 다시 알린다.
+   /subscribe는 같은 주소를 덮어쓰기만 하므로 여러 번 불러도 안전하다. */
+const PUSH_RESYNC_MS = 24 * 60 * 60 * 1000;
+function pushNeedsResync() {
+  const at = notifyLedger && notifyLedger.pushSyncedAt;
+  return !at || (Date.now() - at) > PUSH_RESYNC_MS;
+}
+
 /* 학교를 바꾸면 서버에 등록된 학교도 따라가야 한다 (안 그러면 남의 학교 공고로 깨워진다) */
 async function pushSyncSchool() {
   if (!pushActive()) return;
@@ -571,15 +593,60 @@ async function pushSyncSchool() {
    예전에는 등록이 '최초 1회 동의 시트'에서만 일어났다. 그런데 그 시트는 사람당 딱 한 번만 뜨므로,
    **알림을 이미 켜 둔 사용자**(= 발송 서버가 생기기 전에 켠 모든 사람)는 영영 등록되지 않았다.
    MY 화면에서 알림을 켜는 경로에도 등록이 빠져 있었다. 그래서 앱을 열 때마다 여기서 메꾼다.
-   이미 등록돼 있으면 학교만 맞춰 보고 끝나므로 서버를 괴롭히지 않는다. */
+
+   2026-08-07 보강 — **메모가 아니라 브라우저의 진짜 구독을 확인한다.** 예전에는 메모가 있으면
+   그대로 통과시켜서, 구독이 죽은 폰은 앱을 아무리 열어도 되살아나지 않았다. 이제 세 가지를 본다:
+   ① 브라우저에 구독이 없으면 → 메모를 지우고 새로 등록  ② 주소가 메모와 다르면 → 다시 등록
+   ③ 같아도 하루가 지났으면 → 서버에 한 번 더 알린다(서버가 지웠을 수 있으므로). */
 async function pushEnsure() {
-  if (!notifyLedger || !notifyLedger.enabled) return { ok: false, reason: 'off' };
-  if (!pushConfigured() || !pushSupported()) return { ok: false, reason: 'unsupported' };
+  if (!notifyLedger || !notifyLedger.enabled) return pushRemember({ ok: false, reason: 'off' });
+  if (!pushConfigured() || !pushSupported()) return pushRemember({ ok: false, reason: 'unsupported' });
   if (typeof Notification === 'undefined' || Notification.permission !== 'granted') {
-    return { ok: false, reason: 'permission' };
+    return pushRemember({ ok: false, reason: 'permission' });
   }
-  if (pushActive()) { await pushSyncSchool(); return { ok: true, reason: 'already' }; }
-  return pushSubscribe();
+
+  const real = await pushRealEndpoint();
+  if (!real) {
+    // 브라우저에 구독이 없다 — 메모가 남아 있어도 그건 죽은 기록이다
+    if (notifyLedger.pushEndpoint) {
+      notifyLedger.pushEndpoint = null;
+      notifyLedger.pushSchool = '';
+      await notifySaveLedger();
+    }
+    return pushRemember(await pushSubscribe());
+  }
+  if (real !== notifyLedger.pushEndpoint) return pushRemember(await pushSubscribe());
+
+  await pushSyncSchool();
+  if (pushNeedsResync()) return pushRemember(await pushSubscribe());
+  return pushRemember({ ok: true, reason: 'already' });
+}
+
+/* 마지막 결과를 기억해 MY 화면이 **왜** 연결되지 않았는지 말해 줄 수 있게 한다.
+   예전에는 '연결하는 중'만 떠서, 폰이 알림을 막고 있는 것인지 서버가 안 되는 것인지
+   사용자도 개발자도 알 수 없었다. */
+let pushLastReason = null;
+function pushRemember(res) {
+  pushLastReason = res && res.ok ? null : (res && res.reason) || null;
+  return res;
+}
+
+/* 원인을 사용자가 할 수 있는 행동으로 바꿔 준다 (전문 용어 금지 — 이 화면은 학생이 본다) */
+function pushReasonText(reason, iosNotInstalled) {
+  if (iosNotInstalled) return '아직 이 기기에 연결되지 않았어요.';
+  switch (reason) {
+    case 'permission':
+      return '휴대폰이 이 앱의 알림을 막고 있어요. 폰 설정 → 알림에서 한대장을 허용해 주세요.';
+    case 'unsupported':
+      return '이 브라우저에서는 앱을 켜지 않아도 오는 알림을 쓸 수 없어요. 크롬·사파리로 열어 주세요(카카오톡 안에서 열면 안 돼요).';
+    case 'network':
+    case 'server':
+      return '연결이 잠시 안 됐어요. 앱을 껐다 켜면 다시 시도해요.';
+    case 'subscribe-failed':
+      return '휴대폰이 알림 연결을 거절했어요. 폰 설정 → 알림에서 허용한 뒤 앱을 껐다 켜 주세요.';
+    default:
+      return '곧 자동으로 연결돼요. 앱을 껐다 켜면 바로 반영돼요.';
+  }
 }
 
 /* 데이터 초기화와 함께 알림 설정·알림함도 지운다 (MY → 데이터 초기화) */

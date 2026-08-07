@@ -10,6 +10,14 @@
    실행: python3 -m http.server 8123 & 후 node verify/verify-notify.js */
 const { chromium } = require('playwright-core');
 const EXE = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
+/* 우리 코드의 잘못이 아닌 콘솔 메시지는 빼고 센다.
+   · Failed to load resource — 드라이버가 일부러 없는 파일을 부르는 경우
+   · Push API in incognito — 검사용 브라우저가 시크릿 모드라 크롬이 남기는 안내다.
+     크롬 문서가 "웹사이트가 알아챌 수 없게 하려고 일부러 감지 수단을 주지 않는다"고
+     밝히고 있어 앱이 피할 방법이 없다(2026-08-07 확인 — 이 줄이 없으면 이 검사는 영영 빨간불).
+     진짜 푸시 동작은 verify-push-client.js가 가짜 푸시 서비스로 따로 검증한다. */
+const IGNORE_CONSOLE = /Failed to load resource|does not support the Push API in incognito/;
+
 const BASE = 'http://localhost:8123';
 const SHOT = (n) => `${__dirname}/shot-nf-${n}.png`;
 
@@ -71,7 +79,7 @@ async function onboard(page) {
     const page = await ctx.newPage();
     const errors = [];
     page.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
-    page.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push('CONSOLE: ' + m.text()); });
+    page.on('console', (m) => { if (m.type() === 'error' && !IGNORE_CONSOLE.test(m.text())) errors.push('CONSOLE: ' + m.text()); });
     await page.addInitScript(SPY);
 
     await page.goto(BASE + '/', { waitUntil: 'domcontentloaded' });
@@ -125,7 +133,7 @@ async function onboard(page) {
   const page = await ctx.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
-  page.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push('CONSOLE: ' + m.text()); });
+  page.on('console', (m) => { if (m.type() === 'error' && !IGNORE_CONSOLE.test(m.text())) errors.push('CONSOLE: ' + m.text()); });
   page.on('dialog', async (d) => { await d.accept(); });
   await page.addInitScript(SPY);
 

@@ -255,6 +255,26 @@ async function onboard(page, school = '외대') {
   ok(received.some((r) => r.path === '/subscribe'),
     '등록이 비어 있으면 앱을 열 때 자동으로 등록됨 (pushEnsure)', received.map((r) => r.path));
 
+  /* ⑤-2 회귀 — **메모는 남아 있는데 브라우저 구독이 사라진 폰**도 되살아난다 (2026-08-07)
+     구독은 앱이 모르는 사이에 사라진다(iPhone이 안 쓰는 앱을 정리 · 저장 공간 삭제 · 주소 변경).
+     예전 pushEnsure는 장부의 메모만 보고 "이미 등록됨"으로 통과시켜서, 그런 폰은 앱을 아무리
+     열어도 영영 다시 등록되지 않았다 — 공동개발자 폰이 실제로 이 상태였다(앱을 켤 때만 알림).
+     아래는 하루 재동기화 경로와 헷갈리지 않게 pushSyncedAt을 방금으로 두고 검사한다.
+     이 검사를 지우면 '죽은 메모를 믿는' 상태로 되돌아간다. */
+  received.length = 0;
+  await page.evaluate(async () => {
+    notifyLedger.pushEndpoint = 'https://fcm.googleapis.com/fcm/send/DEAD-ENDPOINT';
+    notifyLedger.pushSyncedAt = Date.now();
+    await notifySaveLedger();
+  });
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.waitForTimeout(2600);
+  ok(received.some((r) => r.path === '/subscribe'),
+    '브라우저 구독이 사라지면 다시 등록한다 (죽은 메모를 믿지 않음)', received.map((r) => r.path));
+  const healed = await page.evaluate(() => notifyLedger.pushEndpoint);
+  ok(healed && !/DEAD-ENDPOINT/.test(healed),
+    '죽은 주소가 살아 있는 주소로 교체된다', healed);
+
   // 새로고침으로 홈으로 돌아왔으므로 아래 검사를 위해 MY 화면으로 다시 들어간다
   await page.click('.nav-item[data-nav="my"]');
   await page.waitForSelector('#my-notify:not([hidden])');
