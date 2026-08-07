@@ -18,12 +18,21 @@ const cfg = JSON.parse(fs.readFileSync(new URL('browser-targets.json', HERE), 'u
    (프로세스 강제 종료) 해법은 저장이 아니라 **스스로 예산 안에 끝내기**다.
    워크플로 상한(30분)보다 넉넉히 앞서 끝내 저장·감사·리포트 단계가 돌 시간을 남긴다. */
 const BUDGET_MS = Number(process.env.HARVEST_BUDGET_MS || 22 * 60000);        // 기본 22분
-/* 학교 하나를 새로 시작할 최소 여유 — 45초 → 2분 30초 (2026-08-05).
+/* 학교 하나를 새로 시작할 최소 여유 — 45초 → 2분 30초(2026-08-05) → **7분 30초(2026-08-07)**.
    45초는 '학교 한 곳에 드는 실제 시간'과 너무 동떨어진 값이었다. 후보 주소를 여는 데만
    최대 30+45+45초가 들고, 클릭 채집이 붙으면 몇 분이다. 그래서 예산이 45초 남았을 때
    학교를 새로 집어 들고는 한참을 더 썼다. 못 돈 학교는 커서 회전으로 다음 실행이
-   먼저 도니 **건너뛰는 편이 언제나 이득**이다 — 넘기면 그날 수집분 전체를 잃는다. */
-const MIN_PER_TARGET_MS = Number(process.env.MIN_PER_TARGET_MS || 150000);
+   먼저 도니 **건너뛰는 편이 언제나 이득**이다 — 넘기면 그날 수집분 전체를 잃는다.
+
+   ⚠️ 2분 30초도 여전히 동떨어져 있었다 (2026-08-07 실제로 취소됨). 학교 하나의 **최악치는
+   클릭 채집 180초 + 상세 방문 240초 = 7분**인데 2분 30초만 남아도 새로 집어 들었다.
+   그날 실행은 학교 17곳을 9분 40초에 다 돌고도, 그 뒤 **실패 학교 재시도**(동국대·외대)가
+   예산이 12분이나 남은 줄 알고 시작해 16분 30초를 썼다 → 22분 예산을 넘기고 26분 단계
+   상한에 걸려 **취소**, 그날 수집분이 통째로 버려졌다.
+   그래서 이 값은 **한 학교의 최악치보다 커야 한다** — 아래 두 예산의 합 + 여유.
+   (재시도 패스도 같은 값을 쓰므로, 예산이 모자라면 재시도가 통째로 생략된다. 재시도는
+    '덤'이라 생략해도 다음 실행이 커서 회전으로 다시 집는다.) */
+const MIN_PER_TARGET_MS = Number(process.env.MIN_PER_TARGET_MS || 450000);
 const budget = makeBudget(BUDGET_MS);
 
 /* 이번 실행이 어느 학교부터 돌지 — 예산에 걸려 잘리는 학교가 매번 같지 않게 회전시킨다 */
@@ -431,7 +440,13 @@ if (failedTargets.length && failedTargets.length <= Math.max(1, Math.floor(cfg.t
       stillFailed.push(f.name);
       return;
     }
+    /* 재시도에도 시작·끝을 실행 로그에 남긴다 (2026-08-07 추가 — 여기가 비어 있어서
+       16분 30초가 어디로 갔는지 아무도 못 봤다). 본 수집에는 8/5에 넣었는데 짝인
+       이쪽을 빠뜨렸고, 리포트는 취소되면 커밋 자체가 안 되므로 실행 로그가 유일한 단서다. */
+    const t0 = Date.now();
+    console.log(`[${Math.round(budget.elapsed() / 1000)}s] ▶ (재시도) ${f.name}`);
     const ok = await harvestTarget(f.t, lines);
+    console.log(`[${Math.round(budget.elapsed() / 1000)}s] ◀ (재시도) ${f.name} — ${ok ? '수집' : '실패'} (${Math.round((Date.now() - t0) / 1000)}초)`);
     if (!ok) stillFailed.push(f.name);
     lines.push('');
   }, PARALLEL);

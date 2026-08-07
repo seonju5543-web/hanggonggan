@@ -377,6 +377,18 @@ console.log('■ 예산 장치가 실제로 배선돼 있나 (되돌아가면 �
   eq('학교를 새로 시작하기 전에 남은 시간을 본다', /budget\.hasRoom\(MIN_PER_TARGET_MS\)/.test(src), true);
   eq('상세 방문에도 예산이 있다 (한 학교가 20분을 먹던 자리)', /detailBudgetMs/.test(src), true);
   eq('회전 커서를 저장한다 (안 하면 매번 같은 학교가 잘린다)', /nextCursor\(/.test(src) && /cursorPath/.test(src), true);
+  /* 학교 하나를 새로 집어 들 최소 여유는 **그 학교의 최악치보다 커야** 한다.
+     작으면 예산이 거의 다 됐는데도 학교를 시작해 상한을 넘긴다 — 2026-08-07에 실제로
+     그렇게 취소됐다(2분 30초만 남은 줄 알고 재시도를 시작해 16분 30초를 씀).
+     최악치 = 클릭 채집 예산 + 상세 방문 예산. */
+  const num = (re) => Number((src.match(re) || [])[1]);
+  const minPer = num(/MIN_PER_TARGET_MS \|\| (\d+)\)/);
+  const clickCap = num(/const clickBudgetMs = (\d+);/);
+  const detailCap = num(/DETAIL_BUDGET_MS \|\| (\d+)\)/);
+  eq('세 값을 다 읽어냈다', [minPer, clickCap, detailCap].some(Number.isNaN), false);
+  eq('학교 시작 여유가 한 학교 최악치(클릭+상세)보다 크다', minPer >= clickCap + detailCap, true);
+  // 재시도 패스도 로그를 남겨야 한다 — 없으면 시간을 어디서 썼는지 영영 못 본다
+  eq('실패 학교 재시도에도 실행 로그가 있다', /\(재시도\) \$\{f\.name\}/.test(src), true);
   const yml = fs.readFileSync(new URL('.github/workflows/browser-collect.yml', root), 'utf8');
   eq('워크플로 저장 목록에 회전 커서가 있다', /browser-cursor\.json/.test(yml), true);
   /* 작업(job) 상한은 들여쓰기 4칸, 단계(step) 상한은 8칸이다. 2026-08-04에 단계별 상한이
