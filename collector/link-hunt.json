@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-08-08",
+ "updatedAt": "2026-08-09",
  "items": {
   "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2668%20%5B%ED%99%8D%EB%B3%B4%5D%20%ED%95%9C%EA%B5%AD%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EA%B3%B5%EA%B3%B5%EB%8D%B0%EC%9D%B4%ED%84%B0%20%EA%B0%9C%EB%B0%A9%20%EB%B0%8F%20%ED%99%9C%EC%9A%A9%20%EC%95%88%EB%82%B4%202026.0": {
    "attempts": 4,
@@ -1018,11 +1018,11 @@
    "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765584"
   },
   "r:reg-dg-gasong": {
-   "attempts": 3,
+   "attempts": 4,
    "title": "(재)가송재단 장학생 (동국대 접수, 2026-2학기)",
-   "lastTried": "2026-08-06",
+   "lastTried": "2026-08-09",
    "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-08-09",
+   "nextTryAt": "2026-08-16",
    "status": "",
    "escalated": true,
    "likelyGone": true
@@ -1404,11 +1404,11 @@
    "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322718"
   },
   "n:https://www.yonsei.ac.kr/bbs/sc/58/artclList.do?findClSeq=257#n-1388%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EB%B6%80%EC%98%81%EC%A3%BC%ED%83%9D%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%A7%80%EC%9B%90%20%EC%95%88%EB%82%B4%20%EC%83%88%EA%B8%80%20%EC%9E%A5%ED%95%99%20%EC%A1%B0%ED%9A%8C": {
-   "attempts": 1,
+   "attempts": 2,
    "title": "1388 2026학년도 2학기 부영주택 장학생 지원 안내 새글 장학 조회수9 작성일2026.08.06 기간2026.08.06 ~ 2026.08.",
-   "lastTried": "2026-08-08",
+   "lastTried": "2026-08-09",
    "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-08-09",
+   "nextTryAt": "2026-08-10",
    "status": ""
   },
   "n:https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53027&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
@@ -1489,6 +1489,86 @@
   },
   "n:https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269744&pageOrder=0&cmd=2&parm_bod_uid=269159&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&": {
    "patrolledAt": "2026-08-08",
+   "lastWhy": ""
+  },
+  "n:https://www.konkuk.ac.kr/bbs/konkuk/235/1203155/artclView.do": {
+   "patrolledAt": "2026-08-09",
+   "lastWhy": ""
+  },
+  "n:https://www.konkuk.ac.kr/bbs/konkuk/235/1203142/artclView.do": {
+   "patrolledAt": "2026-08-09",
+   "lastWhy": ""
+  },
+  "n:https://www.kookmin.ac.kr/user/kmuNews/notice/7/12209/view.do?currentPageNo=1": {
+   "patrolledAt": "2026-08-09",
+   "lastWhy": "page.goto: Timeout 20000ms exceeded."
+  },
+  "n:https://www.kookmin.ac.kr/user/kmuNews/notice/7/12206/view.do?currentPageNo=1": {
+   "patrolledAt": "2026-08-09",
+   "lastWhy": ""
+  },
+  "n:https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=362541&article.offset=0&articleLimit=10": {
+   "patrolledAt": "2026-08-09",
+   "lastWhy": ""
+  },
+  "n:https://www.inha.ac.kr/bbs/kr/8/44983/artclView.do": {
+   "patrolledAt": "2026-08-09",
+   "lastWhy": ""
+  },
+  "n:https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=893672&qidx=5233&cate=0&allboard=true&nowpage=1": {
+   "patrolledAt": "2026-08-09",
+   "lastWhy": ""
+  },
+  "n:https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=893670&qidx=5233&cate=0&allboard=true&nowpage=1": {
+   "patrolledAt": "2026-08-09",
+   "lastWhy": ""
+  },
+  "n:https://www.knou.ac.kr/bbs/knou/51/808219/artclView.do": {
+   "patrolledAt": "2026-08-09",
+   "lastWhy": ""
+  },
+  "n:https://www.knou.ac.kr/bbs/knou/51/808271/artclView.do": {
+   "patrolledAt": "2026-08-09",
+   "lastWhy": ""
+  },
+  "n:https://www.knou.ac.kr/bbs/knou/51/808214/artclView.do": {
+   "patrolledAt": "2026-08-09",
+   "lastWhy": ""
+  },
+  "n:https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2514606&code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=": {
+   "patrolledAt": "2026-08-09",
+   "lastWhy": ""
+  },
+  "n:https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=815&bbsNo=8&nttNo=169088&pageUnit=10&searchCtgry=%ed%95%99%ec%82%ac%2f%ec%9e%a5%ed%95%99&searchCnd=all&pageIndex=1": {
+   "patrolledAt": "2026-08-09",
+   "lastWhy": ""
+  },
+  "n:https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2454&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0": {
+   "patrolledAt": "2026-08-09",
+   "lastWhy": ""
+  },
+  "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322718": {
+   "patrolledAt": "2026-08-09",
+   "lastWhy": ""
+  },
+  "n:https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269744&pageOrder=0&cmd=2&parm_bod_uid=268653&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&": {
+   "patrolledAt": "2026-08-09",
+   "lastWhy": ""
+  },
+  "n:https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269744&pageOrder=0&cmd=2&parm_bod_uid=268651&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&": {
+   "patrolledAt": "2026-08-09",
+   "lastWhy": ""
+  },
+  "n:https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269744&pageOrder=0&cmd=2&parm_bod_uid=268512&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&": {
+   "patrolledAt": "2026-08-09",
+   "lastWhy": ""
+  },
+  "n:https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269744&pageOrder=0&cmd=2&parm_bod_uid=268394&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&": {
+   "patrolledAt": "2026-08-09",
+   "lastWhy": ""
+  },
+  "n:https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269744&pageOrder=0&cmd=2&parm_bod_uid=268392&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&": {
+   "patrolledAt": "2026-08-09",
    "lastWhy": ""
   }
  }
