@@ -306,6 +306,14 @@ function undeclaredNames(src) {
       .split('\n').filter((l) => !/^\s*#/.test(l)).join('\n');
     const plain = (yml.match(/git pull --rebase(?! --autostash)/g) || []).length;
     eq(`${f}: 맨몸 git pull --rebase 없음(--autostash 필수)`, plain, 0);
+    /* 합치다 부딪혀도 단계 전체가 죽으면 안 된다 (2026-08-08 추가).
+       shell이 bash -e라, 재시도 안의 pull이 조건문 밖에 있으면 충돌 한 번에 남은
+       재시도를 못 해 보고 그날 수집분을 버린다 — 8/7 05:53 실행이 실제로 그랬다.
+       (수집 2종만 해당 — 나머지 로봇은 저장 경합이 없다) */
+    if (f === 'collect-scholarships' || f === 'browser-collect') {
+      eq(`${f}: 합치다 부딪혀도 재시도가 이어진다`,
+        /if ! git pull --rebase --autostash/.test(yml) && /rebase --abort/.test(yml), true);
+    }
   }
 }
 
@@ -389,6 +397,20 @@ console.log('■ 예산 장치가 실제로 배선돼 있나 (되돌아가면 �
   eq('학교 시작 여유가 한 학교 최악치(클릭+상세)보다 크다', minPer >= clickCap + detailCap, true);
   // 재시도 패스도 로그를 남겨야 한다 — 없으면 시간을 어디서 썼는지 영영 못 본다
   eq('실패 학교 재시도에도 실행 로그가 있다', /\(재시도\) \$\{f\.name\}/.test(src), true);
+  /* ── 뒷정리가 수집분을 잡아먹지 못하게 (2026-08-08 사고 회귀) ──────────────
+     8/7~8/8 모든 실행이 학교 17곳을 12분에 다 돌고도 `browser.close()`에서 14분을
+     매달려 26분 단계 상한에 걸려 죽었다. 저장이 전부 그 뒤에 있었기 때문에
+     이틀 내리 브라우저 수집분이 0건이었다(리포트·seen 기록도 안 남았다).
+     규칙 두 가지: ① 저장이 닫기보다 **앞**에 있을 것 ② 닫기에는 시간 제한이 있을 것. */
+  // 주석은 걷어내고 본다 — '여기서 닫지 말라'고 적어 둔 설명 자체를 잡으면 안 된다
+  const code = src.replace(/^\s*\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
+  const closeAt = code.indexOf('browser.close(');
+  const saveAt = code.indexOf("writeFileSync(new URL('browser-report.md'");
+  eq('수집분 저장이 브라우저 닫기보다 앞에 있다', saveAt > 0 && closeAt > saveAt, true);
+  eq('브라우저 닫기에 시간 제한이 있다 (여기서 매달리면 그날 수집분이 통째로 날아간다)',
+    /Promise\.race\(\[\s*browser\.close\(\)[\s\S]{0,80}sleep\(/.test(src), true);
+  eq('클릭으로 띄운 창은 실패해도 닫는다 (안 닫힌 창이 쌓이면 닫기가 매달린다)',
+    /finally\s*\{[\s\S]{0,160}popup\.close\(\)/.test(src), true);
   const yml = fs.readFileSync(new URL('.github/workflows/browser-collect.yml', root), 'utf8');
   eq('워크플로 저장 목록에 회전 커서가 있다', /browser-cursor\.json/.test(yml), true);
   /* 작업(job) 상한은 들여쓰기 4칸, 단계(step) 상한은 8칸이다. 2026-08-04에 단계별 상한이

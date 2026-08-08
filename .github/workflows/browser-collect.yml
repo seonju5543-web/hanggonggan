@@ -137,7 +137,16 @@ jobs:
               if git push; then pushed=1; break; fi
               # --autostash: 저장 목록에 안 든 파일이 남아 있어도 재시도가 죽지 않게 (2026-08-02).
               # 이게 없으면 "cannot pull with rebase: You have unstaged changes"로 실행 전체가 날아간다.
-              git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
+              #
+              # if로 감싸는 이유 (2026-08-08): 이 줄이 맨몸으로 있으면 **합치다 부딪히는 순간
+              # 단계 전체가 죽는다**(shell은 bash -e). 실제로 8/7 05:53 실행이 data/forms.json
+              # 충돌 한 번에 남은 재시도 2번을 못 해 보고 그날 수집분을 버렸다.
+              # 부딪히면 되돌린 뒤(rebase --abort) 로봇이 방금 만든 쪽을 살려 다시 얹는다
+              # (-X theirs = 지금 얹는 우리 커밋 쪽). 그래도 안 되면 다음 회차가 다시 담는다.
+              if ! git pull --rebase --autostash origin "${GITHUB_REF_NAME}"; then
+                git rebase --abort || true
+                git pull --rebase --autostash -X theirs origin "${GITHUB_REF_NAME}" || git rebase --abort || true
+              fi
             done
             # 3번 다 실패하면 조용히 넘어가지 않는다 — 빨간불로 죽고 아래 실패 알림이 이슈에 붙는다
             if [ "$pushed" != "1" ]; then

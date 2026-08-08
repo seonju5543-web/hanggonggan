@@ -189,13 +189,16 @@ async function loadPage(url, { attempts = 3, lines = report, retryClosed = 1 } =
            작업 상한(34분)에 걸려 취소됐다 — 그날 수집분이 통째로 버려졌다. */
         if (budget.expired()) { lines.push(`  - (⏱ 시간 예산 초과 — ${ci}/${clickRows.length}건까지 채집)`); break; }
         ci += 1;
+        /* 팝업은 try 바깥에 둔다 — 중간에 오류가 나도 **반드시 닫기 위해서**(아래 finally).
+           안 닫힌 창이 쌓이면 실행 끝의 브라우저 닫기가 몇 분씩 매달린다 (2026-08-08 사고). */
+        let popup = null;
         try {
           const els = await page.$$(CLICKABLE);
           if (!els[idx]) continue;
           const popupP = ctx.waitForEvent('page', { timeout: 3500 }).catch(() => null);
           const navP = page.waitForNavigation({ timeout: 5000 }).catch(() => null);
           await els[idx].click({ timeout: 4000 });
-          const popup = await popupP;
+          popup = await popupP;
           const detailPage = popup || page;
           if (popup) await popup.waitForLoadState('domcontentloaded').catch(() => {});
           else { await navP; await page.waitForTimeout(1800); }
@@ -251,13 +254,17 @@ async function loadPage(url, { attempts = 3, lines = report, retryClosed = 1 } =
           usedUrls.add(recUrl);
           links.push({ title, url: recUrl });
           clickDetails[title] = { deadlineHint: dm ? dm[0].trim().slice(0, 80) : null, attachments: atts };
-          if (popup) await popup.close().catch(() => {});
-          else if (page.url() !== url) await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 }).catch(() => {});
-          else { await page.goBack({ waitUntil: 'domcontentloaded', timeout: 10000 }).catch(() => {}); }
+          if (!popup) {
+            if (page.url() !== url) await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 }).catch(() => {});
+            else await page.goBack({ waitUntil: 'domcontentloaded', timeout: 10000 }).catch(() => {});
+          }
           await page.waitForTimeout(1800);
           // 목록으로 못 돌아왔으면 강제로 다시 연다
           if (page.url() !== url) { await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 }).catch(() => {}); await page.waitForTimeout(1800); }
-        } catch { /* 행 하나 실패는 건너뜀 */ }
+        } catch { /* 행 하나 실패는 건너뜀 */ } finally {
+          // 성공했든 중간에 실패했든 이 행이 띄운 창은 여기서 닫는다
+          if (popup) await popup.close().catch(() => {});
+        }
       }
     }
     const html = await page.content();
@@ -454,7 +461,11 @@ if (failedTargets.length && failedTargets.length <= Math.max(1, Math.floor(cfg.t
 } else if (failedTargets.length && !budget.hasRoom(MIN_PER_TARGET_MS)) {
   report.push('### 🔁 실패 학교 재시도 — ⏱ 시간 예산이 없어 생략 (다음 실행에서 다시 시도)', '');
 }
-await browser.close();
+/* ⚠️ 여기서 브라우저를 닫지 않는다 (2026-08-08 사고로 옮김 — 맨 아래 '브라우저 닫기' 참조).
+   8/7~8/8 모든 실행이 학교 17곳을 12분 만에 다 돌고도 이 자리의 `browser.close()`에서
+   14분을 매달려 26분 단계 상한에 걸려 **죽었다**. 아래 저장이 전부 그 뒤에 있었기 때문에
+   그날 수집분(공고·seen 기록·리포트)이 통째로 버려졌다 — 이틀 내리 0건.
+   원칙: **모은 것을 먼저 디스크에 적고, 브라우저 정리는 마지막에 시간 제한을 걸어서 한다.** */
 
 /* 발행 병합 (일반 수집기와 동일 규칙) */
 notices.items = freshAll.concat(notices.items || []);
@@ -518,3 +529,15 @@ if (chronic.length) {
 fs.writeFileSync(new URL('browser-report.md', HERE), report.join('\n'));
 console.log(`browser-collect: ${freshAll.length} new items`);
 if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT, `new_count=${freshAll.length}\n`);
+
+/* ── 브라우저 닫기 (반드시 저장이 끝난 뒤 · 반드시 시간 제한과 함께) ──────────────
+   닫기는 '뒷정리'일 뿐인데, 여기서 매달리면 실행 전체가 상한에 걸려 죽는다.
+   실제로 2026-08-07 부산대(누르면 창이 뜨는 게시판)·서울교대 클릭 수집이 켜진 직후부터
+   매 실행이 이 줄에서 14분씩 멈췄다 — 열어 둔 팝업 창들이 정리되지 않아서다.
+   그래서 ① 저장을 먼저 끝내 놓고 ② 20초만 기다린 뒤 ③ 남아 있어도 그냥 끝낸다.
+   process.exit는 '아직 살아 있는 크롬 때문에 노드가 안 끝나는' 경우까지 확실히 끊는다. */
+await Promise.race([browser.close().catch(() => {}), sleep(20000)]);
+/* 20초를 기다린 뒤에도 크롬이 남아 노드가 안 끝나는 경우가 있다 — 그때만 강제로 끝낸다.
+   unref: 정상적으로 끝나는 실행에서는 이 타이머가 아무 일도 하지 않는다(먼저 그냥 끝난다).
+   0.5초를 두는 이유는 위 로그 한 줄이 잘리지 않고 나가도록 하기 위해서다. */
+setTimeout(() => process.exit(0), 500).unref();
