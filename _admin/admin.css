@@ -297,12 +297,17 @@ input[type="search"] { min-width: 190px; flex: 1 1 190px; }
 .pick input { width: 19px; height: 19px; accent-color: var(--navy); cursor: pointer; }
 .row-act { display: flex; justify-content: flex-end; }
 
-/* 선택 바 — 목록을 훑는 동안 늘 보이게 위에 붙여 둔다 */
+/* 선택 바 — **화면 아래에 고정**한다.
+   처음엔 `sticky; top:0`으로 위에 붙였는데, 헤더(.topbar)도 top:0에 z-index 20이라
+   스크롤하면 **선택 바가 헤더 뒤로 숨었다**(A단계에서 고친 .job과 같은 유형).
+   게다가 화면 안내 문구는 '화면 아래 바'라고 말하고 있어 말과 실제가 달랐다. */
 .selbar {
-  position: sticky; top: 0; z-index: 15;
+  position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 30;
+  max-width: 1148px; margin: 0 auto;
   display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
-  padding: 10px 14px; margin-bottom: 4px;
-  background: var(--navy-soft); border: 1px solid var(--navy); border-radius: 6px;
+  padding: 12px 14px;
+  background: var(--navy-soft); border: 1px solid var(--navy); border-radius: 8px;
+  box-shadow: var(--shadow);
 }
 .selbar-n { font-weight: 750; color: var(--navy); margin-right: 4px; }
 .selbar-sp { flex: 1 1 auto; }
@@ -358,6 +363,12 @@ td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space
   overflow-y: auto; padding: 18px 16px 40px;
   display: flex; flex-direction: column; gap: 14px;
 }
+/* 🔴 flex 세로 배치는 내용이 넘치면 **자식을 눌러 줄인다.**
+   그래서 안쪽에 스크롤이 있는 상자(.doc-preview·.scroller)만 스크롤되고
+   시트 자체는 넘치지 않아, **맨 아래 칸이 납작하게 눌려 보이지 않았다**
+   (2026-08-09 개발자 제보 — 양식 시트의 '이 양식을 쓰는 공고'를 볼 수 없었다).
+   자식을 줄이지 못하게 하면 내용이 넘치고, 그제야 시트가 스크롤된다. */
+.sheet > * { flex: 0 0 auto; }
 @media (min-width: 900px) {
   .sheet { inset: 0 0 0 auto; width: min(760px, 92vw); max-height: none; border-radius: 0;
            border-top: 0; border-left: 1px solid var(--rule); padding: 22px 24px 60px; }

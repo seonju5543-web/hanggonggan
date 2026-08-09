@@ -512,6 +512,51 @@ function serve() {
   ok(await page.evaluate(() => localStorage.getItem('handaejang.admin.theme')) === themeNext,
     '고른 밝기를 기억한다');
 
+  /* ⑮ 시트가 끝까지 스크롤되는가 (2026-08-09 개발자 제보)
+     flex 세로 배치는 내용이 넘치면 **자식을 눌러 줄인다**. 그래서 안쪽 스크롤 상자만
+     스크롤되고 시트는 넘치지 않아 **맨 아래 칸이 납작하게 눌려 보이지 않았다.** */
+  await page.click('.tab[data-tab="forms"]');
+  await page.waitForSelector('#screen-forms:not([hidden])');
+  const withUse = Object.keys(forms.templates).find((id) => reg.items.some((x) => x.formId === id));
+  if (withUse) {
+    await page.click(`#screen-forms tr[data-form="${withUse}"]`);
+    await page.waitForSelector('#sheet:not([hidden])');
+    const geom = await page.evaluate(() => {
+      const sh = document.querySelector('#sheet');
+      const last = sh.querySelector('.rows:last-of-type');
+      return {
+        scrollable: sh.scrollHeight > sh.clientHeight + 4,
+        lastH: last ? Math.round(last.getBoundingClientRect().height) : -1,
+      };
+    });
+    ok(geom.scrollable, '시트 내용이 넘치면 시트가 실제로 스크롤된다');
+    ok(geom.lastH > 20, '맨 아래 칸이 눌리지 않는다 (이 양식을 쓰는 공고)', `높이 ${geom.lastH}px`);
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(200);
+  } else {
+    ok(true, '시트 스크롤 — 연결된 공고가 있는 양식이 없어 건너뜀');
+  }
+
+  /* ⑯ 선택 바가 헤더 뒤로 숨지 않는가 — 위에 붙이면 sticky 헤더에 가려진다 */
+  await page.click('.tab[data-tab="review"]');
+  await page.waitForSelector('#screen-review:not([hidden])');
+  await page.click('[data-sel="urgent"]');
+  await page.waitForTimeout(250);
+  const barGeom = await page.evaluate(() => {
+    const bar = document.querySelector('.selbar');
+    if (!bar) return null;
+    const top = document.querySelector('.topbar').getBoundingClientRect();
+    const b = bar.getBoundingClientRect();
+    return { pos: getComputedStyle(bar).position, overlapsHeader: b.top < top.bottom, inView: b.bottom <= window.innerHeight + 2 };
+  });
+  ok(barGeom && barGeom.pos === 'fixed', '선택 바가 화면에 고정된다');
+  ok(barGeom && !barGeom.overlapsHeader, '선택 바가 헤더 뒤로 숨지 않는다');
+  ok(barGeom && barGeom.inView, '선택 바가 화면 안에 보인다');
+  /* 화면 안내 문구와 실제 위치가 어긋나면 안 된다 (예전엔 '아래'라 적고 위에 붙였다) */
+  ok(/화면 아래/.test(await page.textContent('#screen-review')), '안내 문구가 실제 위치와 맞다');
+  await page.click('[data-sel="none"]');
+  await page.waitForTimeout(200);
+
   /* 데이터 읽기 실패를 조용히 넘기지 않는가 (A1) — 없는 파일을 읽게 해 배너를 확인한다 */
   const failShown = await page.evaluate(async () => {
     const w = window.__admin;

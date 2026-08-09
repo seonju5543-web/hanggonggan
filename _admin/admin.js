@@ -927,7 +927,7 @@ function renderReview() {
         <button class="btn btn-sm" data-sel="urgent">마감 임박만 (${unrev.filter((it) => { const d = dday(it.deadline); return d != null && d >= 0 && d <= 7; }).length}건)</button>
         <button class="btn btn-sm" data-sel="clean">경고등 없는 것만 (${cleanIds().length}건)</button>
         <button class="btn btn-sm" data-sel="none">해제</button>
-        <span class="muted">고른 뒤 화면 아래 바에서 한 번에 처리합니다</span>
+        <span class="muted">고른 뒤 <b>화면 아래에 뜨는 바</b>에서 한 번에 처리합니다</span>
       </div>
       <div class="filter-row">
         <span class="lb">자동등록</span>
