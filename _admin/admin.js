@@ -119,6 +119,23 @@ let reportCache = {};
 /* ---------------- 밝게/어둡게 (B8) ----------------
    CSS에 `[data-theme]` 훅이 처음부터 있었는데 **아무도 값을 넣지 않아 죽어 있었다.**
    값을 안 넣으면 브라우저·운영체제 설정을 따른다(그게 기본이고, 그대로 두어도 된다). */
+/* 밀도 (B0-7) — 훑을 때와 검수할 때 필요한 밀도가 다르다 */
+const DENSITY_KEY = 'handaejang.admin.density';
+function currentDensity() {
+  try { return localStorage.getItem(DENSITY_KEY) === 'compact' ? 'compact' : 'cozy'; } catch { return 'cozy'; }
+}
+function applyDensity(v) {
+  document.documentElement.setAttribute('data-density', v);
+  const b = byId('btn-density');
+  if (b) { b.textContent = v === 'compact' ? '☰' : '≡'; b.title = `목록 밀도: ${v === 'compact' ? '촘촘하게' : '편안하게'} (눌러서 전환)`; }
+}
+function cycleDensity() {
+  const next = currentDensity() === 'compact' ? 'cozy' : 'compact';
+  try { localStorage.setItem(DENSITY_KEY, next); } catch { /* 저장 못 해도 이번 화면엔 적용된다 */ }
+  applyDensity(next);
+  toast(`목록 밀도: ${next === 'compact' ? '촘촘하게' : '편안하게'}`);
+}
+
 const THEME_KEY = 'handaejang.admin.theme';
 const THEME_ORDER = ['auto', 'light', 'dark'];
 const THEME_LABEL = { auto: '◐', light: '☀', dark: '☾' };
@@ -424,6 +441,29 @@ function renderScreen(name) {
   ({ todo: renderTodo, list: renderList, review: renderReview,
     forms: renderForms, network: renderNetwork, robots: renderRobots,
     quality: renderQuality }[name] || (() => {}))();
+  markScrollers(byId(`screen-${name}`));
+}
+
+/* 헤더 높이를 재서 CSS에 알려 준다 (B0-6).
+   구획 제목이 화면 위에 붙을 때 **헤더 아래**에 멈춰야 하는데, 헤더 높이는
+   글자 크기·화면 폭에 따라 달라져 CSS에 숫자로 박아 둘 수 없다. */
+function measureHead() {
+  const h = document.querySelector('.topbar');
+  if (h) document.documentElement.style.setProperty('--head-h', `${h.offsetHeight}px`);
+}
+
+/* 옆으로 밀어야 나머지 칸이 보이는 표에만 안내를 붙인다 (B0-10).
+   **실제로 넘칠 때만** 붙인다 — 안 넘치는데 "밀어 보세요"라고 하면 없는 칸을 찾게 된다. */
+function markScrollers(root) {
+  if (!root) return;
+  root.querySelectorAll('.scroll-hint').forEach((el) => el.remove());
+  root.querySelectorAll('.scroller').forEach((sc) => {
+    if (sc.scrollWidth <= sc.clientWidth + 4) return;
+    const p = document.createElement('p');
+    p.className = 'scroll-hint';
+    p.textContent = '↔ 표를 옆으로 밀면 나머지 칸이 보입니다';
+    sc.insertAdjacentElement('afterend', p);
+  });
 }
 
 /* 읽지 못한 데이터가 있으면 화면 맨 위에 붙인다.
@@ -439,6 +479,30 @@ function renderDataFail() {
     <ul>${D.failed.map((f) => `<li><code class="mono">${esc(f.path)}</code> — ${esc(f.why)}</li>`).join('')}</ul>
     <button class="btn btn-sm" id="datafail-retry">다시 읽기</button>`;
   byId('datafail-retry').addEventListener('click', () => byId('btn-reload').click());
+}
+
+/* ---------------- 다시 그릴 때 잃는 것 (B7) ----------------
+   필터를 한 번 누를 때마다 화면 전체를 새로 만들어 **스크롤 위치·초점·입력 중이던 글자**가
+   날아갔다. 166줄을 훑다가 칩 하나 눌렀는데 맨 위로 튀면 훑던 자리를 다시 찾아야 한다.
+   예전엔 검색칸만 손으로 초점·커서를 되살리고 있었는데(그 자체가 증상이었다),
+   여기서 한 번에 지킨다 — 새로 만드는 방식은 그대로 두고 '잃는 것'만 되돌린다. */
+function rerender(name = current) {
+  const y = window.scrollY;
+  const a = document.activeElement;
+  const keep = a && a.id ? { id: a.id, start: a.selectionStart, end: a.selectionEnd } : null;
+
+  renderScreen(name);
+
+  window.scrollTo(0, y);
+  if (keep) {
+    const el = byId(keep.id);
+    if (el) {
+      el.focus({ preventScroll: true });
+      if (keep.start != null && el.setSelectionRange) {
+        try { el.setSelectionRange(keep.start, keep.end); } catch { /* 형식상 못 하는 칸도 있다 */ }
+      }
+    }
+  }
 }
 
 function renderAll() {
@@ -650,7 +714,7 @@ async function bulkAction(kind) {
     </div>
     <p class="muted">${esc(meta.note)}</p>
     <div class="rows">${items.map((it) => rowHtml(it)).join('')}</div>
-    <div class="btn-row" style="margin-top:6px">
+    <div class="btn-row sheet-foot">
       <button class="btn ${meta.danger ? 'danger' : 'btn-primary'}" data-bulk-go="${esc(kind)}">
         ${esc(items.length)}건 ${esc(meta.label)}
       </button>
@@ -691,7 +755,7 @@ function askSheet({ title, note, lines = [], goLabel, danger = false, run }) {
           ${l.m ? `<div class="m"><span>${esc(l.m)}</span></div>` : ''}</div>
         <div></div><div></div>
       </div>`).join('')}</div>` : ''}
-    <div class="btn-row" style="margin-top:6px">
+    <div class="btn-row sheet-foot">
       <button class="btn ${danger ? 'danger' : 'btn-primary'}" data-ask-go>${esc(goLabel)}</button>
       <button class="btn" data-close>취소</button>
     </div>`);
@@ -846,9 +910,37 @@ function renderList() {
       </div>
     </details>
 
-    ${items.length ? `<div class="rows">${items.map(rowHtml).join('')}</div>`
+    ${items.length ? groupedRows(items)
     : '<p class="empty">조건에 맞는 공고가 없습니다.</p>'}
   `;
+}
+
+/* ---------------- 스캔 지점 (B0-6) ----------------
+   166줄이 똑같은 높이·색으로 이어지면 눈이 멈출 자리가 없어 '어디까지 봤는지'를 잃는다.
+   마감 임박순으로 볼 때만 기한 구획으로 나눈다 — 다른 정렬에서는 구획이 뜻을 잃는다. */
+const BUCKETS = [
+  { k: 'over', label: '마감 지남', test: (d) => d != null && d < 0 },
+  { k: 'now', label: '오늘·내일', test: (d) => d != null && d <= 1 },
+  { k: 'week', label: '이번 주 (7일 이내)', test: (d) => d != null && d <= 7 },
+  { k: 'month', label: '이번 달 (30일 이내)', test: (d) => d != null && d <= 30 },
+  { k: 'later', label: '그 뒤', test: (d) => d != null },
+  { k: 'none', label: '기한 미확인', test: () => true },
+];
+
+function groupedRows(items) {
+  if (F.sort !== 'deadline') return `<div class="rows">${items.map(rowHtml).join('')}</div>`;
+  const groups = new Map();
+  items.forEach((it) => {
+    const d = dday(it.deadline);
+    const b = BUCKETS.find((x) => x.test(d));
+    if (!groups.has(b.k)) groups.set(b.k, { label: b.label, list: [] });
+    groups.get(b.k).list.push(it);
+  });
+  return [...groups.values()].map((g) => `
+    <div class="group">
+      <h3 class="group-head">${esc(g.label)} <span class="group-n">${g.list.length}</span></h3>
+      <div class="rows">${g.list.map(rowHtml).join('')}</div>
+    </div>`).join('');
 }
 
 /* 수집됐지만 아직 등록하지 않은 공고 — '앞으로 무엇이 남아 있나'를 보는 곳.
@@ -1387,6 +1479,7 @@ function openSheet(html) {
   /* 초점을 시트 안으로 옮긴다. 안 그러면 읽어 주기가 뒤 화면을 계속 읽는다. */
   const first = sheet.querySelector('input, select, textarea, button, [href]');
   (first || sheet).focus({ preventScroll: true });
+  markScrollers(sheet);
 }
 
 function closeSheet() {
@@ -1493,12 +1586,12 @@ function registerSheet(n) {
       </div>
     </div>
 
-    <div class="btn-row">
+    <p class="muted">등록하면 검사를 통과해야만 저장됩니다 — 대출·대학원 전용·행사 같은 것은
+      <b>사람이 눌러도</b> 규칙이 막습니다.</p>
+    <div class="btn-row sheet-foot">
       <button class="btn btn-primary" data-reg-go="${esc(n.url)}">등록하기</button>
       <button class="btn" data-close>취소</button>
-    </div>
-    <p class="muted">등록하면 검사를 통과해야만 저장됩니다 — 대출·대학원 전용·행사 같은 것은
-      <b>사람이 눌러도</b> 규칙이 막습니다.</p>`;
+    </div>`;
 }
 
 let currentSheetItem = null;
@@ -1623,7 +1716,8 @@ function detailSheet(it) {
       </div>
     </div>
 
-    <div class="btn-row">
+    <p class="muted">저장을 누르면 검사를 거쳐 반영됩니다. 검사를 통과하지 못하면 아무것도 바뀌지 않습니다.</p>
+    <div class="btn-row sheet-foot">
       <button class="btn btn-primary" data-act="save" data-id="${esc(it.id)}">수정 내용 저장</button>
       ${st === 'unreviewed'
     ? `<button class="btn good" data-act="confirm" data-id="${esc(it.id)}">검수 완료로 컨펌</button>
@@ -1631,7 +1725,6 @@ function detailSheet(it) {
     : ''}
       <button class="btn danger" data-act="remove" data-id="${esc(it.id)}">등록 삭제</button>
     </div>
-    <p class="muted">저장을 누르면 검사를 거쳐 반영됩니다. 검사를 통과하지 못하면 아무것도 바뀌지 않습니다.</p>
   `;
 }
 
@@ -1778,14 +1871,14 @@ function bindGlobal() {
     if (frow) { openSheet(formSheet(frow.dataset.form)); return; }
 
     const f = e.target.closest('[data-f]');
-    if (f) { F[f.dataset.f] = f.dataset.v; renderList(); return; }
+    if (f) { F[f.dataset.f] = f.dataset.v; rerender('list'); return; }
 
     const so = e.target.closest('[data-sort]');
     if (so) {
       const k = so.dataset.sort;
       if (F.sort === k) F.dir = F.dir === 'asc' ? 'desc' : 'asc';
       else { F.sort = k; F.dir = SORTS[k].dir || 'asc'; }
-      renderList();
+      rerender('list');
       return;
     }
 
@@ -1794,7 +1887,7 @@ function bindGlobal() {
       const k = clr.dataset.clear;
       if (k === '*') Object.keys(FILTER_LABEL).forEach((x) => { F[x] = 'all'; });
       else F[k] = 'all';
-      renderList();
+      rerender('list');
       return;
     }
 
@@ -1918,7 +2011,7 @@ function bindGlobal() {
     if (mr) {
       const k = mr.dataset.more;
       MORE[k] = shown(k, Number(mr.dataset.base) || STEP) + STEP;
-      renderScreen(current);
+      rerender();
       return;
     }
 
@@ -1933,7 +2026,7 @@ function bindGlobal() {
         unrev.forEach((it) => { const d = dday(it.deadline); if (d != null && d >= 0 && d <= 7) SEL.add(it.id); });
       } else if (k === 'clean') cleanIds().forEach((id) => SEL.add(id));
       else { await bulkAction(k); return; }
-      renderReview();
+      rerender('review');
       return;
     }
   });
@@ -1968,18 +2061,16 @@ function bindGlobal() {
   }, true);
 
   byId('app').addEventListener('change', (e) => {
-    if (e.target.id === 'f-school') { F.school = e.target.value; renderList(); }
-    if (e.target.id === 'f-nature') { F.nature = e.target.value; renderList(); }
+    if (e.target.id === 'f-school') { F.school = e.target.value; rerender('list'); }
+    if (e.target.id === 'f-nature') { F.nature = e.target.value; rerender('list'); }
   });
   let qTimer = null;
   byId('app').addEventListener('input', (e) => {
     if (e.target.id !== 'f-q') return;
     clearTimeout(qTimer);
     const v = e.target.value;
-    qTimer = setTimeout(() => {
-      F.q = v; renderList();
-      const el = byId('f-q'); if (el) { el.focus(); el.setSelectionRange(v.length, v.length); }
-    }, 250);
+    /* 초점·커서 복구는 rerender가 한다 — 예전엔 이 칸만 손으로 되살리고 있었다 */
+    qTimer = setTimeout(() => { F.q = v; rerender('list'); }, 250);
   });
 
   /* 시트 */
@@ -2074,6 +2165,17 @@ function bindGlobal() {
   });
   byId('job-close').addEventListener('click', () => { byId('job').hidden = true; });
   byId('btn-theme').addEventListener('click', cycleTheme);
+  byId('btn-density').addEventListener('click', cycleDensity);
+
+  /* 화면 폭이 바뀌면 헤더 높이도 표가 넘치는지 여부도 달라진다 —
+     가로로 돌리거나 창을 줄였을 때 구획 제목이 헤더에 가리거나
+     안내가 남아 있는 일을 막는다. */
+  window.addEventListener('resize', () => {
+    measureHead();
+    markScrollers(byId(`screen-${current}`));
+    const sheet = byId('sheet');
+    if (sheet && !sheet.hidden) markScrollers(sheet);
+  });
 }
 
 async function runCollector(file, label) {
@@ -2134,6 +2236,7 @@ async function enter(key, remember) {
   byId('app').hidden = false;
   bindGlobal();
   renderAll();
+  measureHead();
 
   /* 읽어들인 데이터와 미리보기 함수를 한 곳에 노출한다 —
      검증 드라이버(verify/verify-admin.js)와 브라우저 콘솔에서 상태를 들여다볼 때 쓴다.
@@ -2144,6 +2247,7 @@ async function enter(key, remember) {
 
 function boot() {
   applyTheme(currentTheme());   // 열쇠 화면부터 적용한다
+  applyDensity(currentDensity());
   byId('gate-enter').addEventListener('click', () => {
     const k = byId('gate-key').value.trim();
     if (!k) { const m = byId('gate-msg'); m.hidden = false; m.className = 'gate-msg'; m.textContent = '열쇠를 넣어 주세요.'; return; }

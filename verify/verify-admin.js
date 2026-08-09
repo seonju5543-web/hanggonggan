@@ -636,6 +636,124 @@ function serve() {
   ok(/스키마 자체는 화면에서 만들지 않습니다/.test(await page.textContent('#screen-forms')),
     '스키마를 화면에서 만들지 않는 이유를 밝힌다');
 
+  /* ⑲ 다시 그릴 때 잃는 것 (B7) — 필터를 누르면 스크롤·입력 중이던 값이 날아갔다.
+        166줄을 훑다가 칩 하나 눌렀는데 맨 위로 튀면 훑던 자리를 다시 찾아야 한다. */
+  await page.click('.tab[data-tab="list"]');
+  await page.waitForSelector('#screen-list:not([hidden])');
+  await page.setViewportSize({ width: 420, height: 720 });
+  await page.evaluate(() => window.scrollTo(0, 900));
+  await page.waitForTimeout(60);
+  const beforeY = await page.evaluate(() => window.scrollY);
+  /* 🔴 Playwright의 click()은 누르기 전에 그 요소를 화면 안으로 **끌어온다** —
+     그러면 우리가 재려는 스크롤 위치를 검사 도구가 먼저 망가뜨린다.
+     실제 사용자는 이미 보이는 칩을 누르므로, 여기서는 끌어오지 않고 그대로 누른다. */
+  await page.evaluate(() => document.querySelector('#screen-list .chip[data-sort="listed"]').click());
+  await page.waitForTimeout(120);
+  const afterY = await page.evaluate(() => window.scrollY);
+  ok(beforeY > 300 && Math.abs(afterY - beforeY) < 60,
+    '정렬을 바꿔도 훑던 자리를 잃지 않는다', `${beforeY} → ${afterY}`);
+
+  /* 검색칸은 글자를 칠 때마다 다시 그려진다 — 초점과 커서 자리까지 지켜야 이어서 칠 수 있다 */
+  await page.fill('#f-q', '장학');
+  await page.waitForTimeout(400);
+  const caret = await page.evaluate(() => {
+    const el = document.querySelector('#f-q');
+    return { focused: document.activeElement === el, v: el.value, pos: el.selectionStart };
+  });
+  ok(caret.focused && caret.v === '장학' && caret.pos === 2,
+    '검색 중에 초점과 커서 자리가 유지된다', JSON.stringify(caret));
+  await page.fill('#f-q', '');
+  await page.waitForTimeout(400);
+
+  /* ⑳ 스캔 지점 (B0-6) — 마감 임박순일 때만 구획으로 나눈다 */
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.evaluate(() => document.querySelector('#screen-list .chip[data-sort="deadline"]').click());
+  await page.waitForTimeout(150);
+  if (await page.locator('#screen-list .chip[data-sort="deadline"].on .c').textContent() !== '↑') {
+    await page.evaluate(() => document.querySelector('#screen-list .chip[data-sort="deadline"]').click());
+    await page.waitForTimeout(150);
+  }
+  const groups = await page.locator('#screen-list .group-head').count();
+  ok(groups >= 2, '마감 임박순에서는 기한 구획으로 나뉜다', `${groups}구획`);
+  const grouped = await page.evaluate(() => {
+    const heads = [...document.querySelectorAll('#screen-list .group-head')];
+    const sum = [...document.querySelectorAll('#screen-list .group .rows')]
+      .reduce((a, b) => a + b.children.length, 0);
+    const all = document.querySelectorAll('#screen-list .row').length;
+    const sticky = heads[0] && getComputedStyle(heads[0]).position;
+    return { sum, all, sticky, labels: heads.map((h) => h.firstChild.textContent.trim()) };
+  });
+  ok(grouped.sum === grouped.all, '구획으로 나눠도 공고가 한 건도 사라지지 않는다',
+    `${grouped.sum}/${grouped.all}건`);
+  ok(grouped.sticky === 'sticky', '구획 제목은 스크롤 중에도 화면에 남는다', grouped.sticky);
+  await page.evaluate(() => document.querySelector('#screen-list .chip[data-sort="name"]').click());
+  await page.waitForTimeout(150);
+  ok(await page.locator('#screen-list .group-head').count() === 0,
+    '제목순에서는 구획을 만들지 않는다 (기한 구획이 뜻을 잃으므로)');
+
+  /* ㉑ 밀도 (B0-7) — 글자를 줄이지 않고 줄 간격만 줄인다 */
+  const dens = await page.evaluate(() => {
+    const row = document.querySelector('#screen-list .row');
+    const before = { pad: getComputedStyle(row).paddingTop,
+      font: getComputedStyle(row.querySelector('.t')).fontSize };
+    document.querySelector('#btn-density').click();
+    const after = { pad: getComputedStyle(row).paddingTop,
+      font: getComputedStyle(row.querySelector('.t')).fontSize,
+      saved: localStorage.getItem('handaejang.admin.density'),
+      attr: document.documentElement.getAttribute('data-density') };
+    return { before, after };
+  });
+  ok(parseFloat(dens.after.pad) < parseFloat(dens.before.pad),
+    '촘촘하게를 켜면 줄 간격이 실제로 줄어든다', `${dens.before.pad} → ${dens.after.pad}`);
+  ok(dens.after.font === dens.before.font,
+    '촘촘하게가 글자를 작게 만들지는 않는다 (대비·치수 규칙 유지)', dens.after.font);
+  ok(dens.after.saved === 'compact' && dens.after.attr === 'compact',
+    '고른 밀도가 기기에 남는다');
+  await page.evaluate(() => document.querySelector('#btn-density').click());
+  await page.waitForTimeout(100);
+
+  /* ㉒ 좁은 화면의 표 (B0-10) — 넘칠 때만 안내가 붙는다.
+        전 화면을 돌며 재는 이유: 한 화면만 보면 그 화면의 표가 안 넘칠 때
+        **안내가 한 번도 안 뜨는데도 검사는 통과**한다(뜻 없는 검사가 된다). */
+  const hints = {};
+  for (const n of ['todo', 'list', 'review', 'forms', 'network', 'robots', 'quality']) {
+    await page.click(`.tab[data-tab="${n}"]`);
+    await page.waitForTimeout(200);
+    hints[n] = await page.evaluate((s2) => [...document.querySelectorAll(`#screen-${s2} .scroller`)]
+      .map((sc) => ({ over: sc.scrollWidth > sc.clientWidth + 4,
+        hint: sc.nextElementSibling?.classList.contains('scroll-hint') || false })), n);
+  }
+  const flat = Object.values(hints).flat();
+  ok(flat.some((x) => x.over), '좁은 화면에서 실제로 넘치는 표가 있다 (검사가 헛돌지 않는다)',
+    `${flat.filter((x) => x.over).length}/${flat.length}개`);
+  ok(flat.length > 0 && flat.every((x) => x.over === x.hint),
+    '표가 넘칠 때만 옆으로 밀라고 안내한다 (안 넘치면 안 붙는다)',
+    JSON.stringify(hints));
+
+  /* ㉓ 시트 하단 바 (B0-11) — 저장 버튼이 스크롤에 묻히면 안 된다 */
+  await page.click('.tab[data-tab="list"]');
+  await page.waitForSelector('#screen-list:not([hidden])');
+  await page.locator('#screen-list .row').first().click();
+  await page.waitForSelector('#sheet:not([hidden])');
+  const foot = await page.evaluate(() => {
+    const f = document.querySelector('#sheet .sheet-foot');
+    if (!f) return null;
+    const sheet = document.querySelector('#sheet');
+    sheet.scrollTop = sheet.scrollHeight;      // 맨 아래
+    const atEnd = f.getBoundingClientRect();
+    sheet.scrollTop = 0;                        // 맨 위
+    const atTop = f.getBoundingClientRect();
+    return { pos: getComputedStyle(f).position, atTop: atTop.height,
+      visibleAtTop: atTop.bottom <= window.innerHeight + 1 && atTop.height > 0,
+      atEnd: atEnd.height };
+  });
+  ok(foot && foot.pos === 'sticky', '시트 아래 버튼 줄이 화면에 붙어 있다', foot?.pos);
+  ok(foot && foot.visibleAtTop && foot.atTop > 20,
+    '시트를 맨 위로 올려도 저장 버튼이 보인다', JSON.stringify(foot));
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(200);
+  await page.setViewportSize({ width: 1280, height: 900 });
+
   /* 데이터 읽기 실패를 조용히 넘기지 않는가 (A1) — 없는 파일을 읽게 해 배너를 확인한다 */
   const failShown = await page.evaluate(async () => {
     const w = window.__admin;

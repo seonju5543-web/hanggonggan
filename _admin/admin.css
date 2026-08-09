@@ -314,6 +314,26 @@ input[type="search"] { min-width: 190px; flex: 1 1 190px; }
 
 /* 잘린 목록 '더 보기' */
 .more { display: flex; align-items: center; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+
+/* ── 스캔 지점 (B0-6) ─────────────────────────
+   166줄이 똑같은 높이·색으로 이어지면 눈이 멈출 자리가 없어 '어디까지 봤는지'를 잃는다.
+   구획 제목을 목록 위에 붙여 두면 스크롤 중에도 지금 보는 구간이 계속 보인다.
+   .topbar(헤더)가 z-index 20이므로 그 아래(9)에 두어 **헤더를 덮지 않게** 한다. */
+.group + .group { margin-top: 16px; }
+.group-head {
+  position: sticky; top: var(--head-h, 0px); z-index: 9;
+  display: flex; align-items: center; gap: 8px;
+  font-size: .82rem; font-weight: 750; color: var(--ink-2);
+  background: var(--paper-2); border: 1px solid var(--rule);
+  border-radius: 5px 5px 0 0; border-bottom: 0;
+  padding: 8px 12px; margin-bottom: -1px;
+}
+.group-n {
+  font-family: var(--mono); font-size: .78rem; font-weight: 700;
+  color: var(--ink-2); background: var(--paper); border: 1px solid var(--rule-soft);
+  border-radius: 999px; padding: 1px 8px;
+}
+.group .rows { border-radius: 0 0 5px 5px; }
 /* 누를 수 있다는 표시 — cursor:pointer만으로는 손가락 화면에서 전혀 안 보인다 */
 .row::after { content: '›'; color: var(--ink-3); font-size: 1.2rem; line-height: 1; justify-self: end; }
 .row[data-noclick]::after { content: ''; }
@@ -343,8 +363,40 @@ input[type="search"] { min-width: 190px; flex: 1 1 190px; }
 .pill.warn       { background: var(--warn-bg); color: var(--warn); }
 .pill.info       { background: var(--navy-soft); color: var(--navy); }
 
+/* ── 밀도 (B0-7) ──────────────────────────────
+   훑을 때와 검수할 때 필요한 밀도가 다르다. '촘촘하게'는 한 화면에 들어오는 줄 수를 늘리는
+   것이 목적이므로 **줄 간격만** 줄인다 — 글자 크기·색은 그대로 둔다(작게 만들면 B0의
+   대비·치수 규칙이 깨진다). 터치 목표 40px가 걸린 것(.pick·버튼)도 건드리지 않는다. */
+:root[data-density="compact"] .row { padding: 8px 12px; gap: 3px; }
+:root[data-density="compact"] .rows { gap: 0; }
+:root[data-density="compact"] .row .m { gap: 2px 10px; }
+:root[data-density="compact"] .group + .group { margin-top: 10px; }
+:root[data-density="compact"] .group-head { padding: 6px 12px; }
+:root[data-density="compact"] th,
+:root[data-density="compact"] td { padding: 6px 10px; }
+:root[data-density="compact"] .card { padding: 12px 14px; }
+
 /* ── 표 ──────────────────────────────────────── */
-.scroller { overflow-x: auto; border: 1px solid var(--rule-soft); border-radius: 5px; }
+/* 좁은 화면에서 표는 옆으로 밀어야 나머지 칸이 보이는데, 그 사실이 화면에 드러나지 않아
+   **오른쪽 칸이 아예 없는 것처럼 보였다**(B0-10). 두 가지로 알린다:
+   ① 밀 수 있는 방향에만 나타나는 그림자(순수 CSS — 끝까지 밀면 저절로 사라진다)
+   ② 실제로 넘칠 때만 붙는 안내 한 줄(JS가 재어 보고 붙인다 — 안 넘치면 안 붙는다) */
+.scroller {
+  overflow-x: auto; border: 1px solid var(--rule-soft); border-radius: 5px;
+  background:
+    linear-gradient(to right, var(--paper) 30%, rgba(255,255,255,0)) left center,
+    linear-gradient(to left,  var(--paper) 30%, rgba(255,255,255,0)) right center,
+    radial-gradient(farthest-side at 0 50%, rgba(25,29,40,.20), rgba(25,29,40,0)) left center,
+    radial-gradient(farthest-side at 100% 50%, rgba(25,29,40,.20), rgba(25,29,40,0)) right center;
+  background-repeat: no-repeat;
+  background-size: 36px 100%, 36px 100%, 12px 100%, 12px 100%;
+  /* local = 내용과 함께 움직인다(가려 주는 흰 판) · scroll = 제자리(그림자) */
+  background-attachment: local, local, scroll, scroll;
+}
+.scroll-hint {
+  font-size: .8rem; color: var(--ink-2); margin-top: 6px;
+  display: flex; align-items: center; gap: 6px;
+}
 table { border-collapse: collapse; width: 100%; font-size: .9rem; background: var(--paper); }
 th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--rule-soft); vertical-align: top; }
 /* `text-transform:uppercase`와 넓은 자간을 뺐다 — **한글에 대문자 변환은 효과가 없고**
@@ -373,6 +425,17 @@ td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space
   .sheet { inset: 0 0 0 auto; width: min(760px, 92vw); max-height: none; border-radius: 0;
            border-top: 0; border-left: 1px solid var(--rule); padding: 22px 24px 60px; }
 }
+/* 시트 하단 고정 바 (B0-11) — 저장·컨펌 버튼이 스크롤에 묻히면
+   긴 시트에서는 **끝까지 내려야만** 저장할 수 있다는 뜻이 된다.
+   sticky는 시트가 스크롤될 때만 붙으므로, 짧은 시트에서는 평소 모습 그대로다.
+   좌우 여백을 음수 마진으로 밀어내야 아래로 지나가는 내용이 배경에 가려진다. */
+.sheet-foot {
+  position: sticky; bottom: 0; z-index: 2;
+  margin: 0 -16px; padding: 12px 16px;
+  background: var(--paper); border-top: 1px solid var(--rule-soft);
+}
+@media (min-width: 900px) { .sheet-foot { margin: 0 -24px; padding: 14px 24px; } }
+
 .sheet-head { display: flex; gap: 12px; align-items: flex-start; }
 .sheet-head h3 { font-size: 1.05rem; flex: 1; }
 .sheet-close { border: 0; background: none; font-size: 1.5rem; line-height: 1; cursor: pointer; color: var(--ink-3); }
