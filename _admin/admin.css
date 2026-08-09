@@ -289,7 +289,26 @@ input[type="search"] { min-width: 190px; flex: 1 1 190px; }
 .row:active { background: var(--paper-3); }
 @media (min-width: 780px) {
   .row { grid-template-columns: 1fr 8.5rem 6rem 1rem; gap: 14px; align-items: center; }
+  .row.has-pick { grid-template-columns: 1.75rem 1fr 8.5rem 6rem 5rem 1rem; }
 }
+/* 선택 네모 — 손가락으로 눌러야 하므로 눌리는 면적을 크게 잡는다 */
+.pick { display: inline-flex; align-items: center; justify-content: center;
+        min-width: 40px; min-height: 40px; margin: -8px 0 -8px -8px; cursor: pointer; }
+.pick input { width: 19px; height: 19px; accent-color: var(--navy); cursor: pointer; }
+.row-act { display: flex; justify-content: flex-end; }
+
+/* 선택 바 — 목록을 훑는 동안 늘 보이게 위에 붙여 둔다 */
+.selbar {
+  position: sticky; top: 0; z-index: 15;
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+  padding: 10px 14px; margin-bottom: 4px;
+  background: var(--navy-soft); border: 1px solid var(--navy); border-radius: 6px;
+}
+.selbar-n { font-weight: 750; color: var(--navy); margin-right: 4px; }
+.selbar-sp { flex: 1 1 auto; }
+
+/* 잘린 목록 '더 보기' */
+.more { display: flex; align-items: center; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
 /* 누를 수 있다는 표시 — cursor:pointer만으로는 손가락 화면에서 전혀 안 보인다 */
 .row::after { content: '›'; color: var(--ink-3); font-size: 1.2rem; line-height: 1; justify-self: end; }
 .row[data-noclick]::after { content: ''; }

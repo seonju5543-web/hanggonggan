@@ -523,13 +523,55 @@ function renderTodo() {
   `;
 }
 
+/* ---------------- 다중 선택 ----------------
+   저장소 쪽은 이미 여러 건을 받는다(`admin-apply.mjs`의 confirm·revert·remove가
+   `payload.ids` 배열을 순회한다). 화면이 한 건씩만 보내고 있었을 뿐이다. */
+const SEL = new Set();
+
+function selClear() { SEL.clear(); }
+function selRows() { return D.reg.filter((it) => SEL.has(it.id)); }
+
+/* 선택은 '지금 화면에 보이는 것'만 유지한다 — 필터를 바꾼 뒤
+   보이지도 않는 공고가 선택된 채 남아 있으면 '선택 12건'이 무엇인지 알 수 없다. */
+function selKeepOnly(visibleIds) {
+  const keep = new Set(visibleIds);
+  [...SEL].forEach((id) => { if (!keep.has(id)) SEL.delete(id); });
+}
+
+/* ---------------- 잘린 목록 '더 보기' (B1) ----------------
+   예전엔 목록마다 앞의 N건에서 **말없이 잘렸다** — 등록 후보 268건 중 80건,
+   죽은 링크 256건 중 60건은 화면에서 도달할 방법이 아예 없었다.
+   지금은 얼마나 남았는지 밝히고 눌러서 더 볼 수 있다. */
+const MORE = {};                       // 목록별로 지금 몇 건까지 보여 주는가
+const STEP = 50;
+function shown(key, base = STEP) { return MORE[key] || base; }
+function moreBtn(key, total, base = STEP) {
+  const now = shown(key, base);
+  if (total <= now) return '';
+  const rest = total - now;
+  return `<p class="more"><button class="btn btn-sm" data-more="${esc(key)}" data-base="${base}">
+    ${Math.min(STEP, rest)}건 더 보기</button>
+    <span class="muted">${now}/${total}건 표시 중 · ${rest}건 남음</span></p>`;
+}
+
+/* 경고등도 규칙 위반도 없는 검수 전 공고 — '한꺼번에 컨펌'의 안전한 대상 */
+function cleanIds() {
+  const fi = formIdSet();
+  return D.reg.filter((it) => statusOf(it) === 'unreviewed'
+    && !badgesOf(it, fi).length && !problemsOf(it, fi).length).map((it) => it.id);
+}
+
 /* ---------------- 목록 한 줄 ---------------- */
-function rowHtml(it) {
+function rowHtml(it, opt = {}) {
   const fi = formIdSet();
   const st = statusOf(it);
   const badges = badgesOf(it, fi);
+  const pick = opt.pick
+    ? `<label class="pick" title="선택"><input type="checkbox" data-pick="${esc(it.id)}"${SEL.has(it.id) ? ' checked' : ''} /></label>`
+    : '';
   return `
-    <div class="row" data-id="${esc(it.id)}">
+    <div class="row${opt.pick ? ' has-pick' : ''}" data-id="${esc(it.id)}">
+      ${pick}
       <div>
         <div class="t">${esc(it.name)}</div>
         <div class="m">
@@ -541,6 +583,66 @@ function rowHtml(it) {
       </div>
       <div><span class="pill ${st}">${STATUS_LABEL[st]}</span></div>
       <div>${ddayHtml(it)}</div>
+      ${opt.act ? `<div class="row-act"><button class="btn btn-sm btn-primary" data-quick-confirm="${esc(it.id)}">컨펌</button></div>` : ''}
+    </div>`;
+}
+
+/* 여러 건 처리 — **무엇을 처리하는지 목록으로 보여 준 뒤** 확인받는다.
+   삭제·되돌리기는 git 말고는 되돌릴 방법이 없으므로 "N건 처리할까요?"만 묻는 것으로는 부족하다.
+   예전 '문제 없는 것 한꺼번에 컨펌'이 딱 그 방식이었다 — 몇 건인지만 알려 주고 무엇인지는 안 보여 줬다. */
+const BULK = {
+  confirm: { label: '검수 완료로', verb: '검수 완료로 표시', danger: false,
+    note: "'검수 전' 배지가 사라지고 학생 앱에 정식 등록으로 보입니다." },
+  revert: { label: '되돌리기', verb: '등록에서 빼고 재등록 차단', danger: true,
+    note: '등록에서 빠지고, 수집 로봇이 다시 등록하지 않도록 차단 목록에 올라갑니다.' },
+  remove: { label: '등록 삭제', verb: '등록에서 삭제', danger: true,
+    note: '등록에서 지웁니다. 차단은 하지 않으므로 로봇이 다시 등록할 수 있습니다.' },
+};
+
+async function bulkAction(kind) {
+  const meta = BULK[kind];
+  if (!meta) return;
+  const items = selRows();
+  if (!items.length) { toast('선택된 공고가 없습니다'); return; }
+
+  openSheet(`
+    <div class="sheet-head">
+      <h3>${esc(items.length)}건을 ${esc(meta.verb)}</h3>
+      <button class="sheet-close" data-close aria-label="닫기">×</button>
+    </div>
+    <p class="muted">${esc(meta.note)}</p>
+    <div class="rows">${items.map((it) => rowHtml(it)).join('')}</div>
+    <div class="btn-row" style="margin-top:6px">
+      <button class="btn ${meta.danger ? 'danger' : 'btn-primary'}" data-bulk-go="${esc(kind)}">
+        ${esc(items.length)}건 ${esc(meta.label)}
+      </button>
+      <button class="btn" data-close>취소</button>
+    </div>`);
+}
+
+/* 선택 바만 갈아 끼운다 — 체크할 때마다 목록 전체를 다시 그리면
+   스크롤이 맨 위로 튀어 87건을 훑으며 고를 수가 없다 */
+function refreshSelBar() {
+  const scr = byId('screen-review');
+  if (!scr) return;
+  const cur = scr.querySelector('.selbar');
+  const html = selBarHtml();
+  if (cur && html) cur.outerHTML = html;
+  else if (cur) cur.remove();
+  else if (html) scr.insertAdjacentHTML('afterbegin', html);
+}
+
+/* 화면 아래 선택 바 — 몇 건 골랐는지와 할 수 있는 일을 항상 보이게 둔다 */
+function selBarHtml() {
+  if (!SEL.size) return '';
+  return `
+    <div class="selbar" role="region" aria-label="선택한 공고 처리">
+      <span class="selbar-n">선택 ${SEL.size}건</span>
+      <button class="btn btn-sm" data-sel="none">선택 해제</button>
+      <span class="selbar-sp"></span>
+      <button class="btn btn-sm btn-primary" data-sel="confirm">검수 완료로</button>
+      <button class="btn btn-sm danger" data-sel="revert">되돌리기(재등록 차단)</button>
+      <button class="btn btn-sm danger" data-sel="remove">등록 삭제</button>
     </div>`;
 }
 
@@ -686,13 +788,14 @@ function unregHtml() {
       <p>로봇이 게시판에서 가져왔지만 정식 등록에는 들어가지 않은 것들입니다.
          원문을 열어 보고 등록할 만한 것이 있으면 알려 주세요 — 등록 버튼은 다음 단계에 붙습니다.</p>
     </div>
-    ${cand.length ? `<div class="rows">${cand.slice(0, 80).map(row).join('')}</div>`
+    ${cand.length ? `<div class="rows">${cand.slice(0, shown('cand', 80)).map(row).join('')}</div>`
     : '<p class="empty">등록 후보가 없습니다.</p>'}
-    ${cand.length > 80 ? `<p class="muted">앞의 80건만 보입니다 (전체 ${cand.length}건).</p>` : ''}
+    ${moreBtn('cand', cand.length, 80)}
 
     ${skipped.length ? `<details style="margin-top:8px">
       <summary class="muted" style="cursor:pointer">등록 대상이 아닌 것 ${skipped.length}건 — 대출·대학원·파일명 등 (펼쳐 보기)</summary>
-      <div class="rows" style="margin-top:8px">${skipped.slice(0, 60).map(row).join('')}</div>
+      <div class="rows" style="margin-top:8px">${skipped.slice(0, shown('skip', 60)).map(row).join('')}</div>
+      ${moreBtn('skip', skipped.length, 60)}
       <p class="muted">규칙이 잘못 걸렀다고 보이면 알려 주세요 — 규칙은 <code class="mono">verify/entry-rules.cjs</code> 한 곳에 있습니다.</p>
     </details>` : ''}
   `;
@@ -709,8 +812,10 @@ function renderReview() {
       return da - db;
     });
   const dups = duplicatePairs();
+  selKeepOnly(unrev.map((it) => it.id));   // 처리된 공고가 선택에 남아 있지 않게
 
   byId('screen-review').innerHTML = `
+    ${selBarHtml()}
     <div class="sec-head">
       <h2>컨펌 작업대</h2>
       <p>왼쪽에 앱1에 나갈 내용, 오른쪽에 공고 원문을 나란히 놓고 확인합니다.
@@ -719,9 +824,12 @@ function renderReview() {
 
     <div class="filters">
       <div class="filter-row">
-        <span class="lb">일괄</span>
-        <button class="btn btn-sm" id="btn-confirm-clean">문제 없는 것 한꺼번에 컨펌</button>
-        <span class="muted">경고등이 하나도 없는 검수 전 공고만 대상입니다</span>
+        <span class="lb">선택</span>
+        <button class="btn btn-sm" data-sel="all">전체 선택 (${unrev.length}건)</button>
+        <button class="btn btn-sm" data-sel="urgent">마감 임박만 (${unrev.filter((it) => { const d = dday(it.deadline); return d != null && d >= 0 && d <= 7; }).length}건)</button>
+        <button class="btn btn-sm" data-sel="clean">경고등 없는 것만 (${cleanIds().length}건)</button>
+        <button class="btn btn-sm" data-sel="none">해제</button>
+        <span class="muted">고른 뒤 화면 아래 바에서 한 번에 처리합니다</span>
       </div>
       <div class="filter-row">
         <span class="lb">자동등록</span>
@@ -732,7 +840,7 @@ function renderReview() {
       </div>
     </div>
 
-    ${unrev.length ? `<div class="rows">${unrev.map(rowHtml).join('')}</div>`
+    ${unrev.length ? `<div class="rows">${unrev.map((it) => rowHtml(it, { pick: true, act: true })).join('')}</div>`
     : '<p class="empty">검수 전 공고가 없습니다. 모두 확인되었습니다.</p>'}
 
     ${unregHtml()}
@@ -965,12 +1073,13 @@ function renderQuality() {
       <div class="sec-head" style="margin-top:12px"><h2>원문 링크 실패 ${dead.length}건</h2></div>
       <div class="scroller"><table>
         <thead><tr><th>공고</th><th>사유</th><th class="n">시도</th><th class="n">마지막 시도</th></tr></thead>
-        <tbody>${dead.slice(0, 60).map((d) => `<tr>
+        <tbody>${dead.slice(0, shown('dead', 60)).map((d) => `<tr>
           <td>${esc(d.title || d.key.slice(0, 70))}</td>
           <td>${esc(d.lastWhy || '')}</td>
           <td class="n">${d.attempts || 0}</td>
           <td class="n">${esc(d.lastTried || '')}</td></tr>`).join('')}</tbody>
-      </table></div>` : ''}
+      </table></div>
+      ${moreBtn('dead', dead.length, 60)}` : ''}
 
     <div class="sec-head" style="margin-top:12px">
       <h2>변경 이력</h2>
@@ -978,12 +1087,13 @@ function renderQuality() {
     </div>
     ${D.log.length ? `<div class="scroller"><table>
       <thead><tr><th class="n">시각 (KST)</th><th>사람</th><th>한 일</th><th>대상</th></tr></thead>
-      <tbody>${D.log.slice(0, 100).map((l) => `<tr>
+      <tbody>${D.log.slice(0, shown('log', 100)).map((l) => `<tr>
         <td class="n">${esc(l.at || '')}</td>
         <td>${esc(l.by || '')}</td>
         <td>${esc(l.action || '')}</td>
         <td>${esc(l.detail || '')}</td></tr>`).join('')}</tbody>
-    </table></div>` : '<p class="empty">아직 변경 이력이 없습니다.</p>'}
+    </table></div>
+    ${moreBtn('log', D.log.length, 100)}` : '<p class="empty">아직 변경 이력이 없습니다.</p>'}
   `;
 }
 
@@ -1199,6 +1309,15 @@ function bindGlobal() {
     const go = e.target.closest('[data-go]');
     if (go) { show(go.dataset.go); return; }
 
+    /* 체크박스는 상세를 열지 않는다 — 줄을 누르면 상세, 네모를 누르면 선택 */
+    const pick = e.target.closest('[data-pick]');
+    if (pick) {
+      e.stopPropagation();
+      if (pick.checked) SEL.add(pick.dataset.pick); else SEL.delete(pick.dataset.pick);
+      refreshSelBar();          // 목록 전체를 다시 그리지 않는다(스크롤 위치가 날아간다)
+      return;
+    }
+
     const row = e.target.closest('.row[data-id]');
     if (row) {
       const it = D.reg.find((x) => x.id === row.dataset.id);
@@ -1264,13 +1383,35 @@ function bindGlobal() {
       await applyAction('autoRegister', { enabled: next }, next ? '자동 등록 켜기' : '자동 등록 끄기');
       return;
     }
-    if (e.target.closest('#btn-confirm-clean')) {
-      const fi = formIdSet();
-      const ids = D.reg.filter((it) => statusOf(it) === 'unreviewed'
-        && !badgesOf(it, fi).length && !problemsOf(it, fi).length).map((it) => it.id);
-      if (!ids.length) { toast('경고등 없는 검수 전 공고가 없습니다'); return; }
-      if (!confirm(`${ids.length}건을 한꺼번에 검수 완료로 표시합니다. 계속할까요?`)) return;
-      await applyAction('confirm', { ids }, `일괄 컨펌 ${ids.length}건`);
+    /* 행에서 바로 컨펌 — 문제 없는 공고까지 시트를 열었다 닫을 이유가 없다 */
+    const qc = e.target.closest('[data-quick-confirm]');
+    if (qc) {
+      e.stopPropagation();
+      await applyAction('confirm', { ids: [qc.dataset.quickConfirm] }, '컨펌');
+      return;
+    }
+
+    /* 잘린 목록 더 보기 */
+    const mr = e.target.closest('[data-more]');
+    if (mr) {
+      const k = mr.dataset.more;
+      MORE[k] = shown(k, Number(mr.dataset.base) || STEP) + STEP;
+      renderScreen(current);
+      return;
+    }
+
+    /* 선택 묶음 만들기 */
+    const sel = e.target.closest('[data-sel]');
+    if (sel) {
+      const k = sel.dataset.sel;
+      const unrev = D.reg.filter((it) => statusOf(it) === 'unreviewed');
+      if (k === 'none') selClear();
+      else if (k === 'all') unrev.forEach((it) => SEL.add(it.id));
+      else if (k === 'urgent') {
+        unrev.forEach((it) => { const d = dday(it.deadline); if (d != null && d >= 0 && d <= 7) SEL.add(it.id); });
+      } else if (k === 'clean') cleanIds().forEach((id) => SEL.add(id));
+      else { await bulkAction(k); return; }
+      renderReview();
       return;
     }
   });
@@ -1301,6 +1442,17 @@ function bindGlobal() {
   /* 시트 */
   byId('sheet').addEventListener('click', async (e) => {
     if (e.target.closest('[data-close]')) { closeSheet(); return; }
+
+    /* 확인 화면에서 실제로 실행 — 여기까지 와야 데이터가 바뀐다 */
+    const bg = e.target.closest('[data-bulk-go]');
+    if (bg) {
+      const kind = bg.dataset.bulkGo;
+      const ids = [...SEL];
+      closeSheet();
+      selClear();
+      await applyAction(kind, { ids }, `${BULK[kind].label} ${ids.length}건`);
+      return;
+    }
 
     const row = e.target.closest('.row[data-id]');
     if (row) {

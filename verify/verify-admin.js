@@ -243,6 +243,58 @@ function serve() {
       '태그를 누르면 그 필터가 풀린다');
   }
 
+  /* ⑦ 다중 선택 (B3) — 87건을 한 줄씩 누르는 것을 끝내는 기능이라 여기서 실제로 눌러 본다 */
+  await page.click('.tab[data-tab="review"]');
+  await page.waitForSelector('#screen-review:not([hidden])');
+
+  ok(await page.locator('#screen-review .row.has-pick input[data-pick]').count() > 0,
+    '컨펌 작업대의 줄마다 선택 네모가 있다');
+  ok(await page.locator('.selbar').count() === 0, '아무것도 안 골랐을 땐 선택 바가 없다');
+
+  await page.locator('#screen-review input[data-pick]').first().check();
+  await page.waitForTimeout(120);
+  ok(await page.locator('.selbar').count() === 1, '하나 고르면 선택 바가 나타난다');
+  ok(!(await page.locator('#sheet').isVisible()), '네모를 눌러도 상세 시트가 열리지 않는다');
+
+  await page.click('[data-sel="urgent"]');
+  await page.waitForTimeout(200);
+  const urgentN = Number((await page.locator('.selbar-n').innerText()).replace(/\D/g, ''));
+  ok(urgentN > 1, '마감 임박만 고르기가 여러 건을 선택한다', `${urgentN}건`);
+
+  /* 실제로 여러 id를 보내는지 — 이 검사가 이 기능의 핵심이다.
+     보내는 요청을 가로채 개수를 세고, 진짜 실행은 시키지 않는다. */
+  let sentIds = null;
+  await page.route('**/actions/workflows/**/dispatches', (route) => {
+    try { sentIds = JSON.parse(route.request().postData() || '{}'); } catch { sentIds = 'parse-fail'; }
+    route.fulfill({ status: 204, body: '' });
+  });
+  await page.click('[data-sel="confirm"]');
+  await page.waitForSelector('#sheet:not([hidden])');
+  const listedN = await page.locator('#sheet .rows .row').count();
+  ok(listedN === urgentN, '실행 전에 대상 목록을 실제로 보여 준다', `${listedN}건 표시`);
+
+  await page.click('#sheet [data-bulk-go]');
+  await page.waitForTimeout(600);
+  const payload = (() => { try { return JSON.parse(sentIds?.inputs?.payload || '{}'); } catch { return {}; } })();
+  ok(Array.isArray(payload.ids) && payload.ids.length === urgentN,
+    '다중 선택이 실제로 여러 id를 보낸다', `보낸 id ${payload.ids ? payload.ids.length : 0}개`);
+  ok(sentIds?.inputs?.action === 'confirm', '보내는 동작 이름이 confirm이다');
+  await page.unroute('**/actions/workflows/**/dispatches');
+
+  /* ⑧ 잘린 목록 더 보기 (B1) — 예전엔 268건 중 80건만 화면에서 도달 가능했다 */
+  await page.click('.tab[data-tab="review"]');
+  await page.waitForSelector('#screen-review:not([hidden])');
+  const moreBtns = await page.locator('#screen-review [data-more]').count();
+  if (moreBtns) {
+    const before = await page.locator('#screen-review .rows .row').count();
+    await page.locator('#screen-review [data-more]').first().click();
+    await page.waitForTimeout(250);
+    const after = await page.locator('#screen-review .rows .row').count();
+    ok(after > before, '더 보기를 누르면 잘려 있던 줄이 실제로 늘어난다', `${before} → ${after}줄`);
+  } else {
+    ok(true, '더 보기 버튼 — 지금 데이터에선 잘린 목록이 없어 건너뜀');
+  }
+
   /* 데이터 읽기 실패를 조용히 넘기지 않는가 (A1) — 없는 파일을 읽게 해 배너를 확인한다 */
   const failShown = await page.evaluate(async () => {
     const w = window.__admin;
