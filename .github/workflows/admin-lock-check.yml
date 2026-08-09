@@ -1,0 +1,159 @@
+name: 관리자 화면 잠금 확인
+
+# 관리자 화면(Cloudflare Pages)이 **정말 잠겨 있는지** 바깥에서 확인하는 버튼.
+#
+# 왜 필요한가 (2026-08-09 신설):
+#   · Claude 실행 환경은 pages.dev 접속이 막혀 있어(프록시 403) 직접 확인할 수 없다.
+#   · Cloudflare Access는 설정 화면에서 '만들어진 것처럼' 보여도 **호스트 이름이 어긋나면
+#     실제 주소는 열린 채로 남는다.** 설정 화면을 보는 것으로는 증명이 안 된다.
+#   · 이 저장소는 공개라서, 잠기지 않으면 주소를 아는 사람이 등록 공고 전체를 들여다볼 수 있다
+#     (`_admin/admin.js`의 열쇠 확인은 `GET /repos/OWNER/REPO`가 200이면 통과하는데,
+#      공개 저장소는 **누구의 GitHub 토큰으로도 200**이다).
+#   → 그래서 '눌러서 실제로 열어 보는' 검사만이 증명이다. 푸시 알림 검사 버튼과 같은 계열.
+#
+# 판정 방법: 로그인하지 않은 채로 주소를 열고 **따라가지 않은 첫 응답**을 본다.
+#   · 302/303 → cloudflareaccess.com 또는 /cdn-cgi/access/login  … ✅ 잠김
+#   · 200 + 관리자 화면 HTML                                      … 🔴 안 잠김
+#
+# 실행: Actions 탭 → '관리자 화면 잠금 확인' → Run workflow
+#       자동: 매일 14:23 KST (잠근 뒤 조용히 풀리는 것을 막는다)
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: '확인할 주소 (비우면 hanggonggan-admin.pages.dev)'
+        required: false
+        default: ''
+  schedule:
+    - cron: '23 5 * * *'   # 14:23 KST
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: 잠겼는지 열어 본다
+        id: probe
+        env:
+          IN_URL: ${{ inputs.url }}
+        run: |
+          BASE="${IN_URL:-https://hanggonggan-admin.pages.dev}"
+          BASE="${BASE%/}"
+          echo "확인 대상: $BASE"
+          echo
+
+          # 판정은 **셋**이다: 열림 / 잠김 / 판정 불가.
+          # '못 읽음'을 '괜찮음'으로 단정하면 안 된다 — 접속이 안 될 때 "✅ 잠겼습니다"라고
+          # 말해 버리는 것이 이 저장소가 동국대 링크 판정에서 이미 한 번 저지른 실수다.
+          open=0; sure=0; total=0
+          for p in "/" "/index.html" "/admin.js"; do
+            total=$((total+1))
+            # -o /dev/null 대신 본문을 받아 둔다 — 200일 때 '진짜 관리자 화면인지' 봐야 한다.
+            # 리다이렉트는 따라가지 않는다(-L 금지): 따라가면 로그인 화면이 200으로 보여 헷갈린다.
+            code=$(curl -s -o /tmp/body -D /tmp/head -w '%{http_code}' --max-time 25 "$BASE$p" || echo 000)
+            loc=$(grep -i '^location:' /tmp/head | head -1 | tr -d '\r' | cut -d' ' -f2- || true)
+            echo "$p → HTTP $code${loc:+  →  $loc}"
+
+            case "$code" in
+              200)
+                if grep -qE '한대장 관리자|gate-key|admin\.css' /tmp/body; then
+                  echo "   🔴 로그인 없이 관리자 화면이 그대로 열립니다."
+                  open=1
+                else
+                  echo "   (200이지만 관리자 화면은 아닙니다 — 판정에서 제외)"
+                fi
+                ;;
+              301|302|303|307|308)
+                if echo "$loc" | grep -qiE 'cloudflareaccess\.com|/cdn-cgi/access/login'; then
+                  echo "   ✅ Cloudflare Access 로그인으로 보냅니다."
+                  sure=$((sure+1))
+                else
+                  echo "   ⚠️ Access가 아닌 곳으로 보냅니다 — 사람이 한 번 봐야 합니다."
+                fi
+                ;;
+              000)
+                echo "   ⚠️ 접속하지 못했습니다(주소가 아직 없거나 일시 장애). 판정 불가."
+                ;;
+              *)
+                echo "   ⚠️ 예상 밖 응답입니다. 판정 불가."
+                ;;
+            esac
+          done
+
+          echo
+          if [ "$open" = "1" ]; then
+            verdict=open
+            echo "::error::관리자 화면이 잠기지 않았습니다 — 주소를 아는 사람이 볼 수 있습니다."
+            echo "🔴 결론: 아직 잠기지 않았습니다."
+          elif [ "$sure" = "$total" ]; then
+            verdict=locked
+            echo "✅ 결론: 로그인 없이는 관리자 화면이 열리지 않습니다."
+          else
+            verdict=unknown
+            echo "⚠️ 결론: 판정할 수 없습니다 ($total개 중 확실히 잠긴 것 $sure개)."
+            echo "   접속이 안 됐거나 예상 밖 응답이 섞여 있습니다."
+            echo "   **잠겼다는 뜻이 아닙니다** — 잠시 뒤 다시 실행해 주세요."
+          fi
+          echo "verdict=$verdict" >> "$GITHUB_OUTPUT"
+          echo "open=$open" >> "$GITHUB_OUTPUT"
+
+      # 라벨로 중복을 막는다 — 제목 검색은 이모지·한글에서 놓친다(이 저장소의 기존 교훈)
+      - name: 🚨 안 잠겼으면 이슈로 알린다
+        if: steps.probe.outputs.open == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          OWNER: ${{ github.repository_owner }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh label create admin-lock --repo "$REPO" --color B60205 \
+            --description "관리자 화면 잠금 경보" 2>/dev/null || true
+          if [ -n "$(gh issue list --repo "$REPO" --label admin-lock --state open --json number --jq '.[0].number')" ]; then
+            echo "이미 열린 경보 이슈가 있어 새로 만들지 않습니다."
+            exit 0
+          fi
+          cat > /tmp/lock.md <<'EOF'
+          관리자 화면이 **로그인 없이 열립니다.** 등록 공고 전체가 주소를 아는 사람에게 보입니다.
+
+          화면의 GitHub 열쇠 확인은 이 상황을 막지 못합니다 — 저장소가 공개라
+          `GET /repos/OWNER/REPO`가 **누구의 토큰으로도 200**이기 때문입니다.
+          잠금은 Cloudflare Access가 유일한 방어입니다.
+
+          조치: Cloudflare `Zero Trust` → `Access` → `Applications` 에서
+          `hanggonggan-admin.pages.dev`를 덮는 애플리케이션이 있는지 확인하세요.
+          **운영 주소와 미리보기 주소는 서로 다른 호스트 이름**이라, 한쪽만 덮으면
+          다른 쪽이 열린 채로 남습니다. 설정한 뒤 이 워크플로를 다시 눌러 확인하세요.
+          EOF
+          printf '\n실행 기록: %s\n\n---\n_Generated by [Claude Code](https://claude.ai/code)_\n' \
+            "$RUN_URL" >> /tmp/lock.md
+          gh issue create \
+            --title "🚨 관리자 화면이 잠기지 않았습니다 ($(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST)" \
+            --repo "$REPO" --assignee "$OWNER" --label admin-lock --body-file /tmp/lock.md
+
+      # '판정 불가'일 때는 닫지 않는다 — 못 읽은 것을 '해결됐다'로 읽으면 경보가 조용히 사라진다
+      - name: 잠겨 있으면 옛 경보 이슈를 닫는다
+        if: steps.probe.outputs.verdict == 'locked'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          for n in $(gh issue list --repo "$REPO" --label admin-lock --state open --json number --jq '.[].number'); do
+            gh issue close "$n" --repo "$REPO" \
+              --comment "✅ 확인 결과 이제 로그인 없이는 열리지 않습니다. (자동 확인)
+
+          ---
+          _Generated by [Claude Code](https://claude.ai/code)_"
+          done
+
+      - name: 결과를 실패로 남긴다 (안 잠긴 경우)
+        if: steps.probe.outputs.open == '1'
+        run: exit 1
