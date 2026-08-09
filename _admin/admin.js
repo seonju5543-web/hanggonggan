@@ -385,7 +385,11 @@ let current = 'todo';
 function show(name) {
   current = name;
   SCREENS.forEach((n) => { byId(`screen-${n}`).hidden = n !== name; });
-  $$('.tab').forEach((b) => b.classList.toggle('active', b.dataset.tab === name));
+  $$('.tab').forEach((b) => {
+    const on = b.dataset.tab === name;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
   window.scrollTo(0, 0);
   renderScreen(name);
 }
@@ -574,8 +578,11 @@ function rowHtml(it, opt = {}) {
   const pick = opt.pick
     ? `<label class="pick" title="선택"><input type="checkbox" data-pick="${esc(it.id)}"${SEL.has(it.id) ? ' checked' : ''} /></label>`
     : '';
+  /* 키보드로도 열려야 한다 — 예전엔 **마우스로만** 상세를 열 수 있었다.
+     읽어 주기에도 '버튼'으로 잡히도록 role을 준다. */
   return `
-    <div class="row${opt.pick ? ' has-pick' : ''}" data-id="${esc(it.id)}">
+    <div class="row${opt.pick ? ' has-pick' : ''}" data-id="${esc(it.id)}"
+         tabindex="0" role="button" aria-label="${esc(it.name)} 상세 열기">
       ${pick}
       <div>
         <div class="t">${esc(it.name)}</div>
@@ -903,7 +910,7 @@ function renderForms() {
           ${ids.map((id) => {
     const t = D.forms[id];
     const nf = (t.sections || []).reduce((s, sec) => s + ((sec.fields || []).length), 0);
-    return `<tr data-form="${esc(id)}" style="cursor:pointer">
+    return `<tr data-form="${esc(id)}" style="cursor:pointer" tabindex="0" role="button" aria-label="${esc(t.title || id)} 미리 보기">
               <td class="mono">${esc(id)}</td>
               <td>${esc(t.title || '')}</td>
               <td>${esc(t.org || '')}</td>
@@ -1209,7 +1216,7 @@ function renderQuality() {
     && hasFormAttachment(it) && !it.formId).length;
 
   const probRow = (x) => `
-    <div class="row" data-id="${esc(x.it.id)}">
+    <div class="row" data-id="${esc(x.it.id)}" tabindex="0" role="button" aria-label="${esc(x.it.name)} 상세 열기">
       <div>
         <div class="t">${esc(x.it.name)}</div>
         <div class="m"><span class="mono">${esc(x.it.id)}</span><span>${esc(schoolOf(x.it))}</span></div>
@@ -1276,16 +1283,42 @@ function renderQuality() {
 }
 
 /* ---------------- 상세·편집 시트 ---------------- */
+/* 시트를 열기 직전에 어디에 있었는지 기억한다 — 닫을 때 그 자리로 돌려보내야
+   키보드 사용자가 목록의 제자리를 잃지 않는다. */
+let sheetReturn = null;
+
 function openSheet(html) {
-  byId('sheet').innerHTML = html;
-  byId('sheet').hidden = false;
+  const sheet = byId('sheet');
+  if (sheet.hidden) sheetReturn = document.activeElement;   // 시트 안에서 시트를 또 열 때는 덮어쓰지 않는다
+  sheet.innerHTML = html;
+  sheet.hidden = false;
   byId('sheet-back').hidden = false;
   document.body.style.overflow = 'hidden';
+  /* 초점을 시트 안으로 옮긴다. 안 그러면 읽어 주기가 뒤 화면을 계속 읽는다. */
+  const first = sheet.querySelector('input, select, textarea, button, [href]');
+  (first || sheet).focus({ preventScroll: true });
 }
+
 function closeSheet() {
   byId('sheet').hidden = true;
   byId('sheet-back').hidden = true;
   document.body.style.overflow = '';
+  if (sheetReturn && document.contains(sheetReturn)) sheetReturn.focus({ preventScroll: true });
+  sheetReturn = null;
+}
+
+/* 초점 가두기 — 시트가 열려 있는 동안 Tab이 뒤 화면으로 새 나가지 않게 한다.
+   (`aria-modal`은 읽어 주기에만 알리는 표시이고, 키보드 이동까지 막지는 않는다) */
+function trapFocus(e) {
+  if (e.key !== 'Tab') return;
+  const sheet = byId('sheet');
+  if (!sheet || sheet.hidden) return;
+  const f = [...sheet.querySelectorAll('input, select, textarea, button, [href], [tabindex]:not([tabindex="-1"])')]
+    .filter((el) => !el.disabled && el.offsetParent !== null);
+  if (!f.length) return;
+  const first = f[0], last = f[f.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
 }
 
 const EDIT_FIELDS = [
@@ -1685,6 +1718,27 @@ function bindGlobal() {
   });
 
   /* 필터 입력 */
+  /* 키보드로 목록·표를 여는 길 — Enter와 Space 둘 다 받는다(버튼의 표준 동작).
+     Space는 기본 동작이 '스크롤'이라 막아야 한다. */
+  byId('app').addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
+    const t = e.target;
+    if (!t || !t.matches || !t.matches('[role="button"][tabindex="0"]')) return;
+    e.preventDefault();
+    t.click();
+  });
+
+  /* 탭 줄을 좌우 화살표로 넘긴다 (읽어 주기 사용자의 표준 조작) */
+  byId('tabs').addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    const tabs = $$('.tab');
+    const i = tabs.indexOf(document.activeElement);
+    if (i < 0) return;
+    e.preventDefault();
+    const next = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
+    next.focus(); next.click();
+  });
+
   /* '필터 더보기'를 펼친 상태를 기억한다. 안 그러면 필터를 하나 고를 때마다
      다시 그려지면서 접혀 버려 연달아 고를 수가 없다.
      (toggle 이벤트는 버블링하지 않으므로 캡처 단계로 받는다) */
@@ -1769,6 +1823,7 @@ function bindGlobal() {
   });
   byId('sheet-back').addEventListener('click', closeSheet);
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet(); });
+  document.addEventListener('keydown', trapFocus);
 
   /* 상단 */
   byId('btn-reload').addEventListener('click', async () => {

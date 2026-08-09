@@ -83,6 +83,15 @@ function serve() {
     return route.fulfill({ status: 200, contentType: 'application/json', body: fs.readFileSync(f, 'utf8') });
   });
 
+  /* 푸시 발송 서버 — 이 샌드박스는 workers.dev에 닿지 못한다(프록시 차단).
+     흉내 내 주지 않으면 콘솔에 연결 실패가 찍혀 '오류 없음' 검사가 깨진다.
+     제품은 못 닿을 때 정직한 안내를 띄우므로 결함이 아니다(그 경로도 아래에서 확인한다). */
+  await page.route('https://handaejang-push.seonju5543.workers.dev/**', (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify({ ok: true, configured: true, step: 'idle', lastError: null, subs: 2 }),
+  }));
+
   await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
 
   /* ① 잠금 — 열쇠 전에는 데이터가 하나도 없어야 한다 */
@@ -363,6 +372,25 @@ function serve() {
   ok(await page.locator('#screen-robots [data-run]').count() >= 12, '로봇 12종 이상에 실행 버튼이 있다');
   ok(await page.locator('#screen-robots [data-report]').count() === 5, '리포트 5종을 볼 수 있다');
 
+  await page.waitForFunction(() => !/확인하는 중/.test(document.querySelector('#push-health')?.textContent || ''),
+    null, { timeout: 10000 });
+  const bare = (t) => (t || '').replace(/['’‘"“”]/g, '');   // 화면 문구의 따옴표는 무시하고 본다
+  const pushText = bare(await page.textContent('#push-health'));
+  ok(/등록된 폰/.test(pushText) && /살아 있는 폰 수가 아닙니다/.test(pushText),
+    '푸시 서버 상태와 그 한계를 함께 보여 준다');
+
+  /* 못 닿을 때 '정상'으로 보이면 안 된다 — 이 화면 전체의 규칙 */
+  const pushFail = await page.evaluate(async () => {
+    const box = document.querySelector('#push-health');
+    const orig = window.fetch;
+    window.fetch = () => Promise.reject(new Error('연결 실패'));
+    await window.__admin.loadPushHealth();
+    window.fetch = orig;
+    return box.textContent;
+  });
+  ok(/읽지 못했습니다/.test(bare(pushFail)) && /정상으로 보지 마세요/.test(bare(pushFail)),
+    '푸시 상태를 못 읽으면 정상으로 보지 말라고 말한다');
+
   /* 🔴 이 화면의 존재 이유가 '로봇이 뭐라고 하는지'다 —
      못 읽었을 때 '아무 말 없음'으로 보이면 화면이 거짓말하는 것이다 */
   const failText = await page.evaluate(async () => {
@@ -377,6 +405,63 @@ function serve() {
   ok(/읽지 못했습니다/.test(failText) && /아무 말 없음이 아닙니다/.test(failText.replace(/[''"]/g, '')),
     '로봇 소식을 못 읽으면 그렇다고 말한다 (조용히 비우지 않는다)');
   await page.unroute('**/api.github.com/repos/*/*/issues?**');
+
+  /* ⑪ 키보드·읽어 주기 (B6) — 예전엔 상세를 **마우스로만** 열 수 있었다.
+     마우스를 한 번도 쓰지 않고 조작되는지 실제로 눌러 본다. */
+  await page.click('.tab[data-tab="list"]');
+  await page.waitForSelector('#screen-list:not([hidden])');
+
+  const openedByKey = await page.evaluate(() => {
+    const row = document.querySelector('#screen-list .row[data-id]');
+    if (!row) return 'no-row';
+    row.focus();
+    if (document.activeElement !== row) return 'not-focusable';
+    row.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    return 'sent';
+  });
+  await page.waitForTimeout(300);
+  ok(openedByKey === 'sent' && await page.isVisible('#sheet'),
+    '목록 줄에 초점이 가고 Enter로 상세가 열린다', openedByKey);
+
+  ok(await page.locator('#sheet').getAttribute('aria-modal') === 'true',
+    '시트가 대화상자로 알려진다 (aria-modal)');
+  ok(await page.evaluate(() => document.querySelector('#sheet').contains(document.activeElement)),
+    '시트를 열면 초점이 시트 안으로 들어간다');
+
+  /* 초점 가두기 — Tab이 뒤 화면으로 새 나가면 키보드 사용자가 길을 잃는다 */
+  const trapped = await page.evaluate(() => {
+    const sheet = document.querySelector('#sheet');
+    const f = [...sheet.querySelectorAll('input, select, textarea, button, [href]')]
+      .filter((el) => !el.disabled && el.offsetParent !== null);
+    if (!f.length) return 'no-focusable';
+    f[f.length - 1].focus();
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true }));
+    return sheet.contains(document.activeElement) ? 'kept' : 'escaped';
+  });
+  ok(trapped === 'kept', '시트 안에서 Tab이 뒤 화면으로 새지 않는다', trapped);
+
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(250);
+  ok(await page.evaluate(() => {
+    const a = document.activeElement;
+    return !!(a && a.matches && a.matches('#screen-list .row[data-id]'));
+  }), '시트를 닫으면 초점이 원래 줄로 돌아온다');
+
+  /* 탭 줄 — 좌우 화살표와 aria-selected */
+  ok(await page.locator('.tab[data-tab="list"]').getAttribute('aria-selected') === 'true',
+    '지금 보고 있는 탭이 aria-selected로 표시된다');
+  await page.evaluate(() => {
+    const t = document.querySelector('.tab[data-tab="list"]');
+    t.focus();
+    document.querySelector('#tabs').dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true }));
+  });
+  await page.waitForTimeout(250);
+  ok(await page.locator('.tab[data-tab="review"]').getAttribute('aria-selected') === 'true',
+    '좌우 화살표로 탭을 넘길 수 있다');
+
+  ok(await page.locator('#job').getAttribute('aria-live') === 'polite'
+    && await page.locator('#toast').getAttribute('aria-live') === 'polite',
+    '진행·알림 표시가 읽어 주기에 잡힌다 (aria-live)');
 
   /* 데이터 읽기 실패를 조용히 넘기지 않는가 (A1) — 없는 파일을 읽게 해 배너를 확인한다 */
   const failShown = await page.evaluate(async () => {

@@ -74,19 +74,19 @@
         <button id="btn-logout" class="btn btn-ghost btn-sm danger">열쇠 지우기</button>
       </div>
     </div>
-    <nav class="tabs" id="tabs">
-      <button class="tab active" data-tab="todo">오늘 할 일 <span class="tab-n" id="n-todo"></span></button>
-      <button class="tab" data-tab="list">공고 전체 <span class="tab-n" id="n-list"></span></button>
-      <button class="tab" data-tab="review">컨펌 작업대 <span class="tab-n" id="n-review"></span></button>
-      <button class="tab" data-tab="forms">양식 <span class="tab-n" id="n-forms"></span></button>
-      <button class="tab" data-tab="network">수집망 <span class="tab-n" id="n-network"></span></button>
-      <button class="tab" data-tab="robots">로봇 <span class="tab-n" id="n-robots"></span></button>
-      <button class="tab" data-tab="quality">데이터 품질 <span class="tab-n" id="n-quality"></span></button>
+    <nav class="tabs" id="tabs" role="tablist" aria-label="화면 전환">
+      <button class="tab active" data-tab="todo" role="tab" aria-selected="true" aria-controls="screen-todo">오늘 할 일 <span class="tab-n" id="n-todo"></span></button>
+      <button class="tab" data-tab="list" role="tab" aria-selected="false" aria-controls="screen-list">공고 전체 <span class="tab-n" id="n-list"></span></button>
+      <button class="tab" data-tab="review" role="tab" aria-selected="false" aria-controls="screen-review">컨펌 작업대 <span class="tab-n" id="n-review"></span></button>
+      <button class="tab" data-tab="forms" role="tab" aria-selected="false" aria-controls="screen-forms">양식 <span class="tab-n" id="n-forms"></span></button>
+      <button class="tab" data-tab="network" role="tab" aria-selected="false" aria-controls="screen-network">수집망 <span class="tab-n" id="n-network"></span></button>
+      <button class="tab" data-tab="robots" role="tab" aria-selected="false" aria-controls="screen-robots">로봇 <span class="tab-n" id="n-robots"></span></button>
+      <button class="tab" data-tab="quality" role="tab" aria-selected="false" aria-controls="screen-quality">데이터 품질 <span class="tab-n" id="n-quality"></span></button>
     </nav>
 
     <!-- 작업 진행 표시 (변경 요청 → 검사 → 반영).
          **헤더 안에 둔다** — 밖에 두고 각자 sticky를 걸면 스크롤할 때 이 띠가 탭 줄을 덮는다. -->
-    <div id="job" class="job" hidden>
+    <div id="job" class="job" role="status" aria-live="polite" hidden>
       <span class="job-dot"></span>
       <span id="job-text"></span>
       <a id="job-link" href="#" target="_blank" rel="noreferrer noopener" hidden>실행 기록 보기 ↗</a>
@@ -98,13 +98,13 @@
   <div id="datafail" class="datafail" role="alert" hidden></div>
 
   <main class="wrap">
-    <section id="screen-todo"    class="screen"></section>
-    <section id="screen-list"    class="screen" hidden></section>
-    <section id="screen-review"  class="screen" hidden></section>
-    <section id="screen-forms"   class="screen" hidden></section>
-    <section id="screen-network" class="screen" hidden></section>
-    <section id="screen-robots"  class="screen" hidden></section>
-    <section id="screen-quality" class="screen" hidden></section>
+    <section id="screen-todo" role="tabpanel" tabindex="-1"    class="screen"></section>
+    <section id="screen-list" role="tabpanel" tabindex="-1"    class="screen" hidden></section>
+    <section id="screen-review" role="tabpanel" tabindex="-1"  class="screen" hidden></section>
+    <section id="screen-forms" role="tabpanel" tabindex="-1"   class="screen" hidden></section>
+    <section id="screen-network" role="tabpanel" tabindex="-1" class="screen" hidden></section>
+    <section id="screen-robots" role="tabpanel" tabindex="-1"  class="screen" hidden></section>
+    <section id="screen-quality" role="tabpanel" tabindex="-1" class="screen" hidden></section>
   </main>
 
   <footer class="foot">
@@ -114,9 +114,9 @@
 
 <!-- 상세·편집 시트 -->
 <div id="sheet-back" class="sheet-back" hidden></div>
-<aside id="sheet" class="sheet" hidden aria-label="상세"></aside>
+<aside id="sheet" class="sheet" hidden role="dialog" aria-modal="true" aria-label="상세"></aside>
 
-<div id="toast" class="toast" hidden></div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
 <!-- 앱1과 공유하는 원본 코드 (build.sh가 복사 — 규칙을 두 벌로 두지 않기 위해) -->
 <script src="vendor/data.js"></script>
