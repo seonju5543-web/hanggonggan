@@ -12,6 +12,11 @@
    실행: ACTION=<이름> PAYLOAD='<json>' node tools/admin-apply.mjs            */
 
 import fs from 'node:fs';
+import { createRequire } from 'node:module';
+import { canonUrl } from '../collector/canon-url.mjs';
+
+/* 등록 규칙은 로봇이 쓰는 그 파일 하나뿐이다 — 화면이 따로 판단하게 만들지 않는다 */
+const { checkEntry } = createRequire(import.meta.url)('../verify/entry-rules.cjs');
 
 const REG = 'data/registered.json';
 const CFG = 'collector/auto-register-config.json';
@@ -37,6 +42,7 @@ const readJson = (p, dflt) => {
 };
 const writeJson = (p, obj) => fs.writeFileSync(p, `${JSON.stringify(obj, null, 1)}\n`);
 const kstNow = () => new Date(Date.now() + 9 * 3600e3).toISOString().replace('T', ' ').slice(0, 16);
+const TODAY = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);   // KST 기준 날짜
 
 /* 고칠 수 있는 항목만 — 이 목록에 없는 키는 무시한다 */
 const ALLOWED = new Set([
@@ -94,6 +100,65 @@ switch (action) {
     reg.items = reg.items.filter((x) => !ids.includes(x.id));
     if (reg.items.length === before) fail('삭제할 대상을 찾지 못했습니다');
     detail = `${before - reg.items.length}건 삭제: ${ids.join(', ')}`;
+    touched = true;
+    break;
+  }
+
+  /* ── 새 등록 — 수집된 공고를 사람이 골라 정식 등록한다 (2026-08-09 신설) ──
+     로봇의 자동 등록과 다른 점: `auto` 배지를 붙이지 않는다(사람이 보고 넣은 것이므로
+     이미 검수 완료다). 대신 **로봇과 똑같은 관문 두 개**를 통과해야 한다.
+       ① 중복 판정 — auto-register와 **같은 canonUrl**로 본다. 규칙이 갈라지면
+          로봇이 이 공고를 하루 뒤에 다시 등록한다(classify의 첫 줄이 이 집합을 본다).
+       ② 등록 규칙 — `verify/entry-rules.cjs`의 checkEntry. 대출·대학원 전용·행사·
+          목록 주소 등이 **사람 손으로도** 들어가지 않는다. */
+  case 'register': {
+    const n = payload.notice || {};
+    const patch = payload.patch || {};
+    const url = String(n.url || patch.sourceUrl || '').trim();
+    const title = String(patch.name || n.title || '').trim();
+    if (!url) fail('공고 원문 주소가 없습니다');
+    if (title.length < 8) fail('제목이 너무 짧습니다 (8자 이상)');
+
+    const cu = canonUrl(url);
+    const dup = reg.items.find((x) => x.sourceUrl && canonUrl(x.sourceUrl) === cu);
+    if (dup) fail(`이미 등록된 공고입니다 (${dup.id})`);
+
+    const id = `adm-${cu.replace(/[^a-z0-9]/gi, '').slice(-24).toLowerCase()}`;
+    if (byId(id)) fail(`같은 id가 이미 있습니다 (${id})`);
+
+    const school = String(n.school || '').trim();
+    const campus = String(n.campus || '').trim();
+    const entry = {
+      id,
+      name: title.slice(0, 70),
+      type: patch.type === '교외' ? '교외' : '교내',
+      provider: patch.provider || `${school}${campus ? ` ${campus}` : ''} 게시 공고`.trim() || '원문 확인',
+      amount: patch.amount || '금액 원문 확인',
+      // 금액을 확인하지 못했으면 0 — 지어낸 숫자를 홈 합계에 섞지 않는다 (운영 원칙 8-1)
+      amountValue: Number(patch.amountValue) > 0 ? Number(patch.amountValue) : 0,
+      deadline: patch.deadline || null,
+      ...(patch.deadline ? {} : { listedAt: TODAY }),
+      period: patch.period || (patch.deadline ? `접수 ~${patch.deadline}` : '접수 기간 원문 확인'),
+      summary: patch.summary || '관리자 화면에서 사람이 확인해 등록한 공고예요. 세부 내용은 원문 공고에서 확인하세요.',
+      eligibility: { selective: true, ...(school ? { schoolOnly: school } : {}), ...(campus ? { campusOnly: campus } : {}) },
+      documents: ['지원 자격·제출 서류는 원문 공고에서 확인'],
+      duplicable: true,
+      sourceUrl: url,
+      sourceKind: 'admin',
+      ...(patch.note ? { note: patch.note } : {}),
+      ...(patch.formId ? { formId: patch.formId }
+        : { noForm: patch.noForm || `관리자 등록 ${TODAY} — 양식은 확인 후 연결` }),
+      ...(Array.isArray(n.attachments) && n.attachments.length ? { attachments: n.attachments.slice(0, 6) } : {}),
+    };
+
+    /* 로봇이 쓰는 규칙으로 먼저 걸러 본다 — 오류가 있으면 아예 넣지 않는다.
+       (경고는 통과시킨다. 금액·마감 미확인은 정직한 상태이지 잘못이 아니다) */
+    const problems = (checkEntry(entry, { formIds: new Set(Object.keys(readJson('data/forms.json', { templates: {} }).templates || {})) }) || [])
+      .filter((p) => p.level === 'error');
+    if (problems.length) fail(`등록 규칙에 걸립니다 — ${problems.map((p) => p.msg).join(' · ')}`);
+
+    reg.items.push(entry);
+    detail = `${id} · ${entry.name.slice(0, 40)}`;
     touched = true;
     break;
   }
@@ -200,8 +265,12 @@ switch (action) {
 
 if (!touched) fail('아무것도 바뀌지 않았습니다');
 
-/* 공고 목록을 건드린 작업만 저장 (설정·게시판은 위에서 이미 저장했다) */
-if (['confirm', 'revert', 'remove', 'edit', 'merge'].includes(action)) {
+/* 공고 목록을 건드린 작업만 저장 (설정·게시판은 위에서 이미 저장했다).
+   ⚠️ **새 동작을 추가하면 이 목록에도 반드시 넣을 것.** 빠뜨리면 화면에는 "✅ 성공"이
+   뜨는데 파일은 그대로다 — 2026-08-09에 `register`가 실제로 이 상태였고, 로컬 시험에서
+   "등록했다고 하는데 목록에 없다"로 잡혔다. 이슈 #79('로봇이 고친 파일은 전부 git add')와 같은 유형이다. */
+const WRITES_REG = ['confirm', 'revert', 'remove', 'edit', 'merge', 'register'];
+if (WRITES_REG.includes(action)) {
   reg.updatedAt = kstNow().slice(0, 10);
   writeJson(REG, reg);
 }

@@ -34,19 +34,12 @@ try { forms = JSON.parse(fs.readFileSync(new URL('../data/forms.json', HERE), 'u
 
 const TODAY = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10); // KST
 
-/* ---------- URL 정규화: 목록 파라미터(sort·페이지 등)를 떼고 글 식별자만 남긴다 ---------- */
-const ID_PARAMS = /^(seq|articleno|bbs_seq|duid|list_id|entryid|bbsidx|menu_id|contents_no|site_no|board_seq|menuno|no|ntt|nttsn|idx|wr_id|bidx)$/i;
-export function canonUrl(raw) {
-  try {
-    const u = new URL(raw);
-    const keep = [];
-    for (const [k, v] of u.searchParams) if (ID_PARAMS.test(k) && v) keep.push(`${k.toLowerCase()}=${v}`);
-    keep.sort();
-    // 클릭형 게시판(경희 등)은 목록 주소+제목 표식(#n-…)이 글의 정체성이다 — 떼면 서로 뭉개진다
-    const marker = u.hash && u.hash.startsWith('#n-') ? u.hash : '';
-    return u.origin + u.pathname + (keep.length ? '?' + keep.join('&') : '') + marker;
-  } catch { return (raw || '').split('#')[0]; }
-}
+/* ---------- URL 정규화 ----------
+   규칙 본체는 `collector/canon-url.mjs`에 있다(순수 함수). 관리자 화면의 쓰기 경로도
+   같은 함수를 써야 '이미 등록된 공고를 로봇이 다시 등록하는' 일이 안 생긴다.
+   이 파일은 불러오는 즉시 실행되므로 남이 여기서 가져갈 수 없어 따로 뺐다. */
+export { canonUrl } from './canon-url.mjs';
+import { canonUrl } from './canon-url.mjs';
 
 /* 제목 유사도 — 4글자 조각(4-gram) 겹침 비율. 재게시·접수분 중복 감지용 */
 function titleSim(a, b) {

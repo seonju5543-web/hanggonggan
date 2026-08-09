@@ -376,7 +376,9 @@ td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space
 }
 .pane-body { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
 .field { display: flex; flex-direction: column; gap: 4px; }
-.field > label { font-size: .75rem; font-weight: 700; color: var(--ink-3); }
+/* 라벨은 .75rem(11.3px)이라 --ink-3(밝은 화면 3.72:1)를 쓰면 안 된다 — B0의 색 규칙 */
+.field > label { font-size: .8rem; font-weight: 700; color: var(--ink-2); }
+.field .hint { font-size: .8rem; color: var(--ink-2); }
 .field input, .field select, .field textarea { width: 100%; }
 .excerpt {
   font-size: .85rem; line-height: 1.65; background: var(--paper-2);

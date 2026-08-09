@@ -263,6 +263,21 @@ function serve() {
 
   /* 실제로 여러 id를 보내는지 — 이 검사가 이 기능의 핵심이다.
      보내는 요청을 가로채 개수를 세고, 진짜 실행은 시키지 않는다. */
+  /* 요청을 가로챈다. 보내기(dispatches)는 내용을 받아 적고, 그 뒤 '결과 기다리기'(runs)는
+     **성공한 실행 하나**를 돌려준다 — 안 그러면 화면이 6분간 결과를 기다리며 `jobBusy` 잠금을
+     붙들고 있어서, 이어지는 검사가 "앞선 작업이 아직 끝나지 않았어요"로 막힌다.
+     (이 잠금은 제품이 옳게 동작하는 것이다. 검사가 그 사정을 몰랐던 것이 문제였다.) */
+  const fakeRun = () => ({
+    workflow_runs: [{
+      id: 1, status: 'completed', conclusion: 'success',
+      created_at: new Date(Date.now() + 5000).toISOString(),
+      html_url: 'https://example.invalid/run',
+    }],
+  });
+  await page.route('**/actions/workflows/**/runs**', (route) => route.fulfill({
+    status: 200, contentType: 'application/json', body: JSON.stringify(fakeRun()),
+  }));
+
   let sentIds = null;
   await page.route('**/actions/workflows/**/dispatches', (route) => {
     try { sentIds = JSON.parse(route.request().postData() || '{}'); } catch { sentIds = 'parse-fail'; }
@@ -279,7 +294,39 @@ function serve() {
   ok(Array.isArray(payload.ids) && payload.ids.length === urgentN,
     '다중 선택이 실제로 여러 id를 보낸다', `보낸 id ${payload.ids ? payload.ids.length : 0}개`);
   ok(sentIds?.inputs?.action === 'confirm', '보내는 동작 이름이 confirm이다');
+  /* 앞선 작업이 끝나야(jobBusy 해제) 다음 요청이 나간다 — 화면이 '반영 완료'라고 말할 때까지 기다린다 */
+  await page.waitForFunction(() => /반영 완료/.test(document.querySelector('#job-text')?.textContent || ''),
+    null, { timeout: 20000 });
   await page.unroute('**/actions/workflows/**/dispatches');
+
+  /* ⑨ 화면에서 직접 등록 (C) — 관리자 화면의 목적 절반이 여기 있었다.
+     예전 코드에는 "등록 버튼은 다음 단계에 붙습니다"라고 적혀 있었다. */
+  await page.click('.tab[data-tab="review"]');
+  await page.waitForSelector('#screen-review:not([hidden])');
+  ok(await page.locator('[data-reg-open]').count() > 0, '미등록 공고 줄에 등록 버튼이 있다');
+
+  await page.locator('[data-reg-open]').first().click();
+  await page.waitForSelector('#sheet:not([hidden])');
+  ok((await page.locator('#sheet #rg-name').inputValue()).length > 5,
+    '등록 시트에 수집된 제목이 미리 채워진다');
+  ok(await page.locator('#sheet .pane').count() === 2, '왼쪽 앱1 내용 · 오른쪽 공고 원문 두 칸으로 대조한다');
+  ok(await page.locator('#sheet #rg-amountValue').inputValue() === '',
+    '금액은 비워 둔다 (지어내지 않는다)');
+
+  let regSent = null;
+  await page.route('**/actions/workflows/**/dispatches', (route) => {
+    try { regSent = JSON.parse(route.request().postData() || '{}'); } catch { regSent = 'parse-fail'; }
+    route.fulfill({ status: 204, body: '' });
+  });
+  await page.click('#sheet [data-reg-go]');
+  await page.waitForTimeout(600);
+  const regPayload = (() => { try { return JSON.parse(regSent?.inputs?.payload || '{}'); } catch { return {}; } })();
+  ok(regSent?.inputs?.action === 'register', '등록 동작을 보낸다');
+  ok(!!(regPayload.notice && regPayload.notice.url), '보내는 내용에 공고 원문 주소가 들어 있다');
+  ok(!!(regPayload.patch && regPayload.patch.name), '보내는 내용에 제목이 들어 있다');
+  ok(!regPayload.patch?.amountValue, '확인하지 않은 금액은 보내지 않는다');
+  await page.unroute('**/actions/workflows/**/dispatches');
+  await page.unroute('**/actions/workflows/**/runs**');
 
   /* ⑧ 잘린 목록 더 보기 (B1) — 예전엔 268건 중 80건만 화면에서 도달 가능했다 */
   await page.click('.tab[data-tab="review"]');

@@ -777,7 +777,10 @@ function unregHtml() {
         </div>
         ${x.why ? `<div class="badges"><span class="pill">${esc(x.why)}</span></div>` : ''}
       </div>
-      <div>${u ? `<a class="btn btn-sm" href="${esc(u)}" target="_blank" rel="noreferrer noopener">원문 ↗</a>` : ''}</div>
+      <div class="btn-row">
+        ${u ? `<a class="btn btn-sm" href="${esc(u)}" target="_blank" rel="noreferrer noopener">원문 ↗</a>` : ''}
+        ${x.why ? '' : `<button class="btn btn-sm btn-primary" data-reg-open="${esc(x.n.url)}">등록하기</button>`}
+      </div>
       <div><span class="dd none">${esc(x.n.foundAt || '')}</span></div>
     </div>`;
   };
@@ -786,7 +789,7 @@ function unregHtml() {
     <div class="sec-head" style="margin-top:12px">
       <h2>수집됐지만 아직 등록 안 한 공고 ${cand.length}건</h2>
       <p>로봇이 게시판에서 가져왔지만 정식 등록에는 들어가지 않은 것들입니다.
-         원문을 열어 보고 등록할 만한 것이 있으면 알려 주세요 — 등록 버튼은 다음 단계에 붙습니다.</p>
+         <b>원문 ↗</b>으로 확인한 뒤 <b>등록하기</b>를 누르면 학생 앱에 카드로 나갑니다.</p>
     </div>
     ${cand.length ? `<div class="rows">${cand.slice(0, shown('cand', 80)).map(row).join('')}</div>`
     : '<p class="empty">등록 후보가 없습니다.</p>'}
@@ -1126,6 +1129,80 @@ const EDIT_FIELDS = [
   ['applyEmail', '이메일 접수 주소', 'text'],
 ];
 
+/* 등록 시트 (C2) — 왼쪽에 앱1로 나갈 내용, 오른쪽에 공고 원문.
+   상세 시트의 두 칸 대조 구조를 그대로 쓴다(따로 만들면 서로 달라진다).
+   **아는 것만 미리 채운다** — 제목·주소·학교는 수집된 값이라 확실하고,
+   금액·마감은 비워 둔 채 '원문 확인'으로 나간다(운영 원칙 8-1 추론 금지). */
+function registerSheet(n) {
+  const u = safeUrl(n.url);
+  const atts = (n.attachments || []).slice(0, 8);
+  const f = (k, label, ph = '', hint = '') => `
+    <div class="field">
+      <label for="rg-${k}">${esc(label)}</label>
+      <input type="text" id="rg-${k}" data-rg="${k}" placeholder="${esc(ph)}" />
+      ${hint ? `<span class="hint">${esc(hint)}</span>` : ''}
+    </div>`;
+
+  return `
+    <div class="sheet-head">
+      <h3>정식 등록</h3>
+      <button class="sheet-close" data-close aria-label="닫기">×</button>
+    </div>
+
+    <p class="muted">비워 두면 <b>'원문 확인'</b>으로 표시됩니다. <b>확인하지 못한 값을 지어내지 마세요</b> —
+      비어 있는 편이 틀린 숫자보다 낫습니다.</p>
+
+    <div class="compare">
+      <div class="pane">
+        <h4>앱1에 나갈 내용</h4>
+        <div class="pane-body">
+          <div class="field">
+            <label for="rg-name">제목</label>
+            <input type="text" id="rg-name" data-rg="name" value="${esc(n.title || '')}" />
+          </div>
+          <div class="field">
+            <label for="rg-type">구분</label>
+            <select id="rg-type" data-rg="type">
+              <option value="교내">교내</option>
+              <option value="교외">교외 (재단·지자체 등)</option>
+            </select>
+          </div>
+          ${f('deadline', '마감일', 'YYYY-MM-DD', '모르면 비워 두세요 — 등록 60일 뒤 자동으로 숨겨집니다')}
+          ${f('amount', '금액 문구', '예: 등록금 전액')}
+          ${f('amountValue', '금액(숫자)', '예: 3000000', '확인한 금액만 넣으세요. 비우면 합계에서 제외됩니다')}
+          ${f('provider', '주관', `${esc(n.school || '')}${n.campus ? ` ${esc(n.campus)}` : ''} 게시 공고`)}
+          <div class="field">
+            <label for="rg-summary">요약</label>
+            <textarea id="rg-summary" data-rg="summary" rows="3"
+              placeholder="비우면 '관리자 화면에서 사람이 확인해 등록한 공고예요'로 나갑니다"></textarea>
+          </div>
+          <p class="muted">학교 한정: <b>${esc(n.school || '(없음)')}${n.campus ? ` ${esc(n.campus)}` : ''}</b>
+            — 이 학교 학생에게만 보입니다. 전국 사업이면 등록 뒤 상세에서 고치세요.</p>
+        </div>
+      </div>
+
+      <div class="pane">
+        <h4>공고 원문</h4>
+        <div class="pane-body">
+          <p><b>${esc(n.title || '')}</b></p>
+          <p class="muted">${esc(n.school || '')}${n.campus ? ` ${esc(n.campus)}` : ''}
+            ${n.foundAt ? ` · 수집 ${esc(n.foundAt)}` : ''}</p>
+          ${n.deadlineHint ? `<p class="muted">게시판 기한 단서: ${esc(String(n.deadlineHint).slice(0, 80))}</p>` : ''}
+          ${u ? `<p><a class="btn btn-sm" href="${esc(u)}" target="_blank" rel="noreferrer noopener">원문 공고 열기 ↗</a></p>` : ''}
+          ${atts.length ? `<p class="muted">첨부 ${atts.length}건 — 등록하면 그대로 따라갑니다</p>
+            <ul>${atts.map((a) => `<li>${esc(a.name || a.url || '')}</li>`).join('')}</ul>` : '<p class="muted">첨부 없음</p>'}
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" data-reg-go="${esc(n.url)}">등록하기</button>
+      <button class="btn" data-close>취소</button>
+    </div>
+    <p class="muted">등록하면 검사를 통과해야만 저장됩니다 — 대출·대학원 전용·행사 같은 것은
+      <b>사람이 눌러도</b> 규칙이 막습니다.</p>`;
+}
+
 function detailSheet(it) {
   const fi = formIdSet();
   const ps = problemsOf(it, fi);
@@ -1391,6 +1468,15 @@ function bindGlobal() {
       return;
     }
 
+    /* 등록 시트 열기 */
+    const ro = e.target.closest('[data-reg-open]');
+    if (ro) {
+      e.stopPropagation();
+      const n = D.notices.find((x) => x.url === ro.dataset.regOpen);
+      if (n) openSheet(registerSheet(n));
+      return;
+    }
+
     /* 잘린 목록 더 보기 */
     const mr = e.target.closest('[data-more]');
     if (mr) {
@@ -1442,6 +1528,22 @@ function bindGlobal() {
   /* 시트 */
   byId('sheet').addEventListener('click', async (e) => {
     if (e.target.closest('[data-close]')) { closeSheet(); return; }
+
+    /* 등록 실행 */
+    const rg = e.target.closest('[data-reg-go]');
+    if (rg) {
+      const n = D.notices.find((x) => x.url === rg.dataset.regGo);
+      if (!n) { toast('공고를 찾지 못했습니다'); return; }
+      const patch = {};
+      $$('#sheet [data-rg]').forEach((el) => {
+        const v = (el.value || '').trim();
+        if (v) patch[el.dataset.rg] = v;
+      });
+      if (!patch.name || patch.name.length < 8) { toast('제목이 너무 짧습니다'); return; }
+      closeSheet();
+      await applyAction('register', { notice: n, patch }, '정식 등록');
+      return;
+    }
 
     /* 확인 화면에서 실제로 실행 — 여기까지 와야 데이터가 바뀐다 */
     const bg = e.target.closest('[data-bulk-go]');
