@@ -983,8 +983,11 @@ function renderForms() {
          미리 보고 컨펌해야 의미가 있습니다.</p>
     </div>
 
-    ${broken.length ? `<p class="empty" style="border-color:var(--bad);color:var(--bad)">
-      없는 양식을 가리키는 공고 ${broken.length}건: ${broken.map((b) => esc(b.id)).join(', ')}</p>` : ''}
+    ${broken.length ? `<div class="empty" style="border-color:var(--bad);color:var(--bad);text-align:left">
+      <p><b>없는 양식을 가리키는 공고 ${broken.length}건</b> — 학생이 '앱에서 작성'을 눌러도 아무것도 안 뜹니다.</p>
+      <p class="mono" style="margin:6px 0">${broken.map((b) => `${esc(b.id)} → ${esc(b.formId)}`).join(' · ')}</p>
+      <button class="btn btn-sm danger" data-unlink="${esc(broken.map((b) => b.id).join(','))}">연결 끊기</button>
+    </div>` : ''}
 
     <div class="scroller">
       <table>
@@ -1010,12 +1013,16 @@ function renderForms() {
       <p>원본 신청서는 확보됐고, 앱에서 작성할 수 있게 만드는 일이 남은 것들입니다.</p>
     </div>
     ${queue.length ? `<div class="scroller"><table>
-        <thead><tr><th>공고</th><th>연결 id</th><th class="n">등록일</th></tr></thead>
+        <thead><tr><th>공고</th><th>연결 id</th><th class="n">등록일</th><th></th></tr></thead>
         <tbody>${queue.map((q) => `<tr>
           <td>${esc(q.name || '')}</td>
           <td class="mono">${esc(q.id || '')}</td>
-          <td class="n">${esc(q.added || '')}</td></tr>`).join('')}</tbody>
-      </table></div>`
+          <td class="n">${esc(q.added || '')}</td>
+          <td><button class="btn btn-sm" data-fq="retire" data-fq-id="${esc(q.id)}"
+                title="자동 재시도를 멈춥니다">그만 시도</button></td></tr>`).join('')}</tbody>
+      </table></div>
+      <p class="muted">스키마 자체는 화면에서 만들지 않습니다 — 원본과 <b>같은 구조</b>여야 해서
+        원본을 눈으로 보고 옮겨야 합니다(운영 원칙 4). 여기서는 큐만 정리합니다.</p>`
     : '<p class="empty">대기 중인 양식이 없습니다.</p>'}
 
     ${fetchWait.length ? `<details style="margin-top:8px">
@@ -1031,13 +1038,13 @@ function renderForms() {
     ${retired.length ? `<details style="margin-top:8px">
       <summary class="muted" style="cursor:pointer">자동 재시도를 멈춘 것 ${retired.length}건 — 6회 실패해 표적에서 내렸습니다 (펼쳐 보기)</summary>
       <div class="scroller" style="margin-top:8px"><table>
-        <thead><tr><th>공고</th><th>연결 id</th><th class="n">등록일</th></tr></thead>
+        <thead><tr><th>공고</th><th>연결 id</th><th class="n">등록일</th><th></th></tr></thead>
         <tbody>${retired.map((q) => `<tr>
           <td>${esc(q.name || '')}</td><td class="mono">${esc(q.id || '')}</td>
-          <td class="n">${esc(q.added || '')}</td></tr>`).join('')}</tbody>
+          <td class="n">${esc(q.added || '')}</td>
+          <td><button class="btn btn-sm" data-fq="retry" data-fq-id="${esc(q.id)}"
+                title="다음 수집 때 다시 받아 봅니다">다시 받기</button></td></tr>`).join('')}</tbody>
       </table></div>
-      <p class="muted">다시 받게 하려면 <code class="mono">collector/pending-forms.json</code>에서 그 항목의
-        <code class="mono">retired</code>만 지우면 됩니다.</p>
     </details>` : ''}
 
     ${orphan.length ? `<p class="muted">아직 어떤 공고에도 연결되지 않은 양식 ${orphan.length}종:
@@ -1860,6 +1867,40 @@ function bindGlobal() {
     if (qc) {
       e.stopPropagation();
       await applyAction('confirm', { ids: [qc.dataset.quickConfirm] }, '컨펌');
+      return;
+    }
+
+    /* 양식 큐 조작 (D2) */
+    const fq = e.target.closest('[data-fq]');
+    if (fq) {
+      const op = fq.dataset.fq, id = fq.dataset.fqId;
+      const q = D.pending.find((x) => x.id === id);
+      askSheet({
+        title: op === 'retire' ? '자동 재시도 멈추기' : '다시 받기',
+        goLabel: op === 'retire' ? '멈추기' : '다시 받기', danger: op === 'retire',
+        note: op === 'retire'
+          ? '로봇이 이 공고의 양식 원본을 더 이상 받으려 하지 않습니다. 리포트에는 계속 표시됩니다.'
+          : '다음 수집 때 원본을 다시 받아 봅니다.',
+        lines: [{ t: (q && q.name) || id, m: id }],
+        run: () => applyAction('formQueue', { ids: [id], op },
+          op === 'retire' ? '자동 재시도 중단' : '다시 받기'),
+      });
+      return;
+    }
+
+    const ul = e.target.closest('[data-unlink]');
+    if (ul) {
+      const list = ul.dataset.unlink.split(',').filter(Boolean);
+      askSheet({
+        title: '없는 양식 연결 끊기', goLabel: '연결 끊기', danger: true,
+        note: '가리키던 양식이 실제로 없는 공고들입니다. 연결을 끊으면 학생 화면에서 '
+          + "'앱에서 작성' 대신 원문 안내로 바뀝니다. 양식이 실제로 있으면 저장 단계에서 막힙니다.",
+        lines: list.map((id) => {
+          const it = D.reg.find((x) => x.id === id);
+          return { t: (it && it.name) || id, m: `${id} → ${(it && it.formId) || ''}` };
+        }),
+        run: () => applyAction('unlinkForm', { ids: list }, '양식 연결 끊기'),
+      });
       return;
     }
 

@@ -21,6 +21,8 @@ const { checkEntry } = createRequire(import.meta.url)('../verify/entry-rules.cjs
 const REG = 'data/registered.json';
 const CFG = 'collector/auto-register-config.json';
 const SCHOOLS = 'collector/schools.json';
+const PENDING = 'collector/pending-forms.json';
+const FORMS = 'data/forms.json';
 const LOG = 'data/admin-log.json';
 
 const action = process.env.ACTION || '';
@@ -211,6 +213,54 @@ switch (action) {
     break;
   }
 
+  /* ── 양식 큐 조작 (D2, 2026-08-09) ──────────────────────────
+     화면이 '스키마화 대기'를 보여만 주고 못 고쳤다. 두 가지만 연다:
+       retire  — 자동 재시도를 멈춘다(원본을 6회 받아도 못 받는 것 등)
+       retry   — 다시 받아 보게 한다(retired 해제 + fetched 되돌림)
+     스키마 자체를 화면에서 만드는 것은 넣지 않는다 — 운영 원칙 4(원본과 동일 구조)와
+     부딪힌다. 원본을 눈으로 보고 옮기는 일이라 사람이 세션에서 해야 한다. */
+  case 'formQueue': {
+    const q = readJson(PENDING, null);
+    if (!q || !Array.isArray(q.items)) fail(`${PENDING} 를 읽지 못했습니다`);
+    const op = payload.op;
+    if (!['retire', 'retry'].includes(op)) fail(`모르는 작업입니다: ${op}`);
+    if (!ids.length) fail('대상이 지정되지 않았습니다');
+
+    const done = [];
+    ids.forEach((id) => {
+      const item = q.items.find((x) => x.id === id);
+      if (!item) return;
+      if (op === 'retire') { item.retired = true; done.push(id); }
+      else { delete item.retired; item.fetched = false; done.push(id); }
+    });
+    if (!done.length) fail('큐에서 대상을 찾지 못했습니다');
+    writeJson(PENDING, q);
+    detail = `${op === 'retire' ? '자동 재시도 중단' : '다시 받기'} ${done.length}건: ${done.slice(0, 5).join(', ')}`;
+    touched = true;
+    break;
+  }
+
+  /* ── 없는 양식을 가리키는 연결 끊기 (D2) ────────────────────
+     `formId`가 실제로는 없는 양식을 가리키면 학생이 '앱에서 작성'을 눌렀을 때 아무것도 안 뜬다.
+     화면이 빨간 배너로 알려만 주고 고칠 수는 없었다. */
+  case 'unlinkForm': {
+    if (!ids.length) fail('대상이 지정되지 않았습니다');
+    const templates = (readJson(FORMS, { templates: {} }) || {}).templates || {};
+    const done = [];
+    ids.forEach((id) => {
+      const it = byId(id);
+      if (!it || !it.formId) return;
+      if (templates[it.formId]) fail(`${id} 의 양식(${it.formId})은 실제로 있습니다 — 끊지 않았습니다`);
+      delete it.formId;
+      it.noForm = `양식 연결 끊음 ${TODAY} — 가리키던 양식이 없어 정리했습니다`;
+      done.push(id);
+    });
+    if (!done.length) fail('끊을 연결을 찾지 못했습니다');
+    detail = `${done.length}건 연결 끊음: ${done.join(', ')}`;
+    touched = true;
+    break;
+  }
+
   /* ── 개별 항목 수정 ─────────────────────────────────────────── */
   case 'edit': {
     const it = byId(payload.id);
@@ -330,7 +380,7 @@ if (!touched) fail('아무것도 바뀌지 않았습니다');
    ⚠️ **새 동작을 추가하면 이 목록에도 반드시 넣을 것.** 빠뜨리면 화면에는 "✅ 성공"이
    뜨는데 파일은 그대로다 — 2026-08-09에 `register`가 실제로 이 상태였고, 로컬 시험에서
    "등록했다고 하는데 목록에 없다"로 잡혔다. 이슈 #79('로봇이 고친 파일은 전부 git add')와 같은 유형이다. */
-const WRITES_REG = ['confirm', 'revert', 'remove', 'edit', 'merge', 'register'];
+const WRITES_REG = ['confirm', 'revert', 'remove', 'edit', 'merge', 'register', 'unlinkForm'];
 if (WRITES_REG.includes(action)) {
   reg.updatedAt = kstNow().slice(0, 10);
   writeJson(REG, reg);

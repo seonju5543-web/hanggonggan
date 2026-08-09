@@ -614,6 +614,28 @@ function serve() {
   await page.keyboard.press('Escape');
   await page.waitForTimeout(200);
 
+  /* ⑱ 양식 큐 조작 (D2) — 예전엔 알려만 주고 못 고쳤다 */
+  await page.click('.tab[data-tab="forms"]');
+  await page.waitForSelector('#screen-forms:not([hidden])');
+  const pend = JSON.parse(fs.readFileSync(path.join(ROOT, 'collector/pending-forms.json'), 'utf8')).items || [];
+  const waiting = pend.filter((q) => q.fetched && !q.schematized && !q.retired).length;
+  if (waiting) {
+    ok(await page.locator('[data-fq="retire"]').count() === waiting,
+      '스키마화 대기 줄마다 그만 시도 버튼이 있다', `${waiting}건`);
+    await page.locator('[data-fq="retire"]').first().click();
+    await page.waitForSelector('#sheet:not([hidden])');
+    const t = await page.textContent('#sheet');
+    ok(/자동 재시도 멈추기/.test(t) && /리포트에는 계속 표시/.test(t),
+      '멈추기 전에 무슨 일이 생기는지 알려 준다');
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(200);
+  } else {
+    ok(true, '양식 큐 — 대기 건이 없어 건너뜀');
+  }
+  /* 스키마 자체는 화면에서 만들지 않는다 — 원본과 같은 구조여야 하므로(운영 원칙 4) */
+  ok(/스키마 자체는 화면에서 만들지 않습니다/.test(await page.textContent('#screen-forms')),
+    '스키마를 화면에서 만들지 않는 이유를 밝힌다');
+
   /* 데이터 읽기 실패를 조용히 넘기지 않는가 (A1) — 없는 파일을 읽게 해 배너를 확인한다 */
   const failShown = await page.evaluate(async () => {
     const w = window.__admin;
