@@ -463,6 +463,55 @@ function serve() {
     && await page.locator('#toast').getAttribute('aria-live') === 'polite',
     '진행·알림 표시가 읽어 주기에 잡힌다 (aria-live)');
 
+  /* ⑫ 정렬 (B2) — 예전엔 어디에도 사용자 정렬이 없었다 */
+  await page.click('.tab[data-tab="list"]');
+  await page.waitForSelector('#screen-list:not([hidden])');
+  ok(await page.locator('[data-sort]').count() >= 4, '정렬 버튼이 있다');
+
+  const firstBy = async () => (await page.locator('#screen-list .row .t').first().innerText()).trim();
+  await page.click('[data-sort="name"]');
+  await page.waitForTimeout(250);
+  const asc = await firstBy();
+  await page.click('[data-sort="name"]');           // 같은 것을 다시 누르면 방향이 뒤집힌다
+  await page.waitForTimeout(250);
+  const desc = await firstBy();
+  ok(asc !== desc, '같은 정렬을 다시 누르면 방향이 뒤집힌다', `${asc.slice(0, 14)} ↔ ${desc.slice(0, 14)}`);
+
+  /* 마감 없는 공고가 맨 위를 차지하면 급한 것이 안 보인다 */
+  await page.click('[data-sort="deadline"]');
+  await page.waitForTimeout(250);
+  ok(!/기한|미확인/.test(await firstBy()) , '마감 임박순에서 기한 미확인이 맨 위에 오지 않는다');
+
+  /* ⑬ 되돌릴 수 없는 동작의 확인 (B5) — window.confirm이 아니라 대상을 보여 주는 시트 */
+  /* '되돌리기'는 **검수 전 공고에만** 붙는다 — 아무 줄이나 고르면 그 버튼이 없다.
+     그래서 컨펌 작업대(전부 검수 전)에서 연다. */
+  await page.evaluate(() => { window.__confirmUsed = 0; const o = window.confirm;
+    window.confirm = () => { window.__confirmUsed += 1; return false; }; window.__origConfirm = o; });
+  await page.click('.tab[data-tab="review"]');
+  await page.waitForSelector('#screen-review:not([hidden])');
+  await page.click('#screen-review .row[data-id]');
+  await page.waitForSelector('#sheet:not([hidden])');
+  await page.click('#sheet [data-act="revert"]');
+  await page.waitForTimeout(400);
+
+  const askText = await page.textContent('#sheet');
+  const usedConfirm = await page.evaluate(() => { window.confirm = window.__origConfirm; return window.__confirmUsed; });
+  ok(usedConfirm === 0, '되돌리기에 브라우저 기본 confirm을 쓰지 않는다');
+  ok(/차단/.test(askText) && /되돌리기/.test(askText),
+    '되돌리기 확인 화면이 무엇을 하는지 보여 준다');
+  ok(await page.locator('#sheet .rows .row').count() >= 1, '어느 공고인지 목록으로 보여 준다');
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(200);
+
+  /* ⑭ 밝게/어둡게 (B8) — CSS 훅은 있었는데 아무도 값을 안 넣어 죽어 있었다 */
+  const themeStart = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
+  await page.click('#btn-theme');
+  await page.waitForTimeout(200);
+  const themeNext = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
+  ok(themeStart !== themeNext, '테마 버튼이 실제로 화면 밝기를 바꾼다', `${themeStart} → ${themeNext}`);
+  ok(await page.evaluate(() => localStorage.getItem('handaejang.admin.theme')) === themeNext,
+    '고른 밝기를 기억한다');
+
   /* 데이터 읽기 실패를 조용히 넘기지 않는가 (A1) — 없는 파일을 읽게 해 배너를 확인한다 */
   const failShown = await page.evaluate(async () => {
     const w = window.__admin;

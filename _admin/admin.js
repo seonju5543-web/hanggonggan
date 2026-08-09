@@ -116,6 +116,32 @@ const D = {
 /* 로봇 리포트 원문 캐시 — loadAll()에서 비운다(로봇을 돌린 뒤 옛 리포트가 보이면 안 된다) */
 let reportCache = {};
 
+/* ---------------- 밝게/어둡게 (B8) ----------------
+   CSS에 `[data-theme]` 훅이 처음부터 있었는데 **아무도 값을 넣지 않아 죽어 있었다.**
+   값을 안 넣으면 브라우저·운영체제 설정을 따른다(그게 기본이고, 그대로 두어도 된다). */
+const THEME_KEY = 'handaejang.admin.theme';
+const THEME_ORDER = ['auto', 'light', 'dark'];
+const THEME_LABEL = { auto: '◐', light: '☀', dark: '☾' };
+const THEME_NAME = { auto: '기기 설정 따름', light: '밝게', dark: '어둡게' };
+
+function applyTheme(mode) {
+  const root = document.documentElement;
+  if (mode === 'auto') root.removeAttribute('data-theme');
+  else root.setAttribute('data-theme', mode);
+  const b = byId('btn-theme');
+  if (b) { b.textContent = THEME_LABEL[mode]; b.title = `화면 밝기: ${THEME_NAME[mode]} (눌러서 전환)`; }
+}
+function currentTheme() {
+  try { return THEME_ORDER.includes(localStorage.getItem(THEME_KEY)) ? localStorage.getItem(THEME_KEY) : 'auto'; }
+  catch { return 'auto'; }
+}
+function cycleTheme() {
+  const next = THEME_ORDER[(THEME_ORDER.indexOf(currentTheme()) + 1) % THEME_ORDER.length];
+  try { localStorage.setItem(THEME_KEY, next); } catch { /* 저장 못 해도 이번 화면엔 적용된다 */ }
+  applyTheme(next);
+  toast(`화면 밝기: ${THEME_NAME[next]}`);
+}
+
 /* 읽기에 실패해도 화면은 계속 그려야 한다(한 파일 때문에 전부 못 보면 더 나쁘다).
    다만 **조용히 빈 값으로 바꾸면 안 된다** — 그러면 인터넷이 끊겨도 '검수 전 0건 ·
    모든 게시판 정상'으로 보인다. 실패한 경로를 모아 화면 맨 위에 경고로 띄운다. */
@@ -644,6 +670,33 @@ function refreshSelBar() {
   else if (html) scr.insertAdjacentHTML('afterbegin', html);
 }
 
+/* ---------------- 확인 시트 (B5) ----------------
+   `window.confirm`은 ⓐ 무엇을 처리하는지 못 보여 주고 ⓑ 브라우저마다 생김새가 달라
+   중요한 경고가 '그냥 눌러 넘기는 창'으로 읽힌다. 되돌릴 수 없는 동작은
+   **무엇에 대해 하는 일인지 눈으로 보여 준 뒤** 확인받는다.
+   실행할 일은 여기 담아 두고, 확인 버튼이 눌리면 그때 꺼내 돌린다. */
+let pendingGo = null;
+
+function askSheet({ title, note, lines = [], goLabel, danger = false, run }) {
+  pendingGo = run;
+  openSheet(`
+    <div class="sheet-head">
+      <h3>${esc(title)}</h3>
+      <button class="sheet-close" data-close aria-label="닫기">×</button>
+    </div>
+    ${note ? `<p class="muted">${esc(note)}</p>` : ''}
+    ${lines.length ? `<div class="rows">${lines.map((l) => `
+      <div class="row" data-noclick style="cursor:default">
+        <div><div class="t">${esc(l.t)}</div>
+          ${l.m ? `<div class="m"><span>${esc(l.m)}</span></div>` : ''}</div>
+        <div></div><div></div>
+      </div>`).join('')}</div>` : ''}
+    <div class="btn-row" style="margin-top:6px">
+      <button class="btn ${danger ? 'danger' : 'btn-primary'}" data-ask-go>${esc(goLabel)}</button>
+      <button class="btn" data-close>취소</button>
+    </div>`);
+}
+
 /* 화면 아래 선택 바 — 몇 건 골랐는지와 할 수 있는 일을 항상 보이게 둔다 */
 function selBarHtml() {
   if (!SEL.size) return '';
@@ -659,7 +712,31 @@ function selBarHtml() {
 }
 
 /* ---------------- ② 공고 전체 ---------------- */
-const F = { status: 'all', school: 'all', nature: 'all', channel: 'all', badge: 'all', q: '', open: false };
+const F = { status: 'all', school: 'all', nature: 'all', channel: 'all', badge: 'all', q: '', open: false,
+  sort: 'deadline', dir: 'asc' };
+
+/* ---------------- 정렬 (B2) ----------------
+   예전엔 **어디에도 사용자 정렬이 없었다.** 166건이 늘 같은 순서로만 나왔다.
+   마감 없는 공고는 어느 방향으로 정렬하든 **항상 뒤로** 보낸다 —
+   '기한 미확인'이 맨 위를 차지하면 급한 것이 안 보인다. */
+const SORTS = {
+  deadline: { label: '마감 임박순', get: (it) => it.deadline || '' },
+  listed: { label: '등록 최신순', get: (it) => it.listedAt || it.deadline || '', dir: 'desc' },
+  school: { label: '학교순', get: (it) => schoolOf(it) },
+  name: { label: '제목순', get: (it) => it.name || '' },
+};
+
+function sortItems(items) {
+  const s = SORTS[F.sort] || SORTS.deadline;
+  const sign = F.dir === 'desc' ? -1 : 1;
+  return items.slice().sort((a, b) => {
+    const va = s.get(a), vb = s.get(b);
+    if (!va && !vb) return 0;
+    if (!va) return 1;          // 값이 없는 것은 방향과 무관하게 뒤로
+    if (!vb) return -1;
+    return va < vb ? -sign : va > vb ? sign : 0;
+  });
+}
 
 /* 접어 둔 필터가 걸려 있는지 한눈에 — 안 그러면 "왜 몇 건밖에 안 보이지?"가 된다.
    태그를 누르면 그 필터만 풀린다. */
@@ -710,7 +787,7 @@ function renderList() {
   const schoolOpts = Object.entries(schoolC).sort((a, b) => b[1] - a[1])
     .map(([s, n]) => `<option value="${esc(s)}"${F.school === s ? ' selected' : ''}>${esc(s)} (${n})</option>`).join('');
 
-  const items = filteredList();
+  const items = sortItems(filteredList());
 
   byId('screen-list').innerHTML = `
     <div class="sec-head">
@@ -730,6 +807,12 @@ function renderList() {
         <span class="lb">검색</span>
         <input type="search" id="f-q" placeholder="제목·재단·id로 찾기" value="${esc(F.q)}" />
         <span class="muted">${items.length}건</span>
+      </div>
+      <div class="filter-row">
+        <span class="lb">정렬</span>
+        ${Object.entries(SORTS).map(([k, v]) =>
+    `<button class="chip ${F.sort === k ? 'on' : ''}" data-sort="${esc(k)}">${esc(v.label)}${
+      F.sort === k ? `<span class="c">${F.dir === 'asc' ? '↑' : '↓'}</span>` : ''}</button>`).join('')}
       </div>
     </div>
 
@@ -1616,6 +1699,15 @@ function bindGlobal() {
     const f = e.target.closest('[data-f]');
     if (f) { F[f.dataset.f] = f.dataset.v; renderList(); return; }
 
+    const so = e.target.closest('[data-sort]');
+    if (so) {
+      const k = so.dataset.sort;
+      if (F.sort === k) F.dir = F.dir === 'asc' ? 'desc' : 'asc';
+      else { F.sort = k; F.dir = SORTS[k].dir || 'asc'; }
+      renderList();
+      return;
+    }
+
     const clr = e.target.closest('[data-clear]');
     if (clr) {
       const k = clr.dataset.clear;
@@ -1628,8 +1720,16 @@ function bindGlobal() {
     const mg = e.target.closest('[data-merge]');
     if (mg) {
       const [keepId, dropId] = mg.dataset.merge.split('|');
-      if (!confirm(`${dropId} 를 지우고 ${keepId} 하나로 합칩니다. 계속할까요?`)) return;
-      await applyAction('merge', { keepId, dropId }, '중복 합치기');
+      const keep = D.reg.find((x) => x.id === keepId), drop = D.reg.find((x) => x.id === dropId);
+      askSheet({
+        title: '중복 공고 합치기', danger: true, goLabel: '합치기',
+        note: '아래 두 번째 공고를 등록에서 지웁니다. 되돌리려면 git 기록을 봐야 합니다.',
+        lines: [
+          { t: `남길 것 — ${keep ? keep.name : keepId}`, m: keepId },
+          { t: `지울 것 — ${drop ? drop.name : dropId}`, m: dropId },
+        ],
+        run: () => applyAction('merge', { keepId, dropId }, '중복 합치기'),
+      });
       return;
     }
 
@@ -1671,8 +1771,14 @@ function bindGlobal() {
     }
     if (e.target.closest('#btn-auto-toggle')) {
       const next = !D.autoCfg.enabled;
-      if (!confirm(next ? '자동 등록 로봇을 켤까요?' : '자동 등록 로봇을 끌까요? 로봇은 리포트만 올리게 됩니다.')) return;
-      await applyAction('autoRegister', { enabled: next }, next ? '자동 등록 켜기' : '자동 등록 끄기');
+      askSheet({
+        title: next ? '자동 등록 로봇 켜기' : '자동 등록 로봇 끄기',
+        goLabel: next ? '켜기' : '끄기', danger: !next,
+        note: next
+          ? '로봇이 보수적 규칙을 통과한 공고를 스스로 등록합니다. 앱에는 "검수 전" 배지가 붙습니다.'
+          : '로봇이 등록을 멈추고 리포트만 올립니다. 새 공고가 학생 앱에 자동으로 나가지 않게 됩니다.',
+        run: () => applyAction('autoRegister', { enabled: next }, next ? '자동 등록 켜기' : '자동 등록 끄기'),
+      });
       return;
     }
     /* 행에서 바로 컨펌 — 문제 없는 공고까지 시트를 열었다 닫을 이유가 없다 */
@@ -1765,6 +1871,15 @@ function bindGlobal() {
   byId('sheet').addEventListener('click', async (e) => {
     if (e.target.closest('[data-close]')) { closeSheet(); return; }
 
+    /* 확인 시트의 '실행' — 담아 둔 일을 여기서 꺼내 돌린다 */
+    if (e.target.closest('[data-ask-go]')) {
+      const go = pendingGo;
+      pendingGo = null;
+      closeSheet();
+      if (go) await go();
+      return;
+    }
+
     /* 등록 실행 */
     const rg = e.target.closest('[data-reg-go]');
     if (rg) {
@@ -1812,13 +1927,21 @@ function bindGlobal() {
       closeSheet();
       await applyAction('confirm', { ids: [id] }, '컨펌');
     } else if (kind === 'revert') {
-      if (!confirm('이 공고를 등록에서 빼고, 로봇이 다시 등록하지 않도록 차단 목록에 넣습니다. 계속할까요?')) return;
-      closeSheet();
-      await applyAction('revert', { ids: [id] }, '되돌리기');
+      const it = D.reg.find((x) => x.id === id);
+      askSheet({
+        title: '등록에서 빼고 재등록 차단', danger: true, goLabel: '되돌리기',
+        note: '등록에서 빠지고, 수집 로봇이 다시 등록하지 않도록 차단 목록에 올라갑니다.',
+        lines: [{ t: it ? it.name : id, m: id }],
+        run: () => applyAction('revert', { ids: [id] }, '되돌리기'),
+      });
     } else if (kind === 'remove') {
-      if (!confirm('이 공고를 등록에서 삭제합니다. 계속할까요?')) return;
-      closeSheet();
-      await applyAction('remove', { ids: [id] }, '등록 삭제');
+      const it = D.reg.find((x) => x.id === id);
+      askSheet({
+        title: '등록 삭제', danger: true, goLabel: '삭제',
+        note: '등록에서 지웁니다. 차단은 하지 않으므로 로봇이 다시 등록할 수 있습니다.',
+        lines: [{ t: it ? it.name : id, m: id }],
+        run: () => applyAction('remove', { ids: [id] }, '등록 삭제'),
+      });
     }
   });
   byId('sheet-back').addEventListener('click', closeSheet);
@@ -1835,10 +1958,20 @@ function bindGlobal() {
     location.reload();
   });
   byId('job-close').addEventListener('click', () => { byId('job').hidden = true; });
+  byId('btn-theme').addEventListener('click', cycleTheme);
 }
 
 async function runCollector(file, label) {
-  if (!confirm(`${label}을(를) 지금 실행할까요? 몇 분 걸립니다.`)) return;
+  askSheet({
+    title: `${label} 지금 실행`, goLabel: '실행',
+    note: '몇 분 걸립니다. 수집 계열은 같은 학교를 짧은 시간에 여러 번 두드리면 '
+      + '학교 서버가 막아 멀쩡한 주소까지 실패로 뜰 수 있습니다.',
+    lines: [{ t: label, m: file }],
+    run: () => reallyRun(file, label),
+  });
+}
+
+async function reallyRun(file, label) {
   try {
     jobShow(`${label} 실행을 요청했어요`);
     await dispatchWorkflow(file, {});
@@ -1895,6 +2028,7 @@ async function enter(key, remember) {
 }
 
 function boot() {
+  applyTheme(currentTheme());   // 열쇠 화면부터 적용한다
   byId('gate-enter').addEventListener('click', () => {
     const k = byId('gate-key').value.trim();
     if (!k) { const m = byId('gate-msg'); m.hidden = false; m.className = 'gate-msg'; m.textContent = '열쇠를 넣어 주세요.'; return; }
