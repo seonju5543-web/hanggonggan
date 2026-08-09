@@ -342,6 +342,42 @@ function serve() {
     ok(true, '더 보기 버튼 — 지금 데이터에선 잘린 목록이 없어 건너뜀');
   }
 
+  /* ⑩ 로봇 통제판 (E) — 로봇이 뭐라고 하는지 화면이 말해 주는가 */
+  await page.route('**/api.github.com/repos/*/*/issues?**', (route) => route.fulfill({
+    status: 200, contentType: 'application/json', body: JSON.stringify([
+      { number: 9001, title: '🚨 관리자 화면이 잠기지 않았습니다', html_url: 'https://example.invalid/1', created_at: '2026-08-09T00:00:00Z', comments: 0 },
+      { number: 9002, title: '🔧 원문 주소를 3회 못 찾은 공고 1건', html_url: 'https://example.invalid/2', created_at: '2026-08-05T00:00:00Z', comments: 0 },
+      { number: 9003, title: '🤖 장학공고 수집 리포트 2026-08-08 (새 공고 14건)', html_url: 'https://example.invalid/3', created_at: '2026-08-08T00:00:00Z', comments: 3 },
+    ]),
+  }));
+  await page.click('.tab[data-tab="robots"]');
+  await page.waitForSelector('#screen-robots:not([hidden])');
+  await page.waitForFunction(() => !/불러오는 중/.test(document.querySelector('#robot-issues')?.textContent || ''),
+    null, { timeout: 10000 });
+
+  const issueText = await page.textContent('#robot-issues');
+  ok(/잠기지 않았습니다/.test(issueText), '🚨 경보를 맨 위에 보여 준다');
+  ok(/원문 주소를 3회/.test(issueText), '🔧 조치 요청도 함께 보여 준다');
+  ok(/수집 리포트 1건/.test(issueText), '수집 리포트는 접어 둔다 (경보가 묻히지 않게)');
+  ok(await page.locator('#n-robots').textContent() === '2', '탭 배지가 경보 건수를 센다 (리포트는 안 센다)');
+  ok(await page.locator('#screen-robots [data-run]').count() >= 12, '로봇 12종 이상에 실행 버튼이 있다');
+  ok(await page.locator('#screen-robots [data-report]').count() === 5, '리포트 5종을 볼 수 있다');
+
+  /* 🔴 이 화면의 존재 이유가 '로봇이 뭐라고 하는지'다 —
+     못 읽었을 때 '아무 말 없음'으로 보이면 화면이 거짓말하는 것이다 */
+  const failText = await page.evaluate(async () => {
+    const box = document.querySelector('#robot-issues');
+    box.innerHTML = '<p class="muted">불러오는 중…</p>';
+    const orig = window.fetch;
+    window.fetch = () => Promise.reject(new Error('네트워크 끊김'));
+    await window.__admin.loadRobotIssues();
+    window.fetch = orig;
+    return box.textContent;
+  });
+  ok(/읽지 못했습니다/.test(failText) && /아무 말 없음이 아닙니다/.test(failText.replace(/[''"]/g, '')),
+    '로봇 소식을 못 읽으면 그렇다고 말한다 (조용히 비우지 않는다)');
+  await page.unroute('**/api.github.com/repos/*/*/issues?**');
+
   /* 데이터 읽기 실패를 조용히 넘기지 않는가 (A1) — 없는 파일을 읽게 해 배너를 확인한다 */
   const failShown = await page.evaluate(async () => {
     const w = window.__admin;

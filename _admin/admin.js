@@ -379,7 +379,7 @@ async function applyAction(action, payload, label) {
 }
 
 /* ---------------- 화면 전환 ---------------- */
-const SCREENS = ['todo', 'list', 'review', 'forms', 'network', 'quality'];
+const SCREENS = ['todo', 'list', 'review', 'forms', 'network', 'robots', 'quality'];
 let current = 'todo';
 
 function show(name) {
@@ -392,7 +392,8 @@ function show(name) {
 
 function renderScreen(name) {
   ({ todo: renderTodo, list: renderList, review: renderReview,
-    forms: renderForms, network: renderNetwork, quality: renderQuality }[name] || (() => {}))();
+    forms: renderForms, network: renderNetwork, robots: renderRobots,
+    quality: renderQuality }[name] || (() => {}))();
 }
 
 /* 읽지 못한 데이터가 있으면 화면 맨 위에 붙인다.
@@ -441,6 +442,10 @@ function renderCounts() {
   set('n-review', unrev, true);
   set('n-forms', Object.keys(D.forms).length);
   set('n-network', failingSchools().length, true);
+  /* 로봇 탭 배지는 열린 경보 수 — loadRobotIssues가 읽어 채운다.
+     읽기 전에는 '—'로 둔다. 0으로 두면 **못 읽은 것이 '이상 없음'으로 보인다.** */
+  const rb = byId('n-robots');
+  if (rb && !rb.dataset.filled) { rb.textContent = '—'; rb.className = 'tab-n'; }
   set('n-quality', probs, true);
 }
 
@@ -1021,7 +1026,177 @@ function renderNetwork() {
   `;
 }
 
-/* ---------------- ⑥ 데이터 품질 ---------------- */
+/* ---------------- ⑥ 로봇 통제판 (E단계, 2026-08-09) ----------------
+   왜 만들었나: 로봇이 13종인데 화면에서 돌릴 수 있는 건 3종뿐이었고, 로봇이 뭐라고
+   말하는지(리포트 이슈)는 화면에 아예 없었다. 그래서 로봇이 멈춰도 이 화면은 조용했다.
+   같은 날 실제로 겪은 일: 건강 기록의 고아 키를 보고 **멀쩡한 학교 4곳을 '멈췄다'고
+   오진**했다. 화면이 진짜 신호(열린 경보·마지막 실행)를 보여 줬으면 바로 알았을 것이다. */
+
+const ROBOTS = [
+  { f: 'collect-scholarships.yml', n: '일반 수집 로봇', d: '게시판 37곳을 훑어 새 공고를 담습니다', when: '매일 07:41·11:41' },
+  { f: 'browser-collect.yml', n: '브라우저형 수집 로봇', d: '봇차단·동적 게시판 17곳을 진짜 브라우저로 봅니다', when: '매일 08:07·12:07' },
+  { f: 'link-hunter.yml', n: '링크 사냥꾼', d: '원문 주소를 못 찾은 공고를 계속 다시 찾습니다', when: '매일 06:37' },
+  { f: 'resolve-detail-urls.yml', n: '원문 링크 복구', d: '목록 주소로 남은 공고를 게시판에서 찾아 고칩니다', when: '주 1회' },
+  { f: 'deep-fetch.yml', n: '심층 수집', d: '공고 본문 전문과 첨부 원본을 받아 옵니다', when: '수동' },
+  { f: 'deploy-sync.yml', n: '배포 동기화', d: '지금 내용을 학생 앱으로 내보냅니다', when: '수집 후 자동' },
+  { f: 'check-live.yml', n: '실제 앱 반영 확인', d: '학생 앱이 저장소와 같은지 대조합니다', when: '매일 13:11' },
+  { f: 'push-check.yml', n: '푸시 알림 검사', d: '등록된 모든 폰에 시험 알림을 보냅니다', when: '수동' },
+  { f: 'admin-lock-check.yml', n: '관리자 화면 잠금 확인', d: '이 화면이 정말 잠겨 있는지 밖에서 열어 봅니다', when: '매일 14:23' },
+  { f: 'close-old-reports.yml', n: '오래된 리포트 닫기', d: '지난 수집 리포트를 닫아 경보가 묻히지 않게 합니다', when: '매주 월' },
+  { f: 'probe-links.yml', n: '링크 정찰', d: '이 주소가 학생 눈에 어떻게 보이는지 확인합니다', when: '수동' },
+  { f: 'refresh-majors.yml', n: '학과 목록 갱신', d: '커리어넷에서 학교별 개설 학과를 다시 받습니다', when: '수동' },
+];
+
+const REPORTS = [
+  ['collector/report.md', '일반 수집'],
+  ['collector/browser-report.md', '브라우저 수집'],
+  ['collector/link-hunt-report.md', '링크 사냥꾼'],
+  ['collector/resolve-report.md', '원문 링크 복구'],
+  ['collector/deepfetch-report.md', '심층 수집'],
+];
+
+/* 로봇이 남긴 열린 이슈 — 🚨 경보를 맨 위로, 리포트는 접어 둔다 */
+function issueKind(t) {
+  if (/^🚨/.test(t)) return { k: 'alarm', label: '경보', tone: 'bad' };
+  if (/^🔧/.test(t)) return { k: 'todo', label: '조치 필요', tone: 'warn' };
+  if (/^(🤖|🖥)/.test(t)) return { k: 'report', label: '리포트', tone: '' };
+  return { k: 'other', label: '기타', tone: '' };
+}
+
+function renderRobots() {
+  const box = byId('screen-robots');
+  const runRow = (r) => `
+    <div class="row" data-noclick style="cursor:default">
+      <div>
+        <div class="t">${esc(r.n)}</div>
+        <div class="m"><span>${esc(r.d)}</span><span>${esc(r.when)}</span></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-sm" data-run="${esc(r.f)}" data-run-name="${esc(r.n)}">지금 실행</button>
+        <a class="btn btn-sm" href="https://github.com/${OWNER}/${REPO}/actions/workflows/${esc(r.f)}"
+           target="_blank" rel="noreferrer noopener">기록 ↗</a>
+      </div>
+      <div></div>
+    </div>`;
+
+  box.innerHTML = `
+    <div class="sec-head">
+      <h2>로봇</h2>
+      <p>로봇이 무슨 말을 하고 있는지 먼저 보고, 필요하면 여기서 바로 돌립니다.</p>
+    </div>
+
+    <div class="sec-head"><h2>로봇이 남긴 것</h2></div>
+    <div id="robot-issues"><p class="muted">불러오는 중…</p></div>
+
+    <div class="sec-head" style="margin-top:12px"><h2>푸시 발송 서버</h2></div>
+    <div id="push-health"><p class="muted">확인하는 중…</p></div>
+
+    <div class="sec-head" style="margin-top:12px"><h2>로봇 ${ROBOTS.length}종 — 지금 실행</h2>
+      <p>예약 시간과 무관하게 한 번 더 돌립니다. <b>같은 학교를 하루에 여러 번 두드리면</b>
+         학교 서버가 막아 멀쩡한 주소까지 실패로 뜰 수 있으니, 수집 계열은 필요할 때만 누르세요.</p>
+    </div>
+    <div class="rows">${ROBOTS.map(runRow).join('')}</div>
+
+    <div class="sec-head" style="margin-top:12px"><h2>로봇 리포트 전문</h2></div>
+    <div class="filter-row">
+      ${REPORTS.map(([p, n]) => `<button class="btn btn-sm" data-report="${esc(p)}">${esc(n)}</button>`).join('')}
+    </div>
+    <div id="report-box"></div>
+
+    <div class="sec-head" style="margin-top:12px"><h2>로봇 설정</h2></div>
+    <div class="rows">
+      <div class="row" data-noclick style="cursor:default">
+        <div>
+          <div class="t">자동 등록 로봇</div>
+          <div class="m"><span>${D.autoCfg.enabled ? '켜짐 — 로봇이 스스로 등록합니다' : '꺼짐 — 리포트만 올립니다'}</span>
+            <span>한 번에 최대 ${esc(String(D.autoCfg.maxPerRun ?? 8))}건</span>
+            <span>재등록 차단 ${(D.autoCfg.blockIds || []).length}건</span></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-sm ${D.autoCfg.enabled ? 'danger' : 'good'}" id="btn-auto-toggle">
+            ${D.autoCfg.enabled ? '끄기' : '켜기'}</button>
+        </div>
+        <div></div>
+      </div>
+    </div>`;
+
+  loadRobotIssues();
+  loadPushHealth();
+}
+
+/* 열린 이슈를 읽어 온다. 실패하면 **조용히 비우지 않는다** — 이 화면의 존재 이유가
+   '로봇이 뭐라고 하는지'인데, 못 읽은 것을 '아무 말 없음'으로 보이면 안 된다. */
+async function loadRobotIssues() {
+  const box = byId('robot-issues');
+  if (!box) return;
+  try {
+    const r = await fetch(`${API}/repos/${OWNER}/${REPO}/issues?state=open&per_page=100`, { headers: ghHeaders() });
+    if (!r.ok) throw new Error(`GitHub 응답 ${r.status}`);
+    const all = (await r.json()).filter((x) => !x.pull_request);
+    const g = { alarm: [], todo: [], report: [], other: [] };
+    all.forEach((x) => { g[issueKind(x.title).k].push(x); });
+
+    const row = (x) => {
+      const kind = issueKind(x.title);
+      return `<div class="row" data-noclick style="cursor:default">
+        <div>
+          <div class="t">${esc(x.title)}</div>
+          <div class="m"><span>#${x.number}</span><span>${esc((x.created_at || '').slice(0, 10))}</span>
+            ${x.comments ? `<span>코멘트 ${x.comments}</span>` : ''}</div>
+        </div>
+        <div><span class="pill ${kind.tone}">${esc(kind.label)}</span></div>
+        <div class="btn-row"><a class="btn btn-sm" href="${esc(x.html_url)}"
+           target="_blank" rel="noreferrer noopener">열기 ↗</a></div>
+        <div></div>
+      </div>`;
+    };
+    const urgent = [...g.alarm, ...g.todo];
+    const rb = byId('n-robots');
+    if (rb) { rb.textContent = urgent.length; rb.className = `tab-n${urgent.length ? ' hot' : ''}`; rb.dataset.filled = '1'; }
+    box.innerHTML = `
+      ${urgent.length
+    ? `<div class="rows">${urgent.map(row).join('')}</div>`
+    : '<p class="empty">🚨 경보도 조치 요청도 없습니다 — 로봇이 조용합니다.</p>'}
+      ${g.report.length ? `<details style="margin-top:8px">
+        <summary class="muted" style="cursor:pointer">수집 리포트 ${g.report.length}건 (펼쳐 보기)</summary>
+        <div class="rows" style="margin-top:8px">${g.report.slice(0, 20).map(row).join('')}</div>
+      </details>` : ''}
+      ${g.other.length ? `<p class="muted">그 밖의 열린 이슈 ${g.other.length}건</p>` : ''}`;
+  } catch (e) {
+    box.innerHTML = `<p class="empty" style="border-color:var(--bad);color:var(--bad)">
+      로봇이 남긴 것을 읽지 못했습니다 (${esc(e.message)}) — <b>'아무 말 없음'이 아닙니다.</b>
+      잠시 후 새로고침해 주세요.</p>`;
+  }
+}
+
+/* 푸시 서버는 `lastError`가 **조용히 멈춘 것을 알 수 있는 유일한 신호**다 */
+async function loadPushHealth() {
+  const box = byId('push-health');
+  if (!box) return;
+  const url = 'https://handaejang-push.seonju5543.workers.dev/health';
+  try {
+    const r = await fetch(url, { cache: 'no-store' });
+    if (!r.ok) throw new Error(`응답 ${r.status}`);
+    const h = await r.json();
+    const bad = !!h.lastError;
+    box.innerHTML = `<div class="cards"><div class="card ${bad ? 'is-bad' : 'is-ok'}">
+      <div class="v">${h.subs == null ? '—' : esc(String(h.subs))}</div>
+      <div class="k">등록된 폰</div>
+      <div class="d">${bad ? `마지막 오류: ${esc(JSON.stringify(h.lastError)).slice(0, 90)}`
+    : `정상 · 지금 단계 ${esc(String(h.step || 'idle'))}`}</div>
+      <div class="btn-row">
+        <button class="btn btn-sm" data-run="push-check.yml" data-run-name="푸시 알림 검사">시험 발송</button>
+      </div></div></div>
+      <p class="muted">등록 수는 <b>'살아 있는 폰 수'가 아닙니다</b> — 실제로 받는지는 시험 발송만이 증명합니다.</p>`;
+  } catch (e) {
+    box.innerHTML = `<p class="muted">푸시 서버 상태를 읽지 못했습니다 (${esc(e.message)}).
+      서버가 멈춘 것일 수도, 이 브라우저가 못 닿는 것일 수도 있습니다 —
+      <b>둘을 구분할 수 없으니 '정상'으로 보지 마세요.</b>
+      <a href="${esc(url)}" target="_blank" rel="noreferrer noopener">직접 열어 보기 ↗</a></p>`;
+  }
+}
+
+/* ---------------- ⑦ 데이터 품질 ---------------- */
 function renderQuality() {
   const fi = formIdSet();
   const withProb = D.reg.map((it) => ({ it, ps: problemsOf(it, fi) })).filter((x) => x.ps.length);
@@ -1448,6 +1623,13 @@ function bindGlobal() {
       return;
     }
 
+    /* 로봇 통제판의 '지금 실행' — 어떤 로봇이든 같은 경로로 돈다 */
+    const run = e.target.closest('[data-run]');
+    if (run) {
+      await runCollector(run.dataset.run, run.dataset.runName || '로봇');
+      return;
+    }
+
     if (e.target.closest('#btn-run-collect')) {
       await runCollector(WF_COLLECT, '일반 수집 로봇'); return;
     }
@@ -1654,7 +1836,7 @@ async function enter(key, remember) {
      검증 드라이버(verify/verify-admin.js)와 브라우저 콘솔에서 상태를 들여다볼 때 쓴다.
      열쇠를 통과한 뒤에만 만들어지므로 이것으로 잠금이 느슨해지지는 않는다. */
   window.__admin = { D, previewDoc, blankAnswers, statusOf, badgesOf, channelOf, naturesOf,
-    renderDataFail, pendingForms };
+    renderDataFail, pendingForms, loadRobotIssues, loadPushHealth };
 }
 
 function boot() {
