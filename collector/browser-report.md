@@ -1,4 +1,4 @@
-## 🖥 브라우저형 수집 리포트 (2026-08-09 08:39 KST)
+## 🖥 브라우저형 수집 리포트 (2026-08-09 13:24 KST)
 
 ### 서울대학교
 - ✅ 링크 222 · 장학 공고 19 · https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=list&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80
@@ -49,12 +49,9 @@
 
 ### 중앙대학교
 - ✅ 링크 670 · 장학 공고 15 · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5
-  - [수집] 다빈치캠퍼스 2026-1학기 일취월장 장학금 선발 공고
-  - [수집] 서울캠퍼스 2026-1학기 일취월장 장학금 선발 공고
-  - [수집] 2026-1학기 복지장학금 시행 공고(서울캠퍼스)
   - [수집] 2026학년도 대통령과학장학금 신규장학생 선발 안내
   - [수집] 2026년도 인문100년 장학금 신청 안내
-- ❌ 오류(page.goto: Target page, context or browser has been closed) · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100
+- ✅ 링크 652 · 장학 공고 2 · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100
 
 ### 숙명여자대학교
 - ⚪ 링크 2 · 장학 공고 0 · https://www.sookmyung.ac.kr/kr/life/scholarship-notice.do
@@ -96,9 +93,7 @@
 
 ### 상명대학교
 - ✅ 링크 547 · 장학 공고 10 · https://www.smu.ac.kr/kor/life/notice.do
-  - [수집] [학생복지팀] 2026학년도 2학기 국가장학금 재학생 우선(학비)감면 안내
-  - [수집] [학술정보관] 제2자료실 두레장학생(두레조교) 모집 안내
-- ✅ 링크 547 · 장학 공고 10 · https://www.smu.ac.kr/kor/life/notice.do?srCategoryId=8
+- ❌ 오류(page.goto: Target page, context or browser has been closed) · https://www.smu.ac.kr/kor/life/notice.do?srCategoryId=8
 - ⚪ 링크 0 · 장학 공고 0 · https://www.smu.ac.kr/kor/life/scholarship.do
 
 ### 고려대학교
@@ -109,31 +104,17 @@
 
 ### 부산대학교
 - ✅ 링크 47 · 장학 공고 2 · https://onestop.pusan.ac.kr/page?menuCD=000000000000062
-  - [수집] 2026학년도 2학기 2차 주거안정장학금 신청 안내
 
 ### 서울교육대학교
-- ✅ 링크 385 · 장학 공고 14 · https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083
-  - [수집] [한국장학재단] 2026학년도 2학기 학자금대출 안내
-  - [수집] ※신입생 장학금의 경우, 등록금 납부 이후 장학금 추후 개별 지급※
-  - [수집] 등록금을 납부하지 않고 휴학한 경우 해당학기 장학금 지급 제외
-  - [수집] ※메가스터디 장학은 본교에서 지급하지 않고 있습니다※
-  - [수집] [한국장학재단] 2026학년도 2학기 2차 주거안정장학금 신청
-  - [수집] [한국장학재단] 2026학년도 2학기 2차 국가근로장학금 학생 신청 기간 안내
-  - [수집] [군산시] 2026년 하반기 군산시 대학생 학자금 이자 지원 사업
-  - [수집] [서울특별시] 2026년 제2차 서울시 학자금대출이자 지원 사업 신청
-  - [수집] [울산광역시] 2026년 하반기 대학(원)생 학자금대출 이자지원사업
-  - [수집] [서울미래인재재단] 2026년 하반기 서울인재대학장학금 장학생 선발
-  - [수집] [5·18기념재단] 2026년 5·18희망장학생 모집
-  - [수집] [서울 사랑의열매 ] 2026년 상반기 사랑나눔장학생 모집 안내
-  - [수집] [국립국제교육원] 2026-2027 슬로바키아 정부초청 장학생 선발 안내
-  - [수집] [화성시인재육성재단] 2026년 「소상공인 장학금」 홍보
+- ❌ 오류(page.goto: Target page, context or browser has been closed) · https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083
 
 ### 홍익대학교
-- ⚪ 링크 0 · 장학 공고 0 · https://www.hongik.ac.kr/kr/newscenter/notice.do
+- ⚪ 링크 399 · 장학 공고 0 · https://www.hongik.ac.kr/kr/newscenter/notice.do
+  - (프레임 1개 · 클릭 시도 0건)
 - ❌ 오류(page.goto: Target page, context or browser has been closed) · https://www.hongik.ac.kr/index.do
 
 ### 서울과학기술대학교
-- ❌ 오류(page.goto: Target page, context or browser has been closed) · https://www.seoultech.ac.kr/service/info/janghak/
+- ✅ 링크 292 · 장학 공고 17 · https://www.seoultech.ac.kr/service/info/janghak/
 
 ### 🔁 실패 학교 재시도 (몇 분 뒤 재접속)
 **경희대학교**
@@ -141,14 +122,13 @@
 
 **고려대학교**
 - ✅ 링크 391 · 장학 공고 7 · https://www.korea.ac.kr/ko/568/subview.do
-  - [수집] [국가근로] 2026학년도 2학기 국가근로장학 희망근로지 신청(1차) 및 신청방법 변경 안내
 
-**서울과학기술대학교**
-- ✅ 링크 292 · 장학 공고 17 · https://www.seoultech.ac.kr/service/info/janghak/
+**서울교육대학교**
+- ✅ 링크 385 · 장학 공고 14 · https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083
 
 ---
-이번 실행 신규 수집: **23건** · 브라우저로도 수집 실패한 학교는 게시판 주소 확인이 필요합니다.
-⏱ 소요 6분 / 예산 22분 · 학교 17/17곳 처리
+이번 실행 신규 수집: **2건** · 브라우저로도 수집 실패한 학교는 게시판 주소 확인이 필요합니다.
+⏱ 소요 5분 / 예산 22분 · 학교 17/17곳 처리
 **⏳ 스키마화 대기 중 18건** (원본 확보됨 — collector/pending-forms.json)
 
 ### 🤖 자동 등록 (선조치후보고) — 0건 등록
@@ -246,7 +226,7 @@
 
 **건너뜀 5건**
 
-- 2. 2026년 상반기 바로바로론 사랑나눔 장학생 모집 공고.docx — 첨부 문서가 모집 공고문(모집 내용·일정·지원 자격·제출 서류·접수 방법 안내)으로, 학생이 직접 기입하는 입력 칸이나 항목이 없습니다. 실제 작성 서류인 자기소개서 및 개인정보 수집·이용 동의서 양식이 포함되어 있지 않아 입력 양식으로 옮길 수 없습니다.
+- 2. 2026년 상반기 바로바로론 사랑나눔 장학생 모집 공고.docx — 첨부 문서는 모집 요강(공고)으로, 모집 인원·일정·지원 자격·제출 서류·접수 방법 등 안내 내용만 담겨 있습니다. 학생이 직접 기입하는 신청서 양식(자기소개서, 개인정보 수집·이용 동의서 등)의 항목이나 기입란이 포함되어 있지 않아 입력 양식 스키마로 옮길 수 없습니다.
 - 봉은재단(추천서).hwp — 제3자 작성 서식 — 원본 다운로드 안내 유지
 - 장학 2026년 서울미래인재재단 서울인재대학장학금 선발 안내(1학년 대상, 8.3.월 10 — registered.json에 항목 없음
 - 붙임4. 장학금 신청서 및 추천서 서식.hwp — 제3자 작성 서식 — 원본 다운로드 안내 유지
