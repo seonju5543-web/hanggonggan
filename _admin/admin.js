@@ -110,14 +110,24 @@ const D = {
   reg: [], notices: [], forms: {}, health: {}, schools: [], targets: [],
   linkHunt: {}, pending: [], autoCfg: { enabled: true, blockIds: [] }, log: [],
   updatedAt: '', deployAhead: null,
+  failed: [],   // 읽지 못한 파일 — 비어 있지 않으면 화면 숫자를 믿으면 안 된다
 };
 
+/* 로봇 리포트 원문 캐시 — loadAll()에서 비운다(로봇을 돌린 뒤 옛 리포트가 보이면 안 된다) */
+let reportCache = {};
+
+/* 읽기에 실패해도 화면은 계속 그려야 한다(한 파일 때문에 전부 못 보면 더 나쁘다).
+   다만 **조용히 빈 값으로 바꾸면 안 된다** — 그러면 인터넷이 끊겨도 '검수 전 0건 ·
+   모든 게시판 정상'으로 보인다. 실패한 경로를 모아 화면 맨 위에 경고로 띄운다. */
 async function readJson(path, fallback) {
   try {
     const r = await fetch(raw(path), { cache: 'no-store' });
-    if (!r.ok) return fallback;
+    if (!r.ok) { D.failed.push({ path, why: `응답 ${r.status}` }); return fallback; }
     return await r.json();
-  } catch (e) { return fallback; }
+  } catch (e) {
+    D.failed.push({ path, why: '읽지 못함(네트워크 또는 형식 오류)' });
+    return fallback;
+  }
 }
 async function readText(path) {
   try {
@@ -127,6 +137,8 @@ async function readText(path) {
 }
 
 async function loadAll() {
+  D.failed = [];        // 매번 새로 센다 — 지난번 실패가 남아 있으면 안 된다
+  reportCache = {};     // 로봇을 돌린 뒤 옛 리포트가 보이던 문제(A5)
   const [reg, notices, forms, health, schools, targets, linkHunt, pending, autoCfg, log] =
     await Promise.all([
       readJson('data/registered.json', { items: [] }),
@@ -213,6 +225,16 @@ const isDuplicatePair = (window.ENTRY_RULES && window.ENTRY_RULES.isDuplicatePai
 
 function formIdSet() { return new Set(Object.keys(D.forms)); }
 
+/* 스키마화 대기 — **한 곳에서만** 센다.
+   예전엔 '오늘 할 일'이 `fetched && !schematized`, '양식' 화면이 `!schematized`로 세어
+   같은 화면 안에서 건수가 달랐다. `retired`(6회 실패로 자동 재시도를 멈춘 것)도 뺀다 —
+   사람이 지금 할 수 있는 일이 아니므로 '할 일' 숫자에 섞이면 안 된다. */
+function pendingForms() {
+  return D.pending.filter((q) => q.fetched && !q.schematized && !q.retired);
+}
+function pendingFetchWait() { return D.pending.filter((q) => !q.fetched && !q.retired); }
+function pendingRetired() { return D.pending.filter((q) => q.retired && !q.schematized); }
+
 function badgesOf(it, formIds) {
   const b = [];
   if (!it.amountValue) b.push('금액 미확인');
@@ -226,6 +248,15 @@ function badgesOf(it, formIds) {
 function problemsOf(it, formIds) {
   return checkEntry(it, { formIds }) || [];
 }
+
+/* 경고등의 무게 — 예전엔 전부 `pill bad`(빨강)라 **무엇이 문제인지 구별이 안 됐다.**
+   빨강은 '앱1에 잘못 나갈 수 있는 것'에만 쓴다. */
+const BADGE_TONE = {
+  '금액 미확인': '', '마감일 없음': '',
+  '양식 미등록': 'warn',
+  '원문 링크 이상': 'bad', '없는 양식 연결': 'bad',
+};
+const badgeTone = (b) => BADGE_TONE[b] ?? 'warn';
 
 /* 미등록 피드 — 수집됐지만 등록되지 않은 공고 (주소·제목 두 열쇠로 대조).
    수집기와 **같은 주소 정규화**(url-key.mjs)를 쓴다 — 규칙이 갈라지면 이미 등록한 공고가
@@ -364,7 +395,23 @@ function renderScreen(name) {
     forms: renderForms, network: renderNetwork, quality: renderQuality }[name] || (() => {}))();
 }
 
+/* 읽지 못한 데이터가 있으면 화면 맨 위에 붙인다.
+   "아래 숫자를 믿지 마세요"까지 적는 이유: 실패한 파일은 빈 값으로 대체돼
+   '검수 전 0건'·'모든 게시판 정상'처럼 **안심되는 쪽으로** 틀리기 때문이다. */
+function renderDataFail() {
+  const box = byId('datafail');
+  if (!box) return;
+  if (!D.failed.length) { box.hidden = true; box.innerHTML = ''; return; }
+  box.hidden = false;
+  box.innerHTML = `
+    <b>데이터 ${D.failed.length}종을 읽지 못했습니다 — 아래 숫자를 믿지 마세요.</b>
+    <ul>${D.failed.map((f) => `<li><code class="mono">${esc(f.path)}</code> — ${esc(f.why)}</li>`).join('')}</ul>
+    <button class="btn btn-sm" id="datafail-retry">다시 읽기</button>`;
+  byId('datafail-retry').addEventListener('click', () => byId('btn-reload').click());
+}
+
 function renderAll() {
+  renderDataFail();
   renderCounts();
   renderScreen(current);
   const dep = byId('deploy-state');
@@ -377,14 +424,19 @@ function renderAll() {
 
 function renderCounts() {
   const fi = formIdSet();
-  const unrev = D.reg.filter((it) => statusOf(it) === 'unreviewed').length;
-  const probs = D.reg.filter((it) => problemsOf(it, fi).length).length;
+  const unrevItems = D.reg.filter((it) => statusOf(it) === 'unreviewed');
+  const probItems = D.reg.filter((it) => problemsOf(it, fi).length);
+  const unrev = unrevItems.length;
+  const probs = probItems.length;
+  /* '오늘 할 일' 배지는 **합집합**이다 — 예전엔 unrev + probs로 더해서
+     검수도 안 됐고 규칙도 어긴 공고를 두 번 셌다(실제 숫자가 부풀려져 있었다). */
+  const todo = new Set([...unrevItems, ...probItems].map((it) => it.id)).size;
   const set = (id, n, hot) => {
     const el = byId(id);
     el.textContent = n;
     el.className = `tab-n${hot && n > 0 ? ' hot' : ''}`;
   };
-  set('n-todo', unrev + probs, true);
+  set('n-todo', todo, true);
   set('n-list', D.reg.length);
   set('n-review', unrev, true);
   set('n-forms', Object.keys(D.forms).length);
@@ -401,16 +453,51 @@ function renderTodo() {
   const warns = D.reg.filter((it) => problemsOf(it, fi).some((p) => p.level === 'warn'));
   const dead = deadLinks();
   const fails = failingSchools();
-  const queue = D.pending.filter((q) => q.fetched && !q.schematized);
+  const queue = pendingForms();
   const noBoard = D.schools.filter((s) => !s.boardUrl);
 
-  const card = (cls, v, k, d, btn) => `
-    <div class="card ${cls}">
-      <div class="v">${v}</div>
-      <div class="k">${esc(k)}</div>
-      <div class="d">${d}</div>
-      ${btn ? `<div class="btn-row">${btn}</div>` : ''}
+  const card = (c) => `
+    <div class="card ${c.cls}">
+      <div class="v">${c.v}</div>
+      <div class="k">${esc(c.k)}</div>
+      <div class="d">${c.d}</div>
+      ${c.btn ? `<div class="btn-row">${c.btn}</div>` : ''}
     </div>`;
+
+  /* 카드 9장이 전부 같은 크기·같은 무게라 급한 것과 참고가 구별되지 않았고,
+     **0건인 초록 카드가 첫 화면의 2/3를 먹었다.** 이제 할 일이 있는 것만 카드로 올리고
+     0건은 아래 한 줄 띠로 접는다 — '오늘 할 일' 화면이 실제로 할 일만 보여준다. */
+  const all = [
+    { n: urgent.length, tone: 'is-bad', k: '마감 임박한데 검수 전',
+      d: '오늘 처리하지 않으면 학생이 놓칩니다 (7일 이내 마감)',
+      btn: '<button class="btn btn-primary btn-sm" data-go="review">컨펌 작업대로</button>' },
+    { n: unrev.length, tone: 'is-warn', k: '검수 전 (학생 앱에 이미 노출)',
+      d: '로봇이 자동 등록했고 아직 사람이 확인하지 않았습니다',
+      btn: '<button class="btn btn-sm" data-go="review">확인하기</button>' },
+    { n: probs.length, tone: 'is-bad', k: '규칙 위반 (오류)',
+      d: '앱1에 잘못 표시될 수 있는 항목입니다',
+      btn: '<button class="btn btn-sm" data-go="quality">품질 화면으로</button>' },
+    { n: warns.length, tone: 'is-warn', k: '규칙 경고',
+      d: '치명적이지는 않지만 손봐야 할 항목입니다',
+      btn: '<button class="btn btn-sm" data-go="quality">보기</button>' },
+    { n: dead.length, tone: 'is-warn', k: '원문 링크 실패 기록',
+      d: '학생이 원문 보기를 눌렀을 때 안 열리는 주소입니다',
+      btn: '<button class="btn btn-sm" data-go="quality">보기</button>' },
+    { n: fails.length, tone: 'is-bad', k: '수집 실패 중인 학교',
+      d: '이 학교 공고가 앱1에 들어오지 않고 있습니다',
+      btn: '<button class="btn btn-sm" data-go="network">수집망 보기</button>' },
+    { n: queue.length, tone: 'is-warn', k: '양식 스키마화 대기',
+      d: '원본은 확보됐고 앱에서 작성 가능하게 만드는 일이 남았습니다',
+      btn: '<button class="btn btn-sm" data-go="forms">양식 화면으로</button>' },
+    { n: noBoard.length, tone: 'is-warn', k: '게시판 주소 없는 학교',
+      d: '주소를 넣으면 그 학교 학생에게 공고가 보이기 시작합니다',
+      btn: '<button class="btn btn-sm" data-go="network">주소 넣기</button>' },
+    { n: D.deployAhead || 0, tone: 'is-warn', k: '앱1 반영 대기',
+      d: '배포 로봇이 아직 올리지 않은 변경입니다', btn: '',
+      okD: '학생 앱이 최신입니다', v: D.deployAhead == null ? '—' : D.deployAhead },
+  ];
+  const todo = all.filter((c) => c.n > 0);
+  const clear = all.filter((c) => c.n === 0);
 
   byId('screen-todo').innerHTML = `
     <div class="sec-head">
@@ -418,34 +505,15 @@ function renderTodo() {
       <p>눌러야 할 것만 모았습니다. 숫자를 구경하는 화면이 아닙니다.</p>
     </div>
 
-    <div class="cards">
-      ${card(urgent.length ? 'is-bad' : 'is-ok', urgent.length,
-    '마감 임박한데 검수 전', '오늘 처리하지 않으면 학생이 놓칩니다 (7일 이내 마감)',
-    urgent.length ? '<button class="btn btn-primary btn-sm" data-go="review">컨펌 작업대로</button>' : '')}
-      ${card(unrev.length ? 'is-warn' : 'is-ok', unrev.length,
-    '검수 전 (학생 앱에 이미 노출)', '로봇이 자동 등록했고 아직 사람이 확인하지 않았습니다',
-    unrev.length ? '<button class="btn btn-sm" data-go="review">확인하기</button>' : '')}
-      ${card(probs.length ? 'is-bad' : 'is-ok', probs.length,
-    '규칙 위반 (오류)', '앱1에 잘못 표시될 수 있는 항목입니다',
-    probs.length ? '<button class="btn btn-sm" data-go="quality">품질 화면으로</button>' : '')}
-      ${card(warns.length ? 'is-warn' : 'is-ok', warns.length,
-    '규칙 경고', '치명적이지는 않지만 손봐야 할 항목입니다',
-    warns.length ? '<button class="btn btn-sm" data-go="quality">보기</button>' : '')}
-      ${card(dead.length ? 'is-warn' : 'is-ok', dead.length,
-    '원문 링크 실패 기록', '학생이 원문 보기를 눌렀을 때 안 열리는 주소입니다',
-    dead.length ? '<button class="btn btn-sm" data-go="quality">보기</button>' : '')}
-      ${card(fails.length ? 'is-bad' : 'is-ok', fails.length,
-    '수집 실패 중인 학교', '이 학교 공고가 앱1에 들어오지 않고 있습니다',
-    fails.length ? '<button class="btn btn-sm" data-go="network">수집망 보기</button>' : '')}
-      ${card(queue.length ? 'is-warn' : 'is-ok', queue.length,
-    '양식 스키마화 대기', '원본은 확보됐고 앱에서 작성 가능하게 만드는 일이 남았습니다',
-    queue.length ? '<button class="btn btn-sm" data-go="forms">양식 화면으로</button>' : '')}
-      ${card(noBoard.length ? 'is-warn' : 'is-ok', noBoard.length,
-    '게시판 주소 없는 학교', '주소를 넣으면 그 학교 학생에게 공고가 보이기 시작합니다',
-    noBoard.length ? '<button class="btn btn-sm" data-go="network">주소 넣기</button>' : '')}
-      ${card(D.deployAhead ? 'is-warn' : 'is-ok', D.deployAhead == null ? '—' : D.deployAhead,
-    '앱1 반영 대기', D.deployAhead ? '배포 로봇이 아직 올리지 않은 변경입니다' : '학생 앱이 최신입니다', '')}
-    </div>
+    ${todo.length ? `<div class="cards">
+      ${todo.map((c) => card({ cls: c.tone, v: c.v ?? c.n, k: c.k, d: c.d, btn: c.btn })).join('')}
+    </div>` : '<p class="empty">지금 처리할 일이 없습니다. 모든 항목이 정상입니다.</p>'}
+
+    ${clear.length ? `<div class="allclear">
+      <span class="allclear-mark">✓</span>
+      <span>정상 ${clear.length}항목</span>
+      <span class="allclear-list">${clear.map((c) => esc(c.k)).join(' · ')}</span>
+    </div>` : ''}
 
     ${urgent.length ? `
       <div class="sec-head" style="margin-top:8px">
@@ -469,7 +537,7 @@ function rowHtml(it) {
           <span>${esc(it.provider || '')}</span>
           <span>${esc(CHANNEL_LABEL[channelOf(it)])}</span>
         </div>
-        ${badges.length ? `<div class="badges">${badges.map((b) => `<span class="pill bad">${esc(b)}</span>`).join('')}</div>` : ''}
+        ${badges.length ? `<div class="badges">${badges.map((b) => `<span class="pill ${badgeTone(b)}">${esc(b)}</span>`).join('')}</div>` : ''}
       </div>
       <div><span class="pill ${st}">${STATUS_LABEL[st]}</span></div>
       <div>${ddayHtml(it)}</div>
@@ -477,7 +545,19 @@ function rowHtml(it) {
 }
 
 /* ---------------- ② 공고 전체 ---------------- */
-const F = { status: 'all', school: 'all', nature: 'all', channel: 'all', badge: 'all', q: '' };
+const F = { status: 'all', school: 'all', nature: 'all', channel: 'all', badge: 'all', q: '', open: false };
+
+/* 접어 둔 필터가 걸려 있는지 한눈에 — 안 그러면 "왜 몇 건밖에 안 보이지?"가 된다.
+   태그를 누르면 그 필터만 풀린다. */
+const FILTER_LABEL = { school: '소속', nature: '성격', channel: '접수', badge: '경고등' };
+function activeFilterTags() {
+  const on = Object.keys(FILTER_LABEL).filter((k) => F[k] !== 'all');
+  if (!on.length) return '';
+  return `<div class="ftags">${on.map((k) => {
+    const v = k === 'channel' ? (CHANNEL_LABEL[F[k]] || F[k]) : F[k];
+    return `<button class="ftag" data-clear="${k}">${esc(FILTER_LABEL[k])}: ${esc(v)} <span aria-hidden="true">×</span></button>`;
+  }).join('')}<button class="ftag ftag-all" data-clear="*">모두 지우기</button></div>`;
+}
 
 function filteredList() {
   const fi = formIdSet();
@@ -488,7 +568,8 @@ function filteredList() {
     if (F.channel !== 'all' && channelOf(it) !== F.channel) return false;
     if (F.badge !== 'all' && !badgesOf(it, fi).includes(F.badge)) return false;
     if (F.q) {
-      const hay = `${it.name} ${it.provider} ${it.summary} ${it.id}`.toLowerCase();
+      /* 널 가드 필수 — 예전엔 summary 없는 공고가 문자열 "undefined"로 검색됐다 */
+      const hay = [it.name, it.provider, it.summary, it.id].filter(Boolean).join(' ').toLowerCase();
       if (!hay.includes(F.q.toLowerCase())) return false;
     }
     return true;
@@ -532,6 +613,18 @@ function renderList() {
         ${chip('status', 'closed', '마감·종료', stC.closed || 0)}
       </div>
       <div class="filter-row">
+        <span class="lb">검색</span>
+        <input type="search" id="f-q" placeholder="제목·재단·id로 찾기" value="${esc(F.q)}" />
+        <span class="muted">${items.length}건</span>
+      </div>
+    </div>
+
+    ${activeFilterTags()}
+
+    <!-- 나머지 필터는 접어 둔다 — 5줄이 늘 펼쳐져 있으면 목록이 화면 밖으로 밀려난다 -->
+    <details class="filters-more"${F.open ? ' open' : ''}>
+      <summary>필터 더보기 — 소속 · 성격 · 접수 · 경고등</summary>
+      <div class="filter-row">
         <span class="lb">소속</span>
         <select id="f-school">
           <option value="all"${F.school === 'all' ? ' selected' : ''}>학교 전체</option>
@@ -554,12 +647,7 @@ function renderList() {
         ${chip('badge', 'all', '전체')}
         ${Object.entries(bgC).map(([k, n]) => chip('badge', k, k, n)).join('')}
       </div>
-      <div class="filter-row">
-        <span class="lb">검색</span>
-        <input type="search" id="f-q" placeholder="제목·재단·id로 찾기" value="${esc(F.q)}" />
-        <span class="muted">${items.length}건</span>
-      </div>
-    </div>
+    </details>
 
     ${items.length ? `<div class="rows">${items.map(rowHtml).join('')}</div>`
     : '<p class="empty">조건에 맞는 공고가 없습니다.</p>'}
@@ -577,7 +665,7 @@ function unregHtml() {
 
   const row = (x) => {
     const u = safeUrl(x.n.url);
-    return `<div class="row" style="cursor:default${x.why ? ';opacity:.55' : ''}">
+    return `<div class="row" data-noclick style="cursor:default${x.why ? ';opacity:.55' : ''}">
       <div>
         <div class="t">${esc(x.n.title)}</div>
         <div class="m">
@@ -654,7 +742,7 @@ function renderReview() {
       <p>같은 장학금이 여러 학교 게시판에 올라온 경우입니다. 따로 두면 학생에게 같은 것이 여러 번 보입니다.</p>
     </div>
     ${dups.length ? `<div class="rows">${dups.map(([a, b]) => `
-      <div class="row" style="cursor:default">
+      <div class="row" data-noclick style="cursor:default">
         <div>
           <div class="t">${esc(a.name)}</div>
           <div class="m"><span>${esc(a.id)}</span><span>${esc(schoolOf(a))}</span></div>
@@ -676,7 +764,9 @@ function renderForms() {
   const ids = Object.keys(D.forms).sort();
   const used = {};
   D.reg.forEach((it) => { if (it.formId) used[it.formId] = (used[it.formId] || 0) + 1; });
-  const queue = D.pending.filter((q) => !q.schematized);
+  const queue = pendingForms();               // '오늘 할 일'과 같은 함수 — 건수가 갈라지지 않는다
+  const fetchWait = pendingFetchWait();       // 원본을 아직 못 받은 것
+  const retired = pendingRetired();           // 6회 실패로 자동 재시도를 멈춘 것
   const orphan = ids.filter((id) => !used[id]);
   const broken = D.reg.filter((it) => it.formId && !D.forms[it.formId]);
 
@@ -714,14 +804,35 @@ function renderForms() {
       <p>원본 신청서는 확보됐고, 앱에서 작성할 수 있게 만드는 일이 남은 것들입니다.</p>
     </div>
     ${queue.length ? `<div class="scroller"><table>
-        <thead><tr><th>공고</th><th>연결 id</th><th>원본 확보</th><th>등록일</th></tr></thead>
+        <thead><tr><th>공고</th><th>연결 id</th><th class="n">등록일</th></tr></thead>
         <tbody>${queue.map((q) => `<tr>
           <td>${esc(q.name || '')}</td>
           <td class="mono">${esc(q.id || '')}</td>
-          <td>${q.fetched ? '<span class="pill official">확보됨</span>' : '<span class="pill bad">대기</span>'}</td>
           <td class="n">${esc(q.added || '')}</td></tr>`).join('')}</tbody>
       </table></div>`
     : '<p class="empty">대기 중인 양식이 없습니다.</p>'}
+
+    ${fetchWait.length ? `<details style="margin-top:8px">
+      <summary class="muted" style="cursor:pointer">원본을 아직 못 받은 것 ${fetchWait.length}건 — 로봇이 다음 수집에서 다시 시도합니다 (펼쳐 보기)</summary>
+      <div class="scroller" style="margin-top:8px"><table>
+        <thead><tr><th>공고</th><th>연결 id</th><th class="n">등록일</th></tr></thead>
+        <tbody>${fetchWait.map((q) => `<tr>
+          <td>${esc(q.name || '')}</td><td class="mono">${esc(q.id || '')}</td>
+          <td class="n">${esc(q.added || '')}</td></tr>`).join('')}</tbody>
+      </table></div>
+    </details>` : ''}
+
+    ${retired.length ? `<details style="margin-top:8px">
+      <summary class="muted" style="cursor:pointer">자동 재시도를 멈춘 것 ${retired.length}건 — 6회 실패해 표적에서 내렸습니다 (펼쳐 보기)</summary>
+      <div class="scroller" style="margin-top:8px"><table>
+        <thead><tr><th>공고</th><th>연결 id</th><th class="n">등록일</th></tr></thead>
+        <tbody>${retired.map((q) => `<tr>
+          <td>${esc(q.name || '')}</td><td class="mono">${esc(q.id || '')}</td>
+          <td class="n">${esc(q.added || '')}</td></tr>`).join('')}</tbody>
+      </table></div>
+      <p class="muted">다시 받게 하려면 <code class="mono">collector/pending-forms.json</code>에서 그 항목의
+        <code class="mono">retired</code>만 지우면 됩니다.</p>
+    </details>` : ''}
 
     ${orphan.length ? `<p class="muted">아직 어떤 공고에도 연결되지 않은 양식 ${orphan.length}종:
       ${orphan.map((o) => `<code class="mono">${esc(o)}</code>`).join(' · ')}</p>` : ''}
@@ -729,13 +840,15 @@ function renderForms() {
 }
 
 /* ---------------- ⑤ 수집망 ---------------- */
-let reportCache = {};
-
 function renderNetwork() {
   const fails = failingSchools();
   const noBoard = D.schools.filter((s) => !s.boardUrl);
   const withBoard = D.schools.filter((s) => s.boardUrl);
-  const hEntry = (name) => D.health[name] || {};
+  /* 건강 기록은 '학교 캠퍼스'로도 '학교'로도 적혀 있다.
+     예전엔 `hEntry()`가 없을 때 `{}`(참)를 돌려줘서 `|| hEntry(s.school)` 폴백이
+     **한 번도 실행되지 않았고**, 캠퍼스가 '공통'인 학교 4곳이 언제나 '—/0'으로 보였다. */
+  const hEntry = (school, campus) =>
+    D.health[campus ? `${school} ${campus}` : school] ?? D.health[school] ?? {};
 
   byId('screen-network').innerHTML = `
     <div class="sec-head">
@@ -778,7 +891,7 @@ function renderNetwork() {
     <div class="scroller"><table>
       <thead><tr><th>학교</th><th>캠퍼스</th><th class="n">마지막 성공</th><th class="n">실패</th></tr></thead>
       <tbody>${withBoard.map((s) => {
-    const h = hEntry(s.campus ? `${s.school} ${s.campus}` : s.school) || hEntry(s.school);
+    const h = hEntry(s.school, s.campus);
     return `<tr>
           <td>${esc(s.school)}</td><td>${esc(s.campus || '')}</td>
           <td class="n">${esc(h.lastOk || '—')}</td>
@@ -1099,6 +1212,15 @@ function bindGlobal() {
     const f = e.target.closest('[data-f]');
     if (f) { F[f.dataset.f] = f.dataset.v; renderList(); return; }
 
+    const clr = e.target.closest('[data-clear]');
+    if (clr) {
+      const k = clr.dataset.clear;
+      if (k === '*') Object.keys(FILTER_LABEL).forEach((x) => { F[x] = 'all'; });
+      else F[k] = 'all';
+      renderList();
+      return;
+    }
+
     const mg = e.target.closest('[data-merge]');
     if (mg) {
       const [keepId, dropId] = mg.dataset.merge.split('|');
@@ -1154,6 +1276,13 @@ function bindGlobal() {
   });
 
   /* 필터 입력 */
+  /* '필터 더보기'를 펼친 상태를 기억한다. 안 그러면 필터를 하나 고를 때마다
+     다시 그려지면서 접혀 버려 연달아 고를 수가 없다.
+     (toggle 이벤트는 버블링하지 않으므로 캡처 단계로 받는다) */
+  byId('app').addEventListener('toggle', (e) => {
+    if (e.target.classList && e.target.classList.contains('filters-more')) F.open = e.target.open;
+  }, true);
+
   byId('app').addEventListener('change', (e) => {
     if (e.target.id === 'f-school') { F.school = e.target.value; renderList(); }
     if (e.target.id === 'f-nature') { F.nature = e.target.value; renderList(); }
@@ -1253,6 +1382,14 @@ async function enter(key, remember) {
     btn.disabled = false;
     return;
   }
+  /* 전부 실패했으면 안으로 들여보내지 않는다 — 텅 빈 화면이 '이상 없음'으로 보이는 것보다
+     문 앞에서 사유를 말해 주는 편이 낫다. 일부만 실패한 경우는 들어가되 빨간 배너로 알린다. */
+  if (!D.reg.length && D.failed.length) {
+    msg.className = 'gate-msg';
+    msg.textContent = `데이터를 읽지 못했습니다 (${D.failed[0].path} — ${D.failed[0].why}). 잠시 후 다시 시도해 주세요.`;
+    btn.disabled = false;
+    return;
+  }
 
   byId('gate').hidden = true;
   byId('app').hidden = false;
@@ -1262,7 +1399,8 @@ async function enter(key, remember) {
   /* 읽어들인 데이터와 미리보기 함수를 한 곳에 노출한다 —
      검증 드라이버(verify/verify-admin.js)와 브라우저 콘솔에서 상태를 들여다볼 때 쓴다.
      열쇠를 통과한 뒤에만 만들어지므로 이것으로 잠금이 느슨해지지는 않는다. */
-  window.__admin = { D, previewDoc, blankAnswers, statusOf, badgesOf, channelOf, naturesOf };
+  window.__admin = { D, previewDoc, blankAnswers, statusOf, badgesOf, channelOf, naturesOf,
+    renderDataFail, pendingForms };
 }
 
 function boot() {

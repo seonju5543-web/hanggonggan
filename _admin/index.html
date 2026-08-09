@@ -82,15 +82,19 @@
       <button class="tab" data-tab="network">수집망 <span class="tab-n" id="n-network"></span></button>
       <button class="tab" data-tab="quality">데이터 품질 <span class="tab-n" id="n-quality"></span></button>
     </nav>
+
+    <!-- 작업 진행 표시 (변경 요청 → 검사 → 반영).
+         **헤더 안에 둔다** — 밖에 두고 각자 sticky를 걸면 스크롤할 때 이 띠가 탭 줄을 덮는다. -->
+    <div id="job" class="job" hidden>
+      <span class="job-dot"></span>
+      <span id="job-text"></span>
+      <a id="job-link" href="#" target="_blank" rel="noreferrer noopener" hidden>실행 기록 보기 ↗</a>
+      <button id="job-close" class="job-close" aria-label="닫기">×</button>
+    </div>
   </header>
 
-  <!-- 작업 진행 표시 (변경 요청 → 검사 → 반영) -->
-  <div id="job" class="job" hidden>
-    <span class="job-dot"></span>
-    <span id="job-text"></span>
-    <a id="job-link" href="#" target="_blank" rel="noreferrer noopener" hidden>실행 기록 보기 ↗</a>
-    <button id="job-close" class="job-close" aria-label="닫기">×</button>
-  </div>
+  <!-- 데이터를 못 읽었을 때의 경고 — 이게 없으면 읽기 실패가 '이상 없음'으로 보인다 -->
+  <div id="datafail" class="datafail" role="alert" hidden></div>
 
   <main class="wrap">
     <section id="screen-todo"    class="screen"></section>
