@@ -85,7 +85,7 @@
 | `collector/clean-title.mjs` | **제목 청소 공용 모듈 (2026-07-30)** — 게시판이 `<a>` 안에 번호·분류·조회수·작성일·기간을 함께 넣는 유형에서 부스러기 제거. 수집기(collect.mjs)와 자동 등록(auto-register.mjs)이 **같은 규칙**을 써야 중복 판정이 어긋나지 않는다 |
 | `collector/probe.mjs` + `.github/workflows/probe-boards.yml` | 게시판 후보 주소 일괄 정찰 |
 | `.github/workflows/fetch-page.yml` | 임의 페이지+첨부를 원격으로 받아 artifact로 — 차단 환경 우회용 |
-| `_admin/` + `tools/admin-apply.mjs` + `.github/workflows/admin-apply.yml` | **관리자 페이지 (2026-08-03)** — 개발자가 학생인 척 접속하지 않고 등록 공고 전부를 한 화면에서 보고 고치고 컨펌한다. 화면 6개(오늘 할 일·공고 전체·컨펌 작업대·양식·수집망·데이터 품질). **버튼이 저장소를 직접 고치지 않는다** — `admin-apply.yml`을 깨우고 그 안에서 `audit-data.js`를 통과해야만 저장(실패 시 되돌림). 올리는 절차는 `_admin/README.md`. **2026-08-07 Cloudflare Pages에 게시됨 — https://hanggonggan-admin.pages.dev (잠금은 아직)** |
+| `_admin/` + `tools/admin-apply.mjs` + `.github/workflows/admin-apply.yml` | **관리자 페이지 (2026-08-03)** — 개발자가 학생인 척 접속하지 않고 등록 공고 전부를 한 화면에서 보고 고치고 컨펌한다. 화면 6개(오늘 할 일·공고 전체·컨펌 작업대·양식·수집망·데이터 품질). **버튼이 저장소를 직접 고치지 않는다** — `admin-apply.yml`을 깨우고 그 안에서 `audit-data.js`를 통과해야만 저장(실패 시 되돌림). 올리는 절차는 `_admin/README.md`. **2026-08-09 가동 시작 — https://hanggonggan-admin.pages.dev · Cloudflare Access 잠금 + GitHub 열쇠 완료.** 잠금 확인은 `.github/workflows/admin-lock-check.yml`(매일 14:23 KST · 풀리면 🚨 이슈, 다시 잠기면 자동으로 닫음) |
 | `.github/workflows/push-check.yml` | **푸시 알림 검사 버튼 (2026-08-07)** — Actions 탭에서 수동 실행. `/health`(등록 폰 수·마지막 오류) + `/test`(등록된 전 기기 시험 발송). 시크릿 `PUSH_ADMIN_KEY` 필요. **KV 화면의 등록 수는 '살아 있는 폰 수'가 아니다** — 실제로 받는지는 발송해 보는 것만이 증명이라 만든 도구 |
 | `server/mail-worker.js` | 완전 자동 접수 메일 서버(배포 대기 — Resend 키 필요) |
 | `proposals/` | 장학팀·G-RISE 제안서 **PDF** (2026-07-06 전면 재작성 — 요청 사항 명시형). 원본 HTML·렌더 스크립트는 `proposals/src/` (`node render-pdf.js`) |
@@ -623,7 +623,7 @@
 | ④ **스토어 결정** — 웹은 지금 배포 중이라 즉시 공유 가능 / 스토어면 Google Play $25 등록 → 이후 Apple $99/년 | 스토어 배포 — TWA/Capacitor 패키징은 Claude가 수행 | 대기 |
 | ⑤ **커리어넷 학과정보 API 키** — 2026-08-02 개발자가 **신청 완료**, 관리자 승인 대기 중 | 학과 자동추천이 '그 학교에 실제로 있는 학과'만 뜬다 (아래 절 참조) | **승인 대기** |
 | ⑥ ~~무료 푸시 서버 올리기~~ | ~~앱을 안 켜도 폰에 알림 도착~~ | ✅ **2026-08-06 완료** — 실제 폰 2대 도착 실증 (18차 세션 절) |
-| ⑦ **관리자 화면 올리기** — 4단계 중 **2단계까지 완료**(2026-08-07). 남은 것은 **Access 잠금(10분) + GitHub 열쇠(5분)** | 학생인 척 접속하지 않고 등록 공고 전부를 한 화면에서 보고 컨펌 | **🔴 진행 중** — 주소는 살아 있으나 **아직 안 잠김**. 20차 세션 절 7번 표 |
+| ~~⑦ 관리자 화면 올리기~~ | 학생인 척 접속하지 않고 등록 공고 전부를 한 화면에서 보고 컨펌 | ✅ **2026-08-09 완료** — Access 잠금 + GitHub 열쇠까지. 화면에 166건 표시·작동 확인 |
 | ⑧ **회원가입·로그인 (Supabase)** — 출시 전에 붙이기로 결정(2026-08-07). 개발자 몫은 Supabase 가입·소셜 앱 등록뿐 | 기기를 바꿔도 프로필·신청내역이 이어짐 | **나중에** — 아래 절 참조 |
 
 ### ⑧ 회원가입·로그인 — 설계 확정, 착수는 나중에 (2026-08-07 개발자와 정리)
@@ -806,7 +806,12 @@
 
 ### 🔜 다음 세션이 첫 5분에 할 일
 1. `node verify/audit-data.js` · `node verify/check-collab.js`
-2. **선주님께 물을 것**: *"Access 잠금 하셨나요?"* (아직 안 됐으면 그것이 최우선 — 주소가 열려 있다)
+2. **Access 잠금·GitHub 열쇠는 2026-08-09에 끝났다** — 다시 묻지 말 것.
+   `hanggonggan-admin.pages.dev`는 Cloudflare Access 뒤에 있고(검사로 확인), 화면에 166건이 뜬다.
+   · 확인 방법: Actions 탭 → **`관리자 화면 잠금 확인`** (매일 14:23 KST 자동 실행 · 풀리면 🚨 이슈)
+   · **선주님 GitHub 열쇠는 2026-11-07 만료** — 그때 화면이 '열쇠 만료'라고 하면 같은 절차로 재발급
+   · **공동작업자는 열쇠를 따로 만들어야 한다**(classic · `repo`+`workflow`) —
+     `admin-apply.yml`이 `github.actor`를 변경 이력에 남기므로 공유하면 '누가'가 뭉개진다
 3. 이어서 할 개편 순서는 **`docs/ADMIN-PLAN-2026-08-06.md`** 에 그대로 있다.
    0·A·B0은 끝났고 **다음은 B3(다중 선택) → B1(잘린 목록) → C(등록) → E(로봇) → D(자격/양식)**.
    ⚠️ 계획서를 만든 브랜치(`claude/two-factor-admin-screen-44a4u9`)는 **이제 합쳐졌다** —
