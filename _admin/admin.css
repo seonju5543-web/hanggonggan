@@ -66,9 +66,16 @@ html, body { margin: 0; padding: 0; }
    우선순위가 높아져 **숨겨야 할 것이 안 숨는다.** 실제로 숨은 상세 시트가 화면 전체를
    덮어 아무 버튼도 눌리지 않았다(2026-08-03 검증에서 발견). */
 [hidden] { display: none !important; }
+/* 본문 15 → 16px.
+   이 화면은 목록을 훑고 누르는 도구다. 예전 치수는 **가장 중요한 글자(공고 제목 13.8px)가
+   본문보다 작고**, 학교·기관 줄은 11.9px였다 — 한글은 그 크기에서 뭉갠다.
+
+   ⚠️ 색 규칙(되돌리지 말 것): `--ink-3`는 밝은 화면에서 대비 3.72:1이라 **작은 글자 기준
+   4.5:1에 못 미친다**(다크 모드는 5.05:1로 통과 — 그래서 낮에만 유독 안 보였다).
+   그래서 `--ink-3`는 **14px 이상**에만 쓰고, 그보다 작은 글자는 `--ink-2`(7.58:1)를 쓴다. */
 body {
   background: var(--paper); color: var(--ink);
-  font-family: var(--sans); font-size: 15px; line-height: 1.6;
+  font-family: var(--sans); font-size: 16px; line-height: 1.6;
   -webkit-font-smoothing: antialiased; word-break: keep-all; overflow-wrap: break-word;
 }
 h1,h2,h3,h4 { margin: 0; line-height: 1.3; letter-spacing: -.015em; text-wrap: balance; }
@@ -126,23 +133,33 @@ a { color: var(--navy); }
 }
 .tab {
   border: 0; background: none; cursor: pointer; white-space: nowrap;
-  padding: 9px 12px 10px; font-size: .89rem; font-weight: 600; color: var(--ink-3);
-  border-bottom: 2px solid transparent;
+  padding: 11px 14px 12px; font-size: .95rem; font-weight: 600; color: var(--ink-2);
+  border-bottom: 2px solid transparent; min-height: 44px;
 }
 .tab:hover { color: var(--ink); }
 .tab.active { color: var(--ink); border-bottom-color: var(--navy); }
 .tab-n {
-  font-family: var(--mono); font-size: .74rem; font-weight: 700;
-  background: var(--paper-3); color: var(--ink-2); border-radius: 8px; padding: 1px 6px; margin-left: 3px;
+  font-family: var(--mono); font-size: .8rem; font-weight: 700;
+  background: var(--paper-3); color: var(--ink-2); border-radius: 8px; padding: 2px 7px; margin-left: 4px;
 }
 .tab-n.hot { background: var(--bad-bg); color: var(--bad); }
 
 /* ── 작업 진행 ───────────────────────────────── */
+/* 헤더(.topbar) 안에 들어 있으므로 스스로 sticky를 걸지 않는다.
+   예전엔 .job(z-index 30)과 .topbar(20)가 **둘 다 top:0**이라 스크롤하면 탭 줄을 덮었다. */
 .job {
-  position: sticky; top: 0; z-index: 30;
   background: var(--navy); color: #fff; padding: 9px 16px;
   display: flex; align-items: center; gap: 10px; font-size: .87rem;
 }
+
+/* ── 데이터 읽기 실패 경고 ───────────────────── */
+.datafail {
+  max-width: 1148px; margin: 16px auto -4px; padding: 12px 14px;   /* .wrap(1180 - 좌우 16)과 폭을 맞춘다 */
+  background: var(--bad-bg); border: 1px solid var(--bad); border-radius: 6px;
+  color: var(--bad); font-size: .92rem; line-height: 1.5;
+}
+.datafail ul { margin: 8px 0 10px; padding-left: 20px; display: flex; flex-direction: column; gap: 3px; }
+.datafail code { color: inherit; }
 .job.ok  { background: var(--ok); }
 .job.bad { background: var(--bad); }
 .job a { color: #fff; text-decoration: underline; }
@@ -157,8 +174,8 @@ a { color: var(--navy); }
 .sec-head { display: flex; flex-direction: column; gap: 5px; }
 .sec-head h2 { font-size: 1.12rem; font-weight: 750; }
 .sec-head p { font-size: .86rem; color: var(--ink-2); }
-.muted { color: var(--ink-2); font-size: .86rem; }
-.empty { color: var(--ink-3); font-size: .88rem; padding: 22px; text-align: center;
+.muted { color: var(--ink-2); font-size: .9rem; }
+.empty { color: var(--ink-2); font-size: .92rem; padding: 22px; text-align: center;
          border: 1px dashed var(--rule); border-radius: 5px; }
 
 /* ── 버튼 ────────────────────────────────────── */
@@ -168,8 +185,10 @@ a { color: var(--navy); }
 }
 .btn:hover { background: var(--paper-2); }
 .btn:disabled { opacity: .45; cursor: not-allowed; }
-.btn-sm { padding: 4px 9px; font-size: .79rem; }
+/* btn-sm도 손가락으로 눌러야 한다 — 예전엔 높이가 약 26px이었다 */
+.btn-sm { padding: 7px 12px; font-size: .85rem; min-height: 40px; display: inline-flex; align-items: center; }
 .btn-lg { padding: 11px 16px; font-size: .95rem; }
+.btn:active { background: var(--paper-3); }
 .btn-primary { background: var(--navy); border-color: var(--navy); color: #fff; }
 .btn-primary:hover { filter: brightness(1.1); background: var(--navy); }
 .btn-ghost { background: none; }
@@ -189,13 +208,24 @@ a { color: var(--navy); }
 .card.is-bad  { border-left-color: var(--bad); }
 .card.is-warn { border-left-color: var(--warn); }
 .card.is-ok   { border-left-color: var(--ok); }
-.card .k { font-size: .82rem; color: var(--ink-2); font-weight: 600; }
-.card .v { font-family: var(--mono); font-size: 1.75rem; font-weight: 700; line-height: 1.05; letter-spacing: -.03em; }
+.card .k { font-size: .95rem; color: var(--ink); font-weight: 650; }
+/* 숫자를 1.75rem(28px)에서 줄였다 — 제목의 2배라 눈이 숫자에만 가고
+   '무엇에 대한 숫자인가'가 안 읽혔다 */
+.card .v { font-family: var(--mono); font-size: 1.5rem; font-weight: 700; line-height: 1.05; letter-spacing: -.03em; }
 .card.is-bad .v  { color: var(--bad); }
 .card.is-warn .v { color: var(--warn); }
 .card.is-ok .v   { color: var(--ok); }
-.card .d { font-size: .82rem; color: var(--ink-3); }
+.card .d { font-size: .875rem; color: var(--ink-2); }
 .card .btn-row { margin-top: 4px; }
+
+/* 이상 없는 항목은 카드로 자리를 먹지 않고 한 줄 띠로 접는다 */
+.allclear {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 10px 14px; border: 1px solid var(--rule-soft); border-left: 3px solid var(--ok);
+  border-radius: 5px; background: var(--paper); font-size: .9rem; color: var(--ink-2);
+}
+.allclear-mark { color: var(--ok); font-weight: 800; }
+.allclear-list { color: var(--ink-3); font-size: .875rem; }
 
 /* ── 필터 ────────────────────────────────────── */
 .filters {
@@ -207,57 +237,95 @@ a { color: var(--navy); }
   font-size: .74rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
   color: var(--ink-3); min-width: 4.4rem;
 }
+/* 터치 목표 40px — 예전엔 약 26px이라 손가락으로 필터를 고를 수 없었다 */
 .chip {
   border: 1px solid var(--rule); background: var(--paper); border-radius: 20px;
-  padding: 4px 11px; font-size: .8rem; cursor: pointer; white-space: nowrap;
+  padding: 8px 14px; font-size: .875rem; cursor: pointer; white-space: nowrap;
+  min-height: 40px; display: inline-flex; align-items: center;
 }
 .chip:hover { background: var(--paper-3); }
+.chip:active { background: var(--paper-3); }
 .chip.on { background: var(--navy); border-color: var(--navy); color: #fff; font-weight: 600; }
-.chip .c { font-family: var(--mono); opacity: .75; margin-left: 4px; font-size: .74rem; }
+.chip .c { font-family: var(--mono); opacity: .85; margin-left: 5px; font-size: .8rem; }
 .chip.st-unreviewed.on { background: var(--warn); border-color: var(--warn); color: #17140b; }
 .chip.st-closed.on { background: var(--mute); border-color: var(--mute); }
+
+/* 접어 둔 필터 */
+.filters-more { border: 1px solid var(--rule-soft); border-radius: 5px; padding: 0 12px; }
+.filters-more > summary {
+  cursor: pointer; padding: 11px 2px; font-size: .9rem; font-weight: 600; color: var(--ink-2);
+  min-height: 44px; display: flex; align-items: center;
+}
+.filters-more[open] > summary { border-bottom: 1px solid var(--rule-soft); margin-bottom: 8px; }
+.filters-more .filter-row:last-child { padding-bottom: 12px; }
+
+/* 지금 걸려 있는 필터 — 접혀 있어도 보이게 */
+.ftags { display: flex; flex-wrap: wrap; gap: 6px; }
+.ftag {
+  border: 1px solid var(--navy); background: var(--navy-soft); color: var(--navy);
+  border-radius: 20px; padding: 6px 12px; font-size: .85rem; font-weight: 600; cursor: pointer;
+  min-height: 36px; display: inline-flex; align-items: center; gap: 5px;
+}
+.ftag-all { border-color: var(--rule); background: var(--paper); color: var(--ink-2); font-weight: 500; }
 select, input[type="text"], input[type="search"], input[type="date"], input[type="url"], textarea {
   border: 1px solid var(--rule); background: var(--paper); color: var(--ink);
-  border-radius: 4px; padding: 6px 9px; font-size: .85rem; font-family: inherit; max-width: 100%;
+  border-radius: 4px; padding: 9px 10px; font-size: .95rem; font-family: inherit; max-width: 100%;
 }
-textarea { width: 100%; font-size: .86rem; line-height: 1.55; }
+select, input[type="text"], input[type="search"], input[type="date"], input[type="url"] { min-height: 40px; }
+textarea { width: 100%; font-size: .92rem; line-height: 1.55; }
 input[type="search"] { min-width: 190px; flex: 1 1 190px; }
 
 /* ── 목록 ────────────────────────────────────── */
-.rows { display: flex; flex-direction: column; gap: 1px; background: var(--rule-soft);
-        border: 1px solid var(--rule-soft); border-radius: 5px; overflow: hidden; }
+/* 구분선을 --rule-soft에서 --rule로 — 예전 선은 거의 안 보여서
+   166줄이 똑같은 높이·색으로 이어져 눈이 멈출 자리가 없었다 */
+.rows { display: flex; flex-direction: column; gap: 1px; background: var(--rule);
+        border: 1px solid var(--rule); border-radius: 5px; overflow: hidden; }
 .row {
-  background: var(--paper); padding: 11px 14px; cursor: pointer;
-  display: grid; grid-template-columns: 1fr; gap: 5px;
+  background: var(--paper); padding: 13px 14px; cursor: pointer;
+  display: grid; grid-template-columns: 1fr; gap: 6px;
 }
 .row:hover { background: var(--paper-2); }
+/* 모바일엔 :hover가 없다 — 눌리는 느낌은 :active로 준다 */
+.row:active { background: var(--paper-3); }
 @media (min-width: 780px) {
-  .row { grid-template-columns: 1fr 8.5rem 6rem; gap: 14px; align-items: center; }
+  .row { grid-template-columns: 1fr 8.5rem 6rem 1rem; gap: 14px; align-items: center; }
 }
-.row .t { font-weight: 620; font-size: .92rem; }
-.row .m { font-size: .79rem; color: var(--ink-3); display: flex; flex-wrap: wrap; gap: 4px 10px; }
+/* 누를 수 있다는 표시 — cursor:pointer만으로는 손가락 화면에서 전혀 안 보인다 */
+.row::after { content: '›'; color: var(--ink-3); font-size: 1.2rem; line-height: 1; justify-self: end; }
+.row[data-noclick]::after { content: ''; }
+@media (max-width: 779px) { .row::after { display: none; } }
+.row .t { font-weight: 650; font-size: 1rem; }
+/* 메타 줄: .79rem(11.9px) + --ink-3 → .875rem(14px) + --ink-2. 위 색 규칙 참조 */
+.row .m { font-size: .875rem; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 4px 10px; }
+.row .m > span + span::before { content: '·'; color: var(--ink-3); margin-right: 10px; }
 .row .badges { display: flex; flex-wrap: wrap; gap: 4px; }
-.row .dd { font-family: var(--mono); font-size: .82rem; font-weight: 700; text-align: left; }
+.row .dd { font-family: var(--mono); font-size: .875rem; font-weight: 700; text-align: left; }
 @media (min-width: 780px) { .row .dd { text-align: right; } }
+/* 색만으로 뜻을 전하지 않는다 — 색을 못 가리는 사람에게도 기호로 구별된다 */
 .dd.near { color: var(--bad); }
+.dd.near::before { content: '⏰ '; }
 .dd.soon { color: var(--warn); }
-.dd.none { color: var(--ink-3); font-weight: 500; }
+.dd.soon::before { content: '• '; }
+.dd.none { color: var(--ink-2); font-weight: 500; }
 
 .pill {
-  font-size: .7rem; font-weight: 700; padding: 1px 7px; border-radius: 3px; white-space: nowrap;
+  font-size: .78rem; font-weight: 700; padding: 2px 8px; border-radius: 3px; white-space: nowrap;
   background: var(--mute-bg); color: var(--mute);
 }
 .pill.unreviewed { background: var(--warn-bg); color: var(--warn); }
 .pill.official   { background: var(--ok-bg);   color: var(--ok); }
 .pill.closed     { background: var(--mute-bg); color: var(--mute); }
 .pill.bad        { background: var(--bad-bg);  color: var(--bad); }
+.pill.warn       { background: var(--warn-bg); color: var(--warn); }
 .pill.info       { background: var(--navy-soft); color: var(--navy); }
 
 /* ── 표 ──────────────────────────────────────── */
 .scroller { overflow-x: auto; border: 1px solid var(--rule-soft); border-radius: 5px; }
-table { border-collapse: collapse; width: 100%; font-size: .86rem; background: var(--paper); }
-th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--rule-soft); vertical-align: top; }
-th { font-size: .72rem; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-3);
+table { border-collapse: collapse; width: 100%; font-size: .9rem; background: var(--paper); }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--rule-soft); vertical-align: top; }
+/* `text-transform:uppercase`와 넓은 자간을 뺐다 — **한글에 대문자 변환은 효과가 없고**
+   자간만 벌어져 읽기만 나빠진다. 이 화면은 한글 전용이다. */
+th { font-size: .8rem; color: var(--ink-2);
      font-weight: 700; background: var(--paper-2); position: sticky; top: 0; }
 tbody tr:last-child td { border-bottom: 0; }
 td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }

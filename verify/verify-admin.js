@@ -214,6 +214,14 @@ function serve() {
 
   await page.click('.chip[data-f="status"][data-v="all"]');
   await page.waitForTimeout(200);
+
+  /* 소속·성격·접수·경고등 필터는 '필터 더보기' 안에 접혀 있다 (2026-08-09).
+     기본에서 접혀 있는 것 자체가 검사 대상이다 — 5줄이 늘 펼쳐져 있으면 목록이 화면 밖으로 밀린다. */
+  ok(await page.locator('.filters-more').count() === 1, '나머지 필터는 접어 둔다');
+  ok(!(await page.locator('.filters-more').evaluate((el) => el.open)), '필터 더보기는 기본이 닫힘');
+  await page.click('.filters-more > summary');
+  await page.waitForSelector('#f-school', { state: 'visible' });
+
   const schools = [...new Set(reg.items.map((x) => (x.eligibility || {}).schoolOnly).filter(Boolean))];
   if (schools.length) {
     await page.selectOption('#f-school', schools[0]);
@@ -221,7 +229,31 @@ function serve() {
     const n = await page.locator('#screen-list .row').count();
     const expect = reg.items.filter((x) => (x.eligibility || {}).schoolOnly === schools[0]).length;
     ok(n === expect, `학교 분류가 실제로 걸러 낸다 (${schools[0]})`, `${n}/${expect}건`);
+
+    /* 접힌 필터가 걸려 있으면 목록 위에 태그로 보여야 한다 —
+       안 그러면 "왜 몇 건밖에 안 보이지?"의 원인을 화면에서 알 수 없다 */
+    ok(await page.locator('.ftag[data-clear="school"]').count() === 1,
+      '걸려 있는 필터가 목록 위에 태그로 보인다');
+    ok(await page.locator('.filters-more').evaluate((el) => el.open),
+      '필터를 고른 뒤에도 펼친 상태가 유지된다');
+
+    await page.click('.ftag[data-clear="school"]');
+    await page.waitForTimeout(250);
+    ok(await page.locator('#screen-list .row').count() === reg.items.length,
+      '태그를 누르면 그 필터가 풀린다');
   }
+
+  /* 데이터 읽기 실패를 조용히 넘기지 않는가 (A1) — 없는 파일을 읽게 해 배너를 확인한다 */
+  const failShown = await page.evaluate(async () => {
+    const w = window.__admin;
+    if (!w) return 'no-admin';
+    w.D.failed = [{ path: 'data/registered.json', why: '응답 500' }];
+    document.querySelector('#datafail').hidden = true;
+    w.renderDataFail();
+    const box = document.querySelector('#datafail');
+    return (!box.hidden && /믿지 마세요/.test(box.textContent)) ? 'shown' : 'hidden';
+  });
+  ok(failShown === 'shown', '데이터를 못 읽으면 화면 맨 위에 경고가 뜬다', failShown);
 
   /* 콘솔 오류 */
   ok(errors.length === 0, '콘솔·페이지 오류 없음', errors.slice(0, 3).join(' | '));
