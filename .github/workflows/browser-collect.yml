@@ -36,7 +36,7 @@ jobs:
     #    그때의 교훈은 그대로다 — **상한을 키우는 것으로 때우지 말 것**. 단계가 오래 걸리면
     #    그 단계의 예산(HARVEST_BUDGET_MS, 아래 timeout-minutes)을 줄이고, 상한은 그 합을
     #    담는 그릇으로만 쓴다. verify/test-collector.mjs가 이 대소관계를 검사한다.
-    timeout-minutes: 38
+    timeout-minutes: 39
     steps:
       - uses: actions/checkout@v4
 
@@ -88,6 +88,14 @@ jobs:
         continue-on-error: true
         run: node collector/deepfetch.mjs --fill
 
+      # 학교 이름이 바뀌면 health.json에 옛 키가 고아로 남아 "이 학교는 그날 이후 멈췄다"로
+      # 보인다. 2026-08-02 캠퍼스 정리 뒤 실제로 4곳이 그 상태였고, 2026-08-09 세션이
+      # 그걸 '멈춘 학교'로 잘못 진단했다. 매 실행 청소해 없는 고장을 만들지 않는다.
+      # 보강 단계이므로 실패해도 그날 수집·저장·리포트는 그대로 나간다.
+      - name: 건강 기록 고아 키 청소
+        continue-on-error: true
+        timeout-minutes: 1
+        run: node collector/prune-health.mjs
       - name: 공고 원문 발췌 갱신 (정직 원칙 — 추론 대신 원문 그대로)
         run: node collector/extract-excerpts.mjs --write
 
