@@ -557,6 +557,63 @@ function serve() {
   await page.click('[data-sel="none"]');
   await page.waitForTimeout(200);
 
+  /* ⑰ 자격 요건 편집 (D1) — 예전엔 화면에서 **읽기 전용**이라 못 읽은 자격을 채울 수 없었다.
+     🔴 기계 판정용(eligibility)과 사람이 읽는 문장(eligibilityLines)이 섞이면
+     매칭·알림·홈 합계가 조용히 망가진다. 보내는 내용에서 그 분리를 확인한다. */
+  await page.click('.tab[data-tab="review"]');
+  await page.waitForSelector('#screen-review:not([hidden])');
+  await page.click('#screen-review .row[data-id]');
+  await page.waitForSelector('#sheet:not([hidden])');
+
+  ok(await page.locator('#sheet [data-eg]').count() >= 6, '자격을 화면에서 고칠 수 있다 (읽기 전용이 아니다)');
+  ok(await page.locator('#sheet #eg-verified').count() === 1, "'제한 없음을 확인했다' 체크칸이 있다");
+
+  await page.fill('#sheet #eg-minGpa', '3.5');
+  await page.fill('#sheet #eg-years', '1,2');
+  await page.fill('#sheet #eg-lines', '1) 본교 재학생\n2) 직전 학기 성적 3.5 이상');
+  const picks = await page.locator('#sheet [data-eline]').count();
+  if (picks) await page.locator('#sheet [data-eline]').first().check();
+
+  /* 앞선 검사(등록)가 결과를 기다리며 `jobBusy` 잠금을 6분간 붙들고 있으면
+     이 저장 요청이 "앞선 작업이 아직 끝나지 않았어요"로 막힌다(제품이 옳다).
+     그래서 '실행 결과'도 함께 흉내 내 앞 작업이 끝나게 한다. */
+  await page.route('**/actions/workflows/**/runs**', (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify({
+      workflow_runs: [{
+        id: 2, status: 'completed', conclusion: 'success',
+        created_at: new Date(Date.now() + 5000).toISOString(),
+        html_url: 'https://example.invalid/run',
+      }],
+    }),
+  }));
+  await page.waitForFunction(() => {
+    const t = document.querySelector('#job-text')?.textContent || '';
+    return !/요청을 보냈어요|반영 중/.test(t);
+  }, null, { timeout: 25000 }).catch(() => {});
+
+  let editSent = null;
+  await page.route('**/actions/workflows/**/dispatches', (route) => {
+    try { editSent = JSON.parse(route.request().postData() || '{}'); } catch { editSent = 'parse-fail'; }
+    route.fulfill({ status: 204, body: '' });
+  });
+  await page.click('#sheet [data-act="save"]');
+  await page.waitForTimeout(700);
+  const ep = (() => { try { return JSON.parse(editSent?.inputs?.payload || '{}').patch || {}; } catch { return {}; } })();
+
+  ok(ep.eligibility && ep.eligibility.minGpa === '3.5' && ep.eligibility.years === '1,2',
+    '기계 판정용 값이 eligibility로 간다');
+  ok(Array.isArray(ep.eligibilityLines) && ep.eligibilityLines.length >= 2,
+    '사람이 읽는 문장은 eligibilityLines로 따로 간다', `${(ep.eligibilityLines || []).length}줄`);
+  ok(!Object.values(ep.eligibility || {}).some((v) => typeof v === 'string' && v.length > 40),
+    '기계 판정칸에 긴 자유 문장이 섞이지 않는다');
+  ok('eligibilityVerified' in ep, "'제한 없음 확인' 여부를 함께 보낸다");
+  await page.unroute('**/actions/workflows/**/dispatches');
+  await page.unroute('**/actions/workflows/**/runs**');
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(200);
+
   /* 데이터 읽기 실패를 조용히 넘기지 않는가 (A1) — 없는 파일을 읽게 해 배너를 확인한다 */
   const failShown = await page.evaluate(async () => {
     const w = window.__admin;

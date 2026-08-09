@@ -48,7 +48,55 @@ const TODAY = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);   //
 const ALLOWED = new Set([
   'name', 'provider', 'type', 'amount', 'amountValue', 'deadline', 'period',
   'summary', 'note', 'sourceUrl', 'formId', 'noForm', 'applyEmail',
+  /* 자격 요건 (2026-08-09 추가) — 학생 앱이 이미 읽는 칸들이라 앱 코드 변경은 필요 없다
+     (`app.js`의 qBlock·reasonRows, `match-engine.js`의 tidyRequirement). */
+  'eligibilityLines', 'eligibilityVerified', 'eligibility', 'documents',
 ]);
+
+/* 🔴 `eligibility`(기계 판정용)와 `eligibilityLines`(사람이 읽는 문장)를 **섞지 말 것.**
+   매칭·알림·홈 합계는 전부 `eligibility`를 보고 판정한다. 여기에 자유 문장이 들어가면
+   판정이 조용히 망가진다. 그래서 중첩 키도 화이트리스트로 못 박고, 값의 형태까지 검사한다. */
+const ELIG_KEYS = {
+  selective: 'bool',
+  schoolOnly: 'str',
+  campusOnly: 'str',
+  years: 'numArr',      // [1,2,3,4]
+  minGpa: 'num',
+  maxBracket: 'num',
+  tracks: 'strArr',
+};
+
+function cleanEligibility(v) {
+  if (!v || typeof v !== 'object' || Array.isArray(v)) fail('자격(기계 판정용) 형식이 올바르지 않습니다');
+  const out = {};
+  Object.keys(v).forEach((k) => {
+    const kind = ELIG_KEYS[k];
+    if (!kind) return;                                  // 모르는 키는 조용히 버린다
+    const raw = v[k];
+    if (raw === null || raw === '' || raw === undefined) return;
+    if (kind === 'bool') { if (raw === true) out[k] = true; return; }
+    if (kind === 'str') { const t = String(raw).trim(); if (t) out[k] = t; return; }
+    if (kind === 'num') { const n = Number(raw); if (Number.isFinite(n)) out[k] = n; return; }
+    if (kind === 'numArr') {
+      const a = (Array.isArray(raw) ? raw : String(raw).split(',')).map((x) => Number(String(x).trim()))
+        .filter((n) => Number.isInteger(n) && n >= 1 && n <= 6);
+      if (a.length) out[k] = [...new Set(a)].sort();
+      return;
+    }
+    if (kind === 'strArr') {
+      const a = (Array.isArray(raw) ? raw : String(raw).split(',')).map((x) => String(x).trim()).filter(Boolean);
+      if (a.length) out[k] = [...new Set(a)];
+    }
+  });
+  return out;
+}
+
+/* 사람이 읽는 자격 문장 — 줄 수·길이에 상한을 둔다(브라우저에서 오는 값을 믿지 않는다) */
+function cleanLines(v) {
+  const arr = Array.isArray(v) ? v : String(v || '').split('\n');
+  return arr.map((x) => String(x).replace(/\s+/g, ' ').trim()).filter(Boolean).slice(0, 20)
+    .map((x) => x.slice(0, 300));
+}
 
 const reg = readJson(REG, null);
 if (!reg || !Array.isArray(reg.items)) fail(`${REG} 를 읽지 못했습니다`);
@@ -175,7 +223,18 @@ switch (action) {
       let v = patch[k];
       if (typeof v === 'string') v = v.trim();
 
-      if (k === 'amountValue') {
+      if (k === 'eligibility') {
+        v = cleanEligibility(v);
+      } else if (k === 'eligibilityLines') {
+        v = cleanLines(v);
+        if (!v.length) v = null;
+      } else if (k === 'eligibilityVerified') {
+        v = v === true || v === 'true';
+        if (!v) v = null;                                // 거짓이면 칸 자체를 지운다
+      } else if (k === 'documents') {
+        v = cleanLines(v);
+        if (!v.length) v = null;
+      } else if (k === 'amountValue') {
         v = Number(v) || 0;
       } else if (k === 'deadline' && v) {
         if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) fail(`마감일 형식이 올바르지 않습니다: ${v} (YYYY-MM-DD)`);
@@ -187,9 +246,11 @@ switch (action) {
       }
 
       const old = it[k];
+      const same = (a, b) => (typeof a === 'object' || typeof b === 'object')
+        ? JSON.stringify(a) === JSON.stringify(b) : a === b;
       if (v === null || v === '') {
         if (old !== undefined) { delete it[k]; changed.push(k); }
-      } else if (old !== v) {
+      } else if (!same(old, v)) {
         it[k] = v; changed.push(k);
       }
     });

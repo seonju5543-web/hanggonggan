@@ -419,3 +419,13 @@ td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space
 }
 .foot { border-top: 1px solid var(--rule-soft); padding: 14px 16px 30px; text-align: center;
         font-size: .78rem; color: var(--ink-3); }
+
+/* ── 자격 편집 (D단계) ───────────────────────── */
+.grid2 { display: grid; grid-template-columns: 1fr; gap: 10px; }
+@media (min-width: 560px) { .grid2 { grid-template-columns: 1fr 1fr; } }
+.pick-lines { display: flex; flex-direction: column; gap: 2px; max-height: 34vh; overflow-y: auto;
+  border: 1px solid var(--rule-soft); border-radius: 5px; padding: 8px; background: var(--paper-2); }
+.pick-line { display: flex; gap: 9px; align-items: flex-start; padding: 7px 6px; border-radius: 4px;
+  cursor: pointer; font-size: .9rem; line-height: 1.45; min-height: 40px; }
+.pick-line:hover { background: var(--paper-3); }
+.pick-line input { margin-top: 3px; width: 18px; height: 18px; accent-color: var(--navy); flex: 0 0 auto; }

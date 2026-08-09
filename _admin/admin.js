@@ -1494,7 +1494,10 @@ function registerSheet(n) {
       <b>사람이 눌러도</b> 규칙이 막습니다.</p>`;
 }
 
+let currentSheetItem = null;
+
 function detailSheet(it) {
+  currentSheetItem = it;
   const fi = formIdSet();
   const ps = problemsOf(it, fi);
   const st = statusOf(it);
@@ -1538,14 +1541,57 @@ function detailSheet(it) {
         <div class="pane-body">
           ${EDIT_FIELDS.map(field).join('')}
           <div class="field">
-            <label>자격 (읽기 전용)</label>
-            <dl class="kv">
-              <dt>학교 한정</dt><dd>${esc(e.schoolOnly || '전국')}</dd>
-              <dt>캠퍼스</dt><dd>${esc(e.campusOnly || '—')}</dd>
-              <dt>학년</dt><dd>${esc((e.years || []).join(', ') || '—')}</dd>
-              <dt>최저 성적</dt><dd>${esc(e.minGpa != null ? e.minGpa : '—')}</dd>
-              <dt>소득 구간</dt><dd>${esc(e.maxBracket != null ? `${e.maxBracket}구간 이하` : '—')}</dd>
-            </dl>
+            <label>자격 — 기계 판정용 (매칭·알림이 이 값을 봅니다)</label>
+            <div class="grid2">
+              <div class="field"><label for="eg-schoolOnly">학교 한정</label>
+                <input type="text" id="eg-schoolOnly" data-eg="schoolOnly" value="${esc(e.schoolOnly || '')}"
+                  placeholder="비우면 전국" /></div>
+              <div class="field"><label for="eg-campusOnly">캠퍼스</label>
+                <input type="text" id="eg-campusOnly" data-eg="campusOnly" value="${esc(e.campusOnly || '')}" /></div>
+              <div class="field"><label for="eg-years">학년</label>
+                <input type="text" id="eg-years" data-eg="years" value="${esc((e.years || []).join(','))}"
+                  placeholder="예: 1,2" /></div>
+              <div class="field"><label for="eg-tracks">계열</label>
+                <input type="text" id="eg-tracks" data-eg="tracks" value="${esc((e.tracks || []).join(','))}"
+                  placeholder="쉼표로 구분" /></div>
+              <div class="field"><label for="eg-minGpa">최저 성적</label>
+                <input type="text" id="eg-minGpa" data-eg="minGpa" value="${esc(e.minGpa != null ? e.minGpa : '')}"
+                  placeholder="예: 3.5" /></div>
+              <div class="field"><label for="eg-maxBracket">소득 구간(이하)</label>
+                <input type="text" id="eg-maxBracket" data-eg="maxBracket" value="${esc(e.maxBracket != null ? e.maxBracket : '')}"
+                  placeholder="예: 8" /></div>
+            </div>
+            <p class="hint">비우면 그 조건은 없는 것으로 봅니다. <b>확인하지 못한 값을 짐작해 넣지 마세요</b> —
+              틀린 자격 판정은 '모른다'보다 나쁩니다(자격도 안 되는 학생이 서류를 준비하게 됩니다).</p>
+
+            <label style="margin-top:10px">학생에게 보여 줄 자격 문장</label>
+            ${(() => {
+    /* 후보 = 공고 원문에서 뽑아 둔 조각(excerpts, 문자열 배열) + 이미 담아 둔 문장.
+       excerpts에는 첨부 파일명 같은 것도 섞여 있으므로 **사람이 골라야 한다** —
+       기계가 알아서 고르면 그게 곧 '추론'이다(운영 원칙 8-1). */
+    const cand = [...new Set([...(it.eligibilityLines || []), ...(it.excerpts || [])])]
+      .map((l) => String(l).trim()).filter((l) => l.length > 3).slice(0, 24);
+    if (!cand.length) return '<p class="hint">이 공고는 원문 발췌가 없습니다. 아래에 직접 적으면 <b>사람이 입력</b>으로 남습니다.</p>';
+    return `<div class="pick-lines">
+        <p class="hint">공고 원문에서 뽑아 둔 조각입니다. 첨부 파일명 같은 것도 섞여 있으니
+          <b>진짜 자격 문장만 체크</b>하세요. 체크한 것만 학생 화면에 그대로 나갑니다.</p>
+        ${cand.map((l, i) => `<label class="pick-line">
+          <input type="checkbox" data-eline="${i}" value="${esc(l)}"
+            ${(it.eligibilityLines || []).includes(l) ? 'checked' : ''} />
+          <span>${esc(l)}</span></label>`).join('')}
+      </div>`;
+  })()}
+            <div class="field">
+              <label for="eg-lines">직접 입력 (한 줄에 하나)</label>
+              <textarea id="eg-lines" data-eg-lines rows="3"
+                placeholder="원문에 있는 문장을 그대로 옮겨 적으세요">${esc((it.eligibilityLines || []).join('\n'))}</textarea>
+            </div>
+            <label class="gate-check" style="margin-top:6px">
+              <input type="checkbox" id="eg-verified" data-eg-verified ${it.eligibilityVerified ? 'checked' : ''} />
+              <span>원문에서 <b>'자격 제한 없음'을 실제로 확인했다</b>
+                <em>— 체크해야 앱이 "별도 자격 제한이 없는 공고예요"라고 확신해서 말합니다.
+                  확인하지 않았으면 비워 두세요(그러면 "원문에서 확인하세요"로 정직하게 나갑니다).</em></span>
+            </label>
           </div>
         </div>
       </div>
@@ -1655,6 +1701,34 @@ function formSheet(id) {
 /* ---------------- 동작 연결 ---------------- */
 function collectEdits() {
   const patch = {};
+
+  /* ── 자격 (D단계) ──────────────────────────────────────────
+     🔴 **기계 판정용(eligibility)과 사람이 읽는 문장(eligibilityLines)을 섞지 않는다.**
+     매칭·알림·홈 합계는 전부 eligibility를 본다. 여기에 자유 문장이 들어가면
+     판정이 조용히 망가진다. 저장소 쪽(admin-apply.mjs)에서도 한 번 더 걸러낸다. */
+  const eg = {};
+  let egTouched = false;
+  $$('#sheet [data-eg]').forEach((el) => {
+    egTouched = true;
+    const v = (el.value || '').trim();
+    if (v) eg[el.dataset.eg] = v;
+  });
+  if (egTouched) {
+    /* selective는 화면에서 고치는 값이 아니다 — 원래 값을 그대로 지킨다 */
+    const cur = (currentSheetItem && currentSheetItem.eligibility) || {};
+    if (cur.selective) eg.selective = true;
+    patch.eligibility = eg;
+  }
+
+  const lines = [];
+  $$('#sheet [data-eline]:checked').forEach((el) => lines.push(el.value));
+  const typed = byId('eg-lines');
+  if (typed) String(typed.value || '').split('\n').forEach((l) => { if (l.trim()) lines.push(l.trim()); });
+  if (typed || $$('#sheet [data-eline]').length) patch.eligibilityLines = [...new Set(lines)];
+
+  const ver = byId('eg-verified');
+  if (ver) patch.eligibilityVerified = ver.checked;
+
   $$('#sheet [data-ed]').forEach((el) => {
     const k = el.dataset.ed;
     let v = el.value;
