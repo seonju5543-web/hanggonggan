@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-08-09",
+ "updatedAt": "2026-08-10",
  "items": {
   "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2668%20%5B%ED%99%8D%EB%B3%B4%5D%20%ED%95%9C%EA%B5%AD%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EA%B3%B5%EA%B3%B5%EB%8D%B0%EC%9D%B4%ED%84%B0%20%EA%B0%9C%EB%B0%A9%20%EB%B0%8F%20%ED%99%9C%EC%9A%A9%20%EC%95%88%EB%82%B4%202026.0": {
    "attempts": 4,
@@ -1404,12 +1404,14 @@
    "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322718"
   },
   "n:https://www.yonsei.ac.kr/bbs/sc/58/artclList.do?findClSeq=257#n-1388%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EB%B6%80%EC%98%81%EC%A3%BC%ED%83%9D%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%A7%80%EC%9B%90%20%EC%95%88%EB%82%B4%20%EC%83%88%EA%B8%80%20%EC%9E%A5%ED%95%99%20%EC%A1%B0%ED%9A%8C": {
-   "attempts": 2,
+   "attempts": 3,
    "title": "1388 2026학년도 2학기 부영주택 장학생 지원 안내 새글 장학 조회수9 작성일2026.08.06 기간2026.08.06 ~ 2026.08.",
-   "lastTried": "2026-08-09",
+   "lastTried": "2026-08-10",
    "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-08-10",
-   "status": ""
+   "nextTryAt": "2026-08-13",
+   "status": "",
+   "escalated": true,
+   "likelyGone": true
   },
   "n:https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53027&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
    "patrolledAt": "2026-08-08",
@@ -1569,6 +1571,86 @@
   },
   "n:https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269744&pageOrder=0&cmd=2&parm_bod_uid=268392&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&": {
    "patrolledAt": "2026-08-09",
+   "lastWhy": ""
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=29762&pageNo=1": {
+   "patrolledAt": "2026-08-10",
+   "lastWhy": ""
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/view.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5&nttId=30049": {
+   "patrolledAt": "2026-08-10",
+   "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)"
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/view.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5&nttId=30031": {
+   "patrolledAt": "2026-08-10",
+   "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)"
+  },
+  "n:https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767641&article.offset=0&articleLimit=10": {
+   "patrolledAt": "2026-08-10",
+   "lastWhy": ""
+  },
+  "n:https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767627&article.offset=0&articleLimit=10": {
+   "patrolledAt": "2026-08-10",
+   "lastWhy": ""
+  },
+  "n:https://onestop.pusan.ac.kr/page?menuCD=000000000000062&mode=DETAIL&seq=688": {
+   "patrolledAt": "2026-08-10",
+   "lastWhy": ""
+  },
+  "n:https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083&nttId=54165": {
+   "patrolledAt": "2026-08-10",
+   "lastWhy": ""
+  },
+  "n:https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=52322": {
+   "patrolledAt": "2026-08-10",
+   "lastWhy": ""
+  },
+  "n:https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=48910": {
+   "patrolledAt": "2026-08-10",
+   "lastWhy": ""
+  },
+  "n:https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=48884": {
+   "patrolledAt": "2026-08-10",
+   "lastWhy": ""
+  },
+  "n:https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54522": {
+   "patrolledAt": "2026-08-10",
+   "lastWhy": ""
+  },
+  "n:https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54518": {
+   "patrolledAt": "2026-08-10",
+   "lastWhy": ""
+  },
+  "n:https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54516": {
+   "patrolledAt": "2026-08-10",
+   "lastWhy": ""
+  },
+  "n:https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54497": {
+   "patrolledAt": "2026-08-10",
+   "lastWhy": ""
+  },
+  "n:https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083&nttId=54445": {
+   "patrolledAt": "2026-08-10",
+   "lastWhy": ""
+  },
+  "n:https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083&nttId=54444": {
+   "patrolledAt": "2026-08-10",
+   "lastWhy": ""
+  },
+  "n:https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083&nttId=54443": {
+   "patrolledAt": "2026-08-10",
+   "lastWhy": ""
+  },
+  "n:https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083&nttId=54353": {
+   "patrolledAt": "2026-08-10",
+   "lastWhy": ""
+  },
+  "n:https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083&nttId=54335": {
+   "patrolledAt": "2026-08-10",
+   "lastWhy": ""
+  },
+  "n:https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083&nttId=54334": {
+   "patrolledAt": "2026-08-10",
    "lastWhy": ""
   }
  }
