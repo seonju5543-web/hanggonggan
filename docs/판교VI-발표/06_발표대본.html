@@ -1,98 +1,88 @@
 <meta charset="utf-8">
 <title>한대장 · 경희판교VI캠퍼스 입주 발표평가 대본</title>
 <style>
-  @page { size: A4; margin: 15mm 15mm 15mm 15mm; }
+  @page { size: A4; margin: 17mm 18mm 15mm 18mm; }
   * { box-sizing: border-box; }
   body {
     font-family: "Noto Sans CJK KR", "NanumGothic", sans-serif;
-    font-size: 10.5pt; line-height: 1.64; color: #16181d; margin: 0;
+    font-size: 10.8pt; line-height: 1.75; color: #1a1a1a; margin: 0;
     -webkit-print-color-adjust: exact; print-color-adjust: exact;
   }
-  h1 { font-size: 21pt; margin: 0 0 4px; letter-spacing: -.02em; }
-  h2 { font-size: 13pt; margin: 0 0 14px; font-weight: 700; color: #1b4d8f;
-       border-bottom: 2px solid #1b4d8f; padding-bottom: 5px; letter-spacing: -.01em; }
-  h3 { font-size: 11.4pt; margin: 18px 0 6px; color: #1b4d8f; break-after: avoid; }
-  h3::before { content: "▶ "; }
+  h1 { font-size: 22pt; margin: 0 0 6px; letter-spacing: -.02em; font-weight: 700; }
+  h2 { font-size: 12.6pt; font-weight: 700; color: #16305c; margin: 0 0 16px;
+       padding-bottom: 4px; border-bottom: 1px solid #16305c; letter-spacing: -.01em; }
+  h3 { font-size: 11.2pt; font-weight: 700; color: #16305c; margin: 22px 0 8px;
+       break-after: avoid; }
   p { margin: 0 0 8px; }
+  b { font-weight: 700; }
 
-  /* ── 표지 · 0장 (그대로 유지) ── */
-  .cover { text-align: center; padding-top: 52mm; }
-  .cover .sub { color: #4a5160; font-size: 11pt; margin-top: 10px; }
-  .cover .rule { width: 72px; height: 3px; background: #1b4d8f; margin: 20px auto; }
-  .cover .meta { margin-top: 34mm; font-size: 9.8pt; color: #4a5160; line-height: 1.9; }
-  table { width: 100%; border-collapse: collapse; font-size: 9.6pt; margin: 8px 0 12px; }
-  th, td { border: 1px solid #ccd2dc; padding: 5px 7px; text-align: left; vertical-align: top; }
-  th { background: #eef2f8; font-weight: 700; }
-  td.n { text-align: center; white-space: nowrap; }
-  tr.mark td { background: #fff8e6; }
-  .warn { border: 1.4px solid #b3261e; background: #fdf3f2; color: #7f1d17;
-          padding: 9px 12px; border-radius: 4px; font-size: 9.9pt; margin: 12px 0; }
-  .legend { font-size: 9.8pt; color: #4a5160; margin: 10px 0 16px; }
-  .legend span { padding: 1px 7px; border-radius: 9px; font-weight: 700; margin-right: 5px; }
-  ul { margin: 5px 0 9px; padding-left: 19px; }
-  li { margin-bottom: 4px; }
+  /* 표지 */
+  .cover { text-align: center; padding-top: 56mm; }
+  .cover .sub { color: #555; font-size: 11pt; margin-top: 12px; line-height: 1.8; }
+  .cover .rule { width: 56px; height: 2px; background: #16305c; margin: 22px auto; }
+  .cover .meta { margin-top: 36mm; font-size: 10pt; color: #555; line-height: 2; }
 
-  /* ── 슬라이드 대본: 카드 제거, 글 위주 ── */
-  .slide { margin: 0 0 17px; }
-  .slide + .slide { border-top: 1px dotted #dfe3ea; padding-top: 13px; }
-  .sh { border-bottom: 1.6px solid #1b4d8f; padding: 0 0 3px; margin-bottom: 7px; break-after: avoid;
-        display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
-  .sh .t { font-weight: 700; font-size: 11.6pt; letter-spacing: -.01em; color: #16181d; }
-  .sh .t .no { color: #1b4d8f; }
-  .sh .t .who { font-size: 9.4pt; font-weight: 700; margin-left: 7px; padding: 1px 7px; border-radius: 9px; }
-  .sj { background: #1b4d8f; color: #fff; }
-  .ls { background: #0b6b52; color: #fff; }
-  .both { background: #6b4c9a; color: #fff; }
-  .sh .time { font-size: 9.5pt; color: #4a5160; white-space: nowrap; }
+  /* 슬라이드 */
+  .slide { margin: 0 0 22px; }
+  .sh { border-bottom: 1px solid #c8c8c8; padding-bottom: 3px; margin-bottom: 9px;
+        display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+        break-after: avoid; }
+  .sh .t { font-weight: 700; font-size: 11.6pt; letter-spacing: -.01em; }
+  .sh .t .no { color: #16305c; }
+  .sh .t .who { font-size: 9.8pt; font-weight: 700; color: #6b6b6b; background: none;
+                padding: 0; margin-left: 6px; }
+  .sh .t .who::before { content: "· "; }
+  .sh .time { font-size: 9.8pt; color: #6b6b6b; white-space: nowrap; font-weight: 400; }
   .sb { padding: 0; }
-  .screen { font-size: 9.5pt; color: #5a6373; margin: 0 0 8px; padding-left: 11px; break-after: avoid; break-inside: avoid;
-            border-left: 2px solid #c9cfd9; }
-  .say { margin: 0 0 8px; }
-  .say p { margin: 0 0 8px; orphans: 2; widows: 2; break-inside: avoid; }
-  .pause { color: #b3261e; font-weight: 700; }
-  .stress { border-bottom: 2px solid #ffd54a; padding-bottom: 1px; }
-  .next { margin: 10px 0 0; padding-left: 11px; border-left: 2px solid #0b6b52; break-inside: avoid; break-before: avoid;
-          font-size: 10pt; color: #0b6b52; }
-  .next b { color: #16181d; }
-  .cut { font-size: 9.5pt; color: #8a5a00; margin: 7px 0 0; padding-left: 11px; break-inside: avoid; break-before: avoid;
-         border-left: 2px solid #e0b64a; }
-  .bait { font-size: 9.5pt; color: #5b3a8a; margin: 7px 0 0; padding-left: 11px; break-inside: avoid; break-before: avoid;
-          border-left: 2px solid #b79ede; }
-  .inter { margin: 9px 0; padding-left: 11px; border-left: 3px solid #0b6b52; font-size: 10.2pt; break-inside: avoid; }
-  .inter .lab { font-weight: 700; color: #0b6b52; display: block; margin-bottom: 2px; font-size: 9.7pt; }
-  .slide .warn { border: none; background: none; color: #7f1d17; padding: 0 0 0 11px;
-                 border-left: 3px solid #b3261e; border-radius: 0; margin: 9px 0; font-size: 9.9pt; }
 
-  /* ── 글줄 목록 (표 대체) ── */
-  dl.rows { margin: 6px 0 12px; }
-  dl.rows > div { display: flex; gap: 10px; padding: 4px 0;
-                  border-bottom: 1px dotted #d6dae2; break-inside: avoid; }
-  dl.rows > div:last-child { border-bottom: none; }
-  dl.rows dt { flex: 0 0 96px; font-weight: 700; font-size: 9.9pt; color: #1b4d8f; }
-  dl.rows dd { margin: 0; flex: 1; font-size: 10.2pt; }
-  dl.rows dd .tail-note { color: #4a5160; }
-  dl.wide dt { flex: 0 0 150px; }
-  dl.slim dt { flex: 0 0 62px; }
-  dl.cheat dt { flex: 0 0 84px; }
+  /* 회색 = 발표자만 보는 것 */
+  .screen, .bait, .cut, .slide .warn, .inter .lab, .tail, .never, .qa .qh .who2 {
+    color: #6b6b6b; font-size: 9.8pt; }
+  .screen { margin: 0 0 9px; break-after: avoid; break-inside: avoid; }
+  .bait, .cut, .slide .warn { margin: 8px 0 0; padding-left: 14px; text-indent: -14px;
+    break-inside: avoid; break-before: avoid; border: none; background: none; border-radius: 0; }
+  .bait b, .cut b, .slide .warn b, .tail b, .never b { color: #3a3a3a; }
 
-  ol.steps { margin: 6px 0 12px; padding-left: 21px; }
-  ol.steps > li { margin-bottom: 7px; break-inside: avoid; }
-  ol.steps > li > b:first-child { color: #1b4d8f; }
+  /* 검정 = 입으로 말하는 것 */
+  .say { margin: 0; }
+  .say p { margin: 0 0 9px; orphans: 2; widows: 2; break-inside: avoid; }
+  .stress { border: none; font-weight: 700; }
+  .pause { color: #8a8a8a; font-weight: 400; }
+  .next { margin: 10px 0 0; break-inside: avoid; break-before: avoid; }
+  .next b { font-weight: 700; }
+  .inter { margin: 10px 0; break-inside: avoid; }
+  .inter .lab { display: block; font-weight: 700; margin-bottom: 1px; }
 
-  /* ── 질의응답: 카드 제거 ── */
-  .qa { margin: 0 0 15px; }
-  .qa + .qa { border-top: 1px dotted #dfe3ea; padding-top: 11px; }
-  .qa .qh { font-weight: 700; font-size: 11pt; color: #16181d; break-after: avoid; break-inside: avoid;
-            border-bottom: 1.4px solid #c9b8e0; padding-bottom: 3px; margin-bottom: 6px; }
-  .qa .qh .tag { font-size: 9pt; font-weight: 700; padding: 1px 7px; border-radius: 9px;
-                 margin-right: 7px; vertical-align: 1px; }
-  .qa .qh .who2 { font-weight: 400; font-size: 9.5pt; color: #4a5160; }
-  .qa .qb { padding: 0; }
-  .qa .ans { margin-bottom: 7px; orphans: 2; widows: 2; break-inside: avoid; }
-  .tail { break-inside: avoid; padding-left: 11px; border-left: 2px solid #c9cfd9; font-size: 9.9pt; margin-top: 7px; color: #33393f; }
-  .tail b { color: #16181d; }
-  .tail .qq { color: #b3261e; font-weight: 700; }
-  .never { font-size: 9.7pt; color: #7f1d17; margin: 0 0 6px; padding-left: 11px; border-left: 2px solid #e8a9a4; }
+  /* 목록 */
+  ul { margin: 6px 0 10px; padding-left: 18px; }
+  li { margin-bottom: 5px; }
+  dl.rows { margin: 8px 0 14px; }
+  dl.rows > div { display: flex; gap: 12px; padding: 3px 0; break-inside: avoid; }
+  dl.rows dt { flex: 0 0 96px; font-weight: 700; }
+  dl.rows dd { margin: 0; flex: 1; }
+  dl.rows dd .tail-note { color: #6b6b6b; }
+  dl.wide dt { flex: 0 0 138px; }
+  dl.slim dt { flex: 0 0 66px; }
+  dl.cheat dt { flex: 0 0 86px; }
+  ol.steps { margin: 8px 0 14px; padding-left: 20px; }
+  ol.steps > li { margin-bottom: 9px; break-inside: avoid; }
+
+  /* 질의응답 */
+  .qa { margin: 0 0 20px; }
+  .qa .qh { font-weight: 700; font-size: 11.2pt; margin-bottom: 7px;
+            break-after: avoid; break-inside: avoid; }
+  .qa .qh .tag { background: none !important; color: #16305c !important;
+                 font-weight: 700; padding: 0; margin-right: 5px; font-size: inherit; }
+  .qa .qh .who2 { font-weight: 400; }
+  .qa .ans { margin-bottom: 8px; orphans: 2; widows: 2; break-inside: avoid; }
+  .tail { margin-top: 8px; break-inside: avoid; }
+  .tail p { margin: 0 0 5px; }
+  .tail .qq { color: #3a3a3a; font-weight: 700; }
+  .never { margin: 0 0 7px; }
+
+  /* 문서 앞부분 안내 */
+  .warn { border: none; background: none; color: #1a1a1a; padding: 0;
+          border-radius: 0; font-size: inherit; margin: 10px 0 14px; }
   .pb { break-before: page; }
 </style>
 
@@ -115,28 +105,29 @@
 <p>실제 덱은 <b>15장</b>입니다. 폴더의 <code>02_슬라이드구성.md</code>(본편 11 + 백업 8)와 장수가 다르므로,
 이 대본은 <b>업로드하신 실제 PPT를 기준</b>으로 작성했습니다.</p>
 
-<table>
-  <tr><th style="width:20%">구간</th><th style="width:14%">시간</th><th>역할</th></tr>
-  <tr><td>슬라이드 1~10</td><td class="n">7분 36초</td><td>본편 — 문제 → 해법 → 완결 → 실적 → 운영 → 해자 → 개인정보 → 수익 → 팀</td></tr>
-  <tr><td>슬라이드 11</td><td class="n">48초</td><td>왜 이 자리인가 · 왜 한대장인가</td></tr>
-  <tr class="mark"><td>슬라이드 12~15</td><td class="n">56초</td><td><b>장당 12초로 짚고 넘어감.</b> 동시에 질의응답 유도 장치</td></tr>
-  <tr class="mark"><td>클로징</td><td class="n">1분 47초</td><td><b>요청 사항 4가지 + 대표 문장 반복</b></td></tr>
-  <tr><td colspan="2" class="n"><b>합계 11분 07초</b></td><td>「10분 컷」 여섯 곳을 지우면 <b>10분 00초</b>, 「7분 컷」까지 지우면 <b>7분 05초</b> (2절 참조)</td></tr>
-</table>
+<dl class="rows wide">
+  <div><dt>슬라이드 1~10</dt><dd><b>7분 36초</b> — 문제 → 해법 → 완결 → 실적 → 운영 → 해자 → 개인정보 → 수익 → 팀</dd></div>
+  <div><dt>슬라이드 11</dt><dd><b>48초</b> — 왜 이 자리인가 · 왜 한대장인가</dd></div>
+  <div><dt>슬라이드 12~15</dt><dd><b>56초</b> — 장당 12초로 짚고 넘어감. 동시에 질의응답 유도 장치</dd></div>
+  <div><dt>클로징</dt><dd><b>1분 47초</b> — 요청 사항 4가지 + 대표 문장 반복</dd></div>
+  <div><dt>합계</dt><dd><b>11분 07초</b> — 「10분 컷」 여섯 곳을 지우면 <b>10분 00초</b>,
+    「7분 컷」까지 지우면 <b>7분 05초</b> (2절 참조)</dd></div>
+</dl>
 
-<div class="legend">
-  <span class="sj">조세현</span> 대표 · 문제 정의 · 실적 · 운영 · 수익 · 요청&nbsp;&nbsp;
-  <span class="ls">이선주</span> 개발 · 매칭 · 서식 · 수집 · 개인정보
-</div>
+<p><b>발표자 분담</b> — <b>조세현</b>: 표지 · 문제 · 실적 · 운영 · 수익 · 팀 · 요청 &nbsp;/&nbsp;
+<b>이선주</b>: 매칭 · 서식 · 수집 · 개인정보 · 근거 4장</p>
 
-<h3>표기 규칙</h3>
+<h3>표기 규칙 — 딱 하나만 기억하십시오</h3>
+
+<p style="font-size:11.4pt"><b>검정 글자는 입 밖에 내고, 회색 글자는 발표자만 봅니다.</b></p>
+
 <ul>
-  <li><b>따옴표 안 문장은 그대로 입 밖에 냅니다.</b> 개조식 메모가 아닙니다.</li>
+  <li><b>따옴표 안 문장은 그대로 말합니다.</b> 개조식 메모가 아닙니다. <b>굵은 글씨</b>는 목소리를 한 단계 올리는 곳입니다.</li>
   <li><span class="pause">(쉼)</span> — 반드시 한 박자 쉽니다. 여기가 문장이 꽂히는 자리입니다.</li>
-  <li><span class="stress">노란 밑줄</span> — 목소리를 한 단계 올리는 구간입니다.</li>
-  <li><span style="color:#5b3a8a;font-weight:700">보라색 세로줄</span> — <b>발표자만 아는 질의응답 유도 장치.</b> 읽지 않습니다.</li>
-  <li><span style="color:#8a5a00;font-weight:700">노란 세로줄</span> — <b>7분 컷.</b> 시간이 강제로 7분이면 이 문장들만 지웁니다.</li>
-  <li><span style="color:#0b6b52;font-weight:700">초록 세로줄</span> — 다음 장으로 넘어가는 연결 문장, 그리고 청중 참여 구간입니다.</li>
+  <li>회색 <b>[화면]</b> — 그 장에 뜬 캡쳐가 무엇인지. 말하지 않고 손으로 가리킵니다.</li>
+  <li>회색 <b>유도 ①~⑫</b> — 질의응답을 부르는 장치. <b>절대 읽지 않습니다.</b></li>
+  <li>회색 <b>▸ 7분 컷</b> — 시간이 강제로 7분이면 이 문장만 지웁니다.</li>
+  <li><b>→ [연결]</b>과 <b>▸ 청중 참여</b>는 검정입니다. <b>말하는 문장</b>입니다.</li>
 </ul>
 
 <div class="warn">
