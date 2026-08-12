@@ -6351,8 +6351,9 @@
    "noForm": "자동 등록(검수 전) 2026-08-12 — 양식 스키마화는 검수 후 진행",
    "auto": true,
    "attachments": [],
-   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B5%AD%EC%A0%9C%202026%ED%95%99%EB%85%84%EB%8F%84%20%EB%AA%A9%ED%8F%AC%ED%96%A5%EC%9A%B0%ED%9A%8C%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4%20(~8%2F26(%EC%88%98)%EA%B9%8C%EC%A7%80)",
-   "sourceKind": "auto"
+   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322759",
+   "sourceKind": "auto",
+   "boardTitle": "국제 2026학년도 목포향우회 장학생 선발 안내 (~8/26(수)까지)"
   },
   {
    "id": "auto-aaa8eca79120ec9588eb82b4",
@@ -6378,7 +6379,8 @@
    "auto": true,
    "attachments": [],
    "sourceUrl": "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5#n-(%EC%9E%AC)%EC%A4%91%EC%95%99%EB%8C%80%ED%95%99%EA%B5%90%EB%8F%99%EB%AC%B8%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%202026%EB%85%84%EB%8F%84%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EC%95%88%EB%82%B4",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "boardTitle": "(재)중앙대학교동문장학재단 2026년도 장학생 모집 안내"
   }
  ]
 }
