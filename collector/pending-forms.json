@@ -377,6 +377,22 @@
    "added": "2026-08-12",
    "fetched": true,
    "schematized": false
+  },
+  {
+   "id": "auto-larshipdoarticleno373578",
+   "name": "[장애학생지원실] 2026-2 면학장학생 모집( ~8.13 17:00)",
+   "target": "2026-2 면학장학생 모집( ~8.13 17:00)",
+   "added": "2026-08-12",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-krbbskr845011artclviewdo",
+   "name": "[학부-교외장학] 2026학년도 2학기 인하대동문장학회 변호산 장학금 장학생 선발 공고",
+   "target": "2026학년도 2학기 인하대동문장학회 변호산 장학금 장",
+   "added": "2026-08-12",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }

@@ -6240,30 +6240,78 @@
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   },
   {
-   "id": "auto-aaa8eca79120ec9588eb82b4",
-   "name": "(재)중앙대학교동문장학재단 2026년도 장학생 모집 안내",
-   "type": "교외",
-   "provider": "중앙대학교 게시 공고",
+   "id": "auto-larshipdoarticleno373578",
+   "name": "[장애학생지원실] 2026-2 면학장학생 모집( ~8.13 17:00)",
+   "type": "교내",
+   "provider": "아주대학교 게시 공고",
    "amount": "금액 원문 확인",
    "amountValue": 0,
-   "deadline": null,
-   "listedAt": "2026-08-12",
-   "period": "접수 기간 원문 확인",
-   "summary": "중앙대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "deadline": "2026-08-13",
+   "period": "접수 ~2026-08-13",
+   "summary": "아주대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true,
-    "schoolOnly": "중앙대학교"
+    "schoolOnly": "아주대학교"
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
    ],
    "duplicable": true,
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
-   "noForm": "자동 등록(검수 전) 2026-08-12 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
-   "sourceUrl": "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5#n-(%EC%9E%AC)%EC%A4%91%EC%95%99%EB%8C%80%ED%95%99%EA%B5%90%EB%8F%99%EB%AC%B8%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%202026%EB%85%84%EB%8F%84%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EC%95%88%EB%82%B4",
-   "sourceKind": "auto"
+   "attachments": [
+    {
+     "name": "면학장학생 지원서(성명).hwp",
+     "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=file-download&articleNo=373578&attachNo=331476"
+    }
+   ],
+   "sourceUrl": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=373578&article.offset=0&articleLimit=10",
+   "sourceKind": "auto",
+   "formId": "auto-2026-2-면학장학생-모집-8-13-17--apply"
+  },
+  {
+   "id": "auto-krbbskr845011artclviewdo",
+   "name": "[학부-교외장학] 2026학년도 2학기 인하대동문장학회 변호산 장학금 장학생 선발 공고",
+   "type": "교외",
+   "provider": "인하대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-12",
+   "period": "접수 기간 원문 확인",
+   "summary": "인하대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "인하대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2. 변호산장학금 신청 서식.hwp",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/40850/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.inha.ac.kr/bbs/kr/8/45011/artclView.do",
+   "sourceKind": "auto",
+   "formId": "auto-2026학년도-2학기-인하대동문장학회-변호산-apply",
+   "eligibilityLines": [
+    "1. 신청 자격",
+    "가. 2026년 2학기 정규등록 예정 중인 자 (휴학, 부분등록자 제외)",
+    "나. 직전 정규학기 평점평균 3.0 이상인 학생"
+   ],
+   "excerpts": [
+    "장학금액 : 등록금 전액 ( ※ 등록금성, 이중수혜 불가)",
+    "신청 기한 : ~ 26.",
+    "신청 방법 : (재)인하대동문장학회 메일 접수 inhain4@inhain.com",
+    "문의처 : 인하대동문장학회 032-887-2345",
+    "구비 서류 및 일정 등 자세한 내용은 붙임 파일을 참고하시기 바랍니다"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   }
  ]
 }
