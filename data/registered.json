@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-08-12",
+ "updatedAt": "2026-08-13",
  "items": [
   {
    "id": "reg-kw-gukgagosi",
@@ -6351,8 +6351,218 @@
    "noForm": "자동 등록(검수 전) 2026-08-12 — 양식 스키마화는 검수 후 진행",
    "auto": true,
    "attachments": [],
-   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B5%AD%EC%A0%9C%202026%ED%95%99%EB%85%84%EB%8F%84%20%EB%AA%A9%ED%8F%AC%ED%96%A5%EC%9A%B0%ED%9A%8C%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4%20(~8%2F26(%EC%88%98)%EA%B9%8C%EC%A7%80)",
+   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322759",
+   "sourceKind": "auto",
+   "boardTitle": "국제 2026학년도 목포향우회 장학생 선발 안내 (~8/26(수)까지)",
+   "eligibilityLines": [
+    "1. 선발 대상",
+    "( 아래 요건을 모두 충족해야 함 )",
+    "1) 대한민국 국적이며 , 국내 4 년제 대학 1 학년 재학 중인 학생",
+    "- 2026 년도 신입생에 한함 ( 전공불문 )",
+    "- 2 학기 휴학 예정자 지원 불가",
+    "2) 1 학기 성적 4.0 (4.5 만점 ) 이상인 학생",
+    "3) 재단 주최 활동에 성실하고 적극적으로 참여할 수 있는 학생",
+    "4) 부모 직장으로부터 학자금 지원을 받고 있지 않은 학생"
+   ],
+   "excerpts": [
+    "※ 접수 기간 내에 접수 확인 및 수정 가능 .",
+    "2) 문의처 : 서암 윤세영 재단 (http://foundation.sbs.co.kr/seoam) 홈페이지 內 윤세영 스칼라십 문의 게시판 >"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-rnoticedoarticleno155093",
+   "name": "입학관리본부 입학사정관실 봉사장학생 모집(~8/19 19:00)",
+   "type": "교내",
+   "provider": "홍익대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-08-19",
+   "period": "접수 ~2026-08-19",
+   "summary": "홍익대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "홍익대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-13 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2027 입학사정관실 봉사장학생_지원서(이름 OOO).hwp",
+     "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=download&articleNo=155093&attachNo=90697"
+    }
+   ],
+   "sourceUrl": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=155093&article.offset=0&articleLimit=10&noCat=501",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "1. 모집 대상",
+    "1) 홍익대학교 재학생으로 서울캠퍼스 교내 근로 가능한 자",
+    "※ 졸업유예자, 휴학생, 대학원생, 세종캠퍼스 학생은 지원 불가",
+    "2) 직전학기 15학점 이상 이수하고 성적 경고를 받지 않은 학생",
+    "※ 단, 학과(부)장 추천서를 받아 이메일로 제출하면 지원 가능",
+    "3) 학기초과자 중 10학점 이상 수강 신청하여 수업료 전액 납부 예정인 학생"
+   ],
+   "excerpts": [
+    "문의: 입학사정관실 봉사장학생 담당자 (02-320-3410 / showered@hongik.ac.kr )"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-iceinfojanghakbidx893886",
+   "name": "[교양대학] 물리실험 준비실 국가근로 장학생 모집",
+   "type": "교내",
+   "provider": "서울과학기술대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-13",
+   "period": "접수 기간 원문 확인",
+   "summary": "서울과학기술대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서울과학기술대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-13 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "국가근로장학생 지원서(학생).hwp",
+     "url": "javascript:downloadfile("
+    }
+   ],
+   "sourceUrl": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=57138&bidx=893886&qidx=57138&cate=0&allboard=true&nowpage=1",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "2. 자격요건",
+    "- 한국장학재단 2026년 2학기 국가근로장학 신청 학생",
+    "- 2026학년도 2학기 재학생 중 일반물리학실험(1)/(2)를 이수한 학생",
+    "3. 모집마감: 2026. 8. 20(목) 정오",
+    "*1차 합격자에 한하여 면접 예정(개별 연락)"
+   ],
+   "excerpts": [
+    "- 지원 및 문의: physinexus@seoultech.ac.kr / 02-970-7235 / 정창근"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-enoticedoarticleno767721",
+   "name": "[비교과통합지원센터] 2026-1학기 비교과 마일리지 장학생 선발 안내(서울,천안)",
+   "type": "교내",
+   "provider": "상명대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-13",
+   "period": "접수 기간 원문 확인",
+   "summary": "상명대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "상명대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-13 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767721&article.offset=0&articleLimit=10",
    "sourceKind": "auto"
+  },
+  {
+   "id": "auto-otice06doarticleno139106",
+   "name": "2026년도 세종연구원 \"세종이도인재장학금-핵심인재육성분야(특기적성)\" 장학생 선발안내",
+   "type": "교내",
+   "provider": "성균관대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-13",
+   "period": "접수 기간 원문 확인",
+   "summary": "성균관대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "성균관대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "1. 2026년도 세종이도인재장학금 장학생 선발계획 공고.pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=139106&attachNo=116608"
+    },
+    {
+     "name": "2. 2026년도 세종이도인재장학금 장학생 선발계획 공고 붙임자료.pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=139106&attachNo=116609"
+    },
+    {
+     "name": "3. 별지 서식 제출 서류.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=139106&attachNo=116610"
+    }
+   ],
+   "sourceUrl": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=139106&article.offset=0&articleLimit=10",
+   "sourceKind": "auto",
+   "formId": "auto-2026년도-세종연구원-세종이도인재장학금-핵-apply",
+   "eligibilityLines": [
+    "2) 신청대상 : 아래 자격을 모두 충족해야함",
+    "- 신청시작일로부터 1년 이내(2025.08.10~2026.08.09.)에 4차 산업, 예체능 등 위 특기분야 중 전국 규모 이상의 대회에서 3위 이내 입상한 자",
+    "- 신청시작일 기준 1년 이상 세종시 계속 거주자(부,모 또는 본인)",
+    "3) 선발인원 : 35명 ※ 예산범위 내 변동 가능"
+   ],
+   "excerpts": [
+    "2) 신청대상 : 아래 자격을 모두 충족해야함",
+    "3) 선발인원 : 35명 ※ 예산범위 내 변동 가능",
+    "4) 접수방법 : 온라인, 오프라인 개별 신청",
+    "5) 문의: 인재개발부 044-865-9685",
+    "※ 재단에서 핵심인재육성분야(특기적성)을 제외한 분야는 공지 안내일 기준으로 신청기간이 마감된 상태입니다."
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-munewsnotice712224viewdo",
+   "name": "2026학년도 2학기 한국대학봉사회 장학생 선발 안내 (봉사실적 우수 학생 선발)",
+   "type": "교내",
+   "provider": "국민대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-13",
+   "period": "접수 기간 원문 확인",
+   "summary": "국민대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "국민대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-13 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12224/view.do?currentPageNo=1",
+   "sourceKind": "auto",
+   "excerpts": [
+    "ㅇ 신청방법: ON 국민 - 포털 - 학생서비스 - 장학정보 - 장학신청",
+    "* 제출서류에는 봉사활동 기간, 봉사시간, 봉사내용 및 발급기관이 확인되어야 함."
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   },
   {
    "id": "auto-aaa8eca79120ec9588eb82b4",
@@ -6362,7 +6572,7 @@
    "amount": "금액 원문 확인",
    "amountValue": 0,
    "deadline": null,
-   "listedAt": "2026-08-12",
+   "listedAt": "2026-08-13",
    "period": "접수 기간 원문 확인",
    "summary": "중앙대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
@@ -6374,7 +6584,7 @@
    ],
    "duplicable": true,
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
-   "noForm": "자동 등록(검수 전) 2026-08-12 — 양식 스키마화는 검수 후 진행",
+   "noForm": "자동 등록(검수 전) 2026-08-13 — 양식 스키마화는 검수 후 진행",
    "auto": true,
    "attachments": [],
    "sourceUrl": "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5#n-(%EC%9E%AC)%EC%A4%91%EC%95%99%EB%8C%80%ED%95%99%EA%B5%90%EB%8F%99%EB%AC%B8%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%202026%EB%85%84%EB%8F%84%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EC%95%88%EB%82%B4",

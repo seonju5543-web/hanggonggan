@@ -393,6 +393,30 @@
    "added": "2026-08-12",
    "fetched": true,
    "schematized": false
+  },
+  {
+   "id": "auto-rnoticedoarticleno155093",
+   "name": "입학관리본부 입학사정관실 봉사장학생 모집(~8/19 19:00)",
+   "target": "입학관리본부 입학사정관실 봉사장학생 모집(~8/19 1",
+   "added": "2026-08-13",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-iceinfojanghakbidx893886",
+   "name": "[교양대학] 물리실험 준비실 국가근로 장학생 모집",
+   "target": "물리실험 준비실 국가근로 장학생 모집",
+   "added": "2026-08-13",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-otice06doarticleno139106",
+   "name": "2026년도 세종연구원 \"세종이도인재장학금-핵심인재육성분야(특기적성)\" 장학생 선발안내",
+   "target": "2026년도 세종연구원 \"세종이도인재장학금-핵심인재육성",
+   "added": "2026-08-13",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }
