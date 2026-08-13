@@ -6481,19 +6481,72 @@
    "sourceKind": "auto"
   },
   {
-   "id": "auto-aaa8eca79120ec9588eb82b4",
-   "name": "(재)중앙대학교동문장학재단 2026년도 장학생 모집 안내",
-   "type": "교외",
-   "provider": "중앙대학교 게시 공고",
+   "id": "auto-otice06doarticleno139106",
+   "name": "2026년도 세종연구원 \"세종이도인재장학금-핵심인재육성분야(특기적성)\" 장학생 선발안내",
+   "type": "교내",
+   "provider": "성균관대학교 게시 공고",
    "amount": "금액 원문 확인",
    "amountValue": 0,
    "deadline": null,
    "listedAt": "2026-08-13",
    "period": "접수 기간 원문 확인",
-   "summary": "중앙대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "summary": "성균관대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true,
-    "schoolOnly": "중앙대학교"
+    "schoolOnly": "성균관대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "1. 2026년도 세종이도인재장학금 장학생 선발계획 공고.pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=139106&attachNo=116608"
+    },
+    {
+     "name": "2. 2026년도 세종이도인재장학금 장학생 선발계획 공고 붙임자료.pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=139106&attachNo=116609"
+    },
+    {
+     "name": "3. 별지 서식 제출 서류.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=139106&attachNo=116610"
+    }
+   ],
+   "sourceUrl": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=139106&article.offset=0&articleLimit=10",
+   "sourceKind": "auto",
+   "formId": "auto-2026년도-세종연구원-세종이도인재장학금-핵-apply",
+   "eligibilityLines": [
+    "2) 신청대상 : 아래 자격을 모두 충족해야함",
+    "- 신청시작일로부터 1년 이내(2025.08.10~2026.08.09.)에 4차 산업, 예체능 등 위 특기분야 중 전국 규모 이상의 대회에서 3위 이내 입상한 자",
+    "- 신청시작일 기준 1년 이상 세종시 계속 거주자(부,모 또는 본인)",
+    "3) 선발인원 : 35명 ※ 예산범위 내 변동 가능"
+   ],
+   "excerpts": [
+    "2) 신청대상 : 아래 자격을 모두 충족해야함",
+    "3) 선발인원 : 35명 ※ 예산범위 내 변동 가능",
+    "4) 접수방법 : 온라인, 오프라인 개별 신청",
+    "5) 문의: 인재개발부 044-865-9685",
+    "※ 재단에서 핵심인재육성분야(특기적성)을 제외한 분야는 공지 안내일 기준으로 신청기간이 마감된 상태입니다."
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-munewsnotice712224viewdo",
+   "name": "2026학년도 2학기 한국대학봉사회 장학생 선발 안내 (봉사실적 우수 학생 선발)",
+   "type": "교내",
+   "provider": "국민대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-13",
+   "period": "접수 기간 원문 확인",
+   "summary": "국민대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "국민대학교"
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -6503,8 +6556,13 @@
    "noForm": "자동 등록(검수 전) 2026-08-13 — 양식 스키마화는 검수 후 진행",
    "auto": true,
    "attachments": [],
-   "sourceUrl": "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5#n-(%EC%9E%AC)%EC%A4%91%EC%95%99%EB%8C%80%ED%95%99%EA%B5%90%EB%8F%99%EB%AC%B8%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%202026%EB%85%84%EB%8F%84%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EC%95%88%EB%82%B4",
-   "sourceKind": "auto"
+   "sourceUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12224/view.do?currentPageNo=1",
+   "sourceKind": "auto",
+   "excerpts": [
+    "ㅇ 신청방법: ON 국민 - 포털 - 학생서비스 - 장학정보 - 장학신청",
+    "* 제출서류에는 봉사활동 기간, 봉사시간, 봉사내용 및 발급기관이 확인되어야 함."
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   }
  ]
 }
