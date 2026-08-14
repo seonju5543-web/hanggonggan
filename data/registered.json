@@ -6632,19 +6632,19 @@
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   },
   {
-   "id": "auto-aaa8eca79120ec9588eb82b4",
-   "name": "(재)중앙대학교동문장학재단 2026년도 장학생 모집 안내",
+   "id": "auto-rnoticedoarticleno155185",
+   "name": "[손태희장학재단] 2026년 손태희장학재단 4기 장학생 모집",
    "type": "교외",
-   "provider": "중앙대학교 게시 공고",
+   "provider": "홍익대학교 게시 공고",
    "amount": "금액 원문 확인",
    "amountValue": 0,
    "deadline": null,
    "listedAt": "2026-08-14",
    "period": "접수 기간 원문 확인",
-   "summary": "중앙대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "summary": "홍익대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true,
-    "schoolOnly": "중앙대학교"
+    "schoolOnly": "홍익대학교"
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -6654,8 +6654,50 @@
    "noForm": "자동 등록(검수 전) 2026-08-14 — 양식 스키마화는 검수 후 진행",
    "auto": true,
    "attachments": [],
-   "sourceUrl": "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5#n-(%EC%9E%AC)%EC%A4%91%EC%95%99%EB%8C%80%ED%95%99%EA%B5%90%EB%8F%99%EB%AC%B8%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%202026%EB%85%84%EB%8F%84%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EC%95%88%EB%82%B4",
+   "sourceUrl": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=155185&article.offset=0&articleLimit=10&noCat=501",
    "sourceKind": "auto"
+  },
+  {
+   "id": "auto-larshipdoarticleno373714",
+   "name": "[국제교육센터]에서 함께할 성실한 면학장학생을 모집합니다. (~8/21)",
+   "type": "교내",
+   "provider": "아주대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-08-21",
+   "period": "접수 ~2026-08-21",
+   "summary": "아주대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "아주대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-14 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=373714&article.offset=0&articleLimit=10",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "1. 신청 자격",
+    "* 국적-몽골",
+    "* 본교 재학생 (초과 학기생, 휴학생, 졸업생 신청 불가)",
+    "* 국가근로성장학(국가근로, 대청교, 다문화 등) 미참여 학생(참여자 신청 불가)",
+    "* 직전학기 기준 12학점 이상 이수 및 평점 2.0이상",
+    "* 직전학기 교환학생, 인턴십의 경우 9학점 이상 이수",
+    "2. 봉사 시간 : 월~금 09:00~18:00 내 면학 시간 협의",
+    "* 재학생"
+   ],
+   "excerpts": [
+    "장학금 지급규칙 제 3 장 ( 장학생 선발 대상 및 기준 )",
+    "장학금액 : 10,320원/시간 (2026 기준)",
+    "접수 기간 : 2026 년 08 월 21 일 (금 ) 까지",
+    "문의 : 국제교육센터 ( 캠퍼스플라자 B 101 호 , ☎ 031-219-1675)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   }
  ]
 }
