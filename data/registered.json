@@ -930,7 +930,8 @@
     "문의: nccoss@uos.ac.kr 이메일 문의",
     "전화 : 02-6490-6114 / 서울시통합문의 : 02-120"
    ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "applyEmail": "nccoss@uos.ac.kr"
   },
   {
    "id": "reg-sm-woosu",
@@ -3907,7 +3908,8 @@
     "*접수 마감일 기준으로 모교의 교환학생 파견 자득을 취득해야 함",
     "학점 2.87/4.3 만점(3.0/4.5 만점) 이상",
     "파견교에서 요구하는 어학성적 충족"
-   ]
+   ],
+   "applyEmail": "sgs8730@sogang.ac.kr"
   },
   {
    "id": "auto-sogangackrkodetail550536",
@@ -6327,7 +6329,8 @@
     "문의처 : 인하대동문장학회 032-887-2345",
     "구비 서류 및 일정 등 자세한 내용은 붙임 파일을 참고하시기 바랍니다"
    ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "applyEmail": "inhain4@inhain.com"
   },
   {
    "id": "auto-082f26ec8898eab98ceca780",
@@ -6410,7 +6413,8 @@
    "excerpts": [
     "문의: 입학사정관실 봉사장학생 담당자 (02-320-3410 / showered@hongik.ac.kr )"
    ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "applyEmail": "showered@hongik.ac.kr"
   },
   {
    "id": "auto-iceinfojanghakbidx893886",

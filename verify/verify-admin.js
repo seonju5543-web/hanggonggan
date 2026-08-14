@@ -376,7 +376,7 @@ function serve() {
   ok(/원문 주소를 3회/.test(issueText), '🔧 조치 요청도 함께 보여 준다');
   ok(/수집 리포트 1건/.test(issueText), '수집 리포트는 접어 둔다 (경보가 묻히지 않게)');
   ok(await page.locator('#n-robots').textContent() === '2', '탭 배지가 경보 건수를 센다 (리포트는 안 센다)');
-  ok(await page.locator('#screen-robots [data-run]').count() >= 14, '로봇 14종 이상에 실행 버튼이 있다');
+  ok(await page.locator('#screen-robots [data-run]').count() >= 16, '로봇 16종 이상에 실행 버튼이 있다');
 
   /* 🔴 버튼 **개수**만 세던 검사가 2026-08-12까지 진짜 결함을 놓쳤다 — 리포트 버튼 5개 중
      2개(일반 수집·심층 수집)가 저장소에 없는 파일을 가리켜 **영원히 빈 화면**이었는데,
