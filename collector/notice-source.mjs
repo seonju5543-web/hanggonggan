@@ -12,20 +12,12 @@
      · verify/eligibility-report.mjs   (전수 재채점)
    ============================================================ */
 
-/* 상세 주소에서 '이 글이 무엇인가'를 정하는 파라미터만 남긴다.
-   세션값·페이지 번호·검색어는 매번 달라져서 같은 글을 다른 글로 보게 만든다. */
-const ID_PARAMS = /^(seq|articleno|bbs_seq|duid|list_id|entryid|bbsidx|menu_id|contents_no|site_no|board_seq|menuno|no|ntt|nttsn|idx|wr_id|bidx)$/i;
-
-export function canonUrl(raw) {
-  try {
-    const u = new URL(raw);
-    const keep = [];
-    for (const [k, v] of u.searchParams) if (ID_PARAMS.test(k) && v) keep.push(`${k.toLowerCase()}=${v}`);
-    keep.sort();
-    const marker = u.hash && u.hash.startsWith('#n-') ? u.hash : '';
-    return u.origin + u.pathname + (keep.length ? '?' + keep.join('&') : '') + marker;
-  } catch { return (raw || '').split('#')[0]; }
-}
+/* 상세 주소에서 '이 글이 무엇인가'를 정하는 규칙은 `collector/canon-url.mjs` 한 곳에 있다.
+   ⚠️ 여기에 **베껴 두면 안 된다.** 2026-08-14까지 실제로 똑같은 함수가 두 벌 있었고,
+   그래서 "발췌기는 A공고 원문을 붙였는데 등록 로봇은 B공고로 판정"하는 어긋남이 생겼다.
+   canon-url은 순수 함수만 담고 있어(불러도 아무것도 실행되지 않아) 안전하게 가져다 쓴다. */
+export { canonUrl } from './canon-url.mjs';
+import { canonUrl } from './canon-url.mjs';
 
 export const normTitle = (t) => (t || '')
   .replace(/\[[^\]]*\]/g, '')
