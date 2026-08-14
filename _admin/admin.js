@@ -434,8 +434,20 @@ function show(name) {
     b.setAttribute('aria-selected', on ? 'true' : 'false');
   });
   window.scrollTo(0, 0);
+  /* 주소에 화면 이름을 남긴다 — 새로고침해도 보던 화면으로 돌아오고,
+     "로봇 탭 보세요"를 링크 하나로 전할 수 있다. pushState가 아니라 replaceState인 이유는
+     탭을 옮길 때마다 뒤로가기 기록이 쌓이면 화면을 빠져나가기 어려워지기 때문이다. */
+  if (location.hash.slice(1) !== name) {
+    try { history.replaceState(null, '', `#${name}`); } catch { /* 파일로 열었을 때 */ }
+  }
   renderScreen(name);
 }
+
+/* 주소의 #이름이 진짜 화면일 때만 받아들인다 (없는 이름이면 기본 화면) */
+const screenFromHash = () => {
+  const h = decodeURIComponent(location.hash.slice(1));
+  return SCREENS.includes(h) ? h : null;
+};
 
 function renderScreen(name) {
   ({ todo: renderTodo, list: renderList, review: renderReview,
@@ -1233,15 +1245,29 @@ const ROBOTS = [
   { f: 'admin-lock-check.yml', n: '관리자 화면 잠금 확인', d: '이 화면이 정말 잠겨 있는지 밖에서 열어 봅니다', when: '매일 14:23' },
   { f: 'close-old-reports.yml', n: '오래된 리포트 닫기', d: '지난 수집 리포트를 닫아 경보가 묻히지 않게 합니다', when: '매주 월' },
   { f: 'probe-links.yml', n: '링크 정찰', d: '이 주소가 학생 눈에 어떻게 보이는지 확인합니다', when: '수동' },
+  { f: 'probe-boards.yml', n: '게시판 후보 정찰', d: '새 학교의 장학 게시판 주소 후보를 찾아 리포트로 올립니다', when: '수동' },
   { f: 'refresh-majors.yml', n: '학과 목록 갱신', d: '커리어넷에서 학교별 개설 학과를 다시 받습니다', when: '수동' },
+  /* 입력칸이 있는 유일한 로봇 — 이 워크플로는 `url`을 **필수 입력**으로 받는다.
+     입력 없이 그냥 던지면 GitHub이 422로 거부하므로, 버튼만 달면 안 된다. */
+  {
+    f: 'fetch-page.yml',
+    n: '페이지 원격 열람',
+    d: '막힌 주소를 대신 열어 본문·첨부를 받아 옵니다 (결과는 실행 기록의 artifact)',
+    when: '수동',
+    input: { name: 'url', label: '가져올 페이지 주소', ph: 'https://…' },
+  },
 ];
 
+/* ⚠️ **로봇이 실제로 저장하는 리포트만 넣는다.**
+   2026-08-12까지 여기 '심층 수집'(collector/deepfetch-report.md)이 있었는데
+   deepfetch.mjs는 리포트 파일을 아예 만들지 않아 **영원히 빈 화면**이었다.
+   '일반 수집'(collector/report.md)도 같은 증상이었지만 그쪽은 원인이 달랐다 —
+   파일은 만들어지는데 워크플로 `git add` 목록에 없어 커밋되지 않았다(같은 날 수리). */
 const REPORTS = [
   ['collector/report.md', '일반 수집'],
   ['collector/browser-report.md', '브라우저 수집'],
   ['collector/link-hunt-report.md', '링크 사냥꾼'],
   ['collector/resolve-report.md', '원문 링크 복구'],
-  ['collector/deepfetch-report.md', '심층 수집'],
 ];
 
 /* 로봇이 남긴 열린 이슈 — 🚨 경보를 맨 위로, 리포트는 접어 둔다 */
@@ -1259,9 +1285,12 @@ function renderRobots() {
       <div>
         <div class="t">${esc(r.n)}</div>
         <div class="m"><span>${esc(r.d)}</span><span>${esc(r.when)}</span></div>
+        ${r.input ? `<input type="url" data-run-input="${esc(r.f)}" style="margin-top:6px;width:100%"
+            placeholder="${esc(r.input.ph)}" aria-label="${esc(r.input.label)}" />` : ''}
       </div>
       <div class="btn-row">
-        <button class="btn btn-sm" data-run="${esc(r.f)}" data-run-name="${esc(r.n)}">지금 실행</button>
+        <button class="btn btn-sm" data-run="${esc(r.f)}" data-run-name="${esc(r.n)}"
+          ${r.input ? `data-run-input-name="${esc(r.input.name)}"` : ''}>지금 실행</button>
         <a class="btn btn-sm" href="https://github.com/${OWNER}/${REPO}/actions/workflows/${esc(r.f)}"
            target="_blank" rel="noreferrer noopener">기록 ↗</a>
       </div>
@@ -1279,6 +1308,9 @@ function renderRobots() {
 
     <div class="sec-head" style="margin-top:12px"><h2>푸시 발송 서버</h2></div>
     <div id="push-health"><p class="muted">확인하는 중…</p></div>
+
+    <div class="sec-head" style="margin-top:12px"><h2>양식 변환 API</h2></div>
+    <div id="api-health"><p class="muted">확인하는 중…</p></div>
 
     <div class="sec-head" style="margin-top:12px"><h2>로봇 ${ROBOTS.length}종 — 지금 실행</h2>
       <p>예약 시간과 무관하게 한 번 더 돌립니다. <b>같은 학교를 하루에 여러 번 두드리면</b>
@@ -1311,6 +1343,53 @@ function renderRobots() {
 
   loadRobotIssues();
   loadPushHealth();
+  loadApiHealth();
+}
+
+/* 양식 변환 API가 살아 있는지 (2026-08-12 신설).
+   왜 만들었나: 잔액이 떨어져 8/11부터 유료 변환이 멈췄는데, 실패가 리포트의 '건너뜀'
+   목록에 한 줄로 섞여 있어서 **화면은 아무 말도 하지 않았다.** 다음 날 사람이 물어서야
+   알았다. 푸시 서버엔 lastError 카드가 있는데 이쪽만 없던 비대칭을 메운다.
+   ⚠️ '실패가 없다'와 '리포트를 못 읽었다'를 구분한다 — 못 읽은 것을 정상으로 보이면 안 된다. */
+async function loadApiHealth() {
+  const box = byId('api-health');
+  if (!box) return;
+  /* 브라우저 수집 리포트만 **먼저 읽는다.** 일반 수집 리포트는 2026-08-12에야 커밋되기
+     시작해서(그 전 실행분은 파일이 없다) 무조건 부르면 404가 콘솔 오류로 남는다 —
+     검사의 '콘솔 오류 없음' 항목이 이걸 잡는다. 이미 읽어 둔 것이 있으면 같이 본다.
+     양쪽 수집 로봇이 **같은 스키마화 단계**를 돌기 때문에, API 실패는 어느 쪽 리포트에도
+     똑같이 남는다 — 한쪽만 봐도 놓치지 않는다. */
+  const found = [];
+  let readAny = false;
+  const primary = 'collector/browser-report.md';
+  if (reportCache[primary] == null) reportCache[primary] = await readText(primary);
+  for (const p of [primary, 'collector/report.md']) {
+    const t = reportCache[p];
+    if (!t) continue;
+    readAny = true;
+    (t.match(/API 호출 실패[^\n]*/g) || []).forEach((m) => found.push(m));
+  }
+  if (!readAny) {
+    box.innerHTML = '<p class="muted">리포트를 읽지 못했습니다 — 정상이라는 뜻은 아닙니다.</p>';
+    return;
+  }
+  if (!found.length) {
+    box.innerHTML = '<div class="cards"><div class="card is-ok"><div class="v">정상</div>'
+      + '<div class="k">양식 변환 API</div>'
+      + '<div class="d">최근 리포트에 호출 실패가 없습니다</div></div></div>';
+    return;
+  }
+  const credit = found.some((m) => /cred/i.test(m));
+  box.innerHTML = `<div class="cards"><div class="card is-bad"><div class="v">${found.length}</div>
+      <div class="k">API 호출 실패</div>
+      <div class="d">${credit ? '<b>잔액 부족으로 보입니다</b> — 충전 전까지 유료 변환(스캔 PDF·표 서식)이 멈춥니다.'
+    : '최근 리포트에 실패가 기록돼 있습니다.'}
+        무료 변환기는 그대로 돌고 있어 앱은 정상입니다.</div>
+      <div class="btn-row">
+        <a class="btn btn-sm" href="https://console.anthropic.com/settings/billing"
+           target="_blank" rel="noreferrer noopener">잔액 확인 ↗</a>
+      </div></div></div>
+    <p class="muted mono">${esc(found[0]).slice(0, 200)}</p>`;
 }
 
 /* 열린 이슈를 읽어 온다. 실패하면 **조용히 비우지 않는다** — 이 화면의 존재 이유가
@@ -1396,6 +1475,10 @@ function renderQuality() {
   const noDeadline = D.reg.filter((it) => !it.deadline).length;
   const noForm = D.reg.filter((it) => typeof hasFormAttachment === 'function'
     && hasFormAttachment(it) && !it.formId).length;
+  /* 지원 자격 미확보 — 학생 화면에 "지원 자격을 아직 읽지 못했어요"로 나가는 공고.
+     판정 기준은 **학생 앱과 같은 칸**(eligibilityLines)이다. 고치는 자리는 상세 시트에
+     있었는데 '몇 건인지'를 세는 자리가 어디에도 없어서, 76건이 밀려 있어도 화면이 조용했다. */
+  const noElig = D.reg.filter((it) => !(it.eligibilityLines || []).length && !it.eligibilityVerified).length;
 
   const probRow = (x) => `
     <div class="row" data-id="${esc(x.it.id)}" tabindex="0" role="button" aria-label="${esc(x.it.name)} 상세 열기">
@@ -1426,6 +1509,9 @@ function renderQuality() {
         <div class="k">마감일 없음</div><div class="d">언제까지인지 모르는 공고</div></div>
       <div class="card ${noForm ? 'is-warn' : 'is-ok'}"><div class="v">${noForm}</div>
         <div class="k">신청서 첨부는 있는데 양식 미등록</div><div class="d">앱에서 작성하게 만들 수 있는 후보</div></div>
+      <div class="card ${noElig ? 'is-warn' : 'is-ok'}"><div class="v">${noElig}</div>
+        <div class="k">지원 자격 미확보</div>
+        <div class="d">학생에게 "자격을 아직 읽지 못했어요"로 나가는 공고 — 상세에서 원문 문장을 골라 주면 사라집니다</div></div>
       <div class="card ${dead.length ? 'is-warn' : 'is-ok'}"><div class="v">${dead.length}</div>
         <div class="k">원문 링크 실패 기록</div><div class="d">링크 사냥꾼이 못 연 주소</div></div>
     </div>
@@ -1933,7 +2019,20 @@ function bindGlobal() {
     /* 로봇 통제판의 '지금 실행' — 어떤 로봇이든 같은 경로로 돈다 */
     const run = e.target.closest('[data-run]');
     if (run) {
-      await runCollector(run.dataset.run, run.dataset.runName || '로봇');
+      /* 입력이 필요한 로봇은 빈 값으로 던지면 GitHub이 422로 거부한다 — 먼저 막는다 */
+      const inputName = run.dataset.runInputName;
+      let inputs = {};
+      if (inputName) {
+        const el = $(`[data-run-input="${run.dataset.run}"]`);
+        const v = ((el && el.value) || '').trim();
+        if (!/^https?:\/\//i.test(v)) {
+          jobShow('먼저 http로 시작하는 주소를 입력하세요', 'bad');
+          if (el) el.focus();
+          return;
+        }
+        inputs = { [inputName]: v };
+      }
+      await runCollector(run.dataset.run, run.dataset.runName || '로봇', inputs);
       return;
     }
 
@@ -2178,20 +2277,21 @@ function bindGlobal() {
   });
 }
 
-async function runCollector(file, label) {
+async function runCollector(file, label, inputs = {}) {
+  const extra = Object.entries(inputs).map(([k, v]) => ({ t: k, m: v }));
   askSheet({
     title: `${label} 지금 실행`, goLabel: '실행',
     note: '몇 분 걸립니다. 수집 계열은 같은 학교를 짧은 시간에 여러 번 두드리면 '
       + '학교 서버가 막아 멀쩡한 주소까지 실패로 뜰 수 있습니다.',
-    lines: [{ t: label, m: file }],
-    run: () => reallyRun(file, label),
+    lines: [{ t: label, m: file }, ...extra],
+    run: () => reallyRun(file, label, inputs),
   });
 }
 
-async function reallyRun(file, label) {
+async function reallyRun(file, label, inputs = {}) {
   try {
     jobShow(`${label} 실행을 요청했어요`);
-    await dispatchWorkflow(file, {});
+    await dispatchWorkflow(file, inputs);
     jobShow(`${label}을 실행했습니다. 끝나면 새로고침으로 결과를 확인하세요`, 'ok',
       `https://github.com/${OWNER}/${REPO}/actions/workflows/${file}`);
   } catch (err) {
@@ -2248,6 +2348,11 @@ async function enter(key, remember) {
 function boot() {
   applyTheme(currentTheme());   // 열쇠 화면부터 적용한다
   applyDensity(currentDensity());
+  current = screenFromHash() || current;   // 주소로 들어온 화면을 첫 화면으로
+  window.addEventListener('hashchange', () => {
+    const n = screenFromHash();
+    if (n && n !== current) show(n);
+  });
   byId('gate-enter').addEventListener('click', () => {
     const k = byId('gate-key').value.trim();
     if (!k) { const m = byId('gate-msg'); m.hidden = false; m.className = 'gate-msg'; m.textContent = '열쇠를 넣어 주세요.'; return; }

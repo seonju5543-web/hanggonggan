@@ -128,6 +128,10 @@ jobs:
           [ -f collector/health.json ] && git add collector/health.json
           [ -f collector/pending-forms.json ] && git add collector/pending-forms.json
           [ -d collector/extracted ] && git add collector/extracted
+          # 리포트 본문도 저장한다 — 이슈에만 올리고 파일을 커밋하지 않아서, 관리자 화면의
+          # '일반 수집 리포트' 버튼이 늘 "리포트 파일이 아직 없습니다"였다 (2026-08-12 수리).
+          # 형제 로봇(브라우저 수집·사냥꾼·복구)은 셋 다 자기 리포트를 커밋하고 있었다.
+          [ -f collector/report.md ] && git add collector/report.md
           true  # 위 선택 파일이 없어도 저장 단계는 계속된다 (2026-07-19 8회 연속 실패 원인 수정)
           if ! git diff --cached --quiet; then
             git commit -m "collector: seen state update"

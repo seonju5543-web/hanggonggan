@@ -167,6 +167,13 @@ function serve() {
   await page.waitForSelector('#screen-quality:not([hidden])');
   ok(/데이터 품질/.test(await page.textContent('#screen-quality')), '⑥ 데이터 품질 화면이 그려진다');
 
+  /* 지원 자격 미확보 — 고치는 자리는 상세에 있었는데 **몇 건인지 세는 자리가 없어서**
+     76건이 밀려 있어도 화면이 조용했다(2026-08-12). 학생 앱과 같은 칸으로 센다. */
+  const noEligN = reg.items.filter((x) => !(x.eligibilityLines || []).length && !x.eligibilityVerified).length;
+  const eligCard = await page.locator('#screen-quality .card', { hasText: '지원 자격 미확보' }).first().textContent();
+  ok(/지원 자격 미확보/.test(eligCard || ''), '⑥ 지원 자격 미확보 건수를 센다');
+  ok((eligCard || '').includes(String(noEligN)), '⑥ 그 건수가 실제 데이터와 같다', `${noEligN}건`);
+
   /* ④ 원문 대조 */
   await page.click('.tab[data-tab="list"]');
   await page.waitForSelector('#screen-list:not([hidden])');
@@ -369,8 +376,44 @@ function serve() {
   ok(/원문 주소를 3회/.test(issueText), '🔧 조치 요청도 함께 보여 준다');
   ok(/수집 리포트 1건/.test(issueText), '수집 리포트는 접어 둔다 (경보가 묻히지 않게)');
   ok(await page.locator('#n-robots').textContent() === '2', '탭 배지가 경보 건수를 센다 (리포트는 안 센다)');
-  ok(await page.locator('#screen-robots [data-run]').count() >= 12, '로봇 12종 이상에 실행 버튼이 있다');
-  ok(await page.locator('#screen-robots [data-report]').count() === 5, '리포트 5종을 볼 수 있다');
+  ok(await page.locator('#screen-robots [data-run]').count() >= 14, '로봇 14종 이상에 실행 버튼이 있다');
+
+  /* 🔴 버튼 **개수**만 세던 검사가 2026-08-12까지 진짜 결함을 놓쳤다 — 리포트 버튼 5개 중
+     2개(일반 수집·심층 수집)가 저장소에 없는 파일을 가리켜 **영원히 빈 화면**이었는데,
+     개수는 5였으므로 통과했다. 이제 **가리키는 파일이 실제로 있는지**를 본다. */
+  const reportPaths = await page.locator('#screen-robots [data-report]')
+    .evaluateAll((els) => els.map((e) => e.dataset.report));
+  ok(reportPaths.length >= 4, `리포트 버튼이 있다 — ${reportPaths.length}종`);
+  /* 판정 기준은 '지금 파일이 있는가'가 아니라 **'로봇이 그 파일을 저장하는가'** 다.
+     갓 고친 리포트는 다음 실행 전까지 저장소에 없을 수 있지만, 워크플로의 `git add`에
+     들어 있으면 반드시 생긴다. 반대로 아무도 저장하지 않는 리포트는 영원히 빈 화면이다. */
+  const wfDir = path.join(ROOT, '.github', 'workflows');
+  const wfAll = fs.readdirSync(wfDir).filter((f) => f.endsWith('.yml'))
+    .map((f) => fs.readFileSync(path.join(wfDir, f), 'utf8')).join('\n');
+  const dead = reportPaths.filter((p) => !fs.existsSync(path.join(ROOT, p))
+    && !new RegExp(`git add[^\\n]*${p.replace(/[.]/g, '\\.')}`).test(wfAll));
+  ok(dead.length === 0,
+    `리포트 버튼이 가리키는 파일을 로봇이 실제로 저장한다${dead.length ? ` — 아무도 안 만드는 것: ${dead.join(', ')}` : ''}`);
+
+  /* 입력이 필요한 로봇은 빈 값으로 던지면 GitHub이 422로 거부한다 — 화면이 먼저 막아야 한다.
+     ⚠️ **누르는 검사는 맨 끝에서 한다** — 아래 관리자 조정 검사들이 '앞 작업이 끝났나'를
+     알림 띠(#job-text)의 문구로 판단하기 때문에, 여기서 띠 문구를 덮어쓰면 그 판단이
+     빗나가 뒤 항목이 줄줄이 실패한다(실제로 겪음). 여기서는 **붙어 있는지만** 본다. */
+  ok(await page.locator('#screen-robots [data-run-input-name]').count() === 1,
+    '입력이 필요한 로봇에 입력칸이 붙어 있다');
+
+  /* 양식 변환 API가 멈춘 것을 화면이 말하는가 (2026-08-12 신설).
+     8/11에 잔액이 떨어져 유료 변환이 멈췄는데 실패가 리포트 '건너뜀'에 한 줄로 섞여
+     화면은 아무 말도 하지 않았다. **리포트에 실패가 있는데 '정상'이라고 말하면 실패**. */
+  await page.waitForFunction(() => !/확인하는 중/.test(document.querySelector('#api-health')?.textContent || ''),
+    null, { timeout: 10000 });
+  const apiText = await page.textContent('#api-health');
+  const reportHasFail = /API 호출 실패/.test(
+    fs.existsSync(path.join(ROOT, 'collector/browser-report.md'))
+      ? fs.readFileSync(path.join(ROOT, 'collector/browser-report.md'), 'utf8') : '');
+  ok(reportHasFail ? /호출 실패/.test(apiText) : /정상|읽지 못/.test(apiText),
+    '양식 변환 API가 멈추면 화면이 알린다 (리포트와 화면이 어긋나지 않는다)',
+    reportHasFail ? '리포트에 실패 있음' : '리포트에 실패 없음');
 
   await page.waitForFunction(() => !/확인하는 중/.test(document.querySelector('#push-health')?.textContent || ''),
     null, { timeout: 10000 });
@@ -765,6 +808,19 @@ function serve() {
     return (!box.hidden && /믿지 마세요/.test(box.textContent)) ? 'shown' : 'hidden';
   });
   ok(failShown === 'shown', '데이터를 못 읽으면 화면 맨 위에 경고가 뜬다', failShown);
+
+  /* 입력이 필요한 로봇 — 실제로 눌러 본다 (알림 띠를 덮어쓰므로 맨 끝에서) */
+  await page.click('.tab[data-tab="robots"]');
+  await page.waitForSelector('#screen-robots:not([hidden])');
+  await page.locator('#screen-robots [data-run-input-name]').first().click();
+  ok(/주소를 입력/.test(await page.textContent('#job') || ''),
+    '주소 없이 누르면 실행하지 않고 알려 준다');
+
+  /* 화면 이름이 주소에 남는가 — "로봇 탭 보세요"를 링크로 전할 수 있어야 한다 */
+  ok(/#robots$/.test(page.url()), '지금 보는 화면이 주소에 남는다', page.url().split('/').pop());
+  await page.evaluate(() => { location.hash = '#quality'; });
+  await page.waitForTimeout(300);
+  ok(await page.isVisible('#screen-quality'), '주소의 화면 이름으로 그 화면이 열린다');
 
   /* 콘솔 오류 */
   ok(errors.length === 0, '콘솔·페이지 오류 없음', errors.slice(0, 3).join(' | '));
