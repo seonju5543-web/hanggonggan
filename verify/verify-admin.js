@@ -214,11 +214,27 @@ function serve() {
   /* 화면에서도 미리보기가 실제로 뜨는지 (1종) */
   await page.click('.tab[data-tab="forms"]');
   await page.waitForSelector('#screen-forms:not([hidden])');
-  await page.click('#screen-forms tr[data-form]');
+
+  /* 미리보기는 '눈에 보이는 버튼'이어야 한다 — 줄 클릭만으로는 개발자가 찾지 못했다(2026-08-14) */
+  const previewBtns = await page.locator('#screen-forms [data-form-preview]').count();
+  const rowsForPreview = await page.locator('#screen-forms tr[data-form]').count();
+  ok(previewBtns === rowsForPreview && rowsForPreview > 0,
+    '양식 목록 줄마다 미리보기 버튼이 보인다', `버튼 ${previewBtns} / 줄 ${rowsForPreview}`);
+
+  await page.click('#screen-forms [data-form-preview]');
   await page.waitForSelector('#sheet:not([hidden])');
   const docLen = await page.locator('#sheet .doc-preview').innerText();
   ok(docLen.length > 80, '양식 화면에서 생성 문서 미리보기가 뜬다', `${docLen.length}자`);
+
+  /* 원본과 대조하려면 원문 주소가 같은 화면에 있어야 한다 */
+  const sheetLinks = await page.evaluate(() =>
+    [...document.querySelectorAll('#sheet a[href^="http"]')].map((a) => a.href));
+  ok(sheetLinks.length > 0, '양식 미리보기 시트에 원본 링크가 있다', `${sheetLinks.length}개`);
   await page.click('#sheet [data-close]');
+
+  /* 목록에도 원문 링크가 있어야 한다(시트를 열지 않고 대조 시작) */
+  const rowLinks = await page.locator('#screen-forms tr[data-form] a[href^="http"]').count();
+  ok(rowLinks > 0, '양식 목록 줄에 원문·첨부 링크가 있다', `${rowLinks}개`);
 
   /* ⑥ 분류가 실제로 걸러 내는가 */
   await page.click('.tab[data-tab="list"]');

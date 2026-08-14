@@ -1095,17 +1095,31 @@ function renderForms() {
 
     <div class="scroller">
       <table>
-        <thead><tr><th>양식 id</th><th>제목</th><th>기관</th><th class="n">항목</th><th class="n">연결된 공고</th></tr></thead>
+        <thead><tr><th>양식</th><th>기관</th><th class="n">항목</th><th class="n">공고</th>
+          <th>원본과 비교</th></tr></thead>
         <tbody>
           ${ids.map((id) => {
     const t = D.forms[id];
     const nf = (t.sections || []).reduce((s, sec) => s + ((sec.fields || []).length), 0);
+    /* 원본 대조는 **원본이 한 번에 열려야** 할 수 있는 일이다. 예전엔 이 표에 링크가 하나도
+       없어서, 첨부 원본을 보려면 공고 화면으로 건너가 id로 다시 찾아야 했다. */
+    const owner = D.reg.find((it) => it.formId === id);
+    const atts = (owner && owner.attachments) || [];
     return `<tr data-form="${esc(id)}" style="cursor:pointer" tabindex="0" role="button" aria-label="${esc(t.title || id)} 미리 보기">
-              <td class="mono">${esc(id)}</td>
-              <td>${esc(t.title || '')}</td>
+              <td>${esc(t.title || id)}
+                ${/^auto-/.test(id) ? '<span class="pill warn">로봇 생성</span>' : ''}
+                <div class="m mono">${esc(id)}</div></td>
               <td>${esc(t.org || '')}</td>
               <td class="n">${nf}</td>
               <td class="n">${used[id] ? used[id] : '<span class="pill">미연결</span>'}</td>
+              <td class="btn-row">
+                <button class="btn btn-sm" data-form-preview="${esc(id)}">미리보기</button>
+                ${owner && safeUrl(owner.sourceUrl)
+    ? `<a class="btn btn-sm" href="${esc(safeUrl(owner.sourceUrl))}" target="_blank" rel="noreferrer noopener">원문 ↗</a>` : ''}
+                ${atts.filter((a) => safeUrl(a.url)).slice(0, 2).map((a, i) => `<a class="btn btn-sm"
+                    href="${esc(safeUrl(a.url))}" target="_blank" rel="noreferrer noopener"
+                    title="${esc(a.name || '')}">첨부${atts.length > 1 ? i + 1 : ''} ↗</a>`).join('')}
+              </td>
             </tr>`;
   }).join('')}
         </tbody>
@@ -1867,7 +1881,20 @@ function formSheet(id) {
       <span class="mono muted">${esc(id)}</span>
       <span class="pill info">${esc(tpl.org || '')}</span>
       <span class="muted">연결된 공고 ${used.length}건</span>
+      ${/^auto-/.test(id) ? '<span class="pill warn">로봇이 만든 양식 — 원본 대조 필요</span>' : ''}
     </div>
+
+    ${/* 원본을 열 수 있어야 대조가 된다. 이 링크가 없던 동안은 "원본과 같은지 확인해 주세요"라는
+        리포트 문구만 있고 **원본으로 가는 길이 화면에 없었다**(2026-08-14 개발자 지적). */ ''}
+    ${used.length ? `<div class="filter-row">
+      ${safeUrl(used[0].sourceUrl) ? `<a class="btn btn-sm" href="${esc(safeUrl(used[0].sourceUrl))}"
+          target="_blank" rel="noreferrer noopener">공고 원문 ↗</a>` : ''}
+      ${(used[0].attachments || []).filter((a) => safeUrl(a.url)).map((a) => `<a class="btn btn-sm"
+          href="${esc(safeUrl(a.url))}" target="_blank" rel="noreferrer noopener"
+          title="${esc(a.name || '')}">📎 ${esc((a.name || '첨부').slice(0, 28))}</a>`).join('')}
+    </div>
+    <p class="muted">위 원본과 아래 미리보기를 나란히 놓고 <b>항목이 빠지지 않았는지</b> 보세요 —
+      로봇이 만든 양식에서 인적사항 블록이 통째로 빠지는 경우가 실제로 있었습니다.</p>` : ''}
 
     <div class="sec-head"><h2>실제로 생성되는 문서</h2>
       <p>학생이 이 양식을 작성하면 아래 모양의 문서가 만들어집니다. (예시 인적사항으로 채운 미리보기)</p></div>
@@ -1958,6 +1985,11 @@ function bindGlobal() {
       return;
     }
 
+    /* 미리보기 버튼이 먼저다 — 같은 줄에 링크(원문·첨부)가 들어오면서, 링크를 누른 것까지
+       줄 클릭으로 잡아 시트가 함께 열리는 일이 생긴다. 링크는 그냥 통과시킨다. */
+    const fbtn = e.target.closest('[data-form-preview]');
+    if (fbtn) { openSheet(formSheet(fbtn.dataset.formPreview)); return; }
+    if (e.target.closest('tr[data-form] a')) return;
     const frow = e.target.closest('tr[data-form]');
     if (frow) { openSheet(formSheet(frow.dataset.form)); return; }
 
