@@ -73,6 +73,7 @@ jobs:
             FORM_TARGETS="$targets" node collector/deepfetch.mjs --forms-only
             pip install olefile --quiet
             python3 collector/hwp-prvtext.py
+            python3 collector/hwp-bodytext.py || true   # 본문 전체 (미리보기는 1023자에서 잘린다)
             # 실제로 원본이 내려온 항목만 fetched로 표시한다 (전부 true로 찍어 원본 없는 항목이
             # 영원히 대기하던 버그 수정 — 2026-07-30)
             node collector/mark-fetched.mjs

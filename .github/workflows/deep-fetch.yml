@@ -39,6 +39,7 @@ jobs:
         run: |
           pip install olefile --quiet
           python3 collector/hwp-prvtext.py
+          python3 collector/hwp-bodytext.py || true   # 본문 전체 (미리보기는 1023자에서 잘린다)
       - run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
