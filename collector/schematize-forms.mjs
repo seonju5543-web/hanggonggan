@@ -33,6 +33,7 @@ const THIRD_PARTY = /추천서|추천\s*양식|소견서|확인서\(기관|재�
 const COMPLEX_LAYOUT = /시간표|원고지|주\s*간\s*계\s*획|월\s*\|?\s*화\s*\|?\s*수\s*\|?\s*목\s*\|?\s*금|별지\s*제?\s*\d+\s*호\s*서식.*표/;
 
 import { checkFormQuality } from './form-quality.mjs';
+import { checkFormCoverage } from './form-coverage.mjs';
 
 const cfgPath = new URL('schematize-config.json', HERE);
 let cfg = { enabled: true, maxApiCallsPerRun: 2, minTextChars: 400, maxManualChars: 6000, alwaysApiIds: [], neverApiIds: [] };
@@ -340,7 +341,8 @@ for (const item of pending) {
       if (conv.ok) {
         /* 같은 공고의 첨부는 '한 벌'로 합친다 — 신청서·자소서·동의서를 각각 다른 양식으로
            만들면 공고에는 하나만 연결돼 나머지가 앱에서 열리지 않는다 */
-        freeParts.push({ tpl: conv.tpl, attachment: row.attachment });
+        /* text도 함께 담는다 — 아래에서 '원본 항목이 빠지지 않았나'를 대조하는 데 쓴다 */
+        freeParts.push({ tpl: conv.tpl, attachment: row.attachment, text });
         continue;
       }
       manual.push([item.name, row.attachment, `자동 변환 보류: ${conv.why}`]);
@@ -436,10 +438,18 @@ for (const item of pending) {
        원본 표를 잘못 쪼개 **학생이 못 채우는 질문**이 된 경우다(2026-08-14, 5종 실제 발견).
        그 판정은 결과물을 보는 checkFormQuality가 한다. 걸리면 등록하지 않는다. */
     const q0 = bad0 ? null : checkFormQuality(merged);
-    if (bad0 || !q0.ok) {
+    /* 🔴 모양이 멀쩡해도 **한 칸이 통째로 빠질 수 있다** — 그게 무료 변환기의 가장 위험한 실패다.
+       2026-08-14 전수 대조에서 원본이 있는 10종 중 9종이 이랬다(자기소개서 4문항 중 3번만 누락,
+       우선선발 체크칸 통째 누락 등). 남은 항목이 다 멀쩡해 보여 위 검사는 통과시킨다.
+       원본 글자가 있을 때만 뜻이 있고, 없으면 '모른다'라 막지 않는다. */
+    const cov0 = bad0 ? { known: false, missing: [] }
+      : checkFormCoverage(merged, freeParts.map((p) => p.text || '').join('\n'));
+    if (bad0 || !q0.ok || (cov0.known && cov0.missing.length)) {
       manual.push([item.name, freeParts.map((p) => p.attachment).join(', '),
         bad0 ? `자동 변환 결과가 검증을 통과하지 못함(${bad0})`
-             : `무료 변환이 원본 표를 옮기지 못함 — ${q0.problems.slice(0, 3).join(' · ')}${q0.problems.length > 3 ? ` 외 ${q0.problems.length - 3}건` : ''}. 원본 첨부 안내를 유지합니다(API 경로 대상)`]);
+             : !q0.ok
+               ? `무료 변환이 원본 표를 옮기지 못함 — ${q0.problems.slice(0, 3).join(' · ')}${q0.problems.length > 3 ? ` 외 ${q0.problems.length - 3}건` : ''}. 원본 첨부 안내를 유지합니다(API 경로 대상)`
+               : `원본에 있는 항목이 빠짐 — ${cov0.missing.join('·')}. 원본 첨부 안내를 유지합니다(API 경로 대상)`]);
       leftForManual = true;
     } else {
       const fid0 = newFormId(item, forms, registered, entry);

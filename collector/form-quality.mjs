@@ -28,7 +28,11 @@ const UNIT = /^(점|명|원|시간|년|월|일|호|여|부|초|중|고|대|남|�
    그래서 번호만 있고 이름이 없는 것, 그리고 문서 꼬리표만 잡는다. */
 const NUMBERED = /^\s*[0-9]+\s*[).\-]?\s*$|^※|^예시\)|^\(작성 시 삭제\)|^붙임\s*\d*\s*$/;
 /* 공고문 본문의 절 제목 — 이게 질문이면 신청서가 아니라 공고문을 옮긴 것이다 */
-const BODY = /^(목적|근거|개요|신청\s*대상|지원\s*자격|제출\s*서류|선발\s*인원|유의\s*사항|문의|추진\s*일정|배정\s*인원|선발\s*계획|합격자\s*통보|최종\s*합격)/;
+const BODY = /^(목적|근거|개요|신청\s*대상|지원\s*자격|제출\s*서류|구비\s*서류|선발\s*인원|유의\s*사항|문의|추진\s*일정|배정\s*인원|선발\s*계획|합격자\s*통보|최종\s*합격)/;
+/* 제출서류 목록의 한 줄 — 하림장학재단에서 "성적증명서 1통"·"장학금 수령 계좌 사본"·
+   "학과장 또는 학장 추천서 1통"이 **질문 5개**가 돼 있었다(2026-08-14). 학생이 채우는 칸이 아니라
+   **가져와야 할 서류 이름**이다. 낱말이 아니라 '증명서/사본/추천서 + 통·부' 꼴로 잡는다. */
+const DOC_ITEM = /(증명서|사본|추천서|확인서|동의서|재학증명|성적증명)\s*\d*\s*(통|부|장)?\s*$/;
 
 export function badLabel(label) {
   const s = String(label || '').trim();
@@ -38,6 +42,7 @@ export function badLabel(label) {
   /* 공고문 판정은 **번호를 떼고** 본다 — 공고문의 절도 '1) 신청대상'처럼 번호가 붙어 있다.
      번호를 안 떼면 '3. 최종 합격자 통보'가 그냥 통과한다(실제로 통과하고 있었다). */
   if (BODY.test(s.replace(/^\s*[0-9]+\s*[).\-]\s*/, ''))) return '공고문 본문 제목이 질문이 됨';
+  if (DOC_ITEM.test(s)) return '제출서류 목록의 한 줄이 질문이 됨';
   return '';
 }
 
@@ -68,7 +73,10 @@ export function checkFormQuality(tpl, { maxBadRatio = 0.2 } = {}) {
   /* 선택지가 깨진 것은 비율과 무관하게 못 쓴다 — 학생이 고를 수 없는 칸이 생긴다 */
   const optBroken = fields.some((f) => (f.options || []).some(badOption));
   /* 공고문 절 제목이 질문이 됐다 = 신청서가 아니라 공고문을 옮긴 것 */
-  const isNotice = fields.some((f) => badLabel(f.label) === '공고문 본문 제목이 질문이 됨');
+  const isNotice = fields.some((f) => {
+    const w = badLabel(f.label);
+    return w === '공고문 본문 제목이 질문이 됨' || w === '제출서류 목록의 한 줄이 질문이 됨';
+  });
   return { ok: !optBroken && !isNotice && ratio < maxBadRatio && fields.length > 0, ratio, problems };
 }
 

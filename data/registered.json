@@ -1581,11 +1581,11 @@
         "장학금액 : 등록금 전액 ( 등록금범위 장학금 )"
       ],
       "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
-      "formId": "auto-2026-2학기-염곡문-apply",
       "eligibilityLines": [
         "가 . 글로벌캠퍼스 재학생",
         "다 . 직전학기 이수학점 15 학점이상 , 평점평균 3.5/4.5 이상인 자"
-      ]
+      ],
+      "noForm": "앱 양식 준비 중 — 자동 변환 결과가 원본과 대조해 항목이 빠져 있었습니다(서약·학과·학년·보호자 외). 아래 원본 첨부를 받아 작성해 주세요."
     },
     {
       "id": "auto-ent2431260214artclviewdo",
@@ -2831,7 +2831,6 @@
       ],
       "sourceUrl": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=2026%ED%95%99%EB%85%84%EB%8F%84-2%ED%95%99%EA%B8%B0-%EC%83%88%EB%AC%B8%EC%95%88%EA%B5%90%ED%9A%8C-%EC%9E%A5%ED%95%99%EC%83%9D-%EB%AA%A8%EC%A7%91-%EC%95%88%EB%82%B4&keyword=%EC%9E%A5%ED%95%99",
       "sourceKind": "official",
-      "formId": "auto-새문안교회-장학생-apply",
       "eligibilityLines": [
         "2. 근로장학생 자격 및 선발기준",
         "가. 2026학년도 2학기 국가장학금을 1 차 신청하고 소득분위가 9 분위 이내인 자",
@@ -2848,7 +2847,8 @@
         "※ 주 기준은 학기당 받을 수 있는 장학금액 산정을 위한 것이며, 총 시간 내에서 2027년 2월 12일 까지까지 근로할 수 있음",
         "1) 제출서류: 지원서(u-SAINT출력본)"
       ],
-      "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+      "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+      "noForm": "앱 양식 준비 중 — 자동 변환이 제출서류 목록을 질문으로 만들었습니다. 아래 원본 첨부를 받아 작성해 주세요."
     },
     {
       "id": "reg-ssu-dept-workstudy",
@@ -4767,12 +4767,12 @@
       ],
       "sourceUrl": "https://www.inha.ac.kr/bbs/kr/8/44732/artclView.do",
       "sourceKind": "official",
-      "formId": "auto-2026학년도-2학기-사회적협동조합-신협사회-apply",
       "excerpts": [
         "장학금액 : 1,000,000원 (※ 생활비성)",
         "구비 서류 및 일정 등 자세한 내용은 붙임 파일을 참고하시기 바랍니다"
       ],
-      "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+      "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+      "noForm": "앱 양식 준비 중 — 자동 변환 결과가 원본과 대조해 항목이 빠져 있었습니다(생년월일). 아래 원본 첨부를 받아 작성해 주세요."
     },
     {
       "id": "auto-krbbskr844708artclviewdo",
@@ -4916,7 +4916,6 @@
       ],
       "sourceUrl": "https://www.gachon.ac.kr/bbs/kor/478/122799/artclView.do",
       "sourceKind": "official",
-      "formId": "auto-생활비-2026-2학기-재-하림장학재단-하림-apply",
       "eligibilityLines": [
         "1. 선발기준",
         "1) 2026-2학기 재학생 으로 가정형편이 어려우나 사상이 건전하고 품행이 단정한 자",
@@ -4932,7 +4931,8 @@
         "신청방법 : 2026.8.14.(금).12시까지 장학복지팀에 직접 제출",
         "문의 : 글로벌캠퍼스 장학복지팀(031-750-5057)"
       ],
-      "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+      "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+      "noForm": "앱 양식 준비 중 — 자동 변환 결과가 원본과 대조해 항목이 빠져 있었습니다(e-mail). 아래 원본 첨부를 받아 작성해 주세요."
     },
     {
       "id": "auto-munewsnotice712191viewdo",
@@ -5124,7 +5124,6 @@
       ],
       "sourceUrl": "https://www.knou.ac.kr/bbs/knou/51/808271/artclView.do",
       "sourceKind": "official",
-      "formId": "auto-2026학년도-2학기-중앙도서관-국가근로장학-apply",
       "eligibilityLines": [
         "1. 자격요건",
         "- 2026학년도 2학기 한국장학재단 국가근로 신청자(2026학년도 2학기 등록생)",
@@ -5134,7 +5133,8 @@
       "excerpts": [
         "- 제출서류: [붙임] 국가근로장학생 지원서(개인정보 수집 동의서 포함) 제출"
       ],
-      "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+      "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+      "noForm": "앱 양식 준비 중 — 자동 변환 결과가 원본과 대조해 항목이 빠져 있었습니다(생년월일·우선선발·자기소개·지원사유). 아래 원본 첨부를 받아 작성해 주세요."
     },
     {
       "id": "auto-sknou51808214artclviewdo",
@@ -5163,7 +5163,6 @@
       ],
       "sourceUrl": "https://www.knou.ac.kr/bbs/knou/51/808214/artclView.do",
       "sourceKind": "official",
-      "formId": "auto-교외근로-2026학년도-2학기-출판문화원-국-apply",
       "eligibilityLines": [
         "1. 선발기준 : ① 2026 학년도 2 학기 방송대 재학생으로 , ② 2026.2학기 한국장학재단 국가 근로 장학 신청자 ,",
         "③ 직전학기 성적 C(70 점 ) 이상 , ④ 학자금 지원구간 9 구간 이하",
@@ -5173,7 +5172,8 @@
         "※ 소득분위가 확인된 경우만 선발가능",
         "2. 근로시작일 : 2026.09.01.이후~",
         "※ 근무시간은 1 일 8 시간 , 1 주 40 시간 , 학기당 640 시간 이내에서 조정 될 수 있습니다 ."
-      ]
+      ],
+      "noForm": "앱 양식 준비 중 — 자동 변환 결과가 원본과 대조해 항목이 빠져 있었습니다(생년월일·우선선발·학년). 아래 원본 첨부를 받아 작성해 주세요."
     },
     {
       "id": "auto-nuackrprogboardno2514606",
@@ -5202,7 +5202,6 @@
       ],
       "sourceUrl": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2514606&code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
       "sourceKind": "official",
-      "formId": "auto-2026학년도-대학생-청소년-ai-교육지원사-apply",
       "eligibilityLines": [
         "11. 장학생 공통 자격 요건",
         "1) 대한민국 국적 소지",
@@ -5219,7 +5218,8 @@
         "(학생)신청방법: [붙임4] 매뉴얼 참고하여 한국장학재단 홈페이지 접속 후, 신청 진행 및 필요",
         "18.(화)까지 필요서류를 학생과로 공문(스캔본) 제출※ 학생의 신청 기간은 단과대학의 장학생 추천 기간과 별도로 운영되므로, 단과대학별 학생 신청 일정 조정 필요"
       ],
-      "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+      "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+      "noForm": "앱 양식 준비 중 — 자동 변환 결과가 원본과 대조해 항목이 빠져 있었습니다(학년). 아래 원본 첨부를 받아 작성해 주세요."
     },
     {
       "id": "auto-chonackrkor7986subviewdo",
@@ -5253,7 +5253,7 @@
       ],
       "sourceUrl": "https://www.gachon.ac.kr/kor/7986/subview.do?nttId=122600",
       "sourceKind": "official",
-      "formId": "auto-2026-2학기-지성학-서포터즈-장학생-모집-apply"
+      "noForm": "앱 양식 준비 중 — 자동 변환 결과가 원본과 대조해 항목이 빠져 있었습니다(지원동기). 아래 원본 첨부를 받아 작성해 주세요."
     },
     {
       "id": "auto-ec9588eb82b4ec8898eca095",
@@ -5337,7 +5337,7 @@
       ],
       "sourceUrl": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767674&article.offset=0&articleLimit=10",
       "sourceKind": "official",
-      "formId": "auto-2026-2-근로장학생-학기중-신청-안내-apply"
+      "noForm": "앱 양식 준비 중 — 자동 변환 결과가 원본과 대조해 항목이 빠져 있었습니다(은행·생년월일·소득분위). 아래 원본 첨부를 받아 작성해 주세요."
     },
     {
       "id": "auto-eknuackrhomeknusswsubhtm",
@@ -5450,7 +5450,6 @@
       ],
       "sourceUrl": "https://www.inha.ac.kr/bbs/kr/8/45011/artclView.do",
       "sourceKind": "official",
-      "formId": "auto-2026학년도-2학기-인하대동문장학회-변호산-apply",
       "eligibilityLines": [
         "1. 신청 자격",
         "가. 2026년 2학기 정규등록 예정 중인 자 (휴학, 부분등록자 제외)",
@@ -5464,7 +5463,8 @@
         "구비 서류 및 일정 등 자세한 내용은 붙임 파일을 참고하시기 바랍니다"
       ],
       "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
-      "applyEmail": "inhain4@inhain.com"
+      "applyEmail": "inhain4@inhain.com",
+      "noForm": "앱 양식 준비 중 — 자동 변환 결과가 원본과 대조해 항목이 빠져 있었습니다(자기소개·생년월일·e-mail·학업계획 외). 아래 원본 첨부를 받아 작성해 주세요."
     },
     {
       "id": "auto-082f26ec8898eab98ceca780",

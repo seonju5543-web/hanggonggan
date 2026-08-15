@@ -12,6 +12,7 @@ import { cleanTitle, isMenuEntry } from '../collector/clean-title.mjs';
 import { makeBudget, rotateOrder, nextCursor } from '../collector/harvest-budget.mjs';
 import { canonUrl } from '../collector/canon-url.mjs';
 import { checkFormQuality } from '../collector/form-quality.mjs';
+import { checkFormCoverage } from '../collector/form-coverage.mjs';
 import { canonUrl as nsCanonUrl } from '../collector/notice-source.mjs';
 
 let fail = 0;
@@ -78,6 +79,28 @@ eq('원본이 번호를 붙여 쓰는 진짜 항목은 걸지 않는다 ("1. 성
   checkFormQuality({ sections: [{ fields: [
     { id: 'a', label: '1. 성       명' }, { id: 'b', label: '2. 학       번' },
     { id: 'c', label: '3. 학부 / 전공' }, { id: 'd', label: '4. 연락처' }] }] }).ok, true);
+eq('제출서류 목록이 질문이 되면 걸린다 (하림장학재단 — "성적증명서 1통"이 질문이었다)',
+  checkFormQuality({ sections: [{ fields: [
+    { id: 'a', label: '성명' }, { id: 'b', label: '학과' }, { id: 'c', label: '연락처' },
+    { id: 'd', label: '성적증명서 1통' }, { id: 'e', label: '장학금 수령 계좌 사본' }] }] }).ok, false);
+
+console.log('■ 원본 항목이 양식에서 빠지지 않았나 (2026-08-14 — 조용한 누락이 진짜 위험이다)');
+/* form-quality가 못 잡는 실패가 있다: 남은 항목은 전부 멀쩡해 보이는데 **한 칸이 통째로 빠진** 경우.
+   인하대 변호산장학금은 자기소개서 4문항 중 3번 "학업계획 및 향후 진로계획"만 빠져 있었고,
+   방송대 중앙도서관 건은 우선선발 체크칸과 자기소개가 통째로 없었다. 학생이 그대로 제출한다. */
+const 원본 = '장학금 신청서  성 명  생년월일  학 번  연락처  e-mail  자기소개  학업계획';
+eq('원본 항목이 다 들어 있으면 통과',
+  checkFormCoverage({ sections: [{ info: [['성명', 'name', '학번', 'studentId']],
+    fields: [{ id: 'birth', label: '생년월일' }, { id: 'phone', label: '연락처' },
+      { id: 'email', label: 'e-mail' }, { id: 'a', label: '자기소개' }, { id: 'b', label: '학업계획' }] }] },
+    원본).missing.length, 0);
+eq('원본에 있는 항목이 빠지면 잡아낸다',
+  checkFormCoverage({ sections: [{ fields: [{ id: 'a', label: '성명' }, { id: 'b', label: '학번' }] }] },
+    원본).missing.includes('생년월일'), true);
+eq('원본이 없으면 "통과"가 아니라 "모른다"로 답한다 (확인 안 한 것을 확인한 것처럼 보이면 안 된다)',
+  checkFormCoverage({ sections: [] }, '').known, false);
+
+console.log('■ (이어서) 양식 모양 검사');
 eq('번호가 붙어도 공고문 절 제목이면 걸린다 ("3. 최종 합격자 통보")',
   checkFormQuality({ sections: [{ fields: [
     { id: 'a', label: '성명' }, { id: 'b', label: '학과' }, { id: 'c', label: '연락처' },
