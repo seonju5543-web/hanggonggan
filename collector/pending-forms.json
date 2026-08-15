@@ -433,8 +433,16 @@
    "added": "2026-08-16",
    "fetched": false,
    "schematized": false,
-   "tries": 1,
+   "tries": 2,
    "lastTryAt": "2026-08-16"
+  },
+  {
+   "id": "auto-o2432actionviewno9910969",
+   "name": "2016학년도 (재)동원학술연구재단‘내 자서전 미리 쓰고 받는’섬김의 리더십 장학생 선발 안내",
+   "target": "2016학년도 (재)동원학술연구재단‘내 자서전 미리 쓰",
+   "added": "2026-08-16",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }
