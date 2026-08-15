@@ -1,8 +1,7 @@
-## 🖥 브라우저형 수집 리포트 (2026-08-15 08:32 KST)
+## 🖥 브라우저형 수집 리포트 (2026-08-15 12:47 KST)
 
 ### 서울대학교
-- ✅ 링크 223 · 장학 공고 20 · https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=list&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80
-  - [수집] 2026학년도 2학기 동행장학금 선발 안내(학부 및 대학원)
+- ⚪ 링크 0 · 장학 공고 0 · https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=list&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80
 - ⚪ 링크 1 · 장학 공고 0 · https://www.snu.ac.kr/snunow/notice/genl
 
 ### 연세대학교
@@ -39,12 +38,9 @@
   - (본 링크) <2026학년도 2학기 교양물리 학문기초 교과목 전체 학년 수강신청 안내 (8.14 오전 10시~)>
 
 ### 중앙대학교
-- ❌ 오류(page.goto: Target page, context or browser has been closed) · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5
+  - (클릭 예산 초과 — 14/15건까지 채집)
+- ✅ 링크 669 · 장학 공고 14 · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5
 - ✅ 링크 657 · 장학 공고 4 · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100
-  - [수집] 2026학년도 2학기 장애학생도우미(국가근로장학생) 모집 (서울캠퍼스)
-  - [수집] (통합) 2026학년도 2학기 2차 국가근로장학금 신청 안내
-  - [수집] 2026학년도 2학기 저소득층 지원 장학금 - 중앙나래(II) 장학금 지급 안내
-  - [수집] 2026학년도 2학기 주거안정장학금 2차 신청 안내 (한국장학재단 문의)
 
 ### 숙명여자대학교
 - ⚪ 링크 2 · 장학 공고 0 · https://www.sookmyung.ac.kr/kr/life/scholarship-notice.do
@@ -64,22 +60,28 @@
   - (본 링크) 2026-2학기 코드쉐어 교과목 수강신청 안내(추가)
   - (본 링크) 2026-2학기 수강신청 안내
 - ✅ 링크 432 · 장학 공고 12 · https://www.gachon.ac.kr/kor/7986/subview.do
-- ❌ 오류(page.waitForTimeout: Target page, context or browser has been closed) · https://www.gachon.ac.kr/
+- ⚪ 링크 443 · 장학 공고 0 · https://www.gachon.ac.kr/
+  - (프레임 1개 · 클릭 시도 0건)
+  - (본 링크) 2026-2학기 등록금 고지서 출력 바로가기 2026-2학기 등록금 고지서 출력하시어 등록금 납부하여 주시기 바랍니다.
+  - (본 링크) 2026학년도 2학기 장기 현장실습 참여자 모집 ○ 모집기간: 2026.06.29. ~ 상시신청
+  - (본 링크) 2007학번 특례편입생 졸업학점기준(별표 A)
+  - (본 링크) 2008학번 특례편입생 졸업학점기준(별표 A)
+  - (본 링크) 2009학번 특례편입생 졸업학점기준(별표 A)
+  - (본 링크) 2010학번 특례편입생 졸업학점기준(별표 A)
+  - (본 링크) 2011학번 특례편입생 졸업학점기준(별표 A)
 
 ### 동국대학교
-- ✅ 링크 635 · 장학 공고 21 · https://www.dongguk.edu/article/JANGHAKNOTICE/list
-  - [수집] 공지 공지 롯데 43기 희망장학생 선발 2026.05.28. 조회 3130
+- ❌ 오류(page.goto: Target page, context or browser has been closed) · https://www.dongguk.edu/article/JANGHAKNOTICE/list
 
 ### 한국외국어대학교
-- ❌ 오류(page.goto: Target page, context or browser has been closed) · https://dep.hufs.ac.kr/student/12767/subview.do
+- ✅ 링크 81 · 장학 공고 12 · https://dep.hufs.ac.kr/student/12767/subview.do
 
 ### 경희대학교
 - ✅ 링크 300 · 장학 공고 9 · https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318
 
 ### 상명대학교
-- ✅ 링크 578 · 장학 공고 11 · https://www.smu.ac.kr/kor/life/notice.do
-  - [수집] [학생복지팀] 26-2 교내장학금 선발 안내
-- ❌ 오류(page.goto: Target page, context or browser has been closed) · https://www.smu.ac.kr/kor/life/notice.do?srCategoryId=8
+- ❌ 오류(page.goto: Target page, context or browser has been closed) · https://www.smu.ac.kr/kor/life/notice.do
+- ✅ 링크 578 · 장학 공고 11 · https://www.smu.ac.kr/kor/life/notice.do?srCategoryId=8
 - ⚪ 링크 0 · 장학 공고 0 · https://www.smu.ac.kr/kor/life/scholarship.do
 
 ### 고려대학교
@@ -87,31 +89,12 @@
 
 ### 계명대학교
 - ✅ 링크 525 · 장학 공고 20 · https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=145&
-  - [수집] [교외]2026년 하반기 군산시 대학생 학자금 이자 지원 공고
-  - [수집] 2026학년도 2학기 2차 주거안정장학금 신청 안내(한국장학재단)
-  - [수집] [교내] 2026-2학기 장애대학생 지원 도우미 장학생 선발 안내
-  - [수집] [교외] 2026학년도 5·18희망장학생 모집
-  - [수집] [교외] 2026학년도 (재)서울미래인재재단 장학생 선발
-  - [수집] [국가근로] 2026학년도 2학기 국가근로장학금 신청 안내(2차)
-  - [수집] 2026년 하반기 울산광역시 대학(원)생 학자금대출 이자지원사업 안내
-  - [수집] 2026학년도 1학기 주거안정장학금 7월분 지급요청서 제출 안내
-  - [수집] [교외]2026년 (재)서구인재육성재단 장학생 선발 안내 및 홍보
-  - [수집] [교외] 2026년 화성시인재육성재단 소상공인 장학금 모집
-  - [수집] [교외] 2026년 김해시미래인재장학재단 제3회 장학수기 공모전
-  - [수집] [교외] 2026학년도 충남평생교육인재육성진흥원 재능키움 장학생 선발
-  - [수집] [교외]2026년도 정읍시민장학재단 장학생 선발 공고
-  - [수집] [교외] 2026년 세종이도인재장학금 디딤돌 장학사업 학자금대출 관련분야 신청(원금상환, 이자지원)
-  - [수집] [교외] 2026년 제주평생교육장학진흥원 미래이음 장학금 장학생 선발
-  - [수집] 2026학년도 1학기 주거안정장학금 6월분 지급요청서 제출 안내
-  - [수집] 2026년 2학기 농촌출신대학(원)생 학자금 대출 안내
-  - [수집] 2026학년도 2학기 재학생 학자금 대출 신청 안내
-  - [수집] [국가근로] 2026학년도 하계방학 중 국가(교외)근로장학생 최종 선발자 공고
 
 ### 부산대학교
 - ⚪ 링크 0 · 장학 공고 0 · https://onestop.pusan.ac.kr/page?menuCD=000000000000062
 
 ### 서울교육대학교
-- ❌ 오류(page.goto: Target page, context or browser has been closed) · https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083
+- ✅ 링크 396 · 장학 공고 18 · https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083
 
 ### 홍익대학교
 - ⚪ 링크 0 · 장학 공고 0 · https://www.hongik.ac.kr/kr/newscenter/notice.do
@@ -121,19 +104,16 @@
 - ✅ 링크 292 · 장학 공고 15 · https://www.seoultech.ac.kr/service/info/janghak/
 
 ### 🔁 실패 학교 재시도 (몇 분 뒤 재접속)
-**한국외국어대학교**
-- ✅ 링크 81 · 장학 공고 12 · https://dep.hufs.ac.kr/student/12767/subview.do
+**동국대학교**
+- ✅ 링크 635 · 장학 공고 21 · https://www.dongguk.edu/article/JANGHAKNOTICE/list
+  - [수집] 공지 공지 롯데 43기 희망장학생 선발 2026.05.28. 조회 3145
 
 **고려대학교**
 - ✅ 링크 391 · 장학 공고 7 · https://www.korea.ac.kr/ko/568/subview.do
-  - [수집] 2026년도 한미 첨단분야 청년교류 지원사업 제6기 장학생 선발 공고
-
-**서울교육대학교**
-- ✅ 링크 396 · 장학 공고 18 · https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083
 
 ---
-이번 실행 신규 수집: **27건** · 브라우저로도 수집 실패한 학교는 게시판 주소 확인이 필요합니다.
-⏱ 소요 7분 / 예산 22분 · 학교 17/17곳 처리
+이번 실행 신규 수집: **1건** · 브라우저로도 수집 실패한 학교는 게시판 주소 확인이 필요합니다.
+⏱ 소요 8분 / 예산 22분 · 학교 17/17곳 처리
 **⏳ 스키마화 대기 중 26건** (원본 확보됨 — collector/pending-forms.json)
 
 ### 🤖 자동 등록 (선조치후보고) — 1건 등록 · 1건 제거(blockIds)
