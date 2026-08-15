@@ -84,6 +84,21 @@ eq('제출서류 목록이 질문이 되면 걸린다 (하림장학재단 — "�
     { id: 'a', label: '성명' }, { id: 'b', label: '학과' }, { id: 'c', label: '연락처' },
     { id: 'd', label: '성적증명서 1통' }, { id: 'e', label: '장학금 수령 계좌 사본' }] }] }).ok, false);
 
+console.log('■ HWP 원본은 미리보기가 아니라 본문을 읽는다 (2026-08-14 — 앞 1023자만 보고 있었다)');
+/* 한글의 `PrvText`는 **미리보기용**이라 1023자에서 잘린다(저장분 91개 중 56개가 그 상태였다).
+   그래서 변환기는 신청서 뒷부분 항목의 **존재 자체를 몰랐다** — 인하대 변호산 건의
+   "졸업 후 총동창회 가입 동의(필수)"가 그렇게 사라졌다. 본문(BodyText)을 읽자 같은 91개에서
+   글자가 24만 자 늘었다. 아래 두 줄이 그 배선을 지킨다. */
+{
+  const sch = fs.readFileSync(new URL('../collector/schematize-forms.mjs', import.meta.url), 'utf8');
+  eq('본문(.body.txt)을 미리보기(.txt)보다 먼저 본다',
+    /\['\.body\.txt',\s*'\.txt'\]/.test(sch), true);
+  const wf = ['collect-scholarships', 'browser-collect', 'deep-fetch']
+    .map((n) => fs.readFileSync(new URL(`../.github/workflows/${n}.yml`, import.meta.url), 'utf8'));
+  eq('수집·심층 로봇이 본문 추출기를 실제로 돌린다',
+    wf.every((y) => y.includes('hwp-bodytext.py')), true);
+}
+
 console.log('■ 원본 항목이 양식에서 빠지지 않았나 (2026-08-14 — 조용한 누락이 진짜 위험이다)');
 /* form-quality가 못 잡는 실패가 있다: 남은 항목은 전부 멀쩡해 보이는데 **한 칸이 통째로 빠진** 경우.
    인하대 변호산장학금은 자기소개서 4문항 중 3번 "학업계획 및 향후 진로계획"만 빠져 있었고,
