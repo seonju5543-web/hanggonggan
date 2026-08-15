@@ -101,9 +101,16 @@ function extractText(file) {
   const url = new URL(file, OUT);
   const lower = file.toLowerCase();
   if (lower.endsWith('.hwp')) {
-    /* hwp-prvtext.py가 만들어 둔 미리보기 텍스트 */
-    const txt = new URL(file + '.txt', OUT);
-    return fs.existsSync(txt) ? fs.readFileSync(txt, 'utf8') : '';
+    /* 🔴 본문(.body.txt)을 먼저 본다. 미리보기(.txt)는 **한글이 앞부분만 담아 두는 칸**이라
+       **1023자에서 잘린다** — 2026-08-14 실측으로 저장분 91개 중 56개가 그 상태였고,
+       그래서 변환기가 신청서 뒷부분 항목의 존재를 아예 몰랐다(원본 대조에서 나온
+       '조용한 누락'의 구조적 원인). 본문을 읽자 같은 91개에서 글자가 24만 자 늘었다.
+       본문 추출은 `collector/hwp-bodytext.py`가 한다. 순서를 뒤집지 말 것. */
+    for (const ext of ['.body.txt', '.txt']) {
+      const txt = new URL(file + ext, OUT);
+      if (fs.existsSync(txt)) return fs.readFileSync(txt, 'utf8');
+    }
+    return '';
   }
   if (lower.endsWith('.txt')) return fs.readFileSync(url, 'utf8');
   if (lower.endsWith('.docx') || lower.endsWith('.hwpx')) {
