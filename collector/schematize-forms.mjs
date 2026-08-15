@@ -32,6 +32,8 @@ const THIRD_PARTY = /추천서|추천\s*양식|소견서|확인서\(기관|재�
    이런 건 API가 원본 파일을 직접 보게 한다 (운영 원칙 4 — 양식의 정의). */
 const COMPLEX_LAYOUT = /시간표|원고지|주\s*간\s*계\s*획|월\s*\|?\s*화\s*\|?\s*수\s*\|?\s*목\s*\|?\s*금|별지\s*제?\s*\d+\s*호\s*서식.*표/;
 
+import { checkFormQuality } from './form-quality.mjs';
+
 const cfgPath = new URL('schematize-config.json', HERE);
 let cfg = { enabled: true, maxApiCallsPerRun: 2, minTextChars: 400, maxManualChars: 6000, alwaysApiIds: [], neverApiIds: [] };
 try { cfg = { ...cfg, ...JSON.parse(fs.readFileSync(cfgPath, 'utf8')) }; } catch { /* 기본값 */ }
@@ -392,6 +394,8 @@ for (const item of pending) {
     const tpl = tidy(parsed);
     const bad = validate(tpl);
     if (bad) { skipped.push([row.attachment, `검증 실패: ${bad}`]); continue; }
+    const q = checkFormQuality(tpl);
+    if (!q.ok) { skipped.push([row.attachment, `결과가 학생이 채울 수 있는 신청서가 아님 — ${q.problems.slice(0, 3).join(' · ')}`]); continue; }
 
     const fid = newFormId(item, forms, registered, entry);
     forms.templates[fid] = tpl;
@@ -428,8 +432,14 @@ for (const item of pending) {
     /* 원본에 서약 문구가 없으면 지어내지 않고 그 사실을 적는다 (원칙 8-1 — 추론 금지) */
     merged.pledge = pl ? pl.tpl.pledge : '원본 서식에는 별도의 서약 문구가 없어요. 제출 전 원본을 한 번 확인해 주세요.';
     const bad0 = validate(merged);
-    if (bad0) {
-      manual.push([item.name, freeParts.map((p) => p.attachment).join(', '), `자동 변환 결과가 검증을 통과하지 못함(${bad0})`]);
+    /* 🔴 '모양이 맞나'만 보던 검사(validate)로는 못 잡는 것이 있다 — 칸은 다 채워져 있는데
+       원본 표를 잘못 쪼개 **학생이 못 채우는 질문**이 된 경우다(2026-08-14, 5종 실제 발견).
+       그 판정은 결과물을 보는 checkFormQuality가 한다. 걸리면 등록하지 않는다. */
+    const q0 = bad0 ? null : checkFormQuality(merged);
+    if (bad0 || !q0.ok) {
+      manual.push([item.name, freeParts.map((p) => p.attachment).join(', '),
+        bad0 ? `자동 변환 결과가 검증을 통과하지 못함(${bad0})`
+             : `무료 변환이 원본 표를 옮기지 못함 — ${q0.problems.slice(0, 3).join(' · ')}${q0.problems.length > 3 ? ` 외 ${q0.problems.length - 3}건` : ''}. 원본 첨부 안내를 유지합니다(API 경로 대상)`]);
       leftForManual = true;
     } else {
       const fid0 = newFormId(item, forms, registered, entry);

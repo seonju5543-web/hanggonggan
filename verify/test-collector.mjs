@@ -11,6 +11,7 @@ import { isDetailUrl, isMarkerUrl, markerTitle, sameTitle, detailCandidates, loo
 import { cleanTitle, isMenuEntry } from '../collector/clean-title.mjs';
 import { makeBudget, rotateOrder, nextCursor } from '../collector/harvest-budget.mjs';
 import { canonUrl } from '../collector/canon-url.mjs';
+import { checkFormQuality } from '../collector/form-quality.mjs';
 import { canonUrl as nsCanonUrl } from '../collector/notice-source.mjs';
 
 let fail = 0;
@@ -46,6 +47,41 @@ eq('같은 글이면 페이지·표시값이 달라도 같은 열쇠',
   canonUrl('https://x.ac.kr/v.do?articleNo=1&mode=view') === canonUrl('https://x.ac.kr/v.do?articleNo=1&mode=view&article.offset=0&pageIndex=3'), true);
 eq('규칙이 한 벌뿐이다 (notice-source가 베끼면 발췌기와 등록기가 갈라진다)',
   nsCanonUrl(knuA) === canonUrl(knuA) && nsCanonUrl(khuA) === canonUrl(khuA), true);
+
+console.log('■ 만들어진 양식이 학생이 채울 수 있는 모양인가 (2026-08-14 — 못 쓸 양식 5종이 등록돼 있었다)');
+/* 무료 변환기는 원본이 표로 짜인 신청서에서 칸을 잘못 쪼갠다. 예전 판정은 **입력 글자**에
+   특정 낱말('시간표'·'원고지')이 있나만 봐서 아래 것들이 전부 통과해 앱에 올라갔다.
+   지금은 **결과물**을 본다. 이 검사가 되돌아가면 학생이 원본과 다른 신청서를 내게 된다. */
+const 깨끗 = { sections: [{ fields: [
+  { id: 'a', label: '성명' }, { id: 'b', label: '학과' }, { id: 'c', label: '연락처' },
+  { id: 'd', label: '지원 동기', type: 'textarea' }, { id: 'e', label: '개인정보 수집 동의', options: ['동의함', '동의하지 않음'] },
+] }] };
+eq('멀쩡한 양식은 통과', checkFormQuality(깨끗).ok, true);
+eq('"성적 __ 점"의 단위가 질문이 되면 걸린다',
+  checkFormQuality({ sections: [{ fields: [{ id: 'a', label: '성적' }, { id: 'b', label: '점' }, { id: 'c', label: '학년' }, { id: 'd', label: '이름' }] }] }).ok, false);
+eq('선택지가 부스러기면 비율과 상관없이 걸린다 (학생이 고를 수 없는 칸)',
+  checkFormQuality({ sections: [{ fields: [
+    { id: 'a', label: '성명' }, { id: 'b', label: '학과' }, { id: 'c', label: '연락처' }, { id: 'd', label: '주소' },
+    { id: 'e', label: '동의 여부', options: ['동의함', ')'] }] }] }).ok, false);
+eq('공고문을 신청서로 오인하면 걸린다 (국가우수장학금 선발계획 사례)',
+  checkFormQuality({ sections: [{ fields: [
+    { id: 'a', label: '목적' }, { id: 'b', label: '1) 신청대상' }, { id: 'c', label: '2) 지원자격' },
+    { id: 'd', label: '제출 서류' }, { id: 'e', label: '지원자 정보' }] }] }).ok, false);
+eq('빈 양식은 통과시키지 않는다', checkFormQuality({ sections: [] }).ok, false);
+eq('걸릴 때는 무엇이 문제인지 남긴다',
+  checkFormQuality({ sections: [{ fields: [{ id: 'a', label: '초' }] }] }).problems.length > 0, true);
+/* 🔴 기준을 조이다 **멀쩡한 양식까지 걸리는** 일이 실제로 있었다.
+   손으로 만든 신청서(조병두·산학·롯데)는 '1. 성명'처럼 번호를 붙여 쓴다 — 원본이 그 모양이다.
+   그래서 번호가 붙었다는 이유만으로 걸면 안 되고, 번호를 뗀 뒤 내용을 봐야 한다.
+   아래 두 줄이 그 균형을 지킨다. 지금 앱의 양식 전수 검사는 verify/audit-data.js가 한다. */
+eq('원본이 번호를 붙여 쓰는 진짜 항목은 걸지 않는다 ("1. 성명")',
+  checkFormQuality({ sections: [{ fields: [
+    { id: 'a', label: '1. 성       명' }, { id: 'b', label: '2. 학       번' },
+    { id: 'c', label: '3. 학부 / 전공' }, { id: 'd', label: '4. 연락처' }] }] }).ok, true);
+eq('번호가 붙어도 공고문 절 제목이면 걸린다 ("3. 최종 합격자 통보")',
+  checkFormQuality({ sections: [{ fields: [
+    { id: 'a', label: '성명' }, { id: 'b', label: '학과' }, { id: 'c', label: '연락처' },
+    { id: 'd', label: '주소' }, { id: 'e', label: '3. 최종 합격자 통보' }] }] }).ok, false);
 
 console.log('■ 제목 열쇠 (같은 공고가 다른 주소 형태로 들어와도 하나로)');
 const t1 = { school: '서울시립대학교', title: '[빅데이터혁신융합대학사업단] 2026학년도 1학기 성과형 장학금(자격증) 신청 안내' };

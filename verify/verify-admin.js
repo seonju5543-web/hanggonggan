@@ -62,6 +62,8 @@ function serve() {
 
   /* 바깥 요청 가로채기 — 저장소의 진짜 파일로 응답한다 */
   let apiCalls = 0;
+  let INJECTED_PENDING = null;   // 아래 raw 가로채기가 채운다 (검수 대기 0건일 때 검사가 사라지지 않게)
+  let PAGE_ITEMS = null;
   await page.route('https://api.github.com/**', async (route) => {
     apiCalls += 1;
     const u = route.request().url();
@@ -80,7 +82,32 @@ function serve() {
       : u.pathname.split('/').slice(4).join('/');
     const f = path.join(ROOT, rel);
     if (!f.startsWith(ROOT) || !fs.existsSync(f)) return route.fulfill({ status: 404, body: '' });
-    return route.fulfill({ status: 200, contentType: 'application/json', body: fs.readFileSync(f, 'utf8') });
+    let body = fs.readFileSync(f, 'utf8');
+    /* 🔴 검수 대기가 0건이면 '컨펌 작업대'와 '다중 선택' 검사가 **조용히 사라진다**
+       (2026-08-14에 실제로 그렇게 됐다 — 밀린 105건을 전부 검수하자 두 항목이 실패했다).
+       검수 대기 0건은 우리가 바라는 상태이므로, 그때도 그 기능이 살아 있는지는 확인해야 한다.
+       그래서 **검사용 대기 공고 2건을 끼워 넣는다.** 저장소 데이터는 건드리지 않는다. */
+    if (rel === 'data/registered.json') {
+      const db = JSON.parse(body);
+      if (!db.items.some((x) => x.auto)) {
+        for (const n of [1, 2]) db.items.push({
+          id: `verify-pending-${n}`, name: `검사용 대기 공고 ${n}`, type: '교외',
+          provider: '검사용', amount: '금액 원문 확인', amountValue: 0,
+          /* 마감을 가깝게 둔다 — '마감 임박만 고르기'가 실제로 여러 건을 잡는지 봐야 하므로 */
+          deadline: new Date(Date.now() + 9 * 3600e3 + n * 86400e3).toISOString().slice(0, 10),
+          period: '접수 기간 원문 확인',
+          summary: '검사 드라이버가 끼워 넣은 항목입니다(저장소에는 없습니다).',
+          documents: ['원문 공고에서 확인'], eligibility: { selective: true },
+          noForm: '검사용', auto: true, attachments: [],
+          sourceUrl: `https://example.ac.kr/view.do?seq=${900 + n}`,
+          sourceKind: 'auto', listedAt: '2026-08-14',
+        });
+        body = JSON.stringify(db);
+      }
+      PAGE_ITEMS = JSON.parse(body).items;   // 화면이 실제로 받은 목록 — 아래 건수 비교는 전부 이걸 기준으로 한다
+      INJECTED_PENDING = PAGE_ITEMS.filter((x) => x.auto).length;
+    }
+    return route.fulfill({ status: 200, contentType: 'application/json', body });
   });
 
   /* 푸시 발송 서버 — 이 샌드박스는 workers.dev에 닿지 못한다(프록시 차단).
@@ -118,13 +145,18 @@ function serve() {
   ok(true, '올바른 열쇠로 입장');
   ok(apiCalls > 0, '열쇠를 GitHub에 실제로 확인한다 (흉내가 아님)');
 
-  const reg = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/registered.json'), 'utf8'));
+  const regFile = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/registered.json'), 'utf8'));
+  /* 화면이 받은 목록으로 비교한다 — 검사용 대기 공고를 끼워 넣었을 수 있다(위 참조).
+     파일로 비교하면 끼워 넣은 만큼 건수가 어긋나 멀쩡한 화면이 실패로 읽힌다. */
+  const reg = { ...regFile, items: PAGE_ITEMS || regFile.items };
   const forms = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/forms.json'), 'utf8'));
   const total = reg.items.length;
   /* '검수 전'은 자동 등록분 중 **아직 마감되지 않은 것**이다.
      마감이 지난 것은 이미 학생에게 의미가 없으므로 '마감·종료'로 간다 (화면의 statusOf와 같은 기준). */
   const TODAY = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
-  const autoN = reg.items.filter((x) => x.auto && !(x.deadline && x.deadline < TODAY)).length;
+  const autoN = INJECTED_PENDING != null
+    ? INJECTED_PENDING
+    : reg.items.filter((x) => x.auto && !(x.deadline && x.deadline < TODAY)).length;
 
   /* ③ 6개 화면 */
   const todoText = await page.textContent('#screen-todo');
