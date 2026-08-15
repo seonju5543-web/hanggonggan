@@ -425,6 +425,16 @@
    "added": "2026-08-15",
    "fetched": true,
    "schematized": true
+  },
+  {
+   "id": "auto-srchenable1srchvotetype1",
+   "name": "[교내] 2026-2학기 장애대학생 지원 도우미 장학생 선발 안내",
+   "target": "2026-2학기 장애대학생 지원 도우미 장학생 선발 안",
+   "added": "2026-08-16",
+   "fetched": false,
+   "schematized": false,
+   "tries": 1,
+   "lastTryAt": "2026-08-16"
   }
  ]
 }
