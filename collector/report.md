@@ -1,12 +1,11 @@
 ## 🤖 장학공고 수집 리포트 (2026-08-15)
 
-새로 발견한 공고: **13건** — 앱의 '실시간 공고'에는 즉시 표시되며(링크 연결만), 맞춤 매칭·양식 작성 지원 등록은 아래에서 컨펌해 주세요.
+새로 발견한 공고: **0건** — 앱의 '실시간 공고'에는 즉시 표시되며(링크 연결만), 맞춤 매칭·양식 작성 지원 등록은 아래에서 컨펌해 주세요.
 
 > 컨펌 방법: 채팅에 "이슈 #N에서 ○○ 정식 등록해줘"라고 말씀해 주시면 자격요건·금액·마감일·첨부 양식을 스키마로 정리해 등록합니다.
 
 ### 서울대학교
-상태: ✅ 정상 (실공고 20건 감지)
-- [2026학년도 2학기 동행장학금 선발 안내(학부 및 대학원)](https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&#038;category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&#038;uid=339)
+상태: 🟡 접속은 되지만 실공고를 찾지 못함 — 공지 목록 페이지인지 확인 필요
 
 ### 연세대학교
 상태: ✅ 정상 (실공고 9건 감지)
@@ -22,14 +21,9 @@
 
 ### 서강대학교
 상태: ✅ 정상 (실공고 25건 감지)
-- [[교외] 손태희장학재단 장학생 선발 안내(9/8 마감, 등록금 or 생활비 200만원)](https://www.sogang.ac.kr/ko/detail/550851?bbsConfigFk=141&namepage=ScholarshipNotice)
-  - ⏰ 마감, 등록금 or 생활비 200만원) 작성자 학생지원팀 작성일 2026.08.14 15:21:17 조회수 손태
 
 ### 성균관대학교
 상태: ✅ 정상 (실공고 10건 감지)
-- [[한국장학재단] 2026학년도 2학기 주거안정장학금 지원 자체기준 안내](https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=139145&article.offset=0&articleLimit=10)
-  - 📎 [부속기관](https://www.skku.edu/skku/about/organ/attachment_01.do)
-  - 📎 [2026학년도_주거안정장학사업_자체기준_안내.pdf](https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=139145&attachNo=116645)
 
 ### 한양대학교
 상태: ✅ 정상 (실공고 15건 감지)
@@ -63,19 +57,9 @@
 
 ### 광운대학교
 상태: ✅ 정상 (실공고 7건 감지)
-- [[등록/장학] 2026년 손태희장학재단 장학생 선발 안내](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53097&tpage=1&searchKey=1&searchVal=&srCategoryId=)
-  - ⏰ 마감일[ 9월8일(화) 16시 ​] 까지 도착한 서류에 한하여 심사 대상에 포함됨) &nbsp; 나. 제출처 :
-  - 📎 [부설기관](https://www.kw.ac.kr/ko/department/attach01.jsp)
-  - 📎 [부설연구기관](https://www.kw.ac.kr/ko/department/research_attach.jsp)
-  - 📎 [연구지원팀](https://www.kw.ac.kr/ko/department/attach03.jsp)
-  - 📎 [연구진흥팀](https://www.kw.ac.kr/ko/department/attach04.jsp)
-  - 📎 [경영관리팀](https://www.kw.ac.kr/ko/department/attach02.jsp)
 
 ### 명지대학교
 상태: ✅ 정상 (실공고 9건 감지)
-- [[자연캠퍼스] 2026학년도 2학기 학기중 국가근로장학생(교내근로) 선발 안내](https://www.mju.ac.kr/bbs/mjukr/145/234489/artclView.do)
-  - ⏰ 신청기간: 2026. 8. 14. (금) ~ 8. 19. (수) 12:00까지 &nbsp; 다. 선발 인원: 00명
-  - 📎 [2026-2 자연캠퍼스 학기중 교내 국가근로장학생 지원서.hwp](https://www.mju.ac.kr/bbs/mjukr/145/179682/download.do)
 
 ### 상명대학교
 상태: 🟡 접속은 되지만 실공고를 찾지 못함 — 공지 목록 페이지인지 확인 필요
@@ -91,11 +75,6 @@
 
 ### 숭실대학교
 상태: ✅ 정상 (실공고 15건 감지)
-- [장학 앨트웰민초장학재단 제27기 장학생 선발 안내(~9.18.금 18시, 1학년 대상)](https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=%EC%95%A8%ED%8A%B8%EC%9B%B0%EB%AF%BC%EC%B4%88%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8-%EC%A0%9C27%EA%B8%B0-%EC%9E%A5%ED%95%99%EC%83%9D-%EC%84%A0%EB%B0%9C-%EC%95%88%EB%82%B49-18-%EA%B8%88-18%EC%8B%9C-1&keyword=%EC%9E%A5%ED%95%99)
-  - 📎 [앨트웰민초장학재단-장학생-지원서.docx](https://scatch.ssu.ac.kr/download.php?data=1iZBAEYP01G24N2v6wVl9s5jGa0smQ8%2B8HVba1YhOwKiKp0Ym%2FP%2FpR0dBOZOTbHzGy%2BTusAioC15PqvrQTvbszQdCElSnK0TwZL7GJKXLuWSr%2BiYA9nlBy70r4EYftw16hba8i68eRNKEKK%2BmoumwVdfNoCqXIi5Qte1lDD02IxRU%2BBcnTB4uskqMLyDvH5qGZC%2Fy9IRMpBq0Ztb29H8b6q052Gxq2PS1yYBhKlQcX01OLCRf16RToyniRVokbxg)
-- [장학 2026년 손태희장학재단 장학생 선발 안내(8.24월 ~ 9.8.화 16시)](https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=2026%EB%85%84-%EC%86%90%ED%83%9C%ED%9D%AC%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8-%EC%9E%A5%ED%95%99%EC%83%9D-%EC%84%A0%EB%B0%9C-%EC%95%88%EB%82%B48-24%EC%9B%94-9-8-%ED%99%94-16%EC%8B%9C&keyword=%EC%9E%A5%ED%95%99)
-  - 📎 [2026년-손태희장학재단-4기-장학생-선발-공고문.pdf](https://scatch.ssu.ac.kr/download.php?data=1iZBAEYP01G24N2v6wVl9s5jGa0smQ8%2B8HVba1YhOwKiKp0Ym%2FP%2FpR0dBOZOTbHzGy%2BTusAioC15PqvrQTvbs%2F0voDhdVk%2BIK%2FN3DuaXy0hCgg57YYVrR3yIg5cEzVPxUGZhBCiJ8LoxNjzTjqI3dc9sApNF82BGkhnyVuiLu6BF5I2WQk5%2BYNBL8SW2bTD7RW2IRa3L7cV8m4eofzs%2Fnoc%2Fw%2FlKSH5cfMM%2FkKy7CXF2e98QrKd1xpn0IsSrf40nSwgvezhka9fU7zZNykGSxg%3D%3D)
-  - 📎 [2026년-손태희장학재단-4기-장학생-서식.hwpx](https://scatch.ssu.ac.kr/download.php?data=1iZBAEYP01G24N2v6wVl9s5jGa0smQ8%2B8HVba1YhOwKiKp0Ym%2FP%2FpR0dBOZOTbHzGy%2BTusAioC15PqvrQTvbs%2F0voDhdVk%2BIK%2FN3DuaXy0hCgg57YYVrR3yIg5cEzVPxUGZhBCiJ8LoxNjzTjqI3dbLvUS%2FhfO1tjW%2BwtDH1Oa49yjIe9KRF4AE8zTFdxjMvqcEgEJmCMBzDGe8wv79Q957fdYxXSEGZBBGTFpVB9psj68bz%2F5SFyDvuK%2FUwUHZs)
 
 ### 세종대학교
 상태: ✅ 정상 (실공고 9건 감지)
@@ -105,20 +84,12 @@
 
 ### 인하대학교
 상태: ✅ 정상 (실공고 14건 감지)
-- [[학부-교외장학] 2026학년도 2학기 손태희장학재단 장학생 선발 안내](https://www.inha.ac.kr/bbs/kr/8/45045/artclView.do)
-  - ⏰ 기한 : ~ 26. 9. 8. (화) 16시 6. 제출방법&nbsp;: 공고문 내 QR코드 스캔하여 온라인 신청
-  - 📎 [2026년 손태희장학재단 4기 장학생 선발 공고문.pdf](https://www.inha.ac.kr/bbs/kr/8/40876/download.do)
-  - 📎 [2026년 손태희장학재단 4기 장학생 서식.hwpx](https://www.inha.ac.kr/bbs/kr/8/40877/download.do)
 
 ### 부산대학교
 상태: ⚙️ 게시판 주소 미설정 (주소는 확보했다(2026-08-02) — onestop.pusan.ac.kr 장학 공지 511건. 목록을 자바스크립트가 그리고 행이 href="#popup"이라 browser-targets.json이 담당한다)
 
 ### 가톨릭대학교
 상태: ✅ 정상 (실공고 11건 감지)
-- [[학생지원팀] 2026년도 손태희장학재단 장학생 신청 안내](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=274779&article.offset=0&articleLimit=10&srCategoryId=22)
-  - 📎 [2026년 손태희장학재단 4기 장학생 선발 공고문.pdf](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=274779&attachNo=224546)
-  - 📎 [2026년 손태희장학재단 4기 장학생 서식.hwpx](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=274779&attachNo=224547)
-  - 📎 [2026년 손태희장학재단 신규교사 남성학원 홍보자료.pdf](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=274779&attachNo=224548)
 
 ### 한국항공대학교
 상태: ✅ 정상 (실공고 20건 감지)
@@ -128,12 +99,6 @@
 
 ### 서울과학기술대학교
 상태: ✅ 정상 (실공고 15건 감지)
-- [[학사지원과] 2026학년도 2학기 국가근로장학생 모집](https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=57138&bidx=893994&qidx=57138&cate=0&allboard=true&nowpage=1)
-  - ⏰ 신청기간: 2026. 8. 19.(수) 09:00 ~ 18:00,&nbsp; e-mail 제출 ○ 신청 방법: (필
-  - 📎 [장학금 신청 주요 일정](https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf)
-  - 📎 [장학금 규정 전문(2021. 10. 1.)](https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp)
-  - 📎 [장학금 지침 전문(2026. 02. 04.)](https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp)
-  - 📎 [서식1. 국가근로장학생 지원서(학생).hwp](javascript:downloadfile()
 
 ### 계명대학교
 상태: ⚙️ 게시판 주소 미설정 (주소는 확보했다(2026-08-02) — kmu.ac.kr 장학 공고 23건 보임. 상세 링크가 HTML에 없어 browser-targets.json이 담당한다)
@@ -143,26 +108,12 @@
 
 ### 한국방송통신대학교
 상태: ✅ 정상 (실공고 12건 감지)
-- [[장학] 2026학년도 2학기 KAI사업본부 AX·XR콘텐츠혁신센터 국가 근로장학생 모집 공고](https://www.knou.ac.kr/bbs/knou/51/809090/artclView.do)
-  - ⏰ 기한: 8. 17.(월) 12:00까지 &nbsp; 7. 시급단가: 10,320원 * 4대 보험은 해당사항 없음
-  - 📎 [붙임1 국가근로장학생 지원서(지원자 성명).hwp](https://www.knou.ac.kr/bbs/knou/51/273454/download.do)
-  - 📎 [붙임2 개인정보 수집·이용 및 제공·조회 동의서(지원자 성명).hwp](https://www.knou.ac.kr/bbs/knou/51/273455/download.do)
 
 ### 경북대학교
 상태: ✅ 정상 (실공고 5건 감지)
-- [2026년도 손태희장학재단 장학생 선발 안내](https://home.knu.ac.kr/HOME/knussw/sub.htm?nav_code=knu1619416593&mode=view&mv_data=aWR4PTIxMTQmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZjb2RlPU11NlN4bjZQMUlRYyZzZWFyY2hfaXRlbT0mc2VhcmNoX29yZGVyPSZvcmRlcl9saXN0PSZsaXN0X3NjYWxlPSZ2aWV3X2xldmVsPSZ2aWV3X2NhdGU9JnZpZXdfY2F0ZTI9JnNpdGVfY29kZT1rbnVzc3c=)
-  - ⏰ 기한 내 신청하시기 바랍니다. 1. 접수기간 &nbsp; 가. 1차 온라인 접수: 2026. 8. 24.(월)
-  - 📎 [2026년 손태희장학재단 4기 장학생 선발 공고문.pdf](https://home.knu.ac.kr/HOME/bbs/bbs_download.php?mv_data=aWR4PTIxMTQmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZuYXZfY29kZT1rbnUxNjE5NDE2NTkzJnNpdGVfY29kZT1rbnVzc3cmY29kZT1NdTZTeG42UDFJUWMmc2VhcmNoX2l0ZW09JnNlYXJjaF9vcmRlcj0mb3JkZXJfbGlzdD0mbGlzdF9zY2FsZT0=&download=h&seq=0)
-  - 📎 [2026년 손태희장학재단 4기 장학생 서식.hwpx](https://home.knu.ac.kr/HOME/bbs/bbs_download.php?mv_data=aWR4PTIxMTQmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZuYXZfY29kZT1rbnUxNjE5NDE2NTkzJnNpdGVfY29kZT1rbnVzc3cmY29kZT1NdTZTeG42UDFJUWMmc2VhcmNoX2l0ZW09JnNlYXJjaF9vcmRlcj0mb3JkZXJfbGlzdD0mbGlzdF9zY2FsZT0=&download=h&seq=1)
-  - 📎 [2026년 손태희장학재단 신규교사 남성학원 홍보자료.pdf](https://home.knu.ac.kr/HOME/bbs/bbs_download.php?mv_data=aWR4PTIxMTQmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZuYXZfY29kZT1rbnUxNjE5NDE2NTkzJnNpdGVfY29kZT1rbnVzc3cmY29kZT1NdTZTeG42UDFJUWMmc2VhcmNoX2l0ZW09JnNlYXJjaF9vcmRlcj0mb3JkZXJfbGlzdD0mbGlzdF9zY2FsZT0=&download=h&seq=2)
 
 ### 영남대학교
 상태: ✅ 정상 (실공고 17건 감지)
-- [2026년 손태희장학재단 장학생 모집 안내](https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=231216973&article.offset=0&articleLimit=10)
-  - ⏰ 접수기간: 2026.08.24.(월) 9:00 ~ 09.08.(화) 16:00 (1차 온라인 접수) &nbsp; &
-  - 📎 [2026년 손태희장학재단 4기 장학생 선발 공고문.pdf](https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=231216973&attachNo=375448)
-  - 📎 [2026년 손태희장학재단 4기 장학생 서식.hwpx](https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=231216973&attachNo=375449)
-  - 📎 [2026년 손태희장학재단 신규교사 남성학원 홍보자료.pdf](https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=231216973&attachNo=375450)
 
 ### 전북대학교
 상태: ✅ 정상 (실공고 12건 감지)
@@ -180,35 +131,32 @@
 상태: ✅ 정상 (실공고 7건 감지)
 
 ### 부경대학교
-상태: ⚠️ 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요
+상태: ✅ 정상 (실공고 17건 감지)
 
 ### 강원대학교
 상태: ✅ 정상 (실공고 12건 감지)
 
 ---
 ⚙️ 설정: `collector/schools.json` · 발행: `data/notices.json` · 로봇: `collector/collect.mjs`
-**🧩 양식 원본 자동 확보 예약 1건** — 원본은 이 실행에서 바로 내려받고, 스키마화(앱 내 작성 전환)는 다음 Claude 세션이 처리해요.
-
 **⏳ 스키마화 대기 중 26건** (원본 확보됨 — collector/pending-forms.json)
 
-### 🤖 자동 등록 (선조치후보고) — 2건 등록 · 1건 제거(blockIds)
+### 🤖 자동 등록 (선조치후보고) — 1건 등록 · 1건 제거(blockIds)
 
 자동 등록분은 앱에 **자동 등록 · 검수 전** 배지로 표시돼요. 잘못 등록된 건이 있으면 채팅으로 알려주시거나 `collector/auto-register-config.json`의 `blockIds`에 id를 넣어주세요.
 
-- `auto-eab3b5eca780ec82aced95ad` [2026학년도 2학기 동행장학금 선발 안내(학부 및 대학원)](https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&#038;category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&#038;uid=339) · 서울대학교
-- `auto-jukr145234489artclviewdo` [[자연캠퍼스] 2026학년도 2학기 학기중 국가근로장학생(교내근로) 선발 안내](https://www.mju.ac.kr/bbs/mjukr/145/234489/artclView.do) · 명지대학교
+- `auto-eab3b5eca780ec82aced95ad` [2026학년도 2학기 동행장학금 선발 안내(학부 및 대학원)](https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=339) · 서울대학교
 
 **컨펌 대기 (자동 기준 미달 120건)** — 장학 신호는 있지만 선발·모집 신호가 약해요:
+- 2026학년도 2학기 장애학생도우미(국가근로장학생) 모집 (서울캠퍼스) (타교 등록분과 동일 사업([장학] 2026학년도 2학기 중앙도서관 국) — 접수분 여부 컨펌 대기)
+- (통합) 2026학년도 2학기 2차 국가근로장학금 신청 안내 (타교 등록분과 동일 사업([국가근로] 2026학년도 2학기 한국장학재) — 접수분 여부 컨펌 대기)
+- 2026학년도 2학기 주거안정장학금 2차 신청 안내 (한국장학재단 문의) (타교 등록분과 동일 사업(2026학년도 2학기 국가근로장학금 2차 신) — 접수분 여부 컨펌 대기)
+- [학생복지팀] 26-2 교내장학금 선발 안내 (타교 등록분과 동일 사업(2026-2 교내장학금 신청 안내(신/편입생) — 접수분 여부 컨펌 대기)
 - [교외] 손태희장학재단 장학생 선발 안내(9/8 마감, 등록금 or 생활비 200만원) (타교 등록분과 동일 사업(양영재단 장학생 선발 (이화여대, 2026-) — 접수분 여부 컨펌 대기)
 - [한국장학재단] 2026학년도 2학기 주거안정장학금 지원 자체기준 안내 (선발·모집·신청 신호 없음 — 개발자 컨펌 대기)
 - [등록/장학] 2026년 손태희장학재단 장학생 선발 안내 (타교 등록분과 동일 사업(양영재단 장학생 선발 (이화여대, 2026-) — 접수분 여부 컨펌 대기)
 - [학생지원팀] 2026년도 손태희장학재단 장학생 신청 안내 (타교 등록분과 동일 사업([학생복지팀] (2026-2) 근로장학생(학) — 접수분 여부 컨펌 대기)
 - [학사지원과] 2026학년도 2학기 국가근로장학생 모집 (타교 등록분과 동일 사업([국가근로] 2026학년도 2학기 한국장학재) — 접수분 여부 컨펌 대기)
 - 2026년 손태희장학재단 장학생 모집 안내 (타교 등록분과 동일 사업([손태희장학재단] 2026년 손태희장학재단 ) — 접수분 여부 컨펌 대기)
-- 2026학년도 2학기 장애학생도우미(국가근로장학생) 모집 (서울캠퍼스) (타교 등록분과 동일 사업([장학] 2026학년도 2학기 중앙도서관 국) — 접수분 여부 컨펌 대기)
-- (통합) 2026학년도 2학기 2차 국가근로장학금 신청 안내 (타교 등록분과 동일 사업([국가근로] 2026학년도 2학기 한국장학재) — 접수분 여부 컨펌 대기)
-- 2026학년도 2학기 주거안정장학금 2차 신청 안내 (한국장학재단 문의) (타교 등록분과 동일 사업(2026학년도 2학기 국가근로장학금 2차 신) — 접수분 여부 컨펌 대기)
-- 2026년 손태희장학재단 4기 장학생 선발 안내 (타교 등록분과 동일 사업([손태희장학재단] 2026년 손태희장학재단 ) — 접수분 여부 컨펌 대기)
 
 
 ### 🚨 양식 원본을 못 받고 있는 공고 5건 (3회 이상 시도)
@@ -222,9 +170,9 @@
 - 성적향상장학금 신청 (세종대, 2026-1학기) — 6회 실패 (마지막 시도 2026-08-05) · **자동 재시도 중단**(매일 시간만 버려서). 다시 받으려면 pending-forms.json에서 retired를 지우세요
 - 동문장학금 신청 (가톨릭대, 2026-2학기) — 6회 실패 (마지막 시도 2026-08-05) · **자동 재시도 중단**(매일 시간만 버려서). 다시 받으려면 pending-forms.json에서 retired를 지우세요
 
-### 🧩 양식 스키마화 — 무료 자동 16건 · API 0건 · 보류 58건
+### 🧩 양식 스키마화 — 무료 자동 15건 · API 0건 · 보류 58건
 
-**무료 변환기가 앱 양식으로 바로 만들었어요 (16건 · 비용 0)** — 학생이 앱 안에서 바로 작성할 수 있습니다. 아래 항목이 원본과 같은지 확인해 주세요.
+**무료 변환기가 앱 양식으로 바로 만들었어요 (15건 · 비용 0)** — 학생이 앱 안에서 바로 작성할 수 있습니다. 아래 항목이 원본과 같은지 확인해 주세요.
 
 - `auto-남가주동문-apply` — **개인정보 수집 · 이용 동의서** (원본: (서식) 개인정보수집이용동의서.hwp)
   · 공고: 남가주동문장학회 장학생 선발 · 자동 채움 2칸 · 입력 항목 1개
@@ -302,10 +250,6 @@
   · 공고: 2026년도 세종연구원 "세종이도인재장학금-핵심인재육성분야(특기적성)"  · 자동 채움 2칸 · 입력 항목 18개
   · [장학금 지원 신청서] 프로필 자동 채움: 성명·학교명 / 해당란에 ○ 표기, 장학금 신청 분야, 장학금명, 예시) 핵심인재육성 우수인재 성적우수 장학금 / 디딤돌 모범 장학금, 대상구분, 초, 중, 고, 대, 기타, 신청인, 학년, 주소, 보호자, 신청인과의관 계, 은행명, 계좌번호 (예금주)
   · [개인정보 수집·이용·제공 및 조회 동의서] 동의 여부(동의하지 않음/))
-  · 서약문: 원본 서식에는 별도의 서약 문구가 없어요. 제출 전 원본을 한 번 확인해 주세요.…
-- `auto-2026학년도-2학기-학기중-국가근로장학생--apply` — **2026-2 자연캠퍼스 학기중 교내 국가근로장학생 지원서** (원본: 2026-2 자연캠퍼스 학기중 교내 국가근로장학생 지원서.hwp)
-  · 공고: [자연캠퍼스] 2026학년도 2학기 학기중 국가근로장학생(교내근로) 선발 · 자동 채움 2칸 · 입력 항목 16개
-  · [신청 내용] 프로필 자동 채움: 학과·학번 / 학년, 이수학기 (예: 7학기), 휴대폰번호, 실거주지 주소, 업무능력(예: 컴활2급), 언어능력(예: 오픽 IH), 희망근로지, 월, 화, 수, 목, 금, 토, 일, 시간 계, 신청시 참고사항 1. 근무기간
   · 서약문: 원본 서식에는 별도의 서약 문구가 없어요. 제출 전 원본을 한 번 확인해 주세요.…
 
 **보류 58건** — 자동 변환기가 원본과 같은 문서를 장담하지 못한 것들이에요. 원본 다운로드 안내는 그대로 유지됩니다.
