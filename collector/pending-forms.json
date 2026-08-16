@@ -433,8 +433,8 @@
    "added": "2026-08-16",
    "fetched": false,
    "schematized": false,
-   "tries": 4,
-   "lastTryAt": "2026-08-16"
+   "tries": 5,
+   "lastTryAt": "2026-08-17"
   },
   {
    "id": "auto-o2432actionviewno9910969",
@@ -449,6 +449,14 @@
    "name": "2014-2학기 사랑드림장학사업(삼성) 장학금 신청 안내",
    "target": "2014-2학기 사랑드림장학사업(삼성) 장학금 신청 안",
    "added": "2026-08-16",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-oardid322606menuno200318",
+   "name": "공통 2026년 상반기 사랑나눔장학생 모집 공고",
+   "target": "공통 2026년 상반기 사랑나눔장학생 모집 공고",
+   "added": "2026-08-17",
    "fetched": true,
    "schematized": false
   }
