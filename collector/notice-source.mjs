@@ -45,7 +45,20 @@ export function sourceFor(item, idx) {
 
 /* 원문을 '읽을 수 있는 상태로' 갖고 있는가.
    FETCH_FAIL/FETCH_ERROR는 deepfetch가 실패를 기록해 둔 문자열이라 본문이 아니다. */
-export const hasText = (src) => !!(src && src.text && !/^FETCH_(FAIL|ERROR)/.test(src.text));
+/* 🔴 200으로 받았지만 **공고가 아니라 오류·점검 화면**인 경우 (2026-08-14 발견).
+   서울대가 점검 중이던 날 수집이 돌아, 저장된 '원문' 16건이 전부
+   "정보서비스 장애 조치 안내"였다. 발췌기는 그걸 공고 원문으로 읽어
+   **장학금 공고의 문의처를 전산실 헬프데스크 번호로** 만들어 놨다 —
+   원칙 8-1(원문 그대로)이 가장 나쁘게 깨지는 방식이다.
+   받아 오지 못한 것과 똑같이 '원문 없음'으로 다룬다. 그래야 앱이 정직하게
+   "아직 못 읽었어요"라고 말한다. 실패는 안심되는 쪽으로 틀리면 안 된다. */
+const ERROR_PAGE = /장애\s*조치\s*안내|Domain Recovery Notice|서비스\s*점검\s*중|일시적으로 사용할 수 없|Service (Unavailable|Temporarily)|페이지를 찾을 수 없|잠시 후 다시 시도해\s*주/i;
+
+export const looksLikeErrorPage = (text) => ERROR_PAGE.test(String(text || '').slice(0, 1500));
+
+export const hasText = (src) => !!(src && src.text
+  && !/^FETCH_(FAIL|ERROR)/.test(src.text)
+  && !looksLikeErrorPage(src.text));
 
 /* 원문이 중간에 잘렸는가.
    deepfetch는 받을 때마다 cut(true/false)과 그때 쓴 한도(limit)를 함께 남긴다.

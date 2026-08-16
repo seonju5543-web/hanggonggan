@@ -43,9 +43,17 @@ export function checkFormCoverage(tpl, originalText) {
   const have = squash((tpl?.sections || []).flatMap((s) => [
     ...(s.fields || []).map((f) => f.label),
     ...(s.fields || []).map((f) => f.id),
+    /* 선택지·질문 문구도 '들어 있는 것'이다 — 안 보면 체크칸으로 담은 항목이
+       '빠졌다'로 나온다(2026-08-14: 방송대 이력서의 '초등 2학년 이하'가 그랬다). */
+    ...(s.fields || []).flatMap((f) => f.options || []),
+    ...(s.fields || []).map((f) => f.q || ''),
+    ...(s.fields || []).map((f) => f.placeholder || ''),
     ...(s.info || []).flat(),
-    s.title || '',
-  ]).join('|') + '|' + (tpl?.pledge || ''));
+    /* 🔴 절 제목의 키는 `heading`이다. `title`만 읽으면 손으로 만든 양식의 절 제목
+       ('자기소개서' 등)을 통째로 못 봐서 **멀쩡한 양식이 '빠졌다'로 나온다**
+       (2026-08-14에 실제로 그랬다). 로봇 판이 쓰던 `title`도 함께 본다. */
+    s.heading || '', s.title || '', s.note || '',
+  ]).join('|') + '|' + (tpl?.pledge || '') + '|' + (tpl?.note || ''));
   const missing = want.filter((w) => !have.includes(w) && !(ALIAS[w] && have.includes(ALIAS[w])));
   return { known: true, missing, want };
 }

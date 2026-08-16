@@ -164,9 +164,17 @@ if (!cfg.enabled) {
   const added = [];
   const held = [];
 
-  // blockIds: 개발자가 지정한 잘못된 자동 등록분 제거 (되돌리기 장치)
+  /* 잘못 등록된 건 되돌리기 (막음 장치) — id와 주소 **둘 다** 본다.
+     🔴 왜 주소까지 보나 (2026-08-14에 실제로 당했다):
+        id는 `'auto-' + canonUrl(...).slice(-24)`로 **주소에서 파생된다.** 그래서
+        주소 정규화 규칙을 고치자 **막아 둔 23건의 id가 전부 바뀌어** blockIds가 무효가 됐고,
+        바로 다음 실행에서 부경대 2014·2016·2021·2024년 공고가 **새 id를 달고 되살아났다.**
+        주소로 막으면 규칙이 또 바뀌어도 살아남는다. */
+  const blockedIds = new Set(cfg.blockIds || []);
+  const blockedUrls = new Set((cfg.blockUrls || []).map((u) => canonUrl(u)));
   const before = registered.items.length;
-  registered.items = registered.items.filter((i) => !(i.auto && (cfg.blockIds || []).includes(i.id)));
+  registered.items = registered.items.filter((i) => !(i.auto
+    && (blockedIds.has(i.id) || blockedUrls.has(canonUrl(i.sourceUrl || '')))));
   const removed = before - registered.items.length;
 
   for (const n of notices.items || []) {
@@ -185,6 +193,9 @@ if (!cfg.enabled) {
       .slice(0, 6);
     const id = 'auto-' + cu.replace(/[^a-z0-9]/gi, '').slice(-24).toLowerCase();
     if (registered.items.some((i) => i.id === id)) continue;
+    /* 사람이 한 번 '이건 아니다'라고 뺀 공고는 다시 등록하지 않는다.
+       위 되돌리기와 같은 이유로 주소도 함께 본다 — 지우기만 하면 다음 실행에 또 들어온다. */
+    if (blockedIds.has(id) || blockedUrls.has(cu)) continue;
     const title = cleanTitle(n.title).slice(0, 70);
     const entry = {
       id,
