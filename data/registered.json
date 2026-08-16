@@ -5246,7 +5246,7 @@
         "18.(화)까지 필요서류를 학생과로 공문(스캔본) 제출※ 학생의 신청 기간은 단과대학의 장학생 추천 기간과 별도로 운영되므로, 단과대학별 학생 신청 일정 조정 필요"
       ],
       "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
-      "noForm": "앱 양식 준비 중 — 자동 변환 결과가 원본과 대조해 항목이 빠져 있었습니다(학년). 아래 원본 첨부를 받아 작성해 주세요."
+      "formId": "kosaf-ai-mentor"
     },
     {
       "id": "auto-chonackrkor7986subviewdo",
@@ -5402,7 +5402,6 @@
       ],
       "sourceUrl": "https://home.knu.ac.kr/HOME/knussw/sub.htm?nav_code=knu1619416593&mode=view&mv_data=aWR4PTIxMTImc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZjb2RlPU11NlN4bjZQMUlRYyZzZWFyY2hfaXRlbT0mc2VhcmNoX29yZGVyPSZvcmRlcl9saXN0PSZsaXN0X3NjYWxlPSZ2aWV3X2xldmVsPSZ2aWV3X2NhdGU9JnZpZXdfY2F0ZTI9JnNpdGVfY29kZT1rbnVzc3c=",
       "sourceKind": "official",
-      "noForm": "앱 양식 준비 중 — 무료 변환기가 원본 표 서식을 옮기지 못했습니다. 아래 원본 첨부를 받아 작성해 주세요.",
       "eligibilityLines": [
         "4. 신청 자격: 세종특별자치시에서 신청작성일 기준 1년 이상 계속 거주자(본인 또는 부모)"
       ],
@@ -5411,7 +5410,8 @@
         "신청 자격: 세종특별자치시에서 신청작성일 기준 1년 이상 계속 거주자(본인 또는 부모)",
         "문의처: 인재개발부 044-865-9685"
       ],
-      "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+      "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+      "formId": "sejong-ido-apply"
     },
     {
       "id": "auto-larshipdoarticleno373578",
@@ -5699,7 +5699,7 @@
         "※ 재단에서 핵심인재육성분야(특기적성)을 제외한 분야는 공지 안내일 기준으로 신청기간이 마감된 상태입니다."
       ],
       "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
-      "noForm": "앱 양식 준비 중 — 무료 변환기가 원본 표 서식을 옮기지 못했습니다. 아래 원본 첨부를 받아 작성해 주세요."
+      "formId": "sejong-ido-apply"
     },
     {
       "id": "auto-munewsnotice712224viewdo",
