@@ -140,22 +140,17 @@
 ⚙️ 설정: `collector/schools.json` · 발행: `data/notices.json` · 로봇: `collector/collect.mjs`
 **🧩 양식 원본 자동 확보 예약 1건** — 원본은 이 실행에서 바로 내려받고, 스키마화(앱 내 작성 전환)는 다음 Claude 세션이 처리해요.
 
-**⏳ 스키마화 대기 중 26건** (원본 확보됨 — collector/pending-forms.json)
+**⏳ 스키마화 대기 중 27건** (원본 확보됨 — collector/pending-forms.json)
 
-### 🤖 자동 등록 (선조치후보고) — 8건 등록
+### 🤖 자동 등록 (선조치후보고) — 3건 등록
 
 자동 등록분은 앱에 **자동 등록 · 검수 전** 배지로 표시돼요. 잘못 등록된 건이 있으면 채팅으로 알려주시거나 `collector/auto-register-config.json`의 `blockIds`에 id를 넣어주세요.
 
-- `auto-tegory1moddocumentuid339` [2026학년도 2학기 동행장학금 선발 안내(학부 및 대학원)](https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=339) · 서울대학교
-- `auto-srchenable1srchvotetype1` [[교내] 2026-2학기 장애대학생 지원 도우미 장학생 선발 안내](https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269875&pageOrder=0&cmd=2&parm_bod_uid=269744&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&) · 계명대학교
-- `auto-spxboardid5cate8key69996` [[장학안내] 2026학년도 2학기 행정업무보조 국가근로장학생 희망근로기관 신청](https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=69996&cate=8) · 전남대학교
-- `auto-5menuid100ptabno5siteno2` [2026년도 인문100년 장학금 신청 안내](https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=29762&pageNo=1) · 중앙대학교
-- `auto-otice06doarticleno138939` [2026학년도 1차 연구우수장학생 선발 결과 안내](https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=138939&article.offset=0&articleLimit=10) · 성균관대학교
 - `auto-jukr145233953artclviewdo` [5.18 기념재단-5.18 희망장학생 모집 공고](https://www.mju.ac.kr/bbs/mjukr/145/233953/artclView.do) · 명지대학교
-- `auto-tegory1moddocumentuid320` [사랑의열매 2026년 상반기 바로바로론 사랑나눔 장학생 모집 안내](https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=320) · 서울대학교
-- `auto-tegory1moddocumentuid319` [2026년 화성시인재육성재단 「소상공인 장학금」 선발 안내](https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=319) · 서울대학교
+- `auto-o2432actionviewno9910966` [2014-2학기 사랑드림장학사업(삼성) 장학금 신청 안내](https://nano.pknu.ac.kr/nano/2432?action=view&no=9910966) · 부경대학교
+- `auto-notice7doarticleno886382` [2026-1 기숙지원장학금 선발결과 안내](https://www.sejong.ac.kr/kor/intro/notice7.do?mode=view&articleNo=886382&article.offset=0&articleLimit=10) · 세종대학교
 
-**컨펌 대기 (자동 기준 미달 125건)** — 장학 신호는 있지만 선발·모집 신호가 약해요:
+**컨펌 대기 (자동 기준 미달 184건)** — 장학 신호는 있지만 선발·모집 신호가 약해요:
 - 2026학년도 2학기 장애학생도우미(국가근로장학생) 모집 (서울캠퍼스) (타교 등록분과 동일 사업([장학] 2026학년도 2학기 중앙도서관 국) — 접수분 여부 컨펌 대기)
 - (통합) 2026학년도 2학기 2차 국가근로장학금 신청 안내 (타교 등록분과 동일 사업([국가근로] 2026학년도 2학기 한국장학재) — 접수분 여부 컨펌 대기)
 - 2026학년도 2학기 주거안정장학금 2차 신청 안내 (한국장학재단 문의) (타교 등록분과 동일 사업(2026학년도 2학기 국가근로장학금 2차 신) — 접수분 여부 컨펌 대기)
@@ -164,11 +159,11 @@
 - [교외] 2026학년도 (재)서울미래인재재단 장학생 선발 (타교 등록분과 동일 사업(양영재단 장학생 선발 (이화여대, 2026-) — 접수분 여부 컨펌 대기)
 - [국가근로] 2026학년도 2학기 국가근로장학금 신청 안내(2차) (타교 등록분과 동일 사업([국가근로] 2026학년도 2학기 한국장학재) — 접수분 여부 컨펌 대기)
 - 2026학년도 1학기 주거안정장학금 7월분 지급요청서 제출 안내 (선발·모집·신청 신호 없음 — 개발자 컨펌 대기)
+- [교외] 2026년 화성시인재육성재단 소상공인 장학금 모집 (타교 등록분과 동일 사업(2026년 화성시인재육성재단 「소상공인 장학) — 접수분 여부 컨펌 대기)
 - 2026학년도 1학기 주거안정장학금 6월분 지급요청서 제출 안내 (선발·모집·신청 신호 없음 — 개발자 컨펌 대기)
-- [교외] 손태희장학재단 장학생 선발 안내(9/8 마감, 등록금 or 생활비 200만원) (타교 등록분과 동일 사업(양영재단 장학생 선발 (이화여대, 2026-) — 접수분 여부 컨펌 대기)
 
 
-### 🚨 양식 원본을 못 받고 있는 공고 5건 (3회 이상 시도)
+### 🚨 양식 원본을 못 받고 있는 공고 6건 (3회 이상 시도)
 
 자동으로는 더 못 가져옵니다. 첨부 주소가 바뀌었거나 로그인이 필요한 경우예요.
 이 공고들은 앱에서 양식 작성이 안 되고 원본 다운로드 안내만 나갑니다.
@@ -178,10 +173,11 @@
 - 성적향상 장학금 신청 (가천대, 2026-1학기) — 6회 실패 (마지막 시도 2026-08-05) · **자동 재시도 중단**(매일 시간만 버려서). 다시 받으려면 pending-forms.json에서 retired를 지우세요
 - 성적향상장학금 신청 (세종대, 2026-1학기) — 6회 실패 (마지막 시도 2026-08-05) · **자동 재시도 중단**(매일 시간만 버려서). 다시 받으려면 pending-forms.json에서 retired를 지우세요
 - 동문장학금 신청 (가톨릭대, 2026-2학기) — 6회 실패 (마지막 시도 2026-08-05) · **자동 재시도 중단**(매일 시간만 버려서). 다시 받으려면 pending-forms.json에서 retired를 지우세요
+- [교내] 2026-2학기 장애대학생 지원 도우미 장학생 선발 안내 — 3회 실패 (마지막 시도 2026-08-16)
 
-### 🧩 양식 스키마화 — 무료 자동 0건 · API 0건 · 보류 59건
+### 🧩 양식 스키마화 — 무료 자동 0건 · API 0건 · 보류 65건
 
-**보류 59건** — 자동 변환기가 원본과 같은 문서를 장담하지 못한 것들이에요. 원본 다운로드 안내는 그대로 유지됩니다.
+**보류 65건** — 자동 변환기가 원본과 같은 문서를 장담하지 못한 것들이에요. 원본 다운로드 안내는 그대로 유지됩니다.
 
 - 2026-2학기 남가주동문회 장학금 신청공고.hwp (남가주동문장학회 장학생 선발) · 자동 변환 보류: 공고문·안내문 파일(채울 칸이 있는 서식 아님)
 - (서식) 개인정보수집이용동의서.hwp (남가주동문장학회 장학생 선발) · 원본에 있는 항목이 빠짐 — 주소·연락처·이메일·평점·소득분위. 원본 첨부 안내를 유지합니다(API 경로 대상)
