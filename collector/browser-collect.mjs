@@ -6,6 +6,7 @@ import { chromium } from 'playwright';
 import { urlKey, dedupeNotices, capNotices, clickRowKey } from './url-key.mjs';
 import { loadCandidates, mergeCandidates, saveCandidates } from './candidates.mjs';
 import { publishBySchool } from './publish-notices.mjs';
+import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { isMenuEntry } from './clean-title.mjs';
 import { isDetailUrl, detailCandidates, sameTitle, idsFromSource } from './detail-url.mjs';
@@ -310,6 +311,41 @@ async function loadPage(url, { attempts = 3, lines = report, retryClosed = 1 } =
   }
 }
 
+/* ── 목록 페이지 넘기기 (2026-08-17) ────────────────────────────────────────
+   1페이지만 읽던 탓에 상단 고정 공지에 밀린 실공고가 영영 안 잡혔다. 여기(브라우저 로봇)는
+   시간 예산이 빡빡하므로 **한 페이지만 더** 보고, 예산이 모자라면 아예 건너뛴다 —
+   덤으로 붙는 일이 그날 수집 전체를 위협하면 안 된다(2026-08-16 재시도 사고와 같은 계열).
+   알아낸 방식은 collector/pagination.json에 남겨 매일 다시 헤매지 않는다. */
+const BROWSER_PAGES = Number(process.env.BROWSER_BOARD_PAGES || 2);   // 1페이지 + 1페이지
+const pagePath = new URL('pagination.json', HERE);
+let pageMemo = {};
+try { pageMemo = JSON.parse(fs.readFileSync(pagePath, 'utf8')); } catch { /* 첫 실행 */ }
+const pageNotes = [];
+const todayStr = new Date().toISOString().slice(0, 10);
+
+async function readMorePages(boardUrl, firstRows, lines) {
+  if (BROWSER_PAGES <= 1) return [];
+  /* 예산이 한 학교 몫만큼 남아 있지 않으면 손대지 않는다 — 페이지 하나 더 읽는 것은
+     '덤'이고, 그것 때문에 저장 단계에 못 가면 그날 수집분 전체를 잃는다. */
+  if (!budget.hasRoom(MIN_PER_TARGET_MS)) return [];
+  const learned = pageMemo[boardUrl];
+  if (!shouldRetry(learned)) return [];
+  const firstKeys = firstRows.map((r) => urlKey(r.url));
+  for (const c of pageCandidates(boardUrl, 2, learned && learned.ok !== false ? { way: learned.way } : null)) {
+    const r = await loadPage(c.url, { attempts: 1, lines: [] });   // 진단 줄은 남기지 않는다(리포트가 두 배로 길어진다)
+    if (r.error || !r.links || !r.links.length) continue;
+    const kw = r.links.filter((l) => l.title.length >= 6 && /^https?:/.test(l.url) && KEYWORDS.test(l.title) && !isMenuEntry(l.title) && !isAttachmentEntry(l));
+    if (!kw.length) continue;
+    if (samePage(firstKeys, kw.map((l) => urlKey(l.url)))) continue;   // 파라미터를 무시하는 게시판
+    pageMemo[boardUrl] = { ok: true, way: c.way, checkedAt: todayStr };
+    lines.push(`  - 📄 2페이지에서 장학 공고 ${kw.length}건 더 읽음`);
+    pageNotes.push(`${boardUrl} → 2페이지 ${kw.length}건`);
+    return r.links;
+  }
+  pageMemo[boardUrl] = { ok: false, checkedAt: todayStr };
+  return [];
+}
+
 const report = [`## 🖥 브라우저형 수집 리포트 (${new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 16).replace('T', ' ')} KST)`, ''];
 const freshAll = [];
 
@@ -322,7 +358,10 @@ async function harvestTarget(t, report) {
     const r = await loadPage(url, { lines: report });
     if (r.error) { report.push(`- ❌ 오류(${r.error}) · ${url}`); continue; }
     loadedAny = true;
-    const items = r.links
+    // 2페이지에서 읽은 행도 같은 그물로 걸러 함께 담는다 (2026-08-17)
+    const morePages = await readMorePages(url, r.links, report);
+    const allLinks = morePages.length ? r.links.concat(morePages) : r.links;
+    const items = allLinks
       .filter((l) => l.title.length >= 6 && l.title.length <= 140 && /^https?:/.test(l.url))
       // 메뉴 제외 — 일반 수집기와 같은 모듈을 써서 판정이 갈라지지 않게 한다
       .filter((l) => KEYWORDS.test(l.title) && !isMenuEntry(l.title))
@@ -333,11 +372,11 @@ async function harvestTarget(t, report) {
     /* 이미 아는 행을 건너뛰면 '장학 공고 N'이 줄어드는 게 정상이다. 그 사실을 적지 않으면
        리포트만 보고 "공고가 줄었다 = 로봇이 고장났다"로 읽게 된다 (2026-08-17). */
     const skipNote = r.clickSkipped ? ` · 이미 아는 공고 ${r.clickSkipped}건은 다시 열지 않음` : '';
-    report.push(`- ${uniq.length ? '✅' : '⚪'} 링크 ${r.links.length} · 장학 공고 ${uniq.length}${skipNote} · ${url}`);
+    report.push(`- ${uniq.length ? '✅' : '⚪'} 링크 ${allLinks.length} · 장학 공고 ${uniq.length}${skipNote} · ${url}`);
     /* 진단: 공고를 거의 못 알아본 게시판은 화면에서 본 것을 남겨 원인 파악을 돕는다.
        단 '아는 공고를 건너뛰어서 0건'인 경우는 고장이 아니므로 진단을 쏟아내지 않는다 —
        매일 정상 게시판마다 (본 링크) 열 줄씩 쌓이면 리포트가 이슈 한도를 넘긴다. */
-    if (uniq.length <= 1 && r.links.length > 5 && !r.clickSkipped) {
+    if (uniq.length <= 1 && allLinks.length > 5 && !r.clickSkipped) {
       report.push(`  - (프레임 ${r.frameCount || 1}개 · 클릭 시도 ${r.clickTried || 0}건)`);
       (r.textLines || []).forEach((s) => report.push(`  - (본 글자) ${s.slice(0, 66)}`));
       const sample = [...new Map(r.links
@@ -561,6 +600,7 @@ publishBySchool(beforeCap);
 notices.items = capNotices(notices.items);
 notices.updatedAt = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
 fs.writeFileSync(seenPath, JSON.stringify(seen, null, 1));
+fs.writeFileSync(pagePath, JSON.stringify(pageMemo, null, 1));
 fs.writeFileSync(noticesPath, JSON.stringify(notices, null, 1));
 
 /* 다음 실행 시작 자리 저장 — 이번에 못 돈 학교가 다음 실행의 맨 앞이 된다 */

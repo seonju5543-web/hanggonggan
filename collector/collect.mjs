@@ -10,6 +10,7 @@ import fs from 'node:fs';
 import { urlKey, dedupeNotices, capNotices } from './url-key.mjs';
 import { loadCandidates, mergeCandidates, saveCandidates } from './candidates.mjs';
 import { publishBySchool } from './publish-notices.mjs';
+import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { cleanTitle, isMenuEntry } from './clean-title.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 
@@ -187,6 +188,51 @@ async function rowsByRule(rule, boardUrl) {
   })).filter((x) => x.title);
 }
 
+/* ── 목록 페이지 넘기기 (2026-08-17) ────────────────────────────────────────
+   알아낸 방식은 collector/pagination.json에 적어 두어 매일 다시 헤매지 않는다.
+   '안 되는 게시판'도 적어 두지만 영구 포기는 아니다 — 14일 뒤 한 번 더 본다(게시판 개편). */
+const PAGES = Number(process.env.BOARD_PAGES || 3);          // 1페이지 + 뒤 2페이지
+const pagePath = new URL('pagination.json', HERE);
+let pageMemo = {};
+try { pageMemo = JSON.parse(fs.readFileSync(pagePath, 'utf8')); } catch { /* 첫 실행 */ }
+const pageNotes = [];
+const todayStr = new Date().toISOString().slice(0, 10);
+
+async function readMorePages(boardUrl, firstRows, readPage) {
+  if (PAGES <= 1) return { rows: [], note: '' };
+  const learned = pageMemo[boardUrl];
+  if (!shouldRetry(learned)) return { rows: [], note: '' };
+  const firstKeys = firstRows.map((r) => urlKey(r.url));
+  const rows = [];
+  let way = learned && learned.ok !== false ? learned.way : null;
+  for (let pageNo = 2; pageNo <= PAGES; pageNo += 1) {
+    const cands = pageCandidates(boardUrl, pageNo, way ? { way } : null);
+    let got = null;
+    for (const c of cands) {
+      let page;
+      try { page = await readPage(c.url); } catch { continue; }
+      if (!page || !page.length) continue;
+      /* 받아 온 목록이 1페이지와 사실상 같으면 게시판이 그 파라미터를 무시한 것이다.
+         여기서 걸러 내지 않으면 같은 공고를 몇 번씩 담는다. */
+      if (samePage(firstKeys, page.map((r) => urlKey(r.url)))) continue;
+      got = { rows: page, way: c.way };
+      break;
+    }
+    if (!got) {
+      if (pageNo === 2) {   // 2페이지부터 못 넘겼다 = 이 게시판은 페이지 넘기기가 안 된다
+        pageMemo[boardUrl] = { ok: false, checkedAt: todayStr };
+        return { rows, note: '' };
+      }
+      break;                // 3페이지가 없는 것은 정상 (공고가 그만큼 없는 게시판)
+    }
+    way = got.way;
+    pageMemo[boardUrl] = { ok: true, way, checkedAt: todayStr };
+    rows.push(...got.rows);
+    firstKeys.push(...got.rows.map((r) => urlKey(r.url)));   // 다음 페이지 비교 기준에 누적
+  }
+  return { rows, note: rows.length ? `${PAGES - 1}페이지 더 읽어 ${rows.length}행 추가` : '' };
+}
+
 const results = [];
 const freshAll = [];
 
@@ -208,6 +254,12 @@ for (const s of cfg.schools) {
         continue;
       }
       rawLinks = extractLinks(await res.text(), s.boardUrl);
+      /* 목록 2페이지부터도 훑는다 (2026-08-17) — 상단 고정 공지가 많은 게시판은 실공고가
+         1페이지 밖으로 밀리면 영영 안 잡혔다. 장부를 비워도 안 잡힌다(게시판에 그 순간
+         떠 있는 것만 읽으므로). 규칙·경위는 collector/paginate.mjs 첫머리. */
+      const extra = await readMorePages(s.boardUrl, rawLinks, (u) => fetchBoard(u).then(async (r) => (r.ok ? extractLinks(await r.text(), u) : [])));
+      rawLinks = rawLinks.concat(extra.rows);
+      if (extra.note) pageNotes.push(`${name}: ${extra.note}`);
     }
     const items = rawLinks
       .filter((i) => KEYWORDS.test(i.title))
@@ -241,6 +293,7 @@ for (const s of cfg.schools) {
 }
 
 fs.writeFileSync(seenPath, JSON.stringify(seen, null, 1));
+fs.writeFileSync(pagePath, JSON.stringify(pageMemo, null, 1));
 
 /* 앱 발행: 최신 공고를 학교별로 병합, 학교당 최대 15건·전체 200건 유지 */
 notices.items = freshAll.concat(notices.items || []);
@@ -320,6 +373,15 @@ if (chronic.length) {
   chronic.forEach((c) => lines.push(`- ${c}`));
   lines.push('');
 }
+
+if (pageNotes.length) {
+  lines.push('### 📄 목록 2페이지 이후에서 더 읽은 게시판');
+  lines.push('1페이지만 읽던 시절에는 상단 고정 공지에 밀린 실공고가 영영 안 잡혔습니다.');
+  pageNotes.forEach((n) => lines.push(`- ${n}`));
+  lines.push('');
+}
+const noPage = Object.values(pageMemo).filter((v) => v && v.ok === false).length;
+if (noPage) lines.push(`📄 페이지 넘기기가 안 되는 게시판 ${noPage}곳 (14일 뒤 다시 시도합니다)`, '');
 
 lines.push('---');
 lines.push('⚙️ 설정: `collector/schools.json` · 발행: `data/notices.json` · 로봇: `collector/collect.mjs`');

@@ -8,6 +8,7 @@ import fs from 'node:fs';
 import { urlKey, titleKey, dedupeNotices, preferNotice, capNotices, clickRowKey } from '../collector/url-key.mjs';
 import { mergeCandidates } from '../collector/candidates.mjs';
 import { publishBySchool, splitBySchool } from '../collector/publish-notices.mjs';
+import { pageCandidates, pageUrl, existingPageParam, samePage, shouldRetry } from '../collector/paginate.mjs';
 import { createRequire } from 'node:module';
 import { isAttachmentEntry, isHtmlPayload } from '../collector/attachment-link.mjs';
 import { isDetailUrl, isMarkerUrl, markerTitle, sameTitle, detailCandidates, looksLikeLoginWall, rowDetailCandidates } from '../collector/detail-url.mjs';
@@ -518,6 +519,57 @@ console.log('\n■ 클릭형 게시판 장부 (아는 행을 다시 누르지 �
   // 이미 아는 공고로 밝혀진 행도 적어야 한다 — 안 적으면 상세 루프가 안 건드려 영영 다시 누른다
   eq('이미 아는 공고로 밝혀진 행도 장부에 적는다', /if \(known\) seen\[clickRowKey\(url, title\)\] = known;/.test(src), true);
   eq('건너뛴 건수를 리포트에 적는다 (공고가 준 것처럼 보이지 않게)', /이미 아는 공고 \$\{r\.clickSkipped\}건/.test(src), true);
+}
+
+/* 목록 페이지 넘기기 (2026-08-17) — 1페이지만 읽어 상단 고정 공지에 밀린 실공고를 놓치던 것 */
+console.log('\n■ 목록 페이지 넘기기 (1페이지 밖의 공고도 잡게)');
+{
+  // 이미 페이지 파라미터가 있으면 그것만 바꾼다 — 확실한 경우라 짐작하지 않는다
+  const withParam = 'https://x.ac.kr/list.do?menuNo=1&pageIndex=1';
+  eq('이미 있는 파라미터를 알아본다', existingPageParam(withParam).param, 'pageIndex');
+  eq('그 파라미터만 바꾼다', pageUrl(withParam, 3, { kind: 'page', param: 'pageIndex' }).includes('pageIndex=3'), true);
+  // artclList.do 계열은 '몇 번째 글부터'(offset)를 받는다 — 연세·외대·가천이 이 계열
+  const artcl = 'https://www.yonsei.ac.kr/bbs/sc/58/artclList.do?findClSeq=257';
+  eq('artclList 계열은 offset을 먼저 시도', pageCandidates(artcl, 2)[0].way.param, 'article.offset');
+  eq('offset은 (페이지-1)×한페이지', pageUrl(artcl, 3, { kind: 'offset', param: 'article.offset', limit: 10 }).includes('article.offset=20'), true);
+  // 한 페이지 크기가 주소에 적혀 있으면 그 값을 쓴다 (10건이 아닐 수 있다)
+  eq('주소에 적힌 한 페이지 크기를 쓴다',
+    pageUrl('https://x.ac.kr/artclList.do?pageUnit=20', 2, { kind: 'offset', param: 'article.offset' }).includes('article.offset=20'), true);
+  eq('list.do 계열은 pageIndex를 먼저 시도', pageCandidates('https://x.ac.kr/list.do?menuNo=1', 2)[0].way.param, 'pageIndex');
+  eq('후보에 원래 주소는 넣지 않는다', pageCandidates(artcl, 2).every((c) => c.url !== artcl), true);
+  /* 🔴 '받아 왔지만 1페이지와 같다'를 걸러 내는 것이 이 기능의 안전장치다.
+     게시판이 파라미터를 무시하면 1페이지가 한 번 더 오는데, 그걸 못 걸러 내면
+     같은 공고를 몇 번씩 담는다(이슈 #75와 같은 유형). */
+  const first = ['a', 'b', 'c', 'd', 'e'];
+  eq('파라미터를 무시하는 게시판 = 같은 페이지', samePage(first, ['a', 'b', 'c', 'd', 'e']), true);
+  eq('진짜 2페이지는 다른 페이지', samePage(first, ['f', 'g', 'h', 'i', 'j']), false);
+  eq('아무것도 안 오면 다음 페이지가 없는 것', samePage(first, []), true);
+  // 고정 공지가 모든 페이지에 얹혀 오는 게시판이 있다 — 겹침이 조금 있는 것은 정상
+  eq('고정 공지가 겹쳐도 새 글이 있으면 다른 페이지', samePage(first, ['a', 'b', 'f', 'g', 'h']), false);
+  // 안 되는 게시판은 매일 다시 헤매지 않는다. 다만 영구 포기도 아니다(게시판은 개편된다)
+  eq('안 되는 게시판은 후보를 만들지 않는다', pageCandidates(artcl, 2, { ok: false }).length, 0);
+  eq('오늘 확인했으면 다시 시도하지 않는다',
+    shouldRetry({ ok: false, checkedAt: new Date().toISOString().slice(0, 10) }), false);
+  eq('14일 지나면 다시 시도한다', shouldRetry({ ok: false, checkedAt: '2026-07-01' }, new Date('2026-08-17')), true);
+  eq('기록이 없으면 시도한다', shouldRetry(null), true);
+  eq('알아낸 방식이 있으면 그것만 쓴다',
+    pageCandidates(artcl, 2, { ok: true, way: { kind: 'page', param: 'page' } }).length, 1);
+  const root = new URL('../', import.meta.url);
+  for (const f of ['collector/collect.mjs', 'collector/browser-collect.mjs']) {
+    const src = fs.readFileSync(new URL(f, root), 'utf8');
+    eq(`${f}가 2페이지 이후도 읽는다`, /readMorePages\(/.test(src), true);
+    // 알아낸 것을 저장하지 않으면 매 실행 처음부터 헤맨다 (이슈 #79와 같은 유형)
+    eq(`${f}가 알아낸 방식을 저장한다`, /pagination\.json/.test(src) && /writeFileSync\(pagePath/.test(src), true);
+  }
+  /* 브라우저 로봇에서는 '덤'이다 — 예산이 모자라면 손대지 않아야 한다.
+     2026-08-16에 덤으로 붙는 재시도가 멈춰 그날 수집분 전체를 잃은 것과 같은 계열. */
+  const bsrc = fs.readFileSync(new URL('collector/browser-collect.mjs', root), 'utf8');
+  eq('브라우저 로봇은 예산이 모자라면 페이지를 더 안 읽는다',
+    /if \(!budget\.hasRoom\(MIN_PER_TARGET_MS\)\) return \[\];/.test(bsrc), true);
+  for (const f of ['.github/workflows/collect-scholarships.yml', '.github/workflows/browser-collect.yml']) {
+    eq(`${f} 저장 목록에 페이지 기록이 있다`,
+      /git add collector\/pagination\.json/.test(fs.readFileSync(new URL(f, root), 'utf8')), true);
+  }
 }
 
 /* 학교별 공고 파일 (2026-08-17) — '학교당 16건'의 원인이던 전체 상한을 없앤 구조 */
