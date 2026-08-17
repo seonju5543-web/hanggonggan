@@ -173,6 +173,11 @@ async function ask(page, q) {
   await page.evaluate(() => { const s = document.querySelector('#chat-sheet'); if (s && !s.hidden) chatClose(); });
   await page.waitForTimeout(350);
   ok(await page.locator('#btn-chat-fab .mascot').count() > 0, '떠 있는 버튼이 마스코트로 바뀌었다');
+  /* 마스코트 이름은 개발자가 정한 것이라 코드가 마음대로 바꾸면 안 된다 */
+  const mascotName = (await page.textContent('#chat-title, .chat-title')) || '';
+  ok(mascotName.trim() === '대장님', "마스코트 이름이 '대장님'이다", mascotName.trim());
+  const askText = await page.textContent('#home-ask .ask-text');
+  ok(askText.includes('대장님'), '홈 진입줄도 같은 이름을 쓴다', askText);
 
   /* 손가락 동작을 흉내 내는 도우미 — pointer 이벤트를 직접 만들어 보낸다 */
   const press = (opts) => page.evaluate(async ({ hold, dx, dy }) => {
