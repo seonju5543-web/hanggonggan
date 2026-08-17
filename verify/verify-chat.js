@@ -83,23 +83,22 @@ async function ask(page, q) {
   ok(await page.isHidden('#btn-chat-fab'), '온보딩 중에는 떠 있는 버튼이 안 보인다');
   await onboard(page);
   await dismissNotify(page);
-  ok(await page.isVisible('#home-ask'), '홈에 물어보는 줄이 있다');
-  ok(await page.isVisible('#btn-chat-fab'), '온보딩이 끝나면 떠 있는 버튼이 보인다');
+  ok(await page.isVisible('#btn-chat-fab'), '온보딩이 끝나면 마스코트가 보인다');
+  /* 도우미로 들어가는 길은 마스코트 하나뿐이다 — 홈의 진입줄은 2026-08-17에 없앴다 */
+  ok(await page.locator('#home-ask').count() === 0, '홈 진입줄은 없앴다(길은 마스코트 하나)');
 
   /* 히어로의 '한 번에 신청' 버튼을 가리지 않는가 — 두 요소의 자리를 실제로 재서 확인 */
   const applyBox = await page.locator('#btn-apply-all').boundingBox();
-  const askBox = await page.locator('#home-ask').boundingBox();
   const fabBox = await page.locator('#btn-chat-fab').boundingBox();
-  ok(askBox.y > applyBox.y + applyBox.height - 1, '물어보는 줄은 신청 버튼 아래에 있다', { apply: applyBox.y, ask: askBox.y });
   const overlaps = fabBox.y < applyBox.y + applyBox.height && fabBox.y + fabBox.height > applyBox.y;
   ok(!overlaps, '떠 있는 버튼이 신청 버튼과 겹치지 않는다');
   const navBox = await page.locator('#bottom-nav').boundingBox();
   ok(fabBox.y + fabBox.height <= navBox.y + 1, '떠 있는 버튼이 하단 탭을 가리지 않는다', { fab: fabBox.y + fabBox.height, nav: navBox.y });
 
   console.log('\n[2] 열고 묻기');
-  await page.click('#home-ask');
+  await page.click('#btn-chat-fab');
   await page.waitForSelector('#chat-sheet:not([hidden])');
-  ok(true, '물어보는 줄을 누르면 도우미가 열린다');
+  ok(true, '마스코트를 누르면 도우미가 열린다');
   const chipCount = await page.locator('.chat-chip').count();
   ok(chipCount >= 3, '추천 질문이 보인다', { chipCount });
 
@@ -234,8 +233,6 @@ async function ask(page, q) {
   /* 마스코트 이름은 개발자가 정한 것이라 코드가 마음대로 바꾸면 안 된다 */
   const mascotName = (await page.textContent('#chat-title, .chat-title')) || '';
   ok(mascotName.trim() === '대장님', "마스코트 이름이 '대장님'이다", mascotName.trim());
-  const askText = await page.textContent('#home-ask .ask-text');
-  ok(askText.includes('대장님'), '홈 진입줄도 같은 이름을 쓴다', askText);
   /* 인사말 문구는 개발자가 직접 고른 것이라 코드가 바꾸면 안 된다 (2026-08-17) */
   const greet = await page.textContent('#chat-log .chat-row.bot');
   ok(greet.includes('저는 대장님이에요'), '인사말에서 이름을 말한다(개발자 지정 문구)', greet.slice(0, 40));

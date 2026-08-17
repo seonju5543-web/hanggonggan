@@ -1052,37 +1052,6 @@ textarea:focus {
    자리 원칙: 홈에서는 히어로 카드 **아래** 한 줄(‘한 번에 신청’ 버튼을 가리지 않는다),
    그 밖의 화면에서는 우하단 떠 있는 버튼. 하단 탭을 5개로 늘리지 않은 이유는
    도우미가 '가는 곳'이 아니라 '부르는 도구'이기 때문이다. */
-.ask-bar {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 48px;
-  padding: 12px 16px;
-  margin-bottom: 22px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow);
-  text-align: left;
-  transition: transform 0.12s, box-shadow 0.15s;
-}
-.ask-bar:active { transform: scale(0.99); box-shadow: none; }
-.ask-icon {
-  width: 30px;
-  height: 30px;
-  flex: 0 0 auto;
-  border-radius: 50%;
-  background: linear-gradient(150deg, var(--navy-2), var(--navy-1));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.ask-icon .mascot { width: 22px; height: 22px; }
-.ask-text { font-size: 14.5px; color: var(--text-weak); font-weight: 600; }
-
-/* 마스코트 버튼 — 자리는 chat.js가 정한다(꾹 눌러 옮기면 기기에 기억된다).
-   CSS의 right/bottom은 **아직 옮긴 적 없는 사용자의 첫 자리**일 뿐이다. */
 .chat-fab {
   position: fixed;
   right: max(16px, calc(50% - 240px + 16px));
