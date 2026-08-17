@@ -3,7 +3,8 @@
    결과는 일반 수집기와 같은 data/notices.json에 합쳐진다. */
 import fs from 'node:fs';
 import { chromium } from 'playwright';
-import { urlKey, dedupeNotices, capNotices } from './url-key.mjs';
+import { urlKey, dedupeNotices, capNotices, clickRowKey } from './url-key.mjs';
+import { loadCandidates, mergeCandidates, saveCandidates } from './candidates.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { isMenuEntry } from './clean-title.mjs';
 import { isDetailUrl, detailCandidates, sameTitle, idsFromSource } from './detail-url.mjs';
@@ -163,6 +164,7 @@ async function loadPage(url, { attempts = 3, lines = report, retryClosed = 1 } =
       .filter((l) => !isMenuEntry(l.title))
       .map((l) => l.url)).size;
     let clickTried = 0;
+    let clickSkipped = 0;   // 이미 아는 공고라 다시 누르지 않은 행 수 (2026-08-17)
     if (kwAnchors < 3) {
       /* 클릭 대상: onclick 속성 행 + javascript: 가짜 주소 링크 + 해시(#) 가짜 주소 링크.
          셋째는 2026-08-07 추가 — 부산대 onestop은 행이 `<a href="#popup">`이고 클릭 처리는
@@ -173,14 +175,26 @@ async function loadPage(url, { attempts = 3, lines = report, retryClosed = 1 } =
       const CLICKABLE = '[onclick], a[href^="javascript"], a[href^="#"]';
       // 클릭 스크립트가 넘기는 글 번호(src)도 함께 받아 둔다 — 경희처럼 클릭이 form POST라
       // 주소창이 안 바뀌는 게시판은 이 번호가 원문 주소를 만드는 유일한 재료다 (2026-07-31)
-      const clickRows = await page.$$eval(CLICKABLE, (els) => els
+      /* 화면에서는 넉넉히(80행) 받아 두고, **이미 아는 공고를 걸러낸 뒤에** 40건을 고른다.
+         순서가 중요하다 — 예전처럼 화면에서 40행을 먼저 자르면, 위쪽 40행이 전부 아는
+         공고인 게시판에서는 41번째의 새 공고에 영영 닿지 못한다. */
+      const rawRows = await page.$$eval(CLICKABLE, (els) => els
         .map((e, i) => ({
           i,
           t: (e.textContent || '').replace(/\s+/g, ' ').trim(),
           src: [e.getAttribute('onclick') || '', e.getAttribute('href') || '', e.getAttribute('data-id') || ''].join('|'),
         }))
         .filter((x) => /장학|학자금/.test(x.t) && x.t.length >= 10 && x.t.length <= 120)
-        .slice(0, 40).map((x) => [x.i, x.t, x.src])).catch(() => []);
+        .slice(0, 80).map((x) => [x.i, x.t, x.src])).catch(() => []);
+      /* 🔴 이미 채집한 행은 다시 누르지 않는다 (2026-08-17).
+         클릭형 게시판은 눌러 봐야 주소를 알 수 있어서, 예전엔 **장부를 보지 않고** 매 실행
+         40행을 전부 다시 눌렀다. 클릭 한 번에 상세 열기·읽기·되돌아오기로 몇 초씩 들고
+         게시판 예산은 180초라, **아는 공고를 다시 누르는 데 예산을 다 쓰고 목록 아래쪽의
+         새 공고에는 닿지 못한 채 끊겼다.** 2026-08-17 실행에서 중앙대가 정확히 그랬다
+         ("클릭 예산 초과 — 11/15건까지 채집" — 나머지 4건은 열어 보지도 못함).
+         행에는 주소가 없으므로 **게시판+제목**으로 장부를 만든다(clickRowKey). */
+      const clickRows = rawRows.filter(([, t]) => !seen[clickRowKey(url, t)]).slice(0, 40);
+      clickSkipped = rawRows.length - clickRows.length;
       let ci = 0;
       clickTried = clickRows.length;
       const usedUrls = new Set(); // 상세 주소가 전부 같은 게시판(내부 전송형) 대응
@@ -257,6 +271,11 @@ async function loadPage(url, { attempts = 3, lines = report, retryClosed = 1 } =
           }
           usedUrls.add(recUrl);
           links.push({ title, url: recUrl });
+          /* 이 행이 '이미 수집한 공고'로 밝혀졌으면 지금 장부에 적어 둔다 — 안 적으면
+             아래 상세 루프가 (이미 seen이라) 건드리지 않아 다음 실행에 또 누르게 된다.
+             새로 수집되는 행은 상세 루프가 적는다(그쪽이 '진짜 저장됐다'는 확증). */
+          const known = seen[urlKey(recUrl)] || seen[recUrl];
+          if (known) seen[clickRowKey(url, title)] = known;
           clickDetails[title] = { deadlineHint: dm ? dm[0].trim().slice(0, 80) : null, attachments: atts };
           if (popup) await popup.close().catch(() => {});
           else if (page.url() !== url) await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 }).catch(() => {});
@@ -275,7 +294,7 @@ async function loadPage(url, { attempts = 3, lines = report, retryClosed = 1 } =
     ).catch(() => []);
     const frameCount = page.frames().length;
     await page.close();
-    return { links, html, textLines, frameCount, clickDetails, clickTried };
+    return { links, html, textLines, frameCount, clickDetails, clickTried, clickSkipped };
   } catch (e) {
     await page.close().catch(() => {});
     // 오류 문구는 한 줄로 (Playwright의 'Call log:' 여러 줄이 리포트를 깨뜨리던 것 정리)
@@ -310,9 +329,14 @@ async function harvestTarget(t, report) {
       .filter((l) => !isAttachmentEntry(l));
     // 중복 판정은 정규화 주소로 — 시립대처럼 정렬 순번(sort=)이 주소에 붙는 게시판 대응
     const uniq = [...new Map(items.map((i) => [urlKey(i.url), i])).values()];
-    report.push(`- ${uniq.length ? '✅' : '⚪'} 링크 ${r.links.length} · 장학 공고 ${uniq.length} · ${url}`);
-    // 진단: 공고를 거의 못 알아본 게시판은 화면에서 본 것을 남겨 원인 파악을 돕는다
-    if (uniq.length <= 1 && r.links.length > 5) {
+    /* 이미 아는 행을 건너뛰면 '장학 공고 N'이 줄어드는 게 정상이다. 그 사실을 적지 않으면
+       리포트만 보고 "공고가 줄었다 = 로봇이 고장났다"로 읽게 된다 (2026-08-17). */
+    const skipNote = r.clickSkipped ? ` · 이미 아는 공고 ${r.clickSkipped}건은 다시 열지 않음` : '';
+    report.push(`- ${uniq.length ? '✅' : '⚪'} 링크 ${r.links.length} · 장학 공고 ${uniq.length}${skipNote} · ${url}`);
+    /* 진단: 공고를 거의 못 알아본 게시판은 화면에서 본 것을 남겨 원인 파악을 돕는다.
+       단 '아는 공고를 건너뛰어서 0건'인 경우는 고장이 아니므로 진단을 쏟아내지 않는다 —
+       매일 정상 게시판마다 (본 링크) 열 줄씩 쌓이면 리포트가 이슈 한도를 넘긴다. */
+    if (uniq.length <= 1 && r.links.length > 5 && !r.clickSkipped) {
       report.push(`  - (프레임 ${r.frameCount || 1}개 · 클릭 시도 ${r.clickTried || 0}건)`);
       (r.textLines || []).forEach((s) => report.push(`  - (본 글자) ${s.slice(0, 66)}`));
       const sample = [...new Map(r.links
@@ -365,6 +389,9 @@ async function harvestTarget(t, report) {
         foundAt: new Date().toISOString().slice(0, 10),
       };
       seen[urlKey(it.url)] = rec.foundAt;
+      /* 클릭형 게시판이면 '이 행은 처리했다'도 함께 적는다 — 다음 실행이 다시 누르지 않게.
+         클릭이 아닌 게시판에도 적히지만 해가 없고, 나중에 그 게시판이 클릭형으로 바뀌면 그대로 쓰인다. */
+      seen[clickRowKey(url, it.title)] = rec.foundAt;
       freshAll.push(rec);
       report.push(`  - [수집] ${it.title.slice(0, 70)}`);
     }
@@ -517,6 +544,12 @@ notices.items = notices.items.filter((n) => !isAttachmentEntry(n));
 notices.items = dedupeNotices(notices.items);
 /* 학교당 40건 · 전체는 학교 수에 비례 (학교 수 × 15건, 최소 200건).
    상한이 200건 고정이던 시절엔 학교를 더 붙이면 오래된 공고가 조용히 잘려 나갔다. */
+/* 검수 후보 장부에도 남긴다 (2026-08-17) — 아래 capNotices가 잘라내도 여기에는 남는다.
+   상한은 **폰이 받는 파일**을 작게 유지하려는 것이지 '이 공고는 볼 필요 없다'는 뜻이 아닌데,
+   예전엔 잘린 공고가 seen.json에만 '봤다'로 남아 다시 수집되지도, 검수되지도 않았다
+   (2026-08-17 실측 747건 유실). 경위는 collector/candidates.mjs 첫머리. */
+saveCandidates(mergeCandidates(loadCandidates().items, freshAll));
+
 notices.items = capNotices(notices.items);
 notices.updatedAt = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
 fs.writeFileSync(seenPath, JSON.stringify(seen, null, 1));

@@ -48,15 +48,36 @@ export function urlKey(raw) {
    같은 게시판을 일반 수집기와 브라우저 수집기가 각각 훑거나, 브라우저 수집기가 링크와
    클릭 수집을 모두 성공했을 때 생긴다. 주소가 아예 다르므로 urlKey로는 못 걸러진다.
    그래서 '학교 + 제목'을 두 번째 열쇠로 쓴다. */
-export function titleKey(item) {
-  const t = (item.title || '')
+export function normTitle(title) {
+  return (title || '')
     .replace(/^\d{3,5}\s+/, '')                 // 목록 행 번호
     .replace(/\s*20\d{2}\.\d{1,2}\.\d{1,2}\.?\s*조회\s*\d+\s*$/, '')
     .replace(/신규게시글|Attachment|새글|공지/g, '')
     .replace(/[\s\[\]()·ㆍ~〜.,'"“”‘’!⭐★]/g, '')
     .toLowerCase();
+}
+
+export function titleKey(item) {
+  const t = normTitle(item.title);
   if (!t) return '';
   return `${item.school || ''}|${item.campus || ''}|${t}`;
+}
+
+/* 클릭형 게시판의 '이 행을 이미 눌러 봤나' 열쇠 (2026-08-17).
+
+   클릭형 게시판(중앙·경희·동국·부산·서울교대…)은 행을 **눌러 봐야** 주소를 알 수 있다.
+   그래서 주소로 만든 장부(seen)로는 "이 행이 이미 아는 공고인가"를 누르기 전에 물어볼 수
+   없었고, 로봇은 매 실행 40행을 전부 다시 눌렀다. 게시판 예산 180초를 아는 공고에 다 쓰고
+   목록 아래쪽 **새 공고에는 닿지 못한 채** 끊기던 것이 이 때문이다.
+
+   그래서 주소 대신 **게시판 + 제목**으로 열쇠를 만든다. 제목 다듬기는 titleKey와 같은
+   함수(normTitle)를 쓴다 — 갈라지면 "중복 판정은 같은 글이라는데 클릭 장부는 다른 글"이라는
+   엇갈림이 생긴다. 게시판 주소는 urlKey로 정규화해, 정렬 순번 같은 군더더기가 붙어도
+   같은 게시판으로 본다. */
+export function clickRowKey(listUrl, title) {
+  const t = normTitle(title);
+  if (!t) return '';
+  return `click:${urlKey(listUrl)}|${t.slice(0, 80)}`;
 }
 
 /* 두 항목 중 사용자에게 더 나은 쪽 — 공고로 바로 가는 진짜 주소를 남긴다

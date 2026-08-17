@@ -15,6 +15,22 @@ const path = require('path');
 
 const ROOT = fs.existsSync('data/notices.json') ? '.' : path.join(__dirname, '..');
 const notices = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/notices.json'), 'utf8'));
+/* 검수 후보는 **후보 장부**에서 본다 (2026-08-17).
+   data/notices.json은 폰이 통째로 내려받는 파일이라 크기 상한이 걸려 있어서,
+   학교가 41곳이 된 뒤로 바쁜 학교는 16건에서 잘리고 있었다. 잘린 공고는 seen.json에
+   '봤다'로만 남아 **다시 수집되지도, 검수되지도 않았다**(2026-08-17 실측 747건).
+   앱 파일과 검수 기록을 분리한 것이 collector/candidates.json — 상한이 없다.
+   경위는 collector/candidates.mjs 첫머리 주석. */
+const poolPath = path.join(ROOT, 'collector/candidates.json');
+let pool = notices.items;
+let poolLabel = 'data/notices.json (앱 파일)';
+if (fs.existsSync(poolPath)) {
+  const c = JSON.parse(fs.readFileSync(poolPath, 'utf8'));
+  if (Array.isArray(c.items) && c.items.length) {
+    pool = c.items;
+    poolLabel = `collector/candidates.json (후보 장부 · 앱 파일 ${notices.items.length}건 + 상한에 밀린 것까지)`;
+  }
+}
 const registered = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/registered.json'), 'utf8'));
 const showAll = process.argv.includes('--all');
 const TODAY = new Date().toISOString().slice(0, 10);
@@ -53,7 +69,7 @@ function pastDeadline(n) {
 }
 
 const buckets = { candidate: [], duplicate: [], nonNotice: [], past: [] };
-for (const n of notices.items) {
+for (const n of pool) {
   let why = 'candidate';
   if (isRegistered(n.url)) why = 'duplicate';
   else if (NON_NOTICE.test(n.title) || LOAN.test(n.title) || EVENT.test(n.title) || MENU_TAIL.test(n.title) || n.title.length < 8) why = 'nonNotice';
@@ -84,7 +100,8 @@ for (const [k, items] of Object.entries(bySchool)) {
 }
 
 console.log(`\n=== 요약 ===`);
-console.log(`등록 후보 ${buckets.candidate.length} · 이미 등록(중복) ${buckets.duplicate.length} · 비공고/메뉴/대출/행사 ${buckets.nonNotice.length} · 마감경과 ${buckets.past.length} · 전체 ${notices.items.length}`);
+console.log(`등록 후보 ${buckets.candidate.length} · 이미 등록(중복) ${buckets.duplicate.length} · 비공고/메뉴/대출/행사 ${buckets.nonNotice.length} · 마감경과 ${buckets.past.length} · 전체 ${pool.length}`);
+console.log(`읽은 곳: ${poolLabel}`);
 console.log(`현재 정식 등록: ${registered.items.length}건`);
 
 if (showAll) {

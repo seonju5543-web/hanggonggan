@@ -8,6 +8,7 @@
    ============================================================ */
 import fs from 'node:fs';
 import { urlKey, dedupeNotices, capNotices } from './url-key.mjs';
+import { loadCandidates, mergeCandidates, saveCandidates } from './candidates.mjs';
 import { cleanTitle, isMenuEntry } from './clean-title.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 
@@ -250,6 +251,12 @@ notices.items = notices.items.filter((n) => !isAttachmentEntry(n));
 notices.items = dedupeNotices(notices.items);
 /* 학교당 40건 · 전체는 학교 수에 비례 (학교 수 × 15건, 최소 200건).
    상한이 200건 고정이던 시절엔 학교를 더 붙이면 오래된 공고가 조용히 잘려 나갔다. */
+/* 검수 후보 장부에도 남긴다 (2026-08-17) — 아래 capNotices가 잘라내도 여기에는 남는다.
+   상한은 **폰이 받는 파일**을 작게 유지하려는 것이지 '이 공고는 볼 필요 없다'는 뜻이 아닌데,
+   예전엔 잘린 공고가 seen.json에만 '봤다'로 남아 다시 수집되지도, 검수되지도 않았다
+   (2026-08-17 실측 747건 유실). 경위는 collector/candidates.mjs 첫머리. */
+saveCandidates(mergeCandidates(loadCandidates().items, freshAll));
+
 notices.items = capNotices(notices.items);
 notices.updatedAt = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
 fs.mkdirSync(new URL('../data/', HERE), { recursive: true });

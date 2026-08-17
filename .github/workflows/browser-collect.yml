@@ -134,6 +134,9 @@ jobs:
           # 학교 순서 회전 커서 — 예산에 걸려 건너뛴 학교가 다음 실행의 맨 앞이 된다.
           # 이게 저장 안 되면 매 실행 같은 학교(설정 파일 뒤쪽)만 계속 잘린다.
           [ -f collector/browser-cursor.json ] && git add collector/browser-cursor.json
+          # 검수 후보 장부 — 앱 파일(notices.json)의 크기 상한에 밀린 공고까지 담는다.
+          # 빠뜨리면 매 실행 되살아났다 다시 사라져, 컨펌 대상이 조용히 증발한다 (2026-08-17).
+          [ -f collector/candidates.json ] && git add collector/candidates.json
           [ -f collector/health.json ] && git add collector/health.json
           [ -f collector/pending-forms.json ] && git add collector/pending-forms.json
           [ -d collector/extracted ] && git add collector/extracted
