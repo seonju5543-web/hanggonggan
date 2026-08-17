@@ -236,6 +236,9 @@ async function ask(page, q) {
   ok(mascotName.trim() === '대장님', "마스코트 이름이 '대장님'이다", mascotName.trim());
   const askText = await page.textContent('#home-ask .ask-text');
   ok(askText.includes('대장님'), '홈 진입줄도 같은 이름을 쓴다', askText);
+  /* 인사말 문구는 개발자가 직접 고른 것이라 코드가 바꾸면 안 된다 (2026-08-17) */
+  const greet = await page.textContent('#chat-log .chat-row.bot');
+  ok(greet.includes('저는 대장님이에요'), '인사말에서 이름을 말한다(개발자 지정 문구)', greet.slice(0, 40));
 
   /* 손가락 동작을 흉내 내는 도우미 — pointer 이벤트를 직접 만들어 보낸다 */
   const press = (opts) => page.evaluate(async ({ hold, dx, dy }) => {
