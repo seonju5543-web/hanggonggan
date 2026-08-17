@@ -36,10 +36,16 @@ export function looseCandidate(title) {
    바뀌어 "규칙을 고쳤더니 누락이 사라졌다"는 착시가 생긴다. 감사는 독립이어야 한다. */
 export function fingerprint(title) {
   return String(title || '')
-    .replace(/^\d{1,5}\s+/, '')
-    .replace(/\s*20\d{2}[.\-/]\d{1,2}[.\-/]\d{1,2}\.?\s*/g, ' ')
-    .replace(/조회\s*\d+/g, ' ')
+    .replace(/^\d{1,5}\s+/, '')                                        // 목록 행 번호
+    .replace(/\s*20\d{2}[.\-/]\d{1,2}[.\-/]\d{1,2}\.?\s*/g, ' ')      // 작성일
+    .replace(/조회\s*수?\s*[\d,]+/g, ' ')                                // '조회수 1,250'
     .replace(/신규게시글|새글|Attachment|N$/g, ' ')
+    /* 🔴 꼬리에 붙은 숫자를 뗀다 (2026-08-17 거짓 누락의 원인).
+       한국항공대 게시판은 제목·부서·작성일·**조회수**를 한 칸에 그려서, 조회수가 늘면
+       같은 공고의 지문이 달라진다. 실제로 '…2026-08-10 69'로 수집한 공고가 감사 때는
+       '…2026-08-10 269'가 되어 **22건 전부 누락(인식 0%)**으로 잘못 보고됐다.
+       조회수는 매시간 바뀌므로 이걸 지문에 넣으면 그 게시판은 영영 '전부 누락'이 된다. */
+    .replace(/[\d,]{2,}\s*$/, ' ')
     .replace(/[^가-힣a-z0-9]/gi, '')
     .toLowerCase()
     .slice(0, 60);
@@ -84,6 +90,10 @@ export function looksLikeBoardChrome(title) {
   /* 아이콘 글꼴(Material Icons)의 리거처 이름이 메뉴 링크 글자에 섞여 나온다 —
      '장학금안내(서울) chevron_right' 처럼. 공고 제목에는 절대 안 붙는다. */
   if (/\b(chevron_right|chevron_left|open_in_new|expand_more|expand_less|keyboard_arrow_\w+|arrow_forward|menu|search)\b/.test(t)) return true;
+  /* 전화번호·내선번호 조각 — 경북대 게시판의 '교내장학금 : 053-950-2103',
+     '글로컬대학사업, Bk21장학금: 2108' 같은 안내 표가 행으로 잡혔다. 공고가 아니다. */
+  if (/\d{2,4}-\d{3,4}-\d{4}/.test(t)) return true;
+  if (/[:：]\s*[\d\-,\s]{3,}$/.test(t) && !HAS_DATE.test(t.replace(/[:：][\d\-,\s]+$/, ''))) return true;
   const menuHits = (t.match(MENU_WORDS) || []).length;
   if (menuHits >= 3) return true;                       // 메뉴 낱말이 셋 이상 = 메뉴 덩어리
   if (menuHits >= 2 && !HAS_DATE.test(t)) return true;  // 둘 + 날짜 없음
