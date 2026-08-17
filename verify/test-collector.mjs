@@ -9,6 +9,7 @@ import { urlKey, titleKey, dedupeNotices, preferNotice, capNotices, clickRowKey 
 import { mergeCandidates } from '../collector/candidates.mjs';
 import { publishBySchool, splitBySchool } from '../collector/publish-notices.mjs';
 import { pageCandidates, pageUrl, existingPageParam, samePage, shouldRetry } from '../collector/paginate.mjs';
+import { looseCandidate, sameNotice, findMissing, classifyMiss, coverageOf } from '../collector/coverage-rules.mjs';
 import { createRequire } from 'node:module';
 import { isAttachmentEntry, isHtmlPayload } from '../collector/attachment-link.mjs';
 import { isDetailUrl, isMarkerUrl, markerTitle, sameTitle, detailCandidates, looksLikeLoginWall, rowDetailCandidates } from '../collector/detail-url.mjs';
@@ -519,6 +520,88 @@ console.log('\n■ 클릭형 게시판 장부 (아는 행을 다시 누르지 �
   // 이미 아는 공고로 밝혀진 행도 적어야 한다 — 안 적으면 상세 루프가 안 건드려 영영 다시 누른다
   eq('이미 아는 공고로 밝혀진 행도 장부에 적는다', /if \(known\) seen\[clickRowKey\(url, title\)\] = known;/.test(src), true);
   eq('건너뛴 건수를 리포트에 적는다 (공고가 준 것처럼 보이지 않게)', /이미 아는 공고 \$\{r\.clickSkipped\}건/.test(src), true);
+}
+
+/* 누락 감사 (2026-08-17) — 로봇은 자기가 읽은 것만 알아서 스스로는 누락을 셀 수 없다.
+   그래서 게시판을 별도로 다시 읽어 대조한다. 이 절의 검사들이 지키는 것은
+   **감사가 수집기와 같은 그물을 쓰지 않는다**는 점이다 — 같으면 언제나 '누락 0건'이 된다. */
+console.log('\n■ 누락 감사 (감사가 수집기의 맹점을 물려받지 않는가)');
+{
+  const root = new URL('../', import.meta.url);
+  /* 🔴 이 절의 핵심 검사. 감사 그물이 수집기 그물보다 넓어야 한다.
+     '면학보조금'은 수집기가 못 잡는 대표 사례인데, 감사도 못 잡으면 누락을 영영 못 본다. */
+  const HARVEST = /장학|학자금|등록금 감면|학업장려|근로장학/;
+  const onlyLoose = ['2026-2학기 면학보조금 지급 안내', '2026학년도 2학기 수업료 감면 신청 안내',
+    '2026학년도 2학기 학업지원 프로그램 참가자 모집', '2026년 2학기 생활비 지원 신청 안내'];
+  for (const t of onlyLoose) {
+    eq(`감사 그물이 '${t.slice(0, 14)}…'를 후보로 집는다`, looseCandidate(t), true);
+    eq(`  (수집기 그물은 못 잡는다 — 그래서 감사가 필요하다)`, HARVEST.test(t), false);
+  }
+  // 너무 짧거나 긴 것은 행 부스러기다 (감사도 무한정 넓으면 리포트가 잡음으로 덮인다)
+  eq('짧은 부스러기는 후보가 아니다', looseCandidate('장학'), false);
+  eq('장학과 무관한 제목은 후보가 아니다', looseCandidate('2026학년도 2학기 수강신청 안내입니다'), false);
+
+  // 제목 대조 — 게시판 목록의 부스러기(행 번호·조회수·새글)에 흔들리면 멀쩡한 공고를 누락으로 센다
+  eq('행 번호·새글 표식을 무시하고 같은 글로 본다',
+    sameNotice('1234 2026학년도 2학기 교내장학금 신청 안내 새글', '2026학년도 2학기 교내장학금 신청 안내'), true);
+  eq('제목이 잘려도 같은 글로 본다',
+    sameNotice('2026학년도 2학기 성적우수장학금 신청 안내(8월 20일까지)', '2026학년도 2학기 성적우수장학금 신청 안내'), true);
+  eq('다른 공고는 다른 글로 본다', sameNotice('제1호 교내장학금 신청', '제2호 교내장학금 신청'), false);
+  eq('짧은 제목은 우연히 겹쳐도 같다고 하지 않는다', sameNotice('장학 안내', '교내 장학 안내 공고문'), false);
+  eq('우리 데이터에 있는 것은 누락이 아니다',
+    findMissing(['2026학년도 2학기 성적우수장학금 신청'], ['2026학년도 2학기 성적우수장학금 신청']).length, 0);
+  eq('우리 데이터에 없는 것만 누락',
+    findMissing(['A 2026 성적우수장학금 신청 안내', 'B 2026 면학보조금 지급 안내'], ['A 2026 성적우수장학금 신청 안내']).length, 1);
+
+  /* 원인 분류 — '몇 건 누락'이 아니라 '무엇을 고쳐야 하나'가 나와야 값이 있다 */
+  const deps = { keywords: HARVEST, isMenuEntry, isAttachmentEntry: () => false };
+  eq('키워드 밖으로 가른다', classifyMiss('2026-2학기 면학보조금 지급 안내', deps), '키워드 밖');
+  eq('메뉴로 걸러진 것을 가른다', classifyMiss('학자금 대출', deps), '메뉴로 걸러짐');
+  eq('2페이지 이후를 가른다',
+    classifyMiss('2026학년도 2학기 성적우수장학금 선발 공고', { ...deps, page: 2 }), '2페이지 이후');
+  /* 수집기 규칙을 다 통과하는데 없는 것 = 진짜 문제. 이 이름이 바뀌면 리포트·워크플로도 어긋난다 */
+  eq('규칙을 다 통과하는데 없으면 원인 미상',
+    classifyMiss('2026학년도 2학기 성적우수장학금 선발 공고', { ...deps, page: 1 }), '원인 미상');
+  eq('게시판을 못 읽었으면 비율을 말하지 않는다', coverageOf(0, 0), null);
+  eq('비율 계산', coverageOf(10, 2), 80);
+
+  const src = fs.readFileSync(new URL('collector/audit-coverage.mjs', root), 'utf8');
+  /* 🔴 감사는 아무것도 고치지 않는다. 데이터를 만지면 감사가 만든 변화를 감사가 다시 재는
+     순환이 생긴다. 쓰기는 자기 리포트 둘뿐이어야 한다. */
+  /* 쓰기 대상을 **끝까지 따라가서** 확인한다. 인자가 변수면 그 선언을 찾아 실제 파일명을 본다 —
+     변수 이름만 보면 `writeFileSync(histPath, …)`가 무엇을 쓰는지 알 수 없어 검사가 헛돈다. */
+  const writeArgs = [...src.matchAll(/writeFileSync\(\s*([^,]+?)\s*,/g)].map((m) => m[1].trim());
+  const resolveTarget = (arg) => {
+    const lit = arg.match(/new URL\('([^']+)'/);
+    if (lit) return lit[1];
+    const decl = src.match(new RegExp(`(?:const|let)\\s+${arg.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')}\\s*=\\s*new URL\\('([^']+)'`));
+    return decl ? decl[1] : arg;                      // 못 따라가면 원문을 그대로 넘겨 실패하게 둔다
+  };
+  const writes = writeArgs.map(resolveTarget);
+  eq('감사가 쓰는 파일이 둘뿐', writes.length, 2);
+  eq('감사가 쓰는 파일은 자기 리포트뿐 (실제 파일명까지 확인)',
+    writes.every((w) => /^coverage-(report\.md|history\.json)$/.test(w)), true);
+  eq('감사가 seen.json을 고치지 않는다', /writeFileSync\([^)]*seen/.test(src), false);
+  eq('감사가 notices.json을 고치지 않는다', /writeFileSync\([^)]*notices/.test(src), false);
+  // 주소를 못 받은 학교를 누락으로 세면 매일 같은 경고가 떠서 진짜 문제가 묻힌다
+  eq('주소가 있는 게시판만 감사한다', /s\.boardUrl \? \[s\.boardUrl\] : null/.test(src), true);
+  // '못 읽음'을 '괜찮음'으로도 '누락'으로도 단정하지 않는다 (동국대 교훈과 같은 계열)
+  eq("못 읽은 게시판은 '판정 불가'로 다룬다", /verdict: 'unreadable'/.test(src), true);
+  eq('학교 하나에 절대 시한이 있다', /withDeadline\(/.test(src) && /PER_SCHOOL_MS/.test(src), true);
+  /* 원인을 가를 때 쓰는 수집기 그물은 수집기의 것과 **같아야** 한다.
+     갈라지면 '키워드 밖'이라는 진단 자체가 거짓이 된다. */
+  const audited = (src.match(/HARVEST_KEYWORDS = (\/[^\n]+\/);/) || [])[1];
+  for (const f of ['collector/collect.mjs', 'collector/browser-collect.mjs']) {
+    const k = (fs.readFileSync(new URL(f, root), 'utf8').match(/KEYWORDS = (\/[^\n]+\/);/) || [])[1];
+    eq(`감사의 수집기 그물 사본이 ${f}와 같다`, audited === k, true);
+  }
+  const yml = fs.readFileSync(new URL('.github/workflows/audit-coverage.yml', root), 'utf8');
+  eq('감사 워크플로가 리포트만 저장한다',
+    [...yml.matchAll(/git add (\S+)/g)].every((m) => m[1].startsWith('collector/coverage')), true);
+  // 상한을 넘긴 작업은 '실패'가 아니라 '취소'로 끝난다 — cancelled()가 없으면 알림을 건너뛴다
+  eq('시간 초과에도 알림이 간다', /failure\(\) \|\| cancelled\(\)/.test(yml), true);
+  // 수집 로봇과 같은 대기줄에 넣으면 감사가 조용히 취소된다
+  eq('수집 로봇과 다른 대기줄을 쓴다', /group: audit-coverage/.test(yml), true);
 }
 
 /* 목록 페이지 넘기기 (2026-08-17) — 1페이지만 읽어 상단 고정 공지에 밀린 실공고를 놓치던 것 */

@@ -1,0 +1,109 @@
+name: 공고 누락 감사
+
+# 게시판을 수집기와 **별도로 다시 읽어** 빠진 공고를 찾는다 (2026-08-17 개발자 지시).
+# 로봇은 자기가 읽은 것만 알아서 스스로는 누락을 셀 수 없다 — 그래서 바깥에서 대조한다.
+on:
+  schedule:
+    - cron: '23 21 * * 1'    # 매주 월요일 06:23 KST (수집 예약과 겹치지 않는 홀수 분)
+  workflow_dispatch:
+  push:
+    branches: ['claude/nice-heisenberg-WESq5']
+    paths:
+      - 'collector/run-audit-coverage.txt'   # 이 파일을 고쳐 push하면 즉시 실행 (push-to-run)
+
+permissions:
+  contents: write
+  issues: write
+
+# 수집 로봇과 **다른 대기줄**을 쓴다 — 같은 줄에 넣으면 감사가 수집을 기다리게 하거나
+# GitHub이 오래된 대기분을 취소해 감사가 조용히 사라진다 (되가져오기 로봇에서 겪은 일).
+concurrency:
+  group: audit-coverage
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    # 상한 = 감사 예산 20분 + 준비·저장 여유. 예산을 스스로 지키므로 취소되지 않아야 한다.
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+      - name: 협업 병합기 등록 (충돌 자동 해소 — COLLAB.md)
+        run: bash tools/setup-collab.sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm init -y >/dev/null && npm i playwright@1 --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+
+      - id: run
+        name: 누락 감사 (게시판 재집계 → 우리 데이터와 대조)
+        timeout-minutes: 24
+        continue-on-error: true
+        run: node collector/audit-coverage.mjs
+
+      # 🔴 감사는 아무것도 고치지 않는다. 그래서 저장 목록에 **리포트 둘만** 넣는다.
+      # 여기에 seen.json이나 data/*.json을 추가하면 감사가 데이터를 만지게 되고,
+      # 감사가 만든 변화를 감사가 다시 재는 순환이 생긴다. 절대 늘리지 말 것.
+      - name: 리포트 저장
+        if: always()
+        run: |
+          git config user.name "handaejang-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          [ -f collector/coverage-report.md ] && git add collector/coverage-report.md
+          [ -f collector/coverage-history.json ] && git add collector/coverage-history.json
+          true
+          if ! git diff --cached --quiet; then
+            git commit -m "coverage-audit: 누락 감사 결과"
+            pushed=0
+            for i in 1 2 3; do
+              if git push; then pushed=1; break; fi
+              git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
+            done
+            if [ "$pushed" != "1" ]; then
+              echo "::error::감사 리포트 push 실패 — 3회 재시도 모두 실패"
+              exit 1
+            fi
+          fi
+
+      # 결과를 이슈로 — '원인 미상'이 있을 때만. 없으면 조용히 끝낸다(정상 세션에 소음 0).
+      - name: 결과 이슈 (원인 미상이 있을 때만)
+        if: steps.run.outcome == 'success' && steps.run.outputs.unknown != '' && steps.run.outputs.unknown != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BODY=collector/coverage-report.md
+          LIMIT=60000
+          if [ "$(wc -c < "$BODY")" -gt "$LIMIT" ]; then
+            head -c "$LIMIT" "$BODY" > /tmp/cut.md
+            printf '\n\n---\n> ⚠️ 리포트가 길어 잘렸습니다. 전문은 `collector/coverage-report.md`.\n' >> /tmp/cut.md
+            BODY=/tmp/cut.md
+          fi
+          gh issue create \
+            --title "🔍 공고 누락 감사 $(TZ=Asia/Seoul date +%Y-%m-%d) (원인 미상 ${{ steps.run.outputs.unknown }}건)" \
+            --body-file "$BODY" \
+            --repo "${{ github.repository }}" \
+            --label "coverage-audit" \
+            --assignee "${{ github.repository_owner }}" \
+            --assignee "Se-Hyeon-Jo" || \
+          gh issue create \
+            --title "🔍 공고 누락 감사 $(TZ=Asia/Seoul date +%Y-%m-%d) (원인 미상 ${{ steps.run.outputs.unknown }}건)" \
+            --body-file "$BODY" --repo "${{ github.repository }}"
+
+      # cancelled()까지 봐야 한다 — 상한을 넘긴 작업은 '실패'가 아니라 '취소'로 끝나서
+      # failure()만 보면 알림을 건너뛴다 (2026-08-04에 실제로 뚫린 구멍).
+      - name: 🚨 감사가 끝까지 못 갔을 때
+        if: failure() || cancelled() || steps.run.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          {
+            printf '감사 로봇이 끝까지 못 갔습니다(실패 또는 시간 초과).\n\n'
+            printf '실행 로그: %s\n\n' "$RUN_URL"
+            printf '수집 로봇에는 영향이 없습니다 — 감사는 데이터를 고치지 않습니다.\n'
+          } > /tmp/audit-fail.md
+          gh issue create \
+            --title "🚨 공고 누락 감사 실패 $(TZ=Asia/Seoul date +%Y-%m-%d)" \
+            --body-file /tmp/audit-fail.md \
+            --repo "${{ github.repository }}" --label "coverage-audit" || true
