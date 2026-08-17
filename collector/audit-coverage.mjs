@@ -23,8 +23,8 @@
 import fs from 'node:fs';
 import { chromium } from 'playwright';
 import { createRequire } from 'node:module';
-import { looseCandidate, findMissing, classifyMiss, coverageOf, fingerprint } from './coverage-rules.mjs';
-import { makeBudget, withDeadline, TIMED_OUT } from './harvest-budget.mjs';
+import { looseCandidate, findMissing, classifyMiss, coverageOf, fingerprint, dedupeNear } from './coverage-rules.mjs';
+import { makeBudget, withDeadline, TIMED_OUT, rotateOrder, nextCursor } from './harvest-budget.mjs';
 import { pageCandidates, samePage } from './paginate.mjs';
 import { isMenuEntry } from './clean-title.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
@@ -33,7 +33,11 @@ import { urlKey } from './url-key.mjs';
 const HERE = new URL('.', import.meta.url);
 const require = createRequire(import.meta.url);
 
-const BUDGET_MS = Number(process.env.AUDIT_BUDGET_MS || 20 * 60000);
+/* 첫 실행(2026-08-17)은 20분 예산으로 학교 **16곳만** 보고 23곳을 건너뛰었다.
+   학교당 75초쯤 드니 41곳을 한 번에 보려면 35분이 필요하다. 그래서 예산을 늘리고,
+   그래도 남으면 **다음 실행이 건너뛴 학교부터** 시작하도록 회전시킨다(수집 로봇과 같은 방식) —
+   회전이 없으면 설정 파일 뒤쪽 학교는 영영 감사되지 않는다. */
+const BUDGET_MS = Number(process.env.AUDIT_BUDGET_MS || 35 * 60000);
 const PER_SCHOOL_MS = Number(process.env.AUDIT_PER_SCHOOL_MS || 150000);   // 학교 하나 절대 시한
 const PAGES = Number(process.env.AUDIT_PAGES || 3);
 const ONLY = process.env.AUDIT_ONLY || '';
@@ -59,7 +63,13 @@ const add = (school, campus, urls) => {
 };
 for (const s of schools) add(s.school, s.campus, s.boardUrl ? [s.boardUrl] : null);
 for (const t of bTargets) add(t.school, t.campus, t.candidates);
-const list = [...targets.values()].filter((t) => !ONLY || t.school.includes(ONLY));
+const all = [...targets.values()].filter((t) => !ONLY || t.school.includes(ONLY));
+/* 회전 — 지난 실행이 건너뛴 학교부터 본다 */
+const curPath = new URL('coverage-cursor.json', HERE);
+let cur = { next: 0 };
+try { cur = JSON.parse(fs.readFileSync(curPath, 'utf8')); } catch { /* 첫 실행 */ }
+const order = rotateOrder(all.length, cur.next || 0);
+const list = order.map((i) => all[i]);
 
 /* ── 우리가 가진 공고 (읽기만 한다) ─────────────────────────────────────── */
 const notices = JSON.parse(fs.readFileSync(new URL('../data/notices.json', HERE), 'utf8')).items || [];
@@ -90,10 +100,16 @@ async function readBoard(url) {
     await page.waitForTimeout(3500);
     const rows = [];
     for (const f of page.frames()) {
-      const got = await f.$$eval('a, [onclick], td, li', (els) => els.map((e) => ({
-        t: (e.textContent || '').replace(/\s+/g, ' ').trim(),
-        u: e.tagName === 'A' ? (e.href || '') : '',
-      }))).catch(() => []);
+      /* 🔴 **잎 노드만** 읽는다 (2026-08-17 첫 실행 결과로 수정).
+         처음엔 td·li를 그대로 읽었더니 옆 메뉴를 감싼 컨테이너가 통째로 한 줄이 되어
+         '장학 장학금안내 교내장학금 한국장학재단 …' 같은 덩어리가 60건 중 32건을 채웠다.
+         자식 요소가 없는 칸만 읽으면 그 덩어리가 애초에 안 생긴다. */
+      const got = await f.$$eval('a, [onclick], td, li', (els) => els
+        .filter((e) => e.tagName === 'A' || e.hasAttribute('onclick') || e.children.length === 0)
+        .map((e) => ({
+          t: (e.textContent || '').replace(/\s+/g, ' ').trim(),
+          u: e.tagName === 'A' ? (e.href || '') : '',
+        }))).catch(() => []);
       rows.push(...got);
     }
     return { rows, error: null };
@@ -123,6 +139,7 @@ for (const t of list) {
 
     /* 2페이지 이후도 본다 — 1페이지만 보면 '2페이지 이후' 원인을 아예 셀 수 없다 */
     const pageOf = new Map();
+    const urlOf = new Map();          // 첨부 링크 판정에 주소가 필요하다
     const seenFp = new Set();
     const collect = (rows, pageNo) => {
       for (const row of rows) {
@@ -131,6 +148,7 @@ for (const t of list) {
         if (!f || seenFp.has(f)) continue;
         seenFp.add(f);
         pageOf.set(row.t, pageNo);
+        if (row.u) urlOf.set(row.t, row.u);
       }
     };
     collect(best.rows, 1);
@@ -150,13 +168,15 @@ for (const t of list) {
       if (!advanced) break;
     }
 
-    const boardTitles = [...pageOf.keys()];
+    /* 같은 공고가 '제목만'과 '제목+조회수·작성일'로 두 번 세어지던 것을 합친다 */
+    const boardTitles = dedupeNear([...pageOf.keys()]);
     const ours = (oursBySchool.get(t.school) || []).concat(regTitles);
     const missing = findMissing(boardTitles, ours);
     const byCause = {};
     for (const m of missing) {
       const cause = classifyMiss(m, {
-        keywords: HARVEST_KEYWORDS, isMenuEntry, isAttachmentEntry, page: pageOf.get(m),
+        keywords: HARVEST_KEYWORDS, isMenuEntry, isAttachmentEntry,
+        page: pageOf.get(m), url: urlOf.get(m) || '',
       });
       (byCause[cause] = byCause[cause] || []).push(m);
     }
@@ -240,6 +260,12 @@ hist[today.slice(0, 10)] = {
   bySchool: Object.fromEntries(ok.map((r) => [r.school, r.coverage])),
 };
 fs.writeFileSync(histPath, JSON.stringify(hist, null, 1));
+
+/* 다음 실행 시작 자리 — 이번에 감사한 학교 수만큼 앞으로 옮긴다.
+   ⚠️ 워크플로 저장 목록에 이 파일을 넣는 것까지가 한 세트다(빠뜨리면 회전이 무의미). */
+cur.next = nextCursor(all.length, cur.next || 0, ok.length + unreadable.length);
+cur.updatedAt = today;
+fs.writeFileSync(curPath, JSON.stringify(cur, null, 1));
 
 console.log(`audit-coverage: 학교 ${ok.length}곳 · 후보 ${totalBoard} · 누락 ${totalMiss} · 원인 미상 ${unknown}`);
 if (process.env.GITHUB_OUTPUT) {

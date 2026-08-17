@@ -24,8 +24,9 @@ concurrency:
 jobs:
   audit:
     runs-on: ubuntu-latest
-    # 상한 = 감사 예산 20분 + 준비·저장 여유. 예산을 스스로 지키므로 취소되지 않아야 한다.
-    timeout-minutes: 28
+    # 상한 = 감사 예산 35분 + 준비·저장 여유. 예산을 스스로 지키므로 취소되지 않아야 한다.
+    # (첫 실행은 20분 예산으로 16/41곳만 봤다 — 학교당 약 75초.)
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - name: 협업 병합기 등록 (충돌 자동 해소 — COLLAB.md)
@@ -38,7 +39,7 @@ jobs:
 
       - id: run
         name: 누락 감사 (게시판 재집계 → 우리 데이터와 대조)
-        timeout-minutes: 24
+        timeout-minutes: 40
         continue-on-error: true
         run: node collector/audit-coverage.mjs
 
@@ -52,6 +53,8 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           [ -f collector/coverage-report.md ] && git add collector/coverage-report.md
           [ -f collector/coverage-history.json ] && git add collector/coverage-history.json
+          # 회전 커서 — 빠뜨리면 건너뛴 학교가 매번 같아 뒤쪽 학교는 영영 감사되지 않는다
+          [ -f collector/coverage-cursor.json ] && git add collector/coverage-cursor.json
           true
           if ! git diff --cached --quiet; then
             git commit -m "coverage-audit: 누락 감사 결과"

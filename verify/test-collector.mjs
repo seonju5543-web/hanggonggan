@@ -9,7 +9,7 @@ import { urlKey, titleKey, dedupeNotices, preferNotice, capNotices, clickRowKey 
 import { mergeCandidates } from '../collector/candidates.mjs';
 import { publishBySchool, splitBySchool } from '../collector/publish-notices.mjs';
 import { pageCandidates, pageUrl, existingPageParam, samePage, shouldRetry } from '../collector/paginate.mjs';
-import { looseCandidate, sameNotice, findMissing, classifyMiss, coverageOf } from '../collector/coverage-rules.mjs';
+import { looseCandidate, sameNotice, findMissing, classifyMiss, coverageOf, looksLikeBoardChrome, looksLikeAttachmentName, dedupeNear } from '../collector/coverage-rules.mjs';
 import { createRequire } from 'node:module';
 import { isAttachmentEntry, isHtmlPayload } from '../collector/attachment-link.mjs';
 import { isDetailUrl, isMarkerUrl, markerTitle, sameTitle, detailCandidates, looksLikeLoginWall, rowDetailCandidates } from '../collector/detail-url.mjs';
@@ -565,6 +565,56 @@ console.log('\n■ 누락 감사 (감사가 수집기의 맹점을 물려받지 
   eq('게시판을 못 읽었으면 비율을 말하지 않는다', coverageOf(0, 0), null);
   eq('비율 계산', coverageOf(10, 2), 80);
 
+  /* 🔴 첫 실행(2026-08-17)의 실제 잡음을 고정 자료로 박아 둔다.
+     그때 '원인 미상 60건' 중 **37건이 게시판 옆 메뉴 덩어리, 9건이 첨부 파일 이름**이었다.
+     사람이 볼 칸에 잡음이 62%면 그 칸은 안 보게 된다 — 감사가 장식이 되는 실패다.
+     아래 문장들은 실제 리포트에서 그대로 가져온 것이다. */
+  const realMenuBlobs = [
+    '장학 장학금안내 교내장학금 한국장학재단 발전재단·교외재단 학자금대출',
+    '소식·알림 공지사항 학생처 소식 FAQ 장학 복지 상담 부속시설 시설이용 기타 S-CARD 병무안내 견학',
+    '공지사항 - 전체 - 학사 - 입학 - 취업 - 채용/모집 - 장학 - 행사/세미나 - 일반',
+    '행정 지원 안내 업무별 담당 부서 안내 등록 안내 장학 안내 증명발급 안내 기숙사 안내 교직이수 교원자격증발급 학생대관 외부대관 통합 양식자료실',
+    '커뮤니티 커뮤니티 학생지원 장학 도서관/박물관 정보서비스 경희미디어',
+    '장학 및 학자금 대출 교내장학 외부장학 국가장학 국가근로장학 학자금 대출 학자금 중복지원 방지 장학 상담',
+    '게시판 학생활동 장학(공지) 자료실 FAQ / Q&A',
+    '장학금 신청안내 종류 선발절차 학자금대출',
+    '장학금안내(서울) chevron_right',
+    '장학금안내(ERICA) open_in_new',
+  ];
+  realMenuBlobs.forEach((t) => eq(`메뉴 덩어리로 가른다: '${t.slice(0, 20)}…'`, looksLikeBoardChrome(t), true));
+  ['2. (홈페이지 게시글) 2026학년도 2학기 근로(행정부서) 장학생 신청 안내.hwp 웹 브라우저에서 바로보기',
+    '2026년_손태희장학재단_4기_장학생_선발_공고문.pdf 웹 브라우저에서 바로보기']
+    .forEach((t) => eq(`첨부 파일 이름으로 가른다: '${t.slice(0, 18)}…'`, looksLikeAttachmentName(t), true));
+
+  /* 🔴 그리고 **진짜 공고는 부스러기로 버리지 않아야 한다** — 이쪽이 더 중요하다.
+     부스러기 규칙이 과하면 감사가 진짜 누락을 숨겨, 있는 문제를 없다고 말하게 된다. */
+  const realNotices = [
+    '[한국장학재단] 2026학년도 2학기 국가장학금 2차 신청 안내 (8/12~9/9)',
+    '[학생복지팀] 2026학년도 2학기 교내 근로(행정부서) 장학생 신청 안내',
+    '[등록/장학] 2026학년도 2학기 문주장학재단 신규장학생 선발 안내(기간연장)',
+    '1388 2026학년도 2학기 부영주택 장학생 지원 안내',
+    '[공통][국가] 2026학년도 2학기 2차 주거안정장학금 신청기간 안내(~9/9) 새글',
+    '2026학년도 2학기 한국사학진흥재단 행복기숙사(연합) 입주생 정기모집 안내',
+  ];
+  realNotices.forEach((t) => {
+    eq(`진짜 공고를 부스러기로 버리지 않는다: '${t.slice(0, 22)}…'`, looksLikeBoardChrome(t), false);
+    eq(`  (첨부로도 오해하지 않는다)`, looksLikeAttachmentName(t), false);
+  });
+  /* 순서 확인 — 메뉴 덩어리를 '키워드 밖'으로 세면 "키워드를 넓히면 되겠구나"라는 틀린 결론이 된다 */
+  eq('메뉴 덩어리는 키워드 밖이 아니라 부스러기로 센다',
+    classifyMiss('장학 및 학자금 대출 교내장학 외부장학 국가장학 국가근로장학 학자금 대출 학자금 중복지원 방지 장학 상담', deps),
+    '게시판 메뉴·설명문 (공고 아님)');
+
+  /* 같은 공고가 '제목만'과 '제목+조회수·작성일'로 두 번 세어지던 것 (성균관·광운에서 실제로 발생) */
+  eq('메타데이터가 붙은 같은 공고는 한 건으로 합친다', dedupeNear([
+    '[한국장학재단] 2026학년도 2학기 국가장학금 2차 신청 안내 (8/12~9/9) NEW No.3080 학생지원팀 2026-08-12 조회수2199 첨부파일',
+    '[한국장학재단] 2026학년도 2학기 국가장학금 2차 신청 안내 (8/12~9/9)',
+  ]).length, 1);
+  eq('다른 공고는 합치지 않는다', dedupeNear([
+    '2026학년도 2학기 국가장학금 2차 신청 안내',
+    '2026학년도 2학기 주거안정장학금 2차 신청 안내',
+  ]).length, 2);
+
   const src = fs.readFileSync(new URL('collector/audit-coverage.mjs', root), 'utf8');
   /* 🔴 감사는 아무것도 고치지 않는다. 데이터를 만지면 감사가 만든 변화를 감사가 다시 재는
      순환이 생긴다. 쓰기는 자기 리포트 둘뿐이어야 한다. */
@@ -578,9 +628,11 @@ console.log('\n■ 누락 감사 (감사가 수집기의 맹점을 물려받지 
     return decl ? decl[1] : arg;                      // 못 따라가면 원문을 그대로 넘겨 실패하게 둔다
   };
   const writes = writeArgs.map(resolveTarget);
-  eq('감사가 쓰는 파일이 둘뿐', writes.length, 2);
-  eq('감사가 쓰는 파일은 자기 리포트뿐 (실제 파일명까지 확인)',
-    writes.every((w) => /^coverage-(report\.md|history\.json)$/.test(w)), true);
+  /* 쓰기 파일이 늘면 이 검사가 실패한다 — 그때 '감사가 왜 그 파일을 쓰나'를 먼저 따져야 한다.
+     (2026-08-17에 회전 커서가 늘어 둘 → 셋이 됐다. 셋 다 감사 자기 파일이다.) */
+  eq('감사가 쓰는 파일이 셋뿐', writes.length, 3);
+  eq('감사가 쓰는 파일은 자기 것뿐 (실제 파일명까지 확인)',
+    writes.every((w) => /^coverage-(report\.md|history\.json|cursor\.json)$/.test(w)), true);
   eq('감사가 seen.json을 고치지 않는다', /writeFileSync\([^)]*seen/.test(src), false);
   eq('감사가 notices.json을 고치지 않는다', /writeFileSync\([^)]*notices/.test(src), false);
   // 주소를 못 받은 학교를 누락으로 세면 매일 같은 경고가 떠서 진짜 문제가 묻힌다
@@ -602,6 +654,12 @@ console.log('\n■ 누락 감사 (감사가 수집기의 맹점을 물려받지 
   eq('시간 초과에도 알림이 간다', /failure\(\) \|\| cancelled\(\)/.test(yml), true);
   // 수집 로봇과 같은 대기줄에 넣으면 감사가 조용히 취소된다
   eq('수집 로봇과 다른 대기줄을 쓴다', /group: audit-coverage/.test(yml), true);
+  // 첫 실행은 20분 예산으로 16/41곳만 봤다 — 회전이 없으면 뒤쪽 학교는 영영 감사되지 않는다
+  eq('감사도 학교 순서를 회전시킨다', /rotateOrder\(/.test(src) && /coverage-cursor/.test(src), true);
+  eq('워크플로 저장 목록에 회전 커서가 있다', /git add collector\/coverage-cursor\.json/.test(yml), true);
+  const jobCap = Number((yml.match(/^ {4}timeout-minutes:\s*(\d+)/m) || [])[1]);
+  const auditBudget = Number((src.match(/AUDIT_BUDGET_MS \|\| (\d+)/) || [])[1]);
+  eq('작업 상한이 감사 예산보다 크다', jobCap > auditBudget, true);
 }
 
 /* 목록 페이지 넘기기 (2026-08-17) — 1페이지만 읽어 상단 고정 공지에 밀린 실공고를 놓치던 것 */
