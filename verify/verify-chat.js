@@ -169,6 +169,60 @@ async function ask(page, q) {
   await page.waitForTimeout(400);
   ok(await sheetEl.isVisible(), '대화를 아래로 끌어도 도우미가 닫히지 않는다');
 
+  console.log('\n[5-1] 🔴 마스코트 — 짧게 누르면 열리고, 꾹 눌러야 옮겨진다');
+  await page.evaluate(() => { const s = document.querySelector('#chat-sheet'); if (s && !s.hidden) chatClose(); });
+  await page.waitForTimeout(350);
+  ok(await page.locator('#btn-chat-fab .mascot').count() > 0, '떠 있는 버튼이 마스코트로 바뀌었다');
+
+  /* 손가락 동작을 흉내 내는 도우미 — pointer 이벤트를 직접 만들어 보낸다 */
+  const press = (opts) => page.evaluate(async ({ hold, dx, dy }) => {
+    const fab = document.querySelector('#btn-chat-fab');
+    const r = fab.getBoundingClientRect();
+    const x = r.left + r.width / 2, y = r.top + r.height / 2;
+    const send = (type, cx, cy) => fab.dispatchEvent(new PointerEvent(type, {
+      pointerId: 1, clientX: cx, clientY: cy, button: 0, bubbles: true, cancelable: true,
+    }));
+    fab.setPointerCapture = () => {};       // 가짜 이벤트에는 진짜 포인터가 없다
+    fab.releasePointerCapture = () => {};
+    send('pointerdown', x, y);
+    await new Promise((res) => setTimeout(res, hold));
+    if (dx || dy) { send('pointermove', x + dx, y + dy); await new Promise((res) => setTimeout(res, 40)); }
+    send('pointerup', x + (dx || 0), y + (dy || 0));
+    await new Promise((res) => setTimeout(res, 350));
+    const after = fab.getBoundingClientRect();
+    return { sheetOpen: !document.querySelector('#chat-sheet').hidden, left: after.left, top: after.top };
+  }, opts);
+
+  const before = await page.locator('#btn-chat-fab').boundingBox();
+  const tap = await press({ hold: 90, dx: 0, dy: 0 });
+  ok(tap.sheetOpen, '짧게 누르면 도우미가 열린다');
+  ok(Math.abs(tap.left - before.x) < 2 && Math.abs(tap.top - before.y) < 2, '짧게 눌렀을 때는 자리가 안 움직인다');
+
+  await page.evaluate(() => chatClose());
+  await page.waitForTimeout(350);
+  const drag = await press({ hold: 500, dx: -260, dy: -220 });   // 꾹 누른 뒤 왼쪽 위로 끌기
+  ok(!drag.sheetOpen, '꾹 눌러 옮긴 뒤에는 도우미가 열리지 않는다(옮기려던 것이지 열려던 게 아니다)');
+  ok(Math.abs(drag.top - before.y) > 40, '꾹 누르면 마스코트가 실제로 옮겨진다', { 전: before.y, 후: drag.top });
+  ok(drag.left < before.x - 40, '떼면 가까운 쪽 가장자리에 붙는다', { 전: before.x, 후: drag.left });
+
+  /* 하단 탭을 덮어 버리면 학생이 앱을 못 옮겨 다닌다 */
+  const low = await press({ hold: 500, dx: 0, dy: 900 });
+  const navBox2 = await page.locator('#bottom-nav').boundingBox();
+  const fabBox2 = await page.locator('#btn-chat-fab').boundingBox();
+  ok(fabBox2.y + fabBox2.height <= navBox2.y + 1, '아무리 아래로 끌어도 하단 탭을 덮지 않는다',
+    { fab: fabBox2.y + fabBox2.height, nav: navBox2.y });
+  ok(fabBox2.x >= 0 && fabBox2.x + fabBox2.width <= 390, '화면 밖으로 나가지 않는다', fabBox2);
+
+  /* 옮긴 자리가 기억되는가 — 앱을 다시 열어도 그대로여야 한다 */
+  const placed = await page.locator('#btn-chat-fab').boundingBox();
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('#screen-home:not([hidden])');
+  await page.waitForTimeout(600);
+  const after = await page.locator('#btn-chat-fab').boundingBox();
+  ok(Math.abs(after.x - placed.x) < 3 && Math.abs(after.y - placed.y) < 3,
+    '앱을 다시 열어도 옮긴 자리를 기억한다', { 옮긴자리: placed, 다시연뒤: after });
+  await dismissNotify(page);
+
   console.log('\n[6] 🔴 AI가 꺼져 있는 동안 바깥 통신 0건');
   const aiOff = await page.evaluate(() => typeof chatAiConfigured === 'function' && !chatAiConfigured());
   ok(aiOff, 'AI 자리는 꺼져 있다(endpoint 비어 있음)');
@@ -176,7 +230,9 @@ async function ask(page, q) {
   ok(external.length === 0, 'AI가 꺼진 동안 바깥으로 나간 요청이 없다', external.slice(0, 3));
 
   console.log('\n[7] 질문에 스크립트를 넣어도 실행되지 않는다');
-  await page.evaluate(() => { window.__xss = false; });
+  await page.evaluate(() => { window.__xss = false; if (document.querySelector('#chat-sheet').hidden) chatOpen(); });
+  await page.waitForSelector('#chat-sheet:not([hidden])');
+  await page.waitForTimeout(300);
   await ask(page, '<img src=x onerror="window.__xss=true">');
   const xss = await page.evaluate(() => window.__xss);
   ok(xss === false, '질문 속 스크립트가 실행되지 않는다');

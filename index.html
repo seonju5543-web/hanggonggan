@@ -214,8 +214,10 @@
       <!-- 장학금 도우미 — 글자로 물어볼 수 있는 유일한 자리.
            히어로 카드의 '한 번에 신청' 버튼을 가리지 않도록 그 아래에 둔다. -->
       <button class="ask-bar" id="home-ask" aria-label="장학금 도우미에게 물어보기">
-        <span class="ask-icon" aria-hidden="true">💬</span>
-        <span class="ask-text">궁금한 걸 물어보세요 — 마감·서류·금액</span>
+        <span class="ask-icon" aria-hidden="true">
+          <svg class="mascot" viewBox="0 0 48 48"><use href="#mascot"/></svg>
+        </span>
+        <span class="ask-text">한대장이에게 물어보세요 — 마감·서류·금액</span>
       </button>
 
       <div class="section-head">
@@ -290,15 +292,38 @@
     <div id="detail-sheet" class="sheet" hidden></div>
 
     <!-- ============ 장학금 도우미 (챗봇) ============ -->
-    <button class="chat-fab" id="btn-chat-fab" hidden aria-label="장학금 도우미 열기">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 01-9 8.4L3 21l1.1-4.2A8.4 8.4 0 1121 11.5z"/><path d="M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01"/></svg>
+    <!-- 마스코트 '한대장이' — 한 번만 그려 두고 필요한 곳에서 <use>로 불러 쓴다.
+         파일을 따로 두지 않는 이유: 앱의 보안 설정(CSP)이 바깥 그림을 막고,
+         한 곳만 고치면 떠 있는 버튼·머리말·말풍선이 함께 바뀌기 때문. -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+      <symbol id="mascot" viewBox="0 0 48 48">
+        <rect x="12" y="17" width="24" height="23" rx="11.5" fill="#f6f9ff"/>
+        <circle cx="16.4" cy="31.6" r="1.9" fill="#ffd3c2"/>
+        <circle cx="31.6" cy="31.6" r="1.9" fill="#ffd3c2"/>
+        <circle cx="20.2" cy="28.6" r="2.3" fill="#101d3d"/>
+        <circle cx="27.8" cy="28.6" r="2.3" fill="#101d3d"/>
+        <path d="M20.8 34.2c1.5 1.5 4.9 1.5 6.4 0" fill="none" stroke="#101d3d" stroke-width="1.9" stroke-linecap="round"/>
+        <rect x="14" y="13.5" width="20" height="6.5" rx="2.6" fill="#c19a45"/>
+        <path d="M24 5.5 43.5 13 24 20.5 4.5 13z" fill="#d9b56a"/>
+        <path d="M40 14.6v7.2a2.2 2.2 0 0 1-2.2 2.2" fill="none" stroke="#d9b56a" stroke-width="1.9" stroke-linecap="round"/>
+        <circle cx="37.6" cy="25.4" r="2.3" fill="#d9b56a"/>
+      </symbol>
+    </svg>
+
+    <!-- 꾹 눌러 옮길 수 있어서 위치를 코드가 아니라 chat.js가 정한다 (숨은 동작이라 첫 1회 안내도 붙는다) -->
+    <button class="chat-fab" id="btn-chat-fab" hidden aria-label="장학금 도우미 열기 (길게 눌러 위치를 옮길 수 있어요)">
+      <svg class="mascot" viewBox="0 0 48 48" aria-hidden="true"><use href="#mascot"/></svg>
     </button>
+    <div class="chat-hint" id="chat-hint" hidden role="status">꾹 눌러서 옮길 수 있어요</div>
     <div id="chat-backdrop" class="sheet-backdrop" hidden></div>
     <div id="chat-sheet" class="sheet chat-sheet" hidden role="dialog" aria-label="장학금 도우미" aria-modal="true">
       <div class="sheet-handle"></div>
       <div class="chat-head">
-        <div>
-          <p class="chat-title">장학금 도우미</p>
+        <span class="chat-head-avatar" aria-hidden="true">
+          <svg class="mascot" viewBox="0 0 48 48"><use href="#mascot"/></svg>
+        </span>
+        <div class="chat-head-text">
+          <p class="chat-title">한대장이</p>
           <p class="chat-sub">앱에 있는 공고·서류 정보로만 답해요</p>
         </div>
         <button class="icon-btn" id="btn-chat-close" aria-label="닫기">✕</button>

@@ -406,13 +406,24 @@ function chatAnswerHtml(a) {
   return parts.join('');
 }
 
+const CHAT_FACE = '<span class="chat-avatar" aria-hidden="true"><svg class="mascot" viewBox="0 0 48 48"><use href="#mascot"/></svg></span>';
+const CHAT_FACE_BLANK = '<span class="chat-avatar blank" aria-hidden="true"></span>';
+
 function chatRender() {
   const box = document.querySelector('#chat-log');
   if (!box) return;
-  box.innerHTML = chatHistory.map((m) => m.who === 'me'
-    ? `<div class="chat-row me"><div class="chat-bubble me">${chatEsc(m.text)}</div></div>`
-    : `<div class="chat-row bot"><div class="chat-bubble bot">${m.html}</div></div>`
-  ).join('') + (chatBusy ? '<div class="chat-row bot"><div class="chat-bubble bot chat-typing">…</div></div>' : '');
+  /* 마스코트 얼굴은 **연달아 말하는 첫 줄에만** 붙인다. 줄마다 붙이면 같은 얼굴이
+     세로로 늘어서 대화가 아니라 목록처럼 보인다. 뒷줄은 빈 자리로 채워 말풍선 왼쪽 끝을 맞춘다. */
+  let prev = null;
+  const rows = chatHistory.map((m) => {
+    const first = prev !== 'bot';
+    prev = m.who;
+    return m.who === 'me'
+      ? `<div class="chat-row me"><div class="chat-bubble me">${chatEsc(m.text)}</div></div>`
+      : `<div class="chat-row bot">${first ? CHAT_FACE : CHAT_FACE_BLANK}<div class="chat-bubble bot">${m.html}</div></div>`;
+  });
+  box.innerHTML = rows.join('')
+    + (chatBusy ? `<div class="chat-row bot">${prev === 'bot' ? CHAT_FACE_BLANK : CHAT_FACE}<div class="chat-bubble bot chat-typing">…</div></div>` : '');
   box.scrollTop = box.scrollHeight;
 }
 
@@ -494,6 +505,162 @@ function chatClose() {
   setTimeout(() => { back.hidden = true; sheet.hidden = true; }, 250);
 }
 
+/* ============================================================
+   마스코트 버튼 — 눌러서 열고, **꾹 눌러서 옮긴다**
+   ------------------------------------------------------------
+   🔴 '누르기'와 '옮기기'를 반드시 갈라야 한다. 13차 세션의 학교 검색 사고가 이 구분을
+   빠뜨려서 났다(손가락이 닿는 순간 선택돼 목록을 못 내렸다). 여기서는 반대 방향의 같은 실수가
+   가능하다 — 손이 조금 흔들렸다고 열리지 않으면 버튼이 안 눌리는 것처럼 느껴진다.
+   그래서 규칙을 둘로 못 박는다:
+     · 짧게 누르고 뗀다(움직임 8px 미만)      → **연다**
+     · 꾹 누른다(360ms) → 그때부터 손가락을 따라온다 → 떼면 가까운 쪽 가장자리에 붙는다
+   옮긴 자리는 기기에 기억되고, 화면을 돌리거나 창 크기가 바뀌면 다시 화면 안으로 넣는다.
+   ============================================================ */
+const CHAT_FAB_KEY = 'handaejang.chatFab';   // { side:'left'|'right', ratio: 0~1 }
+const CHAT_HOLD_MS = 360;
+const CHAT_MOVE_TOL = 8;                     // 이만큼 움직이기 전까지는 '누른 것'으로 본다
+const CHAT_EDGE = 14;
+
+function chatFabSaved() {
+  try { return JSON.parse(localStorage.getItem(CHAT_FAB_KEY) || 'null'); } catch (e) { return null; }
+}
+
+/* 마스코트가 놓일 수 있는 세로 범위 — 위는 화면 머리, 아래는 하단 탭 위까지.
+   하단 탭을 덮게 두면 학생이 탭을 못 눌러 앱을 못 옮겨 다닌다. */
+function chatFabBand(size) {
+  const nav = document.querySelector('#bottom-nav');
+  const navTop = nav && !nav.hidden ? nav.getBoundingClientRect().top : window.innerHeight;
+  return { min: CHAT_EDGE + 44, max: Math.max(CHAT_EDGE + 44, navTop - size - 10) };
+}
+
+/* 저장된 자리를 화면에 적용한다. 저장된 것이 없으면 CSS의 첫 자리를 그대로 둔다. */
+function chatFabPlace(pos) {
+  const fab = document.querySelector('#btn-chat-fab');
+  if (!fab || !pos) return;
+  const size = fab.offsetWidth || 56;
+  const band = chatFabBand(size);
+  const col = Math.min(480, window.innerWidth);           // 앱은 가운데 480px 칸에 그려진다
+  const gutter = (window.innerWidth - col) / 2;
+  const left = pos.side === 'left' ? gutter + CHAT_EDGE : gutter + col - size - CHAT_EDGE;
+  const top = Math.round(band.min + (band.max - band.min) * Math.min(1, Math.max(0, pos.ratio)));
+  fab.style.left = left + 'px';
+  fab.style.top = top + 'px';
+  fab.style.right = 'auto';
+  fab.style.bottom = 'auto';
+}
+
+function chatBindFab() {
+  const fab = document.querySelector('#btn-chat-fab');
+  if (!fab) return;
+
+  const saved = chatFabSaved();
+  if (saved) chatFabPlace(saved);
+  window.addEventListener('resize', () => {
+    const s = chatFabSaved();
+    if (s) chatFabPlace(s);          // 화면을 돌려도 마스코트가 화면 밖으로 나가지 않게
+  });
+
+  let holdTimer = null, lifted = false, moved = false;
+  let startX = 0, startY = 0, offX = 0, offY = 0;
+
+  const cancelHold = () => { clearTimeout(holdTimer); holdTimer = null; };
+
+  const lift = () => {
+    lifted = true;
+    fab.classList.add('lifted');
+    fab.classList.remove('dropping');
+    chatHintHide();
+    if (navigator.vibrate) { try { navigator.vibrate(12); } catch (e) { /* 진동은 있으면 좋은 것 */ } }
+  };
+
+  fab.addEventListener('pointerdown', (e) => {
+    if (e.button != null && e.button !== 0) return;
+    moved = false;
+    lifted = false;
+    startX = e.clientX; startY = e.clientY;
+    const r = fab.getBoundingClientRect();
+    offX = e.clientX - r.left;
+    offY = e.clientY - r.top;
+    fab.setPointerCapture(e.pointerId);
+    holdTimer = setTimeout(lift, CHAT_HOLD_MS);
+  });
+
+  fab.addEventListener('pointermove', (e) => {
+    const dx = e.clientX - startX, dy = e.clientY - startY;
+    if (!lifted) {
+      /* 아직 안 들었는데 많이 움직였다 = 옮기려는 것도, 누르려는 것도 아니다(스크롤 등) */
+      if (Math.hypot(dx, dy) > CHAT_MOVE_TOL) { moved = true; cancelHold(); }
+      return;
+    }
+    moved = true;
+    const size = fab.offsetWidth || 56;
+    const band = chatFabBand(size);
+    const x = Math.min(window.innerWidth - size - CHAT_EDGE, Math.max(CHAT_EDGE, e.clientX - offX));
+    const y = Math.min(band.max, Math.max(band.min, e.clientY - offY));
+    fab.style.left = x + 'px';
+    fab.style.top = y + 'px';
+    fab.style.right = 'auto';
+    fab.style.bottom = 'auto';
+  });
+
+  const finish = (e) => {
+    cancelHold();
+    if (lifted) {
+      lifted = false;
+      fab.classList.remove('lifted');
+      fab.classList.add('dropping');
+      /* 가까운 쪽 가장자리에 붙인다 — 가운데 떠 있으면 공고 카드를 가린다 */
+      const size = fab.offsetWidth || 56;
+      const r = fab.getBoundingClientRect();
+      const band = chatFabBand(size);
+      const side = (r.left + size / 2) < window.innerWidth / 2 ? 'left' : 'right';
+      const ratio = band.max > band.min ? (r.top - band.min) / (band.max - band.min) : 0;
+      const pos = { side, ratio: Math.min(1, Math.max(0, ratio)) };
+      chatFabPlace(pos);
+      try { localStorage.setItem(CHAT_FAB_KEY, JSON.stringify(pos)); } catch (err) { /* 저장 실패해도 이번 자리는 유지 */ }
+      setTimeout(() => fab.classList.remove('dropping'), 260);
+      return;
+    }
+    if (!moved) chatOpen();          // 짧게 눌렀다 = 열기
+  };
+
+  fab.addEventListener('pointerup', finish);
+  fab.addEventListener('pointercancel', () => { cancelHold(); lifted = false; fab.classList.remove('lifted'); });
+
+  /* 키보드로도 열 수 있어야 한다 — pointer 경로로만 열면 버튼이 아닌 것이 된다.
+     (옮기기는 키보드로 못 하지만, 자리는 편의 기능이라 못 해도 쓸 수 있다) */
+  fab.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    chatOpen();
+  });
+}
+
+/* 꾹 눌러 옮길 수 있다는 것을 처음 한 번만 알려 준다 — 숨은 동작은 알려 주지 않으면 없는 것과 같다 */
+const CHAT_HINT_KEY = 'handaejang.chatHint';
+function chatHintHide() {
+  const hint = document.querySelector('#chat-hint');
+  if (!hint) return;
+  hint.classList.remove('show');
+  setTimeout(() => { hint.hidden = true; }, 300);
+}
+function chatHintMaybeShow() {
+  const hint = document.querySelector('#chat-hint');
+  const fab = document.querySelector('#btn-chat-fab');
+  if (!hint || !fab || fab.hidden) return;
+  try { if (localStorage.getItem(CHAT_HINT_KEY)) return; } catch (e) { return; }
+  const r = fab.getBoundingClientRect();
+  hint.hidden = false;
+  const w = hint.offsetWidth;
+  /* 마스코트가 오른쪽에 있으면 왼쪽에, 왼쪽에 있으면 오른쪽에 띄운다 — 화면 밖으로 나가지 않게 */
+  const left = r.left + r.width / 2 > window.innerWidth / 2 ? r.left - w - 10 : r.right + 10;
+  hint.style.left = Math.max(8, left) + 'px';
+  hint.style.top = Math.round(r.top + (r.height - hint.offsetHeight) / 2) + 'px';
+  requestAnimationFrame(() => hint.classList.add('show'));
+  try { localStorage.setItem(CHAT_HINT_KEY, '1'); } catch (e) { /* 못 저장하면 다음에 또 뜬다 — 무해 */ }
+  setTimeout(chatHintHide, 4200);
+}
+
 function chatBind() {
   const form = document.querySelector('#chat-form');
   const input = document.querySelector('#chat-input');
@@ -528,8 +695,7 @@ function chatBind() {
   const back = document.querySelector('#chat-backdrop');
   if (back) back.addEventListener('click', chatClose);
 
-  const fab = document.querySelector('#btn-chat-fab');
-  if (fab) fab.addEventListener('click', () => chatOpen());
+  chatBindFab();
   const bar = document.querySelector('#home-ask');
   if (bar) bar.addEventListener('click', () => chatOpen());
   const closeBtn = document.querySelector('#btn-chat-close');
@@ -552,7 +718,18 @@ function chatSyncFab() {
   const fab = document.querySelector('#btn-chat-fab');
   const nav = document.querySelector('#bottom-nav');
   if (!fab || !nav) return;
+  const was = fab.hidden;
   fab.hidden = nav.hidden;
+  if (was && !fab.hidden) {
+    const saved = chatFabSaved();
+    if (saved) chatFabPlace(saved);
+    /* 알림 동의 시트가 온보딩 2.9초 뒤에 뜨므로 그보다 늦게 — 두 안내가 겹치면 둘 다 안 읽힌다 */
+    setTimeout(() => {
+      const sheetOpen = ['#notify-sheet', '#detail-sheet', '#chat-sheet']
+        .some((s) => { const el = document.querySelector(s); return el && !el.hidden; });
+      if (!sheetOpen) chatHintMaybeShow();
+    }, 6000);
+  }
 }
 
 if (typeof document !== 'undefined' && document.querySelector('#chat-sheet')) {
