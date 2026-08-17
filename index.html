@@ -211,6 +211,13 @@
         <button class="btn btn-white btn-lg" id="btn-apply-all">⚡ 한 번에 모두 신청하기</button>
       </div>
 
+      <!-- 장학금 도우미 — 글자로 물어볼 수 있는 유일한 자리.
+           히어로 카드의 '한 번에 신청' 버튼을 가리지 않도록 그 아래에 둔다. -->
+      <button class="ask-bar" id="home-ask" aria-label="장학금 도우미에게 물어보기">
+        <span class="ask-icon" aria-hidden="true">💬</span>
+        <span class="ask-text">궁금한 걸 물어보세요 — 마감·서류·금액</span>
+      </button>
+
       <div class="section-head">
         <h3>마감 임박</h3>
         <button class="link-btn" data-goto="explore">전체 보기</button>
@@ -282,6 +289,28 @@
     <div id="sheet-backdrop" class="sheet-backdrop" hidden></div>
     <div id="detail-sheet" class="sheet" hidden></div>
 
+    <!-- ============ 장학금 도우미 (챗봇) ============ -->
+    <button class="chat-fab" id="btn-chat-fab" hidden aria-label="장학금 도우미 열기">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 01-9 8.4L3 21l1.1-4.2A8.4 8.4 0 1121 11.5z"/><path d="M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01"/></svg>
+    </button>
+    <div id="chat-backdrop" class="sheet-backdrop" hidden></div>
+    <div id="chat-sheet" class="sheet chat-sheet" hidden role="dialog" aria-label="장학금 도우미" aria-modal="true">
+      <div class="sheet-handle"></div>
+      <div class="chat-head">
+        <div>
+          <p class="chat-title">장학금 도우미</p>
+          <p class="chat-sub">앱에 있는 공고·서류 정보로만 답해요</p>
+        </div>
+        <button class="icon-btn" id="btn-chat-close" aria-label="닫기">✕</button>
+      </div>
+      <div id="chat-log" class="chat-log" aria-live="polite"></div>
+      <div id="chat-chips" class="chat-chips"></div>
+      <form id="chat-form" class="chat-form" autocomplete="off">
+        <input type="text" id="chat-input" placeholder="예: 마감 임박한 거 알려줘" maxlength="120" aria-label="질문 입력" />
+        <button type="submit" class="chat-send" aria-label="보내기">↑</button>
+      </form>
+    </div>
+
     <!-- ============ 알림 시트 (동의 안내 · 알림함) ============ -->
     <div id="notify-backdrop" class="sheet-backdrop" hidden></div>
     <div id="notify-sheet" class="sheet" hidden></div>
@@ -297,5 +326,7 @@
   <script src="forms.js"></script>
   <script src="notify.js"></script>
   <script src="app.js"></script>
+  <script src="chat-config.js"></script>
+  <script src="chat.js"></script>
 </body>
 </html>

@@ -1047,3 +1047,164 @@ textarea:focus {
 
 /* 판정할 수 없는 요건 — 번호만 붙이고 색을 칠하지 않는다 (틀린 초록 체크보다 낫다) */
 .reason-list .r-req { color: var(--text-sub); }
+
+/* ---------------- 장학금 도우미 (챗봇) ----------------
+   자리 원칙: 홈에서는 히어로 카드 **아래** 한 줄(‘한 번에 신청’ 버튼을 가리지 않는다),
+   그 밖의 화면에서는 우하단 떠 있는 버튼. 하단 탭을 5개로 늘리지 않은 이유는
+   도우미가 '가는 곳'이 아니라 '부르는 도구'이기 때문이다. */
+.ask-bar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 12px 16px;
+  margin-bottom: 22px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  text-align: left;
+  transition: transform 0.12s, box-shadow 0.15s;
+}
+.ask-bar:active { transform: scale(0.99); box-shadow: none; }
+.ask-icon { font-size: 17px; line-height: 1; }
+.ask-text { font-size: 14.5px; color: var(--text-weak); font-weight: 600; }
+
+.chat-fab {
+  position: fixed;
+  right: max(16px, calc(50% - 240px + 16px));
+  bottom: calc(74px + env(safe-area-inset-bottom));
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 6px 20px rgba(47, 107, 255, 0.38);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 55;                      /* 하단 탭(50)보다 위, 시트 배경(90)보다 아래 */
+  transition: transform 0.12s;
+}
+.chat-fab[hidden] { display: none !important; }
+.chat-fab:active { transform: scale(0.94); }
+.chat-fab svg { width: 24px; height: 24px; }
+
+.chat-sheet {
+  height: 78dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;                 /* 시트는 고정, 안쪽 대화 목록만 스크롤된다 */
+}
+/* 🔴 이 줄을 지우지 말 것 — 클래스에 display를 주면 브라우저 기본 규칙 [hidden]{display:none}보다
+   우선순위가 높아져 **닫아도 안 닫힌다.** 화면 밖으로 밀려나 있어 눈에는 안 보이지만 요소는 살아 있어,
+   화면 읽어 주기가 닫힌 대화를 계속 읽고 키보드 초점도 그리로 들어간다.
+   관리자 화면(_admin/admin.css)이 같은 함정에 빠져 숨은 시트가 화면을 막았던 것과 같은 유형이다. */
+.chat-sheet[hidden] { display: none !important; }
+.chat-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 20px 10px;
+  border-bottom: 1px solid var(--line);
+}
+.chat-title { font-size: 17px; font-weight: 800; letter-spacing: -0.02em; }
+.chat-sub { font-size: 12px; color: var(--text-weak); margin-top: 2px; }
+#btn-chat-close { font-size: 17px; line-height: 1; color: var(--text-weak); }
+
+.chat-log {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px 16px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.chat-row { display: flex; }
+.chat-row.me { justify-content: flex-end; }
+.chat-bubble {
+  max-width: 88%;
+  padding: 11px 14px;
+  border-radius: 16px;
+  font-size: 14.5px;
+  line-height: 1.5;
+}
+.chat-bubble.me { background: var(--primary); color: #fff; border-bottom-right-radius: 5px; }
+.chat-bubble.bot { background: var(--bg); color: var(--text); border-bottom-left-radius: 5px; }
+.chat-typing { color: var(--text-weak); letter-spacing: 3px; }
+.chat-text { font-size: 14.5px; }
+.chat-ai-tag {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--orange);
+  background: var(--orange-weak);
+  border-radius: 8px;
+  padding: 4px 8px;
+  margin-top: 8px;
+  display: inline-block;
+}
+.chat-list { list-style: none; margin-top: 9px; display: flex; flex-direction: column; gap: 5px; }
+.chat-list li { font-size: 13.5px; color: var(--text-sub); }
+.chat-notices { list-style: none; margin-top: 9px; display: flex; flex-direction: column; gap: 6px; }
+.chat-notices a { font-size: 13.5px; color: var(--primary); font-weight: 600; }
+/* 모르는 것을 모른다고 적는 자리 — 눈에 띄되 답을 가리지 않게 */
+.chat-note {
+  font-size: 12.5px;
+  color: var(--text-weak);
+  line-height: 1.5;
+  margin-top: 9px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--line);
+}
+.chat-cards { margin-top: 11px; display: flex; flex-direction: column; gap: 9px; }
+.chat-cards .sch-card { width: 100%; }
+
+.chat-chips {
+  display: flex;
+  gap: 7px;
+  overflow-x: auto;
+  padding: 10px 16px 0;
+  scrollbar-width: none;
+}
+.chat-chips::-webkit-scrollbar { display: none; }
+.chat-chip {
+  flex: 0 0 auto;
+  min-height: 34px;
+  padding: 7px 13px;
+  border-radius: 999px;
+  background: var(--primary-weak);
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.chat-form {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px calc(14px + env(safe-area-inset-bottom));
+}
+#chat-input {
+  flex: 1;
+  min-height: 44px;
+  padding: 11px 15px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--bg);
+  font-size: 16px;                  /* 🔴 16px 미만으로 낮추지 말 것 — iOS가 입력을 시작할 때 화면을 확대해 버린다 */
+  font-family: inherit;
+  color: var(--text);
+}
+#chat-input:focus { outline: none; border-color: var(--primary); background: var(--surface); }
+.chat-send {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+  flex: 0 0 auto;
+}

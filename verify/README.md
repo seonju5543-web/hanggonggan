@@ -22,6 +22,7 @@ node verify-notify.js       # 알림 시스템 브라우저 검증: 최초 1회 
 node verify-push-server.mjs # 진짜 푸시 서버 검증: VAPID 서명을 실제로 검증 · 깨울 학교 판정 · 구독 저장 (서버 불필요)
 node verify-push-client.js  # 진짜 푸시 앱 검증: 미설정/설정 두 상태 · 개인정보가 서버로 새지 않는지 요청 본문 전수 검사
 node verify-admin.js        # 관리자 페이지 검증 (아래 설명 — 서버 불필요, 스스로 띄운다)
+node verify-chat.js         # 장학금 도우미(챗봇): 자리·정직 답변(모르면 모른다)·AI 꺼진 동안 바깥통신 0건·XSS
 ```
 
 `verify-admin.js` — 2026-08-03 신설. 관리자 페이지(`_admin/`)를 검사한다.
