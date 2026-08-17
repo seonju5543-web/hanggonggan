@@ -9,7 +9,7 @@ import { urlKey, titleKey, dedupeNotices, preferNotice, capNotices } from '../co
 import { isAttachmentEntry, isHtmlPayload } from '../collector/attachment-link.mjs';
 import { isDetailUrl, isMarkerUrl, markerTitle, sameTitle, detailCandidates, looksLikeLoginWall, rowDetailCandidates } from '../collector/detail-url.mjs';
 import { cleanTitle, isMenuEntry } from '../collector/clean-title.mjs';
-import { makeBudget, rotateOrder, nextCursor } from '../collector/harvest-budget.mjs';
+import { makeBudget, rotateOrder, nextCursor, withDeadline, TIMED_OUT } from '../collector/harvest-budget.mjs';
 import { canonUrl } from '../collector/canon-url.mjs';
 import { checkFormQuality } from '../collector/form-quality.mjs';
 import { checkFormCoverage } from '../collector/form-coverage.mjs';
@@ -486,7 +486,26 @@ console.log('■ 클릭 수집이 도는 조건');
     isMenuEntry('2026학년도 2학기 학부 재학생 우선선발장학금(형제자매장학 등) 신청 안내'), false);
 }
 
-console.log('■ 예산 장치가 실제로 배선돼 있나 (되돌아가면 같은 사고가 난다)');
+/* 절대 시한 (2026-08-17 사고) — 예산 시계는 일을 **시작하기 전과 끝난 뒤**에만 물어볼 수
+   있어서, 학교 하나가 답을 영영 안 주면 로봇이 그 자리에 멈춰 선다. 그러면 저장 단계까지
+   강제 종료돼 그날 수집분이 통째로 버려진다(8/15~17 3회 연속, 하루치 2번 + 리포트 3일치).
+   그래서 '대답을 안 기다리고 끊는' 장치를 따로 둔다. */
+console.log('\n■ 절대 시한 (답이 안 오는 학교에서 로봇이 멈춰 서지 않게)');
+{
+  const late = new Promise((r) => { setTimeout(() => r('늦게 옴'), 200); });
+  eq('시한 안에 못 끝내면 TIMED_OUT', (await withDeadline(late, 20)) === TIMED_OUT, true);
+  eq('시한 안에 끝나면 원래 결과', await withDeadline(Promise.resolve('수집'), 50), '수집');
+  eq('영영 안 끝나는 일도 반드시 돌아온다', (await withDeadline(new Promise(() => {}), 20)) === TIMED_OUT, true);
+  /* 타이머를 안 걷어내면 다 끝난 뒤에도 프로세스가 안 죽는다 —
+     저장까지 다 해 놓고 단계 상한에 걸려 '실패'로 끝나는 최악의 결말이 된다. */
+  let cleared = 0;
+  await withDeadline(Promise.resolve(1), 50, setTimeout, (h) => { cleared += 1; clearTimeout(h); });
+  eq('일이 먼저 끝나면 타이머를 걷어낸다', cleared, 1);
+  await withDeadline(new Promise(() => {}), 10, setTimeout, (h) => { cleared += 1; clearTimeout(h); });
+  eq('시한에 걸렸을 때도 타이머를 걷어낸다', cleared, 2);
+}
+
+console.log('\n■ 예산 장치가 실제로 배선돼 있나 (되돌아가면 같은 사고가 난다)');
 {
   const root = new URL('../', import.meta.url);
   const src = fs.readFileSync(new URL('collector/browser-collect.mjs', root), 'utf8');
@@ -504,8 +523,27 @@ console.log('■ 예산 장치가 실제로 배선돼 있나 (되돌아가면 �
   const detailCap = num(/DETAIL_BUDGET_MS \|\| (\d+)\)/);
   eq('세 값을 다 읽어냈다', [minPer, clickCap, detailCap].some(Number.isNaN), false);
   eq('학교 시작 여유가 한 학교 최악치(클릭+상세)보다 크다', minPer >= clickCap + detailCap, true);
-  // 재시도 패스도 로그를 남겨야 한다 — 없으면 시간을 어디서 썼는지 영영 못 본다
-  eq('실패 학교 재시도에도 실행 로그가 있다', /\(재시도\) \$\{f\.name\}/.test(src), true);
+  /* 예산은 '물어보는 장치'라 일이 끝나야 물어볼 수 있다. 학교 하나가 답을 안 주면
+     아무도 못 물어보고 로봇이 멈춰 선다 — 2026-08-15~17에 3회 연속 그렇게 하루치를 잃었다.
+     그래서 본 수집·재시도 **양쪽 다** 대답을 안 기다리고 끊는 시한이 걸려 있어야 한다.
+     (8/16 08:29은 학교 17곳을 7분 50초에 다 돌고도 '재시도' 한 곳이 멈춰 전부 잃었다 —
+      본 수집에만 걸면 그 사고는 그대로 다시 난다.) */
+  eq('학교 한 곳에 절대 시한이 걸려 있다', /withDeadline\(harvestTarget\(/.test(src), true);
+  eq('본 수집이 시한 장치를 거쳐 학교를 본다', /await harvestWithDeadline\(t,/.test(src), true);
+  eq('재시도도 같은 시한 장치를 거친다', /await harvestWithDeadline\(f\.t,/.test(src), true);
+  /* 시한이 '학교를 하나 더 집어도 되는 여유'보다 길면, 여유를 보고 시작한 학교가 그
+     여유를 넘겨 예산 밖으로 흘러넘친다 — 약속과 장치가 어긋나면 장치가 무의미해진다. */
+  const hardMs = num(/TARGET_HARD_MS \|\| (\w+)\)/) || minPer;   // 기본값이 MIN_PER_TARGET_MS면 같은 값
+  eq('학교 절대 시한이 학교 시작 여유를 넘지 않는다', hardMs <= minPer, true);
+  // 멈춘 학교를 또 두드리면 시한을 한 번 더 통째로 쓴다 — 재시도 목록에 넣지 않는다
+  eq('멈춘 학교는 재시도 목록에 넣지 않는다', /if \(stalled\) hung\.push\(name\);\s*\n\s*else if \(!ok\) failedTargets\.push/.test(src), true);
+  // 버려진 브라우저 작업이 프로세스를 붙잡아 '저장은 다 했는데 실패'로 끝나는 것을 막는다
+  eq('저장을 마치면 스스로 끝낸다', /process\.exit\(0\)/.test(src), true);
+  /* 재시도 패스도 로그를 남겨야 한다 — 없으면 시간을 어디서 썼는지 영영 못 본다.
+     2026-08-17에 본 수집과 재시도가 같은 함수(harvestWithDeadline)를 쓰게 바뀌면서,
+     로그는 그 함수 안에서 찍히고 재시도인지는 넘긴 표식으로 구분한다. */
+  eq('학교마다 시작·끝을 실행 로그에 남긴다', /console\.log\(`\[\$\{[^`]*\}s\] ▶ \$\{tag\}`\)/.test(src), true);
+  eq('실패 학교 재시도에도 실행 로그가 있다', /harvestWithDeadline\(f\.t, lines, f\.name, '\(재시도\)'\)/.test(src), true);
   const yml = fs.readFileSync(new URL('.github/workflows/browser-collect.yml', root), 'utf8');
   eq('워크플로 저장 목록에 회전 커서가 있다', /browser-cursor\.json/.test(yml), true);
   /* 작업(job) 상한은 들여쓰기 4칸, 단계(step) 상한은 8칸이다. 2026-08-04에 단계별 상한이

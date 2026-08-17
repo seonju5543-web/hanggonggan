@@ -7,7 +7,7 @@ import { urlKey, dedupeNotices, capNotices } from './url-key.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { isMenuEntry } from './clean-title.mjs';
 import { isDetailUrl, detailCandidates, sameTitle, idsFromSource } from './detail-url.mjs';
-import { makeBudget, rotateOrder, nextCursor } from './harvest-budget.mjs';
+import { makeBudget, rotateOrder, nextCursor, withDeadline, TIMED_OUT } from './harvest-budget.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const cfg = JSON.parse(fs.readFileSync(new URL('browser-targets.json', HERE), 'utf8'));
@@ -33,6 +33,13 @@ const BUDGET_MS = Number(process.env.HARVEST_BUDGET_MS || 22 * 60000);        //
    (재시도 패스도 같은 값을 쓰므로, 예산이 모자라면 재시도가 통째로 생략된다. 재시도는
     '덤'이라 생략해도 다음 실행이 커서 회전으로 다시 집는다.) */
 const MIN_PER_TARGET_MS = Number(process.env.MIN_PER_TARGET_MS || 450000);
+/* 한 학교에 허용하는 **절대 시한** (2026-08-17 신설 — 경위는 harvest-budget.mjs 참조).
+   위 MIN_PER_TARGET_MS는 "이만큼 남았으면 학교를 하나 더 집어도 된다"는 **약속**이고,
+   이 값은 그 약속을 **지키게 만드는 장치**다. 그래서 둘은 같은 값이어야 한다 —
+   시한이 더 길면 '남은 시간 안에 끝난다'던 계산이 거짓이 되고, 더 짧으면 정상적으로
+   오래 걸리는 학교(클릭 채집 180초 + 상세 방문 240초)를 멀쩡히 자른다.
+   verify/test-collector.mjs가 이 대소관계를 지킨다. */
+const TARGET_HARD_MS = Number(process.env.TARGET_HARD_MS || MIN_PER_TARGET_MS);
 const budget = makeBudget(BUDGET_MS);
 
 /* 이번 실행이 어느 학교부터 돌지 — 예산에 걸려 잘리는 학교가 매번 같지 않게 회전시킨다 */
@@ -388,6 +395,42 @@ async function runPool(list, worker, size) {
 const failedTargets = [];
 const targetLines = cfg.targets.map(() => []);   // 학교별 리포트 줄 (원래 순서대로 되돌리려고)
 const skipped = [];
+const hung = [];                                 // 절대 시한에 걸려 강제로 끊은 학교 (2026-08-17)
+/* 시간을 사람 말로 — 450,000을 '8분'으로 반올림하면 리포트가 사실과 어긋난다(실제 7분 30초) */
+const humanMs = (ms) => {
+  const s = Math.round(ms / 1000);
+  return s < 60 ? `${s}초` : (s % 60 ? `${Math.floor(s / 60)}분 ${s % 60}초` : `${s / 60}분`);
+};
+
+/* 학교 한 곳을 보되, 절대 시한을 넘기면 **기다리기를 그만두고** 돌아온다 (2026-08-17).
+   여기서 끊지 않으면 로봇이 그 자리에 멈춰 서고, 강제 종료되면 저장 단계까지 죽어
+   그날 수집분 전체가 버려진다 — 8/15~17에 3회 연속 그렇게 됐다.
+   끊어도 손해가 작은 이유: 공고는 harvestTarget 안에서 **한 건씩 바로** freshAll·seen에
+   담기므로, 끊긴 시점까지 모은 것은 그대로 저장된다. */
+async function harvestWithDeadline(t, lines, name, label = '') {
+  const t0 = Date.now();
+  const tag = label ? `${label} ${name}` : name;
+  console.log(`[${Math.round(budget.elapsed() / 1000)}s] ▶ ${tag}`);
+  let ok = false;
+  let stalled = false;
+  try {
+    const r = await withDeadline(harvestTarget(t, lines), TARGET_HARD_MS);
+    if (r === TIMED_OUT) {
+      stalled = true;
+      lines.push(`- ⛔ 응답이 멈춰 ${humanMs(TARGET_HARD_MS)}에서 강제 중단 — 여기까지 채집한 공고만 저장합니다`);
+    } else {
+      ok = r;
+    }
+  } catch (e) {
+    /* 학교 하나가 예기치 못하게 터져도 실행 전체를 끌고 가면 안 된다 —
+       runPool은 Promise.all이라, 여기서 안 잡으면 저장 단계에 닿지 못한다. */
+    lines.push(`- ❌ 예기치 못한 오류(${(e && e.message ? e.message : String(e)).split('\n')[0].slice(0, 80)})`);
+  }
+  const took = Math.round((Date.now() - t0) / 1000);
+  const verdict = stalled ? '⛔ 응답 멈춤(강제 중단)' : (ok ? '수집' : '실패');
+  console.log(`[${Math.round(budget.elapsed() / 1000)}s] ◀ ${tag} — ${verdict} (${took}초)`);
+  return { ok, stalled };
+}
 
 /* 이번 실행은 커서 자리부터 시작한다 — 예산에 걸려 잘리는 학교가 매번 같지 않도록 */
 const order = rotateOrder(cfg.targets.length, cursor.next || 0);
@@ -405,15 +448,15 @@ await runPool(order, async (idx) => {
     return;
   }
   lines.push(`### ${name}`);
-  /* 학교마다 시작·끝을 실행 로그에 남긴다 (2026-08-05 추가).
+  /* 학교마다 시작·끝을 실행 로그에 남긴다 (2026-08-05 추가 — harvestWithDeadline 안).
      리포트는 저장 단계에서야 커밋되므로, 작업이 취소되면 **아무 흔적도 안 남는다**.
      8/5 05:52 실행이 33분을 쓰고 취소됐을 때 로그가 통째로 비어 있어서 어느 학교가
      시간을 먹었는지 알 수 없었다. 실행 로그는 취소돼도 남으므로 여기에 찍어 둔다. */
-  const t0 = Date.now();
-  console.log(`[${Math.round(budget.elapsed() / 1000)}s] ▶ ${name}`);
-  const ok = await harvestTarget(t, lines);
-  console.log(`[${Math.round(budget.elapsed() / 1000)}s] ◀ ${name} — ${ok ? '수집' : '실패'} (${Math.round((Date.now() - t0) / 1000)}초)`);
-  if (!ok) failedTargets.push({ t, name });
+  const { ok, stalled } = await harvestWithDeadline(t, lines, name);
+  /* 멈춘 학교는 **재시도하지 않는다** — 답을 안 주는 서버를 한 번 더 두드려 봐야 시한을
+     또 한 번 통째로 쓸 뿐이다. 8/16 08:29 실행이 정확히 그 재시도에서 하루치를 잃었다. */
+  if (stalled) hung.push(name);
+  else if (!ok) failedTargets.push({ t, name });
   doneCount += 1;
   lines.push('');
 }, PARALLEL);
@@ -442,19 +485,27 @@ if (failedTargets.length && failedTargets.length <= Math.max(1, Math.floor(cfg.t
     }
     /* 재시도에도 시작·끝을 실행 로그에 남긴다 (2026-08-07 추가 — 여기가 비어 있어서
        16분 30초가 어디로 갔는지 아무도 못 봤다). 본 수집에는 8/5에 넣었는데 짝인
-       이쪽을 빠뜨렸고, 리포트는 취소되면 커밋 자체가 안 되므로 실행 로그가 유일한 단서다. */
-    const t0 = Date.now();
-    console.log(`[${Math.round(budget.elapsed() / 1000)}s] ▶ (재시도) ${f.name}`);
-    const ok = await harvestTarget(f.t, lines);
-    console.log(`[${Math.round(budget.elapsed() / 1000)}s] ◀ (재시도) ${f.name} — ${ok ? '수집' : '실패'} (${Math.round((Date.now() - t0) / 1000)}초)`);
-    if (!ok) stillFailed.push(f.name);
+       이쪽을 빠뜨렸고, 리포트는 취소되면 커밋 자체가 안 되므로 실행 로그가 유일한 단서다.
+       절대 시한도 본 수집과 **같은 장치**를 쓴다 — 2026-08-16 08:29 실행은 학교 17곳을
+       7분 50초에 다 돌고도 이 재시도(가천대)가 멈춰 18분을 서 있다 강제 종료됐고,
+       다 모아 둔 하루치가 통째로 버려졌다. 덤으로 붙는 일이 본 수집을 죽이면 안 된다. */
+    const { ok, stalled } = await harvestWithDeadline(f.t, lines, f.name, '(재시도)');
+    if (stalled) hung.push(f.name);
+    else if (!ok) stillFailed.push(f.name);
     lines.push('');
   }, PARALLEL);
   retryLines.forEach((lines) => lines.forEach((l) => report.push(l)));
 } else if (failedTargets.length && !budget.hasRoom(MIN_PER_TARGET_MS)) {
   report.push('### 🔁 실패 학교 재시도 — ⏱ 시간 예산이 없어 생략 (다음 실행에서 다시 시도)', '');
 }
-await browser.close();
+/* 멈춘 학교도 '이번 실행에 못 받아온 학교'다 — health.json에 실패로 기록해야
+   연속 3회부터 "주소가 바뀐 것 같다"는 경고가 뜬다. 재시도 분기가 stillFailed를
+   비우고 다시 채우므로, 합치는 것은 그 분기가 끝난 **뒤**여야 한다. */
+stillFailed.push(...hung);
+
+/* 브라우저 닫기에도 시한을 둔다 — 멈춘 페이지를 안고 있으면 여기서 또 멈출 수 있고,
+   그러면 바로 아래 저장을 못 해 지금까지 모은 것이 다시 전부 버려진다. */
+await withDeadline(browser.close(), 30000);
 
 /* 발행 병합 (일반 수집기와 동일 규칙) */
 notices.items = freshAll.concat(notices.items || []);
@@ -482,6 +533,9 @@ report.push(`⏱ 소요 ${Math.round(budget.elapsed() / 60000)}분 / 예산 ${Ma
 if (skipped.length) {
   report.push(`⏱ **시간 예산으로 건너뛴 학교 ${skipped.length}곳**: ${skipped.join(' · ')}`);
   report.push(`  → 다음 실행은 **${cfg.targets[cursor.next] ? (cfg.targets[cursor.next].school) : '처음'}**부터 시작합니다(하루 2회 실행이라 모든 학교가 하루 안에 한 번은 돕니다).`);
+}
+if (hung.length) {
+  report.push(`⛔ **응답이 멈춰 강제로 끊은 학교 ${hung.length}곳**: ${hung.join(' · ')} — 학교 서버가 연결만 열어 두고 답을 주지 않아 ${humanMs(TARGET_HARD_MS)}에서 끊었어요. 끊지 않으면 로봇이 그 자리에 멈춰 서고, 강제 종료되면서 **그날 수집분 전체가 버려집니다**(2026-08-15~17에 3회 연속 그렇게 됐어요). 다음 실행(약 12시간 뒤)에 다시 시도합니다.`);
 }
 /* 접속 자체가 안 된 학교는 요약에 따로 적는다 — 리포트 중간의 ❌ 한 줄은 놓치기 쉬웠다.
    (재시도까지 실패해도 다음 실행에서 다시 수집되므로 공고가 영구히 사라지지는 않는다)
@@ -518,3 +572,10 @@ if (chronic.length) {
 fs.writeFileSync(new URL('browser-report.md', HERE), report.join('\n'));
 console.log(`browser-collect: ${freshAll.length} new items`);
 if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT, `new_count=${freshAll.length}\n`);
+
+/* 여기서 명시적으로 끝낸다 (2026-08-17).
+   강제로 끊은 학교의 브라우저 작업은 **버렸을 뿐 아직 돌고 있을 수 있다**. 그것이 붙잡고
+   있는 타이머·소켓 때문에 노드가 저 혼자 안 죽으면, 저장은 다 끝났는데도 단계 상한에 걸려
+   '실패'로 끝난다 — 그러면 워크플로가 이번 수집을 실패로 알리고 리포트 이슈도 안 만든다.
+   위 저장은 전부 동기(writeFileSync/appendFileSync)라 이미 디스크에 내려갔으므로 안전하다. */
+process.exit(0);
