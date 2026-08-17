@@ -999,9 +999,11 @@ function chatBind() {
   const back = document.querySelector('#chat-backdrop');
   if (back) back.addEventListener('click', chatClose);
 
+  /* 도우미로 들어가는 길은 **마스코트 하나뿐이다** (2026-08-17 개발자 지시로 홈의
+     진입줄을 없앴다). 두 군데로 두면 홈만 한 줄 더 길어지고, 마스코트는 어느 화면에서나
+     같은 자리에 있어 학생이 한 번 익히면 계속 쓴다.
+     ⚠️ 길이 하나뿐이므로 **이 줄을 지우면 도우미에 들어갈 방법이 아예 없어진다.** */
   chatBindFab();
-  const bar = document.querySelector('#home-ask');
-  if (bar) bar.addEventListener('click', () => chatOpen());
   const closeBtn = document.querySelector('#btn-chat-close');
   if (closeBtn) closeBtn.addEventListener('click', chatClose);
 
