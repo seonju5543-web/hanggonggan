@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-08-17",
+ "updatedAt": "2026-08-18",
  "items": [
   {
    "id": "reg-kw-gukgagosi",
@@ -6174,6 +6174,245 @@
     }
    ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322606",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-bbssc58943633artclviewdo",
+   "name": "[포스코비전장학] 대학생 생활장학금 지원 장학프로그램 선발 안내",
+   "type": "교내",
+   "provider": "연세대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-18",
+   "period": "접수 기간 원문 확인",
+   "summary": "연세대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "연세대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-18 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.yonsei.ac.kr/bbs/sc/58/943633/artclView.do",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-bbssc58943575artclviewdo",
+   "name": "서암 윤세영 스칼라십 신규 장학생 선발 안내",
+   "type": "교내",
+   "provider": "연세대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-18",
+   "period": "접수 기간 원문 확인",
+   "summary": "연세대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "연세대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-18 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.yonsei.ac.kr/bbs/sc/58/943575/artclView.do",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "1. 선발 대상",
+    "1) 대한민국 국적이며, 국내 4년제 대학 1학년 재학 중인 학생",
+    "- 2026년도 신입생에 한함 (전공 불문)",
+    "- 2학기 휴학 예정자 지원 불가",
+    "2) 1학기 성적 4.0 (4.5 만점) 이상인 학생",
+    "3) 재단 주최 활동에 성실하고 적극적으로 참여할 수 있는 학생",
+    "4) 부모 직장으로부터 학자금 지원을 받고 있지 않은 학생"
+   ]
+  },
+  {
+   "id": "auto-bbssc58943574artclviewdo",
+   "name": "2026년 미래이음 장학금 장학생 추가 선발 안내",
+   "type": "교내",
+   "provider": "연세대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-18",
+   "period": "접수 기간 원문 확인",
+   "summary": "연세대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "연세대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-18 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "(공고문) 2026년 미래이음 장학금 장학생 선발 계획 재공고-2026.07.01.pdf",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1013806/download.do"
+    },
+    {
+     "name": "(붙임1) 2026년 미래이음 장학금 신청 제출(구비) 서류-재공고.pdf",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1013807/download.do"
+    },
+    {
+     "name": "(붙임2) 성적등급 및 평점평균 환산기준표-재공고.pdf",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1013808/download.do"
+    },
+    {
+     "name": "(신청서식) 2026년 미래이음 장학금-개인정보 제공 동의서-재공고.hwp",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1013809/download.do"
+    },
+    {
+     "name": "(참고) 임대차계약 묵시적 갱신 관련 안내-재공고.pdf",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1013810/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.yonsei.ac.kr/bbs/sc/58/943574/artclView.do",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "2. 신청 자격",
+    "(1) 유형별 자격 요건",
+    "1) 제주 4.3 유족",
+    "2) 독립유공자 증손 또는 고손",
+    "3) 독립유공자의 후손(손자녀~고손자녀) 중 1인이 제주특별자치도에 주민등록이 되어 있는 자",
+    "* 가족(손자녀~고손자녀) 관계 및 제주 거주 확인 가능한 증빙서류 제출자에 한함",
+    "(2) 공통 요건",
+    "1) 공고일(2026.07.01) 기준 도외 소재 대학에 재학 중인 39세 이하 학생"
+   ],
+   "excerpts": [
+    "- 선발 인원: 총 100명 이내",
+    "(1) 유형별 자격 요건",
+    "신청 방법 및 접수(인터넷 접수만 가능)",
+    "- 접수 기간: 2026.07.01(수) ~ 07.15(수)",
+    "- 접수 방법: 진흥원 홈페이지를 통한 개별 온라인 접수"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-sknou51802585artclviewdo",
+   "name": "[장학] 2026. 1학기 한국방송통신대학교 발전기금장학생 선발 관련 인정 활동기간 정정 안내",
+   "type": "교내",
+   "provider": "한국방송통신대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-18",
+   "period": "접수 기간 원문 확인",
+   "summary": "한국방송통신대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국방송통신대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-18 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.knou.ac.kr/bbs/knou/51/802585/artclView.do",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-scho332276283artclviewdo",
+   "name": "[장학금 접수] 2026학년도 동원글로벌드리머 장학생 선발안내(기한 연장)",
+   "type": "교내",
+   "provider": "조선대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-18",
+   "period": "접수 기간 원문 확인",
+   "summary": "조선대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "조선대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-18 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026학년도 동원글로벌드리머 제출서류 서식.hwp",
+     "url": "https://www3.chosun.ac.kr/bbs/scho/332/372958/download.do"
+    }
+   ],
+   "sourceUrl": "https://www3.chosun.ac.kr/bbs/scho/332/276283/artclView.do",
+   "sourceKind": "auto",
+   "excerpts": [
+    "2026학년도 동원글로벌드리머 제출서류 서식.hwp"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-scho332275936artclviewdo",
+   "name": "[장학금 접수] 2026학년도 인문100년 및 예술체육비전 장학금 사전신청 안내",
+   "type": "교내",
+   "provider": "조선대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-18",
+   "period": "접수 기간 원문 확인",
+   "summary": "조선대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "조선대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-18 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www3.chosun.ac.kr/bbs/scho/332/275936/artclView.do",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-scho332275857artclviewdo",
+   "name": "[장학금 접수] [기간연장]2026-1 고졸 후학습자(희망사다리 Ⅱ유형) 장학금 신청 안내",
+   "type": "교내",
+   "provider": "조선대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-18",
+   "period": "접수 기간 원문 확인",
+   "summary": "조선대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "조선대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-18 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www3.chosun.ac.kr/bbs/scho/332/275857/artclView.do",
    "sourceKind": "auto"
   }
  ]

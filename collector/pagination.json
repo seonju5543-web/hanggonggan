@@ -1,0 +1,154 @@
+{
+ "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=list&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80": {
+  "ok": false,
+  "checkedAt": "2026-08-17"
+ },
+ "https://www.yonsei.ac.kr/bbs/sc/58/artclList.do?findClSeq=257": {
+  "ok": true,
+  "way": {
+   "kind": "page",
+   "param": "page"
+  },
+  "checkedAt": "2026-08-17"
+ },
+ "https://www.skku.edu/skku/campus/skk_comm/notice06.do": {
+  "ok": false,
+  "checkedAt": "2026-08-17"
+ },
+ "https://www.hanyang.ac.kr/notice_all?p_p_id=kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_action=view&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_sCategoryId=224311300": {
+  "ok": false,
+  "checkedAt": "2026-08-17"
+ },
+ "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318": {
+  "ok": false,
+  "checkedAt": "2026-08-17"
+ },
+ "https://dep.hufs.ac.kr/student/12767/subview.do": {
+  "ok": true,
+  "way": {
+   "kind": "page",
+   "param": "page"
+  },
+  "checkedAt": "2026-08-17"
+ },
+ "https://www.uos.ac.kr/korNotice/list.do?list_id=FA1": {
+  "ok": false,
+  "checkedAt": "2026-08-17"
+ },
+ "https://www.konkuk.ac.kr/konkuk/2239/subview.do": {
+  "ok": false,
+  "checkedAt": "2026-08-17"
+ },
+ "https://www.dongguk.edu/article/JANGHAKNOTICE/list": {
+  "ok": false,
+  "checkedAt": "2026-08-17"
+ },
+ "https://www.hongik.ac.kr/kr/newscenter/notice.do": {
+  "ok": false,
+  "checkedAt": "2026-08-17"
+ },
+ "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=list&srCategoryId=46": {
+  "ok": false,
+  "checkedAt": "2026-08-17"
+ },
+ "https://www.kw.ac.kr/ko/life/notice.jsp": {
+  "ok": false,
+  "checkedAt": "2026-08-17"
+ },
+ "https://www.mju.ac.kr/mjukr/259/subview.do": {
+  "ok": false,
+  "checkedAt": "2026-08-17"
+ },
+ "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do": {
+  "ok": false,
+  "checkedAt": "2026-08-17"
+ },
+ "https://www.kookmin.ac.kr/user/kmuNews/notice/7/index.do": {
+  "ok": false,
+  "checkedAt": "2026-08-17"
+ },
+ "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&keyword=%EC%9E%A5%ED%95%99": {
+  "ok": false,
+  "checkedAt": "2026-08-17"
+ },
+ "https://www.sejong.ac.kr/kor/intro/notice7.do?mode=list&article.offset=0": {
+  "ok": false,
+  "checkedAt": "2026-08-17"
+ },
+ "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do": {
+  "ok": false,
+  "checkedAt": "2026-08-17"
+ },
+ "https://www.inha.ac.kr/bbs/kr/8/artclList.do?bbsClSeq=215": {
+  "ok": true,
+  "way": {
+   "kind": "page",
+   "param": "page"
+  },
+  "checkedAt": "2026-08-17"
+ },
+ "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=list&srCategoryId=22": {
+  "ok": false,
+  "checkedAt": "2026-08-17"
+ },
+ "https://kau.ac.kr/kaulife/scholnoti.php": {
+  "ok": false,
+  "checkedAt": "2026-08-17"
+ },
+ "https://www.kyonggi.ac.kr/www/selectBbsNttList.do?key=7520&bbsNo=1073&pageUnit=10&sf.pnos=1073&sf.pnos=888&searchCnd=WRTER&searchKrwd=%EC%9E%A5%ED%95%99": {
+  "ok": false,
+  "checkedAt": "2026-08-17"
+ },
+ "https://www.seoultech.ac.kr/service/info/janghak/": {
+  "ok": true,
+  "way": {
+   "kind": "page",
+   "param": "page"
+  },
+  "checkedAt": "2026-08-17"
+ },
+ "https://www.knou.ac.kr/bbs/knou/51/artclList.do?bbsClSeq=&bbsOpenWrdSeq=25&isViewMine=false&srchColumn=sj&srchWrd=": {
+  "ok": true,
+  "way": {
+   "kind": "page",
+   "param": "page"
+  },
+  "checkedAt": "2026-08-17"
+ },
+ "https://home.knu.ac.kr/HOME/knussw/index.htm": {
+  "ok": false,
+  "checkedAt": "2026-08-17"
+ },
+ "https://www.yu.ac.kr/scholar/notice/notice.do": {
+  "ok": false,
+  "checkedAt": "2026-08-17"
+ },
+ "https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713": {
+  "ok": false,
+  "checkedAt": "2026-08-17"
+ },
+ "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&cate=8": {
+  "ok": false,
+  "checkedAt": "2026-08-17"
+ },
+ "https://www3.chosun.ac.kr/bbs/scho/332/artclList.do?bbsClSeq=365": {
+  "ok": true,
+  "way": {
+   "kind": "page",
+   "param": "page"
+  },
+  "checkedAt": "2026-08-17"
+ },
+ "https://www.cbnu.ac.kr/www/selectBbsNttList.do?bbsNo=8&key=815&searchCtgry=%ED%95%99%EC%82%AC/%EC%9E%A5%ED%95%99": {
+  "ok": false,
+  "checkedAt": "2026-08-17"
+ },
+ "https://nano.pknu.ac.kr/nano/2432": {
+  "ok": false,
+  "checkedAt": "2026-08-17"
+ },
+ "https://kangwon.ac.kr/ko/bbs/750/list.do": {
+  "ok": false,
+  "checkedAt": "2026-08-17"
+ }
+}
