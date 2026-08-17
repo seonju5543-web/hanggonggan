@@ -124,6 +124,64 @@ async function ask(page, q) {
   const honest = /원문|확인|없어요/.test(amount);
   ok(honest, '금액 답에 "원문 확인" 안내가 함께 나온다', amount.slice(0, 90));
 
+  console.log('\n[3-1] 말귀 — 같은 뜻 다른 말 · 초성 · 오타 · 앞 대화 기억');
+  /* 규칙 자체를 직접 재는 편이 화면 글자로 재는 것보다 정확하다 */
+  const lang = await page.evaluate(() => ({
+    /* ① 같은 뜻 다른 말 — '기숙사비'를 물으면 '생활관'까지 함께 찾는다 */
+    synonym: chatExpandWords(['기숙사비']).includes('생활관'),
+    /* ③ 초성 — 'ㅎㄱㅈㅎㅈㄷ'이 '한국장학재단'의 초성과 같은가 */
+    chosung: chatChosung('한국장학재단') === 'ㅎㄱㅈㅎㅈㄷ',
+    /* ③ 오타 하나는 봐주고, 두 개는 안 봐준다 */
+    typo1: chatNear('장학재단', '장학제단'),
+    typo2: chatNear('장학재단', '장확제단'),
+    /* 너무 짧은 낱말에는 오타 봐주기를 쓰지 않는다(엉뚱한 게 걸린다) */
+    typoShort: chatNear('국장', '국정'),
+  }));
+  ok(lang.synonym, "'기숙사비'를 물으면 '생활관'도 함께 찾는다");
+  ok(lang.chosung, '초성으로도 찾을 수 있다 (한국장학재단 → ㅎㄱㅈㅎㅈㄷ)');
+  ok(lang.typo1 && !lang.typo2, '오타 하나는 봐주고 두 개는 안 봐준다', lang);
+  ok(!lang.typoShort, '짧은 낱말에는 오타 봐주기를 쓰지 않는다');
+
+  /* ② 되묻기 — 못 찾으면 비슷한 후보를 눌러 볼 수 있게 준다 */
+  const clarified = await ask(page, '조병두 장학');
+  const askChips = await page.locator('#chat-log .chat-asks .chat-chip').count();
+  ok(/이 중 하나인가요|찾았어요/.test(clarified) || askChips > 0,
+    '딱 안 맞아도 비슷한 후보를 되묻는다', clarified.slice(0, 60));
+
+  /* ④ 앞 대화 기억 — 공고 하나를 물은 뒤 "그거 서류 뭐야?"가 통하는가 */
+  const one = await page.evaluate(() => {
+    const m = chatApplyable()[0];
+    return m ? m.sch.name : null;
+  });
+  if (one) {
+    await ask(page, one);
+    const follow = await ask(page, '그거 서류 뭐야?');
+    ok(follow.includes(one.slice(0, 6)) || /서류/.test(follow),
+      '"그거 서류 뭐야?"가 앞에서 말한 공고를 가리킨다', follow.slice(0, 70));
+  } else {
+    ok(false, '앞 대화 기억을 시험할 공고가 있다');
+  }
+
+  /* ⑥ 답에서 바로 다음 행동 */
+  await ask(page, '서류 뭐 준비해?');
+  /* ⚠️ 대화에는 앞선 답들의 버튼도 남아 있다 — **마지막 답의** 버튼을 눌러야 한다.
+     (`#chat-log .chat-act:last-child`는 앞 답의 버튼도 함께 걸린다) */
+  const lastBot = page.locator('#chat-log .chat-row.bot').last();
+  const acts = await lastBot.locator('.chat-act').count();
+  ok(acts > 0, '답에서 바로 다음 행동으로 갈 수 있다', { acts });
+  const wallet = lastBot.locator('.chat-act[data-act="wallet"]');
+  ok(await wallet.count() > 0, "서류 답에는 '보관함 열기'가 붙는다");
+  await wallet.click();
+  await page.waitForTimeout(700);
+  ok(await page.isVisible('#screen-my'), '행동 버튼을 누르면 그 화면으로 간다');
+  await page.click('#btn-chat-fab');
+  await page.waitForSelector('#chat-sheet:not([hidden])');
+
+  /* ⑦ 못 알아들은 질문을 기기 안에 세어 둔다 (밖으로는 안 보낸다) */
+  await ask(page, 'ㅁㄴㅇㄹ 쿼카 사육');
+  const missed = await page.evaluate(() => Object.keys(chatMissReport()).length);
+  ok(missed > 0, '못 알아들은 질문을 기기 안에 세어 둔다', { missed });
+
   console.log('\n[4] 카드 → 상세 화면');
   await ask(page, '지금 뭐 신청할 수 있어?');
   const cardCount = await page.locator('#chat-log .sch-card').count();
@@ -233,6 +291,68 @@ async function ask(page, q) {
   ok(aiOff, 'AI 자리는 꺼져 있다(endpoint 비어 있음)');
   const external = outbound.filter((u) => !/cdn\.jsdelivr\.net/.test(u));  // 글꼴은 원래부터 쓰던 것
   ok(external.length === 0, 'AI가 꺼진 동안 바깥으로 나간 요청이 없다', external.slice(0, 3));
+
+  /* ============================================================
+     [6-1] 🔴 AI를 켰을 때 — 지어낸 답이 화면에 못 올라오는가
+     진짜 API 없이 **가짜 AI 서버**를 세워, 일부러 지어낸 응답을 돌려주고
+     앱의 검사(chatVerifyAI)가 그걸 막는지 본다. 이게 이 앱의 정직 원칙을
+     AI를 켠 뒤에도 지키는 마지막 관문이다.
+     ============================================================ */
+  console.log('\n[6-1] 🔴 AI 켠 상태 — 지어낸 답 차단 (가짜 서버)');
+  const FAKE = 'https://fake-chat-test.workers.dev/ask';
+  let sent = null;
+  let reply = { picks: [], needSource: true };
+  await page.route('https://fake-chat-test.workers.dev/**', async (route) => {
+    try { sent = JSON.parse(route.request().postData() || '{}'); } catch (e) { sent = null; }
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(reply) });
+  });
+  await page.evaluate((url) => { CHAT_CONFIG.endpoint = url; }, FAKE);
+  await page.evaluate(() => { if (document.querySelector('#chat-sheet').hidden) chatOpen(); });
+  await page.waitForSelector('#chat-sheet:not([hidden])');
+  ok(await page.evaluate(() => chatAiConfigured()), '가짜 서버로 AI를 켰다');
+
+  /* ⓐ 서버가 '근거 없다'고 하면 안내봇 답으로 되돌아간다 */
+  const a1 = await ask(page, '쿼카 사육 지원금 있어?');
+  ok(/못 알아들었|찾지 못|이 중 하나인가요/.test(a1), 'needSource면 AI 답을 버리고 안내봇 답을 낸다', a1.slice(0, 60));
+
+  /* 🔴 프로필이 서버로 새지 않는가 — 요청 본문을 통째로 검사한다 */
+  const body = JSON.stringify(sent || {});
+  const leaked = ['이선주', '한국외국어대학교', '3.8', 'gpa', 'bracket', 'flags', 'account']
+    .filter((k) => body.includes(k));
+  ok(sent !== null, 'AI가 실제로 불렸다(요청이 나갔다)');
+  ok(leaked.length === 0, '🔴 이름·학교·성적·소득이 서버로 나가지 않는다', leaked);
+  ok(Array.isArray(sent && sent.items) && sent.items.every((i) => i.id && Array.isArray(i.quotes)),
+    '보내는 것은 공고 공개 정보와 인용 문장뿐이다');
+
+  /* ⓑ 앱에 없는 공고를 지어내면 통째로 막는다 */
+  reply = { picks: [{ id: 'reg-존재하지-않는-공고', quotes: [0] }], lead: '찾았어요!', needSource: false };
+  const a2 = await ask(page, '쿼카 사육 지원금 있어?');
+  ok(!/찾았어요!/.test(a2), '앱에 없는 공고를 고르면 AI 답을 버린다', a2.slice(0, 60));
+
+  /* ⓒ 진짜 공고를 골랐지만 **없는 금액을 지어낸** 경우 — 그 줄만 버린다 */
+  const realId = sent.items[0].id;
+  reply = { picks: [{ id: realId, quotes: [0] }], lead: '최대 987654원을 받을 수 있어요', needSource: false };
+  const a3 = await ask(page, '쿼카 사육 지원금 있어?');
+  ok(!/987654/.test(a3), '🔴 앱이 모르는 금액이 들어간 문장은 화면에 안 나간다', a3.slice(0, 80));
+  ok(/원문/.test(a3), '대신 원문 인용으로 답한다', a3.slice(0, 80));
+
+  /* ⓓ 인용 번호를 범위 밖으로 지어내도 그 인용만 사라진다 */
+  reply = { picks: [{ id: realId, quotes: [99] }], lead: '', needSource: false };
+  const a4 = await ask(page, '쿼카 사육 지원금 있어?');
+  ok(a4.length > 5, '인용 번호가 엉뚱해도 답은 나온다(근거 카드는 진짜)');
+
+  /* ⓔ 정상 응답 — AI 표시와 원문 인용이 함께 나온다 */
+  reply = { picks: [{ id: realId, quotes: [0] }], lead: '이 공고가 가장 가까워요', needSource: false };
+  const a5 = await ask(page, '쿼카 사육 지원금 있어?');
+  ok(/이 공고가 가장 가까워요/.test(a5), '숫자가 없는 요약은 그대로 쓴다');
+  ok(await page.locator('#chat-log .chat-ai-tag').count() > 0, 'AI가 만든 답이라고 표시한다');
+  ok(await page.locator('#chat-log .chat-quote').count() > 0, '원문 인용 블록이 함께 나온다');
+
+  /* 서버가 통째로 죽어도 앱은 멀쩡해야 한다 */
+  await page.route('https://fake-chat-test.workers.dev/**', (route) => route.abort());
+  const a6 = await ask(page, '쿼카 사육 지원금 있어?');
+  ok(a6.length > 5, 'AI 서버가 죽어도 안내봇 답이 나간다', a6.slice(0, 50));
+  await page.evaluate(() => { CHAT_CONFIG.endpoint = ''; });   // 다시 꺼 둔다
 
   console.log('\n[7] 질문에 스크립트를 넣어도 실행되지 않는다');
   await page.evaluate(() => { window.__xss = false; if (document.querySelector('#chat-sheet').hidden) chatOpen(); });

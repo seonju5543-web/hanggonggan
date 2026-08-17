@@ -1,0 +1,68 @@
+name: 검색용 요약 만들기
+
+# 장학금 도우미(대장님)가 공고 **원문 전문**까지 뒤져 찾을 수 있도록,
+# 원문에서 '그 공고만의 낱말'만 추려 작은 파일(data/search-index.json)로 만든다.
+# 원문 전문은 수 MB라 앱이 통째로 받을 수 없어서 만든 우회로다.
+#
+# 🔴 수집 워크플로를 고치지 않고 **따로 도는 로봇으로 만들었다.**
+#    수집 로봇 파일은 공동작업자가 자주 손대는 곳이라, 거기에 스텝을 끼워 넣으면
+#    합칠 때마다 부딪힌다. 여기서는 결과만 받아 쓰므로 따로 있어도 아무 문제가 없다.
+on:
+  workflow_run:
+    workflows: ['장학공고 수집 로봇', '브라우저형 수집 로봇', '공고 원문 심층 수집']
+    types: [completed]
+  schedule:
+    - cron: '37 22 * * *'     # 매일 07:37 KST (수집 예약과 겹치지 않는 홀수 분)
+  workflow_dispatch:
+  push:
+    branches: ['claude/nice-heisenberg-WESq5']
+    paths:
+      - 'collector/run-search-index.txt'   # 이 파일을 고쳐 push하면 즉시 실행 (push-to-run)
+
+permissions:
+  contents: write
+
+# 수집 로봇과 다른 대기줄 — 같은 줄에 넣으면 GitHub이 오래된 대기분을 취소해
+# 이 로봇이 조용히 사라진다 (되가져오기 로봇에서 겪은 일).
+concurrency:
+  group: search-index
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/nice-heisenberg-WESq5   # 로봇은 자기가 읽은 브랜치에만 저장한다 (배포는 deploy-sync가)
+      - name: 협업 병합기 등록 (충돌 자동 해소 — COLLAB.md)
+        run: bash tools/setup-collab.sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 검색용 요약 만들기
+        run: node collector/build-search-index.mjs
+
+      - name: 저장
+        run: |
+          git config user.name "handaejang-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          [ -f data/search-index.json ] && git add data/search-index.json
+          true
+          if ! git diff --cached --quiet; then
+            git commit -m "search-index: 검색용 요약 갱신"
+            pushed=0
+            for i in 1 2 3; do
+              if git push; then pushed=1; break; fi
+              git pull --rebase --autostash || true
+              sleep $((i * 5))
+            done
+            if [ "$pushed" != "1" ]; then
+              echo "::error::검색용 요약 저장 실패 (push 3회)"
+              exit 1
+            fi
+          else
+            echo "바뀐 것 없음"
+          fi

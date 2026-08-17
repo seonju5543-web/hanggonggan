@@ -1277,3 +1277,30 @@ textarea:focus {
   font-weight: 800;
   flex: 0 0 auto;
 }
+
+/* 되묻기 후보 · 다음 행동 버튼 — 답 안에서 바로 누를 수 있게 */
+.chat-asks, .chat-acts { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 11px; }
+.chat-asks .chat-chip { max-width: 100%; white-space: normal; text-align: left; }
+.chat-act {
+  min-height: 36px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 3px 10px rgba(47, 107, 255, 0.28);
+}
+.chat-act:active { transform: scale(0.97); }
+
+/* AI가 고른 공고의 원문 문장 — '앱이 가진 원문 그대로'라는 것이 눈에 보여야 한다 */
+.chat-quote {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--gold);
+  background: rgba(217, 181, 106, 0.09);
+  border-radius: 0 10px 10px 0;
+}
+.chat-quote-head { font-size: 11.5px; font-weight: 800; color: var(--text-weak); margin-bottom: 5px; }
+.chat-quote-line { font-size: 13.5px; color: var(--text-sub); line-height: 1.5; }
+.chat-quote-line + .chat-quote-line { margin-top: 5px; }

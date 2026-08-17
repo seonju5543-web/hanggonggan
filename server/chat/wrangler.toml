@@ -1,0 +1,13 @@
+name = "handaejang-chat"
+main = "worker.js"
+compatibility_date = "2026-01-01"
+
+# 저장할 것이 없다 — 질문도 답도 남기지 않는다(KV 없음).
+# 그래서 사고가 나도 새어 나갈 기록 자체가 없다.
+
+# 쓸 모델. 이 서버는 '고르기'만 하므로 가장 싼 모델로 충분하다.
+[vars]
+CHAT_MODEL = "claude-haiku-4-5-20251001"
+
+# 🔴 열쇠는 여기 두지 않는다. 배포 후 명령 한 줄로 넣는다:
+#     npx wrangler secret put ANTHROPIC_API_KEY
