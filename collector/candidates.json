@@ -1,8 +1,53 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-08-17",
- "count": 1399,
+ "count": 1404,
  "items": [
+  {
+   "title": "2026학년도 2학기 국가장학금 및 사전장학 2차 신청 안내",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30065&pageNo=1",
+   "attachments": [],
+   "deadlineHint": "신청기간 미준수) ▶ 국가장학금의 경우, 재학생은 1차 신청이 원칙이나 재학 중 총 2회에 한하여 구제신청이 자동",
+   "school": "중앙대학교",
+   "campus": "",
+   "foundAt": "2026-08-17"
+  },
+  {
+   "title": "(재)중앙대학교동문장학재단 2026년도 장학생 모집 안내",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30066&pageNo=1",
+   "attachments": [],
+   "deadlineHint": "까지 모교 재학생 2,671 명에게 총 26 억 9 천 4 백만원의 장학금을 지원하여 모교 인재양성에 기여해 왔",
+   "school": "중앙대학교",
+   "campus": "",
+   "foundAt": "2026-08-17"
+  },
+  {
+   "title": "2026학년도 2학기 주거안정장학금 2차 신청 안내 (한국장학재단 문의)",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30068&pageNo=1",
+   "attachments": [],
+   "deadlineHint": "신청기간 내 24시간 신청 가능(단, 신청시작일 및 마감일 제외) 대상자 : 신입생·편입생·재입학생·복학생·재학생",
+   "school": "중앙대학교",
+   "campus": "",
+   "foundAt": "2026-08-17"
+  },
+  {
+   "title": "2026학년도 2학기 저소득층 지원 장학금 - 중앙나래(II) 장학금 지급 안내",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30069&pageNo=1",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "중앙대학교",
+   "campus": "",
+   "foundAt": "2026-08-17"
+  },
+  {
+   "title": "(통합) 2026학년도 2학기 2차 국가근로장학금 신청 안내",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30072&pageNo=1",
+   "attachments": [],
+   "deadlineHint": "까지 &nbsp; ※ 2 차 신청기간에 신청한 학생은 방학 중에만 국가근로장학생으로 선발 가능합니다 . &nbs",
+   "school": "중앙대학교",
+   "campus": "",
+   "foundAt": "2026-08-17"
+  },
   {
    "title": "공지 공지 롯데 43기 희망장학생 선발 2026.05.28. 조회 3230",
    "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-%EA%B3%B5%EC%A7%80%20%EA%B3%B5%EC%A7%80%20%EB%A1%AF%EB%8D%B0%2043%EA%B8%B0%20%ED%9D%AC%EB%A7%9D%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%202026.05.28.%20%EC%A1%B0%ED%9A%8C%20323",

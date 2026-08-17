@@ -1,4 +1,4 @@
-## 🖥 브라우저형 수집 리포트 (2026-08-17 11:13 KST)
+## 🖥 브라우저형 수집 리포트 (2026-08-17 12:56 KST)
 
 ### 서울대학교
 - ✅ 링크 223 · 장학 공고 20 · https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=list&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80
@@ -38,22 +38,25 @@
   - (본 링크) [AI·SW융합교육원] 2026학년도 2학기 AI·SW 교양필수 교과목 수강신청 유의사항 안내
 
 ### 중앙대학교
-  - (클릭 예산 초과 — 11/15건까지 채집)
-- ✅ 링크 666 · 장학 공고 11 · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5
+  - (클릭 예산 초과 — 12/15건까지 채집)
+- ✅ 링크 667 · 장학 공고 12 · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5
+  - [수집] (통합) 2026학년도 2학기 2차 국가근로장학금 신청 안내
+  - [수집] 2026학년도 2학기 저소득층 지원 장학금 - 중앙나래(II) 장학금 지급 안내
+  - [수집] 2026학년도 2학기 주거안정장학금 2차 신청 안내 (한국장학재단 문의)
+  - [수집] (재)중앙대학교동문장학재단 2026년도 장학생 모집 안내
+  - [수집] 2026학년도 2학기 국가장학금 및 사전장학 2차 신청 안내
 - ✅ 링크 657 · 장학 공고 4 · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100
 
 ### 숙명여자대학교
 - ⚪ 링크 2 · 장학 공고 0 · https://www.sookmyung.ac.kr/kr/life/scholarship-notice.do
-- ❌ 오류(page.goto: Target page, context or browser has been closed) · https://www.sookmyung.ac.kr/kr/index.do
+- ✅ 링크 611 · 장학 공고 6 · https://www.sookmyung.ac.kr/kr/index.do
 
 ### 가천대학교
 - ❌ 오류(page.goto: Timeout 45000ms exceeded.) · https://www.gachon.ac.kr/bbs/kor/475/artclList.do
-- ❌ 오류(page.goto: net::ERR_CONNECTION_TIMED_OUT at https://www.gachon.ac.kr/kor/7986/subview.do) · https://www.gachon.ac.kr/kor/7986/subview.do
 - ⛔ 응답이 멈춰 7분 30초에서 강제 중단 — 여기까지 채집한 공고만 저장합니다
 
 ### 동국대학교
 - ✅ 링크 635 · 장학 공고 21 · https://www.dongguk.edu/article/JANGHAKNOTICE/list
-  - [수집] 공지 공지 롯데 43기 희망장학생 선발 2026.05.28. 조회 3230
 
 ### 한국외국어대학교
 - ✅ 링크 80 · 장학 공고 12 · https://dep.hufs.ac.kr/student/12767/subview.do
@@ -76,11 +79,11 @@
 - ❌ 오류(page.goto: Target page, context or browser has been closed) · https://onestop.pusan.ac.kr/page?menuCD=000000000000062
 
 ### 서울교육대학교
-- ✅ 링크 393 · 장학 공고 18 · https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083
+- ✅ 링크 396 · 장학 공고 18 · https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083
 
 ### 홍익대학교
-- ❌ 오류(page.goto: Target page, context or browser has been closed) · https://www.hongik.ac.kr/kr/newscenter/notice.do
-- ⚪ 링크 0 · 장학 공고 0 · https://www.hongik.ac.kr/index.do
+- ⚪ 링크 0 · 장학 공고 0 · https://www.hongik.ac.kr/kr/newscenter/notice.do
+- ❌ 오류(page.goto: Target page, context or browser has been closed) · https://www.hongik.ac.kr/index.do
 
 ### 서울과학기술대학교
 - ✅ 링크 292 · 장학 공고 15 · https://www.seoultech.ac.kr/service/info/janghak/
@@ -90,13 +93,13 @@
 - ✅ 링크 56 · 장학 공고 11 · https://onestop.pusan.ac.kr/page?menuCD=000000000000062
 
 ---
-이번 실행 신규 수집: **1건** · 브라우저로도 수집 실패한 학교는 게시판 주소 확인이 필요합니다.
+이번 실행 신규 수집: **5건** · 브라우저로도 수집 실패한 학교는 게시판 주소 확인이 필요합니다.
 ⏱ 소요 10분 / 예산 22분 · 학교 17/17곳 처리
 ⛔ **응답이 멈춰 강제로 끊은 학교 1곳**: 가천대학교 — 학교 서버가 연결만 열어 두고 답을 주지 않아 7분 30초에서 끊었어요. 끊지 않으면 로봇이 그 자리에 멈춰 서고, 강제 종료되면서 **그날 수집분 전체가 버려집니다**(2026-08-15~17에 3회 연속 그렇게 됐어요). 다음 실행(약 12시간 뒤)에 다시 시도합니다.
 
 ⚠️ **이번 실행에 접속 실패한 학교: 가천대학교** — 학교 서버가 응답하지 않아 이번 회차만 건너뛰었어요. 다음 실행(약 12시간 뒤)에 자동으로 다시 수집합니다.
 
-🚨 **여러 번 연속 실패한 학교: 가천대학교(4회 연속)** — 일시 장애가 아니라 게시판 주소가 바뀌었을 가능성이 큽니다. 해당 학교 학생에게 새 공고가 나가지 않고 있으니 주소 확인이 필요해요(Claude 세션에 "○○대 게시판 주소 확인해줘"라고 지시하면 정찰 도구로 후보를 찾아드려요).
+🚨 **여러 번 연속 실패한 학교: 가천대학교(6회 연속)** — 일시 장애가 아니라 게시판 주소가 바뀌었을 가능성이 큽니다. 해당 학교 학생에게 새 공고가 나가지 않고 있으니 주소 확인이 필요해요(Claude 세션에 "○○대 게시판 주소 확인해줘"라고 지시하면 정찰 도구로 후보를 찾아드려요).
 **⏳ 스키마화 대기 중 29건** (원본 확보됨 — collector/pending-forms.json)
 
 ### 🤖 자동 등록 (선조치후보고) — 0건 등록
@@ -104,9 +107,9 @@
 이번 실행에서 자동 등록 기준(개별 실공고·미등록·마감 전)을 전부 통과한 공고가 없어요.
 
 **컨펌 대기 (자동 기준 미달 180건)** — 장학 신호는 있지만 선발·모집 신호가 약해요:
-- 2026학년도 2학기 장애학생도우미(국가근로장학생) 모집 (서울캠퍼스) (타교 등록분과 동일 사업([장학] 2026학년도 2학기 중앙도서관 국) — 접수분 여부 컨펌 대기)
 - (통합) 2026학년도 2학기 2차 국가근로장학금 신청 안내 (타교 등록분과 동일 사업([국가근로] 2026학년도 2학기 한국장학재) — 접수분 여부 컨펌 대기)
 - 2026학년도 2학기 주거안정장학금 2차 신청 안내 (한국장학재단 문의) (타교 등록분과 동일 사업(2026학년도 2학기 국가근로장학금 2차 신) — 접수분 여부 컨펌 대기)
+- 2026학년도 2학기 장애학생도우미(국가근로장학생) 모집 (서울캠퍼스) (타교 등록분과 동일 사업([장학] 2026학년도 2학기 중앙도서관 국) — 접수분 여부 컨펌 대기)
 - [학생복지팀] 26-2 교내장학금 선발 안내 (타교 등록분과 동일 사업(2026-2 교내장학금 신청 안내(신/편입생) — 접수분 여부 컨펌 대기)
 - 2026학년도 2학기 2차 주거안정장학금 신청 안내(한국장학재단) (타교 등록분과 동일 사업(2026학년도 2학기 목적장학금(패밀리장학금) — 접수분 여부 컨펌 대기)
 - [교외] 2026학년도 (재)서울미래인재재단 장학생 선발 (타교 등록분과 동일 사업(양영재단 장학생 선발 (이화여대, 2026-) — 접수분 여부 컨펌 대기)
