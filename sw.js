@@ -10,7 +10,7 @@
    같은 번호로 올리는 일이 반복된다. v15도 v16도 양쪽이 따로 올려 '내용이 다른 같은 버전'이
    됐다. 합칠 때는 **둘 다보다 큰 번호로** 올려야 설치된 앱의 옛 캐시가 확실히 청소된다.
    v17 = 알림·진짜 푸시(선주) + 원문 링크 정직 표기(Josehyeon)를 합친 판. */
-const CACHE = 'handaejang-v51';
+const CACHE = 'handaejang-v52';
 const ASSETS = ['.', 'index.html', 'style.css', 'app.js', 'data.js', 'forms.js',
   'match-engine.js', 'notify-rules.js', 'notify.js', 'push-config.js',
   'manifest.json', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png'];
@@ -142,7 +142,18 @@ async function backgroundCheck() {
   if (!ledger.enabled) return 0; // 사용자가 끈 상태면 아무것도 하지 않는다
 
   const readJson = (url) => fetch(url, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
-  const [reg, notices] = await Promise.all([readJson('data/registered.json'), readJson('data/notices.json')]);
+  /* 공고는 **학교별 파일**에서 읽는다 (2026-08-17) — 화면(app.js loadNotices)과 같은 규칙.
+     여기만 옛 파일을 보면, 화면에는 있는 공고를 알림이 모르거나 그 반대가 된다
+     (이 저장소가 match-engine.js를 화면·알림이 함께 쓰는 것과 같은 이유). */
+  const noticeFiles = typeof noticeFilesForProfile === 'function' ? noticeFilesForProfile(profile) : [];
+  const [reg, ...noticeDocs] = await Promise.all([
+    readJson('data/registered.json'),
+    ...(noticeFiles.length ? noticeFiles : ['data/notices.json']).map(readJson),
+  ]);
+  const gotAny = noticeDocs.some(Boolean);
+  const notices = gotAny
+    ? { items: noticeDocs.filter(Boolean).flatMap((d) => d.items || []) }
+    : await readJson('data/notices.json');   // 학교별 파일이 아직 없는 학교
 
   const out = NOTIFY_RULES.evaluate({
     now: Date.now(),

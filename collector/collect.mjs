@@ -9,6 +9,7 @@
 import fs from 'node:fs';
 import { urlKey, dedupeNotices, capNotices } from './url-key.mjs';
 import { loadCandidates, mergeCandidates, saveCandidates } from './candidates.mjs';
+import { publishBySchool } from './publish-notices.mjs';
 import { cleanTitle, isMenuEntry } from './clean-title.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 
@@ -256,6 +257,13 @@ notices.items = dedupeNotices(notices.items);
    예전엔 잘린 공고가 seen.json에만 '봤다'로 남아 다시 수집되지도, 검수되지도 않았다
    (2026-08-17 실측 747건 유실). 경위는 collector/candidates.mjs 첫머리. */
 saveCandidates(mergeCandidates(loadCandidates().items, freshAll));
+
+const beforeCap = notices.items;
+/* 학교별 파일도 함께 발행한다 (2026-08-17) — 앱은 이쪽을 읽는다.
+   위 capNotices는 **폰이 통째로 받는 옛 파일**을 작게 유지하려는 것이고, 학교별 파일에는
+   그 상한이 필요 없다(학생은 자기 학교 것만 받는다). 그래서 자르기 **전** 목록으로 발행한다 —
+   순서가 바뀌면 학교별 파일도 16건으로 잘려 나눈 뜻이 사라진다. 경위는 collector/publish-notices.mjs */
+publishBySchool(beforeCap);
 
 notices.items = capNotices(notices.items);
 notices.updatedAt = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);

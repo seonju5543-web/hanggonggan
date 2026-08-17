@@ -264,9 +264,51 @@ function requirementMatch(text, p) {
   return null;   // 판정 불가 — 색을 칠하지 않는다
 }
 
+/* ---------------- 학교별 공고 파일 이름 (2026-08-17 신설) ----------------
+   왜 나눴나: `data/notices.json`은 **폰이 통째로 내려받는 파일**이라, 고려대 학생도
+   동국대 공고를 같이 받았다. 그래서 크기 상한(학교 수 × 15건)이 필요했고, 학교가 41곳이
+   되면서 그 상한이 실제로 물려 바쁜 학교 34곳이 **16건에서 잘리고** 있었다.
+   학교별로 나누면 학생은 자기 학교 것만 받으므로 **상한 자체가 필요 없어진다.**
+
+   ⚠️ 파일 이름에 한글을 쓰지 않는 이유: 이 저장소에는 한글 파일명이 하나도 없다.
+   지금 들이면 git 설정(core.quotepath)·GitHub Pages·나중의 Cloudflare 이전까지
+   전부 확인해야 할 것이 늘어난다. 그래서 학교 이름을 **정해진 규칙으로 짧은 영숫자**로
+   바꾼다(FNV-1a). 사람이 읽을 이름은 `data/notices/index.json`에 함께 적어 둔다.
+
+   ⚠️ 이 함수는 **화면(app.js)·알림(sw.js)·수집 로봇(Node)이 같이 쓴다.**
+   베껴 두면 로봇이 쓴 파일을 앱이 못 찾는다 — 그런데 앱은 404를 조용히 넘기므로
+   **아무 오류 없이 공고가 0건이 된다**(가장 찾기 힘든 종류의 고장).
+   verify/test-collector.mjs가 로봇과 이 함수의 결과가 같은지 검사한다. */
+function noticeFileKey(school) {
+  let h = 0x811c9dc5;
+  const s = String(school || '');
+  for (let i = 0; i < s.length; i += 1) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;    // imul — 32비트 곱셈을 정확히 (그냥 *는 정밀도를 잃는다)
+  }
+  return `n${h.toString(36)}`;
+}
+
+function noticeFileFor(school) {
+  return `data/notices/${noticeFileKey(school)}.json`;
+}
+
+/* 이 학생이 받아야 할 공고 파일들.
+   분교가 본교 게시판을 함께 쓰는 경우(한양 ERICA·건국 글로컬·홍익 세종)에는 본교 파일도
+   받아야 한다 — 공고가 본교 이름으로 저장되기 때문. 어느 것이 내 공고인지는 그다음에
+   noticeForProfile이 가른다(그 판정은 여기서 손대지 않는다). */
+function noticeFilesForProfile(p) {
+  if (!p || !p.school) return [];
+  const list = [noticeFileFor(p.school)];
+  const parent = SHARED_BOARD_BRANCH[p.school];
+  if (parent) list.push(noticeFileFor(parent));
+  return list;
+}
+
 /* Node(검증 스크립트)에서도 같은 엔진을 불러 쓸 수 있게 — 브라우저·서비스워커에는 영향 없음 */
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { evaluate, fitScore, scopedToProfile, notStale, STALE_DAYS,
                      requirementLines, requirementMatch, tidyRequirement,
-                     noticeForProfile, taggedSchool, SHARED_BOARD_BRANCH };
+                     noticeForProfile, taggedSchool, SHARED_BOARD_BRANCH,
+                     noticeFileKey, noticeFileFor, noticeFilesForProfile };
 }

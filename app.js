@@ -868,14 +868,34 @@ function renderFormFill() {
 
 /* ---------------- 실시간 공고 (수집 로봇 발행) ---------------- */
 let liveNotices = null;
+/* 학교별 파일을 읽는다 (2026-08-17). 예전에는 전 학교 공고가 든 data/notices.json을
+   통째로 받아서 자기 학교 것만 골라 썼다 — 고려대 학생이 동국대 공고까지 받는 구조라
+   파일이 커지지 않게 상한(학교 수 × 15건)이 필요했고, 학교가 41곳이 되면서 그 상한이
+   실제로 물려 **바쁜 학교는 16건에서 잘리고** 있었다.
+   지금은 자기 학교 파일 하나만 받으므로 받는 양이 크게 줄고(476KB → 10KB 안팎)
+   상한도 필요 없다. 파일 이름 규칙은 match-engine.js의 noticeFileFor 한 곳에 있다.
+
+   ⚠️ 옛 파일(data/notices.json)로 물러나는 길을 남겨 둔다 — 학교별 파일이 아직 없거나
+   (그 학교 첫 수집 전) 배포가 엇갈린 순간에도 화면이 비지 않게. */
 function loadNotices() {
-  fetch('data/notices.json', { cache: 'no-store' })
-    .then((r) => (r.ok ? r.json() : null))
-    .then((d) => {
-      liveNotices = d;
-      if (!$('#screen-explore').hidden) renderExplore();
+  const p = state.profile;
+  const files = (typeof noticeFilesForProfile === 'function' && p) ? noticeFilesForProfile(p) : [];
+  const get = (u) => fetch(u, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  const job = files.length
+    ? Promise.all(files.map(get)).then((docs) => {
+      const ok = docs.filter(Boolean);
+      if (!ok.length) return get('data/notices.json');    // 아직 학교별 파일이 없는 학교
+      return {
+        updatedAt: ok.map((d) => d.updatedAt).filter(Boolean).sort().pop() || null,
+        items: ok.flatMap((d) => d.items || []),
+      };
     })
-    .catch(() => { /* 오프라인 등 — 조용히 무시 */ });
+    : get('data/notices.json');
+  job.then((d) => {
+    if (!d) return;
+    liveNotices = d;
+    if (!$('#screen-explore').hidden) renderExplore();
+  }).catch(() => { /* 오프라인 등 — 조용히 무시 */ });
 }
 
 /* 자유 형식 지원문서 연결 (2026-07-15): 공고가 별도 양식 없이 자유 형식 제출을

@@ -7,6 +7,8 @@
 import fs from 'node:fs';
 import { urlKey, titleKey, dedupeNotices, preferNotice, capNotices, clickRowKey } from '../collector/url-key.mjs';
 import { mergeCandidates } from '../collector/candidates.mjs';
+import { publishBySchool, splitBySchool } from '../collector/publish-notices.mjs';
+import { createRequire } from 'node:module';
 import { isAttachmentEntry, isHtmlPayload } from '../collector/attachment-link.mjs';
 import { isDetailUrl, isMarkerUrl, markerTitle, sameTitle, detailCandidates, looksLikeLoginWall, rowDetailCandidates } from '../collector/detail-url.mjs';
 import { cleanTitle, isMenuEntry } from '../collector/clean-title.mjs';
@@ -516,6 +518,61 @@ console.log('\n■ 클릭형 게시판 장부 (아는 행을 다시 누르지 �
   // 이미 아는 공고로 밝혀진 행도 적어야 한다 — 안 적으면 상세 루프가 안 건드려 영영 다시 누른다
   eq('이미 아는 공고로 밝혀진 행도 장부에 적는다', /if \(known\) seen\[clickRowKey\(url, title\)\] = known;/.test(src), true);
   eq('건너뛴 건수를 리포트에 적는다 (공고가 준 것처럼 보이지 않게)', /이미 아는 공고 \$\{r\.clickSkipped\}건/.test(src), true);
+}
+
+/* 학교별 공고 파일 (2026-08-17) — '학교당 16건'의 원인이던 전체 상한을 없앤 구조 */
+console.log('\n■ 학교별 공고 파일 (로봇이 쓴 파일을 앱이 찾아갈 수 있나)');
+{
+  const root = new URL('../', import.meta.url);
+  const req = createRequire(import.meta.url);
+  const ME = req('../match-engine.js');
+  eq('이름이 영숫자뿐 (이 저장소엔 한글 파일명이 하나도 없다)', /^n[0-9a-z]+$/.test(ME.noticeFileKey('한국외국어대학교')), true);
+  eq('같은 학교면 같은 이름', ME.noticeFileKey('경희대학교'), ME.noticeFileKey('경희대학교'));
+  eq('다른 학교면 다른 이름', ME.noticeFileKey('경희대학교') !== ME.noticeFileKey('고려대학교'), true);
+  /* 🔴 이 검사가 이 절의 핵심이다. 로봇이 쓰는 파일 이름과 앱이 찾아가는 이름이 갈라지면
+     **앱은 404를 조용히 넘기므로 오류 하나 없이 공고가 0건**이 된다. */
+  const tmp = new URL('../.tmp-notices-test/', root);
+  fs.rmSync(tmp, { recursive: true, force: true });
+  publishBySchool([
+    { school: '경희대학교', campus: '서울', title: 'a', url: 'https://k.kr/1', foundAt: '2026-08-17' },
+    { school: '고려대학교', title: 'b', url: 'https://k2.kr/1', foundAt: '2026-08-17' },
+  ], { dir: tmp });
+  const wrote = fs.readdirSync(tmp).filter((f) => f !== 'index.json');
+  const wants = ME.noticeFileFor('경희대학교').split('/').pop();
+  eq('로봇이 쓴 파일을 앱의 규칙으로 찾을 수 있다', wrote.includes(wants), true);
+  eq('학교 수만큼 파일이 생긴다', wrote.length, 2);
+  // 색인은 사람이 읽으려는 것 — 한글 학교명이 파일 이름과 이어져 있어야 디버깅이 된다
+  const idx = JSON.parse(fs.readFileSync(new URL('index.json', tmp), 'utf8'));
+  eq('색인이 학교 이름과 파일을 이어 준다', idx.files['경희대학교'].file, wants);
+  fs.rmSync(tmp, { recursive: true, force: true });
+  /* 학교별 파일은 **다른 학교에 밀려 줄어들지 않는다** — 전체 상한이 없어진 것이 이 작업의 핵심.
+     capNotices는 학교가 늘수록 학교당 몫을 함께 줄여 41곳에서 16건까지 조여졌다. */
+  const many = [];
+  for (let s = 0; s < 60; s += 1) for (let i = 0; i < 30; i += 1) many.push({ school: `학교${s}`, title: `t${i}`, url: `https://x.kr/${s}/${i}` });
+  const split = splitBySchool(many);
+  eq('학교가 60곳이어도 학교당 30건 그대로', split.get('학교0').length, 30);
+  eq('학교당 상한은 지킨다', splitBySchool(many, 10).get('학교0').length, 10);
+  // 분교가 본교 게시판을 함께 쓰면 본교 파일도 받아야 한다 (한양 ERICA·건국 글로컬·홍익 세종)
+  eq('분교 학생은 본교 파일도 받는다',
+    ME.noticeFilesForProfile({ school: '한양대학교 ERICA캠퍼스' }).includes(ME.noticeFileFor('한양대학교')), true);
+  eq('본교 학생은 자기 파일 하나', ME.noticeFilesForProfile({ school: '고려대학교' }).length, 1);
+  eq('학교가 없으면 받을 파일도 없다', ME.noticeFilesForProfile({}).length, 0);
+  // 화면과 알림이 **같은 규칙**을 써야 한다 — 갈라지면 화면에 있는 공고를 알림이 모른다
+  for (const f of ['app.js', 'sw.js']) {
+    eq(`${f}가 학교별 파일 규칙을 쓴다`,
+      /noticeFilesForProfile\(/.test(fs.readFileSync(new URL(f, root), 'utf8')), true);
+  }
+  // 옛 파일로 물러나는 길 — 아직 자기 학교 파일이 없는 학생의 화면이 비면 안 된다
+  for (const f of ['app.js', 'sw.js']) {
+    eq(`${f}에 옛 파일 폴백이 남아 있다`,
+      /data\/notices\.json/.test(fs.readFileSync(new URL(f, root), 'utf8')), true);
+  }
+  for (const f of ['collector/collect.mjs', 'collector/browser-collect.mjs']) {
+    const src = fs.readFileSync(new URL(f, root), 'utf8');
+    // 자르기 **전** 목록으로 발행해야 한다 — 순서가 뒤집히면 학교별 파일도 16건으로 잘린다
+    eq(`${f}가 상한을 적용하기 전 목록으로 발행한다`,
+      src.indexOf('publishBySchool(beforeCap)') < src.indexOf('notices.items = capNotices('), true);
+  }
 }
 
 /* 검수 후보 장부 (2026-08-17) — 앱 파일의 크기 상한에 밀린 공고가 조용히 사라지던 것 */
