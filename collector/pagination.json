@@ -184,12 +184,8 @@
   "checkedAt": "2026-08-17"
  },
  "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5": {
-  "ok": true,
-  "way": {
-   "kind": "page",
-   "param": "pageNo"
-  },
-  "checkedAt": "2026-08-17"
+  "ok": false,
+  "checkedAt": "2026-08-18"
  },
  "https://www.smu.ac.kr/kor/life/notice.do": {
   "ok": false,
@@ -222,7 +218,7 @@
    "kind": "page",
    "param": "pageNo"
   },
-  "checkedAt": "2026-08-17"
+  "checkedAt": "2026-08-18"
  },
  "https://onestop.pusan.ac.kr/page?menuCD=000000000000062": {
   "ok": true,
