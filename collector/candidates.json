@@ -1,8 +1,299 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-08-18",
- "count": 1540,
+ "count": 1554,
  "items": [
+  {
+   "title": "2026년도 손태희장학재단 장학생 선발 안내 학생지원팀 2026-08-18 28",
+   "url": "https://kau.ac.kr/kaulife/scholnoti.php?searchkey=&searchvalue=&code=s1301&page=&mode=read&seq=11034",
+   "attachments": [
+    {
+     "name": "2026년 손태희장학재단 신규교사 남성학원 홍보자료.pdf",
+     "url": "https://kau.ac.kr/upfile/2026/08/18/20260818094901-7132.pdf"
+    },
+    {
+     "name": "2026년 손태희장학재단 4기 장학생 서식.hwpx",
+     "url": "https://kau.ac.kr/upfile/2026/08/18/20260818094901-6881.hwpx"
+    },
+    {
+     "name": "2026년 손태희장학재단 4기 장학생 선발 공고문.pdf",
+     "url": "https://kau.ac.kr/upfile/2026/08/18/20260818094901-2608.pdf"
+    },
+    {
+     "name": "대학자체평가",
+     "url": "https://www.kau.ac.kr/doc/popup/2025_selfeval.pdf"
+    }
+   ],
+   "deadlineHint": "접수기간 1) 1 차 온라인 접수:&nbsp; 2026. 8.24. ( 월 ) ~ 9.8.( 화 ) 2) 2 차 등",
+   "school": "한국항공대학교",
+   "campus": "",
+   "foundAt": "2026-08-18"
+  },
+  {
+   "title": "[공지] [국가근로] 2026학년도 2학기 국가근로장학금 일반유형 추가모집 희망근로지 신청 안내",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=373777&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "2026학년도 2학기 아주대학교 국가근로 일반유형(교외· 교내) 추가모집 희망 근로지 명단.xlsx",
+     "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=file-download&articleNo=373777&attachNo=331705"
+    }
+   ],
+   "deadlineHint": "까지 - 구글폼 신청 바로가기 : https://forms.gle/yrhwjyCaojuzejkY9 (희망근로지",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-08-18"
+  },
+  {
+   "title": "(재)손태희장학재단 2026학년도 손태희장학생 선발 안내",
+   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=815&bbsNo=8&nttNo=169259&pageUnit=10&searchCtgry=%ed%95%99%ec%82%ac%2f%ec%9e%a5%ed%95%99&searchCnd=all&pageIndex=1",
+   "attachments": [],
+   "deadlineHint": "신청기간: 2026. 8. 24.(월) ~ 9. 8.(화) 16:00 바. 신청방법: 학생 개별 신청(등기우편 접수",
+   "school": "충북대학교",
+   "campus": "",
+   "foundAt": "2026-08-18"
+  },
+  {
+   "title": "[홍익대학교 박물관] 전시 지킴이 봉사장학생 모집(학부)",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=155260&article.offset=0&articleLimit=10&noCat=35",
+   "attachments": [
+    {
+     "name": "박물관 전시지킴이 신청서(양식).hwp",
+     "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=download&articleNo=155260&attachNo=90773"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "홍익대학교",
+   "campus": "",
+   "foundAt": "2026-08-18"
+  },
+  {
+   "title": "[장학안내] 2026년도 손태희장학재단 장학생 선발 안내",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70017&cate=8",
+   "attachments": [
+    {
+     "name": "교육기본시설/부속시설",
+     "url": "https://www.jnu.ac.kr/MainIntro/Institution/AttachedFac"
+    },
+    {
+     "name": "2026년 손태희장학재단 4기 장학생 선발 공고문.pdf",
+     "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2570556"
+    },
+    {
+     "name": "2026년 손태희장학재단 4기 장학생 서식.hwpx",
+     "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2570557"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-08-18"
+  },
+  {
+   "title": "2026년 손태희장학재단 장학생 선발 공고문",
+   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12235/view.do?currentPageNo=1",
+   "attachments": [
+    {
+     "name": "' + fileItem.fileNm + '",
+     "url": "https://kep.kookmin.ac.kr/com/cmsv/FileCtr/fileDefaultDownload.do?fileNo="
+    }
+   ],
+   "deadlineHint": null,
+   "school": "국민대학교",
+   "campus": "",
+   "foundAt": "2026-08-18"
+  },
+  {
+   "title": "(홍보) 2026년도 세종이도인재장학금 디딤돌 장학사업 신청 안내 (~8/31(월)까지)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=5233&bidx=892400&qidx=5233&cate=0&allboard=true&nowpage=3",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "3. 별지 서식 제출 서류(학자금대출 관련)_최종.hwp",
+     "url": "javascript:downloadfile("
+    }
+   ],
+   "deadlineHint": "까지) 작성자 학생지원과 조회수 730 날짜 2026-07-09 첨부파일 3. 별지 서식 제출 서류(학자금대출",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-08-18"
+  },
+  {
+   "title": "2026학년도 2학기 한국장학재단 학자금대출 신청 안내",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=5233&bidx=892401&qidx=5233&cate=0&allboard=true&nowpage=3",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "붙임1. 2026학년도 2학기 학자금대출 업무처리기준_대학(원).pdf",
+     "url": "javascript:downloadfile("
+    }
+   ],
+   "deadlineHint": "마감) (홍보) 2026년도 세종이도인재장학금 디딤돌 장학사업 신청 안내 (~8/31(월)까지) 담당부서 : 학",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-08-18"
+  },
+  {
+   "title": "(홍보) 2026년 제2회 서울시 대학(원)생 학자금대출 이자지원사업 신청자 모집(~9/15(화)까지)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=5233&bidx=893554&qidx=5233&cate=0&allboard=true&nowpage=2",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "2026년 제2회 대학생 학자금대출 이자지원 공고문.hwpx",
+     "url": "javascript:downloadfile("
+    }
+   ],
+   "deadlineHint": "까지) 작성자 학생지원과 조회수 425 날짜 2026-08-05 첨부파일 2026년 제2회 대학생 학자금대출 이",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-08-18"
+  },
+  {
+   "title": "[정보전산원] 2026학년도 2학기 국가근로장학생 모집(2명)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=57138&bidx=894055&qidx=57138&cate=0&allboard=true&nowpage=1",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "(서식1)국가근로장학생 지원서 및 자기소개서.hwp",
+     "url": "javascript:downloadfile("
+    }
+   ],
+   "deadlineHint": "마감 안내 / 최종 선발자만 유선통보 예정 &nbsp; 4. 업무: 정보전산원 업무보조 및 전화 민원 응대 등",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-08-18"
+  },
+  {
+   "title": "(홍보) 2026년도 손태희장학재단 4기 장학생 선발 공고(~9/8(화)까지)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=894064&qidx=5233&cate=0&allboard=true&nowpage=1",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "2026년 손태희장학재단 4기 장학생 선발 공고문.pdf",
+     "url": "javascript:downloadfile("
+    }
+   ],
+   "deadlineHint": "까지) 작성자 학생지원과 조회수 37 날짜 2026-08-18 첨부파일 2026년 손태희장학재단 4기 장학생 선",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-08-18"
+  },
+  {
+   "title": "2026학년도 2학기 재학생 학자금대출 기등록자 특별승인 신청 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=139165&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "부속기관",
+     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+    }
+   ],
+   "deadlineHint": "신청기간: 8.20.(목) ~ 11.13.(금) * 유의 사항 - 등록금 중 필수경비를 장학금으로 모두 지급받은 대",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-08-18"
+  },
+  {
+   "title": "[손태희장학재단] 2026년 장학생 선발 안내",
+   "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54623",
+   "attachments": [
+    {
+     "name": "2026년 손태희장학재단 4기 장학생 선발 공고문.pdf&nbsp; &nbsp;(다운로드 : 10회) 바로보기",
+     "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=ed7fb9c2c524a0b8c62801469d3fc4ec&bbsId=1083"
+    },
+    {
+     "name": "2026년 손태희장학재단 4기 장학생 서식.hwpx&nbsp; &nbsp;(다운로드 : 3회) 바로보기",
+     "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=075311e79a66f8f29a925f64cc6016da&bbsId=1083"
+    },
+    {
+     "name": "2026년 손태희장학재단 신규교사 남성학원 홍보자료.pdf&nbsp; &nbsp;(다운로드 : 2회) 바로보기",
+     "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=e690b12ef332a16fb0e2ffe49563a9f9&bbsId=1083"
+    },
+    {
+     "name": "정부혁신",
+     "url": "https://www.snue.ac.kr/common/nttFileDownload.do?fileKey=664d7a4b00c31659ba3878e5e722a3d4&bbsId=3011"
+    }
+   ],
+   "deadlineHint": "접수기간 1） 1차 온라인 접수 - 2026. 8.24. （월） - 9.8.（화） 2） 2차 등기우편 접수 - 20",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-08-18"
+  },
+  {
+   "title": "2026년 손태희장학재단 장학생 선발 안내",
+   "url": "https://www.yonsei.ac.kr/bbs/sc/58/943880/artclView.do",
+   "attachments": [
+    {
+     "name": "2026년 손태희장학재단 4기 장학생 선발 공고문.pdf",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1014325/download.do"
+    },
+    {
+     "name": "2026년 손태희장학재단 신규교사 남성학원 홍보자료.pdf",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1014326/download.do"
+    },
+    {
+     "name": "2026년 손태희장학재단 4기 장학생 서식.hwp",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1014327/download.do"
+    }
+   ],
+   "deadlineHint": "접수기간 &nbsp; 1) 1차 온라인 접수 - 2026. 8. 24 (월) ~ 9. 8 (화) &nbsp; 2)",
+   "school": "연세대학교",
+   "campus": "",
+   "foundAt": "2026-08-18"
+  },
   {
    "title": "2026년 2학기 국가장학금 2차 신청기간 안내",
    "url": "https://onestop.pusan.ac.kr/page?menuCD=000000000000062&currentPageNo=2#n-2026%EB%85%84%202%ED%95%99%EA%B8%B0%20%EA%B5%AD%EA%B0%80%EC%9E%A5%ED%95%99%EA%B8%88%202%EC%B0%A8%20%EC%8B%A0%EC%B2%AD%EA%B8%B0%EA%B0%84%20%EC%95%88%EB%82%B4",
