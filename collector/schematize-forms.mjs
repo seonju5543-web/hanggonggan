@@ -140,10 +140,17 @@ const SYSTEM = `당신은 한국 대학 장학금 신청서를 앱 입력 양식
 - 원본에 없는 안내 문구를 추가하지 마세요.
 - label은 원본의 항목명을 그대로 씁니다. q는 사용자에게 물어보는 짧은 질문입니다.
 - info는 프로필에서 자동으로 채워지는 인적사항 줄입니다. [표시명, 키, 표시명, 키] 형태이고
-  키로 쓸 수 있는 값은 name, studentId, major, school, phone, email, bracket, yearRemain, gpaLast 뿐입니다.
+  키로 쓸 수 있는 값은 name, studentId, major, school, phone, email, birth, addr, emergency,
+  guardianName, guardianRel, guardianPhone, bank, account, gender, bracket, yearRemain, gpaLast 뿐입니다.
   원본에 해당 인적사항 칸이 있을 때만 넣고, 없으면 빈 배열로 두세요.
-- fields의 type: text(한 줄), textarea(여러 줄), checks(선택지 중 체크), checks+text(체크+보충 기입).
-- 동의/서약 항목은 checks로 만들고 options에 원본의 선택지(예: "동의함", "동의하지 않음")를 그대로 넣습니다.
+- fields의 type: text(한 줄), textarea(여러 줄), choice(보기 중 **하나만** 고르기),
+  checks(보기 중 **여러 개** 고르기), checks+text(체크+보충 기입).
+- 성별·병역·동의·서약처럼 답이 하나뿐인 항목은 checks가 아니라 **choice**로 만드세요.
+  '해당하는 것을 모두' 고르는 항목만 checks입니다.
+- 위 info 키로 채울 수 있는 text 필드에는 auto에 그 키를 적으세요(예: 두 번째로 나오는 '성명').
+  그러면 앱이 학생에게 묻지 않고 프로필에서 채웁니다. 해당 없으면 빈 문자열.
+- options에는 **원본에 실제로 적힌 보기만** 넣습니다. 원본에 없는 보기를 만들어 내지 마세요.
+- 원본에서 항목 이름을 못 찾은 체크칸은 '선택 1' 같은 이름을 지어 붙이지 말고 아예 만들지 마세요.
 - id는 영문 소문자와 숫자로 짧게(예: name, addr, jumin, amount, agree1).
 - pledge는 원본 하단의 서약·확약 문장을 그대로 옮깁니다. 없으면 빈 문자열.
 - 주민등록번호처럼 민감한 항목은 placeholder에 "비워두고 인쇄 후 직접 기입해도 됩니다"를 넣으세요.`;
@@ -174,13 +181,14 @@ const SCHEMA = {
                 id: { type: 'string' },
                 label: { type: 'string' },
                 q: { type: 'string' },
-                type: { type: 'string', enum: ['text', 'textarea', 'checks', 'checks+text'] },
+                type: { type: 'string', enum: ['text', 'textarea', 'choice', 'checks', 'checks+text'] },
+                auto: { type: 'string' },
                 options: { type: 'array', items: { type: 'string' } },
                 placeholder: { type: 'string' },
                 suffix: { type: 'string' },
                 textLabel: { type: 'string' }
               },
-              required: ['id', 'label', 'q', 'type', 'options', 'placeholder', 'suffix', 'textLabel'],
+              required: ['id', 'label', 'q', 'type', 'auto', 'options', 'placeholder', 'suffix', 'textLabel'],
               additionalProperties: false
             }
           }
@@ -217,7 +225,12 @@ function tidy(t) {
   return out;
 }
 
-const INFO_KEYS = new Set(['name', 'studentId', 'major', 'school', 'phone', 'email', 'bracket', 'yearRemain', 'gpaLast']);
+/* 🔴 원본은 form-plan.js의 FORM_AUTO_KEYS_ALL이다 — 늘릴 때 같이 늘린다.
+   여기만 늘리면 앱이 못 알아보는 키가 들어와 문서에 빈 칸이 찍힌다 */
+const INFO_KEYS = new Set(['name', 'studentId', 'major', 'school', 'phone', 'email',
+  'birth', 'addr', 'emergency', 'guardianName', 'guardianRel', 'guardianPhone',
+  'bank', 'account', 'gender', 'rrn', 'bracket', 'yearRemain', 'gpaLast', 'year']);
+const FIELD_TYPES_OK = new Set(['text', 'textarea', 'choice', 'checks', 'checks+text', 'schedule', 'group', 'static']);
 
 function validate(t) {
   if (!t.title || !t.docName) return '제목·파일명 누락';
@@ -233,7 +246,11 @@ function validate(t) {
     for (const f of s.fields || []) {
       fieldCount++;
       if (!f.id || !/^[a-z0-9_]+$/.test(f.id)) return `필드 id가 올바르지 않음: ${f.id}`;
-      if ((f.type === 'checks' || f.type === 'checks+text') && !(f.options || []).length) return `${f.id}: 체크 선택지 없음`;
+      /* 예전엔 type 값을 아예 검사하지 않아, 앱이 모르는 타입이 들어오면
+         질문 화면에 입력칸이 없고 문서에 조용히 빈 칸이 찍혔다 */
+      if (!FIELD_TYPES_OK.has(f.type)) return `${f.id}: 알 수 없는 type: ${f.type}`;
+      if (f.auto && !INFO_KEYS.has(f.auto)) return `${f.id}: 허용되지 않은 auto 키: ${f.auto}`;
+      if ((f.type === 'checks' || f.type === 'checks+text' || f.type === 'choice') && !(f.options || []).length) return `${f.id}: 체크 선택지 없음`;
     }
   }
   if (!fieldCount) return '입력 항목 없음';

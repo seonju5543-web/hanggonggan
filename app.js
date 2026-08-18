@@ -517,16 +517,27 @@ function collectProfile() {
     flags: $$('#in-flags input:checked').map((c) => c.value),
     cert: $('#in-cert').checked,
     exchange: $('#in-exchange').checked,
-    common: {
+    /* 🔴 온보딩 화면에 칸이 없는 값(현주소·긴급연락처·보호자·성별·주민등록번호)은
+       신청서를 채우다 학생이 알려 준 것이라, 여기서 통째로 새로 만들면 **사라진다.**
+       프로필을 한 번 수정할 때마다 그동안 배운 것을 잃게 되므로 반드시 이어 붙인다. */
+    common: Object.assign({}, (state.profile && state.profile.common) || {}, {
       studentId: $('#in-sid').value.trim(),
       birth: $('#in-birth').value.trim(),
       phone: $('#in-phone').value.trim(),
       email: $('#in-email').value.trim(),
       bank: $('#in-bank').value.trim(),
       account: $('#in-account').value.trim(),
-    },
+    }),
   };
 }
+
+/* 신청서를 채우며 배운 값 — 온보딩에는 칸이 없고 '다음에도 쓸게요'로만 쌓인다.
+   MY 화면에서 언제든 보고 지울 수 있어야 한다(개인정보는 학생의 것이다). */
+const LEARNED_COMMON = [
+  ['gender', '성별'], ['addr', '주소'], ['emergency', '긴급연락처'],
+  ['guardianName', '보호자 성명'], ['guardianRel', '보호자와의 관계'], ['guardianPhone', '보호자 연락처'],
+  ['rrn', '주민등록번호'],
+];
 
 /* ---------------- 카드 렌더링 ---------------- */
 function schCard(sch, result, { compact = false, fit = 0 } = {}) {
@@ -812,6 +823,8 @@ let formFill = null; // { schId, stage:'q'|'preview', ans }
 
 function startFormFill(sch) {
   formFill = { schId: sch.id, stage: 'q', ans: null };
+  /* 프로필이 바뀌었을 수 있으니 질문 설계를 다시 짠다 */
+  if (typeof formInvalidatePlan === 'function') formInvalidatePlan();
   renderFormFill();
 }
 
@@ -828,10 +841,14 @@ function renderFormFill() {
         <p class="sheet-provider">${esc(tpl.title)} · ${tpl.unofficial ? '자유 형식 제출 공고라 이 문서를 그대로 제출할 수 있어요' : '실제 공고 양식과 동일한 문서가 만들어져요'}</p>
         ${formQuestionsHtml(tpl)}
         <button class="btn btn-primary btn-lg" id="btn-ff-generate">양식 문서 만들기</button>
-        <p class="dp-note">기본정보(학교·이름·학번·연락처)는 프로필에서 자동으로 채워져요.</p>
+        <p class="dp-note">앱이 이미 아는 정보는 묻지 않고 채워요 — 위 '프로필에서 채웠어요'를 열어 확인·수정할 수 있어요.</p>
       </div>`;
     $('#btn-ff-generate').addEventListener('click', () => {
       formFill.ans = collectFormAnswers(tpl);
+      /* '다음 신청서에도 쓸게요'를 켜 둔 항목은 프로필에 남긴다 —
+         두 번째 신청서부터는 그 질문이 아예 안 나온다 (기기 안에만 저장) */
+      const kept = typeof formKeepToProfile === 'function' ? formKeepToProfile() : 0;
+      if (kept) { saveState(); if (typeof formInvalidatePlan === 'function') formInvalidatePlan(); }
       formFill.stage = 'preview';
       renderFormFill();
     });
@@ -1415,6 +1432,35 @@ function renderApplications() {
 }
 
 /* ---------------- MY ---------------- */
+
+/* 신청서를 채우며 앱이 배운 값 — 무엇을 갖고 있는지 학생에게 보이고 지울 수 있게 한다.
+   🔴 주민등록번호는 이 기기 안에만 있고 어디로도 보내지 않는다(외부 전송 코드 없음).
+      그 사실을 화면에 그대로 적는다 — 말하지 않으면 학생은 알 수 없다. */
+function learnedHtml(c) {
+  const rows = LEARNED_COMMON.filter(([k]) => c[k]);
+  if (!rows.length) return '';
+  return `<div class="my-learned">
+    <p class="my-learned-head">신청서에서 배운 정보 <span>${rows.length}개 · 이 기기에만 저장돼요</span></p>
+    <ul>${rows.map(([k, label]) => `<li><span>${esc(label)}</span><strong>${esc(k === 'rrn' ? maskRrn(c[k]) : c[k])}</strong>
+      <button type="button" class="btn-link" data-forget="${k}">지우기</button></li>`).join('')}</ul>
+  </div>`;
+}
+
+/* 주민등록번호는 화면에도 통째로 띄우지 않는다 — 어깨너머로 보인다 */
+function maskRrn(v) {
+  const s = String(v || '');
+  return s.length > 8 ? `${s.slice(0, 8)}${'*'.repeat(s.length - 8)}` : s;
+}
+
+function forgetLearned(key) {
+  if (!state.profile || !state.profile.common) return;
+  delete state.profile.common[key];
+  saveState();
+  if (typeof formInvalidatePlan === 'function') formInvalidatePlan();
+  renderMy();
+  toast('지웠어요 — 다음 신청서에서 다시 물어볼게요');
+}
+
 function renderMy() {
   const p = state.profile;
   const c = p.common || {};
@@ -1431,6 +1477,7 @@ function renderMy() {
       <div><span>공통 서류정보</span><strong>${commonFilled}/5 입력됨</strong></div>
     </div>
     <p class="my-flags">특별자격: ${flagText}</p>
+    ${learnedHtml(c)}
     <p class="my-flags">공통 서류정보(학번·연락처·계좌 등)는 이 기기에만 저장되고 서류 초안에 자동 기입돼요.</p>`;
   renderNotifyCard();
   renderWallet();
@@ -1539,6 +1586,16 @@ function bindEvents() {
   document.addEventListener('click', (e) => {
     const fill = e.target.closest('[data-fill]');
     if (fill) { const ta = $('#' + fill.dataset.fill); if (ta) { ta.value = fill.dataset.text; } return; }
+    /* 🔴 순서 주의 — 단일 선택(.fq-choice)을 다중 선택(.fq-checks)보다 먼저 본다.
+       뒤에 두면 '하나만 고르기'가 영영 안 걸려 성별에 남·여를 둘 다 체크할 수 있다 */
+    const one = e.target.closest('.fq-choice .chip');
+    if (one) {
+      const g = one.closest('.fq-choice');
+      const was = one.classList.contains('active');
+      g.querySelectorAll('.chip').forEach((c) => c.classList.remove('active'));
+      if (!was) one.classList.add('active');   // 다시 누르면 선택 해제 (잘못 고른 것을 되돌릴 수 있게)
+      return;
+    }
     const multi = e.target.closest('.fq-checks .chip');
     if (multi) { multi.classList.toggle('active'); return; }
     const chip = e.target.closest('.dp-q .chip');
@@ -1597,6 +1654,15 @@ function bindEvents() {
     });
   };
   onTap('#btn-home-profile', () => showScreen('my'));   // 홈 왼쪽 위 프로필 → MY
+  /* 🔴 캡처 단계로 먼저 잡는다 — 카드 전체가 '프로필 수정' 버튼이라
+     그냥 두면 '지우기'를 눌러도 수정 화면이 열려 버린다 */
+  $('#my-profile').addEventListener('click', (e) => {
+    const del = e.target.closest('[data-forget]');
+    if (!del) return;
+    e.stopPropagation();
+    e.preventDefault();
+    forgetLearned(del.dataset.forget);
+  }, true);
   onTap('#my-profile', editProfile);                     // MY 맨 위 카드 → 프로필 수정
 
   $('#btn-reset').addEventListener('click', () => {

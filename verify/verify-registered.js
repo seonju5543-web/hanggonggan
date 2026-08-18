@@ -4,6 +4,19 @@ const SHOT = (n) => `${__dirname}/shot-${n}.png`;
 /* 앱에서 '아직 마감되지 않은 + 양식이 연결된' 공고를 스스로 찾아 질문 → 문서 생성까지 구동한다.
    대상 공고를 코드에 박아두면 그 공고가 마감되는 순간 검증이 저절로 깨지므로(2026-08-01 조병두),
    양식 종류와 무관하게 굴러가도록 만들었다: 빈 칸은 아무 값으로 채우고 체크는 첫 항목을 고른다. */
+/* 알림 동의 시트는 온보딩 **2.9초 뒤**에 뜬다(app.js). 1.3초만 기다리고 넘어가면
+   검사 도중에 뒤늦게 떠서 화면을 덮고, 그때부터 모든 클릭이 막힌다 —
+   이 드라이버가 오래 빨간불이던 진짜 원인이다(CLAUDE.md 14차 세션 기록).
+   그래서 **뜰 때까지 기다렸다가** 치운다. verify-chat.js와 같은 방식. */
+async function dismissNotify(page) {
+  await page.waitForSelector('#notify-sheet:not([hidden])', { timeout: 6000 }).catch(() => {});
+  const later = await page.$('#btn-nf-later');
+  if (later) await later.click().catch(() => {});
+  else await page.keyboard.press('Escape');
+  await page.waitForSelector('#notify-sheet[hidden]', { timeout: 4000 }).catch(() => {});
+  await page.waitForTimeout(300);
+}
+
 async function driveAnyLiveForm(page) {
   const id = await page.evaluate(() => {
     const today = new Date().toISOString().slice(0, 10);
@@ -68,7 +81,7 @@ async function driveAnyLiveForm(page) {
   await page.fill('#in-email', 'test@skku.edu');
   await page.click('#btn-finish-onboard');
   await page.waitForSelector('#screen-home:not([hidden])');
-  await page.waitForTimeout(1300);
+  await dismissNotify(page);
 
   // 탐색 탭: 정식 등록 공고 (성균관 6건) 노출 확인
   await page.click('.nav-item[data-nav="explore"]');

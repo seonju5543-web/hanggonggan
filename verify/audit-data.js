@@ -17,7 +17,10 @@ const ROOT = path.join(__dirname, '..');
 const reg = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/registered.json'), 'utf8'));
 const forms = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/forms.json'), 'utf8'));
 const { checkEntry, isDuplicatePair } = require('./entry-rules.cjs');
-const FIELD_TYPES = ['text', 'textarea', 'checks', 'checks+text', 'schedule'];
+const { formBudgetReport, FORM_LIMITS } = require('../form-plan.js');
+/* 🔴 새 필드 타입을 여기 안 넣으면 감사가 exit 1로 죽고, 그날 수집 로봇 결과가
+   하나도 저장되지 않는다(워크플로가 감사 실패 시 되돌리기를 한다) */
+const FIELD_TYPES = ['text', 'textarea', 'checks', 'checks+text', 'schedule', 'choice', 'group', 'static'];
 
 const errors = [];
 const warns = [];
@@ -60,17 +63,39 @@ for (const [key, tpl] of Object.entries(forms.templates)) {
     if (tpl[f] == null) errors.push(`${where} — 필수 필드 누락: ${f}`);
   }
   const ids = new Set();
+  const secSigs = new Set();
   for (const sec of tpl.sections || []) {
     for (const f of sec.fields || []) {
       if (!f.id || !f.label || !f.type) { errors.push(`${where} — 필드에 id/label/type 누락`); continue; }
       if (ids.has(f.id)) errors.push(`${where} — 필드 id 중복: ${f.id}`);
       ids.add(f.id);
       if (!FIELD_TYPES.includes(f.type)) errors.push(`${where}.${f.id} — 알 수 없는 type: ${f.type}`);
-      if (/checks/.test(f.type) && (!Array.isArray(f.options) || !f.options.length)) {
-        errors.push(`${where}.${f.id} — checks 타입인데 options 없음`);
+      if (/checks|choice/.test(f.type) && (!Array.isArray(f.options) || !f.options.length)) {
+        errors.push(`${where}.${f.id} — ${f.type} 타입인데 options 없음`);
+      }
+      /* group은 원본 표의 칸들을 한 질문 카드로 묶은 것 — sub가 비면 문서에 그 칸들이 통째로 빠진다 */
+      if (f.type === 'group' && (!Array.isArray(f.sub) || f.sub.length < 2)) {
+        errors.push(`${where}.${f.id} — group 타입인데 sub가 2개 미만`);
       }
       if (!f.q) warns.push(`${where}.${f.id} — 질문 문구(q) 없음`);
     }
+    /* 로봇이 같은 첨부를 두 번 담으면 같은 섹션이 통째로 되풀이된다
+       (실측: 동산장학회 45개×2 = 90개, 가송재단 7개×3). 질문 설계기가 화면에서는
+       접어 주지만, 원인은 데이터라 여기서 눈에 보이게 해 둔다 */
+    const sig = (sec.fields || []).map((f) => (f.label || '').replace(/[\s　]/g, '')).join('|');
+    if (sig) { if (secSigs.has(sig)) warns.push(`${where} — 같은 항목의 섹션이 되풀이됨(로봇이 같은 첨부를 두 번 담았을 수 있음)`); secSigs.add(sig); }
+  }
+
+  /* ⑥ 질문 개수 상한 (2026-08-17 개발자 지시: 클릭 15 · 직접입력 10 · 전체 20)
+     ⚠️ 넘는다고 앱이 질문을 감추지는 않는다 — 전부 보여 주고 여기서 에스컬레이션한다.
+     숨기면 학생이 못 채운 칸이 있는 문서를 제출하게 된다.
+     세는 기준은 화면(forms.js)과 같은 form-plan.js를 쓴다 — 베끼면 숫자가 갈라진다.
+     프로필이 다 채워졌을 때(=최선의 경우)를 센다: '최적화하면 몇 개인가'가 개발자가 볼 숫자다 */
+  try {
+    const b = formBudgetReport(tpl);
+    if (b.over.length) warns.push(`${where} — 질문 상한 초과: ${b.over.join(' · ')} (직접입력 ${b.counts.input}·클릭 ${b.counts.click}·전체 ${b.counts.total}) — 병합하거나 원본과 대조해 정리가 필요합니다`);
+  } catch (e) {
+    errors.push(`${where} — 질문 개수를 세지 못했습니다: ${e.message}`);
   }
 }
 

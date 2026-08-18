@@ -15,6 +15,9 @@ node verify-registered.js   # 정식 등록 검증: 성균관 프로필→등록
 node verify-new-forms.js    # 신규 양식 5종: 스키마 렌더링 + 삼일·명지 UI 문서 생성
 node verify-forms-data.js   # 데이터 주도 양식: forms.json에만 더미 양식을 넣은 앱 복사본(8124 포트)으로 검증
 node audit-data.js          # 소급 감사: 기존 데이터 전체가 현재 엔진 기준을 충족하는지 (엔진 변경 후 필수)
+node form-snapshot.mjs      # 양식 문서 48종이 한 글자도 안 변했는지 대조 (질문 방식을 손댈 때 필수 — 운영 원칙 4)
+node form-snapshot.mjs --save        #   └ 기준본 저장 (작업 시작 전에 한 번)
+node form-snapshot.mjs --diff <형식id> #   └ 그 양식의 달라진 줄만 보기
 node personas.js            # 페르소나 스윕: 120종 사용자 조합으로 홈·탐색·상세를 훑어 크래시·빈 상태·콘솔 오류 탐지
 node verify-source-links.js # 원문 링크 검증: '원문 공고 ↗'가 정말 그 공고로 가는지 (아래 설명)
 node verify-notify-rules.js # 알림 규칙 단위 검증 (서버·브라우저 불필요 — 언제 알림이 가고 안 가는지 고정)

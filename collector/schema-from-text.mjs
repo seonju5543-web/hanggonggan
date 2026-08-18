@@ -27,13 +27,23 @@ const NOTICE_FILE = /공고|안내문|모집요강|리플릿|포스터/;
 /* "1) 장학금 신청서 1부" 같은 목록 항목은 문서 제목이 아니다 */
 const LIST_ITEM = /^\s*(\d+[).]|[가-하][).]|[-·•])\s/;
 
+/* 프로필에서 그대로 채울 수 있는 칸. 여기 없는 것은 학생이 직접 쓰게 된다.
+   🔴 '긴급연락처'를 phone으로 보내면 안 된다 — 본인 번호와 다른 칸이라
+   원본과 다른 값이 찍힌다(예전에 그렇게 돼 있었다). 앱의 emergency 키로 따로 받는다.
+   키 목록의 원본은 form-plan.js의 FORM_AUTO_LABELS다. */
 const INFO_MAP = [
   [/^(성명|이름|신청인성명|지원자)$/, 'name'],
   [/^(학번)$/, 'studentId'],
   [/^(학과|전공|학부학과|소속학과|전공분야|학과전공)$/, 'major'],
   [/^(학교|대학교|재적학교|소속대학|학교명|소속)$/, 'school'],
-  [/^(연락처|전화번호|휴대전화|핸드폰|전화|이동전화|긴급연락처)$/, 'phone'],
+  [/^(연락처|전화번호|휴대전화|핸드폰|전화|이동전화)$/, 'phone'],
   [/^(이메일|이메일주소|email|e-?mail)$/i, 'email'],
+  [/^(생년월일|생년월일자|출생년월일)$/, 'birth'],
+  [/^(주소|현주소|거주지|주소지|자택주소)$/, 'addr'],
+  [/^(긴급연락처|비상연락처)$/, 'emergency'],
+  [/^(은행|은행명|거래은행)$/, 'bank'],
+  [/^(계좌번호|입금계좌|입금계좌번호)$/, 'account'],
+  [/^(소득분위|학자금지원구간|지원구간)$/, 'bracket'],
 ];
 
 const TEXTAREA = /사유|계획|동기|소개|포부|내용|의견|경위|성장|과정|활동|특기|신조|인생관|성격|장래|비고/;
@@ -82,6 +92,13 @@ function makeField(label, used, forceType) {
   if (!forceType && (TEXTAREA.test(l) || l.length > 14)) { f.type = 'textarea'; f.q = `${l} — 원본 서식대로 작성해 주세요.`; }
   if (/^성별$/.test(key(l))) { f.type = 'checks'; f.options = ['남', '여']; f.q = '성별을 선택해 주세요.'; }
   if (/병역구분/.test(key(l))) { f.type = 'checks'; f.options = ['필', '미필', '면제', '해당없음']; f.q = '병역 구분을 선택해 주세요.'; }
+  /* 프로필에서 채울 수 있는 칸이면 표시해 둔다. info로 못 간 두 번째 '성명' 같은 것도
+     이 표시가 있으면 앱이 묻지 않고 채운다 — 예전엔 로봇이 만든 양식에 auto가 0건이라
+     학생이 같은 것을 신청서마다 다시 썼다(실측: 생년월일 20종·주소 30칸) */
+  if (f.type === 'text') {
+    const hit = INFO_MAP.find(([re]) => re.test(bare(l)));
+    if (hit) f.auto = hit[1];
+  }
   return f;
 }
 
@@ -181,6 +198,7 @@ export function schemaFromText(text, { notice = '', attachment = '', org = '' } 
 
   const used = new Set();
   const usedInfoKeys = new Set();
+  const skipped = [];   // 지어내지 않고 건너뛴 항목 — 리포트에 사유로 남는다
   const docs = walk(text);
   const sections = [];
   let pledge = '', orgName = org, title = '';
@@ -203,10 +221,16 @@ export function schemaFromText(text, { notice = '', attachment = '', org = '' } 
       else fields.push(makeField(label, used));
     }
     d.checks.forEach((options, i) => {
-      const label = /동의/.test(options.join()) ? '동의 여부' : `선택 ${i + 1}`;
-      const f = makeField(label, used, 'checks');
+      /* 🔴 라벨을 지어내지 않는다(운영 원칙 8-1). 예전엔 '선택 1'·'선택 2'로 붙였는데,
+         학생 화면에 "선택 1을(를) 선택해 주세요"라고 떠서 무엇을 고르는지 알 수 없었다.
+         원본에서 이름을 못 찾은 체크칸은 만들지 않고 사유를 남긴다 — 그 항목은
+         원본 첨부 다운로드로 안내된다. */
+      const named = /동의|서약/.test(options.join()) ? '동의 여부' : '';
+      if (!named) { skipped.push(`체크 항목 ${i + 1}(${options.slice(0, 3).join('/')}) — 원본에서 항목 이름을 못 찾음`); return; }
+      const f = makeField(named, used, 'checks');
       f.options = options;
-      f.q = `${label}를 선택해 주세요.`;
+      f.single = true;   // 동의·서약은 하나만 고르는 항목
+      f.q = `${named}를 선택해 주세요.`;
       fields.push(f);
     });
 
@@ -233,6 +257,19 @@ export function schemaFromText(text, { notice = '', attachment = '', org = '' } 
     sections.push(sec);
   }
 
+  /* 🔴 같은 서식이 두 번 이상 담기는 것을 여기서 끊는다.
+     한 공고의 첨부 여러 개를 한 벌로 합칠 때 같은 신청서가 겹쳐 들어와,
+     실측으로 동산장학회가 45개×2 = 90개, 가송재단이 7개×3으로 저장돼 있었다.
+     학생은 같은 질문을 두 번 받았고 문서도 두 벌로 나갔다. */
+  {
+    const seenSec = new Set();
+    for (let i = sections.length - 1; i >= 0; i--) {
+      const sig = `${sections[i].heading}|${sections[i].fields.map((f) => key(f.label)).join('|')}`;
+      if (seenSec.has(sig)) { sections.splice(i, 1); skipped.push('같은 항목의 섹션이 되풀이돼 한 벌만 남김'); }
+      else seenSec.add(sig);
+    }
+  }
+
   const fieldCount = sections.reduce((n, s) => n + s.fields.length, 0);
   const infoCount = sections.reduce((n, s) => n + (s.info ? s.info[0].length / 2 : 0), 0);
   if (NOTICE_FILE.test(String(attachment))) return { ok: false, why: '공고문·안내문 파일(채울 칸이 있는 서식 아님)' };
@@ -253,5 +290,5 @@ export function schemaFromText(text, { notice = '', attachment = '', org = '' } 
     sections,
   };
   if (pledge) tpl.pledge = pledge;
-  return { ok: true, tpl, stats: { fields: fieldCount, info: infoCount, sections: sections.length } };
+  return { ok: true, tpl, skipped, stats: { fields: fieldCount, info: infoCount, sections: sections.length } };
 }

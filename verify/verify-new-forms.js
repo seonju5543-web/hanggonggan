@@ -18,6 +18,23 @@ function pickTarget(formId) {
 }
 const SCHOOL_ALIAS = { 한국외국어대학교: '외대', 서울시립대학교: '서울시립', 성균관대학교: '성균관', 중앙대학교: '중앙', 명지대학교: '명지', 광운대학교: '광운', 동국대학교: '동국', 경희대학교: '경희' };
 
+/* 질문 최적화(2026-08-18) 이후: 앱이 아는 값은 **질문으로 안 나오고** 자동 채움 패널
+   (.fq-auto-in[data-f=…])에 들어간다. 그래서 '#fq-<id> 입력칸이 있다'를 전제하면 안 된다.
+   어느 쪽에 있든 값을 읽고/쓰는 헬퍼로 감싼다 — 이게 최적화가 실제로 먹었는지도 함께 검사한다. */
+async function fqValue(page, id) {
+  const auto = await page.$(`.fq-auto-in[data-f="${id}"]`);
+  if (auto) return (await auto.inputValue()) + ' (자동 채움)';
+  const el = await page.$(`#fq-${id}`);
+  return el ? await el.inputValue() : '(칸 없음)';
+}
+async function fqFill(page, id, value) {
+  const auto = await page.$(`.fq-auto-in[data-f="${id}"]`);
+  if (auto) { await auto.fill(value); return 'auto'; }
+  const el = await page.$(`#fq-${id}`);
+  if (el) { await el.fill(value); return 'asked'; }
+  return 'none';
+}
+
 async function onboard(page, school, major) {
   await page.click('.onboard-step[data-step="0"] [data-next]');
   await page.fill('#in-school', school);
@@ -100,13 +117,15 @@ async function onboard(page, school, major) {
   await page.waitForTimeout(400);
   await page.click('#btn-apply-one');
   await page.waitForSelector('#btn-ff-generate', { timeout: 8000 });
-  const autoName = await page.inputValue('#fq-name');
-  const autoPhone = await page.inputValue('#fq-phoneSelf');
-  const autoEmail = await page.inputValue('#fq-email');
+  const autoName = await fqValue(page, 'name');
+  const autoPhone = await fqValue(page, 'phoneSelf');
+  const autoEmail = await fqValue(page, 'email');
   console.log('삼일 자동 채움 — 성명:', autoName, '| 휴대전화:', autoPhone, '| 이메일:', autoEmail);
-  await page.click('.fq-checks[data-f="field"] .chip:nth-child(2)'); // 희망
-  await page.click('.fq-checks[data-f="ceremony"] .chip:first-child'); // 참석
-  await page.fill('#fq-birth', '2004-03-15');
+  /* 지원 분야·참석 여부는 보기가 2~3개인 단일 선택이라 choice로 승격된다(.fq-choice).
+     다중 선택(.fq-checks)으로 남는 것도 있어 두 자리를 모두 본다 */
+  await page.click('.fq-choice[data-f="field"] .chip:nth-child(2), .fq-checks[data-f="field"] .chip:nth-child(2)');
+  await page.click('.fq-choice[data-f="ceremony"] .chip:first-child, .fq-checks[data-f="ceremony"] .chip:first-child');
+  console.log('삼일 생년월일 입력 위치:', await fqFill(page, 'birth', '2004-03-15'));
   await page.click('#btn-ff-generate');
   await page.waitForSelector('.form-doc', { timeout: 8000 });
   const doc = await page.$eval('.form-doc', (el) => el.textContent);

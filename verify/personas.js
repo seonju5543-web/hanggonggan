@@ -39,6 +39,16 @@ function mkProfile(i) {
   };
 }
 
+/* 알림 동의 시트 치우기 — verify-chat.js·verify-registered.js와 같은 방식 */
+async function dismissNotify(page) {
+  const sheet = await page.$('#notify-sheet:not([hidden])');
+  if (!sheet) return;
+  const later = await page.$('#btn-nf-later');
+  if (later) await later.click().catch(() => {});
+  else await page.keyboard.press('Escape').catch(() => {});
+  await page.waitForSelector('#notify-sheet[hidden]', { timeout: 3000 }).catch(() => {});
+}
+
 (async () => {
   const browser = await chromium.launch({ executablePath: EXE });
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -61,6 +71,10 @@ function mkProfile(i) {
     }, p);
     await page.reload({ waitUntil: 'networkidle' });
     await page.waitForTimeout(120);
+    /* 알림 동의 시트를 치우지 않으면 화면을 덮어 그때부터 클릭이 전부 막힌다.
+       프로필을 직접 넣고 새로고침하는 방식이라 '나중에'를 누른 적이 없어
+       매 회차 다시 뜬다 — 회차마다 치운다(CLAUDE.md 14차·23차 세션 기록). */
+    await dismissNotify(page);
 
     // 홈 히어로
     const hero = await page.textContent('#hero-amount').catch(() => 'ERR');

@@ -159,7 +159,10 @@ function loadFormTemplates() {
     .catch(() => { /* 오프라인 등 — 내장 폴백으로 동작 */ });
 }
 
-/* 질문 입력칸 자동 채움 — 프로필에서 가져올 수 있는 값 */
+/* 질문 입력칸 자동 채움 — 프로필에서 가져올 수 있는 값.
+   🔴 여기에 키를 추가하면 form-plan.js의 FORM_AUTO_LABELS·FORM_AUTO_KEYS_ALL도 같이 본다.
+   앱이 아는 값을 안 이어 두면 학생이 같은 것을 신청서마다 다시 쓴다
+   (실측: 생년월일 20개 양식·주소 30개 항목이 그 상태였다). */
 function formAutoVal(key) {
   const p = (typeof state !== 'undefined' && state.profile) || null;
   if (!p || !key) return '';
@@ -171,81 +174,180 @@ function formAutoVal(key) {
     case 'school': return p.school || '';
     case 'phone': return c.phone || '';
     case 'email': return c.email || '';
+    case 'birth': return c.birth || '';
+    case 'bank': return c.bank || '';
+    case 'account': return c.account || '';
+    case 'gender': return c.gender || '';
+    case 'addr': return c.addr || '';
+    case 'emergency': return c.emergency || '';
+    case 'guardianName': return c.guardianName || '';
+    case 'guardianRel': return c.guardianRel || '';
+    case 'guardianPhone': return c.guardianPhone || '';
+    case 'rrn': return c.rrn || '';
+    case 'campus': return p.campus || '';
+    case 'region': return p.region || '';
     case 'bracket': return p.bracket != null ? `${p.bracket}구간` : '';
+    case 'year': return p.year ? `${p.year}학년` : '';
     case 'yearRemain': return p.year ? `${p.year}학년 (잔여  학기)` : '';
     case 'gpaLast': return p.gpa != null ? `  /  / ${p.gpa} /4.5` : '';
     default: return '';
   }
 }
 
+/* 설계기(form-plan.js)에 넘길 값 묶음 — 순수 함수라 프로필을 직접 못 읽는다 */
+function formAutoValues() {
+  const out = {};
+  (typeof FORM_AUTO_KEYS_ALL !== 'undefined' ? FORM_AUTO_KEYS_ALL : []).forEach((k) => {
+    const v = formAutoVal(k);
+    if (v) out[k] = v;
+  });
+  return out;
+}
+
+
 const FORM_DAYS = ['월', '화', '수', '목', '금', '토', '일'];
 
-/* ---------- 질문 화면 HTML ---------- */
+/* ---------- 질문 화면 HTML ----------
+   설계기(form-plan.js)가 짠 질문만 그린다. 원본 스키마는 손대지 않으므로
+   문서(renderFormDoc)는 그대로다 — 바뀌는 것은 '묻는 방식'뿐이다. */
+function formFieldHtml(f) {
+  const fid = `fq-${f.id}`;
+  let html = `<div class="field"><span class="field-label">${esc(f.q || f.label)}</span>`;
+  if (f.type === 'checks' || f.type === 'checks+text') {
+    html += `<div class="chip-group fq-checks" data-f="${f.id}">` +
+      (f.options || []).map((o) => `<button type="button" class="chip" data-value="${esc(o)}">${esc(o)}</button>`).join('') +
+      `</div>`;
+  }
+  if (f.type === 'choice') {
+    /* 하나만 고르는 항목. 문서 출력은 checks와 똑같다(□/☑ 한 줄) — 원본 구조 불변 */
+    html += `<div class="chip-group fq-choice" data-f="${f.id}">` +
+      (f.options || []).map((o) => `<button type="button" class="chip" data-value="${esc(o)}">${esc(o)}</button>`).join('') +
+      `</div>`;
+  }
+  if (f.type === 'checks+text') {
+    html += `<div class="fq-sugg">${(f.sugg || []).map((s) => `<button type="button" class="chip chip-sm" data-fill="${fid}-t" data-text="${esc(s)}">${esc(s.slice(0, 26))}…</button>`).join('')}</div>`;
+    html += `<textarea id="${fid}-t" rows="2" placeholder="${esc(f.tq || '')}" style="margin-top:8px"></textarea>`;
+  }
+  if (f.type === 'text') {
+    html += `<input type="text" id="${fid}" placeholder="${esc(f.placeholder || '')}" value="${esc(f.preset || '')}" autocomplete="off" />`;
+    const key = typeof formAutoKey === 'function' ? formAutoKey(f) : '';
+    if (key) html += `<label class="fq-keep"><input type="checkbox" class="fq-keep-box" data-key="${esc(key)}" data-for="${fid}" checked /><span>다음 신청서에도 쓸게요</span></label>`;
+  }
+  if (f.type === 'textarea') {
+    html += `<div class="fq-sugg">${(f.sugg || []).map((s) => `<button type="button" class="chip chip-sm" data-fill="${fid}" data-text="${esc(s)}">${esc(s.slice(0, 26))}…</button>`).join('')}</div>`;
+    html += `<textarea id="${fid}" rows="3" placeholder="직접 입력하거나 위 추천 문구를 눌러 채워보세요"></textarea>`;
+  }
+  if (f.type === 'group') {
+    /* 원본이 표인데 셀마다 질문이 된 것을 한 카드로 묶은 것.
+       카드 1개로 세지만 문서에는 원래 칸 수만큼 그대로 나간다. */
+    html += `<div class="fq-group">` + (f.sub || []).map((sf) =>
+      `<label class="fq-sub"><span>${esc(sf.label)}</span>` +
+      `<input type="text" id="fq-${sf.id}" placeholder="${esc(sf.placeholder || '')}" autocomplete="off" /></label>`).join('') + `</div>`;
+  }
+  if (f.type === 'schedule') {
+    html += `<div class="chip-group fq-checks" data-f="${f.id}-days">` +
+      FORM_DAYS.map((d) => `<button type="button" class="chip" data-value="${d}">${d}</button>`).join('') + `</div>`;
+    html += `<input type="text" id="${fid}-time" placeholder="예: 15:00 ~ 17:00" style="margin-top:8px" autocomplete="off" />`;
+  }
+  html += `</div>`;
+  return html;
+}
+
 function formQuestionsHtml(tpl) {
+  const plan = formPlanFor(tpl);
   let html = '';
-  tpl.sections.forEach((sec, si) => {
-    if (!sec.fields || !sec.fields.length) return; // 안내 전용 섹션(추천서·동의서 등)은 질문 없음
-    html += `<div class="dp-block"><h4>${esc(sec.heading)}</h4>`;
-    sec.fields.forEach((f) => {
-      const fid = `fq-${f.id}`;
-      html += `<div class="field"><span class="field-label">${esc(f.q)}</span>`;
-      if (f.type === 'checks' || f.type === 'checks+text') {
-        html += `<div class="chip-group fq-checks" data-f="${f.id}">` +
-          f.options.map((o) => `<button type="button" class="chip" data-value="${esc(o)}">${esc(o)}</button>`).join('') +
-          `</div>`;
-      }
-      if (f.type === 'checks+text') {
-        html += `<div class="fq-sugg">${(f.sugg || []).map((s) => `<button type="button" class="chip chip-sm" data-fill="${fid}-t" data-text="${esc(s)}">${esc(s.slice(0, 26))}…</button>`).join('')}</div>`;
-        html += `<textarea id="${fid}-t" rows="2" placeholder="${esc(f.tq || '')}" style="margin-top:8px"></textarea>`;
-      }
-      if (f.type === 'text') {
-        html += `<input type="text" id="${fid}" placeholder="${esc(f.placeholder || '')}" value="${esc(f.preset || formAutoVal(f.auto) || '')}" autocomplete="off" />`;
-      }
-      if (f.type === 'textarea') {
-        html += `<div class="fq-sugg">${(f.sugg || []).map((s) => `<button type="button" class="chip chip-sm" data-fill="${fid}" data-text="${esc(s)}">${esc(s.slice(0, 26))}…</button>`).join('')}</div>`;
-        html += `<textarea id="${fid}" rows="3" placeholder="직접 입력하거나 위 추천 문구를 눌러 채워보세요"></textarea>`;
-      }
-      if (f.type === 'schedule') {
-        html += `<div class="chip-group fq-checks" data-f="${f.id}-days">` +
-          FORM_DAYS.map((d) => `<button type="button" class="chip" data-value="${d}">${d}</button>`).join('') + `</div>`;
-        html += `<input type="text" id="${fid}-time" placeholder="예: 15:00 ~ 17:00" style="margin-top:8px" autocomplete="off" />`;
-      }
-      html += `</div>`;
-    });
+
+  /* 안 물어본 것을 감추지 않는다 — 무엇을 채웠는지 보이고 그 자리에서 고칠 수 있어야 한다 */
+  if (plan.autoRows.length) {
+    html += `<details class="fq-auto"><summary>프로필에서 ${plan.autoRows.length}개를 채웠어요 · 확인하고 고치기</summary>` +
+      plan.autoRows.map((r) => `<label class="fq-sub"><span>${esc(String(r.label).replace(/\n/g, ' '))}</span>` +
+        `<input type="text" class="fq-auto-in" data-f="${esc(r.id)}" value="${esc(r.value)}" autocomplete="off" /></label>`).join('') +
+      `<p class="dp-note">여기서 고친 값은 이 신청서에만 적용돼요. 계속 바꾸려면 MY → 내 정보에서 고치세요.</p></details>`;
+  }
+  if (plan.over.length) {
+    html += `<p class="dp-note fq-over">이 신청서는 원본 항목이 많아요 — 질문 ${plan.counts.total}개예요. 하나도 빠뜨리지 않으려고 전부 보여 드려요.</p>`;
+  }
+
+  plan.secs.forEach((sec) => {
+    html += `<div class="dp-block"><h4>${esc(sec.heading || '')}</h4>`;
+    sec.items.forEach((f) => { html += formFieldHtml(f); });
     html += `</div>`;
   });
   return html;
 }
 
+/* 이 양식의 질문 설계 — 화면·수집이 같은 결과를 봐야 하므로 한 번 계산해 재사용한다 */
+let formPlanCache = null;
+function formPlanFor(tpl) {
+  if (formPlanCache && formPlanCache.tpl === tpl) return formPlanCache.plan;
+  const plan = planFormQuestions(tpl, formAutoValues());
+  formPlanCache = { tpl, plan };
+  return plan;
+}
+function formInvalidatePlan() { formPlanCache = null; }
+
 /* ---------- 답변 수집 ---------- */
 function collectFormAnswers(tpl) {
+  const plan = formPlanFor(tpl);
   const ans = {};
-  tpl.sections.forEach((sec) => {
-    (sec.fields || []).forEach((f) => {
-      const fid = `fq-${f.id}`;
-      if (f.type === 'checks' || f.type === 'checks+text') {
-        ans[f.id] = {
-          checks: $$(`.fq-checks[data-f="${f.id}"] .chip.active`).map((c) => c.dataset.value),
-          text: f.type === 'checks+text' ? ($(`#${fid}-t`) || { value: '' }).value.trim() : '',
-        };
-      } else if (f.type === 'schedule') {
-        ans[f.id] = {
-          days: $$(`.fq-checks[data-f="${f.id}-days"] .chip.active`).map((c) => c.dataset.value),
-          time: ($(`#${fid}-time`) || { value: '' }).value.trim() || '15:00 ~ 17:00',
-        };
-      } else {
-        ans[f.id] = ($(`#${fid}`) || { value: '' }).value.trim();
-      }
-    });
-  });
+
+  /* ① 안 물어본 것 — 프로필에서 채운 값(확인 패널에서 고쳤으면 고친 값) */
+  Object.keys(plan.auto).forEach((id) => { ans[id] = plan.auto[id]; });
+  $$('.fq-auto-in').forEach((el) => { ans[el.dataset.f] = el.value.trim(); });
+
+  /* ② 화면에 낸 질문 */
+  plan.secs.forEach((sec) => sec.items.forEach((f) => {
+    const fid = `fq-${f.id}`;
+    if (f.type === 'checks' || f.type === 'checks+text') {
+      ans[f.id] = {
+        checks: $$(`.fq-checks[data-f="${f.id}"] .chip.active`).map((c) => c.dataset.value),
+        text: f.type === 'checks+text' ? ($(`#${fid}-t`) || { value: '' }).value.trim() : '',
+      };
+    } else if (f.type === 'choice') {
+      ans[f.id] = { checks: $$(`.fq-choice[data-f="${f.id}"] .chip.active`).map((c) => c.dataset.value), text: '' };
+    } else if (f.type === 'schedule') {
+      ans[f.id] = {
+        days: $$(`.fq-checks[data-f="${f.id}-days"] .chip.active`).map((c) => c.dataset.value),
+        time: ($(`#${fid}-time`) || { value: '' }).value.trim() || '15:00 ~ 17:00',
+      };
+    } else if (f.type === 'group') {
+      /* 묶어서 물었어도 답은 원래 필드 id로 되돌린다 — 문서가 원본 그대로 나오게 */
+      (f.sub || []).forEach((sf) => { ans[sf.id] = ($(`#fq-${sf.id}`) || { value: '' }).value.trim(); });
+    } else {
+      ans[f.id] = ($(`#${fid}`) || { value: '' }).value.trim();
+    }
+  }));
+
+  /* ③ 같은 섹션이 두 번 들어 있는 양식 — 앞에서 받은 답을 뒤에도 그대로 */
+  Object.keys(plan.mirror).forEach((id) => { ans[id] = ans[plan.mirror[id]]; });
   return ans;
+}
+
+/* 학생이 새로 적어 준 값을 프로필에 남긴다 ('다음 신청서에도 쓸게요').
+   🔴 저장은 기기 안(localStorage)뿐이다 — 밖으로 나가는 코드는 없다. */
+function formKeepToProfile() {
+  const p = (typeof state !== 'undefined' && state.profile) || null;
+  if (!p) return 0;
+  p.common = p.common || {};
+  const OWN = { name: 'name', major: 'major', school: 'school' }; // 프로필 최상위에 있는 값
+  let n = 0;
+  $$('.fq-keep-box').forEach((box) => {
+    if (!box.checked) return;
+    const el = $(`#${box.dataset.for}`);
+    const v = el ? el.value.trim() : '';
+    const key = box.dataset.key;
+    if (!v || !key) return;
+    if (OWN[key]) { if (!p[key]) { p[key] = v; n++; } return; }
+    if (!p.common[key]) { p.common[key] = v; n++; }
+  });
+  return n;
 }
 
 /* ---------- 문서 렌더링 (원본 양식과 동일 구조) ---------- */
 function renderFormDoc(tpl, p, ans, { editable = false } = {}) {
-  const c = (p && p.common) || {};
-  const autoVal = { school: p.school || '', major: p.major || '', name: p.name || '',
-    studentId: c.studentId || '', phone: c.phone || '', email: c.email || '' };
+  /* 🔴 info 칸의 값 사전을 따로 두지 않는다 — 예전엔 여기 6키, formAutoVal에 9키로
+     갈라져 있어서 bracket·yearRemain·gpaLast가 info에서만 조용히 빈 칸이 됐다 */
+  const autoVal = (k) => (k ? formAutoVal(k) : '');
   const ed = editable ? ' contenteditable="true"' : '';
   const box = (checked) => (checked ? '☑' : '□');
 
@@ -259,8 +361,8 @@ function renderFormDoc(tpl, p, ans, { editable = false } = {}) {
       html += '<table class="fd-table">';
       sec.info.forEach((row) => {
         /* 한 줄에 칸이 하나뿐인 서식도 있다 — 없는 칸을 그리면 'undefined'가 찍힌다 */
-        html += `<tr><th>${esc(row[0])}</th><td${ed}>${esc(autoVal[row[1]] || '')}</td>
-                 <th>${esc(row[2] || '')}</th><td${ed}>${esc(autoVal[row[3]] || '')}</td></tr>`;
+        html += `<tr><th>${esc(row[0])}</th><td${ed}>${esc(autoVal(row[1]) || '')}</td>
+                 <th>${esc(row[2] || '')}</th><td${ed}>${esc(autoVal(row[3]) || '')}</td></tr>`;
       });
       html += '</table>';
       // 여기서 끝내면 안 된다 — info와 fields가 같은 섹션에 있으면(산학디딤돌 등)
@@ -269,9 +371,17 @@ function renderFormDoc(tpl, p, ans, { editable = false } = {}) {
     if (!sec.fields || !sec.fields.length) return; // 안내 전용 섹션 — 제목·주석만 출력
     html += '<table class="fd-table">';
     (sec.fields || []).forEach((f) => {
-      const a = ans[f.id];
+      /* 🔴 저장된 답(formAns)은 기기에 남아 나중에 다시 그려진다. 그 사이 타입이 바뀌었으면
+         모양이 달라 a.checks.includes(...)에서 터진다 — 버리지 않고 맞춰 준다 */
+      const a = typeof formAnswerFor === 'function' ? formAnswerFor(f, ans[f.id]) : ans[f.id];
       const label = esc(f.label).replace(/\n/g, '<br />');
-      if (f.type === 'checks') {
+      const cell = (v) => esc(v || '').replace(/\n/g, '<br />');
+      if (f.type === 'group') {
+        /* 묶어서 물었어도 문서는 원본대로 칸마다 한 줄씩 — 한 줄 칸과 같은 HTML이어야 한다 */
+        (f.sub || []).forEach((sf) => {
+          html += `<tr><th>${esc(sf.label).replace(/\n/g, '<br />')}</th><td${ed}>${cell(a[sf.id])}</td></tr>`;
+        });
+      } else if (f.type === 'checks' || f.type === 'choice') {
         const line = f.options.map((o) => `${box(a.checks.includes(o))} ${esc(o)}`).join('&nbsp;&nbsp;&nbsp;');
         html += `<tr><th>${label}</th><td${ed}>${line}${f.suffix ? `&nbsp;&nbsp;<span class="fd-note">${esc(f.suffix)}</span>` : ''}</td></tr>`;
       } else if (f.type === 'checks+text') {
@@ -287,8 +397,12 @@ function renderFormDoc(tpl, p, ans, { editable = false } = {}) {
         grid += '</table>';
         html += `<tr><th>${label}</th><td${ed}>${grid}</td></tr>`;
       } else {
-        html += `<tr><th>${label}</th><td${ed}>${esc(a || '')
-          .replace(/\n/g, '<br />')}</td></tr>`;
+        /* text · textarea · static(채우는 칸이 아닌 표 헤더 — 원본대로 빈 칸) ·
+           그리고 아직 모르는 타입. 예전엔 모르는 타입이 조용히 빈 칸이 되어
+           검사가 못 잡았다 — 이제는 콘솔에 남긴다 */
+        if (f.type !== 'text' && f.type !== 'textarea' && f.type !== 'static'
+            && typeof console !== 'undefined') console.warn('[forms] 모르는 필드 타입:', f.type, f.id);
+        html += `<tr><th>${label}</th><td${ed}>${cell(a)}</td></tr>`;
       }
     });
     html += '</table>';
