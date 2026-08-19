@@ -1,8 +1,36 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
- "updatedAt": "2026-08-19",
- "count": 1670,
+ "updatedAt": "2026-08-20",
+ "count": 1702,
  "items": [
+  {
+   "title": "[서울][국가근로] 2026학년도 2학기 국가근로장학생 모집 안내(추가)",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/263498/artclView.do",
+   "attachments": [
+    {
+     "name": "(서식)2026학년도 2학기 국가근로(추가모집) 지원서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/148894/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간에 신청 하였으며 , &nbsp; 국가근로장학금 장학생 기본요건 ( 소득구간 &nbsp; 9 구간 이하 등",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "2026년도 제7기 경원장학재단 장학생 선발 안내",
+   "url": "https://home.knu.ac.kr/HOME/knussw/sub.htm?nav_code=knu1619416593&mode=view&mv_data=aWR4PTIxMTcmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZjb2RlPU11NlN4bjZQMUlRYyZzZWFyY2hfaXRlbT0mc2VhcmNoX29yZGVyPSZvcmRlcl9saXN0PSZsaXN0X3NjYWxlPSZ2aWV3X2xldmVsPSZ2aWV3X2NhdGU9JnZpZXdfY2F0ZTI9JnNpdGVfY29kZT1rbnVzc3c=",
+   "attachments": [
+    {
+     "name": "제7기 경원장학재단 장학생 선발 안내 공고문.pdf",
+     "url": "https://home.knu.ac.kr/HOME/bbs/bbs_download.php?mv_data=aWR4PTIxMTcmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZuYXZfY29kZT1rbnUxNjE5NDE2NTkzJnNpdGVfY29kZT1rbnVzc3cmY29kZT1NdTZTeG42UDFJUWMmc2VhcmNoX2l0ZW09JnNlYXJjaF9vcmRlcj0mb3JkZXJfbGlzdD0mbGlzdF9zY2FsZT0=&download=h&seq=0"
+    }
+   ],
+   "deadlineHint": "기한 내 신청하시기 바랍니다. 1. 신청 기간: 2026. 8. 19.(수) ~ 9. 30.(수) 우편접수(9.",
+   "school": "경북대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
   {
    "title": "2026년 2학기 주거안정장학금 우선지원 및 지급제외 기준 안내 학생지원팀 2026-08-19 15",
    "url": "https://kau.ac.kr/kaulife/scholnoti.php?searchkey=&searchvalue=&code=s1301&page=&mode=read&seq=11048",
@@ -14,6 +42,38 @@
    ],
    "deadlineHint": "까지만 지급하며 학적 변동일 이후 기간은 지급 제외 - 학적 변동일 익월 지급요청서 미제출 시 지급 제외 - 계",
    "school": "한국항공대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "장학 ★★★ 2026학년도 2학기 교내장학금 2차 신청 안내(재학생 및 복학예정자 대상) ★★★",
+   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=%E2%98%85%E2%98%85%E2%98%85-2026%ED%95%99%EB%85%84%EB%8F%84-2%ED%95%99%EA%B8%B0-%EA%B5%90%EB%82%B4%EC%9E%A5%ED%95%99%EA%B8%88-2%EC%B0%A8-%EC%8B%A0%EC%B2%AD-%EC%95%88%EB%82%B4%EC%9E%AC%ED%95%99&keyword=%EC%9E%A5%ED%95%99",
+   "attachments": [
+    {
+     "name": "2026-2학기_교내장학금-선발자격-및-제출서류-안내.pdf",
+     "url": "https://scatch.ssu.ac.kr/download.php?data=1iZBAEYP01G24N2v6wVl9s5jGa0smQ8%2B8HVba1YhOwKiKp0Ym%2FP%2FpR0dBOZOTbHzGy%2BTusAioC15PqvrQTvbs%2FyQw1hy49pg9sZtdmD%2BsEXlcQ4NJAngf6LjMxO0dqQ5uDMZz2Rs6TdfDEG8zXNPNtkYz9JnECSt%2Frnv1%2FLShFwUzx9efYI0CaJSWsPUSSQOg7i6SVfLUcW6kNwJV9Hiq6mkqnoZki%2BIq4qONMa1Ka8Z7WkojZN6AoFcvytNDNujC2puLNsWHY49m8wVAlt51SyFFdC3izvjPYZ%2FeAvu%2BQE%3D"
+    },
+    {
+     "name": "교내장학금-신청-매뉴얼_202606.pdf",
+     "url": "https://scatch.ssu.ac.kr/download.php?data=1iZBAEYP01G24N2v6wVl9s5jGa0smQ8%2B8HVba1YhOwKiKp0Ym%2FP%2FpR0dBOZOTbHzGy%2BTusAioC15PqvrQTvbsxJ1P2KsFCJJYKiZJTeuysvyioU%2BKpJCd64uvNwAQI8V0lfGwOyufTeF5ZZ8OeaMK8Ev8mNxgN%2BmR4MsdZn4fwqE4QAFS%2BX4wPay9xU3mVgmWevZb8HEUQf99E6z9SGZQ6P40Vx%2F995YAYzT%2Fwx08NU%3D"
+    }
+   ],
+   "deadlineHint": "신청기간 내 국가장학금을 신청하고 서류제출을 완료하여 소득분위가 조회된 학생을 대상으로만 수혜자를 선정합니다 . 따",
+   "school": "숭실대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "장학 2026학년도 제7기 경원장학재단 장학생 선발 안내(~9.30.수)",
+   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=2026%ED%95%99%EB%85%84%EB%8F%84-%EC%A0%9C7%EA%B8%B0-%EA%B2%BD%EC%9B%90%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8-%EC%9E%A5%ED%95%99%EC%83%9D-%EC%84%A0%EB%B0%9C-%EC%95%88%EB%82%B4&keyword=%EC%9E%A5%ED%95%99",
+   "attachments": [
+    {
+     "name": "제7기-경원장학재단-장학생-선발-안내-공고문.pdf",
+     "url": "https://scatch.ssu.ac.kr/download.php?data=1iZBAEYP01G24N2v6wVl9s5jGa0smQ8%2B8HVba1YhOwKiKp0Ym%2FP%2FpR0dBOZOTbHzGy%2BTusAioC15PqvrQTvbs4ntz4Q4eHweSkUR1yB3mJOBQKSkYTRh2cJ3FJeIEfmAOcOfAbPwtpg9UrKpZszwcbMXxNvWRYUL8IhTv2HkB6j%2B1VJ%2Bk1GR5jgLy9%2FsvTU%2BxCPcLDIqVIgE5%2FFDYlh%2FUvOMMdib11bNAVWHMK0vQ4jrEQTyZpK0EFzs3syY8SH%2F2oFz90auRwpuUCGR10FBqQ%3D%3D"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "숭실대학교",
    "campus": "",
    "foundAt": "2026-08-19"
   },
@@ -31,6 +91,29 @@
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=274845&article.offset=0&articleLimit=10&srCategoryId=22",
    "attachments": [],
    "deadlineHint": null,
+   "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "[학생지원팀] 2026학년도 2학기 장학생 선발 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=274880&article.offset=0&articleLimit=10&srCategoryId=22",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "[학생지원팀] 2026년도 제7기 경원장학재단 장학생 선발 안내(2026. 8. 19.(수) ~ 9. 30.(수))",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=274888&article.offset=0&articleLimit=10&srCategoryId=22",
+   "attachments": [
+    {
+     "name": "제7기 경원장학재단 장학생 선발 안내 공고문.pdf",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=274888&attachNo=224671"
+    }
+   ],
+   "deadlineHint": "접수기간 및 방법 &nbsp;-&nbsp; &nbsp; 접수기간: 2026. 8. 19.(수) ~ 9. 30.(수)",
    "school": "가톨릭대학교",
    "campus": "",
    "foundAt": "2026-08-19"
@@ -72,6 +155,20 @@
    "foundAt": "2026-08-19"
   },
   {
+   "title": "2026년 2학기 주거안정장학금 이화여자대학교 자체 기준",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366343&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "붙임. 2026년 2학기 주거안정장학금 이화여자대학교 자체 기준.pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366343&attachNo=352527"
+    }
+   ],
+   "deadlineHint": "신청기간 ~ 조회 40 붙임. 2026년 2학기 주거안정장학금 이화여자대학교 자체 기준.pdf 2026년 2학기 주",
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
    "title": "[삼원장학재단] 2026 삼원 장학생 선발 안내",
    "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=155323&article.offset=0&articleLimit=10&noCat=501",
    "attachments": [
@@ -82,6 +179,20 @@
    ],
    "deadlineHint": null,
    "school": "홍익대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "[학부-교외장학] 2026학년도 제7기 경원장학재단 장학생 선발 안내",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/45089/artclView.do",
+   "attachments": [
+    {
+     "name": "제7기 경원장학재단 장학생 선발 안내 공고문.pdf",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/40919/download.do"
+    }
+   ],
+   "deadlineHint": "까지 월별 납부 내역 &nbsp; 아. (선택) 본인, 보호자 장애인 증명서 - 붙임 참조 &nbsp; 자. (",
+   "school": "인하대학교",
    "campus": "",
    "foundAt": "2026-08-19"
   },
@@ -112,6 +223,133 @@
    "foundAt": "2026-08-19"
   },
   {
+   "title": "[장학안내] [경원장학재단] 2026년도 제7기 장학생 선발 안내",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70042&cate=8",
+   "attachments": [
+    {
+     "name": "교육기본시설/부속시설",
+     "url": "https://www.jnu.ac.kr/MainIntro/Institution/AttachedFac"
+    },
+    {
+     "name": "제7기 경원장학재단 장학생 선발 안내 공고문.pdf",
+     "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2570979"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "[장학] 206년 세종이도인재장학생 선발안내(세종연구원)",
+   "url": "https://www.knou.ac.kr/bbs/knou/51/799642/artclView.do",
+   "attachments": [
+    {
+     "name": "2026 장학생 선발 공고문.zip",
+     "url": "https://www.knou.ac.kr/bbs/knou/51/268368/download.do"
+    },
+    {
+     "name": "[최종] 2026 세종이도인재장학금 장학생 모집[A2]포스터.pdf",
+     "url": "https://www.knou.ac.kr/bbs/knou/51/268369/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간 : 분야별 상이 &nbsp; - 디딤돌 ( 학자금대출관련 외 ), 무지개 장학사업 : 2026. 5. 6.",
+   "school": "한국방송통신대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "2026년도 제7기 경원장학재단 장학생 선발 안내",
+   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12243/view.do?currentPageNo=1",
+   "attachments": [
+    {
+     "name": "' + fileItem.fileNm + '",
+     "url": "https://kep.kookmin.ac.kr/com/cmsv/FileCtr/fileDefaultDownload.do?fileNo="
+    }
+   ],
+   "deadlineHint": null,
+   "school": "국민대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "[등록/장학] 2026년도 제7기 경원장학재단 장학생 선발 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53120&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [
+    {
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "부설연구기관",
+     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    }
+   ],
+   "deadlineHint": "까지 장학생 총 465명을 선발하여 14억 1천만원의 장학금을 지원 하였습니다. &nbsp; 보다 많은 장학생들",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "[국제학생] 2026년 AISA(유실협) 우수 장학 외국인 유학생 선발 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53124&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [
+    {
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "부설연구기관",
+     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    }
+   ],
+   "deadlineHint": "신청기간: 2026년 9월 1일~ 9월 18일 5. 신청방법: 신청서 및 기타 서류를 작성하여 이메일로 제출(PDF",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "2026학년도 2학기 주거안정장학금 대학별 자체 기준 안내",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/145/234552/artclView.do",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "명지대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
    "title": "(홍보) 2026년 화성시인재육성재단 코나아이 소상공인 장학생 모집(마감)",
    "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=5233&bidx=892910&qidx=5233&cate=0&allboard=true&nowpage=3",
    "attachments": [
@@ -133,6 +371,110 @@
     }
    ],
    "deadlineHint": "마감) 작성자 학생지원과 조회수 515 날짜 2026-07-22 첨부파일 [공고문] 2026년 (주)코나아이 소",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "(홍보) [서울 사랑의열매] 2026년 상반기 사랑나눔 장학생 모집 안내(마감)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=5233&bidx=892964&qidx=5233&cate=0&allboard=true&nowpage=3",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "2. 2026년 상반기 바로바로론 사랑나눔 장학생 모집 공고.docx",
+     "url": "javascript:downloadfile("
+    }
+   ],
+   "deadlineHint": "마감) 작성자 학생지원과 조회수 925 날짜 2026-07-22 첨부파일 1. 2026년 상반기 바로바로론 사랑",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "[해성문화재단] 2026년도 2학기 장학생 선발 안내 (마감)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=5233&bidx=893177&qidx=5233&cate=0&allboard=true&nowpage=3",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "(양식) 개인정보 동의서 및 서약서.pdf",
+     "url": "javascript:downloadfile("
+    }
+   ],
+   "deadlineHint": "마감) 작성자 학생지원과 조회수 1243 날짜 2026-07-27 첨부파일 (양식) 개인정보 동의서 및 서약서.",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "(홍보) 2026년 하반기 울산광역시 대학(원)생 학자금대출 이자지원사업 안내(~8/30(일)까지)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=5233&bidx=893363&qidx=5233&cate=0&allboard=true&nowpage=3",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "2026년 하반기 대학(원)생 학자금대출 이자지원사업 공고문.hwpx",
+     "url": "javascript:downloadfile("
+    }
+   ],
+   "deadlineHint": "까지) 작성자 학생지원과 조회수 305 날짜 2026-07-30 첨부파일 2026년 하반기 대학(원)생 학자금대",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "(홍보) 2026년 하반기 서울인재대학장학금 선발 안내(마감)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=5233&bidx=893368&qidx=5233&cate=0&allboard=true&nowpage=3",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "★ 붙임 1. [공고문] 2026년 하반기 서울인재대학장학금 선발 공고.hwp",
+     "url": "javascript:downloadfile("
+    }
+   ],
+   "deadlineHint": "마감) 작성자 학생지원과 조회수 1330 날짜 2026-07-30 첨부파일 ★ 붙임 1. [공고문] 2026년",
    "school": "서울과학기술대학교",
    "campus": "",
    "foundAt": "2026-08-19"
@@ -160,6 +502,84 @@
    "foundAt": "2026-08-19"
   },
   {
+   "title": "[도서관] 2026학년도 2학기 국가근로장학생 모집 안내",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=57138&bidx=893915&qidx=57138&cate=0&allboard=true&nowpage=2",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "서식1. 국가근로장학생 지원서(이름기재).hwp",
+     "url": "javascript:downloadfile("
+    }
+   ],
+   "deadlineHint": "접수기간 &nbsp;-&nbsp;2026년 8월 24일 (월) 00시 ~ 당일 자정까지&nbsp;&nbsp;접수마감",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "(홍보) 세종이도인재장학금 핵심인재육성 장학생 모집(~9/30(수)까지)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=5233&bidx=893923&qidx=5233&cate=0&allboard=true&nowpage=2",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "3. 별지 서식 제출 서류.hwp",
+     "url": "javascript:downloadfile("
+    }
+   ],
+   "deadlineHint": "까지) 작성자 학생지원과 조회수 390 날짜 2026-08-13 첨부파일 3. 별지 서식 제출 서류.hwp 1.",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "[미래융합대학] 2026학년도 2학기 국가 근로장학생 모집",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=57138&bidx=893965&qidx=57138&cate=0&allboard=true&nowpage=2",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "(붙임1) 국가근로장학생 지원서.hwp",
+     "url": "javascript:downloadfile("
+    }
+   ],
+   "deadlineHint": null,
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
    "title": "[취업진로본부] 2026학년도 2학기 국가근로장학생 모집",
    "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=57138&bidx=894134&qidx=57138&cate=0&allboard=true&nowpage=1",
    "attachments": [
@@ -181,6 +601,288 @@
     }
    ],
    "deadlineHint": "까지 (마감 후 제출 서류는 검토&nbsp;제외) ◦ 지원서류 검토 후 면접 대상자에 한하여 개별 연락 후 면접",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "[필독] 2026학년도 2학기 교내근로장학생(ST근로, ST인턴, ST튜터) 신청절차 안내(8/24신청)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=57138&bidx=894150&qidx=57138&cate=0&allboard=true&nowpage=1",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "(붙임3) 2026학년도_ST근로,ST튜터장학사업 운영계획.hwp",
+     "url": "javascript:downloadfile("
+    }
+   ],
+   "deadlineHint": "신청기간:&nbsp; &nbsp; 2026. 8. 24.(월) 10:00 ~ 8. 31.(월) 18:00까지 &nb",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "[필독] 2026학년도 2학기 교내근로장학생(ST근로, ST인턴, ST튜터) 신청절차 안내(8/24신청)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=57138&bidx=894150&qidx=57138&cate=0&allboard=true&nowpage=2",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "(붙임3) 2026학년도_ST근로,ST튜터장학사업 운영계획.hwp",
+     "url": "javascript:downloadfile("
+    }
+   ],
+   "deadlineHint": "신청기간:&nbsp; &nbsp; 2026. 8. 24.(월) 10:00 ~ 8. 31.(월) 18:00까지 &nb",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "[필독] 2026학년도 2학기 교내근로장학생(ST근로, ST인턴, ST튜터) 신청절차 안내(8/24신청)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=57138&bidx=894150&qidx=57138&cate=0&allboard=true&nowpage=3",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "(붙임3) 2026학년도_ST근로,ST튜터장학사업 운영계획.hwp",
+     "url": "javascript:downloadfile("
+    }
+   ],
+   "deadlineHint": "신청기간:&nbsp; &nbsp; 2026. 8. 24.(월) 10:00 ~ 8. 31.(월) 18:00까지 &nb",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "[국제대학] 2026학년도 2학기 유학생 학습지원 튜터 장학생(한국어) 모집",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=57138&bidx=894151&qidx=57138&cate=0&allboard=true&nowpage=1",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    }
+   ],
+   "deadlineHint": "까지 국제대학 행정실에 제출 &nbsp;※ 월 30시간 미만 근무 시, 시간당 14,000원으로 계산하여 지급",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "[장애학생지원센터]2026학년도 2학기 국가근로장학생 모집 안내",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=57138&bidx=894153&qidx=57138&cate=0&allboard=true&nowpage=1",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "서식1. 국가근로장학생 지원서(학생).hwp",
+     "url": "javascript:downloadfile("
+    }
+   ],
+   "deadlineHint": "까지 ※지원자가 많을 시 조기 마감할 수 있음 ※지원서 제출 후 1차 선발예정자에 한하여 개별 연락 후 면접 실",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "[필독] 2026학년도 1학기 국가근로 장학생 신청 및 참여기관 안내(8/24부터 접수)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=57138&bidx=894158&qidx=57138&cate=0&allboard=true&nowpage=1",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "서식1. 국가근로장학생 지원서(학생).hwp",
+     "url": "javascript:downloadfile("
+    }
+   ],
+   "deadlineHint": "까지 &nbsp;&nbsp;(근로기관의 참여동의가 아직 안되어있으므로 미리 지원하지 말고 지원기간에 맞춰 지원",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "[필독] 2026학년도 1학기 국가근로 장학생 신청 및 참여기관 안내(8/24부터 접수)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=57138&bidx=894158&qidx=57138&cate=0&allboard=true&nowpage=2",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "서식1. 국가근로장학생 지원서(학생).hwp",
+     "url": "javascript:downloadfile("
+    }
+   ],
+   "deadlineHint": "까지 &nbsp;&nbsp;(근로기관의 참여동의가 아직 안되어있으므로 미리 지원하지 말고 지원기간에 맞춰 지원",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "[필독] 2026학년도 1학기 국가근로 장학생 신청 및 참여기관 안내(8/24부터 접수)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=57138&bidx=894158&qidx=57138&cate=0&allboard=true&nowpage=3",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "서식1. 국가근로장학생 지원서(학생).hwp",
+     "url": "javascript:downloadfile("
+    }
+   ],
+   "deadlineHint": "까지 &nbsp;&nbsp;(근로기관의 참여동의가 아직 안되어있으므로 미리 지원하지 말고 지원기간에 맞춰 지원",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "[국제교류처]2026학년도 2학기 교내근로장학생(ST근로) 선발공고",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=57138&bidx=894167&qidx=57138&cate=0&allboard=true&nowpage=1",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "(붙임) 국제교류처 교내근로장학생 지원서.hwp",
+     "url": "javascript:downloadfile("
+    }
+   ],
+   "deadlineHint": "신청기간 ※ 통합정보시스템 신청: 2026. 8. 24.(월) 10:00~ 마감시 ※ 서류접수: 2026. 8. 1",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "[국제교류처] 2026학년도 2학기 교내 근로장학생 모집(대외국제부총장 비서실)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=57138&bidx=894168&qidx=57138&cate=0&allboard=true&nowpage=1",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "(붙임) 국제교류처 교내근로장학생 지원서.hwp",
+     "url": "javascript:downloadfile("
+    }
+   ],
+   "deadlineHint": "신청기간 ※ 통합정보시스템 신청: 2027. 8. 24.(월) 10:00~ 마감시 ※ 서류접수: 2026. 8. 1",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "[학생지원과] 2026-2학기 국가근로장학생 모집 안내",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=57138&bidx=894173&qidx=57138&cate=0&allboard=true&nowpage=1",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "근로가능 시간표 서식_학번_이름.xlsx",
+     "url": "javascript:downloadfile("
+    }
+   ],
+   "deadlineHint": "까지 &nbsp; &nbsp; ※지원자가 많을 시 조기 마감할 수 있음 &nbsp; &nbsp; ※모집 시간 이",
    "school": "서울과학기술대학교",
    "campus": "",
    "foundAt": "2026-08-19"
