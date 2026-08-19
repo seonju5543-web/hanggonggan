@@ -11468,21 +11468,21 @@
   "school": "중앙대학교",
   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30066&pageNo=2",
   "text": "FETCH_ERROR TimeoutError",
-  "fails": 2
+  "fails": 3
  },
  {
   "title": "2026학년도 2학기 국가장학금 및 사전장학 2차 신청 안내",
   "school": "중앙대학교",
   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30065&pageNo=2",
   "text": "FETCH_ERROR TimeoutError",
-  "fails": 2
+  "fails": 3
  },
  {
   "title": "2026학년도 2학기 서울 미래인재재단 서울인재대학장학금 장학생 선발 공고",
   "school": "중앙대학교",
   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30050&pageNo=2",
   "text": "FETCH_ERROR TimeoutError",
-  "fails": 2
+  "fails": 3
  },
  {
   "title": "2026년도 「세종이도인재장학금」 핵심인재육성 장학사업 특기적성 분야 선발 안내",
@@ -11500,7 +11500,7 @@
   "school": "중앙대학교",
   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30043&pageNo=2",
   "text": "FETCH_ERROR TimeoutError",
-  "fails": 2
+  "fails": 3
  },
  {
   "title": "공통 ⭐중요⭐ 2026-2학기 국가장학금(2차) 및 복학생 우정장학(가계곤란) 신청 안내",
@@ -11529,112 +11529,112 @@
   "school": "계명대학교",
   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269918&pageOrder=0&cmd=2&parm_bod_uid=269918&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
   "text": "FETCH_ERROR TypeError",
-  "fails": 2
+  "fails": 3
  },
  {
   "title": "[교외] 2026학년도 2학기 보훈청 보훈(가족)장학 홍보",
   "school": "계명대학교",
   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269918&pageOrder=0&cmd=2&parm_bod_uid=269917&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
   "text": "FETCH_ERROR TypeError",
-  "fails": 2
+  "fails": 3
  },
  {
   "title": "[재학생 필수] ★ 2026-2학기 국가장학금 2차 신청 기간 안내 ★",
   "school": "계명대학교",
   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269918&pageOrder=0&cmd=2&parm_bod_uid=269836&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
   "text": "FETCH_ERROR TypeError",
-  "fails": 2
+  "fails": 3
  },
  {
   "title": "[교외]2026년 하반기 군산시 대학생 학자금 이자 지원 공고",
   "school": "계명대학교",
   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269918&pageOrder=0&cmd=2&parm_bod_uid=269774&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
   "text": "FETCH_ERROR TypeError",
-  "fails": 2
+  "fails": 3
  },
  {
   "title": "2026학년도 2학기 2차 주거안정장학금 신청 안내(한국장학재단)",
   "school": "계명대학교",
   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269918&pageOrder=0&cmd=2&parm_bod_uid=269773&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
   "text": "FETCH_ERROR TypeError",
-  "fails": 2
+  "fails": 3
  },
  {
   "title": "[교내] 2026-2학기 장애대학생 지원 도우미 장학생 선발 안내",
   "school": "계명대학교",
   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269918&pageOrder=0&cmd=2&parm_bod_uid=269744&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
   "text": "FETCH_ERROR TypeError",
-  "fails": 2
+  "fails": 3
  },
  {
   "title": "[교외] 2026학년도 5·18희망장학생 모집",
   "school": "계명대학교",
   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269918&pageOrder=0&cmd=2&parm_bod_uid=269688&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
   "text": "FETCH_ERROR TypeError",
-  "fails": 2
+  "fails": 3
  },
  {
   "title": "[교외] 2026학년도 (재)서울미래인재재단 장학생 선발",
   "school": "계명대학교",
   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269918&pageOrder=0&cmd=2&parm_bod_uid=269687&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
   "text": "FETCH_ERROR TypeError",
-  "fails": 2
+  "fails": 3
  },
  {
   "title": "[국가근로] 2026학년도 2학기 국가근로장학금 신청 안내(2차)",
   "school": "계명대학교",
   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269918&pageOrder=0&cmd=2&parm_bod_uid=269595&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
   "text": "FETCH_ERROR TypeError",
-  "fails": 2
+  "fails": 3
  },
  {
   "title": "2026년 하반기 울산광역시 대학(원)생 학자금대출 이자지원사업 안내",
   "school": "계명대학교",
   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269918&pageOrder=0&cmd=2&parm_bod_uid=269594&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
   "text": "FETCH_ERROR TypeError",
-  "fails": 2
+  "fails": 3
  },
  {
   "title": "2026학년도 1학기 주거안정장학금 7월분 지급요청서 제출 안내",
   "school": "계명대학교",
   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269918&pageOrder=0&cmd=2&parm_bod_uid=269475&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
   "text": "FETCH_ERROR TypeError",
-  "fails": 2
+  "fails": 3
  },
  {
   "title": "[교외]2026년 (재)서구인재육성재단 장학생 선발 안내 및 홍보",
   "school": "계명대학교",
   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269918&pageOrder=0&cmd=2&parm_bod_uid=269438&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
   "text": "FETCH_ERROR TypeError",
-  "fails": 2
+  "fails": 3
  },
  {
   "title": "[교외] 2026년 화성시인재육성재단 소상공인 장학금 모집",
   "school": "계명대학교",
   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269918&pageOrder=0&cmd=2&parm_bod_uid=269418&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
   "text": "FETCH_ERROR TypeError",
-  "fails": 2
+  "fails": 3
  },
  {
   "title": "[교외] 2026년 김해시미래인재장학재단 제3회 장학수기 공모전",
   "school": "계명대학교",
   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269918&pageOrder=0&cmd=2&parm_bod_uid=269417&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
   "text": "FETCH_ERROR TypeError",
-  "fails": 2
+  "fails": 3
  },
  {
   "title": "[교외] 2026학년도 충남평생교육인재육성진흥원 재능키움 장학생 선발",
   "school": "계명대학교",
   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269918&pageOrder=0&cmd=2&parm_bod_uid=269160&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
   "text": "FETCH_ERROR TypeError",
-  "fails": 2
+  "fails": 3
  },
  {
   "title": "[교외]2026년도 정읍시민장학재단 장학생 선발 공고",
   "school": "계명대학교",
   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269918&pageOrder=0&cmd=2&parm_bod_uid=269159&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
   "text": "FETCH_ERROR TypeError",
-  "fails": 2
+  "fails": 3
  },
  {
   "title": "[한국장학재단] 2026학년도 2학기 2차 주거안정장학금 신청",
@@ -11948,5 +11948,26 @@
   "text": "공지사항 < 공지사항 < 커뮤니티 < 전남대학교 대표 홈페이지\r\n 본문 바로가기 \r\n 주 메뉴 바로가기 \r\n 예비학생 \r\n 예비학생 주요서비스 \r\n 학부입학 \n 원클릭서비스 \n 대학원입학 \n 외국인입학 \n 캠퍼스투어신청 \n 퀵 서비스 레이어 닫기 \r\n 재학생 \r\n 재학생 주요서비스 \r\n 원격지원 \n 도서관 \n 언어교육원 \n 시설물바로고치미 \n 취업,진로(취업지원실) \n 대학일자리플러스센터\n재학생 맞춤형 고용서비스 \n 학생생활상담센터 \n 장애학생지원센터 \n 정보화본부 \n 증명발급 \n 교육혁신본부 \n 국제협력본부 \n 생활관 \r\n 광주생활관 \n 여수생활관 \n 퀵 서비스 레이어 닫기 \r\n 교직원 \r\n 교직원 주요서비스 \r\n 교육혁신본부 \n 도서관 \n PC병원 \n 증명발급 \n 서비스데스크 \n 시설물바로고치미 \n 퀵 서비스 레이어 닫기 \r\n 동문·일반인 \r\n 동문·일반인 주요서비스 \r\n 총동창회 \n 증명발급 \n 발전기금 \n 평생교육원 \n 언어교육원 \n 스포츠센터 \n 퀵 서비스 레이어 닫기 \r\n 세계대학평가 \r\n 세계대학평가 \r\n QS Survey Pool \n 퀵 서비스 레이어 닫기 \r\n 로그인 \n ENGLISH \n 전남대포털 \n 팝업존 닫기 \n SITEMAP \n 검색 \r\n 키워드검색 \r\n 검색 \r\n 닫기 \r\n 전남대소개 \r\n 전남대소개 CHONNAM NATIONAL UNIVERSITY \n 입학안내 바로가기 \r\n 캠퍼스안내 바로가기 \r\n 열린총장실 \n 인사말 \n 주요경력 \n 총장메시지 \n 총장동정 \n 역대총장 \n 신문고 \n 대학소개 \n 대학역사 \n 대학발전계획 \n 대학상징 \n 대학보도자료 \n 미디어포털 \n 대학홍보물 \n 대학평가 \n 대학현황 \n 대학평의원회 회의록 \n 대학기관 \n 조직도 \n 대학본부 \n 교수평의회 \n 대학원 \n 대학/직할학부 \n 교육기본시설/부속시설 \n 지원시설 \n 연구기관 \n 감사센터 \n 규정/지침/요람 \n 규정 \n 지침 \n 요람 \n 업무매뉴얼 \n 캠퍼스안내 \n 찾아오시는길 \n 캠퍼스안내 \n 캠퍼스안전서비스 \n 캠퍼스투어(방문, VR) \n 전남대학교 민주길 \n 교내주차 \n 교내홈페이지 \n 입학·취업 \r\n 입학·취업 CHONNAM NATIONAL UNIVERSITY \n 입학안내 바로가기 \r\n 캠퍼스안내 바로가기 \r\n 입학안내 \n 학부 입학 \n 대학원 입학 \n 원클릭서비스 \n International Admission \n 취업안내 \n 취업·진로포털 \n 현장실습 \n 대학일자리플러스센터 재학생 맞춤형 고용서비스 \n 구인신청 \n 대학·대학원 \r\n 대학·학부 CHONNAM NATIONAL UNIVERSITY \n 입학안내 바로가기 \r\n 캠퍼스안내 바로가기 \r\n 대학·학부 \n 대학·학부(과) \n 간호대학 \n 경영대학 \n 공과대학 \n 농업생명과학대학 \n 사범대학 \n 사회과학대학 \n 생활과학대학 \n 수의과대학 \n 약학대학 \n 예술대학 \n 의과대학 \n 인문대학 \n 자연과학대학 \n AI융합대학 \n 자율전공학부 \n 공학대학(여수) \n 문화사회과학대학(여수) \n 수산해양대학(여수) \n 창의융합학부(여수) \n 대학원 \n 일반대학원 \n 전문대학원 \n 경영전문대학원 \n 문화전문대학원 \n 치의학전문대학원 \n 법학전문대학원 \n 데이터사이언스대학원 \n 특수대학원 \n 교육대학원 \n 산업대학원 \n 정책대학원 \n 식물방역대학원 \n 간호대학원 \n 농생명산업대학원 \n 산학협력대학원(여수) \n 수산해양대학원(여수) \n 대학생활 \r\n 대학생활 CHONNAM NATIONAL UNIVERSITY \n 입학안내 바로가기 \r\n 캠퍼스안내 바로가기 \r\n 학사정보 \n 학사일정 \n 수강신청 \n 수업/성적 \n 학적 \n 등록금 \n 학생교류 \n 병무/학군단 \n 장학/학자금융자 \n 장학일반 \n 교내장학금 \n 교외장학금 \n 학자금대출안내 \n 신용교육콘텐츠 \n 교육지원 \n 인재상 및 핵심역량 \n 교육과정 \n 평생교육사자격제도 \n 학점은행제 \n 교육과정검색 \n 비정규프로그램 \n 교직정보 \n 교직과정 \n 입학년도 결정기준 \n 교직이수자선발 \n 교원자격증 취득요건 \n 교원자격증 발급 \n 자격증 발급 유의사항 \n 교직정보 게시판 \n 후생복지 \n 학교버스 \n 도서관이용 \n 생활관(기숙사) \n 보건진료소 \n 수련원 \n 전시시설 \n 생활협동조합 \n 교내식당 \n 바로고치미 \n 교육시설물 \n 스포츠센터 \n 학생상담지원 \n 인권센터 \n 학생생활상담센터 \n 장애학생지원센터 \n 학생활동 \n 총학생회 \n 동아리활동 \n 도서관 사물함 \n 정보서비스 \n 포털서비스 \n 전남대스토어 \n 무선랜서비스 \n PC병원 \n 성장마루(비교과통합플랫폼) \n 증명발급 \n 증명발급 \n 학생증 \n 국제학생증 \n 연구·산학 \r\n 연구산학 CHONNAM NATIONAL UNIVERSITY \n 입학안내 바로가기 \r\n 캠퍼스안내 바로가기 \r\n 연구소식 \n 연구소식 \n Research Highlights \n SciVal(연구성과분석 솔루션) \n 산학협력단 \n 연구지원 및 산학협력 \n 지적재산권 \n 기술이전 \n 창업보육 \n 기술지주회사 \n 연구소 및 사업단 \n 연구소현황 \n 사업단현황 \n 연구지원시설 \n 공동실험실습관 \n 연구실안전관리센터 \n 인프라활용지원센터 \n 연구인력·장비·특허 \n 연구장비 공동활용 장비검색 \n 국제교류 \r\n 국제교류 CHONNAM NATIONAL UNIVERSITY \n 입학안내 바로가기 \r\n 캠퍼스안내 바로가기 \r\n 커뮤니티 \r\n 커뮤니티 CHONNAM NATIONAL UNIVERSITY \n 입학안내 바로가기 \r\n 캠퍼스안내 바로가기 \r\n 공지사항 \n 공지사항 \n 묻고답하기 \n 묻고답하기 \n FAQ \n Q&A \n 생활광장 \n 알뜰장터 \n 주거정보 \n 아르바이트 \n 분실물센터 \n 동아리소모임알림방 \n 우편물검색 \n 캠퍼스갤러리 \n 사랑방 \n 인터넷은사랑을싣고 \n 칭찬릴레이(이달의 전남대인) \n 청렴센터 \n 청렴센터 안내 \n 청렴 정책 및 규정 안내 \n 청렴 관련 자료 공개 \n 감사사례 공개 \n 행정정보 공개 \n 부패행위신고센터 \n 공익신고 \n 청렴제안방 \n 청탁금지법 \n 클린신고 \n 갑질신고 \n 청렴마당 \n 자료실 \n 학부서식 \n 대학원서식 \n 대학정책제안방 \n 대학정책제안방 \n 주메뉴 닫기 \r\n 로그인 \r\n SITEMAP \r\n ENGLISH \r\n 전남대포털 \r\n 검색 \r\n 커뮤니티 \r\n 지성이 피어나는 그랜드캠퍼스 \r\n 커뮤니티 \r\n 공지사항 \n 공지사항 \n 묻고답하기 \n 묻고답하기 \n FAQ \n Q&A \n 생활광장 \n 알뜰장터 \n 주거정보 \n 아르바이트 \n 분실물센터 \n 동아리소모임알림방 \n 우편물검색 \n 캠퍼스갤러리 \n 사랑방 \n 인터넷은사랑을싣고 \n 칭찬릴레이(이달의 전남대인) \n 청렴센터 \n 청렴센터 안내 \n 청렴 정책 및 규정 안내 \n 청렴 관련 자료 공개 \n 감사사례 공개 \n 행정정보 공개 \n 부패행위신고센터 \n 공익신고 \n 청렴제안방 \n 청탁금지법 \n 클린신고 \n 갑질신고 \n 청렴마당 \n 자료실 \n 학부서식 \n 대학원서식 \n 대학정책제안방 \n 대학정책제안방 \n 홈 \r\n 커뮤니티 공지사항 공지사항 \r\n 공지사항\n 인쇄 \r\n \r [장학안내][삼원장학재단] 2026 삼원장학생 선발안내 \n 작성자 학생과 \r\n 문의전화(연락처) 010-7182-3150 \r\n 작성일 2026.08.19 10:16 \r\n 조회 208 \r\n 첨부파일 #1 F_장학생 선발원서(제24기 후기_2026년 2학기).docx 미리보기 \r\n 첨부파일 #2 F_장학생 선발요강(제24기 후기_2026년 2학기).pdf 미리보기 \r\n 첨부파일 #3 F_장학생 선발요강(제24기 후기_2026년 2학기).pdf 미리보기 \r\n 목록 \r\n 대학 / 대학원 \r\n 대학·학부 \r\n 본부직할학부 \n-->\r\n 간호대학 \n 경영대학 \n 공과대학 \n 농업생명과학대학 \n 사범대학 \n 사회과학대학 \n 생활과학대학 \n 수의과대학 \n 약학대학 \n 예술대학 \n 의과대학 \n 인문대학 \n 자연과학대학 \n AI융합대학 \n 자율전공학부(1년) \n 자율전공학부(4년) \n 공학대학 \n 문화사회과학대학 \n 수산해양대학 \n 창의융합학부 \n 대학원 \r\n 대학원 \n 경영전문대학원 \n 문화전문대학원 \n 치의학전문대학원 \n 의학전문대학원 \n 법학전문대학원 \n 데이터사이언스대학원 \n 교육대학원 \n 산업대학원 \n 정책대학원 \n 식물방역대학원 \n 간호대학원 \n 농생명산업대학원 \n 산학협력대학원 \n 수산해양대학원 \n 대학본부 \r\n 교무처 \r\n 교무과 \n 학사과 \n 학생처 \r\n 학생과 \n 연구처 \r\n 연구행정과 \n 연구진흥과 \n 연구지원부 \n 산학연구지원실 \n 연구감사센터 \n 연구행정과 \n 연구진흥과 \n 연구지원부 \n 산학연구지원실 \n -->\r\n 기획처 \r\n 기획조정과 \n 재정전략실 \n 대학혁신지원과 \n 대외협력처 \r\n 대외협력과 \n 국제처 \r\n 국제협력과 \n 입학처 \r\n 입학과 \n 교육협력관실 \n 사무국 \r\n 총무과 \n 재무과 \n 시설과 \n 감사센터 \n 미래전략본부 \r\n 미래전략정책실 \n 진로취업본부 \r\n 진로취업지원실 \n 교육혁신본부 \r\n 교육혁신정책실 \n 대학원혁신본부 \r\n 인재양성실 \n 정보화본부 \r\n AI정보화과 \n 교학본부 \r\n 교학과 \n 기획연구본부 \r\n 기획협력실 \n 행정본부 \r\n 행정지원과 \n 시설지원실 \n 부속/부설기관 \r\n 교육기본시설 \r\n 도서관 ( 광주 , 여수 )\n 부속시설 \r\n 융합인재교육원 \n-->\r\n 공동실험실습관 ( 광주 , 여수 )\n 동물병원 \n 박물관 \n 보건진료소 \n 평생교육원 (광주, 여수 )\n 농업실습교육원 \n 언어교육원 \n 생활관 ( 광주 , 여수 , 화순 )\n 신문방송사 \n 스포츠센터 \n 연구실안전관리센터 \n 글로벌교육원 \n 대학부속시설 \r\n 교육연수원 \n 교직부 \n 선박실습센터 \n 리걸클리닉센터 \n 문화예술교육원 \n 대학부설학교 \r\n 부설중학교 \n 부설고등학교 \n 총장직속기구 \r\n 3단계 산학연협력\n선도대학 육성사업(LINC 3.0)\n-->\r\n 생명윤리심의위원회 \n 인권센터 \n 미래위원회 \n 대학일자리플러스센터 \n-->\r\n 학생군사교육단 \n 지역선도대학 육성사업단 \n 소프트웨어교육원 \n 인공지능혁신융합대학사업단 \n 광주국제개발협력센터 \n 차세대통신혁신융합대학사업단 \n 광주‧전남 반도체공동연구소 \n 그린바이오혁신융합대학사업단 \n G-램프(LAMP)사업단 \n 지역혁신중심 대학지원체계(RISE)사업단 \n 지역혁신중심 대학지원체계(RISE) 전남 RISE 사업단 \n 인문사회융합인재양성사업단 \n 창업중심대학사업단 \n 글로벌인문사회진흥원 \n AI융합연구원 \n 대학재정지원사업단 \n 전남광주인문사회연구원 \n 지원시설 \r\n 발전기금재단 \n 산학협력단 \n 학생생활상담센터 \n 장애학생지원센터 \n 학군단 (광주 , 여수 )\n 생활협동조합 \n 신용협동조합 \n-->\r\n 신용협동조합 \n 수련원 \n 어린이집 \n 기타 \r\n 우수이러닝강좌 \r\n 학습법 \n 교수법 \n 온라인 토익 \n -->\r\n 기타 \r\n 병원 \n 총동창회 \n 민주길 \n 국어문화원 \n 대학요람 \r\n 국문요람 \n 영문요람 \n 대학정보공시 \n 행정서비스 \n 정보공개 \n 청렴센터 \n 교내홈페이지 \n 대학요람 \n 찾아오시는길 \n 개인정보처리방침 \n 정보보호 실천수칙 \n 이메일무단수집거부 \n -->\r\n 광주캠퍼스 (61186) 전남광주통합특별시 북구 용봉로 77(용봉동) / 대표전화 : 062-530-5114, 당직실 : 062-530-1167 / 팩스 : 062-530-1189\n여수캠퍼스 (59626) 전남광주통합특별시 여수시 대학로 50(둔덕동) / 대표전화 : 061-659-6114, 당직실 : 061-659-6111 / 팩스 : 061-659-6319 \r\n Copyright© 2018 CHONNAM NATIONAL UNIVERSITY. All rights reserved.",
   "cut": false,
   "limit": 15000
+ },
+ {
+  "title": "참슬기 식당 및 카우버거 근로 장학생 모집",
+  "school": "중앙대학교",
+  "url": "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100#n-%EC%B0%B8%EC%8A%AC%EA%B8%B0%20%EC%8B%9D%EB%8B%B9%20%EB%B0%8F%20%EC%B9%B4%EC%9A%B0%EB%B2%84%EA%B1%B0%20%EA%B7%BC%EB%A1%9C%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91",
+  "text": "FETCH_ERROR TimeoutError",
+  "fails": 1
+ },
+ {
+  "title": "2026학년도 2학기 저소득층 지원 장학금 - 중앙나래(II) 장학금 지급 안내",
+  "school": "중앙대학교",
+  "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30069&pageNo=2",
+  "text": "FETCH_ERROR TimeoutError",
+  "fails": 1
+ },
+ {
+  "title": "2026학년도 2학기 주거안정장학금 2차 신청 안내 (한국장학재단 문의)",
+  "school": "중앙대학교",
+  "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30068&pageNo=2",
+  "text": "FETCH_ERROR TimeoutError",
+  "fails": 1
  }
 ]

@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-08-19",
- "count": 1667,
+ "count": 1670,
  "items": [
   {
    "title": "2026년 2학기 주거안정장학금 우선지원 및 지급제외 기준 안내 학생지원팀 2026-08-19 15",
@@ -32,6 +32,42 @@
    "attachments": [],
    "deadlineHint": null,
    "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "2026학년도 2학기 주거안정장학금 2차 신청 안내 (한국장학재단 문의)",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30068&pageNo=2",
+   "attachments": [
+    {
+     "name": "01. (홈페이지) 주거안정장학금 장학생 통합신청 매뉴얼.pdf",
+     "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30068&pageNo=2#n-01.%20(%ED%99%88%ED%8E%98%EC%9D%B4%EC%A7%80)%20%EC%A3%BC%EA%B1%B0%EC%95%88%EC%A0%95%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%9E%A5%ED%95%99%EC%83%9D%20%ED%86%B5%ED%95%A9%EC%8B%A0%EC%B2%AD%20%EB%A7%A4%EB%89%B4%EC%96%BC.pdf"
+    },
+    {
+     "name": "02. (모바일) 주거안정장학금 장학생 통합신청 매뉴얼.pdf",
+     "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30068&pageNo=2#n-02.%20(%EB%AA%A8%EB%B0%94%EC%9D%BC)%20%EC%A3%BC%EA%B1%B0%EC%95%88%EC%A0%95%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%9E%A5%ED%95%99%EC%83%9D%20%ED%86%B5%ED%95%A9%EC%8B%A0%EC%B2%AD%20%EB%A7%A4%EB%89%B4%EC%96%BC.pdf"
+    }
+   ],
+   "deadlineHint": "신청기간 내 24시간 신청 가능(단, 신청시작일 및 마감일 제외) 대상자 : 신입생·편입생·재입학생·복학생·재학생",
+   "school": "중앙대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "2026학년도 2학기 저소득층 지원 장학금 - 중앙나래(II) 장학금 지급 안내",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30069&pageNo=2",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "중앙대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "참슬기 식당 및 카우버거 근로 장학생 모집",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100#n-%EC%B0%B8%EC%8A%AC%EA%B8%B0%20%EC%8B%9D%EB%8B%B9%20%EB%B0%8F%20%EC%B9%B4%EC%9A%B0%EB%B2%84%EA%B1%B0%20%EA%B7%BC%EB%A1%9C%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "중앙대학교",
    "campus": "",
    "foundAt": "2026-08-19"
   },
