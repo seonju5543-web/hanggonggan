@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<title>한대장 — 제품 전체 개요</title>
+<link rel="stylesheet" href="report.css">
+</head><body>
+
+<!-- ============ 표지 ============ -->
+<div class="cover">
+  <div class="kicker">CTO ONBOARDING · DOCUMENT 1 / 2</div>
+  <h1>한대장 (한국 대학교 장학금)<br>제품 전체 개요</h1>
+  <div class="sub">무엇을 만들었고, 지금 어디까지 작동하며, 무엇이 남았는가</div>
+  <div class="meta">
+    <b>서비스</b> 대학생 장학금 자동 매칭 · 신청서 작성 PWA &nbsp;·&nbsp;
+    <b>배포</b> seonju5543-web.github.io/hanggonggan (GitHub Pages, main push 시 자동)<br>
+    <b>기준 시점</b> 2026-08-20 (main HEAD) &nbsp;·&nbsp; <b>서비스워커 캐시</b> v58 &nbsp;·&nbsp;
+    <b>누적 커밋</b> 646 &nbsp;·&nbsp; <b>문서 2/2</b> 코드·아키텍처 상세 별첨
+  </div>
+</div>
+
+<h2 class="sh"><span class="n">01</span>한 장 요약</h2>
+<p class="lede">학생이 프로필을 <b>한 번</b> 등록하면, 흩어진 교내·교외 장학 공고를 자동으로 매칭받고
+증명서류 준비와 <b>공고 원본과 같은 구조의 신청서 작성</b>까지 앱 안에서 끝낸다. 공고 데이터는
+사람이 넣는 것이 아니라 <b>매일 도는 수집 로봇</b>이 41개 대학 게시판에서 가져온다.
+서버는 사실상 없다 — 앱은 정적 파일이고, 데이터 파이프라인 전체가 GitHub Actions 위에서 돈다.</p>
+
+<div class="tiles">
+  <div class="tile"><div class="v">188<span class="u">건</span></div><div class="l">정식 등록 공고<br>(마감 전 146건)</div></div>
+  <div class="tile"><div class="v">615<span class="u">건</span></div><div class="l">실시간 공고 피드<br>(41개 대학)</div></div>
+  <div class="tile"><div class="v">48<span class="u">종</span></div><div class="l">신청서 양식 스키마<br>(앱에서 직접 작성)</div></div>
+  <div class="tile"><div class="v">45<span class="u">곳</span></div><div class="l">수집 대상 캠퍼스<br>(최근 정상 40곳)</div></div>
+  <div class="tile"><div class="v">19<span class="u">개</span></div><div class="l">자동화 워크플로<br>(수집·검수·배포)</div></div>
+  <div class="tile"><div class="v">26k<span class="u">줄</span></div><div class="l">코드 (앱 7.5k ·<br>로봇 6.7k · 검증 5.2k)</div></div>
+</div>
+
+<div class="callout dark">
+  <h4>이 제품을 이해하는 열쇠 — "정직성"이 기능이 아니라 제약이다</h4>
+  창업자(이선주)와 합의된 8개 운영 원칙이 코드 구조를 지배한다. 핵심은 셋이다.
+  ① <b>가짜 공지 금지</b>: 실존하지 않는 장학금을 만들지 않는다. ② <b>추론 금지</b>: 공고 원문에
+  적히지 않은 금액·자격·제출방법을 앱이 추측해 채우지 않는다(못 찾으면 "원문 확인"이라고 말한다).
+  ③ <b>정직한 신청 상태</b>: 실제 접수가 일어나지 않는 것을 "신청 완료"라고 쓰지 않는다.
+  <br>→ 그래서 <b>금액이 확정 표기된 공고가 188건 중 8건뿐</b>이다. 이건 데이터 결함이 아니라
+  설계된 결과다. 이 원칙을 모르고 "빈 칸을 채우는" 개선을 하면 제품의 정체성이 깨진다.
+</div>
+
+<h2 class="sh"><span class="n">02</span>문제와 해법</h2>
+
+<table class="tight">
+  <tr><th style="width:26%">사용자가 겪는 문제</th><th style="width:37%">한대장이 하는 일</th><th>구현 상태</th></tr>
+  <tr><td>공고가 학교 게시판·재단 홈페이지·한국장학재단에 흩어져 있다</td>
+      <td>41개 대학 게시판을 매일 2회 수집해 한 화면에 모은다</td>
+      <td><span class="pill ok">가동</span> 피드 615건 + 큐레이션 188건</td></tr>
+  <tr><td>내가 지원 가능한지 공고를 다 읽어야 안다</td>
+      <td>프로필 1회 등록 → 12개 신호로 자격을 자동 진단하고 4단계로 판정</td>
+      <td><span class="pill ok">가동</span> 적합도 점수 정렬</td></tr>
+  <tr><td>신청서 양식(HWP)을 받아 워드로 옮겨 적어야 한다</td>
+      <td>원본과 <b>같은 구조</b>의 문서를 앱이 생성 (.doc 저장·인쇄·공유)</td>
+      <td><span class="pill ok">가동</span> 48종 · 공고 34건 연결</td></tr>
+  <tr><td>같은 증명서류를 매번 다시 뗀다</td>
+      <td>서류 보관함 8슬롯(기기 내 저장) → 신청 때 자동 체크리스트</td>
+      <td><span class="pill ok">가동</span></td></tr>
+  <tr><td>마감을 놓친다</td>
+      <td>마감 D-1·당일 푸시 알림(앱을 안 켜도 도착)</td>
+      <td><span class="pill ok">가동</span> Cloudflare Worker</td></tr>
+  <tr><td>최종 제출 버튼은 학교 전산에 있다</td>
+      <td>제출처 안내 + 내용 복사 + 이메일 접수 공고는 메일 자동완성</td>
+      <td><span class="pill warn">부분</span> 진짜 원클릭은 5장 참조</td></tr>
+</table>
+
+<h3 class="ss">사용자 여정 — 앱 화면 5개</h3>
+<div class="flow">
+  <div class="st"><b>① 온보딩</b><span>학교 자동추천(212개교·별칭 110) → 캠퍼스 → 계열 → 성적·소득 → 특별자격 → 공통 서류정보</span></div>
+  <div class="ar">›</div>
+  <div class="st"><b>② 홈</b><span>내 조건 요약, 바로 신청 가능 건수, 마감 임박, 장학금 도우미(챗봇) 진입</span></div>
+  <div class="ar">›</div>
+  <div class="st"><b>③ 탐색</b><span>큐레이션 카드(자격 진단·D-day·적합도) + 실시간 피드(제목·링크)</span></div>
+  <div class="ar">›</div>
+  <div class="st"><b>④ 신청 준비</b><span>서류 체크 → 신청서 작성(질문형) → 문서 생성 → 제출처 열기</span></div>
+  <div class="ar">›</div>
+  <div class="st"><b>⑤ 내역·MY</b><span>진척도 4단계 트래커, 보관함, 알림 설정</span></div>
+</div>
+<p><small>학과 자동추천은 커리어넷 오픈API에서 받아 온 <b>209개 대학 14,312개 학과</b> 목록(<code>data/majors.json</code>)을 쓴다.
+특별자격 5종(수급자·차상위·다자녀·국가유공자·장애), 서류 슬롯 8종.</small></p>
+
+<h2 class="sh"><span class="n">03</span>제품 헌법 — 운영 원칙 8개</h2>
+<p class="lede">전부 창업자와 합의된 것이고 <b>변경 금지</b>로 표기돼 있다. 코드 리뷰·기능 제안의 판단 기준이므로
+CTO가 가장 먼저 알아야 할 목록이다.</p>
+<table class="tight">
+  <tr><th class="num" style="width:4%">#</th><th style="width:24%">원칙</th><th>코드에서의 강제 장치</th></tr>
+  <tr><td class="num">1</td><td><b>정직한 신청 상태</b></td><td>진척도는 "신청 준비 완료"까지만 앱이 표기. 공식 제출·선정 결과는 사용자가 직접 기록(<code>effectiveStep</code>)</td></tr>
+  <tr><td class="num">2</td><td><b>등록은 컨펌 후</b> (자동 등록은 예외)</td><td>보수적 규칙을 통과한 공고만 로봇이 자동 등록하고 앱에 <b>'자동 등록·검수 전' 배지</b> 표시. 킬스위치 <code>auto-register-config.json</code></td></tr>
+  <tr><td class="num">3</td><td><b>선조치 후보고</b></td><td>방향 결정이 필요하면 최적안으로 먼저 조치하고 무엇을 왜 했는지 보고</td></tr>
+  <tr><td class="num">4</td><td><b>양식의 정의</b></td><td>공고 첨부 원본과 <b>동일한 구조</b>의 문서를 생성해야 한다. 자유서식 텍스트로 대체 금지. 증명 장치: <code>verify/form-snapshot.mjs</code>(48종 문자 단위 대조)</td></tr>
+  <tr><td class="num">5</td><td><b>양식 확보 절차</b></td><td>정식 등록 시 첨부 신청서가 있으면 스키마화까지가 한 세트. 없으면 <code>noForm:"사유"</code> 기재 — 감사 통과 조건</td></tr>
+  <tr><td class="num">6</td><td><b>가짜 공지 금지</b></td><td>임의 생성 공고 0건. 실존 상시 제도(국가장학금 등)는 임의 마감일 없이 '상시 제도'로 표기</td></tr>
+  <tr><td class="num">7</td><td><b>소급 적용</b></td><td>엔진·정책이 바뀌면 신규가 아니라 <b>전수</b>에 적용. 강제 장치: <code>verify/audit-data.js</code>(실패 시 그날 수집 결과를 저장하지 않음)</td></tr>
+  <tr><td class="num">8-1</td><td><b>추론 금지 · 원문 발췌</b></td><td>신청방법·제출서류는 확보한 공고 전문에서 <b>원문 문장을 그대로 발췌</b>해서만 표시. 발췌 없으면 '원문 보기' 링크만</td></tr>
+  <tr><td class="num">8-2</td><td><b>앱 제작 문서 한정</b></td><td>앱이 만든 지원문서는 자유형식 제출이 원문으로 확인된 공고(<code>prepDoc:true</code>)에만 제공</td></tr>
+</table>
+
+<div class="break"></div>
+<h2 class="sh"><span class="n">04</span>지금 가진 데이터 자산</h2>
+
+<figure class="avoid">
+  <div class="figtitle">신청 채널 분포 — 정식 등록 188건</div>
+  <div class="bars">
+    <div class="bar"><div class="lb">원문 접수<br>(포털·재단·오프라인)</div><div class="tr"><div class="fl" style="width:100%;background:var(--c1)"></div></div><div class="vl">144<s> · 77%</s></div></div>
+    <div class="bar"><div class="lb">앱에서 신청서 작성</div><div class="tr"><div class="fl" style="width:23.6%;background:var(--c2)"></div></div><div class="vl">34<s> · 18%</s></div></div>
+    <div class="bar"><div class="lb">이메일 접수<br>(원클릭 후보)</div><div class="tr"><div class="fl" style="width:2.8%;background:var(--c3)"></div></div><div class="vl">4<s> · 2%</s></div></div>
+    <div class="bar"><div class="lb">미분류<br>(감사 경고 대상)</div><div class="tr"><div class="fl" style="width:4.2%;background:var(--gray)"></div></div><div class="vl">6<s> · 3%</s></div></div>
+  </div>
+  <figcaption>'앱에서 신청서 작성' 34건은 <code>formId</code>가 연결돼 질문에 답하면 원본 구조 문서가 나오는 공고다.
+  미분류 6건은 <code>formId</code>도 <code>noForm</code>도 없어 감사가 매일 경고하는 항목(→ 6장).</figcaption>
+</figure>
+
+<figure class="avoid">
+  <div class="figtitle">정직성 커버리지 — 188건 중 '원문으로 확인된 것'의 비율</div>
+  <div class="bars">
+    <div class="bar"><div class="lb">공고 원문 발췌 보유</div><div class="tr"><div class="fl" style="width:63.3%;background:var(--c1)"></div></div><div class="vl">119<s> · 63%</s></div></div>
+    <div class="bar"><div class="lb">자격 요건 확보</div><div class="tr"><div class="fl" style="width:58.5%;background:var(--c1)"></div></div><div class="vl">110<s> · 59%</s></div></div>
+    <div class="bar"><div class="lb">앱 내 신청서 작성</div><div class="tr"><div class="fl" style="width:18.1%;background:var(--c1)"></div></div><div class="vl">34<s> · 18%</s></div></div>
+    <div class="bar"><div class="lb">금액 확정치 보유</div><div class="tr"><div class="fl" style="width:4.3%;background:var(--c1)"></div></div><div class="vl">8<s> · 4%</s></div></div>
+  </div>
+  <figcaption>금액 4%는 버그가 아니라 <b>원칙 8-1의 결과</b>다 — 공고에 금액이 안 적혀 있으면 <code>amountValue:0</code>으로 두고
+  홈 합계에서 '금액 미확인 n건 제외'라고 밝힌다. 자격 미확보 78건의 내역: 원문에 자격 제목이 없음 58건, 원문 자체를 아직 못 받음 20건.</figcaption>
+</figure>
+
+<figure class="avoid">
+  <div class="figtitle">등록 공고의 학교 분포 — 상위 12개교 (전체 39개교)</div>
+  <div class="bars">
+    <div class="bar narrow"><div class="lb">동국대</div><div class="tr"><div class="fl" style="width:100%"></div></div><div class="vl">16</div></div>
+    <div class="bar narrow"><div class="lb">중앙대</div><div class="tr"><div class="fl" style="width:87.5%"></div></div><div class="vl">14</div></div>
+    <div class="bar narrow"><div class="lb">전국(교외)</div><div class="tr"><div class="fl" style="width:87.5%;background:var(--c2)"></div></div><div class="vl">14</div></div>
+    <div class="bar narrow"><div class="lb">한국외대</div><div class="tr"><div class="fl" style="width:75%"></div></div><div class="vl">12</div></div>
+    <div class="bar narrow"><div class="lb">조선대</div><div class="tr"><div class="fl" style="width:75%"></div></div><div class="vl">12</div></div>
+    <div class="bar narrow"><div class="lb">서울과기대</div><div class="tr"><div class="fl" style="width:43.8%"></div></div><div class="vl">7</div></div>
+    <div class="bar narrow"><div class="lb">광운·성균관·홍익<br>가천·이화·국민</div><div class="tr"><div class="fl" style="width:37.5%"></div></div><div class="vl">각 6</div></div>
+  </div>
+  <figcaption>상위 12개 버킷이 111건이고, <b>나머지 27개 학교가 77건</b>을 나눠 갖는다(막대에는 표시하지 않음 — 축이 달라진다).
+  주황 막대(전국 교외)만 <b>학교 무관</b>으로 모든 사용자에게 매칭된다. 나머지는 <code>eligibility.schoolOnly</code>로
+  해당 학교 재학생에게만 노출된다 — 남의 학교 공고를 보여 주지 않는 것이 신뢰의 기본이라 엔진 차원에서 막는다.</figcaption>
+</figure>
+
+<h3 class="ss">수집망 현황</h3>
+<table class="tight">
+  <tr><th>구분</th><th class="num">수</th><th>내용</th></tr>
+  <tr><td>일반 수집 대상 캠퍼스</td><td class="num">44</td><td>게시판 주소 확보 <b>37</b> · 미확보 <b>7</b>(창업자가 주소를 주면 즉시 연결)</td></tr>
+  <tr><td>브라우저형 수집 대상</td><td class="num">17</td><td>봇 차단·동적 렌더링·클릭형 게시판 — 진짜 Chromium으로 행을 눌러 상세를 채집</td></tr>
+  <tr><td>최근 정상 수집 기록</td><td class="num">40</td><td>41곳 중 40곳이 2026-08-20에 정상(<code>collector/health.json</code>), 1곳은 08-15 이후 지연</td></tr>
+  <tr><td>수집 주기</td><td class="num">4회/일</td><td>일반 07:41·11:41 KST / 브라우저형 08:07·12:07 KST (GitHub 예약 혼잡을 피해 홀수 분)</td></tr>
+</table>
+
+<h2 class="sh"><span class="n">05</span>도달 수준 — "진짜 원클릭"까지 남은 거리</h2>
+<p class="lede">현재 앱은 <b>제출 직전까지</b> 완결돼 있다. 마지막 제출 버튼은 학교 전산 안에 있어서 대신 누를 수 없다.
+채널별 도달 수준은 다음과 같다.</p>
+<table class="tight">
+  <tr><th style="width:20%">접수 채널</th><th class="num" style="width:8%">공고 수</th><th>앱이 어디까지 하는가</th><th style="width:22%">완전 자동화 조건</th></tr>
+  <tr><td><b>이메일 접수</b></td><td class="num">4</td><td>서류·본문 자동완성 → 메일 앱 열기 (mailto)</td><td>Resend API 키 → <code>server/mail-worker.js</code> 배포 시 <b>앱 안에서 발송 완료</b></td></tr>
+  <tr><td><b>양식 제출</b></td><td class="num">34</td><td>원본 동일 구조 문서 생성 → 저장·인쇄·공유</td><td>학교 장학팀 파일럿(표준화 접수 인정)</td></tr>
+  <tr><td><b>포털 입력 · 재단 접수 등<br>원문 접수형</b></td><td class="num">144</td><td>원문 발췌 안내 + 내용 복사 + 제출처 바로 열기<br><small>세부 채널은 저장하지 않고 <b>공고 원문 발췌</b>로 안내한다(원칙 8-1)</small></td><td>학교 SSO/학사 연동 — 장기</td></tr>
+  <tr><td><b>한국장학재단 상시 제도</b></td><td class="num">7<small>*</small></td><td>준비 + 안내 (본인 인증이 법적 상한)</td><td>제도상 대행 불가 — 현 수준이 상한</td></tr>
+</table>
+<p><small>* 한국장학재단 상시 제도 7종은 공고가 아니라 제도라서 <code>data.js</code>에 별도로 들어 있다(위 188건에 포함되지 않음). 막대 합계 182 + 미분류 6 = 188.</small></p>
+<div class="callout">
+  <h4>제안서 → 진짜 원클릭 연결 논리 (창업자가 대학에 제시하는 서사)</h4>
+  ① <b>정보 연계</b>: 장학팀이 공고를 직접 제공 → 수집 추측이 불필요해지고 정확도 100%.
+  ② <b>표준화 접수 파일럿</b>: 장학팀이 지정 장학금의 이메일 접수를 공식 인정 → 앱이 만든 원본 양식 + 보관함 서류가
+  버튼 하나로 접수됨 → <b>이때부터 "신청 완료" 표기가 정직해진다</b>.
+  ③ <b>학사 연동</b>: 성적·재학 정보 연동 → 증명서 발급 자체가 소멸.
+  제안서 PDF 2종(<code>proposals/</code>)은 작성 완료 상태로 제출 대기 중이다.
+</div>
+
+<h2 class="sh"><span class="n">06</span>CTO가 지금 결정해야 하는 것</h2>
+<table class="tight">
+  <tr><th style="width:22%">항목</th><th style="width:34%">현재 상태</th><th>결정하면 생기는 결과 / 리스크</th></tr>
+  <tr><td><b>Claude API 잔액</b></td><td><span class="pill bad">중단</span> 8/11부터 잔액 부족으로 유료 스키마화 경로 정지. 무료 규칙 경로는 정상 작동 중</td>
+      <td>PDF·표 서식 신청서의 자동 양식화가 재개된다. 지금은 그 유형이 계속 밀린다(대기 23건)</td></tr>
+  <tr><td><b>Resend API 키</b></td><td><span class="pill warn">대기</span> 메일 서버 코드는 작성 완료·미배포</td>
+      <td>이메일 접수 4건이 <b>앱 내 발송 완료</b>가 된다 — 제품 최초의 진짜 원클릭 실증</td></tr>
+  <tr><td><b>미확보 게시판 7곳</b></td><td><span class="pill warn">대기</span> 주소만 있으면 즉시 등록·수집</td><td>수집망 44/44 완성</td></tr>
+  <tr><td><b>스토어 출시</b></td><td><span class="pill warn">미결</span> 현재 PWA 설치형으로 배포 중</td><td>Play(TWA, $25) → App Store(Capacitor, $99/년). 패키징 작업 자체는 소규모</td></tr>
+  <tr><td><b>담당 영역 분담</b></td><td><span class="pill warn">미결</span> 두 개발자(선주·Josehyeon)가 같은 파일을 건드릴 위험</td>
+      <td>충돌 자동 해소 체계는 이미 있음(<code>COLLAB.md</code>) — 남은 것은 사람 사이의 소유권 합의</td></tr>
+</table>
+
+<h3 class="ss">지금 열려 있는 품질 이슈 (매일 감사가 세는 숫자)</h3>
+<table class="tight">
+  <tr><th class="num" style="width:6%">건수</th><th style="width:30%">항목</th><th>영향과 처리 경로</th></tr>
+  <tr><td class="num">18</td><td>원문 주소 대신 <b>게시판 목록 주소</b>만 확보</td><td>학생이 '원문 공고 ↗'로 바로 못 간다. 앱은 이 경우 '게시판 목록 ↗'으로 정직하게 표기.
+      링크 사냥꾼 로봇이 매일 06:37 재시도(간격 1→3→7→14→30일, 영구 포기 없음)</td></tr>
+  <tr><td class="num">6</td><td>양식 미연결 (첨부 신청서는 있는데 스키마 없음)</td><td>해당 공고는 '앱에서 작성'이 안 된다. 원본 확보 후 스키마화하면 해소</td></tr>
+  <tr><td class="num">2</td><td>질문 개수 상한 초과 양식</td><td>두 양식이 서술형 7·9개라 더 못 줄인다. 감사가 이름을 계속 보고(숨기지 않는 것이 원칙)</td></tr>
+  <tr><td class="num">22</td><td>'자동 등록 · 검수 전' 배지 상태 공고</td><td>사용자에게는 배지로 정직하게 표시됨. 검수는 관리자 화면에서 일괄 처리</td></tr>
+</table>
+
+<div class="callout warn">
+  <h4>구조적 리스크 3가지 (기술 상세는 문서 2/2의 마지막 장)</h4>
+  ① <b>수집 대상은 통제 밖이다</b> — 학교가 게시판 구조를 바꾸면 그 학교만 조용히 0건이 된다.
+  대응으로 실패 시 🚨 이슈 자동 생성·건강 기록·누락 감사가 붙어 있다.
+  ② <b>브랜치 토폴로지가 특수하다</b> — 예약 로봇은 기본 브랜치에서만 돌고 배포는 main에서만 된다.
+  둘을 잇는 동기화 로봇이 없으면 수집 결과가 앱에 안 나간다(실제로 겪은 사고).
+  ③ <b>사람 검수가 병목</b> — 로봇이 매일 등록하므로 검수를 멈추면 '검수 전' 재고가 계속 쌓인다.
+</div>
+
+</body></html>
