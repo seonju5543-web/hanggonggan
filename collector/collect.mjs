@@ -7,6 +7,7 @@
    4) 컨펌용 리포트 이슈 생성 (양식 스키마화·정식 등록은 개발자 컨펌 후)
    ============================================================ */
 import fs from 'node:fs';
+import { FETCH_HEADERS } from './http-headers.mjs';
 import { urlKey, dedupeNotices, capNotices } from './url-key.mjs';
 import { loadCandidates, mergeCandidates, saveCandidates } from './candidates.mjs';
 import { publishBySchool } from './publish-notices.mjs';
@@ -31,7 +32,7 @@ const KEYWORDS = /장학|학자금|등록금 감면|학업장려|근로장학/;
 const ATTACH_RE = /\.(hwp|hwpx|doc|docx|pdf|xls|xlsx)(\?|$)/i;
 const DEADLINE_RE = /(마감|까지|기한|접수기간|신청기간)[^\n<]{0,60}/;
 
-const UA = { 'User-Agent': 'Mozilla/5.0 (compatible; HandaejangBot/0.2; +https://github.com/seonju5543-web/hanggonggan)' };
+const UA = FETCH_HEADERS;   // 규칙은 http-headers.mjs 한 곳 (2026-08-20)
 
 function extractLinks(html, base) {
   const out = [];

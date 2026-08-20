@@ -1123,5 +1123,21 @@ console.log('\n■ 신청서 질문 설계기 (form-plan.js)');
     ['choice', 'group', 'static'].every((t) => audit.includes(`'${t}'`)), true);
 }
 
+/* 2026-08-20 — 중앙대 15건이 원문을 통째로 못 받던 원인은 게시판이 아니라 **요청 머리말**이었다 */
+console.log('\n■ 공고를 받아올 때 쓰는 머리말 (2026-08-20)');
+{
+  const root = new URL('../', import.meta.url);
+  const H = await import(new URL('collector/http-headers.mjs', root));
+  eq('학생 브라우저와 같은 UA를 쓴다', /Chrome\/\d/.test(H.FETCH_HEADERS['User-Agent']), true);
+  // 🔴 UA 꼬리에 봇 이름을 붙이면 중앙대가 실제로 거부했다(UND_ERR_SOCKET) — 신원은 From에 담는다
+  eq('  UA에 봇 이름을 붙이지 않는다', /bot/i.test(H.FETCH_HEADERS['User-Agent']), false);
+  eq('  대신 From 헤더로 신원을 밝힌다', /@/.test(H.FETCH_HEADERS.From || ''), true);
+  for (const f of ['collector/deepfetch.mjs', 'collector/collect.mjs']) {
+    const src = fs.readFileSync(new URL(f, root), 'utf8');
+    eq(`  ${f.split('/').pop()} 가 같은 머리말을 쓴다`, /FETCH_HEADERS/.test(src), true);
+    eq(`  ${f.split('/').pop()} 에 UA를 따로 박아 두지 않았다`, /'User-Agent':\s*'Mozilla[^']*compatible/.test(src), false);
+  }
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);

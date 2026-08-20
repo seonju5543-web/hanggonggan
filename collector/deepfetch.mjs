@@ -2,6 +2,9 @@
    저장소(collector/extracted/)에 저장한다. 정식 등록 큐레이션의 원천 자료. */
 import fs from 'node:fs';
 import { isHtmlPayload } from './attachment-link.mjs';
+/* 요청 머리말은 http-headers.mjs 한 곳에 있다 — 베껴 두면 한쪽만 고쳐져
+   "수집기는 받는데 심층 수집은 못 받는" 어긋남이 생긴다 (2026-08-20 신설, 첫머리 주석 참조) */
+import { FETCH_HEADERS } from './http-headers.mjs';
 import { canonUrl, normTitle, indexTexts, sourceFor, needsFetch } from './notice-source.mjs';
 
 const HERE = new URL('.', import.meta.url);
@@ -9,7 +12,7 @@ const OUT = new URL('extracted/', HERE);
 fs.mkdirSync(OUT, { recursive: true });
 
 const notices = JSON.parse(fs.readFileSync(new URL('../data/notices.json', HERE), 'utf8'));
-const UA = { 'User-Agent': 'Mozilla/5.0 (compatible; HandaejangBot/0.2)' };
+const UA = FETCH_HEADERS;
 
 /* 첨부 원본까지 내려받을 공고 (제목 부분일치).
    우선순위: 환경변수 FORM_TARGETS > run-deepfetch.txt의 "targets: a,b,c" 줄 > 기본값.
@@ -117,7 +120,9 @@ const FILL_CAP = 120;
    그래서 매 실행 몇 자리만 떼어 다시 두드린다. **실패가 적은 것부터** 고르므로,
    두드릴 때마다 fails가 올라 자연히 다음 차례로 넘어간다(별도 기록장이 필요 없는 회전).
    link-hunter의 '영구 포기는 없다'와 같은 방침이다. 예산은 4자리 × 20초 = 80초로 묶인다. */
-const RETRY_SLOTS = 4;
+/* 평소엔 4자리면 충분하지만, 헤더·규칙을 고친 뒤 **밀린 것을 한 번에 따라잡을 때**는
+   자리를 늘려 돌린다: `FILL_RETRY_SLOTS=40 node collector/deepfetch.mjs --fill` */
+const RETRY_SLOTS = Number(process.env.FILL_RETRY_SLOTS || 4);
 const retired = [];
 let todo = [...wanted.values()]
   .filter((n) => {
