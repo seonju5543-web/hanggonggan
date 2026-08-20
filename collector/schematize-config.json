@@ -2,7 +2,7 @@
  "enabled": false,
  "maxApiCallsPerRun": 2,
  "giveUpAfter": 6,
- "model": "claude-opus-5",
+ "model": "claude-sonnet-5",
  "effort": "low",
  "minTextChars": 400,
  "maxManualChars": 6000,
