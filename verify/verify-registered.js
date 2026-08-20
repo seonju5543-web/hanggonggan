@@ -50,7 +50,7 @@ async function driveAnyLiveForm(page) {
 }
 
 (async () => {
-  const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+  const browser = await chromium.launch({ executablePath: (process.env.CHROME_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome') });
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   const errors = [];
   page.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));

@@ -11,7 +11,7 @@
    ⑨ 질문에 스크립트를 넣어도 그대로 실행되지 않는다(XSS)
    실행: python3 -m http.server 8123 & 후 node verify/verify-chat.js */
 const { chromium } = require('playwright-core');
-const EXE = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
+const EXE = (process.env.CHROME_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome');
 const IGNORE_CONSOLE = /Failed to load resource|does not support the Push API in incognito/;
 const BASE = 'http://localhost:8123';
 

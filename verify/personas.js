@@ -2,7 +2,7 @@
    - 대표 페르소나 몇은 UI로 직접 온보딩(클릭) → UI 버그 포착
    - 넓은 매트릭스는 localStorage 주입 → 매칭 엔진·렌더·빈 상태 포착 */
 const { chromium } = require('playwright-core');
-const EXE = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
+const EXE = (process.env.CHROME_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome');
 
 const SCHOOLS = [
   '한국외국어대학교', '성균관대학교', '광운대학교', '경희대학교', '동국대학교',
