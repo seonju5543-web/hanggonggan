@@ -1216,5 +1216,32 @@ console.log('\n■ 학교가 빠뜨린 중간 인증서 (2026-08-20)');
   }
 }
 
+/* 2026-08-20 — AI로 자격을 읽을 때의 지어냄 방지. **잔액 없이** 가짜 응답으로 검증한다
+   (챗봇 AI 안전장치를 가짜 서버로 검증한 것과 같은 방식). */
+console.log('\n■ AI 자격 읽기 안전장치 (2026-08-20)');
+{
+  process.env.ELIG_AI_AS_LIB = '1';
+  const AI = await import(new URL('../collector/eligibility-ai.mjs', import.meta.url));
+  const lines = ['3. 신청 자격', '가. 2026-2학기 재학 예정인 학부생', '나. 직전학기 평점평균 3.0 이상인 자',
+    '4. 제출서류', '가. 성적증명서 1부', '5. 문의 : 02-1234-5678',
+    '등록일 2026.06.02.', '조회 5464', '인재개발실', '포스터.png'];
+  const v = (p) => AI.verifyPick(p, lines);
+  eq('자격 줄만 고르면 채택', v({ none: false, lines: [0, 1, 2] }).ok, true);
+  eq('  범위 밖 번호는 버리고 나머지는 살린다', v({ none: false, lines: [1, 2, 999] }).lines.length, 2);
+  eq('  범위 밖만 주면 통째로 버린다', v({ none: false, lines: [999] }).ok, false);
+  eq('  제출서류·문의는 자격이 아니다', v({ none: false, lines: [3, 4, 5] }).ok, false);
+  /* 🔴 한글 뒤에는 \b(낱말 경계)가 듣지 않는다 — `^(등록일)\b`로 썼다가 하나도 안 걸렸다 */
+  eq('  게시판 머리말·부서명·첨부명은 자격이 아니다', v({ none: false, lines: [6, 7, 8, 9] }).ok, false);
+  eq('  요건 신호가 없으면 통째로 버린다', v({ none: false, lines: [0] }).ok, false);
+  eq('  모른다(none)고 하면 그대로 둔다', v({ none: true, lines: [] }).ok, false);
+  eq('  빈 응답도 버린다', v(null).ok, false);
+  /* 🔴 이것이 이 파일의 존재 이유 — 모델이 글자를 보내도 화면에는 **앱이 제 원문에서 꺼낸 것**만 간다 */
+  const made = v({ none: false, lines: [1], text: '최대 987654원 지급' });
+  eq('  모델이 보낸 글자는 결과에 섞이지 않는다', JSON.stringify(made.lines).includes('987654'), false);
+  // 기본은 꺼져 있어야 한다 — 켠 채로 배포되면 잔액이 조용히 샌다
+  const cfg = JSON.parse(fs.readFileSync(new URL('../collector/eligibility-ai-config.json', import.meta.url), 'utf8'));
+  eq('  기본은 꺼져 있다', cfg.enabled, false);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);
