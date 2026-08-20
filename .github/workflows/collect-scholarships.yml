@@ -33,7 +33,7 @@ jobs:
     # 실제로 7/31 브라우저 수집이 360분을 돌다 취소됐고, 수집 로봇 2종이 같은
     # 대기줄(concurrency: collector)을 쓰기 때문에 그동안 다음 수집이 줄을 섰다.
     # 학교를 더 붙일수록 '한 곳이 안 열려 멈추는' 확률도 같이 오른다.
-    timeout-minutes: 26   # 실측 0.9~7.7분 (단계 예산 합: 6+5+1+2 + 준비·저장)
+    timeout-minutes: 26   # 실측 0.9~7.7분 (단계 예산 합: 6+4+5+1 + 준비·저장 — 자격 첨부 4분 추가 2026-08-20)
     steps:
       - uses: actions/checkout@v4
 
@@ -100,6 +100,17 @@ jobs:
         continue-on-error: true
         timeout-minutes: 1
         run: node collector/prune-health.mjs
+      # 자격을 못 읽은 공고의 **공고문 첨부**만 받아 둔다 (2026-08-20)
+      # 보강 단계다 — 무슨 일이 있어도 그날 수집 저장·리포트는 나가야 하므로
+      # 자체 예산(2.5분) + timeout-minutes + continue-on-error 세 겹으로 막는다.
+      - name: 자격용 공고문 첨부 확보 (보강 — 실패해도 수집은 나간다)
+        continue-on-error: true
+        timeout-minutes: 4
+        run: |
+          node collector/deepfetch.mjs --elig-attach
+          pip install olefile --quiet || true
+          python3 collector/hwp-bodytext.py || true
+
       - name: 공고 원문 발췌 갱신 (정직 원칙 — 추론 대신 원문 그대로)
         run: node collector/extract-excerpts.mjs --write
 

@@ -6249,7 +6249,18 @@
     }
    ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322606",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "eligibilityFrom": "공고문 첨부",
+   "eligibilityLines": [
+    "■ 지원 자격",
+    "아래 두 가지 자격을 모두 충족하는 자",
+    "1) 학업 성적 기준",
+    "- 국내 4년제 대학교 재학생으로서, 25-2학기 성적의 평균이 3.8/4.5점 이상",
+    "- 만점이 4.3점인 경우, 3.6/4.3점 이상",
+    "- 복학생인 경우, 휴학 직전학기 성적 기준",
+    "※ 정규학기 내 재학생만 지원 가능 (건축학과 등 예외 인정 / 초과학기생 제외)",
+    "2) 경제적 기준"
+   ]
   },
   {
    "id": "auto-bbssc58943633artclviewdo",

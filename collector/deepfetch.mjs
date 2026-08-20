@@ -5,6 +5,7 @@ import { isHtmlPayload } from './attachment-link.mjs';
 /* 요청 머리말은 http-headers.mjs 한 곳에 있다 — 베껴 두면 한쪽만 고쳐져
    "수집기는 받는데 심층 수집은 못 받는" 어긋남이 생긴다 (2026-08-20 신설, 첫머리 주석 참조) */
 import { FETCH_HEADERS } from './http-headers.mjs';
+import { isNoticeDoc } from './attachment-text.mjs';
 import { canonUrl, normTitle, indexTexts, sourceFor, needsFetch } from './notice-source.mjs';
 
 const HERE = new URL('.', import.meta.url);
@@ -36,6 +37,12 @@ const DOWNLOAD_FORMS_FOR = (process.env.FORM_TARGETS || readTargetsFromTrigger()
    본문은 바로 다음 단계의 증분 수집(--fill)이 어차피 받으므로 여기서는 중복이다. */
 const FORMS_ONLY = process.argv.includes('--forms-only');
 
+/* --elig-attach : 자격을 못 읽은 등록 공고의 **공고문 첨부만** 받아 둔다 (2026-08-20).
+   자격은 공고문에 있지 학생이 채우는 신청서에는 없다 — 가리지 않고 받았다가
+   개인정보 동의서 문구가 지원 자격 자리에 앉은 적이 있어 되돌렸다(attachment-text.mjs 첫머리).
+   받아 둔 글자는 extract-excerpts가 **본문에서 못 뽑았을 때만** 본다. */
+const ELIG_ATTACH = process.argv.includes('--elig-attach');
+
 function clean(html) {
   return html
     .replace(/<script[\s\S]*?<\/script>/gi, ' ')
@@ -53,6 +60,11 @@ function clean(html) {
 if (FORMS_ONLY) {
   const n = await downloadForms();
   console.log(`done(forms-only): ${n} attachments`);
+  process.exit(0);
+}
+if (ELIG_ATTACH) {
+  const n = await downloadEligDocs();
+  console.log(`done(elig-attach): ${n} attachments`);
   process.exit(0);
 }
 
@@ -210,12 +222,15 @@ console.log(`done: ${texts.length} texts, ${fi} attachments`);
    '스키마화 대기'로 큐에 남아 있던 공고의 원본이 다음 수집 때 사라져, 다음 세션이 양식을
    만들 수 없었다(2026-07-30 발견 — 도레이·염곡·시립대 원본이 이렇게 유실됨).
    그래서 파일 이름에 공고별 표식을 넣고, 이번에 다시 받는 공고의 파일만 갈아끼운다. */
+/* 파일 이름에 넣는 공고별 표식. **양식 수집과 자격 수집이 같은 규칙을 써야** 한 공고의
+   첨부가 두 벌로 쌓이지 않고, 다시 받을 때 옛 파일이 제대로 갈아끼워진다. */
+function slugOf(title) {
+  let h = 0;
+  for (let i = 0; i < title.length; i++) h = (h * 31 + title.charCodeAt(i)) >>> 0;
+  return h.toString(36).slice(0, 6);
+}
+
 async function downloadForms() {
-  const slugOf = (title) => {
-    let h = 0;
-    for (let i = 0; i < title.length; i++) h = (h * 31 + title.charCodeAt(i)) >>> 0;
-    return h.toString(36).slice(0, 6);
-  };
   /* 표적은 '제목 앞부분'이라 짧으면 엉뚱한 공고까지 몽땅 걸린다.
      실제로 대기 큐가 제목을 12자로 잘라 넣는 바람에 "2026학년도 2학기 " 같은 조각이
      수십 건에 걸렸고, 학자금대출·캠퍼스 투어 같은 공고의 첨부(3.9MB zip 등)까지 받다가
@@ -277,4 +292,74 @@ async function downloadForms() {
   }
   fs.writeFileSync(indexPath, indexLines.join('\n') + (indexLines.length ? '\n' : ''));
   return fi;
+}
+
+/* ── 자격 미확보 공고의 '공고문' 첨부 받기 (2026-08-20) ──────────────
+   🔴 이 단계는 **보강**이다. 이 저장소는 보강 단계가 본업을 죽여 그날 수집분을 통째로
+   잃은 적이 세 번 있다(8/3·8/4·8/16). 그래서 세 겹으로 막는다:
+     ① 스스로 예산(ELIG_BUDGET_MS) 안에 끝낸다 — 시간 초과는 강제 종료라 저장까지 죽는다
+     ② 요청마다 시한(20초)을 건다 — 학교가 영영 답을 안 줘도 거기서 멈추지 않는다
+     ③ 워크플로에서 timeout-minutes + continue-on-error 로 돈다
+   못 받은 것은 다음 실행이 마저 받는다. 자격을 읽은 공고는 대상에서 빠지므로
+   **같은 파일을 매일 다시 받는 일이 구조적으로 없다.** */
+async function downloadEligDocs() {
+  const { createRequire } = await import('node:module');
+  const { requirementLines } = createRequire(import.meta.url)('../match-engine.js');
+  const reg = JSON.parse(fs.readFileSync(new URL('../data/registered.json', HERE), 'utf8'));
+
+  const BUDGET_MS = Number(process.env.ELIG_BUDGET_MS || 150 * 1000);   // 2.5분
+  const MAX_NOTICES = 6;
+  const MAX_BYTES = 8 * 1024 * 1024;
+  const startedAt = Date.now();
+  /* PDF는 받지 않는다 — 글자가 정확히 안 나온다(attachment-text.mjs 첫머리 참조).
+     받아 봐야 못 쓰므로 예산만 쓴다. 스캔 PDF는 AI 경로의 몫이다. */
+  const OK_EXT = /\.(hwp|hwpx|docx?)$/i;
+
+  const targets = [];
+  for (const it of reg.items) {
+    if (it.program || requirementLines(it).length) continue;
+    const atts = (it.attachments || []).filter((a) => OK_EXT.test(a.name || '') && isNoticeDoc(a.name));
+    if (atts.length) targets.push({ it, atts: atts.slice(0, 2) });
+    if (targets.length >= MAX_NOTICES) break;
+  }
+  console.log(`자격용 공고문 첨부 대상 ${targets.length}건 (예산 ${Math.round(BUDGET_MS / 1000)}초)`);
+  if (!targets.length) return 0;
+
+  /* 파일 이름 표식은 **등록 공고 이름**으로 만든다 — 양식 수집은 수집 목록의 제목을 쓰므로
+     표식이 서로 달라, 아래 '다시 받는 것만 지우기'가 양식 원본을 건드리지 않는다. */
+  const refreshing = new Set(targets.map((t) => slugOf(t.it.name)));
+  for (const f of fs.readdirSync(OUT)) {
+    const m = f.match(/^elig-([a-z0-9]{1,6})-/);
+    if (m && refreshing.has(m[1])) fs.unlinkSync(new URL(f, OUT));
+  }
+  const idxPath = new URL('elig-docs.json', OUT);
+  let index = {};
+  try { index = JSON.parse(fs.readFileSync(idxPath, 'utf8')); } catch { /* 첫 실행 */ }
+  for (const k of Object.keys(index)) if (refreshing.has(index[k].slug)) delete index[k];
+
+  let got = 0;
+  for (const { it, atts } of targets) {
+    if (Date.now() - startedAt > BUDGET_MS) { console.log('예산 도달 — 나머지는 다음 실행'); break; }
+    const slug = slugOf(it.name);
+    let ai = 0;
+    for (const a of atts) {
+      if (Date.now() - startedAt > BUDGET_MS) break;
+      try {
+        const res = await fetch(a.url, { redirect: 'follow', headers: UA, signal: AbortSignal.timeout(20000) });
+        if (!res.ok) { console.log('elig doc fail', res.status, a.name); continue; }
+        const buf = Buffer.from(await res.arrayBuffer());
+        if (buf.length < 1000 || buf.length > MAX_BYTES) continue;
+        // 받아 보니 문서가 아니라 로그인 페이지면 버린다 — 글자로 읽으면 엉뚱한 자격이 된다
+        if (isHtmlPayload(buf)) { console.log('elig doc skip (웹페이지였음):', a.name); continue; }
+        ai += 1; got += 1;
+        const ext = (a.name.match(/\.(hwp|hwpx|docx?)$/i) || [, 'bin'])[1].toLowerCase();
+        const fname = `elig-${slug}-${ai}.${ext}`;
+        fs.writeFileSync(new URL(fname, OUT), buf);
+        (index[it.id] ||= { slug, files: [] }).files.push(fname);
+        console.log('elig doc ok:', it.id, a.name, buf.length);
+      } catch (e) { console.log('elig doc err', a.name, e.name || e.message); }
+    }
+  }
+  fs.writeFileSync(idxPath, JSON.stringify(index, null, 1));
+  return got;
 }

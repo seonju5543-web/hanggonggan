@@ -1243,5 +1243,29 @@ console.log('\n■ AI 자격 읽기 안전장치 (2026-08-20)');
   eq('  기본은 꺼져 있다', cfg.enabled, false);
 }
 
+/* 2026-08-20 — 공고문 첨부에서 자격 읽기. 되돌리면 안 되는 지점이 셋이다. */
+console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
+{
+  const AT = await import(new URL('../collector/attachment-text.mjs', import.meta.url));
+  /* ① 신청서·동의서는 읽지 않는다 — 읽으면 개인정보 수집 항목이 자격 자리에 앉는다
+        (2026-08-20에 실제로 3건이 그렇게 돼 통째로 되돌린 적이 있다) */
+  eq('공고문은 읽을 대상', AT.isNoticeDoc('2026년 장학생 선발 공고문.hwp'), true);
+  eq('  신청서는 읽지 않는다', AT.isNoticeDoc('장학금 신청서.hwp'), false);
+  eq('  개인정보 동의서도 읽지 않는다', AT.isNoticeDoc('개인정보 수집·이용 동의서.hwp'), false);
+  eq('  선발원서도 서식이다', AT.isNoticeDoc('F_장학생 선발원서(제24기).docx'), false);
+  /* ② PDF는 자격 경로에서 쓰지 않는다 — 글자가 정확히 안 나온다.
+        실측: 원문 `3년 이상`이 `년이상`으로 뽑혔다. 숫자 하나가 결론을 바꾸는 글이다. */
+  eq('  PDF는 자격 경로에서 쓰지 않는다', AT.attachmentText('없는파일.pdf'), '');
+  /* ③ 문단 단위로 이어 붙인다 — 조각마다 줄을 나누면 `4년제`의 `4`가 버려져
+        `년제 대학교 재학생`만 남는다(실제로 그렇게 나와서 고쳤다) */
+  const docx = fs.readdirSync(new URL('../collector/extracted/', import.meta.url))
+    .filter((f) => /^elig-.*\.docx$/.test(f))[0];
+  if (docx) {
+    const t = AT.attachmentText(new URL(`../collector/extracted/${docx}`, import.meta.url).pathname);
+    eq('  docx는 문단 단위로 읽어 숫자가 안 빠진다', /\d년제/.test(t) || /\d\.\d\/\d\.\d/.test(t), true);
+  } else eq('  (docx 표본 없음 — 건너뜀)', true, true);
+  eq('  글자가 거의 없으면 읽을 만하지 않다고 답한다', AT.readable('가나다'), false);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);

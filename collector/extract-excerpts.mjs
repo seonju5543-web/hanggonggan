@@ -16,6 +16,10 @@ import { indexTexts, sourceFor, hasText } from './notice-source.mjs';
 /* 게시판 메뉴·푸터를 걷어내는 규칙 (2026-08-20 신설 — page-boilerplate.mjs 첫머리 참조).
    자격을 못 뽑은 61건 중 40건이 '본문이 메뉴에 파묻힌' 상태였다. */
 import { makeStripper } from './page-boilerplate.mjs';
+/* 공고문 첨부에서 글자 뽑기 — 본문이 "붙임 참조"뿐인 공고가 있다.
+   🔴 **공고문만** 본다(attachment-text.mjs 첫머리 참조) — 신청서·동의서를 읽으면
+   개인정보 수집 항목이 지원 자격 자리에 앉는다(실제로 겪고 되돌린 적이 있다). */
+import { attachmentText, readable } from './attachment-text.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const texts = JSON.parse(fs.readFileSync(new URL('extracted/notices-text.json', HERE), 'utf8'));
@@ -320,7 +324,11 @@ const idx = indexTexts(texts, browserBodies);
    걷어낸 결과가 앙상하면 stripBoilerplate가 원문을 그대로 돌려준다(안전판). */
 const strip = makeStripper(texts);
 
-let hit = 0, none = 0, kept = 0, cleaned = 0;
+/* 공고문 첨부 색인 (deepfetch --elig-attach 가 만든다) */
+let eligDocs = {};
+try { eligDocs = JSON.parse(fs.readFileSync(new URL('extracted/elig-docs.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
+
+let hit = 0, none = 0, kept = 0, cleaned = 0, fromDoc = 0;
 if (!process.env.EXCERPTS_AS_LIB) main();
 function main() {
 for (const it of reg.items) {
@@ -340,10 +348,23 @@ for (const it of reg.items) {
 
   const ex = extractFrom(body);
   // 자격 절을 못 찾았을 때만 2차 경로로 물러난다 (절이 있으면 그쪽이 언제나 정확하다)
-  const qual = extractQualifyLines(body).length
+  let qual = extractQualifyLines(body).length
     ? extractQualifyLines(body)
     : scoopQualifyLines(body);
+  /* 본문에서 못 뽑았으면 **공고문 첨부**를 본다 — 순서를 뒤집지 말 것.
+     본문이 있는 한 본문이 언제나 정확하다(첨부에는 붙임·서식이 섞인다). */
+  let viaDoc = false;
+  if (!qual.length && eligDocs[it.id]) {
+    for (const f of eligDocs[it.id].files || []) {
+      const t = attachmentText(new URL(`extracted/${f}`, HERE).pathname);
+      if (!readable(t)) continue;                       // 스캔 PDF 등 — 조용히 넘어간다
+      const got = extractQualifyLines(t);
+      if (got.length) { qual = got; viaDoc = true; fromDoc += 1; break; }
+    }
+  }
   if (WRITE) {
+    if (viaDoc) it.eligibilityFrom = '공고문 첨부';
+    else if (it.eligibilityFrom === '공고문 첨부') delete it.eligibilityFrom;
     if (qual.length) it.eligibilityLines = qual;
     else delete it.eligibilityLines;   // 원문은 읽었는데 못 뽑았다 → 옛 값을 남기지 않는다
 
