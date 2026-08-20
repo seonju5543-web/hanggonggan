@@ -6026,7 +6026,20 @@
     }
    ],
    "sourceUrl": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269875&pageOrder=0&cmd=2&parm_bod_uid=269744&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "eligibilityLines": [
+    "1. 지원자격: 2026학년도 2학기 기준 본교 재학생 (정규학기 이내), 한국장학재단 산정 소득분위 9구간 이내",
+    "※ 소득구간 확정 후 근로 가능(확인 필수)",
+    "2. 도우미 장학생 선발인원 : 최대 16 명"
+   ],
+   "excerpts": [
+    "지원자격: 2026학년도 2학기 기준 본교 재학생 (정규학기 이내), 한국장학재단 산정 소득분위 9구간 이내",
+    "도우미 장학생 선발인원 : 최대 16 명",
+    "신청방법: 붙임파일(장애학생활동지원 신청서 ) 작성 후 본인 시간표 와 함께 바우어관 1220호 장애학생지원센터로 선착순 방문 및 이메일 제출",
+    "장학금액: 시간당 10,740원 (근로가능 시간: 1학기 최대 330시간 이내)",
+    "문의: 장애학생지원센터(☎580-6098)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   },
   {
    "id": "auto-spxboardid5cate8key69996",

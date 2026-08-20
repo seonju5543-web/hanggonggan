@@ -1196,5 +1196,25 @@ console.log('\n■ 목록 화면인가 상세 화면인가 (2026-08-20)');
   }
 }
 
+/* 2026-08-20 — 중간 인증서를 안 보내는 학교(계명대) 때문에 Node만 연결이 막히던 문제 */
+console.log('\n■ 학교가 빠뜨린 중간 인증서 (2026-08-20)');
+{
+  const root = new URL('../', import.meta.url);
+  const pem = fs.readFileSync(new URL('collector/certs/sectigo-server-auth-dv-r36.pem', root), 'utf8');
+  eq('중간 인증서가 저장소에 있다', /BEGIN CERTIFICATE/.test(pem), true);
+  for (const f of ['.github/workflows/collect-scholarships.yml', '.github/workflows/browser-collect.yml']) {
+    const yml = fs.readFileSync(new URL(f, root), 'utf8');
+    eq(`  ${f.split('/').pop()} 가 그 인증서를 쓴다`, /NODE_EXTRA_CA_CERTS:\s*collector\/certs\//.test(yml), true);
+    /* 🔴 검증을 끄는 것이 아니다 — 이게 들어오면 아무 서버나 믿게 된다 */
+    eq(`  ${f.split('/').pop()} 가 인증서 검증을 끄지 않는다`,
+      /NODE_TLS_REJECT_UNAUTHORIZED|rejectUnauthorized:\s*false/.test(yml), false);
+  }
+  for (const f of ['collector/deepfetch.mjs', 'collector/collect.mjs', 'collector/browser-collect.mjs']) {
+    const src = fs.readFileSync(new URL(f, root), 'utf8');
+    eq(`  ${f.split('/').pop()} 가 인증서 검증을 끄지 않는다`,
+      /NODE_TLS_REJECT_UNAUTHORIZED|rejectUnauthorized:\s*false/.test(src), false);
+  }
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);
