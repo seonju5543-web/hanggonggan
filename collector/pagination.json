@@ -157,7 +157,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-08-19"
+  "checkedAt": "2026-08-20"
  },
  "https://www.sogang.ac.kr/ko/scholarship-notice": {
   "ok": false,
@@ -201,7 +201,7 @@
    "kind": "page",
    "param": "pageNo"
   },
-  "checkedAt": "2026-08-19"
+  "checkedAt": "2026-08-20"
  },
  "https://www.korea.ac.kr/ko/568/subview.do": {
   "ok": true,
@@ -210,7 +210,7 @@
    "param": "article.offset",
    "limit": 10
   },
-  "checkedAt": "2026-08-19"
+  "checkedAt": "2026-08-20"
  },
  "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100": {
   "ok": true,
@@ -218,7 +218,7 @@
    "kind": "page",
    "param": "pageNo"
   },
-  "checkedAt": "2026-08-19"
+  "checkedAt": "2026-08-20"
  },
  "https://onestop.pusan.ac.kr/page?menuCD=000000000000062": {
   "ok": true,
@@ -226,7 +226,7 @@
    "kind": "page",
    "param": "currentPageNo"
   },
-  "checkedAt": "2026-08-19"
+  "checkedAt": "2026-08-20"
  },
  "https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083": {
   "ok": false,

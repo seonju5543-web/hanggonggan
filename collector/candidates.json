@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-08-20",
- "count": 1759,
+ "count": 1764,
  "items": [
   {
    "title": "2026년도 제7기 경원장학재단 장학생 선발 안내",
@@ -9,6 +9,20 @@
    "attachments": [],
    "deadlineHint": "접수기간: 2026. 8. 19. ~ 9. 30. - 접수방법: 등기우편 접수(마감일 우편 소인까지 유효) . (1",
    "school": "강원대학교",
+   "campus": "",
+   "foundAt": "2026-08-20"
+  },
+  {
+   "title": "서울 [서울C] 2026학년도 2학기 우덕재단 장학생 선발 안내(~8/25일 까지)",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EC%84%9C%EC%9A%B8%20%5B%EC%84%9C%EC%9A%B8C%5D%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EC%9A%B0%EB%8D%95%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4(~8%2F2",
+   "attachments": [
+    {
+     "name": "[우덕재단] 장학생 추천서 양식.hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=bd0e3c56e3de490fbab2169796601c7e&fileSn=1&bbsId=BMSR00040"
+    }
+   ],
+   "deadlineHint": "까지) 2026-08-20 조회수 39 작성자 (서울)학생지원센터 2026학년도 2학기 우덕재단 장학생 선발 안",
+   "school": "경희대학교",
    "campus": "",
    "foundAt": "2026-08-20"
   },
@@ -41,6 +55,42 @@
    ],
    "deadlineHint": "신청기간: 2026년 9월 1일(화) ~ 9월 18일(금) 신청방법: 신청서 및 기타 서류를 작성하여 이메일로 제출",
    "school": "숭실대학교",
+   "campus": "",
+   "foundAt": "2026-08-20"
+  },
+  {
+   "title": "삼원장학재단 제24기 후기(2026년 2학기) 장학생 선발 안내",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=342",
+   "attachments": [
+    {
+     "name": "F_장학생-선발원서제24기-후기_2026년-2학기.pdf",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=342#n-F_%EC%9E%A5%ED%95%99%EC%83%9D-%EC%84%A0%EB%B0%9C%EC%9B%90%EC%84%9C%EC%A0%9C24%EA%B8%B0-%ED%9B%84%EA%B8%B0_2026%EB%85%84-2%ED%95%99%EA%B8%B0.pdf"
+    },
+    {
+     "name": "F_장학생-선발원서제24기-후기_2026년-2학기.docx",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=342#n-F_%EC%9E%A5%ED%95%99%EC%83%9D-%EC%84%A0%EB%B0%9C%EC%9B%90%EC%84%9C%EC%A0%9C24%EA%B8%B0-%ED%9B%84%EA%B8%B0_2026%EB%85%84-2%ED%95%99%EA%B8%B0.docx"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-08-20"
+  },
+  {
+   "title": "2026학년도 손태희장학재단 장학생 선발 공고",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30087&pageNo=1",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "중앙대학교",
+   "campus": "",
+   "foundAt": "2026-08-20"
+  },
+  {
+   "title": "2026년도 제7기 경원장학재단 장학생 선발 공고",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30088&pageNo=1",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "중앙대학교",
    "campus": "",
    "foundAt": "2026-08-20"
   },
@@ -233,6 +283,32 @@
    ],
    "deadlineHint": "까지 * 지원자가 많을 시 조기 마감할 수 있음 * 모집시간 이추 제출자 1차 선발예정자에서 제함 * 지원서 제",
    "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-08-20"
+  },
+  {
+   "title": "[학생복지팀] 2026학년도 2학기 국가근로장학생 선발확정 및 사전교육시행",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767880&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "붙임1. 2026-2학기_국가근로장학생_기관별_배정_현황_공지.pdf",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=767880&attachNo=560858"
+    },
+    {
+     "name": "붙임2. (2026-2)_국가근로장학생_근로지침.hwp",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=767880&attachNo=560859"
+    },
+    {
+     "name": "붙임3.2026년 2학기 국가근로장학금 사전교육 자료.pdf",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=767880&attachNo=560860"
+    },
+    {
+     "name": "붙임4. (2026-2)_국가근로장학생_포기신청서.hwp",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=767880&attachNo=560861"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "상명대학교",
    "campus": "",
    "foundAt": "2026-08-20"
   },
