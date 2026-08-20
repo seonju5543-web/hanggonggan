@@ -29,7 +29,9 @@ const HERE = new URL('.', import.meta.url);
 const reg = JSON.parse(fs.readFileSync(new URL('../data/registered.json', HERE), 'utf8'));
 let texts = [];
 try { texts = JSON.parse(fs.readFileSync(new URL('../collector/extracted/notices-text.json', HERE), 'utf8')); } catch { /* 없으면 원문 0건 */ }
-const idx = indexTexts(texts);
+let browserBodies = {};
+try { browserBodies = JSON.parse(fs.readFileSync(new URL('../collector/extracted/browser-bodies.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
+const idx = indexTexts(texts, browserBodies);
 
 const LIST = process.argv.includes('--list');
 const BAD = process.argv.includes('--bad');

@@ -312,7 +312,9 @@ function scoopQualifyLines(text) {
    규칙이 살아 있는지만 보는' 약한 방식에 머물렀다. `EXCERPTS_AS_LIB=1`이면 본편을 건너뛴다. */
 export { extractQualifyLines, scoopQualifyLines, extractFrom, extractExcludeLines };
 
-const idx = indexTexts(texts);
+let browserBodies = {};
+try { browserBodies = JSON.parse(fs.readFileSync(new URL('extracted/browser-bodies.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
+const idx = indexTexts(texts, browserBodies);
 /* 게시판 메뉴·푸터를 걷어낸 글자로 읽는다 — 자격이 메뉴 700줄에 파묻혀 있던 문제.
    같은 학교 여러 공고에 똑같이 나오는 줄만 지우므로 학교 구조를 알 필요가 없다.
    걷어낸 결과가 앙상하면 stripBoilerplate가 원문을 그대로 돌려준다(안전판). */

@@ -1139,5 +1139,39 @@ console.log('\n■ 공고를 받아올 때 쓰는 머리말 (2026-08-20)');
   }
 }
 
+/* 2026-08-20 — 자바스크립트로 그리는 게시판(서강·부산·건국·명지)의 껍데기 문제 */
+console.log('\n■ 껍데기 페이지와 브라우저 본문 (2026-08-20)');
+{
+  const root = new URL('../', import.meta.url);
+  const NS = await import(new URL('collector/notice-source.mjs', root));
+  const shell = 'K2Web Wizard L o a d i n g . . . --> 단축 url 글번호 1202730 [교외] 안내';
+  const real = '신청 자격\n가. 2026학년도 2학기 재학 예정인 학부생으로서 직전학기를 이수한 자\n'
+    + '나. 직전학기 평점평균이 3.0 이상이고 취득학점이 12학점 이상인 자(계절학기 제외)\n'
+    + '다. 다른 교내외 장학금을 등록금 전액 범위로 이미 받고 있지 않은 자';
+  /* 🔴 껍데기를 '원문 확보'로 세면 **문제가 있는 곳을 영영 못 찾는다** —
+     자격을 못 읽는 원인이 '원문이 없어서'가 아니라 '규칙이 나빠서'인 것처럼 보였다. */
+  eq('껍데기는 원문으로 세지 않는다', NS.hasText({ text: shell }), false);
+  /* 문턱(한글 400자)을 확실히 넘겨서 잰다 — 아슬아슬한 자료를 쓰면 검사가 문턱을 재는지
+     규칙을 재는지 알 수 없다(실제로 361자로 붙어 있다가 고쳤다). */
+  eq('  본문이 딸려 온 것은 껍데기로 보지 않는다', NS.hasText({ text: shell + ' ' + real.repeat(8) }), true);
+  eq('  멀쩡한 원문은 그대로 통과', NS.hasText({ text: real }), true);
+
+  const U = 'https://a.ac.kr/view?id=1';
+  const bodies = { [U]: { title: '가나다 장학금', text: real, at: '2026-08-20', via: 'browser' } };
+  /* 브라우저 본문이 껍데기를 이겨야 한다 */
+  const i1 = NS.indexTexts([{ url: U, title: '가나다 장학금', text: shell }], bodies);
+  eq('브라우저 본문이 껍데기를 이긴다', /평점평균/.test(i1.byUrl.get([...i1.byUrl.keys()][0]).text), true);
+  /* 🔴 반대로 멀쩡한 원문은 덮으면 안 된다 — 순서를 뒤집으면 여기서 걸린다 */
+  const good = real + ' 추가로 저장돼 있던 온전한 원문입니다.';
+  const i2 = NS.indexTexts([{ url: U, title: '가나다 장학금', text: good }], bodies);
+  eq('  멀쩡한 원문은 브라우저 본문이 덮지 않는다',
+    /추가로 저장돼 있던/.test(i2.byUrl.get([...i2.byUrl.keys()][0]).text), true);
+
+  // 브라우저 수집기가 이미 그린 본문을 저장한다 (추가 페이지 열기 0회)
+  const bc = fs.readFileSync(new URL('collector/browser-collect.mjs', root), 'utf8');
+  eq('브라우저 수집기가 상세 본문을 저장한다', /bodies\[it\.url\]\s*=/.test(bc), true);
+  eq('  심층 수집과 다른 파일에 저장한다(서로 지우지 않게)', /browser-bodies\.json/.test(bc), true);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);

@@ -55,6 +55,14 @@ let seen = {};
 try { seen = JSON.parse(fs.readFileSync(seenPath, 'utf8')); } catch { /* 첫 실행 */ }
 
 const noticesPath = new URL('../data/notices.json', HERE);
+/* 브라우저가 그린 상세 본문 — 자바스크립트로 그리는 게시판(서강·부산·건국·명지)은
+   일반 fetch로는 껍데기만 온다. 여기가 그 학교들의 **유일한 원문 통로**다.
+   ⚠️ 파일을 따로 둔 이유: `extracted/notices-text.json`은 심층 수집(deepfetch)이
+   매 실행 통째로 다시 쓰므로, 같은 파일에 쓰면 서로 지운다(이 저장소가 여러 번 겪은 유형).
+   읽는 쪽은 notice-source.mjs가 두 파일을 합쳐 본다. */
+const bodiesPath = new URL('extracted/browser-bodies.json', HERE);
+let bodies = {};
+try { bodies = JSON.parse(fs.readFileSync(bodiesPath, 'utf8')); } catch { /* 첫 실행 */ }
 let notices = { updatedAt: null, items: [] };
 try { notices = JSON.parse(fs.readFileSync(noticesPath, 'utf8')); } catch { /* 첫 실행 */ }
 
@@ -414,6 +422,15 @@ async function harvestTarget(t, report) {
       if (!d.error) {
         const text = d.html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ')
           .replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+        /* 🔴 여기서 만든 글자를 버리지 말 것 (2026-08-20).
+           서강·부산·건국·명지는 본문을 **자바스크립트로 그린다.** 그래서 심층 수집(일반 fetch)이
+           받아 오는 것은 `L o a d i n g . . .` 껍데기뿐이고, 그 학교 공고는 자격도 마감도
+           영영 못 읽었다. 그런데 **이 줄에 이미 브라우저가 그린 진짜 본문이 들어 있다** —
+           마감·첨부만 뽑고 버리고 있었을 뿐이다. 저장은 추가 페이지 열기가 0회라
+           시간 예산에 아무 영향이 없다(이 저장소가 세 번 데인 자리라 일부러 확인했다). */
+        if (text.replace(/[^가-힣]/g, '').length >= 120) {
+          bodies[it.url] = { title: it.title, text: text.trim().slice(0, 15000), at: today, via: 'browser' };
+        }
         const dm = text.match(DEADLINE_RE);
         deadlineHint = dm ? dm[0].trim().slice(0, 80) : null;
         attachments = d.links
@@ -602,6 +619,13 @@ notices.updatedAt = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10
 fs.writeFileSync(seenPath, JSON.stringify(seen, null, 1));
 fs.writeFileSync(pagePath, JSON.stringify(pageMemo, null, 1));
 fs.writeFileSync(noticesPath, JSON.stringify(notices, null, 1));
+/* 브라우저가 그린 본문 저장 — 오래된 것은 60일 뒤 버린다(실시간 공고와 같은 수명) */
+{
+  const keep = {};
+  const cutoff = new Date(Date.now() - 60 * 86400000).toISOString().slice(0, 10);
+  for (const [u, v] of Object.entries(bodies)) if (!v.at || v.at >= cutoff) keep[u] = v;
+  fs.writeFileSync(bodiesPath, JSON.stringify(keep, null, 1));
+}
 
 /* 다음 실행 시작 자리 저장 — 이번에 못 돈 학교가 다음 실행의 맨 앞이 된다 */
 cursor.next = nextCursor(cfg.targets.length, cursor.next || 0, doneCount);

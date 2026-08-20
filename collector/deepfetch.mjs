@@ -79,7 +79,9 @@ const FILL = process.argv.includes('--fill');
 
 let prev = [];
 try { prev = JSON.parse(fs.readFileSync(new URL('notices-text.json', OUT), 'utf8')); } catch { /* 첫 실행 */ }
-const prevIdx = indexTexts(prev);
+let browserBodies = {};
+try { browserBodies = JSON.parse(fs.readFileSync(new URL('browser-bodies.json', OUT), 'utf8')); } catch { /* 아직 없음 */ }
+const prevIdx = indexTexts(prev, browserBodies);
 
 let registered = { items: [] };
 try { registered = JSON.parse(fs.readFileSync(new URL('../data/registered.json', HERE), 'utf8')); } catch { /* 없어도 진행 */ }

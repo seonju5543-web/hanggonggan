@@ -139,6 +139,22 @@
     "https://www.seoultech.ac.kr/service/info/janghak/"
    ],
    "_note": "일반 수집기가 연결 시간초과(UND_ERR_CONNECT_TIMEOUT)로 실패. 주소가 틀린 게 아니라 느린 쪽이라 브라우저 로봇(대기 시간이 길다)이 더 잘 맞는다. 개발자 제공 주소 — 장학 24건·상세형 19건 확인된 곳."
+  },
+  {
+   "school": "건국대학교",
+   "campus": "공통",
+   "candidates": [
+    "https://www.konkuk.ac.kr/konkuk/2239/subview.do"
+   ],
+   "_note": "2026-08-20 추가 — 개발자가 준 그 주소 그대로 일반 수집에도 있었지만, **상세 본문을 자바스크립트로 그려** 일반 fetch로는 `L o a d i n g . . .` 껍데기만 왔다(자격·마감을 영영 못 읽던 원인). 브라우저로 상세를 열어야 본문이 나온다."
+  },
+  {
+   "school": "명지대학교",
+   "campus": "공통",
+   "candidates": [
+    "https://www.mju.ac.kr/mjukr/259/subview.do"
+   ],
+   "_note": "2026-08-20 추가 — 건국대와 같은 K2Web 계열. 상세 본문이 자바스크립트라 일반 fetch는 `K2Web Wizard / L o a d i n g . . .`만 받는다."
   }
  ]
 }

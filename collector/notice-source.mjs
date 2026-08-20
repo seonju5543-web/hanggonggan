@@ -25,12 +25,28 @@ export const normTitle = (t) => (t || '')
   .toLowerCase();
 
 /* 저장된 원문 배열을 주소·제목 두 갈래로 색인한다 */
-export function indexTexts(texts) {
+export function indexTexts(texts, browserBodies) {
   const byUrl = new Map();
   const byTitle = new Map();
   for (const v of Object.values(texts || {})) {
     if (v && v.url) byUrl.set(canonUrl(v.url), v);
     if (v && v.title) byTitle.set(normTitle(v.title), v);
+  }
+  /* 브라우저가 그린 본문은 **나중에, 그러나 이길 때만** 얹는다.
+     🔴 순서를 뒤집지 말 것 — 먼저 깔면 그 뒤 일반 수집분(껍데기)이 덮어써서
+     애써 그린 본문을 잃는다(처음에 그렇게 썼다가 고쳤다).
+     '이긴다'의 기준은 **읽을 수 있는 본문이 있는가** 하나다: 기존 것이 껍데기·오류화면·
+     실패 기록이면 브라우저 본문으로 바꾸고, 기존 것이 멀쩡하면 건드리지 않는다. */
+  const better = (had, now) => !hasText(had) && !!(now && now.text);
+  for (const [url, v] of Object.entries(browserBodies || {})) {
+    if (!v || !v.text) continue;
+    const entry = { url, ...v };
+    const k = canonUrl(url);
+    if (better(byUrl.get(k), entry)) byUrl.set(k, entry);
+    if (v.title) {
+      const t = normTitle(v.title);
+      if (better(byTitle.get(t), entry)) byTitle.set(t, entry);
+    }
   }
   return { byUrl, byTitle };
 }
@@ -56,7 +72,23 @@ const ERROR_PAGE = /장애\s*조치\s*안내|Domain Recovery Notice|서비스\s*
 
 export const looksLikeErrorPage = (text) => ERROR_PAGE.test(String(text || '').slice(0, 1500));
 
+/* 🔴 **본문을 자바스크립트로 그리는 게시판의 껍데기** (2026-08-20 발견).
+   서강·부산·건국·명지는 일반 fetch로 받으면 `L o a d i n g . . .`이나 사이트 메뉴만 오고
+   정작 공고 본문이 없다. 그런데 글자 수는 제법 되니 지금까지 **'원문 확보'로 세어져**,
+   자격을 못 읽는 원인이 '원문이 없어서'가 아니라 '규칙이 나빠서'인 것처럼 보였다.
+   못 받은 것을 받은 것으로 세면 문제가 있는 곳을 영영 못 찾는다(오류 화면 판정과 같은 계열).
+   → 껍데기는 '원문 없음'으로 다룬다. 진짜 본문은 브라우저 수집기가 따로 저장한다
+     (`extracted/browser-bodies.json` — browser-collect.mjs 참조). */
+const SHELL_PAGE = /L\s*o\s*a\s*d\s*i\s*n\s*g\s*\.\s*\.\s*\.|divLoadBody|K2Web Wizard/;
+export const looksLikeShell = (text) => {
+  const t = String(text || '');
+  if (!SHELL_PAGE.test(t.slice(0, 3000))) return false;
+  // 껍데기 표시가 있어도 본문이 충분히 딸려 왔으면 진짜 원문이다
+  return t.replace(/[^가-힣]/g, '').length < 400;
+};
+
 export const hasText = (src) => !!(src && src.text
+  && !looksLikeShell(src.text)
   && !/^FETCH_(FAIL|ERROR)/.test(src.text)
   && !looksLikeErrorPage(src.text));
 
