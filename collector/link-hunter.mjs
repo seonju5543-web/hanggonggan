@@ -55,7 +55,7 @@
          (워크플로 link-hunter.yml · collector/run-link-hunt.txt 를 고쳐 push해도 실행) */
 import fs from 'node:fs';
 import { chromium } from 'playwright';
-import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, titleFingerprint, detailCandidates, idsFromSource, looksLikeLoginWall, rowDetailCandidates } from './detail-url.mjs';
+import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, titleFingerprint, detailCandidates, idsFromSource, looksLikeLoginWall, rowDetailCandidates, looksLikeList } from './detail-url.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const DRY = process.argv.includes('--dry');
@@ -250,16 +250,8 @@ const fp = (s) => String(s || '').replace(/[\s .,·ㆍ~〜'"“”‘’!?()[\]{
    규칙은 한 곳에만 둔다 — 이 저장소가 entry-rules·url-key에서 이미 지키는 원칙이다. */
 const coreTitle = titleFingerprint;
 
-function looksLikeList(text, others) {
-  const body = fp(text);
-  let hits = 0;
-  for (const o of others) {
-    const k = coreTitle(o);
-    if (k.length >= 10 && body.includes(k)) hits += 1;
-    if (hits >= 3) return true;
-  }
-  return false;
-}
+/* looksLikeList는 detail-url.mjs 한 곳에 있다 — 복사본을 두면 한쪽만 고쳐져
+   "사냥꾼은 통과시키는데 복구 로봇은 버리는" 어긋남이 생긴다 (2026-08-20 합침). */
 
 async function verify(url, title, others) {
   const p = await freshPage();

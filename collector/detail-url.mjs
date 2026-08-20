@@ -346,3 +346,33 @@ export function rowDetailCandidates({ row, listUrl, forms, landed, dom }) {
 }
 
 export default { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, titleFingerprint, sameTitle, detailCandidates, idsFromSource, looksLikeLoginWall, rowDetailCandidates };
+
+/* ── 이 화면이 '목록'인가 '상세'인가 (2026-08-20 — 두 로봇에 있던 복사본을 여기로 합쳤다) ──
+   제목이 화면에 보인다는 것만으로는 부족하다: **게시판 목록에도 그 제목이 있다.**
+   그래서 다른 공고 제목이 여럿 보이면 목록으로 본다(동국 진담거사에 안내 페이지 번호가
+   붙었던 사고를 막은 규칙).
+
+   🔴 그런데 그 규칙만으로는 **한 장에 목록과 상세가 함께 들어 있는 게시판**을 통째로 버린다.
+   중앙대가 그렇다 — 상세 화면에도 사이트 전체와 목록이 같이 그려져, 멀쩡한 상세 12건이
+   전부 '목록 화면'으로 탈락하고 있었다(2026-08-20 실측: 같은 주소를 그냥 받으면
+   한글 5,368자에 자격 절까지 멀쩡히 있다).
+
+   가르는 신호는 **`이전글`·`다음글`**이다. 이건 '지금 글 하나를 보고 있다'는 뜻이라
+   목록 화면에는 나올 이유가 없다. 세 학교로 확인했다:
+     중앙대 상세 있음 / 중앙대 목록 없음 · 동국 상세 있음 / 동국 목록 없음 · 경희 목록 없음
+   ⚠️ 이 표지를 무시하도록 되돌리면 중앙대가 다시 통째로 막히고, 반대로 표지를 안 보고
+   통과시키면 동국 사고가 되살아난다. 둘 다 test-collector가 지킨다. */
+const DETAIL_MARK = /이전\s?글|다음\s?글|이전글보기|다음글보기/;
+
+export function looksLikeList(text, otherTitles) {
+  const body = String(text || '');
+  if (DETAIL_MARK.test(body)) return false;          // 글 하나를 보고 있는 화면이다
+  const flat = titleFingerprint(body);
+  let hits = 0;
+  for (const t of otherTitles || []) {
+    const k = titleFingerprint(t);
+    if (k.length >= 10 && flat.includes(k)) hits += 1;
+    if (hits >= 3) return true;
+  }
+  return false;
+}

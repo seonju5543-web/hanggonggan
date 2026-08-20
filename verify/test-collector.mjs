@@ -1173,5 +1173,28 @@ console.log('\n■ 껍데기 페이지와 브라우저 본문 (2026-08-20)');
   eq('  심층 수집과 다른 파일에 저장한다(서로 지우지 않게)', /browser-bodies\.json/.test(bc), true);
 }
 
+/* 2026-08-20 — '목록 화면' 오인. 한쪽으로만 재면 반드시 다른 학교가 망가지는 자리라
+   **양방향을 함께** 검사한다(중앙대를 살리는 것과 동국대를 지키는 것). */
+console.log('\n■ 목록 화면인가 상세 화면인가 (2026-08-20)');
+{
+  const D = await import(new URL('../collector/detail-url.mjs', import.meta.url));
+  const others = ['가송재단 장학생 모집 안내입니다 여기까지가 제목',
+    '서울인재대학장학금 장학생 선발 공고 안내입니다', '해성문화재단 장학생 선발 안내 공고입니다'];
+  // ① 진짜 목록 — 다른 공고 제목이 여럿 보이고 '이전글/다음글'이 없다 (동국 진담거사 사고 방지)
+  eq('진짜 목록은 목록으로 본다', D.looksLikeList(others.join('\n') + '\n조회 등록일', others), true);
+  /* ② 한 장에 목록과 상세가 함께 들어 있는 게시판(중앙대) — 멀쩡한 상세 12건이
+        통째로 '목록'으로 탈락하고 있었다. `이전글/다음글`은 '글 하나를 보는 중'이라는 뜻이라
+        목록 화면에는 나올 이유가 없다(중앙대·동국·경희 실측으로 확인). */
+  eq('상세+목록이 한 장인 화면은 목록으로 보지 않는다',
+    D.looksLikeList('찾는 공고 제목\n신청 자격 …\n이전글 다음글\n' + others.join('\n'), others), false);
+  eq('  다른 제목이 적으면 애초에 목록이 아니다', D.looksLikeList(others[0], others), false);
+  // ③ 규칙은 한 곳에만 — 복사본이 살아나면 두 로봇이 갈라진다
+  for (const f of ['collector/link-hunter.mjs', 'collector/resolve-detail-urls.mjs']) {
+    const src = fs.readFileSync(new URL('../' + f, import.meta.url), 'utf8');
+    eq(`  ${f.split('/').pop()} 는 공용 규칙을 쓴다`, /looksLikeList[^\n]*detail-url|looksLikeList\s*\}/.test(src), true);
+    eq(`  ${f.split('/').pop()} 에 복사본이 없다`, /function looksLikeList/.test(src), false);
+  }
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);

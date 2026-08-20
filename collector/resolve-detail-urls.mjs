@@ -17,7 +17,7 @@
    실행: node collector/resolve-detail-urls.mjs [--dry]  (워크플로 resolve-detail-urls.yml) */
 import fs from 'node:fs';
 import { chromium } from 'playwright';
-import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, detailCandidates, idsFromSource, looksLikeLoginWall, rowDetailCandidates } from './detail-url.mjs';
+import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, detailCandidates, idsFromSource, looksLikeLoginWall, rowDetailCandidates, looksLikeList} from './detail-url.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const DRY = process.argv.includes('--dry');
@@ -161,17 +161,7 @@ function titleMatches(title, docTitle, text) {
    실제로 3차 실행이 동국 진담거사 공고에 `view?nttId=533`(안내 페이지 번호)을 붙였고,
    그 화면에 제목이 보였다는 이유로 통과시켰다. 상세 화면에는 그 글 하나만 있고
    목록에는 다른 글 제목이 잔뜩 있으므로, 다른 글 제목이 여럿 보이면 목록으로 본다. */
-function looksLikeList(text, otherTitles) {
-  const fp = (s) => String(s).replace(/[\s .,·ㆍ~〜'"“”‘’!?()[\]{}<>:;|/\\_+\-*&#%]/g, '').toLowerCase();
-  const body = fp(text);
-  let hits = 0;
-  for (const t of otherTitles) {
-    const k = fp(String(t).replace(/^\s*\d{1,5}\s+/, '').replace(/^\s*(공통|서울|글로벌|국제|공지|홍보)\s+/, '').replace(/\[[^\]]{0,20}\]/g, ''));
-    if (k.length >= 10 && body.includes(k)) hits += 1;
-    if (hits >= 3) return true;
-  }
-  return false;
-}
+/* looksLikeList는 detail-url.mjs 한 곳에 있다 (2026-08-20 합침) */
 
 async function verifyCandidate(url, title, attempt = 0, otherTitles = []) {
   const c = await verifyContext();
