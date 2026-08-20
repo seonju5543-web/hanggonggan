@@ -13,9 +13,14 @@
    실행: node collector/schematize-forms.mjs [리포트파일]   (deepfetch 직후)
    ============================================================ */
 import fs from 'node:fs';
-import zlib from 'node:zlib';
 import { pdfText } from './pdf-text.mjs';
 import { schemaFromText } from './schema-from-text.mjs';
+/* docx·hwpx 글자 읽기는 attachment-text.mjs 한 곳에 있다 (2026-08-20 합침).
+   여기 있던 판은 글자 조각마다 줄바꿈을 넣어 **숫자가 떨어져 나갔다** —
+   저장된 docx·hwpx 18개 전부에서 '숫자만 든 조각'이 나왔다(파일당 1~42개).
+   다행히 지금 등록된 양식 48종에는 눈에 띄는 피해가 없었지만(의심 2건, 그마저
+   원본의 빈칸 `___년 ___월 졸업`이었다), 앞으로 만들어질 양식은 막아야 한다. */
+import { attachmentText } from './attachment-text.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const OUT = new URL('extracted/', HERE);
@@ -72,41 +77,7 @@ function triage(item, row, text) {
 }
 
 /* ---------- 원본에서 텍스트 뽑기 ---------- */
-function unzipEntries(buf) {
-  /* zip 중앙 디렉터리를 직접 읽는다 (docx·hwpx 모두 zip) */
-  const out = {};
-  let end = buf.length - 22;
-  while (end >= 0 && buf.readUInt32LE(end) !== 0x06054b50) end--;
-  if (end < 0) return out;
-  let ptr = buf.readUInt32LE(end + 16);
-  const count = buf.readUInt16LE(end + 10);
-  for (let i = 0; i < count; i++) {
-    if (buf.readUInt32LE(ptr) !== 0x02014b50) break;
-    const method = buf.readUInt16LE(ptr + 10);
-    const sizeC = buf.readUInt32LE(ptr + 20);
-    const nameLen = buf.readUInt16LE(ptr + 28);
-    const extraLen = buf.readUInt16LE(ptr + 30);
-    const commentLen = buf.readUInt16LE(ptr + 32);
-    const localOff = buf.readUInt32LE(ptr + 42);
-    const name = buf.slice(ptr + 46, ptr + 46 + nameLen).toString('utf8');
-    const lNameLen = buf.readUInt16LE(localOff + 26);
-    const lExtraLen = buf.readUInt16LE(localOff + 28);
-    const dataOff = localOff + 30 + lNameLen + lExtraLen;
-    const raw = buf.slice(dataOff, dataOff + sizeC);
-    try {
-      out[name] = method === 0 ? raw : zlib.inflateRawSync(raw);
-    } catch { /* 개별 항목 실패는 무시 */ }
-    ptr += 46 + nameLen + extraLen + commentLen;
-  }
-  return out;
-}
 
-function xmlText(xml, tagRe) {
-  const parts = [];
-  let m;
-  while ((m = tagRe.exec(xml))) parts.push(m[1]);
-  return parts.join('\n').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
-}
 
 function extractText(file) {
   const url = new URL(file, OUT);
@@ -124,18 +95,8 @@ function extractText(file) {
     return '';
   }
   if (lower.endsWith('.txt')) return fs.readFileSync(url, 'utf8');
-  if (lower.endsWith('.docx') || lower.endsWith('.hwpx')) {
-    const entries = unzipEntries(fs.readFileSync(url));
-    if (lower.endsWith('.docx')) {
-      const doc = entries['word/document.xml'];
-      return doc ? xmlText(doc.toString('utf8'), /<w:t[^>]*>([\s\S]*?)<\/w:t>/g) : '';
-    }
-    return Object.keys(entries)
-      .filter((k) => /^Contents\/section\d+\.xml$/.test(k))
-      .sort()
-      .map((k) => xmlText(entries[k].toString('utf8'), /<hp:t[^>]*>([\s\S]*?)<\/hp:t>/g))
-      .join('\n');
-  }
+  /* 문단 단위로 이어 붙여 읽는다 — 규칙은 attachment-text.mjs 한 곳 (위 주석 참조) */
+  if (lower.endsWith('.docx') || lower.endsWith('.hwpx')) return attachmentText(url.pathname);
   if (lower.endsWith('.pdf')) {
     /* 글자층이 있는 PDF는 여기서 공짜로 읽힌다. 스캔 PDF면 ''가 나와 API 경로로 간다. */
     try { return pdfText(fs.readFileSync(url)); } catch { return ''; }

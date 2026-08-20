@@ -162,9 +162,27 @@ function extractExcludeLines(text) {
    갈라지면 채점기가 통과시킨 것을 발췌기가 버리는(또는 그 반대) 일이 생긴다. */
 const REQ_SIGNAL = /(재학|휴학|복학|신입|편입|졸업|\d\s?학년|학부생|대학생|성적|평점|학점|분위|수급|차상위|기초생활|한부모|다자녀|자녀|유공|보훈|장애|다문화|북한이탈|거주|출신|이상인?\s?자|이하의?\s?(해당\s?)?학생|해당하는\s?자|자격을\s?갖춘|결격\s?사유|결격사유)/;
 
+/* 🔴 한 줄에 뭉친 번호 항목을 나눈다 (2026-08-20).
+   HTML이 납작해지면서 `1) 국내 4년제 대학 재학생 2) 부모가 모두 … 3) 성적 우수자 우대`가
+   **한 줄**로 들어오는 공고가 있다(가톨릭대 산학협동재단). 그 줄이 **201자**여서 아래 길이
+   상한(200)에 딱 1자 걸려 통째로 버려졌고, 제목만 남아 '내용 없음'이 됐다.
+   상한을 올리는 것은 답이 아니다 — 다음 공고가 또 걸린다. 원래 여러 항목이었으니 나눈다.
+   ⚠️ 번호가 **2개 이상**이고 줄이 길 때만 나눈다. 짧은 줄의 `1)`은 문장 속 표기일 수 있다. */
+function splitMerged(line) {
+  if (line.length <= 120) return [line];
+  let parts = [line];
+  const marks = line.match(/(?:^|\s)\d\s?\)\s/g) || [];
+  if (marks.length >= 2) parts = line.split(/(?=(?:^|\s)\d\s?\)\s)/);
+  /* 항목 안에 다시 `* 지원제한 …` `※ …`이 붙어 오는 경우가 있다 — 그것도 원래 딴 줄이다.
+     (가톨릭대 산학협동재단: `3) 성적 우수자 우대 (…) * 지원제한(제외대상) : …`) */
+  return parts.flatMap((p2) => (p2.length > 100 ? p2.split(/\s(?=[*※]\s)/) : [p2]))
+    .map((p2) => p2.trim()).filter((p2) => p2.length >= 4);
+}
+
 function extractQualifyLines(text) {
   if (!text) return [];
-  const lines = text.split(/\n+/).map((l) => unent(l).replace(/[ \t　]+/g, ' ').trim()).filter(Boolean);
+  const lines = text.split(/\n+/).map((l) => unent(l).replace(/[ \t　]+/g, ' ').trim())
+    .filter(Boolean).flatMap(splitMerged);
   /* 자격처럼 보이는 곳이 여러 군데일 수 있다. **첫 번째를 잡으면 안 된다** —
      교육보호장학은 "교육보호장학 대상자는 반드시…"라는 평범한 문장이 앞에 있어서
      거기서 시작해 엉뚱한 '변경내용' 표를 자격으로 읽었다(2026-08-03 개발자 지적).
