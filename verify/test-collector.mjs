@@ -925,5 +925,31 @@ console.log('\n■ 원문 자르는 길이 (자격 절이 날아가지 않을 �
   eq('  (자기검증) LIMIT 상수 형태도 읽어낸다', cutLimit('const LIMIT = 15000;\nx.slice(0, LIMIT)'), 15000);
 }
 
+/* 2026-08-20 — 자격 요건이 '엉망'이라는 개발자 지적으로 고친 것들.
+   발췌기는 불러오는 순간 실행되는 파일이라(이 저장소의 알려진 함정) 함수를 직접 부를 수 없다.
+   그래서 위 '본문 컷'과 같은 방식으로 **원본 글자를 읽어** 규칙이 살아 있는지만 본다.
+   숫자로 된 검증은 `node verify/eligibility-report.mjs`가 맡는다(전후 비교가 그 도구의 일). */
+console.log('\n■ 자격 요건 발췌 규칙 (2026-08-20 수리분이 되돌려지지 않았는가)');
+{
+  const root = new URL('../', import.meta.url);
+  const src = fs.readFileSync(new URL('collector/extract-excerpts.mjs', root), 'utf8');
+  const code = src.replace(/^\s*\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
+
+  // ① 안 풀린 개체 문자가 절 경계를 막던 문제 — 저장된 원문에 실제로 있던 7종
+  for (const e of ['diams', 'Dagger', 'rArr', 'sim', 'copy', 'ne', 'divide']) {
+    eq(`  &${e}; 를 글자로 푼다`, code.includes(`&${e};`), true);
+  }
+  // ② 절 머리글 기호에 ♦(=&diams;)가 들어 있어야 "♦ 신청기간:"을 다음 절로 읽는다
+  eq('  절 머리글 기호에 ♦ 가 있다', /SECT_PREFIX\s*=[^\n]*♦/.test(code), true);
+  // ③ "3. 제출기한 : …" 같은 소제목을 다음 절로 알아본다
+  for (const w of ['제출\\\\s?기한', '확인\\\\s?방법', '양식']) {
+    eq(`  다음 절 낱말에 ${w.replace('\\\\s?', ' ')} 가 있다`, code.includes(w), true);
+  }
+  // ④ 자격 신호가 하나도 없는 블록은 쓰지 않는다(이화 양영재단이 제출서류를 자격으로 보여 줬다)
+  eq('  요건 신호 없는 블록은 버린다', /REQ_SIGNAL\.test/.test(code), true);
+  // ⑤ 표는 줄 단위로 못 가른다 — 재시도 금지 경고가 코드에 남아 있어야 한다
+  eq('  표 파싱 재시도 금지 경고가 남아 있다', /표는 납작해지면서/.test(src), true);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);
