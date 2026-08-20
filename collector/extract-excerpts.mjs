@@ -65,7 +65,7 @@ const QUALIFY_HEAD = /(신청\s?자격|지원\s?자격|응모\s?자격|자격\s?
    (2026-08-03 전수 재채점에서 발견 — 의심 줄 22개 중 12개가 이 하나 때문이었다).
    세종대·서울과기대처럼 절을 '■ 자격요건 / ■ 장학금액 / ■ 유의사항'으로 나누는 공고에서
    기호를 못 알아봐 자격 절을 지나 금액·문의·유의사항까지 통째로 자격으로 읽고 있었다. */
-const SECT_PREFIX = '^\\s*(?:[■□▣●▶▷◆◇○★♦⇒‡]\\s*|[가-힣]\\s*[.)]\\s*|\\d+\\s*[.)]\\s*|[①-⑳]\\s*)?';
+const SECT_PREFIX = '^\\s*(?:[■□▣●▶▷◆◇○★♦⇒‡◦∙❍◎￭ㅇ]\\s*|[가-힣]\\s*[.)]\\s*|\\d+\\s*[.)]\\s*|[①-⑳]\\s*)?';
 const NEXT_SECTION = new RegExp(SECT_PREFIX +
   /* 🔴 여기 빠진 낱말은 그대로 '자격 요건'이 되어 학생에게 보인다 (2026-08-20).
      "3. 제출기한 : ~2026.8.3" 처럼 **콜론 뒤에 내용이 붙은 소제목**은 아래 SECTION_HEAD
@@ -134,7 +134,7 @@ function extractExcludeLines(text) {
       const body = l.replace(/^\s*(?:[가-힣]\s*[.)]|\d+\s*\.)\s*/, '');
       if (body.length <= 20) break;
     }
-    if (/^[●▶◆■□▣♦]/.test(l)) break;           // 다음 큰 항목
+    if (/^[●▶◆■□▣♦❍◎￭]/.test(l)) break;           // 다음 큰 항목
     if (TABLE_NOISE.test(l) || l.length < 4 || l.length > 120) continue;
     out.push(l);
   }
@@ -157,7 +157,7 @@ function extractQualifyLines(text) {
   lines.forEach((l, i) => { if (QUALIFY_HEAD.test(l)) cands.push(i); });
   if (!cands.length) return [];
   const headScore = (l) => {
-    const t = l.replace(/^[\s\-–—•▪▶▷◆◇○●■□▣★♦⇒‡·ㆍ*]+/, '').replace(/^(?:[가-힣]\s*[.)]|\d+\s*[.)])\s*/, '');
+    const t = l.replace(/^[\s\-–—•▪▶▷◆◇○●■□▣★♦⇒‡◦∙❍◎￭·ㆍ*]+/, '').replace(/^(?:[가-힣]\s*[.)]|\d+\s*[.)])\s*/, '');
     let s = 0;
     if (QUALIFY_HEAD.test(t.slice(0, 12))) s += 3;      // 낱말이 앞머리에 있다
     if (t.length <= 12) s += 3;                          // 제목처럼 짧다
@@ -169,8 +169,19 @@ function extractQualifyLines(text) {
     if (/인원|금액|지급액|배정/.test(t)) s -= 4;
     return s;
   };
-  let start = cands[0], best = -99;
-  for (const i of cands) { const s = headScore(lines[i]); if (s > best) { best = s; start = i; } }
+  /* 🔴 점수 1등 하나만 보고 포기하지 않는다 (2026-08-20).
+     예전엔 가장 높은 후보 **한 곳**에서만 읽어 보고, 거기서 못 건지면 그대로 빈손이었다.
+     그런데 점수는 제목의 생김새만 보는 것이라 어느 쪽이 진짜 자격 절인지 확실히 못 가른다 —
+     '자격 기준 및 선발 인원'(동국: 학과별 배정표라 자격 아님)과 '선발대상 및 지급금액'
+     (방송대: 그 아래가 진짜 요건)이 점수로는 똑같이 깎인다. 어느 쪽인지는 **읽어 봐야** 안다.
+     그래서 점수 순으로 몇 곳을 실제로 읽어 보고, 아래 관문(요건 신호)을 통과한 첫 블록을 쓴다.
+     관문이 이미 '자격이 아닌 블록'을 걸러 주므로 이 되풀이가 안전하다.
+     상위 4곳까지만 본다 — 더 뒤지면 공고 끝의 엉뚱한 절까지 손을 뻗는다. */
+  let best = -99, top = cands[0];
+  for (const i of cands) { const s = headScore(lines[i]); if (s > best) { best = s; top = i; } }
+  return blockFrom(top);
+
+  function blockFrom(start) {
   const out = [];
   for (let i = start; i < lines.length && out.length < 8; i += 1) {
     const l = lines[i];
@@ -212,10 +223,11 @@ function extractQualifyLines(text) {
      "지원대상 : 만3세~만24세 소아·청소년 당뇨인" 처럼 대상이 학생 속성이 아닌 공고가 있어서,
      신호만으로 자르면 **멀쩡한 요건까지 날아간다**(실제로 2건 날아가 이 예외를 만들었다).
      단 '추천 대상 인원 : 본교 최대 1명'처럼 인원·금액 이름표는 자격이 아니므로 뺀다. */
-  const head = out[0].replace(/^[\s\-–—•▪▶▷◆◇○●■□▣★♦⇒‡·ㆍ*]+/, '')
+  const head = out[0].replace(/^[\s\-–—•▪▶▷◆◇○●■□▣★♦⇒‡◦∙❍◎￭·ㆍ*]+/, '')
     .replace(/^(?:[가-힣]\s*[.)]|\d+\s*[.)])\s*/, '');
   const m = head.match(/^([^:：]{2,14})[:：]\s*\S/);
   return m && QUALIFY_HEAD.test(m[1]) && !/인원|금액|지급액|배정/.test(m[1]) ? out : [];
+  }
 }
 
 /* ── 2차 경로: 자격 절 제목이 아예 없는 공고 (2026-08-03) ──────────────
