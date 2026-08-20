@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-08-21",
- "count": 1781,
+ "count": 1786,
  "items": [
   {
    "title": "2026년도 제7기 경원장학재단 장학생 선발 안내",
@@ -132,6 +132,51 @@
    "attachments": [],
    "deadlineHint": null,
    "school": "중앙대학교",
+   "campus": "",
+   "foundAt": "2026-08-20"
+  },
+  {
+   "title": "윤영문화재단 2026학년도 2학기 장학생 선발 공고",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100#n-%EC%9C%A4%EC%98%81%EB%AC%B8%ED%99%94%EC%9E%AC%EB%8B%A8%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EA%B3%B5%EA%B3%A0",
+   "attachments": [],
+   "deadlineHint": "까지(11일 도착분까지 접수) □ 스테이플러 철 절대 금지, 제출 서류 순서대로 정리하여 제출 □ 지원방법: 아",
+   "school": "중앙대학교",
+   "campus": "",
+   "foundAt": "2026-08-20"
+  },
+  {
+   "title": "2026년도 제7기 경원장학재단 장학생 선발 공고",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100#n-2026%EB%85%84%EB%8F%84%20%EC%A0%9C7%EA%B8%B0%20%EA%B2%BD%EC%9B%90%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EA%B3%B5%EA%B3%A0",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "중앙대학교",
+   "campus": "",
+   "foundAt": "2026-08-20"
+  },
+  {
+   "title": "2026학년도 손태희장학재단 장학생 선발 공고",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100#n-2026%ED%95%99%EB%85%84%EB%8F%84%20%EC%86%90%ED%83%9C%ED%9D%AC%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EA%B3%B5%EA%B3%A0",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "중앙대학교",
+   "campus": "",
+   "foundAt": "2026-08-20"
+  },
+  {
+   "title": "2684 [홍보] 앨트웰민초장학재단 제27기 장학생 선발 안내 2026.08.20. 조회 173",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2684%20%5B%ED%99%8D%EB%B3%B4%5D%20%EC%95%A8%ED%8A%B8%EC%9B%B0%EB%AF%BC%EC%B4%88%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EC%A0%9C27%EA%B8%B0%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4%202026.",
+   "attachments": [],
+   "deadlineHint": "접수기간 : 2026 년 8 월 18 일 (화 )~9 월 18 일 (금 ) &nbsp; ▶ 접수방법 : 우편 접수",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-08-20"
+  },
+  {
+   "title": "2685 [홍보] 한국장학재단 2026년 장학금 부정수급 자진신고 캠페인 안내 2026.08.20. 조회 89",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2685%20%5B%ED%99%8D%EB%B3%B4%5D%20%ED%95%9C%EA%B5%AD%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%202026%EB%85%84%20%EC%9E%A5%ED%95%99%EA%B8%88%20%EB%B6%80%EC%A0%95%EC%88%98%EA%B8%89%20%EC%9E%90%EC%A7%84%EC%8B%A0%EA%B3%A0%20%EC%BA%A0%ED%8E%98%EC%9D%B8",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교",
    "campus": "",
    "foundAt": "2026-08-20"
   },
