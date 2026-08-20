@@ -82,6 +82,15 @@ const NEXT_SECTION = new RegExp(SECT_PREFIX +
    나열하는 방식은 '장학금 지급 관련 안내'처럼 처음 보는 제목에 계속 뚫린다.
    단, 그 머리글 자체가 자격을 뜻하면(선발 대상 등) 이어서 읽는다. */
 const SECTION_HEAD = /^\s*(?:[가-힣]\s*[.)]|\d+\s*\.)\s*\S/;
+/* 줄 앞머리 번호가 '어느 단계'인가 — 같은 단계를 만나야 절이 바뀐 것이다.
+   숫자는 값까지 본다(3. 아래의 1)은 하위 항목, 4.가 다음 절). */
+function markerOf(line) {
+  const num = String(line).match(/^\s*(\d+)\s*[.)]/);
+  if (num) return { kind: 'num', n: Number(num[1]) };
+  if (/^\s*[가-힣]\s*[.)]/.test(line)) return { kind: 'kor', n: 0 };
+  if (/^\s*[\u2460-\u2473]/.test(line)) return { kind: 'circ', n: 0 };
+  return { kind: '', n: 0 };
+}
 /* 이 절 머리글이 여전히 '누가 받을 수 있나'를 말하면 이어서 읽는다.
    '나. 장학생 선발' / '1) 선발기준' 아래에 실제 요건이 이어지는 공고가 있다(유흥수 장학금). */
 const STILL_QUALIFY = /(자격|대상자?|요건|기준)\s*$|(신청|지원|선발|모집|추천)\s?(자격|대상)|장학생\s?선발|선발\s?기준/;
@@ -185,6 +194,7 @@ function extractQualifyLines(text) {
   return blockFrom(top);
 
   function blockFrom(start) {
+  const startMark = markerOf(lines[start]);
   const out = [];
   for (let i = start; i < lines.length && out.length < 8; i += 1) {
     const l = lines[i];
@@ -199,12 +209,25 @@ function extractQualifyLines(text) {
        살려 두어야 한다(별건). 여기서 재시도하면 반드시 다른 공고가 대신 망가진다. */
     if (i > start && NEXT_SECTION.test(l)) break;
     /* 다른 절 머리글(다. / 라. / 3.)을 만나면 자격 절이 끝난 것이다.
-       단 '가./나./다.'는 **자격 절 안의 하위 항목**으로도 쓰인다(면학장학금:
-       "가. 2026-2학기 등록자…"). 그래서 **제목처럼 짧을 때만** 절 머리글로 본다 —
-       내용이 이어지는 긴 줄은 요건 그 자체다. 이 구분이 없으면 자격을 통째로 놓친다. */
+       🔴 **길이로 재지 말 것** (2026-08-20 — 개발자가 "본문에 다 써 있는데 못 읽는 것 같다"고
+       짚어 파 보고 찾은 진짜 버그). 예전 규칙은 '떼어낸 본문이 20자 이하면 절 제목'이었는데,
+       시립대 빅데이터 성과형 장학금의 첫 요건 `가. 빅데이터 마이크로디그리 이수(예정)자`가
+       **정확히 20자**라 자격 절 첫 줄에서 그대로 끊겼다. 제목만 남아 내용 없음으로 버려졌다.
+
+       바른 기준은 길이가 아니라 **번호 단계**다. `3. 신청 자격` 아래의 `가./나./다.`는
+       한 단계 **아래** 항목이지 다음 절이 아니다. 다음 절은 같은 단계의 `4.`다.
+       그래서 시작 줄의 번호 종류를 기억해 두고 **같은 종류를 만났을 때만** 끊는다.
+       숫자는 순서까지 본다 — `3. 신청자격` 아래의 `1)` `2)`는 하위 항목이고 `4.`가 다음 절이다.
+       시작 줄에 번호가 없으면(`■ 신청자격` 등) 예전처럼 길이로 재되 문턱을 낮춰 둔다. */
     if (i > start && SECTION_HEAD.test(l) && !STILL_QUALIFY.test(l)) {
-      const body = l.replace(/^\s*(?:[가-힣]\s*[.)]|\d+\s*\.)\s*/, '');
-      if (body.length <= 20) break;      // 짧으면 제목 → 절이 바뀐 것
+      const mk = markerOf(l);
+      if (startMark.kind) {
+        if (mk.kind === startMark.kind
+          && (mk.kind !== 'num' || mk.n > startMark.n)) break;
+      } else {
+        const body = l.replace(/^\s*(?:[가-힣]\s*[.)]|\d+\s*\.)\s*/, '');
+        if (body.length <= 20) break;
+      }
     }
     if (JUNK.test(l)) continue;
     if (TABLE_NOISE.test(l.replace(/\s+/g, ' ').trim())) continue;   // 표 머리글·표 값
@@ -271,6 +294,12 @@ function scoopQualifyLines(text) {
   return out.length >= 2 ? out : [];      // 한 줄짜리는 믿지 않는다
 }
 
+/* 규칙 함수를 밖에서 부를 수 있게 내보낸다 (2026-08-20).
+   이 파일은 **불러오는 순간 아래 본편이 통째로 실행되던** 구조라 규칙 하나를 시험해 보려면
+   비슷한 코드를 따로 베껴야 했고(그러면 규칙이 두 벌이 된다), 검사도 '원본 글자를 읽어
+   규칙이 살아 있는지만 보는' 약한 방식에 머물렀다. `EXCERPTS_AS_LIB=1`이면 본편을 건너뛴다. */
+export { extractQualifyLines, scoopQualifyLines, extractFrom, extractExcludeLines };
+
 const idx = indexTexts(texts);
 /* 게시판 메뉴·푸터를 걷어낸 글자로 읽는다 — 자격이 메뉴 700줄에 파묻혀 있던 문제.
    같은 학교 여러 공고에 똑같이 나오는 줄만 지우므로 학교 구조를 알 필요가 없다.
@@ -278,6 +307,8 @@ const idx = indexTexts(texts);
 const strip = makeStripper(texts);
 
 let hit = 0, none = 0, kept = 0, cleaned = 0;
+if (!process.env.EXCERPTS_AS_LIB) main();
+function main() {
 for (const it of reg.items) {
   if (it.program) continue;
   const src = sourceFor(it, idx);
@@ -326,4 +357,5 @@ console.log(`발췌 성공 ${hit}건 · 원문은 읽었으나 발췌 불가 ${n
 if (WRITE) {
   fs.writeFileSync(regPath, JSON.stringify(reg, null, 1) + '\n');
   console.log('registered.json 반영 완료');
+}
 }
