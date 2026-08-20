@@ -961,5 +961,19 @@ console.log('\n■ 자격 요건 발췌 규칙 (2026-08-20 수리분이 되돌�
   eq('  다시 두드릴 때는 넉넉히 기다린다', /patient \? 20000 : 8000/.test(dfCode), true);
 }
 
+/* 2026-08-20 — 유료 API 크레딧이 새던 세 자리. 되돌리면 같은 파일을 매 실행 다시 보낸다. */
+console.log('\n■ 유료 API 크레딧 누수 방지 (2026-08-20)');
+{
+  const root = new URL('../', import.meta.url);
+  const sf = fs.readFileSync(new URL('collector/schematize-forms.mjs', root), 'utf8');
+  const code = sf.replace(/^\s*\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
+  // ① 공고문·안내문은 학생이 채우는 신청서가 아니다 — API로 보내면 반드시 관문에 걸린다
+  eq('  신청서가 아닌 첨부를 유료 경로에서 뺀다', /NOT_A_FORM\.test\(row\.attachment\)/.test(code), true);
+  // ② 실패한 항목이 큐에 남아 매 실행 재전송되던 것 — 상한이 있어야 멈춘다
+  eq('  자동 변환 실패가 쌓이면 재시도를 멈춘다', /apiTries/.test(code), true);
+  // ③ effort 미지정이면 opus-5는 사고 켜진 채 high로 돈다(사고 토큰 = 출력 단가)
+  eq('  사고 깊이를 지정한다(기본값이 가장 비싸다)', /output_config:\s*\{\s*effort:/.test(code), true);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);

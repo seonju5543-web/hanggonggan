@@ -27,6 +27,10 @@ const reportPath = process.argv[2] ? new URL(process.argv[2], new URL('..', HERE
 const MODEL = 'claude-opus-5';
 /* 학생이 직접 채우는 문서가 아닌 서식 — 스키마화 대상에서 제외한다 */
 const THIRD_PARTY = /추천서|추천\s*양식|소견서|확인서\(기관|재직증명/;
+/* 학생이 '채우는' 문서가 아니라 '읽는' 문서 — 신청서로 만들 수 없다.
+   ⚠️ '신청서'·'지원서'·'양식'·'서식'이 이름에 있으면 여기 걸리지 않는다
+   (예: "2026 장학생 선발 공고 및 신청서.hwp"는 신청서가 맞다). */
+const NOT_A_FORM = /(공고문|공고\)|선발\s*계획|모집\s*요강|업무처리기준|Requirements|Q\s*&\s*A|매뉴얼|manual|리플렛|포스터|홍보)/i;
 
 /* 줄글로 펴면 배치가 무너져 '원본과 동일한 문서'를 장담할 수 없는 서식들.
    이런 건 API가 원본 파일을 직접 보게 한다 (운영 원칙 4 — 양식의 정의). */
@@ -46,6 +50,13 @@ function log(msg) { console.log(`[schematize] ${msg}`); }
    API 경로  = 유료 호출. 무료 경로로는 원본과 동일한 문서를 만들 수 없는 건만 보낸다.  */
 function triage(item, row, text) {
   if (THIRD_PARTY.test(row.attachment)) return { route: 'skip', why: '제3자 작성 서식 — 원본 다운로드 안내 유지' };
+  /* 🔴 학생이 채우는 문서가 아닌 것을 유료 경로로 보내지 말 것 (2026-08-20 크레딧 누수 조사).
+     8/2~8/10 리포트를 보니 `공고문.hwp` · `선발 계획.pdf` · `Scholarship Requirements.pdf` ·
+     `Q&A.pdf` 같은 **읽는 문서**가 매 실행 API로 가고 있었다. 이런 건 아무리 잘 변환해도
+     신청서가 아니라 품질 관문에 걸리고, 걸리면 큐에 남아 **다음 실행이 또 보낸다.**
+     하루 4회 실행 × 2건 상한이라 같은 공고문을 끝없이 재전송한 셈이다.
+     파일 이름만으로 판정하므로 오판이 있을 수 있으나, 오판의 대가는 '무료 경로로 감'뿐이다. */
+  if (NOT_A_FORM.test(row.attachment)) return { route: 'skip', why: '학생이 채우는 신청서가 아님(공고문·안내문·요건서) — 원본 다운로드 안내 유지' };
   if ((cfg.neverApiIds || []).includes(item.id)) return { route: 'manual', why: '개발자 지정(neverApiIds) — 무료 경로' };
   if ((cfg.alwaysApiIds || []).includes(item.id)) return { route: 'api', why: '개발자 지정(alwaysApiIds)' };
 
@@ -382,12 +393,16 @@ for (const item of pending) {
       const c = await getClient();
       /* fallbacks: 안전 분류기가 요청을 거절하면 다른 모델로 자동 재시도 (같은 호출 안에서) */
       const stream = c.beta.messages.stream({
-        model: MODEL,
+        model: cfg.model || MODEL,
         max_tokens: 32000,
         system: SYSTEM,
         betas: ['server-side-fallback-2026-07-01'],
         fallbacks: 'default',
-        output_config: { format: { type: 'json_schema', schema: SCHEMA } },
+        /* 🔴 effort를 지정하지 않으면 claude-opus-5는 **사고가 켜진 채 effort high**로 돈다
+           (기본값). 사고 토큰은 출력 단가로 과금되므로, '원본 글자를 JSON으로 옮기기'라는
+           기계적인 일에 가장 비싼 설정이 붙어 있었다 — 2026-08-20 크레딧 누수 조사에서 확인.
+           low로 낮춰도 옮겨 적기 정확도는 떨어지지 않는다. 더 높이고 싶으면 설정에서 바꾼다. */
+        output_config: { effort: cfg.effort || 'low', format: { type: 'json_schema', schema: SCHEMA } },
         messages: [{ role: 'user', content }]
       });
       const msg = await stream.finalMessage();
@@ -469,6 +484,20 @@ for (const item of pending) {
 
   /* 무료 경로로 남긴 첨부가 있으면 큐에 계속 둔다 (다음 세션이 처리) */
   if (!leftForManual) item.schematized = true;
+  /* 🔴 끝없이 재전송되는 것을 막는다 (2026-08-20 크레딧 누수 조사).
+     큐에 남은 항목은 다음 실행이 **또** 유료 API로 보낸다. 원본이 애초에 신청서가 아니거나
+     변환이 구조적으로 불가능하면 그 재시도는 영원히 성공하지 못하고 돈만 쓴다.
+     원본 재확보 쪽에 이미 있는 `retired` 장치(mark-fetched.mjs)와 같은 방침 —
+     조용히 사라지지 않고 리포트에 '자동 재시도 중단'으로 계속 뜨며,
+     pending-forms.json에서 apiTries를 지우면 다시 시도한다. */
+  else {
+    item.apiTries = (item.apiTries || 0) + 1;
+    if (item.apiTries >= (cfg.giveUpAfter ?? 6)) {
+      item.schematized = true;
+      item.gaveUp = `자동 변환 ${item.apiTries}회 실패 — 재시도 중단(원본 첨부 안내는 유지)`;
+      log(`재시도 중단: ${String(item.name || item.id).slice(0, 40)} (${item.apiTries}회)`);
+    }
+  }
 }
 
 /* 마지막 안전장치 (2026-08-01) — '있지도 않은 양식을 가리키는 연결'은 저장 전에 끊는다.

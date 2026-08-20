@@ -35,11 +35,33 @@ const ALIAS = {
 
 const squash = (s) => String(s || '').replace(/[\s:：.·]/g, '').toLowerCase();
 
+/* 🔴 개인정보 동의서의 '수집·이용 항목' 나열을 **양식의 빈칸으로 세면 안 된다**
+   (2026-08-20 크레딧 누수 조사에서 찾은 진짜 버그).
+   동의서에는 "수집·이용하는 개인정보 항목: 성명, 생년월일, 주소, 연락처, 이메일, 평점, 소득분위"
+   같은 줄이 있다. 이건 '이런 정보를 가져다 쓰겠다'는 **설명**이지 학생이 채울 칸이 아니다.
+   그런데 이 검사는 원본 어디에 나오든 칸으로 셌기 때문에, 동의서는 빈칸 6개가 늘 '빠짐'으로
+   나와 **어떤 변환기도 통과할 수 없었다.** 통과 못 하면 큐에 남고, 큐에 남으면 다음 실행이
+   또 유료 API로 보낸다 — 하루 4회씩 같은 동의서를 끝없이 재전송한 원인이다.
+   그래서 그 나열 구간(항목 머리글 ~ 다음 절/빈 줄)을 세기 전에 들어낸다. */
+const COLLECTED_HEAD = /(수집[·\s]*이용(하는)?\s*(개인정보\s*)?(항목|정보)|수집하는\s*개인정보의?\s*항목|개인정보\s*수집\s*항목)/;
+function stripCollectedList(text) {
+  return String(text || '').split(/\n/).reduce((acc, line) => {
+    if (acc.skip) {
+      // 다음 절 머리글이나 빈 줄을 만나면 다시 센다 — 나열은 보통 한 문단이다
+      if (!line.trim() || /^[\s]*[○●■□▶◆\d가-힣][.)]\s|^\s*\[/.test(line)) acc.skip = false;
+      else return acc;
+    }
+    if (COLLECTED_HEAD.test(line)) { acc.skip = true; return acc; }
+    acc.out.push(line);
+    return acc;
+  }, { out: [], skip: false }).out.join('\n');
+}
+
 /* originalText: 저장된 원본 첨부의 글자(여러 장이면 이어 붙인 것)
    반환: { known, missing[], want[] }  — known=false면 '모른다'(원본 없음) */
 export function checkFormCoverage(tpl, originalText) {
   if (!originalText || originalText.trim().length < 40) return { known: false, missing: [], want: [] };
-  const want = [...new Set((originalText.match(SLOT) || []).map(squash))];
+  const want = [...new Set((stripCollectedList(originalText).match(SLOT) || []).map(squash))];
   const have = squash((tpl?.sections || []).flatMap((s) => [
     ...(s.fields || []).map((f) => f.label),
     ...(s.fields || []).map((f) => f.id),
