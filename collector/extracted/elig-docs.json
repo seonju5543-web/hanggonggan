@@ -1,14 +1,14 @@
 {
- "reg-konkuk-uiam": {
-  "slug": "14wfl9",
-  "files": [
-   "elig-14wfl9-1.hwp"
-  ]
- },
  "auto-oardid322606menuno200318": {
   "slug": "1xmn1p",
   "files": [
    "elig-1xmn1p-1.docx"
+  ]
+ },
+ "reg-konkuk-uiam": {
+  "slug": "14wfl9",
+  "files": [
+   "elig-14wfl9-1.hwp"
   ]
  }
 }
