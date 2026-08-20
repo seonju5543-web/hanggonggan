@@ -219,7 +219,11 @@ report.push(`사냥 대상 **${active.length}건** (게시판 ${boards.size}곳)
 report0.forEach((l) => report.push(l));
 report.push('');
 
-const browser = await chromium.launch({ args: ['--no-sandbox'] });
+/* CHROME_PATH가 있으면 그 브라우저를 쓴다 — 검증 드라이버와 같은 방식(2026-08-20).
+   맥에서 세션을 여는 개발자도 이 로봇을 손으로 돌려 볼 수 있어야 한다. CI에서는 비어 있어
+   playwright가 알아서 찾으므로 동작이 바뀌지 않는다. */
+const browser = await chromium.launch({ args: ['--no-sandbox'],
+  ...(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {}) });
 const ctx = await browser.newContext({
   userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36',
   locale: 'ko-KR',

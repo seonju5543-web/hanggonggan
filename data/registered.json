@@ -4584,7 +4584,21 @@
    "noForm": "검수 완료 2026-08-03 — 원문 첨부에 채울 신청서 양식 없음(있으면 다음 수집이 스키마화)",
    "attachments": [],
    "sourceUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30000&pageNo=1",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "eligibilityLines": [
+    "-  본인: 교육지원 대상자 증명서",
+    "-  북한이탈주민: 교육보호대상자 증명서 및 고졸 학력인정 증빙서류",
+    "-  합격확인서",
+    "-  국가고시반 지도교수 확인서 (1차 합격자만 해당)",
+    "-  가족관계증명서",
+    "( 부 또는 모 명의 발급)",
+    "① 중앙나래장학금 신청서",
+    "② 개인정보보호수집이용 동의서"
+   ],
+   "excerpts": [
+    "※ 2026-2학기 등록금 고지감면을 위한 신청기간이며2026."
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   },
   {
    "id": "auto-gwonackrkobbs750detaildo",
@@ -5777,7 +5791,8 @@
    "noForm": "검수 완료 2026-08-14 — 원문 첨부에 채울 신청서 양식 없음(있으면 다음 수집이 스키마화)",
    "attachments": [],
    "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-%EA%B3%B5%EC%A7%80%20%EA%B3%B5%EC%A7%80%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EC%9B%94%EB%93%9C%EB%A8%B8%EC%8B%9C%EC%BD%94%EB%A6%AC%EC%95%84%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4(~8%2F17",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "boardTitle": "공지 공지 2026학년도 2학기 월드머시코리아장학생 선발 안내(~8/17(월)) 2026.08.13. 조회 494"
   },
   {
    "id": "auto-estoppusanackrpageseq692",
@@ -6077,7 +6092,25 @@
    "noForm": "검수 완료 2026-08-16",
    "attachments": [],
    "sourceUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=29762&pageNo=1",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "eligibilityLines": [
+    "대한민국 국적 소지자로서 인문사회계열 학과(부)에 재학중인 1 학년 신입생",
+    "※ ‘26-1학기 휴학생 지원불가",
+    "※ 한국장학재단에서 운영중인 우수장학금 수혜자 제외",
+    "대한민국 국적소지자로서 인문사회계열 학과(부)에 재학중인 3 학년 재학생",
+    "※ ‘26-1학기 휴학생/편입생 지원불가",
+    "※ 한국장학재단에서 운영중인 우수장학금 수혜자 제외",
+    "※ 기본자격조건 : 직전학기까지의 총 평균성적이 백분위 90점 이상(3.5이상/4.5만점), 취득 이수학점이 졸업이수학점의 40% 이상이어야 함",
+    "제출 서 류"
+   ],
+   "excerpts": [
+    "2026년도 한국장학재단 인문100년 장학금 신규장학생 선발을 위한 사전신청 기간(’26.3.6.~3.25.)에 신청을 완료한 학생은 심사서류를 제출하여 주시기 바랍니다.",
+    "아울러, 사전신청 기간에 신청을 못한 학생도 심사서류를 구비해 제출한 경우 추가 신청이 가능합니다.",
+    "☞ 제출서류 일체를 순서대로 하나의 파일(pdf)로 취합하여 제출",
+    "**사전신청 미신청자는 우선 본교에만 서류를 제출하면 되며, 이후 본교 심사를 거쳐 추천 대상자로 선정된 경우에 한해 별도 연락 예정이니, 안내에 따라 추후 재단 신청을 진행하시기 바랍니다.",
+    "- 현재 사전신청자만으로도 경쟁률이 10:1을 크게 상회하는 매우 높은 경쟁 상황이므로, 제출서류의 내용뿐 아니라 제출 형식 준수 여부 또한 중요한 평가 요소입니다."
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   },
   {
    "id": "auto-351detailviewdocategory6",
@@ -6804,8 +6837,9 @@
    "noForm": "자동 등록(검수 전) 2026-08-19 — 양식 스키마화는 검수 후 진행",
    "auto": true,
    "attachments": [],
-   "sourceUrl": "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100#n-%EC%B0%B8%EC%8A%AC%EA%B8%B0%20%EC%8B%9D%EB%8B%B9%20%EB%B0%8F%20%EC%B9%B4%EC%9A%B0%EB%B2%84%EA%B1%B0%20%EA%B7%BC%EB%A1%9C%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91",
-   "sourceKind": "auto"
+   "sourceUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?SITE_NO=2&MENU_ID=100&CONTENTS_NO=1&P_TAB_NO=1&BOARD_SEQ=4&BBS_SEQ=29063",
+   "sourceKind": "auto",
+   "boardTitle": "참슬기 식당 및 카우버거 근로 장학생 모집"
   },
   {
    "id": "auto-eywordpaged1slug2026aisa",
