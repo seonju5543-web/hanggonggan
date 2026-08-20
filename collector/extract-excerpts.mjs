@@ -13,6 +13,9 @@ import fs from 'node:fs';
 /* 원문 찾기 규칙은 notice-source.mjs 한 곳에 있다 — 수집기·재채점 도구와 같은 방법을
    써야 "발췌기는 찾았는데 수집기는 못 찾는" 어긋남이 안 생긴다 (2026-08-03 분리). */
 import { indexTexts, sourceFor, hasText } from './notice-source.mjs';
+/* 게시판 메뉴·푸터를 걷어내는 규칙 (2026-08-20 신설 — page-boilerplate.mjs 첫머리 참조).
+   자격을 못 뽑은 61건 중 40건이 '본문이 메뉴에 파묻힌' 상태였다. */
+import { makeStripper } from './page-boilerplate.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const texts = JSON.parse(fs.readFileSync(new URL('extracted/notices-text.json', HERE), 'utf8'));
@@ -56,7 +59,7 @@ function extractFrom(text) {
 /* 자격 절의 제목으로 실제 쓰이는 표현 (2026-08-02 미확보 80건을 세어 보고 추가).
    **그냥 '자격'이나 '대상'은 넣지 않는다** — 세어 보니 가장 많이 나온 것이
    '교원자격'·'평생교육사자격'처럼 **자격증 이름**이라, 넣으면 엉뚱한 줄이 요건으로 들어온다. */
-const QUALIFY_HEAD = /(신청\s?자격|지원\s?자격|응모\s?자격|자격\s?요건|자격\s?기준|지원\s?조건|신청\s?조건|지원\s?대상|신청\s?대상|모집\s?대상|선발\s?대상|추천\s?대상|수혜\s?대상|장학\s?대상|지급\s?대상|지원\s?가능\s?대상|선발\s?기준|심사\s?기준)/;
+const QUALIFY_HEAD = /(신청\s?자격|지원\s?자격|응모\s?자격|자격\s?요건|지원\s?요건|신청\s?요건|장학생\s?기본\s?자격|장학생\s?자격|선발\s?요건|응모\s?요건|자격\s?기준|지원\s?조건|신청\s?조건|지원\s?대상|신청\s?대상|모집\s?대상|선발\s?대상|추천\s?대상|수혜\s?대상|장학\s?대상|지급\s?대상|지원\s?가능\s?대상|선발\s?기준|심사\s?기준)/;
 /* 자격 블록의 끝 — **확실한 다음 절**에서만 끊는다.
    예전엔 '장학금액' 같은 낱말에서도 끊었는데, 자격이 표로 적힌 공고에서는 그게
    표의 머리글이라 거기서 잘려 정작 중요한 요건 줄(장애의 정도가 심한 장애인 등)을
@@ -269,8 +272,12 @@ function scoopQualifyLines(text) {
 }
 
 const idx = indexTexts(texts);
+/* 게시판 메뉴·푸터를 걷어낸 글자로 읽는다 — 자격이 메뉴 700줄에 파묻혀 있던 문제.
+   같은 학교 여러 공고에 똑같이 나오는 줄만 지우므로 학교 구조를 알 필요가 없다.
+   걷어낸 결과가 앙상하면 stripBoilerplate가 원문을 그대로 돌려준다(안전판). */
+const strip = makeStripper(texts);
 
-let hit = 0, none = 0, kept = 0;
+let hit = 0, none = 0, kept = 0, cleaned = 0;
 for (const it of reg.items) {
   if (it.program) continue;
   const src = sourceFor(it, idx);
@@ -283,18 +290,21 @@ for (const it of reg.items) {
      — 원칙 8-1(모르는 것을 단정하지 않는다)과 같은 정신. */
   if (!hasText(src)) { kept += 1; continue; }
 
-  const ex = extractFrom(src.text);
+  const body = strip(src.url, src.text);
+  if (body !== src.text) cleaned += 1;
+
+  const ex = extractFrom(body);
   // 자격 절을 못 찾았을 때만 2차 경로로 물러난다 (절이 있으면 그쪽이 언제나 정확하다)
-  const qual = extractQualifyLines(src.text).length
-    ? extractQualifyLines(src.text)
-    : scoopQualifyLines(src.text);
+  const qual = extractQualifyLines(body).length
+    ? extractQualifyLines(body)
+    : scoopQualifyLines(body);
   if (WRITE) {
     if (qual.length) it.eligibilityLines = qual;
     else delete it.eligibilityLines;   // 원문은 읽었는데 못 뽑았다 → 옛 값을 남기지 않는다
 
     /* '제외 대상'도 자격 정보다 (2026-08-03 개발자 지적 — 동국인재육성장학).
        "누가 받을 수 있나"만큼 "누가 못 받나"도 학생이 알아야 한다. 원문 그대로 뽑는다. */
-    const excl = extractExcludeLines(src.text);
+    const excl = extractExcludeLines(body);
     if (excl.length) it.eligibilityExcludes = excl;
     else delete it.eligibilityExcludes;
   }
@@ -311,7 +321,8 @@ for (const it of reg.items) {
     if (WRITE && it.excerpts) { delete it.excerpts; delete it.excerptNote; }
   }
 }
-console.log(`\n발췌 성공 ${hit}건 · 원문은 읽었으나 발췌 불가 ${none}건 · 원문 미확보라 손대지 않음 ${kept}건`);
+console.log(`\n게시판 메뉴를 걷어낸 공고 ${cleaned}건`);
+console.log(`발췌 성공 ${hit}건 · 원문은 읽었으나 발췌 불가 ${none}건 · 원문 미확보라 손대지 않음 ${kept}건`);
 if (WRITE) {
   fs.writeFileSync(regPath, JSON.stringify(reg, null, 1) + '\n');
   console.log('registered.json 반영 완료');

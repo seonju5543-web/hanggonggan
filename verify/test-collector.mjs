@@ -975,6 +975,42 @@ console.log('\n■ 유료 API 크레딧 누수 방지 (2026-08-20)');
   eq('  사고 깊이를 지정한다(기본값이 가장 비싸다)', /output_config:\s*\{\s*effort:/.test(code), true);
 }
 
+/* 2026-08-20 — 게시판 메뉴 걷어내기. 이건 순수 함수라 **진짜로 돌려서** 검사한다
+   (발췌기와 달리 불러도 아무것도 실행되지 않는다). */
+console.log('\n■ 게시판 메뉴 걷어내기 (2026-08-20)');
+{
+  const { buildBoilerplate, stripBoilerplate } = await import(new URL('../collector/page-boilerplate.mjs', import.meta.url));
+  const menu = ['홈', '로그인', '학사안내', '오시는 길', '개인정보처리방침'];
+  const page = (n, body) => ({ url: `https://a.ac.kr/view?id=${n}`, text: [...menu, ...body].join('\n') });
+  /* 본문은 실제 공고만큼 길게 둔다 — 아래 안전판이 '너무 앙상하면 원문 유지'라
+     짧은 시험 자료를 쓰면 걷어내기가 아예 일어나지 않아 검사가 헛돈다(실제로 그랬다). */
+  const body1 = ['1. 지원자격',
+    '가. 2026학년도 2학기 재학 예정인 학부생으로서 직전학기를 정상적으로 이수한 자',
+    '나. 직전학기 평점평균이 3.0 이상이고 취득학점이 12학점 이상인 자(계절학기 제외)',
+    '다. 다른 교내외 장학금을 등록금 전액 범위로 이미 받고 있지 않은 자'];
+  const texts = [
+    page(1, body1),
+    page(2, ['공지 둘', '내용이 전혀 다른 두 번째 공고 본문입니다. 여기에는 자격 이야기가 없습니다.']),
+    page(3, ['공지 셋', '세 번째 공고의 본문으로 앞의 것들과 겹치는 문장이 하나도 없습니다.']),
+    page(4, ['공지 넷', '네 번째 공고의 본문이며 역시 다른 공고와 같은 줄이 없습니다.']),
+  ];
+  const boiler = buildBoilerplate(texts);
+  const set = boiler.get('a.ac.kr');
+  eq('여러 공고에 똑같이 나오는 줄을 메뉴로 본다', set && set.has('로그인'), true);
+  eq('한 공고에만 있는 줄은 지우지 않는다', set && set.has('1. 지원자격'), false);
+  const out = stripBoilerplate(texts[0].text, set);
+  eq('메뉴만 사라지고 본문은 남는다', out.split('\n').join('|'), body1.join('|'));
+
+  /* 🔴 표본이 적으면 판단하지 않는다 — 두세 건만 보고 지우면 본문을 지운다 */
+  eq('공고가 적은 학교는 아무것도 지우지 않는다', buildBoilerplate(texts.slice(0, 2)).size, 0);
+
+  /* 🔴 안전판 — 다 지워질 상황이면 원문을 그대로 돌려준다.
+     '조금 지저분한 원문'은 고쳐 읽을 수 있지만 '내용이 사라진 원문'은 손쓸 수가 없다. */
+  const allBoiler = new Set(['가', '나', '다']);
+  eq('본문이 통째로 사라질 상황이면 원문을 그대로 둔다',
+    stripBoilerplate('가\n나\n다', allBoiler), '가\n나\n다');
+}
+
 /* ── 신청서 질문 방식 최적화 (2026-08-18 개발자 지시) ──────────────
    지키려는 것: **묻는 방식만 바꾸고 문서는 그대로.** 아래가 깨지면 학생이
    같은 것을 신청서마다 다시 쓰거나(자동 채움 끊김), 성별에 남·여를 둘 다

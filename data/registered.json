@@ -732,8 +732,7 @@
     "※ 첨부파일의 참가신청서 및 관련 제출서류 작성 후 업로드",
     "※ 첨부파일의 참가신청서 및 관련 제출서류 작성 후 업로드",
     "◆ 기타 문의 : ☎ 02-6490-6287",
-    "※ 세부 신청자격 , 제출서류 , 선발일정 , 활동내용 등은 반드시 첨부된 모집 공고문을 확인해 주시기 바랍니다",
-    "전화 : 02-6490-6114 / 서울시통합문의 : 02-120"
+    "※ 세부 신청자격 , 제출서류 , 선발일정 , 활동내용 등은 반드시 첨부된 모집 공고문을 확인해 주시기 바랍니다"
    ],
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   },
@@ -906,8 +905,7 @@
     "☆ 필수 서류 미제출 및 제출 서류에 오류가 있을 시 별도의 안내 없이 장학금이 미지급될 수 있습니다",
     "* 차세대통신 성과형 장학금은 본인이 속한 학과의 등록금을 초과하여 장학금 지급이 불가하므로, 장학금액이 등록금을 초과하는 경우 일부 마이크로디그리를 다음학기에 이수인증하는 것을 고려 바랍니다.",
     "제출 방법: 첨부된 장학금 신청서 양식을 작성 후, 하나의 파일로 제출",
-    "문의: nccoss@uos.ac.kr 이메일 문의",
-    "전화 : 02-6490-6114 / 서울시통합문의 : 02-120"
+    "문의: nccoss@uos.ac.kr 이메일 문의"
    ],
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
    "applyEmail": "nccoss@uos.ac.kr"
@@ -1038,11 +1036,7 @@
    ],
    "sourceUrl": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31133&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
    "sourceKind": "official",
-   "formId": "uos-bigdata-cert-apply",
-   "excerpts": [
-    "전화 : 02-6490-6114 / 서울시통합문의 : 02-120"
-   ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "formId": "uos-bigdata-cert-apply"
   },
   {
    "id": "reg-skku-merit",
@@ -1089,8 +1083,12 @@
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
    "listedAt": "2026-07-16",
    "eligibilityLines": [
-    "장애학생지원",
-    "- 직전학기 이수학점이 12학점(최종학기 직전학기 : 9학점) 이상 이수하고 평점평균이 3.0 이상인 자로서 2026학년도 2학기 재학 예정자"
+    "1) 장학생 기본 자격",
+    "- 직전학기 이수학점이 12학점(최종학기 직전학기 : 9학점) 이상 이수하고 평점평균이 3.0 이상인 자로서 2026학년도 2학기 재학 예정자",
+    "(단, 외국인전형 입학자는 외국인 성적우수장학금 대상자임에 따라 제외 / 무료복학자 제외)",
+    "- 성적우수장학금의 경우 직전학기 과락과목(F학점)이 없어야 장학생 선발 가능",
+    "- 초과등록생의 경우 단과대학 및 학과 기준에 따라 선발 가능(선발되지 않을 수 있음)",
+    "- 장학생 신청자격은 현재 학적기준에 따름"
    ]
   },
   {
@@ -3177,10 +3175,6 @@
    ],
    "sourceUrl": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=365911&article.offset=0&articleLimit=10",
    "sourceKind": "official",
-   "eligibilityLines": [
-    "장애학생지원",
-    "북한이탈주민학생지원"
-   ],
    "excerpts": [
     "장학금액 및 지급기간: 수업료전액, 학업보조비 300만원/학기(월 50만원)",
     "신청기한: 2026.8.",
@@ -3518,8 +3512,7 @@
    "excerpts": [
     "◎ 선발인원: 2명",
     "◎ 신청방법: 활동 도우미 신청서 1부, 사회문제 해결 제안서 1부 각각 제출",
-    "※ 관련 문의: damdami8@uos.ac.kr",
-    "전화 : 02-6490-6114 / 서울시통합문의 : 02-120"
+    "※ 관련 문의: damdami8@uos.ac.kr"
    ],
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
    "eligibilityLines": [
@@ -3877,8 +3870,7 @@
    "sourceUrl": "https://www.inha.ac.kr/bbs/kr/8/44703/artclView.do",
    "listedAt": "2026-08-02",
    "excerpts": [
-    "문의처 : 장학복지팀 교외장학 담당 (032-860-7076)",
-    "구비 서류 및 일정 등 자세한 내용은 붙임 파일을 참고하시기 바랍니다"
+    "문의처 : 장학복지팀 교외장학 담당 (032-860-7076)"
    ],
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
    "formId": "auto-학부-교외장학-2026학년도-2학기-가송-apply",
@@ -4657,10 +4649,6 @@
    "sourceUrl": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=273597&article.offset=0&articleLimit=10&srCategoryId=22",
    "sourceKind": "official",
    "formId": "sanhak-foreign-apply",
-   "eligibilityLines": [
-    "장애학생지원",
-    "[학생지원팀] [한국장애인개발원] 2026년도 쌍용곰두리장학생 신청 안내(2026.07.13~20까지)"
-   ],
    "excerpts": [
     "제출서류 *각1부씩 원본 제출, 공고일(5/18) 이후 발급분만 인정",
     "신청기간 : ~ 7.",
@@ -4764,8 +4752,7 @@
    "sourceUrl": "https://www.inha.ac.kr/bbs/kr/8/44732/artclView.do",
    "sourceKind": "official",
    "excerpts": [
-    "장학금액 : 1,000,000원 (※ 생활비성)",
-    "구비 서류 및 일정 등 자세한 내용은 붙임 파일을 참고하시기 바랍니다"
+    "장학금액 : 1,000,000원 (※ 생활비성)"
    ],
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
    "formId": "shinhyup-scholarship-apply"
@@ -5457,8 +5444,7 @@
     "장학금액 : 등록금 전액 ( ※ 등록금성, 이중수혜 불가)",
     "신청 기한 : ~ 26.",
     "신청 방법 : (재)인하대동문장학회 메일 접수 inhain4@inhain.com",
-    "문의처 : 인하대동문장학회 032-887-2345",
-    "구비 서류 및 일정 등 자세한 내용은 붙임 파일을 참고하시기 바랍니다"
+    "문의처 : 인하대동문장학회 032-887-2345"
    ],
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
    "applyEmail": "inhain4@inhain.com",
@@ -6443,8 +6429,10 @@
    "sourceUrl": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=139168&article.offset=0&articleLimit=10",
    "sourceKind": "auto",
    "eligibilityLines": [
-    "장애학생지원",
-    "다. 한국장학재단 소득분위 증명서(2026-2학기 必) 1부"
+    "2. 지원요건 2026년도 2학기에 정규학기 내 학부 2~3학년 재학예정인 자로서, 아래 요건을 모두 충족하는 자",
+    "1) 평균성적 만점의 75% 이상 취득한 자",
+    "2) 2026년 2학기 한국장학재단 학자금지원구간 6 구간 이하인 자",
+    "3. 지원금액 : 학업보조금 300 만원 (매달 50 만원 지급)"
    ],
    "excerpts": [
     "■ 신청기한: 2026년 8월 18일 오후 2시 ~ 8월 21일 금요일 오전 9시",
