@@ -1839,8 +1839,12 @@ function blankAnswers(tpl) {
   const ans = {};
   (tpl.sections || []).forEach((sec) => {
     (sec.fields || []).forEach((f) => {
-      if (f.type === 'checks' || f.type === 'checks+text') ans[f.id] = { checks: [], text: '' };
+      /* 🔴 새 필드 타입이 생기면 여기도 같이 늘려야 한다 — 안 그러면 모양이 안 맞아
+         미리보기가 빈 칸을 찍거나 터진다. 판정은 forms.js와 같은 규칙(formAnswerFor)을 쓴다 */
+      if (typeof formAnswerFor === 'function') { ans[f.id] = formAnswerFor(f, undefined); return; }
+      if (f.type === 'checks' || f.type === 'checks+text' || f.type === 'choice') ans[f.id] = { checks: [], text: '' };
       else if (f.type === 'schedule') ans[f.id] = { days: [], time: '' };
+      else if (f.type === 'group') { ans[f.id] = {}; (f.sub || []).forEach((sf) => { ans[f.id][sf.id] = ''; }); }
       else ans[f.id] = '';
     });
   });

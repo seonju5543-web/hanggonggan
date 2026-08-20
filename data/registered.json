@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-08-19",
+ "updatedAt": "2026-08-20",
  "items": [
   {
    "id": "reg-kw-gukgagosi",
@@ -6729,6 +6729,40 @@
    "attachments": [],
    "sourceUrl": "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100#n-%EC%B0%B8%EC%8A%AC%EA%B8%B0%20%EC%8B%9D%EB%8B%B9%20%EB%B0%8F%20%EC%B9%B4%EC%9A%B0%EB%B2%84%EA%B1%B0%20%EA%B7%BC%EB%A1%9C%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91",
    "sourceKind": "auto"
+  },
+  {
+   "id": "auto-eywordpaged1slug2026aisa",
+   "name": "장학 2026년 한국대학유학생실무자협의회(AISA) 장학생 선발(외국인 유학생 대상, 9.1.화~9.18.금)",
+   "type": "교내",
+   "provider": "숭실대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-09-18",
+   "period": "접수 ~2026-09-18",
+   "summary": "숭실대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "숭실대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-20 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=2026%EB%85%84-%ED%95%9C%EA%B5%AD%EB%8C%80%ED%95%99%EC%9C%A0%ED%95%99%EC%83%9D%EC%8B%A4%EB%AC%B4%EC%9E%90%ED%98%91%EC%9D%98%ED%9A%8Caisa-%EC%9E%A5%ED%95%99%EC%83%9D-%EC%84%A0%EB%B0%9C%EC%99%B8&keyword=%EC%9E%A5%ED%95%99",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "지원대상: 4년제 대학교, 전문대학교, 대학원대학교에 재학 중인 자 (외국인 유학생으로서 어학연수생, 학부생, 대학원생)"
+   ],
+   "excerpts": [
+    "지원대상: 4년제 대학교, 전문대학교, 대학원대학교에 재학 중인 자 (외국인 유학생으로서 어학연수생, 학부생, 대학원생)",
+    "신청기간: 2026년 9월 1일(화) ~ 9월 18일(금)",
+    "신청방법: 신청서 및 기타 서류를 작성하여 이메일로 제출(PDF 통합본 제출, 붙임1에 신청서 양식 있습니다.)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   }
  ]
 }

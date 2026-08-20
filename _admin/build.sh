@@ -26,6 +26,8 @@ printf 'User-agent: *\nDisallow: /\n' > "$OUT/robots.txt"
 cp data.js "$OUT/vendor/data.js"
 # 양식 문서 생성(renderFormDoc·FORM_DOC_CSS)
 cp forms.js "$OUT/vendor/forms.js"
+# 질문 설계기 — 양식별 질문 개수(클릭/입력/합계)를 화면과 감사가 같은 규칙으로 센다
+cp form-plan.js "$OUT/vendor/form-plan.js"
 # 공고 주소 정규화 (ES 모듈이라 브라우저에서 그대로 import 된다)
 cp collector/url-key.mjs "$OUT/vendor/url-key.mjs"
 

@@ -1273,3 +1273,62 @@ textarea:focus {
 .chat-quote-head { font-size: 11.5px; font-weight: 800; color: var(--text-weak); margin-bottom: 5px; }
 .chat-quote-line { font-size: 13.5px; color: var(--text-sub); line-height: 1.5; }
 .chat-quote-line + .chat-quote-line { margin-top: 5px; }
+
+/* ===== 신청서 질문 최적화 (2026-08-18) =====
+   클릭형 우선 · 자동 채움 확인 패널 · 표 병합 카드.
+   문서 출력과는 무관하다 — 여기 있는 것은 전부 '묻는 화면'의 모양이다. */
+
+/* 하나만 고르는 항목. 여러 개 고르는 칩(.fq-checks)과 눈으로 구분돼야
+   학생이 '더 고를 수 있나?'를 헷갈리지 않는다 */
+.fq-choice .chip { border-radius: 12px; }
+.fq-choice .chip.active::before { content: '● '; font-size: 11px; }
+.fq-checks .chip.active::before { content: '✓ '; font-size: 12px; }
+
+/* 프로필에서 채운 것 — 감추지 않고 접어 둔다 */
+.fq-auto {
+  border: 1.5px solid rgba(18, 22, 31, 0.10);
+  border-radius: 14px; padding: 12px 14px; margin-bottom: 20px;
+  background: var(--surface);
+}
+.fq-auto > summary {
+  cursor: pointer; font-size: 14px; font-weight: 700; color: var(--primary);
+  list-style: none; min-height: 24px;
+}
+.fq-auto > summary::-webkit-details-marker { display: none; }
+.fq-auto > summary::after { content: ' ▾'; }
+.fq-auto[open] > summary::after { content: ' ▴'; }
+.fq-auto[open] > summary { margin-bottom: 12px; }
+
+/* 원본이 표인데 셀마다 질문이 된 것을 한 카드로 묶은 것 */
+.fq-group {
+  display: grid; gap: 10px;
+  border: 1.5px solid rgba(18, 22, 31, 0.10);
+  border-radius: 14px; padding: 12px;
+}
+.fq-sub { display: grid; gap: 5px; margin-bottom: 8px; }
+.fq-group .fq-sub { margin-bottom: 0; }
+.fq-sub > span { font-size: 12.5px; font-weight: 600; color: var(--text-weak); }
+
+/* '다음 신청서에도 쓸게요' — 프로필이 학생을 따라 자라게 하는 스위치 */
+.fq-keep {
+  display: flex; align-items: center; gap: 7px;
+  margin-top: 7px; font-size: 12px; color: var(--text-weak);
+  min-height: 24px;
+}
+.fq-keep input { width: 16px; height: 16px; accent-color: var(--primary); }
+
+/* 상한을 넘는 양식은 숨기지 않고 그렇다고 말한다 (개발자 지시 2026-08-18) */
+.fq-over { margin-bottom: 18px; font-weight: 600; }
+
+/* 신청서에서 배운 정보 (MY) — 앱이 무엇을 갖고 있는지 보이고 지울 수 있게 */
+.my-learned { margin-top: 14px; border-top: 1px solid rgba(18, 22, 31, 0.08); padding-top: 12px; }
+.my-learned-head { font-size: 13px; font-weight: 700; color: var(--text-sub); margin-bottom: 8px; }
+.my-learned-head > span { font-weight: 500; font-size: 12px; color: var(--text-weak); }
+.my-learned ul { list-style: none; display: grid; gap: 7px; }
+.my-learned li { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.my-learned li > span { color: var(--text-weak); min-width: 92px; }
+.my-learned li > strong { flex: 1; font-weight: 600; word-break: break-all; }
+.btn-link {
+  background: none; border: 0; padding: 6px 8px; min-height: 32px;
+  font-size: 12.5px; color: var(--text-weak); text-decoration: underline;
+}

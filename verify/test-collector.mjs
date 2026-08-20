@@ -975,5 +975,65 @@ console.log('\n■ 유료 API 크레딧 누수 방지 (2026-08-20)');
   eq('  사고 깊이를 지정한다(기본값이 가장 비싸다)', /output_config:\s*\{\s*effort:/.test(code), true);
 }
 
+/* ── 신청서 질문 방식 최적화 (2026-08-18 개발자 지시) ──────────────
+   지키려는 것: **묻는 방식만 바꾸고 문서는 그대로.** 아래가 깨지면 학생이
+   같은 것을 신청서마다 다시 쓰거나(자동 채움 끊김), 성별에 남·여를 둘 다
+   체크할 수 있게 되거나(단일 선택 끊김), 문서에 빈 칸이 나간다. */
+console.log('\n■ 신청서 질문 설계기 (form-plan.js)');
+{
+  const FP = await import(new URL('../form-plan.js', import.meta.url));
+  const T = JSON.parse(fs.readFileSync(new URL('../data/forms.json', import.meta.url), 'utf8')).templates;
+
+  // ① 라벨 정규화 — 게시판마다 '성 명'·'성　명'·'1. 성    명'으로 적힌다
+  eq('라벨 정규화: 공백·번호를 걷어낸다', FP.formLabelKey('1. 성       명'), '성명');
+  eq('라벨 정규화: 전각 공백도 같은 값', FP.formLabelKey('성　명'), '성명');
+
+  // ② 자동 채움 — 이게 끊기면 생년월일 20종·주소 30칸을 매번 다시 묻는다
+  eq('자동 채움: 라벨로 프로필 열쇠를 찾는다', FP.formAutoKey({ label: '생년월일', type: 'text' }), 'birth');
+  eq('자동 채움: 데이터에 적힌 auto가 우선', FP.formAutoKey({ label: '아무거나', type: 'text', auto: 'name' }), 'name');
+  eq('자동 채움: 서술형은 프로필로 대신하지 않는다', FP.formAutoKey({ label: '성명', type: 'textarea' }), '');
+
+  // ③ 단일 선택 — 원본이 '중복 선택 가능'이라 한 것은 절대 하나만 고르게 하지 않는다
+  eq('단일 선택: 성별은 하나만',
+    FP.formIsSingleChoice({ type: 'checks', label: '성 별', options: ['남', '여'] }), true);
+  eq('단일 선택: 원본이 중복 가능이라 하면 여러 개 그대로',
+    FP.formIsSingleChoice({ type: 'checks', label: '희망 대상 학교급', options: ['초등학교', '중학교', '고등학교'],
+      suffix: '※ 중복 선택 가능' }), false);
+  eq('단일 선택: 보기가 많은 항목은 건드리지 않는다',
+    FP.formIsSingleChoice({ type: 'checks', label: '우선선발 대상자 여부',
+      options: ['장애인', '다문화', '다자녀', '유공자', '중증환자', '육아', '기타'] }), false);
+
+  // ④ 저장된 답 방어 — 타입이 바뀌어도 기기에 남은 답으로 문서를 다시 그릴 수 있어야 한다
+  eq('옛 답 방어: 글자로 저장된 답이 선택형에서도 안 터진다',
+    FP.formAnswerFor({ type: 'choice', options: ['남', '여'] }, '여').checks.join(''), '여');
+  eq('옛 답 방어: 답이 없어도 모양은 맞춘다',
+    Array.isArray(FP.formAnswerFor({ type: 'checks', options: ['남'] }, undefined).checks), true);
+
+  // ⑤ 상한 — 전부 세어 개발자 지시(클릭 15·입력 10·전체 20)와 대조
+  const rows = Object.entries(T).map(([k, v]) => ({ k, ...FP.formBudgetReport(v).counts }));
+  eq('전체 질문 20개를 넘는 양식이 없다', rows.filter((r) => r.total > 20).length, 0);
+  eq('클릭형 15개를 넘는 양식이 없다', rows.filter((r) => r.click > 15).length, 0);
+  /* 직접입력 10개를 넘는 2종은 서술형이 7·9개라 더 못 줄인다 — 감사가 이름을 보고한다.
+     늘어나면 새 양식이 최적화를 못 탄 것이니 여기서 잡는다. */
+  eq('직접입력 10개를 넘는 양식이 2종 이하', rows.filter((r) => r.input > 10).length <= 2, true);
+
+  // ⑥ 되풀이된 섹션이 남아 있지 않다 (로봇이 같은 첨부를 두 번 담던 문제)
+  const dupes = Object.entries(T).filter(([, v]) => {
+    const seen = new Set();
+    return (v.sections || []).some((sec) => {
+      const sig = (sec.fields || []).map((f) => FP.formLabelKey(f.label)).join('|');
+      if (!sig) return false;
+      if (seen.has(sig)) return true;
+      seen.add(sig); return false;
+    });
+  });
+  eq('같은 항목의 섹션이 되풀이된 양식이 없다', dupes.length, 0);
+
+  // ⑦ 감사가 새 타입을 알고 있다 — 모르면 exit 1로 죽어 그날 수집분이 통째로 안 저장된다
+  const audit = fs.readFileSync(new URL('../verify/audit-data.js', import.meta.url), 'utf8');
+  eq('감사 FIELD_TYPES에 choice·group·static이 들어 있다',
+    ['choice', 'group', 'static'].every((t) => audit.includes(`'${t}'`)), true);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);
