@@ -109,15 +109,33 @@ const GIVE_UP_AFTER = 3;
 const tooManyFails = (src) => FILL && (src?.fails ?? 0) >= GIVE_UP_AFTER;
 
 const FILL_CAP = 120;
+/* 🔴 물러선 주소를 **영영 버리면 안 된다** (2026-08-20 수정).
+   위 주석은 "심층 수집 본편이 다시 시도한다"고 적어 두었지만 본편은 **수동 실행**이라
+   아무도 돌리지 않는다. 그래서 3번 실패한 주소는 사실상 영구 포기 상태였고, 그 집합은
+   줄지 않고 **쌓이기만 했다** — 자격 미확보 81건 중 20건이 정확히 이 상태다(18건이 fails 3+).
+   게다가 물러선 이유가 대개 '증분 모드의 8초'인데, 20초를 주면 열리는 학교가 실제로 있다.
+   그래서 매 실행 몇 자리만 떼어 다시 두드린다. **실패가 적은 것부터** 고르므로,
+   두드릴 때마다 fails가 올라 자연히 다음 차례로 넘어간다(별도 기록장이 필요 없는 회전).
+   link-hunter의 '영구 포기는 없다'와 같은 방침이다. 예산은 4자리 × 20초 = 80초로 묶인다. */
+const RETRY_SLOTS = 4;
+const retired = [];
 let todo = [...wanted.values()]
   .filter((n) => {
     const src = prevIdx.byUrl.get(canonUrl(n.url));
-    if (tooManyFails(src)) return false;
+    if (tooManyFails(src)) { retired.push({ n, fails: src?.fails ?? 0 }); return false; }
     return !FILL || needsFetch(src, LIMIT);
   });
 if (FILL && todo.length > FILL_CAP) {
   console.log(`보충 대상 ${todo.length}건 중 ${FILL_CAP}건만 이번에 받는다 (나머지는 다음 실행)`);
   todo = todo.slice(0, FILL_CAP);
+}
+/* 다시 두드릴 주소는 **넉넉히 기다려 준다** — 8초에 걸려 물러선 것을 또 8초로 재는 것은
+   같은 실험을 반복하는 것이라 결과가 바뀔 리 없다. */
+const retryUrls = new Set();
+if (FILL && retired.length) {
+  retired.sort((a, b) => a.fails - b.fails);
+  for (const r of retired.slice(0, RETRY_SLOTS)) { todo.push(r.n); retryUrls.add(canonUrl(r.n.url)); }
+  console.log(`물러섰던 주소 ${retired.length}건 중 ${Math.min(RETRY_SLOTS, retired.length)}건을 다시 두드려 본다`);
 }
 console.log(`원문 수집 대상 ${todo.length}건 (수집 목록 ${notices.items.length} + 등록 공고 보충 ${extra}${FILL ? ', 증분 모드' : ''})`);
 
@@ -128,8 +146,9 @@ for (const n of todo) {
        상한(120건)에 곱해져 예산을 다 먹고, 그러면 그 실행의 수집분이 통째로 버려진다
        (2026-08-03 브라우저 수집 시간초과 사고와 같은 계열). 그래서 증분 모드는 더 짧게 기다린다 —
        못 받은 건 다음 실행이 다시 받으므로 잃는 것이 없다. */
+    const patient = !FILL || retryUrls.has(canonUrl(n.url));   // 다시 두드리는 주소는 넉넉히
     const res = await fetch(n.url, { redirect: 'follow', headers: UA,
-      signal: AbortSignal.timeout(FILL ? 8000 : 20000) });
+      signal: AbortSignal.timeout(patient ? 20000 : 8000) });
     let entry;
     if (res.ok) {
       const full = clean(await res.text());

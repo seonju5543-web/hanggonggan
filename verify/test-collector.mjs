@@ -949,6 +949,16 @@ console.log('\n■ 자격 요건 발췌 규칙 (2026-08-20 수리분이 되돌�
   eq('  요건 신호 없는 블록은 버린다', /REQ_SIGNAL\.test/.test(code), true);
   // ⑤ 표는 줄 단위로 못 가른다 — 재시도 금지 경고가 코드에 남아 있어야 한다
   eq('  표 파싱 재시도 금지 경고가 남아 있다', /표는 납작해지면서/.test(src), true);
+
+  /* ⑥ 물러선 주소를 영영 버리지 않는다 (2026-08-20).
+     '3번 실패하면 제외'만 있고 되돌아오는 길이 없어서, 물러선 주소가 줄지 않고 쌓이기만 했다
+     (자격 미확보 81건 중 20건이 그 상태였다). 이 세 줄이 사라지면 그 상태로 되돌아간다. */
+  const df = fs.readFileSync(new URL('collector/deepfetch.mjs', root), 'utf8');
+  const dfCode = df.replace(/^\s*\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
+  eq('  물러선 주소를 다시 두드릴 자리가 있다', /RETRY_SLOTS/.test(dfCode), true);
+  eq('  실패가 적은 것부터 골라 회전한다', /retired\.sort\(\(a, b\) => a\.fails - b\.fails\)/.test(dfCode), true);
+  // 8초에 걸려 물러선 것을 또 8초로 재면 결과가 바뀔 리 없다
+  eq('  다시 두드릴 때는 넉넉히 기다린다', /patient \? 20000 : 8000/.test(dfCode), true);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
