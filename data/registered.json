@@ -2655,7 +2655,12 @@
     }
    ],
    "sourceUrl": "https://www.konkuk.ac.kr/bbs/konkuk/235/1200997/artclView.do",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "eligibilityLines": [
+    "□ 참가자격",
+    "○ 전국 대학(원)생 (휴학생 제외)"
+   ],
+   "eligibilityFrom": "공고문 첨부"
   },
   {
    "id": "reg-konkuk-bulgaria",
@@ -3407,12 +3412,7 @@
    "eligibilityLines": [
     "□ 지원 자격",
     "- <인공지능개론> 또는 <인공지능기초와활용> 또는 <딥러닝> 중 최소 1개 과목 A0 이상 이수",
-    "- 전체 평균평점 3.6 이상",
-    "□ 장학금",
-    "- 32시간 근무 기준 월 420,800원 지급",
-    "* 타 부서 근로와 중복 불가",
-    "□ 선발기준",
-    "- 교과목 이수 학점"
+    "- 전체 평균평점 3.6 이상"
    ]
   },
   {

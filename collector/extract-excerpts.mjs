@@ -79,7 +79,7 @@ function extractFrom(text) {
 /* 자격 절의 제목으로 실제 쓰이는 표현 (2026-08-02 미확보 80건을 세어 보고 추가).
    **그냥 '자격'이나 '대상'은 넣지 않는다** — 세어 보니 가장 많이 나온 것이
    '교원자격'·'평생교육사자격'처럼 **자격증 이름**이라, 넣으면 엉뚱한 줄이 요건으로 들어온다. */
-const QUALIFY_HEAD = /(신청\s?자격|지원\s?자격|응모\s?자격|자격\s?요건|지원\s?요건|신청\s?요건|장학생\s?기본\s?자격|장학생\s?자격|선발\s?요건|응모\s?요건|자격\s?기준|지원\s?조건|신청\s?조건|지원\s?대상|신청\s?대상|모집\s?대상|선발\s?대상|추천\s?대상|수혜\s?대상|장학\s?대상|지급\s?대상|지원\s?가능\s?대상|선발\s?기준|심사\s?기준|응시\s?자격|추천\s?조건|추천\s?자격|대\s?상\s?자\s*[:：]|^\s*\d+\s*[.)]\s*대\s?상\s*[:：])/;
+const QUALIFY_HEAD = /(신청\s?자격|지원\s?자격|응모\s?자격|자격\s?요건|지원\s?요건|신청\s?요건|장학생\s?기본\s?자격|장학생\s?자격|선발\s?요건|응모\s?요건|자격\s?기준|지원\s?조건|신청\s?조건|지원\s?대상|신청\s?대상|모집\s?대상|선발\s?대상|추천\s?대상|수혜\s?대상|장학\s?대상|지급\s?대상|지원\s?가능\s?대상|선발\s?기준|심사\s?기준|응시\s?자격|추천\s?조건|추천\s?자격|참가\s?자격|참여\s?자격|참가\s?대상|참여\s?대상|응모\s?대상|모집\s?자격|대\s?상\s?자\s*[:：]|^\s*\d+\s*[.)]\s*대\s?상\s*[:：])/;
 /* 자격 블록의 끝 — **확실한 다음 절**에서만 끊는다.
    예전엔 '장학금액' 같은 낱말에서도 끊었는데, 자격이 표로 적힌 공고에서는 그게
    표의 머리글이라 거기서 잘려 정작 중요한 요건 줄(장애의 정도가 심한 장애인 등)을
@@ -101,7 +101,11 @@ const NEXT_SECTION = new RegExp(SECT_PREFIX +
    자격 절 다음에 오는 **다른 절 머리글**을 만나면 거기서 끝이다 — 낱말을 일일이
    나열하는 방식은 '장학금 지급 관련 안내'처럼 처음 보는 제목에 계속 뚫린다.
    단, 그 머리글 자체가 자격을 뜻하면(선발 대상 등) 이어서 읽는다. */
-const SECTION_HEAD = /^\s*(?:[가-힣]\s*[.)]|\d+\s*\.)\s*\S/;
+/* 절 머리글 — 번호(`3.` `가.`)뿐 아니라 **기호 머리글(■□▣◇◆)** 도 절을 가른다.
+   빠뜨렸을 때 무슨 일이 나는가: 의암 손병희 공고는 `□ 참가자격` 다음이 `□ 시상내역`인데
+   `□`를 절 머리글로 못 봐서 **시상 내역·상금표까지 지원 자격 자리에 딸려 들어왔다**(2026-08-21).
+   ⚠️ `○`는 넣지 않는다 — `□` 아래의 **하위 항목** 기호라, 넣으면 자격 절이 첫 항목에서 끊긴다. */
+const SECTION_HEAD = /^\s*(?:[가-힣]\s*[.)]|\d+\s*\.|[■□▣◇◆]\s*)\s*\S/;
 /* 줄 앞머리 번호가 '어느 단계'인가 — 같은 단계를 만나야 절이 바뀐 것이다.
    숫자는 값까지 본다(3. 아래의 1)은 하위 항목, 4.가 다음 절). */
 function markerOf(line) {
@@ -109,6 +113,12 @@ function markerOf(line) {
   if (num) return { kind: 'num', n: Number(num[1]) };
   if (/^\s*[가-힣]\s*[.)]/.test(line)) return { kind: 'kor', n: 0 };
   if (/^\s*[\u2460-\u2473]/.test(line)) return { kind: 'circ', n: 0 };
+  /* 기호는 **하나하나가 다른 단계**다 (■ 아래에 □, 그 아래에 ○ 식으로 겹쳐 쓴다).
+     한 덩어리로 묶으면 `■ 모집 대상 및 요건` 아래 첫 `□ …`에서 절이 끊겨
+     **진짜 요건이 통째로 날아간다**(GR 인재양성 플랫폼에서 실제로 그랬다).
+     같은 기호를 다시 만났을 때만 다음 절로 본다. */
+  const sym = String(line).match(/^\s*([■□▣◇◆])/);
+  if (sym) return { kind: 'sym' + sym[1], n: 0 };
   return { kind: '', n: 0 };
 }
 /* 이 절 머리글이 여전히 '누가 받을 수 있나'를 말하면 이어서 읽는다.
@@ -363,6 +373,19 @@ let eligDocs = {};
 try { eligDocs = JSON.parse(fs.readFileSync(new URL('extracted/elig-docs.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
 
 let hit = 0, none = 0, kept = 0, cleaned = 0, fromDoc = 0;
+/* 공고문 첨부에서 자격 줄을 읽는다. 본문 경로와 원문 없는 경로가 **같은 함수**를 써야
+   "본문 있을 땐 읽고 없을 땐 안 읽는" 어긋남이 안 생긴다. 스캔 PDF 등 글자가 안 나오는
+   것은 조용히 건너뛴다(읽은 척하는 것보다 안 읽는 편이 낫다). */
+function qualFromDocs(it) {
+  for (const f of (eligDocs[it.id] || {}).files || []) {
+    const t = attachmentText(new URL(`extracted/${f}`, HERE).pathname);
+    if (!readable(t)) continue;
+    const got = extractQualifyLines(t);
+    if (got.length) return got;
+  }
+  return [];
+}
+
 if (!process.env.EXCERPTS_AS_LIB) main();
 function main() {
 for (const it of reg.items) {
@@ -375,7 +398,21 @@ for (const it of reg.items) {
      그래서 **멀쩡하던 자격이 두 달 뒤 저절로 없어지고 있었다**(원문 미확보 17건이 그 결과).
      "원문이 없다"는 "자격이 없다"가 아니라 "모른다"이므로, 이전 값을 그대로 둔다.
      — 원칙 8-1(모르는 것을 단정하지 않는다)과 같은 정신. */
-  if (!hasText(src)) { kept += 1; continue; }
+  if (!hasText(src)) {
+    /* 🆕 원문이 없어도 **공고문 첨부**가 있으면 그것으로 자격을 읽는다 (2026-08-21).
+       건국대처럼 본문이 `Loading...` 껍데기뿐이고 자격이 첨부 HWP 안에만 있는 게시판이 있다.
+       예전엔 여기서 그냥 돌아서서, `--elig-attach`가 애써 받아 둔 첨부를 **한 번도 안 열어 봤다**
+       (받아 놓고 못 쓰는 상태였다 — 2026-08-21에 실제로 그랬다).
+       🔴 못 뽑았을 때 기존 값을 지우지 않는 것은 그대로다 — '원문이 없다'는 '모른다'이지
+       '자격이 없다'가 아니다(위 2026-08-03 주석과 같은 정신). */
+    const got = qualFromDocs(it);
+    if (got.length && WRITE) {
+      it.eligibilityLines = got;
+      it.eligibilityFrom = '공고문 첨부';
+      fromDoc += 1;
+    }
+    kept += 1; continue;
+  }
 
   const body = strip(src.url, src.text);
   if (body !== src.text) cleaned += 1;
@@ -388,13 +425,9 @@ for (const it of reg.items) {
   /* 본문에서 못 뽑았으면 **공고문 첨부**를 본다 — 순서를 뒤집지 말 것.
      본문이 있는 한 본문이 언제나 정확하다(첨부에는 붙임·서식이 섞인다). */
   let viaDoc = false;
-  if (!qual.length && eligDocs[it.id]) {
-    for (const f of eligDocs[it.id].files || []) {
-      const t = attachmentText(new URL(`extracted/${f}`, HERE).pathname);
-      if (!readable(t)) continue;                       // 스캔 PDF 등 — 조용히 넘어간다
-      const got = extractQualifyLines(t);
-      if (got.length) { qual = got; viaDoc = true; fromDoc += 1; break; }
-    }
+  if (!qual.length) {
+    const got = qualFromDocs(it);
+    if (got.length) { qual = got; viaDoc = true; fromDoc += 1; }
   }
   if (WRITE) {
     if (viaDoc) it.eligibilityFrom = '공고문 첨부';
