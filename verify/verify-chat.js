@@ -349,8 +349,15 @@ async function ask(page, q) {
   const a2 = await ask(page, '쿼카 사육 지원금 있어?');
   ok(!/찾았어요!/.test(a2), '앱에 없는 공고를 고르면 AI 답을 버린다', a2.slice(0, 60));
 
-  /* ⓒ 진짜 공고를 골랐지만 **없는 금액을 지어낸** 경우 — 그 줄만 버린다 */
-  const realId = sent.items[0].id;
+  /* ⓒ 진짜 공고를 골랐지만 **없는 금액을 지어낸** 경우 — 그 줄만 버린다
+     🔴 인용을 검사하려면 **원문이 실제로 있는 후보**를 골라야 한다. items[0]을 그냥 쓰면
+     원문 없는 공고가 걸려 인용이 0개로 나오고, 그걸 '앱이 막았다'로 오해하게 된다
+     (2026-08-21에 실제로 이 항목이 오래 빨간불이었던 원인). 후보에 원문 있는 것이 하나도
+     없으면 그건 앱 쪽 문제이므로 **여기서 실패로 잡는다.** */
+  const quoted = sent.items.find((i) => i.quotes.length);
+  ok(!!quoted, '원문 인용이 있는 후보를 AI에게 보낸다', { 후보: sent.items.length, 원문있음: sent.items.filter((i) => i.quotes.length).length });
+  ok(sent.items[0].quotes.length > 0, '원문 있는 후보가 목록 앞쪽에 온다(AI가 고를 것이 있다)');
+  const realId = (quoted || sent.items[0]).id;
   reply = { picks: [{ id: realId, quotes: [0] }], lead: '최대 987654원을 받을 수 있어요', needSource: false };
   const a3 = await ask(page, '쿼카 사육 지원금 있어?');
   ok(!/987654/.test(a3), '🔴 앱이 모르는 금액이 들어간 문장은 화면에 안 나간다', a3.slice(0, 80));
