@@ -1007,11 +1007,12 @@ function chatBind() {
   const closeBtn = document.querySelector('#btn-chat-close');
   if (closeBtn) closeBtn.addEventListener('click', chatClose);
 
-  /* ⚠️ 다른 시트와 달리 **쓸어내려 닫기를 붙이지 않는다.**
-     enableSheetSwipe는 '시트가 맨 위에 있을 때 아래로 끌면 닫기'인데, 도우미는 시트 자체가
-     스크롤되지 않고 **안쪽 대화 목록이** 스크롤된다. 그래서 시트의 scrollTop이 늘 0이라
-     대화를 위로 올려 보려고 손가락을 내릴 때마다 시트가 닫힌다(학교 목록에서 손가락이
-     닿자마자 선택되던 것과 같은 계열의 함정). 닫기는 ✕ · 손잡이 · 바깥 누르기 · Esc 네 가지로 충분하다. */
+  /* 쓸어내려 닫기 — 앱의 다른 시트와 같은 규칙(2026-08-21 개발자 지시로 도우미에도 붙였다).
+     ⚠️ 예전에 이걸 안 붙였던 이유는 도우미가 시트 자체가 아니라 **안쪽 대화 목록**을 스크롤해서
+     시트의 scrollTop이 늘 0이었기 때문이다(대화를 올려 보려 할 때마다 닫혔다). 지금은
+     enableSheetSwipe가 손가락 아래 스크롤 영역까지 거슬러 올라가 확인하므로(scrollableAtTop)
+     대화가 맨 위일 때만 닫힌다. **그 확인을 지우면 이 함정이 그대로 되살아난다.** */
+  if (typeof enableSheetSwipe === 'function') enableSheetSwipe(sheet, chatClose);
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !sheet.hidden) chatClose();

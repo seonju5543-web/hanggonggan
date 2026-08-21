@@ -1347,16 +1347,28 @@ function openDetail(id) {
   });
 }
 
-/* 바텀시트를 아래로 쓸어내려 닫기 — 두 시트(#detail-sheet·#notify-sheet)가 같은 규칙을 쓴다.
-   시트가 맨 위에 있을 때 아래로 끄는 동작만 '닫기'로 본다. 그래야 안쪽 내용 스크롤을 뺏지 않는다
-   (학교 목록에서 손가락이 닿는 순간 선택돼 버리던 것과 같은 계열의 실수를 막는 조건). */
+/* 손가락 아래에 아직 위로 올릴 수 있는 스크롤 영역이 남아 있으면 그건 '닫기'가 아니라 스크롤이다.
+   시트 자신뿐 아니라 **안쪽 스크롤 영역까지** 봐야 한다 — 도우미 시트는 시트가 고정이고
+   안쪽 대화 목록이 스크롤돼서, 시트만 보면 scrollTop이 늘 0이라 대화를 올려 보려 할 때마다 닫힌다. */
+function scrollableAtTop(target, sheet) {
+  for (let el = target; el && el !== sheet.parentNode; el = el.parentElement) {
+    if (el.scrollTop > 0) return false;
+  }
+  return true;
+}
+
+/* 바텀시트를 아래로 쓸어내려 닫기 — 앱 안에서 뜨는 시트 전부가 같은 규칙을 쓴다
+   (#detail-sheet · #notify-sheet · #chat-sheet). 위로 올릴 내용이 남아 있지 않을 때
+   아래로 끄는 동작만 '닫기'로 본다. 그래야 안쪽 내용 스크롤을 뺏지 않는다
+   (학교 목록에서 손가락이 닿는 순간 선택돼 버리던 것과 같은 계열의 실수를 막는 조건).
+   ⚠️ 새로 만드는 시트에도 반드시 붙일 것 — 2026-08-21 개발자 지시. */
 function enableSheetSwipe(sheet, close) {
   let startY = 0, dy = 0, dragging = false;
   sheet.addEventListener('touchstart', (e) => {
     if (e.touches.length !== 1) return;
     startY = e.touches[0].clientY;
     dy = 0;
-    dragging = sheet.scrollTop <= 0;
+    dragging = scrollableAtTop(e.target, sheet);
   }, { passive: true });
 
   sheet.addEventListener('touchmove', (e) => {

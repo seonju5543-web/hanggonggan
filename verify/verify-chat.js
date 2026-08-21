@@ -6,7 +6,7 @@
    ④ 🔴 **정직 검사** — 모르는 질문에 지어내지 않고 "못 찾았다"고 말한다
    ⑤ 🔴 **정직 검사** — 금액 답에 앱이 모르는 숫자가 섞이지 않는다(원문 확인 안내)
    ⑥ 답에 나온 공고 카드를 누르면 기존 상세 화면이 열리고 도우미는 닫힌다
-   ⑦ 대화 목록을 손가락으로 끌어도 시트가 닫히지 않는다(스크롤을 뺏지 않는다)
+   ⑦ 쓸어내려 닫기 — 대화가 중간이면 스크롤, 맨 위·머리말이면 닫기 (스크롤을 뺏지 않는다)
    ⑧ AI가 꺼져 있는 동안에는 바깥으로 나가는 요청이 **0건**이다
    ⑨ 질문에 스크립트를 넣어도 그대로 실행되지 않는다(XSS)
    실행: python3 -m http.server 8123 & 후 node verify/verify-chat.js */
@@ -204,27 +204,47 @@ async function ask(page, q) {
      '손가락으로 끌면 목록이 안 내려간다'를 한 번도 재현하지 못한 채 통과시켰다.
      Touch는 브라우저 안에서 만들어야 identifier·target이 제대로 붙는다. */
   const sheetEl = page.locator('#chat-sheet');
-  const dragged = await page.evaluate(() => {
+  /* 아래로 끄는 동작 한 번. sel = 손가락이 닿는 곳, top = 대화 목록을 맨 위에 둘지 */
+  const dragDown = (sel, top) => page.evaluate(({ sel, top }) => {
     const log = document.querySelector('#chat-log');
-    log.scrollTop = 0;                       // 맨 위에 둔다 — 다른 시트였다면 여기서 아래로 끌면 닫힌다
-    const r = log.getBoundingClientRect();
+    log.scrollTop = top ? 0 : Math.max(1, Math.floor(log.scrollHeight - log.clientHeight));
+    const el = document.querySelector(sel);
+    const r = el.getBoundingClientRect();
     const x = r.left + r.width / 2;
     const fire = (type, y) => {
-      const t = new Touch({ identifier: 1, target: log, clientX: x, clientY: y });
-      log.dispatchEvent(new TouchEvent(type, {
+      const t = new Touch({ identifier: 1, target: el, clientX: x, clientY: y });
+      el.dispatchEvent(new TouchEvent(type, {
         touches: type === 'touchend' ? [] : [t],
         targetTouches: type === 'touchend' ? [] : [t],
         changedTouches: [t], bubbles: true, cancelable: true,
       }));
     };
-    fire('touchstart', r.top + 60);
-    fire('touchmove', r.top + 200);           // 아래로 140px 끌기
-    fire('touchend', r.top + 200);
-    return true;
-  });
-  ok(dragged, '손가락으로 끄는 동작을 재현했다');
+    fire('touchstart', r.top + 20);
+    fire('touchmove', r.top + 160);           // 아래로 140px 끌기
+    fire('touchend', r.top + 160);
+    return log.scrollTop;
+  }, { sel, top });
+
+  /* 🔴 진짜 지켜야 하는 것 — 대화가 중간에 있을 때 끌면 **스크롤이지 닫기가 아니다.**
+     예전에 도우미에 쓸어내려 닫기를 안 붙였던 이유가 이것이었다(시트의 scrollTop이 늘 0이라
+     대화를 올려 보려 할 때마다 닫혔다). 지금은 손가락 아래 스크롤 영역까지 보고 판단한다. */
+  const midScroll = await dragDown('#chat-log', false);
+  ok(midScroll > 0, '대화 목록이 실제로 스크롤된 상태를 만들었다', { midScroll });
   await page.waitForTimeout(400);
-  ok(await sheetEl.isVisible(), '대화를 아래로 끌어도 도우미가 닫히지 않는다');
+  ok(await sheetEl.isVisible(), '대화가 중간일 때 아래로 끌어도 닫히지 않는다(스크롤을 뺏지 않는다)');
+
+  /* 그리고 개발자 지시(2026-08-21) — ✕ 말고 쓸어내려서도 닫혀야 한다 */
+  await dragDown('#chat-log', true);
+  await page.waitForTimeout(500);
+  ok(!(await sheetEl.isVisible()), '대화가 맨 위일 때 아래로 끌면 닫힌다');
+
+  await page.click('#btn-chat-fab');
+  await page.waitForSelector('#chat-sheet:not([hidden])');
+  await dragDown('.chat-head', false);        // 머리말은 스크롤 영역이 아니다 — 언제나 닫혀야 한다
+  await page.waitForTimeout(500);
+  ok(!(await sheetEl.isVisible()), '머리말을 아래로 끌면 대화 위치와 무관하게 닫힌다');
+  await page.click('#btn-chat-fab');
+  await page.waitForSelector('#chat-sheet:not([hidden])');
 
   console.log('\n[5-1] 🔴 마스코트 — 짧게 누르면 열리고, 꾹 눌러야 옮겨진다');
   await page.evaluate(() => { const s = document.querySelector('#chat-sheet'); if (s && !s.hidden) chatClose(); });
