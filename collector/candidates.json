@@ -1,8 +1,72 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-08-21",
- "count": 1786,
+ "count": 1791,
  "items": [
+  {
+   "title": "[서울][국가근로] 2026학년도 2학기 국가근로장학생 모집 안내(추가)",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/263613/artclView.do",
+   "attachments": [
+    {
+     "name": "(서식)2026학년도 2학기 국가근로(추가모집) 지원서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/148964/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간에 신청 하였으며 , &nbsp; 국가근로장학금 장학생 기본요건 ( 소득구간 &nbsp; 9 구간 이하 등",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-08-21"
+  },
+  {
+   "title": "2026학년도 2학기 디딤돌 장학 신청 안내 학생지원팀 2026-08-21 45",
+   "url": "https://kau.ac.kr/kaulife/scholnoti.php?searchkey=&searchvalue=&code=s1301&page=&mode=read&seq=11058",
+   "attachments": [
+    {
+     "name": "2026학년도 2학기 디딤돌 장학금 신청서 양식.hwpx",
+     "url": "https://kau.ac.kr/upfile/2026/08/21/20260821093453-9512.hwpx"
+    },
+    {
+     "name": "대학자체평가",
+     "url": "https://www.kau.ac.kr/doc/popup/2025_selfeval.pdf"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026. 08. 21.( 금 ) ~ 09. 04.( 금 ) &nbsp; 9. 선발기준 : 학자금 지원",
+   "school": "한국항공대학교",
+   "campus": "",
+   "foundAt": "2026-08-21"
+  },
+  {
+   "title": "장학 한국장학재단「2026년 장학금 부정수급 자진신고 캠페인」안내",
+   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=%ED%95%9C%EA%B5%AD%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%E3%80%8C2026%EB%85%84-%EC%9E%A5%ED%95%99%EA%B8%88-%EB%B6%80%EC%A0%95%EC%88%98%EA%B8%89-%EC%9E%90%EC%A7%84%EC%8B%A0%EA%B3%A0-%EC%BA%A0%ED%8E%98&keyword=%EC%9E%A5%ED%95%99",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "숭실대학교",
+   "campus": "",
+   "foundAt": "2026-08-21"
+  },
+  {
+   "title": "[광산장학회] 2026년도 (재)광산장학회 장학생 선발 공고",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=155476&article.offset=0&articleLimit=10&noCat=501",
+   "attachments": [
+    {
+     "name": "(공고)2026년도 (재)광산장학회 장학생 선발.zip",
+     "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=download&articleNo=155476&attachNo=90904"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "홍익대학교",
+   "campus": "",
+   "foundAt": "2026-08-21"
+  },
+  {
+   "title": "[국가근로] 2026학년도 2학기 국가근로장학금 희망근로지 1차 신청 안내 (신촌캠퍼스)",
+   "url": "https://www.yonsei.ac.kr/bbs/sc/58/943930/artclView.do",
+   "attachments": [],
+   "deadlineHint": "신청기간 : 2026. 8. 21.( 금 ) 12:00 ~ 8. 23.( 일 ) 24:00 까지 &nbsp; 3.",
+   "school": "연세대학교",
+   "campus": "",
+   "foundAt": "2026-08-21"
+  },
   {
    "title": "2026년도 제7기 경원장학재단 장학생 선발 안내",
    "url": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2464&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
