@@ -213,17 +213,58 @@ function tidyRequirement(line) {
 
 /* lines를 따로 넘기면 그 줄들을 정리한다 — 자격 줄이 없어 원문 발췌로 물러날 때도
    같은 정리를 거치게 하기 위해서다(안 그러면 그 경로로만 ※ 부연이 새어 나온다). */
+/* 뒷줄로 이어지는 줄 — 여기서 끊으면 **문장이 잘린 채** 화면에 나간다.
+   실제로 이렇게 떠 있었다: `소득분위가 “기초생활수급자” 또는` (뒤가 없다),
+   `2026-2학기 정규학기 학부 재학생 및 복학예정자 중`.
+   🔴 버리면 안 된다 — 그 줄에 진짜 요건이 들어 있다. **다음 줄과 이어 붙인다.** */
+const CONTINUES = /(또는|및|이고|이며|하여|중)\s*$|\s인\s*$|[,·+]\s*$/;
+
+/* 자격이 아닌 것이 확실한 줄만 걷어낸다.
+   ⚠️ '조건 낱말이 없으면 버린다'는 식의 일괄 규칙을 쓰지 말 것 — 2026-08-20에 세어 보니
+   그렇게 버려지는 105줄 안에 `2026-1학기 종단추천장학 기수혜자`,
+   `대한불교조계종 교육원의 장학추천 가능자`, `직전학기 평균성적이 0점인 경우 지원 불가`
+   같은 **진짜 요건**이 섞여 있었다. 확실한 것만 이름을 대서 버린다. */
+const NOT_REQ_LINE = [
+  '^\\(.{1,14}\\)$',                       // (1 종) · (계속장학생) · (신규자) — 구분 머리표
+  '^\\d+\\s?종$',
+  '^합격일\\s?후|지급\\s?기간',              // 언제까지 주나 — 혜택이지 자격이 아니다
+  '^총점\\s|\\(\\d+\\s?%\\)\\s*$|^배점',      // 배점표 — '비교과프로그램참여 (30%)'처럼 뒤에 붙는다
+  '참고$|참고하시기|확인\\s?바랍|인정하지\\s?않음|첨부파일\\s*\\d*\\s*\\]?$',   // 참조·부연
+].join('|');
+const NOT_REQ_RE = new RegExp(NOT_REQ_LINE);
+
+/* 표의 칸 하나가 통째로 줄이 된 것 — `국가고시` `모집부문` `재학여부` 같은 머리글이다.
+   띄어쓰기가 없고 짧으며 서술로 끝나지 않는다.
+   🔴 다만 **자격 범주 이름은 지킨다** — `북한이탈주민` `국적-몽골` 같은 것은 그 자체가 요건이다
+   (전수로 세어 보니 16개 중 2개가 그랬다. 뭉뚱그려 버리면 진짜 자격이 사라진다). */
+const BARE_CELL = /^\S{1,6}$/;
+const REAL_CATEGORY = /(자|생|중|상|하|명|원)$|북한이탈|새터민|다문화|기초생활|차상위|국적|유공|보훈|장애|한부모|다자녀/;
+const isTableCell = (t) => BARE_CELL.test(t) && !REAL_CATEGORY.test(t);
+
 function requirementLines(sch, lines) {
   const raw = lines || (sch && sch.eligibilityLines) || [];
-  const out = [];
+  /* ① 먼저 이어지는 줄을 붙인다 — 정리·거르기는 **붙인 뒤에** 해야 한다.
+     (붙이기 전에 거르면 앞줄이 잡음 규칙에 걸려 사라지고 뒷줄만 덩그러니 남는다) */
+  const joined = [];
   for (const l of raw) {
+    const s = String(l || '').trim();
+    if (!s) continue;
+    const prev = joined[joined.length - 1];
+    if (prev && CONTINUES.test(prev) && (prev + ' ' + s).length <= 160) joined[joined.length - 1] = `${prev} ${s}`;
+    else joined.push(s);
+  }
+  const out = [];
+  for (const l of joined) {
     const t = tidyRequirement(l);
     // 다듬은 뒤에 검사한다 — "3 ) 금 액 : …"은 번호를 떼야 '금액' 줄인 것이 드러난다
     if (REQ_NOISE.test(l.trim()) || REQ_NOISE.test(t)) continue;
-    if (t.length < 4 || t.length > 120) continue;
+    if (NOT_REQ_RE.test(t) || isTableCell(t)) continue;
+    if (t.length < 4 || t.length > 160) continue;
     if (/^(신청\s?자격|지원\s?자격|지원\s?대상|신청\s?대상|모집\s?대상|선발\s?대상|자격\s?요건)$/.test(t)) continue;
     if (!out.includes(t)) out.push(t);
-    if (out.length >= 6) break;
+    /* 5줄이면 충분하다 — 더 늘어놓으면 학생이 안 읽는다. 사람이 정리한 것처럼 보여야 한다.
+       못 담은 것은 바로 아래 '원문 보기'로 갈 수 있다. */
+    if (out.length >= 5) break;
   }
   return out;
 }
