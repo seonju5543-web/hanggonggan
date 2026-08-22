@@ -27,6 +27,8 @@
 
 set -uo pipefail
 cd "$(dirname "$0")/.." || exit 1
+# 저장소 안이 아니면 이 겉옷은 아무것도 지켜 주지 못한다 — 지키는 척하지 말고 멈춘다
+git rev-parse --git-dir >/dev/null 2>&1 || { echo "⛔ 저장소 안에서 실행하세요 (tools/robot-run.sh)"; exit 1; }
 BASE=claude/nice-heisenberg-WESq5     # 예약 실행이 도는 기본 브랜치
 FORCE=${ROBOT_RUN_FORCE:-0}
 
