@@ -1,8 +1,143 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-08-22",
- "count": 1831,
+ "count": 1840,
  "items": [
+  {
+   "title": "2026학년도 2학기 국가근로장학사업 관련 절차 및 선발 여부 확인 방법 등 안내",
+   "url": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2514862&code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
+   "attachments": [
+    {
+     "name": "대학(원)별 훈련일정",
+     "url": "https://plus.cnu.ac.kr/Upl/kr/20200818_2.hwp"
+    },
+    {
+     "name": "마이크로디그리과정",
+     "url": "https://plus.cnu.ac.kr/html/kr/26file/2026_di_2010.pdf"
+    },
+    {
+     "name": "붙임. 2026학년도 2학기 국가근로장학사업 관련 절차 및 선발 여부 확인 방법 안내문.pdf",
+     "url": "https://plus.cnu.ac.kr/_prog/_board/common/download.php?code=sub07_0713&ntt_no=2514862&atch_no=1"
+    },
+    {
+     "name": "학교홈페이지관리규정",
+     "url": "https://plus.cnu.ac.kr/Upl/kr/2025_homepage_3020.hwp"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "충남대학교",
+   "campus": "",
+   "foundAt": "2026-08-22"
+  },
+  {
+   "title": "[학부] 2026학년도 제2학기 국가근로장학금 희망근로지 신청 안내(2차)",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366384&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "2026년도 2학기 희망근로지 신청 매뉴얼_모바일앱.pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366384&attachNo=352567"
+    },
+    {
+     "name": "2026년도 2학기 희망근로지 신청 매뉴얼_홈페이지.pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366384&attachNo=352568"
+    }
+   ],
+   "deadlineHint": "신청기간 2026.09.07 ~ 2026.09.13 조회 55 2026년도 2학기 희망근로지 신청 매뉴얼_모바일앱.",
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-08-22"
+  },
+  {
+   "title": "[학부] 2026년도 「세종이도인재장학금」 핵심인재육성 특기적성 분야 장학금 신청 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366399&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "2026 장학생 선발 공고문 (3).zip",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366399&attachNo=352579"
+    }
+   ],
+   "deadlineHint": "신청기간 2026.08.21 ~ 2026.09.30 조회 17 2026 장학생 선발 공고문 (3).zip 2026년",
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-08-22"
+  },
+  {
+   "title": "[학부] 2026년도 손태희장학재단 장학생 선발 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366404&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "2026년 손태희장학재단 4기 장학생 선발 공고문.pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366404&attachNo=352581"
+    },
+    {
+     "name": "2026년 손태희장학재단 4기 장학생 서식.hwpx",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366404&attachNo=352583"
+    }
+   ],
+   "deadlineHint": "신청기간 2026.08.24 ~ 2026.09.08 조회 23 2026년 손태희장학재단 4기 장학생 선발 공고문.p",
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-08-22"
+  },
+  {
+   "title": "2026학년도 2학기 대학원 및 대학 보훈(가족)장학 신청 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/216445/detailView.do?category=6",
+   "attachments": [],
+   "deadlineHint": "신청기간: 2026. 9. 1.(화)~9. 30.(수) 2. 신청대상 및 자격 &nbsp;장학구분 신청대상 및 자격",
+   "school": "전북대학교",
+   "campus": "",
+   "foundAt": "2026-08-22"
+  },
+  {
+   "title": "2026년도 (재)광산장학회 장학생 선발 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/216446/detailView.do?category=6",
+   "attachments": [],
+   "deadlineHint": "신청기간 : 2026. 8. 24.(월) ~ 9. 18.(금) 까지 2. 선발대상 : 공고일('26. 8. 24)",
+   "school": "전북대학교",
+   "campus": "",
+   "foundAt": "2026-08-22"
+  },
+  {
+   "title": "[교외] 2026학년도 광산장학회 장학생 선발 공고(8. 24. ~ 9. 18.)",
+   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1204185/artclView.do",
+   "attachments": [
+    {
+     "name": "공문_붙임) (공고)2026년도 (재)광산장학회 장학생 선발계획 공고.pdf",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1224160/download.do"
+    },
+    {
+     "name": "공문_붙임) 2026년도 (재)광산장학회 장학생 신청서 및 구비서류 서식.hwpx",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1224161/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "건국대학교",
+   "campus": "",
+   "foundAt": "2026-08-22"
+  },
+  {
+   "title": "[교외][생활비] 2026학년도 한국산업기술진흥원 한미 첨단분야 청년교류 지원사업 제6기 장학생 선발 공고",
+   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1204186/artclView.do",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "건국대학교",
+   "campus": "",
+   "foundAt": "2026-08-22"
+  },
+  {
+   "title": "[교외][생활비] 2026학년도 2학기 경원장학재단 장학생 선발 안내(8. 19. ~ 9. 30.)",
+   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1204187/artclView.do",
+   "attachments": [
+    {
+     "name": "제7기 경원장학재단 장학생 선발 안내 공고문.pdf",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1224162/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "건국대학교",
+   "campus": "",
+   "foundAt": "2026-08-22"
+  },
   {
    "title": "[서울][국가근로] 2026학년도 2학기 국가근로장학생 모집 안내(추가)",
    "url": "https://dep.hufs.ac.kr/bbs/student/2431/263613/artclView.do",
