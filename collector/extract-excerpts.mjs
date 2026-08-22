@@ -187,6 +187,36 @@ function extractExcludeLines(text) {
   return out;
 }
 
+/* 우선 선발 기준 — "3. 장학생 우선선발 기준" 아래의 항목들을 원문 그대로 모은다.
+   🔴 자격이 **아니지만** 학생에게 쓸모가 있다(2026-08-21 개발자 지적). 자격 블록에
+   섞으면 요건이 실제보다 훨씬 까다로워 보이므로(목포향우회 — 진짜 자격은 한 줄뿐인데
+   5줄이 떴다) 제외 대상처럼 **따로 모아 따로 보여 준다.**
+   제목 줄은 담지 않는다 — 화면 블록에 이미 이름이 있어 같은 말이 두 번 나온다. */
+const PRIORITY_HEAD = /(우선\s?선발|우선\s?순위|선발\s?우선)/;
+function extractPriorityLines(text) {
+  if (!text) return [];
+  const lines = text.split(/\n+/).map((l) => unent(l).replace(/[ \t　]+/g, ' ').trim()).filter(Boolean);
+  const start = lines.findIndex((l) => PRIORITY_HEAD.test(l) && l.length <= 40);
+  if (start < 0) return [];
+  const out = [];
+  for (let i = start + 1; i < lines.length && out.length < 5; i += 1) {
+    const l = lines[i];
+    if (NEXT_SECTION.test(l)) break;
+    if (SECTION_HEAD.test(l)) {
+      const body = l.replace(/^\s*(?:[가-힣]\s*[.)]|\d+\s*\.)\s*/, '');
+      if (body.length <= 20) break;
+    }
+    if (/^[●▶◆■□▣♦❍◎￭]/.test(l)) break;           // 다음 큰 항목 (제외 대상과 같은 규칙)
+    if (TABLE_NOISE.test(l) || l.length < 4 || l.length > 120) continue;
+    /* 🔴 '우선순위를 말하는 줄'만 담는다. 절이 어디서 끝나는지 게시판마다 달라서
+       머리글만 믿으면 자기소개 안내·결과발표·문의처가 딸려 온다(실제로 2건이 그랬다).
+       `>` 사슬은 낱말 없이 순서만 적는 유형이다(주거안정: `비기숙사생 > 기숙사생 > …`). */
+    if (!/우선|우대|순위|가산점|먼저|[>＞]/.test(l)) continue;
+    out.push(l);
+  }
+  return out;
+}
+
 /* '이 줄이 누가 받을 수 있나를 말한다'는 신호.
    verify/eligibility-report.mjs의 REQ_SIGNAL과 **같은 낱말이어야 한다** —
    갈라지면 채점기가 통과시킨 것을 발췌기가 버리는(또는 그 반대) 일이 생긴다. */
@@ -362,7 +392,7 @@ function scoopQualifyLines(text) {
    이 파일은 **불러오는 순간 아래 본편이 통째로 실행되던** 구조라 규칙 하나를 시험해 보려면
    비슷한 코드를 따로 베껴야 했고(그러면 규칙이 두 벌이 된다), 검사도 '원본 글자를 읽어
    규칙이 살아 있는지만 보는' 약한 방식에 머물렀다. `EXCERPTS_AS_LIB=1`이면 본편을 건너뛴다. */
-export { extractQualifyLines, scoopQualifyLines, extractFrom, extractExcludeLines };
+export { extractQualifyLines, scoopQualifyLines, extractFrom, extractExcludeLines, extractPriorityLines };
 
 let browserBodies = {};
 try { browserBodies = JSON.parse(fs.readFileSync(new URL('extracted/browser-bodies.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
@@ -444,6 +474,11 @@ for (const it of reg.items) {
     const excl = extractExcludeLines(body);
     if (excl.length) it.eligibilityExcludes = excl;
     else delete it.eligibilityExcludes;
+
+    /* 우선 선발 기준 — 자격이 아니지만 학생에게 쓸모가 있어 따로 모은다 (위 주석) */
+    const pri = extractPriorityLines(body);
+    if (pri.length) it.eligibilityPriority = pri;
+    else delete it.eligibilityPriority;
   }
   if (ex.length) {
     hit++;

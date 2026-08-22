@@ -200,15 +200,19 @@ const REQ_NOISE = new RegExp([
   // 분류 머리표 — '국가유공자 관련 장학금' '새터민(교육보호대상자) 관련 장학금'
   '관련\\s?장학금\\s*$',
   '^학자금\\s?지원\\s?구간\\s*$',              // 이름표만 남은 칸
-  /* 🔴 '우선선발'은 자격이 아니라 **자격을 갖춘 사람 중 누구를 먼저 뽑나**이다.
-     자격 자리에 앉으면 요건이 훨씬 까다로워 보인다 — 목포향우회는 진짜 자격이
-     `전남 목포에서 중·고등 과정을 마친 자` **하나뿐**인데 성적·가정형편·애향심까지
-     요건처럼 5줄이 떠 있었다(2026-08-21 개발자 지적). */
-  '우선\\s?선발\\s*[).\\]]*\\s*$|우선\\s?선발\\s?기준|우선\\s?순위\\s*[:：]',
   '\\.(hwp|hwpx|pdf|docx?|xlsx?|zip|png|jpg)$',    // 첨부 파일 이름이 섞여 들어온 것
   '신청\\s?(일정|안내)\\s*$',                       // "…국가장학금 1차 신청 안내"
   '지급\\s*$|근무 기준 월|원 지급',                  // 금액·지급 안내
 ].join('|'));
+
+/* 🔴 '우선선발'은 자격이 **아니지만 버릴 것도 아니다** — 자격을 갖춘 사람 중 누구를
+   먼저 뽑나이고, 학생에게 쓸모가 있다(2026-08-21 개발자 지적).
+   그래서 **자격 블록에서는 걸러내고, '먼저 뽑는 기준' 블록에서 따로 보여 준다**
+   (제외 대상을 따로 두는 것과 같은 방식). 섞어 놓으면 요건이 실제보다 훨씬 까다로워
+   보여서 지원할 수 있는 학생이 스스로 포기한다 — 목포향우회가 그랬다.
+   ⚠️ 판정(✓/✗)은 하지 않는다. 충족해도 '된다'는 뜻이 아니라 '먼저 본다'는 뜻이라
+   초록 체크를 달면 거짓 안심이 된다(제외 대상과 같은 규칙). */
+const PRIORITY_LINE = /우선\s?선발\s*[).\]]*\s*$|우선\s?선발\s?기준|우선\s?순위\s*[:：]|우대\s*[).\]]*\s*$/;
 
 function tidyRequirement(line) {
   return String(line || '')
@@ -265,7 +269,8 @@ const BARE_CELL = /^\S{1,10}$/;   // 6자였을 때 `학자금지원구간`(7자
 const REAL_CATEGORY = /(자|생|중|상|하|명|원)$|북한이탈|새터민|다문화|기초생활|차상위|국적|유공|보훈|장애|한부모|다자녀/;
 const isTableCell = (t) => BARE_CELL.test(t) && !REAL_CATEGORY.test(t);
 
-function requirementLines(sch, lines) {
+function requirementLines(sch, lines, opts) {
+  const keepPriority = !!(opts && opts.keepPriority);   // '먼저 뽑는 기준' 블록을 그릴 때만 참
   const raw = lines || (sch && sch.eligibilityLines) || [];
   /* ① 먼저 이어지는 줄을 붙인다 — 정리·거르기는 **붙인 뒤에** 해야 한다.
      (붙이기 전에 거르면 앞줄이 잡음 규칙에 걸려 사라지고 뒷줄만 덩그러니 남는다) */
@@ -283,6 +288,7 @@ function requirementLines(sch, lines) {
     // 다듬은 뒤에 검사한다 — "3 ) 금 액 : …"은 번호를 떼야 '금액' 줄인 것이 드러난다
     if (REQ_NOISE.test(l.trim()) || REQ_NOISE.test(t)) continue;
     if (NOT_REQ_RE.test(t) || isTableCell(t)) continue;
+    if (!keepPriority && PRIORITY_LINE.test(t)) continue;   // 자격 블록에서는 뺀다 (위 주석)
     if (t.length < 4 || t.length > 160) continue;
     if (/^(신청\s?자격|지원\s?자격|지원\s?대상|신청\s?대상|모집\s?대상|선발\s?대상|자격\s?요건)$/.test(t)) continue;
     if (!out.includes(t)) out.push(t);

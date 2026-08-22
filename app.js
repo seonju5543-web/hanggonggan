@@ -1175,6 +1175,17 @@ function openDetail(id) {
     reasonRows += requirementLines(sch, qLines)
       .map((e) => `<li class="r-req">${esc(e)}</li>`).join('');
   }
+  /* 먼저 뽑는 기준 — 자격이 **아니지만** 학생에게 쓸모가 있다 (2026-08-21 개발자 지적).
+     자격 블록에 섞으면 요건이 실제보다 훨씬 까다로워 보여 지원할 수 있는 학생이 포기한다
+     (목포향우회: 진짜 자격은 한 줄인데 우선순위까지 5줄이 떠 있었다). 그래서 자리를 나눈다.
+     🔴 판정(✓/✗)을 하지 않는다 — 충족해도 '된다'가 아니라 '먼저 본다'는 뜻이라
+     초록 체크를 달면 거짓 안심이 된다(제외 대상과 같은 규칙). */
+  const priLines = requirementLines(sch, sch.eligibilityPriority || [], { keepPriority: true });
+  if (priLines.length) {
+    reasonRows += `<li class="r-head">자격을 갖춘 사람 중 먼저 뽑는 기준이에요</li>`
+      + priLines.map((e) => `<li class="r-req">${esc(e)}</li>`).join('');
+  }
+
   /* 제외 대상 — '누가 받을 수 있나'만큼 '누가 못 받나'도 자격 정보다 (2026-08-03 개발자 지적).
      판정하지 않고 원문 그대로 보여 준다 — 해당 여부는 학생이 안다. */
   const exLines = requirementLines(sch, sch.eligibilityExcludes || []);
