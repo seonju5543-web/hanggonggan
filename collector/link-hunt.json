@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-08-20",
+ "updatedAt": "2026-08-21",
  "items": {
   "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2668%20%5B%ED%99%8D%EB%B3%B4%5D%20%ED%95%9C%EA%B5%AD%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EA%B3%B5%EA%B3%B5%EB%8D%B0%EC%9D%B4%ED%84%B0%20%EA%B0%9C%EB%B0%A9%20%EB%B0%8F%20%ED%99%9C%EC%9A%A9%20%EC%95%88%EB%82%B4%202026.0": {
    "attempts": 5,
@@ -1017,11 +1017,11 @@
    "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765584"
   },
   "r:reg-dg-gasong": {
-   "attempts": 4,
+   "attempts": 5,
    "title": "(재)가송재단 장학생 (동국대 접수, 2026-2학기)",
-   "lastTried": "2026-08-09",
+   "lastTried": "2026-08-21",
    "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-08-16",
+   "nextTryAt": "2026-09-04",
    "status": "",
    "escalated": true,
    "likelyGone": true
@@ -1702,23 +1702,25 @@
    "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765733"
   },
   "r:auto-ec9588eb82b4ec8898eca095": {
-   "attempts": 3,
+   "attempts": 0,
    "title": "2026학년도 2학기 등록금재원 근로봉사장학생 선발 일정 안내(수정)",
-   "lastTried": "2026-08-14",
-   "lastWhy": "목록 화면(다른 공고 제목이 여럿 보임)",
+   "lastTried": "2026-08-21",
+   "lastWhy": "",
    "nextTryAt": "2026-08-17",
-   "status": "",
-   "escalated": true
+   "status": "resolved",
+   "escalated": true,
+   "resolvedUrl": "https://onestop.pusan.ac.kr/page?menuCD=000000000000062&mode=DETAIL&seq=687"
   },
   "r:auto-20eb93b120ec8ba0ecb2ad20": {
-   "attempts": 3,
+   "attempts": 0,
    "title": "2026학년도 2학기 학부 재학생 우선선발장학금(형제자매장학 등) 신청 안내",
-   "lastTried": "2026-08-14",
-   "lastWhy": "목록에서 못 찾음",
+   "lastTried": "2026-08-21",
+   "lastWhy": "",
    "nextTryAt": "2026-08-17",
-   "status": "",
+   "status": "resolved",
    "escalated": true,
-   "likelyGone": true
+   "likelyGone": true,
+   "resolvedUrl": "https://onestop.pusan.ac.kr/page?menuCD=000000000000062&mode=DETAIL&seq=685"
   },
   "n:https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767674&article.offset=0&articleLimit=10": {
    "patrolledAt": "2026-08-12",
@@ -1878,12 +1880,14 @@
    "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765751"
   },
   "n:https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-%5B%EA%B3%B5%ED%86%B5%5D%202026%EB%85%84%202%ED%95%99%EA%B8%B0%20%EA%B5%AD%EA%B0%80%EC%9E%A5%ED%95%99%EA%B8%88%202%EC%B0%A8%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4%20N": {
-   "attempts": 2,
+   "attempts": 3,
    "title": "[공통] 2026년 2학기 국가장학금 2차 신청 안내 N",
-   "lastTried": "2026-08-14",
+   "lastTried": "2026-08-21",
    "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-08-15",
-   "status": ""
+   "nextTryAt": "2026-08-24",
+   "status": "",
+   "escalated": true,
+   "likelyGone": true
   },
   "n:https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=0&pageOrder=0&cmd=2&parm_bod_uid=269836&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&": {
    "patrolledAt": "2026-08-13",
@@ -2063,83 +2067,83 @@
    "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?SITE_NO=2&MENU_ID=100&CONTENTS_NO=1&P_TAB_NO=1&BOARD_SEQ=4&BBS_SEQ=29063"
   },
   "r:reg-cau-samil": {
-   "attempts": 1,
+   "attempts": 2,
    "title": "삼일장학회 희망/동행 장학생 (중앙대 접수)",
-   "lastTried": "2026-08-20",
+   "lastTried": "2026-08-21",
    "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-08-21",
+   "nextTryAt": "2026-08-22",
    "status": ""
   },
   "r:reg-cau-geunro-out": {
-   "attempts": 1,
+   "attempts": 2,
    "title": "하계방학 교외 근로지 국가근로장학생 추가 모집 (다빈치)",
-   "lastTried": "2026-08-20",
+   "lastTried": "2026-08-21",
    "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-08-21",
+   "nextTryAt": "2026-08-22",
    "status": ""
   },
   "r:reg-cau-geunro-in": {
-   "attempts": 1,
+   "attempts": 2,
    "title": "하계방학 국가근로장학금(교내·교외) 추가 선발 (다빈치)",
-   "lastTried": "2026-08-20",
+   "lastTried": "2026-08-21",
    "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-08-21",
+   "nextTryAt": "2026-08-22",
    "status": ""
   },
   "r:reg-cau-bogun-multi": {
-   "attempts": 1,
+   "attempts": 2,
    "title": "보건장학회 다문화가정 장학생 (중앙대 접수)",
-   "lastTried": "2026-08-20",
+   "lastTried": "2026-08-21",
    "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-08-21",
+   "nextTryAt": "2026-08-22",
    "status": ""
   },
   "r:reg-cau-gomduri": {
-   "attempts": 1,
+   "attempts": 2,
    "title": "쌍용곰두리장학생 (중앙대 접수)",
-   "lastTried": "2026-08-20",
+   "lastTried": "2026-08-21",
    "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-08-21",
+   "nextTryAt": "2026-08-22",
    "status": ""
   },
   "r:reg-cau-gyonae": {
-   "attempts": 1,
+   "attempts": 2,
    "title": "교내장학금 보훈·국가시험지원·가족·중앙나래 (중앙대)",
-   "lastTried": "2026-08-20",
+   "lastTried": "2026-08-21",
    "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-08-21",
+   "nextTryAt": "2026-08-22",
    "status": ""
   },
   "r:reg-cau-sunglim": {
-   "attempts": 1,
+   "attempts": 2,
    "title": "성림교회 대학장학생 (2026 하반기)",
-   "lastTried": "2026-08-20",
+   "lastTried": "2026-08-21",
    "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-08-21",
+   "nextTryAt": "2026-08-22",
    "status": ""
   },
   "r:reg-cau-ilchwi": {
-   "attempts": 1,
+   "attempts": 2,
    "title": "일취월장 장학금 (중앙대 서울캠퍼스, 2026-1학기)",
-   "lastTried": "2026-08-20",
+   "lastTried": "2026-08-21",
    "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-08-21",
+   "nextTryAt": "2026-08-22",
    "status": ""
   },
   "r:reg-cau-bokji-seoul": {
-   "attempts": 1,
+   "attempts": 2,
    "title": "복지장학금 (중앙대 서울캠퍼스, 2026-1학기)",
-   "lastTried": "2026-08-20",
+   "lastTried": "2026-08-21",
    "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-08-21",
+   "nextTryAt": "2026-08-22",
    "status": ""
   },
   "r:reg-cau-bokji-davinci": {
-   "attempts": 1,
+   "attempts": 2,
    "title": "복지장학금 (중앙대 다빈치캠퍼스, 2026-1학기)",
-   "lastTried": "2026-08-20",
+   "lastTried": "2026-08-21",
    "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-08-21",
+   "nextTryAt": "2026-08-22",
    "status": ""
   },
   "n:https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5&pageNo=2#n-2027%ED%95%99%EB%85%84%EB%8F%84%20%EC%9A%B0%EC%88%98%EC%A4%91%EC%95%99%EC%9D%B8%20%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%84%A0%EB%B0%9C%20%EA%B8%B0%EC%A4%80%20%EA%B3%B5%EA%B3%A0(26%ED%95%99%EB%B2%88%20%EB%8C%80%EC%83%81)": {
@@ -2165,6 +2169,230 @@
    "lastWhy": "",
    "status": "resolved",
    "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?SITE_NO=2&MENU_ID=100&CONTENTS_NO=1&P_TAB_NO=1&BOARD_SEQ=4&BBS_SEQ=29624"
+  },
+  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2687%20%5B%ED%99%8D%EB%B3%B4%5D%202026%EB%85%84%EB%8F%84%20(%EC%9E%AC)%EA%B4%91%EC%82%B0%EC%9E%A5%ED%95%99%ED%9A%8C%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4%202026": {
+   "attempts": 1,
+   "title": "2687 [홍보] 2026년도 (재)광산장학회 장학생 선발 안내 2026.08.21. 조회 53",
+   "lastTried": "2026-08-21",
+   "lastWhy": "HTTP 404",
+   "nextTryAt": "2026-08-22",
+   "status": ""
+  },
+  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2686%20%5B%EB%B6%88%EA%B5%90%EB%8C%80%ED%95%99%5D%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EB%B6%88%EA%B5%90%EB%8C%80%ED%95%99(%EC%9B%90)%20%ED%95%99%EC%82%AC%EC%9A%B4%EC%98%81%EC%8B%A4%20%EA%B5%AD%EA%B0%80": {
+   "attempts": 0,
+   "title": "2686 [불교대학] 2026학년도 2학기 불교대학(원) 학사운영실 국가근로장학생 추가모집 안내(~8. 25 12:00까지) 2026.08.21",
+   "lastTried": "2026-08-21",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765845"
+  },
+  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2685%20%5B%ED%99%8D%EB%B3%B4%5D%20%ED%95%9C%EA%B5%AD%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%202026%EB%85%84%20%EC%9E%A5%ED%95%99%EA%B8%88%20%EB%B6%80%EC%A0%95%EC%88%98%EA%B8%89%20%EC%9E%90%EC%A7%84%EC%8B%A0%EA%B3%A0%20%EC%BA%A0%ED%8E%98%EC%9D%B8": {
+   "attempts": 0,
+   "title": "2685 [홍보] 한국장학재단 2026년 장학금 부정수급 자진신고 캠페인 안내 2026.08.20. 조회 89",
+   "lastTried": "2026-08-21",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765841"
+  },
+  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2684%20%5B%ED%99%8D%EB%B3%B4%5D%20%EC%95%A8%ED%8A%B8%EC%9B%B0%EB%AF%BC%EC%B4%88%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EC%A0%9C27%EA%B8%B0%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4%202026.": {
+   "attempts": 1,
+   "title": "2684 [홍보] 앨트웰민초장학재단 제27기 장학생 선발 안내 2026.08.20. 조회 173",
+   "lastTried": "2026-08-21",
+   "lastWhy": "HTTP 404",
+   "nextTryAt": "2026-08-22",
+   "status": ""
+  },
+  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2683%20%5B%ED%99%8D%EB%B3%B4%5D%202026%EB%85%84%EB%8F%84%20%EC%A0%9C7%EA%B8%B0%20%EA%B2%BD%EC%9B%90%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4%2020": {
+   "attempts": 1,
+   "title": "2683 [홍보] 2026년도 제7기 경원장학재단 장학생 선발 안내 2026.08.19. 조회 234",
+   "lastTried": "2026-08-21",
+   "lastWhy": "HTTP 404",
+   "nextTryAt": "2026-08-22",
+   "status": ""
+  },
+  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2681%202026-2%ED%95%99%EA%B8%B0%20%EC%A3%BC%EA%B1%B0%EC%95%88%EC%A0%95%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%9A%B0%EC%84%A0%EC%A7%80%EC%9B%90%20%EB%B0%8F%20%EC%A7%80%EC%9B%90%EC%A0%9C%EC%99%B8%20%EA%B8%B0%EC%A4%80%20%EC%95%88%EB%82%B4%20": {
+   "attempts": 0,
+   "title": "2681 2026-2학기 주거안정장학금 우선지원 및 지원제외 기준 안내 2026.08.18. 조회 46",
+   "lastTried": "2026-08-21",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765808"
+  },
+  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-%EA%B3%B5%EC%A7%80%20%EA%B3%B5%EC%A7%80%20%EB%A1%AF%EB%8D%B0%2043%EA%B8%B0%20%ED%9D%AC%EB%A7%9D%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%202026.05.28.%20%EC%A1%B0%ED%9A%8C%20323": {
+   "attempts": 0,
+   "title": "공지 공지 롯데 43기 희망장학생 선발 2026.05.28. 조회 3230",
+   "lastTried": "2026-08-21",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764895"
+  },
+  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2680%20%5B%ED%99%8D%EB%B3%B4%5D%202026%EB%85%84%EB%8F%84%20%EC%86%90%ED%83%9C%ED%9D%AC%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4%202026.": {
+   "attempts": 1,
+   "title": "2680 [홍보] 2026년도 손태희장학재단 장학생 선발 안내 2026.08.14. 조회 109",
+   "lastTried": "2026-08-21",
+   "lastWhy": "HTTP 404",
+   "nextTryAt": "2026-08-22",
+   "status": ""
+  },
+  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-%EA%B3%B5%EC%A7%80%20%EA%B3%B5%EC%A7%80%202026-2%ED%95%99%EA%B8%B0%20%EB%B3%B5%EC%A7%80%EC%9E%A5%ED%95%992(%EB%A9%B4%ED%95%99)%20%EC%9E%A5%ED%95%99%20%EC%95%88%EB%82%B4%202026.08.1": {
+   "attempts": 0,
+   "title": "공지 공지 2026-2학기 복지장학2(면학) 장학 안내 2026.08.13. 조회 210",
+   "lastTried": "2026-08-21",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765782"
+  },
+  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-%EA%B3%B5%EC%A7%80%20%EA%B3%B5%EC%A7%80%202026-2%ED%95%99%EA%B8%B0%20%EB%8F%99%EA%B5%AD%EC%9D%B8%EC%9E%AC%EC%9C%A1%EC%84%B1%EC%9E%A5%ED%95%99%20%EC%84%A0%EB%B0%9C%20%EB%B0%8F%20%EA%B2%B0%EA%B3%BC%EB%B0%9C%ED%91%9C%20%EC%95%88%EB%82%B4%20202": {
+   "attempts": 0,
+   "title": "공지 공지 2026-2학기 동국인재육성장학 선발 및 결과발표 안내 2026.08.13. 조회 283",
+   "lastTried": "2026-08-21",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765781"
+  },
+  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-%EA%B3%B5%EC%A7%80%20%EA%B3%B5%EC%A7%80%202026-2%ED%95%99%EA%B8%B0%20%EA%B3%B5%EB%A1%9C%EC%9E%A5%ED%95%99A%2F%EA%B3%A0%EC%8B%9C%EC%9E%A5%ED%95%99A%2F%EA%B3%B5%EC%9D%B8%ED%9A%8C%EA%B3%84%EC%82%AC%EC%9E%A5%ED%95%99A%20%EC%8B%A0%EC%B2%AD%EC%95%88%EB%82%B4": {
+   "attempts": 0,
+   "title": "공지 공지 2026-2학기 공로장학A/고시장학A/공인회계사장학A 신청안내 2026.06.01. 조회 1434",
+   "lastTried": "2026-08-21",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764942"
+  },
+  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-%EA%B3%B5%EC%A7%80%20%EA%B3%B5%EC%A7%80%202026-1%ED%95%99%EA%B8%B0%20SOS%EB%91%90%EB%93%9C%EB%A6%BC%EC%9E%A5%ED%95%99%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4%202026.06.01": {
+   "attempts": 0,
+   "title": "공지 공지 2026-1학기 SOS두드림장학 신청 안내 2026.06.01. 조회 1420",
+   "lastTried": "2026-08-21",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764939"
+  },
+  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-%EA%B3%B5%EC%A7%80%20%EA%B3%B5%EC%A7%80%202026%EB%85%84%202%ED%95%99%EA%B8%B0%201%EC%B0%A8%20%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EA%B8%88%20%ED%95%99%EC%83%9D%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4(~6%2F2": {
+   "attempts": 0,
+   "title": "공지 공지 2026년 2학기 1차 국가근로장학금 학생 신청 안내(~6/22(월)) 2026.05.22. 조회 1449",
+   "lastTried": "2026-08-21",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764836"
+  },
+  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-%EA%B3%B5%EC%A7%80%20%EA%B3%B5%EC%A7%80%20%5B%ED%99%8D%EB%B3%B4%5D%202026-2%ED%95%99%EA%B8%B0%20%EA%B5%AD%EA%B0%80%EC%9E%A5%ED%95%99%EA%B8%88%201%EC%B0%A8%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4(~6%2F22": {
+   "attempts": 1,
+   "title": "공지 공지 [홍보] 2026-2학기 국가장학금 1차 신청 안내(~6/22(월)) 2026.05.19. 조회 1399",
+   "lastTried": "2026-08-21",
+   "lastWhy": "HTTP 404",
+   "nextTryAt": "2026-08-22",
+   "status": ""
+  },
+  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2679%202026%ED%95%99%EB%85%84%EB%8F%84%20%EC%9D%B4%EC%83%81%ED%98%B8.%EB%B0%95%EC%88%9C%EC%97%BD%20%EC%9E%A5%ED%95%99%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4%202026.08.13": {
+   "attempts": 0,
+   "title": "2679 2026학년도 이상호.박순엽 장학 선발 안내 2026.08.13. 조회 418",
+   "lastTried": "2026-08-21",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765783"
+  },
+  "r:auto-bb09c20ec9588eb82b482f17": {
+   "attempts": 0,
+   "title": "2026학년도 2학기 월드머시코리아장학생 선발 안내(~8/17(월))",
+   "lastTried": "2026-08-21",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765770"
+  },
+  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-%EA%B3%B5%EC%A7%80%20%EA%B3%B5%EC%A7%80%20%5B%ED%99%8D%EB%B3%B4%5D%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EC%A3%BC%EA%B1%B0%EC%95%88%EC%A0%95%EC%9E%A5%ED%95%99%EA%B8%88%201%EC%B0%A8%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4(": {
+   "attempts": 1,
+   "title": "공지 공지 [홍보] 2026학년도 2학기 주거안정장학금 1차 신청 안내(~6/22(월)) 2026.05.18. 조회 958",
+   "lastTried": "2026-08-21",
+   "lastWhy": "목록에서 못 찾음",
+   "nextTryAt": "2026-08-22",
+   "status": ""
+  },
+  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-%EA%B3%B5%EC%A7%80%20%EA%B3%B5%EC%A7%80%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EC%9B%94%EB%93%9C%EB%A8%B8%EC%8B%9C%EC%BD%94%EB%A6%AC%EC%95%84%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4(~8%2F17": {
+   "attempts": 1,
+   "title": "공지 공지 2026학년도 2학기 월드머시코리아장학생 선발 안내(~8/17(월)) 2026.08.13. 조회 494",
+   "lastTried": "2026-08-21",
+   "lastWhy": "목록에서 못 찾음",
+   "nextTryAt": "2026-08-22",
+   "status": ""
+  },
+  "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EC%84%9C%EC%9A%B8%20%5B%EC%84%9C%EC%9A%B8C%5D%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EC%9A%B0%EB%8D%95%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4(~8%2F2": {
+   "attempts": 0,
+   "title": "서울 [서울C] 2026학년도 2학기 우덕재단 장학생 선발 안내(~8/25일 까지)",
+   "lastTried": "2026-08-21",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322821"
+  },
+  "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%20%E2%AD%90%EC%A4%91%EC%9A%94%E2%AD%90%202026-2%ED%95%99%EA%B8%B0%20%EA%B5%AD%EA%B0%80%EC%9E%A5%ED%95%99%EA%B8%88(2%EC%B0%A8)%20%EB%B0%8F%20%EB%B3%B5%ED%95%99%EC%83%9D%20%EC%9A%B0%EC%A0%95%EC%9E%A5%ED%95%99(%EA%B0%80%EA%B3%84": {
+   "attempts": 0,
+   "title": "공통 ⭐중요⭐ 2026-2학기 국가장학금(2차) 및 복학생 우정장학(가계곤란) 신청 안내",
+   "lastTried": "2026-08-21",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322808"
+  },
+  "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%202026%EB%85%84%EB%8F%84%20%EC%84%B8%EC%A2%85%EC%97%B0%EA%B5%AC%EC%9B%90%20%EC%84%B8%EC%A2%85%EC%9D%B4%EB%8F%84%EC%9D%B8%EC%9E%AC%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EC%95%88%EB%82%B4": {
+   "attempts": 0,
+   "title": "공통 2026년도 세종연구원 세종이도인재장학금 장학생 모집 안내",
+   "lastTried": "2026-08-21",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=321881"
+  },
+  "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B5%AD%EC%A0%9C%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EA%B2%BD%ED%9D%AC%EC%9D%B8%ED%84%B4%EC%9E%A5%ED%95%99%20%EB%AA%A8%EC%A7%91%20%EA%B3%B5%EA%B3%A0": {
+   "attempts": 0,
+   "title": "국제 2026학년도 2학기 경희인턴장학 모집 공고",
+   "lastTried": "2026-08-21",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322775"
+  },
+  "n:https://www.uos.ac.kr/korNotice/list.do?list_id=FA1#n-%5B%EB%A7%88%EA%B0%90%5D%5B%EB%B9%85%EB%8D%B0%EC%9D%B4%ED%84%B0%ED%98%81%EC%8B%A0%EC%9C%B5%ED%95%A9%EB%8C%80%ED%95%99%EC%82%AC%EC%97%85%EB%8B%A8%5D%202026%ED%95%99%EB%85%84%EB%8F%84%201%ED%95%99%EA%B8%B0%20%EC%84%B1%EA%B3%BC%ED%98%95%20%EC%9E%A5%ED%95%99%EA%B8%88(": {
+   "attempts": 0,
+   "title": "[마감][빅데이터혁신융합대학사업단] 2026학년도 1학기 성과형 장학금(자격증) 신청 안내",
+   "lastTried": "2026-08-21",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31133&sort=57&pageIndex=5&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&"
+  },
+  "n:https://www.yonsei.ac.kr/bbs/sc/58/943930/artclView.do": {
+   "patrolledAt": "2026-08-21",
+   "lastWhy": ""
+  },
+  "n:https://www.yonsei.ac.kr/bbs/sc/58/943928/artclView.do": {
+   "patrolledAt": "2026-08-21",
+   "lastWhy": "제목 불일치(다른 글이 열림)"
+  },
+  "n:https://www.yonsei.ac.kr/bbs/sc/58/943919/artclView.do": {
+   "patrolledAt": "2026-08-21",
+   "lastWhy": ""
+  },
+  "n:https://dep.hufs.ac.kr/bbs/student/2431/263613/artclView.do": {
+   "patrolledAt": "2026-08-21",
+   "lastWhy": ""
+  },
+  "n:https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=155476&article.offset=0&articleLimit=10&noCat=501": {
+   "patrolledAt": "2026-08-21",
+   "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)"
+  },
+  "n:https://www.hongik.ac.kr/kr/education/notice-undergrad.do?mode=view&articleNo=155441&noCat=24": {
+   "patrolledAt": "2026-08-21",
+   "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)"
+  },
+  "n:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=%ED%95%9C%EA%B5%AD%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%E3%80%8C2026%EB%85%84-%EC%9E%A5%ED%95%99%EA%B8%88-%EB%B6%80%EC%A0%95%EC%88%98%EA%B8%89-%EC%9E%90%EC%A7%84%EC%8B%A0%EA%B3%A0-%EC%BA%A0%ED%8E%98&keyword=%EC%9E%A5%ED%95%99": {
+   "patrolledAt": "2026-08-21",
+   "lastWhy": ""
+  },
+  "n:https://kau.ac.kr/kaulife/scholnoti.php?searchkey=&searchvalue=&code=s1301&page=&mode=read&seq=11058": {
+   "patrolledAt": "2026-08-21",
+   "lastWhy": "제목 불일치(다른 글이 열림)"
+  },
+  "n:https://kau.ac.kr/kaulife/scholnoti.php?searchkey=&searchvalue=&code=s1301&page=&mode=read&seq=11056": {
+   "patrolledAt": "2026-08-21",
+   "lastWhy": ""
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30088&pageNo=1": {
+   "patrolledAt": "2026-08-21",
+   "lastWhy": "page.goto: Timeout 20000ms exceeded."
   }
  }
 }
