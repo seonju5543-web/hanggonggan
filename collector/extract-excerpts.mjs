@@ -124,6 +124,10 @@ function markerOf(line) {
 /* 이 절 머리글이 여전히 '누가 받을 수 있나'를 말하면 이어서 읽는다.
    '나. 장학생 선발' / '1) 선발기준' 아래에 실제 요건이 이어지는 공고가 있다(유흥수 장학금). */
 const STILL_QUALIFY = /(자격|대상자?|요건|기준)\s*$|(신청|지원|선발|모집|추천)\s?(자격|대상)|장학생\s?선발|선발\s?기준/;
+/* 🔴 그런데 **'우선선발'은 예외다** — 자격이 아니라 자격을 갖춘 사람 중 누구를 먼저 뽑나이다.
+   `선발 기준`에 걸려 "여전히 자격 이야기"로 판정되는 바람에 자격 절이 안 끝나고
+   우선순위 항목이 통째로 요건 자리에 앉았다(목포향우회 — 진짜 자격은 한 줄뿐인데 5줄이 떴다). */
+const PRIORITY_PICK = /우선\s?선발|우선\s?순위/;
 
 /* 표 머리글·표 안의 값 — 요건이 아니라 표를 이루는 부속이라 버린다 */
 const TABLE_NOISE = new RegExp([
@@ -279,7 +283,7 @@ function extractQualifyLines(text) {
        그래서 시작 줄의 번호 종류를 기억해 두고 **같은 종류를 만났을 때만** 끊는다.
        숫자는 순서까지 본다 — `3. 신청자격` 아래의 `1)` `2)`는 하위 항목이고 `4.`가 다음 절이다.
        시작 줄에 번호가 없으면(`■ 신청자격` 등) 예전처럼 길이로 재되 문턱을 낮춰 둔다. */
-    if (i > start && SECTION_HEAD.test(l) && !STILL_QUALIFY.test(l)) {
+    if (i > start && SECTION_HEAD.test(l) && (!STILL_QUALIFY.test(l) || PRIORITY_PICK.test(l))) {
       const mk = markerOf(l);
       if (startMark.kind) {
         if (mk.kind === startMark.kind
