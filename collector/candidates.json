@@ -1,8 +1,17 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
- "updatedAt": "2026-08-22",
- "count": 1840,
+ "updatedAt": "2026-08-23",
+ "count": 1841,
  "items": [
+  {
+   "title": "[한국장학재단] 2026년 장학금 부정수급 자진신고 캠페인 안내",
+   "url": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2467&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "강원대학교",
+   "campus": "",
+   "foundAt": "2026-08-22"
+  },
   {
    "title": "2026학년도 2학기 국가근로장학사업 관련 절차 및 선발 여부 확인 방법 등 안내",
    "url": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2514862&code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",

@@ -1,6 +1,6 @@
-## 🤖 장학공고 수집 리포트 (2026-08-22)
+## 🤖 장학공고 수집 리포트 (2026-08-23)
 
-새로 발견한 공고: **9건** — 앱의 '실시간 공고'에는 즉시 표시되며(링크 연결만), 맞춤 매칭·양식 작성 지원 등록은 아래에서 컨펌해 주세요.
+새로 발견한 공고: **1건** — 앱의 '실시간 공고'에는 즉시 표시되며(링크 연결만), 맞춤 매칭·양식 작성 지원 등록은 아래에서 컨펌해 주세요.
 
 > 컨펌 방법: 채팅에 "이슈 #N에서 ○○ 정식 등록해줘"라고 말씀해 주시면 자격요건·금액·마감일·첨부 양식을 스키마로 정리해 등록합니다.
 
@@ -42,12 +42,6 @@
 
 ### 건국대학교
 상태: ✅ 정상 (실공고 30건 감지)
-- [[교외][생활비] 2026학년도 한국산업기술진흥원 한미 첨단분야 청년교류 지원사업 제6기 장학생 선발 공고](https://www.konkuk.ac.kr/bbs/konkuk/235/1204186/artclView.do)
-- [[교외] 2026학년도 광산장학회 장학생 선발 공고(8. 24. ~ 9. 18.)](https://www.konkuk.ac.kr/bbs/konkuk/235/1204185/artclView.do)
-  - 📎 [공문_붙임) (공고)2026년도 (재)광산장학회 장학생 선발계획 공고.pdf](https://www.konkuk.ac.kr/bbs/konkuk/235/1224160/download.do)
-  - 📎 [공문_붙임) 2026년도 (재)광산장학회 장학생 신청서 및 구비서류 서식.hwpx](https://www.konkuk.ac.kr/bbs/konkuk/235/1224161/download.do)
-- [[교외][생활비] 2026학년도 2학기 경원장학재단 장학생 선발 안내(8. 19. ~ 9. 30.)](https://www.konkuk.ac.kr/bbs/konkuk/235/1204187/artclView.do)
-  - 📎 [제7기 경원장학재단 장학생 선발 안내 공고문.pdf](https://www.konkuk.ac.kr/bbs/konkuk/235/1224162/download.do)
 
 ### 동국대학교
 상태: 🟡 접속은 되지만 실공고를 찾지 못함 — 공지 목록 페이지인지 확인 필요
@@ -87,17 +81,6 @@
 
 ### 이화여자대학교
 상태: ✅ 정상 (실공고 20건 감지)
-- [[학부] 2026학년도 제2학기 국가근로장학금 희망근로지 신청 안내(2차)](https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366384&article.offset=0&articleLimit=10)
-  - ⏰ 신청기간 2026.09.07 ~ 2026.09.13 조회 55 2026년도 2학기 희망근로지 신청 매뉴얼_모바일앱.
-  - 📎 [2026년도 2학기 희망근로지 신청 매뉴얼_모바일앱.pdf](https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366384&attachNo=352567)
-  - 📎 [2026년도 2학기 희망근로지 신청 매뉴얼_홈페이지.pdf](https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366384&attachNo=352568)
-- [[학부] 2026년도 손태희장학재단 장학생 선발 안내](https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366404&article.offset=0&articleLimit=10)
-  - ⏰ 신청기간 2026.08.24 ~ 2026.09.08 조회 23 2026년 손태희장학재단 4기 장학생 선발 공고문.p
-  - 📎 [2026년 손태희장학재단 4기 장학생 선발 공고문.pdf](https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366404&attachNo=352581)
-  - 📎 [2026년 손태희장학재단 4기 장학생 서식.hwpx](https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366404&attachNo=352583)
-- [[학부] 2026년도 「세종이도인재장학금」 핵심인재육성 특기적성 분야 장학금 신청 안내](https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366399&article.offset=0&articleLimit=10)
-  - ⏰ 신청기간 2026.08.21 ~ 2026.09.30 조회 17 2026 장학생 선발 공고문 (3).zip 2026년
-  - 📎 [2026 장학생 선발 공고문 (3).zip](https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366399&attachNo=352579)
 
 ### 인하대학교
 상태: ✅ 정상 (실공고 47건 감지)
@@ -134,18 +117,9 @@
 
 ### 전북대학교
 상태: ✅ 정상 (실공고 12건 감지)
-- [2026년도 (재)광산장학회 장학생 선발 안내](https://www.jbnu.ac.kr/web/Board/216446/detailView.do?category=6)
-  - ⏰ 신청기간 : 2026. 8. 24.(월) ~ 9. 18.(금) 까지 2. 선발대상 : 공고일('26. 8. 24)
-- [2026학년도 2학기 대학원 및 대학 보훈(가족)장학 신청 안내](https://www.jbnu.ac.kr/web/Board/216445/detailView.do?category=6)
-  - ⏰ 신청기간: 2026. 9. 1.(화)~9. 30.(수) 2. 신청대상 및 자격 &nbsp;장학구분 신청대상 및 자격
 
 ### 충남대학교
 상태: ✅ 정상 (실공고 8건 감지)
-- [2026학년도 2학기 국가근로장학사업 관련 절차 및 선발 여부 확인 방법 등 안내](https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2514862&code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=)
-  - 📎 [대학(원)별 훈련일정](https://plus.cnu.ac.kr/Upl/kr/20200818_2.hwp)
-  - 📎 [마이크로디그리과정](https://plus.cnu.ac.kr/html/kr/26file/2026_di_2010.pdf)
-  - 📎 [붙임. 2026학년도 2학기 국가근로장학사업 관련 절차 및 선발 여부 확인 방법 안내문.pdf](https://plus.cnu.ac.kr/_prog/_board/common/download.php?code=sub07_0713&ntt_no=2514862&atch_no=1)
-  - 📎 [학교홈페이지관리규정](https://plus.cnu.ac.kr/Upl/kr/2025_homepage_3020.hwp)
 
 ### 전남대학교
 상태: ✅ 정상 (실공고 18건 감지)
@@ -160,11 +134,12 @@
 상태: ✅ 정상 (실공고 17건 감지)
 
 ### 강원대학교
-상태: ✅ 정상 (실공고 11건 감지)
+상태: ✅ 정상 (실공고 12건 감지)
+- [[한국장학재단] 2026년 장학금 부정수급 자진신고 캠페인 안내](https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2467&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0)
 
 ### 🚨 연속 실패 — 게시판 주소 확인 필요
 한 번은 일시 장애지만 3회 연속이면 주소가 바뀐 것입니다. 해당 학교 학생 화면에 새 공고가 안 들어옵니다.
-- 가천대학교 (25회 연속) — 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요
+- 가천대학교 (27회 연속) — 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요
 
 ### 📄 목록 2페이지 이후에서 더 읽은 게시판
 1페이지만 읽던 시절에는 상단 고정 공지에 밀린 실공고가 영영 안 잡혔습니다.
@@ -181,13 +156,12 @@
 ⚙️ 설정: `collector/schools.json` · 발행: `data/notices.json` · 로봇: `collector/collect.mjs`
 **⏳ 스키마화 대기 중 39건** (원본 확보됨 — collector/pending-forms.json)
 
-### 🤖 자동 등록 (선조치후보고) — 1건 등록
+### 🤖 자동 등록 (선조치후보고) — 0건 등록
 
-자동 등록분은 앱에 **자동 등록 · 검수 전** 배지로 표시돼요. 잘못 등록된 건이 있으면 채팅으로 알려주시거나 `collector/auto-register-config.json`의 `blockIds`에 id를 넣어주세요.
+이번 실행에서 자동 등록 기준(개별 실공고·미등록·마감 전)을 전부 통과한 공고가 없어요.
 
-- `auto-pnoticedoarticleno366399` [[학부] 2026년도 「세종이도인재장학금」 핵심인재육성 특기적성 분야 장학금 신청 안내](https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366399&article.offset=0&articleLimit=10) · 마감 2026-09-30 · 이화여자대학교
-
-**컨펌 대기 (자동 기준 미달 104건)** — 장학 신호는 있지만 선발·모집 신호가 약해요:
+**컨펌 대기 (자동 기준 미달 105건)** — 장학 신호는 있지만 선발·모집 신호가 약해요:
+- [한국장학재단] 2026년 장학금 부정수급 자진신고 캠페인 안내 (선발·모집·신청 신호 없음 — 개발자 컨펌 대기)
 - [교외][생활비] 2026학년도 2학기 경원장학재단 장학생 선발 안내(8. 19. ~ 9. 30.) (타교 등록분과 동일 사업(2026학년도 2학기 해성문화재단 장학생 선) — 접수분 여부 컨펌 대기)
 - 2686 [불교대학] 2026학년도 2학기 불교대학(원) 학사운영실 국가근로장학생 추가모집 안내(~8. 25 (타교 등록분과 동일 사업(하계방학 국가근로장학생 추가모집 3차 (가천) — 접수분 여부 컨펌 대기)
 - [국가근로] 2026학년도 2학기 국가근로장학금 희망근로지 1차 신청 안내 (신촌캠퍼스) (타교 등록분과 동일 사업(국가근로장학금 희망근로지 신청 1차 (이화여) — 접수분 여부 컨펌 대기)
@@ -197,4 +171,3 @@
 - 공통 2026년도 제7기 경원장학재단 장학생 선발 안내 (타교 등록분과 동일 사업(양영재단 장학생 선발 (이화여대, 2026-) — 접수분 여부 컨펌 대기)
 - 공통 2026년 2학기 제24기 후기 삼원장학생 선발 안내 (타교 등록분과 동일 사업(2026-2학기 제 24기 후기 삼원장학생 ) — 접수분 여부 컨펌 대기)
 - 공통 2026년도 손태희장학재단 장학생 선발 안내 (타교 등록분과 동일 사업(양영재단 장학생 선발 (이화여대, 2026-) — 접수분 여부 컨펌 대기)
-- 공통 2026년 장학금 부정수급 자진신고 캠페인 안내(2026.8.10.(월) ~ 10.9.(금)) (선발·모집·신청 신호 없음 — 개발자 컨펌 대기)
