@@ -3855,7 +3855,8 @@
    "noForm": "검수 완료 2026-08-02 — 원문 첨부에 채울 신청서 양식 없음(있으면 다음 수집이 스키마화)",
    "attachments": [],
    "sourceUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12160/view.do?currentPageNo=1",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "aiTries": 1
   },
   {
    "id": "auto-notice7doarticleno886181",
@@ -3921,7 +3922,8 @@
    "noForm": "검수 완료 2026-08-02 — 원문 첨부에 채울 신청서 양식 없음(있으면 다음 수집이 스키마화)",
    "attachments": [],
    "sourceUrl": "https://www.sogang.ac.kr/ko/detail/550408?bbsConfigFk=141&namepage=ScholarshipNotice",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "aiTries": 1
   },
   {
    "id": "auto-sogangackrkodetail550406",
