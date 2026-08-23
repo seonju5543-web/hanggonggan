@@ -1440,6 +1440,11 @@ console.log('\n■ AI 자격 읽기 안전장치 (2026-08-20)');
   eq('  그림은 image 블록으로 보낸다', /type: 'image', source:/.test(src), true);
   eq('    PDF 는 document 블록 그대로', /type: 'document', source:/.test(src), true);
   eq('    출처를 그림/PDF 로 갈라 남긴다', /'AI\(공고 포스터 그림\)'/.test(src), true);
+  /* 🔴 API 는 이미지 한 변을 8,000픽셀까지만 받는다. 학교 포스터는 인쇄용 원본을
+     그대로 올려 이 한계를 자주 넘는다 — 한미 첨단분야가 5906×8268이라 400 이 났다. */
+  eq('    8,000픽셀을 넘는 포스터는 줄여서 보낸다', /> 7800/.test(src), true);
+  const wf = fs.readFileSync(new URL('../.github/workflows/eligibility-fill.yml', import.meta.url), 'utf8');
+  eq('      줄이는 도구가 워크플로에 설치된다', /npm i @anthropic-ai\/sdk sharp/.test(wf), true);
   const dfx = fs.readFileSync(new URL('../collector/deepfetch.mjs', import.meta.url), 'utf8');
   eq('  본문 그림도 내려받는다 (이름 규칙에는 안 걸린다)', /a\.bodyImage && IMG_EXT\.test/.test(dfx), true);
 

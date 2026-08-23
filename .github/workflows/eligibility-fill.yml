@@ -104,7 +104,9 @@ jobs:
 
       - name: SDK 설치
         if: inputs.mode != '미리보기만'
-        run: npm i @anthropic-ai/sdk --no-audit --no-fund --silent
+        # sharp 는 큰 포스터를 줄이는 데 쓴다 — API 는 한 변 8,000픽셀까지만 받는데
+        # 학교 포스터는 인쇄용 원본을 그대로 올려 이 한계를 자주 넘는다(실측 5906×8268).
+        run: npm i @anthropic-ai/sdk sharp --no-audit --no-fund --silent
 
       # ③ 시범 3건 — 전수 전에 작게 해 본다. 소넷 기준 50원쯤.
       # 공고 하나만 — 구조 소실(갈래)은 '이미 자격이 뜨는' 공고 쪽에 있어서

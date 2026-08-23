@@ -315,8 +315,25 @@ async function askPdf(item, path, kind) {
   if (process.env.ELIG_AI_FAKE) return JSON.parse(fs.readFileSync(process.env.ELIG_AI_FAKE, 'utf8'));
   const { default: Anthropic } = await import('@anthropic-ai/sdk');
   const client = new Anthropic();
-  const b64 = fs.readFileSync(path).toString('base64');
-  const ext = (path.match(/\.([a-z0-9]+)$/i) || [, 'pdf'])[1].toLowerCase();
+  let buf = fs.readFileSync(path);
+  let ext = (path.match(/\.([a-z0-9]+)$/i) || [, 'pdf'])[1].toLowerCase();
+  /* 🔴 **한 변이 8,000픽셀을 넘으면 API가 400을 낸다** (실측 2026-08-23:
+     한미 첨단분야 포스터가 5906×8268이라 세로가 초과 → `At least one of the image
+     dimensions exceed max allowed size: 8000 pixels`).
+     학교 포스터는 인쇄용 원본을 그대로 올리는 일이 흔해서 이 한계를 자주 넘는다.
+     줄여서 보낸다 — 글자를 읽는 일이라 7,000픽셀이면 충분하고도 남는다. */
+  if (kind === 'image') {
+    try {
+      const sharp = (await import('sharp')).default;
+      const meta = await sharp(buf).metadata();
+      if (Math.max(meta.width || 0, meta.height || 0) > 7800) {
+        buf = await sharp(buf).resize({ width: 7000, height: 7000, fit: 'inside' }).png().toBuffer();
+        ext = 'png';
+        log(`  · ${item.name.slice(0, 24)} — 포스터가 ${meta.width}×${meta.height}라 줄여서 보냅니다`);
+      }
+    } catch (e) { log(`  · 그림 크기 조정 못 함(${String(e.message).slice(0, 60)}) — 원본 그대로 보냅니다`); }
+  }
+  const b64 = buf.toString('base64');
   /* PDF 는 문서 블록, 그림은 이미지 블록으로 보낸다 — 형태가 다르면 400 이 난다 */
   const doc = kind === 'image'
     ? { type: 'image', source: { type: 'base64', media_type: MEDIA[ext] || 'image/png', data: b64 } }
