@@ -189,12 +189,28 @@ for (const t of targets) {
       /* 이름 앞의 번호(`1. `)와 `미리보기` 꼬리를 떼고 비교한다 — 안 그러면
          `1. ○○.hwp`와 `○○.hwp`가 다른 첨부로 보여 같은 파일이 두 번 쌓인다(실측). */
       const norm = (n) => String(n || '').replace(/\s*미리보기\s*$/, '').replace(/^\d+\.\s*/, '').trim();
+      /* 🔴 **본문이 이미지인 공고가 있다** (2026-08-23). `[홍보]`가 붙은 공고들은
+         글자 없이 포스터 그림만 올려 둔다 — innerText 로는 한 글자도 안 잡히니
+         '본문이 없다'로 보이지만 실제로는 **눈으로 읽을 내용이 있다.**
+         큰 그림만 담는다(가로·세로 300px 이상) — 아이콘·로고·버튼을 담으면
+         자격을 읽으라고 로고를 보내는 꼴이 된다. */
+      for (const f of page.frames()) {
+        const imgs = await f.$$eval('img', (els) => els
+          .filter((e) => e.naturalWidth >= 300 && e.naturalHeight >= 300)
+          .map((e) => ({ url: e.currentSrc || e.src, w: e.naturalWidth, h: e.naturalHeight }))).catch(() => []);
+        for (const im of imgs) {
+          if (!im.url || /^data:/.test(im.url)) continue;
+          const nm = `본문이미지-${im.w}x${im.h}.${(im.url.match(/\.(png|jpe?g|gif|webp)(\?|$)/i) || [, 'jpg'])[1]}`;
+          if (!found.some((x) => x.url === im.url)) found.push({ name: nm, url: im.url, bodyImage: true });
+        }
+      }
       const had = new Set((t.it.attachments || []).map((a) => norm(a.name)));
       const add = found.filter((a) => !had.has(norm(a.name)));
       if (add.length) {
         t.it.attachments = [...(t.it.attachments || []), ...add];
         regDirty = true;
-        report.push(`- 📎 ${t.it.name.slice(0, 36)} — 첨부 ${add.length}개를 새로 받아 적음: ${add.map((a) => a.name).join(' , ').slice(0, 90)}`);
+        const pic = add.filter((a) => a.bodyImage).length;
+        report.push(`- 📎 ${t.it.name.slice(0, 36)} — 첨부 ${add.length}개를 새로 받아 적음${pic ? ` (그중 **본문 그림 ${pic}장**)` : ''}: ${add.map((a) => a.name).join(' , ').slice(0, 90)}`);
       }
     } catch { /* 첨부를 못 걷어도 본문 저장은 계속한다 */ }
   } catch (e) {

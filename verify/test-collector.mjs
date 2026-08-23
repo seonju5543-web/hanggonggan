@@ -1273,6 +1273,11 @@ console.log('\n■ 껍데기 페이지와 브라우저 본문 (2026-08-20)');
      대안은 '브라우저를 더 잘 위장한다'가 아니라 '막히면 다른 길로 간다'이다. */
   eq('  봇 차단에 걸리면 일반 내려받기로 물러선다', /BOT_WALL\.test\(text\)/.test(rb), true);
   eq('    최종 주소로도 판정한다 (challenge 로 튕긴다)', /BOT_WALL\.test\(String\(finalUrl\)\)/.test(rb), true);
+  /* 🔴 `[홍보]` 계열 공고는 글자 없이 **포스터 그림만** 올려 둔다. innerText 로는 한 글자도
+     안 잡혀 '본문이 없다'로 보이지만 눈으로 읽을 내용은 있다. 큰 그림만 담는다 —
+     아이콘·로고를 담으면 자격을 읽으라고 로고를 보내는 꼴이 된다. */
+  eq('  본문이 그림뿐인 공고는 그림을 찾아 적는다', /naturalWidth >= 300/.test(rb), true);
+  eq('    아이콘·로고는 담지 않는다 (세로도 본다)', /naturalHeight >= 300/.test(rb), true);
 
   // 브라우저 수집기가 이미 그린 본문을 저장한다 (추가 페이지 열기 0회)
   const bc = fs.readFileSync(new URL('collector/browser-collect.mjs', root), 'utf8');
