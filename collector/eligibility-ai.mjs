@@ -317,19 +317,27 @@ async function askPdf(item, path, kind) {
   const client = new Anthropic();
   let buf = fs.readFileSync(path);
   let ext = (path.match(/\.([a-z0-9]+)$/i) || [, 'pdf'])[1].toLowerCase();
-  /* 🔴 **한 변이 8,000픽셀을 넘으면 API가 400을 낸다** (실측 2026-08-23:
-     한미 첨단분야 포스터가 5906×8268이라 세로가 초과 → `At least one of the image
-     dimensions exceed max allowed size: 8000 pixels`).
-     학교 포스터는 인쇄용 원본을 그대로 올리는 일이 흔해서 이 한계를 자주 넘는다.
-     줄여서 보낸다 — 글자를 읽는 일이라 7,000픽셀이면 충분하고도 남는다. */
+  /* 🔴 API 가 그림에 거는 한계는 **둘**이다 (실측 2026-08-23, 둘 다 400 으로 맞았다):
+       ① 한 변 8,000픽셀   — 한미 첨단분야 포스터가 5906×8268이라 걸렸다
+       ② 파일 10MB        — ①을 고치려고 7,000픽셀 PNG 로 다시 만들었더니 15MB 가 됐다
+     학교 포스터는 인쇄용 원본을 그대로 올리는 일이 흔해 ①을 자주 넘는다.
+     글자를 읽는 일이라 크기는 넉넉히 줄여도 된다 — A4 300dpi 가 2480×3508이므로
+     긴 변 3,500픽셀이면 인쇄물과 같은 선명도다. PNG 가 아니라 JPEG 로 내보낸다
+     (사진·그라데이션이 많은 포스터에서 PNG 는 몇 배로 부푼다). */
   if (kind === 'image') {
     try {
       const sharp = (await import('sharp')).default;
       const meta = await sharp(buf).metadata();
-      if (Math.max(meta.width || 0, meta.height || 0) > 7800) {
-        buf = await sharp(buf).resize({ width: 7000, height: 7000, fit: 'inside' }).png().toBuffer();
-        ext = 'png';
-        log(`  · ${item.name.slice(0, 24)} — 포스터가 ${meta.width}×${meta.height}라 줄여서 보냅니다`);
+      const tooBig = Math.max(meta.width || 0, meta.height || 0) > 7800 || buf.length > 9 * 1024 * 1024;
+      if (tooBig) {
+        for (const [side, q] of [[3500, 85], [2600, 80], [1800, 75]]) {
+          buf = await sharp(fs.readFileSync(path))
+            .resize({ width: side, height: side, fit: 'inside', withoutEnlargement: true })
+            .jpeg({ quality: q }).toBuffer();
+          if (buf.length <= 9 * 1024 * 1024) break;
+        }
+        ext = 'jpg';
+        log(`  · ${item.name.slice(0, 24)} — 포스터 ${meta.width}×${meta.height} → ${Math.round(buf.length / 1024)}KB 로 줄여 보냅니다`);
       }
     } catch (e) { log(`  · 그림 크기 조정 못 함(${String(e.message).slice(0, 60)}) — 원본 그대로 보냅니다`); }
   }
@@ -382,8 +390,12 @@ if (!process.env.ELIG_AI_AS_LIB) {
   /* `--all` = 169건 전수(구조 소실은 이미 뜨는 카드에 있다). 기본은 못 읽은 것만. */
   const ALL = process.argv.includes('--all');
   const ONLY = (process.argv.find((a) => a.startsWith('--only=')) || '').slice(7) || null;
-  const targets = pickTargets(reg.items, ALL, ONLY).filter((t) => t.lines.length);
-  log(ONLY ? `대상 ${targets.length}건 — 지정(${ONLY})`
+  /* `--docs-only` — 첨부(공고문 PDF·포스터 그림)만 읽는다. 지정 실행을 여러 번 띄우면
+     서로의 registered.json 을 덮어쓴다(실측). 한 번에 끝내는 길이 필요하다. */
+  const DOCS_ONLY = process.argv.includes('--docs-only');
+  const targets = DOCS_ONLY ? [] : pickTargets(reg.items, ALL, ONLY).filter((t) => t.lines.length);
+  log(DOCS_ONLY ? '첨부(공고문 PDF·포스터 그림)만 읽습니다'
+    : ONLY ? `대상 ${targets.length}건 — 지정(${ONLY})`
     : ALL ? `대상 ${targets.length}건 — 전수(--all)`
     : `대상 ${targets.length}건 (무료 경로가 못 읽었고 원문은 있는 공고)`);
 
@@ -442,7 +454,7 @@ if (!process.env.ELIG_AI_AS_LIB) {
   }
   /* ── 공고문 PDF 경로 — 무료로 글자가 안 나오는 것만 (전수·지정 실행에서만 돈다) ── */
   let pdfGot = 0;
-  if (ALL || ONLY) {
+  if (ALL || ONLY || DOCS_ONLY) {
     for (const { it, path, file, kind } of pickPdfTargets(reg.items)) {
       if (ONLY && it.id !== ONLY) continue;
       let pick;

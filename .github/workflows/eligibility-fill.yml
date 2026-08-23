@@ -30,6 +30,7 @@ on:
           - '미리보기만'      # 돈 안 씀
           - '시범 3건만'
           - '공고 하나만'    # 아래 only 칸에 공고 id 를 적는다
+          - '첨부만'          # 공고문 PDF·포스터 그림만 읽는다 (본문이 '붙임 참조'뿐인 공고)
       only:
         description: "공고 하나만 돌릴 때 그 공고의 id (예: reg-dg-jongdan). 위에서 '공고 하나만'을 골랐을 때만 씁니다."
         type: string
@@ -111,6 +112,15 @@ jobs:
       # ③ 시범 3건 — 전수 전에 작게 해 본다. 소넷 기준 50원쯤.
       # 공고 하나만 — 구조 소실(갈래)은 '이미 자격이 뜨는' 공고 쪽에 있어서
       # 시범 3건(빈칸만 고름)으로는 영영 안 나온다. 한 건 확인에 전수를 쓸 이유가 없다.
+      # 본문이 '붙임 참조'뿐이고 내용이 공고문 PDF·포스터 그림에만 있는 공고들.
+      # 지정 실행을 여러 번 띄우면 서로의 registered.json 을 덮어쓰므로 한 번에 돈다.
+      - name: 첨부만 (공고문 PDF · 포스터 그림)
+        if: inputs.mode == '첨부만'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ELIG_AI_ENABLE: '1'
+        run: node collector/eligibility-ai.mjs --docs-only --write | tee /tmp/trial.txt
+
       - name: 공고 하나만
         if: inputs.mode == '공고 하나만'
         env:

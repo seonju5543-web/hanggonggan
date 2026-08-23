@@ -1443,6 +1443,10 @@ console.log('\n■ AI 자격 읽기 안전장치 (2026-08-20)');
   /* 🔴 API 는 이미지 한 변을 8,000픽셀까지만 받는다. 학교 포스터는 인쇄용 원본을
      그대로 올려 이 한계를 자주 넘는다 — 한미 첨단분야가 5906×8268이라 400 이 났다. */
   eq('    8,000픽셀을 넘는 포스터는 줄여서 보낸다', /> 7800/.test(src), true);
+  /* 🔴 한계는 **둘**이다 — 치수를 고치려고 큰 PNG 로 다시 만들었더니 15MB 가 돼
+     이번엔 파일 크기(10MB)에 걸렸다. 둘 다 봐야 한다. */
+  eq('    파일 10MB 한계도 함께 본다', /9 \* 1024 \* 1024/.test(src), true);
+  eq('    PNG 가 아니라 JPEG 로 내보낸다 (PNG 는 포스터에서 몇 배로 부푼다)', /\.jpeg\(\{ quality/.test(src), true);
   const wf = fs.readFileSync(new URL('../.github/workflows/eligibility-fill.yml', import.meta.url), 'utf8');
   eq('      줄이는 도구가 워크플로에 설치된다', /npm i @anthropic-ai\/sdk sharp/.test(wf), true);
   const dfx = fs.readFileSync(new URL('../collector/deepfetch.mjs', import.meta.url), 'utf8');
