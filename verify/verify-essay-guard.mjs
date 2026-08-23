@@ -220,6 +220,76 @@ head('12) 재료 모으기 — 검사와 프롬프트가 같은 글을 보는가
   ok(!m.includes('test-key'), '열쇠는 재료에 섞이지 않는다');
 }
 
+/* ─────────────────────────────────────────────────────────── */
+head('13) 앱 쪽 (essay.js) — 무엇을 재료로 모으는가');
+{
+  const vm = await import('node:vm');
+  const src = fs.readFileSync(fileURLToPath(new URL('../essay.js', import.meta.url)), 'utf8');
+
+  /* 화면을 흉내 낸다 — 학생이 여러 칸에 글을 쳐 넣은 상태 */
+  const values = {
+    'fq-growth': '아버지가 편찮으셔서 제가 생활비를 보태고 있습니다',   // 서술형(story)
+    'fq-vol': '지역아동센터 120시간',                                  // 서술형(fact) — 좋은 재료다
+    'fq-name': '홍길동',                                              // 짧은 입력 + auto 키 → 나가면 안 된다
+    'fq-account': '110-234-567890',                                   // 짧은 입력 + auto 키 → 나가면 안 된다
+    'fq-club': '코딩 동아리 회장',                                    // 짧은 입력, auto 키 없음 → 재료
+  };
+  const fakeDoc = {
+    getElementById: (id) => (values[id] != null ? { value: values[id] } : null),
+    querySelectorAll: () => [],
+  };
+  const plan = { secs: [{ items: [
+    { id: 'growth', type: 'textarea', kind: 'story', label: '성장과정', q: '성장과정' },
+    { id: 'vol', type: 'textarea', kind: 'fact', label: '봉사내역', q: '' },
+    { id: 'name', type: 'text', label: '성명' },
+    { id: 'account', type: 'text', label: '계좌번호' },
+    { id: 'club', type: 'text', label: '교외 활동' },
+  ] }] };
+
+  const ctx = {
+    console, document: fakeDoc,
+    ESSAY_CONFIG: { endpoint: 'https://x.workers.dev', label: 'AI 초안 만들기' },
+    state: { profile: { school: '한국외국어대학교', year: 3, major: '소프트웨어학과', name: '홍길동', gpa: 4.1, bracket: 4 } },
+    esc: (s) => String(s == null ? '' : s),
+    formPlanFor: () => plan,
+    /* 진짜 form-plan.js 와 같은 판정: 프로필로 채울 수 있는 자리에는 auto 키가 있다 */
+    formAutoKey: (f) => ({ name: 'name', account: 'account' }[f.id] || ''),
+  };
+  vm.createContext(ctx);
+  vm.runInContext(src, ctx);
+
+  const story = ctx.essayStoryFields(plan);
+  ok(story.length === 1 && story[0].id === 'growth',
+    '③ story 칸만 고른다 — fact 서술형(봉사내역)은 안 고른다');
+
+  const mats = ctx.essayMaterials(plan);
+  const ids = mats.map((m) => m.id);
+  ok(!ids.includes('name'), '④ 이름은 재료에 안 들어간다');
+  ok(!ids.includes('account'), '④ 계좌번호는 재료에 안 들어간다');
+  ok(ids.includes('vol'), '학생이 쓴 봉사 내역은 재료로 쓴다 — 자소서의 가장 좋은 재료다');
+  ok(ids.includes('club'), '프로필로 못 채우는 자유 입력은 재료로 쓴다');
+  ok(ids.includes('growth'), '학생이 쓴 서술형 답도 재료로 쓴다 (뜻을 살리려고)');
+
+  const prof = ctx.essayProfile();
+  ok(Object.keys(prof).join(',') === 'school,year,major',
+    '④ 나가는 프로필은 학교·학년·전공 셋뿐이다');
+  ok(!JSON.stringify(prof).includes('4.1') && !JSON.stringify(prof).includes('홍길동'),
+    '④ 성적·소득분위·이름은 프로필에 섞이지 않는다');
+
+  /* 서버가 다시 봐도 안전한가 — 앱이 모은 그대로 서버 검사에 넣어 본다 */
+  const built = { scholarship: { quotes: [] }, profile: prof, materials: mats, fields: [] };
+  const serverSees = scanOutgoing(built);
+  ok(serverSees.ok, '앱이 모은 재료는 서버 민감정보 검사도 통과한다', (serverSees.hits || []).join(', '));
+
+  /* 꺼져 있으면 버튼이 아예 없다 */
+  ctx.ESSAY_CONFIG.endpoint = '';
+  ok(ctx.essayButtonHtml({}) === '', '⑤ endpoint 가 비어 있으면 버튼이 안 나온다 — 기능이 꺼진다');
+  ctx.ESSAY_CONFIG.endpoint = 'https://x.workers.dev';
+  ok(ctx.essayButtonHtml({}).includes('btn-essay-ai'), '켜져 있고 도울 칸이 있으면 버튼이 나온다');
+  ok(ctx.essayStoryFields({ secs: [{ items: [{ id: 'a', type: 'textarea' }] }] }).length === 0,
+    '③ kind 가 없는 서술형은 안 고른다 — 애매할 때 안 건드리는 쪽');
+}
+
 globalThis.fetch = realFetch;
 console.log(`\n${fail ? '✗' : '✓'} AI 초안 안전장치 — 통과 ${pass} · 실패 ${fail}`);
 process.exit(fail ? 1 : 0);

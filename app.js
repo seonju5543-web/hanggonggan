@@ -712,6 +712,11 @@ function personLine(p) {
   return bits + (extra ? `\n${extra}` : '');
 }
 
+/* 🔴 이름 주의 — 이 함수는 **AI가 아니다.** 네트워크 호출이 0건인 고정 문장 조립기다.
+   2026-08-23까지 버튼 이름이 'AI 초안 만들기'였는데 학생은 AI가 써 준 줄 알고 눌렀다.
+   원칙 1(정직한 신청 상태)의 계열 문제라 이름을 '초안 문장 만들기'로 고쳤다.
+   진짜 AI 초안은 등록 양식 쪽(essay.js + server/essay/)에 붙어 있다 —
+   나중에 이 자유서식 도우미까지 그쪽으로 잇게 되면 그때 이름을 되돌릴 것. */
 function generateEssay(def, sch, p, ans, extra) {
   const gpaTxt = p.gpa != null ? `직전 학기 평점 ${p.gpa}/4.5` : '';
   const trackLabel = (TRACKS.find((t) => t.id === p.track) || {}).label || '';
@@ -757,7 +762,7 @@ function renderDocPrep() {
       <div class="sheet-handle"></div>
       <div class="sheet-body">
         <h3 class="sheet-title">서류 작성 도우미</h3>
-        <p class="sheet-provider">${sch.name} · 답을 선택하면 AI가 초안을 만들어드려요</p>
+        <p class="sheet-provider">${sch.name} · 답을 고르면 그 답으로 초안 문장을 엮어 드려요</p>
         ${docPrep.defs.map((def, di) => `
           <div class="dp-block">
             <h4>${def.doc}</h4>
@@ -773,7 +778,7 @@ function renderDocPrep() {
               <textarea class="dp-extra" data-def="${di}" rows="2" placeholder="넣고 싶은 문장을 자유롭게 적어주세요"></textarea>
             </label>
           </div>`).join('')}
-        <button class="btn btn-primary btn-lg" id="btn-dp-generate">AI 초안 만들기</button>
+        <button class="btn btn-primary btn-lg" id="btn-dp-generate">초안 문장 만들기</button>
       </div>`;
 
     $('#btn-dp-generate').addEventListener('click', () => {
@@ -840,9 +845,12 @@ function renderFormFill() {
         <h3 class="sheet-title">${tpl.unofficial ? '지원문서 작성 도우미' : '양식 작성 도우미'}</h3>
         <p class="sheet-provider">${esc(tpl.title)} · ${tpl.unofficial ? '자유 형식 제출 공고라 이 문서를 그대로 제출할 수 있어요' : '실제 공고 양식과 동일한 문서가 만들어져요'}</p>
         ${formQuestionsHtml(tpl)}
+        ${typeof essayButtonHtml === 'function' ? essayButtonHtml(tpl) : ''}
         <button class="btn btn-primary btn-lg" id="btn-ff-generate">양식 문서 만들기</button>
         <p class="dp-note">앱이 이미 아는 정보는 묻지 않고 채워요 — 위 '프로필에서 채웠어요'를 열어 확인·수정할 수 있어요.</p>
       </div>`;
+    /* AI 초안 버튼 — essay-config.js 의 endpoint 가 비어 있으면 버튼 자체가 없다 */
+    if (typeof essayBind === 'function') essayBind(tpl, sch);
     $('#btn-ff-generate').addEventListener('click', () => {
       formFill.ans = collectFormAnswers(tpl);
       /* '다음 신청서에도 쓸게요'를 켜 둔 항목은 프로필에 남긴다 —
