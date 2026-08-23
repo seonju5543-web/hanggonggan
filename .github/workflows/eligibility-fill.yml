@@ -80,6 +80,21 @@ jobs:
           echo "::notice::AI로 읽을 대상이 없습니다 — 원문이 없거나 이미 다 읽었습니다."
           exit 0
 
+      # 🔴 무료로 읽을 수 있는 것을 먼저 읽는다 — 이 저장소의 방식이다(양식 스키마화와 같은 순서).
+      #    본문이 "붙임 참조"뿐인 공고는 공고문 첨부(HWP·PDF)에 자격이 있다. 받아서 발췌하면
+      #    AI를 부를 것도 없이 풀린다. 실패해도 아래 AI 단계는 그대로 돈다.
+      - name: 공고문 첨부 받기 (무료)
+        if: inputs.mode != '미리보기만'
+        continue-on-error: true
+        timeout-minutes: 5
+        run: node collector/deepfetch.mjs --elig-attach
+
+      - name: 첨부에서 자격 발췌 (무료)
+        if: inputs.mode != '미리보기만'
+        continue-on-error: true
+        timeout-minutes: 5
+        run: node collector/extract-excerpts.mjs --write
+
       - name: SDK 설치
         if: inputs.mode != '미리보기만'
         run: npm i @anthropic-ai/sdk --no-audit --no-fund --silent
@@ -150,7 +165,11 @@ jobs:
         run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # 로봇이 고치는 파일은 전부 넣는다 (이슈 #79 — 빠뜨리면 조용히 버려진다).
+          # 공고문 첨부 원본과 그 색인이 안 저장되면 발췌가 다음 실행에 되살아나지 않는다.
           git add data/registered.json
+          [ -d collector/extracted ] && git add collector/extracted
+          true
           if ! git diff --cached --quiet; then
             git commit -m "자격 요건: AI가 공고 원문에서 구조로 읽음 (검수 전)"
             pushed=0
