@@ -198,12 +198,15 @@ async function ask(item, lines) {
   const { default: Anthropic } = await import('@anthropic-ai/sdk');
   const client = new Anthropic();
   const numbered = lines.map((l, i) => `${i}\t${l}`).join('\n');
+  /* 🔴 `fallbacks`(안전 거절 시 다른 모델로 넘기기)를 붙이지 말 것 —
+     `claude-sonnet-5` does not support the `fallbacks` parameter. 로 **400이 난다**(실측 2026-08-23).
+     그 파라미터는 Fable 5·Opus 5 전용이다. 지난 세션이 습관적으로 붙여 뒀는데
+     잔액이 없어 한 번도 안 걸렸고, 잔액을 채우자마자 3건이 전부 죽었다.
+     장학금 공고에서 자격 줄을 고르는 일에 안전 거절이 날 일도 없으므로 빼도 잃는 게 없다. */
   const stream = client.beta.messages.stream({
     model: cfg.model,
     max_tokens: 2000,
     system: SYSTEM,
-    betas: ['server-side-fallback-2026-07-01'],
-    fallbacks: 'default',
     output_config: { effort: cfg.effort, format: { type: 'json_schema', schema: SCHEMA } },
     messages: [{ role: 'user', content: `공고: ${item.name}\n\n----- 원문(줄 번호\\t내용) -----\n${numbered}` }],
   });
