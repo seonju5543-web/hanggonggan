@@ -283,7 +283,15 @@ export function pickPdfTargets(items) {
   for (const it of items) {
     if (it.program || requirementLines(it).length) continue;
     if ((it.aiTries || 0) >= (cfg.giveUpAfter ?? 3)) continue;
-    for (const f of (index[it.id] || {}).files || []) {
+    /* 🔴 **큰 그림을 고른다.** 파일 순서대로 첫 장을 집으면 머리말 배너(1002×551)를
+       골라 놓고 진짜 포스터(3368×4768)를 지나친다 — 실제로 그랬다.
+       PDF 가 있으면 PDF 가 먼저다(글자층이 남아 있을 수 있어 더 정확하다). */
+    /* 크기는 **파일 무게**로 잰다 — 저장할 때 이름이 `elig-슬러그-번호.확장자`로 바뀌어
+       원래 이름에 있던 가로×세로가 남지 않는다. 머리말 배너 39KB vs 포스터 2MB라 확실히 갈린다. */
+    const bytes = (f) => { try { return fs.statSync(new URL(`extracted/${f}`, HERE).pathname).size; } catch { return 0; } };
+    const files = [...((index[it.id] || {}).files || [])]
+      .sort((a, b) => (/\.pdf$/i.test(b) ? 1 : 0) - (/\.pdf$/i.test(a) ? 1 : 0) || bytes(b) - bytes(a));
+    for (const f of files) {
       /* PDF 와 **본문 그림**을 같이 본다 — `[홍보]` 계열은 글자 없이 포스터만 올려 두는데,
          그건 '본문이 없는 것'이 아니라 '눈으로 읽어야 하는 것'이다(2026-08-23). */
       const m = f.match(/\.(pdf|png|jpe?g|gif|webp)$/i);
