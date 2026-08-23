@@ -1344,6 +1344,23 @@ console.log('\n■ 자격 자리의 잡음을 유형별로 세는가 (2026-08-23
   eq('  배점·평가를 잡는다 (마일리지 산정기간)', /산정\\s\*\(기간/.test(kinds), true);
   eq('  일정·기한을 잡는다 (추천기한)', /'일정·기한'/.test(kinds), true);
   eq('  제외 대상을 잡는다', /'제외 대상/.test(kinds), true);
+
+  /* 🔴 **리포트가 아니라 관문이어야 재발이 끝난다** (개발자 질문: "왜 자꾸 재발하는거지?").
+     지금까지 잡음을 찾아내는 일이 개발자가 앱을 눈으로 보는 것뿐이었다. 이제 감사가
+     오류로 올리고, 수집 워크플로는 감사가 실패하면 그 실행분을 되돌린다 —
+     잡음이 섞인 데이터는 앱에 하루도 못 나간다. */
+  const aud = fs.readFileSync(new URL('../verify/audit-data.js', import.meta.url), 'utf8');
+  eq('감사가 자격 잡음을 오류로 올린다 (경고가 아니라)', /errors\.push\(`registered:\$\{it\.id\} — 지원 자격에 \[/.test(aud), true);
+  eq('  화면과 같은 함수로 본다 (감사만 통과하는 일이 없게)', /require\('\.\.\/match-engine\.js'\)/.test(aud), true);
+  eq('  글자가 상한 줄은 경고로 둔다 (버리면 진짜 요건을 잃는다)', /자격 줄의 글자가 상했습니다/.test(aud), true);
+
+  /* 화면 문 자체가 줄마다 '요건임'을 묻는가 — 이게 없으면 좋은 줄에 잡음이 얹혀 간다 */
+  const eng = fs.readFileSync(new URL('../match-engine.js', import.meta.url), 'utf8');
+  eq('화면 문이 줄마다 요건 신호를 확인한다', /if \(!REQ_SIGNAL\.test\(t\)\) continue;/.test(eng), true);
+  eq('  자격이 아닌 부류는 줄 단위로 버린다', /if \(NOT_A_REQUIREMENT\.test\(t\)\) continue;/.test(eng), true);
+  eq('  제외 대상은 버리지 않고 자리를 옮긴다', /if \(EXCLUDE_LINE\.test\(t\)\) continue;/.test(eng), true);
+  /* 제외·우선 블록에는 그 잣대를 대면 안 된다 — 대면 그 블록이 통째로 사라진다 */
+  eq('  제외·우선 블록에는 그 잣대를 대지 않는다', /opts\.loose \|\| opts\.keepPriority/.test(eng), true);
 }
 
 console.log('\n■ 링크 사냥꾼의 제목 대조 (2026-08-23)');

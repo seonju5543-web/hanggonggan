@@ -1218,7 +1218,7 @@ function openDetail(id) {
 
   /* 제외 대상 — '누가 받을 수 있나'만큼 '누가 못 받나'도 자격 정보다 (2026-08-03 개발자 지적).
      판정하지 않고 원문 그대로 보여 준다 — 해당 여부는 학생이 안다. */
-  const exLines = requirementLines(sch, sch.eligibilityExcludes || []);
+  const exLines = requirementLines(sch, sch.eligibilityExcludes || [], { loose: true });
   if (exLines.length) {
     reasonRows += `<li class="r-head">이런 경우는 제외돼요</li>`
       + exLines.map((e) => `<li class="r-req">${esc(e)}</li>`).join('');
