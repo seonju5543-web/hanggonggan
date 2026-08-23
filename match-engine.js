@@ -210,6 +210,9 @@ const NOT_A_REQUIREMENT = new RegExp([
   '(기한|기간)\\s*[:：]',                                   // 추천기한 : 2026년 10월 2일
   '우편\\s*도착분',
   '(만점|배점|가점|점수\\s*적용|반영\\s*비율)',              // Dream PATH 마일리지 점수 적용 : 70점 만점
+  /* 배점표의 한 행 — `학자금 지원구간 (40 점): …에 따라 평정`. 요건 낱말(구간)을 갖고 있어
+     통과 조건을 뚫는다. 괄호 안 점수 + '평정'이 배점표의 표지다 (2026-08-24) */
+  '\\(\\s*\\d{1,3}\\s*점\\s*\\)|따라\\s*평정|평정\\s*(기준|결과)',
   '산정\\s*(기간|방법|기준)\\s*$',                          // 마일리지 산정기간
   '평가\\s*(항목|비율)',
 ].join('|'));
@@ -263,7 +266,39 @@ const REQ_NOISE = new RegExp([
    보여서 지원할 수 있는 학생이 스스로 포기한다 — 목포향우회가 그랬다.
    ⚠️ 판정(✓/✗)은 하지 않는다. 충족해도 '된다'는 뜻이 아니라 '먼저 본다'는 뜻이라
    초록 체크를 달면 거짓 안심이 된다(제외 대상과 같은 규칙). */
-const PRIORITY_LINE = /우선\s?선발\s*[).\]]*\s*$|우선\s?선발\s?기준|우선\s?순위\s*[:：]|우대\s*[).\]]*\s*$/;
+/* 🔴 '우선선발'이라고 **써 있는 줄만** 잡으면 안 된다 (2026-08-24 개발자 지적 — 앱 열자마자 3건).
+   공고는 순위 기준을 그 낱말 없이 쓴다: `학년이 높은 학생` `누적 평균 평점이 높은 학생`
+   `학자금지원구간이 낮은 학생` `소득순위 순으로 선발` `성적상위자 우선 고려`.
+   이 줄들은 **요건 낱말(학년·성적·구간·소득)을 갖고 있어서** 통과 조건도 채점기도 뚫었다.
+   가르는 것은 낱말이 아니라 **말투**다 — 요건은 선(`3.0 이상`)을 긋고, 순위는 **비교**(`높은`)를 한다.
+   비교형은 충족 여부를 물을 수 없으므로 자격이 아니다. 버리지 않고 '먼저 뽑는 기준'으로 옮긴다.
+
+   ⚠️ 줄 **끝**에만 걸면 안 된다 — 처음에 그렇게 적었더니 채점기가 곧바로 셋을 더 찾아냈다:
+   `…평점평균이 높은 학생 우선` `…우수한 학생(타 장학금 미수혜 학생)` `…높은 학생을 순차적으로 선발`.
+   비교 표현은 문장 어디에나 온다. */
+const RANK_LINE = new RegExp([
+  '(높은|낮은|우수한|많은|좋은)\\s*(순|순서)?\\s*(학생|자|사람|가정|순)',
+  '순으로\\s*(선발|선정|지급|배정)|순차적으로\\s*선발',
+  '상위자|고득점자|성적순|점수순',
+  '우선\\s?(선발|고려|검토|배정|선정|순위|함|한다|시)|우선\\s*[).\\]]*\\s*$',
+  '우대\\s*[).\\]]*\\s*$',
+].join('|'));
+
+/* 🔴 같은 줄에 **진짜 커트라인**이 있으면 자격에 남긴다 — `평점 3.0 이상인 성적 우수한 학생`을
+   통째로 순위 블록에 보내면 3.0이라는 선이 사라진다. 순위를 걷어내려다 자격을 잃는 쪽이 더 나쁘다. */
+const HARD_THRESHOLD = /\d\s*(\.\d+)?\s*(점|학점|분위|구간|세|명)?\s*(이상|이하|미만|초과|이내)/;
+const PRIORITY_LINE = new RegExp(`우선\\s?선발\\s?기준|우선\\s?순위\\s*[:：]|${RANK_LINE.source}`);
+
+/* 🔴 제출서류가 **수량을 달고** 온다 — `학자금 지원구간 확인서 1 부` `주민등록등본 각 1통`.
+   서류 규칙(REQ_NOISE)이 '서류 이름으로 끝날 때만' 버리게 돼 있어 `1 부` 꼬리에 그대로 뚫렸다.
+   수량으로 끝나는 줄은 세는 물건, 곧 제출물이다(`재학생 2명`은 '명'이라 여기 안 걸린다). */
+const DOC_COUNT_TAIL = /\d+\s*(부|통|매|장)\s*(\([^)]*\))?\s*$/;
+
+/* 🔴 절 제목을 버리고 나면 **자식 줄이 혼자 남아** 무슨 절에 속했는지 아무도 모른다 —
+   그래서 서류 목록·자기소개 항목이 "학생으로 끝나는 문장"으로만 보인다(위 세 건의 공통 뿌리).
+   제목을 읽고 **그 뒤를 통째로** 자격 아님으로 본다. 다시 자격 제목이 나오면 되돌아온다. */
+const NON_ELIG_SECTION = /^(필수|공통|추가|기타|구비|첨부|제출)?\s*(제출|구비|첨부)?\s*서류\s*[:：]?\s*$|^자기소개서?\s*[:：]?\s*$/;
+const ELIG_SECTION = /(신청|지원|응모|선발|모집|추천)?\s*(자격|대상|요건)\s*[:：]?\s*$/;
 
 function tidyRequirement(line) {
   return String(line || '')
@@ -367,12 +402,22 @@ function requirementLines(sch, lines, opts) {
     else joined.push(s);
   }
   const out = [];
+  const moved = [];   // 순위로 옮긴 줄 — 자격이 통째로 비면 되돌린다 (아래)
+  let inNonElig = false;   // 지금 읽는 줄이 '제출서류'·'자기소개' 절 안인가 (위 주석)
   for (const l of joined) {
     const t = tidyRequirement(l);
+    if (NON_ELIG_SECTION.test(t)) { inNonElig = true; continue; }
+    if (ELIG_SECTION.test(t)) inNonElig = false;
+    if (inNonElig && !loose) continue;
     // 다듬은 뒤에 검사한다 — "3 ) 금 액 : …"은 번호를 떼야 '금액' 줄인 것이 드러난다
     if (REQ_NOISE.test(l.trim()) || REQ_NOISE.test(t)) continue;
+    if (!loose && DOC_COUNT_TAIL.test(t)) continue;
     if (NOT_REQ_RE.test(t) || isTableCell(t)) continue;
-    if (!keepPriority && PRIORITY_LINE.test(t)) continue;   // 자격 블록에서는 뺀다 (위 주석)
+    const ranks = PRIORITY_LINE.test(t) && !HARD_THRESHOLD.test(t);
+    if (!keepPriority && ranks) { moved.push(t); continue; }   // 자격 블록에서는 뺀다 (위 주석)
+    /* 자격 줄 안에 섞여 있던 순위 기준을 **주워서 옮길 때**만 참 — 버리지 않는다는 약속을
+       지키는 자리다(자격에서 뺐는데 아무 데도 안 나오면 그건 그냥 삭제다). */
+    if (opts && opts.onlyPriority && !ranks) continue;
     /* ⚠️ 여기서 REAL_CATEGORY를 쓰면 안 된다 — 그건 짧은 **표 칸** 판정용이라
        `(자|생|중|상|하|명|원)$`처럼 느슨해서 `지원 제외 대상`의 '상'까지 자격으로 봤다.
        제목에서 지켜야 할 것은 **진짜 자격 범주 이름뿐**이므로 좁게 적는다. */
@@ -397,7 +442,13 @@ function requirementLines(sch, lines, opts) {
          ③ 요건 신호가 하나도 없으면 안 보여 준다 — 모른다고 말하는 편이 낫다 */
     if (!loose) {
       if (NOT_A_REQUIREMENT.test(t)) continue;
-      if (EXCLUDE_LINE.test(t)) continue;
+      /* 🔴 괄호 **안**의 '지원불가'로 줄을 통째로 버리면 안 된다 (2026-08-24) —
+         `2026년 2학기 재학생 (휴학예정자 지원불가)`는 요건이고 괄호는 부연일 뿐인데,
+         제외 규칙에 걸려 **진짜 자격이 조용히 사라지고 있었다**(잡음보다 나쁜 실패).
+         괄호를 떼고도 여전히 제외를 말하는 줄만 옮긴다. 괄호가 곧 전부인 줄
+         (`(타 장학금 수혜자 지원 불가)`)은 떼면 빈 껍데기라 그대로 본다. */
+      const bare = t.replace(/\s*[(（][^)）]*[)）]\s*$/, '').trim();
+      if (EXCLUDE_LINE.test(bare.length >= 4 ? bare : t)) continue;
       if (!REQ_SIGNAL.test(t)) continue;
     }
     if (!out.includes(t)) out.push(t);
@@ -405,6 +456,11 @@ function requirementLines(sch, lines, opts) {
        못 담은 것은 바로 아래 '원문 보기'로 갈 수 있다. */
     if (out.length >= 5) break;
   }
+  /* 🔴 자격 칸을 **비우면서까지** 순위를 걷어내지는 않는다 (2026-08-24) —
+     학계장학문화재단은 `소득분위가 낮고 학업성적이 우수한 학생`이 공고의 유일한 조건이라,
+     옮겨 버리면 카드가 '자격을 아직 읽지 못했어요'가 된다. 애매한 진짜 조건을 보여 주는 편이
+     아무것도 안 보여 주는 것보다 낫다(잡음보다 나쁜 실패 = 자격이 사라지는 것). */
+  if (!out.length && !keepPriority && moved.length) return moved.slice(0, 5);
   return out;
 }
 
@@ -521,7 +577,7 @@ function requirementStruct(sch) {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { evaluate, fitScore, scopedToProfile, notStale, STALE_DAYS,
                      requirementLines, requirementStruct, requirementMatch, tidyRequirement,
-                     REQ_SIGNAL, NOT_A_REQUIREMENT, EXCLUDE_LINE,
+                     REQ_SIGNAL, NOT_A_REQUIREMENT, EXCLUDE_LINE, HARD_THRESHOLD,
                      noticeForProfile, taggedSchool, SHARED_BOARD_BRANCH,
                      noticeFileKey, noticeFileFor, noticeFilesForProfile };
 }

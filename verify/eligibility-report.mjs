@@ -173,22 +173,7 @@ else console.log('   (--bad 를 붙이면 전부 보여 줍니다 — 이상한 
    🔴 필터(match-engine의 REQ_NOISE)가 쓰는 낱말을 그대로 쓰면 안 된다 —
    필터의 눈으로 필터를 채점하는 꼴이라 필터가 놓친 것은 영영 0으로 나온다.
    그래서 '문장이 무엇을 말하는가'라는 **다른 축**으로 가른다. */
-const NOISE_KIND = {
-  /* ⚠️ **요건 신호가 있는 줄은 애초에 후보에서 뺀다.** 조이기 전에는 진짜 요건 셋이
-     낱말 하나 때문에 잡음으로 세어졌다(2026-08-23 실측):
-       `한부모가족증명서 발급 대상 가정의 대학생`      ← '증명서'
-       `서울 소재 대학교 … 재학생 228명 내외`          ← '명 내외' (관악구 사례와 같다)
-       `소득분위 9분위 이하 (한국장학재단 산정 기준)`   ← '산정 기준'
-     채점기가 부정확하면 숫자를 못 믿고, 못 믿는 숫자는 관문으로 쓸 수 없다. */
-  '제외 대상 (자리가 틀렸다 — 제외 블록으로)': /(제외(한다|합니다|됨|대상)?\s*$|받은\s*(학생|자)는?\s*제외|지원\s*불가|신청\s*불가|중복\s*수혜\s*불가)/,
-  '배점·평가': /(만점|배점|가점|점수\s*적용|반영\s*비율|평가\s*(항목|비율)|산정\s*(기간|방법)\s*$)/,
-  '일정·기한': /(기한|기간)\s*[:：]|우편\s*도착분|\d{4}[.\-]\s?\d{1,2}[.\-]\s?\d{1,2}\s*(까지|마감)/,
-  '선발·인원': /^(추천|선발|모집)\s*인원|(추천|선발|모집)\s*인원\s*[:：]/,
-  '제출·서류': /^(제출|구비)\s*서류|서식\s*[:：]|증명서\s*\d*\s*부/,
-  /* 조각은 좁게 잡는다 — 한글로 끝나는 줄을 전부 조각으로 세면 정상 문장이 다 걸려
-     숫자가 뜻을 잃는다(처음에 그렇게 재서 303줄이 나왔다). 실제 표지만 쓴다. */
-  '잘린 조각': /^[^()（）]*[(（][^)）]*$|^.{0,12}(기간|방법|기준|현황|내역|사항)\s*$|\s인\s*\(/,
-};
+const { NOISE_KIND, FRAGMENT, MISPLACED } = require('./eligibility-noise.cjs');
 {
   const hits = [];
   let shown = 0;
@@ -196,11 +181,11 @@ const NOISE_KIND = {
     if (it.program) continue;
     for (const l of requirementLines(it)) {
       shown += 1;
-      for (const [k, re] of Object.entries(NOISE_KIND)) {
-        if (!re.test(l)) continue;
+      for (const [k, re] of [...Object.entries(NOISE_KIND), ['잘린 조각', (t) => FRAGMENT.test(t)]]) {
+        if (!re(l)) continue;
         /* 요건 신호가 뚜렷한 줄은 '자리가 틀린 것'(제외)과 '망가진 것'(조각)만 문제 삼는다 —
            그 밖의 유형은 낱말 하나로 진짜 요건을 잡음이라 부르게 된다(위 주석). */
-        if (REQ_SIGNAL.test(l) && !/제외|조각/.test(k)) continue;
+        if (REQ_SIGNAL.test(l) && !MISPLACED.test(k)) continue;
         hits.push({ id: it.id, kind: k, line: l, ai: /^AI/.test(it.eligibilityFrom || '') });
         break;
       }

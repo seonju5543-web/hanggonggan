@@ -1210,7 +1210,13 @@ function openDetail(id) {
      (목포향우회: 진짜 자격은 한 줄인데 우선순위까지 5줄이 떠 있었다). 그래서 자리를 나눈다.
      🔴 판정(✓/✗)을 하지 않는다 — 충족해도 '된다'가 아니라 '먼저 본다'는 뜻이라
      초록 체크를 달면 거짓 안심이 된다(제외 대상과 같은 규칙). */
-  const priLines = requirementLines(sch, sch.eligibilityPriority || [], { keepPriority: true });
+  /* 두 곳에서 모은다 — 수집기가 따로 갈라 둔 것 + **자격 줄에 섞여 있던 것**.
+     뒤쪽이 없으면 `학년이 높은 학생`처럼 자격에서 뺀 줄이 그냥 사라진다(2026-08-24). */
+  const priLines = [...new Set([
+    ...requirementLines(sch, sch.eligibilityPriority || [], { keepPriority: true }),
+    ...requirementLines(sch, sch.eligibilityLines || [], { keepPriority: true, onlyPriority: true }),
+    /* 자격 칸이 비지 않게 되돌린 줄은 여기 또 쓰지 않는다 — 같은 문장이 두 블록에 뜬다 */
+  ])].filter((t) => !reqLines.includes(t));
   if (priLines.length) {
     reasonRows += `<li class="r-head">자격을 갖춘 사람 중 먼저 뽑는 기준이에요</li>`
       + priLines.map((e) => `<li class="r-req">${esc(e)}</li>`).join('');

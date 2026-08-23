@@ -180,26 +180,27 @@ console.log(`감사 대상: 정식 등록 ${reg.items.length}건 · 양식 ${Obj
 {
   /* 화면으로 나가는 문과 **같은 함수**로 본다 — 감사가 제 규칙을 따로 두면
      "감사는 통과하는데 화면엔 잡음이 뜨는" 상태가 된다(이 저장소가 여러 번 겪은 유형). */
-  const { requirementLines, REQ_SIGNAL } = require('../match-engine.js');
-  const kinds = {
-    '제외 대상': /(제외(한다|합니다|됨|대상)?\s*$|받은\s*(학생|자)는?\s*제외|지원\s*불가|신청\s*불가|중복\s*수혜\s*불가)/,
-    '배점·평가': /(만점|배점|가점|점수\s*적용|반영\s*비율|평가\s*(항목|비율)|산정\s*(기간|방법)\s*$)/,
-    '일정·기한': /(기한|기간)\s*[:：]|우편\s*도착분/,
-    '선발·인원': /^(추천|선발|모집)\s*인원|(추천|선발|모집)\s*인원\s*[:：]/,
-    '제출·서류': /^(제출|구비)\s*서류|서식\s*[:：]|증명서\s*\d*\s*부/,
-  };
-  const FRAGMENT = /^[^()（）]*[(（][^)）]*$|^.{0,12}(기간|방법|기준|현황|내역|사항)\s*$|\s인\s*\(/;
+  const { requirementLines, REQ_SIGNAL, HARD_THRESHOLD } = require('../match-engine.js');
+  /* 규칙은 채점기와 **같은 파일**을 읽는다 — 예전엔 여기 한 벌이 베껴져 있어
+     한쪽만 고치면 조용히 갈라졌다(2026-08-24). */
+  const { NOISE_KIND: kinds, FRAGMENT: FRAG, MISPLACED } = require('./eligibility-noise.cjs');
   for (const it of reg.items) {
     if (it.program) continue;
-    for (const l of requirementLines(it)) {
+    const shownLines = requirementLines(it);
+    for (const l of shownLines) {
       for (const [k, re] of Object.entries(kinds)) {
         /* 요건 신호가 뚜렷하면 '자리가 틀린 것'(제외)만 문제 삼는다 — 안 그러면
            `한부모가족증명서 발급 대상 가정의 대학생` 같은 진짜 요건을 잡음이라 부른다 */
-        if (!re.test(l) || (REQ_SIGNAL.test(l) && k !== '제외 대상')) continue;
+        if (!re(l) || (REQ_SIGNAL.test(l) && !MISPLACED.test(k))) continue;
+        /* 순위 기준을 **일부러 남긴** 두 자리는 막지 않는다 (2026-08-24, match-engine과 같은 예외):
+           ① 같은 줄에 진짜 커트라인이 있다 — 옮기면 그 선이 사라진다
+           ② 그 줄이 이 공고의 유일한 자격이다 — 옮기면 카드가 '못 읽었어요'가 된다
+           둘 다 채점기(넓은 축)가 경고로 계속 올리므로 눈에서 사라지지는 않는다. */
+        if (k.startsWith('순위 기준') && (HARD_THRESHOLD.test(l) || shownLines.length === 1)) continue;
         errors.push(`registered:${it.id} — 지원 자격에 [${k}] 줄이 있습니다: "${l.slice(0, 60)}"`);
         break;
       }
-      if (FRAGMENT.test(l)) warns.push(`registered:${it.id} — 자격 줄의 글자가 상했습니다(수집 단계): "${l.slice(0, 60)}"`);
+      if (FRAG.test(l)) warns.push(`registered:${it.id} — 자격 줄의 글자가 상했습니다(수집 단계): "${l.slice(0, 60)}"`);
     }
   }
 }
