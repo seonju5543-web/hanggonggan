@@ -1442,7 +1442,8 @@
    "attachments": [],
    "sourceUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30025&pageNo=1",
    "sourceKind": "official",
-   "listedAt": "2026-07-16"
+   "listedAt": "2026-07-16",
+   "aiTries": 1
   },
   {
    "id": "auto-dergraddoarticleno154505",
@@ -1503,7 +1504,8 @@
    "attachments": [],
    "sourceUrl": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=154473&article.offset=0&articleLimit=10&noCat=501",
    "sourceKind": "official",
-   "listedAt": "2026-07-23"
+   "listedAt": "2026-07-23",
+   "aiTries": 1
   },
   {
    "id": "auto-otice06doarticleno138662",
@@ -1780,7 +1782,8 @@
    "attachments": [],
    "sourceUrl": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52964&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "sourceKind": "official",
-   "listedAt": "2026-07-30"
+   "listedAt": "2026-07-30",
+   "aiTries": 1
   },
   {
    "id": "auto-c839d20ec84a0ebb09c20202",
