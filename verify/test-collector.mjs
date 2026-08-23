@@ -1227,6 +1227,16 @@ console.log('\n■ 껍데기 페이지와 브라우저 본문 (2026-08-20)');
   eq('  메뉴 뒤에 본문이 있으면 원문으로 센다', NS.hasText(i4.byUrl.get(NS.canonUrl('https://b.ac.kr/view?id=9'))), true);
   eq('  문턱은 300자다 (내리면 껍데기를 다시 놓친다)', NS.MIN_BODY, 300);
 
+  /* 🔴 2026-08-23 — **줄바꿈을 없애면 본문이 있으나 마나다.** 재수집 로봇을 처음
+     만들 때 태그를 벗기고 `\s+ → ' '`로 눌렀더니 본문이 통짜 한 줄이 됐고,
+     ① AI가 줄 번호를 못 매겨 대상에서 빠지고 ② 표의 칸 구분(공통/재학생/신규자)이
+     통째로 사라졌다 — 이 작업의 핵심이 그 구조를 살리는 것인데 받는 자리에서 죽였다.
+     37건을 그렇게 저장했다가 전부 다시 받았다. */
+  const rb = fs.readFileSync(new URL('collector/rescue-bodies.mjs', root), 'utf8');
+  eq('재수집은 화면에 그려진 줄바꿈을 그대로 받는다', /innerText\(/.test(rb), true);
+  eq('  줄바꿈까지 뭉개지 않는다', /replace\(\/\\s\+\/g, ' '\)/.test(rb), false);
+  eq('  통짜 한 줄로 저장된 본문은 다시 받는다', /\/\\n\/\.test\(String\(cur\.text/.test(rb), true);
+
   // 브라우저 수집기가 이미 그린 본문을 저장한다 (추가 페이지 열기 0회)
   const bc = fs.readFileSync(new URL('collector/browser-collect.mjs', root), 'utf8');
   eq('브라우저 수집기가 상세 본문을 저장한다', /bodies\[it\.url\]\s*=/.test(bc), true);

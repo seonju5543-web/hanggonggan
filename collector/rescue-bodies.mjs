@@ -64,7 +64,10 @@ export function pickTargets(items) {
     if (it.program) continue;
     const url = it.sourceUrl || '';
     if (!/^https?:\/\//.test(url) || url.includes('#n-')) continue;
-    if (hasText(sourceFor(it, idx))) continue;          // 이미 본문이 있다
+    /* 이미 본문이 있어도 **통짜 한 줄이면 다시 받는다** — 줄바꿈이 없는 본문은
+       AI가 줄 번호를 못 매기고 표 구조도 못 읽어, 있으나 마나다(위 주석 참조). */
+    const cur = sourceFor(it, idx);
+    if (hasText(cur) && /\n/.test(String(cur.text || ''))) continue;
     const led = ledger[canonUrl(url)];
     if (led && led.tries >= REST_AFTER && led.at && daysBetween(led.at, today) < REST_DAYS) continue;
     out.push({ it, url, tries: (led && led.tries) || 0 });
@@ -119,9 +122,15 @@ for (const t of targets) {
   try {
     await page.goto(t.url, { waitUntil: 'domcontentloaded', timeout: 30000 });
     await page.waitForTimeout(4000);           // 자바스크립트가 본문을 그릴 시간
-    const html = await page.content();
-    text = html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ')
-      .replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    /* 🔴 **줄바꿈을 없애면 안 된다** (2026-08-23 실측으로 배웠다).
+       처음엔 태그를 정규식으로 벗기고 `\s+ → ' '`로 눌렀는데, 그러면 본문이
+       **통짜 한 줄**이 된다. 그 한 줄은 ① AI가 줄 번호를 못 매겨 대상에서 빠지고
+       ② 표의 칸 구분(공통 / 재학생 / 신규자)이 통째로 사라진다 —
+       이 작업의 핵심이 바로 그 구조를 살리는 것인데 받아 오는 자리에서 죽이고 있었다.
+       `innerText`는 브라우저가 화면에 그린 그대로의 줄바꿈을 준다. */
+    text = (await page.innerText('body'))
+      .replace(/[ \t\u00a0]+/g, ' ')
+      .split('\n').map((l) => l.trim()).filter(Boolean).join('\n');
   } catch (e) {
     report.push(`- ✕ ${t.it.name.slice(0, 40)} — 열지 못함: ${String(e.message).slice(0, 60)}`);
   } finally {
