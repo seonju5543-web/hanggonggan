@@ -1515,13 +1515,24 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
      readable()이 조용히 거른다. 안 받으면 그 공고는 영영 자격을 못 읽는다. */
   const df = fs.readFileSync(new URL('../collector/deepfetch.mjs', import.meta.url), 'utf8');
   eq('자격용 공고문 첨부에 PDF가 들어간다', /OK_EXT = \/\\\.\(hwp\|hwpx\|docx\?\|pdf\)/.test(df), true);
-  /* 🔴 **두 목록이 갈라지면 파일이 `.bin`으로 저장돼 아무도 못 읽는다.**
-     받을 대상(OK_EXT)에만 pdf를 넣고 파일 확장자를 정하는 쪽을 안 고쳐서,
-     내려받은 PDF 5개가 전부 `.bin`이 됐다 — attachmentText()는 확장자로
-     해석기를 고르므로 320KB·1.1MB짜리 파일을 눈앞에 두고 손도 못 댔다.
-     한 곳만 고치고 다른 곳을 안 고치는 이 유형은 검사로 묶어 둬야 한다. */
-  eq('  파일 확장자를 정하는 목록도 같다 (갈라지면 .bin 이 된다)',
-    /a\.name\.match\(\/\\\.\(hwp\|hwpx\|docx\?\|pdf\)\$\/i\)/.test(df), true);
+  /* 🔴 **목록이 갈라지면 파일이 `.bin`으로 저장돼 아무도 못 읽는다.**
+     받을 대상(OK_EXT·IMG_EXT)에만 넣고 파일 확장자를 정하는 쪽을 안 고치면,
+     내려받은 것이 전부 `.bin`이 된다 — attachmentText()·AI 경로 둘 다 확장자로
+     해석기를 고르므로 320KB·1.1MB짜리 파일을 눈앞에 두고 손도 못 댄다(실제로 그랬다).
+     낱말을 하나씩 박아 두면 목록이 늘 때마다 검사가 헛되이 깨지므로,
+     **'받는 목록의 모든 확장자가 정하는 목록에 있는가'** 라는 뜻 자체를 잰다. */
+  /* ⚠️ **자격 함수 안만 본다.** `const ext = (a.name.match(…))` 는 양식 내려받기 쪽에도
+     같은 이름으로 있어서, 파일 전체에서 찾으면 엉뚱한 줄을 잰다(실제로 그랬다). */
+  const eligFn = df.slice(df.indexOf('async function downloadEligDocs'));
+  const extsOf = (re) => (eligFn.match(re) || [, ''])[1].split('|')
+    .map((x) => x.replace('?', '').replace(/[()]/g, '')).filter(Boolean);
+  const wanted = [...new Set([
+    ...extsOf(/OK_EXT = \/\\\.\(([^)]+)\)\$\/i/),
+    ...extsOf(/IMG_EXT = \/\\\.\(([^)]+)\)\$\/i/),
+  ])];
+  const mapping = extsOf(/const ext = \(a\.name\.match\(\/\\\.\(([^)]+)\)\$\/i\)/);
+  const gap = wanted.filter((e) => !mapping.includes(e));
+  eq(`받는 확장자 ${wanted.length}종이 모두 파일 이름 규칙에 있다`, gap.join(',') || '(없음)', '(없음)');
   const AT = await import(new URL('../collector/attachment-text.mjs', import.meta.url));
   /* ① 신청서·동의서는 읽지 않는다 — 읽으면 개인정보 수집 항목이 자격 자리에 앉는다
         (2026-08-20에 실제로 3건이 그렇게 돼 통째로 되돌린 적이 있다) */
