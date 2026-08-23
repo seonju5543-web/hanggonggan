@@ -174,21 +174,152 @@ const ESSAY_ASKS = {
   ],
 };
 
+/* ============================================================
+   ── 학생마다 다른 보기 (2026-08-23 개발자 지시) ──
+   지금까지 essayAskFor 는 **양식 칸만** 보고 모든 학생에게 같은 보기를 냈다.
+   그런데 프로필에는 계열 8 · 학년 4 · 재학상태 3 · 지역 3 · 특별자격 5 가
+   이미 들어 있다(288 조합). 새로 묻기 전에 있는 것부터 쓴다.
+
+   🔴 민감정보(기초수급·차상위·유공자·장애)는 **어떤 질문을 낼지 고르는 데만** 쓴다.
+      보기 문구에는 절대 넣지 않는다 — 학생이 그 보기를 고르면 그 낱말이 서버로
+      나가고, draft-guard 가 400 으로 막아 기능이 통째로 죽는다.
+      (개발자 승인 범위: "서버에 반영되는 내용이 아니므로 기기 안에서는 전부 활용")
+      회귀 검사가 보기 문구를 전수로 훑는다 — verify/verify-essay-ask.mjs [5].
+   ============================================================ */
+
+/* 계열마다 돈 쓰는 데가 다르다 — '교재비'는 공대생에게 실습비고 예체능에겐 재료비다 */
+const TRACK_SPEND = {
+  engineering: ['실습·재료비', '개발 장비', '학회·공모전 참가비'],
+  science: ['실험 재료비', '학회 참가비'],
+  medical: ['실습복·실습비', '국가시험 교재'],
+  arts: ['재료·악기', '연습실 대관', '작품 제작비'],
+  humanities: ['어학 시험 응시료', '원서·전공 도서'],
+  education: ['임용 교재', '교생 실습비'],
+  business: ['자격증 응시료', '전공 도서'],
+  social: ['전공 도서', '자격증 응시료'],
+};
+/* 계열마다 '지금 하는 준비'도 다르다 */
+const TRACK_PREP = {
+  engineering: ['전공 프로젝트', '개발 스터디', '공모전'],
+  science: ['실험실 참여', '학부연구생'],
+  medical: ['실습·임상 준비', '국가시험 준비'],
+  arts: ['작품·공연 준비', '실기 연습'],
+  humanities: ['어학 공부', '번역·글쓰기 연습'],
+  education: ['임용 준비', '교육 봉사'],
+  business: ['자격증 준비', '대외활동'],
+  social: ['자격증 준비', '전공 스터디'],
+};
+
+/* 학년·재학상태마다 글의 무게중심이 다르다.
+   신입생에게 '그동안 해 온 일'을 물으면 쓸 말이 없고,
+   4학년에게 '앞으로의 다짐'만 물으면 그동안 해 온 것이 통째로 빠진다. */
+function essayStage(p) {
+  if (!p) return 'mid';
+  if (p.status === 'freshman' || Number(p.year) <= 1) return 'new';
+  if (p.status === 'returning') return 'back';
+  return Number(p.year) >= 4 ? 'late' : 'mid';
+}
+const STAGE_NOW = {
+  new: ['첫 학기 적응', '전공 기초 다지기', '아르바이트', '동아리 찾는 중'],
+  back: ['학업 리듬 되찾기', '아르바이트', '밀린 전공 따라잡기', '자격증 준비'],
+  late: ['졸업 요건 채우기', '취업·진학 준비', '전공 심화', '아르바이트'],
+  mid: [],
+};
+
+/* 그 밖의 신호 — 전부 기기 안에서만 쓴다 */
+const SIGNAL_CHIPS = {
+  cert: '어학 점수 활용',            // 프로필: 공인 외국어성적 보유
+  exchange: '교환학생 준비',          // 프로필: 해외 교환학생 파견 예정
+  region_etc: '통학·자취 부담',       // 지역: 수도권 밖
+  multiChild: '형제자매와 함께 부담',  // 특별자격: 다자녀 (민감 낱말 아님)
+};
+
+/* 서류보관함이 아는 것 — 파일도 파일 이름도 서버로 안 나간다.
+   여기 쓰는 것은 **무엇을 물을지** 고르는 데까지다 (개발자 지시 2026-08-23 · E안).
+   🔴 수급·차상위 자격 증명(welfare) 슬롯은 민감정보라 아예 보지 않는다. */
+const DOC_SIGNAL = {
+  langCert: { ask: 'langUse', q: '어학 점수를 어디에 쓸 계획인가요', c: ['교환학생', '전공 원서 읽기', '취업 준비', '번역·통역'] },
+  exchange: { ask: 'exchangePlan', q: '교환학생으로 무엇을 해 보고 싶나요', c: ['전공 심화', '어학 실력', '현지 경험', '진로 탐색'] },
+  recommend: { ask: 'recWho', q: '추천서를 써 주실 분과 어떤 인연인가요', c: ['전공 수업', '연구실·프로젝트', '동아리 지도', '오래 지켜봐 주심'] },
+};
+
+/* 되묻기가 열렸을 때만 덧붙는 '장면' 질문 (개발자 아이디어 2026-08-23).
+   지금 보기는 '재단이 보는 것'(사정·의지)에 쏠려 있어 글이 평평해진다.
+   글을 살아 있게 만드는 것은 **언제·누구와**라는 장면 표지다.
+   되묻기를 여는 학생에게만 붙으므로 카드가 길어지지 않는다. */
+const SCENE_ASKS = [
+  { id: 'when', q: '주로 언제였나요', c: ['새벽·야간', '방학 내내', '학기 중 매주', '시험 기간', '몇 달 동안'] },
+  { id: 'with', q: '누구와 함께였나요', c: ['혼자서', '가족과', '친구·동기와', '교수님 지도로', '후배들과'] },
+];
+
+/* 보기 목록에서 특정 값을 갈아 끼운다 (원본을 건드리지 않는다) */
+function swapChips(ask, replace, add) {
+  const base = (replace && replace.length) ? replace.slice() : (ask.c || []).slice();
+  /* 🔴 맞춤 보기를 **앞에** 둔다. 뒤에 붙이면 줄바꿈 아래로 밀려 안 보이고,
+     그러면 맞춤이 있으나 마나가 된다(실측하고 고쳤다). */
+  const c = [];
+  for (const x of (add || [])) if (x && !c.includes(x)) c.push(x);
+  for (const x of base) if (x && !c.includes(x)) c.push(x);
+  return Object.assign({}, ask, { c: c.slice(0, 8) });
+}
+
+/** 프로필·공고·보관함에 맞춰 보기를 고쳐 낸다. 원본 ESSAY_ASKS 는 그대로 둔다. */
+function tailorAsks(asks, ctx) {
+  const p = (ctx && ctx.profile) || null;
+  if (!p) return asks;
+  const track = p.track || '';
+  const stage = essayStage(p);
+  const flags = p.flags || [];
+  const docs = (ctx && ctx.docs) || [];
+
+  const extra = [];
+  if (p.cert) extra.push(SIGNAL_CHIPS.cert);
+  if (p.exchange) extra.push(SIGNAL_CHIPS.exchange);
+  if (p.region && p.region !== 'seoul' && p.region !== 'gyeonggi') extra.push(SIGNAL_CHIPS.region_etc);
+  if (flags.includes('multiChild')) extra.push(SIGNAL_CHIPS.multiChild);
+
+  const out = asks.map((a) => {
+    if (a.free) return a;
+    /* 돈 쓰는 데 — 계열마다 다르다 */
+    if (a.id === 'where' && TRACK_SPEND[track]) return swapChips(a, null, TRACK_SPEND[track]);
+    /* 지금 하는 준비 — 계열마다 다르다 */
+    if (a.id === 'prep' && TRACK_PREP[track]) return swapChips(a, null, TRACK_PREP[track]);
+    /* 요즘 하는 것 — 학년·재학상태마다 다르다 */
+    if (a.id === 'now' && STAGE_NOW[stage] && STAGE_NOW[stage].length) return swapChips(a, null, STAGE_NOW[stage]);
+    /* 사정 — 지역·가구 신호를 덧붙인다 */
+    if (a.id === 'need' && extra.length) return swapChips(a, null, extra);
+    if (a.id === 'change' && p.exchange) return swapChips(a, null, ['교환학생 준비에 집중']);
+    return a;
+  });
+
+  /* 보관함이 알려 주는 것 — 그 증명서가 있으면 그것에 대해 **묻는다**.
+     내용은 모르므로 답은 학생이 준다(원칙 8-1). */
+  for (const slot of docs) {
+    const d = DOC_SIGNAL[slot];
+    if (d && !out.some((a) => a.id === d.ask)) out.push({ id: d.ask, q: d.q, c: d.c });
+  }
+  return out.slice(0, 6);
+}
+
 /**
  * 서술형 칸 하나에 낼 키워드 질문.
  * @returns {{kind:string, target:number, asks:Array}}
  */
-function essayAskFor(field) {
+function essayAskFor(field, ctx) {
   const label = String((field && field.label) || '').replace(/\s+/g, ' ');
   const hint = String((field && field.q) || '');
+  const target = essayTargetChars(`${label} ${hint}`);
   /* 데이터가 이긴다 — 사람이 원본을 보고 적어 둔 것이 규칙보다 낫다 */
   if (field && Array.isArray(field.ask) && field.ask.length) {
-    return { kind: 'data', target: essayTargetChars(`${label} ${hint}`), asks: field.ask };
+    return { kind: 'data', target, asks: field.ask, scene: SCENE_ASKS };
   }
   const kind = essayKindOf(label, hint);
-  return { kind, target: essayTargetChars(`${label} ${hint}`), asks: ESSAY_ASKS[kind] || ESSAY_ASKS.generic };
+  const base = ESSAY_ASKS[kind] || ESSAY_ASKS.generic;
+  /* ctx 를 안 주면 예전과 똑같이 동작한다 — 검사 도구·감사가 그대로 쓴다 */
+  return { kind, target, asks: ctx ? tailorAsks(base, ctx) : base, scene: SCENE_ASKS };
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { essayAskFor, essayKindOf, essayTargetChars, ESSAY_ASKS, ESSAY_KINDS };
+  module.exports = { essayAskFor, essayKindOf, essayTargetChars, essayStage, tailorAsks,
+    ESSAY_ASKS, ESSAY_KINDS, SCENE_ASKS, TRACK_SPEND, TRACK_PREP, DOC_SIGNAL };
 }

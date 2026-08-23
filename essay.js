@@ -40,13 +40,30 @@ function essayStoryFields(plan) {
   return out;
 }
 
+/* 이 학생·이 공고에 맞춘 보기를 만들기 위해 넘기는 것.
+   🔴 여기 담기는 것은 **기기 안에서 질문을 고르는 데만** 쓰인다.
+      서버로 나가는 것은 학생이 실제로 고르거나 친 것뿐이다(essaySend 참조). */
+function essayCtx(sch) {
+  const p = (typeof state !== 'undefined' && state.profile) || null;
+  /* 보관함에 무엇이 있는지 — 파일도 파일 이름도 나가지 않는다.
+     🔴 수급·차상위 자격 증명(welfare)은 민감정보라 아예 보지 않는다. */
+  let docs = [];
+  try {
+    /* 보관함은 walletCache(slot -> {name,type,savedAt}) 에 있다 — 파일 내용은 IndexedDB
+       안에 있고 여기서 읽지 않는다. 우리가 보는 것은 '그 칸이 차 있나'뿐이다. */
+    const box = (typeof walletCache !== 'undefined' && walletCache) || {};
+    docs = Object.keys(box).filter((k) => k !== 'welfare' && box[k]);
+  } catch (e) { docs = []; }
+  return { profile: p, sch, docs };
+}
+
 /* ── 키워드 질문 카드 ──
    🔴 이것은 **그 서술형 칸 안**에 그려진다. 새 질문이 아니므로
       form-plan.js 의 질문 수 상한(FORM_LIMITS)에 영향이 없다.
       (증명: verify/verify-essay-ask.mjs) */
-function essayAskHtml(field) {
+function essayAskHtml(field, ctx) {
   if (typeof essayAskFor !== 'function') return '';
-  const plan = essayAskFor(field);
+  const plan = essayAskFor(field, ctx);
   const base = `ask-${field.id}`;
   const rows = plan.asks.map((a) => {
     const rid = `${base}-${a.id}`;
@@ -64,7 +81,7 @@ function essayAskHtml(field) {
          백지에 '꼭 넣고 싶은 말'을 물으면 대부분 비운다. 방금 누른 것에 대해서만
          좁게 되물으면 답이 이미 머릿속에 있다. 새 질문이 아니라 이 칸 안이라
          질문 수 상한(FORM_LIMITS)과는 무관하다. */
-      (a.fu ? essayFollowUpHtml(`${rid}-fu`, a.fu, a.eg || []) : '') +
+      (a.fu ? essayFollowUpHtml(`${rid}-fu`, a.fu, a.eg || [], plan.scene || []) : '') +
       `</div>`;
   }).join('');
 
@@ -84,7 +101,7 @@ function essayAskHtml(field) {
       어떻게 시작하면 되는지를 같이 준다. */
 const ESSAY_FU_INFO = '이 한 줄이 지원서의 차별점이 됩니다. 재단은 비슷한 사정보다 <b>그 상황에서 어떻게 해 왔는지</b>를 눈여겨봐요 — 한 줄이면 충분합니다.';
 
-function essayFollowUpHtml(id, question, egs) {
+function essayFollowUpHtml(id, question, egs, scene) {
   return `<div class="essay-fu" data-fu-for="${id}" hidden>
     <p class="essay-fu-q"><b class="essay-fu-pick"></b> — ${esc(question)}</p>
     <p class="essay-fu-info">💡 ${ESSAY_FU_INFO}</p>
@@ -92,6 +109,12 @@ function essayFollowUpHtml(id, question, egs) {
     ${egs.length ? `<div class="essay-fu-eg"><span>이렇게 시작해 보세요</span>${
       egs.map((e) => `<button type="button" class="chip chip-sm essay-eg" data-fill-fu="${id}" data-text="${esc(e)}">${esc(e.slice(0, 22))}…</button>`).join('')
     }</div>` : ''}
+    ${/* 🔴 장면 — 글을 살아 있게 만드는 것은 '언제·누구와'다 (개발자 아이디어 2026-08-23).
+          되묻기를 여는 학생에게만 붙으므로 카드가 길어지지 않는다. */''}
+    ${(scene || []).map((sc) => `<div class="essay-scene"><span>${esc(sc.q)}</span>` +
+      `<div class="chip-group fq-checks essay-chips" data-f="${id}-${sc.id}" data-q="${esc(sc.q)}">` +
+      sc.c.map((o) => `<button type="button" class="chip chip-sm" data-value="${esc(o)}">${esc(o)}</button>`).join('') +
+      `</div></div>`).join('')}
   </div>`;
 }
 
@@ -269,7 +292,7 @@ async function essaySend(tpl, sch, btn) {
     profile: essayProfile(),
     materials: essayMaterials(plan),
     fields: fields.map((f) => {
-      const askPlan = typeof essayAskFor === 'function' ? essayAskFor(f) : { target: 500 };
+      const askPlan = typeof essayAskFor === 'function' ? essayAskFor(f, essayCtx(sch)) : { target: 500 };
       return {
         key: f.id,
         kind: f.kind,

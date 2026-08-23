@@ -239,7 +239,7 @@ function formFieldHtml(f) {
        대신 **키워드 질문**을 이 칸 안에 그리고, 글은 앱이 쓴다.
        카드가 이 칸 '안'에 들어가므로 질문 수 상한(FORM_LIMITS)은 그대로다. */
     const isStory = f.kind === 'story' && typeof essayAskHtml === 'function';
-    if (isStory) html += essayAskHtml(f);
+    if (isStory) html += essayAskHtml(f, typeof essayCtx === 'function' ? essayCtx(null) : null);
     html += `<div class="fq-sugg">${(f.sugg || []).map((s) => `<button type="button" class="chip chip-sm" data-fill="${fid}" data-text="${esc(s)}">${esc(s.slice(0, 26))}…</button>`).join('')}</div>`;
     const ph = isStory
       ? (typeof essayOn === 'function' && essayOn()

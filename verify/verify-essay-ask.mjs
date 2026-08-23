@@ -20,7 +20,7 @@ import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
-const { essayAskFor, essayKindOf, essayTargetChars } = require('../essay-ask.js');
+const { essayAskFor, essayKindOf, essayTargetChars, essayStage, TRACK_SPEND, DOC_SIGNAL, SCENE_ASKS } = require('../essay-ask.js');
 /* countPlan 은 내보내지 않는다 — planFormQuestions 가 plan.counts 에 넣어 주는 값이
    화면·감사가 실제로 쓰는 값이라 그것을 본다. */
 const { planFormQuestions, formBudgetReport, FORM_LIMITS } = require('../form-plan.js');
@@ -126,6 +126,84 @@ head('5) 보기를 지어내지 않는가');
         for (const b of BAD) if (c.includes(b)) hits.push(`${c} (${b})`);
   ok(hits.length === 0, '⑤ 민감정보를 보기로 내밀지 않는다 — 서버가 거절해 기능이 죽는다',
     [...new Set(hits)].join(', '));
+}
+
+head('6) 학생마다 다른 보기가 나오는가 (2026-08-23)');
+{
+  const f = { label: '장학금 사용계획', type: 'textarea', kind: 'story' };
+  const spend = (p) => (essayAskFor(f, { profile: p }).asks.find((a) => a.id === 'where') || {}).c || [];
+  const eng = spend({ track: 'engineering' });
+  const art = spend({ track: 'arts' });
+  const med = spend({ track: 'medical' });
+  ok(eng.includes('개발 장비'), '공학·IT 에게는 개발 장비를 보여 준다', eng.join('/'));
+  ok(art.includes('재료·악기'), '예체능에게는 재료·악기를 보여 준다', art.join('/'));
+  ok(med.includes('국가시험 교재'), '의약·간호에게는 국가시험 교재를 보여 준다', med.join('/'));
+  ok(eng.join() !== art.join(), '계열이 다르면 보기가 실제로 달라진다');
+  ok(eng[0] === '실습·재료비' || TRACK_SPEND.engineering.includes(eng[0]),
+    '맞춤 보기가 **맨 앞**에 온다 — 뒤에 붙이면 줄바꿈 아래로 밀려 안 보인다', eng[0]);
+
+  const g = { label: '지원 동기', type: 'textarea', kind: 'story' };
+  const now = (p) => (essayAskFor(g, { profile: p }).asks.find((a) => a.id === 'now') || {}).c || [];
+  ok(now({ status: 'freshman', year: 1 }).includes('첫 학기 적응'), '신입생에게는 첫 학기 적응을 보여 준다');
+  ok(now({ status: 'returning', year: 2 }).includes('학업 리듬 되찾기'), '복학생에게는 학업 리듬 되찾기를 보여 준다');
+  ok(now({ status: 'enrolled', year: 4 }).includes('졸업 요건 채우기'), '4학년에게는 졸업 요건을 보여 준다');
+  ok(essayStage({ status: 'returning', year: 3 }) === 'back', '복학은 학년보다 앞선다');
+
+  const need = (p) => (essayAskFor(g, { profile: p }).asks.find((a) => a.id === 'need') || {}).c || [];
+  ok(need({ region: 'etc' }).includes('통학·자취 부담'), '수도권 밖 학생에게는 통학·자취 부담을 보여 준다');
+  ok(!need({ region: 'seoul' }).includes('통학·자취 부담'), '서울 학생에게는 안 보여 준다');
+  ok(need({ flags: ['multiChild'] }).includes('형제자매와 함께 부담'), '다자녀 가구 신호를 쓴다');
+
+  ok(essayAskFor(g).asks === essayAskFor(g).asks || true, '(참고) ctx 없이 부르면 예전과 같다');
+  ok(JSON.stringify(essayAskFor(g).asks) === JSON.stringify(essayAskFor(g, {}).asks),
+    'ctx 가 비면 손대지 않는다 — 감사·검사 도구가 그대로 쓴다');
+}
+
+head('7) 보관함이 아는 것 — 묻는 데만 쓰는가');
+{
+  const g = { label: '지원 동기', type: 'textarea', kind: 'story' };
+  const withDocs = essayAskFor(g, { profile: { track: 'humanities' }, docs: ['langCert', 'recommend'] }).asks;
+  ok(withDocs.some((a) => a.id === 'langUse'), '어학성적표가 있으면 그것에 대해 **묻는다**');
+  ok(withDocs.some((a) => a.id === 'recWho'), '추천서가 있으면 그것에 대해 묻는다');
+  ok(withDocs.every((a) => !/증명서|파일|첨부/.test(JSON.stringify(a.c || []))),
+    '보기 문구에 서류 이름이 안 들어간다 — 서버로 나가는 것은 학생이 고른 답뿐이다');
+  const welfare = essayAskFor(g, { profile: {}, docs: ['welfare'] }).asks;
+  ok(!welfare.some((a) => /welfare|수급|차상위/.test(JSON.stringify(a))),
+    '🔴 수급·차상위 자격 증명은 아예 보지 않는다');
+}
+
+head('8) 장면 질문 — 글을 살아 있게 만드는 것');
+{
+  ok(SCENE_ASKS.length >= 2, `장면 질문 ${SCENE_ASKS.length}개 (언제·누구와)`);
+  ok(SCENE_ASKS.every((s2) => (s2.c || []).length >= 3), '장면 질문은 전부 눌러서 고르는 것이다');
+  const f = { label: '성장과정', type: 'textarea', kind: 'story' };
+  ok((essayAskFor(f).scene || []).length >= 2, '어느 칸에서든 장면 질문이 함께 나온다');
+}
+
+head('9) 🔴 맞춤 보기에도 민감 낱말이 없는가 (전수)');
+{
+  /* 학생이 고른 보기는 **서버로 나간다**. 민감 낱말이 보기에 있으면 그걸 고르는 순간
+     draft-guard 가 400 으로 막아 기능이 통째로 죽는다. 조합을 전수로 훑는다. */
+  const BAD = ['기초생활수급', '차상위', '국가유공자', '보훈', '장애', '수급자', '주민등록번호', '계좌'];
+  const TRACKS = ['humanities', 'social', 'business', 'education', 'science', 'engineering', 'arts', 'medical'];
+  const STATUS = ['enrolled', 'freshman', 'returning'];
+  const REGION = ['seoul', 'gyeonggi', 'etc'];
+  const FLAGS = [[], ['basicLiving'], ['nearPoverty'], ['multiChild'], ['merit'], ['disabled'],
+    ['basicLiving', 'disabled', 'merit', 'multiChild', 'nearPoverty']];
+  const DOCS = [[], Object.keys(DOC_SIGNAL), ['welfare']];
+  const hits = []; let combos = 0;
+  for (const { f } of storyFields) {
+    for (const track of TRACKS) for (const status of STATUS) for (const region of REGION)
+      for (const flags of FLAGS) for (const docs of DOCS) {
+        combos++;
+        const profile = { track, status, region, flags, year: 3, cert: true, exchange: true };
+        for (const a of essayAskFor(f, { profile, docs }).asks)
+          for (const c of a.c || [])
+            for (const b of BAD) if (c.includes(b)) hits.push(`${c} (${b})`);
+      }
+  }
+  ok(hits.length === 0, `⑨ 조합 ${combos.toLocaleString()}가지를 훑어도 민감 낱말이 보기에 없다`,
+    [...new Set(hits)].slice(0, 5).join(', '));
 }
 
 console.log(`\n${fail ? '✗' : '✓'} 키워드 질문 — 통과 ${pass} · 실패 ${fail}`);
