@@ -2874,34 +2874,6 @@
    ]
   },
   {
-   "id": "reg-konkuk-alumni",
-   "name": "총동문회 장학생 (건국대, 2026-2학기)",
-   "type": "교외",
-   "provider": "건국대학교 총동문회",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
-   "deadline": "2026-08-05",
-   "period": "신청 ~2026.8.5(수) 18:00",
-   "summary": "건국대학교 총동문회가 선발하는 2026학년도 2학기 장학생입니다. 세부 지원액·서류는 원문 공고에서 확인하세요.",
-   "eligibility": {
-    "selective": true,
-    "schoolOnly": "건국대학교"
-   },
-   "documents": [
-    "지원 자격·제출 서류는 원문 공고에서 확인"
-   ],
-   "duplicable": true,
-   "noForm": "공고 첨부에 신청서 양식 없음(홍보 이미지만 첨부) — 원문 공고 확인",
-   "attachments": [
-    {
-     "name": "2026-2학기 총동문회.jpg",
-     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1221897/download.do"
-    }
-   ],
-   "sourceUrl": "https://www.konkuk.ac.kr/bbs/konkuk/235/1201830/artclView.do",
-   "sourceKind": "official"
-  },
-  {
    "id": "reg-konkuk-sunglim",
    "name": "성림교회 대학장학생 (건국대, 2026 하반기)",
    "type": "교내",

@@ -3,16 +3,12 @@
 # checkUrl:  이 주소를 로그인 없는 새 탭에서 열어 그대로 보고 (로그인 벽인지 포함)
 # findBoard: <학교 홈> | <메뉴 > 메뉴>
 
-# 2026-08-23 — 재수집 로봇이 '본문 없음'으로 떨어뜨린 공고들을 눈으로 확인한다.
-#   팝업을 닫고 프레임까지 읽게 고쳤는데도 24건 전부 0건이었다.
-#   추측을 멈추고, 학생 눈에 실제로 무엇이 보이는지 그대로 받아 적는다.
-#   (CLAUDE.md: "로봇 판정이 의심스러우면 추측하지 말고 이걸 돌릴 것")
-#
-#   · 동국대 — 받아 온 게 '불교동아리 소식 · 공양기도문 · POPUP'뿐이었다
-#   · 광운대 — 제목·조회수·부서명만 왔다
-#   · 홍익대 — 제목 다음 바로 다른 공고가 왔다
-#   · 중앙대 — 열었더니 '2027-1학기 전임교원 초빙'이 나왔다(다른 글?)
-checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26764960
-checkUrl: https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52964
-checkUrl: https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=154473
-checkUrl: https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&
+# 2026-08-23 — 개발자 지시로 남은 것을 갈라 낸다.
+#   ① 동국대·명지대가 "진짜로 본문이 비어 있는지" 확인. 진짜면 개발자에게 넘긴다.
+#   ② 동국대 장학공지 게시판의 행별 원제목을 받아 적는다 —
+#      (재)가송재단 공고의 boardTitle 이 비어 있어 링크 사냥꾼이 영영 못 찾는다.
+#      CLAUDE.md의 '미아' 유형(중앙대 11건이 3주간 헛돈 원인)과 같다.
+findBoard: https://www.dongguk.edu/article/JANGHAKNOTICE/list |
+checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765586
+checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765245
+checkUrl: https://www.mju.ac.kr/mjukr/8/subview.do
