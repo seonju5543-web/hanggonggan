@@ -1391,6 +1391,39 @@ textarea:focus {
     학생에게 필요 없는 정보라 가독성만 떨어뜨렸다.) */
 .essay-fine { font-size: 11.5px; margin-top: 6px; }
 
+/* ── 되묻기 — 보기를 누르면 열리는 한 줄 (2026-08-23) ──
+   백지에 '꼭 넣고 싶은 말'을 물으면 대부분 비운다. 방금 누른 것에 대해서만 좁게 되묻는다. */
+.essay-fu {
+  margin-top: 9px; padding: 10px 11px;
+  background: var(--surface); border: 1px solid var(--primary);
+  border-radius: 10px;
+}
+.essay-fu-q { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 5px; }
+.essay-fu-q .essay-fu-pick { color: var(--primary-dark); }
+.essay-fu-info { font-size: 11.5px; color: var(--text-weak); line-height: 1.55; margin-bottom: 8px; }
+.essay-fu-info b { color: var(--text-sub); }
+.essay-fu-eg { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 7px; }
+.essay-fu-eg > span { font-size: 11.5px; color: var(--text-weak); }
+.essay-eg { background: var(--primary-weak); border-color: transparent; font-size: 11.5px; }
+/* 되묻기 칸은 두 줄로 — 한 줄 입력이면 문장 끝이 잘려 보여 학생이 자기가 쓴 것을 못 읽는다 */
+textarea.essay-fu-in { width: 100%; font-size: 13.5px; line-height: 1.6; padding: 9px 11px; resize: vertical; }
+
+/* 한 번만 세우는 안내 — 막지 않는다 */
+.essay-nudge {
+  border: 1px solid var(--primary); background: var(--primary-weak);
+  border-radius: 14px; padding: 14px; margin-bottom: 10px;
+}
+.essay-nudge h4 { margin-bottom: 6px; }
+.essay-nudge .dp-note { text-align: left; line-height: 1.6; margin-bottom: 10px; }
+
+/* 직접 쓴 한 줄이 없을 때만 나오는 독려 */
+.essay-urge {
+  text-align: left; line-height: 1.6; margin-top: 6px;
+  padding: 9px 11px; border-radius: 10px;
+  background: var(--primary-weak); color: var(--text-sub);
+}
+.essay-urge b { color: var(--primary-dark); }
+
 /* 글이 들어간 칸은 눈에 띄게 — 학생이 '이건 내가 쓴 글'로 착각하면 안 된다 */
 textarea.essay-drafted { border-color: var(--primary); background: #fbfcff; line-height: 1.7; }
 .essay-flag { color: var(--primary); font-weight: 600; margin-top: 6px; text-align: left; }

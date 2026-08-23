@@ -62,6 +62,11 @@ const SYSTEM = `당신은 한국 대학생의 장학금 신청서를 **대신 �
    다만 **[ ]는 꼭 필요한 곳에만** 쓰세요. 키워드로 충분히 쓸 수 있는 문장까지 비워 두면
    학생이 받은 것이 없는 셈이 됩니다.
 
+3. **★ 표시가 붙은 '학생이 직접 쓴 이야기'가 있으면 그것이 글의 중심입니다.**
+   첫 문단은 반드시 그 이야기에서 출발하고, 고른 보기(키워드)는 그 이야기를 뒷받침하도록
+   엮으세요. 직접 쓴 이야기를 한 문장으로 요약해 흘려보내면 안 됩니다 —
+   그 이야기가 이 지원자를 다른 지원자와 구별해 주는 유일한 재료입니다.
+
 글의 수준 — 여기가 이 서비스의 값어치입니다:
 3. **문단을 나눠 쓰세요.** 목표 분량이 400자를 넘으면 2~4개 문단으로 구성합니다.
    한 덩어리로 이어 붙인 글은 실패로 봅니다.
@@ -146,6 +151,9 @@ function sanitize(body) {
       asks: (Array.isArray(f.asks) ? f.asks : []).slice(0, MAX_ASKS).map((a) => ({
         q: String(a.q || '').slice(0, 120),
         a: String(a.a || '').slice(0, 400),
+        /* own = 학생이 **직접 친 글**. 고른 보기와 구별해야 한다 —
+           이것이 글의 중심이 되고 보기는 거기에 엮이는 재료다(개발자 지시 2026-08-23). */
+        own: !!a.own,
       })).filter((a) => a.a),
       answer: String(f.answer || '').slice(0, MAX_ANSWER),
     })).filter((f) => f.key && f.label),
@@ -193,8 +201,15 @@ export default {
         `  목표 분량: 약 ${f.target}자 (±15%)${f.target >= 400 ? ' · 문단을 나눠 쓰세요' : ''}`,
         `  지켜야 할 규칙:\n${rulesFor(PLAYBOOK, f.askKind).map((r) => `    - ${r.text}`).join('\n')}`,
         f.hint ? `  원본 안내: ${f.hint}` : '',
-        f.asks.length
-          ? `  학생이 고른 키워드 — 이것만으로 쓰세요:\n${f.asks.map((a) => `    · ${a.q}: ${a.a}`).join('\n')}`
+        /* 🔴 직접 쓴 것을 **먼저, 따로** 준다. 한 덩어리로 주면 모델이 고른 보기와
+           똑같이 취급해 흔한 문장으로 녹여 버린다 — 그러면 획일화가 그대로 남는다. */
+        f.asks.some((a) => a.own)
+          ? `  ★ 학생이 직접 쓴 이야기 — **이것을 글의 중심으로 삼으세요**:\n${
+              f.asks.filter((a) => a.own).map((a) => `    · ${a.q}: ${a.a}`).join('\n')}`
+          : '',
+        f.asks.some((a) => !a.own)
+          ? `  학생이 고른 키워드 — 위 이야기에 엮을 재료입니다:\n${
+              f.asks.filter((a) => !a.own).map((a) => `    · ${a.q}: ${a.a}`).join('\n')}`
           : '  학생이 고른 키워드: (없음)',
         f.answer ? `  학생이 직접 쓴 것(이 뜻을 살려 주세요): ${f.answer}` : '',
       ].filter(Boolean).join('\n')),
@@ -252,7 +267,8 @@ export default {
       /* 지어냄은 없다 — 이제 '제출 가능한 수준인가'를 본다. 통과/실패가 아니라
          **고칠 곳 목록**이라 초안은 그대로 주고 학생에게 짚어 준다. */
       const f = payload.fields.find((x) => x.key === key) || {};
-      const own = (f.asks || []).filter((a) => !/,\s/.test(a.a) && a.a.length >= 4).map((a) => a.a);
+      /* 이제 앱이 own 을 표시해 준다 — 글자 모양으로 짐작하던 것을 데이터로 바꿨다 */
+      const own = (f.asks || []).filter((a) => a.own).map((a) => a.a);
       const q = qualityCheck(text, { target: f.target, ownWords: own, checks: PLAYBOOK.checks });
       drafts.push({ key, text, quality: q.warnings });
     }
