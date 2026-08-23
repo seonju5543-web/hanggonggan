@@ -1807,7 +1807,8 @@
    "attachments": [],
    "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765586",
    "sourceKind": "official",
-   "listedAt": "2026-07-30"
+   "listedAt": "2026-07-30",
+   "aiTries": 1
   },
   {
    "type": "교외",
@@ -2222,7 +2223,25 @@
     "❖ 전화문의: 지능형로봇학과 02-940-5756",
     "❖ 시스템 관련 문의: kw.share.service@gmail.com"
    ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "eligibilityPrev": {
+    "lines": null,
+    "excludes": null,
+    "priority": null,
+    "from": null
+   },
+   "eligibilityLines": [
+    "본 사업단에서는 지능형로봇 분야(초급·중급·고급) 마이크로 전공 모듈 교과목을 12학점 이상 이수한 본교생을 대상으로 마이크로모듈 이수증 발급 및 성적 우수 장학금을 지급하고 있습니다. 학생분들의 많은 신청 바랍니다."
+   ],
+   "eligibilityStruct": {
+    "common": [
+     "본 사업단에서는 지능형로봇 분야(초급·중급·고급) 마이크로 전공 모듈 교과목을 12학점 이상 이수한 본교생을 대상으로 마이크로모듈 이수증 발급 및 성적 우수 장학금을 지급하고 있습니다. 학생분들의 많은 신청 바랍니다."
+    ],
+    "either": [],
+    "grade": []
+   },
+   "eligibilityFrom": "AI(원문 줄 그대로)",
+   "eligibilityReviewed": false
   },
   {
    "id": "auto-09c6eab8b020ec9ea5ed9599",
@@ -2246,7 +2265,8 @@
    "noForm": "검수 완료 2026-07-31 — 원문 첨부에 채울 신청서 양식 없음(있으면 다음 수집이 스키마화)",
    "attachments": [],
    "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765595",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "aiTries": 1
   },
   {
    "id": "auto-20ec9588eb82b482f2ec9dbc",
