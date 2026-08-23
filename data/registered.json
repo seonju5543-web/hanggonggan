@@ -3990,7 +3990,8 @@
    "noForm": "검수 완료 2026-08-02 — 원문 첨부에 채울 신청서 양식 없음(있으면 다음 수집이 스키마화)",
    "attachments": [],
    "sourceUrl": "https://www.sogang.ac.kr/ko/detail/550318?bbsConfigFk=141&namepage=ScholarshipNotice",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "aiTries": 1
   },
   {
    "id": "auto-kuk2351201750artclviewdo",
@@ -4594,7 +4595,8 @@
    "noForm": "검수 완료 2026-08-03 — 원문 첨부에 채울 신청서 양식 없음(있으면 다음 수집이 스키마화)",
    "attachments": [],
    "sourceUrl": "https://www3.chosun.ac.kr/bbs/scho/332/277925/artclView.do",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "aiTries": 1
   },
   {
    "id": "auto-scho332277911artclviewdo",
