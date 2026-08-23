@@ -71,8 +71,7 @@
    ],
    "sourceKind": "official",
    "formId": "jeju-consent-apply",
-   "listedAt": "2026-07-16",
-   "aiTries": 1
+   "listedAt": "2026-07-16"
   },
   {
    "id": "reg-sejong-didim",
@@ -110,8 +109,7 @@
     }
    ],
    "sourceUrl": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=138212&article.offset=0&articleLimit=10",
-   "sourceKind": "official",
-   "aiTries": 1
+   "sourceKind": "official"
   },
   {
    "id": "reg-kw-hwado",
@@ -226,8 +224,7 @@
     "▶ 복지장학 2( 기초생활수급자 ) 신청안내",
     "▶ 교육보호장학 ( 새터민 및 새터민자녀 ) 신청안내",
     "▶ 보훈장학 ( 본인 /( 손 ) 자녀 ) 신청안내"
-   ],
-   "aiTries": 1
+   ]
   },
   {
    "id": "reg-dg-jongdan",

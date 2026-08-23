@@ -240,7 +240,12 @@ if (!process.env.ELIG_AI_AS_LIB) {
     try { pick = await ask(it, lines); }
     /* 오류를 60자에서 자르지 말 것 — 처음 붙였을 때 400의 이유가 통째로 잘려
        무엇이 틀렸는지 알 수 없었다. API 오류는 원인이 뒷부분에 적혀 온다. */
-    catch (e) { log(`✕ ${it.name.slice(0, 30)} — 호출 실패: ${String(e && e.message || e).slice(0, 600)}`); it.aiTries = (it.aiTries || 0) + 1; continue; }
+    /* 🔴 호출이 실패한 것은 **이 공고의 잘못이 아니다** — aiTries를 올리지 않는다.
+       aiTries는 `giveUpAfter`(3회)에서 그 공고를 영영 제외하는 장부라, 여기에
+       내 코드의 400이나 네트워크 오류를 섞으면 멀쩡한 공고가 조용히 버려진다.
+       실제로 그럴 뻔했다 — 첫 실행에서 요청 형태가 틀려 3건에 헛되이 1이 찍혔다.
+       세는 것은 '모델이 읽어 봤는데 자격을 못 찾았다'뿐이다(아래 검산 실패 쪽). */
+    catch (e) { log(`✕ ${it.name.slice(0, 30)} — 호출 실패(공고 탓 아님): ${String(e && e.message || e).slice(0, 600)}`); continue; }
     const v = verifyPick(pick, lines);
     /* 🔴 검산을 통과 못 하면 **지금 것을 그대로 둔다.** 지우지 않는다 —
        AI가 못 읽었다고 이미 있던 자격까지 날리면 전수 실행이 앱을 나쁘게 만든다. */
