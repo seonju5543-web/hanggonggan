@@ -161,10 +161,21 @@ export function verifyPick(pick, lines) {
 const idx = indexTexts(texts, browserBodies);
 const strip = makeStripper(texts);
 
-export function pickTargets(items, all) {
+/* 원문 한 건을 모델에게 보일 줄 목록으로 — 대상 고르기와 `--only`가 같은 길을 쓴다 */
+function linesOf(it) {
+  const src = sourceFor(it, idx);
+  if (!hasText(src)) return [];
+  return src.text.split(/\n+/).map((l) => l.trim()).filter((l) => l.length >= 2 && l.length <= 200);
+}
+
+export function pickTargets(items, all, only) {
   const out = [];
   for (const it of items) {
     if (it.program) continue;
+    /* `--only <id>` — 공고 하나만. 시범 모드는 **빈칸만** 고르는데, 구조 소실(갈래가
+       평평해진 것)은 **이미 자격이 뜨는 공고** 쪽에 있어서 시범으로는 영영 안 나온다.
+       한 건을 눈으로 확인하는 데 전수 2,200원을 쓸 이유가 없다. */
+    if (only) { if (it.id === only) out.push({ it, lines: linesOf(it) }); continue; }
     /* 평소엔 '무료 경로가 못 읽은 것'만 온다. `--all`은 이미 자격이 뜨는 것까지 다시 읽는다 —
        구조 소실(공통/택일이 평평해진 것)은 **이미 뜨는 카드**에 숨어 있기 때문이다. */
     if (!all && requirementLines(it).length) continue;
@@ -223,8 +234,11 @@ async function ask(item, lines) {
 if (!process.env.ELIG_AI_AS_LIB) {
   /* `--all` = 169건 전수(구조 소실은 이미 뜨는 카드에 있다). 기본은 못 읽은 것만. */
   const ALL = process.argv.includes('--all');
-  const targets = pickTargets(reg.items, ALL);
-  log(ALL ? `대상 ${targets.length}건 — 전수(--all)` : `대상 ${targets.length}건 (무료 경로가 못 읽었고 원문은 있는 공고)`);
+  const ONLY = (process.argv.find((a) => a.startsWith('--only=')) || '').slice(7) || null;
+  const targets = pickTargets(reg.items, ALL, ONLY).filter((t) => t.lines.length);
+  log(ONLY ? `대상 ${targets.length}건 — 지정(${ONLY})`
+    : ALL ? `대상 ${targets.length}건 — 전수(--all)`
+    : `대상 ${targets.length}건 (무료 경로가 못 읽었고 원문은 있는 공고)`);
 
   const hasKey = !!process.env.ANTHROPIC_API_KEY || !!process.env.ELIG_AI_FAKE;
   /* 설정은 꺼진 채로 두고 **버튼에서만 켠다**(ELIG_AI_ENABLE=1).
@@ -238,7 +252,7 @@ if (!process.env.ELIG_AI_AS_LIB) {
 
   /* 전수에는 한도를 걸지 않는다 — 전수 1회가 소넷 기준 2,229원이라(2026-08-23 실측)
      3건씩 끊으면 169건에 두 달이 걸린다. 평소 실행은 한도를 지킨다. */
-  const cap = ALL ? Infinity : (cfg.maxApiCallsPerRun ?? 3);
+  const cap = (ALL || ONLY) ? Infinity : (cfg.maxApiCallsPerRun ?? 3);
   let calls = 0, got = 0, kept = 0, branched = 0;
   for (const { it, lines } of targets) {
     if (calls >= cap) { log(`이번 실행 한도(${cap}건) 도달 — 나머지는 다음 실행`); break; }

@@ -29,6 +29,12 @@ on:
           - '전부'            # 미리보기 → 시범 3건 → 전수. 권장.
           - '미리보기만'      # 돈 안 씀
           - '시범 3건만'
+          - '공고 하나만'    # 아래 only 칸에 공고 id 를 적는다
+      only:
+        description: "공고 하나만 돌릴 때 그 공고의 id (예: reg-dg-jongdan). 위에서 '공고 하나만'을 골랐을 때만 씁니다."
+        type: string
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -79,15 +85,25 @@ jobs:
         run: npm i @anthropic-ai/sdk --no-audit --no-fund --silent
 
       # ③ 시범 3건 — 전수 전에 작게 해 본다. 소넷 기준 50원쯤.
+      # 공고 하나만 — 구조 소실(갈래)은 '이미 자격이 뜨는' 공고 쪽에 있어서
+      # 시범 3건(빈칸만 고름)으로는 영영 안 나온다. 한 건 확인에 전수를 쓸 이유가 없다.
+      - name: 공고 하나만
+        if: inputs.mode == '공고 하나만'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ELIG_AI_ENABLE: '1'
+          ONLY_ID: ${{ inputs.only }}
+        run: node collector/eligibility-ai.mjs --only="$ONLY_ID" --write | tee /tmp/trial.txt
+
       - name: 시범 3건
-        if: inputs.mode != '미리보기만'
+        if: inputs.mode == '전부' || inputs.mode == '시범 3건만'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ELIG_AI_ENABLE: '1'
         run: node collector/eligibility-ai.mjs --write | tee /tmp/trial.txt
 
       # 시범 결과가 규칙을 어기면 되돌리고 전수로 넘어가지 않는다.
-      - name: 시범 결과 감사
+      - name: 결과 감사
         if: inputs.mode != '미리보기만'
         id: audit1
         continue-on-error: true
