@@ -16,7 +16,7 @@
 # 되돌리는 법: 이 워크플로가 만든 커밋 하나를 revert 하면 된다. 항목마다
 #   eligibilityPrev 에 원래 값이 남아 있어 부분 복구도 가능하다.
 
-name: 자격 요건 채우기 (AI)
+name: 자격요건 매칭 · AI 자격 읽기
 
 on:
   workflow_dispatch:
@@ -180,7 +180,7 @@ jobs:
             await github.rest.issues.create({
               owner: context.repo.owner, repo: context.repo.repo,
               labels: ['eligibility-ai'],
-              title: `${ok ? '✅' : '🚨'} 자격 요건 채우기 — ${new Date().toISOString().slice(0, 10)}`,
+              title: `${ok ? '✅' : '🚨'} 자격요건 매칭 · AI 자격 읽기 — ${new Date().toISOString().slice(0, 10)}`,
               body: [
                 ok ? '자격을 읽어 저장했습니다. 앱에는 **AI가 읽음 · 검수 전** 표식이 붙어 나갑니다.'
                    : '실패했습니다. 데이터는 되돌아갔으니 **앱은 그대로**입니다.',
