@@ -87,14 +87,11 @@
    "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765437"
   },
   "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2650%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EC%82%BC%EC%9D%BC%EC%9E%A5%ED%95%99%ED%9A%8C%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4%202026.07": {
-   "attempts": 4,
+   "attempts": 0,
    "title": "2026학년도 2학기 삼일장학회 장학생 선발 안내",
    "lastTried": "2026-08-01",
-   "lastWhy": "목록에서 못 찾음",
-   "status": "",
-   "likelyGone": true,
-   "nextTryAt": "2026-08-08",
-   "escalated": true
+   "lastWhy": "게시판 주소가 틀렸던 것으로 확인 — 재시도",
+   "status": ""
   },
   "r:reg-dg-sanhak-foreign": {
    "attempts": 4,
@@ -1985,12 +1982,11 @@
    "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322745"
   },
   "n:https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5#n-(%EC%9E%AC)%EC%A4%91%EC%95%99%EB%8C%80%ED%95%99%EA%B5%90%EB%8F%99%EB%AC%B8%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%202026%EB%85%84%EB%8F%84%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EC%95%88%EB%82%B4": {
-   "attempts": 3,
+   "attempts": 0,
    "title": "(재)중앙대학교동문장학재단 2026년도 장학생 모집 안내",
    "lastTried": "2026-08-14",
-   "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)",
-   "status": "",
-   "escalated": true
+   "lastWhy": "게시판 주소가 틀렸던 것으로 확인 — 재시도",
+   "status": ""
   },
   "n:https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5#n-2026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EA%B5%AD%EA%B0%80%EC%9E%A5%ED%95%99%EA%B8%88%20%EB%B0%8F%20%EC%82%AC%EC%A0%84%EC%9E%A5%ED%95%99%202%EC%B0%A8%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4": {
    "attempts": 3,
@@ -2001,13 +1997,13 @@
    "escalated": true
   },
   "r:auto-aaa8eca79120ec9588eb82b4": {
-   "attempts": 4,
+   "attempts": 0,
    "title": "(재)중앙대학교동문장학재단 2026년도 장학생 모집 안내",
-   "lastTried": "2026-08-20",
-   "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)",
-   "nextTryAt": "2026-08-27",
-   "status": "",
-   "escalated": true
+   "lastTried": "2026-08-23",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30066&pageNo=2",
+   "patrolledAt": "2026-08-23"
   },
   "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-%EA%B3%B5%EC%A7%80%20%EA%B3%B5%EC%A7%80%202026%EB%85%84%202%ED%95%99%EA%B8%B0%20%EA%B5%AD%EA%B0%80%EC%9E%A5%ED%95%99%EA%B8%88%202%EC%B0%A8%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4(8%2F12(%EC%88%98)~9": {
    "attempts": 0,
@@ -2440,107 +2436,95 @@
    "lastWhy": "",
    "nextTryAt": "2026-08-21",
    "status": "resolved",
-   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?SITE_NO=2&MENU_ID=100&CONTENTS_NO=1&P_TAB_NO=1&BOARD_SEQ=4&BBS_SEQ=29063"
+   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?SITE_NO=2&MENU_ID=100&CONTENTS_NO=1&P_TAB_NO=1&BOARD_SEQ=4&BBS_SEQ=29063",
+   "patrolledAt": "2026-08-23"
   },
   "r:reg-cau-samil": {
-   "attempts": 3,
+   "attempts": 0,
    "title": "삼일장학회 희망/동행 장학생 (중앙대 접수)",
    "lastTried": "2026-08-23",
-   "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-08-26",
-   "status": "",
-   "escalated": true,
-   "likelyGone": true
+   "lastWhy": "",
+   "status": "resolved",
+   "nextTryAt": "2026-08-24",
+   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?SITE_NO=2&MENU_ID=100&CONTENTS_NO=1&P_TAB_NO=1&BOARD_SEQ=4&BBS_SEQ=29987",
+   "patrolledAt": "2026-08-23"
   },
   "r:reg-cau-geunro-out": {
-   "attempts": 3,
+   "attempts": 0,
    "title": "하계방학 교외 근로지 국가근로장학생 추가 모집 (다빈치)",
    "lastTried": "2026-08-23",
-   "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-08-26",
-   "status": "",
-   "escalated": true,
-   "likelyGone": true
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=29982&pageNo=3"
   },
   "r:reg-cau-geunro-in": {
-   "attempts": 3,
+   "attempts": 0,
    "title": "하계방학 국가근로장학금(교내·교외) 추가 선발 (다빈치)",
    "lastTried": "2026-08-23",
-   "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-08-26",
-   "status": "",
-   "escalated": true,
-   "likelyGone": true
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=29980&pageNo=3"
   },
   "r:reg-cau-bogun-multi": {
-   "attempts": 3,
+   "attempts": 0,
    "title": "보건장학회 다문화가정 장학생 (중앙대 접수)",
    "lastTried": "2026-08-23",
-   "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-08-26",
-   "status": "",
-   "escalated": true,
-   "likelyGone": true
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=29992&pageNo=3"
   },
   "r:reg-cau-gomduri": {
-   "attempts": 3,
+   "attempts": 0,
    "title": "쌍용곰두리장학생 (중앙대 접수)",
    "lastTried": "2026-08-23",
-   "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-08-26",
-   "status": "",
-   "escalated": true,
-   "likelyGone": true
+   "lastWhy": "",
+   "status": "resolved",
+   "nextTryAt": "2026-08-24",
+   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?SITE_NO=2&MENU_ID=100&CONTENTS_NO=1&P_TAB_NO=1&BOARD_SEQ=4&BBS_SEQ=29996",
+   "patrolledAt": "2026-08-23"
   },
   "r:reg-cau-gyonae": {
-   "attempts": 3,
+   "attempts": 0,
    "title": "교내장학금 보훈·국가시험지원·가족·중앙나래 (중앙대)",
    "lastTried": "2026-08-23",
-   "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-08-26",
-   "status": "",
-   "escalated": true,
-   "likelyGone": true
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30000&pageNo=4",
+   "patrolledAt": "2026-08-23"
   },
   "r:reg-cau-sunglim": {
-   "attempts": 3,
+   "attempts": 0,
    "title": "성림교회 대학장학생 (2026 하반기)",
    "lastTried": "2026-08-23",
-   "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-08-26",
-   "status": "",
-   "escalated": true,
-   "likelyGone": true
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30009&pageNo=4",
+   "patrolledAt": "2026-08-23"
   },
   "r:reg-cau-ilchwi": {
-   "attempts": 3,
+   "attempts": 0,
    "title": "일취월장 장학금 (중앙대 서울캠퍼스, 2026-1학기)",
    "lastTried": "2026-08-23",
-   "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-08-26",
-   "status": "",
-   "escalated": true,
-   "likelyGone": true
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30031&pageNo=2"
   },
   "r:reg-cau-bokji-seoul": {
-   "attempts": 3,
+   "attempts": 0,
    "title": "복지장학금 (중앙대 서울캠퍼스, 2026-1학기)",
    "lastTried": "2026-08-23",
-   "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-08-26",
-   "status": "",
-   "escalated": true,
-   "likelyGone": true
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30018&pageNo=3",
+   "patrolledAt": "2026-08-23"
   },
   "r:reg-cau-bokji-davinci": {
-   "attempts": 3,
+   "attempts": 1,
    "title": "복지장학금 (중앙대 다빈치캠퍼스, 2026-1학기)",
    "lastTried": "2026-08-23",
    "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-08-26",
    "status": "",
-   "escalated": true,
-   "likelyGone": true
+   "nextTryAt": "2026-08-24"
   },
   "n:https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5&pageNo=2#n-2027%ED%95%99%EB%85%84%EB%8F%84%20%EC%9A%B0%EC%88%98%EC%A4%91%EC%95%99%EC%9D%B8%20%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%84%A0%EB%B0%9C%20%EA%B8%B0%EC%A4%80%20%EA%B3%B5%EA%B3%A0(26%ED%95%99%EB%B2%88%20%EB%8C%80%EC%83%81)": {
    "attempts": 0,
@@ -2797,16 +2781,16 @@
    "attempts": 0
   },
   "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30088&pageNo=1": {
-   "patrolledAt": "2026-08-21",
-   "lastWhy": "page.goto: Timeout 20000ms exceeded.",
+   "patrolledAt": "2026-08-23",
+   "lastWhy": "",
    "attempts": 0
   },
   "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30087&pageNo=1": {
-   "patrolledAt": "2026-08-22",
+   "patrolledAt": "2026-08-23",
    "lastWhy": ""
   },
   "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30086&pageNo=1": {
-   "patrolledAt": "2026-08-22",
+   "patrolledAt": "2026-08-23",
    "lastWhy": ""
   },
   "n:https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=342": {
@@ -2976,6 +2960,54 @@
   "n:https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=155526&article.offset=0&articleLimit=10&noCat=29": {
    "patrolledAt": "2026-08-23",
    "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)"
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?SITE_NO=2&MENU_ID=100&CONTENTS_NO=1&P_TAB_NO=1&BOARD_SEQ=4&BBS_SEQ=29063": {
+   "patrolledAt": "2026-08-23",
+   "lastWhy": ""
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30069&pageNo=2": {
+   "patrolledAt": "2026-08-23",
+   "lastWhy": ""
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30068&pageNo=2": {
+   "patrolledAt": "2026-08-23",
+   "lastWhy": ""
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30066&pageNo=2": {
+   "patrolledAt": "2026-08-23",
+   "lastWhy": ""
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30065&pageNo=2": {
+   "patrolledAt": "2026-08-23",
+   "lastWhy": ""
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30050&pageNo=2": {
+   "patrolledAt": "2026-08-23",
+   "lastWhy": ""
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30043&pageNo=2": {
+   "patrolledAt": "2026-08-23",
+   "lastWhy": ""
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=29735&pageNo=2": {
+   "patrolledAt": "2026-08-23",
+   "lastWhy": ""
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=29629&pageNo=2": {
+   "patrolledAt": "2026-08-23",
+   "lastWhy": ""
+  },
+  "r:auto-tentsno1menuid100siteno2": {
+   "patrolledAt": "2026-08-23",
+   "lastWhy": ""
+  },
+  "r:auto-tentsno5menuid100siteno2": {
+   "patrolledAt": "2026-08-23",
+   "lastWhy": ""
+  },
+  "r:auto-5menuid100ptabno5siteno2": {
+   "patrolledAt": "2026-08-23",
+   "lastWhy": ""
   }
  }
 }

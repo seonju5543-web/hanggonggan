@@ -156,14 +156,21 @@ function boardListFor(t) {
   const url = String(t.ref[t.field] || '');
   let origin = '';
   try { origin = new URL(url).origin; } catch { return null; }
-  // ① 같은 호스트의 다른 공고가 이미 쓰고 있는 목록 주소
+  /* 🔴 ① **수집 설정에 적힌 주소를 먼저 쓴다** (2026-08-21 — 순서를 바꾼 이유가 중요하다).
+     예전엔 '같은 호스트의 다른 표식 공고가 쓰는 목록 주소'를 먼저 봤는데, 표식 공고들끼리는
+     서로가 서로의 근거라 **다 같이 틀린 곳을 가리킬 수 있다.**
+     중앙대가 정확히 그랬다: 표식 주소가 `index.do?MENU_ID=100`(전체 공지)이라 사냥꾼이
+     그 탭만 뒤졌는데, 장학 공고는 **`P_TAB_NO=5`(장학 탭, 498건)** 에 있다. 전체 탭에서는
+     수천 건 뒤로 밀려 14페이지 안에 없으니 매번 `목록에서 못 찾음`으로 떨어졌다 —
+     11건이 그렇게 **사라진 공고로 오해**받고 있었다(`likelyGone`).
+     수집 설정 값은 사람이 정찰로 확인해 넣은 것이라 유추보다 언제나 낫다. */
+  const hint = BOARD_HINTS.find((h) => { try { return new URL(h).origin === origin; } catch { return false; } });
+  if (hint) return hint;
+  // ② 그래도 없으면 같은 호스트의 다른 공고가 쓰고 있는 목록 주소로 물러난다
   const mate = [...(notices.items || []), ...(registered.items || [])]
     .map((x) => x.url || x.sourceUrl || '')
     .find((u) => u.startsWith(origin) && isMarkerUrl(u));
-  if (mate) return listUrlOf(mate);
-  // ② 수집 설정에 적힌 그 학교 게시판 주소
-  const hint = BOARD_HINTS.find((h) => { try { return new URL(h).origin === origin; } catch { return false; } });
-  return hint || null;
+  return mate ? listUrlOf(mate) : null;
 }
 
 /* 정식 등록 항목에 게시판 원래 제목이 없으면, 같은 글이 실시간 공고로도 수집돼 있는지 보고
@@ -181,6 +188,22 @@ function backfillBoardTitles() {
 }
 const backfilled = backfillBoardTitles();
 if (backfilled) report0.push(`- 게시판 원래 제목을 실시간 공고에서 보강: ${backfilled}건`);
+
+/* 🔴 **미아를 따로 보고한다** (2026-08-21 개발자 지적: "얘 확실하게 수정 좀").
+   게시판 원제목이 없으면 이 로봇은 그 공고를 **찾을 수가 없다** — 우리가 가진 것은
+   사람이 다듬은 이름(`삼일장학회 희망/동행 장학생 (중앙대 접수)`)이고 게시판 제목은
+   다른 글자(`2026학년도 2학기 삼일장학회 희망/동행 장학생 선발 공고`)이기 때문이다.
+   그런데 리포트에는 다른 실패와 똑같이 `목록에서 못 찾음`으로 찍혀서, 중앙대 11건이
+   **3주 동안 '게시판에서 내려간 공고'로 오해**받고 있었다(likelyGone까지 붙었다).
+   원인이 다르면 다르게 적어야 고칠 수 있다 — 이건 로봇이 더 뒤져서 될 일이 아니라
+   사람이 원제목을 채워 줘야 하는 일이다. */
+const orphans = targets.filter((t) => t.field === 'sourceUrl' && !(t.ref.boardTitle || '').trim());
+if (orphans.length) {
+  report0.push(`- 🚨 **게시판 원제목이 없어 찾을 수 없는 공고 ${orphans.length}건** — 로봇이 더 뒤져도 안 됩니다.`);
+  report0.push('  (우리가 가진 이름은 사람이 다듬은 것이라 게시판 행과 글자가 다릅니다.'
+    + ' `data/registered.json`의 해당 항목에 `boardTitle`(게시판에 뜨는 제목 그대로)을 채워 주세요.)');
+  orphans.slice(0, 12).forEach((t) => report0.push(`  - ${t.ref.id || ''} · ${String(t.title).slice(0, 50)}`));
+}
 
 /* ── 순찰 대상: **이미 주소가 있는 링크**도 다시 열어 본다 (2026-08-01 개발자 지적) ──
    이 로봇을 만든 목적은 '동국대 고치기'가 아니라 **원문 공고로 못 가는 링크를 계속 찾아
@@ -208,7 +231,11 @@ const active = targets.filter((t) => {
 
 const boards = new Map();
 for (const t of active) {
-  const list = listUrlOf(t.ref[t.field]);
+  /* 🔴 표식 주소가 가리키는 곳이 아니라 **수집 설정에 적힌 게시판**을 먼저 쓴다 (2026-08-21).
+     중앙대 표식은 `index.do?MENU_ID=100`(전체 공지)이라 장학 공고가 수천 건 뒤로 밀린다.
+     설정에는 정찰로 확인한 `P_TAB_NO=5`(장학 탭, 498건)가 있는데 1단계가 그걸 안 보고 있었다.
+     (3단계는 이미 boardListFor를 쓰고 있었다 — 두 단계가 서로 다른 곳을 뒤지고 있던 셈이다.) */
+  const list = boardListFor(t) || listUrlOf(t.ref[t.field]);
   if (ONLY && !list.includes(ONLY)) continue;
   if (!boards.has(list)) boards.set(list, []);
   boards.get(list).push(t);
