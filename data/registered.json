@@ -842,7 +842,25 @@
     "◆ 기타 문의 : ☎ 02-6490-6287"
    ],
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
-   "aiTries": 2
+   "eligibilityPrev": {
+    "lines": null,
+    "excludes": null,
+    "priority": null,
+    "from": null
+   },
+   "eligibilityLines": [
+    "글로벌 무대에서 진로 탐색을 희망하는 2학년 이상 학부 재학생",
+    "2026-2학기 재학 상태 유지 필수(건축학전공 10학기까지 가능)",
+    "프로그램 전체 일정에 참여 가능한 자(프로그램 1회이상 미참여시 팀 탈락 장학금 환수 조치)"
+   ],
+   "eligibilityExcludes": [
+    "2026학년도 2학기 휴학생, 초과학기생, 졸업유예생, 기참가자, 대학원생, 본교 외국인 교환학생",
+    "프로그램 참가 기간 중 본교 타부서 주관 프로그램 참가 예정자",
+    "해외여행 결격 사유가 있는 자",
+    "학칙에 의해 징계를 받은 사실이 있는 자(단, 학사경고 등 학사징계 제외)"
+   ],
+   "eligibilityFrom": "AI(공고문 PDF)",
+   "eligibilityReviewed": false
   },
   {
    "id": "reg-cau-bogun-multi",
@@ -4565,7 +4583,7 @@
    ],
    "sourceUrl": "https://www3.chosun.ac.kr/bbs/scho/332/279981/artclView.do",
    "sourceKind": "official",
-   "aiTries": 1
+   "aiTries": 2
   },
   {
    "id": "auto-scho332278300artclviewdo",
@@ -6154,7 +6172,23 @@
    ],
    "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765770",
    "sourceKind": "official",
-   "boardTitle": "2026학년도 2학기 월드머시코리아장학생 선발 안내(~8/17(월))"
+   "boardTitle": "2026학년도 2학기 월드머시코리아장학생 선발 안내(~8/17(월))",
+   "eligibilityPrev": {
+    "lines": null,
+    "excludes": null,
+    "priority": null,
+    "from": null
+   },
+   "eligibilityLines": [
+    "가. 2026학년도 학부 재학생(정규학기)으로서 한 학기동안 장학활동이 가능한 자",
+    "나. 불교적 소양을 갖추고 신행활동에 적극적인 학생(※ 상기 합격자 필수사항 참고)",
+    "다. 직전학기 취득(이수)학점 15학점 이상, 평점평균 3.0 이상이며 이외는 본교 장학규정에 따름",
+    "라. 소속 단과대학 불교동아리 가입자",
+    "마. 가정형편이 어려운 학생 우대",
+    "바. 타 불교계장학 미수혜자 우선 선발"
+   ],
+   "eligibilityFrom": "AI(공고 포스터 그림)",
+   "eligibilityReviewed": false
   },
   {
    "id": "auto-estoppusanackrpageseq692",
@@ -6652,7 +6686,23 @@
     }
    ],
    "sourceUrl": "https://www.yonsei.ac.kr/bbs/sc/58/943633/artclView.do",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "eligibilityPrev": {
+    "lines": null,
+    "excludes": null,
+    "priority": null,
+    "from": null
+   },
+   "eligibilityLines": [
+    "1) 포항·광양 지역 가정 자녀 중 2026년 대학 신입생",
+    "2) 포항·광양 소재 고등학교 졸업자로서 2026년 대학 신입생",
+    "3) 포항·광양 소재 대학교 2026년 우수성적 신입생",
+    "*북한이탈주민의 경우 경상북도, 전라남도 지역까지 지원 가능",
+    "학업성적: 1학기 성적 3.0/4.5 이상",
+    "소득구간 5분위 이하"
+   ],
+   "eligibilityFrom": "AI(공고 포스터 그림)",
+   "eligibilityReviewed": false
   },
   {
    "id": "auto-bbssc58943575artclviewdo",
