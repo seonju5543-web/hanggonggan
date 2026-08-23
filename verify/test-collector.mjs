@@ -1288,6 +1288,29 @@ console.log('\n■ 껍데기 페이지와 브라우저 본문 (2026-08-20)');
    slice(0,24)), 앞머리가 어긋나면 뒤가 아무리 같아도 통째로 빗나간다.
    청소는 수집기와 **같은 모듈**을 써야 한다 — 여기에 한 벌 더 두면
    "수집기는 같다는데 사냥꾼은 다르다"가 된다(중앙대 11건이 3주간 헛돈 유형). */
+/* 🔴 2026-08-23 — **학교 서버에 붙는 워크플로는 인증서 설정을 갖고 있어야 한다.**
+   계명대·조선대처럼 중간 인증서를 안 보내는 학교가 있는데, 브라우저·curl 은 시스템
+   저장소에서 사슬을 이어 붙이지만 Node 는 안 한다 — '로봇만 못 읽고 학생은 멀쩡히
+   보는' 상태가 된다. 수집 워크플로에는 대비가 돼 있었는데 나중에 만든 워크플로 둘에
+   빠져 있어서, 조선대 공고문 PDF 내려받기가 TypeError 로 죽었다.
+   새 워크플로를 만들 때마다 사람이 기억해서 넣는 방식은 또 빠뜨린다 — 검사로 묶는다. */
+console.log('\n■ 학교 서버에 붙는 워크플로의 인증서 설정 (2026-08-23)');
+{
+  const dir = new URL('../.github/workflows/', import.meta.url);
+  /* collector 의 로봇을 부르는 워크플로만 본다 — 배포·알림 워크플로는 학교에 안 붙는다 */
+  const need = fs.readdirSync(dir).filter((f) => /\.ya?ml$/.test(f))
+    .map((f) => ({ f, t: fs.readFileSync(new URL(f, dir), 'utf8') }))
+    .filter((x) => /node collector\/(collect|deepfetch|browser-collect|rescue-bodies|link-hunter|resolve-detail-urls|eligibility-ai|extract-excerpts)/.test(x.t));
+  const missing = need.filter((x) => !/NODE_EXTRA_CA_CERTS/.test(x.t)).map((x) => x.f);
+  eq(`수집 로봇을 부르는 워크플로 ${need.length}개가 모두 인증서 설정을 갖고 있다`, missing.join(',') || '(없음)', '(없음)');
+  /* 검증을 끄는 것과 혼동하지 말 것 — 그건 아무 서버나 믿겠다는 뜻이다 */
+  const unsafe = need.filter((x) => /NODE_TLS_REJECT_UNAUTHORIZED|rejectUnauthorized:\s*false/.test(x.t)).map((x) => x.f);
+  eq('  인증서 검증을 끄는 워크플로는 없다', unsafe.join(',') || '(없음)', '(없음)');
+  /* 오류를 낱말 하나로 뭉개면 원인을 영영 못 본다 — Node fetch 의 진짜 이유는 cause 안에 있다 */
+  const df = fs.readFileSync(new URL('../collector/deepfetch.mjs', import.meta.url), 'utf8');
+  eq('  내려받기 실패는 원인(cause)까지 적는다', /e\.cause && \(e\.cause\.code/.test(df), true);
+}
+
 console.log('\n■ 링크 사냥꾼의 제목 대조 (2026-08-23)');
 {
   const lh = fs.readFileSync(new URL('../collector/link-hunter.mjs', import.meta.url), 'utf8');

@@ -369,7 +369,15 @@ async function downloadEligDocs() {
         fs.writeFileSync(new URL(fname, OUT), buf);
         (index[it.id] ||= { slug, files: [] }).files.push(fname);
         console.log('elig doc ok:', it.id, a.name, buf.length);
-      } catch (e) { console.log('elig doc err', a.name, e.name || e.message); }
+      /* 🔴 오류를 낱말 하나로 뭉개지 말 것 (2026-08-23). `e.name || e.message` 는
+         Node fetch 의 연결 실패를 전부 `TypeError` 한 낱말로 줄여 버려, 조선대 공고문
+         PDF가 왜 안 받아지는지 알 수 없었다. 진짜 원인은 `cause` 안에 들어 있다
+         (여기서는 UNABLE_TO_VERIFY_LEAF_SIGNATURE — 학교가 중간 인증서를 안 보낸 것). */
+      } catch (e) {
+        const why = [e && e.name, e && e.message, e && e.cause && (e.cause.code || e.cause.message)]
+          .filter(Boolean).join(' · ').slice(0, 200);
+        console.log('elig doc err', a.name, why);
+      }
     }
   }
   fs.writeFileSync(idxPath, JSON.stringify(index, null, 1));
