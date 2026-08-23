@@ -140,7 +140,13 @@ for (const t of targets) {
   /* 받아 온 글자가 **본문인지**는 notice-source의 규칙 하나로만 판단한다.
      여기에 규칙을 한 벌 더 두면 "재수집기는 됐다는데 발췌기는 못 읽는" 어긋남이 생긴다. */
   const entry = { title: t.it.name, text: text.slice(0, 15000), at: today, via: 'rescue' };
-  const probe = indexTexts([], { [t.url]: entry });
+  /* 🔴 **빈 말뭉치로 재면 안 된다** (2026-08-23 실측). 메뉴를 걷어내는 규칙은
+     '같은 학교의 여러 공고에 똑같이 나오는 줄'을 찾는 것이라 **원문 전체가 필요하다.**
+     처음엔 `indexTexts([], …)`로 재서 걷어낼 게 없었고, 그래서 메뉴 글자가 본문으로
+     세어져 정읍시민장학재단(한글 387자가 전부 메뉴)이 '확보 ✅'로 통과했다.
+     같은 말뭉치를 써야 재수집기·발췌기·AI가 같은 판정을 한다 — 갈라지면
+     "재수집기는 됐다는데 발췌기는 못 읽는" 일이 생긴다. */
+  const probe = indexTexts(texts, { [t.url]: entry });
   const ok = text && hasText(probe.byUrl.get(key) || entry);
 
   if (ok) {

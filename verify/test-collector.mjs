@@ -1236,6 +1236,11 @@ console.log('\n■ 껍데기 페이지와 브라우저 본문 (2026-08-20)');
   eq('재수집은 화면에 그려진 줄바꿈을 그대로 받는다', /innerText\(/.test(rb), true);
   eq('  줄바꿈까지 뭉개지 않는다', /replace\(\/\\s\+\/g, ' '\)/.test(rb), false);
   eq('  통짜 한 줄로 저장된 본문은 다시 받는다', /\/\\n\/\.test\(String\(cur\.text/.test(rb), true);
+  /* 🔴 빈 말뭉치로 재면 메뉴를 걷어낼 수 없어 **메뉴 글자가 본문으로 세어진다.**
+     실제로 정읍시민장학재단(한글 387자가 전부 메뉴)이 '확보 ✅'로 통과했고,
+     되찾았다던 37건 중 24건이 그런 가짜였다. 발췌기·AI와 같은 말뭉치를 써야
+     "재수집기는 됐다는데 발췌기는 못 읽는" 어긋남이 안 생긴다. */
+  eq('  본문 판정은 발췌기와 같은 말뭉치로 한다', /indexTexts\(texts, \{ \[t\.url\]/.test(rb), true);
 
   // 브라우저 수집기가 이미 그린 본문을 저장한다 (추가 페이지 열기 0회)
   const bc = fs.readFileSync(new URL('collector/browser-collect.mjs', root), 'utf8');
