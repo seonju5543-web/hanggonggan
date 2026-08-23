@@ -12,7 +12,7 @@
   "minBody": 300
  },
  "https://www.mju.ac.kr/bbs/mjukr/145/233439/artclView.do": {
-  "tries": 1,
+  "tries": 2,
   "at": "2026-08-23",
   "minBody": 100,
   "name": "[한국고등교육재단] 2026년 제5기 동아시아연구장학생 모집 안내"
@@ -24,13 +24,14 @@
   "minBody": 300
  },
  "https://www.konkuk.ac.kr/bbs/konkuk/235/1201830/artclView.do": {
-  "tries": 1,
+  "tries": 3,
   "at": "2026-08-23",
   "minBody": 100,
+  "gone": true,
   "name": "총동문회 장학생 (건국대, 2026-2학기)"
  },
  "https://www.konkuk.ac.kr/bbs/konkuk/235/1200997/artclView.do": {
-  "tries": 1,
+  "tries": 2,
   "at": "2026-08-23",
   "minBody": 100,
   "name": "의암 손병희 우수논문 장학생 (건국대, 2026)"
@@ -42,13 +43,13 @@
   "minBody": 300
  },
  "https://www.konkuk.ac.kr/bbs/konkuk/235/1201750/artclView.do": {
-  "tries": 1,
+  "tries": 2,
   "at": "2026-08-23",
   "minBody": 100,
   "name": "[교외][생활비] 2026년 충남평생교육진흥원 재능키움 장학사업 장학생 2차 모집 안내(7. 13. ~ 7."
  },
  "https://www3.chosun.ac.kr/bbs/scho/332/279981/artclView.do": {
-  "tries": 1,
+  "tries": 2,
   "at": "2026-08-23",
   "minBody": 100,
   "name": "2026-2 교내장학금 신청 안내(신/편입생, 재학생)"
@@ -60,7 +61,7 @@
   "minBody": 300
  },
  "https://www.konkuk.ac.kr/bbs/konkuk/235/1202780/artclView.do": {
-  "tries": 1,
+  "tries": 2,
   "at": "2026-08-23",
   "minBody": 100,
   "name": "충북인재평생교육진흥원 장학생 (2026 하반기)"
@@ -72,7 +73,7 @@
   "minBody": 300
  },
  "https://www.yonsei.ac.kr/bbs/sc/58/943633/artclView.do": {
-  "tries": 1,
+  "tries": 2,
   "at": "2026-08-23",
   "minBody": 100,
   "name": "[포스코비전장학] 대학생 생활장학금 지원 장학프로그램 선발 안내"
@@ -138,13 +139,13 @@
   "minBody": 300
  },
  "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765586": {
-  "tries": 1,
+  "tries": 2,
   "at": "2026-08-23",
   "minBody": 100,
   "name": "[홍보] 2026년 하반기 서울인재대학장학금 장학생 선발"
  },
  "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765595": {
-  "tries": 1,
+  "tries": 2,
   "at": "2026-08-23",
   "minBody": 100,
   "name": "한미 첨단분야 청년교류 지원사업 제6기 장학생 (2026)"
@@ -174,7 +175,7 @@
   "minBody": 300
  },
  "https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0713&menu_dvs_cd=0713&no=2514559&site_dvs_cd=kr": {
-  "tries": 1,
+  "tries": 2,
   "at": "2026-08-23",
   "minBody": 100,
   "name": "2026학년도 제2학기 교내 장학생(재학생) 선발 계획 안내"
@@ -198,7 +199,7 @@
   "minBody": 300
  },
  "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765770": {
-  "tries": 1,
+  "tries": 2,
   "at": "2026-08-23",
   "minBody": 100,
   "name": "2026학년도 2학기 월드머시코리아장학생 선발 안내(~8/17(월))"

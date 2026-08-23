@@ -2927,6 +2927,14 @@
     {
      "name": "2. 의암 손병희 우수논문 장학생 선발 홍보물.jpg",
      "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1221156/download.do"
+    },
+    {
+     "name": "2026 의암 손병희 우수 논문 장학생 선발.hwp",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1221155/download.do"
+    },
+    {
+     "name": "의암 손병희 우수논문 장학생 선발 홍보물.jpg",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1221156/download.do"
     }
    ],
    "sourceUrl": "https://www.konkuk.ac.kr/bbs/konkuk/235/1200997/artclView.do",
@@ -4414,6 +4422,10 @@
     {
      "name": "개인정보수집이용제공동의서(2024.12.26수정).pdf",
      "url": "https://www3.chosun.ac.kr/bbs/scho/332/376742/download.do"
+    },
+    {
+     "name": "2026-2학기 교내장학금 신청 안내(~2026.11.25).pdf",
+     "url": "https://www3.chosun.ac.kr/bbs/scho/332/376744/download.do"
     }
    ],
    "sourceUrl": "https://www3.chosun.ac.kr/bbs/scho/332/279981/artclView.do",
@@ -4799,6 +4811,10 @@
     {
      "name": "공문_붙임) 2026년 하반기 장학생 선발 공고문.pdf",
      "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1222846/download.do"
+    },
+    {
+     "name": "공문_붙임) 2026년 하반기 충북인재평생교육진흥원 장학생 선발공고.png",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1222845/download.do"
     }
    ],
    "sourceUrl": "https://www.konkuk.ac.kr/bbs/konkuk/235/1202780/artclView.do",
@@ -4906,6 +4922,22 @@
     {
      "name": "붙임4. 장학금 신청서 및 추천서 서식.hwp",
      "url": "https://plus.cnu.ac.kr/_prog/_board/common/download.php?code=sub07_0713&ntt_no=2514559&atch_no=3"
+    },
+    {
+     "name": "마이크로디그리과정",
+     "url": "https://plus.cnu.ac.kr/html/kr/26file/2026_di_2010.pdf"
+    },
+    {
+     "name": "안내문.pdf",
+     "url": "https://plus.cnu.ac.kr/_prog/_board/common/download.php?code=sub07_0713&ntt_no=2514559&atch_no=1"
+    },
+    {
+     "name": "붙임1-2. (게시용)26-2학기 장학생(재학생) 선발 계획.hwp",
+     "url": "https://plus.cnu.ac.kr/_prog/_board/common/download.php?code=sub07_0713&ntt_no=2514559&atch_no=2"
+    },
+    {
+     "name": "Current View",
+     "url": "https://plus.cnu.ac.kr/_module/pdfjs/web/viewer.html?file=/Upl/_board/sub07_0713/sub07_0713_0_1785805533.pdf#"
     }
    ],
    "sourceUrl": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2514559&code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
@@ -6409,7 +6441,12 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-08-18 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "2026 포스코비전장학 선발포스터.jpg",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1013915/download.do"
+    }
+   ],
    "sourceUrl": "https://www.yonsei.ac.kr/bbs/sc/58/943633/artclView.do",
    "sourceKind": "auto"
   },
