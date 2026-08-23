@@ -1368,6 +1368,7 @@ textarea:focus {
   background: var(--primary-weak); padding: 14px; margin-bottom: 12px;
 }
 .essay-confirm h4 { margin-bottom: 6px; }
+.essay-confirm .dp-note { text-align: left; line-height: 1.6; }
 .essay-list { display: grid; gap: 6px; margin: 10px 0 4px; }
 .essay-row {
   display: grid; grid-template-columns: 18px minmax(72px, 96px) 1fr;
