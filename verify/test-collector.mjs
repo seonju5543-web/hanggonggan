@@ -1251,6 +1251,12 @@ console.log('\n■ 껍데기 페이지와 브라우저 본문 (2026-08-20)');
      둘 다 CLAUDE.md에 이미 적혀 있던 함정인데 이 로봇을 만들 때 빠뜨렸다. */
   eq('  화면을 덮은 팝업을 먼저 치운다', /오늘 하루 보지 않기/.test(rb), true);
   eq('  본문 프레임 안까지 읽는다', /page\.frames\(\)/.test(rb), true);
+  /* 🔴 실패 횟수는 '그때의 코드와 그때의 문턱'으로 센 값이다. 문턱을 300 → 100으로
+     내렸더니 42건 전부가 '3회 실패·7일 휴식'이었는데, 그 판정은 100~299자 본문을
+     받아 놓고 버린 것일 수 있었다. 고장 났던 코드로 센 실패로 멀쩡한 공고가 쉬면 안 된다.
+     notice-source의 needsFetch가 '지금보다 짧은 한도로 잘렸으면 다시 받는다'와 같은 규칙. */
+  eq('  판정이 느슨해지면 쉬는 중이라도 다시 해 본다', /staleJudgment/.test(rb), true);
+  eq('    어떤 문턱으로 판정했는지 장부에 남긴다', /minBody: MIN_BODY/.test(rb), true);
 
   // 브라우저 수집기가 이미 그린 본문을 저장한다 (추가 페이지 열기 0회)
   const bc = fs.readFileSync(new URL('collector/browser-collect.mjs', root), 'utf8');

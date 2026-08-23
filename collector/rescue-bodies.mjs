@@ -71,7 +71,15 @@ export function pickTargets(items) {
     const cur = sourceFor(it, idx);
     if (hasText(cur) && /\n/.test(String(cur.text || ''))) continue;
     const led = ledger[canonUrl(url)];
-    if (led && led.tries >= REST_AFTER && led.at && daysBetween(led.at, today) < REST_DAYS) continue;
+    /* 🔴 **판정이 느슨해졌으면 쉬는 중이라도 다시 해 본다** (2026-08-23).
+       실패 횟수는 '그때의 코드와 그때의 문턱'으로 센 값이다. 문턱을 300 → 100으로
+       내리자 42건 전부가 '3회 실패, 7일 휴식' 상태였는데, 그 셋 중 마지막 판은
+       **100~299자 본문을 받아 놓고 버린 것일 수 있다.**
+       고장 났던 코드로 센 실패 때문에 멀쩡한 공고가 쉬면 안 된다.
+       notice-source의 `needsFetch`가 '지금보다 짧은 한도로 잘렸으면 다시 받는다'로
+       같은 문제를 푸는 것과 같은 규칙이다. */
+    const staleJudgment = led && led.minBody !== undefined && led.minBody > MIN_BODY;
+    if (!staleJudgment && led && led.tries >= REST_AFTER && led.at && daysBetween(led.at, today) < REST_DAYS) continue;
     out.push({ it, url, tries: (led && led.tries) || 0 });
   }
   /* 안 해 본 것부터 — 안 그러면 한도(25건)가 매번 앞쪽 같은 것만 다시 붙든다
@@ -175,7 +183,8 @@ for (const t of targets) {
     report.push(`- ✅ ${t.it.name.slice(0, 40)} — 본문 확보 (${text.replace(/[^가-힣]/g, '').length}자)`);
     log(`✅ ${t.it.name.slice(0, 30)}`);
   } else {
-    ledger[key] = { tries: t.tries + 1, at: today, name: t.it.name.slice(0, 60) };
+    /* 어떤 문턱으로 판정했는지 함께 남긴다 — 나중에 문턱이 내려가면 이 값을 보고 다시 해 본다 */
+    ledger[key] = { tries: t.tries + 1, at: today, minBody: MIN_BODY, name: t.it.name.slice(0, 60) };
     miss += 1;
     if (text) {
       /* 🔴 **실패할 때 무엇을 받았는지 남긴다** (2026-08-23 추가).
