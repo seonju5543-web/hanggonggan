@@ -1343,6 +1343,24 @@ console.log('\n■ AI 자격 읽기 안전장치 (2026-08-20)');
   const cfg = JSON.parse(fs.readFileSync(new URL('../collector/eligibility-ai-config.json', import.meta.url), 'utf8'));
   eq('  기본은 꺼져 있다', cfg.enabled, false);
 
+  /* 2026-08-23 — **공고문 PDF 경로.** 게시판 본문이 '붙임 참조'뿐이고 공고문이 PDF인데
+     그 PDF가 CID 폰트·스캔이면 무료 해석기로 한글이 0자 나온다(실측 5개 전부).
+     여기서는 뽑을 글자가 없어 **줄 번호 계약을 쓸 수 없다** — 이 경로만 모델이 글자를
+     돌려주고, 개발자가 자격 요건에 한해 승인한 예외를 쓰는 곳이 여기 하나다.
+     그래서 번호 경로와 **같은 낱말 관문**을 반드시 통과시켜야 한다. */
+  const p = (lines, none = false) => AI.verifyPdfLines({ none, lines, why: '' });
+  eq('공고문 PDF: 자격 줄이면 채택', p(['2026학년도 2학기 재학 예정인 학부생']).ok, true);
+  eq('  제출서류·문의는 자격이 아니다', p(['성적증명서 1부', '문의 : 02-1234-5678']).ok, false);
+  eq('  게시판 머리말도 거른다', p(['등록일 2026.06.02.', '조회 5464']).ok, false);
+  eq('  요건 신호가 없으면 통째로 버린다', p(['3. 신청 자격']).ok, false);
+  eq('  모른다(none)고 하면 그대로 둔다', p([], true).ok, false);
+  eq('  같은 줄이 여러 번 와도 한 번만', p(['1학년 재학생', '1학년 재학생']).lines.length, 1);
+  /* 🔴 이 경로는 출처를 **'AI(공고문 PDF)'**로 남겨 번호 경로와 구분한다 —
+     화면 표식은 같지만, 나중에 되짚을 때 어느 계약으로 들어온 글자인지 알아야 한다. */
+  const src = fs.readFileSync(new URL('../collector/eligibility-ai.mjs', import.meta.url), 'utf8');
+  eq('  출처를 번호 경로와 구분해 남긴다', /'AI\(공고문 PDF\)'/.test(src), true);
+  eq('  기관명을 줄이지 말라고 못 박는다', /줄이지 마세요/.test(src), true);
+
   /* 2026-08-23 — 자격을 **구조로** 읽는 경로. 종단추천장학처럼 원문이 표인 공고에서
      '공통 / 둘 중 하나 / 성적'이 평평해지면 학생이 뜻을 정반대로 읽는다(설계 문서 참조). */
   const L2 = ['3. 신청 자격', '대한불교조계종 스님 (학부 정규학기 재학생)',

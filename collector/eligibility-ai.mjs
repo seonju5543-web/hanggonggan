@@ -27,6 +27,7 @@ import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { indexTexts, sourceFor, hasText } from './notice-source.mjs';
 import { makeStripper } from './page-boilerplate.mjs';
+import { attachmentText, readable } from './attachment-text.mjs';
 
 const require = createRequire(import.meta.url);
 const { requirementLines } = require('../match-engine.js');
@@ -171,6 +172,50 @@ export function verifyPick(pick, lines) {
   };
 }
 
+/* ── 공고문 PDF 경로 (2026-08-23 신설) ──────────────────────────────
+   게시판 본문이 "붙임 참조"뿐이고 공고문이 PDF인 공고가 있다. 그 PDF가 CID 폰트·스캔이면
+   무료 해석기(pdf-text.mjs)로 한글이 **0자** 나온다 — 실측 5개 전부 그랬다.
+   `attachment-text.mjs` 첫머리가 "그건 AI 경로의 몫"이라고 넘겨 놓은 자리인데,
+   **받을 준비가 안 돼 있어서** 그 사이로 공고들이 떨어지고 있었다.
+
+   🔴 여기서는 **줄 번호 계약을 쓸 수 없다.** 뽑을 글자가 없으니 번호를 매길 대상이 없다.
+   그래서 이 경로만 모델이 **글자를 돌려준다** — 개발자가 자격 요건에 한해 승인한
+   정직 원칙 예외를 쓰는 곳이 여기 하나다. 대신:
+     · 화면에 'AI가 읽음 · 검수 전' 표식이 붙는다(다른 경로와 같다)
+     · `eligibilityFrom`에 **'AI(공고문 PDF)'**로 출처를 남겨 번호 경로와 구분한다
+     · 번호 경로와 **같은 관문**(요건 신호·제출서류·게시판 머리말)을 통과해야 한다
+   ────────────────────────────────────────────────────────────── */
+const PDF_SYSTEM = `당신은 첨부된 한국 대학 장학금 **공고문 PDF**에서 '지원 자격 요건'을 읽는 일을 합니다.
+
+원칙:
+- 공고문에 **적혀 있는 문장을 그대로** 옮깁니다. 요약하거나 바꿔 쓰지 마세요.
+- 기관·재단·시험 이름은 **줄이지 마세요**. '대한불교조계종 스님'을 '스님'으로 줄이면
+  다른 소속 학생이 자기 공고로 읽습니다. 원문에 적힌 이름을 통째로 옮깁니다.
+- '누가 받을 수 있는가'를 말하는 줄만 고릅니다(학년·성적·소득구간·거주지·특별자격·재학 상태 등).
+- 신청기간·제출서류·문의처·장학금액·선발인원·지급방법은 자격이 **아닙니다**.
+- 공고문에 자격 요건이 없으면 none을 true로 두세요. **없는 것을 지어내지 마세요.**
+- 최대 10줄까지만 고릅니다.`;
+
+const PDF_SCHEMA = {
+  type: 'object',
+  properties: { none: { type: 'boolean' }, lines: { type: 'array', items: { type: 'string' } }, why: { type: 'string' } },
+  required: ['none', 'lines', 'why'],
+  additionalProperties: false,
+};
+
+/* 모델이 보낸 **글자**를 되받아 거른다. 번호 경로의 verifyPick과 같은 낱말 관문을 쓴다 —
+   여기만 느슨하면 PDF 경로로 쓰레기가 들어온다. */
+export function verifyPdfLines(pick) {
+  if (!pick || pick.none) return { ok: false, why: (pick && pick.why) || '자격 없음' };
+  const out = [...new Set((pick.lines || [])
+    .map((l) => String(l || '').replace(/\s+/g, ' ').trim())
+    .filter((l) => l.length >= 4 && l.length <= 200)
+    .filter((l) => !NOT_REQ.test(l) && !HEADER.test(l)))].slice(0, 10);
+  if (!out.length) return { ok: false, why: '고른 줄이 자격이 아님' };
+  if (!out.some((l) => REQ_SIGNAL.test(l))) return { ok: false, why: '요건 신호가 하나도 없음' };
+  return { ok: true, lines: out };
+}
+
 /* ── 대상 고르기 ── */
 const idx = indexTexts(texts, browserBodies);
 const strip = makeStripper(texts);
@@ -217,6 +262,47 @@ export function pickTargets(items, all, only) {
      (2026-08-23 시범에서 실제로 같은 3건이 두 번 반복됐다). */
   out.sort((a, b) => (a.it.aiTries || 0) - (b.it.aiTries || 0));
   return out;
+}
+
+/* 공고문 PDF가 있는데 무료로 글자가 안 나오는 공고 — 이 경로의 대상 */
+export function pickPdfTargets(items) {
+  let index = {};
+  try { index = JSON.parse(fs.readFileSync(new URL('extracted/elig-docs.json', HERE), 'utf8')); } catch { return []; }
+  const out = [];
+  for (const it of items) {
+    if (it.program || requirementLines(it).length) continue;
+    if ((it.aiTries || 0) >= (cfg.giveUpAfter ?? 3)) continue;
+    for (const f of (index[it.id] || {}).files || []) {
+      if (!/\.pdf$/i.test(f)) continue;
+      const path = new URL(`extracted/${f}`, HERE).pathname;
+      if (!fs.existsSync(path)) continue;
+      /* 무료로 글자가 나오면 이 경로에 올 이유가 없다 — 발췌기가 이미 읽었거나 읽을 것이다 */
+      if (readable(attachmentText(path))) continue;
+      out.push({ it, path, file: f });
+      break;
+    }
+  }
+  return out;
+}
+
+async function askPdf(item, path) {
+  if (process.env.ELIG_AI_FAKE) return JSON.parse(fs.readFileSync(process.env.ELIG_AI_FAKE, 'utf8'));
+  const { default: Anthropic } = await import('@anthropic-ai/sdk');
+  const client = new Anthropic();
+  const b64 = fs.readFileSync(path).toString('base64');
+  const stream = client.beta.messages.stream({
+    model: cfg.model,
+    max_tokens: 2000,
+    system: PDF_SYSTEM,
+    output_config: { effort: cfg.effort, format: { type: 'json_schema', schema: PDF_SCHEMA } },
+    messages: [{ role: 'user', content: [
+      { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 } },
+      { type: 'text', text: `공고: ${item.name}\n\n이 공고문에서 지원 자격 요건 줄을 원문 그대로 옮겨 주세요.` },
+    ] }],
+  });
+  const msg = await stream.finalMessage();
+  if (msg.stop_reason === 'refusal') throw new Error('모델이 처리를 거부함');
+  return JSON.parse(msg.content.find((b) => b.type === 'text').text);
 }
 
 /* ── 모델 부르기 (가짜 응답으로 시험할 수 있게 갈라 둔다) ──
@@ -307,6 +393,31 @@ if (!process.env.ELIG_AI_AS_LIB) {
     if (v.struct.either.length) branched += 1;
     log(`✓ ${it.name.slice(0, 30)} — 공통 ${v.struct.common.length} · 갈래 ${v.struct.either.length} · 성적 ${v.struct.grade.length}`);
   }
+  /* ── 공고문 PDF 경로 — 무료로 글자가 안 나오는 것만 (전수·지정 실행에서만 돈다) ── */
+  let pdfGot = 0;
+  if (ALL || ONLY) {
+    for (const { it, path, file } of pickPdfTargets(reg.items)) {
+      if (ONLY && it.id !== ONLY) continue;
+      let pick;
+      try { pick = await askPdf(it, path); }
+      catch (e) { log(`✕ ${it.name.slice(0, 30)} — PDF 호출 실패(공고 탓 아님): ${String(e && e.message || e).slice(0, 300)}`); continue; }
+      const v = verifyPdfLines(pick);
+      if (!v.ok) { log(`· ${it.name.slice(0, 30)} — PDF: ${v.why} (지금 것 유지)`); it.aiTries = (it.aiTries || 0) + 1; continue; }
+      if (!it.eligibilityPrev) {
+        it.eligibilityPrev = { lines: it.eligibilityLines || null, excludes: it.eligibilityExcludes || null,
+          priority: it.eligibilityPriority || null, from: it.eligibilityFrom || null };
+      }
+      it.eligibilityLines = v.lines;
+      delete it.eligibilityStruct;                 // PDF 경로는 구조를 만들지 않는다
+      /* 출처를 번호 경로와 구분해 남긴다 — 이 경로만 모델이 글자를 돌려준다 */
+      it.eligibilityFrom = 'AI(공고문 PDF)';
+      it.eligibilityReviewed = false;
+      delete it.aiTries;
+      pdfGot += 1;
+      log(`✓ ${it.name.slice(0, 30)} — 공고문 PDF에서 ${v.lines.length}줄 (${file})`);
+    }
+  }
+
   fs.writeFileSync(regPath, JSON.stringify(reg, null, 1) + '\n');
-  log(`끝 — 호출 ${calls}회 · 확보 ${got}건 · 갈래 있는 공고 ${branched}건 · 검산 실패로 지금 것 유지 ${kept}건`);
+  log(`끝 — 호출 ${calls}회 · 확보 ${got}건 · 갈래 있는 공고 ${branched}건 · 공고문 PDF ${pdfGot}건 · 검산 실패로 지금 것 유지 ${kept}건`);
 }
