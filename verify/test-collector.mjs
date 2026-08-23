@@ -1333,6 +1333,13 @@ console.log('\n■ AI 자격 읽기 안전장치 (2026-08-20)');
   const sNum = AI.verifyPick({ none: false, why: '', common: [2], grade: [], exclude: [], priority: [],
     either: [{ label: 3, lines: [5] }, { label: 6, lines: [8] }] }, L3);
   eq('  갈래 이름이 숫자 하나로 와도 죽지 않는다', sNum.ok, true);
+  /* 🔴 실측(2026-08-23): 모델이 `교육원의 장학추천 가능자`를 공통과 신규자 갈래
+     양쪽에 넣었다. 그대로 두면 계속장학생이 "나도 그게 필요하네" 하고 포기한다. */
+  const sDup = AI.verifyPick({ none: false, why: '', common: [2, 8], grade: [], exclude: [], priority: [],
+    either: [{ label: [3, 4], lines: [5] }, { label: [6, 7], lines: [8] }] }, L3);
+  eq('  갈래에 든 줄은 공통에서 뺀다', sDup.struct.common.includes(L3[8]), false);
+  eq('    그래도 갈래 쪽에는 남는다', sDup.struct.either[1].lines.includes(L3[8]), true);
+  eq('    공통의 다른 줄은 그대로', sDup.struct.common.includes(L3[2]), true);
 }
 
 /* 2026-08-20 — 공고문 첨부에서 자격 읽기. 되돌리면 안 되는 지점이 셋이다. */

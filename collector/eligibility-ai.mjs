@@ -65,6 +65,9 @@ const SYSTEM = `당신은 한국 대학 장학금 공고에서 '지원 자격 �
 - exclude  : 제외 대상 ('~인 자는 제외', '타 장학금 중복 수혜 불가' 등)
 - priority : 우선 선발 기준 (자격이 아니라 **먼저 뽑는 순서**)
 
+🔴 같은 줄을 common 과 either 양쪽에 넣지 마세요. 한 곳에만 넣습니다.
+   어느 갈래에만 해당하는 요건이면 그 갈래에만 넣으세요.
+
 🔴 애매하면 반드시 common 에 넣으세요.
    택일인데 common 으로 넣으면 → 자격 있는 학생이 지레 포기합니다(기회 하나 손해).
    공통인데 either 로 넣으면 → **자격 없는 학생이 서류를 떼고 신청합니다.** 이쪽이 훨씬 나쁩니다.
@@ -144,14 +147,24 @@ export function verifyPick(pick, lines) {
      공통인데 택일로 그리면 **자격 없는 학생이 서류를 뗀다.** */
   if (either.length === 1) { common.push(...either[0].lines); either = []; }
 
-  const flat = [...new Set([...common, ...either.flatMap((b) => b.lines), ...grade])].slice(0, 12);
+  /* 🔴 갈래에 든 줄은 공통에서 뺀다 (2026-08-23 실측으로 추가).
+     종단추천장학에서 `대한불교조계종 교육원의 장학추천 가능자`가 **공통과 신규자 갈래
+     양쪽에** 들어왔다. 원문에는 신규자 아래 한 번만 나오는 줄이다.
+     그대로 두면 계속장학생이 "나도 교육원 추천을 받아야 하네" 하고 포기한다 —
+     이 설계가 고치려던 실패와 같은 종류다.
+     **갈래 쪽을 남긴다**: 모델이 어느 갈래인지 콕 집은 것은 구체적인 판단이고,
+     공통에 겹쳐 넣은 것은 대개 그냥 중복이다. 갈래에 남아 있으니 화면에서 사라지지도 않는다. */
+  const inBranch = new Set(either.flatMap((b) => b.lines));
+  const commonOnly = common.filter((l) => !inBranch.has(l));
+
+  const flat = [...new Set([...commonOnly, ...either.flatMap((b) => b.lines), ...grade])].slice(0, 12);
   if (!flat.length) return { ok: false, why: '고른 줄이 범위 밖이거나 자격이 아님' };
   if (!flat.some((l) => REQ_SIGNAL.test(l))) return { ok: false, why: '요건 신호가 하나도 없음' };
 
   return {
     ok: true,
     lines: flat,                                   // 화면·알림·챗봇이 지금 쓰는 평평한 모양 (그대로 둔다)
-    struct: { common: [...new Set(common)], either, grade },   // 새 렌더러가 쓰는 구조
+    struct: { common: [...new Set(commonOnly)], either, grade },   // 새 렌더러가 쓰는 구조
     excludes: pull(pick.exclude, 6),
     priority: pull(pick.priority, 6),
   };
