@@ -187,6 +187,10 @@ export function pickTargets(items, all) {
     if (gauge.replace(/[^가-힣]/g, '').length < (cfg.minBodyChars ?? 20)) continue;
     out.push({ it, lines });
   }
+  /* 안 해 본 것부터 — 등록 순서 그대로 두면 실행 한도(3건)가 매번 **같은 앞쪽 3건**만
+     다시 붙들어, 그 셋이 giveUpAfter에 닿기 전까지 뒤쪽 47건은 차례가 오지 않는다
+     (2026-08-23 시범에서 실제로 같은 3건이 두 번 반복됐다). */
+  out.sort((a, b) => (a.it.aiTries || 0) - (b.it.aiTries || 0));
   return out;
 }
 
@@ -198,12 +202,15 @@ async function ask(item, lines) {
   const { default: Anthropic } = await import('@anthropic-ai/sdk');
   const client = new Anthropic();
   const numbered = lines.map((l, i) => `${i}\t${l}`).join('\n');
+  /* 🔴 `fallbacks`(안전 거절 시 다른 모델로 넘기기)를 붙이지 말 것 —
+     `claude-sonnet-5` does not support the `fallbacks` parameter. 로 **400이 난다**(실측 2026-08-23).
+     그 파라미터는 Fable 5·Opus 5 전용이다. 지난 세션이 습관적으로 붙여 뒀는데
+     잔액이 없어 한 번도 안 걸렸고, 잔액을 채우자마자 3건이 전부 죽었다.
+     장학금 공고에서 자격 줄을 고르는 일에 안전 거절이 날 일도 없으므로 빼도 잃는 게 없다. */
   const stream = client.beta.messages.stream({
     model: cfg.model,
     max_tokens: 2000,
     system: SYSTEM,
-    betas: ['server-side-fallback-2026-07-01'],
-    fallbacks: 'default',
     output_config: { effort: cfg.effort, format: { type: 'json_schema', schema: SCHEMA } },
     messages: [{ role: 'user', content: `공고: ${item.name}\n\n----- 원문(줄 번호\\t내용) -----\n${numbered}` }],
   });
@@ -238,7 +245,14 @@ if (!process.env.ELIG_AI_AS_LIB) {
     calls += 1;
     let pick;
     try { pick = await ask(it, lines); }
-    catch (e) { log(`✕ ${it.name.slice(0, 30)} — 호출 실패: ${String(e.message).slice(0, 60)}`); it.aiTries = (it.aiTries || 0) + 1; continue; }
+    /* 오류를 60자에서 자르지 말 것 — 처음 붙였을 때 400의 이유가 통째로 잘려
+       무엇이 틀렸는지 알 수 없었다. API 오류는 원인이 뒷부분에 적혀 온다. */
+    /* 🔴 호출이 실패한 것은 **이 공고의 잘못이 아니다** — aiTries를 올리지 않는다.
+       aiTries는 `giveUpAfter`(3회)에서 그 공고를 영영 제외하는 장부라, 여기에
+       내 코드의 400이나 네트워크 오류를 섞으면 멀쩡한 공고가 조용히 버려진다.
+       실제로 그럴 뻔했다 — 첫 실행에서 요청 형태가 틀려 3건에 헛되이 1이 찍혔다.
+       세는 것은 '모델이 읽어 봤는데 자격을 못 찾았다'뿐이다(아래 검산 실패 쪽). */
+    catch (e) { log(`✕ ${it.name.slice(0, 30)} — 호출 실패(공고 탓 아님): ${String(e && e.message || e).slice(0, 600)}`); continue; }
     const v = verifyPick(pick, lines);
     /* 🔴 검산을 통과 못 하면 **지금 것을 그대로 둔다.** 지우지 않는다 —
        AI가 못 읽었다고 이미 있던 자격까지 날리면 전수 실행이 앱을 나쁘게 만든다. */

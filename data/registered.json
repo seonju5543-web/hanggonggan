@@ -559,7 +559,8 @@
    ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322415",
    "sourceKind": "official",
-   "formId": "uiam-apply"
+   "formId": "uiam-apply",
+   "aiTries": 1
   },
   {
    "id": "reg-cau-samil",
@@ -732,7 +733,8 @@
    "excerpts": [
     "◆ 기타 문의 : ☎ 02-6490-6287"
    ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "aiTries": 1
   },
   {
    "id": "reg-cau-bogun-multi",
@@ -908,7 +910,34 @@
     "문의: nccoss@uos.ac.kr 이메일 문의"
    ],
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
-   "applyEmail": "nccoss@uos.ac.kr"
+   "applyEmail": "nccoss@uos.ac.kr",
+   "eligibilityPrev": {
+    "lines": null,
+    "excludes": null,
+    "priority": null,
+    "from": null
+   },
+   "eligibilityLines": [
+    "- 26년 1학기 기준 서울시립대학교 재학생만 지급 가능 (휴학생, 졸업생, 졸업 유예생 지급 불가)",
+    "- 26년 1학기 (26. 03. ~ 26. 07.) 에 인증된 교육과정(마이크로디그리) 이수인증만 인정됨",
+    "* 사업 시작 연도 이후에 (2023 학년도 ~) 이수한 교과목 으로 해당 학기에 이수 인증한 마이크로디그리 평점 평균 B0( 평점 평균 3.0) 이상 수령 가능"
+   ],
+   "eligibilityStruct": {
+    "common": [
+     "- 26년 1학기 기준 서울시립대학교 재학생만 지급 가능 (휴학생, 졸업생, 졸업 유예생 지급 불가)",
+     "- 26년 1학기 (26. 03. ~ 26. 07.) 에 인증된 교육과정(마이크로디그리) 이수인증만 인정됨",
+     "* 사업 시작 연도 이후에 (2023 학년도 ~) 이수한 교과목 으로 해당 학기에 이수 인증한 마이크로디그리 평점 평균 B0( 평점 평균 3.0) 이상 수령 가능"
+    ],
+    "either": [],
+    "grade": [
+     "* 사업 시작 연도 이후에 (2023 학년도 ~) 이수한 교과목 으로 해당 학기에 이수 인증한 마이크로디그리 평점 평균 B0( 평점 평균 3.0) 이상 수령 가능"
+    ]
+   },
+   "eligibilityExcludes": [
+    "- 26년 1학기 기준 서울시립대학교 재학생만 지급 가능 (휴학생, 졸업생, 졸업 유예생 지급 불가)"
+   ],
+   "eligibilityFrom": "AI(원문 줄 그대로)",
+   "eligibilityReviewed": false
   },
   {
    "id": "reg-sm-woosu",
@@ -939,7 +968,8 @@
     }
    ],
    "sourceKind": "official",
-   "listedAt": "2026-07-16"
+   "listedAt": "2026-07-16",
+   "aiTries": 1
   },
   {
    "id": "reg-hi-jeongeup",
@@ -976,7 +1006,8 @@
    ],
    "sourceKind": "official",
    "formId": "jeongeup-apply",
-   "listedAt": "2026-07-16"
+   "listedAt": "2026-07-16",
+   "aiTries": 1
   },
   {
    "id": "reg-cau-gyonae",
@@ -1195,7 +1226,8 @@
    "attachments": [],
    "sourceUrl": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52884&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "sourceKind": "official",
-   "listedAt": "2026-07-16"
+   "listedAt": "2026-07-16",
+   "aiTries": 1
   },
   {
    "id": "reg-kosaf-daecheonggyo",
@@ -1410,7 +1442,8 @@
    "attachments": [],
    "sourceUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30025&pageNo=1",
    "sourceKind": "official",
-   "listedAt": "2026-07-16"
+   "listedAt": "2026-07-16",
+   "aiTries": 1
   },
   {
    "id": "auto-dergraddoarticleno154505",
@@ -1471,7 +1504,8 @@
    "attachments": [],
    "sourceUrl": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=154473&article.offset=0&articleLimit=10&noCat=501",
    "sourceKind": "official",
-   "listedAt": "2026-07-23"
+   "listedAt": "2026-07-23",
+   "aiTries": 1
   },
   {
    "id": "auto-otice06doarticleno138662",
@@ -1748,7 +1782,8 @@
    "attachments": [],
    "sourceUrl": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52964&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "sourceKind": "official",
-   "listedAt": "2026-07-30"
+   "listedAt": "2026-07-30",
+   "aiTries": 1
   },
   {
    "id": "auto-c839d20ec84a0ebb09c20202",
@@ -1772,7 +1807,8 @@
    "attachments": [],
    "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765586",
    "sourceKind": "official",
-   "listedAt": "2026-07-30"
+   "listedAt": "2026-07-30",
+   "aiTries": 1
   },
   {
    "type": "교외",
@@ -2187,7 +2223,25 @@
     "❖ 전화문의: 지능형로봇학과 02-940-5756",
     "❖ 시스템 관련 문의: kw.share.service@gmail.com"
    ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "eligibilityPrev": {
+    "lines": null,
+    "excludes": null,
+    "priority": null,
+    "from": null
+   },
+   "eligibilityLines": [
+    "본 사업단에서는 지능형로봇 분야(초급·중급·고급) 마이크로 전공 모듈 교과목을 12학점 이상 이수한 본교생을 대상으로 마이크로모듈 이수증 발급 및 성적 우수 장학금을 지급하고 있습니다. 학생분들의 많은 신청 바랍니다."
+   ],
+   "eligibilityStruct": {
+    "common": [
+     "본 사업단에서는 지능형로봇 분야(초급·중급·고급) 마이크로 전공 모듈 교과목을 12학점 이상 이수한 본교생을 대상으로 마이크로모듈 이수증 발급 및 성적 우수 장학금을 지급하고 있습니다. 학생분들의 많은 신청 바랍니다."
+    ],
+    "either": [],
+    "grade": []
+   },
+   "eligibilityFrom": "AI(원문 줄 그대로)",
+   "eligibilityReviewed": false
   },
   {
    "id": "auto-09c6eab8b020ec9ea5ed9599",
@@ -2211,7 +2265,8 @@
    "noForm": "검수 완료 2026-07-31 — 원문 첨부에 채울 신청서 양식 없음(있으면 다음 수집이 스키마화)",
    "attachments": [],
    "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765595",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "aiTries": 1
   },
   {
    "id": "auto-20ec9588eb82b482f2ec9dbc",
