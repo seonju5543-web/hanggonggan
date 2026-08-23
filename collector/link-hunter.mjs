@@ -55,6 +55,7 @@
          (워크플로 link-hunter.yml · collector/run-link-hunt.txt 를 고쳐 push해도 실행) */
 import fs from 'node:fs';
 import { chromium } from 'playwright';
+import { cleanTitle } from './clean-title.mjs';
 import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, titleFingerprint, detailCandidates, idsFromSource, looksLikeLoginWall, rowDetailCandidates, looksLikeList } from './detail-url.mjs';
 
 const HERE = new URL('.', import.meta.url);
@@ -129,9 +130,14 @@ for (const r of registered.items || []) {
    게시판 행("공지 공지 2026-2학기 전문자격장학 신청안내 …")과 안 맞아 못 찾는다.
    표식(#n-)에 든 제목이 원래 제목이고, boardTitle 필드가 있으면 그게 더 정확하다. */
 function huntTitle(t) {
-  const stored = (t.ref.boardTitle || '').trim();
+  /* 🔴 **부스러기를 떼고 쓴다** (2026-08-23). 게시판 행 글자를 그대로 담아 둔 값에는
+     앞머리에 `공지 공지`·`2651` 같은 행 번호·분류 배지가 붙어 있다. 대조는 제목 **앞부분**을
+     맞춰 보므로(아래 fingerprint의 `slice(0, 24)`), 앞머리가 어긋나면 뒤가 아무리 같아도
+     통째로 빗나간다. 청소 규칙은 수집기와 **같은 모듈**을 쓴다 — 여기에 한 벌 더 두면
+     "수집기는 같다는데 사냥꾼은 다르다"가 된다(clean-title.mjs 첫머리 참조). */
+  const stored = cleanTitle((t.ref.boardTitle || '').trim());
   if (stored) return stored;
-  const fromMarker = markerTitle(t.ref[t.field]);
+  const fromMarker = cleanTitle(markerTitle(t.ref[t.field]) || '');
   if (fromMarker) return fromMarker;
   return String(t.title);
 }
@@ -182,7 +188,7 @@ function backfillBoardTitles() {
     if (t.field !== 'sourceUrl' || (t.ref.boardTitle || '').trim()) continue;
     const list = listUrlOf(t.ref[t.field]);
     const mate = (notices.items || []).find((x) => listUrlOf(x.url) === list && sameTitle(markerTitle(t.ref[t.field]) || t.title, x.title));
-    if (mate) { t.ref.boardTitle = mate.title; n += 1; }
+    if (mate) { t.ref.boardTitle = cleanTitle(mate.title); n += 1; }
   }
   return n;
 }
@@ -447,7 +453,7 @@ async function runPatrol() {
     for (const { t, v } of realFails) {
       const list = boardListFor(t);
       if (!list) { report.push(`  - ⚠️ ${t.id || String(t.title).slice(0, 30)} (${v.why}) — 되돌릴 게시판 주소를 몰라 그대로 둡니다`); continue; }
-      const back = (t.ref.boardTitle || '').trim() || String(t.title);
+      const back = cleanTitle((t.ref.boardTitle || '').trim()) || String(t.title);
       if (!t.ref.boardTitle) t.ref.boardTitle = back;      // 게시판 원래 제목을 잃지 않게
       if (!DRY) t.ref[t.field] = `${list}#n-${encodeURIComponent(back.slice(0, 40))}`;
       demoted += 1;
@@ -581,7 +587,7 @@ for (const [listUrl, group] of boards) {
       rows = await scrapeRows(page);
 
       if (url) {
-        if (!DRY) { t.ref[t.field] = url; if (!t.ref.boardTitle) t.ref.boardTitle = want; }
+        if (!DRY) { t.ref[t.field] = url; if (!t.ref.boardTitle) t.ref.boardTitle = cleanTitle(want); }
         found += 1;
         record(t, 'ok');
         report.push(`  - ✅ ${want.slice(0, 42)} → ${url.slice(0, 104)}`);

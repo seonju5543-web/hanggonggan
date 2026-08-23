@@ -27,6 +27,7 @@
 import fs from 'node:fs';
 import { chromium } from 'playwright';
 import { indexTexts, sourceFor, hasText, canonUrl, MIN_BODY } from './notice-source.mjs';
+import { makeStripper } from './page-boilerplate.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const bodiesPath = new URL('extracted/browser-bodies.json', HERE);
@@ -40,12 +41,17 @@ const CAP = Number(process.env.RESCUE_CAP || 25);
    게시판이 고쳐지거나 우리 판정이 나아질 수 있다(링크 사냥꾼과 같은 원칙). */
 const REST_AFTER = 3;
 const REST_DAYS = 7;
+/* 봇 차단 화면 표지 — 홍익대가 쓰는 STCLab 봇매니저가 대표적이다 */
+const BOT_WALL = /botmanager|stclab|Security Verification|자동입력\s*방지/i;
+const UA = { 'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36' };
 
 const log = (m) => console.log(`[rescue] ${m}`);
+let regDirty = false;
 const today = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
 const daysBetween = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 86400000);
 
-const reg = JSON.parse(fs.readFileSync(new URL('../data/registered.json', HERE), 'utf8'));
+const regPath = new URL('../data/registered.json', HERE);
+const reg = JSON.parse(fs.readFileSync(regPath, 'utf8'));
 let texts = [];
 try { texts = JSON.parse(fs.readFileSync(new URL('extracted/notices-text.json', HERE), 'utf8')); } catch { /* 없으면 0건 */ }
 let bodies = {};
@@ -54,6 +60,7 @@ let ledger = {};
 try { ledger = JSON.parse(fs.readFileSync(ledgerPath, 'utf8')); } catch { /* 첫 실행 */ }
 
 const idx = indexTexts(texts, bodies);
+const strip = makeStripper(texts);
 const report = ['# 자격요건 매칭 · 공고 본문 재수집 리포트', '', `실행: ${today}`, ''];
 
 /* ── 대상 고르기 ──
@@ -64,9 +71,20 @@ export function pickTargets(items) {
     if (it.program) continue;
     const url = it.sourceUrl || '';
     if (!/^https?:\/\//.test(url) || url.includes('#n-')) continue;
-    if (hasText(sourceFor(it, idx))) continue;          // 이미 본문이 있다
+    /* 이미 본문이 있어도 **통짜 한 줄이면 다시 받는다** — 줄바꿈이 없는 본문은
+       AI가 줄 번호를 못 매기고 표 구조도 못 읽어, 있으나 마나다(위 주석 참조). */
+    const cur = sourceFor(it, idx);
+    if (hasText(cur) && /\n/.test(String(cur.text || ''))) continue;
     const led = ledger[canonUrl(url)];
-    if (led && led.tries >= REST_AFTER && led.at && daysBetween(led.at, today) < REST_DAYS) continue;
+    /* 🔴 **판정이 느슨해졌으면 쉬는 중이라도 다시 해 본다** (2026-08-23).
+       실패 횟수는 '그때의 코드와 그때의 문턱'으로 센 값이다. 문턱을 300 → 100으로
+       내리자 42건 전부가 '3회 실패, 7일 휴식' 상태였는데, 그 셋 중 마지막 판은
+       **100~299자 본문을 받아 놓고 버린 것일 수 있다.**
+       고장 났던 코드로 센 실패 때문에 멀쩡한 공고가 쉬면 안 된다.
+       notice-source의 `needsFetch`가 '지금보다 짧은 한도로 잘렸으면 다시 받는다'로
+       같은 문제를 푸는 것과 같은 규칙이다. */
+    const staleJudgment = led && led.minBody !== undefined && led.minBody > MIN_BODY;
+    if (!staleJudgment && led && led.tries >= REST_AFTER && led.at && daysBetween(led.at, today) < REST_DAYS) continue;
     out.push({ it, url, tries: (led && led.tries) || 0 });
   }
   /* 안 해 본 것부터 — 안 그러면 한도(25건)가 매번 앞쪽 같은 것만 다시 붙든다
@@ -85,6 +103,7 @@ function saveAll(crashNote) {
   for (const [u, v] of Object.entries(bodies)) if (!v.at || v.at >= cutoff) keep[u] = v;
   fs.writeFileSync(bodiesPath, JSON.stringify(keep, null, 1));
   fs.writeFileSync(ledgerPath, JSON.stringify(ledger, null, 1));
+  if (regDirty) fs.writeFileSync(regPath, JSON.stringify(reg, null, 1) + '\n');
   if (crashNote) report.push('', `🚨 도중에 넘어졌습니다: ${crashNote}`);
   fs.writeFileSync(reportPath, report.join('\n') + '\n');
 }
@@ -106,7 +125,7 @@ const ctx = await browser.newContext({
 });
 
 const startedAt = Date.now();
-let got = 0, miss = 0, done = 0;
+let got = 0, miss = 0, done = 0, gone = 0;
 for (const t of targets) {
   if (done >= CAP) { log(`이번 실행 한도(${CAP}건) 도달`); break; }
   /* 시간 예산은 **시작 전에** 본다 — 예산을 넘긴 채 시작하면 강제 종료로 저장까지 죽는다
@@ -116,22 +135,130 @@ for (const t of targets) {
   const key = canonUrl(t.url);
   const page = await ctx.newPage();
   let text = '';
+  let finalUrl = '';
   try {
     await page.goto(t.url, { waitUntil: 'domcontentloaded', timeout: 30000 });
-    await page.waitForTimeout(4000);           // 자바스크립트가 본문을 그릴 시간
-    const html = await page.content();
-    text = html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ')
-      .replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    await page.waitForTimeout(6000);           // 자바스크립트가 본문을 그릴 시간 (4초로는 모자란 학교가 있었다)
+    finalUrl = page.url();      // 봇 차단은 최종 주소가 challenge 로 바뀌는 것으로 드러난다
+    /* 🔴 **줄바꿈을 없애면 안 된다** (2026-08-23 실측으로 배웠다).
+       처음엔 태그를 정규식으로 벗기고 `\s+ → ' '`로 눌렀는데, 그러면 본문이
+       **통짜 한 줄**이 된다. 그 한 줄은 ① AI가 줄 번호를 못 매겨 대상에서 빠지고
+       ② 표의 칸 구분(공통 / 재학생 / 신규자)이 통째로 사라진다 —
+       이 작업의 핵심이 바로 그 구조를 살리는 것인데 받아 오는 자리에서 죽이고 있었다.
+       `innerText`는 브라우저가 화면에 그린 그대로의 줄바꿈을 준다. */
+    /* ① 화면을 덮은 팝업을 먼저 치운다. 동국대는 '오늘 하루 보지 않기' 팝업이
+       본문을 가려서, 받아 온 글자가 `불교동아리 소식 · 공양기도문 · POPUP`뿐이었다
+       (CLAUDE.md에 이미 적혀 있던 함정인데 이 로봇을 만들 때 빠뜨렸다).
+       보통 클릭이 막히므로 evaluate로 직접 누른다 — 같은 이유로 목록 클릭도 그렇게 한다. */
+    for (const label of ['오늘 하루 보지 않기', '오늘하루 열지 않기', '오늘 하루 열지 않기', '팝업 닫기', '닫기']) {
+      try {
+        const el = page.locator(`text=${label}`).first();
+        if (await el.count()) await el.evaluate((e) => e.click());
+      } catch { /* 없으면 그만 */ }
+    }
+    /* ② **프레임 안까지 읽는다.** 일부 학교는 본문을 iframe에 그린다 —
+       주 프레임만 보면 메뉴와 팝업만 손에 남는다(브라우저 수집기는 이미 frames()를 본다).
+       메뉴가 섞여도 괜찮다 — 걷어내는 일은 page-boilerplate가 한다. */
+    const parts = [];
+    for (const f of page.frames()) {
+      try { parts.push(await f.locator('body').innerText({ timeout: 3000 })); } catch { /* 죽은 프레임은 건너뛴다 */ }
+    }
+    text = parts.join('\n')
+      .replace(/[ \t\u00a0]+/g, ' ')
+      .split('\n').map((l) => l.trim()).filter(Boolean).join('\n');
+
+    /* 🔴 **첨부 목록도 같이 받아 적는다** (2026-08-23).
+       페이지를 이미 열어 놓고 첨부 이름을 눈앞에 두고도 기록을 안 고치고 있었다.
+       그 사이 우리가 가진 목록은 낡아서, 게시판에는 공고문이 붙어 있는데
+       우리 기록엔 서식·동의서만 있어 무료 경로가 못 읽는 일이 생겼다:
+         건국대 의암 손병희 — 게시판 `…우수 논문 장학생 선발.hwp` / 기록 `서식 및 작성요령.hwp`
+         조선대 교내장학금 — 게시판 `…교내장학금 신청 안내.pdf` / 기록 `개인정보수집이용제공동의서.pdf`
+       추가 페이지 열기가 0회라 시간 예산에 아무 영향이 없다. */
+    try {
+      const found = [];
+      for (const f of page.frames()) {
+        const links = await f.$$eval('a[href]', (as) => as.map((a) => ({
+          name: (a.textContent || '').replace(/\s+/g, ' ').trim(), url: a.href,
+        }))).catch(() => []);
+        for (const l of links) {
+          if (!/\.(hwp|hwpx|pdf|docx?|xlsx?|zip)(\?|$)/i.test(l.name) && !/download|file|attach/i.test(l.url)) continue;
+          const nm = l.name.replace(/\s*미리보기\s*$/, '').replace(/^\d+\.\s*/, '').trim();
+          if (nm.length >= 5 && nm.length <= 120 && !found.some((x) => x.name === nm)) found.push({ name: nm, url: l.url });
+        }
+      }
+      /* 이름 앞의 번호(`1. `)와 `미리보기` 꼬리를 떼고 비교한다 — 안 그러면
+         `1. ○○.hwp`와 `○○.hwp`가 다른 첨부로 보여 같은 파일이 두 번 쌓인다(실측). */
+      const norm = (n) => String(n || '').replace(/\s*미리보기\s*$/, '').replace(/^\d+\.\s*/, '').trim();
+      /* 🔴 **본문이 이미지인 공고가 있다** (2026-08-23). `[홍보]`가 붙은 공고들은
+         글자 없이 포스터 그림만 올려 둔다 — innerText 로는 한 글자도 안 잡히니
+         '본문이 없다'로 보이지만 실제로는 **눈으로 읽을 내용이 있다.**
+         큰 그림만 담는다(가로·세로 300px 이상) — 아이콘·로고·버튼을 담으면
+         자격을 읽으라고 로고를 보내는 꼴이 된다. */
+      for (const f of page.frames()) {
+        const imgs = await f.$$eval('img', (els) => els
+          .filter((e) => e.naturalWidth >= 300 && e.naturalHeight >= 300)
+          .map((e) => ({ url: e.currentSrc || e.src, w: e.naturalWidth, h: e.naturalHeight }))).catch(() => []);
+        for (const im of imgs) {
+          if (!im.url || /^data:/.test(im.url)) continue;
+          const nm = `본문이미지-${im.w}x${im.h}.${(im.url.match(/\.(png|jpe?g|gif|webp)(\?|$)/i) || [, 'jpg'])[1]}`;
+          if (!found.some((x) => x.url === im.url)) found.push({ name: nm, url: im.url, bodyImage: true });
+        }
+      }
+      const had = new Set((t.it.attachments || []).map((a) => norm(a.name)));
+      const add = found.filter((a) => !had.has(norm(a.name)));
+      if (add.length) {
+        t.it.attachments = [...(t.it.attachments || []), ...add];
+        regDirty = true;
+        const pic = add.filter((a) => a.bodyImage).length;
+        report.push(`- 📎 ${t.it.name.slice(0, 36)} — 첨부 ${add.length}개를 새로 받아 적음${pic ? ` (그중 **본문 그림 ${pic}장**)` : ''}: ${add.map((a) => a.name).join(' , ').slice(0, 90)}`);
+      }
+    } catch { /* 첨부를 못 걷어도 본문 저장은 계속한다 */ }
   } catch (e) {
     report.push(`- ✕ ${t.it.name.slice(0, 40)} — 열지 못함: ${String(e.message).slice(0, 60)}`);
   } finally {
     await page.close().catch(() => {});
   }
 
+  /* 🔴 **봇 차단은 브라우저만 막는다 — 그럴 땐 일반 fetch로 물러선다** (2026-08-23 실측).
+     홍익대는 브라우저로 열면 `cdn-botmanager.stclab.com/…/challenge`(제목 `Security
+     Verification`)로 튕기는데, **일반 fetch로 받아 둔 원문 13건에는 봇 차단 화면이 0건**이다.
+     STCLab 봇매니저가 헤드리스 브라우저만 잡는 것이다.
+     그래서 대안은 '브라우저를 더 잘 위장한다'가 아니라 '막히면 다른 길로 간다'이다 —
+     브라우저가 필요했던 이유(본문을 JS로 그린다)와 봇 차단은 서로 다른 문제이고,
+     봇 차단이 걸린 게시판은 대개 서버가 완성된 HTML을 준다. */
+  if (BOT_WALL.test(text) || BOT_WALL.test(String(finalUrl))) {
+    report.push(`- 🤖 ${t.it.name.slice(0, 36)} — 브라우저가 봇 차단에 걸려 일반 내려받기로 물러섬`);
+    try {
+      const res = await fetch(t.url, { redirect: 'follow', headers: UA, signal: AbortSignal.timeout(20000) });
+      if (res.ok) {
+        const html = await res.text();
+        text = html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ')
+          .replace(/<br\s*\/?>/gi, '\n').replace(/<\/(p|div|li|tr|h[1-6])>/gi, '\n')
+          .replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ')
+          .replace(/[ \t\u00a0]+/g, ' ').split('\n').map((l) => l.trim()).filter(Boolean).join('\n');
+      }
+    } catch { /* 이쪽도 안 되면 그냥 실패로 둔다 */ }
+  }
+
   /* 받아 온 글자가 **본문인지**는 notice-source의 규칙 하나로만 판단한다.
      여기에 규칙을 한 벌 더 두면 "재수집기는 됐다는데 발췌기는 못 읽는" 어긋남이 생긴다. */
+  /* 게시판에서 내려간 공고는 '못 받은 것'이 아니라 '없어진 것'이다 — 섞으면
+     영영 다시 받으려 애쓴다. 건국대 총동문회 장학생이 실제로 이 상태였다. */
+  if (/게시물이?\s*\(?가?\)?\s*존재\s*하지\s*않|삭제된?\s*게시물|없는 게시물/.test(text)) {
+    gone += 1;
+    ledger[key] = { tries: REST_AFTER, at: today, minBody: MIN_BODY, gone: true, name: t.it.name.slice(0, 60) };
+    report.push(`- 🗑 **${t.it.name.slice(0, 40)}** — 게시판에서 내려갔습니다(삭제된 공고). 등록 목록에서 뺄지 검토가 필요합니다.`);
+    log(`🗑 ${t.it.name.slice(0, 30)} — 삭제된 공고`);
+    continue;
+  }
   const entry = { title: t.it.name, text: text.slice(0, 15000), at: today, via: 'rescue' };
-  const probe = indexTexts([], { [t.url]: entry });
+  /* 🔴 **빈 말뭉치로 재면 안 된다** (2026-08-23 실측). 메뉴를 걷어내는 규칙은
+     '같은 학교의 여러 공고에 똑같이 나오는 줄'을 찾는 것이라 **원문 전체가 필요하다.**
+     처음엔 `indexTexts([], …)`로 재서 걷어낼 게 없었고, 그래서 메뉴 글자가 본문으로
+     세어져 정읍시민장학재단(한글 387자가 전부 메뉴)이 '확보 ✅'로 통과했다.
+     같은 말뭉치를 써야 재수집기·발췌기·AI가 같은 판정을 한다 — 갈라지면
+     "재수집기는 됐다는데 발췌기는 못 읽는" 일이 생긴다. */
+  const probe = indexTexts(texts, { [t.url]: entry });
   const ok = text && hasText(probe.byUrl.get(key) || entry);
 
   if (ok) {
@@ -141,17 +268,31 @@ for (const t of targets) {
     report.push(`- ✅ ${t.it.name.slice(0, 40)} — 본문 확보 (${text.replace(/[^가-힣]/g, '').length}자)`);
     log(`✅ ${t.it.name.slice(0, 30)}`);
   } else {
-    ledger[key] = { tries: t.tries + 1, at: today, name: t.it.name.slice(0, 60) };
+    /* 어떤 문턱으로 판정했는지 함께 남긴다 — 나중에 문턱이 내려가면 이 값을 보고 다시 해 본다 */
+    ledger[key] = { tries: t.tries + 1, at: today, minBody: MIN_BODY, name: t.it.name.slice(0, 60) };
     miss += 1;
-    if (text) report.push(`- · ${t.it.name.slice(0, 40)} — 열리긴 했지만 본문이 없다(메뉴뿐, ${ledger[key].tries}회째)`);
+    if (text) {
+      /* 🔴 **실패할 때 무엇을 받았는지 남긴다** (2026-08-23 추가).
+         예전엔 실패하면 받아 온 글자를 통째로 버려서, 왜 안 되는지 보려면 학교마다
+         정찰을 따로 돌려야 했다. 원인이 학교마다 다르므로(팝업·JS 렌더·봇 차단·
+         로그인 벽·PDF 첨부) 이 한 줄이 진단 한 판을 대신한다. */
+      const left = strip(t.url, text).split('\n').filter(Boolean);
+      report.push(`- · **${t.it.name.slice(0, 40)}** — 본문 없음 (${ledger[key].tries}회째)`);
+      report.push(`    - 받아 온 줄 ${text.split('\n').length} · 메뉴 걷어낸 뒤 ${left.length}줄 · 한글 ${strip(t.url, text).replace(/[^가-힣]/g, '').length}자`);
+      /* 표본을 넉넉히 남긴다 — 6줄만 봤을 때 동국대가 '본문이 없는' 것인지
+         '팝업 글자가 앞을 채워 본문이 뒤로 밀린' 것인지 가릴 수 없었다. */
+      report.push('```');
+      left.slice(0, 20).forEach((l) => report.push(l.slice(0, 110)));
+      report.push('```');
+    }
     log(`· ${t.it.name.slice(0, 30)} — 본문 없음 (${ledger[key].tries}회째)`);
   }
   await new Promise((r) => setTimeout(r, 2500));   // 같은 학교를 몰아치지 않는다
 }
 
 await browser.close().catch(() => {});
-report.push('', `---`, `확보 **${got}건** · 본문 없음 ${miss}건 · 처리 ${done}/${targets.length}건`,
+report.push('', `---`, `확보 **${got}건** · 본문 없음 ${miss}건 · 삭제된 공고 ${gone}건 · 처리 ${done}/${targets.length}건`,
   `본문 판정 기준: 메뉴를 걷어낸 뒤 한글 ${MIN_BODY}자 이상 (notice-source.mjs)`);
 saveAll();
-log(`끝 — 확보 ${got}건 · 본문 없음 ${miss}건`);
+log(`끝 — 확보 ${got}건 · 본문 없음 ${miss}건 · 삭제된 공고 ${gone}건`);
 process.exit(0);

@@ -50,6 +50,13 @@ concurrency:
 jobs:
   fill:
     runs-on: ubuntu-latest
+    # 🔴 학교가 중간 인증서를 빠뜨려 Node 만 연결이 막히는 곳이 있다(계명대·조선대 등).
+    # 브라우저·curl 은 시스템 저장소에서 사슬을 이어 붙이지만 Node 는 안 한다 —
+    # '로봇만 못 읽고 학생은 멀쩡히 보는' 상태가 된다. 검증을 끄는 것이 아니라
+    # 서버가 깜빡한 사슬 한 칸을 우리가 들고 있는 것이다. 자세히: collector/certs/README.md
+    # 2026-08-23에 이게 없어서 조선대 공고문 PDF 내려받기가 TypeError 로 죽었다.
+    env:
+      NODE_EXTRA_CA_CERTS: collector/certs/sectigo-server-auth-dv-r36.pem
     # 전수 169건 × 약 5초 = 15분. 준비·감사·저장까지 담는 그릇으로 30분.
     timeout-minutes: 30
     steps:
@@ -80,9 +87,26 @@ jobs:
           echo "::notice::AI로 읽을 대상이 없습니다 — 원문이 없거나 이미 다 읽었습니다."
           exit 0
 
+      # 🔴 무료로 읽을 수 있는 것을 먼저 읽는다 — 이 저장소의 방식이다(양식 스키마화와 같은 순서).
+      #    본문이 "붙임 참조"뿐인 공고는 공고문 첨부(HWP·PDF)에 자격이 있다. 받아서 발췌하면
+      #    AI를 부를 것도 없이 풀린다. 실패해도 아래 AI 단계는 그대로 돈다.
+      - name: 공고문 첨부 받기 (무료)
+        if: inputs.mode != '미리보기만'
+        continue-on-error: true
+        timeout-minutes: 5
+        run: node collector/deepfetch.mjs --elig-attach
+
+      - name: 첨부에서 자격 발췌 (무료)
+        if: inputs.mode != '미리보기만'
+        continue-on-error: true
+        timeout-minutes: 5
+        run: node collector/extract-excerpts.mjs --write
+
       - name: SDK 설치
         if: inputs.mode != '미리보기만'
-        run: npm i @anthropic-ai/sdk --no-audit --no-fund --silent
+        # sharp 는 큰 포스터를 줄이는 데 쓴다 — API 는 한 변 8,000픽셀까지만 받는데
+        # 학교 포스터는 인쇄용 원본을 그대로 올려 이 한계를 자주 넘는다(실측 5906×8268).
+        run: npm i @anthropic-ai/sdk sharp --no-audit --no-fund --silent
 
       # ③ 시범 3건 — 전수 전에 작게 해 본다. 소넷 기준 50원쯤.
       # 공고 하나만 — 구조 소실(갈래)은 '이미 자격이 뜨는' 공고 쪽에 있어서
@@ -150,7 +174,11 @@ jobs:
         run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # 로봇이 고치는 파일은 전부 넣는다 (이슈 #79 — 빠뜨리면 조용히 버려진다).
+          # 공고문 첨부 원본과 그 색인이 안 저장되면 발췌가 다음 실행에 되살아나지 않는다.
           git add data/registered.json
+          [ -d collector/extracted ] && git add collector/extracted
+          true
           if ! git diff --cached --quiet; then
             git commit -m "자격 요건: AI가 공고 원문에서 구조로 읽음 (검수 전)"
             pushed=0

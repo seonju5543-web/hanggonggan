@@ -27,6 +27,7 @@ import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { indexTexts, sourceFor, hasText } from './notice-source.mjs';
 import { makeStripper } from './page-boilerplate.mjs';
+import { attachmentText, readable } from './attachment-text.mjs';
 
 const require = createRequire(import.meta.url);
 const { requirementLines } = require('../match-engine.js');
@@ -171,6 +172,61 @@ export function verifyPick(pick, lines) {
   };
 }
 
+/* ── 공고문 PDF 경로 (2026-08-23 신설) ──────────────────────────────
+   게시판 본문이 "붙임 참조"뿐이고 공고문이 PDF인 공고가 있다. 그 PDF가 CID 폰트·스캔이면
+   무료 해석기(pdf-text.mjs)로 한글이 **0자** 나온다 — 실측 5개 전부 그랬다.
+   `attachment-text.mjs` 첫머리가 "그건 AI 경로의 몫"이라고 넘겨 놓은 자리인데,
+   **받을 준비가 안 돼 있어서** 그 사이로 공고들이 떨어지고 있었다.
+
+   🔴 여기서는 **줄 번호 계약을 쓸 수 없다.** 뽑을 글자가 없으니 번호를 매길 대상이 없다.
+   그래서 이 경로만 모델이 **글자를 돌려준다** — 개발자가 자격 요건에 한해 승인한
+   정직 원칙 예외를 쓰는 곳이 여기 하나다. 대신:
+     · 화면에 'AI가 읽음 · 검수 전' 표식이 붙는다(다른 경로와 같다)
+     · `eligibilityFrom`에 **'AI(공고문 PDF)'**로 출처를 남겨 번호 경로와 구분한다
+     · 번호 경로와 **같은 관문**(요건 신호·제출서류·게시판 머리말)을 통과해야 한다
+   ────────────────────────────────────────────────────────────── */
+const PDF_SYSTEM = `당신은 첨부된 한국 대학 장학금 **공고문(PDF 또는 포스터 그림)**에서 '지원 자격 요건'을 읽는 일을 합니다.
+
+원칙:
+- 공고문에 **적혀 있는 문장을 그대로** 옮깁니다. 요약하거나 바꿔 쓰지 마세요.
+- 기관·재단·시험 이름은 **줄이지 마세요**. '대한불교조계종 스님'을 '스님'으로 줄이면
+  다른 소속 학생이 자기 공고로 읽습니다. 원문에 적힌 이름을 통째로 옮깁니다.
+- '누가 받을 수 있는가'를 말하는 줄만 고릅니다(학년·성적·소득구간·거주지·특별자격·재학 상태 등).
+- 신청기간·제출서류·문의처·장학금액·선발인원·지급방법은 자격이 **아닙니다**.
+- '~인 자는 제외', '지원 불가' 같은 **제외 대상**은 lines 가 아니라 excludes 에 넣으세요.
+  자격과 섞으면 화면에서 요건이 실제보다 훨씬 까다로워 보여 지원할 수 있는 학생이 포기합니다.
+- 공고문에 자격 요건이 없으면 none을 true로 두세요. **없는 것을 지어내지 마세요.**
+- lines 최대 8줄 · excludes 최대 6줄.`;
+
+const PDF_SCHEMA = {
+  type: 'object',
+  properties: {
+    none: { type: 'boolean' },
+    lines: { type: 'array', items: { type: 'string' } },
+    excludes: { type: 'array', items: { type: 'string' } },
+    why: { type: 'string' },
+  },
+  required: ['none', 'lines', 'excludes', 'why'],
+  additionalProperties: false,
+};
+
+/* 모델이 보낸 **글자**를 되받아 거른다. 번호 경로의 verifyPick과 같은 낱말 관문을 쓴다 —
+   여기만 느슨하면 PDF 경로로 쓰레기가 들어온다. */
+export function verifyPdfLines(pick) {
+  if (!pick || pick.none) return { ok: false, why: (pick && pick.why) || '자격 없음' };
+  const clean = (arr, cap) => [...new Set((arr || [])
+    .map((l) => String(l || '').replace(/\s+/g, ' ').trim())
+    .filter((l) => l.length >= 4 && l.length <= 200)
+    .filter((l) => !NOT_REQ.test(l) && !HEADER.test(l)))].slice(0, cap);
+  const out = clean(pick.lines, 8);
+  if (!out.length) return { ok: false, why: '고른 줄이 자격이 아님' };
+  if (!out.some((l) => REQ_SIGNAL.test(l))) return { ok: false, why: '요건 신호가 하나도 없음' };
+  /* 제외 대상은 자격 줄과 섞지 않는다 — 섞으면 요건이 실제보다 까다로워 보여
+     지원할 수 있는 학생이 포기하고, 5줄 상한에 밀려 진짜 요건이 잘려 나간다
+     (정읍시민장학재단에서 제외 3줄이 실제로 그렇게 버려졌다). */
+  return { ok: true, lines: out, excludes: clean(pick.excludes, 6) };
+}
+
 /* ── 대상 고르기 ── */
 const idx = indexTexts(texts, browserBodies);
 const strip = makeStripper(texts);
@@ -217,6 +273,83 @@ export function pickTargets(items, all, only) {
      (2026-08-23 시범에서 실제로 같은 3건이 두 번 반복됐다). */
   out.sort((a, b) => (a.it.aiTries || 0) - (b.it.aiTries || 0));
   return out;
+}
+
+/* 공고문 PDF가 있는데 무료로 글자가 안 나오는 공고 — 이 경로의 대상 */
+export function pickPdfTargets(items) {
+  let index = {};
+  try { index = JSON.parse(fs.readFileSync(new URL('extracted/elig-docs.json', HERE), 'utf8')); } catch { return []; }
+  const out = [];
+  for (const it of items) {
+    if (it.program || requirementLines(it).length) continue;
+    if ((it.aiTries || 0) >= (cfg.giveUpAfter ?? 3)) continue;
+    /* 🔴 **큰 그림을 고른다.** 파일 순서대로 첫 장을 집으면 머리말 배너(1002×551)를
+       골라 놓고 진짜 포스터(3368×4768)를 지나친다 — 실제로 그랬다.
+       PDF 가 있으면 PDF 가 먼저다(글자층이 남아 있을 수 있어 더 정확하다). */
+    /* 크기는 **파일 무게**로 잰다 — 저장할 때 이름이 `elig-슬러그-번호.확장자`로 바뀌어
+       원래 이름에 있던 가로×세로가 남지 않는다. 머리말 배너 39KB vs 포스터 2MB라 확실히 갈린다. */
+    const bytes = (f) => { try { return fs.statSync(new URL(`extracted/${f}`, HERE).pathname).size; } catch { return 0; } };
+    const files = [...((index[it.id] || {}).files || [])]
+      .sort((a, b) => (/\.pdf$/i.test(b) ? 1 : 0) - (/\.pdf$/i.test(a) ? 1 : 0) || bytes(b) - bytes(a));
+    for (const f of files) {
+      /* PDF 와 **본문 그림**을 같이 본다 — `[홍보]` 계열은 글자 없이 포스터만 올려 두는데,
+         그건 '본문이 없는 것'이 아니라 '눈으로 읽어야 하는 것'이다(2026-08-23). */
+      const m = f.match(/\.(pdf|png|jpe?g|gif|webp)$/i);
+      if (!m) continue;
+      const path = new URL(`extracted/${f}`, HERE).pathname;
+      if (!fs.existsSync(path)) continue;
+      /* 무료로 글자가 나오면 이 경로에 올 이유가 없다 — 발췌기가 이미 읽었거나 읽을 것이다.
+         그림은 애초에 글자가 안 나오므로 이 검사를 건너뛴다. */
+      const ext = m[1].toLowerCase();
+      if (ext === 'pdf' && readable(attachmentText(path))) continue;
+      out.push({ it, path, file: f, kind: ext === 'pdf' ? 'pdf' : 'image' });
+      break;
+    }
+  }
+  return out;
+}
+
+const MEDIA = { pdf: 'application/pdf', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', webp: 'image/webp' };
+
+async function askPdf(item, path, kind) {
+  if (process.env.ELIG_AI_FAKE) return JSON.parse(fs.readFileSync(process.env.ELIG_AI_FAKE, 'utf8'));
+  const { default: Anthropic } = await import('@anthropic-ai/sdk');
+  const client = new Anthropic();
+  let buf = fs.readFileSync(path);
+  let ext = (path.match(/\.([a-z0-9]+)$/i) || [, 'pdf'])[1].toLowerCase();
+  /* 🔴 **한 변이 8,000픽셀을 넘으면 API가 400을 낸다** (실측 2026-08-23:
+     한미 첨단분야 포스터가 5906×8268이라 세로가 초과 → `At least one of the image
+     dimensions exceed max allowed size: 8000 pixels`).
+     학교 포스터는 인쇄용 원본을 그대로 올리는 일이 흔해서 이 한계를 자주 넘는다.
+     줄여서 보낸다 — 글자를 읽는 일이라 7,000픽셀이면 충분하고도 남는다. */
+  if (kind === 'image') {
+    try {
+      const sharp = (await import('sharp')).default;
+      const meta = await sharp(buf).metadata();
+      if (Math.max(meta.width || 0, meta.height || 0) > 7800) {
+        buf = await sharp(buf).resize({ width: 7000, height: 7000, fit: 'inside' }).png().toBuffer();
+        ext = 'png';
+        log(`  · ${item.name.slice(0, 24)} — 포스터가 ${meta.width}×${meta.height}라 줄여서 보냅니다`);
+      }
+    } catch (e) { log(`  · 그림 크기 조정 못 함(${String(e.message).slice(0, 60)}) — 원본 그대로 보냅니다`); }
+  }
+  const b64 = buf.toString('base64');
+  /* PDF 는 문서 블록, 그림은 이미지 블록으로 보낸다 — 형태가 다르면 400 이 난다 */
+  const doc = kind === 'image'
+    ? { type: 'image', source: { type: 'base64', media_type: MEDIA[ext] || 'image/png', data: b64 } }
+    : { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 } };
+  const stream = client.beta.messages.stream({
+    model: cfg.model,
+    max_tokens: 2000,
+    system: PDF_SYSTEM,
+    output_config: { effort: cfg.effort, format: { type: 'json_schema', schema: PDF_SCHEMA } },
+    messages: [{ role: 'user', content: [doc,
+      { type: 'text', text: `공고: ${item.name}\n\n이 ${kind === 'image' ? '공고 포스터' : '공고문'}에서 지원 자격 요건 줄을 원문 그대로 옮겨 주세요.` },
+    ] }],
+  });
+  const msg = await stream.finalMessage();
+  if (msg.stop_reason === 'refusal') throw new Error('모델이 처리를 거부함');
+  return JSON.parse(msg.content.find((b) => b.type === 'text').text);
 }
 
 /* ── 모델 부르기 (가짜 응답으로 시험할 수 있게 갈라 둔다) ──
@@ -307,6 +440,32 @@ if (!process.env.ELIG_AI_AS_LIB) {
     if (v.struct.either.length) branched += 1;
     log(`✓ ${it.name.slice(0, 30)} — 공통 ${v.struct.common.length} · 갈래 ${v.struct.either.length} · 성적 ${v.struct.grade.length}`);
   }
+  /* ── 공고문 PDF 경로 — 무료로 글자가 안 나오는 것만 (전수·지정 실행에서만 돈다) ── */
+  let pdfGot = 0;
+  if (ALL || ONLY) {
+    for (const { it, path, file, kind } of pickPdfTargets(reg.items)) {
+      if (ONLY && it.id !== ONLY) continue;
+      let pick;
+      try { pick = await askPdf(it, path, kind); }
+      catch (e) { log(`✕ ${it.name.slice(0, 30)} — PDF 호출 실패(공고 탓 아님): ${String(e && e.message || e).slice(0, 300)}`); continue; }
+      const v = verifyPdfLines(pick);
+      if (!v.ok) { log(`· ${it.name.slice(0, 30)} — PDF: ${v.why} (지금 것 유지)`); it.aiTries = (it.aiTries || 0) + 1; continue; }
+      if (!it.eligibilityPrev) {
+        it.eligibilityPrev = { lines: it.eligibilityLines || null, excludes: it.eligibilityExcludes || null,
+          priority: it.eligibilityPriority || null, from: it.eligibilityFrom || null };
+      }
+      it.eligibilityLines = v.lines;
+      if (v.excludes.length) it.eligibilityExcludes = v.excludes;
+      delete it.eligibilityStruct;                 // PDF 경로는 구조를 만들지 않는다
+      /* 출처를 번호 경로와 구분해 남긴다 — 이 경로만 모델이 글자를 돌려준다 */
+      it.eligibilityFrom = kind === 'image' ? 'AI(공고 포스터 그림)' : 'AI(공고문 PDF)';
+      it.eligibilityReviewed = false;
+      delete it.aiTries;
+      pdfGot += 1;
+      log(`✓ ${it.name.slice(0, 30)} — ${kind === 'image' ? '공고 포스터 그림' : '공고문 PDF'}에서 ${v.lines.length}줄 (${file})`);
+    }
+  }
+
   fs.writeFileSync(regPath, JSON.stringify(reg, null, 1) + '\n');
-  log(`끝 — 호출 ${calls}회 · 확보 ${got}건 · 갈래 있는 공고 ${branched}건 · 검산 실패로 지금 것 유지 ${kept}건`);
+  log(`끝 — 호출 ${calls}회 · 확보 ${got}건 · 갈래 있는 공고 ${branched}건 · 공고문 PDF ${pdfGot}건 · 검산 실패로 지금 것 유지 ${kept}건`);
 }

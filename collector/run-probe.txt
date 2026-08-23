@@ -3,10 +3,12 @@
 # checkUrl:  이 주소를 로그인 없는 새 탭에서 열어 그대로 보고 (로그인 벽인지 포함)
 # findBoard: <학교 홈> | <메뉴 > 메뉴>
 
-# 2026-08-01(3차) — 남은 정식 등록 2건의 원문 주소를 찾는다.
-#   · 진담거사 지역미래불자육성장학  (사냥에서 '클릭 실패'로 떨어졌다)
-#   · 산학협동재단 국내 외국인 근로자 자녀 장학생 (동국대 접수) ('목록에서 못 찾음' 4회)
-# 게시판 목록을 열어 **각 행이 실제로 가리키는 주소를 그대로 받아 적는다.**
-# (1차 정찰 때는 이 단계가 연결 끊김으로 실패했다 — 확인용 브라우저를 주소마다
-#  새로 만든 것이 원인이라 하나만 재사용하도록 고쳤다. 이번엔 열릴 것이다.)
+# 2026-08-23 — 개발자 지시로 남은 것을 갈라 낸다.
+#   ① 동국대·명지대가 "진짜로 본문이 비어 있는지" 확인. 진짜면 개발자에게 넘긴다.
+#   ② 동국대 장학공지 게시판의 행별 원제목을 받아 적는다 —
+#      (재)가송재단 공고의 boardTitle 이 비어 있어 링크 사냥꾼이 영영 못 찾는다.
+#      CLAUDE.md의 '미아' 유형(중앙대 11건이 3주간 헛돈 원인)과 같다.
 findBoard: https://www.dongguk.edu/article/JANGHAKNOTICE/list |
+checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765586
+checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765245
+checkUrl: https://www.mju.ac.kr/mjukr/8/subview.do

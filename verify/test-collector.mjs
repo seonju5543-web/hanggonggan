@@ -1225,7 +1225,59 @@ console.log('\n■ 껍데기 페이지와 브라우저 본문 (2026-08-20)');
   const withBody = [...pages, { url: 'https://b.ac.kr/view?id=9', title: '공고 9', text: menu.join('\n') + '\n' + real.repeat(4) }];
   const i4 = NS.indexTexts(withBody, {});
   eq('  메뉴 뒤에 본문이 있으면 원문으로 센다', NS.hasText(i4.byUrl.get(NS.canonUrl('https://b.ac.kr/view?id=9'))), true);
-  eq('  문턱은 300자다 (내리면 껍데기를 다시 놓친다)', NS.MIN_BODY, 300);
+  /* 🔴 문턱을 **올리지 말 것.** 손해가 대칭이 아니다 — 멀쩡한 본문을 '없음'으로 보면
+     AI가 영영 시도하지 않아 공고 하나를 영구히 잃고, 메뉴뿐인데 '있음'으로 보면
+     AI가 "못 읽겠다"고 답하고 끝나 0.2원이다. 처음에 300으로 잡았다가
+     동국대 교내장학(전체)(본문 정상, 한글 237자)을 버리는 것을 보고 내렸다. */
+  eq('  문턱은 100자다 (올리면 멀쩡한 짧은 공고를 버린다)', NS.MIN_BODY, 100);
+
+  /* 🔴 2026-08-23 — **줄바꿈을 없애면 본문이 있으나 마나다.** 재수집 로봇을 처음
+     만들 때 태그를 벗기고 `\s+ → ' '`로 눌렀더니 본문이 통짜 한 줄이 됐고,
+     ① AI가 줄 번호를 못 매겨 대상에서 빠지고 ② 표의 칸 구분(공통/재학생/신규자)이
+     통째로 사라졌다 — 이 작업의 핵심이 그 구조를 살리는 것인데 받는 자리에서 죽였다.
+     37건을 그렇게 저장했다가 전부 다시 받았다. */
+  const rb = fs.readFileSync(new URL('collector/rescue-bodies.mjs', root), 'utf8');
+  eq('재수집은 화면에 그려진 줄바꿈을 그대로 받는다', /innerText\(/.test(rb), true);
+  /* 본문을 다듬을 때 **가로 공백만** 누른다 — `\s+`로 누르면 줄바꿈까지 사라진다.
+     ⚠️ '파일 어디에도 \s+ 가 없다'로 검사하면 안 된다. 첨부 **이름**을 다듬는
+     `textContent.replace(/\s+/g,' ')`는 정상이고 본문과 무관한데 거기 걸린다
+     (실제로 그렇게 썼다가 멀쩡한 코드가 검사에 걸렸다). 본문 줄만 콕 집어 본다. */
+  eq('  본문은 가로 공백만 누른다(줄바꿈 보존)', /replace\(\/\[ \\t\\u00a0\]\+\/g, ' '\)/.test(rb), true);
+  eq('  통짜 한 줄로 저장된 본문은 다시 받는다', /\/\\n\/\.test\(String\(cur\.text/.test(rb), true);
+  /* 🔴 빈 말뭉치로 재면 메뉴를 걷어낼 수 없어 **메뉴 글자가 본문으로 세어진다.**
+     실제로 정읍시민장학재단(한글 387자가 전부 메뉴)이 '확보 ✅'로 통과했고,
+     되찾았다던 37건 중 24건이 그런 가짜였다. 발췌기·AI와 같은 말뭉치를 써야
+     "재수집기는 됐다는데 발췌기는 못 읽는" 어긋남이 안 생긴다. */
+  eq('  본문 판정은 발췌기와 같은 말뭉치로 한다', /indexTexts\(texts, \{ \[t\.url\]/.test(rb), true);
+  /* 🔴 동국대는 '오늘 하루 보지 않기' 팝업이 본문을 덮어, 받아 온 글자가
+     `불교동아리 소식 · 공양기도문 · POPUP`뿐이었다. 그리고 일부 학교는 본문을
+     iframe에 그린다 — 주 프레임만 보면 메뉴와 팝업만 손에 남는다.
+     둘 다 CLAUDE.md에 이미 적혀 있던 함정인데 이 로봇을 만들 때 빠뜨렸다. */
+  eq('  화면을 덮은 팝업을 먼저 치운다', /오늘 하루 보지 않기/.test(rb), true);
+  eq('  본문 프레임 안까지 읽는다', /page\.frames\(\)/.test(rb), true);
+  /* 🔴 실패 횟수는 '그때의 코드와 그때의 문턱'으로 센 값이다. 문턱을 300 → 100으로
+     내렸더니 42건 전부가 '3회 실패·7일 휴식'이었는데, 그 판정은 100~299자 본문을
+     받아 놓고 버린 것일 수 있었다. 고장 났던 코드로 센 실패로 멀쩡한 공고가 쉬면 안 된다.
+     notice-source의 needsFetch가 '지금보다 짧은 한도로 잘렸으면 다시 받는다'와 같은 규칙. */
+  eq('  판정이 느슨해지면 쉬는 중이라도 다시 해 본다', /staleJudgment/.test(rb), true);
+  eq('    어떤 문턱으로 판정했는지 장부에 남긴다', /minBody: MIN_BODY/.test(rb), true);
+  /* 🔴 페이지를 열어 놓고 첨부 이름을 눈앞에 두고도 기록을 안 고치고 있었다. 그 사이
+     우리 목록이 낡아, 게시판엔 공고문이 붙어 있는데 기록엔 서식·동의서만 있어
+     무료 경로가 못 읽었다(건국대 의암 손병희 · 조선대 교내장학금). */
+  eq('  본문을 받을 때 첨부 목록도 받아 적는다', /regDirty = true/.test(rb), true);
+  /* 게시판에서 내려간 공고는 '못 받은 것'이 아니라 '없어진 것'이다 — 섞으면 영영 다시 받으려 애쓴다 */
+  eq('  삭제된 공고는 따로 가려낸다', /gone: true/.test(rb), true);
+  /* 🔴 봇 차단은 **브라우저만** 막는다 (2026-08-23 실측). 홍익대는 브라우저로 열면
+     cdn-botmanager.stclab.com/…/challenge 로 튕기는데, 일반 fetch 로 받아 둔 원문
+     13건에는 봇 차단 화면이 0건이었다 — STCLab 봇매니저가 헤드리스만 잡는 것이다.
+     대안은 '브라우저를 더 잘 위장한다'가 아니라 '막히면 다른 길로 간다'이다. */
+  eq('  봇 차단에 걸리면 일반 내려받기로 물러선다', /BOT_WALL\.test\(text\)/.test(rb), true);
+  eq('    최종 주소로도 판정한다 (challenge 로 튕긴다)', /BOT_WALL\.test\(String\(finalUrl\)\)/.test(rb), true);
+  /* 🔴 `[홍보]` 계열 공고는 글자 없이 **포스터 그림만** 올려 둔다. innerText 로는 한 글자도
+     안 잡혀 '본문이 없다'로 보이지만 눈으로 읽을 내용은 있다. 큰 그림만 담는다 —
+     아이콘·로고를 담으면 자격을 읽으라고 로고를 보내는 꼴이 된다. */
+  eq('  본문이 그림뿐인 공고는 그림을 찾아 적는다', /naturalWidth >= 300/.test(rb), true);
+  eq('    아이콘·로고는 담지 않는다 (세로도 본다)', /naturalHeight >= 300/.test(rb), true);
 
   // 브라우저 수집기가 이미 그린 본문을 저장한다 (추가 페이지 열기 0회)
   const bc = fs.readFileSync(new URL('collector/browser-collect.mjs', root), 'utf8');
@@ -1235,6 +1287,50 @@ console.log('\n■ 껍데기 페이지와 브라우저 본문 (2026-08-20)');
 
 /* 2026-08-20 — '목록 화면' 오인. 한쪽으로만 재면 반드시 다른 학교가 망가지는 자리라
    **양방향을 함께** 검사한다(중앙대를 살리는 것과 동국대를 지키는 것). */
+/* 🔴 2026-08-23 — 링크 사냥꾼이 헛걸음하는 첫째 원인은 '제목이 안 맞는 것'이다.
+   게시판 행 글자를 그대로 담아 둔 boardTitle 에는 앞머리에 `공지 공지`·`2651` 같은
+   행 번호·분류 배지가 붙는다. 대조는 제목 **앞부분**을 맞춰 보므로(fingerprint의
+   slice(0,24)), 앞머리가 어긋나면 뒤가 아무리 같아도 통째로 빗나간다.
+   청소는 수집기와 **같은 모듈**을 써야 한다 — 여기에 한 벌 더 두면
+   "수집기는 같다는데 사냥꾼은 다르다"가 된다(중앙대 11건이 3주간 헛돈 유형). */
+/* 🔴 2026-08-23 — **학교 서버에 붙는 워크플로는 인증서 설정을 갖고 있어야 한다.**
+   계명대·조선대처럼 중간 인증서를 안 보내는 학교가 있는데, 브라우저·curl 은 시스템
+   저장소에서 사슬을 이어 붙이지만 Node 는 안 한다 — '로봇만 못 읽고 학생은 멀쩡히
+   보는' 상태가 된다. 수집 워크플로에는 대비가 돼 있었는데 나중에 만든 워크플로 둘에
+   빠져 있어서, 조선대 공고문 PDF 내려받기가 TypeError 로 죽었다.
+   새 워크플로를 만들 때마다 사람이 기억해서 넣는 방식은 또 빠뜨린다 — 검사로 묶는다. */
+console.log('\n■ 학교 서버에 붙는 워크플로의 인증서 설정 (2026-08-23)');
+{
+  const dir = new URL('../.github/workflows/', import.meta.url);
+  /* collector 의 로봇을 부르는 워크플로만 본다 — 배포·알림 워크플로는 학교에 안 붙는다 */
+  const need = fs.readdirSync(dir).filter((f) => /\.ya?ml$/.test(f))
+    .map((f) => ({ f, t: fs.readFileSync(new URL(f, dir), 'utf8') }))
+    .filter((x) => /node collector\/(collect|deepfetch|browser-collect|rescue-bodies|link-hunter|resolve-detail-urls|eligibility-ai|extract-excerpts)/.test(x.t));
+  const missing = need.filter((x) => !/NODE_EXTRA_CA_CERTS/.test(x.t)).map((x) => x.f);
+  eq(`수집 로봇을 부르는 워크플로 ${need.length}개가 모두 인증서 설정을 갖고 있다`, missing.join(',') || '(없음)', '(없음)');
+  /* 검증을 끄는 것과 혼동하지 말 것 — 그건 아무 서버나 믿겠다는 뜻이다 */
+  const unsafe = need.filter((x) => /NODE_TLS_REJECT_UNAUTHORIZED|rejectUnauthorized:\s*false/.test(x.t)).map((x) => x.f);
+  eq('  인증서 검증을 끄는 워크플로는 없다', unsafe.join(',') || '(없음)', '(없음)');
+  /* 오류를 낱말 하나로 뭉개면 원인을 영영 못 본다 — Node fetch 의 진짜 이유는 cause 안에 있다 */
+  const df = fs.readFileSync(new URL('../collector/deepfetch.mjs', import.meta.url), 'utf8');
+  eq('  내려받기 실패는 원인(cause)까지 적는다', /e\.cause && \(e\.cause\.code/.test(df), true);
+}
+
+console.log('\n■ 링크 사냥꾼의 제목 대조 (2026-08-23)');
+{
+  const lh = fs.readFileSync(new URL('../collector/link-hunter.mjs', import.meta.url), 'utf8');
+  eq('사냥꾼은 수집기와 같은 제목 청소 규칙을 쓴다', /from '\.\/clean-title\.mjs'/.test(lh), true);
+  eq('  대조할 제목에서 부스러기를 뗀다', /cleanTitle\(\(t\.ref\.boardTitle/.test(lh), true);
+  eq('  받아 적을 때도 떼고 담는다', /boardTitle = cleanTitle\(mate\.title\)/.test(lh), true);
+  const CT = await import(new URL('../collector/clean-title.mjs', import.meta.url));
+  eq('  분류 배지를 뗀다', /^공지/.test(CT.cleanTitle('공지 공지 2026-2학기 복지장학1(본인장애) 신청안내')), false);
+  eq('  행 번호를 뗀다', /^2651/.test(CT.cleanTitle('2651 2026-2학기 부남장학생 선발 안내')), false);
+  /* 저장된 값에도 부스러기가 남아 있으면 안 된다 — 대조는 저장된 값으로 한다 */
+  const regd = JSON.parse(fs.readFileSync(new URL('../data/registered.json', import.meta.url), 'utf8'));
+  const dirty = (regd.items || regd).filter((x) => x.boardTitle && CT.cleanTitle(x.boardTitle) !== x.boardTitle);
+  eq('  저장된 boardTitle 에도 부스러기가 없다', dirty.length, 0);
+}
+
 console.log('\n■ 목록 화면인가 상세 화면인가 (2026-08-20)');
 {
   const D = await import(new URL('../collector/detail-url.mjs', import.meta.url));
@@ -1301,6 +1397,56 @@ console.log('\n■ AI 자격 읽기 안전장치 (2026-08-20)');
   // 기본은 꺼져 있어야 한다 — 켠 채로 배포되면 잔액이 조용히 샌다
   const cfg = JSON.parse(fs.readFileSync(new URL('../collector/eligibility-ai-config.json', import.meta.url), 'utf8'));
   eq('  기본은 꺼져 있다', cfg.enabled, false);
+
+  /* 2026-08-23 — **공고문 PDF 경로.** 게시판 본문이 '붙임 참조'뿐이고 공고문이 PDF인데
+     그 PDF가 CID 폰트·스캔이면 무료 해석기로 한글이 0자 나온다(실측 5개 전부).
+     여기서는 뽑을 글자가 없어 **줄 번호 계약을 쓸 수 없다** — 이 경로만 모델이 글자를
+     돌려주고, 개발자가 자격 요건에 한해 승인한 예외를 쓰는 곳이 여기 하나다.
+     그래서 번호 경로와 **같은 낱말 관문**을 반드시 통과시켜야 한다. */
+  const p = (lines, none = false) => AI.verifyPdfLines({ none, lines, why: '' });
+  eq('공고문 PDF: 자격 줄이면 채택', p(['2026학년도 2학기 재학 예정인 학부생']).ok, true);
+  eq('  제출서류·문의는 자격이 아니다', p(['성적증명서 1부', '문의 : 02-1234-5678']).ok, false);
+  eq('  게시판 머리말도 거른다', p(['등록일 2026.06.02.', '조회 5464']).ok, false);
+  eq('  요건 신호가 없으면 통째로 버린다', p(['3. 신청 자격']).ok, false);
+  eq('  모른다(none)고 하면 그대로 둔다', p([], true).ok, false);
+  eq('  같은 줄이 여러 번 와도 한 번만', p(['1학년 재학생', '1학년 재학생']).lines.length, 1);
+  /* 🔴 제외 대상을 자격 줄과 섞으면 요건이 실제보다 까다로워 보여 지원할 수 있는
+     학생이 포기하고, 5줄 상한에 밀려 진짜 요건이 잘려 나간다 —
+     정읍시민장학재단에서 제외 3줄이 실제로 그렇게 버려졌다. */
+  const pe = AI.verifyPdfLines({ none: false, why: '', lines: ['1학년 재학생'],
+    excludes: ['타 장학금 수령자는 제외', '원격대학 재학생 제외'] });
+  eq('  제외 대상은 자격 줄과 갈라 담는다', pe.excludes.length, 2);
+  eq('    자격 줄에는 섞이지 않는다', pe.lines.length, 1);
+  /* 🔴 발췌기가 AI가 읽은 자격을 덮어쓰면 안 된다. '원문은 읽었는데 못 뽑았다 →
+     낡은 발췌를 남기지 않는다'는 규칙은 발췌 결과에는 맞지만, AI가 **공고문 PDF**에서
+     읽은 값까지 지웠다 — 게시판 본문이 비어 있다는 사실은 PDF 안 내용에 대해
+     아무 말도 하지 않는다. 실제로 정읍시민·세종이도가 7줄·6줄을 읽어 놓고 지워졌다
+     (로그에는 ✓로 남고 데이터는 비어 있었다). */
+  const xs = fs.readFileSync(new URL('../collector/extract-excerpts.mjs', import.meta.url), 'utf8');
+  eq('  발췌기는 AI가 읽은 자격을 건드리지 않는다', /\/\^AI\/\.test\(it\.eligibilityFrom/.test(xs), true);
+  /* ⚠️ 그 가드는 **for 반복문 안**이라 continue 여야 한다 — return 을 쓰면 그 뒤 공고를
+     전부 건너뛴다(실제로 return 으로 썼다가 잡았다). */
+  eq('    그 가드는 continue 다 (return 이면 나머지 공고를 다 건너뛴다)',
+    /eligibilityFrom \|\| ''\)\) \{ kept \+= 1; continue; \}/.test(xs), true);
+  /* 🔴 이 경로는 출처를 **'AI(공고문 PDF)'**로 남겨 번호 경로와 구분한다 —
+     화면 표식은 같지만, 나중에 되짚을 때 어느 계약으로 들어온 글자인지 알아야 한다. */
+  const src = fs.readFileSync(new URL('../collector/eligibility-ai.mjs', import.meta.url), 'utf8');
+  eq('  출처를 번호 경로와 구분해 남긴다', /'AI\(공고문 PDF\)'/.test(src), true);
+  eq('  기관명을 줄이지 말라고 못 박는다', /줄이지 마세요/.test(src), true);
+  /* 🔴 **본문이 그림뿐인 공고**도 같은 길로 읽는다 (2026-08-23). `[홍보]` 계열은 글자 없이
+     포스터만 올려 둔다 — 넘기려던 7건 전부에 A4 포스터급 그림이 있었다(최대 5906×8268).
+     '본문이 없는 것'이 아니라 '눈으로 읽어야 하는 것'이었다.
+     ⚠️ PDF 는 document 블록, 그림은 image 블록이다 — 형태를 섞으면 400 이 난다. */
+  eq('  그림은 image 블록으로 보낸다', /type: 'image', source:/.test(src), true);
+  eq('    PDF 는 document 블록 그대로', /type: 'document', source:/.test(src), true);
+  eq('    출처를 그림/PDF 로 갈라 남긴다', /'AI\(공고 포스터 그림\)'/.test(src), true);
+  /* 🔴 API 는 이미지 한 변을 8,000픽셀까지만 받는다. 학교 포스터는 인쇄용 원본을
+     그대로 올려 이 한계를 자주 넘는다 — 한미 첨단분야가 5906×8268이라 400 이 났다. */
+  eq('    8,000픽셀을 넘는 포스터는 줄여서 보낸다', /> 7800/.test(src), true);
+  const wf = fs.readFileSync(new URL('../.github/workflows/eligibility-fill.yml', import.meta.url), 'utf8');
+  eq('      줄이는 도구가 워크플로에 설치된다', /npm i @anthropic-ai\/sdk sharp/.test(wf), true);
+  const dfx = fs.readFileSync(new URL('../collector/deepfetch.mjs', import.meta.url), 'utf8');
+  eq('  본문 그림도 내려받는다 (이름 규칙에는 안 걸린다)', /a\.bodyImage && IMG_EXT\.test/.test(dfx), true);
 
   /* 2026-08-23 — 자격을 **구조로** 읽는 경로. 종단추천장학처럼 원문이 표인 공고에서
      '공통 / 둘 중 하나 / 성적'이 평평해지면 학생이 뜻을 정반대로 읽는다(설계 문서 참조). */
@@ -1369,6 +1515,29 @@ console.log('\n■ AI 자격 읽기 안전장치 (2026-08-20)');
 /* 2026-08-20 — 공고문 첨부에서 자격 읽기. 되돌리면 안 되는 지점이 셋이다. */
 console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
 {
+  /* 🔴 PDF를 받아야 한다 (2026-08-23). 예전엔 '글자가 정확히 안 나온다'며 제외했는데,
+     그건 안 받을 이유가 아니라 받아 보고 안 되면 버릴 이유였다 — 못 읽는 PDF는
+     readable()이 조용히 거른다. 안 받으면 그 공고는 영영 자격을 못 읽는다. */
+  const df = fs.readFileSync(new URL('../collector/deepfetch.mjs', import.meta.url), 'utf8');
+  eq('자격용 공고문 첨부에 PDF가 들어간다', /OK_EXT = \/\\\.\(hwp\|hwpx\|docx\?\|pdf\)/.test(df), true);
+  /* 🔴 **목록이 갈라지면 파일이 `.bin`으로 저장돼 아무도 못 읽는다.**
+     받을 대상(OK_EXT·IMG_EXT)에만 넣고 파일 확장자를 정하는 쪽을 안 고치면,
+     내려받은 것이 전부 `.bin`이 된다 — attachmentText()·AI 경로 둘 다 확장자로
+     해석기를 고르므로 320KB·1.1MB짜리 파일을 눈앞에 두고 손도 못 댄다(실제로 그랬다).
+     낱말을 하나씩 박아 두면 목록이 늘 때마다 검사가 헛되이 깨지므로,
+     **'받는 목록의 모든 확장자가 정하는 목록에 있는가'** 라는 뜻 자체를 잰다. */
+  /* ⚠️ **자격 함수 안만 본다.** `const ext = (a.name.match(…))` 는 양식 내려받기 쪽에도
+     같은 이름으로 있어서, 파일 전체에서 찾으면 엉뚱한 줄을 잰다(실제로 그랬다). */
+  const eligFn = df.slice(df.indexOf('async function downloadEligDocs'));
+  const extsOf = (re) => (eligFn.match(re) || [, ''])[1].split('|')
+    .map((x) => x.replace('?', '').replace(/[()]/g, '')).filter(Boolean);
+  const wanted = [...new Set([
+    ...extsOf(/OK_EXT = \/\\\.\(([^)]+)\)\$\/i/),
+    ...extsOf(/IMG_EXT = \/\\\.\(([^)]+)\)\$\/i/),
+  ])];
+  const mapping = extsOf(/const ext = \(a\.name\.match\(\/\\\.\(([^)]+)\)\$\/i\)/);
+  const gap = wanted.filter((e) => !mapping.includes(e));
+  eq(`받는 확장자 ${wanted.length}종이 모두 파일 이름 규칙에 있다`, gap.join(',') || '(없음)', '(없음)');
   const AT = await import(new URL('../collector/attachment-text.mjs', import.meta.url));
   /* ① 신청서·동의서는 읽지 않는다 — 읽으면 개인정보 수집 항목이 자격 자리에 앉는다
         (2026-08-20에 실제로 3건이 그렇게 돼 통째로 되돌린 적이 있다) */

@@ -39,6 +39,12 @@ concurrency:
 jobs:
   resolve:
     runs-on: ubuntu-latest
+    # 🔴 학교가 중간 인증서를 빠뜨려 Node 만 연결이 막히는 곳이 있다(계명대·조선대 등).
+    # 브라우저·curl 은 사슬을 스스로 이어 붙이지만 Node 는 안 한다 — '로봇만 못 읽고
+    # 학생은 멀쩡히 보는' 상태가 된다. 검증을 끄는 것이 아니라 서버가 깜빡한 사슬 한 칸을
+    # 우리가 들고 있는 것이다(collector/certs/README.md). 2026-08-23 전수 점검으로 추가.
+    env:
+      NODE_EXTRA_CA_CERTS: collector/certs/sectigo-server-auth-dv-r36.pem
     # 시간 상한 (2026-08-01) — 없으면 GitHub 기본값인 **6시간**까지 매달린다.
     # 실제로 7/31 브라우저 수집이 360분을 돌다 취소됐고, 수집 로봇 2종이 같은
     # 대기줄(concurrency: collector)을 쓰기 때문에 그동안 다음 수집이 줄을 섰다.
