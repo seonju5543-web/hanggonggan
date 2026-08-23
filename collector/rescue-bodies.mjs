@@ -121,14 +121,31 @@ for (const t of targets) {
   let text = '';
   try {
     await page.goto(t.url, { waitUntil: 'domcontentloaded', timeout: 30000 });
-    await page.waitForTimeout(4000);           // 자바스크립트가 본문을 그릴 시간
+    await page.waitForTimeout(6000);           // 자바스크립트가 본문을 그릴 시간 (4초로는 모자란 학교가 있었다)
     /* 🔴 **줄바꿈을 없애면 안 된다** (2026-08-23 실측으로 배웠다).
        처음엔 태그를 정규식으로 벗기고 `\s+ → ' '`로 눌렀는데, 그러면 본문이
        **통짜 한 줄**이 된다. 그 한 줄은 ① AI가 줄 번호를 못 매겨 대상에서 빠지고
        ② 표의 칸 구분(공통 / 재학생 / 신규자)이 통째로 사라진다 —
        이 작업의 핵심이 바로 그 구조를 살리는 것인데 받아 오는 자리에서 죽이고 있었다.
        `innerText`는 브라우저가 화면에 그린 그대로의 줄바꿈을 준다. */
-    text = (await page.innerText('body'))
+    /* ① 화면을 덮은 팝업을 먼저 치운다. 동국대는 '오늘 하루 보지 않기' 팝업이
+       본문을 가려서, 받아 온 글자가 `불교동아리 소식 · 공양기도문 · POPUP`뿐이었다
+       (CLAUDE.md에 이미 적혀 있던 함정인데 이 로봇을 만들 때 빠뜨렸다).
+       보통 클릭이 막히므로 evaluate로 직접 누른다 — 같은 이유로 목록 클릭도 그렇게 한다. */
+    for (const label of ['오늘 하루 보지 않기', '오늘하루 열지 않기', '오늘 하루 열지 않기', '팝업 닫기', '닫기']) {
+      try {
+        const el = page.locator(`text=${label}`).first();
+        if (await el.count()) await el.evaluate((e) => e.click());
+      } catch { /* 없으면 그만 */ }
+    }
+    /* ② **프레임 안까지 읽는다.** 일부 학교는 본문을 iframe에 그린다 —
+       주 프레임만 보면 메뉴와 팝업만 손에 남는다(브라우저 수집기는 이미 frames()를 본다).
+       메뉴가 섞여도 괜찮다 — 걷어내는 일은 page-boilerplate가 한다. */
+    const parts = [];
+    for (const f of page.frames()) {
+      try { parts.push(await f.locator('body').innerText({ timeout: 3000 })); } catch { /* 죽은 프레임은 건너뛴다 */ }
+    }
+    text = parts.join('\n')
       .replace(/[ \t\u00a0]+/g, ' ')
       .split('\n').map((l) => l.trim()).filter(Boolean).join('\n');
   } catch (e) {
