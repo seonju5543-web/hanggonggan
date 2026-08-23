@@ -1040,8 +1040,7 @@
    "eligibilityStruct": {
     "common": [
      "- 26년 1학기 기준 서울시립대학교 재학생만 지급 가능 (휴학생, 졸업생, 졸업 유예생 지급 불가)",
-     "- 26년 1학기 (26. 03. ~ 26. 07.) 에 인증된 교육과정(마이크로디그리) 이수인증만 인정됨",
-     "* 장학금 신청 해당 학기 (26 학년도 1 학기 ) 에 이수 인증한 마이크로디그리에 한하여 장학금 지급"
+     "- 26년 1학기 (26. 03. ~ 26. 07.) 에 인증된 교육과정(마이크로디그리) 이수인증만 인정됨"
     ],
     "either": [],
     "grade": [
@@ -1053,7 +1052,6 @@
    "eligibilityLines": [
     "- 26년 1학기 기준 서울시립대학교 재학생만 지급 가능 (휴학생, 졸업생, 졸업 유예생 지급 불가)",
     "- 26년 1학기 (26. 03. ~ 26. 07.) 에 인증된 교육과정(마이크로디그리) 이수인증만 인정됨",
-    "* 장학금 신청 해당 학기 (26 학년도 1 학기 ) 에 이수 인증한 마이크로디그리에 한하여 장학금 지급",
     "* 사업 시작 연도 이후에 (2023 학년도 ~) 이수한 교과목 으로 해당 학기에 이수 인증한 마이크로디그리 평점 평균 B0( 평점 평균 3.0) 이상 수령 가능"
    ],
    "eligibilityExcludes": [
@@ -2581,7 +2579,8 @@
    "noForm": "검수 완료 2026-08-02 — 원문 첨부에 채울 신청서 양식 없음(있으면 다음 수집이 스키마화)",
    "attachments": [],
    "sourceUrl": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269475&pageOrder=0&cmd=2&parm_bod_uid=269438&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
-   "sourceKind": "official"
+   "sourceKind": "official",
+   "aiTries": 1
   },
   {
    "id": "auto-jukr145233626artclviewdo",
