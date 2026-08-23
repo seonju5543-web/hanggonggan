@@ -390,8 +390,12 @@ if (!process.env.ELIG_AI_AS_LIB) {
   /* `--all` = 169건 전수(구조 소실은 이미 뜨는 카드에 있다). 기본은 못 읽은 것만. */
   const ALL = process.argv.includes('--all');
   const ONLY = (process.argv.find((a) => a.startsWith('--only=')) || '').slice(7) || null;
-  const targets = pickTargets(reg.items, ALL, ONLY).filter((t) => t.lines.length);
-  log(ONLY ? `대상 ${targets.length}건 — 지정(${ONLY})`
+  /* `--docs-only` — 첨부(공고문 PDF·포스터 그림)만 읽는다. 지정 실행을 여러 번 띄우면
+     서로의 registered.json 을 덮어쓴다(실측). 한 번에 끝내는 길이 필요하다. */
+  const DOCS_ONLY = process.argv.includes('--docs-only');
+  const targets = DOCS_ONLY ? [] : pickTargets(reg.items, ALL, ONLY).filter((t) => t.lines.length);
+  log(DOCS_ONLY ? '첨부(공고문 PDF·포스터 그림)만 읽습니다'
+    : ONLY ? `대상 ${targets.length}건 — 지정(${ONLY})`
     : ALL ? `대상 ${targets.length}건 — 전수(--all)`
     : `대상 ${targets.length}건 (무료 경로가 못 읽었고 원문은 있는 공고)`);
 
@@ -450,7 +454,7 @@ if (!process.env.ELIG_AI_AS_LIB) {
   }
   /* ── 공고문 PDF 경로 — 무료로 글자가 안 나오는 것만 (전수·지정 실행에서만 돈다) ── */
   let pdfGot = 0;
-  if (ALL || ONLY) {
+  if (ALL || ONLY || DOCS_ONLY) {
     for (const { it, path, file, kind } of pickPdfTargets(reg.items)) {
       if (ONLY && it.id !== ONLY) continue;
       let pick;
