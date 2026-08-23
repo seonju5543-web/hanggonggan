@@ -185,7 +185,7 @@ export function verifyPick(pick, lines) {
      · `eligibilityFrom`에 **'AI(공고문 PDF)'**로 출처를 남겨 번호 경로와 구분한다
      · 번호 경로와 **같은 관문**(요건 신호·제출서류·게시판 머리말)을 통과해야 한다
    ────────────────────────────────────────────────────────────── */
-const PDF_SYSTEM = `당신은 첨부된 한국 대학 장학금 **공고문 PDF**에서 '지원 자격 요건'을 읽는 일을 합니다.
+const PDF_SYSTEM = `당신은 첨부된 한국 대학 장학금 **공고문(PDF 또는 포스터 그림)**에서 '지원 자격 요건'을 읽는 일을 합니다.
 
 원칙:
 - 공고문에 **적혀 있는 문장을 그대로** 옮깁니다. 요약하거나 바꿔 쓰지 마세요.
@@ -284,31 +284,42 @@ export function pickPdfTargets(items) {
     if (it.program || requirementLines(it).length) continue;
     if ((it.aiTries || 0) >= (cfg.giveUpAfter ?? 3)) continue;
     for (const f of (index[it.id] || {}).files || []) {
-      if (!/\.pdf$/i.test(f)) continue;
+      /* PDF 와 **본문 그림**을 같이 본다 — `[홍보]` 계열은 글자 없이 포스터만 올려 두는데,
+         그건 '본문이 없는 것'이 아니라 '눈으로 읽어야 하는 것'이다(2026-08-23). */
+      const m = f.match(/\.(pdf|png|jpe?g|gif|webp)$/i);
+      if (!m) continue;
       const path = new URL(`extracted/${f}`, HERE).pathname;
       if (!fs.existsSync(path)) continue;
-      /* 무료로 글자가 나오면 이 경로에 올 이유가 없다 — 발췌기가 이미 읽었거나 읽을 것이다 */
-      if (readable(attachmentText(path))) continue;
-      out.push({ it, path, file: f });
+      /* 무료로 글자가 나오면 이 경로에 올 이유가 없다 — 발췌기가 이미 읽었거나 읽을 것이다.
+         그림은 애초에 글자가 안 나오므로 이 검사를 건너뛴다. */
+      const ext = m[1].toLowerCase();
+      if (ext === 'pdf' && readable(attachmentText(path))) continue;
+      out.push({ it, path, file: f, kind: ext === 'pdf' ? 'pdf' : 'image' });
       break;
     }
   }
   return out;
 }
 
-async function askPdf(item, path) {
+const MEDIA = { pdf: 'application/pdf', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', webp: 'image/webp' };
+
+async function askPdf(item, path, kind) {
   if (process.env.ELIG_AI_FAKE) return JSON.parse(fs.readFileSync(process.env.ELIG_AI_FAKE, 'utf8'));
   const { default: Anthropic } = await import('@anthropic-ai/sdk');
   const client = new Anthropic();
   const b64 = fs.readFileSync(path).toString('base64');
+  const ext = (path.match(/\.([a-z0-9]+)$/i) || [, 'pdf'])[1].toLowerCase();
+  /* PDF 는 문서 블록, 그림은 이미지 블록으로 보낸다 — 형태가 다르면 400 이 난다 */
+  const doc = kind === 'image'
+    ? { type: 'image', source: { type: 'base64', media_type: MEDIA[ext] || 'image/png', data: b64 } }
+    : { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 } };
   const stream = client.beta.messages.stream({
     model: cfg.model,
     max_tokens: 2000,
     system: PDF_SYSTEM,
     output_config: { effort: cfg.effort, format: { type: 'json_schema', schema: PDF_SCHEMA } },
-    messages: [{ role: 'user', content: [
-      { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: b64 } },
-      { type: 'text', text: `공고: ${item.name}\n\n이 공고문에서 지원 자격 요건 줄을 원문 그대로 옮겨 주세요.` },
+    messages: [{ role: 'user', content: [doc,
+      { type: 'text', text: `공고: ${item.name}\n\n이 ${kind === 'image' ? '공고 포스터' : '공고문'}에서 지원 자격 요건 줄을 원문 그대로 옮겨 주세요.` },
     ] }],
   });
   const msg = await stream.finalMessage();
@@ -407,10 +418,10 @@ if (!process.env.ELIG_AI_AS_LIB) {
   /* ── 공고문 PDF 경로 — 무료로 글자가 안 나오는 것만 (전수·지정 실행에서만 돈다) ── */
   let pdfGot = 0;
   if (ALL || ONLY) {
-    for (const { it, path, file } of pickPdfTargets(reg.items)) {
+    for (const { it, path, file, kind } of pickPdfTargets(reg.items)) {
       if (ONLY && it.id !== ONLY) continue;
       let pick;
-      try { pick = await askPdf(it, path); }
+      try { pick = await askPdf(it, path, kind); }
       catch (e) { log(`✕ ${it.name.slice(0, 30)} — PDF 호출 실패(공고 탓 아님): ${String(e && e.message || e).slice(0, 300)}`); continue; }
       const v = verifyPdfLines(pick);
       if (!v.ok) { log(`· ${it.name.slice(0, 30)} — PDF: ${v.why} (지금 것 유지)`); it.aiTries = (it.aiTries || 0) + 1; continue; }
@@ -422,11 +433,11 @@ if (!process.env.ELIG_AI_AS_LIB) {
       if (v.excludes.length) it.eligibilityExcludes = v.excludes;
       delete it.eligibilityStruct;                 // PDF 경로는 구조를 만들지 않는다
       /* 출처를 번호 경로와 구분해 남긴다 — 이 경로만 모델이 글자를 돌려준다 */
-      it.eligibilityFrom = 'AI(공고문 PDF)';
+      it.eligibilityFrom = kind === 'image' ? 'AI(공고 포스터 그림)' : 'AI(공고문 PDF)';
       it.eligibilityReviewed = false;
       delete it.aiTries;
       pdfGot += 1;
-      log(`✓ ${it.name.slice(0, 30)} — 공고문 PDF에서 ${v.lines.length}줄 (${file})`);
+      log(`✓ ${it.name.slice(0, 30)} — ${kind === 'image' ? '공고 포스터 그림' : '공고문 PDF'}에서 ${v.lines.length}줄 (${file})`);
     }
   }
 

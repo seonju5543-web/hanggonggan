@@ -1433,6 +1433,15 @@ console.log('\n■ AI 자격 읽기 안전장치 (2026-08-20)');
   const src = fs.readFileSync(new URL('../collector/eligibility-ai.mjs', import.meta.url), 'utf8');
   eq('  출처를 번호 경로와 구분해 남긴다', /'AI\(공고문 PDF\)'/.test(src), true);
   eq('  기관명을 줄이지 말라고 못 박는다', /줄이지 마세요/.test(src), true);
+  /* 🔴 **본문이 그림뿐인 공고**도 같은 길로 읽는다 (2026-08-23). `[홍보]` 계열은 글자 없이
+     포스터만 올려 둔다 — 넘기려던 7건 전부에 A4 포스터급 그림이 있었다(최대 5906×8268).
+     '본문이 없는 것'이 아니라 '눈으로 읽어야 하는 것'이었다.
+     ⚠️ PDF 는 document 블록, 그림은 image 블록이다 — 형태를 섞으면 400 이 난다. */
+  eq('  그림은 image 블록으로 보낸다', /type: 'image', source:/.test(src), true);
+  eq('    PDF 는 document 블록 그대로', /type: 'document', source:/.test(src), true);
+  eq('    출처를 그림/PDF 로 갈라 남긴다', /'AI\(공고 포스터 그림\)'/.test(src), true);
+  const dfx = fs.readFileSync(new URL('../collector/deepfetch.mjs', import.meta.url), 'utf8');
+  eq('  본문 그림도 내려받는다 (이름 규칙에는 안 걸린다)', /a\.bodyImage && IMG_EXT\.test/.test(dfx), true);
 
   /* 2026-08-23 — 자격을 **구조로** 읽는 경로. 종단추천장학처럼 원문이 표인 공고에서
      '공통 / 둘 중 하나 / 성적'이 평평해지면 학생이 뜻을 정반대로 읽는다(설계 문서 참조). */
