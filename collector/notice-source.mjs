@@ -18,6 +18,7 @@
    canon-url은 순수 함수만 담고 있어(불러도 아무것도 실행되지 않아) 안전하게 가져다 쓴다. */
 export { canonUrl } from './canon-url.mjs';
 import { canonUrl } from './canon-url.mjs';
+import { makeStripper } from './page-boilerplate.mjs';
 
 export const normTitle = (t) => (t || '')
   .replace(/\[[^\]]*\]/g, '')
@@ -28,7 +29,16 @@ export const normTitle = (t) => (t || '')
 export function indexTexts(texts, browserBodies) {
   const byUrl = new Map();
   const byTitle = new Map();
-  for (const v of Object.values(texts || {})) {
+  /* 각 원문에 '메뉴를 걷어내고 남는 본문이 몇 글자인가'를 붙여 둔다.
+     이게 있어야 아래 hasText가 **본문 없는 껍데기**를 가려낸다 — 자세한 사정은 MIN_BODY 참조.
+     스트리퍼는 '같은 학교의 여러 공고에 똑같이 나오는 줄 = 메뉴'라는 원리라 원문 전체가 필요하다. */
+  const strip = makeStripper(texts);
+  const measure = (v) => {
+    if (!v || typeof v.text !== 'string' || v.bodyChars !== undefined) return v;
+    try { v.bodyChars = strip(v.url || '', v.text).replace(/[^가-힣]/g, '').length; } catch { /* 재지 못하면 안 잰다 */ }
+    return v;
+  };
+  for (const v of Object.values(texts || {}).map(measure)) {
     if (v && v.url) byUrl.set(canonUrl(v.url), v);
     if (v && v.title) byTitle.set(normTitle(v.title), v);
   }
@@ -40,7 +50,7 @@ export function indexTexts(texts, browserBodies) {
   const better = (had, now) => !hasText(had) && !!(now && now.text);
   for (const [url, v] of Object.entries(browserBodies || {})) {
     if (!v || !v.text) continue;
-    const entry = { url, ...v };
+    const entry = measure({ url, ...v });
     const k = canonUrl(url);
     if (better(byUrl.get(k), entry)) byUrl.set(k, entry);
     if (v.title) {
@@ -80,15 +90,42 @@ export const looksLikeErrorPage = (text) => ERROR_PAGE.test(String(text || '').s
    → 껍데기는 '원문 없음'으로 다룬다. 진짜 본문은 브라우저 수집기가 따로 저장한다
      (`extracted/browser-bodies.json` — browser-collect.mjs 참조). */
 const SHELL_PAGE = /L\s*o\s*a\s*d\s*i\s*n\s*g\s*\.\s*\.\s*\.|divLoadBody|K2Web Wizard/;
-export const looksLikeShell = (text) => {
+
+/* 🔴 **껍데기 표시가 없는 껍데기가 훨씬 많다** (2026-08-23 실측).
+   `Loading...`·`K2Web` 같은 표시만 보던 시절, 자격을 못 읽는 70건 중 **29건**이
+   "원문 확보"로 세어지고 있었다. 실제로는 5,439자를 받아 놓고 그중 공고 본문은
+   **한글 191자**뿐이고 나머지는 로그인·사이트맵·학사일정이었다(세종이도).
+   AI에게 물어보면 셋 중 하나 꼴로 "메뉴/네비게이션만 있다"고 답한 이유가 이것이다.
+
+   못 받은 것을 받은 것으로 세면 문제가 있는 곳을 영영 못 찾는다 —
+   이 저장소가 오류 화면·JS 껍데기에서 두 번 겪은 것과 같은 계열이고, 이번이 세 번째다.
+   그래서 **표시가 아니라 실제 본문 분량**으로 판정한다. 메뉴를 걷어낸 뒤(page-boilerplate)
+   한글이 이 수보다 적으면 본문이 안 온 것이다.
+
+   문턱을 300으로 정한 근거 (2026-08-23 전수 실측 — 짐작이 아니다):
+     문턱 200 → 껍데기 44건을 잡고, 이미 자격을 읽은 공고 4건이 걸린다
+     문턱 300 → 껍데기 49건을 잡고,                        7건이 걸린다   ← 채택
+     문턱 400 → 껍데기 52건을 잡고,                       20건이 걸린다
+     문턱 500 → 껍데기 55건을 잡고,                       37건이 걸린다
+   400부터 급격히 나빠진다. 자격을 읽어낸 124건의 본문 분량 중앙값은 673자다.
+
+   ⚠️ '걸린다'가 **자격을 잃는다는 뜻은 아니다.** 발췌기는 원문이 없으면 아무것도 지우지
+   않으므로(extract-excerpts 첫머리 — '없다'가 아니라 '모른다'), 이미 읽어 둔 자격은 남는다.
+   치르는 값은 그 공고를 다시 받으러 가는 헛걸음뿐이고, 못 받은 것을 받았다고 세는 쪽이
+   훨씬 비싸다. */
+export const MIN_BODY = 300;
+
+export const looksLikeShell = (text, bodyChars) => {
   const t = String(text || '');
+  /* 본문 분량을 잴 수 있으면 그것이 우선이다. 못 재면(옛 호출부) 예전 규칙으로 돈다. */
+  if (typeof bodyChars === 'number') return bodyChars < MIN_BODY;
   if (!SHELL_PAGE.test(t.slice(0, 3000))) return false;
   // 껍데기 표시가 있어도 본문이 충분히 딸려 왔으면 진짜 원문이다
   return t.replace(/[^가-힣]/g, '').length < 400;
 };
 
 export const hasText = (src) => !!(src && src.text
-  && !looksLikeShell(src.text)
+  && !looksLikeShell(src.text, src.bodyChars)
   && !/^FETCH_(FAIL|ERROR)/.test(src.text)
   && !looksLikeErrorPage(src.text));
 

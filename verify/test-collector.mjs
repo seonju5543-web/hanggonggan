@@ -1201,11 +1201,31 @@ console.log('\n■ 껍데기 페이지와 브라우저 본문 (2026-08-20)');
   /* 브라우저 본문이 껍데기를 이겨야 한다 */
   const i1 = NS.indexTexts([{ url: U, title: '가나다 장학금', text: shell }], bodies);
   eq('브라우저 본문이 껍데기를 이긴다', /평점평균/.test(i1.byUrl.get([...i1.byUrl.keys()][0]).text), true);
-  /* 🔴 반대로 멀쩡한 원문은 덮으면 안 된다 — 순서를 뒤집으면 여기서 걸린다 */
-  const good = real + ' 추가로 저장돼 있던 온전한 원문입니다.';
+  /* 🔴 반대로 멀쩡한 원문은 덮으면 안 된다 — 순서를 뒤집으면 여기서 걸린다.
+     ⚠️ 예시를 4배로 늘린 이유(2026-08-23): 껍데기 판정이 '본문 한글 300자 미만'으로
+     넓어지면서, 100자짜리 예시가 **그 자체로 껍데기 취급**이 돼 이 검사가 엉뚱하게
+     깨졌다. 실제 공고 본문의 중앙값은 673자다 — 검사가 재려는 것은 '길이'가 아니라
+     '덮어쓰기 순서'이므로 예시를 현실적인 길이로 맞춘다. */
+  const good = real.repeat(4) + ' 추가로 저장돼 있던 온전한 원문입니다.';
   const i2 = NS.indexTexts([{ url: U, title: '가나다 장학금', text: good }], bodies);
   eq('  멀쩡한 원문은 브라우저 본문이 덮지 않는다',
     /추가로 저장돼 있던/.test(i2.byUrl.get([...i2.byUrl.keys()][0]).text), true);
+
+  /* 🔴 2026-08-23 — **껍데기 표시가 없는 껍데기**. 자격을 못 읽는 70건 중 29건이
+     "원문 확보"로 세어지고 있었다(세종이도: 5,439자를 받아 놓고 본문은 한글 191자,
+     나머지는 로그인·사이트맵·학사일정). 표시가 아니라 실제 본문 분량으로 판정한다.
+     이 검사를 지우면 "못 받은 것을 받았다고 세는" 상태로 그대로 되돌아간다. */
+  const menu = ['로그인', '사이트맵', '학사일정', '전체메뉴', '개인정보처리방침', '찾아오시는길'];
+  const pages = [1, 2, 3, 4].map((n) => ({
+    url: `https://b.ac.kr/view?id=${n}`, title: `공고 ${n}`,
+    text: menu.join('\n') + `\n공고 ${n} 제목입니다`,
+  }));
+  const i3 = NS.indexTexts(pages, {});
+  eq('메뉴만 있는 페이지는 원문으로 세지 않는다', NS.hasText(i3.byUrl.get([...i3.byUrl.keys()][0])), false);
+  const withBody = [...pages, { url: 'https://b.ac.kr/view?id=9', title: '공고 9', text: menu.join('\n') + '\n' + real.repeat(4) }];
+  const i4 = NS.indexTexts(withBody, {});
+  eq('  메뉴 뒤에 본문이 있으면 원문으로 센다', NS.hasText(i4.byUrl.get(NS.canonUrl('https://b.ac.kr/view?id=9'))), true);
+  eq('  문턱은 300자다 (내리면 껍데기를 다시 놓친다)', NS.MIN_BODY, 300);
 
   // 브라우저 수집기가 이미 그린 본문을 저장한다 (추가 페이지 열기 0회)
   const bc = fs.readFileSync(new URL('collector/browser-collect.mjs', root), 'utf8');
