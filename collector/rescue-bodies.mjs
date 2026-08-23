@@ -41,6 +41,9 @@ const CAP = Number(process.env.RESCUE_CAP || 25);
    게시판이 고쳐지거나 우리 판정이 나아질 수 있다(링크 사냥꾼과 같은 원칙). */
 const REST_AFTER = 3;
 const REST_DAYS = 7;
+/* 봇 차단 화면 표지 — 홍익대가 쓰는 STCLab 봇매니저가 대표적이다 */
+const BOT_WALL = /botmanager|stclab|Security Verification|자동입력\s*방지/i;
+const UA = { 'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36' };
 
 const log = (m) => console.log(`[rescue] ${m}`);
 let regDirty = false;
@@ -132,9 +135,11 @@ for (const t of targets) {
   const key = canonUrl(t.url);
   const page = await ctx.newPage();
   let text = '';
+  let finalUrl = '';
   try {
     await page.goto(t.url, { waitUntil: 'domcontentloaded', timeout: 30000 });
     await page.waitForTimeout(6000);           // 자바스크립트가 본문을 그릴 시간 (4초로는 모자란 학교가 있었다)
+    finalUrl = page.url();      // 봇 차단은 최종 주소가 challenge 로 바뀌는 것으로 드러난다
     /* 🔴 **줄바꿈을 없애면 안 된다** (2026-08-23 실측으로 배웠다).
        처음엔 태그를 정규식으로 벗기고 `\s+ → ' '`로 눌렀는데, 그러면 본문이
        **통짜 한 줄**이 된다. 그 한 줄은 ① AI가 줄 번호를 못 매겨 대상에서 빠지고
@@ -196,6 +201,27 @@ for (const t of targets) {
     report.push(`- ✕ ${t.it.name.slice(0, 40)} — 열지 못함: ${String(e.message).slice(0, 60)}`);
   } finally {
     await page.close().catch(() => {});
+  }
+
+  /* 🔴 **봇 차단은 브라우저만 막는다 — 그럴 땐 일반 fetch로 물러선다** (2026-08-23 실측).
+     홍익대는 브라우저로 열면 `cdn-botmanager.stclab.com/…/challenge`(제목 `Security
+     Verification`)로 튕기는데, **일반 fetch로 받아 둔 원문 13건에는 봇 차단 화면이 0건**이다.
+     STCLab 봇매니저가 헤드리스 브라우저만 잡는 것이다.
+     그래서 대안은 '브라우저를 더 잘 위장한다'가 아니라 '막히면 다른 길로 간다'이다 —
+     브라우저가 필요했던 이유(본문을 JS로 그린다)와 봇 차단은 서로 다른 문제이고,
+     봇 차단이 걸린 게시판은 대개 서버가 완성된 HTML을 준다. */
+  if (BOT_WALL.test(text) || BOT_WALL.test(String(finalUrl))) {
+    report.push(`- 🤖 ${t.it.name.slice(0, 36)} — 브라우저가 봇 차단에 걸려 일반 내려받기로 물러섬`);
+    try {
+      const res = await fetch(t.url, { redirect: 'follow', headers: UA, signal: AbortSignal.timeout(20000) });
+      if (res.ok) {
+        const html = await res.text();
+        text = html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ')
+          .replace(/<br\s*\/?>/gi, '\n').replace(/<\/(p|div|li|tr|h[1-6])>/gi, '\n')
+          .replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ')
+          .replace(/[ \t\u00a0]+/g, ' ').split('\n').map((l) => l.trim()).filter(Boolean).join('\n');
+      }
+    } catch { /* 이쪽도 안 되면 그냥 실패로 둔다 */ }
   }
 
   /* 받아 온 글자가 **본문인지**는 notice-source의 규칙 하나로만 판단한다.

@@ -1267,6 +1267,12 @@ console.log('\n■ 껍데기 페이지와 브라우저 본문 (2026-08-20)');
   eq('  본문을 받을 때 첨부 목록도 받아 적는다', /regDirty = true/.test(rb), true);
   /* 게시판에서 내려간 공고는 '못 받은 것'이 아니라 '없어진 것'이다 — 섞으면 영영 다시 받으려 애쓴다 */
   eq('  삭제된 공고는 따로 가려낸다', /gone: true/.test(rb), true);
+  /* 🔴 봇 차단은 **브라우저만** 막는다 (2026-08-23 실측). 홍익대는 브라우저로 열면
+     cdn-botmanager.stclab.com/…/challenge 로 튕기는데, 일반 fetch 로 받아 둔 원문
+     13건에는 봇 차단 화면이 0건이었다 — STCLab 봇매니저가 헤드리스만 잡는 것이다.
+     대안은 '브라우저를 더 잘 위장한다'가 아니라 '막히면 다른 길로 간다'이다. */
+  eq('  봇 차단에 걸리면 일반 내려받기로 물러선다', /BOT_WALL\.test\(text\)/.test(rb), true);
+  eq('    최종 주소로도 판정한다 (challenge 로 튕긴다)', /BOT_WALL\.test\(String\(finalUrl\)\)/.test(rb), true);
 
   // 브라우저 수집기가 이미 그린 본문을 저장한다 (추가 페이지 열기 0회)
   const bc = fs.readFileSync(new URL('collector/browser-collect.mjs', root), 'utf8');
@@ -1276,6 +1282,27 @@ console.log('\n■ 껍데기 페이지와 브라우저 본문 (2026-08-20)');
 
 /* 2026-08-20 — '목록 화면' 오인. 한쪽으로만 재면 반드시 다른 학교가 망가지는 자리라
    **양방향을 함께** 검사한다(중앙대를 살리는 것과 동국대를 지키는 것). */
+/* 🔴 2026-08-23 — 링크 사냥꾼이 헛걸음하는 첫째 원인은 '제목이 안 맞는 것'이다.
+   게시판 행 글자를 그대로 담아 둔 boardTitle 에는 앞머리에 `공지 공지`·`2651` 같은
+   행 번호·분류 배지가 붙는다. 대조는 제목 **앞부분**을 맞춰 보므로(fingerprint의
+   slice(0,24)), 앞머리가 어긋나면 뒤가 아무리 같아도 통째로 빗나간다.
+   청소는 수집기와 **같은 모듈**을 써야 한다 — 여기에 한 벌 더 두면
+   "수집기는 같다는데 사냥꾼은 다르다"가 된다(중앙대 11건이 3주간 헛돈 유형). */
+console.log('\n■ 링크 사냥꾼의 제목 대조 (2026-08-23)');
+{
+  const lh = fs.readFileSync(new URL('../collector/link-hunter.mjs', import.meta.url), 'utf8');
+  eq('사냥꾼은 수집기와 같은 제목 청소 규칙을 쓴다', /from '\.\/clean-title\.mjs'/.test(lh), true);
+  eq('  대조할 제목에서 부스러기를 뗀다', /cleanTitle\(\(t\.ref\.boardTitle/.test(lh), true);
+  eq('  받아 적을 때도 떼고 담는다', /boardTitle = cleanTitle\(mate\.title\)/.test(lh), true);
+  const CT = await import(new URL('../collector/clean-title.mjs', import.meta.url));
+  eq('  분류 배지를 뗀다', /^공지/.test(CT.cleanTitle('공지 공지 2026-2학기 복지장학1(본인장애) 신청안내')), false);
+  eq('  행 번호를 뗀다', /^2651/.test(CT.cleanTitle('2651 2026-2학기 부남장학생 선발 안내')), false);
+  /* 저장된 값에도 부스러기가 남아 있으면 안 된다 — 대조는 저장된 값으로 한다 */
+  const regd = JSON.parse(fs.readFileSync(new URL('../data/registered.json', import.meta.url), 'utf8'));
+  const dirty = (regd.items || regd).filter((x) => x.boardTitle && CT.cleanTitle(x.boardTitle) !== x.boardTitle);
+  eq('  저장된 boardTitle 에도 부스러기가 없다', dirty.length, 0);
+}
+
 console.log('\n■ 목록 화면인가 상세 화면인가 (2026-08-20)');
 {
   const D = await import(new URL('../collector/detail-url.mjs', import.meta.url));
