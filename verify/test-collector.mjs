@@ -1316,6 +1316,29 @@ console.log('\n■ 학교 서버에 붙는 워크플로의 인증서 설정 (202
   eq('  내려받기 실패는 원인(cause)까지 적는다', /e\.cause && \(e\.cause\.code/.test(df), true);
 }
 
+/* 🔴 개발자가 **네 번째로** 같은 것을 지적했다 (2026-08-23): 동국인재육성장학에
+   '마일리지 산정기간', 동산장학회에 '추천기한'·제외가 지원 자격으로 들어가 있다.
+   앞선 세 번은 그때그때 잡음을 이름 대서 필터에 추가했고, 그래서 새 유형이 나오면
+   개발자가 앱을 눈으로 볼 때까지 아무도 몰랐다. 이번엔 **세는 자리**를 만들었다.
+   ⚠️ 채점기가 필터와 같은 낱말을 쓰면 필터의 눈으로 필터를 채점하는 꼴이라
+   필터가 놓친 것은 영영 0으로 나온다 — 다른 축(문장이 무엇을 말하는가)으로 재야 한다. */
+console.log('\n■ 자격 자리의 잡음을 유형별로 세는가 (2026-08-23)');
+{
+  const rep = fs.readFileSync(new URL('../verify/eligibility-report.mjs', import.meta.url), 'utf8');
+  eq('채점기가 잡음을 유형별로 센다', /NOISE_KIND/.test(rep), true);
+  eq('  어느 경로가 넣었는지도 센다 (규칙 vs AI)', /발췌기\(규칙\) \$\{hits\.length - byAi\}/.test(rep), true);
+  /* 필터의 낱말 목록을 그대로 **가져다 쓰면** 안 된다.
+     ⚠️ 낱말만 찾으면 '쓰지 말라'고 적은 주석까지 잡힌다(실제로 그랬다) —
+     주석을 걷어내고 **실제로 부르는지**를 본다. */
+  const code = rep.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  eq('  필터의 잡음 목록을 그대로 쓰지 않는다', /REQ_NOISE|NOT_REQ_RE/.test(code), false);
+  /* 개발자가 짚은 두 유형은 반드시 잡혀야 한다 */
+  const kinds = rep.slice(rep.indexOf('const NOISE_KIND'), rep.indexOf('};', rep.indexOf('const NOISE_KIND')));
+  eq('  배점·평가를 잡는다 (마일리지 산정기간)', /산정\\s\*\(기간/.test(kinds), true);
+  eq('  일정·기한을 잡는다 (추천기한)', /'일정·기한'/.test(kinds), true);
+  eq('  제외 대상을 잡는다', /'제외 대상/.test(kinds), true);
+}
+
 console.log('\n■ 링크 사냥꾼의 제목 대조 (2026-08-23)');
 {
   const lh = fs.readFileSync(new URL('../collector/link-hunter.mjs', import.meta.url), 'utf8');
