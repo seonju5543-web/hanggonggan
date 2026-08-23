@@ -11,6 +11,12 @@
    "elig-14wfl9-1.hwp"
   ]
  },
+ "reg-hi-jeongeup": {
+  "slug": "wn0grj",
+  "files": [
+   "elig-wn0grj-1.pdf"
+  ]
+ },
  "reg-sejong-didim": {
   "slug": "14do6t",
   "files": [
@@ -29,16 +35,17 @@
    "elig-rtcxm5-1.pdf"
   ]
  },
- "reg-hi-jeongeup": {
-  "slug": "wn0grj",
-  "files": [
-   "elig-wn0grj-1.pdf"
-  ]
- },
  "auto-kuk2351202780artclviewdo": {
   "slug": "pxmg94",
   "files": [
    "elig-pxmg94-1.pdf"
+  ]
+ },
+ "auto-nuackrprogboardno2514559": {
+  "slug": "1w5jng",
+  "files": [
+   "elig-1w5jng-1.pdf",
+   "elig-1w5jng-2.hwp"
   ]
  }
 }
