@@ -359,7 +359,12 @@ async function downloadEligDocs() {
         // 받아 보니 문서가 아니라 로그인 페이지면 버린다 — 글자로 읽으면 엉뚱한 자격이 된다
         if (isHtmlPayload(buf)) { console.log('elig doc skip (웹페이지였음):', a.name); continue; }
         ai += 1; got += 1;
-        const ext = (a.name.match(/\.(hwp|hwpx|docx?)$/i) || [, 'bin'])[1].toLowerCase();
+        /* 🔴 확장자는 **첨부 이름**에서 딴다 — 주소는 `download.do`처럼 확장자가 없는 경우가 많다.
+           그리고 이 목록은 위 OK_EXT와 **반드시 같아야 한다.** 2026-08-23에 OK_EXT에만
+           pdf를 넣고 여기를 안 고쳐서, 받아 온 PDF 5개가 전부 `.bin`으로 저장됐다 —
+           `attachmentText()`는 확장자로 해석기를 고르므로 손도 못 댔다.
+           파일은 멀쩡히 내려받아져 있는데(320KB·1.1MB…) 아무도 못 읽는 상태였다. */
+        const ext = (a.name.match(/\.(hwp|hwpx|docx?|pdf)$/i) || [, 'bin'])[1].toLowerCase();
         const fname = `elig-${slug}-${ai}.${ext}`;
         fs.writeFileSync(new URL(fname, OUT), buf);
         (index[it.id] ||= { slug, files: [] }).files.push(fname);

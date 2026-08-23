@@ -181,8 +181,11 @@ for (const t of targets) {
           if (nm.length >= 5 && nm.length <= 120 && !found.some((x) => x.name === nm)) found.push({ name: nm, url: l.url });
         }
       }
-      const had = new Set((t.it.attachments || []).map((a) => a.name));
-      const add = found.filter((a) => !had.has(a.name));
+      /* 이름 앞의 번호(`1. `)와 `미리보기` 꼬리를 떼고 비교한다 — 안 그러면
+         `1. ○○.hwp`와 `○○.hwp`가 다른 첨부로 보여 같은 파일이 두 번 쌓인다(실측). */
+      const norm = (n) => String(n || '').replace(/\s*미리보기\s*$/, '').replace(/^\d+\.\s*/, '').trim();
+      const had = new Set((t.it.attachments || []).map((a) => norm(a.name)));
+      const add = found.filter((a) => !had.has(norm(a.name)));
       if (add.length) {
         t.it.attachments = [...(t.it.attachments || []), ...add];
         regDirty = true;

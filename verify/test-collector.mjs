@@ -1415,6 +1415,13 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
      readable()이 조용히 거른다. 안 받으면 그 공고는 영영 자격을 못 읽는다. */
   const df = fs.readFileSync(new URL('../collector/deepfetch.mjs', import.meta.url), 'utf8');
   eq('자격용 공고문 첨부에 PDF가 들어간다', /OK_EXT = \/\\\.\(hwp\|hwpx\|docx\?\|pdf\)/.test(df), true);
+  /* 🔴 **두 목록이 갈라지면 파일이 `.bin`으로 저장돼 아무도 못 읽는다.**
+     받을 대상(OK_EXT)에만 pdf를 넣고 파일 확장자를 정하는 쪽을 안 고쳐서,
+     내려받은 PDF 5개가 전부 `.bin`이 됐다 — attachmentText()는 확장자로
+     해석기를 고르므로 320KB·1.1MB짜리 파일을 눈앞에 두고 손도 못 댔다.
+     한 곳만 고치고 다른 곳을 안 고치는 이 유형은 검사로 묶어 둬야 한다. */
+  eq('  파일 확장자를 정하는 목록도 같다 (갈라지면 .bin 이 된다)',
+    /a\.name\.match\(\/\\\.\(hwp\|hwpx\|docx\?\|pdf\)\$\/i\)/.test(df), true);
   const AT = await import(new URL('../collector/attachment-text.mjs', import.meta.url));
   /* ① 신청서·동의서는 읽지 않는다 — 읽으면 개인정보 수집 항목이 자격 자리에 앉는다
         (2026-08-20에 실제로 3건이 그렇게 돼 통째로 되돌린 적이 있다) */
