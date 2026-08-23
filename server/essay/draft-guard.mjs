@@ -146,7 +146,13 @@ export function materialText(payload) {
     for (const q of s.quotes || []) parts.push(q);
   }
   for (const m of (payload && payload.materials) || []) parts.push(`${m.label || ''} ${m.value || ''}`);
-  for (const f of (payload && payload.fields) || []) parts.push(f.label || '', f.hint || '', f.answer || '');
+  for (const f of (payload && payload.fields) || []) {
+    parts.push(f.label || '', f.hint || '', f.answer || '');
+    /* 🔴 학생이 고른 키워드가 재료의 본체다 (2026-08-23).
+       이걸 빠뜨리면 검사기가 **키워드로 쓴 멀쩡한 글을 전부 지어냄으로 보고 버린다** —
+       이 기능이 통째로 동작하지 않게 되는 자리라서 회귀 검사를 붙여 뒀다. */
+    for (const a of f.asks || []) parts.push(`${a.q || ''} ${a.a || ''}`);
+  }
   const p = payload && payload.profile;
   if (p) parts.push(p.year || '', p.major || '', p.school || '');
   return parts.filter(Boolean).join('\n');

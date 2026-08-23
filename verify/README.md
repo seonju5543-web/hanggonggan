@@ -27,9 +27,10 @@ node verify-notify.js       # 알림 시스템 브라우저 검증: 최초 1회 
 node verify-push-server.mjs # 진짜 푸시 서버 검증: VAPID 서명을 실제로 검증 · 깨울 학교 판정 · 구독 저장 (서버 불필요)
 node verify-push-client.js  # 진짜 푸시 앱 검증: 미설정/설정 두 상태 · 개인정보가 서버로 새지 않는지 요청 본문 전수 검사
 node verify-admin.js        # 관리자 페이지 검증 (아래 설명 — 서버 불필요, 스스로 띄운다)
+node verify-essay-ask.mjs   # 키워드 질문: 서술형 66칸에 빈 A4 2장을 던지지 않는가 + 질문 수 상한이 안 늘었는가
 node verify-essay-guard.mjs # AI 초안 안전장치(서버·검사 공용 규칙): 가짜 응답으로 모델이 일부러 나쁘게 굴게 해서
                             #   ①없는 수상·봉사시간 ②모르는 숫자·날짜 ③사실 나열형 칸 ④민감정보 — 브라우저·서버·돈 불필요
-node verify-essay-ui.js     # AI 초안 UI: 꺼진 상태/켠 상태 · 보낼 내용 확인 화면 · 요청 본문 개인정보 전수 · 실패 시 학생 글 보존
+node verify-essay-ui.js     # AI 초안 UI: 꺼진 상태(옮기기만·네트워크 0건)/켠 상태 · 키워드가 요청에 실리는가 · 개인정보 전수 · 실패 시 학생 글 보존
 node verify-chat.js         # 장학금 도우미 대장님: 자리·마스코트 드래그·정직 답변·말귀(동의어/초성/오타/앞대화)·AI 안전장치(가짜 서버로 지어낸 답 차단)·XSS
 ```
 

@@ -10,9 +10,10 @@
 
    무엇을 눈으로 확인하는가
      ① endpoint 가 비어 있으면 버튼이 아예 없다 (지금 배포 상태)
-     ② 켜면 버튼이 나오고, 누르면 **무엇이 나가는지 한 줄씩** 보인다
+     ② 🔴 서술형 칸에 **빈 A4 2장을 던지지 않는다** — 키워드 질문이 그 자리에 있다
      ③ 실제로 나간 요청 본문에 이름·학번·연락처·계좌·성적·소득분위가 없다
-     ④ 초안이 칸에 들어가고 '초안입니다' 표시가 붙는다
+        + 학생이 고른 키워드와 목표 분량이 실려 간다
+     ④ 글이 칸에 들어가고 '초안입니다' 표시가 붙는다
      ⑤ 서버가 실패하면 학생이 쓴 글이 그대로 남는다
    ============================================================ */
 const { chromium } = require('playwright-core');
@@ -103,12 +104,45 @@ async function dismissNotify(page) {
 
   console.log('\n[1) 꺼져 있을 때 — 지금 배포 상태]');
   ok(await openForm(), '양식 작성 화면이 열린다');
-  ok(await page.$('#btn-essay-ai') === null,
-    '① endpoint 가 비어 있으면 AI 초안 버튼이 없다 — 기능이 완전히 꺼져 있다');
+  {
+    /* endpoint 가 비면 **네트워크로 나가는 것이 없다.** 버튼은 남되 앱이 옮겨만 준다 —
+       키워드를 골라 놓고 아무 일도 안 일어나면 그 카드는 학생을 놀린 셈이 되기 때문이다. */
+    const b = await page.$('#btn-essay-ai');
+    ok(b !== null, '① 꺼져 있어도 버튼은 있다 (앱이 키워드를 옮겨 준다)');
+    const t = b ? await b.textContent() : '';
+    ok(/옮기기/.test(t), '① 꺼져 있을 때는 "옮기기"라고만 말한다 — 못 하는 일을 한다고 하지 않는다', t);
+    const lead = await page.$eval('.essay-ask-lead', (el) => el.textContent).catch(() => '');
+    ok(!/앱이 씁니다/.test(lead), '① 꺼져 있을 때 "앱이 씁니다"라고 하지 않는다', lead);
+    /* 실제로 눌러서 네트워크가 안 나가는지 본다 */
+    await page.evaluate(() => { window.__off = 0; const r = window.fetch; window.fetch = (...a) => { window.__off++; return r(...a); }; });
+    await page.evaluate(() => { const c = document.querySelector('.essay-ask .essay-chips .chip'); if (c) c.click(); });
+    await page.click('#btn-essay-ai');
+    await page.waitForTimeout(500);
+    ok(await page.evaluate(() => window.__off) === 0, '① 꺼져 있을 때 바깥으로 나가는 요청이 0건이다');
+    const moved = await page.evaluate(() => {
+      const t2 = [...document.querySelectorAll('.sheet-body textarea')].find((x) => x.id.startsWith('fq-'));
+      return t2 ? t2.value : '';
+    });
+    ok(moved.includes('·'), '① 고른 키워드가 칸에 옮겨진다', moved.slice(0, 50));
+  }
   await page.screenshot({ path: SHOT('1-off') });
 
-  console.log('\n[2) 켰을 때 — 가짜 서버로]');
-  /* 서버를 켠 셈 치고, fetch 를 가로채 무엇이 나갔는지 그대로 받아 적는다 */
+  console.log('\n[2) 서술형 칸에 키워드 질문이 있는가]');
+  /* 🔴 개발자 지적(2026-08-23): "장학 신청 사유를 자기소개서로 (A4 2장 내외)"라고 적힌
+     빈 칸을 학생에게 던지면 안 된다. 그 자리에 키워드 질문이 있어야 한다. */
+  const askBox = await page.$('.essay-ask');
+  ok(askBox !== null, '② 서술형 칸 안에 키워드 질문 카드가 있다 (AI가 꺼져 있어도)');
+  if (askBox) {
+    const askText = await askBox.textContent();
+    ok(/키워드만 골라/.test(askText), '② "키워드만 골라 주세요"가 그 자리에 있다');
+    ok(/목표 약 \d+자/.test(askText), '② 목표 분량을 원본에서 읽어 보여 준다', askText.slice(0, 60));
+    const chips = await page.$$('.essay-ask .essay-chips .chip');
+    const frees = await page.$$('.essay-ask .essay-ask-free');
+    ok(chips.length >= 4, `② 눌러서 고르는 보기가 있다 (${chips.length}개)`);
+    console.log(`      키워드 질문: 고르기 ${chips.length}개 · 직접입력 ${frees.length}칸`);
+  }
+
+  console.log('\n[3) 켜면 버튼이 나오고, 키워드가 실려 가는가]');
   await page.evaluate(() => {
     ESSAY_CONFIG.endpoint = 'https://fake.workers.dev';
     window.__sent = [];
@@ -122,37 +156,29 @@ async function dismissNotify(page) {
       return real(url, init);
     };
   });
-  await page.click('#btn-ff-back').catch(() => {});
-  await page.evaluate(() => { if (typeof formInvalidatePlan === 'function') formInvalidatePlan(); });
   await page.keyboard.press('Escape');
   await page.waitForTimeout(300);
+  await page.evaluate(() => { if (typeof formInvalidatePlan === 'function') formInvalidatePlan(); });
   ok(await openForm(), '양식 화면을 다시 연다');
-  ok(await page.$('#btn-essay-ai') !== null, '② 켜면 AI 초안 버튼이 나온다');
+  ok(await page.$('#btn-essay-ai') !== null, '③ 켜면 글 만들기 버튼이 나온다');
+  const fine = await page.$('.essay-fine');
+  ok(fine !== null, '③ 버튼 아래 한 줄로 무엇이 나가는지 밝힌다 (긴 확인 상자는 없앴다)');
+  ok(await page.$('#essay-confirm') === null, '③ 옛 "이 내용을 보낼게요" 상자는 없다');
 
-  /* 학생이 몇 칸 적어 둔 상태를 만든다 — 이것이 '재료'다 */
-  const firstStory = await page.evaluate(() => {
-    const el = [...document.querySelectorAll('.sheet-body textarea')].find((t) => t.id.startsWith('fq-'));
-    return el ? el.id : null;
+  /* 학생이 키워드를 고른다 — 이것이 이 서비스가 요구하는 전부여야 한다 */
+  const picked = await page.evaluate(() => {
+    const out = [];
+    document.querySelectorAll('.essay-ask .essay-chips').forEach((g) => {
+      const c = g.querySelector('.chip');
+      if (c) { c.click(); out.push(c.dataset.value); }
+    });
+    return out;
   });
-  await page.fill(`#${firstStory}`, '등록금이 부담돼서');
+  console.log('      학생이 고른 키워드:', picked.join(' / ') || '(없음)');
+  ok(picked.length >= 1, '③ 키워드를 눌러서 고를 수 있다');
+
   await page.click('#btn-essay-ai');
-  await page.waitForSelector('#essay-confirm', { timeout: 4000 });
-  await page.screenshot({ path: SHOT('2-confirm') });
-
-  const confirmText = await page.$eval('#essay-confirm', (el) => el.textContent);
-  ok(/보낼게요/.test(confirmText), '② 무엇을 보내는지 화면에 밝힌다');
-  ok(/Cloudflare/.test(confirmText) && /Anthropic/.test(confirmText) && /해외/.test(confirmText),
-    '② 어디로 나가는지(우리 서버 → Anthropic · 해외)를 그대로 적는다');
-  ok(/주민등록번호/.test(confirmText) && /보내지 않아요/.test(confirmText),
-    '② 무엇을 안 보내는지도 적는다');
-  ok((await page.$$('#essay-confirm .essay-send')).length >= 2, '② 줄마다 끌 수 있다');
-
-  console.log('\n[3) 실제로 나간 요청 본문]');
-  await page.evaluate(() => {
-    window.__reply = { drafts: [], skipped: [] };
-  });
-  await page.click('#btn-essay-send');
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(1000);
   const sent = await page.evaluate(() => window.__sent);
   ok(sent.length === 1, `요청이 한 번 나갔다 (${sent.length}회)`);
   const body = JSON.stringify(sent[0] || {});
@@ -162,21 +188,22 @@ async function dismissNotify(page) {
   ok(!/fallbacks/.test(body), '③ fallbacks 를 붙이지 않는다');
   ok((sent[0].fields || []).every((f) => f.kind === 'story'),
     '③ story 칸만 보낸다 — 사실 나열형은 요청에 없다');
+  const f0 = (sent[0].fields || [])[0] || {};
+  ok((f0.asks || []).length >= 1, '③ 학생이 고른 키워드가 요청에 실려 간다', JSON.stringify(f0.asks || []));
+  ok(Number(f0.target) >= 200, `③ 목표 분량이 실려 간다 (${f0.target}자)`);
   console.log('    보낸 것:', JSON.stringify({
     profile: sent[0].profile,
-    materials: (sent[0].materials || []).map((m) => m.label || '(무제)'),
-    fields: (sent[0].fields || []).map((f) => f.label),
+    target: f0.target,
+    asks: (f0.asks || []).map((a) => `${a.q}=${a.a}`),
   }));
 
   console.log('\n[4) 초안이 칸에 들어가는가]');
   const key = sent[0].fields[0].key;
   await page.evaluate((k) => {
-    window.__reply = { drafts: [{ key: k, text: '가계 사정으로 등록금 마련이 어려워 학업에 전념하기 힘든 상황입니다.' }], skipped: [] };
+    window.__reply = { drafts: [{ key: k, text: '가계 사정으로 등록금 마련이 어려워 학업에 전념하기 힘든 상황입니다.\n\n그래서 학기 중에도 아르바이트를 이어 왔습니다.' }], skipped: [] };
   }, key);
   await page.click('#btn-essay-ai');
-  await page.waitForSelector('#btn-essay-send', { timeout: 4000 });
-  await page.click('#btn-essay-send');
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(1000);
   const filled = await page.$eval(`#fq-${key}`, (el) => el.value);
   ok(filled.includes('가계 사정'), '④ 초안이 칸에 들어간다');
   ok(await page.$('.essay-flag') !== null, '④ 그 칸에 초안 표시가 붙는다');
@@ -190,12 +217,10 @@ async function dismissNotify(page) {
     window.fetch = async () => { throw new Error('서버 죽음'); };
   });
   await page.click('#btn-essay-ai');
-  await page.waitForSelector('#btn-essay-send', { timeout: 4000 });
-  await page.click('#btn-essay-send');
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(1200);
   ok(await page.$eval(`#fq-${key}`, (el) => el.value) === '제가 직접 쓴 문장입니다',
     '⑤ 서버가 죽어도 학생이 쓴 글이 그대로 남는다');
-  ok(await page.$('#essay-confirm') === null, '⑤ 실패해도 화면이 원래대로 돌아온다');
+  ok(await page.$eval('#btn-essay-ai', (el) => !el.disabled), '⑤ 실패해도 버튼이 다시 눌린다');
 
   console.log('\n[6) 문서는 그대로인가]');
   await page.click('#btn-ff-generate');

@@ -29,14 +29,15 @@ const ESSAY_CONFIG = {
   endpoint: '',
 
   /* 화면에 붙는 말. 개발자 결정 2026-08-23 — '초안'이라고 밝힌다. */
-  label: 'AI 초안 만들기',
+  label: '키워드로 글 만들기',
   notice: '반드시 읽고 고쳐서 제출하세요.',
 
   /* 한 번에 보낼 서술형 칸 수. 서버도 같은 상한을 갖고 있다. */
   maxFields: 8,
 
-  /* 응답을 기다릴 시간(밀리초). 넘으면 조용히 포기하고 학생 원문을 그대로 둔다. */
-  timeoutMs: 45000,
+  /* 응답을 기다릴 시간(밀리초). A4 2장짜리 칸이 여럿이면 1분을 넘길 수 있어 넉넉히 둔다.
+     넘으면 조용히 포기하고 학생 원문을 그대로 둔다. */
+  timeoutMs: 90000,
 };
 
 if (typeof module !== 'undefined' && module.exports) module.exports = { ESSAY_CONFIG };

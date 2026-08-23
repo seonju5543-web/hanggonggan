@@ -61,7 +61,15 @@ const basePayload = () => ({
     { label: '왜 필요한가', value: '등록금이 부담돼서' },
     { label: '봉사', value: '지역아동센터에서 120시간 봉사했습니다' },
   ],
-  fields: [{ key: 'growth', kind: 'story', label: '성장과정 · 가정환경', hint: '성장과정과 가정환경', answer: '' }],
+  fields: [{
+    key: 'growth', kind: 'story', label: '성장과정 · 가정환경', hint: '성장과정과 가정환경',
+    target: 600, answer: '',
+    /* 학생이 고른 키워드 — 이 서비스의 재료 본체다 */
+    asks: [
+      { q: '어떤 가정에서 자랐나요', a: '맞벌이 가정' },
+      { q: '그 시간에서 배운 것', a: '성실함, 아끼는 습관' },
+    ],
+  }],
 });
 
 /* ─────────────────────────────────────────────────────────── */
@@ -217,6 +225,12 @@ head('12) 재료 모으기 — 검사와 프롬프트가 같은 글을 보는가
   const m = materialText(basePayload());
   ok(m.includes('120시간') && m.includes('등록금이 부담돼서') && m.includes('가정형편'),
     '학생 재료와 공고 발췌가 모두 재료에 들어간다');
+  /* 🔴 이 한 줄이 빠지면 기능이 통째로 죽는다 — 검사기가 키워드로 쓴 멀쩡한 글을
+     전부 '지어냄'으로 보고 버린다 (2026-08-23 실제로 그럴 뻔했다). */
+  ok(m.includes('맞벌이 가정') && m.includes('아끼는 습관'),
+    '🔴 학생이 고른 키워드가 재료에 들어간다 — 빠지면 초안이 전부 버려진다');
+  ok(checkDraft('저는 맞벌이 가정에서 자라며 아끼는 습관을 익혔습니다.', m).ok,
+    '키워드로 쓴 글이 검사를 통과한다');
   ok(!m.includes('test-key'), '열쇠는 재료에 섞이지 않는다');
 }
 
@@ -268,7 +282,9 @@ head('13) 앱 쪽 (essay.js) — 무엇을 재료로 모으는가');
   ok(!ids.includes('account'), '④ 계좌번호는 재료에 안 들어간다');
   ok(ids.includes('vol'), '학생이 쓴 봉사 내역은 재료로 쓴다 — 자소서의 가장 좋은 재료다');
   ok(ids.includes('club'), '프로필로 못 채우는 자유 입력은 재료로 쓴다');
-  ok(ids.includes('growth'), '학생이 쓴 서술형 답도 재료로 쓴다 (뜻을 살리려고)');
+  /* story 칸은 **결과가 들어갈 자리**라 재료 목록에 넣지 않는다.
+     학생이 거기 직접 쓴 글은 fields[].answer 로 따로 실려 간다 — 그 뜻은 살린다. */
+  ok(!ids.includes('growth'), 'story 칸은 재료가 아니라 결과가 들어갈 자리다');
 
   const prof = ctx.essayProfile();
   ok(Object.keys(prof).join(',') === 'school,year,major',
@@ -283,7 +299,9 @@ head('13) 앱 쪽 (essay.js) — 무엇을 재료로 모으는가');
 
   /* 꺼져 있으면 버튼이 아예 없다 */
   ctx.ESSAY_CONFIG.endpoint = '';
-  ok(ctx.essayButtonHtml({}) === '', '⑤ endpoint 가 비어 있으면 버튼이 안 나온다 — 기능이 꺼진다');
+  const offBtn = ctx.essayButtonHtml({});
+  ok(offBtn.includes('옮기기') && !offBtn.includes('✨'),
+    '⑤ endpoint 가 비면 "옮기기" 버튼만 나온다 — 못 하는 일을 한다고 하지 않는다');
   ctx.ESSAY_CONFIG.endpoint = 'https://x.workers.dev';
   ok(ctx.essayButtonHtml({}).includes('btn-essay-ai'), '켜져 있고 도울 칸이 있으면 버튼이 나온다');
   ok(ctx.essayStoryFields({ secs: [{ items: [{ id: 'a', type: 'textarea' }] }] }).length === 0,

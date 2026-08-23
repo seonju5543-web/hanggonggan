@@ -234,8 +234,19 @@ function formFieldHtml(f) {
     if (key) html += `<label class="fq-keep"><input type="checkbox" class="fq-keep-box" data-key="${esc(key)}" data-for="${fid}" checked /><span>다음 신청서에도 쓸게요</span></label>`;
   }
   if (f.type === 'textarea') {
+    /* 🔴 서술형(story) 칸은 빈 칸을 던지지 않는다 (개발자 지적 2026-08-23).
+       'A4 2장 내외'를 학생에게 쓰라고 하는 것은 우리가 할 일을 떠넘기는 것이다.
+       대신 **키워드 질문**을 이 칸 안에 그리고, 글은 앱이 쓴다.
+       카드가 이 칸 '안'에 들어가므로 질문 수 상한(FORM_LIMITS)은 그대로다. */
+    const isStory = f.kind === 'story' && typeof essayAskHtml === 'function';
+    if (isStory) html += essayAskHtml(f);
     html += `<div class="fq-sugg">${(f.sugg || []).map((s) => `<button type="button" class="chip chip-sm" data-fill="${fid}" data-text="${esc(s)}">${esc(s.slice(0, 26))}…</button>`).join('')}</div>`;
-    html += `<textarea id="${fid}" rows="3" placeholder="직접 입력하거나 위 추천 문구를 눌러 채워보세요"></textarea>`;
+    const ph = isStory
+      ? (typeof essayOn === 'function' && essayOn()
+        ? '위 키워드를 고르고 아래 ✨ 버튼을 누르면 여기가 채워져요 — 직접 쓰셔도 돼요'
+        : '위 키워드를 고르고 아래 버튼을 누르면 여기로 옮겨져요 — 직접 쓰셔도 돼요')
+      : '직접 입력하거나 위 추천 문구를 눌러 채워보세요';
+    html += `<textarea id="${fid}" rows="${isStory ? 5 : 3}" placeholder="${esc(ph)}"></textarea>`;
   }
   if (f.type === 'group') {
     /* 원본이 표인데 셀마다 질문이 된 것을 한 카드로 묶은 것.

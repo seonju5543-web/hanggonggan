@@ -1360,28 +1360,37 @@ textarea:focus {
   font-size: 12.5px; color: var(--text-weak); text-decoration: underline;
 }
 
-/* ── AI 초안 (essay.js) ──
-   무엇이 나가는지 한 줄씩 보이고 줄마다 끌 수 있게 한다.
-   개발자 승인 조건이 '버튼을 눌러야 가고, 무엇이 나가는지 그대로 밝힌다'였다. */
-.essay-confirm {
-  border: 1px solid var(--primary); border-radius: 14px;
-  background: var(--primary-weak); padding: 14px; margin-bottom: 12px;
+/* ── AI 초안 (essay.js · essay-ask.js) ──
+   🔴 서술형 칸에 빈 A4 2장을 던지지 않는다 (개발자 지적 2026-08-23).
+      키워드 질문을 그 칸 '안'에 그린다 — 새 질문이 아니라 질문 수 상한과 무관하다. */
+.essay-ask {
+  border: 1px solid var(--line); border-left: 3px solid var(--primary);
+  border-radius: 12px; background: var(--primary-weak);
+  padding: 12px 13px; margin: 4px 0 10px;
 }
-.essay-confirm h4 { margin-bottom: 6px; }
-.essay-confirm .dp-note { text-align: left; line-height: 1.6; }
-.essay-list { display: grid; gap: 6px; margin: 10px 0 4px; }
-.essay-row {
-  display: grid; grid-template-columns: 18px minmax(72px, 96px) 1fr;
-  align-items: center; gap: 8px; font-size: 12.5px;
+.essay-ask-lead {
+  font-size: 12.5px; color: var(--text-sub); line-height: 1.5;
+  margin-bottom: 10px;
 }
-.essay-row input { width: 16px; height: 16px; accent-color: var(--primary); }
-.essay-row > span { color: var(--text-weak); }
-.essay-row > em {
-  font-style: normal; color: var(--text-sub); font-weight: 600;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+.essay-ask-lead b { color: var(--primary-dark); }
+.essay-ask-row { display: block; margin-bottom: 11px; }
+.essay-ask-row:last-child { margin-bottom: 0; }
+.essay-ask-row > span {
+  display: block; font-size: 12.5px; font-weight: 600;
+  color: var(--text-sub); margin-bottom: 6px;
 }
-.essay-thin { color: var(--orange); font-weight: 600; }
+.essay-ask .chip-group { gap: 6px; }
+.essay-ask .chip-sm { background: var(--surface); font-size: 12px; padding: 6px 10px; min-height: 30px; }
+.essay-ask-free {
+  width: 100%; font-size: 13.5px; padding: 9px 11px;
+  border: 1px solid var(--line); border-radius: 10px; background: var(--surface);
+}
 
-/* 초안이 들어간 칸은 눈에 띄게 — 학생이 '이건 내가 쓴 글'로 착각하면 안 된다 */
-textarea.essay-drafted { border-color: var(--primary); background: #fbfcff; }
-.essay-flag { color: var(--primary); font-weight: 600; margin-top: 6px; }
+/* 버튼 아래 한 줄 — 무엇이 나가는지 짧게만 밝힌다.
+   (2026-08-23: 길게 늘어놓던 '이 내용을 보낼게요' 확인 상자는 개발자 지시로 없앴다 —
+    학생에게 필요 없는 정보라 가독성만 떨어뜨렸다.) */
+.essay-fine { font-size: 11.5px; margin-top: 6px; }
+
+/* 글이 들어간 칸은 눈에 띄게 — 학생이 '이건 내가 쓴 글'로 착각하면 안 된다 */
+textarea.essay-drafted { border-color: var(--primary); background: #fbfcff; line-height: 1.7; }
+.essay-flag { color: var(--primary); font-weight: 600; margin-top: 6px; text-align: left; }
