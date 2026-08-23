@@ -559,7 +559,8 @@
    ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322415",
    "sourceKind": "official",
-   "formId": "uiam-apply"
+   "formId": "uiam-apply",
+   "aiTries": 1
   },
   {
    "id": "reg-cau-samil",
@@ -732,7 +733,8 @@
    "excerpts": [
     "◆ 기타 문의 : ☎ 02-6490-6287"
    ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "aiTries": 1
   },
   {
    "id": "reg-cau-bogun-multi",
@@ -908,7 +910,34 @@
     "문의: nccoss@uos.ac.kr 이메일 문의"
    ],
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
-   "applyEmail": "nccoss@uos.ac.kr"
+   "applyEmail": "nccoss@uos.ac.kr",
+   "eligibilityPrev": {
+    "lines": null,
+    "excludes": null,
+    "priority": null,
+    "from": null
+   },
+   "eligibilityLines": [
+    "- 26년 1학기 기준 서울시립대학교 재학생만 지급 가능 (휴학생, 졸업생, 졸업 유예생 지급 불가)",
+    "- 26년 1학기 (26. 03. ~ 26. 07.) 에 인증된 교육과정(마이크로디그리) 이수인증만 인정됨",
+    "* 사업 시작 연도 이후에 (2023 학년도 ~) 이수한 교과목 으로 해당 학기에 이수 인증한 마이크로디그리 평점 평균 B0( 평점 평균 3.0) 이상 수령 가능"
+   ],
+   "eligibilityStruct": {
+    "common": [
+     "- 26년 1학기 기준 서울시립대학교 재학생만 지급 가능 (휴학생, 졸업생, 졸업 유예생 지급 불가)",
+     "- 26년 1학기 (26. 03. ~ 26. 07.) 에 인증된 교육과정(마이크로디그리) 이수인증만 인정됨",
+     "* 사업 시작 연도 이후에 (2023 학년도 ~) 이수한 교과목 으로 해당 학기에 이수 인증한 마이크로디그리 평점 평균 B0( 평점 평균 3.0) 이상 수령 가능"
+    ],
+    "either": [],
+    "grade": [
+     "* 사업 시작 연도 이후에 (2023 학년도 ~) 이수한 교과목 으로 해당 학기에 이수 인증한 마이크로디그리 평점 평균 B0( 평점 평균 3.0) 이상 수령 가능"
+    ]
+   },
+   "eligibilityExcludes": [
+    "- 26년 1학기 기준 서울시립대학교 재학생만 지급 가능 (휴학생, 졸업생, 졸업 유예생 지급 불가)"
+   ],
+   "eligibilityFrom": "AI(원문 줄 그대로)",
+   "eligibilityReviewed": false
   },
   {
    "id": "reg-sm-woosu",
