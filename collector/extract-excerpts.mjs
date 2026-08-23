@@ -283,7 +283,12 @@ function extractQualifyLines(text) {
   function blockFrom(start) {
   const startMark = markerOf(lines[start]);
   const out = [];
-  for (let i = start; i < lines.length && out.length < 8; i += 1) {
+  /* 🔴 칸이 8개면 **잡음이 진짜 요건을 밀어낸다** (2026-08-21 사랑나눔에서 실제로 그랬다).
+     `■ 지원 자격` `아래 두 가지를 모두 충족하는 자` `1) 학업 성적 기준` 이 세 칸을 먹어
+     `2) 경제적 기준` 아래의 **기초생활수급자/차상위** 요건이 통째로 잘렸다 —
+     수급자가 아닌 학생이 자기가 된다고 오해하게 되는, 잡음보다 나쁜 실패다.
+     화면 쪽에서 잡음을 걸러내고 5줄로 줄이므로 여기서는 넉넉히 담아 두는 편이 맞다. */
+  for (let i = start; i < lines.length && out.length < 14; i += 1) {
     const l = lines[i];
     /* 🔴 표 머리글 칸은 **다음 절 판정보다 먼저** 걸러낸다 (2026-08-20 전수 읽기에서 발견).
        광운 국가고시장학금은 `장학금명|신청자격|장학금액|장학금지급기간` 표인데, 자격 절

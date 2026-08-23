@@ -137,6 +137,22 @@ try {
   }
 } catch { /* 큐가 없으면 건너뜀 */ }
 
+/* 🔴 지원 자격 자리에 '요건이 아닌 것'이 들어갔는가 — 매 실행 채점한다 (2026-08-21 신설)
+   개발자가 목포향우회·사랑나눔에서 **세 번** 같은 것을 짚어 준 뒤에 만들었다.
+   그동안 이 검사가 없어서, 새 잡음 유형이 생겨도 **다음에 누가 앱을 눈으로 볼 때까지** 아무도 몰랐다.
+   ⚠️ 채점 규칙은 화면 필터(match-engine)와 **일부러 다른 축**으로 적는다 —
+   "조건을 말하는가"가 아니라 "제목·목록·표처럼 생겼는가". 같은 규칙을 쓰면
+   필터의 눈으로 필터를 채점하는 셈이라 **새 유형을 영영 못 본다**(그게 이번 실패의 원인이었다).
+   규칙 원본은 verify/eligibility-report.mjs 한 곳뿐이고 여기서는 실행만 한다. */
+try {
+  const out = require('child_process')
+    .execFileSync(process.execPath, [require('path').join(__dirname, 'eligibility-report.mjs'), '--bad'],
+      { encoding: 'utf8' });
+  out.split('\n').filter((l) => l.includes('✕')).forEach((l) => {
+    warns.push(`자격 품질: ${l.replace(/^\s*✕\s*/, '').trim()} — 지원 자격 자리에 요건이 아닌 줄이 있습니다`);
+  });
+} catch (e) { warns.push(`자격 품질 채점을 돌리지 못했습니다: ${e.message.slice(0, 80)}`); }
+
 /* 결과 */
 console.log(`감사 대상: 정식 등록 ${reg.items.length}건 · 양식 ${Object.keys(forms.templates).length}종`);
 if (errors.length) { console.log('\n[오류 — 반드시 수정]'); errors.forEach((e) => console.log(' ✕', e)); }
