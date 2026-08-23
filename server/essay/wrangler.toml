@@ -1,0 +1,18 @@
+name = "handaejang-essay"
+main = "worker.js"
+compatibility_date = "2026-01-01"
+
+# 저장할 것이 없다 — 학생이 쓴 글도, 만들어 준 초안도 남기지 않는다(KV 없음).
+# 그래서 사고가 나도 새어 나갈 기록 자체가 없다.
+# 붙이고 싶어지는 날이 오면 그 순간을 의심할 것.
+
+[vars]
+# 개발자 결정 2026-08-23: 기본은 sonnet-5 (서류 1건당 약 47원).
+# opus-5 로 올리려면 이 한 줄만 고친다 (약 78원 — 품질 차이는 눈으로 보고 정할 것).
+ESSAY_MODEL = "claude-sonnet-5"
+# 사고 깊이. 자소서는 기계적인 일이 아니라 low 로 두지 않는다.
+# (effort 를 아예 안 주면 기본이 high 라 값이 더 나간다 — 지정하는 편이 낫다.)
+ESSAY_EFFORT = "medium"
+
+# 🔴 열쇠는 여기 두지 않는다. 배포 후 명령 한 줄로 넣는다:
+#     npx wrangler secret put ANTHROPIC_API_KEY
