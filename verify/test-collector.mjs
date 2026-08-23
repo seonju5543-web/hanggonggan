@@ -1362,6 +1362,17 @@ console.log('\n■ AI 자격 읽기 안전장치 (2026-08-20)');
     excludes: ['타 장학금 수령자는 제외', '원격대학 재학생 제외'] });
   eq('  제외 대상은 자격 줄과 갈라 담는다', pe.excludes.length, 2);
   eq('    자격 줄에는 섞이지 않는다', pe.lines.length, 1);
+  /* 🔴 발췌기가 AI가 읽은 자격을 덮어쓰면 안 된다. '원문은 읽었는데 못 뽑았다 →
+     낡은 발췌를 남기지 않는다'는 규칙은 발췌 결과에는 맞지만, AI가 **공고문 PDF**에서
+     읽은 값까지 지웠다 — 게시판 본문이 비어 있다는 사실은 PDF 안 내용에 대해
+     아무 말도 하지 않는다. 실제로 정읍시민·세종이도가 7줄·6줄을 읽어 놓고 지워졌다
+     (로그에는 ✓로 남고 데이터는 비어 있었다). */
+  const xs = fs.readFileSync(new URL('../collector/extract-excerpts.mjs', import.meta.url), 'utf8');
+  eq('  발췌기는 AI가 읽은 자격을 건드리지 않는다', /\/\^AI\/\.test\(it\.eligibilityFrom/.test(xs), true);
+  /* ⚠️ 그 가드는 **for 반복문 안**이라 continue 여야 한다 — return 을 쓰면 그 뒤 공고를
+     전부 건너뛴다(실제로 return 으로 썼다가 잡았다). */
+  eq('    그 가드는 continue 다 (return 이면 나머지 공고를 다 건너뛴다)',
+    /eligibilityFrom \|\| ''\)\) \{ kept \+= 1; continue; \}/.test(xs), true);
   /* 🔴 이 경로는 출처를 **'AI(공고문 PDF)'**로 남겨 번호 경로와 구분한다 —
      화면 표식은 같지만, 나중에 되짚을 때 어느 계약으로 들어온 글자인지 알아야 한다. */
   const src = fs.readFileSync(new URL('../collector/eligibility-ai.mjs', import.meta.url), 'utf8');

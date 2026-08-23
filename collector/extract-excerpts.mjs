@@ -468,6 +468,13 @@ for (const it of reg.items) {
     const got = qualFromDocs(it);
     if (got.length) { qual = got; viaDoc = true; fromDoc += 1; }
   }
+  /* 🔴 **AI가 다른 출처에서 읽은 자격은 건드리지 않는다** (2026-08-23).
+     아래 `delete it.eligibilityLines`는 '원문은 읽었는데 못 뽑았다 → 낡은 발췌를 남기지 않는다'는
+     규칙이라 발췌 결과에는 맞다. 그런데 AI가 **공고문 PDF**에서 읽은 값까지 지웠다 —
+     게시판 본문이 비어 있다는 사실은 PDF 안 내용에 대해 아무 말도 하지 않는데도.
+     실제로 정읍시민장학재단·세종이도가 PDF에서 7줄·6줄을 읽어 놓고, 다음 실행의
+     발췌 단계에 통째로 지워졌다(로그에는 ✓로 남고 데이터는 비어 있었다). */
+  if (WRITE && /^AI/.test(it.eligibilityFrom || '')) { kept += 1; continue; }
   if (WRITE) {
     if (viaDoc) it.eligibilityFrom = '공고문 첨부';
     else if (it.eligibilityFrom === '공고문 첨부') delete it.eligibilityFrom;
