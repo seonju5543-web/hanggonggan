@@ -26,9 +26,11 @@
    ============================================================ */
 import fs from 'node:fs';
 import { chromium } from 'playwright';
+import { createRequire } from 'node:module';
 import { indexTexts, sourceFor, hasText, canonUrl, MIN_BODY } from './notice-source.mjs';
 import { makeStripper } from './page-boilerplate.mjs';
 
+const { requirementLines } = createRequire(import.meta.url)('../match-engine.js');
 const HERE = new URL('.', import.meta.url);
 const bodiesPath = new URL('extracted/browser-bodies.json', HERE);
 const ledgerPath = new URL('rescue-ledger.json', HERE);
@@ -71,10 +73,16 @@ export function pickTargets(items) {
     if (it.program) continue;
     const url = it.sourceUrl || '';
     if (!/^https?:\/\//.test(url) || url.includes('#n-')) continue;
-    /* 이미 본문이 있어도 **통짜 한 줄이면 다시 받는다** — 줄바꿈이 없는 본문은
-       AI가 줄 번호를 못 매기고 표 구조도 못 읽어, 있으나 마나다(위 주석 참조). */
+    /* 🔴 **기준은 '본문이 없나'가 아니라 '아직 자격을 못 읽었나'다** (2026-08-23 수정).
+       처음엔 `!hasText()` 로 골랐다. 그런데 본문 문턱을 300 → 100 으로 내리자
+       메뉴만 있는 페이지들이 '본문 있음'으로 보이게 돼 **이 로봇이 아예 안 갔고**,
+       그래서 포스터 그림도 못 찾고 첨부 목록도 안 고쳐졌다 — 43건이 그 상태였다.
+       읽을 재료를 찾으러 가는 로봇이므로, **아직 못 읽은 공고면 다시 가 본다.**
+       이미 읽은 공고는 건드리지 않는다(요건이 있으면 재료를 더 찾을 이유가 없다). */
+    if (requirementLines(it).length) continue;
+    /* 통짜 한 줄로 저장된 본문도 다시 받는다 — 줄바꿈이 없으면 AI가 줄 번호를 못 매기고
+       표 구조도 사라져 있으나 마나다(위 주석 참조). */
     const cur = sourceFor(it, idx);
-    if (hasText(cur) && /\n/.test(String(cur.text || ''))) continue;
     const led = ledger[canonUrl(url)];
     /* 🔴 **판정이 느슨해졌으면 쉬는 중이라도 다시 해 본다** (2026-08-23).
        실패 횟수는 '그때의 코드와 그때의 문턱'으로 센 값이다. 문턱을 300 → 100으로
@@ -113,7 +121,7 @@ process.on('unhandledRejection', onCrash);
 
 /* ── 본편 ── */
 const targets = pickTargets(reg.items);
-log(`대상 ${targets.length}건 (등록 공고 중 본문이 안 온 것)`);
+log(`대상 ${targets.length}건 (아직 자격을 못 읽은 공고 — 읽을 재료를 찾으러 간다)`);
 report.push(`대상 **${targets.length}건** · 이번 실행 한도 ${CAP}건`, '');
 if (!WRITE) { log('미리보기 — --write 를 붙여야 실제로 받는다'); process.exit(0); }
 if (!targets.length) { saveAll(); process.exit(0); }
