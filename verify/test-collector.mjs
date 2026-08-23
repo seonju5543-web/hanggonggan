@@ -1340,6 +1340,10 @@ console.log('\n■ AI 자격 읽기 안전장치 (2026-08-20)');
   eq('  갈래에 든 줄은 공통에서 뺀다', sDup.struct.common.includes(L3[8]), false);
   eq('    그래도 갈래 쪽에는 남는다', sDup.struct.either[1].lines.includes(L3[8]), true);
   eq('    공통의 다른 줄은 그대로', sDup.struct.common.includes(L3[2]), true);
+  /* 성적 줄이 공통에도 오면 화면에 같은 줄이 두 번 뜬다 (2026-08-23 실측) */
+  const sDup2 = AI.verifyPick({ none: false, why: '', common: [2, 5], grade: [5], exclude: [], priority: [],
+    either: [] }, L3);
+  eq('  성적 줄이 공통에도 오면 한 번만 뜬다', sDup2.struct.common.includes(L3[5]), false);
 }
 
 /* 2026-08-20 — 공고문 첨부에서 자격 읽기. 되돌리면 안 되는 지점이 셋이다. */

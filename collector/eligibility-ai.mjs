@@ -154,8 +154,9 @@ export function verifyPick(pick, lines) {
      이 설계가 고치려던 실패와 같은 종류다.
      **갈래 쪽을 남긴다**: 모델이 어느 갈래인지 콕 집은 것은 구체적인 판단이고,
      공통에 겹쳐 넣은 것은 대개 그냥 중복이다. 갈래에 남아 있으니 화면에서 사라지지도 않는다. */
-  const inBranch = new Set(either.flatMap((b) => b.lines));
-  const commonOnly = common.filter((l) => !inBranch.has(l));
+  /* 성적 줄도 마찬가지다 — 공통과 성적 양쪽에 들어오면 화면에 같은 줄이 두 번 뜬다(실측). */
+  const elsewhere = new Set([...either.flatMap((b) => b.lines), ...grade]);
+  const commonOnly = common.filter((l) => !elsewhere.has(l));
 
   const flat = [...new Set([...commonOnly, ...either.flatMap((b) => b.lines), ...grade])].slice(0, 12);
   if (!flat.length) return { ok: false, why: '고른 줄이 범위 밖이거나 자격이 아님' };
