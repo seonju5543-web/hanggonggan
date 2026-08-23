@@ -16,6 +16,8 @@ node verify-new-forms.js    # 신규 양식 5종: 스키마 렌더링 + 삼일·
 node verify-forms-data.js   # 데이터 주도 양식: forms.json에만 더미 양식을 넣은 앱 복사본(8124 포트)으로 검증
 node audit-data.js          # 소급 감사: 기존 데이터 전체가 현재 엔진 기준을 충족하는지 (엔진 변경 후 필수)
 node form-snapshot.mjs      # 양식 문서 48종이 한 글자도 안 변했는지 대조 (질문 방식을 손댈 때 필수 — 운영 원칙 4)
+node essay-survey.mjs       # 서술형 질문 전수 조사 — AI가 글을 써 줄 자리와 손대면 안 되는 자리를 가른다
+node essay-survey.mjs --fact #   └ 사실 나열형(AI 금지 구역) · --gray 애매 · --bare 추천 문구 없는 것
 node form-snapshot.mjs --save        #   └ 기준본 저장 (작업 시작 전에 한 번)
 node form-snapshot.mjs --diff <형식id> #   └ 그 양식의 달라진 줄만 보기
 node personas.js            # 페르소나 스윕: 120종 사용자 조합으로 홈·탐색·상세를 훑어 크래시·빈 상태·콘솔 오류 탐지
