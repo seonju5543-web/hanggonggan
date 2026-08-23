@@ -59,7 +59,13 @@ function essayAskHtml(field) {
     return `<div class="essay-ask-row"><span>${esc(a.q)}</span>` +
       `<div class="chip-group fq-checks essay-chips" data-f="${rid}" data-q="${esc(a.q)}">` +
       a.c.map((o) => `<button type="button" class="chip chip-sm" data-value="${esc(o)}">${esc(o)}</button>`).join('') +
-      `</div></div>`;
+      `</div>` +
+      /* 🔴 되묻기 — 그 보기를 누른 학생에게만 열린다 (2026-08-23 개발자 지시).
+         백지에 '꼭 넣고 싶은 말'을 물으면 대부분 비운다. 방금 누른 것에 대해서만
+         좁게 되물으면 답이 이미 머릿속에 있다. 새 질문이 아니라 이 칸 안이라
+         질문 수 상한(FORM_LIMITS)과는 무관하다. */
+      (a.fu ? essayFollowUpHtml(`${rid}-fu`, a.fu, a.eg || []) : '') +
+      `</div>`;
   }).join('');
 
   /* 켜져 있을 때만 '앱이 씁니다'라고 말한다 — 못 하는 일을 한다고 하면 안 된다(원칙 1) */
@@ -70,6 +76,51 @@ function essayAskHtml(field) {
     <p class="essay-ask-lead">${lead} (목표 약 ${plan.target}자)</p>
     ${rows}
   </div>`;
+}
+
+/* 되묻기 한 줄 — 처음엔 감춰 두고, 그 보기를 누르면 열린다.
+   🔴 여기가 '지원서의 차별점'이 되는 칸이라 그렇게 적어 준다(개발자 지시 2026-08-23).
+      학생 대부분은 '무엇을 써야 할지 몰라서' 비워 두므로, 왜 써야 하는지와
+      어떻게 시작하면 되는지를 같이 준다. */
+const ESSAY_FU_INFO = '이 한 줄이 지원서의 차별점이 됩니다. 재단은 비슷한 사정보다 <b>그 상황에서 어떻게 해 왔는지</b>를 눈여겨봐요 — 한 줄이면 충분합니다.';
+
+function essayFollowUpHtml(id, question, egs) {
+  return `<div class="essay-fu" data-fu-for="${id}" hidden>
+    <p class="essay-fu-q"><b class="essay-fu-pick"></b> — ${esc(question)}</p>
+    <p class="essay-fu-info">💡 ${ESSAY_FU_INFO}</p>
+    <textarea class="essay-ask-free essay-fu-in" id="${id}" data-q="${esc(question)}" rows="2" placeholder="한 줄이면 충분해요"></textarea>
+    ${egs.length ? `<div class="essay-fu-eg"><span>이렇게 시작해 보세요</span>${
+      egs.map((e) => `<button type="button" class="chip chip-sm essay-eg" data-fill-fu="${id}" data-text="${esc(e)}">${esc(e.slice(0, 22))}…</button>`).join('')
+    }</div>` : ''}
+  </div>`;
+}
+
+/* 보기를 누르면 그 아래 되묻기를 열고, 무엇을 눌렀는지 되비춰 준다 */
+function essaySyncFollowUp(group) {
+  if (!group) return;
+  const fu = group.parentElement && group.parentElement.querySelector(`.essay-fu[data-fu-for="${CSS.escape(group.dataset.f)}-fu"]`);
+  if (!fu) return;
+  const picked = [...group.querySelectorAll('.chip.active')].map((c) => c.dataset.value);
+  fu.hidden = picked.length === 0;
+  const tag = fu.querySelector('.essay-fu-pick');
+  if (tag) tag.textContent = picked.length ? `'${picked.join(', ')}'` : '';
+}
+
+/* 앱 전체에 한 번만 다는 청취기.
+   🔴 setTimeout 0 이 필요하다 — app.js 의 칩 처리기가 .active 를 토글한 **뒤에** 읽어야 한다.
+      바로 읽으면 방금 누른 칩이 아직 반영되지 않아 한 박자씩 밀린다. */
+if (typeof document !== 'undefined' && typeof window !== 'undefined' && !window.__essayFuBound) {
+  window.__essayFuBound = true;
+  document.addEventListener('click', (e) => {
+    const fill = e.target.closest('[data-fill-fu]');
+    if (fill) {
+      const el = document.getElementById(fill.dataset.fillFu);
+      if (el) { el.value = fill.dataset.text; el.focus(); }
+      return;
+    }
+    const chip = e.target.closest('.essay-chips .chip');
+    if (chip) setTimeout(() => essaySyncFollowUp(chip.closest('.essay-chips')), 0);
+  });
 }
 
 /* 이 칸에 학생이 고르거나 적은 키워드 */
@@ -83,7 +134,9 @@ function essayAskAnswers(fieldId) {
   });
   box.querySelectorAll('.essay-ask-free').forEach((el) => {
     const v = String(el.value || '').trim();
-    if (v) out.push({ q: el.dataset.q || '', a: v });
+    /* 🔴 own = 학생이 **직접 친 글**. 서버가 이것을 글의 중심으로 삼는다
+       (개발자 지시 2026-08-23) — 고른 보기는 거기에 엮이는 재료일 뿐이다. */
+    if (v) out.push({ q: el.dataset.q || '', a: v, own: true });
   });
   return out;
 }
@@ -180,6 +233,30 @@ async function essaySend(tpl, sch, btn) {
     return;
   }
 
+  /* 🔴 직접 쓴 한 줄이 하나도 없으면 한 번만 세운다 (개발자 지시 2026-08-23).
+     막지 않는다 — 학생을 가두는 것은 이 앱의 방식이 아니다. [이대로 만들기]가 늘 있다.
+     문구는 앱의 부족함이 아니라 **학생이 얻을 것**을 말한다. */
+  const anyOwn = fields.some((f) => essayAskAnswers(f.id).some((a) => a.own));
+  if (!anyOwn && !btn.dataset.nudged) {
+    btn.dataset.nudged = '1';
+    document.getElementById('essay-nudge')?.remove();
+    btn.insertAdjacentHTML('beforebegin', `<div class="dp-block essay-nudge" id="essay-nudge">
+      <h4>한 줄만 더 적어 보시겠어요?</h4>
+      <p class="dp-note">직접 겪으신 이야기가 한 줄 들어가면 재단이 눈여겨보는 부분이 훨씬 분명해집니다.
+        위 <b>보기를 누르면 열리는 칸</b>에 한 줄이면 충분해요.</p>
+      <button class="btn btn-outline" id="btn-essay-nudge-go">위로 올라가서 적을게요</button>
+    </div>`);
+    document.getElementById('btn-essay-nudge-go').addEventListener('click', () => {
+      const first = document.querySelector('.essay-fu:not([hidden]) .essay-fu-in')
+        || document.querySelector('.essay-ask-free');
+      document.getElementById('essay-nudge')?.remove();
+      if (first) { first.scrollIntoView({ block: 'center', behavior: 'smooth' }); first.focus(); }
+    });
+    if (typeof toast === 'function') toast('한 줄만 더 적으시면 훨씬 좋아져요 — 그대로 만드시려면 다시 눌러 주세요');
+    return;
+  }
+  document.getElementById('essay-nudge')?.remove();
+
   const label = btn.textContent;
   btn.disabled = true;
   btn.textContent = '글을 쓰는 중… (20초쯤 걸려요)';
@@ -241,10 +318,18 @@ async function essaySend(tpl, sch, btn) {
     el.value = d.text;
     el.classList.add('essay-drafted');
     el.rows = Math.min(18, Math.max(6, Math.ceil(d.text.length / 40)));
-    el.parentElement.querySelectorAll('.essay-flag, .essay-fix').forEach((x) => x.remove());
+    el.parentElement.querySelectorAll('.essay-flag, .essay-fix, .essay-urge').forEach((x) => x.remove());
     el.insertAdjacentHTML('afterend',
       `<p class="dp-note essay-flag">✨ AI 초안이에요 — ${esc(essayCfg('notice', '반드시 읽고 고쳐서 제출하세요.'))}</p>`);
-    /* 🔴 '고칠 곳' — 좋은 장학 자소서의 조건(data/essay-playbook.json)으로 되받아 검사한 결과.
+    /* 🔴 직접 쓴 한 줄이 없을 때만 독려한다 (개발자 지시 2026-08-23 — 있을 때
+       칭찬하는 문구는 넣지 않는다). 앱의 부족함이 아니라 학생이 얻을 것을 말한다. */
+    const hasOwn = ((payload.fields.find((x) => x.key === d.key) || {}).asks || []).some((a) => a.own);
+    if (!hasOwn) {
+      el.parentElement.querySelector('.essay-flag').insertAdjacentHTML('afterend',
+        `<p class="dp-note essay-urge">직접 적어 주신 이야기가 아직 없어요. 위 보기를 눌러 열리는 칸에
+         <b>한 줄만 더하면</b> 심사위원에게 전해지는 인상이 크게 달라집니다.</p>`);
+    }
+    /* '고칠 곳' — 좋은 장학 자소서의 조건(data/essay-playbook.json)으로 되받아 검사한 결과.
        버리지 않고 짚어 준다. 학생이 읽고 고치는 것이 이 기능의 전제이기 때문이다. */
     if ((d.quality || []).length) {
       el.parentElement.querySelector('.essay-flag').insertAdjacentHTML('afterend',

@@ -174,8 +174,38 @@ async function dismissNotify(page) {
     });
     return out;
   });
+  await page.waitForTimeout(200);
   console.log('      학생이 고른 키워드:', picked.join(' / ') || '(없음)');
   ok(picked.length >= 1, '③ 키워드를 눌러서 고를 수 있다');
+
+  /* 🔴 되묻기 — 보기를 누르면 그 보기에 대해서만 좁게 묻는 칸이 열려야 한다 */
+  const fu = await page.$('.essay-fu:not([hidden])');
+  ok(fu !== null, '③ 보기를 누르면 되묻기 칸이 열린다 (백지가 아니라 좁은 질문)');
+  if (fu) {
+    const t = await fu.textContent();
+    ok(/차별점/.test(t), '③ 왜 써야 하는지 알려 준다 (지원서의 차별점)');
+    ok(/어떻게 해 왔는지/.test(t), '③ 재단이 무엇을 보는지 알려 준다');
+    ok((await page.$$('.essay-fu:not([hidden]) .essay-eg')).length >= 1,
+      '③ 눌러서 시작할 예시 문장이 있다');
+    ok(/'/.test(t), '③ 방금 누른 보기를 되비춰 준다', t.slice(0, 40));
+  }
+
+  /* 아직 직접 쓴 한 줄이 없으므로 한 번 세워야 한다 (막지는 않는다) */
+  await page.click('#btn-essay-ai');
+  await page.waitForTimeout(600);
+  ok(await page.$('#essay-nudge') !== null, '③ 직접 쓴 한 줄이 없으면 한 번 세운다');
+  const nudge = await page.$eval('#essay-nudge', (el) => el.textContent).catch(() => '');
+  ok(!/같은 글이 나와요|비슷한 사정/.test(nudge), '③ 앱의 부족함이 아니라 학생이 얻을 것을 말한다', nudge.slice(0, 60));
+  ok((await page.evaluate(() => window.__sent.length)) === 0, '③ 세우는 동안에는 보내지 않는다');
+
+  /* 예시를 눌러 시작점을 넣고 — 이것이 '직접 쓴 한 줄'이 된다 */
+  await page.click('.essay-fu:not([hidden]) .essay-eg');
+  await page.waitForTimeout(200);
+  const own = await page.$eval('.essay-fu:not([hidden]) .essay-fu-in', (el) => el.value);
+  ok(own.length > 5, '③ 예시를 누르면 칸이 채워져 고칠 수 있다', own);
+  await page.evaluate(() => document.querySelector('.essay-fu:not([hidden])').scrollIntoView({ block: 'center' }));
+  await page.waitForTimeout(200);
+  await page.screenshot({ path: SHOT('2-followup') });
 
   await page.click('#btn-essay-ai');
   await page.waitForTimeout(1000);
@@ -190,6 +220,7 @@ async function dismissNotify(page) {
     '③ story 칸만 보낸다 — 사실 나열형은 요청에 없다');
   const f0 = (sent[0].fields || [])[0] || {};
   ok((f0.asks || []).length >= 1, '③ 학생이 고른 키워드가 요청에 실려 간다', JSON.stringify(f0.asks || []));
+  ok((f0.asks || []).some((a) => a.own), '③ 직접 쓴 한 줄이 own 으로 구분돼 실려 간다');
   ok(Number(f0.target) >= 200, `③ 목표 분량이 실려 간다 (${f0.target}자)`);
   console.log('    보낸 것:', JSON.stringify({
     profile: sent[0].profile,

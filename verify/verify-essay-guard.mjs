@@ -251,7 +251,9 @@ head('13) 앱 쪽 (essay.js) — 무엇을 재료로 모으는가');
   };
   const fakeDoc = {
     getElementById: (id) => (values[id] != null ? { value: values[id] } : null),
+    querySelector: () => null,
     querySelectorAll: () => [],
+    addEventListener: () => {},
   };
   const plan = { secs: [{ items: [
     { id: 'growth', type: 'textarea', kind: 'story', label: '성장과정', q: '성장과정' },
@@ -348,6 +350,32 @@ head('14) 품질 규칙 — 에세이가 아니라 제출 가능한 문서인가
   ok(longest <= 120, `🔴 규칙집에 예시 문장이 섞이지 않는다 — 가장 긴 규칙 ${longest}자 (상한 120)`);
   ok(PLAYBOOK.rules.every((r) => (r.text.match(/[.。]/g) || []).length <= 2),
     '규칙 하나가 문단이 되지 않는다 (문장 2개 이내)');
+}
+
+head('14-1) 학생이 직접 쓴 한 줄이 글의 중심이 되는가');
+calls.length = 0;
+reply = { drafts: [{ key: 'growth', text: '맞벌이 가정에서 자라 스스로 계획을 세우는 습관이 생겼습니다.\n\n그 습관으로 지금도 학기 계획을 지키고 있습니다.' }] };
+{
+  const p = basePayload();
+  p.fields[0].asks.push({ q: '그 환경에서 배운 것이 지금 학업에 어떻게 이어지나요?',
+    a: '부모님이 늦게 오셔서 스스로 계획을 세우는 습관이 생겼어요', own: true });
+  await post(p);
+  /* 🔴 system 프롬프트에도 같은 낱말이 있으므로 **사용자 쪽 본문**만 본다 —
+     통째로 보면 언제나 통과해 검사가 아무것도 증명하지 못한다. */
+  const body = calls[calls.length - 1].body.messages[0].content;
+  ok(body.includes('학생이 직접 쓴 이야기'), '직접 쓴 한 줄이 **따로** 표시돼 나간다');
+  ok(body.includes('글의 중심으로 삼으세요'), '그것을 글의 중심으로 삼으라고 지시한다');
+  ok(body.includes('엮을 재료'), '고른 보기는 거기에 엮을 재료라고 알려 준다');
+  const own = body.indexOf('학생이 직접 쓴 이야기');
+  const chips = body.indexOf('엮을 재료');
+  ok(own > 0 && chips > own, '직접 쓴 것이 고른 보기보다 **먼저** 나온다', `own=${own} chips=${chips}`);
+}
+calls.length = 0;
+{
+  /* 직접 쓴 것이 없으면 그 자리를 만들지 않는다 — 빈 ★ 블록이 나가면 모델이 헷갈린다 */
+  await post(basePayload());
+  const body = calls[calls.length - 1].body.messages[0].content;
+  ok(!body.includes('학생이 직접 쓴 이야기'), '직접 쓴 것이 없으면 그 블록이 아예 안 나간다');
 }
 
 head('15) 진짜 서버 — 초안과 함께 고칠 곳을 돌려주는가');
