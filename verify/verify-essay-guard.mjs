@@ -19,7 +19,8 @@
    ============================================================ */
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { scanOutgoing, checkDraft, mayDraft, materialText } from '../server/essay/draft-guard.mjs';
+import { scanOutgoing, checkDraft, mayDraft, materialText, qualityCheck, rulesFor } from '../server/essay/draft-guard.mjs';
+import PLAYBOOK from '../data/essay-playbook.json' with { type: 'json' };
 import worker from '../server/essay/worker.js';
 
 let pass = 0, fail = 0;
@@ -306,6 +307,59 @@ head('13) 앱 쪽 (essay.js) — 무엇을 재료로 모으는가');
   ok(ctx.essayButtonHtml({}).includes('btn-essay-ai'), '켜져 있고 도울 칸이 있으면 버튼이 나온다');
   ok(ctx.essayStoryFields({ secs: [{ items: [{ id: 'a', type: 'textarea' }] }] }).length === 0,
     '③ kind 가 없는 서술형은 안 고른다 — 애매할 때 안 건드리는 쪽');
+}
+
+/* ─────────────────────────────────────────────────────────── */
+head('14) 품질 규칙 — 에세이가 아니라 제출 가능한 문서인가');
+{
+  const C = PLAYBOOK.checks;
+  const w = (t, opt) => qualityCheck(t, Object.assign({ checks: C }, opt)).warnings.map((x) => x.code);
+
+  ok(w('저는 성실합니다. 그래서 열심히 하겠습니다.').includes('no-self-label'),
+    "'저는 성실합니다' 같은 자기규정 문장을 잡는다 — 심사자가 가장 공허하게 보는 문장");
+  ok(!w('새벽 아르바이트를 1년간 하루도 빠지지 않았습니다.').includes('no-self-label'),
+    '장면으로 쓴 글은 안 걸린다');
+  ok(w('귀 재단의 무궁한 발전을 기원합니다.').includes('no-cliche'), '상투적 미사여구를 잡는다');
+  ok(w('어릴 적부터 화목한 가정에서 자랐습니다.').includes('no-cliche'), '진부한 성장과정 도입을 잡는다');
+  ok(w('부족하지만 지푸라기라도 잡는 심정입니다.').includes('no-self-pity'), '자기 비하 표현을 잡는다');
+
+  const one = '가'.repeat(600);
+  ok(w(one, { target: 600 }).includes('paragraphs'), '600자인데 한 덩어리면 잡는다');
+  ok(!w(one + '\n\n' + '나'.repeat(60), { target: 660 }).includes('paragraphs'), '문단이 나뉘면 안 걸린다');
+  ok(w('짧게 끝.', { target: 600 }).includes('length'), '분량 미달을 잡는다');
+  ok(!w('가'.repeat(600), { target: 600 }).includes('length'), '분량이 맞으면 안 걸린다');
+
+  ok(w('가'.repeat(600), { target: 600, ownWords: ['새벽 아르바이트를 1년간 했어요'] }).includes('uses-own-words'),
+    '🔴 학생이 직접 쓴 내용이 글에 안 들어가면 잡는다 — 획일화가 실제로 일어나는 지점');
+  ok(!w('저는 새벽 아르바이트를 이어 왔습니다. ' + '가'.repeat(560), { target: 600, ownWords: ['새벽 아르바이트를 1년간 했어요'] }).includes('uses-own-words'),
+    '반영됐으면 안 걸린다');
+
+  /* 규칙이 종류별로 갈리는가 */
+  const all = rulesFor(PLAYBOOK, 'motive').map((r) => r.code);
+  ok(all.includes('lead-first') && all.includes('motive-need-then-plan'),
+    '공통 규칙 + 그 종류 전용 규칙이 함께 나온다');
+  ok(!rulesFor(PLAYBOOK, 'motive').some((r) => r.kind === 'growth'), '다른 종류의 규칙은 안 섞인다');
+  ok(PLAYBOOK.rules.every((r) => (r.src || []).length), '모든 규칙에 출처가 붙어 있다 — 왜 있는지 알 수 있어야 지워지지 않는다');
+  ok(PLAYBOOK.sources.every((x) => x.url && x.seenAt), '출처에 주소와 본 날짜가 있다');
+  /* 🔴 규칙집에는 **규칙**만 담는다. 남의 예시문을 옮겨 오면 표절·저작권 문제가
+     그대로 따라온다(docs/designs/essay-tailoring.md). 규칙은 짧고, 예시문은 길다 —
+     길이로 잡는다. (규칙 안에 인용부호로 든 금지 표현은 규칙의 일부라 괜찮다.) */
+  const longest = Math.max(...PLAYBOOK.rules.map((r) => r.text.length));
+  ok(longest <= 120, `🔴 규칙집에 예시 문장이 섞이지 않는다 — 가장 긴 규칙 ${longest}자 (상한 120)`);
+  ok(PLAYBOOK.rules.every((r) => (r.text.match(/[.。]/g) || []).length <= 2),
+    '규칙 하나가 문단이 되지 않는다 (문장 2개 이내)');
+}
+
+head('15) 진짜 서버 — 초안과 함께 고칠 곳을 돌려주는가');
+reply = { drafts: [{ key: 'growth', text: '저는 성실합니다. 맞벌이 가정에서 자라며 아끼는 습관을 배웠습니다.' }] };
+{
+  const j = await (await post(basePayload())).json();
+  ok(j.drafts.length === 1, '지어냄이 없으면 초안은 그대로 준다 (버리지 않는다)');
+  const codes = (j.drafts[0].quality || []).map((x) => x.code);
+  ok(codes.includes('no-self-label'), '수준이 낮은 부분을 짚어 준다', codes.join(', '));
+  const body = JSON.stringify(calls[calls.length - 1].body);
+  ok(body.includes('지켜야 할 규칙'), '요청에 작성 규칙이 조건으로 실려 간다');
+  ok(body.includes('두괄식'), '규칙집의 실제 규칙이 실려 간다');
 }
 
 globalThis.fetch = realFetch;

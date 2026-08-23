@@ -199,6 +199,9 @@ async function essaySend(tpl, sch, btn) {
         label: String(f.label || '').replace(/\n/g, ' '),
         hint: f.q || '',
         target: askPlan.target,
+        /* 어떤 종류의 서술형인가 — 서버가 data/essay-playbook.json 에서
+           그 종류에 맞는 작성 규칙을 골라 조건으로 준다 */
+        askKind: askPlan.kind,
         asks: essayAskAnswers(f.id),
         answer: (document.getElementById(`fq-${f.id}`) || {}).value || '',
       };
@@ -238,9 +241,14 @@ async function essaySend(tpl, sch, btn) {
     el.value = d.text;
     el.classList.add('essay-drafted');
     el.rows = Math.min(18, Math.max(6, Math.ceil(d.text.length / 40)));
-    if (!el.parentElement.querySelector('.essay-flag')) {
-      el.insertAdjacentHTML('afterend',
-        `<p class="dp-note essay-flag">✨ AI 초안이에요 — ${esc(essayCfg('notice', '반드시 읽고 고쳐서 제출하세요.'))}</p>`);
+    el.parentElement.querySelectorAll('.essay-flag, .essay-fix').forEach((x) => x.remove());
+    el.insertAdjacentHTML('afterend',
+      `<p class="dp-note essay-flag">✨ AI 초안이에요 — ${esc(essayCfg('notice', '반드시 읽고 고쳐서 제출하세요.'))}</p>`);
+    /* 🔴 '고칠 곳' — 좋은 장학 자소서의 조건(data/essay-playbook.json)으로 되받아 검사한 결과.
+       버리지 않고 짚어 준다. 학생이 읽고 고치는 것이 이 기능의 전제이기 때문이다. */
+    if ((d.quality || []).length) {
+      el.parentElement.querySelector('.essay-flag').insertAdjacentHTML('afterend',
+        `<ul class="essay-fix">${d.quality.map((w) => `<li>${esc(w.msg)}</li>`).join('')}</ul>`);
     }
     filled++;
   }

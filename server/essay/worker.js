@@ -27,7 +27,11 @@
    배포: server/essay/README.md
    ============================================================ */
 
-import { scanOutgoing, checkDraft, mayDraft, materialText } from './draft-guard.mjs';
+import { scanOutgoing, checkDraft, mayDraft, materialText, qualityCheck, rulesFor } from './draft-guard.mjs';
+/* 🔴 규칙집은 **저장소에 한 벌만** 둔다 (data/essay-playbook.json). 여기로 베껴 오면
+   앱이 보여 주는 '고칠 곳'과 서버가 검사하는 기준이 갈라진다. wrangler 가 번들할 때
+   이 JSON 을 코드 안에 넣어 준다 — 실행 중에 파일을 읽지 않는다. */
+import PLAYBOOK from '../../data/essay-playbook.json' with { type: 'json' };
 
 /* 개발자 결정 2026-08-23: 기본은 sonnet-5 (서류 1건당 약 47원).
    opus-5 로 바꾸려면 Cloudflare 변수 ESSAY_MODEL 한 칸만 고치면 된다 (약 78원). */
@@ -135,6 +139,7 @@ function sanitize(body) {
       kind: String(f.kind || ''),
       label: String(f.label || '').slice(0, 120),
       hint: String(f.hint || '').slice(0, 200),
+      askKind: String(f.askKind || '').slice(0, 20),
       /* 목표 분량 — 앱이 원본 라벨에서 읽어 온 값이다(essay-ask.js). 지어낸 값이 아니다. */
       target: Math.min(2400, Math.max(200, Number(f.target) || 500)),
       /* 학생이 고르거나 적은 키워드 — 이 서비스의 재료 전부다 */
@@ -186,6 +191,7 @@ export default {
       ...payload.fields.map((f) => [
         `[key=${f.key}] ${f.label}`,
         `  목표 분량: 약 ${f.target}자 (±15%)${f.target >= 400 ? ' · 문단을 나눠 쓰세요' : ''}`,
+        `  지켜야 할 규칙:\n${rulesFor(PLAYBOOK, f.askKind).map((r) => `    - ${r.text}`).join('\n')}`,
         f.hint ? `  원본 안내: ${f.hint}` : '',
         f.asks.length
           ? `  학생이 고른 키워드 — 이것만으로 쓰세요:\n${f.asks.map((a) => `    · ${a.q}: ${a.a}`).join('\n')}`
@@ -242,8 +248,13 @@ export default {
       if (!wanted.has(key)) continue;                      // 안 물어본 칸은 버린다
       const text = String(d.text || '').trim();
       const v = checkDraft(text, material);
-      if (v.ok) drafts.push({ key, text });
-      else skipped.push({ key, reason: v.reasons[0], reasons: v.reasons });
+      if (!v.ok) { skipped.push({ key, reason: v.reasons[0], reasons: v.reasons }); continue; }
+      /* 지어냄은 없다 — 이제 '제출 가능한 수준인가'를 본다. 통과/실패가 아니라
+         **고칠 곳 목록**이라 초안은 그대로 주고 학생에게 짚어 준다. */
+      const f = payload.fields.find((x) => x.key === key) || {};
+      const own = (f.asks || []).filter((a) => !/,\s/.test(a.a) && a.a.length >= 4).map((a) => a.a);
+      const q = qualityCheck(text, { target: f.target, ownWords: own, checks: PLAYBOOK.checks });
+      drafts.push({ key, text, quality: q.warnings });
     }
     /* 아무 말도 못 받은 칸은 조용히 넘어가지 않고 이유를 남긴다 */
     for (const f of payload.fields) {
