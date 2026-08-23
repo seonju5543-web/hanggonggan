@@ -46,7 +46,8 @@
   "auto-tegory1moddocumentuid320",
   "auto-ticedoarticleno230331183",
   "auto-wkoreaackrko568subviewdo",
-  "reg-konkuk-alumni"
+  "reg-konkuk-alumni",
+  "reg-sm-woosu"
  ],
  "blockUrls": [
   "https://nano.pknu.ac.kr/nano/2432?action=view&no=9910966",
@@ -80,5 +81,6 @@
   "https://www.yu.ac.kr/scholar/notice/notice.do?articleno=230331183"
  ],
  "_왜 blockUrls도 있나": "id는 주소에서 파생되므로(auto- + canonUrl 뒷 24자) 주소 정규화 규칙을 고치면 blockIds가 통째로 무효가 된다. 2026-08-14에 실제로 그래서 부경대 2014~2024년 공고가 새 id를 달고 되살아났다. 주소로 막으면 규칙이 바뀌어도 살아남는다. 앞으로 뺄 때는 여기에 sourceUrl을 넣을 것.",
- "_reg-konkuk-alumni": "2026-08-23 — 건국대 총동문회 장학생. 재수집 로봇이 열어 보니 게시판이 '게시물이(가) 존재 하지 않습니다.'라고 답했다(삭제된 공고). 등록에서 뺐고, 같은 주소가 다시 걸려도 자동 등록되지 않게 막는다."
+ "_reg-konkuk-alumni": "2026-08-23 — 건국대 총동문회 장학생. 재수집 로봇이 열어 보니 게시판이 '게시물이(가) 존재 하지 않습니다.'라고 답했다(삭제된 공고). 등록에서 뺐고, 같은 주소가 다시 걸려도 자동 등록되지 않게 막는다.",
+ "_reg-sm-woosu": "2026-08-23 — 상명대 '우수인재장학금'. 첨부 공고문이 홍익대 게시분(reg-hi-jeongeup)과 **같은 파일(531,980바이트)**이었다 — 정읍시민장학재단 전국 사업을 학교마다 게시한 것이라 두 번 등록돼 있었다. 정읍시민장학재단은 이미 전국 승격·통합 처리된 사업이므로 reg-hi-jeongeup 하나로 합쳤다."
 }

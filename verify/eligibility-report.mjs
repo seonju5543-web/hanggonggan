@@ -164,6 +164,48 @@ console.log(`   ${noSignal.length}줄 / 화면에 나가는 ${reg.items.reduce((
 if (BAD) for (const s of noSignal) console.log(`   ? ${s.id} ${s.line.slice(0, 90)}`);
 else console.log('   (--bad 를 붙이면 전부 보여 줍니다 — 이상한 줄이 보이면 필터에 규칙을 더합니다)');
 
+/* ── 자격 자리에 들어간 '자격이 아닌 줄'을 **유형별로** 센다 (2026-08-23 개발자 지시) ──
+   개발자가 **네 번째로** 같은 것을 지적했다: "동국인재육성장학에 마일리지 산정기간이,
+   동산장학회에 추천기한·제외가 지원 자격으로 들어가 있다."
+   앞선 세 번은 그때그때 잡음을 이름 대서 필터에 추가했고, 그래서 새 유형이 나오면
+   개발자가 앱을 눈으로 볼 때까지 아무도 몰랐다. 이번엔 **세는 자리를 만든다.**
+
+   🔴 필터(match-engine의 REQ_NOISE)가 쓰는 낱말을 그대로 쓰면 안 된다 —
+   필터의 눈으로 필터를 채점하는 꼴이라 필터가 놓친 것은 영영 0으로 나온다.
+   그래서 '문장이 무엇을 말하는가'라는 **다른 축**으로 가른다. */
+const NOISE_KIND = {
+  '제외 대상 (자리가 틀렸다 — 제외 블록으로)': /(제외(한다|합니다|됨|대상)?\s*$|받은\s*학생은\s*제외|지원\s*불가|신청\s*불가|중복\s*수혜\s*불가)/,
+  '배점·평가': /(만점|배점|가점|점수\s*적용|산정\s*(기간|방법|기준)|평가\s*(항목|비율)|반영\s*비율|\d+\s*점\s*(만점|이내))/,
+  '일정·기한': /(기한|기간)\s*[:：]|우편\s*도착분|\d{4}[.\-]\s?\d{1,2}[.\-]\s?\d{1,2}\s*(까지|마감)/,
+  '선발·인원': /(선발\s*인원|모집\s*인원|명\s*(내외|이내)\s*$|추천\s*인원)/,
+  '제출·서류': /(제출\s*서류|구비\s*서류|증명서|서식\s*[:：])/,
+  /* 조각은 좁게 잡는다 — 한글로 끝나는 줄을 전부 조각으로 세면 정상 문장이 다 걸려
+     숫자가 뜻을 잃는다(실제로 그렇게 재서 303줄이 나왔다). 실제 표지만 쓴다. */
+  '잘린 조각': /^[^()（）]*[(（][^)）]*$|^.{0,12}(기간|방법|기준|현황|내역|사항)\s*$|\s인\s*\(/,
+};
+{
+  const hits = [];
+  let shown = 0;
+  for (const it of reg.items) {
+    if (it.program) continue;
+    for (const l of requirementLines(it)) {
+      shown += 1;
+      for (const [k, re] of Object.entries(NOISE_KIND)) if (re.test(l)) { hits.push({ id: it.id, kind: k, line: l, ai: /^AI/.test(it.eligibilityFrom || '') }); break; }
+    }
+  }
+  const cards = new Set(hits.map((h) => h.id)).size;
+  console.log(`\n■ 자격이 아닌 줄이 자격 자리에 (유형별 — 필터와 다른 축으로 잰다)`);
+  console.log(`   ${hits.length}줄 / 화면에 나가는 ${shown}줄 · 카드 ${cards}건`);
+  const tally = {};
+  for (const h of hits) tally[h.kind] = (tally[h.kind] || 0) + 1;
+  for (const [k, v] of Object.entries(tally).sort((a, b) => b[1] - a[1])) console.log(`      ${String(v).padStart(3)}줄  ${k}`);
+  /* 어느 경로가 넣었는지 함께 센다 — 규칙이 뽑은 것과 AI가 읽은 것의 품질 차이가 여기 드러난다 */
+  const byAi = hits.filter((h) => h.ai).length;
+  console.log(`   경로별: 발췌기(규칙) ${hits.length - byAi}줄 · AI ${byAi}줄`);
+  if (BAD) for (const h of hits) console.log(`   ! [${h.kind.split(' ')[0]}] ${h.id} ${h.line.slice(0, 80)}`);
+  else console.log('   (--bad 를 붙이면 전부 보여 줍니다)');
+}
+
 if (LIST) {
   console.log(`\n■ 미확보 ${missing.length}건`);
   for (const m of missing) console.log(`   - ${m.id} [${m.why}] ${m.name.slice(0, 40)}`);

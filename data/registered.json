@@ -1099,61 +1099,6 @@
    ]
   },
   {
-   "id": "reg-sm-woosu",
-   "name": "우수인재장학금 (상명대)",
-   "type": "교내",
-   "provider": "상명대학교",
-   "amount": "우수인재장학금 (세부 원문 확인)",
-   "amountValue": 0,
-   "deadline": null,
-   "period": "2026년 우수인재장학금 선발 (기간 원문 확인)",
-   "summary": "상명대학교 교내 우수인재장학금 선발 공고입니다. 지원서(서식 HWPX)를 내려받아 작성해 제출하세요. 세부 자격·기간은 원문 공고에서 확인하세요.",
-   "eligibility": {
-    "selective": true,
-    "schoolOnly": "상명대학교"
-   },
-   "documents": [
-    "우수인재 장학금 지원서 (공고 첨부 서식 HWPX)",
-    "제출 서류는 원문 공고 확인"
-   ],
-   "duplicable": true,
-   "note": "교내 우수인재 장학이에요. 지원서 서식(HWPX)을 원문 공고에서 내려받아 작성하세요. 기간·자격은 원문 확인.",
-   "noForm": "상명 게시판 특성상 지원서(HWPX)는 원문 공고에서 내려받아 작성 — 원본 확보 시 앱 스키마화 예정(2026-07-14)",
-   "sourceUrl": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767064",
-   "attachments": [
-    {
-     "name": "2026년 우수인재장학금 장학생 선발 공고.pdf",
-     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=767064&attachNo=559699"
-    }
-   ],
-   "sourceKind": "official",
-   "listedAt": "2026-07-16",
-   "eligibilityPrev": {
-    "lines": null,
-    "excludes": null,
-    "priority": null,
-    "from": null
-   },
-   "eligibilityLines": [
-    "공고일 현재 부 또는 모가 1년 이상 계속하여 정읍시에 주소를 두고 있는 국내 대학(고등교육법 제2조의 학교)의 재학생",
-    "단, 기혼자 또는 만학도(1991. 12. 31. 이전 출생자) 또는 부모가 없는 자의 경우 본인의 주소기간 적용",
-    "학기별 최소 9학점 이상 이수하고 평점평균(백분율환산)이 85점 이상인 자",
-    "신입생 : 2026년 1학기 85점 이상",
-    "재학생 : 2025년 2학기와 2026년 1학기 각각 85점 이상",
-    "복학생 및 편입생<2026년 1학기 해당자> : 2026년 1학기 85점 이상",
-    "학년제 성적 산출 대학생 : 2025학년도 1년 성적 85점 이상"
-   ],
-   "eligibilityExcludes": [
-    "<장학사업운영규정>에 따른 자격기준에 미달하는 자",
-    "당해연도 정읍시에서 지급하는 장학금 수령자(농업인, 이·통장, 새마을지도자 등)",
-    "직업학교, 원격대학(사이버대 및 방통대), 평생교육원 교육과정, 시간제 과정, 학비 전액 지원 대학 등 재학생",
-    "우수인재장학금 선발 기회는 1회로 제한",
-    "동일 세대 2명 선발 시 1명 지원(3자녀 이상 가정은 2명 선발)"
-   ],
-   "eligibilityFrom": "AI(공고문 PDF)",
-   "eligibilityReviewed": false
-  },
-  {
    "id": "reg-hi-jeongeup",
    "name": "정읍시민장학재단 우수인재장학금 (2026)",
    "type": "교외",
