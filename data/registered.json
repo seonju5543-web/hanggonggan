@@ -2481,7 +2481,17 @@
    ],
    "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765595",
    "sourceKind": "official",
-   "aiTries": 1
+   "eligibilityPrev": {
+    "lines": null,
+    "excludes": null,
+    "priority": null,
+    "from": null
+   },
+   "eligibilityLines": [
+    "모교의 교환학생 선발 과정을 통과하여 美 대학에 2027년 봄학기부터 최초 파견 시작 예정인 이공계 학부생"
+   ],
+   "eligibilityFrom": "AI(공고 포스터 그림)",
+   "eligibilityReviewed": false
   },
   {
    "id": "auto-20ec9588eb82b482f2ec9dbc",
