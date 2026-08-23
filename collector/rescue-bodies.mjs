@@ -185,7 +185,11 @@ for (const t of targets) {
       const left = strip(t.url, text).split('\n').filter(Boolean);
       report.push(`- · **${t.it.name.slice(0, 40)}** — 본문 없음 (${ledger[key].tries}회째)`);
       report.push(`    - 받아 온 줄 ${text.split('\n').length} · 메뉴 걷어낸 뒤 ${left.length}줄 · 한글 ${strip(t.url, text).replace(/[^가-힣]/g, '').length}자`);
-      report.push(`    - 남은 것: \`${left.slice(0, 6).join(' | ').slice(0, 180)}\``);
+      /* 표본을 넉넉히 남긴다 — 6줄만 봤을 때 동국대가 '본문이 없는' 것인지
+         '팝업 글자가 앞을 채워 본문이 뒤로 밀린' 것인지 가릴 수 없었다. */
+      report.push('```');
+      left.slice(0, 20).forEach((l) => report.push(l.slice(0, 110)));
+      report.push('```');
     }
     log(`· ${t.it.name.slice(0, 30)} — 본문 없음 (${ledger[key].tries}회째)`);
   }
