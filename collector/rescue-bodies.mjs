@@ -43,10 +43,12 @@ const REST_AFTER = 3;
 const REST_DAYS = 7;
 
 const log = (m) => console.log(`[rescue] ${m}`);
+let regDirty = false;
 const today = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
 const daysBetween = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 86400000);
 
-const reg = JSON.parse(fs.readFileSync(new URL('../data/registered.json', HERE), 'utf8'));
+const regPath = new URL('../data/registered.json', HERE);
+const reg = JSON.parse(fs.readFileSync(regPath, 'utf8'));
 let texts = [];
 try { texts = JSON.parse(fs.readFileSync(new URL('extracted/notices-text.json', HERE), 'utf8')); } catch { /* 없으면 0건 */ }
 let bodies = {};
@@ -98,6 +100,7 @@ function saveAll(crashNote) {
   for (const [u, v] of Object.entries(bodies)) if (!v.at || v.at >= cutoff) keep[u] = v;
   fs.writeFileSync(bodiesPath, JSON.stringify(keep, null, 1));
   fs.writeFileSync(ledgerPath, JSON.stringify(ledger, null, 1));
+  if (regDirty) fs.writeFileSync(regPath, JSON.stringify(reg, null, 1) + '\n');
   if (crashNote) report.push('', `🚨 도중에 넘어졌습니다: ${crashNote}`);
   fs.writeFileSync(reportPath, report.join('\n') + '\n');
 }
@@ -119,7 +122,7 @@ const ctx = await browser.newContext({
 });
 
 const startedAt = Date.now();
-let got = 0, miss = 0, done = 0;
+let got = 0, miss = 0, done = 0, gone = 0;
 for (const t of targets) {
   if (done >= CAP) { log(`이번 실행 한도(${CAP}건) 도달`); break; }
   /* 시간 예산은 **시작 전에** 본다 — 예산을 넘긴 채 시작하면 강제 종료로 저장까지 죽는다
@@ -158,6 +161,34 @@ for (const t of targets) {
     text = parts.join('\n')
       .replace(/[ \t\u00a0]+/g, ' ')
       .split('\n').map((l) => l.trim()).filter(Boolean).join('\n');
+
+    /* 🔴 **첨부 목록도 같이 받아 적는다** (2026-08-23).
+       페이지를 이미 열어 놓고 첨부 이름을 눈앞에 두고도 기록을 안 고치고 있었다.
+       그 사이 우리가 가진 목록은 낡아서, 게시판에는 공고문이 붙어 있는데
+       우리 기록엔 서식·동의서만 있어 무료 경로가 못 읽는 일이 생겼다:
+         건국대 의암 손병희 — 게시판 `…우수 논문 장학생 선발.hwp` / 기록 `서식 및 작성요령.hwp`
+         조선대 교내장학금 — 게시판 `…교내장학금 신청 안내.pdf` / 기록 `개인정보수집이용제공동의서.pdf`
+       추가 페이지 열기가 0회라 시간 예산에 아무 영향이 없다. */
+    try {
+      const found = [];
+      for (const f of page.frames()) {
+        const links = await f.$$eval('a[href]', (as) => as.map((a) => ({
+          name: (a.textContent || '').replace(/\s+/g, ' ').trim(), url: a.href,
+        }))).catch(() => []);
+        for (const l of links) {
+          if (!/\.(hwp|hwpx|pdf|docx?|xlsx?|zip)(\?|$)/i.test(l.name) && !/download|file|attach/i.test(l.url)) continue;
+          const nm = l.name.replace(/\s*미리보기\s*$/, '').replace(/^\d+\.\s*/, '').trim();
+          if (nm.length >= 5 && nm.length <= 120 && !found.some((x) => x.name === nm)) found.push({ name: nm, url: l.url });
+        }
+      }
+      const had = new Set((t.it.attachments || []).map((a) => a.name));
+      const add = found.filter((a) => !had.has(a.name));
+      if (add.length) {
+        t.it.attachments = [...(t.it.attachments || []), ...add];
+        regDirty = true;
+        report.push(`- 📎 ${t.it.name.slice(0, 36)} — 첨부 ${add.length}개를 새로 받아 적음: ${add.map((a) => a.name).join(' , ').slice(0, 90)}`);
+      }
+    } catch { /* 첨부를 못 걷어도 본문 저장은 계속한다 */ }
   } catch (e) {
     report.push(`- ✕ ${t.it.name.slice(0, 40)} — 열지 못함: ${String(e.message).slice(0, 60)}`);
   } finally {
@@ -166,6 +197,15 @@ for (const t of targets) {
 
   /* 받아 온 글자가 **본문인지**는 notice-source의 규칙 하나로만 판단한다.
      여기에 규칙을 한 벌 더 두면 "재수집기는 됐다는데 발췌기는 못 읽는" 어긋남이 생긴다. */
+  /* 게시판에서 내려간 공고는 '못 받은 것'이 아니라 '없어진 것'이다 — 섞으면
+     영영 다시 받으려 애쓴다. 건국대 총동문회 장학생이 실제로 이 상태였다. */
+  if (/게시물이?\s*\(?가?\)?\s*존재\s*하지\s*않|삭제된?\s*게시물|없는 게시물/.test(text)) {
+    gone += 1;
+    ledger[key] = { tries: REST_AFTER, at: today, minBody: MIN_BODY, gone: true, name: t.it.name.slice(0, 60) };
+    report.push(`- 🗑 **${t.it.name.slice(0, 40)}** — 게시판에서 내려갔습니다(삭제된 공고). 등록 목록에서 뺄지 검토가 필요합니다.`);
+    log(`🗑 ${t.it.name.slice(0, 30)} — 삭제된 공고`);
+    continue;
+  }
   const entry = { title: t.it.name, text: text.slice(0, 15000), at: today, via: 'rescue' };
   /* 🔴 **빈 말뭉치로 재면 안 된다** (2026-08-23 실측). 메뉴를 걷어내는 규칙은
      '같은 학교의 여러 공고에 똑같이 나오는 줄'을 찾는 것이라 **원문 전체가 필요하다.**
@@ -206,8 +246,8 @@ for (const t of targets) {
 }
 
 await browser.close().catch(() => {});
-report.push('', `---`, `확보 **${got}건** · 본문 없음 ${miss}건 · 처리 ${done}/${targets.length}건`,
+report.push('', `---`, `확보 **${got}건** · 본문 없음 ${miss}건 · 삭제된 공고 ${gone}건 · 처리 ${done}/${targets.length}건`,
   `본문 판정 기준: 메뉴를 걷어낸 뒤 한글 ${MIN_BODY}자 이상 (notice-source.mjs)`);
 saveAll();
-log(`끝 — 확보 ${got}건 · 본문 없음 ${miss}건`);
+log(`끝 — 확보 ${got}건 · 본문 없음 ${miss}건 · 삭제된 공고 ${gone}건`);
 process.exit(0);

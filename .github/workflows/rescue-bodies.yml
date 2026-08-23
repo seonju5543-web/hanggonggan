@@ -64,7 +64,7 @@ jobs:
       - name: 관문에 걸리면 되돌린다
         if: steps.audit.outcome == 'failure'
         run: |
-          git checkout -- collector/extracted/browser-bodies.json || true
+          git checkout -- collector/extracted/browser-bodies.json data/registered.json || true
           echo "::error::재수집 결과가 감사를 통과하지 못했습니다. 되돌렸습니다."
           exit 1
 
@@ -77,6 +77,9 @@ jobs:
           [ -f collector/extracted/browser-bodies.json ] && git add collector/extracted/browser-bodies.json
           [ -f collector/rescue-ledger.json ] && git add collector/rescue-ledger.json
           [ -f collector/rescue-report.md ] && git add collector/rescue-report.md
+          # 첨부 목록을 새로 받아 적으면 registered.json 이 바뀐다 — 빠뜨리면
+          # 애써 찾은 공고문 첨부가 조용히 버려진다 (이슈 #79와 같은 유형)
+          git add data/registered.json
           true
           if ! git diff --cached --quiet; then
             git commit -m "rescue: 공고 본문 재수집"
