@@ -311,9 +311,16 @@ async function downloadEligDocs() {
   const MAX_NOTICES = 6;
   const MAX_BYTES = 8 * 1024 * 1024;
   const startedAt = Date.now();
-  /* PDF는 받지 않는다 — 글자가 정확히 안 나온다(attachment-text.mjs 첫머리 참조).
-     받아 봐야 못 쓰므로 예산만 쓴다. 스캔 PDF는 AI 경로의 몫이다. */
-  const OK_EXT = /\.(hwp|hwpx|docx?)$/i;
+  /* PDF도 받는다 (2026-08-23 변경 — 예전엔 제외했다).
+     제외한 이유는 '글자가 정확히 안 나온다'(실측 PDF 5개 중 1개만 추출됨)였는데,
+     **그건 안 받을 이유가 아니라 받아 보고 안 되면 버릴 이유였다.**
+     · 못 읽는 PDF는 `readable()`이 걸러 조용히 넘어간다 — 잘못 읽히는 게 아니다.
+     · 대가는 내려받기 몇 초뿐이고, 아래 예산·건수 상한이 그것도 막는다.
+     · 반면 안 받으면 그 공고는 **영영** 자격을 못 읽는다 — 손해가 대칭이 아니다.
+     실제로 남은 미확보 공고 중 내용이 PDF 공고문에만 있는 것이 여럿 있었다
+     (충북인재평생교육진흥원 `2026년 하반기 장학생 선발 공고문.pdf` 등).
+     스캔 PDF(글자가 아예 없는 것)는 여전히 AI 경로의 몫이다. */
+  const OK_EXT = /\.(hwp|hwpx|docx?|pdf)$/i;
 
   const targets = [];
   for (const it of reg.items) {

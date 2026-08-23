@@ -1400,6 +1400,11 @@ console.log('\n■ AI 자격 읽기 안전장치 (2026-08-20)');
 /* 2026-08-20 — 공고문 첨부에서 자격 읽기. 되돌리면 안 되는 지점이 셋이다. */
 console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
 {
+  /* 🔴 PDF를 받아야 한다 (2026-08-23). 예전엔 '글자가 정확히 안 나온다'며 제외했는데,
+     그건 안 받을 이유가 아니라 받아 보고 안 되면 버릴 이유였다 — 못 읽는 PDF는
+     readable()이 조용히 거른다. 안 받으면 그 공고는 영영 자격을 못 읽는다. */
+  const df = fs.readFileSync(new URL('../collector/deepfetch.mjs', import.meta.url), 'utf8');
+  eq('자격용 공고문 첨부에 PDF가 들어간다', /OK_EXT = \/\\\.\(hwp\|hwpx\|docx\?\|pdf\)/.test(df), true);
   const AT = await import(new URL('../collector/attachment-text.mjs', import.meta.url));
   /* ① 신청서·동의서는 읽지 않는다 — 읽으면 개인정보 수집 항목이 자격 자리에 앉는다
         (2026-08-20에 실제로 3건이 그렇게 돼 통째로 되돌린 적이 있다) */
