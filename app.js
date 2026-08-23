@@ -1156,20 +1156,42 @@ function openDetail(id) {
      앱이 판정할 수 있는 건 성적·소득구간·학년 같은 숫자 조건뿐이고, 원문의 '유자녀' 같은 항목은
      판정할 수 없다. 그래서 두 묶음을 **구분해서** 보여 준다 — 섞으면 앱이 다 판정한 것처럼 읽힌다. */
   let reasonRows = '';
+  /* 'AI가 읽음 · 검수 전' — '자동 등록 · 검수 전' 배지와 같은 규칙(2026-08-23).
+     사람이 검수하지 않았다는 사실을 숨기지 않는다. 관리자 화면에서 컨펌하면
+     eligibilityReviewed 가 true 가 되어 사라진다. */
+  const aiRead = /^AI/.test(sch.eligibilityFrom || '') && sch.eligibilityReviewed !== true;
   /* 요건은 원문을 통째로 붙이지 않고 **짧게 다듬어 번호를 매겨** 보여 준다.
      프로필과 확실히 맞으면 ✓, 확실히 안 맞으면 ✕, 판정할 수 없으면 색 없이 둔다
      (2026-08-02 개발자 지시). 판정 규칙은 match-engine에 있어 알림과 갈라지지 않는다. */
   const reqLines = requirementLines(sch);
-  if (reqLines.length) {
+  /* 요건 한 줄을 그리는 법 — 구조 렌더와 평평한 렌더가 **같은 함수**를 쓴다.
+     따로 두면 한쪽만 고쳐져서 두 모양의 판정이 갈라진다. */
+  const reqRow = (e, extra) => {
+    const m = requirementMatch(e, state.profile);
+    const cls = m === 'ok' ? 'r-ok' : m === 'no' ? 'r-bad' : 'r-req';
+    const mark = m === 'ok' ? '✓ ' : m === 'no' ? '✕ ' : '';
+    return `<li class="${cls}${extra ? ' ' + extra : ''}">${mark}${esc(e)}</li>`;
+  };
+
+  /* 원문이 표인 공고 — 공통 / 둘 중 하나 / 성적을 갈라서 그린다 (2026-08-23).
+     평평하게 늘어놓으면 '둘 중 하나'가 '둘 다'로 읽혀 뜻이 정반대가 된다
+     (동국대 종단추천장학: 신규 지원자가 "기수혜자여야 한다"로 읽고 포기했다).
+     🔴 갈래가 둘 이상인 공고에서만 이 모양이 나온다 — 나머지는 아래 평평한 렌더 그대로. */
+  const reqStruct = requirementStruct(sch);
+  if (reqStruct) {
+    const must = [...reqStruct.common, ...reqStruct.grade];
+    if (must.length) reasonRows += `<li class="r-head">모두 해당해야 해요</li>` + must.map((e) => reqRow(e)).join('');
+    reasonRows += `<li class="r-head">아래 ${reqStruct.either.length === 2 ? '둘' : reqStruct.either.length + '가지'} 중 하나에 해당하면 돼요</li>`;
+    reqStruct.either.forEach((b, i) => {
+      /* 이름을 못 읽었으면 지어내지 않고 순서로만 가른다 (원칙 8-1) */
+      reasonRows += `<li class="r-branch">${esc(b.label || `${i + 1}번째 경우`)}</li>`
+        + b.lines.map((e) => reqRow(e, 'r-inbranch')).join('');
+    });
+  } else if (reqLines.length) {
     // 소제목을 달지 않는다 — 바깥 <h4>가 이미 '지원 자격'이라 두 번 나온다
-    reasonRows += reqLines.map((e) => {
-        const m = requirementMatch(e, state.profile);
-        /* 번호(1) 2) 3))는 붙이지 않는다 — 요건은 순서가 아니라 목록이고,
-           판정 못 한 줄에 번호만 달면 체크된 줄과 뒤섞여 어수선하다(2026-08-02 개발자 지시). */
-        const cls = m === 'ok' ? 'r-ok' : m === 'no' ? 'r-bad' : 'r-req';
-        const mark = m === 'ok' ? '✓ ' : m === 'no' ? '✕ ' : '';
-        return `<li class="${cls}">${mark}${esc(e)}</li>`;
-      }).join('');
+    /* 번호(1) 2) 3))는 붙이지 않는다 — 요건은 순서가 아니라 목록이고,
+       판정 못 한 줄에 번호만 달면 체크된 줄과 뒤섞여 어수선하다(2026-08-02 개발자 지시). */
+    reasonRows += reqLines.map((e) => reqRow(e)).join('');
   } else if (requirementLines(sch, qLines).length) {
     // 자격 줄이 없으면 발췌 문장으로 물러나되, **같은 정리를 거쳐** 보여 준다
     reasonRows += requirementLines(sch, qLines)
@@ -1192,6 +1214,9 @@ function openDetail(id) {
   if (exLines.length) {
     reasonRows += `<li class="r-head">이런 경우는 제외돼요</li>`
       + exLines.map((e) => `<li class="r-req">${esc(e)}</li>`).join('');
+  }
+  if (aiRead && reasonRows) {
+    reasonRows = `<li class="r-ai">🤖 이 자격은 AI가 공고 원문에서 읽었어요 · 사람 검수 전</li>` + reasonRows;
   }
   if (checkRows) {
     reasonRows += `<li class="r-head">내 정보로 확인한 것</li>` + checkRows;

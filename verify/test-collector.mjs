@@ -1281,6 +1281,58 @@ console.log('\n■ AI 자격 읽기 안전장치 (2026-08-20)');
   // 기본은 꺼져 있어야 한다 — 켠 채로 배포되면 잔액이 조용히 샌다
   const cfg = JSON.parse(fs.readFileSync(new URL('../collector/eligibility-ai-config.json', import.meta.url), 'utf8'));
   eq('  기본은 꺼져 있다', cfg.enabled, false);
+
+  /* 2026-08-23 — 자격을 **구조로** 읽는 경로. 종단추천장학처럼 원문이 표인 공고에서
+     '공통 / 둘 중 하나 / 성적'이 평평해지면 학생이 뜻을 정반대로 읽는다(설계 문서 참조). */
+  const L2 = ['3. 신청 자격', '대한불교조계종 스님 (학부 정규학기 재학생)',
+    '재학생(계속장학생)', '2026-1학기 종단추천장학 기수혜자', '2026-2학기 재학 및 복학예정자',
+    '재학생(신규자)', '대한불교조계종 교육원의 장학추천 가능자',
+    '직전학기 평점평균 3.0/4.5, 취득학점 15학점 이상인 자',
+    '타 장학금 중복 수혜자는 제외', '기초생활수급자 우선 선발'];
+  const s2 = AI.verifyPick({
+    none: false, why: '',
+    common: [1], grade: [7], exclude: [8], priority: [9],
+    either: [{ label: [2], lines: [3, 4] }, { label: [5], lines: [6] }],
+  }, L2);
+  eq('구조로 고르면 공통·갈래·성적이 갈라진다', s2.ok, true);
+  eq('  갈래가 둘로 남는다', s2.struct.either.length, 2);
+  /* 🔴 갈래 이름이 없으면 학생이 어느 쪽을 봐야 할지 모른다 (2026-08-23 개발자 지적) */
+  eq('  갈래 이름도 원문에서 꺼낸다', s2.struct.either[0].label, '재학생(계속장학생)');
+  /* 🔴 기관명을 줄이면 다른 종단 스님이 자기 공고로 읽는다 — 앱은 원문 줄을 통째로 낸다 */
+  eq('  기관명이 줄지 않는다', s2.struct.either[1].lines[0], '대한불교조계종 교육원의 장학추천 가능자');
+  eq('  제외 대상은 따로 나온다', s2.excludes.length, 1);
+  eq('  우선 선발 기준도 따로 나온다', s2.priority.length, 1);
+  /* 화면·알림·챗봇이 지금 쓰는 평평한 모양은 그대로 나와야 한다 — 안 그러면 셋이 갈라진다 */
+  eq('  평평한 모양도 함께 나온다(하위호환)', s2.lines.length >= 4, true);
+
+  /* 🔴 애매하면 공통 — 공통인데 택일로 그리면 자격 없는 학생이 서류를 뗀다.
+     갈래가 하나뿐인 건 택일이 아니므로 공통으로 합친다. */
+  const s1 = AI.verifyPick({ none: false, why: '', common: [1], grade: [], exclude: [], priority: [],
+    either: [{ label: [2], lines: [3] }] }, L2);
+  eq('  갈래가 하나뿐이면 공통으로 합친다', s1.struct.either.length, 0);
+  eq('    합쳐진 줄은 사라지지 않는다', s1.struct.common.includes(L2[3]), true);
+
+  /* 구조 경로에도 같은 관문이 걸린다 — 여기가 느슨하면 AI 경로로 쓰레기가 들어온다 */
+  const sBad = AI.verifyPick({ none: false, why: '', common: [0], grade: [], exclude: [], priority: [],
+    either: [] }, L2);
+  eq('  구조로 와도 요건 신호가 없으면 버린다', sBad.ok, false);
+  const sOut = AI.verifyPick({ none: false, why: '', common: [1, 999], grade: [], exclude: [], priority: [],
+    either: [{ label: [999], lines: [3] }, { label: [5], lines: [6] }] }, L2);
+  eq('  범위 밖 갈래 이름은 null 로 둔다', sOut.struct.either[0].label, null);
+  eq('    이름을 못 읽어도 그 갈래의 요건은 살린다', sOut.struct.either[0].lines.length, 1);
+  /* 🔴 표의 칸 이름이 두 줄로 쪼개진 게시판이 흔하다 ("재학생" + "(계속장학생)").
+     한 줄만 쓰면 두 갈래가 똑같이 "재학생"이 돼 학생이 자기 갈래를 못 고른다. */
+  const L3 = ['신청대상', '공통', '스님 (학부 정규학기 재학생)', '재학생', '(계속장학생)',
+    '2026-1학기 종단추천장학 기수혜자', '재학생', '(신규자)', '교육원의 장학추천 가능자'];
+  const sJoin = AI.verifyPick({ none: false, why: '', common: [2], grade: [], exclude: [], priority: [],
+    either: [{ label: [3, 4], lines: [5] }, { label: [6, 7], lines: [8] }] }, L3);
+  eq('  갈래 이름이 두 줄이면 붙여서 쓴다', sJoin.struct.either[0].label, '재학생 (계속장학생)');
+  eq('    두 갈래 이름이 서로 달라진다', sJoin.struct.either[1].label, '재학생 (신규자)');
+  /* 스키마가 있어도 모델은 배열 대신 숫자를 보낼 수 있다 — 여기서 죽으면
+     그 실행의 나머지 공고까지 통째로 못 읽는다. */
+  const sNum = AI.verifyPick({ none: false, why: '', common: [2], grade: [], exclude: [], priority: [],
+    either: [{ label: 3, lines: [5] }, { label: 6, lines: [8] }] }, L3);
+  eq('  갈래 이름이 숫자 하나로 와도 죽지 않는다', sNum.ok, true);
 }
 
 /* 2026-08-20 — 공고문 첨부에서 자격 읽기. 되돌리면 안 되는 지점이 셋이다. */

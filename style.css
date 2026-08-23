@@ -1048,6 +1048,33 @@ textarea:focus {
 /* 판정할 수 없는 요건 — 번호만 붙이고 색을 칠하지 않는다 (틀린 초록 체크보다 낫다) */
 .reason-list .r-req { color: var(--text-sub); }
 
+/* 갈래 이름 — '둘 중 하나' 아래에서 어느 쪽이 내 경우인지 가리키는 줄 (2026-08-23).
+   원문의 표 머리(예: "재학생(계속장학생)")를 그대로 쓴다. 학생은 자기가 어느 쪽인지
+   알고 있으므로, 이 이름이 있어야 자기 갈래만 읽는다. */
+.reason-list .r-branch {
+  font-weight: 700;
+  color: var(--text);
+  margin-top: 8px;
+  padding-left: 8px;
+  border-left: 3px solid var(--line);
+  list-style: none;
+}
+/* 갈래에 속한 요건 줄. 형제 선택자(~)로 하면 뒤따르는 '제외 대상'·'내 정보로 확인한 것'
+   블록까지 같이 밀려난다 — 클래스로 명시한다. */
+.reason-list .r-inbranch { margin-left: 10px; }
+
+/* 'AI가 읽음 · 검수 전' 표식 (2026-08-23) — '자동 등록 · 검수 전' 배지와 같은 규칙.
+   사람이 확인하지 않았다는 사실을 숨기면, 틀렸을 때 학생이 앱 전체를 못 믿게 된다. */
+.reason-list .r-ai {
+  font-size: 12px;
+  color: var(--text-sub);
+  background: var(--bg-sub, rgba(127,127,127,.08));
+  border-radius: 6px;
+  padding: 5px 8px;
+  margin-bottom: 6px;
+  list-style: none;
+}
+
 /* ---------------- 장학금 도우미 (챗봇) ----------------
    자리 원칙: 홈에서는 히어로 카드 **아래** 한 줄(‘한 번에 신청’ 버튼을 가리지 않는다),
    그 밖의 화면에서는 우하단 떠 있는 버튼. 하단 탭을 5개로 늘리지 않은 이유는

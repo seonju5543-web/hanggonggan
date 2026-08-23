@@ -424,10 +424,38 @@ function noticeFilesForProfile(p) {
   return list;
 }
 
+/* 자격 요건을 **구조**로 — 공통 / 둘 중 하나 / 성적 (2026-08-23 신설).
+
+   왜 필요한가: 원문이 표인 공고를 줄 목록으로 펴면 공통·분기가 사라져 뜻이 뒤집힌다.
+   동국대 종단추천장학이 실증 — 원문은 "공통 1개 + 둘 중 하나 + 성적"인데 다섯 줄을
+   나란히 그려서, 신규 지원자가 "기수혜자여야 한다"로 읽고 포기한다.
+
+   🔴 **갈래가 둘 이상일 때만** 구조를 낸다(아니면 null → 화면은 지금 모양 그대로).
+   갈래가 없는 공고까지 새 모양으로 바꿀 이유가 없고, 바뀌는 곳이 적을수록 사고도 적다.
+
+   줄을 다듬고 거르는 일은 `requirementLines`에게 그대로 맡긴다 — 여기에 규칙을 한 벌 더
+   두면 화면·알림·챗봇이 서로 다른 말을 하게 된다(이 파일이 존재하는 이유). */
+function requirementStruct(sch) {
+  const st = sch && sch.eligibilityStruct;
+  if (!st) return null;
+  const clean = (arr) => requirementLines(sch, arr || []);
+  const either = (st.either || [])
+    .map((b) => ({
+      /* 갈래 이름도 원문 줄이다 — 앱이 지어내지 않는다. 못 읽었으면 null로 두고
+         화면이 '첫째 · 둘째'로만 가른다(이름을 만들어 붙이는 것보다 낫다). */
+      label: b && b.label ? tidyRequirement(String(b.label)) : null,
+      lines: clean(b && b.lines).slice(0, 3),
+    }))
+    .filter((b) => b.lines.length);
+  if (either.length < 2) return null;
+  /* 칸 수는 구조 단위로 나눈다 — 예전엔 통째로 5줄에서 잘려 갈래가 통으로 날아갔다 */
+  return { common: clean(st.common).slice(0, 4), either, grade: clean(st.grade).slice(0, 2) };
+}
+
 /* Node(검증 스크립트)에서도 같은 엔진을 불러 쓸 수 있게 — 브라우저·서비스워커에는 영향 없음 */
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { evaluate, fitScore, scopedToProfile, notStale, STALE_DAYS,
-                     requirementLines, requirementMatch, tidyRequirement,
+                     requirementLines, requirementStruct, requirementMatch, tidyRequirement,
                      noticeForProfile, taggedSchool, SHARED_BOARD_BRANCH,
                      noticeFileKey, noticeFileFor, noticeFilesForProfile };
 }

@@ -1,0 +1,175 @@
+# 자격 요건 채우기 — 개발자가 Actions 탭에서 한 번 누르면 끝나는 버튼 (2026-08-23 신설)
+#
+# 하는 일: 공고 원문에서 '지원 자격'을 AI에게 **구조로** 읽힌다
+#          (공통 / 둘 중 하나 / 성적 / 제외 / 우선 선발).
+#
+# 🔴 모델에게 글자를 쓰게 하지 않는다. 원문에 번호를 매겨 주고 번호만 고르게 한 뒤,
+#    화면에 나가는 글자는 앱이 제 원문에서 그 번호로 꺼낸다. 지어낼 자리가 구조적으로 없다.
+#    자세한 계약: collector/eligibility-ai.mjs 첫머리 · docs/designs/eligibility-structure.md
+#
+# 안전장치가 단계마다 있다 — 사람이 중간에 지켜보지 않아도 된다:
+#   ① 부르기 전에 가짜 응답으로 안전장치를 시험한다(돈 0). 통과 못 하면 시작도 안 한다.
+#   ② 시범 3건을 먼저 돌리고 감사에 건다. 여기서 걸리면 되돌리고 전수로 안 간다.
+#   ③ 전수 뒤에도 감사에 건다. 걸리면 통째로 되돌린다 — 잘못된 자격은 앱에 못 나간다.
+#   ④ 어느 단계든 실패하면 🚨 이슈를 만든다. 조용히 끝나지 않는다.
+#
+# 되돌리는 법: 이 워크플로가 만든 커밋 하나를 revert 하면 된다. 항목마다
+#   eligibilityPrev 에 원래 값이 남아 있어 부분 복구도 가능하다.
+
+name: 자격 요건 채우기 (AI)
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: '무엇을 할까요'
+        type: choice
+        default: '전부'
+        options:
+          - '전부'            # 미리보기 → 시범 3건 → 전수. 권장.
+          - '미리보기만'      # 돈 안 씀
+          - '시범 3건만'
+
+permissions:
+  contents: write
+  issues: write
+
+# 🔴 수집 로봇(group: collector)과 **다른 대기줄**에 둔다.
+#    같은 줄에 넣으면 GitHub이 대기 중인 예약 수집을 취소해 그날 수집분이 조용히 사라진다
+#    (deploy-sync·main-guard를 따로 둔 것과 같은 함정 — CLAUDE.md 참조).
+concurrency:
+  group: eligibility-ai
+  cancel-in-progress: false
+
+jobs:
+  fill:
+    runs-on: ubuntu-latest
+    # 전수 169건 × 약 5초 = 15분. 준비·감사·저장까지 담는 그릇으로 30분.
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # 로봇은 자기가 읽은 브랜치(=기본 브랜치)에만 저장한다. 배포는 deploy-sync의 몫.
+          ref: 'claude/nice-heisenberg-WESq5'
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+
+      # ① 돈 쓰기 전에 안전장치부터. 가짜 응답으로 '지어냄이 정말 막히는가'를 확인한다.
+      #    여기서 실패하면 API를 아예 부르지 않는다.
+      - name: 안전장치 시험 (돈 0)
+        run: node verify/test-collector.mjs
+
+      # ② 대상 목록을 눈으로 볼 수 있게 로그에 남긴다. 호출하지 않는다.
+      #    유료 API가 샜던 원인이 '대상이 잘못 골라진 것'이었다(schematize-config.json 참조).
+      - name: 대상 미리보기 (돈 0)
+        id: preview
+        run: |
+          node collector/eligibility-ai.mjs --all | tee /tmp/preview.txt
+          n=$(sed -n 's/.*대상 \([0-9]*\)건.*/\1/p' /tmp/preview.txt | head -1)
+          echo "count=${n:-0}" >> "$GITHUB_OUTPUT"
+
+      - name: 대상이 0건이면 여기서 끝
+        if: steps.preview.outputs.count == '0'
+        run: |
+          echo "::notice::AI로 읽을 대상이 없습니다 — 원문이 없거나 이미 다 읽었습니다."
+          exit 0
+
+      - name: SDK 설치
+        if: inputs.mode != '미리보기만'
+        run: npm i @anthropic-ai/sdk --no-audit --no-fund --silent
+
+      # ③ 시범 3건 — 전수 전에 작게 해 본다. 소넷 기준 50원쯤.
+      - name: 시범 3건
+        if: inputs.mode != '미리보기만'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ELIG_AI_ENABLE: '1'
+        run: node collector/eligibility-ai.mjs --write | tee /tmp/trial.txt
+
+      # 시범 결과가 규칙을 어기면 되돌리고 전수로 넘어가지 않는다.
+      - name: 시범 결과 감사
+        if: inputs.mode != '미리보기만'
+        id: audit1
+        continue-on-error: true
+        run: |
+          node verify/test-collector.mjs
+          node verify/audit-data.js
+      - name: 시범이 감사에 걸리면 되돌리고 중단
+        if: steps.audit1.outcome == 'failure'
+        run: |
+          git checkout -- data/registered.json
+          echo "::error::시범 3건이 감사를 통과하지 못했습니다. 되돌렸고 전수는 돌리지 않았습니다."
+          exit 1
+
+      # ④ 전수 — 소넷 기준 2,229원(2026-08-23 실측). 처음 한 번뿐이다.
+      - name: 전수 169건
+        if: inputs.mode == '전부'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ELIG_AI_ENABLE: '1'
+        run: node collector/eligibility-ai.mjs --all --write | tee /tmp/all.txt
+
+      # 데이터 관문은 **저장 직전**에 둔다 (이슈 #79의 교훈 — 앞에 두면 그 실행에서 안 잡히고
+      # 다음 날 터진다).
+      - name: 데이터 관문 (저장 직전)
+        id: audit2
+        continue-on-error: true
+        run: |
+          node verify/test-collector.mjs
+          node verify/audit-data.js
+      - name: 관문에 걸리면 통째로 되돌린다
+        if: steps.audit2.outcome == 'failure'
+        run: |
+          git checkout -- data/registered.json
+          echo "::error::전수 결과가 감사를 통과하지 못했습니다. 통째로 되돌렸습니다 — 앱은 그대로입니다."
+          exit 1
+
+      - name: 자격 확보 현황 다시 세기
+        if: always()
+        continue-on-error: true
+        run: node verify/eligibility-report.mjs | tee /tmp/report.txt
+
+      - name: 저장
+        if: inputs.mode != '미리보기만'
+        run: |
+          git config user.name "handaejang-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/registered.json
+          if ! git diff --cached --quiet; then
+            git commit -m "자격 요건: AI가 공고 원문에서 구조로 읽음 (검수 전)"
+            pushed=0
+            for i in 1 2 3; do
+              if git push; then pushed=1; break; fi
+              git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
+            done
+            if [ "$pushed" != "1" ]; then
+              echo "::error::push 3회 실패 — 이번 결과가 저장되지 않았습니다."
+              exit 1
+            fi
+          else
+            echo "::notice::바뀐 것이 없습니다."
+          fi
+
+      - name: 결과 리포트 이슈
+        if: always() && inputs.mode != '미리보기만'
+        continue-on-error: true
+        uses: actions/github-script@v7
+        env:
+          RESULT: ${{ job.status }}
+        with:
+          script: |
+            const fs = require('fs');
+            const read = (p) => { try { return fs.readFileSync(p, 'utf8').slice(0, 8000); } catch { return '(없음)'; } };
+            const ok = process.env.RESULT === 'success';
+            await github.rest.issues.create({
+              owner: context.repo.owner, repo: context.repo.repo,
+              labels: ['eligibility-ai'],
+              title: `${ok ? '✅' : '🚨'} 자격 요건 채우기 — ${new Date().toISOString().slice(0, 10)}`,
+              body: [
+                ok ? '자격을 읽어 저장했습니다. 앱에는 **AI가 읽음 · 검수 전** 표식이 붙어 나갑니다.'
+                   : '실패했습니다. 데이터는 되돌아갔으니 **앱은 그대로**입니다.',
+                '', '## 확보 현황', '```', read('/tmp/report.txt'), '```',
+                '', '## 전수 로그', '```', read('/tmp/all.txt'), '```',
+                '', '## 시범 로그', '```', read('/tmp/trial.txt'), '```',
+              ].join('\n'),
+            });

@@ -46,24 +46,53 @@ const log = (m) => console.log(`[elig-ai] ${m}`);
 
 /* ── 지어냄이 들어올 수 없는 계약 ────────────────────────────────
    모델은 **번호만** 돌려준다. 글자를 돌려받지 않으므로 검사할 것도 번호뿐이다. */
-const SYSTEM = `당신은 한국 대학 장학금 공고에서 '지원 자격 요건'에 해당하는 줄을 고르는 일을 합니다.
+const SYSTEM = `당신은 한국 대학 장학금 공고에서 '지원 자격 요건'을 **구조로** 읽는 일을 합니다.
 
 원칙:
-- 새 문장을 쓰지 마세요. **줄 번호만** 고릅니다.
+- 새 문장을 쓰지 마세요. **줄 번호만** 고릅니다. 글자를 돌려보내도 화면에는 안 나갑니다.
 - '누가 받을 수 있는가'를 말하는 줄만 고릅니다(학년·성적·소득구간·거주지·특별자격·재학 상태 등).
-- 신청기간·제출서류·문의처·장학금액·선발인원·지급방법은 자격이 **아닙니다**. 고르지 마세요.
-- 자격 절의 제목 줄(예: "3. 신청 자격")은 그 아래 내용과 함께일 때만 포함합니다.
-- 원문에 자격 요건이 없으면 none을 true로 하고 lines는 빈 배열로 두세요. **억지로 고르지 마세요.**
-- 최대 8줄까지만 고릅니다.`;
+- 신청기간·제출서류·문의처·장학금액·선발인원·지급방법은 자격이 **아닙니다**.
+- 원문에 자격 요건이 없으면 none을 true로 두세요. **억지로 고르지 마세요.**
 
+어디에 넣을지:
+- common   : 지원자 **모두**가 만족해야 하는 요건
+- either   : **이 중 한 갈래만** 만족하면 되는 것 (예: 계속장학생 / 신규자, 학부 / 대학원)
+             갈래마다 label 에 그 갈래의 **이름 줄 번호들**을 넣으세요.
+             이름이 두 줄로 쪼개져 있으면 둘 다 넣습니다
+             (예: "재학생" 줄과 "(계속장학생)" 줄 → label: [7, 8]).
+             이름 줄이 없으면 label 은 빈 배열 [].
+- grade    : 성적·학점 조건
+- exclude  : 제외 대상 ('~인 자는 제외', '타 장학금 중복 수혜 불가' 등)
+- priority : 우선 선발 기준 (자격이 아니라 **먼저 뽑는 순서**)
+
+🔴 애매하면 반드시 common 에 넣으세요.
+   택일인데 common 으로 넣으면 → 자격 있는 학생이 지레 포기합니다(기회 하나 손해).
+   공통인데 either 로 넣으면 → **자격 없는 학생이 서류를 떼고 신청합니다.** 이쪽이 훨씬 나쁩니다.
+   확신이 없으면 안전한 쪽(common)으로 가세요.
+
+절 전체를 합쳐 최대 12줄까지만 고릅니다.`;
+
+const NUMS = { type: 'array', items: { type: 'integer' } };
 const SCHEMA = {
   type: 'object',
   properties: {
     none: { type: 'boolean' },
-    lines: { type: 'array', items: { type: 'integer' } },
+    common: NUMS,
+    either: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: { label: NUMS, lines: NUMS },
+        required: ['label', 'lines'],
+        additionalProperties: false,
+      },
+    },
+    grade: NUMS,
+    exclude: NUMS,
+    priority: NUMS,
     why: { type: 'string' },
   },
-  required: ['none', 'lines', 'why'],
+  required: ['none', 'common', 'either', 'grade', 'exclude', 'priority', 'why'],
   additionalProperties: false,
 };
 
@@ -87,29 +116,75 @@ const HEADER = /^(등록일|작성일|수정일|조회수?|담당자?|게시기�
    하나도 안 남으면 '아직 못 읽었어요'를 유지한다(지어낸 자격보다 낫다 — 원칙 8-1). */
 export function verifyPick(pick, lines) {
   if (!pick || pick.none) return { ok: false, why: pick && pick.why ? pick.why : '자격 없음' };
-  const idx = [...new Set((pick.lines || []).filter((n) => Number.isInteger(n) && n >= 0 && n < lines.length))];
-  const out = idx.sort((a, b) => a - b).map((n) => lines[n])
-    .filter((l) => !NOT_REQ.test(l) && !HEADER.test(l)).slice(0, 8);
-  if (!out.length) return { ok: false, why: '고른 줄이 범위 밖이거나 자격이 아님' };
-  if (!out.some((l) => REQ_SIGNAL.test(l))) return { ok: false, why: '요건 신호가 하나도 없음' };
-  return { ok: true, lines: out };
+
+  /* 번호 → 앱이 제 원문에서 꺼낸 글자. 모델이 글자를 보내도 여기로 들어올 길이 없다. */
+  const pull = (nums, cap) => [...new Set((nums || [])
+    .filter((n) => Number.isInteger(n) && n >= 0 && n < lines.length))]
+    .sort((a, b) => a - b).map((n) => lines[n])
+    .filter((l) => !NOT_REQ.test(l) && !HEADER.test(l)).slice(0, cap);
+
+  /* 옛 모양(`lines`만 주던 응답)도 그대로 받는다 — 그 시절 회귀 검사가 살아 있어야
+     '모델이 보낸 글자는 결과에 섞이지 않는다'는 단언이 계속 우리를 지킨다. */
+  const common = pull(pick.common || pick.lines, 8);
+  const grade = pull(pick.grade, 4);
+  let either = (pick.either || []).map((b) => ({
+    /* 이름이 두 줄로 쪼개진 표가 흔하다("재학생" + "(계속장학생)") — 붙여서 한 이름으로 쓴다.
+       여기서도 글자는 원문 줄이다. 못 읽었으면 null 로 두고 화면이 순서로만 가른다. */
+    /* 모델이 배열 대신 숫자 하나를 보낼 수도 있다 — 스키마가 있어도 방어한다.
+       여기서 죽으면 그 실행의 나머지 공고까지 통째로 못 읽는다. */
+    label: [...new Set([].concat(b && b.label != null ? b.label : [])
+      .filter((n) => Number.isInteger(n) && n >= 0 && n < lines.length))]
+      .sort((a, b2) => a - b2).map((n) => lines[n]).join(' ').trim() || null,
+    lines: pull(b && b.lines, 6),
+  })).filter((b) => b.lines.length);
+
+  /* 🔴 갈래가 하나뿐이면 택일이 아니다 — 공통으로 합친다.
+     '둘 중 하나'라고 써 놓고 하나만 보여 주면 학생이 "나머지는 어디 갔지" 한다.
+     그리고 애매할 때 공통으로 가는 것이 이 파일의 기본값이다(프롬프트와 같은 규칙):
+     공통인데 택일로 그리면 **자격 없는 학생이 서류를 뗀다.** */
+  if (either.length === 1) { common.push(...either[0].lines); either = []; }
+
+  const flat = [...new Set([...common, ...either.flatMap((b) => b.lines), ...grade])].slice(0, 12);
+  if (!flat.length) return { ok: false, why: '고른 줄이 범위 밖이거나 자격이 아님' };
+  if (!flat.some((l) => REQ_SIGNAL.test(l))) return { ok: false, why: '요건 신호가 하나도 없음' };
+
+  return {
+    ok: true,
+    lines: flat,                                   // 화면·알림·챗봇이 지금 쓰는 평평한 모양 (그대로 둔다)
+    struct: { common: [...new Set(common)], either, grade },   // 새 렌더러가 쓰는 구조
+    excludes: pull(pick.exclude, 6),
+    priority: pull(pick.priority, 6),
+  };
 }
 
 /* ── 대상 고르기 ── */
 const idx = indexTexts(texts, browserBodies);
 const strip = makeStripper(texts);
 
-export function pickTargets(items) {
+export function pickTargets(items, all) {
   const out = [];
   for (const it of items) {
     if (it.program) continue;
-    if (requirementLines(it).length) continue;              // 무료 경로가 이미 읽었다
+    /* 평소엔 '무료 경로가 못 읽은 것'만 온다. `--all`은 이미 자격이 뜨는 것까지 다시 읽는다 —
+       구조 소실(공통/택일이 평평해진 것)은 **이미 뜨는 카드**에 숨어 있기 때문이다. */
+    if (!all && requirementLines(it).length) continue;
     if ((it.aiTries || 0) >= (cfg.giveUpAfter ?? 3)) continue;  // 계속 실패하는 건 그만 부른다
     const src = sourceFor(it, idx);
     if (!hasText(src)) continue;                             // 읽을 원문이 없으면 물어볼 것도 없다
-    const body = strip(src.url || it.sourceUrl, src.text);
-    const lines = body.split(/\n+/).map((l) => l.trim()).filter((l) => l.length >= 4 && l.length <= 200);
-    if (body.replace(/[^가-힣]/g, '').length < (cfg.minBodyChars ?? 200)) continue;
+    /* 🔴 보일러플레이트 제거기를 **모델 입력에 쓰지 않는다** (2026-08-23).
+       제거기는 '여러 공고에 흔한 줄'을 버리는데, 표의 칸 이름이 바로 그런 줄이다 —
+       `재학생`·`공통`·`신규자`가 통째로 지워져 갈래 이름이 엉뚱하게 붙었다(실증).
+       제거기는 **'이 공고에 읽을 만한 본문이 있나'를 재는 데만** 쓴다.
+       원문 그대로 보내면 등록 169건 전수가 620원 → 2,229원인데, 그 1,600원을 아끼려고
+       구조를 잃는 건 밑지는 장사다(이 파일의 비용 전제는 config 주석 참조). */
+    const gauge = strip(src.url || it.sourceUrl, src.text);
+    const body = src.text;
+    /* 🔴 짧은 줄을 버리면 안 된다 (2026-08-23). `공통`(2자)·`재학생`(3자)·`신규자`(3자)처럼
+       **표의 칸 이름이 전부 짧다.** 4자 문턱을 두고 "구조를 읽어라"라고 하면 구조 표시를
+       지우고 주는 셈이다 — 실제로 종단추천장학의 갈래 이름이 반쪽만 나왔다.
+       줄 하나는 토큰 몇 개라 넉넉히 보내도 값이 거의 안 오른다. */
+    const lines = body.split(/\n+/).map((l) => l.trim()).filter((l) => l.length >= 2 && l.length <= 200);
+    if (gauge.replace(/[^가-힣]/g, '').length < (cfg.minBodyChars ?? 20)) continue;
     out.push({ it, lines });
   }
   return out;
@@ -139,16 +214,25 @@ async function ask(item, lines) {
 
 /* ── 본편 ── */
 if (!process.env.ELIG_AI_AS_LIB) {
-  const targets = pickTargets(reg.items);
-  log(`대상 ${targets.length}건 (무료 경로가 못 읽었고 원문은 있는 공고)`);
+  /* `--all` = 169건 전수(구조 소실은 이미 뜨는 카드에 있다). 기본은 못 읽은 것만. */
+  const ALL = process.argv.includes('--all');
+  const targets = pickTargets(reg.items, ALL);
+  log(ALL ? `대상 ${targets.length}건 — 전수(--all)` : `대상 ${targets.length}건 (무료 경로가 못 읽었고 원문은 있는 공고)`);
 
   const hasKey = !!process.env.ANTHROPIC_API_KEY || !!process.env.ELIG_AI_FAKE;
-  if (!cfg.enabled) { log('꺼져 있음 (eligibility-ai-config.json의 enabled) — 부르지 않는다'); process.exit(0); }
+  /* 설정은 꺼진 채로 두고 **버튼에서만 켠다**(ELIG_AI_ENABLE=1).
+     설정 파일을 true로 바꿔 두면 수집 로봇이 매 실행 돈다 — 그건 전수를 마치고
+     결과를 눈으로 본 다음에 할 일이다. 그때까지는 사람이 누를 때만 돈다.
+     '기본은 꺼져 있다' 회귀 검사도 이 방식이라야 계속 우리를 지킨다. */
+  const on = cfg.enabled || process.env.ELIG_AI_ENABLE === '1';
+  if (!on) { log('꺼져 있음 (eligibility-ai-config.json의 enabled) — 부르지 않는다'); process.exit(0); }
   if (!hasKey) { log('API 열쇠 없음 — 부르지 않는다'); process.exit(0); }
   if (!WRITE) { log('미리보기 — --write 를 붙여야 반영한다'); process.exit(0); }
 
-  const cap = cfg.maxApiCallsPerRun ?? 3;
-  let calls = 0, got = 0;
+  /* 전수에는 한도를 걸지 않는다 — 전수 1회가 소넷 기준 2,229원이라(2026-08-23 실측)
+     3건씩 끊으면 169건에 두 달이 걸린다. 평소 실행은 한도를 지킨다. */
+  const cap = ALL ? Infinity : (cfg.maxApiCallsPerRun ?? 3);
+  let calls = 0, got = 0, kept = 0, branched = 0;
   for (const { it, lines } of targets) {
     if (calls >= cap) { log(`이번 실행 한도(${cap}건) 도달 — 나머지는 다음 실행`); break; }
     calls += 1;
@@ -156,13 +240,31 @@ if (!process.env.ELIG_AI_AS_LIB) {
     try { pick = await ask(it, lines); }
     catch (e) { log(`✕ ${it.name.slice(0, 30)} — 호출 실패: ${String(e.message).slice(0, 60)}`); it.aiTries = (it.aiTries || 0) + 1; continue; }
     const v = verifyPick(pick, lines);
-    if (!v.ok) { log(`✕ ${it.name.slice(0, 30)} — ${v.why}`); it.aiTries = (it.aiTries || 0) + 1; continue; }
+    /* 🔴 검산을 통과 못 하면 **지금 것을 그대로 둔다.** 지우지 않는다 —
+       AI가 못 읽었다고 이미 있던 자격까지 날리면 전수 실행이 앱을 나쁘게 만든다. */
+    if (!v.ok) { log(`· ${it.name.slice(0, 30)} — ${v.why} (지금 것 유지)`); it.aiTries = (it.aiTries || 0) + 1; kept += 1; continue; }
+
+    /* 되돌릴 수 있게 **처음 한 번만** 원래 값을 남긴다. 지금 데이터 194건에는
+       '이 자격 줄을 누가 넣었나' 표시가 없어서, 이게 없으면 덮어쓴 뒤 복구가 불가능하다. */
+    if (!it.eligibilityPrev) {
+      it.eligibilityPrev = {
+        lines: it.eligibilityLines || null,
+        excludes: it.eligibilityExcludes || null,
+        priority: it.eligibilityPriority || null,
+        from: it.eligibilityFrom || null,
+      };
+    }
     it.eligibilityLines = v.lines;
+    it.eligibilityStruct = v.struct;
+    if (v.excludes.length) it.eligibilityExcludes = v.excludes;
+    if (v.priority.length) it.eligibilityPriority = v.priority;
     it.eligibilityFrom = 'AI(원문 줄 그대로)';
+    it.eligibilityReviewed = false;          // 화면의 'AI가 읽음 · 검수 전' 표식
     delete it.aiTries;
     got += 1;
-    log(`✓ ${it.name.slice(0, 30)} — ${v.lines.length}줄`);
+    if (v.struct.either.length) branched += 1;
+    log(`✓ ${it.name.slice(0, 30)} — 공통 ${v.struct.common.length} · 갈래 ${v.struct.either.length} · 성적 ${v.struct.grade.length}`);
   }
   fs.writeFileSync(regPath, JSON.stringify(reg, null, 1) + '\n');
-  log(`끝 — 호출 ${calls}회 · 확보 ${got}건`);
+  log(`끝 — 호출 ${calls}회 · 확보 ${got}건 · 갈래 있는 공고 ${branched}건 · 검산 실패로 지금 것 유지 ${kept}건`);
 }
