@@ -27,6 +27,7 @@
 import fs from 'node:fs';
 import { chromium } from 'playwright';
 import { indexTexts, sourceFor, hasText, canonUrl, MIN_BODY } from './notice-source.mjs';
+import { makeStripper } from './page-boilerplate.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const bodiesPath = new URL('extracted/browser-bodies.json', HERE);
@@ -54,6 +55,7 @@ let ledger = {};
 try { ledger = JSON.parse(fs.readFileSync(ledgerPath, 'utf8')); } catch { /* 첫 실행 */ }
 
 const idx = indexTexts(texts, bodies);
+const strip = makeStripper(texts);
 const report = ['# 자격요건 매칭 · 공고 본문 재수집 리포트', '', `실행: ${today}`, ''];
 
 /* ── 대상 고르기 ──
@@ -175,7 +177,16 @@ for (const t of targets) {
   } else {
     ledger[key] = { tries: t.tries + 1, at: today, name: t.it.name.slice(0, 60) };
     miss += 1;
-    if (text) report.push(`- · ${t.it.name.slice(0, 40)} — 열리긴 했지만 본문이 없다(메뉴뿐, ${ledger[key].tries}회째)`);
+    if (text) {
+      /* 🔴 **실패할 때 무엇을 받았는지 남긴다** (2026-08-23 추가).
+         예전엔 실패하면 받아 온 글자를 통째로 버려서, 왜 안 되는지 보려면 학교마다
+         정찰을 따로 돌려야 했다. 원인이 학교마다 다르므로(팝업·JS 렌더·봇 차단·
+         로그인 벽·PDF 첨부) 이 한 줄이 진단 한 판을 대신한다. */
+      const left = strip(t.url, text).split('\n').filter(Boolean);
+      report.push(`- · **${t.it.name.slice(0, 40)}** — 본문 없음 (${ledger[key].tries}회째)`);
+      report.push(`    - 받아 온 줄 ${text.split('\n').length} · 메뉴 걷어낸 뒤 ${left.length}줄 · 한글 ${strip(t.url, text).replace(/[^가-힣]/g, '').length}자`);
+      report.push(`    - 남은 것: \`${left.slice(0, 6).join(' | ').slice(0, 180)}\``);
+    }
     log(`· ${t.it.name.slice(0, 30)} — 본문 없음 (${ledger[key].tries}회째)`);
   }
   await new Promise((r) => setTimeout(r, 2500));   // 같은 학교를 몰아치지 않는다
