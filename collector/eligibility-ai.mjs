@@ -187,6 +187,10 @@ export function pickTargets(items, all) {
     if (gauge.replace(/[^가-힣]/g, '').length < (cfg.minBodyChars ?? 20)) continue;
     out.push({ it, lines });
   }
+  /* 안 해 본 것부터 — 등록 순서 그대로 두면 실행 한도(3건)가 매번 **같은 앞쪽 3건**만
+     다시 붙들어, 그 셋이 giveUpAfter에 닿기 전까지 뒤쪽 47건은 차례가 오지 않는다
+     (2026-08-23 시범에서 실제로 같은 3건이 두 번 반복됐다). */
+  out.sort((a, b) => (a.it.aiTries || 0) - (b.it.aiTries || 0));
   return out;
 }
 
