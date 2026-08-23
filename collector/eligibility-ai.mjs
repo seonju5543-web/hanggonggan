@@ -193,13 +193,20 @@ const PDF_SYSTEM = `당신은 첨부된 한국 대학 장학금 **공고문 PDF*
   다른 소속 학생이 자기 공고로 읽습니다. 원문에 적힌 이름을 통째로 옮깁니다.
 - '누가 받을 수 있는가'를 말하는 줄만 고릅니다(학년·성적·소득구간·거주지·특별자격·재학 상태 등).
 - 신청기간·제출서류·문의처·장학금액·선발인원·지급방법은 자격이 **아닙니다**.
+- '~인 자는 제외', '지원 불가' 같은 **제외 대상**은 lines 가 아니라 excludes 에 넣으세요.
+  자격과 섞으면 화면에서 요건이 실제보다 훨씬 까다로워 보여 지원할 수 있는 학생이 포기합니다.
 - 공고문에 자격 요건이 없으면 none을 true로 두세요. **없는 것을 지어내지 마세요.**
-- 최대 10줄까지만 고릅니다.`;
+- lines 최대 8줄 · excludes 최대 6줄.`;
 
 const PDF_SCHEMA = {
   type: 'object',
-  properties: { none: { type: 'boolean' }, lines: { type: 'array', items: { type: 'string' } }, why: { type: 'string' } },
-  required: ['none', 'lines', 'why'],
+  properties: {
+    none: { type: 'boolean' },
+    lines: { type: 'array', items: { type: 'string' } },
+    excludes: { type: 'array', items: { type: 'string' } },
+    why: { type: 'string' },
+  },
+  required: ['none', 'lines', 'excludes', 'why'],
   additionalProperties: false,
 };
 
@@ -207,13 +214,17 @@ const PDF_SCHEMA = {
    여기만 느슨하면 PDF 경로로 쓰레기가 들어온다. */
 export function verifyPdfLines(pick) {
   if (!pick || pick.none) return { ok: false, why: (pick && pick.why) || '자격 없음' };
-  const out = [...new Set((pick.lines || [])
+  const clean = (arr, cap) => [...new Set((arr || [])
     .map((l) => String(l || '').replace(/\s+/g, ' ').trim())
     .filter((l) => l.length >= 4 && l.length <= 200)
-    .filter((l) => !NOT_REQ.test(l) && !HEADER.test(l)))].slice(0, 10);
+    .filter((l) => !NOT_REQ.test(l) && !HEADER.test(l)))].slice(0, cap);
+  const out = clean(pick.lines, 8);
   if (!out.length) return { ok: false, why: '고른 줄이 자격이 아님' };
   if (!out.some((l) => REQ_SIGNAL.test(l))) return { ok: false, why: '요건 신호가 하나도 없음' };
-  return { ok: true, lines: out };
+  /* 제외 대상은 자격 줄과 섞지 않는다 — 섞으면 요건이 실제보다 까다로워 보여
+     지원할 수 있는 학생이 포기하고, 5줄 상한에 밀려 진짜 요건이 잘려 나간다
+     (정읍시민장학재단에서 제외 3줄이 실제로 그렇게 버려졌다). */
+  return { ok: true, lines: out, excludes: clean(pick.excludes, 6) };
 }
 
 /* ── 대상 고르기 ── */
@@ -408,6 +419,7 @@ if (!process.env.ELIG_AI_AS_LIB) {
           priority: it.eligibilityPriority || null, from: it.eligibilityFrom || null };
       }
       it.eligibilityLines = v.lines;
+      if (v.excludes.length) it.eligibilityExcludes = v.excludes;
       delete it.eligibilityStruct;                 // PDF 경로는 구조를 만들지 않는다
       /* 출처를 번호 경로와 구분해 남긴다 — 이 경로만 모델이 글자를 돌려준다 */
       it.eligibilityFrom = 'AI(공고문 PDF)';

@@ -1355,6 +1355,13 @@ console.log('\n■ AI 자격 읽기 안전장치 (2026-08-20)');
   eq('  요건 신호가 없으면 통째로 버린다', p(['3. 신청 자격']).ok, false);
   eq('  모른다(none)고 하면 그대로 둔다', p([], true).ok, false);
   eq('  같은 줄이 여러 번 와도 한 번만', p(['1학년 재학생', '1학년 재학생']).lines.length, 1);
+  /* 🔴 제외 대상을 자격 줄과 섞으면 요건이 실제보다 까다로워 보여 지원할 수 있는
+     학생이 포기하고, 5줄 상한에 밀려 진짜 요건이 잘려 나간다 —
+     정읍시민장학재단에서 제외 3줄이 실제로 그렇게 버려졌다. */
+  const pe = AI.verifyPdfLines({ none: false, why: '', lines: ['1학년 재학생'],
+    excludes: ['타 장학금 수령자는 제외', '원격대학 재학생 제외'] });
+  eq('  제외 대상은 자격 줄과 갈라 담는다', pe.excludes.length, 2);
+  eq('    자격 줄에는 섞이지 않는다', pe.lines.length, 1);
   /* 🔴 이 경로는 출처를 **'AI(공고문 PDF)'**로 남겨 번호 경로와 구분한다 —
      화면 표식은 같지만, 나중에 되짚을 때 어느 계약으로 들어온 글자인지 알아야 한다. */
   const src = fs.readFileSync(new URL('../collector/eligibility-ai.mjs', import.meta.url), 'utf8');
