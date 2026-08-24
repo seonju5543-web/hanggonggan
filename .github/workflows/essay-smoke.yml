@@ -15,6 +15,13 @@ name: 양식 자동작성 · 초안 서버 실물 확인
 on:
   workflow_dispatch:
     inputs:
+      mode:
+        description: '무엇을 할까요'
+        type: choice
+        default: '요청 모양만 확인 (호출 1회 · 약 50원)'
+        options:
+          - '요청 모양만 확인 (호출 1회 · 약 50원)'
+          - '실제 사용 시연 (호출 2회 · 약 100원)'
       model:
         description: '어느 모델로 볼까요 (비우면 기본값 claude-sonnet-5)'
         type: choice
@@ -50,4 +57,4 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ESSAY_MODEL: ${{ inputs.model }}
-        run: node server/essay/smoke.mjs
+        run: node server/essay/smoke.mjs ${{ startsWith(inputs.mode, '실제 사용 시연') && '--demo' || '' }}

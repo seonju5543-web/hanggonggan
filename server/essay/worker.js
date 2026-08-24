@@ -27,7 +27,7 @@
    배포: server/essay/README.md
    ============================================================ */
 
-import { scanOutgoing, checkDraft, mayDraft, materialText, qualityCheck, rulesFor } from './draft-guard.mjs';
+import { scanOutgoing, checkDraft, mayDraft, materialText, qualityCheck, rulesFor, scrubSchool } from './draft-guard.mjs';
 /* 🔴 규칙집은 **저장소에 한 벌만** 둔다 (data/essay-playbook.json). 여기로 베껴 오면
    앱이 보여 주는 '고칠 곳'과 서버가 검사하는 기준이 갈라진다. wrangler 가 번들할 때
    이 JSON 을 코드 안에 넣어 준다 — 실행 중에 파일을 읽지 않는다. */
@@ -136,10 +136,20 @@ function sanitize(body) {
       provider: String(s.provider || '').slice(0, 80),
       amountText: String(s.amountText || '').slice(0, 80),
       quotes: (Array.isArray(s.quotes) ? s.quotes : []).slice(0, MAX_QUOTES).map((q) => String(q).slice(0, 300)),
+      /* 이 공고가 정한 작성 규정 — 재단이 공고·첨부에 직접 적은 문장 그대로.
+         우리 규칙집보다 세다: 안 지키면 감점되거나 심사에서 제외된다. */
+      writeRules: (Array.isArray(s.writeRules) ? s.writeRules : []).slice(0, 8).map((r) => String(r).slice(0, 220)),
+      /* B — 앱이 공고 원문에서 읽어 온 '이 재단이 보는 것'. 앱이 지어낸 값이 아니다. */
+      focus: (Array.isArray(s.focus) ? s.focus : []).slice(0, 3).map((f) => String(f).slice(0, 40)),
+      /* 🔴 블라인드 심사 공고 — 학교명이 들어가면 학생이 심사에서 제외된다 */
+      blind: !!s.blind,
     },
     /* 🔴 보낼 수 있는 프로필은 이 셋뿐이다. 성적·소득분위·이름·연락처는 받지 않는다. */
     profile: {
       school: String(p.school || '').slice(0, 40),
+      /* 🔴 블라인드 심사에서 학교명을 지울 때만 쓴다. 앱이 아는 줄임말('외대')은
+         정식 명칭에서 만들어지지 않아서 함께 받는다. 프롬프트에는 넣지 않는다. */
+      schoolAliases: (Array.isArray(p.schoolAliases) ? p.schoolAliases : []).slice(0, 6).map((a) => String(a).slice(0, 20)),
       year: String(p.year || '').slice(0, 20),
       major: String(p.major || '').slice(0, 40),
     },
@@ -198,9 +208,26 @@ export default {
       s.provider ? `주관: ${s.provider}` : '',
       s.amountText ? `금액: ${s.amountText}` : '',
       s.quotes.length ? `공고 원문에서:\n${s.quotes.map((q) => `  · ${q}`).join('\n')}` : '',
+      s.writeRules.length
+        ? `\n■ 🔴 이 공고가 정한 작성 규정 (재단이 직접 적은 문장입니다 — 우리 규칙보다 우선합니다)\n${
+            s.writeRules.map((r) => `  · ${r}`).join('\n')}`
+        : '',
+      /* B — 자기규정 문장("저는 이 재단이 찾는 인재입니다")을 만들라는 뜻이 아니다.
+         **순서**를 정하라는 뜻이다. 9곳에서 배운 규칙 know-the-foundation. */
+      s.focus.length
+        ? `\n■ 이 재단이 보는 것 (공고가 밝힌 순서대로)\n${s.focus.map((f, i) => `  ${i + 1}. ${f}`).join('\n')}\n` +
+          `  → 학생의 재료 중 여기에 이어지는 것을 **앞 문단에** 두세요.\n` +
+          `  → "저는 이 재단이 찾는 인재입니다" 같은 **자기규정 문장은 쓰지 마세요.** 순서로 보여 주세요.`
+        : '',
+      s.blind
+        ? `\n🔴 이 공고는 **블라인드 심사**입니다. 학교명·캠퍼스·소속을 알 수 있는 표현을\n` +
+          `  한 글자도 쓰지 마세요. 쓰면 학생이 심사에서 제외됩니다. '제가 다니는 학교'로 쓰세요.`
+        : '',
       '',
       `■ 학생 (이것이 전부입니다 — 여기 없는 사실은 쓰지 마세요)`,
-      `${payload.profile.school || ''} ${payload.profile.major || ''} ${payload.profile.year || ''}`.trim() || '(밝히지 않음)',
+      s.blind
+        ? `${payload.profile.major || ''} ${payload.profile.year || ''}`.trim() || '(밝히지 않음)'
+        : `${payload.profile.school || ''} ${payload.profile.major || ''} ${payload.profile.year || ''}`.trim() || '(밝히지 않음)',
       ...payload.materials.map((m) => `· ${m.label}: ${m.value}`),
       '',
       `■ 써 주실 칸`,
@@ -269,7 +296,11 @@ export default {
     for (const d of (out.drafts || [])) {
       const key = String(d && d.key || '');
       if (!wanted.has(key)) continue;                      // 안 물어본 칸은 버린다
-      const text = String(d.text || '').trim();
+      let text = String(d.text || '').trim();
+      /* 🔴 블라인드 심사 공고면 학교명을 지운다 — 프롬프트로 시켰어도 되받아 본다.
+         버리지 않고 '제가 다니는 학교'로 바꾼다(대체할 말이 있는 자리다). */
+      let blindHits = [];
+      if (s.blind) { const r = scrubSchool(text, payload.profile.school, payload.profile.schoolAliases); text = r.text; blindHits = r.hits; }
       const v = checkDraft(text, material);
       if (!v.ok) { skipped.push({ key, reason: v.reasons[0], reasons: v.reasons }); continue; }
       /* 지어냄은 없다 — 이제 '제출 가능한 수준인가'를 본다. 통과/실패가 아니라
@@ -278,7 +309,10 @@ export default {
       /* 이제 앱이 own 을 표시해 준다 — 글자 모양으로 짐작하던 것을 데이터로 바꿨다 */
       const own = (f.asks || []).filter((a) => a.own).map((a) => a.a);
       const q = qualityCheck(text, { target: f.target, ownWords: own, checks: PLAYBOOK.checks });
-      drafts.push({ key, text, quality: q.warnings });
+      const warnings = blindHits.length
+        ? [`이 공고는 블라인드 심사예요 — 학교 이름이 들어가면 심사에서 제외돼요. 앱이 '제가 다니는 학교'로 바꿨어요`].concat(q.warnings)
+        : q.warnings;
+      drafts.push({ key, text, quality: warnings });
     }
     /* 아무 말도 못 받은 칸은 조용히 넘어가지 않고 이유를 남긴다 */
     for (const f of payload.fields) {

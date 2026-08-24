@@ -43,6 +43,25 @@ function essayStoryFields(plan) {
 /* 이 학생·이 공고에 맞춘 보기를 만들기 위해 넘기는 것.
    🔴 여기 담기는 것은 **기기 안에서 질문을 고르는 데만** 쓰인다.
       서버로 나가는 것은 학생이 실제로 고르거나 친 것뿐이다(essaySend 참조). */
+/* ── 이 공고가 정한 작성 규정 (2026-08-24) ──
+   재단이 공고·첨부에 직접 적어 둔 문장이다(collector/essay-house-mine.mjs 가 캤다).
+   우리가 만든 규칙보다 세다 — 지키지 않으면 학생이 감점되거나 심사에서 제외된다.
+   🔴 원문 그대로 쓴다. 요약하면 뜻이 바뀐다(운영 원칙 8-1). */
+let essayRulesCache = null;
+async function essayLoadFormRules() {
+  if (essayRulesCache) return essayRulesCache;
+  try {
+    const res = await fetch('data/essay-form-rules.json', { cache: 'no-cache' });
+    essayRulesCache = (await res.json()).notices || {};
+  } catch (e) { essayRulesCache = {}; }   /* 없어도 앱은 그대로 돈다 */
+  return essayRulesCache;
+}
+function essayNoticeRules(sch) {
+  const box = essayRulesCache || {};
+  const hit = (sch && box[sch.id]) || null;
+  return { blind: !!(hit && hit.blind), lines: (hit && hit.lines) || [] };
+}
+
 function essayCtx(sch) {
   const p = (typeof state !== 'undefined' && state.profile) || null;
   /* 보관함에 무엇이 있는지 — 파일도 파일 이름도 나가지 않는다.
@@ -191,10 +210,18 @@ function essayMaterials(plan) {
 /* 나가는 프로필 — 이 셋뿐이다 */
 function essayProfile() {
   const p = (typeof state !== 'undefined' && state.profile) || {};
+  /* 🔴 블라인드 심사 공고에서 학교명을 지우기 위한 재료. 프롬프트에는 안 들어간다.
+     '외대' 같은 줄임말은 정식 명칭에서 만들어지지 않아 별칭표에서 찾아 보낸다. */
+  const aliases = [];
+  try {
+    const table = (typeof UNIV_ALIASES !== 'undefined' && UNIV_ALIASES) || {};
+    for (const k of Object.keys(table)) if (table[k] === p.school && !aliases.includes(k)) aliases.push(k);
+  } catch (e) { /* 별칭표가 없어도 정식 명칭은 지워진다 */ }
   return {
     school: p.school || '',
     year: p.year ? `${p.year}학년` : '',
     major: p.major || '',
+    schoolAliases: aliases.slice(0, 6),
   };
 }
 
@@ -230,6 +257,7 @@ function essayBind(tpl, sch) {
 }
 
 async function essaySend(tpl, sch, btn) {
+  await essayLoadFormRules();   /* 이 공고가 정한 작성 규정 — 없으면 빈손으로 돌아온다 */
   const plan = formPlanFor(tpl);
   const fields = essayStoryFields(plan);
   if (!fields.length) return;
@@ -288,6 +316,20 @@ async function essaySend(tpl, sch, btn) {
     scholarship: {
       name: sch.name || '', provider: sch.provider || sch.org || '', amountText: sch.amountText || '',
       quotes: (sch.excerpts || []).slice(0, 14),
+      /* 이 공고가 정한 작성 규정 — 재단이 직접 적은 문장 그대로 */
+      writeRules: essayNoticeRules(sch).lines,
+      /* B — 이 재단이 무엇을 보는가. 공고 원문에 실제로 있는 것만 담긴다(essay-ask.js).
+         재단이 '평가기준1순위'처럼 순서를 밝혀 두었으면 그 순서 그대로다. */
+      /* 🔴 작성 규정도 함께 읽힌다 — 재단이 '평가기준1순위'처럼 순서를 직접 밝힌 줄이
+         공고 발췌가 아니라 첨부 서식에 들어 있는 경우가 많다. */
+      focus: (typeof foundationFocus === 'function' ? foundationFocus({
+        name: sch.name || '', provider: sch.provider || sch.org || '',
+        quotes: (sch.excerpts || []).slice(0, 14).concat(essayNoticeRules(sch).lines),
+      }) : []).map((f) => f.say),
+      /* 🔴 블라인드 심사 — 학교명을 쓰면 심사에서 제외되는 공고가 실제로 있다 */
+      blind: essayNoticeRules(sch).blind || (typeof blindReview === 'function' ? blindReview({
+        name: sch.name || '', quotes: (sch.excerpts || []).slice(0, 14),
+      }) : false),
     },
     profile: essayProfile(),
     materials: essayMaterials(plan),

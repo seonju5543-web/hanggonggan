@@ -246,5 +246,61 @@ head('9) 🔴 맞춤 보기에도 민감 낱말이 없는가 (전수)');
     '학습 로봇이 같은 판정 모듈을 쓴다 (베끼지 않았다)');
 }
 
+/* ───────────────────────────────────────────────────────────────────────────
+   11) B — 이 재단이 보는 것을 앞세운다 (know-the-foundation)
+   🔴 지어내지 않는다: 공고 원문에 그 낱말이 있을 때만 켜진다.
+   ─────────────────────────────────────────────────────────────────────────── */
+{
+  head('11) B — 이 재단이 보는 것');
+  const { foundationFocus, blindReview, storyAsksFor, STORY_ASKS } = require('../essay-ask.js');
+
+  /* 실제 공고 문구다 (collector/extracted 의 서울인재대학장학금 원문) */
+  const 서울인재 = { name: '2026년 하반기 서울인재대학장학금', quotes: [
+    '자기소개서에 소속 대학교를 식별할 수 있는 정보(학교명 등)를 기재한 경우 심사에서 제외',
+    '<소득기준 [평가기준1순위]>', '<학업성적 [평가기준2순위]>', '<사회공헌 [평가기준3순위]>',
+  ] };
+  const f = foundationFocus(서울인재);
+  ok(f.length === 3, `재단이 보는 것 3가지를 읽었다 — ${f.map((x) => x.say).join(' · ')}`);
+  ok(f[0].id === 'need' && f[1].id === 'merit' && f[2].id === 'share',
+    '재단이 밝힌 순위(1소득·2성적·3사회공헌) 그대로 정렬한다', f.map((x) => x.id).join(','));
+
+  ok(foundationFocus({ name: '장학금', quotes: [] }).length === 0,
+    '🔴 공고에 없으면 빈손이다 — 지어내지 않는다');
+  ok(foundationFocus(null).length === 0, '공고가 없어도 넘어지지 않는다');
+
+  ok(blindReview(서울인재) === true, '🔴 블라인드 심사 공고를 알아본다');
+  ok(blindReview({ name: '평범한 장학금', quotes: ['성적 3.0 이상'] }) === false,
+    '보통 공고를 블라인드로 착각하지 않는다');
+
+  /* B 가 학생에게 새 질문을 만들지 않는다 — 보기 순서만 바꾼다 */
+  const { essayAskFor } = require('../essay-ask.js');
+  const field = { label: '지원 동기', type: 'textarea', kind: 'story' };
+  const before = essayAskFor(field, { profile: { track: 'humanities' } });
+  const after = essayAskFor(field, { profile: { track: 'humanities' }, scholarship: 서울인재 });
+  ok(before.asks.length === after.asks.length, '🔴 B 는 질문 수를 늘리지 않는다 — 순서만 바꾼다');
+  ok(after.blind === true && after.focus.length === 3, '칸 계획에 focus·blind 가 함께 실린다');
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   12) 스토리텔링 질문 — 배운 규칙에서 나왔는지
+   ─────────────────────────────────────────────────────────────────────────── */
+{
+  head('12) 스토리텔링 질문 — 규칙에서 나왔는가');
+  const { storyAsksFor, STORY_ASKS } = require('../essay-ask.js');
+  const PB = JSON.parse(fs.readFileSync(new URL('../data/essay-playbook.json', import.meta.url), 'utf8'));
+  const codes = new Set(PB.rules.map((r) => r.code));
+
+  for (const a of STORY_ASKS) {
+    ok(codes.has(a.rule), `'${a.q}' 의 근거 규칙이 규칙집에 실재한다 — ${a.rule}`);
+  }
+  ok(storyAsksFor('episode')[0].id === 'result',
+    "경험 칸에는 '그래서 어떻게 됐나요'가 **맨 앞에** 온다 (공통 셋이 자리를 다 먹지 않는다)");
+  ok(storyAsksFor('growth')[0].id === 'turn', "성장과정 칸에는 '언제부터 달라졌나요'가 맨 앞에 온다");
+  for (const k of ['episode', 'growth', 'motive', 'share', 'generic'])
+    ok(storyAsksFor(k).length === 3, `${k} — 카드가 길어지지 않게 3개까지`);
+  ok(STORY_ASKS.every((a) => !a.free && Array.isArray(a.c) && a.c.length),
+    '🔴 스토리텔링 질문은 전부 눌러서 고르는 것이다 — 학생이 글을 쓰지 않는다');
+}
+
 console.log(`\n${fail ? '✗' : '✓'} 키워드 질문 — 통과 ${pass} · 실패 ${fail}`);
 process.exit(fail ? 1 : 0);

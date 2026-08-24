@@ -290,8 +290,17 @@ head('13) 앱 쪽 (essay.js) — 무엇을 재료로 모으는가');
   ok(!ids.includes('growth'), 'story 칸은 재료가 아니라 결과가 들어갈 자리다');
 
   const prof = ctx.essayProfile();
-  ok(Object.keys(prof).join(',') === 'school,year,major',
-    '④ 나가는 프로필은 학교·학년·전공 셋뿐이다');
+  /* 🔴 개발자와 정한 전송 범위는 학교·학년·전공 셋이다. schoolAliases 는 **넷째 항목이 아니라**
+     학교 이름을 달리 부르는 말일 뿐이고(그래서 새 정보가 아니다), 쓰이는 곳은
+     블라인드 심사에서 그 이름을 **지우는** 자리 하나뿐이다 — 프롬프트에는 안 들어간다.
+     새 항목이 늘어나면 여기서 바로 걸린다. */
+  ok(Object.keys(prof).sort().join(',') === 'major,school,schoolAliases,year',
+    '④ 나가는 프로필은 학교·학년·전공(+학교 별칭) 뿐이다', Object.keys(prof).join(','));
+  {
+    const w = fs.readFileSync(new URL('../server/essay/worker.js', import.meta.url), 'utf8');
+    const promptPart = w.slice(w.indexOf('const prompt = ['), w.indexOf('let data;'));
+    ok(!/schoolAliases/.test(promptPart), '🔴 학교 별칭은 프롬프트에 실리지 않는다 — 지울 때만 쓴다');
+  }
   ok(!JSON.stringify(prof).includes('4.1') && !JSON.stringify(prof).includes('홍길동'),
     '④ 성적·소득분위·이름은 프로필에 섞이지 않는다');
 
@@ -391,5 +400,35 @@ reply = { drafts: [{ key: 'growth', text: '저는 성실합니다. 맞벌이 가
 }
 
 globalThis.fetch = realFetch;
+/* ───────────────────────────────────────────────────────────────────────────
+   🔴 블라인드 심사 — 학교명이 들어가면 학생이 심사에서 제외된다
+   실제 공고 문구에서 나온 요구다(서울인재대학장학금). 프롬프트로만 지키지 않는다.
+   ─────────────────────────────────────────────────────────────────────────── */
+{
+  head('16) 🔴 블라인드 심사 — 학교명을 지운다');
+  const { scrubSchool } = await import('../server/essay/draft-guard.mjs');
+
+  const r1 = scrubSchool('저는 한국외국어대학교 통번역학과에서 공부하고 있습니다.', '한국외국어대학교');
+  ok(!r1.text.includes('한국외국어대학교') && r1.hits.length === 1, '정식 명칭을 지운다');
+  ok(r1.text.includes('제가 다니는 학교'), "버리지 않고 '제가 다니는 학교'로 바꾼다");
+
+  const r2 = scrubSchool('외대 도서관에서 매일 공부했습니다.', '한국외국어대학교', ['외대', '한국외대']);
+  ok(!r2.text.includes('외대'), '🔴 줄임말도 지운다 — 별칭표를 함께 받는다');
+
+  const r3 = scrubSchool('명지대학교 학생회에서 활동했습니다.', '명지대학교');
+  ok(scrubSchool('명지대 학생회에서 활동했습니다.', '명지대학교').hits.length === 1,
+    "'명지대'처럼 줄여 쓴 말은 이름에서 만들어 지운다");
+  ok(!/학교\s*(대학교|대학)/.test(r3.text), '바꾼 뒤에 학교학교 같은 말이 남지 않는다');
+
+  const r4 = scrubSchool('저는 통번역학과에서 공부하고 있습니다.', '한국외국어대학교');
+  ok(r4.hits.length === 0 && r4.text.includes('통번역학과'), '없으면 아무것도 건드리지 않는다');
+  ok(scrubSchool('아무 글', '').hits.length === 0, '학교를 모르면 그대로 둔다');
+
+  /* 서버가 실제로 이것을 부르는지 — 배선이 끊기면 프롬프트만 남는다 */
+  const w = fs.readFileSync(new URL('../server/essay/worker.js', import.meta.url), 'utf8');
+  ok(/scrubSchool\(text, payload\.profile\.school/.test(w), '서버가 받은 초안에 실제로 이 검사를 건다');
+  ok(/s\.blind[\s\S]{0,200}payload\.profile\.major/.test(w), '블라인드 공고에는 프롬프트에서도 학교를 빼고 보낸다');
+}
+
 console.log(`\n${fail ? '✗' : '✓'} AI 초안 안전장치 — 통과 ${pass} · 실패 ${fail}`);
 process.exit(fail ? 1 : 0);

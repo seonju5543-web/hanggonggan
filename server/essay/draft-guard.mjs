@@ -184,6 +184,44 @@ const paraCount = (t) => String(t || '').split(/\n\s*\n/).filter((p) => p.trim()
  * @param {object} opt      { target, ownWords: string[], checks: [] }
  * @returns {{warnings: {code:string,msg:string}[]}}
  */
+/* ── 🔴 블라인드 심사 — 학교명이 들어가면 학생이 심사에서 제외된다 (2026-08-24) ──
+
+   경위: 작성 규칙 학습을 **우리가 이미 가진 공고 원문**으로 넓혔더니 이런 줄이 나왔다.
+     "자기소개서에 소속 대학교를 식별할 수 있는 정보(학교명 등)를 기재한 경우 심사에서 제외"
+     (collector/extracted/form-x0lmrs-1.hwp.body.txt · 서울인재대학장학금)
+
+   우리는 프로필의 학교를 서버로 보내고 프롬프트에도 넣는다. 막지 않으면
+   **앱이 만들어 준 초안 때문에 학생이 탈락한다.** 지어냄을 막는 것보다 결과가 무겁다.
+
+   프롬프트로만 지키지 않는다 — 받은 뒤 한 칸씩 되받아 본다(이 파일의 존재 이유).
+   걸리면 버리지 않고 **'제가 다니는 학교'로 바꿔서** 준다. 초안이 통째로 사라지면
+   학생이 받은 것이 없어지기 때문이다(비우는 것과 다르다 — 여기는 대체할 말이 있다).
+*/
+export function scrubSchool(text, school, aliases) {
+  const raw = String(school || '').trim();
+  if (!raw) return { text: String(text || ''), hits: [] };
+  /* '한국외국어대학교' · '한국외대' · '외대' 처럼 줄여 부르는 말까지 본다 */
+  const stem = raw.replace(/\s*(대학교|대학|캠퍼스)\s*$/g, '').trim();
+  const names = [raw];
+  if (stem && stem !== raw) { names.push(stem, `${stem}대학교`, `${stem}대학`, `${stem}대`); }
+  /* 줄여 부르는 말('외대')은 이름에서 만들어지지 않는다 — 앱이 아는 별칭표를 함께 받는다
+     (data.js UNIV_ALIASES). 없으면 정식 명칭만 지운다. */
+  for (const a of (Array.isArray(aliases) ? aliases : [])) {
+    const t = String(a || '').trim();
+    if (t.length >= 2 && !names.includes(t)) names.push(t);
+  }
+  const hits = [];
+  let out = String(text || '');
+  for (const n of names.sort((a, b) => b.length - a.length)) {
+    if (n.length < 2 || !out.includes(n)) continue;
+    hits.push(n);
+    out = out.split(n).join('제가 다니는 학교');
+  }
+  /* 같은 자리에 두 번 들어가 '제가 다니는 학교학교' 같은 말이 되는 것을 막는다 */
+  out = out.replace(/제가 다니는 학교\s*(대학교|대학|캠퍼스)/g, '제가 다니는 학교');
+  return { text: out, hits };
+}
+
 export function qualityCheck(text, opt = {}) {
   const t = String(text || '').trim();
   const checks = opt.checks || [];

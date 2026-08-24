@@ -243,14 +243,130 @@ const DOC_SIGNAL = {
   recommend: { ask: 'recWho', q: '추천서를 써 주실 분과 어떤 인연인가요', c: ['전공 수업', '연구실·프로젝트', '동아리 지도', '오래 지켜봐 주심'] },
 };
 
-/* 되묻기가 열렸을 때만 덧붙는 '장면' 질문 (개발자 아이디어 2026-08-23).
-   지금 보기는 '재단이 보는 것'(사정·의지)에 쏠려 있어 글이 평평해진다.
-   글을 살아 있게 만드는 것은 **언제·누구와**라는 장면 표지다.
-   되묻기를 여는 학생에게만 붙으므로 카드가 길어지지 않는다. */
-const SCENE_ASKS = [
-  { id: 'when', q: '주로 언제였나요', c: ['새벽·야간', '방학 내내', '학기 중 매주', '시험 기간', '몇 달 동안'] },
-  { id: 'with', q: '누구와 함께였나요', c: ['혼자서', '가족과', '친구·동기와', '교수님 지도로', '후배들과'] },
+/* ============================================================
+   ── 스토리텔링 질문 (2026-08-24 · 크롤링으로 배운 규칙에서 나왔다) ──
+
+   되묻기가 열렸을 때만 덧붙는다. 되묻기를 여는 학생에게만 붙으므로 카드가 길어지지 않는다.
+
+   🔴 이 질문들은 **짐작해서 만든 것이 아니다.** 9곳에서 배운 규칙집
+      (data/essay-playbook.json)이 "좋은 글에는 이것이 있다"고 말한 것을,
+      학생이 **글을 쓰지 않고 눌러서** 줄 수 있는 모양으로 바꾼 것이다.
+      그래서 질문마다 `rule` 로 근거를 적어 둔다 — 다음 세션이 '이건 왜 있지?' 하고
+      지우지 않게, 그리고 규칙이 바뀌면 질문도 같이 손보게.
+
+        concrete-scene  형용사 대신 구체적인 장면·행동·숫자   → 언제 · 누구와 · 얼마나 오래
+        episode-star    상황 → 어려움 → 내가 한 일 → 결과     → 그래서 어떻게 됐나요
+        growth-lesson   환경 설명은 짧게, 배운 것에 분량을     → 언제부터 달라졌나요
+
+   🔴 '얼마나 오래'가 숫자를 만든다. 규칙집이 여러 곳에서 '숫자로 쓰라'고 하는데,
+      학생에게 "숫자를 쓰세요"라고 하면 아무도 안 쓴다. 눌러서 고르게 하면 준다.
+      그리고 그 숫자는 **학생이 준 사실**이라 draft-guard 가 지어냄으로 막지 않는다.
+   ============================================================ */
+const STORY_ASKS = [
+  { id: 'when', q: '주로 언제였나요', rule: 'concrete-scene', for: '*',
+    c: ['새벽·야간', '방학 내내', '학기 중 매주', '시험 기간', '몇 달 동안'] },
+  { id: 'with', q: '누구와 함께였나요', rule: 'concrete-scene', for: '*',
+    c: ['혼자서', '가족과', '친구·동기와', '교수님 지도로', '후배들과'] },
+  { id: 'howLong', q: '얼마나 오래 했나요', rule: 'concrete-scene', for: '*',
+    c: ['한 학기 동안', '1년쯤', '2년 넘게', '방학 동안', '지금도 계속'] },
+  { id: 'result', q: '그래서 어떻게 됐나요', rule: 'episode-star',
+    for: ['episode', 'future', 'study', 'motive', 'effect', 'intro', 'generic'],
+    c: ['끝까지 마쳤어요', '성적이 올랐어요', '자격증을 땄어요', '주변이 알아줬어요', '아직 하는 중이에요'] },
+  { id: 'turn', q: '언제부터 달라졌나요', rule: 'growth-lesson',
+    for: ['growth', 'character', 'value', 'message', 'share'],
+    c: ['고등학교 때', '대학에 오고 나서', '그 일을 겪고 나서', '가족을 보며', '조금씩 계속'] },
 ];
+
+/** 그 칸 종류에 맞는 스토리텔링 질문 — 카드가 길어지지 않게 3개까지.
+    🔴 **종류 전용을 먼저** 담는다. 공통('*') 셋을 앞에 두면 3칸을 다 먹어
+       '그래서 어떻게 됐나요'가 어느 칸에도 안 나온다(실측하고 고쳤다). */
+function storyAsksFor(kind) {
+  const mine = STORY_ASKS.filter((a) => Array.isArray(a.for) && a.for.includes(kind));
+  const any = STORY_ASKS.filter((a) => a.for === '*');
+  return mine.concat(any).slice(0, 3);
+}
+
+/* 예전 이름 — 다른 곳에서 쓰던 것이 있으면 그대로 돌게 둔다 */
+const SCENE_ASKS = STORY_ASKS.filter((a) => a.id === 'when' || a.id === 'with');
+
+/* ============================================================
+   ── B · 이 재단이 무엇을 보는가 (2026-08-24 개발자 컨펌 후 되살림) ──
+
+   경위: 처음 낸 안은 "저는 이 재단이 찾는 인재입니다" 같은 **자기규정 문장**을
+   글에 넣는 것이었고, 개발자가 "이상적인 예시문에 그런 문장은 없다"며 보류시켰다.
+   그 뒤 9곳을 읽어 보니 개발자가 맞았다 — 자기규정을 권한 곳은 **한 곳도 없었고**,
+   오히려 `no-self-label`(자기규정 금지)이 여러 곳에서 나왔다.
+
+   대신 5곳이 공통으로 말한 것은 `know-the-foundation` 이다:
+     **재단의 목적을 알고, 거기에 이어지는 내 재료를 앞세워라.**
+
+   그래서 B 를 이렇게 다시 만들었다 — 문장을 만들어 넣는 것이 아니라 **순서를 정한다**:
+     ① 공고 원문·이름에서 이 재단이 보는 것을 읽는다 (아래 FOCUS_THEMES)
+     ② 학생에게 낼 보기에서 그것과 이어지는 것을 앞에 둔다
+     ③ 초안 서버에 '이 재단이 보는 것'을 함께 보내 앞 문단에 배치하게 한다
+   학생에게 질문을 더 던지지 않는다. 이미 가진 공고 정보만 쓴다.
+
+   🔴 지어내지 않는다. 공고 원문에 그 낱말이 실제로 있을 때만 켜진다 —
+      없으면 focus 는 빈 배열이고 예전과 똑같이 동작한다(원칙 8-1).
+   ============================================================ */
+const FOCUS_THEMES = [
+  { id: 'faith',  re: /신앙|교회|기독|성도|불자|불교|천주교/, say: '신앙 생활',
+    chips: ['신앙 활동', '교회·모임 봉사'] },
+  { id: 'region', re: /지역\s*인재|출신|거주|시민|군민|도민|향우|고향|재학생\s*중\s*[가-힣]{2,4}\s*출신/, say: '지역과의 인연',
+    chips: ['고향·지역과의 인연', '지역에서 한 활동'] },
+  { id: 'stem',   re: /이공|공학|과학|SW|소프트웨어|반도체|기술|IT|디지털/, say: '이공계 전공 역량',
+    chips: ['전공 프로젝트', '실습·실험'] },
+  { id: 'share',  re: /나눔|봉사|사회\s*공헌|환원|기여|사랑|이웃/, say: '나눔과 사회 기여',
+    chips: ['봉사·나눔 경험', '후배·이웃 돕기'] },
+  { id: 'merit',  re: /성적\s*우수|학업\s*우수|학업\s*성적|우수\s*인재|평점|성적\s*기준/, say: '학업 성적과 성실함',
+    chips: ['성적 관리', '수업 개근'] },
+  { id: 'need',   re: /가정\s*형편|생활\s*형편|저소득|소득\s*기준|소득\s*분위|경제적\s*어려움|형편이\s*어려운|생활비/, say: '경제적 형편',
+    chips: [] },
+  { id: 'char',   re: /품행|인성|모범|성실|바른/, say: '성실함과 품행',
+    chips: ['꾸준히 해 온 일'] },
+  { id: 'global', re: /글로벌|해외|교환|어학|국제/, say: '국제 역량',
+    chips: ['어학 공부', '교환학생 준비'] },
+  { id: 'leader', re: /리더|지도자|인재\s*육성|미래\s*인재|차세대/, say: '앞으로의 성장 가능성',
+    chips: ['맡아서 이끈 일'] },
+];
+
+/* 공고가 순위를 직접 적어 둔 경우가 있다 — 실제 문구:
+   `<소득기준 [평가기준1순위]>` `<학업성적 [평가기준2순위]>` `<사회공헌 [평가기준3순위]>`
+   (collector/extracted 의 공고 원문에서 확인. 재단이 스스로 밝힌 순서라 우리 짐작보다 낫다.) */
+const FOCUS_RANK = /(?:평가|심사)\s*기준\s*(\d)\s*순위/;
+
+/** 이 공고가 무엇을 보는가 — 원문에 있는 것만. 없으면 빈 배열. */
+function foundationFocus(sch) {
+  if (!sch) return [];
+  const quotes = Array.isArray(sch.quotes) ? sch.quotes : [];
+  const hay = `${sch.name || ''} ${sch.provider || ''} ${quotes.join(' ')}`;
+  const out = [];
+  for (const t of FOCUS_THEMES) {
+    if (!t.re.test(hay)) continue;
+    /* 그 낱말이 들어 있는 줄에 '평가기준N순위'가 함께 있으면 그 순위를 그대로 쓴다 */
+    let rank = 9;
+    for (const q of quotes) {
+      if (!t.re.test(q)) continue;
+      const m = q.match(FOCUS_RANK);
+      if (m) rank = Math.min(rank, Number(m[1]));
+    }
+    out.push({ id: t.id, say: t.say, chips: t.chips || [], rank });
+  }
+  /* 재단이 밝힌 순위 → 그다음은 찾은 순서(구체적인 것부터) */
+  return out.sort((a, b) => a.rank - b.rank).slice(0, 3);
+}
+
+/* ── 블라인드 심사 — 학교명을 쓰면 심사에서 제외된다 ──
+   🔴 실제 공고 문구(collector/extracted/form-x0lmrs-1.hwp.body.txt):
+      "자기소개서에 소속 대학교를 식별할 수 있는 정보(학교명 등)를 기재한 경우 심사에서 제외"
+   우리는 프로필의 학교를 초안 서버에 보내고 프롬프트에도 넣는다. 그대로 두면
+   **앱이 만든 초안 때문에 학생이 탈락한다.** 공고가 이렇게 말할 때만 켜진다. */
+const BLIND_RE = /식별할\s*수\s*있는\s*정보|학교명[\s\S]{0,24}(기재|표기)[\s\S]{0,24}(제외|감점)|블라인드/;
+function blindReview(sch) {
+  if (!sch) return false;
+  const quotes = Array.isArray(sch.quotes) ? sch.quotes : [];
+  return BLIND_RE.test(`${sch.name || ''} ${quotes.join(' ')}`);
+}
 
 /* 보기 목록에서 특정 값을 갈아 끼운다 (원본을 건드리지 않는다) */
 function swapChips(ask, replace, add) {
@@ -265,12 +381,14 @@ function swapChips(ask, replace, add) {
 
 /** 프로필·공고·보관함에 맞춰 보기를 고쳐 낸다. 원본 ESSAY_ASKS 는 그대로 둔다. */
 function tailorAsks(asks, ctx) {
-  const p = (ctx && ctx.profile) || null;
-  if (!p) return asks;
+  const p = (ctx && ctx.profile) || {};
   const track = p.track || '';
   const stage = essayStage(p);
   const flags = p.flags || [];
   const docs = (ctx && ctx.docs) || [];
+  /* B — 공고 원문이 실제로 말한 것만. 없으면 빈 배열이라 예전과 똑같이 동작한다. */
+  const focusChips = [];
+  for (const f of foundationFocus(ctx && ctx.scholarship)) for (const c of f.chips) if (!focusChips.includes(c)) focusChips.push(c);
 
   const extra = [];
   if (p.cert) extra.push(SIGNAL_CHIPS.cert);
@@ -289,6 +407,10 @@ function tailorAsks(asks, ctx) {
     /* 사정 — 지역·가구 신호를 덧붙인다 */
     if (a.id === 'need' && extra.length) return swapChips(a, null, extra);
     if (a.id === 'change' && p.exchange) return swapChips(a, null, ['교환학생 준비에 집중']);
+    /* B — 이 재단이 보는 것과 이어지는 보기를 **앞에** 둔다 (know-the-foundation).
+       학생에게 새로 묻지 않는다. 이미 있는 보기의 순서만 바꾼다. */
+    if (focusChips.length && (a.id === 'now' || a.id === 'prep' || a.id === 'proud' || a.id === 'plan' || a.id === 'think'))
+      return swapChips(a, null, focusChips);
     return a;
   });
 
@@ -311,15 +433,28 @@ function essayAskFor(field, ctx) {
   const target = essayTargetChars(`${label} ${hint}`);
   /* 데이터가 이긴다 — 사람이 원본을 보고 적어 둔 것이 규칙보다 낫다 */
   if (field && Array.isArray(field.ask) && field.ask.length) {
-    return { kind: 'data', target, asks: field.ask, scene: SCENE_ASKS };
+    return {
+      kind: 'data', target, asks: field.ask,
+      scene: storyAsksFor(essayKindOf(label, hint)),
+      focus: foundationFocus(ctx && ctx.scholarship),
+      blind: blindReview(ctx && ctx.scholarship),
+    };
   }
   const kind = essayKindOf(label, hint);
   const base = ESSAY_ASKS[kind] || ESSAY_ASKS.generic;
   /* ctx 를 안 주면 예전과 똑같이 동작한다 — 검사 도구·감사가 그대로 쓴다 */
-  return { kind, target, asks: ctx ? tailorAsks(base, ctx) : base, scene: SCENE_ASKS };
+  return {
+    kind, target,
+    asks: ctx ? tailorAsks(base, ctx) : base,
+    scene: storyAsksFor(kind),
+    focus: foundationFocus(ctx && ctx.scholarship),
+    blind: blindReview(ctx && ctx.scholarship),
+  };
 }
 
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { essayAskFor, essayKindOf, essayTargetChars, essayStage, tailorAsks,
-    ESSAY_ASKS, ESSAY_KINDS, SCENE_ASKS, TRACK_SPEND, TRACK_PREP, DOC_SIGNAL };
+    foundationFocus, blindReview, storyAsksFor,
+    ESSAY_ASKS, ESSAY_KINDS, SCENE_ASKS, STORY_ASKS, FOCUS_THEMES,
+    TRACK_SPEND, TRACK_PREP, DOC_SIGNAL };
 }
