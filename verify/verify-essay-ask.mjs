@@ -300,6 +300,11 @@ head('9) 🔴 맞춤 보기에도 민감 낱말이 없는가 (전수)');
     ok(storyAsksFor(k).length === 3, `${k} — 카드가 길어지지 않게 3개까지`);
   ok(STORY_ASKS.every((a) => !a.free && Array.isArray(a.c) && a.c.length),
     '🔴 스토리텔링 질문은 전부 눌러서 고르는 것이다 — 학생이 글을 쓰지 않는다');
+  /* 🔴 숫자를 만들어 주는 질문이 잘려 나가지 않는가 — 자리가 3칸뿐이라 순서가 곧 생존이다 */
+  const 숫자없는칸 = ['motive', 'growth', 'character', 'value', 'study', 'future', 'share', 'episode', 'message', 'intro', 'generic']
+    .filter((k) => !storyAsksFor(k).some((a) => a.id === 'howLong'));
+  ok(숫자없는칸.length === 0,
+    "🔴 어느 칸에서든 '얼마나 오래'가 살아남는다 — 규칙집이 숫자로 쓰라고 한다", 숫자없는칸.join(', '));
 }
 
 /* ───────────────────────────────────────────────────────────────────────────
@@ -322,6 +327,22 @@ head('9) 🔴 맞춤 보기에도 민감 낱말이 없는가 (전수)');
   ok(urls.some((u) => u.endsWith('/tips/jagisogeseo')), '주제인 링크를 줍는다 (제목으로)');
   ok(urls.some((u) => /%EA%B8%80%EC%93%B0%EA%B8%B0|글쓰기/.test(decodeURIComponent(u))), '다른 집 링크도 줍는다');
   ok(!urls.some((u) => /login|cart|recruit/.test(u)), '🔴 로그인·장바구니·채용은 줍지 않는다');
+
+  /* 🔴 1차 자동 확장에서 실제로 승격됐던 곳들이다 — 이 기능의 뼈대를 뒤집는 곳이라 막았다 */
+  const 예시문사이트 = `
+    <a href="https://linkareer.com/cover-letter/search">자기소개서</a>
+    <a href="https://x.example/a?keyword=삼성">삼성 최신 합격자소서</a>
+    <a href="https://x.example/자소서-예시문-모음">자소서 예시문 모음</a>
+    <a href="https://community.example/junior_activity">서류 합격 후기</a>`;
+  const 막힌것 = linkCandidates(예시문사이트, 'https://ex.example/');
+  ok(막힌것.length === 0,
+    '🔴 합격자소서·예시문 모음은 줍지 않는다 — 표절·저작권·획일화 때문에 안 쓰기로 한 곳이다',
+    막힌것.map((g) => g.url).join(', '));
+
+  /* 앵커 글자에 속성이 섞이지 않는가 — 1차 실행에서 data-tiara-layer 가 제목으로 잡혔다 */
+  const 속성섞임 = linkCandidates('<a href="/t/자기소개서" data-x="본문 하단 > 키워드 클릭">장학금 자기소개서</a>', 'https://ex.example/');
+  ok(속성섞임.length === 1 && !/data-|=|"/.test(속성섞임[0].text),
+    '링크 제목에 HTML 속성이 섞이지 않는다', 속성섞임[0] && 속성섞임[0].text);
   ok(!urls.some((u) => u.endsWith('/notice')), '주제라는 표시가 없으면 줍지 않는다');
   ok(got.every((g) => /^https?:/.test(g.url) && !g.url.includes('#')), '주소는 절대주소이고 조각(#)이 없다');
 

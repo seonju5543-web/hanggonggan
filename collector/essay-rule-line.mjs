@@ -32,14 +32,22 @@ export function isCandidate(line) {
 
 export const TOPIC = /(자기소개서|자소서|장학금|장학생|작성법|작성-법|글쓰기|첨삭|지원서|합격|자소서작성)/;
 /* 주제어가 있어도 이런 곳은 규칙이 아니라 광고·서비스다 */
-export const NOT_SOURCE = /(login|signin|signup|join|cart|order|pay|price|이력서|resume|채용|recruit|job)/i;
+/* 🔴 '예시문 모음'은 출처가 아니다 — 이 기능의 뼈대를 뒤집는 곳이다.
+   1차 자동 확장에서 로봇이 **합격자소서 데이터베이스 2곳을 승격시켰다.**
+   규칙이 붙은 이유는 그 집 메뉴에 '자기소개서'가 있어서였지 글에 규칙이 있어서가 아니다.
+   우리가 예시문을 안 쓰기로 한 이유는 셋이다(docs/designs/essay-tailoring.md):
+   ① 재단의 표절 검사 ② 저작권 ③ 모두가 같은 예시를 보면 오히려 획일화된다.
+   자동으로 넓히더라도 이 선은 넘지 않는다. */
+export const NOT_SOURCE = /(login|signin|signup|join|cart|order|pay|price|이력서|resume|채용|recruit|job|합격\s*자소서|합격\s*자기소개서|자소서\s*모음|예시문|샘플|cover-letter|자소서\s*검색|합격\s*후기)/i;
 
 /** 읽은 글에서 '다음에 읽을 만한 곳' 을 줍는다 */
 export function linkCandidates(html, baseUrl) {
   const out = [];
   for (const m of String(html).matchAll(/<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]{0,120}?)<\/a>/gi)) {
     const [, href, inner] = m;
-    const text = inner.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    /* 속성이 섞여 들어오지 않게 — 1차 실행에서 `data-tiara-layer="..."` 가 제목으로 잡혔다 */
+    const text = inner.replace(/<[^>]*>?/g, ' ').replace(/[\w-]+=["'][^"']*["']/g, ' ')
+      .replace(/["'>]/g, ' ').replace(/\s+/g, ' ').trim();
     let abs; try { abs = new URL(href, baseUrl).toString(); } catch { continue; }
     if (!/^https?:/.test(abs)) continue;
     if (NOT_SOURCE.test(abs) || NOT_SOURCE.test(text)) continue;
