@@ -8,7 +8,7 @@
       "url": "https://brunch.co.kr/@geonahn/425",
       "kind": "*",
       "note": "장학재단 운영자가 쓴 심사 관점",
-      "strike": 2
+      "strike": 3
     },
     {
       "url": "https://community.linkareer.com/employment_data/4250237",
@@ -38,7 +38,7 @@
       "url": "https://soomgo.com/community/pro-knowhow/64d1ccfa207c23ba67c9350b",
       "kind": "*",
       "note": "두괄식 작성법 · 첫 문장",
-      "strike": 2
+      "strike": 3
     },
     {
       "url": "https://www.skillagit.com/mobile/people/curation_view.php?idx=522",
@@ -82,6 +82,13 @@
       "url": "https://linkareer.com/activity/284206",
       "kind": "*",
       "note": "로봇이 스스로 찾음 — 2026 협성문화재단신규 협성장학생",
+      "addedAt": "2026-08-24",
+      "strike": 0
+    },
+    {
+      "url": "https://www.skillagit.com/product/view.php?idx=3862",
+      "kind": "*",
+      "note": "로봇이 스스로 찾음 — &gt;&gt;&gt;카이스트 출신 현직 면접관, 임원이 내 자소서를 첨삭해준다면 &gt;&gt;&gt;",
       "addedAt": "2026-08-24",
       "strike": 0
     }
@@ -156,6 +163,31 @@
     },
     {
       "url": "https://www.skillagit.com/mobile/product/view.php?idx=17880&amp;code=1216?%3E",
+      "seenAt": "2026-08-24",
+      "why": "규칙 0종"
+    },
+    {
+      "url": "https://www.skillagit.com/mobile/product/view.php?idx=17871&amp;code=1212?%3E",
+      "seenAt": "2026-08-24",
+      "why": "규칙 0종"
+    },
+    {
+      "url": "https://www.skillagit.com/mobile/product/view.php?idx=17843&amp;code=1212?%3E",
+      "seenAt": "2026-08-24",
+      "why": "규칙 0종"
+    },
+    {
+      "url": "https://www.skillagit.com/people/people_view.php?b_id=008&amp;idx=531",
+      "seenAt": "2026-08-24",
+      "why": "규칙 0종"
+    },
+    {
+      "url": "https://www.skillagit.com/people/people_view.php?b_id=008&amp;idx=728",
+      "seenAt": "2026-08-24",
+      "why": "규칙 0종"
+    },
+    {
+      "url": "https://www.skillagit.com/people/people_view.php?b_id=008&amp;idx=762",
       "seenAt": "2026-08-24",
       "why": "규칙 0종"
     }
