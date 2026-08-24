@@ -81,10 +81,14 @@
           <div class="field">
             <span class="field-label">학적 상태</span>
             <div class="chip-group" id="in-status">
-              <button class="chip" data-value="enrolled">재학</button>
-              <button class="chip" data-value="freshman">신입학 첫 학기</button>
-              <button class="chip" data-value="returning">복학</button>
+              <button class="chip" data-value="재학">재학</button>
+              <button class="chip" data-value="신입학">신입학 첫 학기</button>
+              <button class="chip" data-value="복학예정">복학 예정</button>
+              <button class="chip" data-value="휴학">휴학</button>
+              <button class="chip" data-value="초과학기">초과학기</button>
+              <button class="chip" data-value="졸업유예">졸업유예</button>
             </div>
+            <span class="field-hint">'휴학생 지원 불가' 같은 조건이 많아, 이 항목이 적합도에 가장 크게 반영돼요</span>
           </div>
         </div>
         <div class="onboard-actions">
@@ -103,6 +107,11 @@
             <span class="field-hint">신입학 첫 학기는 성적 요건이 면제 처리돼요 (비워두어도 괜찮아요)</span>
           </label>
           <label class="field">
+            <span class="field-label">직전학기 이수학점</span>
+            <input type="number" id="in-credits" placeholder="예: 15" min="0" max="30" step="1" inputmode="numeric" />
+            <span class="field-hint">'직전학기 12학점 이상' 같은 조건을 판단하는 데 써요</span>
+          </label>
+          <label class="field">
             <span class="field-label">학자금 지원구간 (소득구간)</span>
             <select id="in-bracket">
               <option value="">모름 / 미산정</option>
@@ -114,14 +123,40 @@
             </select>
             <span class="field-hint">한국장학재단에서 산정한 구간이에요. 모르면 '모름'을 선택해도 매칭돼요.</span>
           </label>
-          <div class="field">
-            <span class="field-label">거주 지역</span>
-            <div class="chip-group" id="in-region">
-              <button class="chip" data-value="seoul">서울</button>
-              <button class="chip" data-value="gyeonggi">경기/인천</button>
-              <button class="chip" data-value="etc">그 외</button>
-            </div>
-          </div>
+          <label class="field">
+            <span class="field-label">본인 거주 지역</span>
+            <select id="in-region">
+              <option value="">선택 안 함</option>
+              <option>서울</option><option>부산</option><option>대구</option><option>인천</option>
+              <option>광주</option><option>대전</option><option>울산</option><option>세종</option>
+              <option>경기</option><option>강원</option><option>충북</option><option>충남</option>
+              <option>전북</option><option>전남</option><option>경북</option><option>경남</option><option>제주</option>
+            </select>
+          </label>
+          <label class="field">
+            <span class="field-label">부모님 거주 지역</span>
+            <select id="in-parent-region">
+              <option value="">본인과 같음 / 선택 안 함</option>
+              <option>서울</option><option>부산</option><option>대구</option><option>인천</option>
+              <option>광주</option><option>대전</option><option>울산</option><option>세종</option>
+              <option>경기</option><option>강원</option><option>충북</option><option>충남</option>
+              <option>전북</option><option>전남</option><option>경북</option><option>경남</option><option>제주</option>
+            </select>
+            <span class="field-hint">지역 장학금은 '부 또는 모가 1년 이상 거주'를 요구하는 곳이 많아요</span>
+          </label>
+          <label class="field">
+            <span class="field-label">국적</span>
+            <select id="in-nationality">
+              <option value="korean">대한민국</option>
+              <option value="foreign">외국인 유학생</option>
+              <option value="dual">복수국적 · 영주권</option>
+            </select>
+          </label>
+          <label class="field">
+            <span class="field-label">태어난 해 (선택)</span>
+            <input type="number" id="in-birth-year" placeholder="예: 2004" min="1940" max="2020" step="1" inputmode="numeric" />
+            <span class="field-hint">'만 39세 이하' 같은 나이 조건에만 써요</span>
+          </label>
         </div>
         <div class="onboard-actions">
           <button class="btn btn-primary btn-lg" data-next>다음</button>
@@ -139,6 +174,9 @@
             <label class="check-item"><input type="checkbox" value="multiChild" /><span>다자녀 가구 (3자녀 이상)</span></label>
             <label class="check-item"><input type="checkbox" value="merit" /><span>국가유공자 (본인/자녀)</span></label>
             <label class="check-item"><input type="checkbox" value="disabled" /><span>장애 학생</span></label>
+            <label class="check-item"><input type="checkbox" value="singleParent" /><span>한부모 가정</span></label>
+            <label class="check-item"><input type="checkbox" value="defector" /><span>북한이탈주민 (본인/자녀)</span></label>
+            <label class="check-item"><input type="checkbox" value="multicultural" /><span>다문화 가정</span></label>
           </div>
           <div class="check-list" id="in-extra">
             <label class="check-item"><input type="checkbox" id="in-cert" /><span>공인 외국어성적 보유 (FLEX, TOEFL, HSK 등)</span></label>
@@ -345,6 +383,7 @@
   <script src="data.js"></script>
   <!-- 절 경계 판정 — match-engine이 전역으로 참조하므로 반드시 먼저 실어야 한다 -->
   <script src="section-head.js"></script>
+  <script src="parse-requirements.js"></script>
   <script src="match-engine.js"></script>
   <script src="notify-rules.js"></script>
   <script src="push-config.js"></script>

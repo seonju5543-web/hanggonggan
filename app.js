@@ -40,12 +40,27 @@ function migrateBranchCampus(p) {
   return p;
 }
 
+/* 🔴 적합도 재설계로 값의 **모양이 바뀐 항목**을 옮긴다 (2026-08-24 · docs/designs/fit-score.md).
+   이런 이전을 빼먹으면 기존 사용자의 학적상태가 갈 곳을 잃어 판정이 통째로 'unknown'이 되고,
+   적합도가 이유 없이 뚝 떨어진다(분교 나눌 때 겪은 것과 같은 유형이다 — 원칙 7).
+     · 학적상태: 영문 코드 → 파서와 같은 한글 낱말
+     · 거주지: 뭉뚱그린 3분류 → 시·도 이름 (경기/인천은 가를 수 없으니 경기로 둔다) */
+const LEGACY_STATUS = { enrolled: '재학', freshman: '신입학', returning: '복학예정' };
+const LEGACY_REGION = { seoul: '서울', gyeonggi: '경기', etc: null };
+function migrateFitFields(p) {
+  if (!p) return p;
+  if (p.status && LEGACY_STATUS[p.status]) p.status = LEGACY_STATUS[p.status];
+  if (p.region && LEGACY_REGION[p.region] !== undefined) p.region = LEGACY_REGION[p.region];
+  if (p.nationality == null) p.nationality = 'korean';   // 예전 사용자는 국적을 물은 적이 없다
+  return p;
+}
+
 function loadState() {
   try {
     let raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) for (const k of LEGACY_KEYS) { raw = localStorage.getItem(k); if (raw) break; }
     if (raw) state = Object.assign(state, JSON.parse(raw));
-    if (state.profile) migrateBranchCampus(state.profile);
+    if (state.profile) { migrateBranchCampus(state.profile); migrateFitFields(state.profile); }
   } catch (e) { /* 손상된 데이터는 무시 */ }
 }
 function saveState() {
@@ -78,7 +93,7 @@ function getMatches() {
   const p = state.profile;
   return allScholarships().map((s) => {
     const result = evaluate(s, p);
-    return { sch: s, result, fit: fitScore(s, result, p) };
+    return { sch: s, result, fit: fitScore(s, result, p), fd: fitDetail(s, p) };
   });
 }
 
@@ -460,13 +475,17 @@ function initOnboarding() {
     setChip('#in-track', p.track);
     setChip('#in-year', String(p.year));
     setChip('#in-status', p.status);
-    setChip('#in-region', p.region);
+    $('#in-region').value = p.region || '';
+    $('#in-parent-region').value = p.parentRegion || '';
+    $('#in-nationality').value = p.nationality || 'korean';
+    $('#in-credits').value = p.credits != null ? p.credits : '';
+    $('#in-birth-year').value = p.birthYear || '';
     $$('#in-flags input').forEach((cb) => (cb.checked = p.flags.includes(cb.value)));
   } else {
     setChip('#in-track', 'humanities');
     setChip('#in-year', '1');
-    setChip('#in-status', 'enrolled');
-    setChip('#in-region', 'seoul');
+    setChip('#in-status', '재학');
+    $('#in-nationality').value = 'korean';
   }
 
   renderCampusChips(p ? p.campus : null);
@@ -513,7 +532,14 @@ function collectProfile() {
     gpa: Number.isNaN(gpa) ? null : gpa,
     bracket: bracketRaw === '' ? null : Number(bracketRaw),
     campus: $('#campus-field').hidden ? '' : (getChip('#in-campus') || ''),
-    region: getChip('#in-region'),
+    /* 적합도 판정에 쓰는 값들 — 자격 요건의 37%(학적상태)·9%(학점)·7%(거주지)를 연다.
+       빈 칸은 null로 둔다. **모르면 판정하지 않는 것**이 이 앱의 규칙이라, 0이나 기본값을
+       넣으면 안 된다(엉뚱한 0% 판정이 난다). 설계: docs/designs/fit-score.md */
+    region: $('#in-region').value || null,
+    parentRegion: $('#in-parent-region').value || null,
+    nationality: $('#in-nationality').value || null,
+    credits: $('#in-credits').value.trim() === '' ? null : Number($('#in-credits').value),
+    birthYear: $('#in-birth-year').value.trim() === '' ? null : Number($('#in-birth-year').value),
     flags: $$('#in-flags input:checked').map((c) => c.value),
     cert: $('#in-cert').checked,
     exchange: $('#in-exchange').checked,
@@ -539,8 +565,22 @@ const LEARNED_COMMON = [
   ['rrn', '주민등록번호'],
 ];
 
+/* 적합도 배지 — **숫자만 두지 않는다** (2026-08-24 · docs/designs/fit-score.md).
+   개발자 지적: "적합도 높은 줄 알고 들어갔는데 신청을 못 하면 피로감이 쌓여 앱을 안 쓰게 된다."
+   그래서 퍼센트 옆에 근거를 함께 적어, 학생이 **누르기 전에** 판단할 수 있게 한다.
+     · 0%      → 왜 안 되는지 (미달 사유)
+     · 미확인   → 앱이 자격을 못 읽었음을 밝힌다 (지어내지 않는다 — 원칙 8-1)
+     · 그 외    → 요건 n개 중 m개 충족 */
+function fitBadgeHtml(fit, fd) {
+  if (!fd) return fit > 0 ? `<span class="badge badge-fit">적합도 ${fit}%</span>` : '';
+  if (fd.unread) return '<span class="badge badge-fit-unknown">자격 미확인</span>';
+  if (fd.pct === 0) return '<span class="badge badge-fit-no">지원 자격 미달</span>';
+  const note = fd.unknown > 0 ? ` · 확인 필요 ${fd.unknown}` : '';
+  return `<span class="badge badge-fit">적합도 ${fd.pct}% <em>요건 ${fd.total}개 중 ${fd.met}개 충족${note}</em></span>`;
+}
+
 /* ---------------- 카드 렌더링 ---------------- */
-function schCard(sch, result, { compact = false, fit = 0 } = {}) {
+function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
   const meta = STATUS_META[result.status];
   const d = dday(sch.deadline);
   const applied = state.applications.some((a) => a.id === sch.id);
@@ -551,7 +591,7 @@ function schCard(sch, result, { compact = false, fit = 0 } = {}) {
         ${sch.program ? '<span class="badge badge-program">상시 제도</span>' : `<span class="badge badge-dday ${d.cls}">${d.label}</span>`}
         ${sch.auto ? '<span class="badge badge-auto">자동 등록 · 검수 전</span>' : ''}
         ${applied ? '<span class="badge badge-applied">신청함</span>' : ''}
-        ${fit > 0 ? `<span class="badge badge-fit">적합도 ${fit}%</span>` : ''}
+        ${fitBadgeHtml(fit, fd)}
       </div>
       <p class="sch-name">${esc(sch.name)}</p>
       <p class="sch-amount">${esc(sch.amount)}</p>
@@ -589,7 +629,7 @@ function renderHome() {
     .sort((a, b) => deadlineTs(a.sch) - deadlineTs(b.sch))
     .slice(0, 3);
   $('#home-deadline-list').innerHTML = upcoming.length
-    ? upcoming.map((m) => schCard(m.sch, m.result, { compact: true, fit: m.fit })).join('')
+    ? upcoming.map((m) => schCard(m.sch, m.result, { compact: true, fit: m.fit, fd: m.fd })).join('')
     : '<p class="empty">지금 신청 가능한 장학금이 없어요. 프로필을 업데이트해 보세요.</p>';
 
   const recent = state.applications.slice(-2).reverse().filter((a) => findSch(a.id));
@@ -622,7 +662,7 @@ function renderExplore() {
 
   $('#live-notices').innerHTML = exploreFilter === 'all' ? liveNoticesHtml() : '';
   $('#explore-list').innerHTML = list.length
-    ? list.map((m) => schCard(m.sch, m.result, { fit: m.fit })).join('')
+    ? list.map((m) => schCard(m.sch, m.result, { fit: m.fit, fd: m.fd })).join('')
     : '<p class="empty">조건에 맞는 장학금이 없어요.</p>';
 }
 
@@ -1132,6 +1172,7 @@ function openDetail(id) {
   if (!sch) return;
   const result = evaluate(sch, state.profile);
   const fit = fitScore(sch, result, state.profile);
+  const fd = fitDetail(sch, state.profile);
   const meta = STATUS_META[result.status];
   const d = dday(sch.deadline);
   const app = state.applications.find((a) => a.id === id);
@@ -1262,7 +1303,7 @@ function openDetail(id) {
         <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${sch.type}</span>
         ${sch.program ? '<span class="badge badge-program">상시 제도</span>' : `<span class="badge badge-dday ${d.cls}">${d.label}</span>`}
         ${sch.auto ? '<span class="badge badge-auto">자동 등록 · 검수 전</span>' : ''}
-        ${fit > 0 ? `<span class="badge badge-fit">적합도 ${fit}%</span>` : ''}
+        ${fitBadgeHtml(fit, fd)}
         <span class="status-pill pill-${meta.cls}">${meta.label}</span>
       </div>
       <h3 class="sheet-title">${esc(sch.name)}</h3>
