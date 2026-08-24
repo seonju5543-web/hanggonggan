@@ -1441,3 +1441,10 @@ textarea.essay-drafted { border-color: var(--primary); background: #fbfcff; line
 .essay-fix li { font-size: 12.5px; color: var(--text-sub); line-height: 1.6; }
 .essay-fix li + li { margin-top: 5px; }
 .essay-fix li::before { content: '✎ '; color: var(--orange); font-weight: 700; }
+/* 이 공고가 정한 작성 규정 배너 (2026-08-24) — 지키지 않으면 심사 제외·감점되는 규정 */
+.essay-rules-banner { border: 1px solid var(--line, #e5e7eb); border-radius: 12px; padding: 12px 14px; margin: 10px 0; background: var(--card-bg, #fff); }
+.essay-rules-banner > b { display: block; margin-bottom: 6px; font-size: 13.5px; }
+.essay-rules-banner ul { margin: 6px 0 0; padding-left: 18px; }
+.essay-rules-banner li { font-size: 12.5px; line-height: 1.5; margin: 2px 0; }
+.essay-rule-danger { color: #c0392b; font-weight: 600; }
+:root[data-theme="dark"] .essay-rule-danger, :root:not([data-theme="light"]) .essay-rule-danger { color: #ff8a7a; }

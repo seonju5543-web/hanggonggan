@@ -205,6 +205,37 @@ console.log(`감사 대상: 정식 등록 ${reg.items.length}건 · 양식 ${Obj
   }
 }
 
+/* ── 🔴 초안이 학생을 탈락시키지 못하게 하는 관문 (2026-08-24) ──
+   개발자 지적: "공고 원문·첨부에서 드러난 위험과 같은 위험이 또 있나? 자격 매칭 개발과
+   엮어 확인하고 예방할 수 있나?"
+
+   있었다. 코퍼스 전수를 훑어 보니 초안에 영향을 주는 실격·감점 규정이 세 갈래였다:
+     ① 블라인드 심사 — 학교명을 쓰면 **심사에서 제외**. 앱이 학교명을 서버로 보낸다.
+     ② 분량 미달/초과 — "1페이지 미만 심사 제외" · "2페이지 초과 페이지당 감점".
+     ③ 내용 부실/질문 무관 — 초안이 엉뚱하면 제외(품질 규칙이 이미 짚는다).
+   (참고: '대필'은 9건 나왔지만 전부 '수업 대필 도우미'라는 근로장학 역할명이었다 —
+    자기소개서 대필 금지가 아니다. 오해해서 기능을 막지 않도록 확인 후 남긴다.)
+
+   자격 매칭과 엮는 방식은 **관문을 공유**하는 것이다. 자격 잡음이 리포트가 아니라
+   관문이 되어서야 재발이 끝났듯(위 절), 이 위험도 관문으로 막는다:
+     **코퍼스가 '블라인드'라고 말하는 공고를 앱(essay-form-rules.json)이 모르면 배포 차단.**
+   그러면 새 블라인드 공고가 들어와도 앱이 학교명을 지우지 못한 채 나가는 일이 없다.
+   판정은 자격 추출과 **같은 원문 링크 규칙**(notice-source·canon-url)을 쓰는 miner 다. */
+try {
+  const { mine } = require('../collector/essay-house-mine.mjs');
+  const rulesPath = path.join(__dirname, '..', 'data', 'essay-form-rules.json');
+  const deployed = fs.existsSync(rulesPath) ? JSON.parse(fs.readFileSync(rulesPath, 'utf8')).notices || {} : {};
+  const fresh = mine().perNotice;              // 코퍼스에서 지금 다시 계산한 것
+  for (const [id, v] of Object.entries(fresh)) {
+    if (v.blind && !(deployed[id] && deployed[id].blind)) {
+      errors.push(`essay-form-rules:${id} — 코퍼스는 블라인드 심사 공고라는데 앱이 모릅니다. ` +
+        `학교명이 든 초안이 나가면 학생이 심사에서 제외됩니다 — '작성 규칙 학습' 워크플로(읽고 저장)를 돌려 갱신하세요`);
+    }
+  }
+} catch (e) {
+  warns.push(`초안 위험 관문을 돌리지 못했습니다: ${e.message.slice(0, 80)}`);
+}
+
 if (errors.length) { console.log('\n[오류 — 반드시 수정]'); errors.forEach((e) => console.log(' ✕', e)); }
 if (warns.length) { console.log('\n[경고 — 소급 적용 필요 항목]'); warns.forEach((w) => console.log(' ⚠', w)); }
 if (!errors.length && !warns.length) console.log('✓ 모든 데이터가 현재 엔진 기준을 충족합니다');

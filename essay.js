@@ -250,10 +250,41 @@ function essayComposeLocal(field) {
   return asks.map((a) => `· ${a.q}: ${a.a}`).join('\n');
 }
 
-function essayBind(tpl, sch) {
+/* ── 이 공고가 정한 규정을 학생에게 보여 준다 (2026-08-24) ──
+   🔴 재단이 공고·첨부에 직접 적은 규정이다(essay-house-mine.mjs 가 캤다). 지키지 않으면
+      **심사에서 제외되거나 감점된다** — 코퍼스 전수에서 실제로 나온 위험이다:
+        · 학교명을 쓰면 심사 제외(블라인드)  · 1페이지 미만 심사 제외  · 2페이지 초과 감점
+   초안 서버에도 같은 규정을 조건으로 보내지만(essaySend), 학생이 **직접 눈으로** 봐야
+   초안을 믿고 그대로 낼 수 있다. 원문 그대로 보여 준다 — 우리가 요약하지 않는다(원칙 8-1). */
+function essayRulesBannerHtml(sch) {
+  const r = essayNoticeRules(sch);
+  if (!r.lines.length && !r.blind) return '';
+  const 위험 = /(심사에서\s*제외|심사\s*제외|감점|실격|무효|식별할\s*수\s*있는|블라인드)/;
+  const items = r.lines.slice(0, 5).map((l) =>
+    `<li class="${위험.test(l) ? 'essay-rule-danger' : ''}">${esc(l)}</li>`).join('');
+  return `<div class="essay-rules-banner">` +
+    `<b>📋 이 공고가 정한 작성 규정 — 꼭 지켜야 해요</b>` +
+    (r.blind ? `<p class="essay-rule-danger">🔴 <b>블라인드 심사</b>: 학교 이름을 쓰면 심사에서 제외돼요. ` +
+      `초안에는 학교 이름을 넣지 않아요(전공은 괜찮아요).</p>` : '') +
+    (items ? `<ul>${items}</ul>` : '') +
+    `<p class="essay-fine">재단이 공고·첨부에 직접 적은 문구예요.</p></div>`;
+}
+
+async function essayBind(tpl, sch) {
   const btn = document.getElementById('btn-essay-ai');
   if (!btn) return;
   btn.addEventListener('click', () => essaySend(tpl, sch, btn));
+  /* 규정 배너 — 규정 파일을 받아 버튼 위에 끼운다. 없으면 아무것도 안 뜬다. */
+  try {
+    await essayLoadFormRules();
+    const html = essayRulesBannerHtml(sch);
+    if (html && !document.getElementById('essay-rules-banner-box')) {
+      const box = document.createElement('div');
+      box.id = 'essay-rules-banner-box';
+      box.innerHTML = html;
+      btn.parentNode.insertBefore(box, btn);
+    }
+  } catch (e) { /* 규정을 못 받아도 버튼은 그대로 동작한다 */ }
 }
 
 async function essaySend(tpl, sch, btn) {

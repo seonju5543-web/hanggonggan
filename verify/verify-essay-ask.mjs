@@ -401,5 +401,34 @@ head('9) 🔴 맞춤 보기에도 민감 낱말이 없는가 (전수)');
   }
 }
 
+/* ───────────────────────────────────────────────────────────────────────────
+   14) 🔴 위험 원문 — 집 안 자료에서 캔 작성 규정과 감사 관문
+   개발자 지적: "같은 위험이 또 있나? 자격 매칭과 엮어 예방할 수 있나?"
+   ─────────────────────────────────────────────────────────────────────────── */
+{
+  head('14) 🔴 위험 원문 규정 — 캐기와 관문');
+  const { isFormRule, isBlind, mine } = await import('../collector/essay-house-mine.mjs');
+
+  ok(isBlind(['자기소개서에 소속 대학교를 식별할 수 있는 정보(학교명 등)를 기재한 경우 심사에서 제외']),
+    '블라인드 심사 규정을 알아본다');
+  ok(isFormRule('자기소개서 전체 분량이 1페이지 미만인 경우 심사에서 제외됩니다.'),
+    '분량 미달 실격 규정을 규정으로 캔다');
+  ok(!isFormRule('[자기소개서 작성 규정 및 감점 기준]'),
+    '🔴 대괄호 머리글은 규정이 아니다 — 학생에게 규칙으로 보여 주면 소음이다');
+  ok(!isFormRule('※ 제출 전, 본 문구를 포함한 안내문을 모두 삭제해 주세요.'),
+    '서식 설명박스 안내는 규정이 아니다');
+  ok(!isFormRule('지원서류: 성적증명서 1부'),
+    '제출 서류 목록은 작성 규정이 아니다');
+
+  const { perNotice } = mine();
+  const blindCount = Object.values(perNotice).filter((v) => v.blind).length;
+  ok(blindCount >= 1, `코퍼스에서 블라인드 심사 공고를 찾는다 (${blindCount}건)`);
+
+  /* 감사 관문이 실제로 배선돼 있는가 — 배선이 끊기면 새 블라인드 공고가 그대로 나간다 */
+  const audit = fs.readFileSync(new URL('../verify/audit-data.js', import.meta.url), 'utf8');
+  ok(/essay-house-mine/.test(audit) && /essay-form-rules/.test(audit) && /errors\.push/.test(audit.slice(audit.indexOf('essay-house-mine'))),
+    '🔴 감사가 essay-form-rules 를 코퍼스와 대조해 배포를 막는다 (자격 매칭과 같은 관문 방식)');
+}
+
 console.log(`\n${fail ? '✗' : '✓'} 키워드 질문 — 통과 ${pass} · 실패 ${fail}`);
 process.exit(fail ? 1 : 0);
