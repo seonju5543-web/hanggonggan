@@ -20,6 +20,7 @@
    ============================================================ */
 import fs from 'node:fs';
 import path from 'node:path';
+import { isCandidate } from './essay-rule-line.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const rd = (p) => JSON.parse(fs.readFileSync(path.join(ROOT, p), 'utf8'));
@@ -51,38 +52,9 @@ const VOCAB = {
   'use-itemized': [/사용\s*계획/, /사용처/, /어디에\s*쓸/],
   'episode-star': [/STAR/i, /상황.*행동.*결과/, /경험\s*기술/],
   'message-short': [/간결/, /짧게/, /담백/],
+  'consistency': [/통일성/, /일관성/, /한\s*방향/, /끝까지\s*이어/],
+  'plain-sentence': [/군더더기/, /주어와\s*서술어/, /수식어/, /간결한\s*문장/],
 };
-
-/* 규칙처럼 생긴 문장인가 — 목록 항목이거나 권고·금지형 어미로 끝난다 */
-const LISTY = /^\s*(?:[-–—·•●▶▸◆■□▣①②③④⑤⑥⑦⑧⑨⑩]|\d{1,2}[.)])\s*/;
-const ADVICE = /(하세요|해야|하지\s*마|하지\s*말|것이\s*좋|중요합?니다|피하|권장|필수|금물|안\s*됩니다|주의)/;
-
-/* 규칙 후보로 볼 수 없는 줄 — 게시판 껍데기·광고·목차 */
-const JUNK = /(로그인|회원가입|댓글|조회수|구독|광고|저작권|무단전재|이전\s*글|다음\s*글|목차|바로가기|앱\s*다운|카카오|공유하기|스크랩)/;
-
-/** HTML 에서 글자만 — 태그를 지우고 줄로 자른다 */
-function toLines(html) {
-  const body = String(html)
-    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
-    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
-    .replace(/<\/(p|div|li|h[1-6]|br|tr)>/gi, '\n')
-    .replace(/<br\s*\/?>/gi, '\n')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"').replace(/&#39;/g, "'");
-  return body.split(/\n+/).map((l) => l.replace(/\s+/g, ' ').trim()).filter(Boolean);
-}
-
-/** 이 줄이 규칙 후보인가 */
-function isCandidate(line) {
-  const t = line.replace(LISTY, '').trim();
-  if (t.length < 8 || t.length > 120) return null;
-  if (JUNK.test(t)) return null;
-  if (!/[가-힣]/.test(t)) return null;
-  const listy = LISTY.test(line);
-  if (!listy && !ADVICE.test(t)) return null;
-  return t;
-}
 
 /** 이 문장이 어느 규칙을 말하고 있나 */
 function matchRule(text) {
