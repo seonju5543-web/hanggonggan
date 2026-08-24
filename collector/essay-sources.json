@@ -8,7 +8,7 @@
       "url": "https://brunch.co.kr/@geonahn/425",
       "kind": "*",
       "note": "장학재단 운영자가 쓴 심사 관점",
-      "strike": 1
+      "strike": 2
     },
     {
       "url": "https://community.linkareer.com/employment_data/4250237",
@@ -38,7 +38,7 @@
       "url": "https://soomgo.com/community/pro-knowhow/64d1ccfa207c23ba67c9350b",
       "kind": "*",
       "note": "두괄식 작성법 · 첫 문장",
-      "strike": 1
+      "strike": 2
     },
     {
       "url": "https://www.skillagit.com/mobile/people/curation_view.php?idx=522",
@@ -75,6 +75,13 @@
       "url": "https://linkareer.com/activity/277626",
       "kind": "*",
       "note": "로봇이 스스로 찾음 — 2026 에몬스 18기 장학생",
+      "addedAt": "2026-08-24",
+      "strike": 0
+    },
+    {
+      "url": "https://linkareer.com/activity/284206",
+      "kind": "*",
+      "note": "로봇이 스스로 찾음 — 2026 협성문화재단신규 협성장학생",
       "addedAt": "2026-08-24",
       "strike": 0
     }
@@ -124,6 +131,31 @@
     },
     {
       "url": "https://linkareer.com/activity/283454",
+      "seenAt": "2026-08-24",
+      "why": "규칙 0종"
+    },
+    {
+      "url": "https://linkareer.com/activity/281528",
+      "seenAt": "2026-08-24",
+      "why": "규칙 0종"
+    },
+    {
+      "url": "https://community.linkareer.com/honeytips/4895008",
+      "seenAt": "2026-08-24",
+      "why": "규칙 0종"
+    },
+    {
+      "url": "https://sgsg.hankyung.com/tag/20161014123229556",
+      "seenAt": "2026-08-24",
+      "why": "규칙 0종"
+    },
+    {
+      "url": "https://sgsg.hankyung.com/tag/20250221163637551",
+      "seenAt": "2026-08-24",
+      "why": "규칙 0종"
+    },
+    {
+      "url": "https://www.skillagit.com/mobile/product/view.php?idx=17880&amp;code=1216?%3E",
       "seenAt": "2026-08-24",
       "why": "규칙 0종"
     }
