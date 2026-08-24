@@ -4,7 +4,7 @@
   "_두 종류": "rules = 모델에게 조건으로 주는 것. checks = 받은 글을 되받아 기계로 검사하는 것(돈 0). 프롬프트만으로는 안 지켜지므로 두 겹으로 둔다 — draft-guard.mjs가 '지어냄'을 막는 것과 같은 계열이다.",
   "_출처를 남기는 이유": "어느 규칙이 어디서 왔는지 없으면 다음 세션이 '이건 왜 있지?' 하고 지운다. 원문은 저장하지 않는다 — 주소와 날짜만 남긴다(저작권).",
   "updatedAt": "2026-08-24",
-  "version": 4,
+  "version": 5,
   "sources": [
     {
       "id": "s1",
@@ -83,6 +83,18 @@
       "title": "삼성 최신 합격자소서",
       "url": "https://linkareer.com/cover-letter/search?keyword=&amp;organizationName=%EC%82%BC%EC%84%B1&amp;page=1&amp;role=&amp;sort=PASSED_AT",
       "seenAt": "2026-08-24"
+    },
+    {
+      "id": "s14",
+      "title": "2026 국가장학금",
+      "url": "https://community.linkareer.com/employment_data/5118788",
+      "seenAt": "2026-08-24"
+    },
+    {
+      "id": "s15",
+      "title": "2026 에몬스 18기 장학생",
+      "url": "https://linkareer.com/activity/277626",
+      "seenAt": "2026-08-24"
     }
   ],
   "rules": [
@@ -138,7 +150,9 @@
         "s3",
         "s2",
         "s7",
-        "s5"
+        "s5",
+        "s14",
+        "s15"
       ]
     },
     {
@@ -210,7 +224,8 @@
       "text": "장점은 근거가 되는 행동과 함께 쓴다. 단점은 고치려고 실제로 하는 일까지 쓴다.",
       "src": [
         "s5",
-        "s9"
+        "s9",
+        "s14"
       ]
     },
     {
