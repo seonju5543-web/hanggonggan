@@ -53,6 +53,16 @@
       "url": "https://brunch.co.kr/@icebergw/4",
       "kind": "*",
       "note": "자소서에 적합한 문장 표현법"
+    },
+    {
+      "url": "https://linkareer.com/cover-letter/search",
+      "kind": "*",
+      "note": "로봇이 스스로 찾음 — 자기소개서"
+    },
+    {
+      "url": "https://linkareer.com/cover-letter/search?keyword=&amp;organizationName=%EC%82%BC%EC%84%B1&amp;page=1&amp;role=&amp;sort=PASSED_AT",
+      "kind": "*",
+      "note": "로봇이 스스로 찾음 — 삼성 최신 합격자소서"
     }
   ],
   "_큐": "규칙이 모자란 종류. 로봇이 스스로 채우고, 개발자가 그 종류의 주소를 seeds 에 넣어 주면 비워진다.",
@@ -61,5 +71,27 @@
     "value",
     "effect",
     "idea"
+  ],
+  "tried": [
+    {
+      "url": "https://brunch.co.kr/keyword/%EC%9E%A5%ED%95%99%EA%B8%88",
+      "seenAt": "2026-08-24",
+      "why": "규칙 0종"
+    },
+    {
+      "url": "https://brunch.co.kr/keyword/%EC%9E%90%EC%86%8C%EC%84%9C",
+      "seenAt": "2026-08-24",
+      "why": "규칙 0종"
+    },
+    {
+      "url": "https://community.linkareer.com/junior_activity",
+      "seenAt": "2026-08-24",
+      "why": "규칙 0종"
+    },
+    {
+      "url": "https://community.linkareer.com/written_test",
+      "seenAt": "2026-08-24",
+      "why": "규칙 0종"
+    }
   ]
 }
