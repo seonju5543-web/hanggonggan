@@ -161,6 +161,8 @@ const M = require("../match-engine.js");
 const misplaced = [];
 {
   const EX_TAIL = /(지원|신청|참여|참가|지급|수혜)\s*불가\s*$|제외\s*$|제외됩니다\s*$/;
+  /* 면제·산정 규칙은 제외가 아니다 — `성적 기준 적용 제외`는 오히려 유리하다(2026-08-24) */
+  const EXEMPT = /(기준\s*)?적용\s*제외|미적용|산정.{0,6}제외|학점\s*제외|계절.{0,10}제외|을\s*제외한|를\s*제외한/;
   const POS_TAIL = /해당하지\s*않는\s*자|아닌\s*자\s*$|없는\s*자\s*$/;
   const bare = (t) => t.replace(/\s*[(（][^)）]*[)）]\s*$/, '').trim();
   for (const it of reg.items) {
@@ -176,7 +178,7 @@ const misplaced = [];
     for (const l of pri) if (R.has(l)) add('같은 줄이 자격·선발 두 칸에', l);
     for (const l of req) {
       const b = bare(l);
-      if (EX_TAIL.test(b.length >= 4 ? b : l)) add('못 받는 조건이 지원 자격 칸에', l);
+      if (EX_TAIL.test(b.length >= 4 ? b : l) && !EXEMPT.test(l)) add('못 받는 조건이 지원 자격 칸에', l);
     }
     for (const l of exl) if (POS_TAIL.test(l)) add('받을 수 있는 조건이 제외 칸에', l);
     /* 자격은 한 줄도 못 읽었는데 선발·제외는 읽었다 → 절을 잘못 갈랐을 가능성이 높다 */
