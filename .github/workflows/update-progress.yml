@@ -23,7 +23,7 @@ jobs:
           fetch-depth: 0
 
       - name: Fetch branches
-        run: git fetch origin claude/work-seonju claude/work-josehyeon claude/nice-heisenberg-WESq5 2>/dev/null || true
+        run: git fetch origin claude/work-seonju claude/work-josehyeon claude/work-eunseo claude/nice-heisenberg-WESq5 2>/dev/null || true
 
       - name: Rebuild activity section (실제 변화 있을 때만)
         id: build
@@ -42,7 +42,7 @@ jobs:
             const ahead = sh(`git rev-list --count ${range}`) || '0';
             return `**${label}** (\`${branch}\`) — 본인 작업 ${ahead}커밋\n${log || '- 아직 이 브랜치의 개별 작업 없음'}\n`;
           }
-          const activity = `${section('claude/work-seonju','🟦 선주')}\n${section('claude/work-josehyeon','🟩 공동작업자')}`;
+          const activity = `${section('claude/work-seonju','🟦 선주')}\n${section('claude/work-josehyeon','🟩 공동작업자')}\n${section('claude/work-eunseo','🟨 은서 (CTO)')}`;
           // 타임스탬프 줄을 뺀 '내용'만 비교 — 실제 활동 변화가 없으면 갱신·메일 생략(스팸 방지)
           const cur = (doc.match(/<!-- AUTO-ACTIVITY-START -->([\s\S]*?)<!-- AUTO-ACTIVITY-END -->/) || [,''])[1]
                         .replace(/\*\(자동 갱신[^\n]*\n/, '').trim();
