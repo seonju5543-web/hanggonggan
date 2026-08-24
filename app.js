@@ -1224,7 +1224,12 @@ function openDetail(id) {
 
   /* 제외 대상 — '누가 받을 수 있나'만큼 '누가 못 받나'도 자격 정보다 (2026-08-03 개발자 지적).
      판정하지 않고 원문 그대로 보여 준다 — 해당 여부는 학생이 안다. */
-  const exLines = requirementLines(sch, sch.eligibilityExcludes || [], { loose: true });
+  /* 🔴 제외 줄은 **자격 줄 목록 안에도** 섞여 있다 (2026-08-24 개발자 지적).
+     발췌기가 따로 뽑아 둔 eligibilityExcludes만 보면, 자격 절에 섞인 제외 줄이
+     '지원 자격'으로 뜨거나(휴학생·자퇴생이 자격으로 떴다) 갈 곳이 없어 사라졌다.
+     둘을 합쳐 넘기고, 무엇이 제외인지는 match-engine이 절 경계로 판정한다. */
+  const exLines = requirementLines(
+    sch, [...(sch.eligibilityExcludes || []), ...(sch.eligibilityLines || [])], { onlyExclude: true });
   if (exLines.length) {
     reasonRows += `<li class="r-head">이런 경우는 제외돼요</li>`
       + exLines.map((e) => `<li class="r-req">${esc(e)}</li>`).join('');

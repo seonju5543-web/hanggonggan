@@ -16,6 +16,10 @@ import { indexTexts, sourceFor, hasText } from './notice-source.mjs';
 /* 게시판 메뉴·푸터를 걷어내는 규칙 (2026-08-20 신설 — page-boilerplate.mjs 첫머리 참조).
    자격을 못 뽑은 61건 중 40건이 '본문이 메뉴에 파묻힌' 상태였다. */
 import { makeStripper } from './page-boilerplate.mjs';
+/* 절 머리글 판정은 section-head.js 한 곳 — 화면(match-engine)·감사와 같은 파일을 쓴다.
+   베끼면 '발췌기는 제외 절로 보는데 화면은 자격으로 보는' 어긋남이 생긴다. */
+import { createRequire as _cr } from 'node:module';
+const { isExcludeHead: shExclude } = _cr(import.meta.url)('../section-head.js');
 /* 공고문 첨부에서 글자 뽑기 — 본문이 "붙임 참조"뿐인 공고가 있다.
    🔴 **공고문만** 본다(attachment-text.mjs 첫머리 참조) — 신청서·동의서를 읽으면
    개인정보 수집 항목이 지원 자격 자리에 앉는다(실제로 겪고 되돌린 적이 있다). */
@@ -297,6 +301,13 @@ function extractQualifyLines(text) {
        표 머리글만 좁게 잡으므로("3. 장학금액 : 200만원" 같은 진짜 절 제목은 안 걸린다)
        먼저 건너뛰어도 안전하다. 순서를 되돌리면 표로 된 공고가 다시 통째로 사라진다. */
     if (i > start && TABLE_NOISE.test(l.replace(/\s+/g, ' ').trim())) continue;
+    /* 🔴 **제외 절 머리글**에서 끊는다 (2026-08-24). NEXT_SECTION은 `◎ 지원 제외 대상`에서
+       멈추지 못했다 — 기호를 뗀 자리에 '지원'이 먼저 와서 `제외\s?대상` 가지가 안 붙었다.
+       그래서 자격 절 읽기가 제외 절을 통째로 삼켰고, **휴학생·자퇴생이 '지원 자격'에 떴다**.
+       판정은 section-head.js가 한다(같은 파일을 화면·감사도 쓴다).
+       ⚠️ **선발 절에서는 끊지 않는다** — `가. 선발기준` 아래에 진짜 요건이 이어지는 공고가
+       있다(유흥수·가톨릭대). 발췌기는 담는 쪽이고, 자격/선발 가르기는 화면이 줄 단위로 한다. */
+    if (i > start && shExclude(l)) break;
     /* 다음 절 시작 — 여기서 끊는다.
        ⚠️ **표로 된 공고를 여기서 구해내려 하지 말 것** (2026-08-20에 해 보고 되돌렸다).
        광운 국가고시장학금은 `장학금명|신청자격|장학금액|장학금지급기간` 표라 '신청자격' 칸에서
