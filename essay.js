@@ -62,6 +62,165 @@ function essayNoticeRules(sch) {
   return { blind: !!(hit && hit.blind), lines: (hit && hit.lines) || [] };
 }
 
+/* ── 완성 문서 수정 돕기 — '빠진 팁 · 판 되돌리기 · 바뀐 곳' (2026-08-24) ──
+   설계: docs/designs/essay-edit.md ①②③.
+   🔴 여기 있는 것은 전부 **서버 없이 기기 안에서** 돈다. endpoint 가 비어 있어도,
+      학생이 직접 고친 글에도 작동한다. 나가는 네트워크 요청이 하나도 없다.
+
+   품질 검사(qualityCheck)는 essay-quality.js 한 곳에 산다 — 서버(worker)가 쓰는 것과
+   **같은 함수·같은 규칙집**이라 "서버는 통과, 화면은 잡는" 갈라짐이 없다. */
+let essayPlaybookCache = null;
+async function essayLoadPlaybook() {
+  if (essayPlaybookCache) return essayPlaybookCache;
+  try {
+    const res = await fetch('data/essay-playbook.json', { cache: 'no-cache' });
+    const d = await res.json();
+    essayPlaybookCache = { checks: d.checks || [], rules: d.rules || [] };
+  } catch (e) { essayPlaybookCache = { checks: [], rules: [] }; }   /* 없어도 앱은 그대로 돈다 */
+  return essayPlaybookCache;
+}
+/* 규칙별 '왜' — 학생이 납득해야 고친다(설계 ③). 없으면 붙이지 않는다(지어내지 않는다). */
+function essayWhyFor(code) {
+  const rs = (essayPlaybookCache && essayPlaybookCache.rules) || [];
+  const hit = rs.find((r) => r.code === code && r.why);
+  return hit ? hit.why : '';
+}
+
+/* 이 칸의 지금 글을 검사해 '고칠 곳'을 얻는다. 통과/실패가 아니라 짚어 줄 목록이다. */
+function essayFieldWarnings(field, sch) {
+  const el = document.getElementById(`fq-${field.id}`);
+  if (!el || typeof qualityCheck !== 'function') return [];
+  const checks = (essayPlaybookCache && essayPlaybookCache.checks) || [];
+  if (!checks.length) return [];
+  const own = essayAskAnswers(field.id).filter((a) => a.own).map((a) => a.a);
+  let target = 500;
+  try {
+    if (typeof essayAskFor === 'function') target = (essayAskFor(field, essayCtx(sch)) || {}).target || 500;
+  } catch (e) { /* 목표를 못 읽어도 나머지 검사는 돈다 */ }
+  return (qualityCheck(el.value, { target, ownWords: own, checks }).warnings) || [];
+}
+
+/* '이렇게 하면 더 좋아져요' 카드 — 빠진 것만 골라 보여 준다(설계 ③).
+   🔴 규정(essayRulesBannerHtml)과 다르다: 규정은 '꼭 지켜야 하는 것'(빨강), 이건 '더 좋게 하는 제안'이다. */
+function essayTipsHtml(warnings) {
+  if (!warnings || !warnings.length) return '';
+  const items = warnings.map((w) => {
+    const why = essayWhyFor(w.code);
+    return `<li><span class="essay-tip-msg">${esc(w.msg)}</span>` +
+      (why ? `<span class="essay-tip-why">${esc(why)}</span>` : '') + `</li>`;
+  }).join('');
+  return `<div class="essay-tips"><b>💡 이렇게 하면 더 좋아져요</b><ul>${items}</ul>` +
+    `<p class="essay-fine">고치면 이 안내는 사라져요 — 규정이 아니라 더 좋게 만드는 제안이에요.</p></div>`;
+}
+
+/* ── 판(version) 관리 — AI/옮기기가 글을 바꿀 때마다 이전 판을 기기 안에 남긴다(설계 ①·4) ──
+   🔴 서버에 안 남긴다(초안 서버는 KV 없음). 이 세션 메모리에만 둔다.
+      학생이 직접 타자로 고치는 것은 브라우저 기본 되돌리기(Ctrl+Z)가 맡는다 — 여기 판은
+      'AI가 만든 판'을 단위로 되돌리는 것이다. */
+const essayVersions = {};   /* fieldId -> [{text, at}]  (오래된 것 앞에서 버림) */
+const essayLastChange = {}; /* fieldId -> {before, after}  '바뀐 곳 보기'용 */
+function essaySnapshot(fieldId) {
+  const el = document.getElementById(`fq-${fieldId}`);
+  if (!el) return;
+  /* 되돌아갈 판의 '그때 상태'를 통째로 남긴다 — 글자뿐 아니라 그 판이 AI 초안이었는지도.
+     그래야 되돌린 뒤 '✨ AI 초안' 표시를 정확히 켜고 끌 수 있다. */
+  const box = (essayVersions[fieldId] = essayVersions[fieldId] || []);
+  box.push({ text: el.value, drafted: el.classList.contains('essay-drafted'), at: Date.now() });
+  if (box.length > 12) box.shift();
+}
+
+/* 두 판 사이 바뀐 곳 — 뒤 글(after)에서 새로 들어온 낱말만 표시한다.
+   낱말 단위 LCS. 지운 곳은 이 화면(=완성될 글)에는 없으므로 표시하지 않는다. */
+function essayWordDiffHtml(before, after) {
+  const a = String(before || '').split(/(\s+)/);
+  const b = String(after || '').split(/(\s+)/);
+  const n = a.length, m = b.length;
+  const dp = Array.from({ length: n + 1 }, () => new Int32Array(m + 1));
+  for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--)
+    dp[i][j] = a[i] === b[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+  let i = 0, j = 0, out = '';
+  const emit = (tok) => { out += (/^\s+$/.test(tok)) ? tok : `<mark class="essay-add">${esc(tok)}</mark>`; };
+  while (i < n && j < m) {
+    if (a[i] === b[j]) { out += esc(b[j]); i++; j++; }
+    else if (dp[i + 1][j] >= dp[i][j + 1]) { i++; }   /* 지운 낱말 — after 화면에는 없다 */
+    else { emit(b[j]); j++; }
+  }
+  while (j < m) { emit(b[j]); j++; }
+  return out;
+}
+
+/* 이 칸의 도움 위젯(되돌리기·바뀐 곳 보기·팁)을 한 번에 다시 그린다.
+   초안 표시(.essay-flag) 다음에 [컨트롤] → [바뀐 곳] → [팁] 순서로 둔다. */
+function essayRenderAids(field, sch) {
+  const el = document.getElementById(`fq-${field.id}`);
+  if (!el) return;
+  const box = el.parentElement;
+  const fid = CSS.escape(field.id);
+  box.querySelectorAll(`.essay-controls[data-for="${fid}"], .essay-diff[data-for="${fid}"], .essay-tips[data-for="${fid}"]`)
+    .forEach((x) => x.remove());
+
+  let anchor = box.querySelector('.essay-urge') || box.querySelector('.essay-flag') || el;
+  const after = (node) => { anchor.insertAdjacentElement('afterend', node); anchor = node; };
+
+  /* 컨트롤 — 되돌릴 판이 있거나, 방금 바뀐 곳이 있을 때만 */
+  const hasPrev = (essayVersions[field.id] || []).length > 0;
+  const chg = essayLastChange[field.id];
+  if (hasPrev || chg) {
+    const c = document.createElement('div');
+    c.className = 'essay-controls'; c.dataset.for = field.id;
+    c.innerHTML =
+      (hasPrev ? `<button type="button" class="btn btn-outline btn-sm essay-undo">↶ 이전 판으로 되돌리기</button>` : '') +
+      (chg ? `<button type="button" class="btn btn-ghost btn-sm essay-diff-toggle">바뀐 곳 보기</button>` : '');
+    after(c);
+    const undo = c.querySelector('.essay-undo');
+    if (undo) undo.addEventListener('click', () => essayUndo(field, sch));
+    const dt = c.querySelector('.essay-diff-toggle');
+    if (dt) dt.addEventListener('click', () => {
+      const d = box.querySelector(`.essay-diff[data-for="${fid}"]`);
+      if (d) { d.hidden = !d.hidden; dt.textContent = d.hidden ? '바뀐 곳 보기' : '바뀐 곳 숨기기'; }
+    });
+  }
+
+  /* 바뀐 곳 — 처음엔 접혀 있다 */
+  if (chg) {
+    const d = document.createElement('div');
+    d.className = 'essay-diff'; d.dataset.for = field.id; d.hidden = true;
+    d.innerHTML = `<p class="essay-fine">🟩 표시가 이번에 새로 들어온 부분이에요</p>` +
+      `<div class="essay-diff-body">${essayWordDiffHtml(chg.before, chg.after)}</div>`;
+    after(d);
+  }
+
+  /* 팁 — 글이 어느 정도 있을 때만(막 시작한 칸에 잔소리하지 않는다) */
+  const text = String(el.value || '').trim();
+  const warnings = text.length >= 30 ? essayFieldWarnings(field, sch) : [];
+  const tipsHtml = essayTipsHtml(warnings);
+  if (tipsHtml) {
+    const wrap = document.createElement('div'); wrap.innerHTML = tipsHtml;
+    const node = wrap.firstElementChild; node.dataset.for = field.id;
+    after(node);
+  }
+}
+
+/* 되돌리기 — 가장 최근 판으로 글을 되돌린다. AI가 만들기 전으로 돌아갈 수 있다. */
+function essayUndo(field, sch) {
+  const el = document.getElementById(`fq-${field.id}`);
+  const box = essayVersions[field.id] || [];
+  if (!el || !box.length) return;
+  const prev = box.pop();
+  el.value = prev.text;
+  el.rows = Math.min(18, Math.max(4, Math.ceil((prev.text.length || 40) / 40)));
+  /* 되돌리면 '바뀐 곳'은 뜻을 잃는다 — 지운다 */
+  delete essayLastChange[field.id];
+  /* 되돌아간 판이 AI 초안이 아니었으면(=학생 글이거나 빈 칸) '✨ AI 초안' 표시·독려를 정리한다.
+     그 판도 AI 초안이었으면(여러 번 AI로 고친 경우) 표시를 그대로 둔다. */
+  if (!prev.drafted) {
+    el.classList.remove('essay-drafted');
+    el.parentElement.querySelectorAll('.essay-flag, .essay-urge').forEach((x) => x.remove());
+  }
+  essayRenderAids(field, sch);
+  if (typeof toast === 'function') toast('이전 판으로 되돌렸어요');
+}
+
 function essayCtx(sch) {
   const p = (typeof state !== 'undefined' && state.profile) || null;
   /* 보관함에 무엇이 있는지 — 파일도 파일 이름도 나가지 않는다.
@@ -285,6 +444,26 @@ async function essayBind(tpl, sch) {
       btn.parentNode.insertBefore(box, btn);
     }
   } catch (e) { /* 규정을 못 받아도 버튼은 그대로 동작한다 */ }
+
+  /* ── 완성 문서 수정 돕기 (2026-08-24) — 서버 없이, 학생 직접 편집에도 작동 ──
+     playbook 을 받아 두고, 서술형 칸을 고칠 때마다 '빠진 팁'을 갱신한다. */
+  try {
+    await essayLoadPlaybook();
+    const stories = essayStoryFields(formPlanFor(tpl));
+    stories.forEach((f) => {
+      const el = document.getElementById(`fq-${f.id}`);
+      if (!el || el.dataset.essayAids) return;
+      el.dataset.essayAids = '1';   /* 한 칸에 청취기 한 번만 */
+      let t;
+      el.addEventListener('input', () => {
+        clearTimeout(t);
+        /* 타자를 멈춘 뒤에 검사한다 — 글자마다 다시 그리면 어수선하다 */
+        t = setTimeout(() => essayRenderAids(f, sch), 500);
+      });
+      /* 바인드 때 한 번 — 앞서 저장된 초안이 있으면 팁이 바로 보인다 */
+      essayRenderAids(f, sch);
+    });
+  } catch (e) { /* 팁을 못 그려도 양식 작성은 그대로 된다 */ }
 }
 
 async function essaySend(tpl, sch, btn) {
@@ -301,6 +480,8 @@ async function essaySend(tpl, sch, btn) {
       if (!el) continue;
       const text = essayComposeLocal(f);
       if (!text) { empty++; continue; }
+      const before = el.value;
+      essaySnapshot(f.id);   /* 옮기기 전 판을 남긴다 — 되돌릴 수 있게 */
       /* 학생이 이미 쓴 글이 있으면 덮지 않고 아래에 붙인다 */
       el.value = el.value.trim() ? `${el.value.trim()}\n${text}` : text;
       el.classList.add('essay-drafted');
@@ -308,6 +489,8 @@ async function essaySend(tpl, sch, btn) {
         el.insertAdjacentHTML('afterend',
           '<p class="dp-note essay-flag">📝 고르신 키워드를 옮겨 적었어요 — 문장으로 다듬어 주세요</p>');
       }
+      essayLastChange[f.id] = { before, after: el.value };
+      essayRenderAids(f, sch);   /* 되돌리기·바뀐 곳·팁 다시 그리기 */
       moved++;
     }
     if (moved) toast(`${moved}칸에 옮겼어요 — 문장으로 다듬어 주세요`);
@@ -411,6 +594,9 @@ async function essaySend(tpl, sch, btn) {
   for (const d of data.drafts || []) {
     const el = document.getElementById(`fq-${d.key}`);
     if (!el || !d.text) continue;
+    const field = fields.find((x) => x.id === d.key) || { id: d.key };
+    const before = el.value;
+    essaySnapshot(d.key);   /* AI 가 고치기 전 판을 남긴다 — 되돌릴 수 있게(설계 ①·4) */
     el.value = d.text;
     el.classList.add('essay-drafted');
     el.rows = Math.min(18, Math.max(6, Math.ceil(d.text.length / 40)));
@@ -425,12 +611,12 @@ async function essaySend(tpl, sch, btn) {
         `<p class="dp-note essay-urge">직접 적어 주신 이야기가 아직 없어요. 위 보기를 눌러 열리는 칸에
          <b>한 줄만 더하면</b> 심사위원에게 전해지는 인상이 크게 달라집니다.</p>`);
     }
-    /* '고칠 곳' — 좋은 장학 자소서의 조건(data/essay-playbook.json)으로 되받아 검사한 결과.
-       버리지 않고 짚어 준다. 학생이 읽고 고치는 것이 이 기능의 전제이기 때문이다. */
-    if ((d.quality || []).length) {
-      el.parentElement.querySelector('.essay-flag').insertAdjacentHTML('afterend',
-        `<ul class="essay-fix">${d.quality.map((w) => `<li>${esc(w.msg)}</li>`).join('')}</ul>`);
-    }
+    /* 바뀐 곳(diff) · 되돌리기 · '고칠 곳' 팁을 한 번에 그린다.
+       🔴 '고칠 곳'은 서버 응답(d.quality)을 베끼지 않고 essay-quality.js 의 qualityCheck 로
+          화면에서 다시 계산한다 — 서버가 쓰는 것과 **같은 함수·같은 규칙집**이라 값이 갈리지 않고,
+          이후 학생이 직접 고치면 그 자리에서 다시 갱신된다(서버 없이도 도는 길). */
+    essayLastChange[d.key] = { before, after: d.text };
+    essayRenderAids(field, sch);
     filled++;
   }
 

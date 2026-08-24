@@ -242,6 +242,23 @@ async function dismissNotify(page) {
   ok(/초안/.test(flag) && /고쳐/.test(flag), '④ "초안 — 읽고 고치세요"라고 말한다', flag);
   await page.screenshot({ path: SHOT('3-drafted') });
 
+  console.log('\n[4-2) 완성 문서 수정 돕기 — 되돌리기·바뀐 곳·빠진 팁 (서버 없이)]');
+  /* 초안(목표 1800자인데 약 60자)이라 '분량' 팁이 뜬다 — 서버 응답이 아니라
+     화면에서 essay-quality.js 로 다시 계산한 것이다(단일 출처). */
+  ok(await page.$('.essay-tips') !== null, '④-2 "이렇게 하면 더 좋아져요" 팁 카드가 뜬다');
+  ok(await page.$('.essay-undo') !== null, '④-2 "되돌리기" 버튼이 생긴다');
+  ok(await page.$('.essay-diff-toggle') !== null, '④-2 "바뀐 곳 보기" 버튼이 생긴다');
+  /* 바뀐 곳 보기 → 새로 들어온 부분이 표시된다 */
+  await page.click('.essay-diff-toggle');
+  await page.waitForTimeout(150);
+  ok(await page.$('.essay-diff .essay-add') !== null, '④-2 바뀐 곳을 열면 새로 들어온 부분이 표시된다');
+  await page.screenshot({ path: SHOT('4-aids') });
+  /* 되돌리기 → AI가 만들기 전(빈 칸)으로 돌아가고 초안 표시도 사라진다 */
+  await page.click('.essay-undo');
+  await page.waitForTimeout(200);
+  ok(await page.$eval(`#fq-${key}`, (el) => el.value) === '', '④-2 되돌리면 AI 초안 전으로 돌아간다');
+  ok(await page.$('.essay-flag') === null, '④-2 되돌리면 초안 표시도 사라진다');
+
   console.log('\n[5) 실패해도 학생 글을 덮지 않는가]');
   await page.fill(`#fq-${key}`, '제가 직접 쓴 문장입니다');
   await page.evaluate(() => {

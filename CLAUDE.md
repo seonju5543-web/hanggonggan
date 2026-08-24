@@ -100,6 +100,12 @@
    ① AI 대화창구(학생이 말로 고쳐 달라 — `revise` 엔드포인트, 초안과 같은 안전장치)
    ② 직접 수정 칸 유지 ③ 빠진 팁 제시("이렇게 하면 향상돼요" — 이미 다 반영돼 있어야 정상).
    + 판 되돌리기·diff·분량 미터(공고 min/max와 잇기)·재단 정렬 표시.
+   · **✅ 27차(2026-08-24)에 착수 ①② 완료·배포**: 빠진 팁 카드(`.essay-tips`)를 **서버 없이도**
+     화면에 띄우고(품질 검사를 겸용 `essay-quality.js` 한 곳으로 옮겨 draft-guard 가 재수출 —
+     서버·화면이 같은 함수를 쓴다), 판 되돌리기(`↶ 이전 판으로`)·바뀐 곳 diff(🟩 낱말 LCS)를 붙였다.
+     검사 UI 44/0·guard 91/0·ask 111/0. **경위는 `docs/designs/essay-edit.md` 「①② 실제로 한 일」.**
+   · **남은 것 ③④**(서버 필요): AI 대화창구(`revise` 엔드포인트 — 초안과 같은 안전장치) · 분량
+     미터·재단 정렬. `essay-config.js` endpoint 가 비어 있어 대화창구는 **서버 배포 후(아래 4번)** 켜진다.
 3. **약관·개인정보처리방침 초안** — 앱에 지금 0건, 국외 이전(Cloudflare·Anthropic) 고지 법적 필수.
 4. **서버 배포**(`server/essay/README.md`) → `essay-config.js` endpoint 채우기 → 초안·대화창구 켜짐.
 
@@ -264,8 +270,9 @@ Fable 5 · Opus 5 전용이다. 자격 AI가 습관적으로 붙였다가 잔액
 | `collector/build-search-index.mjs` + `.github/workflows/search-index.yml` | **검색용 요약 (2026-08-17)** — 공고 원문 전문은 수 MB라 앱이 못 받는다. 그래서 **'그 공고만의 낱말'만** 추려 `data/search-index.json`(51KB)으로 발행하고 도우미가 그것만 읽는다. **여러 공고에 나오는 낱말은 버린다(문턱 2건)** — 게시판 껍데기(로그인·사이트맵·취업)가 섞여 있어 안 버리면 검색이 오히려 나빠진다. **수집 워크플로를 고치지 않고 따로 도는 로봇**이라 공동작업자 파일과 부딪히지 않는다 |
 | `server/chat/` | **도우미 AI 서버 (미배포 · 선택)** — 하는 일은 "어느 공고·어느 원문 문장이 맞는지 **고르는 것**" 하나. **답 문장을 쓰지 않는다** → 지어낼 자리가 없다. 질문도 답도 저장하지 않고(KV 없음), 앱이 보내는 것은 질문 + 공고 공개 정보뿐. 켜는 법은 `server/chat/README.md` |
 | `form-plan.js` | **신청서 질문 설계기 (2026-08-18)** — 원본 스키마를 **건드리지 않고** 화면에 낼 질문만 다시 짠다. 앱이 아는 값은 안 묻고(자동 채움 22키), 답이 정해진 것은 클릭(`choice`)으로, 원본 표의 칸들은 카드 1개(`group`)로. 그래서 **질문을 줄여도 문서는 한 글자도 안 바뀐다**(증명: `verify/form-snapshot.mjs`). `match-engine.js`처럼 브라우저·Node 겸용이라 화면·감사·관리자 화면이 **같은 파일로 같은 개수**를 센다 |
-| `essay.js` + `essay-config.js` | **신청서 AI 초안 (2026-08-23)** — 서술형 칸을 학생이 준 재료로 엮어 **초안**을 만든다. 이 저장소에서 **AI가 진짜 문장을 쓰는 유일한 경로**라, 금지의 정의를 '글을 쓰는 것'이 아니라 **'사실을 만드는 것'**으로 다시 그었다(개발자 승인). 어느 칸에 붙는지는 `data/forms.json`의 `kind`가 정한다 — 짐작하지 않는다. `endpoint`가 비어 있으면 버튼조차 안 나온다 |
-| `server/essay/` | **초안 서버 (Cloudflare Worker · 배포 대기)** — KV 없음(학생 글이 안 남는다). `draft-guard.mjs`가 **서버와 검사 드라이버 공용**으로 ①보내기 전 민감정보 ②받은 뒤 지어냄을 본다. 기본 `claude-sonnet-5`(서류 1건 약 47원). 🔴 `fallbacks` 금지 — sonnet-5는 400 |
+| `essay.js` + `essay-config.js` | **신청서 AI 초안 (2026-08-23)** — 서술형 칸을 학생이 준 재료로 엮어 **초안**을 만든다. 이 저장소에서 **AI가 진짜 문장을 쓰는 유일한 경로**라, 금지의 정의를 '글을 쓰는 것'이 아니라 **'사실을 만드는 것'**으로 다시 그었다(개발자 승인). 어느 칸에 붙는지는 `data/forms.json`의 `kind`가 정한다 — 짐작하지 않는다. `endpoint`가 비어 있으면 버튼조차 안 나온다. **27차(2026-08-24)**: 초안·학생 글을 **서버 없이도** 검사해 '이렇게 하면 더 좋아져요' 팁 카드(`.essay-tips`)·판 되돌리기·바뀐 곳 diff를 붙였다(설계 `docs/designs/essay-edit.md` ①②) |
+| `essay-quality.js` | **초안/완성 문서 품질 검사 (2026-08-24) — 브라우저·서버·검사 공용 단일 출처**. `qualityCheck`·`rulesFor`·`paraCount`. 원래 `draft-guard.mjs` 안에 있어 **서버가 켜져야만** 보이던 것을, 화면(essay.js)에서도 같은 함수로 돌리려고 겸용 파일로 옮겼다. `draft-guard.mjs`가 여기서 **가져다 재수출**한다(worker·검사 import 는 그대로). 🔴 원본은 여기 하나 — 베끼면 "서버는 통과, 화면은 잡는" 갈라짐이 생긴다. wrangler에 `nodejs_compat`가 없어 `createRequire`는 못 쓰지만 esbuild/Node의 CJS named import 로 충분(실증) |
+| `server/essay/` | **초안 서버 (Cloudflare Worker · 배포 대기)** — KV 없음(학생 글이 안 남는다). `draft-guard.mjs`가 **서버와 검사 드라이버 공용**으로 ①보내기 전 민감정보 ②받은 뒤 지어냄을 본다(품질 검사는 `essay-quality.js`에서 재수출). 기본 `claude-sonnet-5`(서류 1건 약 47원). 🔴 `fallbacks` 금지 — sonnet-5는 400 |
 | `forms.js` | **양식 엔진**: 스키마 → 질문 → 원본 동일 문서(.doc 저장/인쇄/공유). 내장 2종은 오프라인 폴백일 뿐 — **양식 원본은 `data/forms.json`** |
 | `data/forms.json` | **양식 스키마 원본(single source of truth)** — 여기에만 추가하면 설치된 앱에도 자동 반영. **등록 34종**(2026-08-01 기준): …+ uos-bigdata-cert-apply, gasong-apply + **다운로드형 전량 승격분 9종**(jeongeup·uos-fund·ihanae·lotte-dorm·uiam·jeju-consent·skku-merit-plan·khu-intern·hufs-alumni — 2026-07-15) |
 | `data/notices.json` | 수집 로봇이 발행하는 실시간 공고 (앱이 fetch) |

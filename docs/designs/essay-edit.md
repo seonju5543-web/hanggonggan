@@ -61,7 +61,26 @@ AI 가 고친 결과도 그 칸에 들어가 학생이 다시 손볼 수 있어�
 - `server/essay/smoke.mjs --demo` 에 '고쳐쓰기 1회' 시연 추가(진짜 API, 약 47원).
 
 ## 착수 순서
-① 빠진 팁 카드(③) — 서버 없이 되는 것부터. qualityCheck 결과를 화면 카드로.
-② 판 되돌리기·diff(4·1·2) — 역시 서버 불필요, 기기 안.
+① ✅ **완료 (2026-08-24)** 빠진 팁 카드(③) — 서버 없이 되는 것부터. qualityCheck 결과를 화면 카드로.
+② ✅ **완료 (2026-08-24)** 판 되돌리기·diff(4·1·2) — 역시 서버 불필요, 기기 안.
 ③ AI 대화창구(①) — revise 엔드포인트 + 안전장치 + 대화 UI. endpoint 비면 숨김.
 ④ 분량 미터·재단 정렬(3·4) — essay-form-rules·foundationFocus 와 잇기.
+
+### ①② 실제로 한 일 (2026-08-24 · 전부 배포 · 검사 통과)
+- **단일 출처 분리**: 품질 검사(`qualityCheck`·`rulesFor`·`paraCount`)를 브라우저·Node 겸용
+  **`essay-quality.js`** 로 옮기고, `server/essay/draft-guard.mjs` 가 거기서 **가져다 재수출**한다
+  (worker·검사 드라이버의 import 는 손대지 않았다). 🔴 wrangler.toml 에 `nodejs_compat` 가 없어
+  `createRequire` 는 못 쓰지만, esbuild/Node 는 CJS `.js` 에서 named import 이 되므로 재수출로 충분하다
+  (실증 후 채택). 베끼지 말 것 — 원본은 essay-quality.js 하나다.
+- **① 빠진 팁 카드**: `essay.js` 가 `data/essay-playbook.json` 의 `checks` 를 받아, 학생이 칸을
+  고칠 때마다(디바운스 500ms) `qualityCheck` 를 돌려 `.essay-tips`("이렇게 하면 더 좋아져요")로
+  띄운다. **서버가 꺼져 있어도, 학생이 직접 고친 글에도** 뜬다. 규칙별 '왜'(playbook rules 의 `why`)를
+  있으면 붙인다. 서버가 켜졌을 때의 `d.quality` 도 이제 **같은 함수로 화면에서 다시 계산**해 값이 갈리지 않는다.
+- **② 판 되돌리기 + 바뀐 곳**: AI/옮기기가 글을 바꾸기 전 판을 **기기 메모리**(`essayVersions`,
+  서버 KV 없음)에 남기고 `↶ 이전 판으로 되돌리기` 제공. 판마다 'AI 초안이었나'(`drafted`)를 함께
+  기록해 되돌린 뒤 '✨ AI 초안' 표시를 정확히 켜고 끈다. `바뀐 곳 보기` 는 낱말 단위 LCS diff 로
+  이번에 새로 들어온 부분을 🟩 로 짚는다.
+- **파일**: 새 `essay-quality.js` · `essay.js`(팁·판·diff) · `style.css`(카드·버튼) ·
+  `index.html`(스크립트 로드) · `sw.js`(v72→v73, 캐시 목록에 essay-quality.js). 서버는 안 건드렸다.
+- **검사**: `verify-essay-ui.js` 44/0(④-2 항목 신설) · `verify-essay-guard.mjs` 91/0(단일 출처 유지 확인) ·
+  `verify-essay-ask.mjs` 111/0.

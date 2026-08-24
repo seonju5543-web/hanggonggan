@@ -1448,3 +1448,38 @@ textarea.essay-drafted { border-color: var(--primary); background: #fbfcff; line
 .essay-rules-banner li { font-size: 12.5px; line-height: 1.5; margin: 2px 0; }
 .essay-rule-danger { color: #c0392b; font-weight: 600; }
 :root[data-theme="dark"] .essay-rule-danger, :root:not([data-theme="light"]) .essay-rule-danger { color: #ff8a7a; }
+
+/* ── 완성 문서 수정 돕기 (2026-08-24, docs/designs/essay-edit.md) ──
+   규정 배너(.essay-rules-banner)와 다르다: 규정은 '꼭 지켜야 하는 것', 아래는 '더 좋게 하는 제안'이다. */
+.essay-tips {
+  margin: 8px 0 0; padding: 10px 12px;
+  background: var(--orange-weak, #fff7e8); border-radius: 10px;
+  border-left: 3px solid var(--orange, #e08a1e);
+}
+.essay-tips > b { display: block; font-size: 13px; margin-bottom: 6px; }
+.essay-tips ul { list-style: none; margin: 0; padding: 0; }
+.essay-tips li { margin: 0 0 7px; }
+.essay-tips li:last-child { margin-bottom: 0; }
+.essay-tip-msg { display: block; font-size: 12.5px; color: var(--text-sub); line-height: 1.55; }
+.essay-tip-msg::before { content: '✎ '; color: var(--orange, #e08a1e); font-weight: 700; }
+.essay-tip-why { display: block; font-size: 11.5px; color: var(--text-weak); line-height: 1.5; margin-top: 2px; padding-left: 15px; }
+
+/* 되돌리기·바뀐 곳 보기 컨트롤 줄 */
+.essay-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.btn-sm { font-size: 12.5px; padding: 6px 12px; min-height: 32px; border-radius: 9px; }
+.btn-ghost {
+  background: transparent; border: 1px solid var(--line, #e5e7eb); color: var(--text-sub);
+}
+.btn-ghost:hover { background: var(--surface, #f4f5f7); }
+
+/* 바뀐 곳(diff) — 🟩 표시가 이번에 새로 들어온 부분 */
+.essay-diff {
+  margin-top: 8px; padding: 10px 12px; border-radius: 10px;
+  background: var(--card-bg, #fff); border: 1px solid var(--line, #e5e7eb);
+}
+.essay-diff-body {
+  white-space: pre-wrap; word-break: break-word; font-size: 13px; line-height: 1.7;
+  color: var(--text-sub); margin-top: 6px;
+}
+mark.essay-add { background: #d7f5df; color: #166534; border-radius: 3px; padding: 0 1px; }
+:root[data-theme="dark"] mark.essay-add, :root:not([data-theme="light"]) mark.essay-add { background: #1f4a2e; color: #a6e6bb; }
