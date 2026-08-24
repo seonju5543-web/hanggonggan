@@ -1,6 +1,6 @@
 # 작성 규칙 학습 — 2026-08-24
 
-읽은 곳 15곳 · 못 읽은 곳 1곳 · 규칙에 붙은 출처 9건
+읽은 곳 15곳 · 못 읽은 곳 1곳 · 규칙에 붙은 출처 3건
 
 ## 읽은 곳
   ✓ https://brunch.co.kr/@geonahn/425
@@ -32,20 +32,22 @@
   ✓ https://brunch.co.kr/@icebergw/4
       줄 72 · 규칙을 뒷받침한 것 4종 (plain-sentence, direction, no-cliche, no-self-pity)
       🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
-  ✓ https://brunch.co.kr/keyword/%EC%9E%A5%ED%95%99%EA%B8%88
-      줄 90 · 규칙을 뒷받침한 것 0종
-  ✓ https://brunch.co.kr/keyword/%EC%9E%90%EC%86%8C%EC%84%9C
-      줄 127 · 규칙을 뒷받침한 것 0종
-  ✓ https://linkareer.com/cover-letter/search
-      줄 151 · 규칙을 뒷받침한 것 2종 (direction, motive-need-then-plan)
-      🆕 어느 규칙에도 안 붙은 문장 3개 — 컨펌 대기
-  ✓ https://linkareer.com/cover-letter/search?keyword=&amp;organizationName=%EC%82%BC%EC%84%B1&amp;page=1&amp;role=&amp;sort=PASSED_AT
-      줄 151 · 규칙을 뒷받침한 것 2종 (direction, motive-need-then-plan)
-      🆕 어느 규칙에도 안 붙은 문장 3개 — 컨펌 대기
-  ✓ https://community.linkareer.com/junior_activity
-      줄 342 · 규칙을 뒷받침한 것 0종
-  ✓ https://community.linkareer.com/written_test
+  ✓ https://community.linkareer.com/interview
       줄 334 · 규칙을 뒷받침한 것 0종
+  ✓ https://community.linkareer.com/employment_data/4227270?page=1
+      줄 500 · 규칙을 뒷받침한 것 0종
+      🆕 어느 규칙에도 안 붙은 문장 5개 — 컨펌 대기
+  ✓ https://pf.kakao.com/_MGgexb
+      줄 2 · 규칙을 뒷받침한 것 0종
+  ✓ https://community.linkareer.com/employment_data/5118788
+      줄 363 · 규칙을 뒷받침한 것 2종 (know-the-foundation, character-evidence)
+      🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
+  ✓ https://linkareer.com/activity/283454
+      줄 104 · 규칙을 뒷받침한 것 0종
+      🆕 어느 규칙에도 안 붙은 문장 1개 — 컨펌 대기
+  ✓ https://linkareer.com/activity/277626
+      줄 137 · 규칙을 뒷받침한 것 1종 (know-the-foundation)
+      🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
 
 ## 🆕 어느 규칙에도 안 붙은 문장 — 개발자 컨펌 대기
 아래는 **규칙 후보**입니다. 규칙집에 넣을지는 사람이 정합니다(운영 원칙 2).
@@ -132,20 +134,34 @@
   <sub>https://brunch.co.kr/@icebergw/4</sub>
 
 ## 스스로 넓히기 — 로봇이 읽은 글에서 다음에 읽을 곳을 주웠습니다
-주운 곳 32곳 · 이번에 읽은 곳 6곳 · robots.txt 가 막아 건너뛴 곳 0곳
+주운 곳 23곳 · 이번에 읽은 곳 6곳 · robots.txt 가 막아 건너뛴 곳 0곳
 
-- · 규칙 0종 — 30일 뒤 다시 시도 https://brunch.co.kr/keyword/%EC%9E%A5%ED%95%99%EA%B8%88
-  <sub>본문 하단 > 키워드 클릭" data-tiara-layer="bottom more_contents keyword"> 장학금</sub>
-- · 규칙 0종 — 30일 뒤 다시 시도 https://brunch.co.kr/keyword/%EC%9E%90%EC%86%8C%EC%84%9C
-  <sub>본문 하단 > 키워드 클릭" data-tiara-layer="bottom more_contents keyword"> 자소서</sub>
-- ⬆️ seeds 로 승격 https://linkareer.com/cover-letter/search
-  <sub>자기소개서</sub>
-- ⬆️ seeds 로 승격 https://linkareer.com/cover-letter/search?keyword=&amp;organizationName=%EC%82%BC%EC%84%B1&amp;page=1&amp;role=&amp;sort=PASSED_AT
-  <sub>삼성 최신 합격자소서</sub>
-- · 규칙 0종 — 30일 뒤 다시 시도 https://community.linkareer.com/junior_activity
-  <sub>서류 합격 후기</sub>
-- · 규칙 0종 — 30일 뒤 다시 시도 https://community.linkareer.com/written_test
-  <sub>인적성/필기 합격 후기</sub>
+- · 규칙 0종 — 30일 뒤 다시 시도 https://community.linkareer.com/interview
+  <sub>면접 합격 후기</sub>
+- · 규칙 0종 — 30일 뒤 다시 시도 https://community.linkareer.com/employment_data/4227270?page=1
+  <sub>삼성 SSAFY 합격 후기 모음집 (feat. 합격 스펙, 인재상 등)</sub>
+- · 규칙 0종 — 30일 뒤 다시 시도 https://pf.kakao.com/_MGgexb
+  <sub>자소서봇</sub>
+- ⬆️ seeds 로 승격 https://community.linkareer.com/employment_data/5118788
+  <sub>2026 국가장학금</sub>
+- · 규칙 0종 — 30일 뒤 다시 시도 https://linkareer.com/activity/283454
+  <sub>2026 T&amp;C재단 공감인재 장학생</sub>
+- ⬆️ seeds 로 승격 https://linkareer.com/activity/277626
+  <sub>2026 에몬스 18기 장학생</sub>
+
+## 🩺 seed 건강 (지속가능성)
+살아 있는 seed 12개 (상한 60) · 이번 실행에서 규칙을 준 곳 10개
+
+시든 seed 없음.
+
+
+## 📌 다음에 크롤링할 출처 — 개발자 확인용 (정직 보고)
+🔴 정직 보고 (2026-08-24): **지금 학습 출처는 논문이 아니다.** 전부 블로그·커뮤니티의 '작성 팁 글'이다 — brunch(장학재단 운영자 관점·문장 표현법), linkareer 커뮤니티(작성법 정리), 한경 생글이(학생 칼럼), soomgo·skillagit(금지어·인사담당자 체크리스트), owlapply(자소서 잘 쓰는 법). 논문은 한 건도 없다. 아래는 개발자가 넓히라고 지시한 '사람이 남긴 팁·학생 후기' 출처들이며, 확인·승인 후 seeds 에 넣거나 로봇의 자동 확장이 링크를 따라 닿는다.
+
+- **네이버 블로그 (개별 글)** — 로봇이 m.blog.naver.com 모바일 주소로 읽을 수 있게 만들었다(naverMobile). 데스크톱 주소는 프레임 껍데기라 못 읽는다. ⚠️ 네이버 '검색결과'는 robots.txt 가 막고 JS 로 그려 자동 크롤링 불가 — 그래서 개발자가 좋은 글 주소를 몇 개 붙여 주면 seeds 에 넣고, 그 글의 링크에서 로봇이 스스로 이웃 글로 넓힌다.
+- **티스토리 (tistory.com) 장학 자소서 팁·후기 글** — 일반 fetch 로 읽힌다. robots.txt 준수. 개발자가 글 주소를 주거나, 팁 글 안의 링크에서 자동 확장이 닿는다.
+- **학생 합격 후기 글 (개인 블로그·커뮤니티)** — '후기·팁' 글은 이제 막지 않는다(NOT_SOURCE 를 DB 전용으로 좁혔다). 예시문 전문만 파는 DB(linkareer cover-letter·jasoseol)는 계속 막는다 — 표절·저작권·획일화.
+- **brunch 매거진·키워드 페이지** — 이미 seeds 에 2건. 키워드 페이지(brunch.co.kr/keyword/장학금)는 규칙 0종이라 tried 로 물러났다 — 목록 페이지는 팁이 아니라 링크뿐이라 그렇다. 개별 글로 넓히는 게 낫다.
 
 ## 규칙이 모자란 종류
 - `intro` — 이 종류 전용 규칙이 없습니다. 관련 글 주소를 `collector/essay-sources.json` 의 seeds 에 넣어 주세요.
