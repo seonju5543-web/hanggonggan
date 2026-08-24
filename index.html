@@ -278,9 +278,18 @@
 
     <!-- ============ 신청 내역 ============ -->
     <section id="screen-applications" class="screen" hidden>
-      <header class="page-header"><h2>신청 내역</h2></header>
+      <header class="page-header apps-header">
+        <h2>신청 내역</h2>
+        <button id="apps-select-toggle" class="btn-ghost btn-sm" hidden>선택</button>
+      </header>
       <div id="apps-summary" class="apps-summary"></div>
+      <!-- 선택 모드 막대 — 여러 건을 한 번에 정리할 때만 나온다 -->
+      <div id="apps-bulkbar" class="bulkbar" hidden>
+        <label class="bulk-all"><input type="checkbox" id="apps-check-all" /><span>전체 선택</span></label>
+        <button id="apps-delete-selected" class="btn-danger btn-sm" disabled>삭제</button>
+      </div>
       <div id="apps-list" class="card-list"></div>
+      <p class="data-note" id="apps-swipe-hint" hidden>※ 카드를 <strong>왼쪽으로 밀면</strong> 삭제할 수 있어요. 지워도 잠시 되돌릴 수 있고, 장학금 자체는 사라지지 않아요.</p>
     </section>
 
     <!-- ============ MY ============ -->

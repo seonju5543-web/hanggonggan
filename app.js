@@ -186,9 +186,23 @@ function refreshProgressViews(id) {
   openDetail(id);
 }
 
-function toast(msg) {
+function toast(msg, action) {
   const el = $('#toast');
   el.textContent = msg;
+  /* 되돌리기처럼 **되살릴 수 있는 실수**는 단추를 함께 준다.
+     터치 타깃 44px은 style.css의 .toast-undo가 지킨다. */
+  if (action) {
+    const b = document.createElement('button');
+    b.className = 'toast-undo';
+    b.textContent = action.label;
+    b.addEventListener('click', () => {
+      clearTimeout(toast._t);
+      el.classList.remove('show');
+      setTimeout(() => (el.hidden = true), 250);
+      action.run();
+    });
+    el.appendChild(b);
+  }
   el.hidden = false;
   el.classList.add('show');
   clearTimeout(toast._t);
@@ -1497,6 +1511,20 @@ function closeSheet() {
 }
 
 /* ---------------- 신청 내역 ---------------- */
+/* ── 신청 내역 관리 (2026-08-24 개발자 요청) ──────────────────────────────
+   *"신청내역에서 왼쪽으로 끌면 삭제도 가능하게 하고 전체 선택에서 삭제도 가능하게"*
+
+   🔴 여기서 지우는 것은 **학생이 기록한 진행 상황**이다(담아둔 것·제출 기록·선정 결과).
+      장학 공고 자체는 모두의 데이터라 사라지지 않는다 — 화면에도 그렇게 적었다.
+      기록은 되살릴 길이 없으면 그대로 손실이라 **되돌리기를 반드시 붙인다.**
+   🔴 방향은 **왼쪽**이다. iOS는 왼쪽 끝에서 오른쪽으로 끄는 것을 '뒤로 가기'로 가로채므로
+      오른쪽 스와이프는 설치형 앱에서 안 열린다(개발자와 확인 후 왼쪽으로 결정).
+   ────────────────────────────────────────────────────────────────────── */
+let appsSelectMode = false;
+const appsSelected = new Set();
+let lastSwipeAt = 0;            // 스와이프 직후의 클릭을 삼키는 자리 (아래 주석)
+let undoBuffer = null;          // 되돌리기용 — 지운 항목과 원래 자리
+
 function appCard(app) {
   const sch = findSch(app.id);
   if (!sch) return '';
@@ -1505,16 +1533,94 @@ function appCard(app) {
   const statusBadge = app.pending
     ? '<span class="badge badge-pending">서류 작성 필요</span>'
     : `<span class="badge badge-applied">${stepLabel}</span>`;
+  const checked = appsSelected.has(app.id) ? 'checked' : '';
   return `
-    <button class="sch-card" data-detail="${sch.id}">
-      <div class="sch-top">
-        <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${sch.type}</span>
-        ${statusBadge}
-      </div>
-      <p class="sch-name">${esc(sch.name)}</p>
-      <p class="sch-provider">${app.appliedAt} ${app.pending ? '담아둠' : '준비 완료'} · 제출처 ${esc(officialChannel(sch).label)}</p>
-      <div class="mini-progress"><div style="width:${app.pending ? 6 : ((step + 1) / APP_STEPS.length) * 100}%"></div></div>
-    </button>`;
+    <div class="swipe-row" data-row="${esc(app.id)}">
+      <button class="swipe-del" data-del="${esc(app.id)}" aria-label="이 신청 기록 삭제">삭제</button>
+      ${appsSelectMode ? `<input type="checkbox" class="row-check" data-pick="${esc(app.id)}" ${checked}
+         aria-label="${esc(sch.name)} 선택" />` : ''}
+      <button class="sch-card" data-detail="${sch.id}">
+        <div class="sch-top">
+          <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${sch.type}</span>
+          ${statusBadge}
+        </div>
+        <p class="sch-name">${esc(sch.name)}</p>
+        <p class="sch-provider">${app.appliedAt} ${app.pending ? '담아둠' : '준비 완료'} · 제출처 ${esc(officialChannel(sch).label)}</p>
+        <div class="mini-progress"><div style="width:${app.pending ? 6 : ((step + 1) / APP_STEPS.length) * 100}%"></div></div>
+      </button>
+    </div>`;
+}
+
+/* 지우기 — 여러 건을 한 번에 받는다(스와이프 1건도 같은 길로 지나간다). */
+function deleteApps(ids) {
+  if (!ids.length) return;
+  const removed = ids
+    .map((id) => ({ id, at: state.applications.findIndex((a) => a.id === id) }))
+    .filter((r) => r.at >= 0)
+    .map((r) => ({ at: r.at, app: state.applications[r.at] }));
+  if (!removed.length) return;
+  state.applications = state.applications.filter((a) => !ids.includes(a.id));
+  appsSelected.clear();
+  saveState();
+  /* 되돌릴 때 **원래 자리로** 넣는다 — 뒤에 붙이면 목록 순서가 바뀌어
+     학생이 "지웠다 살렸더니 딴 데 가 있네" 하고 또 헷갈린다. */
+  undoBuffer = removed.slice().sort((x, y) => x.at - y.at);
+  renderApplications();
+  renderHome();
+  toast(`${removed.length}건을 지웠어요`, {
+    label: '되돌리기',
+    run: () => {
+      for (const r of undoBuffer) state.applications.splice(r.at, 0, r.app);
+      undoBuffer = null;
+      saveState();
+      renderApplications();
+      renderHome();
+      toast('되돌렸어요');
+    },
+  });
+}
+
+/* 카드를 왼쪽으로 미는 손짓. **세로 스크롤을 막지 않는 것**이 이 함수의 어려운 부분이다 —
+   첫 움직임에서 가로/세로를 정하고, 세로면 즉시 손을 뗀다(목록이 정상으로 스크롤된다).
+   ⚠️ 이 유형은 **마우스로는 한 번도 재현되지 않는다** — 검사는 TouchEvent로 해야 한다
+   (13차 세션 학교 검색 사고와 같은 계열, CLAUDE.md 참조). */
+function enableRowSwipe(list) {
+  const REVEAL = 96;            // 삭제 버튼 너비와 같아야 한다 (style.css .swipe-del)
+  let row = null, x0 = 0, y0 = 0, dir = null, dx = 0;
+  const end = () => { if (row) row.classList.remove('dragging'); row = null; dir = null; };
+
+  list.addEventListener('touchstart', (e) => {
+    if (e.touches.length !== 1 || appsSelectMode) return;
+    const r = e.target.closest('.swipe-row');
+    if (!r) return;
+    list.querySelectorAll('.swipe-row.open').forEach((o) => { if (o !== r) o.classList.remove('open'); });
+    row = r; x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; dir = null; dx = 0;
+    row.classList.add('dragging');
+  }, { passive: true });
+
+  list.addEventListener('touchmove', (e) => {
+    if (!row) return;
+    const ax = e.touches[0].clientX - x0;
+    const ay = e.touches[0].clientY - y0;
+    if (!dir) {
+      if (Math.abs(ax) < 6 && Math.abs(ay) < 6) return;   // 아직 방향을 모른다
+      dir = Math.abs(ax) > Math.abs(ay) ? 'x' : 'y';
+      if (dir === 'y') { end(); return; }                 // 세로다 — 목록에 넘긴다
+    }
+    e.preventDefault();
+    const base = row.classList.contains('open') ? -REVEAL : 0;
+    dx = Math.max(-REVEAL, Math.min(0, base + ax));
+    row.style.setProperty('--dx', `${dx}px`);
+  }, { passive: false });
+
+  list.addEventListener('touchend', () => {
+    if (!row) return;
+    row.style.removeProperty('--dx');
+    row.classList.toggle('open', dx < -REVEAL / 2);
+    /* 민 뒤에 곧바로 오는 click은 카드 열기가 아니다 — 삼킨다 */
+    if (Math.abs(dx) > 6) lastSwipeAt = Date.now();
+    end();
+  }, { passive: true });
 }
 
 function renderApplications() {
@@ -1534,9 +1640,66 @@ function renderApplications() {
        </div>`
     : '';
 
-  $('#apps-list').innerHTML = apps.length
+  /* 지워진 항목이 선택 목록에 남지 않게 — 남으면 '삭제 3건'인데 2건만 지워진다 */
+  for (const id of [...appsSelected]) if (!apps.some((a) => a.id === id)) appsSelected.delete(id);
+
+  const list = $('#apps-list');
+  list.classList.toggle('selecting', appsSelectMode);
+  list.innerHTML = apps.length
     ? apps.map(appCard).join('')
     : '<p class="empty">아직 준비한 장학금이 없어요.<br />홈에서 한 번에 준비해 보세요 ⚡</p>';
+
+  /* 항목이 없으면 관리 장치를 통째로 숨긴다 — 빈 화면에 쓸 수 없는 버튼을 두지 않는다 */
+  $('#apps-select-toggle').hidden = !apps.length;
+  $('#apps-swipe-hint').hidden = !apps.length;
+  $('#apps-select-toggle').textContent = appsSelectMode ? '완료' : '선택';
+  $('#apps-bulkbar').hidden = !(appsSelectMode && apps.length);
+  const all = $('#apps-check-all');
+  if (all) all.checked = apps.length > 0 && appsSelected.size === apps.length;
+  const del = $('#apps-delete-selected');
+  if (del) {
+    del.disabled = appsSelected.size === 0;
+    del.textContent = appsSelected.size ? `삭제 ${appsSelected.size}건` : '삭제';
+  }
+}
+
+/* 신청 내역 관리 배선 — 화면이 처음 만들어질 때 한 번만 건다 */
+function wireAppsManage() {
+  const list = $('#apps-list');
+  enableRowSwipe(list);
+
+  $('#apps-select-toggle').addEventListener('click', () => {
+    appsSelectMode = !appsSelectMode;
+    appsSelected.clear();
+    list.querySelectorAll('.swipe-row.open').forEach((o) => o.classList.remove('open'));
+    renderApplications();
+  });
+
+  $('#apps-check-all').addEventListener('change', (e) => {
+    const ids = state.applications.filter((a) => findSch(a.id)).map((a) => a.id);
+    appsSelected.clear();
+    if (e.target.checked) ids.forEach((id) => appsSelected.add(id));
+    renderApplications();
+  });
+
+  $('#apps-delete-selected').addEventListener('click', () => {
+    const ids = [...appsSelected];
+    if (!ids.length) return;
+    deleteApps(ids);
+    appsSelectMode = false;
+    renderApplications();
+  });
+
+  list.addEventListener('click', (e) => {
+    const del = e.target.closest('[data-del]');
+    if (del) { deleteApps([del.dataset.del]); return; }
+    const pick = e.target.closest('[data-pick]');
+    if (pick) {
+      if (pick.checked) appsSelected.add(pick.dataset.pick);
+      else appsSelected.delete(pick.dataset.pick);
+      renderApplications();
+    }
+  });
 }
 
 /* ---------------- MY ---------------- */
@@ -1728,8 +1891,19 @@ function bindEvents() {
   });
 
   document.addEventListener('click', (e) => {
+    /* 🔴 카드를 민 직후에 오는 click은 '열기'가 아니다 — 밀었는데 상세가 열리면
+       삭제 버튼을 보려던 학생이 매번 시트를 닫아야 한다. 선택 모드에서도 열지 않는다. */
+    if (Date.now() - lastSwipeAt < 350) return;
+    if (e.target.closest('[data-del]') || e.target.closest('[data-pick]')) return;
     const card = e.target.closest('[data-detail]');
-    if (card) openDetail(card.dataset.detail);
+    if (!card) return;
+    if (appsSelectMode && card.closest('#apps-list')) {
+      const id = card.dataset.detail;                 // 선택 모드에서는 카드를 눌러도 선택이 된다
+      if (appsSelected.has(id)) appsSelected.delete(id); else appsSelected.add(id);
+      renderApplications();
+      return;
+    }
+    openDetail(card.dataset.detail);
   });
 
   $('#sheet-backdrop').addEventListener('click', closeSheet);
@@ -1737,6 +1911,7 @@ function bindEvents() {
     if (e.target.classList.contains('sheet-handle')) closeSheet();
   });
   enableSheetSwipe($('#detail-sheet'), closeSheet);
+  wireAppsManage();   // 신청 내역 — 왼쪽으로 밀어 삭제 · 선택 모드 (2026-08-24)
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     if (!$('#notify-sheet').hidden) closeNotifyPanel();
