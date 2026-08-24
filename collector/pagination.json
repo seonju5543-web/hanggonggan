@@ -239,5 +239,13 @@
  "https://www.smu.ac.kr/kor/life/scholarship.do": {
   "ok": false,
   "checkedAt": "2026-08-19"
+ },
+ "https://www.gachon.ac.kr/kor/1146/subview.do": {
+  "ok": true,
+  "way": {
+   "kind": "page",
+   "param": "page"
+  },
+  "checkedAt": "2026-08-24"
  }
 }
