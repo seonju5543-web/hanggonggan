@@ -1,6 +1,6 @@
 # 작성 규칙 학습 — 2026-08-24
 
-읽은 곳 15곳 · 못 읽은 곳 1곳 · 규칙에 붙은 출처 3건
+읽은 곳 17곳 · 못 읽은 곳 1곳 · 규칙에 붙은 출처 1건
 
 ## 읽은 곳
   ✓ https://brunch.co.kr/@geonahn/425
@@ -32,22 +32,27 @@
   ✓ https://brunch.co.kr/@icebergw/4
       줄 72 · 규칙을 뒷받침한 것 4종 (plain-sentence, direction, no-cliche, no-self-pity)
       🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
-  ✓ https://community.linkareer.com/interview
-      줄 334 · 규칙을 뒷받침한 것 0종
-  ✓ https://community.linkareer.com/employment_data/4227270?page=1
-      줄 500 · 규칙을 뒷받침한 것 0종
-      🆕 어느 규칙에도 안 붙은 문장 5개 — 컨펌 대기
-  ✓ https://pf.kakao.com/_MGgexb
-      줄 2 · 규칙을 뒷받침한 것 0종
   ✓ https://community.linkareer.com/employment_data/5118788
       줄 363 · 규칙을 뒷받침한 것 2종 (know-the-foundation, character-evidence)
       🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
-  ✓ https://linkareer.com/activity/283454
-      줄 104 · 규칙을 뒷받침한 것 0종
-      🆕 어느 규칙에도 안 붙은 문장 1개 — 컨펌 대기
   ✓ https://linkareer.com/activity/277626
       줄 137 · 규칙을 뒷받침한 것 1종 (know-the-foundation)
       🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
+  ✓ https://linkareer.com/activity/284206
+      줄 124 · 규칙을 뒷받침한 것 1종 (know-the-foundation)
+      🆕 어느 규칙에도 안 붙은 문장 4개 — 컨펌 대기
+  ✓ https://linkareer.com/activity/281528
+      줄 152 · 규칙을 뒷받침한 것 0종
+      🆕 어느 규칙에도 안 붙은 문장 1개 — 컨펌 대기
+  ✓ https://community.linkareer.com/honeytips/4895008
+      줄 334 · 규칙을 뒷받침한 것 0종
+  ✓ https://sgsg.hankyung.com/tag/20161014123229556
+      줄 150 · 규칙을 뒷받침한 것 0종
+  ✓ https://sgsg.hankyung.com/tag/20250221163637551
+      줄 142 · 규칙을 뒷받침한 것 0종
+  ✓ https://www.skillagit.com/mobile/product/view.php?idx=17880&amp;code=1216?%3E
+      줄 1056 · 규칙을 뒷받침한 것 0종
+      🆕 어느 규칙에도 안 붙은 문장 5개 — 컨펌 대기
 
 ## 🆕 어느 규칙에도 안 붙은 문장 — 개발자 컨펌 대기
 아래는 **규칙 후보**입니다. 규칙집에 넣을지는 사람이 정합니다(운영 원칙 2).
@@ -134,23 +139,23 @@
   <sub>https://brunch.co.kr/@icebergw/4</sub>
 
 ## 스스로 넓히기 — 로봇이 읽은 글에서 다음에 읽을 곳을 주웠습니다
-주운 곳 23곳 · 이번에 읽은 곳 6곳 · robots.txt 가 막아 건너뛴 곳 0곳
+주운 곳 20곳 · 이번에 읽은 곳 6곳 · robots.txt 가 막아 건너뛴 곳 0곳
 
-- · 규칙 0종 — 30일 뒤 다시 시도 https://community.linkareer.com/interview
-  <sub>면접 합격 후기</sub>
-- · 규칙 0종 — 30일 뒤 다시 시도 https://community.linkareer.com/employment_data/4227270?page=1
-  <sub>삼성 SSAFY 합격 후기 모음집 (feat. 합격 스펙, 인재상 등)</sub>
-- · 규칙 0종 — 30일 뒤 다시 시도 https://pf.kakao.com/_MGgexb
-  <sub>자소서봇</sub>
-- ⬆️ seeds 로 승격 https://community.linkareer.com/employment_data/5118788
-  <sub>2026 국가장학금</sub>
-- · 규칙 0종 — 30일 뒤 다시 시도 https://linkareer.com/activity/283454
-  <sub>2026 T&amp;C재단 공감인재 장학생</sub>
-- ⬆️ seeds 로 승격 https://linkareer.com/activity/277626
-  <sub>2026 에몬스 18기 장학생</sub>
+- ⬆️ seeds 로 승격 https://linkareer.com/activity/284206
+  <sub>2026 협성문화재단신규 협성장학생</sub>
+- · 규칙 0종 — 30일 뒤 다시 시도 https://linkareer.com/activity/281528
+  <sub>2026 시안장학회 장학생</sub>
+- · 규칙 0종 — 30일 뒤 다시 시도 https://community.linkareer.com/honeytips/4895008
+  <sub>🛫대학생 교환학생&amp;해외유학 장학금 꿀팁 모음</sub>
+- · 규칙 0종 — 30일 뒤 다시 시도 https://sgsg.hankyung.com/tag/20161014123229556
+  <sub>#장학금</sub>
+- · 규칙 0종 — 30일 뒤 다시 시도 https://sgsg.hankyung.com/tag/20250221163637551
+  <sub>#자기소개서 작성법</sub>
+- · 규칙 0종 — 30일 뒤 다시 시도 https://www.skillagit.com/mobile/product/view.php?idx=17880&amp;code=1216?%3E
+  <sub>문서 첨삭부터 과제 컨설팅까지, 꼼꼼하게 도와드립니다.</sub>
 
 ## 🩺 seed 건강 (지속가능성)
-살아 있는 seed 12개 (상한 60) · 이번 실행에서 규칙을 준 곳 10개
+살아 있는 seed 13개 (상한 60) · 이번 실행에서 규칙을 준 곳 11개
 
 시든 seed 없음.
 
