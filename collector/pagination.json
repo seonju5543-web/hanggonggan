@@ -247,5 +247,14 @@
    "param": "page"
   },
   "checkedAt": "2026-08-24"
+ },
+ "https://www.gachon.ac.kr/kor/7986/subview.do": {
+  "ok": true,
+  "way": {
+   "kind": "offset",
+   "param": "article.offset",
+   "limit": 10
+  },
+  "checkedAt": "2026-08-24"
  }
 }
