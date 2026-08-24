@@ -2,6 +2,11 @@
 
 > 2026-07-31 신설. 공동작업자(Josehyeon)의 질문 — *"작업이 자꾸 겹쳐 문제가 생긴다.
 > 하이젠버그 브랜치를 하나 더 만들어 각자 쓰면 충돌이 안 되지 않을까?"* — 에 대한 답과 조치.
+>
+> **2026-08-24 갱신 — CTO 유은서 합류로 세 사람 체제.** 아래 "두 사람"이라 적힌 곳은 전부
+> **세 사람**으로 읽는다. 브랜치는 선주=`claude/work-seonju` · Josehyeon=`claude/work-josehyeon` ·
+> **유은서=`claude/work-eunseo`(신설)**. 겹침 감지(`check-collab.js`)는 브랜치 개수를 하드코딩하지
+> 않고 원격의 모든 브랜치를 자동으로 훑으므로 코드 변경 없이 그대로 작동한다.
 
 ---
 
@@ -151,10 +156,10 @@ Claude 세션이 시작될 때 자동으로 `verify/check-collab.js`가 돌면�
 
 ## 5. 알아 두면 좋은 사실
 
-- **두 사람의 커밋은 이름으로 구분되지 않습니다.** 둘 다 Claude 세션으로 작업하므로 커밋
+- **여러 사람의 커밋은 이름으로 구분되지 않습니다.** 다들 Claude 세션으로 작업하므로 커밋
   작성자가 똑같이 `Claude <noreply@anthropic.com>`로 찍힙니다. 그래서 겹침 검사는 사람이
   아니라 **브랜치**를 기준으로 봅니다. 진척도 문서의 활동 로그도 브랜치로 구분합니다
-  (선주 = `claude/work-seonju`, Josehyeon = `claude/work-josehyeon`).
+  (선주 = `claude/work-seonju`, Josehyeon = `claude/work-josehyeon`, 유은서 = `claude/work-eunseo`).
 - **브랜치는 이 흐름으로만 움직입니다.**
   `내 세션 브랜치` → `기본 브랜치(claude/nice-heisenberg-WESq5)` → (배포 로봇) → `main` → 앱
   기본 브랜치는 *로봇이 사는 집*이고, `main`은 *앱이 나가는 문*입니다. 사람은 자기 브랜치에서
@@ -163,7 +168,27 @@ Claude 세션이 시작될 때 자동으로 `verify/check-collab.js`가 돌면�
 
 ---
 
-## 6. 개발자 액션 (선주·Josehyeon 두 분 합의 필요)
+## 6. 개발자 액션 (선주·Josehyeon·유은서 세 분 합의 필요)
+
+### 🔴 CTO 유은서 합류 — 계정 연결 체크리스트 (2026-08-24, 선주님만 할 수 있음)
+Claude 세션은 계정에 사람을 초대하는 버튼을 대신 눌러줄 수 없다(초대 도구 자체가 없음).
+아래 세 곳을 **선주님이 직접** 열어드려야 유은서님이 조세현님과 동급으로 움직일 수 있다.
+
+| # | 어디 | 무엇을 | 비고 |
+|---|---|---|---|
+| 1 | GitHub 저장소 | Settings → Collaborators and teams → Add people → 유은서님 GitHub 아이디, 권한 `Admin` | BUSINESS.md 1절에 CTO가 "설계·파트너 선정·일정 전권"이라 명시돼 있어 `Write`(조세현님과 동일)보다 `Admin` 권장. 개인 계정 저장소라 Admin이 줄 수 있는 최대치(저장소 삭제·양도만 소유자 고유 권한) |
+| 2 | Cloudflare 계정 | Manage Account → Members → Invite Member → 유은서님 이메일, 역할 `Super Administrator` | 이게 있어야 `server/push/`(가동 중)·`_admin/`(관리자 화면)·앞으로 배포할 `server/essay/`·`server/chat/`를 직접 만질 수 있다 |
+| 3 | 관리자 화면(`_admin`) 로그인 허용 목록 | Cloudflare Zero Trust → Access → Applications → `hanggonggan-admin` → Policies → 허용 이메일에 유은서님 이메일 추가 | 2번과 **별개의 문**이다 — 2번만 하면 Cloudflare 계정 권한은 있어도 관리자 화면 로그인 시트에서 막힌다 |
+
+세 곳 다 해야 조세현님과 동급 접근이 완성된다. 저장소 쪽 준비(작업 브랜치·인수인계 문서)는
+같은 날 Claude 세션이 먼저 처리했다 — 아래 참조.
+
+### 저장소 쪽 준비물 (2026-08-24 완료)
+- **전용 작업 브랜치 `claude/work-eunseo`** 신설 — 기본 브랜치(`claude/nice-heisenberg-WESq5`)에서 분기.
+- **`docs/cto-onboarding/`** — 2026-08-20에 이미 만들어져 있었는데 별도 브랜치(`claude/cto-onboarding-docs-c8efrf`)에
+  고립돼 기본 브랜치·main 어디에도 반영되지 않은 채 방치돼 있던 것을 되찾아 이 세션에서 다시 커밋했다.
+  PDF 2종(제품 전체 개요 4쪽 · 코드·아키텍처 상세 11쪽) — 수치는 2026-08-20 스냅샷 기준이라
+  최신 숫자는 본 CLAUDE.md·BUSINESS.md 9절을 함께 참조할 것.
 
 | 할 일 | 하고 나면 | 왜 사람이 해야 하나 |
 |---|---|---|
