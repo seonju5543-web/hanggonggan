@@ -17,6 +17,7 @@ const SH = (typeof module !== 'undefined' && module.exports)
 const PR = (typeof module !== 'undefined' && module.exports)
   ? require('./parse-requirements.js')
   : { parseLine, gradOnly, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM };
+const PR2 = PR;   // requirementLines가 쓰는 별칭 (선언 순서 때문에 이름만 따로 둔다)
 
 /* 자격 진단 — 프로필과 공고의 요건을 대조해 상태·사유·부족정보를 돌려준다 */
 function evaluate(sch, p) {
@@ -172,6 +173,43 @@ function judgeCond(c, p) {
   }
 }
 
+/* 🔴 줄 하나의 판정 — **퍼센트와 화면의 ✓/✗가 반드시 같은 함수를 써야 한다** (2026-08-24).
+   개발자 지적: *"적합도가 100%인데 지원 자격에 ✕가 쳐져 있고 아예 체크가 안 된 것도 있다."*
+   원인은 판정이 두 벌이었기 때문이다 — 퍼센트는 parse-requirements로, 화면의 ✓/✗는
+   옛 `requirementMatch`(정규식 한 벌 더)로 각각 계산했다. 그 옛 함수는 심지어
+   `p.status === 'enrolled'`처럼 **오늘 바뀐 옛 학적상태 값**을 보고 있었다.
+   이 저장소가 되풀이해 겪은 '규칙 두 벌' 사고와 같은 계열이라, 아예 하나로 합친다.
+
+   반환: 'ok'(충족) | 'no'(미달) | null(판정 불가 — 화면에 아무 표시도 안 한다)
+   ⚠️ **'no'는 확신이 높을 때만** 낸다. ✕는 0%와 같은 무게의 판정이다. */
+function lineVerdict(text, p, isExclude, ctx) {
+  if (!p) return null;
+  if (PR.gradOnly(text)) return null;          // 대학원 전용 줄 — 학부생과 무관
+  const { conds } = PR.parseLine(text, !!isExclude);
+  let seen = null;
+  for (const c of conds) {
+    /* 지급액 구간표는 요건이 아니다 — 공고를 통째로 봐야 알 수 있어 맥락으로 받는다
+       (한 공고에 `4분위 이하`·`5~6분위`가 함께 있으면 표다). 이걸 모르면
+       퍼센트는 멀쩡한데 화면에만 ✕가 뜬다(2026-08-24 개발자 지적). */
+    if (ctx && ctx.bracketTable && c.kind === 'bracket') continue;
+    const v = judgeCond(c, p);
+    if (v === 'fail' && c.conf === PR.HIGH) return 'no';
+    if (v === 'pass') seen = 'ok';
+  }
+  return seen;
+}
+
+/* 공고 단위로만 알 수 있는 것 — 줄 하나만 봐서는 판단할 수 없다. 퍼센트와 ✓/✗가
+   **같은 맥락**을 봐야 갈라지지 않는다. */
+function noticeCtx(sch) {
+  const lines = (sch && sch.eligibilityLines) || [];
+  const brackets = new Set();
+  for (const it of requirementLines(sch, lines, { withMeta: true })) {
+    for (const c of PR.parseLine(it.text, false).conds) if (c.kind === 'bracket') brackets.add(c.max);
+  }
+  return { bracketTable: brackets.size > 1 };
+}
+
 /* 공고 하나에 대한 적합도 **내역**. 카드가 "요건 6개 중 4개 충족"을 띄우려면 숫자가 필요하다. */
 function fitDetail(sch, p) {
   const parseLine = PR.parseLine;
@@ -185,27 +223,14 @@ function fitDetail(sch, p) {
   /* 여러 장학금이 묶인 공고는 0%를 내지 않는다(설계 조건 ⑧) — 하나에 미달해도 다른 것에 지원한다 */
   const multi = items.some((it) => PR.MULTI_PROGRAM.test(it.text));
 
-  /* 🔴 한 공고에 **서로 다른 구간 값이 둘 이상** 나오면 그건 요건이 아니라 지급액 표다
-     (`4분위 이하` / `5분위 이상~6분위 이하` — 서울과기대 근로장학). 줄 하나만 봐서는
-     알 수 없어 공고 단위로 센다. 표를 요건으로 읽으면 멀쩡한 학생이 0%가 된다. */
-  const brackets = new Set();
-  for (const it of items) {
-    for (const c of parseLine(it.text, false).conds) if (c.kind === 'bracket') brackets.add(c.max);
-  }
-  const bracketTable = brackets.size > 1;
+  const ctx = noticeCtx(sch);
 
   const fails = [];
   let met = 0, unknown = 0;
   const groups = new Map();          // 선택지 묶음 → 그 안에서 하나라도 충족했나
   for (const it of items) {
-    const { conds } = parseLine(it.text, false);
-    let verdict = 'unknown';
-    for (const c of conds) {
-      if (bracketTable && c.kind === 'bracket') continue;   // 지급액 표는 요건이 아니다 (위 주석)
-      const v = judgeCond(c, p);
-      if (v === 'fail' && c.conf === PR.HIGH) { verdict = 'fail'; break; }
-      if (v === 'pass' && verdict !== 'fail') verdict = 'pass';
-    }
+    const lv = lineVerdict(it.text, p, false, ctx);
+    const verdict = lv === 'no' ? 'fail' : lv === 'ok' ? 'pass' : 'unknown';
     if (it.group > 0) {
       const g = groups.get(it.group) || { any: false };
       if (verdict === 'pass') g.any = true;
@@ -224,6 +249,7 @@ function fitDetail(sch, p) {
     const { conds } = parseLine(line, true);
     for (const c of conds) {
       if (c.conf !== PR.HIGH) continue;
+      if (ctx.bracketTable && c.kind === 'bracket') continue;
       if (judgeCond(c, p) === 'fail' && !multi) fails.push(line);
     }
   }
@@ -684,6 +710,9 @@ function requirementLines(sch, lines, opts) {
        `(자|생|중|상|하|명|원)$`처럼 느슨해서 `지원 제외 대상`의 '상'까지 자격으로 봤다.
        제목에서 지켜야 할 것은 **진짜 자격 범주 이름뿐**이므로 좁게 적는다. */
     if (SUB_HEAD.test(t) && !/수급|차상위|보훈|유공|장애|다자녀|한부모|새터민|북한이탈|다문화|국적/.test(t)) continue;
+    /* 대학원 전용 줄(`일반대학원생 : …`)은 학부생에게 해당이 없다. 화면에 남겨 두면
+       100%인데 아무 표시도 없는 줄이 되어 학생이 혼란스럽다(2026-08-24 개발자 지적). */
+    if (!loose && PR2.gradOnly(t)) continue;
     if (POINTER_LINE.test(t)) {
       /* 안내 줄 자신은 화면에 안 내보내되, '여기부터 n줄은 선택지'라는 사실은 남긴다 */
       const n = anyOfCount(t);
@@ -751,41 +780,13 @@ function requirementLines(sch, lines, opts) {
 /* 요건 한 줄이 이 학생에게 맞는지 — **확실할 때만** 판정한다.
    틀린 초록 체크는 '모른다'보다 나쁘다(자격도 안 되는 학생이 서류를 준비하게 된다).
    그래서 숫자·낱말이 명확한 것만 보고, 조금이라도 애매하면 null(판정 안 함)을 낸다. */
-function requirementMatch(text, p) {
-  if (!p) return null;
-  const t = String(text || '');
-  const flags = p.flags || [];
-  const has = (f) => flags.includes(f);
-
-  // 소득분위/구간 — "1~9분위", "8분위 이내", "0분위"
-  const band = t.match(/(\d)\s*[~∼-]\s*(\d)\s*(?:분위|구간)/) || t.match(/(\d)\s*(?:분위|구간)\s*(이내|이하|까지)/);
-  if (band && p.bracket != null && /분위|구간/.test(t)) {
-    const lo = band[3] ? 0 : Number(band[1]);
-    const hi = band[3] ? Number(band[1]) : Number(band[2]);
-    return p.bracket >= lo && p.bracket <= hi ? 'ok' : 'no';
-  }
-  // 평점 — "평점 3.0 이상", "평균평점 2.75/4.5 이상"
-  const gpa = t.match(/(?:평점|평균평점|성적)[^0-9]{0,8}(\d\.\d{1,2})\s*(?:\/\s*4\.5)?\s*이상/);
-  if (gpa && p.gpa != null) return p.gpa >= Number(gpa[1]) ? 'ok' : 'no';
-  // 특별자격 — 낱말이 그대로 있을 때만
-  if (/한부모/.test(t)) return has('basicLiving') || has('nearPoverty') ? null : null; // 프로필에 한부모 항목이 없다 — 판정하지 않는다
-  if (/기초\s?생활|수급자/.test(t)) return has('basicLiving') ? 'ok' : 'no';
-  if (/차상위/.test(t)) return has('nearPoverty') ? 'ok' : 'no';
-  if (/다자녀|3자녀|세자녀/.test(t)) return has('multiChild') ? 'ok' : 'no';
-  if (/국가유공|보훈/.test(t)) return has('merit') ? 'ok' : 'no';
-  if (/장애\s?(학생|인)/.test(t)) return has('disabled') ? 'ok' : 'no';
-  // 학년 — "1학년만", "2~3학년"
-  const yr = t.match(/(\d)\s*[~∼-]\s*(\d)\s*학년/);
-  if (yr && p.year != null) return p.year >= +yr[1] && p.year <= +yr[2] ? 'ok' : 'no';
-  const yr1 = t.match(/(\d)\s*학년\s*(?:만|대상|재학생)/);
-  if (yr1 && p.year != null) return p.year === +yr1[1] ? 'ok' : 'no';
-  // 재학 상태 — "재학생 및 복학예정자"
-  if (/재학생/.test(t) && !/대학원|졸업생/.test(t)) {
-    if (p.status === 'enrolled' || p.status === 'returning') return 'ok';
-    if (p.status === 'freshman' && /신입/.test(t)) return 'ok';
-  }
-  if (/4\s?년제|대학생|학부생/.test(t) && !/대학원/.test(t)) return 'ok';
-  return null;   // 판정 불가 — 색을 칠하지 않는다
+function requirementMatch(text, p, sch) {
+  /* 🔴 예전에는 여기에 **정규식 판정기가 한 벌 더** 있었다(2026-08-24 제거).
+     그래서 화면의 ✓/✗가 적합도 퍼센트와 따로 놀았다 — 100%인데 ✕가 뜨고, 아무 표시도
+     없는 줄이 100%에 섞였다. 게다가 그 판정기는 `p.status === 'enrolled'`처럼
+     **바뀐 옛 프로필 값**을 보고 있어 학적 판정이 조용히 죽어 있었다.
+     지금은 퍼센트를 만드는 것과 **똑같은 함수**를 쓴다 — 갈라질 수가 없다. */
+  return lineVerdict(text, p, false, sch ? noticeCtx(sch) : null);
 }
 
 /* ---------------- 학교별 공고 파일 이름 (2026-08-17 신설) ----------------

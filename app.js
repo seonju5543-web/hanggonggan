@@ -1216,7 +1216,7 @@ function openDetail(id) {
   /* 요건 한 줄을 그리는 법 — 구조 렌더와 평평한 렌더가 **같은 함수**를 쓴다.
      따로 두면 한쪽만 고쳐져서 두 모양의 판정이 갈라진다. */
   const reqRow = (e, extra) => {
-    const m = requirementMatch(e, state.profile);
+    const m = requirementMatch(e, state.profile, sch);
     const cls = m === 'ok' ? 'r-ok' : m === 'no' ? 'r-bad' : 'r-req';
     const mark = m === 'ok' ? '✓ ' : m === 'no' ? '✕ ' : '';
     return `<li class="${cls}${extra ? ' ' + extra : ''}">${mark}${esc(e)}</li>`;

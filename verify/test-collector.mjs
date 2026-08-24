@@ -1882,6 +1882,40 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
   eq('구간이 여러 값이면 지급액 표로 보고 미달을 내지 않는다',
     fit(['학자금지원구간 4분위 이하', '학자금지원구간 5분위 이상 ~ 6분위 이하'], 평범).pct > 0, true);
 
+  /* 🔴 **퍼센트와 화면의 ✓/✗는 갈라질 수 없어야 한다** (2026-08-24 개발자 지적).
+     *"적합도가 100%인데 지원 자격에 ✕가 쳐져 있고 아예 체크도 안 된 것도 있다."*
+     원인은 판정이 두 벌이었기 때문이다(퍼센트=parse-requirements / 표시=옛 정규식).
+     지금은 `lineVerdict` 하나를 함께 쓴다. 아래 셋이 이 약속을 지킨다 —
+     누군가 판정기를 한 벌 더 만들면 여기서 바로 깨진다. */
+  {
+    const reg = req('../data/registered.json');
+    const base = { school: '한국외국어대학교', track: '인문', nationality: 'korean',
+                   region: '서울', parentRegion: '서울', birthYear: 2004 };
+    const profs = [
+      { gpa: 4.3, bracket: 1, year: 3, status: '재학', credits: 18, flags: ['basicLiving'] },
+      { gpa: 3.5, bracket: 5, year: 3, status: '재학', credits: 15, flags: [] },
+      { gpa: 2.3, bracket: 9, year: 2, status: '재학', credits: 12, flags: [] },
+      { gpa: 3.5, bracket: 5, year: 3, status: '휴학', credits: 15, flags: [] },
+      { gpa: null, bracket: null, year: 3, status: null, credits: null, flags: [] },
+    ];
+    let mismatch100 = 0, mismatchX = 0, muteZero = 0;
+    for (const pp of profs) {
+      const p = { ...base, ...pp };
+      for (const sch of reg.items) {
+        const fd = M.fitDetail(sch, p);
+        if (fd.unread) continue;
+        const marks = (M.requirementLines(sch, sch.eligibilityLines) || [])
+          .map((l) => M.requirementMatch(l, p, sch));
+        if (fd.pct === 100 && marks.some((v) => v !== 'ok')) mismatch100 += 1;
+        if (fd.pct > 0 && marks.some((v) => v === 'no')) mismatchX += 1;
+        if (fd.pct === 0 && !fd.fails.length) muteZero += 1;
+      }
+    }
+    eq('적합도 100%면 모든 자격 줄이 ✓다 (등록 전수 × 프로필 5종)', mismatch100, 0);
+    eq('0%가 아니면 ✕가 있는 줄이 없다', mismatchX, 0);
+    eq('0%에는 반드시 사유가 있다', muteZero, 0);
+  }
+
   // ⑩ 자격을 하나도 못 읽은 공고는 0%가 아니라 '자격 미확인'
   const un = fit(['경제적 지원이 필요한 학생'], 평범);
   eq('자격을 못 읽으면 0%가 아니다', un.pct, M.FIT_FLOOR);

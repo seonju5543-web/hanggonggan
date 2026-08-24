@@ -185,6 +185,46 @@ const misplaced = [];
     if (!req.length && (pri.length || exl.length)) add('자격 칸만 비어 있다 (절 가르기 의심)', `선발 ${pri.length}줄 · 제외 ${exl.length}줄`);
   }
 }
+/* ── 🔴 네 번째 축 — **퍼센트와 화면 표시가 같은 말을 하는가** (2026-08-24) ──
+   개발자가 앱을 보고 지적했다: *"적합도가 100%인데 지원 자격에 ✕가 쳐져 있다."*
+   판정이 두 벌이라 생긴 일이라 하나로 합쳤지만, 데이터가 바뀌면 또 갈라질 수 있다.
+   그래서 **매 실행 등록 전수를 대조한다.** 여기가 0이 아니면 판정기가 두 벌이 된 것이다. */
+const inconsistent = [];
+{
+  const base = { school: '한국외국어대학교', track: '인문', nationality: 'korean',
+                 region: '서울', parentRegion: '서울', birthYear: 2004 };
+  const profs = [
+    { gpa: 4.3, bracket: 1, year: 3, status: '재학', credits: 18, flags: ['basicLiving'] },
+    { gpa: 3.5, bracket: 5, year: 3, status: '재학', credits: 15, flags: [] },
+    { gpa: 2.3, bracket: 9, year: 2, status: '재학', credits: 12, flags: [] },
+    { gpa: 3.5, bracket: 5, year: 3, status: '휴학', credits: 15, flags: [] },
+  ];
+  for (const pp of profs) {
+    const p = { ...base, ...pp };
+    for (const it of reg.items) {
+      const fd = M.fitDetail(it, p);
+      if (fd.unread) continue;
+      const marks = (M.requirementLines(it, it.eligibilityLines) || [])
+        .map((l) => M.requirementMatch(l, p, it));
+      if (fd.pct === 100 && marks.some((v) => v !== 'ok'))
+        inconsistent.push({ id: it.id, why: '적합도 100%인데 ✓가 아닌 자격 줄이 있다', line: `${fd.met}/${fd.total}` });
+      else if (fd.pct > 0 && marks.some((v) => v === 'no'))
+        inconsistent.push({ id: it.id, why: `적합도 ${fd.pct}%인데 ✕인 줄이 있다`, line: `${fd.met}/${fd.total}` });
+      else if (fd.pct === 0 && !fd.fails.length)
+        inconsistent.push({ id: it.id, why: '0%인데 사유가 없다', line: '' });
+    }
+  }
+}
+console.log(`\n■ 퍼센트와 화면 표시가 같은 말을 하는가 (2026-08-24 — 일관성 축)`);
+if (!inconsistent.length) console.log('   없음');
+else {
+  const byWhy = new Map();
+  for (const s of inconsistent) byWhy.set(s.why, (byWhy.get(s.why) || 0) + 1);
+  console.log(`   어긋난 것 ${inconsistent.length}개 · 공고 ${new Set(inconsistent.map((s) => s.id)).size}건`);
+  for (const [why, n] of [...byWhy].sort((a, b) => b[1] - a[1])) console.log(`     · ${why}: ${n}개`);
+}
+if (BAD) for (const s of inconsistent) console.log(`   ✕ ${s.id} [${s.why}] ${s.line}`);
+
 console.log(`\n■ 줄이 맞는 칸에 있는가 (2026-08-24 — 자리 축)`);
 if (!misplaced.length) console.log('   없음');
 else {
