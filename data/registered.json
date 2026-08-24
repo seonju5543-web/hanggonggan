@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-08-22",
+ "updatedAt": "2026-08-24",
  "items": [
   {
    "id": "reg-kw-gukgagosi",
@@ -8087,6 +8087,72 @@
     }
    ],
    "sourceUrl": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366399&article.offset=0&articleLimit=10",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-ent2431263714artclviewdo",
+   "name": "[교내][서울]2026-2 국제학부 김봉철 장학금 장학생 모집(~9/4)",
+   "type": "교내",
+   "provider": "한국외국어대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-09-04",
+   "period": "접수 ~2026-09-04",
+   "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-24 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/263714/artclView.do",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "4. 지원자격",
+    "가 . 2026-2 학기 국제학부 재학생 ( 외국인 포함 ), 국제학부를 졸업한 국제지역대학원 재학생",
+    "나 . 전체평점 3.0/4.5 이상인 자",
+    "다 . 가계 곤란으로 학비조달이 어려운 자"
+   ],
+   "excerpts": [
+    "문의처 : 서울캠퍼스 장학팀 02-2173-2137"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-leno274954srcategoryid22",
+   "name": "[학생지원팀] 2026-2학기 장애학생 도우미 국가근로장학생(생활/이동/수업대필) 모집 (★~8월26일까지)",
+   "type": "교내",
+   "provider": "가톨릭대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-24",
+   "period": "접수 기간 원문 확인",
+   "summary": "가톨릭대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "가톨릭대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-24 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "[양식]도우미 활동신청서.hwp",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=274954&attachNo=224735"
+    }
+   ],
+   "sourceUrl": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=274954&article.offset=0&articleLimit=10&srCategoryId=22",
    "sourceKind": "auto"
   }
  ]
