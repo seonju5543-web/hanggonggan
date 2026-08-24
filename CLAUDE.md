@@ -498,7 +498,7 @@ Fable 5 · Opus 5 전용이다. 자격 AI가 습관적으로 붙였다가 잔액
   GitHub이 오래된 대기분을 취소해 되가져오기가 조용히 사라진다).
 - **두 개발자의 커밋은 작성자로 구분되지 않는다 (2026-07-31 확인)**: 둘 다 Claude 세션으로 작업해
   커밋 작성자가 똑같이 `Claude <noreply@anthropic.com>`로 찍힌다. 누가 한 작업인지 알려면
-  **브랜치를 봐야 한다**(선주 `claude/work-seonju` / Josehyeon `claude/work-josehyeon`).
+  **브랜치를 봐야 한다**(선주 `claude/work-seonju` / Josehyeon `claude/work-josehyeon` / 은서(CTO) `claude/work-eunseo`).
   겹침 검사·진척도 활동 로그가 모두 브랜치 기준인 이유.
 - **배포 동기화 (2026-07-31 구축 — 이게 없어서 수집분이 앱에 안 나갔다)**: 로봇(수집·자동등록·심층수집)은
   **기본 브랜치에만** 커밋하는데 앱은 **main만** 배포하므로, 사람이 손으로 옮기기 전까지 새 공고가
@@ -1238,7 +1238,7 @@ claude-md-improver 검사 결과 — 당시 이 문서의 60%가 세션 기록�
 
 ## 공동 개발 진척도 문서 (PROGRESS.md) — 세션 시작 시 필독 (2026-07-28 신설)
 - 두 개발자 공용 진척도 문서. **정본은 항상 `main`의 `PROGRESS.md`** (열람: https://github.com/seonju5543-web/hanggonggan/blob/main/PROGRESS.md).
-  개발자별 작업 브랜치: 선주=`claude/work-seonju`, 공동작업자(Josehyeon)=`claude/work-josehyeon`.
+  개발자별 작업 브랜치: 선주=`claude/work-seonju`, 공동작업자(Josehyeon)=`claude/work-josehyeon`, 은서(CTO)=`claude/work-eunseo`.
 - **새 세션 시작 시**: `git show origin/main:PROGRESS.md`로 최신본을 읽고, 두 개발자의 완료/개발중/구상중 상태를 사용자에게 먼저 요약 보고한다.
 - **작업 종료 시**: 자기 담당 칸(완료/개발중/구상중)만 수정해 **`main`에 커밋**한다. 상대 칸은 건드리지 않는다(충돌 방지).
   '🤖 활동 로그'(AUTO-ACTIVITY 마커 사이)는 매일 08:07·22:07 KST `update-progress.yml` 워크플로가 브랜치별 커밋으로 자동 갱신하므로 **손대지 않는다**.
