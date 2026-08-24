@@ -29,6 +29,15 @@
    민감정보가 나가지 않아야 한다 — 두 겹으로 두는 편이 낫다.
    ============================================================ */
 
+/* ── ③ 품질 검사는 essay-quality.js 한 곳에 산다 (2026-08-24) ──
+   qualityCheck·rulesFor 는 원래 이 파일 안에 있었으나, 설계
+   (docs/designs/essay-edit.md ③)가 이것을 **서버 없이 화면에서도** 돌리라
+   해서 브라우저·Node 겸용 파일로 옮겼다. 여기서 가져다 그대로 재수출하므로
+   worker.js·검사 드라이버(이 파일에서 import 하던 곳)는 손댈 것이 없다.
+   🔴 원본은 essay-quality.js 하나다. 여기로 다시 베끼지 말 것. */
+import { qualityCheck, rulesFor } from '../../essay-quality.js';
+export { qualityCheck, rulesFor };
+
 /* ── ① 민감정보 — 무슨 일이 있어도 나가지 않는다 ──
    개발자 승인 범위(2026-08-23): 나갈 수 있는 것은 '그 질문에 학생이 쓴 답 +
    공고의 공개 정보 + 학년/전공'뿐이다. 아래는 그 밖의 것을 잡는 그물이다. */
@@ -158,32 +167,6 @@ export function materialText(payload) {
   return parts.filter(Boolean).join('\n');
 }
 
-/* ============================================================
-   ③ 품질 검사 — '에세이'와 '제출 가능한 문서'를 가르는 층
-   ------------------------------------------------------------
-   🔴 왜 필요한가 (개발자 지적 2026-08-23):
-      "아무 데이터도 없는 상황에서 API에게 양식 필아웃을 시키면 제출 가능 수준의
-       문서가 아니라 말 그대로 '에세이'를 쓸 문제가 걱정된다."
-      맞다. 지금까지 프롬프트에 적어 둔 '좋은 글'의 기준은 내가 짐작해 쓴 것이지
-      근거가 없었다. 그래서 **'좋은 장학 자소서의 조건'을 규칙으로 모아**
-      (data/essay-playbook.json) ⓐ 모델에게 조건으로 주고 ⓑ 받은 글을 되받아 검사한다.
-
-   🔴 예시문을 베끼지 않는다. 규칙만 쓴다 — 표절·저작권·획일화를 셋 다 피한다.
-      (경위: docs/designs/essay-tailoring.md)
-
-   비용 0원. 정규식과 글자 수만 본다.
-   ============================================================ */
-
-/** 문단 수 — 빈 줄로 나뉜 덩어리 */
-const paraCount = (t) => String(t || '').split(/\n\s*\n/).filter((p) => p.trim().length > 20).length || 1;
-
-/**
- * 초안 한 칸의 '수준'을 본다. 통과/실패가 아니라 **고칠 곳 목록**을 돌려준다 —
- * 학생이 읽고 고치는 것이 이 기능의 전제이므로, 버리는 것보다 짚어 주는 편이 낫다.
- * @param {string} text     검사할 글 (AI 초안이든 학생이 쓴 글이든)
- * @param {object} opt      { target, ownWords: string[], checks: [] }
- * @returns {{warnings: {code:string,msg:string}[]}}
- */
 /* ── 🔴 블라인드 심사 — 학교명이 들어가면 학생이 심사에서 제외된다 (2026-08-24) ──
 
    경위: 작성 규칙 학습을 **우리가 이미 가진 공고 원문**으로 넓혔더니 이런 줄이 나왔다.
@@ -222,55 +205,5 @@ export function scrubSchool(text, school, aliases) {
   return { text: out, hits };
 }
 
-export function qualityCheck(text, opt = {}) {
-  const t = String(text || '').trim();
-  const checks = opt.checks || [];
-  const warnings = [];
-  const add = (c, msg) => { if (!warnings.some((w) => w.code === c)) warnings.push({ code: c, msg }); };
-  if (!t) return { warnings };
-
-  for (const c of checks) {
-    if (c.type === 'banRegex') {
-      let re;
-      try { re = new RegExp(c.pattern); } catch { continue; }
-      if (re.test(t)) add(c.code, c.msg);
-    } else if (c.type === 'banWords') {
-      const hit = (c.words || []).find((w) => t.includes(w));
-      if (hit) add(c.code, `${c.msg} ("${hit}")`);
-    } else if (c.type === 'minParagraphs') {
-      const need = Number(c.whenTargetAtLeast) || 0;
-      if ((opt.target || 0) >= need && paraCount(t) < (c.min || 2)) add(c.code, c.msg);
-    } else if (c.type === 'lengthBand') {
-      const tg = Number(opt.target) || 0;
-      const tol = Number(c.tolerance) || 0.25;
-      if (tg && (t.length < tg * (1 - tol) || t.length > tg * (1 + tol))) {
-        add(c.code, `${c.msg} (지금 ${t.length}자 · 목표 약 ${tg}자)`);
-      }
-    } else if (c.type === 'usesOwnMaterial') {
-      /* 학생이 **직접 친 글**(칩이 아니라 자유 입력)의 낱말이 본문에 반영됐는가.
-         반영이 하나도 없으면 그 글은 누구에게나 맞는 글이 된다 — 개발자가 걱정한 획일화가
-         실제로 일어나는 지점이 여기다. */
-      /* 🔴 통짜로 비교하면 안 된다 — 학생이 '새벽 아르바이트를 1년간 했어요'라고 적으면
-         글에는 '새벽 아르바이트를 이어 왔습니다'처럼 다르게 들어간다. 문장 전체를 찾으면
-         거의 언제나 '안 썼다'가 나와 경고가 소음이 된다. **낱말 단위로** 본다. */
-      const STOP = new Set(['해요', '했어요', '합니다', '입니다', '있어요', '없어요', '그리고', '하지만', '예요', '이에요']);
-      const tokens = (opt.ownWords || [])
-        .flatMap((w) => String(w).split(/[\s,·/]+/))
-        .map((x) => x.replace(/[.!?]/g, '').trim())
-        .filter((x) => x.length >= 2 && !STOP.has(x));
-      if (tokens.length) {
-        const body = String(t).replace(/\s/g, '');
-        /* 조사가 붙어 형태가 달라지므로 앞 2~4자로 본다 ('아르바이트를' → '아르바이트') */
-        const used = tokens.some((x) => body.includes(x) || body.includes(x.slice(0, Math.max(2, x.length - 1))));
-        if (!used) add(c.code, c.msg);
-      }
-    }
-  }
-  return { warnings };
-}
-
-/** 이 칸에 줄 규칙 — 전체 공통(*) + 그 종류 전용 */
-export function rulesFor(playbook, kind) {
-  const rs = (playbook && playbook.rules) || [];
-  return rs.filter((r) => r.kind === '*' || r.kind === kind);
-}
+/* qualityCheck·rulesFor 는 essay-quality.js 로 옮겨 이 파일 첫머리에서 재수출한다.
+   (서버 없이 화면에서도 같은 검사를 돌리기 위해서다 — docs/designs/essay-edit.md ③) */
