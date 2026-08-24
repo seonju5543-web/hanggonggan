@@ -328,16 +328,37 @@ head('9) 🔴 맞춤 보기에도 민감 낱말이 없는가 (전수)');
   ok(urls.some((u) => /%EA%B8%80%EC%93%B0%EA%B8%B0|글쓰기/.test(decodeURIComponent(u))), '다른 집 링크도 줍는다');
   ok(!urls.some((u) => /login|cart|recruit/.test(u)), '🔴 로그인·장바구니·채용은 줍지 않는다');
 
-  /* 🔴 1차 자동 확장에서 실제로 승격됐던 곳들이다 — 이 기능의 뼈대를 뒤집는 곳이라 막았다 */
-  const 예시문사이트 = `
+  /* 🔴 막는 것은 **예시문 DB 뿐**이다 (2026-08-24 정책 정정).
+     개발자가 '팁·후기 글은 널리 학습하라'고 지시했다 — 그런 글은 열어야 한다. */
+  const dbLinks = `
     <a href="https://linkareer.com/cover-letter/search">자기소개서</a>
     <a href="https://x.example/a?keyword=삼성">삼성 최신 합격자소서</a>
-    <a href="https://x.example/자소서-예시문-모음">자소서 예시문 모음</a>
-    <a href="https://community.example/junior_activity">서류 합격 후기</a>`;
-  const 막힌것 = linkCandidates(예시문사이트, 'https://ex.example/');
-  ok(막힌것.length === 0,
-    '🔴 합격자소서·예시문 모음은 줍지 않는다 — 표절·저작권·획일화 때문에 안 쓰기로 한 곳이다',
-    막힌것.map((g) => g.url).join(', '));
+    <a href="https://x.example/자소서-예시문-모음">자소서 예시문 모음</a>`;
+  const 막힌DB = linkCandidates(dbLinks, 'https://ex.example/');
+  ok(막힌DB.length === 0, '🔴 예시문 DB(cover-letter·검색결과·모음)는 줍지 않는다 — 표절·저작권·획일화',
+    막힌DB.map((g) => g.url).join(', '));
+
+  const tipLinks = `
+    <a href="https://m.blog.naver.com/hong/223">장학금 자소서 합격 후기</a>
+    <a href="https://someone.tistory.com/42">자기소개서 작성 꿀팁</a>`;
+  const 열린팁 = linkCandidates(tipLinks, 'https://ex.example/');
+  ok(열린팁.length === 2, '🔴 팁·후기 글은 이제 줍는다 — 개발자가 널리 학습하라고 한 글이다',
+    열린팁.map((g) => g.url).join(', '));
+
+  /* 네이버 블로그는 모바일 주소로 읽는다 */
+  const { naverMobile } = await import('../collector/essay-rule-line.mjs');
+  ok(naverMobile('https://blog.naver.com/hong/223456') === 'https://m.blog.naver.com/hong/223456',
+    '네이버 데스크톱 주소를 모바일로 바꾼다 (프레임 껍데기를 피한다)');
+  ok(naverMobile('https://blog.naver.com/PostView.naver?blogId=hong&logNo=99') === 'https://m.blog.naver.com/hong/99',
+    'PostView 주소도 모바일 경로로 바꾼다');
+  ok(naverMobile('https://ex.example/a') === 'https://ex.example/a', '네이버가 아니면 건드리지 않는다');
+
+  /* 지속가능성 배선 — seed 상한·시든 seed 점검이 로봇에 실제로 있는가 */
+  const learn = fs.readFileSync(new URL('../collector/essay-playbook-learn.mjs', import.meta.url), 'utf8');
+  ok(/MAX_SEEDS/.test(learn) && /strike/.test(learn) && /withered/.test(learn),
+    '🔴 seed 가 무한정 불어나지 않고, 시든 seed 를 리포트에 올린다 (지속가능성)');
+  ok(/자동\s*삭제(하지\s*않는다|\s*안\s*함)/.test(learn),
+    '시든 seed 를 자동 삭제하지 않는다 — 판단은 사람에게 남긴다');
 
   /* 앵커 글자에 속성이 섞이지 않는가 — 1차 실행에서 data-tiara-layer 가 제목으로 잡혔다 */
   const 속성섞임 = linkCandidates('<a href="/t/자기소개서" data-x="본문 하단 > 키워드 클릭">장학금 자기소개서</a>', 'https://ex.example/');

@@ -20,7 +20,7 @@
    ============================================================ */
 import fs from 'node:fs';
 import path from 'node:path';
-import { isCandidate, linkCandidates, parseRobots, robotsBlocks, toLines } from './essay-rule-line.mjs';
+import { isCandidate, linkCandidates, parseRobots, robotsBlocks, toLines, naverMobile } from './essay-rule-line.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const rd = (p) => JSON.parse(fs.readFileSync(path.join(ROOT, p), 'utf8'));
@@ -68,7 +68,8 @@ function matchRule(text) {
 /* 우리가 누구인지 밝힌다 — 몰래 읽지 않는다 */
 const UA = 'Mozilla/5.0 (compatible; handaejang-playbook/1.0; +https://github.com/seonju5543-web/hanggonggan)';
 async function fetchPage(url) {
-  const res = await fetch(url, {
+  /* 네이버 블로그는 모바일 주소로 바꿔 읽는다 — 데스크톱은 프레임 껍데기만 온다 */
+  const res = await fetch(naverMobile(url), {
     redirect: 'follow',
     headers: { 'user-agent': UA, 'accept-language': 'ko-KR,ko;q=0.9' },
   });
@@ -119,6 +120,7 @@ const existingUrls = new Set((PLAYBOOK.sources || []).map((s) => s.url));
 let nextId = (PLAYBOOK.sources || []).length + 1;
 
 const grow = [];               // 읽은 글에서 주운, 다음에 읽을 만한 곳
+const yieldedUrls = new Set();  // 이번 실행에서 규칙을 하나라도 준 주소 (seed 건강 점검용)
 const today = new Date().toISOString().slice(0, 10);
 
 /** 주소 하나를 읽어 규칙에 붙인다. 규칙을 하나라도 준 곳만 출처가 된다. */
@@ -148,6 +150,7 @@ async function readOne(url, note) {
   /* 출처 등록 — 규칙을 하나라도 뒷받침했을 때만 */
   let sid = (PLAYBOOK.sources || []).find((x) => x.url === url)?.id;
   if (!sid && found.size) { sid = `s${nextId++}`; newSrc.set(sid, { id: sid, title: note || url, url, seenAt: today }); }
+  if (found.size) yieldedUrls.add(url);
   if (sid) for (const c of found.keys()) {
     if (!ruleHits.has(c)) ruleHits.set(c, new Set());
     ruleHits.get(c).add(sid);
@@ -186,9 +189,12 @@ for (const c of fresh) {
   const r = await readOne(c.url, c.text);
   grown.push({ url: c.url, text: c.text, rules: r.found.size });
   if (r.found.size) {
-    /* 규칙을 준 곳은 seeds 로 승격 — 다음 실행부터 정식으로 읽는다 */
+    /* 규칙을 준 곳은 seeds 로 승격 — 다음 실행부터 정식으로 읽는다.
+       🔴 지속가능성: seeds 가 무한정 불어나면 매 실행이 길어지고, 규칙을 더는 안 주는
+          죽은 주소가 쌓인다. 상한(MAX_SEEDS)을 두고, 꽉 찼으면 **가장 약한 seed 를
+          밀어내야만** 새것이 들어온다(그 판정은 아래 seed 건강 점검이 한다). */
     if (!known.has(c.url)) {
-      (SOURCES.seeds = SOURCES.seeds || []).push({ url: c.url, kind: '*', note: `로봇이 스스로 찾음 — ${c.text}`.slice(0, 80) });
+      (SOURCES.seeds = SOURCES.seeds || []).push({ url: c.url, kind: '*', note: `로봇이 스스로 찾음 — ${c.text}`.slice(0, 80), addedAt: today });
       known.add(c.url);
     }
     parked.delete(c.url);
@@ -198,6 +204,34 @@ for (const c of fresh) {
   }
 }
 SOURCES.tried = [...parked.values()].slice(-200);
+
+/* ── 🔴 seed 건강 점검 — 지속가능성·오류예방 (2026-08-24 개발자 지시) ──
+   "출처 넓히기 두 방법 좋다. 다만 지속가능성과 오류 예방 조치를 진행해라."
+
+   자동 확장을 열어 두면 두 가지가 썩는다: ① seeds 가 끝없이 불어난다 ② 한때 규칙을
+   주던 주소가 글이 바뀌거나 사라져 **죽은 seed** 로 남는다. 그래서 매 실행 건강을 잰다:
+     · 이번 실행에서 규칙 0종이었던 seed 에 strike 를 +1 (regen 되면 0으로)
+     · strike 가 STRIKE_OUT 이상이면 '시든 seed' 로 리포트에 올린다(사람이 지운다 —
+       자동 삭제하지 않는다. registered.json 처럼 '삭제가 뜻을 갖는' 파일이라서다).
+     · seeds 총수가 MAX_SEEDS 를 넘으면, 사람이 넣은 것(addedAt 없음)은 지키고
+       **로봇이 스스로 넣은 것 중 가장 오래 시든 것**부터 리포트에 '밀어낼 후보'로 올린다.
+   자동 삭제를 안 하는 이유: 그 주소가 개발자가 손수 넣은 좋은 글일 수 있고, 글이 잠깐
+   접속 실패한 것과 영영 죽은 것을 로봇이 구별 못 한다. 판단은 사람에게 남긴다. */
+const MAX_SEEDS = Number(process.env.MAX_SEEDS || 60);
+const STRIKE_OUT = 3;
+const withered = [];
+for (const s of (SOURCES.seeds || [])) {
+  /* 이번 실행에서 이 seed 를 실제로 읽었고 규칙을 못 줬을 때만 strike. 못 읽은 것(403 등)은
+     주소가 죽은 게 아니라 잠깐 막힌 것일 수 있으므로 벌하지 않는다. */
+  const read = okCount && seeds.some((x) => x.url === s.url);
+  if (read && !yieldedUrls.has(s.url)) s.strike = (s.strike || 0) + 1;
+  else if (yieldedUrls.has(s.url)) s.strike = 0;
+  if ((s.strike || 0) >= STRIKE_OUT) withered.push(s);
+}
+const robotSeeds = (SOURCES.seeds || []).filter((s) => s.addedAt);
+const overCap = (SOURCES.seeds || []).length > MAX_SEEDS
+  ? robotSeeds.slice().sort((a, b) => (b.strike || 0) - (a.strike || 0)).slice(0, (SOURCES.seeds.length - MAX_SEEDS))
+  : [];
 
 /* ── 규칙이 모자란 종류를 큐에 올린다 (미학습 양식이 생기면 계속 배운다) ── */
 const kindsWithRules = new Set(PLAYBOOK.rules.filter((r) => r.kind !== '*').map((r) => r.kind));
@@ -244,6 +278,22 @@ const md = [
   grown.length
     ? grown.map((g) => `- ${g.rules ? '⬆️ seeds 로 승격' : '· 규칙 0종 — 30일 뒤 다시 시도'} ${g.url}\n  <sub>${g.text}</sub>`).join('\n')
     : '이번에 새로 읽은 곳이 없습니다.',
+  '',
+  '## 🩺 seed 건강 (지속가능성)',
+  `살아 있는 seed ${(SOURCES.seeds || []).length}개 (상한 ${MAX_SEEDS}) · 이번 실행에서 규칙을 준 곳 ${yieldedUrls.size}개`,
+  withered.length
+    ? `\n**시든 seed — ${STRIKE_OUT}회 연속 규칙 0종.** 사람이 확인해 지워 주세요(자동 삭제 안 함):\n`
+      + withered.map((s) => `- (${s.strike}회) ${s.url}`).join('\n')
+    : '\n시든 seed 없음.',
+  overCap.length
+    ? `\n**seed 가 상한을 넘었습니다.** 밀어낼 후보(로봇이 넣은 것 중 가장 오래 시든 것):\n`
+      + overCap.map((s) => `- ${s.url}`).join('\n')
+    : '',
+  '',
+  '## 📌 다음에 크롤링할 출처 — 개발자 확인용 (정직 보고)',
+  (SOURCES.nextCrawl && SOURCES.nextCrawl.plan)
+    ? SOURCES.nextCrawl.note + '\n\n' + SOURCES.nextCrawl.plan.map((p) => `- **${p.where}** — ${p.how}`).join('\n')
+    : '(nextCrawl 계획이 없습니다.)',
   '',
   '## 규칙이 모자란 종류',
   thin.length ? thin.map((k) => `- \`${k}\` — 이 종류 전용 규칙이 없습니다. 관련 글 주소를 \`collector/essay-sources.json\` 의 seeds 에 넣어 주세요.`).join('\n') : '없습니다.',

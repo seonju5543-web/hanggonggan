@@ -38,7 +38,41 @@ export const TOPIC = /(자기소개서|자소서|장학금|장학생|작성법|�
    우리가 예시문을 안 쓰기로 한 이유는 셋이다(docs/designs/essay-tailoring.md):
    ① 재단의 표절 검사 ② 저작권 ③ 모두가 같은 예시를 보면 오히려 획일화된다.
    자동으로 넓히더라도 이 선은 넘지 않는다. */
-export const NOT_SOURCE = /(login|signin|signup|join|cart|order|pay|price|이력서|resume|채용|recruit|job|합격\s*자소서|합격\s*자기소개서|자소서\s*모음|예시문|샘플|cover-letter|자소서\s*검색|합격\s*후기)/i;
+/* 🔴 무엇을 막고 무엇을 여는가 — 2026-08-24 개발자 지시로 다시 그었다.
+
+   개발자가 원하는 것: **사람이 팁을 남기는 글 · 학생이 후기로 남기는 글**을 널리 학습.
+   그래서 '후기·팁·예시가 섞인 블로그 글'은 **열어야** 한다 — 거기가 진짜 팁이 사는 곳이다.
+
+   막아야 하는 것은 **예시문 데이터베이스**뿐이다(합격자소서를 통째로 베껴 파는 곳):
+     ① 재단의 표절 검사 ② 저작권 ③ 모두가 같은 예시를 보면 획일화(docs/designs/essay-tailoring.md).
+   1차 확장에서 승격됐던 것이 정확히 그런 DB 두 곳이었다(linkareer cover-letter · 검색결과).
+
+   그래서 막는 기준을 **낱말이 아니라 구조**로 바꿨다:
+     · DB 경로/도메인 (cover-letter · jasoseol · keyword= 검색결과)
+     · '모음/총정리 DB' 꼴 (예시문·자소서 뒤에 '모음')
+   '후기'·'팁'·'예시'가 제목에 들었다고 막지 않는다 — 그게 우리가 찾는 글이다.
+
+   진짜 방어선은 따로 있다: 우리는 **규칙 문장만** 뽑고 예시문 자체는 한 줄도 저장하지 않는다
+   (isCandidate 가 조언·규칙 어미만 통과시킨다). DB를 실수로 읽어도 규칙 0종이면 승격 안 된다. */
+export const NOT_SOURCE = /(login|signin|signup|join|cart|order|pay|price|이력서|resume|채용|recruit\b|jobkorea|saramin|cover-letter|jasoseol|keyword=|(예시문|자소서|자기소개서)\s*모음|자소서\s*데이터?베이스)/i;
+
+/* ── 네이버 블로그는 모바일 주소로 읽는다 (2026-08-24) ──
+   개발자 지시로 네이버 블로그의 장학 팁·예시 글을 학습 대상에 넣는다. 그런데 데스크톱
+   주소(blog.naver.com/{id}/{no})는 **프레임 껍데기**만 오고 본문은 iframe 안에 있다.
+   모바일 주소(m.blog.naver.com/{id}/{no})는 본문이 HTML 에 그대로 온다 — 그것으로 읽는다.
+   (PostView.naver?blogId=..&logNo=.. 꼴도 모바일 경로로 바꾼다.) */
+export function naverMobile(url) {
+  let u; try { u = new URL(url); } catch { return url; }
+  if (!/(^|\.)blog\.naver\.com$/.test(u.hostname)) return url;
+  const pv = u.pathname.replace(/\/$/, '') === '/PostView.naver' || /PostView/i.test(u.pathname);
+  if (pv) {
+    const id = u.searchParams.get('blogId'); const no = u.searchParams.get('logNo');
+    if (id && no) return `https://m.blog.naver.com/${id}/${no}`;
+  }
+  const m = u.pathname.match(/^\/([A-Za-z0-9_-]+)\/(\d+)\/?$/);
+  if (m) return `https://m.blog.naver.com/${m[1]}/${m[2]}`;
+  return url.replace('://blog.naver.com', '://m.blog.naver.com');
+}
 
 /** 읽은 글에서 '다음에 읽을 만한 곳' 을 줍는다 */
 export function linkCandidates(html, baseUrl) {
