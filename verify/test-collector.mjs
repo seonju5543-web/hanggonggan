@@ -1896,6 +1896,10 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
       { gpa: 3.5, bracket: 5, year: 3, status: '재학', credits: 15, flags: [] },
       { gpa: 2.3, bracket: 9, year: 2, status: '재학', credits: 12, flags: [] },
       { gpa: 3.5, bracket: 5, year: 3, status: '휴학', credits: 15, flags: [] },
+      { gpa: null, bracket: 5, year: 1, status: '신입학', credits: null, flags: [] },
+      { gpa: 3.0, bracket: 6, year: 4, status: '초과학기', credits: 12, flags: [] },
+      { gpa: 3.2, bracket: 4, year: 4, status: '졸업유예', credits: 9, flags: [] },
+      { gpa: 3.5, bracket: 5, year: 2, status: '복학예정', credits: 15, flags: [] },
       { gpa: null, bracket: null, year: 3, status: null, credits: null, flags: [] },
     ];
     let mismatch100 = 0, mismatchX = 0, muteZero = 0;
@@ -1911,9 +1915,26 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
         if (fd.pct === 0 && !fd.fails.length) muteZero += 1;
       }
     }
-    eq('적합도 100%면 모든 자격 줄이 ✓다 (등록 전수 × 프로필 5종)', mismatch100, 0);
+    eq('적합도 100%면 모든 자격 줄이 ✓다 (등록 전수 × 프로필 9종)', mismatch100, 0);
     eq('0%가 아니면 ✕가 있는 줄이 없다', mismatchX, 0);
     eq('0%에는 반드시 사유가 있다', muteZero, 0);
+  }
+
+  /* 🔴 학적상태는 **평평한 이름표가 아니라 포함 관계**다 (2026-08-24 개발자 지적):
+     *"재학 = 신입생 첫 학기 똑같잖아. 신입생도 재학생인데."*
+     `국내 대학교 재학생`이 신입생 화면에 아무 표시도 안 뜨고 있었다. */
+  {
+    const 재학요건 = '한국장학재단에서 학자금대출을 받은 국내 대학교 재학생';
+    const mk = (status) => ({ school: 'x', status, flags: [] });
+    eq('신입생도 재학생이다', M.requirementMatch(재학요건, mk('신입학'), null), 'ok');
+    eq('초과학기생도 재학생이다', M.requirementMatch(재학요건, mk('초과학기'), null), 'ok');
+    eq('졸업유예자도 재학생이다', M.requirementMatch(재학요건, mk('졸업유예'), null), 'ok');
+    eq('휴학생은 재학생이 아니다', M.requirementMatch(재학요건, mk('휴학'), null), 'no');
+    eq('복학예정은 단정하지 않는다', M.requirementMatch(재학요건, mk('복학예정'), null), null);
+    /* `정규학기 재학생`(실측 14줄)은 초과학기·졸업유예를 뺀 말이다 */
+    const 정규 = '2026-2학기 정규학기 학부 재학생';
+    eq('정규학기 한정이면 신입생은 포함', M.requirementMatch(정규, mk('신입학'), null), 'ok');
+    eq('정규학기 한정이면 초과학기는 단정하지 않는다', M.requirementMatch(정규, mk('초과학기'), null), null);
   }
 
   // ⑩ 자격을 하나도 못 읽은 공고는 0%가 아니라 '자격 미확인'

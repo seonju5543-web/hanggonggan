@@ -144,8 +144,22 @@ function judgeCond(c, p) {
     case 'status': {
       if (!p.status) return 'unknown';
       if (c.not) return c.not.includes(p.status) ? 'fail' : 'pass';
-      if (c.anyOf) return c.anyOf.includes(p.status) ? 'pass' : 'unknown';   // 목록에 없다고 미달은 아니다
-      return 'unknown';
+      if (!c.anyOf) return 'unknown';
+      if (c.anyOf.includes(p.status)) return 'pass';
+      /* 🔴 학적상태는 **평평한 이름표가 아니라 포함 관계**다 (2026-08-24 개발자 지적):
+         *"재학 = 신입생 첫 학기 똑같잖아. 신입생도 재학생인데."*
+         `국내 대학교 재학생`이 신입생에게 아무 표시도 안 뜨고 있었다.
+           · 신입학·초과학기·졸업유예 → 다 재학생이다
+           · 단 `정규학기 재학생`(실측 14줄)은 초과학기·졸업유예를 뺀 말이라 제외한다
+           · 복학예정은 공고가 `재학생 및 복학예정자`로 **직접 적을 때만** 인정한다
+             (그냥 `재학생`이면 지금은 휴학 중이라 단정할 수 없다 — 모르면 판정하지 않는다)
+         `휴학`은 재학생이 아니므로 미달이다 — 이게 헛걸음을 막는 자리다. */
+      if (c.anyOf.includes('재학')) {
+        const asEnrolled = c.regularOnly ? ['신입학'] : ['신입학', '초과학기', '졸업유예'];
+        if (asEnrolled.includes(p.status)) return 'pass';
+        if (['휴학', '수료', '졸업', '자퇴'].includes(p.status)) return 'fail';
+      }
+      return 'unknown';   // 그 밖에는 단정하지 않는다
     }
     case 'flags': {
       const f = p.flags || [];
@@ -185,6 +199,14 @@ function judgeCond(c, p) {
 function lineVerdict(text, p, isExclude, ctx) {
   if (!p) return null;
   if (PR.gradOnly(text)) return null;          // 대학원 전용 줄 — 학부생과 무관
+  /* 🔴 아래 둘은 **미달이라고 말하면 안 되는 자리**다 (2026-08-24 전수 대조에서 발견).
+     퍼센트는 이미 맞게 처리하고 있었는데 화면 표시만 ✕가 떠서 서로 어긋났다. */
+  if (ctx && ctx.multi) return null;                        // 장학금이 여럿 묶인 공고
+  if (ctx && ctx.inAnyOf && ctx.inAnyOf.has(text)) {        // 선택지 묶음의 한 갈래
+    const { conds: cs } = PR.parseLine(text, !!isExclude);
+    for (const c of cs) if (judgeCond(c, p) === 'pass') return 'ok';
+    return null;                                            // 떨어져도 ✕는 안 친다
+  }
   const { conds } = PR.parseLine(text, !!isExclude);
   let seen = null;
   for (const c of conds) {
@@ -203,11 +225,18 @@ function lineVerdict(text, p, isExclude, ctx) {
    **같은 맥락**을 봐야 갈라지지 않는다. */
 function noticeCtx(sch) {
   const lines = (sch && sch.eligibilityLines) || [];
+  const items = requirementLines(sch, lines, { withMeta: true });
   const brackets = new Set();
-  for (const it of requirementLines(sch, lines, { withMeta: true })) {
+  /* 선택지 묶음에 든 줄 — **여기서 하나 떨어지는 건 정상**이다(하나만 만족하면 되므로).
+     ✕를 치면 학생이 "안 되는구나" 하고 접는다. 퍼센트는 맞는데 표시만 틀렸던 자리다. */
+  const inAnyOf = new Set();
+  for (const it of items) {
+    if (it.group > 0) inAnyOf.add(it.text);
     for (const c of PR.parseLine(it.text, false).conds) if (c.kind === 'bracket') brackets.add(c.max);
   }
-  return { bracketTable: brackets.size > 1 };
+  /* 여러 장학금이 묶인 공고 — 하나에 미달해도 다른 것에 지원한다(설계 조건 ⑧) */
+  const multi = items.some((it) => PR.MULTI_PROGRAM.test(it.text));
+  return { bracketTable: brackets.size > 1, inAnyOf, multi };
 }
 
 /* 공고 하나에 대한 적합도 **내역**. 카드가 "요건 6개 중 4개 충족"을 띄우려면 숫자가 필요하다. */

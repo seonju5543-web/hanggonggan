@@ -121,7 +121,10 @@ function parseStatus(t, isExclude) {
   /* 🔴 `복학예정`이 함께 적혀 있으면 `휴학`을 금지로 읽지 않는다 —
      `2026-2학기 재학 및 복학예정자`는 휴학 중인 학생을 받아 주는 공고다(실측 14건). */
   const list = hit.includes('복학예정') ? hit.filter((h) => h !== '휴학') : hit;
+  /* `정규학기 재학생`은 초과학기생·졸업유예자를 뺀 말이다(실측 14줄).
+     그냥 `재학생`(120줄)이면 그들도 재학생이므로 포함한다 — 판정은 judgeCond가 한다. */
   return { kind: 'status', [isExclude ? 'not' : 'anyOf']: list,
+           regularOnly: /정규\s?학기/.test(t),
            conf: HAS_EXCEPTION.test(t) ? LOW : HIGH };
 }
 

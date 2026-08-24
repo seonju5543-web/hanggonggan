@@ -198,6 +198,9 @@ const inconsistent = [];
     { gpa: 3.5, bracket: 5, year: 3, status: '재학', credits: 15, flags: [] },
     { gpa: 2.3, bracket: 9, year: 2, status: '재학', credits: 12, flags: [] },
     { gpa: 3.5, bracket: 5, year: 3, status: '휴학', credits: 15, flags: [] },
+    { gpa: null, bracket: 5, year: 1, status: '신입학', credits: null, flags: [] },
+    { gpa: 3.0, bracket: 6, year: 4, status: '초과학기', credits: 12, flags: [] },
+    { gpa: 3.5, bracket: 5, year: 2, status: '복학예정', credits: 15, flags: [] },
   ];
   for (const pp of profs) {
     const p = { ...base, ...pp };
