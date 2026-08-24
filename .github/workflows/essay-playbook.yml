@@ -21,6 +21,15 @@ on:
         options:
           - '읽고 저장'
           - '미리보기만'      # 읽기만 하고 아무것도 저장하지 않는다
+  # 🔴 지속가능성 (2026-08-24 개발자 지시 — 출처 넓히기를 '한 번'이 아니라 계속) :
+  #    주 1회 스스로 돌아 ① 집 안 코퍼스를 다시 캐고 ② seeds 에서 링크를 6곳 더 따라간다.
+  #    · 예약은 **기본 브랜치에서만** 돈다(GitHub 규칙) — 이 파일이 거기 있어야 작동한다.
+  #    · 홀수 분 · UTC 자정·정각을 피한다(예약 혼잡 회피 정책, CLAUDE.md).
+  #    · robots.txt 준수 · 실행당 새로 6곳뿐이라 바깥 사이트에 부담이 없다.
+  #    · 저장 전 audit 관문을 통과해야만 커밋된다(실패 시 되돌림). 새 규칙은 자동 추가하지
+  #      않고 리포트에만 — 예약이라 해서 검수 없이 규칙이 앱에 들어가지는 않는다.
+  schedule:
+    - cron: '37 20 * * 1'   # 매주 월 20:37 UTC = 화 05:37 KST
 
 permissions:
   contents: write
@@ -53,12 +62,12 @@ jobs:
       # ① 집 안부터 — 이미 가진 공고 원문·첨부에서 **재단이 직접 적은 작성 규정**을 캔다.
       #    비용 0 · 네트워크 0. 바깥을 뒤지기 전에 여기부터 보는 것이 순서다.
       - name: 집 안 자료에서 작성 규정 캐기 (비용 0)
-        run: node collector/essay-house-mine.mjs ${{ inputs.mode == '읽고 저장' && '--write' || '' }}
+        run: node collector/essay-house-mine.mjs ${{ (inputs.mode == '읽고 저장' || github.event_name == 'schedule') && '--write' || '' }}
 
       # ② 바깥 — seeds 를 읽고, **읽은 글에서 다음에 읽을 곳을 스스로 주워** 몇 곳 더 읽는다.
       #    robots.txt 를 먼저 보고, 헛걸음한 곳은 30일 동안 다시 가지 않는다.
       - name: 읽고 규칙에 붙이기 (+ 스스로 넓히기)
-        run: node collector/essay-playbook-learn.mjs ${{ inputs.mode == '읽고 저장' && '--write' || '' }}
+        run: node collector/essay-playbook-learn.mjs ${{ (inputs.mode == '읽고 저장' || github.event_name == 'schedule') && '--write' || '' }}
 
       # 데이터 관문은 **저장 직전**에 둔다 (이슈 #79 의 교훈 — 앞에 두면 그 실행에서 안 잡히고
       # 다음 날 터진다). 규칙집이 깨지면 초안 서버가 통째로 못 뜬다.
@@ -78,7 +87,8 @@ jobs:
           exit 1
 
       - name: 저장
-        if: inputs.mode == '읽고 저장'
+        id: save
+        if: inputs.mode == '읽고 저장' || github.event_name == 'schedule'
         run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -96,12 +106,16 @@ jobs:
               echo "::error::push 3회 실패 — 이번 결과가 저장되지 않았습니다."
               exit 1
             fi
+            echo "changed=1" >> "$GITHUB_OUTPUT"
           else
             echo "::notice::바뀐 것이 없습니다."
           fi
 
+      # 🔴 예약 실행은 **바뀐 게 있거나 실패했을 때만** 이슈를 연다 — 매주 '변화 없음' 이슈가
+      #    쌓이면 소음이 된다(수집 로봇의 '0건이면 코멘트만' 원칙과 같은 맥락). 사람이 누른
+      #    실행(workflow_dispatch)은 결과가 궁금해 누른 것이므로 언제나 리포트한다.
       - name: 결과 리포트 이슈
-        if: always()
+        if: always() && (github.event_name == 'workflow_dispatch' || failure() || steps.save.outputs.changed == '1')
         uses: actions/github-script@v7
         with:
           script: |
