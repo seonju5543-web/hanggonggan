@@ -159,7 +159,10 @@ try {
     .execFileSync(process.execPath, [require('path').join(__dirname, 'eligibility-report.mjs'), '--bad'],
       { encoding: 'utf8' });
   out.split('\n').filter((l) => l.includes('✕')).forEach((l) => {
-    warns.push(`자격 품질: ${l.replace(/^\s*✕\s*/, '').trim()} — 지원 자격 자리에 요건이 아닌 줄이 있습니다`);
+    const body = l.replace(/^\s*✕\s*/, '').trim();
+    /* 자리 축(2026-08-24)은 다른 말을 해야 한다 — '요건이 아닌 줄'이 아니라 '칸이 틀렸다'다 */
+    const placed = /두 칸에|제외 칸에|자격 칸만|자격 자리에/.test(body);
+    warns.push(`자격 품질: ${body}${placed ? ' — 줄이 엉뚱한 칸에 있습니다' : ' — 지원 자격 자리에 요건이 아닌 줄이 있습니다'}`);
   });
 } catch (e) { warns.push(`자격 품질 채점을 돌리지 못했습니다: ${e.message.slice(0, 80)}`); }
 

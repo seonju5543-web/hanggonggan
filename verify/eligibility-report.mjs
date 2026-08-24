@@ -146,6 +146,53 @@ else {
 }
 if (BAD) for (const s of suspects) console.log(`   ✕ ${s.id} [${s.why}] ${s.line.slice(0, 90)}`);
 
+/* ── 🔴 세 번째 축 — **줄이 맞는 칸에 있는가** (2026-08-24 신설) ──
+   개발자가 앱을 눈으로 보고 여섯 가지를 짚어 줬는데 이 채점기는 '잡음 0'을 답하고 있었다.
+   이유가 분명하다: 위 두 축은 줄의 **생김새**만 본다(제목처럼 생겼나 · 요건 낱말이 있나).
+   그런데 지적된 여섯 개는 전부 **자리**가 틀린 것이었다 — 제외 조건이 지원 자격에,
+   선발 기준이 지원 자격에, 같은 줄이 두 칸에, 긍정 자격이 제외 칸에.
+   생김새는 멀쩡하니 두 축 모두 통과했다. 그래서 축을 하나 더 둔다.
+
+   ⚠️ 여기서는 화면 필터의 절 판정(section-head)을 **쓰지 않는다** — 필터의 눈으로
+   필터를 채점하면 새 유형을 영영 못 본다(이 저장소가 이미 두 번 겪은 실패다).
+   대신 **칸끼리 대조한다**: 세 칸에 같은 줄이 있나, 자격 칸의 줄이 못 받는 조건을
+   말하나, 제외 칸의 줄이 받을 조건을 말하나. 필터가 어떻게 판정했든 결과만 본다. */
+const M = require("../match-engine.js");
+const misplaced = [];
+{
+  const EX_TAIL = /(지원|신청|참여|참가|지급|수혜)\s*불가\s*$|제외\s*$|제외됩니다\s*$/;
+  const POS_TAIL = /해당하지\s*않는\s*자|아닌\s*자\s*$|없는\s*자\s*$/;
+  const bare = (t) => t.replace(/\s*[(（][^)）]*[)）]\s*$/, '').trim();
+  for (const it of reg.items) {
+    const lines = it.eligibilityLines || [];
+    if (!lines.length) continue;
+    const req = M.requirementLines(it, lines) || [];
+    const exl = M.requirementLines(it, [...(it.eligibilityExcludes || []), ...lines],
+      { onlyExclude: true }) || [];
+    const pri = M.requirementLines(it, lines, { keepPriority: true, onlyPriority: true }) || [];
+    const add = (why, line) => misplaced.push({ id: it.id, why, line });
+    const R = new Set(req);
+    for (const l of exl) if (R.has(l)) add('같은 줄이 자격·제외 두 칸에', l);
+    for (const l of pri) if (R.has(l)) add('같은 줄이 자격·선발 두 칸에', l);
+    for (const l of req) {
+      const b = bare(l);
+      if (EX_TAIL.test(b.length >= 4 ? b : l)) add('못 받는 조건이 지원 자격 칸에', l);
+    }
+    for (const l of exl) if (POS_TAIL.test(l)) add('받을 수 있는 조건이 제외 칸에', l);
+    /* 자격은 한 줄도 못 읽었는데 선발·제외는 읽었다 → 절을 잘못 갈랐을 가능성이 높다 */
+    if (!req.length && (pri.length || exl.length)) add('자격 칸만 비어 있다 (절 가르기 의심)', `선발 ${pri.length}줄 · 제외 ${exl.length}줄`);
+  }
+}
+console.log(`\n■ 줄이 맞는 칸에 있는가 (2026-08-24 — 자리 축)`);
+if (!misplaced.length) console.log('   없음');
+else {
+  const byWhy = new Map();
+  for (const s of misplaced) byWhy.set(s.why, (byWhy.get(s.why) || 0) + 1);
+  console.log(`   자리가 틀린 줄 ${misplaced.length}개 · 공고 ${new Set(misplaced.map((s) => s.id)).size}건`);
+  for (const [why, n] of [...byWhy].sort((a, b) => b[1] - a[1])) console.log(`     · ${why}: ${n}개`);
+}
+if (BAD) for (const s of misplaced) console.log(`   ✕ ${s.id} [${s.why}] ${s.line.slice(0, 90)}`);
+
 /* 🔴 참고 목록 — **필터도 채점기도 이름을 모르는 새 잡음**을 찾는 자리 (2026-08-21 신설).
    위 '의심 줄'은 이름을 아는 유형만 잡는다. 그래서 새 유형이 생기면 0으로 보이고,
    개발자가 앱을 눈으로 볼 때까지 아무도 모른다 — 목포향우회·사랑나눔이 그렇게 세 번 지적됐다.

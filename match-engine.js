@@ -5,6 +5,12 @@
    (소급 적용 원칙 — 엔진이 두 벌이면 알림만 옛 기준으로 남는 사고가 난다)
    ============================================================ */
 
+/* 절 경계 판정 — section-head.js 한 곳에서만 정한다(브라우저는 전역, Node는 require).
+   베끼면 화면·발췌기·감사가 서로 다른 경계를 쓰게 된다 — 그게 이 문제가 재발한 이유다. */
+const SH = (typeof module !== 'undefined' && module.exports)
+  ? require('./section-head.js')
+  : { sectionOf, headRest, isQualifyHead, isExcludeHead, isSelectHead };
+
 /* 자격 진단 — 프로필과 공고의 요건을 대조해 상태·사유·부족정보를 돌려준다 */
 function evaluate(sch, p) {
   const e = sch.eligibility || {};
@@ -209,7 +215,10 @@ const REQ_SIGNAL = new RegExp([
 const NOT_A_REQUIREMENT = new RegExp([
   '(기한|기간)\\s*[:：]',                                   // 추천기한 : 2026년 10월 2일
   '우편\\s*도착분',
-  '(만점|배점|가점|점수\\s*적용|반영\\s*비율)',              // Dream PATH 마일리지 점수 적용 : 70점 만점
+  /* 🔴 `만점` 뒤에 문턱 낱말이 오면 그건 배점표가 아니라 **진짜 요건**이다 (2026-08-24).
+     `직전학기 성적기준: 80점/100점 만점 이상을 충족하는 자`가 이 가지에 걸려
+     시립대 활동도우미의 성적 요건이 통째로 사라져 있었다 — 잡음보다 나쁜 실패다. */
+  '(만점(?!\\s*(이상|이하|미만|초과|충족))|배점|가점|점수\\s*적용|반영\\s*비율)',
   /* 배점표의 한 행 — `학자금 지원구간 (40 점): …에 따라 평정`. 요건 낱말(구간)을 갖고 있어
      통과 조건을 뚫는다. 괄호 안 점수 + '평정'이 배점표의 표지다 (2026-08-24) */
   '\\(\\s*\\d{1,3}\\s*점\\s*\\)|따라\\s*평정|평정\\s*(기준|결과)',
@@ -220,7 +229,15 @@ const NOT_A_REQUIREMENT = new RegExp([
 /* 제외 대상은 **버리지 않고 자리를 옮긴다** — 정보는 맞고 자리가 틀린 것뿐이다.
    자격 줄에 섞이면 요건이 실제보다 훨씬 까다로워 보여 지원할 수 있는 학생이 포기한다
    (2026-08-21 목포향우회 우선선발과 같은 계열). 앱에 '이런 경우는 제외돼요' 블록이 이미 있다. */
-const EXCLUDE_LINE = /(제외(한다|합니다|됨|대상)?\s*$|받은\s*(학생|자)는?\s*제외|지원\s*불가|신청\s*불가|중복\s*수혜\s*불가)/;
+/* 🔴 `참여 불가`·`참가 불가`가 빠져 있어서 `휴학생 참여 불가`가 지원 자격 자리에 앉아 있었다
+   (2026-08-24 개발자 지적 — 대청교 멘토). 제외를 말하는 낱말은 여기 한 곳에 모은다. */
+const EXCLUDE_LINE = /(제외(한다|합니다|됨|대상)?\s*$|받은\s*(학생|자)는?\s*제외|지원\s*불가|신청\s*불가|참여\s*불가|참가\s*불가|수혜\s*불가|중복\s*수혜\s*불가)/;
+/* 제외 절에 있어도 **긍정으로 적힌 줄은 자격**이다 (2026-08-24 개발자 지적).
+   `결격사유에 해당하지 않는 자`는 지원 자격이고, `결격사유에 해당하면` 제외다. */
+const POSITIVE_REQ = /해당하지\s*않는\s*자|아닌\s*자\s*$|없는\s*자\s*$/;
+/* 뽑는 **행위**를 말하는 줄 — 학생의 상태가 아니라 심사자가 하는 일이다.
+   '선발기준' 절에서 이런 줄만 '먼저 뽑는 기준'으로 옮긴다(아래 주석 참조). */
+const SELECT_VERB = /평가하여|평가하고|종합\s*평가|종합적으로|심사하여|선발한다|선발함|선발하되|가산점|우대|고려하여|우수자/;
 
 const REQ_NOISE = new RegExp([
   '^(※|상세내역|참고|유의|비고|문의|첨부|붙임)',
@@ -322,6 +339,11 @@ function tidyRequirement(line) {
     .replace(/([(【「『])\s+/g, '$1')
     .replace(/([“‘])\s+/g, '$1').replace(/\s+([”’])/g, '$1')   // 따옴표 안쪽 공백
     .replace(/([”’])\s*(로|으로|이|가|는|은|을|를)\b/g, '$1 $2')
+    /* 🔴 줄 전체가 괄호로 싸인 부연은 괄호·별표를 벗겨 사람 문장처럼 보여 준다 (2026-08-24).
+       동산장학회의 `(*공대, 자연대, 농대 우대)`가 기호를 단 채 화면에 그대로 떠 있었다
+       (개발자 지적 — "사람같이 하기로 했는데 괄호랑 별 모양 기호 쓰여있음"). */
+    .replace(/^[(（]\s*[*※]\s*([^)）]+?)\s*[)）]$/, '$1')
+    .replace(/^[*※]\s*/, '')
     .trim();
 }
 
@@ -389,7 +411,7 @@ function requirementLines(sch, lines, opts) {
   const keepPriority = !!(opts && opts.keepPriority);   // '먼저 뽑는 기준' 블록을 그릴 때만 참
   /* `loose` — '제외 대상'·'먼저 뽑는 기준' 블록을 그릴 때만 참.
      그 블록들은 애초에 자격이 아니므로 '요건임을 증명하라'를 적용하면 통째로 사라진다. */
-  const loose = !!(opts && (opts.loose || opts.keepPriority));
+  const loose = !!(opts && (opts.loose || opts.keepPriority || opts.onlyExclude));
   const raw = lines || (sch && sch.eligibilityLines) || [];
   /* ① 먼저 이어지는 줄을 붙인다 — 정리·거르기는 **붙인 뒤에** 해야 한다.
      (붙이기 전에 거르면 앞줄이 잡음 규칙에 걸려 사라지고 뒷줄만 덩그러니 남는다) */
@@ -403,9 +425,41 @@ function requirementLines(sch, lines, opts) {
   }
   const out = [];
   const moved = [];   // 순위로 옮긴 줄 — 자격이 통째로 비면 되돌린다 (아래)
+  const sectMoved = [];   // '선발기준' **절**에 있던 줄 — 이건 되돌리지 않는다 (아래 주석)
   let inNonElig = false;   // 지금 읽는 줄이 '제출서류'·'자기소개' 절 안인가 (위 주석)
+  /* 🔴 공고가 스스로 적어 둔 절 경계를 **버리지 않고 쓴다** (2026-08-24 개발자 지적).
+     `◎ 신청 자격` / `◎ 지원 제외 대상` / `4. 선발기준`이 줄 목록 안에 그대로 들어 있는데,
+     예전에는 아래 TITLE_LINE이 그 머리글을 **지워 버리고** 줄마다 낱말로 소속을 다시
+     알아맞혔다. 그래서 제외 대상이 지원 자격으로 새어 나갔다 —
+     시립대 활동도우미에서 `휴학생, 졸업생, 자퇴생, 대학원생…`이 '지원 자격'에 떴다.
+     휴학생이 그 줄을 보고 자기가 된다고 읽는, **자격이 뒤집혀 보이는 실패**다.
+     판정은 section-head.js 한 곳에 있다(발췌기·감사도 같은 파일을 쓴다 — 베끼지 말 것). */
+  let sect = 'qualify';   // 머리글을 만나기 전까지는 자격 절로 본다(대개 자격부터 적는다)
   for (const l of joined) {
-    const t = tidyRequirement(l);
+    let t = tidyRequirement(l);
+    const head = SH.sectionOf(l) || SH.sectionOf(t);
+    if (head) {
+      sect = head;
+      /* 🔴 머리글 뒤에 내용이 붙어 있으면 그 내용은 살린다 — `2) 추천대상 : 4년제 대학교…`.
+         버리면 그 공고의 **유일한 자격 줄**이 사라진다(동산장학회로 실증). */
+      const rest = SH.headRest(l);
+      if (!rest) continue;
+      t = tidyRequirement(rest);
+    }
+    /* 자격 블록을 그릴 때는 자격 절 밖의 줄을 담지 않는다.
+       `loose`(제외·순위 블록)일 때는 이 잣대를 대지 않는다 — 그 블록은 애초에 자격이 아니다. */
+    /* 🔴 '선발기준' 절을 **통째로** 자격에서 빼면 진짜 요건이 사라진다 (2026-08-24 회귀).
+       유흥수 장학금은 `1) 선발기준` 아래 첫 줄이 `2026년 2학기 재학생`이다 — 뽑는 순서가
+       아니라 넘어야 하는 선인데, 절째로 빼자 어느 칸에도 안 남았다(잡음보다 나쁜 실패).
+       그래서 절이 아니라 **줄**을 본다:
+         · 옮긴다 — `종합적으로 평가하여 선발` `기참여자 가산점` `평점이 높은 학생`
+         · 남긴다 — `2026년 2학기 재학생` `직전학기 성적 백분위 70점 이상인 재학생` */
+    if (!loose && sect === 'exclude' && POSITIVE_REQ.test(t)) {
+      // 제외 절에 있어도 긍정으로 적힌 줄은 자격이다 (위 POSITIVE_REQ 주석)
+    } else if (!loose && sect === 'select'
+               && !(SELECT_VERB.test(t) || (PRIORITY_LINE.test(t) && !HARD_THRESHOLD.test(t)))) {
+      // 자격으로 통과시킨다 (아래 공통 검사는 그대로 받는다)
+    } else if (!loose && sect !== 'qualify') { if (sect === 'select') sectMoved.push(t); continue; }
     if (NON_ELIG_SECTION.test(t)) { inNonElig = true; continue; }
     if (ELIG_SECTION.test(t)) inNonElig = false;
     if (inNonElig && !loose) continue;
@@ -417,7 +471,32 @@ function requirementLines(sch, lines, opts) {
     if (!keepPriority && ranks) { moved.push(t); continue; }   // 자격 블록에서는 뺀다 (위 주석)
     /* 자격 줄 안에 섞여 있던 순위 기준을 **주워서 옮길 때**만 참 — 버리지 않는다는 약속을
        지키는 자리다(자격에서 뺐는데 아무 데도 안 나오면 그건 그냥 삭제다). */
-    if (opts && opts.onlyPriority && !ranks) continue;
+    /* 🔴 제외 줄은 **어느 절에 있든** 제외 블록으로 모은다 (2026-08-24).
+       예전엔 발췌기가 따로 뽑아 둔 `eligibilityExcludes`만 봤다. 그래서 자격 절 안에 섞여
+       있던 제외 줄(동산장학회 `정학·퇴학 등 징계 처분을 받은 학생은 제외`)은 갈 곳이 없어
+       자격으로 뜨거나 통째로 사라졌다. 긍정으로 적힌 줄은 자격이므로 여기서 뺀다. */
+    if (opts && opts.onlyExclude) {
+      if (POSITIVE_REQ.test(t)) continue;
+      /* 🔴 괄호 **안**의 '지원 불가'로 줄을 제외 블록에 넣으면 안 된다 (2026-08-24).
+         `2026학년도 2학기 정규 등록 예정자 (※ 휴학 예정자 지원 불가)`는 **자격 줄**이고
+         괄호는 부연일 뿐이다. 넣으면 같은 줄이 자격·제외 두 곳에 뜬다(실측 9줄).
+         자격 블록이 쓰는 잣대와 **같은 규칙**이다 — 갈라지면 또 어긋난다. */
+      const bareEx = t.replace(/\s*[(（][^)）]*[)）]\s*$/, '').trim();
+      const pureEx = EXCLUDE_LINE.test(bareEx.length >= 4 ? bareEx : t);
+      if (!(sect === 'exclude' || pureEx)) continue;
+      /* 🔴 말투 (2026-08-24 개발자 지시 — "그냥 ~인 경우라고만 쓰는 게 사람같은 말투").
+         블록 제목이 이미 '이런 경우는 제외돼요'이므로 꼬리의 '…참여 불가'는 같은 말이
+         두 번이다: `학칙 등에 따라 징계 중인 경우 해당 기간 내 사업 참여 불가`
+         → `학칙 등에 따라 징계 중인 경우`. '경우'로 끊을 수 있을 때만 손댄다. */
+      t = t.replace(/^(.*?경우)\s*[^)]*?(참여|참가|지원|신청|지급|수혜)\s*불가\s*$/, '$1');
+    }
+    if (opts && opts.onlyPriority && !ranks
+        && !(sect === 'select' && (SELECT_VERB.test(t) || PRIORITY_LINE.test(t)))) continue;
+    /* '먼저 뽑는 기준' 블록에 **제외 줄**을 넣지 않는다 — 그건 '이런 경우는 제외돼요' 몫이다
+       (동산장학회: `정학·퇴학 등 징계 처분을 받은 학생은 제외`가 순위로 떠 있었다). */
+    if (opts && opts.onlyPriority && EXCLUDE_LINE.test(t)) continue;
+    // 문턱 줄은 자격 블록으로 이미 나갔다 — 두 블록에 같은 줄을 띄우지 않는다
+    if (opts && opts.onlyPriority && sect === 'select' && HARD_THRESHOLD.test(t) && !SELECT_VERB.test(t)) continue;
     /* ⚠️ 여기서 REAL_CATEGORY를 쓰면 안 된다 — 그건 짧은 **표 칸** 판정용이라
        `(자|생|중|상|하|명|원)$`처럼 느슨해서 `지원 제외 대상`의 '상'까지 자격으로 봤다.
        제목에서 지켜야 할 것은 **진짜 자격 범주 이름뿐**이므로 좁게 적는다. */
@@ -460,7 +539,15 @@ function requirementLines(sch, lines, opts) {
      학계장학문화재단은 `소득분위가 낮고 학업성적이 우수한 학생`이 공고의 유일한 조건이라,
      옮겨 버리면 카드가 '자격을 아직 읽지 못했어요'가 된다. 애매한 진짜 조건을 보여 주는 편이
      아무것도 안 보여 주는 것보다 낫다(잡음보다 나쁜 실패 = 자격이 사라지는 것). */
-  if (!out.length && !keepPriority && moved.length) return moved.slice(0, 5);
+  /* ⚠️ 이 구제는 **자격 블록 전용**이다. onlyExclude에도 적용됐더니 '이런 경우는 제외돼요'에
+     `누적 평균 평점이 높은 학생` 같은 순위 줄이 튀어나왔다(2026-08-24 유흥수로 실증). */
+  if (!out.length && !keepPriority && !(opts && opts.onlyExclude) && moved.length) return moved.slice(0, 5);
+  /* 🔴 `sectMoved`는 **되돌리지 않는다** (2026-08-24 개발자 지적).
+     위 되돌리기는 '자격 줄 하나가 순위처럼 보여 옮겼는데 자격이 비었다'를 구제하는 장치다.
+     그런데 공고 전체가 `4. 선발기준`뿐인 경우(대청교 멘토)에는 **뽑는 기준을 지원 자격으로
+     되살려** 놓았다 — '종합적으로 평가하여 선발', '기참여자 가산점'이 자격으로 떴다.
+     자격이 원문에 없으면 없다고 말하는 편이 맞다(원칙 8-1) — 앱이 '아직 읽지 못했어요'로
+     정직하게 표시하고, 이 줄들은 '먼저 뽑는 기준' 블록에서 따로 보여 준다. */
   return out;
 }
 
