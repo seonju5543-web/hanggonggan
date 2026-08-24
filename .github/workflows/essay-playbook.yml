@@ -50,7 +50,14 @@ jobs:
           node verify/verify-essay-ask.mjs
           node verify/verify-essay-guard.mjs
 
-      - name: 읽고 규칙에 붙이기
+      # ① 집 안부터 — 이미 가진 공고 원문·첨부에서 **재단이 직접 적은 작성 규정**을 캔다.
+      #    비용 0 · 네트워크 0. 바깥을 뒤지기 전에 여기부터 보는 것이 순서다.
+      - name: 집 안 자료에서 작성 규정 캐기 (비용 0)
+        run: node collector/essay-house-mine.mjs ${{ inputs.mode == '읽고 저장' && '--write' || '' }}
+
+      # ② 바깥 — seeds 를 읽고, **읽은 글에서 다음에 읽을 곳을 스스로 주워** 몇 곳 더 읽는다.
+      #    robots.txt 를 먼저 보고, 헛걸음한 곳은 30일 동안 다시 가지 않는다.
+      - name: 읽고 규칙에 붙이기 (+ 스스로 넓히기)
         run: node collector/essay-playbook-learn.mjs ${{ inputs.mode == '읽고 저장' && '--write' || '' }}
 
       # 데이터 관문은 **저장 직전**에 둔다 (이슈 #79 의 교훈 — 앞에 두면 그 실행에서 안 잡히고
@@ -76,7 +83,8 @@ jobs:
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           # 🔴 로봇이 고치는 파일을 전부 담는다 — 하나라도 빠지면 '반쪽만 저장'이 된다(이슈 #79).
-          git add data/essay-playbook.json collector/essay-sources.json collector/essay-playbook-report.md
+          git add data/essay-playbook.json collector/essay-sources.json collector/essay-playbook-report.md \
+                  data/essay-form-rules.json collector/essay-house-report.md
           if ! git diff --cached --quiet; then
             git commit -m "작성 규칙 학습 — 출처 갱신 (검수 전)"
             pushed=0
@@ -100,11 +108,12 @@ jobs:
             const fs = require('fs');
             const read = (p) => { try { return fs.readFileSync(p, 'utf8').slice(0, 60000); } catch { return '(리포트를 만들지 못했습니다)'; } };
             const ok = process.env.RESULT === 'success';
+            const house = read('collector/essay-house-report.md');
             await github.rest.issues.create({
               owner: context.repo.owner, repo: context.repo.repo,
               labels: ['essay-playbook'],
               title: `${ok ? '📘' : '🚨'} 작성 규칙 학습 — ${new Date().toISOString().slice(0, 10)}`,
-              body: read('collector/essay-playbook-report.md'),
+              body: `${read('collector/essay-playbook-report.md')}\n\n---\n\n${house}`.slice(0, 60000),
             });
         env:
           RESULT: ${{ job.status }}

@@ -181,15 +181,21 @@ if (!DEMO) {
   if (!blockedFact) { console.error('\n❌ 사실 나열형 칸(volunteer)이 막히지 않았습니다.'); process.exit(1); }
   console.log('\n✓ 사실 나열형 칸은 막혔습니다.');
 } else {
-  /* 시연에서는 이것을 본다: 학교 이름이 한 글자도 안 들어갔는가 */
-  const 학교표현 = ['한국외국어대학교', '한국외대', '외대', '한외대'];
-  const 샌것 = (j.drafts || []).filter((d) => 학교표현.some((n) => d.text.includes(n)));
-  console.log(샌것.length
-    ? `\n❌ 블라인드 심사인데 학교 이름이 남았습니다: ${샌것.map((d) => d.key).join(', ')}`
-    : '\n✓ 블라인드 심사 — 초안에 학교 이름이 한 글자도 없습니다.');
+  /* 🔴 블라인드 공고일 때만 본다. 처음엔 무조건 봐서, 학교명을 써도 되는 공고에
+     '❌ 학교 이름이 남았습니다'를 찍었다 — 멀쩡한 동작을 실패로 보고할 뻔했다. */
+  if (sendPayload.scholarship.blind) {
+    const 학교표현 = ['한국외국어대학교', '한국외대', '외대', '한외대'];
+    const 샌것 = (j.drafts || []).filter((d) => 학교표현.some((n) => d.text.includes(n)));
+    console.log(샌것.length
+      ? `\n❌ 블라인드 심사인데 학교 이름이 남았습니다: ${샌것.map((d) => d.key).join(', ')}`
+      : '\n✓ 블라인드 심사 — 초안에 학교 이름이 한 글자도 없습니다.');
+  } else {
+    console.log('\n(이 공고는 블라인드가 아니라 학교 이름을 써도 됩니다)');
+  }
   for (const d of j.drafts || []) if ((d.quality || []).length) {
     console.log(`\n[${d.key}] 앱이 학생에게 짚어 줄 것:`);
-    for (const w of d.quality) console.log(`  · ${w}`);
+    /* 경고는 {code,msg} 다 — 그냥 찍으면 [object Object] 가 나온다(실제로 그랬다) */
+    for (const w of d.quality) console.log(`  · ${typeof w === 'string' ? w : w.msg || w.code}`);
   }
 }
 

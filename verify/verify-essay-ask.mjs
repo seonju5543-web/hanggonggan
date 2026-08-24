@@ -302,5 +302,46 @@ head('9) 🔴 맞춤 보기에도 민감 낱말이 없는가 (전수)');
     '🔴 스토리텔링 질문은 전부 눌러서 고르는 것이다 — 학생이 글을 쓰지 않는다');
 }
 
+/* ───────────────────────────────────────────────────────────────────────────
+   13) 스스로 넓히기 — 다음에 읽을 곳을 줍는 눈, 그리고 남의 집 규칙
+   🔴 순수 모듈에 있어야 검사가 돌려 볼 수 있다. 학습 로봇은 불러오는 순간 인터넷을 두드린다.
+   ─────────────────────────────────────────────────────────────────────────── */
+{
+  head('13) 🔴 스스로 넓히기 — 링크 줍기와 robots.txt');
+  const { linkCandidates, parseRobots, robotsBlocks } = await import('../collector/essay-rule-line.mjs');
+
+  const html = `
+    <a href="/tips/jagisogeseo">장학금 자기소개서 작성법</a>
+    <a href="https://other.example/blog/글쓰기-요령">글쓰기 요령</a>
+    <a href="/login?next=/x">로그인</a>
+    <a href="/shop/cart">장바구니</a>
+    <a href="/recruit/resume">이력서 자동 작성</a>
+    <a href="/notice">공지사항</a>`;
+  const got = linkCandidates(html, 'https://ex.example/a/b');
+  const urls = got.map((g) => g.url);
+  ok(urls.some((u) => u.endsWith('/tips/jagisogeseo')), '주제인 링크를 줍는다 (제목으로)');
+  ok(urls.some((u) => /%EA%B8%80%EC%93%B0%EA%B8%B0|글쓰기/.test(decodeURIComponent(u))), '다른 집 링크도 줍는다');
+  ok(!urls.some((u) => /login|cart|recruit/.test(u)), '🔴 로그인·장바구니·채용은 줍지 않는다');
+  ok(!urls.some((u) => u.endsWith('/notice')), '주제라는 표시가 없으면 줍지 않는다');
+  ok(got.every((g) => /^https?:/.test(g.url) && !g.url.includes('#')), '주소는 절대주소이고 조각(#)이 없다');
+
+  const rules = parseRobots([
+    'User-agent: BadBot', 'Disallow: /', '', 'User-agent: *', 'Disallow: /private', 'Disallow: /tmp  # 메모',
+  ].join('\n'));
+  ok(rules.join(',') === '/private,/tmp', "우리(별표)에게 걸린 규칙만 읽는다 — 남의 규칙을 우리 것으로 읽지 않는다", rules.join(','));
+  ok(robotsBlocks(rules, 'https://x.example/private/a') === true, '막아 둔 곳은 안 간다');
+  ok(robotsBlocks(rules, 'https://x.example/tips/a') === false, '막지 않은 곳은 간다');
+  ok(robotsBlocks(parseRobots('User-agent: *\nDisallow: /'), 'https://x.example/any') === true,
+    "'전부 금지'인 집은 한 곳도 안 간다");
+  ok(robotsBlocks([], 'https://x.example/any') === false, 'robots.txt 가 없으면 막지 않는다');
+
+  /* 배선 — 학습 로봇이 실제로 robots 를 보고 가는가 */
+  const src = fs.readFileSync(new URL('../collector/essay-playbook-learn.mjs', import.meta.url), 'utf8');
+  ok(/await robotsAllows\(c\.url\)/.test(src), '🔴 새 주소를 읽기 전에 robots.txt 를 본다');
+  ok(/GROW_PER_RUN/.test(src) && /RETRY_AFTER_DAYS/.test(src),
+    '한 번에 몰아치지 않고, 헛걸음한 곳은 한동안 다시 안 간다');
+  ok(!/const\s+TOPIC\s*=/.test(src), '학습 로봇이 판정을 베끼지 않았다 — 순수 모듈을 쓴다');
+}
+
 console.log(`\n${fail ? '✗' : '✓'} 키워드 질문 — 통과 ${pass} · 실패 ${fail}`);
 process.exit(fail ? 1 : 0);

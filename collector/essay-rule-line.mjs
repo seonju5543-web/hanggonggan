@@ -29,3 +29,47 @@ export function isCandidate(line) {
   if (!listy && !ADVICE.test(t)) return null;
   return t;
 }
+
+export const TOPIC = /(자기소개서|자소서|장학금|장학생|작성법|작성-법|글쓰기|첨삭|지원서|합격|자소서작성)/;
+/* 주제어가 있어도 이런 곳은 규칙이 아니라 광고·서비스다 */
+export const NOT_SOURCE = /(login|signin|signup|join|cart|order|pay|price|이력서|resume|채용|recruit|job)/i;
+
+/** 읽은 글에서 '다음에 읽을 만한 곳' 을 줍는다 */
+export function linkCandidates(html, baseUrl) {
+  const out = [];
+  for (const m of String(html).matchAll(/<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]{0,120}?)<\/a>/gi)) {
+    const [, href, inner] = m;
+    const text = inner.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    let abs; try { abs = new URL(href, baseUrl).toString(); } catch { continue; }
+    if (!/^https?:/.test(abs)) continue;
+    if (NOT_SOURCE.test(abs) || NOT_SOURCE.test(text)) continue;
+    /* 제목이든 주소든 이 주제라는 표시가 있어야 한다 */
+    if (!TOPIC.test(text) && !TOPIC.test(decodeURIComponent(abs))) continue;
+    if (abs.split('#')[0] === String(baseUrl).split('#')[0]) continue;
+    out.push({ url: abs.split('#')[0], text: text.slice(0, 80) });
+  }
+  return out;
+}
+
+
+/* ── robots.txt — 남의 집 규칙을 먼저 읽는다 ──
+   순수 함수로 둔 이유: 읽어 오는 일(fetch)과 해석하는 일을 가르면 **검사가 해석만 돌려 볼 수 있다.**
+   `User-agent: *` 아래의 Disallow 만 본다 — 우리가 그 별표에 해당한다. */
+export function parseRobots(text) {
+  const rules = [];
+  let mine = false;
+  for (const raw of String(text || '').split('\n')) {
+    const line = raw.split('#')[0].trim();
+    const m = line.match(/^([A-Za-z-]+)\s*:\s*(.*)$/);
+    if (!m) continue;
+    const [, k, v] = m;
+    if (/^user-agent$/i.test(k)) mine = (v.trim() === '*');
+    else if (mine && /^disallow$/i.test(k) && v.trim()) rules.push(v.trim());
+  }
+  return rules;
+}
+export function robotsBlocks(rules, url) {
+  let u; try { u = new URL(url); } catch { return true; }
+  const path0 = u.pathname + u.search;
+  return (rules || []).some((d) => d === '/' || path0.startsWith(d));
+}

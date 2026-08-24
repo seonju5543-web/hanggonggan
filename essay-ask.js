@@ -398,20 +398,25 @@ function tailorAsks(asks, ctx) {
 
   const out = asks.map((a) => {
     if (a.free) return a;
-    /* 돈 쓰는 데 — 계열마다 다르다 */
-    if (a.id === 'where' && TRACK_SPEND[track]) return swapChips(a, null, TRACK_SPEND[track]);
-    /* 지금 하는 준비 — 계열마다 다르다 */
-    if (a.id === 'prep' && TRACK_PREP[track]) return swapChips(a, null, TRACK_PREP[track]);
-    /* 요즘 하는 것 — 학년·재학상태마다 다르다 */
-    if (a.id === 'now' && STAGE_NOW[stage] && STAGE_NOW[stage].length) return swapChips(a, null, STAGE_NOW[stage]);
-    /* 사정 — 지역·가구 신호를 덧붙인다 */
-    if (a.id === 'need' && extra.length) return swapChips(a, null, extra);
-    if (a.id === 'change' && p.exchange) return swapChips(a, null, ['교환학생 준비에 집중']);
-    /* B — 이 재단이 보는 것과 이어지는 보기를 **앞에** 둔다 (know-the-foundation).
+    /* 🔴 맞춤은 **겹친다.** 예전엔 `if … return` 이 줄줄이라 앞의 조건 하나가 걸리면
+       뒤의 맞춤이 통째로 무시됐다 — 복학생 보기가 걸려서 B(재단이 보는 것)가
+       화면에 한 번도 안 나타났다(시연 화면으로 발견하고 고쳤다).
+       그래서 앞세울 보기를 **모아서** 한 번에 넣는다. */
+    const add = [];
+    /* B — 이 재단이 보는 것과 이어지는 보기를 맨 앞에 (know-the-foundation).
        학생에게 새로 묻지 않는다. 이미 있는 보기의 순서만 바꾼다. */
-    if (focusChips.length && (a.id === 'now' || a.id === 'prep' || a.id === 'proud' || a.id === 'plan' || a.id === 'think'))
-      return swapChips(a, null, focusChips);
-    return a;
+    if (focusChips.length && ['now', 'prep', 'proud', 'plan', 'think', 'change'].includes(a.id))
+      add.push(...focusChips);
+    /* 돈 쓰는 데 — 계열마다 다르다 */
+    if (a.id === 'where' && TRACK_SPEND[track]) add.push(...TRACK_SPEND[track]);
+    /* 지금 하는 준비 — 계열마다 다르다 */
+    if (a.id === 'prep' && TRACK_PREP[track]) add.push(...TRACK_PREP[track]);
+    /* 요즘 하는 것 — 학년·재학상태마다 다르다 */
+    if (a.id === 'now' && STAGE_NOW[stage]) add.push(...STAGE_NOW[stage]);
+    /* 사정 — 지역·가구 신호를 덧붙인다 */
+    if (a.id === 'need') add.push(...extra);
+    if (a.id === 'change' && p.exchange) add.push('교환학생 준비에 집중');
+    return add.length ? swapChips(a, null, add) : a;
   });
 
   /* 보관함이 알려 주는 것 — 그 증명서가 있으면 그것에 대해 **묻는다**.

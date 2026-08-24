@@ -20,7 +20,7 @@
    ============================================================ */
 import fs from 'node:fs';
 import path from 'node:path';
-import { isCandidate } from './essay-rule-line.mjs';
+import { isCandidate, linkCandidates, parseRobots, robotsBlocks } from './essay-rule-line.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const rd = (p) => JSON.parse(fs.readFileSync(path.join(ROOT, p), 'utf8'));
@@ -65,17 +65,46 @@ function matchRule(text) {
   return hits;
 }
 
+/* 우리가 누구인지 밝힌다 — 몰래 읽지 않는다 */
+const UA = 'Mozilla/5.0 (compatible; handaejang-playbook/1.0; +https://github.com/seonju5543-web/hanggonggan)';
 async function fetchPage(url) {
   const res = await fetch(url, {
     redirect: 'follow',
-    headers: {
-      /* 학교 게시판을 읽을 때와 같은 방식 — 사람이 브라우저로 여는 것처럼 */
-      'user-agent': 'Mozilla/5.0 (compatible; handaejang-playbook/1.0; +https://github.com/seonju5543-web/hanggonggan)',
-      'accept-language': 'ko-KR,ko;q=0.9',
-    },
+    headers: { 'user-agent': UA, 'accept-language': 'ko-KR,ko;q=0.9' },
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.text();
+}
+
+/* ============================================================
+   ── 스스로 넓히기 (2026-08-24 개발자 지시) ──
+   "현재의 크롤링 결과와 출처에 안주하지 말고 계속해서 출처를 넓힐 방안을 찾아.
+    사용자의 직접적인 양식 제시 없이."
+
+   그래서 로봇이 **읽은 페이지에서 다음에 읽을 곳을 스스로 찾는다.**
+     ① 읽은 글 안의 링크 중 제목·주소가 이 주제인 것만 후보로 줍는다
+     ② 그 집의 robots.txt 를 먼저 보고, 막아 둔 곳은 읽지 않는다
+     ③ 실행당 몇 곳만 새로 읽는다 (한 번에 몰아치지 않는다 — 남의 서버다)
+     ④ 규칙을 하나라도 준 곳은 seeds 로 승격, 아무것도 못 준 곳은 tried 에 적어
+        30일 동안 다시 가지 않는다 — 안 그러면 매번 같은 헛걸음을 되풀이한다
+
+   🔴 여전히 원문은 저장하지 않는다. 넓어지는 것은 **어디를 읽었나**뿐이다.
+   ============================================================ */
+const GROW_PER_RUN = Number(process.env.GROW_PER_RUN || 6);
+const RETRY_AFTER_DAYS = 30;
+const robotsCache = new Map();
+async function robotsAllows(url) {
+  let u; try { u = new URL(url); } catch { return false; }
+  const host = u.origin;
+  if (!robotsCache.has(host)) {
+    let rules = [];
+    try {
+      const res = await fetch(`${host}/robots.txt`, { headers: { 'user-agent': UA } });
+      if (res.ok) rules = parseRobots(await res.text());
+    } catch { rules = []; }   /* robots.txt 를 못 읽으면 막지 않는다 (없는 집이 흔하다) */
+    robotsCache.set(host, rules);
+  }
+  return !robotsBlocks(robotsCache.get(host), url);
 }
 
 /* ── 본편 ── */
@@ -89,16 +118,22 @@ let okCount = 0, failCount = 0;
 const existingUrls = new Set((PLAYBOOK.sources || []).map((s) => s.url));
 let nextId = (PLAYBOOK.sources || []).length + 1;
 
-for (const seed of seeds) {
-  let lines;
+const grow = [];               // 읽은 글에서 주운, 다음에 읽을 만한 곳
+const today = new Date().toISOString().slice(0, 10);
+
+/** 주소 하나를 읽어 규칙에 붙인다. 규칙을 하나라도 준 곳만 출처가 된다. */
+async function readOne(url, note) {
+  let html;
   try {
-    lines = toLines(await fetchPage(seed.url));
+    html = await fetchPage(url);
     okCount++;
   } catch (e) {
     failCount++;
-    report.push(`  ✗ ${seed.url}\n      못 읽음: ${String(e.message).slice(0, 80)}`);
-    continue;
+    report.push(`  ✗ ${url}\n      못 읽음: ${String(e.message).slice(0, 80)}`);
+    return { ok: false, found: new Map() };
   }
+  const lines = toLines(html);
+  for (const c of linkCandidates(html, url)) grow.push(c);
 
   const found = new Map();     // code -> 그 규칙을 말한 문장 수
   const unmatched = [];
@@ -111,18 +146,58 @@ for (const seed of seeds) {
   }
 
   /* 출처 등록 — 규칙을 하나라도 뒷받침했을 때만 */
-  let sid = (PLAYBOOK.sources || []).find((s) => s.url === seed.url)?.id;
-  if (!sid && found.size) { sid = `s${nextId++}`; newSrc.set(sid, { id: sid, title: seed.note || seed.url, url: seed.url, seenAt: new Date().toISOString().slice(0, 10) }); }
+  let sid = (PLAYBOOK.sources || []).find((x) => x.url === url)?.id;
+  if (!sid && found.size) { sid = `s${nextId++}`; newSrc.set(sid, { id: sid, title: note || url, url, seenAt: today }); }
   if (sid) for (const c of found.keys()) {
     if (!ruleHits.has(c)) ruleHits.set(c, new Set());
     ruleHits.get(c).add(sid);
   }
 
-  report.push(`  ✓ ${seed.url}\n      줄 ${lines.length} · 규칙을 뒷받침한 것 ${found.size}종`
+  report.push(`  ✓ ${url}\n      줄 ${lines.length} · 규칙을 뒷받침한 것 ${found.size}종`
     + (found.size ? ` (${[...found.keys()].join(', ')})` : '')
     + (unmatched.length ? `\n      🆕 어느 규칙에도 안 붙은 문장 ${unmatched.length}개 — 컨펌 대기` : ''));
-  for (const u of unmatched) candidates.push({ url: seed.url, text: u });
+  for (const u of unmatched) candidates.push({ url, text: u });
+  return { ok: true, found };
 }
+
+for (const seed of seeds) await readOne(seed.url, seed.note);
+
+/* ── 스스로 넓히기 — 주운 곳 중 몇 곳만 새로 읽는다 ── */
+SOURCES.tried = Array.isArray(SOURCES.tried) ? SOURCES.tried : [];
+const known = new Set((SOURCES.seeds || []).map((x) => x.url));
+const parked = new Map(SOURCES.tried.map((t) => [t.url, t]));
+const stale = (d) => (Date.now() - Date.parse(d || 0)) / 86400000 > RETRY_AFTER_DAYS;
+
+const fresh = [];
+const seenGrow = new Set();
+for (const c of grow) {
+  if (known.has(c.url) || seenGrow.has(c.url)) continue;
+  const p = parked.get(c.url);
+  if (p && !stale(p.seenAt)) continue;      /* 지난번에 헛걸음한 곳 — 아직 다시 안 간다 */
+  seenGrow.add(c.url);
+  fresh.push(c);
+}
+
+const grown = [];
+const barred = [];
+for (const c of fresh) {
+  if (grown.length >= GROW_PER_RUN) break;
+  if (!(await robotsAllows(c.url))) { barred.push(c.url); continue; }
+  const r = await readOne(c.url, c.text);
+  grown.push({ url: c.url, text: c.text, rules: r.found.size });
+  if (r.found.size) {
+    /* 규칙을 준 곳은 seeds 로 승격 — 다음 실행부터 정식으로 읽는다 */
+    if (!known.has(c.url)) {
+      (SOURCES.seeds = SOURCES.seeds || []).push({ url: c.url, kind: '*', note: `로봇이 스스로 찾음 — ${c.text}`.slice(0, 80) });
+      known.add(c.url);
+    }
+    parked.delete(c.url);
+  } else {
+    /* 아무것도 못 준 곳은 적어 둔다 — 30일 동안 다시 가지 않는다 */
+    parked.set(c.url, { url: c.url, seenAt: today, why: '규칙 0종' });
+  }
+}
+SOURCES.tried = [...parked.values()].slice(-200);
 
 /* ── 규칙이 모자란 종류를 큐에 올린다 (미학습 양식이 생기면 계속 배운다) ── */
 const kindsWithRules = new Set(PLAYBOOK.rules.filter((r) => r.kind !== '*').map((r) => r.kind));
@@ -162,6 +237,13 @@ const md = [
       + '넣기로 하면 우리 말로 다시 적어 `data/essay-playbook.json` 의 `rules` 에 추가합니다 — 원문을 그대로 옮기지 않습니다.\n'
       + candidates.slice(0, 40).map((c) => `- ${c.text}\n  <sub>${c.url}</sub>`).join('\n')
     : '없습니다.',
+  '',
+  '## 스스로 넓히기 — 로봇이 읽은 글에서 다음에 읽을 곳을 주웠습니다',
+  `주운 곳 ${fresh.length}곳 · 이번에 읽은 곳 ${grown.length}곳 · robots.txt 가 막아 건너뛴 곳 ${barred.length}곳`,
+  '',
+  grown.length
+    ? grown.map((g) => `- ${g.rules ? '⬆️ seeds 로 승격' : '· 규칙 0종 — 30일 뒤 다시 시도'} ${g.url}\n  <sub>${g.text}</sub>`).join('\n')
+    : '이번에 새로 읽은 곳이 없습니다.',
   '',
   '## 규칙이 모자란 종류',
   thin.length ? thin.map((k) => `- \`${k}\` — 이 종류 전용 규칙이 없습니다. 관련 글 주소를 \`collector/essay-sources.json\` 의 seeds 에 넣어 주세요.`).join('\n') : '없습니다.',
