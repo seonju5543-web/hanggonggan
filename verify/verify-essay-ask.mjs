@@ -341,6 +341,43 @@ head('9) 🔴 맞춤 보기에도 민감 낱말이 없는가 (전수)');
   ok(/GROW_PER_RUN/.test(src) && /RETRY_AFTER_DAYS/.test(src),
     '한 번에 몰아치지 않고, 헛걸음한 곳은 한동안 다시 안 간다');
   ok(!/const\s+TOPIC\s*=/.test(src), '학습 로봇이 판정을 베끼지 않았다 — 순수 모듈을 쓴다');
+
+    /* 🔴 '가져왔다'만으로는 부족하다 — 저쪽이 실제로 내보내는지 봐야 한다.
+     가져오는 줄만 보는 검사는 저쪽에서 함수가 사라져도 통과한다(실제로 그랬다). */
+  const pure = fs.readFileSync(new URL('../collector/essay-rule-line.mjs', import.meta.url), 'utf8');
+  const 내보낸것 = new Set([...pure.matchAll(/export\s+(?:async\s+)?(?:function|const|let|class)\s+([A-Za-z_$][\w$]*)/g)].map((m) => m[1]));
+  const 가져온것 = [...src.matchAll(/import\s*\{([^}]*)\}\s*from\s*'\.\/essay-rule-line\.mjs'/g)]
+    .flatMap((m) => m[1].split(',').map((x) => x.trim())).filter(Boolean);
+  const 없는수출 = 가져온것.filter((n) => !내보낸것.has(n));
+  ok(가져온것.length > 0 && 없는수출.length === 0,
+    '🔴 가져오는 이름을 판정 모듈이 실제로 내보낸다', `없는 것: ${없는수출.join(', ')}`);
+
+  /* 글자 뽑기 — 실제로 돌려 본다 */
+  const { toLines } = await import('../collector/essay-rule-line.mjs');
+  const lines = toLines('<script>x</script><div>첫 문장에 결론을 먼저 쓰세요.</div><li>구체적인 경험으로 채워야 합니다.</li>');
+  ok(lines.length === 2 && lines[0] === '첫 문장에 결론을 먼저 쓰세요.', 'HTML 에서 글자만 줄로 뽑는다', lines.join(' | '));
+  ok(!toLines('<script>alert(1)</script>').length, '스크립트는 글자로 세지 않는다');
+
+  /* 🔴 2026-08-24 사고: toLines 가 로봇에서 사라졌는데 **로컬에서는 안 터졌다.**
+     페이지가 전부 403 이라 그 줄까지 가 보지도 못했기 때문이다 — '못 읽어서 안 터진 것'을
+     '잘 된 것'으로 읽었다. 그래서 부르기만 하고 어디에도 없는 이름을 정적으로 잡는다. */
+  {
+    const 선언된것 = new Set([
+      ...[...src.matchAll(/(?:function|const|let|var|class)\s+([A-Za-z_$][\w$]*)/g)].map((m) => m[1]),
+      ...[...src.matchAll(/import\s*\{([^}]*)\}/g)].flatMap((m) => m[1].split(',').map((x) => x.trim().split(/\s+as\s+/).pop())),
+      ...[...src.matchAll(/import\s+([A-Za-z_$][\w$]*)\s+from/g)].map((m) => m[1]),
+      /* 자바스크립트가 원래 주는 것들 */
+      'require', 'fetch', 'String', 'Number', 'Boolean', 'Array', 'Object', 'Map', 'Set', 'Date',
+      'JSON', 'Math', 'RegExp', 'Error', 'URL', 'Promise', 'parseInt', 'parseFloat', 'isNaN',
+      'decodeURIComponent', 'encodeURIComponent', 'console', 'process', 'catch', 'if', 'for',
+      'while', 'switch', 'return', 'typeof', 'function', 'await', 'new', 'of', 'in', 'do', 'else',
+    ]);
+    const 없는것 = [...new Set([...src.matchAll(/(?:^|[^.\w$])([a-z][\w$]*)\s*\(/g)].map((m) => m[1]))]
+      .filter((n) => !선언된것.has(n));
+    ok(없는것.length === 0, '🔴 학습 로봇이 부르는 이름이 전부 실재한다 (선언되었거나 가져왔다)',
+      없는것.join(', '));
+
+  }
 }
 
 console.log(`\n${fail ? '✗' : '✓'} 키워드 질문 — 통과 ${pass} · 실패 ${fail}`);

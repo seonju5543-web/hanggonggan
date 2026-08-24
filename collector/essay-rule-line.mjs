@@ -73,3 +73,22 @@ export function robotsBlocks(rules, url) {
   const path0 = u.pathname + u.search;
   return (rules || []).some((d) => d === '/' || path0.startsWith(d));
 }
+
+/* ── HTML 에서 글자만 — 태그를 지우고 줄로 자른다 ──
+   🔴 순수 모듈에 둔 이유(2026-08-24 사고): 이 함수가 학습 로봇 안에 있었는데,
+      출처 넓히기를 만들며 코드를 옮기다 **함께 지워졌다.** 그런데 로컬에서는 페이지가
+      전부 403 이라 이 줄까지 가 보지도 못하고 '통과'로 보였고, Actions 에서 처음으로
+      `ReferenceError: toLines is not defined` 가 났다.
+      = **못 읽어서 안 터진 것을 잘 된 것으로 읽은 것**이다(이 저장소가 여러 번 겪은 유형).
+      이제 검사가 실제로 이 함수를 돌려 본다 — verify/verify-essay-ask.mjs [13]. */
+export function toLines(html) {
+  const body = String(html)
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<\/(p|div|li|h[1-6]|br|tr)>/gi, '\n')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+  return body.split(/\n+/).map((l) => l.replace(/\s+/g, ' ').trim()).filter(Boolean);
+}

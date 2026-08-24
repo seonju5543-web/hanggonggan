@@ -20,7 +20,7 @@
    ============================================================ */
 import fs from 'node:fs';
 import path from 'node:path';
-import { isCandidate, linkCandidates, parseRobots, robotsBlocks } from './essay-rule-line.mjs';
+import { isCandidate, linkCandidates, parseRobots, robotsBlocks, toLines } from './essay-rule-line.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const rd = (p) => JSON.parse(fs.readFileSync(path.join(ROOT, p), 'utf8'));
