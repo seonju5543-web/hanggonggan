@@ -1813,7 +1813,7 @@ console.log('\n■ 절 경계 — 제외 대상·선발기준이 자격으로 �
      그래서 index.html과 같은 순서로 두 파일을 실어 보고 실제로 불러 본다. */
   const vm = createRequire(import.meta.url)('node:vm');
   const ctx = vm.createContext({ console });
-  for (const f of ['../section-head.js', '../match-engine.js']) {
+  for (const f of ['../section-head.js', '../parse-requirements.js', '../match-engine.js']) {
     vm.runInContext(fs.readFileSync(new URL(f, import.meta.url), 'utf8'), ctx, { filename: f });
   }
   const lines = '["◎ 신청 자격","▶ 서울시립대학교 재학생","◎ 지원 제외 대상","1. 휴학생, 졸업생, 자퇴생"]';
@@ -1824,6 +1824,68 @@ console.log('\n■ 절 경계 — 제외 대상·선발기준이 자격으로 �
   eq('브라우저에서 머리글 뒤 내용도 살린다',
     vm.runInContext(`requirementLines({}, ["2) 추천대상 : 4년제 대학교 이공계 전공 새터민으로 재학 예정인 대학생"])`, ctx),
     ['4년제 대학교 이공계 전공 새터민으로 재학 예정인 대학생']);
+}
+
+
+/* ── 🔴 적합도 — 0%를 내는 여덟 조건 (2026-08-24 · docs/designs/fit-score.md) ──
+   0%는 학생에게서 장학금을 뺏는 판정이라 틀리면 가장 비싸다. 개발자 지시:
+   *"0%로 뜨면 학생이 아예 거들떠보지도 않을 테니 엄청 정확하게 0%임을 찾아야 한다."*
+   아래 항목들은 전부 **0% 전수 확인에서 실제로 오탐이 났던 것**이다(18건 → 9건으로 줄인 과정).
+   되돌리면 멀쩡한 학생이 0%를 보게 된다. */
+console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
+{
+  const req = createRequire(import.meta.url);
+  const M = req('../match-engine.js');
+  const P = req('../parse-requirements.js');
+  const fit = (lines, p, ex) => M.fitDetail({ eligibilityLines: lines, eligibilityExcludes: ex || [] }, p);
+  const 평범 = { gpa: 3.5, bracket: 5, year: 3, status: '재학', credits: 15, nationality: 'korean', flags: [] };
+
+  // ① 확신 있는 미달만 0%
+  eq('평점 미달은 0%', fit(['직전학기 평점평균 4.0 이상인 자'], 평범).pct, 0);
+  eq('평점 충족은 100%', fit(['직전학기 평점평균 3.0 이상인 자'], 평범).pct, 100);
+
+  // ② 프로필에 값이 없으면 미달이 아니라 '확인 필요'
+  eq('평점을 안 적었으면 0%가 아니다', fit(['직전학기 평점평균 4.0 이상인 자'], { flags: [] }).pct > 0, true);
+
+  // ③ 단위가 다르면 떨어뜨리지 않는다 (백분위 70을 평점 70으로 읽으면 전원 0%)
+  eq('백분위 요건으로는 미달을 내지 않는다', fit(['직전학기 성적 70/100 만점 이상'], 평범).pct > 0, true);
+  eq('두 단위가 섞인 줄은 확신이 낮다',
+    P.parseLine('평균 평점 80 점 또는 평균평점 B 학점 이상인 학생').conds[0].conf, P.LOW);
+
+  // ④ 괄호 예외가 붙으면 확신을 낮춘다
+  eq('예외가 붙은 줄은 확신이 낮다',
+    P.parseLine('직전 정규학기 12학점 이상(신입생, 편입생 예외)').conds.every((c) => c.conf === P.LOW), true);
+
+  // ⑤ 선택지(OR)는 하나만 만족해도 충족 — 필수로 읽으면 오탐 0%가 난다
+  {
+    const lines = ['아래 세 가지 조건 중 하나를 만족하는 자',
+      '직전학기 평점평균 4.0 이상인 자', '직전학기 평점평균 3.0 이상인 자', '직전학기 평점평균 4.4 이상인 자'];
+    eq('선택지는 하나만 만족해도 0%가 아니다', fit(lines, 평범).pct > 0, true);
+    eq('선택지 묶음은 요건 1개로 센다', fit(lines, 평범).total, 1);
+  }
+
+  // ⑥ `재학`이 부분문자열로 제외 목록에 들어가면 재학생이 통째로 0%가 된다
+  eq('“수업연한 초과 재학생 지원 불가”로 재학생을 떨어뜨리지 않는다',
+    fit(['본교 재학생'], 평범, ['휴학생, 수료생 및 수업연한 초과 재학생은 지원 불가']).pct > 0, true);
+  eq('휴학생은 제대로 걸러낸다',
+    fit(['본교 재학생'], { ...평범, status: '휴학' }, ['휴학생은 지원 불가']).pct, 0);
+
+  // ⑦ 제외 줄의 국적은 **같을 때만** 미달 (내국인이 0%가 됐던 오탐)
+  eq('“외국인 유학생 선발 불가”로 내국인을 떨어뜨리지 않는다',
+    fit(['본교 재학생'], 평범, ['순수외국인전형으로 입학한 외국인 유학생은 선발 불가']).pct > 0, true);
+
+  // ⑧ 대학원 전용 줄은 학부생 판정에서 뺀다
+  eq('대학원 전용 줄로 학부생을 떨어뜨리지 않는다',
+    fit(['학부생 : 전체 평점 3.3 이상인 자', '일반대학원생 : 전체 평점 4.0 이상인 자'], 평범).pct, 100);
+
+  // ⑨ 지급액 구간표를 요건으로 읽지 않는다
+  eq('구간이 여러 값이면 지급액 표로 보고 미달을 내지 않는다',
+    fit(['학자금지원구간 4분위 이하', '학자금지원구간 5분위 이상 ~ 6분위 이하'], 평범).pct > 0, true);
+
+  // ⑩ 자격을 하나도 못 읽은 공고는 0%가 아니라 '자격 미확인'
+  const un = fit(['경제적 지원이 필요한 학생'], 평범);
+  eq('자격을 못 읽으면 0%가 아니다', un.pct, M.FIT_FLOOR);
+  eq('자격 줄이 아예 없으면 미확인', fit([], 평범).unread, true);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');

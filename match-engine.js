@@ -11,6 +11,13 @@ const SH = (typeof module !== 'undefined' && module.exports)
   ? require('./section-head.js')
   : { sectionOf, headRest, isQualifyHead, isExcludeHead, isSelectHead };
 
+/* 요건 파서도 같은 방식으로 — 브라우저는 전역, Node는 require.
+   ⚠️ `window.parseLine`으로 찾으면 안 된다(서비스워커에는 window가 없다).
+      전역 이름을 그대로 쓰면 <script>·importScripts 양쪽에서 잡힌다. */
+const PR = (typeof module !== 'undefined' && module.exports)
+  ? require('./parse-requirements.js')
+  : { parseLine, gradOnly, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM };
+
 /* 자격 진단 — 프로필과 공고의 요건을 대조해 상태·사유·부족정보를 돌려준다 */
 function evaluate(sch, p) {
   const e = sch.eligibility || {};
@@ -86,19 +93,151 @@ function evaluate(sch, p) {
 }
 
 /* 적합도 점수 (0~99) — 정렬용 */
+/* ══════════════════════════════════════════════════════════════════════════
+   적합도 — 자격 요건 기반 (2026-08-24 전면 재설계 · docs/designs/fit-score.md)
+
+   왜 바꿨나: 예전 점수는 `62 - 8 + 3`에서 거의 안 움직여, 한 학생에게 보이는 27건이
+   **57%와 54% 두 값**뿐이었다. 정렬이 사실상 무작위였고 학생이 보는 퍼센트는
+   근거가 없는데 정밀해 보였다 — 개발자가 지적한 피로감의 진짜 원인이다.
+
+   지금 방식: **화면에 나가는 자격 줄을 세어, 학생이 충족한 비율**을 낸다.
+     · 못 읽은 요건은 **분모에만** 들어간다(= 감점 — 개발자 결정)
+     · 확신 있는 미달이 하나라도 있으면 **0%**
+     · 요건을 하나도 못 읽은 공고는 **35%** + '자격 미확인'
+   ══════════════════════════════════════════════════════════════════════════ */
+const FIT_UNREAD = 35;   // 자격을 하나도 못 읽은 공고 (실측 53건) — 읽어낸 공고보다 낮게 깐다
+const FIT_FLOOR = 15;    // 요건은 읽었으나 하나도 충족을 확인 못 한 경우. 0%(미달 확정)와 구분한다
+
+/* 파싱된 조건 하나를 학생과 맞춰 본다 → 'pass' | 'fail' | 'unknown'
+   🔴 **모르면 unknown**이다. 틀린 fail은 학생에게서 장학금을 뺏는다. */
+function judgeCond(c, p) {
+  const S = PR.GRADE_SCALE;
+  switch (c.kind) {
+    case 'grade': {
+      if (p.gpa == null) return 'unknown';
+      /* 🔴 단위가 다르면 **떨어뜨리지 않는다**(설계 조건 ⑥). 백분위 70을 평점 70으로 읽으면
+         거의 모든 학생이 0%가 된다. 넉넉히 넘을 때만 통과로 보고, 미달 판정은 안 낸다. */
+      if (c.scale === S.gpa45) return p.gpa >= c.min ? 'pass' : 'fail';
+      if (c.scale === S.gpa43) return (p.gpa / 4.5 * 4.3) >= c.min ? 'pass' : 'fail';
+      if (c.scale === S.percent) {
+        const pct = p.gpa / 4.5 * 100;
+        return pct >= c.min + 10 ? 'pass' : 'unknown';   // 환산표가 학교마다 달라 미달은 안 낸다
+      }
+      return 'unknown';                                   // B학점 등 — 환산 불가
+    }
+    case 'bracket':
+      if (p.bracket == null) return 'unknown';
+      return p.bracket <= c.max ? 'pass' : 'fail';
+    case 'credits':
+      if (p.credits == null) return 'unknown';
+      if (c.min != null) return p.credits >= c.min ? 'pass' : 'fail';
+      return 'unknown';
+    case 'year': {
+      const y = p.year == null ? null : Number(p.year);
+      if (y == null || Number.isNaN(y)) return 'unknown';
+      if (c.min != null) return y >= c.min ? 'pass' : 'fail';
+      if (c.max != null) return y <= c.max ? 'pass' : 'fail';
+      if (c.eq != null) return y === c.eq ? 'pass' : 'unknown';   // `2학년 학생`은 딱 그 학년인지 애매
+      return 'unknown';
+    }
+    case 'status': {
+      if (!p.status) return 'unknown';
+      if (c.not) return c.not.includes(p.status) ? 'fail' : 'pass';
+      if (c.anyOf) return c.anyOf.includes(p.status) ? 'pass' : 'unknown';   // 목록에 없다고 미달은 아니다
+      return 'unknown';
+    }
+    case 'flags': {
+      const f = p.flags || [];
+      if (!f.length) return 'unknown';                    // 안 고른 것과 해당 없는 것은 다르다
+      return c.anyOf.some((k) => f.includes(k)) ? 'pass' : 'unknown';
+    }
+    case 'nationality':
+      if (!p.nationality) return 'unknown';
+      /* 🔴 제외 줄에서는 **같을 때만** 미달이다 — `외국인 유학생 선발 불가`는
+         한국 학생에게 아무 문제가 없다. 예전엔 '다르면 미달'로 읽어 내국인이 0%가 됐다
+         (2026-08-24 0% 전수 확인에서 오탐 3건). */
+      if (c.exclude) return p.nationality === c.eq ? 'fail' : 'pass';
+      return p.nationality === c.eq ? 'pass' : 'fail';
+    case 'age': {
+      if (!p.birthYear) return 'unknown';
+      const age = new Date().getFullYear() - Number(p.birthYear);
+      return age <= c.max ? 'pass' : 'fail';
+    }
+    case 'residence': {
+      const mine = [p.region, p.parentRegion].filter(Boolean);
+      if (!mine.length) return 'unknown';
+      return c.anyOf.some((r) => mine.some((x) => x.includes(r) || r.includes(x))) ? 'pass' : 'unknown';
+    }
+    default: return 'unknown';
+  }
+}
+
+/* 공고 하나에 대한 적합도 **내역**. 카드가 "요건 6개 중 4개 충족"을 띄우려면 숫자가 필요하다. */
+function fitDetail(sch, p) {
+  const parseLine = PR.parseLine;
+  const lines = (sch && sch.eligibilityLines) || [];
+  /* 🔴 대학원 전용 줄은 **분모에서도 뺀다** — 건너뛰기만 하면 학부생에게 무관한 줄이
+     '확인 필요'로 남아 점수를 깎는다(가톨릭대 동문장학금이 50%로 떨어졌다). */
+  const items = requirementLines(sch, lines, { withMeta: true }).filter((it) => !PR.gradOnly(it.text));
+  if (!items.length) return { pct: FIT_UNREAD, unread: true, met: 0, total: 0, unknown: 0, fails: [] };
+
+  const exLines = requirementLines(sch, [...((sch && sch.eligibilityExcludes) || []), ...lines], { onlyExclude: true });
+  /* 여러 장학금이 묶인 공고는 0%를 내지 않는다(설계 조건 ⑧) — 하나에 미달해도 다른 것에 지원한다 */
+  const multi = items.some((it) => PR.MULTI_PROGRAM.test(it.text));
+
+  /* 🔴 한 공고에 **서로 다른 구간 값이 둘 이상** 나오면 그건 요건이 아니라 지급액 표다
+     (`4분위 이하` / `5분위 이상~6분위 이하` — 서울과기대 근로장학). 줄 하나만 봐서는
+     알 수 없어 공고 단위로 센다. 표를 요건으로 읽으면 멀쩡한 학생이 0%가 된다. */
+  const brackets = new Set();
+  for (const it of items) {
+    for (const c of parseLine(it.text, false).conds) if (c.kind === 'bracket') brackets.add(c.max);
+  }
+  const bracketTable = brackets.size > 1;
+
+  const fails = [];
+  let met = 0, unknown = 0;
+  const groups = new Map();          // 선택지 묶음 → 그 안에서 하나라도 충족했나
+  for (const it of items) {
+    const { conds } = parseLine(it.text, false);
+    let verdict = 'unknown';
+    for (const c of conds) {
+      if (bracketTable && c.kind === 'bracket') continue;   // 지급액 표는 요건이 아니다 (위 주석)
+      const v = judgeCond(c, p);
+      if (v === 'fail' && c.conf === PR.HIGH) { verdict = 'fail'; break; }
+      if (v === 'pass' && verdict !== 'fail') verdict = 'pass';
+    }
+    if (it.group > 0) {
+      const g = groups.get(it.group) || { any: false };
+      if (verdict === 'pass') g.any = true;
+      groups.set(it.group, g);
+      continue;
+    }
+    if (verdict === 'pass') met += 1;
+    else if (verdict === 'fail' && !multi) fails.push(it.text);
+    else unknown += 1;
+  }
+  /* 선택지 묶음은 통째로 요건 1개로 센다 — 하나만 만족하면 충족이다(설계 조건 ⑤) */
+  for (const [, g] of groups) { if (g.any) met += 1; else unknown += 1; }
+
+  /* 제외 조항에 걸리면 미달과 같다 */
+  for (const line of exLines) {
+    const { conds } = parseLine(line, true);
+    for (const c of conds) {
+      if (c.conf !== PR.HIGH) continue;
+      if (judgeCond(c, p) === 'fail' && !multi) fails.push(line);
+    }
+  }
+
+  const total = items.filter((it) => it.group === 0).length + groups.size;
+  if (fails.length) return { pct: 0, unread: false, met, total, unknown, fails };
+  const pct = total ? Math.round((met / total) * 100) : FIT_UNREAD;
+  return { pct: Math.max(FIT_FLOOR, pct), unread: false, met, total, unknown, fails: [] };
+}
+
 function fitScore(sch, result, p) {
+  /* 구조화된 자격(eligibility)으로 이미 미달이 확정된 공고는 그대로 0 */
   if (result.status === 'ineligible') return 0;
-  const e = sch.eligibility || {};
-  let score = 62;
-  const condCount = ['minGpa', 'maxBracket', 'years', 'tracks', 'flagsAny', 'seoulOnly', 'needCert', 'exchange', 'freshmanOnly', 'schoolOnly']
-    .filter((k) => e[k] != null && e[k] !== false).length;
-  score += Math.min(15, condCount * 3);
-  if (result.status === 'selective') score -= 8;
-  if (result.status === 'unknown') score -= 22;
-  if (e.minGpa != null && p.gpa != null) score += Math.min(12, Math.max(0, Math.round((p.gpa - e.minGpa) * 10)));
-  if (e.maxBracket != null && p.bracket != null) score += Math.min(6, e.maxBracket - p.bracket);
-  if (e.flagsAny) score += 6;
-  return Math.max(5, Math.min(99, score));
+  return fitDetail(sch, p).pct;
 }
 
 /* 마감일을 확정하지 못한 공고(원문에 마감이 없거나 못 읽은 경우)는 dday가 '기한 원문 확인'이라
@@ -417,6 +556,22 @@ const SCHEDULE_LINE = /추후\s?(개별\s?)?안내|^\s*\d{1,2}\.\d{1,2}\.?\s*\([
    `아래 두 가지 조건을 모두 충족하는 학부 재학생` `이상 위 3개항 모두에 해당하는 자에 한함`
    같은 꼴을 2026-08-24 전수 조사에서 더 찾아 넓혔다. */
 const POINTER_LINE = /^(아래|다음|위|상기|이상\s*위)[^.]{0,30}(모두|중\s*하나|각)?[^.]{0,20}(충족|해당|만족|같|참고|기재)[^.]{0,12}$/;
+
+/* 🔴 **선택지(OR) 구조를 잃지 않는다** (2026-08-24 · 설계 docs/designs/fit-score.md 조건 ⑤).
+   `아래 세 가지 조건 중 하나를 만족하는 자` 다음 줄들은 **선택지**지 필수가 아니다.
+   안내 줄을 그냥 지우면 선택지가 필수처럼 남아, 하나만 만족하는 학생이 0%가 된다
+   (한국고등교육재단 동아시아연구장학생으로 실증 — 석사 재학생은 1번만 만족한다).
+   `세 가지`처럼 **개수가 적혀 있으면 그 개수만큼**을 한 묶음으로 본다 — 짐작보다 정확하다. */
+const ANY_OF_LINE = /(중\s*(하나|1\s*개|어느\s*하나)|둘\s*중|가지\s*중)[^.]{0,12}(만족|해당|충족)/;
+const KOR_NUM = { 한: 1, 두: 2, 세: 3, 네: 4, 다섯: 5, 여섯: 6 };
+function anyOfCount(line) {
+  const t = String(line || '');
+  if (!ANY_OF_LINE.test(t)) return 0;
+  const kor = t.match(/(한|두|세|네|다섯|여섯)\s*가지/);
+  if (kor) return KOR_NUM[kor[1]] || 0;
+  const dig = t.match(/(\d)\s*가지/);
+  return dig ? parseInt(dig[1], 10) : 0;
+}
 const REAL_CATEGORY = /(자|생|중|상|하|명|원)$|북한이탈|새터민|다문화|기초생활|차상위|국적|유공|보훈|장애|한부모|다자녀/;
 const isTableCell = (t) => BARE_CELL.test(t) && !REAL_CATEGORY.test(t);
 
@@ -450,6 +605,8 @@ function requirementLines(sch, lines, opts) {
   let sect = 'qualify';   // 머리글을 만나기 전까지는 자격 절로 본다(대개 자격부터 적는다)
   let asideSect = false;  // 지금 절이 ※ 곁말에서 온 것인가 (아래 주석)
   let asideBase = 'qualify';   // 곁말 전에 있던 절 — 번호 항목을 만나면 여기로 돌아온다
+  let anyLeft = 0, anyGroup = 0;   // 선택지 묶음 — 몇 줄 남았나 / 몇 번째 묶음인가 (위 주석)
+  const meta = [];                 // out과 같은 순서로 각 줄의 묶음 번호
   for (const l of joined) {
     let t = tidyRequirement(l);
     const head = SH.sectionOf(l) || SH.sectionOf(t);
@@ -527,7 +684,12 @@ function requirementLines(sch, lines, opts) {
        `(자|생|중|상|하|명|원)$`처럼 느슨해서 `지원 제외 대상`의 '상'까지 자격으로 봤다.
        제목에서 지켜야 할 것은 **진짜 자격 범주 이름뿐**이므로 좁게 적는다. */
     if (SUB_HEAD.test(t) && !/수급|차상위|보훈|유공|장애|다자녀|한부모|새터민|북한이탈|다문화|국적/.test(t)) continue;
-    if (POINTER_LINE.test(t)) continue;
+    if (POINTER_LINE.test(t)) {
+      /* 안내 줄 자신은 화면에 안 내보내되, '여기부터 n줄은 선택지'라는 사실은 남긴다 */
+      const n = anyOfCount(t);
+      if (n > 0) { anyLeft = n; anyGroup += 1; }
+      continue;
+    }
     /* 제목 판정은 **공백을 없애고** 본다 — 한글 문서가 `제 출 서 류`처럼 자간을 벌려 쓴다 */
     if (TITLE_LINE.test(t) || TITLE_LINE.test(t.replace(/\s+/g, ''))) continue;
     if (/^[~〜]/.test(t)) continue;          // `~ ④ 모두 만족하는 자` — 앞이 잘린 조각
@@ -556,7 +718,11 @@ function requirementLines(sch, lines, opts) {
       if (EXCLUDE_LINE.test(bare.length >= 4 ? bare : t) && !NOT_AN_EXCLUSION.test(t)) continue;
       if (!REQ_SIGNAL.test(t)) continue;
     }
-    if (!out.includes(t)) out.push(t);
+    if (!out.includes(t)) {
+      out.push(t);
+      meta.push(anyLeft > 0 ? anyGroup : 0);   // 0 = 반드시 충족 / 1 이상 = 그 묶음 중 하나만
+      if (anyLeft > 0) anyLeft -= 1;
+    }
     /* 5줄이면 충분하다 — 더 늘어놓으면 학생이 안 읽는다. 사람이 정리한 것처럼 보여야 한다.
        못 담은 것은 바로 아래 '원문 보기'로 갈 수 있다. */
     if (out.length >= 5) break;
@@ -567,13 +733,18 @@ function requirementLines(sch, lines, opts) {
      아무것도 안 보여 주는 것보다 낫다(잡음보다 나쁜 실패 = 자격이 사라지는 것). */
   /* ⚠️ 이 구제는 **자격 블록 전용**이다. onlyExclude에도 적용됐더니 '이런 경우는 제외돼요'에
      `누적 평균 평점이 높은 학생` 같은 순위 줄이 튀어나왔다(2026-08-24 유흥수로 실증). */
-  if (!out.length && !keepPriority && !(opts && opts.onlyExclude) && moved.length) return moved.slice(0, 5);
+  if (!out.length && !keepPriority && !(opts && opts.onlyExclude) && moved.length) {
+    const mv = moved.slice(0, 5);
+    return (opts && opts.withMeta) ? mv.map((text) => ({ text, group: 0 })) : mv;
+  }
   /* 🔴 `sectMoved`는 **되돌리지 않는다** (2026-08-24 개발자 지적).
      위 되돌리기는 '자격 줄 하나가 순위처럼 보여 옮겼는데 자격이 비었다'를 구제하는 장치다.
      그런데 공고 전체가 `4. 선발기준`뿐인 경우(대청교 멘토)에는 **뽑는 기준을 지원 자격으로
      되살려** 놓았다 — '종합적으로 평가하여 선발', '기참여자 가산점'이 자격으로 떴다.
      자격이 원문에 없으면 없다고 말하는 편이 맞다(원칙 8-1) — 앱이 '아직 읽지 못했어요'로
      정직하게 표시하고, 이 줄들은 '먼저 뽑는 기준' 블록에서 따로 보여 준다. */
+  /* `withMeta`를 달라고 한 쪽(적합도 계산)에만 묶음 정보를 준다 — 화면은 예전 그대로 문자열이다 */
+  if (opts && opts.withMeta) return out.map((text, i) => ({ text, group: meta[i] || 0 }));
   return out;
 }
 
@@ -688,7 +859,8 @@ function requirementStruct(sch) {
 
 /* Node(검증 스크립트)에서도 같은 엔진을 불러 쓸 수 있게 — 브라우저·서비스워커에는 영향 없음 */
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { evaluate, fitScore, scopedToProfile, notStale, STALE_DAYS,
+  module.exports = { evaluate, fitScore, fitDetail, judgeCond, FIT_UNREAD, FIT_FLOOR,
+                     scopedToProfile, notStale, STALE_DAYS,
                      requirementLines, requirementStruct, requirementMatch, tidyRequirement,
                      REQ_SIGNAL, NOT_A_REQUIREMENT, EXCLUDE_LINE, HARD_THRESHOLD,
                      noticeForProfile, taggedSchool, SHARED_BOARD_BRANCH,

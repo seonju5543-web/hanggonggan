@@ -1448,3 +1448,11 @@ textarea.essay-drafted { border-color: var(--primary); background: #fbfcff; line
 .essay-rules-banner li { font-size: 12.5px; line-height: 1.5; margin: 2px 0; }
 .essay-rule-danger { color: #c0392b; font-weight: 600; }
 :root[data-theme="dark"] .essay-rule-danger, :root:not([data-theme="light"]) .essay-rule-danger { color: #ff8a7a; }
+
+/* 적합도 배지 — 숫자 옆 근거(요건 n개 중 m개)를 작게 붙인다 (2026-08-24) */
+.badge-fit em { font-style: normal; opacity: .75; font-size: .92em; margin-left: 4px; }
+.badge-fit-unknown { background: var(--chip-bg, #eceff3); color: var(--muted, #6b7280); }
+.badge-fit-no { background: #fdecec; color: #b42318; }
+@media (prefers-color-scheme: dark) {
+  .badge-fit-no { background: #4a1d1d; color: #ffb4ab; }
+}

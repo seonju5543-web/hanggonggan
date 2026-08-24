@@ -139,11 +139,11 @@ async function onboard(page, school = '외대') {
   await page.click('#in-track .chip[data-value="humanities"]');
   await page.fill('#in-name', '이선주');
   await page.click('#in-year .chip[data-value="3"]');
-  await page.click('#in-status .chip[data-value="enrolled"]');
+  await page.click('#in-status .chip[data-value="재학"]');
   await page.click('.onboard-step[data-step="1"] [data-next]');
   await page.fill('#in-gpa', '3.8');
   await page.selectOption('#in-bracket', '4');
-  await page.click('#in-region .chip[data-value="seoul"]');
+  await page.selectOption('#in-region', '서울');
   await page.click('.onboard-step[data-step="2"] [data-next]');
   await page.click('.onboard-step[data-step="3"] [data-next]');
   await page.click('#btn-finish-onboard');
