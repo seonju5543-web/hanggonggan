@@ -1,14 +1,14 @@
-## 🖥 브라우저형 수집 리포트 (2026-08-23 12:56 KST)
+## 🖥 브라우저형 수집 리포트 (2026-08-24 08:31 KST)
 
 ### 서울대학교
 - ✅ 링크 223 · 장학 공고 20 · https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=list&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80
 - ⚪ 링크 1 · 장학 공고 0 · https://www.snu.ac.kr/snunow/notice/genl
 
 ### 연세대학교
-  - 📄 2페이지에서 장학 공고 11건 더 읽음
-- ✅ 링크 61 · 장학 공고 20 · https://www.yonsei.ac.kr/bbs/sc/58/artclList.do?findClSeq=257
-  - 📄 2페이지에서 장학 공고 11건 더 읽음
-- ✅ 링크 493 · 장학 공고 20 · https://www.yonsei.ac.kr/sc/254/subview.do?enc=Zm5jdDF8QEB8JTJGYmJzJTJGc2MlMkY1OCUyRmFydGNsTGlzdC5kbyUzRmZpbmRDbFNlcSUzRDI1NyUyNg%3D%3D
+  - 📄 2페이지에서 장학 공고 10건 더 읽음
+- ✅ 링크 59 · 장학 공고 20 · https://www.yonsei.ac.kr/bbs/sc/58/artclList.do?findClSeq=257
+  - 📄 2페이지에서 장학 공고 10건 더 읽음
+- ✅ 링크 491 · 장학 공고 20 · https://www.yonsei.ac.kr/sc/254/subview.do?enc=Zm5jdDF8QEB8JTJGYmJzJTJGc2MlMkY1OCUyRmFydGNsTGlzdC5kbyUzRmZpbmRDbFNlcSUzRDI1NyUyNg%3D%3D
 
 ### 서강대학교
 - ⚪ 링크 198 · 장학 공고 0 · https://www.sogang.ac.kr/ko/scholarship-notice
@@ -51,7 +51,7 @@
 ### 중앙대학교
 - ⚪ 링크 659 · 장학 공고 0 · 이미 아는 공고 14건은 다시 열지 않음 · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5
   - 📄 2페이지에서 장학 공고 2건 더 읽음
-- ✅ 링크 1315 · 장학 공고 2 · 이미 아는 공고 4건은 다시 열지 않음 · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100
+- ✅ 링크 1317 · 장학 공고 2 · 이미 아는 공고 4건은 다시 열지 않음 · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100
 - ❌ 예기치 못한 오류(today is not defined)
 
 ### 숙명여자대학교
@@ -73,7 +73,7 @@
 - ⚪ 링크 291 · 장학 공고 0 · 이미 아는 공고 9건은 다시 열지 않음 · https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318
 
 ### 상명대학교
-- ✅ 링크 563 · 장학 공고 7 · https://www.smu.ac.kr/kor/life/notice.do
+- ✅ 링크 555 · 장학 공고 7 · https://www.smu.ac.kr/kor/life/notice.do
 - ❌ 예기치 못한 오류(today is not defined)
 
 ### 고려대학교
@@ -90,7 +90,7 @@
 - ✅ 링크 92 · 장학 공고 2 · 이미 아는 공고 10건은 다시 열지 않음 · https://onestop.pusan.ac.kr/page?menuCD=000000000000062
 
 ### 서울교육대학교
-- ⚪ 링크 377 · 장학 공고 0 · 이미 아는 공고 17건은 다시 열지 않음 · https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083
+- ⚪ 링크 374 · 장학 공고 0 · 이미 아는 공고 17건은 다시 열지 않음 · https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083
 
 ### 홍익대학교
 - ⚪ 링크 0 · 장학 공고 0 · https://www.hongik.ac.kr/kr/newscenter/notice.do
@@ -101,20 +101,20 @@
 - ✅ 링크 584 · 장학 공고 36 · https://www.seoultech.ac.kr/service/info/janghak/
 
 ### 건국대학교
-- ✅ 링크 433 · 장학 공고 30 · https://www.konkuk.ac.kr/konkuk/2239/subview.do
+- ✅ 링크 434 · 장학 공고 30 · https://www.konkuk.ac.kr/konkuk/2239/subview.do
 
 ### 명지대학교
 - ✅ 링크 412 · 장학 공고 9 · https://www.mju.ac.kr/mjukr/259/subview.do
 
 ### 🔁 실패 학교 재시도 (몇 분 뒤 재접속)
-**상명대학교**
-- ✅ 링크 563 · 장학 공고 7 · https://www.smu.ac.kr/kor/life/notice.do
-- ❌ 예기치 못한 오류(today is not defined)
-
 **중앙대학교**
 - ⚪ 링크 659 · 장학 공고 0 · 이미 아는 공고 14건은 다시 열지 않음 · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5
   - 📄 2페이지에서 장학 공고 2건 더 읽음
-- ✅ 링크 1315 · 장학 공고 2 · 이미 아는 공고 4건은 다시 열지 않음 · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100
+- ✅ 링크 1317 · 장학 공고 2 · 이미 아는 공고 4건은 다시 열지 않음 · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100
+- ❌ 예기치 못한 오류(today is not defined)
+
+**상명대학교**
+- ✅ 링크 555 · 장학 공고 7 · https://www.smu.ac.kr/kor/life/notice.do
 - ❌ 예기치 못한 오류(today is not defined)
 
 **계명대학교**
@@ -124,12 +124,12 @@
 
 ---
 이번 실행 신규 수집: **0건** · 브라우저로도 수집 실패한 학교는 게시판 주소 확인이 필요합니다.
-⏱ 소요 10분 / 예산 22분 · 학교 19/19곳 처리
+⏱ 소요 9분 / 예산 22분 · 학교 19/19곳 처리
 ⛔ **응답이 멈춰 강제로 끊은 학교 1곳**: 가천대학교 — 학교 서버가 연결만 열어 두고 답을 주지 않아 7분 30초에서 끊었어요. 끊지 않으면 로봇이 그 자리에 멈춰 서고, 강제 종료되면서 **그날 수집분 전체가 버려집니다**(2026-08-15~17에 3회 연속 그렇게 됐어요). 다음 실행(약 12시간 뒤)에 다시 시도합니다.
 
 ⚠️ **이번 실행에 접속 실패한 학교: 상명대학교, 계명대학교, 중앙대학교, 가천대학교** — 학교 서버가 응답하지 않아 이번 회차만 건너뛰었어요. 다음 실행(약 12시간 뒤)에 자동으로 다시 수집합니다.
 
-🚨 **여러 번 연속 실패한 학교: 중앙대학교(6회 연속), 가천대학교(30회 연속), 계명대학교(4회 연속)** — 일시 장애가 아니라 게시판 주소가 바뀌었을 가능성이 큽니다. 해당 학교 학생에게 새 공고가 나가지 않고 있으니 주소 확인이 필요해요(Claude 세션에 "○○대 게시판 주소 확인해줘"라고 지시하면 정찰 도구로 후보를 찾아드려요).
+🚨 **여러 번 연속 실패한 학교: 중앙대학교(7회 연속), 가천대학교(32회 연속), 계명대학교(5회 연속)** — 일시 장애가 아니라 게시판 주소가 바뀌었을 가능성이 큽니다. 해당 학교 학생에게 새 공고가 나가지 않고 있으니 주소 확인이 필요해요(Claude 세션에 "○○대 게시판 주소 확인해줘"라고 지시하면 정찰 도구로 후보를 찾아드려요).
 **⏳ 스키마화 대기 중 39건** (원본 확보됨 — collector/pending-forms.json)
 
 ### 🤖 자동 등록 (선조치후보고) — 0건 등록
