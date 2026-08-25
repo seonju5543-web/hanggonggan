@@ -18,6 +18,11 @@ function todayStart() {
 let state = {
   profile: null,          // 온보딩 결과
   applications: [],       // { id, appliedAt, step, docs?, pending? }
+  /* 민감정보(기초생활수급·장애 등)를 서버에 올려도 되는가 — 온보딩 Step 3에서 받는다.
+     동의 안 하면 그 항목은 기기에만 남는다(supabase-client.js syncSafeProfile). */
+  consent: { sensitive: false },
+  /* 이 기기에서 마지막으로 고친 시각. 서버 것과 견줘 **최신이 이긴다**. */
+  updatedAt: null,
 };
 
 /* 분교를 별개 학교로 나누기 전에 저장된 프로필 고치기 (2026-08-02).
@@ -68,13 +73,20 @@ function loadState() {
     let raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) for (const k of LEGACY_KEYS) { raw = localStorage.getItem(k); if (raw) break; }
     if (raw) state = Object.assign(state, JSON.parse(raw));
+    if (!state.consent) state.consent = { sensitive: false };   // 로그인 이전에 저장된 판
     if (state.profile) { migrateBranchCampus(state.profile); migrateFitFields(state.profile); }
   } catch (e) { /* 손상된 데이터는 무시 */ }
 }
-function saveState() {
+/* opts.fromServer = 서버에서 받아 온 것을 그대로 적는 중이라는 뜻.
+   그때는 시각을 새로 찍지 않고(서버 시각을 그대로 쓴다) 되돌려 올리지도 않는다 —
+   안 그러면 받은 것을 곧바로 다시 올리는 헛돌기가 생긴다. */
+function saveState(opts) {
+  const o = opts || {};
+  if (!o.fromServer) state.updatedAt = new Date().toISOString();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   // 알림 판단에 쓰는 프로필·신청내역 사본을 갱신한다 (서비스워커는 localStorage를 못 읽는다)
   if (typeof notifySyncContext === 'function') notifySyncContext();
+  if (!o.fromServer && typeof syncSchedulePush === 'function') syncSchedulePush();
 }
 
 /* ---------------- 장학금 목록 (한국장학재단 상시 제도 + 정식 등록 실공고) ---------------- */
@@ -503,6 +515,7 @@ function initOnboarding() {
     $('#in-credits').value = p.credits != null ? p.credits : '';
     $('#in-birth-year').value = p.birthYear || '';
     $$('#in-flags input').forEach((cb) => (cb.checked = p.flags.includes(cb.value)));
+    $('#in-sensitive-ok').checked = !!(state.consent && state.consent.sensitive);
   } else {
     setChip('#in-track', 'humanities');
     setChip('#in-year', '1');
@@ -511,6 +524,7 @@ function initOnboarding() {
   }
 
   renderCampusChips(p ? p.campus : null);
+  syncConsentRow();
 
   onboardStep = p ? 1 : 0;
   renderOnboardStep();
@@ -1944,6 +1958,7 @@ function forgetLearned(key) {
 
 function renderMy() {
   const p = state.profile;
+  if (!p) return;   // 온보딩을 아직 안 마친 상태 — 그릴 프로필이 없다
   const c = p.common || {};
   const flagText = p.flags.length ? p.flags.map((f) => FLAG_LABELS[f]).join(', ') : '해당 없음';
   const trackLabel = (TRACKS.find((t) => t.id === p.track) || {}).label || '-';
@@ -1952,7 +1967,7 @@ function renderMy() {
     <p class="my-name">${p.name || '대학생'} 님<span class="my-edit-hint">수정하기 ›</span></p>
     <p class="my-line">${p.school || '대학 미설정'} · ${trackLabel}${p.major ? ' · ' + p.major : ''}</p>
     <div class="my-grid">
-      <div><span>학년</span><strong>${p.year}학년 (${{ enrolled: '재학', freshman: '신입', returning: '복학' }[p.status]})</strong></div>
+      <div><span>학년</span><strong>${p.year}학년 (${esc(p.status || '미설정')})</strong></div>
       <div><span>직전학기 평점</span><strong>${p.gpa != null ? p.gpa.toFixed(2) : '미입력'}</strong></div>
       <div><span>지원구간</span><strong>${p.bracket != null ? p.bracket + '구간' : '모름'}</strong></div>
       <div><span>공통 서류정보</span><strong>${commonFilled}/5 입력됨</strong></div>
@@ -1960,6 +1975,7 @@ function renderMy() {
     <p class="my-flags">특별자격: ${flagText}</p>
     ${learnedHtml(c)}
     <p class="my-flags">공통 서류정보(학번·연락처·계좌 등)는 이 기기에만 저장되고 서류 초안에 자동 기입돼요.</p>`;
+  renderAccountCard();
   renderNotifyCard();
   renderWallet();
 }
@@ -2038,6 +2054,9 @@ function bindEvents() {
   $('#btn-finish-onboard').addEventListener('click', () => {
     const isFirstTime = !state.profile;
     state.profile = collectProfile();
+    /* 민감정보 동의는 프로필이 아니라 따로 둔다 — 프로필은 서버로 나가는 값이고
+       동의 여부는 '나가도 되는가'를 정하는 값이라 섞으면 헷갈린다. */
+    state.consent = { sensitive: !!$('#in-sensitive-ok').checked };
     saveState();
     toast('프로필이 저장됐어요. 맞춤 장학금을 찾았어요!');
     showScreen('home');
@@ -2045,6 +2064,8 @@ function bindEvents() {
     // 저장 완료 토스트가 사라진 뒤에 물어본다 (문구가 겹치지 않게)
     if (isFirstTime && typeof notifyMaybeAskConsent === 'function') notifyMaybeAskConsent(2900);
   });
+
+  $('#in-flags').addEventListener('change', syncConsentRow);
 
   $('#btn-notify').addEventListener('click', () => {
     if (typeof openNotifyInbox === 'function') openNotifyInbox();
@@ -2225,6 +2246,208 @@ document.addEventListener('visibilitychange', () => {
   if (swReg) swReg.update().catch(() => {});
 });
 
+/* ══════════════════════════════════════════════════════════════════════════
+   회원가입·로그인 — 기기를 바꿔도 이어쓰기 (2026-08-25)
+
+   개발자가 겪던 문제: *"핸드폰으로 로그인했을 때 정보가 저장되지 않아 다른 기기와
+   연결이 되지 않는다."* 프로필·신청내역이 폰 안에만 있어서 기기를 바꾸면 온보딩부터
+   다시 해야 했다.
+
+   🔴 **기기 우선**이다. 화면은 언제나 폰 안 데이터로 즉시 뜨고, 서버는 뒤에서 맞출 뿐이다.
+      서버 우선으로 바꾸면 지하철·비행기모드에서 화면이 비거나 온보딩이 다시 뜬다.
+   🔴 서버로 나가는 값은 **반드시** supabase-client.js 의 syncSafeProfile 을 거친다 —
+      주민등록번호·계좌번호는 거기서 떨어져 나간다. 여기서 profile 을 직접 보내지 말 것.
+   ══════════════════════════════════════════════════════════════════════════ */
+let syncTimer = null;
+let syncBusy = false;
+
+/* 저장할 때마다 서버를 두들기지 않는다 — 온보딩에서 한 칸 고칠 때마다 보내면
+   무료 등급이 금방 닳는다. 묶어서 한 번만 올린다. */
+function syncSchedulePush() {
+  if (typeof signedIn !== 'function' || !signedIn()) return;
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(() => {
+    syncPush(state).catch(() => { /* 실패해도 앱은 그대로 — 폰 안 저장이 원본이다 */ });
+  }, (typeof SUPABASE_CONFIG !== 'undefined' && SUPABASE_CONFIG.pushDelayMs) || 2000);
+}
+
+/* 서버에서 받은 것을 이 기기에 적는다.
+   🔴 **서버에 일부러 안 올린 것**(주민번호·계좌·미동의 민감자격)은 서버에 없다.
+      그대로 덮어쓰면 이 기기의 값이 사라지므로, 빈자리만 기기 것으로 채운다. */
+function syncApplyRemote(remote) {
+  const wasOnboarding = !state.profile;
+  if (remote.profile) {
+    const localP = state.profile || {};
+    const localCommon = localP.common || {};
+    const p = JSON.parse(JSON.stringify(remote.profile));
+    p.common = Object.assign({}, p.common || {});
+    for (const k of ['rrn', 'account']) if (localCommon[k] && !p.common[k]) p.common[k] = localCommon[k];
+    if (!p.flags) p.flags = localP.flags || [];
+    migrateBranchCampus(p);
+    migrateFitFields(p);
+    state.profile = p;
+  }
+  if (Array.isArray(remote.applications)) state.applications = remote.applications;
+  state.consent = Object.assign({}, state.consent, { sensitive: !!remote.sensitiveOk });
+  state.updatedAt = remote.updatedAt || state.updatedAt;
+  saveState({ fromServer: true });
+
+  if (wasOnboarding && state.profile) { initOnboarding(); showScreen('home'); return; }
+  const cur = $$('.screen').find((sc) => !sc.hidden);
+  if (cur) showScreen(cur.id.replace('screen-', ''));
+}
+
+/* 앱을 열 때 / 로그인 직후 한 번. **최신이 이긴다**(last-write-wins). */
+async function syncAfterLoad() {
+  if (typeof signedIn !== 'function' || !signedIn() || syncBusy) return;
+  syncBusy = true;
+  try {
+    const remote = await syncPull();
+    if (!remote) { await syncPush(state); return; }          // 서버가 비었으면 내 것을 올린다
+    const mine = state.updatedAt || '';
+    const theirs = remote.updatedAt || '';
+    /* 새 기기(프로필이 아예 없음)면 무조건 받는다 — 이게 개발자가 겪던 바로 그 상황이다 */
+    if (!state.profile || theirs > mine) syncApplyRemote(remote);
+    else if (mine > theirs) await syncPush(state);
+  } catch (e) {
+    /* 인터넷이 없거나 서버가 자고 있으면 그냥 지나간다 — 앱은 폰 안 데이터로 계속 돈다 */
+  } finally { syncBusy = false; }
+}
+
+/* 온보딩 Step 3 — 특별자격을 **하나라도 켰을 때만** 동의 줄을 보여 준다.
+   아무것도 안 켠 학생은 민감정보를 주지 않으므로 동의를 물을 이유가 없다. */
+function syncConsentRow() {
+  const row = $('#in-sensitive-row');
+  if (!row) return;
+  const anyFlag = $$('#in-flags input:checked').length > 0;
+  row.hidden = !(anyFlag && typeof supabaseConfigured === 'function' && supabaseConfigured());
+}
+
+/* ---------------- MY 화면 계정 카드 ---------------- */
+function renderAccountCard() {
+  const el = $('#my-account');
+  if (!el) return;
+  /* 설정이 비어 있으면 로그인 기능이 아예 없는 앱처럼 보인다 (push-config·chat-config와 같은 규칙) */
+  if (typeof supabaseConfigured !== 'function' || !supabaseConfigured()) { el.hidden = true; return; }
+  el.hidden = false;
+  const u = authUser();
+  el.innerHTML = u
+    ? `<p class="acc-head">계정 <span class="acc-on">이어쓰기 켜짐</span></p>
+       <p class="acc-mail">${esc(u.email || '로그인됨')}</p>
+       <p class="acc-note">이 계정으로 다른 기기에서 로그인하면 프로필과 신청내역이 그대로 이어져요.
+         주민등록번호·계좌번호·증명서류는 서버로 보내지 않아요.</p>
+       <div class="acc-actions">
+         <button class="btn btn-outline" id="btn-acc-out">로그아웃</button>
+         <button class="btn btn-outline danger" id="btn-acc-del">탈퇴 (서버 정보 삭제)</button>
+       </div>`
+    : `<p class="acc-head">계정</p>
+       <p class="acc-note">지금은 이 기기에만 저장돼요. <strong>기기를 바꾸면 처음부터 다시 입력해야 해요.</strong>
+         로그인하면 프로필과 신청내역이 기기를 바꿔도 이어져요.</p>
+       <div class="acc-actions">
+         <button class="btn btn-primary" id="btn-acc-in">로그인</button>
+         <button class="btn btn-outline" id="btn-acc-up">회원가입</button>
+       </div>
+       <p class="acc-note"><a href="terms.html" target="_blank" rel="noopener">이용약관 · 개인정보처리방침</a></p>`;
+
+  const btnIn = $('#btn-acc-in'); if (btnIn) btnIn.addEventListener('click', () => openAuthSheet('in'));
+  const btnUp = $('#btn-acc-up'); if (btnUp) btnUp.addEventListener('click', () => openAuthSheet('up'));
+  const btnOut = $('#btn-acc-out');
+  if (btnOut) btnOut.addEventListener('click', async () => {
+    await authSignOut();
+    toast('로그아웃했어요 — 이 기기의 정보는 그대로 남아 있어요');
+    renderMy();
+  });
+  const btnDel = $('#btn-acc-del');
+  if (btnDel) btnDel.addEventListener('click', async () => {
+    if (!confirm('서버에 저장된 프로필·신청내역을 지울까요?\n이 기기의 정보는 그대로 남습니다.')) return;
+    const r = await authDeleteData();
+    toast(r.ok ? '서버 정보를 지웠어요' : r.error);
+    renderMy();
+  });
+}
+
+/* ---------------- 로그인 · 가입 시트 ---------------- */
+/* 🔴 새 시트를 만들지 않고 #detail-sheet 를 그대로 쓴다 —
+   쓸어 내려 닫기·배경 눌러 닫기·ESC 가 이미 배선돼 있다(2026-08-21 개발자 지시). */
+let authMode = 'in';   // 'in' 로그인 · 'up' 가입
+
+function openAuthSheet(mode) {
+  authMode = mode || 'in';
+  openSheetShell();
+  renderAuthSheet();
+}
+
+function renderAuthSheet(errText) {
+  const up = authMode === 'up';
+  $('#detail-sheet').innerHTML = `
+    <div class="sheet-handle"></div>
+    <div class="sheet-body">
+      <h3 class="sheet-title">${up ? '회원가입' : '로그인'}</h3>
+      <p class="sheet-provider">${up
+        ? '이메일과 비밀번호만 있으면 돼요. 다른 정보는 묻지 않아요.'
+        : '가입할 때 쓴 이메일과 비밀번호를 넣어 주세요.'}</p>
+      <label class="field">
+        <span class="field-label">이메일</span>
+        <input type="email" id="in-auth-email" placeholder="name@example.com"
+          autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" />
+      </label>
+      <label class="field">
+        <span class="field-label">비밀번호${up ? ' (6자 이상)' : ''}</span>
+        <input type="password" id="in-auth-pw" placeholder="비밀번호"
+          autocomplete="${up ? 'new-password' : 'current-password'}" />
+      </label>
+      ${up ? `<label class="check-item consent-item">
+        <input type="checkbox" id="in-auth-agree" />
+        <span>(필수) <a href="terms.html" target="_blank" rel="noopener">이용약관 · 개인정보처리방침</a>에 동의합니다</span>
+      </label>` : ''}
+      <p class="auth-err" id="auth-err" ${errText ? '' : 'hidden'}>${esc(errText || '')}</p>
+      <button class="btn btn-primary btn-lg" id="btn-auth-go">${up ? '가입하기' : '로그인'}</button>
+      <button class="btn btn-outline" id="btn-auth-swap" style="width:100%">
+        ${up ? '이미 계정이 있어요 — 로그인' : '계정이 없어요 — 회원가입'}
+      </button>
+      <p class="dp-note">주민등록번호·계좌번호·증명서류는 서버로 보내지 않고 이 기기에만 남아요.</p>
+    </div>`;
+
+  $('#btn-auth-swap').addEventListener('click', () => { authMode = up ? 'in' : 'up'; renderAuthSheet(); });
+  $('#btn-auth-go').addEventListener('click', authSubmit);
+  $('#in-auth-pw').addEventListener('keydown', (e) => { if (e.key === 'Enter') authSubmit(); });
+  $('#detail-sheet').scrollTop = 0;
+}
+
+function authShowError(msg) {
+  const el = $('#auth-err');
+  if (!el) return;
+  el.textContent = msg;
+  el.hidden = false;
+}
+
+async function authSubmit() {
+  const up = authMode === 'up';
+  const email = $('#in-auth-email').value.trim();
+  const pw = $('#in-auth-pw').value;
+  if (!email || !pw) { authShowError('이메일과 비밀번호를 모두 입력해 주세요'); return; }
+  if (up && !$('#in-auth-agree').checked) { authShowError('약관과 개인정보처리방침에 동의해 주세요'); return; }
+
+  const btn = $('#btn-auth-go');
+  btn.disabled = true;
+  btn.textContent = up ? '가입하는 중…' : '로그인하는 중…';
+  const r = up ? await authSignUp(email, pw) : await authSignIn(email, pw);
+  btn.disabled = false;
+  btn.textContent = up ? '가입하기' : '로그인';
+
+  if (!r.ok) { authShowError(r.error); return; }
+  if (r.needsEmailConfirm) {
+    authShowError('가입 확인 메일을 보냈어요 — 메일의 링크를 누른 뒤 로그인해 주세요');
+    return;
+  }
+  closeSheet();
+  toast('로그인했어요 — 이제 기기를 바꿔도 이어져요');
+  /* 🔴 순서가 중요하다 — **먼저** 서버와 맞춘다. 새 기기에서는 이 줄에서 프로필이
+     처음 생기므로, 화면 그리기를 앞에 두면 아직 프로필이 없는 상태로 그리게 된다. */
+  await syncAfterLoad();
+  renderMy();
+}
+
 /* ---------------- 시작 ---------------- */
 loadState();
 bindEvents();
@@ -2245,3 +2468,6 @@ if (state.profile) {
 } else {
   showScreen('onboarding');
 }
+/* 🔴 화면을 **다 그린 뒤에** 서버와 맞춘다. 기기 우선이라 여기서 기다리지 않는다 —
+   인터넷이 없으면 아무 일도 안 일어나고 앱은 지금처럼 그대로 돈다. */
+if (typeof syncAfterLoad === 'function') syncAfterLoad();

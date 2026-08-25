@@ -1988,13 +1988,59 @@ console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08
   eq('사흘 전 기준의 D-2 는 이제 마감이다', make(t3).dday(어제(t0)).label, '마감');
 
   /* 지원 자격을 '단어'로 옮기는 규칙 — 지어내지 않는지 본다(원칙 8-1) */
-  const bulkTags = new Function('FLAG_LABELS', 'TRACKS', `${grab('bulkTags')}\nreturn bulkTags;`)(
-    { basicLiving: '기초생활수급자' }, [{ id: 'eng', label: '공학계열' }]);
+  /* bulkTags 는 자기 파일의 상수(BULK_TAG_MAX)와 원문 파서(parseLine)를 함께 쓴다.
+     파서는 typeof 로 막혀 있어 없으면 건너뛴다 — 여기서는 구조화된 자격만 본다. */
+  const bulkTags = new Function('FLAG_LABELS', 'TRACKS', 'BULK_TAG_MAX',
+    `${grab('bulkTags')}\nreturn bulkTags;`)(
+    { basicLiving: '기초생활수급자' }, [{ id: 'eng', label: '공학계열' }], 5);
   eq('구조로 저장된 자격만 단어로 옮긴다',
     bulkTags({ eligibility: { minGpa: 3, maxBracket: 8, years: [2, 3], flagsAny: ['basicLiving'] } }),
-    ['기초생활수급자', '평점 3↑', '소득 8구간 이내', '2·3학년']);
+    ['기초생활수급자', '평점 3 이상', '소득 8구간 이하', '2·3학년']);
   eq('자격을 모르면 지어내지 않는다', bulkTags({ eligibility: {} }), ['자격 원문 확인']);
   eq('자격 칸이 아예 없어도 지어내지 않는다', bulkTags({}), ['자격 원문 확인']);
+}
+
+console.log('■ 회원가입·로그인 배선 (2026-08-25) — 빠뜨리면 조용히 안 되는 세 가지');
+{
+  const at = (f) => fs.readFileSync(new URL('../' + f, import.meta.url), 'utf8');
+  const html = at('index.html');
+  const sw = at('sw.js');
+  const cli = at('supabase-client.js');
+
+  /* ① CSP — 이걸 빼면 앱이 Supabase 에 아예 못 붙는다. 오류도 조용해서 원인 찾기가 어렵다. */
+  eq('CSP connect-src 가 supabase 를 허용한다', /connect-src[^"]*https:\/\/\*\.supabase\.co/.test(html), true);
+  eq('CSP script-src 는 여전히 self 뿐이다 (외부 스크립트 차단 유지)', /script-src 'self';/.test(html), true);
+  eq('supabase 스크립트가 app.js 보다 먼저 실린다',
+    html.indexOf('supabase-client.js') < html.indexOf('src="app.js"'), true);
+
+  /* ② 오프라인 — 캐시 목록에서 빠지면 그 파일만 없어 앱이 죽는다 */
+  for (const f of ['supabase-config.js', 'supabase-client.js', 'terms.html']) {
+    eq('sw.js 캐시 목록에 ' + f, sw.includes("'" + f + "'"), true);
+  }
+  /* 서비스워커는 로그인을 모른다 — importScripts 에 들어가면 개인정보 경계가 흐려진다 */
+  eq('서비스워커가 로그인 코드를 실어 들이지 않는다', /importScripts\([^)]*supabase/.test(sw), false);
+
+  /* ③ 🔴 나가면 안 되는 것 — terms.html 이 약속한 문장의 뿌리.
+     **베낀 사본이 아니라 supabase-client.js 의 진짜 함수**를 떼어 내 돌린다. */
+  const start = cli.indexOf('function syncSafeProfile(');
+  if (start < 0) throw new Error('supabase-client.js 에서 syncSafeProfile 을 못 찾음');
+  let depth = 0, seen = false, body = null;
+  for (let j = cli.indexOf('{', start); j < cli.length; j++) {
+    if (cli[j] === '{') { depth++; seen = true; }
+    else if (cli[j] === '}') { depth--; if (seen && depth === 0) { body = cli.slice(start, j + 1); break; } }
+  }
+  const safe = new Function(body + "\nconst SYNC_OMIT_COMMON=['rrn','account'];"
+    + "\nconst SYNC_SENSITIVE_KEYS=['flags'];\nreturn syncSafeProfile;")();
+
+  const raw = { school: '한국외국어대학교', flags: ['basicLiving'],
+    common: { studentId: '1', rrn: '990101-1', account: '110-2' } };
+  const out = safe(raw, true);
+  eq('주민등록번호는 서버로 갈 사본에서 떨어진다', out.common.rrn, undefined);
+  eq('계좌번호도 떨어진다', out.common.account, undefined);
+  eq('학번처럼 민감하지 않은 것은 남는다', out.common.studentId, '1');
+  eq('동의하면 특별자격이 남는다', out.flags, ['basicLiving']);
+  eq('동의하지 않으면 특별자격이 빠진다', safe(raw, false).flags, undefined);
+  eq('원본은 손대지 않는다 (기기 데이터가 사라지면 안 된다)', raw.common.rrn, '990101-1');
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');

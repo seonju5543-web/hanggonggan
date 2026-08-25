@@ -74,7 +74,16 @@ const SHOT = (n) => `${__dirname}/shot-${n}.png`;
   await page.screenshot({ path: SHOT('14-step4') });
   await page.click('#btn-finish-onboard');
   await page.waitForSelector('#screen-home:not([hidden])');
-  await page.waitForTimeout(1100);
+  /* 🔴 온보딩을 마치면 2.9초 뒤에 알림 동의 시트가 뜬다(notifyMaybeAskConsent).
+     그게 뒤 화면을 덮어 그 뒤의 클릭이 전부 시간초과로 죽는다 — 실제로 이 드라이버가
+     '#explore-list 카드 클릭'에서 그렇게 실패했다(기기가 느리면 재현된다).
+     이 드라이버가 보는 것은 알림이 아니라 매칭·신청 플로우이므로 여기서 꺼 둔다
+     (알림은 verify-notify.js 가 따로 본다). */
+  /* ⚠️ 함수를 바꿔치기해도 소용없다 — 완료를 누른 순간 이미 예약(setTimeout)이 걸린다.
+     그 시각(2.9초)을 **지나서** 닫아야 확실히 사라진다. */
+  await page.waitForTimeout(3300);
+  await page.evaluate(() => { if (typeof closeNotifyPanel === 'function') closeNotifyPanel(); });
+  await page.waitForTimeout(400);
   console.log('STEP home:', await page.textContent('#hero-amount'), '/', await page.textContent('#home-school'));
   console.log('STEP home campus shown:', (await page.textContent('#home-school')).includes('글로벌캠퍼스'));
   await page.screenshot({ path: SHOT('15-home') });
@@ -199,6 +208,13 @@ const SHOT = (n) => `${__dirname}/shot-${n}.png`;
 
   // ── 영속성/비정상 입력 프로브
   await page.reload({ waitUntil: 'domcontentloaded' });
+  // MY 화면에 값이 안 채워진 자리가 없는가 (2026-08-25 '(undefined)' 사고로 추가)
+  await page.click('.nav-item[data-nav="my"]');
+  await page.waitForTimeout(400);
+  const myText = (await page.textContent('#my-profile')).replace(/s+/g, ' ').trim();
+  console.log('STEP my profile:', myText.slice(0, 90));
+  console.log('STEP my has undefined/NaN (없어야 정상):', /undefined|NaN/.test(myText));
+
   console.log('PROBE reload lands on home:', await page.locator('#screen-home').isHidden() === false);
   const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('handaejang.v1')));
   console.log('PROBE storage key v1 has common info:', stored.profile.common.studentId === '202312345');

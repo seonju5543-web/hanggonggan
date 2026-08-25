@@ -1616,3 +1616,66 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: 3px; paddin
 .bulk-reqs { font-size: 12.5px; color: var(--text-sub); line-height: 1.65; padding-left: 2px; list-style: none; }
 .bulk-reqs li { margin-bottom: 2px; }
 .bulk-reqs li::before { content: '· '; color: var(--text-weak); }
+
+
+/* ============================================================
+   회원가입·로그인 (2026-08-25) — MY 계정 카드 · 인증 시트 · 동의 줄
+   ============================================================ */
+.acc-head { font-size: 13px; font-weight: 700; color: var(--text-weak); margin-bottom: 8px; }
+.acc-on {
+  font-size: 11.5px; font-weight: 600; color: var(--green);
+  background: var(--green-weak); border-radius: 999px; padding: 3px 9px; margin-left: 6px;
+}
+.acc-mail { font-size: 15.5px; font-weight: 700; color: var(--text); margin-bottom: 8px; word-break: break-all; }
+.acc-note { font-size: 12.5px; color: var(--text-sub); line-height: 1.65; margin-bottom: 10px; }
+.acc-note a { color: var(--primary); }
+.acc-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.acc-actions .btn { flex: 1; min-width: 120px; }
+.acc-actions .btn.danger { color: var(--red); border-color: rgba(224, 80, 62, 0.35); }
+
+/* 동의 줄 — 온보딩 특별자격 아래, 가입 시트 안. 기존 .check-item 위에 얹는다 */
+.consent-item {
+  align-items: flex-start; line-height: 1.6;
+  background: var(--primary-weak); border-color: rgba(47, 107, 255, 0.18);
+}
+.consent-item span { font-size: 13px; }
+.consent-item em { display: block; margin-top: 4px; font-size: 12px; color: var(--text-sub); font-style: normal; }
+.consent-item a { color: var(--primary); font-weight: 600; }
+
+.auth-err {
+  font-size: 13px; color: var(--red); background: var(--red-weak);
+  border-radius: var(--radius-sm); padding: 10px 12px; margin-bottom: 12px; line-height: 1.6;
+}
+.auth-err[hidden] { display: none; }
+
+/* ============================================================
+   약관 · 개인정보처리방침 (terms.html)
+   ============================================================ */
+.legal { padding: 20px 18px 60px; }
+.legal h3.legal-h {
+  font-size: 17px; font-weight: 800; color: var(--text);
+  margin: 28px 0 12px; padding-top: 18px; border-top: 2px solid var(--line);
+}
+.legal h4 { font-size: 14.5px; font-weight: 700; color: var(--text); margin: 18px 0 6px; }
+.legal p, .legal li { font-size: 13.5px; color: var(--text-sub); line-height: 1.75; }
+.legal p { margin-bottom: 8px; }
+.legal ul { padding-left: 18px; margin-bottom: 10px; }
+.legal li { margin-bottom: 4px; list-style: disc; }
+.legal a { color: var(--primary); }
+.legal-note {
+  background: var(--orange-weak); color: var(--orange);
+  border-radius: var(--radius-sm); padding: 12px 14px; font-size: 13px; line-height: 1.7;
+}
+.legal-strong {
+  background: var(--primary-weak); border-radius: var(--radius-sm);
+  padding: 12px 14px; color: var(--text) !important;
+}
+.legal-table { width: 100%; border-collapse: collapse; margin: 8px 0 12px; font-size: 12.5px; }
+.legal-table th, .legal-table td {
+  border: 1px solid var(--line); padding: 8px 9px; text-align: left;
+  color: var(--text-sub); line-height: 1.6; vertical-align: top;
+}
+.legal-table th { background: var(--bg); color: var(--text); font-weight: 700; }
+.legal-date { font-size: 12.5px; color: var(--text-weak); margin-top: 20px; }
+.legal-actions { margin-top: 24px; }
+.legal-actions .btn { display: inline-block; text-decoration: none; }
