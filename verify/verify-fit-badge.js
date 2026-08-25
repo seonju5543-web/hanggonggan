@@ -58,6 +58,19 @@ const PROFILE = (over) => ({
   eq('0%가 안 뜬다', shown.some((t) => /적합도 0%/.test(t)), false);
   eq('100%가 안 뜬다', shown.some((t) => /적합도 100%/.test(t)), false);
 
+  /* 🔴 `evaluate()`가 미달로 확정한 공고(fit === 0)를 '자격 미확인'으로 보여 주면 안 된다
+     (2026-08-26 정렬 검증에서 발견). fitDetail은 `eligibilityLines`만 읽어서
+     구조화된 자격(flagsAny·tracks)을 못 본다 — 다자녀 국가장학금이 다자녀 아닌 학생에게
+     '자격 미확인'으로 떴다. 판정이 둘로 갈라지면 안 된다. */
+  console.log('\n■ evaluate가 미달로 본 공고는 미달로 보인다 (판정이 갈라지지 않는다)');
+  const mismatch = await page.$$eval('#explore-list .sch-card', (els) => els.filter((e) => {
+    const s = allScholarships().find((x) => x.id === e.dataset.detail);
+    if (!s) return false;
+    if (fitScore(s, evaluate(s, state.profile), state.profile) !== 0) return false;
+    return !e.querySelector('.badge-fit-no');   // 미달인데 미달 배지가 없다
+  }).length);
+  eq('미달 확정 공고에 미달 배지가 빠진 카드가 없다', mismatch, 0);
+
   console.log('\n■ 자격이 되는 학생');
   await page.context().close();
   page = await open({});
@@ -66,19 +79,28 @@ const PROFILE = (over) => ({
   eq('적합도 배지에 근거가 함께 붙는다', okBadges.every((b) => /요건 \d+개 중 \d+개 충족/.test(b.text)), true);
   eq('여기서도 100%는 안 뜬다', bs.some((b) => /적합도 100%/.test(b.text)), false);
 
-  /* 🔴 배지가 말하는 것과 상세가 보여 주는 것이 같아야 한다 — 배지가 '요건 9개'라는데
-     시트에 5줄만 뜨면 학생이 세어 봤을 때 숫자가 안 맞는다(화면 5줄 상한 사고). */
-  console.log('\n■ 배지의 요건 개수 = 상세 시트의 줄 수');
+  /* 🔴 상세 시트는 자격 줄을 **하나도 빠뜨리지 않고** 보여야 한다 — 화면 5줄 상한이
+     점수 분모까지 자르던 사고(2026-08-24)의 회귀다.
+     ⚠️ 배지의 '요건 n개'와 줄 수를 **같다고 보면 안 된다** — 배지는 묶음 단위로 세고
+        (선택지 3갈래 = 1개) 시트는 원문 줄을 그대로 보여 준다. 그래서 앱이 실제로
+        내보내는 줄 수(`requirementLines(sch, null, {all:true})`)와 대조한다. */
+  console.log('\n■ 상세 시트가 자격 줄을 빠뜨리지 않는다');
   const idx = await page.$$eval('#explore-list .sch-card',
     (els) => els.findIndex((e) => /요건 \d+개/.test((e.querySelector('.badge-fit') || {}).innerText || '')));
   if (idx >= 0) {
     const cards = await page.$$('#explore-list .sch-card');
     const txt = await cards[idx].$eval('.badge-fit', (e) => e.innerText.replace(/\s+/g, ' '));
     const total = Number((txt.match(/요건 (\d+)개/) || [])[1]);
+    const id = await cards[idx].evaluate((e) => e.dataset.detail);
+    const expected = await page.evaluate((sid) => {
+      const s = allScholarships().find((x) => x.id === sid);
+      return (requirementLines(s, null, { all: true }) || []).length;
+    }, id);
     await cards[idx].click();
     await page.waitForTimeout(700);
-    const lines = await page.$$eval('#detail-sheet li.r-ok, #detail-sheet li.r-bad, #detail-sheet li.r-req', (e) => e.length);
-    eq(`배지 '${txt}' 의 요건 수와 상세 줄 수가 같다`, lines, total);
+    const lines = await page.$$eval('#detail-sheet li.r-elig', (e) => e.length);
+    eq(`'${txt}' — 자격 줄 ${expected}개가 모두 보인다`, lines, expected);
+    eq('배지의 요건 수가 줄 수를 넘지 않는다 (묶음은 1개로 센다)', total <= expected, true);
   } else console.log('  (요건 개수를 띄운 카드가 없어 건너뜀)');
 
   console.log('\nERRORS:', errors.length ? errors : 'none');

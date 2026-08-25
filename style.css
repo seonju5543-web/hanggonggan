@@ -1689,3 +1689,25 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: 3px; paddin
 .badge-fit.fit-yellow { background: #fdf6d3; color: #8a6100; }
 .badge-fit.fit-green  { background: #e6f6ec; color: #17683a; }
 .badge-fit.fit-blue   { background: #e8f0ff; color: #1c47b8; }
+
+/* ── 장학금 찾기 정렬 버튼 (2026-08-26) ────────────────────────────────
+   🔴 `.icon-btn`을 그대로 쓰지 않는다 — padding 8 + svg 22 = 38px라 터치 타깃 44px에
+      못 미친다. 새 버튼은 min-height를 직접 준다.
+   🔴 글자에 테두리·배경을 두르지 않는다 — 두르면 아래 필터 칩과 같은 무게로 보여서
+      '거르기'와 '순서 바꾸기'가 뒤섞인다(개발자 지적).
+   다크모드 규칙은 넣지 않는다 — 앱 전체가 밝은 화면 한 벌이다(2026-08-24 결정). */
+.sort-btn {
+  display: flex; align-items: center; gap: 5px;
+  min-height: 44px; padding: 0 10px; border-radius: 12px;
+  font-size: 13.5px; font-weight: 600; color: var(--text-sub);
+  background: transparent; border: 0; cursor: pointer; white-space: nowrap;
+}
+.sort-btn:hover { background: rgba(18, 22, 31, 0.05); }
+.sort-btn svg { width: 18px; height: 18px; display: block; flex-shrink: 0; }
+
+/* 정렬 시트 — 선택지는 세로로 한 줄씩 (기준 이름이 길어 가로 칩으로는 줄바꿈이 지저분하다) */
+.sort-options { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.sort-options .chip { width: 100%; text-align: left; min-height: 48px; font-size: 15px; }
+.sort-options .chip em { display: block; font-style: normal; font-size: 12.5px;
+  font-weight: 500; color: var(--text-weak); margin-top: 2px; }
+.sort-options .chip.active em { color: inherit; opacity: .75; }

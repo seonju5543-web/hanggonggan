@@ -621,6 +621,12 @@ function fitTone(pct) {
 
 function fitBadgeHtml(fit, fd) {
   if (!fd) return fit > 0 ? `<span class="badge badge-fit">적합도 ${fit}%</span>` : '';
+  /* 🔴 `fit === 0`은 **evaluate()가 미달로 확정한 것**이다 (fitDetail은 FIT_MIN=5가 바닥이라
+     0을 내지 않는다 — fitScore만 ineligible에 0을 준다). 여기를 안 보면 판정이 갈라진다:
+     다자녀 국가장학금은 학생이 다자녀가 아니라고 **확실히** 판정됐는데, fitDetail이
+     `eligibilityLines`만 읽어 구조화된 자격(flagsAny·tracks)을 못 봐서 '자격 미확인'이 떴다
+     (2026-08-26 정렬 검증에서 발견). 미달을 모른다고 말하면 학생이 헛걸음한다. */
+  if (fit === 0) return '<span class="badge badge-fit-no">지원 자격 미달</span>';
   if (fd.unread) return '<span class="badge badge-fit-unknown">자격 미확인</span>';
   /* 🔴 미달은 **숫자가 아니라 fails로** 판정한다 (2026-08-24). 0%를 안 쓰기로 하면서
      `pct === 0`이 영영 참이 되지 않아 '지원 자격 미달' 배지가 통째로 사라졌었다.
@@ -695,14 +701,80 @@ function renderHome() {
 
 /* ---------------- 탐색 ---------------- */
 let exploreFilter = 'all';
+/* 정렬 기준 — 필터와 같은 성격으로 **저장하지 않는다**(새로고침하면 기본값). */
+let exploreSort = 'fit';
+
+/* 🔴 정렬 키가 비면 **방향과 무관하게 뒤로** 보낸다 (2026-08-26).
+   `deadlineTs()`는 마감일이 없는 공고에 `Infinity`를 주는데(app.js 위쪽), 그걸 그대로
+   비교에 쓰면 내림차순에서 **마감 없는 131건 + 상시 제도 6건이 통째로 맨 위로** 올라온다.
+   관리자 화면(_admin/admin.js `sortItems`)이 같은 데이터에서 이미 쓰는 규칙이다.
+   ⚠️ `dday().days`를 정렬 키로 쓰면 안 된다 — 마감 없는 건에 **가짜 14**를 준다
+      (목록에서 안 사라지게 하려는 장치라 순서로 쓰면 전부 D-14 자리에 뭉친다). */
+function byMissingLast(va, vb, dir) {
+  if (!va && !vb) return 0;
+  if (!va) return 1;
+  if (!vb) return -1;
+  return va < vb ? -dir : va > vb ? dir : 0;
+}
+/* 🔴 이미 마감된 공고는 '마감 임박순'에서 **뒤로** 보낸다 (2026-08-26 스크린샷으로 발견).
+   마감 7일까지는 목록에 남기는 규칙(CLOSED_KEEP_DAYS) 때문에, 그냥 날짜 오름차순으로 두면
+   **지나간 공고가 맨 위**에 온다. '임박'은 다가온다는 뜻이지 지나갔다는 뜻이 아니다.
+   지난 것끼리는 최근에 마감된 것부터 (아직 접수를 받을 여지가 그나마 크다). */
+const isPastDue = (d) => !!d && dday(d).days < 0;
+const byDeadline = (a, b) => {
+  const pa = isPastDue(a.sch.deadline), pb = isPastDue(b.sch.deadline);
+  if (pa !== pb) return pa ? 1 : -1;
+  if (pa && pb) return byMissingLast(a.sch.deadline, b.sch.deadline, -1);
+  return byMissingLast(a.sch.deadline, b.sch.deadline, 1);
+};
+/* 등록일이 없는 50건은 전부 마감일이 있다 — 폴백하면 사실상 전건이 값을 갖는다 */
+const listedKey = (m) => m.sch.listedAt || m.sch.deadline || '';
+const byListed = (a, b) => byMissingLast(listedKey(a), listedKey(b), -1);
+
+const EXPLORE_SORTS = {
+  fit: { label: '적합도순', hint: '내 조건에 맞는 것부터',
+         cmp: (a, b) => b.fit - a.fit || byDeadline(a, b) },
+  deadline: { label: '마감 임박순', hint: '곧 마감되는 것부터', cmp: byDeadline },
+  listed: { label: '등록 최신순', hint: '새로 올라온 것부터', cmp: byListed },
+};
+
+/* 정렬 고르기 — 새 드롭다운을 만들지 않고 이미 있는 시트 셸을 쓴다.
+   아래로 쓸어내려 닫기(enableSheetSwipe)·배경 클릭·Escape가 이미 배선돼 있다.
+   ⚠️ 시트 안에서는 `.chip`을 쓴다 — `.filter-chip`을 쓰면 `$$('.filter-chip')`가
+      문서 전역 선택이라 화면 위쪽 필터 칩의 active를 서로 빼앗는다. */
+function openSortSheet() {
+  const opts = Object.entries(EXPLORE_SORTS).map(([k, s]) => `
+    <button class="chip ${k === exploreSort ? 'active' : ''}" data-sort="${k}">
+      ${s.label} <em>${s.hint}</em>
+    </button>`).join('');
+  $('#detail-sheet').innerHTML = `
+    <div class="sheet-handle"></div>
+    <div class="sheet-body">
+      <h3 class="sheet-title">정렬</h3>
+      <div class="sort-options">${opts}</div>
+    </div>`;
+  openSheetShell();
+}
+
+function applySort(key) {
+  if (!EXPLORE_SORTS[key]) return;
+  exploreSort = key;
+  $('#explore-sort-label').textContent = EXPLORE_SORTS[key].label;
+  renderExplore();
+  closeSheet();
+}
 
 function renderExplore() {
   const matches = getMatches();
   const order = { eligible: 0, selective: 0, unknown: 1, ineligible: 2 };
+  const sorter = EXPLORE_SORTS[exploreSort] || EXPLORE_SORTS.fit;
+  /* 🔴 판정 3단(가능/정보부족/미달)은 **적합도순일 때만** 1차 키다 (2026-08-26 개발자 결정:
+     "적합도를 기준으로 했을 때는 맨 아래에 두는 게 맞지"). 마감순·최신순에서는 고른 기준이
+     곧이곧대로 적용된다 — 마감 임박순인데 미달이라고 뒤로 밀면 그 정렬은 거짓말이 된다.
+     미달 카드는 빨간 '지원 자격 미달' 배지로 구분되므로 위로 와도 오해하지 않는다. */
   let list = matches.slice().sort((a, b) =>
-    order[a.result.status] - order[b.result.status] ||
-    b.fit - a.fit ||
-    deadlineTs(a.sch) - deadlineTs(b.sch)
+    (exploreSort === 'fit' ? order[a.result.status] - order[b.result.status] : 0)
+    || sorter.cmp(a, b)
   );
 
   list = list.filter((m) => dday(m.sch.deadline).days >= -CLOSED_KEEP_DAYS); // 마감 1주일 경과 시 자동 숨김
@@ -1470,7 +1542,10 @@ function openDetail(id) {
      따로 두면 한쪽만 고쳐져서 두 모양의 판정이 갈라진다. */
   const reqRow = (e, extra) => {
     const m = requirementMatch(e, state.profile, sch);
-    const cls = m === 'ok' ? 'r-ok' : m === 'no' ? 'r-bad' : 'r-req';
+    /* 🔴 `r-req`는 **자격 요건·먼저 뽑는 기준·제외** 세 블록이 함께 쓴다. 그래서 밖에서는
+       어느 줄이 자격인지 가릴 수 없었다(검사가 셋을 다 세고 있었다 — 2026-08-26).
+       자격 줄에만 `r-elig`를 달아 구분한다. 보이는 모양은 그대로다. */
+    const cls = m === 'ok' ? 'r-elig r-ok' : m === 'no' ? 'r-elig r-bad' : 'r-elig r-req';
     const mark = m === 'ok' ? '✓ ' : m === 'no' ? '✕ ' : '';
     return `<li class="${cls}${extra ? ' ' + extra : ''}">${mark}${esc(e)}</li>`;
   };
@@ -1497,7 +1572,7 @@ function openDetail(id) {
   } else if (requirementLines(sch, qLines).length) {
     // 자격 줄이 없으면 발췌 문장으로 물러나되, **같은 정리를 거쳐** 보여 준다
     reasonRows += requirementLines(sch, qLines)
-      .map((e) => `<li class="r-req">${esc(e)}</li>`).join('');
+      .map((e) => `<li class="r-elig r-req">${esc(e)}</li>`).join('');
   }
   /* 먼저 뽑는 기준 — 자격이 **아니지만** 학생에게 쓸모가 있다 (2026-08-21 개발자 지적).
      자격 블록에 섞으면 요건이 실제보다 훨씬 까다로워 보여 지원할 수 있는 학생이 포기한다
@@ -2141,6 +2216,13 @@ function bindEvents() {
     exploreFilter = chip.dataset.filter;
     $$('.filter-chip').forEach((c) => c.classList.toggle('active', c === chip));
     renderExplore();
+  });
+
+  $('#explore-sort-btn').addEventListener('click', openSortSheet);
+  /* 시트 안의 선택지는 시트가 열릴 때마다 새로 그려지므로 위임으로 받는다 */
+  $('#detail-sheet').addEventListener('click', (e) => {
+    const pick = e.target.closest('[data-sort]');
+    if (pick) applySort(pick.dataset.sort);
   });
 
   document.addEventListener('click', (e) => {

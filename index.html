@@ -273,7 +273,19 @@
 
     <!-- ============ 장학금 탐색 ============ -->
     <section id="screen-explore" class="screen" hidden>
-      <header class="page-header"><h2>장학금 찾기</h2></header>
+      <header class="page-header apps-header">
+        <h2>장학금 찾기</h2>
+        <!-- 정렬 — 아이콘 하나(↑↓) + 지금 기준 글자. 필터 아이콘(☰)은 쓰지 않는다:
+             거르는 일은 아래 칩(전체/교내/교외/신청 가능만)이 이미 한다. -->
+        <button id="explore-sort-btn" class="sort-btn" aria-haspopup="dialog" aria-label="정렬 기준 바꾸기">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M7 4v16"/><path d="M4 8l3-4 3 4"/>
+            <path d="M17 20V4"/><path d="M14 16l3 4 3-4"/>
+          </svg>
+          <span id="explore-sort-label">적합도순</span>
+        </button>
+      </header>
       <div class="filter-row" id="explore-filters">
         <button class="filter-chip active" data-filter="all">전체</button>
         <button class="filter-chip" data-filter="교내">교내</button>
