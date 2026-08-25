@@ -732,28 +732,35 @@ const listedKey = (m) => m.sch.listedAt || m.sch.deadline || '';
 const byListed = (a, b) => byMissingLast(listedKey(a), listedKey(b), -1);
 
 const EXPLORE_SORTS = {
-  fit: { label: '적합도순', hint: '내 조건에 맞는 것부터',
-         cmp: (a, b) => b.fit - a.fit || byDeadline(a, b) },
-  deadline: { label: '마감 임박순', hint: '곧 마감되는 것부터', cmp: byDeadline },
-  listed: { label: '등록 최신순', hint: '새로 올라온 것부터', cmp: byListed },
+  fit: { label: '적합도순', cmp: (a, b) => b.fit - a.fit || byDeadline(a, b) },
+  deadline: { label: '마감 임박순', cmp: byDeadline },
+  listed: { label: '등록 최신순', cmp: byListed },
 };
+const SORT_KEYS = Object.keys(EXPLORE_SORTS);
 
-/* 정렬 고르기 — 새 드롭다운을 만들지 않고 이미 있는 시트 셸을 쓴다.
-   아래로 쓸어내려 닫기(enableSheetSwipe)·배경 클릭·Escape가 이미 배선돼 있다.
-   ⚠️ 시트 안에서는 `.chip`을 쓴다 — `.filter-chip`을 쓰면 `$$('.filter-chip')`가
-      문서 전역 선택이라 화면 위쪽 필터 칩의 active를 서로 빼앗는다. */
-function openSortSheet() {
-  const opts = Object.entries(EXPLORE_SORTS).map(([k, s]) => `
-    <button class="chip ${k === exploreSort ? 'active' : ''}" data-sort="${k}">
-      ${s.label} <em>${s.hint}</em>
-    </button>`).join('');
-  $('#detail-sheet').innerHTML = `
-    <div class="sheet-handle"></div>
-    <div class="sheet-body">
-      <h3 class="sheet-title">정렬</h3>
-      <div class="sort-options">${opts}</div>
-    </div>`;
-  openSheetShell();
+/* 정렬 — **누르면 다음 기준으로 넘어가고, 길게 누르면 아래에 목록이 뜬다**
+   (2026-08-26 개발자 지시). 기준이 셋뿐이라 한 번 누르는 것이 가장 빠르고,
+   바로 고르고 싶을 때만 목록을 연다. 목록은 화면 절반을 덮는 시트가 아니라
+   **아이콘 바로 아래** 뜨는 작은 팝오버다. */
+function openSortMenu() {
+  const menu = $('#explore-sort-menu');
+  menu.innerHTML = SORT_KEYS.map((k) => `
+    <button class="sort-opt" role="menuitemradio" data-sort="${k}"
+            aria-checked="${k === exploreSort}">${EXPLORE_SORTS[k].label}</button>`).join('');
+  menu.hidden = false;
+  $('#explore-sort-btn').setAttribute('aria-expanded', 'true');
+}
+
+function closeSortMenu() {
+  const menu = $('#explore-sort-menu');
+  if (!menu || menu.hidden) return;
+  menu.hidden = true;
+  $('#explore-sort-btn').setAttribute('aria-expanded', 'false');
+}
+
+/* 누를 때마다 다음 기준으로 — 셋을 돌고 처음으로 */
+function cycleSort() {
+  applySort(SORT_KEYS[(SORT_KEYS.indexOf(exploreSort) + 1) % SORT_KEYS.length]);
 }
 
 function applySort(key) {
@@ -761,7 +768,7 @@ function applySort(key) {
   exploreSort = key;
   $('#explore-sort-label').textContent = EXPLORE_SORTS[key].label;
   renderExplore();
-  closeSheet();
+  closeSortMenu();
 }
 
 function renderExplore() {
@@ -2218,12 +2225,49 @@ function bindEvents() {
     renderExplore();
   });
 
-  $('#explore-sort-btn').addEventListener('click', openSortSheet);
-  /* 시트 안의 선택지는 시트가 열릴 때마다 새로 그려지므로 위임으로 받는다 */
-  $('#detail-sheet').addEventListener('click', (e) => {
-    const pick = e.target.closest('[data-sort]');
-    if (pick) applySort(pick.dataset.sort);
-  });
+  /* 정렬 버튼 — 짧게 누르면 다음 기준, 길게 누르면 목록 (2026-08-26 개발자 지시).
+     🔴 길게 눌러 목록을 연 뒤에 오는 click은 **삼켜야 한다** — 안 그러면 목록이 뜨는
+        동시에 기준까지 한 칸 넘어간다(신청 내역 스와이프와 같은 계열의 함정).
+     🔴 touch와 mouse를 **둘 다** 받되 겹쳐서 두 번 세지 않는다 — 터치 기기는
+        touchend 뒤에 click도 보내므로 길게 누른 사실을 플래그로 남겨 거른다. */
+  {
+    const btn = $('#explore-sort-btn');
+    const menu = $('#explore-sort-menu');
+    let timer = null, longFired = false;
+
+    const startPress = () => {
+      longFired = false;
+      clearTimeout(timer);
+      timer = setTimeout(() => { longFired = true; openSortMenu(); }, 450);
+    };
+    const endPress = () => clearTimeout(timer);
+
+    btn.addEventListener('touchstart', startPress, { passive: true });
+    btn.addEventListener('touchend', endPress, { passive: true });
+    btn.addEventListener('touchcancel', endPress, { passive: true });
+    btn.addEventListener('mousedown', startPress);
+    btn.addEventListener('mouseup', endPress);
+    btn.addEventListener('mouseleave', endPress);
+
+    btn.addEventListener('click', () => {
+      if (longFired) { longFired = false; return; }   // 길게 눌러 목록을 연 것이다
+      if (!menu.hidden) { closeSortMenu(); return; }   // 열려 있으면 닫기만
+      cycleSort();
+    });
+    /* 키보드 — Enter/Space는 click으로 오므로 순환된다. 목록은 ↓로 연다. */
+    btn.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown') { e.preventDefault(); openSortMenu(); }
+    });
+
+    menu.addEventListener('click', (e) => {
+      const pick = e.target.closest('[data-sort]');
+      if (pick) applySort(pick.dataset.sort);
+    });
+    document.addEventListener('click', (e) => {
+      if (!menu.hidden && !e.target.closest('.sort-wrap')) closeSortMenu();
+    });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSortMenu(); });
+  }
 
   document.addEventListener('click', (e) => {
     /* 🔴 카드를 민 직후에 오는 click은 '열기'가 아니다 — 밀었는데 상세가 열리면

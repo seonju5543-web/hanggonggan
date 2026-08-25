@@ -1703,11 +1703,27 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: 3px; paddin
   background: transparent; border: 0; cursor: pointer; white-space: nowrap;
 }
 .sort-btn:hover { background: rgba(18, 22, 31, 0.05); }
+/* 길게 누르기를 쓰므로 글자 선택·iOS 확대 메뉴가 뜨지 않게 막는다 */
+.sort-btn { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
 .sort-btn svg { width: 18px; height: 18px; display: block; flex-shrink: 0; }
 
-/* 정렬 시트 — 선택지는 세로로 한 줄씩 (기준 이름이 길어 가로 칩으로는 줄바꿈이 지저분하다) */
-.sort-options { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
-.sort-options .chip { width: 100%; text-align: left; min-height: 48px; font-size: 15px; }
-.sort-options .chip em { display: block; font-style: normal; font-size: 12.5px;
-  font-weight: 500; color: var(--text-weak); margin-top: 2px; }
-.sort-options .chip.active em { color: inherit; opacity: .75; }
+/* 정렬 목록 — 시트가 아니라 **아이콘 바로 아래** 뜨는 작은 팝오버 (2026-08-26 개발자 지시).
+   시트는 화면 절반을 덮어서, 기준 세 줄을 고르는 데는 과하다. */
+.sort-wrap { position: relative; }
+/* 🔴 클래스에 display를 주면 브라우저 기본 `[hidden]{display:none}`을 이겨 안 숨는다 —
+   이 저장소가 관리자 화면·선택 막대에서 이미 두 번 겪은 함정이다. */
+.sort-menu[hidden] { display: none !important; }
+.sort-menu {
+  position: absolute; top: calc(100% + 4px); right: 0; z-index: 40;
+  display: flex; flex-direction: column; min-width: 148px; padding: 6px;
+  background: #fff; border-radius: 14px;
+  box-shadow: 0 8px 28px rgba(18, 22, 31, .16), 0 0 0 1px rgba(18, 22, 31, .06);
+}
+.sort-opt {
+  display: block; width: 100%; text-align: left;
+  min-height: 44px; padding: 0 12px; border: 0; background: transparent;
+  border-radius: 10px; font-size: 14.5px; font-weight: 600;
+  color: var(--text-sub); cursor: pointer; white-space: nowrap;
+}
+.sort-opt:hover { background: rgba(18, 22, 31, .05); }
+.sort-opt[aria-checked="true"] { background: var(--primary-weak, #e8f0ff); color: var(--primary, #2f6bff); }
