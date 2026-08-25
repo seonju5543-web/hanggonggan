@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-08-25",
+ "updatedAt": "2026-08-26",
  "items": [
   {
    "id": "reg-kw-gukgagosi",
@@ -8472,6 +8472,277 @@
    ],
    "sourceUrl": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=374112&article.offset=0&articleLimit=10",
    "sourceKind": "auto"
+  },
+  {
+   "id": "auto-dmodeviewduid53184tpage1",
+   "name": "[등록/장학] 2026년도 제23회 안중근 의사 장학생 후보 모집 안내",
+   "type": "교내",
+   "provider": "광운대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-26",
+   "period": "접수 기간 원문 확인",
+   "summary": "광운대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "광운대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-26 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53184&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "3. 자격요건",
+    "① 2026 학년도 2 학기 기준 , 정규학기 재학생 (2~3 학년 )",
+    "※ 휴학생 신청 불가",
+    "② 타 대외장학금과 이중 수혜 지원 불가 .",
+    "※ 단 , 한국장학재단 국가장학금이나 교내 장학금과 중복수혜 가능",
+    "③ 전체 학업성적이 평균 평점 3.6 점이상 (4.5 기준 ) 인 학생"
+   ],
+   "excerpts": [
+    "문의 : 학생복지팀 (02-940-5033)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-larshipdoarticleno374240",
+   "name": "[교외장학] 2026년 선원가족 장학생 모집 공고",
+   "type": "교외",
+   "provider": "아주대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-26",
+   "period": "접수 기간 원문 확인",
+   "summary": "아주대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "아주대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-26 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=374240&article.offset=0&articleLimit=10",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-2269viewdocurrentpageno1",
+   "name": "2026-2 안중근의사숭모회 생활비성 장학생 선발 (역사 관련 활동 실적 보유자 우대)",
+   "type": "교내",
+   "provider": "국민대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-26",
+   "period": "접수 기간 원문 확인",
+   "summary": "국민대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "국민대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-26 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12269/view.do?currentPageNo=1",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "1. 2026-2 학기 기준 2 학년 2 학기 ~ 3 학년 2 학기 재학생",
+    "3. 평점평균 3.6 이상인 학생",
+    "※ 직전학기를 포함하여 3 학기 이상의 성적이 확인되며 , 전체 평점평균 3.6 이상"
+   ]
+  },
+  {
+   "id": "auto-2272viewdocurrentpageno1",
+   "name": "2026년도 2학기 고졸 후학습자 장학사업(희망사다리 II유형) 신규 장학생 신청기간 안내",
+   "type": "교내",
+   "provider": "국민대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-26",
+   "period": "접수 기간 원문 확인",
+   "summary": "국민대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "국민대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-26 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12272/view.do?currentPageNo=1",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "□ 지원대상 및 내용 → 세부내역은 (붙임) 참조",
+    "○ (지원대상) 대한민국 국적자로 학부 재학생이며, 재직요건을 충족한 학생 중 직전학기 성적이 100점 만점의 70점 이상인 자",
+    "※신입·편입(재입학)생은 성적 심사 제외",
+    "· 재 직 요 건 : 고등학교 졸업자로서 심사일 기준 재직기간이 2년 이상",
+    "(단, 현재 중소․중견기업 재직자는 1년 이상)이며, 심사일(’26.7.1.) 기준 장학생 선발 대상기업에 재직 중인 자",
+    "▸ 가족기업(본인 명의 가족관계증명서 상 확인되는 가족), 공공기관, 국가 및 지자체 등 일부기업은 지원대상에서 제외 (업무처리기준 참조)",
+    "▸ 전문학사 취득자가 전공심화과정 및 4년제 대학에 신편입하는 경우, ‘전문학사 취득 전’ 재직경력 2년을 추가로 보유하고 있는 자에 한해 장학금 지원 가능",
+    "○ (지원내용) 현 재직기업 유형 및 규모에 따라 등록금 차등지원",
+    "기업 유형",
+    "중소․중견기업",
+    "대기업․비영리기관",
+    "지원 금액",
+    "등록금 전액",
+    "등록금의 50%"
+   ],
+   "excerpts": [
+    "○ (신청기간) 2026.9.1.(월) 09:00 ~ 9.18.(금) 18:00",
+    "□ 지원대상 및 내용 → 세부내역은 (붙임) 참조",
+    "(단, 현재 중소․중견기업 재직자는 1년 이상)이며, 심사일(’26.7.1.) 기준 장학생 선발 대상기업에 재직 중인 자",
+    "□ 문의처: 희망사다리 취업연계 지원센터 1800-0499"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-pnoticedoarticleno366484",
+   "name": "[학부] 2026년 2학기 통영시 대학생 등록금 전액 장학금 신청 안내",
+   "type": "교내",
+   "provider": "이화여자대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-09-30",
+   "period": "접수 ~2026-09-30",
+   "summary": "이화여자대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "이화여자대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-26 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366484&article.offset=0&articleLimit=10",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "나. 지원대상: 통영시에 주소를 둔 34세 이하 대학 1~4학년 재학생"
+   ]
+  },
+  {
+   "id": "auto-ticedoarticleno231371606",
+   "name": "2026-2학기 한국선원복지고용센터 선원가족 장학생 모집 안내",
+   "type": "교내",
+   "provider": "영남대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-26",
+   "period": "접수 기간 원문 확인",
+   "summary": "영남대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "영남대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-26 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=231371606&article.offset=0&articleLimit=10",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-archgbn0searchordersort0",
+   "name": "2026년도 하반기 울산연구원 장학생 선발 공고 안내",
+   "type": "교내",
+   "provider": "강원대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-26",
+   "period": "접수 기간 원문 확인",
+   "summary": "강원대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "강원대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-26 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026년 하반기 장학생 선발계획 공고.hwp chevron_forward",
+     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20260825050643780.hwp&path=/bbs/34&fn=2026%EB%85%84%20%ED%95%98%EB%B0%98%EA%B8%B0%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%EA%B3%84%ED%9A%8D%20%EA%B3%B5%EA%B3%A0.hwp"
+    }
+   ],
+   "sourceUrl": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2470&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "sourceKind": "auto",
+   "excerpts": [
+    "접수방법: 개별신청, 온라인(https://uill.uri.re.kr/)신청 후 관련서류 메일제출"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-ent2431263858artclviewdo",
+   "name": "[공통][교외]2026년도 2학기 이백장학금 장학생 모집(9/7~9/15)",
+   "type": "교외",
+   "provider": "한국외국어대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-09-15",
+   "period": "접수 ~2026-09-15",
+   "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-26 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/263858/artclView.do",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "4. 지원자격",
+    "가 . 2026-2 학기 재학생",
+    "나 . 직전학기 12 학점이상 , 직전학기 평점평균 3.0 이상 취득한 자 ( 계절학기 제외 )",
+    "다 . 가계곤란자 ( 학자금지원구간 , 아르바이트 경력 등 고려 )",
+    "라 . 26-2 생활비성 장학금 미수혜자",
+    "※ 최종 장학생으로 선발될 경우 장학금 수여식 참석 및 자필 감사편지 작성이 필수입니다 ."
+   ],
+   "excerpts": [
+    "아래와 같이 2026-2 학기 이백장학금 장학생 모집을 하오니 지원 자격을 충족하는 학생들의 많은 지원 바랍니다",
+    "문의처 : 서울 장학팀 (02-2173-2137), 글로벌 학생지원 · 장학팀 (031-330-4034)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   }
  ]
 }
