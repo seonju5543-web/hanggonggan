@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-08-26",
- "count": 2046,
+ "count": 2058,
  "items": [
   {
    "title": "[공통][교외]2026년도 2학기 이백장학금 장학생 모집(9/7~9/15)",
@@ -357,6 +357,15 @@
    "foundAt": "2026-08-25"
   },
   {
+   "title": "[다빈치] 2026학년도 2학기(학기중) 국가근로장학생(교외근로) 추가 모집 안내",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30100&pageNo=1",
+   "attachments": [],
+   "deadlineHint": "까지 ※ 2026학년도 2학기 1차 신청자 중 미선발 학생만 신청 가능 ※ 대학생 청소년교육지원장학금사업 및 다",
+   "school": "중앙대학교",
+   "campus": "",
+   "foundAt": "2026-08-25"
+  },
+  {
    "title": "(다빈치) 2026학년도 다빈치캠퍼스 2학기 학기 중 교내•외근로 국가근로장학생 선발 안내",
    "url": "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5#n-(%EB%8B%A4%EB%B9%88%EC%B9%98)%202026%ED%95%99%EB%85%84%EB%8F%84%20%EB%8B%A4%EB%B9%88%EC%B9%98%EC%BA%A0%ED%8D%BC%EC%8A%A4%202%ED%95%99%EA%B8%B0%20%ED%95%99%EA%B8%B0%20%EC%A4%91%20%EA%B5%90%EB%82%B4%E2%80%A2%EC%99%B8%EA%B7%BC%EB%A1%9C%20%EA%B5%AD%EA%B0%80%EA%B7%BC",
    "attachments": [],
@@ -393,6 +402,33 @@
    "foundAt": "2026-08-25"
   },
   {
+   "title": "공지 공지 [기한연장] 2026학년도 이상호.박순엽 장학 선발 안내(~9/4) 2026.08.13. 조회 1949",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-%EA%B3%B5%EC%A7%80%20%EA%B3%B5%EC%A7%80%20%5B%EA%B8%B0%ED%95%9C%EC%97%B0%EC%9E%A5%5D%202026%ED%95%99%EB%85%84%EB%8F%84%20%EC%9D%B4%EC%83%81%ED%98%B8.%EB%B0%95%EC%88%9C%EC%97%BD%20%EC%9E%A5%ED%95%99%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4(~9",
+   "attachments": [],
+   "deadlineHint": "기한연장] 2026학년도 이상호.박순엽 장학 선발 안내(~9/4) 등록일 2026.08.13. 조회 1950 첨",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-08-25"
+  },
+  {
+   "title": "공지 공지 한국장학재단 학자금 지원 구간 개편 안내(2027년 시행) 2026.03.20. 조회 1521",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-%EA%B3%B5%EC%A7%80%20%EA%B3%B5%EC%A7%80%20%ED%95%9C%EA%B5%AD%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%ED%95%99%EC%9E%90%EA%B8%88%20%EC%A7%80%EC%9B%90%20%EA%B5%AC%EA%B0%84%20%EA%B0%9C%ED%8E%B8%20%EC%95%88%EB%82%B4(2027%EB%85%84%20%EC%8B%9C%ED%96%89)%202",
+   "attachments": [],
+   "deadlineHint": "까지, 시간당 3만원(월 48만원 내외)) 목록 동국대학교 챗봇 서비스 열기 닫기 TOP 개인정보처리방침 개인정",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-08-25"
+  },
+  {
+   "title": "공지 공지 2026-2학기 고양이엄마(송수경)장학 장학생 선발 안내(1인당 400만원(생활비), ~9/18(금) 16:00까지) 2026.08.25. 조회 287",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-%EA%B3%B5%EC%A7%80%20%EA%B3%B5%EC%A7%80%202026-2%ED%95%99%EA%B8%B0%20%EA%B3%A0%EC%96%91%EC%9D%B4%EC%97%84%EB%A7%88(%EC%86%A1%EC%88%98%EA%B2%BD)%EC%9E%A5%ED%95%99%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4(1%EC%9D%B8",
+   "attachments": [],
+   "deadlineHint": "까지) 등록일 2026.08.25. 조회 288 &nbsp; 1. 장학명 : 고양이엄마 ( 송수경 ) 장학 &n",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-08-25"
+  },
+  {
    "title": "2690 [홍보] (재)달서인재육성장학재단 2026년도 하반기 장학생 선발 안내 2026.08.25. 조회 53",
    "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2690%20%5B%ED%99%8D%EB%B3%B4%5D%20(%EC%9E%AC)%EB%8B%AC%EC%84%9C%EC%9D%B8%EC%9E%AC%EC%9C%A1%EC%84%B1%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%202026%EB%85%84%EB%8F%84%20%ED%95%98%EB%B0%98%EA%B8%B0%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0",
    "attachments": [],
@@ -406,6 +442,24 @@
    "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2691%20%5B%ED%99%8D%EB%B3%B4%5D%202026%EB%85%84%202%ED%95%99%EA%B8%B0%20%EC%84%A0%EC%9B%90%EA%B0%80%EC%A1%B1%EC%9E%A5%ED%95%99%EC%82%AC%EC%97%85%20%EC%95%88%EB%82%B4%202026.08.",
    "attachments": [],
    "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-08-25"
+  },
+  {
+   "title": "2692 2026-2학기 고양이엄마(송수경)장학 장학생 선발 안내(1인당 400만원(생활비), ~9/18(금) 16:00까지) 2026.08.25. 조회 287",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2692%202026-2%ED%95%99%EA%B8%B0%20%EA%B3%A0%EC%96%91%EC%9D%B4%EC%97%84%EB%A7%88(%EC%86%A1%EC%88%98%EA%B2%BD)%EC%9E%A5%ED%95%99%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4(1%EC%9D%B8%EB%8B%B9",
+   "attachments": [],
+   "deadlineHint": "까지) 등록일 2026.08.25. 조회 290 &nbsp; 1. 장학명 : 고양이엄마 ( 송수경 ) 장학 &n",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-08-25"
+  },
+  {
+   "title": "2693 [홍보] 2026년도 하반기 울산연구원 장학생 선발 안내 2026.08.25. 조회 100",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2693%20%5B%ED%99%8D%EB%B3%B4%5D%202026%EB%85%84%EB%8F%84%20%ED%95%98%EB%B0%98%EA%B8%B0%20%EC%9A%B8%EC%82%B0%EC%97%B0%EA%B5%AC%EC%9B%90%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4%20202",
+   "attachments": [],
+   "deadlineHint": "접수기간: 2026.09.16.(수) 10:00 ~ 09.23.(수) 18:00 3. 접수대상: 우수·다자녀·생활장",
    "school": "동국대학교",
    "campus": "",
    "foundAt": "2026-08-25"
@@ -1545,6 +1599,42 @@
    "foundAt": "2026-08-25"
   },
   {
+   "title": "[교외-9/28]2026학년도 하반기 (재)달서인재육성장학재단 장학생 선발 안내(재단지원)",
+   "url": "https://www.korea.ac.kr/ko/568/subview.do?article.offset=10&nttId=000100000000003827",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "고려대학교",
+   "campus": "",
+   "foundAt": "2026-08-25"
+  },
+  {
+   "title": "[교외-10/23]2026학년도 2학기 선원가족장학사업 선발 안내(재단지원)",
+   "url": "https://www.korea.ac.kr/ko/568/subview.do?article.offset=10&nttId=000100000000003828",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "고려대학교",
+   "campus": "",
+   "foundAt": "2026-08-25"
+  },
+  {
+   "title": "[교외-9/28]2026학년도 하반기 (재)달서인재육성장학재단 장학생 선발 안내(재단지원)",
+   "url": "https://www.korea.ac.kr/ko/568/subview.do?nttId=000100000000003827",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "고려대학교",
+   "campus": "",
+   "foundAt": "2026-08-25"
+  },
+  {
+   "title": "[교외-10/23]2026학년도 2학기 선원가족장학사업 선발 안내(재단지원)",
+   "url": "https://www.korea.ac.kr/ko/568/subview.do?nttId=000100000000003828",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "고려대학교",
+   "campus": "",
+   "foundAt": "2026-08-25"
+  },
+  {
    "title": "[등록/장학] (재)달서인재육성장학재단 2026년도 하반기 장학생 선발 안내",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53175&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "attachments": [
@@ -1831,6 +1921,29 @@
     }
    ],
    "deadlineHint": "접수기간 및 방법 &nbsp;- 접수기간 : 2026. 8. 26.( 수 ) 자정까지 &nbsp; ※ 접수기간 내",
+   "school": "서울시립대학교",
+   "campus": "",
+   "foundAt": "2026-08-25"
+  },
+  {
+   "title": "[근무부서 : 교무과] 2026학년도 2학기 국가근로장학생 모집",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31325&sort=12&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "서울시립대학교",
+   "campus": "",
+   "foundAt": "2026-08-25"
+  },
+  {
+   "title": "[인권센터] 2026학년도 2학기 국가근로장학생 모집",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31328&sort=6&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "attachments": [
+    {
+     "name": "국가근로장학 신청서 및 서약서(2026-2학기).hwp",
+     "url": "https://www.uos.ac.kr/common/board-download.do?listId=FA1&seq=31328&fSeq=1"
+    }
+   ],
+   "deadlineHint": "마감 ( 모집 공고에 ‘ 마감 ’ 표시 예정 ) ※ 선발자에게 개별 연락 예정이며 , 미선발자의 경우 별도 안내",
    "school": "서울시립대학교",
    "campus": "",
    "foundAt": "2026-08-25"
