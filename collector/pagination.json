@@ -9,7 +9,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-08-24"
+  "checkedAt": "2026-08-25"
  },
  "https://www.skku.edu/skku/campus/skk_comm/notice06.do": {
   "ok": false,
@@ -24,12 +24,8 @@
   "checkedAt": "2026-08-17"
  },
  "https://dep.hufs.ac.kr/student/12767/subview.do": {
-  "ok": true,
-  "way": {
-   "kind": "page",
-   "param": "page"
-  },
-  "checkedAt": "2026-08-24"
+  "ok": false,
+  "checkedAt": "2026-08-25"
  },
  "https://www.uos.ac.kr/korNotice/list.do?list_id=FA1": {
   "ok": false,
@@ -85,7 +81,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-08-24"
+  "checkedAt": "2026-08-25"
  },
  "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=list&srCategoryId=22": {
   "ok": false,
@@ -105,7 +101,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-08-24"
+  "checkedAt": "2026-08-25"
  },
  "https://www.knou.ac.kr/bbs/knou/51/artclList.do?bbsClSeq=&bbsOpenWrdSeq=25&isViewMine=false&srchColumn=sj&srchWrd=": {
   "ok": true,
@@ -113,7 +109,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-08-24"
+  "checkedAt": "2026-08-25"
  },
  "https://home.knu.ac.kr/HOME/knussw/index.htm": {
   "ok": false,
@@ -137,7 +133,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-08-24"
+  "checkedAt": "2026-08-25"
  },
  "https://www.cbnu.ac.kr/www/selectBbsNttList.do?bbsNo=8&key=815&searchCtgry=%ED%95%99%EC%82%AC/%EC%9E%A5%ED%95%99": {
   "ok": false,
@@ -157,7 +153,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-08-24"
+  "checkedAt": "2026-08-25"
  },
  "https://www.sogang.ac.kr/ko/scholarship-notice": {
   "ok": false,
@@ -196,12 +192,8 @@
   "checkedAt": "2026-08-17"
  },
  "https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=145&": {
-  "ok": true,
-  "way": {
-   "kind": "page",
-   "param": "pageNo"
-  },
-  "checkedAt": "2026-08-24"
+  "ok": false,
+  "checkedAt": "2026-08-25"
  },
  "https://www.korea.ac.kr/ko/568/subview.do": {
   "ok": true,
@@ -210,7 +202,7 @@
    "param": "article.offset",
    "limit": 10
   },
-  "checkedAt": "2026-08-24"
+  "checkedAt": "2026-08-25"
  },
  "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100": {
   "ok": true,
@@ -218,7 +210,7 @@
    "kind": "page",
    "param": "pageNo"
   },
-  "checkedAt": "2026-08-24"
+  "checkedAt": "2026-08-25"
  },
  "https://onestop.pusan.ac.kr/page?menuCD=000000000000062": {
   "ok": true,
@@ -226,7 +218,7 @@
    "kind": "page",
    "param": "currentPageNo"
   },
-  "checkedAt": "2026-08-24"
+  "checkedAt": "2026-08-25"
  },
  "https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083": {
   "ok": false,
@@ -246,7 +238,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-08-24"
+  "checkedAt": "2026-08-25"
  },
  "https://www.gachon.ac.kr/kor/7986/subview.do": {
   "ok": true,
@@ -255,6 +247,6 @@
    "param": "article.offset",
    "limit": 10
   },
-  "checkedAt": "2026-08-24"
+  "checkedAt": "2026-08-25"
  }
 }
