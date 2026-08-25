@@ -1533,12 +1533,12 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: 3px; paddin
    그냥 두면 **동그란 빈 원**만 보이고 체크 표시가 안 뜬다(CLAUDE.md 기록).
    기존 .check-item과 같은 그림을 쓴다 — 앱 안에서 체크 모양이 두 가지면 안 된다. */
 .bulk-all { display: flex; align-items: center; gap: 10px; font-size: 14px; min-height: 44px; cursor: pointer; }
-.bulk-all input, .swipe-row .row-check {
+.bulk-all input, .swipe-row .row-check, .bulk-check {
   width: 24px; height: 24px; padding: 0; flex-shrink: 0;
   border: 1.5px solid rgba(18, 22, 31, 0.22); border-radius: 50%;
   background: #fff center / 62% no-repeat; transition: all .15s; cursor: pointer;
 }
-.bulk-all input:checked, .swipe-row .row-check:checked {
+.bulk-all input:checked, .swipe-row .row-check:checked, .bulk-check:checked {
   border-color: var(--primary); background-color: var(--primary);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-6.5' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   box-shadow: 0 3px 8px rgba(47, 107, 255, .35);
@@ -1563,3 +1563,56 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: 3px; paddin
 @media (prefers-reduced-motion: reduce) {
   .swipe-row > .sch-card { transition: none; }
 }
+
+/* ============================================================
+   일괄 신청 준비 목록 (2026-08-25)
+   겉에 보이는 것은 넷 — 체크 · 제목 · 자격 단어 · 금액.
+   마감·배지·제출처·자격 원문은 <details> 안에 접는다(개발자 지시).
+   ⚠️ 새 색을 만들지 않는다 — 배지·D-day 는 기존 규칙을 그대로 쓴다.
+   ============================================================ */
+/* 🔴 .bulk-all 은 신청내역 전체선택이 이미 쓰는 이름이다(style.css 위쪽).
+   같은 물건이라 그림은 그대로 쓰고, 시트에서만 필요한 구분선만 **시트 안으로 한정**해
+   덧붙인다. 통째로 다시 선언하면 신청내역 쪽 모양이 함께 바뀐다. */
+#detail-sheet .bulk-all {
+  padding: 10px 0; margin-bottom: 6px;
+  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+}
+.bulk-group-head {
+  font-size: 12.5px; font-weight: 700; color: var(--text-weak);
+  margin: 16px 0 8px;
+}
+.bulk-row {
+  display: flex; gap: 10px;
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
+  padding: 12px; margin-bottom: 8px;
+  transition: opacity 0.15s;
+}
+/* 뺀 줄은 **지우지 않고 흐리게** 둔다 — 실수로 뺐을 때 되돌릴 수 있어야 한다 */
+.bulk-row.off { opacity: 0.42; }
+.bulk-row.off .bulk-name { text-decoration: line-through; }
+.bulk-check { margin: 1px 0 0; }   /* 크기·그림은 위 공용 규칙이 준다 */
+.bulk-main { flex: 1; min-width: 0; }
+.bulk-name {
+  font-size: 15px; font-weight: 700; color: var(--text);
+  margin-bottom: 6px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+}
+.bulk-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; }
+.bulk-tags .chip-sm {
+  background: var(--primary-weak); color: var(--primary);
+  border-radius: 999px; font-weight: 600; padding: 4px 9px; font-size: 11.5px;
+}
+.bulk-amount { font-size: 13px; color: var(--text-sub); margin-bottom: 6px; }
+.bulk-more { border-top: 1px dashed var(--line); padding-top: 8px; }
+.bulk-more > summary {
+  font-size: 12.5px; color: var(--primary); font-weight: 600;
+  cursor: pointer; list-style: none; min-height: 24px;
+}
+.bulk-more > summary::-webkit-details-marker { display: none; }
+.bulk-more > summary::before { content: '▸ '; }
+.bulk-more[open] > summary::before { content: '▾ '; }
+.bulk-badges { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0 6px; }
+.bulk-meta { font-size: 12.5px; color: var(--text-sub); line-height: 1.6; margin-bottom: 3px; }
+.bulk-meta-head { font-size: 11.5px; color: var(--text-weak); font-weight: 700; margin: 8px 0 4px; }
+.bulk-reqs { font-size: 12.5px; color: var(--text-sub); line-height: 1.65; padding-left: 2px; list-style: none; }
+.bulk-reqs li { margin-bottom: 2px; }
+.bulk-reqs li::before { content: '· '; color: var(--text-weak); }

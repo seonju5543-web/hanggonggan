@@ -4,7 +4,15 @@
 
 const STORAGE_KEY = 'handaejang.v1';
 const LEGACY_KEYS = ['hanjang.v2', 'hanjang.v1'];
-const TODAY = new Date();
+/* 오늘 — 🔴 상수로 굳히지 말 것 (2026-08-25 수리, 개발자 지적으로 발견).
+   예전엔 `const TODAY = new Date()`로 **앱을 불러올 때 한 번만** 정했다. 그런데 이 앱은
+   홈 화면에 설치해 쓰는 앱(PWA)이라 한 번 연 화면이 며칠씩 살아 있다. 그러면 그 값이
+   사흘 전인 채로 남아 **이미 마감된 공고가 D-2로 보이고 일괄 신청 준비 대상에도 들어갔다.**
+   부를 때마다 새로 읽는다 — dday를 쓰는 홈·탐색·상세·신청내역·알림이 함께 낫는다(원칙 7). */
+function todayStart() {
+  const n = new Date();
+  return new Date(n.getFullYear(), n.getMonth(), n.getDate());
+}
 
 /* ---------------- 상태 ---------------- */
 let state = {
@@ -117,7 +125,7 @@ const CLOSED_KEEP_DAYS = 7;
 function dday(dateStr) {
   if (!dateStr) return { label: '기한 원문 확인', cls: '', days: 14 }; // 마감을 확정 못 한 공고 — 목록에 유지
   // 날짜끼리 비교해야 마감 다음 날 새벽에 D-DAY로 잘못 뜨지 않는다 (마감 당일=D-DAY, 지난 날=마감)
-  const startOfToday = new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate());
+  const startOfToday = todayStart();
   const d = Math.round((new Date(dateStr + 'T00:00:00') - startOfToday) / 86400000);
   if (d < 0) return { label: '마감', cls: 'closed', days: d };
   if (d === 0) return { label: 'D-DAY', cls: 'urgent', days: d };
@@ -1149,35 +1157,230 @@ function applyTo(sch) {
   closeSheet();
 }
 
-function applyAll() {
-  const matches = getMatches();
-  const targets = matches
+/* ══════════════════════════════════════════════════════════════════════════
+   일괄 신청 준비 (2026-08-25 개발자 지시로 재설계)
+
+   예전엔 브라우저 기본 `confirm()` 창 하나였다. 그 창은 앱이 아니라 **브라우저가**
+   만드는 것이라 확인·취소 두 버튼밖에 못 넣는다 — 그래서 지원자격도 금액도 안 보이고,
+   원하지 않는 장학금을 **한 건도 뺄 수 없었다**(전부 담거나 전부 취소).
+
+   지금은 앱이 만든 목록이다. 겉에 보이는 것은 넷 — 체크 · 제목 · 자격 단어 · 금액.
+   마감·배지·제출처·자격 원문은 '더보기' 안에 접는다(2026-08-25 개발자 지시).
+
+   🔴 확인을 눌러도 학교·재단에 **실제 접수가 되는 것은 아니다**(운영원칙 1).
+      일어나는 일은 '신청 준비 완료 상태로 신청내역에 담기는 것'이고, 화면 문구도 그렇게 적는다.
+   🔴 시트 그릇은 #detail-sheet 를 그대로 쓴다 — 쓸어 닫기·배경 눌러 닫기·ESC 가 이미
+      배선돼 있다. 새 시트를 만들면 그 배선을 또 해야 하고 한쪽만 고쳐져 갈라진다.
+   ══════════════════════════════════════════════════════════════════════════ */
+let bulkPrep = null;   // { list: [sch], ids: Set } — 목록이 열려 있는 동안만 산다
+
+/* 서류(자소서·앱 양식)를 써야 끝나는 공고인가.
+   🔴 신청내역의 '서류 작성 필요' 배지와 **같은 기준**이어야 한다 — 여기서 새 기준을
+      만들면 두 화면이 같은 공고를 두고 다른 말을 한다. */
+function bulkNeedsWork(sch) {
+  return !!(essayDefsFor(sch).length
+    || (sch.formId && typeof FORM_TEMPLATES !== 'undefined' && FORM_TEMPLATES[sch.formId]));
+}
+
+/* 일괄 준비 대상 — 자격 통과 · 아직 안 담음 · 마감 전 · 오래되지 않음.
+   ⚠️ 목록을 **열 때와 확인을 누를 때 둘 다** 이 함수를 쓴다. 열 때만 거르면
+      목록을 한참 보다가 자정을 넘겨 확인한 학생이 마감된 공고를 담게 된다. */
+function bulkTargets() {
+  return getMatches()
     .filter((m) => ['eligible', 'selective'].includes(m.result.status))
     .filter((m) => !state.applications.some((a) => a.id === m.sch.id))
     .filter((m) => dday(m.sch.deadline).days >= 0 && notStale(m.sch))
-    .map((m) => m.sch);
-  if (!targets.length) { toast('준비할 수 있는 장학금이 없어요'); return; }
+    .map((m) => m.sch)
+    .sort((a, b) => deadlineTs(a) - deadlineTs(b));   // 마감일을 겉에 안 써도 급한 것이 위로
+}
 
-  const needsWork = (s) => essayDefsFor(s).length || (s.formId && typeof FORM_TEMPLATES !== 'undefined' && FORM_TEMPLATES[s.formId]);
-  const ready = targets.filter((s) => !needsWork(s));
-  const needsDocs = targets.filter(needsWork);
+/* 지원 자격을 **단어로** 옮긴다.
+   🔴 원문 문장을 잘라 단어를 만들지 않는다 — 자르면 뜻이 바뀐다. 등록할 때 이미
+      구조로 저장해 둔 값(sch.eligibility)만 옮긴다 — evaluate() 가 읽는 그 값이다.
+      하나도 없으면 지어내지 않고 '자격 원문 확인'이라고 말한다(원칙 8-1).
+   순수 함수라 브라우저 없이 검사할 수 있다. */
+/* 학적상태 낱말에 '생'을 붙일지 — `복학예정생`·`초과학기생`은 말이 안 된다 */
+const BULK_STATUS_WORD = {
+  재학: '재학생', 휴학: '휴학생', 졸업: '졸업생', 수료: '수료생', 대학원: '대학원생',
+  복학예정: '복학예정', 초과학기: '초과학기', 졸업유예: '졸업유예', 자퇴: '자퇴',
+};
 
-  const ok = confirm(
-    `아래 ${targets.length}건을 한 번에 신청 준비할까요?\n\n` +
-    targets.map((s) => `· [${s.type}] ${s.name}${needsWork(s) ? ' (서류 작성 필요)' : ''}`).join('\n') +
-    `\n\n${ready.length}건은 바로 준비되고, ${needsDocs.length}건은 서류 작성 도우미로 이어서 완성할 수 있어요.` +
-    '\n※ 최종 제출은 한국장학재단·학교 등 공식 채널에서 이루어져요.'
-  );
-  if (!ok) return;
+/* 파서가 읽어 낸 조건 하나 → 화면에 띄울 낱말.
+   🔴 숫자·지역·학적은 **원문에서 읽어 낸 값 그대로** 쓴다. 앱이 보태는 것은 조사뿐이다. */
+function bulkCondWords(c, L) {
+  const S = (typeof GRADE_SCALE !== 'undefined' && GRADE_SCALE) || {};
+  switch (c.kind) {
+    case 'grade':
+      if (c.min == null) return [];
+      /* 단위를 섞으면 재앙이다 — 백분위 70을 평점 70으로 적으면 학생이 오해한다 */
+      if (c.scale === S.percent) return [`백분위 ${c.min} 이상`];
+      if (c.scale === S.letter) return [`${c.min} 이상`];
+      return [`평점 ${c.min} 이상`];
+    case 'bracket': return c.max == null ? [] : [`소득 ${c.max}구간 이하`];
+    case 'credits':
+      if (c.min != null) return [`${c.min}학점 이상`];
+      return c.max != null ? [`${c.max}학점 이하`] : [];
+    case 'year':
+      if (c.eq != null) return [`${c.eq}학년`];
+      if (c.min != null) return [`${c.min}학년 이상`];
+      return c.max != null ? [`${c.max}학년 이하`] : [];
+    case 'status':
+      return (c.anyOf || []).map((x) => BULK_STATUS_WORD[x] || x)
+        .concat((c.not || []).map((x) => (BULK_STATUS_WORD[x] || x) + ' 제외'));
+    case 'flags': return (c.anyOf || []).map((f) => L[f] || f);
+    case 'nationality': return [c.eq === 'foreign' ? '외국인 유학생' : '대한민국 국적'];
+    case 'age': return c.max == null ? [] : [`만 ${c.max}세 이하`];
+    case 'residence': return (c.anyOf || []).slice(0, 2).map((r) => r + ' 거주');
+    default: return [];
+  }
+}
 
-  ready.forEach((s) => state.applications.push({ id: s.id, appliedAt: nowStamp(), step: 0, docs: null, pending: false }));
-  needsDocs.forEach((s) => state.applications.push({ id: s.id, appliedAt: nowStamp(), step: 0, docs: null, pending: true }));
+/* 지원 자격을 **단어로** 옮긴다. 두 곳에서 가져온다.
+   ① 등록할 때 사람이 구조로 넣어 둔 값(sch.eligibility) — evaluate() 가 읽는 그 값.
+   ② 공고 원문 자격 줄 — 화면·적합도가 이미 쓰는 파서(parse-requirements.js)로 읽는다.
+   ②가 필요한 이유: 등록 데이터의 eligibility 는 실제로 대부분 selective 하나뿐이라
+   ①만 쓰면 거의 모든 공고가 '자격 원문 확인'으로만 뜬다(실측으로 확인).
+   🔴 어느 쪽도 지어내지 않는다 — 문장을 잘라 만들지도 않는다. 원문에 실제로 적힌
+      숫자·지역·자격만 읽어 조사만 붙인다. 하나도 못 읽으면 '자격 원문 확인'이다(원칙 8-1).
+   순수 함수라 브라우저 없이 검사할 수 있다. */
+const BULK_TAG_MAX = 5;
+function bulkTags(sch) {
+  const out = [];
+  const add = (label) => { if (label && !out.includes(label)) out.push(label); };
+  const e = (sch && sch.eligibility) || {};
+  const L = (typeof FLAG_LABELS !== 'undefined' && FLAG_LABELS) || {};
+
+  if (e.schoolOnly) add('우리 학교 공고');
+  if (e.flagsAny) e.flagsAny.forEach((f) => add(L[f] || f));
+  if (e.minGpa != null) add(`평점 ${e.minGpa} 이상`);
+  if (e.maxBracket != null) add(`소득 ${e.maxBracket}구간 이하`);
+  if (e.freshmanOnly) add('신입생만');
+  else if (e.years && e.years.length) add(`${e.years.join('·')}학년`);
+  if (e.tracks && e.tracks.length && typeof TRACKS !== 'undefined') {
+    e.tracks.forEach((id) => {
+      const tr = TRACKS.find((x) => x.id === id);
+      if (tr) add(tr.label);
+    });
+  }
+  if (e.seoulOnly) add('서울 거주');
+  if (e.needCert) add('외국어성적');
+  if (e.exchange) add('교환학생 예정');
+
+  if (typeof parseLine === 'function' && typeof requirementLines === 'function') {
+    for (const line of requirementLines(sch) || []) {
+      if (out.length >= BULK_TAG_MAX) break;
+      /* 대학원 전용 줄은 학부생 화면에 띄우지 않는다 — 파서가 이미 가려 준다 */
+      if (typeof gradOnly === 'function' && gradOnly(line)) continue;
+      for (const c of (parseLine(line).conds || [])) bulkCondWords(c, L).forEach(add);
+    }
+  }
+  return out.length ? out.slice(0, BULK_TAG_MAX) : ['자격 원문 확인'];
+}
+
+/* 목록 한 줄. 겉은 넷(체크·제목·자격 단어·금액)이고 나머지는 <details> 안이다.
+   <details> 는 브라우저가 이미 가진 접기 기능이라 여닫는 코드가 한 줄도 필요 없다. */
+function bulkRowHtml(sch) {
+  const on = bulkPrep.ids.has(sch.id);
+  const d = dday(sch.deadline);
+  const reqs = (typeof requirementLines === 'function' ? requirementLines(sch) : []).slice(0, 6);
+  return `
+    <div class="bulk-row${on ? '' : ' off'}" data-row="${esc(sch.id)}">
+      <input type="checkbox" class="bulk-check" data-bulk="${esc(sch.id)}" ${on ? 'checked' : ''}
+        aria-label="${esc(sch.name)} 준비 목록에 넣기" />
+      <div class="bulk-main">
+        <p class="bulk-name">${esc(sch.name)}${bulkNeedsWork(sch) ? '<span class="badge badge-pending">서류 작성 필요</span>' : ''}</p>
+        <p class="bulk-tags">${bulkTags(sch).map((x) => `<span class="chip-sm">${esc(x)}</span>`).join('')}</p>
+        <p class="bulk-amount">${esc(sch.amount || '금액 원문 확인')}</p>
+        <details class="bulk-more">
+          <summary>더보기</summary>
+          <div class="bulk-badges">
+            <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${esc(sch.type)}</span>
+            ${sch.program ? '<span class="badge badge-program">상시 제도</span>' : `<span class="badge badge-dday ${d.cls}">${d.label}</span>`}
+            ${sch.auto ? '<span class="badge badge-auto">자동 등록 · 검수 전</span>' : ''}
+          </div>
+          <p class="bulk-meta">${sch.deadline
+            ? `마감 ${esc(sch.deadline.replace(/-/g, '.'))}`
+            : '마감 기한을 아직 읽지 못했어요 — 공고 원문에서 꼭 확인하세요'}</p>
+          <p class="bulk-meta">${esc(submitChannelLabel(sch))}</p>
+          ${reqs.length
+            ? `<p class="bulk-meta-head">지원자격 (공고 원문)</p><ul class="bulk-reqs">${reqs.map((r) => `<li>${esc(r)}</li>`).join('')}</ul>`
+            : '<p class="bulk-meta">지원 자격을 아직 읽지 못했어요 — 공고 원문에서 확인하세요</p>'}
+        </details>
+      </div>
+    </div>`;
+}
+
+function renderBulkPrep() {
+  const targets = bulkPrep.list;
+  const ready = targets.filter((sch) => !bulkNeedsWork(sch));
+  const need = targets.filter(bulkNeedsWork);
+  $('#detail-sheet').innerHTML = `
+    <div class="sheet-handle"></div>
+    <div class="sheet-body">
+      <h3 class="sheet-title">한 번에 신청 준비</h3>
+      <p class="sheet-provider" id="bulk-sum"></p>
+      <label class="bulk-all"><input type="checkbox" id="bulk-all" checked /> 전체 선택</label>
+      ${ready.length ? `<p class="bulk-group-head">바로 준비돼요 · ${ready.length}건</p>${ready.map(bulkRowHtml).join('')}` : ''}
+      ${need.length ? `<p class="bulk-group-head">서류를 써야 해요 · ${need.length}건</p>${need.map(bulkRowHtml).join('')}
+        <p class="dp-note">이 ${need.length}건은 담아 둔 뒤 신청내역에서 자소서·신청서를 이어서 쓰면 돼요.</p>` : ''}
+      <button class="btn btn-primary btn-lg" id="btn-bulk-go"></button>
+      <p class="dp-note">※ 최종 제출은 한국장학재단·학교 등 공식 채널에서 이루어져요.</p>
+    </div>`;
+  bulkRefresh();
+  $('#detail-sheet').scrollTop = 0;
+}
+
+/* 체크를 눌렀을 때 **목록을 다시 그리지 않는다** — 다시 그리면 펼쳐 둔 '더보기'가 접히고
+   스크롤이 맨 위로 튄다. 바뀌는 것(줄 흐리기·합계·버튼)만 손댄다. */
+function bulkRefresh() {
+  const picked = bulkPrep.list.filter((sch) => bulkPrep.ids.has(sch.id));
+  const total = picked.reduce((sum, sch) => sum + (sch.amountValue || 0), 0);
+  /* 금액을 확인 못 한 공고는 합계에 넣지 않는다 — 지어낸 숫자를 섞지 않는다(원칙 8-1).
+     홈 히어로의 '금액 미확인 n건 제외'와 같은 규칙이다. */
+  const unknown = picked.filter((sch) => !sch.amountValue).length;
+  $('#bulk-sum').textContent = `선택 ${picked.length}건 · 최대 ${won(total)}${unknown ? ` · 금액 미확인 ${unknown}건 제외` : ''}`;
+  const all = $('#bulk-all');
+  if (all) all.checked = picked.length === bulkPrep.list.length;
+  $$('#detail-sheet [data-bulk]').forEach((box) => {
+    const row = box.closest('.bulk-row');
+    if (row) row.classList.toggle('off', !box.checked);
+  });
+  const go = $('#btn-bulk-go');
+  go.disabled = !picked.length;
+  go.textContent = `선택한 ${picked.length}건 준비하기`;
+}
+
+function bulkStart() {
+  /* 🔴 담기 직전에 마감을 한 번 더 본다. 목록을 열 때만 걸렀다면, 한참 보다가 자정을
+     넘겨 확인한 학생이 마감된 공고를 담게 된다. 빠진 건은 조용히 버리지 않고 알린다. */
+  const live = new Set(bulkTargets().map((sch) => sch.id));
+  const picked = bulkPrep.list.filter((sch) => bulkPrep.ids.has(sch.id));
+  const gone = picked.filter((sch) => !live.has(sch.id));
+  const go = picked.filter((sch) => live.has(sch.id));
+  if (!go.length) {
+    closeSheet();
+    toast(gone.length ? '고른 장학금이 그 사이 모두 마감됐어요' : '준비할 수 있는 장학금이 없어요');
+    return;
+  }
+  const need = go.filter(bulkNeedsWork);
+  go.forEach((sch) => state.applications.push({
+    id: sch.id, appliedAt: nowStamp(), step: 0, docs: null, pending: bulkNeedsWork(sch),
+  }));
   saveState();
-  toast(needsDocs.length
-    ? `${ready.length}건 준비 완료 · ${needsDocs.length}건은 신청내역에서 서류를 작성해 주세요`
-    : `장학금 ${ready.length}건 신청 준비가 완료됐어요 🎉`);
-  const current = $$('.screen').find((s) => !s.hidden);
-  if (current) showScreen(current.id.replace('screen-', ''));
+  closeSheet();
+  const goneMsg = gone.length ? ` · ${gone.length}건은 그 사이 마감돼 빼놓았어요` : '';
+  toast(need.length
+    ? `${go.length - need.length}건 준비 완료 · ${need.length}건은 신청내역에서 서류를 이어서 쓰세요${goneMsg}`
+    : `장학금 ${go.length}건 신청 준비가 완료됐어요 🎉${goneMsg}`);
+  showScreen('applications');
+}
+
+function applyAll() {
+  const targets = bulkTargets();
+  if (!targets.length) { toast('준비할 수 있는 장학금이 없어요'); return; }
+  bulkPrep = { list: targets, ids: new Set(targets.map((sch) => sch.id)) };
+  openSheetShell();
+  renderBulkPrep();
 }
 
 /* ---------------- 상세 바텀시트 ---------------- */
@@ -1411,13 +1614,7 @@ function openDetail(id) {
       ${canApply ? `<p class="dp-note">준비 완료 후 최종 제출처(${ch.label})를 안내해 드려요.${(!sch.formId && sch.prepFormId) ? ' 이 공고는 별도 양식 없이 자유 형식 제출을 받는 공고라, 앱이 제출용 지원문서 작성을 도와드려요.' : ''}</p>` : ''}
     </div>`;
 
-  $('#sheet-backdrop').hidden = false;
-  const sheet = $('#detail-sheet');
-  sheet.hidden = false;
-  requestAnimationFrame(() => {
-    $('#sheet-backdrop').classList.add('show');
-    sheet.classList.add('show');
-  });
+  openSheetShell();
 
   if (canApply) {
     $('#btn-apply-one').addEventListener('click', () => applyTo(sch));
@@ -1500,8 +1697,21 @@ function enableSheetSwipe(sheet, close) {
   }, { passive: true });
 }
 
+/* 바텀시트를 여는 동작 한 곳 — 상세 시트와 일괄 준비 목록이 **같은 함수**를 쓴다.
+   베끼면 열리는 모양이 갈라진다(내용은 부르는 쪽이 innerHTML 로 채운다). */
+function openSheetShell() {
+  $('#sheet-backdrop').hidden = false;
+  const sheet = $('#detail-sheet');
+  sheet.hidden = false;
+  requestAnimationFrame(() => {
+    $('#sheet-backdrop').classList.add('show');
+    sheet.classList.add('show');
+  });
+}
+
 function closeSheet() {
   docPrep = null;
+  bulkPrep = null;
   $('#sheet-backdrop').classList.remove('show');
   $('#detail-sheet').classList.remove('show');
   setTimeout(() => {
@@ -1909,6 +2119,23 @@ function bindEvents() {
   $('#sheet-backdrop').addEventListener('click', closeSheet);
   $('#detail-sheet').addEventListener('click', (e) => {
     if (e.target.classList.contains('sheet-handle')) closeSheet();
+    if (e.target.id === 'btn-bulk-go' && bulkPrep) bulkStart();
+  });
+  /* 일괄 준비 목록의 체크 — 시트는 innerHTML 이 계속 갈리므로 줄마다 리스너를 걸지 않고
+     **시트 하나에 위임**한다. 걸어 두면 다시 그릴 때마다 리스너가 쌓여 새는 자리가 된다. */
+  $('#detail-sheet').addEventListener('change', (e) => {
+    if (!bulkPrep) return;
+    if (e.target.id === 'bulk-all') {
+      bulkPrep.ids.clear();
+      if (e.target.checked) bulkPrep.list.forEach((sch) => bulkPrep.ids.add(sch.id));
+      $$('#detail-sheet [data-bulk]').forEach((box) => { box.checked = e.target.checked; });
+      bulkRefresh();
+      return;
+    }
+    const id = e.target.dataset && e.target.dataset.bulk;
+    if (!id) return;
+    if (e.target.checked) bulkPrep.ids.add(id); else bulkPrep.ids.delete(id);
+    bulkRefresh();
   });
   enableSheetSwipe($('#detail-sheet'), closeSheet);
   wireAppsManage();   // 신청 내역 — 왼쪽으로 밀어 삭제 · 선택 모드 (2026-08-24)

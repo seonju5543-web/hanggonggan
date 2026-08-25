@@ -1943,5 +1943,59 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
   eq('자격 줄이 아예 없으면 미확인', fit([], 평범).unread, true);
 }
 
+console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08-25 개발자 지적으로 수리)');
+/* 🔴 예전엔 app.js 첫머리에 `const TODAY = new Date()` 가 있었고 dday() 가 그 값을 썼다.
+   이 앱은 홈 화면에 설치해 쓰는 앱이라 한 번 연 화면이 며칠씩 살아 있다 — 그동안 그 값이
+   사흘 전인 채로 남아 **이미 마감된 공고가 D-2로 보이고 일괄 신청 준비 대상에도 들어갔다.**
+   되돌아가면 여기서 잡는다. 브라우저 없이 app.js 의 진짜 함수를 떼어 내 돌려 본다. */
+{
+  const appSrc = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+  /* 이름으로 함수 한 덩어리를 떼어 낸다 — 베낀 사본이 아니라 **진짜 코드**를 검사해야
+     의미가 있다(사본을 검사하면 원본이 바뀌어도 계속 통과한다). */
+  const grab = (name) => {
+    const start = appSrc.indexOf(`function ${name}(`);
+    if (start < 0) throw new Error(`app.js 에서 ${name} 을 못 찾음`);
+    let depth = 0, seen = false;
+    for (let i = appSrc.indexOf('{', start); i < appSrc.length; i++) {
+      if (appSrc[i] === '{') { depth++; seen = true; }
+      else if (appSrc[i] === '}') { depth--; if (seen && depth === 0) return appSrc.slice(start, i + 1); }
+    }
+    throw new Error(`${name} 의 끝을 못 찾음`);
+  };
+
+  eq('app.js 에 굳은 TODAY 상수가 없다', /^const\s+TODAY\s*=\s*new Date\(\);/m.test(appSrc), false);
+  eq('dday 가 todayStart() 로 오늘을 읽는다', /const startOfToday = todayStart\(\);/.test(appSrc), true);
+
+  /* Date 를 가짜 시계로 바꿔 끼운다 — 함수 인자로 넘기면 안쪽의 new Date() 가 이걸 쓴다 */
+  const make = (nowMs) => {
+    class FakeDate extends Date {
+      constructor(...a) { super(...(a.length ? a : [nowMs])); }
+      static now() { return nowMs; }
+    }
+    return new Function('Date', `${grab('todayStart')}\n${grab('dday')}\nreturn { todayStart, dday };`)(FakeDate);
+  };
+  const DAY = 86400000;
+  const 어제 = (ms) => new Date(ms - DAY).toISOString().slice(0, 10);
+
+  const t0 = Date.UTC(2026, 7, 25, 3, 0, 0);          // 2026-08-25 (KST 정오쯤)
+  eq('어제 마감은 마감이다', make(t0).dday(어제(t0)).label, '마감');
+  eq('오늘 마감은 D-DAY다', make(t0).dday(new Date(t0).toISOString().slice(0, 10)).label, 'D-DAY');
+
+  /* 🔴 이 항목이 이 절의 존재 이유다 — 앱을 켠 지 사흘 지난 상태.
+     TODAY 굳음이 되살아나면 '그때의 어제'가 여전히 D-2 로 나와 여기서 실패한다. */
+  const t3 = t0 + 3 * DAY;
+  eq('앱을 켠 지 사흘 지나도 그날의 어제는 마감이다', make(t3).dday(어제(t3)).label, '마감');
+  eq('사흘 전 기준의 D-2 는 이제 마감이다', make(t3).dday(어제(t0)).label, '마감');
+
+  /* 지원 자격을 '단어'로 옮기는 규칙 — 지어내지 않는지 본다(원칙 8-1) */
+  const bulkTags = new Function('FLAG_LABELS', 'TRACKS', `${grab('bulkTags')}\nreturn bulkTags;`)(
+    { basicLiving: '기초생활수급자' }, [{ id: 'eng', label: '공학계열' }]);
+  eq('구조로 저장된 자격만 단어로 옮긴다',
+    bulkTags({ eligibility: { minGpa: 3, maxBracket: 8, years: [2, 3], flagsAny: ['basicLiving'] } }),
+    ['기초생활수급자', '평점 3↑', '소득 8구간 이내', '2·3학년']);
+  eq('자격을 모르면 지어내지 않는다', bulkTags({ eligibility: {} }), ['자격 원문 확인']);
+  eq('자격 칸이 아예 없어도 지어내지 않는다', bulkTags({}), ['자격 원문 확인']);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);
