@@ -157,8 +157,19 @@ function parseNationality(t) {
 /* 🔴 학부생에게 해당하지 않는 줄 — `일반대학원생 : 2학기 이수자 이상, 평점 4.0 이상`.
    가톨릭대 동문장학금은 학부(3.3)와 대학원(4.0) 기준을 따로 적는데, 대학원 줄로 학부생을
    떨어뜨리고 있었다(2026-08-24 오탐). 이런 줄은 아예 판정에서 뺀다. */
-const GRAD_ONLY_LINE = /^\s*(일반)?\s*대학원\s?생?\s*[:：]|^\s*대학원\s?과정\s*[:：]/;
-function gradOnly(t) { return GRAD_ONLY_LINE.test(String(t || '')); }
+/* 🔴 예전에는 **`대학원생 :` 꼴의 이름표만** 잡았다. 그래서 `국내 대학원 박사과정
+   첫 번째 학기 재학자`처럼 문장으로 적힌 대학원 전용 줄이 학부생 화면에서 ✓를 받았다
+   (2026-08-24 전수 스윕에서 발견 — 동아시아연구장학생).
+   ⚠️ `본교 재학생 (학부 및 대학원생)`처럼 **학부를 함께 적은 줄은 대학원 전용이 아니다** —
+      학부생도 해당하므로 여기서 빼면 진짜 요건이 사라진다. */
+const GRAD_LABEL = /^\s*(일반)?\s*대학원\s?생?\s*[:：]|^\s*대학원\s?과정\s*[:：]/;
+const GRAD_BODY = /대학원\s?(석사|박사)?\s?과정|석사\s?(과정|학위)|박사\s?(과정|학위)|대학원\s?재학/;
+const UNDERGRAD_TOO = /학부|학사\s?과정|전문대/;
+function gradOnly(t) {
+  const x = String(t || '');
+  if (GRAD_LABEL.test(x)) return true;
+  return GRAD_BODY.test(x) && !UNDERGRAD_TOO.test(x);
+}
 
 /* ── 나이 ── `만 39세 이하` */
 function parseAge(t) {
@@ -194,5 +205,38 @@ function parseLine(line, isExclude) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { parseLine, gradOnly, GRADE_SCALE, STATUSES, HIGH, LOW, MULTI_PROGRAM, HAS_EXCEPTION };
+  module.exports = { parseLine, gradOnly, GRADE_SCALE, STATUSES, HIGH, LOW, MULTI_PROGRAM, HAS_EXCEPTION, caseBranch};
+}
+
+/* ── 경우별 분기 (2026-08-24 개발자 지적) ─────────────────────────────────
+   *"난 재학생(신입생)으로 했는데 복학생 및 편입생에도 체크 표시가 되어 있네."*
+
+   공고는 같은 기준을 **학적 경우별로** 나눠 적는다(정읍시민장학재단):
+     신입생: 2026년 1학기 85점 이상
+     재학생: 2025년 2학기와 2026년 1학기 각각 85점 이상
+     복학생 및 편입생<2026년 1학기 해당자>: 2026년 1학기 85점 이상
+     학년제 성적 산출 대학생: 2025학년도 1년 성적 85점 이상
+   이건 **네 개의 요건이 아니라 한 요건의 네 가지 경우**다. 한 학생에게는 하나만 해당한다.
+   그런데 줄마다 따로 판정해서 재학생인데 `신입생:` 줄에도 ✓가 붙고, 분모도 4로 부풀었다.
+
+   🔴 프로필에 없는 경우(편입생·재입학생·학년제)는 **빈 목록**을 준다 —
+      해당 여부를 모르므로 ✓도 ✕도 치지 않는다(모르면 판정하지 않는다).
+   ───────────────────────────────────────────────────────────────────── */
+const CASE_STATUS = [
+  [/^신입생/, ['신입학']],
+  [/^재학생/, ['재학', '초과학기', '졸업유예']],
+  [/^복학생/, ['복학예정']],
+  [/^편입생|^재입학생/, []],
+  [/^학년제/, []],
+];
+
+/** 이 줄이 '경우별 분기'인가 — 맞으면 그 경우에 해당하는 학적상태 목록, 아니면 null */
+function caseBranch(text) {
+  const t = String(text || '').trim();
+  /* 이름표가 줄 맨 앞에 있고 **콜론이 곧 따라와야** 분기다.
+     `직전학기 성적기준: 80점…`처럼 앞말이 다르면 분기가 아니다. */
+  const head = t.split(/[:：]/)[0];
+  if (head === t || head.length > 26) return null;
+  for (const [re, statuses] of CASE_STATUS) if (re.test(head)) return statuses;
+  return null;
 }

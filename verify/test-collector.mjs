@@ -1821,6 +1821,10 @@ console.log('\n■ 절 경계 — 제외 대상·선발기준이 자격으로 �
     vm.runInContext(`requirementLines({}, ${lines})`, ctx), ['서울시립대학교 재학생']);
   eq('브라우저에서 제외 줄은 제외 칸으로 간다',
     vm.runInContext(`requirementLines({}, ${lines}, {onlyExclude:true})`, ctx), ['휴학생, 졸업생, 자퇴생']);
+  /* 🔴 브라우저 전역 목록에 이름을 빠뜨리면 Node 검사는 통과하는데 앱이 죽는다 —
+     headRest에 이어 caseBranch로 두 번째다(2026-08-24). 경우별 분기까지 실제로 불러 본다. */
+  eq('브라우저에서 경우별 분기가 돈다',
+    vm.runInContext(`requirementLines({}, ["신입생: 2026년 1학기 85점 이상","재학생: 2025년 2학기 85점 이상"])`, ctx).length, 2);
   eq('브라우저에서 머리글 뒤 내용도 살린다',
     vm.runInContext(`requirementLines({}, ["2) 추천대상 : 4년제 대학교 이공계 전공 새터민으로 재학 예정인 대학생"])`, ctx),
     ['4년제 대학교 이공계 전공 새터민으로 재학 예정인 대학생']);

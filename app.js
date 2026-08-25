@@ -607,6 +607,18 @@ const LEARNED_COMMON = [
      · 0%      → 왜 안 되는지 (미달 사유)
      · 미확인   → 앱이 자격을 못 읽었음을 밝힌다 (지어내지 않는다 — 원칙 8-1)
      · 그 외    → 요건 n개 중 m개 충족 */
+/* 🔴 적합도 색깔 (2026-08-24 개발자 지시): "빨강 주황 노랑 초록 파랑 순이고
+   제일 딸리는 게 빨강, 제일 적합한 게 파랑."
+   ⚠️ 색만으로 뜻을 전하지 않는다 — 숫자와 '요건 n개 중 m개'가 늘 함께 간다
+   (색각 이상이 있는 학생에게 색은 아무 말도 하지 않는다). */
+function fitTone(pct) {
+  if (pct >= 80) return 'blue';
+  if (pct >= 60) return 'green';
+  if (pct >= 40) return 'yellow';
+  if (pct >= 20) return 'orange';
+  return 'red';
+}
+
 function fitBadgeHtml(fit, fd) {
   if (!fd) return fit > 0 ? `<span class="badge badge-fit">적합도 ${fit}%</span>` : '';
   if (fd.unread) return '<span class="badge badge-fit-unknown">자격 미확인</span>';
@@ -615,7 +627,7 @@ function fitBadgeHtml(fit, fd) {
      숫자는 순서를 정할 뿐이고 뜻은 배지가 전한다 — 그 뜻의 근거는 fails다. */
   if (fd.fails && fd.fails.length) return '<span class="badge badge-fit-no">지원 자격 미달</span>';
   const note = fd.unknown > 0 ? ` · 확인 필요 ${fd.unknown}` : '';
-  return `<span class="badge badge-fit">적합도 ${fd.pct}% <em>요건 ${fd.total}개 중 ${fd.met}개 충족${note}</em></span>`;
+  return `<span class="badge badge-fit fit-${fitTone(fd.pct)}">적합도 ${fd.pct}% <em>요건 ${fd.total}개 중 ${fd.met}개 충족${note}</em></span>`;
 }
 
 /* ---------------- 카드 렌더링 ---------------- */
@@ -635,7 +647,11 @@ function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
       <p class="sch-name">${esc(sch.name)}</p>
       <p class="sch-amount">${esc(sch.amount)}</p>
       ${compact ? '' : `<p class="sch-provider">${esc(sch.provider)}</p>`}
-      <span class="status-pill pill-${meta.cls}">${meta.label}</span>
+      ${/* 🔴 옛 판정 배지('지원 가능 · 선발 심사')를 **카드에서** 뺐다 (2026-08-24).
+           적합도 배지가 생긴 뒤로 한 카드에 판정이 둘이었고 서로 다른 축을 말해서,
+           `자격 미확인`인데 `지원 가능`이 함께 떴다. 학생은 '지원 가능'만 보고 들어갔다가
+           자격이 안 맞으면 헛걸음한다 — 이 앱이 없애려는 바로 그 피로감이다.
+           상세 시트에는 그대로 둔다(거기서는 마감·접수 상태를 함께 읽는다). */ ''}
     </button>`;
 }
 

@@ -16,7 +16,10 @@ const SH = (typeof module !== 'undefined' && module.exports)
       전역 이름을 그대로 쓰면 <script>·importScripts 양쪽에서 잡힌다. */
 const PR = (typeof module !== 'undefined' && module.exports)
   ? require('./parse-requirements.js')
-  : { parseLine, gradOnly, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM };
+  /* 🔴 브라우저에서는 **전역 함수**로 쓴다 — 여기에 이름을 빠뜨리면 Node 검사는 전부
+     통과하는데 앱은 첫 카드에서 죽는다. `headRest`(section-head)에 이어 `caseBranch`도
+     같은 실수를 했다(2026-08-24). 아래 회귀가 브라우저 순서로 실어 실제로 불러 본다. */
+  : { parseLine, gradOnly, caseBranch, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM };
 const PR2 = PR;   // requirementLines가 쓰는 별칭 (선언 순서 때문에 이름만 따로 둔다)
 
 /* 자격 진단 — 프로필과 공고의 요건을 대조해 상태·사유·부족정보를 돌려준다 */
@@ -207,6 +210,11 @@ function judgeCond(c, p) {
 function lineVerdict(text, p, isExclude, ctx) {
   if (!p) return null;
   if (PR.gradOnly(text)) return null;          // 대학원 전용 줄 — 학부생과 무관
+  /* 🔴 경우별 분기(`신입생:` `재학생:` `복학생 및 편입생:`)는 **내 경우만** 판정한다
+     (2026-08-24 개발자 지적). 안 그러면 재학생인데 `신입생:` 줄에도 ✓가 붙는다.
+     프로필에 없는 경우(편입생·학년제)는 해당 여부를 모르므로 아무 표시도 안 한다. */
+  const cases = PR.caseBranch(text);
+  if (cases && !(p.status && cases.includes(p.status))) return null;
   /* 🔴 아래 둘은 **미달이라고 말하면 안 되는 자리**다 (2026-08-24 전수 대조에서 발견).
      퍼센트는 이미 맞게 처리하고 있었는데 화면 표시만 ✕가 떠서 서로 어긋났다. */
   if (ctx && ctx.multi) return null;                        // 장학금이 여럿 묶인 공고
@@ -676,6 +684,7 @@ function requirementLines(sch, lines, opts) {
   let asideBase = 'qualify';   // 곁말 전에 있던 절 — 번호 항목을 만나면 여기로 돌아온다
   let anyLeft = 0, anyGroup = 0;   // 선택지 묶음 — 몇 줄 남았나 / 몇 번째 묶음인가 (위 주석)
   const meta = [];                 // out과 같은 순서로 각 줄의 묶음 번호
+  let caseRun = false, caseGroup = 0;   // 연달아 오는 '경우별 분기'를 한 묶음으로 (아래 주석)
   for (const l of joined) {
     let t = tidyRequirement(l);
     const head = SH.sectionOf(l) || SH.sectionOf(t);
@@ -792,7 +801,15 @@ function requirementLines(sch, lines, opts) {
     }
     if (!out.includes(t)) {
       out.push(t);
-      meta.push(anyLeft > 0 ? anyGroup : 0);   // 0 = 반드시 충족 / 1 이상 = 그 묶음 중 하나만
+      /* 🔴 연달아 오는 경우 분기는 **한 요건**이다 — 따로 세면 분모가 부풀어
+         정읍시민이 요건 7개(실제 4개)로 잡혔다. 첫 분기에서 묶음을 열고 이어 붙인다. */
+      if (PR.caseBranch(t)) {
+        if (!caseRun) { caseGroup = (anyGroup += 1); caseRun = true; }
+        meta.push(caseGroup);
+      } else {
+        caseRun = false;
+        meta.push(anyLeft > 0 ? anyGroup : 0);   // 0 = 반드시 충족 / 1 이상 = 그 묶음 중 하나만
+      }
       if (anyLeft > 0) anyLeft -= 1;
     }
     /* 5줄이면 충분하다 — 더 늘어놓으면 학생이 안 읽는다. 사람이 정리한 것처럼 보여야 한다.
