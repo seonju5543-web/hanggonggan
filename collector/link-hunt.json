@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-08-25",
+ "updatedAt": "2026-08-26",
  "items": {
   "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2668%20%5B%ED%99%8D%EB%B3%B4%5D%20%ED%95%9C%EA%B5%AD%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EA%B3%B5%EA%B3%B5%EB%8D%B0%EC%9D%B4%ED%84%B0%20%EA%B0%9C%EB%B0%A9%20%EB%B0%8F%20%ED%99%9C%EC%9A%A9%20%EC%95%88%EB%82%B4%202026.0": {
    "attempts": 5,
@@ -3188,11 +3188,11 @@
    "lastWhy": ""
   },
   "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-%EA%B3%B5%EC%A7%80%20%EA%B3%B5%EC%A7%80%20%ED%95%99%EC%9E%90%EA%B8%88%EB%8C%80%EC%B6%9C%20%EA%B8%B0%EB%93%B1%EB%A1%9D%EC%B2%98%EB%A6%AC%20%EA%B4%80%EB%A0%A8%20%EA%B3%B5%EC%A7%80%20(8%2F31%EC%9D%BC%20%EC%9D%B4%ED%9B%84%EA%B0%80%EB%8A%A5)%20202": {
-   "attempts": 1,
+   "attempts": 2,
    "title": "공지 공지 학자금대출 기등록처리 관련 공지 (8/31일 이후가능) 2026.08.24. 조회 82",
-   "lastTried": "2026-08-25",
+   "lastTried": "2026-08-26",
    "lastWhy": "HTTP 404",
-   "nextTryAt": "2026-08-26",
+   "nextTryAt": "2026-08-27",
    "status": ""
   },
   "n:https://www.yonsei.ac.kr/bbs/sc/58/943933/artclView.do": {
@@ -3273,6 +3273,116 @@
   },
   "n:https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=57138&bidx=894091&qidx=57138&cate=0&allboard=true&nowpage=2": {
    "patrolledAt": "2026-08-25",
+   "lastWhy": ""
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5#n-(%EB%8B%A4%EB%B9%88%EC%B9%98)%202026%ED%95%99%EB%85%84%EB%8F%84%20%EB%8B%A4%EB%B9%88%EC%B9%98%EC%BA%A0%ED%8D%BC%EC%8A%A4%202%ED%95%99%EA%B8%B0%20%ED%95%99%EA%B8%B0%20%EC%A4%91%20%EA%B5%90%EB%82%B4%E2%80%A2%EC%99%B8%EA%B7%BC%EB%A1%9C%20%EA%B5%AD%EA%B0%80%EA%B7%BC": {
+   "attempts": 0,
+   "title": "(다빈치) 2026학년도 다빈치캠퍼스 2학기 학기 중 교내•외근로 국가근로장학생 선발 안내",
+   "lastTried": "2026-08-26",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30099&pageNo=1"
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5#n-(%EC%84%9C%EC%9A%B8)2026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EC%84%9C%EC%9A%B8%EC%BA%A0%ED%8D%BC%EC%8A%A4%20%ED%95%99%EA%B8%B0%EC%A4%91%20%EC%9D%BC%EB%B0%98%20%EA%B5%90%EB%82%B4%C2%B7%EC%99%B8%20%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99": {
+   "attempts": 1,
+   "title": "(서울)2026학년도 2학기 서울캠퍼스 학기중 일반 교내·외 국가근로장학생 선발 안내",
+   "lastTried": "2026-08-26",
+   "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)",
+   "nextTryAt": "2026-08-27",
+   "status": ""
+  },
+  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2691%20%5B%ED%99%8D%EB%B3%B4%5D%202026%EB%85%84%202%ED%95%99%EA%B8%B0%20%EC%84%A0%EC%9B%90%EA%B0%80%EC%A1%B1%EC%9E%A5%ED%95%99%EC%82%AC%EC%97%85%20%EC%95%88%EB%82%B4%202026.08.": {
+   "attempts": 0,
+   "title": "2691 [홍보] 2026년 2학기 선원가족장학사업 안내 2026.08.25. 조회 39",
+   "lastTried": "2026-08-26",
+   "lastWhy": "page.goto: net::ERR_CONNECTION_CLOSED at https://www.don"
+  },
+  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2690%20%5B%ED%99%8D%EB%B3%B4%5D%20(%EC%9E%AC)%EB%8B%AC%EC%84%9C%EC%9D%B8%EC%9E%AC%EC%9C%A1%EC%84%B1%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%202026%EB%85%84%EB%8F%84%20%ED%95%98%EB%B0%98%EA%B8%B0%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0": {
+   "attempts": 0,
+   "title": "2690 [홍보] (재)달서인재육성장학재단 2026년도 하반기 장학생 선발 안내 2026.08.25. 조회 53",
+   "lastTried": "2026-08-26",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765887"
+  },
+  "n:https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31318&sort=2&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&": {
+   "patrolledAt": "2026-08-26",
+   "lastWhy": ""
+  },
+  "n:https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&nttId=31313": {
+   "patrolledAt": "2026-08-26",
+   "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)"
+  },
+  "n:https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&nttId=28791": {
+   "patrolledAt": "2026-08-26",
+   "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)"
+  },
+  "n:https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54696": {
+   "patrolledAt": "2026-08-26",
+   "lastWhy": ""
+  },
+  "n:https://www.yonsei.ac.kr/bbs/sc/58/943941/artclView.do": {
+   "patrolledAt": "2026-08-26",
+   "lastWhy": ""
+  },
+  "n:https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=139337&article.offset=0&articleLimit=10": {
+   "patrolledAt": "2026-08-26",
+   "lastWhy": ""
+  },
+  "n:https://dep.hufs.ac.kr/bbs/student/2431/263858/artclView.do": {
+   "patrolledAt": "2026-08-26",
+   "lastWhy": ""
+  },
+  "n:https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53175&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
+   "patrolledAt": "2026-08-26",
+   "lastWhy": ""
+  },
+  "n:https://www.gachon.ac.kr/bbs/kor/478/119763/artclView.do": {
+   "patrolledAt": "2026-08-26",
+   "lastWhy": ""
+  },
+  "n:https://www.gachon.ac.kr/bbs/kor/478/119761/artclView.do": {
+   "patrolledAt": "2026-08-26",
+   "lastWhy": ""
+  },
+  "n:https://www.gachon.ac.kr/bbs/kor/478/119757/artclView.do": {
+   "patrolledAt": "2026-08-26",
+   "lastWhy": ""
+  },
+  "n:https://www.gachon.ac.kr/bbs/kor/478/119753/artclView.do": {
+   "patrolledAt": "2026-08-26",
+   "lastWhy": ""
+  },
+  "n:https://www.gachon.ac.kr/bbs/kor/478/119645/artclView.do": {
+   "patrolledAt": "2026-08-26",
+   "lastWhy": ""
+  },
+  "n:https://www.gachon.ac.kr/bbs/kor/478/120455/artclView.do": {
+   "patrolledAt": "2026-08-26",
+   "lastWhy": "제목 불일치(다른 글이 열림)"
+  },
+  "n:https://www.gachon.ac.kr/bbs/kor/478/119643/artclView.do": {
+   "patrolledAt": "2026-08-26",
+   "lastWhy": ""
+  },
+  "n:https://www.gachon.ac.kr/bbs/kor/478/119641/artclView.do": {
+   "patrolledAt": "2026-08-26",
+   "lastWhy": ""
+  },
+  "n:https://www.gachon.ac.kr/bbs/kor/478/119619/artclView.do": {
+   "patrolledAt": "2026-08-26",
+   "lastWhy": ""
+  },
+  "n:https://www.gachon.ac.kr/bbs/kor/478/119561/artclView.do": {
+   "patrolledAt": "2026-08-26",
+   "lastWhy": ""
+  },
+  "n:https://www.gachon.ac.kr/bbs/kor/478/119502/artclView.do": {
+   "patrolledAt": "2026-08-26",
+   "lastWhy": ""
+  },
+  "n:https://www.gachon.ac.kr/bbs/kor/478/119423/artclView.do": {
+   "patrolledAt": "2026-08-26",
    "lastWhy": ""
   }
  }
