@@ -131,5 +131,11 @@
   "at": "2026-08-24",
   "minBody": 100,
   "name": "[공지사항-기타공지] 2026-2학기 지성학Ⅱ 서포터즈 장학생 모집 안내"
+ },
+ "https://www.hongik.ac.kr/kr/newscenter/notice.do?articleno=154473&nocat=501": {
+  "tries": 1,
+  "at": "2026-08-26",
+  "minBody": 100,
+  "name": "[화성시] 2026년 코나아이 소상공인 장학생 모집"
  }
 }
