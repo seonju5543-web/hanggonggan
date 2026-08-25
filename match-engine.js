@@ -107,7 +107,15 @@ function evaluate(sch, p) {
      · 요건을 하나도 못 읽은 공고는 **35%** + '자격 미확인'
    ══════════════════════════════════════════════════════════════════════════ */
 const FIT_UNREAD = 35;   // 자격을 하나도 못 읽은 공고 (실측 53건) — 읽어낸 공고보다 낮게 깐다
-const FIT_FLOOR = 15;    // 요건은 읽었으나 하나도 충족을 확인 못 한 경우. 0%(미달 확정)와 구분한다
+const FIT_FLOOR = 15;    // 요건은 읽었으나 하나도 충족을 확인 못 한 경우. 미달 확정과 구분한다
+/* 🔴 **100%도 0%도 쓰지 않는다** (2026-08-24 개발자 지시: "아무리 적합해도 혹시 모르니까").
+   근거가 있는 조심이다 — 자격이 첨부 HWP 안에만 있거나, 발췌기가 절을 통째로 놓쳤거나,
+   원문에 안 적힌 조건이 있을 수 있다. 앱은 **자기가 읽은 것**만 알지 공고의 전부를 알지 못한다.
+   100은 '완벽히 맞는다', 0은 '절대 안 된다'는 뜻이라 앱이 낼 수 있는 말이 아니다.
+   대신 뜻은 배지가 전한다 — 미달은 '지원 자격 미달' 빨강, 확인 필요는 개수로.
+   숫자는 순서를 정하는 일만 한다. */
+const FIT_MAX = 95;      // 다 맞아도 95 — 못 읽은 요건이 있을 수 있다
+const FIT_MIN = 5;       // 미달이어도 5 — 파싱이 틀렸을 수 있다 (0이면 학생이 아예 안 본다)
 
 /* 파싱된 조건 하나를 학생과 맞춰 본다 → 'pass' | 'fail' | 'unknown'
    🔴 **모르면 unknown**이다. 틀린 fail은 학생에게서 장학금을 뺏는다. */
@@ -245,7 +253,12 @@ function fitDetail(sch, p) {
   const lines = (sch && sch.eligibilityLines) || [];
   /* 🔴 대학원 전용 줄은 **분모에서도 뺀다** — 건너뛰기만 하면 학부생에게 무관한 줄이
      '확인 필요'로 남아 점수를 깎는다(가톨릭대 동문장학금이 50%로 떨어졌다). */
-  const items = requirementLines(sch, lines, { withMeta: true }).filter((it) => !PR.gradOnly(it.text));
+  /* 🔴 **화면 5줄 상한을 점수에 적용하면 안 된다** (2026-08-24 개발자 지적으로 발견).
+     화면은 5줄만 보여 주는데 점수도 그 5줄만 세고 있었다. 그래서 삼일장학회(중앙대)는
+     요건이 **9개**인데 5개만 맞으면 '요건 5개 중 5개 충족 · 100%'가 떴다 —
+     확인조차 안 한 요건 4개가 점수에서 통째로 빠진 것이다(실측 15건 · 23줄).
+     점수는 `all: true`로 **전부** 세고, 화면에 몇 줄을 띄우는지는 따로 정한다. */
+  const items = requirementLines(sch, lines, { withMeta: true, all: true }).filter((it) => !PR.gradOnly(it.text));
   if (!items.length) return { pct: FIT_UNREAD, unread: true, met: 0, total: 0, unknown: 0, fails: [] };
 
   const exLines = requirementLines(sch, [...((sch && sch.eligibilityExcludes) || []), ...lines], { onlyExclude: true });
@@ -284,9 +297,10 @@ function fitDetail(sch, p) {
   }
 
   const total = items.filter((it) => it.group === 0).length + groups.size;
-  if (fails.length) return { pct: 0, unread: false, met, total, unknown, fails };
+  /* 미달이어도 0이 아니라 FIT_MIN — 파싱이 틀렸을 가능성을 남긴다(위 FIT_MIN 주석) */
+  if (fails.length) return { pct: FIT_MIN, unread: false, met, total, unknown, fails };
   const pct = total ? Math.round((met / total) * 100) : FIT_UNREAD;
-  return { pct: Math.max(FIT_FLOOR, pct), unread: false, met, total, unknown, fails: [] };
+  return { pct: Math.min(FIT_MAX, Math.max(FIT_FLOOR, pct)), unread: false, met, total, unknown, fails: [] };
 }
 
 function fitScore(sch, result, p) {
@@ -783,7 +797,7 @@ function requirementLines(sch, lines, opts) {
     }
     /* 5줄이면 충분하다 — 더 늘어놓으면 학생이 안 읽는다. 사람이 정리한 것처럼 보여야 한다.
        못 담은 것은 바로 아래 '원문 보기'로 갈 수 있다. */
-    if (out.length >= 5) break;
+    if (!(opts && opts.all) && out.length >= 5) break;
   }
   /* 🔴 자격 칸을 **비우면서까지** 순위를 걷어내지는 않는다 (2026-08-24) —
      학계장학문화재단은 `소득분위가 낮고 학업성적이 우수한 학생`이 공고의 유일한 조건이라,
@@ -889,7 +903,7 @@ function requirementStruct(sch) {
 
 /* Node(검증 스크립트)에서도 같은 엔진을 불러 쓸 수 있게 — 브라우저·서비스워커에는 영향 없음 */
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { evaluate, fitScore, fitDetail, judgeCond, FIT_UNREAD, FIT_FLOOR,
+  module.exports = { evaluate, fitScore, fitDetail, judgeCond, FIT_UNREAD, FIT_FLOOR, FIT_MAX, FIT_MIN,
                      scopedToProfile, notStale, STALE_DAYS,
                      requirementLines, requirementStruct, requirementMatch, tidyRequirement,
                      REQ_SIGNAL, NOT_A_REQUIREMENT, EXCLUDE_LINE, HARD_THRESHOLD,

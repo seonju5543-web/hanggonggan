@@ -610,7 +610,10 @@ const LEARNED_COMMON = [
 function fitBadgeHtml(fit, fd) {
   if (!fd) return fit > 0 ? `<span class="badge badge-fit">적합도 ${fit}%</span>` : '';
   if (fd.unread) return '<span class="badge badge-fit-unknown">자격 미확인</span>';
-  if (fd.pct === 0) return '<span class="badge badge-fit-no">지원 자격 미달</span>';
+  /* 🔴 미달은 **숫자가 아니라 fails로** 판정한다 (2026-08-24). 0%를 안 쓰기로 하면서
+     `pct === 0`이 영영 참이 되지 않아 '지원 자격 미달' 배지가 통째로 사라졌었다.
+     숫자는 순서를 정할 뿐이고 뜻은 배지가 전한다 — 그 뜻의 근거는 fails다. */
+  if (fd.fails && fd.fails.length) return '<span class="badge badge-fit-no">지원 자격 미달</span>';
   const note = fd.unknown > 0 ? ` · 확인 필요 ${fd.unknown}` : '';
   return `<span class="badge badge-fit">적합도 ${fd.pct}% <em>요건 ${fd.total}개 중 ${fd.met}개 충족${note}</em></span>`;
 }
@@ -1443,7 +1446,10 @@ function openDetail(id) {
   /* 요건은 원문을 통째로 붙이지 않고 **짧게 다듬어 번호를 매겨** 보여 준다.
      프로필과 확실히 맞으면 ✓, 확실히 안 맞으면 ✕, 판정할 수 없으면 색 없이 둔다
      (2026-08-02 개발자 지시). 판정 규칙은 match-engine에 있어 알림과 갈라지지 않는다. */
-  const reqLines = requirementLines(sch);
+  /* 🔴 상세 시트는 요건을 **전부** 보여 준다 (2026-08-24). 화면 상한(5줄) 때문에
+     배지는 '요건 9개 중 3개 충족'이라고 하는데 시트에는 5줄만 떠서, 학생이 세어 보면
+     숫자가 안 맞았다. 카드는 요약이라 짧아도 되지만 **상세는 읽으러 오는 자리**다. */
+  const reqLines = requirementLines(sch, null, { all: true });
   /* 요건 한 줄을 그리는 법 — 구조 렌더와 평평한 렌더가 **같은 함수**를 쓴다.
      따로 두면 한쪽만 고쳐져서 두 모양의 판정이 갈라진다. */
   const reqRow = (e, extra) => {
