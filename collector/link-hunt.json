@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-08-24",
+ "updatedAt": "2026-08-25",
  "items": {
   "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2668%20%5B%ED%99%8D%EB%B3%B4%5D%20%ED%95%9C%EA%B5%AD%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EA%B3%B5%EA%B3%B5%EB%8D%B0%EC%9D%B4%ED%84%B0%20%EA%B0%9C%EB%B0%A9%20%EB%B0%8F%20%ED%99%9C%EC%9A%A9%20%EC%95%88%EB%82%B4%202026.0": {
    "attempts": 5,
@@ -2442,17 +2442,17 @@
   "r:reg-cau-samil": {
    "attempts": 0,
    "title": "삼일장학회 희망/동행 장학생 (중앙대 접수)",
-   "lastTried": "2026-08-23",
+   "lastTried": "2026-08-25",
    "lastWhy": "",
    "status": "resolved",
    "nextTryAt": "2026-08-24",
-   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?SITE_NO=2&MENU_ID=100&CONTENTS_NO=1&P_TAB_NO=1&BOARD_SEQ=4&BBS_SEQ=29987",
+   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=29987&pageNo=3",
    "patrolledAt": "2026-08-23"
   },
   "r:reg-cau-geunro-out": {
    "attempts": 0,
    "title": "하계방학 교외 근로지 국가근로장학생 추가 모집 (다빈치)",
-   "lastTried": "2026-08-23",
+   "lastTried": "2026-08-25",
    "lastWhy": "",
    "status": "resolved",
    "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=29982&pageNo=3"
@@ -2460,7 +2460,7 @@
   "r:reg-cau-geunro-in": {
    "attempts": 0,
    "title": "하계방학 국가근로장학금(교내·교외) 추가 선발 (다빈치)",
-   "lastTried": "2026-08-23",
+   "lastTried": "2026-08-25",
    "lastWhy": "",
    "status": "resolved",
    "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=29980&pageNo=3"
@@ -2468,7 +2468,7 @@
   "r:reg-cau-bogun-multi": {
    "attempts": 0,
    "title": "보건장학회 다문화가정 장학생 (중앙대 접수)",
-   "lastTried": "2026-08-23",
+   "lastTried": "2026-08-25",
    "lastWhy": "",
    "status": "resolved",
    "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=29992&pageNo=3"
@@ -2476,35 +2476,35 @@
   "r:reg-cau-gomduri": {
    "attempts": 0,
    "title": "쌍용곰두리장학생 (중앙대 접수)",
-   "lastTried": "2026-08-23",
+   "lastTried": "2026-08-25",
    "lastWhy": "",
    "status": "resolved",
    "nextTryAt": "2026-08-24",
-   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?SITE_NO=2&MENU_ID=100&CONTENTS_NO=1&P_TAB_NO=1&BOARD_SEQ=4&BBS_SEQ=29996",
+   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=29996&pageNo=3",
    "patrolledAt": "2026-08-23"
   },
   "r:reg-cau-gyonae": {
    "attempts": 0,
    "title": "교내장학금 보훈·국가시험지원·가족·중앙나래 (중앙대)",
-   "lastTried": "2026-08-23",
+   "lastTried": "2026-08-25",
    "lastWhy": "",
    "status": "resolved",
-   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30000&pageNo=4",
+   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30000&pageNo=1",
    "patrolledAt": "2026-08-23"
   },
   "r:reg-cau-sunglim": {
    "attempts": 0,
    "title": "성림교회 대학장학생 (2026 하반기)",
-   "lastTried": "2026-08-23",
+   "lastTried": "2026-08-25",
    "lastWhy": "",
    "status": "resolved",
-   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30009&pageNo=4",
+   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30009&pageNo=1",
    "patrolledAt": "2026-08-23"
   },
   "r:reg-cau-ilchwi": {
    "attempts": 0,
    "title": "일취월장 장학금 (중앙대 서울캠퍼스, 2026-1학기)",
-   "lastTried": "2026-08-23",
+   "lastTried": "2026-08-25",
    "lastWhy": "",
    "status": "resolved",
    "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30031&pageNo=2"
@@ -2512,16 +2512,16 @@
   "r:reg-cau-bokji-seoul": {
    "attempts": 0,
    "title": "복지장학금 (중앙대 서울캠퍼스, 2026-1학기)",
-   "lastTried": "2026-08-23",
+   "lastTried": "2026-08-25",
    "lastWhy": "",
    "status": "resolved",
-   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30018&pageNo=3",
+   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30018&pageNo=1",
    "patrolledAt": "2026-08-23"
   },
   "r:reg-cau-bokji-davinci": {
    "attempts": 0,
    "title": "복지장학금 (중앙대 다빈치캠퍼스, 2026-1학기)",
-   "lastTried": "2026-08-24",
+   "lastTried": "2026-08-25",
    "lastWhy": "",
    "status": "resolved",
    "nextTryAt": "2026-08-24",
@@ -2831,12 +2831,14 @@
    "lastWhy": ""
   },
   "n:https://kau.ac.kr/kaulife/scholnoti.php#n-2026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EB%94%94%EB%94%A4%EB%8F%8C%20%EC%9E%A5%ED%95%99%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4%20%ED%95%99%EC%83%9D%EC%A7%80%EC%9B%90%ED%8C%80%202026-08-2": {
-   "attempts": 2,
+   "attempts": 3,
    "title": "2026학년도 2학기 디딤돌 장학 신청 안내 학생지원팀 2026-08-21 45",
-   "lastTried": "2026-08-24",
+   "lastTried": "2026-08-25",
    "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-08-25",
-   "status": ""
+   "nextTryAt": "2026-08-28",
+   "status": "",
+   "escalated": true,
+   "likelyGone": true
   },
   "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%202026%EB%85%84%EB%8F%84%20(%EC%9E%AC)%EA%B4%91%EC%82%B0%EC%9E%A5%ED%95%99%ED%9A%8C%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4": {
    "attempts": 0,
@@ -2879,12 +2881,14 @@
    "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322848"
   },
   "n:https://www.yonsei.ac.kr/bbs/sc/58/artclList.do?findClSeq=257#n-%EC%9D%BC%EB%B0%98%EA%B3%B5%EC%A7%80%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EA%B2%BD%EB%B0%A9%EC%9C%A1%EC%98%81%ED%9A%8C%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%8B%A0%EC%B4%8C%2F%EA%B5%AD%EC%A0%9C": {
-   "attempts": 2,
+   "attempts": 3,
    "title": "일반공지 2026학년도 2학기 경방육영회 장학생 선발 신촌/국제",
-   "lastTried": "2026-08-24",
+   "lastTried": "2026-08-25",
    "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-08-25",
-   "status": ""
+   "nextTryAt": "2026-08-28",
+   "status": "",
+   "escalated": true,
+   "likelyGone": true
   },
   "n:https://www.konkuk.ac.kr/bbs/konkuk/235/1204186/artclView.do": {
    "patrolledAt": "2026-08-23",
@@ -3015,12 +3019,13 @@
    "lastWhy": ""
   },
   "n:https://dep.hufs.ac.kr/student/12767/subview.do#n-%5B%EA%B3%B5%ED%86%B5%5D%5B%EA%B5%AD%EA%B0%80%5D%20%EC%9E%A5%ED%95%99%EA%B8%88%20%EB%B6%80%EC%A0%95%EC%B2%AD%EA%B5%AC%20%EC%9E%90%EC%A7%84%EC%8B%A0%EA%B3%A0%20%EC%95%88%EB%82%B4%20%EC%83%88%EA%B8%80": {
-   "attempts": 2,
+   "attempts": 3,
    "title": "[공통][국가] 장학금 부정청구 자진신고 안내 새글",
-   "lastTried": "2026-08-24",
+   "lastTried": "2026-08-25",
    "lastWhy": "목록 화면(다른 공고 제목이 여럿 보임)",
-   "nextTryAt": "2026-08-25",
-   "status": ""
+   "nextTryAt": "2026-08-28",
+   "status": "",
+   "escalated": true
   },
   "n:https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2467&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0": {
    "patrolledAt": "2026-08-23",
@@ -3180,6 +3185,94 @@
   },
   "n:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=2026%EB%85%84-%ED%95%9C%EA%B5%AD%EB%8C%80%ED%95%99%EC%9C%A0%ED%95%99%EC%83%9D%EC%8B%A4%EB%AC%B4%EC%9E%90%ED%98%91%EC%9D%98%ED%9A%8Caisa-%EC%9E%A5%ED%95%99%EC%83%9D-%EC%84%A0%EB%B0%9C%EC%99%B8&keyword=%EC%9E%A5%ED%95%99": {
    "patrolledAt": "2026-08-24",
+   "lastWhy": ""
+  },
+  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-%EA%B3%B5%EC%A7%80%20%EA%B3%B5%EC%A7%80%20%ED%95%99%EC%9E%90%EA%B8%88%EB%8C%80%EC%B6%9C%20%EA%B8%B0%EB%93%B1%EB%A1%9D%EC%B2%98%EB%A6%AC%20%EA%B4%80%EB%A0%A8%20%EA%B3%B5%EC%A7%80%20(8%2F31%EC%9D%BC%20%EC%9D%B4%ED%9B%84%EA%B0%80%EB%8A%A5)%20202": {
+   "attempts": 1,
+   "title": "공지 공지 학자금대출 기등록처리 관련 공지 (8/31일 이후가능) 2026.08.24. 조회 82",
+   "lastTried": "2026-08-25",
+   "lastWhy": "HTTP 404",
+   "nextTryAt": "2026-08-26",
+   "status": ""
+  },
+  "n:https://www.yonsei.ac.kr/bbs/sc/58/943933/artclView.do": {
+   "patrolledAt": "2026-08-25",
+   "lastWhy": ""
+  },
+  "n:https://dep.hufs.ac.kr/bbs/student/2431/263714/artclView.do": {
+   "patrolledAt": "2026-08-25",
+   "lastWhy": ""
+  },
+  "n:https://www.mju.ac.kr/bbs/mjukr/145/234639/artclView.do": {
+   "patrolledAt": "2026-08-25",
+   "lastWhy": ""
+  },
+  "n:https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=374088&article.offset=0&articleLimit=10": {
+   "patrolledAt": "2026-08-25",
+   "lastWhy": ""
+  },
+  "n:https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=374069&article.offset=0&articleLimit=10": {
+   "patrolledAt": "2026-08-25",
+   "lastWhy": ""
+  },
+  "n:https://www.kookmin.ac.kr/user/kmuNews/notice/7/12258/view.do?currentPageNo=1": {
+   "patrolledAt": "2026-08-25",
+   "lastWhy": ""
+  },
+  "n:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=%E2%98%85-2026%ED%95%99%EB%85%84%EB%8F%84-2%ED%95%99%EA%B8%B0-%ED%95%99%EA%B3%BC%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EC%83%9D-%EC%84%A0%EB%B0%9C-%EA%B2%B0%EA%B3%BC-%EC%95%88%EB%82%B4&keyword=%EC%9E%A5%ED%95%99": {
+   "patrolledAt": "2026-08-25",
+   "lastWhy": ""
+  },
+  "n:https://www.sejong.ac.kr/kor/intro/notice7.do?mode=view&articleNo=892119&article.offset=0&articleLimit=10": {
+   "patrolledAt": "2026-08-25",
+   "lastWhy": ""
+  },
+  "n:https://www.sejong.ac.kr/kor/intro/notice7.do?mode=view&articleNo=892118&article.offset=0&articleLimit=10": {
+   "patrolledAt": "2026-08-25",
+   "lastWhy": ""
+  },
+  "n:https://www.sejong.ac.kr/kor/intro/notice7.do?mode=view&articleNo=892117&article.offset=0&articleLimit=10": {
+   "patrolledAt": "2026-08-25",
+   "lastWhy": ""
+  },
+  "n:https://www.sejong.ac.kr/kor/intro/notice7.do?mode=view&articleNo=892116&article.offset=0&articleLimit=10": {
+   "patrolledAt": "2026-08-25",
+   "lastWhy": ""
+  },
+  "n:https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=274954&article.offset=0&articleLimit=10&srCategoryId=22": {
+   "patrolledAt": "2026-08-25",
+   "lastWhy": ""
+  },
+  "n:https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=274934&article.offset=0&articleLimit=10&srCategoryId=22": {
+   "patrolledAt": "2026-08-25",
+   "lastWhy": ""
+  },
+  "n:https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=274920&article.offset=0&articleLimit=10&srCategoryId=22": {
+   "patrolledAt": "2026-08-25",
+   "lastWhy": ""
+  },
+  "n:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=625459&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888": {
+   "patrolledAt": "2026-08-25",
+   "lastWhy": ""
+  },
+  "n:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=625455&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888": {
+   "patrolledAt": "2026-08-25",
+   "lastWhy": ""
+  },
+  "n:https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=894288&qidx=5233&cate=0&allboard=true&nowpage=1": {
+   "patrolledAt": "2026-08-25",
+   "lastWhy": ""
+  },
+  "n:https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=57138&bidx=894270&qidx=57138&cate=0&allboard=true&nowpage=1": {
+   "patrolledAt": "2026-08-25",
+   "lastWhy": ""
+  },
+  "n:https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=57138&bidx=894092&qidx=57138&cate=0&allboard=true&nowpage=2": {
+   "patrolledAt": "2026-08-25",
+   "lastWhy": ""
+  },
+  "n:https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=57138&bidx=894091&qidx=57138&cate=0&allboard=true&nowpage=2": {
+   "patrolledAt": "2026-08-25",
    "lastWhy": ""
   }
  }

@@ -549,6 +549,38 @@
    "added": "2026-08-24",
    "fetched": true,
    "schematized": false
+  },
+  {
+   "id": "auto-skor478120036artclviewdo",
+   "name": "[공통] 2026년 국가우수장학(이공계) 장학생 성적우수 및 재학중우수유형 장학금 신청 안내",
+   "target": "2026년 국가우수장학(이공계) 장학생 성적우수 및 재",
+   "added": "2026-08-25",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-skor478119944artclviewdo",
+   "name": "[글로벌] KICS 한국통신학회 장학금 지원 대상자 선발 지원자 모집 안내(ICT 관련 학과)",
+   "target": "KICS 한국통신학회 장학금 지원 대상자 선발 지원자 ",
+   "added": "2026-08-25",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-skor478119859artclviewdo",
+   "name": "[공통] 2026-1학기 장학사정관(릴레이쉽) 장학금 신청 안내",
+   "target": "2026-1학기 장학사정관(릴레이쉽) 장학금 신청 안내",
+   "added": "2026-08-25",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-larshipdoarticleno374112",
+   "name": "[교외장학] 2026학년도 제23회 안중근 장학생 모집(~09.16.(수)까지)",
+   "target": "2026학년도 제23회 안중근 장학생 모집(~09.16",
+   "added": "2026-08-25",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }
