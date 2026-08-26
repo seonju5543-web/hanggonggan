@@ -2291,7 +2291,28 @@ console.log('\n■ 금액 상세 — 승인받은 화면 그대로인가 (2026-0
   eq('미확인 공고도 더보기로 보여 준다', body.includes('건 보기'), true);
   eq('합침은 학교 이름 외 N건으로 쓴다', /외 \$\{merged\}건|외 \$\{/.test(app), true);
 
-  // ④ 시트가 따로 계산하지 않는다 (홈과 다른 말을 하면 안 된다)
+  // ④ 줄을 누르면 장학금 찾기의 그 카드로 간다 (2026-08-27 개발자 요청)
+  eq('줄마다 이동 표식이 붙는다', body.includes('data-goto'), true);
+  {
+    const goto = app.slice(app.indexOf('function gotoExploreCard'), app.indexOf('function renderExplore'));
+    eq('이동 함수가 있다', goto.length > 100, true);
+    /* 🔴 필터가 교내·교외·신청가능만으로 걸려 있으면 그 카드가 목록에 없어 스크롤할 곳이 사라진다 */
+    eq('이동 전에 필터를 전체로 되돌린다', goto.includes("exploreFilter = 'all'"), true);
+    eq('필터 칩 표시도 같이 맞춘다', goto.includes('filter-chip'), true);
+    /* 정렬은 건드리지 않는다 — 학생이 고른 기준을 말없이 바꾸면 그것도 임의 변경이다 */
+    eq('정렬은 건드리지 않는다', /exploreSort\s*=/.test(goto), false);
+    /* 카드를 못 찾아도 아무 일도 안 일어나게 두지 않는다 (학생에겐 고장으로 보인다) */
+    eq('카드를 못 찾으면 상세를 대신 연다', goto.includes('openDetail'), true);
+    eq('시트를 닫고 간다', goto.includes('closeSheet'), true);
+  }
+  /* 안쪽 `원문 보기`·링크를 누른 것은 이동이 아니다 */
+  {
+    const h = app.slice(app.indexOf("const row = e.target.closest('[data-goto]')"));
+    eq('원문 보기 클릭은 이동이 아니다', h.slice(0, 400).includes("closest('details')"), true);
+    eq('링크 클릭도 이동이 아니다', h.slice(0, 400).includes("closest('a')"), true);
+  }
+
+  // ⑤ 시트가 따로 계산하지 않는다 (홈과 다른 말을 하면 안 된다)
   eq('홈이 만든 lastBill 을 그대로 그린다', body.includes('lastBill'), true);
   eq('시트가 sumAmounts 를 다시 부르지 않는다', body.includes('sumAmounts('), false);
 }

@@ -789,6 +789,23 @@ function applySort(key) {
   closeSortMenu();
 }
 
+/* 금액 상세에서 고른 공고를 장학금 찾기 화면에서 찾아 보여 준다 (2026-08-27).
+   못 찾으면 아무 일도 안 일어나게 두지 않고 그 공고 상세를 연다 —
+   '눌렀는데 아무 반응 없음'이 학생에게는 고장으로 보인다. */
+function gotoExploreCard(id) {
+  closeSheet();
+  exploreFilter = 'all';
+  $$('.filter-chip').forEach((c) => c.classList.toggle('active', c.dataset.filter === 'all'));
+  showScreen('explore');
+  setTimeout(() => {
+    const card = $(`#explore-list [data-detail="${CSS.escape(id)}"]`);
+    if (!card) { openDetail(id); return; }
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    card.classList.add('flash');
+    setTimeout(() => card.classList.remove('flash'), 1600);
+  }, 260);
+}
+
 function renderExplore() {
   const matches = getMatches();
   const order = { eligible: 0, selective: 0, unknown: 1, ineligible: 2 };
@@ -1469,11 +1486,13 @@ function amountDetailRow(m, opt) {
   const o = opt || {};
   const sch = m.ref, a = sch.amountSpec || null;
   const val = o.text || (m.won ? won(m.won) : '금액 원문 확인');
-  const cls = o.dim ? 'ad-row dim' : 'ad-row';
+  /* 줄을 누르면 장학금 찾기의 그 카드로 간다 (2026-08-27 개발자 요청).
+     안쪽 `원문 보기` 를 여닫는 클릭은 이동이 아니다 — 아래 핸들러가 details·a 를 걸러낸다. */
+  const cls = (o.dim ? 'ad-row dim' : 'ad-row') + ' tappable';
   const merged = (m.mergedFrom || []).length;
   const raw = a && a.raw ? a.raw : '';
   const exRaw = sch.exclusivity && sch.exclusivity.raw ? sch.exclusivity.raw : '';
-  return `<div class="${cls}">
+  return `<div class="${cls}" data-goto="${esc(sch.id)}" role="button" tabindex="0">
     <div class="ad-top"><p class="ad-name">${esc(sch.name || '')}</p>
       <p class="ad-val ${o.tone || ''}">${o.check ? '<span class="ad-chk">✓</span>' : ''}${esc(val)}</p></div>
     ${o.note ? `<p class="ad-note">${esc(o.note)}</p>` : ''}
@@ -2432,6 +2451,24 @@ function bindEvents() {
       return;
     }
     openDetail(card.dataset.detail);
+  });
+
+  /* 금액 상세의 줄 → 장학금 찾기의 그 카드로 이동 (2026-08-27 개발자 요청).
+     🔴 필터가 '교내'·'교외'·'신청 가능만'으로 걸려 있으면 그 카드가 목록에 없어
+        스크롤할 곳이 사라진다. 그래서 **필터만 전체로 되돌린다** —
+        정렬은 건드리지 않는다(학생이 고른 기준을 말없이 바꾸면 그것도 임의 변경이다). */
+  document.addEventListener('click', (e) => {
+    const row = e.target.closest('[data-goto]');
+    if (!row) return;
+    if (e.target.closest('details') || e.target.closest('a')) return;   // 원문 보기·링크는 이동이 아니다
+    gotoExploreCard(row.dataset.goto);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const row = e.target.closest && e.target.closest('[data-goto]');
+    if (!row || e.target.closest('details') || e.target.closest('a')) return;
+    e.preventDefault();
+    gotoExploreCard(row.dataset.goto);
   });
 
   $('#sheet-backdrop').addEventListener('click', closeSheet);
