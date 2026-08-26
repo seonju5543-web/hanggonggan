@@ -80,6 +80,38 @@ function isQualifyHead(line) {
   return isHead(t, QUALIFY_WORD);
 }
 
+/* '얼마를 주나' 절의 머리글 (2026-08-27 신설 — 금액 산정용).
+   OTHER_SECTION 안에 이미 금액 갈래가 있지만 그건 **자격 절이 여기서 끝난다**는 표시로만
+   쓰여서, 그 절의 내용(=금액)은 통째로 버려지고 있었다. 등록 224건 중 216건이 금액 0인
+   진짜 이유가 이것이다. 판정을 여기 두는 것은 **절 가르기를 한 곳에만 둔다**는 규칙 때문이다 —
+   parse-amount.js 가 자기 정규식을 따로 갖게 두면 화면과 수집기가 다른 절을 읽게 된다. */
+const AMOUNT_WORD = /(장학\s?금액|지급\s?금액|지원\s?금액|수혜\s?금액|지급\s?액|지급\s?내역|장학금?\s?(지급|내용|혜택|종류)|지원\s?내용|장학\s?내용)/;
+
+/* 🔴 `혜택`을 홀로 두면 안 된다 — 학교 홈 메뉴의 `의료기관 진료혜택`이 금액 머리글로 읽힌다
+   (정읍시민장학재단·경희대 인턴십에서 실제로 그랬다). `장학혜택`은 위 `장학금?\s?혜택`이 잡는다. */
+
+/* '지급'이 붙어도 **언제·어떻게** 주는지를 말하는 머리글은 금액이 아니다.
+   `장학금 지급시기 : 2026년 9월`을 금액 절로 읽으면 그 밑의 날짜·계좌를 금액 자리에서 뒤진다. */
+/* 🔴 좁게 잡을 것. 처음에 `(시기|기간|방법|…)`으로 넓게 썼더니
+   `2. 장학혜택(기간 1년) : … 장학금 800만원/년` 이 `기간` 때문에 걸려 **진짜 금액 7건이 죽었다.**
+   막아야 하는 건 '지급'에 딱 붙어 때·방법을 말하는 머리글뿐이다. */
+/* `결격`·`제외`도 막는다. `<교내 장학금 지급 결격사유>` 는 제외 절 머리글인데,
+   낱말을 뺀 나머지(`교내장학금지급`)가 7자라 isExcludeHead 의 길이 관문(≤6)을 못 넘는다.
+   그래서 제외로도 안 잡히고 금액으로 잡혀 **결격사유 절에서 숫자를 주워 왔다**.
+   ⚠️ `불가`는 넣지 말 것 — `장학금액 : 100만원 (중복수혜 불가)` 같은 진짜 금액 줄이 죽는다. */
+const AMOUNT_NOT = /지급\s?(시기|시점|일정|방법|기간|절차|계좌)|결격|제외/;
+
+/** '얼마를 주나' 절의 머리글인가 */
+function isAmountHead(line) {
+  /* 🔴 순서가 방어선이다. `<교내 장학금 지급 결격사유>` 가 실제 원문에 있고,
+     '장학금 지급'만 보면 금액 머리글로 읽혀 결격사유 절에서 숫자를 주워 온다.
+     제외·선발·자격이 이기게 두면 그 오탐이 사라진다(isSelectHead 가 EXCLUDE 에 지는 것과 같은 방식). */
+  if (isExcludeHead(line) || isSelectHead(line) || isQualifyHead(line)) return false;
+  const t = headText(line);
+  if (AMOUNT_NOT.test(t)) return false;
+  return isHead(t, AMOUNT_WORD);
+}
+
 /** 자격 절을 여기서 끊어야 하는가 (제외·선발·그 밖의 다음 절 전부) */
 function isSectionBreak(line) {
   if (isQualifyHead(line)) return false;         // 자격이 이어지는 머리글은 안 끊는다
@@ -99,7 +131,9 @@ function headRest(line) {
   return rest.length >= 4 ? rest : '';
 }
 
-/** 이 줄이 속한 절 — 'qualify' | 'exclude' | 'select' | 'other' | null(머리글 아님) */
+/** 이 줄이 속한 절 — 'qualify' | 'exclude' | 'select' | 'other' | null(머리글 아님)
+    ⚠️ 금액 절은 여기서 'other' 로 남는다. 새 값('amount')을 돌려주면 이 함수를 쓰는
+    match-engine.js 의 절 판정이 조용히 달라진다 — 금액이 필요하면 isAmountHead 를 직접 쓸 것. */
 function sectionOf(line) {
   if (isQualifyHead(line)) return 'qualify';
   if (isExcludeHead(line)) return 'exclude';
@@ -110,5 +144,5 @@ function sectionOf(line) {
 /* Node(발췌기·검사·감사)에서도 같은 판정을 쓰게 — 브라우저·서비스워커에는 영향 없음.
    match-engine.js와 같은 겸용 방식이다. */
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { headText, headRest, isExcludeHead, isSelectHead, isQualifyHead, isSectionBreak, sectionOf };
+  module.exports = { headText, headRest, isExcludeHead, isSelectHead, isQualifyHead, isAmountHead, isSectionBreak, sectionOf };
 }

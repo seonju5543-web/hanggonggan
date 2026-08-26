@@ -1,0 +1,7 @@
+{
+ "updatedAt": null,
+ "source": "공공데이터포털 전국대학별평균등록금정보 (한국장학재단 공시연계)",
+ "sourceUrl": "https://www.data.go.kr/data/15107738/standard.do",
+ "note": "avg = 그 학교 평균 등록금(원). byField = 계열별 등록금이 있으면 그쪽이 우선. 학과 단위 등록금은 공시 항목 자체가 없어 공개 데이터로 닿지 않는다 — 계열이 실질 상한이다. 채우는 로봇: collector/fetch-tuition.mjs (DATA_GO_KR_KEY 필요). 비어 있으면 앱은 등록금 비율형 공고를 '금액 미확인'으로 두고 지어내지 않는다.",
+ "schools": {}
+}

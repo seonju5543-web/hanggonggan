@@ -675,8 +675,16 @@ function renderHome() {
   const applyable = matches.filter((m) =>
     ['eligible', 'selective'].includes(m.result.status) && dday(m.sch.deadline).days >= 0 && notStale(m.sch));
   const notApplied = applyable.filter((m) => !state.applications.some((a) => a.id === m.sch.id));
-  const total = applyable.reduce((sum, m) => sum + (m.sch.amountValue || 0), 0);
-  const unknownAmt = applyable.filter((m) => !m.sch.amountValue).length;
+
+  /* 🔴 합계는 **더하기가 아니라 고르기**다 (2026-08-27 · parse-amount.js).
+     그냥 다 더하면 ① 같은 장학금이 여러 학교 접수분으로 등록된 것(가송재단 5건)을
+     5번 세고 ② 원문이 '함께 받을 수 없다'고 적은 공고까지 다 더한다.
+     학생이 실제로 받을 수 없는 숫자를 '지금 받을 수 있는 장학금'이라 부르는 것은
+     기망이고 법적 책임이 따른다(개발자 지적). sumAmounts 가 그 둘을 걸러 준다. */
+  const bill = sumAmounts(applyable.map((m) => m.sch), { tuition: tuitionFor(p, tuitionTable) });
+  const total = bill.total;
+  const unknownAmt = bill.unknown.length;
+  lastBill = { bill, count: applyable.length };
 
   countUp($('#hero-amount'), total, (v) => `최대 ${won(v)}`);
   $('#hero-count').textContent = `바로 신청 ${applyable.filter((m) => m.result.status === 'eligible').length}건 · 선발 심사형 ${applyable.filter((m) => m.result.status === 'selective').length}건${unknownAmt ? ` · 금액 미확인 ${unknownAmt}건 제외` : ''}`;
@@ -1134,6 +1142,23 @@ function loadMajors() {
       }
     })
     .catch(() => { /* 오프라인 등 — 전국 공통 목록으로 동작 */ });
+}
+
+/* 학교별 등록금 (2026-08-27) — `수업료 100%` 같은 비율형 공고를 원으로 바꾸는 데 쓴다.
+   비어 있으면 그 공고들은 '금액 미확인'으로 남는다. **전국 평균 같은 걸 지어내지 않는다.**
+   채우는 로봇: collector/fetch-tuition.mjs */
+let tuitionTable = {};
+/* 홈 합계를 마지막으로 계산한 내역 — '금액 상세' 시트가 이걸 그대로 보여 준다.
+   시트가 따로 다시 계산하면 화면과 시트가 다른 말을 하게 된다. */
+let lastBill = null;
+function loadTuition() {
+  fetch('data/tuition.json', { cache: 'no-store' })
+    .then((r) => (r.ok ? r.json() : null))
+    .then((d) => {
+      tuitionTable = (d && d.schools) || {};
+      if (state.profile && !$('#screen-home').hidden) renderHome();
+    })
+    .catch(() => { /* 오프라인 — 비율형은 미확인으로 둔다 */ });
 }
 
 /* 정식 등록 공고 (수집 → 큐레이션 → 매칭·신청 지원) */
@@ -2698,6 +2723,7 @@ initOnboarding();
 loadNotices();
 loadRegistered();
 loadMajors();   // 학교별 학과 목록 — 온보딩 학과 자동추천이 그 학교 것만 보게
+loadTuition();  // 학교별 등록금 — `수업료 100%` 비율형 공고를 원으로 바꾸는 데 쓴다
 if (typeof loadFormTemplates === 'function') loadFormTemplates(); // 정식 등록 양식 최신화
 walletRefresh().then(() => {
   if (!$('#screen-my').hidden) renderMy();

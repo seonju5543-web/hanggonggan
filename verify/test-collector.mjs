@@ -2075,5 +2075,141 @@ console.log('■ 회원가입·로그인 배선 (2026-08-25) — 빠뜨리면 �
   eq('원본은 손대지 않는다 (기기 데이터가 사라지면 안 된다)', raw.common.rrn, '990101-1');
 }
 
+/* ── 🔴 금액 산정 (2026-08-27 신설) ──────────────────────────────
+   등록 224건 중 216건(96%)이 금액 0이었다. auto-register가 `amountValue: 0`을 박고
+   파싱을 한 번도 시도하지 않았기 때문이다. 그런데 **금액만 채우면 홈 합계는 더 틀린다** —
+   같은 장학금이 여러 학교 접수분으로 중복 등록돼 있고, 이중수혜 금지 공고를 그냥 더하면
+   학생이 실제로 받을 수 없는 숫자가 된다. 그건 기망이고 법적 책임이 따른다(개발자 지적).
+   아래는 전부 **실제 원문에서 오탐이 났던 것**이다. 되돌리면 그 상태로 돌아간다. */
+console.log('\n■ 금액 산정 — 부풀리지 않는가 (2026-08-27)');
+{
+  const PA = createRequire(import.meta.url)('../parse-amount.js');
+  const { isAmountHead } = createRequire(import.meta.url)('../section-head.js');
+  const kindOf = (lines) => PA.amountFrom(lines).kind;
+  const wonOf = (lines) => PA.amountFrom(lines).value;
+
+  /* ① 🔴 사업 전체 규모를 1인당으로 내보내면 안 된다 — 가톨릭대 이원길장학금.
+        원문: `- 총 장학금액: 총 5천만원` (사업 전체) / 실제 1인당은 200만원.
+        그대로 읽으면 한 카드가 25배로 부푼다. */
+  eq('총 사업규모는 금액으로 읽지 않는다',
+    kindOf(['- 총 장학금액: 총 5천만원', '- 지급기준']), 'unknown');
+  eq('총액과 1인당이 같이 있으면 1인당을 쓴다',
+    wonOf(['장학금액 : 총상금 3천만원, 1인당 200만원 기준']), 2000000);
+
+  /* ② 🔴 금액 절이 다음 절을 삼키면 자격 줄의 숫자를 금액으로 줍는다 — 중앙대 성림장학금.
+        `5. 신청자격: … 건강보험료 지역 17만원 이하`의 17만원이 장학금액이 될 뻔했다. */
+  eq('자격 절의 숫자를 금액으로 줍지 않는다',
+    wonOf(['4. 장학금액: 1백만원 ~ 2백만원(1인당)', '5. 신청자격: 건강보험료 지역 17만원 이하']), 2000000);
+
+  /* ③ 🔴 머리글 오탐 — 전부 실제 원문에 있는 줄이다 */
+  eq('결격사유는 금액 머리글이 아니다', isAmountHead('<교내 장학금 지급 결격사유>'), false);
+  eq('지급시기는 금액 머리글이 아니다', isAmountHead('6) 장학금 지급시기 : 2026 년 9 월'), false);
+  eq('학교 홈 메뉴는 금액 머리글이 아니다', isAmountHead('의료기관 진료혜택'), false);
+  /* 🔴 반대로 조이다 죽이면 안 된다 — `기간`을 넓게 막았더니 진짜 금액 7건이 사라졌다 */
+  eq('장학혜택(기간 N년)은 금액 머리글이다', isAmountHead('2. 장학혜택(기간 1년) : 장학금 800 만원/년'), true);
+  eq('그 안의 800만원을 읽는다',
+    wonOf(['2. 장학혜택(기간 1년) : 프로그램 교육비 전액 지원, 장학금 800 만원/년']), 8000000);
+
+  /* ④ 등록금 비율형은 숫자로 바꾸지 않고 비율로 남긴다 (학생 등록금을 모르면 환산 불가) */
+  eq('수업료 70%는 비율로 읽는다', kindOf(['장학금액', '수업료 70% ( 정규학기 )']), 'ratio');
+  eq('등록금 전액은 100%다', PA.ratioIn('등록금 전액'), 1);
+  eq('등록금을 모르면 비율은 0원이다', PA.ratioWon({ kind: 'ratio', ratio: 0.7 }, 0), 0);
+  eq('등록금을 알면 환산한다', PA.ratioWon({ kind: 'ratio', ratio: 0.7 }, 4180000), 2926000);
+
+  /* ⑤ 시급형은 활동 시간에 따라 달라져 합산할 수 없다 */
+  eq('시급형은 합산하지 않는다', kindOf(['장학금액 : 시급 12,790원 (활동 시간 기준 지급)']), 'hourly');
+
+  /* ⑥ 🔴 이중수혜 — 괄호 안 예외 때문에 뜻이 뒤집히면 안 된다.
+        원문: `라. 타 장학금과 중복수혜 가능(근로장학금 간 중복 불가)`
+        괄호까지 보면 '불가'가 걸려 **받을 수 있는 공고를 못 받는다고** 뒤집는다. */
+  eq('이중수혜 금지를 읽는다', PA.exclusivityFrom(['※ 타 대외 장학금과 이중수혜 불가']).kind, 'forbidden');
+  eq('괄호 안 예외에 뒤집히지 않는다',
+    PA.exclusivityFrom(['라. 타 장학금과 중복수혜 가능(근로장학금 간 중복 불가)']).kind, 'allowed');
+  eq('조항이 없으면 모른다고 답한다', PA.exclusivityFrom(['가. 재학생']).kind, 'unknown');
+
+  /* ⑦ 🔴 합계는 더하기가 아니라 고르기다 */
+  const A = (v) => ({ kind: 'fixed', value: v, ratio: 0, min: v, max: v, raw: '' });
+  const sum = PA.sumAmounts([
+    { id: 'a', amountSpec: A(1000000) },
+    { id: 'b', amountSpec: A(1500000) },
+    /* 같은 장학금이 여러 학교 접수분으로 등록된 경우 — 가송재단이 실제로 8건이다 */
+    { id: 'c1', sameAs: 'gasong', amountSpec: A(5000000) },
+    { id: 'c2', sameAs: 'gasong', amountSpec: A(5000000) },
+    { id: 'c3', sameAs: 'gasong', amountSpec: A(5000000) },
+    /* 함께 받을 수 없는 셋 — 가장 큰 하나만 */
+    { id: 'x', amountSpec: A(3180000), exclusivity: { kind: 'forbidden', raw: '' } },
+    { id: 'y', amountSpec: A(2000000), exclusivity: { kind: 'forbidden', raw: '' } },
+    { id: 'z', amountSpec: A(1000000), exclusivity: { kind: 'forbidden', raw: '' } },
+    /* 못 읽은 것은 0원 — 합계에서 빠지되 목록에는 남는다 */
+    { id: 'u', amountSpec: { kind: 'unknown', value: 0, ratio: 0, min: 0, max: 0, raw: '' } }
+  ], {});
+  eq('같은 장학금은 한 번만 센다', sum.added.length, 3);              // a, b, gasong 1건
+  eq('함께 못 받는 것은 하나만 센다', sum.onlyOne.length, 1);
+  eq('나머지 배타 건은 버리지 않고 남긴다', sum.dropped.length, 2);
+  eq('못 읽은 것은 목록에 남는다', sum.unknown.length, 1);
+  eq('합계 = 100만 + 150만 + 500만(가송 1건) + 318만(배타 최대)',
+    sum.total, 1000000 + 1500000 + 5000000 + 3180000);
+  /* 중복 합치기가 없으면 가송이 1,500만원으로 세어진다 — 이 차이가 기망의 크기다 */
+  eq('중복을 안 합치면 1,000만원이 더 붙는다는 것', 5000000 * 3 - 5000000, 10000000);
+
+  /* ⑧ 🔴 등록금은 세 단계로 찾는다 — 학생 입력 > 학교×계열 > 학교 평균. 셋 다 없으면 0.
+        전국 평균 같은 것을 끼워 넣으면 안 된다(지어낸 숫자다).
+        ⚠️ 학과 단위 등록금은 **공시 항목 자체가 없다** — 계열이 공개 데이터의 상한이다. */
+  const TT = { '한국외국어대학교': { avg: 4180000, byField: { '인문사회': 3820000, '공학': 4960000 } } };
+  eq('계열 등록금이 있으면 그걸 쓴다',
+    PA.tuitionFor({ school: '한국외국어대학교', track: 'engineering' }, TT), 4960000);
+  eq('계열이 없으면 학교 평균으로 내려간다',
+    PA.tuitionFor({ school: '한국외국어대학교', track: 'medical' }, TT), 4180000);
+  eq('학생이 직접 넣은 등록금이 가장 세다',
+    PA.tuitionFor({ school: '한국외국어대학교', track: 'engineering', tuitionSelf: 5200000 }, TT), 5200000);
+  eq('모르는 학교는 0 — 전국 평균을 지어내지 않는다',
+    PA.tuitionFor({ school: '없는대학교', track: 'engineering' }, TT), 0);
+  eq('환산 근거를 화면에 밝힐 수 있다',
+    PA.tuitionSource({ school: '한국외국어대학교', track: 'engineering' }, TT), 'field');
+  eq('상경·사범은 인문사회로 묶인다 (공시 계열이 5종이라)',
+    PA.TRACK_TO_FIELD.business, '인문사회');
+
+  /* ⑨ 🔴 **브라우저에서 실제로 도는가** — Node 만 보면 놓친다.
+        이 저장소는 match-engine 의 전역 목록에 이름을 빠뜨려 **Node 검사는 전부 통과하는데
+        앱은 첫 카드에서 죽은** 사고를 두 번 냈다(headRest·caseBranch). parse-amount 도
+        브라우저에서는 section-head 의 **전역 함수**를 쓰므로 같은 함정이 있다.
+        그래서 index.html 과 같은 순서로 실어 보고 실제로 불러 본다. */
+  {
+    const vm2 = createRequire(import.meta.url)('node:vm');
+    const ctx2 = vm2.createContext({ console });
+    for (const f of ['../section-head.js', '../parse-requirements.js', '../parse-amount.js']) {
+      vm2.runInContext(fs.readFileSync(new URL(f, import.meta.url), 'utf8'), ctx2, { filename: f });
+    }
+    eq('브라우저 순서로 실어도 금액 절을 찾는다',
+      vm2.runInContext(`amountFrom(["장학금액","수업료 70% ( 정규학기 )"]).ratio`, ctx2), 0.7);
+    eq('브라우저에서 이중수혜를 읽는다',
+      vm2.runInContext(`exclusivityFrom(["※ 타 대외 장학금과 이중수혜 불가"]).kind`, ctx2), 'forbidden');
+    eq('브라우저에서 합계 고르기가 돈다',
+      vm2.runInContext(`sumAmounts([{id:'a',amountSpec:{kind:'fixed',value:1000000}},{id:'b',sameAs:'g',amountSpec:{kind:'fixed',value:5000000}},{id:'c',sameAs:'g',amountSpec:{kind:'fixed',value:5000000}}],{}).total`, ctx2), 6000000);
+    eq('브라우저에서 등록금 조회가 돈다',
+      vm2.runInContext(`tuitionFor({school:'A',track:'engineering'},{A:{avg:4000000,byField:{'공학':5000000}}})`, ctx2), 5000000);
+  }
+
+  /* ⑩ 🔴 앱이 parse-amount.js 를 실제로 싣고 있는가 — 파일만 만들고 안 실으면 앱이 죽는다 */
+  {
+    const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+    const swSrc = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
+    eq('index.html 이 parse-amount.js 를 싣는다', html.includes('parse-amount.js'), true);
+    eq('section-head.js 가 parse-amount.js 보다 먼저 실린다 (전역을 쓰므로)',
+      html.indexOf('section-head.js') < html.indexOf('parse-amount.js'), true);
+    eq('서비스워커도 parse-amount.js 를 싣는다',
+      /importScripts\([^)]*parse-amount\.js/.test(swSrc), true);
+    eq('캐시 목록에 parse-amount.js 가 있다',
+      /ASSETS\s*=[\s\S]{0,600}parse-amount\.js/.test(swSrc), true);
+  }
+
+  /* ⑪ 등록금 비율형은 등록금을 알 때만 합계에 들어간다 */
+  const r = { kind: 'ratio', value: 0, ratio: 0.7, min: 0, max: 0, raw: '' };
+  eq('등록금을 모르면 비율형은 미확인으로 간다',
+    PA.sumAmounts([{ id: 'r', amountSpec: r }], {}).unknown.length, 1);
+  eq('등록금을 알면 추정으로 간다 (합계와 분리해 표시해야 한다)',
+    PA.sumAmounts([{ id: 'r', amountSpec: r }], { tuition: 4180000 }).estimated.length, 1);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);
