@@ -477,7 +477,7 @@ function showScreen(name) {
 
 /* ---------------- 온보딩 ---------------- */
 let onboardStep = 0;
-const ONBOARD_STEPS = 5;
+const ONBOARD_STEPS = 6;   /* 2026-08-27 — '지금 받고 있는 장학금'(이중수혜) 단계 추가 */
 
 function renderOnboardStep() {
   $$('.onboard-step').forEach((el) => (el.hidden = Number(el.dataset.step) !== onboardStep));
@@ -515,6 +515,10 @@ function initOnboarding() {
     $('#in-credits').value = p.credits != null ? p.credits : '';
     $('#in-birth-year').value = p.birthYear || '';
     $$('#in-flags input').forEach((cb) => (cb.checked = p.flags.includes(cb.value)));
+    if (Array.isArray(p.scholarships)) {
+      $$('#in-scholarships input').forEach((cb) => (cb.checked = p.scholarships.includes(cb.value)));
+      if ($('#in-schol-none')) $('#in-schol-none').checked = p.scholarships.length === 0;
+    }
     $('#in-sensitive-ok').checked = !!(state.consent && state.consent.sensitive);
   } else {
     setChip('#in-track', 'humanities');
@@ -577,6 +581,12 @@ function collectProfile() {
     credits: $('#in-credits').value.trim() === '' ? null : Number($('#in-credits').value),
     birthYear: $('#in-birth-year').value.trim() === '' ? null : Number($('#in-birth-year').value),
     flags: $$('#in-flags input:checked').map((c) => c.value),
+    /* 지금 받고 있는 장학금 (2026-08-27) — 이중수혜 금지 공고를 자격 판정에서 거른다.
+       '없음'을 눌렀으면 빈 배열, 아무것도 안 골랐으면 null(= 모른다). 둘은 다르다:
+       빈 배열이면 "안 받는다"라 전부 지원 가능이고, null 이면 판정하지 않는다. */
+    scholarships: $('#in-schol-none') && $('#in-schol-none').checked
+      ? []
+      : (() => { const v = $$('#in-scholarships input:checked').map((c) => c.value); return v.length ? v : null; })(),
     cert: $('#in-cert').checked,
     exchange: $('#in-exchange').checked,
     /* 🔴 온보딩 화면에 칸이 없는 값(현주소·긴급연락처·보호자·성별·주민등록번호)은
@@ -1447,6 +1457,77 @@ function bulkRowHtml(sch) {
     </div>`;
 }
 
+/* ── 금액 상세 (2026-08-27) ────────────────────────────────────
+   홈의 '최대 N원'을 누르면 열린다. 그 숫자가 **어떻게 나왔는지 줄 단위로** 보여 준다.
+   갈래를 넷으로 나눈 이유: 합계 하나만 보여 주면 방어가 안 되고, 갈래를 나누면
+   각 줄이 원문을 근거로 갖는다. 특히 **안 더한 것도 보여 준다** — 감춘 게 아니라
+   이유가 있다는 걸 학생이 봐야 한다(개발자와 확정한 배치).
+
+   🔴 여기서 다시 계산하지 않는다. renderHome 이 만든 lastBill 을 그대로 그린다 —
+      따로 계산하면 히어로 숫자와 상세가 다른 말을 하게 된다. */
+function amountDetailRow(m, opt) {
+  const o = opt || {};
+  const sch = m.ref, a = sch.amountSpec || null;
+  const val = o.text || (m.won ? won(m.won) : '금액 원문 확인');
+  const cls = o.dim ? 'ad-row dim' : 'ad-row';
+  const merged = (m.mergedFrom || []).length;
+  const raw = a && a.raw ? a.raw : '';
+  const exRaw = sch.exclusivity && sch.exclusivity.raw ? sch.exclusivity.raw : '';
+  return `<div class="${cls}">
+    <div class="ad-top"><p class="ad-name">${esc(sch.name || '')}</p>
+      <p class="ad-val ${o.tone || ''}">${o.check ? '<span class="ad-chk">✓</span>' : ''}${esc(val)}</p></div>
+    ${o.note ? `<p class="ad-note">${esc(o.note)}</p>` : ''}
+    ${merged ? `<details><summary>${esc(schoolOfNotice(m.mergedFrom[0]) || '다른 학교')} 외 ${merged}건</summary>
+      <div class="ad-list"><span>같은 재단이 여러 학교에서 접수하는 공고. 1건으로 합산.</span>
+      ${[sch, ...m.mergedFrom].map((x) => `<span>${esc(x.provider || x.name || '')}</span>`).join('')}</div></details>` : ''}
+    ${raw || exRaw ? `<details><summary>원문 보기</summary>
+      <p class="ad-src">${esc(raw || exRaw)}</p></details>` : ''}
+  </div>`;
+}
+
+const schoolOfNotice = (sch) => {
+  const m = String(sch && sch.provider || '').match(/\(([^)]*대학교[^)]*)\s*접수\)/);
+  return m ? m[1] : (sch && sch.school) || '';
+};
+
+function renderAmountDetail() {
+  if (!lastBill) return;
+  const { bill, count } = lastBill;
+  const p = state.profile;
+  const sum = (arr) => arr.reduce((s, m) => s + (m.won || 0), 0);
+  const grp = (title, right, note, rows) => (rows ? `
+    <div class="ad-grp"><div class="ad-grp-h"><b>${title}</b><span>${right}</span></div>
+    ${note ? `<p class="ad-grp-note">${note}</p>` : ''}${rows}</div>` : '');
+
+  $('#detail-sheet').innerHTML = `
+    <div class="sheet-handle"></div>
+    <div class="sheet-body">
+      <h3 class="sheet-title">금액 상세</h3>
+      <p class="sheet-provider">${esc(p.school || '')}${p.campus ? ' · ' + esc(p.campus) : ''} · 신청 가능 ${count}건</p>
+      <div class="ad-total">
+        <p class="ad-total-lb">지금 받을 수 있는 장학금</p>
+        <p class="ad-total-amt">최대 ${won(bill.total)}</p>
+        <p class="ad-total-sub">확인된 금액만 합산${bill.unknown.length ? ` · 미확인 ${bill.unknown.length}건 제외` : ''}</p>
+      </div>
+      ${grp('합산', `${bill.added.length}건 · ${won(sum(bill.added))}`, '',
+        bill.added.map((m) => amountDetailRow(m, { tone: 'on' })).join(''))}
+      ${grp('중복 수혜 불가', `${bill.onlyOne.length + bill.dropped.length}건 중 ${bill.onlyOne.length}건`,
+        '함께 받을 수 없는 공고입니다. 가장 큰 1건만 합산했습니다.',
+        bill.onlyOne.map((m) => amountDetailRow(m, { tone: 'on', check: true })).join('')
+        + (bill.dropped.length ? `<details><summary>함께 못 받는 공고 ${bill.dropped.length}건</summary>
+          ${bill.dropped.map((m) => amountDetailRow(m, { dim: true, tone: 'off', note: '위 공고와 동시 수혜 불가' })).join('')}</details>` : ''))}
+      ${grp('등록금 비율 환산', `${bill.estimated.length}건 · 추정`,
+        '금액이 등록금 비율로만 적힌 공고입니다. 학교별 등록금 기준 추정값이며 실제 금액과 다를 수 있습니다.',
+        bill.estimated.map((m) => amountDetailRow(m, { tone: 'est', text: '약 ' + won(m.won) })).join(''))}
+      ${grp('금액 미확인', `${bill.unknown.length}건 · 0원`,
+        '원문에 금액이 없거나 첨부파일에만 있는 공고입니다.',
+        bill.unknown.length ? `<details><summary>공고 ${bill.unknown.length}건 보기</summary>
+          ${bill.unknown.map((m) => amountDetailRow(m, { dim: true, tone: 'off', text: '금액 원문 확인' })).join('')}</details>` : '')}
+      <p class="ad-foot">모든 금액은 공고 원문 기준입니다.<br>선발 결과에 따라 실제 수혜액은 달라질 수 있습니다.</p>
+    </div>`;
+  openSheetShell();
+}
+
 function renderBulkPrep() {
   const targets = bulkPrep.list;
   const ready = targets.filter((sch) => !bulkNeedsWork(sch));
@@ -2195,6 +2276,26 @@ function bindEvents() {
   });
 
   $('#in-flags').addEventListener('change', syncConsentRow);
+
+  /* 히어로 금액을 누르면 '금액 상세' — 그 숫자가 어떻게 나왔는지 줄 단위로 보여 준다 */
+  const heroAmt = $('#hero-amount');
+  if (heroAmt) {
+    heroAmt.addEventListener('click', renderAmountDetail);
+    heroAmt.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); renderAmountDetail(); }
+    });
+  }
+
+  /* '받고 있는 장학금 없음'과 나머지는 같이 켤 수 없다 — 둘 다 켜지면 뜻이 모순된다 */
+  const scholBox = $('#in-scholarships'), scholNone = $('#in-schol-none');
+  if (scholBox && scholNone) {
+    scholBox.addEventListener('change', () => {
+      if ($$('#in-scholarships input:checked').length) scholNone.checked = false;
+    });
+    scholNone.addEventListener('change', () => {
+      if (scholNone.checked) $$('#in-scholarships input').forEach((c) => (c.checked = false));
+    });
+  }
 
   $('#btn-notify').addEventListener('click', () => {
     if (typeof openNotifyInbox === 'function') openNotifyInbox();

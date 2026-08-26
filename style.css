@@ -1765,3 +1765,57 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: 3px; paddin
 }
 .sort-opt:hover { background: rgba(18, 22, 31, .05); }
 .sort-opt[aria-checked="true"] { background: var(--primary-weak, #e8f0ff); color: var(--primary, #2f6bff); }
+
+/* ---------- 금액 상세 (2026-08-27) ----------
+   홈 '최대 N원'을 누르면 열리는 시트. 갈래를 넷으로 나눠 각 줄이 원문 근거를 갖는다.
+   🔴 갈래 설명은 상자에 넣지 않는다(개발자 지시) — 흰 카드와 설명이 섞여 보인다. */
+.ad-total {
+  background: linear-gradient(155deg, #172a5e 0%, #101d3d 58%, #0a1226 100%);
+  border-radius: var(--radius); padding: 17px 18px 16px; color: #fff; margin: 4px 0 2px;
+}
+.ad-total-lb  { font-size: 12.5px; font-weight: 600; color: rgba(232,239,254,.75); }
+.ad-total-amt { font-size: 31px; font-weight: 800; letter-spacing: -.03em; margin: 5px 0 3px;
+                font-variant-numeric: tabular-nums; }
+.ad-total-sub { font-size: 12px; color: rgba(232,239,254,.72); }
+
+.ad-grp { margin-top: 17px; }
+.ad-grp-h { display: flex; align-items: baseline; gap: 7px; margin-bottom: 7px; padding: 0 3px; }
+.ad-grp-h b    { font-size: 13.5px; font-weight: 800; letter-spacing: -.02em; }
+.ad-grp-h span { font-size: 11.5px; color: var(--text-weak); margin-left: auto;
+                 font-variant-numeric: tabular-nums; font-weight: 600; }
+.ad-grp-note { font-size: 11.5px; color: var(--text-weak); padding: 0 3px; margin: -3px 0 8px; line-height: 1.55; }
+
+.ad-row { background: var(--surface); border-radius: var(--radius-sm); padding: 11px 13px;
+          margin-bottom: 6px; box-shadow: var(--shadow); }
+.ad-row.dim { opacity: .6; box-shadow: none; background: #fafbfc; }
+.ad-top { display: flex; gap: 8px; align-items: baseline; }
+.ad-name { font-size: 13.5px; font-weight: 700; letter-spacing: -.02em; flex: 1; line-height: 1.4; }
+.ad-val  { font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ad-val.on  { color: var(--green); }
+.ad-val.off { color: var(--text-weak); }
+.ad-val.est { color: var(--orange); }
+.ad-chk  { color: var(--green); font-size: 13px; font-weight: 900; margin-right: 1px; }
+.ad-note { font-size: 11.5px; color: var(--text-weak); margin-top: 5px; }
+
+/* 원문·합친 학교 목록은 더보기로 접는다 — 브라우저 기본 <details> 라 여닫는 코드가 0줄이다
+   (일괄 신청 준비가 쓰는 방식과 같다). */
+.ad-row details, .ad-grp > details { margin-top: 7px; }
+.ad-row details + details { margin-top: 5px; }
+.ad-row summary, .ad-grp > details > summary {
+  font-size: 11.5px; color: var(--text-sub); font-weight: 600; cursor: pointer;
+  list-style: none; display: flex; align-items: center; gap: 4px; padding: 2px 0;
+}
+.ad-row summary::-webkit-details-marker, .ad-grp > details > summary::-webkit-details-marker { display: none; }
+.ad-row summary::after, .ad-grp > details > summary::after { content: '⌄'; font-size: 13px; color: var(--text-weak); line-height: 1; }
+.ad-row details[open] summary::after, .ad-grp > details[open] > summary::after { content: '⌃'; }
+.ad-src { font-size: 11.5px; color: var(--text-sub); margin-top: 5px; padding: 7px 10px;
+          background: #f7f8fb; border-left: 2.5px solid #d7dbe4; border-radius: 0 7px 7px 0; line-height: 1.55; }
+.ad-list { font-size: 11.5px; color: var(--text-sub); margin-top: 5px; padding: 7px 10px;
+           background: #f7f8fb; border-radius: 8px; line-height: 1.75; }
+.ad-list span { display: block; }
+.ad-grp > details > .ad-row { margin-top: 6px; }
+.ad-foot { font-size: 11.5px; color: var(--text-weak); text-align: center; margin-top: 18px; line-height: 1.6; }
+
+/* 온보딩 체크 항목의 부연 설명 — '국가장학금 / 한국장학재단 I·II유형' 같은 두 줄 */
+.check-item span em { font-style: normal; font-size: 11.5px; color: var(--text-sub);
+                      display: block; margin-top: 2px; line-height: 1.45; }

@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-08-26T20:00:57.845Z",
+ "updatedAt": "2026-08-26T20:09:55.394Z",
  "items": [
   {
    "id": "reg-kw-gukgagosi",
@@ -43,6 +43,7 @@
    ],
    "exclusivity": {
     "kind": "allowed",
+    "scope": "external",
     "raw": "사 . 타 장학금과 중복수혜 가능 ( 단 , 등록금 범위 내에서 ) 하며 , 교외장학금을 우선 지급함 . 교외장학금으로 등록금 전액을 수혜받은 경우 국가고시장학금은 지급하지 않으며 수혜횟수는 차감함 ."
    }
   },
@@ -183,6 +184,7 @@
    },
    "exclusivity": {
     "kind": "allowed",
+    "scope": "unclear",
     "raw": "※ 화도 / 동해장학금은 국가장학금과 중복수혜 가능 함 ."
    }
   },
@@ -412,6 +414,7 @@
    },
    "exclusivity": {
     "kind": "allowed",
+    "scope": "unclear",
     "raw": "▶ 전문자격장학은 등록금성 장학으로 수업료 범위 내에서 이중수혜가능"
    }
   },
@@ -467,6 +470,7 @@
    },
    "exclusivity": {
     "kind": "forbidden",
+    "scope": "unclear",
     "raw": "※ 복지장학 2( 부분 ) 장학은 복지장학 2( 기초생활수급자 ), 복지장학 1( 본인장애 ) 장학과 중복수혜 불가"
    }
   },
@@ -783,6 +787,7 @@
    },
    "exclusivity": {
     "kind": "allowed",
+    "scope": "unclear",
     "raw": "- 생활비성 장학금 250만원 1회 지급(타 장학금과 중복수혜 가능)"
    }
   },
@@ -1029,6 +1034,7 @@
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
    "exclusivity": {
     "kind": "allowed",
+    "scope": "unclear",
     "raw": "※ 다만, 등록금성 장학금(예: 국가장학금, 교내 등록금성 장학금 등) 및 국가근로 등 근로에 따른 급여 성격의 장학금과 공모전 등 1회성 포상 성격의 장학금은 중복 수혜 가능"
    }
   },
@@ -1158,6 +1164,7 @@
    ],
    "exclusivity": {
     "kind": "allowed",
+    "scope": "unclear",
     "raw": "나 . 면학장학금은 타 장학금과 중복지원 가능하나 , 등록금 범위 내에서 지급합니다 ."
    }
   },
@@ -2338,6 +2345,7 @@
    },
    "exclusivity": {
     "kind": "forbidden",
+    "scope": "external",
     "raw": "2. 장학금 지급액 : 500 만원 /1 인 ( 학업지원비 ( 생활비 ) 로 지급 ) ( 타 대외 장학금과 이중수혜 금지 )"
    },
    "sameAs": "가송재단"
@@ -2437,6 +2445,7 @@
    },
    "exclusivity": {
     "kind": "forbidden",
+    "scope": "external",
     "raw": "※ 타 대외 장학금과 이중수혜 불가"
    },
    "sameAs": "가송재단"
@@ -2622,6 +2631,7 @@
    },
    "exclusivity": {
     "kind": "allowed",
+    "scope": "external",
     "raw": "※ 타 기관 등록금성 장학금과 중복 수혜 가능"
    }
   },
@@ -2751,6 +2761,7 @@
    },
    "exclusivity": {
     "kind": "allowed",
+    "scope": "unclear",
     "raw": "가 . 생활비 장학금 ( 등록금 범위 외 초과수혜 가능 , 중복수혜 가능 )"
    }
   },
@@ -2974,6 +2985,7 @@
    ],
    "exclusivity": {
     "kind": "forbidden",
+    "scope": "external",
     "raw": "★ 합격 후 27-1학기부터 타 재단(기업연계 계약학과 포함) 장학금 중복수혜 불가★"
    }
   },
@@ -3148,6 +3160,7 @@
    },
    "exclusivity": {
     "kind": "forbidden",
+    "scope": "external",
     "raw": "5. 장학금액: 학업지원비(생활비) 장학 5,000,000원 (1인 기준) - 타 대외 장학금과는 이중수혜 금지"
    },
    "sameAs": "가송재단"
@@ -3619,6 +3632,7 @@
    ],
    "exclusivity": {
     "kind": "forbidden",
+    "scope": "external",
     "raw": "* 자유 양식(학교 및 국가 장학금 이외의 교외 장학금 중복 수혜 사실이 없음을 증명함) 또는 장학수혜증명서 제출"
    }
   },
@@ -3718,6 +3732,7 @@
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
    "exclusivity": {
     "kind": "allowed",
+    "scope": "unclear",
     "raw": "라. 타 장학금과 중복수혜 가능(근로장학금 간 중복 불가)"
    }
   },
@@ -3953,6 +3968,7 @@
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
    "exclusivity": {
     "kind": "forbidden",
+    "scope": "unclear",
     "raw": "1) 국가장학금, 이화복지 장학금과의 중복수혜 불가"
    }
   },
@@ -3996,6 +4012,7 @@
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
    "exclusivity": {
     "kind": "forbidden",
+    "scope": "unclear",
     "raw": "- 전액 장학금 지원 (등록금성) 타 등록금성 장학금과 중복 수혜 불가"
    }
   },
@@ -4799,6 +4816,7 @@
    ],
    "exclusivity": {
     "kind": "forbidden",
+    "scope": "external",
     "raw": "※ 타 장학재단 중복 수혜 금지"
    }
   },
@@ -4964,6 +4982,7 @@
    ],
    "exclusivity": {
     "kind": "forbidden",
+    "scope": "unclear",
     "raw": "⎆ 2026학년도 2학기 다산장학금 신청 학생은 후생복지장학금 신청 불필요(중복수혜 불가)"
    }
   },
@@ -5014,6 +5033,7 @@
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
    "exclusivity": {
     "kind": "allowed",
+    "scope": "unclear",
     "raw": "※ 학업보조비 성격으로 등록금 범위 초과하여 중복수혜 가능"
    }
   },
@@ -5063,6 +5083,7 @@
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
    "exclusivity": {
     "kind": "allowed",
+    "scope": "unclear",
     "raw": "※ 학업보조비 성격으로 등록금 범위 초과하여 중복수혜 가능"
    }
   },
@@ -5698,6 +5719,7 @@
    },
    "exclusivity": {
     "kind": "allowed",
+    "scope": "unclear",
     "raw": "- 선발후 최대 4 학기 , 수업료 장학금 중복 수혜 가능 , 생활비성 장학금 중복"
    }
   },
@@ -5744,6 +5766,7 @@
    ],
    "exclusivity": {
     "kind": "forbidden",
+    "scope": "unclear",
     "raw": "1) 국내 4년제 대학 재학생 2) 부모가 모두 대한민국 국적이 아닌 외국인으로서, 부모 중 1명 이상이 국내에서 근로를 목적으로 체류하며 현재 근로 중인 자의 자녀 3) 전체 이수학기 성적 우수자 우대 (전체 평점평균 높은 순서대로 우선 선발) * 지원제한(제외대상) : 타 민간재단 및 부보 직장 복지(학비(등록금성격 장학금) 이중 수혜에 해당시 지원 불"
    }
   },
@@ -6247,6 +6270,7 @@
    ],
    "exclusivity": {
     "kind": "forbidden",
+    "scope": "external",
     "raw": "* 복수 수혜 및 타 대외 장학금과 이중수혜는 금지됩니다."
    }
   },
@@ -6707,6 +6731,7 @@
    },
    "exclusivity": {
     "kind": "forbidden",
+    "scope": "unclear",
     "raw": "3. 장학금액 : 등록금 전액 ( ※ 등록금성, 이중수혜 불가)"
    }
   },
@@ -6756,6 +6781,7 @@
    },
    "exclusivity": {
     "kind": "allowed",
+    "scope": "unclear",
     "raw": "3. 장학금액 : 50만원 ( 생활비성 장학, 중복수혜 가능)"
    }
   },
@@ -6986,6 +7012,7 @@
    "sourceKind": "official",
    "exclusivity": {
     "kind": "forbidden",
+    "scope": "unclear",
     "raw": "* 타 생활비성 장학금과 이중수혜는 금지됩니다."
    }
   },
@@ -7179,6 +7206,7 @@
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
    "exclusivity": {
     "kind": "allowed",
+    "scope": "unclear",
     "raw": ": 모교에 재학하고 있는 ( 휴학생 제외 ) 학부 및 대학원 재학생으로 아래 항목을 고려하여 선정되는 학생에게 지급하는 생활지원 장학금이므로 타 장학금과 중복 수혜 가능함 ."
    }
   },
@@ -7721,6 +7749,7 @@
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
    "exclusivity": {
     "kind": "allowed",
+    "scope": "unclear",
     "raw": "- 지원 내용: 생활비 지원형(주거/생활비) 장학금 * 타 장학금과 중복 수혜 가능"
    }
   },
@@ -8236,6 +8265,7 @@
    ],
    "exclusivity": {
     "kind": "forbidden",
+    "scope": "external",
     "raw": "• 학교 및 유관기관 추천 학생(타기관 장학사업 중복수혜 불가)"
    }
   },
@@ -8446,6 +8476,7 @@
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
    "exclusivity": {
     "kind": "forbidden",
+    "scope": "unclear",
     "raw": "④ 타 인재양성사업 중복 수혜 불가"
    }
   },
@@ -9097,6 +9128,7 @@
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
    "exclusivity": {
     "kind": "forbidden",
+    "scope": "external",
     "raw": "② 타 대외장학금과 이중 수혜 지원 불가 ."
    }
   },
@@ -9417,6 +9449,7 @@
    },
    "exclusivity": {
     "kind": "allowed",
+    "scope": "external",
     "raw": "※ 소속 대학, 한국장학재단 등 타 기관의 장학금 및 장학 프로그램과 중복수혜 가능"
    }
   },

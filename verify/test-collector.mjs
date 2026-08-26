@@ -2126,6 +2126,31 @@ console.log('\n■ 금액 산정 — 부풀리지 않는가 (2026-08-27)');
   eq('괄호 안 예외에 뒤집히지 않는다',
     PA.exclusivityFrom(['라. 타 장학금과 중복수혜 가능(근로장학금 간 중복 불가)']).kind, 'allowed');
   eq('조항이 없으면 모른다고 답한다', PA.exclusivityFrom(['가. 재학생']).kind, 'unknown');
+  /* 🔴 '무엇과' 중복이 안 되는지까지 봐야 한다. 17건 중 8건이 **교내끼리의 배타**였다 —
+     그걸 '외부 재단 장학금 보유자는 지원 불가'로 쓰면 멀쩡한 학생이 떨어진다. */
+  eq('대외 배타는 자격 판정에 쓴다',
+    PA.exclusivityFrom(['타 대외 장학금과는 이중수혜 금지']).scope, 'external');
+  eq('교내끼리 배타는 판정에 쓰지 않는다',
+    PA.exclusivityFrom(['복지장학 2( 부분 ) 장학은 복지장학 1( 본인장애 ) 장학과 중복수혜 불가']).scope, 'unclear');
+
+  /* ⑥-2 자격 판정에 실제로 반영되는가 — 학생이 헛수고하는 걸 막는 자리 */
+  {
+    const ME = createRequire(import.meta.url)('../match-engine.js');
+    const ev = ME.evaluate || ME;
+    const base = { school: 'A', flags: [], status: 'enrolled', gpa: 4.0, bracket: 5, year: 2 };
+    const ext = { eligibility: {}, exclusivity: { kind: 'forbidden', scope: 'external', raw: '' } };
+    const inn = { eligibility: {}, exclusivity: { kind: 'forbidden', scope: 'unclear', raw: '' } };
+    eq('외부 재단 장학금을 받는 중이면 지원 불가로 뜬다',
+      ev(ext, { ...base, scholarships: ['external'] }).status, 'ineligible');
+    eq('받는 게 없으면 지원 가능이다',
+      ev(ext, { ...base, scholarships: [] }).status, 'eligible');
+    eq('국가장학금은 막지 않는다 (원문이 대개 허용한다)',
+      ev(ext, { ...base, scholarships: ['kosaf'] }).status, 'eligible');
+    eq('아직 안 물어봤으면 판정하지 않는다 (모른다)',
+      ev(ext, { ...base }).status, 'unknown');
+    eq('교내끼리 배타는 외부 장학금 보유자를 막지 않는다',
+      ev(inn, { ...base, scholarships: ['external'] }).status, 'eligible');
+  }
 
   /* ⑦ 🔴 합계는 더하기가 아니라 고르기다 */
   const A = (v) => ({ kind: 'fixed', value: v, ratio: 0, min: v, max: v, raw: '' });

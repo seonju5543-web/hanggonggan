@@ -197,8 +197,32 @@
         </div>
       </div>
 
-      <!-- Step 4: 공통 서류 정보 -->
+      <!-- Step 4: 지금 받고 있는 장학금 (2026-08-27)
+           🔴 이건 '있으면 좋은 정보'가 아니라 **지원 자격 그 자체**다. 공고 원문 66건에
+              `타 재단 장학금 중복수혜 불가` 같은 조항이 있는데, 그동안 학생이 보는 자리에는
+              0건 노출이었다. 이미 다른 장학금을 받는 학생이 서류를 다 준비하고 지원했다가
+              탈락한다 — 이 저장소가 가장 싫어하는 실패다(개발자 지적 2026-08-27). -->
       <div class="onboard-step" data-step="4" hidden>
+        <div class="onboard-body">
+          <h2>지금 받고 있는<br />장학금이 있나요?</h2>
+          <p class="onboard-sub">다른 장학금과 함께 받을 수 없는 공고가 있습니다.<br />선택하면 지원할 수 없는 공고를 걸러냅니다.</p>
+          <div class="check-list" id="in-scholarships">
+            <label class="check-item"><input type="checkbox" value="kosaf" /><span>국가장학금<em>한국장학재단 I·II유형, 다자녀 등</em></span></label>
+            <label class="check-item"><input type="checkbox" value="internal" /><span>교내 장학금<em>우리 학교에서 주는 성적·복지 장학금</em></span></label>
+            <label class="check-item"><input type="checkbox" value="external" /><span>교외 장학금 (외부 재단)<em>재단·기업·지자체에서 주는 장학금</em></span></label>
+            <label class="check-item"><input type="checkbox" value="work" /><span>근로장학금<em>국가근로·교내근로</em></span></label>
+          </div>
+          <div class="check-list" id="in-scholarships-none">
+            <label class="check-item"><input type="checkbox" id="in-schol-none" /><span>받고 있는 장학금 없음</span></label>
+          </div>
+        </div>
+        <div class="onboard-actions">
+          <button class="btn btn-primary btn-lg" data-next>다음</button>
+        </div>
+      </div>
+
+      <!-- Step 5: 공통 서류 정보 -->
+      <div class="onboard-step" data-step="5" hidden>
         <div class="onboard-body">
           <h2>서류에 자동으로 채울<br />기본 정보를 알려주세요</h2>
           <p class="onboard-sub">거의 모든 장학금 신청서가 공통으로 요구하는 정보예요.<br />모두 선택 사항이고, 이 기기에만 저장돼요.</p>
@@ -253,7 +277,7 @@
 
       <div class="hero-card">
         <p class="hero-label">지금 받을 수 있는 장학금</p>
-        <p class="hero-amount" id="hero-amount">0원</p>
+        <p class="hero-amount tappable" id="hero-amount" role="button" tabindex="0" aria-label="금액 상세 보기">0원</p>
         <p class="hero-count" id="hero-count"></p>
         <button class="btn btn-white btn-lg" id="btn-apply-all">⚡ 한 번에 모두 신청하기</button>
       </div>

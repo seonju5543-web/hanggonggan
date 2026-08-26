@@ -185,9 +185,19 @@ var DUP_LINE = /(이중\s?수혜|중복\s?수혜|중복\s?지급|동시\s?수혜
 var DUP_NO   = /(불가|금지|안\s?됨|제한|불허|없음)/;
 var DUP_OK   = /(가능|허용|무관|상관\s?없)/;
 
+/* 🔴 '무엇과' 중복이 안 되는지까지 봐야 한다 (2026-08-27).
+   17건을 눈으로 보니 두 종류가 섞여 있었다:
+     · 교외 배타 — `타 대외 장학금과는 이중수혜 금지`, `타 재단 장학금 중복수혜 불가`
+     · 교내끼리 — `복지장학 2(부분)은 복지장학 1(본인장애)과 중복수혜 불가`
+   뒤엣것을 '외부 재단 장학금을 받는 학생은 지원 불가'로 쓰면 **멀쩡한 학생을 떨어뜨린다.**
+   이 저장소의 규칙대로, 확실한 것만 판정에 쓰고 나머지는 원문만 보여 준다. */
+var DUP_EXTERNAL = /(대외|교외|타\s?재단|타\s?기관|외부\s?재단|타\s?장학\s?재단)/;
+
 /**
  * 이 공고를 다른 장학금과 함께 받을 수 있는가.
- * @returns {{kind:'forbidden'|'allowed'|'unknown', raw:string}}
+ * @returns {{kind:'forbidden'|'allowed'|'unknown', scope:'external'|'unclear', raw:string}}
+ *   scope 가 'external' 일 때만 자격 판정에 쓴다 — 'unclear' 는 교내끼리의 배타일 수 있어
+ *   원문만 보여 주고 판정하지 않는다.
  */
 function exclusivityFrom(lines) {
   var arr = lines || [];
@@ -202,12 +212,14 @@ function exclusivityFrom(lines) {
     var main = line.replace(/[（(][^）)]*[）)]/g, ' ');
     var probe = DUP_LINE.test(main) ? main : line;
 
-    if (DUP_NO.test(probe) && !DUP_OK.test(probe)) return { kind: 'forbidden', raw: line.trim().slice(0, 200) };
-    if (DUP_OK.test(probe) && !DUP_NO.test(probe)) return { kind: 'allowed',   raw: line.trim().slice(0, 200) };
+    var scope = DUP_EXTERNAL.test(line) ? 'external' : 'unclear';
+    var raw = line.trim().slice(0, 200);
+    if (DUP_NO.test(probe) && !DUP_OK.test(probe)) return { kind: 'forbidden', scope: scope, raw: raw };
+    if (DUP_OK.test(probe) && !DUP_NO.test(probe)) return { kind: 'allowed',   scope: scope, raw: raw };
     /* 둘 다 있거나 둘 다 없으면 **모른다고 말한다.** 원문은 화면에 그대로 보여 준다. */
-    return { kind: 'unknown', raw: line.trim().slice(0, 200) };
+    return { kind: 'unknown', scope: scope, raw: raw };
   }
-  return { kind: 'unknown', raw: '' };
+  return { kind: 'unknown', scope: 'unclear', raw: '' };
 }
 
 /* ── 합산 ────────────────────────────────────────────────────

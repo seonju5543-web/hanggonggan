@@ -90,6 +90,28 @@ function evaluate(sch, p) {
     else reasons.push(`재학 대학 공고 (${e.schoolOnly})`);
   }
 
+  /* 🔴 이중수혜 (2026-08-27 개발자 지적으로 신설).
+     공고 원문 66건에 `타 재단 장학금 중복수혜 불가` 같은 조항이 있는데, 그동안 학생이
+     보는 자리에는 **0건** 노출이었다. 이 조항은 자격 절에도 제외 절에도 안 살고
+     신청기간·장학금액·제출서류 절에 흩어져 있어서, 절 단위로 자격을 읽는 구조가
+     통째로 버리고 있었다. 결과는 이 저장소가 가장 싫어하는 실패다 — 이미 다른
+     장학금을 받는 학생이 서류를 다 준비하고 지원했다가 탈락한다.
+
+     ⚠️ 모르면 판정하지 않는다. `scholarships` 가 null(=아직 안 물어봄)이면 missing 으로
+        두고, 없다고 단정하지 않는다. 이 앱의 '모른다고 말할 자유' 규칙 그대로다. */
+  const ex = sch.exclusivity;
+  /* 🔴 scope 가 'external' 인 것만 판정에 쓴다. `복지장학 2는 복지장학 1과 중복 불가`
+     같은 **교내끼리의 배타**를 외부 재단 장학금 보유자에게 적용하면 멀쩡한 학생이 떨어진다.
+     원문이 대외·교외·타 재단이라고 못박은 것만 자격으로 본다. */
+  if (ex && ex.kind === 'forbidden' && ex.scope === 'external') {
+    const held = p && p.scholarships;
+    if (!Array.isArray(held)) missing.push('지금 받고 있는 장학금');
+    else if (held.includes('external')) {
+      ok = false;
+      reasons.push('이미 받고 있는 외부 재단 장학금이 있어 지원할 수 없어요');
+    } else reasons.push('중복 수혜 조건 충족 (외부 재단 장학금 없음)');
+  }
+
   if (!ok) return { status: 'ineligible', reasons, missing };
   if (missing.length) return { status: 'unknown', reasons, missing };
   if (e.selective) return { status: 'selective', reasons, missing };
