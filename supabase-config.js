@@ -36,22 +36,19 @@ const SUPABASE_CONFIG = {
           Site URL          https://seonju5543-web.github.io/hanggonggan/
           Redirect URLs     https://seonju5543-web.github.io/hanggonggan/
      쓸 수 있는 값: 'google' · 'kakao' (Supabase 가 공식 지원한다) */
-  providers: ['google'],
-  /* 🔴 카카오를 붙이려면 (2026-08-25 여기까지 해 둠 — 남은 것은 아래 넷뿐)
-     ① developers.kakao.com 앱 '한대장'(ID 1556646)은 **이미 만들어져 있고**
-        제품 설정 → 카카오 로그인 → 사용 설정 = ON 까지 되어 있다.
-     ② 남은 것: 앱 설정 → 플랫폼 → Web 등록에 사이트 도메인
-          https://ffnzmiorcojbhpqwqgcy.supabase.co
-        ⚠️ 이걸 먼저 해야 Redirect URI 칸이 **나타난다**(안 하면 안 보인다 — 여기서 막혔다).
-     ③ 그다음 카카오 로그인 → 일반 → Redirect URI 에
-          https://ffnzmiorcojbhpqwqgcy.supabase.co/auth/v1/callback
-        동의항목: profile_nickname · profile_image (이메일은 비즈 앱만 가능)
-        보안 → Client Secret 생성하고 '사용함'으로
-     ④ Supabase → Providers → Kakao 에 REST API 키(=Client ID)와 Client Secret 을 넣고,
-        🔴 **'Allow users without an email' 을 켠다** — 카카오는 이메일을 안 주므로
-           안 켜면 로그인이 실패한다(공식 문서 확인).
-        마지막으로 위 providers 를 ['google', 'kakao'] 로 고친다.
-     ⚠️ 앱 코드는 이미 카카오를 지원한다(동그란 아이콘 포함). 고칠 것은 위 한 줄뿐이다. */
+  providers: ['google', 'kakao'],
+  /* 🔴 카카오 — 2026-08-26 연결 완료. 다시 설정할 일이 생기면 이 순서다.
+     앱: developers.kakao.com '한대장'(ID 1556646)
+     ① 제품 설정 → 카카오 로그인 → 사용 설정 ON
+     ② 앱 설정 → 플랫폼 키 → REST API 키 → **그 키를 눌러 들어가면** 아래에
+        '카카오 로그인 리다이렉트 URI'와 '클라이언트 시크릿'이 함께 있다.
+        ⚠️ 옛 문서가 말하는 '웹 플랫폼 등록'은 콘솔 개편으로 사라졌다 — 여기 한 곳이다.
+        리다이렉트 URI = https://ffnzmiorcojbhpqwqgcy.supabase.co/auth/v1/callback
+     ③ Supabase → Providers → Kakao: REST API 키를 Client ID 로, 시크릿 코드를 Secret 으로.
+        🔴 'Allow users without an email' 을 **켠다** — 카카오는 개인 개발자 앱에
+           이메일을 주지 않으므로 꺼져 있으면 로그인이 실패한다.
+        ⚠️ 브라우저 자동완성이 구글 열쇠를 그 칸에 다시 채워 넣은 적이 있다. 저장 뒤
+           /auth/v1/authorize?provider=kakao 를 따라가 client_id 를 눈으로 확인할 것. */
 
   /* 저장을 서버로 보내기 전에 기다리는 시간(밀리초).
      온보딩에서 한 칸 고칠 때마다 서버를 두들기면 무료 등급이 금방 닳는다 — 묶어서 한 번 보낸다. */
