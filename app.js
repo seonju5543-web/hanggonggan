@@ -1495,9 +1495,12 @@ function renderAmountDetail() {
   const { bill, count } = lastBill;
   const p = state.profile;
   const sum = (arr) => arr.reduce((s, m) => s + (m.won || 0), 0);
-  const grp = (title, right, note, rows) => (rows ? `
+  /* 🔴 갈래는 **비어 있어도 그린다.** 승인받은 화면이 네 갈래이기 때문이다.
+     처음에 '내용 없으면 통째로 숨김'을 넣었다가 개발자가 승인한 화면과 다른 것이 나갔다
+     (2026-08-27). 보여 주고 승인받은 구조를 코드에서 조용히 바꾸지 말 것. */
+  const grp = (title, right, note, rows, empty) => `
     <div class="ad-grp"><div class="ad-grp-h"><b>${title}</b><span>${right}</span></div>
-    ${note ? `<p class="ad-grp-note">${note}</p>` : ''}${rows}</div>` : '');
+    ${note ? `<p class="ad-grp-note">${note}</p>` : ''}${rows || `<p class="ad-empty">${empty}</p>`}</div>`;
 
   $('#detail-sheet').innerHTML = `
     <div class="sheet-handle"></div>
@@ -1510,19 +1513,23 @@ function renderAmountDetail() {
         <p class="ad-total-sub">확인된 금액만 합산${bill.unknown.length ? ` · 미확인 ${bill.unknown.length}건 제외` : ''}</p>
       </div>
       ${grp('합산', `${bill.added.length}건 · ${won(sum(bill.added))}`, '',
-        bill.added.map((m) => amountDetailRow(m, { tone: 'on' })).join(''))}
+        bill.added.map((m) => amountDetailRow(m, { tone: 'on' })).join(''),
+        '합산된 공고가 없습니다.')}
       ${grp('중복 수혜 불가', `${bill.onlyOne.length + bill.dropped.length}건 중 ${bill.onlyOne.length}건`,
         '함께 받을 수 없는 공고입니다. 가장 큰 1건만 합산했습니다.',
         bill.onlyOne.map((m) => amountDetailRow(m, { tone: 'on', check: true })).join('')
         + (bill.dropped.length ? `<details><summary>함께 못 받는 공고 ${bill.dropped.length}건</summary>
-          ${bill.dropped.map((m) => amountDetailRow(m, { dim: true, tone: 'off', note: '위 공고와 동시 수혜 불가' })).join('')}</details>` : ''))}
+          ${bill.dropped.map((m) => amountDetailRow(m, { dim: true, tone: 'off', note: '위 공고와 동시 수혜 불가' })).join('')}</details>` : ''),
+        '함께 받을 수 없는 공고가 없습니다.')}
       ${grp('등록금 비율 환산', `${bill.estimated.length}건 · 추정`,
         '금액이 등록금 비율로만 적힌 공고입니다. 학교별 등록금 기준 추정값이며 실제 금액과 다를 수 있습니다.',
-        bill.estimated.map((m) => amountDetailRow(m, { tone: 'est', text: '약 ' + won(m.won) })).join(''))}
+        bill.estimated.map((m) => amountDetailRow(m, { tone: 'est', text: '약 ' + won(m.won) })).join(''),
+        '등록금 비율로 적힌 공고가 없습니다.')}
       ${grp('금액 미확인', `${bill.unknown.length}건 · 0원`,
         '원문에 금액이 없거나 첨부파일에만 있는 공고입니다.',
         bill.unknown.length ? `<details><summary>공고 ${bill.unknown.length}건 보기</summary>
-          ${bill.unknown.map((m) => amountDetailRow(m, { dim: true, tone: 'off', text: '금액 원문 확인' })).join('')}</details>` : '')}
+          ${bill.unknown.map((m) => amountDetailRow(m, { dim: true, tone: 'off', text: '금액 원문 확인' })).join('')}</details>` : '',
+        '금액을 못 읽은 공고가 없습니다.')}
       <p class="ad-foot">모든 금액은 공고 원문 기준입니다.<br>선발 결과에 따라 실제 수혜액은 달라질 수 있습니다.</p>
     </div>`;
   openSheetShell();

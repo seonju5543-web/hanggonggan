@@ -2236,5 +2236,43 @@ console.log('\n■ 금액 산정 — 부풀리지 않는가 (2026-08-27)');
     PA.sumAmounts([{ id: 'r', amountSpec: r }], { tuition: 4180000 }).estimated.length, 1);
 }
 
+/* ── 🔴 승인받은 화면을 코드가 조용히 바꾸지 못하게 (2026-08-27 사고로 신설) ──
+   개발자에게 목업을 보여 주고 네 차례 수정받아 확정한 '금액 상세' 화면이 있는데,
+   구현하면서 **'내용이 없으면 갈래를 통째로 숨긴다'는 규칙을 말없이 넣어** 실제 앱에는
+   갈래가 2개만 나갔다. 승인받은 것과 다른 것이 배포된 것이다.
+   이 절은 그 화면의 **구조와 문구를 코드에 못 박는다.** 바꾸려면 개발자에게 다시 보여
+   승인받고 이 검사도 같이 고쳐야 한다 — 검사만 고치는 것은 같은 사고의 반복이다. */
+console.log('\n■ 금액 상세 — 승인받은 화면 그대로인가 (2026-08-27)');
+{
+  const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+  /* 줄 하나를 그리는 amountDetailRow 도 같은 화면이라 함께 본다 */
+  const body = app.slice(app.indexOf('function amountDetailRow'), app.indexOf('function renderBulkPrep'));
+  eq('renderAmountDetail 이 있다', body.length > 200, true);
+
+  // ① 갈래 넷 — 이름은 개발자가 '명사형으로 조이기'로 정한 것이다
+  for (const t of ['합산', '중복 수혜 불가', '등록금 비율 환산', '금액 미확인']) {
+    eq(`갈래 '${t}' 가 있다`, body.includes(`grp('${t}'`), true);
+  }
+  eq('제목은 금액 상세다', body.includes('금액 상세'), true);
+
+  // ② 🔴 비어 있어도 갈래를 그린다 — 이게 이번 사고의 재발 방지선이다
+  eq('갈래가 비었다고 통째로 숨기지 않는다', /grp = \([^)]*\) => \(rows \?/.test(body), false);
+  eq('빈 갈래는 안내 문구로 자리를 지킨다', body.includes('ad-empty'), true);
+
+  // ③ 개발자가 고쳐 준 문구 — 되돌아가면 실패한다
+  eq('학교별 등록금 기준 (평균 아님)', body.includes('학교별 등록금 기준 추정값'), true);
+  eq("'~했어요' 체를 쓰지 않는다", /했어요|드릴게요|돼요/.test(body), false);
+  eq('갈래 이름에 이모지를 붙이지 않는다', /grp\('[^']*[\u{1F300}-\u{1FAFF}\u{2700}-\u{27BF}]/u.test(body), false);
+  eq('뺀 공고 문구에 안 셈을 붙이지 않는다', body.includes('안 셈'), false);
+  eq('원문은 더보기로 접는다', body.includes('원문 보기'), true);
+  eq('뺀 공고도 더보기로 보여 준다', body.includes('함께 못 받는 공고'), true);
+  eq('미확인 공고도 더보기로 보여 준다', body.includes('건 보기'), true);
+  eq('합침은 학교 이름 외 N건으로 쓴다', /외 \$\{merged\}건|외 \$\{/.test(app), true);
+
+  // ④ 시트가 따로 계산하지 않는다 (홈과 다른 말을 하면 안 된다)
+  eq('홈이 만든 lastBill 을 그대로 그린다', body.includes('lastBill'), true);
+  eq('시트가 sumAmounts 를 다시 부르지 않는다', body.includes('sumAmounts('), false);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);
