@@ -46,7 +46,9 @@ var WON_PATTERNS = [
 
 /* 등록금 비율 — `전액`은 100%, `반액`은 50%로 읽는다(원문이 그 뜻으로 쓴다). */
 var RATIO_RE = /(등록금|수업료)\s*(의)?\s*(전액|반액|절반|(\d{1,3})\s*%)|(전액)\s*(면제|감면|지원)/;
-var HOURLY_RE = /(시급|시간당)\s*[\d,]+\s*원|활동\s*시간\s*기준|시간\s*단위/;
+/* `시급 12,790원` 뿐 아니라 `10,320원/시간`·`12,790원/h` 도 시급형이다 —
+   국가근로·교내근로 공고가 대부분 뒤쪽 꼴로 적는다(2026-08-27 전수 조사). */
+var HOURLY_RE = /(시급|시간당)\s*[\d,]+\s*원|[\d,]+\s*원\s*\/\s*(시간|시|h|H)|활동\s*시간\s*기준|시간\s*단위/;
 
 /* 금액이 아닌 숫자를 금액으로 읽지 않기 위한 최소선.
    5만원 미만은 대개 수수료·보험료·서류 부수라 금액으로 보지 않는다. */
@@ -113,9 +115,14 @@ function paEndsAmount(line) {
       || PA_SH.isSelectHead(line) || PA_SH.isSectionBreak(line);
 }
 
-/** 금액 절을 찾아 그 안의 줄만 돌려준다. 못 찾으면 null */
+/** 금액 절을 찾아 그 안의 줄만 돌려준다. 못 찾으면 null
+ *  🔴 **첫 머리글에서 멈추면 안 된다.** 공고에는 금액 머리글로 읽히는 줄이 여러 개 있고
+ *     (학교 홈 메뉴 `# 장학금`, `장학금 종류`, `지원내용` 같은 빈 껍데기가 흔하다)
+ *     첫 번째가 껍데기면 진짜 금액이 뒤에 있어도 통째로 놓친다 — 2026-08-27에 실제로
+ *     절대액이 48→35건으로 떨어졌다. 그래서 **숫자나 등록금 비율이 들어 있는 블록**을
+ *     우선으로 고르고, 그런 게 하나도 없을 때만 첫 블록을 돌려준다. */
 function amountBlock(lines, maxLines) {
-  var arr = lines || [], cap = maxLines || 8;
+  var arr = lines || [], cap = maxLines || 8, first = null;
   for (var i = 0; i < arr.length; i++) {
     if (!PA_SH.isAmountHead(arr[i])) continue;
     var out = [arr[i]];
@@ -123,9 +130,12 @@ function amountBlock(lines, maxLines) {
       if (paEndsAmount(arr[j])) break;
       out.push(arr[j]);
     }
-    return { head: arr[i], lines: out, at: i };
+    var blk = { head: arr[i], lines: out, at: i };
+    if (!first) first = blk;
+    var body = out.join(' ');
+    if (wonIn(body) || ratioIn(body) || HOURLY_RE.test(body)) return blk;   // 알맹이가 있는 블록
   }
-  return null;
+  return first;
 }
 
 /**

@@ -166,6 +166,27 @@ try {
   });
 } catch (e) { warns.push(`자격 품질 채점을 돌리지 못했습니다: ${e.message.slice(0, 80)}`); }
 
+/* 🔴 화면에 금액이 뜨는데 근거를 못 보여 주는 공고 (2026-08-27 신설)
+   개발자 지적: *"실패분이라는 게 있는 게 말이 된다고 생각해, 사용자 앱에 들어가는 화면인데?"*
+   `amountValue`(화면에 뜨는 숫자)는 있는데 `amountSpec`(원문에서 읽은 근거)이 없으면,
+   학생은 금액만 보고 어디서 나온 값인지 확인할 길이 없다. 그런 공고는 화면이
+   **원문 공고 링크라도** 줘야 한다(원칙 8-1). 링크조차 없으면 오류로 막는다.
+   ⚠️ 이 검사는 파서가 나빠지는 것도 같이 잡는다 — 규칙을 잘못 고쳐 읽던 금액을
+      못 읽게 되면 여기 건수가 늘어난다(2026-08-27에 실제로 48→35건으로 떨어뜨렸다). */
+{
+  const noBasis = reg.items.filter((it) => (it.amountValue || 0) > 0 && !it.amountSpec);
+  for (const it of noBasis) {
+    const where = `registered:${it.id}`;
+    if (!it.sourceUrl) {
+      errors.push(`${where} — 화면에 ${it.amountValue.toLocaleString()}원이 뜨는데 원문 근거도 링크도 없습니다`);
+    } else {
+      warns.push(`${where} — 금액 ${it.amountValue.toLocaleString()}원의 원문 발췌가 없습니다 (원문이 첨부·제목에만 있는 공고 — 화면은 원문 링크를 줍니다)`);
+    }
+  }
+  const withSpec = reg.items.filter((it) => it.amountSpec).length;
+  console.log(`금액 근거: 원문 발췌 ${withSpec}건 · 발췌 없이 숫자만 ${noBasis.length}건`);
+}
+
 /* 결과 */
 console.log(`감사 대상: 정식 등록 ${reg.items.length}건 · 양식 ${Object.keys(forms.templates).length}종`);
 /* ── 🔴 자격 자리에 자격이 아닌 줄이 있으면 **저장을 막는다** (2026-08-23) ──

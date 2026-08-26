@@ -87,6 +87,13 @@ function isQualifyHead(line) {
    parse-amount.js 가 자기 정규식을 따로 갖게 두면 화면과 수집기가 다른 절을 읽게 된다. */
 const AMOUNT_WORD = /(장학\s?금액|지급\s?금액|지원\s?금액|수혜\s?금액|지급\s?액|지급\s?내역|장학금?\s?(지급|내용|혜택|종류)|지원\s?내용|장학\s?내용)/;
 
+/* 🔴 맨 `장학금`은 **콜론이 붙었을 때만** 머리글이다.
+   인하대 가송재단이 `2. 장학금 : 500만원` 이라고만 적어 500만원을 통째로 못 읽고 있었다.
+   그런데 낱말 목록에 그냥 넣었더니 학교 홈 메뉴 `# 장학금 | # 도서관 | # 증명서` 가
+   금액 머리글로 잡혀, 진짜 금액 절보다 **앞에서** 걸리는 바람에 절대액이 48→35건으로
+   떨어졌다(2026-08-27에 실제로 그렇게 만들었다가 되돌림). 메뉴에는 콜론이 없다. */
+const AMOUNT_BARE = /^[^:：]{0,12}장학\s?금\s*[:：]/;
+
 /* 🔴 `혜택`을 홀로 두면 안 된다 — 학교 홈 메뉴의 `의료기관 진료혜택`이 금액 머리글로 읽힌다
    (정읍시민장학재단·경희대 인턴십에서 실제로 그랬다). `장학혜택`은 위 `장학금?\s?혜택`이 잡는다. */
 
@@ -109,7 +116,8 @@ function isAmountHead(line) {
   if (isExcludeHead(line) || isSelectHead(line) || isQualifyHead(line)) return false;
   const t = headText(line);
   if (AMOUNT_NOT.test(t)) return false;
-  return isHead(t, AMOUNT_WORD);
+  if (isHead(t, AMOUNT_WORD)) return true;
+  return AMOUNT_BARE.test(t);
 }
 
 /** 자격 절을 여기서 끊어야 하는가 (제외·선발·그 밖의 다음 절 전부) */

@@ -1481,7 +1481,15 @@ function amountDetailRow(m, opt) {
       <div class="ad-list"><span>같은 재단이 여러 학교에서 접수하는 공고. 1건으로 합산.</span>
       ${[sch, ...m.mergedFrom].map((x) => `<span>${esc(x.provider || x.name || '')}</span>`).join('')}</div></details>` : ''}
     ${raw || exRaw ? `<details><summary>원문 보기</summary>
-      <p class="ad-src">"${esc(raw || exRaw)}"<em>${esc(noticeSourceLabel(sch))}</em></p></details>` : ''}
+      <p class="ad-src">"${esc(raw || exRaw)}"<em>${esc(noticeSourceLabel(sch))}</em></p></details>`
+    /* 🔴 발췌가 없으면 지어내지 않고 **원문으로 가는 길**을 준다 (원칙 8-1).
+       금액이 첨부파일이나 제목에만 있어 사람이 손으로 넣은 공고가 있다 — 화면에 금액이
+       뜨는데 근거를 하나도 못 보여 주는 상태로 두면 안 된다(개발자 지적 2026-08-27).
+       게시판 목록 주소인 공고는 '원문 공고'라고 쓰면 거짓말이라 라벨을 바꾼다. */
+    : (o.text || m.won ? (sch.sourceUrl
+      ? `<p class="ad-link"><a href="${esc(safeUrl(sch.sourceUrl))}" target="_blank" rel="noopener">${
+          sch.program ? '한국장학재단 ↗' : (isBoardListLink(sch.sourceUrl) ? '게시판 목록 ↗' : '원문 공고 ↗')}</a></p>`
+      : '') : '')}
   </div>`;
 }
 
