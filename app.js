@@ -2341,13 +2341,10 @@ function renderAccountCard() {
          <button class="btn btn-outline danger" id="btn-acc-del">탈퇴 (서버 정보 삭제)</button>
        </div>`
     : `<p class="acc-head">계정</p>
-       <p class="acc-note">지금은 이 기기에만 저장돼요. <strong>기기를 바꾸면 처음부터 다시 입력해야 해요.</strong>
-         로그인하면 프로필과 신청내역이 기기를 바꿔도 이어져요.</p>
        <div class="acc-actions">
          <button class="btn btn-primary" id="btn-acc-in">로그인</button>
          <button class="btn btn-outline" id="btn-acc-up">회원가입</button>
-       </div>
-       <p class="acc-note"><a href="terms.html" target="_blank" rel="noopener">이용약관 · 개인정보처리방침</a></p>`;
+       </div>`;
 
   const btnIn = $('#btn-acc-in'); if (btnIn) btnIn.addEventListener('click', () => openAuthSheet('in'));
   const btnUp = $('#btn-acc-up'); if (btnUp) btnUp.addEventListener('click', () => openAuthSheet('up'));
@@ -2369,7 +2366,8 @@ function renderAccountCard() {
 /* ---------------- 로그인 · 가입 시트 ---------------- */
 /* 🔴 새 시트를 만들지 않고 #detail-sheet 를 그대로 쓴다 —
    쓸어 내려 닫기·배경 눌러 닫기·ESC 가 이미 배선돼 있다(2026-08-21 개발자 지시). */
-let authMode = 'in';   // 'in' 로그인 · 'up' 가입
+/* 화면 넷 — 'in' 로그인 · 'up' 가입 · 'reset' 비밀번호 재설정 요청 · 'newpw' 새 비밀번호 */
+let authMode = 'in';
 
 function openAuthSheet(mode) {
   authMode = mode || 'in';
@@ -2377,40 +2375,100 @@ function openAuthSheet(mode) {
   renderAuthSheet();
 }
 
-function renderAuthSheet(errText) {
-  const up = authMode === 'up';
+/* 소셜 로그인 — supabase-config.js 의 providers 에 적은 것만 **동그란 아이콘**으로 나온다.
+   🔴 여기에 적는 것만으로는 안 되고, 대시보드에서 그 제공자를 켜야 실제로 동작한다.
+   🔴 로고는 **그림 파일이 아니라 코드 안의 도형**이다 — 앱의 보안 설정(CSP)이 바깥 그림을
+      막기도 하고, 파일이 없어도 아이콘이 깨지지 않아서다. */
+const AUTH_PROVIDERS = {
+  google: { label: '구글', svg: '<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.7-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.7-.4-3.9z"/></svg>' },
+  kakao: { label: '카카오', svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#191600" d="M12 3.5C6.8 3.5 2.6 6.9 2.6 11c0 2.6 1.7 4.9 4.3 6.2-.2.7-.7 2.6-.8 3-.1.5.2.5.4.4.2-.1 2.7-1.9 3.8-2.6.6.1 1.2.1 1.7.1 5.2 0 9.4-3.4 9.4-7.5S17.2 3.5 12 3.5z"/></svg>' },
+  naver: { label: '네이버', svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M16.3 12.9L7.5 0H0v24h7.7V11.1L16.5 24H24V0h-7.7v12.9z"/></svg>' },
+};
+function authProvidersHtml() {
+  const list = (typeof SUPABASE_CONFIG !== 'undefined' && SUPABASE_CONFIG.providers) || [];
+  const known = list.filter((p) => AUTH_PROVIDERS[p]);
+  if (!known.length) return '';
+  return `<div class="auth-or"><span>또는 간편하게</span></div>
+    <div class="auth-social">${known.map((p) => {
+      const m = AUTH_PROVIDERS[p];
+      return `<button type="button" class="auth-social-btn auth-${esc(p)}" data-oauth="${esc(p)}"
+        aria-label="${esc(m.label)}로 계속하기" title="${esc(m.label)}로 계속하기">${m.svg}</button>`;
+    }).join('')}</div>
+    <p class="auth-social-note">한 번 연결하면 다음부터는 비밀번호 없이 바로 로그인돼요</p>`;
+}
+
+function renderAuthSheet(errText, okText) {
+  const mode = authMode;
+  const title = { in: '로그인', up: '회원가입', reset: '비밀번호 재설정', newpw: '새 비밀번호 정하기' }[mode];
+  const emailVal = mode === 'up' ? '' : (typeof rememberedEmail === 'function' ? rememberedEmail() : '');
+  const remembered = !!emailVal;
+
+  const emailField = `
+      <label class="field">
+        <span class="field-label">이메일</span>
+        <input type="email" id="in-auth-email" placeholder="name@example.com" value="${esc(emailVal)}"
+          autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" />
+      </label>`;
+  const pwField = (label, auto) => `
+      <label class="field">
+        <span class="field-label">${label}</span>
+        <input type="password" id="in-auth-pw" placeholder="비밀번호" autocomplete="${auto}" />
+      </label>`;
+
+  let mid = '';
+  if (mode === 'in') {
+    mid = emailField + pwField('비밀번호', 'current-password') + `
+      <div class="auth-row">
+        <label class="auth-remember"><input type="checkbox" id="in-auth-remember" ${remembered ? 'checked' : ''} /> 아이디 저장</label>
+        <button type="button" class="btn-link" id="btn-auth-forgot">비밀번호를 잊으셨나요?</button>
+      </div>`;
+  } else if (mode === 'up') {
+    mid = emailField + pwField('비밀번호 (6자 이상)', 'new-password') + `
+      <label class="check-item consent-item">
+        <input type="checkbox" id="in-auth-agree" />
+        <span>(필수) <a href="terms.html" target="_blank" rel="noopener">이용약관 · 개인정보처리방침</a>에 동의합니다</span>
+      </label>`;
+  } else if (mode === 'reset') {
+    mid = `<p class="auth-lead">가입할 때 쓴 이메일로 비밀번호를 다시 정하는 링크를 보내 드려요.</p>`
+      + emailField;
+  } else {
+    mid = `<p class="auth-lead">새로 쓸 비밀번호를 정해 주세요.</p>`
+      + pwField('새 비밀번호 (6자 이상)', 'new-password');
+  }
+
+  const goLabel = { in: '로그인', up: '가입하기', reset: '재설정 메일 보내기', newpw: '비밀번호 바꾸기' }[mode];
+  const swap = mode === 'in'
+    ? '<button class="btn btn-outline" id="btn-auth-swap" style="width:100%">계정이 없어요 — 회원가입</button>'
+    : mode === 'up'
+      ? '<button class="btn btn-outline" id="btn-auth-swap" style="width:100%">이미 계정이 있어요 — 로그인</button>'
+      : '<button class="btn btn-outline" id="btn-auth-swap" style="width:100%">← 로그인으로 돌아가기</button>';
+
   $('#detail-sheet').innerHTML = `
     <div class="sheet-handle"></div>
     <div class="sheet-body">
-      <h3 class="sheet-title">${up ? '회원가입' : '로그인'}</h3>
-      <p class="sheet-provider">${up
-        ? '이메일과 비밀번호만 있으면 돼요. 다른 정보는 묻지 않아요.'
-        : '가입할 때 쓴 이메일과 비밀번호를 넣어 주세요.'}</p>
-      <label class="field">
-        <span class="field-label">이메일</span>
-        <input type="email" id="in-auth-email" placeholder="name@example.com"
-          autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" />
-      </label>
-      <label class="field">
-        <span class="field-label">비밀번호${up ? ' (6자 이상)' : ''}</span>
-        <input type="password" id="in-auth-pw" placeholder="비밀번호"
-          autocomplete="${up ? 'new-password' : 'current-password'}" />
-      </label>
-      ${up ? `<label class="check-item consent-item">
-        <input type="checkbox" id="in-auth-agree" />
-        <span>(필수) <a href="terms.html" target="_blank" rel="noopener">이용약관 · 개인정보처리방침</a>에 동의합니다</span>
-      </label>` : ''}
+      <h3 class="sheet-title">${title}</h3>
+      ${mid}
       <p class="auth-err" id="auth-err" ${errText ? '' : 'hidden'}>${esc(errText || '')}</p>
-      <button class="btn btn-primary btn-lg" id="btn-auth-go">${up ? '가입하기' : '로그인'}</button>
-      <button class="btn btn-outline" id="btn-auth-swap" style="width:100%">
-        ${up ? '이미 계정이 있어요 — 로그인' : '계정이 없어요 — 회원가입'}
-      </button>
+      <p class="auth-ok" id="auth-ok" ${okText ? '' : 'hidden'}>${esc(okText || '')}</p>
+      <button class="btn btn-primary btn-lg" id="btn-auth-go">${goLabel}</button>
+      ${swap}
+      ${mode === 'in' || mode === 'up' ? authProvidersHtml() : ''}
       <p class="dp-note">주민등록번호·계좌번호·증명서류는 서버로 보내지 않고 이 기기에만 남아요.</p>
     </div>`;
 
-  $('#btn-auth-swap').addEventListener('click', () => { authMode = up ? 'in' : 'up'; renderAuthSheet(); });
   $('#btn-auth-go').addEventListener('click', authSubmit);
-  $('#in-auth-pw').addEventListener('keydown', (e) => { if (e.key === 'Enter') authSubmit(); });
+  $('#btn-auth-swap').addEventListener('click', () => {
+    authMode = mode === 'up' ? 'in' : (mode === 'in' ? 'up' : 'in');
+    renderAuthSheet();
+  });
+  const forgot = $('#btn-auth-forgot');
+  if (forgot) forgot.addEventListener('click', () => { authMode = 'reset'; renderAuthSheet(); });
+  const pw = $('#in-auth-pw');
+  if (pw) pw.addEventListener('keydown', (e) => { if (e.key === 'Enter') authSubmit(); });
+  const mail = $('#in-auth-email');
+  if (mail) mail.addEventListener('keydown', (e) => { if (e.key === 'Enter' && mode === 'reset') authSubmit(); });
+  $$('#detail-sheet [data-oauth]').forEach((b) =>
+    b.addEventListener('click', () => authOAuthGo(b.dataset.oauth)));
   $('#detail-sheet').scrollTop = 0;
 }
 
@@ -2419,27 +2477,64 @@ function authShowError(msg) {
   if (!el) return;
   el.textContent = msg;
   el.hidden = false;
+  const okEl = $('#auth-ok');
+  if (okEl) okEl.hidden = true;
 }
 
 async function authSubmit() {
-  const up = authMode === 'up';
-  const email = $('#in-auth-email').value.trim();
-  const pw = $('#in-auth-pw').value;
-  if (!email || !pw) { authShowError('이메일과 비밀번호를 모두 입력해 주세요'); return; }
-  if (up && !$('#in-auth-agree').checked) { authShowError('약관과 개인정보처리방침에 동의해 주세요'); return; }
+  const mode = authMode;
+  const emailEl = $('#in-auth-email');
+  const pwEl = $('#in-auth-pw');
+  const email = emailEl ? emailEl.value.trim() : '';
+  const pw = pwEl ? pwEl.value : '';
+
+  if ((mode === 'in' || mode === 'up') && (!email || !pw)) {
+    authShowError('이메일과 비밀번호를 모두 입력해 주세요'); return;
+  }
+  if (mode === 'reset' && !email) { authShowError('이메일을 입력해 주세요'); return; }
+  if (mode === 'newpw' && !pw) { authShowError('새 비밀번호를 입력해 주세요'); return; }
+  if (mode === 'up' && !$('#in-auth-agree').checked) {
+    authShowError('약관과 개인정보처리방침에 동의해 주세요'); return;
+  }
 
   const btn = $('#btn-auth-go');
+  const label = btn.textContent;
   btn.disabled = true;
-  btn.textContent = up ? '가입하는 중…' : '로그인하는 중…';
-  const r = up ? await authSignUp(email, pw) : await authSignIn(email, pw);
+  btn.textContent = '잠시만요…';
+  let r;
+  if (mode === 'up') r = await authSignUp(email, pw);
+  else if (mode === 'in') r = await authSignIn(email, pw);
+  else if (mode === 'reset') r = await authResetRequest(email);
+  else r = await authUpdatePassword(pw);
   btn.disabled = false;
-  btn.textContent = up ? '가입하기' : '로그인';
+  btn.textContent = label;
 
   if (!r.ok) { authShowError(r.error); return; }
-  if (r.needsEmailConfirm) {
-    authShowError('가입 확인 메일을 보냈어요 — 메일의 링크를 누른 뒤 로그인해 주세요');
+
+  /* 🔴 재설정 메일은 **정말 갔는지 앱이 알 수 없다.** Supabase 기본 발송기는 시간당 2통이고
+     팀원이 아닌 주소로는 거부하는데, 그 거부가 앱에는 성공으로 보인다. 그래서
+     "보냈습니다"라고 단정하지 않고 안 왔을 때 무엇을 하면 되는지까지 적는다. */
+  if (mode === 'reset') {
+    renderAuthSheet(null, '재설정 링크를 보내 달라고 요청했어요. 메일함(스팸함도)을 확인해 주세요.\n'
+      + '몇 분 안에 안 오면 아직 메일 발송이 준비되지 않은 것이니 관리자에게 알려 주세요.');
     return;
   }
+  if (mode === 'newpw') {
+    closeSheet();
+    toast('비밀번호를 바꿨어요');
+    renderMy();
+    return;
+  }
+  if (r.needsEmailConfirm) {
+    renderAuthSheet(null, '가입 확인 메일을 보냈어요 — 메일의 링크를 누른 뒤 로그인해 주세요.');
+    return;
+  }
+
+  /* '아이디 저장' — 이메일 한 줄만. 비밀번호는 절대 저장하지 않는다. */
+  const rememberEl = $('#in-auth-remember');
+  if (mode === 'in') setRememberedEmail(rememberEl && rememberEl.checked ? email : '');
+  else setRememberedEmail(email);          // 가입한 사람은 그 주소를 기억해 둔다
+
   closeSheet();
   toast('로그인했어요 — 이제 기기를 바꿔도 이어져요');
   /* 🔴 순서가 중요하다 — **먼저** 서버와 맞춘다. 새 기기에서는 이 줄에서 프로필이
@@ -2468,6 +2563,18 @@ if (state.profile) {
 } else {
   showScreen('onboarding');
 }
-/* 🔴 화면을 **다 그린 뒤에** 서버와 맞춘다. 기기 우선이라 여기서 기다리지 않는다 —
-   인터넷이 없으면 아무 일도 안 일어나고 앱은 지금처럼 그대로 돈다. */
-if (typeof syncAfterLoad === 'function') syncAfterLoad();
+/* 🔴 소셜 로그인·비밀번호 재설정 메일은 **주소 뒤에 토큰을 붙여** 이 앱으로 돌아온다.
+   그걸 먼저 주워 담아야(그리고 주소창에서 지워야) 로그인 상태로 이어진다.
+   그 뒤에 서버와 맞춘다 — 기기 우선이라 여기서 기다리지 않는다. 인터넷이 없으면
+   아무 일도 안 일어나고 앱은 지금처럼 그대로 돈다. */
+if (typeof authCaptureFromUrl === 'function') {
+  authCaptureFromUrl().then((kind) => {
+    if (kind === 'recovery') { openAuthSheet('newpw'); return; }   // 새 비밀번호를 정할 차례
+    if (kind === 'signin') { toast('로그인했어요'); renderMy(); }
+    if (typeof syncAfterLoad === 'function') syncAfterLoad();
+  }).catch(() => {
+    if (typeof syncAfterLoad === 'function') syncAfterLoad();
+  });
+} else if (typeof syncAfterLoad === 'function') {
+  syncAfterLoad();
+}

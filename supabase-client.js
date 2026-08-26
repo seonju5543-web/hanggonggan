@@ -23,6 +23,9 @@
 
 /* 로그인 표 — 토큰은 폰 안에만 둔다. 서비스워커는 이 값을 안 쓴다(로그인을 모른다). */
 const AUTH_KEY = 'handaejang.auth';
+/* '아이디 저장' — 이메일 한 줄뿐이고 비밀번호는 절대 저장하지 않는다.
+   비밀번호를 저장하면 폰을 잃어버렸을 때 그대로 남의 것이 된다. */
+const REMEMBER_KEY = 'handaejang.remember';
 
 /* 🔴 서버로 내보내지 않을 것 — 이 목록이 약속의 전부다.
    `rrn`(주민등록번호)·`account`(계좌번호)는 신청서를 채우다 앱이 배운 값이라
@@ -39,6 +42,16 @@ function authLoad() {
 }
 function authSave(t) { localStorage.setItem(AUTH_KEY, JSON.stringify(t)); }
 function authClear() { localStorage.removeItem(AUTH_KEY); }
+
+function rememberedEmail() {
+  try { return localStorage.getItem(REMEMBER_KEY) || ''; } catch { return ''; }
+}
+function setRememberedEmail(email) {
+  try {
+    if (email) localStorage.setItem(REMEMBER_KEY, email);
+    else localStorage.removeItem(REMEMBER_KEY);
+  } catch { /* 저장 공간이 막혀 있어도 로그인은 되어야 한다 */ }
+}
 
 function authUser() {
   const t = authLoad();
@@ -71,6 +84,9 @@ function sbFetch(path, opts) {
   const timer = ctrl ? setTimeout(() => ctrl.abort(), SUPABASE_CONFIG.timeoutMs || 8000) : null;
   const headers = Object.assign({
     apikey: SUPABASE_CONFIG.anonKey,
+    /* 공식 라이브러리와 같은 모양으로 보낸다 — 새 publishable 열쇠는 이 조합을 전제로 한다.
+       로그인한 자격으로 부를 때는 sbAuthed 가 이 줄을 사용자 토큰으로 덮어쓴다. */
+    Authorization: 'Bearer ' + SUPABASE_CONFIG.anonKey,
     'Content-Type': 'application/json',
   }, o.headers || {});
   return fetch(sbUrl(path), {
@@ -150,6 +166,74 @@ async function authRefresh() {
   return true;
 }
 
+/* 이 앱이 열려 있는 주소 — 메일 링크와 소셜 로그인이 **여기로 되돌아온다**.
+   ⚠️ 이 주소가 Supabase 대시보드의 Redirect URLs 에 등록돼 있어야 한다. 아니면
+      "requested path is invalid" 로 튕긴다. */
+function authRedirectTo() {
+  return location.origin + location.pathname;
+}
+
+/* 비밀번호 재설정 메일 보내기.
+   🔴 기본 메일 발송기는 시간당 2통이고 **팀원이 아닌 주소로는 거부**한다(supabase-config.js 주석).
+      그래서 실패해도 "메일을 보냈다"고 단정하지 않는다 — 서버가 성공을 주면 그대로 전한다. */
+async function authResetRequest(email) {
+  /* 🔴 돌아올 주소는 **주소 뒤에 붙인다**(redirect_to=). 헤더로 보내면 브라우저가
+     CORS 사전 확인 단계에서 막아 요청 자체가 안 나간다 — 실제로 그렇게 막혔다. */
+  const res = await sbFetch('/auth/v1/recover?redirect_to=' + encodeURIComponent(authRedirectTo()), {
+    method: 'POST',
+    body: { email },
+  });
+  if (!res.ok) return { ok: false, error: authErrorText(res) };
+  return { ok: true };
+}
+
+/* 메일 링크로 돌아온 뒤 새 비밀번호를 정한다 (그 링크가 준 토큰으로 부른다) */
+async function authUpdatePassword(password) {
+  const res = await sbAuthed('/auth/v1/user', { method: 'PUT', body: { password } });
+  if (!res.ok) return { ok: false, error: authErrorText(res) };
+  return { ok: true };
+}
+
+/* 소셜 로그인 — 이 주소로 **화면을 통째로 옮긴다**(리디렉션). SDK 가 필요 없고,
+   CSP 는 화면 이동을 막지 않는다(connect-src 는 데이터 요청에만 걸린다). */
+function authOAuthUrl(provider) {
+  return sbUrl('/auth/v1/authorize?provider=' + encodeURIComponent(provider)
+    + '&redirect_to=' + encodeURIComponent(authRedirectTo()));
+}
+function authOAuthGo(provider) { location.href = authOAuthUrl(provider); }
+
+/* 토큰만 있고 누구인지 모를 때(소셜·메일 링크로 돌아온 직후) 사람 정보를 받아 온다 */
+async function authFetchUser() {
+  const res = await sbAuthed('/auth/v1/user');
+  if (!res.ok || !res.json) return null;
+  const t = authLoad();
+  if (t) { t.userId = res.json.id || t.userId; t.email = res.json.email || t.email; authSave(t); }
+  return res.json;
+}
+
+/* 🔴 소셜 로그인·메일 링크는 **주소 뒤에 토큰을 붙여** 돌아온다
+   (…/#access_token=…&type=recovery). 그걸 주워 담고 주소창을 깨끗이 지운다 —
+   안 지우면 학생이 그 주소를 복사해 남에게 보내는 순간 계정이 넘어간다.
+   돌려주는 값: null | 'signin' | 'recovery' */
+async function authCaptureFromUrl() {
+  if (!supabaseConfigured()) return null;
+  const hash = String(location.hash || '').replace(/^#/, '');
+  if (!hash || hash.indexOf('access_token=') < 0) return null;
+  const q = new URLSearchParams(hash);
+  const kind = q.get('type') === 'recovery' ? 'recovery' : 'signin';
+  authStore({
+    access_token: q.get('access_token'),
+    refresh_token: q.get('refresh_token') || '',
+    expires_in: Number(q.get('expires_in') || 3600),
+  });
+  /* 주소창에서 토큰을 지운다 — 뒤로 가기 기록에도 안 남게 replaceState 를 쓴다 */
+  try { history.replaceState(null, '', location.pathname + location.search); } catch { location.hash = ''; }
+  await authFetchUser();
+  const u = authUser();
+  if (u && u.email) setRememberedEmail(u.email);
+  return kind;
+}
+
 async function authSignOut() {
   const t = authLoad();
   if (t) await sbAuthed('/auth/v1/logout', { method: 'POST' });
@@ -223,6 +307,6 @@ async function syncPull() {
 
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
-    syncSafeProfile, SYNC_OMIT_COMMON, SYNC_SENSITIVE_KEYS, authErrorText,
+    syncSafeProfile, SYNC_OMIT_COMMON, SYNC_SENSITIVE_KEYS, authErrorText, REMEMBER_KEY,
   };
 }

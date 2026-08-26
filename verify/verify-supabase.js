@@ -42,7 +42,7 @@ function startSupabase() {
     const srv = http.createServer((req, res) => {
       const cors = {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
         'Access-Control-Allow-Headers': 'content-type, authorization, apikey, prefer',
       };
       if (req.method === 'OPTIONS') { res.writeHead(204, cors); res.end(); return; }
@@ -64,6 +64,11 @@ function startSupabase() {
         if (req.url.startsWith('/auth/v1/signup')) return send(200, token((body && body.email) || ''));
         if (req.url.startsWith('/auth/v1/token')) return send(200, token((body && body.email) || 'test@example.com'));
         if (req.url.startsWith('/auth/v1/logout')) return send(204);
+        if (req.url.startsWith('/auth/v1/recover')) return send(200, {});
+        if (req.url.startsWith('/auth/v1/user')) {
+          if (req.method === 'PUT') return send(200, { id: '00000000-0000-4000-8000-000000000001', email: 'test@example.com' });
+          return send(200, { id: '00000000-0000-4000-8000-000000000001', email: 'test@example.com' });
+        }
         if (req.url.startsWith('/rest/v1/profiles')) {
           if (req.method === 'POST') { storedRow = (body && body[0]) || null; return send(201); }
           if (req.method === 'DELETE') { storedRow = null; return send(204); }
@@ -93,6 +98,16 @@ function makeAppCopy(configured) {
   cfg = setStr(cfg, 'url', configured ? `http://localhost:${SB_PORT}` : '');
   cfg = setStr(cfg, 'anonKey', configured ? 'anon-test-key' : '');
   cfg = setNum(cfg, 'pushDelayMs', 60);      // 검사에서 2초를 기다릴 이유가 없다
+  /* 소셜 버튼이 providers 목록에 따라 나오는지 보려면 켠 판이 필요하다.
+     🔴 **항상 덮어쓴다** — 저장소에 무엇이 적혀 있든 검사가 흔들리면 안 된다.
+     (저장소에 'google' 하나가 실제로 채워지자 이 검사가 1개만 세고 실패했다 —
+      푸시 검사에서 겪은 것과 같은 종류의 함정이다.) */
+  if (configured) {
+    cfg = cfg.replace(/\bproviders:\s*\[[^\]]*\]/, "providers: ['google', 'kakao', 'naver']");
+    if (!/providers:\s*\['google', 'kakao', 'naver'\]/.test(cfg)) {
+      throw new Error('supabase-config.js 의 providers 를 바꾸지 못했습니다 — 파일 모양이 바뀐 것 같습니다');
+    }
+  }
   fs.writeFileSync(cfgPath, cfg);
 
   const want = configured ? `http://localhost:${SB_PORT}` : '';
@@ -298,8 +313,79 @@ const seedScript = (seed) => `localStorage.setItem('handaejang.v1', ${JSON.strin
     await ctx.close();
   }
 
-  /* ───────────── [6] 서버가 죽어도 앱은 열린다 ───────────── */
-  console.log('\n[6] 서버가 죽어 있어도 앱은 그대로 열린다 (기기 우선)');
+  /* ───────── [7] 아이디 저장 · 비밀번호 찾기 · 소셜 ───────── */
+  console.log('\n[7] 아이디 저장 · 비밀번호 찾기 · 소셜 로그인');
+  {
+    const { ctx, page } = await newPage();
+    await page.goto(`http://localhost:${APP_PORT}/`, { waitUntil: 'domcontentloaded' });
+    await page.evaluate(seedScript(SEED));
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await settle(page);
+    await page.click('.nav-item[data-nav="my"]');
+    await page.waitForTimeout(300);
+    await page.click('#btn-acc-in');
+    await page.waitForSelector('#btn-auth-go');
+
+    ok(await page.locator('#in-auth-remember').count() === 1, '로그인 화면에 아이디 저장이 있다');
+    ok(await page.locator('#btn-auth-forgot').count() === 1, '비밀번호를 잊으셨나요 링크가 있다');
+    const social = await page.locator('#detail-sheet [data-oauth]').count();
+    ok(social === 3, '소셜 버튼이 providers 수만큼 나온다', social);
+    const gUrl = await page.evaluate(() => authOAuthUrl('google'));
+    ok(gUrl.includes('/auth/v1/authorize?provider=google') && gUrl.includes('redirect_to='),
+      '소셜 주소가 제공자와 돌아올 주소를 담는다', gUrl);
+
+    /* 아이디 저장 — 켜고 로그인하면 다음에 열 때 채워져 있다 */
+    await page.fill('#in-auth-email', 'test@example.com');
+    await page.fill('#in-auth-pw', 'test-password-1234');
+    await page.check('#in-auth-remember');
+    await page.click('#btn-auth-go');
+    await page.waitForTimeout(1200);
+    ok(await page.evaluate(() => rememberedEmail()) === 'test@example.com', '아이디를 저장했다');
+    /* 🔴 비밀번호는 절대 저장하지 않는다 */
+    const dump = await page.evaluate(() => JSON.stringify(Object.entries(localStorage)));
+    ok(!dump.includes('test-password-1234'), '🔴 비밀번호는 어디에도 저장되지 않는다');
+
+    await page.evaluate(() => authSignOut());
+    await page.waitForTimeout(300);
+    await page.evaluate(() => openAuthSheet('in'));
+    await page.waitForSelector('#btn-auth-go');
+    ok(await page.inputValue('#in-auth-email') === 'test@example.com', '다음에 열면 이메일이 채워져 있다');
+
+    /* 비밀번호 재설정 요청 */
+    await page.click('#btn-auth-forgot');
+    await page.waitForTimeout(300);
+    ok(await page.locator('#in-auth-pw').count() === 0, '재설정 화면에는 비밀번호 칸이 없다');
+    await page.fill('#in-auth-email', 'test@example.com');
+    await page.click('#btn-auth-go');
+    await page.waitForTimeout(800);
+    ok(received.some((r) => r.path.startsWith('/auth/v1/recover')), '재설정 요청이 서버로 갔다');
+    const okMsg = await page.textContent('#auth-ok');
+    ok(/스팸함|안 오면/.test(okMsg), '메일이 안 올 수 있다는 것까지 알린다', okMsg.slice(0, 40));
+    await ctx.close();
+  }
+
+  /* ───────── [8] 메일 링크로 돌아왔을 때 ───────── */
+  console.log('\n[8] 메일 링크·소셜로 돌아온 주소 처리');
+  {
+    const { ctx, page } = await newPage();
+    await page.goto(`http://localhost:${APP_PORT}/#access_token=recovery-token&refresh_token=r&expires_in=3600&type=recovery`,
+      { waitUntil: 'domcontentloaded' });
+    await settle(page);
+    ok(await page.locator('#btn-auth-go').count() === 1, '새 비밀번호 화면이 뜬다');
+    ok((await page.textContent('.sheet-title')).includes('새 비밀번호'), '제목이 새 비밀번호다');
+    /* 🔴 주소창에 토큰이 남으면 그 주소를 복사해 보내는 순간 계정이 넘어간다 */
+    ok(!(await page.evaluate(() => location.hash)).includes('access_token'),
+      '🔴 주소창에서 토큰이 지워진다', await page.evaluate(() => location.hash));
+
+    await page.fill('#in-auth-pw', 'brand-new-password');
+    await page.click('#btn-auth-go');
+    await page.waitForTimeout(900);
+    ok(received.some((r) => r.method === 'PUT' && r.path.startsWith('/auth/v1/user')), '새 비밀번호가 서버로 갔다');
+    await ctx.close();
+  }
+
+  /* ───────────── [9] 서버가 죽어도 앱은 열린다 ───────────── */
+  console.log('\n[9] 서버가 죽어 있어도 앱은 그대로 열린다 (기기 우선)');
   {
     await new Promise((r) => sb.close(r));
     const { ctx, page } = await newPage();
@@ -314,7 +400,7 @@ const seedScript = (seed) => `localStorage.setItem('handaejang.v1', ${JSON.strin
     await ctx.close();
   }
 
-  console.log('\n[7] 콘솔 오류');
+  console.log('\n[10] 콘솔 오류');
   ok(errors.length === 0, '콘솔·페이지 오류 없음', errors.slice(0, 4));
 
   await browser.close();
