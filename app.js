@@ -2457,16 +2457,26 @@ function bindEvents() {
      🔴 필터가 '교내'·'교외'·'신청 가능만'으로 걸려 있으면 그 카드가 목록에 없어
         스크롤할 곳이 사라진다. 그래서 **필터만 전체로 되돌린다** —
         정렬은 건드리지 않는다(학생이 고른 기준을 말없이 바꾸면 그것도 임의 변경이다). */
+  /* 🔴 `details` 안쪽 클릭을 통째로 막으면 안 된다 (2026-08-27에 그렇게 했다가 걸렸다).
+     뺀 공고(`함께 못 받는 공고 2건`)와 미확인 공고(`공고 N건 보기`)는 **그 접기 안에 들어 있어서**,
+     통째로 막으면 그 줄들은 눌러도 안 간다. 막아야 하는 것은 셋뿐이다:
+       ① summary — 여닫는 손잡이  ② a — 원문 공고 링크
+       ③ **그 줄 자신의** 접기 안쪽 (원문 발췌·합친 학교 목록)
+     ③이 핵심이다. 바깥 접기 안에 든 줄은 `row.contains(det)` 가 false 라 그대로 이동한다. */
+  const notNav = (t, row) => {
+    if (t.closest('summary') || t.closest('a')) return true;
+    const det = t.closest('details');
+    return !!(det && row.contains(det));
+  };
   document.addEventListener('click', (e) => {
     const row = e.target.closest('[data-goto]');
-    if (!row) return;
-    if (e.target.closest('details') || e.target.closest('a')) return;   // 원문 보기·링크는 이동이 아니다
+    if (!row || notNav(e.target, row)) return;
     gotoExploreCard(row.dataset.goto);
   });
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter' && e.key !== ' ') return;
     const row = e.target.closest && e.target.closest('[data-goto]');
-    if (!row || e.target.closest('details') || e.target.closest('a')) return;
+    if (!row || notNav(e.target, row)) return;
     e.preventDefault();
     gotoExploreCard(row.dataset.goto);
   });

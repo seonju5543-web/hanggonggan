@@ -2305,11 +2305,18 @@ console.log('\n■ 금액 상세 — 승인받은 화면 그대로인가 (2026-0
     eq('카드를 못 찾으면 상세를 대신 연다', goto.includes('openDetail'), true);
     eq('시트를 닫고 간다', goto.includes('closeSheet'), true);
   }
-  /* 안쪽 `원문 보기`·링크를 누른 것은 이동이 아니다 */
+  /* 🔴 무엇이 '이동이 아닌가' — 2026-08-27에 여기서 한 번 틀렸다.
+     `details` 안쪽 클릭을 통째로 막았더니, **뺀 공고와 미확인 공고가 그 접기 안에 들어 있어서**
+     그 줄들은 눌러도 안 갔다. 막아야 하는 건 손잡이·링크·**그 줄 자신의** 접기 안쪽뿐이다. */
   {
-    const h = app.slice(app.indexOf("const row = e.target.closest('[data-goto]')"));
-    eq('원문 보기 클릭은 이동이 아니다', h.slice(0, 400).includes("closest('details')"), true);
-    eq('링크 클릭도 이동이 아니다', h.slice(0, 400).includes("closest('a')"), true);
+    const nav = app.slice(app.indexOf('const notNav ='), app.indexOf('const notNav =') + 400);
+    eq('여닫는 손잡이는 이동이 아니다', nav.includes("closest('summary')"), true);
+    eq('링크는 이동이 아니다', nav.includes("closest('a')"), true);
+    eq('막는 것은 그 줄 자신의 접기 안쪽뿐이다', nav.includes('row.contains(det)'), true);
+    /* 되돌아가면 접기 안의 줄이 죽는다 — details 를 통째로 막는 꼴을 금지한다 */
+    const handler = app.slice(app.indexOf("document.addEventListener('click', (e) => {\n    const row = e.target.closest('[data-goto]')"));
+    eq('details 를 통째로 막지 않는다',
+      /if \(!row \|\| .*closest\('details'\)/.test(handler.slice(0, 300)), false);
   }
 
   // ⑤ 시트가 따로 계산하지 않는다 (홈과 다른 말을 하면 안 된다)
