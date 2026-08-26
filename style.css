@@ -1821,3 +1821,5 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: 3px; paddin
                       display: block; margin-top: 2px; line-height: 1.45; }
 .ad-empty { font-size: 12px; color: var(--text-weak); background: var(--surface);
             border-radius: var(--radius-sm); padding: 12px 13px; box-shadow: var(--shadow); }
+.ad-src em { font-style: normal; color: var(--text-weak); display: block;
+             font-size: 10.5px; margin-top: 3px; }

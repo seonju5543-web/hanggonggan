@@ -2265,6 +2265,13 @@ console.log('\n■ 금액 상세 — 승인받은 화면 그대로인가 (2026-0
   eq('갈래 이름에 이모지를 붙이지 않는다', /grp\('[^']*[\u{1F300}-\u{1FAFF}\u{2700}-\u{27BF}]/u.test(body), false);
   eq('뺀 공고 문구에 안 셈을 붙이지 않는다', body.includes('안 셈'), false);
   eq('원문은 더보기로 접는다', body.includes('원문 보기'), true);
+  /* 🔴 발췌만 넣고 **출처 줄을 빠뜨렸다가** 승인받은 화면과 달라졌다(2026-08-27).
+     목업은 발췌를 따옴표로 감싸고 밑에 `○○대학교 게시 원문`을 붙인다. */
+  eq('원문 발췌를 따옴표로 감싼다', body.includes('"${esc(raw || exRaw)}"'), true);
+  eq('발췌 밑에 출처 줄을 붙인다', body.includes('noticeSourceLabel'), true);
+  /* 빈 갈래 문구에 이중부정을 쓰지 않는다 (개발자 지적) */
+  eq('빈 갈래에 이중부정을 쓰지 않는다', /없는 공고가 없|못 읽은 공고가 없/.test(body), false);
+  eq("빈 갈래는 '0건 중 0건' 대신 해당 없음으로 쓴다", body.includes("'해당 없음'"), true);
   eq('뺀 공고도 더보기로 보여 준다', body.includes('함께 못 받는 공고'), true);
   eq('미확인 공고도 더보기로 보여 준다', body.includes('건 보기'), true);
   eq('합침은 학교 이름 외 N건으로 쓴다', /외 \$\{merged\}건|외 \$\{/.test(app), true);
