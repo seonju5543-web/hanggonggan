@@ -9006,6 +9006,143 @@
    ],
    "sourceUrl": "https://www.gachon.ac.kr/bbs/kor/478/118839/artclView.do",
    "sourceKind": "auto"
+  },
+  {
+   "id": "auto-2275viewdocurrentpageno1",
+   "name": "2026년 울산연구원 하반기 장학생 선발계획 공고",
+   "type": "교내",
+   "provider": "국민대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-26",
+   "period": "접수 기간 원문 확인",
+   "summary": "국민대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "국민대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-26 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12275/view.do?currentPageNo=1",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "○ 선발분야 : 우수 ‧ 다자녀 ‧ 생활 ‧ 재능 ‧ 지역정착청년인재장학금 (5 종 )",
+    "○ 지원대상 : 관내 초 ‧ 중 ‧ 고등학생 , 대학교 신입생 및 재학생",
+    "다자녀장학금",
+    "초 ‧ 중 ‧ 고등학생 , 대학생",
+    "※ 우수 ‧ 다자녀 장학금 의 경우 본인 부담금 ( 등록금 ) 이 없을 경우 신청불가",
+    "• 직전학기 취득학점이 12 학점 이상 , 성적이 4.0/4.5 또는 3.7/4.3 이상인 학생"
+   ],
+   "excerpts": [
+    "※ 제출서류는 공고일 이후 발급된 서류만 인정되며 , 공통서류 (1 ∼ 7 번 ) → 추가서류 (8 ∼ 11 번 ) 순으로 정리하여 제출"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-ticedoarticleno231385659",
+   "name": "2026년 하반기 (재)울산연구원 장학생 선발 안내",
+   "type": "교내",
+   "provider": "영남대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-09-23",
+   "period": "접수 ~2026-09-23",
+   "summary": "영남대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "영남대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-26 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026년 하반기 장학생 선발계획 공고.hwp",
+     "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=231385659&attachNo=375862"
+    }
+   ],
+   "sourceUrl": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=231385659&article.offset=0&articleLimit=10",
+   "sourceKind": "auto",
+   "excerpts": [
+    "접수기간: 2026.09.16.(수) 10:00 ~ 09.23.(수) 18:00"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-skor478118836artclviewdo",
+   "name": "[공통] (생활비)2026년 우양재단 기명ㆍ기타 장학생 모집 안내",
+   "type": "교외",
+   "provider": "가천대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-26",
+   "period": "접수 기간 원문 확인",
+   "summary": "가천대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "가천대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-26 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.gachon.ac.kr/bbs/kor/478/118836/artclView.do",
+   "sourceKind": "auto",
+   "excerpts": [
+    "전화문의 : 장학담당자 02-333-1287"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-skor478118833artclviewdo",
+   "name": "[공통] 울산광역시 남구 『우듬지 인재키움』 장학생 모집기간 안내(연장)",
+   "type": "교내",
+   "provider": "가천대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-26",
+   "period": "접수 기간 원문 확인",
+   "summary": "가천대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "가천대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-26 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "울산광역시 남구-(공고문)우듬지 인재 키움 사업 장학생 모집 공고_재공고 (1).hwp",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/144827/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.gachon.ac.kr/bbs/kor/478/118833/artclView.do",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "7. 지원자격 : 공고일 기준 본인 또는 부모가 남구 1년이상 거주,",
+    "남구 소재 초·중·고등학교 中 1개이상 졸업자 및 학교밖 청소년"
+   ]
   }
  ]
 }

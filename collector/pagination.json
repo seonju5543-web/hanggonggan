@@ -9,7 +9,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-08-25"
+  "checkedAt": "2026-08-26"
  },
  "https://www.skku.edu/skku/campus/skk_comm/notice06.do": {
   "ok": false,
@@ -81,7 +81,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-08-25"
+  "checkedAt": "2026-08-26"
  },
  "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=list&srCategoryId=22": {
   "ok": false,
@@ -101,7 +101,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-08-25"
+  "checkedAt": "2026-08-26"
  },
  "https://www.knou.ac.kr/bbs/knou/51/artclList.do?bbsClSeq=&bbsOpenWrdSeq=25&isViewMine=false&srchColumn=sj&srchWrd=": {
   "ok": true,
@@ -109,7 +109,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-08-25"
+  "checkedAt": "2026-08-26"
  },
  "https://home.knu.ac.kr/HOME/knussw/index.htm": {
   "ok": false,
@@ -133,7 +133,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-08-25"
+  "checkedAt": "2026-08-26"
  },
  "https://www.cbnu.ac.kr/www/selectBbsNttList.do?bbsNo=8&key=815&searchCtgry=%ED%95%99%EC%82%AC/%EC%9E%A5%ED%95%99": {
   "ok": false,
@@ -238,7 +238,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-08-25"
+  "checkedAt": "2026-08-26"
  },
  "https://www.gachon.ac.kr/kor/7986/subview.do": {
   "ok": true,
