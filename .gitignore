@@ -14,3 +14,4 @@ _admin/dist/
 
 # 관리자 미리보기 (필요할 때 만들어 쓰는 일회용 파일)
 _admin/preview.html
+verify/tour/
