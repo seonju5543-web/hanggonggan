@@ -178,6 +178,10 @@
             <label class="check-item"><input type="checkbox" value="defector" /><span>북한이탈주민 (본인/자녀)</span></label>
             <label class="check-item"><input type="checkbox" value="multicultural" /><span>다문화 가정</span></label>
           </div>
+          <div class="check-list" id="in-extra">
+            <label class="check-item"><input type="checkbox" id="in-cert" /><span>공인 외국어성적 보유 (FLEX, TOEFL, HSK 등)</span></label>
+            <label class="check-item"><input type="checkbox" id="in-exchange" /><span>해외 교환학생 파견 예정</span></label>
+          </div>
           <!-- 위 항목을 하나라도 켰고 로그인 기능이 켜져 있을 때만 나타난다 (app.js syncConsentRow).
                🔴 '선택'이다 — 동의하지 않아도 앱은 그대로 쓸 수 있고, 그 경우 이 항목은
                   기기에만 남아 서버로 안 나간다(supabase-client.js syncSafeProfile). -->
@@ -187,10 +191,6 @@
               서버 저장에 동의해 주세요. <a href="terms.html" target="_blank" rel="noopener">자세히 보기</a>
               <em>동의하지 않아도 앱은 그대로 쓸 수 있어요 — 이 항목이 이 기기에만 남을 뿐이에요.</em></span>
           </label>
-          <div class="check-list" id="in-extra">
-            <label class="check-item"><input type="checkbox" id="in-cert" /><span>공인 외국어성적 보유 (FLEX, TOEFL, HSK 등)</span></label>
-            <label class="check-item"><input type="checkbox" id="in-exchange" /><span>해외 교환학생 파견 예정</span></label>
-          </div>
         </div>
         <div class="onboard-actions">
           <button class="btn btn-primary btn-lg" data-next>다음</button>
@@ -273,7 +273,24 @@
 
     <!-- ============ 장학금 탐색 ============ -->
     <section id="screen-explore" class="screen" hidden>
-      <header class="page-header"><h2>장학금 찾기</h2></header>
+      <header class="page-header apps-header">
+        <h2>장학금 찾기</h2>
+        <!-- 정렬 — 아이콘 하나(↑↓) + 지금 기준 글자. 필터 아이콘(☰)은 쓰지 않는다:
+             거르는 일은 아래 칩(전체/교내/교외/신청 가능만)이 이미 한다.
+             누르면 다음 기준으로 넘어가고, 길게 누르면 아래에 목록이 뜬다. -->
+        <div class="sort-wrap">
+          <button id="explore-sort-btn" class="sort-btn" aria-haspopup="menu" aria-expanded="false"
+                  aria-label="정렬 기준 — 눌러서 바꾸기, 길게 눌러 목록 보기">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M7 4v16"/><path d="M4 8l3-4 3 4"/>
+              <path d="M17 20V4"/><path d="M14 16l3 4 3-4"/>
+            </svg>
+            <span id="explore-sort-label">적합도순</span>
+          </button>
+          <div id="explore-sort-menu" class="sort-menu" role="menu" hidden></div>
+        </div>
+      </header>
       <div class="filter-row" id="explore-filters">
         <button class="filter-chip active" data-filter="all">전체</button>
         <button class="filter-chip" data-filter="교내">교내</button>

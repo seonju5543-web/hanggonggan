@@ -607,12 +607,33 @@ const LEARNED_COMMON = [
      · 0%      → 왜 안 되는지 (미달 사유)
      · 미확인   → 앱이 자격을 못 읽었음을 밝힌다 (지어내지 않는다 — 원칙 8-1)
      · 그 외    → 요건 n개 중 m개 충족 */
+/* 🔴 적합도 색깔 (2026-08-24 개발자 지시): "빨강 주황 노랑 초록 파랑 순이고
+   제일 딸리는 게 빨강, 제일 적합한 게 파랑."
+   ⚠️ 색만으로 뜻을 전하지 않는다 — 숫자와 '요건 n개 중 m개'가 늘 함께 간다
+   (색각 이상이 있는 학생에게 색은 아무 말도 하지 않는다). */
+function fitTone(pct) {
+  if (pct >= 80) return 'blue';
+  if (pct >= 60) return 'green';
+  if (pct >= 40) return 'yellow';
+  if (pct >= 20) return 'orange';
+  return 'red';
+}
+
 function fitBadgeHtml(fit, fd) {
   if (!fd) return fit > 0 ? `<span class="badge badge-fit">적합도 ${fit}%</span>` : '';
+  /* 🔴 `fit === 0`은 **evaluate()가 미달로 확정한 것**이다 (fitDetail은 FIT_MIN=5가 바닥이라
+     0을 내지 않는다 — fitScore만 ineligible에 0을 준다). 여기를 안 보면 판정이 갈라진다:
+     다자녀 국가장학금은 학생이 다자녀가 아니라고 **확실히** 판정됐는데, fitDetail이
+     `eligibilityLines`만 읽어 구조화된 자격(flagsAny·tracks)을 못 봐서 '자격 미확인'이 떴다
+     (2026-08-26 정렬 검증에서 발견). 미달을 모른다고 말하면 학생이 헛걸음한다. */
+  if (fit === 0) return '<span class="badge badge-fit-no">지원 자격 미달</span>';
   if (fd.unread) return '<span class="badge badge-fit-unknown">자격 미확인</span>';
-  if (fd.pct === 0) return '<span class="badge badge-fit-no">지원 자격 미달</span>';
+  /* 🔴 미달은 **숫자가 아니라 fails로** 판정한다 (2026-08-24). 0%를 안 쓰기로 하면서
+     `pct === 0`이 영영 참이 되지 않아 '지원 자격 미달' 배지가 통째로 사라졌었다.
+     숫자는 순서를 정할 뿐이고 뜻은 배지가 전한다 — 그 뜻의 근거는 fails다. */
+  if (fd.fails && fd.fails.length) return '<span class="badge badge-fit-no">지원 자격 미달</span>';
   const note = fd.unknown > 0 ? ` · 확인 필요 ${fd.unknown}` : '';
-  return `<span class="badge badge-fit">적합도 ${fd.pct}% <em>요건 ${fd.total}개 중 ${fd.met}개 충족${note}</em></span>`;
+  return `<span class="badge badge-fit fit-${fitTone(fd.pct)}">적합도 ${fd.pct}% <em>요건 ${fd.total}개 중 ${fd.met}개 충족${note}</em></span>`;
 }
 
 /* ---------------- 카드 렌더링 ---------------- */
@@ -632,7 +653,11 @@ function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
       <p class="sch-name">${esc(sch.name)}</p>
       <p class="sch-amount">${esc(sch.amount)}</p>
       ${compact ? '' : `<p class="sch-provider">${esc(sch.provider)}</p>`}
-      <span class="status-pill pill-${meta.cls}">${meta.label}</span>
+      ${/* 🔴 옛 판정 배지('지원 가능 · 선발 심사')를 **카드에서** 뺐다 (2026-08-24).
+           적합도 배지가 생긴 뒤로 한 카드에 판정이 둘이었고 서로 다른 축을 말해서,
+           `자격 미확인`인데 `지원 가능`이 함께 떴다. 학생은 '지원 가능'만 보고 들어갔다가
+           자격이 안 맞으면 헛걸음한다 — 이 앱이 없애려는 바로 그 피로감이다.
+           상세 시트에는 그대로 둔다(거기서는 마감·접수 상태를 함께 읽는다). */ ''}
     </button>`;
 }
 
@@ -676,14 +701,87 @@ function renderHome() {
 
 /* ---------------- 탐색 ---------------- */
 let exploreFilter = 'all';
+/* 정렬 기준 — 필터와 같은 성격으로 **저장하지 않는다**(새로고침하면 기본값). */
+let exploreSort = 'fit';
+
+/* 🔴 정렬 키가 비면 **방향과 무관하게 뒤로** 보낸다 (2026-08-26).
+   `deadlineTs()`는 마감일이 없는 공고에 `Infinity`를 주는데(app.js 위쪽), 그걸 그대로
+   비교에 쓰면 내림차순에서 **마감 없는 131건 + 상시 제도 6건이 통째로 맨 위로** 올라온다.
+   관리자 화면(_admin/admin.js `sortItems`)이 같은 데이터에서 이미 쓰는 규칙이다.
+   ⚠️ `dday().days`를 정렬 키로 쓰면 안 된다 — 마감 없는 건에 **가짜 14**를 준다
+      (목록에서 안 사라지게 하려는 장치라 순서로 쓰면 전부 D-14 자리에 뭉친다). */
+function byMissingLast(va, vb, dir) {
+  if (!va && !vb) return 0;
+  if (!va) return 1;
+  if (!vb) return -1;
+  return va < vb ? -dir : va > vb ? dir : 0;
+}
+/* 🔴 이미 마감된 공고는 '마감 임박순'에서 **뒤로** 보낸다 (2026-08-26 스크린샷으로 발견).
+   마감 7일까지는 목록에 남기는 규칙(CLOSED_KEEP_DAYS) 때문에, 그냥 날짜 오름차순으로 두면
+   **지나간 공고가 맨 위**에 온다. '임박'은 다가온다는 뜻이지 지나갔다는 뜻이 아니다.
+   지난 것끼리는 최근에 마감된 것부터 (아직 접수를 받을 여지가 그나마 크다). */
+const isPastDue = (d) => !!d && dday(d).days < 0;
+const byDeadline = (a, b) => {
+  const pa = isPastDue(a.sch.deadline), pb = isPastDue(b.sch.deadline);
+  if (pa !== pb) return pa ? 1 : -1;
+  if (pa && pb) return byMissingLast(a.sch.deadline, b.sch.deadline, -1);
+  return byMissingLast(a.sch.deadline, b.sch.deadline, 1);
+};
+/* 등록일이 없는 50건은 전부 마감일이 있다 — 폴백하면 사실상 전건이 값을 갖는다 */
+const listedKey = (m) => m.sch.listedAt || m.sch.deadline || '';
+const byListed = (a, b) => byMissingLast(listedKey(a), listedKey(b), -1);
+
+const EXPLORE_SORTS = {
+  fit: { label: '적합도순', cmp: (a, b) => b.fit - a.fit || byDeadline(a, b) },
+  deadline: { label: '마감 임박순', cmp: byDeadline },
+  listed: { label: '등록 최신순', cmp: byListed },
+};
+const SORT_KEYS = Object.keys(EXPLORE_SORTS);
+
+/* 정렬 — **누르면 다음 기준으로 넘어가고, 길게 누르면 아래에 목록이 뜬다**
+   (2026-08-26 개발자 지시). 기준이 셋뿐이라 한 번 누르는 것이 가장 빠르고,
+   바로 고르고 싶을 때만 목록을 연다. 목록은 화면 절반을 덮는 시트가 아니라
+   **아이콘 바로 아래** 뜨는 작은 팝오버다. */
+function openSortMenu() {
+  const menu = $('#explore-sort-menu');
+  menu.innerHTML = SORT_KEYS.map((k) => `
+    <button class="sort-opt" role="menuitemradio" data-sort="${k}"
+            aria-checked="${k === exploreSort}">${EXPLORE_SORTS[k].label}</button>`).join('');
+  menu.hidden = false;
+  $('#explore-sort-btn').setAttribute('aria-expanded', 'true');
+}
+
+function closeSortMenu() {
+  const menu = $('#explore-sort-menu');
+  if (!menu || menu.hidden) return;
+  menu.hidden = true;
+  $('#explore-sort-btn').setAttribute('aria-expanded', 'false');
+}
+
+/* 누를 때마다 다음 기준으로 — 셋을 돌고 처음으로 */
+function cycleSort() {
+  applySort(SORT_KEYS[(SORT_KEYS.indexOf(exploreSort) + 1) % SORT_KEYS.length]);
+}
+
+function applySort(key) {
+  if (!EXPLORE_SORTS[key]) return;
+  exploreSort = key;
+  $('#explore-sort-label').textContent = EXPLORE_SORTS[key].label;
+  renderExplore();
+  closeSortMenu();
+}
 
 function renderExplore() {
   const matches = getMatches();
   const order = { eligible: 0, selective: 0, unknown: 1, ineligible: 2 };
+  const sorter = EXPLORE_SORTS[exploreSort] || EXPLORE_SORTS.fit;
+  /* 🔴 판정 3단(가능/정보부족/미달)은 **적합도순일 때만** 1차 키다 (2026-08-26 개발자 결정:
+     "적합도를 기준으로 했을 때는 맨 아래에 두는 게 맞지"). 마감순·최신순에서는 고른 기준이
+     곧이곧대로 적용된다 — 마감 임박순인데 미달이라고 뒤로 밀면 그 정렬은 거짓말이 된다.
+     미달 카드는 빨간 '지원 자격 미달' 배지로 구분되므로 위로 와도 오해하지 않는다. */
   let list = matches.slice().sort((a, b) =>
-    order[a.result.status] - order[b.result.status] ||
-    b.fit - a.fit ||
-    deadlineTs(a.sch) - deadlineTs(b.sch)
+    (exploreSort === 'fit' ? order[a.result.status] - order[b.result.status] : 0)
+    || sorter.cmp(a, b)
   );
 
   list = list.filter((m) => dday(m.sch.deadline).days >= -CLOSED_KEEP_DAYS); // 마감 1주일 경과 시 자동 숨김
@@ -1443,12 +1541,18 @@ function openDetail(id) {
   /* 요건은 원문을 통째로 붙이지 않고 **짧게 다듬어 번호를 매겨** 보여 준다.
      프로필과 확실히 맞으면 ✓, 확실히 안 맞으면 ✕, 판정할 수 없으면 색 없이 둔다
      (2026-08-02 개발자 지시). 판정 규칙은 match-engine에 있어 알림과 갈라지지 않는다. */
-  const reqLines = requirementLines(sch);
+  /* 🔴 상세 시트는 요건을 **전부** 보여 준다 (2026-08-24). 화면 상한(5줄) 때문에
+     배지는 '요건 9개 중 3개 충족'이라고 하는데 시트에는 5줄만 떠서, 학생이 세어 보면
+     숫자가 안 맞았다. 카드는 요약이라 짧아도 되지만 **상세는 읽으러 오는 자리**다. */
+  const reqLines = requirementLines(sch, null, { all: true });
   /* 요건 한 줄을 그리는 법 — 구조 렌더와 평평한 렌더가 **같은 함수**를 쓴다.
      따로 두면 한쪽만 고쳐져서 두 모양의 판정이 갈라진다. */
   const reqRow = (e, extra) => {
     const m = requirementMatch(e, state.profile, sch);
-    const cls = m === 'ok' ? 'r-ok' : m === 'no' ? 'r-bad' : 'r-req';
+    /* 🔴 `r-req`는 **자격 요건·먼저 뽑는 기준·제외** 세 블록이 함께 쓴다. 그래서 밖에서는
+       어느 줄이 자격인지 가릴 수 없었다(검사가 셋을 다 세고 있었다 — 2026-08-26).
+       자격 줄에만 `r-elig`를 달아 구분한다. 보이는 모양은 그대로다. */
+    const cls = m === 'ok' ? 'r-elig r-ok' : m === 'no' ? 'r-elig r-bad' : 'r-elig r-req';
     const mark = m === 'ok' ? '✓ ' : m === 'no' ? '✕ ' : '';
     return `<li class="${cls}${extra ? ' ' + extra : ''}">${mark}${esc(e)}</li>`;
   };
@@ -1475,7 +1579,7 @@ function openDetail(id) {
   } else if (requirementLines(sch, qLines).length) {
     // 자격 줄이 없으면 발췌 문장으로 물러나되, **같은 정리를 거쳐** 보여 준다
     reasonRows += requirementLines(sch, qLines)
-      .map((e) => `<li class="r-req">${esc(e)}</li>`).join('');
+      .map((e) => `<li class="r-elig r-req">${esc(e)}</li>`).join('');
   }
   /* 먼저 뽑는 기준 — 자격이 **아니지만** 학생에게 쓸모가 있다 (2026-08-21 개발자 지적).
      자격 블록에 섞으면 요건이 실제보다 훨씬 까다로워 보여 지원할 수 있는 학생이 포기한다
@@ -2120,6 +2224,50 @@ function bindEvents() {
     $$('.filter-chip').forEach((c) => c.classList.toggle('active', c === chip));
     renderExplore();
   });
+
+  /* 정렬 버튼 — 짧게 누르면 다음 기준, 길게 누르면 목록 (2026-08-26 개발자 지시).
+     🔴 길게 눌러 목록을 연 뒤에 오는 click은 **삼켜야 한다** — 안 그러면 목록이 뜨는
+        동시에 기준까지 한 칸 넘어간다(신청 내역 스와이프와 같은 계열의 함정).
+     🔴 touch와 mouse를 **둘 다** 받되 겹쳐서 두 번 세지 않는다 — 터치 기기는
+        touchend 뒤에 click도 보내므로 길게 누른 사실을 플래그로 남겨 거른다. */
+  {
+    const btn = $('#explore-sort-btn');
+    const menu = $('#explore-sort-menu');
+    let timer = null, longFired = false;
+
+    const startPress = () => {
+      longFired = false;
+      clearTimeout(timer);
+      timer = setTimeout(() => { longFired = true; openSortMenu(); }, 450);
+    };
+    const endPress = () => clearTimeout(timer);
+
+    btn.addEventListener('touchstart', startPress, { passive: true });
+    btn.addEventListener('touchend', endPress, { passive: true });
+    btn.addEventListener('touchcancel', endPress, { passive: true });
+    btn.addEventListener('mousedown', startPress);
+    btn.addEventListener('mouseup', endPress);
+    btn.addEventListener('mouseleave', endPress);
+
+    btn.addEventListener('click', () => {
+      if (longFired) { longFired = false; return; }   // 길게 눌러 목록을 연 것이다
+      if (!menu.hidden) { closeSortMenu(); return; }   // 열려 있으면 닫기만
+      cycleSort();
+    });
+    /* 키보드 — Enter/Space는 click으로 오므로 순환된다. 목록은 ↓로 연다. */
+    btn.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown') { e.preventDefault(); openSortMenu(); }
+    });
+
+    menu.addEventListener('click', (e) => {
+      const pick = e.target.closest('[data-sort]');
+      if (pick) applySort(pick.dataset.sort);
+    });
+    document.addEventListener('click', (e) => {
+      if (!menu.hidden && !e.target.closest('.sort-wrap')) closeSortMenu();
+    });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSortMenu(); });
+  }
 
   document.addEventListener('click', (e) => {
     /* 🔴 카드를 민 직후에 오는 click은 '열기'가 아니다 — 밀었는데 상세가 열리면

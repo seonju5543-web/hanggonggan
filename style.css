@@ -214,7 +214,11 @@ input::placeholder { color: var(--text-weak); }
   box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.10);
 }
 
-.check-list { display: grid; gap: 10px; margin-bottom: 20px; }
+/* 🔴 특별자격은 두 덩어리(#in-flags · #in-extra)로 나뉘어 있어 **그 경계만** 벌어져 있었다
+   (칸 사이는 gap 10px인데 덩어리 사이는 margin-bottom 20px — 2026-08-26 개발자 지적).
+   눈에는 한 목록으로 보이므로 간격도 하나여야 한다. 마지막 덩어리 뒤에만 여백을 남긴다. */
+.check-list { display: grid; gap: 10px; margin-bottom: 10px; }
+.check-list:last-of-type:not(:has(~ .check-item)) { margin-bottom: 20px; }
 .check-item {
   display: flex;
   align-items: center;
@@ -1453,9 +1457,6 @@ textarea.essay-drafted { border-color: var(--primary); background: #fbfcff; line
 .badge-fit em { font-style: normal; opacity: .75; font-size: .92em; margin-left: 4px; }
 .badge-fit-unknown { background: var(--chip-bg, #eceff3); color: var(--muted, #6b7280); }
 .badge-fit-no { background: #fdecec; color: #b42318; }
-@media (prefers-color-scheme: dark) {
-  .badge-fit-no { background: #4a1d1d; color: #ffb4ab; }
-}
 /* ── 완성 문서 수정 돕기 (2026-08-24, docs/designs/essay-edit.md) ──
    규정 배너(.essay-rules-banner)와 다르다: 규정은 '꼭 지켜야 하는 것', 아래는 '더 좋게 하는 제안'이다. */
 .essay-tips {
@@ -1714,3 +1715,53 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: 3px; paddin
 .auth-naver { background: #03c75a; border-color: #02b351; }
 .auth-naver svg { width: 22px; height: 22px; }
 .auth-social-note { font-size: 12px; color: var(--text-weak); text-align: center; line-height: 1.6; margin-bottom: 10px; }
+/* ── 적합도 색깔 (2026-08-24 개발자 지시) ────────────────────────────
+   빨강 → 주황 → 노랑 → 초록 → 파랑. 제일 딸리는 게 빨강, 제일 적합한 게 파랑.
+   ⚠️ 색만으로 뜻을 전하지 않는다 — 배지에 숫자와 '요건 n개 중 m개'가 늘 함께 있다.
+   노랑 계열은 흰 글자로 쓰면 대비가 모자라 어두운 글자를 쓴다(WCAG AA).
+   🔴 **다크모드 규칙을 넣지 말 것** (2026-08-24 개발자 지시). 이 앱은 전체가 밝은 화면
+      한 벌뿐이라, 배지만 `prefers-color-scheme: dark`를 따르면 폰 설정이 다크인 학생에게
+      **흰 바탕 위에 어두운 배지만** 떠서 튄다. 앱 전체가 다크모드를 갖추기 전에는 넣지 않는다. */
+.badge-fit.fit-red    { background: #fdecec; color: #b42318; }
+.badge-fit.fit-orange { background: #fff1e3; color: #b54708; }
+.badge-fit.fit-yellow { background: #fdf6d3; color: #8a6100; }
+.badge-fit.fit-green  { background: #e6f6ec; color: #17683a; }
+.badge-fit.fit-blue   { background: #e8f0ff; color: #1c47b8; }
+
+/* ── 장학금 찾기 정렬 버튼 (2026-08-26) ────────────────────────────────
+   🔴 `.icon-btn`을 그대로 쓰지 않는다 — padding 8 + svg 22 = 38px라 터치 타깃 44px에
+      못 미친다. 새 버튼은 min-height를 직접 준다.
+   🔴 글자에 테두리·배경을 두르지 않는다 — 두르면 아래 필터 칩과 같은 무게로 보여서
+      '거르기'와 '순서 바꾸기'가 뒤섞인다(개발자 지적).
+   다크모드 규칙은 넣지 않는다 — 앱 전체가 밝은 화면 한 벌이다(2026-08-24 결정). */
+.sort-btn {
+  display: flex; align-items: center; gap: 5px;
+  min-height: 44px; padding: 0 10px; border-radius: 12px;
+  font-size: 13.5px; font-weight: 600; color: var(--text-sub);
+  background: transparent; border: 0; cursor: pointer; white-space: nowrap;
+}
+.sort-btn:hover { background: rgba(18, 22, 31, 0.05); }
+/* 길게 누르기를 쓰므로 글자 선택·iOS 확대 메뉴가 뜨지 않게 막는다 */
+.sort-btn { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+.sort-btn svg { width: 18px; height: 18px; display: block; flex-shrink: 0; }
+
+/* 정렬 목록 — 시트가 아니라 **아이콘 바로 아래** 뜨는 작은 팝오버 (2026-08-26 개발자 지시).
+   시트는 화면 절반을 덮어서, 기준 세 줄을 고르는 데는 과하다. */
+.sort-wrap { position: relative; }
+/* 🔴 클래스에 display를 주면 브라우저 기본 `[hidden]{display:none}`을 이겨 안 숨는다 —
+   이 저장소가 관리자 화면·선택 막대에서 이미 두 번 겪은 함정이다. */
+.sort-menu[hidden] { display: none !important; }
+.sort-menu {
+  position: absolute; top: calc(100% + 4px); right: 0; z-index: 40;
+  display: flex; flex-direction: column; min-width: 148px; padding: 6px;
+  background: #fff; border-radius: 14px;
+  box-shadow: 0 8px 28px rgba(18, 22, 31, .16), 0 0 0 1px rgba(18, 22, 31, .06);
+}
+.sort-opt {
+  display: block; width: 100%; text-align: left;
+  min-height: 44px; padding: 0 12px; border: 0; background: transparent;
+  border-radius: 10px; font-size: 14.5px; font-weight: 600;
+  color: var(--text-sub); cursor: pointer; white-space: nowrap;
+}
+.sort-opt:hover { background: rgba(18, 22, 31, .05); }
+.sort-opt[aria-checked="true"] { background: var(--primary-weak, #e8f0ff); color: var(--primary, #2f6bff); }

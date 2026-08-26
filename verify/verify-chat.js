@@ -335,12 +335,29 @@ async function ask(page, q) {
   const a1 = await ask(page, '쿼카 사육 지원금 있어?');
   ok(/못 알아들었|찾지 못|이 중 하나인가요/.test(a1), 'needSource면 AI 답을 버리고 안내봇 답을 낸다', a1.slice(0, 60));
 
-  /* 🔴 프로필이 서버로 새지 않는가 — 요청 본문을 통째로 검사한다 */
-  const body = JSON.stringify(sent || {});
-  const leaked = ['이선주', '한국외국어대학교', '3.8', 'gpa', 'bracket', 'flags', 'account']
-    .filter((k) => body.includes(k));
+  /* 🔴 프로필이 서버로 새지 않는가.
+     ⚠️ **본문을 문자열로 훑으면 안 된다** (2026-08-24 교정). 예전 검사는
+     `body.includes('한국외국어대학교')`로 판정해서, **장학금 이름·주관기관에 들어 있는 학교명**을
+     학생의 학교로 잘못 셌다(`유흥수 장학금 (한국외대 융합일본지역학부)`, provider `한국외국어대학교`).
+     그건 공고의 공개 정보라 당연히 나가야 하는 값이고, 그걸 누수로 세면 **영영 빨간불**이 된다.
+     늘 실패하는 검사는 나중에 진짜 실패를 가린다.
+     그래서 '무엇이 들어 있나'가 아니라 **'어떤 칸이 나가나'**를 본다 — 나가도 되는 칸을 못박고
+     그 밖의 칸이 하나라도 붙으면 실패한다. 프로필 칸이 새로 붙는 순간 여기서 잡힌다. */
   ok(sent !== null, 'AI가 실제로 불렸다(요청이 나갔다)');
-  ok(leaked.length === 0, '🔴 이름·학교·성적·소득이 서버로 나가지 않는다', leaked);
+  const ALLOWED_TOP = ['q', 'items'];
+  const ALLOWED_ITEM = ['id', 'name', 'provider', 'amount', 'period', 'summary',
+                        'deadline', 'sourceUrl', 'quotes'];
+  const topExtra = Object.keys(sent || {}).filter((k) => !ALLOWED_TOP.includes(k));
+  const itemExtra = [...new Set((sent && sent.items || [])
+    .flatMap((it) => Object.keys(it)).filter((k) => !ALLOWED_ITEM.includes(k)))];
+  ok(topExtra.length === 0, '🔴 요청에 정해진 칸(질문·공고) 말고는 아무것도 없다', topExtra);
+  ok(itemExtra.length === 0, '🔴 공고 칸에 공개 정보 말고는 아무것도 없다', itemExtra);
+  /* 프로필 값 자체가 어딘가에 실려 나가지 않는지도 본다 — 칸 이름을 바꿔 숨겨도 잡힌다.
+     학교명은 공고의 공개 정보라 여기서 뺀다(위 주석). */
+  const body = JSON.stringify(sent || {});
+  const leaked = ['이선주', '3.8', 'gpa', 'bracket', 'flags', 'account', 'resident']
+    .filter((k) => body.includes(k));
+  ok(leaked.length === 0, '🔴 이름·성적·소득·계좌가 서버로 나가지 않는다', leaked);
   ok(Array.isArray(sent && sent.items) && sent.items.every((i) => i.id && Array.isArray(i.quotes)),
     '보내는 것은 공고 공개 정보와 인용 문장뿐이다');
 

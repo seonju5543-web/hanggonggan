@@ -16,7 +16,10 @@ const SH = (typeof module !== 'undefined' && module.exports)
       전역 이름을 그대로 쓰면 <script>·importScripts 양쪽에서 잡힌다. */
 const PR = (typeof module !== 'undefined' && module.exports)
   ? require('./parse-requirements.js')
-  : { parseLine, gradOnly, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM };
+  /* 🔴 브라우저에서는 **전역 함수**로 쓴다 — 여기에 이름을 빠뜨리면 Node 검사는 전부
+     통과하는데 앱은 첫 카드에서 죽는다. `headRest`(section-head)에 이어 `caseBranch`도
+     같은 실수를 했다(2026-08-24). 아래 회귀가 브라우저 순서로 실어 실제로 불러 본다. */
+  : { parseLine, gradOnly, caseBranch, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM };
 const PR2 = PR;   // requirementLines가 쓰는 별칭 (선언 순서 때문에 이름만 따로 둔다)
 
 /* 자격 진단 — 프로필과 공고의 요건을 대조해 상태·사유·부족정보를 돌려준다 */
@@ -107,7 +110,15 @@ function evaluate(sch, p) {
      · 요건을 하나도 못 읽은 공고는 **35%** + '자격 미확인'
    ══════════════════════════════════════════════════════════════════════════ */
 const FIT_UNREAD = 35;   // 자격을 하나도 못 읽은 공고 (실측 53건) — 읽어낸 공고보다 낮게 깐다
-const FIT_FLOOR = 15;    // 요건은 읽었으나 하나도 충족을 확인 못 한 경우. 0%(미달 확정)와 구분한다
+const FIT_FLOOR = 15;    // 요건은 읽었으나 하나도 충족을 확인 못 한 경우. 미달 확정과 구분한다
+/* 🔴 **100%도 0%도 쓰지 않는다** (2026-08-24 개발자 지시: "아무리 적합해도 혹시 모르니까").
+   근거가 있는 조심이다 — 자격이 첨부 HWP 안에만 있거나, 발췌기가 절을 통째로 놓쳤거나,
+   원문에 안 적힌 조건이 있을 수 있다. 앱은 **자기가 읽은 것**만 알지 공고의 전부를 알지 못한다.
+   100은 '완벽히 맞는다', 0은 '절대 안 된다'는 뜻이라 앱이 낼 수 있는 말이 아니다.
+   대신 뜻은 배지가 전한다 — 미달은 '지원 자격 미달' 빨강, 확인 필요는 개수로.
+   숫자는 순서를 정하는 일만 한다. */
+const FIT_MAX = 95;      // 다 맞아도 95 — 못 읽은 요건이 있을 수 있다
+const FIT_MIN = 5;       // 미달이어도 5 — 파싱이 틀렸을 수 있다 (0이면 학생이 아예 안 본다)
 
 /* 파싱된 조건 하나를 학생과 맞춰 본다 → 'pass' | 'fail' | 'unknown'
    🔴 **모르면 unknown**이다. 틀린 fail은 학생에게서 장학금을 뺏는다. */
@@ -199,6 +210,11 @@ function judgeCond(c, p) {
 function lineVerdict(text, p, isExclude, ctx) {
   if (!p) return null;
   if (PR.gradOnly(text)) return null;          // 대학원 전용 줄 — 학부생과 무관
+  /* 🔴 경우별 분기(`신입생:` `재학생:` `복학생 및 편입생:`)는 **내 경우만** 판정한다
+     (2026-08-24 개발자 지적). 안 그러면 재학생인데 `신입생:` 줄에도 ✓가 붙는다.
+     프로필에 없는 경우(편입생·학년제)는 해당 여부를 모르므로 아무 표시도 안 한다. */
+  const cases = PR.caseBranch(text);
+  if (cases && !(p.status && cases.includes(p.status))) return null;
   /* 🔴 아래 둘은 **미달이라고 말하면 안 되는 자리**다 (2026-08-24 전수 대조에서 발견).
      퍼센트는 이미 맞게 처리하고 있었는데 화면 표시만 ✕가 떠서 서로 어긋났다. */
   if (ctx && ctx.multi) return null;                        // 장학금이 여럿 묶인 공고
@@ -245,7 +261,12 @@ function fitDetail(sch, p) {
   const lines = (sch && sch.eligibilityLines) || [];
   /* 🔴 대학원 전용 줄은 **분모에서도 뺀다** — 건너뛰기만 하면 학부생에게 무관한 줄이
      '확인 필요'로 남아 점수를 깎는다(가톨릭대 동문장학금이 50%로 떨어졌다). */
-  const items = requirementLines(sch, lines, { withMeta: true }).filter((it) => !PR.gradOnly(it.text));
+  /* 🔴 **화면 5줄 상한을 점수에 적용하면 안 된다** (2026-08-24 개발자 지적으로 발견).
+     화면은 5줄만 보여 주는데 점수도 그 5줄만 세고 있었다. 그래서 삼일장학회(중앙대)는
+     요건이 **9개**인데 5개만 맞으면 '요건 5개 중 5개 충족 · 100%'가 떴다 —
+     확인조차 안 한 요건 4개가 점수에서 통째로 빠진 것이다(실측 15건 · 23줄).
+     점수는 `all: true`로 **전부** 세고, 화면에 몇 줄을 띄우는지는 따로 정한다. */
+  const items = requirementLines(sch, lines, { withMeta: true, all: true }).filter((it) => !PR.gradOnly(it.text));
   if (!items.length) return { pct: FIT_UNREAD, unread: true, met: 0, total: 0, unknown: 0, fails: [] };
 
   const exLines = requirementLines(sch, [...((sch && sch.eligibilityExcludes) || []), ...lines], { onlyExclude: true });
@@ -284,9 +305,10 @@ function fitDetail(sch, p) {
   }
 
   const total = items.filter((it) => it.group === 0).length + groups.size;
-  if (fails.length) return { pct: 0, unread: false, met, total, unknown, fails };
+  /* 미달이어도 0이 아니라 FIT_MIN — 파싱이 틀렸을 가능성을 남긴다(위 FIT_MIN 주석) */
+  if (fails.length) return { pct: FIT_MIN, unread: false, met, total, unknown, fails };
   const pct = total ? Math.round((met / total) * 100) : FIT_UNREAD;
-  return { pct: Math.max(FIT_FLOOR, pct), unread: false, met, total, unknown, fails: [] };
+  return { pct: Math.min(FIT_MAX, Math.max(FIT_FLOOR, pct)), unread: false, met, total, unknown, fails: [] };
 }
 
 function fitScore(sch, result, p) {
@@ -662,6 +684,7 @@ function requirementLines(sch, lines, opts) {
   let asideBase = 'qualify';   // 곁말 전에 있던 절 — 번호 항목을 만나면 여기로 돌아온다
   let anyLeft = 0, anyGroup = 0;   // 선택지 묶음 — 몇 줄 남았나 / 몇 번째 묶음인가 (위 주석)
   const meta = [];                 // out과 같은 순서로 각 줄의 묶음 번호
+  let caseRun = false, caseGroup = 0;   // 연달아 오는 '경우별 분기'를 한 묶음으로 (아래 주석)
   for (const l of joined) {
     let t = tidyRequirement(l);
     const head = SH.sectionOf(l) || SH.sectionOf(t);
@@ -778,12 +801,20 @@ function requirementLines(sch, lines, opts) {
     }
     if (!out.includes(t)) {
       out.push(t);
-      meta.push(anyLeft > 0 ? anyGroup : 0);   // 0 = 반드시 충족 / 1 이상 = 그 묶음 중 하나만
+      /* 🔴 연달아 오는 경우 분기는 **한 요건**이다 — 따로 세면 분모가 부풀어
+         정읍시민이 요건 7개(실제 4개)로 잡혔다. 첫 분기에서 묶음을 열고 이어 붙인다. */
+      if (PR.caseBranch(t)) {
+        if (!caseRun) { caseGroup = (anyGroup += 1); caseRun = true; }
+        meta.push(caseGroup);
+      } else {
+        caseRun = false;
+        meta.push(anyLeft > 0 ? anyGroup : 0);   // 0 = 반드시 충족 / 1 이상 = 그 묶음 중 하나만
+      }
       if (anyLeft > 0) anyLeft -= 1;
     }
     /* 5줄이면 충분하다 — 더 늘어놓으면 학생이 안 읽는다. 사람이 정리한 것처럼 보여야 한다.
        못 담은 것은 바로 아래 '원문 보기'로 갈 수 있다. */
-    if (out.length >= 5) break;
+    if (!(opts && opts.all) && out.length >= 5) break;
   }
   /* 🔴 자격 칸을 **비우면서까지** 순위를 걷어내지는 않는다 (2026-08-24) —
      학계장학문화재단은 `소득분위가 낮고 학업성적이 우수한 학생`이 공고의 유일한 조건이라,
@@ -889,7 +920,7 @@ function requirementStruct(sch) {
 
 /* Node(검증 스크립트)에서도 같은 엔진을 불러 쓸 수 있게 — 브라우저·서비스워커에는 영향 없음 */
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { evaluate, fitScore, fitDetail, judgeCond, FIT_UNREAD, FIT_FLOOR,
+  module.exports = { evaluate, fitScore, fitDetail, judgeCond, FIT_UNREAD, FIT_FLOOR, FIT_MAX, FIT_MIN,
                      scopedToProfile, notStale, STALE_DAYS,
                      requirementLines, requirementStruct, requirementMatch, tidyRequirement,
                      REQ_SIGNAL, NOT_A_REQUIREMENT, EXCLUDE_LINE, HARD_THRESHOLD,
