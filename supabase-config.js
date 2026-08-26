@@ -36,19 +36,34 @@ const SUPABASE_CONFIG = {
           Site URL          https://seonju5543-web.github.io/hanggonggan/
           Redirect URLs     https://seonju5543-web.github.io/hanggonggan/
      쓸 수 있는 값: 'google' · 'kakao' (Supabase 가 공식 지원한다) */
-  providers: ['google', 'kakao'],
-  /* 🔴 카카오 — 2026-08-26 연결 완료. 다시 설정할 일이 생기면 이 순서다.
-     앱: developers.kakao.com '한대장'(ID 1556646)
-     ① 제품 설정 → 카카오 로그인 → 사용 설정 ON
-     ② 앱 설정 → 플랫폼 키 → REST API 키 → **그 키를 눌러 들어가면** 아래에
-        '카카오 로그인 리다이렉트 URI'와 '클라이언트 시크릿'이 함께 있다.
-        ⚠️ 옛 문서가 말하는 '웹 플랫폼 등록'은 콘솔 개편으로 사라졌다 — 여기 한 곳이다.
-        리다이렉트 URI = https://ffnzmiorcojbhpqwqgcy.supabase.co/auth/v1/callback
-     ③ Supabase → Providers → Kakao: REST API 키를 Client ID 로, 시크릿 코드를 Secret 으로.
-        🔴 'Allow users without an email' 을 **켠다** — 카카오는 개인 개발자 앱에
-           이메일을 주지 않으므로 꺼져 있으면 로그인이 실패한다.
-        ⚠️ 브라우저 자동완성이 구글 열쇠를 그 칸에 다시 채워 넣은 적이 있다. 저장 뒤
-           /auth/v1/authorize?provider=kakao 를 따라가 client_id 를 눈으로 확인할 것. */
+  providers: ['google'],
+  /* 🔴 카카오 — 설정은 다 됐는데 **켤 수 없다** (2026-08-26).
+     한 줄 요약: 카카오는 이메일을 비즈 앱에만 주는데, Supabase 는 이메일을 반드시 요청한다.
+
+     막힌 지점 (재조사 금지 — 실측으로 확인했다)
+     · Supabase 의 카카오 provider 는 `account_email profile_image profile_nickname` 을
+       **고정으로** 요청한다. authorize 에 `scopes=` 를 줘도 **덧붙기만 하고 빠지지 않는다**
+       (직접 시험: scopes=profile_nickname → account_email+profile_image+profile_nickname+profile_nickname).
+       즉 **앱 코드로는 이메일 요청을 뺄 수 없다.**
+     · 카카오 동의항목에서 `account_email` 은 **권한 없음**(회색)이라 켤 수가 없다.
+       비즈 앱 전환이 필요하고, 그건 보통 사업자 정보 등록을 요구한다.
+       (제품 설정 → 비즈니스 인증 → '추가 기능 신청'이 그 문이다.)
+     · 결과: 학생이 카카오를 누르면 "서비스 설정에 오류가 있어 이용할 수 없습니다"가 뜬다.
+       그래서 providers 에서 'kakao' 를 뺐다 — 안 되는 버튼을 띄우지 않는다.
+
+     🟢 카카오 쪽 설정은 **이미 다 되어 있다.** 비즈 앱이 되면 아래 한 줄만 고치면 끝난다.
+        providers: ['google'] → ['google', 'kakao']
+        · 앱: developers.kakao.com '한대장' (ID 1556646)
+        · 카카오 로그인 사용 설정 ON · 리디렉션 URI 등록 완료 · 클라이언트 시크릿 활성화
+        · 동의항목: 닉네임 필수 동의 · 프로필 사진 선택 동의 (이메일만 못 켠 상태)
+        · Supabase Providers → Kakao 에 키 두 개 등록 완료 + Allow users without an email ON
+        ⚠️ Supabase 칸에 키를 다시 넣을 일이 생기면, 브라우저 자동완성이 **구글 Client ID를
+           카카오 칸에 몰래 채워 넣은 적이 있다.** 저장 뒤 /auth/v1/authorize?provider=kakao 를
+           따라가 client_id 를 눈으로 확인할 것 — 실제로 첫 저장이 그렇게 조용히 잘못됐다.
+
+     · 다른 길(안 해 봄): Supabase 커스텀 OIDC 제공자로 카카오를 직접 등록하면 scope 를
+       우리가 정할 수 있어 이메일 없이도 될 수 있다(무료 등급 3개까지). 카카오 쪽
+       'OpenID Connect' 를 켜야 한다. 비즈 앱 전환이 막히면 이 길을 검토할 것. */
 
   /* 저장을 서버로 보내기 전에 기다리는 시간(밀리초).
      온보딩에서 한 칸 고칠 때마다 서버를 두들기면 무료 등급이 금방 닳는다 — 묶어서 한 번 보낸다. */
