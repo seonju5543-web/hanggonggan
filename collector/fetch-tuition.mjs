@@ -101,7 +101,11 @@ const schools = {};
 let skipped = 0;
 for (const r of rows) {
   const name = normSchool(r[NAME_KEY]);
-  const avg = Number(String(r[AVG_KEY] ?? '').replace(/[^\d]/g, '')) || 0;
+  /* 🔴 소수점을 지우면 안 된다 — 이 API 는 `7791804.0` 처럼 소수점을 붙여 준다.
+     숫자만 남기면 `77918040` 이 되어 **정확히 10배**가 되고, 등록금 비율형 공고의
+     환산액이 그대로 10배로 나간다(2026-08-27 실제로 저장까지 갔다가 되돌린 사고).
+     쉼표는 버리고 소수점은 남긴 뒤 반올림한다. */
+  const avg = Math.round(Number(String(r[AVG_KEY] ?? '').replace(/[^\d.]/g, '')) || 0);
   if (!name || !avg) { skipped++; continue; }
   /* 같은 학교가 여러 줄이면 큰 값을 쓰지 않는다 — 먼저 온 값을 지킨다(임의 선택 금지) */
   if (schools[name]) continue;
@@ -125,6 +129,26 @@ if (had && now < had * 0.8) {
   console.error(`✕ 학교 수가 ${had} → ${now} 로 줄었습니다. 저장하지 않습니다.`);
   process.exit(1);
 }
+
+/* 🔴 자릿수 관문 — 등록금이 있을 수 없는 값이면 저장하지 않는다.
+   2026-08-27 에 소수점을 지우는 파싱 실수로 값이 **10배**가 된 채 저장까지 갔다.
+   앱은 이 값에 비율을 곱해 '받을 수 있는 금액'이라고 말하므로, 자릿수가 틀리면
+   그대로 사용자 기망이 된다. 리포트가 아니라 관문이어야 재발이 끝난다.
+   범위는 넉넉하게 잡았다 — 국내 4년제 연간 등록금은 200만~1,500만원 사이다. */
+const MIN_TUITION = 2_000_000, MAX_TUITION = 15_000_000;
+const all = Object.values(schools).map((s) => s.avg).sort((a, b) => a - b);
+const median = all[Math.floor(all.length / 2)] || 0;
+if (median < MIN_TUITION || median > MAX_TUITION) {
+  console.error(`✕ 등록금 중앙값이 ${median.toLocaleString()}원 입니다 — 있을 수 없는 자릿수라 저장하지 않습니다.`);
+  console.error(`  (기대 범위 ${MIN_TUITION.toLocaleString()}~${MAX_TUITION.toLocaleString()}원. 소수점 처리·단위(원/천원)를 확인하세요.)`);
+  process.exit(1);
+}
+const outOfRange = all.filter((v) => v < MIN_TUITION || v > MAX_TUITION).length;
+if (outOfRange > all.length * 0.1) {
+  console.error(`✕ 범위 밖 학교가 ${outOfRange}/${all.length}곳 입니다 — 저장하지 않습니다.`);
+  process.exit(1);
+}
+if (outOfRange) console.log(`⚠ 범위 밖 ${outOfRange}곳 (그대로 저장 — 소수 학교의 실제 특수값일 수 있다)`);
 
 if (!WRITE) {
   console.log('\n(미리보기입니다 — 저장하려면 --write)');
