@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-08-27",
- "count": 2229,
+ "count": 2236,
  "items": [
   {
    "title": "[서울][국가근로] 2026학년도 2학기 국가근로장학생 모집 안내(추가)",
@@ -517,6 +517,15 @@
    "foundAt": "2026-08-27"
   },
   {
+   "title": "2026-2학기 NKL Law 김재연 장학기금 장학생 선발 공고",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30108&pageNo=1",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "중앙대학교",
+   "campus": "",
+   "foundAt": "2026-08-27"
+  },
+  {
    "title": "2026학년도 2학기 장애학생지원센터(다빈치) 블루메이트(국가근로 장학생) 모집 공고",
    "url": "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5#n-2026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EC%9E%A5%EC%95%A0%ED%95%99%EC%83%9D%EC%A7%80%EC%9B%90%EC%84%BC%ED%84%B0(%EB%8B%A4%EB%B9%88%EC%B9%98)%20%EB%B8%94%EB%A3%A8%EB%A9%94%EC%9D%B4%ED%8A%B8(%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%20%EC%9E%A5%ED%95%99%EC%83%9D",
    "attachments": [],
@@ -877,6 +886,33 @@
    "foundAt": "2026-08-27"
   },
   {
+   "title": "[장학공지] 제12회 (재)연수큰재장학재단 장학생 선발 안내",
+   "url": "https://www.gachon.ac.kr/kor/7986/subview.do?article.offset=10&nttId=123856",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "가천대학교",
+   "campus": "",
+   "foundAt": "2026-08-27"
+  },
+  {
+   "title": "[장학공지] 2026년도 익산시 익산사랑장학생 선발 안내",
+   "url": "https://www.gachon.ac.kr/kor/7986/subview.do?article.offset=10&nttId=123857",
+   "attachments": [
+    {
+     "name": "익산시익산사랑장학생-선발공고문.hwpx",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/153675/download.do"
+    },
+    {
+     "name": "익산시익산사랑장학생-선발개요.hwpx",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/153676/download.do"
+    }
+   ],
+   "deadlineHint": "접수기간 : 2026. 9. 3.(목) ∼ 9. 9.(수) 18:00까지 2. 선발대상(기본자격)&nbsp; &nb",
+   "school": "가천대학교",
+   "campus": "",
+   "foundAt": "2026-08-27"
+  },
+  {
    "title": "[장학공지] [글로벌] 2026-2학기 일반 교내 및 교외 국가근로장학생 선발 결과 및 유의사항 안내",
    "url": "https://www.gachon.ac.kr/kor/7986/subview.do?nttId=123830",
    "attachments": [],
@@ -962,6 +998,33 @@
    "url": "https://www.gachon.ac.kr/kor/7986/subview.do?nttId=123855",
    "attachments": [],
    "deadlineHint": null,
+   "school": "가천대학교",
+   "campus": "",
+   "foundAt": "2026-08-27"
+  },
+  {
+   "title": "[장학공지] 제12회 (재)연수큰재장학재단 장학생 선발 안내",
+   "url": "https://www.gachon.ac.kr/kor/7986/subview.do?nttId=123856",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "가천대학교",
+   "campus": "",
+   "foundAt": "2026-08-27"
+  },
+  {
+   "title": "[장학공지] 2026년도 익산시 익산사랑장학생 선발 안내",
+   "url": "https://www.gachon.ac.kr/kor/7986/subview.do?nttId=123857",
+   "attachments": [
+    {
+     "name": "익산시익산사랑장학생-선발공고문.hwpx",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/153675/download.do"
+    },
+    {
+     "name": "익산시익산사랑장학생-선발개요.hwpx",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/153676/download.do"
+    }
+   ],
+   "deadlineHint": "접수기간 : 2026. 9. 3.(목) ∼ 9. 9.(수) 18:00까지 2. 선발대상(기본자격)&nbsp; &nb",
    "school": "가천대학교",
    "campus": "",
    "foundAt": "2026-08-27"
@@ -1809,6 +1872,15 @@
    "foundAt": "2026-08-27"
   },
   {
+   "title": "2026학년도 2학기 국가근로장학생 선발 결과 및 2차 추가 선발 안내",
+   "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083&nttId=54747",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-08-27"
+  },
+  {
    "title": "(마감) [일반대학원] 2026학년도 2학기 직장체험인턴장학생 모집",
    "url": "https://www.uos.ac.kr/korNotice/list.do?list_id=FA1#n-(%EB%A7%88%EA%B0%90)%20%5B%EC%9D%BC%EB%B0%98%EB%8C%80%ED%95%99%EC%9B%90%5D%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EC%A7%81%EC%9E%A5%EC%B2%B4%ED%97%98%EC%9D%B8%ED%84%B4%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91",
    "attachments": [],
@@ -1831,6 +1903,20 @@
    "url": "https://www.uos.ac.kr/korNotice/list.do?list_id=FA1#n-**%EB%A7%88%EA%B0%90**%20%5B%EC%9D%B8%EA%B3%B5%EC%A7%80%EB%8A%A5%EC%9C%B5%ED%95%A9%EB%8C%80%ED%95%99%5D%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91",
    "attachments": [],
    "deadlineHint": null,
+   "school": "서울시립대학교",
+   "campus": "",
+   "foundAt": "2026-08-27"
+  },
+  {
+   "title": "[마감][대외협력과] 2026년 2학기 국가근로장학생 모집",
+   "url": "https://www.uos.ac.kr/korNotice/list.do?list_id=FA1#n-%5B%EB%A7%88%EA%B0%90%5D%5B%EB%8C%80%EC%99%B8%ED%98%91%EB%A0%A5%EA%B3%BC%5D%202026%EB%85%84%202%ED%95%99%EA%B8%B0%20%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91",
+   "attachments": [
+    {
+     "name": "국가근로장학 신청서 및 서약서.hwp",
+     "url": "https://www.uos.ac.kr/common/board-download.do?listId=FA1&seq=31334&fSeq=1"
+    }
+   ],
+   "deadlineHint": "마감][대외협력과] 2026년 2학기 국가근로장학생 모집 김승유 대외협력과 2026-08-27(등록일 : 202",
    "school": "서울시립대학교",
    "campus": "",
    "foundAt": "2026-08-27"
