@@ -15,16 +15,37 @@
                      이 로봇은 odcloud를 본다. 둘은 같은 숫자이므로 둘 다 신청할
                      이유가 없다(2026-08-27 확인).
                      엔드포인트는 **연도별로 따로** 있고 위 uddi 가 최신(20260519)이다.
-     ❔ 학교 × 계열 — 대학알리미가 계열별 등록금을 공시하지만 **오픈API 오퍼레이션명을
-                     찾지 못했다.** `openapi.academyinfo.go.kr` 은 살아 있고
-                     BasicInformationService·SchoolMajorInfoService 는 응답하지만,
-                     등록금 쪽 이름은 문서 없이 맞히지 못했다(빈 응답 = 없는 오퍼레이션).
-     ❌ 학과 단위  — **공시 항목 자체가 없다.** 학교가 개별 공지하는 값이라 공개
-                     데이터로는 닿지 않는다. 계열이 실질 상한이다.
+     ✅ 학교 × 계열 × 학과 — **한국장학재단 포털 '학과별 등록금 검색'에 다 있다.**
+                     🔴 2026-08-27 정정: 아래 두 줄은 **틀린 기록이었다.** 예전에 여기에
+                     "계열은 오퍼레이션명을 못 찾았다 / 학과 단위는 공시 항목 자체가 없다"고
+                     적혀 있었는데, 개발자가 실제 제공처를 찾아내 실측으로 뒤집혔다.
+                     그 기록을 믿고 다음 세션이 또 포기하지 않도록 레시피를 아래에 남긴다.
 
-   그래서 이 로봇은 **학교 평균까지** 받아 온다. 계열 값이 생기면 같은 파일의
-   `byField` 칸에 넣기만 하면 앱은 고칠 것이 없다(parse-amount.js 의 tuitionFor 가
-   계열 → 학교평균 순으로 이미 본다).
+   ── KOSAF 학과별 등록금 수확 레시피 (2026-08-27 실측 · 아직 로봇은 안 만들었다) ──
+     화면:  https://portal.kosaf.go.kr/CO/jspActionSafe.do
+              ?beanName=PTSMTtnAmtSttcSVC&methodName=getSchlDptTtnAmtList
+              &inputVOName=kr.go.kosaf.portal.pt.sm.ttnamtsttc.svc.PTSMTtnAmtSttcSVO
+              &forwardPage=pt/sm/ttnamtsttc/PTSMTtnAmtSttc_06M
+              &forwardOnlyFlag=N&ignoreSession=Y&innerFlag=1
+     호출:  같은 주소로 **POST**. 위 GET 을 먼저 불러 **쿠키를 받고**, 그 HTML 의
+            `csrfTokenPortal` 값을 같이 보내야 한다.
+            🔴 쿠키 없이 토큰만 보내면 176바이트짜리
+               `alert('보안상 문제가 생겨 전송이 취소 되었습니다..')` 가 온다.
+     파라미터: yr=2026 · univDivCd=10(대학=학부) · dptNm=<학과명, **필수**>
+               univFndnDivCd(설립: 1공립/2국립/3사립) · areaCd(시도) · paging=<쪽>
+               ⚠️ dptNm 이 비면 "등록된 자료가 없습니다" 만 온다 — 전량 덤프가 안 된다.
+                  학과명을 돌려 가며 긁고 (학교, 계열) 로 집계해야 한다.
+     응답표: 학과명 | 학위구분 | 계열 | 학교명 | 본교/분교 | 대학구분 | 지역 | 입학금 | 등록금
+             예) 경영학과 | 학사 | 인문사회 | 동의대학교[본교] | 본교 | 대학 | 부산 | 0 | 6,358
+     🔴 **금액 단위가 천원이다** (6,358 = 635.8만원). 이 파일의 원 단위와 다르다.
+     🔴 학교명이 `동서대학교[본교]` 꼴이라 `[본교]`·`[제2캠퍼스]` 를 떼고 앱 학교명에 맞춰야
+        한다. 분교는 앱에서 별개 학교이므로 합치면 안 된다(운영 원칙 · normSchool 참조).
+     아직 안 본 것: 페이징 규칙(총 건수 표기를 못 찾았다) · 학과명 부분일치 범위.
+     ─────────────────────────────────────────────────────────────
+
+   그래서 이 로봇은 **학교 평균까지** 받아 온다. 계열 값은 위 레시피로 채우면 되고,
+   같은 파일의 `byField` 칸에 넣기만 하면 앱은 고칠 것이 없다(parse-amount.js 의
+   tuitionFor 가 학생입력 → 계열 → 학교평균 순으로 이미 본다).
 
    실행:  DATA_GO_KR_KEY=<키> node collector/fetch-tuition.mjs          (미리보기)
           DATA_GO_KR_KEY=<키> node collector/fetch-tuition.mjs --write  (반영)
@@ -135,7 +156,10 @@ if (had && now < had * 0.8) {
    앱은 이 값에 비율을 곱해 '받을 수 있는 금액'이라고 말하므로, 자릿수가 틀리면
    그대로 사용자 기망이 된다. 리포트가 아니라 관문이어야 재발이 끝난다.
    범위는 넉넉하게 잡았다 — 국내 4년제 연간 등록금은 200만~1,500만원 사이다. */
-const MIN_TUITION = 2_000_000, MAX_TUITION = 15_000_000;
+/* 한 줄에 둘을 선언하지 말 것 — test-collector 의 '선언 없는 대문자 이름' 검사가
+   `const A = 1, B = 2;` 에서 뒤엣것을 못 읽어 실패한다(2026-08-27 실제로 걸렸다). */
+const MIN_TUITION = 2_000_000;
+const MAX_TUITION = 15_000_000;
 const all = Object.values(schools).map((s) => s.avg).sort((a, b) => a - b);
 const median = all[Math.floor(all.length / 2)] || 0;
 if (median < MIN_TUITION || median > MAX_TUITION) {
@@ -159,7 +183,7 @@ fs.writeFileSync(OUT, JSON.stringify({
   updatedAt: new Date().toISOString(),
   source: '공공데이터포털 전국대학별평균등록금정보 (한국장학재단 공시연계)',
   sourceUrl: 'https://www.data.go.kr/data/15107738/standard.do',
-  note: 'avg = 그 학교 평균 등록금. byField = 계열별(있으면 우선). 학과 단위는 공시 항목이 없다.',
+  note: 'avg = 그 학교 평균 등록금(원). byField = 계열별(있으면 우선 — 아직 비어 있다). 계열·학과별은 한국장학재단 포털에 있고 수확 레시피가 collector/fetch-tuition.mjs 머리말에 있다.',
   schools
 }, null, 1) + '\n');
 console.log(`\ndata/tuition.json 저장 완료 — 학교 ${now}곳`);
