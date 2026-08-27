@@ -581,6 +581,22 @@
    "added": "2026-08-25",
    "fetched": true,
    "schematized": false
+  },
+  {
+   "id": "auto-bbssc58943954artclviewdo",
+   "name": "일반공지 2026학년도 2학기 유한재단 결손 및 다문화 가정 장학생 대체 추천(~8/30) 신촌/국제",
+   "target": "일반공지 2026학년도 2학기 유한재단 결손 및 다문화",
+   "added": "2026-08-27",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-krbbskr845189artclviewdo",
+   "name": "[학부-교외장학] 2026학년도 KT&G장학재단 대학 상상 장학사업 장학생 모집 안내",
+   "target": "2026학년도 KT&G장학재단 대학 상상 장학사업 장학",
+   "added": "2026-08-27",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }
