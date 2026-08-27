@@ -1,0 +1,47 @@
+# 대학별 등록금 갱신 (2026-08-27)
+# 공공데이터포털(한국장학재단 대학별 평균등록금)에서 학교별 등록금을 받아 data/tuition.json으로 발행한다.
+# 등록금 공시는 연 1회라 예약 실행은 두지 않았다 — 필요할 때 Actions에서 수동 실행.
+# 키는 저장소 Secret DATA_GO_KR_KEY (없으면 스크립트가 아무것도 안 하고 조용히 종료).
+# 저장은 기본 브랜치(로봇 저장 위치 원칙) — deploy-sync가 main으로 자동 배포한다.
+name: 대학별 등록금 갱신 (공공데이터포털)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: collector
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/nice-heisenberg-WESq5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 등록금 수확
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+        # --write 가 없으면 미리보기만 하고 저장하지 않는다(스크립트 기본값) — 빼면 안 된다.
+        run: node collector/fetch-tuition.mjs --write
+
+      - name: 저장
+        run: |
+          git config user.name "handaejang-bot"
+          git config user.email "bot@handaejang.local"
+          [ -f data/tuition.json ] && git add data/tuition.json
+          git diff --cached --quiet && { echo "변경 없음"; exit 0; }
+          git commit -m "tuition: 대학별 등록금 갱신 (공공데이터포털)"
+          for i in 1 2 3; do
+            git pull --rebase --autostash origin claude/nice-heisenberg-WESq5 && git push origin HEAD:claude/nice-heisenberg-WESq5 && exit 0
+            sleep 5
+          done
+          echo "::error::push 3회 실패"; exit 1
