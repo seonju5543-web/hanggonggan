@@ -2451,5 +2451,27 @@ console.log('\n■ 금액 상세 — 승인받은 화면 그대로인가 (2026-0
     /AFFIRM_ELIG\.source/.test(meSrc) && /isAside && \(EXCLUDE_LINE\.test\(t\) \|\| AFFIRM_ELIG\.test\(t\)\)/.test(meSrc), true);
 }
 
+/* ── 로봇이 쓰는 학교 열쇠 = 앱이 읽는 학교 이름 (2026-08-27) ────────────────────
+   majors.mjs 가 '연세대학교 미래캠퍼스(원주)' 로 저장하는데 app.js 는
+   MAJORS_BY_SCHOOL['연세대학교 미래캠퍼스'] 로 찾고 있었다 — 커리어넷에 그 학교
+   학과가 나타나는 순간 영영 매칭되지 않는다. 폴백(전국 공통 목록)이 조용히 받아
+   주기 때문에 화면상으로는 아무 일도 안 일어난 것처럼 보인다. 검사가 없으면 아무도 모른다. */
+console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 학과 추천이 조용히 죽는다)');
+{
+  const strip = (t) => t.replace(/\/\*[\s\S]*?\*\//g, '');
+  const sec = (src, head) => strip(src.slice(src.indexOf(head)).split(/\n[}\]];/)[0]);
+  const dataSrc = fs.readFileSync(new URL('../data.js', import.meta.url), 'utf8');
+  const majorsSrc = fs.readFileSync(new URL('../collector/majors.mjs', import.meta.url), 'utf8');
+  const unis = new Set([...sec(dataSrc, 'const UNIVERSITIES = [').matchAll(/'([^']+)'/g)].map((m) => m[1]));
+  const targets = [...sec(majorsSrc, 'const BRANCH_MAP = {').matchAll(/:\s*'([^']+)'/g)].map((m) => m[1]);
+
+  eq('data.js 학교 목록을 실제로 읽었다', unis.size > 100, true);
+  eq('BRANCH_MAP 을 실제로 읽었다', targets.length >= 7, true);
+  eq('BRANCH_MAP 값이 전부 data.js UNIVERSITIES 안에 있다', targets.filter((t) => !unis.has(t)), []);
+  /* 분교 7곳은 전부 매핑돼 있어야 한다 — 빠지면 그 학교 학과가 본교로 합쳐진다 */
+  eq('data.js 분교 7곳이 전부 BRANCH_MAP 에 있다',
+    [...unis].filter((u) => /캠퍼스$/.test(u) && !targets.includes(u)), []);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);
