@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-08-27T09:09:15.938Z",
+ "updatedAt": "2026-08-27",
  "items": [
   {
    "id": "reg-kw-gukgagosi",
@@ -10365,6 +10365,216 @@
     "max": 0,
     "raw": "지원 금액 등록금 전액 등록금의 50% ① 장학금 수혜 후 일정기간 ( 수혜학기 ×4 개월 ) 재직상태를 유지하여야 하며 , 미이행 시 장학금반환 및 환수 절차 진행 ② 장학금 수혜학기 재학상태를 유지하여야 하며 , 수혜학기 학적변동 ( 휴학 · 자퇴 · 제적 ) 발생 시 해당학기 장학금 전액 반환 이전 다음 목록"
    }
+  },
+  {
+   "id": "auto-ent2431264156artclviewdo",
+   "name": "[공통][국가]2026년 2학기 푸른등대 기부장학금 장학생 선발(~9/10)",
+   "type": "교내",
+   "provider": "한국외국어대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-09-10",
+   "period": "접수 ~2026-09-10",
+   "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-27 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/264156/artclView.do",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-doarticleno155863nocat35",
+   "name": "홍익 메이커스페이스 26-2학기 봉사장학생 선발 안내",
+   "type": "교내",
+   "provider": "홍익대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-27",
+   "period": "접수 기간 원문 확인",
+   "summary": "홍익대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "홍익대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-27 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "26학년도 1학기 메이커스페이스 봉사장학생 신청서_OO학과_OOO.hwp",
+     "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=download&articleNo=155863&attachNo=91106"
+    }
+   ],
+   "sourceUrl": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=155863&article.offset=0&articleLimit=10&noCat=35",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "3. 신청 자격 : 2026 년 2 학기 학부 재학생",
+    "가 . 필수 조건",
+    "1) 2026-2 학기 학부 재학생으로 직전 학기 15 학점 이상 이수하고 성적경고를 받지 않은 학생 .",
+    "2) 주인의식을 가지고 매사에 함께 협력하며 , 적극적이고 활발한 성격",
+    "3) 만드는 것을 좋아하고 3D 모델링 , 3D 프린팅 , 레이저 조각 , 목공 등 해당 작업 가능자 또는 유경험자",
+    "4) 아래 기재된 기간동안 근무 가능한 자",
+    "5) 원활한 업무 수행을 위한 오전 , 오후 중 2 시간 이상 연속 근무가 가능한 자",
+    "나 . 신청 자격 : 2026 년 2 학기 학부 재학생 (1,4 학년 불가 )",
+    "1) 직전 학기 성적경고 및 15 학점 미만 이수 학생",
+    "2) 당해 학기 신입생 및 편입생",
+    "3) 휴학생 ( 휴학 예정자 포함 ) 및 졸업생",
+    "4) 학기초과자 중 수업료 전액 납부 대상자가 아닌 자",
+    "5) 미등록자는 등록이 확인될 때까지 봉사장학금이 지급되지 않음",
+    "6) 캠퍼스별 교차지원 불가"
+   ],
+   "excerpts": [
+    "신청 자격 : 2026 년 2 학기 학부 재학생",
+    "신청 자격 : 2026 년 2 학기 학부 재학생 (1,4 학년 불가 )",
+    "신청기간 : ~ 9.7( 월 )16:00 / 면접 대상자 통보 : ~ 9.7( 월 ) 17:00"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-doarticleno155847nocat29",
+   "name": "[교양교육원] 2026-2학기 외국어 통역지원 TA 장학생 모집",
+   "type": "교내",
+   "provider": "홍익대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-27",
+   "period": "접수 기간 원문 확인",
+   "summary": "홍익대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "홍익대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-27 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=155847&article.offset=0&articleLimit=10&noCat=29",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-2289viewdocurrentpageno1",
+   "name": "[기업가정신창업허브] 2026년 2학기 중소기업 취업연계 장학사업(희망사다리Ⅰ유형) 신규장학생 모집 (~09/18)_창업장학",
+   "type": "교내",
+   "provider": "국민대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-09-18",
+   "period": "접수 ~2026-09-18",
+   "summary": "국민대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "국민대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-27 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12289/view.do?currentPageNo=1",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "2.지원대상(*연도 및 학기별 재학생이어야 함)",
+    "□대한민국 국적 소지자로서 선발 학기 기준으로 대학 3학년 이상 재학 중인 자",
+    "-창업지원형:기본요건을 충족하는 학생 중 창업희망자 또는 창업자",
+    "□직전학기 성적이 100점 만점의 70점 이상인 자(신·편입(재입학)생은 성적 심사 제외)",
+    "□직전학기 12학점 이상 이수자",
+    "□지원자 중 투기가능성,사치조장 및 유흥·향락 등 불건전 업종의 창업희망자 제외"
+   ]
+  },
+  {
+   "id": "auto-leno275081srcategoryid22",
+   "name": "[학생지원팀] 2026학년도 <성적우수장학생> 장학금 양도 신청 안내(-9/2, 15시까지)",
+   "type": "교내",
+   "provider": "가톨릭대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-27",
+   "period": "접수 기간 원문 확인",
+   "summary": "가톨릭대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "가톨릭대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-27 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "[교내장학금]장학금 양도신청서(오프라인 양식)(최종).hwp",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=275081&attachNo=224871"
+    },
+    {
+     "name": "개인정보수집이용 동의서(장학금양도신청).hwp",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=275081&attachNo=224872"
+    }
+   ],
+   "sourceUrl": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=275081&article.offset=0&articleLimit=10&srCategoryId=22",
+   "sourceKind": "auto",
+   "excerpts": [
+    "신청기간 : 2026.08.27.( 목 ) ~ 09.02( 수 ) 15 시 까지"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-15nttno169522searchctgry",
+   "name": "(재)경주시장학회 2026학년도 장학생 선발 안내",
+   "type": "교외",
+   "provider": "충북대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-27",
+   "period": "접수 기간 원문 확인",
+   "summary": "충북대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "충북대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-27 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=815&bbsNo=8&nttNo=169522&pageUnit=10&searchCtgry=%ed%95%99%ec%82%ac%2f%ec%9e%a5%ed%95%99&searchCnd=all&pageIndex=1",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "(재)경주시장학회에서 2026학년도 장학생을 선발한다 하오니 관심있는 학생들은 신청하여 주시기 바랍니다. 가. 선발인원: 450명(일반전형: 432명, 특기생전형: 18명) 나. 장학금액: 1인당 200만 원(생활비성) 다. 신청자격: 붙임 참고"
+   ],
+   "excerpts": [
+    "장학금액: 1인당 200만 원(생활비성) 다.",
+    "문의처: (재)경주시장학회 사무국 (054-748-7760, 760-7350) 붙임 (재)경주시장학회 2026학년도 장학생 선발 공고문 및 서식 1부."
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   }
  ]
 }
