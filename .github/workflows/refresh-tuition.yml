@@ -1,9 +1,10 @@
 # 대학별 등록금 갱신 (2026-08-27)
-# 공공데이터포털(한국장학재단 대학별 평균등록금)에서 학교별 등록금을 받아 data/tuition.json으로 발행한다.
+# 두 갈래를 한 파일에 담는다 — 둘 다 data/tuition.json 을 고치므로 순서대로 돌아야 한다.
+#   ① 학교 평균(avg)  : 공공데이터포털. Secret DATA_GO_KR_KEY 필요(없으면 조용히 건너뛴다).
+#   ② 학교×계열(byField): 한국장학재단 포털. 열쇠가 필요 없어 ①이 건너뛰어도 혼자 돈다.
 # 등록금 공시는 연 1회라 예약 실행은 두지 않았다 — 필요할 때 Actions에서 수동 실행.
-# 키는 저장소 Secret DATA_GO_KR_KEY (없으면 스크립트가 아무것도 안 하고 조용히 종료).
 # 저장은 기본 브랜치(로봇 저장 위치 원칙) — deploy-sync가 main으로 자동 배포한다.
-name: 대학별 등록금 갱신 (공공데이터포털)
+name: 대학별·계열별 등록금 갱신
 
 on:
   workflow_dispatch:
@@ -18,7 +19,8 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # ② 계열 수확이 전량 2,711쪽 · 약 25분이다(서버가 초당 ~1.9쪽으로 막는다).
+    timeout-minutes: 55
     steps:
       - uses: actions/checkout@v4
         with:
@@ -33,13 +35,19 @@ jobs:
         # --write 가 없으면 미리보기만 하고 저장하지 않는다(스크립트 기본값) — 빼면 안 된다.
         run: node collector/fetch-tuition.mjs --write
 
+      # 열쇠가 필요 없다. 위 단계가 키 없이 끝났어도 이 단계는 제 몫을 한다.
+      # 보강이 아니라 본업이라 continue-on-error 를 달지 않는다 — 관문에 걸리면 저장도 막혀야 한다.
+      - name: 계열별 등록금 수확
+        timeout-minutes: 45
+        run: node collector/fetch-tuition-field.mjs --write
+
       - name: 저장
         run: |
           git config user.name "handaejang-bot"
           git config user.email "bot@handaejang.local"
           [ -f data/tuition.json ] && git add data/tuition.json
           git diff --cached --quiet && { echo "변경 없음"; exit 0; }
-          git commit -m "tuition: 대학별 등록금 갱신 (공공데이터포털)"
+          git commit -m "tuition: 대학별·계열별 등록금 갱신"
           for i in 1 2 3; do
             git pull --rebase --autostash origin claude/nice-heisenberg-WESq5 && git push origin HEAD:claude/nice-heisenberg-WESq5 && exit 0
             sleep 5

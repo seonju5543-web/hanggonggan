@@ -98,8 +98,21 @@ function wonIn(text) {
 
 /** 등록금 비율을 읽는다 → 0~1 사이 비율. 비율형이 아니면 0 */
 function ratioIn(text) {
-  var m = String(text || '').match(RATIO_RE);
+  var s = String(text || '');
+  var m = s.match(RATIO_RE);
   if (!m) return 0;
+  /* 🔴 `전액`이 **무엇의** 전액인지 확인한다 (2026-08-27 — 실제로 틀렸다).
+     종근당고촌재단 무상기숙사 공고의 `가. 지원혜택 : 주거비 전액지원` 을 **등록금 100%** 로
+     읽어, 그 학생의 등록금 전액(약 800만원)이 '받을 수 있는 돈'으로 합계에 들어갔다.
+     주거비·식비·기숙사비의 전액지원은 등록금과 아무 상관이 없다.
+     RATIO_RE 의 둘째 갈래(`전액 면제/감면/지원`)에는 등록금 닻이 없어서 생긴 일이라,
+     여기서 **바로 앞 20자 안에 등록금 낱말이 있을 때만** 비율로 인정한다.
+     ⚠️ 글 전체에서 찾으면 안 된다 — `기숙사비 전액지원 … 등록금은 본인 부담` 이 되살아난다. */
+  if (m[5]) {
+    var at = s.indexOf(m[0]);
+    var near = s.slice(Math.max(0, at - 20), at + m[0].length);
+    if (!/등록금|수업료|학비/.test(near)) return 0;
+  }
   if (m[4]) return Math.min(100, paNum(m[4])) / 100;      // `수업료 70%`
   if (/전액/.test(m[0])) return 1;
   if (/반액|절반/.test(m[0])) return 0.5;

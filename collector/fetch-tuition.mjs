@@ -21,31 +21,14 @@
                      적혀 있었는데, 개발자가 실제 제공처를 찾아내 실측으로 뒤집혔다.
                      그 기록을 믿고 다음 세션이 또 포기하지 않도록 레시피를 아래에 남긴다.
 
-   ── KOSAF 학과별 등록금 수확 레시피 (2026-08-27 실측 · 아직 로봇은 안 만들었다) ──
-     화면:  https://portal.kosaf.go.kr/CO/jspActionSafe.do
-              ?beanName=PTSMTtnAmtSttcSVC&methodName=getSchlDptTtnAmtList
-              &inputVOName=kr.go.kosaf.portal.pt.sm.ttnamtsttc.svc.PTSMTtnAmtSttcSVO
-              &forwardPage=pt/sm/ttnamtsttc/PTSMTtnAmtSttc_06M
-              &forwardOnlyFlag=N&ignoreSession=Y&innerFlag=1
-     호출:  같은 주소로 **POST**. 위 GET 을 먼저 불러 **쿠키를 받고**, 그 HTML 의
-            `csrfTokenPortal` 값을 같이 보내야 한다.
-            🔴 쿠키 없이 토큰만 보내면 176바이트짜리
-               `alert('보안상 문제가 생겨 전송이 취소 되었습니다..')` 가 온다.
-     파라미터: yr=2026 · univDivCd=10(대학=학부) · dptNm=<학과명, **필수**>
-               univFndnDivCd(설립: 1공립/2국립/3사립) · areaCd(시도) · paging=<쪽>
-               ⚠️ dptNm 이 비면 "등록된 자료가 없습니다" 만 온다 — 전량 덤프가 안 된다.
-                  학과명을 돌려 가며 긁고 (학교, 계열) 로 집계해야 한다.
-     응답표: 학과명 | 학위구분 | 계열 | 학교명 | 본교/분교 | 대학구분 | 지역 | 입학금 | 등록금
-             예) 경영학과 | 학사 | 인문사회 | 동의대학교[본교] | 본교 | 대학 | 부산 | 0 | 6,358
-     🔴 **금액 단위가 천원이다** (6,358 = 635.8만원). 이 파일의 원 단위와 다르다.
-     🔴 학교명이 `동서대학교[본교]` 꼴이라 `[본교]`·`[제2캠퍼스]` 를 떼고 앱 학교명에 맞춰야
-        한다. 분교는 앱에서 별개 학교이므로 합치면 안 된다(운영 원칙 · normSchool 참조).
-     아직 안 본 것: 페이징 규칙(총 건수 표기를 못 찾았다) · 학과명 부분일치 범위.
-     ─────────────────────────────────────────────────────────────
+   ── KOSAF 학과별 등록금 → **로봇이 생겼다: `collector/fetch-tuition-field.mjs`** ──
+     이 파일은 **학교 평균(avg)** 만 받는다. 학교 × 계열(`byField`)은 위 로봇이 채운다.
+     같은 워크플로(`refresh-tuition.yml`)에서 이 파일 다음에 이어서 돈다.
+     🔴 여기 있던 수확 레시피는 실측해 보니 **셋이 틀렸다**(쪽 넘김 파라미터·학과명
+        와일드카드·화면 대신 JSON 경로). 바로잡은 전문은 그 로봇 머리말에 있다 —
+        레시피를 이 파일에 다시 베껴 두지 말 것(둘이 갈라지면 또 틀린 쪽을 믿게 된다).
+   ─────────────────────────────────────────────────────────────
 
-   그래서 이 로봇은 **학교 평균까지** 받아 온다. 계열 값은 위 레시피로 채우면 되고,
-   같은 파일의 `byField` 칸에 넣기만 하면 앱은 고칠 것이 없다(parse-amount.js 의
-   tuitionFor 가 학생입력 → 계열 → 학교평균 순으로 이미 본다).
 
    실행:  DATA_GO_KR_KEY=<키> node collector/fetch-tuition.mjs          (미리보기)
           DATA_GO_KR_KEY=<키> node collector/fetch-tuition.mjs --write  (반영)

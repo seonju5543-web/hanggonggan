@@ -431,6 +431,10 @@ function noticeForProfile(n, p) {
    🔴 이 잣대는 **여기 한 곳에만** 둔다. 예전엔 collector/eligibility-ai.mjs 와
    verify/eligibility-report.mjs 에 같은 정규식이 복사돼 있었고, 정작 화면으로 나가는
    문인 이 파일에는 없었다 — 그래서 앱이 무엇을 내보내는지 아무도 검사하지 않았다. */
+/* '누구는 신청할 수 있다' 꼴 — REQ_SIGNAL 과 ※ 곁말 관문이 **같은 것**을 본다.
+   두 곳에 따로 적으면 한쪽만 고쳐져 갈라진다(이 저장소가 반복해 겪은 실패). */
+const AFFIRM_ELIG = /(자|학생|생)[는은도만이가]?\s?[^.]{0,25}(신청|지원|참여|응모|수혜|선발)\s?(이|가)?\s?(가능|할\s?수\s?있)/;
+
 const REQ_SIGNAL = new RegExp([
   /* ① 자격을 이루는 낱말 — 학적·성적·소득·특별자격·지역 */
   '재학|휴학|복학|신입|편입|졸업|\\d\\s?학년|학부생|대학생|대학원생',
@@ -446,6 +450,18 @@ const REQ_SIGNAL = new RegExp([
   '(마친|가진|이수한|합격한|해당하는|갖춘)\\s?자',
   '이상인?\\s?자|이하의?\\s?(해당\\s?)?학생',
   '결격\\s?사유|결격사유|합격자|재직|파견|추천\\s?(가능|대상)자?|이수(한|자)',
+  /* ③ '누구는 신청할 수 있다' 꼴 — 한국어 공고가 **예외 자격**을 쓰는 대표 형식이다.
+        ②까지로는 증명이 안 돼 실제로 21줄이 화면에서 사라져 있었다(2026-08-27 전수):
+          `10학기 이하 후기 이중전공자는 등록금 전액 납부 시 신청 가능`   ← 면학장학금
+          `정규학기 내 재학생만 지원 가능 (건축학과 등 예외 인정)`        ← 사랑나눔
+          `학제 5~6년인 전공에 한하여 … 재학 중인 학생 지원 가능`        ← 인재림
+        이 줄들은 **본문 규칙을 뒤집는 예외**라, 빠지면 자격이 되는 학생이 안 된다고 본다.
+        (잡음보다 나쁜 실패 — 사랑나눔에서 기초생활수급자 요건이 잘렸던 것과 같은 계열)
+     🔴 넓히지 말 것. `포털을 통해 신청가능`(신청 방법)·`8월 20일부터 신청 가능`(일정)이
+        같이 들어오면 개발자가 네 번 지적한 그 잡음이 되살아난다. 그래서 두 겹으로 좁혔다:
+          ⓐ **사람을 가리키는 낱말**이 앞에 있어야 하고 (자·학생·생)
+          ⓑ 그 사이에 **마침표가 없어야** 한다(다른 문장으로 건너뛰지 않는다). */
+  AFFIRM_ELIG.source,
 ].join('|'));
 
 /* 자격이 **아닌 것**이 스스로 드러내는 표지 — 이름을 대는 게 아니라 '무엇을 말하는 줄인가'를 본다.
@@ -474,6 +490,11 @@ const EXCLUDE_LINE = /(제외(한다|합니다|됨|대상)?\s*$|받은\s*(학생
    (2026-08-24 전수 조사). `신/편입생은 입학 학기에만 학점 및 성적 기준 적용 제외`가
    '이런 경우는 제외돼요'에 떠서, 혜택을 불이익으로 보여 주고 있었다.
    `계절, 교류, 인정학점 제외`도 사람을 빼는 말이 아니라 학점 세는 규칙이다. */
+/* 🔴 줄의 **주장**은 끝에 있다 (2026-08-27). `국가장학금을 신청할 수 없는 대한민국 국적
+   미소지자도 선발 가능` 은 '신청할 수 없는'만 보면 제외로 읽히지만, 이 줄이 실제로
+   말하는 것은 **선발 가능**이다. 앞의 '없는'은 대상을 꾸미는 말일 뿐이다.
+   제외 칸에 넣으면 외국 국적 학생이 자기가 안 된다고 읽는다 — 자격이 뒤집혀 보인다. */
+const ENDS_AFFIRM = /(가능|있음|인\s?자|한다)\s*[.]?\s*$/;
 const NOT_AN_EXCLUSION = /(기준\s*)?적용\s*제외|미적용|산정.{0,6}제외|학점\s*제외|계절.{0,10}제외|제외한\s|제외하고|을\s*제외한|를\s*제외한/;
 /* 제외 절에 있어도 **긍정으로 적힌 줄은 자격**이다 (2026-08-24 개발자 지적).
    `결격사유에 해당하지 않는 자`는 지원 자격이고, `결격사유에 해당하면` 제외다. */
@@ -746,7 +767,21 @@ function requirementLines(sch, lines, opts) {
     if (ELIG_SECTION.test(t)) inNonElig = false;
     if (inNonElig && !loose) continue;
     // 다듬은 뒤에 검사한다 — "3 ) 금 액 : …"은 번호를 떼야 '금액' 줄인 것이 드러난다
-    if (REQ_NOISE.test(l.trim()) || REQ_NOISE.test(t)) continue;
+    /* 🔴 `※` 곁말을 **내용도 안 보고** 버리면 안 된다 (2026-08-27 전수 조사).
+       ※ 로 시작하는 자격 줄이 95개인데 한 줄도 화면에 못 나가고 있었다. 그중에는
+       버려선 안 되는 것이 섞여 있다:
+         · `※ 졸업유예자, 휴학생, 대학원생, 세종캠퍼스 학생은 지원 불가`  (25건)
+           → 제외 칸에도 못 가서, 그 학생이 **자기가 된다고 읽는다.** 자격이 뒤집혀
+             보이는 실패라 잡음보다 나쁘다.
+         · `※ 10학기 이하 후기 이중전공자는 등록금 전액 납부 시 신청 가능`
+           → 본문 규칙(`8학기 이하`)을 뒤집는 **예외 자격**이다. 빠지면 되는 학생이 안 된다고 나온다.
+       ⚠️ 그렇다고 ※ 를 통째로 열면 2026-08-02에 개발자가 지적한 그 잡음이 되살아난다
+          (`※ 예산 범위 내 학교 지급기준에 의거하여 …`, `※ 동점자 처리기준 : …`).
+       그래서 이 저장소 방식대로 **증명한 줄만** 통과시킨다 — 제외를 말하거나(EXCLUDE_LINE),
+       '누구는 신청 가능' 꼴이거나(AFFIRM_ELIG). 나머지 ※ 는 예전처럼 버린다. */
+    const asideProven = isAside && (EXCLUDE_LINE.test(t) || AFFIRM_ELIG.test(t));
+    if (!asideProven && REQ_NOISE.test(l.trim())) continue;
+    if (REQ_NOISE.test(t)) continue;
     if (!loose && DOC_COUNT_TAIL.test(t)) continue;
     if (NOT_REQ_RE.test(t) || isTableCell(t)) continue;
     const ranks = PRIORITY_LINE.test(t) && !HARD_THRESHOLD.test(t);
@@ -764,6 +799,8 @@ function requirementLines(sch, lines, opts) {
          괄호는 부연일 뿐이다. 넣으면 같은 줄이 자격·제외 두 곳에 뜬다(실측 9줄).
          자격 블록이 쓰는 잣대와 **같은 규칙**이다 — 갈라지면 또 어긋난다. */
       if (NOT_AN_EXCLUSION.test(t)) continue;   // 면제·산정 규칙은 제외가 아니다 (위 주석)
+      /* 끝이 '…선발 가능'이면 그 줄의 주장은 자격이다 (위 ENDS_AFFIRM 주석) */
+      if (AFFIRM_ELIG.test(t) && ENDS_AFFIRM.test(t)) continue;
       const bareEx = t.replace(/\s*[(（][^)）]*[)）]\s*$/, '').trim();
       const pureEx = EXCLUDE_LINE.test(bareEx.length >= 4 ? bareEx : t);
       if (!(sect === 'exclude' || pureEx)) continue;
@@ -818,7 +855,8 @@ function requirementLines(sch, lines, opts) {
          괄호를 떼고도 여전히 제외를 말하는 줄만 옮긴다. 괄호가 곧 전부인 줄
          (`(타 장학금 수혜자 지원 불가)`)은 떼면 빈 껍데기라 그대로 본다. */
       const bare = t.replace(/\s*[(（][^)）]*[)）]\s*$/, '').trim();
-      if (EXCLUDE_LINE.test(bare.length >= 4 ? bare : t) && !NOT_AN_EXCLUSION.test(t)) continue;
+      if (EXCLUDE_LINE.test(bare.length >= 4 ? bare : t) && !NOT_AN_EXCLUSION.test(t)
+          && !(AFFIRM_ELIG.test(t) && ENDS_AFFIRM.test(t))) continue;
       if (!REQ_SIGNAL.test(t)) continue;
     }
     if (!out.includes(t)) {

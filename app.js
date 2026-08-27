@@ -792,20 +792,6 @@ function applySort(key) {
 /* 금액 상세에서 고른 공고를 장학금 찾기 화면에서 찾아 보여 준다 (2026-08-27).
    못 찾으면 아무 일도 안 일어나게 두지 않고 그 공고 상세를 연다 —
    '눌렀는데 아무 반응 없음'이 학생에게는 고장으로 보인다. */
-function gotoExploreCard(id) {
-  closeSheet();
-  exploreFilter = 'all';
-  $$('.filter-chip').forEach((c) => c.classList.toggle('active', c.dataset.filter === 'all'));
-  showScreen('explore');
-  setTimeout(() => {
-    const card = $(`#explore-list [data-detail="${CSS.escape(id)}"]`);
-    if (!card) { openDetail(id); return; }
-    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    card.classList.add('flash');
-    setTimeout(() => card.classList.remove('flash'), 1600);
-  }, 260);
-}
-
 function renderExplore() {
   const matches = getMatches();
   const order = { eligible: 0, selective: 0, unknown: 1, ineligible: 2 };
@@ -1486,7 +1472,11 @@ function amountDetailRow(m, opt) {
   const o = opt || {};
   const sch = m.ref, a = sch.amountSpec || null;
   const val = o.text || (m.won ? won(m.won) : '금액 원문 확인');
-  /* 줄을 누르면 장학금 찾기의 그 카드로 간다 (2026-08-27 개발자 요청).
+  /* 줄을 누르면 **그 공고의 상세 시트**가 뜬다 (2026-08-27 개발자 지시로 변경).
+     처음엔 장학금 탭으로 옮겨 그 카드를 찾아 스크롤했는데, 카드를 못 찾으면(필터·정렬·
+     마감 숨김) 아무 일도 안 일어난 것처럼 보였다. 지금은 찾아가지 않고 **바로 연다** —
+     장학금 탭에서 카드를 누른 것과 같은 화면이다.
+     시트 그릇(`#detail-sheet`)이 금액 상세와 같아서 내용만 갈린다(새 시트를 만들지 않는다).
      안쪽 `원문 보기` 를 여닫는 클릭은 이동이 아니다 — 아래 핸들러가 details·a 를 걸러낸다. */
   const cls = (o.dim ? 'ad-row dim' : 'ad-row') + ' tappable';
   const merged = (m.mergedFrom || []).length;
@@ -2471,14 +2461,14 @@ function bindEvents() {
   document.addEventListener('click', (e) => {
     const row = e.target.closest('[data-goto]');
     if (!row || notNav(e.target, row)) return;
-    gotoExploreCard(row.dataset.goto);
+    openDetail(row.dataset.goto);
   });
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter' && e.key !== ' ') return;
     const row = e.target.closest && e.target.closest('[data-goto]');
     if (!row || notNav(e.target, row)) return;
     e.preventDefault();
-    gotoExploreCard(row.dataset.goto);
+    openDetail(row.dataset.goto);
   });
 
   $('#sheet-backdrop').addEventListener('click', closeSheet);
