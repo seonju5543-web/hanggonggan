@@ -58,6 +58,17 @@ async function dismissNotify(page) {
   await page.selectOption('#in-region', '서울');
   await page.click('.onboard-step[data-step="2"] [data-next]');
   await page.click('.onboard-step[data-step="3"] [data-next]');
+  /* 🔴 단계 번호를 박지 않는다 (2026-08-24) — 공동개발자가 4단계(이중수혜)를 새로 끼우자
+     서류 정보가 4→5단계로 밀려 이 드라이버가 '#in-sid 가 안 보인다'로 죽었다.
+     앞으로 단계가 더 늘어도 깨지지 않게 **서류 칸이 보일 때까지 '다음'을 누른다**
+     (검증 드라이버에 공고 id 를 박지 말라는 이 저장소의 규칙과 같은 계열). */
+  for (let i = 0; i < 4; i++) {
+    if (await page.isVisible('#in-sid').catch(() => false)) break;
+    const next = await page.$('.onboard-step:not([hidden]) [data-next]');
+    if (!next) break;
+    await next.click().catch(() => {});
+    await page.waitForTimeout(250);
+  }
   await page.fill('#in-sid', '202312345');
   await page.fill('#in-phone', '010-1234-5678');
   await page.fill('#in-email', 'test@hufs.ac.kr');
