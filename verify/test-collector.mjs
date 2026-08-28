@@ -2663,5 +2663,59 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
   eq('판정이 fitDetail 의 fails 를 쓴다', /fitDetail\(sch, p\)\.fails/.test(src3), true);
 }
 
+
+/* ── 화면 주장을 재는 도구가 앱과 갈라지지 않게 (2026-08-29) ─────────────────
+   2026-08-29에 `requirementLines()` 를 그냥 불러 5줄이 나온 것을 보고
+   "자격 줄 18건이 화면에 안 뜬다"고 보고했다. 틀렸다 — 그건 **목록 카드용 5줄
+   미리보기**였고 상세 시트는 전부 보여 주고 있었다. 코드는 멀쩡했고 검사도 조용했다.
+   틀린 것은 **내가 잰 방법**이었다. 그래서 `verify/what-shows.mjs` 로만 재기로 했다.
+
+   🔴 첫 판의 이 검사는 **글자만 훑는 껍데기**여서, 아무것도 안 하는 도구도 전부 통과했다
+      (코드 리뷰가 잡았다: 한 줄짜리 가짜 파일로 6개 다 ✓). 그래서 **실제로 돌려서** 본다. */
+{
+  console.log('\n■ 화면 주장을 재는 도구 (verify/what-shows.mjs · 2026-08-29)');
+  const { execFileSync } = await import('node:child_process');
+  const run = (args) => {
+    try {
+      return execFileSync(process.execPath, ['verify/what-shows.mjs', ...args],
+        { cwd: new URL('..', import.meta.url).pathname, encoding: 'utf8', timeout: 60000 });
+    } catch (e) { return String((e && (e.stdout || e.message)) || ''); }
+  };
+
+  /* 🔴 **실제로 돌려서** 앱과 같은 답을 내는지 본다 — 글자만 훑으면 빈 파일도 통과한다 */
+  const reg2 = JSON.parse(fs.readFileSync(new URL('../data/registered.json', import.meta.url), 'utf8'));
+  const ME4 = createRequire(import.meta.url)('../match-engine.js');
+  /* 목록(상한 5)과 상세(전부)의 줄 수가 **다른** 공고를 골라야 그날의 실수를 재현 검사할 수 있다 */
+  const target = reg2.items.find((x) =>
+    ME4.requirementLines(x, null, { all: true }).length > ME4.requirementLines(x, null).length);
+  eq('목록과 상세가 다른 공고가 실제로 있다 (이 검사의 전제)', !!target, true);
+  if (target) {
+    const out = run([target.id]);
+    const listN = Number((out.match(/목록 카드에 보이는 자격 줄 \((\d+)줄/) || [])[1]);
+    const allN = Number((out.match(/상세 시트에 보이는 자격 줄 \((\d+)줄/) || [])[1]);
+    eq('  도구가 목록 줄 수를 앱과 같게 센다', listN, ME4.requirementLines(target, null).length);
+    eq('  도구가 상세 줄 수를 앱과 같게 센다', allN, ME4.requirementLines(target, null, { all: true }).length);
+    eq('  둘이 다르면 그 사실을 짚어 준다 (그날 실수의 정체)', /미리보기 상한/.test(out) && allN > listN, true);
+  }
+
+  /* 🔴 신청 버튼은 **마감까지** 봐야 한다 — 첫 판은 이걸 빠뜨려 8건을 '열림'이라 했다.
+     마감이 지난 공고를 골라 '잠김'이라 말하는지 실제로 확인한다. */
+  const closed = reg2.items.find((x) => {
+    if (!x.deadline) return false;
+    return new Date(x.deadline) < new Date() && ME4.requirementLines(x, null).length > 0;
+  });
+  if (closed) {
+    const out = run([closed.id]);
+    eq('마감 지난 공고는 신청 버튼 잠김이라고 말한다', /신청 버튼 잠김/.test(out), true);
+  }
+
+  /* 배지 문구를 손으로 옮겨 적으면 갈라진다 — 앱 함수를 가져다 쓰는지 소스로도 못 박는다 */
+  const ws = fs.readFileSync(new URL('../verify/what-shows.mjs', import.meta.url), 'utf8');
+  eq('앱 함수를 이름으로 떼어 온다 (사이를 잘라 오지 않는다)', /function takeFn\(name\)/.test(ws), true);
+  eq('  배지는 앱의 fitBadgeHtml 이 낸 것을 쓴다', /fitBadgeHtml/.test(ws) && !/지원 자격 미달'/.test(ws), true);
+  eq('  신청 버튼은 앱처럼 마감도 본다', /d\.days >= 0/.test(ws), true);
+  eq('  못 가져오면 조용히 넘어가지 않고 멈춘다', /throw new Error\(`app\.js 에서/.test(ws), true);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);
