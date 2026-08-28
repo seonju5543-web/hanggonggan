@@ -210,7 +210,7 @@ var DUP_OK   = /(가능|허용|무관|상관\s?없)/;
 
 /* 🔴 '무엇과' 겹치면 안 되는가 — **한정어**로 읽는다 (2026-08-28 개발자 확인).
    18건을 원문으로 대조해 개발자가 직접 정해 준 기준이다:
-     · `타 **대외** 장학금` → 전부      · `타 장학금` → **전부**(한정어가 없으면 전부다)
+     · `타 **대외** 장학금` → 교외 전부   · `타 장학금` → **교외 전부**(한정어가 없으면 전부다)
      · `타 **인재양성사업**` → 그 사업만
    예전에는 `대외·타 재단` 같은 **낱말이 있느냐**로만 갈라서, 낱말이 없다는 이유로
    `유한재단 장학금을 수혜 받을 시 타 장학금은 중복 수혜 불가`(= 명백히 전부)를
@@ -221,7 +221,14 @@ var DUP_OK   = /(가능|허용|무관|상관\s?없)/;
         `학교 및 국가 장학금 **이외의** 교외 장학금` 처럼 좁은 낱말이 예외로 끼어 있어도
         주장은 '교외 전부'다 — 순서를 뒤집으면 이 줄이 좁은 것으로 뒤집힌다.
      ② 좁은 한정어가 붙었으면 그 범위만이다.
-     ③ 아무것도 없으면 **전부**다 — 축소는 안전하고 과장은 기망이다. */
+     ③ 아무것도 없으면 **전부**다 — 축소는 안전하고 과장은 기망이다.
+
+   🔴 값 이름이 `external`인 이유 (2026-08-28 개발자 확인 — 바꾸지 말 것):
+      여기서 말하는 '전부'는 **교외(민간) 장학금 전부**이지 문자 그대로의 전부가 아니다.
+      `학교 및 국가 장학금 **이외의** 교외 장학금` 처럼 원문이 스스로 학교·국가를 빼고,
+      `민간재단` 이라는 말에도 **공기관(한국장학재단)은 안 들어간다.**
+      한때 이 값을 `all` 이라고 불렀는데, 그 이름을 읽고 국가장학금까지 막으면
+      **거의 모든 학생이 떨어진다**(국가장학금은 대부분이 받는다). 이름이 뜻을 지킨다. */
 /* ⚠️ `민간재단` 은 **공기관을 뺀 말**이다 (2026-08-28 개발자 확인) — 한국장학재단
    국가장학금 같은 것은 그 배타에 안 걸린다. 그래도 여기서는 넓은 표지로 둔다:
    '민간재단 전부'라는 뜻이라 범위가 넓고, **국가장학금은 애초에 막히지 않는다** —
@@ -232,8 +239,9 @@ var DUP_NARROW = /(등록금성|생활비성|인재\s?양성\s?사업|근로\s?�
 
 /**
  * 이 공고를 다른 장학금과 함께 받을 수 있는가.
- * @returns {{kind:'forbidden'|'allowed'|'unknown', scope:'all'|'narrow', raw:string}}
- *   scope 'all'    — 다른 장학금 **전부**와 못 겹친다. 자격 판정과 합산에 쓴다.
+ * @returns {{kind:'forbidden'|'allowed'|'unknown', scope:'external'|'narrow', raw:string}}
+ *   scope 'external' — **교외(민간) 장학금 전부**와 못 겹친다. 자격 판정과 합산에 쓴다.
+ *                      학교·국가장학금은 여기 안 들어간다(공기관 · 개발자 확인 2026-08-28).
  *   scope 'narrow' — 정해진 몇 개·같은 성격끼리만. 다른 장학금과는 같이 받을 수 있으므로
  *                    합계에서 빼지 않는다. 원문은 화면에 그대로 보여 준다.
  */
@@ -250,14 +258,14 @@ function exclusivityFrom(lines) {
     var main = line.replace(/[（(][^）)]*[）)]/g, ' ');
     var probe = DUP_LINE.test(main) ? main : line;
 
-    var scope = DUP_BROAD.test(line) ? 'all' : (DUP_NARROW.test(line) ? 'narrow' : 'all');
+    var scope = DUP_BROAD.test(line) ? 'external' : (DUP_NARROW.test(line) ? 'narrow' : 'external');
     var raw = line.trim().slice(0, 200);
     if (DUP_NO.test(probe) && !DUP_OK.test(probe)) return { kind: 'forbidden', scope: scope, raw: raw };
     if (DUP_OK.test(probe) && !DUP_NO.test(probe)) return { kind: 'allowed',   scope: scope, raw: raw };
     /* 둘 다 있거나 둘 다 없으면 **모른다고 말한다.** 원문은 화면에 그대로 보여 준다. */
     return { kind: 'unknown', scope: scope, raw: raw };
   }
-  return { kind: 'unknown', scope: 'all', raw: '' };
+  return { kind: 'unknown', scope: 'external', raw: '' };
 }
 
 /* ── 합산 ────────────────────────────────────────────────────

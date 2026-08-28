@@ -2185,41 +2185,47 @@ console.log('\n■ 금액 산정 — 부풀리지 않는가 (2026-08-27)');
      좁은 것을 '외부 재단 장학금 보유자는 지원 불가'로 쓰면 멀쩡한 학생이 떨어지고,
      반대로 좁은 것을 합계에서 빼면 받을 수 있는 돈을 적게 말하게 된다. */
   eq('타 대외 장학금 → 전부',
-    PA.exclusivityFrom(['타 대외 장학금과는 이중수혜 금지']).scope, 'all');
+    PA.exclusivityFrom(['타 대외 장학금과는 이중수혜 금지']).scope, 'external');
   /* 🔴 한정어가 없으면 전부다 — 예전엔 '대외' 낱말이 없다는 이유로 범위 불분명으로 뒀다 */
   eq('타 장학금(한정어 없음) → 전부',
-    PA.exclusivityFrom(['유한재단 장학금을 수혜 받을 시 타 장학금은 중복 수혜 불가합니다']).scope, 'all');
+    PA.exclusivityFrom(['유한재단 장학금을 수혜 받을 시 타 장학금은 중복 수혜 불가합니다']).scope, 'external');
   eq('타 인재양성사업 → 그 사업만',
     PA.exclusivityFrom(['④ 타 인재양성사업 중복 수혜 불가']).scope, 'narrow');
   eq('특정 장학금 이름을 대면 그것과만',
     PA.exclusivityFrom(['복지장학 2( 부분 ) 장학은 복지장학 1( 본인장애 ) 장학과 중복수혜 불가']).scope, 'narrow');
   /* ⚠️ 순서가 방어선 — 넓은 표지가 있으면 좁은 낱말이 예외로 끼어 있어도 전부다 */
   eq('「국가 장학금 이외의 교외 장학금」은 전부',
-    PA.exclusivityFrom(['학교 및 국가 장학금 이외의 교외 장학금 중복 수혜 사실이 없음을 증명함']).scope, 'all');
+    PA.exclusivityFrom(['학교 및 국가 장학금 이외의 교외 장학금 중복 수혜 사실이 없음을 증명함']).scope, 'external');
   /* 🔴 `민간재단` 은 공기관을 뺀 말이다 (2026-08-28 개발자 확인) —
      국가장학금만 받고 있는 학생은 막히면 안 된다. 거의 모든 학생이 국가장학금을 받는다. */
   {
     const ME2 = createRequire(import.meta.url)('../match-engine.js');
-    const sch2 = { eligibility: {}, exclusivity: { kind: 'forbidden', scope: 'all', raw: '타 민간재단 이중수혜 불가' } };
+    const sch2 = { eligibility: {}, exclusivity: { kind: 'forbidden', scope: 'external', raw: '타 민간재단 이중수혜 불가' } };
     const who = (list) => ME2.evaluate(sch2, { school: 'A', flags: [], gpa: 4.0, bracket: 5, year: 2, scholarships: list }).status;
     eq('국가장학금만 받고 있으면 안 막는다', who(['kosaf']) !== 'ineligible', true);
     eq('교내 장학금만 받고 있어도 안 막는다', who(['internal']) !== 'ineligible', true);
     eq('교외(외부 재단)를 받고 있으면 막는다', who(['external']), 'ineligible');
     eq('아무것도 안 받으면 안 막는다', who([]) !== 'ineligible', true);
+    /* 🔴 이름이 뜻을 지킨다 — 한때 이 값을 `all` 이라고 불렀다. 그 이름을 읽고
+       국가장학금까지 막으면 거의 모든 학생이 떨어진다(대부분이 국가장학금을 받는다).
+       여기서 '전부'는 **교외(민간) 전부**이지 문자 그대로의 전부가 아니다. */
+    const src2 = fs.readFileSync(new URL('../parse-amount.js', import.meta.url), 'utf8');
+    eq('범위 값 이름이 external 이다 (all 이 아니다)',
+      /scope:\s?'external'\|'narrow'/.test(src2) && !/\? 'all' :/.test(src2), true);
   }
   eq('타 민간재단도 전부',
-    PA.exclusivityFrom(['지원제한 : 타 민간재단 및 직장 복지(등록금성격 장학금) 이중 수혜에 해당시 지원 불가']).scope, 'all');
+    PA.exclusivityFrom(['지원제한 : 타 민간재단 및 직장 복지(등록금성격 장학금) 이중 수혜에 해당시 지원 불가']).scope, 'external');
   /* 🔴 좁은 것은 **합계에서 빼지 않는다** — 빼면 받을 수 있는 돈을 적게 말한다 */
   {
     const narrow = { id: 'n', amountSpec: { kind: 'fixed', value: 1000000 },
       exclusivity: { kind: 'forbidden', scope: 'narrow', raw: '' } };
     const all = { id: 'a', amountSpec: { kind: 'fixed', value: 2000000 },
-      exclusivity: { kind: 'forbidden', scope: 'all', raw: '' } };
+      exclusivity: { kind: 'forbidden', scope: 'external', raw: '' } };
     const plain = { id: 'p', amountSpec: { kind: 'fixed', value: 3000000 } };
     const bill = PA.sumAmounts([narrow, all, plain], {});
     eq('좁은 배타는 그대로 더한다', bill.total, 6000000);
     eq('좁은 배타는 버려지지 않는다', bill.dropped.length, 0);
-    const two = PA.sumAmounts([all, { ...plain, id: 'a2', exclusivity: { kind: 'forbidden', scope: 'all', raw: '' } }], {});
+    const two = PA.sumAmounts([all, { ...plain, id: 'a2', exclusivity: { kind: 'forbidden', scope: 'external', raw: '' } }], {});
     eq('전부 배타끼리는 큰 것 하나만', two.total, 3000000);
   }
 
@@ -2228,7 +2234,7 @@ console.log('\n■ 금액 산정 — 부풀리지 않는가 (2026-08-27)');
     const ME = createRequire(import.meta.url)('../match-engine.js');
     const ev = ME.evaluate || ME;
     const base = { school: 'A', flags: [], status: 'enrolled', gpa: 4.0, bracket: 5, year: 2 };
-    const ext = { eligibility: {}, exclusivity: { kind: 'forbidden', scope: 'all', raw: '' } };
+    const ext = { eligibility: {}, exclusivity: { kind: 'forbidden', scope: 'external', raw: '' } };
     const inn = { eligibility: {}, exclusivity: { kind: 'forbidden', scope: 'narrow', raw: '' } };
     eq('외부 재단 장학금을 받는 중이면 지원 불가로 뜬다',
       ev(ext, { ...base, scholarships: ['external'] }).status, 'ineligible');
