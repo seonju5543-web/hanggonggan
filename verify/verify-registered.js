@@ -75,7 +75,15 @@ async function driveAnyLiveForm(page) {
   await page.selectOption('#in-bracket', '4');
   await page.selectOption('#in-region', '서울');
   await page.click('.onboard-step[data-step="2"] [data-next]');
-  await page.click('.onboard-step[data-step="3"] [data-next]');
+  /* 🔴 단계 번호를 박지 말 것 (2026-08-29 — 실제로 이것 때문에 이 검사가 죽어 있었다).
+     공동개발자가 4단계(지금 받고 있는 장학금)를 끼우자 서류 칸이 뒤로 밀렸고,
+     `data-step="3"` 만 누르던 이 드라이버는 `#in-sid` 를 못 찾아 30초 만에 시간초과로
+     통째로 실패했다. verify-essay-ui.js 가 2026-08-24에 똑같이 죽었고 그때 쓴 처방이
+     이것이다 — **서류 칸이 보일 때까지 '다음'을 누른다.** 단계가 더 늘어도 안 깨진다. */
+  for (let i = 0; i < 5 && !(await page.isVisible('#in-sid')); i++) {
+    await page.click('.onboard-step:not([hidden]) [data-next]');
+    await page.waitForTimeout(150);
+  }
   await page.fill('#in-sid', '2023310123');
   await page.fill('#in-phone', '010-1234-5678');
   await page.fill('#in-email', 'test@skku.edu');

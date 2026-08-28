@@ -1,0 +1,82 @@
+# 앱 화면 검사 (브라우저) — 2026-08-29 신설
+#
+# 왜 만들었나 (개발자 질문: "왜 자꾸 스스로 뭔가를 빼먹거나 오류가 나지?"):
+#   이 저장소의 검사 31개 중 **워크플로가 돌리는 것은 5개뿐**이었다. 나머지는
+#   브라우저가 필요해서 사람이 손으로 돌려야 했고, 그래서 아무도 안 돌렸다.
+#   2026-08-29에 전수로 돌려 보니 **7개가 깨진 채 방치**돼 있었고, 그중 하나는
+#   공동개발자가 온보딩에 단계를 하나 끼운 순간부터 죽어 있었다(아무도 몰랐다).
+#
+#   🔴 이 저장소의 원칙 그대로다 — **리포트가 아니라 관문이어야 재발이 끝난다.**
+#   Claude 세션 안내문에 "검사를 돌려라"라고 적어 두는 것은 리포트다(실제로 안 돌았다).
+#   여기서 돌리면 사람이 기억하든 말든 돈다.
+name: 앱 화면 검사 (브라우저)
+
+on:
+  push:
+    branches: [claude/nice-heisenberg-WESq5, main]
+    paths:                     # 화면·판정에 닿는 것이 바뀔 때만 (로봇 데이터 커밋마다 돌지 않게)
+      - 'app.js'
+      - 'match-engine.js'
+      - 'parse-amount.js'
+      - 'section-head.js'
+      - 'parse-requirements.js'
+      - 'forms.js'
+      - 'chat.js'
+      - 'notify*.js'
+      - 'essay*.js'
+      - 'index.html'
+      - 'data.js'
+      - 'verify/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-ui-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ui:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm init -y >/dev/null && npm i playwright-core@1 --no-audit --no-fund
+      - run: npx playwright@1 install --with-deps chromium
+      - name: 브라우저 경로 찾기
+        run: echo "CHROME_PATH=$(find ~/.cache/ms-playwright -name chrome -type f | head -1)" >> $GITHUB_ENV
+
+      # 드라이버마다 8123·8124 를 쓴다 (verify/README.md)
+      - name: 로컬 서버 띄우기
+        run: |
+          python3 -m http.server 8123 >/dev/null 2>&1 &
+          python3 -m http.server 8124 >/dev/null 2>&1 &
+          sleep 2
+
+      # ── 관문: 지금 통과하는 것들. 여기서 실패하면 화면이 깨진 것이다 ──
+      - name: 화면 검사 (관문)
+        run: |
+          set -e
+          for f in verify-fit-badge.js verify-onboard-gaps.js verify-registered.js \
+                   verify-apps-manage.js verify-supabase.js verify-essay-ui.js; do
+            echo "── $f"
+            node "verify/$f"
+          done
+
+      # ── 리포트: 2026-08-29 기준 이미 깨져 있던 것들 ──
+      # 🔴 통과하는 것부터 관문으로 만들고, 깨진 것은 여기 두어 **눈에 보이게** 한다.
+      #    처음부터 전부 관문으로 만들면 첫날부터 빨간불이라 모두가 무시하게 된다 —
+      #    그건 지금 상태(아무도 안 봄)와 똑같아진다. 하나씩 고쳐서 위로 올린다.
+      - name: 이미 깨져 있던 검사 (고치면 위 관문으로 올릴 것)
+        continue-on-error: true
+        run: |
+          for f in verify-explore-sort.js verify-chat.js verify-notify.js \
+                   verify-forms-data.js verify-new-forms.js verify-source-links.js \
+                   verify-push-client.js; do
+            echo "── $f"
+            node "verify/$f" || echo "::warning::$f 실패 (2026-08-29부터 알려진 상태)"
+          done
