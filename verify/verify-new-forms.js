@@ -2,6 +2,7 @@
    ① data/forms.json 병합 확인 ② 각 스키마가 질문 화면·문서 렌더링에서 오류 없이 동작
    ③ 대표 1종(삼일)은 UI로 질문→문서 생성까지 ④ 명지 프로필로 고시장학금 양식 확인 */
 const { chromium } = require('playwright-core');
+const { nextUntil } = require('./onboard-helper.js');
 
 const NEW_KEYS = ['samil-apply', 'bogun-study-apply', 'bogun-multi-apply', 'sanhak-foreign-apply', 'mju-gosi-apply'];
 
@@ -53,7 +54,8 @@ async function onboard(page, school, major) {
   await page.selectOption('#in-bracket', '4');
   await page.selectOption('#in-region', '서울');
   await page.click('.onboard-step[data-step="2"] [data-next]');
-  await page.click('.onboard-step[data-step="3"] [data-next]');
+  /* 단계 번호를 박지 말 것 — 온보딩이 4단계에서 6단계가 되며 이 검사들이 죽어 있었다 */
+  await nextUntil(page, '#in-sid');
   await page.fill('#in-sid', '2023310123');
   await page.fill('#in-phone', '010-1234-5678');
   await page.fill('#in-email', 'test@test.ac.kr');

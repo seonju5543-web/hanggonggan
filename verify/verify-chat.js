@@ -11,6 +11,7 @@
    ⑨ 질문에 스크립트를 넣어도 그대로 실행되지 않는다(XSS)
    실행: python3 -m http.server 8123 & 후 node verify/verify-chat.js */
 const { chromium } = require('playwright-core');
+const { nextUntil } = require('./onboard-helper.js');
 const EXE = (process.env.CHROME_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome');
 const IGNORE_CONSOLE = /Failed to load resource|does not support the Push API in incognito/;
 const BASE = 'http://localhost:8123';
@@ -37,7 +38,8 @@ async function onboard(page) {
   await page.selectOption('#in-bracket', '4');
   await page.selectOption('#in-region', '서울');
   await page.click('.onboard-step[data-step="2"] [data-next]');
-  await page.click('.onboard-step[data-step="3"] [data-next]');
+  /* 단계 번호를 박지 말 것 — 온보딩이 4단계에서 6단계가 되며 이 검사가 죽어 있었다 */
+  await nextUntil(page, '#btn-finish-onboard');
   await page.click('#btn-finish-onboard');
   await page.waitForSelector('#screen-home:not([hidden])');
 }

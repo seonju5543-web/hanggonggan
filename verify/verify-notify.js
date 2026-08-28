@@ -9,7 +9,8 @@
    ⑦ 알림 클릭으로 앱이 열렸을 때(?sch=) 해당 공고가 열린다
    실행: python3 -m http.server 8123 & 후 node verify/verify-notify.js */
 const { chromium } = require('playwright-core');
-const EXE = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
+const { nextUntil } = require('./onboard-helper.js');
+const EXE = process.env.CHROME_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 /* 우리 코드의 잘못이 아닌 콘솔 메시지는 빼고 센다.
    · Failed to load resource — 드라이버가 일부러 없는 파일을 부르는 경우
    · Push API in incognito — 검사용 브라우저가 시크릿 모드라 크롬이 남기는 안내다.
@@ -63,7 +64,8 @@ async function onboard(page) {
   await page.selectOption('#in-bracket', '4');
   await page.selectOption('#in-region', '서울');
   await page.click('.onboard-step[data-step="2"] [data-next]');
-  await page.click('.onboard-step[data-step="3"] [data-next]');
+  /* 단계 번호를 박지 말 것 — 온보딩이 4단계에서 6단계가 되며 이 검사들이 죽어 있었다 */
+  await nextUntil(page, '#btn-finish-onboard');
   await page.click('#btn-finish-onboard');
   await page.waitForSelector('#screen-home:not([hidden])');
 }

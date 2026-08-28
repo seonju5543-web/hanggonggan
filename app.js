@@ -629,6 +629,24 @@ function fitTone(pct) {
   return 'red';
 }
 
+/* 🔴 '미달인가'를 정하는 **단 한 곳** (2026-08-29 신설).
+   배지는 여기를 보고, 목록 정렬도 여기를 본다. 예전에는 배지가 `fd.fails` 로,
+   정렬이 `result.status` 로 각각 판단해서 **화면이 스스로 모순**됐다:
+   `적합도 33%` 라고 적힌 카드가 '지원 자격 미달' 카드들 **사이에** 앉아 있었다
+   (verify-explore-sort 가 그걸 잡고 있었는데 아무도 그 검사를 안 돌렸다).
+   ⚠️ 여기 규칙을 복사해 쓰지 말 것 — 복사하는 순간 다시 갈라진다. */
+function fitVerdict(fit, fd) {
+  if (fit === 0) return 'no';                                   // evaluate 가 미달로 확정
+  if (fd && fd.unread) return 'unread';                         // 자격을 아직 못 읽었다
+  if (fd && fd.fails && fd.fails.length) return 'no';           // 원문 요건을 못 맞춘다
+  return 'ok';
+}
+/* 정렬용 순위 — 낮을수록 위. 미달은 맨 아래(2026-08-26 개발자 결정) */
+function fitRank(m) {
+  const v = fitVerdict(m.fit, m.fd);
+  return v === 'no' ? 2 : (v === 'unread' ? 1 : 0);
+}
+
 function fitBadgeHtml(fit, fd) {
   if (!fd) return fit > 0 ? `<span class="badge badge-fit">적합도 ${fit}%</span>` : '';
   /* 🔴 `fit === 0`은 **evaluate()가 미달로 확정한 것**이다 (fitDetail은 FIT_MIN=5가 바닥이라
@@ -636,12 +654,12 @@ function fitBadgeHtml(fit, fd) {
      다자녀 국가장학금은 학생이 다자녀가 아니라고 **확실히** 판정됐는데, fitDetail이
      `eligibilityLines`만 읽어 구조화된 자격(flagsAny·tracks)을 못 봐서 '자격 미확인'이 떴다
      (2026-08-26 정렬 검증에서 발견). 미달을 모른다고 말하면 학생이 헛걸음한다. */
-  if (fit === 0) return '<span class="badge badge-fit-no">지원 자격 미달</span>';
-  if (fd.unread) return '<span class="badge badge-fit-unknown">자격 미확인</span>';
+  const verdict = fitVerdict(fit, fd);
+  if (verdict === 'unread') return '<span class="badge badge-fit-unknown">자격 미확인</span>';
+  if (verdict === 'no') return '<span class="badge badge-fit-no">지원 자격 미달</span>';
   /* 🔴 미달은 **숫자가 아니라 fails로** 판정한다 (2026-08-24). 0%를 안 쓰기로 하면서
      `pct === 0`이 영영 참이 되지 않아 '지원 자격 미달' 배지가 통째로 사라졌었다.
      숫자는 순서를 정할 뿐이고 뜻은 배지가 전한다 — 그 뜻의 근거는 fails다. */
-  if (fd.fails && fd.fails.length) return '<span class="badge badge-fit-no">지원 자격 미달</span>';
   const note = fd.unknown > 0 ? ` · 확인 필요 ${fd.unknown}` : '';
   return `<span class="badge badge-fit fit-${fitTone(fd.pct)}">적합도 ${fd.pct}% <em>요건 ${fd.total}개 중 ${fd.met}개 충족${note}</em></span>`;
 }
@@ -794,14 +812,15 @@ function applySort(key) {
    '눌렀는데 아무 반응 없음'이 학생에게는 고장으로 보인다. */
 function renderExplore() {
   const matches = getMatches();
-  const order = { eligible: 0, selective: 0, unknown: 1, ineligible: 2 };
   const sorter = EXPLORE_SORTS[exploreSort] || EXPLORE_SORTS.fit;
   /* 🔴 판정 3단(가능/정보부족/미달)은 **적합도순일 때만** 1차 키다 (2026-08-26 개발자 결정:
      "적합도를 기준으로 했을 때는 맨 아래에 두는 게 맞지"). 마감순·최신순에서는 고른 기준이
      곧이곧대로 적용된다 — 마감 임박순인데 미달이라고 뒤로 밀면 그 정렬은 거짓말이 된다.
      미달 카드는 빨간 '지원 자격 미달' 배지로 구분되므로 위로 와도 오해하지 않는다. */
+  /* 🔴 정렬도 **배지와 같은 근거**(fitVerdict)를 쓴다 — `order[status]` 만 보면
+     배지가 '미달'인 카드와 '적합도 N%'인 카드가 뒤섞인다(2026-08-29에 실제로 그랬다). */
   let list = matches.slice().sort((a, b) =>
-    (exploreSort === 'fit' ? order[a.result.status] - order[b.result.status] : 0)
+    (exploreSort === 'fit' ? fitRank(a) - fitRank(b) : 0)
     || sorter.cmp(a, b)
   );
 

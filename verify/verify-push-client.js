@@ -6,11 +6,12 @@
    ⑤ 알림 동의 한 번으로 진짜 푸시까지 함께 켜진다
    실행: python3 -m http.server 8123 & 후 node verify/verify-push-client.js */
 const { chromium } = require('playwright-core');
+const { nextUntil } = require('./onboard-helper.js');
 const fs = require('fs');
 const path = require('path');
 const http = require('http');
 
-const EXE = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
+const EXE = process.env.CHROME_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 const ROOT = path.join(__dirname, '..');
 const BASE = 'http://localhost:8126';
 const PUSH_PORT = 8127;
@@ -145,7 +146,8 @@ async function onboard(page, school = '외대') {
   await page.selectOption('#in-bracket', '4');
   await page.selectOption('#in-region', '서울');
   await page.click('.onboard-step[data-step="2"] [data-next]');
-  await page.click('.onboard-step[data-step="3"] [data-next]');
+  /* 단계 번호를 박지 말 것 — 온보딩이 4단계에서 6단계가 되며 이 검사들이 죽어 있었다 */
+  await nextUntil(page, '#btn-finish-onboard');
   await page.click('#btn-finish-onboard');
   await page.waitForSelector('#screen-home:not([hidden])');
 }

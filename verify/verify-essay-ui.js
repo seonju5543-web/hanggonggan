@@ -57,7 +57,6 @@ async function dismissNotify(page) {
   await page.selectOption('#in-bracket', '4');
   await page.selectOption('#in-region', '서울');
   await page.click('.onboard-step[data-step="2"] [data-next]');
-  await page.click('.onboard-step[data-step="3"] [data-next]');
   /* 🔴 단계 번호를 박지 않는다 (2026-08-24) — 공동개발자가 4단계(이중수혜)를 새로 끼우자
      서류 정보가 4→5단계로 밀려 이 드라이버가 '#in-sid 가 안 보인다'로 죽었다.
      앞으로 단계가 더 늘어도 깨지지 않게 **서류 칸이 보일 때까지 '다음'을 누른다**

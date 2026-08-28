@@ -11,6 +11,7 @@
 
    실행: (python3 -m http.server 8123 &) 후 node verify/verify-source-links.js */
 const { chromium } = require('playwright-core');
+const { nextUntil } = require('./onboard-helper.js');
 const fs = require('fs');
 const path = require('path');
 
@@ -41,7 +42,7 @@ const SCHOOL = process.env.LINKCHECK_SCHOOL || '경희';
 
   /* ── ② 브라우저 검사 ─────────────────────────────── */
   console.log(`■ 브라우저 — ${SCHOOL} 학생으로 실제 카드를 열어 링크 확인`);
-  const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+  const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.setDefaultTimeout(8000);   // 없는 요소를 30초씩 기다리다 검사가 멈추지 않게
   const errors = [];
@@ -67,7 +68,8 @@ const SCHOOL = process.env.LINKCHECK_SCHOOL || '경희';
   await page.selectOption('#in-bracket', '4');
   await page.selectOption('#in-region', '서울');
   await page.click('.onboard-step[data-step="2"] [data-next]');
-  await page.click('.onboard-step[data-step="3"] [data-next]');
+  /* 단계 번호를 박지 말 것 — 온보딩이 4단계에서 6단계가 되며 이 검사들이 죽어 있었다 */
+  await nextUntil(page, '#in-sid');
   await page.fill('#in-sid', '2023100123');
   await page.fill('#in-phone', '010-1234-5678');
   await page.fill('#in-email', 'test@univ.ac.kr');

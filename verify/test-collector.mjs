@@ -2588,5 +2588,46 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
   }
 }
 
+
+/* ── 검사 드라이버가 조용히 썩지 않게 (2026-08-29) ────────────────────────────
+   브라우저 검사 7개가 깨진 채 방치돼 있었고, 원인은 셋뿐이었다. 전부 **정적으로**
+   잡을 수 있는 것이라 여기서 못 박는다 — 브라우저 없이 즉시 끝난다. */
+{
+  console.log('\n■ 검사 드라이버가 썩지 않게 (2026-08-29)');
+  const dir = new URL('../verify/', import.meta.url);
+  const names = fs.readdirSync(dir).filter((f) => /\.(js|mjs)$/.test(f));
+
+  /* ① 온보딩 단계 번호를 박으면 단계가 늘 때마다 죽는다 (4 → 6 이 되며 6개가 죽었다).
+        `data-step="N"` 으로 **마지막 단계**를 짚는 것이 금지다 — 중간 단계를 채우는
+        용도(0,1,2)는 그 단계에 입력 칸이 있어 어쩔 수 없다. */
+  const lastStepUsers = names.filter((f) => {
+    const src = fs.readFileSync(new URL(f, dir), 'utf8');
+    return /data-step="[3-9]"\]\s*\[data-next\]/.test(src);
+  });
+  eq('마지막 온보딩 단계를 번호로 짚는 드라이버가 없다', lastStepUsers, []);
+
+  /* ② 브라우저 경로를 박으면 개발자 맥에서 통째로 못 돈다(그 경로는 리눅스 샌드박스용) */
+  const hardPath = names.filter((f) => {
+    const src = fs.readFileSync(new URL(f, dir), 'utf8');
+    return /=\s*'\/opt\/pw-browsers/.test(src) || /executablePath:\s*'\/opt\/pw-browsers/.test(src);
+  });
+  eq('브라우저 경로를 박은 드라이버가 없다 (CHROME_PATH 를 먼저 본다)', hardPath, []);
+
+  /* ③ 사람이 미리 준비해야 하는 검사는 언젠가 반드시 안 돌아간다.
+        verify-forms-data 가 "더미 양식이 주입된 앱 복사본이 서빙 중이어야 함"을 요구해
+        돌리는 족족 실패했다 — 이제 드라이버가 스스로 주입한다. */
+  const fd = fs.readFileSync(new URL('verify-forms-data.js', dir), 'utf8');
+  eq('forms-data 가 픽스처를 스스로 주입한다', /page\.route\('\*\*\/data\/forms\.json'/.test(fd), true);
+  eq('  살아 있는 데이터에 픽스처가 남아 있기를 기대하지 않는다',
+    /registeredList\.find\(\(s\) => s\.formId === 'test-dummy'\)/.test(fd), false);
+
+  /* ④ 배지와 정렬이 같은 근거를 쓴다 — 갈라지면 '적합도 33%' 카드가 미달 카드 사이에 앉는다 */
+  const app2 = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+  eq('미달 판정이 한 곳(fitVerdict)에 있다', /function fitVerdict\(/.test(app2), true);
+  eq('배지가 그 한 곳을 쓴다', /const verdict = fitVerdict\(fit, fd\)/.test(app2), true);
+  eq('정렬도 그 한 곳을 쓴다', /fitRank\(a\) - fitRank\(b\)/.test(app2), true);
+  eq('정렬이 status 로 따로 판단하지 않는다', /order\[a\.result\.status\]/.test(app2), false);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);

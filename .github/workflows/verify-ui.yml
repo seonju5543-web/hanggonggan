@@ -3,8 +3,11 @@
 # 왜 만들었나 (개발자 질문: "왜 자꾸 스스로 뭔가를 빼먹거나 오류가 나지?"):
 #   이 저장소의 검사 31개 중 **워크플로가 돌리는 것은 5개뿐**이었다. 나머지는
 #   브라우저가 필요해서 사람이 손으로 돌려야 했고, 그래서 아무도 안 돌렸다.
-#   2026-08-29에 전수로 돌려 보니 **7개가 깨진 채 방치**돼 있었고, 그중 하나는
-#   공동개발자가 온보딩에 단계를 하나 끼운 순간부터 죽어 있었다(아무도 몰랐다).
+#   2026-08-29에 전수로 돌려 보니 **7개가 깨진 채 방치**돼 있었다. 원인은 셋뿐이었다:
+#     ① 온보딩 단계 번호를 박아 둠 (단계가 4→6이 되며 6개가 동시에 죽음)
+#     ② 브라우저 경로를 박아 둠 (리눅스 샌드박스 경로라 맥에서 아예 안 뜸)
+#     ③ "사람이 미리 준비해야 하는" 픽스처에 의존 (그 준비를 아무도 안 함)
+#   셋 다 고쳐 13개 전부 초록불로 만들었고, 재발은 test-collector 의 정적 검사가 막는다.
 #
 #   🔴 이 저장소의 원칙 그대로다 — **리포트가 아니라 관문이어야 재발이 끝난다.**
 #   Claude 세션 안내문에 "검사를 돌려라"라고 적어 두는 것은 리포트다(실제로 안 돌았다).
@@ -57,26 +60,17 @@ jobs:
           python3 -m http.server 8124 >/dev/null 2>&1 &
           sleep 2
 
-      # ── 관문: 지금 통과하는 것들. 여기서 실패하면 화면이 깨진 것이다 ──
+      # ── 관문: 전부 통과해야 한다 (2026-08-29에 7개를 고쳐 모두 초록불로 만들었다) ──
+      # 🔴 여기서 실패하면 화면이 깨진 것이다. 넘기지 말 것 —
+      #    "나중에 보자"로 두면 정확히 그렇게 7개가 썩었다.
       - name: 화면 검사 (관문)
         run: |
           set -e
-          for f in verify-fit-badge.js verify-onboard-gaps.js verify-registered.js \
-                   verify-apps-manage.js verify-supabase.js verify-essay-ui.js; do
+          for f in verify-fit-badge.js verify-explore-sort.js verify-onboard-gaps.js \
+                   verify-registered.js verify-chat.js verify-apps-manage.js \
+                   verify-supabase.js verify-essay-ui.js verify-forms-data.js \
+                   verify-new-forms.js verify-source-links.js verify-push-client.js \
+                   verify-notify.js; do
             echo "── $f"
             node "verify/$f"
-          done
-
-      # ── 리포트: 2026-08-29 기준 이미 깨져 있던 것들 ──
-      # 🔴 통과하는 것부터 관문으로 만들고, 깨진 것은 여기 두어 **눈에 보이게** 한다.
-      #    처음부터 전부 관문으로 만들면 첫날부터 빨간불이라 모두가 무시하게 된다 —
-      #    그건 지금 상태(아무도 안 봄)와 똑같아진다. 하나씩 고쳐서 위로 올린다.
-      - name: 이미 깨져 있던 검사 (고치면 위 관문으로 올릴 것)
-        continue-on-error: true
-        run: |
-          for f in verify-explore-sort.js verify-chat.js verify-notify.js \
-                   verify-forms-data.js verify-new-forms.js verify-source-links.js \
-                   verify-push-client.js; do
-            echo "── $f"
-            node "verify/$f" || echo "::warning::$f 실패 (2026-08-29부터 알려진 상태)"
           done

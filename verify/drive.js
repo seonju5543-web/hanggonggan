@@ -1,4 +1,5 @@
 const { chromium } = require('playwright-core');
+const { nextUntil } = require('./onboard-helper.js');
 const SHOT = (n) => `${__dirname}/shot-${n}.png`;
 
 (async () => {
@@ -63,7 +64,8 @@ const SHOT = (n) => `${__dirname}/shot-${n}.png`;
   const bg = await page.$eval('#in-flags input[value="multiChild"]', (el) => getComputedStyle(el).backgroundImage.slice(0, 30));
   console.log('STEP checkbox check visible (bg-image):', bg !== 'none' ? 'yes' : 'NO!');
   await page.screenshot({ path: SHOT('13-checkbox') });
-  await page.click('.onboard-step[data-step="3"] [data-next]');
+  /* 단계 번호를 박지 말 것 — 온보딩이 4단계에서 6단계가 되며 이 검사들이 죽어 있었다 */
+  await nextUntil(page, '#in-sid');
 
   // ── Step 4: 공통 서류 정보
   await page.fill('#in-sid', '202312345');
