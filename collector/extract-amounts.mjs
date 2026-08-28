@@ -73,14 +73,30 @@ let read = 0, noText = 0;
 const stat = { fixed: 0, ratio: 0, range: 0, hourly: 0, unknown: 0 };
 const excl = { forbidden: 0, allowed: 0, unknown: 0 };
 const parsed = new Map();
+let fromAi = 0;   // 첨부(그림·PDF)를 읽어 둔 줄에서 건진 금액
 
 for (const it of items) {
   const src = sourceFor(it, idx);
-  if (!hasText(src)) { noText++; continue; }
+  /* 🔴 본문이 없다고 포기하지 않는다 (2026-08-28 개발자 지시).
+     원문 미확보 15건을 실제로 열어 보니 **수집 실패가 아니라** 게시자가 공고문을
+     그림·PDF 로만 올린 것이었다(`본문이미지-5906x8268.jpg`). 페이지에 글자가 없으니
+     브라우저를 아무리 몰아도 못 읽는다. 그 글자는 `eligibility-ai.mjs` 가 그림을 읽어
+     `amountLines` 에 **원문 그대로** 담아 둔다 — 여기서 그것을 본문 대신 쓴다.
+     ⚠️ 모델이 옮긴 글자여도 얼마인지는 여전히 parse-amount 가 정한다 —
+        총액/1인당 가르기·유의사항 절 차단·'전액'의 닻·자릿수 관문이 그대로 걸린다. */
+  const aiLines = Array.isArray(it.amountLines) ? it.amountLines : [];
+  const bodyLines = hasText(src) ? String(src.text).split('\n').map((s) => s.trim()).filter(Boolean) : [];
+  if (!bodyLines.length && !aiLines.length) { noText++; continue; }
   read++;
-  const lines = String(src.text).split('\n').map((s) => s.trim()).filter(Boolean);
-  const a = PA.amountFrom(lines);
-  const e = PA.exclusivityFrom(lines);
+  /* 본문이 있으면 본문이 먼저다. 본문으로 못 읽었을 때만 AI 가 옮겨 둔 줄로 한 번 더 본다 —
+     읽어 둔 것을 안 쓰는 것이 지금까지 같은 그림을 두 번 읽게 만든 원인이었다. */
+  let a = bodyLines.length ? PA.amountFrom(bodyLines) : { kind: 'unknown', value: 0, ratio: 0, min: 0, max: 0, raw: '' };
+  if (a.kind === 'unknown' && aiLines.length) {
+    /* 금액 절만 뽑아 온 줄이라 머리글이 없을 수 있다 — 머리글을 붙여 절로 읽히게 한다 */
+    const b = PA.amountFrom(['장학금액', ...aiLines]);
+    if (b.kind !== 'unknown') { a = b; fromAi++; }
+  }
+  const e = PA.exclusivityFrom(bodyLines.length ? bodyLines : aiLines);
   stat[a.kind]++; excl[e.kind]++;
   parsed.set(it.id, { a, e });
 }
@@ -129,7 +145,7 @@ const wonText = (n) => (n % 10000 === 0
 const amountText = (a) => (a.kind === 'range'
   ? `${wonText(a.min)} ~ ${wonText(a.max)}`
   : wonText(a.value));
-console.log(`\n■ 금액 읽기 — 등록 ${items.length}건 (원문 있음 ${read} · 없음 ${noText})`);
+console.log(`\n■ 금액 읽기 — 등록 ${items.length}건 (원문 있음 ${read} · 없음 ${noText}${fromAi ? ` · 그중 첨부를 읽어 건진 것 ${fromAi}건` : ''})`);
 console.log(`   절대액 ${stat.fixed + stat.range}건 · 등록금 비율 ${stat.ratio}건 · 시급 ${stat.hourly}건 · 미확인 ${stat.unknown}건`);
 console.log(`\n■ 이중수혜`);
 console.log(`   함께 못 받음 ${excl.forbidden}건 · 함께 받을 수 있음 ${excl.allowed}건 · 원문에 없음 ${excl.unknown}건`);

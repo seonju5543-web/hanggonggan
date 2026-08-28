@@ -198,17 +198,29 @@ const PDF_SYSTEM = `당신은 첨부된 한국 대학 장학금 **공고문(PDF 
 - 공고문에 자격 요건이 없으면 none을 true로 두세요. **없는 것을 지어내지 마세요.**
 - lines 최대 8줄 · excludes 최대 6줄.`;
 
+/* 🔴 자격과 **금액을 한 번에** 받는다 (2026-08-28 개발자 지시).
+   예전엔 자격만 물어서, 포스터 그림 한 장을 읽어 놓고도 금액은 못 읽은 채 남았다.
+   같은 그림을 금액 때문에 또 읽는 것은 돈과 시간을 두 번 쓰는 일이다.
+   ⚠️ 그래도 **모델에게 금액을 계산시키지 않는다.** 금액 절의 줄을 **원문 그대로** 옮겨
+      달라고만 하고, 얼마인지는 `parse-amount.js` 가 정한다 — 총액/1인당 가르기,
+      유의사항 절 차단, '전액'의 닻 확인, 자릿수 관문이 전부 그대로 걸린다.
+      이 파일의 계약(모델은 옮기기만 한다)이 금액에도 그대로 적용된다. */
 const PDF_SCHEMA = {
   type: 'object',
   properties: {
     none: { type: 'boolean' },
     lines: { type: 'array', items: { type: 'string' } },
     excludes: { type: 'array', items: { type: 'string' } },
+    amountLines: { type: 'array', items: { type: 'string' } },
     why: { type: 'string' },
   },
-  required: ['none', 'lines', 'excludes', 'why'],
+  required: ['none', 'lines', 'excludes', 'amountLines', 'why'],
   additionalProperties: false,
 };
+
+/* 금액 줄에는 자격 관문(REQ_SIGNAL)을 대면 안 된다 — 금액 줄은 자격 낱말이 없다.
+   대신 '금액처럼 생겼는가'만 본다. 판정은 여기서 하지 않는다(parse-amount 의 몫). */
+const AMOUNT_ISH = /[\d,]+\s*(원|만원|천원)|등록금|수업료|장학금액|지원\s?금액|지급\s?액|전액|%/;
 
 /* 모델이 보낸 **글자**를 되받아 거른다. 번호 경로의 verifyPick과 같은 낱말 관문을 쓴다 —
    여기만 느슨하면 PDF 경로로 쓰레기가 들어온다. */
@@ -224,7 +236,13 @@ export function verifyPdfLines(pick) {
   /* 제외 대상은 자격 줄과 섞지 않는다 — 섞으면 요건이 실제보다 까다로워 보여
      지원할 수 있는 학생이 포기하고, 5줄 상한에 밀려 진짜 요건이 잘려 나간다
      (정읍시민장학재단에서 제외 3줄이 실제로 그렇게 버려졌다). */
-  return { ok: true, lines: out, excludes: clean(pick.excludes, 6) };
+  /* 금액 줄은 자격이 하나도 없어도 살린다 — 그 공고의 금액만이라도 건지는 편이 낫다.
+     캡 6줄: 금액 절은 대개 2~4줄이고, 넘치면 parse-amount 의 절 읽기가 어차피 앞쪽만 본다. */
+  const amountLines = [...new Set((pick.amountLines || [])
+    .map((l) => String(l || '').replace(/\s+/g, ' ').trim())
+    .filter((l) => l.length >= 3 && l.length <= 200)
+    .filter((l) => AMOUNT_ISH.test(l)))].slice(0, 6);
+  return { ok: true, lines: out, excludes: clean(pick.excludes, 6), amountLines };
 }
 
 /* ── 대상 고르기 ── */
@@ -281,7 +299,15 @@ export function pickPdfTargets(items) {
   try { index = JSON.parse(fs.readFileSync(new URL('extracted/elig-docs.json', HERE), 'utf8')); } catch { return []; }
   const out = [];
   for (const it of items) {
-    if (it.program || requirementLines(it).length) continue;
+    /* 🔴 대상은 '자격을 못 읽은 것'만이 아니다 (2026-08-28 개발자 지시).
+       한 번의 읽기가 자격과 금액을 함께 주므로, **금액만 못 읽은 공고**도 같은 자리에서
+       처리한다. 예전엔 자격이 채워지면 대상에서 빠져, 같은 포스터를 금액 때문에 다시
+       읽어야 했다(= 자격 다 끝내고 금액을 처음부터 또 하는 '한세월'의 정체).
+       ⚠️ 둘 다 이미 있으면 부르지 않는다 — 돈이 나가는 자리라 늘리기만 하면 안 된다. */
+    const needElig = !requirementLines(it).length;
+    const needAmount = !(it.amountSpec && it.amountSpec.kind && it.amountSpec.kind !== 'unknown')
+                       && !(it.amountLines && it.amountLines.length);
+    if (it.program || (!needElig && !needAmount)) continue;
     if ((it.aiTries || 0) >= (cfg.giveUpAfter ?? 3)) continue;
     /* 🔴 **큰 그림을 고른다.** 파일 순서대로 첫 장을 집으면 머리말 배너(1002×551)를
        골라 놓고 진짜 포스터(3368×4768)를 지나친다 — 실제로 그랬다.
@@ -352,7 +378,10 @@ async function askPdf(item, path, kind) {
     system: PDF_SYSTEM,
     output_config: { effort: cfg.effort, format: { type: 'json_schema', schema: PDF_SCHEMA } },
     messages: [{ role: 'user', content: [doc,
-      { type: 'text', text: `공고: ${item.name}\n\n이 ${kind === 'image' ? '공고 포스터' : '공고문'}에서 지원 자격 요건 줄을 원문 그대로 옮겨 주세요.` },
+      { type: 'text', text: `공고: ${item.name}\n\n이 ${kind === 'image' ? '공고 포스터' : '공고문'}에서 다음 두 가지를 **원문 그대로** 옮겨 주세요.\n`
+        + `1) 지원 자격 요건 줄 → lines (못 받는 조건은 excludes)\n`
+        + `2) 장학금액·지원금액이 적힌 줄 → amountLines\n`
+        + `요약하거나 계산하지 마세요. 적혀 있는 문장을 그대로 옮기고, 없으면 빈 배열로 두세요.` },
     ] }],
   });
   const msg = await stream.finalMessage();
@@ -398,6 +427,15 @@ if (!process.env.ELIG_AI_AS_LIB) {
     : ONLY ? `대상 ${targets.length}건 — 지정(${ONLY})`
     : ALL ? `대상 ${targets.length}건 — 전수(--all)`
     : `대상 ${targets.length}건 (무료 경로가 못 읽었고 원문은 있는 공고)`);
+  /* 🔴 첨부(포스터 그림·공고문 PDF) 대상 수를 **미리보기에서도** 보여 준다 (2026-08-28).
+     이 숫자가 안 보여서, '본문이 없다'는 공고들이 실은 그림 첨부로 읽을 수 있는 것인지
+     아무도 몰랐다. 돈이 나가는 자리는 누르기 전에 대상이 눈에 보여야 한다. */
+  {
+    const docs = pickPdfTargets(reg.items);
+    const img = docs.filter((d) => d.kind === 'image').length;
+    log(`첨부로 읽을 수 있는 공고 ${docs.length}건 (포스터 그림 ${img} · 공고문 PDF ${docs.length - img})`);
+    if (!WRITE) for (const d of docs.slice(0, 8)) log(`   · ${(d.it.name || d.it.id).slice(0, 40)} — ${d.file}`);
+  }
 
   const hasKey = !!process.env.ANTHROPIC_API_KEY || !!process.env.ELIG_AI_FAKE;
   /* 설정은 꺼진 채로 두고 **버튼에서만 켠다**(ELIG_AI_ENABLE=1).
@@ -468,6 +506,9 @@ if (!process.env.ELIG_AI_AS_LIB) {
       }
       it.eligibilityLines = v.lines;
       if (v.excludes.length) it.eligibilityExcludes = v.excludes;
+      /* 금액 줄은 **그대로 보관만** 한다. 숫자로 바꾸는 것은 extract-amounts.mjs 가
+         parse-amount.js 를 통해 하고, 그래야 총액·유의사항·자릿수 관문이 다 걸린다. */
+      if (v.amountLines && v.amountLines.length) it.amountLines = v.amountLines;
       delete it.eligibilityStruct;                 // PDF 경로는 구조를 만들지 않는다
       /* 출처를 번호 경로와 구분해 남긴다 — 이 경로만 모델이 글자를 돌려준다 */
       it.eligibilityFrom = kind === 'image' ? 'AI(공고 포스터 그림)' : 'AI(공고문 PDF)';

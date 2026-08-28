@@ -1374,7 +1374,12 @@ console.log('\n■ 자격 자리의 잡음을 유형별로 세는가 (2026-08-23
   /* 화면 문 자체가 줄마다 '요건임'을 묻는가 — 이게 없으면 좋은 줄에 잡음이 얹혀 간다 */
   const eng = fs.readFileSync(new URL('../match-engine.js', import.meta.url), 'utf8');
   eq('화면 문이 줄마다 요건 신호를 확인한다', /if \(!REQ_SIGNAL\.test\(t\)\) continue;/.test(eng), true);
-  eq('  자격이 아닌 부류는 줄 단위로 버린다', /if \(NOT_A_REQUIREMENT\.test\(t\)\) continue;/.test(eng), true);
+  /* 🔴 잣대는 그대로 줄 단위다. 다만 **괄호 안은 부연**이라 떼고 본다 (2026-08-28) —
+     `직전학기 C⁰ 수준(70/100점 만점) 이상인 재학생` 의 '만점'이 배점표 표지로 읽혀
+     진짜 성적 요건이 사라지고 있었다. 괄호를 떼고도 잡음이면 그대로 버린다. */
+  eq('  자격이 아닌 부류는 줄 단위로 버린다',
+    /if \(NOT_A_REQUIREMENT\.test\(bareAll\.length >= 6 \? bareAll : t\)\) continue;/.test(eng), true);
+  eq('  괄호 안 부연으로 요건을 죽이지 않는다', /const bareAll = t\.replace\(/.test(eng), true);
   eq('  제외 대상은 버리지 않고 자리를 옮긴다', /if \(EXCLUDE_LINE\.test\(bare/.test(eng), true);
   /* 제외·우선 블록에는 그 잣대를 대면 안 된다 — 대면 그 블록이 통째로 사라진다 */
   eq('  제외·우선 블록에는 그 잣대를 대지 않는다', /opts\.loose \|\| opts\.keepPriority/.test(eng), true);
@@ -2450,7 +2455,10 @@ console.log('\n■ 금액 상세 — 승인받은 화면 그대로인가 (2026-0
   eq('AFFIRM_ELIG 를 REQ_SIGNAL 과 ※ 관문이 함께 쓴다',
     /AFFIRM_ELIG\.source/.test(meSrc) && /asideProven = EXCLUDE_LINE\.test\(t\) \|\| AFFIRM_ELIG\.test\(t\)/.test(meSrc), true);
   /* ⚠️ 버리는 것은 ※ 뿐이다 — `*` 까지 버리면 멀쩡한 요건이 같이 죽는다(실제로 그랬다) */
-  eq('※ 만 버린다 (별표는 아니다)', /\/\^\\s\*※\/\.test\(String\(l \|\| ''\)\) && !asideProven/.test(meSrc), true);
+  /* 잡음 판정은 **원문 줄에서 괄호만 뗀 것**으로 본다 — 다듬은 줄로 보면 `^배점` 같은
+     줄머리 규칙이 이름표와 함께 사라져 뚫리고, 원문 그대로 보면 괄호 안 부연에 걸린다. */
+  eq('잡음 판정은 원문에서 괄호만 떼고 본다', /let noiseProbe = String\(l \|\| ''\)\.replace\(/.test(meSrc), true);
+  eq('증명된 ※ 곁말은 기호를 떼고 본다', /if \(asideProven\) noiseProbe = noiseProbe\.replace\(\/\^\[※\*\]/.test(meSrc), true);
   eq('별표로 시작하는 요건은 살아 있다', where('* 2026-2학기 재학생인 자'), '자격');
   /* 🔴 괄호 **안**의 낱말로 줄을 통째로 버리지 않는다 (2026-08-28).
      `… 확정된 자 (국가장학 필수 신청, 미신청시 수혜 불가)` 가 괄호 안 `미신청시` 하나 때문에
@@ -2458,6 +2466,16 @@ console.log('\n■ 금액 상세 — 승인받은 화면 그대로인가 (2026-0
   eq('괄호 안 잡음 낱말이 진짜 요건을 죽이지 않는다',
     where('2026학년도 2학기 국가장학금 1유형을 신청하여 소득분위가 “기초생활수급자” 또는 “0분위”로 확정된 자 (국가장학 필수 신청, 미신청시 수혜 불가)'), '자격');
   eq('괄호 밖이 잡음이면 여전히 버린다', where('미신청시 불이익이 있습니다 (참고)'), '버림');
+  /* 🔴 괄호 안의 `만점` 은 배점표 표지가 아니라 **성적 척도**다 (2026-08-28).
+     이것 때문에 진짜 성적 요건이 자격 칸에서 사라지고 있었다. */
+  eq('괄호 안 만점은 성적 척도다', where('직전학기 C⁰ 수준(70/100점 만점) 이상인 재학생'), '자격');
+  eq('괄호 안 만점 (평점 척도)도 같다', where('직전 이수학점 3.5 이상 (4.5 만점) 인 자에 한함'), '자격');
+  /* ⚠️ 반대편 — 괄호를 떼고도 배점표면 그대로 버린다 */
+  eq('배점 안내는 여전히 버린다', where('Dream PATH 마일리지 점수 적용 : 매학기 70 점 만점 적용'), '버림');
+  eq('배점표도 여전히 버린다', where('학업성적(50) + 취창업준비계획(20) + 면접(30)'), '버림');
+  eq('총점 안내도 여전히 버린다', where('총점 100점 만점'), '버림');
+  /* 줄머리 규칙이 살아 있는가 — 다듬은 줄로만 보면 이름표가 떨어져 뚫린다 */
+  eq('번호 뗀 「금 액 :」은 자격이 아니다', where('3 ) 금 액 : 250 만 원'), '버림');
 }
 
 /* ── 로봇이 쓰는 학교 열쇠 = 앱이 읽는 학교 이름 (2026-08-27) ────────────────────
@@ -2480,6 +2498,51 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
   /* 분교 7곳은 전부 매핑돼 있어야 한다 — 빠지면 그 학교 학과가 본교로 합쳐진다 */
   eq('data.js 분교 7곳이 전부 BRANCH_MAP 에 있다',
     [...unis].filter((u) => /캠퍼스$/.test(u) && !targets.includes(u)), []);
+}
+
+
+/* ── 한 번의 읽기로 자격과 금액을 함께 (2026-08-28 개발자 지시) ────────────────
+   원문 미확보 15건을 실제로 열어 보니 **수집 실패가 아니라** 게시자가 공고문을
+   그림·PDF 로만 올린 것이었다. 그 글자는 AI 가 그림을 읽어야 나오는데, 예전에는
+   자격만 받아 와서 같은 그림을 금액 때문에 또 읽어야 했다. */
+{
+  const AI = await import('../collector/eligibility-ai.mjs').catch(() => null);
+  const src = fs.readFileSync(new URL('../collector/eligibility-ai.mjs', import.meta.url), 'utf8');
+  const ex = fs.readFileSync(new URL('../collector/extract-amounts.mjs', import.meta.url), 'utf8');
+  console.log('\n■ 첨부 한 번 읽어 자격·금액 함께 (2026-08-28)');
+
+  eq('그림·PDF 응답 스키마에 금액 줄이 있다', /amountLines: \{ type: 'array'/.test(src), true);
+  eq('required 에도 들어 있다', /required: \['none', 'lines', 'excludes', 'amountLines', 'why'\]/.test(src), true);
+  eq('프롬프트가 금액 줄을 원문 그대로 달라고 한다', /amountLines/.test(src) && /원문 그대로/.test(src), true);
+  eq('읽어 온 금액 줄을 저장한다', /it\.amountLines = v\.amountLines/.test(src), true);
+  /* 🔴 대상이 '자격 없음'만이면 금액만 빠진 공고는 영영 안 읽힌다 — 그게 '한세월'의 정체였다 */
+  eq('금액만 못 읽은 공고도 대상이다', /const needAmount =/.test(src) && /!needElig && !needAmount/.test(src), true);
+  /* 돈 나가는 자리는 누르기 전에 대상이 보여야 한다 */
+  eq('미리보기가 첨부 대상 수를 보여 준다', /첨부로 읽을 수 있는 공고/.test(src), true);
+  /* 🔴 기본은 꺼져 있어야 한다 — 되돌아가면 수집 로봇이 매 실행 돈을 쓴다 */
+  {
+    const cfg = JSON.parse(fs.readFileSync(new URL('../collector/eligibility-ai-config.json', import.meta.url), 'utf8'));
+    eq('AI 자격 읽기는 기본이 꺼짐', cfg.enabled, false);
+  }
+
+  /* 🔴 모델에게 금액을 **계산**시키지 않는다 — 옮겨 온 줄을 parse-amount 가 읽는다.
+     그래야 총액/1인당 가르기·유의사항 절 차단·자릿수 관문이 그대로 걸린다. */
+  eq('금액 판정은 parse-amount 가 한다', /PA\.amountFrom\(\['장학금액', \.\.\.aiLines\]\)/.test(ex), true);
+  eq('본문이 있으면 본문이 먼저다', /bodyLines\.length \? PA\.amountFrom\(bodyLines\)/.test(ex), true);
+
+  /* 검산기가 금액 줄을 실제로 돌려주는지 — 가짜 응답으로 돌려 본다(돈 0원) */
+  if (AI && AI.verifyPdfLines) {
+    const v = AI.verifyPdfLines({ none: false, why: '',
+      lines: ['대한민국 국적의 4년제 대학 재학생'], excludes: ['휴학생은 지원 불가'],
+      amountLines: ['장학금액 : 1인당 300만원 (생활비성)', '문의 : 학생지원팀'] });
+    eq('금액 줄을 돌려준다', v.ok && v.amountLines.includes('장학금액 : 1인당 300만원 (생활비성)'), true);
+    /* 금액처럼 생기지 않은 줄은 버린다 — 자격 관문(REQ_SIGNAL)을 대면 안 되지만 아무거나 받아도 안 된다 */
+    eq('금액이 아닌 줄은 버린다', v.ok && !v.amountLines.includes('문의 : 학생지원팀'), true);
+    /* 그 줄을 parse-amount 에 먹이면 1인당 300만원이 나온다 (150만원 분할에 끌려가지 않는다) */
+    const PAx = createRequire(import.meta.url)('../parse-amount.js');
+    const a = PAx.amountFrom(['장학금액', '장학금액 : 1인당 300만원 (생활비성)', '지급 방법 : 학기당 150만원씩 2회 분할']);
+    eq('1인당 금액을 집는다', a.kind === 'fixed' && a.value === 3000000, true);
+  }
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');

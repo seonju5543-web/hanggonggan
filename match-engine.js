@@ -785,14 +785,24 @@ function requirementLines(sch, lines, opts) {
     /* ⚠️ `isAside` 는 `※` 와 `*` 둘 다다(절 판정용). 버리는 것은 **※ 뿐**이다 —
        `*` 까지 버리면 멀쩡한 요건 줄이 같이 죽는다(2026-08-28에 실제로 그렇게 만들었다가 되돌림). */
     const asideProven = EXCLUDE_LINE.test(t) || AFFIRM_ELIG.test(t);
-    if (/^\s*※/.test(String(l || '')) && !asideProven) continue;
-    /* 🔴 **괄호 안**의 낱말로 줄을 통째로 버리면 안 된다 (2026-08-28).
-       제외 판정에는 이미 있던 규칙인데(아래 `bare`) 잡음 판정에는 없어서, 이런 줄이 죽었다:
-         `2026학년도 2학기 국가장학금 1유형을 신청하여 소득분위가 "기초생활수급자" 또는
-          "0분위"로 확정된 자 (국가장학 필수 신청, 미신청시 수혜 불가)`
-       괄호 안 `미신청시` 하나 때문에 **그 공고의 핵심 자격**이 화면에서 사라졌다.
-       괄호 밖이 그 줄의 주장이고 괄호 안은 부연이다. 괄호를 떼고도 여전히 잡음이면 버린다. */
-    const bareNoise = t.replace(/\s*[(（][^)）]*[)）]\s*$/, '').trim();
+    /* 🔴 **괄호가 곧 구조**인 부류는 괄호를 떼기 전에 먼저 거른다 (2026-08-28).
+       `학업성적(50) + 취창업준비계획(20) + 면접(30)` 은 괄호를 떼면 `학업성적 + …` 가 되어
+       배점표 규칙이 무력해진다 — 배점표가 지원 자격으로 새는 것이 개발자가 네 번 지적한 그 잡음이다.
+       아래의 '괄호는 부연' 규칙과 반대 방향이라, 순서로 갈라 둔다. */
+    const STRUCT_NOISE = /\(\d{1,3}\)\s*\+.*\(\d{1,3}\)|\(\d+\s?%\)\s*$|\(\d{1,3}\s?점\)/;
+    if (!loose && STRUCT_NOISE.test(t)) continue;
+    /* 잡음 판정은 **원문 줄에서 괄호 부연만 뗀 것**으로 본다.
+       · 원문으로 봐야 하는 이유 — `^배점`·`^총점` 처럼 **줄 앞**을 보는 규칙이 있는데,
+         다듬은 줄은 이름표(`배점 :`)를 이미 떼어 내서 그 규칙이 통째로 뚫린다.
+       · 괄호를 떼야 하는 이유 — `… 확정된 자 (국가장학 필수 신청, 미신청시 수혜 불가)` 가
+         괄호 안 `미신청시` 하나 때문에 죽었다. 괄호 밖이 그 줄의 주장이다.
+       · 증명된 ※ 곁말은 기호를 떼고 본다(그 기호 자체가 REQ_NOISE 의 첫 항목이라). */
+    let noiseProbe = String(l || '').replace(/\s*[(（][^)）]*[)）]\s*/g, ' ').replace(/\s+/g, ' ').trim();
+    if (asideProven) noiseProbe = noiseProbe.replace(/^[※*]\s*/, '');
+    if (REQ_NOISE.test(noiseProbe.length >= 4 ? noiseProbe : String(l || ''))) continue;
+    /* 다듬은 뒤에야 드러나는 잡음도 본다 — `3 ) 금 액 : …` 은 번호를 떼야 '금액' 줄인 것이 보인다.
+       여기서도 괄호는 부연이라 떼고 본다(위와 같은 이유). */
+    const bareNoise = t.replace(/\s*[(（][^)）]*[)）]\s*/g, ' ').replace(/\s+/g, ' ').trim();
     if (REQ_NOISE.test(bareNoise.length >= 4 ? bareNoise : t)) continue;
     if (!loose && DOC_COUNT_TAIL.test(t)) continue;
     if (NOT_REQ_RE.test(t) || isTableCell(t)) continue;
@@ -860,7 +870,15 @@ function requirementLines(sch, lines, opts) {
          ② 제외 대상은 버리지 않고 '이런 경우는 제외돼요' 블록으로 자리를 옮긴다
          ③ 요건 신호가 하나도 없으면 안 보여 준다 — 모른다고 말하는 편이 낫다 */
     if (!loose) {
-      if (NOT_A_REQUIREMENT.test(t)) continue;
+      /* 🔴 괄호 **안**은 부연이다 — 잡음 판정도 괄호를 떼고 본다 (2026-08-28).
+         `직전학기 C⁰ 수준(70/100점 만점) 이상인 재학생`
+         `직전 이수학점 3.5 이상 (4.5 만점) 인 자에 한함`
+         이 줄들의 `만점`은 배점표 표지가 아니라 **성적 척도**인데, 배점표 규칙에 걸려
+         진짜 성적 요건이 통째로 사라지고 있었다. 줄의 주장은 괄호 밖에 있다.
+         ⚠️ 괄호를 떼고도 잡음이면 그대로 버린다 —
+            `Dream PATH 마일리지 점수 적용 : 매학기 70점 만점 적용` 은 여전히 잡음이다. */
+      const bareAll = t.replace(/\s*[(（][^)）]*[)）]\s*/g, ' ').replace(/\s+/g, ' ').trim();
+      if (NOT_A_REQUIREMENT.test(bareAll.length >= 6 ? bareAll : t)) continue;
       /* 🔴 괄호 **안**의 '지원불가'로 줄을 통째로 버리면 안 된다 (2026-08-24) —
          `2026년 2학기 재학생 (휴학예정자 지원불가)`는 요건이고 괄호는 부연일 뿐인데,
          제외 규칙에 걸려 **진짜 자격이 조용히 사라지고 있었다**(잡음보다 나쁜 실패).
