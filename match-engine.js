@@ -779,9 +779,21 @@ function requirementLines(sch, lines, opts) {
           (`※ 예산 범위 내 학교 지급기준에 의거하여 …`, `※ 동점자 처리기준 : …`).
        그래서 이 저장소 방식대로 **증명한 줄만** 통과시킨다 — 제외를 말하거나(EXCLUDE_LINE),
        '누구는 신청 가능' 꼴이거나(AFFIRM_ELIG). 나머지 ※ 는 예전처럼 버린다. */
-    const asideProven = isAside && (EXCLUDE_LINE.test(t) || AFFIRM_ELIG.test(t));
-    if (!asideProven && REQ_NOISE.test(l.trim())) continue;
-    if (REQ_NOISE.test(t)) continue;
+    /* ※ 곁말은 증명한 줄만 통과 (아래 주석). 예전엔 이 자리에서 **원문 줄 전체**에
+       REQ_NOISE 를 댔는데, 그러면 괄호 안 낱말까지 걸려 진짜 요건이 죽었다(바로 아래 참조).
+       ※ 판정만 원문으로 하고, 잡음 판정은 다듬은 줄로 한다. */
+    /* ⚠️ `isAside` 는 `※` 와 `*` 둘 다다(절 판정용). 버리는 것은 **※ 뿐**이다 —
+       `*` 까지 버리면 멀쩡한 요건 줄이 같이 죽는다(2026-08-28에 실제로 그렇게 만들었다가 되돌림). */
+    const asideProven = EXCLUDE_LINE.test(t) || AFFIRM_ELIG.test(t);
+    if (/^\s*※/.test(String(l || '')) && !asideProven) continue;
+    /* 🔴 **괄호 안**의 낱말로 줄을 통째로 버리면 안 된다 (2026-08-28).
+       제외 판정에는 이미 있던 규칙인데(아래 `bare`) 잡음 판정에는 없어서, 이런 줄이 죽었다:
+         `2026학년도 2학기 국가장학금 1유형을 신청하여 소득분위가 "기초생활수급자" 또는
+          "0분위"로 확정된 자 (국가장학 필수 신청, 미신청시 수혜 불가)`
+       괄호 안 `미신청시` 하나 때문에 **그 공고의 핵심 자격**이 화면에서 사라졌다.
+       괄호 밖이 그 줄의 주장이고 괄호 안은 부연이다. 괄호를 떼고도 여전히 잡음이면 버린다. */
+    const bareNoise = t.replace(/\s*[(（][^)）]*[)）]\s*$/, '').trim();
+    if (REQ_NOISE.test(bareNoise.length >= 4 ? bareNoise : t)) continue;
     if (!loose && DOC_COUNT_TAIL.test(t)) continue;
     if (NOT_REQ_RE.test(t) || isTableCell(t)) continue;
     const ranks = PRIORITY_LINE.test(t) && !HARD_THRESHOLD.test(t);

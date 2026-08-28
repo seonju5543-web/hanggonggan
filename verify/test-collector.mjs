@@ -2448,7 +2448,16 @@ console.log('\n■ 금액 상세 — 승인받은 화면 그대로인가 (2026-0
   /* 두 곳이 같은 잣대를 쓰는지 — 베껴 두면 한쪽만 고쳐져 갈라진다 */
   const meSrc = fs.readFileSync(new URL('../match-engine.js', import.meta.url), 'utf8');
   eq('AFFIRM_ELIG 를 REQ_SIGNAL 과 ※ 관문이 함께 쓴다',
-    /AFFIRM_ELIG\.source/.test(meSrc) && /isAside && \(EXCLUDE_LINE\.test\(t\) \|\| AFFIRM_ELIG\.test\(t\)\)/.test(meSrc), true);
+    /AFFIRM_ELIG\.source/.test(meSrc) && /asideProven = EXCLUDE_LINE\.test\(t\) \|\| AFFIRM_ELIG\.test\(t\)/.test(meSrc), true);
+  /* ⚠️ 버리는 것은 ※ 뿐이다 — `*` 까지 버리면 멀쩡한 요건이 같이 죽는다(실제로 그랬다) */
+  eq('※ 만 버린다 (별표는 아니다)', /\/\^\\s\*※\/\.test\(String\(l \|\| ''\)\) && !asideProven/.test(meSrc), true);
+  eq('별표로 시작하는 요건은 살아 있다', where('* 2026-2학기 재학생인 자'), '자격');
+  /* 🔴 괄호 **안**의 낱말로 줄을 통째로 버리지 않는다 (2026-08-28).
+     `… 확정된 자 (국가장학 필수 신청, 미신청시 수혜 불가)` 가 괄호 안 `미신청시` 하나 때문에
+     죽어, 그 공고의 **핵심 자격**이 화면에서 사라져 있었다. */
+  eq('괄호 안 잡음 낱말이 진짜 요건을 죽이지 않는다',
+    where('2026학년도 2학기 국가장학금 1유형을 신청하여 소득분위가 “기초생활수급자” 또는 “0분위”로 확정된 자 (국가장학 필수 신청, 미신청시 수혜 불가)'), '자격');
+  eq('괄호 밖이 잡음이면 여전히 버린다', where('미신청시 불이익이 있습니다 (참고)'), '버림');
 }
 
 /* ── 로봇이 쓰는 학교 열쇠 = 앱이 읽는 학교 이름 (2026-08-27) ────────────────────
