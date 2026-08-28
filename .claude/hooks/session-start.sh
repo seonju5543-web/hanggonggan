@@ -17,4 +17,22 @@ bash tools/setup-collab.sh 2>&1 || echo "⚠️ 협업 병합기 등록을 건�
 # 인터넷이 막혀 있으면 조용히 넘어간다
 node verify/check-collab.js --brief 2>/dev/null || true
 
+# 🔴 스킬을 언제 부를지 못 박는다 (2026-08-29 개발자 지시)
+#    superpowers 안내문은 이미 매 세션 들어오는데도 2026-08-29 하루 종일 한 번도
+#    안 불렸다 — "적용되면 써라"는 **판단에 맡기는 말**이라 긴 세션에서 밀린다.
+#    그래서 **어느 시점에 무엇을 부르는지**를 못 박아 둔다. 검사 자체는 훅이 강제한다
+#    (PostToolUse: 고칠 때마다 · Stop: 끝내기 전 — 실패하면 exit 2 로 못 끝낸다).
+cat <<'MSG'
+
+📌 이 저장소에서 반드시 부를 스킬 (판단하지 말고 그대로)
+   · 코드를 짜거나 고쳤으면 → 끝내기 전에
+        Skill(skill="superpowers:requesting-code-review")
+   · 오류·검사 실패·예상 못 한 동작이 나오면 → 고치기 **전에**
+        Skill(skill="superpowers:systematic-debugging")
+   · "고쳤다/됐다"고 말하기 직전 → Skill(skill="superpowers:verification-before-completion")
+   ⚠️ 이 셋은 훅이 대신 실행해 주지 못한다(훅은 셸만 돌린다). 부르는 것은 네 몫이고,
+      안 불렀을 때 드러나는 것만 훅이 맡는다.
+
+MSG
+
 exit 0
