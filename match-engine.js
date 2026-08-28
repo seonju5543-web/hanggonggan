@@ -117,6 +117,29 @@ function evaluate(sch, p) {
     } else reasons.push('중복 수혜 조건 충족 (외부 재단 장학금 없음)');
   }
 
+  /* 🔴 **공고 원문에 적힌 요건도 판정에 쓴다** (2026-08-29 개발자 지시).
+     예전에는 구조화된 `eligibility` 규칙만 봤다. 그런데 등록 공고 대부분은 그 칸이
+     비어 있고 요건이 **원문 자격 줄에만** 있어서, 원문에 `직전학기 18학점 이상,
+     평점 4.0/4.5 이상` 이라고 적힌 공고가 평점 3.2·14학점 학생에게 '지원 가능'으로
+     떴다(실측 6건). 배지는 '지원 자격 미달'이라 맞게 말하는데 **신청 버튼은 열려 있어**
+     학생이 서류를 준비하다 헛수고한다 — 이 저장소가 가장 싫어하는 실패다.
+
+     ⚠️ **틀린 미달은 못 받는 것보다 나쁘다.** 그래서 아무 줄이나 쓰지 않는다.
+        `fitDetail().fails` 는 이미 네 겹의 관문을 통과한 것만 담는다:
+          ① 확신이 높은 조건만 (`conf === HIGH`) — 예외 문구(`단,`·`다만`)가 붙었거나
+             한 줄에 조건이 여러 개면 LOW 라 미달을 안 낸다
+          ② 프로필에 그 값이 **있을 때만** (없으면 'unknown')
+          ③ 환산이 불확실하면 안 낸다 (백분위 성적은 미달 판정 자체를 안 한다)
+          ④ 여러 장학금이 묶인 공고·선택지 묶음·지급액 구간표는 제외
+        그래서 여기서 미달이 나오면 **원문 숫자와 프로필 숫자를 곧바로 비교한 결과**다. */
+  if (ok && p) {
+    const fails = (fitDetail(sch, p).fails || []);
+    if (fails.length) {
+      ok = false;
+      reasons.push('공고에 적힌 요건에 미달해요: ' + fails[0]);
+    }
+  }
+
   if (!ok) return { status: 'ineligible', reasons, missing };
   if (missing.length) return { status: 'unknown', reasons, missing };
   if (e.selective) return { status: 'selective', reasons, missing };

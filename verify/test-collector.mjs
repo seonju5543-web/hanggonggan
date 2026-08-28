@@ -2629,5 +2629,39 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
   eq('정렬이 status 로 따로 판단하지 않는다', /order\[a\.result\.status\]/.test(app2), false);
 }
 
+
+/* ── 판정이 공고 원문 요건을 본다 (2026-08-29 개발자 지시) ─────────────────────
+   예전에는 구조화된 `eligibility` 규칙만 봐서, 원문에 `평점 4.0 이상` 이라고 적힌
+   공고가 평점 3.2 학생에게 '지원 가능'으로 떴다. 배지는 미달이라 맞게 말하는데
+   신청 버튼은 열려 있어 학생이 서류를 준비하다 헛수고했다. */
+{
+  const ME3 = createRequire(import.meta.url)('../match-engine.js');
+  console.log('\n■ 판정이 원문 요건을 본다 (2026-08-29)');
+  const who = (over) => ({ school: 'A', flags: [], status: '재학', year: 3,
+    gpa: 3.2, bracket: 6, credits: 14, nationality: 'korean', common: {}, ...over });
+  const sch = (lines) => ({ id: 't', eligibility: {}, eligibilityLines: lines });
+
+  eq('원문 요건에 미달하면 미달이다',
+    ME3.evaluate(sch(['직전학기 18학점 이상, 전체 학년 총 평점평균 4.0/4.5 이상인 학생']), who()).status, 'ineligible');
+  eq('  사유에 그 원문 줄을 그대로 적는다',
+    /직전학기 18학점 이상/.test(ME3.evaluate(sch(['직전학기 18학점 이상, 전체 학년 총 평점평균 4.0/4.5 이상인 학생']), who()).reasons.join(' ')), true);
+  eq('넘으면 미달이 아니다',
+    ME3.evaluate(sch(['직전학기 12학점 이상, 평점평균 3.0/4.5 이상인 학생']), who()).status !== 'ineligible', true);
+
+  /* 🔴 **틀린 미달은 못 받는 것보다 나쁘다.** 아래 넷은 미달을 내면 안 되는 자리다 —
+     되돌아가면 멀쩡한 학생이 통째로 막힌다. */
+  eq('프로필에 값이 없으면 미달이 아니다 (모른다)',
+    ME3.evaluate(sch(['직전학기 평점평균 4.0 이상인 자']), who({ gpa: null })).status !== 'ineligible', true);
+  eq('예외 문구가 붙은 줄로는 미달을 안 낸다',
+    ME3.evaluate(sch(['평점평균 4.0 이상인 자 (단, 신입생은 예외)']), who()).status !== 'ineligible', true);
+  eq('백분위 성적은 환산이 불확실해 미달을 안 낸다',
+    ME3.evaluate(sch(['직전학기 성적 90점 이상인 학생']), who()).status !== 'ineligible', true);
+  eq('자격 줄이 없으면 미달이 아니다', ME3.evaluate(sch([]), who()).status !== 'ineligible', true);
+
+  /* 판정과 배지가 같은 근거를 쓰는지 — 갈라지면 화면이 스스로 모순된다 */
+  const src3 = fs.readFileSync(new URL('../match-engine.js', import.meta.url), 'utf8');
+  eq('판정이 fitDetail 의 fails 를 쓴다', /fitDetail\(sch, p\)\.fails/.test(src3), true);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);
