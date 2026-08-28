@@ -2179,20 +2179,57 @@ console.log('\n■ 금액 산정 — 부풀리지 않는가 (2026-08-27)');
   eq('괄호 안 예외에 뒤집히지 않는다',
     PA.exclusivityFrom(['라. 타 장학금과 중복수혜 가능(근로장학금 간 중복 불가)']).kind, 'allowed');
   eq('조항이 없으면 모른다고 답한다', PA.exclusivityFrom(['가. 재학생']).kind, 'unknown');
-  /* 🔴 '무엇과' 중복이 안 되는지까지 봐야 한다. 17건 중 8건이 **교내끼리의 배타**였다 —
-     그걸 '외부 재단 장학금 보유자는 지원 불가'로 쓰면 멀쩡한 학생이 떨어진다. */
-  eq('대외 배타는 자격 판정에 쓴다',
-    PA.exclusivityFrom(['타 대외 장학금과는 이중수혜 금지']).scope, 'external');
-  eq('교내끼리 배타는 판정에 쓰지 않는다',
-    PA.exclusivityFrom(['복지장학 2( 부분 ) 장학은 복지장학 1( 본인장애 ) 장학과 중복수혜 불가']).scope, 'unclear');
+  /* 🔴 '무엇과' 겹치면 안 되는가를 **한정어**로 읽는다 (2026-08-28 개발자가 직접 정해 줌):
+       `타 대외 장학금` → 전부 · `타 장학금` → **전부**(한정어가 없으면 전부) ·
+       `타 인재양성사업` → 그 사업만.
+     좁은 것을 '외부 재단 장학금 보유자는 지원 불가'로 쓰면 멀쩡한 학생이 떨어지고,
+     반대로 좁은 것을 합계에서 빼면 받을 수 있는 돈을 적게 말하게 된다. */
+  eq('타 대외 장학금 → 전부',
+    PA.exclusivityFrom(['타 대외 장학금과는 이중수혜 금지']).scope, 'all');
+  /* 🔴 한정어가 없으면 전부다 — 예전엔 '대외' 낱말이 없다는 이유로 범위 불분명으로 뒀다 */
+  eq('타 장학금(한정어 없음) → 전부',
+    PA.exclusivityFrom(['유한재단 장학금을 수혜 받을 시 타 장학금은 중복 수혜 불가합니다']).scope, 'all');
+  eq('타 인재양성사업 → 그 사업만',
+    PA.exclusivityFrom(['④ 타 인재양성사업 중복 수혜 불가']).scope, 'narrow');
+  eq('특정 장학금 이름을 대면 그것과만',
+    PA.exclusivityFrom(['복지장학 2( 부분 ) 장학은 복지장학 1( 본인장애 ) 장학과 중복수혜 불가']).scope, 'narrow');
+  /* ⚠️ 순서가 방어선 — 넓은 표지가 있으면 좁은 낱말이 예외로 끼어 있어도 전부다 */
+  eq('「국가 장학금 이외의 교외 장학금」은 전부',
+    PA.exclusivityFrom(['학교 및 국가 장학금 이외의 교외 장학금 중복 수혜 사실이 없음을 증명함']).scope, 'all');
+  /* 🔴 `민간재단` 은 공기관을 뺀 말이다 (2026-08-28 개발자 확인) —
+     국가장학금만 받고 있는 학생은 막히면 안 된다. 거의 모든 학생이 국가장학금을 받는다. */
+  {
+    const ME2 = createRequire(import.meta.url)('../match-engine.js');
+    const sch2 = { eligibility: {}, exclusivity: { kind: 'forbidden', scope: 'all', raw: '타 민간재단 이중수혜 불가' } };
+    const who = (list) => ME2.evaluate(sch2, { school: 'A', flags: [], gpa: 4.0, bracket: 5, year: 2, scholarships: list }).status;
+    eq('국가장학금만 받고 있으면 안 막는다', who(['kosaf']) !== 'ineligible', true);
+    eq('교내 장학금만 받고 있어도 안 막는다', who(['internal']) !== 'ineligible', true);
+    eq('교외(외부 재단)를 받고 있으면 막는다', who(['external']), 'ineligible');
+    eq('아무것도 안 받으면 안 막는다', who([]) !== 'ineligible', true);
+  }
+  eq('타 민간재단도 전부',
+    PA.exclusivityFrom(['지원제한 : 타 민간재단 및 직장 복지(등록금성격 장학금) 이중 수혜에 해당시 지원 불가']).scope, 'all');
+  /* 🔴 좁은 것은 **합계에서 빼지 않는다** — 빼면 받을 수 있는 돈을 적게 말한다 */
+  {
+    const narrow = { id: 'n', amountSpec: { kind: 'fixed', value: 1000000 },
+      exclusivity: { kind: 'forbidden', scope: 'narrow', raw: '' } };
+    const all = { id: 'a', amountSpec: { kind: 'fixed', value: 2000000 },
+      exclusivity: { kind: 'forbidden', scope: 'all', raw: '' } };
+    const plain = { id: 'p', amountSpec: { kind: 'fixed', value: 3000000 } };
+    const bill = PA.sumAmounts([narrow, all, plain], {});
+    eq('좁은 배타는 그대로 더한다', bill.total, 6000000);
+    eq('좁은 배타는 버려지지 않는다', bill.dropped.length, 0);
+    const two = PA.sumAmounts([all, { ...plain, id: 'a2', exclusivity: { kind: 'forbidden', scope: 'all', raw: '' } }], {});
+    eq('전부 배타끼리는 큰 것 하나만', two.total, 3000000);
+  }
 
   /* ⑥-2 자격 판정에 실제로 반영되는가 — 학생이 헛수고하는 걸 막는 자리 */
   {
     const ME = createRequire(import.meta.url)('../match-engine.js');
     const ev = ME.evaluate || ME;
     const base = { school: 'A', flags: [], status: 'enrolled', gpa: 4.0, bracket: 5, year: 2 };
-    const ext = { eligibility: {}, exclusivity: { kind: 'forbidden', scope: 'external', raw: '' } };
-    const inn = { eligibility: {}, exclusivity: { kind: 'forbidden', scope: 'unclear', raw: '' } };
+    const ext = { eligibility: {}, exclusivity: { kind: 'forbidden', scope: 'all', raw: '' } };
+    const inn = { eligibility: {}, exclusivity: { kind: 'forbidden', scope: 'narrow', raw: '' } };
     eq('외부 재단 장학금을 받는 중이면 지원 불가로 뜬다',
       ev(ext, { ...base, scholarships: ['external'] }).status, 'ineligible');
     eq('받는 게 없으면 지원 가능이다',

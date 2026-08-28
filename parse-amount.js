@@ -208,19 +208,34 @@ var DUP_LINE = /(이중\s?수혜|중복\s?수혜|중복\s?지급|동시\s?수혜
 var DUP_NO   = /(불가|금지|안\s?됨|제한|불허|없음)/;
 var DUP_OK   = /(가능|허용|무관|상관\s?없)/;
 
-/* 🔴 '무엇과' 중복이 안 되는지까지 봐야 한다 (2026-08-27).
-   17건을 눈으로 보니 두 종류가 섞여 있었다:
-     · 교외 배타 — `타 대외 장학금과는 이중수혜 금지`, `타 재단 장학금 중복수혜 불가`
-     · 교내끼리 — `복지장학 2(부분)은 복지장학 1(본인장애)과 중복수혜 불가`
-   뒤엣것을 '외부 재단 장학금을 받는 학생은 지원 불가'로 쓰면 **멀쩡한 학생을 떨어뜨린다.**
-   이 저장소의 규칙대로, 확실한 것만 판정에 쓰고 나머지는 원문만 보여 준다. */
-var DUP_EXTERNAL = /(대외|교외|타\s?재단|타\s?기관|외부\s?재단|타\s?장학\s?재단)/;
+/* 🔴 '무엇과' 겹치면 안 되는가 — **한정어**로 읽는다 (2026-08-28 개발자 확인).
+   18건을 원문으로 대조해 개발자가 직접 정해 준 기준이다:
+     · `타 **대외** 장학금` → 전부      · `타 장학금` → **전부**(한정어가 없으면 전부다)
+     · `타 **인재양성사업**` → 그 사업만
+   예전에는 `대외·타 재단` 같은 **낱말이 있느냐**로만 갈라서, 낱말이 없다는 이유로
+   `유한재단 장학금을 수혜 받을 시 타 장학금은 중복 수혜 불가`(= 명백히 전부)를
+   '범위 불분명'으로 분류했다. 우연히 결과가 맞았을 뿐 판정이 틀렸다.
+
+   순서가 방어선이다:
+     ① 넓은 표지(대외·교외·타 재단·타 기관)가 있으면 **전부**다.
+        `학교 및 국가 장학금 **이외의** 교외 장학금` 처럼 좁은 낱말이 예외로 끼어 있어도
+        주장은 '교외 전부'다 — 순서를 뒤집으면 이 줄이 좁은 것으로 뒤집힌다.
+     ② 좁은 한정어가 붙었으면 그 범위만이다.
+     ③ 아무것도 없으면 **전부**다 — 축소는 안전하고 과장은 기망이다. */
+/* ⚠️ `민간재단` 은 **공기관을 뺀 말**이다 (2026-08-28 개발자 확인) — 한국장학재단
+   국가장학금 같은 것은 그 배타에 안 걸린다. 그래도 여기서는 넓은 표지로 둔다:
+   '민간재단 전부'라는 뜻이라 범위가 넓고, **국가장학금은 애초에 막히지 않는다** —
+   자격 판정(match-engine)이 프로필의 `external`(교외·외부 재단)만 보기 때문이다.
+   온보딩이 국가장학금·교내·교외·근로를 따로 묻는 것이 그 근거다. */
+var DUP_BROAD  = /(대외|교외|외부\s?재단|타\s?재단|타\s?기관|타\s?장학\s?재단|타\s?기관\s?장학|민간\s?재단|타\s?단체)/;
+var DUP_NARROW = /(등록금성|생활비성|인재\s?양성\s?사업|근로\s?장학|교내\s?장학|복지\s?장학|다산\s?장학|성적\s?우수\s?장학|국가\s?장학금)/;
 
 /**
  * 이 공고를 다른 장학금과 함께 받을 수 있는가.
- * @returns {{kind:'forbidden'|'allowed'|'unknown', scope:'external'|'unclear', raw:string}}
- *   scope 가 'external' 일 때만 자격 판정에 쓴다 — 'unclear' 는 교내끼리의 배타일 수 있어
- *   원문만 보여 주고 판정하지 않는다.
+ * @returns {{kind:'forbidden'|'allowed'|'unknown', scope:'all'|'narrow', raw:string}}
+ *   scope 'all'    — 다른 장학금 **전부**와 못 겹친다. 자격 판정과 합산에 쓴다.
+ *   scope 'narrow' — 정해진 몇 개·같은 성격끼리만. 다른 장학금과는 같이 받을 수 있으므로
+ *                    합계에서 빼지 않는다. 원문은 화면에 그대로 보여 준다.
  */
 function exclusivityFrom(lines) {
   var arr = lines || [];
@@ -235,14 +250,14 @@ function exclusivityFrom(lines) {
     var main = line.replace(/[（(][^）)]*[）)]/g, ' ');
     var probe = DUP_LINE.test(main) ? main : line;
 
-    var scope = DUP_EXTERNAL.test(line) ? 'external' : 'unclear';
+    var scope = DUP_BROAD.test(line) ? 'all' : (DUP_NARROW.test(line) ? 'narrow' : 'all');
     var raw = line.trim().slice(0, 200);
     if (DUP_NO.test(probe) && !DUP_OK.test(probe)) return { kind: 'forbidden', scope: scope, raw: raw };
     if (DUP_OK.test(probe) && !DUP_NO.test(probe)) return { kind: 'allowed',   scope: scope, raw: raw };
     /* 둘 다 있거나 둘 다 없으면 **모른다고 말한다.** 원문은 화면에 그대로 보여 준다. */
     return { kind: 'unknown', scope: scope, raw: raw };
   }
-  return { kind: 'unknown', scope: 'unclear', raw: '' };
+  return { kind: 'unknown', scope: 'all', raw: '' };
 }
 
 /* ── 합산 ────────────────────────────────────────────────────
@@ -340,8 +355,11 @@ function sumAmounts(items, opts) {
     m.won = won;
     if (a && a.kind === 'ratio') { if (won) estimated.push(m); else unknown.push(m); continue; }
     if (!won) { unknown.push(m); continue; }
+    /* 🔴 **전부**와 못 겹치는 것만 골라내기 대상이다 (2026-08-28 개발자 확인).
+       `타 인재양성사업 중복 수혜 불가` 처럼 범위가 좁은 것은 다른 장학금과 같이 받을 수
+       있으므로 합계에서 빼면 **실제보다 적게** 말하게 된다. 원문은 화면에 그대로 남는다. */
     var ex = m.ref.exclusivity;
-    if (ex && ex.kind === 'forbidden') exclusive.push(m); else added.push(m);
+    if (ex && ex.kind === 'forbidden' && ex.scope !== 'narrow') exclusive.push(m); else added.push(m);
   }
 
   /* ③ 함께 못 받는 것들 중 가장 큰 하나만 */

@@ -100,12 +100,17 @@ function evaluate(sch, p) {
      ⚠️ 모르면 판정하지 않는다. `scholarships` 가 null(=아직 안 물어봄)이면 missing 으로
         두고, 없다고 단정하지 않는다. 이 앱의 '모른다고 말할 자유' 규칙 그대로다. */
   const ex = sch.exclusivity;
-  /* 🔴 scope 가 'external' 인 것만 판정에 쓴다. `복지장학 2는 복지장학 1과 중복 불가`
+  /* 🔴 scope 가 'all'(다른 장학금 **전부**와 못 겹침) 인 것만 판정에 쓴다.
+     `복지장학 2는 복지장학 1과 중복 불가`
      같은 **교내끼리의 배타**를 외부 재단 장학금 보유자에게 적용하면 멀쩡한 학생이 떨어진다.
      원문이 대외·교외·타 재단이라고 못박은 것만 자격으로 본다. */
-  if (ex && ex.kind === 'forbidden' && ex.scope === 'external') {
+  if (ex && ex.kind === 'forbidden' && ex.scope === 'all') {
     const held = p && p.scholarships;
     if (!Array.isArray(held)) missing.push('지금 받고 있는 장학금');
+    /* 🔴 막는 것은 **교외(외부 재단)** 하나뿐이다. 국가장학금·교내·근로는 안 막는다 —
+       원문이 `타 민간재단` 이라고 적어도 그건 **공기관을 뺀 말**이고(개발자 확인 2026-08-28),
+       공고들도 대개 `국가장학금 및 교내장학금만 중복 가능` 이라고 적는다.
+       여기에 kosaf 를 넣으면 국가장학금 받는 학생이 통째로 떨어진다 — 거의 모든 학생이다. */
     else if (held.includes('external')) {
       ok = false;
       reasons.push('이미 받고 있는 외부 재단 장학금이 있어 지원할 수 없어요');
