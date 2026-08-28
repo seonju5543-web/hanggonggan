@@ -137,5 +137,11 @@
   "at": "2026-08-26",
   "minBody": 100,
   "name": "[화성시] 2026년 코나아이 소상공인 장학생 모집"
+ },
+ "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?bbs_seq=30024&board_category_no=11&board_seq=4&contents_no=5&menu_id=100&p_tab_no=5&site_no=2": {
+  "tries": 1,
+  "at": "2026-08-28",
+  "minBody": 100,
+  "name": "복지장학금 (중앙대 다빈치캠퍼스, 2026-1학기)"
  }
 }

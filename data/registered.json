@@ -6312,6 +6312,11 @@
      "name": "본문이미지-509x348.png",
      "url": "https://www.smu.ac.kr/_res/kor/img/common/img-footer-wa2026.png",
      "bodyImage": true
+    },
+    {
+     "name": "본문이미지-350x350.png",
+     "url": "https://www.smu.ac.kr/_attach/image/2026/08/thumb_xhphDuWeLMmEFCLWDepG.png",
+     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767590&article.offset=0&articleLimit=10",
@@ -6707,6 +6712,11 @@
     {
      "name": "본문이미지-509x348.png",
      "url": "https://www.smu.ac.kr/_res/kor/img/common/img-footer-wa2026.png",
+     "bodyImage": true
+    },
+    {
+     "name": "본문이미지-350x350.png",
+     "url": "https://www.smu.ac.kr/_attach/image/2026/08/thumb_xhphDuWeLMmEFCLWDepG.png",
      "bodyImage": true
     }
    ],
