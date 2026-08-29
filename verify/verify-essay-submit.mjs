@@ -16,7 +16,7 @@ import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const {
   essaySubmitChecklist, essayCountBlanks, essayStyleMixed,
-  essaySchoolLeak, essayFocusMissing,
+  essaySchoolLeak, essayFocusMissing, essayParticle,
 } = require('../essay-submit-check.js');
 
 let pass = 0, fail = 0;
@@ -35,7 +35,19 @@ const field = (over = {}) => Object.assign({
 head('1) 빈칸 [ ] 세기');
 ok(essayCountBlanks('앞 [ ] 뒤') === 1, '[ ] 하나를 센다');
 ok(essayCountBlanks('[]와 [   ]') === 2, '[] 와 [   ] 를 모두 센다');
-ok(essayCountBlanks('대괄호 없음[문자]') === 0, '내용이 있는 대괄호는 빈칸이 아니다');
+/* 🔴 이름 붙은 자리 표시도 빈칸이다 (2026-08-29 · 되돌리지 말 것).
+   첫 판은 `[]`·`[ ]` 만 셌는데, **초안 서버가 실제로 만드는 것은 이름 붙은 자리**다:
+     · server/essay/worker.js:60 프롬프트의 예시 자체가 `"[봉사 기관명]에서 활동하며"`
+     · verify/verify-essay-guard.mjs:95 의 통과 예시도 `[봉사 기관명]`
+   그래서 빈 대괄호만 세면 **관문이 가장 흔한 진짜 경우를 그냥 통과시킨다** —
+   학생이 `[봉사 기관명]` 이 박힌 문서를 그대로 제출하게 된다. 1순위가 막으려던 사고가
+   바로 이것이라 관문이 무의미해진다. */
+ok(essayCountBlanks('[봉사 기관명]에서 활동하며') === 1, '🔴 이름 붙은 자리 표시 [봉사 기관명] 도 빈칸이다');
+ok(essayCountBlanks('[기관명]과 [활동 시간]') === 2, '이름 붙은 자리 표시를 여러 개 센다');
+/* 숫자가 든 대괄호는 인용·붙임 표기다 — 자리 표시가 아니다(멀쩡한 글을 막으면 안 된다) */
+ok(essayCountBlanks('붙임 문서[붙임2]를 참고') === 0, '숫자가 든 대괄호는 빈칸이 아니다 (붙임2)');
+ok(essayCountBlanks('영문 [note] 표기') === 0, '한글이 없는 대괄호는 빈칸이 아니다');
+ok(essayCountBlanks('[열두 자가 넘는 아주 긴 대괄호 내용입니다]') === 0, '너무 긴 대괄호는 자리 표시가 아니다');
 
 head('2) 문체 혼용');
 ok(essayStyleMixed('열심히 했습니다. 앞으로도 잘할게요.') === true, '합니다체+해요체가 섞이면 잡는다');
@@ -77,6 +89,14 @@ head('5) 점검표 조립 — 막을 것을 막는가');
   const r = essaySubmitChecklist({ fields: [field({ text: '가정 형편이 [ ] 어려워' })] });
   const blank = r.items.find((i) => i.id === 'blank');
   ok(blank && blank.status === 'block', '빈칸 [ ] 이 있으면 block');
+  /* 🔴 무엇을 찾아야 할지 알려 준다 — 이름 붙은 자리라 '[ ]가 있어요'로는 못 찾는다 */
+  {
+    const r2 = essaySubmitChecklist({ fields: [field({ text: '[봉사 기관명]에서 활동했습니다.' })] });
+    const b2 = r2.items.find((i) => i.id === 'blank');
+    ok(b2 && b2.status === 'block', '이름 붙은 자리도 block 이다');
+    ok(b2 && b2.detail.includes('[봉사 기관명]'), '찾은 자리를 그대로 보여 준다');
+    ok(r2.submittable === false, '이름 붙은 자리가 있으면 제출 불가');
+  }
   ok(r.submittable === false, '① 빈칸이 있으면 제출 불가(submittable=false)');
 }
 {
@@ -130,6 +150,19 @@ head('9) 빈 입력에도 안 죽는다');
 {
   const r = essaySubmitChecklist({ fields: [] });
   ok(r && Array.isArray(r.items), '필드가 없어도 결과 객체를 돌려준다');
+}
+
+head('10) 조사 — 문장이 어색하지 않은가');
+/* '국제 역량를 봐요' 처럼 나오던 것 (2026-08-29). 받침을 보고 고른다. */
+ok(essayParticle('국제 역량', '을', '를') === '을', '받침 있는 낱말에는 을');
+ok(essayParticle('나눔과 사회 기여', '을', '를') === '를', '받침 없는 낱말에는 를');
+ok(essayParticle('[봉사 기관명]', '을', '를') === '을', '대괄호로 끝나도 마지막 한글로 고른다');
+ok(essayParticle('note', '을', '를') === '를', '한글이 없으면 받침 없는 쪽');
+{
+  const r = essaySubmitChecklist({ fields: [field({
+    focus: [{ say: '국제 역량', re: /글로벌|해외|국제/ }], text: '가정 형편이 어려워 학업을 이어 왔습니다.' })] });
+  const f = r.items.find((i) => i.id === 'focus');
+  ok(f && f.detail.includes("'국제 역량'을 봐요"), '재단 정렬 문구의 조사가 맞다');
 }
 
 console.log(`\n${fail ? '✗' : '✓'} 통과 ${pass} · 실패 ${fail}`);
