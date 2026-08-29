@@ -988,6 +988,30 @@ console.log('\n■ 유료 API 크레딧 누수 방지 (2026-08-20)');
 /* 2026-08-30 — 정식 등록을 경희대·한국외대로 좁혔다(개발자 지시).
    🔴 좁힌 것은 **등록뿐**이고 수집은 그대로다 — 실시간 공고 피드는 계속 나가야
    다른 학교 학생이 빈 화면을 보지 않는다. 되돌리려면 설정의 `schools` 를 [] 로. */
+/* 2026-08-30 — 수집망도 두 곳으로 좁혔다. 🔴 뺀 학교의 주소는 **지우지 않고 parked 로 옮겼다** —
+   이 boardUrl 들은 알아내는 데 실행이 여러 번 걸렸고(경희대만 8회), 지우면 되돌릴 때 처음부터
+   다시 찾아야 한다. 로봇은 `schools`·`targets` 만 읽으므로 parked 는 아무 일도 하지 않는다. */
+console.log('\n■ 수집망 좁히기 (2026-08-30)');
+{
+  const sc = JSON.parse(fs.readFileSync(new URL('../collector/schools.json', import.meta.url), 'utf8'));
+  const bt = JSON.parse(fs.readFileSync(new URL('../collector/browser-targets.json', import.meta.url), 'utf8'));
+  const names = (a) => a.map((x) => x.school).sort();
+  eq('일반 수집은 두 곳', names(sc.schools), ['경희대학교', '한국외국어대학교']);
+  eq('브라우저 수집도 두 곳', names(bt.targets), ['경희대학교', '한국외국어대학교']);
+  /* 🔴 뺀 학교를 지워 버리면 되돌릴 때 주소를 처음부터 다시 찾아야 한다 */
+  /* ⚠️ `sc.parked.length` 로 바로 읽으면 키가 통째로 사라졌을 때 **검사가 죽는다** —
+     빨간불이 아니라 뒤 절이 아예 안 도는 것이라 더 나쁘다. 없으면 빈 배열로 본다. */
+  const parked = (o) => (Array.isArray(o.parked) ? o.parked : []);
+  eq('뺀 학교의 게시판 주소가 남아 있다', parked(sc).length > 0 && parked(bt).length > 0, true);
+  eq('  보관분에도 주소가 실제로 들어 있다',
+    parked(sc).length > 0 && parked(sc).every((x) => 'boardUrl' in x), true);
+  eq('  왜 뺐는지·어떻게 되돌리는지 적혀 있다', /되돌리려면/.test(sc._parked || ''), true);
+  /* 로봇이 보관분을 실수로 훑으면 좁힌 뜻이 사라진다 */
+  const cm = fs.readFileSync(new URL('../collector/collect.mjs', import.meta.url), 'utf8');
+  const bc = fs.readFileSync(new URL('../collector/browser-collect.mjs', import.meta.url), 'utf8');
+  eq('로봇은 parked 를 읽지 않는다', /\.parked/.test(cm) || /\.parked/.test(bc), false);
+}
+
 console.log('\n■ 정식 등록 대상 학교 좁히기 (2026-08-30)');
 {
   const cfg = JSON.parse(fs.readFileSync(new URL('../collector/auto-register-config.json', import.meta.url), 'utf8'));

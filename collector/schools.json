@@ -2,6 +2,19 @@
  "_comment": "장학공고 수집 대상 학교. boardUrl이 null이면 게시판 주소 확인이 필요한 상태이며, 로봇이 매 실행마다 상태 리포트에 표시한다. 주소는 첫 실행 리포트를 보고 하나씩 확정한다.",
  "schools": [
   {
+   "school": "경희대학교",
+   "campus": "공통",
+   "boardUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318"
+  },
+  {
+   "school": "한국외국어대학교",
+   "campus": "공통",
+   "boardUrl": "https://dep.hufs.ac.kr/student/12767/subview.do"
+  }
+ ],
+ "_parked": "2026-08-30 개발자 지시로 경희대·한국외대만 남기고 뺐다(docs/designs/kosaf-and-narrowing.md ③). 🔴 지우지 말고 여기 둔다 — 이 boardUrl 들은 알아내는 데 실행이 여러 번 걸렸다(경희대만 8회). 되돌리려면 이 배열의 항목을 위 목록으로 옮기면 된다. ⚠️ 뺀 학교의 실시간 공고는 60일에 걸쳐 서서히 사라진다(collect.mjs 의 cutoff) — 즉시 비지 않는다.",
+ "parked": [
+  {
    "school": "서울대학교",
    "campus": "",
    "boardUrl": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=list&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80",
@@ -53,16 +66,6 @@
    "campus": "공통",
    "boardUrl": null,
    "note": "주소는 확보했다(2026-08-02) — CAU Notice의 장학 탭(P_TAB_NO=5), 485건. 행이 클릭형(fn_goDetail)이라 browser-targets.json이 담당한다"
-  },
-  {
-   "school": "경희대학교",
-   "campus": "공통",
-   "boardUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318"
-  },
-  {
-   "school": "한국외국어대학교",
-   "campus": "공통",
-   "boardUrl": "https://dep.hufs.ac.kr/student/12767/subview.do"
   },
   {
    "school": "서울시립대학교",
