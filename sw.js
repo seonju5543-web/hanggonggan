@@ -12,8 +12,8 @@
    v17 = 알림·진짜 푸시(선주) + 원문 링크 정직 표기(Josehyeon)를 합친 판. */
 /* v59 = 자격 요건 발췌 수리(Josehyeon) + 신청서 질문 방식 최적화(선주)를 합친 판.
    양쪽이 각자 v58로 올려 또 부딪혔다 — 위 주석의 규칙대로 **둘 다보다 큰 번호**로 올린다. */
-const CACHE = 'handaejang-v92';   /* v87 — 금액 상세 시트 · 이중수혜 온보딩·자격 반영 */
-const ASSETS = ['.', 'index.html', 'style.css', 'app.js', 'data.js', 'forms.js', 'form-plan.js', 'essay.js', 'essay-config.js', 'essay-ask.js', 'essay-quality.js',
+const CACHE = 'handaejang-v93';   /* v93 — 제출 전 점검표 + 재료 충분도 게이지 (양식 작성 고도화 1·2순위) */
+const ASSETS = ['.', 'index.html', 'style.css', 'app.js', 'data.js', 'forms.js', 'form-plan.js', 'essay.js', 'essay-config.js', 'essay-ask.js', 'essay-quality.js', 'essay-submit-check.js',
   'section-head.js', 'parse-requirements.js', 'parse-amount.js', 'match-engine.js', 'notify-rules.js', 'notify.js', 'push-config.js',
   'chat-config.js', 'chat.js',
   /* 로그인 — 목록에서 빠지면 **오프라인에서** 이 파일만 없어 앱이 죽는다.

@@ -86,10 +86,11 @@ function essayWhyFor(code) {
   return hit ? hit.why : '';
 }
 
-/* 이 칸의 지금 글을 검사해 '고칠 곳'을 얻는다. 통과/실패가 아니라 짚어 줄 목록이다. */
-function essayFieldWarnings(field, sch) {
-  const el = document.getElementById(`fq-${field.id}`);
-  if (!el || typeof qualityCheck !== 'function') return [];
+/* 이 칸의 글을 검사해 '고칠 곳'을 얻는다 — 글을 넘겨 받는 것이 원본이다.
+   🔴 질문 단계('q')에는 textarea 가 있지만, 미리보기·점검표는 저장된 답에서 온다.
+      그래서 DOM 이 아니라 **글자를 받아** 검사한다 — 두 단계가 같은 함수를 쓴다. */
+function essayWarnFor(field, sch, text) {
+  if (typeof qualityCheck !== 'function') return [];
   const checks = (essayPlaybookCache && essayPlaybookCache.checks) || [];
   if (!checks.length) return [];
   const own = essayAskAnswers(field.id).filter((a) => a.own).map((a) => a.a);
@@ -97,7 +98,13 @@ function essayFieldWarnings(field, sch) {
   try {
     if (typeof essayAskFor === 'function') target = (essayAskFor(field, essayCtx(sch)) || {}).target || 500;
   } catch (e) { /* 목표를 못 읽어도 나머지 검사는 돈다 */ }
-  return (qualityCheck(el.value, { target, ownWords: own, checks }).warnings) || [];
+  return (qualityCheck(text, { target, ownWords: own, checks }).warnings) || [];
+}
+/* 이 칸의 지금 글(textarea)을 검사한다 — 위 함수에 DOM 값을 넘겨 준다. */
+function essayFieldWarnings(field, sch) {
+  const el = document.getElementById(`fq-${field.id}`);
+  if (!el) return [];
+  return essayWarnFor(field, sch, el.value);
 }
 
 /* '이렇게 하면 더 좋아져요' 카드 — 빠진 것만 골라 보여 준다(설계 ③).
@@ -221,6 +228,153 @@ function essayUndo(field, sch) {
   if (typeof toast === 'function') toast('이전 판으로 되돌렸어요');
 }
 
+/* ── 지금 열려 있는 양식 (2026-08-29) ──
+   앱 전역 청취기(칩 클릭·입력)가 재료 게이지와 제출 점검표를 다시 그리려면
+   어느 양식·공고인지 알아야 한다. 한 번에 한 양식만 열리므로 하나면 충분하다. */
+let essayActive = null;
+
+/* ============================================================
+   ── 2순위 · 재료 충분도 게이지 (2026-08-29) ──
+   설계 docs/designs/essay-submit-ready.md 갈래② :
+     "덤덤한 글의 진짜 원인은 AI가 아니라 재료 부족이다."
+   초안을 만들기 **전에** 잰다 — 목표 분량 대비 학생이 준 재료가 얼마인지.
+   부족하면 위의 되묻기(essay-ask.js 에 이미 있다)로 한 줄 더 적게 이끈다.
+
+   🔴 이건 '품질' 판정이 아니라 '재료' 판정이다 — 화면에도 그렇게 적는다.
+      직접 쓴 한 줄(own)이 고른 보기보다 무겁다(글을 살아 있게 만드는 것이 그것이라).
+   ============================================================ */
+function essayMaterialLevel(fieldId, target) {
+  const asks = (typeof essayAskAnswers === 'function' ? essayAskAnswers(fieldId) : []) || [];
+  let chips = 0, own = 0;
+  asks.forEach((a) => {
+    if (a.own) { if (String(a.a || '').trim()) own++; }
+    else chips += String(a.a || '').split(',').filter((x) => x.trim()).length;
+  });
+  const tg = Number(target) || 500;
+  /* 직접 쓴 줄은 3점, 고른 보기는 0.5점(최대 8개까지만 센다 — 마구 누른다고 좋아지지 않게) */
+  const score = own * 3 + Math.min(chips, 8) * 0.5;
+  const needFull = Math.max(4, Math.min(10, Math.round(tg / 220)));
+  let level;
+  if (own === 0 && chips < 3) level = 'low';
+  else if (score >= needFull && own >= 1) level = 'full';
+  else level = 'some';
+  const pct = Math.max(6, Math.min(100, Math.round((score / needFull) * 100)));
+  return { level, pct, own, chips };
+}
+
+const ESSAY_GAUGE_TEXT = {
+  low:  { word: '부족', msg: '재료가 아직 적어요 — 위에서 키워드를 고르고, 보기를 누르면 열리는 칸에 <b>한 줄만</b> 적어 보세요.' },
+  some: { word: '조금 더', msg: '조금만 더 있으면 좋아요 — 직접 겪은 이야기 <b>한 줄</b>이 글을 살아 있게 만들어요.' },
+  full: { word: '충분', msg: '재료가 충분해요 — 좋은 초안이 나올 거예요.' },
+};
+function essayGaugeHtml(m) {
+  const t = ESSAY_GAUGE_TEXT[m.level] || ESSAY_GAUGE_TEXT.some;
+  return `<div class="essay-gauge-bar esg-${m.level}"><span style="width:${m.pct}%"></span></div>` +
+    `<p class="essay-gauge-lead"><b>재료 충분도 — ${t.word}</b></p>` +
+    `<p class="essay-gauge-msg">${t.msg}</p>`;
+}
+/* 이 칸의 게이지를 다시 그린다. 없으면 조용히 지나간다. */
+function essayRenderGauge(fieldId, target) {
+  const box = document.querySelector(`.essay-gauge[data-for="${CSS.escape(fieldId)}"]`);
+  if (!box) return;
+  box.innerHTML = essayGaugeHtml(essayMaterialLevel(fieldId, target));
+}
+/* 칩·입력이 일어난 노드에서 그 칸을 찾아 게이지를 갱신한다 (전역 청취기용) */
+function essayRefreshGaugeFrom(node) {
+  const card = node && node.closest && node.closest('.essay-ask[data-for]');
+  if (!card) return;
+  essayRenderGauge(card.dataset.for, card.dataset.target);
+}
+
+/* ============================================================
+   ── 1순위 · 제출 전 점검표 (2026-08-29) ──
+   설계 docs/designs/essay-submit-ready.md 갈래① :
+     "이 앱에는 '제출 가능'이라는 선 자체가 없다." 그 선을 여기서 긋는다.
+   판정은 essay-submit-check.js 한 곳에 있다(베끼지 않는다). 여기는 화면에서
+   재료를 모아 그 함수에 넘기고, 결과를 '양식 문서 만들기' 버튼 위에 그린다.
+   ============================================================ */
+function essayPlaybookCodeByType(type) {
+  const cs = (essayPlaybookCache && essayPlaybookCache.checks) || [];
+  const hit = cs.find((c) => c.type === type);
+  return hit ? hit.code : '';
+}
+
+/* 서술형 칸마다 점검표에 넘길 재료를 모은다. getText 로 글을 읽는다
+   (질문 단계에서는 textarea, 미리보기에서는 저장된 답). */
+function essaySubmitFields(tpl, sch, getText) {
+  const plan = formPlanFor(tpl);
+  const stories = essayStoryFields(plan);
+  if (!stories.length) return [];
+  const lenCode = essayPlaybookCodeByType('lengthBand');
+  const ownCode = essayPlaybookCodeByType('usesOwnMaterial');
+  const prof = essayProfile();
+  const schoolTerms = [prof.school].concat(prof.schoolAliases || []).filter(Boolean);
+  const notice = essayNoticeRules(sch);
+  const blind = notice.blind || (typeof blindReview === 'function' ? blindReview({
+    name: sch.name || '', quotes: (sch.excerpts || []).slice(0, 14),
+  }) : false);
+  /* 이 재단이 보는 것(focus) — 그 테마의 정규식을 함께 실어 보낸다(점검표가 본문에 대 본다).
+     foundationFocus 는 테마 id 를 주고, 정규식은 FOCUS_THEMES 에 있다(원본 한 곳). */
+  const themeRe = {};
+  try { (typeof FOCUS_THEMES !== 'undefined' ? FOCUS_THEMES : []).forEach((t) => { themeRe[t.id] = t.re; }); } catch (e) { /* 표가 없어도 나머지는 돈다 */ }
+  const focusItems = (typeof foundationFocus === 'function' ? foundationFocus({
+    name: sch.name || '', provider: sch.provider || sch.org || '',
+    quotes: (sch.excerpts || []).slice(0, 14).concat(notice.lines || []),
+  }) : []);
+  const focus = focusItems.map((f) => ({ say: f.say, re: themeRe[f.id] })).filter((f) => f.re);
+
+  return stories.map((f) => {
+    const text = String((getText ? getText(f.id) : ((document.getElementById(`fq-${f.id}`) || {}).value)) || '');
+    const warns = essayWarnFor(f, sch, text);
+    return {
+      label: String(f.label || '').replace(/\n/g, ' '),
+      text,
+      blind,
+      schoolTerms,
+      focus,
+      lengthWarn: !!lenCode && warns.some((w) => w.code === lenCode),
+      ownWarn: !!ownCode && warns.some((w) => w.code === ownCode),
+    };
+  });
+}
+
+/* 점검표 결과 — 서술형 칸이 없으면 null(점검표를 그리지 않는다) */
+function essaySubmitReadiness(tpl, sch, getText) {
+  if (typeof essaySubmitChecklist !== 'function') return null;
+  const fields = essaySubmitFields(tpl, sch, getText);
+  if (!fields.length) return null;
+  return essaySubmitChecklist({ fields });
+}
+
+function essaySubmitCheckHtml(result) {
+  if (!result || !result.items.length) return '';
+  const icon = { pass: '✓', warn: '△', block: '✗' };
+  const rows = result.items.map((i) =>
+    `<li class="esc-${i.status}"><span class="esc-mark">${icon[i.status]}</span>` +
+    `<span class="esc-body"><b>${esc(i.label)}</b>` +
+    `<span class="esc-detail">${esc(i.detail)}</span></span></li>`).join('');
+  const badge = result.allPass
+    ? `<span class="esc-badge esc-ok">제출 가능 ✅</span>`
+    : (result.submittable
+      ? `<span class="esc-badge esc-soft">조금 더 다듬으면 좋아요</span>`
+      : `<span class="esc-badge esc-block">먼저 고칠 곳이 있어요</span>`);
+  return `<div class="essay-submit-check" id="essay-submit-check">` +
+    `<div class="esc-head"><b>📋 제출 전 점검</b>${badge}</div>` +
+    `<ul class="esc-list">${rows}</ul>` +
+    `<p class="essay-fine">✗ 는 그대로 내면 문제가 되는 것 · △ 는 더 좋게 만드는 제안이에요.</p></div>`;
+}
+
+/* 점검표를 '양식 문서 만들기' 버튼 위에 그린다(있으면 갈아끼운다) */
+function essayRenderSubmitCheck(tpl, sch) {
+  const gen = document.getElementById('btn-ff-generate');
+  const old = document.getElementById('essay-submit-check');
+  const result = gen ? essaySubmitReadiness(tpl, sch) : null;
+  if (!result) { if (old) old.remove(); return; }
+  const html = essaySubmitCheckHtml(result);
+  if (old) { old.insertAdjacentHTML('beforebegin', html); old.remove(); }
+  else gen.insertAdjacentHTML('beforebegin', html);
+}
+
 function essayCtx(sch) {
   const p = (typeof state !== 'undefined' && state.profile) || null;
   /* 보관함에 무엇이 있는지 — 파일도 파일 이름도 나가지 않는다.
@@ -267,9 +421,12 @@ function essayAskHtml(field, ctx) {
   const lead = essayOn()
     ? '✍️ <b>키워드만 골라 주세요</b> — 긴 글은 앱이 씁니다'
     : '✍️ <b>키워드만 골라 주세요</b> — 아래 버튼으로 이 칸에 옮겨 드려요';
+  /* 재료 충분도 게이지 — 초안을 만들기 전에 잰다(설계 갈래② · 2순위).
+     처음엔 비어 있고 essayBind 가 첫 값을 채운다. 칩·입력마다 다시 그린다. */
   return `<div class="essay-ask" data-for="${field.id}" data-target="${plan.target}">
     <p class="essay-ask-lead">${lead} (목표 약 ${plan.target}자)</p>
     ${rows}
+    <div class="essay-gauge" data-for="${field.id}"></div>
   </div>`;
 }
 
@@ -312,15 +469,32 @@ function essaySyncFollowUp(group) {
       바로 읽으면 방금 누른 칩이 아직 반영되지 않아 한 박자씩 밀린다. */
 if (typeof document !== 'undefined' && typeof window !== 'undefined' && !window.__essayFuBound) {
   window.__essayFuBound = true;
+  /* 재료 게이지·제출 점검표를 다시 그린다 — 지금 열린 양식이 있을 때만.
+     🔴 setTimeout 0 : app.js 의 칩 처리기가 .active 를 토글한 뒤에 세야 값이 맞는다. */
+  const essayAfterEdit = (node) => {
+    essayRefreshGaugeFrom(node);
+    if (essayActive) essayRenderSubmitCheck(essayActive.tpl, essayActive.sch);
+  };
   document.addEventListener('click', (e) => {
     const fill = e.target.closest('[data-fill-fu]');
     if (fill) {
       const el = document.getElementById(fill.dataset.fillFu);
-      if (el) { el.value = fill.dataset.text; el.focus(); }
+      if (el) { el.value = fill.dataset.text; el.focus(); essayAfterEdit(el); }
       return;
     }
     const chip = e.target.closest('.essay-chips .chip');
-    if (chip) setTimeout(() => essaySyncFollowUp(chip.closest('.essay-chips')), 0);
+    if (chip) setTimeout(() => { essaySyncFollowUp(chip.closest('.essay-chips')); essayAfterEdit(chip); }, 0);
+  });
+  /* 직접 적는 칸(자유 입력·되묻기 한 줄)이 바뀌면 **게이지만** 갱신 — 타자 멈춘 뒤.
+     🔴 점검표는 여기서 다시 그리지 않는다(코드 리뷰 지적 — 키워드 재료는 최종 초안 글이
+        아니라 매 타자마다 같은 점검표를 다시 계산하는 낭비였다). 점검표는 초안 글 편집·칩
+        클릭·AI 채움 때 갱신되고, '문서 만들기'를 누르는 순간 그 자리에서 새로 판정한다. */
+  let essayInT;
+  document.addEventListener('input', (e) => {
+    if (!e.target.closest('.essay-ask-free, .essay-fu-in')) return;
+    clearTimeout(essayInT);
+    const node = e.target;
+    essayInT = setTimeout(() => essayRefreshGaugeFrom(node), 400);
   });
 }
 
@@ -430,27 +604,33 @@ function essayRulesBannerHtml(sch) {
 }
 
 async function essayBind(tpl, sch) {
+  /* 지금 열린 양식을 기억한다 — 전역 청취기가 게이지·점검표를 다시 그릴 때 쓴다. */
+  essayActive = { tpl, sch };
   const btn = document.getElementById('btn-essay-ai');
-  if (!btn) return;
-  btn.addEventListener('click', () => essaySend(tpl, sch, btn));
-  /* 규정 배너 — 규정 파일을 받아 버튼 위에 끼운다. 없으면 아무것도 안 뜬다. */
-  try {
-    await essayLoadFormRules();
-    const html = essayRulesBannerHtml(sch);
-    if (html && !document.getElementById('essay-rules-banner-box')) {
-      const box = document.createElement('div');
-      box.id = 'essay-rules-banner-box';
-      box.innerHTML = html;
-      btn.parentNode.insertBefore(box, btn);
-    }
-  } catch (e) { /* 규정을 못 받아도 버튼은 그대로 동작한다 */ }
+  if (btn) {
+    btn.addEventListener('click', () => essaySend(tpl, sch, btn));
+    /* 규정 배너 — 규정 파일을 받아 버튼 위에 끼운다. 없으면 아무것도 안 뜬다. */
+    try {
+      await essayLoadFormRules();
+      const html = essayRulesBannerHtml(sch);
+      if (html && !document.getElementById('essay-rules-banner-box')) {
+        const box = document.createElement('div');
+        box.id = 'essay-rules-banner-box';
+        box.innerHTML = html;
+        btn.parentNode.insertBefore(box, btn);
+      }
+    } catch (e) { /* 규정을 못 받아도 버튼은 그대로 동작한다 */ }
+  }
 
   /* ── 완성 문서 수정 돕기 (2026-08-24) — 서버 없이, 학생 직접 편집에도 작동 ──
-     playbook 을 받아 두고, 서술형 칸을 고칠 때마다 '빠진 팁'을 갱신한다. */
+     playbook 을 받아 두고, 서술형 칸을 고칠 때마다 '빠진 팁'·점검표를 갱신한다. */
   try {
     await essayLoadPlaybook();
     const stories = essayStoryFields(formPlanFor(tpl));
     stories.forEach((f) => {
+      /* 재료 게이지 첫 값 (2순위) — 저장된 답이 있으면 바로 채워진다 */
+      const askPlan = typeof essayAskFor === 'function' ? essayAskFor(f, essayCtx(sch)) : { target: 500 };
+      essayRenderGauge(f.id, askPlan.target);
       const el = document.getElementById(`fq-${f.id}`);
       if (!el || el.dataset.essayAids) return;
       el.dataset.essayAids = '1';   /* 한 칸에 청취기 한 번만 */
@@ -458,12 +638,14 @@ async function essayBind(tpl, sch) {
       el.addEventListener('input', () => {
         clearTimeout(t);
         /* 타자를 멈춘 뒤에 검사한다 — 글자마다 다시 그리면 어수선하다 */
-        t = setTimeout(() => essayRenderAids(f, sch), 500);
+        t = setTimeout(() => { essayRenderAids(f, sch); essayRenderSubmitCheck(tpl, sch); }, 500);
       });
       /* 바인드 때 한 번 — 앞서 저장된 초안이 있으면 팁이 바로 보인다 */
       essayRenderAids(f, sch);
     });
-  } catch (e) { /* 팁을 못 그려도 양식 작성은 그대로 된다 */ }
+    /* 제출 전 점검표 첫 그림 (1순위) — '양식 문서 만들기' 버튼 위에 */
+    essayRenderSubmitCheck(tpl, sch);
+  } catch (e) { /* 팁·점검표를 못 그려도 양식 작성은 그대로 된다 */ }
 }
 
 async function essaySend(tpl, sch, btn) {
@@ -493,7 +675,7 @@ async function essaySend(tpl, sch, btn) {
       essayRenderAids(f, sch);   /* 되돌리기·바뀐 곳·팁 다시 그리기 */
       moved++;
     }
-    if (moved) toast(`${moved}칸에 옮겼어요 — 문장으로 다듬어 주세요`);
+    if (moved) { essayRenderSubmitCheck(tpl, sch); toast(`${moved}칸에 옮겼어요 — 문장으로 다듬어 주세요`); }
     else if (empty) toast('먼저 위에서 키워드를 골라 주세요');
     return;
   }
@@ -619,6 +801,10 @@ async function essaySend(tpl, sch, btn) {
     essayRenderAids(field, sch);
     filled++;
   }
+
+  /* AI 가 채운 뒤 제출 전 점검표를 다시 그린다 — 초안에 빈칸 [ ]·블라인드 유출이
+     있으면 바로 눈에 띄게(1순위). 팁은 칸마다 essayRenderAids 가 이미 그렸다. */
+  if (filled) essayRenderSubmitCheck(tpl, sch);
 
   const skipped = (data.skipped || []).filter((s) => !(data.drafts || []).some((d) => d.key === s.key));
   if (filled && skipped.length) toast(`${filled}칸을 채웠어요 · ${skipped.length}칸은 직접 써 주세요`);
