@@ -11,6 +11,7 @@
 
    실행: (python3 -m http.server 8123 &) 후 node verify/verify-source-links.js */
 const { chromium } = require('playwright-core');
+const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
 const { nextUntil } = require('./onboard-helper.js');
 const fs = require('fs');
 const path = require('path');
@@ -50,7 +51,7 @@ const SCHOOL = process.env.LINKCHECK_SCHOOL || '경희';
   page.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push('CONSOLE: ' + m.text()); });
   page.on('dialog', async (d) => { await d.accept(); });
 
-  await page.goto('http://localhost:8123/', { waitUntil: 'domcontentloaded' });
+  await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
   await page.click('.onboard-step[data-step="0"] [data-next]');
   await page.fill('#in-school', SCHOOL);
   await page.waitForTimeout(300);

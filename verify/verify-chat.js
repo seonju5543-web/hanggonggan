@@ -11,10 +11,11 @@
    ⑨ 질문에 스크립트를 넣어도 그대로 실행되지 않는다(XSS)
    실행: python3 -m http.server 8123 & 후 node verify/verify-chat.js */
 const { chromium } = require('playwright-core');
+const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
 const { nextUntil } = require('./onboard-helper.js');
 const EXE = (process.env.CHROME_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome');
 const IGNORE_CONSOLE = /Failed to load resource|does not support the Push API in incognito/;
-const BASE = 'http://localhost:8123';
+const BASE = `http://localhost:${PORT}`;
 
 let fail = 0;
 const ok = (cond, label, extra) => {

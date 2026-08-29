@@ -9,6 +9,7 @@
    ⑦ 알림 클릭으로 앱이 열렸을 때(?sch=) 해당 공고가 열린다
    실행: python3 -m http.server 8123 & 후 node verify/verify-notify.js */
 const { chromium } = require('playwright-core');
+const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
 const { nextUntil } = require('./onboard-helper.js');
 const EXE = process.env.CHROME_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 /* 우리 코드의 잘못이 아닌 콘솔 메시지는 빼고 센다.
@@ -19,7 +20,7 @@ const EXE = process.env.CHROME_PATH || '/opt/pw-browsers/chromium-1194/chrome-li
      진짜 푸시 동작은 verify-push-client.js가 가짜 푸시 서비스로 따로 검증한다. */
 const IGNORE_CONSOLE = /Failed to load resource|does not support the Push API in incognito/;
 
-const BASE = 'http://localhost:8123';
+const BASE = `http://localhost:${PORT}`;
 const SHOT = (n) => `${__dirname}/shot-nf-${n}.png`;
 
 let fail = 0;

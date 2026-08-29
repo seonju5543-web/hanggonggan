@@ -5,6 +5,7 @@
    개발자 지시(2026-08-24): "숫자는 0을 안 띄우되 지원 자격 미달 배지는 넣어야 돼."
    실행: node verify/verify-fit-badge.js   (CHROME_PATH + localhost:8123 필요) */
 const { chromium } = require('playwright-core');
+const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
 
 let fail = 0;
 const eq = (label, got, want) => {
@@ -29,7 +30,7 @@ const PROFILE = (over) => ({
     page.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
     await page.addInitScript((p) => localStorage.setItem('handaejang.v1',
       JSON.stringify({ profile: p, applications: [] })), PROFILE(profileOver));
-    await page.goto('http://localhost:8123/', { waitUntil: 'domcontentloaded' });
+    await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#screen-home:not([hidden])', { timeout: 8000 });
     await page.waitForSelector('#notify-sheet:not([hidden])', { timeout: 6000 }).catch(() => {});
     const later = await page.$('#btn-nf-later');

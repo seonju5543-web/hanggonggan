@@ -1534,7 +1534,7 @@ const schoolOfNotice = (sch) => {
   return m ? m[1] : (sch && sch.school) || '';
 };
 
-function renderAmountDetail() {
+function renderAmountDetail(keepScroll) {
   /* 못 그렸다는 것을 부르는 쪽이 알아야 한다 — dismissSheet 가 이 값을 보고 닫는다 */
   if (!lastBill) return false;
   const { bill, count } = lastBill;
@@ -1577,7 +1577,7 @@ function renderAmountDetail() {
         '모든 공고의 금액을 확인했습니다.')}
       <p class="ad-foot">모든 금액은 공고 원문 기준입니다.<br>선발 결과에 따라 실제 수혜액은 달라질 수 있습니다.</p>
     </div>`;
-  openSheetShell();
+  openSheetShell(keepScroll);   // 되돌아온 것이면 보던 자리로 (아니면 undefined → 맨 위)
   return true;
 }
 
@@ -1976,13 +1976,21 @@ function enableSheetSwipe(sheet, close) {
 
 /* 바텀시트를 여는 동작 한 곳 — 상세 시트와 일괄 준비 목록이 **같은 함수**를 쓴다.
    베끼면 열리는 모양이 갈라진다(내용은 부르는 쪽이 innerHTML 로 채운다). */
-function openSheetShell() {
+function openSheetShell(keepScroll) {
   $('#sheet-backdrop').hidden = false;
   const sheet = $('#detail-sheet');
   sheet.hidden = false;
   requestAnimationFrame(() => {
     $('#sheet-backdrop').classList.add('show');
     sheet.classList.add('show');
+    /* 🔴 **맨 위부터 보여 준다** (2026-08-29 개발자 지적: "공고를 누르면 그 공고의
+       아랫부분이 나온다"). 스크롤되는 것은 `.sheet` 자신인데(style.css `overflow-y:auto`)
+       내용만 innerHTML 로 갈아끼우므로 **앞 내용에서 내려 둔 위치가 그대로 남는다** —
+       금액 상세를 한참 내려보다 공고를 누르면 그 공고의 중간부터 보였다.
+       여기서 하는 이유: 부르는 쪽은 이 함수 **뒤에** innerHTML 을 채우므로 그 자리에서
+       되돌리면 내용이 없어 안 먹는다. 이 rAF 는 채운 뒤에 돈다.
+       되돌아가기(`dismissSheet`)만 보던 자리를 넘겨 그 위치를 되살린다. */
+    sheet.scrollTop = keepScroll || 0;
   });
 }
 
@@ -1997,11 +2005,31 @@ let sheetBack = null;
 function dismissSheet() {
   const back = sheetBack;
   sheetBack = null;
-  /* 🔴 되돌아가기가 **실패하면 그냥 닫는다.** `renderAmountDetail()` 은 `lastBill` 이
-     없으면 아무것도 안 그리고 돌아오는데, 그때 여기서 return 해 버리면 시트가
-     **열린 채 그대로 멈춘다** — 학생이 내려도 아무 일이 안 일어난다. */
-  if (typeof back === 'function' && back() !== false) return;
-  closeSheet();
+  if (typeof back !== 'function') { closeSheet(); return; }
+  /* 🔴 **내려가는 동작을 끝까지 보여 준 뒤에** 이전 화면을 올린다
+     (2026-08-29 개발자 지적: "그 탭을 내리면 금액 상세 탭이 너무 빠르게 나와서 헷갈린다").
+     예전에는 손을 떼자마자 innerHTML 만 갈아끼웠다 — 쓸어내린 시트가 도로 **올라오면서**
+     내용만 바뀌니, 학생 눈에는 '닫으려 했는데 다른 게 튀어나온' 것으로 보였다.
+     지금은 ① 내려보내고 ② 다 내려간 뒤 이전 화면으로 채우고 ③ 다시 올린다.
+     배경(backdrop)은 끄지 않는다 — 끄면 그 사이에 화면이 한 번 번쩍인다.
+     ⏱ 기다리는 시간은 **CSS 에서 읽는다**(style.css `.sheet` transition). 숫자를 여기 적으면
+        CSS 를 고칠 때 조용히 어긋난다 — 이 저장소가 반복해 겪은 '베끼면 갈라진다'. */
+  const sheet = $('#detail-sheet');
+  const ms = (parseFloat(getComputedStyle(sheet).transitionDuration) || 0.3) * 1000;
+  sheet.classList.remove('show');
+  setTimeout(() => {
+    /* 🔴 되돌아가기가 **실패하면 그냥 닫는다.** `renderAmountDetail()` 은 `lastBill` 이
+       없으면 아무것도 안 그리고 돌아오는데, 그때 여기서 return 해 버리면 시트가
+       **내려간 채 멈춘다** — 배경만 깔린 화면이 남는다. */
+    if (back() === false) closeSheet();
+  }, ms);
+}
+
+/* 금액 상세에서 공고로 들어갈 때 — 돌아갈 곳과 **보던 위치**를 함께 기억한다.
+   두 곳(누르기·키보드)에서 부르므로 함수로 둔다. 베껴 두면 한쪽만 고쳐져 갈라진다. */
+function rememberAmountBack() {
+  const y = $('#detail-sheet').scrollTop;
+  sheetBack = () => renderAmountDetail(y);
 }
 
 function closeSheet() {
@@ -2505,7 +2533,7 @@ function bindEvents() {
        `data-goto="explore"` 같은 화면 이동 버튼까지 걸리면 엉뚱한 곳으로 되돌아간다 */
     /* 🔴 **진짜 공고일 때만** 기억한다 — openDetail 은 못 찾으면 조용히 돌아오는데,
        그때 되돌아갈 곳만 남으면 학생이 한 번 더 내려야 닫힌다. */
-    if (row.closest('#detail-sheet') && findSch(row.dataset.goto)) sheetBack = renderAmountDetail;
+    if (row.closest('#detail-sheet') && findSch(row.dataset.goto)) rememberAmountBack();
     openDetail(row.dataset.goto);
   });
   document.addEventListener('keydown', (e) => {
@@ -2515,7 +2543,7 @@ function bindEvents() {
     e.preventDefault();
     /* 🔴 **진짜 공고일 때만** 기억한다 — openDetail 은 못 찾으면 조용히 돌아오는데,
        그때 되돌아갈 곳만 남으면 학생이 한 번 더 내려야 닫힌다. */
-    if (row.closest('#detail-sheet') && findSch(row.dataset.goto)) sheetBack = renderAmountDetail;
+    if (row.closest('#detail-sheet') && findSch(row.dataset.goto)) rememberAmountBack();
     openDetail(row.dataset.goto);
   });
 

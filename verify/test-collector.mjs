@@ -2481,7 +2481,16 @@ console.log('\n■ 금액 상세 — 승인받은 화면 그대로인가 (2026-0
     /row\.closest\('#detail-sheet'\) && findSch\(row\.dataset\.goto\)/.test(app), true);
   /* 🔴 되돌아가기가 **실패하면 닫는다** — 안 그러면 시트가 열린 채 멈춘다
      (`renderAmountDetail()` 은 lastBill 이 없으면 아무것도 안 그린다. 코드 리뷰 지적) */
-  eq('되돌아가기가 실패하면 그냥 닫는다', /back\(\) !== false\) return;/.test(app), true);
+  eq('되돌아가기가 실패하면 그냥 닫는다', /if \(back\(\) === false\) closeSheet\(\);/.test(app), true);
+  /* 🔴 되돌아갈 때 **내려가는 동작을 끝까지 보여 준다** (2026-08-29 개발자 지적:
+     "그 탭을 내리면 금액 상세 탭이 너무 빠르게 나와서 헷갈린다"). 손을 떼자마자 내용만
+     갈아끼우면 쓸어내린 시트가 도로 올라오면서 다른 것이 튀어나온 것처럼 보인다. */
+  eq('  내려간 뒤에 이전 화면을 올린다', /classList\.remove\('show'\);\s*\n\s*setTimeout\(/.test(app), true);
+  eq('  기다리는 시간을 CSS 에서 읽는다 (숫자를 박지 않는다)',
+     /getComputedStyle\(sheet\)\.transitionDuration/.test(app), true);
+  /* 내용만 갈아끼우면 앞 내용의 스크롤이 남아 '공고의 아랫부분'이 보인다 */
+  eq('  시트를 열 때 스크롤을 맨 위로 되돌린다', /sheet\.scrollTop = keepScroll \|\| 0;/.test(app), true);
+  eq('  되돌아갈 때만 보던 자리를 넘긴다', /openSheetShell\(keepScroll\)/.test(app), true);
   eq('  못 그렸다는 것을 알려 준다', /if \(!lastBill\) return false;/.test(app), true);
   /* 🔴 이 동작은 **실제로 눌러 보는 드라이버**가 지킨다 — 글자만 훑는 검사는
      아무것도 안 하는 구현도 통과시킨다(2026-08-29에 실제로 그랬다). */
@@ -2705,6 +2714,18 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
     return /=\s*'\/opt\/pw-browsers/.test(src) || /executablePath:\s*'\/opt\/pw-browsers/.test(src);
   });
   eq('브라우저 경로를 박은 드라이버가 없다 (CHROME_PATH 를 먼저 본다)', hardPath, []);
+
+  /* 🔴 ②-2 **포트를 박으면 남의 워크트리를 잰다** (2026-08-29 실사고).
+     이 저장소는 워크트리를 여러 개 두고 쓰는데, 드라이버가 `localhost:8123` 을 박아 둬서
+     다른 세션이 띄워 둔 서버(= 다른 워크트리의 코드)를 재고 있었다.
+     그날 `drive.js` 가 **두 번 연속 `ERRORS: none`** 을 냈는데 전부 남의 코드였고,
+     정작 내가 고친 app.js 는 한 번도 실행되지 않았다 — 통과가 거짓이 된다.
+     경로 박기·단계 번호 박기와 같은 계열이라 여기에 함께 둔다. */
+  const hardPort = names.filter((f) => {
+    const src = fs.readFileSync(new URL(f, dir), 'utf8');
+    return /goto\(\s*['"]http:\/\/localhost:\d+/.test(src);
+  });
+  eq('서버 포트를 박은 드라이버가 없다 (PORT 를 먼저 본다)', hardPort, []);
 
   /* ③ 사람이 미리 준비해야 하는 검사는 언젠가 반드시 안 돌아간다.
         verify-forms-data 가 "더미 양식이 주입된 앱 복사본이 서빙 중이어야 함"을 요구해

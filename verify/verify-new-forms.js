@@ -2,6 +2,7 @@
    ① data/forms.json 병합 확인 ② 각 스키마가 질문 화면·문서 렌더링에서 오류 없이 동작
    ③ 대표 1종(삼일)은 UI로 질문→문서 생성까지 ④ 명지 프로필로 고시장학금 양식 확인 */
 const { chromium } = require('playwright-core');
+const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
 const { nextUntil } = require('./onboard-helper.js');
 
 const NEW_KEYS = ['samil-apply', 'bogun-study-apply', 'bogun-multi-apply', 'sanhak-foreign-apply', 'mju-gosi-apply'];
@@ -71,7 +72,7 @@ async function onboard(page, school, major) {
   page.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
   page.on('dialog', async (d) => { await d.accept(); });
 
-  await page.goto('http://localhost:8123/', { waitUntil: 'domcontentloaded' });
+  await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
   await onboard(page, '성균관', '소프트웨어학과');
 
   // ① 병합 확인
@@ -108,7 +109,7 @@ async function onboard(page, school, major) {
   const samilPage = await browser.newPage({ viewport: { width: 390, height: 844 } });
   samilPage.on('pageerror', (e) => errors.push('PAGEERROR-SAMIL: ' + e.message));
   samilPage.on('dialog', async (d) => { await d.accept(); });
-  await samilPage.goto('http://localhost:8123/', { waitUntil: 'domcontentloaded' });
+  await samilPage.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
   await onboard(samilPage, SCHOOL_ALIAS[samilTarget.eligibility.schoolOnly] || samilTarget.eligibility.schoolOnly, '컴퓨터공학부');
   {
     const page = samilPage; // 아래 단언들은 기존 그대로 재사용
@@ -147,7 +148,7 @@ async function onboard(page, school, major) {
   const page2 = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page2.on('pageerror', (e) => errors.push('PAGEERROR2: ' + e.message));
   page2.on('dialog', async (d) => { await d.accept(); });
-  await page2.goto('http://localhost:8123/', { waitUntil: 'domcontentloaded' });
+  await page2.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
   await onboard(page2, SCHOOL_ALIAS[gosiTarget.eligibility.schoolOnly] || gosiTarget.eligibility.schoolOnly, '융합소프트웨어학부');
   await page2.click('.nav-item[data-nav="explore"]');
   await page2.waitForTimeout(600);

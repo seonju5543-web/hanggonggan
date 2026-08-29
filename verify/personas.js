@@ -2,6 +2,7 @@
    - 대표 페르소나 몇은 UI로 직접 온보딩(클릭) → UI 버그 포착
    - 넓은 매트릭스는 localStorage 주입 → 매칭 엔진·렌더·빈 상태 포착 */
 const { chromium } = require('playwright-core');
+const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
 const EXE = (process.env.CHROME_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome');
 
 const SCHOOLS = [
@@ -57,7 +58,7 @@ async function dismissNotify(page) {
   page.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push('CONSOLE: ' + m.text()); });
   page.on('dialog', async (d) => { await d.accept(); });
 
-  await page.goto('http://localhost:8123/', { waitUntil: 'networkidle' });
+  await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'networkidle' });
 
   const anomalies = [];
   const N = 120;

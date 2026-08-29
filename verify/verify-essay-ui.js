@@ -17,6 +17,7 @@
      ⑤ 서버가 실패하면 학생이 쓴 글이 그대로 남는다
    ============================================================ */
 const { chromium } = require('playwright-core');
+const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
 const SHOT = (n) => `${__dirname}/shot-essay-${n}.png`;
 
 let pass = 0, fail = 0;
@@ -42,7 +43,7 @@ async function dismissNotify(page) {
   page.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push('CONSOLE: ' + m.text()); });
   page.on('dialog', async (d) => { await d.accept(); });
 
-  await page.goto('http://localhost:8123/', { waitUntil: 'domcontentloaded' });
+  await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
   await page.click('.onboard-step[data-step="0"] [data-next]');
   await page.fill('#in-school', '한국외국어대학교');
   await page.waitForTimeout(200);

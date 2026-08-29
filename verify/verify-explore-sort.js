@@ -7,6 +7,7 @@
         active가 안 흔들리는지 확인한다
    실행: node verify/verify-explore-sort.js   (CHROME_PATH + localhost:8123) */
 const { chromium } = require('playwright-core');
+const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
 
 /* 길게 누르기 — 진짜 TouchEvent로 재현한다. 마우스로만 보면 터치 기기에서
    touchend 뒤에 오는 click까지 세는 함정을 못 잡는다(신청 내역 스와이프와 같은 계열). */
@@ -49,7 +50,7 @@ const PROFILE = {
 
   await page.addInitScript((p) => localStorage.setItem('handaejang.v1',
     JSON.stringify({ profile: p, applications: [] })), PROFILE);
-  await page.goto('http://localhost:8123/', { waitUntil: 'domcontentloaded' });
+  await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('#screen-home:not([hidden])', { timeout: 8000 });
   await page.waitForSelector('#notify-sheet:not([hidden])', { timeout: 6000 }).catch(() => {});
   const later = await page.$('#btn-nf-later');

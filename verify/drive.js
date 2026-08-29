@@ -1,4 +1,5 @@
 const { chromium } = require('playwright-core');
+const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
 const { nextUntil } = require('./onboard-helper.js');
 const SHOT = (n) => `${__dirname}/shot-${n}.png`;
 
@@ -10,7 +11,7 @@ const SHOT = (n) => `${__dirname}/shot-${n}.png`;
   page.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push('CONSOLE: ' + m.text()); });
   page.on('dialog', async (d) => { console.log('DIALOG:', d.message().slice(0, 160).replace(/\n/g, ' | ')); await d.accept(); });
 
-  await page.goto('http://localhost:8123/', { waitUntil: 'domcontentloaded' });
+  await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
   console.log('STEP title:', await page.title(), '| h1:', await page.textContent('.onboard-hero h1'));
   await page.click('.onboard-step[data-step="0"] [data-next]');
 

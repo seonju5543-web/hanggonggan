@@ -16,11 +16,12 @@
          (앱 서버가 8123 포트에 떠 있어야 한다 — verify/README.md)
    ============================================================ */
 const { chromium } = require('playwright-core');
+const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
 const fs = require('fs');
 const path = require('path');
 
 const OUT = path.join(__dirname, '..', 'docs', 'demo');
-const BASE = process.env.APP_URL || 'http://localhost:8123';
+const BASE = process.env.APP_URL || `http://localhost:${PORT}`;
 
 const PROFILE = {
   school: '한국외국어대학교', campus: '', track: 'humanities', major: '통번역학과',

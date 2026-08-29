@@ -3,6 +3,7 @@
       않는다(CLAUDE.md — 13차 세션 학교 검색 사고). 세로 스크롤이 살아 있는지도 함께 본다.
    실행: node verify/verify-apps-manage.js   (CHROME_PATH 필요) */
 const { chromium } = require('playwright-core');
+const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
 
 /* 진짜 손가락 끌기 — Playwright의 마우스로는 touchstart/move/end가 안 난다 */
 async function drag(page, sel, dx, dy, steps = 8) {
@@ -51,7 +52,7 @@ const eq = (label, got, want) => {
       ],
     }));
   });
-  await page.goto('http://localhost:8123/', { waitUntil: 'domcontentloaded' });
+  await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('#screen-home:not([hidden])', { timeout: 8000 });
   /* 알림 동의 시트가 뒤에서 클릭을 가로챈다 — 다른 드라이버와 같은 방식으로 닫는다 */
   await page.waitForSelector('#notify-sheet:not([hidden])', { timeout: 6000 }).catch(() => {});

@@ -6,6 +6,7 @@
    🔴 이건 **재 봐야 보이는 결함**이다 — 코드만 읽으면 두 값이 다른 줄 모른다.
    실행: node verify/verify-onboard-gaps.js   (CHROME_PATH + localhost:8123) */
 const { chromium } = require('playwright-core');
+const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
 
 let fail = 0;
 const eq = (label, got, want) => {
@@ -21,7 +22,7 @@ const eq = (label, got, want) => {
   const errors = [];
   page.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
 
-  await page.goto('http://localhost:8123/', { waitUntil: 'domcontentloaded' });
+  await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
   await page.click('.onboard-step[data-step="0"] [data-next]');
   await page.fill('#in-school', '한국외국어'); await page.waitForTimeout(250);
   await page.click('.ac-list:not([hidden]) .ac-item');
