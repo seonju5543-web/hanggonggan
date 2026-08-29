@@ -270,6 +270,97 @@ async function dismissNotify(page) {
   ok(await page.$eval(`#fq-${key}`, (el) => el.value) === '', '④-2 되돌리면 AI 초안 전으로 돌아간다');
   ok(await page.$('.essay-flag') === null, '④-2 되돌리면 초안 표시도 사라진다');
 
+  /* ── 7) 제출 전 점검표 + 빈칸 관문 · 재료 충분도 게이지 (2026-08-29, 고도화 1·2순위) ──
+     🔴 이 두 장치는 순수 모듈 검사(verify-essay-submit.mjs)가 판정을 지키지만,
+        **화면에 실제로 뜨는지**는 그 검사가 알 수 없다. 붙이는 것을 빠뜨려도 순수 검사는
+        조용히 통과한다 — 이 저장소가 여러 번 겪은 '검사가 조용해서 못 봤다' 유형이라
+        여기서 진짜 앱을 눌러 확인한다. */
+  console.log('\n[7) 제출 전 점검표 + 재료 게이지 — 화면에 실제로 뜨는가]');
+  /* 🔴 openForm 은 아래 내비게이션을 누르는데, 지금은 양식 시트가 그 위를 덮고 있다.
+     먼저 시트를 닫아야 한다(안 닫으면 클릭이 가로채여 시간초과로 죽는다). */
+  await page.keyboard.press('Escape');
+  await page.waitForSelector('#detail-sheet:not(.show)', { timeout: 4000 }).catch(() => {});
+  await page.waitForTimeout(300);
+  ok(await openForm(), '양식 화면을 다시 연다');
+  const askBox7 = await page.$('.essay-ask');
+  const fid = askBox7 ? await askBox7.evaluate((e) => e.dataset.for) : null;
+  ok(!!fid, '서술형 칸을 찾았다');
+
+  /* 게이지 — 아무것도 안 골랐을 때는 '부족'이어야 한다 */
+  const gaugeText = async () => page.$eval('.essay-gauge, [class*="gauge"]', (e) => e.innerText).catch(() => '');
+  ok((await gaugeText()).includes('부족'), '② 재료를 안 줬을 때 게이지가 "부족"이라고 말한다');
+
+  /* 키워드를 고르면 게이지가 실제로 움직인다 */
+  /* 🔴 눈금은 일부러 세 단계(부족/조금더/충분)라 키워드 하나로는 글자가 안 바뀐다.
+     그래서 **막대 길이**를 본다 — 그게 재료가 실제로 늘었다는 표시다.
+     🔴 page.click 을 쓰지 않는다 — 시트 안의 안내문이 위에 겹쳐 클릭이 가로채인다.
+        이 드라이버가 위(③)에서 이미 쓰는 방식대로 요소에게 직접 누르라고 한다. */
+  const barPct = async () => page.$eval('.essay-gauge-bar span',
+    (e) => parseFloat(e.style.width) || 0).catch(() => -1);
+  const before = await barPct();
+  await page.evaluate(() => {
+    document.querySelectorAll('.essay-ask .essay-chips').forEach((g) => {
+      const c = g.querySelector('.chip');
+      if (c) c.click();
+    });
+  });
+  await page.waitForTimeout(500);
+  const after = await barPct();
+  ok(after > before, `② 키워드를 고르면 게이지가 움직인다 (${before}% → ${after}%)`);
+
+  /* 직접 쓴 한 줄은 고른 보기보다 무겁게 센다 — 게이지가 그만큼 더 올라간다 */
+  const fu7 = await page.$('.essay-fu:not([hidden]) .essay-fu-in');
+  if (fu7) {
+    await fu7.fill('등록금을 벌면서도 전공 수업은 한 번도 빠지지 않았고 새벽에 공부하는 습관을 들였어요');
+    await page.waitForTimeout(500);
+    ok(await barPct() > after, '② 직접 쓴 한 줄이 게이지를 더 올린다');
+  } else {
+    ok(false, '② 되묻기 칸이 열려 있어야 한다');
+  }
+
+  /* 점검표 — 이름 붙은 자리 표시를 막는가 (관문의 핵심) */
+  await page.fill(`#fq-${fid}`, '[봉사 기관명]에서 꾸준히 활동하며 배운 것이 많습니다. '.repeat(3));
+  await page.waitForTimeout(900);
+  const checkText = await page.$eval('[class*="submit-check"], [class*="checklist"]', (e) => e.innerText).catch(() => '');
+  ok(checkText.includes('빈칸'), '① 제출 전 점검표가 화면에 뜬다');
+  /* 🔴 이 한 줄이 이 관문의 존재 이유다 — 초안 서버가 실제로 만드는 것은 `[ ]` 가 아니라
+     `[봉사 기관명]` 처럼 **이름 붙은 자리**다(worker.js 프롬프트의 예시 자체가 그것). */
+  ok(checkText.includes('[봉사 기관명]'),
+    '① 이름 붙은 자리 표시를 잡아 무엇을 채울지 짚어 준다');
+
+  /* 다 지우면 그 줄이 통과로 바뀐다 — 관문이 굳어 있지 않다 */
+  await page.fill(`#fq-${fid}`, '가정 형편이 어려운 가운데에도 학업을 이어 왔습니다. '.repeat(4));
+  await page.waitForTimeout(900);
+  const cleared = await page.$eval('[class*="submit-check"], [class*="checklist"]', (e) => e.innerText).catch(() => '');
+  ok(!cleared.includes('[봉사 기관명]'), '① 자리 표시를 지우면 그 줄이 풀린다');
+
+  /* 🔴 관문이 '한 번 세우고 영영 잠들지' 않는가 (코드 리뷰가 잡은 버그의 회귀).
+     예전에는 forced 를 한 번 켜면 안 꺼서, 그 뒤에 **새로 생긴** 빈칸을 그냥 통과시켰다.
+     ⚠️ '← 질문 다시'로 돌아가면 화면을 다시 그려 버튼이 새로 만들어지므로 래치가 저절로
+        풀린다 — 그 길로 시험하면 버그가 있어도 검사가 통과한다(실제로 처음에 그렇게 짰다가
+        고친 코드를 되돌려도 초록불이 나와서 알았다). 그래서 **화면을 다시 그리지 않고
+        그 자리에서 글만 바꿔** 시험한다. */
+  await page.fill(`#fq-${fid}`, '[봉사 기관명]에서 활동했습니다. '.repeat(4));
+  await page.waitForTimeout(700);
+  await page.click('#btn-ff-generate');                 // 1) 한 번 세운다
+  await page.waitForTimeout(500);
+  ok(await page.$('.form-doc') === null, '① 빈칸이 있으면 문서로 넘어가지 않고 세운다');
+
+  /* 2) 옛 빈칸을 고치고 **다른** 빈칸을 새로 만든다 — 화면은 그대로다(같은 버튼 그대로) */
+  await page.fill(`#fq-${fid}`, '[활동 시간]을 이렇게 썼습니다. '.repeat(4));
+  await page.waitForTimeout(700);
+  await page.click('#btn-ff-generate');
+  await page.waitForTimeout(600);
+  ok(await page.$('.form-doc') === null,
+    '① 새로 생긴 빈칸에는 다시 세운다 (관문이 한 번 쓰고 잠들지 않는다)');
+
+  /* 3) 같은 빈칸이면 다시 눌러 진행된다 — 가두지 않는다 */
+  await page.click('#btn-ff-generate');
+  await page.waitForTimeout(700);
+  ok(await page.$('.form-doc') !== null, '① 같은 것이면 다시 눌러 진행된다 (학생을 가두지 않는다)');
+  await page.click('#btn-ff-back');
+  await page.waitForTimeout(500);
+
   console.log('\n[5) 실패해도 학생 글을 덮지 않는가]');
   await page.fill(`#fq-${key}`, '제가 직접 쓴 문장입니다');
   await page.evaluate(() => {
