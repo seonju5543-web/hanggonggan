@@ -1535,7 +1535,8 @@ const schoolOfNotice = (sch) => {
 };
 
 function renderAmountDetail() {
-  if (!lastBill) return;
+  /* 못 그렸다는 것을 부르는 쪽이 알아야 한다 — dismissSheet 가 이 값을 보고 닫는다 */
+  if (!lastBill) return false;
   const { bill, count } = lastBill;
   const p = state.profile;
   const sum = (arr) => arr.reduce((s, m) => s + (m.won || 0), 0);
@@ -1577,6 +1578,7 @@ function renderAmountDetail() {
       <p class="ad-foot">모든 금액은 공고 원문 기준입니다.<br>선발 결과에 따라 실제 수혜액은 달라질 수 있습니다.</p>
     </div>`;
   openSheetShell();
+  return true;
 }
 
 function renderBulkPrep() {
@@ -1984,7 +1986,26 @@ function openSheetShell() {
   });
 }
 
+/* 시트를 내렸을 때 **돌아갈 곳** (2026-08-29 개발자 요청).
+   금액 상세에서 공고를 눌러 들어갔는데, 내리면 그냥 닫혀서 금액 상세를 처음부터
+   다시 열어야 했다("귀찮음이 있어서"). 한 단계 뒤로 가게 한다.
+   🔴 `closeSheet()` 자체를 고치면 안 된다 — 신청 준비·양식 작성 흐름도 그걸 부르는데,
+      그때 금액 상세로 튕겨 돌아가면 엉뚱하다. **사용자가 내리는 경로만** 뒤로 간다. */
+let sheetBack = null;
+
+/* 사용자가 시트를 내렸다 — 돌아갈 곳이 있으면 거기로, 없으면 닫는다 */
+function dismissSheet() {
+  const back = sheetBack;
+  sheetBack = null;
+  /* 🔴 되돌아가기가 **실패하면 그냥 닫는다.** `renderAmountDetail()` 은 `lastBill` 이
+     없으면 아무것도 안 그리고 돌아오는데, 그때 여기서 return 해 버리면 시트가
+     **열린 채 그대로 멈춘다** — 학생이 내려도 아무 일이 안 일어난다. */
+  if (typeof back === 'function' && back() !== false) return;
+  closeSheet();
+}
+
 function closeSheet() {
+  sheetBack = null;          // 흐름이 닫을 때는 돌아갈 곳도 지운다
   docPrep = null;
   bulkPrep = null;
   $('#sheet-backdrop').classList.remove('show');
@@ -2480,6 +2501,11 @@ function bindEvents() {
   document.addEventListener('click', (e) => {
     const row = e.target.closest('[data-goto]');
     if (!row || notNav(e.target, row)) return;
+    /* 시트 **안**에서 눌렀을 때만 돌아갈 곳을 기억한다 — index.html 의
+       `data-goto="explore"` 같은 화면 이동 버튼까지 걸리면 엉뚱한 곳으로 되돌아간다 */
+    /* 🔴 **진짜 공고일 때만** 기억한다 — openDetail 은 못 찾으면 조용히 돌아오는데,
+       그때 되돌아갈 곳만 남으면 학생이 한 번 더 내려야 닫힌다. */
+    if (row.closest('#detail-sheet') && findSch(row.dataset.goto)) sheetBack = renderAmountDetail;
     openDetail(row.dataset.goto);
   });
   document.addEventListener('keydown', (e) => {
@@ -2487,12 +2513,15 @@ function bindEvents() {
     const row = e.target.closest && e.target.closest('[data-goto]');
     if (!row || notNav(e.target, row)) return;
     e.preventDefault();
+    /* 🔴 **진짜 공고일 때만** 기억한다 — openDetail 은 못 찾으면 조용히 돌아오는데,
+       그때 되돌아갈 곳만 남으면 학생이 한 번 더 내려야 닫힌다. */
+    if (row.closest('#detail-sheet') && findSch(row.dataset.goto)) sheetBack = renderAmountDetail;
     openDetail(row.dataset.goto);
   });
 
-  $('#sheet-backdrop').addEventListener('click', closeSheet);
+  $('#sheet-backdrop').addEventListener('click', dismissSheet);
   $('#detail-sheet').addEventListener('click', (e) => {
-    if (e.target.classList.contains('sheet-handle')) closeSheet();
+    if (e.target.classList.contains('sheet-handle')) dismissSheet();
     if (e.target.id === 'btn-bulk-go' && bulkPrep) bulkStart();
   });
   /* 일괄 준비 목록의 체크 — 시트는 innerHTML 이 계속 갈리므로 줄마다 리스너를 걸지 않고
@@ -2511,12 +2540,12 @@ function bindEvents() {
     if (e.target.checked) bulkPrep.ids.add(id); else bulkPrep.ids.delete(id);
     bulkRefresh();
   });
-  enableSheetSwipe($('#detail-sheet'), closeSheet);
+  enableSheetSwipe($('#detail-sheet'), dismissSheet);   // 쓸어 내리기 — 개발자가 말한 그 동작
   wireAppsManage();   // 신청 내역 — 왼쪽으로 밀어 삭제 · 선택 모드 (2026-08-24)
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     if (!$('#notify-sheet').hidden) closeNotifyPanel();
-    else if (!$('#detail-sheet').hidden) closeSheet();
+    else if (!$('#detail-sheet').hidden) dismissSheet();
   });
 
   $('#btn-apply-all').addEventListener('click', applyAll);

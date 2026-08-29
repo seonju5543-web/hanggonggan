@@ -2399,6 +2399,35 @@ console.log('\n■ 금액 상세 — 승인받은 화면 그대로인가 (2026-0
       /if \(!row \|\| .*closest\('details'\)/.test(handler.slice(0, 300)), false);
   }
 
+  /* ⑥ 공고 카드에서 **내리면 보던 금액 상세로 돌아온다** (2026-08-29 개발자 요청)
+     그냥 닫히면 금액 상세를 처음부터 다시 열어야 한다("귀찮음이 있어서"). */
+  eq('돌아갈 곳을 기억하는 자리가 있다', /let sheetBack = null;/.test(app), true);
+  eq('사용자가 내리는 경로는 dismissSheet 로 모인다',
+    /enableSheetSwipe\(\$\('#detail-sheet'\), dismissSheet\)/.test(app)
+    && /'#sheet-backdrop'\)\.addEventListener\('click', dismissSheet\)/.test(app), true);
+  eq('  ESC·손잡이도 같은 길을 쓴다',
+    (app.match(/dismissSheet\(\)/g) || []).length >= 2, true);
+  /* 🔴 closeSheet 자체를 고치면 안 된다 — 신청 준비·양식 작성 흐름도 그걸 부르는데
+     그때 금액 상세로 튕겨 돌아가면 엉뚱하다. 흐름은 여전히 closeSheet 를 쓴다. */
+  eq('신청 흐름은 여전히 그냥 닫는다 (되돌아가지 않는다)',
+    /finalizeApply\(sch, null\);\n\s*closeSheet\(\);/.test(app), true);
+  eq('흐름이 닫을 때 돌아갈 곳도 지운다', /sheetBack = null;\s*\/\/ 흐름이 닫을 때/.test(app), true);
+  /* 화면 이동 버튼(index.html 의 data-goto="explore")까지 걸리면 엉뚱한 곳으로 되돌아간다 */
+  eq('시트 안에서 누른 것만 되돌아갈 곳을 기억한다',
+    /row\.closest\('#detail-sheet'\) && findSch\(row\.dataset\.goto\)/.test(app), true);
+  /* 🔴 되돌아가기가 **실패하면 닫는다** — 안 그러면 시트가 열린 채 멈춘다
+     (`renderAmountDetail()` 은 lastBill 이 없으면 아무것도 안 그린다. 코드 리뷰 지적) */
+  eq('되돌아가기가 실패하면 그냥 닫는다', /back\(\) !== false\) return;/.test(app), true);
+  eq('  못 그렸다는 것을 알려 준다', /if \(!lastBill\) return false;/.test(app), true);
+  /* 🔴 이 동작은 **실제로 눌러 보는 드라이버**가 지킨다 — 글자만 훑는 검사는
+     아무것도 안 하는 구현도 통과시킨다(2026-08-29에 실제로 그랬다). */
+  eq('실제로 눌러 보는 드라이버가 있다',
+    fs.existsSync(new URL('../verify/verify-sheet-back.js', import.meta.url)), true);
+  {
+    const ui = fs.readFileSync(new URL('../.github/workflows/verify-ui.yml', import.meta.url), 'utf8');
+    eq('  그 드라이버가 CI 관문에 들어 있다', /verify-sheet-back\.js/.test(ui), true);
+  }
+
   // ⑤ 시트가 따로 계산하지 않는다 (홈과 다른 말을 하면 안 된다)
   eq('홈이 만든 lastBill 을 그대로 그린다', body.includes('lastBill'), true);
   eq('시트가 sumAmounts 를 다시 부르지 않는다', body.includes('sumAmounts('), false);
