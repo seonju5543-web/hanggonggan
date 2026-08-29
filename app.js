@@ -91,6 +91,11 @@ function saveState(opts) {
 
 /* ---------------- 장학금 목록 (한국장학재단 상시 제도 + 정식 등록 실공고) ---------------- */
 let registeredList = []; // data/registered.json — 수집 로봇이 확보한 실공고를 큐레이션해 정식 등록한 목록
+/* 층2 — 한국장학재단(KOSAF) 통합검색에서 받은 **마감 전** 재단 장학금 (2026-08-30).
+   🔴 층1(registeredList)과 절대 섞지 않는다. 우리가 원문을 읽은 것이 아니라 재단이
+      KOSAF 에 적어 둔 칸이라, 자격 진단도 양식 작성도 붙이지 않는다 — 그대로 보여 주고
+      "자격은 재단 홈페이지에서 확인"이라고 밝힌다(설계: docs/designs/kosaf-and-narrowing.md ②). */
+let kosafList = [];
 
 function registeredFor(p) {
   return scopedToProfile(registeredList, p); // match-engine.js — 알림도 같은 기준을 쓴다
@@ -835,6 +840,9 @@ function renderExplore() {
   }
 
   $('#live-notices').innerHTML = exploreFilter === 'all' ? liveNoticesHtml() : '';
+  /* 층2는 '전체'와 '교외'에서만 — '교내'·'신청 가능만'에 섞으면 그 칩이 거짓말이 된다
+     (층2는 자격 판정을 안 하므로 '신청 가능'인지 우리가 알 수 없다). */
+  $('#kosaf-list').innerHTML = ['all', '교외'].includes(exploreFilter) ? kosafHtml() : '';
   $('#explore-list').innerHTML = list.length
     ? list.map((m) => schCard(m.sch, m.result, { fit: m.fit, fd: m.fd })).join('')
     : '<p class="empty">조건에 맞는 장학금이 없어요.</p>';
@@ -1226,6 +1234,95 @@ function loadRegistered() {
       }
     })
     .catch(() => { /* 오프라인 등 — 조용히 무시 */ });
+}
+
+function loadKosaf() {
+  fetch('data/kosaf-open.json', { cache: 'no-store' })
+    .then((r) => (r.ok ? r.json() : null))
+    .then((d) => {
+      kosafList = (d && d.items) || [];
+      if (!$('#screen-explore').hidden) renderExplore();
+    })
+    .catch(() => { /* 오프라인 등 — 조용히 무시. 층2가 없어도 앱은 그대로 돈다 */ });
+}
+
+/* 카드 한 줄에 들어갈 만큼만. 🔴 자르는 것은 **카드뿐**이다 — 상세 시트는 전문을 그대로 보여 준다.
+   재단이 적어 둔 금액 칸은 조건까지 함께 적혀 있어(`※ 타 장학금을 지급 받은 대학생은…`)
+   길면 150자다. 카드에서 넘치면 그 줄이 카드를 통째로 밀어내 목록을 훑을 수 없다. */
+function cut(t, n) { const s = String(t).trim(); return s.length > n ? `${s.slice(0, n)}…` : s; }
+
+/* 층2 목록. 🔴 판정을 하지 않는다 — 배지도 적합도도 붙이지 않는다.
+   우리가 아는 것은 '재단이 이렇게 적어 뒀다'뿐이고, 그 이상을 말하면 원칙 8-1 위반이다. */
+function kosafHtml() {
+  const p = state.profile;
+  if (!kosafList.length || !p) return '';
+  /* 사는 곳이 걸린 장학금이 많아 학생 지역이 적힌 것을 앞에 둔다. **거르지는 않는다** —
+     지역 문장은 시·군·구 이름으로 적혀 있어(`익산시`) 시·도(`전북`)와 글자가 안 맞는
+     경우가 많고, 그걸로 숨기면 받을 수 있는 것을 못 보게 된다(틀린 미달이 더 나쁘다). */
+  const mine = [p.region, p.parentRegion].filter(Boolean);
+  const near = (i) => (mine.some((r) => (i.org + (i.fields['지역거주구분'] || '')).includes(r)) ? 0 : 1);
+  /* 🔴 마감 판정을 **파일에 굳히면 안 된다** — 수확 로봇은 가끔 돌고 앱은 매일 열린다.
+     받아 둔 파일이 며칠만 지나도 끝난 재단이 목록에 남는다(실제로 화면에서 「마감」 배지를
+     달고 떠 있었다). 층1의 `dday(...).days >= 0` 과 같은 기준으로 **그릴 때마다** 다시 본다.
+     상시 제도가 아니라 마감이 늘 있으므로 층1의 유예(CLOSED_KEEP_DAYS)는 두지 않는다 —
+     신청 기록이 없어 지난 것을 남겨 둘 이유가 없다. */
+  const open = kosafList.filter((i) => dday(i.due).days >= 0);
+  if (!open.length) return '';
+  const list = open.slice().sort((a, b) => near(a) - near(b) || (a.due < b.due ? -1 : 1)).slice(0, 30);
+  const head = `<div class="section-head" style="margin-top:4px"><h3>한국장학재단에 등록된 재단 장학금</h3>
+    <span class="link-btn">${open.length}곳 모집 중</span></div>
+    <p class="empty" style="margin:0 0 10px;text-align:left">
+      재단이 한국장학재단에 올린 정보를 그대로 옮긴 목록이에요.
+      우리가 공고 원문을 읽은 것이 아니라서 <strong>자격 진단·신청서 작성은 지원하지 않아요</strong> —
+      신청 전에 재단 홈페이지에서 꼭 확인하세요.</p>`;
+  return head + '<div class="card-list" style="margin-bottom:18px">' + list.map((i) => `
+    <button class="sch-card" data-kosaf="${esc(i.code)}">
+      <div class="sch-top">
+        <span class="badge badge-out">교외</span>
+        <span class="badge badge-dday ${dday(i.due).cls}">${dday(i.due).label}</span>
+        <span class="badge badge-auto">한국장학재단 정보</span>
+      </div>
+      <p class="sch-name">${esc(i.name)}</p>
+      <p class="sch-amount">${esc(cut(i.fields['지원금액'] || '금액은 재단 홈페이지에서 확인', 52))}</p>
+      <p class="sch-provider">${esc(i.org)} · ${esc(i.kind)}</p>
+    </button>`).join('') + '</div>'
+    + (open.length > list.length
+      ? `<p class="data-note">가까운 순서로 30곳만 보여 주고 있어요 (모집 중 ${open.length}곳).</p>` : '');
+}
+
+/* 층2 상세 — **재단이 적어 둔 칸을 그대로** 보여 준다. 우리가 덧붙이는 문장은 없다.
+   🔴 선발공고문 첨부 주소는 넣지 않는다: KOSAF 가 Referer 를 검사하는데 앱은 리퍼러를
+      보내지 않아 학생이 누르면 "비정상적인 접근"이 뜬다(설계 문서 ②의 ⚠️). */
+function openKosafDetail(code) {
+  const i = kosafList.find((x) => x.code === code);
+  if (!i) return;
+  openSheetShell();
+  /* 🔴 시트 그릇은 층1과 **같은 마크업**을 쓴다 (sheet-handle / sheet-body / sheet-title …).
+     제 클래스를 새로 지으면 쓸어 닫기·여백·글꼴이 층1과 미묘하게 달라진다. */
+  $('#detail-sheet').innerHTML = `
+    <div class="sheet-handle"></div>
+    <div class="sheet-body">
+      <div class="sch-top">
+        <span class="badge badge-out">교외</span>
+        <span class="badge badge-dday ${dday(i.due).cls}">${dday(i.due).label}</span>
+        <span class="badge badge-auto">한국장학재단 정보</span>
+      </div>
+      <h3 class="sheet-title">${esc(i.name)}</h3>
+      <p class="sheet-provider">${esc(i.org)} · ${esc(i.kind)}</p>
+      ${i.fields['지원금액'] ? `<p class="sheet-amount">${esc(i.fields['지원금액'])}</p>` : ''}
+
+      <h4>재단이 올린 내용 <span class="channel-tag">그대로</span></h4>
+      <ul class="doc-list">${Object.entries(i.fields)
+    /* 지원금액은 바로 위 sheet-amount 에 이미 있다 — 두 번 쓰면 같은 문단이 연달아 나온다 */
+    .filter(([k]) => k !== '지원금액')
+    .map(([k, v]) => `<li><strong>${esc(k)}</strong> ${esc(v)}</li>`).join('')}</ul>
+      <p class="doc-legend">이 목록은 재단이 한국장학재단에 올린 정보예요. 앱이 공고 원문을 읽은 것이 아니라서
+        <strong>자격을 판정하거나 신청서를 만들어 주지 않아요</strong> — 신청 전에 재단 홈페이지에서 꼭 확인하세요.</p>
+
+      ${i.home
+    ? `<a class="btn btn-primary" href="${esc(safeUrl(i.home))}" target="_blank" rel="noopener">재단 홈페이지에서 확인 ↗</a>`
+    : '<p class="doc-legend">재단 홈페이지 주소가 없어요. 위 문의처로 연락해 주세요.</p>'}
+    </div>`;
 }
 
 function liveNoticesHtml() {
@@ -2520,6 +2617,8 @@ function bindEvents() {
        삭제 버튼을 보려던 학생이 매번 시트를 닫아야 한다. 선택 모드에서도 열지 않는다. */
     if (Date.now() - lastSwipeAt < 350) return;
     if (e.target.closest('[data-del]') || e.target.closest('[data-pick]')) return;
+    const kosaf = e.target.closest('[data-kosaf]');
+    if (kosaf) { openKosafDetail(kosaf.dataset.kosaf); return; }
     const card = e.target.closest('[data-detail]');
     if (!card) return;
     if (appsSelectMode && card.closest('#apps-list')) {
@@ -2672,6 +2771,7 @@ document.addEventListener('visibilitychange', () => {
   lastFgRefresh = Date.now();
   loadNotices();
   loadRegistered();
+  loadKosaf();
   if (typeof loadFormTemplates === 'function') loadFormTemplates();
   if (swReg) swReg.update().catch(() => {});
 });
@@ -2979,6 +3079,7 @@ bindEvents();
 initOnboarding();
 loadNotices();
 loadRegistered();
+loadKosaf();
 loadMajors();   // 학교별 학과 목록 — 온보딩 학과 자동추천이 그 학교 것만 보게
 loadTuition();  // 학교별 등록금 — `수업료 100%` 비율형 공고를 원으로 바꾸는 데 쓴다
 if (typeof loadFormTemplates === 'function') loadFormTemplates(); // 정식 등록 양식 최신화

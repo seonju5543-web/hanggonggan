@@ -81,22 +81,41 @@ async function dismissNotify(page) {
   await page.click('.nav-item[data-nav="explore"]');
   await page.waitForTimeout(600);
   const target = await page.evaluate(() => {
+    const storyOf = (s) => (!s || !s.formId || !FORM_TEMPLATES[s.formId] ? []
+      : (FORM_TEMPLATES[s.formId].sections || []).flatMap((x) => x.fields || [])
+        .filter((f) => f.type === 'textarea' && f.kind === 'story'));
+    /* 🔴 신청 버튼이 **실제로 열리는** 공고만 집는다 (2026-08-30).
+       위 주석은 늘 '마감 안 된'이라고 말했지만 코드는 아무것도 안 보고 있었다.
+       앱이 신청을 여는 조건은 둘이다 — 마감 전이고, 자격 판정이 unknown·미달이 아닐 것.
+       🔴 조건을 베끼지 말고 **앱의 함수를 그대로 쓴다**(evaluate·dday) — 베끼면
+       앱이 조건을 바꿔도 이 검사만 옛 조건으로 남는다. */
+    const usable = (s) => dday(s.deadline).days >= 0
+      && ['eligible', 'selective'].includes(evaluate(s, state.profile).status);
     /* 🔴 화면에 실제로 뜬 카드 중에서 고른다. registeredList 전체에서 고르면
        '이 학생에게 안 보이는 학교한정 공고'를 집어 검사가 열리지도 않는다
        (첫 시도에 중앙대 공고를 집어 그렇게 됐다). */
-    for (const el of document.querySelectorAll('#explore-list [data-detail]')) {
-      const id = el.dataset.detail;
-      const s = (typeof registeredList !== 'undefined' ? registeredList : []).find((x) => x.id === id);
-      if (!s || !s.formId || !FORM_TEMPLATES[s.formId]) continue;
-      const tpl = FORM_TEMPLATES[s.formId];
-      const story = (tpl.sections || []).flatMap((x) => x.fields || [])
-        .filter((f) => f.type === 'textarea' && f.kind === 'story');
-      if (story.length) return { id: s.id, name: s.name, formId: s.formId, story: story.length };
+    const visible = [...document.querySelectorAll('#explore-list [data-detail]')]
+      .map((el) => registeredList.find((x) => x.id === el.dataset.detail)).filter(Boolean);
+    for (const s of visible) if (usable(s) && storyOf(s).length) {
+      return { id: s.id, name: s.name, formId: s.formId, story: storyOf(s).length, injected: false };
     }
-    return null;
+    /* 🔴 하나도 없으면 **조용히 건너뛰지 않는다** — 그러면 44항목이 통째로 안 돌고
+       초록불만 남는다(2026-08-30 실제로 그랬다: 마감일 파서를 고쳐 진짜 마감이 채워지자
+       마감 전 + 자격 통과 + 서술형 양식인 공고가 이 학생에게 0건이 됐다).
+       이 검사가 보는 것은 **서류 도우미 화면**이지 마감·자격 판정이 아니므로,
+       자격은 통과하는 공고의 마감만 앞당겨 픽스처로 쓴다(README ③ — 드라이버가 스스로 주입). */
+    /* '이 학생에게 보이는가'는 앱의 scopedToProfile 이 정한다 — 여기 베끼면 갈라진다 */
+    const relaxable = scopedToProfile(registeredList, state.profile).find((s) => storyOf(s).length
+      && ['eligible', 'selective'].includes(evaluate(s, state.profile).status));
+    if (!relaxable) return null;
+    const d = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
+    relaxable.deadline = d;
+    renderExplore();
+    return { id: relaxable.id, name: relaxable.name, formId: relaxable.formId,
+      story: storyOf(relaxable).length, injected: true };
   });
-  console.log(`\n대상 공고: ${target ? `${target.name} (${target.formId} · story ${target.story}칸)` : '없음'}`);
-  if (!target) { console.log('마감 전 + story 칸이 있는 양식 공고가 없습니다 — 건너뜁니다.'); await browser.close(); process.exit(0); }
+  console.log(`\n대상 공고: ${target ? `${target.name} (${target.formId} · story ${target.story}칸)${target.injected ? ' ⚠️ 마감 전인 공고가 없어 이 공고의 마감만 앞당겨 씁니다(픽스처)' : ''}` : '없음'}`);
+  if (!target) { console.log('서술형 양식 + 자격 통과 공고가 하나도 없습니다 — 건너뜁니다.'); await browser.close(); process.exit(0); }
 
   const openForm = async () => {
     await page.click('.nav-item[data-nav="explore"]');

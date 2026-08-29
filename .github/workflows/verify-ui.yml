@@ -77,7 +77,7 @@ jobs:
                    verify-registered.js verify-chat.js verify-apps-manage.js \
                    verify-supabase.js verify-essay-ui.js verify-forms-data.js \
                    verify-new-forms.js verify-source-links.js verify-push-client.js \
-                   verify-notify.js verify-sheet-back.js; do
+                   verify-notify.js verify-sheet-back.js verify-kosaf.js; do
             echo "── $f"
             node "verify/$f"
           done

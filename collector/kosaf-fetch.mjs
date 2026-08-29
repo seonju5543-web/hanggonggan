@@ -23,6 +23,7 @@
  * 결과: data/kosaf.json
  */
 import fs from 'node:fs';
+import { slimKosaf } from './kosaf-open.mjs';
 
 const BASE = 'https://portal.kosaf.go.kr';
 const LIST = `${BASE}/CO/jspAction.do?beanName=PTSMCstmDsgnGoodsSVC&methodName=getItgnSrchCstmDsgnGoodsList`
@@ -169,8 +170,8 @@ list.sort((a, b) => a.no - b.no);
 console.log(`목록 확보: ${list.length}건`);
 
 let got = 0;
+const today = new Date().toISOString().slice(0, 10);
 if (!LIST_ONLY) {
-  const today = new Date().toISOString().slice(0, 10);
   /* 마감이 지난 것도 **자격은 그대로 쓸 수 있다**(자격은 잘 안 바뀐다). 다만 시간이 드니
      아직 유효한 것을 먼저 받고, --max 로 끊는다. */
   const order = [...list].sort((a, b) => (b.due >= today ? 1 : 0) - (a.due >= today ? 1 : 0));
@@ -204,6 +205,11 @@ if (WRITE) {
   };
   fs.writeFileSync(new URL('../data/kosaf.json', import.meta.url), `${JSON.stringify(out, null, 1)}\n`);
   console.log('→ data/kosaf.json 저장');
+  /* 앱이 받는 것은 이 큰 파일이 아니라 **마감 전만 추린 것**이다 — 같이 갱신하지 않으면
+     앱의 층2가 낡은 채로 남는다(둘을 따로 돌리게 두면 반드시 잊는다). */
+  const slim = slimKosaf(out, today);
+  fs.writeFileSync(new URL('../data/kosaf-open.json', import.meta.url), `${JSON.stringify(slim, null, 1)}\n`);
+  console.log(`→ data/kosaf-open.json 저장 (마감 전 ${slim.count}건)`);
 } else {
   console.log('(미리보기 — 저장하려면 --write)');
 }
