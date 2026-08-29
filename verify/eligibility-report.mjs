@@ -209,12 +209,21 @@ const inconsistent = [];
       if (fd.unread) continue;
       const marks = (M.requirementLines(it, it.eligibilityLines) || [])
         .map((l) => M.requirementMatch(l, p, it));
-      if (fd.pct === 100 && marks.some((v) => v !== 'ok'))
-        inconsistent.push({ id: it.id, why: '적합도 100%인데 ✓가 아닌 자격 줄이 있다', line: `${fd.met}/${fd.total}` });
-      else if (fd.pct > 0 && marks.some((v) => v === 'no'))
-        inconsistent.push({ id: it.id, why: `적합도 ${fd.pct}%인데 ✕인 줄이 있다`, line: `${fd.met}/${fd.total}` });
-      else if (fd.pct === 0 && !fd.fails.length)
-        inconsistent.push({ id: it.id, why: '0%인데 사유가 없다', line: '' });
+      /* 🔴 퍼센트가 아니라 **뜻**을 본다 (2026-08-29 · 227건 오탐을 끝낸 자리).
+         예전에는 상태를 숫자로 알아맞혔다 — 미달은 0%, 만점은 100%. 그런데 2026-08-26
+         (83f0e42)이 그 숫자를 바꿨다: 미달 0 → FIT_MIN(5) · 만점 100 → FIT_MAX(95).
+         **상수는 바뀌었는데 그 값을 읽는 이 검사는 안 바뀌어서** 세 가지가 한꺼번에 죽었다 —
+         `=== 100`·`=== 0`은 영영 참이 안 되고(죽은 가지), `pct > 0 && ✕`는 **미달을 전부**
+         모순이라 불러 경고 227건(감사 전체의 85%)을 냈다. 잡는 것 없이 소음만 낸 것이다.
+         그래서 숫자를 아예 안 본다 — 퍼센트는 화면에 보이려고 있는 값이고,
+         판정의 근거는 `met/total`과 `fails`다. 상수가 또 바뀌어도 이 검사는 안 깨진다.
+         (되돌리기 방지: test-collector 의 '적합도 상수' 절이 숫자 비교를 금지한다.) */
+      if (fd.total && fd.met === fd.total && marks.some((v) => v !== 'ok'))
+        inconsistent.push({ id: it.id, why: '요건을 다 충족했는데 ✓가 아닌 자격 줄이 있다', line: `${fd.met}/${fd.total}` });
+      else if (!fd.fails.length && marks.some((v) => v === 'no'))
+        inconsistent.push({ id: it.id, why: '미달 사유가 없는데 ✕인 자격 줄이 있다', line: `${fd.met}/${fd.total}` });
+      else if (fd.fails.length && fd.pct !== M.FIT_MIN)
+        inconsistent.push({ id: it.id, why: '미달 사유가 있는데 미달 점수가 아니다', line: `${fd.pct}%` });
     }
   }
 }

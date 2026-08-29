@@ -1369,7 +1369,11 @@ console.log('\n■ 자격 자리의 잡음을 유형별로 세는가 (2026-08-23
   const aud = fs.readFileSync(new URL('../verify/audit-data.js', import.meta.url), 'utf8');
   eq('감사가 자격 잡음을 오류로 올린다 (경고가 아니라)', /errors\.push\(`registered:\$\{it\.id\} — 지원 자격에 \[/.test(aud), true);
   eq('  화면과 같은 함수로 본다 (감사만 통과하는 일이 없게)', /require\('\.\.\/match-engine\.js'\)/.test(aud), true);
-  eq('  글자가 상한 줄은 경고로 둔다 (버리면 진짜 요건을 잃는다)', /자격 줄의 글자가 상했습니다/.test(aud), true);
+  eq('  조각난 줄은 경고로 둔다 (버리면 진짜 요건을 잃는다)', /자격 줄이 조각나 보입니다/.test(aud), true);
+  /* 🔴 원인을 단정하지 않는다 (2026-08-29). 걸린 두 건을 원문과 대조하니 둘 다
+     학교가 문장 중간에 줄을 바꾼 것이었는데, 문구는 `(수집 단계)`라고 못 박고 있었다.
+     확인 안 한 원인을 적으면 다음 세션이 없는 버그를 쫓는다. */
+  eq('    원인을 단정하지 않는다 (수집 탓이라고 적지 않는다)', /상했습니다\(수집 단계\)/.test(aud), false);
 
   /* 화면 문 자체가 줄마다 '요건임'을 묻는가 — 이게 없으면 좋은 줄에 잡음이 얹혀 간다 */
   const eng = fs.readFileSync(new URL('../match-engine.js', import.meta.url), 'utf8');
@@ -1383,6 +1387,22 @@ console.log('\n■ 자격 자리의 잡음을 유형별로 세는가 (2026-08-23
   eq('  제외 대상은 버리지 않고 자리를 옮긴다', /if \(EXCLUDE_LINE\.test\(bare/.test(eng), true);
   /* 제외·우선 블록에는 그 잣대를 대면 안 된다 — 대면 그 블록이 통째로 사라진다 */
   eq('  제외·우선 블록에는 그 잣대를 대지 않는다', /opts\.loose \|\| opts\.keepPriority/.test(eng), true);
+}
+
+/* ── 🔴 데이터 파일을 **그 파일의 형식 그대로** 저장하는가 (2026-08-29) ──
+   `data/registered.json` 은 일부러 자동 병합에서 뺀 파일이다(여기서는 '삭제'가 뜻을 가진다).
+   그래서 형식이 바뀌면 로봇 커밋과 **파일 전체가 충돌**한다. 실제로 이 세션에서 값 두 개를
+   채우려다 `JSON.stringify(…, null, 2)` 로 저장해 **10,849줄짜리 diff** 를 만들었다.
+   저장할 때 반드시 원래 폭(1칸)과 끝 개행을 지킬 것 — 이 검사가 그걸 못 박는다. */
+console.log('\n■ 데이터 파일 형식 (2026-08-29)');
+{
+  /* 파일마다 폭이 다르다 — 하나로 통일하지 말 것. 통일하는 그 커밋이 곧 전체 충돌이다.
+     대상은 **자동 병합에서 뺀 두 파일**(CLAUDE.md: 여기서는 '삭제'가 뜻을 가진다). */
+  for (const [f, indent] of [['registered', 1], ['forms', 2]]) {
+    const raw = fs.readFileSync(new URL(`../data/${f}.json`, import.meta.url), 'utf8');
+    eq(`data/${f}.json 은 들여쓰기 ${indent}칸 + 끝 개행이다`,
+       JSON.stringify(JSON.parse(raw), null, indent) + '\n' === raw, true);
+  }
 }
 
 console.log('\n■ 링크 사냥꾼의 제목 대조 (2026-08-23)');
@@ -2744,6 +2764,50 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
   eq('  배지는 앱의 fitBadgeHtml 이 낸 것을 쓴다', /fitBadgeHtml/.test(ws) && !/지원 자격 미달'/.test(ws), true);
   eq('  신청 버튼은 앱처럼 마감도 본다', /d\.days >= 0/.test(ws), true);
   eq('  못 가져오면 조용히 넘어가지 않고 멈춘다', /throw new Error\(`app\.js 에서/.test(ws), true);
+}
+
+/* ── 🔴 적합도 상수와 감사가 갈라지지 않는가 (2026-08-29) ──
+   2026-08-24 에 만든 '퍼센트와 화면이 같은 말을 하는가' 검사는 그때의 뜻으로 쓰였다:
+   미달 = 0% · 만점 = 100%. 그런데 2026-08-26(83f0e42)이 그 뜻을 바꿨다 —
+   미달은 FIT_MIN(5), 만점은 FIT_MAX(95)가 됐다. **상수는 바뀌었는데 그 값을 읽는
+   감사는 안 바뀌어서** 세 가지가 한꺼번에 죽었다:
+     ① `pct === 100` → 95가 상한이라 영영 참이 안 된다 (죽은 가지)
+     ② `pct > 0 && ✕`  → 미달(5%)이 전부 걸린다 (경고 227건 = 전체의 85%)
+     ③ `pct === 0`     → 0이 안 나오므로 영영 참이 안 된다 (죽은 가지)
+   즉 이 검사는 8/26 이후 **아무것도 못 잡으면서 오탐만 227건** 내고 있었다.
+   되돌리기 방지: 임계값을 숫자로 적지 말고 match-engine 이 내보내는 상수를 읽는다. */
+console.log('\n■ 적합도 상수 — 감사가 match-engine 과 같은 뜻을 쓰는가 (2026-08-29)');
+{
+  const req = createRequire(import.meta.url);
+  const M = req('../match-engine.js');
+  const src = fs.readFileSync(new URL('../verify/eligibility-report.mjs', import.meta.url), 'utf8');
+
+  /* 상수가 실제로 그 뜻인지부터 — 여기가 바뀌면 아래 검사도 같이 바뀌어야 한다 */
+  eq('미달 확정 점수는 0이 아니다 (FIT_MIN)', M.FIT_MIN > 0, true);
+  eq('만점은 100이 아니다 (FIT_MAX)', M.FIT_MAX < 100, true);
+
+  /* 🔴 핵심 — 임계값을 숫자로 적어 두면 상수가 바뀔 때 조용히 갈라진다.
+     이 한 줄이 8/26 회귀를 그날 잡았을 검사다. **한 파일이 아니라 적합도를 읽는
+     도구 전부**를 본다 — 실제로 같은 커밋이 세 곳을 한꺼번에 죽였고(감사 2가지 +
+     fit-report), 파일 하나만 막았으면 나머지는 그대로 눈이 먼 채였다. */
+  const readers = ['eligibility-report.mjs', 'fit-report.mjs'];
+  const hard = readers.flatMap((f) => {
+    const t = fs.readFileSync(new URL(`../verify/${f}`, import.meta.url), 'utf8');
+    return (t.match(/\.pct\s*(===|!==|>=|<=|>|<)\s*\d+/g) || []).map((m) => `${f}: ${m}`);
+  });
+  eq('적합도를 읽는 도구가 점수를 숫자와 직접 비교하지 않는다', hard.join(' · '), '');
+  /* 미달을 세는 도구가 실제로 셀 수 있는가 — 조건이 참이 될 수 있는지 못 박는다.
+     (8/26 이후 fit-report 는 '0% 0건'만 답했다. 안 세는 검사는 통과해도 무의미하다) */
+  eq('미달을 fails 로 센다 (점수로 세면 상수가 바뀔 때 0건이 된다)',
+     /!r\.f\.unread && r\.f\.fails\.length/.test(
+       fs.readFileSync(new URL('../verify/fit-report.mjs', import.meta.url), 'utf8')), true);
+
+  /* 확정 미달은 ✕가 있는 것이 **정상**이다 — 그걸 모순이라 부르면 안 된다 */
+  const 미달 = M.fitDetail(
+    { eligibilityLines: ['직전학기 평점 4.0 이상인 학생'], eligibilityExcludes: [] },
+    { gpa: 2.3, bracket: 9, year: 2, status: '재학', credits: 12, nationality: 'korean', flags: [] });
+  eq('평점 미달 학생의 적합도는 FIT_MIN 이다', 미달.pct, M.FIT_MIN);
+  eq('  그리고 사유가 함께 있다 (사유 없는 미달은 없다)', 미달.fails.length > 0, true);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
