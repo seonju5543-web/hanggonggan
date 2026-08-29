@@ -143,5 +143,11 @@
   "at": "2026-08-28",
   "minBody": 100,
   "name": "복지장학금 (중앙대 다빈치캠퍼스, 2026-1학기)"
+ },
+ "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12191/view.do?currentpageno=1": {
+  "tries": 1,
+  "at": "2026-08-29",
+  "minBody": 100,
+  "name": "2026학년도 2학기 국가근로장학금 2차 신청 안내(1차 미신청자만 신청)"
  }
 }
