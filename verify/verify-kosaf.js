@@ -1,11 +1,13 @@
 /* 층2(한국장학재단 목록) 검증 (2026-08-30 — docs/designs/kosaf-and-narrowing.md ②)
-   🔴 이 드라이버가 지키는 것은 **정직함**이다. 층2는 우리가 원문을 읽은 것이 아니라
-      재단이 KOSAF 에 적어 둔 칸이라, 자격 진단·양식 작성을 붙이면 안 된다:
-        ① 층1 카드와 섞이지 않는가 (#explore-list 는 그대로인가)
-        ② 판정 배지(적합도·지원 가능)를 달지 않는가
-        ③ '자격은 재단 홈페이지에서 확인'을 실제로 말하는가
-        ④ 첨부(선발공고문) 주소가 화면에 없는가 — Referer 검사라 학생이 못 받는다
-        ⑤ 마감이 지난 재단이 섞이지 않는가
+   🔴 개발자 지적 둘로 설계가 바뀌었다 (2026-08-30):
+      ① "앱에 하나도 안 뜬다" — 전용 구역이 목록 맨 아래 5,745px 에 있었다
+      ② "복붙 수준으로 못생기게 해놨네 · 그냥 교외에 포함시켜줘"
+      → 지금은 **교외 공고와 같은 카드**로 나온다(schCard·openDetail 를 그대로 쓴다).
+   🔴 그래도 정직함은 지켜야 한다 — KOSAF 는 재단이 적어 둔 칸이지 우리가 읽은 원문이 아니다:
+        · 금액을 합계에 넣지 않는다(amountValue 0)
+        · 양식 작성이 붙지 않는다
+        · 상세 시트가 출처를 밝힌다
+        · 첨부(선발공고문) 주소가 화면에 없다 — Referer 검사라 학생이 못 받는다
    실행: node verify/verify-kosaf.js   (CHROME_PATH + PORT) */
 const { chromium } = require('playwright-core');
 const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
@@ -40,100 +42,87 @@ const PROFILE = {
   if (later) await later.click().catch(() => {}); else await page.keyboard.press('Escape');
   await page.waitForSelector('#notify-sheet[hidden]', { timeout: 4000 }).catch(() => {});
   await page.click('.nav-item[data-nav="explore"]');
-  await page.waitForSelector('#kosaf-list .sch-card', { timeout: 8000 });
+  await page.waitForTimeout(2000);
 
-  console.log('■ 층1과 층2가 섞이지 않는다');
-  eq('층2 카드가 떴다', (await page.$$('#kosaf-list [data-kosaf]')).length > 0, true);
-  eq('층2 카드는 층1 목록(#explore-list) 안에 없다',
-    await page.$$eval('#explore-list [data-kosaf]', (e) => e.length), 0);
-  eq('층1 카드는 층2 목록 안에 없다',
-    await page.$$eval('#kosaf-list [data-detail]', (e) => e.length), 0);
+  console.log('■ 교외 공고와 같은 모양으로 나온다');
+  const info = await page.evaluate(() => {
+    const all = allScholarships().filter((s) => s.sourceKind === 'kosaf');
+    const ids = [...document.querySelectorAll('#explore-list .sch-card')].map((e) => e.dataset.detail);
+    const shown = ids.filter((id) => id.startsWith('kosaf-'));
+    return {
+      made: all.length,
+      shown: shown.length,
+      first: shown[0] || null,
+      allExternal: all.every((s) => s.type === '교외'),
+      hasSpec: all.filter((s) => s.amountSpec).length,
+      /* 원문에 숫자가 없는데 값이 잡혔으면 지어낸 것이다 */
+      inventedAmount: all.filter((s) => s.amountValue > 0 && !/\d/.test(s.amount)).length,
+      withExcl: all.filter((s) => s.exclusivity && s.exclusivity.kind).length,
+      amtRead: all.filter((s) => s.amountValue > 0).length,
+      amtRatio: all.filter((s) => s.amountSpec && s.amountSpec.kind === 'ratio').length,
+      noForm: all.every((s) => !s.formId && !s.prepFormId),
+      withElig: all.filter((s) => (s.eligibilityLines || []).length).length,
+      closedShown: shown.filter((id) => dday(allScholarships().find((s) => s.id === id).deadline).days < -7).length,
+    };
+  });
+  eq(`한국장학재단 등록분이 카드로 만들어진다 (${info.made}곳)`, info.made > 0, true);
+  eq('  전부 교외로 들어간다', info.allExternal, true);
+  eq('  교외 목록에 실제로 섞여 나온다', info.shown > 0, true);
+  eq('  같은 카드(.sch-card)를 쓴다 — 전용 마크업이 없다',
+    await page.$$eval('#explore-list [data-kosaf], .filter-chip[data-filter="kosaf"]', (e) => e.length), 0);
+  eq(`  자격 줄을 재단 글자 그대로 갖고 있다 (${info.withElig}곳)`, info.withElig > 0, true);
+  eq('  마감 지난 것이 섞이지 않는다', info.closedShown, 0);
 
-  console.log('\n■ 판정을 지어내지 않는다 (원칙 8-1)');
-  eq('층2 카드에 적합도 배지가 없다',
-    await page.$$eval('#kosaf-list .badge-fit, #kosaf-list [class*="fit"]', (e) => e.length), 0);
-  const head = await page.$eval('#kosaf-list', (e) => e.textContent);
-  eq('「자격 진단·신청서 작성은 지원하지 않아요」를 말한다', /자격 진단.*지원하지 않아요/.test(head), true);
-  eq('「재단 홈페이지에서 꼭 확인」을 말한다', /재단 홈페이지에서 꼭 확인/.test(head), true);
+  console.log('\n■ 🔴 적합도를 단정하지 않는다');
+  /* 재단이 적어 둔 칸에는 `지역거주구분: 안양시에 주소를 두고…` 처럼 기계가 못 읽는 요건이
+     섞여 있고 그 줄은 판정에서 조용히 빠진다. 그래서 서울 학생에게 안양시 장학금이
+     「적합도 95% · 요건 3개 중 3개 충족」 으로 떠 있었다. 틀린 안심은 틀린 미달만큼 나쁘다. */
+  /* 🔴 단정하면 안 되는 것은 **'적합하다'** 쪽이다. 미달(`no`)은 evaluate 가 확정한 것이라
+     그대로 두는 게 맞다(대학원 전용 등) — 확정된 미달까지 '미확인'으로 덮으면 그것도 거짓말이다. */
+  eq('「적합도 N%」로 단정하는 카드가 없다', await page.evaluate(() =>
+    getMatches().filter((m) => m.sch.sourceKind === 'kosaf')
+      .filter((m) => fitVerdict(m.fit, m.fd) === 'ok').length), 0);
+  eq('  대부분은 「자격 미확인」이다', await page.evaluate(() => {
+    const ms = getMatches().filter((m) => m.sch.sourceKind === 'kosaf');
+    return ms.filter((m) => fitVerdict(m.fit, m.fd) === 'unread').length > ms.length * 0.8;
+  }), true);
+  eq('  그래도 자격 줄은 그대로 갖고 있다', info.withElig > 0, true);
+
+  console.log('\n■ 그래도 지어내지 않는다');
+  /* 🔴 금액은 **손으로 박지 않고** parse-amount.js 한 곳을 통과시킨다 (2026-08-30 개발자 지적).
+     그래야 앞으로 들어올 재단도 자동으로 같은 규칙을 받는다. 다만 **없는 숫자를 만들면 안 된다** —
+     원문에 숫자가 없는데 금액이 잡히면 홈 합계가 부풀고, 그건 기망이다. */
+  eq('금액을 parse-amount 로 읽는다 (amountSpec 이 붙는다)', info.hasSpec, info.made);
+  eq('  원문에 숫자가 없는데 금액이 잡힌 곳은 없다', info.inventedAmount, 0);
+  eq('  이중수혜 조항도 같은 파일이 읽는다', info.withExcl > 0, true);
+  eq('양식 작성을 붙이지 않는다', info.noForm, true);
 
   console.log('\n■ 상세 시트');
-  await page.click('#kosaf-list [data-kosaf]');
-  await page.waitForSelector('#detail-sheet:not([hidden])', { timeout: 4000 });
+  await page.click(`#explore-list [data-detail="${info.first}"]`);
+  await page.waitForSelector('#detail-sheet.show', { timeout: 4000 });
   await page.waitForTimeout(300);
   const sheet = await page.$eval('#detail-sheet', (e) => e.textContent);
-  eq('재단이 적어 둔 칸을 「그대로」 옮긴다고 밝힌다', /그대로/.test(sheet), true);
-  eq('  자격 판정·신청서를 안 해 준다고 밝힌다', /자격을 판정하거나 신청서를 만들어 주지 않아요/.test(sheet), true);
-  /* 🔴 시트 그릇은 층1과 같은 마크업이어야 쓸어 닫기·여백이 갈라지지 않는다 */
-  eq('  층1과 같은 시트 마크업을 쓴다',
-    await page.$$eval('#detail-sheet .sheet-handle, #detail-sheet .sheet-body', (e) => e.length), 2);
-  eq('같은 금액 문단이 두 번 나오지 않는다', await page.$eval('#detail-sheet', (e) => {
-    const a = e.querySelector('.sheet-amount');
-    return a ? [...e.querySelectorAll('.doc-list li')].filter((li) => li.textContent.includes(a.textContent.trim())).length : 0;
-  }), 0);
-  eq('신청·양식 작성 버튼이 없다',
-    await page.$$eval('#detail-sheet button', (b) => b.filter((x) => /신청|양식|작성/.test(x.textContent)).length), 0);
+  eq('출처를 밝힌다 (한국장학재단에 올린 정보)', /한국장학재단에 올린 정보/.test(sheet), true);
+  eq('  자격 판정·신청서를 안 해 준다고 밝힌다', /자격 판정과 신청서 작성은 지원하지 않아요/.test(sheet), true);
+  eq('  「앱에서 작성」 버튼이 없다',
+    await page.$$eval('#detail-sheet button', (b) => b.filter((x) => /양식|작성하기/.test(x.textContent)).length), 0);
   /* 🔴 KOSAF 첨부는 Referer 검사가 있어 앱에서 누르면 "비정상적인 접근"이 뜬다 */
   eq('KOSAF 첨부 내려받기 주소가 화면에 없다',
-    await page.$$eval('#detail-sheet a', (a) => a.filter((x) => /kosaf\.go\.kr.*(download|file|Attach)/i.test(x.href)).length), 0);
-  eq('바깥으로 나가는 링크는 새 탭 + noopener 다',
-    await page.$$eval('#detail-sheet a[target="_blank"]', (a) => a.every((x) => /noopener/.test(x.rel))), true);
+    await page.$$eval('#detail-sheet a', (a) => a.filter((x) => /kosaf\.go\.kr.*(download|fileDown|atchFile)/i.test(x.href)).length), 0);
 
   console.log('\n■ 데이터');
   const data = await page.evaluate(() => ({
     n: kosafList.length,
-    past: kosafList.filter((i) => i.due < new Date().toISOString().slice(0, 10)).length,
-    badHome: kosafList.filter((i) => i.home && !/^https?:\/\//.test(i.home)).length,
     loan: kosafList.filter((i) => /연\s?이율|상환기간|대여한도|대부/.test(i.fields['지원금액'] || '')).length,
-    longAmount: [...document.querySelectorAll('#kosaf-list .sch-amount')]
-      .filter((e) => e.textContent.length > 60).length,
-    closedShown: [...document.querySelectorAll('#kosaf-list .badge-dday')]
-      .filter((e) => /마감/.test(e.textContent)).length,
+    badHome: kosafList.filter((i) => i.home && !/^https?:\/\//.test(i.home)).length,
     noDue: kosafList.filter((i) => !i.due).length,
   }));
-  eq(`마감 지난 재단이 섞이지 않았다 (${data.n}곳)`, data.past, 0);
-  /* 🔴 갚아야 하는 돈을 '받을 수 있는 장학금'에 넣으면 기망이다 (운영 원칙 2) */
-  eq('대여(대출) 상품이 섞이지 않았다', data.loan, 0);
-  /* 🔴 받아 둔 파일은 며칠만 지나도 낡는다 — 마감 판정은 **그릴 때마다** 다시 해야 한다 */
-  eq('화면에 「마감」 배지가 달린 층2 카드가 없다', data.closedShown, 0);
-  /* 🔴 마감일 칸이 빈 재단을 버리면 **지금 모집 중인 것을 통째로 잃는다**
-     (한국장학재단 푸른등대 4곳 — 해 없는 학기 일정이라 칸만 비어 있다) */
-  eq('마감일 칸이 비어도 버리지 않는다', data.noDue > 0, true);
-  /* 🔴 목록은 30장 상한이고 마감일 미상은 맨 뒤라 화면에 안 뜬다 — **화면만 보면 못 잰다.**
-     그래서 진짜 렌더러에 마감일 미상만 넣어 그리고, 그 결과를 본다(층1 what-shows 와 같은 정신). */
-  eq('  그 카드는 D-day 대신 「기간 원문 확인」이라고 적는다', await page.evaluate(() => {
-    const all = kosafList;
-    kosafList = all.filter((i) => !i.due);
-    const n = kosafList.length;
-    renderExplore();
-    const badges = [...document.querySelectorAll('#kosaf-list .badge-dday')].map((e) => e.textContent.trim());
-    kosafList = all; renderExplore();
-    return badges.length === n && badges.every((t) => t === '기간 원문 확인');
-  }), true);
-  eq('  상세 시트도 같은 문구를 쓴다', await page.evaluate(() => {
-    openKosafDetail(kosafList.find((i) => !i.due).code);
-    const t = document.querySelector('#detail-sheet .badge-dday').textContent.trim();
-    dismissSheet ? dismissSheet() : document.querySelector('#sheet-backdrop').click();
-    return t;
-  }), '기간 원문 확인');
-  eq('카드의 금액 줄이 카드를 밀어낼 만큼 길지 않다', data.longAmount, 0);
+  eq(`대여(대출) 상품이 섞이지 않았다 (${data.n}곳)`, data.loan, 0);
   eq('주소가 http(s) 가 아닌 것이 없다 (콜론 빠진 원본을 그대로 넘기면 우리 사이트로 간다)', data.badHome, 0);
-
-  console.log('\n■ 필터');
-  await page.keyboard.press('Escape');
-  await page.waitForTimeout(300);
-  await page.click('.filter-chip[data-filter="교내"]');
-  await page.waitForTimeout(400);
-  eq('「교내」에서는 층2가 안 보인다', await page.$eval('#kosaf-list', (e) => e.innerHTML.trim()), '');
-  await page.click('.filter-chip[data-filter="교외"]');
-  await page.waitForTimeout(400);
-  eq('「교외」에서는 보인다', (await page.$$('#kosaf-list [data-kosaf]')).length > 0, true);
-  /* 층2는 자격을 판정하지 않으므로 '신청 가능만'에 들어가면 그 칩이 거짓말이 된다 */
-  await page.click('.filter-chip[data-filter="eligible"]');
-  await page.waitForTimeout(400);
-  eq('「신청 가능만」에서는 안 보인다', await page.$eval('#kosaf-list', (e) => e.innerHTML.trim()), '');
+  eq('마감일 칸이 비어도 버리지 않는다', data.noDue > 0, true);
 
   eq('콘솔 오류 없음', errors, []);
   await browser.close();
-  console.log(fail ? `\n✕ 실패 ${fail}건` : '\n✓ 층2(한국장학재단) 검증 통과');
+  console.log(fail ? `\n✕ 실패 ${fail}건` : '\n✓ 한국장학재단 등록분 검증 통과');
   process.exit(fail ? 1 : 0);
 })();

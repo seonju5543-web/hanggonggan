@@ -32,7 +32,12 @@ function chatSafe(fn, fallback) {
 
 function chatMatches() {
   /* 내 프로필로 판정된 전체 공고 — 화면(탐색 탭)이 쓰는 것과 같은 함수 */
-  return chatSafe(() => getMatches(), []);
+  /* 🔴 한국장학재단 등록분은 도우미가 다루지 않는다 (2026-08-30).
+     이 파일의 전제는 **우리가 읽은 공고 원문을 그대로 인용한다**는 것인데, KOSAF 는
+     재단이 적어 둔 칸이지 원문이 아니라 인용할 문장이 없다. 그대로 넣었더니
+     인용 없이 "등록 공고 4건을 찾았어요"라고 답해 버렸다(verify-chat 이 잡았다).
+     못 찾으면 지어내지 않고 '못 찾았다'고 말하는 것이 이 파일의 존재 이유다. */
+  return chatSafe(() => getMatches().filter((m) => m.sch.sourceKind !== 'kosaf'), []);
 }
 
 /* '지금 지원할 수 있는 것' — 홈 히어로와 **같은 기준**을 쓴다.
