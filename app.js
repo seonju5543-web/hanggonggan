@@ -118,10 +118,25 @@ function findSch(id) {
    자격 판정(evaluate)·적합도(fitScore)·학교 한정 필터(scopedToProfile)는 match-engine.js에 있다.
    서비스워커(백그라운드 알림)도 같은 파일을 읽어, 화면과 알림의 기준이 갈라지지 않는다. */
 
+/* 🔴 한국장학재단 등록분의 자격은 **우리가 확인한 것이 아니다** (2026-08-30).
+   그대로 두면 evaluate 가 `selective`(선발형 = 신청 가능)로 읽고, 그 status 를 믿는 곳이
+   전부 딸려 온다 — 실측: 홈 히어로 합계가 **2억 2,420만원**으로 부풀고, 일괄 신청 준비
+   118건 중 **104건이 KOSAF** 였다. 앱이 준비해 줄 수도 없는 것들이다.
+   확인 안 한 것을 '받을 수 있다'고 더하는 것은 기망이다(운영 원칙 · parse-amount 첫머리).
+   🔴 호출자마다 막지 않고 **여기 한 곳**에서 정직한 값으로 바꾼다 — getMatches 와
+      openDetail 이 같은 함수를 쓴다. 베끼면 카드와 상세가 갈라진다.
+   ⚠️ 확정된 미달(`ineligible`)은 그대로 둔다 — evaluate 가 근거를 갖고 내린 판정이라
+      '미확인'으로 덮으면 그것도 거짓말이다(배지 규칙과 같은 이유). */
+function evaluateFor(s, p) {
+  const r = evaluate(s, p);
+  return (s && s.sourceKind === 'kosaf' && r.status !== 'ineligible')
+    ? { ...r, status: 'unknown' } : r;
+}
+
 function getMatches() {
   const p = state.profile;
   return allScholarships().map((s) => {
-    const result = evaluate(s, p);
+    const result = evaluateFor(s, p);
     /* 🔴 한국장학재단 등록분은 **적합도를 단정하지 않는다** (2026-08-30).
        재단이 적어 둔 칸에는 `지역거주구분: 안양시에 주소를 두고…` 처럼 기계가 못 읽는 요건이
        섞여 있는데, 그 줄은 판정에서 조용히 빠진다. 그러면 서울 학생에게 안양시 장학금이
@@ -1765,7 +1780,7 @@ function applyAll() {
 function openDetail(id) {
   const sch = findSch(id);
   if (!sch) return;
-  const result = evaluate(sch, state.profile);
+  const result = evaluateFor(sch, state.profile);   // 카드와 같은 판정을 쓴다(위 주석)
   const fit = fitScore(sch, result, state.profile);
   const fd = fitDetail(sch, state.profile);
   const meta = STATUS_META[result.status];

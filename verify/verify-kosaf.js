@@ -97,6 +97,20 @@ const PROFILE = {
   eq('  이중수혜 조항도 같은 파일이 읽는다', info.withExcl > 0, true);
   eq('양식 작성을 붙이지 않는다', info.noForm, true);
 
+  console.log('\n■ 🔴 「받을 수 있다」고 세지 않는다');
+  /* 자격을 확인 안 한 것을 합계에 더하면 기망이다. evaluate 는 KOSAF 를 `selective`
+     (선발형 = 신청 가능)로 읽어서, 실측 홈 합계가 **2억 2,420만원**으로 부풀고
+     일괄 신청 준비 118건 중 **104건이 KOSAF** 였다(앱이 준비해 줄 수도 없는 것들). */
+  const reach = await page.evaluate(() => ({
+    bulk: bulkTargets().filter((s) => s.sourceKind === 'kosaf').length,
+    applyable: getMatches().filter((m) => m.sch.sourceKind === 'kosaf'
+      && ['eligible', 'selective'].includes(m.result.status)).length,
+    stillListed: getMatches().filter((m) => m.sch.sourceKind === 'kosaf').length,
+  }));
+  eq('일괄 신청 준비에 안 들어간다', reach.bulk, 0);
+  eq('  홈 합계가 세는 「신청 가능」에도 안 들어간다', reach.applyable, 0);
+  eq('  그래도 탐색 목록에는 그대로 남는다 (숨기는 게 아니다)', reach.stillListed > 0, true);
+
   console.log('\n■ 상세 시트');
   await page.click(`#explore-list [data-detail="${info.first}"]`);
   await page.waitForSelector('#detail-sheet.show', { timeout: 4000 });
