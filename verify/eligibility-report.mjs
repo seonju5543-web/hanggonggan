@@ -158,6 +158,7 @@ if (BAD) for (const s of suspects) console.log(`   ✕ ${s.id} [${s.why}] ${s.li
    대신 **칸끼리 대조한다**: 세 칸에 같은 줄이 있나, 자격 칸의 줄이 못 받는 조건을
    말하나, 제외 칸의 줄이 받을 조건을 말하나. 필터가 어떻게 판정했든 결과만 본다. */
 const M = require("../match-engine.js");
+const { fitInconsistency } = require("./fit-consistency.cjs");
 const misplaced = [];
 {
   const EX_TAIL = /(지원|신청|참여|참가|지급|수혜)\s*불가\s*$|제외\s*$|제외됩니다\s*$/;
@@ -205,25 +206,13 @@ const inconsistent = [];
   for (const pp of profs) {
     const p = { ...base, ...pp };
     for (const it of reg.items) {
-      const fd = M.fitDetail(it, p);
-      if (fd.unread) continue;
-      const marks = (M.requirementLines(it, it.eligibilityLines) || [])
-        .map((l) => M.requirementMatch(l, p, it));
-      /* 🔴 퍼센트가 아니라 **뜻**을 본다 (2026-08-29 · 227건 오탐을 끝낸 자리).
-         예전에는 상태를 숫자로 알아맞혔다 — 미달은 0%, 만점은 100%. 그런데 2026-08-26
-         (83f0e42)이 그 숫자를 바꿨다: 미달 0 → FIT_MIN(5) · 만점 100 → FIT_MAX(95).
-         **상수는 바뀌었는데 그 값을 읽는 이 검사는 안 바뀌어서** 세 가지가 한꺼번에 죽었다 —
-         `=== 100`·`=== 0`은 영영 참이 안 되고(죽은 가지), `pct > 0 && ✕`는 **미달을 전부**
-         모순이라 불러 경고 227건(감사 전체의 85%)을 냈다. 잡는 것 없이 소음만 낸 것이다.
-         그래서 숫자를 아예 안 본다 — 퍼센트는 화면에 보이려고 있는 값이고,
-         판정의 근거는 `met/total`과 `fails`다. 상수가 또 바뀌어도 이 검사는 안 깨진다.
-         (되돌리기 방지: test-collector 의 '적합도 상수' 절이 숫자 비교를 금지한다.) */
-      if (fd.total && fd.met === fd.total && marks.some((v) => v !== 'ok'))
-        inconsistent.push({ id: it.id, why: '요건을 다 충족했는데 ✓가 아닌 자격 줄이 있다', line: `${fd.met}/${fd.total}` });
-      else if (!fd.fails.length && marks.some((v) => v === 'no'))
-        inconsistent.push({ id: it.id, why: '미달 사유가 없는데 ✕인 자격 줄이 있다', line: `${fd.met}/${fd.total}` });
-      else if (fd.fails.length && fd.pct !== M.FIT_MIN)
-        inconsistent.push({ id: it.id, why: '미달 사유가 있는데 미달 점수가 아니다', line: `${fd.pct}%` });
+      /* 🔴 규칙은 **`verify/fit-consistency.cjs` 한 곳**에 있다 (2026-08-29).
+         예전엔 이 판정이 관문(test-collector)과 채점기(여기) 두 곳에 베껴져 있었고,
+         2026-08-26 상수 변경(미달 0 → FIT_MIN)을 관문만 따라가서 여기가 경고 227건을 냈다.
+         가지 셋 중 둘은 지우고 하나만 남겼다 — 나머지는 이 조건에 포함되거나
+         (met===total) 구조상 참이 될 수 없었다(fails 가 있으면 점수는 언제나 FIT_MIN). */
+      const bad = fitInconsistency(M, it, p);
+      if (bad) inconsistent.push({ id: it.id, ...bad });
     }
   }
 }

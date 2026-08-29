@@ -1389,20 +1389,24 @@ console.log('\n■ 자격 자리의 잡음을 유형별로 세는가 (2026-08-23
   eq('  제외·우선 블록에는 그 잣대를 대지 않는다', /opts\.loose \|\| opts\.keepPriority/.test(eng), true);
 }
 
-/* ── 🔴 데이터 파일을 **그 파일의 형식 그대로** 저장하는가 (2026-08-29) ──
-   `data/registered.json` 은 일부러 자동 병합에서 뺀 파일이다(여기서는 '삭제'가 뜻을 가진다).
+/* ── 🔴 `data/registered.json` 을 로봇과 **같은 형식**으로 저장하는가 (2026-08-29) ──
+   이 파일은 일부러 자동 병합에서 뺐다(여기서는 '삭제'가 뜻을 가진다 — CLAUDE.md).
    그래서 형식이 바뀌면 로봇 커밋과 **파일 전체가 충돌**한다. 실제로 이 세션에서 값 두 개를
    채우려다 `JSON.stringify(…, null, 2)` 로 저장해 **10,849줄짜리 diff** 를 만들었다.
-   저장할 때 반드시 원래 폭(1칸)과 끝 개행을 지킬 것 — 이 검사가 그걸 못 박는다. */
+
+   🔴 기준은 **디스크에 있는 모양이 아니라 로봇이 쓰는 모양**이다 (코드 리뷰 지적).
+   첫 판은 디스크를 그대로 고정했다가 로봇 셋을 어기게 만들 뻔했다 —
+   link-hunter·resolve-detail-urls 는 끝 개행을 **안 붙인다**. 그 상태로 CI 에 올라가면
+   사냥 결과를 저장하는 순간 관문이 빨간불이 되고, 워크플로가 그 실행분을 되돌려
+   **찾아낸 원문 주소를 통째로 버린다**(CLAUDE.md 에 같은 사고가 적혀 있다).
+   그래서 들여쓰기만 본다 — 네 로봇이 모두 `null, 1` 로 쓴다.
+   (`forms.json` 은 넣지 않았다: 디스크는 2칸인데 schematize-forms 는 1칸으로 쓴다.
+    둘 중 무엇이 맞는지는 사람이 정할 일이라 조용히 통일하지 않는다 — 개발자에게 보고.) */
 console.log('\n■ 데이터 파일 형식 (2026-08-29)');
 {
-  /* 파일마다 폭이 다르다 — 하나로 통일하지 말 것. 통일하는 그 커밋이 곧 전체 충돌이다.
-     대상은 **자동 병합에서 뺀 두 파일**(CLAUDE.md: 여기서는 '삭제'가 뜻을 가진다). */
-  for (const [f, indent] of [['registered', 1], ['forms', 2]]) {
-    const raw = fs.readFileSync(new URL(`../data/${f}.json`, import.meta.url), 'utf8');
-    eq(`data/${f}.json 은 들여쓰기 ${indent}칸 + 끝 개행이다`,
-       JSON.stringify(JSON.parse(raw), null, indent) + '\n' === raw, true);
-  }
+  const raw = fs.readFileSync(new URL('../data/registered.json', import.meta.url), 'utf8');
+  eq('data/registered.json 은 로봇과 같은 들여쓰기(1칸)다',
+     JSON.stringify(JSON.parse(raw), null, 1) === raw.replace(/\n$/, ''), true);
 }
 
 console.log('\n■ 링크 사냥꾼의 제목 대조 (2026-08-23)');
@@ -1865,6 +1869,7 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
 {
   const req = createRequire(import.meta.url);
   const M = req('../match-engine.js');
+  const FC = req('./fit-consistency.cjs');   // 판정 규칙 한 곳 (채점기와 공유)
   const P = req('../parse-requirements.js');
   const fit = (lines, p, ex) => M.fitDetail({ eligibilityLines: lines, eligibilityExcludes: ex || [] }, p);
   const 평범 = { gpa: 3.5, bracket: 5, year: 3, status: '재학', credits: 15, nationality: 'korean', flags: [] };
@@ -1876,10 +1881,10 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
   eq('평점 충족은 최고점', fit(['직전학기 평점평균 3.0 이상인 자'], 평범).pct, M.FIT_MAX);
 
   // ② 프로필에 값이 없으면 미달이 아니라 '확인 필요'
-  eq('평점을 안 적었으면 0%가 아니다', fit(['직전학기 평점평균 4.0 이상인 자'], { flags: [] }).pct > 0, true);
+  eq('평점을 안 적었으면 0%가 아니다', fit(['직전학기 평점평균 4.0 이상인 자'], { flags: [] }).fails.length === 0, true);
 
   // ③ 단위가 다르면 떨어뜨리지 않는다 (백분위 70을 평점 70으로 읽으면 전원 0%)
-  eq('백분위 요건으로는 미달을 내지 않는다', fit(['직전학기 성적 70/100 만점 이상'], 평범).pct > 0, true);
+  eq('백분위 요건으로는 미달을 내지 않는다', fit(['직전학기 성적 70/100 만점 이상'], 평범).fails.length === 0, true);
   eq('두 단위가 섞인 줄은 확신이 낮다',
     P.parseLine('평균 평점 80 점 또는 평균평점 B 학점 이상인 학생').conds[0].conf, P.LOW);
 
@@ -1891,19 +1896,19 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
   {
     const lines = ['아래 세 가지 조건 중 하나를 만족하는 자',
       '직전학기 평점평균 4.0 이상인 자', '직전학기 평점평균 3.0 이상인 자', '직전학기 평점평균 4.4 이상인 자'];
-    eq('선택지는 하나만 만족해도 0%가 아니다', fit(lines, 평범).pct > 0, true);
+    eq('선택지는 하나만 만족해도 0%가 아니다', fit(lines, 평범).fails.length === 0, true);
     eq('선택지 묶음은 요건 1개로 센다', fit(lines, 평범).total, 1);
   }
 
   // ⑥ `재학`이 부분문자열로 제외 목록에 들어가면 재학생이 통째로 0%가 된다
   eq('“수업연한 초과 재학생 지원 불가”로 재학생을 떨어뜨리지 않는다',
-    fit(['본교 재학생'], 평범, ['휴학생, 수료생 및 수업연한 초과 재학생은 지원 불가']).pct > 0, true);
+    fit(['본교 재학생'], 평범, ['휴학생, 수료생 및 수업연한 초과 재학생은 지원 불가']).fails.length === 0, true);
   eq('휴학생은 제대로 걸러낸다',
     fit(['본교 재학생'], { ...평범, status: '휴학' }, ['휴학생은 지원 불가']).pct, M.FIT_MIN);
 
   // ⑦ 제외 줄의 국적은 **같을 때만** 미달 (내국인이 0%가 됐던 오탐)
   eq('“외국인 유학생 선발 불가”로 내국인을 떨어뜨리지 않는다',
-    fit(['본교 재학생'], 평범, ['순수외국인전형으로 입학한 외국인 유학생은 선발 불가']).pct > 0, true);
+    fit(['본교 재학생'], 평범, ['순수외국인전형으로 입학한 외국인 유학생은 선발 불가']).fails.length === 0, true);
 
   // ⑧ 대학원 전용 줄은 학부생 판정에서 뺀다
   eq('대학원 전용 줄로 학부생을 떨어뜨리지 않는다',
@@ -1911,7 +1916,7 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
 
   // ⑨ 지급액 구간표를 요건으로 읽지 않는다
   eq('구간이 여러 값이면 지급액 표로 보고 미달을 내지 않는다',
-    fit(['학자금지원구간 4분위 이하', '학자금지원구간 5분위 이상 ~ 6분위 이하'], 평범).pct > 0, true);
+    fit(['학자금지원구간 4분위 이하', '학자금지원구간 5분위 이상 ~ 6분위 이하'], 평범).fails.length === 0, true);
 
   /* 🔴 **퍼센트와 화면의 ✓/✗는 갈라질 수 없어야 한다** (2026-08-24 개발자 지적).
      *"적합도가 100%인데 지원 자격에 ✕가 쳐져 있고 아예 체크도 안 된 것도 있다."*
@@ -1933,23 +1938,23 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
       { gpa: 3.5, bracket: 5, year: 2, status: '복학예정', credits: 15, flags: [] },
       { gpa: null, bracket: null, year: 3, status: null, credits: null, flags: [] },
     ];
-    let mismatch100 = 0, mismatchX = 0, muteZero = 0;
+    let mismatchX = 0, muteZero = 0;
     for (const pp of profs) {
       const p = { ...base, ...pp };
       for (const sch of reg.items) {
         const fd = M.fitDetail(sch, p);
         if (fd.unread) continue;
-        const marks = (M.requirementLines(sch, sch.eligibilityLines) || [])
-          .map((l) => M.requirementMatch(l, p, sch));
-        /* 🔴 100·0을 안 쓰기로 했으므로(2026-08-24) 상·하한으로 본다 — 예전 기준(=== 100)은
-           영영 참이 되지 않아 검사가 조용히 무력해진다. */
-        if (fd.pct === M.FIT_MAX && marks.some((v) => v !== 'ok')) mismatch100 += 1;
-        if (!fd.fails.length && marks.some((v) => v === 'no')) mismatchX += 1;
+        /* 🔴 판정 규칙은 **verify/fit-consistency.cjs 한 곳**에서 가져온다 (2026-08-29).
+           예전엔 여기와 채점기(eligibility-report)에 같은 규칙이 베껴져 있었고,
+           2026-08-26 상수 변경을 여기만 따라가서 채점기가 경고 227건을 냈다.
+           옛 `pct === FIT_MAX && !== 'ok'` 가지는 지웠다 — `!== 'ok'` 는 선택지 묶음의
+           **일부러 null 인 줄**을 모순이라 부르고(실측 재현), `=== 'no'` 로 고치면
+           아래 mismatchX 에 통째로 포함된다(전수 × 프로필 7종에서 단독 발화 0회). */
+        if (FC.fitInconsistency(M, sch, p)) mismatchX += 1;
         if (fd.fails.length && fd.pct !== M.FIT_MIN) muteZero += 1;
       }
     }
-    eq('최고점이면 모든 자격 줄이 ✓다 (등록 전수 × 프로필 9종)', mismatch100, 0);
-    eq('미달이 아니면 ✕가 있는 줄이 없다', mismatchX, 0);
+    eq('미달이 아니면 ✕가 있는 줄이 없다 (등록 전수 × 프로필 9종)', mismatchX, 0);
     eq('미달은 반드시 최저점으로 나온다', muteZero, 0);
 
     /* 🔴 개발자 지시 (2026-08-24): "100이랑 0은 없는 걸로 — 아무리 적합해도 혹시 모르니까."
@@ -2790,9 +2795,18 @@ console.log('\n■ 적합도 상수 — 감사가 match-engine 과 같은 뜻을
      이 한 줄이 8/26 회귀를 그날 잡았을 검사다. **한 파일이 아니라 적합도를 읽는
      도구 전부**를 본다 — 실제로 같은 커밋이 세 곳을 한꺼번에 죽였고(감사 2가지 +
      fit-report), 파일 하나만 막았으면 나머지는 그대로 눈이 먼 채였다. */
-  const readers = ['eligibility-report.mjs', 'fit-report.mjs'];
+  /* 🔴 관문 파일 **자신**도 넣는다 (2026-08-29 코드 리뷰 지적). 첫 판에서 여기를 빼는 바람에
+     이 파일 안에 남아 있던 같은 병 6개(`.pct > 0` — 미달이 5라 언제나 참)를 못 봤다.
+     그 6개는 '틀린 미달을 내지 않는다'를 지키던 것이라, 가장 비싼 판정이 무장 해제돼 있었다. */
+  const readers = ['eligibility-report.mjs', 'fit-report.mjs', 'test-collector.mjs'];
+  /* 주석과 문자열은 코드가 아니다 — 안 걸러내면 **이 병을 설명하는 주석마다** 걸린다
+     (실제로 바로 위 주석의 예시 글자에 걸렸다). 실행되는 코드만 본다. */
+  const codeOnly = (t) => t
+    .replace(/\/\*[\s\S]*?\*\//g, ' ')   // 여러 줄 주석
+    .replace(/(^|[^:])\/\/[^\n]*/g, '$1')  // 한 줄 주석 (URL 의 // 는 남긴다)
+    .replace(/`[^`]*`/g, ' ');             // 템플릿 문자열
   const hard = readers.flatMap((f) => {
-    const t = fs.readFileSync(new URL(`../verify/${f}`, import.meta.url), 'utf8');
+    const t = codeOnly(fs.readFileSync(new URL(`../verify/${f}`, import.meta.url), 'utf8'));
     return (t.match(/\.pct\s*(===|!==|>=|<=|>|<)\s*\d+/g) || []).map((m) => `${f}: ${m}`);
   });
   eq('적합도를 읽는 도구가 점수를 숫자와 직접 비교하지 않는다', hard.join(' · '), '');

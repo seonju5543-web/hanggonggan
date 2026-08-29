@@ -13,7 +13,7 @@ const require = createRequire(import.meta.url);
 const M = require('../match-engine.js');
 const d = require('../data/registered.json');
 
-const ZERO = process.argv.includes('--zero');
+const ZERO = process.argv.includes('--zero');   // 미달 공고의 자격 원문까지 함께 본다
 /* 대표 학생 — 아주 평범한 프로필로 잡는다(극단값이면 0%가 과하게 나온다) */
 const p = { school: '한국외국어대학교', gpa: 3.5, bracket: 5, year: 3, track: '인문', flags: [],
             status: '재학', credits: 15, nationality: 'korean', region: '서울', parentRegion: '서울', birthYear: 2004 };
@@ -32,6 +32,9 @@ for (const { s, f } of zeros) {
   f.fails.forEach((l) => console.log(`      사유: ${l.slice(0, 88)}`));
   if (ZERO) (s.eligibilityLines || []).forEach((l) => console.log(`      원문| ${l.slice(0, 88)}`));
 }
-/* 사유를 못 쓰는 미달은 파싱이 틀렸다는 뜻이다 — 설계에 못박아 둔 규칙 */
-const mute = zeros.filter((r) => !r.f.fails.length);
-if (mute.length) { console.log(`\n🚨 사유 없는 0%가 ${mute.length}건 — 설계 위반입니다`); process.exit(1); }
+/* 🔴 '사유 없는 미달' 검사는 여기서 뺐다 (2026-08-29 코드 리뷰 지적).
+   미달을 `fails` 로 세기 시작한 순간 `zeros` 는 전부 사유가 있는 것이 되어,
+   그걸 다시 거르는 `filter(!fails.length)` 는 **영영 빈 배열**이다 —
+   이 커밋이 없애려던 바로 그 죽은 가지를 새로 만든 꼴이었다.
+   같은 불변식은 관문이 지킨다: test-collector 의 '미달은 반드시 최저점으로 나온다'와
+   '평점 미달 학생의 적합도는 FIT_MIN 이다 / 그리고 사유가 함께 있다'. */

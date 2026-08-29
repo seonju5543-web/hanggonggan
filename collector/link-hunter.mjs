@@ -139,7 +139,12 @@ function huntTitle(t) {
   if (stored) return stored;
   const fromMarker = cleanTitle(markerTitle(t.ref[t.field]) || '');
   if (fromMarker) return fromMarker;
-  return String(t.title);
+  /* 🔴 마지막 폴백도 청소해서 돌려준다 (2026-08-29 코드 리뷰 지적).
+     이 값은 대조에만 쓰이는 게 아니라 **저장되기도 한다**(아래 세 곳에서
+     `t.ref.boardTitle = want|back`). 앞 두 갈래만 청소돼 있어서, 폴백을 탄 경우에만
+     부스러기가 그대로 저장됐다 — 한 곳은 `cleanTitle(want)` 로 감싸고 한 곳은 안 감싸
+     서로 달랐다. 여기서 한 번 청소하면 세 자리가 같이 낫는다(베끼지 않는다). */
+  return cleanTitle(String(t.title));
 }
 
 const report0 = [];
