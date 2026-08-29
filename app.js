@@ -1071,8 +1071,14 @@ function renderFormFill() {
       if (typeof essaySubmitReadiness === 'function') {
         const chk = essaySubmitReadiness(tpl, sch);
         const gen = e.currentTarget;
-        if (chk && !chk.submittable && !gen.dataset.forced) {
-          gen.dataset.forced = '1';
+        /* 🔴 '한 번 봤다'를 무엇에 대해 봤는지까지 기억한다 (2026-08-29 코드 리뷰 지적).
+           예전에는 `forced` 를 한 번 켜면 영영 안 껐다 — 그래서 학생이 그 뒤에 AI 초안을
+           새로 받아 `[봉사 기관명]` 이 **새로 생겨도** 관문이 두 번째부터는 아무 말 없이
+           통과시켰다. 막을 것이 달라지면 다시 한 번 세운다(같은 것이면 그대로 진행). */
+        const sig = (chk && chk.items || []).filter((i) => i.status === 'block')
+          .map((i) => `${i.id}:${i.detail}`).join('|');
+        if (chk && !chk.submittable && gen.dataset.forced !== sig) {
+          gen.dataset.forced = sig;
           if (typeof essayRenderSubmitCheck === 'function') essayRenderSubmitCheck(tpl, sch);
           const panel = $('#essay-submit-check');
           if (panel) panel.scrollIntoView({ block: 'center', behavior: 'smooth' });

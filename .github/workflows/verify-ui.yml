@@ -53,6 +53,13 @@ jobs:
       - name: 브라우저 경로 찾기
         run: echo "CHROME_PATH=$(find ~/.cache/ms-playwright -name chrome -type f | head -1)" >> $GITHUB_ENV
 
+      # 🔴 순수 모듈 검사도 여기서 돌린다 (2026-08-29 코드 리뷰 지적).
+      #    essay-playbook.yml 에도 있지만 그건 **주 1회 예약**이라, 제출 관문이 깨져도
+      #    최대 일주일 뒤에 안다. 관문은 밀어 넣는 그 순간 막아야 한다.
+      #    브라우저가 필요 없어 몇 초면 끝난다.
+      - name: 제출 관문 판정 검사 (순수 모듈)
+        run: node verify/verify-essay-submit.mjs
+
       # 드라이버마다 8123·8124 를 쓴다 (verify/README.md)
       - name: 로컬 서버 띄우기
         run: |

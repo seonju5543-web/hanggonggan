@@ -16,7 +16,7 @@ import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const {
   essaySubmitChecklist, essayCountBlanks, essayStyleMixed,
-  essaySchoolLeak, essayFocusMissing, essayParticle,
+  essaySchoolLeak, essayFocusMissing, essayParticle, essayMaybeBlankTokens,
 } = require('../essay-submit-check.js');
 
 let pass = 0, fail = 0;
@@ -48,6 +48,20 @@ ok(essayCountBlanks('[기관명]과 [활동 시간]') === 2, '이름 붙은 자�
 ok(essayCountBlanks('붙임 문서[붙임2]를 참고') === 0, '숫자가 든 대괄호는 빈칸이 아니다 (붙임2)');
 ok(essayCountBlanks('영문 [note] 표기') === 0, '한글이 없는 대괄호는 빈칸이 아니다');
 ok(essayCountBlanks('[열두 자가 넘는 아주 긴 대괄호 내용입니다]') === 0, '너무 긴 대괄호는 자리 표시가 아니다');
+/* 🔴 소제목을 자리 표시로 오해하면 멀쩡한 자소서가 막힌다 (2026-08-29 코드 리뷰 지적).
+   자소서는 `[성장 과정]` 처럼 대괄호 소제목을 쓰는 것이 흔하다. 가르는 잣대는
+   '빠진 정보를 가리키는 낱말로 끝나는가'다(기관명·시간·날짜 …). */
+ok(essayCountBlanks('[성장 과정] 저는 어려서부터 성실했습니다') === 0, '🔴 소제목 [성장 과정] 은 막지 않는다');
+ok(essayCountBlanks('[지원 동기]') === 0, '소제목 [지원 동기] 는 막지 않는다');
+ok(essayCountBlanks('[학업 계획]') === 0, '소제목 [학업 계획] 은 막지 않는다');
+ok(essayCountBlanks('[활동 시간]을 채워 주세요') === 1, '[활동 시간] 은 자리 표시다');
+ok(essayMaybeBlankTokens('[성장 과정] 저는')[0] === '[성장 과정]', '소제목은 짚어는 준다(warn)');
+{
+  const r = essaySubmitChecklist({ fields: [field({ text: '[성장 과정] 저는 어려서부터 성실하게 살아 왔습니다.' })] });
+  const b = r.items.find((i) => i.id === 'blank');
+  ok(b && b.status === 'warn', '소제목만 있으면 block 이 아니라 warn');
+  ok(r.submittable === true, '🔴 소제목이 있다고 제출을 막지 않는다');
+}
 
 head('2) 문체 혼용');
 ok(essayStyleMixed('열심히 했습니다. 앞으로도 잘할게요.') === true, '합니다체+해요체가 섞이면 잡는다');
@@ -62,17 +76,27 @@ ok(essayStyleMixed('열심히 준비했습니다. 그래서 자신 있게 지원
   '형식체 + 진짜 해요체(지원해요)는 혼용으로 잡는다');
 
 head('3) 블라인드 유출 — 학교명·별칭');
-ok(essaySchoolLeak('저는 외대에서 공부했습니다', ['한국외국어대학교', '외대']).join() === '외대',
-  '별칭 "외대"를 잡는다');
-ok(essaySchoolLeak('전공 수업을 열심히 들었습니다', ['한국외국어대학교', '외대']).length === 0,
-  '학교 이름이 없으면 빈 배열');
-/* 🔴 흔한 낱말·지명과 겹치는 짧은 별칭은 막지 않는다(코드 리뷰 지적 · block 오탐 방지) */
-ok(essaySchoolLeak('오래도록 고대하던 꿈을 이뤘습니다', ['고려대학교', '고대']).length === 0,
+/* 🔴 확신할 수 있는 것만 막는다 (2026-08-29 코드 리뷰로 전면 수정).
+   짧은 별칭을 열거해 빼는 방식은 실제 별칭표에서 7개를 놓쳐 **멀쩡한 문장을 막고 있었다**
+   ('아주 오랜'·'중대한'·'이대로'·'숙명처럼'·'한동안'·'부대끼며'·'성대하게'). */
+ok(essaySchoolLeak('저는 한국외국어대학교에서 공부했습니다', ['한국외국어대학교', '외대']).sure[0] === '한국외국어대학교',
+  '정식 명칭은 막는다(block)');
+ok(essaySchoolLeak('저는 외대에서 공부했습니다', ['한국외국어대학교', '외대']).unsure[0] === '외대',
+  '짧은 별칭 "외대"는 짚어만 준다(warn) — "해외대학"과 겹친다');
+ok(essaySchoolLeak('저는 외대에서 공부했습니다', ['한국외국어대학교', '외대']).sure.length === 0,
+  '짧은 별칭으로는 막지 않는다');
+{
+  const r = essaySchoolLeak('전공 수업을 열심히 들었습니다', ['한국외국어대학교', '외대']);
+  ok(r.sure.length === 0 && r.unsure.length === 0, '학교 이름이 없으면 둘 다 빈 배열');
+}
+/* 🔴 실제 별칭표에서 나온 오탐 — block 으로 가면 안 되는 흔한 낱말들 */
+for (const [txt, alias] of [['아주 오랜 시간 준비했습니다', '아주'], ['중대한 결정을 내렸습니다', '중대'],
+  ['이대로 포기할 수 없었습니다', '이대'], ['숙명처럼 느껴졌습니다', '숙명'],
+  ['한동안 힘들었습니다', '한동'], ['부대끼며 배웠습니다', '부대'], ['성대하게 치러졌습니다', '성대']]) {
+  ok(essaySchoolLeak(txt, [alias]).sure.length === 0, `'${txt}' 를 막지 않는다 (${alias})`);
+}
+ok(essaySchoolLeak('오래도록 고대하던 꿈을 이뤘습니다', ['고려대학교', '고대']).sure.length === 0,
   "'고대하던'을 학교(고대)로 오해해 막지 않는다");
-ok(essaySchoolLeak('연대 의식을 배웠습니다', ['연세대학교', '연대']).length === 0,
-  "'연대 의식'을 학교(연대)로 오해해 막지 않는다");
-ok(essaySchoolLeak('저는 고려대학교 학생입니다', ['고려대학교', '고대'])[0] === '고려대학교',
-  '정식 명칭은 그대로 막는다 (짧은 별칭만 예외)');
 
 head('4) 재단 정렬 — foundationFocus 반영');
 {
@@ -101,11 +125,29 @@ head('5) 점검표 조립 — 막을 것을 막는가');
 }
 {
   const r = essaySubmitChecklist({ fields: [
-    field({ blind: true, schoolTerms: ['외대'], text: '저는 외대 학생으로서 열심히 했습니다' }),
+    field({ blind: true, schoolTerms: ['한국외국어대학교', '외대'],
+      text: '저는 한국외국어대학교 학생으로서 열심히 했습니다' }),
   ] });
   const b = r.items.find((i) => i.id === 'blind');
-  ok(b && b.status === 'block', '블라인드 공고에 학교명이 남으면 block');
+  ok(b && b.status === 'block', '블라인드 공고에 정식 명칭이 남으면 block');
   ok(r.submittable === false, '① 블라인드 유출이면 제출 불가');
+}
+{
+  /* 짧은 별칭은 흔한 낱말과 겹치므로 막지 않고 짚어만 준다 — 제출은 된다 */
+  const r = essaySubmitChecklist({ fields: [
+    field({ blind: true, schoolTerms: ['한국외국어대학교', '외대'], text: '저는 외대에서 열심히 했습니다' }),
+  ] });
+  const b = r.items.find((i) => i.id === 'blind');
+  ok(b && b.status === 'warn', '짧은 별칭은 warn 이다 (block 아님)');
+  ok(r.submittable === true, '짧은 별칭만으로는 제출을 막지 않는다');
+}
+{
+  /* 🔴 확인하지 않은 것을 확인했다고 말하지 않는다 (코드 리뷰 지적) */
+  const r = essaySubmitChecklist({ fields: [field({ blind: true, schoolTerms: ['한국외국어대학교'], text: '' })] });
+  const rows = ['blind', 'style', 'own'].map((id) => r.items.find((i) => i.id === id));
+  ok(rows.every((x) => x && x.status === 'warn' && /확인하지 못했어요/.test(x.detail)),
+    '빈 글에는 "담겨 있어요/통일돼 있어요"라고 말하지 않는다');
+  ok(r.allPass === false, '빈 글은 제출 가능 ✅ 이 아니다');
 }
 {
   /* 블라인드 아님 → 블라인드 줄이 아예 없다(지어내지 않는다) */

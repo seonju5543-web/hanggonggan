@@ -45,19 +45,45 @@ const ESSAY_BLANK_RE = /\[[^\[\]\n]{0,12}\]/g;
 const ESSAY_BLANK_HANGUL = /[가-힣]/;
 const ESSAY_BLANK_DIGIT = /\d/;
 
-/** 그 대괄호 조각이 '아직 안 채운 자리'인가 */
+/* 🔴 자리 표시와 **소제목**을 갈라야 한다 (2026-08-29 코드 리뷰 지적).
+   자소서는 `[성장 과정]` `[지원 동기]` 처럼 대괄호 소제목을 쓰는 것이 흔한데,
+   짧은 한글 대괄호를 전부 자리 표시로 보면 **멀쩡한 자소서가 통째로 막힌다**(block 이라
+   더 나쁘다 — 학생을 세워 놓고 지우라고 시킨다).
+
+   가르는 법은 이 저장소 방식대로 **'자리 표시임을 증명한 것만'** 이다(자격 줄의 REQ_SIGNAL
+   과 같은 계열 — 버릴 것을 열거하지 않고 통과할 것을 증명하게 한다).
+   자리 표시는 **빠진 정보의 이름**이라 그 정보를 가리키는 낱말로 끝난다:
+   기관'명'·활동 '시간'·'날짜'·'금액'… 반면 소제목은 과정·동기·계획으로 끝난다. */
+const ESSAY_DATUM_TAIL = /(명|이름|시간|날짜|일자|기간|금액|액|횟수|점수|번호|년도|연도|주소|기관|단체)$/;
+
+/** 그 대괄호 조각이 '확실히 아직 안 채운 자리'인가 — 막아도 되는 것 */
 function essayIsBlankToken(tok) {
-  const inner = String(tok || '').slice(1, -1);
-  if (!inner.trim()) return true;                       // [] · [ ] · [   ]
+  const inner = String(tok || '').slice(1, -1).trim();
+  if (!inner) return true;                              // [] · [ ] · [   ]
   if (ESSAY_BLANK_DIGIT.test(inner)) return false;      // [붙임2] — 인용·붙임 표기
-  return ESSAY_BLANK_HANGUL.test(inner);                // [봉사 기관명] — 빠진 정보의 이름
+  if (!ESSAY_BLANK_HANGUL.test(inner)) return false;    // [note] — 영문 표기
+  return ESSAY_DATUM_TAIL.test(inner);                  // [봉사 기관명] — 빠진 정보의 이름
 }
 
-/** 찾은 자리 조각을 그대로 (같은 것은 한 번만) — 학생에게 무엇을 찾을지 보여 주려고 */
+/** 자리 표시인지 소제목인지 애매한 것 — 막지 않고 짚어만 준다 */
+function essayIsMaybeBlankToken(tok) {
+  const inner = String(tok || '').slice(1, -1).trim();
+  if (!inner) return false;
+  if (ESSAY_BLANK_DIGIT.test(inner)) return false;
+  if (!ESSAY_BLANK_HANGUL.test(inner)) return false;
+  return !ESSAY_DATUM_TAIL.test(inner);                 // [성장 과정] — 소제목일 수 있다
+}
+
+const essayUniq = (a) => a.filter((v, i) => a.indexOf(v) === i);
+
+/** 확실한 자리 표시 조각 (같은 것은 한 번만) — 학생에게 무엇을 찾을지 보여 주려고 */
 function essayBlankTokens(text) {
-  const m = String(text || '').match(ESSAY_BLANK_RE) || [];
-  const hit = m.filter(essayIsBlankToken);
-  return hit.filter((v, i) => hit.indexOf(v) === i);
+  return essayUniq((String(text || '').match(ESSAY_BLANK_RE) || []).filter(essayIsBlankToken));
+}
+
+/** 애매한 대괄호 조각 — 소제목일 수도 있어 막지 않고 확인만 권한다 */
+function essayMaybeBlankTokens(text) {
+  return essayUniq((String(text || '').match(ESSAY_BLANK_RE) || []).filter(essayIsMaybeBlankToken));
 }
 
 function essayCountBlanks(text) {
@@ -106,16 +132,31 @@ function essayTooShort(text) {
    🔴 이 판정은 서버 scrubSchool(server/essay/draft-guard.mjs)과 두 벌이다. 서버는 어간
       변형(…대학교/…대학/…대)까지 지운다. 별칭표에 그 꼴이 이미 있으면(외대·한국외대·한외대)
       여기서도 잡히고, 없는 어간은 이 그물을 빠져나갈 수 있다 — 그때도 서버가 마지막에 지운다. */
-const ESSAY_LEAK_DENY = new Set(['고대', '연대', '서울', '부산', '상주', '밀양']);
+/* 🔴 짧은 별칭은 **막지 않는다** — 흔한 낱말과 겹친다 (2026-08-29 코드 리뷰로 전면 수정).
+   처음에는 겹치는 별칭을 열거해 빼려 했는데(고대·연대…), 실제 별칭표(data.js UNIV_ALIASES)로
+   재 보니 열거에서 빠진 것들이 **멀쩡한 문장을 통째로 막고 있었다**:
+     '아주 오랜' → 아주(아주대) · '중대한' → 중대(중앙대) · '이대로' → 이대(이화여대)
+     '숙명처럼' → 숙명 · '한동안' → 한동 · '부대끼며' → 부대(부산대) · '성대하게' → 성대(성균관대)
+   열거는 언제나 뒤처진다 — 이 저장소가 자격 잡음에서 이미 배운 것이다("버릴 것을 열거하는
+   대신 줄마다 '요건임'을 증명해야 나간다").
+
+   그래서 **확신할 수 있는 것만 막는다**: 네 글자 이상(정식 명칭 `한국외국어대학교`,
+   긴 별칭 `한국외대`)은 흔한 낱말과 겹칠 일이 사실상 없다. 두세 글자 별칭(`외대`·`고려대`)은
+   '해외대학'·'고려대상' 처럼 겹치므로 **막지 않고 짚어만 준다**(warn).
+   놓친 것은 서버 `scrubSchool`(server/essay/draft-guard.mjs)이 AI 초안에서 실제로 지운다 —
+   이 점검표는 학생이 손으로 친 글을 위한 그물이지 마지막 방어선이 아니다. */
+const ESSAY_LEAK_SURE_LEN = 4;
+
+/** 블라인드 공고에 학교 이름이 남았나. @returns {{sure:string[], unsure:string[]}} */
 function essaySchoolLeak(text, terms) {
   const body = String(text || '');
-  const seen = [];
+  const sure = [], unsure = [];
   for (const x of terms || []) {
-    if (!x || x.length < 2) continue;
-    if (x.length < 4 && ESSAY_LEAK_DENY.has(x)) continue;   // 흔한 낱말·지명과 겹치는 짧은 별칭은 막지 않는다
-    if (body.includes(x) && !seen.includes(x)) seen.push(x);
+    if (!x || x.length < 2 || !body.includes(x)) continue;
+    const bin = x.length >= ESSAY_LEAK_SURE_LEN ? sure : unsure;
+    if (!bin.includes(x)) bin.push(x);
   }
-  return seen;
+  return { sure, unsure };
 }
 
 /* ── 재단 정렬 — 이 재단이 보는 것(focus)이 글에 등장했나 ──
@@ -165,28 +206,50 @@ function essaySubmitChecklist(input) {
   const items = [];
   const firstLabel = (arr) => (arr[0] && arr[0].label) ? arr[0].label.replace(/\s+/g, ' ') : '';
 
-  /* ① 빈칸 — block. 그대로 내면 문서에 대괄호가 그대로 찍힌다.
+  /* ① 빈칸 — 확실한 자리 표시는 block, 소제목일 수 있는 것은 warn.
      🔴 찾은 자리를 **그대로 보여 준다** — `[봉사 기관명]` 처럼 이름이 붙어 있어서,
         '[ ] 가 있어요'라고만 하면 학생이 글에서 무엇을 찾아야 할지 모른다. */
-  const blankFields = fields.filter((f) => essayCountBlanks(f.text) > 0);
-  items.push(blankFields.length
-    ? { id: 'blank', label: '빈칸이 남지 않았는가', status: 'block',
-        detail: `${firstLabel(blankFields)} 칸에 아직 채우지 못한 자리가 있어요 — `
-          + `${(() => { const t = essayBlankTokens(blankFields[0].text).slice(0, 3);
-              return `${t.join(' ')}${essayParticle(t[t.length - 1], '을', '를')}`; })()} 직접 채워 주세요` }
-    : { id: 'blank', label: '빈칸이 남지 않았는가', status: 'pass', detail: '채우지 못한 자리가 없어요' });
+  const blankFields = fields.filter((f) => essayBlankTokens(f.text).length);
+  const maybeFields = fields.filter((f) => essayMaybeBlankTokens(f.text).length);
+  if (blankFields.length) {
+    const t = essayBlankTokens(blankFields[0].text).slice(0, 3);
+    items.push({ id: 'blank', label: '빈칸이 남지 않았는가', status: 'block',
+      detail: `${firstLabel(blankFields)} 칸에 아직 채우지 못한 자리가 있어요 — `
+        + `${t.join(' ')}${essayParticle(t[t.length - 1], '을', '를')} 직접 채워 주세요` });
+  } else if (maybeFields.length) {
+    /* 소제목(`[성장 과정]`)일 수도 있고 채우다 만 자리일 수도 있다. 확신이 없으니 막지 않는다. */
+    const t = essayMaybeBlankTokens(maybeFields[0].text).slice(0, 3);
+    items.push({ id: 'blank', label: '빈칸이 남지 않았는가', status: 'warn',
+      detail: `${firstLabel(maybeFields)} 칸의 ${t.join(' ')}${essayParticle(t[t.length - 1], '이', '가')} `
+        + `소제목이면 그대로 두시고, 채우다 만 자리면 채워 주세요` });
+  } else {
+    items.push({ id: 'blank', label: '빈칸이 남지 않았는가', status: 'pass', detail: '채우지 못한 자리가 없어요' });
+  }
 
-  /* ② 블라인드 유출 — block. 블라인드 공고가 아닐 땐 이 줄을 넣지 않는다. */
+  /* ② 블라인드 유출 — 정식 명칭·긴 별칭은 block, 짧은 별칭은 warn(흔한 낱말과 겹친다).
+     블라인드 공고가 아닐 땐 이 줄을 아예 넣지 않는다.
+     🔴 글이 아직 없는 칸은 세지 않는다 — 빈 글을 두고 '학교 이름이 없어요'라고 말하면
+        확인하지도 않은 것을 확인했다고 하는 셈이다(코드 리뷰 지적). */
   const blindFields = fields.filter((f) => f.blind);
   if (blindFields.length) {
-    const leaked = blindFields
-      .map((f) => ({ label: f.label, hit: essaySchoolLeak(f.text, f.schoolTerms) }))
-      .filter((x) => x.hit.length);
-    items.push(leaked.length
+    const written = blindFields.filter((f) => String(f.text || '').trim().length > 0);
+    const leaks = written.map((f) => ({ label: f.label, hit: essaySchoolLeak(f.text, f.schoolTerms) }));
+    const sure = leaks.filter((x) => x.hit.sure.length);
+    const unsure = leaks.filter((x) => !x.hit.sure.length && x.hit.unsure.length);
+    const say = (list, key) => `'${list[0].hit[key].join("', '")}'`;
+    items.push(sure.length
       ? { id: 'blind', label: '학교 이름을 쓰지 않았는가 (블라인드)', status: 'block',
-          detail: `이 공고는 학교 이름을 쓰면 심사에서 제외돼요 — '${leaked[0].hit.join("', '")}'${essayParticle(leaked[0].hit[leaked[0].hit.length - 1], '을', '를')} 지워 주세요` }
-      : { id: 'blind', label: '학교 이름을 쓰지 않았는가 (블라인드)', status: 'pass',
-          detail: '학교 이름이 글에 들어 있지 않아요' });
+          detail: `이 공고는 학교 이름을 쓰면 심사에서 제외돼요 — ${say(sure, 'sure')}`
+            + `${essayParticle(sure[0].hit.sure[sure[0].hit.sure.length - 1], '을', '를')} 지워 주세요` }
+      : unsure.length
+      ? { id: 'blind', label: '학교 이름을 쓰지 않았는가 (블라인드)', status: 'warn',
+          detail: `${say(unsure, 'unsure')}가 학교를 가리키는 말이면 지워 주세요 — `
+            + `이 공고는 학교 이름을 쓰면 심사에서 제외돼요 (다른 뜻으로 쓰셨다면 그대로 두세요)` }
+      : written.length
+      ? { id: 'blind', label: '학교 이름을 쓰지 않았는가 (블라인드)', status: 'pass',
+          detail: '학교 이름이 글에 들어 있지 않아요' }
+      : { id: 'blind', label: '학교 이름을 쓰지 않았는가 (블라인드)', status: 'warn',
+          detail: '아직 글이 없어 확인하지 못했어요 — 이 공고는 학교 이름을 쓰면 심사에서 제외돼요' });
   }
 
   /* ③ 분량 — warn. 규정 벗어남(essay-quality 판정 · 문턱이 갈라지지 않게)에다,
@@ -201,15 +264,23 @@ function essaySubmitChecklist(input) {
         detail: `${firstLabel(overBand)} 칸의 분량을 공고 규정에 맞춰 주세요` }
     : { id: 'length', label: '분량이 공고 규정 안인가', status: 'pass', detail: '분량이 적당해요' });
 
-  /* ④ 문체 혼용 — warn. */
-  const mixed = fields.filter((f) => essayStyleMixed(f.text));
+  /* ④ 문체 혼용 — warn.
+     🔴 글이 없는 칸은 세지 않는다. 빈 글에 '문체가 하나로 통일돼 있어요'라고 말하는 것은
+        확인하지 않은 것을 확인했다고 하는 것이다(코드 리뷰 지적 · 원칙 8-1 계열). */
+  /* 🔴 '확인할 글이 있나'는 **글자가 있나**로 본다 — essayTooShort(20자)로 보면
+     짧지만 분명히 쓴 글까지 '아직 글이 없어요'가 되어 또 다른 거짓말이 된다.
+     20자 문턱은 분량 줄(③)에서 '아직 안 채웠다'를 말하는 용도다. */
+  const written = fields.filter((f) => String(f.text || '').trim().length > 0);
+  const mixed = written.filter((f) => essayStyleMixed(f.text));
   items.push(mixed.length
     ? { id: 'style', label: '문체가 섞이지 않았는가', status: 'warn',
         detail: `${firstLabel(mixed)} 칸에 '합니다체'와 '해요체'가 섞여 있어요 — 하나로 맞춰 주세요` }
-    : { id: 'style', label: '문체가 섞이지 않았는가', status: 'pass', detail: '문체가 하나로 통일돼 있어요' });
+    : written.length
+    ? { id: 'style', label: '문체가 섞이지 않았는가', status: 'pass', detail: '문체가 하나로 통일돼 있어요' }
+    : { id: 'style', label: '문체가 섞이지 않았는가', status: 'warn', detail: '아직 글이 없어 확인하지 못했어요' });
 
   /* ⑤ 재단 정렬 — warn. 공고가 밝힌 것이 없으면(focus 없음) 이 줄을 넣지 않는다. */
-  const focusRows = fields
+  const focusRows = written
     .map((f) => ({ label: f.label, miss: essayFocusMissing(f.text, f.focus) }))
     .filter((x) => x.miss !== null);
   if (focusRows.length) {
@@ -221,12 +292,15 @@ function essaySubmitChecklist(input) {
           detail: '재단이 보는 것이 글에 담겨 있어요' });
   }
 
-  /* ⑥ 직접 쓴 이야기 — warn. essay-quality 판정을 그대로 쓴다. */
-  const noOwn = fields.filter((f) => f.ownWarn);
+  /* ⑥ 직접 쓴 이야기 — warn. essay-quality 판정을 그대로 쓴다.
+     🔴 여기도 글이 있는 칸만 본다(④와 같은 이유). */
+  const noOwn = written.filter((f) => f.ownWarn);
   items.push(noOwn.length
     ? { id: 'own', label: '직접 쓴 이야기가 담겼는가', status: 'warn',
         detail: `${firstLabel(noOwn)} 칸에 직접 겪은 이야기가 한 줄 들어가면 훨씬 좋아져요` }
-    : { id: 'own', label: '직접 쓴 이야기가 담겼는가', status: 'pass', detail: '직접 쓴 이야기가 담겨 있어요' });
+    : written.length
+    ? { id: 'own', label: '직접 쓴 이야기가 담겼는가', status: 'pass', detail: '직접 쓴 이야기가 담겨 있어요' }
+    : { id: 'own', label: '직접 쓴 이야기가 담겼는가', status: 'warn', detail: '아직 글이 없어 확인하지 못했어요' });
 
   const submittable = !items.some((i) => i.status === 'block');
   const allPass = items.every((i) => i.status === 'pass');
@@ -236,7 +310,8 @@ function essaySubmitChecklist(input) {
 /* ── 브라우저 전역 (essay.js 가 부르는 이름) ── */
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
-    essaySubmitChecklist, essayCountBlanks, essayBlankTokens, essayIsBlankToken, essayParticle, essayStyleMixed, essayTooShort,
+    essaySubmitChecklist, essayCountBlanks, essayBlankTokens, essayMaybeBlankTokens,
+    essayIsBlankToken, essayIsMaybeBlankToken, essayParticle, essayStyleMixed, essayTooShort,
     essaySchoolLeak, essayFocusMissing,
     ESSAY_BLANK_RE, ESSAY_FORMAL_RE, ESSAY_CASUAL_RE,
   };

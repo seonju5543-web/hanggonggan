@@ -333,7 +333,33 @@ async function dismissNotify(page) {
   await page.waitForTimeout(900);
   const cleared = await page.$eval('[class*="submit-check"], [class*="checklist"]', (e) => e.innerText).catch(() => '');
   ok(!cleared.includes('[봉사 기관명]'), '① 자리 표시를 지우면 그 줄이 풀린다');
-  await page.screenshot({ path: SHOT('5-submit-check') });
+
+  /* 🔴 관문이 '한 번 세우고 영영 잠들지' 않는가 (코드 리뷰가 잡은 버그의 회귀).
+     예전에는 forced 를 한 번 켜면 안 꺼서, 그 뒤에 **새로 생긴** 빈칸을 그냥 통과시켰다.
+     ⚠️ '← 질문 다시'로 돌아가면 화면을 다시 그려 버튼이 새로 만들어지므로 래치가 저절로
+        풀린다 — 그 길로 시험하면 버그가 있어도 검사가 통과한다(실제로 처음에 그렇게 짰다가
+        고친 코드를 되돌려도 초록불이 나와서 알았다). 그래서 **화면을 다시 그리지 않고
+        그 자리에서 글만 바꿔** 시험한다. */
+  await page.fill(`#fq-${fid}`, '[봉사 기관명]에서 활동했습니다. '.repeat(4));
+  await page.waitForTimeout(700);
+  await page.click('#btn-ff-generate');                 // 1) 한 번 세운다
+  await page.waitForTimeout(500);
+  ok(await page.$('.form-doc') === null, '① 빈칸이 있으면 문서로 넘어가지 않고 세운다');
+
+  /* 2) 옛 빈칸을 고치고 **다른** 빈칸을 새로 만든다 — 화면은 그대로다(같은 버튼 그대로) */
+  await page.fill(`#fq-${fid}`, '[활동 시간]을 이렇게 썼습니다. '.repeat(4));
+  await page.waitForTimeout(700);
+  await page.click('#btn-ff-generate');
+  await page.waitForTimeout(600);
+  ok(await page.$('.form-doc') === null,
+    '① 새로 생긴 빈칸에는 다시 세운다 (관문이 한 번 쓰고 잠들지 않는다)');
+
+  /* 3) 같은 빈칸이면 다시 눌러 진행된다 — 가두지 않는다 */
+  await page.click('#btn-ff-generate');
+  await page.waitForTimeout(700);
+  ok(await page.$('.form-doc') !== null, '① 같은 것이면 다시 눌러 진행된다 (학생을 가두지 않는다)');
+  await page.click('#btn-ff-back');
+  await page.waitForTimeout(500);
 
   console.log('\n[5) 실패해도 학생 글을 덮지 않는가]');
   await page.fill(`#fq-${key}`, '제가 직접 쓴 문장입니다');
