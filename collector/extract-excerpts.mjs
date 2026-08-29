@@ -19,7 +19,7 @@ import { makeStripper } from './page-boilerplate.mjs';
 /* 절 머리글 판정은 section-head.js 한 곳 — 화면(match-engine)·감사와 같은 파일을 쓴다.
    베끼면 '발췌기는 제외 절로 보는데 화면은 자격으로 보는' 어긋남이 생긴다. */
 import { createRequire as _cr } from 'node:module';
-const { isExcludeHead: shExclude } = _cr(import.meta.url)('../section-head.js');
+const { isExcludeHead: shExclude, headText: shHead } = _cr(import.meta.url)('../section-head.js');
 /* 공고문 첨부에서 글자 뽑기 — 본문이 "붙임 참조"뿐인 공고가 있다.
    🔴 **공고문만** 본다(attachment-text.mjs 첫머리 참조) — 신청서·동의서를 읽으면
    개인정보 수집 항목이 지원 자격 자리에 앉는다(실제로 겪고 되돌린 적이 있다). */
@@ -167,6 +167,97 @@ const ENT = [[/&lt;/g, '<'], [/&gt;/g, '>'], [/&quot;/g, '"'], [/&#39;|&apos;/g,
   [/&#(\d+);/g, (_, n) => String.fromCharCode(+n)],   // 숫자 표기(&#39; 등)도 함께
   [/&amp;/g, '&']];
 const unent = (s) => ENT.reduce((t, [re, ch]) => t.replace(re, ch), s);
+
+/* ============================================================================
+   마감일 읽기 (2026-08-30 신설 — 끝난 공고를 학생에게 보여주고 있었다)
+
+   교외 등록 81건 중 39건이 마감 미상이었고, 그 대부분은 **원문에 날짜가 적혀 있었다.**
+   auto-register 는 제목과 80자짜리 힌트만 보므로 본문 속 기간을 영영 못 읽는다.
+   원문을 실제로 읽는 곳은 여기 하나뿐이라 여기서 채운다(소급 적용 — 원칙 7).
+
+   🔴 아무 날짜나 주우면 안 된다. 저장된 원문에는 게시일(`2026.07.03`)·조회수와
+      **다른 공고의 제목·날짜**가 함께 들어 있다(홍익대 목록이 실제로 그렇다).
+      그래서 판정을 **이름표에 매단다**: `신청기간 :`·`접수기한 :`처럼 기간을 말하는
+      이름표 뒤에 붙은 날짜만 본다. 이름표가 없으면 읽지 않는다.
+   🔴 못 믿을 때는 **비운다.** 지어낸 마감일은 못 읽은 것보다 나쁘다 —
+      학생이 신청 기회를 통째로 놓친다(원칙 8-1).
+   ============================================================================ */
+
+/* 기간을 말하는 이름표. `연장 신청·접수 기간`처럼 앞에 말이 붙어도 잡는다.
+   🔴 **앞머리 동사가 이 파서의 방어선이다.** `게시기간`·`지급기간`·`근로기간`·`거주기간`·
+   `마일리지 산정기간`이 전부 여기서 걸러진다 — 이 목록을 넓히면(예: 맨 `기간`) 장학금을
+   **주는** 기간이 신청 마감으로 둔갑한다. 회귀는 test-collector '마감일' 절의 '읽으면 안 되는 것'. */
+const PERIOD_LABEL = /(신청|접수|모집|지원|응모|제출|추천)\s?(기간|기한|마감(일시?)?)/;
+
+/* 🔴 두 자리 해는 `(?<!\d)`로 감싼다 — 안 그러면 전화번호 `054-748-7760`의 조각이 날짜가 된다. */
+const FULL_DATE = /(?<!\d)(\d{4}|\d{2})\s?[.\-/년]\s?(\d{1,2})\s?[.\-/월]\s?(\d{1,2})(?!\d)/g;
+const BARE_DATE = /(?<!\d)(\d{1,2})\s?[.\-/월]\s?(\d{1,2})(?!\d)/g;
+/* 🔴 `-`는 범위 기호이기도 하고 전화번호의 일부이기도 하다. **숫자 사이에 낀 `-`는 아니다** —
+   `문의 02-940-5114`를 범위로 읽으면 그 뒤에 날짜가 없다는 이유로 멀쩡한 마감일이 버려진다. */
+const RANGE_SEP = /[~∼〜～–—]|(?<!\d)-|-(?!\d)/;
+
+/** 달력에 실제로 있는 날인가 (2월 31일 같은 것을 거른다) */
+function ymd(y, m, d) {
+  const year = String(y).length === 2 ? 2000 + Number(y) : Number(y);
+  const mo = Number(m), da = Number(d);
+  if (year < 2000 || year > 2100 || mo < 1 || mo > 12 || da < 1 || da > 31) return null;
+  const dt = new Date(Date.UTC(year, mo - 1, da));
+  if (dt.getUTCMonth() !== mo - 1 || dt.getUTCDate() !== da) return null;
+  return `${year}-${String(mo).padStart(2, '0')}-${String(da).padStart(2, '0')}`;
+}
+
+/** 이름표 뒤 내용에서 **끝나는 날**을 읽는다. 범위면 뒤쪽, 하나면 그것. */
+function dateFrom(value) {
+  const s = unent(value);
+  FULL_DATE.lastIndex = 0;
+  const m = FULL_DATE.exec(s);
+  if (!m) return null;
+  const start = ymd(m[1], m[2], m[3]);
+  if (!start) return null;
+
+  const tail = s.slice(m.index + m[0].length);
+  const sep = tail.search(RANGE_SEP);
+  if (sep < 0) return start;                       // `~` 없이 날짜 하나 = 그날이 마감
+  const after = tail.slice(sep + 1);
+
+  FULL_DATE.lastIndex = 0; BARE_DATE.lastIndex = 0;
+  const f = FULL_DATE.exec(after);
+  const b = BARE_DATE.exec(after);
+  if (f && (!b || f.index <= b.index)) {
+    const end = ymd(f[1], f[2], f[3]);
+    /* 🔴 끝이 시작보다 앞서면 **원문 오타다**(`2026.09.01 ~ 2025.09.03` 실제 사례).
+       해를 고쳐 주는 것은 지어내는 것이라, 통째로 비운다. */
+    return end && end >= start ? end : null;
+  }
+  if (b) {
+    /* 해가 안 적힌 끝 날짜는 시작한 해를 물려받는다. 그래도 앞서면 해를 넘긴 것
+       (`12.20 ~ 1.10`) — 이건 짐작이 아니라 범위의 뜻이 정하는 값이다. */
+    const y = Number(start.slice(0, 4));
+    return ymd(y, b[1], b[2]) >= start ? ymd(y, b[1], b[2]) : ymd(y + 1, b[1], b[2]);
+  }
+  /* 🔴 `~` 뒤에 날짜가 없으면 **시작일을 마감으로 쓰면 안 된다.**
+     `신청기간: 2026. 8. 10.(월) ~ 선발 완료시 까지` 를 8월 10일 마감으로 읽어
+     아직 열려 있는 공고를 끝난 것으로 만들 뻔했다(2026-08-30 전수 대조에서 잡았다).
+     예외는 같은 날 안의 **시각** 범위뿐이다: `2026. 8. 24.(월) 10:00 ~ 18:00`. */
+  return /^[^0-9]{0,4}\d{1,2}\s?(:\s?\d{2}|시)/.test(after) ? start : null;
+}
+
+/** 공고 원문에서 신청 마감일 하나. 못 믿으면 null. */
+function extractDeadline(text) {
+  if (!text) return null;
+  const lines = String(text).split(/\n+/).map((l) => unent(l).replace(/[ \t　]+/g, ' ').trim()).filter(Boolean);
+  for (const l of lines) {
+    if (l.length > 200) continue;
+    const i = l.search(/[:：]/);
+    if (i < 0) continue;                            // 이름표에 매단다 — 콜론이 없으면 안 읽는다
+    const label = shHead(l.slice(0, i));            // 기호·번호 떼기는 section-head.js 한 곳
+    if (label.length > 30) continue;                // 이름표는 짧다. 길면 문장이다
+    if (!PERIOD_LABEL.test(label)) continue;
+    const d = dateFrom(l.slice(i + 1));
+    if (d) return d;
+  }
+  return null;
+}
 
 /* 장학 제외 대상 — "※ 장학제외 대상자" 아래의 항목들을 원문 그대로 모은다.
    자격 절과 같은 방식으로 다음 절 머리글을 만나면 끊는다. */
@@ -408,7 +499,7 @@ function scoopQualifyLines(text) {
    이 파일은 **불러오는 순간 아래 본편이 통째로 실행되던** 구조라 규칙 하나를 시험해 보려면
    비슷한 코드를 따로 베껴야 했고(그러면 규칙이 두 벌이 된다), 검사도 '원본 글자를 읽어
    규칙이 살아 있는지만 보는' 약한 방식에 머물렀다. `EXCERPTS_AS_LIB=1`이면 본편을 건너뛴다. */
-export { extractQualifyLines, scoopQualifyLines, extractFrom, extractExcludeLines, extractPriorityLines };
+export { extractQualifyLines, scoopQualifyLines, extractFrom, extractExcludeLines, extractPriorityLines, extractDeadline };
 
 let browserBodies = {};
 try { browserBodies = JSON.parse(fs.readFileSync(new URL('extracted/browser-bodies.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
@@ -422,7 +513,7 @@ const strip = makeStripper(texts);
 let eligDocs = {};
 try { eligDocs = JSON.parse(fs.readFileSync(new URL('extracted/elig-docs.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
 
-let hit = 0, none = 0, kept = 0, cleaned = 0, fromDoc = 0;
+let hit = 0, none = 0, kept = 0, cleaned = 0, fromDoc = 0, gotDeadline = 0;
 /* 공고문 첨부에서 자격 줄을 읽는다. 본문 경로와 원문 없는 경로가 **같은 함수**를 써야
    "본문 있을 땐 읽고 없을 땐 안 읽는" 어긋남이 안 생긴다. 스캔 PDF 등 글자가 안 나오는
    것은 조용히 건너뛴다(읽은 척하는 것보다 안 읽는 편이 낫다). */
@@ -479,6 +570,25 @@ for (const it of reg.items) {
     const got = qualFromDocs(it);
     if (got.length) { qual = got; viaDoc = true; fromDoc += 1; }
   }
+  /* 마감일 — **비어 있을 때만** 채운다. 사람이 넣은 값도, auto-register 가 제목에서
+     읽은 값도 덮지 않는다(더 많이 본 쪽이 이기는 게 아니라 먼저 정해진 쪽이 이긴다). */
+  if (!it.deadline) {
+    const dl = extractDeadline(body);
+    if (dl) {
+      gotDeadline += 1;
+      if (WRITE) {
+        it.deadline = dl;
+        it.deadlineFrom = '공고 원문';
+        /* period 는 화면에 그대로 보이는 안내문이다 — 통째로 갈아치우면 '2026-2학기 1차 신청'
+           같은 맥락이 사라진다. 몰라서 적어 둔 '원문 확인' 자리에만 날짜를 끼운다. */
+        if (!it.period) it.period = `접수 ~${dl}`;
+        else if (/원문\s*확인/.test(it.period)) it.period = it.period.replace(/원문\s*확인/, `~${dl}`);
+      } else {
+        console.log(`   [마감] ${it.id} → ${dl}`);
+      }
+    }
+  }
+
   /* 🔴 **AI가 다른 출처에서 읽은 자격은 건드리지 않는다** (2026-08-23).
      아래 `delete it.eligibilityLines`는 '원문은 읽었는데 못 뽑았다 → 낡은 발췌를 남기지 않는다'는
      규칙이라 발췌 결과에는 맞다. 그런데 AI가 **공고문 PDF**에서 읽은 값까지 지웠다 —
@@ -518,6 +628,7 @@ for (const it of reg.items) {
 }
 console.log(`\n게시판 메뉴를 걷어낸 공고 ${cleaned}건`);
 console.log(`발췌 성공 ${hit}건 · 원문은 읽었으나 발췌 불가 ${none}건 · 원문 미확보라 손대지 않음 ${kept}건`);
+console.log(`마감일을 원문에서 새로 읽은 공고 ${gotDeadline}건`);
 if (WRITE) {
   fs.writeFileSync(regPath, JSON.stringify(reg, null, 1) + '\n');
   console.log('registered.json 반영 완료');
