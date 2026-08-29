@@ -97,6 +97,20 @@ async function findBoard(spec) {
       await page.waitForTimeout(3000);
       report.push(`- '${step}' 이동 → ${page.url()}`);
     }
+    /* 🔴 눌러 들어간 **그 화면의 글자**를 그대로 찍는다 (2026-08-29).
+       이 도구의 목적이 '학생 눈에 어떻게 보이는가'인데 여태 링크만 세고 있었다.
+       KOSAF 상세처럼 **클릭으로만 닿는 화면**은 checkUrl(GET)로는 영영 못 본다. */
+    const seen = await page.evaluate(() => ({
+      title: document.title || '',
+      text: (document.body.innerText || '').replace(/\s+/g, ' ').slice(0, 1600),
+      labels: [...document.querySelectorAll('th, dt, .tit, .label, caption')]
+        .map((e) => (e.textContent || '').replace(/\s+/g, ' ').trim())
+        .filter((t) => t && t.length <= 24).slice(0, 40),
+    })).catch(() => ({ title: '', text: '', labels: [] }));
+    report.push(`- 화면 제목: ${seen.title.slice(0, 90)}`);
+    if (seen.labels.length) report.push(`- **이 화면의 항목 이름들**: ${seen.labels.join(' · ')}`);
+    report.push(`- 화면 글자: ${seen.text.slice(0, 900)}`);
+
     const listUrl = page.url();
     // 이 화면의 공고 링크들을 보고한다 — 진짜 게시판이면 상세 주소가 보인다
     const rows = await page.$$eval('a[href], [onclick]', (els) => els.map((e) => ({

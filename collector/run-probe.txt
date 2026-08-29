@@ -1,14 +1,13 @@
 # 링크 정찰 실행 트리거 (push-to-run)
 #
 # checkUrl:  이 주소를 로그인 없는 새 탭에서 열어 그대로 보고 (로그인 벽인지 포함)
-# findBoard: <학교 홈> | <메뉴 > 메뉴>
+# findBoard: <시작 주소> | <눌러 들어갈 글자 > 글자>
 
-# 2026-08-23 — 개발자 지시로 남은 것을 갈라 낸다.
-#   ① 동국대·명지대가 "진짜로 본문이 비어 있는지" 확인. 진짜면 개발자에게 넘긴다.
-#   ② 동국대 장학공지 게시판의 행별 원제목을 받아 적는다 —
-#      (재)가송재단 공고의 boardTitle 이 비어 있어 링크 사냥꾼이 영영 못 찾는다.
-#      CLAUDE.md의 '미아' 유형(중앙대 11건이 3주간 헛돈 원인)과 같다.
-findBoard: https://www.dongguk.edu/article/JANGHAKNOTICE/list |
-checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765586
-checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765245
-checkUrl: https://www.mju.ac.kr/mjukr/8/subview.do
+# 2026-08-29 — 개발자 지시: 한국장학재단 통합검색의 **상세 화면**에 무엇이 있는지 확인.
+#   목록(기관명·장학금명·모집마감일)은 이미 받아 봤다(1,869건). 문제는 상세다 —
+#   개발자는 "한 번 더 클릭하면 자격요건 등 상세내역이 나온다"고 했는데,
+#   이 샌드박스에서는 확인에 실패했다(상세는 POST+CSRF 라 GET 으로 못 열고,
+#   앱 내 브라우저는 CSRF 를 넣어 주는 스크립트가 차단돼 토큰이 DOM 에 없다).
+#   → 진짜 브라우저로 목록에서 '상세보기'를 눌러 그 화면의 **항목 이름과 글자**를 받아 적는다.
+#   자격요건이 있으면 교외 장학금 자격 매칭의 재료가 생긴다(지금 67건이 '자격 미확인').
+findBoard: https://portal.kosaf.go.kr/CO/jspAction.do?beanName=PTSMCstmDsgnGoodsSVC&methodName=getItgnSrchCstmDsgnGoodsList&inputVOName=kr.go.kosaf.portal.pt.sm.cstmdsgngoods.svc.PTSMCstmDsgnGoodsSVO&forwardOnlyFlag=N&ignoreSession=Y&forwardPage=pt/sm/cstmdsgngoods/PTSMCstmDsgnGoods_10M&naviParam=MK,05,02,01 | 상세보기
