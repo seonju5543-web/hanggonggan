@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-08-29T17:13:28.728Z",
+ "updatedAt": "2026-08-29T19:15:08.543Z",
  "source": "한국장학재단 학자금지원정보 통합검색",
  "sourceUrl": "https://portal.kosaf.go.kr/CO/jspAction.do?beanName=PTSMCstmDsgnGoodsSVC&methodName=getItgnSrchCstmDsgnGoodsList&inputVOName=kr.go.kosaf.portal.pt.sm.cstmdsgngoods.svc.PTSMCstmDsgnGoodsSVO&forwardOnlyFlag=N&ignoreSession=Y&forwardPage=pt/sm/cstmdsgngoods/PTSMCstmDsgnGoods_10M&naviParam=MK,05,02,01",
  "count": 1868,
@@ -11227,8 +11227,7 @@
    "goods": "장학금",
    "tel": "○ 02-509-2114",
    "due": "2023-07-06",
-   "home": "http://www.rhof.or.kr/ ",
-   "detail": null
+   "home": "http://www.rhof.or.kr/ "
   },
   {
    "no": 850,

@@ -1266,9 +1266,17 @@ function kosafHtml() {
      달고 떠 있었다). 층1의 `dday(...).days >= 0` 과 같은 기준으로 **그릴 때마다** 다시 본다.
      상시 제도가 아니라 마감이 늘 있으므로 층1의 유예(CLOSED_KEEP_DAYS)는 두지 않는다 —
      신청 기록이 없어 지난 것을 남겨 둘 이유가 없다. */
-  const open = kosafList.filter((i) => dday(i.due).days >= 0);
+  /* 🔴 마감일이 **빈 것을 버리면 안 된다** — 한국장학재단 푸른등대 4곳이 그 꼴인데
+     해가 없는 학기 일정(`ㅇ2학기: 8. 26. ~ 9. 10.`)이라 마감일 칸만 비어 있고 실제로는
+     모집 중이다. 해를 지어내지 않고 `기간 원문 확인`으로 적는다(층1의 같은 문구와 같은 규칙). */
+  const open = kosafList.filter((i) => !i.due || dday(i.due).days >= 0);
   if (!open.length) return '';
-  const list = open.slice().sort((a, b) => near(a) - near(b) || (a.due < b.due ? -1 : 1)).slice(0, 30);
+  const list = open.slice()
+    .sort((a, b) => near(a) - near(b) || (!a.due) - (!b.due) || (a.due < b.due ? -1 : 1)).slice(0, 30);
+  /* 마감일을 모르면 D-day 대신 그렇게 적는다 — 층1이 쓰는 문구와 같다 */
+  const dueBadge = (i) => (i.due
+    ? `<span class="badge badge-dday ${dday(i.due).cls}">${dday(i.due).label}</span>`
+    : '<span class="badge badge-dday">기간 원문 확인</span>');
   const head = `<div class="section-head" style="margin-top:4px"><h3>한국장학재단에 등록된 재단 장학금</h3>
     <span class="link-btn">${open.length}곳 모집 중</span></div>
     <p class="empty" style="margin:0 0 10px;text-align:left">
@@ -1279,7 +1287,7 @@ function kosafHtml() {
     <button class="sch-card" data-kosaf="${esc(i.code)}">
       <div class="sch-top">
         <span class="badge badge-out">교외</span>
-        <span class="badge badge-dday ${dday(i.due).cls}">${dday(i.due).label}</span>
+        ${dueBadge(i)}
         <span class="badge badge-auto">한국장학재단 정보</span>
       </div>
       <p class="sch-name">${esc(i.name)}</p>
@@ -1304,7 +1312,8 @@ function openKosafDetail(code) {
     <div class="sheet-body">
       <div class="sch-top">
         <span class="badge badge-out">교외</span>
-        <span class="badge badge-dday ${dday(i.due).cls}">${dday(i.due).label}</span>
+        ${i.due ? `<span class="badge badge-dday ${dday(i.due).cls}">${dday(i.due).label}</span>`
+    : '<span class="badge badge-dday">기간 원문 확인</span>'}
         <span class="badge badge-auto">한국장학재단 정보</span>
       </div>
       <h3 class="sheet-title">${esc(i.name)}</h3>

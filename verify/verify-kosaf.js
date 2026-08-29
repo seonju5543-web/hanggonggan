@@ -88,12 +88,33 @@ const PROFILE = {
       .filter((e) => e.textContent.length > 60).length,
     closedShown: [...document.querySelectorAll('#kosaf-list .badge-dday')]
       .filter((e) => /마감/.test(e.textContent)).length,
+    noDue: kosafList.filter((i) => !i.due).length,
   }));
   eq(`마감 지난 재단이 섞이지 않았다 (${data.n}곳)`, data.past, 0);
   /* 🔴 갚아야 하는 돈을 '받을 수 있는 장학금'에 넣으면 기망이다 (운영 원칙 2) */
   eq('대여(대출) 상품이 섞이지 않았다', data.loan, 0);
   /* 🔴 받아 둔 파일은 며칠만 지나도 낡는다 — 마감 판정은 **그릴 때마다** 다시 해야 한다 */
   eq('화면에 「마감」 배지가 달린 층2 카드가 없다', data.closedShown, 0);
+  /* 🔴 마감일 칸이 빈 재단을 버리면 **지금 모집 중인 것을 통째로 잃는다**
+     (한국장학재단 푸른등대 4곳 — 해 없는 학기 일정이라 칸만 비어 있다) */
+  eq('마감일 칸이 비어도 버리지 않는다', data.noDue > 0, true);
+  /* 🔴 목록은 30장 상한이고 마감일 미상은 맨 뒤라 화면에 안 뜬다 — **화면만 보면 못 잰다.**
+     그래서 진짜 렌더러에 마감일 미상만 넣어 그리고, 그 결과를 본다(층1 what-shows 와 같은 정신). */
+  eq('  그 카드는 D-day 대신 「기간 원문 확인」이라고 적는다', await page.evaluate(() => {
+    const all = kosafList;
+    kosafList = all.filter((i) => !i.due);
+    const n = kosafList.length;
+    renderExplore();
+    const badges = [...document.querySelectorAll('#kosaf-list .badge-dday')].map((e) => e.textContent.trim());
+    kosafList = all; renderExplore();
+    return badges.length === n && badges.every((t) => t === '기간 원문 확인');
+  }), true);
+  eq('  상세 시트도 같은 문구를 쓴다', await page.evaluate(() => {
+    openKosafDetail(kosafList.find((i) => !i.due).code);
+    const t = document.querySelector('#detail-sheet .badge-dday').textContent.trim();
+    dismissSheet ? dismissSheet() : document.querySelector('#sheet-backdrop').click();
+    return t;
+  }), '기간 원문 확인');
   eq('카드의 금액 줄이 카드를 밀어낼 만큼 길지 않다', data.longAmount, 0);
   eq('주소가 http(s) 가 아닌 것이 없다 (콜론 빠진 원본을 그대로 넘기면 우리 사이트로 간다)', data.badHome, 0);
 

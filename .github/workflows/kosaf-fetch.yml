@@ -1,0 +1,108 @@
+name: 한국장학재단 수확 로봇
+
+# 앱의 **층2**(재단 장학금 목록)를 살려 두는 로봇이다.
+#
+# 🔴 왜 반드시 있어야 하나 (2026-08-30 개발자 지시로 신설):
+#    층2는 마감 전인 재단만 보여 준다. 새로 안 받으면 **1주에 43곳, 2주에 69곳이 마감**되어
+#    두 달이면 목록이 사실상 빈다. 붙여만 두고 갱신하지 않으면 두 달짜리 기능이 된다.
+#
+# 🔴 이 로봇이 지키는 것 둘 (되돌리지 말 것):
+#    ① **지난 실행의 상세를 이어받는다.** 목록은 매 실행 새로 받지만 상세(자격 20칸)는
+#       일부만 받으므로, 그냥 덮어쓰면 애써 모은 205건이 매 실행 사라진다.
+#    ② **예산 안에 스스로 끝낸다**(--budget-min). 시간초과는 GitHub이 프로세스를 강제
+#       종료하는 것이라 '넘어져도 저장'으로 못 막는다 — 저장 단계까지 통째로 죽는다.
+#
+# ⚠️ KOSAF 는 재단은 100% 알지만 **이번 회차는 19%만** 안다(실측). 층2는 층1(학교 게시판
+#    원문)의 대체가 아니라 보완이다 — 실제로 경원장학재단을 KOSAF 는 2025년 회차로,
+#    우리 앱은 2026년 2학기로 알고 있었고 **학교 공고를 직접 열어 우리 쪽이 맞았다.**
+on:
+  schedule:
+    - cron: '23 20 * * 1,4'   # 월·목 05:23 KST (수집 예약과 겹치지 않는 홀수 분)
+  workflow_dispatch:
+  push:
+    branches: ['claude/nice-heisenberg-WESq5']
+    paths:
+      - 'collector/run-kosaf.txt'   # 이 파일을 고쳐 push하면 즉시 실행 (push-to-run)
+
+permissions:
+  contents: write
+  issues: write
+
+# 수집 로봇과 다른 대기줄 — 같은 줄에 넣으면 GitHub이 오래된 대기분을 취소해
+# 이 로봇이 조용히 사라진다 (되가져오기 로봇에서 겪은 일).
+concurrency:
+  group: kosaf
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    # 작업 상한은 아래 단계 예산(15분)을 담는 그릇이다 — 목록 받기·저장까지 여유를 둔다
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/nice-heisenberg-WESq5   # 로봇은 자기가 읽은 브랜치에만 저장한다 (배포는 deploy-sync가)
+      - name: 협업 병합기 등록 (충돌 자동 해소 — COLLAB.md)
+        run: bash tools/setup-collab.sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 한국장학재단 통합검색 수확
+        timeout-minutes: 20
+        run: node collector/kosaf-fetch.mjs --budget-min=15 --write
+
+      - name: 관문 — 층2가 비거나 대출이 섞이지 않았나
+        run: node collector/kosaf-check.mjs
+
+      # 🔴 관문이 실패하면 **저장하지 않는다**(always() 를 쓰지 말 것) — 이미 올라가 있는
+      #    멀쩡한 데이터가 이긴다. 이 로봇은 한 번 걸러도 다음 실행에 다시 받으면 그만이다.
+      - name: 저장
+        run: |
+          git config user.name "handaejang-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          [ -f data/kosaf.json ] && git add data/kosaf.json
+          [ -f data/kosaf-open.json ] && git add data/kosaf-open.json
+          true
+          if ! git diff --cached --quiet; then
+            git commit -m "kosaf: 재단 장학금 목록 갱신 (층2)"
+            pushed=0
+            for i in 1 2 3; do
+              if git push; then pushed=1; break; fi
+              git pull --rebase --autostash || true
+              sleep $((i * 5))
+            done
+            if [ "$pushed" != "1" ]; then
+              echo "::error::한국장학재단 목록 저장 실패 (push 3회)"
+              exit 1
+            fi
+          else
+            echo "바뀐 것 없음"
+          fi
+
+      # 🔴 상한을 넘긴 작업은 '실패'가 아니라 '취소'라 if: failure() 만으로는 안 잡힌다
+      - name: 넘어졌으면 알린다
+        if: failure() || cancelled()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = '🚨 한국장학재단 수확 로봇이 넘어졌습니다';
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: 'kosaf',
+            });
+            const body = `앱의 **층2(재단 장학금 목록)** 갱신이 멈췄습니다.\n\n`
+              + `새로 안 받으면 1주에 43곳, 2주에 69곳이 마감되어 목록이 서서히 빕니다.\n`
+              + `실행 기록: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            if (open.length) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: open[0].number, body,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: ['kosaf'],
+              });
+            }

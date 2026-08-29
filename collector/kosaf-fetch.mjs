@@ -24,6 +24,9 @@
  */
 import fs from 'node:fs';
 import { slimKosaf } from './kosaf-open.mjs';
+/* 예산 시계는 수집 로봇과 같은 것을 쓴다 — 시간초과는 '넘어져도 저장'으로 못 막는다.
+   GitHub 이 프로세스를 강제 종료하면 저장 단계까지 통째로 죽는다(2026-08-03 사고). */
+import { makeBudget } from './harvest-budget.mjs';
 
 const BASE = 'https://portal.kosaf.go.kr';
 const LIST = `${BASE}/CO/jspAction.do?beanName=PTSMCstmDsgnGoodsSVC&methodName=getItgnSrchCstmDsgnGoodsList`
@@ -171,10 +174,25 @@ console.log(`목록 확보: ${list.length}건`);
 
 let got = 0;
 const today = new Date().toISOString().slice(0, 10);
+
+/* 🔴 **지난 실행이 받아 둔 상세를 잃지 말 것** (2026-08-30).
+   목록은 매 실행 새로 받는데 상세는 일부만 받는다. 그냥 덮어쓰면 예약 실행이 돌 때마다
+   **애써 모은 자격 20칸이 통째로 사라진다** — 이번 회차가 아닌 재단은 다시는 안 받으므로
+   영영 못 되찾는다. 코드(code)로 이어 붙인다. */
+let prevDetail = new Map();
+try {
+  const prev = JSON.parse(fs.readFileSync(new URL('../data/kosaf.json', import.meta.url), 'utf8'));
+  prevDetail = new Map((prev.items || []).filter((i) => i.detail).map((i) => [i.code, i.detail]));
+  console.log(`지난 실행의 상세 ${prevDetail.size}건을 이어받습니다`);
+} catch { /* 처음 실행 */ }
+
 if (!LIST_ONLY) {
   /* 마감이 지난 것도 **자격은 그대로 쓸 수 있다**(자격은 잘 안 바뀐다). 다만 시간이 드니
-     아직 유효한 것을 먼저 받고, --max 로 끊는다. */
-  const order = [...list].sort((a, b) => (b.due >= today ? 1 : 0) - (a.due >= today ? 1 : 0));
+     아직 유효한 것을 먼저 받고, --max 로 끊는다.
+     ⚠️ 마감일 칸이 **빈 것도 앞에 둔다** — 한국장학재단 푸른등대가 그 꼴인데 칸만 비어
+     있을 뿐 모집 중이다(2026-08-30). 빈 문자열은 어떤 날짜보다 작아 그냥 두면 맨 뒤로 간다. */
+  const fresh = (r) => (!r.due || r.due >= today ? 1 : 0);
+  const order = [...list].sort((a, b) => fresh(b) - fresh(a));
   /* 특정 기관만 받고 싶을 때 — 파일에 낱말을 줄마다 적는다(기관명·상품명 부분일치).
      전량(1,868건)은 응답이 건당 1.3MB라 시간이 오래 걸린다. */
   const pick = arg('only', '');
@@ -186,14 +204,25 @@ if (!LIST_ONLY) {
     console.log(`대상 좁힘: ${target.length}건 (지정 낱말 ${words.length}개 + 마감 유효분)`);
   }
   if (MAX) target = target.slice(0, MAX);
+  /* 예산 안에 스스로 끝낸다. 다 못 받아도 목록과 이어받은 상세는 저장된다 —
+     상한을 넘겨 강제 종료되면 그 실행의 결과가 통째로 사라진다. */
+  const budget = makeBudget(Number(arg('budget-min', 15)) * 60000);
+  let ranOut = 0;
   for (const [i, r] of target.entries()) {
+    if (budget.expired()) { ranOut = target.length - i; break; }
     try { r.detail = await detail(r.code); } catch { r.detail = null; }
     if (r.detail) got += 1;
     if ((i + 1) % 25 === 0) console.log(`  상세 ${i + 1}/${target.length} (성공 ${got})`);
     await new Promise((x) => setTimeout(x, 250));
   }
+  if (ranOut) console.log(`⏱ 예산을 다 써 ${ranOut}건은 다음 실행으로 넘깁니다 (마감 임박순이라 급한 것부터 받았습니다)`);
 }
-console.log(`상세 확보: ${got}건`);
+/* 이번에 못 받은 것은 지난 실행 값을 그대로 쓴다 */
+let carried = 0;
+for (const r of list) {
+  if (!r.detail && prevDetail.has(r.code)) { r.detail = prevDetail.get(r.code); carried += 1; }
+}
+console.log(`상세 확보: 새로 ${got}건 · 이어받음 ${carried}건 · 합계 ${list.filter((r) => r.detail).length}건`);
 
 if (WRITE) {
   const out = {

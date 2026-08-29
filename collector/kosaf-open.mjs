@@ -36,7 +36,13 @@ export function slimKosaf(data, today) {
        갚아야 하는 돈을 '받을 수 있는 장학금' 목록에 넣는 것은 기망이다(운영 원칙 2·
        app.js 의 대출 분리와 같은 규칙). 대출 안내는 실시간 공고 피드 쪽이 맡는다. */
     .filter((i) => i.goods === '장학금')
-    .filter((i) => i.due && i.due >= today)
+    /* 🔴 `due` 가 **빈 재단을 버리면 안 된다** (2026-08-30 개발자 지적으로 발견).
+       한국장학재단 푸른등대 기부장학금 4곳이 정확히 그 꼴인데, 상세를 열어 보면
+       `신청기간: ㅇ1학기: 2. 25. ~ 3. 12. ㅇ2학기: 8. 26. ~ 9. 10.` 처럼
+       **해가 없는 학기 일정**이라 목록의 마감일 칸이 비어 있을 뿐 지금 모집 중이다
+       (실제로 8/26~9/10 접수 중인 것을 통째로 버리고 있었다).
+       해를 지어내지 않는다 — 마감일 없이 두고, 앱이 '기간 원문 확인'으로 정직하게 적는다. */
+    .filter((i) => (i.due ? i.due >= today : !!((i.detail || {})['신청기간'] || '').trim()))
     .map((i) => {
       const fields = {};
       for (const k of FIELDS) {
@@ -45,9 +51,10 @@ export function slimKosaf(data, today) {
         if (v && !/^[○ㅇ\s]*해당\s?없음$/.test(v)) fields[k] = v;
       }
       return { code: i.code, org: i.org, name: i.name, kind: i.kind,
-        due: i.due, home: fixHome(i.home), fields };
+        due: i.due || null, home: fixHome(i.home), fields };
     })
-    .sort((a, b) => (a.due < b.due ? -1 : a.due > b.due ? 1 : 0));
+    /* 마감일을 모르는 것은 맨 뒤 — 앞에 두면 급한 공고를 밀어낸다 */
+    .sort((a, b) => (!a.due) - (!b.due) || (a.due < b.due ? -1 : a.due > b.due ? 1 : 0));
   return { updatedAt: data.updatedAt, source: data.source, count: items.length, items };
 }
 

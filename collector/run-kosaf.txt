@@ -1,0 +1,1 @@
+collector/run-kosaf.txt 로 손수 깨울 수 있습니다. 이 줄을 아무렇게나 고쳐 push하세요.
