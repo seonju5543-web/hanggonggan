@@ -188,6 +188,20 @@ const unent = (s) => ENT.reduce((t, [re, ch]) => t.replace(re, ch), s);
    `마일리지 산정기간`이 전부 여기서 걸러진다 — 이 목록을 넓히면(예: 맨 `기간`) 장학금을
    **주는** 기간이 신청 마감으로 둔갑한다. 회귀는 test-collector '마감일' 절의 '읽으면 안 되는 것'. */
 const PERIOD_LABEL = /(신청|접수|모집|지원|응모|제출|추천)\s?(기간|기한|마감(일시?)?)/;
+/* 맨 `기간`·`기한`·`마감`도 이름표다 — **단, 그것뿐일 때만.** 실제 원문에 `가. 기간 : 2026. 7. 20.
+   ~ 8. 14.(금) 16:00 까지` 가 있는데 앞머리 동사를 요구하다 놓치고 있었다(2026-08-30 개발자 지적).
+   🔴 `거주기간`·`근로기간`처럼 **앞에 말이 붙으면 여기서 안 걸린다** — 그게 방어선이다.
+   🔴 그런데 그것만으로는 모자랐다: 근로장학생 공고의 `가. 기간: 2026. 9. 1. ~ 2027. 2. 12.` 이
+      **일하는 기간**인데 접수 마감으로 읽혀, 진짜 접수일(8/24)을 2027년으로 밀어냈다.
+      그래서 맨 이름표는 **내용이 `까지`·`마감`으로 끝날 때만** 연다(아래 PERIOD_VIA 와 같은 방식).
+      일하는 기간은 '까지'라고 쓰지 않는다. */
+const PERIOD_BARE = /^(기\s?간|기\s?한|마\s?감)$/;
+/* `제출방법 : 2026년 7월 23일(목) 오후 18시까지` — 이름표는 '방법'인데 내용은 마감이다.
+   사람은 곧바로 마감으로 읽는데 우리만 못 읽고 있었다(실측 3건).
+   🔴 **내용이 `까지`·`마감`으로 끝날 때만** 연다 — 그래야 `신청방법: 포털에서 신청`처럼
+   날짜가 딴 뜻인 줄이 안 걸린다. */
+const PERIOD_VIA = /(신청|접수|모집|제출|지원서?)\s?(방법|접수|서류)?$|^(신청|접수|제출|지원서)\s/;
+const VALUE_DEADLINE = /(까지|마감)/;
 
 /* 🔴 두 자리 해는 `(?<!\d)`로 감싼다 — 안 그러면 전화번호 `054-748-7760`의 조각이 날짜가 된다. */
 const FULL_DATE = /(?<!\d)(\d{4}|\d{2})\s?[.\-/년]\s?(\d{1,2})\s?[.\-/월]\s?(\d{1,2})(?!\d)/g;
@@ -206,12 +220,27 @@ function ymd(y, m, d) {
   return `${year}-${String(mo).padStart(2, '0')}-${String(da).padStart(2, '0')}`;
 }
 
+/* 🔴 공고에 해가 **한 가지뿐이면** 해 없는 날짜에 그 해를 준다 (2026-08-30).
+   `3. 모집기간: ~ 7월 31일(금) 24:00까지` 처럼 해를 아예 안 적는 공고가 있는데,
+   그걸 못 읽어 '기한 원문 확인'으로 내보내고 있었다. **지어내는 것이 아니라 원문에서
+   가져오는 것이다** — 해가 둘 이상 나오면(2025·2026 혼재) 고르지 않고 포기한다. */
+function soleYear(text) {
+  const ys = [...new Set([...String(text).matchAll(/(20\d{2})\s?(?:년|학년도)/g)].map((m) => m[1]))];
+  return ys.length === 1 ? Number(ys[0]) : null;
+}
+
 /** 이름표 뒤 내용에서 **끝나는 날**을 읽는다. 범위면 뒤쪽, 하나면 그것. */
-function dateFrom(value) {
+function dateFrom(value, ctxYear) {
   const s = unent(value);
   FULL_DATE.lastIndex = 0;
   const m = FULL_DATE.exec(s);
-  if (!m) return null;
+  if (!m) {
+    /* 해가 한 줄에도 없을 때 — 공고 전체의 해를 빌린다(위 soleYear) */
+    if (!ctxYear) return null;
+    BARE_DATE.lastIndex = 0;
+    const b0 = BARE_DATE.exec(s);
+    return b0 ? ymd(ctxYear, b0[1], b0[2]) : null;
+  }
   const start = ymd(m[1], m[2], m[3]);
   if (!start) return null;
 
@@ -246,14 +275,20 @@ function dateFrom(value) {
 function extractDeadline(text) {
   if (!text) return null;
   const lines = String(text).split(/\n+/).map((l) => unent(l).replace(/[ \t　]+/g, ' ').trim()).filter(Boolean);
+  const ctxYear = soleYear(text);
   for (const l of lines) {
     if (l.length > 200) continue;
     const i = l.search(/[:：]/);
     if (i < 0) continue;                            // 이름표에 매단다 — 콜론이 없으면 안 읽는다
     const label = shHead(l.slice(0, i));            // 기호·번호 떼기는 section-head.js 한 곳
     if (label.length > 30) continue;                // 이름표는 짧다. 길면 문장이다
-    if (!PERIOD_LABEL.test(label)) continue;
-    const d = dateFrom(l.slice(i + 1));
+    const value = l.slice(i + 1);
+    const named = PERIOD_LABEL.test(label);
+    /* 이름표가 '방법·접수'면 내용이 마감을 말할 때만 연다 (위 PERIOD_VIA 주석) */
+    const viaValue = (PERIOD_BARE.test(label.replace(/\s/g, '')) || PERIOD_VIA.test(label))
+      && VALUE_DEADLINE.test(value);
+    if (!named && !viaValue) continue;
+    const d = dateFrom(value, ctxYear);
     if (d) return d;
   }
   return null;
