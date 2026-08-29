@@ -243,7 +243,7 @@ function formFieldHtml(f) {
     html += `<div class="fq-sugg">${(f.sugg || []).map((s) => `<button type="button" class="chip chip-sm" data-fill="${fid}" data-text="${esc(s)}">${esc(s.slice(0, 26))}…</button>`).join('')}</div>`;
     const ph = isStory
       ? (typeof essayOn === 'function' && essayOn()
-        ? '위 키워드를 고르고 아래 ✨ 버튼을 누르면 여기가 채워져요 — 직접 쓰셔도 돼요'
+        ? '위 키워드를 고른 뒤 아래 버튼을 누르면 이 칸이 채워집니다 — 직접 써도 됩니다'
         : '위 키워드를 고르고 아래 버튼을 누르면 여기로 옮겨져요 — 직접 쓰셔도 돼요')
       : '직접 입력하거나 위 추천 문구를 눌러 채워보세요';
     html += `<textarea id="${fid}" rows="${isStory ? 5 : 3}" placeholder="${esc(ph)}"></textarea>`;
@@ -276,7 +276,7 @@ function formQuestionsHtml(tpl) {
       `<p class="dp-note">여기서 고친 값은 이 신청서에만 적용돼요. 계속 바꾸려면 MY → 내 정보에서 고치세요.</p></details>`;
   }
   if (plan.over.length) {
-    html += `<p class="dp-note fq-over">이 신청서는 원본 항목이 많아요 — 질문 ${plan.counts.total}개예요. 하나도 빠뜨리지 않으려고 전부 보여 드려요.</p>`;
+    html += `<p class="dp-note fq-over">이 신청서는 원본 항목이 많습니다 — 질문 ${plan.counts.total}개입니다. 하나도 빠뜨리지 않도록 전부 보여 줍니다.</p>`;
   }
 
   plan.secs.forEach((sec) => {

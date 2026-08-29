@@ -41,15 +41,18 @@ const PROFILE = (over) => ({
     return page;
   }
 
+  /* 🔴 2026-08-29 UI 정리로 **목록 카드의 적합도는 배지가 아니라 막대**가 됐다
+     (app.js `fitMeterHtml`). 상세 시트는 배지(`fitBadgeHtml`)를 그대로 쓴다.
+     지켜야 할 뜻은 그대로다: 미달은 숫자 없이 말하고, 적합은 **근거 숫자와 함께** 말한다. */
   const badges = (page) => page.$$eval('#explore-list .sch-card', (els) => els.map((e) => {
-    const b = e.querySelector('.badge-fit, .badge-fit-unknown, .badge-fit-no');
+    const b = e.querySelector('.sch-fit');
     return { cls: b ? b.className : '', text: b ? b.innerText.replace(/\s+/g, ' ') : '' };
   }));
 
   console.log('■ 자격이 안 되는 학생 (휴학 · 평점 2.1 · 9구간)');
   let page = await open({ status: '휴학', gpa: 2.1, bracket: 9, credits: 9 });
   let bs = await badges(page);
-  const no = bs.filter((b) => b.cls.includes('badge-fit-no'));
+  const no = bs.filter((b) => b.cls.includes('is-no'));
   eq('지원 자격 미달 배지가 뜬다', no.length > 0, true);
   eq('미달 배지 문구', [...new Set(no.map((b) => b.text))], ['지원 자격 미달']);
   eq('미달 배지에는 숫자가 없다', no.some((b) => /\d/.test(b.text)), false);
@@ -58,6 +61,8 @@ const PROFILE = (over) => ({
   const shown = bs.map((b) => b.text);
   eq('0%가 안 뜬다', shown.some((t) => /적합도 0%/.test(t)), false);
   eq('100%가 안 뜬다', shown.some((t) => /적합도 100%/.test(t)), false);
+  /* 정리 뒤 목록 카드에는 **퍼센트 자체가 없다** — 뜻은 `요건 m/n` 이 전한다 */
+  eq('목록 카드에 퍼센트가 아예 없다', shown.some((t) => /%/.test(t)), false);
 
   /* 🔴 `evaluate()`가 미달로 확정한 공고(fit === 0)를 '자격 미확인'으로 보여 주면 안 된다
      (2026-08-26 정렬 검증에서 발견). fitDetail은 `eligibilityLines`만 읽어서
@@ -68,7 +73,7 @@ const PROFILE = (over) => ({
     const s = allScholarships().find((x) => x.id === e.dataset.detail);
     if (!s) return false;
     if (fitScore(s, evaluate(s, state.profile), state.profile) !== 0) return false;
-    return !e.querySelector('.badge-fit-no');   // 미달인데 미달 배지가 없다
+    return !e.querySelector('.sch-fit.is-no');   // 미달인데 미달 표시가 없다
   }).length);
   eq('미달 확정 공고에 미달 배지가 빠진 카드가 없다', mismatch, 0);
 
@@ -76,9 +81,9 @@ const PROFILE = (over) => ({
   await page.context().close();
   page = await open({});
   bs = await badges(page);
-  const okBadges = bs.filter((b) => b.cls.includes('badge-fit') && !b.cls.includes('unknown') && !b.cls.includes('-no'));
-  eq('적합도 배지에 근거가 함께 붙는다', okBadges.every((b) => /요건 \d+개 중 \d+개 충족/.test(b.text)), true);
-  eq('여기서도 100%는 안 뜬다', bs.some((b) => /적합도 100%/.test(b.text)), false);
+  const okBadges = bs.filter((b) => b.cls.includes('sch-fit') && !b.cls.includes('is-unread') && !b.cls.includes('is-no'));
+  eq('적합도 표시에 근거 숫자가 함께 붙는다', okBadges.length > 0 && okBadges.every((b) => /요건 \d+\/\d+/.test(b.text)), true);
+  eq('여기서도 퍼센트는 안 뜬다', bs.some((b) => /%/.test(b.text)), false);
 
   /* 🔴 상세 시트는 자격 줄을 **하나도 빠뜨리지 않고** 보여야 한다 — 화면 5줄 상한이
      점수 분모까지 자르던 사고(2026-08-24)의 회귀다.
@@ -87,11 +92,11 @@ const PROFILE = (over) => ({
         내보내는 줄 수(`requirementLines(sch, null, {all:true})`)와 대조한다. */
   console.log('\n■ 상세 시트가 자격 줄을 빠뜨리지 않는다');
   const idx = await page.$$eval('#explore-list .sch-card',
-    (els) => els.findIndex((e) => /요건 \d+개/.test((e.querySelector('.badge-fit') || {}).innerText || '')));
+    (els) => els.findIndex((e) => /요건 \d+\/\d+/.test((e.querySelector('.sch-fit') || {}).innerText || '')));
   if (idx >= 0) {
     const cards = await page.$$('#explore-list .sch-card');
-    const txt = await cards[idx].$eval('.badge-fit', (e) => e.innerText.replace(/\s+/g, ' '));
-    const total = Number((txt.match(/요건 (\d+)개/) || [])[1]);
+    const txt = await cards[idx].$eval('.sch-fit', (e) => e.innerText.replace(/\s+/g, ' '));
+    const total = Number((txt.match(/요건 \d+\/(\d+)/) || [])[1]);
     const id = await cards[idx].evaluate((e) => e.dataset.detail);
     const expected = await page.evaluate((sid) => {
       const s = allScholarships().find((x) => x.id === sid);
@@ -101,7 +106,11 @@ const PROFILE = (over) => ({
     await page.waitForTimeout(700);
     const lines = await page.$$eval('#detail-sheet li.r-elig', (e) => e.length);
     eq(`'${txt}' — 자격 줄 ${expected}개가 모두 보인다`, lines, expected);
-    eq('배지의 요건 수가 줄 수를 넘지 않는다 (묶음은 1개로 센다)', total <= expected, true);
+    eq('막대의 요건 수가 줄 수를 넘지 않는다 (묶음은 1개로 센다)', total <= expected, true);
+    /* 상세 시트는 **배지**를 그대로 쓴다 — 카드만 막대로 바뀌었지 시트는 근거를 다 적는다 */
+    const sheetBadge = await page.$eval('#detail-sheet .badge-fit, #detail-sheet .badge-fit-no, #detail-sheet .badge-fit-unknown',
+      (e) => e.innerText.replace(/\s+/g, ' ')).catch(() => '');
+    eq('상세 시트에는 근거가 적힌 배지가 남아 있다', /요건 \d+개 중 \d+개 충족|지원 자격 미달|자격 미확인/.test(sheetBadge), true);
   } else console.log('  (요건 개수를 띄운 카드가 없어 건너뜀)');
 
   console.log('\nERRORS:', errors.length ? errors : 'none');

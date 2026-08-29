@@ -215,11 +215,15 @@ async function onboard(page) {
   const inboxRows = await page.$$eval('.nf-item', (els) => els.map((e) => e.textContent.replace(/\s+/g, ' ').trim()));
   ok(inboxRows.length >= 2, `알림함에 ${inboxRows.length}건 표시`, inboxRows.slice(0, 2));
   ok(await page.$('.nf-item.nf-unread') !== null, '읽지 않은 알림이 강조 표시됨');
-  const dupIcon = await page.$$eval('.nf-item', (els) => els.some((e) => {
-    const ico = e.querySelector('.nf-ico').textContent.trim();
-    return e.querySelector('.nf-title').textContent.trim().startsWith(ico);
-  }));
-  ok(!dupIcon, '알림함 제목에 종류 아이콘이 중복으로 찍히지 않음');
+  /* 🔴 2026-08-29 UI 정리: 종류 아이콘이 이모지 → 선 아이콘(SVG)이 됐다.
+     `.nf-ico` 에 글자가 없어져서 옛 검사(`제목이 아이콘으로 시작하는가`)는
+     `startsWith('')` 가 늘 참이라 **늘 실패**한다. 지켜야 할 뜻은 그대로다 —
+     아이콘을 제목에 글자로 또 찍지 않는다 = 제목에 이모지가 없다. */
+  const titleEmoji = await page.$$eval('.nf-item .nf-title',
+    (els) => els.filter((e) => /\p{Extended_Pictographic}/u.test(e.textContent)).map((e) => e.textContent.trim()));
+  ok(titleEmoji.length === 0, '알림함 제목에 이모지가 없다 (종류 아이콘은 SVG 로 한 번만)', titleEmoji);
+  const icoIsSvg = await page.$$eval('.nf-item .nf-ico', (els) => els.every((e) => !!e.querySelector('svg')));
+  ok(icoIsSvg, '종류 아이콘이 SVG 로 그려진다');
   await page.screenshot({ path: SHOT('04-inbox') });
 
   // 알림 누르면 해당 공고 상세로

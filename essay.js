@@ -116,7 +116,7 @@ function essayTipsHtml(warnings) {
     return `<li><span class="essay-tip-msg">${esc(w.msg)}</span>` +
       (why ? `<span class="essay-tip-why">${esc(why)}</span>` : '') + `</li>`;
   }).join('');
-  return `<div class="essay-tips"><b>💡 이렇게 하면 더 좋아져요</b><ul>${items}</ul>` +
+  return `<div class="essay-tips"><b>이렇게 하면 더 좋아집니다</b><ul>${items}</ul>` +
     `<p class="essay-fine">고치면 이 안내는 사라져요 — 규정이 아니라 더 좋게 만드는 제안이에요.</p></div>`;
 }
 
@@ -192,7 +192,7 @@ function essayRenderAids(field, sch) {
   if (chg) {
     const d = document.createElement('div');
     d.className = 'essay-diff'; d.dataset.for = field.id; d.hidden = true;
-    d.innerHTML = `<p class="essay-fine">🟩 표시가 이번에 새로 들어온 부분이에요</p>` +
+    d.innerHTML = `<p class="essay-fine">초록색 표시가 이번에 새로 들어온 부분입니다</p>` +
       `<div class="essay-diff-body">${essayWordDiffHtml(chg.before, chg.after)}</div>`;
     after(d);
   }
@@ -354,12 +354,12 @@ function essaySubmitCheckHtml(result) {
     `<span class="esc-body"><b>${esc(i.label)}</b>` +
     `<span class="esc-detail">${esc(i.detail)}</span></span></li>`).join('');
   const badge = result.allPass
-    ? `<span class="esc-badge esc-ok">제출 가능 ✅</span>`
+    ? `<span class="esc-badge esc-ok">제출 가능</span>`
     : (result.submittable
       ? `<span class="esc-badge esc-soft">조금 더 다듬으면 좋아요</span>`
       : `<span class="esc-badge esc-block">먼저 고칠 곳이 있어요</span>`);
   return `<div class="essay-submit-check" id="essay-submit-check">` +
-    `<div class="esc-head"><b>📋 제출 전 점검</b>${badge}</div>` +
+    `<div class="esc-head"><b>제출 전 점검</b>${badge}</div>` +
     `<ul class="esc-list">${rows}</ul>` +
     `<p class="essay-fine">✗ 는 그대로 내면 문제가 되는 것 · △ 는 더 좋게 만드는 제안이에요.</p></div>`;
 }
@@ -419,8 +419,8 @@ function essayAskHtml(field, ctx) {
 
   /* 켜져 있을 때만 '앱이 씁니다'라고 말한다 — 못 하는 일을 한다고 하면 안 된다(원칙 1) */
   const lead = essayOn()
-    ? '✍️ <b>키워드만 골라 주세요</b> — 긴 글은 앱이 씁니다'
-    : '✍️ <b>키워드만 골라 주세요</b> — 아래 버튼으로 이 칸에 옮겨 드려요';
+    ? '<b>키워드만 골라 주세요</b> — 긴 글은 앱이 씁니다'
+    : '<b>키워드만 골라 주세요</b> — 아래 버튼으로 이 칸에 옮깁니다';
   /* 재료 충분도 게이지 — 초안을 만들기 전에 잰다(설계 갈래② · 2순위).
      처음엔 비어 있고 essayBind 가 첫 값을 채운다. 칩·입력마다 다시 그린다. */
   return `<div class="essay-ask" data-for="${field.id}" data-target="${plan.target}">
@@ -439,7 +439,7 @@ const ESSAY_FU_INFO = '이 한 줄이 지원서의 차별점이 됩니다. 재�
 function essayFollowUpHtml(id, question, egs, scene) {
   return `<div class="essay-fu" data-fu-for="${id}" hidden>
     <p class="essay-fu-q"><b class="essay-fu-pick"></b> — ${esc(question)}</p>
-    <p class="essay-fu-info">💡 ${ESSAY_FU_INFO}</p>
+    <p class="essay-fu-info">${ESSAY_FU_INFO}</p>
     <textarea class="essay-ask-free essay-fu-in" id="${id}" data-q="${esc(question)}" rows="2" placeholder="한 줄이면 충분해요"></textarea>
     ${egs.length ? `<div class="essay-fu-eg"><span>이렇게 시작해 보세요</span>${
       egs.map((e) => `<button type="button" class="chip chip-sm essay-eg" data-fill-fu="${id}" data-text="${esc(e)}">${esc(e.slice(0, 22))}…</button>`).join('')
@@ -567,10 +567,10 @@ function essayButtonHtml(tpl) {
      키워드를 골라 놓고 아무 일도 안 일어나면 그 카드는 학생을 놀린 셈이 된다.
      서버가 없을 때는 **앱이 개요로 옮겨 준다** — 문장까지는 못 쓴다고 정직하게 적는다. */
   if (!essayOn()) {
-    return `<button class="btn btn-outline btn-lg" id="btn-essay-ai">📝 고른 키워드를 아래 칸에 옮기기 (${n}칸)</button>` +
+    return `<button class="btn btn-outline btn-lg" id="btn-essay-ai">고른 키워드를 아래 칸에 옮기기 (${n}칸)</button>` +
       `<p class="dp-note essay-fine">아직 글까지 써 드리지는 못해요 — 옮겨 드린 내용을 문장으로 다듬어 주세요</p>`;
   }
-  return `<button class="btn btn-primary btn-lg" id="btn-essay-ai">✨ ${esc(essayCfg('label', '키워드로 글 만들기'))} (${n}칸)</button>` +
+  return `<button class="btn btn-primary btn-lg" id="btn-essay-ai">${esc(essayCfg('label', '키워드로 글 만들기'))} (${n}칸)</button>` +
     `<p class="dp-note essay-fine">눌러야 보내져요 · 고른 키워드와 학교·학년·전공만 나가고 이름·연락처·계좌·성적은 나가지 않아요</p>`;
 }
 
@@ -596,8 +596,8 @@ function essayRulesBannerHtml(sch) {
   const items = r.lines.slice(0, 5).map((l) =>
     `<li class="${위험.test(l) ? 'essay-rule-danger' : ''}">${esc(l)}</li>`).join('');
   return `<div class="essay-rules-banner">` +
-    `<b>📋 이 공고가 정한 작성 규정 — 꼭 지켜야 해요</b>` +
-    (r.blind ? `<p class="essay-rule-danger">🔴 <b>블라인드 심사</b>: 학교 이름을 쓰면 심사에서 제외돼요. ` +
+    `<b>이 공고가 정한 작성 규정 — 반드시 지켜야 합니다</b>` +
+    (r.blind ? `<p class="essay-rule-danger"><b>블라인드 심사</b>: 학교 이름을 쓰면 심사에서 제외됩니다. ` +
       `초안에는 학교 이름을 넣지 않아요(전공은 괜찮아요).</p>` : '') +
     (items ? `<ul>${items}</ul>` : '') +
     `<p class="essay-fine">재단이 공고·첨부에 직접 적은 문구예요.</p></div>`;
@@ -669,7 +669,7 @@ async function essaySend(tpl, sch, btn) {
       el.classList.add('essay-drafted');
       if (!el.parentElement.querySelector('.essay-flag')) {
         el.insertAdjacentHTML('afterend',
-          '<p class="dp-note essay-flag">📝 고르신 키워드를 옮겨 적었어요 — 문장으로 다듬어 주세요</p>');
+          '<p class="dp-note essay-flag">고른 키워드를 옮겨 적었습니다 — 문장으로 다듬어 주세요</p>');
       }
       essayLastChange[f.id] = { before, after: el.value };
       essayRenderAids(f, sch);   /* 되돌리기·바뀐 곳·팁 다시 그리기 */
@@ -784,7 +784,7 @@ async function essaySend(tpl, sch, btn) {
     el.rows = Math.min(18, Math.max(6, Math.ceil(d.text.length / 40)));
     el.parentElement.querySelectorAll('.essay-flag, .essay-fix, .essay-urge').forEach((x) => x.remove());
     el.insertAdjacentHTML('afterend',
-      `<p class="dp-note essay-flag">✨ AI 초안이에요 — ${esc(essayCfg('notice', '반드시 읽고 고쳐서 제출하세요.'))}</p>`);
+      `<p class="dp-note essay-flag">AI 초안입니다 — ${esc(essayCfg('notice', '반드시 읽고 고쳐서 제출하세요.'))}</p>`);
     /* 🔴 직접 쓴 한 줄이 없을 때만 독려한다 (개발자 지시 2026-08-23 — 있을 때
        칭찬하는 문구는 넣지 않는다). 앱의 부족함이 아니라 학생이 얻을 것을 말한다. */
     const hasOwn = ((payload.fields.find((x) => x.key === d.key) || {}).asks || []).some((a) => a.own);

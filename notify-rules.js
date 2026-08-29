@@ -13,18 +13,36 @@
 var NOTIFY_RULES = (function () {
   'use strict';
 
+  /* 알림 종류의 아이콘 — 이모지가 아니라 선 아이콘이다 (2026-08-29 UI 정리).
+     🔴 이모지로 되돌리지 말 것: 기기마다 그림이 달라 브랜드가 잡히지 않고,
+        "AI가 만든 앱"으로 읽히는 가장 큰 신호였다(공동개발자·전문가 지적).
+     ⚠️ 이 문자열은 innerHTML 로 들어간다 — 사용자 입력이 아니라 여기 고정된 값뿐이라 안전하다.
+     ⚠️ 서비스워커도 이 파일을 읽지만 OS 알림 아이콘은 icons/icon-192.png 를 쓴다(sw.js). */
+  function svg(d) {
+    return '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+           'stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>';
+  }
+  var NF_ICON = {
+    cap:    svg('<path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/>'),
+    clock:  svg('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+    up:     svg('<path d="M12 19V6"/><path d="M6 12l6-6 6 6"/><path d="M4 21h16"/>'),
+    school: svg('<path d="M3 21h18"/><path d="M5 21V8l7-4 7 4v13"/><path d="M10 21v-5h4v5"/>'),
+    mail:   svg('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>'),
+    bell:   svg('<path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"/><path d="M10.3 20a2 2 0 0 0 3.4 0"/>'),
+  };
+
   /* 알림 종류 — 설정 화면의 항목 순서이자 기본값 */
   var TYPES = [
-    { id: 'newMatch', icon: '🎓', label: '내 조건에 맞는 새 장학 공고',
-      desc: '새로 등록된 공고가 내 자격에 맞으면 알려드려요', on: true },
-    { id: 'deadline', icon: '⏰', label: '마감 하루 전 · 마감 당일',
-      desc: '신청할 수 있는 공고의 마감이 임박하면 알려드려요', on: true },
-    { id: 'submit', icon: '📤', label: '제출 리마인드',
-      desc: '앱에서 준비만 하고 아직 공식 제출을 기록하지 않은 공고를 챙겨드려요', on: true },
-    { id: 'feed', icon: '🏫', label: '우리 학교 새 공고',
-      desc: '우리 학교 게시판에 새 장학 공고가 올라오면 묶어서 알려드려요', on: true },
-    { id: 'result', icon: '📮', label: '결과 기록 리마인드',
-      desc: '제출한 공고의 접수 마감이 지나면 결과를 기록하도록 알려드려요', on: true },
+    { id: 'newMatch', icon: NF_ICON.cap, label: '내 조건에 맞는 새 장학 공고',
+      desc: '새로 등록된 공고가 내 자격에 맞으면 알립니다', on: true },
+    { id: 'deadline', icon: NF_ICON.clock, label: '마감 하루 전 · 마감 당일',
+      desc: '신청할 수 있는 공고의 마감이 임박하면 알립니다', on: true },
+    { id: 'submit', icon: NF_ICON.up, label: '제출 리마인드',
+      desc: '준비만 하고 아직 공식 제출을 기록하지 않은 공고를 알립니다', on: true },
+    { id: 'feed', icon: NF_ICON.school, label: '우리 학교 새 공고',
+      desc: '우리 학교 게시판에 새 장학 공고가 올라오면 묶어서 알립니다', on: true },
+    { id: 'result', icon: NF_ICON.mail, label: '결과 기록 리마인드',
+      desc: '제출한 공고의 접수 마감이 지나면 결과를 기록하도록 알립니다', on: true },
   ];
 
   var DEFAULT_PREFS = TYPES.reduce(function (o, t) { o[t.id] = t.on; return o; }, {});
@@ -184,7 +202,7 @@ var NOTIFY_RULES = (function () {
         push({
           key: 'new:batch:' + ymd(now) + ':' + fresh.length,
           type: 'newMatch',
-          title: '🎓 새 장학 공고 ' + fresh.length + '건이 등록됐어요',
+          title: '새 장학 공고 ' + fresh.length + '건',
           body: fresh.slice(0, 2).map(function (s) { return s.name; }).join(', ')
             + ' 외 ' + (fresh.length - 2) + '건 · 내 조건에 맞는 공고예요',
           url: './?screen=explore',
@@ -195,7 +213,7 @@ var NOTIFY_RULES = (function () {
           push({
             key: 'new:' + s.id,
             type: 'newMatch',
-            title: '🎓 새 장학 공고 — ' + s.name,
+            title: '새 장학 공고 · ' + s.name,
             body: (s.amount ? s.amount + ' · ' : '')
               + (d != null ? (d === 0 ? '오늘 마감' : '마감 D-' + d) : '마감 원문 확인'),
             schId: s.id,
@@ -223,7 +241,7 @@ var NOTIFY_RULES = (function () {
         push({
           key: 'dl:' + s.id + ':' + d,
           type: 'deadline',
-          title: (d === 1 ? '⏰ 내일 마감 — ' : '🚨 오늘 마감 — ') + s.name,
+          title: (d === 1 ? '내일 마감 · ' : '오늘 마감 · ') + s.name,
           body: app
             ? '준비해 둔 서류로 ' + (d === 1 ? '내일' : '오늘') + ' 안에 제출하세요.'
             : (d === 1 ? '아직 신청 준비 전이에요. 지금 준비하면 내일 제출할 수 있어요.'
@@ -244,7 +262,7 @@ var NOTIFY_RULES = (function () {
         push({
           key: d === 0 ? 'sub:' + s.id + ':last' : 'sub:' + s.id,
           type: 'submit',
-          title: '📤 아직 제출 기록이 없어요 — ' + s.name,
+          title: '제출 기록 없음 · ' + s.name,
           body: '마감 ' + (d === 0 ? '당일' : 'D-' + d) + '이에요. 제출을 마쳤다면 앱에 기록해 주세요.',
           schId: s.id,
         });
@@ -267,7 +285,7 @@ var NOTIFY_RULES = (function () {
       push({
         key: 'feed:' + ymd(now) + ':' + freshNotices.length,
         type: 'feed',
-        title: '🏫 ' + profile.school + ' 새 공고 ' + freshNotices.length + '건',
+        title: profile.school + ' 새 공고 ' + freshNotices.length + '건',
         body: freshNotices[0].title
           + (freshNotices.length > 1 ? ' 외 ' + (freshNotices.length - 1) + '건' : ''),
         url: './?screen=explore',
@@ -285,7 +303,7 @@ var NOTIFY_RULES = (function () {
         push({
           key: 'res:' + s.id,
           type: 'result',
-          title: '📮 결과가 나왔나요? — ' + s.name,
+          title: '결과 기록하기 · ' + s.name,
           body: '접수 마감 후 2주가 지났어요. 선정 결과를 앱에 기록하면 신청 내역이 정확해져요.',
           schId: s.id,
         });
@@ -322,6 +340,7 @@ var NOTIFY_RULES = (function () {
 
   return {
     TYPES: TYPES,
+    ICON: NF_ICON,      /* 화면(notify.js)이 기본 아이콘을 쓸 때 */
     DEFAULT_PREFS: DEFAULT_PREFS,
     newLedger: newLedger,
     normalizeLedger: normalizeLedger,

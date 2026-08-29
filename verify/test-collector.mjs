@@ -3018,5 +3018,18 @@ console.log('\n■ 적합도 상수 — 감사가 match-engine 과 같은 뜻을
   eq('  그리고 사유가 함께 있다 (사유 없는 미달은 없다)', 미달.fails.length > 0, true);
 }
 
+/* ■ 말투·토큰 관문이 워크플로에 걸려 있는가 (2026-08-29)
+   🔴 이 저장소가 이미 겪은 사고다 — 검사를 만들어 두고 워크플로에 안 걸어서
+      31개 중 5개만 돌고 7개가 깨진 채 방치됐다. **관문은 걸려 있어야 관문이다.**
+      여기서는 파일 존재와 워크플로 연결만 본다(실행은 verify-ui.yml 이 한다). */
+console.log('\n■ 화면 말투·토큰 관문이 살아 있는가');
+{
+  const has = fs.existsSync(new URL('../verify/ui-tone.mjs', import.meta.url));
+  eq('verify/ui-tone.mjs 가 있다', has, true);
+  const wf = fs.readFileSync(new URL('../.github/workflows/verify-ui.yml', import.meta.url), 'utf8');
+  eq('워크플로가 그것을 실제로 돌린다', /node verify\/ui-tone\.mjs/.test(wf), true);
+  eq('style.css 가 바뀔 때도 돈다', /- 'style\.css'/.test(wf), true);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);

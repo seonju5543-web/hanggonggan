@@ -138,9 +138,12 @@ const PROFILE = {
   console.log('\n■ 적합도순 — 미달은 맨 아래 (개발자 결정)');
   await longPress(page, '#explore-sort-btn');
   await page.click('#explore-sort-menu [data-sort="fit"]'); await page.waitForTimeout(600);
+  /* 🔴 2026-08-29: 카드의 미달 표시가 배지(.badge-fit-no)에서 막대(.sch-fit.is-no)로 바뀌었다.
+     옛 선택자를 그대로 두면 **늘 0건이 잡혀 검사가 조용히 통과한다** — 무력해진 검사다. */
   const noIdx = await page.$$eval('#explore-list .sch-card',
-    (els) => els.map((e, i) => (e.querySelector('.badge-fit-no') ? i : -1)).filter((i) => i >= 0));
+    (els) => els.map((e, i) => (e.querySelector('.sch-fit.is-no') ? i : -1)).filter((i) => i >= 0));
   const total = await page.$$eval('#explore-list .sch-card', (e) => e.length);
+  console.log('   (미달 카드 ' + noIdx.length + '건 / 전체 ' + total + '건 — 0건이면 이 검사는 무력하다)');
   eq('미달 카드가 목록 끝에 모여 있다',
     noIdx.length === 0 || noIdx[0] + noIdx.length === total, true);
 
@@ -150,9 +153,11 @@ const PROFILE = {
   await page.click('#explore-sort-menu [data-sort="deadline"]'); await page.waitForTimeout(600);
   eq('정렬을 바꿔도 필터 칩 active가 그대로다',
     await page.$$eval('.filter-chip.active', (e) => e.map((x) => x.dataset.filter)), ['교외']);
-  eq('필터도 그대로 걸려 있다',
-    await page.$$eval('#explore-list .sch-card .badge-out, #explore-list .sch-card .badge-in',
-      (e) => [...new Set(e.map((x) => x.textContent.trim()))]), ['교외']);
+  /* 카드의 교내/교외 배지는 '검수 전'과 한 칸으로 합쳐졌다 (.badge-kind — 2026-08-29).
+     그래서 값이 '교외' 또는 '교외 · 검수 전' 둘 다 나온다 — 앞부분으로 본다. */
+  const kinds = await page.$$eval('#explore-list .sch-card .badge-kind',
+    (e) => [...new Set(e.map((x) => x.textContent.trim().split(' · ')[0]))]);
+  eq('필터도 그대로 걸려 있다', kinds, ['교외']);
 
   console.log('\nERRORS:', errors.length ? errors : 'none');
   if (errors.length) fail++;

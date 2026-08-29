@@ -191,7 +191,7 @@ function recordResult(sch, won) {
   app.result = won ? 'won' : 'lost';
   app.resultAt = nowStamp();
   saveState();
-  toast(won ? '🎉 선정 축하드려요! 결과를 기록했어요' : '결과를 기록했어요. 다음 기회를 함께 찾아봐요');
+  toast(won ? '선정 결과를 기록했습니다' : '결과를 기록했습니다');
   refreshProgressViews(sch.id);
 }
 
@@ -327,7 +327,7 @@ function docWalletStatus(doc) {
   if (!s) return null;
   const rec = walletCache[s.slot];
   return rec
-    ? { ok: true, slot: s, text: `보관함에서 자동 첨부 ✓ (${rec.name})` }
+    ? { ok: true, slot: s, text: `보관함에서 자동 첨부 · ${rec.name}` }
     : { ok: false, slot: s, text: `보관함에 없음 · 발급처: ${s.issue}` };
 }
 
@@ -496,6 +496,10 @@ function initOnboarding() {
   ).join('');
 
   const p = state.profile;
+  /* 계좌 칸은 **처음 가입할 때는 감춘다** (2026-08-29). 프로필을 고치러 들어온
+     사람에게만 보인다 — 그때는 이미 앱을 써 보고 신뢰가 생긴 뒤다. */
+  const acField = $('#in-account-field');
+  if (acField) acField.hidden = !p;
   if (p) {
     const c = p.common || {};
     $('#in-name').value = p.name || '';
@@ -670,34 +674,57 @@ function fitBadgeHtml(fit, fd) {
 }
 
 /* ---------------- 카드 렌더링 ---------------- */
+/* 목록 카드의 적합도 — **배지가 아니라 막대**다 (2026-08-29 UI 정리).
+   왜 바꿨나: 배지 하나가 `적합도 62% 요건 8개 중 5개 충족 · 확인 필요 2` 를 다 말하느라
+   카드 폭을 넘겨 두 줄로 흘렀고, 그 줄에 배지가 최대 5개까지 붙어 학생이 배지를 아예
+   안 읽었다(공동개발자·전문가 지적 "AI가 만든 티").
+   🔴 **뜻은 그대로다** — 숫자만 두지 않는다는 원칙(docs/designs/fit-score.md)을 지켜,
+      퍼센트를 아예 없애고 근거인 `요건 5/8` 만 남겼다. 색은 거들 뿐 뜻은 숫자가 전한다.
+   🔴 판정은 여기서 새로 만들지 않는다 — `fitVerdict` 한 곳을 그대로 부른다.
+   검사: verify/verify-fit-badge.js */
+function fitMeterHtml(fit, fd) {
+  const verdict = fitVerdict(fit, fd);
+  if (verdict === 'unread') return '<p class="sch-fit is-unread">자격 미확인</p>';
+  if (verdict === 'no') return '<p class="sch-fit is-no">지원 자격 미달</p>';
+  if (!fd || !fd.total) return '';
+  const w = Math.round((fd.met / fd.total) * 100);
+  const rest = fd.unknown > 0 ? ` · 확인 필요 ${fd.unknown}` : '';
+  return `<p class="sch-fit">
+      <span class="sch-fit-bar"><i style="width:${w}%"></i></span>
+      <span class="sch-fit-txt">요건 ${fd.met}/${fd.total}${rest}</span>
+    </p>`;
+}
+
+/* ---------------- 카드 렌더링 ---------------- */
+/* 🔴 배지는 **둘까지**다 (2026-08-29). 정리 전에는 교외·D-day·자동등록·신청함·적합도로
+      다섯이었고, 셋을 넘으면 학생은 배지를 아예 안 읽는다.
+      · 교내/교외 와 '검수 전' 은 한 칸에 합쳤다(둘 다 '이 공고가 어떤 것인가'를 말한다)
+      · '신청함' 은 배지가 아니라 카드 상태다 — 왼쪽 띠와 아래 표시로 옮겼다
+      · 적합도는 배지가 아니라 막대다 (fitMeterHtml)
+   ⚠️ 이 카드는 자격 원문 줄을 **원래부터 보여 주지 않는다** — 5줄 미리보기는 일괄 준비
+      목록(bulkRowHtml)의 '더보기' 안에 있다. 상세 시트는 `{all:true}` 로 전부 보여 준다. */
 function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
-  const meta = STATUS_META[result.status];
   const d = dday(sch.deadline);
   const applied = state.applications.some((a) => a.id === sch.id);
+  const kind = sch.type + (sch.auto ? ' · 검수 전' : '');
   return `
-    <button class="sch-card" data-detail="${sch.id}">
+    <button class="sch-card tone-${fitVerdict(fit, fd)}${applied ? ' is-applied' : ''}" data-detail="${sch.id}">
       <div class="sch-top">
-        <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${sch.type}</span>
         ${sch.program ? '<span class="badge badge-program">상시 제도</span>' : `<span class="badge badge-dday ${d.cls}">${d.label}</span>`}
-        ${sch.auto ? '<span class="badge badge-auto">자동 등록 · 검수 전</span>' : ''}
-        ${applied ? '<span class="badge badge-applied">신청함</span>' : ''}
-        ${fitBadgeHtml(fit, fd)}
+        <span class="badge badge-kind">${esc(kind)}</span>
       </div>
       <p class="sch-name">${esc(sch.name)}</p>
       <p class="sch-amount">${esc(sch.amount)}</p>
       ${compact ? '' : `<p class="sch-provider">${esc(sch.provider)}</p>`}
-      ${/* 🔴 옛 판정 배지('지원 가능 · 선발 심사')를 **카드에서** 뺐다 (2026-08-24).
-           적합도 배지가 생긴 뒤로 한 카드에 판정이 둘이었고 서로 다른 축을 말해서,
-           `자격 미확인`인데 `지원 가능`이 함께 떴다. 학생은 '지원 가능'만 보고 들어갔다가
-           자격이 안 맞으면 헛걸음한다 — 이 앱이 없애려는 바로 그 피로감이다.
-           상세 시트에는 그대로 둔다(거기서는 마감·접수 상태를 함께 읽는다). */ ''}
+      ${fitMeterHtml(fit, fd)}
+      ${applied ? '<p class="sch-applied">신청 준비함</p>' : ''}
     </button>`;
 }
 
 /* ---------------- 홈 ---------------- */
 function renderHome() {
   const p = state.profile;
-  $('#home-greet').textContent = p.name ? `${p.name}님, 안녕하세요!` : '안녕하세요!';
+  $('#home-greet').textContent = p.name ? `${p.name}님` : '안녕하세요';
   $('#home-school').textContent = (p.school || '대학 미설정') + (p.campus ? ' · ' + p.campus : '');
   $('#home-avatar').textContent = (p.name || '학').charAt(0);
 
@@ -724,7 +751,7 @@ function renderHome() {
 
   const btn = $('#btn-apply-all');
   btn.disabled = notApplied.length === 0;
-  btn.textContent = notApplied.length ? `⚡ ${notApplied.length}건 한 번에 신청 준비하기` : '✓ 가능한 장학금을 모두 준비했어요';
+  btn.textContent = notApplied.length ? `${notApplied.length}건 신청 준비` : '준비할 장학금이 남아 있지 않습니다';
 
   const upcoming = applyable
     .filter((m) => dday(m.sch.deadline).days >= 0 && notStale(m.sch))
@@ -984,7 +1011,7 @@ function renderDocPrep() {
       <div class="sheet-handle"></div>
       <div class="sheet-body">
         <h3 class="sheet-title">서류 작성 도우미</h3>
-        <p class="sheet-provider">${sch.name} · 답을 고르면 그 답으로 초안 문장을 엮어 드려요</p>
+        <p class="sheet-provider">${sch.name} · 고른 답으로 초안 문장을 엮습니다</p>
         ${docPrep.defs.map((def, di) => `
           <div class="dp-block">
             <h4>${def.doc}</h4>
@@ -1029,8 +1056,8 @@ function renderDocPrep() {
             <textarea class="dp-text" data-i="${i}" rows="10">${esc(t.text)}</textarea>
           </div>`).join('')}
         ${certStatusListHtml(sch)}
-        <button class="btn btn-primary btn-lg" id="btn-dp-confirm">✓ 이대로 신청 준비 완료</button>
-        <p class="dp-note">완료하면 작성한 서류가 저장되고, 최종 제출처를 안내해 드려요.</p>
+        <button class="btn btn-primary btn-lg" id="btn-dp-confirm">이대로 신청 준비 완료</button>
+        <p class="dp-note">완료하면 작성한 서류가 저장되고 최종 제출처가 표시됩니다.</p>
       </div>`;
 
     $$('.dp-text').forEach((ta) =>
@@ -1109,10 +1136,10 @@ function renderFormFill() {
         <h3 class="sheet-title">이대로 제출 준비할까요?</h3>
         <p class="sheet-provider">칸을 눌러 직접 수정할 수 있어요 · ${tpl.unofficial ? '자유 형식 제출용 지원문서' : '실제 공고 양식과 동일한 구조'}</p>
         <div class="fd-wrap" id="ff-doc">${renderFormDoc(tpl, state.profile, formFill.ans, { editable: true })}</div>
-        <button class="btn btn-primary btn-lg" id="btn-ff-confirm">✓ 이대로 신청 준비 완료</button>
+        <button class="btn btn-primary btn-lg" id="btn-ff-confirm">이대로 신청 준비 완료</button>
         <div class="submit-actions" style="margin-top:8px">
-          <button class="btn btn-outline" id="btn-ff-back">← 질문 다시</button>
-          <button class="btn btn-outline" id="btn-ff-doc">📄 .doc 저장</button>
+          <button class="btn btn-outline" id="btn-ff-back">질문 다시 보기</button>
+          <button class="btn btn-outline" id="btn-ff-doc">.doc 저장</button>
         </div>
       </div>`;
     $('#btn-ff-back').addEventListener('click', () => { formFill.stage = 'q'; renderFormFill(); });
@@ -1123,7 +1150,7 @@ function renderFormFill() {
       else state.applications.push({ id: sch.id, appliedAt: nowStamp(), step: 0, formAns: formFill.ans, pending: false });
       saveState();
       const ch = officialChannel(sch);
-      toast(`양식 작성 완료! 문서를 저장해 ${ch.label}에 제출하세요`);
+      toast(`양식 작성 완료 · 문서를 저장해 ${ch.label}에 제출하세요`);
       formFill = null;
       closeSheet();
       const current = $$('.screen').find((s) => !s.hidden);
@@ -1361,11 +1388,11 @@ function liveNoticesHtml() {
     <a class="sch-card notice-card" href="${esc(safeUrl(n.url))}" target="_blank" rel="noopener">
       <div class="sch-top">
         <span class="badge badge-in">교내 공고</span>
-        ${n.deadlineHint ? `<span class="badge badge-dday urgent">⏰</span>` : ''}
+        ${n.deadlineHint ? `<span class="badge badge-dday urgent">마감 임박</span>` : ''}
         ${(n.attachments || []).length ? `<span class="badge badge-applied">양식 ${n.attachments.length}</span>` : ''}
       </div>
       <p class="sch-name">${esc(n.title)}</p>
-      ${n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? `<p class="sch-provider">⏰ ${esc(n.deadlineHint)}</p>` : ''}
+      ${n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? `<p class="sch-provider">${esc(n.deadlineHint)}</p>` : ''}
       <p class="sch-provider">${esc(n.school)}${n.campus ? ' ' + esc(n.campus) : ''} · ${esc(n.foundAt || '')} 수집 · ${isBoardListLink(n.url) ? '게시판 목록에서 보기 ↗' : '원문 보기 ↗'}</p>
     </a>`).join('') + `</div>`;
 }
@@ -1434,7 +1461,7 @@ function finalizeApply(sch, docs) {
   }
   saveState();
   const ch = officialChannel(sch);
-  toast(`'${sch.name}' 신청 준비 완료! 최종 제출은 ${ch.label}에서 확인하세요`);
+  toast(`'${sch.name}' 신청 준비 완료 · 최종 제출은 ${ch.label}`);
   const current = $$('.screen').find((s) => !s.hidden);
   if (current) showScreen(current.id.replace('screen-', ''));
 }
@@ -1768,7 +1795,7 @@ function bulkStart() {
   const goneMsg = gone.length ? ` · ${gone.length}건은 그 사이 마감돼 빼놓았어요` : '';
   toast(need.length
     ? `${go.length - need.length}건 준비 완료 · ${need.length}건은 신청내역에서 서류를 이어서 쓰세요${goneMsg}`
-    : `장학금 ${go.length}건 신청 준비가 완료됐어요 🎉${goneMsg}`);
+    : `장학금 ${go.length}건 신청 준비 완료${goneMsg}`);
   showScreen('applications');
 }
 
@@ -1896,7 +1923,7 @@ function openDetail(id) {
       + exLines.map((e) => `<li class="r-req">${esc(e)}</li>`).join('');
   }
   if (aiRead && reasonRows) {
-    reasonRows = `<li class="r-ai">🤖 이 자격은 AI가 공고 원문에서 읽었어요 · 사람 검수 전</li>` + reasonRows;
+    reasonRows = `<li class="r-ai">이 자격은 AI가 공고 원문에서 읽은 것입니다 · 사람 검수 전</li>` + reasonRows;
   }
   if (checkRows) {
     reasonRows += `<li class="r-head">내 정보로 확인한 것</li>` + checkRows;
@@ -1910,9 +1937,9 @@ function openDetail(id) {
   }
   const missingRows = '';
 
-  let btnLabel = '⚡ 원클릭 신청 준비하기';
-  if (app && !app.pending) btnLabel = '✓ 신청 준비 완료됨';
-  else if (app && app.pending) btnLabel = '📝 서류 작성하고 준비 완료하기';
+  let btnLabel = '신청 준비 시작';
+  if (app && !app.pending) btnLabel = '신청 준비 완료됨';
+  else if (app && app.pending) btnLabel = '서류 작성 이어서 하기';
   else if (d.days < 0) btnLabel = '마감된 장학금이에요';
   else if (!canApply) btnLabel = '요건 미충족으로 신청할 수 없어요';
 
@@ -1952,11 +1979,11 @@ function openDetail(id) {
       <h4>공고 원문 안내 <span class="channel-tag">원문 그대로</span></h4>
       <ul class="doc-list">${sch.excerpts.map((e) => `<li>${esc(e)}</li>`).join('')}</ul>
       <p class="doc-legend">공고 본문에서 자동으로 그대로 가져온 문장이에요 — 전체 내용은 원문 공고 ↗에서 확인하세요.</p>` : ''}
-      <p class="sheet-note">💡 ${esc(sch.note)}</p>
+      <p class="sheet-note">${esc(sch.note)}</p>
       ${(sch.attachments && sch.attachments.length) ? `
       <h4>공고 원본 첨부 양식</h4>
       <ul class="doc-list">
-        ${sch.attachments.map((a) => `<li>📎 <a href="${esc(safeUrl(a.url))}" target="_blank" rel="noopener" style="color:var(--primary)">${esc(a.name)}</a></li>`).join('')}
+        ${sch.attachments.map((a) => `<li class="att"><a href="${esc(safeUrl(a.url))}" target="_blank" rel="noopener" style="color:var(--primary)">${esc(a.name)}</a></li>`).join('')}
       </ul>` : ''}
       <p class="sheet-deadline">${sch.program ? '신청 기간: 한국장학재단 공지 확인' : `마감일 ${sch.deadline || '원문 공고 확인'}`} · ${sch.duplicable ? '타 장학금과 중복 수혜 가능' : '중복 수혜 제한 있음'}${sch.sourceUrl ? ` · <a href="${esc(safeUrl(sch.sourceUrl))}" target="_blank" rel="noopener" style="color:var(--primary);font-weight:700">${sch.program ? '한국장학재단 ↗' : (isBoardListLink(sch.sourceUrl) ? '게시판 목록 ↗' : '원문 공고 ↗')}</a>` : ''}</p>
       ${(!sch.program && isBoardListLink(sch.sourceUrl)) ? `<p class="doc-legend">이 학교 게시판은 목록에서 글을 눌러야 열리는 방식이라 공고 하나로 바로 가는 주소를 확인하지 못했어요. 열리는 목록에서 <strong>${esc(boardListTitle(sch.sourceUrl))}</strong>을(를) 찾아 눌러 주세요.</p>` : ''}
@@ -1973,20 +2000,20 @@ function openDetail(id) {
         </div>
         <p class="applied-at">${app.appliedAt} 준비 완료 · 최종 제출처: ${ch.url ? `<a href="${esc(safeUrl(ch.url))}" target="_blank" rel="noopener">${esc(ch.label)}</a>` : esc(ch.label)}</p>
         ${step === 0 ? `
-          <button class="btn btn-outline" id="btn-mark-submitted" style="width:100%;margin-bottom:6px">✅ 공식 제출을 마쳤어요 — 제출 완료로 기록</button>
+          <button class="btn btn-outline" id="btn-mark-submitted" style="width:100%;margin-bottom:6px">공식 제출 완료로 기록</button>
           <p class="dp-note">최종 제출은 ${ch.label}에서 이루어져요. 제출을 마친 뒤 눌러 주시면 진행 단계가 넘어가요.</p>` : ''}
         ${step === 1 ? `
-          <p class="progress-note">📮 ${app.submittedAt} 공식 제출 기록됨${sch.deadline ? ` · 접수 마감(${sch.deadline}) 후 자동으로 심사 단계로 표시돼요` : ''}</p>
+          <p class="progress-note">${app.submittedAt} 공식 제출 기록됨${sch.deadline ? ` · 접수 마감(${sch.deadline}) 후 자동으로 심사 단계로 표시돼요` : ''}</p>
           <button class="link-btn" id="btn-undo-progress" style="margin-bottom:10px">제출 기록 취소</button>` : ''}
         ${step === 2 ? `
-          <p class="progress-note">🔍 접수가 마감되어 심사가 진행 중이에요. 발표 결과가 나오면 아래에 기록해 주세요 — 발표 확인은 ${ch.label}${sch.sourceUrl ? ' 또는 원문 공고' : ''}에서 할 수 있어요.</p>
+          <p class="progress-note">접수가 마감되어 심사가 진행 중입니다. 발표 결과가 나오면 아래에 기록해 주세요 — 발표 확인은 ${ch.label}${sch.sourceUrl ? ' 또는 원문 공고' : ''}에서 할 수 있어요.</p>
           <div class="submit-actions" style="margin-bottom:12px">
-            <button class="btn btn-outline" id="btn-result-won">🎉 선정됐어요</button>
+            <button class="btn btn-outline" id="btn-result-won">선정됨</button>
             <button class="btn btn-outline" id="btn-result-lost">아쉽게 미선정</button>
           </div>` : ''}
         ${step === 3 ? `
           <p class="progress-note ${app.result === 'won' ? 'progress-won' : ''}">${app.result === 'won'
-            ? `🎉 ${app.resultAt} 선정! 축하드려요 — ${sch.amount}`
+            ? `${app.resultAt} 선정 · ${sch.amount}`
             : `${app.resultAt} 미선정으로 기록했어요. 아래 탐색 탭에서 다음 장학금을 함께 찾아봐요.`}</p>
           <button class="link-btn" id="btn-undo-progress" style="margin-bottom:10px">결과 기록 취소</button>` : ''}
         ${app.docs && app.docs.length ? `
@@ -1996,25 +2023,25 @@ function openDetail(id) {
         ${app.formAns && formTplIdFor(sch) ? `
           <h4>작성한 양식 문서</h4>
           <div class="submit-actions">
-            <button class="btn btn-outline" id="btn-form-save">📄 .doc 저장</button>
-            <button class="btn btn-outline" id="btn-form-print">🖨 인쇄/PDF</button>
-            <button class="btn btn-outline" id="btn-form-share">📤 공유</button>
+            <button class="btn btn-outline" id="btn-form-save">.doc 저장</button>
+            <button class="btn btn-outline" id="btn-form-print">인쇄 · PDF</button>
+            <button class="btn btn-outline" id="btn-form-share">공유</button>
           </div>
-          <button class="btn btn-outline" id="btn-form-edit" style="width:100%;margin-bottom:14px">✏️ 양식 다시 작성</button>` : ''}
+          <button class="btn btn-outline" id="btn-form-edit" style="width:100%;margin-bottom:14px">양식 다시 작성</button>` : ''}
         ${certStatusListHtml(sch)}
         <h4>최종 제출 방법 <span class="channel-tag">${submitChannelLabel(sch)}</span></h4>
         <ol class="guide-list">${ch.guide.map((g) => `<li>${g}</li>`).join('')}</ol>
         ${(ch.url || sch.sourceUrl) && step < 1 ? `
-        <button class="btn btn-primary" id="btn-go-submit" style="width:100%;margin-bottom:8px">⚡ 내용 복사하고 제출처 열기 ↗</button>` : ''}
+        <button class="btn btn-primary" id="btn-go-submit" style="width:100%;margin-bottom:8px">내용 복사하고 제출처 열기 ↗</button>` : ''}
         <div class="submit-actions">
-          <button class="btn btn-outline" id="btn-copy-docs">📋 서류 내용 복사</button>
-          <button class="btn btn-outline" id="btn-share-docs">📤 파일과 함께 공유</button>
+          <button class="btn btn-outline" id="btn-copy-docs">서류 내용 복사</button>
+          <button class="btn btn-outline" id="btn-share-docs">파일과 함께 공유</button>
         </div>
-        ${sch.applyEmail ? `<button class="btn btn-primary btn-lg" id="btn-mail-apply" style="margin-bottom:14px">📧 접수 메일 열기 (내용 자동 완성)</button>` : ''}`;
+        ${sch.applyEmail ? `<button class="btn btn-primary btn-lg" id="btn-mail-apply" style="margin-bottom:14px">접수 메일 열기 (내용 자동 완성)</button>` : ''}`;
       })() : ''}
 
       <button class="btn btn-primary btn-lg" id="btn-apply-one" ${canApply ? '' : 'disabled'}>${btnLabel}</button>
-      ${canApply ? `<p class="dp-note">준비 완료 후 최종 제출처(${ch.label})를 안내해 드려요.${(!sch.formId && sch.prepFormId) ? ' 이 공고는 별도 양식 없이 자유 형식 제출을 받는 공고라, 앱이 제출용 지원문서 작성을 도와드려요.' : ''}</p>` : ''}
+      ${canApply ? `<p class="dp-note">준비를 마치면 최종 제출처(${ch.label})가 표시됩니다.${(!sch.formId && sch.prepFormId) ? ' 이 공고는 별도 양식 없이 자유 형식 제출을 받으므로, 앱에서 제출용 지원문서를 작성할 수 있습니다.' : ''}</p>` : ''}
     </div>`;
 
   openSheetShell();
@@ -2189,7 +2216,7 @@ function appCard(app) {
   const sch = findSch(app.id);
   if (!sch) return '';
   const step = effectiveStep(app, sch);
-  const stepLabel = step === 3 ? (app.result === 'won' ? '🎉 선정' : '결과 확인') : APP_STEPS[step];
+  const stepLabel = step === 3 ? (app.result === 'won' ? '선정' : '결과 확인') : APP_STEPS[step];
   const statusBadge = app.pending
     ? '<span class="badge badge-pending">서류 작성 필요</span>'
     : `<span class="badge badge-applied">${stepLabel}</span>`;
@@ -2294,7 +2321,7 @@ function renderApplications() {
 
   $('#apps-summary').innerHTML = apps.length
     ? `<div class="summary-card">
-         <p>준비 완료 ${prepared.length}건${submitted.length ? ` · 제출·심사 중 ${submitted.length}건` : ''}${wonApps.length ? ` · 🎉 선정 ${wonApps.length}건` : ''}${pending.length ? ` · 서류 작성 필요 ${pending.length}건` : ''} · ${wonApps.length ? '선정된 장학금' : '예상 최대 수혜액'}</p>
+         <p>준비 완료 ${prepared.length}건${submitted.length ? ` · 제출·심사 중 ${submitted.length}건` : ''}${wonApps.length ? ` · 선정 ${wonApps.length}건` : ''}${pending.length ? ` · 서류 작성 필요 ${pending.length}건` : ''} · ${wonApps.length ? '선정된 장학금' : '예상 최대 수혜액'}</p>
          <p class="summary-amount">${won(wonApps.length ? wonAmount : totalExpected)}</p>
          <p class="summary-note">제출·발표 단계는 각 장학금 상세에서 직접 기록할 수 있어요 · 최종 제출은 각 공식 채널에서 이루어져요</p>
        </div>`
@@ -2307,7 +2334,7 @@ function renderApplications() {
   list.classList.toggle('selecting', appsSelectMode);
   list.innerHTML = apps.length
     ? apps.map(appCard).join('')
-    : '<p class="empty">아직 준비한 장학금이 없어요.<br />홈에서 한 번에 준비해 보세요 ⚡</p>';
+    : '<p class="empty">아직 준비한 장학금이 없습니다.<br />홈 화면에서 한 번에 준비할 수 있습니다.</p>';
 
   /* 항목이 없으면 관리 장치를 통째로 숨긴다 — 빈 화면에 쓸 수 없는 버튼을 두지 않는다 */
   $('#apps-select-toggle').hidden = !apps.length;
@@ -2494,7 +2521,7 @@ function bindEvents() {
        동의 여부는 '나가도 되는가'를 정하는 값이라 섞으면 헷갈린다. */
     state.consent = { sensitive: !!$('#in-sensitive-ok').checked };
     saveState();
-    toast('프로필이 저장됐어요. 맞춤 장학금을 찾았어요!');
+    toast('프로필을 저장했습니다');
     showScreen('home');
     // 프로필을 처음 만든 직후에 알림 동의를 딱 한 번 묻는다 (이후에는 MY 화면에서만)
     // 저장 완료 토스트가 사라진 뒤에 물어본다 (문구가 겹치지 않게)
@@ -2968,7 +2995,7 @@ function renderAuthSheet(errText, okText) {
         <span>(필수) <a href="terms.html" target="_blank" rel="noopener">이용약관 · 개인정보처리방침</a>에 동의합니다</span>
       </label>`;
   } else if (mode === 'reset') {
-    mid = `<p class="auth-lead">가입할 때 쓴 이메일로 비밀번호를 다시 정하는 링크를 보내 드려요.</p>`
+    mid = `<p class="auth-lead">가입할 때 쓴 이메일로 비밀번호 재설정 링크를 보냅니다.</p>`
       + emailField;
   } else {
     mid = `<p class="auth-lead">새로 쓸 비밀번호를 정해 주세요.</p>`
