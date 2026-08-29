@@ -17,6 +17,10 @@ bash tools/setup-collab.sh 2>&1 || echo "⚠️ 협업 병합기 등록을 건�
 # 인터넷이 막혀 있으면 조용히 넘어간다
 node verify/check-collab.js --brief 2>/dev/null || true
 
+# 스킬 장부·디버깅 빚을 비운다 — 지난 세션 기록이 남아 있으면 이번 세션을 엉뚱하게 막는다
+gitdir="$(git rev-parse --git-dir 2>/dev/null)" \
+  && rm -f "$gitdir/claude-skills-used" "$gitdir/claude-debug-owed"
+
 # 🔴 스킬을 언제 부를지 못 박는다 (2026-08-29 개발자 지시)
 #    superpowers 안내문은 이미 매 세션 들어오는데도 2026-08-29 하루 종일 한 번도
 #    안 불렸다 — "적용되면 써라"는 **판단에 맡기는 말**이라 긴 세션에서 밀린다.
@@ -27,11 +31,16 @@ cat <<'MSG'
 📌 이 저장소에서 반드시 부를 스킬 (판단하지 말고 그대로)
    · 코드를 짜거나 고쳤으면 → 끝내기 전에
         Skill(skill="superpowers:requesting-code-review")
+     ⚠️ 이 스킬은 **리뷰어 서브에이전트**를 띄우라고 한다. 에이전트를 못 쓰는 세션이면
+        건너뛰지 말고 **직접 diff 를 보되 스킬 항목을 하나씩 짚는다**(요구사항 충족 ·
+        경계값·빈 값 · 기존 검사를 무력화하지 않는가). 2026-08-30에 그 절차 없이
+        훑다가 '마감일 칸이 빈 재단을 통째로 버리는' 버그를 놓쳤다.
    · 오류·검사 실패·예상 못 한 동작이 나오면 → 고치기 **전에**
         Skill(skill="superpowers:systematic-debugging")
    · "고쳤다/됐다"고 말하기 직전 → Skill(skill="superpowers:verification-before-completion")
-   ⚠️ 이 셋은 훅이 대신 실행해 주지 못한다(훅은 셸만 돌린다). 부르는 것은 네 몫이고,
-      안 불렀을 때 드러나는 것만 훅이 맡는다.
+   🔴 이제 훅이 **불렀는지 기억한다**(.claude/hooks/skill-ledger.sh). 안 부르고 끝내려 하면
+      Stop 훅이 한 번 막는다 — verify 드라이버가 빨간불이었는데 디버깅 스킬을 안 불렀거나,
+      판정·화면·로봇 코드를 고쳤는데 리뷰 스킬을 안 불렀을 때. 부르면 저절로 풀린다.
 
 📌 화면이 어떻게 보이는지 말하기 전에 (2026-08-29 — 여기서 틀려서 잘못 보고한 적 있다)
    그 자리에서 짠 스크립트로 재지 말 것. 목록은 5줄 상한, 상세는 전부라 결과가 다르다.
