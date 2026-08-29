@@ -1,4 +1,4 @@
-## 🖥 브라우저형 수집 리포트 (2026-08-29 00:15 KST)
+## 🖥 브라우저형 수집 리포트 (2026-08-29 13:07 KST)
 
 ### 서울대학교
 - ✅ 링크 245 · 장학 공고 19 · https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=list&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80
@@ -25,25 +25,24 @@
   - (본 글자) [교외] 경원장학재단 장학생 선발 안내(9/30 마감, 생활비 400만원)
 
 ### 서울시립대학교
-- ⚪ 링크 280 · 장학 공고 0 · 이미 아는 공고 1건은 다시 열지 않음 · https://www.uos.ac.kr/korNotice/list.do?list_id=FA1
-- ⚪ 링크 267 · 장학 공고 0 · https://www.uos.ac.kr/korNotice/list.do?list_id=FA2
+- ⚪ 링크 277 · 장학 공고 0 · 이미 아는 공고 1건은 다시 열지 않음 · https://www.uos.ac.kr/korNotice/list.do?list_id=FA1
+- ⚪ 링크 263 · 장학 공고 0 · https://www.uos.ac.kr/korNotice/list.do?list_id=FA2
   - (프레임 1개 · 클릭 시도 0건)
   - (본 링크) [교직] 「공업교재연구및지도법」(01471) 강의실 변경 안내
   - (본 링크) [의사소통교실] 2026학년도 2학기 외국인을위한글쓰기(02반) 담당교수 변경 안내
   - (본 링크) 2026학년도 2학기 <대학영어W> 진단평가 응시 안내
-  - (본 링크) [추가모집][차세대통신혁신융합대학사업단] 2026학년도 2학기 국내 학점교류 안내(국민대학교, 8/28(금) 14시까지
-  - (본 링크) 2026학년도 제2학기 등록금 납부안내(재학생, 학기초과자)
   - (본 링크) 2026년 2학기 [대학물리학및실험2] 수강정원 증원 안내
   - (본 링크) 2026학년도 2학기 대학수학2 등 교과목 수강정원 증원 안내
   - (본 링크) [진로교육지원팀]2026학년도 2학기 UOS커리어디자인 교과목 수강신청 안내[교양필수]
+  - (본 링크) [추가모집][차세대통신혁신융합대학사업단] 2026학년도 2학기 국내 학점교류 안내(국민대학교, 8/28(금) 14시까지
   - (본 링크) 2026학년도 2학기 생명과학과 <나노생물학>,<면역학>,<병원미생물학> 수강정원 증원 안내
   - (본 링크) 2026학년도 2학기 국내학점교류 안내(한국외국어대학교 AI교육혁신 , 8/25 15시까지)
+  - (본 링크) (8/29 온라인 개강 워크샵 참여 필수!)「사회문제해결형AI」 교과목 수강안내 (카카오 현직자 실무 멘토링, 2026
 
 ### 중앙대학교
 - ⚪ 링크 657 · 장학 공고 0 · 이미 아는 공고 14건은 다시 열지 않음 · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5
-  - 📄 2페이지에서 장학 공고 6건 더 읽음
-- ✅ 링크 1317 · 장학 공고 7 · 이미 아는 공고 2건은 다시 열지 않음 · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100
-  - [수집] [한국장학재단] 2026년 장학금 부정수급 자진신고 캠페인
+  - 📄 2페이지에서 장학 공고 4건 더 읽음
+- ✅ 링크 1314 · 장학 공고 4 · 이미 아는 공고 6건은 다시 열지 않음 · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100
 - ❌ 예기치 못한 오류(today is not defined)
 
 ### 숙명여자대학교
@@ -75,20 +74,15 @@
 - ✅ 링크 85 · 장학 공고 15 · https://dep.hufs.ac.kr/student/12767/subview.do
 
 ### 경희대학교
-- ✅ 링크 294 · 장학 공고 3 · 이미 아는 공고 5건은 다시 열지 않음 · https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318
-  - [수집] 공통 2026년도 익산사랑 장학생 선발 안내
-  - [수집] 공통 2026년도 하반기 울산연구원 장학생 선발 안내
-  - [수집] 공통 2026학년도 2학기 선원가족 장학생 모집 안내
+- ⚪ 링크 291 · 장학 공고 0 · 이미 아는 공고 8건은 다시 열지 않음 · https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318
 
 ### 상명대학교
-- ❌ 오류(page.goto: Target page, context or browser has been closed) · https://www.smu.ac.kr/kor/life/notice.do
-- ✅ 링크 645 · 장학 공고 15 · https://www.smu.ac.kr/kor/life/notice.do?srCategoryId=8
-  - [수집] [학생복지팀] 국가근로장학금 2차 학생 신청 안내(동계방학 집중근로 포함)
+- ✅ 링크 645 · 장학 공고 15 · https://www.smu.ac.kr/kor/life/notice.do
 - ❌ 예기치 못한 오류(today is not defined)
 
 ### 고려대학교
-  - 📄 2페이지에서 장학 공고 7건 더 읽음
-- ✅ 링크 772 · 장학 공고 4 · 이미 아는 공고 5건은 다시 열지 않음 · https://www.korea.ac.kr/ko/568/subview.do
+  - 📄 2페이지에서 장학 공고 6건 더 읽음
+- ✅ 링크 770 · 장학 공고 2 · 이미 아는 공고 6건은 다시 열지 않음 · https://www.korea.ac.kr/ko/568/subview.do
 
 ### 계명대학교
 - ✅ 링크 525 · 장학 공고 18 · https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=145&
@@ -121,13 +115,13 @@
 - ✅ 링크 437 · 장학 공고 32 · https://www.konkuk.ac.kr/konkuk/2239/subview.do
 - ❌ 예기치 못한 오류(today is not defined)
 
-**서울대학교**
-- ✅ 링크 245 · 장학 공고 19 · https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=list&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80
-- ❌ 예기치 못한 오류(today is not defined)
-
 **숙명여자대학교**
 - ⚪ 링크 2 · 장학 공고 0 · https://www.sookmyung.ac.kr/kr/life/scholarship-notice.do
 - ✅ 링크 609 · 장학 공고 7 · https://www.sookmyung.ac.kr/kr/index.do
+- ❌ 예기치 못한 오류(today is not defined)
+
+**서울대학교**
+- ✅ 링크 245 · 장학 공고 19 · https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=list&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80
 - ❌ 예기치 못한 오류(today is not defined)
 
 **상명대학교**
@@ -135,12 +129,9 @@
 - ❌ 예기치 못한 오류(today is not defined)
 
 **중앙대학교**
-- ❌ 오류(page.goto: Target page, context or browser has been closed) · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5
-  - 📄 2페이지에서 장학 공고 5건 더 읽음
-- ✅ 링크 1318 · 장학 공고 8 · 이미 아는 공고 3건은 다시 열지 않음 · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100
-  - [수집] 2026-1학기 중앙사랑 II유형 장학금 지급 안내
-  - [수집] 2026-1학기 서울캠퍼스 복지장학금 장학생 선발 결과 안내
-  - [수집] 2026-2학기 NKL Law 김재연 장학기금 장학생 선발 공고
+- ⚪ 링크 657 · 장학 공고 0 · 이미 아는 공고 14건은 다시 열지 않음 · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5
+  - 📄 2페이지에서 장학 공고 4건 더 읽음
+- ✅ 링크 1314 · 장학 공고 4 · 이미 아는 공고 6건은 다시 열지 않음 · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100
 - ❌ 예기치 못한 오류(today is not defined)
 
 **계명대학교**
@@ -165,12 +156,12 @@
 - ❌ 예기치 못한 오류(today is not defined)
 
 ---
-이번 실행 신규 수집: **8건** · 브라우저로도 수집 실패한 학교는 게시판 주소 확인이 필요합니다.
+이번 실행 신규 수집: **0건** · 브라우저로도 수집 실패한 학교는 게시판 주소 확인이 필요합니다.
 ⏱ 소요 8분 / 예산 22분 · 학교 19/19곳 처리
 
-⚠️ **이번 실행에 접속 실패한 학교: 건국대학교, 숙명여자대학교, 서울대학교, 상명대학교, 계명대학교, 중앙대학교, 가천대학교** — 학교 서버가 응답하지 않아 이번 회차만 건너뛰었어요. 다음 실행(약 12시간 뒤)에 자동으로 다시 수집합니다.
+⚠️ **이번 실행에 접속 실패한 학교: 건국대학교, 숙명여자대학교, 서울대학교, 상명대학교, 중앙대학교, 계명대학교, 가천대학교** — 학교 서버가 응답하지 않아 이번 회차만 건너뛰었어요. 다음 실행(약 12시간 뒤)에 자동으로 다시 수집합니다.
 
-🚨 **여러 번 연속 실패한 학교: 계명대학교(14회 연속)** — 일시 장애가 아니라 게시판 주소가 바뀌었을 가능성이 큽니다. 해당 학교 학생에게 새 공고가 나가지 않고 있으니 주소 확인이 필요해요(Claude 세션에 "○○대 게시판 주소 확인해줘"라고 지시하면 정찰 도구로 후보를 찾아드려요).
+🚨 **여러 번 연속 실패한 학교: 계명대학교(15회 연속)** — 일시 장애가 아니라 게시판 주소가 바뀌었을 가능성이 큽니다. 해당 학교 학생에게 새 공고가 나가지 않고 있으니 주소 확인이 필요해요(Claude 세션에 "○○대 게시판 주소 확인해줘"라고 지시하면 정찰 도구로 후보를 찾아드려요).
 **⏳ 스키마화 대기 중 51건** (원본 확보됨 — collector/pending-forms.json)
 
 ### 🤖 자동 등록 (선조치후보고) — 0건 등록
