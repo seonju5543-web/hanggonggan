@@ -1399,14 +1399,20 @@ console.log('\n■ 자격 자리의 잡음을 유형별로 세는가 (2026-08-23
    link-hunter·resolve-detail-urls 는 끝 개행을 **안 붙인다**. 그 상태로 CI 에 올라가면
    사냥 결과를 저장하는 순간 관문이 빨간불이 되고, 워크플로가 그 실행분을 되돌려
    **찾아낸 원문 주소를 통째로 버린다**(CLAUDE.md 에 같은 사고가 적혀 있다).
-   그래서 들여쓰기만 본다 — 네 로봇이 모두 `null, 1` 로 쓴다.
-   (`forms.json` 은 넣지 않았다: 디스크는 2칸인데 schematize-forms 는 1칸으로 쓴다.
-    둘 중 무엇이 맞는지는 사람이 정할 일이라 조용히 통일하지 않는다 — 개발자에게 보고.) */
+   그래서 들여쓰기만 본다 — 로봇이 모두 `null, 1` 로 쓴다.
+
+   🟢 `forms.json` 도 2026-08-29 개발자 승인으로 1칸으로 되돌렸다(내용 변경 0).
+   2026-08-15 에 한 세션이 2칸으로 저장해 놓은 것이었고, 그 파일을 쓰는 로봇
+   (`schematize-forms.mjs`)은 줄곧 1칸이었다 — 다음 실행에 6천 줄이 뒤집힐 상태였다. */
 console.log('\n■ 데이터 파일 형식 (2026-08-29)');
 {
-  const raw = fs.readFileSync(new URL('../data/registered.json', import.meta.url), 'utf8');
-  eq('data/registered.json 은 로봇과 같은 들여쓰기(1칸)다',
-     JSON.stringify(JSON.parse(raw), null, 1) === raw.replace(/\n$/, ''), true);
+  /* 자동 병합에서 뺀 두 파일. 형식이 어긋나면 로봇 커밋과 파일 전체가 충돌한다.
+     끝 개행은 로봇마다 달라 보지 않는다 — 보면 사냥꾼 결과를 되돌리게 된다(위 주석). */
+  for (const f of ['registered', 'forms']) {
+    const raw = fs.readFileSync(new URL(`../data/${f}.json`, import.meta.url), 'utf8');
+    eq(`data/${f}.json 은 로봇과 같은 들여쓰기(1칸)다`,
+       JSON.stringify(JSON.parse(raw), null, 1) === raw.replace(/\n$/, ''), true);
+  }
 }
 
 console.log('\n■ 링크 사냥꾼의 제목 대조 (2026-08-23)');
