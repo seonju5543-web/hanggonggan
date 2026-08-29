@@ -177,8 +177,16 @@ if (!cfg.enabled) {
     && (blockedIds.has(i.id) || blockedUrls.has(canonUrl(i.sourceUrl || '')))));
   const removed = before - registered.items.length;
 
+  /* 등록 대상 학교 좁히기 (2026-08-30 개발자 지시 — 설정의 `schools`).
+     🔴 **수집은 그대로 두고 등록만 좁힌다.** 수집 비용은 사실상 0이고(Actions 월 700/2,000분),
+     실시간 공고 피드는 계속 나가야 다른 학교 학생이 빈 화면을 보지 않는다.
+     막히는 것은 '정식 등록'뿐이다 — 자격 진단·양식 작성을 붙이는, 사람 손이 드는 그 층.
+     빈 배열이면 제한 없음(예전 동작). */
+  const onlySchools = new Set(cfg.schools || []);
+  let outOfScope = 0;
   for (const n of notices.items || []) {
     if (added.length >= (cfg.maxPerRun || 8)) break;
+    if (onlySchools.size && n.school && !onlySchools.has(n.school)) { outOfScope += 1; continue; }
     const r = classify(n, regUrlSet, regEntries, batchSeen);
     if (r.verdict === 'hold') { held.push({ n, why: r.why }); continue; }
     if (r.verdict !== 'register') continue;
@@ -281,6 +289,12 @@ if (!cfg.enabled) {
   if (waiting) report.push('', `**⏳ 스키마화 대기 중 ${waiting}건** (원본 확보됨 — collector/pending-forms.json)`);
 
   report.push('', `### 🤖 자동 등록 (선조치후보고) — ${added.length}건 등록${removed ? ` · ${removed}건 제거(blockIds)` : ''}`);
+  /* 🔴 좁힌 것을 **말없이** 하지 않는다 — 리포트에 안 적으면 다음 세션이
+     "로봇이 갑자기 아무것도 안 등록한다"고 없는 버그를 쫓는다. */
+  if (onlySchools.size) {
+    report.push('', `등록 대상 학교: ${[...onlySchools].join(' · ')} (설정 \`schools\`)`
+      + `${outOfScope ? ` — 다른 학교 공고 ${outOfScope}건은 등록하지 않고 실시간 피드로만 나갔어요.` : ''}`);
+  }
   if (added.length) {
     report.push('', '자동 등록분은 앱에 **자동 등록 · 검수 전** 배지로 표시돼요. 잘못 등록된 건이 있으면 채팅으로 알려주시거나 `collector/auto-register-config.json`의 `blockIds`에 id를 넣어주세요.', '');
     for (const e of added) report.push(`- \`${e.id}\` [${e.name}](${e.sourceUrl})${e.deadline ? ` · 마감 ${e.deadline}` : ''} · ${(e.eligibility.schoolOnly || '')}`);

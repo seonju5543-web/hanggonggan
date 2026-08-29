@@ -985,6 +985,23 @@ console.log('\n■ 유료 API 크레딧 누수 방지 (2026-08-20)');
    🔴 되돌리지 말 것 — 아래 '읽으면 안 되는 것'이 이 파서의 존재 이유다.
       게시일·조회수·다른 공고의 날짜가 같은 본문에 섞여 있어서, 이름표 없이 날짜를
       주우면 엉뚱한 날이 마감으로 박힌다. */
+/* 2026-08-30 — 정식 등록을 경희대·한국외대로 좁혔다(개발자 지시).
+   🔴 좁힌 것은 **등록뿐**이고 수집은 그대로다 — 실시간 공고 피드는 계속 나가야
+   다른 학교 학생이 빈 화면을 보지 않는다. 되돌리려면 설정의 `schools` 를 [] 로. */
+console.log('\n■ 정식 등록 대상 학교 좁히기 (2026-08-30)');
+{
+  const cfg = JSON.parse(fs.readFileSync(new URL('../collector/auto-register-config.json', import.meta.url), 'utf8'));
+  const src = fs.readFileSync(new URL('../collector/auto-register.mjs', import.meta.url), 'utf8');
+  eq('설정에 대상 학교가 적혀 있다', cfg.schools, ['경희대학교', '한국외국어대학교']);
+  eq('  왜 좁혔는지도 적혀 있다', /품질|자격 요건 매칭/.test(cfg._schools || ''), true);
+  eq('로봇이 그 설정을 실제로 읽는다', /cfg\.schools/.test(src), true);
+  eq('  대상 밖 공고를 등록 전에 거른다', /onlySchools\.size && n\.school && !onlySchools\.has\(n\.school\)/.test(src), true);
+  /* 🔴 조용히 좁히면 다음 세션이 "로봇이 갑자기 등록을 안 한다"고 없는 버그를 쫓는다 */
+  eq('  좁혔다는 사실을 리포트에 적는다', /등록 대상 학교/.test(src), true);
+  /* 🔴 수집까지 좁히면 다른 학교 학생의 실시간 피드가 통째로 빈다 — 등록 로봇은 수집에 손대지 않는다 */
+  eq('등록 로봇이 수집 설정을 건드리지 않는다', /schools\.json|browser-targets/.test(src), false);
+}
+
 console.log('\n■ 마감일을 원문에서 읽는다 (2026-08-30)');
 {
   process.env.EXCERPTS_AS_LIB = '1';
