@@ -1065,7 +1065,21 @@ function renderFormFill() {
       </div>`;
     /* AI 초안 버튼 — essay-config.js 의 endpoint 가 비어 있으면 버튼 자체가 없다 */
     if (typeof essayBind === 'function') essayBind(tpl, sch);
-    $('#btn-ff-generate').addEventListener('click', () => {
+    $('#btn-ff-generate').addEventListener('click', (e) => {
+      /* 제출 전 점검(1순위) — 그대로 내면 사고가 나는 것(빈칸 [ ]·블라인드에 학교명)이
+         있으면 한 번 세운다. 막지 않는다 — 다시 누르면 진행된다(이 앱의 방식). */
+      if (typeof essaySubmitReadiness === 'function') {
+        const chk = essaySubmitReadiness(tpl, sch);
+        const gen = e.currentTarget;
+        if (chk && !chk.submittable && !gen.dataset.forced) {
+          gen.dataset.forced = '1';
+          if (typeof essayRenderSubmitCheck === 'function') essayRenderSubmitCheck(tpl, sch);
+          const panel = $('#essay-submit-check');
+          if (panel) panel.scrollIntoView({ block: 'center', behavior: 'smooth' });
+          toast('먼저 고칠 곳이 있어요 — 위 점검표를 확인해 주세요 (다시 누르면 그대로 진행돼요)');
+          return;
+        }
+      }
       formFill.ans = collectFormAnswers(tpl);
       /* '다음 신청서에도 쓸게요'를 켜 둔 항목은 프로필에 남긴다 —
          두 번째 신청서부터는 그 질문이 아예 안 나온다 (기기 안에만 저장) */
