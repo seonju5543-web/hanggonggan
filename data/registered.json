@@ -1539,7 +1539,17 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-08-27 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "2026년 2학기 푸른등대 기부장학금 신규장학생 선발 내용 요약표.pdf",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/149376/download.do"
+    },
+    {
+     "name": "본문이미지-2480x3508.jpg",
+     "url": "https://dep.hufs.ac.kr/CrossEditor/binary/images/000532/KakaoTalk_20260827_153042017.jpg",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/264156/artclView.do",
    "sourceKind": "auto"
   },
