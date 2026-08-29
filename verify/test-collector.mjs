@@ -2306,12 +2306,14 @@ console.log('\n■ 금액 산정 — 부풀리지 않는가 (2026-08-27)');
 
   /* ⑧ 🔴 등록금은 세 단계로 찾는다 — 학생 입력 > 학교×계열 > 학교 평균. 셋 다 없으면 0.
         전국 평균 같은 것을 끼워 넣으면 안 된다(지어낸 숫자다).
-        ⚠️ 학과 단위 등록금은 **공시 항목 자체가 없다** — 계열이 공개 데이터의 상한이다. */
+        ⚠️ 학과 단위 등록금은 **공시 항목 자체가 없다** — 계열이 공개 데이터의 상한이다.
+        🔴 표는 **1년치**이고 함수는 **한 학기분**을 준다 (2026-08-29 개발자 확인).
+           그래서 기대값이 표 값의 절반이다 — 이 절반이 사라지면 홈 합계가 두 배로 부푼다. */
   const TT = { '한국외국어대학교': { avg: 4180000, byField: { '인문사회': 3820000, '공학': 4960000 } } };
-  eq('계열 등록금이 있으면 그걸 쓴다',
-    PA.tuitionFor({ school: '한국외국어대학교', track: 'engineering' }, TT), 4960000);
-  eq('계열이 없으면 학교 평균으로 내려간다',
-    PA.tuitionFor({ school: '한국외국어대학교', track: 'medical' }, TT), 4180000);
+  eq('계열 등록금이 있으면 그걸 쓴다 (한 학기분)',
+    PA.tuitionFor({ school: '한국외국어대학교', track: 'engineering' }, TT), 4960000 / 2);
+  eq('계열이 없으면 학교 평균으로 내려간다 (한 학기분)',
+    PA.tuitionFor({ school: '한국외국어대학교', track: 'medical' }, TT), 4180000 / 2);
   eq('학생이 직접 넣은 등록금이 가장 세다',
     PA.tuitionFor({ school: '한국외국어대학교', track: 'engineering', tuitionSelf: 5200000 }, TT), 5200000);
   eq('모르는 학교는 0 — 전국 평균을 지어내지 않는다',
@@ -2338,8 +2340,9 @@ console.log('\n■ 금액 산정 — 부풀리지 않는가 (2026-08-27)');
       vm2.runInContext(`exclusivityFrom(["※ 타 대외 장학금과 이중수혜 불가"]).kind`, ctx2), 'forbidden');
     eq('브라우저에서 합계 고르기가 돈다',
       vm2.runInContext(`sumAmounts([{id:'a',amountSpec:{kind:'fixed',value:1000000}},{id:'b',sameAs:'g',amountSpec:{kind:'fixed',value:5000000}},{id:'c',sameAs:'g',amountSpec:{kind:'fixed',value:5000000}}],{}).total`, ctx2), 6000000);
-    eq('브라우저에서 등록금 조회가 돈다',
-      vm2.runInContext(`tuitionFor({school:'A',track:'engineering'},{A:{avg:4000000,byField:{'공학':5000000}}})`, ctx2), 5000000);
+    /* 브라우저에서도 **한 학기분**이 나와야 한다 — 여기만 1년치면 앱 화면만 두 배가 된다 */
+    eq('브라우저에서 등록금 조회가 돈다 (한 학기분)',
+      vm2.runInContext(`tuitionFor({school:'A',track:'engineering'},{A:{avg:4000000,byField:{'공학':5000000}}})`, ctx2), 2500000);
   }
 
   /* ⑩ 🔴 앱이 parse-amount.js 를 실제로 싣고 있는가 — 파일만 만들고 안 실으면 앱이 죽는다 */
@@ -2369,6 +2372,33 @@ console.log('\n■ 금액 산정 — 부풀리지 않는가 (2026-08-27)');
    갈래가 2개만 나갔다. 승인받은 것과 다른 것이 배포된 것이다.
    이 절은 그 화면의 **구조와 문구를 코드에 못 박는다.** 바꾸려면 개발자에게 다시 보여
    승인받고 이 검사도 같이 고쳐야 한다 — 검사만 고치는 것은 같은 사고의 반복이다. */
+/* ── 🔴 등록금 비율은 **한 학기** 기준으로 환산한다 (2026-08-29 개발자 확인) ──
+   `data/tuition.json` 의 값은 **1년치**다(개발자 확인: "1년치네 보통 한 학기에 360이니까
+   외대 인문은"). 그런데 장학금은 학기 단위로 준다 — 등록 공고의 비율형 18건 중
+   **12건이 원문에 스스로 `(정규학기)`·`고지서감면방식`이라 적었고, 연간이라 적은 것은 0건**,
+   나머지 6건도 전부 `2026-2학기` 공고다.
+   그대로 곱하면 한 카드가 두 배가 되고 홈 합계가 부풀려진다 — 학생이 실제로 받을 수 없는
+   숫자를 '지금 받을 수 있는 장학금'이라 부르는 것은 기망이다(운영 원칙·개발자 지적). */
+console.log('\n■ 등록금 비율 환산 — 한 학기 기준인가 (2026-08-29)');
+{
+  const req = createRequire(import.meta.url);
+  const PA = req('../parse-amount.js');
+  const T = req('../data/tuition.json').schools;
+  const p = { school: '한국외국어대학교', track: 'humanities' };
+  const yearly = (T['한국외국어대학교'].byField || {})['인문사회'];
+  eq('표에는 1년치가 들어 있다 (외대 인문사회)', yearly, 7269500);
+  const t = PA.tuitionFor(p, T);
+  eq('tuitionFor 는 한 학기분을 준다', t, Math.round(yearly / 2));
+  eq('  개발자가 말한 값과 맞는다 (한 학기 약 360만원)', t > 3300000 && t < 3900000, true);
+  eq('  계열별 값을 쓴다 (학교 평균이 아니라)', PA.tuitionSource(p, T), 'field');
+  /* 100% 공고가 1년치로 뜨면 그 카드 하나가 두 배가 된다 */
+  const full = PA.ratioWon({ kind: 'ratio', ratio: 1 }, t);
+  eq('수업료 100% 공고가 1년치로 뜨지 않는다', full < yearly, true);
+  /* 학생이 직접 넣는 값이 생기면 그것도 한 학기분이어야 한다 — 섞이면 같은 사고가 난다 */
+  eq('학생 입력값은 그대로 쓴다 (한 학기분으로 받는다)',
+     PA.tuitionFor({ tuitionSelf: 3600000 }, T), 3600000);
+}
+
 console.log('\n■ 금액 상세 — 승인받은 화면 그대로인가 (2026-08-27)');
 {
   const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
@@ -2387,7 +2417,10 @@ console.log('\n■ 금액 상세 — 승인받은 화면 그대로인가 (2026-0
   eq('빈 갈래는 안내 문구로 자리를 지킨다', body.includes('ad-empty'), true);
 
   // ③ 개발자가 고쳐 준 문구 — 되돌아가면 실패한다
-  eq('학교별 등록금 기준 (평균 아님)', body.includes('학교별 등록금 기준 추정값'), true);
+  eq('학교별 등록금 기준 (평균 아님)', body.includes('학교별 한 학기 등록금 기준 추정값'), true);
+  /* 🔴 단위를 밝힌다 (2026-08-29) — 표는 1년치인데 장학금은 학기 단위라, 단위를 안 적으면
+     학생이 1년치로 읽는다. 개발자가 고쳐 준 '학교별'(평균 아님)은 그대로 지켰다. */
+  eq('  한 학기 기준임을 밝힌다', /한 학기 등록금 기준/.test(body), true);
   eq("'~했어요' 체를 쓰지 않는다", /했어요|드릴게요|돼요/.test(body), false);
   eq('갈래 이름에 이모지를 붙이지 않는다', /grp\('[^']*[\u{1F300}-\u{1FAFF}\u{2700}-\u{27BF}]/u.test(body), false);
   eq('뺀 공고 문구에 안 셈을 붙이지 않는다', body.includes('안 셈'), false);

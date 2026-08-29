@@ -288,19 +288,34 @@ var TRACK_TO_FIELD = {
   science: '자연과학', engineering: '공학', arts: '예체능', medical: '의학'
 };
 
+/* 🔴 표의 값은 **1년치**이고, 장학금은 **학기 단위**로 준다 (2026-08-29 개발자 확인).
+   공시 등록금(`data/tuition.json`)은 연간 집계다 — 개발자 확인: *"1년치네, 보통 한 학기에
+   360이니까 외대 인문은"*(표의 외대 인문사회 = 7,269,500원). 그런데 등록 공고의 비율형 18건은
+   원문이 스스로 `수업료 100% (정규학기)`·`고지서감면방식`이라 적고(12건), **연간이라 적은 것은
+   0건**이며 나머지 6건도 전부 `2026-2학기` 공고다.
+   그래서 나누지 않으면 카드 하나가 **두 배**가 되고 홈 합계가 부풀려진다. 학생이 실제로 받을 수
+   없는 숫자를 '지금 받을 수 있는 장학금'이라 부르는 것은 기망이고 법적 책임이 따른다(개발자 지적).
+   🔴 **여기 한 곳에서 나눈다** — 부르는 쪽(app.js 홈 합계·금액 상세)이 저마다 나누게 두면
+   한 곳만 빠뜨려도 그 화면만 두 배가 된다. */
+var SEMESTERS_PER_YEAR = 2;
+
 /**
- * 이 학생의 등록금 (원). 모르면 0.
- * @param profile 앱 프로필 { school, track, tuitionSelf }
- * @param table   data/tuition.json 의 schools 표
+ * 이 학생의 **한 학기** 등록금 (원). 모르면 0.
+ * @param profile 앱 프로필 { school, track, tuitionSelf } — tuitionSelf 도 **한 학기분**이다
+ *                (학생이 받는 고지서가 학기 단위라 그 숫자를 그대로 넣게 된다.
+ *                 입력 칸을 만들 때 라벨에 '한 학기'를 반드시 적을 것 — 안 적으면 같은 사고가 난다)
+ * @param table   data/tuition.json 의 schools 표 (**1년치**가 들어 있다)
  */
 function tuitionFor(profile, table) {
   var p = profile || {};
-  if (p.tuitionSelf > 0) return Number(p.tuitionSelf);        // ① 학생이 직접 넣은 값이 이긴다
+  if (p.tuitionSelf > 0) return Number(p.tuitionSelf);        // ① 학생이 직접 넣은 값이 이긴다(한 학기분)
   var row = table && table[p.school];
   if (!row) return 0;
+  var year = 0;
   var field = TRACK_TO_FIELD[p.track];                         // ② 학교 × 계열
-  if (field && row.byField && row.byField[field] > 0) return Number(row.byField[field]);
-  return Number(row.avg) > 0 ? Number(row.avg) : 0;            // ③ 학교 평균
+  if (field && row.byField && row.byField[field] > 0) year = Number(row.byField[field]);
+  else if (Number(row.avg) > 0) year = Number(row.avg);        // ③ 학교 평균
+  return year > 0 ? Math.round(year / SEMESTERS_PER_YEAR) : 0;
 }
 
 /** 환산값이 어느 단계에서 나왔는가 — 화면이 '추정' 근거를 그대로 보여 주려고 쓴다 */

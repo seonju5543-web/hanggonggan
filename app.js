@@ -1567,7 +1567,7 @@ function renderAmountDetail() {
           ${bill.dropped.map((m) => amountDetailRow(m, { dim: true, tone: 'off', note: '위 공고와 동시 수혜 불가' })).join('')}</details>` : ''),
         '모두 함께 받을 수 있는 공고입니다.')}
       ${grp('등록금 비율 환산', `${bill.estimated.length}건 · 추정`,
-        '금액이 등록금 비율로만 적힌 공고입니다. 학교별 등록금 기준 추정값이며 실제 금액과 다를 수 있습니다.',
+        '금액이 등록금 비율로만 적힌 공고입니다. 학교별 한 학기 등록금 기준 추정값이며 실제 금액과 다를 수 있습니다.',
         bill.estimated.map((m) => amountDetailRow(m, { tone: 'est', text: '약 ' + won(m.won) })).join(''),
         '등록금 비율로 적힌 공고는 없습니다.')}
       ${grp('금액 미확인', `${bill.unknown.length}건 · 0원`,
