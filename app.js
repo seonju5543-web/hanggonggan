@@ -147,12 +147,14 @@ function evaluateFor(s, p) {
   return (s && s.sourceKind === 'kosaf' && r.status !== 'ineligible')
     ? { ...r, status: 'unknown' } : r;
 }
-/* 🔴 적합도도 **한 곳**에서 낸다 (2026-08-30). getMatches 만 고치고 openDetail 을 안 고쳐서
-   카드는 「자격 미확인」인데 시트는 「적합도 25% · 요건 4개 중 1개 충족」이었다 —
-   개발자가 바로 눌러 보고 잡았다. 이 저장소가 반복해 배운 것: **베끼면 갈라진다.** */
+/* 🔴 적합도는 **한 곳**에서 낸다 (2026-08-30). getMatches 만 고치고 openDetail 을 안 고쳐서
+   카드는 「자격 미확인」인데 시트는 「적합도 25%」였다 — 개발자가 바로 눌러 보고 잡았다.
+   ⚠️ 한때 여기서 한국장학재단 등록분을 **무조건 '자격 미확인'** 으로 눌러 뒀다.
+      지역 요건(83곳)을 판정할 수 없어 서울 학생에게 안양시 장학금이 95%로 뜨던 때의
+      임시 조치였다. 시·군을 받아 지역을 판정하게 된 뒤로는 그 눌림이 **오히려 거짓말**이라
+      걷어냈다(실측: 미달 79 · 적합 33 · 미확인 4로 갈린다). */
 function fitDetailFor(s, p) {
-  const fd = fitDetail(s, p);
-  return (s && s.sourceKind === 'kosaf') ? { ...fd, unread: true, fails: [] } : fd;
+  return fitDetail(s, p);
 }
 
 function getMatches() {

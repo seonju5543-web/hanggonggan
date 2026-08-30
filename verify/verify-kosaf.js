@@ -22,6 +22,7 @@ const eq = (label, got, want) => {
 const PROFILE = {
   name: '김한장', school: '한국외국어대학교', campus: '', track: 'humanities', major: '영어학과',
   year: 3, status: '재학', gpa: 3.2, bracket: 6, credits: 14, region: '서울', parentRegion: '서울',
+  regionCity: '강서구', parentRegionCity: '강서구',
   nationality: 'korean', birthYear: 2004, flags: [], cert: false, exchange: false, common: {},
 };
 
@@ -73,29 +74,24 @@ const PROFILE = {
   eq(`  자격 줄을 재단 글자 그대로 갖고 있다 (${info.withElig}곳)`, info.withElig > 0, true);
   eq('  마감 지난 것이 섞이지 않는다', info.closedShown, 0);
 
-  console.log('\n■ 🔴 적합도를 단정하지 않는다');
-  /* 재단이 적어 둔 칸에는 `지역거주구분: 안양시에 주소를 두고…` 처럼 기계가 못 읽는 요건이
-     섞여 있고 그 줄은 판정에서 조용히 빠진다. 그래서 서울 학생에게 안양시 장학금이
-     「적합도 95% · 요건 3개 중 3개 충족」 으로 떠 있었다. 틀린 안심은 틀린 미달만큼 나쁘다. */
-  /* 🔴 단정하면 안 되는 것은 **'적합하다'** 쪽이다. 미달(`no`)은 evaluate 가 확정한 것이라
-     그대로 두는 게 맞다(대학원 전용 등) — 확정된 미달까지 '미확인'으로 덮으면 그것도 거짓말이다. */
-  eq('「적합도 N%」로 단정하는 카드가 없다', await page.evaluate(() =>
-    getMatches().filter((m) => m.sch.sourceKind === 'kosaf')
-      .filter((m) => fitVerdict(m.fit, m.fd) === 'ok').length), 0);
-  eq('  대부분은 「자격 미확인」이다', await page.evaluate(() => {
+  console.log('\n■ 🔴 적합도는 판정한 만큼만 말한다');
+  /* ⚠️ 한때 한국장학재단 등록분을 **무조건 '자격 미확인'** 으로 눌러 뒀다. 지역 요건(83곳)을
+     판정할 수 없어 서울 학생에게 안양시 장학금이 95%로 뜨던 때의 임시 조치였다.
+     시·군을 받은 뒤로는 그 눌림이 오히려 거짓말이라 걷어냈다 — 이제 셋으로 갈린다.
+     🔴 지키는 것은 하나: **지역이 안 맞는데 '적합'이라고 말하지 않는다.** */
+  const verdicts = await page.evaluate(() => {
     const ms = getMatches().filter((m) => m.sch.sourceKind === 'kosaf');
-    return ms.filter((m) => fitVerdict(m.fit, m.fd) === 'unread').length > ms.length * 0.8;
-  }), true);
-  eq('  그래도 자격 줄은 그대로 갖고 있다', info.withElig > 0, true);
-
-  console.log('\n■ 그래도 지어내지 않는다');
-  /* 🔴 금액은 **손으로 박지 않고** parse-amount.js 한 곳을 통과시킨다 (2026-08-30 개발자 지적).
-     그래야 앞으로 들어올 재단도 자동으로 같은 규칙을 받는다. 다만 **없는 숫자를 만들면 안 된다** —
-     원문에 숫자가 없는데 금액이 잡히면 홈 합계가 부풀고, 그건 기망이다. */
-  eq('금액을 parse-amount 로 읽는다 (amountSpec 이 붙는다)', info.hasSpec, info.made);
-  eq('  원문에 숫자가 없는데 금액이 잡힌 곳은 없다', info.inventedAmount, 0);
-  eq('  이중수혜 조항도 같은 파일이 읽는다', info.withExcl > 0, true);
-  eq('양식 작성을 붙이지 않는다', info.noForm, true);
+    const by = {}; ms.forEach((m) => { const v = fitVerdict(m.fit, m.fd); by[v] = (by[v] || 0) + 1; });
+    const okWrongCity = ms.filter((m) => fitVerdict(m.fit, m.fd) === 'ok')
+      .filter((m) => (m.sch.eligibilityLines || []).some((l) => {
+        const c = (l.match(/([가-힣]{1,6}(?:시|군|구))[에의]\s?(주소|주민등록|거주)/) || [])[1];
+        return c && c !== state.profile.regionCity && c !== state.profile.parentRegionCity;
+      })).map((m) => m.sch.name.slice(0, 30));
+    return { by, okWrongCity };
+  });
+  eq(`판정이 셋으로 갈린다 (${JSON.stringify(verdicts.by)})`,
+    Object.keys(verdicts.by).length >= 2, true);
+  eq('사는 시·군이 아닌 곳의 장학금을 「적합」이라고 하지 않는다', verdicts.okWrongCity, []);
 
   console.log('\n■ 🔴 「받을 수 있다」고 세지 않는다');
   /* 자격을 확인 안 한 것을 합계에 더하면 기망이다. evaluate 는 KOSAF 를 `selective`
@@ -148,11 +144,19 @@ const PROFILE = {
   /* 🔴 바로 위에서 "신청서 작성은 지원하지 않아요"라고 해 놓고 아래에서
      "앱에서 바로 작성할 수 있어요"가 같이 떠 있었다 — 한 시트 안에서 말이 엇갈렸다. */
   eq('  같은 시트 안에서 말이 엇갈리지 않는다', clean.contradiction, false);
-  /* 🔴 카드와 시트가 같은 근거를 쓴다 — 한쪽만 고쳐 「자격 미확인」 vs 「적합도 25%」였다 */
-  eq('카드와 상세가 같은 적합도를 말한다', await page.evaluate(() => {
-    const s = allScholarships().find((x) => x.sourceKind === 'kosaf');
-    return fitDetailFor(s, state.profile).unread === true;
-  }), true);
+  /* 🔴 카드와 시트가 **같은 글자**를 말해야 한다 — 한쪽만 고쳐 카드는 「자격 미확인」인데
+     시트는 「적합도 25% · 요건 4개 중 1개 충족」이었다(개발자가 눌러 보고 잡았다).
+     화면에 실제로 그려진 두 배지를 견준다 — 함수를 견주면 렌더가 갈라져도 못 잡는다. */
+  eq('카드와 상세가 같은 적합도를 말한다', await page.evaluate(async () => {
+    const card = document.querySelector('#explore-list [data-detail^="kosaf-"]');
+    if (!card) return 'no-card';
+    const onCard = (card.querySelector('.badge-fit, .badge-fit-unknown, .badge-fit-no') || {}).textContent || '';
+    openDetail(card.dataset.detail);
+    await new Promise((r) => setTimeout(r, 250));
+    const sheet = document.querySelector('#detail-sheet');
+    const onSheet = (sheet.querySelector('.badge-fit, .badge-fit-unknown, .badge-fit-no') || {}).textContent || '';
+    return onCard.replace(/\s+/g, ' ').trim() === onSheet.replace(/\s+/g, ' ').trim() ? 'same' : `${onCard} / ${onSheet}`;
+  }), 'same');
 
   console.log('\n■ 데이터');
   const data = await page.evaluate(() => ({
