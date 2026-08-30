@@ -116,13 +116,43 @@ const PROFILE = {
   await page.waitForSelector('#detail-sheet.show', { timeout: 4000 });
   await page.waitForTimeout(300);
   const sheet = await page.$eval('#detail-sheet', (e) => e.textContent);
-  eq('출처를 밝힌다 (한국장학재단에 올린 정보)', /한국장학재단에 올린 정보/.test(sheet), true);
+  eq('출처를 밝힌다 (재단이 한국장학재단에 등록한 정보)', /한국장학재단에 등록한 정보/.test(sheet), true);
   eq('  자격 판정·신청서를 안 해 준다고 밝힌다', /자격 판정과 신청서 작성은 지원하지 않아요/.test(sheet), true);
   eq('  「앱에서 작성」 버튼이 없다',
     await page.$$eval('#detail-sheet button', (b) => b.filter((x) => /양식|작성하기/.test(x.textContent)).length), 0);
   /* 🔴 KOSAF 첨부는 Referer 검사가 있어 앱에서 누르면 "비정상적인 접근"이 뜬다 */
   eq('KOSAF 첨부 내려받기 주소가 화면에 없다',
     await page.$$eval('#detail-sheet a', (a) => a.filter((x) => /kosaf\.go\.kr.*(download|fileDown|atchFile)/i.test(x.href)).length), 0);
+
+  console.log('\n■ 🔴 원문을 그대로 쏟아 붓지 않는다 (2026-08-30 개발자 지적)');
+  /* 지적 넷: `💡 undefined` · `○` 머리 기호 · `특정자격:` 칸 이름 접두어 ·
+     혜택 자리에 원문 문단 통째. 전부 "원문 그대로"를 게으름의 핑계로 쓴 것이었다. */
+  const clean = await page.evaluate(() => {
+    const t = document.querySelector('#detail-sheet').innerText;
+    const ks = allScholarships().filter((s) => s.sourceKind === 'kosaf');
+    return {
+      undef: /undefined/.test(t),
+      sym: /[○ㅇ※]/.test(t),
+      labelPrefix: ks.filter((s) => (s.eligibilityLines || [])
+        .some((l) => /^(특정자격|학년구분|학과구분|대학구분|성적기준|소득기준|지역거주구분)\s*:/.test(l))).length,
+      longAmount: ks.filter((s) => s.amount.length > 42).length,
+      dumpLine: ks.filter((s) => (s.eligibilityLines || []).some((l) => /대학\d학기 대학\d학기/.test(l))).length,
+      contradiction: /앱에서 바로 작성할 수 있어요/.test(t),
+    };
+  });
+  eq('💡 undefined 가 안 뜬다', clean.undef, false);
+  eq('  ○ ㅇ ※ 머리 기호를 떼고 보여 준다', clean.sym, false);
+  eq('  자격 요건에 칸 이름(`특정자격:`)을 붙이지 않는다', clean.labelPrefix, 0);
+  eq('  요건 자리에 코드 나열(`대학2학기 대학3학기…`)을 넣지 않는다', clean.dumpLine, 0);
+  eq('  혜택은 한 줄로 짧게 말한다 (원문 문단을 통째로 안 쓴다)', clean.longAmount, 0);
+  /* 🔴 바로 위에서 "신청서 작성은 지원하지 않아요"라고 해 놓고 아래에서
+     "앱에서 바로 작성할 수 있어요"가 같이 떠 있었다 — 한 시트 안에서 말이 엇갈렸다. */
+  eq('  같은 시트 안에서 말이 엇갈리지 않는다', clean.contradiction, false);
+  /* 🔴 카드와 시트가 같은 근거를 쓴다 — 한쪽만 고쳐 「자격 미확인」 vs 「적합도 25%」였다 */
+  eq('카드와 상세가 같은 적합도를 말한다', await page.evaluate(() => {
+    const s = allScholarships().find((x) => x.sourceKind === 'kosaf');
+    return fitDetailFor(s, state.profile).unread === true;
+  }), true);
 
   console.log('\n■ 데이터');
   const data = await page.evaluate(() => ({
