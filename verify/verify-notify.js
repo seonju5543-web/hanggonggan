@@ -207,7 +207,11 @@ async function onboard(page) {
   await page.click('.nav-item[data-nav="home"]');
   await page.waitForTimeout(300);
   const badgeText = await page.textContent('#notify-badge');
-  ok(Number(badgeText) >= 2, `홈 종 아이콘 배지에 읽지 않음 ${badgeText}건 표시`, badgeText);
+  /* 🔴 배지는 **10건부터 `9+` 로 상한**이 걸린다(notify.js: `n > 9 ? '9+' : String(n)`).
+     `Number('9+')` 는 NaN 이라, 읽지 않은 알림이 10건을 넘는 순간 이 항목이 조용히
+     빨간불이 됐다 — 앱은 멀쩡한데 검사가 표시 글자를 숫자로 읽은 탓이다(2026-08-30).
+     `parseInt` 는 앞 숫자만 읽어 `9+` → 9 가 된다. */
+  ok(parseInt(badgeText, 10) >= 2, `홈 종 아이콘 배지에 읽지 않음 ${badgeText}건 표시`, badgeText);
   await page.screenshot({ path: SHOT('03-home-badge') });
 
   await page.click('#btn-notify');

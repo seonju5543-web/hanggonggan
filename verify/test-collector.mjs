@@ -1209,6 +1209,24 @@ console.log('\n■ 학교 이름이 걸린 요건 (2026-08-30)');
   eq('「별도 문의」 안내는 요건이 아니다', of('교환학생/방송대학생 별도 문의의'), null);
 }
 
+/* 🔴 **표시용 글자를 숫자로 읽지 말 것** (2026-08-30). 알림 배지는 10건부터 `9+` 로
+   상한이 걸리는데(notify.js) 검사가 `Number(badgeText)` 로 읽어서, 읽지 않은 알림이
+   10건을 넘는 순간 조용히 빨간불이 됐다 — **앱은 멀쩡한데 검사만 죽는** 유형이다.
+   오늘 한국장학재단 116곳이 매칭에 들어오면서 실제로 넘었다. */
+console.log('\n■ 표시 글자를 숫자로 읽지 않는다 (2026-08-30)');
+{
+  const dir = new URL('./', import.meta.url);
+  const bad = [];
+  for (const f of fs.readdirSync(dir).filter((x) => /\.(js|mjs|cjs)$/.test(x))) {
+    /* ⚠️ **주석을 걷어내고 본다** — 안 그러면 이 관문이 자기 설명문에 적힌 예시 글자를
+       잡는다(처음에 그렇게 만들었다). 코드에 진짜로 있는 것만 봐야 한다. */
+    const src = fs.readFileSync(new URL(f, dir), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/^\s*\/\/.*$/gm, ' ');
+    for (const m of src.matchAll(/Number\(\s*(\w*[Bb]adge\w*|\w*[Cc]ount\w*)\s*\)/g)) bad.push(`${f}: ${m[0]}`);
+  }
+  eq('배지·카운트 글자를 Number() 로 읽는 곳이 없다 (상한이 걸리면 NaN 이 된다)', bad, []);
+}
+
 console.log('\n■ 마감일을 원문에서 읽는다 (2026-08-30)');
 {
   process.env.EXCERPTS_AS_LIB = '1';
