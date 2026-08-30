@@ -1703,7 +1703,25 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-08-30 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "저소득층 우대 증빙자료 목록.JPG",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/149365/download.do"
+    },
+    {
+     "name": "붙임1. 중소기업 취업연계(희망사다리Ⅰ유형) 장학사업 개요.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/149366/download.do"
+    },
+    {
+     "name": "(학생용) 장학신청 매뉴얼.pdf",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/149367/download.do"
+    },
+    {
+     "name": "본문이미지-4646x6693.jpeg",
+     "url": "https://dep.hufs.ac.kr/CrossEditor/binary/images/000532/(%ED%8F%AC%EC%8A%A4%ED%84%B0)_2026%EB%85%84_2%ED%95%99%EA%B8%B0_%EC%A4%91%EC%86%8C%EA%B8%B0%EC%97%85%EC%B7%A8%EC%97%85%EC%97%B0%EA%B3%84%EC%9E%A5%ED%95%99%EA%B8%88.jpeg",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/264146/artclView.do",
    "sourceKind": "auto",
    "eligibilityLines": [
@@ -1765,7 +1783,13 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-08-30 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "본문이미지-4646x6693.jpg",
+     "url": "https://dep.hufs.ac.kr/CrossEditor/binary/images/000531/1._26%EB%85%84_2%ED%95%99%EA%B8%B0_%EA%B3%A0%EC%A1%B8%ED%9B%84%ED%95%99%EC%8A%B5%EC%9E%90%EC%9E%A5%ED%95%99%EA%B8%88_%ED%8F%AC%EC%8A%A4%ED%84%B0.jpg",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/263952/artclView.do",
    "sourceKind": "auto"
   },
