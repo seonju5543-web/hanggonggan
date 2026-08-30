@@ -734,7 +734,14 @@ function fitBadgeHtml(fit, fd, { full = false } = {}) {
         미달·미확인은 이미 각자 배지로 빠졌다. 여기 남는 것은 비율이 있는 경우뿐이다.
      ⚠️ 색(fit-*)은 카드에도 그대로 둔다. 다만 `요건 3/6`이 늘 함께 가므로 색만으로 뜻을
         전하지는 않는다(색각 이상이 있는 학생에게 색은 아무 말도 하지 않는다). */
-  if (!full) return `<span class="badge badge-fit fit-${fitTone(fd.pct)}">요건 ${fd.met}/${fd.total}</span>`;
+  /* 🔴 카드는 **퍼센트만** (2026-08-31 개발자 지시: "요건 없애고 퍼센테이지로").
+     ⚠️ 이건 2026-08-24 결정("숫자만 두지 않는다 — 퍼센트 옆에 근거를 함께")을 카드에서는
+        뒤집는 것이다. 그때 이유는 "적합도 높은 줄 알고 들어갔는데 신청을 못 하면 피로감이
+        쌓인다"였다. 근거는 사라지지 않고 **상세로 내려간다** — 아래 full 갈래가
+        `요건 6개 중 3개 충족 · 확인 필요 3`을 그대로 낸다.
+     ⚠️ 색(fit-*)만으로 뜻을 전하지 않는다 — 퍼센트 숫자가 늘 함께 간다
+        (색각 이상이 있는 학생에게 색은 아무 말도 하지 않는다). */
+  if (!full) return `<span class="badge badge-fit fit-${fitTone(fd.pct)}">적합도 ${fd.pct}%</span>`;
   const note = fd.unknown > 0 ? ` · 확인 필요 ${fd.unknown}` : '';
   return `<span class="badge badge-fit fit-${fitTone(fd.pct)}">적합도 ${fd.pct}% <em>요건 ${fd.total}개 중 ${fd.met}개 충족${note}</em></span>`;
 }
