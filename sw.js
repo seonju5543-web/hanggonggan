@@ -12,7 +12,12 @@
    v17 = 알림·진짜 푸시(선주) + 원문 링크 정직 표기(Josehyeon)를 합친 판. */
 /* v59 = 자격 요건 발췌 수리(Josehyeon) + 신청서 질문 방식 최적화(선주)를 합친 판.
    양쪽이 각자 v58로 올려 또 부딪혔다 — 위 주석의 규칙대로 **둘 다보다 큰 번호**로 올린다. */
-const CACHE = 'handaejang-v104';  /* v104 — 온보딩 학교 목록 되돌림(212개교) */
+/* 🔴 v105 — style.css 를 고쳤으면 **여기도 올려야 한다** (2026-08-30에 두 번 빠뜨렸다).
+   349f731·bd3f660 에서 CSS 를 고치고 이 번호를 안 올렸더니, 배포는 성공했는데
+   설치된 앱은 옛 CSS 를 계속 내주고 있었다("아직도 각져 있어").
+   네트워크 우선이라 결국은 반영되지만, 응답이 3.5초를 넘으면 캐시로 떨어지고
+   그 캐시가 옛 판이면 그대로 옛 화면이 보인다. 번호를 올려야 확실히 청소된다. */
+const CACHE = 'handaejang-v105';  /* v105 — 모서리 토큰 선언 복구(35곳) + 장학금 검색 */
 const ASSETS = ['.', 'index.html', 'style.css', 'app.js', 'data.js', 'forms.js', 'form-plan.js', 'essay.js', 'essay-config.js', 'essay-ask.js', 'essay-quality.js', 'essay-submit-check.js',
   'section-head.js', 'parse-requirements.js', 'parse-amount.js', 'match-engine.js', 'notify-rules.js', 'notify.js', 'push-config.js',
   'chat-config.js', 'chat.js',
