@@ -637,6 +637,22 @@
    "added": "2026-08-28",
    "fetched": true,
    "schematized": false
+  },
+  {
+   "id": "auto-ent2431264135artclviewdo",
+   "name": "[서울][국가근로] 2026학년도 2학기 국가근로장학생 모집 안내(추가)",
+   "target": "2026학년도 2학기 국가근로장학생 모집 안내(추가)",
+   "added": "2026-08-30",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-oardid322850menuno200318",
+   "name": "공통 2026년 2학기 제24기 후기 삼원장학생 선발 안내",
+   "target": "공통 2026년 2학기 제24기 후기 삼원장학생 선발 ",
+   "added": "2026-08-30",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }

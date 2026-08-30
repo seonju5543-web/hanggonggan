@@ -12,7 +12,7 @@
    v17 = 알림·진짜 푸시(선주) + 원문 링크 정직 표기(Josehyeon)를 합친 판. */
 /* v59 = 자격 요건 발췌 수리(Josehyeon) + 신청서 질문 방식 최적화(선주)를 합친 판.
    양쪽이 각자 v58로 올려 또 부딪혔다 — 위 주석의 규칙대로 **둘 다보다 큰 번호**로 올린다. */
-const CACHE = 'handaejang-v94';   /* v94 — 마감일 파서 수리 + 한국장학재단 층2 목록 */
+const CACHE = 'handaejang-v97';   /* v97 — 원문 그대로 쏟아붓던 것 정리(undefined·기호·칸이름·긴 금액) */
 const ASSETS = ['.', 'index.html', 'style.css', 'app.js', 'data.js', 'forms.js', 'form-plan.js', 'essay.js', 'essay-config.js', 'essay-ask.js', 'essay-quality.js', 'essay-submit-check.js',
   'section-head.js', 'parse-requirements.js', 'parse-amount.js', 'match-engine.js', 'notify-rules.js', 'notify.js', 'push-config.js',
   'chat-config.js', 'chat.js',

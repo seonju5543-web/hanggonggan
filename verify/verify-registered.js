@@ -20,7 +20,7 @@ async function dismissNotify(page) {
 
 async function driveAnyLiveForm(page) {
   const id = await page.evaluate(() => {
-    const today = new Date().toISOString().slice(0, 10);
+    const today = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);   // 🔴 UTC 면 새벽에 하루 어긋난다
     const live = (typeof registeredList !== 'undefined' ? registeredList : [])
       .filter((s) => s.formId && FORM_TEMPLATES[s.formId] && (!s.deadline || s.deadline >= today));
     return live.length ? live[0].id : null;

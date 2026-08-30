@@ -503,6 +503,10 @@ input::placeholder { color: var(--text-weak); }
 .page-header h2 { font-size: var(--t-2xl); font-weight: 800; letter-spacing: -0.025em; }
 .filter-row {
   display: flex;
+  /* 🔴 칩이 넘치면 **줄을 바꾼다** (2026-08-30). 예전엔 가로 스크롤이라 다섯 번째 칩이
+     화면 밖에 반쯤 잘려 있었고, 개발자가 "앱에 하나도 안 뜬다"고 했다 — 반쯤 보이는 것은
+     안 보이는 것이다. 넘치지 않으면 아무것도 안 바뀐다(한 줄 그대로). */
+  flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 16px;
   overflow-x: auto;

@@ -96,6 +96,7 @@ let registeredList = []; // data/registered.json — 수집 로봇이 확보한 
       KOSAF 에 적어 둔 칸이라, 자격 진단도 양식 작성도 붙이지 않는다 — 그대로 보여 주고
       "자격은 재단 홈페이지에서 확인"이라고 밝힌다(설계: docs/designs/kosaf-and-narrowing.md ②). */
 let kosafList = [];
+let kosafUpdatedAt = '';
 
 function registeredFor(p) {
   return scopedToProfile(registeredList, p); // match-engine.js — 알림도 같은 기준을 쓴다
@@ -104,7 +105,10 @@ function registeredFor(p) {
 function allScholarships() {
   const p = state.profile;
   if (!p || !p.school) return NATIONAL_SCHOLARSHIPS;
-  return NATIONAL_SCHOLARSHIPS.concat(registeredFor(p));
+  /* 한국장학재단 등록분은 **교외 공고로 함께** 낸다 (2026-08-30 개발자 지시:
+     "한국장학재단에 뜬 장학금이라고 하지 말고 그냥 교외에 포함시켜줘").
+     따로 두면 아무도 못 찾고, 화면도 두 벌이 된다. */
+  return NATIONAL_SCHOLARSHIPS.concat(registeredFor(p), kosafAsScholarships());
 }
 function findSch(id) {
   return allScholarships().find((s) => s.id === id) || null;
@@ -114,11 +118,40 @@ function findSch(id) {
    자격 판정(evaluate)·적합도(fitScore)·학교 한정 필터(scopedToProfile)는 match-engine.js에 있다.
    서비스워커(백그라운드 알림)도 같은 파일을 읽어, 화면과 알림의 기준이 갈라지지 않는다. */
 
+/* 🔴 한국장학재단 등록분의 자격은 **우리가 확인한 것이 아니다** (2026-08-30).
+   그대로 두면 evaluate 가 `selective`(선발형 = 신청 가능)로 읽고, 그 status 를 믿는 곳이
+   전부 딸려 온다 — 실측: 홈 히어로 합계가 **2억 2,420만원**으로 부풀고, 일괄 신청 준비
+   118건 중 **104건이 KOSAF** 였다. 앱이 준비해 줄 수도 없는 것들이다.
+   확인 안 한 것을 '받을 수 있다'고 더하는 것은 기망이다(운영 원칙 · parse-amount 첫머리).
+   🔴 호출자마다 막지 않고 **여기 한 곳**에서 정직한 값으로 바꾼다 — getMatches 와
+      openDetail 이 같은 함수를 쓴다. 베끼면 카드와 상세가 갈라진다.
+   ⚠️ 확정된 미달(`ineligible`)은 그대로 둔다 — evaluate 가 근거를 갖고 내린 판정이라
+      '미확인'으로 덮으면 그것도 거짓말이다(배지 규칙과 같은 이유). */
+function evaluateFor(s, p) {
+  const r = evaluate(s, p);
+  return (s && s.sourceKind === 'kosaf' && r.status !== 'ineligible')
+    ? { ...r, status: 'unknown' } : r;
+}
+/* 🔴 적합도도 **한 곳**에서 낸다 (2026-08-30). getMatches 만 고치고 openDetail 을 안 고쳐서
+   카드는 「자격 미확인」인데 시트는 「적합도 25% · 요건 4개 중 1개 충족」이었다 —
+   개발자가 바로 눌러 보고 잡았다. 이 저장소가 반복해 배운 것: **베끼면 갈라진다.** */
+function fitDetailFor(s, p) {
+  const fd = fitDetail(s, p);
+  return (s && s.sourceKind === 'kosaf') ? { ...fd, unread: true, fails: [] } : fd;
+}
+
 function getMatches() {
   const p = state.profile;
   return allScholarships().map((s) => {
-    const result = evaluate(s, p);
-    return { sch: s, result, fit: fitScore(s, result, p), fd: fitDetail(s, p) };
+    const result = evaluateFor(s, p);
+    /* 🔴 한국장학재단 등록분은 **적합도를 단정하지 않는다** (2026-08-30).
+       재단이 적어 둔 칸에는 `지역거주구분: 안양시에 주소를 두고…` 처럼 기계가 못 읽는 요건이
+       섞여 있는데, 그 줄은 판정에서 조용히 빠진다. 그러면 서울 학생에게 안양시 장학금이
+       **「적합도 95% · 요건 3개 중 3개 충족」** 으로 뜬다 — 실제로 그렇게 떠 있었다.
+       틀린 미달이 못 받는 것보다 나쁜 것처럼, **틀린 안심도 그만큼 나쁘다.**
+       그래서 배지·정렬이 보는 fd 를 '아직 못 읽음'으로 준다(자격 줄은 그대로 보여 준다).
+       판정 규칙은 fitVerdict 한 곳 그대로다 — 여기서는 근거만 정직하게 넘긴다. */
+    return { sch: s, result, fit: fitScore(s, result, p), fd: fitDetailFor(s, p) };
   });
 }
 
@@ -867,9 +900,6 @@ function renderExplore() {
   }
 
   $('#live-notices').innerHTML = exploreFilter === 'all' ? liveNoticesHtml() : '';
-  /* 층2는 '전체'와 '교외'에서만 — '교내'·'신청 가능만'에 섞으면 그 칩이 거짓말이 된다
-     (층2는 자격 판정을 안 하므로 '신청 가능'인지 우리가 알 수 없다). */
-  $('#kosaf-list').innerHTML = ['all', '교외'].includes(exploreFilter) ? kosafHtml() : '';
   $('#explore-list').innerHTML = list.length
     ? list.map((m) => schCard(m.sch, m.result, { fit: m.fit, fd: m.fd })).join('')
     : '<p class="empty">조건에 맞는 장학금이 없어요.</p>';
@@ -1268,97 +1298,91 @@ function loadKosaf() {
     .then((r) => (r.ok ? r.json() : null))
     .then((d) => {
       kosafList = (d && d.items) || [];
+      kosafUpdatedAt = (d && d.updatedAt) || '';
       if (!$('#screen-explore').hidden) renderExplore();
     })
     .catch(() => { /* 오프라인 등 — 조용히 무시. 층2가 없어도 앱은 그대로 돈다 */ });
 }
 
-/* 카드 한 줄에 들어갈 만큼만. 🔴 자르는 것은 **카드뿐**이다 — 상세 시트는 전문을 그대로 보여 준다.
-   재단이 적어 둔 금액 칸은 조건까지 함께 적혀 있어(`※ 타 장학금을 지급 받은 대학생은…`)
-   길면 150자다. 카드에서 넘치면 그 줄이 카드를 통째로 밀어내 목록을 훑을 수 없다. */
-function cut(t, n) { const s = String(t).trim(); return s.length > n ? `${s.slice(0, n)}…` : s; }
+/* 층2 — 한국장학재단이 아는 재단 장학금을 **교외 공고와 같은 모양**으로 만든다 (2026-08-30).
+   🔴 처음에는 목록 맨 아래에 전용 구역으로 붙였다가 개발자에게 두 번 지적받았다:
+      ① 5,745px 아래라 "앱에 하나도 안 뜬다"  ② "복붙 수준으로 못생기게 해놨네."
+      맞는 지적이다. 새 화면을 만들 게 아니라 **이미 있는 카드에 얹었어야** 했다.
+      지금은 registeredList 와 같은 모양의 객체로 바꿔 schCard·openDetail·dday·정렬이
+      **한 글자도 새로 안 짜고** 그대로 돌아간다.
+   🔴 정직함은 그대로다 — KOSAF 는 재단이 적어 둔 칸이지 우리가 읽은 공고 원문이 아니다:
+      · 금액은 **합계에 넣지 않는다**(amountValue 0) — 확인 안 한 숫자를 더하면 기망이다
+      · 양식(formId)·준비문서(prepDoc)를 붙이지 않는다 → '앱에서 작성'이 안 뜬다
+      · 자격 줄은 **재단이 쓴 글자 그대로** 옮긴다(지어내지 않는다 — 원칙 8-1)
+      · 상세 시트가 출처를 밝힌다(openDetail 의 sourceKind 분기) */
+/* 🔴 **문장인 칸만 자격 요건으로 보여 준다** (2026-08-30 개발자 지적).
+   `학년구분: 대학신입생 대학2학기 대학3학기 …` 은 요건 문장이 아니라 **코드 나열**이라,
+   그대로 띄우면 요건 칸이 데이터 덤프가 된다. 나열형 칸은 화면에서 뺀다.
+   ⚠️ 뺀다고 판정이 나빠지지 않는다 — 어차피 적합도는 이 공고들에 대해 단정하지 않는다. */
+const KOSAF_ELIG = ['특정자격', '성적기준', '소득기준', '지역거주구분'];
 
-/* 층2 목록. 🔴 판정을 하지 않는다 — 배지도 적합도도 붙이지 않는다.
-   우리가 아는 것은 '재단이 이렇게 적어 뒀다'뿐이고, 그 이상을 말하면 원칙 8-1 위반이다. */
-function kosafHtml() {
-  const p = state.profile;
-  if (!kosafList.length || !p) return '';
-  /* 사는 곳이 걸린 장학금이 많아 학생 지역이 적힌 것을 앞에 둔다. **거르지는 않는다** —
-     지역 문장은 시·군·구 이름으로 적혀 있어(`익산시`) 시·도(`전북`)와 글자가 안 맞는
-     경우가 많고, 그걸로 숨기면 받을 수 있는 것을 못 보게 된다(틀린 미달이 더 나쁘다). */
-  const mine = [p.region, p.parentRegion].filter(Boolean);
-  const near = (i) => (mine.some((r) => (i.org + (i.fields['지역거주구분'] || '')).includes(r)) ? 0 : 1);
-  /* 🔴 마감 판정을 **파일에 굳히면 안 된다** — 수확 로봇은 가끔 돌고 앱은 매일 열린다.
-     받아 둔 파일이 며칠만 지나도 끝난 재단이 목록에 남는다(실제로 화면에서 「마감」 배지를
-     달고 떠 있었다). 층1의 `dday(...).days >= 0` 과 같은 기준으로 **그릴 때마다** 다시 본다.
-     상시 제도가 아니라 마감이 늘 있으므로 층1의 유예(CLOSED_KEEP_DAYS)는 두지 않는다 —
-     신청 기록이 없어 지난 것을 남겨 둘 이유가 없다. */
-  /* 🔴 마감일이 **빈 것을 버리면 안 된다** — 한국장학재단 푸른등대 4곳이 그 꼴인데
-     해가 없는 학기 일정(`ㅇ2학기: 8. 26. ~ 9. 10.`)이라 마감일 칸만 비어 있고 실제로는
-     모집 중이다. 해를 지어내지 않고 `기간 원문 확인`으로 적는다(층1의 같은 문구와 같은 규칙). */
-  const open = kosafList.filter((i) => !i.due || dday(i.due).days >= 0);
-  if (!open.length) return '';
-  const list = open.slice()
-    .sort((a, b) => near(a) - near(b) || (!a.due) - (!b.due) || (a.due < b.due ? -1 : 1)).slice(0, 30);
-  /* 마감일을 모르면 D-day 대신 그렇게 적는다 — 층1이 쓰는 문구와 같다 */
-  const dueBadge = (i) => (i.due
-    ? `<span class="badge badge-dday ${dday(i.due).cls}">${dday(i.due).label}</span>`
-    : '<span class="badge badge-dday">기간 원문 확인</span>');
-  const head = `<div class="section-head" style="margin-top:4px"><h3>한국장학재단에 등록된 재단 장학금</h3>
-    <span class="link-btn">${open.length}곳 모집 중</span></div>
-    <p class="empty" style="margin:0 0 10px;text-align:left">
-      재단이 한국장학재단에 올린 정보를 그대로 옮긴 목록이에요.
-      우리가 공고 원문을 읽은 것이 아니라서 <strong>자격 진단·신청서 작성은 지원하지 않아요</strong> —
-      신청 전에 재단 홈페이지에서 꼭 확인하세요.</p>`;
-  return head + '<div class="card-list" style="margin-bottom:18px">' + list.map((i) => `
-    <button class="sch-card" data-kosaf="${esc(i.code)}">
-      <div class="sch-top">
-        <span class="badge badge-out">교외</span>
-        ${dueBadge(i)}
-        <span class="badge badge-auto">한국장학재단 정보</span>
-      </div>
-      <p class="sch-name">${esc(i.name)}</p>
-      <p class="sch-amount">${esc(cut(i.fields['지원금액'] || '금액은 재단 홈페이지에서 확인', 52))}</p>
-      <p class="sch-provider">${esc(i.org)} · ${esc(i.kind)}</p>
-    </button>`).join('') + '</div>'
-    + (open.length > list.length
-      ? `<p class="data-note">가까운 순서로 30곳만 보여 주고 있어요 (모집 중 ${open.length}곳).</p>` : '');
+/* 🔴 재단이 쓴 글에는 `○`·`ㅇ`·`※` 같은 **머리 기호**가 그대로 들어 있다. 뜻이 아니라
+   서식이므로 화면에서는 떼어낸다(문장 자체는 한 글자도 바꾸지 않는다).
+   개발자 지적: "동그라미 기호니 … 너무 원문 그대로 가져오는 거 아니야?" */
+const kosafClean = (t) => String(t || '').replace(/[○ㅇ●◦※]/g, ' ').replace(/\s+/g, ' ').trim();
+
+/* 카드·시트에 보이는 **혜택 한 줄**. 원문 문단을 통째로 띄우지 않는다 —
+   금액은 이미 parse-amount 가 읽어 뒀으니 그 숫자로 짧게 말하고, 조건은 상세 칸에서 본다.
+   개발자 지적: "받을 수 있는 혜택만 간편하게 적어놔야지 원문 그대로 배껴놨네." */
+function kosafAmountLabel(spec, raw) {
+  if (spec && spec.kind === 'fixed' && spec.value) return `최대 ${won(spec.value)}`;
+  if (spec && spec.kind === 'range' && spec.max) {
+    return spec.min && spec.min !== spec.max ? `${won(spec.min)} ~ ${won(spec.max)}` : `최대 ${won(spec.max)}`;
+  }
+  if (spec && spec.kind === 'ratio' && spec.ratio) return `등록금의 ${Math.round(spec.ratio * 100)}%`;
+  const t = kosafClean(raw);
+  return t ? (t.length > 40 ? `${t.slice(0, 40)}…` : t) : '금액은 재단 홈페이지에서 확인';
 }
-
-/* 층2 상세 — **재단이 적어 둔 칸을 그대로** 보여 준다. 우리가 덧붙이는 문장은 없다.
-   🔴 선발공고문 첨부 주소는 넣지 않는다: KOSAF 가 Referer 를 검사하는데 앱은 리퍼러를
-      보내지 않아 학생이 누르면 "비정상적인 접근"이 뜬다(설계 문서 ②의 ⚠️). */
-function openKosafDetail(code) {
-  const i = kosafList.find((x) => x.code === code);
-  if (!i) return;
-  openSheetShell();
-  /* 🔴 시트 그릇은 층1과 **같은 마크업**을 쓴다 (sheet-handle / sheet-body / sheet-title …).
-     제 클래스를 새로 지으면 쓸어 닫기·여백·글꼴이 층1과 미묘하게 달라진다. */
-  $('#detail-sheet').innerHTML = `
-    <div class="sheet-handle"></div>
-    <div class="sheet-body">
-      <div class="sch-top">
-        <span class="badge badge-out">교외</span>
-        ${i.due ? `<span class="badge badge-dday ${dday(i.due).cls}">${dday(i.due).label}</span>`
-    : '<span class="badge badge-dday">기간 원문 확인</span>'}
-        <span class="badge badge-auto">한국장학재단 정보</span>
-      </div>
-      <h3 class="sheet-title">${esc(i.name)}</h3>
-      <p class="sheet-provider">${esc(i.org)} · ${esc(i.kind)}</p>
-      ${i.fields['지원금액'] ? `<p class="sheet-amount">${esc(i.fields['지원금액'])}</p>` : ''}
-
-      <h4>재단이 올린 내용 <span class="channel-tag">그대로</span></h4>
-      <ul class="doc-list">${Object.entries(i.fields)
-    /* 지원금액은 바로 위 sheet-amount 에 이미 있다 — 두 번 쓰면 같은 문단이 연달아 나온다 */
-    .filter(([k]) => k !== '지원금액')
-    .map(([k, v]) => `<li><strong>${esc(k)}</strong> ${esc(v)}</li>`).join('')}</ul>
-      <p class="doc-legend">이 목록은 재단이 한국장학재단에 올린 정보예요. 앱이 공고 원문을 읽은 것이 아니라서
-        <strong>자격을 판정하거나 신청서를 만들어 주지 않아요</strong> — 신청 전에 재단 홈페이지에서 꼭 확인하세요.</p>
-
-      ${i.home
-    ? `<a class="btn btn-primary" href="${esc(safeUrl(i.home))}" target="_blank" rel="noopener">재단 홈페이지에서 확인 ↗</a>`
-    : '<p class="doc-legend">재단 홈페이지 주소가 없어요. 위 문의처로 연락해 주세요.</p>'}
-    </div>`;
+function kosafAsScholarships() {
+  return kosafList
+    /* 마감 판정을 파일에 굳히지 않는다 — 수확 로봇은 가끔 돌고 앱은 매일 열린다 */
+    .filter((i) => !i.due || dday(i.due).days >= -CLOSED_KEEP_DAYS)
+    .map((i) => {
+      const f = i.fields || {};
+      /* 한 칸에 여러 항목이 `○` 로 붙어 있다 — 재단이 쓴 대로 줄만 나눈다 */
+      const split = (t) => String(t || '').split(/\s*[○ㅇ※]\s*/).map((x) => kosafClean(x))
+        .filter((x) => x.length >= 4);
+      /* 🔴 `특정자격: ` 같은 **칸 이름을 붙이지 않는다** — 자격 요건 자리에는 요건만 적는다
+         (개발자 지적). 어느 칸에서 왔는지는 학생에게 아무 뜻이 없다. */
+      const lines = KOSAF_ELIG.flatMap((k) => split(f[k]));
+      const docs = split(f['제출처 및 제출서류']).filter((d) => !/자세한 사항/.test(d));
+      /* 이름표를 붙여 넘긴다 — parse-amount 는 `isAmountHead` 로 금액 절을 찾는다(section-head.js) */
+      const aSpec = amountFrom([`지원금액: ${f['지원금액'] || ''}`]);
+      const aExcl = exclusivityFrom([f['지원금액'] || '', f['자격제한'] || '']);
+      return {
+        id: `kosaf-${i.code}`,
+        name: `${i.org} ${i.name}`,
+        provider: i.org,
+        type: '교외',
+        amount: kosafAmountLabel(aSpec, f['지원금액']),
+        /* 🔴 금액은 **손으로 박지 않는다** — `parse-amount.js` 한 곳을 그대로 통과시킨다
+           (2026-08-30 개발자 지적). 처음엔 amountValue 를 0 으로 박아 뒀는데, 그러면
+           ① 재단이 적어 둔 금액이 홈 합계에서 통째로 빠지고 ② 앞으로 들어올 재단도
+           영영 0 이다. 이름표를 붙여 넘기면 절대액·비율형·시급·미확인을 그쪽이 가른다.
+           `amountSpec` 이 있으면 화면의 amountWon 이 그것을 읽는다(amountValue 는 폴백). */
+        amountSpec: aSpec,
+        amountValue: (aSpec.kind === 'fixed' || aSpec.kind === 'range') ? aSpec.value : 0,
+        /* 이중수혜 조항도 같은 파일이 읽는다 — 합계는 더하기가 아니라 **고르기**라
+           '타 장학금과 중복 불가'를 놓치면 학생이 못 받는 숫자를 받을 수 있다고 말하게 된다 */
+        ...(aExcl && aExcl.kind ? { exclusivity: aExcl } : {}),
+        deadline: i.due || null,
+        listedAt: (kosafUpdatedAt || '').slice(0, 10) || null,   // 마감 미상일 때 60일 규칙이 걸리게
+        period: i.due ? `접수 ~${i.due}` : (kosafClean(f['신청기간']) || '접수 기간 원문 확인'),
+        summary: `${i.org} — 한국장학재단에 등록된 장학금이에요.`,
+        eligibility: { selective: true },     // 구조화된 조건이 없으니 판정하지 않는다(=unknown)
+        ...(lines.length ? { eligibilityLines: lines } : {}),
+        ...(split(f['자격제한']).length ? { eligibilityExcludes: split(f['자격제한']) } : {}),
+        documents: docs.length ? docs : ['재단 공고문에서 확인'],
+        sourceUrl: i.home || '',
+        sourceKind: 'kosaf',
+        ...(kosafClean(f['문의처']) ? { contact: kosafClean(f['문의처']) } : {}),
+      };
+    });
 }
 
 function liveNoticesHtml() {
@@ -1811,9 +1835,9 @@ function applyAll() {
 function openDetail(id) {
   const sch = findSch(id);
   if (!sch) return;
-  const result = evaluate(sch, state.profile);
+  const result = evaluateFor(sch, state.profile);   // 카드와 같은 판정을 쓴다(위 주석)
   const fit = fitScore(sch, result, state.profile);
-  const fd = fitDetail(sch, state.profile);
+  const fd = fitDetailFor(sch, state.profile);   // 카드와 같은 근거를 쓴다(위 주석)
   const meta = STATUS_META[result.status];
   const d = dday(sch.deadline);
   const app = state.applications.find((a) => a.id === id);
@@ -1969,6 +1993,11 @@ function openDetail(id) {
         ? `<a href="${esc(safeUrl(sch.sourceUrl))}" target="_blank" rel="noopener" style="color:var(--primary);font-weight:700">${sch.program ? '한국장학재단 ↗' : (isBoardListLink(sch.sourceUrl) ? '게시판 목록 ↗' : '원문 공고 ↗')}</a>에서`
         : '공고 원문에서'} 다시 확인하세요.</p>
 
+      ${sch.sourceKind === 'kosaf' ? `
+      <p class="doc-legend">위 내용은 <strong>재단이 한국장학재단에 등록한 정보</strong>를 그대로 옮긴 거예요.
+        앱이 공고 원문을 읽은 것이 아니라서 자격 판정과 신청서 작성은 지원하지 않아요 — 신청 전에 재단에서 꼭 확인하세요.
+        ${sch.contact ? `<br />문의 ${esc(sch.contact)}` : ''}</p>` : ''}
+
       <h4>제출 서류</h4>
       <ul class="doc-list">
         ${sch.documents.map((doc) => {
@@ -1976,9 +2005,13 @@ function openDetail(id) {
           return `<li>${auto ? '<span class="doc-auto">자동</span>' : '<span class="doc-manual">직접</span>'} ${doc}</li>`;
         }).join('')}
       </ul>
-      <p class="doc-legend">${sch.documents.some((doc) => /자동/.test(doc))
+      ${/* 병합 (2026-08-30): 층2(KOSAF) 분기는 공동작업자 것을 그대로 살리고,
+             말투만 이쪽 규칙(앱이 자기 행동을 말할 때는 ~합니다)으로 맞췄다. */ ''}
+      <p class="doc-legend">${sch.sourceKind === 'kosaf'
+        ? '재단이 적어 둔 제출 서류입니다. 앱이 대신 작성하지는 않습니다 — 재단 공고문에서 서식을 받으세요.'
+        : `${sch.documents.some((doc) => /자동/.test(doc))
         ? `'자동' 표시 서류는 한국장학재단 등 제출처가 신청 과정에서 전산으로 확인하는 항목입니다 — 따로 준비해야 하는지는 공고 원문에서 확인하세요. `
-        : ''}'직접' 서류 중 자기소개서·계획서·사유서·신청 양식은 앱에서 바로 작성할 수 있습니다.</p>
+        : ''}'직접' 서류 중 자기소개서·계획서·사유서·신청 양식은 앱에서 바로 작성할 수 있습니다.`}</p>
 
       ${(sch.excerpts && sch.excerpts.length) ? `
       <h4>공고 원문 안내 <span class="channel-tag">원문 그대로</span></h4>
@@ -2658,8 +2691,6 @@ function bindEvents() {
        삭제 버튼을 보려던 학생이 매번 시트를 닫아야 한다. 선택 모드에서도 열지 않는다. */
     if (Date.now() - lastSwipeAt < 350) return;
     if (e.target.closest('[data-del]') || e.target.closest('[data-pick]')) return;
-    const kosaf = e.target.closest('[data-kosaf]');
-    if (kosaf) { openKosafDetail(kosaf.dataset.kosaf); return; }
     const card = e.target.closest('[data-detail]');
     if (!card) return;
     if (appsSelectMode && card.closest('#apps-list')) {

@@ -11,7 +11,9 @@ const NEW_KEYS = ['samil-apply', 'bogun-study-apply', 'bogun-multi-apply', 'sanh
    특정 공고 id를 박아두면 시간이 지나 검증이 저절로 깨진다(2026-07-30 실제 발생).
    같은 양식을 쓰면서 아직 마감되지 않은 접수분을 찾아 구동한다. */
 const REG = require('../data/registered.json');
-const TODAY = new Date().toISOString().slice(0, 10);
+/* 🔴 KST 로 읽는다 — 그냥 toISOString 은 **UTC** 라 새벽에 하루 어긋나고,
+   그날 마감인 공고가 '아직 안 지났다'로 분류된다(verify-explore-sort 가 그래서 빨간불이었다). */
+const TODAY = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
 function pickTarget(formId) {
   const live = REG.items.filter((i) => i.formId === formId && (!i.deadline || i.deadline >= TODAY));
   if (!live.length) return null;

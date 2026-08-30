@@ -64,7 +64,13 @@ const PROFILE = {
   const orderKeys = () => page.evaluate(() => {
     const ids = [...document.querySelectorAll('#explore-list .sch-card')].map((e) => e.dataset.detail);
     const find = (id) => (typeof allScholarships === 'function' ? allScholarships() : []).find((s) => s.id === id) || {};
-    return ids.map((id) => { const s = find(id); return { id, deadline: s.deadline || null, listedAt: s.listedAt || null }; });
+    /* 🔴 마감이 지났는지는 **앱의 dday 로 판정한다** (2026-08-30). 검사에서 따로
+       `new Date().toISOString()` 으로 오늘을 만들면 그건 **UTC** 라 KST 와 하루 어긋나고,
+       그날 마감인 공고가 '미래'로 분류돼 멀쩡한 정렬이 빨간불이 된다(실제로 그랬다).
+       이 저장소의 규칙 그대로 — 판정을 베끼지 말고 앱 함수를 그대로 쓴다. */
+    return ids.map((id) => { const s = find(id);
+      return { id, deadline: s.deadline || null, listedAt: s.listedAt || null,
+        days: s.deadline ? dday(s.deadline).days : null }; });
   });
 
   console.log('■ 기본 상태');
@@ -110,18 +116,17 @@ const PROFILE = {
   /* 순서는 세 덩어리다: ① 앞으로 다가올 마감(빠른 순) ② 기한 미확정 ③ 이미 지난 마감.
      🔴 ②가 ①보다 앞에 오면 `deadlineTs()`의 Infinity 함정에 빠진 것이다.
      🔴 ③이 앞에 오면 '임박순'인데 지나간 게 위에 오는 것이다(2026-08-26 스크린샷으로 발견). */
-  const todayStr = new Date().toISOString().slice(0, 10);
-  const bucket = (r) => (!r.deadline ? 1 : r.deadline >= todayStr ? 0 : 2);
+  const bucket = (r) => (!r.deadline ? 1 : r.days >= 0 ? 0 : 2);
   eq('앞으로 올 마감 → 기한 미확정 → 지난 마감 순으로 묶인다',
     rows.every((r, i, arr) => i === 0 || bucket(arr[i - 1]) <= bucket(r)), true);
-  const withD = rows.filter((r) => r.deadline && r.deadline >= todayStr).length;
+  const withD = rows.filter((r) => bucket(r) === 0).length;
   /* 🔴 이미 마감된 공고가 '마감 임박순' 맨 위에 오면 안 된다 — 마감 7일까지 남기는 규칙 때문에
      그냥 날짜 오름차순으로 두면 지나간 것이 앞에 온다(2026-08-26 스크린샷으로 발견). */
   const future = rows.slice(0, withD);
   eq(`앞으로 올 마감 ${future.length}건이 빠른 순이다`,
     future.every((r, i, arr) => i === 0 || arr[i - 1].deadline <= r.deadline), true);
   eq('이미 지난 마감은 목록 끝에 있다',
-    rows.filter((r) => r.deadline && r.deadline < todayStr)
+    rows.filter((r) => bucket(r) === 2)
         .every((r) => rows.indexOf(r) >= rows.length - rows.filter((x) => bucket(x) === 2).length), true);
 
   console.log('\n■ 등록 최신순');
