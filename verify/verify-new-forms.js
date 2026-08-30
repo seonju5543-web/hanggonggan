@@ -41,14 +41,7 @@ async function fqFill(page, id, value) {
 
 async function onboard(page, school, major) {
   await page.click('.onboard-step[data-step="0"] [data-next]');
-  /* 🔴 **학교 이름을 박거나 데이터에서 온 값을 그대로 믿지 않는다** (2026-08-30).
-     전국 공고(schoolOnly 없음)가 골라지면 school 이 undefined 로 들어오고, 서비스 학교를
-     둘로 좁힌 뒤로는 뺀 학교 이름도 자동완성에 안 떠서 이 드라이버가 통째로 죽었다.
-     앱이 지금 서비스하는 학교로 물러난다 — 이 검사가 보는 것은 **양식 작성**이지 학교가 아니다. */
-  const served = await page.evaluate(() => UNIVERSITIES.slice());
-  const ok = school && served.some((u) => u.includes(school) || school.includes(u)
-    || u.replace('한국외국어', '외').includes(school));
-  await page.fill('#in-school', ok ? school : served[0]);
+  await page.fill('#in-school', school);
   await page.waitForTimeout(250);
   await page.click('.ac-list:not([hidden]) .ac-item');
   // 이원화 캠퍼스 학교면 첫 캠퍼스 선택 (외대 등)

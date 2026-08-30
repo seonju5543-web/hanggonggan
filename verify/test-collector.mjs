@@ -991,33 +991,6 @@ console.log('\n■ 유료 API 크레딧 누수 방지 (2026-08-20)');
 /* 2026-08-30 — 수집망도 두 곳으로 좁혔다. 🔴 뺀 학교의 주소는 **지우지 않고 parked 로 옮겼다** —
    이 boardUrl 들은 알아내는 데 실행이 여러 번 걸렸고(경희대만 8회), 지우면 되돌릴 때 처음부터
    다시 찾아야 한다. 로봇은 `schools`·`targets` 만 읽으므로 parked 는 아무 일도 하지 않는다. */
-/* 2026-08-30 — 온보딩에서 고를 수 있는 학교도 둘로 좁혔다 (개발자 지시).
-   🔴 **수집과 짝이 맞아야 한다** — 목록만 넓게 두면 다른 학교 학생이 자기 학교를 골라 놓고
-   빈 화면을 본다. 반대로 수집만 넓히고 목록을 안 늘리면 모은 공고를 아무도 못 본다. */
-console.log('\n■ 온보딩 학교 목록 (2026-08-30)');
-{
-  const src = fs.readFileSync(new URL('../data.js', import.meta.url), 'utf8');
-  const grab = (name) => {
-    const m = src.match(new RegExp('const ' + name + ' = \\[([\\s\\S]*?)\\n\\];'));
-    return m ? [...m[1].matchAll(/'([^']+)'/g)].map((x) => x[1]) : null;
-  };
-  const served = grab('UNIVERSITIES');
-  const parked = grab('UNIVERSITIES_PARKED');
-  eq('고를 수 있는 학교는 둘뿐이다', served, ['경희대학교', '한국외국어대학교']);
-  /* 🔴 지우면 되돌릴 때 목록을 처음부터 다시 만들어야 한다 */
-  eq('  뺀 학교는 지우지 않고 보관한다', (parked || []).length > 100, true);
-  eq('  보관분이 목록과 겹치지 않는다', (parked || []).filter((x) => served.includes(x)), []);
-  /* 수집 설정과 짝이 맞는가 — 한쪽만 좁히면 빈 화면이거나 못 보는 공고가 생긴다 */
-  const sc = JSON.parse(fs.readFileSync(new URL('../collector/schools.json', import.meta.url), 'utf8'));
-  eq('  수집하는 학교와 같다', [...new Set(sc.schools.map((x) => x.school))].sort(), served.slice().sort());
-
-  const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
-  /* 🔴 별칭도 서비스 학교만 띄워야 한다 — 안 그러면 `서울대` 를 쳤을 때 뺀 학교가 뜬다 */
-  eq('별칭 자동완성도 서비스 학교로 거른다', /if \(!UNIVERSITIES\.includes\(full\)\) return;/.test(app), true);
-  /* 학교 칸은 자유 입력이라 막지 않는다 — 대신 빈 화면을 보기 전에 알린다 */
-  eq('연결 안 된 학교를 적으면 정직하게 알린다', /function schoolServed|renderSchoolNotice/.test(app), true);
-}
-
 console.log('\n■ 수집망 좁히기 (2026-08-30)');
 {
   const sc = JSON.parse(fs.readFileSync(new URL('../collector/schools.json', import.meta.url), 'utf8'));
@@ -2978,21 +2951,14 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
   const sec = (src, head) => strip(src.slice(src.indexOf(head)).split(/\n[}\]];/)[0]);
   const dataSrc = fs.readFileSync(new URL('../data.js', import.meta.url), 'utf8');
   const majorsSrc = fs.readFileSync(new URL('../collector/majors.mjs', import.meta.url), 'utf8');
-  /* 🔴 **서비스 목록과 이름 카탈로그는 다르다** (2026-08-30). 온보딩에서 고를 수 있는 학교를
-     둘로 좁히면서 나머지를 UNIVERSITIES_PARKED 로 옮겼는데, 여기는 '고를 수 있나'가 아니라
-     **'로봇과 앱이 같은 이름을 쓰나'** 를 보는 자리다. 둘을 합쳐서 봐야 한다 —
-     안 그러면 서비스 학교를 줄일 때마다 이 관문이 엉뚱하게 빨간불이 된다. */
-  const unis = new Set([
-    ...[...sec(dataSrc, 'const UNIVERSITIES = [').matchAll(/'([^']+)'/g)].map((m) => m[1]),
-    ...[...sec(dataSrc, 'const UNIVERSITIES_PARKED = [').matchAll(/'([^']+)'/g)].map((m) => m[1]),
-  ]);
+  const unis = new Set([...sec(dataSrc, 'const UNIVERSITIES = [').matchAll(/'([^']+)'/g)].map((m) => m[1]));
   const targets = [...sec(majorsSrc, 'const BRANCH_MAP = {').matchAll(/:\s*'([^']+)'/g)].map((m) => m[1]);
 
-  eq('data.js 학교 이름 카탈로그를 실제로 읽었다 (서비스 목록 + 보관분)', unis.size > 100, true);
+  eq('data.js 학교 목록을 실제로 읽었다', unis.size > 100, true);
   eq('BRANCH_MAP 을 실제로 읽었다', targets.length >= 7, true);
-  eq('BRANCH_MAP 값이 전부 data.js 이름 카탈로그 안에 있다', targets.filter((t) => !unis.has(t)), []);
+  eq('BRANCH_MAP 값이 전부 data.js UNIVERSITIES 안에 있다', targets.filter((t) => !unis.has(t)), []);
   /* 분교 7곳은 전부 매핑돼 있어야 한다 — 빠지면 그 학교 학과가 본교로 합쳐진다 */
-  eq('data.js 분교가 전부 BRANCH_MAP 에 있다',
+  eq('data.js 분교 7곳이 전부 BRANCH_MAP 에 있다',
     [...unis].filter((u) => /캠퍼스$/.test(u) && !targets.includes(u)), []);
 }
 

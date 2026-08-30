@@ -25,9 +25,7 @@ const SHOT = (n) => `${__dirname}/shot-${n}.png`;
   console.log('STEP school picked:', await page.inputValue('#in-school'));
 
   // ── 자동추천: '서울' 케이스
-  /* 🔴 **학교 이름을 박지 않는다** (2026-08-30). 서비스 학교를 둘로 좁히자 자동완성에
-     안 떠서 이 드라이버가 통째로 죽었다 — '공고 id 를 박지 말 것'과 같은 계열이다. */
-  await page.fill('#in-school', await page.evaluate(() => UNIVERSITIES[0]));
+  await page.fill('#in-school', '서울');
   await page.waitForTimeout(150);
   console.log('STEP school suggestions for 서울:', await page.$$eval('.ac-list:not([hidden]) .ac-item', (els) => els.map((e) => e.textContent).join(', ')));
   await page.fill('#in-school', '외대');

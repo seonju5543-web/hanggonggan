@@ -34,9 +34,7 @@ const PORT = process.env.PORT || 8124;
 
   await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
   await page.click('.onboard-step[data-step="0"] [data-next]');
-  /* 🔴 **학교 이름을 박지 않는다** (2026-08-30). 서비스 학교를 둘로 좁히자 자동완성에
-     안 떠서 이 드라이버가 통째로 죽었다 — '공고 id 를 박지 말 것'과 같은 계열이다. */
-  await page.fill('#in-school', await page.evaluate(() => UNIVERSITIES[0]));
+  await page.fill('#in-school', '성균관');
   await page.waitForTimeout(200);
   await page.click('.ac-list:not([hidden]) .ac-item');
   await page.click('#in-track .chip[data-value="engineering"]');
