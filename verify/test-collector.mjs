@@ -1049,6 +1049,61 @@ console.log('\n■ 브라우저에서 쓸 이름이 빠지지 않았나 (2026-08
   eq(`match-engine 이 쓰는 PR.* 이름이 전부 브라우저 목록에 있다 (쓰는 것 ${used.length}개)`, missing, []);
 }
 
+/* 2026-08-30 — 시·군까지 받아 지역 요건을 판정한다 (개발자 지시: "시군 선택도 하고
+   뭐 관내 ~ 이런 거 해결하기 위해"). 지역 요건은 한국장학재단 등록 116곳 중 83곳(72%)에 있는데
+   시·도만으로는 `안양시에 주소를 두고` 를 못 읽어 통째로 '자격 미확인'이었다. */
+console.log('\n■ 지역 요건 — 시·군까지 (2026-08-30)');
+{
+  const MEq = createRequire(import.meta.url)('../match-engine.js');
+  const PRq = createRequire(import.meta.url)('../parse-requirements.js');
+  const res = (t) => PRq.parseLine(t, false).conds.find((c) => c.kind === 'residence') || null;
+  const cityOf = (t) => (res(t) || {}).cities || null;
+
+  eq('시·군을 집는다', cityOf('안양시에 주소를 두고 국내 각 급 학교에 재학 중인 학생'), ['안양시']);
+  /* ⚠️ 한글은 조사가 이름에 **바로 붙는다**(`안양시에`) — 경계를 '한글이 아닌 것'으로
+     잡았다가 하나도 못 집었다. 또 `둔` 은 `두`+`ㄴ` 이 아니라 한 글자다. */
+  eq('  조사가 붙어도 집는다 (`주소를 둔`)', cityOf('광양시에 주소를 둔 광양보건대학교 재학생'), ['광양시']);
+  eq('  두 글자 구도 집는다', cityOf('공고일 현재 동구에 1년이상 주소를 두고 있는 주민'), ['동구']);
+  eq('  시·도 이름은 시·군이 아니다', cityOf('대구광역시에 주소를 둔 학생'), []);
+  eq('  엉뚱한 말은 안 집는다', res('학생구분에 따라 거주 요건이 다름'), null);
+
+  const mk = (prov, line) => ({ id: 'x', name: '장학생', provider: prov, type: '교외', amount: '-',
+    amountValue: 0, deadline: '2026-12-31', period: '-', summary: '-',
+    eligibility: { selective: true }, documents: [], eligibilityLines: [line] });
+  const base = { name: 't', school: '한국외국어대학교', campus: '', track: 'humanities', major: '영어',
+    year: 3, status: '재학', gpa: 3.2, bracket: 6, credits: 14, region: '경기', parentRegion: '경기',
+    nationality: 'korean', birthYear: 2004, flags: [], cert: false, exchange: false, common: {} };
+  const verdict = (sch, over) => {
+    const fd = MEq.fitDetail(sch, { ...base, ...over });
+    return fd.fails.length ? '미달' : (fd.met > 0 ? '통과' : '미확인');
+  };
+  const anyang = { regionCity: '안양시', parentRegionCity: '안양시' };
+  const gwangyang = { regionCity: '광양시', parentRegionCity: '광양시' };
+
+  eq('사는 시·군이 맞으면 통과', verdict(mk('안양시 인재육성재단', '안양시에 주소를 두고 재학 중인 학생'), anyang), '통과');
+  eq('  다르면 미달 (안양시 학생 · 광양시 장학금)',
+    verdict(mk('백운장학회(광양)', '광양시에 주소를 두고 재학 중인 학생'), anyang), '미달');
+  /* 🔴 안 고른 학생에게 ✕ 를 치면 안 된다 — 모르는 것과 안 맞는 것은 다르다 */
+  eq('  시·군을 안 골랐으면 미달이 아니라 미확인',
+    verdict(mk('백운장학회(광양)', '광양시에 주소를 두고 재학 중인 학생'), {}), '미확인');
+  /* 🔴 예외 문구가 있으면 ✕ 를 치지 않는다 — `대학생은 관외 거주 인정` 이 실제로 있다 */
+  eq('  예외 문구가 있으면 미달로 단정하지 않는다',
+    verdict(mk('백운장학회(광양)', '광양시에 주소를 둔 자 대학생의 경우 본인에 한하여 관외 거주 인정'), anyang) !== '미달', true);
+
+  /* 🔴 `관내` 는 **그 재단의 관할**이다 — 줄만 봐서는 모르고 기관 이름이 정한다 */
+  eq('「관내」를 재단 이름에서 알아낸다 (해당 학생은 통과)',
+    verdict(mk('(재)무안군승달장학회', '관내에 1년 이상 거주한 자'), { regionCity: '무안군' }), '통과');
+  eq('  다른 시·군 학생은 미달',
+    verdict(mk('(재)무안군승달장학회', '관내에 1년 이상 거주한 자'), anyang), '미달');
+  eq('  관할을 못 알아내면 단정하지 않는다',
+    verdict(mk('한국장학재단', '관내에 1년 이상 거주한 자'), anyang), '미확인');
+  /* 시·도 이름이 든 기관은 관할로 쓰지 않는다 (`서울시립대학교` → `서울시` 가 아니다) */
+  eq('  시·도에서 온 이름은 관할이 아니다',
+    verdict(mk('서울시립대학교', '관내에 1년 이상 거주한 자'), anyang), '미확인');
+  eq('부모님 시·군으로도 맞는다', verdict(mk('백운장학회(광양)', '부모가 광양시에 주소를 둔 자'),
+    { regionCity: '안양시', parentRegionCity: '광양시' }), '통과');
+}
+
 console.log('\n■ 자격 판정의 정직함 (2026-08-30)');
 {
   const MEq = createRequire(import.meta.url)('../match-engine.js');

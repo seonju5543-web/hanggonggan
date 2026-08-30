@@ -187,11 +187,45 @@ function parseAge(t) {
 const REGIONS = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '경기', '강원',
   '충북', '충남', '전북', '전남', '경북', '경남', '제주', '충청북도', '충청남도', '전라북도',
   '전라남도', '경상북도', '경상남도', '강원도', '경기도', '제주특별자치도'];
+/* 🔴 지역 요건은 **대부분 시·군 단위**다 (2026-08-30 개발자 지시로 신설).
+   `안양시에 주소를 두고`·`무안군에 1년 이상` 을 시·도만으로는 판정할 수 없어,
+   한국장학재단 등록 116곳 중 83곳(72%)이 통째로 '자격 미확인'이었다.
+   ⚠️ 표를 두지 않는다 — 글자만 집는다. 시·군·구 목록은 온보딩 화면(data.js)에만 있고,
+      여기(서비스워커도 읽는 파일)에 두면 두 벌이 된다. */
+/* ⚠️ 한국어는 조사가 이름에 **바로 붙는다**(`안양시에`). 그래서 '뒤가 한글이 아니면 끝'
+   으로 자르면 하나도 못 집는다(처음에 그렇게 만들었다가 전부 놓쳤다).
+   대신 **뒤에 올 수 있는 것**을 적어 경계를 잡는다 — 안 그러면 `학생구분` 의 `학생구`가
+   시·군·구로 잡힌다. */
+const CITY_RE = /([가-힣]{1,6}(?:시|군|구))(?=[에의를을는은이가와과로,·)\s]|$|민|청|내|외)/g;
+/* 시·도 이름이 `시`로 끝나는 것들(대구광역시 등)과 갈래말은 시·군이 아니다 */
+const CITY_NOT = /^(광역시|특별시|자치시|특별자치시|해당시|소재지|거주지|주소지|본인이|우리시|관할시)$/;
 function parseResidence(t) {
-  if (!/거주|주소를?\s?두|주민등록|시민|도민/.test(t)) return null;
-  const hit = REGIONS.filter((r) => t.includes(r));
-  if (!hit.length) return null;
-  return { kind: 'residence', anyOf: hit, conf: HAS_EXCEPTION.test(t) ? LOW : HIGH };
+  /* ⚠️ `주소를 둔` 의 `둔` 은 `두`+`ㄴ` 이 아니라 **한 글자**다 — `주소를?\s?두` 로 잡으려다
+     `주소를 둔 광양보건대학교 재학생` 을 통째로 놓쳤다(한글은 음절이 미리 합쳐져 있다). */
+  if (!/거주|주소|주민등록|시민|도민|군민|구민|관내|관할/.test(t)) return null;
+  const prov = REGIONS.filter((r) => t.includes(r));
+  const cities = [];
+  CITY_RE.lastIndex = 0;
+  let m;
+  while ((m = CITY_RE.exec(t)) !== null) {
+    const c = m[1];
+    /* 시·도 이름은 시·군이 아니다 — `서울특별시`·`대구광역시`·`제주특별자치도` */
+    if (CITY_NOT.test(c) || /(특별시|광역시|특별자치시)$/.test(c)) continue;
+    if (REGIONS.includes(c.replace(/(시|군|구)$/, ''))) continue;
+    if (!cities.includes(c)) cities.push(c);
+  }
+  /* `관내`는 **그 재단의 관할**을 뜻한다 — 어느 시·군인지는 줄만 봐서는 모르고
+     공고를 낸 곳(주관 기관 이름)이 정한다. 판정기가 맥락으로 받는다. */
+  const inArea = /관내|관할/.test(t);
+  if (!prov.length && !cities.length && !inArea) return null;
+  /* 🔴 거주 요건은 **예외를 달고 다닌다.** 실제 원문:
+       `부·모 또는 보호자가 광양시에 1년 이상 주소를 둔 자
+        ○ 대학생의 경우 본인에 한하여 관외 거주 인정`
+     이걸 못 보면 광양 학생이 아닌 사람에게 ✕ 를 친다 — 틀린 미달은 못 받는 것보다 나쁘다.
+     공용 HAS_EXCEPTION 은 `단,`·`다만` 만 알아서 이 꼴을 놓친다(공용이라 넓히지 않는다). */
+  const RES_EXCEPT = /관외|본인에\s?한하여|예외|한하여\s?인정|단\s|다만/;
+  return { kind: 'residence', anyOf: prov, cities, inArea,
+    conf: (HAS_EXCEPTION.test(t) || RES_EXCEPT.test(t)) ? LOW : HIGH };
 }
 
 /* 🔴 **학교 이름이 걸린 요건** (2026-08-30 개발자 지적: "~대 학생은 제외 이런 요건 정도는
@@ -258,7 +292,7 @@ function parseLine(line, isExclude) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { parseLine, gradOnly, GRADE_SCALE, STATUSES, HIGH, LOW, MULTI_PROGRAM, HAS_EXCEPTION, caseBranch, unaskedAttr};
+  module.exports = { parseLine, gradOnly, GRADE_SCALE, STATUSES, HIGH, LOW, MULTI_PROGRAM, HAS_EXCEPTION, caseBranch, unaskedAttr, REGIONS};
 }
 
 /* ── 경우별 분기 (2026-08-24 개발자 지적) ─────────────────────────────────

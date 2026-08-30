@@ -19,8 +19,10 @@ const PR = (typeof module !== 'undefined' && module.exports)
   /* 🔴 브라우저에서는 **전역 함수**로 쓴다 — 여기에 이름을 빠뜨리면 Node 검사는 전부
      통과하는데 앱은 첫 카드에서 죽는다. `headRest`(section-head)에 이어 `caseBranch`도
      같은 실수를 했다(2026-08-24). 아래 회귀가 브라우저 순서로 실어 실제로 불러 본다. */
-  : { parseLine, gradOnly, caseBranch, unaskedAttr, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM };
+  : { parseLine, gradOnly, caseBranch, unaskedAttr, REGIONS, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM };
 const PR2 = PR;   // requirementLines가 쓰는 별칭 (선언 순서 때문에 이름만 따로 둔다)
+/* 시·도 이름은 parse-requirements 가 갖고 있다 — 여기 베끼면 두 벌이 된다 */
+const PR_REGIONS = PR.REGIONS || [];
 
 /* 자격 진단 — 프로필과 공고의 요건을 대조해 상태·사유·부족정보를 돌려준다 */
 function evaluate(sch, p) {
@@ -172,7 +174,7 @@ const FIT_MIN = 5;       // 미달이어도 5 — 파싱이 틀렸을 수 있다
 
 /* 파싱된 조건 하나를 학생과 맞춰 본다 → 'pass' | 'fail' | 'unknown'
    🔴 **모르면 unknown**이다. 틀린 fail은 학생에게서 장학금을 뺏는다. */
-function judgeCond(c, p) {
+function judgeCond(c, p, ctx) {
   const S = PR.GRADE_SCALE;
   switch (c.kind) {
     case 'grade': {
@@ -264,8 +266,28 @@ function judgeCond(c, p) {
       return hit ? 'pass' : 'fail';
     }
     case 'residence': {
+      /* 🔴 지역 요건은 **대부분 시·군 단위**다 (2026-08-30 개발자 지시).
+         시·도만 보던 시절에는 `안양시에 주소를 두고` 를 아예 판정하지 못해
+         한국장학재단 등록 116곳 중 83곳(72%)이 통째로 '자격 미확인'이었다.
+         🔴 `관내`는 **그 재단의 관할**을 뜻한다 — 줄만 봐서는 어느 시·군인지 알 수 없어
+            공고를 낸 곳(주관 기관 이름)에서 뽑아 ctx.homeCity 로 받는다.
+         ⚠️ 시·군을 못 맞춰도 **'fail' 이 아니라 'unknown'** 이다 — 거주 요건은 예외가 많고
+            (`관외 거주 인정`), 틀린 미달은 못 받는 것보다 나쁘다. 시·도도 같은 규칙이다. */
+      const cities = (c.cities || []).concat(c.inArea && ctx && ctx.homeCity ? [ctx.homeCity] : []);
+      const myCities = [p.regionCity, p.parentRegionCity].filter(Boolean);
+      if (cities.length) {
+        if (!myCities.length) return 'unknown';                 // 아직 안 고른 학생
+        if (cities.some((r) => myCities.includes(r))) return 'pass';
+        /* 🔴 학생이 **직접 고른** 시·군과 다르면 미달이다 — 안양시 학생에게 광양시 장학금은
+           받을 수 없는 것이다. 예전에는 여기서도 'unknown' 을 내서, 시·군을 받아 놓고도
+           지역 요건이 판정되지 않았다(실측 102줄 중 2줄만 판정됐다).
+           ⚠️ 예외 문구(`단,`·`관외 거주 인정`)가 있는 줄은 conf 가 LOW 라 위 lineVerdict 가
+              ✕ 로 만들지 않는다 — 그 안전장치가 이 판정을 감당한다. */
+        return 'fail';
+      }
+      if (c.inArea) return 'unknown';                           // 관할을 못 알아냈다
       const mine = [p.region, p.parentRegion].filter(Boolean);
-      if (!mine.length) return 'unknown';
+      if (!mine.length || !c.anyOf.length) return 'unknown';
       return c.anyOf.some((r) => mine.some((x) => x.includes(r) || r.includes(x))) ? 'pass' : 'unknown';
     }
     default: return 'unknown';
@@ -294,7 +316,7 @@ function lineVerdict(text, p, isExclude, ctx) {
   if (ctx && ctx.multi) return null;                        // 장학금이 여럿 묶인 공고
   if (ctx && ctx.inAnyOf && ctx.inAnyOf.has(text)) {        // 선택지 묶음의 한 갈래
     const { conds: cs } = PR.parseLine(text, !!isExclude);
-    for (const c of cs) if (judgeCond(c, p) === 'pass') return 'ok';
+    for (const c of cs) if (judgeCond(c, p, ctx) === 'pass') return 'ok';
     return null;                                            // 떨어져도 ✕는 안 친다
   }
   const { conds } = PR.parseLine(text, !!isExclude);
@@ -313,7 +335,7 @@ function lineVerdict(text, p, isExclude, ctx) {
        (한 공고에 `4분위 이하`·`5~6분위`가 함께 있으면 표다). 이걸 모르면
        퍼센트는 멀쩡한데 화면에만 ✕가 뜬다(2026-08-24 개발자 지적). */
     if (ctx && ctx.bracketTable && c.kind === 'bracket') continue;
-    const v = judgeCond(c, p);
+    const v = judgeCond(c, p, ctx);
     if (v === 'fail' && c.conf === PR.HIGH) return 'no';
     if (v === 'pass') seen = 'ok';
     else if (v === 'unknown') unknown = true;
@@ -325,6 +347,23 @@ function lineVerdict(text, p, isExclude, ctx) {
 
 /* 공고 단위로만 알 수 있는 것 — 줄 하나만 봐서는 판단할 수 없다. 퍼센트와 ✓/✗가
    **같은 맥락**을 봐야 갈라지지 않는다. */
+/* 🔴 `관내`가 어디인가 — **공고를 낸 곳의 이름**에서 뽑는다 (2026-08-30 개발자 지시:
+   "뭐 관내 ~ 이런 거 해결하기 위해"). `무안군승달장학회`·`원주시청`·`강서구장학회` 처럼
+   주관 기관 이름에 관할이 들어 있다. 줄만 봐서는 `관내에 1년 이상 거주` 가 어디인지 알 수 없다.
+   ⚠️ 못 찾으면 null 이고, 그때 판정은 'unknown' 이다 — 지어내지 않는다. */
+function homeCityOf(sch) {
+  const name = `${(sch && sch.provider) || ''} ${(sch && sch.name) || ''}`;
+  /* ⚠️ 기관 이름은 시·군 뒤에 말이 **바로 붙는다**(`무안군승달장학회`). 경계를 요구하면
+     못 집는다 — 첫 후보를 쓰되 시·도에서 온 것만 걸러낸다(`서울시립대학교` → `서울시`). */
+  for (const m of name.matchAll(/([가-힣]{1,6}(?:시|군|구))/g)) {
+    const c = m[1];
+    if (/(특별시|광역시|특별자치시)$/.test(c)) continue;
+    if (PR_REGIONS.includes(c.replace(/(시|군|구)$/, ''))) continue;   // 서울시·부산시…
+    return c;
+  }
+  return null;
+}
+
 function noticeCtx(sch) {
   const lines = (sch && sch.eligibilityLines) || [];
   const items = requirementLines(sch, lines, { withMeta: true });
@@ -338,7 +377,7 @@ function noticeCtx(sch) {
   }
   /* 여러 장학금이 묶인 공고 — 하나에 미달해도 다른 것에 지원한다(설계 조건 ⑧) */
   const multi = items.some((it) => PR.MULTI_PROGRAM.test(it.text));
-  return { bracketTable: brackets.size > 1, inAnyOf, multi };
+  return { bracketTable: brackets.size > 1, inAnyOf, multi, homeCity: homeCityOf(sch) };
 }
 
 /* 공고 하나에 대한 적합도 **내역**. 카드가 "요건 6개 중 4개 충족"을 띄우려면 숫자가 필요하다. */
@@ -396,7 +435,7 @@ function fitDetail(sch, p) {
     for (const c of conds) {
       if (c.conf !== PR.HIGH) continue;
       if (ctx.bracketTable && c.kind === 'bracket') continue;
-      if (judgeCond(c, p) === 'fail' && !multi) fails.push(line);
+      if (judgeCond(c, p, ctx) === 'fail' && !multi) fails.push(line);
     }
   }
 

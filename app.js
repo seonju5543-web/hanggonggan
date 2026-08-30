@@ -68,6 +68,21 @@ function migrateFitFields(p) {
   return p;
 }
 
+/* 시·도를 고르면 그 아래 시·군·구를 채운다 (2026-08-30).
+   🔴 표는 data.js 의 REGION_CITIES 하나뿐이다 — 여기에 목록을 베끼지 말 것.
+   ⚠️ 시·도를 바꾸면 전에 고른 시·군은 뜻이 없어지므로 비운다(경기 성남시를 골라 두고
+      시·도만 부산으로 바꾸면 '부산 성남시'가 된다). */
+function fillRegionCities(provSel, citySel, keep) {
+  const prov = $(provSel) && $(provSel).value;
+  const el = $(citySel);
+  if (!el) return;
+  const first = el.querySelector('option') ? el.querySelector('option').textContent : '선택 안 함';
+  const list = (typeof REGION_CITIES !== 'undefined' && REGION_CITIES[prov]) || [];
+  el.innerHTML = `<option value="">${esc(first)}</option>`
+    + list.map((c) => `<option${keep === c ? ' selected' : ''}>${esc(c)}</option>`).join('');
+  el.disabled = !list.length;
+}
+
 function loadState() {
   try {
     let raw = localStorage.getItem(STORAGE_KEY);
@@ -549,6 +564,8 @@ function initOnboarding() {
     setChip('#in-status', p.status);
     $('#in-region').value = p.region || '';
     $('#in-parent-region').value = p.parentRegion || '';
+    fillRegionCities('#in-region', '#in-region-city', p.regionCity);
+    fillRegionCities('#in-parent-region', '#in-parent-region-city', p.parentRegionCity);
     $('#in-nationality').value = p.nationality || 'korean';
     $('#in-credits').value = p.credits != null ? p.credits : '';
     $('#in-birth-year').value = p.birthYear || '';
@@ -614,7 +631,9 @@ function collectProfile() {
        빈 칸은 null로 둔다. **모르면 판정하지 않는 것**이 이 앱의 규칙이라, 0이나 기본값을
        넣으면 안 된다(엉뚱한 0% 판정이 난다). 설계: docs/designs/fit-score.md */
     region: $('#in-region').value || null,
+    regionCity: $('#in-region-city').value || null,
     parentRegion: $('#in-parent-region').value || null,
+    parentRegionCity: $('#in-parent-region-city').value || null,
     nationality: $('#in-nationality').value || null,
     credits: $('#in-credits').value.trim() === '' ? null : Number($('#in-credits').value),
     birthYear: $('#in-birth-year').value.trim() === '' ? null : Number($('#in-birth-year').value),
@@ -2533,6 +2552,9 @@ function bindEvents() {
   });
 
   $('#in-flags').addEventListener('change', syncConsentRow);
+  /* 시·도를 바꾸면 그 아래 시·군·구 목록을 다시 채운다 (2026-08-30) */
+  $('#in-region').addEventListener('change', () => fillRegionCities('#in-region', '#in-region-city'));
+  $('#in-parent-region').addEventListener('change', () => fillRegionCities('#in-parent-region', '#in-parent-region-city'));
 
   /* 히어로 금액을 누르면 '금액 상세' — 그 숫자가 어떻게 나왔는지 줄 단위로 보여 준다 */
   const heroAmt = $('#hero-amount');

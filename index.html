@@ -133,6 +133,14 @@
               <option>전북</option><option>전남</option><option>경북</option><option>경남</option><option>제주</option>
             </select>
           </label>
+          <!-- 🔴 시·군까지 받는다 (2026-08-30) — 지역 장학금은 대부분 시·군 단위라
+               시·도만으로는 `안양시에 주소를 두고` 같은 요건을 판정할 수 없다.
+               목록은 위 시·도를 고르면 app.js 가 REGION_CITIES 로 채운다. -->
+          <label class="field">
+            <span class="field-label">본인 거주 시·군·구</span>
+            <select id="in-region-city"><option value="">선택 안 함</option></select>
+            <span class="field-hint">지역 장학금은 대부분 시·군 단위로 뽑아요. 골라 두면 받을 수 있는 것만 걸러 드려요.</span>
+          </label>
           <label class="field">
             <span class="field-label">부모님 거주 지역</span>
             <select id="in-parent-region">
@@ -142,7 +150,11 @@
               <option>경기</option><option>강원</option><option>충북</option><option>충남</option>
               <option>전북</option><option>전남</option><option>경북</option><option>경남</option><option>제주</option>
             </select>
-            <span class="field-hint">지역 장학금은 '부 또는 모가 1년 이상 거주'를 요구하는 곳이 많아요</span>
+            <span class="field-hint">지역 장학금은 '부 또는 모가 1년 이상 거주'를 요구하는 곳이 많아요 — 실제로 지역 요건이 있는 83곳 중 47곳(57%)이 부모님 주소를 봐요</span>
+          </label>
+          <label class="field">
+            <span class="field-label">부모님 거주 시·군·구</span>
+            <select id="in-parent-region-city"><option value="">본인과 같음 / 선택 안 함</option></select>
           </label>
           <label class="field">
             <span class="field-label">국적</span>
