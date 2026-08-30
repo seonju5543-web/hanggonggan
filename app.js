@@ -1339,8 +1339,11 @@ function kosafAsScholarships() {
     .map((i) => {
       const f = i.fields || {};
       /* 한 칸에 여러 항목이 `○` 로 붙어 있다 — 재단이 쓴 대로 줄만 나눈다 */
+      /* 🔴 `제한없음` 이 든 칸은 **제한이 없다는 뜻**이라 자격 요건이 아니다 (2026-08-30).
+         재단이 체크박스를 통째로 적어 놓은 것(`제한없음 인문계열 사회계열 …`)이 자격 요건
+         자리를 차지하고 있었다 — 116곳 중 107줄. 아무것도 말하지 않는 줄이다. */
       const split = (t) => String(t || '').split(/\s*[○ㅇ※]\s*/).map((x) => kosafClean(x))
-        .filter((x) => x.length >= 4);
+        .filter((x) => x.length >= 4 && !x.includes('제한없음'));
       /* 🔴 `특정자격: ` 같은 **칸 이름을 붙이지 않는다** — 자격 요건 자리에는 요건만 적는다
          (개발자 지적). 어느 칸에서 왔는지는 학생에게 아무 뜻이 없다. */
       const lines = KOSAF_ELIG.flatMap((k) => split(f[k]));

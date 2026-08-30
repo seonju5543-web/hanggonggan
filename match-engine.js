@@ -279,6 +279,36 @@ function judgeCond(c, p, ctx) {
       if (c.exclude) return hit ? 'fail' : 'pass';
       return hit ? 'pass' : 'fail';
     }
+    /* 🔴 학과·전공·계열 (2026-08-30 개발자 지적: "왜 내 과에 천문 이런 게 없는데도
+       체크표시가 되어 있는지 모르겠네"). 프로필에 학과명·계열이 **둘 다 있는데**
+       조건 종류가 없어 이 축이 통째로 안 읽혔고, 안 읽힌 절은 보이지 않으므로
+       같은 줄의 소득구간 하나가 맞으면 줄 전체에 ✓ 가 붙었다(실측 9줄).
+       ⚠️ **어긋남을 함부로 미달이라 부르지 않는다** — 계열 분류가 재단과 우리가 다르고
+          `관련학과` 는 테두리가 흐리다. 그런 줄은 어긋나면 'unknown' 이다. */
+    case 'major': {
+      const norm = (x) => String(x).replace(/\s/g, '').replace(/(학과|학부|전공|과)$/, '');
+      const mine = p.major ? norm(p.major) : '';
+      const like = (a, b) => a && b && (a === b || a.includes(b) || b.includes(a));
+      /* ① 재단이 적어 준 포함 단어 — `학과명 포함 단어: 물리, 천문` */
+      if (c.words) {
+        if (!p.major) return 'unknown';
+        const hit = c.words.some((w) => String(p.major).includes(w));
+        return c.exclude ? (hit ? 'fail' : 'pass') : (hit ? 'pass' : 'fail');
+      }
+      /* ② 계열이 맞으면 그것으로 통과다 — **이름 대조보다 먼저 본다.**
+         `공학계열 컴퓨터학과` 같은 줄에서 기계공학과 학생이 이름만 어긋났다고 미달이 된다. */
+      const trackHit = c.tracks && p.track && c.tracks.includes(p.track);
+      if (trackHit) return c.exclude ? 'fail' : 'pass';
+      /* ③ 학과·학부 이름 */
+      if (c.names && mine) {
+        const hit = c.names.some((n) => like(mine, norm(n)));
+        if (hit) return c.exclude ? 'fail' : 'pass';
+        if (c.fuzzy) return 'unknown';
+        return c.exclude ? 'pass' : 'fail';
+      }
+      /* ④ 계열이 어긋난 것은 **모른다** — 재단 7분류와 우리 8분류가 안 맞는다 */
+      return 'unknown';
+    }
     case 'residence': {
       /* 🔴 지역 요건은 **대부분 시·군 단위**다 (2026-08-30 개발자 지시).
          시·도만 보던 시절에는 `안양시에 주소를 두고` 를 아예 판정하지 못해
@@ -351,7 +381,12 @@ function lineVerdict(text, p, isExclude, ctx) {
     if (ctx && ctx.bracketTable && c.kind === 'bracket') continue;
     const v = judgeCond(c, p, ctx);
     if (v === 'fail' && c.conf === PR.HIGH) return 'no';
-    if (v === 'pass') seen = 'ok';
+    /* 🔴 확신이 낮은 미달은 **사라지는 게 아니라 '모른다'** 다 (2026-08-30 개발자 지적:
+       "무지성 체크"). 예전에는 그냥 흘려버려서, 어긋난 절이 있는데도 같은 줄의 다른 절이
+       맞으면 ✓ 가 붙었다 — `(외국인 포함)` 때문에 확신이 낮아진 `국제학부 재학생` 줄이
+       영어학과 학생에게 충족으로 떴다. ✕ 를 만들지는 않는다(확신이 없으니까). */
+    if (v === 'fail') unknown = true;
+    else if (v === 'pass') seen = 'ok';
     else if (v === 'unknown') unknown = true;
   }
   /* 프로필에 칸이 없는 처지를 물은 줄이면 충족이라고 말하지 않는다 (parse-requirements 참조) */

@@ -279,6 +279,84 @@ function parseSchool(t) {
   return { kind: 'school', anyOf: names, conf: HAS_EXCEPTION.test(t) ? LOW : HIGH };
 }
 
+/* ── 학과·전공·계열 ── (2026-08-30 개발자 지적)
+   *"윤하 장학금도 보면 학과 이름에 천문 이런 게 들어가야 된다 이런 자격 있던데 …
+     왜 내 과에 천문 이런 게 없는데도 체크표시가 되어 있는지 모르겠네 (무지성 체크)"*
+
+   맞았다. 프로필에 `major`(학과명)·`track`(계열)이 **둘 다 있는데** 조건 종류가 없어서
+   이 축은 통째로 안 읽히고 있었다. 그리고 안 읽히는 것이 그냥 '모른다'로 끝나지 않았다 —
+   조건으로 잡히지 않은 절은 **아예 안 보이므로**, 같은 줄의 쉬운 절(소득구간) 하나가
+   맞으면 줄 전체에 ✓ 가 붙었다. 실측:
+     `학자금 지원구간 6구간 이하이며 학과명에 … 포함 단어: 물리, 천문`  ← 영어학과에 ✓
+     `일본학대학 융합일본지역학부 재학생`   `2026-2학기 국제학부 재학생`
+   ⚠️ 2026-08-30 의 '한 조건만 맞으면 ✓ 금지'는 **unknown 이 된 조건**만 막는다.
+      아예 안 잡힌 절은 그 관문에 걸리지 않는다 — 그래서 종류를 만드는 것이 근본 수리다.
+
+   🔴 **틀린 미달이 못 받는 것보다 나쁘다**(이 파일의 규약)를 여기서도 지킨다:
+     · 계열은 **맞으면 ✓, 어긋나면 모른다** — 재단의 7분류와 우리 8분류가 안 맞는다
+       (상경·경영이 재단에서는 사회계열이다). 어긋남을 미달로 부르면 멀쩡한 학생이 잘린다.
+     · `관련학과`·`유관 전공`처럼 **테두리가 흐린 말**은 어긋나도 미달을 안 낸다(fuzzy).
+     · `우수학과`·`특정학과`처럼 **이름이 아닌 말**은 학과명으로 집지 않는다. */
+const MAJOR_TRACK = [
+  [/인문|어문|문과/, ['humanities']], [/사회\s?과학|사회계열/, ['social']],
+  [/상경|경영|경상/, ['business']], [/사범|교육계열/, ['education']],
+  [/자연\s?과학|자연계열|이학/, ['science']],
+  /* ⚠️ `공과` 만으로는 안 된다 — `포항공과대학교` 가 공학계열로 읽혀 공대생에게 ✓ 가 붙었다.
+     그 줄은 학교 이야기지 계열 이야기가 아니다(전수 대조에서 잡았다). */
+  [/공학계열|이공학/, ['engineering']],
+  [/예체능|예술계열|체육계열/, ['arts']], [/의약|의학계열|약학계열|보건계열|간호계열/, ['medical']],
+  [/이공계/, ['science', 'engineering']],
+];
+/* 학과 이름 자리에 오지만 **이름이 아닌** 말 — 집으면 엉뚱한 미달이 된다 */
+const MAJOR_GENERIC = /^(우수|해당|관련|유관|특정|각|본|타|전|위|아래|상기|모든|기타|일부|이중|복수|부|주|동일|학부|대학|대학원|정규|계약)$/;
+/* 테두리가 흐린 말 — 어긋나도 미달을 안 낸다 */
+const MAJOR_FUZZY = /관련|유관|계통|분야|우대|우선|권장|등\s|예외/;
+/* `A 또는 B 전공`·`치/의예과·한의학·수의학과` 처럼 이름이 이어 붙는다 — 접속사째 집어 나중에 쪼갠다 */
+/* 🔴 이름은 꼬리말에 **붙어 있어야** 한다 — 띄어 쓰면 앞말은 이름이 아니다.
+   `본교 학부`·`2~4학년 학부`·`미술관련 학과` 를 학과명으로 읽어 멀쩡한 학생을 미달로
+   만들고 있었다(전수 대조). 진짜 학과 이름은 `국제학부`처럼 붙여 쓴다.
+   🔴 꼬리말 **뒤도** 봐야 한다 — `한국가스안전공사장학금` 의 `전공`(안'전공'사)을 집어
+   학과명 `한국가스안` 을 만들고 있었다. 조사(에·의·만…)나 한글이 아닌 것만 뒤에 온다. */
+const MAJOR_NAME = /((?:[가-힣A-Za-z]{2,12}\s*(?:또는|및|,|·|\/)\s*)*[가-힣A-Za-z]{2,12})(?:학과|학부|전공)(?=$|[^가-힣]|[에의를을은는이가와과로만도])/g;
+const MAJOR_WORDS = /학과\s?명?\s*포함\s*단어\s*[:：]\s*([^*※]+)/;
+
+function parseMajor(t) {
+  /* ① 「학과명 포함 단어: 물리, 천문」 — 재단이 직접 적어 준 목록이라 가장 확실하다 */
+  const w = t.match(MAJOR_WORDS);
+  if (w) {
+    const words = w[1].split(/[,、·/]|또는|및/).map((x) => x.trim()).filter((x) => x.length >= 1);
+    if (words.length) return { kind: 'major', words, conf: HIGH };
+  }
+  /* ② 계열 — 재단 분류와 우리 분류가 안 맞아 **통과만** 낸다(fuzzy) */
+  /* 재단이 체크박스를 통째로 적어 둔 줄(7계열 전부)은 **제한이 없다는 뜻**이라 요건이 아니다 */
+  const tracks = [...new Set(MAJOR_TRACK.filter(([re]) => re.test(t)).flatMap(([, ids]) => ids))];
+  if (tracks.length >= 5) tracks.length = 0;
+  /* ③ 학과·학부·전공 이름 */
+  const names = [];
+  MAJOR_NAME.lastIndex = 0;
+  let m;
+  while ((m = MAJOR_NAME.exec(t)) !== null) {
+    for (const raw of m[1].split(/또는|및|,|·|\//)) {
+      const n = raw.trim();
+      /* 🔴 계열 낱말은 이름이 아니다 — `이공계 전공` 을 학과명으로 집으면 공대생이 미달이 된다 */
+      if (n.length < 2 || MAJOR_GENERIC.test(n) || names.includes(n)) continue;
+      if (MAJOR_TRACK.some(([re]) => re.test(n))) continue;
+      /* 학교 이름은 학과가 아니다 — `우수대학교 및 우수학과` 에서 앞말이 딸려 왔다 */
+      if (/(대학교|대학|대)$/.test(n)) continue;
+      names.push(n);
+    }
+  }
+  if (!names.length && !tracks.length) return null;
+  return {
+    kind: 'major',
+    ...(names.length ? { names } : {}),
+    ...(tracks.length ? { tracks } : {}),
+    /* 계열만 있는 줄은 언제나 fuzzy — 분류가 서로 안 맞는다 */
+    fuzzy: !names.length || MAJOR_FUZZY.test(t),
+    conf: HAS_EXCEPTION.test(t) ? LOW : HIGH,
+  };
+}
+
 /* 🔴 **우리가 묻지도 않은 처지**를 확인했다고 말하지 않는다 (2026-08-30 개발자 지적:
    "판정할 수 없는 둘째 이상 자녀나 취약계층의 손자녀 이런 건 왜 체크해놨어").
    전수 대조에서 실제로 이런 줄들이 ✓ 로 떠 있었다 — 딸린 조건(국적·나이·재학) 하나가
@@ -312,7 +390,7 @@ function parseLine(line, isExclude) {
   const push = (c) => { if (c) conds.push(c); };
   push(parseGrade(t)); push(parseBracket(t)); push(parseCredits(t)); push(parseYear(t));
   push(parseStatus(t, isExclude)); push(parseFlags(t)); push(parseNationality(t));
-  push(parseAge(t)); push(parseResidence(t)); push(parseSchool(t));
+  push(parseAge(t)); push(parseResidence(t)); push(parseSchool(t)); push(parseMajor(t));
   if (isExclude) conds.forEach((c) => { c.exclude = true; });
   return { conds, multiProgram: MULTI_PROGRAM.test(t) };
 }
