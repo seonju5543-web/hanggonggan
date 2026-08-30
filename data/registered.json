@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-08-28T15:09:41.938Z",
+ "updatedAt": "2026-08-30",
  "items": [
   {
    "id": "reg-hi-jeju",
@@ -1539,7 +1539,17 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-08-27 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "2026년 2학기 푸른등대 기부장학금 신규장학생 선발 내용 요약표.pdf",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/149376/download.do"
+    },
+    {
+     "name": "본문이미지-2480x3508.jpg",
+     "url": "https://dep.hufs.ac.kr/CrossEditor/binary/images/000532/KakaoTalk_20260827_153042017.jpg",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/264156/artclView.do",
    "sourceKind": "auto"
   },
@@ -1591,6 +1601,273 @@
     "scope": "narrow",
     "raw": "* 국가장학금 , 성적장학금 등 중복수혜가능"
    }
+  },
+  {
+   "id": "auto-84a0ebb09c20ec9588eb82b4",
+   "name": "공통 2026년도 익산사랑 장학생 선발 안내",
+   "boardTitle": "공통 2026년도 익산사랑 장학생 선발 안내",
+   "type": "교내",
+   "provider": "경희대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-30",
+   "period": "접수 기간 원문 확인",
+   "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경희대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026년도 익산사랑 장학생 선발 공고문.hwpx",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=d91cc3e2ef824e46adfc5d9969c8b080&fileSn=1&bbsId=BMSR00040"
+    }
+   ],
+   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%202026%EB%85%84%EB%8F%84%20%EC%9D%B5%EC%82%B0%EC%82%AC%EB%9E%91%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4",
+   "sourceKind": "auto",
+   "eligibilityFrom": "공고문 첨부",
+   "eligibilityLines": [
+    "1. 선발대상 : 초·중·고·대학교 재학생(휴학생제외)",
+    "- 개인별 신청 및 학교장 추천",
+    "※ 초·중·고등학생은 학교장 추천서 및 학교 직인 날인 제출 [별지1] 장학생 신청서 서식",
+    "※ 학교장 추천은 *개인별 신청 불가"
+   ]
+  },
+  {
+   "id": "auto-ent2431264135artclviewdo",
+   "name": "[서울][국가근로] 2026학년도 2학기 국가근로장학생 모집 안내(추가)",
+   "boardTitle": "[서울][국가근로] 2026학년도 2학기 국가근로장학생 모집 안내(추가)",
+   "type": "교내",
+   "provider": "한국외국어대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-09-03",
+   "listedAt": "2026-08-30",
+   "period": "접수 기간 ~2026-09-03",
+   "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "(서식)2026학년도 2학기 국가근로(추가모집) 지원서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/149357/download.do"
+    }
+   ],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/264135/artclView.do",
+   "sourceKind": "auto",
+   "deadlineFrom": "공고 원문",
+   "eligibilityLines": [
+    "4. 선발기준 : 소득구간 , 성적 등 고려"
+   ],
+   "excerpts": [
+    "문의처 : 02-2173-2136(서울 장학팀 )"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-ent2431264146artclviewdo",
+   "name": "[공통][국가]2026-2 중소기업취업연계장학금 신규장학생 신청안내(~9/18)",
+   "boardTitle": "[공통][국가]2026-2 중소기업취업연계장학금 신규장학생 신청안내(~9/18)",
+   "type": "교내",
+   "provider": "한국외국어대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-09-18",
+   "period": "접수 ~2026-09-18",
+   "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/264146/artclView.do",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "3. 선발기준 : 100점 만점으로 하여, 50점(학업성적) + 50점(학생의 취창업의지 - 취창업 준비계획, 관련 자격증 및 실적 등)",
+    "+ 가산점(최대 10점, 저소득층 신청 및 서류제출 시)"
+   ],
+   "excerpts": [
+    "2) 신청방법 : ① 한국장학재단 홈페이지 ( www.kosaf.go.kr ) 또는 모바일앱을 통하여신청 →② 장학금신청서 작성",
+    "☎ 관련문의 : 한국장학재단취업연계 지원사업 상담센터 1800-0499"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-cb2ad20ec9588eb82b482f26",
+   "name": "공통 2026-2학기 푸른등대 기부장학금 신규장학생 신청 안내(8/26~9/10)",
+   "boardTitle": "공통 2026-2학기 푸른등대 기부장학금 신규장학생 신청 안내(8/26~9/10)",
+   "type": "교내",
+   "provider": "경희대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-09-10",
+   "period": "접수 ~2026-09-10",
+   "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경희대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%202026-2%ED%95%99%EA%B8%B0%20%ED%91%B8%EB%A5%B8%EB%93%B1%EB%8C%80%20%EA%B8%B0%EB%B6%80%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%8B%A0%EA%B7%9C%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4(8%2F26~",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-ent2431263952artclviewdo",
+   "name": "[공통][국가]2026년 2학기 고졸 후학습자 장학금 신청안내",
+   "boardTitle": "[공통][국가]2026년 2학기 고졸 후학습자 장학금 신청안내",
+   "type": "교내",
+   "provider": "한국외국어대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-30",
+   "period": "접수 기간 원문 확인",
+   "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/263952/artclView.do",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-ent2431263956artclviewdo",
+   "name": "[공통][교외]2026년 하반기 울산연구원 장학생 선발공고",
+   "boardTitle": "[공통][교외]2026년 하반기 울산연구원 장학생 선발공고",
+   "type": "교외",
+   "provider": "한국외국어대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-30",
+   "period": "접수 기간 원문 확인",
+   "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026년 하반기 장학생 선발계획 공고.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/149240/download.do"
+    }
+   ],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/263956/artclView.do",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-oardid322850menuno200318",
+   "name": "공통 2026년 2학기 제24기 후기 삼원장학생 선발 안내",
+   "boardTitle": "공통 2026년 2학기 제24기 후기 삼원장학생 선발 안내",
+   "type": "교내",
+   "provider": "경희대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-30",
+   "period": "접수 기간 원문 확인",
+   "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경희대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "F_장학생 선발원서(제24기 후기_2026년 2학기).pdf",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=a3660760e3174b0d91d9bfc20250de4d&fileSn=2&bbsId=BMSR00040"
+    },
+    {
+     "name": "F_장학생 선발원서(제24기 후기_2026년 2학기).docx",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=a3660760e3174b0d91d9bfc20250de4d&fileSn=3&bbsId=BMSR00040"
+    }
+   ],
+   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322850",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-oardid321881menuno200318",
+   "name": "공통 2026년도 세종연구원 세종이도인재장학금 장학생 모집 안내",
+   "boardTitle": "공통 2026년도 세종연구원 세종이도인재장학금 장학생 모집 안내",
+   "type": "교내",
+   "provider": "경희대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-08-30",
+   "period": "접수 기간 원문 확인",
+   "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경희대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-08-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026 장학생 선발 공고문.zip",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=b66459604ee44d269a963dacf9b456c6&fileSn=1&bbsId=BMSR00040"
+    }
+   ],
+   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=321881",
+   "sourceKind": "auto"
   }
  ]
 }
