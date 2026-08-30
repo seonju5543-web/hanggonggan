@@ -57,6 +57,16 @@ except Exception:
 cmd = (d.get("tool_input") or {}).get("command", "") or ""
 if not re.search(r"verify/\S+\.(js|mjs|cjs)", cmd):
     raise SystemExit(1)
+# 🔴 **검사만 돌린 명령일 때만 본다** (2026-08-30 · 같은 판정기를 세 번째 고치며 세운 규칙).
+#    ⚠️ 이 주석에 작은따옴표를 쓰지 말 것 — 이 파이썬은 python3 -c 뒤 홑따옴표 안에 있어서
+#       따옴표 하나가 셸 문자열을 끊고, 판정기가 조용히 죽는다(만들면서 실제로 그랬다).
+#    판정기는 명령 전체의 출력을 글자로 훑는다. 그래서 검사와 상관없는 ✕ 까지 주웠다:
+#      1차 red-green 이 일부러 낸 ✕  ·  2차 요약 줄 「실패: 없음」  ·  3차 git push 거부의 ✕
+#    셋 다 같은 뿌리다 — 섞인 출력에서 「검사 것」을 가려낼 방법이 없다.
+#    그래서 **섞이지 않은 명령만** 본다. git·루프가 붙은 명령은 아예 판단하지 않는다.
+#    (놓치는 대신 헛으로 걸지 않는다. 관문이 헛걸리면 무시하게 되고, 그게 더 나쁘다.)
+if re.search(r"\bgit\b|\bfor\b|\bwhile\b|&&\s*git", cmd):
+    raise SystemExit(1)
 r = d.get("tool_response")
 out = json.dumps(r, ensure_ascii=False) if not isinstance(r, str) else r
 raise SystemExit(0 if FAILED(out) else 1)
@@ -81,6 +91,16 @@ except Exception:
     raise SystemExit(1)
 cmd = (d.get("tool_input") or {}).get("command", "") or ""
 if not re.search(r"verify/\S+\.(js|mjs|cjs)", cmd):
+    raise SystemExit(1)
+# 🔴 **검사만 돌린 명령일 때만 본다** (2026-08-30 · 같은 판정기를 세 번째 고치며 세운 규칙).
+#    ⚠️ 이 주석에 작은따옴표를 쓰지 말 것 — 이 파이썬은 python3 -c 뒤 홑따옴표 안에 있어서
+#       따옴표 하나가 셸 문자열을 끊고, 판정기가 조용히 죽는다(만들면서 실제로 그랬다).
+#    판정기는 명령 전체의 출력을 글자로 훑는다. 그래서 검사와 상관없는 ✕ 까지 주웠다:
+#      1차 red-green 이 일부러 낸 ✕  ·  2차 요약 줄 「실패: 없음」  ·  3차 git push 거부의 ✕
+#    셋 다 같은 뿌리다 — 섞인 출력에서 「검사 것」을 가려낼 방법이 없다.
+#    그래서 **섞이지 않은 명령만** 본다. git·루프가 붙은 명령은 아예 판단하지 않는다.
+#    (놓치는 대신 헛으로 걸지 않는다. 관문이 헛걸리면 무시하게 되고, 그게 더 나쁘다.)
+if re.search(r"\bgit\b|\bfor\b|\bwhile\b|&&\s*git", cmd):
     raise SystemExit(1)
 r = d.get("tool_response")
 out = json.dumps(r, ensure_ascii=False) if not isinstance(r, str) else r
