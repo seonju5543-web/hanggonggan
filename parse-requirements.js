@@ -132,7 +132,10 @@ function parseStatus(t, isExclude) {
 const FLAG_PAT = [
   ['basicLiving', /기초\s?생활\s?수급|기초수급/], ['nearPoverty', /차상위/],
   ['multiChild', /다자녀/], ['merit', /국가유공|보훈\s?대상|독립유공/],
-  ['disabled', /장애\s?(학생|인|우|의\s?정도)/], ['singleParent', /한부모/],
+  /* 🔴 `특수교육대상자` 는 **장애 학생을 가리키는 행정 용어**다 (2026-08-30 개발자 지적:
+     "특수교육대상자=장애학생인데 이것도 너가 판정할 수 있는 건데"). 못 알아봐서
+     판정에서 빠지고 있었다. `장애인 등에 대한 특수교육법` 의 용어다. */
+  ['disabled', /장애\s?(학생|인|우|의\s?정도)|특수\s?교육\s?대상자?/], ['singleParent', /한부모/],
   ['defector', /북한이탈|새터민|탈북/], ['multicultural', /다문화/],
 ];
 function parseFlags(t) {
@@ -225,6 +228,22 @@ function parseSchool(t) {
   return { kind: 'school', anyOf: names, conf: HAS_EXCEPTION.test(t) ? LOW : HIGH };
 }
 
+/* 🔴 **우리가 묻지도 않은 처지**를 확인했다고 말하지 않는다 (2026-08-30 개발자 지적:
+   "판정할 수 없는 둘째 이상 자녀나 취약계층의 손자녀 이런 건 왜 체크해놨어").
+   전수 대조에서 실제로 이런 줄들이 ✓ 로 떠 있었다 — 딸린 조건(국적·나이·재학) 하나가
+   맞았다는 이유로:
+     `취약계층 국민연금수급자 또는 그 자녀(손자녀)로서 … 재학 중인 자`
+     `보호자가 6개월 이상 원주시에 거주하는 만 24세 이하의 둘째아 이상 자녀`
+     `세대주가 만 65세 이하`   `산업체근로자 … 대학에 재학 중인 자`
+   프로필에 칸이 아예 없는 처지들이라 **모른다고 두는 것**이 맞다.
+   ⚠️ 우리가 묻는 처지(기초생활·차상위·다자녀·장애·한부모·보훈·북한이탈·다문화)는
+      flags 조건으로 잡히므로 여기서 막지 않는다 — 막으면 진짜 판정까지 사라진다. */
+const UNASKED_ATTR = /(둘째|셋째|넷째|막내|손자녀|조손|유자녀|유족|세대주|부양\s?가족|고아|위탁\s?가정|소년소녀|보호\s?종료|자립\s?준비|의사자|의상자|농어촌|농업인|어업인|귀농|귀어|소상공인|중소기업|재직자?|근로자|취약\s?계층|저소득|사회적\s?배려|가정\s?형편|생계|수급자|(도민|시민|군민|구민|주민)의\s?자녀)/;
+function unaskedAttr(text, conds) {
+  if (!UNASKED_ATTR.test(String(text || ''))) return false;
+  return !(conds || []).some((c) => c.kind === 'flags');
+}
+
 /* 한 줄에서 조건을 전부 뽑는다. `isExclude`면 '이러면 안 된다'로 읽는다. */
 function parseLine(line, isExclude) {
   const t = String(line || '');
@@ -239,7 +258,7 @@ function parseLine(line, isExclude) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { parseLine, gradOnly, GRADE_SCALE, STATUSES, HIGH, LOW, MULTI_PROGRAM, HAS_EXCEPTION, caseBranch};
+  module.exports = { parseLine, gradOnly, GRADE_SCALE, STATUSES, HIGH, LOW, MULTI_PROGRAM, HAS_EXCEPTION, caseBranch, unaskedAttr};
 }
 
 /* ── 경우별 분기 (2026-08-24 개발자 지적) ─────────────────────────────────

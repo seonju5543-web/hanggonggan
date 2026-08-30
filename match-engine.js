@@ -19,7 +19,7 @@ const PR = (typeof module !== 'undefined' && module.exports)
   /* 🔴 브라우저에서는 **전역 함수**로 쓴다 — 여기에 이름을 빠뜨리면 Node 검사는 전부
      통과하는데 앱은 첫 카드에서 죽는다. `headRest`(section-head)에 이어 `caseBranch`도
      같은 실수를 했다(2026-08-24). 아래 회귀가 브라우저 순서로 실어 실제로 불러 본다. */
-  : { parseLine, gradOnly, caseBranch, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM };
+  : { parseLine, gradOnly, caseBranch, unaskedAttr, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM };
 const PR2 = PR;   // requirementLines가 쓰는 별칭 (선언 순서 때문에 이름만 따로 둔다)
 
 /* 자격 진단 — 프로필과 공고의 요건을 대조해 상태·사유·부족정보를 돌려준다 */
@@ -225,7 +225,13 @@ function judgeCond(c, p) {
     case 'flags': {
       const f = p.flags || [];
       if (!f.length) return 'unknown';                    // 안 고른 것과 해당 없는 것은 다르다
-      return c.anyOf.some((k) => f.includes(k)) ? 'pass' : 'unknown';
+      const has = c.anyOf.some((k) => f.includes(k));
+      /* 🔴 **제외 줄에서는 뜻이 뒤집힌다** (2026-08-30 전수 대조에서 발견 — 원래부터 있던 버그).
+         `장애학생은 지원 제외` 에 장애 학생이 'pass' 로 나와 **제외 조항이 한 번도 안 걸렸다.**
+         이 파일의 규약은 '제외 줄에서 judgeCond 가 fail 이면 그 학생이 걸린 것'이다
+         (국적이 이미 그렇게 돼 있다). 같은 규약을 따른다. */
+      if (c.exclude) return has ? 'fail' : 'pass';
+      return has ? 'pass' : 'unknown';
     }
     case 'nationality':
       if (!p.nationality) return 'unknown';
@@ -251,6 +257,10 @@ function judgeCond(c, p) {
         const a = norm(n);
         return a === mine || mine.startsWith(a) || a.startsWith(mine);
       });
+      /* 🔴 제외 줄에서는 뜻이 뒤집힌다 — `서울대학교 학생은 제외` 는 **서울대 학생이** 걸린다.
+         안 뒤집었더니 정반대가 됐다: 서울대 학생은 멀쩡히 통과하고 **남이 미달**이 됐다
+         (2026-08-30 개발자 지적 "그 학교 학생이 쓰면 x 도 뜨는 거지?" — 안 떴다). */
+      if (c.exclude) return hit ? 'fail' : 'pass';
       return hit ? 'pass' : 'fail';
     }
     case 'residence': {
@@ -289,6 +299,15 @@ function lineVerdict(text, p, isExclude, ctx) {
   }
   const { conds } = PR.parseLine(text, !!isExclude);
   let seen = null;
+  /* 🔴 **읽어 낸 조건이 하나라도 판정 안 되면 ✓ 를 치지 않는다** (2026-08-30 개발자 지적).
+     예전에는 `if (v === 'pass') seen = 'ok'` 라, **한 조건만 맞으면 줄 전체에 ✓** 가 붙었다.
+     그래서 이런 줄들이 '충족'으로 떠 있었다(전수 대조로 8건 확인):
+       `취약계층 국민연금수급자 또는 그 자녀(손자녀)로서 … 재학 중인 자`  ← '재학'만 맞았다
+       `보호자가 6개월 이상 원주시에 거주하는 만 24세 이하의 둘째아 이상 자녀`  ← '나이'만 맞았다
+       `세대주가 만 65세 이하`
+     우리가 **묻지도 않은 처지**를 확인했다고 말한 셈이다. 틀린 안심은 틀린 미달만큼 나쁘다.
+     ⚠️ 표시를 없앨 뿐 ✕ 를 만들지 않는다 — 모르는 것은 모른다고 두는 쪽이다. */
+  let unknown = false;
   for (const c of conds) {
     /* 지급액 구간표는 요건이 아니다 — 공고를 통째로 봐야 알 수 있어 맥락으로 받는다
        (한 공고에 `4분위 이하`·`5~6분위`가 함께 있으면 표다). 이걸 모르면
@@ -297,8 +316,11 @@ function lineVerdict(text, p, isExclude, ctx) {
     const v = judgeCond(c, p);
     if (v === 'fail' && c.conf === PR.HIGH) return 'no';
     if (v === 'pass') seen = 'ok';
+    else if (v === 'unknown') unknown = true;
   }
-  return seen;
+  /* 프로필에 칸이 없는 처지를 물은 줄이면 충족이라고 말하지 않는다 (parse-requirements 참조) */
+  if (seen === 'ok' && PR.unaskedAttr(text, conds)) return null;
+  return unknown ? null : seen;
 }
 
 /* 공고 단위로만 알 수 있는 것 — 줄 하나만 봐서는 판단할 수 없다. 퍼센트와 ✓/✗가
@@ -333,7 +355,17 @@ function fitDetail(sch, p) {
   const items = requirementLines(sch, lines, { withMeta: true, all: true }).filter((it) => !PR.gradOnly(it.text));
   if (!items.length) return { pct: FIT_UNREAD, unread: true, met: 0, total: 0, unknown: 0, fails: [] };
 
-  const exLines = requirementLines(sch, [...((sch && sch.eligibilityExcludes) || []), ...lines], { onlyExclude: true });
+  /* 🔴 **이미 뽑아 둔 제외 줄을 그대로 판정한다** (2026-08-30 전수 대조에서 발견).
+     예전에는 제외 목록까지 `requirementLines(onlyExclude)` 에 밀어 넣었는데, 그 함수는
+     **자격 줄에 섞여 있는 제외를 찾아내는 용도**(절 경계로 가른다)라 이미 갈라 놓은
+     목록은 오히려 흘린다 — 실측: 정읍시민장학재단 제외 5줄 → 판정 대상 **0줄**,
+     건국대 6줄 → **0줄**. 제외 조항이 사실상 한 번도 안 걸리고 있었다.
+     (게다가 한 줄짜리 제외가 **절 머리글로 읽혀** 그 다음 자격 줄이 제외로 넘어가기도 했다.)
+     둘을 합치되 출처를 나눈다: 발췌기가 제외 절에서 뽑아 둔 것 + 자격 줄에 섞여 있던 것. */
+  const exLines = [...new Set([
+    ...((sch && sch.eligibilityExcludes) || []).map((x) => String(x || '').trim()).filter(Boolean),
+    ...requirementLines(sch, lines, { onlyExclude: true }),
+  ])];
   /* 여러 장학금이 묶인 공고는 0%를 내지 않는다(설계 조건 ⑧) — 하나에 미달해도 다른 것에 지원한다 */
   const multi = items.some((it) => PR.MULTI_PROGRAM.test(it.text));
 

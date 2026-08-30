@@ -1030,6 +1030,70 @@ console.log('\n■ 정식 등록 대상 학교 좁히기 (2026-08-30)');
    너가 다 할 수 있잖아." 실제로 `현재 충남대학교 재학 중인 학부생` 에 한국외대 학생이
    **✓ 충족**으로 떠 있었다 — 아는 것을 안 쓰고 있었다.
    🔴 아래 '집으면 안 되는 것'이 이 규칙의 존재 이유다. 넓히면 **틀린 미달**이 쏟아진다. */
+/* 2026-08-30 — 개발자 지적 셋을 한 절에 모은다. 전부 **전수 대조로 실물을 확인**한 것이다:
+     ① "판정할 수 없는 둘째 이상 자녀나 취약계층의 손자녀 이런 건 왜 체크해놨어 무지성으로?"
+     ② "특수교육대상자=장애학생인데 이것도 너가 판정할 수 있는 건데"
+     ③ "~대학 학생들은 제외했을 때 그 학교 학생이 이 앱을 쓰면 x 도 뜨는 거지?"  ← **안 떴다** */
+/* 🔴 브라우저에서 쓰는 이름을 **손으로 맞추지 않게** 한다 (2026-08-30).
+   match-engine 은 Node 에서는 require, 브라우저에서는 **전역 이름 목록**으로 parse-requirements
+   를 받는다. 그 목록에 이름을 빠뜨리면 **Node 검사는 전부 통과하는데 앱은 죽는다** —
+   파일 주석이 그렇게 경고하고 있었는데도 `unaskedAttr` 을 빠뜨려 앱이 통째로 넘어졌다
+   (`PR.unaskedAttr is not a function`). 사람이 기억하는 대신 소스를 대조한다. */
+console.log('\n■ 브라우저에서 쓸 이름이 빠지지 않았나 (2026-08-30)');
+{
+  const src = fs.readFileSync(new URL('../match-engine.js', import.meta.url), 'utf8');
+  const listed = new Set((src.match(/:\s*\{\s*parseLine[^}]*\}/) || [''])[0]
+    .replace(/[{}:]/g, ' ').split(/[\s,]+/).filter(Boolean));
+  const used = [...new Set([...src.matchAll(/\bPR2?\.([A-Za-z_$][\w$]*)/g)].map((m) => m[1]))];
+  const missing = used.filter((n) => !listed.has(n));
+  eq(`match-engine 이 쓰는 PR.* 이름이 전부 브라우저 목록에 있다 (쓰는 것 ${used.length}개)`, missing, []);
+}
+
+console.log('\n■ 자격 판정의 정직함 (2026-08-30)');
+{
+  const MEq = createRequire(import.meta.url)('../match-engine.js');
+  const PRq = createRequire(import.meta.url)('../parse-requirements.js');
+  const base = { name: 't', school: '한국외국어대학교', campus: '', track: 'humanities', major: '영어',
+    year: 3, status: '재학', gpa: 3.2, bracket: 6, credits: 14, region: '서울', parentRegion: '서울',
+    nationality: 'korean', birthYear: 2004, flags: [], cert: false, exchange: false, common: {} };
+  const mark = (line, over) => MEq.requirementMatch(line, { ...base, ...(over || {}) }, {});
+
+  /* ① 한 조건만 맞았다고 줄 전체에 ✓ 를 치면, **묻지도 않은 처지**를 확인했다고 말하는 셈이다 */
+  eq('묻지 않은 처지에는 ✓ 를 치지 않는다 (손자녀)',
+    mark('취약계층 국민연금수급자 또는 그 자녀(손자녀)로서 대학교 4년제·전문대에 재학 중인 자'), null);
+  eq('  둘째아 이상 자녀', mark('보호자가 6개월 이상 원주시에 주민등록을 두고 거주하는 만 24세 이하의 둘째아 이상 자녀'), null);
+  eq('  세대주 나이', mark('세대주가 만 65세 이하'), null);
+  eq('  산업체 근로자', mark('산업체근로자 - 상주시 기업체에 근무하는 근로자 중 2년제 이상 대학에 재학 중인 자'), null);
+  /* 🔴 반대쪽 — 우리가 **묻는** 처지까지 막으면 진짜 판정이 사라진다 */
+  eq('우리가 묻는 처지는 그대로 판정한다 (장애)',
+    mark('장애학생으로 국내 대학에 재학 중인 자', { flags: ['disabled'] }), 'ok');
+
+  /* ② 특수교육대상자 = 장애학생 (행정 용어라 못 알아보고 있었다) */
+  const flagsOf = (t) => (PRq.parseLine(t, false).conds.find((c) => c.kind === 'flags') || {}).anyOf || null;
+  eq('「특수교육대상자」를 장애로 읽는다', flagsOf('특수교육대상자로 등록된 학생'), ['disabled']);
+
+  /* ③ 🔴 제외 조항의 **방향** — 걸려야 할 사람이 걸리고, 남은 안 걸려야 한다.
+     고치기 전에는 학교·특별자격이 **정반대**였다: 서울대 학생은 멀쩡히 통과하고 남이 미달이었다. */
+  const exSch = { id: 'x', name: 't', type: '교외', provider: 'p', amount: '-', amountValue: 0,
+    deadline: '2026-12-31', period: '-', summary: '-', eligibility: { selective: true }, documents: [],
+    eligibilityLines: ['국내 대학 재학생'] };
+  const caught = (ex, over) => MEq.fitDetail({ ...exSch, eligibilityExcludes: [ex] },
+    { ...base, ...over }).fails.length > 0;
+  for (const [line, hit, miss, label] of [
+    ['서울대학교 학생은 제외', { school: '서울대학교' }, { school: '한국외국어대학교' }, '학교'],
+    ['장애학생은 지원 제외', { flags: ['disabled'] }, { flags: [] }, '특별자격'],
+    ['휴학생은 제외', { status: '휴학' }, { status: '재학' }, '학적'],
+    ['외국인 유학생은 지원 불가', { nationality: 'foreign' }, { nationality: 'korean' }, '국적'],
+  ]) {
+    eq(`제외 조항(${label}) — 해당 학생은 걸린다`, caught(line, hit), true);
+    eq(`  그리고 남은 안 걸린다 (${label})`, caught(line, miss), false);
+  }
+  /* 🔴 이미 뽑아 둔 제외 목록이 판정에 **들어가는가** — 실측 정읍 5줄 → 0줄이었다 */
+  eq('발췌해 둔 제외 줄이 판정 대상에 들어간다',
+    MEq.fitDetail({ ...exSch, eligibilityExcludes: ['휴학생은 제외'] }, { ...base, status: '휴학' })
+      .fails.includes('휴학생은 제외'), true);
+}
+
 console.log('\n■ 학교 이름이 걸린 요건 (2026-08-30)');
 {
   const PRq = createRequire(import.meta.url)('../parse-requirements.js');
