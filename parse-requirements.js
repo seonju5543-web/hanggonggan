@@ -289,10 +289,19 @@ function parseSchool(t) {
    프로필에 칸이 아예 없는 처지들이라 **모른다고 두는 것**이 맞다.
    ⚠️ 우리가 묻는 처지(기초생활·차상위·다자녀·장애·한부모·보훈·북한이탈·다문화)는
       flags 조건으로 잡히므로 여기서 막지 않는다 — 막으면 진짜 판정까지 사라진다. */
-const UNASKED_ATTR = /(둘째|셋째|넷째|막내|손자녀|조손|유자녀|유족|세대주|부양\s?가족|고아|위탁\s?가정|소년소녀|보호\s?종료|자립\s?준비|의사자|의상자|농어촌|농업인|어업인|귀농|귀어|소상공인|중소기업|재직자?|근로자|취약\s?계층|저소득|사회적\s?배려|가정\s?형편|생계|수급자|(도민|시민|군민|구민|주민)의\s?자녀)/;
+const UNASKED_ATTR = /(둘째|셋째|넷째|막내|손자녀|조손|유자녀|유족|세대주|부양\s?가족|고아|위탁\s?가정|소년소녀|보호\s?종료|자립\s?준비|의사자|의상자|농어촌|농업인|어업인|귀농|귀어|소상공인|중소기업|재직자?|근로자|(도민|시민|군민|구민|주민)의\s?자녀)/;
+/* 🔴 **형편을 말하는 낱말은 소득구간으로 확인된다** — 프로필에 칸이 있다.
+   `학자금 지원구간 8구간 이하의 저소득층 학생` 을 `저소득` 이라는 낱말만 보고 막으면,
+   우리가 아는 것(구간)으로 판정할 수 있는 줄까지 '모른다'가 된다.
+   (2026-08-30 코드 리뷰에서 잡았다 — 지금 데이터에는 아직 없지만 들어오면 바로 물린다.) */
+const INCOME_ATTR = /(취약\s?계층|저소득|사회적\s?배려|가정\s?형편|생계|수급자)/;
 function unaskedAttr(text, conds) {
-  if (!UNASKED_ATTR.test(String(text || ''))) return false;
-  return !(conds || []).some((c) => c.kind === 'flags');
+  const t = String(text || '');
+  const cs = conds || [];
+  const has = (k) => cs.some((c) => c.kind === k);
+  if (INCOME_ATTR.test(t) && (has('bracket') || has('flags'))) return false;
+  if (!UNASKED_ATTR.test(t) && !INCOME_ATTR.test(t)) return false;
+  return !has('flags');
 }
 
 /* 한 줄에서 조건을 전부 뽑는다. `isExclude`면 '이러면 안 된다'로 읽는다. */
