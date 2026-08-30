@@ -701,13 +701,27 @@ input::placeholder { color: var(--text-weak); }
   margin: 20px 0 9px;
 }
 
-.reason-list, .doc-list { list-style: none; display: grid; gap: 6px; }
+/* ── 자격·서류 목록 (2026-08-29 재설계) ──────────────────────────────────────
+   🔴 되돌리지 말 것: 줄마다 회색 카드를 씌우면 9줄짜리 자격이 **카드 아홉 장**이 되어
+      읽히지 않는다(전문가 지적 "가독성"). 목록은 목록으로 보여야 눈이 훑는다.
+      배경 대신 **왼쪽 표식과 여백**으로 항목을 가른다. */
+.reason-list, .doc-list { list-style: none; display: grid; gap: 0; }
 .reason-list li, .doc-list li {
   font-size: var(--t-md);
-  background: var(--bg);
-  border-radius: var(--r-md);
-  padding: 11px 13px;
+  line-height: 1.6;
+  padding: 9px 0 9px 15px;
+  position: relative;
+  border-bottom: 1px solid var(--rule-hair, rgba(18, 22, 31, 0.06));
 }
+.reason-list li:last-child, .doc-list li:last-child { border-bottom: 0; }
+.reason-list li::before, .doc-list li::before {
+  content: ''; position: absolute; left: 2px; top: 0.95em;
+  width: 4px; height: 4px; border-radius: var(--r-pill);
+  background: var(--text-weak);
+}
+/* 판정 표시(✓ ✕ ?)가 이미 앞에 붙는 줄은 점을 빼서 두 겹이 되지 않게 한다 */
+.reason-list .r-ok::before, .reason-list .r-bad::before, .reason-list .r-unk::before { display: none; }
+.reason-list .r-ok, .reason-list .r-bad, .reason-list .r-unk { padding-left: 2px; }
 .r-ok  { color: var(--green); }
 .r-bad { color: var(--red); }
 .r-unk { color: var(--orange); }
@@ -1078,11 +1092,22 @@ body { background: var(--bg); }
 }
 
 /* 자격 진단 안의 '지원 자격' 머리말 — 판정 항목(✓/✕/?)이 아니라 원문 인용의 제목이라 표시가 없다 */
+/* 구역 이름 — 문장이 아니라 이름이다. 부연은 <em> 로 작게 뒤에 붙인다 */
 .reason-list .r-head {
-  font-weight: 800;
-  color: var(--text);
-  margin-top: 10px;
+  font-size: var(--t-2xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  color: var(--text-weak);
+  margin-top: 18px;
+  padding: 0 0 6px;
+  border-bottom: 1px solid var(--rule-hair, rgba(18, 22, 31, 0.06));
   list-style: none;
+}
+.reason-list .r-head:first-child { margin-top: 0; }
+.reason-list .r-head::before { display: none; }
+.reason-list .r-head em {
+  font-style: normal; font-weight: 500; color: var(--text-weak);
+  letter-spacing: 0; margin-left: 6px;
 }
 
 /* 판정할 수 없는 요건 — 번호만 붙이고 색을 칠하지 않는다 (틀린 초록 체크보다 낫다) */
@@ -1959,3 +1984,14 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--r-xs)
 .sch-fit.is-no     { font-size: var(--t-2xs); font-weight: 600; color: var(--text-weak); }
 .sch-fit.is-unread { font-size: var(--t-2xs); font-weight: 600; color: var(--orange); }
 .sch-applied { margin-top: 7px; font-size: var(--t-2xs); font-weight: 600; color: var(--primary); }
+
+/* ── 상세 시트 — 판정은 근거 옆에 한 번만 (2026-08-29) ────────────────────────
+   정리 전에는 시트 맨 위에 적합도 배지와 '지원 가능 · 선발 심사' 알약이 나란히 떠서
+   **서로 다른 축의 판정이 둘**이었다. 이제 '지원 자격' 머리 옆에 붙어, 학생이
+   판정과 그 근거(요건 줄)를 한자리에서 읽는다. */
+.sheet-verdict {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 10px; flex-wrap: wrap; margin: 22px 0 4px;
+}
+.sheet-verdict h4 { margin: 0; }
+.verdict-marks { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }

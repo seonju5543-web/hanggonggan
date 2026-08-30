@@ -117,7 +117,7 @@ function essayTipsHtml(warnings) {
       (why ? `<span class="essay-tip-why">${esc(why)}</span>` : '') + `</li>`;
   }).join('');
   return `<div class="essay-tips"><b>이렇게 하면 더 좋아집니다</b><ul>${items}</ul>` +
-    `<p class="essay-fine">고치면 이 안내는 사라져요 — 규정이 아니라 더 좋게 만드는 제안이에요.</p></div>`;
+    `<p class="essay-fine">고치면 이 안내는 사라집니다 — 규정이 아니라 제안입니다.</p></div>`;
 }
 
 /* ── 판(version) 관리 — AI/옮기기가 글을 바꿀 때마다 이전 판을 기기 안에 남긴다(설계 ①·4) ──
@@ -361,7 +361,7 @@ function essaySubmitCheckHtml(result) {
   return `<div class="essay-submit-check" id="essay-submit-check">` +
     `<div class="esc-head"><b>제출 전 점검</b>${badge}</div>` +
     `<ul class="esc-list">${rows}</ul>` +
-    `<p class="essay-fine">✗ 는 그대로 내면 문제가 되는 것 · △ 는 더 좋게 만드는 제안이에요.</p></div>`;
+    `<p class="essay-fine">✗ 는 그대로 내면 문제가 되는 것 · △ 는 더 좋게 만드는 제안입니다.</p></div>`;
 }
 
 /* 점검표를 '양식 문서 만들기' 버튼 위에 그린다(있으면 갈아끼운다) */
@@ -568,7 +568,7 @@ function essayButtonHtml(tpl) {
      서버가 없을 때는 **앱이 개요로 옮겨 준다** — 문장까지는 못 쓴다고 정직하게 적는다. */
   if (!essayOn()) {
     return `<button class="btn btn-outline btn-lg" id="btn-essay-ai">고른 키워드를 아래 칸에 옮기기 (${n}칸)</button>` +
-      `<p class="dp-note essay-fine">아직 글까지 써 드리지는 못해요 — 옮겨 드린 내용을 문장으로 다듬어 주세요</p>`;
+      `<p class="dp-note essay-fine">아직 글까지 쓰지는 못합니다 — 옮겨 드린 내용을 문장으로 다듬어 주세요</p>`;
   }
   return `<button class="btn btn-primary btn-lg" id="btn-essay-ai">${esc(essayCfg('label', '키워드로 글 만들기'))} (${n}칸)</button>` +
     `<p class="dp-note essay-fine">눌러야 보내져요 · 고른 키워드와 학교·학년·전공만 나가고 이름·연락처·계좌·성적은 나가지 않아요</p>`;
@@ -600,7 +600,7 @@ function essayRulesBannerHtml(sch) {
     (r.blind ? `<p class="essay-rule-danger"><b>블라인드 심사</b>: 학교 이름을 쓰면 심사에서 제외됩니다. ` +
       `초안에는 학교 이름을 넣지 않아요(전공은 괜찮아요).</p>` : '') +
     (items ? `<ul>${items}</ul>` : '') +
-    `<p class="essay-fine">재단이 공고·첨부에 직접 적은 문구예요.</p></div>`;
+    `<p class="essay-fine">재단이 공고·첨부에 직접 적은 문구입니다.</p></div>`;
 }
 
 async function essayBind(tpl, sch) {
@@ -699,7 +699,7 @@ async function essaySend(tpl, sch, btn) {
       document.getElementById('essay-nudge')?.remove();
       if (first) { first.scrollIntoView({ block: 'center', behavior: 'smooth' }); first.focus(); }
     });
-    if (typeof toast === 'function') toast('한 줄만 더 적으시면 훨씬 좋아져요 — 그대로 만드시려면 다시 눌러 주세요');
+    if (typeof toast === 'function') toast('한 줄만 더 적으면 훨씬 좋아집니다 — 그대로 만들려면 다시 눌러 주세요');
     return;
   }
   document.getElementById('essay-nudge')?.remove();
@@ -790,7 +790,7 @@ async function essaySend(tpl, sch, btn) {
     const hasOwn = ((payload.fields.find((x) => x.key === d.key) || {}).asks || []).some((a) => a.own);
     if (!hasOwn) {
       el.parentElement.querySelector('.essay-flag').insertAdjacentHTML('afterend',
-        `<p class="dp-note essay-urge">직접 적어 주신 이야기가 아직 없어요. 위 보기를 눌러 열리는 칸에
+        `<p class="dp-note essay-urge">직접 적은 이야기가 아직 없습니다. 위 보기를 눌러 열리는 칸에
          <b>한 줄만 더하면</b> 심사위원에게 전해지는 인상이 크게 달라집니다.</p>`);
     }
     /* 바뀐 곳(diff) · 되돌리기 · '고칠 곳' 팁을 한 번에 그린다.
