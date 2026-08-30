@@ -102,7 +102,7 @@ input::placeholder { color: var(--text-weak); }
   box-shadow: 0 10px 26px rgba(5, 12, 32, 0.35);
 }
 .btn-white:disabled { color: var(--text-weak); cursor: default; box-shadow: none; }
-.icon-btn { padding: 8px; color: var(--text-weak); border-radius: 12px; transition: background 0.15s, color 0.15s; }
+.icon-btn { padding: 8px; color: var(--text-weak); border-radius: var(--radius-sm); transition: background 0.15s, color 0.15s; }
 .icon-btn:hover { background: rgba(18, 22, 31, 0.05); color: var(--text-sub); }
 .icon-btn svg { width: 22px; height: 22px; display: block; }
 .link-btn { color: var(--text-weak); font-size: 13.5px; font-weight: 600; }
@@ -117,14 +117,14 @@ input::placeholder { color: var(--text-weak); }
 .onboard-progress {
   height: 4px;
   background: rgba(18, 22, 31, 0.07);
-  border-radius: 2px;
+  border-radius: var(--radius-hair);
   margin-bottom: 30px;
   overflow: hidden;
 }
 .onboard-bar {
   height: 100%;
   background: linear-gradient(90deg, var(--primary), #6e9bff);
-  border-radius: 2px;
+  border-radius: var(--radius-hair);
   width: 25%;
   transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -141,7 +141,7 @@ input::placeholder { color: var(--text-weak); }
   width: 88px;
   height: 88px;
   margin: 0 auto 18px;
-  border-radius: 26px;
+  border-radius: var(--radius-lg);
   background: linear-gradient(150deg, #16295c 0%, #101d3d 55%, #0b1530 100%);
   color: #e8effe;
   display: flex;
@@ -199,7 +199,7 @@ input::placeholder { color: var(--text-weak); }
 .chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip {
   padding: 10px 16px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--surface);
   border: 1.5px solid rgba(18, 22, 31, 0.10);
   font-size: 14.5px;
@@ -286,7 +286,7 @@ input::placeholder { color: var(--text-weak); }
 .ac-list[hidden] { display: none; }
 /* iOS·크롬은 스크롤 막대를 평소에 감춰서 '더 있다'는 걸 알 수 없다 — 항상 보이게 그린다 */
 .ac-list::-webkit-scrollbar { width: 6px; }
-.ac-list::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
+.ac-list::-webkit-scrollbar-thumb { background: var(--line); border-radius: var(--radius-hair); }
 .ac-list::-webkit-scrollbar-track { background: transparent; }
 .ac-item {
   display: block;
@@ -313,7 +313,7 @@ input::placeholder { color: var(--text-weak); }
 /* 눌러서 넘어가는 영역 — 눌리는 것처럼 보여야 누른다 */
 .tappable { cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform 0.12s, opacity 0.12s; }
 .tappable:active { transform: scale(0.985); opacity: 0.9; }
-.tappable:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; border-radius: 14px; }
+.tappable:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; border-radius: var(--radius-sm); }
 .avatar {
   width: 44px; height: 44px;
   border-radius: 50%;
@@ -336,7 +336,7 @@ input::placeholder { color: var(--text-weak); }
     radial-gradient(120% 140% at 85% -20%, rgba(94, 141, 255, 0.55) 0%, rgba(94, 141, 255, 0) 55%),
     radial-gradient(90% 90% at -10% 110%, rgba(47, 107, 255, 0.35) 0%, rgba(47, 107, 255, 0) 60%),
     linear-gradient(155deg, #172a5e 0%, #101d3d 58%, #0a1226 100%);
-  border-radius: 24px;
+  border-radius: var(--radius-lg);
   padding: 28px 24px 24px;
   color: #fff;
   margin-bottom: 30px;
@@ -397,7 +397,7 @@ input::placeholder { color: var(--text-weak); }
   font-size: 11px;
   font-weight: 700;
   padding: 3.5px 9px;
-  border-radius: 7px;
+  border-radius: var(--radius-xs);
   letter-spacing: 0;
 }
 .badge-in  { background: var(--green-weak); color: var(--green); }
@@ -411,7 +411,7 @@ input::placeholder { color: var(--text-weak); }
   font-size: 13px;
   color: var(--text-sub);
   background: rgba(18, 22, 31, 0.04);
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   padding: 10px 12px;
   margin: 0 0 10px;
   line-height: 1.55;
@@ -423,7 +423,7 @@ input::placeholder { color: var(--text-weak); }
   font-weight: 600;
   color: var(--text-sub);
   background: rgba(18, 22, 31, 0.05);
-  border-radius: 7px;
+  border-radius: var(--radius-xs);
   padding: 2.5px 8px;
   margin-left: 6px;
   vertical-align: 1px;
@@ -445,7 +445,7 @@ input::placeholder { color: var(--text-weak); }
   font-size: 12px;
   font-weight: 700;
   padding: 5px 11px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
 }
 .pill-ok  { background: var(--green-weak); color: var(--green); }
 .pill-sel { background: var(--orange-weak); color: var(--orange); }
@@ -480,7 +480,7 @@ input::placeholder { color: var(--text-weak); }
 .filter-row::-webkit-scrollbar { display: none; }
 .filter-chip {
   padding: 8.5px 15px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--surface);
   border: 1.5px solid rgba(18, 22, 31, 0.10);
   font-size: 14px;
@@ -527,14 +527,14 @@ input::placeholder { color: var(--text-weak); }
 .mini-progress {
   height: 5px;
   background: rgba(18, 22, 31, 0.06);
-  border-radius: 3px;
+  border-radius: var(--radius-hair);
   margin-top: 13px;
   overflow: hidden;
 }
 .mini-progress div {
   height: 100%;
   background: linear-gradient(90deg, var(--primary), #6e9bff);
-  border-radius: 3px;
+  border-radius: var(--radius-hair);
   transition: width 0.3s;
 }
 
@@ -638,7 +638,7 @@ input::placeholder { color: var(--text-weak); }
   max-width: 480px;
   max-height: 86dvh;
   background: var(--surface);
-  border-radius: 26px 26px 0 0;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   z-index: 100;
   overflow-y: auto;
   overscroll-behavior: contain;      /* 시트 끝에서 뒤 화면까지 같이 끌려가지 않게 */
@@ -649,7 +649,7 @@ input::placeholder { color: var(--text-weak); }
 .sheet-handle {
   width: 44px;
   height: 5px;
-  border-radius: 3px;
+  border-radius: var(--radius-hair);
   background: rgba(18, 22, 31, 0.14);
   margin: 11px auto 0;
   position: sticky;
@@ -673,7 +673,7 @@ input::placeholder { color: var(--text-weak); }
 .reason-list li, .doc-list li {
   font-size: 14px;
   background: var(--bg);
-  border-radius: 11px;
+  border-radius: var(--radius-sm);
   padding: 11px 13px;
 }
 .r-ok  { color: var(--green); }
@@ -685,7 +685,7 @@ input::placeholder { color: var(--text-weak); }
   font-size: 11px;
   font-weight: 700;
   padding: 2px 7px;
-  border-radius: 6px;
+  border-radius: var(--radius-xs);
   margin-right: 5px;
 }
 .doc-auto { background: var(--primary-weak); color: var(--primary); }
@@ -696,7 +696,7 @@ input::placeholder { color: var(--text-weak); }
   color: #2c447e;
   background: var(--primary-weak);
   border: 1px solid rgba(47, 107, 255, 0.14);
-  border-radius: 11px;
+  border-radius: var(--radius-sm);
   padding: 13px;
   margin: 18px 0 8px;
 }
@@ -802,7 +802,7 @@ textarea:focus {
   font-size: 14px;
   font-weight: 600;
   padding: 13px 22px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   z-index: 200;
   opacity: 0;
   transition: opacity 0.25s, transform 0.25s;
@@ -844,7 +844,7 @@ textarea:focus {
   font-size: 12.5px;
   font-weight: 700;
   padding: 7px 11px;
-  border-radius: 9px;
+  border-radius: var(--radius-xs);
   background: var(--bg);
   color: var(--text-sub);
   cursor: pointer;
@@ -928,7 +928,7 @@ textarea:focus {
   min-width: 17px;
   height: 17px;
   padding: 0 4px;
-  border-radius: 9px;
+  border-radius: var(--radius-pill);
   background: var(--red);
   color: #fff;
   font-size: 10.5px;
@@ -1000,7 +1000,7 @@ textarea:focus {
   width: 44px; height: 26px;
   flex-shrink: 0;
   padding: 0;
-  border-radius: 13px;
+  border-radius: var(--radius-pill);
   border: none;
   background: rgba(18, 22, 31, 0.14);
   position: relative;
@@ -1077,7 +1077,7 @@ textarea:focus {
   font-size: 12px;
   color: var(--text-sub);
   background: var(--bg-sub, rgba(127,127,127,.08));
-  border-radius: 6px;
+  border-radius: var(--radius-xs);
   padding: 5px 8px;
   margin-bottom: 6px;
   list-style: none;
@@ -1125,7 +1125,7 @@ textarea:focus {
   position: fixed;
   z-index: 56;
   padding: 7px 12px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: rgba(16, 29, 61, 0.92);
   color: #fff;
   font-size: 12.5px;
@@ -1201,7 +1201,7 @@ textarea:focus {
 .chat-bubble {
   max-width: calc(100% - 36px);
   padding: 11px 14px;
-  border-radius: 16px;
+  border-radius: var(--radius-sm);
   font-size: 14.5px;
   line-height: 1.5;
 }
@@ -1214,7 +1214,7 @@ textarea:focus {
   font-weight: 700;
   color: var(--orange);
   background: var(--orange-weak);
-  border-radius: 8px;
+  border-radius: var(--radius-xs);
   padding: 4px 8px;
   margin-top: 8px;
   display: inline-block;
@@ -1247,7 +1247,7 @@ textarea:focus {
   flex: 0 0 auto;
   min-height: 34px;
   padding: 7px 13px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--primary-weak);
   color: var(--primary);
   font-size: 13px;
@@ -1264,7 +1264,7 @@ textarea:focus {
   min-height: 44px;
   padding: 11px 15px;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--bg);
   font-size: 16px;                  /* 🔴 16px 미만으로 낮추지 말 것 — iOS가 입력을 시작할 때 화면을 확대해 버린다 */
   font-family: inherit;
@@ -1288,7 +1288,7 @@ textarea:focus {
 .chat-act {
   min-height: 36px;
   padding: 8px 14px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--primary);
   color: #fff;
   font-size: 13px;
@@ -1303,7 +1303,7 @@ textarea:focus {
   padding: 10px 12px;
   border-left: 3px solid var(--gold);
   background: rgba(217, 181, 106, 0.09);
-  border-radius: 0 10px 10px 0;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
 .chat-quote-head { font-size: 11.5px; font-weight: 800; color: var(--text-weak); margin-bottom: 5px; }
 .chat-quote-line { font-size: 13.5px; color: var(--text-sub); line-height: 1.5; }
@@ -1315,14 +1315,14 @@ textarea:focus {
 
 /* 하나만 고르는 항목. 여러 개 고르는 칩(.fq-checks)과 눈으로 구분돼야
    학생이 '더 고를 수 있나?'를 헷갈리지 않는다 */
-.fq-choice .chip { border-radius: 12px; }
+.fq-choice .chip { border-radius: var(--radius-sm); }
 .fq-choice .chip.active::before { content: '● '; font-size: 11px; }
 .fq-checks .chip.active::before { content: '✓ '; font-size: 12px; }
 
 /* 프로필에서 채운 것 — 감추지 않고 접어 둔다 */
 .fq-auto {
   border: 1.5px solid rgba(18, 22, 31, 0.10);
-  border-radius: 14px; padding: 12px 14px; margin-bottom: 20px;
+  border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 20px;
   background: var(--surface);
 }
 .fq-auto > summary {
@@ -1338,7 +1338,7 @@ textarea:focus {
 .fq-group {
   display: grid; gap: 10px;
   border: 1.5px solid rgba(18, 22, 31, 0.10);
-  border-radius: 14px; padding: 12px;
+  border-radius: var(--radius-sm); padding: 12px;
 }
 .fq-sub { display: grid; gap: 5px; margin-bottom: 8px; }
 .fq-group .fq-sub { margin-bottom: 0; }
@@ -1373,7 +1373,7 @@ textarea:focus {
       키워드 질문을 그 칸 '안'에 그린다 — 새 질문이 아니라 질문 수 상한과 무관하다. */
 .essay-ask {
   border: 1px solid var(--line); border-left: 3px solid var(--primary);
-  border-radius: 12px; background: var(--primary-weak);
+  border-radius: var(--radius-sm); background: var(--primary-weak);
   padding: 12px 13px; margin: 4px 0 10px;
 }
 .essay-ask-lead {
@@ -1391,7 +1391,7 @@ textarea:focus {
 .essay-ask .chip-sm { background: var(--surface); font-size: 12px; padding: 6px 10px; min-height: 30px; }
 .essay-ask-free {
   width: 100%; font-size: 13.5px; padding: 9px 11px;
-  border: 1px solid var(--line); border-radius: 10px; background: var(--surface);
+  border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface);
 }
 
 /* 버튼 아래 한 줄 — 무엇이 나가는지 짧게만 밝힌다.
@@ -1404,7 +1404,7 @@ textarea:focus {
 .essay-fu {
   margin-top: 9px; padding: 10px 11px;
   background: var(--surface); border: 1px solid var(--primary);
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
 }
 .essay-fu-q { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 5px; }
 .essay-fu-q .essay-fu-pick { color: var(--primary-dark); }
@@ -1422,7 +1422,7 @@ textarea.essay-fu-in { width: 100%; font-size: 13.5px; line-height: 1.6; padding
 /* 한 번만 세우는 안내 — 막지 않는다 */
 .essay-nudge {
   border: 1px solid var(--primary); background: var(--primary-weak);
-  border-radius: 14px; padding: 14px; margin-bottom: 10px;
+  border-radius: var(--radius-sm); padding: 14px; margin-bottom: 10px;
 }
 .essay-nudge h4 { margin-bottom: 6px; }
 .essay-nudge .dp-note { text-align: left; line-height: 1.6; margin-bottom: 10px; }
@@ -1430,7 +1430,7 @@ textarea.essay-fu-in { width: 100%; font-size: 13.5px; line-height: 1.6; padding
 /* 직접 쓴 한 줄이 없을 때만 나오는 독려 */
 .essay-urge {
   text-align: left; line-height: 1.6; margin-top: 6px;
-  padding: 9px 11px; border-radius: 10px;
+  padding: 9px 11px; border-radius: var(--radius-sm);
   background: var(--primary-weak); color: var(--text-sub);
 }
 .essay-urge b { color: var(--primary-dark); }
@@ -1443,14 +1443,14 @@ textarea.essay-drafted { border-color: var(--primary); background: #fbfcff; line
    버리지 않고 짚어 준다. 학생이 읽고 고치는 것이 이 기능의 전제다. */
 .essay-fix {
   list-style: none; margin: 6px 0 0; padding: 9px 11px;
-  background: var(--orange-weak, #fff7e8); border-radius: 10px;
+  background: var(--orange-weak, #fff7e8); border-radius: var(--radius-sm);
   border-left: 3px solid var(--orange);
 }
 .essay-fix li { font-size: 12.5px; color: var(--text-sub); line-height: 1.6; }
 .essay-fix li + li { margin-top: 5px; }
 .essay-fix li::before { content: '✎ '; color: var(--orange); font-weight: 700; }
 /* 이 공고가 정한 작성 규정 배너 (2026-08-24) — 지키지 않으면 심사 제외·감점되는 규정 */
-.essay-rules-banner { border: 1px solid var(--line, #e5e7eb); border-radius: 12px; padding: 12px 14px; margin: 10px 0; background: var(--card-bg, #fff); }
+.essay-rules-banner { border: 1px solid var(--line, #e5e7eb); border-radius: var(--radius-sm); padding: 12px 14px; margin: 10px 0; background: var(--card-bg, #fff); }
 .essay-rules-banner > b { display: block; margin-bottom: 6px; font-size: 13.5px; }
 .essay-rules-banner ul { margin: 6px 0 0; padding-left: 18px; }
 .essay-rules-banner li { font-size: 12.5px; line-height: 1.5; margin: 2px 0; }
@@ -1465,7 +1465,7 @@ textarea.essay-drafted { border-color: var(--primary); background: #fbfcff; line
    규정 배너(.essay-rules-banner)와 다르다: 규정은 '꼭 지켜야 하는 것', 아래는 '더 좋게 하는 제안'이다. */
 .essay-tips {
   margin: 8px 0 0; padding: 10px 12px;
-  background: var(--orange-weak, #fff7e8); border-radius: 10px;
+  background: var(--orange-weak, #fff7e8); border-radius: var(--radius-sm);
   border-left: 3px solid var(--orange, #e08a1e);
 }
 .essay-tips > b { display: block; font-size: 13px; margin-bottom: 6px; }
@@ -1478,7 +1478,7 @@ textarea.essay-drafted { border-color: var(--primary); background: #fbfcff; line
 
 /* 되돌리기·바뀐 곳 보기 컨트롤 줄 */
 .essay-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-.btn-sm { font-size: 12.5px; padding: 6px 12px; min-height: 32px; border-radius: 9px; }
+.btn-sm { font-size: 12.5px; padding: 6px 12px; min-height: 32px; border-radius: var(--radius-xs); }
 .btn-ghost {
   background: transparent; border: 1px solid var(--line, #e5e7eb); color: var(--text-sub);
 }
@@ -1486,22 +1486,22 @@ textarea.essay-drafted { border-color: var(--primary); background: #fbfcff; line
 
 /* 바뀐 곳(diff) — 🟩 표시가 이번에 새로 들어온 부분 */
 .essay-diff {
-  margin-top: 8px; padding: 10px 12px; border-radius: 10px;
+  margin-top: 8px; padding: 10px 12px; border-radius: var(--radius-sm);
   background: var(--card-bg, #fff); border: 1px solid var(--line, #e5e7eb);
 }
 .essay-diff-body {
   white-space: pre-wrap; word-break: break-word; font-size: 13px; line-height: 1.7;
   color: var(--text-sub); margin-top: 6px;
 }
-mark.essay-add { background: #d7f5df; color: #166534; border-radius: 3px; padding: 0 1px; }
+mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radius-hair); padding: 0 1px; }
 :root[data-theme="dark"] mark.essay-add, :root:not([data-theme="light"]) mark.essay-add { background: #1f4a2e; color: #a6e6bb; }
 
 /* ── 재료 충분도 게이지 (2026-08-29 · 2순위) ──
    초안을 만들기 전에 '재료가 얼마나 모였나'를 보여 준다. 품질이 아니라 재료다. */
 .essay-gauge:empty { display: none; }
 .essay-gauge { margin-top: 12px; }
-.essay-gauge-bar { height: 7px; border-radius: 6px; background: var(--surface, #eef0f3); overflow: hidden; }
-.essay-gauge-bar > span { display: block; height: 100%; border-radius: 6px; transition: width .3s ease; }
+.essay-gauge-bar { height: 7px; border-radius: var(--radius-xs); background: var(--surface, #eef0f3); overflow: hidden; }
+.essay-gauge-bar > span { display: block; height: 100%; border-radius: var(--radius-xs); transition: width .3s ease; }
 .esg-low  > span { background: #d98b8b; }
 .esg-some > span { background: var(--orange, #e08a1e); }
 .esg-full > span { background: #3aa76d; }
@@ -1515,11 +1515,11 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: 3px; paddin
    '제출 가능'의 선을 만든다. ✗ 는 막을 것(빈칸·블라인드) · △ 는 제안. */
 .essay-submit-check {
   margin: 14px 0 10px; padding: 12px 14px;
-  border: 1px solid var(--line, #e5e7eb); border-radius: 12px; background: var(--card-bg, #fff);
+  border: 1px solid var(--line, #e5e7eb); border-radius: var(--radius-sm); background: var(--card-bg, #fff);
 }
 .esc-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
 .esc-head > b { font-size: 13.5px; }
-.esc-badge { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+.esc-badge { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-pill); white-space: nowrap; }
 .esc-badge.esc-ok { background: #e3f6ec; color: #1c7a4a; }
 .esc-badge.esc-soft { background: var(--orange-weak, #fff7e8); color: #b5760f; }
 .esc-badge.esc-block { background: #fdecea; color: #c0392b; }
@@ -1545,7 +1545,7 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: 3px; paddin
 .apps-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 
 /* 카드 한 줄 — 뒤에 삭제 버튼을 깔고 카드를 그 위로 민다 */
-.swipe-row { position: relative; overflow: hidden; border-radius: 16px; }
+.swipe-row { position: relative; overflow: hidden; border-radius: var(--radius-sm); }
 .swipe-row + .swipe-row { margin-top: 10px; }
 .swipe-row > .sch-card {
   position: relative; z-index: 1; width: 100%;
@@ -1559,7 +1559,7 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: 3px; paddin
   position: absolute; inset: 0 0 0 auto; width: 96px;
   display: flex; align-items: center; justify-content: center;
   background: #d92d20; color: #fff; font-size: 14px; font-weight: 700;
-  border: 0; border-radius: 0 16px 16px 0; cursor: pointer;
+  border: 0; border-radius: 0 var(--radius) var(--radius) 0; cursor: pointer;
   /* 밀기 전에는 보이지 않는다 — 카드 모서리가 둥글어 빨간 조각이 비어져 나왔다 */
   opacity: 0; transition: opacity .15s linear;
 }
@@ -1575,7 +1575,7 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: 3px; paddin
 .bulkbar {
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
   padding: 10px 14px; margin-bottom: 12px;
-  background: var(--surface-2, #f4f6f8); border-radius: 12px;
+  background: var(--surface-2, #f4f6f8); border-radius: var(--radius-sm);
 }
 /* 🔴 전역 `appearance:none`(style.css:62) 때문에 체크박스를 직접 그려야 한다 —
    그냥 두면 **동그란 빈 원**만 보이고 체크 표시가 안 뜬다(CLAUDE.md 기록).
@@ -1592,7 +1592,7 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: 3px; paddin
   box-shadow: 0 3px 8px rgba(47, 107, 255, .35);
 }
 .btn-danger {
-  background: #d92d20; color: #fff; border: 0; border-radius: 10px;
+  background: #d92d20; color: #fff; border: 0; border-radius: var(--radius-sm);
   padding: 8px 16px; min-height: 44px; font-weight: 700; cursor: pointer;
 }
 .btn-danger:disabled { opacity: .45; cursor: not-allowed; }
@@ -1647,7 +1647,7 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: 3px; paddin
 .bulk-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; }
 .bulk-tags .chip-sm {
   background: var(--primary-weak); color: var(--primary);
-  border-radius: 999px; font-weight: 600; padding: 4px 9px; font-size: 11.5px;
+  border-radius: var(--radius-pill); font-weight: 600; padding: 4px 9px; font-size: 11.5px;
 }
 .bulk-amount { font-size: 13px; color: var(--text-sub); margin-bottom: 6px; }
 .bulk-more { border-top: 1px dashed var(--line); padding-top: 8px; }
@@ -1672,7 +1672,7 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: 3px; paddin
 .acc-head { font-size: 13px; font-weight: 700; color: var(--text-weak); margin-bottom: 8px; }
 .acc-on {
   font-size: 11.5px; font-weight: 600; color: var(--green);
-  background: var(--green-weak); border-radius: 999px; padding: 3px 9px; margin-left: 6px;
+  background: var(--green-weak); border-radius: var(--radius-pill); padding: 3px 9px; margin-left: 6px;
 }
 .acc-mail { font-size: 15.5px; font-weight: 700; color: var(--text); margin-bottom: 8px; word-break: break-all; }
 .acc-note { font-size: 12.5px; color: var(--text-sub); line-height: 1.65; margin-bottom: 10px; }
@@ -1733,7 +1733,7 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: 3px; paddin
 .auth-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
 .auth-remember { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--text-sub); cursor: pointer; }
 .auth-remember input { width: 20px; height: 20px; padding: 0; flex: none;
-  border: 1.5px solid rgba(18, 22, 31, 0.22); border-radius: 6px;
+  border: 1.5px solid rgba(18, 22, 31, 0.22); border-radius: var(--radius-xs);
   background: #fff center / 62% no-repeat; cursor: pointer; }
 .auth-remember input:checked { border-color: var(--primary); background-color: var(--primary);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-6.5' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
@@ -1783,7 +1783,7 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: 3px; paddin
    다크모드 규칙은 넣지 않는다 — 앱 전체가 밝은 화면 한 벌이다(2026-08-24 결정). */
 .sort-btn {
   display: flex; align-items: center; gap: 5px;
-  min-height: 44px; padding: 0 10px; border-radius: 12px;
+  min-height: 44px; padding: 0 10px; border-radius: var(--radius-sm);
   font-size: 13.5px; font-weight: 600; color: var(--text-sub);
   background: transparent; border: 0; cursor: pointer; white-space: nowrap;
 }
@@ -1801,13 +1801,13 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: 3px; paddin
 .sort-menu {
   position: absolute; top: calc(100% + 4px); right: 0; z-index: 40;
   display: flex; flex-direction: column; min-width: 148px; padding: 6px;
-  background: #fff; border-radius: 14px;
+  background: #fff; border-radius: var(--radius-sm);
   box-shadow: 0 8px 28px rgba(18, 22, 31, .16), 0 0 0 1px rgba(18, 22, 31, .06);
 }
 .sort-opt {
   display: block; width: 100%; text-align: left;
   min-height: 44px; padding: 0 12px; border: 0; background: transparent;
-  border-radius: 10px; font-size: 14.5px; font-weight: 600;
+  border-radius: var(--radius-sm); font-size: 14.5px; font-weight: 600;
   color: var(--text-sub); cursor: pointer; white-space: nowrap;
 }
 .sort-opt:hover { background: rgba(18, 22, 31, .05); }
@@ -1856,9 +1856,9 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: 3px; paddin
 .ad-row summary::after, .ad-grp > details > summary::after { content: '⌄'; font-size: 13px; color: var(--text-weak); line-height: 1; }
 .ad-row details[open] summary::after, .ad-grp > details[open] > summary::after { content: '⌃'; }
 .ad-src { font-size: 11.5px; color: var(--text-sub); margin-top: 5px; padding: 7px 10px;
-          background: #f7f8fb; border-left: 2.5px solid #d7dbe4; border-radius: 0 7px 7px 0; line-height: 1.55; }
+          background: #f7f8fb; border-left: 2.5px solid #d7dbe4; border-radius: 0 var(--radius-xs) var(--radius-xs) 0; line-height: 1.55; }
 .ad-list { font-size: 11.5px; color: var(--text-sub); margin-top: 5px; padding: 7px 10px;
-           background: #f7f8fb; border-radius: 8px; line-height: 1.75; }
+           background: #f7f8fb; border-radius: var(--radius-xs); line-height: 1.75; }
 .ad-list span { display: block; }
 .ad-grp > details > .ad-row { margin-top: 6px; }
 .ad-foot { font-size: 11.5px; color: var(--text-weak); text-align: center; margin-top: 18px; line-height: 1.6; }
@@ -1881,3 +1881,58 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: 3px; paddin
 }
 .sch-card.flash { animation: card-flash 1.6s ease-out; }
 @media (prefers-reduced-motion: reduce) { .sch-card.flash { animation: none; outline: 2px solid var(--primary); } }
+
+/* ---------------- 적합도 배지 줄 (2026-08-30 개발자 지시) ----------------
+   분류 배지(교내·교외 / D-day)와 **다른 줄**에 둔다 — 같은 줄에 두면 배지 글자 수에 따라
+   카드마다 구조가 달라 보인다. 자세한 내용은 app.js schCard 주석. */
+.sch-fit { margin: -3px 0 9px; }
+
+/* ---------------- 장학금 검색 (2026-08-30) ----------------
+   앱에 검색이 아예 없었다. 기존 필터 칩·정렬 로직은 그대로 두고 그 위에 얹는다.
+   지금 앱의 색·모서리 토큰을 그대로 쓴다(따로 색을 만들지 않는다). */
+.search-box {
+  display: flex; align-items: center; gap: 9px;
+  background: var(--surface);
+  border: 1.5px solid rgba(18, 22, 31, 0.10);
+  border-radius: var(--radius-sm);
+  padding: 0 14px; min-height: 46px;
+  margin-bottom: 12px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+/* 입력칸과 같은 포커스 표시 — 앱의 다른 칸과 같은 신호여야 한다 */
+.search-box:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(47, 107, 255, 0.12);
+}
+.search-box > svg { width: 18px; height: 18px; color: var(--text-weak); flex: none; }
+.search-box input {
+  border: 0; background: none; padding: 12px 0; min-height: 44px;   /* 터치 44px */
+  font-size: 16px;              /* 🔴 16px 미만이면 iOS 가 칸을 누를 때 화면을 확대한다 */
+}
+.search-box input:focus { border: 0; box-shadow: none; }
+.search-clear {
+  flex: none; width: 28px; height: 28px; border-radius: 50%;
+  color: var(--text-sub); font-size: 13px; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+}
+.search-clear:active { background: rgba(18, 22, 31, 0.06); }
+/* 🔴 클래스에 display 를 주면 브라우저 기본 [hidden]{display:none} 을 이겨 안 숨는다 —
+   이 저장소가 .chat-sheet·.bulkbar·.sort-menu 에서 이미 여러 번 겪은 함정이다. */
+.search-clear[hidden] { display: none !important; }
+
+/* ---------------- 접근성·위계 (2026-08-30) ----------------
+   🔴 --text-weak(#8b93a3)는 흰 배경에서 대비 3.1:1 — WCAG AA(4.5:1) 미달이라
+   본문 글씨에 쓰면 안 된다. 보조 링크라도 읽어야 하는 글씨다. */
+.link-btn { color: var(--text-sub); }
+.btn-white:disabled { color: var(--text-sub); }
+/* 🔴 금액은 제목보다 **덜** 강조한다. 파랑(--primary)은 이 앱에서 '누를 수 있음'을 뜻해서
+   ⓐ 링크처럼 보였고 ⓑ 검은 제목보다 먼저 읽혀 위계가 뒤집혀 있었다.
+   특히 amount 칸에는 금액이 아니라 '학자금대출 원금 또는 이자 상환 지원' 같은
+   **설명 문장**이 들어오는 공고가 많아 더 그랬다. 상세(.sheet-amount)는 파랑을 유지한다.
+   ⚠️ tabular-nums 는 남긴다 — 카드가 세로로 쌓일 때 숫자 자리를 맞춘다. */
+.sch-amount { font-weight: 400; color: var(--text-sub); }
+/* 🔴 이 줄을 지우지 말 것 — 클래스에 display 를 주면 브라우저 기본 [hidden]{display:none} 을
+   이겨서 **숨겨야 할 칸이 안 숨는다.** 그래서 캠퍼스가 하나뿐인 학교를 고르면 온보딩에
+   빈 '캠퍼스' 라벨이 떠 있었다(최초 커밋부터 있던 버그).
+   ⚠️ 데이터는 멀쩡했다 — collectProfile()이 `.hidden` **속성**을 읽어서 값은 늘 비어 있었다. */
+.field[hidden] { display: none !important; }

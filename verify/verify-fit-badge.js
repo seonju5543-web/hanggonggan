@@ -77,8 +77,14 @@ const PROFILE = (over) => ({
   page = await open({});
   bs = await badges(page);
   const okBadges = bs.filter((b) => b.cls.includes('badge-fit') && !b.cls.includes('unknown') && !b.cls.includes('-no'));
-  eq('적합도 배지에 근거가 함께 붙는다', okBadges.every((b) => /요건 \d+개 중 \d+개 충족/.test(b.text)), true);
-  eq('여기서도 100%는 안 뜬다', bs.some((b) => /적합도 100%/.test(b.text)), false);
+  /* 🔴 카드 배지는 `요건 3/6` **한 덩어리뿐**이다 (2026-08-30 개발자 지시).
+     퍼센트와 '확인 필요'는 상세로 옮겼다 — 아래 '상세 시트' 절이 거기 남아 있는지 본다.
+     ⚠️ 이 두 검사를 짝으로 두는 것이 핵심이다. 카드만 검사하면 "카드에서 뺐다"는 통과하고
+        "상세에 남겼다"는 아무도 안 봐서, 퍼센트가 화면 어디에도 없는 상태가 조용히 지나간다.
+     ⚠️ `.every()` 는 **빈 배열에서 true** 다 — 선택자가 어긋나도 통과하므로 개수부터 센다. */
+  eq('적합도 배지가 붙은 카드가 있다 (0이면 선택자가 어긋난 것)', okBadges.length > 0, true);
+  eq('카드 배지에 근거가 함께 붙는다', okBadges.every((b) => /^요건 \d+\/\d+$/.test(b.text)), true);
+  eq('카드에는 퍼센트를 쓰지 않는다', bs.some((b) => /%/.test(b.text)), false);
 
   /* 🔴 상세 시트는 자격 줄을 **하나도 빠뜨리지 않고** 보여야 한다 — 화면 5줄 상한이
      점수 분모까지 자르던 사고(2026-08-24)의 회귀다.
@@ -87,11 +93,11 @@ const PROFILE = (over) => ({
         내보내는 줄 수(`requirementLines(sch, null, {all:true})`)와 대조한다. */
   console.log('\n■ 상세 시트가 자격 줄을 빠뜨리지 않는다');
   const idx = await page.$$eval('#explore-list .sch-card',
-    (els) => els.findIndex((e) => /요건 \d+개/.test((e.querySelector('.badge-fit') || {}).innerText || '')));
+    (els) => els.findIndex((e) => /요건 \d+\/\d+/.test((e.querySelector('.badge-fit') || {}).innerText || '')));
   if (idx >= 0) {
     const cards = await page.$$('#explore-list .sch-card');
     const txt = await cards[idx].$eval('.badge-fit', (e) => e.innerText.replace(/\s+/g, ' '));
-    const total = Number((txt.match(/요건 (\d+)개/) || [])[1]);
+    const total = Number((txt.match(/요건 \d+\/(\d+)/) || [])[1]);
     const id = await cards[idx].evaluate((e) => e.dataset.detail);
     const expected = await page.evaluate((sid) => {
       const s = allScholarships().find((x) => x.id === sid);
@@ -102,7 +108,12 @@ const PROFILE = (over) => ({
     const lines = await page.$$eval('#detail-sheet li.r-elig', (e) => e.length);
     eq(`'${txt}' — 자격 줄 ${expected}개가 모두 보인다`, lines, expected);
     eq('배지의 요건 수가 줄 수를 넘지 않는다 (묶음은 1개로 센다)', total <= expected, true);
-  } else console.log('  (요건 개수를 띄운 카드가 없어 건너뜀)');
+    /* 🔴 카드에서 뺀 것이 **상세에는 남아 있어야** 한다. 이 한 줄이 없으면
+       '카드에서 뺐다'만 검사되고 퍼센트가 화면에서 통째로 사라진 상태가 통과한다. */
+    const detailTxt = await page.$eval('#detail-sheet .badge-fit', (e) => e.innerText.replace(/\s+/g, ' '))
+      .catch(() => '');
+    eq('상세 시트에는 퍼센트와 근거가 남아 있다', /적합도 \d+% .*요건 \d+개 중 \d+개 충족/.test(detailTxt), true);
+  } else console.log('  🚨 요건 개수를 띄운 카드가 하나도 없다 — 배지 형식이 바뀌었는지 확인할 것');
 
   console.log('\nERRORS:', errors.length ? errors : 'none');
   if (errors.length) fail++;

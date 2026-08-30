@@ -288,6 +288,13 @@ function toast(msg, action) {
 }
 
 function countUp(el, target, formatter, duration = 900) {
+  /* 🔴 '모션 줄이기'를 켠 사람에게는 숫자를 굴리지 않는다 (2026-08-30).
+     어지럼증·전정기관 질환 때문에 켜는 설정이라, 히어로 금액이 900ms 동안 튀어오르는 것이
+     정확히 그 사람들이 끄고 싶어 한 움직임이다. 값은 그대로 보여 준다 — 정보는 안 줄인다. */
+  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    el.textContent = formatter(target);
+    return;
+  }
   const start = performance.now();
   function tick(now) {
     const t = Math.min(1, (now - start) / duration);
@@ -706,7 +713,7 @@ function fitRank(m) {
   return v === 'no' ? 2 : (v === 'unread' ? 1 : 0);
 }
 
-function fitBadgeHtml(fit, fd) {
+function fitBadgeHtml(fit, fd, { full = false } = {}) {
   if (!fd) return fit > 0 ? `<span class="badge badge-fit">적합도 ${fit}%</span>` : '';
   /* 🔴 `fit === 0`은 **evaluate()가 미달로 확정한 것**이다 (fitDetail은 FIT_MIN=5가 바닥이라
      0을 내지 않는다 — fitScore만 ineligible에 0을 준다). 여기를 안 보면 판정이 갈라진다:
@@ -719,6 +726,15 @@ function fitBadgeHtml(fit, fd) {
   /* 🔴 미달은 **숫자가 아니라 fails로** 판정한다 (2026-08-24). 0%를 안 쓰기로 하면서
      `pct === 0`이 영영 참이 되지 않아 '지원 자격 미달' 배지가 통째로 사라졌었다.
      숫자는 순서를 정할 뿐이고 뜻은 배지가 전한다 — 그 뜻의 근거는 fails다. */
+  /* 🔴 카드와 상세가 **같은 내용을 다른 분량으로** 말한다 (2026-08-30 개발자 지시).
+     카드는 훑는 자리라 `요건 3/6` 하나로 줄이고, 퍼센트와 '확인 필요'는 상세에 남긴다.
+     ⚠️ 상세까지 줄이면 안 된다 — '확인 필요 n'은 **앱이 모르는 요건이 몇 개인지** 밝히는
+        자리라(원칙 8-1) 화면 어디에도 없으면 "다 확인했다"는 거짓말이 된다.
+     ⚠️ 판정은 새로 만들지 않는다 — 위 `fitVerdict` 갈래를 그대로 지나온 뒤라
+        미달·미확인은 이미 각자 배지로 빠졌다. 여기 남는 것은 비율이 있는 경우뿐이다.
+     ⚠️ 색(fit-*)은 카드에도 그대로 둔다. 다만 `요건 3/6`이 늘 함께 가므로 색만으로 뜻을
+        전하지는 않는다(색각 이상이 있는 학생에게 색은 아무 말도 하지 않는다). */
+  if (!full) return `<span class="badge badge-fit fit-${fitTone(fd.pct)}">요건 ${fd.met}/${fd.total}</span>`;
   const note = fd.unknown > 0 ? ` · 확인 필요 ${fd.unknown}` : '';
   return `<span class="badge badge-fit fit-${fitTone(fd.pct)}">적합도 ${fd.pct}% <em>요건 ${fd.total}개 중 ${fd.met}개 충족${note}</em></span>`;
 }
@@ -735,8 +751,13 @@ function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
         ${sch.program ? '<span class="badge badge-program">상시 제도</span>' : `<span class="badge badge-dday ${d.cls}">${d.label}</span>`}
         ${sch.auto ? '<span class="badge badge-auto">자동 등록 · 검수 전</span>' : ''}
         ${applied ? '<span class="badge badge-applied">신청함</span>' : ''}
-        ${fitBadgeHtml(fit, fd)}
       </div>
+      ${/* 🔴 적합도 배지는 분류 배지와 **다른 줄**에 둔다 (2026-08-30 개발자 지시).
+           같은 flex 줄에 두면 배지 글자 수에 따라 어떤 카드는 넷째 배지로 붙고 어떤 카드는
+           혼자 다음 줄로 내려가, 같은 목록의 카드들이 서로 다른 구조로 보인다.
+           CSS(flex-basis:100%)로는 못 고친다 — 줄바꿈은 되지만 배경이 카드 폭 전체로 늘어나고,
+           max-width로 막으면 flex 가 그 값으로 줄을 계산해 줄바꿈 자체가 사라진다(둘 다 실측). */ ''}
+      ${(() => { const h = fitBadgeHtml(fit, fd); return h ? `<div class="sch-fit">${h}</div>` : ''; })()}
       <p class="sch-name">${esc(sch.name)}</p>
       <p class="sch-amount">${esc(sch.amount)}</p>
       ${compact ? '' : `<p class="sch-provider">${esc(sch.provider)}</p>`}
@@ -778,7 +799,10 @@ function renderHome() {
 
   const btn = $('#btn-apply-all');
   btn.disabled = notApplied.length === 0;
-  btn.textContent = notApplied.length ? `⚡ ${notApplied.length}건 한 번에 신청 준비하기` : '✓ 가능한 장학금을 모두 준비했어요';
+  /* 버튼은 **누르면 무슨 일이 나는지**만 말한다 (2026-08-30 개발자 지시).
+     '⚡ 한 번에 모두 신청 준비하기'에서 이모지·'한 번에'·'모두'는 전부 앱의 감탄이지
+     학생이 얻는 정보가 아니었다. 남는 것은 건수와 동사뿐이다. */
+  btn.textContent = notApplied.length ? `${notApplied.length}건 신청 준비` : '✓ 가능한 장학금을 모두 준비했어요';
 
   const upcoming = applyable
     .filter((m) => dday(m.sch.deadline).days >= 0 && notStale(m.sch))
@@ -796,6 +820,8 @@ function renderHome() {
 
 /* ---------------- 탐색 ---------------- */
 let exploreFilter = 'all';
+/* 검색어 — 필터·정렬과 같은 성격으로 **저장하지 않는다**(새로고침하면 빈 값) */
+let exploreQuery = '';
 /* 정렬 기준 — 필터와 같은 성격으로 **저장하지 않는다**(새로고침하면 기본값). */
 let exploreSort = 'fit';
 
@@ -893,10 +919,22 @@ function renderExplore() {
     list = list.filter((m) => ['eligible', 'selective'].includes(m.result.status) && dday(m.sch.deadline).days >= 0);
   }
 
-  $('#live-notices').innerHTML = exploreFilter === 'all' ? liveNoticesHtml() : '';
+  /* 검색 (2026-08-30) — 정렬·필터가 다 끝난 **마지막에** 거른다.
+     ⚠️ 순서를 앞으로 옮기지 말 것: 마감·오래된 공고 숨김은 검색 결과에도 적용돼야 한다.
+        검색으로 마감된 공고가 나오면 '있는 줄 알고 눌렀다 마감'이 된다.
+     ⚠️ 색인을 따로 만들지 않는다 — 카드에 실제로 **보이는 글자**(제목·기관·금액)만 본다.
+        학생이 화면에서 읽은 낱말로 찾는 것이 검색이고, 안 보이는 값으로 걸리면 왜 나왔는지 모른다. */
+  const q = exploreQuery.trim().toLowerCase();
+  if (q) {
+    list = list.filter((m) => [m.sch.name, m.sch.provider, m.sch.amount]
+      .filter(Boolean).join(' ').toLowerCase().includes(q));
+  }
+
+  /* 실시간 공고 피드는 '전체'일 때만 — 검색 중에는 끈다(검색어와 무관한 목록이 아래 붙는다) */
+  $('#live-notices').innerHTML = (exploreFilter === 'all' && !q) ? liveNoticesHtml() : '';
   $('#explore-list').innerHTML = list.length
     ? list.map((m) => schCard(m.sch, m.result, { fit: m.fit, fd: m.fd })).join('')
-    : '<p class="empty">조건에 맞는 장학금이 없어요.</p>';
+    : `<p class="empty">${q ? `'${esc(exploreQuery.trim())}'와 맞는 장학금이 없어요.` : '조건에 맞는 장학금이 없어요.'}</p>`;
 }
 
 /* ---------------- 서류 도우미 (AI 초안 작성) ---------------- */
@@ -1940,7 +1978,7 @@ function openDetail(id) {
   const exLines = requirementLines(
     sch, [...(sch.eligibilityExcludes || []), ...(sch.eligibilityLines || [])], { onlyExclude: true });
   if (exLines.length) {
-    reasonRows += `<li class="r-head">이런 경우는 제외돼요</li>`
+    reasonRows += `<li class="r-head">지원 제외 대상</li>`
       + exLines.map((e) => `<li class="r-req">${esc(e)}</li>`).join('');
   }
   if (aiRead && reasonRows) {
@@ -1971,7 +2009,7 @@ function openDetail(id) {
         <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${sch.type}</span>
         ${sch.program ? '<span class="badge badge-program">상시 제도</span>' : `<span class="badge badge-dday ${d.cls}">${d.label}</span>`}
         ${sch.auto ? '<span class="badge badge-auto">자동 등록 · 검수 전</span>' : ''}
-        ${fitBadgeHtml(fit, fd)}
+        ${fitBadgeHtml(fit, fd, { full: true })}
         <span class="status-pill pill-${meta.cls}">${meta.label}</span>
       </div>
       <h3 class="sheet-title">${esc(sch.name)}</h3>
@@ -2283,14 +2321,14 @@ function deleteApps(ids) {
   renderApplications();
   renderHome();
   toast(`${removed.length}건을 지웠어요`, {
-    label: '되돌리기',
+    label: '실행 취소',
     run: () => {
       for (const r of undoBuffer) state.applications.splice(r.at, 0, r.app);
       undoBuffer = null;
       saveState();
       renderApplications();
       renderHome();
-      toast('되돌렸어요');
+      toast('되살렸어요');
     },
   });
 }
@@ -2366,7 +2404,24 @@ function renderApplications() {
 
   /* 항목이 없으면 관리 장치를 통째로 숨긴다 — 빈 화면에 쓸 수 없는 버튼을 두지 않는다 */
   $('#apps-select-toggle').hidden = !apps.length;
-  $('#apps-swipe-hint').hidden = !apps.length;
+  /* 🔴 손짓 안내는 **처음 3번만** 띄운다 (2026-08-30 개발자 지시).
+     늘 떠 있으면 안내가 아니라 배경이 된다 — 읽어야 할 때는 이미 안 읽힌다.
+     세는 단위는 '앱을 켠 횟수'다. renderApplications() 는 삭제·되돌리기 때마다 다시 도는데
+     그때마다 세면 한 번 방문에 3회를 다 써 버린다(`_counted`가 그걸 막는다).
+     장부에 넣지 않고 localStorage 를 따로 쓰는 이유: 이건 이 기기의 화면 상태일 뿐이라
+     서버로 동기화될 프로필·신청내역에 섞이면 안 된다. */
+  const HINT_KEY = 'handaejang.swipeHintSeen';
+  const hint = $('#apps-swipe-hint');
+  if (!apps.length) hint.hidden = true;
+  else {
+    let seen = 0;
+    try { seen = Number(localStorage.getItem(HINT_KEY)) || 0; } catch (e) { /* 사생활 보호 모드 */ }
+    hint.hidden = seen >= 3;
+    if (seen < 3 && !renderApplications._counted) {
+      renderApplications._counted = true;
+      try { localStorage.setItem(HINT_KEY, String(seen + 1)); } catch (e) { /* 무시 — 안내가 한 번 더 뜰 뿐 */ }
+    }
+  }
   $('#apps-select-toggle').textContent = appsSelectMode ? '완료' : '선택';
   $('#apps-bulkbar').hidden = !(appsSelectMode && apps.length);
   const all = $('#apps-check-all');
@@ -2626,6 +2681,22 @@ function bindEvents() {
   $$('[data-goto]').forEach((btn) =>
     btn.addEventListener('click', () => showScreen(btn.dataset.goto))
   );
+
+  /* 검색 (2026-08-30) — 치는 대로 거른다.
+     ⚠️ 디바운스를 두지 않았다. 등록이 190건대라 한 번 거르는 데 밀리초 단위고,
+        기다렸다 그리면 '반응이 굼뜨다'는 느낌만 준다. 몇 천 건이 되면 그때 넣는다. */
+  {
+    const box = $('#explore-search');
+    const clear = $('#explore-search-clear');
+    const sync = () => {
+      exploreQuery = box.value;
+      clear.hidden = !box.value;
+      renderExplore();
+    };
+    box.addEventListener('input', sync);
+    /* type="search" 의 브라우저 기본 ✕ 는 iOS 에서 안 보인다 — 우리 버튼을 쓴다 */
+    clear.addEventListener('click', () => { box.value = ''; sync(); box.focus(); });
+  }
 
   $('#explore-filters').addEventListener('click', (e) => {
     const chip = e.target.closest('.filter-chip');
@@ -3048,7 +3119,7 @@ function renderAuthSheet(errText, okText) {
       <button class="btn btn-primary btn-lg" id="btn-auth-go">${goLabel}</button>
       ${swap}
       ${mode === 'in' || mode === 'up' ? authProvidersHtml() : ''}
-      <p class="dp-note">주민등록번호·계좌번호·증명서류는 서버로 보내지 않고 이 기기에만 남아요.</p>
+      <p class="dp-note">주민등록번호·계좌번호·증명서류는 이 기기에만 저장됩니다.</p>
     </div>`;
 
   $('#btn-auth-go').addEventListener('click', authSubmit);

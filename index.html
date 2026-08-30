@@ -291,7 +291,7 @@
         <p class="hero-label">지금 받을 수 있는 장학금</p>
         <p class="hero-amount tappable" id="hero-amount" role="button" tabindex="0" aria-label="금액 상세 보기">0원</p>
         <p class="hero-count" id="hero-count"></p>
-        <button class="btn btn-white btn-lg" id="btn-apply-all">⚡ 한 번에 모두 신청하기</button>
+        <button class="btn btn-white btn-lg" id="btn-apply-all">신청 준비</button>
       </div>
 
       <div class="section-head">
@@ -327,6 +327,12 @@
           <div id="explore-sort-menu" class="sort-menu" role="menu" hidden></div>
         </div>
       </header>
+      <!-- 검색 (2026-08-30) — 앱에 검색이 아예 없었다. 기존 필터 칩·정렬 로직은 그대로 두고 위에 얹는다 -->
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input type="search" id="explore-search" placeholder="장학금·재단 이름으로 찾기" maxlength="40" autocomplete="off" aria-label="장학금 검색" />
+        <button type="button" id="explore-search-clear" class="search-clear" aria-label="검색어 지우기" hidden>✕</button>
+      </div>
       <div class="filter-row" id="explore-filters">
         <button class="filter-chip active" data-filter="all">전체</button>
         <button class="filter-chip" data-filter="교내">교내</button>
@@ -351,7 +357,7 @@
         <button id="apps-delete-selected" class="btn-danger btn-sm" disabled>삭제</button>
       </div>
       <div id="apps-list" class="card-list"></div>
-      <p class="data-note" id="apps-swipe-hint" hidden>※ 카드를 <strong>왼쪽으로 밀면</strong> 삭제할 수 있어요. 지워도 잠시 되돌릴 수 있고, 장학금 자체는 사라지지 않아요.</p>
+      <p class="data-note" id="apps-swipe-hint" hidden>밀어서 삭제</p>
     </section>
 
     <!-- ============ MY ============ -->
