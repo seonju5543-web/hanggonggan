@@ -174,6 +174,9 @@ const FIT_MIN = 5;       // 미달이어도 5 — 파싱이 틀렸을 수 있다
 
 /* 파싱된 조건 하나를 학생과 맞춰 본다 → 'pass' | 'fail' | 'unknown'
    🔴 **모르면 unknown**이다. 틀린 fail은 학생에게서 장학금을 뺏는다. */
+/* 등급 → 4.5 만점 평점 (2026-08-30). `B0` 는 `B` 와 같은 뜻이다(학교가 둘 다 쓴다). */
+const LETTER_GPA = { 'A+': 4.5, A: 4.0, A0: 4.0, 'B+': 3.5, B: 3.0, B0: 3.0, 'C+': 2.5, C: 2.0, C0: 2.0 };
+
 function judgeCond(c, p, ctx) {
   const S = PR.GRADE_SCALE;
   switch (c.kind) {
@@ -187,7 +190,18 @@ function judgeCond(c, p, ctx) {
         const pct = p.gpa / 4.5 * 100;
         return pct >= c.min + 10 ? 'pass' : 'unknown';   // 환산표가 학교마다 달라 미달은 안 낸다
       }
-      return 'unknown';                                   // B학점 등 — 환산 불가
+      /* 🔴 **등급도 환산한다** (2026-08-30 개발자 지적: "성적 단위 27줄 정도는 환산할 수 있을텐데").
+         4.5 만점의 표준 대응은 A+ 4.5 · A 4.0 · B+ 3.5 · B 3.0 · C+ 2.5 · C 2.0 이다.
+         ⚠️ 그런데 **학교마다 기준이 다르다** — 이 데이터 안에 그 경고가 직접 적혀 있다:
+            `특정대학 B학점이 2.7 기준인 대학은 신청서 접수 시 유의바람`.
+         그래서 백분위와 **같은 규칙**을 쓴다: 넉넉히 넘으면 통과, 모자라면 **미달을 안 낸다**.
+         표준값(높은 쪽)으로 재므로 통과 판정만으로도 안전하다. */
+      if (c.scale === S.letter) {
+        const need = LETTER_GPA[String(c.min || '').toUpperCase().replace(/학점/g, '')];
+        if (need == null) return 'unknown';
+        return p.gpa >= need ? 'pass' : 'unknown';
+      }
+      return 'unknown';
     }
     case 'bracket':
       if (p.bracket == null) return 'unknown';

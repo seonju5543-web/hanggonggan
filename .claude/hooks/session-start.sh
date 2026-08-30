@@ -19,7 +19,7 @@ node verify/check-collab.js --brief 2>/dev/null || true
 
 # 스킬 장부·디버깅 빚을 비운다 — 지난 세션 기록이 남아 있으면 이번 세션을 엉뚱하게 막는다
 gitdir="$(git rev-parse --git-dir 2>/dev/null)" \
-  && rm -f "$gitdir/claude-skills-used" "$gitdir/claude-debug-owed"
+  && rm -f "$gitdir/claude-skills-used" "$gitdir/claude-debug-owed" "$gitdir/claude-code-touched"
 
 # 🔴 스킬을 언제 부를지 못 박는다 (2026-08-29 개발자 지시)
 #    superpowers 안내문은 이미 매 세션 들어오는데도 2026-08-29 하루 종일 한 번도

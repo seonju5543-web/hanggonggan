@@ -33,8 +33,9 @@ print(t, s)
 
 case "$tool" in
   Skill)
-    # 스킬 이름을 그대로 적는다 (플러그인 접두어 포함)
-    [ "$skill" != "-" ] && printf '%s\n' "$skill" >>"$gitdir/claude-skills-used"
+    # 🔴 **시각을 함께 적는다.** 이름만 적었더니 세션 앞부분에 한 번 부른 것으로
+    #    그 뒤에 난 실패까지 전부 면제됐다(개발자가 "훅이 계속 안 걸린다"고 짚었다).
+    [ "$skill" != "-" ] && printf '%s %s\n' "$(date +%s)" "$skill" >>"$gitdir/claude-skills-used"
     ;;
   Bash)
     # 🔴 여기가 2026-08-30에 새어 나간 자리다: verify 드라이버가 빨간불인데
@@ -52,6 +53,10 @@ r = d.get("tool_response")
 out = json.dumps(r, ensure_ascii=False) if not isinstance(r, str) else r
 raise SystemExit(0 if ("✕" in out or "실패" in out or "FAIL" in out) else 1)
 ' 2>/dev/null && date +%s >"$gitdir/claude-debug-owed"
+    # 🔴 **코드를 만졌다는 사실은 커밋해도 남는다.** 예전엔 Stop 훅이 '지금 고쳐진 파일'만
+    #    봐서, 커밋하고 나면 리뷰 관문이 조용히 사라졌다.
+    ( . "$(dirname "$0")/hook-scope.sh" 2>/dev/null
+      [ -n "$(hook_scope)" ] && date +%s >"$gitdir/claude-code-touched" ) 2>/dev/null || true
     ;;
 esac
 exit 0

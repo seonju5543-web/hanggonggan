@@ -26,19 +26,39 @@ case "$input" in *'"stop_hook_active":true'*|*'"stop_hook_active": true'*) exit 
 
 gitdir="$(git rev-parse --git-dir 2>/dev/null)"
 ledger="$gitdir/claude-skills-used"
-used() { [ -f "$ledger" ] && grep -q "$1" "$ledger"; }
+# 🔴 **그 실패보다 나중에 불렀는가**를 본다. 이름만 보면 세션 앞부분에 한 번 부른 것으로
+#    그 뒤의 실패까지 전부 면제된다(2026-08-30 개발자 지적 "훅은 계속 안 걸리는 것 같은데"
+#    — 실제로 그랬다. 장부에 이름이 있어 빚이 쌓여도 통과하고 있었다).
+used_after() {   # $1=스킬 이름  $2=기준 시각(epoch)
+  [ -f "$ledger" ] || return 1
+  awk -v n="$1" -v t="${2:-0}" '$0 ~ n && $1+0 >= t+0 { f=1 } END { exit f?0:1 }' "$ledger"
+}
 
 # ① 디버깅 빚 — verify 드라이버가 빨간불이었는데 디버깅 스킬을 안 불렀다.
 #    🔴 2026-08-30에 정확히 이 자리가 비어 있었다: verify-essay-ui 가 넘어졌는데
 #    test-collector·audit 은 초록이라 훅이 끝까지 아무 말도 안 했고, 즉흥 수정이 지나갔다.
 #    🔴 **scope 조기 종료보다 위에 둔다** — 빚은 커밋했다고 사라지지 않는다.
 #       아래에 뒀다가 "고치고 커밋하면 관문이 조용히 없어지는" 꼴을 만들었다(같은 날 잡음).
-if [ -f "$gitdir/claude-debug-owed" ] && ! used 'systematic-debugging'; then
+if [ -f "$gitdir/claude-debug-owed" ] && ! used_after 'systematic-debugging' "$(cat "$gitdir/claude-debug-owed" 2>/dev/null)"; then
   {
     echo "🔴 이번 세션에서 verify 검사가 한 번 빨간불이었는데 디버깅 스킬을 안 불렀습니다."
     echo "   **추측으로 고치지 마세요.** 근본 원인을 찾기 전에는 어떤 수정도 하지 않는 것이 그 철칙입니다:"
     echo '       Skill(skill="superpowers:systematic-debugging")'
     echo "   (부르면 이 관문은 저절로 풀립니다.)"
+  } >&2
+  exit 2
+fi
+
+# ② 판정·화면·로봇 코드를 만졌는데 리뷰 스킬을 안 불렀다.
+#    🔴 **조기 종료보다 위에 둔다** — 아래 두면 커밋하는 순간 관문이 조용히 사라진다.
+#       빚 관문에서 이미 겪은 실수를 리뷰 쪽에 그대로 남겨 뒀다(실제로 한 번도 안 걸렸다).
+if [ -f "$gitdir/claude-code-touched" ] \
+   && ! used_after 'requesting-code-review' "$(cat "$gitdir/claude-code-touched" 2>/dev/null)"; then
+  {
+    echo "🔴 판정·화면·로봇 코드를 고쳤는데 코드 리뷰 스킬을 부르지 않았습니다:"
+    echo '       Skill(skill="superpowers:requesting-code-review")'
+    echo "   ⚠️ 에이전트를 못 쓰는 세션이면 **직접 diff 를 보되** 스킬 항목(요구사항 충족·"
+    echo "      경계값·빈 값·기존 검사 무력화)을 하나씩 짚으세요."
   } >&2
   exit 2
 fi
@@ -69,15 +89,4 @@ fi
 #    **정말 안 불렀을 때만** 뜬다 — 그래서 막아도 되는 말이 됐다.
 #    🔴 '한 번만' 막는다: 위쪽 stop_hook_active 가드가 되풀이를 끊고,
 #       빠져나갈 길이 **스킬을 부르는 것**이라 만족 가능하다(2026-08-29에 깨진 조건과 다르다).
-# ② 코드를 고쳤는데 리뷰 스킬을 안 불렀다.
-if [[ "$scope" == *test* ]] && ! used 'requesting-code-review'; then
-  {
-    echo "🔴 판정·화면·로봇 코드를 고쳤는데 코드 리뷰 스킬을 부르지 않았습니다:"
-    echo '       Skill(skill="superpowers:requesting-code-review")'
-    echo "   ⚠️ 이 세션에서 에이전트를 못 쓰는 상황이면 **직접 diff 를 보되**,"
-    echo "      스킬이 시키는 항목(요구사항 충족·경계값·기존 검사 무력화 여부)을 하나씩 짚으세요."
-    echo "      2026-08-30에 그 절차 없이 훑다가 '마감일 칸이 빈 재단을 통째로 버리는' 버그를 놓쳤습니다."
-  } >&2
-  exit 2
-fi
 exit 0

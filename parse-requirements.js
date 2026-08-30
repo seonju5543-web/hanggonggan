@@ -44,7 +44,11 @@ function parseGrade(t) {
   const hasLetter = /\b[ABC][+0]?\s*(학점)?\s*이상/.test(t);
   const kinds = [hasPct, has45 || has43, hasLetter].filter(Boolean).length;
 
-  const mDec = t.match(/(\d\.\d{1,2})\s*(?:\/\s*4\.[35])?\s*(?:이상|이상인|넘)/);
+  /* ⚠️ 숫자와 `이상` 사이에 **딴 게 낀다** — 실제 원문에 이런 것들이 있는데 전부 놓치고 있었다:
+       `누적 평점평균이 3.0(B학점) 이상인 자`      ← 괄호 안 등급
+       `4.5점 만점에 2.5점 이상`                  ← `점`
+       `직전학기 성적 2.5점 이상인 자(4.5점 만점)`  ← `점` */
+  const mDec = t.match(/(\d\.\d{1,2})\s*점?\s*(?:\([^)]{0,8}\))?\s*(?:\/\s*4\.[35])?\s*점?\s*(?:이상|이상인|넘)/);
   const mPct = t.match(/(?:백분위|평균)?\s*(\d{2,3})\s*점?\s*(?:\/\s*100)?\s*(?:만점)?\s*(?:이상|이상인)/);
 
   if (mDec) {
@@ -60,6 +64,11 @@ function parseGrade(t) {
              conf: (kinds > 1 || HAS_EXCEPTION.test(t)) ? LOW : HIGH };
   }
   if (hasLetter) return { kind: 'grade', scale: GRADE_SCALE.letter, min: (t.match(/([ABC][+0]?)\s*(학점)?\s*이상/) || [])[1], conf: LOW };
+  /* `이상` 없이 **기준 등급만** 적는 공고가 있다: `직전학기 학교 성적 평균 B학점`.
+     ⚠️ 앞에 `성적·평점·평균` 이 있을 때만 본다 — 없으면
+        `특정대학 B학점이 2.7 기준인 대학은 신청서 접수 시 유의바람`(주의 문구)까지 요건이 된다. */
+  const mBare = t.match(/(?:성적|평점|평균)[^.\n]{0,12}?([ABC][+0]?)\s*학점/);
+  if (mBare) return { kind: 'grade', scale: GRADE_SCALE.letter, min: mBare[1], conf: LOW };
   return null;
 }
 
