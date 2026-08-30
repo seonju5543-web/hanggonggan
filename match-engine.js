@@ -239,7 +239,8 @@ function judgeCond(c, p, ctx) {
       return 'unknown';   // 그 밖에는 단정하지 않는다
     }
     case 'flags': {
-      const f = p.flags || [];
+      /* 교환학생은 flags 배열이 아니라 따로 받는다(온보딩 체크박스) — 같은 자리에서 본다 */
+      const f = (p.flags || []).concat(p.exchange ? ['exchange'] : []);
       if (!f.length) return 'unknown';                    // 안 고른 것과 해당 없는 것은 다르다
       const has = c.anyOf.some((k) => f.includes(k));
       /* 🔴 **제외 줄에서는 뜻이 뒤집힌다** (2026-08-30 전수 대조에서 발견 — 원래부터 있던 버그).
@@ -288,7 +289,10 @@ function judgeCond(c, p, ctx) {
     case 'major': {
       const norm = (x) => String(x).replace(/\s/g, '').replace(/(학과|학부|전공|과)$/, '');
       const mine = p.major ? norm(p.major) : '';
-      const like = (a, b) => a && b && (a === b || a.includes(b) || b.includes(a));
+      /* 🔴 **부분 일치로 잇지 않는다** — `국제학부` 요건에 국제통상학과 학생이 ✓ 를 받았다.
+         꼬리말을 떼고 나면 `경영`=`경영학과`·`에너지융합공`=`에너지융합공학과` 처럼
+         제 짝은 그대로 같아진다(전수 대조: 부분 일치로 더 잡히는 것은 그 오탐 하나뿐이었다). */
+      const like = (a, b) => !!a && a === b;
       /* ① 재단이 적어 준 포함 단어 — `학과명 포함 단어: 물리, 천문` */
       if (c.words) {
         if (!p.major) return 'unknown';
