@@ -496,9 +496,32 @@ function schoolSuggestions(q) {
     if (u.replace(/\s/g, '').includes(n) || u.toLowerCase().includes(n.toLowerCase())) set.add(u);
   });
   Object.entries(UNIV_ALIASES).forEach(([alias, full]) => {
+    /* 🔴 별칭도 **서비스하는 학교**만 띄운다 (2026-08-30). 안 그러면 `서울대` 를 쳤을 때
+       목록에서 뺀 학교가 그대로 떠서, 고르면 빈 화면으로 간다. */
+    if (!UNIVERSITIES.includes(full)) return;
     if (alias.includes(n) || n.includes(alias)) set.add(full);
   });
   return Array.from(set).sort((a, b) => (b.startsWith(n) ? 1 : 0) - (a.startsWith(n) ? 1 : 0));
+}
+
+/* 🔴 적어 넣은 학교를 우리가 서비스하고 있는가 (2026-08-30).
+   학교 칸은 자유 입력이라 막지 않는다 — 대신 **빈 화면을 보기 전에** 알린다.
+   이미 다른 학교로 쓰던 사용자의 프로필도 지우지 않는다(그 학생도 전국 공고와
+   한국장학재단 목록은 그대로 본다). */
+function schoolServed(name) {
+  const n = String(name || '').replace(/\s/g, '');
+  return !n || UNIVERSITIES.some((u) => u.replace(/\s/g, '') === n);
+}
+function renderSchoolNotice() {
+  const el = $('#school-notice');
+  if (!el) return;
+  const v = $('#in-school').value.trim();
+  const served = schoolServed(v);
+  el.hidden = served;
+  if (!served) {
+    el.textContent = `${v} 공고는 아직 연결 전이에요. 지금은 ${UNIVERSITIES.join('·')} 두 곳의 공고만 모으고 있어서, `
+      + '전국 재단 장학금과 한국장학재단 목록만 보여 드려요.';
+  }
 }
 
 function majorSuggestions(q) {
@@ -2800,7 +2823,7 @@ function bindEvents() {
   attachAutocomplete($('#in-school'), schoolSuggestions);
   attachAutocomplete($('#in-major'), majorSuggestions);
   ['change', 'input'].forEach((ev) =>
-    $('#in-school').addEventListener(ev, () => renderCampusChips(null))
+    $('#in-school').addEventListener(ev, () => { renderCampusChips(null); renderSchoolNotice(); })
   );
 }
 

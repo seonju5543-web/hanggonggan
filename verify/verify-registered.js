@@ -62,7 +62,11 @@ async function driveAnyLiveForm(page) {
   await page.click('.onboard-step[data-step="0"] [data-next]');
 
   // 성균관대 프로필 (3학년 — 조병두 자격)
-  await page.fill('#in-school', '성균관');
+  /* 🔴 **학교 이름을 박지 않는다** (2026-08-30). 서비스 학교를 둘로 좁히자 `성균관` 이
+     자동완성에 안 떠서 이 드라이버가 통째로 죽었다 — '공고 id 를 박지 말 것'과 같은 계열이다.
+     앱이 지금 서비스하는 첫 학교를 그대로 쓴다. */
+  const school0 = await page.evaluate(() => UNIVERSITIES[0]);
+  await page.fill('#in-school', school0);
   await page.waitForTimeout(200);
   await page.click('.ac-list:not([hidden]) .ac-item');
   console.log('school:', await page.inputValue('#in-school'));
