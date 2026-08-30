@@ -17,7 +17,8 @@ name: 한국장학재단 수확 로봇
 #    우리 앱은 2026년 2학기로 알고 있었고 **학교 공고를 직접 열어 우리 쪽이 맞았다.**
 on:
   schedule:
-    - cron: '23 20 * * 1,4'   # 월·목 05:23 KST (수집 예약과 겹치지 않는 홀수 분)
+    - cron: '53 20 * * 1,4'   # 월·목 05:53 KST (홀수 분 · 05:23 은 '공고 본문 재수집'과 겹쳐 피했다 —
+    #                          둘 다 같은 브랜치에 커밋해서 push 가 부딪힌다)
   workflow_dispatch:
   push:
     branches: ['claude/nice-heisenberg-WESq5']

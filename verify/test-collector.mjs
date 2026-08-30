@@ -1227,6 +1227,27 @@ console.log('\n■ 표시 글자를 숫자로 읽지 않는다 (2026-08-30)');
   eq('배지·카운트 글자를 Number() 로 읽는 곳이 없다 (상한이 걸리면 NaN 이 된다)', bad, []);
 }
 
+/* 🔴 **예약 로봇끼리 같은 분에 두지 말 것** (2026-08-30). 대기줄(concurrency)이 다르면
+   GitHub 이 동시에 돌리는데, 커밋하는 로봇끼리 겹치면 같은 브랜치에 동시에 push 해서
+   한쪽이 튕긴다(재시도가 있어 버티지만 헛돈다). 실제로 05:23 과 08:07 이 겹쳐 있었다.
+   ⚠️ 요일이 다르면(월·목 vs 매일) 실제로 겹치는 날이 있으므로 시각만 본다. */
+console.log('\n■ 예약 겹침 (2026-08-30)');
+{
+  const wdir = new URL('../.github/workflows/', import.meta.url);
+  const slots = new Map();
+  for (const f of fs.readdirSync(wdir).filter((x) => x.endsWith('.yml'))) {
+    const src = fs.readFileSync(new URL(f, wdir), 'utf8');
+    if (!/git push/.test(src)) continue;                 // 커밋 안 하는 로봇은 겹쳐도 무해
+    for (const m of src.matchAll(/cron:\s*'(\d+)\s+(\d+)/g)) {
+      const key = `${m[2]}:${m[1]}`;
+      slots.set(key, (slots.get(key) || []).concat(f));
+    }
+  }
+  const clash = [...slots.entries()].filter(([, v]) => v.length > 1)
+    .map(([k, v]) => `${k}UTC ${v.join(' + ')}`);
+  eq('커밋하는 예약 로봇끼리 같은 분에 돌지 않는다', clash, []);
+}
+
 console.log('\n■ 마감일을 원문에서 읽는다 (2026-08-30)');
 {
   process.env.EXCERPTS_AS_LIB = '1';

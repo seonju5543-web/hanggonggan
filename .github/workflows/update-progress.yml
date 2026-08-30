@@ -4,9 +4,12 @@ name: Update PROGRESS doc
 # 실제 활동 변화가 있을 때만 두 개발자에게 메일로 알린다.
 # 예약 워크플로는 기본 브랜치(claude/nice-heisenberg-WESq5)에 있어야 작동한다.
 on:
+  # 🔴 08:17·22:17 KST — 예전엔 :07 이었는데 '브라우저형 수집'과 **같은 분**이라
+  #    둘이 동시에 같은 저장소에 push 했다(둘 다 재시도가 있어 버티긴 했다).
+  #    예약 로봇끼리 분을 겹치지 않게 두는 것이 이 저장소 규칙이다(verify/test-collector '예약 겹침').
   schedule:
-    - cron: '7 23 * * *'   # 08:07 KST (UTC+9)
-    - cron: '7 13 * * *'   # 22:07 KST (UTC+9)
+    - cron: '17 23 * * *'   # 08:17 KST (UTC+9)
+    - cron: '17 13 * * *'   # 22:17 KST (UTC+9)
   workflow_dispatch:        # 수동 실행 버튼
 
 permissions:
@@ -63,7 +66,7 @@ jobs:
           git config user.name "hanjang-progress-bot"
           git config user.email "actions@github.com"
           git add PROGRESS.md
-          git commit -m "PROGRESS: 활동 로그 자동 갱신 (매일 08:07·22:07 KST)"
+          git commit -m "PROGRESS: 활동 로그 자동 갱신 (매일 08:17·22:17 KST)"
           # PROGRESS.md는 두 개발자와 이 로봇이 함께 쓰는 문서라, 그 사이 main이 움직여
           # push가 튕기는 일이 잦다. 예전엔 그러면 그냥 실패했다(활동 로그가 하루 비었다).
           # 이제 최신 main을 받아 얹은 뒤 최대 3회 다시 시도한다.
