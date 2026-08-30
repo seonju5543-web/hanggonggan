@@ -7,8 +7,15 @@
    ⚠️ 쓸어 내리기는 **반드시 TouchEvent 로** 재현할 것 — 마우스로는 이 유형이 한 번도
       재현되지 않는다(13차 세션 학교 검색 사고).
 
-   실행: CHROME_PATH=... node verify/verify-sheet-back.js   (localhost:8123 서빙 중이어야 함) */
+   🔴 **PORT= 를 반드시 준다.** 이 저장소는 워크트리를 여러 개 쓰는데 8123 에는 다른 세션이
+      띄워 둔 서버(= 남의 코드)가 살아 있을 수 있다. 실제로 2026-08-30 에 이 검사가 8123 의
+      옛 app.js 를 재고 빨간불이었다 — 이 워크트리의 코드는 한 번도 실행되지 않았다.
+      지금은 `assertOwnServer` 가 그걸 알아채고 멈춘다(조용히 틀리는 것보다 낫다).
+
+   실행: 이 워크트리에서 `python3 -m http.server <포트>` 를 띄운 뒤
+         CHROME_PATH=... PORT=<포트> node verify/verify-sheet-back.js */
 const { chromium } = require('playwright-core');
+const { assertOwnServer } = require('./onboard-helper');
 const EXE = process.env.CHROME_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 const PORT = process.env.PORT || 8123;
 
@@ -34,6 +41,7 @@ async function swipeDown(page, sel) {
 }
 
 (async () => {
+  await assertOwnServer(PORT);   // 남의 워크트리를 재면 판정이 거짓이 된다
   const browser = await chromium.launch({ executablePath: EXE });
   const page = await browser.newPage({ viewport: { width: 390, height: 844 }, hasTouch: true });
   const errors = [];
