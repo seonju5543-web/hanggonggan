@@ -42,6 +42,14 @@ case "$tool" in
     #    test-collector·audit 은 초록이라 아무도 몰랐다. 출력에서 직접 본다.
     printf '%s' "$input" | python3 -c '
 import sys, json, re
+# 🔴 **"실패" 라는 낱말만 보면 안 된다** (2026-08-30). 검사 요약이 `실패: 없음` 이라고
+#    적는데 그 글자 때문에 통과한 실행이 실패로 잡혀, 관문이 헛으로 걸렸다.
+#    ✕ 표시나 **1건 이상**을 말하는 문장만 실패로 본다.
+def FAILED(out):
+    import re
+    if "✕" in out or "❌" in out or "FAIL " in out or "FAIL:" in out:
+        return True
+    return bool(re.search(r"실패\s*[1-9]\d*\s*건", out))
 try:
     d = json.load(sys.stdin)
 except Exception:
@@ -51,7 +59,7 @@ if not re.search(r"verify/\S+\.(js|mjs|cjs)", cmd):
     raise SystemExit(1)
 r = d.get("tool_response")
 out = json.dumps(r, ensure_ascii=False) if not isinstance(r, str) else r
-raise SystemExit(0 if ("✕" in out or "실패" in out or "FAIL" in out) else 1)
+raise SystemExit(0 if FAILED(out) else 1)
 ' 2>/dev/null && date +%s >"$gitdir/claude-debug-owed"
     # 🔴 **초록으로 돌아오면 빚을 지운다** (2026-08-30). 이 저장소는 관문을 만들 때마다
     #    **일부러 망가뜨려 빨간불을 확인**한다(red-green). 그 ✕ 까지 빚으로 남기면
@@ -59,6 +67,14 @@ raise SystemExit(0 if ("✕" in out or "실패" in out or "FAIL" in out) else 1)
     #    빚은 '고쳐지지 않은 실패'에만 뜻이 있다.
     printf '%s' "$input" | python3 -c '
 import sys, json, re
+# 🔴 **"실패" 라는 낱말만 보면 안 된다** (2026-08-30). 검사 요약이 `실패: 없음` 이라고
+#    적는데 그 글자 때문에 통과한 실행이 실패로 잡혀, 관문이 헛으로 걸렸다.
+#    ✕ 표시나 **1건 이상**을 말하는 문장만 실패로 본다.
+def FAILED(out):
+    import re
+    if "✕" in out or "❌" in out or "FAIL " in out or "FAIL:" in out:
+        return True
+    return bool(re.search(r"실패\s*[1-9]\d*\s*건", out))
 try:
     d = json.load(sys.stdin)
 except Exception:
@@ -68,7 +84,7 @@ if not re.search(r"verify/\S+\.(js|mjs|cjs)", cmd):
     raise SystemExit(1)
 r = d.get("tool_response")
 out = json.dumps(r, ensure_ascii=False) if not isinstance(r, str) else r
-bad = ("✕" in out or "실패" in out or "FAIL" in out)
+bad = FAILED(out)
 raise SystemExit(1 if bad else 0)
 ' 2>/dev/null && rm -f "$gitdir/claude-debug-owed"
     # 🔴 **코드를 만졌다는 사실은 커밋해도 남는다.** 예전엔 Stop 훅이 '지금 고쳐진 파일'만
