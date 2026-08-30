@@ -98,6 +98,13 @@
    "elig-130dd2-2.png"
   ]
  },
+ "reg-cau-bokji-davinci": {
+  "slug": "1sd9qv",
+  "files": [
+   "elig-1sd9qv-1.png",
+   "elig-1sd9qv-2.png"
+  ]
+ },
  "reg-khu-uiam": {
   "slug": "zr29l",
   "files": [
@@ -125,11 +132,17 @@
    "elig-x76pxx-2.jpg"
   ]
  },
- "reg-cau-bokji-davinci": {
-  "slug": "1sd9qv",
+ "auto-ent2431264156artclviewdo": {
+  "slug": "1w5yb7",
   "files": [
-   "elig-1sd9qv-1.png",
-   "elig-1sd9qv-2.png"
+   "elig-1w5yb7-1.pdf",
+   "elig-1w5yb7-2.jpg"
+  ]
+ },
+ "auto-84a0ebb09c20ec9588eb82b4": {
+  "slug": "1dhgil",
+  "files": [
+   "elig-1dhgil-1.hwpx"
   ]
  }
 }
