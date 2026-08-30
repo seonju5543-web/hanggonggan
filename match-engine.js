@@ -239,6 +239,20 @@ function judgeCond(c, p) {
       const age = new Date().getFullYear() - Number(p.birthYear);
       return age <= c.max ? 'pass' : 'fail';
     }
+    /* 🔴 학교 이름이 걸린 요건 — 우리가 아는 것으로 판정한다 (2026-08-30).
+       `충남대학교 재학 중인 학부생` 에 한국외대 학생이 ✓ 로 떠 있었다.
+       ⚠️ `한양대` vs `한양대학교`, `경북대` vs `경북대학교` 처럼 표기가 갈리므로
+          끝의 `학교`를 떼고 견준다. `서울대` 와 `서울시립대` 는 서로 안 걸린다(확인함). */
+    case 'school': {
+      if (!p.school) return 'unknown';
+      const norm = (x) => String(x).replace(/\s/g, '').replace(/학교$/, '');
+      const mine = norm(p.school);
+      const hit = c.anyOf.some((n) => {
+        const a = norm(n);
+        return a === mine || mine.startsWith(a) || a.startsWith(mine);
+      });
+      return hit ? 'pass' : 'fail';
+    }
     case 'residence': {
       const mine = [p.region, p.parentRegion].filter(Boolean);
       if (!mine.length) return 'unknown';

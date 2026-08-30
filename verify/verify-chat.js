@@ -144,11 +144,31 @@ async function ask(page, q) {
   ok(lang.typo1 && !lang.typo2, '오타 하나는 봐주고 두 개는 안 봐준다', lang);
   ok(!lang.typoShort, '짧은 낱말에는 오타 봐주기를 쓰지 않는다');
 
-  /* ② 되묻기 — 못 찾으면 비슷한 후보를 눌러 볼 수 있게 준다 */
-  const clarified = await ask(page, '조병두 장학');
+  /* ② 되묻기 — 못 찾으면 비슷한 후보를 눌러 볼 수 있게 준다
+     🔴 **이름을 박지 않는다** (2026-08-30). 예전에는 `조병두 장학`을 박아 뒀는데 그 공고가
+     데이터에서 사라지자(실시간 공고는 60일마다 갈린다) 이 항목이 조용히 빨간불이 됐다 —
+     '공고 id를 박지 말 것'과 같은 계열이다. 지금은 **살아 있는 공고 이름에 오타를 하나
+     내서** 물어본다. 데이터가 어떻게 바뀌어도 재현된다. */
+  const typoQ = await page.evaluate(() => {
+    const names = chatMatches().map((m) => m.sch.name)
+      .concat((chatNotices() || []).map((n) => n.title));
+    for (const n of names) {
+      const w = String(n).replace(/\[[^\]]*\]/g, ' ').split(/\s+/)
+        .find((x) => /^[가-힣]{3,6}(재단|장학회|문화재단)?$/.test(x) && x.length >= 3);
+      if (!w) continue;
+      /* 한 글자만 바꾼다 — 오타 봐주기가 살아 있으면 되묻어야 한다 */
+      const ch = w[1] === '아' ? '어' : '아';
+      return w.slice(0, 1) + ch + w.slice(2);
+    }
+    return null;
+  });
+  if (!typoQ) console.log('  · 오타를 낼 만한 공고 이름이 없어 되묻기 항목을 건너뜁니다');
+  const clarified = typoQ ? await ask(page, `${typoQ} 장학`) : '';
   const askChips = await page.locator('#chat-log .chat-asks .chat-chip').count();
-  ok(/이 중 하나인가요|찾았어요/.test(clarified) || askChips > 0,
-    '딱 안 맞아도 비슷한 후보를 되묻는다', clarified.slice(0, 60));
+  if (typoQ) {
+    ok(/이 중 하나인가요|찾았어요/.test(clarified) || askChips > 0,
+      `딱 안 맞아도 비슷한 후보를 되묻는다 (물어본 말: ${typoQ})`, clarified.slice(0, 60));
+  }
 
   /* ④ 앞 대화 기억 — 공고 하나를 물은 뒤 "그거 서류 뭐야?"가 통하는가 */
   const one = await page.evaluate(() => {

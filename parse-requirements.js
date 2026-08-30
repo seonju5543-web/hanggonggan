@@ -191,6 +191,40 @@ function parseResidence(t) {
   return { kind: 'residence', anyOf: hit, conf: HAS_EXCEPTION.test(t) ? LOW : HIGH };
 }
 
+/* 🔴 **학교 이름이 걸린 요건** (2026-08-30 개발자 지적: "~대 학생은 제외 이런 요건 정도는
+   다 할 수 있잖아"). 실제로 `현재 충남대학교 재학 중인 학부생` 에 한국외대 학생이
+   **✓ 충족**으로 떠 있었다 — 우리가 학교를 아는데도 판정을 안 했다.
+   🔴 **남 이야기와 가른다.** 같은 줄에 `충남대학교 학부 출신 교수의 추천` 이 있는데,
+      그건 추천인 조건이지 학생 조건이 아니다. 그래서 학교 이름 **바로 뒤에 '재학·학생'** 이
+      붙었을 때만 집고, 둘레에 `출신·교수·동문·졸업생` 이 있으면 버린다.
+   ⚠️ `4년제 대학교`·`관내 대학` 같은 **갈래 이름은 학교가 아니다** — 넣으면 모든 공고가
+      "그 학교가 아니다"로 미달이 된다(틀린 미달은 못 받는 것보다 나쁘다). */
+const SCHOOL_GENERIC = /^(4년제|사년제|국내|해외|외국|관내|관외|소재|각급|각종|전문|일반|방송통신|사이버|원격|기술|산업|지방|수도권|정규|전국|국공립|사립|해당|타|본|우리|위|동|기타|상기|아래|모든|기타의)/;
+/* 🔴 **단과대학은 학교가 아니다** (2026-08-30 전수 대조에서 잡았다).
+   `가. 공과대학 재학생이며 …` 를 학교 이름으로 읽는 바람에, 자기 학교 공대 장학금인데
+   **미달**로 뒤집혔다 — 틀린 미달은 못 받는 것보다 나쁘다. 학교 안의 단위는 전부 뺀다. */
+const SCHOOL_COLLEGE = /^(공과|인문|사범|자연|자연과학|과학|경영|상경|경상|의과|치과|한의과|약학|간호|예술|미술|음악|체육|사회|사회과학|법과|법학|농과|농업|수의과|생활과학|정보|공학|국제|글로벌|융합|자유전공|첨단|바이오|보건|디자인|신학|생명|해양|항공|IT|ICT)대학?$/;
+/* 🔴 안내 문장은 요건이 아니다 — `교환학생/방송대학생 별도 문의` 를 요건으로 읽으면
+   방송대가 아닌 학생이 전부 미달이 된다. */
+const SCHOOL_NOT_REQ = /문의|안내\s?사항|참고|별도\s?문의/;
+const SCHOOL_NAME = /([가-힣]{2,12}(?:대학교|대학|대))\s*(?:에서|에|의|를|을)?\s*(?:재학생|재학|학부생|학생|다니는|소속)/g;
+const SCHOOL_NOT_SELF = /(출신|교수|동문|졸업생|추천인|학부모|자녀의)/;
+function parseSchool(t) {
+  if (SCHOOL_NOT_REQ.test(t)) return null;
+  const names = [];
+  let m;
+  SCHOOL_NAME.lastIndex = 0;
+  while ((m = SCHOOL_NAME.exec(t)) !== null) {
+    const name = m[1];
+    if (SCHOOL_GENERIC.test(name) || SCHOOL_COLLEGE.test(name)) continue;
+    const around = t.slice(Math.max(0, m.index - 10), m.index + m[0].length + 10);
+    if (SCHOOL_NOT_SELF.test(around)) continue;
+    if (!names.includes(name)) names.push(name);
+  }
+  if (!names.length) return null;
+  return { kind: 'school', anyOf: names, conf: HAS_EXCEPTION.test(t) ? LOW : HIGH };
+}
+
 /* 한 줄에서 조건을 전부 뽑는다. `isExclude`면 '이러면 안 된다'로 읽는다. */
 function parseLine(line, isExclude) {
   const t = String(line || '');
@@ -199,7 +233,7 @@ function parseLine(line, isExclude) {
   const push = (c) => { if (c) conds.push(c); };
   push(parseGrade(t)); push(parseBracket(t)); push(parseCredits(t)); push(parseYear(t));
   push(parseStatus(t, isExclude)); push(parseFlags(t)); push(parseNationality(t));
-  push(parseAge(t)); push(parseResidence(t));
+  push(parseAge(t)); push(parseResidence(t)); push(parseSchool(t));
   if (isExclude) conds.forEach((c) => { c.exclude = true; });
   return { conds, multiProgram: MULTI_PROGRAM.test(t) };
 }
