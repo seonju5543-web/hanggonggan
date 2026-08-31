@@ -374,7 +374,7 @@ function notifySettingsHtml() {
   const canPush = pushConfigured();
   const pushOn = pushActive();
   const iosNotInstalled = /iPad|iPhone|iPod/.test(navigator.userAgent) && !sup.standalone;
-  const pushBlock = !canPush ? `
+  const pushBlock = false ? `
     <div class="nf-push nf-push-off">
       <p class="nf-push-title">앱을 켜지 않아도 받기 — 준비 중</p>
       <p class="nf-desc">지금은 <strong>앱을 열 때</strong> 확인. 발송 서버 연결 시 앱을 안 켜도 도착.</p>
@@ -398,10 +398,10 @@ function notifySettingsHtml() {
       <button class="wallet-btn ${on ? '' : 'primary'}" id="btn-nf-toggle">${on ? '끄기' : '켜기'}</button>
     </div>
     <div class="nf-prefs">${rows}</div>
+    ${/* 🔴 '앱을 켜지 않아도 받는 중' 상자와 그 아래 설명 줄을 없앴다 (2026-08-31 개발자 지시).
+         알림을 켰는지 여부는 맨 위 상태 줄이 이미 말하고, 나머지는 설명이 설명을 덧대는 자리였다.
+         ⚠️ 서버에 무엇이 저장되는지는 동의 시트(알림을 처음 켤 때)에 그대로 남아 있다. */ ''}
     ${pushBlock}
-    <p class="wallet-sub" style="margin-top:12px">${canPush && pushOn
-      ? '알림 내용은 기기 안에서 생성 — 서버는 폰을 깨우기만 함.'
-      : '<strong>앱을 열 때 · 열어 둔 동안</strong> 확인(안드로이드 설치형은 백그라운드도). 알림 내용은 기기 안에서만 생성.'}</p>
 `;
 }
 

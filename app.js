@@ -757,18 +757,17 @@ function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
   const applied = state.applications.some((a) => a.id === sch.id);
   return `
     <button class="sch-card" data-detail="${sch.id}">
+      ${/* 🔴 적합도를 **맨 앞에 두고 한 줄로** 합쳤다 (2026-08-31 개발자 지시).
+           2026-08-30 에 다른 줄로 갈라 뒀던 이유는 줄바꿈이 카드마다 달라 보여서였다.
+           맨 앞에 고정하면 그 문제가 사라진다 — 자리가 흔들리는 것은 뒤에 붙는 짧은
+           분류 배지들뿐이고, 그것들은 길이가 고르다. */ ''}
       <div class="sch-top">
+        ${fitBadgeHtml(fit, fd)}
         <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${sch.type}</span>
         ${sch.program ? '<span class="badge badge-program">상시 제도</span>' : `<span class="badge badge-dday ${d.cls}">${d.label}</span>`}
-        ${sch.auto ? '<span class="badge badge-auto">자동 등록 · 검수 전</span>' : ''}
+        ${sch.auto ? '<span class="badge badge-auto">검수 전</span>' : ''}
         ${applied ? '<span class="badge badge-applied">신청 완료</span>' : ''}
       </div>
-      ${/* 🔴 적합도 배지는 분류 배지와 **다른 줄**에 둔다 (2026-08-30 개발자 지시).
-           같은 flex 줄에 두면 배지 글자 수에 따라 어떤 카드는 넷째 배지로 붙고 어떤 카드는
-           혼자 다음 줄로 내려가, 같은 목록의 카드들이 서로 다른 구조로 보인다.
-           CSS(flex-basis:100%)로는 못 고친다 — 줄바꿈은 되지만 배경이 카드 폭 전체로 늘어나고,
-           max-width로 막으면 flex 가 그 값으로 줄을 계산해 줄바꿈 자체가 사라진다(둘 다 실측). */ ''}
-      ${(() => { const h = fitBadgeHtml(fit, fd); return h ? `<div class="sch-fit">${h}</div>` : ''; })()}
       <p class="sch-name">${esc(sch.name)}</p>
       <p class="sch-amount">${esc(sch.amount)}</p>
       ${compact ? '' : `<p class="sch-provider">${esc(sch.provider)}</p>`}

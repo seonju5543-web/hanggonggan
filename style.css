@@ -2633,3 +2633,20 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 body::after { opacity: 0.26; }
 /* 줄을 누를 때 깔리던 따뜻한 회색도 중성으로 */
 .sch-card:hover, .sch-card:active { background: var(--surface-2); }
+
+/* ══ 홈 선 간격 고르기 (2026-08-31 · "막대 사이 간격이 일정하지 않다") ══════
+   실측: 마지막 줄 아래 선(907) → 다음 구역 선(931)이 **24px** 밖에 안 떨어져
+   두 줄이 붙어 보였다. 반면 구역 선 → 목록 첫 선은 37px 이었다.
+   처방: 겹치는 선을 하나로 줄인다 — ① 목록 위 선을 없애고(구역 선이 이미 그 역할)
+   ② 각 목록 **마지막 줄의 아래 선**을 없애 다음 구역 선과 겹치지 않게 한다.
+   그러면 남는 선은 '구역 선'과 '줄 사이 선'뿐이고 간격이 고르다. */
+.card-list { border-top: 0; border-bottom: 0; }
+.card-list > .sch-card:last-child,
+.card-list > *:last-child .sch-card { border-bottom: 0; }
+.section-head { margin: 32px 0 4px; padding-top: 16px; }
+#home-deadline-list, #home-apps { margin-bottom: 4px; }
+
+/* 배지 줄 — 적합도까지 한 줄이므로 간격을 하나로 못 박는다 */
+.sch-top { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 9px; }
+.sch-top > * { margin: 0; }
+.sch-top .badge, .sch-top .badge-fit { line-height: 1.5; padding: 3.5px 9px; }
