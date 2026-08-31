@@ -1,8 +1,30 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-08-31",
- "count": 2294,
+ "count": 2295,
  "items": [
+  {
+   "title": "공통 [공통] 2026학년도 2학기 경희꿈도전장학 신청 안내",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%20%5B%EA%B3%B5%ED%86%B5%5D%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EA%B2%BD%ED%9D%AC%EA%BF%88%EB%8F%84%EC%A0%84%EC%9E%A5%ED%95%99%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4",
+   "attachments": [
+    {
+     "name": "붙임1 2026-2학기 경희꿈도전장학 계획(안) FV3.pdf",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=ecde5e43bac64aebb41c05ff0c70a795&fileSn=1&bbsId=BMSR00040"
+    },
+    {
+     "name": "붙임2-1 2026-2학기 경희꿈도전장학 지도교수 추천서(장학신청시 제출).hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=ecde5e43bac64aebb41c05ff0c70a795&fileSn=2&bbsId=BMSR00040"
+    },
+    {
+     "name": "붙임2-2 2026-2학기 경희꿈도전장학 활동 계획서(장학신청시 제출).hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=ecde5e43bac64aebb41c05ff0c70a795&fileSn=3&bbsId=BMSR00040"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "경희대학교",
+   "campus": "",
+   "foundAt": "2026-08-31"
+  },
   {
    "title": "2026년도 하반기 달서인재육성장학재단 장학생 선발 안내",
    "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=348",
