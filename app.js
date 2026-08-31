@@ -2025,7 +2025,7 @@ function openDetail(id) {
               다 보여 준다는 뜻이라 그대로 살린다(원칙 8-1). */ ''}
       <div class="sch-top">
         ${sch.program ? '<span class="badge badge-program">상시 제도</span>' : `<span class="badge badge-dday ${d.cls}">${d.label}</span>`}
-        <span class="badge badge-kind">${esc(sch.type + (sch.auto ? ' · 검수 전' : ''))}</span>
+        <span class="badge badge-kind">${esc((sch.type || '장학금') + (sch.auto ? ' · 검수 전' : ''))}</span>
       </div>
       <h3 class="sheet-title">${esc(sch.name)}</h3>
       <p class="sheet-provider">${esc(sch.provider)} · ${esc(sch.period)}</p>

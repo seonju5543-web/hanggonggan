@@ -1108,6 +1108,10 @@ textarea:focus {
 }
 .reason-list .r-head:first-child { margin-top: 0; }
 .reason-list .r-head::before { display: none; }
+/* 🔴 갈래 이름은 **줄이 아니라 라벨**이다 — 자기 왼쪽 막대(border-left)를 이미 갖고 있어서
+   목록 점과 아래 선을 함께 받으면 표식이 셋이 된다(2026-08-31 코드 리뷰에서 잡음). */
+.reason-list .r-branch::before { display: none; }
+.reason-list .r-branch { border-bottom: 0; }
 .reason-list .r-head em {
   font-style: normal; font-weight: 500; color: var(--text-weak);
   letter-spacing: 0; margin-left: 6px;
