@@ -3241,10 +3241,40 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
 
   /* 🔴 신청 버튼은 **마감까지** 봐야 한다 — 첫 판은 이걸 빠뜨려 8건을 '열림'이라 했다.
      마감이 지난 공고를 골라 '잠김'이라 말하는지 실제로 확인한다. */
+  /* app.js 에서 함수 한 덩어리를 **이름으로** 떼어 온다 — 베낀 사본이 아니라 진짜 코드다.
+   (같은 방식이 위 '마감 판정' 절에도 있다. 규칙을 두 벌 두지 않으려고 여기서도 이걸 쓴다) */
+  const grabApp = (name) => {
+    const src = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+    const start = src.indexOf(`function ${name}(`);
+    if (start < 0) throw new Error(`app.js 에서 ${name} 을 못 찾음`);
+    let depth = 0, seen = false;
+    for (let i = src.indexOf('{', start); i < src.length; i++) {
+      if (src[i] === '{') { depth++; seen = true; }
+      else if (src[i] === '}') { depth--; if (seen && depth === 0) return src.slice(start, i + 1); }
+    }
+    throw new Error(`${name} 의 끝을 못 찾음`);
+  };
+  /* 🔴 '마감이 지났는가'를 **여기서 새로 판정하지 않는다** (2026-08-31 실패로 수리).
+     예전에는 `new Date(x.deadline) < new Date()` 로 직접 쟀는데, 이 식은
+     `new Date('2026-08-31')` 을 **UTC 자정**으로 읽는다. 앱의 `dday()` 는
+     `todayStart()`(로컬 자정) 기준이라, **오늘이 마감일인 공고**에서 둘의 답이 갈렸다 —
+     검사는 '지났다', 앱은 'D-DAY · 아직 열림'. 그런 공고가 목록 앞에 오는 날에만
+     터져서, 어제까지는 초록불이었다.
+     이 저장소가 이미 배운 것과 같다: **규칙을 베끼면 갈라진다.** 앱 함수를 그대로 쓴다. */
+  const ddayFn = new Function(`${grabApp('todayStart')}\n${grabApp('dday')}\nreturn dday;`)();
+  /* 🔴 **자격은 통과하는데 마감만 지난** 공고를 골라야 한다 (2026-08-31 규명).
+     예전에는 그냥 '마감 지난 것'을 집었는데, 첫 건이 `ineligible` 이라 마감과 상관없이
+     잠겨 있었다 — 그래서 `d.days >= 0` 을 코드에서 **통째로 지워도 검사가 통과했다.**
+     이 검사가 증명하려는 것은 '자격이 되는데도 마감이라 잠긴다'이다. */
+  const WS_P = { school: '한국외국어대학교', campus: '', track: 'humanities', major: '영어학과',
+    year: 3, status: '재학', gpa: 3.2, bracket: 6, credits: 14, region: '서울',
+    parentRegion: '서울', nationality: 'korean', birthYear: 2004, flags: [], common: {} };
   const closed = reg2.items.find((x) => {
-    if (!x.deadline) return false;
-    return new Date(x.deadline) < new Date() && ME4.requirementLines(x, null).length > 0;
+    if (!x.deadline || ddayFn(x.deadline).days >= 0) return false;
+    if (!ME4.requirementLines(x, null).length) return false;
+    return ['eligible', 'selective'].includes(ME4.evaluate(x, WS_P).status);
   });
+  eq('  마감만 지난(자격은 통과) 공고를 실제로 골랐다 — 없으면 이 검사는 무의미하다', !!closed, true);
   if (closed) {
     const out = run([closed.id]);
     eq('마감 지난 공고는 신청 버튼 잠김이라고 말한다', /신청 버튼 잠김/.test(out), true);
@@ -3254,7 +3284,12 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
   const ws = fs.readFileSync(new URL('../verify/what-shows.mjs', import.meta.url), 'utf8');
   eq('앱 함수를 이름으로 떼어 온다 (사이를 잘라 오지 않는다)', /function takeFn\(name\)/.test(ws), true);
   eq('  배지는 앱의 fitBadgeHtml 이 낸 것을 쓴다', /fitBadgeHtml/.test(ws) && !/지원 자격 미달'/.test(ws), true);
-  eq('  신청 버튼은 앱처럼 마감도 본다', /d\.days >= 0/.test(ws), true);
+  /* 🔴 주석을 걷어내고 본다 (2026-08-31 규명). 예전에는 `/d\.days >= 0/` 를 파일 전체에서
+     찾았는데 **머리말 주석 두 줄에 그 글자가 있어**, 실제 판정 줄에서 지워도 통과했다.
+     "검사가 조용하면 통과가 아니라 무력해진 것부터 의심한다"의 표본이다. */
+  const wsCode = ws.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  eq('  신청 버튼은 앱처럼 마감도 본다 (주석 말고 코드에서)',
+     /const canApply = [^;]*d\.days >= 0/.test(wsCode), true);
   eq('  못 가져오면 조용히 넘어가지 않고 멈춘다', /throw new Error\(`app\.js 에서/.test(ws), true);
 }
 
