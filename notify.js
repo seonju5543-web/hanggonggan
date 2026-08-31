@@ -129,7 +129,7 @@ async function notifyCheck({ quiet = false } = {}) {
   if (out.events.length) {
     NOTIFY_RULES.pushToInbox(notifyLedger, out.events, Date.now());
     await notifyDeliver(out.events);
-    if (!quiet) toast(`🔔 새 알림 ${out.events.length}건이 도착했어요`);
+    if (!quiet) toast(`새 알림 ${out.events.length}건`);
   }
   await notifySaveLedger();
   notifyRenderBadge();
@@ -147,7 +147,7 @@ async function notifyDeliver(events) {
     toShow = [{
       key: 'sum:' + Date.now(),
       type: 'newMatch',
-      title: `🔔 한대장 새 알림 ${events.length}건`,
+      title: `한대장 · 새 알림 ${events.length}건`,
       body: events.slice(0, 2).map((e) => e.title.replace(/^[^ ]+ /, '')).join(' / ') + ' 외',
       url: './?screen=notifications',
     }];
@@ -197,7 +197,7 @@ function notifyTimeText(ts) {
 }
 
 function notifyTypeMeta(type) {
-  return NOTIFY_RULES.TYPES.find((t) => t.id === type) || { icon: '🔔', label: '알림' };
+  return NOTIFY_RULES.TYPES.find((t) => t.id === type) || { icon: NOTIFY_RULES.ICON.bell, label: '알림' };
 }
 
 /* 알림함에서는 종류 아이콘을 따로 보여주므로 제목 앞 그림문자를 뺀다 (같은 그림이 두 번 뜨지 않게).
@@ -291,15 +291,15 @@ function notifyConsentSheet() {
 
   openNotifyPanel(`
     <div class="nf-consent-hero">
-      <div class="nf-bell">🔔</div>
+      <div class="nf-bell"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"/><path d="M10.3 20a2 2 0 0 0 3.4 0"/></svg></div>
       <h3 class="sheet-title" style="margin-top:10px">장학금 알림을 받으시겠어요?</h3>
-      <p class="sheet-summary" style="margin-top:6px">마감을 놓쳐서 못 받는 장학금이 가장 아까워요.<br />꼭 필요한 것만 골라서 알려드릴게요.</p>
+      <p class="sheet-summary" style="margin-top:6px">마감을 놓쳐서 못 받는 장학금이 가장 아깝습니다.<br />꼭 필요한 것만 골라서 알립니다.</p>
     </div>
     <ul class="nf-type-list">${typeRows}</ul>
-    <p class="sheet-note">💡 ${pushConfigured()
+    <p class="sheet-note">${pushConfigured()
       ? '알림은 <strong>앱을 켜지 않아도</strong> 폰으로 도착해요. 알림 내용은 이 기기 안에서 만들어지고, 서버에는 폰 주소와 학교만 저장돼요.'
       : '한대장은 아직 발송 서버가 없어요. 알림은 <strong>앱을 열 때</strong>와 <strong>앱을 열어 둔 동안</strong>, 그리고 휴대폰이 지원하면 백그라운드 자동 확인 시점에 전달돼요.'} 언제든 MY에서 끄고 켤 수 있어요.</p>
-    ${sup.iosNeedsInstall ? '<p class="sheet-note">📱 iPhone은 사파리 공유 → <strong>홈 화면에 추가</strong>로 앱을 설치하면 알림을 받을 수 있어요.</p>' : ''}
+    ${sup.iosNeedsInstall ? '<p class="sheet-note">iPhone은 사파리 공유 → <strong>홈 화면에 추가</strong>로 앱을 설치하면 알림을 받을 수 있어요.</p>' : ''}
     <button class="btn btn-primary btn-lg" id="btn-nf-allow" style="margin-top:16px">알림 받기</button>
     <button class="btn btn-outline" id="btn-nf-later" style="margin-top:8px">나중에 할게요</button>
   `);
@@ -315,12 +315,12 @@ function notifyConsentSheet() {
       notifyRegisterBackground();
       const p = await pushEnsure(); // 발송 서버가 있으면 '앱을 안 켜도 오는 알림'까지 한 번에 켠다
       toast(p.ok
-        ? '알림을 켰어요. 앱을 켜지 않아도 폰으로 알려드릴게요'
-        : '알림을 켰어요. 새 공고와 마감을 챙겨드릴게요');
+        ? '알림을 켰습니다. 앱을 켜지 않아도 폰으로 알립니다'
+        : '알림을 켰습니다. 새 공고와 마감을 알립니다');
     } else if (perm === 'denied') {
-      toast('브라우저에서 알림이 차단돼 있어요. 앱 안 알림함으로 계속 알려드릴게요');
+      toast('브라우저에서 알림이 차단돼 있습니다. 앱 안 알림함으로 계속 알립니다');
     } else {
-      toast('앱 안 알림함으로 알려드릴게요. MY에서 언제든 켤 수 있어요');
+      toast('앱 안 알림함으로 알립니다. MY에서 언제든 켤 수 있습니다');
     }
     if (!$('#screen-my').hidden) renderMy();
     notifyRenderBadge();
@@ -376,16 +376,16 @@ function notifySettingsHtml() {
   const iosNotInstalled = /iPad|iPhone|iPod/.test(navigator.userAgent) && !sup.standalone;
   const pushBlock = !canPush ? `
     <div class="nf-push nf-push-off">
-      <p class="nf-push-title">📴 앱을 켜지 않아도 받기 — 준비 중</p>
+      <p class="nf-push-title">앱을 켜지 않아도 받기 — 준비 중</p>
       <p class="nf-desc">지금은 <strong>앱을 열 때</strong> 알림을 확인해요. 발송 서버가 연결되면 앱을 켜지 않아도 폰으로 바로 도착해요.</p>
     </div>`
     : !on ? '' : `
     <div class="nf-push${pushOn ? ' nf-push-on' : ''}">
-      <p class="nf-push-title">${pushOn ? '📲 앱을 켜지 않아도 받는 중' : '⏳ 연결하는 중'}</p>
+      <p class="nf-push-title">${pushOn ? '앱을 켜지 않아도 받는 중' : '연결하는 중'}</p>
       <p class="nf-desc">${pushOn
         ? '앱을 닫아 두거나 화면이 꺼져 있어도 마감·새 공고 알림이 폰으로 도착해요.'
         : esc(pushReasonText(pushLastReason, iosNotInstalled))}</p>
-      ${iosNotInstalled ? '<p class="nf-desc">📱 iPhone은 사파리 <strong>공유 → 홈 화면에 추가</strong>로 설치해야 앱을 켜지 않아도 알림을 받을 수 있어요.</p>' : ''}
+      ${iosNotInstalled ? '<p class="nf-desc">iPhone은 사파리 <strong>공유 → 홈 화면에 추가</strong>로 설치해야 앱을 켜지 않아도 알림을 받을 수 있어요.</p>' : ''}
       <p class="nf-desc">서버에는 <strong>폰 주소와 학교</strong>만 저장돼요 — 이름·성적·소득·서류는 이 기기 밖으로 나가지 않아요.</p>
     </div>`;
 
@@ -401,7 +401,7 @@ function notifySettingsHtml() {
     ${pushBlock}
     <p class="wallet-sub" style="margin-top:12px">${canPush && pushOn
       ? '알림 내용은 이 기기 안에서 만들어져요 — 서버는 "확인해 보라"고 폰을 깨우기만 해요.'
-      : '지금은 <strong>앱을 열 때 · 열어 둔 동안</strong> 확인해 알려드려요(안드로이드 설치형은 백그라운드 확인도 지원). 알림 내용은 이 기기 안에서만 만들어지고 밖으로 나가지 않아요.'}</p>
+      : '지금은 <strong>앱을 열 때 · 열어 둔 동안</strong> 확인해 알립니다(안드로이드 설치형은 백그라운드 확인도 지원). 알림 내용은 이 기기 안에서만 만들어지고 밖으로 나가지 않아요.'}</p>
     <div class="nf-set-actions">
       <button class="wallet-btn" id="btn-nf-inbox">알림함 열기</button>
       <button class="wallet-btn" id="btn-nf-test">테스트 알림</button>
@@ -430,7 +430,7 @@ function bindNotifySettings() {
         // 알림을 켜면 '앱을 안 켜도 오는 알림'까지 함께 켠다 (별도 스위치 없음 — 2026-08-06)
         const p = await pushEnsure();
         toast(p && p.ok
-          ? '알림을 켰어요. 앱을 켜지 않아도 폰으로 알려드릴게요'
+          ? '알림을 켰습니다. 앱을 켜지 않아도 폰으로 알립니다'
           : '알림을 켰어요');
       }
       else if (perm === 'denied') toast('브라우저 사이트 설정에서 알림을 허용해 주세요');
@@ -446,13 +446,13 @@ function bindNotifySettings() {
   $('#btn-nf-inbox').addEventListener('click', openNotifyInbox);
   $('#btn-nf-recheck').addEventListener('click', async () => {
     const n = await notifyCheck({ quiet: true });
-    toast(n ? `새 알림 ${n}건을 받았어요` : '새로 알려드릴 내용이 없어요');
+    toast(n ? `새 알림 ${n}건` : '새로 온 알림이 없습니다');
   });
   $('#btn-nf-test').addEventListener('click', async () => {
     const ev = {
       key: 'test:' + Date.now(),
       type: 'newMatch',
-      title: '🔔 한대장 테스트 알림',
+      title: '한대장 테스트 알림',
       body: '알림이 이렇게 도착해요. 실제 알림에는 공고 이름과 마감일이 담겨요.',
       url: './?screen=notifications',
     };

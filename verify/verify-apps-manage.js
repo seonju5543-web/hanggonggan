@@ -87,7 +87,13 @@ const eq = (label, got, want) => {
   await page.click('#apps-list .swipe-row:first-child .swipe-del');
   await page.waitForTimeout(400);
   eq('한 건이 지워진다', await page.$$eval('#apps-list .swipe-row', (e) => e.length), 2);
-  eq('되돌리기 단추가 뜬다', await page.$eval('#toast .toast-undo', (e) => e.textContent.trim()), '되돌리기');
+  /* 🔴 문구를 바꿀 때는 이 줄도 같이 바꾼다 (2026-08-31 수리).
+     2026-08-30 에 토스트 문구가 '되돌리기' → '실행 취소' 로 바뀌었는데 여기가 안 따라와
+     **main 이 그때부터 빨간불**이었다. 확정된 문구는 검사로 못 박는 것이 맞지만
+     (approved-design), 못 박았으면 문구를 고칠 때 함께 고쳐야 관문이 산다.
+     ⚠️ 진짜 증명은 바로 아래 '되돌리면 3건으로 돌아온다' 다 — 글자만 맞고 동작이
+        안 되면 아무 소용이 없다. 둘을 함께 둔다. */
+  eq('되돌리기 단추가 뜬다', await page.$eval('#toast .toast-undo', (e) => e.textContent.trim()), '실행 취소');
   await page.click('#toast .toast-undo');
   await page.waitForTimeout(400);
   eq('되돌리면 3건으로 돌아온다', await page.$$eval('#apps-list .swipe-row', (e) => e.length), 3);

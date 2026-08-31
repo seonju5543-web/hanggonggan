@@ -228,9 +228,20 @@ const seedScript = (seed) => `localStorage.setItem('handaejang.v1', ${JSON.strin
     ok(await page.locator('#in-auth-email').count() === 1
       && await page.locator('#in-auth-pw').count() === 1, '가입 칸은 이메일·비밀번호 둘뿐');
     /* 🔴 가입 화면에 민감정보 칸이 없다 — 개발자 지시 */
-    const sheetText = await page.textContent('#detail-sheet');
-    ok(!/기초생활|장애|주민등록/.test(sheetText.replace('주민등록번호·계좌번호·증명서류는 서버로 보내지 않고 이 기기에만 남아요.', '')),
-      '가입 화면에 민감정보 입력 칸이 없다');
+    /* 🔴 안내 문구를 **글자 그대로 박아 두지 않는다** (2026-08-31 수리).
+       예전에는 개인정보 안내 한 문장을 literal 로 지운 뒤 '주민등록'을 찾았다. 그래서
+       그 문장의 말투를 다듬는 순간(…남아요 → …저장됩니다) 지우기가 빗나가 **멀쩡한 화면이
+       빨간불**이 됐다. 이 검사가 증명하려는 것은 '민감정보를 **입력받는 칸**이 없다'이지
+       '그 낱말이 화면에 한 번도 안 나온다'가 아니다 — 안내 문단(.dp-note)은 빼고 본다. */
+    const sheetText = await page.$eval('#detail-sheet', (el) => {
+      const c = el.cloneNode(true);
+      c.querySelectorAll('.dp-note, .auth-social-note, .field-hint').forEach((n) => n.remove());
+      return c.textContent;
+    });
+    ok(!/기초생활|장애|주민등록/.test(sheetText), '가입 화면에 민감정보 입력 칸이 없다');
+    /* 안내 문단을 뺐다고 검사가 헐거워지면 안 된다 — 입력 칸 자체도 함께 못 박는다 */
+    ok(await page.locator('#detail-sheet input').count() <= 3,
+      '가입 시트의 입력 칸은 이메일·비밀번호(+기억하기)뿐이다');
 
     await page.fill('#in-auth-email', 'test@example.com');
     await page.fill('#in-auth-pw', 'test-password-1234');

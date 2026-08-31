@@ -147,15 +147,31 @@ const PROFILE = {
   /* 🔴 카드와 시트가 **같은 글자**를 말해야 한다 — 한쪽만 고쳐 카드는 「자격 미확인」인데
      시트는 「적합도 25% · 요건 4개 중 1개 충족」이었다(개발자가 눌러 보고 잡았다).
      화면에 실제로 그려진 두 배지를 견준다 — 함수를 견주면 렌더가 갈라져도 못 잡는다. */
+  /* 🔴 **글자가 같기를 요구하지 않는다** (2026-08-31 수리).
+     2026-08-30 부터 카드는 짧게(`적합도 67%`), 상세는 전부(`… 요건 3개 중 2개 충족 ·
+     확인 필요 1`) 보여 주도록 **일부러** 갈라 놓았다(fitBadgeHtml 의 `{full:true}`).
+     그런데 이 검사는 두 글자가 똑같기를 요구해서 그날부터 **main 이 빨간불**이었다.
+     지켜야 할 뜻은 그대로다 — 원래 잡으려던 사고는 "카드는 「자격 미확인」인데 상세는
+     「적합도 25%」" 처럼 **판정이 갈라지는 것**이지 글자 수가 다른 것이 아니다.
+     그래서 ①판정 갈래 ②퍼센트 숫자 둘만 견준다. */
   eq('카드와 상세가 같은 적합도를 말한다', await page.evaluate(async () => {
     const card = document.querySelector('#explore-list [data-detail^="kosaf-"]');
     if (!card) return 'no-card';
-    const onCard = (card.querySelector('.badge-fit, .badge-fit-unknown, .badge-fit-no') || {}).textContent || '';
+    const read = (root) => {
+      const el = root.querySelector('.badge-fit, .badge-fit-unknown, .badge-fit-no');
+      if (!el) return { kind: 'none', pct: null };
+      const t = el.textContent.replace(/\s+/g, ' ').trim();
+      const kind = el.className.includes('badge-fit-no') ? 'no'
+        : el.className.includes('badge-fit-unknown') ? 'unknown' : 'ok';
+      return { kind, pct: (t.match(/적합도 (\d+)%/) || [])[1] || null };
+    };
+    const onCard = read(card);
     openDetail(card.dataset.detail);
     await new Promise((r) => setTimeout(r, 250));
-    const sheet = document.querySelector('#detail-sheet');
-    const onSheet = (sheet.querySelector('.badge-fit, .badge-fit-unknown, .badge-fit-no') || {}).textContent || '';
-    return onCard.replace(/\s+/g, ' ').trim() === onSheet.replace(/\s+/g, ' ').trim() ? 'same' : `${onCard} / ${onSheet}`;
+    const onSheet = read(document.querySelector('#detail-sheet'));
+    if (onCard.kind !== onSheet.kind) return `판정 갈림: ${onCard.kind} / ${onSheet.kind}`;
+    if (onCard.pct !== onSheet.pct) return `퍼센트 갈림: ${onCard.pct} / ${onSheet.pct}`;
+    return 'same';
   }), 'same');
 
   console.log('\n■ 데이터');

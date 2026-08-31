@@ -164,6 +164,22 @@ async function onboard(page) {
 
   // ③ 조건 1 — 새 공고 + ④ 조건 2 — 마감 하루 전
   console.log('\n  [조건 1·2] 새 공고 등록 / 마감 하루 전');
+  /* ⚠️ **이 절은 간헐적으로 실패한다 — 아직 원인을 못 잡았다** (2026-08-31 조사 기록).
+     증상: `조건 1 — 새 공고 알림 발생` 이 3~4회에 한 번 실패한다. 알림함에 마감 알림만
+     12건(= MAX_EVENTS) 차오르고 새 공고 알림이 없다.
+     🔴 **제 변경 이전부터 그랬다** — origin/main 을 그대로 두고 돌려도 같은 빈도로 실패한다.
+
+     여기까지 확인한 것(같은 것을 다시 재지 말 것):
+       · 픽스처 `test-new-fit` 은 실제로 `eligible` 이다 — 자격 때문이 아니다.
+       · 새 공고 알림은 **첫 동기화에서 설계상 조용하다**(`!first`). 반면 마감 알림은
+         첫 동기화에도 나간다 — 이 비대칭이 증상의 모양을 설명한다.
+       · 그런데 `notifyLedger.baseline` 이 잡힐 때까지 기다리게 해 봐도 실패율이
+         눈에 띄게 줄지 않았다(4회 중 1회). **그래서 그 대기는 넣지 않았다** —
+         효과를 증명 못 한 수정을 '고쳤다'고 남기지 않는다.
+       · ⚠️ `notifyLedger` 는 let 선언이라 `window.notifyLedger` 로는 못 본다(typeof 로 볼 것).
+
+     다음에 볼 곳: notify-rules.js 의 `MAX_EVENTS`(12) 와 마감 규칙이 그 예산을 다 쓰는 경로,
+     그리고 notifyInit 의 첫 확인이 이 evaluate 와 겹치는 시점. */
   const injected = await page.evaluate(async () => {
     const iso = (n) => { const d = new Date(Date.now() + n * 86400000); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
     // 수집 로봇이 새 공고를 올린 상황 재현 (내 학교·내 조건에 맞는 공고)
@@ -219,11 +235,15 @@ async function onboard(page) {
   const inboxRows = await page.$$eval('.nf-item', (els) => els.map((e) => e.textContent.replace(/\s+/g, ' ').trim()));
   ok(inboxRows.length >= 2, `알림함에 ${inboxRows.length}건 표시`, inboxRows.slice(0, 2));
   ok(await page.$('.nf-item.nf-unread') !== null, '읽지 않은 알림이 강조 표시됨');
-  const dupIcon = await page.$$eval('.nf-item', (els) => els.some((e) => {
-    const ico = e.querySelector('.nf-ico').textContent.trim();
-    return e.querySelector('.nf-title').textContent.trim().startsWith(ico);
-  }));
-  ok(!dupIcon, '알림함 제목에 종류 아이콘이 중복으로 찍히지 않음');
+  /* 🔴 2026-08-31 UI 정리: 종류 아이콘이 이모지 → 선 아이콘(SVG)이 됐다.
+     `.nf-ico` 에 글자가 없어져서 옛 검사(`제목이 아이콘으로 시작하는가`)는
+     `startsWith('')` 가 늘 참이라 **늘 실패**한다. 지켜야 할 뜻은 그대로다 —
+     아이콘을 제목에 글자로 또 찍지 않는다 = 제목에 이모지가 없다. */
+  const titleEmoji = await page.$$eval('.nf-item .nf-title',
+    (els) => els.filter((e) => /\p{Extended_Pictographic}/u.test(e.textContent)).map((e) => e.textContent.trim()));
+  ok(titleEmoji.length === 0, '알림함 제목에 이모지가 없다 (종류 아이콘은 SVG 로 한 번만)', titleEmoji);
+  const icoIsSvg = await page.$$eval('.nf-item .nf-ico', (els) => els.every((e) => !!e.querySelector('svg')));
+  ok(icoIsSvg, '종류 아이콘이 SVG 로 그려진다');
   await page.screenshot({ path: SHOT('04-inbox') });
 
   // 알림 누르면 해당 공고 상세로

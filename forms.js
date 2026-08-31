@@ -231,7 +231,7 @@ function formFieldHtml(f) {
   if (f.type === 'text') {
     html += `<input type="text" id="${fid}" placeholder="${esc(f.placeholder || '')}" value="${esc(f.preset || '')}" autocomplete="off" />`;
     const key = typeof formAutoKey === 'function' ? formAutoKey(f) : '';
-    if (key) html += `<label class="fq-keep"><input type="checkbox" class="fq-keep-box" data-key="${esc(key)}" data-for="${fid}" checked /><span>다음 신청서에도 쓸게요</span></label>`;
+    if (key) html += `<label class="fq-keep"><input type="checkbox" class="fq-keep-box" data-key="${esc(key)}" data-for="${fid}" checked /><span>다음 신청서에도 사용</span></label>`;
   }
   if (f.type === 'textarea') {
     /* 🔴 서술형(story) 칸은 빈 칸을 던지지 않는다 (개발자 지적 2026-08-23).
@@ -243,9 +243,9 @@ function formFieldHtml(f) {
     html += `<div class="fq-sugg">${(f.sugg || []).map((s) => `<button type="button" class="chip chip-sm" data-fill="${fid}" data-text="${esc(s)}">${esc(s.slice(0, 26))}…</button>`).join('')}</div>`;
     const ph = isStory
       ? (typeof essayOn === 'function' && essayOn()
-        ? '위 키워드를 고르고 아래 ✨ 버튼을 누르면 여기가 채워져요 — 직접 쓰셔도 돼요'
-        : '위 키워드를 고르고 아래 버튼을 누르면 여기로 옮겨져요 — 직접 쓰셔도 돼요')
-      : '직접 입력하거나 위 추천 문구를 눌러 채워보세요';
+        ? '위 키워드를 고른 뒤 아래 버튼을 누르면 이 칸이 채워집니다 — 직접 써도 됩니다'
+        : '위 키워드를 고른 뒤 아래 버튼을 누르면 이 칸으로 옮겨집니다 — 직접 써도 됩니다')
+      : '직접 입력하거나 위 추천 문구를 눌러 채우세요';
     html += `<textarea id="${fid}" rows="${isStory ? 5 : 3}" placeholder="${esc(ph)}"></textarea>`;
   }
   if (f.type === 'group') {
@@ -270,13 +270,13 @@ function formQuestionsHtml(tpl) {
 
   /* 안 물어본 것을 감추지 않는다 — 무엇을 채웠는지 보이고 그 자리에서 고칠 수 있어야 한다 */
   if (plan.autoRows.length) {
-    html += `<details class="fq-auto"><summary>프로필에서 ${plan.autoRows.length}개를 채웠어요 · 확인하고 고치기</summary>` +
+    html += `<details class="fq-auto"><summary>프로필에서 자동으로 채운 항목 ${plan.autoRows.length}개 · 확인하고 고치기</summary>` +
       plan.autoRows.map((r) => `<label class="fq-sub"><span>${esc(String(r.label).replace(/\n/g, ' '))}</span>` +
         `<input type="text" class="fq-auto-in" data-f="${esc(r.id)}" value="${esc(r.value)}" autocomplete="off" /></label>`).join('') +
-      `<p class="dp-note">여기서 고친 값은 이 신청서에만 적용돼요. 계속 바꾸려면 MY → 내 정보에서 고치세요.</p></details>`;
+      `<p class="dp-note">여기서 고친 값은 이 신청서에만 적용됩니다. 계속 바꾸려면 MY → 내 정보에서 고치세요.</p></details>`;
   }
   if (plan.over.length) {
-    html += `<p class="dp-note fq-over">이 신청서는 원본 항목이 많아요 — 질문 ${plan.counts.total}개예요. 하나도 빠뜨리지 않으려고 전부 보여 드려요.</p>`;
+    html += `<p class="dp-note fq-over">이 신청서는 원본 항목이 많습니다 — 질문 ${plan.counts.total}개입니다. 하나도 빠뜨리지 않도록 전부 보여 줍니다.</p>`;
   }
 
   plan.secs.forEach((sec) => {
@@ -465,12 +465,12 @@ function downloadFormDoc(tpl, p, ans) {
   document.body.appendChild(a);
   a.click();
   a.remove();
-  toast('문서 파일(.doc)로 저장했어요 — 한글·워드에서 열 수 있어요');
+  toast('문서 파일(.doc)로 저장했습니다 — 한글·워드에서 열 수 있어요');
 }
 
 function printFormDoc(tpl, p, ans) {
   const w = window.open('', '_blank');
-  if (!w) { toast('팝업이 차단됐어요. 브라우저 설정을 확인해 주세요'); return; }
+  if (!w) { toast('팝업이 차단됐습니다. 브라우저 설정을 확인해 주세요'); return; }
   w.document.write(formDocFullHtml(tpl, p, ans));
   w.document.close();
   setTimeout(() => w.print(), 400);
@@ -497,7 +497,7 @@ function buildPrepTemplate(sch) {
     title: `${sch.name} — 지원문서`,
     docName: `지원문서_${(sch.name || '').replace(/[^가-힣a-zA-Z0-9]/g, '').slice(0, 24) || '장학금'}`,
     org: sch.provider || '',
-    tag: '※ 이 공고는 별도 신청서 양식 없이 자유 형식 제출을 받습니다 — 아래 문서를 그대로 제출할 수 있어요.',
+    tag: '※ 이 공고는 별도 신청서 양식 없이 자유 형식 제출을 받습니다 — 아래 문서를 그대로 제출할 수 있습니다.',
     unofficial: true,
     pledge: '위 내용은 사실과 다름이 없습니다.',
     signLabel: '지원자',

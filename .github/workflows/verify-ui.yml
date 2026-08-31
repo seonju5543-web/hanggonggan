@@ -28,6 +28,8 @@ on:
       - 'notify*.js'
       - 'essay*.js'
       - 'index.html'
+      - 'style.css'
+      - 'form-plan.js'
       - 'data.js'
       - 'verify/**'
   workflow_dispatch:
@@ -57,6 +59,11 @@ jobs:
       #    essay-playbook.yml 에도 있지만 그건 **주 1회 예약**이라, 제출 관문이 깨져도
       #    최대 일주일 뒤에 안다. 관문은 밀어 넣는 그 순간 막아야 한다.
       #    브라우저가 필요 없어 몇 초면 끝난다.
+      # 화면의 말투·토큰이 되돌아가지 않는지 (2026-08-31 신설 — 브라우저 없이 몇 초).
+      # 🔴 여기서 실패하면 이모지·느낌표·1인칭 말투나 토큰 밖 CSS 값이 다시 들어온 것이다.
+      - name: 말투·토큰 관문
+        run: node verify/ui-tone.mjs
+
       - name: 제출 관문 판정 검사 (순수 모듈)
         run: node verify/verify-essay-submit.mjs
 
