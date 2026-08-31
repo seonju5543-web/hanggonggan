@@ -8,7 +8,7 @@
   <!-- 보안: 외부 스크립트·임의 접속 차단(수집 데이터가 오염돼도 코드 실행 불가) + 학교 사이트로 리퍼러 미전송 -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://cdn.jsdelivr.net; img-src 'self' data: blob:; connect-src 'self' https://*.workers.dev https://*.supabase.co; object-src 'none'; base-uri 'self'" />
   <meta name="referrer" content="no-referrer" />
-  <meta name="theme-color" content="#101d3d" />
+  <meta name="theme-color" content="#f6f4f0" />
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link rel="manifest" href="manifest.json" />
@@ -38,7 +38,7 @@
         </div>
         <div class="onboard-actions">
           <button class="btn btn-primary btn-lg" data-next>시작하기</button>
-          <p class="onboard-note">1분이면 내가 받을 수 있는 장학금을 알 수 있어요</p>
+          <p class="onboard-note">1분이면 내 장학금 확인</p>
         </div>
       </div>
 
@@ -46,7 +46,7 @@
       <div class="onboard-step" data-step="1" hidden>
         <div class="onboard-body">
           <h2>학적 정보를 알려주세요</h2>
-          <p class="onboard-sub">전국 모든 대학을 지원해요</p>
+          <p class="onboard-sub">전국 모든 대학 지원</p>
           <label class="field ac-wrap">
             <span class="field-label">학교</span>
             <input type="text" id="in-school" placeholder="학교명을 검색하세요 (예: 외대, 서울)" maxlength="30" autocomplete="off" />
@@ -88,7 +88,6 @@
               <button class="chip" data-value="초과학기">초과학기</button>
               <button class="chip" data-value="졸업유예">졸업유예</button>
             </div>
-            <span class="field-hint">'휴학생 지원 불가' 같은 조건이 많아, 이 항목이 적합도에 가장 크게 반영돼요</span>
           </div>
         </div>
         <div class="onboard-actions">
@@ -100,19 +99,17 @@
       <div class="onboard-step" data-step="2" hidden>
         <div class="onboard-body">
           <h2>성적과 소득 정보를 알려주세요</h2>
-          <p class="onboard-sub">장학금 자격 판단의 핵심 기준이에요</p>
+          <p class="onboard-sub">장학금 자격 판단의 핵심 기준</p>
           <label class="field">
-            <span class="field-label">직전학기 평점 (4.5 만점)</span>
+            <span class="field-label">직전학기 평점 (4.5 만점 · 신입학은 공란 가능)</span>
             <input type="number" id="in-gpa" placeholder="예: 3.85" min="0" max="4.5" step="0.01" inputmode="decimal" />
-            <span class="field-hint">신입학 첫 학기는 성적 요건이 면제 처리돼요 (비워두어도 괜찮아요)</span>
           </label>
           <label class="field">
             <span class="field-label">직전학기 이수학점</span>
             <input type="number" id="in-credits" placeholder="예: 15" min="0" max="30" step="1" inputmode="numeric" />
-            <span class="field-hint">'직전학기 12학점 이상' 같은 조건을 판단하는 데 써요</span>
           </label>
           <label class="field">
-            <span class="field-label">학자금 지원구간 (소득구간)</span>
+            <span class="field-label">학자금 지원구간 (모르면 '모름')</span>
             <select id="in-bracket">
               <option value="">모름 / 미산정</option>
               <option value="1">1구간</option><option value="2">2구간</option>
@@ -121,7 +118,6 @@
               <option value="7">7구간</option><option value="8">8구간</option>
               <option value="9">9구간</option><option value="10">10구간</option>
             </select>
-            <span class="field-hint">한국장학재단에서 산정한 구간이에요. 모르면 '모름'을 선택해도 매칭돼요.</span>
           </label>
           <label class="field">
             <span class="field-label">본인 거주 지역</span>
@@ -139,7 +135,6 @@
           <label class="field">
             <span class="field-label">본인 거주 시·군·구</span>
             <select id="in-region-city"><option value="">선택 안 함</option></select>
-            <span class="field-hint">지역 장학금은 대부분 시·군 단위로 뽑습니다. 골라 두면 받을 수 있는 것만 걸러 냅니다.</span>
           </label>
           <label class="field">
             <span class="field-label">부모님 거주 지역</span>
@@ -150,7 +145,6 @@
               <option>경기</option><option>강원</option><option>충북</option><option>충남</option>
               <option>전북</option><option>전남</option><option>경북</option><option>경남</option><option>제주</option>
             </select>
-            <span class="field-hint">지역 장학금은 '부 또는 모가 1년 이상 거주'를 요구하는 곳이 많아요 — 실제로 지역 요건이 있는 83곳 중 47곳(57%)이 부모님 주소를 봐요</span>
           </label>
           <label class="field">
             <span class="field-label">부모님 거주 시·군·구</span>
@@ -167,7 +161,6 @@
           <label class="field">
             <span class="field-label">태어난 해 (선택)</span>
             <input type="number" id="in-birth-year" placeholder="예: 2004" min="1940" max="2020" step="1" inputmode="numeric" />
-            <span class="field-hint">'만 39세 이하' 같은 나이 조건에만 써요</span>
           </label>
         </div>
         <div class="onboard-actions">
@@ -179,7 +172,7 @@
       <div class="onboard-step" data-step="3" hidden>
         <div class="onboard-body">
           <h2>해당하는 항목을 모두 선택하세요</h2>
-          <p class="onboard-sub">해당 사항이 없으면 바로 완료를 눌러도 돼요</p>
+          <p class="onboard-sub">해당 없으면 바로 완료</p>
           <div class="check-list" id="in-flags">
             <label class="check-item"><input type="checkbox" value="basicLiving" /><span>기초생활수급자</span></label>
             <label class="check-item"><input type="checkbox" value="nearPoverty" /><span>차상위계층</span></label>
@@ -199,9 +192,9 @@
                   기기에만 남아 서버로 안 나간다(supabase-client.js syncSafeProfile). -->
           <label class="check-item consent-item" id="in-sensitive-row" hidden>
             <input type="checkbox" id="in-sensitive-ok" />
-            <span>(선택) 위 항목은 <strong>민감정보</strong>예요. 기기를 바꿔도 이어지게 하려면
-              서버 저장에 동의해 주세요. <a href="terms.html" target="_blank" rel="noopener">자세히 보기</a>
-              <em>동의하지 않아도 앱은 그대로 쓸 수 있어요 — 이 항목이 이 기기에만 남을 뿐이에요.</em></span>
+            <span>(선택) 위 항목은 <strong>민감정보</strong>. 기기를 바꿔도 이어지게 하려면
+              서버 저장 동의 필요. <a href="terms.html" target="_blank" rel="noopener">자세히 보기</a>
+              <em>미동의 시에도 앱 사용 가능 — 이 항목만 기기에 보관.</em></span>
           </label>
         </div>
         <div class="onboard-actions">
@@ -372,9 +365,13 @@
       <div id="my-account" class="my-card" hidden></div>
       <div id="my-notify" class="my-card" hidden></div>
       <div id="my-wallet" class="my-card"></div>
+      <!-- 서류 보관함 줄과 같은 꼴 — 왼쪽에 할 일, 오른쪽에 누를 것 (2026-08-31).
+           🔴 id 는 그대로 둔다. app.js 가 이 이름으로 동작을 붙인다. -->
+      <!-- 프로필 수정은 맨 위(수정하기 ›)에 이미 있어 여기서는 뺐다 (2026-08-31).
+           🔴 초기화는 **붉은 글자 자체가 버튼**이다 — 오른쪽에 실행 버튼을 따로 두면
+              목록을 훑다 손가락이 스치기 쉬운데, 이건 되돌릴 수 없는 동작이다. -->
       <div class="my-menu">
-        <button class="my-menu-item" id="btn-my-edit">프로필 수정</button>
-        <button class="my-menu-item danger" id="btn-reset">데이터 초기화</button>
+        <button class="my-danger-line" id="btn-reset">데이터 초기화</button>
       </div>
       <p class="data-note">한대장 v0.3 (MVP) · 전국 대학 지원</p>
     </section>
@@ -430,10 +427,10 @@
     </svg>
 
     <!-- 꾹 눌러 옮길 수 있어서 위치를 코드가 아니라 chat.js가 정한다 (숨은 동작이라 첫 1회 안내도 붙는다) -->
-    <button class="chat-fab" id="btn-chat-fab" hidden aria-label="대장님 열기 — 장학금 도우미 (길게 눌러 위치를 옮길 수 있어요)">
+    <button class="chat-fab" id="btn-chat-fab" hidden aria-label="대장님 열기 — 장학금 도우미 (길게 눌러 위치 이동)">
       <svg class="mascot" viewBox="0 0 48 48" aria-hidden="true"><use href="#mascot"/></svg>
     </button>
-    <div class="chat-hint" id="chat-hint" hidden role="status">꾹 눌러서 옮길 수 있어요</div>
+    <div class="chat-hint" id="chat-hint" hidden role="status">꾹 눌러서 이동 가능</div>
     <div id="chat-backdrop" class="sheet-backdrop" hidden></div>
     <div id="chat-sheet" class="sheet chat-sheet" hidden role="dialog" aria-label="대장님 — 장학금 도우미" aria-modal="true">
       <div class="sheet-handle"></div>
@@ -443,7 +440,7 @@
         </span>
         <div class="chat-head-text">
           <p class="chat-title">대장님</p>
-          <p class="chat-sub">앱에 있는 공고·서류 정보로만 답해요</p>
+          <p class="chat-sub">앱에 있는 공고·서류 정보로만 답변</p>
         </div>
         <button class="icon-btn" id="btn-chat-close" aria-label="닫기">✕</button>
       </div>
@@ -458,6 +455,10 @@
     <!-- ============ 알림 시트 (동의 안내 · 알림함) ============ -->
     <div id="notify-backdrop" class="sheet-backdrop" hidden></div>
     <div id="notify-sheet" class="sheet" hidden></div>
+
+    <!-- 서류 발급처 안내 — 서류 이름을 누르면 뜨는 작은 창 (2026-08-31) -->
+    <div id="wallet-pop-backdrop" class="wallet-pop-backdrop"></div>
+    <div id="wallet-pop" class="wallet-pop" hidden role="dialog" aria-label="발급처 안내"></div>
 
     <!-- ============ 토스트 ============ -->
     <div id="toast" class="toast" hidden></div>

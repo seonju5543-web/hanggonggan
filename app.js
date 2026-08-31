@@ -231,7 +231,7 @@ function recordSubmitted(sch) {
   if (!confirm(`${officialChannel(sch).label}에서 공식 제출을 마치셨나요?\n\n제출 완료로 기록하면 진행 단계가 '공식 제출'로 넘어가요.`)) return;
   app.submittedAt = nowStamp();
   saveState();
-  toast('공식 제출로 기록했어요. 접수 마감 후에는 자동으로 심사 단계로 표시돼요');
+  toast('공식 제출 기록 완료 · 접수 마감 후 심사 단계로 자동 전환');
   refreshProgressViews(sch.id);
 }
 
@@ -761,7 +761,7 @@ function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
         <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${sch.type}</span>
         ${sch.program ? '<span class="badge badge-program">상시 제도</span>' : `<span class="badge badge-dday ${d.cls}">${d.label}</span>`}
         ${sch.auto ? '<span class="badge badge-auto">자동 등록 · 검수 전</span>' : ''}
-        ${applied ? '<span class="badge badge-applied">신청함</span>' : ''}
+        ${applied ? '<span class="badge badge-applied">신청 완료</span>' : ''}
       </div>
       ${/* 🔴 적합도 배지는 분류 배지와 **다른 줄**에 둔다 (2026-08-30 개발자 지시).
            같은 flex 줄에 두면 배지 글자 수에 따라 어떤 카드는 넷째 배지로 붙고 어떤 카드는
@@ -783,7 +783,9 @@ function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
 /* ---------------- 홈 ---------------- */
 function renderHome() {
   const p = state.profile;
-  $('#home-greet').textContent = p.name ? `${p.name}님` : '안녕하세요';
+  /* 🔴 이름이 없으면 인사말로 때우지 않는다 — 이름은 신청서에도 들어가는 값이라
+     비어 있다는 사실 자체를 알려야 한다. 이 줄은 이미 눌러서 프로필로 가는 자리다. */
+  $('#home-greet').textContent = p.name ? `${p.name}님` : '이름 설정';
   $('#home-school').textContent = (p.school || '대학 미설정') + (p.campus ? ' · ' + p.campus : '');
   $('#home-avatar').textContent = (p.name || '학').charAt(0);
 
@@ -821,12 +823,12 @@ function renderHome() {
     .slice(0, 3);
   $('#home-deadline-list').innerHTML = upcoming.length
     ? upcoming.map((m) => schCard(m.sch, m.result, { compact: true, fit: m.fit, fd: m.fd })).join('')
-    : '<p class="empty">지금 신청 가능한 장학금이 없어요. 프로필을 업데이트해 보세요.</p>';
+    : '<p class="empty">지금 신청 가능한 장학금 없음 · 프로필 업데이트 권장</p>';
 
   const recent = state.applications.slice(-2).reverse().filter((a) => findSch(a.id));
   $('#home-apps').innerHTML = recent.length
     ? recent.map(appCard).join('')
-    : '<p class="empty">아직 준비한 장학금이 없어요.</p>';
+    : '<p class="empty">담아 둔 장학금 없음</p>';
 }
 
 /* ---------------- 탐색 ---------------- */
@@ -890,11 +892,6 @@ function closeSortMenu() {
   $('#explore-sort-btn').setAttribute('aria-expanded', 'false');
 }
 
-/* 누를 때마다 다음 기준으로 — 셋을 돌고 처음으로 */
-function cycleSort() {
-  applySort(SORT_KEYS[(SORT_KEYS.indexOf(exploreSort) + 1) % SORT_KEYS.length]);
-}
-
 function applySort(key) {
   if (!EXPLORE_SORTS[key]) return;
   exploreSort = key;
@@ -945,7 +942,7 @@ function renderExplore() {
   $('#live-notices').innerHTML = (exploreFilter === 'all' && !q) ? liveNoticesHtml() : '';
   $('#explore-list').innerHTML = list.length
     ? list.map((m) => schCard(m.sch, m.result, { fit: m.fit, fd: m.fd })).join('')
-    : `<p class="empty">${q ? `'${esc(exploreQuery.trim())}'와 맞는 장학금이 없어요.` : '조건에 맞는 장학금이 없어요.'}</p>`;
+    : `<p class="empty">${q ? `'${esc(exploreQuery.trim())}'와 맞는 장학금 없음` : '조건에 맞는 장학금 없음'}</p>`;
 }
 
 /* ---------------- 서류 도우미 (AI 초안 작성) ---------------- */
@@ -1024,7 +1021,7 @@ function certStatusListHtml(sch) {
     return `<li>□ ${doc} — 공식 제출 시 함께 준비하세요</li>`;
   }).join('');
   return `<h4>증명서류 체크리스트</h4><ul class="doc-list">${rows}</ul>
-    <p class="dp-note">보관함(MY 탭)에 올려둔 서류는 다음 신청부터 자동으로 함께 준비돼요.</p>`;
+    <p class="dp-note">보관함(MY 탭) 서류는 다음 신청부터 자동 첨부.</p>`;
 }
 
 function personLine(p) {
@@ -1419,7 +1416,7 @@ function kosafAsScholarships() {
         deadline: i.due || null,
         listedAt: (kosafUpdatedAt || '').slice(0, 10) || null,   // 마감 미상일 때 60일 규칙이 걸리게
         period: i.due ? `접수 ~${i.due}` : (kosafClean(f['신청기간']) || '접수 기간 원문 확인'),
-        summary: `${i.org} — 한국장학재단에 등록된 장학금이에요.`,
+        summary: `${i.org} — 한국장학재단 등록 장학금.`,
         eligibility: { selective: true },     // 구조화된 조건이 없으니 판정하지 않는다(=unknown)
         ...(lines.length ? { eligibilityLines: lines } : {}),
         ...(split(f['자격제한']).length ? { eligibilityExcludes: split(f['자격제한']) } : {}),
@@ -1452,7 +1449,7 @@ function liveNoticesHtml() {
   const head = `<div class="section-head" style="margin-top:4px"><h3>우리 학교 실시간 공고</h3>
     <span class="link-btn">매일 아침 자동 갱신${liveNotices.updatedAt ? ' · ' + liveNotices.updatedAt : ''}</span></div>`;
   if (!mine.length) {
-    return head + `<p class="empty" style="margin-bottom:16px">아직 ${esc(p.school)} 게시판이 연결 전이거나 새 공고가 없어요.<br />연결되면 실제 공고가 여기에 자동으로 떠요.</p>`;
+    return head + `<p class="empty" style="margin-bottom:16px">아직 ${esc(p.school)} 게시판 연결 전이거나 새 공고 없음<br />연결되면 실제 공고가 여기에 자동으로 떠요.</p>`;
   }
   return head + `<div class="card-list" style="margin-bottom:18px">` + mine.map((n) => `
     <a class="sch-card notice-card" href="${esc(safeUrl(n.url))}" target="_blank" rel="noopener">
@@ -1476,7 +1473,7 @@ function buildSubmissionText(sch, app) {
 }
 
 function copyText(text, okMsg) {
-  const done = () => toast(okMsg || '복사했어요. 공식 신청 페이지에 붙여넣으세요');
+  const done = () => toast(okMsg || '복사 완료 · 공식 신청 페이지에 붙여넣기');
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
   } else fallbackCopy(text, done);
@@ -1486,7 +1483,7 @@ function fallbackCopy(text, done) {
   ta.value = text;
   document.body.appendChild(ta);
   ta.select();
-  try { document.execCommand('copy'); done(); } catch (e) { toast('복사에 실패했어요'); }
+  try { document.execCommand('copy'); done(); } catch (e) { toast('복사 실패'); }
   ta.remove();
 }
 
@@ -1502,12 +1499,12 @@ async function shareApplication(sch, app) {
   try {
     if (files.length && navigator.canShare && navigator.canShare({ files })) {
       await navigator.share({ title: `${sch.name} 신청 서류`, text, files });
-      toast('서류와 함께 공유했어요 (메일 앱에서 바로 접수 가능)');
+      toast('서류와 함께 공유 완료 · 메일 앱에서 바로 접수 가능');
       return;
     }
     if (navigator.share) {
       await navigator.share({ title: `${sch.name} 신청 서류`, text });
-      toast('내용을 공유했어요. 파일은 보관함에서 따로 첨부하세요');
+      toast('내용 공유 완료 · 파일은 보관함에서 따로 첨부');
       return;
     }
   } catch (e) { /* 사용자가 공유를 취소한 경우 */ return; }
@@ -1692,7 +1689,7 @@ function bulkRowHtml(sch) {
           </div>
           <p class="bulk-meta">${sch.deadline
             ? `마감 ${esc(sch.deadline.replace(/-/g, '.'))}`
-            : '마감 기한을 아직 읽지 못했어요 — 공고 원문에서 꼭 확인하세요'}</p>
+            : '마감 기한 미확인 — 공고 원문에서 꼭 확인하세요'}</p>
           <p class="bulk-meta">${esc(submitChannelLabel(sch))}</p>
           ${reqs.length
             ? `<p class="bulk-meta-head">지원자격 (공고 원문)</p><ul class="bulk-reqs">${reqs.map((r) => `<li>${esc(r)}</li>`).join('')}</ul>`
@@ -1814,9 +1811,9 @@ function renderBulkPrep() {
       <h3 class="sheet-title">한 번에 신청 준비</h3>
       <p class="sheet-provider" id="bulk-sum"></p>
       <label class="bulk-all"><input type="checkbox" id="bulk-all" checked /> 전체 선택</label>
-      ${ready.length ? `<p class="bulk-group-head">바로 준비돼요 · ${ready.length}건</p>${ready.map(bulkRowHtml).join('')}` : ''}
-      ${need.length ? `<p class="bulk-group-head">서류를 써야 해요 · ${need.length}건</p>${need.map(bulkRowHtml).join('')}
-        <p class="dp-note">이 ${need.length}건은 담아 둔 뒤 신청내역에서 자소서·신청서를 이어서 쓰면 돼요.</p>` : ''}
+      ${ready.length ? `<p class="bulk-group-head">바로 준비 가능 · ${ready.length}건</p>${ready.map(bulkRowHtml).join('')}` : ''}
+      ${need.length ? `<p class="bulk-group-head">서류 작성 필요 · ${need.length}건</p>${need.map(bulkRowHtml).join('')}
+        <p class="dp-note">이 ${need.length}건은 담아 둔 뒤 신청내역에서 자소서·신청서 작성.</p>` : ''}
       <button class="btn btn-primary btn-lg" id="btn-bulk-go"></button>
       <p class="dp-note">※ 최종 제출은 한국장학재단·학교 등 공식 채널에서 이루어져요.</p>
     </div>`;
@@ -1853,7 +1850,7 @@ function bulkStart() {
   const go = picked.filter((sch) => live.has(sch.id));
   if (!go.length) {
     closeSheet();
-    toast(gone.length ? '고른 장학금이 그 사이 모두 마감됐어요' : '준비할 수 있는 장학금이 없어요');
+    toast(gone.length ? '고른 장학금 전부 그 사이 마감' : '준비 가능한 장학금 없음');
     return;
   }
   const need = go.filter(bulkNeedsWork);
@@ -1862,7 +1859,7 @@ function bulkStart() {
   }));
   saveState();
   closeSheet();
-  const goneMsg = gone.length ? ` · ${gone.length}건은 그 사이 마감돼 빼놓았어요` : '';
+  const goneMsg = gone.length ? ` · ${gone.length}건은 그 사이 마감돼 제외` : '';
   toast(need.length
     ? `${go.length - need.length}건 준비 완료 · ${need.length}건은 신청내역에서 서류를 이어서 쓰세요${goneMsg}`
     : `장학금 ${go.length}건 신청 준비 완료${goneMsg}`);
@@ -1871,7 +1868,7 @@ function bulkStart() {
 
 function applyAll() {
   const targets = bulkTargets();
-  if (!targets.length) { toast('준비할 수 있는 장학금이 없어요'); return; }
+  if (!targets.length) { toast('준비 가능한 장학금 없음'); return; }
   bulkPrep = { list: targets, ids: new Set(targets.map((sch) => sch.id)) };
   openSheetShell();
   renderBulkPrep();
@@ -2042,7 +2039,7 @@ function openDetail(id) {
         : '공고 원문에서'} 다시 확인하세요.</p>
 
       ${sch.sourceKind === 'kosaf' ? `
-      <p class="doc-legend">위 내용은 <strong>재단이 한국장학재단에 등록한 정보</strong>를 그대로 옮긴 거예요.
+      <p class="doc-legend">위 내용은 <strong>재단이 한국장학재단에 등록한 정보</strong> 원문 그대로.
         앱이 공고 원문을 읽은 것이 아니라서 자격 판정과 신청서 작성은 지원하지 않아요 — 신청 전에 재단에서 꼭 확인하세요.
         ${sch.contact ? `<br />문의 ${esc(sch.contact)}` : ''}</p>` : ''}
 
@@ -2054,7 +2051,7 @@ function openDetail(id) {
         }).join('')}
       </ul>
       <p class="doc-legend">${sch.sourceKind === 'kosaf'
-        ? '재단이 적어 둔 제출 서류예요. 앱이 대신 작성해 주지는 않아요 — 재단 공고문에서 서식을 받으세요.'
+        ? '재단이 적어 둔 제출 서류. 앱이 대신 작성해 주지는 않아요 — 재단 공고문에서 서식을 받으세요.'
         : `${sch.documents.some((doc) => /자동/.test(doc))
         ? `'자동' 표시 서류는 한국장학재단 등 제출처가 신청 과정에서 전산으로 확인하는 항목입니다 — 따로 준비해야 하는지는 공고 원문에서 확인하세요. `
         : ''}'직접' 서류 중 자기소개서·계획서·사유서·신청 양식은 앱에서 바로 작성할 수 있습니다.`}</p>
@@ -2301,10 +2298,14 @@ function appCard(app) {
   if (!sch) return '';
   const step = effectiveStep(app, sch);
   const stepLabel = step === 3 ? (app.result === 'won' ? '선정' : '결과 확인') : APP_STEPS[step];
-  const statusBadge = app.pending
-    ? '<span class="badge badge-pending">서류 작성 필요</span>'
-    : `<span class="badge badge-applied">${stepLabel}</span>`;
   const checked = appsSelected.has(app.id) ? 'checked' : '';
+  /* 🔴 진행 단계는 **막대에 붙인다** (2026-08-31 개발자 지시).
+     위쪽 배지로 두면 분류 배지(교내/교외)와 같은 무게로 보여서 '단계'라는 것이 안 읽혔고,
+     정작 그 아래 막대가 무엇을 재는 막대인지는 화면 어디에도 안 적혀 있었다.
+     이제 이름과 'n/4'가 막대 바로 위에 붙어, 막대와 글자가 같은 것을 말한다. */
+  const stepNow = app.pending ? '서류 작성 필요' : stepLabel;
+  const stepCount = app.pending ? '' : `${step + 1}/${APP_STEPS.length}`;
+  const pct = app.pending ? 6 : ((step + 1) / APP_STEPS.length) * 100;
   return `
     <div class="swipe-row" data-row="${esc(app.id)}">
       <button class="swipe-del" data-del="${esc(app.id)}" aria-label="이 신청 기록 삭제">삭제</button>
@@ -2313,11 +2314,13 @@ function appCard(app) {
       <button class="sch-card" data-detail="${sch.id}">
         <div class="sch-top">
           <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${sch.type}</span>
-          ${statusBadge}
         </div>
         <p class="sch-name">${esc(sch.name)}</p>
         <p class="sch-provider">${app.appliedAt} ${app.pending ? '담아둠' : '준비 완료'} · 제출처 ${esc(officialChannel(sch).label)}</p>
-        <div class="mini-progress"><div style="width:${app.pending ? 6 : ((step + 1) / APP_STEPS.length) * 100}%"></div></div>
+        <div class="app-step${app.pending ? ' app-step-wait' : ''}">
+          <div class="app-step-head"><span>${esc(stepNow)}</span>${stepCount ? `<em>${stepCount}</em>` : ''}</div>
+          <div class="mini-progress"><div style="width:${pct}%"></div></div>
+        </div>
       </button>
     </div>`;
 }
@@ -2338,7 +2341,7 @@ function deleteApps(ids) {
   undoBuffer = removed.slice().sort((x, y) => x.at - y.at);
   renderApplications();
   renderHome();
-  toast(`${removed.length}건을 지웠어요`, {
+  toast(`${removed.length}건 삭제`, {
     label: '실행 취소',
     run: () => {
       for (const r of undoBuffer) state.applications.splice(r.at, 0, r.app);
@@ -2346,7 +2349,7 @@ function deleteApps(ids) {
       saveState();
       renderApplications();
       renderHome();
-      toast('되살렸어요');
+      toast('되살림');
     },
   });
 }
@@ -2407,7 +2410,7 @@ function renderApplications() {
     ? `<div class="summary-card">
          <p>준비 완료 ${prepared.length}건${submitted.length ? ` · 제출·심사 중 ${submitted.length}건` : ''}${wonApps.length ? ` · 선정 ${wonApps.length}건` : ''}${pending.length ? ` · 서류 작성 필요 ${pending.length}건` : ''} · ${wonApps.length ? '선정된 장학금' : '예상 최대 수혜액'}</p>
          <p class="summary-amount">${won(wonApps.length ? wonAmount : totalExpected)}</p>
-         <p class="summary-note">제출·발표 단계는 각 장학금 상세에서 직접 기록할 수 있어요 · 최종 제출은 각 공식 채널에서 이루어져요</p>
+         <p class="summary-note">제출·발표 단계는 각 장학금 상세에서 직접 기록 · 최종 제출은 각 공식 채널에서 이루어져요</p>
        </div>`
     : '';
 
@@ -2499,7 +2502,7 @@ function learnedHtml(c) {
   const rows = LEARNED_COMMON.filter(([k]) => c[k]);
   if (!rows.length) return '';
   return `<div class="my-learned">
-    <p class="my-learned-head">신청서에서 배운 정보 <span>${rows.length}개 · 이 기기에만 저장돼요</span></p>
+    <p class="my-learned-head">신청서에서 배운 정보 <span>${rows.length}개 · 이 기기에만 저장</span></p>
     <ul>${rows.map(([k, label]) => `<li><span>${esc(label)}</span><strong>${esc(k === 'rrn' ? maskRrn(c[k]) : c[k])}</strong>
       <button type="button" class="btn-link" data-forget="${k}">지우기</button></li>`).join('')}</ul>
   </div>`;
@@ -2517,7 +2520,7 @@ function forgetLearned(key) {
   saveState();
   if (typeof formInvalidatePlan === 'function') formInvalidatePlan();
   renderMy();
-  toast('지웠어요 — 다음 신청서에서 다시 물어볼게요');
+  toast('삭제 완료 · 다음 신청서에서 다시 질문');
 }
 
 function renderMy() {
@@ -2538,7 +2541,7 @@ function renderMy() {
     </div>
     <p class="my-flags">특별자격: ${flagText}</p>
     ${learnedHtml(c)}
-    <p class="my-flags">공통 서류정보(학번·연락처·계좌 등)는 이 기기에만 저장되고 서류 초안에 자동 기입돼요.</p>`;
+    <p class="my-flags">공통 서류정보(학번·연락처·계좌 등)는 이 기기에만 저장 · 서류 초안에 자동 기입.</p>`;
   renderAccountCard();
   renderNotifyCard();
   renderWallet();
@@ -2558,14 +2561,18 @@ function renderWallet() {
   const el = $('#my-wallet');
   el.innerHTML = `
     <p class="wallet-title">서류 보관함</p>
-    <p class="wallet-sub">한 번 올려두면 모든 신청에 자동으로 함께 준비돼요. 파일은 휴대폰 안에만 저장돼요.</p>
+    <p class="wallet-sub">한 번 올려두면 모든 신청에 자동 첨부. 파일은 휴대폰 안에만 저장.</p>
     ${DOC_SLOTS.map((s) => {
       const rec = walletCache[s.slot];
       return `
         <div class="wallet-row">
           <div class="wallet-info">
-            <p class="wallet-label">${s.label}</p>
-            <p class="wallet-status">${rec ? `✓ ${esc(rec.name)} · ${rec.savedAt}` : `없음 · ${s.issue}`}</p>
+            ${/* 🔴 서류 이름은 **누를 수 있다** — 어디서 떼는지를 작은 창으로 알려 준다.
+                 발급처를 줄마다 깔아 두면 여덟 줄이 설명으로 가득 차 정작 '있다/없다'가 안 보인다. */ ''}
+            <button class="wallet-label" data-issue="${s.slot}" aria-haspopup="dialog">
+              ${esc(s.label)}<span class="wallet-q" aria-hidden="true">?</span>
+            </button>
+            ${rec ? '' : '<p class="wallet-status">없음</p>'}
           </div>
           <div class="wallet-btns">
             ${rec ? `<button class="wallet-btn" data-view="${s.slot}">보기</button>
@@ -2577,13 +2584,41 @@ function renderWallet() {
         </div>`;
     }).join('')}`;
 
+  /* 발급처 안내 창 — 시트를 열 만한 내용이 아니라서 **작은 창** 하나로 띄운다.
+     🔴 발급처 글자는 data.js 의 DOC_SLOTS.issue 그대로다 — 여기서 지어내지 않는다. */
+  {
+    const pop = $('#wallet-pop');
+    const bg = $('#wallet-pop-backdrop');
+    const close = () => { if (!pop) return; pop.classList.remove('show'); if (bg) bg.classList.remove('show'); pop.hidden = true; };
+    $$('#my-wallet [data-issue]').forEach((btn) =>
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const slot = DOC_SLOTS.find((d) => d.slot === btn.dataset.issue);
+        if (!slot || !pop) return;
+        pop.innerHTML = `
+          <p class="wp-title">${esc(slot.label)}</p>
+          <p class="wp-label">발급 방법</p>
+          <p class="wp-issue">${esc(slot.issue)}</p>
+          <button class="wp-close" type="button">닫기</button>`;
+        pop.hidden = false;
+        if (bg) bg.classList.add('show');
+        requestAnimationFrame(() => pop.classList.add('show'));
+        pop.querySelector('.wp-close').addEventListener('click', close);
+      })
+    );
+    if (pop) {
+      $('#wallet-pop-backdrop').addEventListener('click', close);
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+    }
+  }
+
   $$('#my-wallet input[type=file]').forEach((inp) =>
     inp.addEventListener('change', async () => {
       const file = inp.files[0];
       if (!file) return;
-      if (file.size > 10 * 1024 * 1024) { toast('10MB 이하 파일만 올릴 수 있어요'); return; }
+      if (file.size > 10 * 1024 * 1024) { toast('10MB 이하 파일만 가능'); return; }
       await walletPut(inp.dataset.slot, file);
-      toast('보관함에 저장했어요');
+      toast('보관함 저장 완료');
       renderWallet();
     })
   );
@@ -2607,8 +2642,8 @@ function bindEvents() {
   $$('.onboard-step [data-next]').forEach((btn) =>
     btn.addEventListener('click', () => {
       if (onboardStep === 1) {
-        if (!$('#in-school').value.trim()) { toast('학교명을 입력해 주세요'); return; }
-        if (!getChip('#in-year')) { toast('학년을 선택해 주세요'); return; }
+        if (!$('#in-school').value.trim()) { toast('학교명 입력 필요'); return; }
+        if (!getChip('#in-year')) { toast('학년 선택 필요'); return; }
       }
       onboardStep += 1;
       renderOnboardStep();
@@ -2724,36 +2759,19 @@ function bindEvents() {
     renderExplore();
   });
 
-  /* 정렬 버튼 — 짧게 누르면 다음 기준, 길게 누르면 목록 (2026-08-26 개발자 지시).
-     🔴 길게 눌러 목록을 연 뒤에 오는 click은 **삼켜야 한다** — 안 그러면 목록이 뜨는
-        동시에 기준까지 한 칸 넘어간다(신청 내역 스와이프와 같은 계열의 함정).
-     🔴 touch와 mouse를 **둘 다** 받되 겹쳐서 두 번 세지 않는다 — 터치 기기는
-        touchend 뒤에 click도 보내므로 길게 누른 사실을 플래그로 남겨 거른다. */
+  /* 정렬 버튼 — **누르면 목록이 열린다** (2026-08-31 개발자 지시).
+     🔴 예전에는 짧게 누르면 기준이 한 칸씩 넘어가고 길게 눌러야 목록이 떴다.
+        그 방식은 지금 무슨 기준인지 눌러 보기 전에는 알 수 없고, 길게 누르기는
+        아무도 발견하지 못하는 동작이다. 한 번 눌러 목록에서 고르는 쪽이 짧다.
+     ⚠️ 키보드도 같은 길이다 — Enter/Space 는 click 으로 와서 목록을 연다. */
   {
     const btn = $('#explore-sort-btn');
     const menu = $('#explore-sort-menu');
-    let timer = null, longFired = false;
-
-    const startPress = () => {
-      longFired = false;
-      clearTimeout(timer);
-      timer = setTimeout(() => { longFired = true; openSortMenu(); }, 450);
-    };
-    const endPress = () => clearTimeout(timer);
-
-    btn.addEventListener('touchstart', startPress, { passive: true });
-    btn.addEventListener('touchend', endPress, { passive: true });
-    btn.addEventListener('touchcancel', endPress, { passive: true });
-    btn.addEventListener('mousedown', startPress);
-    btn.addEventListener('mouseup', endPress);
-    btn.addEventListener('mouseleave', endPress);
 
     btn.addEventListener('click', () => {
-      if (longFired) { longFired = false; return; }   // 길게 눌러 목록을 연 것이다
-      if (!menu.hidden) { closeSortMenu(); return; }   // 열려 있으면 닫기만
-      cycleSort();
+      if (!menu.hidden) { closeSortMenu(); return; }
+      openSortMenu();
     });
-    /* 키보드 — Enter/Space는 click으로 오므로 순환된다. 목록은 ↓로 연다. */
     btn.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowDown') { e.preventDefault(); openSortMenu(); }
     });
@@ -2853,7 +2871,7 @@ function bindEvents() {
 
   const editProfile = () => { initOnboarding(); showScreen('onboarding'); };
   $('#btn-edit-profile').addEventListener('click', editProfile);
-  $('#btn-my-edit').addEventListener('click', editProfile);
+  { const e = $('#btn-my-edit'); if (e) e.addEventListener('click', editProfile); }
 
   /* 눌러서 넘어가는 영역 — 마우스·손가락뿐 아니라 키보드로도 되어야 한다
      (div라 버튼과 달리 Enter·스페이스가 저절로 먹지 않는다) */
@@ -2879,13 +2897,39 @@ function bindEvents() {
   }, true);
   onTap('#my-profile', editProfile);                     // MY 맨 위 카드 → 프로필 수정
 
+  /* 🔴 브라우저 confirm 을 쓰지 않는다 — 그 창은 앱이 아니라 브라우저가 만드는 것이라
+     무엇이 지워지는지 목록으로 보여 줄 수 없고, 확인·취소 두 버튼밖에 못 넣는다.
+     되돌릴 수 없는 동작이므로 **무엇이 사라지는지 적어 두고** 묻는다. */
   $('#btn-reset').addEventListener('click', () => {
-    if (!confirm('프로필과 신청 내역을 모두 삭제할까요?')) return;
-    [STORAGE_KEY, ...LEGACY_KEYS].forEach((k) => localStorage.removeItem(k));
-    state = { profile: null, applications: [] };
-    if (typeof notifyReset === 'function') notifyReset(); // 알림 설정·알림함도 함께 초기화
-    initOnboarding();
-    showScreen('onboarding');
+    const pop = $('#wallet-pop');
+    const bg = $('#wallet-pop-backdrop');
+    if (!pop) return;
+    const close = () => { pop.classList.remove('show'); if (bg) bg.classList.remove('show'); pop.hidden = true; };
+    pop.innerHTML = `
+      <p class="wp-title wp-danger">데이터 초기화</p>
+      <p class="wp-issue">아래가 이 기기에서 모두 사라집니다. 되돌릴 수 없습니다.</p>
+      <ul class="wp-list">
+        <li>프로필 (학교·성적·자격)</li>
+        <li>신청 내역과 진행 기록</li>
+        <li>알림 설정과 알림함</li>
+      </ul>
+      <p class="wp-note">서류 보관함의 파일은 그대로 남습니다.</p>
+      <div class="wp-actions">
+        <button class="wp-cancel" type="button">취소</button>
+        <button class="wp-go" type="button">초기화</button>
+      </div>`;
+    pop.hidden = false;
+    if (bg) bg.classList.add('show');
+    requestAnimationFrame(() => pop.classList.add('show'));
+    pop.querySelector('.wp-cancel').addEventListener('click', close);
+    pop.querySelector('.wp-go').addEventListener('click', () => {
+      close();
+      [STORAGE_KEY, ...LEGACY_KEYS].forEach((k) => localStorage.removeItem(k));
+      state = { profile: null, applications: [] };
+      if (typeof notifyReset === 'function') notifyReset(); // 알림 설정·알림함도 함께 초기화
+      initOnboarding();
+      showScreen('onboarding');
+    });
   });
 
   // 자동추천
@@ -3035,14 +3079,14 @@ function renderAccountCard() {
   const btnOut = $('#btn-acc-out');
   if (btnOut) btnOut.addEventListener('click', async () => {
     await authSignOut();
-    toast('로그아웃했어요 — 이 기기의 정보는 그대로 남아 있어요');
+    toast('로그아웃 · 이 기기의 정보는 그대로 유지');
     renderMy();
   });
   const btnDel = $('#btn-acc-del');
   if (btnDel) btnDel.addEventListener('click', async () => {
     if (!confirm('서버에 저장된 프로필·신청내역을 지울까요?\n이 기기의 정보는 그대로 남습니다.')) return;
     const r = await authDeleteData();
-    toast(r.ok ? '서버 정보를 지웠어요' : r.error);
+    toast(r.ok ? '서버 정보 삭제 완료' : r.error);
     renderMy();
   });
 }
@@ -3078,7 +3122,7 @@ function authProvidersHtml() {
       return `<button type="button" class="auth-social-btn auth-${esc(p)}" data-oauth="${esc(p)}"
         aria-label="${esc(m.label)}로 계속하기" title="${esc(m.label)}로 계속하기">${m.svg}</button>`;
     }).join('')}</div>
-    <p class="auth-social-note">한 번 연결하면 다음부터는 비밀번호 없이 바로 로그인돼요</p>`;
+    <p class="auth-social-note">한 번 연결하면 다음부터 비밀번호 없이 로그인</p>`;
 }
 
 function renderAuthSheet(errText, okText) {
@@ -3104,7 +3148,7 @@ function renderAuthSheet(errText, okText) {
     mid = emailField + pwField('비밀번호', 'current-password') + `
       <div class="auth-row">
         <label class="auth-remember"><input type="checkbox" id="in-auth-remember" ${remembered ? 'checked' : ''} /> 아이디 저장</label>
-        <button type="button" class="btn-link" id="btn-auth-forgot">비밀번호를 잊으셨나요?</button>
+        <button type="button" class="btn-link" id="btn-auth-forgot">비밀번호 찾기</button>
       </div>`;
   } else if (mode === 'up') {
     mid = emailField + pwField('비밀번호 (6자 이상)', 'new-password') + `
@@ -3122,9 +3166,9 @@ function renderAuthSheet(errText, okText) {
 
   const goLabel = { in: '로그인', up: '가입하기', reset: '재설정 메일 보내기', newpw: '비밀번호 바꾸기' }[mode];
   const swap = mode === 'in'
-    ? '<button class="btn btn-outline" id="btn-auth-swap" style="width:100%">계정이 없어요 — 회원가입</button>'
+    ? '<button class="btn btn-outline" id="btn-auth-swap" style="width:100%">계정 없음 — 회원가입</button>'
     : mode === 'up'
-      ? '<button class="btn btn-outline" id="btn-auth-swap" style="width:100%">이미 계정이 있어요 — 로그인</button>'
+      ? '<button class="btn btn-outline" id="btn-auth-swap" style="width:100%">계정 있음 — 로그인</button>'
       : '<button class="btn btn-outline" id="btn-auth-swap" style="width:100%">← 로그인으로 돌아가기</button>';
 
   $('#detail-sheet').innerHTML = `
@@ -3173,12 +3217,12 @@ async function authSubmit() {
   const pw = pwEl ? pwEl.value : '';
 
   if ((mode === 'in' || mode === 'up') && (!email || !pw)) {
-    authShowError('이메일과 비밀번호를 모두 입력해 주세요'); return;
+    authShowError('이메일과 비밀번호 입력 필요'); return;
   }
-  if (mode === 'reset' && !email) { authShowError('이메일을 입력해 주세요'); return; }
-  if (mode === 'newpw' && !pw) { authShowError('새 비밀번호를 입력해 주세요'); return; }
+  if (mode === 'reset' && !email) { authShowError('이메일 입력 필요'); return; }
+  if (mode === 'newpw' && !pw) { authShowError('새 비밀번호 입력 필요'); return; }
   if (mode === 'up' && !$('#in-auth-agree').checked) {
-    authShowError('약관과 개인정보처리방침에 동의해 주세요'); return;
+    authShowError('약관·개인정보처리방침 동의 필요'); return;
   }
 
   const btn = $('#btn-auth-go');
@@ -3199,18 +3243,18 @@ async function authSubmit() {
      팀원이 아닌 주소로는 거부하는데, 그 거부가 앱에는 성공으로 보인다. 그래서
      "보냈습니다"라고 단정하지 않고 안 왔을 때 무엇을 하면 되는지까지 적는다. */
   if (mode === 'reset') {
-    renderAuthSheet(null, '재설정 링크를 보내 달라고 요청했어요. 메일함(스팸함도)을 확인해 주세요.\n'
+    renderAuthSheet(null, '재설정 링크 요청 완료. 메일함(스팸함도)을 확인해 주세요.\n'
       + '몇 분 안에 안 오면 아직 메일 발송이 준비되지 않은 것이니 관리자에게 알려 주세요.');
     return;
   }
   if (mode === 'newpw') {
     closeSheet();
-    toast('비밀번호를 바꿨어요');
+    toast('비밀번호 변경 완료');
     renderMy();
     return;
   }
   if (r.needsEmailConfirm) {
-    renderAuthSheet(null, '가입 확인 메일을 보냈어요 — 메일의 링크를 누른 뒤 로그인해 주세요.');
+    renderAuthSheet(null, '가입 확인 메일 발송 — 메일의 링크를 누른 뒤 로그인해 주세요.');
     return;
   }
 
@@ -3220,7 +3264,7 @@ async function authSubmit() {
   else setRememberedEmail(email);          // 가입한 사람은 그 주소를 기억해 둔다
 
   closeSheet();
-  toast('로그인했어요 — 이제 기기를 바꿔도 이어져요');
+  toast('로그인 완료 · 기기를 바꿔도 이어짐');
   /* 🔴 순서가 중요하다 — **먼저** 서버와 맞춘다. 새 기기에서는 이 줄에서 프로필이
      처음 생기므로, 화면 그리기를 앞에 두면 아직 프로필이 없는 상태로 그리게 된다. */
   await syncAfterLoad();
@@ -3256,7 +3300,7 @@ if (state.profile) {
 if (typeof authCaptureFromUrl === 'function') {
   authCaptureFromUrl().then((kind) => {
     if (kind === 'recovery') { openAuthSheet('newpw'); return; }   // 새 비밀번호를 정할 차례
-    if (kind === 'signin') { toast('로그인했어요'); renderMy(); }
+    if (kind === 'signin') { toast('로그인 완료'); renderMy(); }
     if (typeof syncAfterLoad === 'function') syncAfterLoad();
   }).catch(() => {
     if (typeof syncAfterLoad === 'function') syncAfterLoad();

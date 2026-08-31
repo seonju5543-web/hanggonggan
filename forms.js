@@ -55,10 +55,10 @@ const FORM_TEMPLATES = {
             sugg: ['과제·아이디어 정리에 대화형 AI를 주 3회 이상 활용하고 있습니다.',
               '교내 프로젝트에서 이미지 생성 AI로 포스터를 제작해 봤습니다.'] },
           { id: 'exp', label: 'AI 관련 활동 경험', type: 'checks+text',
-            q: 'AI 관련 경험이 있다면 모두 고르세요 (없으면 선택하지 않아도 돼요)',
+            q: 'AI 관련 경험이 있다면 (해당 항목 모두 선택 · 없으면 선택 안 함)',
             options: ['AI·SW 관련 수업 수강 경험', 'AI·SW 관련 자격증 또는 교육 수료 경험',
               '공모전, 프로젝트, 동아리, 대외활동 경험', '기타 AI·디지털 도구 활용 경험'],
-            textLabel: '작성', tq: '경험 내용 (없으면 비워두세요 — "없음"으로 기재돼요)',
+            textLabel: '작성', tq: '경험 내용 (없으면 비워두세요 — "없음"으로 기재)',
             sugg: ['교양 수업에서 AI 리터러시 과목을 이수했습니다.'] , emptyText: '없음' },
         ],
       },
@@ -465,7 +465,7 @@ function downloadFormDoc(tpl, p, ans) {
   document.body.appendChild(a);
   a.click();
   a.remove();
-  toast('문서 파일(.doc)로 저장했습니다 — 한글·워드에서 열 수 있어요');
+  toast('문서 파일(.doc)로 저장했습니다 — 한글·워드에서 열기 가능');
 }
 
 function printFormDoc(tpl, p, ans) {

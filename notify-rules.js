@@ -37,11 +37,11 @@ var NOTIFY_RULES = (function () {
       desc: '새로 등록된 공고가 내 자격에 맞으면 알립니다', on: true },
     { id: 'deadline', icon: NF_ICON.clock, label: '마감 하루 전 · 마감 당일',
       desc: '신청할 수 있는 공고의 마감이 임박하면 알립니다', on: true },
-    { id: 'submit', icon: NF_ICON.up, label: '제출 리마인드',
+    { id: 'submit', icon: NF_ICON.up, label: '제출 기록 안 한 공고',
       desc: '준비만 하고 아직 공식 제출을 기록하지 않은 공고를 알립니다', on: true },
-    { id: 'feed', icon: NF_ICON.school, label: '우리 학교 새 공고',
+    { id: 'feed', icon: NF_ICON.school, label: '우리 학교 게시판 새 공고',
       desc: '우리 학교 게시판에 새 장학 공고가 올라오면 묶어서 알립니다', on: true },
-    { id: 'result', icon: NF_ICON.mail, label: '결과 기록 리마인드',
+    { id: 'result', icon: NF_ICON.mail, label: '마감 지난 공고 결과 기록',
       desc: '제출한 공고의 접수 마감이 지나면 결과를 기록하도록 알립니다', on: true },
   ];
 
@@ -204,7 +204,7 @@ var NOTIFY_RULES = (function () {
           type: 'newMatch',
           title: '새 장학 공고 ' + fresh.length + '건',
           body: fresh.slice(0, 2).map(function (s) { return s.name; }).join(', ')
-            + ' 외 ' + (fresh.length - 2) + '건 · 내 조건에 맞는 공고예요',
+            + ' 외 ' + (fresh.length - 2) + '건 · 내 조건에 맞는 공고',
           url: './?screen=explore',
         });
       } else {
@@ -244,8 +244,8 @@ var NOTIFY_RULES = (function () {
           title: (d === 1 ? '내일 마감 · ' : '오늘 마감 · ') + s.name,
           body: app
             ? '준비해 둔 서류로 ' + (d === 1 ? '내일' : '오늘') + ' 안에 제출하세요.'
-            : (d === 1 ? '아직 신청 준비 전이에요. 지금 준비하면 내일 제출할 수 있어요.'
-                       : '오늘이 마지막 날이에요. 지금 바로 준비해 보세요.'),
+            : (d === 1 ? '아직 신청 준비 전 · 지금 준비하면 내일 제출 가능.'
+                       : '오늘이 마지막 날 · 지금 바로 준비.'),
           schId: s.id,
         });
       });
@@ -263,7 +263,7 @@ var NOTIFY_RULES = (function () {
           key: d === 0 ? 'sub:' + s.id + ':last' : 'sub:' + s.id,
           type: 'submit',
           title: '제출 기록 없음 · ' + s.name,
-          body: '마감 ' + (d === 0 ? '당일' : 'D-' + d) + '이에요. 제출을 마쳤다면 앱에 기록해 주세요.',
+          body: '마감 ' + (d === 0 ? '당일' : 'D-' + d) + ' · 제출을 마쳤다면 앱에 기록.',
           schId: s.id,
         });
       });
@@ -304,7 +304,7 @@ var NOTIFY_RULES = (function () {
           key: 'res:' + s.id,
           type: 'result',
           title: '결과 기록하기 · ' + s.name,
-          body: '접수 마감 후 2주가 지났어요. 선정 결과를 앱에 기록하면 신청 내역이 정확해져요.',
+          body: '접수 마감 후 2주 경과. 선정 결과를 앱에 기록하면 신청 내역이 정확해져요.',
           schId: s.id,
         });
       });

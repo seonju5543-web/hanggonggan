@@ -4,64 +4,85 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:        #f4f5f8;
-  --surface:   #ffffff;
-  --text:      #12161f;
-  --text-sub:  #4a5568;
-  --text-weak: #8b93a3;
-  --line:      rgba(18, 22, 31, 0.07);
-  --primary:   #2f6bff;
-  --primary-dark: #1f53d6;
-  --primary-weak: #eef3ff;
-  --navy-1:    #101d3d;
-  --navy-2:    #1c3266;
-  --green:     #0f9d63;
-  --green-weak:#e7f7f0;
-  --orange:    #d97a06;
-  --orange-weak:#fdf3e3;
-  --red:       #e0503e;
-  --red-weak:  #fdedeb;
-  --gold:      #d9b56a;
-  /* 🔴 모서리 둥근 정도는 **이 여섯 단계 말고 쓰지 않는다** (2026-08-30).
-     고치기 전 실측: 3·6·7·8·9·10·12·14px 이 제각각이었다. 사람 눈에는 2px 차이가
-     안 보이는데 나란히 놓이면 '왜인지 안 맞는' 느낌만 남는다.
-     새 요소를 만들 때 숫자를 직접 쓰지 말고 여기서 고를 것.
-     ⚠️ 원형(50%)은 토큰이 아니다 — 크기에 따라 달라져야 하는 값이라 그대로 쓴다.
-     🔴 여섯 개를 **전부** 여기 두어야 한다. 2026-08-30 에 선언이 빠진 채로
-        `var(--radius-pill)` 같은 참조만 나가서 **35곳이 통째로 각졌다**
-        (히어로 카드·필터 칩·배지·알약 버튼·시트). CSS 는 없는 변수를 만나면
-        조용히 0 으로 떨어뜨린다 — 오류를 내지 않으니 눈으로 봐야 발견된다. */
-  --radius-hair: 3px;    /* 진행 막대·시트 손잡이·스크롤바 */
-  --radius-xs:   8px;    /* 배지·태그·칩 */
-  --radius-sm: 14px;     /* 리스트 항목·작은 버튼·중간 블록 */
-  --radius:    20px;     /* 카드 */
-  --radius-lg:  26px;    /* 시트·히어로 */
-  --radius-pill: 999px;  /* 알약 버튼·필터 칩·숫자 배지 */
-  --shadow:    0 1px 2px rgba(16, 24, 40, 0.04), 0 6px 20px rgba(16, 24, 40, 0.06);  /* 얹힌 것 — 카드 */
-  --shadow-lift: 0 2px 6px rgba(16, 24, 40, 0.05), 0 14px 34px rgba(16, 24, 40, 0.10); /* 떠 있는 것 — 팝오버·토스트 */
-  --shadow-sheet: 0 -12px 44px rgba(10, 14, 24, 0.24);  /* 아래에서 올라오는 시트 (그림자가 위로 간다) */
-  --ring:        0 0 0 3px rgba(47, 107, 255, 0.14);    /* 고른 것·포커스 — 그림자가 아니라 테두리 링 */
-  --cutout:      0 0 0 2px var(--bg);                   /* 배경을 오려낸 테두리 (알림 점이 종에 겹칠 때) */
-  --knob:        0 1px 3px rgba(16, 24, 40, 0.25);      /* 스위치 손잡이 — 유일하게 '진짜 작은 그림자' */
+  /* ══ Taste 리팩토링 (2026-08-31) — 배포판 팔레트 정리 ═══════════════════
+     진단: ① --primary var(--accent) 는 채도 100% 의 'AI 블루'이고 --grad-navy 는
+     보라·파랑 그라데이션이라, 이 둘이 화면 전체에 AI 지문을 남기고 있었다.
+     ② 강조색이 다섯(파랑·초록·주황·빨강·금)이라 무엇이 중요한지가 흐려졌다.
+     ③ 회색이 차가운 계열(#f6f4f0)과 따뜻한 계열(--gold)로 섞여 있었다.
 
-  /* ── 글자 크기 — 9단 (2026-08-31). 정리 전에는 **27종**이 섞여 위계가 흐렸다 ─────
-     🔴 옮긴 폭은 대부분 0.5~1px 라 눈에 안 띄지만, 이제 '같은 역할이면 같은 크기'다.
-     본문 --t-md 를 15px 이 아니라 14.5px 로 둔 것은 의도다 — 14px 이 가장 많이 쓰이던
-     크기라 15px 으로 올리면 카드 안 한글이 줄바꿈된다(그 반대도 마찬가지).
-     ⚠️ 모서리 토큰과 **같은 사고**를 피할 것: 선언과 참조를 반드시 함께 내보낸다
-        (2026-08-30 에 선언만 빠져 35곳이 각졌다 — CSS 는 조용히 0 으로 떨어뜨린다). */
-  --t-2xs: 11.5px;  /* 배지·미세 라벨 */
-  --t-xs:  12.5px;  /* 보조 설명 */
-  --t-sm:  13.5px;  /* 부연·메타 */
-  --t-md:  14.5px;  /* 본문 */
-  --t-lg:  17px;    /* 카드 제목 */
-  --t-xl:  18.5px;  /* 구역 제목 */
-  --t-2xl: 21px;    /* 화면 제목 */
-  --t-3xl: 27px;    /* 큰 숫자 */
-  --t-hero: 34px;   /* 히어로 — 42px 였다. 그라데이션을 뺀 뒤에도 크기가 과했다 */
+     처방: **중성 = 따뜻한 잉크 한 계열 · 강조 = 놋쇠(brass) 하나.**
+     학사모 금색이 이미 이 앱의 유일한 고유색이었으므로 그것을 강조로 승격하고,
+     동작(누를 수 있음)은 채도를 뺀 잉크가 맡는다. 뜻을 가진 색(합격·마감·경고)만
+     남기되 전부 채도를 60% 아래로 낮춰 중성 위에 얹히게 했다. */
 
-  /* 큰 남색 패널 한 벌 — 그라데이션은 여기 한 곳에서만 정의한다 */
-  --grad-navy: linear-gradient(155deg, #172a5e 0%, #101d3d 58%, #0a1226 100%);
+  /* 중성 — 따뜻하게 틴트한 한 계열 */
+  --bg:        #f6f4f0;
+  --surface:   #fffefc;
+  --surface-2: #f1eee8;
+  --text:      #191713;   /* 잉크 — 흰 바탕 위 15.8:1 */
+  --text-sub:  #57524a;   /* 7.4:1 */
+  --text-weak: #8b857b;   /* 3.7:1 — 안 읽어도 되는 글자에만 */
+  --line:      rgba(25, 23, 19, 0.09);
+  --rule:      rgba(25, 23, 19, 0.14);
+
+  /* 동작 = 잉크. 파랑이 아니다 */
+  --primary:      #23201a;
+  --primary-dark: #0d0c09;
+  --primary-weak: rgba(25, 23, 19, 0.06);
+
+  /* 유일한 강조 — 놋쇠. 채도 58%, 흰 바탕 위 4.6:1 이라 글자에도 쓸 수 있다 */
+  --accent:      #8a6a1f;
+  --accent-soft: rgba(138, 106, 31, 0.10);
+  --accent-line: rgba(138, 106, 31, 0.26);
+  --gold:        #b8912f;   /* 마스코트 학사모 — 그림 안의 색이라 따로 둔다 */
+
+  /* 뜻을 가진 색만 남기고 전부 채도를 낮췄다 (원래는 형광에 가까웠다) */
+  --green:      #3d6b47;  --green-weak:  #e9efe8;
+  --orange:     #8a5a12;  --orange-weak: #f4ede0;
+  --red:        #8f3a2e;  --red-weak:    #f5e9e6;
+  --navy-1:     #23201a;  --navy-2:      #3a352c;
+
+  /* 큰 패널 — 보라·파랑 그라데이션을 걷어내고, 잉크 위에 **은은한 방사형 빛** 하나.
+     45도 균일 그라데이션은 스킬이 지적한 전형적 지문이라 쓰지 않는다. */
+  --grad-navy:
+    radial-gradient(120% 130% at 78% -18%, rgba(184, 145, 47, 0.20) 0%, rgba(184, 145, 47, 0) 58%),
+    radial-gradient(90% 90% at -10% 108%, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0) 60%),
+    #23201a;
+
+  /* 모서리 — 여섯 단계 유지. 안쪽은 더 조이고 바깥은 더 부드럽게(중첩 반경 규칙) */
+  --radius-hair: 3px;
+  --radius-xs:   9px;
+  --radius-sm:  13px;
+  --radius:     19px;
+  --radius-lg:  27px;
+  --radius-pill: 999px;
+
+  /* 그림자 — 바탕의 색조를 띠게 한다. 순수 검정 저투명도는 회색 때가 낀 것처럼 보인다.
+     빛의 방향은 화면 전체에서 위쪽 하나로 통일했다. */
+  --shadow:       0 1px 2px rgba(58, 48, 28, 0.05), 0 8px 22px rgba(58, 48, 28, 0.07);
+  --shadow-lift:  0 2px 6px rgba(58, 48, 28, 0.06), 0 18px 40px rgba(58, 48, 28, 0.13);
+  --shadow-sheet: 0 -14px 48px rgba(40, 33, 20, 0.22);
+  --ring:         0 0 0 3px rgba(138, 106, 31, 0.20);
+  --cutout:       0 0 0 2px var(--bg);
+  --knob:         0 1px 3px rgba(58, 48, 28, 0.26);
+
+  /* 글자 크기 9단 — 그대로 둔다(앞선 세션이 27종에서 줄여 놓은 자산이다).
+     히어로만 조금 키우고 자간을 조였다: 큰 글자는 자간을 좁혀야 덩어리로 읽힌다. */
+  --t-2xs: 11.5px;
+  --t-xs:  12.5px;
+  --t-sm:  13.5px;
+  --t-md:  14.5px;
+  --t-lg:  17px;
+  --t-xl:  18.5px;
+  --t-2xl: 21px;
+  --t-3xl: 27px;
+  --t-hero: 38px;
+
+  /* 움직임 — 스프링에 가까운 곡선 하나로 통일. 요소마다 다른 곡선을 쓰면 '덜 만든 앱'이 된다 */
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.44, 1);
+  --dur: 0.22s;
+  --dur-slow: 0.42s;
 }
 
 html { -webkit-text-size-adjust: 100%; }
@@ -134,7 +155,7 @@ input::placeholder { color: var(--text-weak); }
 .btn-primary:disabled { background: #c9d2de; box-shadow: none; cursor: default; }
 .btn-white {
   background: rgba(255, 255, 255, 0.97);
-  color: #16264f;
+  color: #23201a;
   box-shadow: var(--shadow);
 }
 .btn-white:disabled { color: var(--text-weak); cursor: default; box-shadow: none; }
@@ -179,7 +200,7 @@ input::placeholder { color: var(--text-weak); }
   margin: 0 auto 18px;
   border-radius: var(--radius-lg);
   background: var(--grad-navy);
-  color: #e8effe;
+  color: #f6f0e2;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -354,7 +375,7 @@ input::placeholder { color: var(--text-weak); }
   width: 44px; height: 44px;
   border-radius: 50%;
   background: var(--navy-1);
-  color: #e8effe;
+  color: #f6f0e2;
   font-size: var(--t-lg);
   font-weight: 800;
   display: flex;
@@ -369,8 +390,8 @@ input::placeholder { color: var(--text-weak); }
   position: relative;
   overflow: hidden;
   background:
-    radial-gradient(120% 140% at 85% -20%, rgba(94, 141, 255, 0.55) 0%, rgba(94, 141, 255, 0) 55%),
-    radial-gradient(90% 90% at -10% 110%, rgba(47, 107, 255, 0.35) 0%, rgba(47, 107, 255, 0) 60%),
+    radial-gradient(120% 140% at 85% -20%, rgba(184, 145, 47, 0.55) 0%, rgba(184, 145, 47, 0) 55%),
+    radial-gradient(90% 90% at -10% 110%, rgba(138, 106, 31, 0.35) 0%, rgba(138, 106, 31, 0) 60%),
     var(--grad-navy);
   border-radius: var(--radius-lg);
   padding: 28px 24px 24px;
@@ -544,7 +565,7 @@ input::placeholder { color: var(--text-weak); }
 .apps-summary { margin-bottom: 16px; }
 .summary-card {
   background:
-    radial-gradient(110% 130% at 90% -20%, rgba(94, 141, 255, 0.4) 0%, rgba(94, 141, 255, 0) 55%),
+    radial-gradient(110% 130% at 90% -20%, rgba(184, 145, 47, 0.4) 0%, rgba(184, 145, 47, 0) 55%),
     var(--grad-navy);
   border-radius: var(--radius);
   padding: 20px;
@@ -744,7 +765,7 @@ input::placeholder { color: var(--text-weak); }
   font-size: var(--t-sm);
   color: #2c447e;
   background: var(--primary-weak);
-  border: 1px solid rgba(47, 107, 255, 0.14);
+  border: 1px solid rgba(138, 106, 31, 0.14);
   border-radius: var(--radius-sm);
   padding: 13px;
   margin: 18px 0 8px;
@@ -914,7 +935,7 @@ textarea:focus {
   flex: 1;
   padding: 13px 8px;
   font-size: var(--t-md);
-  border: 1.5px solid rgba(47, 107, 255, 0.35);
+  border: 1.5px solid rgba(138, 106, 31, 0.35);
   color: var(--primary);
   background: var(--surface);
   border-radius: var(--radius-sm);
@@ -948,7 +969,7 @@ textarea:focus {
   word-break: break-word;
 }
 .fd-table th { background: #f1f1f1; width: 27%; font-weight: 600; }
-.fd-table td[contenteditable="true"]:focus { outline: 2px solid var(--primary); background: #f5f9ff; }
+.fd-table td[contenteditable="true"]:focus { outline: 2px solid var(--primary); background: rgba(138,106,31,.06); }
 .fd-inner { width: 70%; border-collapse: collapse; }
 .fd-inner th, .fd-inner td { border: 1px solid #777; padding: 4px 8px; font-size: var(--t-xs); }
 .fd-pledge { margin-top: 16px; font-size: var(--t-xs); text-align: center; color: #111; }
@@ -1023,7 +1044,7 @@ textarea:focus {
   transition: background 0.15s;
 }
 .nf-item:hover { background: rgba(18, 22, 31, 0.02); }
-.nf-item.nf-unread { background: var(--primary-weak); border-color: rgba(47, 107, 255, 0.18); }
+.nf-item.nf-unread { background: var(--primary-weak); border-color: rgba(138, 106, 31, 0.18); }
 .nf-text { display: grid; gap: 3px; min-width: 0; }
 .nf-title { font-size: var(--t-md); font-weight: 700; letter-spacing: -0.015em; }
 .nf-body { font-size: var(--t-sm); color: var(--text-sub); line-height: 1.5; }
@@ -1357,7 +1378,7 @@ textarea:focus {
   color: #fff;
   font-size: 13px;
   font-weight: 700;
-  box-shadow: 0 3px 10px rgba(47, 107, 255, 0.28);
+  box-shadow: 0 3px 10px rgba(138, 106, 31, 0.28);
 }
 .chat-act:active { transform: scale(0.97); }
 
@@ -1500,7 +1521,7 @@ textarea.essay-fu-in { width: 100%; font-size: var(--t-sm); line-height: 1.6; pa
 .essay-urge b { color: var(--primary-dark); }
 
 /* 글이 들어간 칸은 눈에 띄게 — 학생이 '이건 내가 쓴 글'로 착각하면 안 된다 */
-textarea.essay-drafted { border-color: var(--primary); background: #fbfcff; line-height: 1.7; }
+textarea.essay-drafted { border-color: var(--primary); background: #fffefc; line-height: 1.7; }
 .essay-flag { color: var(--primary); font-weight: 600; margin-top: 6px; text-align: left; }
 
 /* '고칠 곳' — 규칙집(data/essay-playbook.json)으로 되받아 검사한 결과.
@@ -1514,7 +1535,7 @@ textarea.essay-drafted { border-color: var(--primary); background: #fbfcff; line
 .essay-fix li + li { margin-top: 5px; }
 .essay-fix li::before { content: '✎ '; color: var(--orange); font-weight: 700; }
 /* 이 공고가 정한 작성 규정 배너 (2026-08-24) — 지키지 않으면 심사 제외·감점되는 규정 */
-.essay-rules-banner { border: 1px solid var(--line, #e5e7eb); border-radius: var(--radius-sm); padding: 12px 14px; margin: 10px 0; background: var(--card-bg, #fff); }
+.essay-rules-banner { border: 1px solid var(--line, rgba(25,23,19,.12)); border-radius: var(--radius-sm); padding: 12px 14px; margin: 10px 0; background: var(--card-bg, #fff); }
 .essay-rules-banner > b { display: block; margin-bottom: 6px; font-size: var(--t-sm); }
 .essay-rules-banner ul { margin: 6px 0 0; padding-left: 18px; }
 .essay-rules-banner li { font-size: var(--t-xs); line-height: 1.5; margin: 2px 0; }
@@ -1544,14 +1565,14 @@ textarea.essay-drafted { border-color: var(--primary); background: #fbfcff; line
 .essay-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
 .btn-sm { font-size: var(--t-xs); padding: 6px 12px; min-height: 32px; border-radius: var(--radius-xs); }
 .btn-ghost {
-  background: transparent; border: 1px solid var(--line, #e5e7eb); color: var(--text-sub);
+  background: transparent; border: 1px solid var(--line, rgba(25,23,19,.12)); color: var(--text-sub);
 }
 .btn-ghost:hover { background: var(--surface, #f4f5f7); }
 
 /* 바뀐 곳(diff) — 🟩 표시가 이번에 새로 들어온 부분 */
 .essay-diff {
   margin-top: 8px; padding: 10px 12px; border-radius: var(--radius-sm);
-  background: var(--card-bg, #fff); border: 1px solid var(--line, #e5e7eb);
+  background: var(--card-bg, #fff); border: 1px solid var(--line, rgba(25,23,19,.12));
 }
 .essay-diff-body {
   white-space: pre-wrap; word-break: break-word; font-size: var(--t-sm); line-height: 1.7;
@@ -1579,7 +1600,7 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
    '제출 가능'의 선을 만든다. ✗ 는 막을 것(빈칸·블라인드) · △ 는 제안. */
 .essay-submit-check {
   margin: 14px 0 10px; padding: 12px 14px;
-  border: 1px solid var(--line, #e5e7eb); border-radius: var(--radius-sm); background: var(--card-bg, #fff);
+  border: 1px solid var(--line, rgba(25,23,19,.12)); border-radius: var(--radius-sm); background: var(--card-bg, #fff);
 }
 .esc-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
 .esc-head > b { font-size: var(--t-sm); }
@@ -1639,7 +1660,7 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
 .bulkbar {
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
   padding: 10px 14px; margin-bottom: 12px;
-  background: var(--surface-2, #f4f6f8); border-radius: var(--radius-sm);
+  background: var(--surface-2, #f1eee8); border-radius: var(--radius-sm);
 }
 /* 🔴 전역 `appearance:none`(style.css:62) 때문에 체크박스를 직접 그려야 한다 —
    그냥 두면 **동그란 빈 원**만 보이고 체크 표시가 안 뜬다(CLAUDE.md 기록).
@@ -1748,7 +1769,7 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
 /* 동의 줄 — 온보딩 특별자격 아래, 가입 시트 안. 기존 .check-item 위에 얹는다 */
 .consent-item {
   align-items: flex-start; line-height: 1.6;
-  background: var(--primary-weak); border-color: rgba(47, 107, 255, 0.18);
+  background: var(--primary-weak); border-color: rgba(138, 106, 31, 0.18);
 }
 .consent-item span { font-size: var(--t-sm); }
 .consent-item em { display: block; margin-top: 4px; font-size: var(--t-xs); color: var(--text-sub); font-style: normal; }
@@ -1837,7 +1858,7 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
 .badge-fit.fit-orange { background: #fff1e3; color: #b54708; }
 .badge-fit.fit-yellow { background: #fdf6d3; color: #8a6100; }
 .badge-fit.fit-green  { background: #e6f6ec; color: #17683a; }
-.badge-fit.fit-blue   { background: #e8f0ff; color: #1c47b8; }
+.badge-fit.fit-blue   { background: rgba(138,106,31,.10); color: #1c47b8; }
 
 /* ── 장학금 찾기 정렬 버튼 (2026-08-26) ────────────────────────────────
    🔴 `.icon-btn`을 그대로 쓰지 않는다 — padding 8 + svg 22 = 38px라 터치 타깃 44px에
@@ -1875,7 +1896,7 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
   color: var(--text-sub); cursor: pointer; white-space: nowrap;
 }
 .sort-opt:hover { background: rgba(18, 22, 31, .05); }
-.sort-opt[aria-checked="true"] { background: var(--primary-weak, #e8f0ff); color: var(--primary, #2f6bff); }
+.sort-opt[aria-checked="true"] { background: var(--primary-weak, rgba(138,106,31,.10)); color: var(--primary, var(--accent)); }
 
 /* ---------- 금액 상세 (2026-08-27) ----------
    홈 '최대 N원'을 누르면 열리는 시트. 갈래를 넷으로 나눠 각 줄이 원문 근거를 갖는다.
@@ -1898,7 +1919,7 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
 
 .ad-row { background: var(--surface); border-radius: var(--radius-sm); padding: 11px 13px;
           margin-bottom: 6px; box-shadow: var(--shadow); }
-.ad-row.dim { opacity: .6; box-shadow: none; background: #fafbfc; }
+.ad-row.dim { opacity: .6; box-shadow: none; background: #f6f4f0; }
 .ad-top { display: flex; gap: 8px; align-items: baseline; }
 .ad-name { font-size: var(--t-sm); font-weight: 700; letter-spacing: -.02em; flex: 1; line-height: 1.4; }
 .ad-val  { font-size: var(--t-md); font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -1920,9 +1941,9 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
 .ad-row summary::after, .ad-grp > details > summary::after { content: '⌄'; font-size: var(--t-sm); color: var(--text-weak); line-height: 1; }
 .ad-row details[open] summary::after, .ad-grp > details[open] > summary::after { content: '⌃'; }
 .ad-src { font-size: var(--t-2xs); color: var(--text-sub); margin-top: 5px; padding: 7px 10px;
-          background: #f7f8fb; border-left: 2.5px solid #d7dbe4; border-radius: 0 var(--radius-xs) var(--radius-xs) 0; line-height: 1.55; }
+          background: #f6f4f0; border-left: 2.5px solid #d7dbe4; border-radius: 0 var(--radius-xs) var(--radius-xs) 0; line-height: 1.55; }
 .ad-list { font-size: var(--t-2xs); color: var(--text-sub); margin-top: 5px; padding: 7px 10px;
-           background: #f7f8fb; border-radius: var(--radius-xs); line-height: 1.75; }
+           background: #f6f4f0; border-radius: var(--radius-xs); line-height: 1.75; }
 .ad-list span { display: block; }
 .ad-grp > details > .ad-row { margin-top: 6px; }
 .ad-foot { font-size: var(--t-2xs); color: var(--text-weak); text-align: center; margin-top: 18px; line-height: 1.6; }
@@ -1939,9 +1960,9 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
 
 /* 금액 상세에서 넘어온 카드를 잠깐 짚어 준다 — 긴 목록에서 어디로 왔는지 알 수 있게 */
 @keyframes card-flash {
-  0%   { box-shadow: 0 0 0 0 rgba(47, 107, 255, .45); }
-  35%  { box-shadow: 0 0 0 5px rgba(47, 107, 255, .18); }
-  100% { box-shadow: 0 0 0 0 rgba(47, 107, 255, 0); }
+  0%   { box-shadow: 0 0 0 0 rgba(138, 106, 31, .45); }
+  35%  { box-shadow: 0 0 0 5px rgba(138, 106, 31, .18); }
+  100% { box-shadow: 0 0 0 0 rgba(138, 106, 31, 0); }
 }
 .sch-card.flash { animation: card-flash 1.6s ease-out; }
 @media (prefers-reduced-motion: reduce) { .sch-card.flash { animation: none; outline: 2px solid var(--primary); } }
@@ -2030,3 +2051,585 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
 
 /* 교내/교외 + '검수 전' 을 한 칸에 합친 조용한 배지 (상세 시트 머리) */
 .badge-kind { background: rgba(18, 22, 31, 0.05); color: var(--text-sub); font-weight: 600; }
+
+/* ══════════════════════════════════════════════════════════════════════
+   Taste 리팩토링 — 마감 층 (2026-08-31)
+   배포판 구조·기능은 그대로 두고, 진단서에서 나온 것만 고친다.
+   기존 규칙을 지우지 않고 **덧대는** 방식이라 되돌리기 쉽다.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── ① 활자 ── 큰 글자는 자간을 조이고, 숫자는 자릿수를 맞추고, 줄바꿈을 다듬는다 */
+body { letter-spacing: -0.014em; text-rendering: optimizeLegibility; }
+h1, h2, h3, .sheet-title, .hero-amount, .summary-amount, .my-name {
+  letter-spacing: -0.032em;
+  line-height: 1.24;
+  text-wrap: balance;          /* 제목 마지막 줄에 한 낱말만 남는 것을 막는다 */
+}
+p, li, .sch-amount, .sheet-summary, .dp-note, .field-hint { text-wrap: pretty; }
+/* 숫자가 세로로 쌓이는 곳은 자릿수를 맞춘다 — 금액·D-day·적합도 */
+.hero-amount, .summary-amount, .badge-dday, .badge-fit, .my-grid strong,
+.sch-amount, .fit-pct, .nf-badge { font-variant-numeric: tabular-nums; }
+/* 400/700 두 굵기만 쓰던 것을 500·600 까지 넓혀 위계를 만든다 */
+.sch-provider, .sheet-provider, .field-hint, .dp-note, .my-line { font-weight: 450; }
+.link-btn, .filter-chip, .chip, .nav-item { font-weight: 550; }
+
+/* ── ② 질감 ── 완전한 평면은 차갑다. 아주 옅은 결을 한 겹 깐다(포인터 통과) */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.4;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+}
+.app { background: var(--bg); }
+
+/* ── ③ 상호작용 ── 진단: 2,032줄에 :hover 9개 · :active 9개 · focus-visible 1개.
+   누를 수 있는 것 전부에 hover·press·focus 를 준다. 접근성은 선택이 아니다. */
+.btn, .chip, .filter-chip, .icon-btn, .nav-item, .my-menu-item, .wallet-btn,
+.sch-card, .link-btn, .sort-btn, .btn-ghost, .auth-social-btn, .dock-item {
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease),
+              border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease),
+              transform 0.14s var(--ease);
+}
+.btn:active, .chip:active, .filter-chip:active, .icon-btn:active,
+.my-menu-item:active, .wallet-btn:active { transform: scale(0.975); }
+.sch-card:active { transform: scale(0.99); }
+.sch-card:hover { box-shadow: var(--shadow-lift); transform: translateY(-1px); }
+.icon-btn:hover { background: var(--primary-weak); color: var(--text); }
+.link-btn:hover { color: var(--accent); }
+.my-menu-item:hover { background: var(--primary-weak); }
+
+/* 키보드로 다니는 사람에게 지금 어디인지 보여 준다 — 원래 이 앱에 한 곳뿐이었다 */
+:where(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+html { scroll-behavior: smooth; }
+
+/* ── ④ 색 정리 ── 파랑을 쓰던 자리를 잉크와 놋쇠로 나눈다 */
+.btn-primary { background: var(--primary); color: #fdfbf6; box-shadow: 0 6px 18px rgba(35, 32, 26, 0.22); }
+.btn-primary:hover { background: var(--primary-dark); box-shadow: 0 8px 24px rgba(35, 32, 26, 0.28); }
+.btn-primary:disabled { background: rgba(25, 23, 19, 0.12); color: rgba(25, 23, 19, 0.36); box-shadow: none; }
+.btn-outline { border-color: var(--rule); color: var(--text); }
+.btn-outline:hover { border-color: var(--text); background: var(--primary-weak); }
+.link-btn, .btn-link, .my-edit-hint, .acc-on { color: var(--accent); }
+input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: var(--ring); }
+.chip.active, .filter-chip.active {
+  background: var(--primary); border-color: var(--primary); color: #fdfbf6;
+  box-shadow: 0 4px 14px rgba(35, 32, 26, 0.20);
+}
+.check-item:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); box-shadow: none; }
+.check-item input:checked { border-color: var(--accent); background-color: var(--accent); }
+.badge-applied, .badge-program { background: var(--accent-soft); color: var(--accent); }
+.badge-fit { background: var(--accent-soft); color: var(--accent); }
+.nav-item.active { color: var(--text); }
+.bell-badge, .nf-dot { background: var(--accent); }
+
+/* ── ⑤ 표면 ── 테두리+그림자+흰배경의 판박이 카드를 줄인다.
+   높이(그림자)는 **정말 떠 있어야 하는 것**에만 남기고, 목록 카드는 결로 나눈다. */
+.sch-card {
+  border: 1px solid var(--line);
+  box-shadow: none;
+  background: var(--surface);
+}
+.card-list { gap: 10px; }
+.my-card, .summary-card { box-shadow: none; border: 1px solid var(--line); }
+.sheet { box-shadow: var(--shadow-sheet); }
+/* 유리는 흐림만으로는 안 된다 — 안쪽 1px 테두리가 있어야 가장자리가 굴절돼 보인다 */
+.bottom-nav {
+  background: rgba(255, 254, 252, 0.82);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  backdrop-filter: blur(20px) saturate(1.6);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 -1px 0 var(--line);
+  border-top: 0;
+}
+
+/* ── ⑥ 등장 ── 한꺼번에 튀어나오지 않고 순서대로 도착한다 */
+@keyframes taste-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.screen { animation: taste-in var(--dur-slow) var(--ease) both; }
+.card-list > *:nth-child(1) { animation: taste-in 0.4s var(--ease) 0.02s both; }
+.card-list > *:nth-child(2) { animation: taste-in 0.4s var(--ease) 0.07s both; }
+.card-list > *:nth-child(3) { animation: taste-in 0.4s var(--ease) 0.12s both; }
+.card-list > *:nth-child(4) { animation: taste-in 0.4s var(--ease) 0.17s both; }
+.card-list > *:nth-child(5) { animation: taste-in 0.4s var(--ease) 0.22s both; }
+
+/* ── ⑦ 빈 화면 ── 아무것도 없는 화면은 기회다. 점선 상자 대신 결로 안내한다 */
+.empty {
+  background: var(--surface-2);
+  border: 0;
+  border-radius: var(--radius);
+  color: var(--text-sub);
+  padding: 34px 22px;
+  line-height: 1.7;
+  text-wrap: pretty;
+}
+
+/* ── ⑧ 손가락 기기 보정 ── hover 가 눌린 채 굳지 않게 */
+@media (hover: none) {
+  .sch-card:hover { transform: none; box-shadow: none; }
+  .icon-btn:hover { background: transparent; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── ⑨ 배지·척도 색 정리 (Taste 진단서: "강조색은 하나") ──────────────
+   진단: 배지에 보라(#6247d6)가 있었고 — 스킬이 첫 번째로 지목한 AI 지문 —
+   적합도 척도는 빨강·주황·노랑·초록·파랑 다섯 색이라, 한 카드 안에 색이 넷씩 떴다.
+   처방: 분류 배지는 **중성**으로 내리고(분류는 글자가 이미 말한다),
+   적합도만 **놋쇠 한 색의 진하기 5단**으로 남긴다.
+   ⚠️ 뜻은 그대로다 — 옅을수록 안 맞고 진할수록 잘 맞는다. 그리고 색만으로 전하지
+      않는다: 배지 글자가 늘 '적합도 n% · 요건 m개 중 k개'를 말한다. */
+.badge-in  { background: var(--primary-weak); color: var(--text-sub); }
+.badge-out { background: transparent; color: var(--text-sub); box-shadow: inset 0 0 0 1px var(--line); }
+.badge-dday { background: var(--primary-weak); color: var(--text-sub); }
+.badge-dday.urgent { background: var(--red-weak); color: var(--red); }
+.badge-auto, .badge-pending { background: var(--orange-weak); color: var(--orange); }
+
+.badge-fit.fit-red    { background: rgba(138, 106, 31, 0.06); color: #948972; }
+.badge-fit.fit-orange { background: rgba(138, 106, 31, 0.09); color: #877a56; }
+.badge-fit.fit-yellow { background: rgba(138, 106, 31, 0.13); color: #7d6b3c; }
+.badge-fit.fit-green  { background: rgba(138, 106, 31, 0.17); color: #6f5722; }
+.badge-fit.fit-blue   { background: rgba(138, 106, 31, 0.22); color: var(--accent); }
+
+/* 흰 버튼(어두운 패널 위) — 남색 글자를 잉크로 */
+.btn-white { background: #fffefc; color: var(--text); box-shadow: 0 10px 26px rgba(20, 16, 8, 0.32); }
+.btn-white:hover { background: #fff; }
+
+/* 하단 내비 — 활성 표시를 놋쇠 점으로. 파랑 글자 대신 위치를 점이 말한다 */
+.nav-item { position: relative; color: var(--text-weak); }
+.nav-item.active { color: var(--text); }
+.nav-item.active::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 50%;
+  width: 4px; height: 4px;
+  margin-left: -2px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* 알림 켜기/끄기 버튼이 세로로 접혔다 — 알약 안의 글자는 줄바꿈하지 않는다 */
+.wallet-btn { white-space: nowrap; flex: none; }
+/* 카드가 숨 쉬게 — 진단서의 '여백을 두 배로' */
+.sch-card { padding: 20px 19px; }
+.card-list { gap: 11px; }
+.section-head { margin: 30px 0 14px; }
+
+/* ══════════════════════════════════════════════════════════════════════
+   리스트·체크리스트 전환 + 파랑 강조 (2026-08-31 개발자 지시)
+   ① 반복되는 상자를 눕혀 **한 줄짜리 목록**으로 바꾼다.
+      상자는 '떠 있어야 할 이유가 있는 것' 하나(히어로 패널)만 남긴다.
+   ② 장학 목록은 **체크리스트**다 — 담은 것은 체크가 채워진다.
+      장식이 아니라 뜻이 있는 표시라서 체크를 쓴다.
+   ③ 강조색만 놋쇠 → 파랑. 베이지 바탕은 그대로 둔다.
+   ══════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* 채도를 낮춘 잉크블루 — 베이지 위 7.4:1. 형광 파랑(#2f6bff)으로 돌아가지 말 것:
+     그 색 하나가 이 앱을 다시 '흔한 AI 화면'으로 만든다(Taste 진단서 1순위). */
+  --accent:      #27508f;
+  --accent-soft: rgba(39, 80, 143, 0.09);
+  --accent-line: rgba(39, 80, 143, 0.24);
+  --ring:        0 0 0 3px rgba(39, 80, 143, 0.18);
+  /* 히어로 패널의 방사광도 같은 파랑으로 */
+  --grad-navy:
+    radial-gradient(120% 130% at 78% -18%, rgba(96, 140, 210, 0.26) 0%, rgba(96, 140, 210, 0) 58%),
+    radial-gradient(90% 90% at -10% 108%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 60%),
+    #1b1f27;
+}
+
+/* ── ① 장학 목록 = 체크리스트 ────────────────────────────────────────
+   🔴 카드의 테두리·그림자·모서리를 없애고 가는 선으로만 나눈다.
+      상자가 스무 개 쌓이면 무엇이 중요한지가 아니라 '상자'가 먼저 보인다. */
+.card-list {
+  display: block;
+  gap: 0;
+  margin-inline: -20px;              /* .screen 좌우 여백(20px)을 상쇄해 지면 끝까지 */
+  border-top: 1px solid var(--line);
+}
+.sch-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  box-shadow: none;
+  padding: 17px 20px 17px 54px;      /* 왼쪽은 체크 자리 */
+  transition: background var(--dur) var(--ease);
+}
+.sch-card:hover { background: var(--surface-2); transform: none; box-shadow: none; }
+.sch-card:active { background: var(--surface-2); transform: none; }
+
+/* 체크 동그라미 — 담은 공고(.badge-applied)면 파랑으로 채워진다 */
+.sch-card::before {
+  content: '';
+  position: absolute;
+  left: 20px; top: 19px;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  border: 1.6px solid var(--line);
+  background: transparent center / 62% no-repeat;
+  transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.sch-card:has(.badge-applied)::before {
+  border-color: var(--accent);
+  background-color: var(--accent);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-6.5' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+/* 마감된 줄은 체크 자리를 비워 두고 글자를 흐린다 */
+.sch-card:has(.badge-dday.closed) { opacity: 0.55; }
+/* 담은 줄은 이미 체크가 말하므로 배지를 지운다 — 같은 말을 두 번 하지 않는다 */
+.sch-card .badge-applied { display: none; }
+
+.sch-top { gap: 5px; margin-bottom: 6px; }
+.sch-name { font-size: var(--t-md); line-height: 1.45; }
+.sch-amount { font-size: var(--t-sm); margin-top: 4px; }
+.sch-provider { font-size: var(--t-xs); margin-top: 2px; }
+.sch-fit { margin: 7px 0 0; }
+/* 실시간 공고·신청내역 줄도 같은 목록으로 */
+.notice-card { padding-left: 20px; }
+.notice-card::before { display: none; }
+.swipe-row { border-radius: 0; }
+.swipe-row + .swipe-row { margin-top: 0; }
+.swipe-row > .sch-card { background: var(--surface); }   /* 밀었을 때 뒤 버튼이 비치면 안 된다 */
+.swipe-del { border-radius: 0; }
+
+/* ── ② MY의 네모 타일 → 정의 목록 ───────────────────────────────── */
+.my-card {
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  box-shadow: none;
+  padding: 20px 0;
+  margin: 0;
+}
+.my-card:first-of-type { border-top: 0; }
+.my-grid {
+  display: block;
+  margin: 14px 0 10px;
+  border-top: 1px solid var(--line);
+}
+.my-grid > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  padding: 11px 0;
+}
+.my-grid span { font-size: var(--t-sm); color: var(--text-sub); }
+.my-grid strong { font-size: var(--t-md); font-weight: 650; }
+.my-menu { border-top: 1px solid var(--line); }
+.my-menu-item {
+  min-height: 50px;
+  padding: 0 2px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+.my-menu-item:hover { background: transparent; color: var(--accent); }
+.wallet-row { border-bottom: 1px solid var(--line); }
+.wallet-row:last-child { border-bottom: 0; }
+
+/* ── ③ 온보딩 선택지 = 체크리스트 ───────────────────────────────── */
+.check-list { gap: 0; border-top: 1px solid var(--line); }
+.check-item {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  padding: 15px 2px;
+  box-shadow: none;
+}
+.check-item:has(input:checked) { background: transparent; box-shadow: none; color: var(--text); font-weight: 600; }
+.check-item input { width: 21px; height: 21px; border-width: 1.6px; }
+.check-item input:checked { border-color: var(--accent); background-color: var(--accent); box-shadow: none; }
+
+/* ── ④ 구역 머리 ── 상자가 사라졌으니 제목이 구조를 맡는다 */
+.section-head {
+  border-top: 1px solid var(--rule);
+  padding-top: 14px;
+  margin: 34px 0 0;
+}
+.section-head h3 { font-size: var(--t-lg); }
+.data-note { text-align: left; }
+.empty { border-radius: 0; background: transparent; border-top: 1px solid var(--line); padding: 30px 20px; }
+
+/* ── ⑤ 파랑으로 바뀌는 자리들 ─────────────────────────────────── */
+.badge-fit.fit-red    { background: rgba(39, 80, 143, 0.05); color: #8a8d95; }
+.badge-fit.fit-orange { background: rgba(39, 80, 143, 0.08); color: #6f7a8c; }
+.badge-fit.fit-yellow { background: rgba(39, 80, 143, 0.12); color: #566880; }
+.badge-fit.fit-green  { background: rgba(39, 80, 143, 0.16); color: #3d5c8a; }
+.badge-fit.fit-blue   { background: rgba(39, 80, 143, 0.20); color: var(--accent); }
+.nav-item.active::after { background: var(--accent); }
+.bell-badge, .nf-dot { background: var(--accent); }
+.link-btn, .btn-link, .my-edit-hint, .acc-on { color: var(--accent); }
+.chip.active, .filter-chip.active {
+  background: var(--accent); border-color: var(--accent); color: #fff;
+  box-shadow: 0 4px 14px rgba(39, 80, 143, 0.26);
+}
+/* 주 버튼은 잉크로 남긴다 — 파랑을 큰 면적에 칠하면 다시 흔한 화면이 된다.
+   파랑은 '이것 하나가 중요하다'를 가리키는 데만 쓴다. */
+.btn-primary { background: var(--primary); color: #fdfbf6; }
+.btn-primary:hover { background: var(--primary-dark); }
+
+/* ── 신청내역은 체크리스트가 아니다 (2026-08-31 개발자 지시) ─────────────
+   여기 있는 것은 **이미 담은 것들**이라, 빈 동그라미를 그리면 '아직 안 했다'로 읽힌다.
+   체크는 고를 것이 남아 있는 목록(홈·장학금 찾기)에서만 뜻을 갖는다. */
+#apps-list .sch-card { padding-left: 20px; }
+#apps-list .sch-card::before { display: none; }
+#apps-list .sch-card .badge-applied { display: inline-block; }
+
+/* 알림 설정 — 제목 한 줄로 끝낸다. 설명 줄은 렌더에서 뺐고, 남는 자리를 정리한다 */
+.nf-pref { align-items: center; min-height: 52px; }
+.nf-pref-text { display: block; }
+.nf-pref-text strong { font-weight: 600; }
+.nf-desc { font-size: var(--t-xs); line-height: 1.55; }
+
+/* ── 서류 보관함 (2026-08-31 개발자 지시) ────────────────────────────
+   ① 상태 줄은 **없을 때만** 뜬다 — 있으면 아무 말도 하지 않는다(있는 것이 정상이다).
+   ② 서류 이름은 누를 수 있고, 발급처는 작은 창으로 나온다. */
+.wallet-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  font-size: var(--t-md);
+  font-weight: 600;
+  color: var(--text);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+}
+.wallet-label:hover { color: var(--accent); }
+.wallet-q {
+  width: 15px; height: 15px;
+  flex: none;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+}
+.wallet-status { font-size: var(--t-xs); color: var(--text-weak); margin-top: 3px; }
+.wallet-row { align-items: center; min-height: 56px; }
+
+/* 작은 창 — 시트를 열 만한 내용이 아니라서 가운데 작은 카드 하나로 띄운다 */
+.wallet-pop-backdrop {
+  position: fixed; inset: 0; z-index: 90;
+  background: rgba(25, 23, 19, 0.34);
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--dur) var(--ease);
+}
+.wallet-pop-backdrop.show { opacity: 1; pointer-events: auto; }
+.wallet-pop {
+  position: fixed;
+  left: 0; right: 0;
+  bottom: 96px;
+  margin-inline: auto;
+  width: min(320px, calc(100vw - 44px));
+  z-index: 91;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lift);
+  opacity: 0;
+  transition: opacity var(--dur) var(--ease), bottom var(--dur-slow) var(--ease);
+}
+.wallet-pop.show { opacity: 1; bottom: 108px; }
+.wallet-pop[hidden] { display: none !important; }
+.wp-title { font-size: var(--t-lg); font-weight: 800; letter-spacing: -0.028em; }
+.wp-label { font-size: var(--t-2xs); font-weight: 700; letter-spacing: 0.14em; color: var(--text-weak); margin-top: 14px; }
+.wp-issue { font-size: var(--t-md); color: var(--text); line-height: 1.6; margin-top: 5px; text-wrap: pretty; }
+.wp-close {
+  width: 100%; min-height: 44px; margin-top: 18px;
+  border-radius: var(--radius-pill);
+  background: var(--primary); color: #fdfbf6;
+  font-size: var(--t-md); font-weight: 650;
+}
+.wp-close:hover { background: var(--primary-dark); }
+
+/* MY 맨 아래 메뉴 — 서류 보관함 줄과 같은 꼴 (2026-08-31 개발자 지시) */
+.my-menu { border-top: 1px solid var(--line); margin-top: 20px; }
+.my-row-label { flex: 1; min-width: 0; font-size: var(--t-md); font-weight: 600; color: var(--text); }
+.my-menu .wallet-row { min-height: 56px; }
+.my-menu .wallet-row:last-child { border-bottom: 0; }
+.wallet-btn.danger { color: var(--red); background: var(--red-weak); }
+.wallet-btn.danger:hover { background: var(--red); color: #fff; }
+/* 옛 규칙(624줄)이 이 블록만 흰 카드로 띄우고 있었다 — 위 보관함 줄과 결을 맞춘다 */
+.my-menu { background: transparent; border: 0; border-top: 1px solid var(--line); border-radius: 0; box-shadow: none; overflow: visible; }
+
+/* ══ 색 미세 조정 (2026-08-31 개발자 지시) ═════════════════════════════
+   ① 베이지를 **아주 살짝만** 밝게 — 따뜻한 기운은 남기고 무게만 덜어낸다.
+   ② 어두운 패널은 **푸른끼를 더한다** — 먹빛에서 남색 쪽으로. 강조 파랑과 한 가족이 된다. */
+:root {
+  --bg:        #faf8f4;   /* #f6f4f0 에서 한 단계 */
+  --surface:   #fffefd;
+  --surface-2: #f4f1ec;   /* #f1eee8 에서 한 단계 */
+  --line:      rgba(25, 25, 32, 0.085);
+  --rule:      rgba(25, 25, 32, 0.13);
+
+  /* 어두운 패널 — 남색. 강조 파랑(#27508f)과 같은 계열의 어두운 끝이다 */
+  --grad-navy:
+    radial-gradient(120% 130% at 78% -18%, rgba(104, 148, 216, 0.30) 0%, rgba(104, 148, 216, 0) 58%),
+    radial-gradient(90% 90% at -10% 108%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 60%),
+    #182338;
+  /* 주 버튼·아바타도 같은 남색으로 — 먹빛 검정과 섞이면 두 계열이 된다 */
+  --primary:      #1e2b42;
+  --primary-dark: #131c2c;
+  --primary-weak: rgba(30, 43, 66, 0.06);
+  --navy-1:       #182338;
+  --navy-2:       #2b3a55;
+}
+.avatar { background: var(--primary); }
+
+/* 초기화 — 붉은 글자 하나가 곧 버튼. 오른쪽에 실행 버튼을 두지 않는다 */
+.my-menu { border-top: 1px solid var(--line); margin-top: 24px; padding-top: 6px; }
+.my-danger-line {
+  display: block;
+  width: 100%;
+  text-align: left;
+  min-height: 52px;
+  padding: 0 2px;
+  font-size: var(--t-md);
+  font-weight: 650;
+  color: var(--red);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  transition: color var(--dur) var(--ease);
+}
+.my-danger-line:hover { color: #6f2a20; text-decoration: underline; }
+
+/* 경고 창 — 무엇이 사라지는지 목록으로 보여 준다 */
+.wp-danger { color: var(--red); }
+.wp-list { margin: 12px 0 0; padding-left: 18px; }
+.wp-list li { font-size: var(--t-sm); color: var(--text-sub); line-height: 1.75; }
+.wp-note { font-size: var(--t-xs); color: var(--text-weak); margin-top: 12px; }
+.wp-actions { display: flex; gap: 8px; margin-top: 18px; }
+.wp-cancel, .wp-go {
+  flex: 1;
+  min-height: 46px;
+  border-radius: var(--radius-pill);
+  font-size: var(--t-md);
+  font-weight: 650;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.wp-cancel { background: var(--surface-2); color: var(--text); }
+.wp-cancel:hover { background: var(--line); }
+.wp-go { background: var(--red); color: #fff; }
+.wp-go:hover { background: #6f2a20; }
+
+/* ══ 장학금 탭 — 체크 동그라미를 뺀다 (2026-08-31 개발자 지시) ═══════════
+   🔴 체크는 **고를 것이 남아 있는 목록**에서만 뜻을 갖는다(홈의 '마감 임박').
+      장학금 탭은 전부 훑어보는 곳이라, 줄마다 빈 동그라미가 서면
+      '아직 안 한 일'이 수십 개 쌓인 것처럼 보인다.
+   대신 담은 공고는 **왼쪽 파란 띠 + '신청 완료' 배지**로 가른다 —
+   체크와 달리 '해야 할 일'이 아니라 '이미 된 것'으로 읽힌다. */
+#explore-list .sch-card { padding-left: 20px; }
+#explore-list .sch-card::before { display: none; }
+#explore-list .sch-card .badge-applied { display: inline-block; }
+#explore-list .sch-card:has(.badge-applied) {
+  background: var(--accent-soft);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+#explore-list .sch-card:has(.badge-applied):hover { background: rgba(39, 80, 143, 0.13); }
+#explore-list .sch-card:has(.badge-applied) .sch-name { color: var(--accent); }
+
+/* 알림 절의 버튼 줄이 사라졌으니 남는 여백을 정리한다 */
+.nf-set-actions { display: none; }
+
+/* 정렬 목록 — 눌러서 여는 방식으로 바뀌었다 (2026-08-31 개발자 지시).
+   지금 기준이 무엇인지 버튼에 보이고, 목록에서 골라 바꾼다. */
+.sort-btn { border: 1px solid var(--line); border-radius: var(--radius-pill); padding: 0 13px; }
+.sort-btn:hover { background: var(--surface-2); border-color: var(--text-weak); }
+.sort-btn[aria-expanded="true"] { border-color: var(--accent); color: var(--accent); }
+.sort-menu {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  min-width: 160px;
+  padding: 6px;
+}
+.sort-opt { color: var(--text); font-weight: 550; }
+.sort-opt:hover { background: var(--surface-2); }
+.sort-opt[aria-checked="true"] { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+
+/* ── 신청 진행 단계 — 막대와 글자를 한 덩어리로 (2026-08-31 개발자 지시) ──
+   위쪽 배지로 두면 분류 배지(교내/교외)와 같은 무게로 보여 '단계'로 안 읽혔고,
+   막대는 무엇을 재는지 적혀 있지 않았다. 둘을 붙여 서로를 설명하게 했다. */
+.app-step { margin-top: 12px; }
+.app-step-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.app-step-head span { font-size: var(--t-xs); font-weight: 650; color: var(--accent); }
+.app-step-head em {
+  font-style: normal;
+  font-size: var(--t-2xs);
+  font-weight: 700;
+  color: var(--text-weak);
+  font-variant-numeric: tabular-nums;
+}
+/* 서류를 아직 안 쓴 건은 '진행'이 아니라 '할 일'이다 — 색을 달리해 구분한다 */
+.app-step-wait .app-step-head span { color: var(--orange); }
+.app-step-wait .mini-progress div { background: var(--orange); }
+.mini-progress { height: 5px; border-radius: var(--radius-hair); background: var(--line); overflow: hidden; }
+.mini-progress div { height: 100%; background: var(--accent); border-radius: var(--radius-hair); transition: width var(--dur-slow) var(--ease); }
+
+/* 홈의 '신청 현황'도 이미 담은 것들이다 — 신청 내역과 같이 체크 동그라미를 뺀다.
+   (빈 동그라미가 '아직 안 했다'로 읽히던 것과 같은 이유) */
+#home-apps .sch-card { padding-left: 20px; }
+#home-apps .sch-card::before { display: none; }
+
+/* ══ 누런 기운 빼기 (2026-08-31 · "배경이 누렇다" 의견) ═══════════════════
+   원인은 셋이었다 — 셋 다 파랑 성분(B)이 빨강(R)보다 낮아 노랗게 보였다:
+     ① 바탕 #faf8f4 (R250 G248 B244 · 6 차이)
+     ② 글자색이 갈색 계열 (#191713 · #57524a · #8b857b)
+     ③ 그림자가 갈색 rgba(58,48,28) — 넓은 면에 깔려 화면 전체를 물들이고 있었다
+   처방: **흰색에 베이지 한 방울.** R과 B 차이를 6 → 2~3 으로 좁히고,
+   글자와 그림자는 중성(살짝 푸른 쪽)으로 옮긴다. 따뜻한 기운은 남되 누렇지 않다. */
+:root {
+  --bg:        #fdfcfa;   /* R253 G252 B250 — 흰색에 베이지 한 방울 */
+  --surface:   #ffffff;   /* 카드·시트는 순백 */
+  --surface-2: #f6f5f2;   /* 눌린 면·첨부 블록 */
+
+  --text:      #17191c;   /* 갈색 기운을 뺀 먹 — 흰 바탕 위 16:1 */
+  --text-sub:  #545a62;   /* 7.6:1 */
+  --text-weak: #888e97;   /* 3.6:1 */
+  --line:      rgba(23, 25, 28, 0.09);
+  --rule:      rgba(23, 25, 28, 0.14);
+
+  /* 그림자를 갈색에서 남색 계열로 — 넓은 면에 깔리는 색이라 여기가 제일 크게 보인다 */
+  --shadow:       0 1px 2px rgba(24, 35, 56, 0.05), 0 8px 22px rgba(24, 35, 56, 0.07);
+  --shadow-lift:  0 2px 6px rgba(24, 35, 56, 0.07), 0 18px 40px rgba(24, 35, 56, 0.14);
+  --shadow-sheet: 0 -14px 48px rgba(18, 26, 42, 0.20);
+  --knob:         0 1px 3px rgba(24, 35, 56, 0.26);
+  --primary-weak: rgba(23, 25, 28, 0.055);
+}
+/* 결(노이즈)도 옅게 — 진하면 그것 자체가 누런 얼룩으로 보인다 */
+body::after { opacity: 0.26; }
+/* 줄을 누를 때 깔리던 따뜻한 회색도 중성으로 */
+.sch-card:hover, .sch-card:active { background: var(--surface-2); }
