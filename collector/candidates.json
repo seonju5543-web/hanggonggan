@@ -1,6 +1,6 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
- "updatedAt": "2026-08-30",
+ "updatedAt": "2026-08-31",
  "count": 2294,
  "items": [
   {
