@@ -2368,6 +2368,59 @@ function nextAction(app, sch, step, d, closed) {
   return { text: app.result === 'won' ? '선정으로 기록됨' : '미선정으로 기록됨', btn: '' };
 }
 
+/* 제출 서류 체크리스트 — 학생이 제출 직전 가장 자주 막히는 자리.
+   🔴 앱이 **이미 아는 것만** 쓴다: 공고가 적어 둔 요구 서류(sch.documents)와
+      기기 안 보관함(walletCache). 지어낼 자리가 없다.
+   🔴 판정은 상세 시트가 쓰는 docWalletStatus 를 그대로 쓴다 — 여기에 규칙을 한 벌
+      더 두면 같은 서류를 두 화면이 다르게 말한다(이 저장소가 자격 판정에서 겪은 일).
+   자소서·계획서 같은 작성물은 뺀다(certStatusListHtml 과 같은 기준) — 발급받는 것이 아니다.
+   다 준비된 경우엔 접어 둔다: 할 일이 없는 목록이 자리를 먹으면 진짜 할 일이 밀린다. */
+/* '서류 이름'인가, '아직 못 읽었다는 표시'인가.
+   원문 공고를 가리키면서 구체적인 서류 이름이 하나도 없으면 후자다.
+   `학자금대출 관련 증빙 (공고 확인)`·`논문 계획서 1부` 처럼 이름이 있는 것은 서류로 남는다. */
+function isUnknownDoc(doc) {
+  return /원문\s*공고|재공고\s*원문/.test(doc)
+    && !/증명서|신청서|동의서|계획서|사본|확인서|의향서|성적|증빙/.test(doc);
+}
+
+function docChecklistHtml(sch) {
+  const all = (sch.documents || []).filter((doc) => !ESSAY_DEFS.some((e) => e.match.test(doc)));
+  if (!all.length) return '';
+  /* 🔴 등록 데이터의 서류 칸 상당수는 서류 이름이 아니라 **'아직 못 읽었다'는 표시**다
+     (`지원 자격·제출 서류는 원문 공고에서 확인` 이 실측 25건으로 최다). 이것을
+     체크리스트 한 줄로 세면 "제출 서류 1개"라고 말하게 되는데, 앱은 그 공고에
+     서류가 몇 개인지 모른다 — 모르는 것을 아는 것처럼 말하는 꼴이다(원칙 8-1).
+     그래서 갈라서, 이런 항목은 세지 않고 '원문 확인' 한 줄로만 내놓는다. */
+  const known = all.filter((doc) => !isUnknownDoc(doc));
+  const unknown = all.length - known.length;
+  const note = unknown
+    ? '<p class="dc-unknown">이 밖의 제출 서류는 공고 원문에서 확인하세요 — 앱이 아직 읽지 못했어요</p>'
+    : '';
+  if (!known.length) {
+    return `<p class="dc-unknown dc-only">제출 서류는 공고 원문에서 확인하세요 — 앱이 아직 읽지 못했어요</p>`;
+  }
+  const certDocs = known;
+  const marks = certDocs.map((doc) => ({ doc, st: docWalletStatus(doc) }));
+  const tracked = marks.filter((m) => m.st);
+  const missing = tracked.filter((m) => !m.st.ok);
+  const rows = marks.map(({ doc, st }) => {
+    const name = esc(doc.replace(/\s*\(.*\)$/, ''));
+    if (st && st.ok) return `<li class="dc-ok">${name}</li>`;
+    if (st) return `<li class="dc-miss">${name}<em>${esc(st.slot.issue)}</em></li>`;
+    /* 보관함에 칸이 없는 서류 — 있는지 없는지 앱이 알 수 없으므로 그렇게 말한다 */
+    return `<li class="dc-etc">${esc(doc)}<em>보관함에서 확인할 수 없는 서류</em></li>`;
+  }).join('');
+  /* 머리글은 **학생이 할 일의 개수**를 말한다 — 분수(0/2)는 읽는 데 한 박자 걸린다 */
+  const head = `제출 서류 ${all.length}개`
+    + (missing.length ? '' : tracked.length ? ' · 보관함에서 자동 첨부' : '');
+  return `
+    <details class="doc-check"${missing.length ? ' open' : ''}>
+      <summary>${esc(head)}${missing.length ? ` <b>${missing.length}개 준비 안 됨</b>` : ''}</summary>
+      <ul>${rows}</ul>
+      ${note}
+    </details>`;
+}
+
 function appLogHtml(app, sch, step) {
   const d = dday(sch.deadline);
   const row = (done, label, value) =>
@@ -2380,6 +2433,7 @@ function appLogHtml(app, sch, step) {
         <p>${esc(next.text)}</p>
         ${next.btn}
       </div>
+      ${docChecklistHtml(sch)}
       <ul class="app-log-list">
         ${row(true, '담아 둔 날', esc(app.appliedAt || '-'))}
         ${row(!!app.submittedAt, '공식 제출',

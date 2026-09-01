@@ -2838,6 +2838,55 @@ body::after { opacity: 0.26; }
   border-color: var(--primary);
 }
 
+/* 제출 서류 — 여닫기는 브라우저 기본 details 를 쓴다(여닫는 코드 0줄) */
+.doc-check { border-bottom: 1px solid var(--line); }
+.doc-check > summary {
+  list-style: none; cursor: pointer;
+  padding: 13px 0;
+  font-size: var(--t-sm); font-weight: 600; color: var(--text-sub);
+  display: flex; align-items: center; gap: 7px;
+}
+.doc-check > summary::-webkit-details-marker { display: none; }
+.doc-check > summary::after {
+  content: ''; margin-left: auto; flex: none;
+  width: 7px; height: 7px;
+  border-right: 2px solid var(--text-weak); border-bottom: 2px solid var(--text-weak);
+  transform: rotate(45deg) translate(-2px, -2px);
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.doc-check[open] > summary::after { transform: rotate(-135deg) translate(-2px, -2px); }
+.doc-check > summary b { color: #b42318; font-weight: 700; }
+.doc-check ul { list-style: none; margin: 0; padding: 0 0 12px; }
+/* 🔴 이름과 발급처를 한 줄에 나란히 두면 `성적증명서` 같은 이름이 두 줄로 접힌다(실측).
+   발급처는 아랫줄로 내린다 — 모바일에서는 가로가 비싸고 세로가 싸다. */
+.doc-check li {
+  display: block;
+  padding: 7px 0 7px 22px;
+  position: relative;
+  font-size: var(--t-sm); color: var(--text);
+}
+.doc-check li::before {
+  position: absolute; left: 2px; top: 5px;
+  font-weight: 700; font-size: var(--t-sm);
+}
+.doc-check .dc-ok { color: var(--text-weak); }
+.doc-check .dc-ok::before { content: '✓'; color: var(--primary); }
+.doc-check .dc-miss::before, .doc-check .dc-etc::before {
+  content: ''; top: 8px; left: 3px;
+  width: 11px; height: 11px; border-radius: 3px;
+  box-shadow: inset 0 0 0 1.5px var(--text-weak);
+}
+.dc-unknown {
+  margin: 0; padding: 0 0 12px;
+  font-size: var(--t-sm); color: var(--text-weak); line-height: 1.5;
+}
+.dc-unknown.dc-only { padding: 13px 0; border-bottom: 1px solid var(--line); }
+.doc-check li em {
+  display: block; margin-top: 2px;
+  font-style: normal; font-size: var(--t-2xs); font-weight: 500;
+  color: var(--text-weak);
+}
+
 /* 지금 뭘 해야 하나 — 나머지 다섯 줄은 그 근거다 */
 .app-next {
   display: flex; align-items: center; gap: 12px;
