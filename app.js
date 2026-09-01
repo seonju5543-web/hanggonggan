@@ -2335,6 +2335,37 @@ function appCard(app) {
           <div class="mini-progress"><div style="width:${pct}%"></div></div>
         </div>
       </button>
+      ${appLogHtml(app, sch, step)}
+    </div>`;
+}
+
+/* 공고를 누르면 그 아래에 펼쳐지는 진행 기록.
+   🔴 앱이 **아는 것만** 적는다. 발표일은 공고 원문에 있을 수도 없을 수도 있는데 앱은
+      그것을 읽지 않았으므로 '공고 원문 확인'이라고 말한다(원칙 8-1) — 지어낸 날짜는
+      학생을 그날까지 기다리게 만든다.
+   🔴 제출·선정 기록은 여기서 바로 남긴다. 앱은 학교 전산을 볼 수 없으므로 이 둘은
+      언제나 학생이 적는 값이다(운영 원칙 8). */
+function appLogHtml(app, sch, step) {
+  const d = dday(sch.deadline);
+  const row = (done, label, value) =>
+    `<li class="${done ? 'done' : ''}"><b>${esc(label)}</b><span>${value}</span></li>`;
+  const closed = sch.deadline && d.days < 0;
+  return `
+    <div class="app-log" hidden>
+      <ul class="app-log-list">
+        ${row(true, '담아 둔 날', esc(app.appliedAt || '-'))}
+        ${row(!!app.submittedAt, '공식 제출',
+          app.submittedAt ? esc(app.submittedAt) + ' 기록됨'
+            : `<button class="app-log-btn" data-mark-submit="${esc(app.id)}">제출했다고 기록</button>`)}
+        ${row(!!closed, '접수 마감', sch.deadline ? esc(sch.deadline) + (closed ? ' 지남' : ' · ' + esc(d.label)) : '기한 미확인')}
+        ${row(step >= 2, '심사', app.submittedAt && closed ? '진행 중' : '제출 기록과 마감 경과 후 표시')}
+        ${row(!!app.result, '선정 발표',
+          app.result ? (app.result === 'won' ? '선정 · ' : '미선정 · ') + esc(app.resultAt || '')
+            : `<span class="app-log-none">발표일은 공고 원문 확인</span>
+               <button class="app-log-btn" data-mark-won="${esc(app.id)}">선정</button>
+               <button class="app-log-btn" data-mark-lost="${esc(app.id)}">미선정</button>`)}
+      </ul>
+      <button class="app-log-more" data-detail="${esc(sch.id)}">공고 상세 보기</button>
     </div>`;
 }
 
@@ -2423,7 +2454,7 @@ function renderApplications() {
     ? `<div class="summary-card">
          <p>준비 완료 ${prepared.length}건${submitted.length ? ` · 제출·심사 중 ${submitted.length}건` : ''}${wonApps.length ? ` · 선정 ${wonApps.length}건` : ''}${pending.length ? ` · 서류 작성 필요 ${pending.length}건` : ''} · ${wonApps.length ? '선정된 장학금' : '예상 최대 수혜액'}</p>
          <p class="summary-amount">${won(wonApps.length ? wonAmount : totalExpected)}</p>
-         <p class="summary-note">제출·발표 단계는 각 장학금 상세에서 직접 기록 · 최종 제출은 각 공식 채널에서 이루어져요</p>
+         <p class="summary-note">제출·발표는 각 공식 채널에서 · 결과는 여기에 기록</p>
        </div>`
     : '';
 
@@ -2811,6 +2842,19 @@ function bindEvents() {
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSortMenu(); });
   }
 
+  /* 펼친 패널 안의 기록 버튼 — 상세 시트를 열지 않고 그 자리에서 남긴다 */
+  document.addEventListener('click', (e) => {
+    const sb = e.target.closest('[data-mark-submit]');
+    const wb = e.target.closest('[data-mark-won]');
+    const lb = e.target.closest('[data-mark-lost]');
+    if (!sb && !wb && !lb) return;
+    e.stopPropagation();
+    const id = (sb || wb || lb).dataset.markSubmit || (wb || lb).dataset.markWon || lb.dataset.markLost;
+    const sch = findSch(id);
+    if (!sch) return;
+    if (sb) recordSubmitted(sch); else recordResult(sch, !!wb);
+  });
+
   document.addEventListener('click', (e) => {
     /* 🔴 카드를 민 직후에 오는 click은 '열기'가 아니다 — 밀었는데 상세가 열리면
        삭제 버튼을 보려던 학생이 매번 시트를 닫아야 한다. 선택 모드에서도 열지 않는다. */
@@ -2818,6 +2862,14 @@ function bindEvents() {
     if (e.target.closest('[data-del]') || e.target.closest('[data-pick]')) return;
     const card = e.target.closest('[data-detail]');
     if (!card) return;
+    /* 신청 내역에서는 시트가 아니라 **그 자리에서 펼친다** (2026-09-01 개발자 지시).
+       담아 둔 공고에서 궁금한 것은 공고 내용이 아니라 '내가 어디까지 왔나'다.
+       공고 원문은 펼친 패널 안의 '공고 상세 보기'로 간다. */
+    const row = card.closest('.swipe-row');
+    if (row && !appsSelectMode && card.classList.contains('sch-card')) {
+      const log = row.querySelector('.app-log');
+      if (log) { log.hidden = !log.hidden; return; }
+    }
     if (appsSelectMode && card.closest('#apps-list')) {
       const id = card.dataset.detail;                 // 선택 모드에서는 카드를 눌러도 선택이 된다
       if (appsSelected.has(id)) appsSelected.delete(id); else appsSelected.add(id);

@@ -2817,3 +2817,54 @@ body::after { opacity: 0.26; }
 #my-wallet .wallet-row:first-of-type { border-top: 0; padding-top: 4px; }
 #my-wallet .wallet-title { margin-bottom: 6px; }
 #my-account .acc-head { margin-bottom: 14px; }
+
+/* ══ 신청 내역 — 공고를 누르면 그 자리에서 펼쳐지는 진행 기록 (2026-09-01) ══
+   담아 둔 공고에서 궁금한 것은 공고 내용이 아니라 '내가 어디까지 왔나'다.
+   그래서 시트를 띄우지 않고 그 줄 아래에 붙인다 — 목록을 떠나지 않아도 된다. */
+.app-log { padding: 2px 20px 16px; background: var(--surface-2); }
+.app-log[hidden] { display: none !important; }
+.app-log-list { list-style: none; margin: 0; padding: 0; }
+.app-log-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: var(--t-sm);
+}
+.app-log-list li:last-child { border-bottom: 0; }
+.app-log-list b {
+  flex: none;
+  width: 76px;
+  font-weight: 600;
+  color: var(--text-weak);
+}
+.app-log-list li.done b { color: var(--accent); }
+.app-log-list span { flex: 1; min-width: 0; color: var(--text); }
+.app-log-none { color: var(--text-weak); margin-right: 8px; }
+.app-log-btn {
+  min-height: 30px;
+  padding: 0 11px;
+  margin-right: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent-line);
+  font-size: var(--t-xs);
+  font-weight: 650;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.app-log-btn:hover { background: var(--accent); color: #fff; box-shadow: none; }
+.app-log-more {
+  display: block;
+  width: 100%;
+  min-height: 40px;
+  margin-top: 12px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-sub);
+  box-shadow: inset 0 0 0 1px var(--line);
+  font-size: var(--t-sm);
+  font-weight: 600;
+}
+.app-log-more:hover { color: var(--text); box-shadow: inset 0 0 0 1px var(--rule); }
