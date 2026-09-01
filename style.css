@@ -2858,17 +2858,22 @@ body::after { opacity: 0.26; }
 .home-updated span { display: block; }
 .home-updated:empty { display: none; }
 
+/* 🔴 위아래 여백은 **같은 값**이어야 한다 — 11/12 로 1px 어긋나 있었고,
+   높이를 실제로 정하던 것은 여백이 아니라 버튼의 min-height 였다(30px).
+   둘을 함께 줄여야 상자가 줄어든다. 오른쪽 여백도 버튼의 margin-right 6px 때문에
+   왼쪽 20px 과 달랐다 — 0 으로 두고 상자 여백 하나로 맞춘다. */
 .app-done {
   display: flex; align-items: center; gap: 10px;
-  padding: 11px 20px 12px;
+  padding: 8px 20px;
 }
 .app-done p {
   flex: 1; min-width: 0; margin: 0;
   font-size: var(--t-sm); font-weight: 650;
+  line-height: 1.35;
   color: var(--text-sub);
 }
 .app-done-won p { color: #cf4436; }
-.app-done .app-log-btn { flex: none; }
+.app-done .app-log-btn { flex: none; margin-right: 0; min-height: 26px; }
 
 /* 이름 있는 손잡이 — ∨ 표식만으로는 "여기를 누르면 뭐가 나온다"가 안 읽혔다 */
 .app-toggle {
