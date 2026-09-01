@@ -2046,6 +2046,16 @@ function openDetail(id) {
   }
   const missingRows = '';
 
+  /* 안내는 한 문장으로 (2026-09-01 개발자 지시). 한 화면에 설명이 셋이나 떠 있었는데
+     (발췌 출처 설명 · 전국 공고 회색 상자 · 제출 서류 부연) 셋 다 결국 '원문을 보라'였다.
+     🔴 링크 이름은 그 주소가 **실제로 여는 화면**을 말한다 — 목록 주소밖에 못 찾은
+        공고를 '원문 공고'라고 적으면 눌러 본 학생에게 거짓말이 된다(원칙 8-1). */
+  const srcLabel = sch.program ? '한국장학재단 ↗'
+    : isBoardListLink(sch.sourceUrl) ? '게시판 목록 ↗' : '원문 공고 ↗';
+  const srcNote = sch.sourceUrl
+    ? `<p class="doc-legend">자세한 내용은 <a href="${esc(safeUrl(sch.sourceUrl))}" target="_blank" rel="noopener">${srcLabel}</a>에서 확인</p>`
+    : '<p class="doc-legend">자세한 내용은 원문 공고에서 확인</p>';
+
   let btnLabel = '신청 준비 시작';
   if (app && !app.pending) btnLabel = '신청 준비 완료됨';
   else if (app && app.pending) btnLabel = '서류 작성 이어서 하기';
@@ -2092,17 +2102,12 @@ function openDetail(id) {
           return `<li>${auto ? '<span class="doc-auto">자동</span>' : '<span class="doc-manual">직접</span>'} ${doc}</li>`;
         }).join('')}
       </ul>
-      <p class="doc-legend">${sch.sourceKind === 'kosaf'
-        ? '재단이 적어 둔 제출 서류. 앱이 대신 작성해 주지는 않아요 — 재단 공고문에서 서식을 받으세요.'
-        : `${sch.documents.some((doc) => /자동/.test(doc))
-        ? `'자동' 표시 서류는 한국장학재단 등 제출처가 신청 과정에서 전산으로 확인하는 항목입니다 — 따로 준비해야 하는지는 공고 원문에서 확인하세요. `
-        : ''}'직접' 서류 중 자기소개서·계획서·사유서·신청 양식은 앱에서 바로 작성할 수 있습니다.`}</p>
+      ${srcNote}
 
       ${(sch.excerpts && sch.excerpts.length) ? `
       <h4>공고 원문 안내 <span class="channel-tag">원문 그대로</span></h4>
       <ul class="doc-list">${sch.excerpts.map((e) => `<li>${esc(e)}</li>`).join('')}</ul>
-      <p class="doc-legend">공고 본문에서 그대로 가져온 문장입니다 — 전체 내용은 원문 공고 ↗에서 확인하세요.</p>` : ''}
-      ${sch.note ? `<p class="sheet-note">${esc(sch.note)}</p>` : ''}
+      ${srcNote}` : ''}
       ${(sch.attachments && sch.attachments.length) ? `
       <h4>공고 원본 첨부 양식</h4>
       <ul class="doc-list">

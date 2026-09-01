@@ -841,6 +841,7 @@ textarea:focus {
   margin-top: 10px;
   line-height: 1.6;
 }
+.doc-legend a { color: var(--primary); font-weight: 700; text-decoration: none; }
 .doc-legend {
   font-size: var(--t-xs);
   color: var(--text-weak);
