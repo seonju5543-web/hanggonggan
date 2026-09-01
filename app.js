@@ -2423,6 +2423,14 @@ function docChecklistHtml(sch) {
 }
 
 function appLogHtml(app, sch, step) {
+  if (app.result) {
+    return `
+      <div class="app-log"${appsLogOpen.has(app.id) ? '' : ' hidden'}>
+        <p class="app-done${app.result === 'won' ? ' app-done-won' : ''}">${
+          app.result === 'won' ? '선정으로 기록되었어요' : '미선정으로 기록되었어요'
+        }${app.resultAt ? ' · ' + esc(app.resultAt) : ''}</p>
+      </div>`;
+  }
   const d = dday(sch.deadline);
   const row = (done, label, value) =>
     `<li class="${done ? 'done' : ''}"><b>${esc(label)}</b><span>${value}</span></li>`;

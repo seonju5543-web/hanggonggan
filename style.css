@@ -2396,6 +2396,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
    여기 있는 것은 **이미 담은 것들**이라, 빈 동그라미를 그리면 '아직 안 했다'로 읽힌다.
    체크는 고를 것이 남아 있는 목록(홈·장학금 찾기)에서만 뜻을 갖는다. */
 #apps-list .sch-card { padding-left: 20px; }
+.swipe-row > .sch-card { border-bottom: 0; }
 #apps-list .sch-card::before { display: none; }
 #apps-list .sch-card .badge-applied { display: inline-block; }
 
@@ -2839,6 +2840,14 @@ body::after { opacity: 0.26; }
    담아 둔 공고에서 궁금한 것은 공고 내용이 아니라 '내가 어디까지 왔나'다.
    그래서 시트를 띄우지 않고 그 줄 아래에 붙인다 — 목록을 떠나지 않아도 된다. */
 .app-log { padding: 2px 20px 16px; background: var(--surface-2); }
+
+/* 결과가 기록된 건 — 한 줄로 끝났다고만 말한다 */
+.app-done {
+  margin: 0; padding: 16px 20px 18px;
+  font-size: var(--t-md); font-weight: 650;
+  color: var(--text-sub);
+}
+.app-done-won { color: #cf4436; }
 
 /* 이름 있는 손잡이 — ∨ 표식만으로는 "여기를 누르면 뭐가 나온다"가 안 읽혔다 */
 .app-toggle {
