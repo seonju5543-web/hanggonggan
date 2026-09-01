@@ -2394,10 +2394,10 @@ function docChecklistHtml(sch) {
   const known = all.filter((doc) => !isUnknownDoc(doc));
   const unknown = all.length - known.length;
   const note = unknown
-    ? '<p class="dc-unknown">이 밖의 제출 서류는 공고 원문에서 확인하세요 — 앱이 아직 읽지 못했어요</p>'
+    ? '<p class="dc-unknown">이 밖의 제출 서류는 공고 원문에서 확인</p>'
     : '';
   if (!known.length) {
-    return `<p class="dc-unknown dc-only">제출 서류는 공고 원문에서 확인하세요 — 앱이 아직 읽지 못했어요</p>`;
+    return '<p class="dc-unknown dc-only">제출 서류는 공고 원문에서 확인</p>';
   }
   const certDocs = known;
   const marks = certDocs.map((doc) => ({ doc, st: docWalletStatus(doc) }));
@@ -2435,19 +2435,11 @@ function appLogHtml(app, sch, step) {
       </div>
       ${docChecklistHtml(sch)}
       <ul class="app-log-list">
-        ${row(!!app.submittedAt, '공식 제출',
-          app.submittedAt ? esc(app.submittedAt) + ' 기록됨'
-            /* 🔴 위 '다음 할 일' 줄이 이미 같은 버튼을 내밀고 있으면 여기엔 안 만든다 —
-               같은 버튼이 두 개 보이면 어느 쪽이 진짜인지 학생이 판단해야 한다. */
-            : (next.btn.includes('data-mark-submit')
-                ? '<span class="app-log-none">아직 기록 없음</span>'
-                : `<button class="app-log-btn" data-mark-submit="${esc(app.id)}">제출했다고 기록</button>`))}
         ${row(!!closed, '접수 마감', sch.deadline ? esc(sch.deadline) + (closed ? ' 지남' : ' · ' + esc(d.label)) : '기한 미확인')}
         ${row(step >= 2, '심사', app.submittedAt && closed ? '진행 중' : '제출 기록과 마감 경과 후 표시')}
         ${row(!!app.result, '선정 발표',
           app.result ? (app.result === 'won' ? '선정 · ' : '미선정 · ') + esc(app.resultAt || '')
-            : `<span class="app-log-none">발표일은 공고 원문 확인</span>
-               <button class="app-log-btn" data-mark-won="${esc(app.id)}">선정</button>
+            : `<button class="app-log-btn" data-mark-won="${esc(app.id)}">선정</button>
                <button class="app-log-btn" data-mark-lost="${esc(app.id)}">미선정</button>`)}
       </ul>
       ${sch.sourceUrl

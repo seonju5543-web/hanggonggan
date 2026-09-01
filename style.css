@@ -1647,8 +1647,9 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
   border: 0; border-radius: 0 var(--radius) var(--radius) 0; cursor: pointer;
   /* 밀기 전에는 보이지 않는다 — 카드 모서리가 둥글어 빨간 조각이 비어져 나왔다 */
   opacity: 0; transition: opacity .15s linear;
+  pointer-events: none;      /* 🔴 안 보일 때는 클릭도 안 받는다 (위 주석) */
 }
-.swipe-row.open .swipe-del,
+.swipe-row.open .swipe-del { opacity: 1; pointer-events: auto; }
 .swipe-row.swiping .swipe-del { opacity: 1; }
 .swipe-del:active { background: #b42318; }
 
@@ -2942,11 +2943,11 @@ body::after { opacity: 0.26; }
   transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
 }
 .app-log-btn:hover { background: var(--accent); color: #fff; box-shadow: none; }
-a.app-log-more { display: block; text-align: center; text-decoration: none; }
+a.app-log-more { text-decoration: none; }
 .app-log-more {
-  display: block;
+  display: flex; align-items: center; justify-content: center;
   width: 100%;
-  min-height: 40px;
+  min-height: 44px;
   margin-top: 12px;
   border-radius: var(--radius-sm);
   background: var(--surface);
