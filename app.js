@@ -2435,7 +2435,6 @@ function appLogHtml(app, sch, step) {
       </div>
       ${docChecklistHtml(sch)}
       <ul class="app-log-list">
-        ${row(true, '담아 둔 날', esc(app.appliedAt || '-'))}
         ${row(!!app.submittedAt, '공식 제출',
           app.submittedAt ? esc(app.submittedAt) + ' 기록됨'
             /* 🔴 위 '다음 할 일' 줄이 이미 같은 버튼을 내밀고 있으면 여기엔 안 만든다 —
@@ -2451,7 +2450,13 @@ function appLogHtml(app, sch, step) {
                <button class="app-log-btn" data-mark-won="${esc(app.id)}">선정</button>
                <button class="app-log-btn" data-mark-lost="${esc(app.id)}">미선정</button>`)}
       </ul>
-      <button class="app-log-more" data-detail="${esc(sch.id)}">공고 상세 보기</button>
+      ${sch.sourceUrl
+        /* 🔴 목록 주소밖에 못 찾은 공고는 '원문'이라고 말하지 않는다 — 눌러 보면
+           게시판 목록이 열리는데 원문이라고 적어 두면 거짓말이 된다(원칙 8-1). */
+        ? `<a class="app-log-more" href="${esc(safeUrl(sch.sourceUrl))}" target="_blank" rel="noopener">${
+            sch.program ? '한국장학재단에서 보기 ↗'
+            : isBoardListLink(sch.sourceUrl) ? '게시판 목록 열기 ↗' : '공고 원문 보기 ↗'}</a>`
+        : `<button class="app-log-more" data-detail="${esc(sch.id)}">공고 상세 보기</button>`}
     </div>`;
 }
 
@@ -2491,12 +2496,19 @@ function deleteApps(ids) {
 function enableRowSwipe(list) {
   const REVEAL = 96;            // 삭제 버튼 너비와 같아야 한다 (style.css .swipe-del)
   let row = null, x0 = 0, y0 = 0, dir = null, dx = 0;
-  const end = () => { if (row) row.classList.remove('dragging'); row = null; dir = null; };
+  const end = () => { if (row) row.classList.remove('dragging', 'swiping'); row = null; dir = null; };
 
   list.addEventListener('touchstart', (e) => {
     if (e.touches.length !== 1 || appsSelectMode) return;
+    /* 미는 것은 **카드**다. 펼친 패널(진행 기록·서류 체크리스트)에서는 밀리지 않는다 —
+       거기서 손이 닿는 것은 읽으려는 것이지 지우려는 것이 아니다. */
+    if (!e.target.closest('.sch-card')) return;
     const r = e.target.closest('.swipe-row');
     if (!r) return;
+    /* 🔴 펼쳐 놓은 줄은 밀지 않는다. 빨간 삭제 판은 줄 전체 높이를 덮는데(inset:0)
+       미는 것은 카드뿐이라, 펼친 상태에서 밀면 **패널 뒤로 빨간 판이 비어져 나온다**(실측).
+       읽으려고 펼친 줄에서 지우기가 필요한 경우도 거의 없다 — 제목을 눌러 접고 밀면 된다. */
+    if (r.classList.contains('log-open')) return;
     list.querySelectorAll('.swipe-row.open').forEach((o) => { if (o !== r) o.classList.remove('open'); });
     row = r; x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; dir = null; dx = 0;
     row.classList.add('dragging');
@@ -2507,9 +2519,12 @@ function enableRowSwipe(list) {
     const ax = e.touches[0].clientX - x0;
     const ay = e.touches[0].clientY - y0;
     if (!dir) {
-      if (Math.abs(ax) < 6 && Math.abs(ay) < 6) return;   // 아직 방향을 모른다
-      dir = Math.abs(ax) > Math.abs(ay) ? 'x' : 'y';
+      /* 문턱 12px + 가로가 세로보다 확실히 커야 한다(1.4배).
+         6px 짜리 문턱은 '누르다 손가락이 흔들린 것'까지 밀기로 셌다. */
+      if (Math.abs(ax) < 12 && Math.abs(ay) < 12) return;  // 아직 방향을 모른다
+      dir = Math.abs(ax) > Math.abs(ay) * 1.4 ? 'x' : 'y';
       if (dir === 'y') { end(); return; }                 // 세로다 — 목록에 넘긴다
+      row.classList.add('swiping');   /* 진짜 가로로 밀 때만 삭제가 보인다 */
     }
     e.preventDefault();
     const base = row.classList.contains('open') ? -REVEAL : 0;
@@ -2522,7 +2537,7 @@ function enableRowSwipe(list) {
     row.style.removeProperty('--dx');
     row.classList.toggle('open', dx < -REVEAL / 2);
     /* 민 뒤에 곧바로 오는 click은 카드 열기가 아니다 — 삼킨다 */
-    if (Math.abs(dx) > 6) lastSwipeAt = Date.now();
+    if (Math.abs(dx) > 12) lastSwipeAt = Date.now();
     end();
   }, { passive: true });
 }

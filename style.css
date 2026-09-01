@@ -1649,7 +1649,7 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
   opacity: 0; transition: opacity .15s linear;
 }
 .swipe-row.open .swipe-del,
-.swipe-row.dragging .swipe-del { opacity: 1; }
+.swipe-row.swiping .swipe-del { opacity: 1; }
 .swipe-del:active { background: #b42318; }
 
 /* 선택 모드 */
@@ -2942,6 +2942,7 @@ body::after { opacity: 0.26; }
   transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
 }
 .app-log-btn:hover { background: var(--accent); color: #fff; box-shadow: none; }
+a.app-log-more { display: block; text-align: center; text-decoration: none; }
 .app-log-more {
   display: block;
   width: 100%;
