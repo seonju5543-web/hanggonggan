@@ -2334,7 +2334,6 @@ function closeSheet() {
 let appsSelectMode = false;
 const appsSelected = new Set();
 const appsLogOpen = new Set();   // 펼쳐 둔 진행 기록 — 다시 그려도 닫히지 않게
-let lastSwipeAt = 0;            // 스와이프 직후의 클릭을 삼키는 자리 (아래 주석)
 let undoBuffer = null;          // 되돌리기용 — 지운 항목과 원래 자리
 
 function appCard(app) {
@@ -2352,7 +2351,6 @@ function appCard(app) {
   const pct = app.pending ? 6 : ((step + 1) / APP_STEPS.length) * 100;
   return `
     <div class="swipe-row${appsLogOpen.has(app.id) ? ' log-open' : ''}" data-row="${esc(app.id)}">
-      <button class="swipe-del" data-del="${esc(app.id)}" aria-label="이 신청 기록 삭제">삭제</button>
       ${appsSelectMode ? `<input type="checkbox" class="row-check" data-pick="${esc(app.id)}" ${checked}
          aria-label="${esc(sch.name)} 선택" />` : ''}
       <button class="sch-card" data-detail="${sch.id}" tabindex="-1">
@@ -2523,58 +2521,14 @@ function deleteApps(ids) {
   });
 }
 
-/* 카드를 왼쪽으로 미는 손짓. **세로 스크롤을 막지 않는 것**이 이 함수의 어려운 부분이다 —
-   첫 움직임에서 가로/세로를 정하고, 세로면 즉시 손을 뗀다(목록이 정상으로 스크롤된다).
-   ⚠️ 이 유형은 **마우스로는 한 번도 재현되지 않는다** — 검사는 TouchEvent로 해야 한다
-   (13차 세션 학교 검색 사고와 같은 계열, CLAUDE.md 참조). */
-function enableRowSwipe(list) {
-  const REVEAL = 96;            // 삭제 버튼 너비와 같아야 한다 (style.css .swipe-del)
-  let row = null, x0 = 0, y0 = 0, dir = null, dx = 0;
-  const end = () => { if (row) row.classList.remove('dragging', 'swiping'); row = null; dir = null; };
-
-  list.addEventListener('touchstart', (e) => {
-    if (e.touches.length !== 1 || appsSelectMode) return;
-    /* 미는 것은 **카드**다. 펼친 패널(진행 기록·서류 체크리스트)에서는 밀리지 않는다 —
-       거기서 손이 닿는 것은 읽으려는 것이지 지우려는 것이 아니다. */
-    if (!e.target.closest('.sch-card')) return;
-    const r = e.target.closest('.swipe-row');
-    if (!r) return;
-    /* 🔴 펼쳐 놓은 줄은 밀지 않는다. 빨간 삭제 판은 줄 전체 높이를 덮는데(inset:0)
-       미는 것은 카드뿐이라, 펼친 상태에서 밀면 **패널 뒤로 빨간 판이 비어져 나온다**(실측).
-       읽으려고 펼친 줄에서 지우기가 필요한 경우도 거의 없다 — 제목을 눌러 접고 밀면 된다. */
-    if (r.classList.contains('log-open')) return;
-    list.querySelectorAll('.swipe-row.open').forEach((o) => { if (o !== r) o.classList.remove('open'); });
-    row = r; x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; dir = null; dx = 0;
-    row.classList.add('dragging');
-  }, { passive: true });
-
-  list.addEventListener('touchmove', (e) => {
-    if (!row) return;
-    const ax = e.touches[0].clientX - x0;
-    const ay = e.touches[0].clientY - y0;
-    if (!dir) {
-      /* 문턱 12px + 가로가 세로보다 확실히 커야 한다(1.4배).
-         6px 짜리 문턱은 '누르다 손가락이 흔들린 것'까지 밀기로 셌다. */
-      if (Math.abs(ax) < 12 && Math.abs(ay) < 12) return;  // 아직 방향을 모른다
-      dir = Math.abs(ax) > Math.abs(ay) * 1.4 ? 'x' : 'y';
-      if (dir === 'y') { end(); return; }                 // 세로다 — 목록에 넘긴다
-      row.classList.add('swiping');   /* 진짜 가로로 밀 때만 삭제가 보인다 */
-    }
-    e.preventDefault();
-    const base = row.classList.contains('open') ? -REVEAL : 0;
-    dx = Math.max(-REVEAL, Math.min(0, base + ax));
-    row.style.setProperty('--dx', `${dx}px`);
-  }, { passive: false });
-
-  list.addEventListener('touchend', () => {
-    if (!row) return;
-    row.style.removeProperty('--dx');
-    row.classList.toggle('open', dx < -REVEAL / 2);
-    /* 민 뒤에 곧바로 오는 click은 카드 열기가 아니다 — 삼킨다 */
-    if (Math.abs(dx) > 12) lastSwipeAt = Date.now();
-    end();
-  }, { passive: true });
-}
+/* 🔴 밀어서 삭제는 걷어냈다 (2026-09-01 개발자 지시: "오류가 자꾸 먹어서").
+   세 번을 고쳤는데도 계속 사고를 냈다 — 스칠 때 삭제가 뜨고, 빨간 판이 패널 위를
+   덮어 신청 기록이 지워지고, 누름이 삼켜졌다. 원인이 손짓 판정 하나가 아니라
+   "보이지 않는 것이 화면 위에 겹쳐 있다"는 구조라 고칠 때마다 다른 자리가 터졌다.
+   지우는 길은 이미 하나 더 있다: 오른쪽 위 '선택' → 체크 → '삭제 n건'.
+   그쪽은 눈에 보이고, 여러 건을 한 번에 지우고, 실행 취소도 같이 준다.
+   되살리려면 이 자리에 enableRowSwipe 를 다시 두는 것이 아니라, 먼저
+   '안 보이는 것이 위를 덮지 않는 구조'부터 만들 것. */
 
 function renderApplications() {
   const apps = state.applications.slice().reverse().filter((a) => findSch(a.id));
@@ -2610,18 +2564,6 @@ function renderApplications() {
      그때마다 세면 한 번 방문에 3회를 다 써 버린다(`_counted`가 그걸 막는다).
      장부에 넣지 않고 localStorage 를 따로 쓰는 이유: 이건 이 기기의 화면 상태일 뿐이라
      서버로 동기화될 프로필·신청내역에 섞이면 안 된다. */
-  const HINT_KEY = 'handaejang.swipeHintSeen';
-  const hint = $('#apps-swipe-hint');
-  if (!apps.length) hint.hidden = true;
-  else {
-    let seen = 0;
-    try { seen = Number(localStorage.getItem(HINT_KEY)) || 0; } catch (e) { /* 사생활 보호 모드 */ }
-    hint.hidden = seen >= 3;
-    if (seen < 3 && !renderApplications._counted) {
-      renderApplications._counted = true;
-      try { localStorage.setItem(HINT_KEY, String(seen + 1)); } catch (e) { /* 무시 — 안내가 한 번 더 뜰 뿐 */ }
-    }
-  }
   $('#apps-select-toggle').textContent = appsSelectMode ? '완료' : '선택';
   $('#apps-bulkbar').hidden = !(appsSelectMode && apps.length);
   const all = $('#apps-check-all');
@@ -2636,12 +2578,10 @@ function renderApplications() {
 /* 신청 내역 관리 배선 — 화면이 처음 만들어질 때 한 번만 건다 */
 function wireAppsManage() {
   const list = $('#apps-list');
-  enableRowSwipe(list);
 
   $('#apps-select-toggle').addEventListener('click', () => {
     appsSelectMode = !appsSelectMode;
     appsSelected.clear();
-    list.querySelectorAll('.swipe-row.open').forEach((o) => o.classList.remove('open'));
     renderApplications();
   });
 
@@ -2661,8 +2601,6 @@ function wireAppsManage() {
   });
 
   list.addEventListener('click', (e) => {
-    const del = e.target.closest('[data-del]');
-    if (del) { deleteApps([del.dataset.del]); return; }
     const pick = e.target.closest('[data-pick]');
     if (pick) {
       if (pick.checked) appsSelected.add(pick.dataset.pick);
@@ -3001,8 +2939,7 @@ function bindEvents() {
   document.addEventListener('click', (e) => {
     /* 🔴 카드를 민 직후에 오는 click은 '열기'가 아니다 — 밀었는데 상세가 열리면
        삭제 버튼을 보려던 학생이 매번 시트를 닫아야 한다. 선택 모드에서도 열지 않는다. */
-    if (Date.now() - lastSwipeAt < 350) return;
-    if (e.target.closest('[data-del]') || e.target.closest('[data-pick]')) return;
+    if (e.target.closest('[data-pick]')) return;
     /* 이름 있는 손잡이('세부사항 입력하기')도 카드와 같은 길로 여닫는다 */
     const handle = e.target.closest('[data-log-toggle]');
     const card = handle || e.target.closest('[data-detail]');
