@@ -2339,31 +2339,6 @@ function appCard(app) {
     </div>`;
 }
 
-/* ── 발표일 — 공고 원문에서 **그 문장을 그대로** 집어 온다 (2026-09-01 개발자 요청) ──
-   🔴 날짜를 새로 조립하지 않는다. '8.26(수)' 을 '2026-08-26' 으로 바꿔 적는 순간
-      그것은 앱이 만든 값이 되고, 연도를 잘못 짚으면 학생이 엉뚱한 날을 기다린다.
-      원문이 쓴 대로 보여 주고 '원문에서'라고 밝힌다(원칙 8-1).
-   🔴 못 찾으면 지어내지 않고 '공고 원문 확인'으로 남는다 — 없는 것을 있다고 하지 않는다.
-   찾는 곳은 앱이 이미 갖고 있는 원문 계열 칸뿐이다(period·note·summary·excerpts·자격 줄). */
-function announceLine(sch) {
-  if (!sch) return null;
-  const pools = [sch.period, sch.note, sch.summary]
-    .concat(Array.isArray(sch.excerpts) ? sch.excerpts : Object.values(sch.excerpts || {}))
-    .concat(Array.isArray(sch.eligibilityLines) ? sch.eligibilityLines : [])
-    .filter((v) => typeof v === 'string' && v);
-  for (const text of pools) {
-    /* 문장 단위로 자른다 — 가운뎃점·줄바꿈·마침표가 이 데이터의 실제 구분자다 */
-    for (const part of text.split(/[·\n]|(?<=[다요])\.\s/)) {
-      const t = part.trim();
-      if (!/발표|선정자|합격자/.test(t)) continue;
-      if (!/\d/.test(t)) continue;                 // 날짜가 없으면 발표'일'이 아니다
-      if (/발표일까지|발표 ?후|발표 ?전/.test(t)) continue;  // 조건문이지 날짜가 아니다
-      return t.length > 46 ? t.slice(0, 45) + '…' : t;
-    }
-  }
-  return null;
-}
-
 /* 공고를 누르면 그 아래에 펼쳐지는 진행 기록.
    🔴 앱이 **아는 것만** 적는다. 발표일은 공고 원문에 있을 수도 없을 수도 있는데 앱은
       그것을 읽지 않았으므로 '공고 원문 확인'이라고 말한다(원칙 8-1) — 지어낸 날짜는
@@ -2372,11 +2347,6 @@ function announceLine(sch) {
       언제나 학생이 적는 값이다(운영 원칙 8). */
 function appLogHtml(app, sch, step) {
   const d = dday(sch.deadline);
-  /* 수집 로봇이 공고 **전문**에서 뽑아 둔 발표일이 있으면 그것을 먼저 쓴다.
-     원문 전문은 앱이 갖고 있지 않다(수 MB) — 로봇만 읽을 수 있어
-     collector/extract-excerpts.mjs 가 원문 문장 그대로 sch.announce 에 담아 둔다.
-     없으면 앱이 가진 원문 계열 칸(period·note·발췌)에서 찾고, 그것도 없으면 지어내지 않는다. */
-  const announce = sch.announce || announceLine(sch);
   const row = (done, label, value) =>
     `<li class="${done ? 'done' : ''}"><b>${esc(label)}</b><span>${value}</span></li>`;
   const closed = sch.deadline && d.days < 0;
@@ -2391,8 +2361,7 @@ function appLogHtml(app, sch, step) {
         ${row(step >= 2, '심사', app.submittedAt && closed ? '진행 중' : '제출 기록과 마감 경과 후 표시')}
         ${row(!!app.result, '선정 발표',
           app.result ? (app.result === 'won' ? '선정 · ' : '미선정 · ') + esc(app.resultAt || '')
-            : `${announce ? `<span class="app-log-src">${esc(announce)}<em>원문에서</em></span>`
-                          : '<span class="app-log-none">발표일은 공고 원문 확인</span>'}
+            : `<span class="app-log-none">발표일은 공고 원문 확인</span>
                <button class="app-log-btn" data-mark-won="${esc(app.id)}">선정</button>
                <button class="app-log-btn" data-mark-lost="${esc(app.id)}">미선정</button>`)}
       </ul>
