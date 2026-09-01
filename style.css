@@ -2822,6 +2822,44 @@ body::after { opacity: 0.26; }
    담아 둔 공고에서 궁금한 것은 공고 내용이 아니라 '내가 어디까지 왔나'다.
    그래서 시트를 띄우지 않고 그 줄 아래에 붙인다 — 목록을 떠나지 않아도 된다. */
 .app-log { padding: 2px 20px 16px; background: var(--surface-2); }
+
+/* 펼쳐진다는 표시 — 없으면 "눌러도 아무 일이 없다"로 읽힌다 */
+.app-caret {
+  position: absolute; top: 18px; right: 18px;
+  width: 9px; height: 9px;
+  border-right: 2px solid var(--text-weak);
+  border-bottom: 2px solid var(--text-weak);
+  border-radius: 1px;
+  transform: rotate(45deg) translate(-2px, -2px);
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.2s;
+}
+.swipe-row.log-open .app-caret {
+  transform: rotate(-135deg) translate(-2px, -2px);
+  border-color: var(--primary);
+}
+
+/* 지금 뭘 해야 하나 — 나머지 다섯 줄은 그 근거다 */
+.app-next {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 0 15px;
+  border-bottom: 1px solid var(--line);
+}
+.app-next p {
+  flex: 1; min-width: 0; margin: 0;
+  font-size: var(--t-md); font-weight: 650; color: var(--text);
+  line-height: 1.45;
+}
+.app-next-btn {
+  flex: none;
+  padding: 9px 15px;
+  border: 0; border-radius: 999px;
+  background: var(--primary); color: #fff;
+  font-size: var(--t-sm); font-weight: 700;
+  cursor: pointer; white-space: nowrap;
+  transition: background 0.15s, transform 0.12s;
+}
+.app-next-btn:hover { background: var(--primary-dark); }
+.app-next-btn:active { transform: scale(0.97); }
 .app-log[hidden] { display: none !important; }
 .app-log-list { list-style: none; margin: 0; padding: 0; }
 .app-log-list li {

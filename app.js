@@ -2303,6 +2303,7 @@ function closeSheet() {
    ────────────────────────────────────────────────────────────────────── */
 let appsSelectMode = false;
 const appsSelected = new Set();
+const appsLogOpen = new Set();   // 펼쳐 둔 진행 기록 — 다시 그려도 닫히지 않게
 let lastSwipeAt = 0;            // 스와이프 직후의 클릭을 삼키는 자리 (아래 주석)
 let undoBuffer = null;          // 되돌리기용 — 지운 항목과 원래 자리
 
@@ -2320,11 +2321,12 @@ function appCard(app) {
   const stepCount = app.pending ? '' : `${step + 1}/${APP_STEPS.length}`;
   const pct = app.pending ? 6 : ((step + 1) / APP_STEPS.length) * 100;
   return `
-    <div class="swipe-row" data-row="${esc(app.id)}">
+    <div class="swipe-row${appsLogOpen.has(app.id) ? ' log-open' : ''}" data-row="${esc(app.id)}">
       <button class="swipe-del" data-del="${esc(app.id)}" aria-label="이 신청 기록 삭제">삭제</button>
       ${appsSelectMode ? `<input type="checkbox" class="row-check" data-pick="${esc(app.id)}" ${checked}
          aria-label="${esc(sch.name)} 선택" />` : ''}
-      <button class="sch-card" data-detail="${sch.id}">
+      <button class="sch-card" data-detail="${sch.id}" aria-expanded="${appsLogOpen.has(app.id)}">
+        <span class="app-caret" aria-hidden="true"></span>
         <div class="sch-top">
           <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${sch.type}</span>
         </div>
@@ -2345,18 +2347,48 @@ function appCard(app) {
       학생을 그날까지 기다리게 만든다.
    🔴 제출·선정 기록은 여기서 바로 남긴다. 앱은 학교 전산을 볼 수 없으므로 이 둘은
       언제나 학생이 적는 값이다(운영 원칙 8). */
+/* 담아 둔 공고를 다시 누르는 학생이 궁금한 것은 공고 내용이 아니다(담을 때 이미 봤다).
+   궁금한 것은 **"내가 지금 뭘 해야 하나"** 하나뿐이라, 그 한 줄을 패널 맨 위에 둔다.
+   🔴 앱이 아는 사실(담김·제출 기록·마감 경과·결과 기록)로만 정한다 — 발표일·경쟁률처럼
+      앱이 모르는 것은 여기 올리지 않는다(원칙 8-1).
+   🔴 무거운 동작(양식 작성·제출처 열기)은 **상세 시트로 보낸다.** 여기에 같은 버튼을
+      한 벌 더 만들면 제출 흐름이 두 곳으로 갈라진다. */
+function nextAction(app, sch, step, d, closed) {
+  const go = (label) => `<button class="app-next-btn" data-detail="${esc(sch.id)}">${label}</button>`;
+  if (app.pending) return { text: '신청서 작성이 남았어요', btn: go('이어서 작성') };
+  if (step === 0) {
+    return closed
+      ? { text: '접수가 마감됐어요. 제출하셨나요?',
+          btn: `<button class="app-next-btn" data-mark-submit="${esc(app.id)}">제출했다고 기록</button>` }
+      : { text: `아직 제출 기록이 없어요 · ${sch.deadline ? '마감 ' + esc(d.label) : '마감 기한 미확인'}`,
+          btn: go('제출하러 가기') };
+  }
+  if (step === 1) return { text: '제출 기록됨 · 접수가 마감되면 심사로 넘어가요', btn: '' };
+  if (step === 2) return { text: '결과가 나오면 아래에 기록해 주세요', btn: '' };
+  return { text: app.result === 'won' ? '선정으로 기록됨' : '미선정으로 기록됨', btn: '' };
+}
+
 function appLogHtml(app, sch, step) {
   const d = dday(sch.deadline);
   const row = (done, label, value) =>
     `<li class="${done ? 'done' : ''}"><b>${esc(label)}</b><span>${value}</span></li>`;
   const closed = sch.deadline && d.days < 0;
+  const next = nextAction(app, sch, step, d, closed);
   return `
-    <div class="app-log" hidden>
+    <div class="app-log"${appsLogOpen.has(app.id) ? '' : ' hidden'}>
+      <div class="app-next">
+        <p>${esc(next.text)}</p>
+        ${next.btn}
+      </div>
       <ul class="app-log-list">
         ${row(true, '담아 둔 날', esc(app.appliedAt || '-'))}
         ${row(!!app.submittedAt, '공식 제출',
           app.submittedAt ? esc(app.submittedAt) + ' 기록됨'
-            : `<button class="app-log-btn" data-mark-submit="${esc(app.id)}">제출했다고 기록</button>`)}
+            /* 🔴 위 '다음 할 일' 줄이 이미 같은 버튼을 내밀고 있으면 여기엔 안 만든다 —
+               같은 버튼이 두 개 보이면 어느 쪽이 진짜인지 학생이 판단해야 한다. */
+            : (next.btn.includes('data-mark-submit')
+                ? '<span class="app-log-none">아직 기록 없음</span>'
+                : `<button class="app-log-btn" data-mark-submit="${esc(app.id)}">제출했다고 기록</button>`))}
         ${row(!!closed, '접수 마감', sch.deadline ? esc(sch.deadline) + (closed ? ' 지남' : ' · ' + esc(d.label)) : '기한 미확인')}
         ${row(step >= 2, '심사', app.submittedAt && closed ? '진행 중' : '제출 기록과 마감 경과 후 표시')}
         ${row(!!app.result, '선정 발표',
@@ -2868,7 +2900,17 @@ function bindEvents() {
     const row = card.closest('.swipe-row');
     if (row && !appsSelectMode && card.classList.contains('sch-card')) {
       const log = row.querySelector('.app-log');
-      if (log) { log.hidden = !log.hidden; return; }
+      if (log) {
+        log.hidden = !log.hidden;
+        if (log.hidden) appsLogOpen.delete(row.dataset.row); else appsLogOpen.add(row.dataset.row);
+        row.classList.toggle('log-open', !log.hidden);
+        card.setAttribute('aria-expanded', String(!log.hidden));
+        /* 🔴 펼치기만 하면 화면 밖에서 열린다 — 카드(250px) 아래로 300px 가 더 붙는데
+           카드가 화면 중간 아래에 있으면 펼쳐진 부분이 통째로 안 보인다.
+           카드를 위로 올려 패널 전체가 화면에 들어오게 한다. */
+        if (!log.hidden) row.scrollIntoView({ block: 'start', behavior: 'smooth' });
+        return;
+      }
     }
     if (appsSelectMode && card.closest('#apps-list')) {
       const id = card.dataset.detail;                 // 선택 모드에서는 카드를 눌러도 선택이 된다
