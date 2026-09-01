@@ -539,9 +539,13 @@ function showScreen(name) {
 
 /* ---------------- 온보딩 ---------------- */
 let onboardStep = 0;
+/* 프로필을 **고치러** 들어왔나 (처음 가입이 아니라) — 취소 버튼을 띄울지 정한다 */
+let onboardEditing = false;
 const ONBOARD_STEPS = 6;   /* 2026-08-27 — '지금 받고 있는 장학금'(이중수혜) 단계 추가 */
 
 function renderOnboardStep() {
+  /* 고치러 들어온 경우에만 취소를 보여 준다 — 처음 가입하는 사람에게는 취소할 것이 없다 */
+  $$('#screen-onboarding .btn-onboard-cancel').forEach((b) => (b.hidden = !onboardEditing));
   $$('.onboard-step').forEach((el) => (el.hidden = Number(el.dataset.step) !== onboardStep));
   $('#onboard-bar').style.width = `${((onboardStep + 1) / ONBOARD_STEPS) * 100}%`;
   window.scrollTo(0, 0);
@@ -816,8 +820,8 @@ function renderHome() {
      학생이 얻는 정보가 아니었다. 남는 것은 건수와 동사뿐이다. */
   btn.textContent = notApplied.length ? `${notApplied.length}건 신청 준비` : '준비할 장학금이 남아 있지 않습니다';
 
-  const upcoming = applyable
-    .filter((m) => dday(m.sch.deadline).days >= 0 && notStale(m.sch))
+  const upcoming = matches
+    .filter((m) => m.result.status !== 'ineligible' && dday(m.sch.deadline).days >= 0 && notStale(m.sch))
     .sort((a, b) => deadlineTs(a.sch) - deadlineTs(b.sch))
     .slice(0, 3);
   $('#home-deadline-list').innerHTML = upcoming.length
@@ -2213,7 +2217,8 @@ function openSheetShell(keepScroll) {
   $('#sheet-backdrop').hidden = false;
   const sheet = $('#detail-sheet');
   sheet.hidden = false;
-  requestAnimationFrame(() => {
+  void sheet.offsetHeight;   /* 배치를 확정시켜 transition 이 걸리게 한다 (rAF 대신) */
+  {
     $('#sheet-backdrop').classList.add('show');
     sheet.classList.add('show');
     /* 🔴 **맨 위부터 보여 준다** (2026-08-29 개발자 지적: "공고를 누르면 그 공고의
@@ -2224,7 +2229,7 @@ function openSheetShell(keepScroll) {
        되돌리면 내용이 없어 안 먹는다. 이 rAF 는 채운 뒤에 돈다.
        되돌아가기(`dismissSheet`)만 보던 자리를 넘겨 그 위치를 되살린다. */
     sheet.scrollTop = keepScroll || 0;
-  });
+  }
 }
 
 /* 시트를 내렸을 때 **돌아갈 곳** (2026-08-29 개발자 요청).
@@ -2638,6 +2643,18 @@ function renderWallet() {
 
 /* ---------------- 이벤트 바인딩 ---------------- */
 function bindEvents() {
+  /* 취소 — 고치던 것을 버리고 있던 화면으로 돌아간다.
+     🔴 저장하지 않는다: collectProfile() 을 부르지 않으므로 입력칸에 친 값은 버려지고
+        state.profile 은 손대지 않은 그대로다. 되돌리기가 아니라 '아무 일도 없던 것'이다. */
+  $$('[data-onboard-cancel]').forEach((btn) =>
+    btn.addEventListener('click', () => {
+      onboardEditing = false;
+      onboardStep = 0;
+      initOnboarding();          /* 칸을 저장된 프로필 값으로 되돌린다 */
+      showScreen('my');
+    })
+  );
+
   $$('.onboard-step [data-next]').forEach((btn) =>
     btn.addEventListener('click', () => {
       if (onboardStep === 1) {
@@ -2650,6 +2667,7 @@ function bindEvents() {
   );
 
   $('#btn-finish-onboard').addEventListener('click', () => {
+    onboardEditing = false;
     const isFirstTime = !state.profile;
     state.profile = collectProfile();
     /* 민감정보 동의는 프로필이 아니라 따로 둔다 — 프로필은 서버로 나가는 값이고
@@ -2868,7 +2886,11 @@ function bindEvents() {
 
   $('#btn-apply-all').addEventListener('click', applyAll);
 
-  const editProfile = () => { initOnboarding(); showScreen('onboarding'); };
+  const editProfile = () => {
+    onboardEditing = !!state.profile;   /* 이미 프로필이 있으면 '고치는 중'이다 */
+    initOnboarding();
+    showScreen('onboarding');
+  };
   $('#btn-edit-profile').addEventListener('click', editProfile);
   { const e = $('#btn-my-edit'); if (e) e.addEventListener('click', editProfile); }
 

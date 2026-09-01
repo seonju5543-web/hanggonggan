@@ -2650,3 +2650,64 @@ body::after { opacity: 0.26; }
 .sch-top { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 9px; }
 .sch-top > * { margin: 0; }
 .sch-top .badge, .sch-top .badge-fit { line-height: 1.5; padding: 3.5px 9px; }
+
+/* ══ 간격 정리 (2026-09-01 · "간격이 맞지 않은 부분이 많다") ══════════════
+   🔴 이 앱의 세로 간격을 **네 단계**로 못 박는다. 새 요소를 만들 때 숫자를 직접 쓰지 말고
+      여기서 고를 것 — 안 그러면 또 제각각이 된다.
+        8px  같은 덩어리 안 (제목과 그 설명)
+        14px 덩어리 사이 (입력칸과 다음 입력칸)
+        24px 절 안의 묶음 사이
+        34px 절과 절 사이
+   원인은 margin 이 위아래에서 각각 붙어 겹치거나 상쇄된 자리들이었다. */
+:root { --sp-1: 8px; --sp-2: 14px; --sp-3: 24px; --sp-4: 34px; }
+
+/* 취소 버튼 — 다음 버튼과 나란히 */
+.onboard-actions { display: flex; flex-direction: column; gap: var(--sp-1); }
+.btn-onboard-cancel {
+  background: transparent;
+  color: var(--text-sub);
+  box-shadow: inset 0 0 0 1px var(--line);
+  padding: 15px;
+  font-size: var(--t-md);
+  order: 2;                      /* 다음 버튼 아래에 둔다 — 주 동작이 먼저 읽혀야 한다 */
+}
+.btn-onboard-cancel:hover { background: var(--surface-2); color: var(--text); }
+.btn-onboard-cancel[hidden] { display: none !important; }
+.onboard-actions .btn-primary { order: 1; }
+.onboard-note { order: 3; margin-top: 2px; }
+
+/* 온보딩 — 칸 사이를 하나로 */
+.onboard-body h2 { margin-bottom: var(--sp-1); }
+.onboard-sub { margin: 0 0 var(--sp-4); }
+.field { margin-bottom: var(--sp-3); }
+.field-label { margin-bottom: var(--sp-1); }
+.chip-group { gap: 7px; }
+
+/* 홈 — 절 사이를 하나로 */
+.alog-sum, .ledger-hero { margin-bottom: var(--sp-4); }
+.section-head { margin: var(--sp-4) 0 0; padding-top: 16px; }
+.hero-count { margin-top: var(--sp-1); padding-top: var(--sp-1); }
+.home-header { margin-bottom: var(--sp-3); padding-bottom: var(--sp-2); }
+
+/* 목록 줄 — 안쪽 간격을 하나로 */
+.sch-card { padding: 17px 20px; }
+.sch-top { margin-bottom: var(--sp-1); }
+.sch-name { margin: 0; }
+.sch-amount { margin-top: 5px; }
+.sch-provider { margin-top: 3px; }
+.app-step { margin-top: var(--sp-2); }
+
+/* MY — 절과 절 사이를 하나로 */
+.my-card { padding: var(--sp-3) 0; }
+.my-grid { margin: var(--sp-2) 0 var(--sp-1); }
+.my-flags { margin-top: var(--sp-1); }
+.my-menu { margin-top: var(--sp-4); }
+.wallet-sub { margin-top: 5px; margin-bottom: var(--sp-1); }
+.nf-set-head { margin-bottom: var(--sp-2); }
+.nf-prefs { margin: 0; }
+.data-note { margin-top: var(--sp-3); }
+
+/* 시트 안 — 제목과 본문 */
+.sheet-title { margin-top: var(--sp-1); }
+.sheet-provider { margin-top: 5px; }
+.sheet-amount { margin-top: var(--sp-1); }
