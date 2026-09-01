@@ -2868,3 +2868,15 @@ body::after { opacity: 0.26; }
   font-weight: 600;
 }
 .app-log-more:hover { color: var(--text); box-shadow: inset 0 0 0 1px var(--rule); }
+
+/* 원문에서 집어 온 발표일 — 어디서 온 값인지 밝힌다 */
+.app-log-src { color: var(--text); }
+.app-log-src em {
+  font-style: normal;
+  font-size: var(--t-2xs);
+  font-weight: 600;
+  color: var(--text-weak);
+  margin-left: 7px;
+}
+/* 신청 내역 요약의 금액을 크게 (2026-09-01 개발자 지시) */
+.summary-amount { font-size: 40px; letter-spacing: -0.04em; line-height: 1.1; }
