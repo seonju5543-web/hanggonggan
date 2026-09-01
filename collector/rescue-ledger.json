@@ -151,14 +151,14 @@
   "name": "[공통][국가]2026년 2학기 푸른등대 기부장학금 장학생 선발(~9/10)"
  },
  "https://dep.hufs.ac.kr/bbs/student/2431/263952/artclView.do": {
-  "tries": 2,
-  "at": "2026-09-01",
+  "tries": 3,
+  "at": "2026-09-02",
   "minBody": 100,
   "name": "[공통][국가]2026년 2학기 고졸 후학습자 장학금 신청안내"
  },
  "https://dep.hufs.ac.kr/bbs/student/2431/263956/artclView.do": {
-  "tries": 2,
-  "at": "2026-09-01",
+  "tries": 3,
+  "at": "2026-09-02",
   "minBody": 100,
   "name": "[공통][교외]2026년 하반기 울산연구원 장학생 선발공고"
  }
