@@ -1,6 +1,6 @@
-# 작성 규칙 학습 — 2026-08-24
+# 작성 규칙 학습 — 2026-09-01
 
-읽은 곳 18곳 · 못 읽은 곳 1곳 · 규칙에 붙은 출처 1건
+읽은 곳 19곳 · 못 읽은 곳 1곳 · 규칙에 붙은 출처 11건
 
 ## 읽은 곳
   ✓ https://brunch.co.kr/@geonahn/425
@@ -36,26 +36,31 @@
       줄 363 · 규칙을 뒷받침한 것 2종 (know-the-foundation, character-evidence)
       🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
   ✓ https://linkareer.com/activity/277626
-      줄 136 · 규칙을 뒷받침한 것 1종 (know-the-foundation)
+      줄 135 · 규칙을 뒷받침한 것 1종 (know-the-foundation)
       🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
   ✓ https://linkareer.com/activity/284206
-      줄 123 · 규칙을 뒷받침한 것 1종 (know-the-foundation)
+      줄 122 · 규칙을 뒷받침한 것 1종 (know-the-foundation)
       🆕 어느 규칙에도 안 붙은 문장 4개 — 컨펌 대기
-  ✓ https://www.skillagit.com/mobile/product/view.php?idx=17871&amp;code=1212?%3E
-      줄 1099 · 규칙을 뒷받침한 것 0종
-      🆕 어느 규칙에도 안 붙은 문장 2개 — 컨펌 대기
-  ✓ https://www.skillagit.com/mobile/product/view.php?idx=17843&amp;code=1212?%3E
-      줄 1039 · 규칙을 뒷받침한 것 0종
-      🆕 어느 규칙에도 안 붙은 문장 2개 — 컨펌 대기
   ✓ https://www.skillagit.com/product/view.php?idx=3862
-      줄 1152 · 규칙을 뒷받침한 것 1종 (concrete-scene)
+      줄 1153 · 규칙을 뒷받침한 것 1종 (concrete-scene)
       🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
-  ✓ https://www.skillagit.com/people/people_view.php?b_id=008&amp;idx=531
-      줄 730 · 규칙을 뒷받침한 것 0종
-  ✓ https://www.skillagit.com/people/people_view.php?b_id=008&amp;idx=728
-      줄 730 · 규칙을 뒷받침한 것 0종
-  ✓ https://www.skillagit.com/people/people_view.php?b_id=008&amp;idx=762
-      줄 730 · 규칙을 뒷받침한 것 0종
+  ✓ https://community.linkareer.com/final_review
+      줄 334 · 규칙을 뒷받침한 것 0종
+  ✓ https://www.skillagit.com/mobile/product/view.php?idx=17903&amp;code=1219?%3E
+      줄 1092 · 규칙을 뒷받침한 것 0종
+      🆕 어느 규칙에도 안 붙은 문장 5개 — 컨펌 대기
+  ✓ https://www.skillagit.com/mobile/product/view.php?idx=17893&amp;code=1219?%3E
+      줄 1098 · 규칙을 뒷받침한 것 2종 (character-evidence, answer-the-question)
+      🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
+  ✓ https://owlapply.com/ko/jagisogeseo-yangsig
+      줄 380 · 규칙을 뒷받침한 것 6종 (episode-star, concrete-scene, growth-lesson, character-evidence, motive-need-then-plan, message-short)
+      🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
+  ✓ https://owlapply.com/ko/blog/jagisogeseo
+      줄 182 · 규칙을 뒷받침한 것 3종 (lead-first, no-cliche, character-evidence)
+      🆕 어느 규칙에도 안 붙은 문장 5개 — 컨펌 대기
+  ✓ https://owlapply.com/ko/ai-dogu/jagisogeseo-saengseong
+      줄 205 · 규칙을 뒷받침한 것 0종
+      🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
 
 ## 🆕 어느 규칙에도 안 붙은 문장 — 개발자 컨펌 대기
 아래는 **규칙 후보**입니다. 규칙집에 넣을지는 사람이 정합니다(운영 원칙 2).
@@ -142,27 +147,27 @@
   <sub>https://brunch.co.kr/@icebergw/4</sub>
 
 ## 스스로 넓히기 — 로봇이 읽은 글에서 다음에 읽을 곳을 주웠습니다
-주운 곳 14곳 · 이번에 읽은 곳 6곳 · robots.txt 가 막아 건너뛴 곳 0곳
+주운 곳 20곳 · 이번에 읽은 곳 6곳 · robots.txt 가 막아 건너뛴 곳 0곳
 
-- · 규칙 0종 — 30일 뒤 다시 시도 https://www.skillagit.com/mobile/product/view.php?idx=17871&amp;code=1212?%3E
-  <sub>정성껏 작성하는 맞춤형 글쓰기/문서 작성 서비스 (자소서)</sub>
-- · 규칙 0종 — 30일 뒤 다시 시도 https://www.skillagit.com/mobile/product/view.php?idx=17843&amp;code=1212?%3E
-  <sub>방송가 출신. 요약, 비평, 정리, 자소서 각종 글을 써드립니다</sub>
-- ⬆️ seeds 로 승격 https://www.skillagit.com/product/view.php?idx=3862
-  <sub>&gt;&gt;&gt;카이스트 출신 현직 면접관, 임원이 내 자소서를 첨삭해준다면 &gt;&gt;&gt;</sub>
-- · 규칙 0종 — 30일 뒤 다시 시도 https://www.skillagit.com/people/people_view.php?b_id=008&amp;idx=531
-  <sub>■ 인사담당자 자소서 핵심 체크리스트 (자소서 금지어, 금지단어 및 표현 체크리스트)</sub>
-- · 규칙 0종 — 30일 뒤 다시 시도 https://www.skillagit.com/people/people_view.php?b_id=008&amp;idx=728
-  <sub>[합격 가이드 X 실전 AI 기술] 나만의 AI 무기 장착</sub>
-- · 규칙 0종 — 30일 뒤 다시 시도 https://www.skillagit.com/people/people_view.php?b_id=008&amp;idx=762
-  <sub>꼬리 질문 방어까지, 합격 부르는 AI 대화 기술</sub>
+- · 규칙 0종 — 30일 뒤 다시 시도 https://community.linkareer.com/final_review
+  <sub>최종 합격 후기</sub>
+- · 규칙 0종 — 30일 뒤 다시 시도 https://www.skillagit.com/mobile/product/view.php?idx=17903&amp;code=1219?%3E
+  <sub>AI에게 이 파일을 전송하면 나만의 합격 자소서가 됩니다.</sub>
+- ⬆️ seeds 로 승격 https://www.skillagit.com/mobile/product/view.php?idx=17893&amp;code=1219?%3E
+  <sub>Ai로 만든 자소서, 깔끔하게 수정해드립니다.</sub>
+- ⬆️ seeds 로 승격 https://owlapply.com/ko/jagisogeseo-yangsig
+  <sub>자기소개서 템플릿</sub>
+- ⬆️ seeds 로 승격 https://owlapply.com/ko/blog/jagisogeseo
+  <sub>자기소개서</sub>
+- · 규칙 0종 — 30일 뒤 다시 시도 https://owlapply.com/ko/ai-dogu/jagisogeseo-saengseong
+  <sub>자기소개서 빌더</sub>
 
 ## 🩺 seed 건강 (지속가능성)
-살아 있는 seed 14개 (상한 60) · 이번 실행에서 규칙을 준 곳 12개
+살아 있는 seed 17개 (상한 60) · 이번 실행에서 규칙을 준 곳 15개
 
 **시든 seed — 3회 연속 규칙 0종.** 사람이 확인해 지워 주세요(자동 삭제 안 함):
-- (3회) https://brunch.co.kr/@geonahn/425
-- (3회) https://soomgo.com/community/pro-knowhow/64d1ccfa207c23ba67c9350b
+- (4회) https://brunch.co.kr/@geonahn/425
+- (4회) https://soomgo.com/community/pro-knowhow/64d1ccfa207c23ba67c9350b
 
 
 ## 📌 다음에 크롤링할 출처 — 개발자 확인용 (정직 보고)

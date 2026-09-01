@@ -8,7 +8,7 @@
       "url": "https://brunch.co.kr/@geonahn/425",
       "kind": "*",
       "note": "장학재단 운영자가 쓴 심사 관점",
-      "strike": 3
+      "strike": 4
     },
     {
       "url": "https://community.linkareer.com/employment_data/4250237",
@@ -38,7 +38,7 @@
       "url": "https://soomgo.com/community/pro-knowhow/64d1ccfa207c23ba67c9350b",
       "kind": "*",
       "note": "두괄식 작성법 · 첫 문장",
-      "strike": 3
+      "strike": 4
     },
     {
       "url": "https://www.skillagit.com/mobile/people/curation_view.php?idx=522",
@@ -90,6 +90,27 @@
       "kind": "*",
       "note": "로봇이 스스로 찾음 — &gt;&gt;&gt;카이스트 출신 현직 면접관, 임원이 내 자소서를 첨삭해준다면 &gt;&gt;&gt;",
       "addedAt": "2026-08-24",
+      "strike": 0
+    },
+    {
+      "url": "https://www.skillagit.com/mobile/product/view.php?idx=17893&amp;code=1219?%3E",
+      "kind": "*",
+      "note": "로봇이 스스로 찾음 — Ai로 만든 자소서, 깔끔하게 수정해드립니다.",
+      "addedAt": "2026-09-01",
+      "strike": 0
+    },
+    {
+      "url": "https://owlapply.com/ko/jagisogeseo-yangsig",
+      "kind": "*",
+      "note": "로봇이 스스로 찾음 — 자기소개서 템플릿",
+      "addedAt": "2026-09-01",
+      "strike": 0
+    },
+    {
+      "url": "https://owlapply.com/ko/blog/jagisogeseo",
+      "kind": "*",
+      "note": "로봇이 스스로 찾음 — 자기소개서",
+      "addedAt": "2026-09-01",
       "strike": 0
     }
   ],
@@ -189,6 +210,21 @@
     {
       "url": "https://www.skillagit.com/people/people_view.php?b_id=008&amp;idx=762",
       "seenAt": "2026-08-24",
+      "why": "규칙 0종"
+    },
+    {
+      "url": "https://community.linkareer.com/final_review",
+      "seenAt": "2026-09-01",
+      "why": "규칙 0종"
+    },
+    {
+      "url": "https://www.skillagit.com/mobile/product/view.php?idx=17903&amp;code=1219?%3E",
+      "seenAt": "2026-09-01",
+      "why": "규칙 0종"
+    },
+    {
+      "url": "https://owlapply.com/ko/ai-dogu/jagisogeseo-saengseong",
+      "seenAt": "2026-09-01",
       "why": "규칙 0종"
     }
   ],
