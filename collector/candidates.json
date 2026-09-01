@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-09-01",
- "count": 2303,
+ "count": 2305,
  "items": [
   {
    "title": "[공통][교외] 2026년 2학기 선원가족장학사업 선발 안내",
@@ -68,6 +68,24 @@
    ],
    "deadlineHint": "까지 학기당 생활비성 학업장려금 3,500,000 원 지원 ( ※ 단 , 계속장학생 요건 충족시 ) &nbsp;",
    "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-09-01"
+  },
+  {
+   "title": "공통 [공통] 두을장학재단 제29기 장학생 모집",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%20%5B%EA%B3%B5%ED%86%B5%5D%20%EB%91%90%EC%9D%84%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EC%A0%9C29%EA%B8%B0%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "경희대학교",
+   "campus": "",
+   "foundAt": "2026-09-01"
+  },
+  {
+   "title": "공통 제36기 미레에셋 해외교환 장학생 선발",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%20%EC%A0%9C36%EA%B8%B0%20%EB%AF%B8%EB%A0%88%EC%97%90%EC%85%8B%20%ED%95%B4%EC%99%B8%EA%B5%90%ED%99%98%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "경희대학교",
    "campus": "",
    "foundAt": "2026-09-01"
   },
