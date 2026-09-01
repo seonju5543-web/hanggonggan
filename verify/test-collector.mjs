@@ -376,6 +376,18 @@ function undeclaredNames(src) {
     undeclaredNames('const A = 1;\nconsole.log(`값 ${A}/${GIVE_UP_AFTER}회`);'), ['GIVE_UP_AFTER']);
 }
 
+/* 🔴 재단 서버가 한 번 안 받아 주면 실행 전체가 죽는다 (2026-09-01 이슈 #227).
+   `ConnectTimeoutError` 하나에 34초 만에 끝나 그날 층2 갱신이 통째로 사라졌다.
+   재시도를 붙였으니, 다음 사람이 무심코 맨 `fetch` 를 다시 쓰는 것을 여기서 막는다.
+   (학교 게시판 수집은 2026-07-30 시립대 유실로 이미 같은 것을 배웠다.) */
+{
+  const src = fs.readFileSync(new URL('../collector/kosaf-fetch.mjs', import.meta.url), 'utf8');
+  const bare = [...src.matchAll(/await\s+fetch\(/g)].length;
+  eq('한국장학재단 수확이 맨 fetch 를 쓰지 않는다 (재시도를 거친다)', bare, 1);  // tryFetch 안의 1회뿐
+  eq('  재시도 함수가 있다', /async function tryFetch\(/.test(src), true);
+  eq('  넘어지면 성공으로 위장하지 않는다 (끝내 못 받으면 던진다)', /\n\s*throw last;/.test(src), true);
+}
+
 /* 재시도 대기에 page.waitForTimeout을 쓰면 안 된다 (2026-08-02 이슈 #89).
    페이지가 닫혀서 goto가 실패한 경우 그 대기가 스스로 예외를 던져 **진짜 실패 원인을
    덮어쓰고 남은 재시도까지 건너뛴다.** 서울대·가천대·외대·상명대가 이 경로로 죽고 있었다.

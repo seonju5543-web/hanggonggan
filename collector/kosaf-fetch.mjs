@@ -42,6 +42,35 @@ const WRITE = process.argv.includes('--write');
 const LIST_ONLY = process.argv.includes('--list-only');
 
 /* 쿠키를 손으로 이어 붙인다 — 의존성을 늘리지 않는다 */
+/* 🔴 재단 서버가 한 번 안 받아 주면 **실행 전체가 죽었다** (2026-09-01 이슈 #227).
+   그날 로그는 `ConnectTimeoutError: portal.kosaf.go.kr:443, timeout: 10000ms` 하나였고
+   34초 만에 끝났다 — 우리 버그가 아니라 재단 쪽이 잠깐 안 받은 것인데, 재시도가 없어
+   그 실행이 통째로 사라졌다. 다음 예약은 사흘 뒤라 그동안 층2 가 늙는다
+   (안 받으면 1주에 43곳·2주에 69곳이 마감돼 목록이 빈다).
+   학교 게시판 수집이 2026-07-30 시립대 유실로 이미 배운 것과 **같은 유형**이다.
+
+   ⚠️ **응답을 못 받은 요청만 다시 보낸다.** 응답이 왔으면 `post()` 가 토큰을 갱신하므로
+      같은 몸통으로 다시 보내면 껍데기가 온다(파일 첫머리의 form2 함정과 같은 뿌리).
+      여기서 잡는 것은 fetch 자체가 던지는 경우 = 응답이 아예 없는 경우뿐이다. */
+async function tryFetch(url, opts = {}, attempts = 3) {
+  let last;
+  for (let i = 1; i <= attempts; i += 1) {
+    try {
+      /* 30초 — 평소 목록은 2초, 상세(1.3MB)는 8초다(실측). 넉넉하되 무한정은 아니다.
+         ⚠️ 여기를 크게 잡으면 포털이 **느릴 때** 185쪽을 도는 동안 작업 상한(20분)에 걸려
+            취소된다. 취소는 실패가 아니라서 `if: failure()` 도 안 잡는다. */
+      return await fetch(url, { ...opts, signal: AbortSignal.timeout(30000) });
+    } catch (e) {
+      last = e;
+      if (i < attempts) {
+        console.log(`  · 재단 서버가 응답하지 않습니다 (${i}/${attempts}) — ${i * 5}초 뒤 다시 겁니다`);
+        await new Promise((r) => setTimeout(r, i * 5000));
+      }
+    }
+  }
+  throw last;
+}
+
 const cookies = new Map();
 function keep(res) {
   const set = typeof res.headers.getSetCookie === 'function' ? res.headers.getSetCookie() : [];
@@ -102,7 +131,7 @@ function baseBody() {
   return body;
 }
 async function post(body) {
-  const r = await fetch(`${BASE}/CO/jspActionSafe.do`, {
+  const r = await tryFetch(`${BASE}/CO/jspActionSafe.do`, {
     method: 'POST',
     headers: { cookie: jar(), 'content-type': 'application/x-www-form-urlencoded' },
     body,
@@ -149,7 +178,7 @@ async function detail(code) {
   return Object.keys(f).length ? f : null;
 }
 
-const first = await fetch(LIST, { headers: { cookie: jar() } });
+const first = await tryFetch(LIST, { headers: { cookie: jar() } });
 keep(first);
 const firstHtml = await first.text();
 readForm(firstHtml);
@@ -202,6 +231,16 @@ if (!LIST_ONLY) {
     target = order.filter((r) => words.some((w) => r.org.includes(w) || r.name.includes(w))
       || r.due >= today);
     console.log(`대상 좁힘: ${target.length}건 (지정 낱말 ${words.length}개 + 마감 유효분)`);
+  }
+  /* 특정 재단만 콕 집어 받는다 — `--codes=2700819001,…`
+     🔴 가설 하나를 확인하려고 넣었다(2026-09-02): 위 주석의 "마감이 지난 것도 자격은
+        그대로 쓸 수 있다"가 **한 번도 확인된 적이 없었다.** 마감 지난 재단은 정렬상
+        늘 뒤로 밀려 예산에 잘려서, `--only` 로도 집을 수가 없었다. */
+  const codes = arg('codes', '');
+  if (codes) {
+    const want = codes.split(',').map((x) => x.trim()).filter(Boolean);
+    target = want.map((c) => list.find((r) => r.code === c)).filter(Boolean);
+    console.log(`대상 지정: ${target.length}/${want.length}건`);
   }
   if (MAX) target = target.slice(0, MAX);
   /* 예산 안에 스스로 끝낸다. 다 못 받아도 목록과 이어받은 상세는 저장된다 —
