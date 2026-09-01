@@ -1,7 +1,7 @@
-## 🖥 브라우저형 수집 리포트 (2026-08-31 18:37 KST)
+## 🖥 브라우저형 수집 리포트 (2026-09-01 10:47 KST)
 
 ### 한국외국어대학교
-- ✅ 링크 87 · 장학 공고 18 · https://dep.hufs.ac.kr/student/12767/subview.do
+- ✅ 링크 86 · 장학 공고 17 · https://dep.hufs.ac.kr/student/12767/subview.do
 
 ### 경희대학교
 - ⚪ 링크 291 · 장학 공고 0 · 이미 아는 공고 8건은 다시 열지 않음 · https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318
