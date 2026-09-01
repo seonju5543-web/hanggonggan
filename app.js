@@ -2372,7 +2372,11 @@ function announceLine(sch) {
       언제나 학생이 적는 값이다(운영 원칙 8). */
 function appLogHtml(app, sch, step) {
   const d = dday(sch.deadline);
-  const announce = announceLine(sch);
+  /* 수집 로봇이 공고 **전문**에서 뽑아 둔 발표일이 있으면 그것을 먼저 쓴다.
+     원문 전문은 앱이 갖고 있지 않다(수 MB) — 로봇만 읽을 수 있어
+     collector/extract-excerpts.mjs 가 원문 문장 그대로 sch.announce 에 담아 둔다.
+     없으면 앱이 가진 원문 계열 칸(period·note·발췌)에서 찾고, 그것도 없으면 지어내지 않는다. */
+  const announce = sch.announce || announceLine(sch);
   const row = (done, label, value) =>
     `<li class="${done ? 'done' : ''}"><b>${esc(label)}</b><span>${value}</span></li>`;
   const closed = sch.deadline && d.days < 0;

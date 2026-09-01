@@ -562,8 +562,49 @@ function qualFromDocs(it) {
   return [];
 }
 
+/* ── 발표일 — 공고 전문에서 **그 문장을 그대로** 집는다 (2026-09-01 개발자 요청) ──
+   🔴 날짜를 새로 조립하지 않는다. '8.26(수)' 을 '2026-08-26' 으로 바꿔 적는 순간 그것은
+      우리가 만든 값이 되고, 연도를 잘못 짚으면 학생이 엉뚱한 날을 기다린다. 원문이 쓴
+      대로 넘기고 앱이 '원문에서'라고 밝힌다(원칙 8-1 · 추론 금지 · 원문 발췌).
+   🔴 못 찾으면 지어내지 않는다 — 앱이 '발표일은 공고 원문 확인'으로 말한다.
+   ⚠️ 버리는 것 셋(전부 실제 데이터에서 나온 오탐이다):
+      ① 숫자가 없는 문장 — 발표'일'이 아니다
+      ② '발표일까지 주소가 …' 같은 **조건문** — 날짜를 말하는 문장이 아니다
+      ③ '결과 발표 후 …' 처럼 발표를 기준점으로만 쓰는 문장 */
+const ANNOUNCE_WORD = /(선정자?|합격자?|최종|장학생)?\s*발표/;
+const ANNOUNCE_SKIP = /발표\s*(일까지|후|전|되면|되기|나면)|발표\s*예정일?\s*(없|미)/;
+const HAS_DATE = /\d{1,2}\s*[.\/월]\s*\d{1,2}|\d{4}\s*[.\-\/년]|\d{1,2}월/;
+
+function extractAnnounce(body) {
+  if (!body) return null;
+  /* 🔴 마침표로 문장을 자르면 **날짜가 잘린다** — `결과발표 : 2026. 8. 28` 이
+     `결과발표 : 2026.` 으로 끊겼다(실측). 숫자 사이의 마침표는 문장 끝이 아니다.
+     줄바꿈·가운뎃점으로만 자르고, 마침표는 한글 어미 뒤일 때만 문장 끝으로 본다. */
+  const lines = String(body).split(/[\n·•]+|(?<=[다요])\.\s+/);
+  for (const raw of lines) {
+    const t = raw.replace(/\s+/g, ' ').trim();
+    if (t.length < 4 || t.length > 120) continue;
+    if (!ANNOUNCE_WORD.test(t)) continue;
+    if (ANNOUNCE_SKIP.test(t)) continue;
+    if (!HAS_DATE.test(t)) continue;
+    /* 앞뒤 군더더기(글머리 기호·괄호 번호)를 떼고 원문 문장만 남긴다 */
+    /* HWP·PDF 에서 뽑힌 글자는 `2026 년 8 월 28 일 (금 )` 처럼 공백이 흩어져 있다.
+       **공백만** 다듬는다 — 글자와 숫자는 원문 그대로 둔다. */
+    const clean = t.replace(/^[\s\-–—*○●◦▪□■◎☞\d]+[.)]?\s*/, '')
+      .replace(/^[가-하]\s*[.)]\s*/, '')   /* `나 . 결과발표` 의 항목 번호 */
+      .replace(/(\d)\s+(년|월|일)/g, '$1$2')
+      .replace(/\(\s+/g, '(').replace(/\s+\)/g, ')')
+      .replace(/\s*:\s*/, ': ')
+      .trim();
+    if (clean.length < 4) continue;
+    return clean.length > 60 ? clean.slice(0, 59) + '…' : clean;
+  }
+  return null;
+}
+
 if (!process.env.EXCERPTS_AS_LIB) main();
 function main() {
+let gotAnnounce = 0;
 for (const it of reg.items) {
   if (it.program) continue;
   const src = sourceFor(it, idx);
@@ -648,6 +689,13 @@ for (const it of reg.items) {
     if (pri.length) it.eligibilityPriority = pri;
     else delete it.eligibilityPriority;
   }
+  /* 발표일 — 원문에 있으면 그대로, 없으면 남기지 않는다 */
+  const ann = extractAnnounce(body);
+  if (WRITE) {
+    if (ann) { it.announce = ann; it.announceNote = '공고 원문에서 그대로 발췌 (자동)'; gotAnnounce += 1; }
+    else { delete it.announce; delete it.announceNote; }
+  } else if (ann) { gotAnnounce += 1; }
+
   if (ex.length) {
     hit++;
     if (WRITE) { it.excerpts = ex; it.excerptNote = '공고 원문에서 그대로 발췌 (자동)'; }
@@ -664,6 +712,7 @@ for (const it of reg.items) {
 console.log(`\n게시판 메뉴를 걷어낸 공고 ${cleaned}건`);
 console.log(`발췌 성공 ${hit}건 · 원문은 읽었으나 발췌 불가 ${none}건 · 원문 미확보라 손대지 않음 ${kept}건`);
 console.log(`마감일을 원문에서 새로 읽은 공고 ${gotDeadline}건`);
+console.log(`발표일을 원문에서 읽은 공고 ${gotAnnounce}건`);
 if (WRITE) {
   fs.writeFileSync(regPath, JSON.stringify(reg, null, 1) + '\n');
   console.log('registered.json 반영 완료');
