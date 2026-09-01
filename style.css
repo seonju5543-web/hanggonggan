@@ -3046,3 +3046,62 @@ a.app-log-more { text-decoration: none; }
 
 /* 신청 내역 요약의 금액을 크게 (2026-09-01 개발자 지시) */
 .summary-amount { font-size: 40px; letter-spacing: -0.04em; line-height: 1.1; }
+
+
+/* ══ 자간을 두 값으로 통일 (2026-09-01 개발자 지시) ═══════════════════════
+   자간이 **17가지 값**으로 흩어져 있었다(-0.04em ~ +0.14em). 같은 화면 안에서도
+   줄마다 글자 사이가 달라 보이던 원인이다. 두 값으로 줄인다:
+     · 보통 글자(본문·이름표·버튼·배지) = --track        (-0.014em)
+     · 크게 강조하는 것(제목·금액)만      = --track-display (-0.03em)
+   🔴 한글에 **양수 자간**(0.02 ~ 0.14em)을 주지 말 것 — '발 급 방 법'처럼 벌어져
+      보인다. 라틴 대문자 이름표에서 온 습관이라 한글에는 맞지 않는다(CLAUDE.md).
+      여기서 되돌리는 것: .hero-label(0.02) · .sheet-body h4(0.04) · r-head(0.04).
+   ⚠️ .chat-typing 의 3px 은 글자가 아니라 '점 세 개' 애니메이션이라 그대로 둔다.
+   새 규칙에 letter-spacing 을 직접 적지 말고 이 두 변수를 쓸 것. */
+:root {
+  --track: -0.014em;
+  --track-display: -0.03em;
+}
+body { letter-spacing: var(--track); }
+/* 🔴 여기가 진짜 원인이었다 — 브라우저 기본 규칙이 button·input 의 자간을 normal(0)
+   로 되돌린다. 이 앱은 **공고 카드 자체가 button** 이라, 카드 안 글자 전부가 본문과
+   다른 자간으로 그려지고 있었다(실측: 목록 글자 16개가 normal). 그래서 같은 화면에서
+   카드 안팎의 글자 사이가 달라 보였다. 물려받게 되돌린다. */
+button, input, select, textarea { letter-spacing: inherit; }
+
+/* 크게 강조하는 것 — 큰 글자는 그대로 두면 사이가 벌어져 보여 조금 좁힌다 */
+.hero-amount,
+.summary-amount,
+.ad-total-amt,
+.onboard-body h2,
+.page-header h2,
+.my-name,
+.sheet-title,
+#my-account .acc-head,
+#my-notify .wallet-title,
+#my-wallet .wallet-title { letter-spacing: var(--track-display); }
+
+/* 나머지는 전부 본문과 같은 자간으로 되돌린다 */
+.home-greet,
+.hero-label,
+.section-head h3,
+.badge,
+.sch-name,
+.nav-item,
+.sheet-body h4,
+.nf-title,
+.nf-push-title,
+.reason-list .r-head,
+.reason-list .r-head em,
+.chat-title,
+.ad-grp-h b,
+.ad-name,
+.wp-title,
+.wp-label,
+.verdict-marks .badge-fit,
+.app-toggle,
+.app-log-list b,
+.doc-check > summary,
+.home-updated,
+.wallet-label,
+.wallet-status { letter-spacing: var(--track); }
