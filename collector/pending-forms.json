@@ -653,6 +653,14 @@
    "added": "2026-08-30",
    "fetched": true,
    "schematized": false
+  },
+  {
+   "id": "auto-ent2431264952artclviewdo",
+   "name": "[공통][교외] 2026년 2학기 (재)달서인재육성장학재단 장학생 선발 안내",
+   "target": "2026년 2학기 (재)달서인재육성장학재단 장학생 선발",
+   "added": "2026-09-01",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }

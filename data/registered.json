@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-08-30",
+ "updatedAt": "2026-09-01",
  "items": [
   {
    "id": "reg-hi-jeju",
@@ -1906,6 +1906,48 @@
    ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=321881",
    "sourceKind": "auto"
+  },
+  {
+   "id": "auto-ent2431264952artclviewdo",
+   "name": "[공통][교외] 2026년 2학기 (재)달서인재육성장학재단 장학생 선발 안내",
+   "boardTitle": "[공통][교외] 2026년 2학기 (재)달서인재육성장학재단 장학생 선발 안내",
+   "type": "교외",
+   "provider": "한국외국어대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-09-28",
+   "period": "접수 ~2026-09-28",
+   "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-01 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026년도 하반기 장학생 선발계획 공고문.pdf",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/149728/download.do"
+    },
+    {
+     "name": "2026년도 하반기 장학생 선발 신청서식.pdf",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/149729/download.do"
+    }
+   ],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/264952/artclView.do",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "4. 선발기준 : 소득구간 , 성적 등 고려"
+   ],
+   "excerpts": [
+    "문의처 : 달서인재육성장학재단사무국 053-667-3232"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   }
  ]
 }
