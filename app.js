@@ -2326,16 +2326,17 @@ function appCard(app) {
       ${appsSelectMode ? `<input type="checkbox" class="row-check" data-pick="${esc(app.id)}" ${checked}
          aria-label="${esc(sch.name)} 선택" />` : ''}
       <button class="sch-card" data-detail="${sch.id}" aria-expanded="${appsLogOpen.has(app.id)}">
-        <span class="app-caret" aria-hidden="true"></span>
         <div class="sch-top">
           <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${sch.type}</span>
         </div>
         <p class="sch-name">${esc(sch.name)}</p>
-        <p class="sch-provider">${app.appliedAt} ${app.pending ? '담아둠' : '준비 완료'} · 제출처 ${esc(officialChannel(sch).label)}</p>
         <div class="app-step${app.pending ? ' app-step-wait' : ''}">
           <div class="app-step-head"><span>${esc(stepNow)}</span>${stepCount ? `<em>${stepCount}</em>` : ''}</div>
           <div class="mini-progress"><div style="width:${pct}%"></div></div>
         </div>
+      </button>
+      <button class="app-toggle" data-log-toggle="${esc(app.id)}" aria-expanded="${appsLogOpen.has(app.id)}">
+        세부사항 입력하기<span class="app-caret" aria-hidden="true"></span>
       </button>
       ${appLogHtml(app, sch, step)}
     </div>`;
@@ -2953,19 +2954,21 @@ function bindEvents() {
        삭제 버튼을 보려던 학생이 매번 시트를 닫아야 한다. 선택 모드에서도 열지 않는다. */
     if (Date.now() - lastSwipeAt < 350) return;
     if (e.target.closest('[data-del]') || e.target.closest('[data-pick]')) return;
-    const card = e.target.closest('[data-detail]');
+    /* 이름 있는 손잡이('세부사항 입력하기')도 카드와 같은 길로 여닫는다 */
+    const handle = e.target.closest('[data-log-toggle]');
+    const card = handle || e.target.closest('[data-detail]');
     if (!card) return;
     /* 신청 내역에서는 시트가 아니라 **그 자리에서 펼친다** (2026-09-01 개발자 지시).
        담아 둔 공고에서 궁금한 것은 공고 내용이 아니라 '내가 어디까지 왔나'다.
        공고 원문은 펼친 패널 안의 '공고 상세 보기'로 간다. */
     const row = card.closest('.swipe-row');
-    if (row && !appsSelectMode && card.classList.contains('sch-card')) {
+    if (row && !appsSelectMode && (handle || card.classList.contains('sch-card'))) {
       const log = row.querySelector('.app-log');
       if (log) {
         log.hidden = !log.hidden;
         if (log.hidden) appsLogOpen.delete(row.dataset.row); else appsLogOpen.add(row.dataset.row);
         row.classList.toggle('log-open', !log.hidden);
-        card.setAttribute('aria-expanded', String(!log.hidden));
+        row.querySelectorAll('[aria-expanded]').forEach((el) => el.setAttribute('aria-expanded', String(!log.hidden)));
         /* 🔴 펼치기만 하면 화면 밖에서 열린다 — 카드(250px) 아래로 300px 가 더 붙는데
            카드가 화면 중간 아래에 있으면 펼쳐진 부분이 통째로 안 보인다.
            카드를 위로 올려 패널 전체가 화면에 들어오게 한다. */

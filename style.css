@@ -2824,9 +2824,25 @@ body::after { opacity: 0.26; }
    그래서 시트를 띄우지 않고 그 줄 아래에 붙인다 — 목록을 떠나지 않아도 된다. */
 .app-log { padding: 2px 20px 16px; background: var(--surface-2); }
 
-/* 펼쳐진다는 표시 — 없으면 "눌러도 아무 일이 없다"로 읽힌다 */
+/* 이름 있는 손잡이 — ∨ 표식만으로는 "여기를 누르면 뭐가 나온다"가 안 읽혔다 */
+.app-toggle {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%;
+  padding: 13px 20px;
+  border: 0; border-top: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text-sub);
+  font-size: var(--t-sm); font-weight: 600;
+  text-align: left; cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.app-toggle:hover { background: var(--surface-2); color: var(--text); }
+.app-toggle:active { background: var(--surface-2); }
+.swipe-row.log-open .app-toggle { color: var(--text); }
+
+/* 펼쳐진다는 표시 */
 .app-caret {
-  position: absolute; top: 18px; right: 18px;
+  margin-left: auto; flex: none;
   width: 9px; height: 9px;
   border-right: 2px solid var(--text-weak);
   border-bottom: 2px solid var(--text-weak);
