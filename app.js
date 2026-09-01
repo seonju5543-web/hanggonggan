@@ -2574,7 +2574,6 @@ function renderWallet() {
   const el = $('#my-wallet');
   el.innerHTML = `
     <p class="wallet-title">서류 보관함</p>
-    <p class="wallet-sub">한 번 올려두면 모든 신청에 자동 첨부. 파일은 휴대폰 안에만 저장.</p>
     ${DOC_SLOTS.map((s) => {
       const rec = walletCache[s.slot];
       return `

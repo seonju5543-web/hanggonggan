@@ -2809,3 +2809,11 @@ body::after { opacity: 0.26; }
 #my-notify .nf-prefs, #my-wallet .wallet-row:first-of-type { margin-top: 0; }
 #my-notify .nf-prefs > .nf-pref:first-child { padding-top: 10px; }
 .nf-set-head { margin-bottom: 0; }
+
+/* ── 서류 보관함·계정 간격 (2026-09-01 개발자 지시) ─────────────────────
+   ① 보관함 부가설명을 없앴다(app.js) — 제목 아래 첫 증명서 위의 회색 선도 함께 지운다.
+      설명이 사라졌으니 그 선은 아무것도 가르지 않고 혼자 떠 있는 줄이 된다.
+   ② '계정' 제목과 로그인·회원가입 버튼이 2px 로 붙어 있었다 — 눌리는 것 앞에는 여백이 필요하다. */
+#my-wallet .wallet-row:first-of-type { border-top: 0; padding-top: 4px; }
+#my-wallet .wallet-title { margin-bottom: 6px; }
+#my-account .acc-head { margin-bottom: 14px; }
