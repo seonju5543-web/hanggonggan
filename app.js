@@ -1244,6 +1244,18 @@ let liveNotices = null;
 
    ⚠️ 옛 파일(data/notices.json)로 물러나는 길을 남겨 둔다 — 학교별 파일이 아직 없거나
    (그 학교 첫 수집 전) 배포가 엇갈린 순간에도 화면이 비지 않게. */
+/* 🔴 늦게 온 데이터로 **보이는 화면을 다시 그린다** (2026-09-01).
+   예전에는 loadRegistered 만 홈을 다시 그리고 loadKosaf·loadNotices 는 탐색만 그렸다.
+   그래서 한국장학재단 공고가 뒤늦게 들어오면 홈의 '마감 임박'이 그 전에 계산한
+   순서로 굳어, D-DAY 공고가 있는데도 D-2 부터 보였다.
+   ⚠️ 새로 데이터를 불러오는 곳을 만들면 여기를 부를 것 — 갈라 두면 또 한 곳만 고치게 된다. */
+function rerenderVisible() {
+  if (!state.profile) return;
+  if (!$('#screen-home').hidden) renderHome();
+  if (!$('#screen-explore').hidden) renderExplore();
+  if (!$('#screen-applications').hidden) renderApplications();
+}
+
 function loadNotices() {
   const p = state.profile;
   const files = (typeof noticeFilesForProfile === 'function' && p) ? noticeFilesForProfile(p) : [];
@@ -1261,7 +1273,7 @@ function loadNotices() {
   job.then((d) => {
     if (!d) return;
     liveNotices = d;
-    if (!$('#screen-explore').hidden) renderExplore();
+    rerenderVisible();
   }).catch(() => { /* 오프라인 등 — 조용히 무시 */ });
 }
 
@@ -1328,10 +1340,7 @@ function loadRegistered() {
     .then((d) => {
       registeredList = (d && d.items) || [];
       attachPrepTemplates(registeredList);
-      if (state.profile) {
-        if (!$('#screen-home').hidden) renderHome();
-        if (!$('#screen-explore').hidden) renderExplore();
-      }
+      rerenderVisible();
     })
     .catch(() => { /* 오프라인 등 — 조용히 무시 */ });
 }
@@ -1342,7 +1351,7 @@ function loadKosaf() {
     .then((d) => {
       kosafList = (d && d.items) || [];
       kosafUpdatedAt = (d && d.updatedAt) || '';
-      if (!$('#screen-explore').hidden) renderExplore();
+      rerenderVisible();
     })
     .catch(() => { /* 오프라인 등 — 조용히 무시. 층2가 없어도 앱은 그대로 돈다 */ });
 }
