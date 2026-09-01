@@ -367,27 +367,13 @@ function notifySettingsHtml() {
       <input type="checkbox" class="nf-switch" data-nf-pref="${t.id}" ${notifyLedger.prefs[t.id] ? 'checked' : ''} />
     </label>`).join('');
 
-  /* 진짜 푸시(앱을 안 켜도 오는 알림) — 2026-08-06 개발자 지시로 **기본값**이 됐다.
-     예전에는 별도 스위치로 사용자가 한 번 더 켜야 했는데, 그 스위치를 눌러 본 사람이 아무도 없어
-     실제로 등록된 폰이 0대였다. 이제 알림을 켜면 자동으로 연결되고(pushEnsure),
-     여기서는 **상태만 보여준다**(끄려면 위의 알림 끄기 하나로 충분하다). */
-  const canPush = pushConfigured();
-  const pushOn = pushActive();
-  const iosNotInstalled = /iPad|iPhone|iPod/.test(navigator.userAgent) && !sup.standalone;
-  const pushBlock = false ? `
-    <div class="nf-push nf-push-off">
-      <p class="nf-push-title">앱을 켜지 않아도 받기 — 준비 중</p>
-      <p class="nf-desc">지금은 <strong>앱을 열 때</strong> 확인. 발송 서버 연결 시 앱을 안 켜도 도착.</p>
-    </div>`
-    : !on ? '' : `
-    <div class="nf-push${pushOn ? ' nf-push-on' : ''}">
-      <p class="nf-push-title">${pushOn ? '앱을 켜지 않아도 받는 중' : '연결하는 중'}</p>
-      <p class="nf-desc">${pushOn
-        ? '앱을 닫아 두거나 화면이 꺼져 있어도 마감·새 공고 알림 도착.'
-        : esc(pushReasonText(pushLastReason, iosNotInstalled))}</p>
-      ${iosNotInstalled ? '<p class="nf-desc">iPhone은 사파리 <strong>공유 → 홈 화면에 추가</strong>로 설치해야 앱을 켜지 않아도 수신 가능.</p>' : ''}
-      <p class="nf-desc">서버 저장: <strong>폰 주소·학교</strong>만. 이름·성적·소득·서류는 기기 밖으로 안 나감.</p>
-    </div>`;
+  /* 🔴 '앱을 켜지 않아도 받는 중' 상자를 없앴다 (2026-09-01 개발자 지시).
+     푸시 연결은 알림을 켜면 자동으로 되고(pushEnsure), 켜졌는지는 맨 위 상태 줄이 말한다.
+     ⚠️ 앞서 `const pushBlock = false ? A : B` 로 바꿔 A(준비 중) 가지만 지웠더니
+        남은 가지 B(받는 중)가 그대로 나와 상자가 계속 떠 있었다 — 조건을 죽이는 것으로는
+        안 된다. 삼항을 통째로 걷어내야 사라진다.
+     ⚠️ 서버에 무엇이 저장되는지(폰 주소·학교만)는 알림을 처음 켤 때 뜨는 동의 시트에
+        그대로 있다. 여기서 지운 것은 같은 말을 되풀이하던 자리다. */
 
   return `
     <div class="nf-set-head">
@@ -397,12 +383,7 @@ function notifySettingsHtml() {
       </div>
       <button class="wallet-btn ${on ? '' : 'primary'}" id="btn-nf-toggle">${on ? '끄기' : '켜기'}</button>
     </div>
-    <div class="nf-prefs">${rows}</div>
-    ${/* 🔴 '앱을 켜지 않아도 받는 중' 상자와 그 아래 설명 줄을 없앴다 (2026-08-31 개발자 지시).
-         알림을 켰는지 여부는 맨 위 상태 줄이 이미 말하고, 나머지는 설명이 설명을 덧대는 자리였다.
-         ⚠️ 서버에 무엇이 저장되는지는 동의 시트(알림을 처음 켤 때)에 그대로 남아 있다. */ ''}
-    ${pushBlock}
-`;
+    <div class="nf-prefs">${rows}</div>`;
 }
 
 function bindNotifySettings() {
