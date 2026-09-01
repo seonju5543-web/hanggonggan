@@ -2786,3 +2786,26 @@ body::after { opacity: 0.26; }
 .my-card:first-of-type { margin-top: 0; padding-top: 0; }
 /* 설정 줄은 제목보다 한 단계 낮게 — 대비를 넓힌다 */
 .nf-pref-text strong, .wallet-label { font-weight: 600; }
+
+/* ── 절 제목 손보기 (2026-09-01 개발자 지시) ──────────────────────────
+   ① 제목 위 막대는 뺀다 — 크기(20px)와 굵기(800)만으로 이미 충분히 구분된다.
+   ② 제목과 그 아래 내용 사이가 떠 있었다 — 한 덩어리로 붙인다.
+   ③ 바탕을 한 단계 더 흰쪽으로. */
+#my-account .acc-head::before,
+#my-notify .wallet-title::before,
+#my-wallet .wallet-title::before { content: none; }
+#my-account .acc-head,
+#my-notify .wallet-title,
+#my-wallet .wallet-title { padding-top: 0; margin-bottom: 2px; }
+#my-notify .nf-status, #my-wallet .wallet-sub { margin-top: 1px; margin-bottom: 8px; }
+.my-card { margin-top: 6px; padding-top: 18px; }
+.my-card:first-of-type { margin-top: 0; padding-top: 0; }
+
+:root {
+  --bg:        #fefdfc;   /* #fdfcfa 에서 한 단계 더 흰쪽 (R254 G253 B252) */
+  --surface-2: #f7f6f4;
+}
+/* 상태 줄과 첫 설정 줄 사이도 붙인다 (22px → 10px) — 제목·상태·설정이 한 덩어리로 읽히게 */
+#my-notify .nf-prefs, #my-wallet .wallet-row:first-of-type { margin-top: 0; }
+#my-notify .nf-prefs > .nf-pref:first-child { padding-top: 10px; }
+.nf-set-head { margin-bottom: 0; }
