@@ -2711,3 +2711,33 @@ body::after { opacity: 0.26; }
 .sheet-title { margin-top: var(--sp-1); }
 .sheet-provider { margin-top: 5px; }
 .sheet-amount { margin-top: var(--sp-1); }
+
+/* ══ 상세 시트 머리의 표식들을 한 규격으로 (2026-09-01 개발자 지적) ══════════
+   실측하니 나란히 선 둘이 모든 값에서 달랐다:
+     적합도 배지  글자 11.5px · 패딩 3.5/9 · 모서리 9px  · 높이 25px
+     판정 알약    글자 12.5px · 패딩 5/11  · 모서리 알약 · 높이 29px
+     (게다가 배지 안 '요건 n개 중 m개'는 10.58px — 한 줄에 글자 크기가 셋이었다)
+   같은 줄에 서는 표식은 **같은 규격**이어야 한다. 하나로 못 박는다.
+   ⚠️ 값은 여기서만 정한다 — 다른 곳에서 padding/font-size 를 덧쓰지 말 것. */
+.verdict-marks { align-items: center; gap: 6px; row-gap: 6px; }
+.verdict-marks > .badge,
+.verdict-marks > .badge-fit,
+.verdict-marks > .status-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 11px;
+  border-radius: var(--radius-pill);
+  font-size: var(--t-2xs);
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: 0;
+  margin: 0;
+}
+/* 배지 안의 부연은 크기를 따로 두지 않는다 — 굵기와 투명도로만 낮춘다 */
+.verdict-marks .badge-fit em {
+  font-size: inherit;
+  font-weight: 500;
+  opacity: 0.75;
+  margin-left: 5px;
+}
