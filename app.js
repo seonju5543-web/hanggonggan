@@ -256,9 +256,13 @@ function undoProgress(sch) {
 
 /* 진척도 기록 후 시트와 뒤 화면(내역·홈)을 함께 갱신 */
 function refreshProgressViews(id) {
+  /* 🔴 시트 **안에서** 기록했을 때만 시트를 다시 연다. 예전엔 무조건 열었는데,
+     그때는 기록 버튼이 시트에만 있었다. 지금은 신청 내역 패널에도 있어서
+     그대로 두면 패널에서 '선정' 을 누를 때마다 엉뚱하게 상세 시트가 튀어나온다(실측). */
+  const wasOpen = !$('#detail-sheet').hidden;
   const current = $$('.screen').find((s) => !s.hidden);
   if (current) showScreen(current.id.replace('screen-', ''));
-  openDetail(id);
+  if (wasOpen) openDetail(id);
 }
 
 function toast(msg, action) {
@@ -829,6 +833,7 @@ function renderHome() {
     : '<p class="empty">지금 신청 가능한 장학금 없음 · 프로필 업데이트 권장</p>';
 
   const recent = state.applications.slice(-2).reverse().filter((a) => findSch(a.id));
+  renderHomeUpdated();
   $('#home-apps').innerHTML = recent.length
     ? recent.map(appCard).join('')
     : '<p class="empty">담아 둔 장학금 없음</p>';
@@ -1334,11 +1339,36 @@ function loadTuition() {
 }
 
 /* 정식 등록 공고 (수집 → 큐레이션 → 매칭·신청 지원) */
+/* 언제 받은 목록인가 — 홈 맨 아래에 적는다 (2026-09-01 개발자 요청).
+   dataFetchedAt 은 **이 폰이 받아 온 시각**, regUpdatedAt 은 **로봇이 발행한 날**이다. */
+let dataFetchedAt = null;
+let regUpdatedAt = '';
+
+function renderHomeUpdated() {
+  const el = $('#home-updated');
+  if (!el) return;
+  if (!dataFetchedAt) {
+    /* 받아 온 적이 없다 — 저장된 목록을 최신인 것처럼 보이면 안 된다 */
+    el.textContent = '장학금 목록을 아직 받지 못했어요 · 인터넷 연결을 확인해 주세요';
+    return;
+  }
+  const t = dataFetchedAt;
+  const two = (n) => String(n).padStart(2, '0');
+  const when = `${t.getMonth() + 1}월 ${t.getDate()}일 ${two(t.getHours())}:${two(t.getMinutes())}`;
+  /* 두 줄로 나눈다 — 한 줄로 두면 오른쪽 끝이 도우미 동그라미에 가린다(실측).
+     두 가지가 서로 다른 사실이기도 하다. */
+  el.innerHTML = `<span>장학금 목록 마지막 확인 ${esc(when)}</span>`
+    + (regUpdatedAt ? `<span>공고 갱신 ${esc(regUpdatedAt)}</span>` : '');
+}
+
 function loadRegistered() {
   fetch('data/registered.json', { cache: 'no-store' })
     .then((r) => (r.ok ? r.json() : null))
     .then((d) => {
-      registeredList = (d && d.items) || [];
+      if (!d) return;
+      registeredList = d.items || [];
+      regUpdatedAt = d.updatedAt || '';
+      dataFetchedAt = new Date();
       attachPrepTemplates(registeredList);
       rerenderVisible();
     })
@@ -2325,7 +2355,7 @@ function appCard(app) {
       <button class="swipe-del" data-del="${esc(app.id)}" aria-label="이 신청 기록 삭제">삭제</button>
       ${appsSelectMode ? `<input type="checkbox" class="row-check" data-pick="${esc(app.id)}" ${checked}
          aria-label="${esc(sch.name)} 선택" />` : ''}
-      <button class="sch-card" data-detail="${sch.id}" aria-expanded="${appsLogOpen.has(app.id)}">
+      <button class="sch-card" data-detail="${sch.id}" tabindex="-1">
         <div class="sch-top">
           <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${sch.type}</span>
         </div>
@@ -2426,9 +2456,12 @@ function appLogHtml(app, sch, step) {
   if (app.result) {
     return `
       <div class="app-log"${appsLogOpen.has(app.id) ? '' : ' hidden'}>
-        <p class="app-done${app.result === 'won' ? ' app-done-won' : ''}">${
-          app.result === 'won' ? '선정으로 기록되었어요' : '미선정으로 기록되었어요'
-        }${app.resultAt ? ' · ' + esc(app.resultAt) : ''}</p>
+        <div class="app-done${app.result === 'won' ? ' app-done-won' : ''}">
+          <p>${app.result === 'won' ? '선정으로 기록되었어요' : '미선정으로 기록되었어요'}${
+            app.resultAt ? ' · ' + esc(app.resultAt) : ''}</p>
+          ${/* 🔴 잘못 눌렀을 때 되돌아갈 길 — 없으면 오누름이 영영 남는다 */ ''}
+          <button class="app-log-btn" data-undo-result="${esc(app.id)}">기록 취소</button>
+        </div>
       </div>`;
   }
   const d = dday(sch.deadline);
@@ -2949,6 +2982,14 @@ function bindEvents() {
     const sb = e.target.closest('[data-mark-submit]');
     const wb = e.target.closest('[data-mark-won]');
     const lb = e.target.closest('[data-mark-lost]');
+    const ub = e.target.closest('[data-undo-result]');
+    if (ub) {
+      /* 잘못 누른 결과 되돌리기 — 기록만 지운다. 상세 시트의 '결과 기록 취소'와 같은 함수다 */
+      e.stopPropagation();
+      const s = findSch(ub.dataset.undoResult);
+      if (s) undoProgress(s);
+      return;
+    }
     if (!sb && !wb && !lb) return;
     e.stopPropagation();
     const id = (sb || wb || lb).dataset.markSubmit || (wb || lb).dataset.markWon || lb.dataset.markLost;
@@ -2970,7 +3011,7 @@ function bindEvents() {
        담아 둔 공고에서 궁금한 것은 공고 내용이 아니라 '내가 어디까지 왔나'다.
        공고 원문은 펼친 패널 안의 '공고 상세 보기'로 간다. */
     const row = card.closest('.swipe-row');
-    if (row && !appsSelectMode && (handle || card.classList.contains('sch-card'))) {
+    if (row && !appsSelectMode && handle) {
       const log = row.querySelector('.app-log');
       if (log) {
         log.hidden = !log.hidden;
@@ -2990,6 +3031,8 @@ function bindEvents() {
       renderApplications();
       return;
     }
+    /* 신청 내역의 이름 박스는 눌러도 아무 일이 없다 — 미는 것(삭제)만 받는다 */
+    if (row) return;
     openDetail(card.dataset.detail);
   });
 
@@ -3476,6 +3519,17 @@ loadKosaf();
 loadMajors();   // 학교별 학과 목록 — 온보딩 학과 자동추천이 그 학교 것만 보게
 loadTuition();  // 학교별 등록금 — `수업료 100%` 비율형 공고를 원으로 바꾸는 데 쓴다
 if (typeof loadFormTemplates === 'function') loadFormTemplates(); // 정식 등록 양식 최신화
+/* 🔴 두 손가락으로 화면이 커졌다 작아졌다 하던 것 (2026-09-01 개발자 지적).
+   막는 곳이 셋이라 셋 다 있어야 한다 — 하나만 두면 어떤 폰에서는 그대로 커진다:
+     ① index.html 뷰포트 user-scalable=no  (안드로이드 크롬 · 설치형 iOS)
+     ② style.css  html { touch-action } (크롬 계열의 손가락 두 개 벌리기)
+     ③ 여기 gesture* 차단          (iOS 사파리 — 위 둘을 **무시한다**)
+   ⚠️ 이 앱은 폰 화면에 맞춰 짜인 목록이라 확대할 일이 없다. 글자를 키우려면
+      폰 설정의 글자 크기를 쓰면 되고 그건 이 차단과 무관하게 그대로 동작한다. */
+['gesturestart', 'gesturechange', 'gestureend'].forEach((t) => {
+  document.addEventListener(t, (e) => e.preventDefault(), { passive: false });
+});
+
 walletRefresh().then(() => {
   if (!$('#screen-my').hidden) renderMy();
 });

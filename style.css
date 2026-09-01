@@ -86,6 +86,10 @@
 }
 
 html { -webkit-text-size-adjust: 100%; }
+/* 🔴 두 손가락 확대 막기 — index.html 뷰포트·app.js gesture 차단과 한 세트.
+   pan-x pan-y 는 '손가락으로 밀기는 되고 벌려서 확대는 안 된다' 는 뜻이다 —
+   목록 스크롤도, 카드를 옆으로 미는 손짓도 그대로 동작한다(검사로 확인). */
+html { touch-action: pan-x pan-y; }
 body {
   font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
     'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', system-ui, sans-serif;
@@ -2396,7 +2400,18 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
    여기 있는 것은 **이미 담은 것들**이라, 빈 동그라미를 그리면 '아직 안 했다'로 읽힌다.
    체크는 고를 것이 남아 있는 목록(홈·장학금 찾기)에서만 뜻을 갖는다. */
 #apps-list .sch-card { padding-left: 20px; }
-.swipe-row > .sch-card { border-bottom: 0; }
+.swipe-row > .sch-card {
+  border-bottom: 0;
+  cursor: default;
+}
+/* 🔴 목록을 내리다 손이 스치기만 해도 색이 변했다(개발자 지적). 이름 박스는 눌러도
+   아무 일이 없으니 눌리는 것처럼 보이면 안 된다 — 손짓은 '미는 것'만 받는다. */
+.swipe-row > .sch-card:hover,
+.swipe-row > .sch-card:active {
+  background: var(--surface);
+  transform: none;
+  box-shadow: none;
+}
 #apps-list .sch-card::before { display: none; }
 #apps-list .sch-card .badge-applied { display: inline-block; }
 
@@ -2842,12 +2857,28 @@ body::after { opacity: 0.26; }
 .app-log { padding: 2px 20px 16px; background: var(--surface-2); }
 
 /* 결과가 기록된 건 — 한 줄로 끝났다고만 말한다 */
+/* 언제 받은 목록인가 — 홈 맨 아래 */
+.home-updated {
+  margin: 26px 4px 10px;
+  font-size: var(--t-2xs);
+  color: var(--text-weak);
+  text-align: center;
+  line-height: 1.6;
+}
+.home-updated span { display: block; }
+.home-updated:empty { display: none; }
+
 .app-done {
-  margin: 0; padding: 16px 20px 18px;
+  display: flex; align-items: center; gap: 12px;
+  padding: 15px 20px 17px;
+}
+.app-done p {
+  flex: 1; min-width: 0; margin: 0;
   font-size: var(--t-md); font-weight: 650;
   color: var(--text-sub);
 }
-.app-done-won { color: #cf4436; }
+.app-done-won p { color: #cf4436; }
+.app-done .app-log-btn { flex: none; }
 
 /* 이름 있는 손잡이 — ∨ 표식만으로는 "여기를 누르면 뭐가 나온다"가 안 읽혔다 */
 .app-toggle {

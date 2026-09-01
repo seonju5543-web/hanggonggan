@@ -17,7 +17,7 @@
    설치된 앱은 옛 CSS 를 계속 내주고 있었다("아직도 각져 있어").
    네트워크 우선이라 결국은 반영되지만, 응답이 3.5초를 넘으면 캐시로 떨어지고
    그 캐시가 옛 판이면 그대로 옛 화면이 보인다. 번호를 올려야 확실히 청소된다. */
-const CACHE = 'handaejang-v127';  /* v127 — 카드·세부사항 사이 선 제거 · 결과 기록 한 줄 */
+const CACHE = 'handaejang-v128';  /* v128 — 홈에 마지막 확인 시각 · 두 손가락 확대 막기 */
 const ASSETS = ['.', 'index.html', 'style.css', 'app.js', 'data.js', 'forms.js', 'form-plan.js', 'essay.js', 'essay-config.js', 'essay-ask.js', 'essay-quality.js', 'essay-submit-check.js',
   'section-head.js', 'parse-requirements.js', 'parse-amount.js', 'match-engine.js', 'notify-rules.js', 'notify.js', 'push-config.js',
   'chat-config.js', 'chat.js',
