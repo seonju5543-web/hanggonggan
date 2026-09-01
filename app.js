@@ -2050,7 +2050,7 @@ function openDetail(id) {
      (발췌 출처 설명 · 전국 공고 회색 상자 · 제출 서류 부연) 셋 다 결국 '원문을 보라'였다.
      🔴 링크 이름은 그 주소가 **실제로 여는 화면**을 말한다 — 목록 주소밖에 못 찾은
         공고를 '원문 공고'라고 적으면 눌러 본 학생에게 거짓말이 된다(원칙 8-1). */
-  const srcLabel = sch.program ? '한국장학재단 ↗'
+  const srcLabel = (sch.program || sch.sourceKind === 'kosaf') ? '한국장학재단 ↗'
     : isBoardListLink(sch.sourceUrl) ? '게시판 목록 ↗' : '원문 공고 ↗';
   const srcNote = sch.sourceUrl
     ? `<p class="doc-legend">자세한 내용은 <a href="${esc(safeUrl(sch.sourceUrl))}" target="_blank" rel="noopener">${srcLabel}</a>에서 확인</p>`
@@ -2087,10 +2087,8 @@ function openDetail(id) {
       </div>
       <ul class="reason-list">${reasonRows}${missingRows}</ul>
 
-      ${sch.sourceKind === 'kosaf' ? `
-      <p class="doc-legend">위 내용은 <strong>재단이 한국장학재단에 등록한 정보</strong> 원문 그대로.
-        앱이 공고 원문을 읽은 것이 아니라서 자격 판정과 신청서 작성은 지원하지 않아요 — 신청 전에 재단에서 꼭 확인하세요.
-        ${sch.contact ? `<br />문의 ${esc(sch.contact)}` : ''}</p>` : ''}
+      ${(sch.sourceKind === 'kosaf' && sch.contact)
+        ? `<p class="doc-legend">문의 ${esc(sch.contact)}</p>` : ''}
 
       <h4>제출 서류</h4>
       <ul class="doc-list">
