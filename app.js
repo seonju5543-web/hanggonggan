@@ -2086,9 +2086,7 @@ function openDetail(id) {
         <span class="verdict-marks">${fitBadgeHtml(fit, fd, { full: true })}<span class="status-pill pill-${meta.cls}">${meta.label}</span></span>
       </div>
       <ul class="reason-list">${reasonRows}${missingRows}</ul>
-      <p class="doc-legend">앱이 확인할 수 있는 것은 성적·소득구간·학년처럼 프로필에 있는 항목뿐입니다. 나머지 요건과 최신 내용은 ${sch.sourceUrl
-        ? `<a href="${esc(safeUrl(sch.sourceUrl))}" target="_blank" rel="noopener" style="color:var(--primary);font-weight:700">${sch.program ? '한국장학재단 ↗' : (isBoardListLink(sch.sourceUrl) ? '게시판 목록 ↗' : '원문 공고 ↗')}</a>에서`
-        : '공고 원문에서'} 다시 확인하세요.</p>
+      ${srcNote}
 
       ${sch.sourceKind === 'kosaf' ? `
       <p class="doc-legend">위 내용은 <strong>재단이 한국장학재단에 등록한 정보</strong> 원문 그대로.
