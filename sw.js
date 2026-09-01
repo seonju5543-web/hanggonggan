@@ -17,7 +17,7 @@
    설치된 앱은 옛 CSS 를 계속 내주고 있었다("아직도 각져 있어").
    네트워크 우선이라 결국은 반영되지만, 응답이 3.5초를 넘으면 캐시로 떨어지고
    그 캐시가 옛 판이면 그대로 옛 화면이 보인다. 번호를 올려야 확실히 청소된다. */
-const CACHE = 'handaejang-v114';  /* v114 — '앱을 켜지 않아도 받는 중' 상자 완전 제거 */
+const CACHE = 'handaejang-v115';  /* v115 — MY 절 제목을 확실히 띄운다 */
 const ASSETS = ['.', 'index.html', 'style.css', 'app.js', 'data.js', 'forms.js', 'form-plan.js', 'essay.js', 'essay-config.js', 'essay-ask.js', 'essay-quality.js', 'essay-submit-check.js',
   'section-head.js', 'parse-requirements.js', 'parse-amount.js', 'match-engine.js', 'notify-rules.js', 'notify.js', 'push-config.js',
   'chat-config.js', 'chat.js',
