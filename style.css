@@ -1630,7 +1630,10 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
 .apps-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 
 /* 카드 한 줄 — 뒤에 삭제 버튼을 깔고 카드를 그 위로 민다 */
-.swipe-row { position: relative; overflow: hidden; border-radius: var(--radius-sm); }
+.swipe-row {
+  position: relative; overflow: hidden; border-radius: var(--radius-sm);
+  border-bottom: 1px solid var(--line);   /* 장학금과 장학금 사이 — 손잡이 아래에 온다 */
+}
 .swipe-row + .swipe-row { margin-top: 10px; }
 .swipe-row > .sch-card {
   position: relative; z-index: 1; width: 100%;
@@ -2598,7 +2601,20 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 .app-step-wait .app-step-head span { color: var(--orange); }
 .app-step-wait .mini-progress div { background: var(--orange); }
 .mini-progress { height: 5px; border-radius: var(--radius-hair); background: var(--line); overflow: hidden; }
-.mini-progress div { height: 100%; background: var(--accent); border-radius: var(--radius-hair); transition: width var(--dur-slow) var(--ease); }
+.mini-progress div { height: 100%; background: var(--accent); border-radius: var(--radius-hair); transition: width var(--dur-slow) var(--ease), background var(--dur-slow) var(--ease); }
+
+/* 단계별 색 — 목록을 훑기만 해도 어느 장학금이 어디까지 왔는지 보인다 */
+.app-step-s0 .mini-progress div { background: #22304d; }   /* 신청 준비 완료 */
+.app-step-s1 .mini-progress div { background: #5a3f78; }   /* 공식 제출 */
+.app-step-s2 .mini-progress div { background: #9c3f63; }   /* 심사 */
+.app-step-s3 .mini-progress div { background: #cf4436; }   /* 선정 발표 */
+.app-step-s0 .app-step-head span { color: #22304d; }
+.app-step-s1 .app-step-head span { color: #5a3f78; }
+.app-step-s2 .app-step-head span { color: #9c3f63; }
+.app-step-s3 .app-step-head span { color: #cf4436; }
+/* 미선정도 4단계지만 축하할 일이 아니다 — 색을 뺀다 */
+.app-step-lost .mini-progress div { background: var(--text-weak); }
+.app-step-lost .app-step-head span { color: var(--text-weak); }
 
 /* 홈의 '신청 현황'도 이미 담은 것들이다 — 신청 내역과 같이 체크 동그라미를 뺀다.
    (빈 동그라미가 '아직 안 했다'로 읽히던 것과 같은 이유) */
@@ -2829,7 +2845,7 @@ body::after { opacity: 0.26; }
   display: flex; align-items: center; gap: 8px;
   width: 100%;
   padding: 13px 20px;
-  border: 0; border-top: 1px solid var(--line);
+  border: 0;
   background: var(--surface);
   color: var(--text-sub);
   font-size: var(--t-sm); font-weight: 600;

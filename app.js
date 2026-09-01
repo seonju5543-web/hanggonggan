@@ -2330,7 +2330,7 @@ function appCard(app) {
           <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${sch.type}</span>
         </div>
         <p class="sch-name">${esc(sch.name)}</p>
-        <div class="app-step${app.pending ? ' app-step-wait' : ''}">
+        <div class="app-step app-step-s${step}${app.result === 'lost' ? ' app-step-lost' : ''}${app.pending ? ' app-step-wait' : ''}">
           <div class="app-step-head"><span>${esc(stepNow)}</span>${stepCount ? `<em>${stepCount}</em>` : ''}</div>
           <div class="mini-progress"><div style="width:${pct}%"></div></div>
         </div>
