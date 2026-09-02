@@ -560,10 +560,28 @@ function taggedSchool(n) {
   return null;
 }
 
+/* 🔴 지금 수집 중인 학교 — 이 목록 밖 학교의 실시간 공고는 **화면에서 내린다**
+   (2026-09-02 개발자 지시: "경희대 외대 두 곳을 제외한 공고는 내려달라").
+
+   🔴 **지우는 게 아니다.** 공고는 `data/notices.json` 에 그대로 남아 있고, 여기 이름을
+      도로 넣으면 그 순간 다시 보인다 — `collector/schools.json` 의 `parked` 와 같은 방식이다.
+      데이터에서 빼면 안 되는 이유가 둘 더 있다: notices.json 은 **합집합 자동 병합** 대상이라
+      지운 항목이 다음 병합에 되살아나고(COLLAB.md), 수집 로봇이 매 실행 이 파일을 다시 쓴다.
+
+   왜 내리나 — 2026-08-30에 수집을 이 두 곳으로 좁혔는데, 그 전에 받아 둔 다른 학교 공고
+   468건이 60일 수명이 다할 때까지 남아 있다(마지막 수집일 2026-08-29). **갱신이 멈춘 목록**을
+   계속 보여 주면 앱이 그 학교를 서비스하는 것처럼 보인다. 빈 화면은 이미 정직하게 말한다
+   ("게시판 연결 전이거나 새 공고 없음") — 온보딩의 학교 목록은 그대로 둔다.
+
+   🔴 이 판정은 화면(app.js)과 알림(sw.js·notify-rules.js)이 **같은 함수**로 본다.
+      한쪽에만 두면 화면에서 내린 공고를 알림이 알리는 모순이 생긴다. */
+const SERVED_SCHOOLS = ['경희대학교', '한국외국어대학교'];
+
 function noticeForProfile(n, p) {
   if (!p || !p.school || !n) return false;
   const tagged = taggedSchool(n);
   const school = tagged || n.school;
+  if (SERVED_SCHOOLS.indexOf(school) < 0) return false;
   if (school === p.school) return !(n.campus && p.campus && n.campus !== p.campus);
   // 공용 게시판의 공고 — 제목이 캠퍼스를 밝히지 않은 것만 분교 학생에게도 보여 준다
   if (!tagged && !n.campus && SHARED_BOARD_BRANCH[p.school] === school) return true;
@@ -1180,6 +1198,6 @@ if (typeof module !== 'undefined' && module.exports) {
                      scopedToProfile, notStale, STALE_DAYS,
                      requirementLines, requirementStruct, requirementMatch, tidyRequirement,
                      REQ_SIGNAL, NOT_A_REQUIREMENT, EXCLUDE_LINE, HARD_THRESHOLD,
-                     noticeForProfile, taggedSchool, SHARED_BOARD_BRANCH,
+                     noticeForProfile, taggedSchool, SHARED_BOARD_BRANCH, SERVED_SCHOOLS,
                      noticeFileKey, noticeFileFor, noticeFilesForProfile };
 }
