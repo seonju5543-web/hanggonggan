@@ -1,0 +1,78 @@
+name: 두 학교 장학 공고 전수 조사 (일회용)
+
+# 2026-09-02 개발자 지시 — 경희대·한국외대 장학 게시판을 직접 훑어
+# 공고 전체와 **신청 채널**을 원문 근거로 분류한다.
+#
+# 🔴 이 로봇은 앱 데이터를 건드리지 않는다.
+#    collector/extracted/two-school/ 에만 쓰고, data/*.json 과 앱 코드는 손대지 않는다.
+#    (browser-collect 는 registered.json·notices.json 을 자동으로 고치므로 이번엔 쓰지 않는다.)
+#
+# 대기줄(concurrency)을 수집 로봇과 합치지 않는다 — 합치면 대기 중인 예약 수집이 취소된다.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['claude/external-expert-consultation-questions-o8bik7']
+    paths:
+      - 'collector/run-two-school-scan.txt'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: two-school-scan
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    # 상한 = 각 단계 예산의 합을 담는 그릇 (조사 20 + 준비·저장 8)
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/external-expert-consultation-questions-o8bik7
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm init -y >/dev/null && npm i playwright@1 --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+
+      - name: 두 학교 게시판 전수 조사
+        timeout-minutes: 20
+        continue-on-error: true
+        env:
+          SCAN_BUDGET_MS: '1020000'   # 17분 — 스스로 끝낸다
+        run: node collector/scan-two-schools.mjs
+
+      - name: 결과 저장 (이 브랜치에만)
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -d collector/extracted/two-school ]; then
+            git add collector/extracted/two-school
+            git commit -m "두 학교 장학 공고 전수 조사 결과 (앱 데이터 무변경)" || echo "변경 없음"
+            for i in 1 2 3; do
+              git pull --rebase origin claude/external-expert-consultation-questions-o8bik7 || true
+              git push origin HEAD:claude/external-expert-consultation-questions-o8bik7 && break
+              sleep $((i*4))
+            done
+          else
+            echo "결과 폴더가 없습니다 — 조사가 시작조차 못 했습니다"
+          fi
+
+      - name: 보고서 요약 출력
+        if: always()
+        run: |
+          if [ -f collector/extracted/two-school/REPORT.md ]; then
+            echo "=========== REPORT.md ==========="
+            cat collector/extracted/two-school/REPORT.md
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: two-school-scan
+          path: collector/extracted/two-school/
