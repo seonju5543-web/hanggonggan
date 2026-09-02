@@ -734,14 +734,14 @@ input::placeholder { color: var(--text-weak); }
 /* 🔴 되돌리지 말 것 (2026-08-31): 줄마다 회색 카드를 씌우면 9줄짜리 자격이
    **카드 아홉 장**이 되어 읽히지 않는다(전문가 지적 "가독성"). 목록은 목록으로
    보여야 눈이 훑는다. 배경 대신 **여백과 왼쪽 표식**으로 항목을 가른다. */
+/* 🔴 항목 사이 선을 두지 않는다 (2026-09-02 개발자 지시) — 왼쪽 점이 이미 항목을
+   가르고 있어서, 선까지 있으면 표식이 두 겹이고 짧은 목록이 표처럼 보인다. */
 .reason-list li, .doc-list li {
   font-size: var(--t-md);
   line-height: 1.6;
-  padding: 9px 0 9px 15px;
+  padding: 7px 0 7px 15px;
   position: relative;
-  border-bottom: 1px solid rgba(18, 22, 31, 0.06);
 }
-.reason-list li:last-child, .doc-list li:last-child { border-bottom: 0; }
 .reason-list li::before, .doc-list li::before {
   content: ''; position: absolute; left: 2px; top: 0.95em;
   width: 4px; height: 4px; border-radius: var(--radius-pill);
@@ -1127,14 +1127,15 @@ textarea:focus {
 
 /* 자격 진단 안의 '지원 자격' 머리말 — 판정 항목(✓/✕/?)이 아니라 원문 인용의 제목이라 표시가 없다 */
 /* 구역 이름 — 문장이 아니라 이름이다. 부연은 <em> 로 작게 뒤에 붙인다 */
+/* 🔴 '지원 제외 대상'·'우선 선발 기준' 은 '지원 자격'·'제출 서류' 와 **같은 층의
+   구역 이름**이다. 크기가 한 단계 작으면 자격에 딸린 부속처럼 읽힌다(개발자 지시).
+   .sheet-body h4 와 같은 값으로 맞춘다 — 그쪽을 바꾸면 여기도 같이 바꿀 것. */
 .reason-list .r-head {
-  font-size: var(--t-2xs);
-  font-weight: 700;
-  letter-spacing: .04em;
+  font-size: var(--t-sm);
+  font-weight: 800;
   color: var(--text-weak);
-  margin-top: 18px;
-  padding: 0 0 6px;
-  border-bottom: 1px solid rgba(18, 22, 31, 0.06);
+  margin-top: 20px;
+  padding: 0 0 3px;
   list-style: none;
 }
 .reason-list .r-head:first-child { margin-top: 0; }
