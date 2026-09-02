@@ -1,138 +1,177 @@
 # 경희대·한국외대 장학 공고 신청 채널 전수 조사
 
-- 조사 시각: 2026-09-02T15:22:14.482Z → 2026-09-02T15:30:13.652Z
+- 조사 시각: 2026-09-02T15:35:07.256Z → 2026-09-02T15:39:31.123Z
 - 근거: 각 공고 **원문 본문에서 신청·접수 방법을 말하는 줄**만 뽑아 분류했습니다(추론 없음).
 
 ## 경희대학교
-- 목록에서 찾은 장학 공고: **51건** · 상세를 연 것: **51건**
+- 목록에서 찾은 장학 공고: **58건** · 상세를 연 것: **58건**
 
 | 신청 채널 | 건수 |
 |---|---|
-| 이메일 접수 | 38 |
-| 미확인 | 13 |
-| 한국장학재단 | 1 |
-| 학교 시스템 입력형 | 1 |
+| 미확인 | 34 |
+| 첨부 양식만 있음(제출처 미확인) | 20 |
+| 한국장학재단 | 2 |
+| 이메일 접수 | 2 |
 
-### 포털(학교 시스템) 입력형으로 분류된 공고 — 1건
-- **개인정보처리방침**
-  - https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200231
-  - 원문 근거: `의학계열실습지원센터 보건복지부(E하늘장사종합정보시스템) 실명인증 및`
+### 포털(학교 시스템) 입력형으로 분류된 공고 — 0건
+_해당 없음_
 
 <details><summary>전체 목록</summary>
 
-- [미확인] 학교법인 경희학원
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200022
-- [미확인] 대학운영기조
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200370
-- [이메일 접수] 부속기관/연구소/기타기관
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200066
-  - 원문: 경희는 대학본부 외에 다양한 부속기관을 운영하며 교육, 연구, 실천의 창조적 결합을 지원하고 있다. 총 34개의 부속기관은 경희의과학연구원을 비롯한 공동기구 7개 외에 서울캠퍼스에 13개, 국제캠퍼스에 14개를 두고 있다. 또한 경희의 각종 연구소와 연구원은 학술역량의 강화를 통해 큰 학문의 길을 열어가고 있다. 서울캠퍼스에서는 36개, 국제캠퍼스에서는 18개의 부설연구소를 운영하고 있다. 그리고 기타기관으로 서울캠퍼스와 국제캠퍼스에서 학군단을 운영하고 있다.
-- [이메일 접수] 대학정보공시
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200070
-- [이메일 접수] 대학정보공개
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200076
-- [이메일 접수] 대학자체평가
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200360
-- [미확인] 신규 서울 캠퍼스
-  - https://news.khu.ac.kr/kor/user/mapManager/view.do?menuNo=200356
-- [미확인] 신규 국제 캠퍼스
-  - https://news.khu.ac.kr/kor/user/mapManager/view.do?menuNo=200357
-- [미확인] 신규 광릉 캠퍼스
-  - https://news.khu.ac.kr/kor/user/mapManager/view.do?menuNo=200358
-- [이메일 접수] Space 21
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200081
-- [미확인] 교내 전화번호
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200091
-- [이메일 접수] 대학 입학/편입학
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200013
-- [미확인] 대학원 입학
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200014
-  - 원문: 대학원 입학 관련 내용은 해당 대학원으로 문의하시기 바랍니다.
-- [이메일 접수] 외국인 입학
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200015
-- [이메일 접수] 언어·문화교육
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200094
-- [이메일 접수] 국가지원연구센터
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200123
-- [이메일 접수] BK21 플러스 사업
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200135
-- [이메일 접수] BK21 사업
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200139
-- [이메일 접수] TLO 사업
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200134
-- [미확인] 명예의 전당
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200121
-  - 원문: 경희는 학문의 탁월성을 실현하는 동시에 더 나은 세계를 위한 공적 실천을 추구하고 있다. 미래대학을 향한 이러한 여정에서 구성원이 이룬 뛰어난 성취는 경희 공동체의 커다란 자산이다. 이에 경희는 구성원의 훌륭한 업적을 존중하는 대학문화를 조성하고 있다. 그러한 대학문화의 일환으로 2009년에 제정된 목련상은 교육, 연구, 실천 부문에서 탁월한 업적을 이룬 교직원에게 수여하는 상이다. 목련상은 학문적 수월성과 인류 보편 가치 창조에 기여하는 문화를 조성하고 구성원의 자긍심을 고취하는 데 이바지하고 있다. 또한 경희가 이룬 성과를 모든 구성원이 확인하고 공유하는 자랑스러운 계기가 되고 있다. 목련상은 해마다 열리는 경희의 송년회 목련회의에서 시상되고 있다.
-- [이메일 접수] 경희와 인류평화
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200296
-- [이메일 접수] World Civic Forum
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200147
-- [미확인] UNAI-경희 국제회의
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200148
-- [이메일 접수] UN평화공원
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200149
-- [이메일 접수] 지구사회봉사단
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200150
-- [이메일 접수] 국제 교류 프로그램
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200154
-- [이메일 접수] 해외 자매대학
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200153
-- [이메일 접수] 석학초청특강
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200159
-- [이메일 접수] 21세기 미래대학을 말한다
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200160
-- [이메일 접수] Peace BAR Festival
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200161
-- [이메일 접수] 대학안전관리
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200217
-- [미확인] 학생지원센터
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200172
-- [이메일 접수] 미래인재센터
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200180
-- [이메일 접수] 장애학생지원센터
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200174
-- [이메일 접수] 국제처 글로벌교육지원팀
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200175
-  - 원문: 제공 서비스 비자 상담, 외국인 유학생 대상 장학금 문의, 신입생 상담 및 재학생 심리상담 프로그램, 문화체험 및 취업지원 프로그램, 한국어능력향상 강좌 및 TOPIK 지원, 기숙사 관련 문의, 생활상담 등
-- [이메일 접수] 의료기관 진료혜택
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200176
-  - 원문: 문의 경희대학교 총동문회 02-744-8855
-  - 원문: 문의처 동서건강증진센터 치과종합검진센터 건강증진센터
-  - 원문: 상조 가입 시 제외 (별도문의)
-- [이메일 접수] 제증명 서비스
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200182
-  - 원문: 신청방법
-- [이메일 접수] 네오르네상스장학
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200191
-- [이메일 접수] 도서관/박물관
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200197
-- [이메일 접수] 자연사박물관
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200194
-- [이메일 접수] 후마니타스칼리지
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200107
-- [이메일 접수] 교육지원사업
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200113
-- [이메일 접수] 수도권 대학특성화 사업
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200114
-  - 원문: 대학특성화사업은 개별 대학 내 또는 대학들 가운데 비교우위가 있는 분야에 자원을 지원함으로써 세계적 수준의 경쟁력을 갖출 수 있도록 하는 것을 목표로 삼고 있다. 이를 위해 정부는 교육 내용의 다양성 유지 및 학문의 균형 발전을 고려한 특성화의 철학, 목표, 방향 등을 제시하고(Top Down) 대학은 각각의 특성에 부합하는 중장기 발전방안을 수립하여 자율적으로 추진하고(Bottom Up) 있다.
-- [이메일 접수] 학부교육 선진화 선도대학 지원사업
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200115
-- [이메일 접수] 교육역량강화 지원사업
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200116
-- [이메일 접수] English
-  - https://news.khu.ac.kr/eng/user/main/view.do
-- [미확인] Sitemap
-  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200227
-- [미확인] 교내전화번호
-  - https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200091
-- [한국장학재단 + 학교 시스템 입력형 + 이메일 접수] 개인정보처리방침
-  - https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200231
-  - 원문: ① 정보주체는 개인정보침해로 인한 구제를 받기 위하여 개인정보 분쟁조정위원회, 한국인터넷진흥원 개인정보침해신고센터 등에 분쟁 해결이나 상담 등을 신청할 수 있습니다. 경희대학교의 자체적인 개인정보 불만처리, 피해구제 결과에 만족하지 못하시거나 보다 자세한 도움이 필요하시면 아래의 기관에 문의하여 주시기 바랍니다.
-  - 원문: ② 정보주체는 경희대학교의 서비스를 이용하시면서 발생한 모든 개인정보보호 관련 문의, 불만처리, 피해구제 등에 관한 사항을 개인정보 보호책임자 및 개인정보보호 담당부서로 문의할 수 있습니다. 경희대학교는 정보주체의 문의에 대해 지체없이 답변 및 처리해 드릴 것입니다.
-- [이메일 접수] 대학정보공시
-  - https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200070
-- [미확인] KHU SDGs/KHU ESG
-  - https://impact.khu.ac.kr/sdgs/user/main/view.do
+- [미확인] 공통 [공통] 2026년도 제13회 동교인재상(東喬人材賞) 선발 안내
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322962
+- [미확인] 공통 제36기 미레에셋 해외교환 장학생 선발
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322953
+- [미확인] 공통 [공통] 두을장학재단 제29기 장학생 모집
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322949
+- [미확인] 공통 [공통] 2026학년도 2학기 경희꿈도전장학 신청 안내
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322922
+- [미확인] 공통 2026년도 익산사랑 장학생 선발 안내
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322917
+- [미확인] 공통 2026년도 하반기 울산연구원 장학생 선발 안내
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322916
+- [미확인] 공통 2026학년도 2학기 선원가족 장학생 모집 안내
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322915
+- [미확인] 공통 2026-2학기 푸른등대 기부장학금 신규장학생 신청 안내(8/26~9/10)
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322894
+  - 원문: 2026-2학기 푸른등대 기부장학금 신규장학생 신청기간을 안내합니다.
+- [미확인] 공통 희망사다리 장학생 대상 2026 중견기업 일자리 박람회 개최 안내 (9/8 10시~17시)
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322893
+- [미확인] 공통 [공통] 2026학년도 2학기 우정장학(학업장려금) 신청 안내
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322875
+- [미확인] 공통 [공통] 2026학년도 2학기 우정장학(가계곤란) 복학생/재입학생 신청 안내
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322874
+- [첨부 양식만 있음(제출처 미확인)] 공통 2026년도 손태희장학재단 장학생 선발 안내
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322849
+- [미확인] 공통 2026년 장학금 부정수급 자진신고 캠페인 안내(2026.8.10.(월) ~ 10.9.(금))
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322848
+- [첨부 양식만 있음(제출처 미확인)] 공통 2026년도 (재)광산장학회 장학생 선발 안내
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322856
+- [미확인] 공통 2026년 2학기 통영시 대학생 등록금 전액 지원사업 안내
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322853
+- [미확인] 공통 2026년도 제7기 경원장학재단 장학생 선발 안내
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322851
+- [첨부 양식만 있음(제출처 미확인)] 공통 2026년 2학기 제24기 후기 삼원장학생 선발 안내
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322850
+- [미확인] 공통 ⭐중요⭐ 2026-2학기 국가장학금(2차) 및 복학생 우정장학(가계곤란) 신청 안내
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322808
+- [미확인] 공통 2026년도 세종연구원 세종이도인재장학금 장학생 모집 안내
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=321881
+- [첨부 양식만 있음(제출처 미확인)] 국제 2026학년도 2학기 경희인턴장학 모집 공고
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322775
+- [미확인] 공통 2026-2학기 등록기간 내 기등록 처리 일정 안내
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322761
+- [미확인] 국제 (~9.9수까지)2026-2학기 주거안정장학 2차 신청 공고
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322762
+- [미확인] 공통 2026년 하반기 군산시 대학생 학자금 이자 지원사업 안내(~9.4.(금))
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322748
+- [한국장학재단] 공통 ⭐중요⭐ 2026-2학기 국가장학금 2차 신청 안내(2026.8.12.(수) 09시 ~ 2026....
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322745
+  - 원문: ▶ 신청기간 : 2026. 8. 12.(수) 09시 ~ 2026. 9. 9.(수) 18시
+- [미확인] 공통 2026년 제 2회 서울시 대학생 학자금대출 이자 지원 안내
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322694
+- [첨부 양식만 있음(제출처 미확인)] 공통 2026 의암 손병희 우수논문 장학생 선발 공고
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322415
+- [한국장학재단] 공통 2026-2학기 한국장학재단 학자금대출(일반/취업후) 신청 안내(2026.7.1.(수) ~ 11....
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322371
+  - 원문: ■ 신청기간 : (등록금/생활비대출) 2026.7.1.(수) ~ 11.17.(화) 18시
+- [미확인] 공통 2026-2학기 AI학업장려 학자금대출 신청 안내(~11.17.화까지)
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322331
+  - 원문: 1. 신청기간: 2026.7.1.(수) 9시 ~ 11.17.(화) 18시까지
+- [첨부 양식만 있음(제출처 미확인)] 공통 제1회 문주-미래디벨로퍼상 2026 공모전 안내
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322319
+- [미확인] 공통 2027학년도 소아·청소년 당뇨인 푸른빛 희망 장학금 신청 안내
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322140
+- [미확인] 공통 [한국장학재단] 학자금지원구간 개편(2027학년도 1학기부터 적용)
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=321882
+- [미확인] 공통 [공통] 2026학년도 교내 장학제도 개편안내
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=321752
+- [미확인] 공통 2026년 경기도 학자금대출 장기연체자 신용회복 지원(2026/4/1(월) ~ 12/11(금))
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=321545
+- [이메일 접수] 서울 인사처 경희인턴장학 지원자 모집
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322831
+  - 원문: 9. 지원방법
+  - 원문: - 제출서류: 신청서 1부 (첨부 양식)
+  - 원문: - 제출방법: insa@khu.ac.kr 이메일 제출
+- [첨부 양식만 있음(제출처 미확인)] 서울 [서울C] 2026학년도 2학기 우덕재단 장학생 선발 안내(~8/25일 까지)
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322821
+  - 원문: 4. .제출서류
+  - 원문: ★ 제출서류 미비자는 장학 추천 대상에서 제외되며, 추천서의 총장 직인은 학생지원센터에서 날인할 예정입니다.
+  - 원문: 5. 신청방법 : 인포21
+- [첨부 양식만 있음(제출처 미확인)] 서울 [서울C] 2026학년도 2학기 LEE&MOON장학 신청 안내(~8/21까지)
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322765
+  - 원문: 4. 제출서류
+  - 원문: 5. 신청기간 : 2026년 08.21(금)까지
+  - 원문: 6. 신청방법 : 인포21 장학신청
+- [첨부 양식만 있음(제출처 미확인)] 공통 2026학년도 2학기 동산장학회 장학생 모집 안내(~8/25(화)까지 신청)
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322764
+  - 원문: 3. 제출서류
+  - 원문: 4. 신청방법
+  - 원문: * 제출서류는 하나의 pdf 파일로 병합하여 제출
+- [미확인] 국제 2026학년도 목포향우회 장학생 선발 안내 (~8/26(수)까지)
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322759
+  - 원문: 5. 제출 서류 : 1개의 PDF 파일로 병합하여 제출
+- [첨부 양식만 있음(제출처 미확인)] 서울 [서울C] 2026학년도 2학기 남순자인재양성장학 선발 안내(~8/21까지)
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322766
+  - 원문: 3. 신청 기간 : 2026년 08월 21일(금)까지
+  - 원문: 4. 신청 방법 : 인포21
+  - 원문: * 모든 제출 서류는 1개의 pdf로 합친 후 업로드(판독할 수 없는 경우 미제출로 간주, 비밀번호 설정없이 제출)
+- [첨부 양식만 있음(제출처 미확인)] 공통 2026년 5·18 희망장학생 모집 안내
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322718
+- [첨부 양식만 있음(제출처 미확인)] 공통 2026년 하반기 서울인재대학장학금 선발 공고
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322715
+  - 원문: 2026년 서울인재대학장학금 신청방법 안내.pdf
+- [첨부 양식만 있음(제출처 미확인)] 서울 2026학년도 2학기 운연장학 신청 안내(~8/14까지)
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322666
+  - 원문: 4. 신청기간 : 2026.08.03.(월) ~ 08.14.(금)
+  - 원문: 5. 신청방법 : 인포21 장학신청 메뉴로 신청
+  - 원문: * 모든 제출 서류는 PDF 파일 1개로 합친 후 비밀번호 설정 없이 업로드하여 제출
+- [미확인] 공통 [교육혁신사업단] KHU Nexus Innovation Challenge 프로그램 참가 신청 (~...
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322671
+- [미확인] 공통 2026년 하반기 울산광역시 대학(원)생 학자금대출 이자지원사업 안내(2026.7.31.(금) ...
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322647
+- [미확인] 공통 2026년 화성시인재육성재단 소상공인 장학금 장학생 모집 안내
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322635
+- [첨부 양식만 있음(제출처 미확인)] 공통 2026년 (재)김해시미래인재장학재단 제3회 장학수기 공모전 공고
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322634
+- [첨부 양식만 있음(제출처 미확인)] 공통 2026년 상반기 사랑나눔장학생 모집 공고
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322606
+- [첨부 양식만 있음(제출처 미확인)] 서울 2026학년도 2학기 가송재단 장학생 모집 안내(~7/27까지 신청)
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322581
+  - 원문: 4. 제출서류
+  - 원문: 5. 신청방법 및 기간
+  - 원문: - 2026. 07. 27(월)까지 인포 21 신청 (제출 서류는 하나의 PDF파일로 병합하여 제출)
+- [미확인] 공통 2026학년도 대한민국 인재상 선발 안내
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322568
+  - 원문: 2026년도 2학기 쌍용곰두리장학생 모집 안내(국제C 7/21까지 신청기간 연장)
+- [첨부 양식만 있음(제출처 미확인)] 국제 2026년도 2학기 쌍용곰두리장학생 모집 안내(국제C 7/21까지 신청기간 연장)
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322564
+  - 원문: 2026년도 2학기 쌍용곰두리장학생 모집 안내(국제C 7/21까지 신청기간 연장)
+  - 원문: 4. 제출서류
+  - 원문: * 세부 제출서류는 첨부된 FAQ파일을 참고하시기 바랍니다
+- [이메일 접수] 서울 2026학년도 2학기 경희인턴(교내장학) 장학생 모집 공고[서울캠퍼스 총무관리처 관재팀]
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322541
+  - 원문: 9. 지원방법: [붙임]의 신청서를 작성하여 관재팀 이메일(khsa0063@khu.ac.kr)로 제출
+  - 원문: 10. 지원서 접수기간: 2026. 7. 20.(월)~8. 9.(일)까지
+  - 원문: 2026년도 2학기 쌍용곰두리장학생 모집 안내(국제C 7/21까지 신청기간 연장)
+- [미확인] 공통 2026년 충남평생교육진흥원 재능키움 장학생 2차 모집 안내
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322535
+- [미확인] 공통 2026년도 포스코청암재단 포스코비전장학생 선발 안내
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322536
+- [첨부 양식만 있음(제출처 미확인)] 공통 2026년도 정읍시민장학재단 우수인재장학금 장학생 선발 안내
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322469
+- [미확인] 서울 2026년 자생한방병원 일반수련의 장학생 모집
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322436
+- [첨부 양식만 있음(제출처 미확인)] 공통 2026년도 2학기 쌍용곰두리장학생 모집 안내(~7/19까지 신청)
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322427
+  - 원문: 4. 제출서류
+  - 원문: * 세부 제출서류는 첨부된 FAQ파일을 참고하시기 바랍니다
+  - 원문: 5. 신청방법 및 기간
+- [첨부 양식만 있음(제출처 미확인)] 공통 2026년도 세종이도인재장학금 디딤돌 장학사업 학자금 대출 관련분야 신청 안내
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322416
+  - 원문: 별지 서식 제출 서류(학자금대출 관련)_최종.hwp
+- [미확인] 공통 2026년 2학기 농림축산식품부 청년창업농장학금 장학생 선발 안내(~7.6.(월) 연장)
+  - https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322009
 
 </details>
 
