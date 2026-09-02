@@ -22,6 +22,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright';
+import { classifyChannels, METHOD_LINE } from './apply-channel.mjs';
 
 const OUT_DIR = path.join(process.cwd(), 'collector', 'extracted', 'two-school');
 const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
@@ -55,19 +56,7 @@ const SCHOOLS = [
   },
 ];
 
-/* ── 신청 채널 판정 — 전부 **본문 원문 줄**을 근거로만 정한다 ──
-   순서가 곧 우선순위다. 근거 줄을 함께 남겨 사람이 검증할 수 있게 한다. */
-const CHANNEL_RULES = [
-  { kind: '한국장학재단', re: /한국장학재단|kosaf\.go\.kr|www\.kosaf|국가장학금\s*신청|국가근로장학|한국장학재단\s*홈페이지/ },
-  { kind: '학교 시스템 입력형', re: /종합정보시스템|HUFS\s?Ability|학사행정|학사정보시스템|통합정보시스템|학생지원시스템|학교\s*포털|포털\s*(에서|로|을)?\s*신청/ },
-  { kind: '이메일 접수', re: /이메일\s*(로)?\s*(접수|제출|송부|발송)|메일\s*(로)?\s*(접수|제출|송부)|전자우편\s*(접수|제출)|[\w.+-]+@[\w-]+\.[\w.]{2,}/ },
-  { kind: '방문·우편 접수', re: /방문\s*(접수|제출)|우편\s*(접수|제출)|직접\s*(제출|접수)|제출\s*처\s*[:：]|접수\s*처\s*[:：]|사무실\s*(로|에)\s*제출/ },
-  { kind: '재단·외부 사이트 신청', re: /재단\s*홈페이지|재단\s*누리집|홈페이지\s*(에서|를 통해)\s*(온라인)?\s*신청|온라인\s*접수\s*[:：]?\s*https?:\/\// },
-  { kind: '구글폼·설문 접수', re: /구글\s*폼|google\.com\/forms|forms\.gle|네이버\s*폼|설문\s*링크/ },
-];
-
-/* 신청·접수 방법을 말하는 줄만 고른다 — 아무 줄이나 주우면 잡음이 근거가 된다 */
-const METHOD_LINE = /(신청\s*방법|접수\s*방법|제출\s*방법|지원\s*방법|신청\s*절차|접수\s*처|제출\s*처|제출\s*서류|접수\s*기간|신청\s*방식|어떻게\s*신청|문의)/;
+/* 신청 채널 판정 규칙은 collector/apply-channel.mjs 하나에만 있다 — 여기 베끼지 말 것 */
 
 const state = { startedAt: new Date().toISOString(), schools: {}, notes: [] };
 
@@ -79,21 +68,7 @@ function saveAll() {
   console.log(`\n💾 저장: ${OUT_DIR}/scan.json · REPORT.md`);
 }
 
-function classify(item) {
-  const hay = [item.body || '', (item.attachments || []).join(' ')].join('\n');
-  const hits = [];
-  for (const rule of CHANNEL_RULES) {
-    if (!rule.re.test(hay)) continue;
-    // 근거 줄 — 규칙이 실제로 걸린 그 줄을 찾아 원문 그대로 남긴다
-    const line = (item.lines || []).find((l) => rule.re.test(l))
-      || (hay.split('\n').find((l) => rule.re.test(l)) || '').trim();
-    hits.push({ kind: rule.kind, evidence: line.replace(/\s+/g, ' ').slice(0, 180) });
-  }
-  if (!hits.length && (item.attachments || []).some((a) => /신청서|지원서|양식|서식|원서/.test(a))) {
-    hits.push({ kind: '첨부 양식만 있음(제출처 미확인)', evidence: `첨부: ${(item.attachments || []).join(', ').slice(0, 140)}` });
-  }
-  return hits.length ? hits : [{ kind: '미확인', evidence: '' }];
-}
+const classify = classifyChannels;
 
 function buildReport() {
   const L = [];
