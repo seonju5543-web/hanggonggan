@@ -3,7 +3,9 @@
    '지원 자격 미달' 배지가 **통째로 사라진 적이 있다**. 배지 로직은 app.js에 있어
    test-collector(순수 모듈 검사)가 닿지 못하므로 진짜 앱을 띄워서 본다.
    개발자 지시(2026-08-24): "숫자는 0을 안 띄우되 지원 자격 미달 배지는 넣어야 돼."
-   실행: node verify/verify-fit-badge.js   (CHROME_PATH + localhost:8123 필요) */
+   실행: 이 워크트리에서 `python3 -m http.server <포트>` 를 띄운 뒤
+         CHROME_PATH=... PORT=<포트> node verify/verify-fit-badge.js
+   🔴 **PORT= 를 반드시 준다** — 8123 에는 다른 워크트리 서버가 떠 있을 수 있다. */
 const { chromium } = require('playwright-core');
 const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
 

@@ -5,7 +5,10 @@
         맨 위로 튀어나오는지 실제 순서로 확인한다
      ② `$$('.filter-chip')`가 문서 전역 선택이다 → 정렬을 바꿔도 위쪽 필터 칩의
         active가 안 흔들리는지 확인한다
-   실행: node verify/verify-explore-sort.js   (CHROME_PATH + localhost:8123) */
+   실행: 이 워크트리에서 `python3 -m http.server <포트>` 를 띄운 뒤
+         CHROME_PATH=... PORT=<포트> node verify/verify-explore-sort.js
+   🔴 **PORT= 를 반드시 준다** — 8123 에는 다른 워크트리 서버가 떠 있을 수 있고,
+      그러면 남의 코드를 재게 된다(2026-09-02에 실제로 겪었다). */
 const { chromium } = require('playwright-core');
 const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
 

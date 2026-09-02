@@ -4,7 +4,9 @@
    margin-bottom(20px)을 타고, 칸 사이는 gap(10px)이었기 때문이다.
    눈에는 한 목록으로 보이므로 간격도 하나여야 한다.
    🔴 이건 **재 봐야 보이는 결함**이다 — 코드만 읽으면 두 값이 다른 줄 모른다.
-   실행: node verify/verify-onboard-gaps.js   (CHROME_PATH + localhost:8123) */
+   실행: 이 워크트리에서 `python3 -m http.server <포트>` 를 띄운 뒤
+         CHROME_PATH=... PORT=<포트> node verify/verify-onboard-gaps.js
+   🔴 **PORT= 를 반드시 준다** — 8123 에는 다른 워크트리 서버가 떠 있을 수 있다. */
 const { chromium } = require('playwright-core');
 const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
 
