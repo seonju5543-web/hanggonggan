@@ -3,6 +3,7 @@
       않는다(CLAUDE.md — 13차 세션 학교 검색 사고). 세로 스크롤이 살아 있는지도 함께 본다.
    실행: node verify/verify-apps-manage.js   (CHROME_PATH 필요) */
 const { chromium } = require('playwright-core');
+const { assertOwnServer } = require('./onboard-helper.js');
 const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
 
 /* 진짜 손가락 끌기 — Playwright의 마우스로는 touchstart/move/end가 안 난다 */
@@ -32,6 +33,10 @@ const eq = (label, got, want) => {
 };
 
 (async () => {
+  /* 🔴 재기 전에 **이 서버가 내 앱인지** 확인한다 — 아니면 여기서 멈춘다.
+     이 저장소는 작업 폴더를 여러 개 두고 쓰는데, 8123 에 다른 폴더의 서버가 떠 있으면
+     그 옛 앱을 재고도 아무도 모른다(빨간불이든 **가짜 초록불이든**). 규칙은 onboard-helper 한 곳. */
+  await assertOwnServer(PORT);
   const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH });
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true });
   const page = await ctx.newPage();

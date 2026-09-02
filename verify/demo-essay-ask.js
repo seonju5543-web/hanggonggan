@@ -16,6 +16,7 @@
          (앱 서버가 8123 포트에 떠 있어야 한다 — verify/README.md)
    ============================================================ */
 const { chromium } = require('playwright-core');
+const { assertOwnServer } = require('./onboard-helper.js');
 const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
 const fs = require('fs');
 const path = require('path');
@@ -29,6 +30,10 @@ const PROFILE = {
 };
 
 (async () => {
+  /* 🔴 재기 전에 **이 서버가 내 앱인지** 확인한다 — 아니면 여기서 멈춘다.
+     이 저장소는 작업 폴더를 여러 개 두고 쓰는데, 8123 에 다른 폴더의 서버가 떠 있으면
+     그 옛 앱을 재고도 아무도 모른다(빨간불이든 **가짜 초록불이든**). 규칙은 onboard-helper 한 곳. */
+  await assertOwnServer(PORT);
   fs.mkdirSync(OUT, { recursive: true });
   const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH });
   const page = await browser.newPage({ viewport: { width: 430, height: 1100 }, deviceScaleFactor: 2 });

@@ -3,10 +3,14 @@
    앱이 자동으로 양식 작성 플로우를 제공하는지 확인한다.
    사전 준비: 더미 양식(test-dummy)이 주입된 앱 복사본이 PORT에서 서빙 중이어야 함. */
 const { chromium } = require('playwright-core');
-const { nextUntil } = require('./onboard-helper.js');
+const { nextUntil, assertOwnServer } = require('./onboard-helper.js');
 const PORT = process.env.PORT || 8124;
 
 (async () => {
+  /* 🔴 재기 전에 **이 서버가 내 앱인지** 확인한다 — 아니면 여기서 멈춘다.
+     이 저장소는 작업 폴더를 여러 개 두고 쓰는데, 8123 에 다른 폴더의 서버가 떠 있으면
+     그 옛 앱을 재고도 아무도 모른다(빨간불이든 **가짜 초록불이든**). 규칙은 onboard-helper 한 곳. */
+  await assertOwnServer(PORT);
   const browser = await chromium.launch({ executablePath: (process.env.CHROME_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome') });
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   const errors = [];

@@ -8,6 +8,7 @@
          CHROME_PATH=... PORT=<포트> node verify/verify-onboard-gaps.js
    🔴 **PORT= 를 반드시 준다** — 8123 에는 다른 워크트리 서버가 떠 있을 수 있다. */
 const { chromium } = require('playwright-core');
+const { assertOwnServer } = require('./onboard-helper.js');
 const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
 
 let fail = 0;
@@ -18,6 +19,10 @@ const eq = (label, got, want) => {
 };
 
 (async () => {
+  /* 🔴 재기 전에 **이 서버가 내 앱인지** 확인한다 — 아니면 여기서 멈춘다.
+     이 저장소는 작업 폴더를 여러 개 두고 쓰는데, 8123 에 다른 폴더의 서버가 떠 있으면
+     그 옛 앱을 재고도 아무도 모른다(빨간불이든 **가짜 초록불이든**). 규칙은 onboard-helper 한 곳. */
+  await assertOwnServer(PORT);
   const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH });
   const ctx = await browser.newContext({ viewport: { width: 390, height: 1000 }, hasTouch: true });
   const page = await ctx.newPage();

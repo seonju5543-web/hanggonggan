@@ -3166,6 +3166,31 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
   });
   eq('서버 포트를 박은 드라이버가 없다 (PORT 를 먼저 본다)', hardPort, []);
 
+  /* 🔴 ②-3 **PORT 를 읽는 것만으로는 안 막힌다 — 서버가 내 앱인지 확인해야 한다** (2026-09-02).
+     2026-08-29 에 포트 박기를 걷어냈는데 **다음 날 같은 사고가 또 났다**: PORT 를 안 주면
+     기본값 8123 으로 가고, 거기엔 다른 작업 폴더가 8월 29일부터 띄워 둔 서버가 살아 있었다.
+     그 옛 app.js 를 재고 `verify-sheet-back` 이 빨간불이었는데 **이 폴더의 코드는 한 번도
+     실행되지 않았다.** 반대 방향이 더 위험하다 — 8/29 `drive.js` 의 `ERRORS: none` 두 번이
+     전부 남의 코드였다. **가짜 초록불은 아무도 의심하지 않는다.**
+     그래서 브라우저를 띄우는 드라이버는 재기 전에 `assertOwnServer(PORT)` 를 불러야 한다.
+
+     ⚠️ 예외 셋은 **자기가 앱 서버를 직접 띄운다**(`http.createServer`). 남의 앱을 잴 수가
+        없어 이미 안전하고, 관문을 붙이면 오히려 없는 포트를 확인하다 죽는다. */
+  const SELF_SERVED = ['verify-admin.js', 'verify-supabase.js', 'verify-push-client.js'];
+  const browserDrivers = names.filter((f) => {
+    const src = fs.readFileSync(new URL(f, dir), 'utf8');
+    return /require\('playwright-core'\)/.test(src) && !SELF_SERVED.includes(f);
+  });
+  const noGuard = browserDrivers.filter((f) =>
+    !/assertOwnServer\s*\(/.test(fs.readFileSync(new URL(f, dir), 'utf8')));
+  eq(`브라우저 드라이버가 전부 서버를 확인한다 (${browserDrivers.length}개)`, noGuard, []);
+  /* 예외로 적어 둔 이름이 실제로 자기 서버를 띄우는지도 본다 — 이유 없이 빠져나가지 못하게 */
+  const fakeExempt = SELF_SERVED.filter((f) => {
+    try { return !/createServer/.test(fs.readFileSync(new URL(f, dir), 'utf8')); }
+    catch { return true; }   // 파일이 없어졌으면 목록에서 빼야 한다
+  });
+  eq('  예외 목록이 전부 자기 서버를 띄우는 드라이버다', fakeExempt, []);
+
   /* 🔴 **화면이 숨기는 학교와 로봇이 수집하는 학교가 갈라지면 안 된다** (2026-09-02 코드 리뷰).
      `match-engine.js` 의 `SERVED_SCHOOLS` 는 `collector/schools.json` 의 활성 학교를
      그대로 옮겨 적은 것이다. 같은 사실이 두 곳에 있으면 반드시 갈라진다 — 학교를 다시
