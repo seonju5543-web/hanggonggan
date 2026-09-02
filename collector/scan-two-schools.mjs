@@ -21,7 +21,7 @@
    ============================================================ */
 import fs from 'node:fs';
 import path from 'node:path';
-import { chromium } from 'playwright';
+import { pathToFileURL } from 'node:url';
 import { classifyChannels, METHOD_LINE } from './apply-channel.mjs';
 
 const OUT_DIR = path.join(process.cwd(), 'collector', 'extracted', 'two-school');
@@ -35,15 +35,24 @@ const MAX_PAGES = Number(process.env.SCAN_MAX_PAGES || 6);   // 학교당 목록
 const MAX_DETAIL = Number(process.env.SCAN_MAX_DETAIL || 90); // 학교당 상세 열람 상한
 const GAP_MS = 1200;                                          // 상세 사이 간격
 
-const SCHOOLS = [
+export const SCHOOLS = [
   {
     key: 'khu',
     name: '경희대학교',
     listUrl: (n) => `https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318&pageIndex=${n}`,
-    /* 행이 진짜 링크가 아니라 클릭 스크립트인 게시판도 있어 onclick 에서 글 번호를 꺼낸다 */
+    /* 🔴 1차 조사(2026-09-02)가 경희대에서 0건이 된 이유 — 되돌리지 말 것.
+       ① `/view.do` 만 보면 학교 홈 메뉴(`/contents/view.do`, `/mapManager/view.do`)가
+          전부 공고로 들어온다. 실제로 51건 모두 메뉴 페이지였다.
+       ② 이 게시판의 행은 `<a href="javascript:...">` 라 **글 번호가 href 안에** 있다.
+          onclick 만 보면 진짜 공고는 한 건도 못 찾는다. */
     detailFrom: (r) => {
-      if (/\/view\.do/.test(r.href)) return r.href;
-      const m = (r.onclick || '').match(/(\d{5,})/);
+      if (/\/bbs\/BMSR00040\/view\.do/.test(r.href) && /boardId=/.test(r.href)) return r.href;
+      const src = `${r.href} ${r.onclick}`;
+      if (/\/(contents|mapManager|greeting)\/view\.do/.test(r.href)) return '';   // 학교 홈 메뉴
+      const clickRow = !r.href || /^#|javascript:/i.test(r.href);   // 주소 없이 눌러야 열리는 행
+      const m = src.match(/boardId['"=:\s]*?(\d{5,})/)
+        || src.match(/goView\D{0,6}(\d{5,})/)
+        || (clickRow ? src.match(/(\d{5,})/) : null);               // 행일 때만 숫자 하나로 찾는다
       return m ? `https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=${m[1]}` : '';
     },
   },
@@ -58,7 +67,13 @@ const SCHOOLS = [
 
 /* 신청 채널 판정 규칙은 collector/apply-channel.mjs 하나에만 있다 — 여기 베끼지 말 것 */
 
+/* 🔴 지난 실행의 결과를 이어받는다 — 한 학교만 다시 돌릴 때 다른 학교를 지우면 안 된다
+   (수집 로봇에서 이미 겪은 함정: 안 이어받으면 205건이 2건이 된다) */
 const state = { startedAt: new Date().toISOString(), schools: {}, notes: [] };
+try {
+  const prev = JSON.parse(fs.readFileSync(path.join(OUT_DIR, 'scan.json'), 'utf8'));
+  if (prev && prev.schools) { state.schools = prev.schools; state.previousRun = prev.startedAt; }
+} catch { /* 첫 실행 */ }
 
 function saveAll() {
   fs.mkdirSync(OUT_DIR, { recursive: true });
@@ -119,6 +134,11 @@ function buildReport() {
 process.on('uncaughtException', (e) => { state.notes.push(`넘어짐: ${e.message}`); saveAll(); process.exit(1); });
 process.on('unhandledRejection', (e) => { state.notes.push(`넘어짐(비동기): ${e}`); saveAll(); process.exit(1); });
 
+/* 🔴 불러오는 것만으로 크롤이 돌면 검사도 못 만든다 — 직접 실행할 때만 돈다 */
+const isMain = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
+if (!isMain) { /* 규칙만 가져다 쓰는 호출 — 크롤하지 않는다 */ }
+else {
+const { chromium } = await import('playwright');   // 크롤할 때만 부른다 (검사에서 못 부르는 짐이 되지 않게)
 const browser = await chromium.launch({ args: ['--no-sandbox'] });
 const ctx = await browser.newContext({ userAgent: UA, locale: 'ko-KR' });
 
@@ -151,7 +171,8 @@ async function collectList(school) {
         rows.set(detail, { title: r.text, url: detail });
         added += 1;
       }
-      console.log(`  ${school.name} ${n}쪽 → 새 공고 ${added}건 (누적 ${rows.size})`);
+      console.log(`  ${school.name} ${n}쪽 → 새 공고 ${added}건 (누적 ${rows.size}, 화면 링크 ${found.length}개)`);
+      if (n === 1 && !added) state.notes.push(`🚨 ${school.name} 1쪽에서 공고 행을 하나도 못 찾음 — 행 판정을 봐야 한다`);
       if (!added) break;               // 더 넘겨도 새 글이 없으면 끝
       await page.waitForTimeout(GAP_MS);
     }
@@ -174,6 +195,7 @@ async function readDetail(url) {
           .filter((a) => /download|fileDown|\.hwpx?|\.pdf|\.docx?|\.zip|\.jpe?g|\.png/i.test(a.h + a.t))
           .map((a) => a.t).filter(Boolean).slice(0, 12),
         pw: !!document.querySelector('input[type=password]'),
+        imgs: document.querySelectorAll('img').length,
       };
     }).catch(() => null);
     if (!got) return { url, error: '화면을 읽지 못함' };
@@ -184,6 +206,9 @@ async function readDetail(url) {
       title: got.title.slice(0, 140),
       loginWall: got.pw,
       bodyLen: got.body.length,
+      imgCount: got.imgs,
+      /* 글자가 거의 없는데 그림이 있으면 '본문이 이미지'다 — '미확인'과 구분해 말해야 한다 */
+      imageOnly: got.body.length < 300 && got.imgs > 0,
       body: got.body,
       attachments: got.atts,
       lines,
@@ -194,7 +219,9 @@ async function readDetail(url) {
   } finally { await page.close().catch(() => {}); }
 }
 
+const ONLY = (process.env.SCAN_ONLY || '').trim();
 for (const school of SCHOOLS) {
+  if (ONLY && ONLY !== school.key) { console.log(`(건너뜀: ${school.name} — SCAN_ONLY=${ONLY})`); continue; }
   console.log(`\n═══ ${school.name} ═══`);
   state.schools[school.key] = { name: school.name, rows: 0, items: [] };
   const st = state.schools[school.key];
@@ -219,3 +246,4 @@ await browser.close();
 saveAll();
 console.log('\n완료');
 process.exit(0);
+}

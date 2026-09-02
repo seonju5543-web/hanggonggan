@@ -44,7 +44,13 @@ jobs:
         continue-on-error: true
         env:
           SCAN_BUDGET_MS: '1020000'   # 17분 — 스스로 끝낸다
-        run: node collector/scan-two-schools.mjs
+          # 한 학교만 다시 돌릴 때 쓴다 (예의 — 잘 받은 학교를 또 두드리지 않는다).
+          # run-two-school-scan.txt 의 'only:' 줄로 지정한다. 비우면 두 학교 다.
+          SCAN_ONLY: ''
+        run: |
+          ONLY=$(grep -oE '^only:[[:space:]]*[a-z]+' collector/run-two-school-scan.txt | awk '{print $2}' | tail -1)
+          echo "대상: ${ONLY:-두 학교 전부}"
+          SCAN_ONLY="$ONLY" node collector/scan-two-schools.mjs
 
       - name: 결과 저장 (이 브랜치에만)
         if: always()

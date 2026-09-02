@@ -1,11 +1,13 @@
 # 두 학교 장학 공고 전수 조사 실행 트리거 (push-to-run)
-# 이 파일을 고쳐 작업 브랜치에 push 하면 조사가 돈다.
 #
-# 2026-09-02 개발자 지시:
-#   "두 학교 모두 장학 사이트에 직접 들어가 크롤링하고 정확한 장학 공고 전체 데이터를 수집.
-#    그 후 포털 입력형 공고 링크를 제시하고, 신청 채널을 분류해 제시."
-#
-# 결과: collector/extracted/two-school/{scan.json, REPORT.md}
+# only: khu   → 경희대만 · only: hufs → 외대만 · 줄이 없으면 두 학교 전부
+# 결과: collector/extracted/two-school/{scan.json, REPORT.md} — 지난 결과를 이어받는다
 # 🔴 앱 데이터(data/*.json)와 앱 코드는 건드리지 않는다.
 
-run: 2026-09-02 1차
+# 2026-09-02 2차 — 1차에서 경희대가 0건이었다(51건 전부 학교 홈 메뉴였다).
+# 원인 둘: ① `/view.do` 만 보면 `/contents/view.do` 메뉴가 다 들어온다
+#          ② 이 게시판 행은 글 번호가 **href 의 javascript 안에** 있다(onclick 아님).
+# 외대 63건은 제대로 받았으므로 다시 두드리지 않는다.
+only: khu
+
+run: 2026-09-02 2차 (경희대 재조사)
