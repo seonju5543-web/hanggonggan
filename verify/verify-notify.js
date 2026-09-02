@@ -91,7 +91,9 @@ async function onboard(page) {
     // ① 최초 1회 동의 시트
     await page.waitForSelector('#notify-sheet:not([hidden])', { timeout: 6000 });
     const consentTitle = await page.textContent('#notify-sheet .sheet-title');
-    ok(/알림을 받으시겠어요/.test(consentTitle), '온보딩 직후 알림 동의 시트가 뜸', consentTitle);
+    /* 🔴 제목 **문구**를 박지 말 것 — '알림을 받으시겠어요' → '장학금 알림 받기' 로 바뀌자
+       이 줄이 죽었다(2026-09-01). 시트의 알맹이는 아래 두 줄이 본다(종류 5가지·전달 방식). */
+    ok(/알림/.test(consentTitle), '온보딩 직후 알림 동의 시트가 뜸', consentTitle);
     const typeCount = await page.$$eval('#notify-sheet .nf-type-list li', (els) => els.length);
     ok(typeCount === 5, '알림 종류 5가지를 미리 안내', typeCount);
     const honesty = await page.textContent('#notify-sheet .sheet-note');
@@ -112,13 +114,26 @@ async function onboard(page) {
     await page.click('.nav-item[data-nav="my"]');
     await page.waitForSelector('#my-notify:not([hidden])');
     const status = await page.textContent('#my-notify .nf-status');
-    ok(/켜지 않았어요|차단|지원하지/.test(status), 'MY에 알림 상태가 정직하게 표시됨', status);
+    /* 문구가 '켜지 않았어요' → '아직 켜지 않음' 으로 바뀌었다. 지키는 것은 표현이 아니라
+       **꺼져 있음을 숨기지 않는다**는 사실이다 — notify.js 의 statusText 갈래를 다 받는다. */
+    ok(/켜지 않|차단|미지원|지원하지/.test(status), 'MY에 알림 상태가 정직하게 표시됨', status);
     ok((await page.textContent('#btn-nf-toggle')).trim() === '켜기', 'MY에서 언제든 켤 수 있는 버튼 제공');
     await page.screenshot({ path: SHOT('02-my-settings') });
 
     // 알림을 안 켰어도 앱 내 알림함에는 쌓인다
     await page.evaluate(async () => { notifyLedger.inbox = []; await notifySaveLedger(); notifyRenderBadge(); window.__notifs = []; });
-    await page.click('#btn-nf-test');
+    /* 🔴 **버튼을 박지 말 것** — MY 알림 설정에서 '테스트 발송' 버튼이 사라지자(2026-09-01
+       개발자 지시로 화면을 단순화) 이 검사가 30초를 기다리다 통째로 죽었다. 지켜야 할 것은
+       버튼이 아니라 **전달 정책**이다: 권한이 없으면 휴대폰 알림은 안 나가고 알림함에는 쌓인다.
+       그래서 버튼이 부르던 것과 **같은 함수**를 직접 부른다. 버튼이 다시 생겨도 안 깨진다. */
+    await page.evaluate(async () => {
+      const ev = { key: 'test:' + Date.now(), type: 'newMatch', title: '한대장 테스트 알림',
+        body: '알림 도착 예시', url: './?screen=notifications' };
+      NOTIFY_RULES.pushToInbox(notifyLedger, [ev], Date.now());
+      await notifyDeliver([ev]);
+      await notifySaveLedger();
+      notifyRenderBadge();
+    });
     await page.waitForTimeout(400);
     const osCount = await page.evaluate(() => window.__notifs.length);
     ok(osCount === 0, '권한 없으면 휴대폰 알림은 나가지 않음', osCount);
@@ -154,6 +169,16 @@ async function onboard(page) {
   const swOk = await page.evaluate(() => navigator.serviceWorker.getRegistration().then((r) => !!r).catch(() => false));
   ok(swOk, '서비스워커 등록됨 (알림 클릭·백그라운드 확인 경로)');
 
+  /* 🔴 **첫 동기화를 우리가 확정하고 시작한다** (2026-09-02 — 오래 끌던 간헐 실패의 원인).
+     `notify-rules.js` 는 첫 동기화에서 **새 공고 알림만** 침묵시킨다(`!first` · baseline).
+     마감 알림은 첫 동기화에도 나간다. 그래서 앱의 최초 확인이 아직 안 끝났을 때 이 검사가
+     evaluate 를 부르면 **우리 호출이 '첫 동기화'가 되어** 새 공고 알림만 사라진다 —
+     알림함에 마감 알림만 남는 정확히 그 증상이다.
+     ⚠️ 배경 확인이 끝나기를 **기다리는** 방식으로는 못 고친다(확인이 진행 중일 수도 있어
+        경합이 남는다 — 2026-08-31 에 그렇게 시도했다가 실패율이 안 줄었다).
+        여기서 **직접 한 번 돌려 baseline 을 세운다.** 타이밍에 기대지 않는다. */
+  await page.evaluate(async () => { await notifyCheck({ quiet: true }); });
+
   // 기존 공고로 이미 쌓인 알림은 비우고 시작
   await page.evaluate(async () => {
     notifyLedger.inbox = [];
@@ -164,22 +189,20 @@ async function onboard(page) {
 
   // ③ 조건 1 — 새 공고 + ④ 조건 2 — 마감 하루 전
   console.log('\n  [조건 1·2] 새 공고 등록 / 마감 하루 전');
-  /* ⚠️ **이 절은 간헐적으로 실패한다 — 아직 원인을 못 잡았다** (2026-08-31 조사 기록).
-     증상: `조건 1 — 새 공고 알림 발생` 이 3~4회에 한 번 실패한다. 알림함에 마감 알림만
-     12건(= MAX_EVENTS) 차오르고 새 공고 알림이 없다.
-     🔴 **제 변경 이전부터 그랬다** — origin/main 을 그대로 두고 돌려도 같은 빈도로 실패한다.
+  /* ✅ **간헐 실패의 원인을 잡았다** (2026-09-02 — 2026-08-31 에 "못 잡았다"고 적혀 있던 것).
 
-     여기까지 확인한 것(같은 것을 다시 재지 말 것):
-       · 픽스처 `test-new-fit` 은 실제로 `eligible` 이다 — 자격 때문이 아니다.
-       · 새 공고 알림은 **첫 동기화에서 설계상 조용하다**(`!first`). 반면 마감 알림은
-         첫 동기화에도 나간다 — 이 비대칭이 증상의 모양을 설명한다.
-       · 그런데 `notifyLedger.baseline` 이 잡힐 때까지 기다리게 해 봐도 실패율이
-         눈에 띄게 줄지 않았다(4회 중 1회). **그래서 그 대기는 넣지 않았다** —
-         효과를 증명 못 한 수정을 '고쳤다'고 남기지 않는다.
-       · ⚠️ `notifyLedger` 는 let 선언이라 `window.notifyLedger` 로는 못 본다(typeof 로 볼 것).
+     원인은 **경합**이었다. `notify-rules.js` 는 첫 동기화에서 새 공고 알림만 침묵시키고
+     (`!first` · ledger.baseline) 마감 알림은 그대로 내보낸다. 앱의 최초 확인이 아직 안
+     끝났을 때 이 검사가 evaluate 를 부르면 **우리 호출이 '첫 동기화'가 되어** 새 공고
+     알림만 사라진다 — 기록된 증상(알림함에 마감 알림만 남는다)과 정확히 같다.
 
-     다음에 볼 곳: notify-rules.js 의 `MAX_EVENTS`(12) 와 마감 규칙이 그 예산을 다 쓰는 경로,
-     그리고 notifyInit 의 첫 확인이 이 evaluate 와 겹치는 시점. */
+     🔴 인과를 증명했다: 주입 직전에 `notifyLedger.baseline = false` 로 경합을 강제하면
+        `조건 1` 이 **매번** 같은 모양으로 실패하고, 되돌리면 통과한다.
+     🔴 옛 가설이던 예산 고갈(MAX_EVENTS 12)은 **아니었다** — 지금은 알림함에 2건뿐인데도
+        같은 실패가 났다. 등록이 45건으로 줄어 마감 알림이 예산을 채우지 못하기 때문이다.
+     ⚠️ 기다리는 방식(baseline 이 참이 될 때까지)으로는 못 고친다 — 확인이 **진행 중**일
+        수도 있어 경합이 남는다. 위에서 우리가 직접 한 번 돌려 baseline 을 세운다.
+     ⚠️ `notifyLedger` 는 let 선언이라 `window.notifyLedger` 로는 못 본다(typeof 로 볼 것). */
   const injected = await page.evaluate(async () => {
     const iso = (n) => { const d = new Date(Date.now() + n * 86400000); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
     // 수집 로봇이 새 공고를 올린 상황 재현 (내 학교·내 조건에 맞는 공고)

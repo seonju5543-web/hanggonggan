@@ -9,23 +9,6 @@
 const { chromium } = require('playwright-core');
 const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
 
-/* 길게 누르기 — 진짜 TouchEvent로 재현한다. 마우스로만 보면 터치 기기에서
-   touchend 뒤에 오는 click까지 세는 함정을 못 잡는다(신청 내역 스와이프와 같은 계열). */
-async function longPress(page, sel, ms = 700) {
-  await page.$eval(sel, (el) => {
-    const r = el.getBoundingClientRect();
-    const t = new Touch({ identifier: 1, target: el, clientX: r.left + r.width / 2, clientY: r.top + r.height / 2 });
-    el.dispatchEvent(new TouchEvent('touchstart', { bubbles: true, cancelable: true, touches: [t], targetTouches: [t], changedTouches: [t] }));
-  });
-  await page.waitForTimeout(ms);
-  await page.$eval(sel, (el) => {
-    const r = el.getBoundingClientRect();
-    const t = new Touch({ identifier: 1, target: el, clientX: r.left + r.width / 2, clientY: r.top + r.height / 2 });
-    el.dispatchEvent(new TouchEvent('touchend', { bubbles: true, cancelable: true, touches: [], targetTouches: [], changedTouches: [t] }));
-    el.click();   // 브라우저가 touchend 뒤에 보내는 click — 삼켜져야 한다
-  });
-  await page.waitForTimeout(300);
-}
 
 let fail = 0;
 const eq = (label, got, want) => {
@@ -79,25 +62,22 @@ const PROFILE = {
   eq(`정렬 버튼 터치 타깃 44px 이상 (${box.w}×${box.h})`, box.h >= 44, true);
   eq('아이콘은 하나뿐이다', await page.$$eval('#explore-sort-btn svg', (e) => e.length), 1);
 
-  console.log('\n■ 눌러서 순환 (개발자 지시 2026-08-26)');
+  /* 🔴 **동작이 바뀌었다 — 검사가 옛 설계를 붙들고 있었다** (2026-09-02).
+     2026-08-26 판은 '눌러서 순환 · 길게 눌러 목록' 이었는데, app.js 가 그걸 **일부러**
+     걷어냈다(주석 그대로: "지금 무슨 기준인지 눌러 보기 전에는 알 수 없고, 길게 누르기는
+     아무도 발견하지 못하는 동작이다. 한 번 눌러 목록에서 고르는 쪽이 짧다").
+     그 뒤로 이 절 6항목이 죽어 있었다 — 앱은 멀쩡한데 검사만 빨간불이었다.
+     지금 지키는 것: **한 번 누르면 목록이 열리고, 골라야 기준이 바뀐다.** */
+  console.log('\n■ 눌러서 목록 · 골라서 바뀐다');
   eq('처음에는 목록이 안 보인다', await page.$eval('#explore-sort-menu', (e) => e.offsetParent !== null), false);
-  await page.click('#explore-sort-btn'); await page.waitForTimeout(500);
-  eq('한 번 누르면 마감 임박순', await page.$eval('#explore-sort-label', (e) => e.textContent.trim()), '마감 임박순');
-  eq('눌렀다고 목록이 뜨지는 않는다', await page.$eval('#explore-sort-menu', (e) => e.offsetParent !== null), false);
   await page.click('#explore-sort-btn'); await page.waitForTimeout(400);
-  eq('두 번이면 등록 최신순', await page.$eval('#explore-sort-label', (e) => e.textContent.trim()), '등록 최신순');
-  await page.click('#explore-sort-btn'); await page.waitForTimeout(400);
-  eq('세 번이면 적합도순으로 돌아온다', await page.$eval('#explore-sort-label', (e) => e.textContent.trim()), '적합도순');
-
-  console.log('\n■ 길게 눌러 목록 (아이콘 바로 아래)');
-  await longPress(page, '#explore-sort-btn');
-  eq('목록이 뜬다', await page.$eval('#explore-sort-menu', (e) => e.offsetParent !== null), true);
+  eq('한 번 누르면 목록이 열린다', await page.$eval('#explore-sort-menu', (e) => e.offsetParent !== null), true);
+  /* 🔴 열기만 해서는 기준이 바뀌면 안 된다 — 옛 '순환' 이 남아 있으면 여기서 걸린다 */
+  eq('  열기만 해서는 기준이 안 바뀐다', await page.$eval('#explore-sort-label', (e) => e.textContent.trim()), '적합도순');
   eq('선택지가 3개다', await page.$$eval('#explore-sort-menu [data-sort]', (e) => e.map((x) => x.dataset.sort)), ['fit', 'deadline', 'listed']);
   eq('부연설명 없이 제목만 나온다',
     await page.$$eval('#explore-sort-menu [data-sort]', (e) => e.map((x) => x.textContent.trim())),
     ['적합도순', '마감 임박순', '등록 최신순']);
-  /* 🔴 길게 눌러 목록을 연 뒤 오는 click을 안 삼키면 기준이 한 칸 넘어간다 */
-  eq('길게 눌러도 기준이 넘어가지 않는다', await page.$eval('#explore-sort-label', (e) => e.textContent.trim()), '적합도순');
   const anchor = await page.evaluate(() => {
     const b = document.querySelector('#explore-sort-btn').getBoundingClientRect();
     const m = document.querySelector('#explore-sort-menu').getBoundingClientRect();
@@ -107,7 +87,17 @@ const PROFILE = {
   eq('오른쪽이 버튼과 맞는다', anchor.rightAligned, true);
   eq('화면 밖으로 안 나간다', anchor.offscreen, false);
 
+  await page.click('#explore-sort-menu [data-sort="deadline"]'); await page.waitForTimeout(400);
+  eq('고르면 그 기준으로 바뀐다', await page.$eval('#explore-sort-label', (e) => e.textContent.trim()), '마감 임박순');
+  eq('  고르고 나면 목록이 닫힌다', await page.$eval('#explore-sort-menu', (e) => e.offsetParent !== null), false);
+  await page.click('#explore-sort-btn'); await page.waitForTimeout(300);
+  await page.click('#explore-sort-menu [data-sort="fit"]'); await page.waitForTimeout(400);
+  eq('  다시 적합도순으로 돌아온다', await page.$eval('#explore-sort-label', (e) => e.textContent.trim()), '적합도순');
+
   console.log('\n■ 마감 임박순');
+  /* ⚠️ 앞 절이 목록을 **닫고** 끝난다(골랐으니까). 옛 판은 열어 둔 채 끝나서 이 줄이
+     바로 고를 수 있었다 — 절 사이에 상태를 넘기지 말고 여기서 연다. */
+  await page.click('#explore-sort-btn'); await page.waitForTimeout(300);
   await page.click('#explore-sort-menu [data-sort="deadline"]');
   await page.waitForTimeout(600);
   eq('고르면 목록이 닫힌다', await page.$eval('#explore-sort-menu', (e) => e.offsetParent !== null), false);
@@ -130,7 +120,7 @@ const PROFILE = {
         .every((r) => rows.indexOf(r) >= rows.length - rows.filter((x) => bucket(x) === 2).length), true);
 
   console.log('\n■ 등록 최신순');
-  await longPress(page, '#explore-sort-btn');
+  await page.click('#explore-sort-btn'); await page.waitForTimeout(300);
   await page.click('#explore-sort-menu [data-sort="listed"]'); await page.waitForTimeout(600);
   eq('라벨이 바뀐다', await page.$eval('#explore-sort-label', (e) => e.textContent.trim()), '등록 최신순');
   rows = await orderKeys();
@@ -141,7 +131,7 @@ const PROFILE = {
     rows.slice(0, withK).every((r, i, arr) => i === 0 || key(arr[i - 1]) >= key(r)), true);
 
   console.log('\n■ 적합도순 — 미달은 맨 아래 (개발자 결정)');
-  await longPress(page, '#explore-sort-btn');
+  await page.click('#explore-sort-btn'); await page.waitForTimeout(300);
   await page.click('#explore-sort-menu [data-sort="fit"]'); await page.waitForTimeout(600);
   const noIdx = await page.$$eval('#explore-list .sch-card',
     (els) => els.map((e, i) => (e.querySelector('.badge-fit-no') ? i : -1)).filter((i) => i >= 0));
@@ -151,7 +141,7 @@ const PROFILE = {
 
   console.log('\n■ 필터 칩과 서로 간섭하지 않는다 (.filter-chip 전역 선택 함정)');
   await page.click('.filter-chip[data-filter="교외"]'); await page.waitForTimeout(500);
-  await longPress(page, '#explore-sort-btn');
+  await page.click('#explore-sort-btn'); await page.waitForTimeout(300);
   await page.click('#explore-sort-menu [data-sort="deadline"]'); await page.waitForTimeout(600);
   eq('정렬을 바꿔도 필터 칩 active가 그대로다',
     await page.$$eval('.filter-chip.active', (e) => e.map((x) => x.dataset.filter)), ['교외']);
