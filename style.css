@@ -2277,26 +2277,17 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 .sch-card:hover { background: var(--surface-2); transform: none; box-shadow: none; }
 .sch-card:active { background: var(--surface-2); transform: none; }
 
-/* 체크 동그라미 — 담은 공고(.badge-applied)면 파랑으로 채워진다 */
-.sch-card::before {
-  content: '';
-  position: absolute;
-  left: 20px; top: 19px;
-  width: 20px; height: 20px;
-  border-radius: 50%;
-  border: 1.6px solid var(--line);
-  background: transparent center / 62% no-repeat;
-  transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease);
-}
-.sch-card:has(.badge-applied)::before {
-  border-color: var(--accent);
-  background-color: var(--accent);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-6.5' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-}
-/* 마감된 줄은 체크 자리를 비워 두고 글자를 흐린다 */
+/* 🔴 체크 동그라미를 걷어냈다 (2026-09-02 개발자 지적: "체크가 적합도를 가린다").
+   원인은 겹침이 아니라 **자리가 사라진 것**이었다 — 이 동그라미는 카드의
+   `padding: 17px 20px 17px 54px` 가 왼쪽에 비워 둔 54px 안에 그려졌는데,
+   나중에 들어온 `.sch-card { padding: 17px 20px; }` 가 그 자리를 없앴다.
+   동그라미는 그대로 남아 left:20px 에 그려지니 같은 자리에서 시작하는
+   '적합도 n%' 배지 위에 올라탔다(실측: 둘 다 카드 왼쪽에서 20px).
+   그리고 이 표시는 홈 '마감 임박' 한 곳에만 남아 있었다 — 장학금 탭·신청 내역·
+   홈 신청 현황에서는 이미 뺀 상태라 네 목록 중 하나만 다른 규칙이었다.
+   담은 공고는 '신청 완료' 배지가 이미 말한다(장학금 탭이 쓰는 방식) — 그것으로 통일한다. */
+/* 마감된 줄은 글자를 흐린다 */
 .sch-card:has(.badge-dday.closed) { opacity: 0.55; }
-/* 담은 줄은 이미 체크가 말하므로 배지를 지운다 — 같은 말을 두 번 하지 않는다 */
-.sch-card .badge-applied { display: none; }
 
 .sch-top { gap: 5px; margin-bottom: 6px; }
 .sch-name { font-size: var(--t-md); line-height: 1.45; }
@@ -2410,8 +2401,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
   transform: none;
   box-shadow: none;
 }
-#apps-list .sch-card::before { display: none; }
-#apps-list .sch-card .badge-applied { display: inline-block; }
 
 /* 알림 설정 — 제목 한 줄로 끝낸다. 설명 줄은 렌더에서 뺐고, 남는 자리를 정리한다 */
 .nf-pref { align-items: center; min-height: 52px; }
@@ -2564,8 +2553,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
    대신 담은 공고는 **왼쪽 파란 띠 + '신청 완료' 배지**로 가른다 —
    체크와 달리 '해야 할 일'이 아니라 '이미 된 것'으로 읽힌다. */
 #explore-list .sch-card { padding-left: 20px; }
-#explore-list .sch-card::before { display: none; }
-#explore-list .sch-card .badge-applied { display: inline-block; }
 #explore-list .sch-card:has(.badge-applied) {
   background: var(--accent-soft);
   box-shadow: inset 3px 0 0 var(--accent);
@@ -2633,7 +2620,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 /* 홈의 '신청 현황'도 이미 담은 것들이다 — 신청 내역과 같이 체크 동그라미를 뺀다.
    (빈 동그라미가 '아직 안 했다'로 읽히던 것과 같은 이유) */
 #home-apps .sch-card { padding-left: 20px; }
-#home-apps .sch-card::before { display: none; }
 
 /* ══ 누런 기운 빼기 (2026-08-31 · "배경이 누렇다" 의견) ═══════════════════
    원인은 셋이었다 — 셋 다 파랑 성분(B)이 빨강(R)보다 낮아 노랗게 보였다:
