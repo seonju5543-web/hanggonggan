@@ -1,0 +1,415 @@
+# 경희대·한국외대 장학 공고 신청 채널 전수 조사
+
+- 조사 시각: 2026-09-02T15:22:14.482Z → 2026-09-02T15:30:13.652Z
+- 근거: 각 공고 **원문 본문에서 신청·접수 방법을 말하는 줄**만 뽑아 분류했습니다(추론 없음).
+
+## 경희대학교
+- 목록에서 찾은 장학 공고: **51건** · 상세를 연 것: **51건**
+
+| 신청 채널 | 건수 |
+|---|---|
+| 이메일 접수 | 38 |
+| 미확인 | 13 |
+| 한국장학재단 | 1 |
+| 학교 시스템 입력형 | 1 |
+
+### 포털(학교 시스템) 입력형으로 분류된 공고 — 1건
+- **개인정보처리방침**
+  - https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200231
+  - 원문 근거: `의학계열실습지원센터 보건복지부(E하늘장사종합정보시스템) 실명인증 및`
+
+<details><summary>전체 목록</summary>
+
+- [미확인] 학교법인 경희학원
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200022
+- [미확인] 대학운영기조
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200370
+- [이메일 접수] 부속기관/연구소/기타기관
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200066
+  - 원문: 경희는 대학본부 외에 다양한 부속기관을 운영하며 교육, 연구, 실천의 창조적 결합을 지원하고 있다. 총 34개의 부속기관은 경희의과학연구원을 비롯한 공동기구 7개 외에 서울캠퍼스에 13개, 국제캠퍼스에 14개를 두고 있다. 또한 경희의 각종 연구소와 연구원은 학술역량의 강화를 통해 큰 학문의 길을 열어가고 있다. 서울캠퍼스에서는 36개, 국제캠퍼스에서는 18개의 부설연구소를 운영하고 있다. 그리고 기타기관으로 서울캠퍼스와 국제캠퍼스에서 학군단을 운영하고 있다.
+- [이메일 접수] 대학정보공시
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200070
+- [이메일 접수] 대학정보공개
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200076
+- [이메일 접수] 대학자체평가
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200360
+- [미확인] 신규 서울 캠퍼스
+  - https://news.khu.ac.kr/kor/user/mapManager/view.do?menuNo=200356
+- [미확인] 신규 국제 캠퍼스
+  - https://news.khu.ac.kr/kor/user/mapManager/view.do?menuNo=200357
+- [미확인] 신규 광릉 캠퍼스
+  - https://news.khu.ac.kr/kor/user/mapManager/view.do?menuNo=200358
+- [이메일 접수] Space 21
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200081
+- [미확인] 교내 전화번호
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200091
+- [이메일 접수] 대학 입학/편입학
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200013
+- [미확인] 대학원 입학
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200014
+  - 원문: 대학원 입학 관련 내용은 해당 대학원으로 문의하시기 바랍니다.
+- [이메일 접수] 외국인 입학
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200015
+- [이메일 접수] 언어·문화교육
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200094
+- [이메일 접수] 국가지원연구센터
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200123
+- [이메일 접수] BK21 플러스 사업
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200135
+- [이메일 접수] BK21 사업
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200139
+- [이메일 접수] TLO 사업
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200134
+- [미확인] 명예의 전당
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200121
+  - 원문: 경희는 학문의 탁월성을 실현하는 동시에 더 나은 세계를 위한 공적 실천을 추구하고 있다. 미래대학을 향한 이러한 여정에서 구성원이 이룬 뛰어난 성취는 경희 공동체의 커다란 자산이다. 이에 경희는 구성원의 훌륭한 업적을 존중하는 대학문화를 조성하고 있다. 그러한 대학문화의 일환으로 2009년에 제정된 목련상은 교육, 연구, 실천 부문에서 탁월한 업적을 이룬 교직원에게 수여하는 상이다. 목련상은 학문적 수월성과 인류 보편 가치 창조에 기여하는 문화를 조성하고 구성원의 자긍심을 고취하는 데 이바지하고 있다. 또한 경희가 이룬 성과를 모든 구성원이 확인하고 공유하는 자랑스러운 계기가 되고 있다. 목련상은 해마다 열리는 경희의 송년회 목련회의에서 시상되고 있다.
+- [이메일 접수] 경희와 인류평화
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200296
+- [이메일 접수] World Civic Forum
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200147
+- [미확인] UNAI-경희 국제회의
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200148
+- [이메일 접수] UN평화공원
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200149
+- [이메일 접수] 지구사회봉사단
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200150
+- [이메일 접수] 국제 교류 프로그램
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200154
+- [이메일 접수] 해외 자매대학
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200153
+- [이메일 접수] 석학초청특강
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200159
+- [이메일 접수] 21세기 미래대학을 말한다
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200160
+- [이메일 접수] Peace BAR Festival
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200161
+- [이메일 접수] 대학안전관리
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200217
+- [미확인] 학생지원센터
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200172
+- [이메일 접수] 미래인재센터
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200180
+- [이메일 접수] 장애학생지원센터
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200174
+- [이메일 접수] 국제처 글로벌교육지원팀
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200175
+  - 원문: 제공 서비스 비자 상담, 외국인 유학생 대상 장학금 문의, 신입생 상담 및 재학생 심리상담 프로그램, 문화체험 및 취업지원 프로그램, 한국어능력향상 강좌 및 TOPIK 지원, 기숙사 관련 문의, 생활상담 등
+- [이메일 접수] 의료기관 진료혜택
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200176
+  - 원문: 문의 경희대학교 총동문회 02-744-8855
+  - 원문: 문의처 동서건강증진센터 치과종합검진센터 건강증진센터
+  - 원문: 상조 가입 시 제외 (별도문의)
+- [이메일 접수] 제증명 서비스
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200182
+  - 원문: 신청방법
+- [이메일 접수] 네오르네상스장학
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200191
+- [이메일 접수] 도서관/박물관
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200197
+- [이메일 접수] 자연사박물관
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200194
+- [이메일 접수] 후마니타스칼리지
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200107
+- [이메일 접수] 교육지원사업
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200113
+- [이메일 접수] 수도권 대학특성화 사업
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200114
+  - 원문: 대학특성화사업은 개별 대학 내 또는 대학들 가운데 비교우위가 있는 분야에 자원을 지원함으로써 세계적 수준의 경쟁력을 갖출 수 있도록 하는 것을 목표로 삼고 있다. 이를 위해 정부는 교육 내용의 다양성 유지 및 학문의 균형 발전을 고려한 특성화의 철학, 목표, 방향 등을 제시하고(Top Down) 대학은 각각의 특성에 부합하는 중장기 발전방안을 수립하여 자율적으로 추진하고(Bottom Up) 있다.
+- [이메일 접수] 학부교육 선진화 선도대학 지원사업
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200115
+- [이메일 접수] 교육역량강화 지원사업
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200116
+- [이메일 접수] English
+  - https://news.khu.ac.kr/eng/user/main/view.do
+- [미확인] Sitemap
+  - https://news.khu.ac.kr/kor/user/contents/view.do?menuNo=200227
+- [미확인] 교내전화번호
+  - https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200091
+- [한국장학재단 + 학교 시스템 입력형 + 이메일 접수] 개인정보처리방침
+  - https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200231
+  - 원문: ① 정보주체는 개인정보침해로 인한 구제를 받기 위하여 개인정보 분쟁조정위원회, 한국인터넷진흥원 개인정보침해신고센터 등에 분쟁 해결이나 상담 등을 신청할 수 있습니다. 경희대학교의 자체적인 개인정보 불만처리, 피해구제 결과에 만족하지 못하시거나 보다 자세한 도움이 필요하시면 아래의 기관에 문의하여 주시기 바랍니다.
+  - 원문: ② 정보주체는 경희대학교의 서비스를 이용하시면서 발생한 모든 개인정보보호 관련 문의, 불만처리, 피해구제 등에 관한 사항을 개인정보 보호책임자 및 개인정보보호 담당부서로 문의할 수 있습니다. 경희대학교는 정보주체의 문의에 대해 지체없이 답변 및 처리해 드릴 것입니다.
+- [이메일 접수] 대학정보공시
+  - https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200070
+- [미확인] KHU SDGs/KHU ESG
+  - https://impact.khu.ac.kr/sdgs/user/main/view.do
+
+</details>
+
+## 한국외국어대학교
+- 목록에서 찾은 장학 공고: **63건** · 상세를 연 것: **63건**
+
+| 신청 채널 | 건수 |
+|---|---|
+| 한국장학재단 | 32 |
+| 미확인 | 17 |
+| 학교 시스템 입력형 | 12 |
+| 이메일 접수 | 11 |
+| 방문·우편 접수 | 10 |
+| 재단·외부 사이트 신청 | 7 |
+| 첨부 양식만 있음(제출처 미확인) | 3 |
+
+### 포털(학교 시스템) 입력형으로 분류된 공고 — 12건
+- **[공통][교외]2026년도 2학기 이백장학금 장학생 모집(9/7~9/15)**
+  - https://dep.hufs.ac.kr/bbs/student/2431/263858/artclView.do
+  - 원문 근거: `다. 선발결과 확인: HUFS Ability 로그인 후 장학금 신청내역에서 확인`
+- **[교내][서울]2026-2 국제학부 김봉철 장학금 장학생 모집(~9/4)**
+  - https://dep.hufs.ac.kr/bbs/student/2431/263714/artclView.do
+  - 원문 근거: `다. 선발확인 : HUFS Ability 로그인 후 장학금 신청내역에서 확인`
+- **[글로벌][교외] 2027-1학기 미래인재육성재단 장학생 모집**
+  - https://dep.hufs.ac.kr/bbs/student/2431/264973/artclView.do
+  - 원문 근거: `5. 신청방법 : 온라인 신청 (HUFS Ability-학생핵심역량통합시스템) → 로그인(학번/비번) → 교과/비교과 → 장학신청 목록 → 해당 장학금`
+- **[글로벌][교외][일시지원] 2026-2학기 라성정형기 재단 장학생 모집**
+  - https://dep.hufs.ac.kr/bbs/student/2431/264197/artclView.do
+  - 원문 근거: `6. 신청방법 : 온라인 신청 (HUFS Ability-학생핵심역량통합시스템) → 로그인(학번/비번) → 교과/비교과 → 장학신청 목록 → 해당 장학금`
+- **[공통][교외] 2026-2 가송재단 장학생 모집**
+  - https://dep.hufs.ac.kr/bbs/student/2431/259919/artclView.do
+  - 원문 근거: `6. 신청방법: 온라인신청(HUFS Ability-학생핵심역량통합시스템) - 로그인(학번/비번) - 교과/비교과 – 장학신청목록 - 해당 장학금`
+- **[공통][교외] 2026-2학기 남가주동문장학회 장학생 선발 공고**
+  - https://dep.hufs.ac.kr/bbs/student/2431/259910/artclView.do
+  - 원문 근거: `4. 지원방법 : 온라인 신청(HUFS Ability - 학생핵심역량통합시스템) - 로그인(학 번/비번) - 교과/비교과 - 해당 장학금 선택`
+- **[공통][교외] 2026-2학기 총동문회 장학금 장학생 선발 공고**
+  - https://dep.hufs.ac.kr/bbs/student/2431/259908/artclView.do
+  - 원문 근거: `3. 신청방법 : 온라인신청(HUFS Ability-학생핵심역량통합시스템) - 로그인(학번/비번) - 교과/비교과 – 장학신청목록 - 해당 장학금`
+- **[공통][교내]2026-1 외대재직직원장학금(씨앗) 장학생 모집(~8/5)**
+  - https://dep.hufs.ac.kr/bbs/student/2431/259826/artclView.do
+  - 원문 근거: `가. 장학금 신청서(HUFS Ability 다운로드)`
+- **[공통][교외]2026-2 한국외대 동문홍보대사 장학금 장학생 모집(~8/12)**
+  - https://dep.hufs.ac.kr/bbs/student/2431/259734/artclView.do
+  - 원문 근거: `7. 신청방법 : 온라인신청(HUFS Ability-학생핵심역량통합시스템) - 로그인(학번/비번) - 교과/비교과 - 장학신청 목록 - 해당 장학금`
+- **[공통][교내] 2026학년도 2학기 고시장학금 신청 안내**
+  - https://dep.hufs.ac.kr/bbs/student/2431/259474/artclView.do
+  - 원문 근거: `4. 신청방법 : 온라인 신청 (HUFS Ability-학생핵심역량통합시스템) → 로그인(학번/비번) → 교과/비교과 → 장학신청 목록 → 해당 장학금 선택`
+- **[공통][교내] 2026학년도 2학기 면학장학금 신청 안내**
+  - https://dep.hufs.ac.kr/bbs/student/2431/259473/artclView.do
+  - 원문 근거: `3. 신청 방법 : 종합정보시스템 로그인 – 등록/장학정보 – 면학장학금 신청`
+- **[서울][교외]2026-2 유흥수 장학금(융합일본지역학부 재학생 대상) 장학생 선발(~8/7)**
+  - https://dep.hufs.ac.kr/bbs/student/2431/259399/artclView.do
+  - 원문 근거: `3) 지원방법 : 온라인 신청(HUFS Ability - 학생핵심역량통합시스템) - 로그인(학 번/비번) - 교과/비교과 - 장학신청 목록에서 해당 장학금 선택`
+
+<details><summary>전체 목록</summary>
+
+- [한국장학재단] [공통][국가] 한국장학재단 학자금 지원 구간 개편 안내
+  - https://dep.hufs.ac.kr/bbs/student/2431/264184/artclView.do
+- [한국장학재단 + 이메일 접수] [서울][국가근로] 2026학년도 2학기 국가근로장학생 모집 안내(추가)
+  - https://dep.hufs.ac.kr/bbs/student/2431/264165/artclView.do
+  - 원문: 2. 신청방법: 첨부된 지원서 작성 후 이메일로 제출
+  - 원문: 7. 문의처: 02-2173-2136(서울 장학팀)
+- [미확인] [공통][국가] 2026년 2학기 푸른등대 기부장학금 장학생 선발(~9/10)
+  - https://dep.hufs.ac.kr/bbs/student/2431/264156/artclView.do
+- [한국장학재단 + 재단·외부 사이트 신청] [공통][국가]2026-2 중소기업취업연계장학금 신규장학생 신청안내(~9/18)
+  - https://dep.hufs.ac.kr/bbs/student/2431/264146/artclView.do
+  - 원문: 2)신청방법:①한국장학재단 홈페이지(www.kosaf.go.kr) 또는 모바일앱을 통하여신청→② 장학금신청서 작성
+  - 원문: 5. 제출서류
+  - 원문: 1) 필수 제출 서류
+- [한국장학재단 + 이메일 접수] [서울][국가근로] 2026학년도 2학기 국가근로장학생 모집 안내(추가)
+  - https://dep.hufs.ac.kr/bbs/student/2431/264135/artclView.do
+  - 원문: 2. 신청방법: 첨부된 지원서 작성 후 이메일로 제출
+  - 원문: 7. 문의처: 02-2173-2136(서울 장학팀)
+- [미확인] [공통][국가]2026년 2학기 고졸 후학습자 장학금 신청안내
+  - https://dep.hufs.ac.kr/bbs/student/2431/263952/artclView.do
+- [학교 시스템 입력형] [공통][교외]2026년도 2학기 이백장학금 장학생 모집(9/7~9/15)
+  - https://dep.hufs.ac.kr/bbs/student/2431/263858/artclView.do
+  - 원문: 6. 제출서류
+  - 원문: 7. 신청방법
+  - 원문: 10. 문의처: 서울 장학팀(02-2173-2137), 글로벌 학생지원·장학팀(031-330-4034)
+- [학교 시스템 입력형] [교내][서울]2026-2 국제학부 김봉철 장학금 장학생 모집(~9/4)
+  - https://dep.hufs.ac.kr/bbs/student/2431/263714/artclView.do
+  - 원문: 6. 제출서류
+  - 원문: 7. 신청방법: 온라인 신청(HUFS Ability – 학생핵심역량통합시스템 – 로그인(학번/비번) - 교과/비교과 – 장학신청 목록 - 해당 장학금 선택
+  - 원문: 9. 문의처: 서울캠퍼스 장학팀 02-2173-2137
+- [미확인] [공통][국가] 2026-2 국가장학금 2차 신청 안내 (~9.9)
+  - https://dep.hufs.ac.kr/bbs/student/2431/261093/artclView.do
+- [미확인] [군산시] 2026년 하반기 군산시 대학(원)생 학자금 대출 이자 지원
+  - https://dep.hufs.ac.kr/bbs/student/2431/260873/artclView.do
+- [한국장학재단] [공통][대출] 2026-2 한국장학재단 학자금 대출 신청 안내
+  - https://dep.hufs.ac.kr/bbs/student/2431/259060/artclView.do
+- [한국장학재단 + 이메일 접수 + 재단·외부 사이트 신청] [서울][다문화탈북학생 멘토링] 2026년도 다문화.탈북(이주.북한배경)학생 멘토링 사업 장학생 모집 안내(상시 모집)
+  - https://dep.hufs.ac.kr/bbs/student/2431/249990/artclView.do
+  - 원문: 4. 신청방법 (가, 나 순서대로)
+  - 원문: - 한국장학재단 홈페이지에서 신청 시 제출서류(소개서(멘토용) 및 (지도)교수추천서(멘토용)) 업로드
+  - 원문: 9. 문의: 자세한 내용은 한국장학재단 홈페이지 확인,
+- [한국장학재단] [공통][교외] 외부장학재단 장학생 지원 전 국가장학금 신청
+  - https://dep.hufs.ac.kr/bbs/student/2431/212178/artclView.do
+- [한국장학재단 + 이메일 접수 + 방문·우편 접수 + 재단·외부 사이트 신청] [공통][대출] 2026년 하반기분 통영시 대학생 학자금 이자 지원 공고(~3/25)
+  - https://dep.hufs.ac.kr/bbs/student/2431/265069/artclView.do
+  - 원문: 4. 신청방법
+  - 원문: 나. 신청방법: 전자 우편, 방문, 등기우편 접수(팩스 불가)
+  - 원문: 1) 전자 우편 접수처: wngus9510@korea.kr
+- [학교 시스템 입력형] [글로벌][교외] 2027-1학기 미래인재육성재단 장학생 모집
+  - https://dep.hufs.ac.kr/bbs/student/2431/264973/artclView.do
+  - 원문: 3. 제출서류
+  - 원문: 5. 신청방법 : 온라인 신청 (HUFS Ability-학생핵심역량통합시스템) → 로그인(학번/비번) → 교과/비교과 → 장학신청 목록 → 해당 장학금
+  - 원문: 6. 문의처 : 글로벌캠퍼스 학생지원장학팀(031-330-4034)
+- [방문·우편 접수] [공통][교외] 2026년 2학기 (재)달서인재육성장학재단 장학생 선발 안내
+  - https://dep.hufs.ac.kr/bbs/student/2431/264952/artclView.do
+  - 원문: 2. 신청방법: 서류 준비하여 방문접수
+  - 원문: 7. 문의처: 달서인재육성장학재단사무국 053-667-3232
+- [미확인] [공통][교외] 2026년 익산사랑 장학생 선발 안내
+  - https://dep.hufs.ac.kr/bbs/student/2431/264949/artclView.do
+- [미확인] [공통][교외] 2026년 2학기 선원가족장학사업 선발 안내
+  - https://dep.hufs.ac.kr/bbs/student/2431/264946/artclView.do
+- [미확인] [공통][교외] 2026년 2학기 통영시 대학생 등록금 전액 지원사업
+  - https://dep.hufs.ac.kr/bbs/student/2431/264701/artclView.do
+- [한국장학재단] [공통][교외] 2026년 하반기 익산시 대학(원)생 학자금 이자지원 신청자 접수 공고
+  - https://dep.hufs.ac.kr/bbs/student/2431/264688/artclView.do
+  - 원문: □ 지원방법 : 한국장학재단을 통한 대출 이자 지원 (12월 지급 예정)
+  - 원문: □ 신청방법 : 온라인 신청(익산시 통합예약시스템)
+  - 원문: □ 관련문의 : 익산시 교육협력과(☎063-859-5881)
+- [첨부 양식만 있음(제출처 미확인)] [글로벌][교외] 2026-2학기 한원장학회 장학금 신청 안내 (~ 9/11)
+  - https://dep.hufs.ac.kr/bbs/student/2431/264662/artclView.do
+  - 원문: 4. 제출서류
+  - 원문: 6. 제출처 및 문의처: 방문 및 등기제출만 가능
+- [한국장학재단] [교외] 두을장학재단 제 29기 장학생 모집(2027년)
+  - https://dep.hufs.ac.kr/bbs/student/2431/264634/artclView.do
+  - 원문: ▶ 접수기간
+  - 원문: ▶ 지원접수 및 문의
+  - 원문: ▷ 지원방법 : www.dooeul.or.kr → 지원신청→ 지원서 작성
+- [한국장학재단] [서울][다문화탈북학생 멘토링] 2026학년도 1학기 8월 다문화탈북학생 멘토링 출근부 마감 안내
+  - https://dep.hufs.ac.kr/bbs/student/2431/264474/artclView.do
+  - 원문: 마. 기타 문의사항 : 서울캠퍼스 장학팀 02-2173-2136
+- [한국장학재단] [공통][대청교] 2026학년도 1학기 8월 대학생 청소년교육지원장학 출근부 마감 안내
+  - https://dep.hufs.ac.kr/bbs/student/2431/264471/artclView.do
+  - 원문: 마. 기타 문의사항 : 서울캠퍼스 장학팀 02-2173-2136, 글로벌캠퍼스 학생지원.장학팀 031-330-4034
+- [한국장학재단] [공통][국가근로] 2026학년도 1학기 8월 국가근로 출근부 마감 안내
+  - https://dep.hufs.ac.kr/bbs/student/2431/264466/artclView.do
+  - 원문: 라. 기타 문의사항 : 서울캠퍼스 장학팀 02-2173-2136, 글로벌캠퍼스 학생지원.장학팀 031-330-4034
+- [한국장학재단 + 학교 시스템 입력형] [글로벌][교외][일시지원] 2026-2학기 라성정형기 재단 장학생 모집
+  - https://dep.hufs.ac.kr/bbs/student/2431/264197/artclView.do
+  - 원문: 4. 제출서류
+  - 원문: 6. 신청방법 : 온라인 신청 (HUFS Ability-학생핵심역량통합시스템) → 로그인(학번/비번) → 교과/비교과 → 장학신청 목록 → 해당 장학금
+  - 원문: 7. 문의처 : 글로벌캠퍼스 학생지원장학팀(031-330-4034)
+- [미확인] [공통][교외]2026년 하반기 울산연구원 장학생 선발공고
+  - https://dep.hufs.ac.kr/bbs/student/2431/263956/artclView.do
+- [미확인] [공통][국가] 장학금 부정청구 자진신고 안내
+  - https://dep.hufs.ac.kr/bbs/student/2431/263674/artclView.do
+- [한국장학재단 + 이메일 접수] [서울][국가근로] 2026학년도 2학기 국가근로장학생 모집 안내(추가)
+  - https://dep.hufs.ac.kr/bbs/student/2431/263613/artclView.do
+  - 원문: 2. 신청방법: 첨부된 지원서 작성 후 이메일로 제출
+  - 원문: 7. 문의처: 02-2173-2136(서울 장학팀)
+- [한국장학재단 + 이메일 접수] [서울][국가근로] 2026학년도 2학기 국가근로장학생 모집 안내(추가)
+  - https://dep.hufs.ac.kr/bbs/student/2431/263498/artclView.do
+  - 원문: 2. 신청방법: 첨부된 지원서 작성 후 이메일로 제출
+  - 원문: 7. 문의처: 02-2173-2136(서울 장학팀)
+- [한국장학재단 + 이메일 접수] [공통][국가근로] 2026학년도 2학기 국가근로장학생 모집 안내 (추가)
+  - https://dep.hufs.ac.kr/bbs/student/2431/261613/artclView.do
+  - 원문: 2. 신청방법: 첨부된 지원서 작성후 이메일 제출
+  - 원문: 7. 문의처: 02-2173-2136(서울 장학팀) / 031-330-4034(글로벌 학생지원.장학팀)
+- [한국장학재단 + 방문·우편 접수] [글로벌][교외] 2026-2학기 다우기술 SW장학생 모집안내 (~8/24)
+  - https://dep.hufs.ac.kr/bbs/student/2431/261572/artclView.do
+  - 원문: 4. 제출서류
+  - 원문: 6. 제출 방법 및 제출처: 직접제출 또는 등기(익일특급)송부
+- [한국장학재단 + 이메일 접수 + 방문·우편 접수] [글로벌][국가근로] 2026학년도 2학기 국가근로장학생 모집 안내(추가)
+  - https://dep.hufs.ac.kr/bbs/student/2431/261446/artclView.do
+  - 원문: 2. 신청방법: 첨부된 지원서 작성후 이메일 혹은 방문 제출
+  - 원문: 7. 문의처: 031-330-4034(학생지원.장학팀)
+- [미확인] [공통][교외] 2026학년도 세종이도인재 장학금 장학생 모집
+  - https://dep.hufs.ac.kr/bbs/student/2431/261289/artclView.do
+- [미확인] [공통][국가] 2026학년도 2학기 2차 주거안정장학금 신청기간 안내(~9/9)
+  - https://dep.hufs.ac.kr/bbs/student/2431/261179/artclView.do
+- [미확인] [공통][대출] 2026년 제 2회 서울시 대학(원)생 학자금대출 이자 지원
+  - https://dep.hufs.ac.kr/bbs/student/2431/260872/artclView.do
+- [첨부 양식만 있음(제출처 미확인)] [공통][교외] 2026년 하반기 서울인재대학장학금 장학생 선발 공고(8/3~8/10)
+  - https://dep.hufs.ac.kr/bbs/student/2431/260566/artclView.do
+  - 원문: 붙임_5._2026년_서울인재대학장학금_신청방법_안내[1].pdf
+- [한국장학재단 + 재단·외부 사이트 신청] [공통][대출] 2026년 하반기 발생 울산광역시 대학(원)생 학자금대출 이자지원사업 안내
+  - https://dep.hufs.ac.kr/bbs/student/2431/260492/artclView.do
+  - 원문: 6. 구비서류 (모든 제출 서류는 주민등록번호 뒷자리(6자리) 가려서 발급 및 제출)
+  - 원문: ★ 모든 제출 서류의 주민등록번호 뒷자리는 가려서 발급 및 제출
+  - 원문: 7. 이자지원 방법
+- [한국장학재단] [서울][다문화탈북학생 멘토링] 2026학년도 1학기 7월 다문화탈북학생 멘토링 출근부 마감 안내
+  - https://dep.hufs.ac.kr/bbs/student/2431/260460/artclView.do
+  - 원문: 마. 기타 문의사항 : 서울캠퍼스 장학팀 02-2173-2136
+- [한국장학재단] [공통][대청교] 2026학년도 1학기 7월 대학생 청소년교육지원장학 출근부 마감 안내
+  - https://dep.hufs.ac.kr/bbs/student/2431/260459/artclView.do
+  - 원문: 마. 기타 문의사항 : 서울캠퍼스 장학팀 02-2173-2136, 글로벌캠퍼스 학생지원.장학팀 031-330-4034
+- [한국장학재단] [공통][국가근로] 2026학년도 1학기 7월 국가근로 출근부 마감 안내
+  - https://dep.hufs.ac.kr/bbs/student/2431/260458/artclView.do
+  - 원문: 라. 기타 문의사항 : 서울캠퍼스 장학팀 02-2173-2136, 글로벌캠퍼스 학생지원.장학팀 031-330-4034
+- [미확인] [공통][교외] 2026년 화성시인재육성재단 코나아이 소상공인 장학생 모집(~8/11)
+  - https://dep.hufs.ac.kr/bbs/student/2431/260301/artclView.do
+- [한국장학재단 + 이메일 접수 + 재단·외부 사이트 신청] [공통][국가근로] 2026-2학기 국가근로장학생 희망근로지 신청 안내
+  - https://dep.hufs.ac.kr/bbs/student/2431/260269/artclView.do
+  - 원문: 2. 신청 방법 :
+  - 원문: ☎문의사항 : 서울 장학팀 (02-2173-2136 / scholarship@hufs.ac.kr)
+- [한국장학재단 + 방문·우편 접수] [서울][교외] 2026년도 2학기 연재장학재단 32기 장학생 선발안내(~8/10)
+  - https://dep.hufs.ac.kr/bbs/student/2431/260214/artclView.do
+  - 원문: 4. 제출서류
+  - 원문: 6. 제출방법: 등기우편(익일특급) 또는 방문접수
+  - 원문: 7. 문의처: 서울캠퍼스 장학팀(02-2173-2136)
+- [미확인] [공통][교외] 서울 사회복지공동모금회 사랑의열매 2026년 상반기 바로바로론 사랑나눔 장학생 선발 안내(~7/30)
+  - https://dep.hufs.ac.kr/bbs/student/2431/260204/artclView.do
+- [한국장학재단 + 방문·우편 접수] [글로벌][교외]2026-2학기 염곡문화재단 장학생 선발 안내(~8/3)
+  - https://dep.hufs.ac.kr/bbs/student/2431/260146/artclView.do
+  - 원문: 3. 제출서류
+  - 원문: 5. 제출처: 글로벌캠퍼스 학생지원.장학팀(031-330-4034)
+- [미확인] [공통][교외]2026년 충남평생교육진흥원 재능키움 장학생 모집(7/27)
+  - https://dep.hufs.ac.kr/bbs/student/2431/259958/artclView.do
+- [미확인] [공통][교외] 포스코청암재단 2026년 포스코비전장학생 모집(~7/19)
+  - https://dep.hufs.ac.kr/bbs/student/2431/259957/artclView.do
+- [한국장학재단 + 학교 시스템 입력형] [공통][교외] 2026-2 가송재단 장학생 모집
+  - https://dep.hufs.ac.kr/bbs/student/2431/259919/artclView.do
+  - 원문: 4. 제출서류
+  - 원문: 6. 신청방법: 온라인신청(HUFS Ability-학생핵심역량통합시스템) - 로그인(학번/비번) - 교과/비교과 – 장학신청목록 - 해당 장학금
+- [학교 시스템 입력형] [공통][교외] 2026-2학기 남가주동문장학회 장학생 선발 공고
+  - https://dep.hufs.ac.kr/bbs/student/2431/259910/artclView.do
+  - 원문: 나. 필수제출서류
+  - 원문: 4. 지원방법 : 온라인 신청(HUFS Ability - 학생핵심역량통합시스템) - 로그인(학 번/비번) - 교과/비교과 - 해당 장학금 선택
+- [학교 시스템 입력형] [공통][교외] 2026-2학기 총동문회 장학금 장학생 선발 공고
+  - https://dep.hufs.ac.kr/bbs/student/2431/259908/artclView.do
+  - 원문: 나. 필수제출서류
+  - 원문: 3. 신청방법 : 온라인신청(HUFS Ability-학생핵심역량통합시스템) - 로그인(학번/비번) - 교과/비교과 – 장학신청목록 - 해당 장학금
+  - 원문: 5. 문의처: 서울캠퍼스 장학팀(02-2173-2137), 글로벌캠퍼스 학생지원장학팀(031-330-4034)
+- [방문·우편 접수] [공통][교외] 2026학년도 후기(2026-2학기) 양천장학회 장학금 신청 안내
+  - https://dep.hufs.ac.kr/bbs/student/2431/259865/artclView.do
+  - 원문: 6. 제출서류 (일반장학금, 면학장학금 공통서류)
+  - 원문: ※ 위 제출서류 순서로 제출하시기 바라며, 스테이플러나 클립없이 제출 요망
+  - 원문: 11. 문의처 : 서울캠퍼스 장학팀(02-2173-2136), 글로벌캠퍼스 학생지원.장학팀(031-330-4034)
+- [첨부 양식만 있음(제출처 미확인)] [공통][교외] 2026년 정읍시민장학재단 장학생(우수인재 장학금) 모집(7/13~7/27)
+  - https://dep.hufs.ac.kr/bbs/student/2431/259850/artclView.do
+- [학교 시스템 입력형] [공통][교내]2026-1 외대재직직원장학금(씨앗) 장학생 모집(~8/5)
+  - https://dep.hufs.ac.kr/bbs/student/2431/259826/artclView.do
+  - 원문: 4. 제출서류
+  - 원문: 6. 신청방법: 온라인 신청 (HUFS Ability-학생핵심역량통합시스템) → 로그인(학번/비번) → 교과/비교과 → 장학신청 목록 → 해당 장학금
+  - 원문: 8. 문의처: 서울캠퍼스 장학팀(02-2173-2137), 글로벌캠퍼스 학생지원·장학팀(031-330-4034)
+- [한국장학재단 + 이메일 접수] [서울][국가근로] 2026년 하계방학 국가근로장학생 추가 모집(교내,~7/16)
+  - https://dep.hufs.ac.kr/bbs/student/2431/259753/artclView.do
+  - 원문: 2. 신청방법: 첨부된 지원서 작성후 이메일 제출(한글/워드/PDF 파일로 제출)
+  - 원문: 7. 문의처: 02-2173-2136 (서울캠퍼스 장학팀)
+- [학교 시스템 입력형] [공통][교외]2026-2 한국외대 동문홍보대사 장학금 장학생 모집(~8/12)
+  - https://dep.hufs.ac.kr/bbs/student/2431/259734/artclView.do
+  - 원문: 5. 제출서류
+  - 원문: 제출서류
+  - 원문: 7. 신청방법 : 온라인신청(HUFS Ability-학생핵심역량통합시스템) - 로그인(학번/비번) - 교과/비교과 - 장학신청 목록 - 해당 장학금
+- [학교 시스템 입력형] [공통][교내] 2026학년도 2학기 고시장학금 신청 안내
+  - https://dep.hufs.ac.kr/bbs/student/2431/259474/artclView.do
+  - 원문: 4. 신청방법 : 온라인 신청 (HUFS Ability-학생핵심역량통합시스템) → 로그인(학번/비번) → 교과/비교과 → 장학신청 목록 → 해당 장학금 선택
+  - 원문: 5. 제출서류 : 신청서 1부, 합격증 1부
+  - 원문: 7. 기간 내 미신청자 신청 방법
+- [한국장학재단 + 학교 시스템 입력형] [공통][교내] 2026학년도 2학기 면학장학금 신청 안내
+  - https://dep.hufs.ac.kr/bbs/student/2431/259473/artclView.do
+  - 원문: 3. 신청 방법 : 종합정보시스템 로그인 – 등록/장학정보 – 면학장학금 신청
+  - 원문: 5. 문의
+- [한국장학재단 + 방문·우편 접수 + 재단·외부 사이트 신청] [공통][교외] 한국장애인개발원 2026년도 쌍용곰두리장학생 모집(7/8~7/27)
+  - https://dep.hufs.ac.kr/bbs/student/2431/259439/artclView.do
+  - 원문: ❍ 접수기간: 2026. 7. 8.(수) ~ 2026. 7. 27.(월)
+  - 원문: ❍ 신청방법: 신청서 및 제출서류 구비 후 재학 중인 학교 장학담당 부서를 통해 신청 ※ 개인신청 불가
+  - 원문: □ 제출서류
+- [한국장학재단 + 방문·우편 접수] [서울][교외] 2026-2학기 남정장학재단 장학생 선발 안내(~7/14)
+  - https://dep.hufs.ac.kr/bbs/student/2431/259415/artclView.do
+  - 원문: 4. 제출서류 ※ 스테이플러나 클립 없이 제출 요망
+  - 원문: 7. 신청방법 : 방문접수 또는 등기우편
+- [학교 시스템 입력형] [서울][교외]2026-2 유흥수 장학금(융합일본지역학부 재학생 대상) 장학생 선발(~8/7)
+  - https://dep.hufs.ac.kr/bbs/student/2431/259399/artclView.do
+  - 원문: 2) 필수제출서류
+  - 원문: 3) 지원방법 : 온라인 신청(HUFS Ability - 학생핵심역량통합시스템) - 로그인(학 번/비번) - 교과/비교과 - 장학신청 목록에서 해당 장학금 선택
+  - 원문: 8) 문의처: 장학팀(02-2173-2137)
+- [미확인] [공통][대출] 2026년 세종이도인재장학금 디딤돌 장학사업 학자금대출 관련분야 신청
+  - https://dep.hufs.ac.kr/bbs/student/2431/259390/artclView.do
+- [한국장학재단 + 이메일 접수 + 방문·우편 접수 + 재단·외부 사이트 신청] [공통][교외] 2026학년도 2학기 삼일장학회 희망/동행 장학생 선발 안내 (~7/27)
+  - https://dep.hufs.ac.kr/bbs/student/2431/259298/artclView.do
+  - 원문: 7. 장학생 접수 : 모든 제출서류는 원본 제출이 원칙임.
+  - 원문: 8. 필수제출 서류(모든 제출서류는 주민등록번호 뒷자리 미공개로 발급.제출)
+  - 원문: 9. 선택요건 증빙서류 (해당 사항만 제출) - 모든 제출서류는 주민등록번호 뒷자리 미공개로 발급
+
+</details>
