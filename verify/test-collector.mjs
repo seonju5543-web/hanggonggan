@@ -3166,6 +3166,18 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
   });
   eq('서버 포트를 박은 드라이버가 없다 (PORT 를 먼저 본다)', hardPort, []);
 
+  /* 🔴 **화면이 숨기는 학교와 로봇이 수집하는 학교가 갈라지면 안 된다** (2026-09-02 코드 리뷰).
+     `match-engine.js` 의 `SERVED_SCHOOLS` 는 `collector/schools.json` 의 활성 학교를
+     그대로 옮겨 적은 것이다. 같은 사실이 두 곳에 있으면 반드시 갈라진다 — 학교를 다시
+     넣었을 때 로봇은 수집하는데 앱은 계속 숨겨서, **아무도 모르는 채로** 그 학교 학생이
+     빈 화면을 본다. 안내문으로는 안 막히므로 여기서 대조한다.
+     (학교를 늘리거나 줄일 때는 두 파일을 같이 고치면 된다 — 이 검사가 알려 준다.) */
+  const served = createRequire(import.meta.url)('../match-engine.js').SERVED_SCHOOLS;
+  const active = JSON.parse(fs.readFileSync(new URL('../collector/schools.json', import.meta.url), 'utf8'))
+    .schools.map((x) => x.school);
+  eq('화면이 보여 주는 학교 = 로봇이 수집하는 학교',
+     [...served].sort(), [...new Set(active)].sort());
+
   /* ③ 사람이 미리 준비해야 하는 검사는 언젠가 반드시 안 돌아간다.
         verify-forms-data 가 "더미 양식이 주입된 앱 복사본이 서빙 중이어야 함"을 요구해
         돌리는 족족 실패했다 — 이제 드라이버가 스스로 주입한다. */
