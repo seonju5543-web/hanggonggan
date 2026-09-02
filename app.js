@@ -2076,10 +2076,17 @@ function openDetail(id) {
         ${sch.program ? '<span class="badge badge-program">상시 제도</span>' : `<span class="badge badge-dday ${d.cls}">${d.label}</span>`}
         <span class="badge badge-kind">${esc((sch.type || '장학금') + (sch.auto ? ' · 검수 전' : ''))}</span>
       </div>
+      ${/* 🔴 순서: 이름 → **금액** → 주관·접수 (2026-09-02 개발자 지시).
+           학생이 카드를 열고 가장 먼저 찾는 것은 얼마를 받느냐다. 주관 기관은 제목에
+           이미 들어 있는 경우가 많아(예: '해외자원개발진흥재단 KOLNG …') 금액을 한 줄
+           아래로 밀고 있었다.
+           그리고 summary 를 지운다 — '해외자원개발진흥재단 — 한국장학재단 등록 장학금.'
+           처럼 바로 윗줄과 같은 말을 두 번 하는 데이터가 많다(개발자 지적). 없앤 정보는
+           없다: 주관은 아랫줄에, '한국장학재단 등록' 이라는 사실은 원문 링크 이름
+           ('한국장학재단 ↗')이 말한다. */ ''}
       <h3 class="sheet-title">${esc(sch.name)}</h3>
-      <p class="sheet-provider">${esc(sch.provider)} · ${esc(sch.period)}</p>
       <p class="sheet-amount">${esc(sch.amount)}</p>
-      <p class="sheet-summary">${esc(sch.summary)}</p>
+      <p class="sheet-provider">${esc(sch.provider)} · ${esc(sch.period)}</p>
 
       <div class="sheet-verdict">
         <h4>지원 자격</h4>

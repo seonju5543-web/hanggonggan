@@ -2734,8 +2734,11 @@ body::after { opacity: 0.26; }
 
 /* 시트 안 — 제목과 본문 */
 .sheet-title { margin-top: var(--sp-1); }
-.sheet-provider { margin-top: 5px; }
-.sheet-amount { margin-top: var(--sp-1); }
+/* 🔴 순서가 이름 → 금액 → 주관·접수 로 바뀌었다(2026-09-02). 아래 여백을 갖고 있던
+   .sheet-summary 가 사라졌으므로 **마지막 줄인 .sheet-provider** 가 그 몫을 받는다 —
+   안 주면 머리와 '지원 자격' 이 붙는다. */
+.sheet-amount { margin: var(--sp-1) 0 0; }
+.sheet-provider { margin: 5px 0 var(--sp-3); }
 
 /* ══ 상세 시트 머리의 표식들을 한 규격으로 (2026-09-01 개발자 지적) ══════════
    실측하니 나란히 선 둘이 모든 값에서 달랐다:
