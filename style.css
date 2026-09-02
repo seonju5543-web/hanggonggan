@@ -720,7 +720,9 @@ input::placeholder { color: var(--text-weak); }
 .sheet-body { padding: 18px 24px calc(30px + env(safe-area-inset-bottom)); }
 .sheet-title { font-size: var(--t-2xl); font-weight: 800; margin-top: 12px; letter-spacing: -0.02em; }
 .sheet-provider { font-size: var(--t-sm); color: var(--text-weak); margin-top: 3px; }
-.sheet-amount { font-size: var(--t-xl); font-weight: 800; color: var(--primary); margin: 9px 0; font-variant-numeric: tabular-nums; }
+/* 🔴 금액은 파랑(--accent)이다 (2026-09-02 개발자 지시). --primary 는 남색이라
+   제목·글자와 같은 색으로 묻혔다. 새 파랑을 만들지 말고 링크가 쓰는 값을 그대로 쓴다. */
+.sheet-amount { font-size: var(--t-xl); font-weight: 800; color: var(--accent); margin: 9px 0; font-variant-numeric: tabular-nums; }
 .sheet-summary { font-size: var(--t-md); color: var(--text-sub); margin-bottom: 20px; }
 .sheet-body h4 {
   font-size: var(--t-sm);
@@ -730,7 +732,11 @@ input::placeholder { color: var(--text-weak); }
   margin: 20px 0 9px;
 }
 
-.reason-list, .doc-list { list-style: none; display: grid; gap: 6px; }
+/* 🔴 줄 사이를 좁게 (2026-09-02 개발자 지시) — ✓ 표시가 붙은 줄이 앞 줄과 떨어져
+   보여서 '같은 지원 자격인데 다른 묶음' 처럼 읽혔다. 실제 간격(20px)은 다른 항목과
+   같았지만, 앞 줄의 마지막 줄이 짧으면 오른쪽이 비어 더 벌어져 보인다.
+   그래서 진짜로 좁힌다 — 사이 20 → 12px. */
+.reason-list, .doc-list { list-style: none; display: grid; gap: 2px; }
 /* 🔴 되돌리지 말 것 (2026-08-31): 줄마다 회색 카드를 씌우면 9줄짜리 자격이
    **카드 아홉 장**이 되어 읽히지 않는다(전문가 지적 "가독성"). 목록은 목록으로
    보여야 눈이 훑는다. 배경 대신 **여백과 왼쪽 표식**으로 항목을 가른다. */
@@ -739,7 +745,7 @@ input::placeholder { color: var(--text-weak); }
 .reason-list li, .doc-list li {
   font-size: var(--t-md);
   line-height: 1.6;
-  padding: 7px 0 7px 15px;
+  padding: 5px 0 5px 15px;
   position: relative;
 }
 .reason-list li::before, .doc-list li::before {
