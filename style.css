@@ -2389,7 +2389,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 #apps-list .sch-card { padding-left: 20px; }
 .swipe-row > .sch-card {
   border-bottom: 0;
-  cursor: default;
 }
 /* 🔴 목록을 내리다 손이 스치기만 해도 색이 변했다(개발자 지적). 이름 박스는 눌러도
    아무 일이 없으니 눌리는 것처럼 보이면 안 된다 — 손짓은 '미는 것'만 받는다. */
