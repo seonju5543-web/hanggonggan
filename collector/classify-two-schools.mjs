@@ -46,10 +46,15 @@ for (const key of Object.keys(state.schools)) {
     it.channels = it.error
       ? [{ kind: '읽기 실패', evidence: it.error, how: '열지 못함' }]
       : classifyChannels({ lines, methodLines, attachments: it.attachments || [] });
-    /* 근거가 본문에서 나왔는지 첨부에서 나왔는지 — 이 구분이 곧 '학교가 어디에 적는가'다 */
+    /* 근거가 본문에서 나왔는지 첨부에서 나왔는지 — 이 구분이 곧 '학교가 어디에 적는가'다.
+       🔴 근거는 apply-channel 이 **180자에서 자른** 값이다. 원본 줄과 통째로 비교하면
+          긴 줄이 늘 어긋나 첨부에서 나온 근거가 전부 '본문'으로 찍힌다(red-green 으로 확인).
+          자르는 방식을 똑같이 맞춰 비교하고, 그래도 못 찾으면 **모른다고 적는다**. */
+    const norm = (l) => String(l).replace(/\s+/g, ' ').trim().slice(0, 180);
     it.channels.forEach((c) => {
       if (!c.evidence) return;
-      c.from = bodyLines.some((l) => l === c.evidence) ? '본문' : (attLines.some((l) => l === c.evidence) ? '첨부' : '본문');
+      c.from = bodyLines.some((l) => norm(l) === c.evidence) ? '본문'
+        : (attLines.some((l) => norm(l) === c.evidence) ? '첨부' : '출처 확인 안 됨');
     });
   }
 }
