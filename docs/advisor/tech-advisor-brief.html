@@ -1,0 +1,1222 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>한대장 기술 고문 요청서</title>
+<style>
+@font-face{font-family:'NSK';src:url('fonts/NotoSansKR-300.ttf') format('truetype');font-weight:300;font-style:normal}
+@font-face{font-family:'NSK';src:url('fonts/NotoSansKR-400.ttf') format('truetype');font-weight:400;font-style:normal}
+@font-face{font-family:'NSK';src:url('fonts/NotoSansKR-500.ttf') format('truetype');font-weight:500;font-style:normal}
+@font-face{font-family:'NSK';src:url('fonts/NotoSansKR-700.ttf') format('truetype');font-weight:700;font-style:normal}
+@font-face{font-family:'GB';src:url('fonts/GowunBatang-400.ttf') format('truetype');font-weight:400;font-style:normal}
+@font-face{font-family:'GB';src:url('fonts/GowunBatang-700.ttf') format('truetype');font-weight:700;font-style:normal}
+@font-face{font-family:'PM';src:url('fonts/IBMPlexMono-400.ttf') format('truetype');font-weight:400;font-style:normal}
+@font-face{font-family:'PM';src:url('fonts/IBMPlexMono-500.ttf') format('truetype');font-weight:500;font-style:normal}
+
+:root{
+  --ink:#14202A; --ink2:#465661; --ink3:#7C8A94;
+  --line:#D4DBE0; --line2:#E8ECEF; --tint:#F4F7F8; --tint2:#FAFBFC;
+  --blue:#1B5E8E; --blue-soft:#E3EDF5; --blue-line:#B7CFE1;
+  --rust:#A03A2B; --rust-soft:#F7E8E4;
+  --grey:#9AA6AE;
+}
+@page{ size:A4; margin:18mm 15mm 16mm; }
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:'NSK',sans-serif; font-weight:400; color:var(--ink);
+  font-size:9.6pt; line-height:1.68; background:#fff;
+  -webkit-print-color-adjust:exact; print-color-adjust:exact;
+}
+p{margin:0 0 8px}
+strong,b{font-weight:700}
+em{font-style:normal;font-weight:500;color:var(--blue)}
+a{color:var(--blue);text-decoration:none}
+.mono{font-family:'PM',monospace}
+
+/* ── 표지 ─────────────────────────── */
+.cover{height:245mm;display:flex;flex-direction:column;page-break-after:always}
+.cover-top{border-top:3px solid var(--ink);padding-top:10px}
+.cover-kicker{font-family:'PM',monospace;font-size:8pt;letter-spacing:.16em;color:var(--ink3);text-transform:uppercase}
+.cover h1{
+  font-family:'GB',serif;font-weight:700;font-size:31pt;line-height:1.26;
+  margin:26px 0 14px;letter-spacing:-.01em;
+}
+.cover .sub{font-size:12pt;color:var(--ink2);font-weight:300;line-height:1.6;max-width:150mm}
+.cover-meta{margin-top:auto;border-top:1px solid var(--line);padding-top:12px;
+  display:grid;grid-template-columns:repeat(4,1fr);gap:10px;font-size:8.4pt;color:var(--ink2)}
+.cover-meta dd{margin:0}
+.cover-meta dt{font-family:'PM',monospace;font-size:7.4pt;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:2px}
+.ask-box{border:1px solid var(--blue-line);background:var(--blue-soft);border-radius:2px;padding:14px 16px;margin:22px 0 0}
+.ask-box h3{font-size:10pt;margin:0 0 6px;color:var(--blue);font-weight:700}
+.ask-box ol{margin:0;padding-left:18px}
+.ask-box li{margin-bottom:3px;font-size:9.4pt}
+
+/* ── 목차 ─────────────────────────── */
+.toc{page-break-after:always}
+.toc ol{list-style:none;margin:0;padding:0;counter-reset:sec}
+.toc>ol>li{border-bottom:1px solid var(--line2);padding:7px 0;display:flex;gap:10px;align-items:baseline}
+.toc .n{font-family:'PM',monospace;color:var(--blue);width:26px;flex:none;font-size:9pt}
+.toc .t{flex:1;font-weight:500}
+.toc .d{color:var(--ink3);font-size:8.6pt;font-weight:400}
+
+/* ── 섹션 ─────────────────────────── */
+h2{
+  font-family:'GB',serif;font-size:16pt;font-weight:700;margin:0 0 4px;
+  padding-bottom:6px;border-bottom:2px solid var(--ink);line-height:1.35;
+}
+h2 .hn{font-family:'PM',monospace;font-size:10pt;color:var(--blue);margin-right:8px;font-weight:400}
+.sec{page-break-before:always}
+.sec-lead{color:var(--ink2);font-size:9.8pt;margin:10px 0 16px;max-width:160mm}
+h3{font-size:11pt;font-weight:700;margin:20px 0 7px;color:var(--ink);
+   padding-left:9px;border-left:3px solid var(--blue)}
+h4{font-size:9.6pt;font-weight:700;margin:14px 0 5px;color:var(--ink)}
+
+ul.b{margin:0 0 10px;padding-left:0;list-style:none}
+ul.b li{padding-left:13px;position:relative;margin-bottom:4px}
+ul.b li::before{content:"";position:absolute;left:0;top:.68em;width:5px;height:1px;background:var(--blue)}
+ol.n{margin:0 0 10px;padding-left:19px}
+ol.n li{margin-bottom:4px}
+
+/* ── 표 ─────────────────────────── */
+table{width:100%;border-collapse:collapse;font-size:8.6pt;margin:8px 0 6px;page-break-inside:avoid}
+caption{caption-side:top;text-align:left;font-family:'PM',monospace;font-size:7.6pt;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);padding-bottom:5px}
+th{text-align:left;font-weight:700;font-size:8pt;color:var(--ink2);
+   border-bottom:1.5px solid var(--ink);padding:5px 7px 5px 0;vertical-align:bottom}
+td{border-bottom:1px solid var(--line2);padding:5px 7px 5px 0;vertical-align:top}
+td.num,th.num{text-align:right;font-family:'PM',monospace;font-variant-numeric:tabular-nums;padding-right:10px}
+tr.tot td{border-top:1.2px solid var(--ink);border-bottom:none;font-weight:700}
+.tbl-note{font-size:7.8pt;color:var(--ink3);margin:2px 0 14px}
+.on{color:var(--blue);font-weight:700}
+.off{color:var(--ink3)}
+.bad{color:var(--rust);font-weight:700}
+
+/* ── 그림 ─────────────────────────── */
+figure{margin:14px 0 16px;page-break-inside:avoid}
+figure svg{width:100%;height:auto;display:block}
+figcaption{font-size:7.9pt;color:var(--ink3);margin-top:6px;line-height:1.5}
+figcaption b{color:var(--ink2);font-family:'PM',monospace;font-size:7.4pt;letter-spacing:.08em;
+  text-transform:uppercase;font-weight:500;margin-right:6px}
+
+/* ── 코드 ─────────────────────────── */
+pre{font-family:'PM',monospace;font-size:7.7pt;line-height:1.55;background:var(--tint);
+  border:1px solid var(--line2);border-left:3px solid var(--blue);border-radius:2px;
+  padding:9px 11px;margin:8px 0 6px;white-space:pre-wrap;word-break:break-all;
+  color:#243240;page-break-inside:avoid}
+pre .c{color:#6E7C86}
+code{font-family:'PM',monospace;font-size:.92em;background:var(--tint);padding:1px 3px;border-radius:2px}
+.filename{font-family:'PM',monospace;font-size:7.6pt;color:var(--ink3);margin:10px 0 -4px}
+
+/* ── 박스 ─────────────────────────── */
+.box{border:1px solid var(--line);border-radius:2px;padding:11px 13px;margin:10px 0;background:var(--tint2);page-break-inside:avoid}
+.box h4{margin-top:0}
+.box.warn{border-color:var(--rust);background:var(--rust-soft)}
+.box.warn h4{color:var(--rust)}
+.box.key{border-color:var(--blue-line);background:var(--blue-soft)}
+.box.key h4{color:var(--blue)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin:10px 0}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0}
+
+/* ── 질문 블록 ─────────────────────── */
+.q{page-break-before:always}
+.q-head{border-top:3px solid var(--blue);padding-top:9px;margin-bottom:12px}
+.q-no{font-family:'PM',monospace;font-size:8pt;letter-spacing:.14em;color:var(--blue);text-transform:uppercase}
+.q-title{font-family:'GB',serif;font-size:15pt;font-weight:700;margin:4px 0 0;line-height:1.35}
+.q-ask{font-family:'GB',serif;font-size:11.4pt;line-height:1.62;margin:12px 0;
+  padding:12px 14px;background:var(--tint);border-left:3px solid var(--ink)}
+.q-ask p{margin:0 0 7px}
+.q-ask p:last-child{margin:0}
+.q-sub{font-size:10pt;color:var(--ink2)}
+.want{border:1px dashed var(--blue-line);border-radius:2px;padding:10px 12px;margin:10px 0;background:#fff}
+.want h4{color:var(--blue);margin-top:0;font-family:'PM',monospace;font-size:7.8pt;letter-spacing:.1em;text-transform:uppercase}
+.hyp{font-size:8.8pt;color:var(--ink2);border-left:2px solid var(--line);padding-left:10px;margin:10px 0}
+.hyp b{color:var(--ink)}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:12px 0 16px}
+.stat{border-top:2px solid var(--ink);padding-top:6px}
+.stat .v{font-family:'PM',monospace;font-size:16pt;font-weight:500;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat .k{font-size:7.9pt;color:var(--ink3);margin-top:2px;line-height:1.4}
+.stat.b .v{color:var(--blue)} .stat.b{border-color:var(--blue)}
+.stat.r .v{color:var(--rust)} .stat.r{border-color:var(--rust)}
+footer.end{border-top:1px solid var(--line);margin-top:20px;padding-top:8px;
+  font-family:'PM',monospace;font-size:7.4pt;color:var(--ink3);letter-spacing:.06em}
+</style>
+</head>
+<body>
+
+<!-- ════════════════ 표지 ════════════════ -->
+<section class="cover">
+  <div class="cover-top">
+    <div class="cover-kicker">한대장 · 기술 고문 요청서 · 2026.09.03</div>
+  </div>
+  <h1>학교 장학 시스템에<br>신청을 밀어 넣는 방법</h1>
+  <p class="sub">대학생 장학금 앱 <strong>한대장</strong>은 공고 수집·자격 매칭·서류 준비·<strong>공고 원본과 동일한 구조의 신청서 생성</strong>까지 동작합니다. 남은 것은 마지막 한 걸음 — 학교 포털에 실제로 제출하는 일입니다. 이 문서는 그 한 걸음을 설계하기 위해 <strong>앱의 구조·코드·데이터를 전부 공개</strong>하고, 개발 관점에서 답이 필요한 다섯 가지를 정리한 것입니다.</p>
+
+  <div class="ask-box">
+    <h3>이 문서가 요청하는 것</h3>
+    <ol>
+      <li><strong>연동 아키텍처 선택</strong> — 상시 서버가 없는 정적 PWA 구조에서 실현 가능한 방식은 무엇인가</li>
+      <li><strong>인증·세션 설계</strong> — 학교 계정 로그인 벽을 넘는 표준 설계와, 대안의 유지비</li>
+      <li><strong>신청 데이터 계약과 멱등성</strong> — 재전송·중복·부분 실패·접수 확인을 어떻게 설계하나</li>
+      <li><strong>현 구조의 기술 리스크 리뷰</strong> — 이대로 학교와 붙였을 때 터질 곳</li>
+      <li><strong>90일 실행 계획</strong> — 협약 없이 지금 작동시킬 수 있는 것의 순서와 최소 구현</li>
+    </ol>
+  </div>
+
+  <div style="margin-top:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 0;margin-bottom:14px">
+    <div><div class="mono" style="font-size:17pt;color:var(--blue);line-height:1.1">14,677</div><div style="font-size:8pt;color:var(--ink3);margin-top:2px">앱 코어 코드 줄 수<br>빌드 도구 없음</div></div>
+    <div><div class="mono" style="font-size:17pt;color:var(--blue);line-height:1.1">48</div><div style="font-size:8pt;color:var(--ink3);margin-top:2px">스키마화된 신청서 양식<br>602개 입력 필드</div></div>
+    <div><div class="mono" style="font-size:17pt;color:var(--blue);line-height:1.1">121</div><div style="font-size:8pt;color:var(--ink3);margin-top:2px">채널을 실측한 공고<br>경희 58 + 외대 63</div></div>
+    <div><div class="mono" style="font-size:17pt;color:var(--rust);line-height:1.1">0</div><div style="font-size:8pt;color:var(--ink3);margin-top:2px">학교 시스템으로<br>실제 전송된 신청</div></div>
+  </div>
+  <dl class="cover-meta" style="margin-top:0">
+    <div><dt>작성</dt><dd>이선주 (개발자 · seonju5543@gmail.com)</dd></div>
+    <div><dt>대상 서비스</dt><dd>한대장 (한국 대학교 장학금)<br>모바일 PWA · 무료</dd></div>
+    <div><dt>저장소</dt><dd>github.com/seonju5543-web/hanggonggan<br>공개 · 전체 열람 가능</dd></div>
+    <div><dt>근거 데이터</dt><dd>2026-09-02 경희대·한국외대<br>장학 공고 121건 전수 조사</dd></div>
+  </dl>
+</section>
+
+<!-- ════════════════ 목차 ════════════════ -->
+<section class="toc">
+  <h2><span class="hn">00</span>목차</h2>
+  <ol>
+    <li><span class="n">01</span><span class="t">30초 요약 — 무엇이 되고, 무엇이 안 되는가</span></li>
+    <li><span class="n">02</span><span class="t">앱의 구조 — 답을 주시려면 알아야 할 전부</span><br>
+      <span class="d">시스템 구성 · 스택 · 코드 지도 · 데이터 파이프라인 · 데이터 모델 · 학생 프로필 33값 · 저장/보안 경계 · 현재 신청 플로우 · 미배포 자산</span></li>
+    <li><span class="n">03</span><span class="t">문제 — 실측 121건이 말하는 것</span><br>
+      <span class="d">채널 분포 · 포털형 18건 · 구현 후보 5안 포지셔닝 · 우리 추정치</span></li>
+    <li><span class="n">04</span><span class="t">질문 다섯</span><br>
+      <span class="d">Q1 연동 아키텍처 · Q2 인증·세션 · Q3 데이터 계약과 멱등성 · Q4 구조 리스크 리뷰 · Q5 90일 실행 계획</span></li>
+    <li><span class="n">05</span><span class="t">부록</span><br>
+      <span class="d">A 답변 후 우리가 정할 것 · B 이 문서 밖의 질문 · C 파일 트리 · D 용어 · E 접근 방법</span></li>
+  </ol>
+
+  <h3 style="margin-top:26px">그림·표 목록</h3>
+  <table>
+    <tr><td style="width:16%" class="mono">그림 1</td><td>사용자 여정과 끊긴 지점</td><td style="width:16%" class="mono">표 1</td><td>실행 환경과 비용</td></tr>
+    <tr><td class="mono">그림 2</td><td>시스템 구성도</td><td class="mono">표 2</td><td>코드 지도 (18개 파일 · 14,677줄)</td></tr>
+    <tr><td class="mono">그림 3</td><td>데이터 파이프라인 (게시판 → 앱)</td><td class="mono">표 3</td><td>자동화 로봇 27종</td></tr>
+    <tr><td class="mono">그림 4</td><td>개인정보 경계 — 기기와 서버</td><td class="mono">표 4</td><td>학생 프로필 33값</td></tr>
+    <tr><td class="mono">그림 5</td><td>지금 신청 플로우 vs 목표</td><td class="mono">표 5</td><td>포털형 18건의 경로</td></tr>
+    <tr><td class="mono">그림 6</td><td>신청 채널 분포 (121건)</td><td class="mono">표 6</td><td>구현 후보 5안 · 우리 추정</td></tr>
+    <tr><td class="mono">그림 7</td><td>구현 후보 포지셔닝 맵</td><td class="mono">표 7</td><td>답변 후 결정 사항</td></tr>
+    <tr><td class="mono">그림 8</td><td>신청 상태 머신과 증거</td><td class="mono">표 8</td><td>고문 범위 밖 질문</td></tr>
+  </table>
+</section>
+
+<!-- ════════════════ 01 요약 ════════════════ -->
+<section class="sec">
+  <h2><span class="hn">01</span>30초 요약</h2>
+  <p class="sec-lead">앱은 학생이 신청서를 <em>작성 완료</em>하는 지점까지 완성돼 있습니다. 학교 시스템에 <em>제출</em>하는 마지막 단계만 사람이 손으로 합니다. 이 문서는 그 단계를 자동화하기 위한 기술 상담 요청입니다.</p>
+
+  <div class="stat-row">
+    <div class="stat b"><div class="v">14,677</div><div class="k">앱 코어 코드 줄 수<br>(18개 파일 · 빌드 도구 없음)</div></div>
+    <div class="stat b"><div class="v">48</div><div class="k">스키마화된 신청서 양식<br>(141섹션 · 602필드)</div></div>
+    <div class="stat b"><div class="v">33</div><div class="k">앱이 이미 보유한<br>학생 프로필 값</div></div>
+    <div class="stat r"><div class="v">0</div><div class="k">학교 시스템으로<br>실제 전송된 신청</div></div>
+  </div>
+
+  <h3>되는 것</h3>
+  <ul class="b">
+    <li>공고 자동 수집 — 학교 게시판을 매일 훑는 로봇 27종(GitHub Actions). 첨부 HWP까지 받아 글자를 뽑습니다.</li>
+    <li>자격 매칭 — 공고 원문의 자격 요건 문장을 읽어 학생 프로필과 대조하고, <strong>모르면 모른다고 말합니다</strong>(추론 금지가 서비스 원칙입니다).</li>
+    <li>양식 작성 — 공고에 첨부된 HWP 신청서를 스키마로 옮겨(48종), 앱에서 질문에 답하면 <strong>원본과 같은 구조의 문서</strong>를 만듭니다.</li>
+    <li>서류 보관함 · 마감 알림(웹 푸시 가동 중) · AI 자기소개서 초안(서버 대기).</li>
+  </ul>
+
+  <h3>안 되는 것 — 그리고 그것이 전부입니다</h3>
+  <ul class="b">
+    <li><strong>제출.</strong> 학교 포털은 학번·비밀번호 로그인 뒤에 있고, 앱은 그 문을 넘지 못합니다. 지금 앱이 하는 말은 “복사해서 붙여넣으세요”입니다.</li>
+    <li>그래서 앱은 <strong>“신청 완료”라고 쓰지 않습니다.</strong> “신청 준비 완료”라고만 씁니다 — 실제 접수가 일어나지 않은 것을 완료라고 표기하지 않는 것이 이 서비스의 운영 원칙 1번입니다.</li>
+  </ul>
+
+  <div class="box key">
+    <h4>고문께 드리는 요청의 성격</h4>
+    <p style="margin:0">법률 자문이나 학교 행정 절차가 아니라 <strong>구현 판단</strong>을 여쭙습니다. 저희는 이미 다섯 가지 구현안(딥링크 자동채움 · 이메일 자동 발송 · 파일 배치 · 연계 API · 학생 계정 대행)을 놓고 비교했고, <strong>표 6</strong>에 각 안의 우리 쪽 추정치를 채워 두었습니다. 비어 있는 칸이 여쭙는 부분입니다. 저장소는 공개이므로 코드를 직접 보셔도 됩니다.</p>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 900 168" xmlns="http://www.w3.org/2000/svg" font-family="NSK, sans-serif">
+      <g font-size="11.5" fill="#14202A">
+        <!-- 6 완료 단계 -->
+        <g>
+          <rect x="0" y="40" width="118" height="52" rx="3" fill="#E3EDF5" stroke="#B7CFE1"/>
+          <text x="59" y="62" text-anchor="middle" font-size="11" font-weight="500">프로필</text>
+          <text x="59" y="78" text-anchor="middle" font-size="9.5" fill="#465661">1회 입력</text>
+        </g>
+        <g>
+          <rect x="132" y="40" width="118" height="52" rx="3" fill="#E3EDF5" stroke="#B7CFE1"/>
+          <text x="191" y="62" text-anchor="middle" font-size="11" font-weight="500">자동 매칭</text>
+          <text x="191" y="78" text-anchor="middle" font-size="9.5" fill="#465661">자격 판정</text>
+        </g>
+        <g>
+          <rect x="264" y="40" width="118" height="52" rx="3" fill="#E3EDF5" stroke="#B7CFE1"/>
+          <text x="323" y="62" text-anchor="middle" font-size="11" font-weight="500">마감 알림</text>
+          <text x="323" y="78" text-anchor="middle" font-size="9.5" fill="#465661">푸시 가동</text>
+        </g>
+        <g>
+          <rect x="396" y="40" width="118" height="52" rx="3" fill="#E3EDF5" stroke="#B7CFE1"/>
+          <text x="455" y="62" text-anchor="middle" font-size="11" font-weight="500">서류 보관함</text>
+          <text x="455" y="78" text-anchor="middle" font-size="9.5" fill="#465661">기기 안 저장</text>
+        </g>
+        <g>
+          <rect x="528" y="40" width="118" height="52" rx="3" fill="#E3EDF5" stroke="#B7CFE1"/>
+          <text x="587" y="62" text-anchor="middle" font-size="11" font-weight="500">양식 작성</text>
+          <text x="587" y="78" text-anchor="middle" font-size="9.5" fill="#465661">원본 48종</text>
+        </g>
+        <!-- 끊긴 지점 -->
+        <path d="M672 26 L680 60 L668 92 L678 128" stroke="#A03A2B" stroke-width="2" fill="none" stroke-dasharray="0"/>
+        <text x="674" y="18" text-anchor="middle" font-size="9" fill="#A03A2B" font-weight="700">끊김</text>
+        <g>
+          <rect x="694" y="40" width="118" height="52" rx="3" fill="#fff" stroke="#A03A2B" stroke-dasharray="4 3"/>
+          <text x="753" y="62" text-anchor="middle" font-size="11" font-weight="500" fill="#A03A2B">학교 제출</text>
+          <text x="753" y="78" text-anchor="middle" font-size="9.5" fill="#A03A2B">사람이 직접</text>
+        </g>
+        <g>
+          <rect x="826" y="40" width="74" height="52" rx="3" fill="#fff" stroke="#D4DBE0" stroke-dasharray="4 3"/>
+          <text x="863" y="62" text-anchor="middle" font-size="10.5" fill="#7C8A94">결과</text>
+          <text x="863" y="78" text-anchor="middle" font-size="9.5" fill="#7C8A94">학생 기록</text>
+        </g>
+        <!-- 화살표 -->
+        <g stroke="#9AA6AE" stroke-width="1.2" fill="none">
+          <path d="M118 66 H130"/><path d="M250 66 H262"/><path d="M382 66 H394"/><path d="M514 66 H526"/>
+          <path d="M646 66 H664" stroke="#A03A2B"/><path d="M812 66 H824"/>
+        </g>
+        <text x="0" y="128" font-size="9.5" fill="#465661">앱이 하는 일 — 여기까지 전부 자동</text>
+        <line x1="0" y1="136" x2="646" y2="136" stroke="#1B5E8E" stroke-width="1.5"/>
+        <text x="694" y="128" font-size="9.5" fill="#A03A2B">이 문서의 주제</text>
+        <line x1="694" y1="136" x2="900" y2="136" stroke="#A03A2B" stroke-width="1.5" stroke-dasharray="3 2"/>
+      </g>
+    </svg>
+    <figcaption><b>그림 1</b>사용자 여정과 끊긴 지점. 앞의 다섯 단계는 완성돼 배포 중이고, 여섯 번째에서 학교 시스템의 로그인 벽을 만납니다. 일곱 번째(결과)는 학교 전산을 볼 수 없으므로 학생이 직접 기록합니다.</figcaption>
+  </figure>
+</section>
+
+<!-- ════════════════ 02 구조 ════════════════ -->
+<section class="sec">
+  <h2><span class="hn">02</span>앱의 구조</h2>
+  <p class="sec-lead">이 절은 <em>고문께서 답을 주시기 위해 필요한 정보 전부</em>입니다. 구조 · 스택 · 코드 지도 · 데이터 모델 · 저장 경계 · 현재 신청 플로우 · 아직 배포하지 않은 자산 순서로 적었습니다.</p>
+
+  <h3>2.1 한 문장 정의</h3>
+  <p>대학생이 프로필을 한 번 등록하면 교내·교외 장학금을 자동 매칭받고, 증명서류 준비와 <strong>공고 원본 양식 작성</strong>까지 앱에서 끝내는 모바일 PWA입니다. 공고 검색·추천·알림은 학생에게 영구 무료이며, 수익은 AI 초안 크레딧과 B2B 광고로 설계돼 있습니다.</p>
+
+  <h3>2.2 시스템 구성</h3>
+  <figure>
+    <svg viewBox="0 0 900 430" xmlns="http://www.w3.org/2000/svg" font-family="NSK, sans-serif">
+      <defs>
+        <marker id="ar" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 z" fill="#465661"/>
+        </marker>
+        <marker id="arb" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 z" fill="#1B5E8E"/>
+        </marker>
+        <marker id="arr" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 z" fill="#A03A2B"/>
+        </marker>
+      </defs>
+
+      <!-- 학생 기기 -->
+      <rect x="0" y="30" width="250" height="290" rx="4" fill="#F4F7F8" stroke="#1B5E8E" stroke-width="1.4"/>
+      <text x="12" y="50" font-size="11.5" font-weight="700" fill="#1B5E8E">학생 휴대폰 — 설치형 PWA</text>
+      <g font-size="9.6" fill="#14202A">
+        <rect x="12" y="60" width="226" height="34" rx="2" fill="#fff" stroke="#D4DBE0"/>
+        <text x="22" y="75">화면 · 신청 플로우</text><text x="22" y="88" font-size="8.4" fill="#7C8A94" font-family="PM, monospace">app.js · index.html · style.css</text>
+        <rect x="12" y="100" width="226" height="34" rx="2" fill="#fff" stroke="#D4DBE0"/>
+        <text x="22" y="115">매칭 엔진 · 금액 · 자격 파서</text><text x="22" y="128" font-size="8.4" fill="#7C8A94" font-family="PM, monospace">match-engine · parse-*.js</text>
+        <rect x="12" y="140" width="226" height="34" rx="2" fill="#fff" stroke="#D4DBE0"/>
+        <text x="22" y="155">양식 엔진 → .doc 생성</text><text x="22" y="168" font-size="8.4" fill="#7C8A94" font-family="PM, monospace">forms.js · form-plan.js</text>
+        <rect x="12" y="180" width="226" height="34" rx="2" fill="#fff" stroke="#D4DBE0"/>
+        <text x="22" y="195">서비스워커 — 캐시 · 백그라운드 알림</text><text x="22" y="208" font-size="8.4" fill="#7C8A94" font-family="PM, monospace">sw.js (v145 · 네트워크 우선)</text>
+        <rect x="12" y="220" width="226" height="42" rx="2" fill="#E3EDF5" stroke="#B7CFE1"/>
+        <text x="22" y="236">개인정보 저장 — 기기 안에만</text>
+        <text x="22" y="250" font-size="8.4" fill="#465661" font-family="PM, monospace">localStorage · IndexedDB ×2</text>
+        <rect x="12" y="268" width="226" height="40" rx="2" fill="#fff" stroke="#D4DBE0"/>
+        <text x="22" y="284">CSP: script-src 'self'</text>
+        <text x="22" y="298" font-size="8.4" fill="#7C8A94">외부 스크립트 실행 불가 · 리퍼러 미전송</text>
+      </g>
+
+      <!-- 배포 -->
+      <rect x="288" y="30" width="230" height="86" rx="4" fill="#fff" stroke="#D4DBE0"/>
+      <text x="300" y="50" font-size="11" font-weight="700">GitHub Pages</text>
+      <text x="300" y="66" font-size="9.4" fill="#465661">정적 파일 배포 (main 브랜치)</text>
+      <text x="300" y="80" font-size="9.4" fill="#465661">빌드 도구 없음 · 번들러 없음</text>
+      <text x="300" y="96" font-size="8.4" fill="#7C8A94" font-family="PM, monospace">seonju5543-web.github.io/hanggonggan</text>
+
+      <!-- 로봇 -->
+      <rect x="288" y="132" width="230" height="104" rx="4" fill="#fff" stroke="#D4DBE0"/>
+      <text x="300" y="152" font-size="11" font-weight="700">GitHub Actions — 로봇 27종</text>
+      <text x="300" y="168" font-size="9.4" fill="#465661">게시판 수집 · 브라우저 수집(Chromium)</text>
+      <text x="300" y="182" font-size="9.4" fill="#465661">첨부 원본 확보 · HWP 텍스트 추출</text>
+      <text x="300" y="196" font-size="9.4" fill="#465661">자동 등록 · 링크 사냥 · 감사 관문</text>
+      <text x="300" y="212" font-size="8.4" fill="#7C8A94">결과를 저장소에 커밋 → 배포 동기화</text>
+      <text x="300" y="226" font-size="8.4" fill="#7C8A94" font-family="PM, monospace">data/*.json (5.6 MB)</text>
+
+      <!-- 서버리스 -->
+      <rect x="556" y="30" width="230" height="128" rx="4" fill="#fff" stroke="#D4DBE0"/>
+      <text x="568" y="50" font-size="11" font-weight="700">Cloudflare Workers</text>
+      <text x="568" y="70" font-size="9.6" fill="#1B5E8E" font-weight="700">● 푸시 발송 — 가동 중</text>
+      <text x="578" y="83" font-size="8.4" fill="#465661">VAPID · 구독만 저장(폰 주소·학교)</text>
+      <text x="568" y="100" font-size="9.6" fill="#7C8A94">○ 접수 메일 — 코드 있음, 미배포</text>
+      <text x="568" y="117" font-size="9.6" fill="#7C8A94">○ AI 초안 — 코드 있음, 미배포</text>
+      <text x="568" y="134" font-size="9.6" fill="#7C8A94">○ 도우미 — 코드 있음, 미배포</text>
+      <text x="568" y="150" font-size="8.4" fill="#7C8A94">설정값이 비면 기능이 화면에 안 나옴</text>
+
+      <rect x="556" y="172" width="230" height="64" rx="4" fill="#fff" stroke="#D4DBE0"/>
+      <text x="568" y="192" font-size="11" font-weight="700">Supabase</text>
+      <text x="568" y="208" font-size="9.4" fill="#465661">로그인 · 기기 간 프로필 이어쓰기</text>
+      <text x="568" y="224" font-size="8.6" fill="#A03A2B">주민번호·계좌는 올리지 않음</text>
+
+      <!-- 학교 -->
+      <rect x="288" y="286" width="498" height="86" rx="4" fill="#fff" stroke="#A03A2B" stroke-width="1.4" stroke-dasharray="5 3"/>
+      <text x="300" y="308" font-size="11.5" font-weight="700" fill="#A03A2B">학교 장학 시스템 — 연결 없음</text>
+      <text x="300" y="326" font-size="9.6" fill="#465661">경희대 인포21 · 한국외대 HUFS Ability · 한국외대 종합정보시스템</text>
+      <text x="300" y="342" font-size="9.6" fill="#465661">학번·비밀번호 로그인 뒤 · 공개 API 없음 · 문서화 없음</text>
+      <text x="300" y="360" font-size="9.6" fill="#A03A2B" font-weight="700">이 상자를 어떻게 이을 것인가 = 이 문서의 질문</text>
+
+      <!-- 화살표 -->
+      <g stroke="#465661" stroke-width="1.2" fill="none" marker-end="url(#ar)">
+        <path d="M288 72 H262"/>
+        <path d="M403 132 V120"/>
+      </g>
+      <g stroke="#1B5E8E" stroke-width="1.2" fill="none" stroke-dasharray="3 2">
+        <path d="M786 100 H800 V258"/>
+        <path d="M786 204 H800"/>
+        <path d="M800 258 H256" marker-end="url(#arb)"/>
+      </g>
+      <text x="474" y="252" font-size="8.4" fill="#465661" text-anchor="middle">푸시 깨우기 · 프로필 동기화 (민감정보 제거 후)</text>
+      <g stroke="#A03A2B" stroke-width="1.4" fill="none" marker-end="url(#arr)" stroke-dasharray="5 3">
+        <path d="M125 320 V330 Q125 348 286 348"/>
+      </g>
+      <text x="150" y="342" font-size="9" fill="#A03A2B">학생이 손으로 옮겨 적음</text>
+      <text x="410" y="128" font-size="8.4" fill="#7C8A94" text-anchor="middle">커밋 → 자동 배포</text>
+
+      <text x="0" y="400" font-size="8.6" fill="#7C8A94">● = 운영 중 · ○ = 코드는 있으나 미배포 · 점선 = 아직 없는 연결</text>
+      <text x="0" y="416" font-size="8.6" fill="#7C8A94">상시 구동 서버(VM·컨테이너)는 한 대도 없습니다. 전부 정적 파일과 이벤트 기반 함수입니다.</text>
+    </svg>
+    <figcaption><b>그림 2</b>시스템 구성도. 학생 기기 안에서 거의 모든 판단이 일어나고, 서버는 “발송”과 “동기화”만 합니다. 이 비대칭이 Q1·Q2·Q3의 전제입니다.</figcaption>
+  </figure>
+
+  <h3>2.3 실행 환경</h3>
+  <table>
+    <caption>표 1 — 실행 환경과 비용</caption>
+    <tr><th style="width:20%">층</th><th style="width:26%">무엇</th><th style="width:34%">현재 상태</th><th style="width:20%">비용</th></tr>
+    <tr><td>클라이언트</td><td>정적 PWA (HTML/CSS/바닐라 JS)</td><td>빌드·번들러·프레임워크 없음. 파일을 그대로 배포</td><td>0원</td></tr>
+    <tr><td>호스팅</td><td>GitHub Pages (main 브랜치)</td><td>공개 저장소여야 무료. 비공개 전환 시 즉시 404</td><td>0원</td></tr>
+    <tr><td>자동화</td><td>GitHub Actions 27 워크플로</td><td>월 약 700분 사용 (무료 한도 2,000분의 35%)</td><td>0원</td></tr>
+    <tr><td>서버리스</td><td>Cloudflare Workers ×4</td><td>푸시 1종 가동, 3종 미배포</td><td>0원 (무료 한도 내)</td></tr>
+    <tr><td>인증·동기화</td><td>Supabase (fetch 4개 엔드포인트만)</td><td>SDK 미사용 — CSP <span class="mono">script-src 'self'</span> 준수 목적</td><td>0원</td></tr>
+    <tr><td>AI</td><td>Claude API (초안 · 스키마화)</td><td>서류 1건 약 47원. 무료 규칙 경로 우선, 실패분만 API</td><td>사용량 과금</td></tr>
+    <tr><td>관리자 화면</td><td>Cloudflare Pages + Access</td><td>가동 중 · 이메일 일회용 코드 잠금</td><td>0원</td></tr>
+    <tr class="tot"><td>합계</td><td colspan="2">고정비 0원 구조. 상시 서버 없음</td><td>≈ 0원</td></tr>
+  </table>
+  <p class="tbl-note">이 “고정비 0원 · 상시 서버 없음”이 설계 제약의 핵심입니다. 학교와의 연동이 <strong>항상 켜져 있는 수신 서버</strong>를 요구한다면 구조가 처음으로 바뀝니다 — Q1과 Q3에서 이 점을 여쭙습니다.</p>
+
+  <h3>2.4 코드 지도</h3>
+  <table>
+    <caption>표 2 — 앱 코어 18개 파일 · 14,677줄 (2026-09-03 실측)</caption>
+    <tr><th style="width:22%">파일</th><th class="num" style="width:9%">줄</th><th>역할 · 연동 관점에서의 의미</th></tr>
+    <tr><td class="mono">app.js</td><td class="num">3,507</td><td>화면·신청 플로우·서류 보관함·진척도 트래커. <strong>제출 버튼이 있는 곳</strong></td></tr>
+    <tr><td class="mono">style.css</td><td class="num">3,134</td><td>화면 스타일</td></tr>
+    <tr><td class="mono">match-engine.js</td><td class="num">1,203</td><td>자격 매칭 12신호 + 적합도. 화면과 서비스워커가 <strong>같은 파일</strong>을 씀</td></tr>
+    <tr><td class="mono">chat.js</td><td class="num">1,074</td><td>장학금 도우미 — 앱이 아는 것만 답함</td></tr>
+    <tr><td class="mono">essay.js</td><td class="num">814</td><td>자기소개서 초안·수정·제출 전 점검</td></tr>
+    <tr><td class="mono">notify.js</td><td class="num">721</td><td>알림 UI·권한·발송</td></tr>
+    <tr><td class="mono">forms.js</td><td class="num">551</td><td><strong>양식 엔진</strong> — 스키마 → 질문 → 원본 동일 문서(.doc)</td></tr>
+    <tr><td class="mono">index.html</td><td class="num">500</td><td>단일 화면 · 5단계 온보딩 · CSP 메타</td></tr>
+    <tr><td class="mono">data.js</td><td class="num">456</td><td>대학·학과·서류 슬롯 사전 + <strong>제출 채널 판정</strong></td></tr>
+    <tr><td class="mono">parse-requirements.js</td><td class="num">445</td><td>공고 원문에서 자격 요건 줄 추출</td></tr>
+    <tr><td class="mono">parse-amount.js</td><td class="num">416</td><td>금액 해석 · 중복 수혜 판정 · 합산 규칙</td></tr>
+    <tr><td class="mono">notify-rules.js</td><td class="num">355</td><td>알림 규칙(순수 로직) — 화면·서비스워커 공용</td></tr>
+    <tr><td class="mono">essay-submit-check.js</td><td class="num">318</td><td>제출 전 점검표 — 빈칸·블라인드 유출 차단</td></tr>
+    <tr><td class="mono">supabase-client.js</td><td class="num">312</td><td>서버 통신 단일 창구 + <strong>민감정보 제거</strong></td></tr>
+    <tr><td class="mono">form-plan.js</td><td class="num">299</td><td>원본 스키마를 건드리지 않고 질문만 재구성(자동 채움 22키)</td></tr>
+    <tr><td class="mono">sw.js</td><td class="num">289</td><td>서비스워커 — 네트워크 우선 캐시 · 푸시 수신</td></tr>
+    <tr><td class="mono">section-head.js</td><td class="num">182</td><td>공고의 절 경계 판정(자격/제외/선발) — 3개 도구 공용</td></tr>
+    <tr><td class="mono">essay-quality.js</td><td class="num">101</td><td>초안 품질 검사 — 브라우저·서버·검사 공용</td></tr>
+    <tr class="tot"><td>18개 파일</td><td class="num">14,677</td><td>이 밖에 수집 로봇 47개(.mjs)와 검증 드라이버 42개가 있습니다</td></tr>
+  </table>
+  <p class="tbl-note">설계 규칙 하나를 미리 말씀드립니다 — <strong>판정 규칙은 절대 복사하지 않습니다.</strong> 화면·서비스워커·감사 도구가 같은 파일을 불러 씁니다. 규칙이 두 벌이 되면 “화면에서 숨긴 공고를 알림이 알리는” 모순이 실제로 발생했기 때문입니다.</p>
+
+  <h3>2.5 데이터 파이프라인</h3>
+  <figure>
+    <svg viewBox="0 0 900 250" xmlns="http://www.w3.org/2000/svg" font-family="NSK, sans-serif">
+      <defs><marker id="ar2" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#1B5E8E"/></marker></defs>
+      <g font-size="9.6">
+        <rect x="0" y="46" width="126" height="60" rx="3" fill="#fff" stroke="#D4DBE0"/>
+        <text x="63" y="68" text-anchor="middle" font-weight="700" font-size="10">학교 게시판</text>
+        <text x="63" y="84" text-anchor="middle" fill="#465661">HTML · 첨부 HWP</text>
+        <text x="63" y="98" text-anchor="middle" fill="#7C8A94" font-size="8.4">봇 차단 게시판 포함</text>
+
+        <rect x="156" y="46" width="126" height="60" rx="3" fill="#E3EDF5" stroke="#B7CFE1"/>
+        <text x="219" y="68" text-anchor="middle" font-weight="700" font-size="10">수집 로봇</text>
+        <text x="219" y="84" text-anchor="middle" fill="#465661">매일 2회 · 진짜 크롬</text>
+        <text x="219" y="98" text-anchor="middle" fill="#7C8A94" font-size="8.4">HWP 텍스트까지 추출</text>
+
+        <rect x="312" y="46" width="126" height="60" rx="3" fill="#E3EDF5" stroke="#B7CFE1"/>
+        <text x="375" y="68" text-anchor="middle" font-weight="700" font-size="10">원문 저장</text>
+        <text x="375" y="84" text-anchor="middle" fill="#465661">본문 + 첨부 원본</text>
+        <text x="375" y="98" text-anchor="middle" fill="#7C8A94" font-size="8.4">542개 파일 보관 중</text>
+
+        <rect x="468" y="46" width="126" height="60" rx="3" fill="#E3EDF5" stroke="#B7CFE1"/>
+        <text x="531" y="68" text-anchor="middle" font-weight="700" font-size="10">자동 등록</text>
+        <text x="531" y="84" text-anchor="middle" fill="#465661">보수적 규칙 통과분만</text>
+        <text x="531" y="98" text-anchor="middle" fill="#7C8A94" font-size="8.4">‘검수 전’ 배지 표시</text>
+
+        <rect x="624" y="46" width="126" height="60" rx="3" fill="#F7E8E4" stroke="#A03A2B"/>
+        <text x="687" y="68" text-anchor="middle" font-weight="700" font-size="10" fill="#A03A2B">감사 관문</text>
+        <text x="687" y="84" text-anchor="middle" fill="#465661">전수 규칙 검사</text>
+        <text x="687" y="98" text-anchor="middle" fill="#A03A2B" font-size="8.4">실패하면 되돌림</text>
+
+        <rect x="780" y="46" width="120" height="60" rx="3" fill="#fff" stroke="#1B5E8E"/>
+        <text x="840" y="68" text-anchor="middle" font-weight="700" font-size="10" fill="#1B5E8E">앱</text>
+        <text x="840" y="84" text-anchor="middle" fill="#465661">네트워크 우선</text>
+        <text x="840" y="98" text-anchor="middle" fill="#7C8A94" font-size="8.4">재설치 없이 반영</text>
+
+        <g stroke="#1B5E8E" stroke-width="1.2" fill="none" marker-end="url(#ar2)">
+          <path d="M126 76 H154"/><path d="M282 76 H310"/><path d="M438 76 H466"/><path d="M594 76 H622"/><path d="M750 76 H778"/>
+        </g>
+
+        <!-- 하단 설명 -->
+        <line x1="0" y1="140" x2="900" y2="140" stroke="#E8ECEF"/>
+        <text x="0" y="160" font-size="9.4" fill="#465661"><tspan font-weight="700" fill="#14202A">사람이 개입하는 지점</tspan> — 애매한 공고는 자동 등록하지 않고 ‘컨펌 대기’로 리포트에만 올립니다. 개발자가 직접 판단합니다.</text>
+        <text x="0" y="180" font-size="9.4" fill="#465661"><tspan font-weight="700" fill="#14202A">되돌리기</tspan> — 감사가 실패하면 그 실행이 새로 등록한 공고만 골라 되돌리고 이슈를 남깁니다. 잘못된 공고가 앱에 하루도 못 나갑니다.</text>
+        <text x="0" y="200" font-size="9.4" fill="#465661"><tspan font-weight="700" fill="#14202A">배포 동기화</tspan> — 로봇은 기본 브랜치에만 커밋하고, 별도 로봇이 main으로 병합해 배포합니다(읽는 곳과 쓰는 곳을 가르면 중복 수집이 발생).</text>
+        <text x="0" y="226" font-size="8.6" fill="#7C8A94">데이터 총량 5.6 MB — 앱이 실제로 내려받는 것은 공고 목록 368 KB · 등록 공고 94 KB · 양식 178 KB입니다. 변경이 없으면 304로 거의 0바이트.</text>
+      </g>
+    </svg>
+    <figcaption><b>그림 3</b>게시판에서 앱까지. 전 과정이 무인이며, 감사 관문이 데이터 품질의 마지막 방어선입니다.</figcaption>
+  </figure>
+
+  <table>
+    <caption>표 3 — 자동화 로봇 27종 (대표)</caption>
+    <tr><th style="width:26%">로봇</th><th style="width:18%">주기</th><th>하는 일</th></tr>
+    <tr><td class="mono">collect-scholarships</td><td>매일 2회</td><td>게시판 수집 · 공고 발행 · 리포트 이슈</td></tr>
+    <tr><td class="mono">browser-collect</td><td>매일 2회</td><td>진짜 Chromium으로 봇 차단·동적 게시판 수집</td></tr>
+    <tr><td class="mono">deep-fetch</td><td>지시형</td><td>공고 본문 전문 + 첨부 원본 확보, HWP 미리보기 텍스트 추출</td></tr>
+    <tr><td class="mono">link-hunter</td><td>매일</td><td>원문 주소를 못 찾은 공고를 실제로 눌러 주소를 받아 적음</td></tr>
+    <tr><td class="mono">kosaf-fetch</td><td>주 2회</td><td>한국장학재단 재단 목록 갱신(마감 전만 추림)</td></tr>
+    <tr><td class="mono">deploy-sync</td><td>수집 직후·하루 2회</td><td>기본 브랜치 → main 자동 병합(= 배포)</td></tr>
+    <tr><td class="mono">verify-ui</td><td>푸시마다</td><td>브라우저 드라이버 13종 전부 실행(관문)</td></tr>
+    <tr><td class="mono">audit-coverage</td><td>매일</td><td>등록 데이터 전수를 현재 규칙으로 재검사</td></tr>
+    <tr><td class="mono">push-check / push-health</td><td>수동·매일</td><td>푸시 서버 상태 및 실제 수신 시험 발송</td></tr>
+    <tr><td class="mono">admin-lock-check</td><td>매일</td><td>관리자 화면이 잠겨 있는지 로그인 없이 확인</td></tr>
+  </table>
+
+  <h3>2.6 데이터 모델</h3>
+  <p>연동 시 학교로 넘어갈 후보가 되는 두 스키마입니다. 실제 파일에서 그대로 가져왔습니다(긴 문자열만 줄임).</p>
+
+  <p class="filename">data/registered.json — 정식 등록 공고 45건 · 94 KB</p>
+<pre>{
+ "id": "reg-hufs-alumni",
+ "name": "총동문회 장학금 (한국외대, 2026-2학기)",
+ "type": "교외",            <span class="c">// 교내/교외 — 접수처와 무관한 분류</span>
+ "provider": "한국외대 총동문회",
+ "amount": "150만원", "amountValue": 1500000,
+ "amountSpec": { "kind": "fixed", "value": 1500000, "ratio": 0 },
+ "deadline": "2026-08-07", "deadlineFrom": "공고 원문",
+ "eligibility": { "selective": true, "schoolOnly": "한국외국어대학교" },
+ "eligibilityLines": ["가 . 선발기준", "1) 2026 년 2 학기 재학생 (휴학예정자 지원불가)"],
+ "documents": ["총동문회 장학금 신청서 (앱에서 원본 양식 작성)",
+               "개인정보 수집·이용 동의서 (원본 첨부 HWP 다운로드)"],
+ "attachments": [{ "name": "2026-2학기 총동문회 장학금+신청서.hwp", "url": "https://dep.hufs…" }],
+ "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/259908/artclView.do",
+ "sourceKind": "official",
+ "formId": "hufs-alumni-apply",   <span class="c">// ← 아래 forms.json 의 양식과 연결</span>
+ "excerpts": ["문의처 : 서울캠퍼스 장학팀 (02-2173-2137) …"],
+ "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+ "listedAt": "2026-07-16"
+}</pre>
+  <p class="tbl-note">이 한 건이 파이프라인 전체를 보여 줍니다. <strong>그리고 이 공고가 바로 포털형 18건 중 하나입니다</strong> — 원문의 신청 방법이 “온라인신청(HUFS Ability) → 로그인 → 교과/비교과 → 장학신청 목록”입니다. 앱은 신청서를 만들어 줄 수 있지만 그 목록에는 닿지 못합니다.</p>
+
+  <p class="filename">data/forms.json — 양식 스키마 48종 · 141섹션 · 602필드 · 178 KB</p>
+<pre>{
+ "title": "대학생 청소년 AI 교육지원장학금 활동계획서 외 3종",
+ "docName": "AI교육지원장학금_활동계획서",
+ "org": "한국장학재단 귀하",
+ "pledge": "본인은 위 내용이 사실임을 확인하며 …",   <span class="c">// 서약 문구 47/48종 보유</span>
+ "sections": [
+  { "heading": "1. 기본정보",
+    "info": [["대학명","school"],["성명","name"],["학번","studentId"]] },  <span class="c">// 프로필에서 자동 채움</span>
+  { "heading": "2. 멘토링 활동 계획",
+    "fields": [
+      { "id":"level", "label":"희망 대상 학교급", "type":"checks",
+        "q":"어느 학교급 학생을 가르치고 싶나요?", "options":["초등학교","중학교","고등학교"] },
+      { "id":"period", "label":"희망 활동기간", "type":"text",
+        "placeholder":"예: 2026. 09. 01 ~ 2026. 12. 20" },
+      { "id":"schedule", "label":"희망 스케줄", "type":"schedule" }
+    ] }
+ ]
+}</pre>
+  <table>
+    <caption>표 · 602개 입력 필드의 타입 분포</caption>
+    <tr><th>타입</th><th class="num">개수</th><th>설명 · 자동 전송 가능성</th></tr>
+    <tr><td class="mono">text</td><td class="num">412</td><td>한 줄 입력 — 구조화 전송에 가장 적합</td></tr>
+    <tr><td class="mono">textarea</td><td class="num">102</td><td>서술형(자기소개·계획) — 길이 제한 협의 필요</td></tr>
+    <tr><td class="mono">checks</td><td class="num">69</td><td>다중 선택 — 코드값 매핑 필요</td></tr>
+    <tr><td class="mono">checks+text</td><td class="num">8</td><td>선택 + 기타 입력</td></tr>
+    <tr><td class="mono">static</td><td class="num">6</td><td>고정 문구(안내·서약)</td></tr>
+    <tr><td class="mono">schedule</td><td class="num">4</td><td>요일×시간 표 — 구조가 특수</td></tr>
+    <tr><td class="mono">choice</td><td class="num">1</td><td>단일 선택</td></tr>
+    <tr class="tot"><td>합계</td><td class="num">602</td><td>85%가 text·textarea. 표 형태는 4건뿐</td></tr>
+  </table>
+
+  <h3>2.7 앱이 이미 보유한 학생 데이터</h3>
+  <p>포털 자동 입력·연계 전송을 설계할 때 <strong>출발점이 되는 값</strong>입니다. 온보딩 5단계에서 받고, 신청서를 채우며 배운 값은 “다음에도 쓸게요”로 누적됩니다.</p>
+  <table>
+    <caption>표 4 — 학생 프로필 33값 (실제 코드 <span class="mono">collectProfile()</span> 기준)</caption>
+    <tr><th style="width:24%">묶음</th><th style="width:44%">필드</th><th>비고</th></tr>
+    <tr><td>신원</td><td class="mono">name · studentId · birth · birthYear · nationality · gender</td><td>gender는 신청서에서 학습</td></tr>
+    <tr><td>학적</td><td class="mono">school · campus · major · track · year · status · credits · gpa</td><td>매칭 12신호의 핵심</td></tr>
+    <tr><td>연락</td><td class="mono">phone · email · addr · emergency</td><td>addr·emergency는 학습값</td></tr>
+    <tr><td>보호자</td><td class="mono">guardianName · guardianRel · guardianPhone</td><td>학습값</td></tr>
+    <tr><td>경제</td><td class="mono">bracket (소득분위) · bank · account</td><td class="bad">계좌는 서버로 안 보냄</td></tr>
+    <tr><td>지역</td><td class="mono">region · regionCity · parentRegion · parentRegionCity</td><td>지역 장학금 자격</td></tr>
+    <tr><td>특별자격</td><td class="mono">flags[] (기초생활수급·장애·국가유공자 등)</td><td class="bad">민감정보 — 별도 동의 시에만 서버</td></tr>
+    <tr><td>중복 수혜</td><td class="mono">scholarships[] | null</td><td>빈 배열(안 받음)과 null(모름)을 구분</td></tr>
+    <tr><td>기타</td><td class="mono">cert · exchange · rrn</td><td class="bad">주민번호는 서버로 안 보냄</td></tr>
+  </table>
+  <p class="tbl-note"><strong>설계상 중요한 구분</strong> — 값이 없으면 <span class="mono">null</span>로 두고 <em>판정하지 않습니다.</em> 0이나 기본값을 넣으면 엉뚱한 자격 미달 판정이 납니다. 연동 스키마를 만들 때도 “모름”을 표현할 수 있어야 합니다.</p>
+
+  <h3>2.8 저장·개인정보 경계</h3>
+  <figure>
+    <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" font-family="NSK, sans-serif">
+      <rect x="0" y="30" width="410" height="240" rx="4" fill="#F4F7F8" stroke="#1B5E8E" stroke-width="1.3"/>
+      <text x="16" y="52" font-size="11.5" font-weight="700" fill="#1B5E8E">기기 안 — 원본</text>
+      <g font-size="9.6" fill="#14202A">
+        <text x="16" y="76" font-family="PM, monospace" font-size="8.6" fill="#465661">localStorage · handaejang.v1</text>
+        <text x="26" y="92">프로필 33값 · 신청내역 · 동의 상태</text>
+        <text x="16" y="116" font-family="PM, monospace" font-size="8.6" fill="#465661">IndexedDB · handaejang-docs</text>
+        <text x="26" y="132">증명서류 파일(재학·성적·주민등록등본 등)</text>
+        <text x="16" y="156" font-family="PM, monospace" font-size="8.6" fill="#465661">IndexedDB · handaejang-notify</text>
+        <text x="26" y="172">알림 설정·중복방지 장부·알림함</text>
+        <text x="16" y="200" font-size="9.4" fill="#465661">서비스워커는 localStorage를 못 읽으므로</text>
+        <text x="16" y="216" font-size="9.4" fill="#465661">알림 판단에 필요한 사본을 IndexedDB에 둡니다.</text>
+        <text x="16" y="244" font-size="9.4" fill="#1B5E8E" font-weight="700">앱을 지우면 전부 사라집니다 — 그것이 기본값입니다.</text>
+      </g>
+
+      <rect x="490" y="30" width="410" height="240" rx="4" fill="#fff" stroke="#D4DBE0"/>
+      <text x="506" y="52" font-size="11.5" font-weight="700">서버로 나가는 것 — 사본</text>
+      <g font-size="9.6" fill="#14202A">
+        <text x="506" y="76" font-weight="700" fill="#1B5E8E">Supabase (로그인한 경우에만)</text>
+        <text x="516" y="92">프로필 사본 — 단, 아래를 제거한 뒤</text>
+        <rect x="516" y="100" width="360" height="46" rx="2" fill="#F7E8E4" stroke="#A03A2B"/>
+        <text x="526" y="118" fill="#A03A2B" font-weight="700" font-size="9.6">항상 제거 — 주민등록번호 · 계좌번호</text>
+        <text x="526" y="136" fill="#A03A2B" font-size="9.4">동의 없으면 제거 — 특별자격(민감정보)</text>
+        <text x="506" y="168" font-weight="700" fill="#1B5E8E">푸시 서버</text>
+        <text x="516" y="184">폰 주소 · 학교 · 캠퍼스 — 이 셋뿐</text>
+        <text x="516" y="200" font-size="9.4" fill="#465661">알림 문구는 서버가 아니라 폰이 만듭니다</text>
+        <text x="506" y="228" font-weight="700" fill="#7C8A94">AI 초안 서버 (미배포)</text>
+        <text x="516" y="244" font-size="9.4" fill="#465661">학생이 쓴 재료와 질문만 · 저장 없음(KV 없음)</text>
+      </g>
+
+      <g stroke="#1B5E8E" stroke-width="1.3" fill="none">
+        <path d="M410 150 H488" marker-end="url(#ar2)"/>
+      </g>
+      <text x="449" y="142" font-size="8.6" fill="#465661" text-anchor="middle">syncSafeProfile()</text>
+      <text x="0" y="292" font-size="8.6" fill="#7C8A94">이 그림의 문장은 검증 드라이버가 코드로 증명합니다 — 가짜 서버를 세워 나가는 요청 본문을 전부 모아, 주민번호·계좌가 한 번도 나가지 않는지 셉니다(30항목).</text>
+    </svg>
+    <figcaption><b>그림 4</b>개인정보 경계. 원본은 기기에, 서버에는 걸러진 사본만 갑니다. 학교 연동은 이 경계를 처음으로 바깥으로 넓히는 일이라 Q3·Q4에서 다시 다룹니다.</figcaption>
+  </figure>
+
+  <p class="filename">supabase-client.js — 서버로 나가는 사본을 만드는 유일한 함수</p>
+<pre>const SYNC_OMIT_COMMON   = ['rrn', 'account'];   <span class="c">// 항상 제거</span>
+const SYNC_SENSITIVE_KEYS = ['flags'];           <span class="c">// 동의했을 때만 전송</span>
+
+function syncSafeProfile(profile, sensitiveOk) {
+  if (!profile) return null;
+  const p = JSON.parse(JSON.stringify(profile));
+  if (p.common) for (const k of SYNC_OMIT_COMMON) delete p.common[k];
+  if (!sensitiveOk) for (const k of SYNC_SENSITIVE_KEYS) delete p[k];
+  return p;
+}</pre>
+
+  <p class="filename">index.html — 콘텐츠 보안 정책(CSP)</p>
+<pre>default-src 'self'; script-src 'self';
+style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
+connect-src 'self' https://*.workers.dev https://*.supabase.co;
+object-src 'none'; base-uri 'self'</pre>
+  <p class="tbl-note">외부 스크립트를 실행할 수 없습니다. 수집한 공고 데이터가 오염되더라도 코드 실행으로 이어지지 않게 하려는 조치이고, 동시에 <strong>SDK를 쓸 수 없다는 제약</strong>이기도 합니다(Supabase도 fetch로 직접 호출). 학교 연동 SDK가 필요하다면 이 정책을 어떻게 다룰지가 Q2의 일부입니다.</p>
+
+  <h3>2.9 지금 ‘신청’ 버튼이 실제로 하는 일</h3>
+  <figure>
+    <svg viewBox="0 0 900 330" xmlns="http://www.w3.org/2000/svg" font-family="NSK, sans-serif">
+      <defs><marker id="ar3" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#14202A"/></marker>
+      <marker id="ar4" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#A03A2B"/></marker></defs>
+
+      <!-- 왼쪽: 현재 -->
+      <text x="0" y="16" font-size="10.5" font-weight="700">지금 (배포 중)</text>
+      <line x1="0" y1="24" x2="420" y2="24" stroke="#14202A" stroke-width="1.5"/>
+      <g font-size="9.2" fill="#14202A">
+        <text x="30" y="44" text-anchor="middle" font-weight="700">학생</text>
+        <text x="175" y="44" text-anchor="middle" font-weight="700">앱</text>
+        <text x="350" y="44" text-anchor="middle" font-weight="700" fill="#A03A2B">학교 포털</text>
+        <line x1="30" y1="52" x2="30" y2="300" stroke="#D4DBE0"/>
+        <line x1="175" y1="52" x2="175" y2="300" stroke="#D4DBE0"/>
+        <line x1="350" y1="52" x2="350" y2="300" stroke="#A03A2B" stroke-dasharray="3 3"/>
+
+        <g stroke="#14202A" stroke-width="1.1" fill="none" marker-end="url(#ar3)">
+          <path d="M30 72 H172"/><path d="M175 104 H33"/><path d="M30 136 H172"/><path d="M175 168 H33"/>
+        </g>
+        <text x="101" y="68" text-anchor="middle" font-size="8.6">신청 버튼</text>
+        <text x="104" y="100" text-anchor="middle" font-size="8.6">질문 → 답 입력</text>
+        <text x="101" y="132" text-anchor="middle" font-size="8.6">작성 완료</text>
+        <text x="104" y="164" text-anchor="middle" font-size="8.6">.doc 파일 생성</text>
+        <rect x="60" y="182" width="230" height="30" rx="2" fill="#F4F7F8" stroke="#D4DBE0"/>
+        <text x="175" y="201" text-anchor="middle" font-size="8.8">상태 = “신청 준비 완료”</text>
+
+        <g stroke="#A03A2B" stroke-width="1.3" fill="none" marker-end="url(#ar4)" stroke-dasharray="4 3">
+          <path d="M30 240 H346"/>
+        </g>
+        <text x="188" y="234" text-anchor="middle" font-size="8.8" fill="#A03A2B" font-weight="700">학생이 직접 로그인해 옮겨 적음</text>
+        <text x="188" y="262" text-anchor="middle" font-size="8.6" fill="#A03A2B">앱은 여기서부터 아무것도 모릅니다</text>
+        <text x="188" y="286" text-anchor="middle" font-size="8.6" fill="#7C8A94">결과도 학생이 손으로 기록</text>
+      </g>
+
+      <line x1="452" y1="10" x2="452" y2="310" stroke="#E8ECEF"/>
+
+      <!-- 오른쪽: 목표 -->
+      <text x="480" y="16" font-size="10.5" font-weight="700" fill="#1B5E8E">목표 (이 문서가 설계하려는 것)</text>
+      <line x1="480" y1="24" x2="900" y2="24" stroke="#1B5E8E" stroke-width="1.5"/>
+      <g font-size="9.2" fill="#14202A">
+        <text x="510" y="44" text-anchor="middle" font-weight="700">학생</text>
+        <text x="655" y="44" text-anchor="middle" font-weight="700">앱 · 서버</text>
+        <text x="840" y="44" text-anchor="middle" font-weight="700" fill="#1B5E8E">학교 시스템</text>
+        <line x1="510" y1="52" x2="510" y2="300" stroke="#D4DBE0"/>
+        <line x1="655" y1="52" x2="655" y2="300" stroke="#D4DBE0"/>
+        <line x1="840" y1="52" x2="840" y2="300" stroke="#1B5E8E"/>
+
+        <g stroke="#14202A" stroke-width="1.1" fill="none" marker-end="url(#ar3)">
+          <path d="M510 72 H652"/>
+        </g>
+        <text x="581" y="68" text-anchor="middle" font-size="8.6">원클릭</text>
+
+        <g stroke="#1B5E8E" stroke-width="1.3" fill="none" marker-end="url(#ar2)">
+          <path d="M655 104 H836"/><path d="M840 140 H659"/><path d="M655 176 H836"/><path d="M840 212 H659"/>
+        </g>
+        <text x="746" y="100" text-anchor="middle" font-size="8.6" fill="#1B5E8E">학생 신원 확인 (Q2)</text>
+        <text x="750" y="136" text-anchor="middle" font-size="8.6" fill="#1B5E8E">확인 결과</text>
+        <text x="746" y="172" text-anchor="middle" font-size="8.6" fill="#1B5E8E">신청 데이터 + 첨부 (Q3)</text>
+        <text x="750" y="208" text-anchor="middle" font-size="8.6" fill="#1B5E8E" font-weight="700">접수번호</text>
+        <g stroke="#14202A" stroke-width="1.1" fill="none" marker-end="url(#ar3)">
+          <path d="M655 244 H513"/>
+        </g>
+        <text x="584" y="240" text-anchor="middle" font-size="8.6">“접수 완료 · 번호 …”</text>
+        <rect x="540" y="264" width="230" height="30" rx="2" fill="#E3EDF5" stroke="#B7CFE1"/>
+        <text x="655" y="283" text-anchor="middle" font-size="8.8" fill="#1B5E8E" font-weight="700">이때부터 ‘신청 완료’라고 쓸 수 있음</text>
+      </g>
+    </svg>
+    <figcaption><b>그림 5</b>현재 플로우와 목표 플로우. 오른쪽 그림의 화살표 네 개가 이 문서의 질문 전부입니다 — 신원 확인(Q2), 데이터 전송(Q1·Q3), 접수번호 회신(Q3), 그리고 이것을 어떤 순서로 만들 것인가(Q5).</figcaption>
+  </figure>
+
+  <p class="filename">app.js — 신청 버튼의 진입점</p>
+<pre>function applyTo(sch) {
+  if (formTplIdFor(sch)) { startFormFill(sch); return; }   <span class="c">// 양식이 있으면 작성 화면</span>
+  if (essayDefsFor(sch).length) { startDocPrep(sch); return; }
+  finalizeApply(sch, null);                                 <span class="c">// 여기서 끝 — 전송은 없음</span>
+  closeSheet();
+}</pre>
+
+  <p class="filename">data.js — 접수 채널 판정 (마지막 줄이 문제의 지점)</p>
+<pre>function submitChannelLabel(sch) {
+  if (sch.applyEmail)                      return '📧 이메일 접수 — 앱에서 메일 자동 완성';
+  if (sch.program || /한국장학재단/…)      return '🏛 한국장학재단 — 본인 인증 후 직접 신청';
+  if (sch.formId)                          return '📄 양식 제출형 — 앱에서 원본 양식 작성';
+  if (hasFormAttachment(sch))              return '📎 원본 양식 다운로드형 — 첨부 양식 작성';
+  return '🖥 온라인·포털 입력형 — 복사해서 붙여넣기';       <span class="c">// ← 나머지 전부가 여기로</span>
+}</pre>
+  <div class="box warn">
+    <h4>이 다섯 줄이 실측 조사에서 드러난 결함입니다</h4>
+    <p style="margin:0">마지막 줄은 <strong>“모르는 것”과 “포털형인 것”을 같은 문구로 처리</strong>합니다. 121건 조사 결과 실제 포털형은 18건이었는데, 앱은 접수 방법을 확인하지 못한 27건에도 “포털에서 복사해 붙여넣으세요”라고 단정하고 있었습니다. 확인하지 않은 것을 확인한 것처럼 말하는 것은 이 서비스의 원칙 위반이라, 연동 설계와 별개로 고쳐야 할 자리입니다. <strong>Q4에서 이런 자리를 더 짚어 주시길 요청드립니다.</strong></p>
+  </div>
+
+  <h3>2.10 이미 만들어 둔, 아직 켜지 않은 자산</h3>
+  <p>연동의 첫 단추가 될 수 있는 코드가 이미 있습니다. <strong>키가 없어 한 번도 실제로 돌려 본 적이 없습니다.</strong></p>
+  <p class="filename">server/mail-worker.js — 접수 메일 발송 (Cloudflare Worker · 미배포)</p>
+<pre>const cors = { 'Access-Control-Allow-Origin': 'https://seonju5543-web.github.io', … };
+
+<span class="c">/* 남용 방지 ① 앱에서 온 요청만 (Origin 검사) */</span>
+if (origin !== 'https://seonju5543-web.github.io') return new Response('forbidden', { status: 403 });
+
+<span class="c">/* 남용 방지 ② 수신자는 접수처 도메인만 (스팸 릴레이 차단) */</span>
+const ALLOWED_TO = /^[^\s@]+@([a-z0-9-]+\.)*(ac\.kr|or\.kr|go\.kr|re\.kr)$/i;
+if (!ALLOWED_TO.test(toClean)) return new Response('recipient not allowed', { status: 403 });
+
+<span class="c">/* 남용 방지 ③ 크기 제한 (본문 100KB · 첨부 5개 각 5MB) */</span>
+…
+await fetch('https://api.resend.com/emails', {
+  headers: { Authorization: `Bearer ${env.RESEND_KEY}` },
+  body: JSON.stringify({ from: '한대장 접수대행 &lt;apply@handaejang.app&gt;', to: [toClean],
+                         reply_to: replyTo, subject, text, attachments })
+});</pre>
+  <p class="tbl-note">발신 도메인 인증·바운스 처리·전송 증빙 보관이 아직 없습니다. <strong>Q5에서 이 세 가지를 여쭙습니다.</strong> 참고로 이 워커에는 저장소(KV)가 없어, 지금 구조로는 “보냈다”는 기록이 어디에도 남지 않습니다.</p>
+</section>
+
+<!-- ════════════════ 03 문제 ════════════════ -->
+<section class="sec">
+  <h2><span class="hn">03</span>문제 — 실측 121건</h2>
+  <p class="sec-lead">2026-09-02, 경희대·한국외대 장학 게시판을 직접 열어 공고 121건(경희 58 · 외대 63)을 받고, 각 공고에서 <em>신청·접수 방법을 말하는 줄만 원문 그대로</em> 뽑아 채널을 갈랐습니다. 추론하지 않았고, 근거가 없으면 “미확인”으로 남겼습니다. 경희대는 본문이 “첨부파일 확인 바랍니다”로 끝나 첨부 원본 41개를 받아 글자를 뽑아야 분류가 됐습니다.</p>
+
+  <figure>
+    <svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" font-family="NSK, sans-serif">
+      <g font-size="9.6">
+        <!-- 축 -->
+        <line x1="196" y1="34" x2="196" y2="272" stroke="#14202A" stroke-width="1.2"/>
+        <!-- 눈금 -->
+        <g stroke="#E8ECEF" stroke-width="1">
+          <line x1="326" y1="34" x2="326" y2="264"/><line x1="457" y1="34" x2="457" y2="264"/>
+          <line x1="587" y1="34" x2="587" y2="264"/><line x1="718" y1="34" x2="718" y2="264"/>
+        </g>
+        <g font-family="PM, monospace" font-size="8" fill="#7C8A94" text-anchor="middle">
+          <text x="196" y="286">0</text><text x="326" y="286">10</text><text x="457" y="286">20</text>
+          <text x="587" y="286">30</text><text x="718" y="286">40</text>
+        </g>
+
+        <!-- 막대: 13.05px per unit -->
+        <g>
+          <rect x="196" y="42" width="600" height="26" rx="3" fill="#9AA6AE"/>
+          <text x="188" y="60" text-anchor="end" font-size="9.6">읽을 글자 없음 (미확인)</text>
+          <text x="806" y="60" font-family="PM, monospace" font-size="9.6" fill="#465661">46 · 38%</text>
+        </g>
+        <g>
+          <rect x="196" y="80" width="391" height="26" rx="3" fill="#9AA6AE"/>
+          <text x="188" y="98" text-anchor="end" font-size="9.6">한국장학재단 직접 신청</text>
+          <text x="597" y="98" font-family="PM, monospace" font-size="9.6" fill="#465661">30 · 25%</text>
+        </g>
+        <g>
+          <rect x="196" y="118" width="235" height="26" rx="3" fill="#1B5E8E"/>
+          <text x="188" y="136" text-anchor="end" font-size="9.6" font-weight="700">학교 포털 입력형</text>
+          <text x="441" y="136" font-family="PM, monospace" font-size="9.6" fill="#1B5E8E" font-weight="500">18 · 15%</text>
+        </g>
+        <g>
+          <rect x="196" y="156" width="170" height="26" rx="3" fill="#1B5E8E"/>
+          <text x="188" y="174" text-anchor="end" font-size="9.6" font-weight="700">이메일 접수</text>
+          <text x="376" y="174" font-family="PM, monospace" font-size="9.6" fill="#1B5E8E" font-weight="500">13 · 11%</text>
+        </g>
+        <g>
+          <rect x="196" y="194" width="170" height="26" rx="3" fill="#9AA6AE"/>
+          <text x="188" y="212" text-anchor="end" font-size="9.6">첨부 양식만 (제출처 미확인)</text>
+          <text x="376" y="212" font-family="PM, monospace" font-size="9.6" fill="#465661">13 · 11%</text>
+        </g>
+        <g>
+          <rect x="196" y="232" width="157" height="26" rx="3" fill="#9AA6AE"/>
+          <text x="188" y="250" text-anchor="end" font-size="9.6">방문 · 우편 접수</text>
+          <text x="363" y="250" font-family="PM, monospace" font-size="9.6" fill="#465661">12 · 10%</text>
+        </g>
+
+        <!-- 범례 -->
+        <rect x="196" y="8" width="11" height="11" rx="2" fill="#1B5E8E"/>
+        <text x="213" y="18" font-size="9" fill="#465661">앱이 개입할 수 있는 채널 (31건)</text>
+        <rect x="400" y="8" width="11" height="11" rx="2" fill="#9AA6AE"/>
+        <text x="417" y="18" font-size="9" fill="#465661">구조상 개입 불가 · 또는 아직 못 읽음 (101건)</text>
+      </g>
+    </svg>
+    <figcaption><b>그림 6</b>신청 채널 분포. 한 공고가 두 채널을 함께 안내하는 경우가 있어 합이 121을 넘습니다. 회색은 우리가 손댈 수 없거나(재단 접수·방문) 아직 판독하지 못한 공고입니다.</figcaption>
+  </figure>
+
+  <h3>3.1 포털형 18건의 실제 경로</h3>
+  <p>포털은 학교마다, 심지어 <strong>같은 학교 안에서도</strong> 다릅니다. 한국외대는 시스템이 둘이고, 그중 하나만 쓰는 장학금이 1건 있습니다. 한쪽만 보면 “포털 신청이 없다”고 잘못 판단하기 쉬운 구조입니다.</p>
+  <table>
+    <caption>표 5 — 포털형 18건의 경로 (공고 원문에서 발췌)</caption>
+    <tr><th style="width:20%">시스템</th><th class="num" style="width:8%">건수</th><th style="width:38%">원문에 적힌 경로</th><th>비고</th></tr>
+    <tr><td>HUFS Ability<br><span class="off">(한국외대)</span></td><td class="num">11</td><td class="mono">로그인(학번/비번) → 교과/비교과 → 장학신청 목록 → 해당 장학금 선택</td><td>11건 전부 같은 경로. 8건이 <strong>교외 재단</strong></td></tr>
+    <tr><td>종합정보시스템<br><span class="off">(한국외대)</span></td><td class="num">1</td><td class="mono">로그인 → 등록/장학정보 → 면학장학금 신청</td><td>이 1건만 다른 시스템</td></tr>
+    <tr><td>인포21<br><span class="off">(경희대)</span></td><td class="num">6</td><td class="mono">신청방법 : 인포21 / 인포21 장학신청 메뉴로 신청</td><td>경로를 길게 적지 않음. 2건이 <strong>교외 재단</strong></td></tr>
+    <tr class="tot"><td>합계</td><td class="num">18</td><td colspan="2">이 중 <strong>10건이 교외 재단 장학금</strong> — 학교 시스템이 외부 재단의 접수 창구 노릇까지 하고 있습니다</td></tr>
+  </table>
+  <div class="box key">
+    <h4>연동의 값어치를 결정하는 사실</h4>
+    <p style="margin:0">학교 시스템과 다리를 하나 놓으면 <strong>교내에 그치지 않고 교외 재단 장학금까지 함께 열립니다.</strong> 총동문회·남가주동문·가송재단·유흥수·동문홍보대사·라성정형기·미래인재육성(외대), 우덕재단·LEE&amp;MOON·쌍용곰두리(경희) — 재단이 학교에 접수를 위탁한 형태입니다. 즉 “학교 1곳 연동 = 장학금 1종”이 아니라 “학교 1곳 = 그 학교를 창구로 쓰는 모든 재단”입니다.</p>
+  </div>
+
+  <h3>3.2 구현 후보 다섯 — 우리가 정리한 지형</h3>
+  <figure>
+    <svg viewBox="0 0 900 560" xmlns="http://www.w3.org/2000/svg" font-family="NSK, sans-serif">
+      <!-- 축 프레임 -->
+      <rect x="120" y="40" width="640" height="400" fill="#fff" stroke="#D4DBE0"/>
+      <line x1="440" y1="40" x2="440" y2="440" stroke="#D4DBE0"/>
+      <line x1="120" y1="240" x2="760" y2="240" stroke="#D4DBE0"/>
+
+      <!-- 사분면 라벨 -->
+      <g font-size="9.4" fill="#9AA6AE">
+        <text x="136" y="60">우리 힘만으로 가능</text>
+        <text x="744" y="60" text-anchor="end">협약 필요 · 진짜 원클릭</text>
+        <text x="136" y="428">학생이 아직 손으로 한다</text>
+        <text x="744" y="428" text-anchor="end">비용은 큰데 학생 편익은 작다</text>
+      </g>
+
+      <!-- 축 제목 -->
+      <text x="440" y="470" text-anchor="middle" font-size="10.5" font-weight="700">학교 협조 필요도 (저 → 고)</text>
+      <text x="-240" y="26" transform="rotate(-90)" text-anchor="middle" font-size="10.5" font-weight="700">학생 대신 앱이 하는 일 (저 → 고)</text>
+
+      <!-- 점: 파랑 원 = 구현 후보 -->
+      <g>
+        <circle cx="238" cy="286" r="11" fill="#1B5E8E"/>
+        <text x="238" y="318" text-anchor="middle" font-size="10" font-weight="700">반클릭 · 딥링크</text>
+        <text x="238" y="332" text-anchor="middle" font-size="8.8" fill="#465661">정확한 화면 + 값 미리 갖춤</text>
+      </g>
+      <g>
+        <circle cx="330" cy="152" r="11" fill="#1B5E8E"/>
+        <text x="330" y="132" text-anchor="middle" font-size="10" font-weight="700">이메일 자동 발송</text>
+        <text x="330" y="118" text-anchor="middle" font-size="8.8" fill="#465661">코드 있음 · 키만 없음</text>
+      </g>
+      <g>
+        <circle cx="566" cy="136" r="11" fill="#1B5E8E"/>
+        <text x="566" y="116" text-anchor="middle" font-size="10" font-weight="700">파일 배치 (CSV/SFTP)</text>
+        <text x="566" y="102" text-anchor="middle" font-size="8.8" fill="#465661">학교가 정기 취입</text>
+      </g>
+      <g>
+        <circle cx="690" cy="96" r="11" fill="#1B5E8E"/>
+        <text x="690" y="126" text-anchor="middle" font-size="10" font-weight="700">연계 API + SSO</text>
+        <text x="690" y="140" text-anchor="middle" font-size="8.8" fill="#465661">학교 개발 필요</text>
+      </g>
+      <!-- 회색 원 = 현재 -->
+      <g>
+        <circle cx="186" cy="396" r="11" fill="#9AA6AE"/>
+        <text x="186" y="378" text-anchor="middle" font-size="10" font-weight="700" fill="#465661">현재 · 복사 안내</text>
+      </g>
+      <!-- 러스트 ✕ = 배제 후보 -->
+      <g stroke="#A03A2B" stroke-width="3.4" stroke-linecap="round">
+        <path d="M196 120 L214 138"/><path d="M214 120 L196 138"/>
+      </g>
+      <text x="205" y="160" text-anchor="middle" font-size="10" font-weight="700" fill="#A03A2B">학생 계정 대행</text>
+      <text x="205" y="174" text-anchor="middle" font-size="8.8" fill="#A03A2B">자격증명을 우리가 보관</text>
+
+      <!-- 범례 -->
+      <g transform="translate(120,502)">
+        <circle cx="8" cy="0" r="8" fill="#1B5E8E"/>
+        <text x="24" y="4" font-size="9.6" fill="#465661">구현 후보 — Q1에서 우선순위를 여쭙습니다</text>
+        <circle cx="330" cy="0" r="8" fill="#9AA6AE"/>
+        <text x="346" y="4" font-size="9.6" fill="#465661">현재 위치</text>
+        <g stroke="#A03A2B" stroke-width="3" stroke-linecap="round" transform="translate(480,-7)">
+          <path d="M0 0 L14 14"/><path d="M14 0 L0 14"/>
+        </g>
+        <text x="502" y="4" font-size="9.6" fill="#465661">배제 후보 — 다만 판단이 맞는지 확인받고 싶습니다</text>
+      </g>
+    </svg>
+    <figcaption><b>그림 7</b>구현 후보 포지셔닝. 가로축은 학교의 협조가 얼마나 필요한가, 세로축은 학생이 손으로 하던 일을 앱이 얼마나 대신하는가입니다. 왼쪽 위가 “허락 없이 지금 만들 수 있고 효과도 있는” 자리이며, 이메일 자동 발송이 여기에 가장 가깝습니다.</figcaption>
+  </figure>
+
+  <table>
+    <caption>표 6 — 다섯 후보에 대한 우리 추정 · 빈칸이 여쭙는 부분</caption>
+    <tr>
+      <th style="width:17%">후보</th><th style="width:17%">우리 쪽 작업</th><th style="width:16%">학교 쪽 필요</th>
+      <th style="width:14%">우리 추정 공수</th><th>모르는 것 (← 고문 요청)</th>
+    </tr>
+    <tr>
+      <td><strong>반클릭 딥링크</strong></td>
+      <td>공고별 정확한 경로·딥링크 저장, 값 복사 UI</td><td>없음</td>
+      <td>2~3주</td>
+      <td>로그인 후 특정 화면으로 보내는 딥링크가 학교 포털에서 실제로 유지되는가 / 자동 채움을 어디까지 구현 가능한가</td>
+    </tr>
+    <tr>
+      <td><strong>이메일 자동 발송</strong></td>
+      <td>도메인·발신 인증, 바운스 처리, 전송 증빙</td><td>접수 주소 확인 · 수신 인정</td>
+      <td>1~2주</td>
+      <td>KV 없는 서버리스에서 전송 증빙을 어떻게 남기나 / 첨부 규격(HWP·PDF 병합) / 도달률</td>
+    </tr>
+    <tr>
+      <td><strong>파일 배치</strong></td>
+      <td>정기 산출·전송, 스키마 확정</td><td>수신함 + 취입 배치</td>
+      <td>3~4주</td>
+      <td>상시 서버 없이 SFTP를 어떻게 다루나 / 재전송·정정의 표현 방법</td>
+    </tr>
+    <tr>
+      <td><strong>연계 API + SSO</strong></td>
+      <td>토큰 보관, 재시도, 상태 동기화</td><td>API 개발 + 계정 발급</td>
+      <td>6~10주</td>
+      <td>클라이언트 시크릿을 어디에 두나 / IP 고정을 서버리스에서 어떻게 / 표준 설계</td>
+    </tr>
+    <tr>
+      <td class="bad">학생 계정 대행</td>
+      <td>브라우저 자동화 유지보수</td><td>없음(묵인 전제)</td>
+      <td class="bad">지속 불가로 판단</td>
+      <td>이 판단이 맞는가 / 학생 기기 안에서만 도는 형태라면 달라지는가</td>
+    </tr>
+  </table>
+</section>
+
+<!-- ════════════════ 04 질문 ════════════════ -->
+<section class="sec" style="page-break-after:avoid">
+  <h2><span class="hn">04</span>질문 다섯</h2>
+  <p class="sec-lead">각 질문은 <em>답에 따라 우리가 만들 물건이 실제로 달라지는 것</em>만 골랐습니다. 질문마다 ① 여쭙는 문장 ② 우리 상황 ③ 우리 가설 ④ 받고 싶은 답의 형태를 붙였습니다. ③을 적은 이유는, 저희 판단이 틀렸다면 그것을 먼저 알려 주시는 것이 가장 큰 도움이기 때문입니다.</p>
+</section>
+
+<!-- Q1 -->
+<section class="q">
+  <div class="q-head">
+    <div class="q-no">질문 01 · 연동 아키텍처</div>
+    <h3 class="q-title" style="border:0;padding:0">상시 서버가 없는 구조에서, 학교 시스템에 신청을 넣는 현실적인 방법</h3>
+  </div>
+
+  <div class="q-ask">
+    <p>저희 구조는 <strong>정적 파일 + 이벤트 기반 함수</strong>가 전부입니다(그림 2). 상시 구동 서버가 없고, 고정 IP도, 항상 열려 있는 수신 포트도 없습니다. 이 제약 아래에서 학교 장학 시스템에 신청 데이터를 넣는 다섯 후보(그림 7·표 6) 중 <em>실제로 감당 가능한 것</em>은 무엇이고, 순서를 어떻게 잡아야 합니까?</p>
+    <p class="q-sub">특히 여쭙고 싶은 것은 <strong>“연계 API를 쓰게 됐을 때 우리 쪽이 무엇을 새로 갖춰야 하는가”</strong>입니다. 학교가 흔히 요구하는 접속 IP 고정·상호 TLS·클라이언트 시크릿 보관을 Cloudflare Workers 같은 서버리스에서 다루는 표준적인 방법이 있습니까, 아니면 이 시점에 상시 서버를 한 대 두는 것이 정석입니까?</p>
+  </div>
+
+  <h4>우리 상황</h4>
+  <ul class="b">
+    <li>앱은 브라우저에서만 돕니다. 서버 쪽 코드는 Cloudflare Worker 4개(각 100줄 안팎)가 전부이고, 그중 가동 중인 것은 푸시 발송 1개입니다.</li>
+    <li>학교 시스템은 <strong>공개 API도 문서도 없습니다.</strong> 경희대 인포21, 한국외대 HUFS Ability는 각각 학사 포털의 일부이고 납품사가 다를 가능성이 큽니다.</li>
+    <li>데이터 흐름은 지금까지 <strong>한 방향</strong>이었습니다(로봇이 읽어 오기만 함). 학교로 <em>쓰는</em> 방향은 이번이 처음입니다.</li>
+  </ul>
+
+  <div class="hyp">
+    <b>우리 가설</b> — ① 이메일 자동 발송이 학교 개발 0으로 시작할 수 있는 유일한 실제 접수 경로다. ② 연계 API는 학교 예산·발주가 필요해 마지막이다. ③ 파일 배치(정기 CSV 전송)가 중간 지점인데, 상시 서버 없이 SFTP를 다루는 방법을 저희가 모릅니다. — 이 세 가지 중 틀린 것이 있으면 그것부터 알려 주십시오.
+  </div>
+
+  <div class="want">
+    <h4>받고 싶은 답의 형태</h4>
+    <ul class="b">
+      <li>다섯 후보에 대한 <strong>우선순위와 그 이유</strong>. 저희 표 6의 공수 추정이 현실과 얼마나 다른지도 함께.</li>
+      <li>서버리스에서 “학교가 요구하는 접속 조건”을 만족시키는 <strong>구체적 구성</strong>(또는 그것이 불가능하다는 판단과 대안).</li>
+      <li>학교 학사시스템과 붙어 본 경험이 있으시다면, <strong>그때 실제로 쓴 방식</strong>과 가장 오래 걸린 지점.</li>
+      <li>저희가 후보 목록에서 빠뜨린 방식이 있다면 그것.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- Q2 -->
+<section class="q">
+  <div class="q-head">
+    <div class="q-no">질문 02 · 인증과 세션</div>
+    <h3 class="q-title" style="border:0;padding:0">학교 계정 로그인 벽을 넘는 표준 설계</h3>
+  </div>
+
+  <div class="q-ask">
+    <p>포털형 18건은 전부 <strong>학번·비밀번호 로그인 뒤</strong>에 있습니다. 학교가 SSO를 열어 준다는 전제에서, <em>정적 PWA + 서버리스 함수 + Supabase</em>라는 저희 구조에 대학 SSO(OIDC 또는 SAML)를 붙이는 표준 설계는 무엇입니까?</p>
+    <p class="q-sub">구체적으로 막히는 지점 셋입니다. ① 토큰을 어디에 두어야 합니까 — 지금 로그인 토큰은 <span class="mono">localStorage</span>에 있는데 이대로 괜찮습니까. ② 서비스워커는 로그인을 <strong>모르도록</strong> 일부러 설계했는데(백그라운드 알림이 서버에 붙는 경로를 만들지 않기 위해), SSO를 붙이면 이 경계가 유지됩니까. ③ Supabase 계정과 학교 IdP 신원, <strong>두 개의 신원을 어떻게 잇습니까</strong> — 어느 쪽을 주(主) 신원으로 삼아야 합니까.</p>
+  </div>
+
+  <h4>우리 상황</h4>
+  <ul class="b">
+    <li>CSP가 <span class="mono">script-src 'self'</span>라 외부 SDK를 스크립트로 불러올 수 없습니다. Supabase도 SDK 없이 fetch 4개로만 씁니다. SSO 라이브러리가 필요하면 이 정책을 손대야 합니다.</li>
+    <li>앱은 설치형 PWA입니다. 리다이렉트 기반 로그인이 설치된 앱에서 어떻게 동작하는지가 저희에겐 미지수입니다.</li>
+    <li>대안으로 <strong>학생 기기 안에서만 도는 자동 입력</strong>(브라우저 확장·인앱 웹뷰)을 생각해 봤지만, 유지비와 실현성을 판단할 근거가 없습니다.</li>
+  </ul>
+
+  <div class="hyp">
+    <b>우리 가설</b> — 학생의 학교 아이디·비밀번호를 우리가 받아 대신 로그인하는 방식은 배제해야 한다(그림 7의 ✕). 자격증명을 보관하는 순간 사고의 크기가 달라지고, 학교가 알면 즉시 차단할 것으로 봅니다. 다만 <b>학생 기기 밖으로 자격증명이 나가지 않는 형태</b>라면 판단이 달라지는지는 저희가 모릅니다.
+  </div>
+
+  <div class="want">
+    <h4>받고 싶은 답의 형태</h4>
+    <ul class="b">
+      <li>SSO를 붙일 때의 <strong>구성도 한 장 수준</strong>의 설계(어디서 리다이렉트를 받고, 토큰을 어디에 두고, 누가 검증하는지).</li>
+      <li>학교에 SSO 연동을 요청할 때 <strong>개발자가 준비해 줘야 하는 항목 목록</strong>(리다이렉트 주소, 스코프, 인증서, 테스트 계정 등).</li>
+      <li>“이 방식만은 하지 마라”에 해당하는 것 하나와 그 이유.</li>
+      <li>학교가 SSO는 못 열고 <strong>학번 대조만</strong> 해 준다면, 그것으로 접수까지 갈 수 있는 설계가 있는지.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- Q3 -->
+<section class="q">
+  <div class="q-head">
+    <div class="q-no">질문 03 · 데이터 계약과 멱등성</div>
+    <h3 class="q-title" style="border:0;padding:0">무엇을 보내고, 무엇을 받아야 ‘접수됐다’고 말할 수 있는가</h3>
+  </div>
+
+  <div class="q-ask">
+    <p>저희에게는 이미 <strong>48종 · 602필드</strong>의 신청서 스키마와 <strong>33값</strong>의 학생 프로필이 있습니다(2.6·2.7). 이것을 학교가 받아먹을 수 있는 형태로 옮길 때, 스키마를 어떻게 설계해야 합니까? 그리고 전송의 신뢰성 — <em>재전송·중복 제출·정정·취소·부분 실패</em> — 은 어떤 패턴으로 다뤄야 합니까?</p>
+    <p class="q-sub">특히 <strong>접수 확인을 어떻게 받을 것인가</strong>가 핵심입니다. 저희는 “실제 접수가 일어나지 않은 것을 신청 완료라고 쓰지 않는다”를 원칙으로 지켜 왔습니다. 접수번호 즉시 반환 · 상태 조회 · 콜백 통지 · 야간 배치 결과 파일 중 <strong>상시 서버가 없는 저희가 실제로 받을 수 있는 형태</strong>는 무엇입니까? 콜백을 받으려면 결국 상시 수신 창구가 필요한 것 아닙니까?</p>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 900 190" xmlns="http://www.w3.org/2000/svg" font-family="NSK, sans-serif">
+      <defs><marker id="ar5" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#1B5E8E"/></marker></defs>
+      <g font-size="9.6">
+        <rect x="0" y="40" width="150" height="46" rx="3" fill="#E3EDF5" stroke="#B7CFE1"/>
+        <text x="75" y="60" text-anchor="middle" font-weight="700">신청 준비 완료</text>
+        <text x="75" y="76" text-anchor="middle" font-size="8.6" fill="#465661">지금 앱의 최종 상태</text>
+
+        <rect x="190" y="40" width="150" height="46" rx="3" fill="#fff" stroke="#D4DBE0"/>
+        <text x="265" y="60" text-anchor="middle" font-weight="700">전송함</text>
+        <text x="265" y="76" text-anchor="middle" font-size="8.6" fill="#465661">우리 로그에만 존재</text>
+
+        <rect x="380" y="40" width="150" height="46" rx="3" fill="#fff" stroke="#1B5E8E" stroke-width="1.4"/>
+        <text x="455" y="60" text-anchor="middle" font-weight="700" fill="#1B5E8E">접수 확인</text>
+        <text x="455" y="76" text-anchor="middle" font-size="8.6" fill="#1B5E8E">학교가 준 증거 필요</text>
+
+        <rect x="570" y="40" width="150" height="46" rx="3" fill="#fff" stroke="#D4DBE0"/>
+        <text x="645" y="60" text-anchor="middle" font-weight="700">심사</text>
+        <text x="645" y="76" text-anchor="middle" font-size="8.6" fill="#465661">마감 경과로 자동 표시</text>
+
+        <rect x="760" y="40" width="140" height="46" rx="3" fill="#fff" stroke="#D4DBE0"/>
+        <text x="830" y="60" text-anchor="middle" font-weight="700">결과</text>
+        <text x="830" y="76" text-anchor="middle" font-size="8.6" fill="#465661">학생이 직접 기록</text>
+
+        <g stroke="#1B5E8E" stroke-width="1.2" fill="none" marker-end="url(#ar5)">
+          <path d="M150 63 H186"/><path d="M340 63 H376"/><path d="M530 63 H566"/><path d="M720 63 H756"/>
+        </g>
+
+        <text x="168" y="110" text-anchor="middle" font-size="8.4" fill="#A03A2B">여기가 지금 벽</text>
+        <text x="455" y="112" text-anchor="middle" font-size="9.2" fill="#1B5E8E" font-weight="700">이 칸을 채우는 증거가 무엇인지가 Q3</text>
+        <line x1="380" y1="96" x2="530" y2="96" stroke="#1B5E8E" stroke-width="1.2"/>
+
+        <text x="0" y="150" font-size="9.2" fill="#465661"><tspan font-weight="700" fill="#14202A">지금 규칙</tspan> — ‘심사’ 단계만 객관적 사실(제출 기록 + 마감 경과)로 자동 표시하고, 제출·결과는 학생이 직접 누릅니다.</text>
+        <text x="0" y="170" font-size="9.2" fill="#465661">학교 전산을 볼 수 없기 때문입니다. 연동이 되면 ‘전송함 → 접수 확인’ 두 칸이 처음으로 자동이 됩니다.</text>
+      </g>
+    </svg>
+    <figcaption><b>그림 8</b>신청 상태 머신. 파란 칸을 무엇으로 채울 수 있느냐가 “신청 완료”라고 표기해도 되는지를 가릅니다.</figcaption>
+  </figure>
+
+  <div class="hyp">
+    <b>우리 가설</b> — 멱등성 키를 붙여 재전송해도 중복 접수가 되지 않게 하고, 학교 응답이 늦으면 폴링으로 상태를 확인하는 구조가 맞다고 봅니다. 다만 <b>폴링을 누가 도느냐</b>가 문제입니다 — 앱은 학생이 열어야만 돌고, 저희에겐 상시 프로세스가 없습니다. GitHub Actions 스케줄(하루 몇 회)로 대신하는 것이 정상적인 해법인지 판단이 서지 않습니다.
+  </div>
+
+  <div class="want">
+    <h4>받고 싶은 답의 형태</h4>
+    <ul class="b">
+      <li>학교에 제안할 <strong>최소 데이터 계약</strong>의 뼈대 — 필드 수준까지는 아니어도, 무엇을 반드시 포함해야 하는지.</li>
+      <li>중복·정정·취소·부분 실패를 다루는 <strong>패턴 이름과 최소 구현</strong>(멱등성 키, 아웃박스, 상태 머신 등).</li>
+      <li>상시 서버 없이 접수 확인을 받는 현실적인 방법. 없다면 “여기서부터는 서버가 필요하다”는 선을 그어 주시면 됩니다.</li>
+      <li>학생이 “냈는데 누락됐다”고 다툴 때 <strong>기술적으로 남겨 두어야 할 기록</strong>이 무엇인지.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- Q4 -->
+<section class="q">
+  <div class="q-head">
+    <div class="q-no">질문 04 · 구조 리뷰</div>
+    <h3 class="q-title" style="border:0;padding:0">이대로 학교와 붙이면 터질 곳은 어디입니까</h3>
+  </div>
+
+  <div class="q-ask">
+    <p>2장에 앱의 구조·코드·데이터를 전부 적었고 저장소도 공개입니다. <strong>연동을 시작하기 전에 반드시 고쳐야 할 것</strong>을 짚어 주십시오. 저희가 스스로 의심하는 자리 여섯을 아래에 적었습니다 — 이 목록이 맞는지, 순서가 맞는지, 빠진 것이 있는지 봐 주시면 됩니다.</p>
+  </div>
+
+  <table>
+    <caption>우리가 의심하는 자리 — 위험하다고 보는 순서대로</caption>
+    <tr><th style="width:5%" class="num">#</th><th style="width:30%">자리</th><th>왜 걱정되나</th></tr>
+    <tr><td class="num">1</td><td><strong>모든 판단이 클라이언트에</strong></td><td>자격 판정·마감·금액 계산이 전부 브라우저에서 돕니다. 서버 검증이 없어, 조작된 신청이 학교로 넘어가는 것을 막을 지점이 없습니다.</td></tr>
+    <tr><td class="num">2</td><td><strong>메일 워커의 방어가 Origin 검사뿐</strong></td><td>브라우저가 아닌 곳에서 오는 요청은 Origin을 위조할 수 있습니다. 수신 도메인 화이트리스트가 있지만, 접수처로 스팸을 보내는 통로가 되지 않는지 확인이 필요합니다.</td></tr>
+    <tr><td class="num">3</td><td><strong>전송 기록이 남지 않음</strong></td><td>워커에 저장소가 없어 “보냈다”는 기록이 어디에도 없습니다. 분쟁이 나면 증명할 수단이 없습니다.</td></tr>
+    <tr><td class="num">4</td><td><strong>로봇이 데이터 원본을 매일 덮어씀</strong></td><td>사람이 등록한 데이터와 로봇이 쓰는 파일이 같습니다. 병합 규칙으로 막고 있지만, 학교와 주고받는 데이터가 여기 섞이면 사고의 성격이 달라집니다.</td></tr>
+    <tr><td class="num">5</td><td><strong>정적 파일 통째 다운로드</strong></td><td>공고 목록 368 KB를 앱이 통째로 받아 자기 학교 것만 고릅니다. 학교가 늘면 한계가 옵니다(실측 기준 50~100개교).</td></tr>
+    <tr><td class="num">6</td><td><strong>서비스워커 캐시 버전 수동 관리</strong></td><td>현재 v145. 올리는 것을 잊으면 옛 화면이 남습니다(실제로 두 번 겪었습니다). 네트워크 우선이라 결국 반영되지만 3.5초를 넘기면 캐시로 떨어집니다.</td></tr>
+  </table>
+
+  <div class="hyp">
+    <b>우리 가설</b> — 1번(서버 검증 없음)이 학교와 붙는 순간 가장 크게 문제가 될 것으로 봅니다. 지금까지는 “틀려도 학생 화면만 틀리는” 구조였는데, 연동이 되면 <b>틀린 데이터가 학교 시스템에 들어갑니다.</b> 다만 서버 검증을 넣으면 “고정비 0원 · 상시 서버 없음”이라는 구조가 깨지므로, 어느 정도까지가 적정선인지 판단이 필요합니다.
+  </div>
+
+  <div class="want">
+    <h4>받고 싶은 답의 형태</h4>
+    <ul class="b">
+      <li>위 여섯 개의 <strong>재정렬</strong>과, 저희가 못 본 항목 추가.</li>
+      <li>각 항목에 대해 “연동 전에 반드시” / “연동과 함께” / “나중에” 세 등급으로만 나눠 주셔도 충분합니다.</li>
+      <li>1번에 대한 <strong>최소 처방</strong> — 상시 서버를 두지 않고 검증을 넣는 방법이 있는지.</li>
+      <li>코드를 직접 보실 수 있으면, 저희가 <em>안전하다고 믿고 있는데 실은 아닌</em> 자리를 하나만이라도 짚어 주십시오.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- Q5 -->
+<section class="q">
+  <div class="q-head">
+    <div class="q-no">질문 05 · 90일 실행 계획</div>
+    <h3 class="q-title" style="border:0;padding:0">협약 전에, 지금 무엇을 만들어야 합니까</h3>
+  </div>
+
+  <div class="q-ask">
+    <p>학교와의 협약은 시간이 걸립니다. 그동안 <strong>학교 개발 없이 지금 작동시킬 수 있는 것</strong>이 둘 있습니다 — ① 이메일 접수 13건을 앱이 실제로 발송(코드는 있고 키만 없습니다) ② 포털형 18건의 반클릭(정확한 화면으로 보내고 값을 미리 갖춰 두기). 어떤 순서로, 어떤 최소 구현으로 만들어야 합니까?</p>
+    <p class="q-sub">①의 기술 요건을 특히 여쭙습니다 — <strong>발신 도메인 인증(SPF·DKIM·DMARC), 바운스 처리, 전송 증빙 보관</strong>. 저희 워커에는 저장소가 없어 증빙을 남길 자리가 없고, 학교 메일 서버가 외부 도메인 첨부 메일을 어떻게 취급하는지도 모릅니다. ②는 <strong>자동 채움을 어디까지 구현할 수 있는지</strong>가 관건입니다 — 클립보드 API, 딥링크 파라미터, PWA 공유 대상 중 실제로 쓸 만한 것이 있습니까?</p>
+  </div>
+
+  <h4>우리 상황 — 이미 있는 재료</h4>
+  <ul class="b">
+    <li>발송 코드(<span class="mono">server/mail-worker.js</span>)는 완성돼 있습니다. Origin 검사 · 수신 도메인 화이트리스트 · 크기 제한까지 들어 있고, <strong>키가 없어 한 번도 돌려 본 적이 없습니다.</strong></li>
+    <li>앱이 만드는 첨부는 <span class="mono">.doc</span>(Word HTML) 형식입니다. 학교가 HWP를 기대할 때 무엇으로 보내야 하는지 판단이 필요합니다.</li>
+    <li>포털형 18건의 <strong>정확한 경로 문장은 이미 확보</strong>돼 있습니다(표 5). 딥링크로 만들 재료는 있습니다.</li>
+  </ul>
+
+  <div class="hyp">
+    <b>우리 가설</b> — ①을 먼저 하는 것이 맞다고 봅니다. 학교에 보여 줄 것이 생기고(“이미 돌아갑니다”), 코드가 이미 있어 가장 빠르며, 무엇보다 <b>“신청 준비 완료”를 “접수 완료”로 바꿀 수 있는 유일한 자리</b>이기 때문입니다. ②는 효과가 확실하지만 학생의 손을 완전히 덜어 주지는 못합니다.
+  </div>
+
+  <div class="want">
+    <h4>받고 싶은 답의 형태</h4>
+    <ul class="b">
+      <li><strong>90일을 3구간으로</strong> 나눈 계획 — 무엇을 언제까지, 무엇을 뒤로 미룰지.</li>
+      <li>메일 발송을 “실제로 접수로 인정받는” 수준까지 올리는 <strong>체크리스트</strong>(도메인·인증·첨부·증빙·실패 처리).</li>
+      <li>반클릭 자동 채움의 <strong>실현 가능한 최대치</strong>와, 넘어서면 안 되는 선.</li>
+      <li>학교에 보여 줄 <strong>데모의 형태</strong> — 무엇을 시연하면 개발자가 아닌 사람에게 설득력이 있는지.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ════════════════ 05 부록 ════════════════ -->
+<section class="sec">
+  <h2><span class="hn">05</span>부록</h2>
+
+  <h3>A. 답변을 받으면 우리가 정할 것</h3>
+  <table>
+    <caption>표 7 — 답변이 직접 바꾸는 결정</caption>
+    <tr><th style="width:12%">질문</th><th style="width:38%">답이 정하는 것</th><th>정해지지 않으면 못 하는 일</th></tr>
+    <tr><td class="mono">Q1</td><td>연동 방식 · 우리 쪽 인프라를 바꿀지 여부</td><td>학교에 무엇을 요청할지 정할 수 없음</td></tr>
+    <tr><td class="mono">Q2</td><td>로그인 구조 — 학교 계정을 붙일지, 기기 안에서 끝낼지</td><td>서버 구조 전체가 대기 상태</td></tr>
+    <tr><td class="mono">Q3</td><td>앱의 상태 표기 문구 · 학교에 요청할 응답 형식</td><td>“신청 완료”라고 쓸 수 있는 조건을 못 정함</td></tr>
+    <tr><td class="mono">Q4</td><td>연동 전 수리 목록과 순서</td><td>고칠 것을 모른 채 연동을 시작하게 됨</td></tr>
+    <tr><td class="mono">Q5</td><td>이번 달 개발 순서</td><td>학교 미팅에 보여 줄 것이 없음</td></tr>
+  </table>
+
+  <h3>B. 이 문서에 넣지 않은 질문</h3>
+  <p>아래는 저희가 답이 필요하다고 판단했지만 <strong>개발 고문의 영역이 아니라고 보아 뺀 것</strong>입니다. 혹시 겹치는 경험이 있으시면 덤으로 말씀해 주셔도 감사하지만, 답을 기대하고 드리는 질문은 아닙니다.</p>
+  <table>
+    <caption>표 8 — 다른 곳에 물을 것</caption>
+    <tr><th style="width:34%">질문</th><th style="width:22%">물을 곳</th><th>왜 뺐나</th></tr>
+    <tr><td>개인정보 처리위탁 계약 · 제3자 제공 동의의 요건</td><td>법무 자문</td><td>계약 문서 작성은 개발 판단이 아님</td></tr>
+    <tr><td>대학 정보보호 심의 통과 요건 · 인증 필요 여부</td><td>학교 정보화 부서 · 보안 컨설팅</td><td>학교마다 기준이 다름</td></tr>
+    <tr><td>학교 예산·발주 시기, 협약서 문안</td><td>학교 장학팀 · 산학협력단</td><td>행정 절차</td></tr>
+    <tr><td>메일 접수를 ‘정식 접수’로 인정할지</td><td>학교 장학팀</td><td>학교의 정책 결정</td></tr>
+  </table>
+  <p class="tbl-note">다만 Q1·Q3에는 <strong>“학교가 보통 요구하는 기술 조건”</strong>이 포함돼 있습니다. 이는 심의 통과 여부가 아니라 <em>구현에 무엇이 필요한지</em>를 여쭙는 것이라 남겨 두었습니다.</p>
+
+  <h3>C. 저장소 구조</h3>
+<pre>hanggonggan/
+├─ index.html · app.js · style.css · sw.js        <span class="c">앱 본체 (빌드 없음)</span>
+├─ match-engine.js · parse-*.js · section-head.js <span class="c">판정 엔진 (화면·워커 공용)</span>
+├─ forms.js · form-plan.js · essay*.js            <span class="c">양식·서술형 문서</span>
+├─ supabase-client.js · notify*.js · chat.js      <span class="c">로그인·알림·도우미</span>
+├─ data/
+│   ├─ registered.json      <span class="c">정식 등록 공고 45건 · 94 KB</span>
+│   ├─ forms.json           <span class="c">양식 스키마 48종 · 178 KB</span>
+│   ├─ notices.json         <span class="c">실시간 공고 507건 · 368 KB</span>
+│   ├─ kosaf-open.json      <span class="c">한국장학재단 재단 116곳 · 210 KB</span>
+│   └─ tuition.json majors.json search-index.json
+├─ collector/               <span class="c">수집 로봇 47개 (.mjs) + 원문 542개 파일</span>
+├─ server/
+│   ├─ push/                <span class="c">푸시 발송 — 가동 중</span>
+│   ├─ mail-worker.js       <span class="c">접수 메일 — 미배포</span>
+│   ├─ essay/ chat/         <span class="c">AI 초안·도우미 — 미배포</span>
+├─ verify/                  <span class="c">검증 드라이버 42개 (브라우저 13 + Node)</span>
+├─ _admin/                  <span class="c">관리자 화면 (Cloudflare Pages + Access)</span>
+└─ .github/workflows/       <span class="c">자동화 27종</span></pre>
+
+  <h3>D. 용어</h3>
+  <table>
+    <tr><td style="width:22%"><strong>정식 등록</strong></td><td>사람이 검수해 매칭·양식 작성까지 붙인 공고. 로봇이 자동 등록한 것은 ‘검수 전’ 배지가 붙습니다.</td></tr>
+    <tr><td><strong>발췌</strong></td><td>공고 원문에서 <em>그대로 잘라 낸</em> 문장. 앱은 신청 방법을 추론하지 않고 발췌만 보여 줍니다.</td></tr>
+    <tr><td><strong>반클릭</strong></td><td>학교 허락 없이 가능한 만큼 — 정확한 화면으로 데려다주고 넣을 값을 미리 갖춰 두는 것.</td></tr>
+    <tr><td><strong>감사 관문</strong></td><td>데이터를 저장하기 직전에 전수 검사해, 실패하면 그 실행의 변경을 되돌리는 장치.</td></tr>
+    <tr><td><strong>양식</strong></td><td>공고에 첨부된 실제 신청서 파일과 <em>같은 구조</em>의 문서. 자유 서식으로 대체하지 않습니다.</td></tr>
+  </table>
+
+  <h3>E. 확인하실 수 있는 것</h3>
+  <ul class="b">
+    <li><strong>앱</strong> — seonju5543-web.github.io/hanggonggan (설치 없이 브라우저에서 바로 동작)</li>
+    <li><strong>저장소</strong> — github.com/seonju5543-web/hanggonggan (공개 · 이 문서의 모든 코드 인용은 여기서 그대로 가져왔습니다)</li>
+    <li><strong>원문 조사</strong> — 121건 채널 분류와 포털형 18건의 근거 문장은 별도 문서로 제공 가능합니다.</li>
+    <li>필요하시면 <strong>테스트 계정과 데모 데이터</strong>를 준비해 드리겠습니다.</li>
+  </ul>
+
+  <footer class="end">
+    한대장 · 기술 고문 요청서 · 2026-09-03 · 이선주 seonju5543@gmail.com<br>
+    이 문서의 수치는 전부 2026-09-03 저장소 실측이며, 채널 분류는 2026-09-02 게시판 직접 열람 결과입니다.
+  </footer>
+</section>
+
+</body>
+</html>
