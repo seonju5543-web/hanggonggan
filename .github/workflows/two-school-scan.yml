@@ -27,7 +27,7 @@ jobs:
   scan:
     runs-on: ubuntu-latest
     # 상한 = 각 단계 예산의 합을 담는 그릇 (조사 20 + 준비·저장 8)
-    timeout-minutes: 28
+    timeout-minutes: 36
     steps:
       - uses: actions/checkout@v4
         with:
@@ -49,8 +49,23 @@ jobs:
           SCAN_ONLY: ''
         run: |
           ONLY=$(grep -oE '^only:[[:space:]]*[a-z]+' collector/run-two-school-scan.txt | awk '{print $2}' | tail -1)
-          echo "대상: ${ONLY:-두 학교 전부}"
-          SCAN_ONLY="$ONLY" node collector/scan-two-schools.mjs
+          ATT=$(grep -oE '^attach:[[:space:]]*(yes|no)' collector/run-two-school-scan.txt | awk '{print $2}' | tail -1)
+          echo "대상: ${ONLY:-두 학교 전부} · 첨부 내려받기: ${ATT:-no}"
+          FLAG=""; [ "$ATT" = "yes" ] && FLAG="--attach"
+          SCAN_ONLY="$ONLY" node collector/scan-two-schools.mjs $FLAG
+
+      - name: 첨부 원본에서 글자 뽑기 (HWP·HWPX·DOCX)
+        timeout-minutes: 5
+        continue-on-error: true
+        run: |
+          pip install olefile --quiet
+          python3 collector/hwp-prvtext.py || true
+          python3 collector/hwp-bodytext.py || true
+
+      - name: 본문 + 첨부로 신청 채널 재분류
+        timeout-minutes: 3
+        continue-on-error: true
+        run: node collector/classify-two-schools.mjs
 
       - name: 결과 저장 (이 브랜치에만)
         if: always()
@@ -59,6 +74,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           if [ -d collector/extracted/two-school ]; then
             git add collector/extracted/two-school
+            git add collector/extracted/ts-*.* 2>/dev/null || true
             git commit -m "두 학교 장학 공고 전수 조사 결과 (앱 데이터 무변경)" || echo "변경 없음"
             for i in 1 2 3; do
               git pull --rebase origin claude/external-expert-consultation-questions-o8bik7 || true

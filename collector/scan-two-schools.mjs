@@ -180,6 +180,38 @@ async function collectList(school) {
   return [...rows.values()];
 }
 
+/* 첨부 원본을 collector/extracted/ 에 내려받는다.
+   그 폴더에 두는 이유: 저장소가 이미 갖고 있는 hwp-prvtext.py·hwp-bodytext.py 가
+   그 폴더만 훑어 글자를 뽑는다. 규칙을 새로 만들지 않고 있는 길을 쓴다.
+   ⚠️ PDF·이미지는 받지 않는다 — attachment-text.mjs 가 PDF 글자를 일부러 안 쓴다
+      (숫자가 빠진 채 뽑혀 원문보다 나쁜 안내가 된 적이 있다). */
+const WANT_ATTACH = process.argv.includes('--attach');
+const ATT_DIR = path.join(process.cwd(), 'collector', 'extracted');
+let attSeq = 0;
+
+async function grabAttachments(school, d) {
+  const saved = [];
+  for (const a of d.attachUrls.slice(0, 3)) {
+    if (left() < 40_000) break;
+    const ext = ((a.name.match(/\.(hwpx?|docx?)$/i) || [])[1] || 'hwp').toLowerCase();
+    try {
+      const res = await ctx.request.get(a.url, { timeout: 25000 });
+      if (!res.ok()) { saved.push({ name: a.name, error: `상태 ${res.status()}` }); continue; }
+      const buf = await res.body();
+      if (!buf || buf.length < 400) { saved.push({ name: a.name, error: '내용이 거의 없음' }); continue; }
+      attSeq += 1;
+      const file = path.join(ATT_DIR, `ts-${school.key}-${attSeq}.${ext}`);
+      fs.mkdirSync(ATT_DIR, { recursive: true });
+      fs.writeFileSync(file, buf);
+      saved.push({ name: a.name, file: path.relative(process.cwd(), file), bytes: buf.length });
+    } catch (e) {
+      saved.push({ name: a.name, error: (e.message || '').split('\n')[0].slice(0, 60) });
+    }
+    await new Promise((r) => setTimeout(r, 500));
+  }
+  return saved;
+}
+
 async function readDetail(url) {
   const page = await ctx.newPage();
   try {
@@ -191,9 +223,9 @@ async function readDetail(url) {
         title: (pick('.view-title') || pick('.artclViewTitle') || pick('h1,h2,h3') || document.title || '').replace(/\s+/g, ' ').trim(),
         body: (document.body.innerText || '').slice(0, 30000),
         atts: [...document.querySelectorAll('a')]
-          .map((a) => ({ t: (a.textContent || '').replace(/\s+/g, ' ').trim(), h: a.getAttribute('href') || '' }))
+          .map((a) => ({ t: (a.textContent || '').replace(/\s+/g, ' ').trim(), h: a.href || '' }))
           .filter((a) => /download|fileDown|\.hwpx?|\.pdf|\.docx?|\.zip|\.jpe?g|\.png/i.test(a.h + a.t))
-          .map((a) => a.t).filter(Boolean).slice(0, 12),
+          .filter((a) => a.t).slice(0, 12),
         pw: !!document.querySelector('input[type=password]'),
         imgs: document.querySelectorAll('img').length,
       };
@@ -210,7 +242,11 @@ async function readDetail(url) {
       /* 글자가 거의 없는데 그림이 있으면 '본문이 이미지'다 — '미확인'과 구분해 말해야 한다 */
       imageOnly: got.body.length < 300 && got.imgs > 0,
       body: got.body,
-      attachments: got.atts,
+      attachments: got.atts.map((a) => a.t),
+      /* 🔴 경희대는 본문에 신청 방법을 안 적고 '첨부파일 확인 바랍니다'로 끝낸다(2026-09-02 실측).
+         첨부를 못 읽으면 그 학교는 통째로 '미확인'이 된다 — 그래서 주소까지 받아 둔다. */
+      attachUrls: got.atts.filter((a) => /\.(hwpx?|docx?)$/i.test(a.t) || /\.(hwpx?|docx?)/i.test(a.h))
+        .map((a) => ({ name: a.t, url: a.h })).slice(0, 4),
       lines,
       methodLines: lines.filter((l) => METHOD_LINE.test(l)).slice(0, 12),
     };
@@ -231,6 +267,7 @@ for (const school of SCHOOLS) {
   for (const r of rows.slice(0, MAX_DETAIL)) {
     if (left() < 45_000) { st.error = `예산이 모자라 ${st.items.length}건에서 중단`; break; }
     const d = await readDetail(r.url);
+    if (WANT_ATTACH && d.attachUrls && d.attachUrls.length) d.attachFiles = await grabAttachments(school, d);
     d.listTitle = r.title;
     if (!d.title) d.title = r.title;
     d.channels = d.error ? [{ kind: '읽기 실패', evidence: d.error }] : classify(d);
