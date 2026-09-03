@@ -57,8 +57,9 @@ a{color:var(--blue);text-decoration:none}
 .toc ol{list-style:none;margin:0;padding:0;counter-reset:sec}
 .toc>ol>li{border-bottom:1px solid var(--line2);padding:7px 0;display:flex;gap:10px;align-items:baseline}
 .toc .n{font-family:'PM',monospace;color:var(--blue);width:26px;flex:none;font-size:9pt}
-.toc .t{flex:1;font-weight:500}
-.toc .d{color:var(--ink3);font-size:8.6pt;font-weight:400}
+.toc .ti{flex:1;min-width:0}
+.toc .t{display:block;font-weight:500}
+.toc .d{display:block;color:var(--ink3);font-size:8.6pt;font-weight:400;margin-top:1px}
 
 /* ── 섹션 ─────────────────────────── */
 h2{
@@ -181,15 +182,15 @@ footer.end{border-top:1px solid var(--line);margin-top:20px;padding-top:8px;
 <section class="toc">
   <h2><span class="hn">00</span>목차</h2>
   <ol>
-    <li><span class="n">01</span><span class="t">30초 요약 — 무엇이 되고, 무엇이 안 되는가</span></li>
-    <li><span class="n">02</span><span class="t">앱의 구조 — 답을 주시려면 알아야 할 전부</span><br>
-      <span class="d">시스템 구성 · 스택 · 코드 지도 · 데이터 파이프라인 · 데이터 모델 · 학생 프로필 33값 · 저장/보안 경계 · 현재 신청 플로우 · 미배포 자산</span></li>
-    <li><span class="n">03</span><span class="t">문제 — 실측 121건이 말하는 것</span><br>
-      <span class="d">채널 분포 · 포털형 18건 · 구현 후보 5안 포지셔닝 · 우리 추정치</span></li>
-    <li><span class="n">04</span><span class="t">질문 다섯</span><br>
-      <span class="d">Q1 연동 아키텍처 · Q2 인증·세션 · Q3 데이터 계약과 멱등성 · Q4 구조 리스크 리뷰 · Q5 90일 실행 계획</span></li>
-    <li><span class="n">05</span><span class="t">부록</span><br>
-      <span class="d">A 답변 후 우리가 정할 것 · B 이 문서 밖의 질문 · C 파일 트리 · D 용어 · E 접근 방법</span></li>
+    <li><span class="n">01</span><div class="ti"><span class="t">30초 요약 — 무엇이 되고, 무엇이 안 되는가</span></div></li>
+    <li><span class="n">02</span><div class="ti"><span class="t">앱의 구조 — 답을 주시려면 알아야 할 전부</span>
+      <span class="d">시스템 구성 · 스택 · 코드 지도 · 데이터 파이프라인 · 데이터 모델 · 학생 프로필 33값 · 저장/보안 경계 · 현재 신청 플로우 · 미배포 자산</span></div></li>
+    <li><span class="n">03</span><div class="ti"><span class="t">문제 — 실측 121건이 말하는 것</span>
+      <span class="d">채널 분포 · 포털형 18건 · 구현 후보 5안 포지셔닝 · 우리 추정치</span></div></li>
+    <li><span class="n">04</span><div class="ti"><span class="t">질문 다섯</span>
+      <span class="d">Q1 연동 아키텍처 · Q2 인증·세션 · Q3 데이터 계약과 멱등성 · Q4 구조 리스크 리뷰 · Q5 90일 실행 계획</span></div></li>
+    <li><span class="n">05</span><div class="ti"><span class="t">부록</span>
+      <span class="d">A 답변 후 우리가 정할 것 · B 이 문서 밖의 질문 · C 파일 트리 · D 용어 · E 접근 방법</span></div></li>
   </ol>
 
   <h3 style="margin-top:26px">그림·표 목록</h3>
