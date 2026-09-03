@@ -135,6 +135,24 @@ input:focus, select:focus {
 input::placeholder { color: var(--text-weak); }
 
 .screen { padding: 20px; animation: fade-in 0.3s ease; }
+/* 🔴 **숨긴 것은 클릭도 못 받아야 한다 — 이 한 줄이 그 규칙의 원본이다** (2026-09-03)
+
+   클래스에 `display` 를 주면 브라우저 기본 규칙 `[hidden]{display:none}` 을 이겨서
+   **숨겼는데 안 숨는다.** 이 저장소는 그 버그를 지금까지 **열한 번 따로따로** 고쳤다
+   (chat-sheet · bulkbar · sort-menu · search-clear · field · wallet-pop · app-log ·
+   btn-onboard-cancel · chat-fab · chat-hint · bottom-nav — 전부 "지우지 말 것" 주석이 붙어 있다).
+   그런데 새로 `display` 를 쓰는 요소가 생길 때마다 열두 번째가 나온다.
+
+   실제로 `.toast` 가 그랬다(실측 2026-09-03): `hidden` 인데 `display:flex` ·
+   `pointer-events:auto` 라서, 화면 아래 **보이지 않는 32×18 죽은 구역**이 상시 있었고
+   그 자리를 누르면 클릭을 toast 가 먹었다. 검사가 '양식 문서 만들기' 버튼을 30초 기다리다
+   죽은 것이 이 때문인데, **학생에게도 똑같이 안 눌린다.**
+
+   `_admin/admin.css` 는 이미 이 한 줄로 해결해 뒀다. 앱에만 없었다.
+   ⚠️ 아래 개별 `[hidden]` 규칙들은 지우지 않는다 — 지금 이 줄이 덮지만, 남겨 두는 것이
+      "왜 그 요소가 문제였는지"의 기록이다. */
+[hidden] { display: none !important; }
+
 .screen[hidden] { display: none !important; }
 @keyframes fade-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
