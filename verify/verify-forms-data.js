@@ -77,22 +77,37 @@ const PORT = process.env.PORT || 8124;
      예전에는 `formId === 'test-dummy'` 를 찾았는데 그 픽스처가 데이터에서 사라져
      `[data-detail="undefined"]` 를 30초 기다리다 죽었다. 마감이 지난 공고는 목록에서
      내려가므로 **화면에 있는 카드 중에서** 골라야 한다(공고 id를 박지 말 것과 같은 계열). */
-  const targetId = await page.evaluate(() => {
-    const ids = [...document.querySelectorAll('#explore-list [data-detail]')].map((e) => e.dataset.detail);
-    const hit = ids.find((id) => {
+  /* 🔴 **양식이 연결된 것만으로는 부족하다 — 마감된 공고는 버튼이 잠긴다** (2026-09-03).
+     예전 주석은 "마감이 지난 공고는 목록에서 내려간다"고 적혀 있었지만 사실이 아니다:
+     마감 뒤 30일은 목록에 남고, 층2(한국장학재단) 공고도 그대로 뜬다. 실제로
+     `reg-kosaf-daecheonggyo` 를 골라 `<button disabled>마감된 장학금</button>` 을
+     30초 기다리다 죽고 있었다 — CLAUDE.md 가 예고한 "잠긴 버튼을 기다리다 죽는다" 그것이다.
+
+     🔴 마감 판정을 여기서 새로 짜지 않는다. **앱이 내린 판정을 그대로 읽는다** —
+        버튼이 잠겼는지가 곧 앱의 답이다(verify-registered 와 같은 방식).
+     그래서 후보를 전부 모아 두고 **열리는 것이 나올 때까지** 하나씩 열어 본다. */
+  const candidates = await page.evaluate(() => [...document.querySelectorAll('#explore-list [data-detail]')]
+    .map((e) => e.dataset.detail)
+    .filter((id) => {
       const s = registeredList.find((x) => x.id === id);
       return s && s.formId && typeof FORM_TEMPLATES !== 'undefined' && FORM_TEMPLATES[s.formId];
-    });
-    return hit || null;
-  });
-  console.log('양식 연결 공고:', targetId);
+    }));
+  let targetId = null;
+  for (const id of candidates) {
+    await page.click(`#explore-list [data-detail="${id}"]`);   // 홈의 같은 카드와 겹치지 않게 탐색 목록으로 한정
+    await page.waitForSelector('#detail-sheet.show');
+    await page.waitForTimeout(300);
+    const locked = await page.$eval('#btn-apply-one', (e) => e.disabled).catch(() => true);
+    if (!locked) { targetId = id; break; }
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(250);
+  }
+  console.log(`양식 연결 공고: ${targetId} (후보 ${candidates.length}건 중 신청 가능한 것)`);
   if (!targetId) {
-    console.log('건너뜀 — 목록에 양식 연결 공고가 하나도 없습니다(마감으로 전부 내려갔을 수 있음)');
+    console.log('건너뜀 — 양식이 연결된 공고가 전부 마감입니다');
     await browser.close();
     return;
   }
-  await page.click(`#explore-list [data-detail="${targetId}"]`); // 홈 화면의 같은 카드와 겹치지 않게 탐색 목록으로 한정
-  await page.waitForSelector('#detail-sheet.show');
   await page.waitForTimeout(400);
   await page.click('#btn-apply-one');
   await page.waitForSelector('#btn-ff-generate', { timeout: 8000 });

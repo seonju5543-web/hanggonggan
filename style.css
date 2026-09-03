@@ -2360,7 +2360,20 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 .wallet-row:last-child { border-bottom: 0; }
 
 /* ── ③ 온보딩 선택지 = 체크리스트 ───────────────────────────────── */
-.check-list { gap: 0; border-top: 1px solid var(--line); }
+/* 🔴 **두 덩어리 경계도 리듬이 끊기면 안 된다** (2026-09-03).
+   특별자격은 `#in-flags` · `#in-extra` 두 덩어리인데 눈에는 한 목록으로 보인다.
+   2026-08-26 에 개발자가 그 경계만 벌어진 것을 지적해 고쳤는데, 2026-09-01 리팩토링이
+   이 목록을 카드에서 **구분선 리스트**로 바꾸면서(`gap:0` + 밑줄) 되살아났다 —
+   칸 사이는 0px 인데 덩어리 사이만 `margin-bottom:10px` 이라 거기서만 벌어졌다(실측 11px).
+
+   ⚠️ 위쪽 `.check-list:last-of-type:not(:has(~ .check-item))` 은 **한 번도 맞은 적이 없다**
+      (실측 false). `:last-of-type` 은 클래스가 아니라 **태그 종류** 기준이라, 뒤에 다른
+      `<div>` 가 있으면 영영 마지막이 못 된다. 그래서 여기서 클래스로 다시 잡는다.
+   ⚠️ 이어지는 덩어리의 `border-top` 은 앞 칸의 밑줄과 겹쳐 선이 두 겹이 된다 — 지운다. */
+.check-list { gap: 0; border-top: 1px solid var(--line); margin-bottom: 0; }
+.check-list + .check-list { border-top: 0; }
+/* 마지막 덩어리 뒤에만 버튼과의 간격을 준다 (형제 중 뒤에 .check-list 가 없는 것) */
+.check-list:not(:has(~ .check-list)) { margin-bottom: 20px; }
 .check-item {
   background: transparent;
   border: 0;

@@ -74,30 +74,28 @@ const eq = (label, got, want) => {
      화면에서 실제로 안 보이는지(offsetParent)까지 확인한다 (CLAUDE.md CSS 함정). */
   eq('선택 모드가 아니면 선택 막대가 안 보인다',
     await page.$eval('#apps-bulkbar', (e) => e.offsetParent !== null), false);
-  eq('밀기 전에는 삭제 버튼이 안 보인다',
-    await page.$eval('#apps-list .swipe-del', (e) => getComputedStyle(e).opacity), '0');
+  /* 🔴 **'밀어서 삭제'는 2026-09-01 에 걷어냈다** (개발자 지시: "오류가 자꾸 먹어서").
+     스칠 때 삭제가 뜨고, 빨간 판이 패널을 덮어 기록이 지워지고, 누름이 삼켜졌다 —
+     세 번 고쳐도 재발해서 기능을 없앴다(커밋 33cdf22). 그런데 이 검사만 남아
+     `.swipe-del` 을 찾다 죽고 있었다(그 클래스는 앱에 한 번도 안 나온다).
+     🔴 **검사를 지우기만 하면 보장을 잃는다.** 삭제와 되돌리기는 여전히 있는 기능이라
+        살아 있는 경로(선택 → 체크 → 삭제 n건)로 **옮겨서** 계속 지킨다. */
 
-  console.log('\n■ 왼쪽으로 밀기 (TouchEvent)');
-  await drag(page, '#apps-list .swipe-row:first-child .sch-card', -110, 0);
-  eq('민 카드가 열린다', await page.$eval('#apps-list .swipe-row:first-child', (e) => e.classList.contains('open')), true);
-  eq('민 직후에 상세가 열리지 않는다', await page.$eval('#detail-sheet', (e) => e.hidden), true);
+  console.log('\n■ 선택 모드 · 전체 선택 · 일괄 삭제');
+  await page.click('#apps-select-toggle');
+  await page.waitForTimeout(300);
+  eq('선택 막대가 나온다', await page.$eval('#apps-bulkbar', (e) => e.hidden), false);
+  eq('선택 전에는 삭제가 잠겨 있다', await page.$eval('#apps-delete-selected', (e) => e.disabled), true);
 
-  console.log('\n■ 세로로 끌면 삭제가 열리지 않는다 (목록 스크롤을 뺏지 않는다)');
-  await page.$eval('#apps-list .swipe-row.open', (e) => e.classList.remove('open'));
-  await drag(page, '#apps-list .swipe-row:nth-child(2) .sch-card', 0, -120);
-  eq('세로로 끌면 안 열린다', await page.$eval('#apps-list .swipe-row:nth-child(2)', (e) => e.classList.contains('open')), false);
-
-  console.log('\n■ 삭제와 되돌리기');
-  await drag(page, '#apps-list .swipe-row:first-child .sch-card', -110, 0);
-  await page.click('#apps-list .swipe-row:first-child .swipe-del');
+  /* 한 건만 골라 지우고 되돌린다 — 예전에 '밀어서 삭제'가 지키던 자리다 */
+  await page.click('#apps-list .swipe-row:first-child .row-check');
+  await page.waitForTimeout(200);
+  await page.click('#apps-delete-selected');
   await page.waitForTimeout(400);
   eq('한 건이 지워진다', await page.$$eval('#apps-list .swipe-row', (e) => e.length), 2);
-  /* 🔴 문구를 바꿀 때는 이 줄도 같이 바꾼다 (2026-08-31 수리).
-     2026-08-30 에 토스트 문구가 '되돌리기' → '실행 취소' 로 바뀌었는데 여기가 안 따라와
-     **main 이 그때부터 빨간불**이었다. 확정된 문구는 검사로 못 박는 것이 맞지만
-     (approved-design), 못 박았으면 문구를 고칠 때 함께 고쳐야 관문이 산다.
-     ⚠️ 진짜 증명은 바로 아래 '되돌리면 3건으로 돌아온다' 다 — 글자만 맞고 동작이
-        안 되면 아무 소용이 없다. 둘을 함께 둔다. */
+  /* 🔴 문구를 바꿀 때는 이 줄도 같이 바꾼다 — 2026-08-30 에 '되돌리기' → '실행 취소' 로
+     바뀌었는데 여기가 안 따라와 main 이 빨간불이었다.
+     ⚠️ 진짜 증명은 바로 아래 '되돌리면 3건' 이다 — 글자만 맞고 동작이 안 되면 소용없다. */
   eq('되돌리기 단추가 뜬다', await page.$eval('#toast .toast-undo', (e) => e.textContent.trim()), '실행 취소');
   await page.click('#toast .toast-undo');
   await page.waitForTimeout(400);
@@ -105,11 +103,12 @@ const eq = (label, got, want) => {
   eq('되돌린 항목이 원래 자리에 있다',
     await page.$eval('#apps-list .swipe-row:first-child', (e) => e.dataset.row), 'reg-hufs-yuheungsu');
 
-  console.log('\n■ 선택 모드 · 전체 선택 · 일괄 삭제');
+  /* ⚠️ 앱은 **삭제하면 선택 모드를 끈다**(app.js `appsSelectMode = false`) — 일부러 그렇게
+     돼 있다(한 번 지우고 나면 보통 볼일이 끝난다). 그래서 일괄 삭제를 재려면 다시 켜야 한다.
+     이걸 모르고 이어서 '전체 선택'을 누르면 안 보이는 체크박스를 30초 기다리다 죽는다. */
   await page.click('#apps-select-toggle');
   await page.waitForTimeout(300);
-  eq('선택 막대가 나온다', await page.$eval('#apps-bulkbar', (e) => e.hidden), false);
-  eq('선택 전에는 삭제가 잠겨 있다', await page.$eval('#apps-delete-selected', (e) => e.disabled), true);
+  eq('삭제 뒤 다시 선택 모드로 들어갈 수 있다', await page.$eval('#apps-bulkbar', (e) => e.hidden), false);
   await page.click('#apps-check-all');
   await page.waitForTimeout(300);
   eq('전체 선택하면 3건', await page.$eval('#apps-delete-selected', (e) => e.textContent.trim()), '삭제 3건');
@@ -128,7 +127,7 @@ const eq = (label, got, want) => {
   eq('일괄 삭제도 되돌아온다', await page.$$eval('#apps-list .swipe-row', (e) => e.length), 3);
 
   console.log('\n■ 터치 타깃 (44px 이상)');
-  const small = await page.$$eval('.swipe-del, #apps-delete-selected, .toast-undo, .bulk-all',
+  const small = await page.$$eval('#apps-delete-selected, .toast-undo, .bulk-all',
     (els) => els.filter((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && (r.width < 44 || r.height < 44); })
       .map((e) => e.className));
   eq('작은 터치 타깃이 없다', small, []);

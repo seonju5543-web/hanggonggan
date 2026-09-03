@@ -91,15 +91,21 @@ const SCHOOL = process.env.LINKCHECK_SCHOOL || '경희';
     .filter((r) => new RegExp(SCHOOL).test((r.eligibility && r.eligibility.schoolOnly) || ''))
     .map((r) => r.id);
   const checked = [];
+  let opened = 0;   // 실제로 연 카드 수 — '링크를 읽은 수'와 구분한다
   for (const id of khuIds) {
     const cardSel = `#explore-list [data-detail="${id}"]`;
     if (!(await page.$(cardSel))) continue;   // 마감돼 목록에서 빠진 공고는 건너뛴다
     await page.click(cardSel);
     await page.waitForSelector('#detail-sheet.show');
     await page.waitForTimeout(300);
-    const link = await page.$$eval('#detail-sheet .sheet-deadline a', (els) =>
+    /* 🔴 **원문 링크는 `.doc-legend` 안에 있다** — `.sheet-deadline` 이 아니다 (2026-09-03).
+       `.sheet-deadline` 은 `마감일 … · 중복 수혜 제한 있음` 한 줄일 뿐 링크가 없다(app.js:2118).
+       옛 자리를 읽고 있어 **늘 0건**이었고, 그래서 "카드를 한 건도 열지 못했다"고 보고했다 —
+       카드는 멀쩡히 열렸다. 자리가 바뀐 것을 검사가 못 따라간 것이다. */
+    const link = await page.$$eval('#detail-sheet .doc-legend a', (els) =>
       els.map((e) => ({ href: e.href, text: e.textContent.trim() }))).catch(() => []);
     const legend = await page.$$eval('#detail-sheet .doc-legend', (els) => els.map((e) => e.textContent)).catch(() => []);
+    opened += 1;
     if (link.length) {
       const l = link[link.length - 1];
       checked.push({ id, href: l.href, label: l.text, hasGuide: legend.some((t) => /목록에서/.test(t)) });
@@ -108,16 +114,26 @@ const SCHOOL = process.env.LINKCHECK_SCHOOL || '경희';
     await page.keyboard.press('Escape');
     await page.waitForTimeout(350);
   }
-  console.log(`  ${SCHOOL} 카드 ${checked.length}건의 링크를 실제로 읽음`);
+  console.log(`  ${SCHOOL} 카드 ${opened}건을 열어 링크 ${checked.length}건을 실제로 읽음`);
+  /* 🔴 라벨 규칙은 이제 **셋**이다 (app.js `srcLabel`) — 2026-09-01 에 한국장학재단 등록분이
+     늘었다. 그 공고는 앱이 원문을 읽은 적이 없어 '원문 공고'라고 부르면 거짓말이 된다. */
+  const kindOf = (id) => {
+    const r = reg.find((x) => x.id === id) || {};
+    return r.program || r.sourceKind === 'kosaf' ? 'kosaf' : 'own';
+  };
   for (const c of checked) {
     const marker = isMarker(c.href);
-    const labelOk = marker ? /게시판 목록/.test(c.label) : /원문 공고/.test(c.label);
+    const labelOk = marker ? /게시판 목록/.test(c.label)
+      : kindOf(c.id) === 'kosaf' ? /한국장학재단/.test(c.label)
+        : /원문 공고/.test(c.label);
     const line = `${c.id} · ${c.label} · ${c.href.slice(0, 92)}`;
     if (!labelOk) bad(`라벨이 실제 링크와 다릅니다 — ${line}`);
     else if (marker && !c.hasGuide) bad(`목록 링크인데 '목록에서 찾으세요' 안내가 없습니다 — ${line}`);
     else ok(line);
   }
-  if (!checked.length) bad(`${SCHOOL} 카드를 한 건도 열지 못했습니다 (온보딩·매칭 확인 필요)`);
+  /* ⚠️ '연 카드'와 '링크를 읽은 카드'를 구분해 말한다 — 뭉뚱그리면 원인을 엉뚱한 데서 찾는다 */
+  if (!opened) bad(`${SCHOOL} 카드를 한 건도 열지 못했습니다 (온보딩·매칭 확인 필요)`);
+  else if (!checked.length) bad(`${SCHOOL} 카드 ${opened}건을 열었지만 원문 링크를 한 건도 못 읽었습니다 (.doc-legend a 위치 확인)`);
 
   /* 실시간 공고 피드의 라벨도 같은 규칙인지 */
   const feed = await page.$$eval('#explore-list .notice-card', (els) => els.map((e) => ({

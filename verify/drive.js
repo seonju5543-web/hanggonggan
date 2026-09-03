@@ -76,8 +76,12 @@ const SHOT = (n) => `${__dirname}/shot-${n}.png`;
   await page.fill('#in-sid', '202312345');
   await page.fill('#in-phone', '010-1234-5678');
   await page.fill('#in-email', 'test@hufs.ac.kr');
-  await page.fill('#in-bank', '국민은행');
-  await page.fill('#in-account', '12345678901234');
+  /* 🔴 **계좌 칸은 온보딩에서 일부러 숨겼다** (2026-08-31 UI 정리 · index.html 주석).
+     "아직 아무 가치도 받지 못한 학생에게 계좌번호를 요구하는 것은 가장 흔한 이탈·불신
+     지점"이라 가입 때는 안 묻고, **프로필 수정으로 들어올 때만** 보인다.
+     그런데 이 검사만 남아 안 보이는 칸을 30초 채우려다 죽고 있었다.
+     ⚠️ 되살리지 말 것 — 값이 필요해지는 때는 신청서에 그 칸이 있을 때뿐이고,
+        그때는 form-plan.js 가 질문으로 띄운다(설계 그대로). */
   await page.screenshot({ path: SHOT('14-step4') });
   await page.click('#btn-finish-onboard');
   await page.waitForSelector('#screen-home:not([hidden])');
@@ -181,7 +185,12 @@ const SHOT = (n) => `${__dirname}/shot-${n}.png`;
 
   await page.click('.nav-item[data-nav="applications"]');
   await page.waitForTimeout(300);
-  const pendingCnt = await page.locator('.badge-pending').count();
+  /* 🔴 **신청내역의 '작성 중' 표시는 `.badge-pending` 이 아니다** (2026-09-03).
+     그 배지는 *일괄 준비 목록*(app.js `bulk-name`)에만 있다. 신청내역은 카드 안 진행 막대에
+     `.app-step-wait` 를 붙인다(app.js:2368). 게다가 이 줄은 화면 **전체**에서 세고 있어
+     일괄 준비 목록의 배지까지 함께 세었고, 그래서 `pendingCnt > 0` 인데 정작
+     `#apps-list` 안에는 없어 30초를 기다리다 죽었다. 세는 곳과 누르는 곳을 맞춘다. */
+  const pendingCnt = await page.locator('#apps-list .swipe-row:has(.app-step-wait)').count();
   const totalCnt = await page.locator('#apps-list .sch-card').count();
   console.log('STEP apps total:', totalCnt, '| pending(서류 작성 필요):', pendingCnt);
   console.log('STEP apps summary:', (await page.textContent('#apps-summary')).replace(/\s+/g, ' ').trim().slice(0, 120));
@@ -189,7 +198,7 @@ const SHOT = (n) => `${__dirname}/shot-${n}.png`;
 
   // pending 건 이어서 완성
   if (pendingCnt > 0) {
-    await page.click('#apps-list .sch-card:has(.badge-pending)');
+    await page.click('#apps-list .swipe-row:has(.app-step-wait) .sch-card');
     await page.waitForSelector('#detail-sheet.show');
     await page.waitForTimeout(350);
     console.log('STEP pending detail btn:', (await page.textContent('#btn-apply-one')).trim());
