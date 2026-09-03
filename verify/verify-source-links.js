@@ -115,17 +115,13 @@ const SCHOOL = process.env.LINKCHECK_SCHOOL || '경희';
     await page.waitForTimeout(350);
   }
   console.log(`  ${SCHOOL} 카드 ${opened}건을 열어 링크 ${checked.length}건을 실제로 읽음`);
-  /* 🔴 라벨 규칙은 이제 **셋**이다 (app.js `srcLabel`) — 2026-09-01 에 한국장학재단 등록분이
-     늘었다. 그 공고는 앱이 원문을 읽은 적이 없어 '원문 공고'라고 부르면 거짓말이 된다. */
-  const kindOf = (id) => {
-    const r = reg.find((x) => x.id === id) || {};
-    return r.program || r.sourceKind === 'kosaf' ? 'kosaf' : 'own';
-  };
+  /* ⚠️ 한국장학재단(층2) 공고의 라벨('한국장학재단 ↗')은 **여기서 보지 않는다.**
+     층2 항목은 실행 중에 만들어져 `registered.json` 에 없고, 이 드라이버는 그 파일을
+     읽으므로 애초에 집히지 않는다(실측 0건). 그 규칙은 `verify-kosaf` 가 갖고 있다 —
+     두 곳에 같은 규칙을 두면 한쪽만 고쳐져 갈라진다. */
   for (const c of checked) {
     const marker = isMarker(c.href);
-    const labelOk = marker ? /게시판 목록/.test(c.label)
-      : kindOf(c.id) === 'kosaf' ? /한국장학재단/.test(c.label)
-        : /원문 공고/.test(c.label);
+    const labelOk = marker ? /게시판 목록/.test(c.label) : /원문 공고/.test(c.label);
     const line = `${c.id} · ${c.label} · ${c.href.slice(0, 92)}`;
     if (!labelOk) bad(`라벨이 실제 링크와 다릅니다 — ${line}`);
     else if (marker && !c.hasGuide) bad(`목록 링크인데 '목록에서 찾으세요' 안내가 없습니다 — ${line}`);
