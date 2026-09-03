@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
- "updatedAt": "2026-09-02",
- "count": 2268,
+ "updatedAt": "2026-09-03",
+ "count": 2267,
  "items": [
   {
    "title": "[공통][대출] 2026년 하반기분 통영시 대학생 학자금 이자 지원 공고(~3/25)",
@@ -36623,14 +36623,6 @@
    "school": "숙명여자대학교",
    "campus": "",
    "foundAt": "2026-07-05"
-  },
-  {
-   "school": "광운대학교",
-   "campus": "",
-   "title": "[등록/장학] 2026학년도 2학기 화도 및 동해장학금 1차 신청 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52803&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "foundAt": "2026-07-04",
-   "attachments": []
   }
  ]
 }
