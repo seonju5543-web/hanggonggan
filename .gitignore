@@ -15,3 +15,6 @@ _admin/dist/
 # 관리자 미리보기 (필요할 때 만들어 쓰는 일회용 파일)
 _admin/preview.html
 verify/tour/
+
+# 기술 고문 요청서 렌더용 한글 폰트 (40MB) — render.js 가 받아 온다
+docs/advisor/fonts/
