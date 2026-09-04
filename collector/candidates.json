@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
- "updatedAt": "2026-09-03",
- "count": 2267,
+ "updatedAt": "2026-09-04",
+ "count": 2263,
  "items": [
   {
    "title": "[공통][대출] 2026년 하반기분 통영시 대학생 학자금 이자 지원 공고(~3/25)",
@@ -36560,69 +36560,6 @@
    "school": "서울시립대학교",
    "campus": "",
    "foundAt": "2026-07-06"
-  },
-  {
-   "title": "[학생지원센터] 26년 미산 러닝 장학생 모집 ~ 7.03",
-   "url": "https://www.sookmyung.ac.kr/kr/news/event.do?mode=view&articleNo=94031",
-   "attachments": [],
-   "deadlineHint": null,
-   "school": "숙명여자대학교",
-   "campus": "",
-   "foundAt": "2026-07-05"
-  },
-  {
-   "title": "장학 2026년 1학기 2차 국가장학금 신청 안내 (2. 3. 09:00~3. 17. 18:00)",
-   "url": "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=91960",
-   "attachments": [
-    {
-     "name": "2. 2026년 1학기 국가장학금 2차 신청 현수막.jpg",
-     "url": "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=download&articleNo=91960&attachNo=44274"
-    },
-    {
-     "name": "3. 신입생 국가장학금 신청 여부 확인 매뉴얼.pdf",
-     "url": "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=download&articleNo=91960&attachNo=44275"
-    },
-    {
-     "name": "1. 2026년 1학기 국가장학금 2차 신청 포스터.jpg",
-     "url": "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=download&articleNo=91960&attachNo=44276"
-    }
-   ],
-   "deadlineHint": "신청기간 미준수’로 심사 탈락)&nbsp; ※ 2026년 1학기 국가장학금 2차 신청 일정 - 신청기간: 2026.",
-   "school": "숙명여자대학교",
-   "campus": "",
-   "foundAt": "2026-07-05"
-  },
-  {
-   "title": "장학 2026-2 국가장학금 1차 신청 안내 (5. 22. ~ 6. 22.)",
-   "url": "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=93518",
-   "attachments": [
-    {
-     "name": "붙임2 2026년 2학기 국가장학금 1차 신청매뉴얼(모바일앱).pdf",
-     "url": "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=download&articleNo=93518&attachNo=45107"
-    },
-    {
-     "name": "붙임1 2026년 2학기 국가장학금 1차 신청매뉴얼(홈페이지).pdf",
-     "url": "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=download&articleNo=93518&attachNo=45108"
-    }
-   ],
-   "deadlineHint": "신청기간 내 24시간 신청 가능(단, 신청 마감일은 18시 종료)&nbsp; 2. 서류제출 및 가구원 동의: &nb",
-   "school": "숙명여자대학교",
-   "campus": "",
-   "foundAt": "2026-07-05"
-  },
-  {
-   "title": "장학 2026-1 점프업 장학금 안내 (성적경고생 성적향상장학금)",
-   "url": "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=93779",
-   "attachments": [
-    {
-     "name": "붙임. 2026-1학기 JUMPUP 성적향상장학금 선발 안내.pdf",
-     "url": "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=download&articleNo=93779&attachNo=45242"
-    }
-   ],
-   "deadlineHint": null,
-   "school": "숙명여자대학교",
-   "campus": "",
-   "foundAt": "2026-07-05"
   }
  ]
 }
