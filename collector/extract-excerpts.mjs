@@ -553,19 +553,28 @@ let hit = 0, none = 0, kept = 0, cleaned = 0, fromDoc = 0, gotDeadline = 0;
    "본문 있을 땐 읽고 없을 땐 안 읽는" 어긋남이 안 생긴다. 스캔 PDF 등 글자가 안 나오는
    것은 조용히 건너뛴다(읽은 척하는 것보다 안 읽는 편이 낫다). */
 function qualFromDocs(it) {
-  /* 🔴 본문 경로와 **같은 2단**을 밟는다 — 1차(절 가르기)를 전부 먼저 보고, 아무 파일에서도
-     안 나올 때만 2차(scoop)로 물러난다. 예전엔 여기만 1차뿐이라, 본문에 있었으면 읽혔을
-     자격이 첨부에 있다는 이유로 조용히 버려졌다(울산연구원 공고문 HWP — 글자 5,167자를
-     멀쩡히 읽고도 `○ 지원대상 :` 줄을 한 줄도 못 건졌다).
-     ⚠️ 파일마다 1차→2차를 돌리면 안 된다 — 첫 파일의 약한 2차가 뒤 파일의 정확한 1차를
-     이겨 버린다. 1차는 언제나 2차보다 정확하다는 순서가 이 두 겹의 존재 이유다. */
-  const texts = [];
+  /* 🔴 여기는 **1차(절 가르기)뿐이다. 2차(scoop)를 붙이지 말 것** (2026-09-04, 붙였다가 되돌렸다).
+     본문 경로에는 `extractQualifyLines() || scoopQualifyLines()` 두 겹이 있어서 "첨부 경로도
+     같아야 대칭"이라고 생각하기 쉽다. **첨부는 본문이 아니다.**
+     · 게시판 본문은 짧은 글이지만 `--elig-attach` 가 받는 것은 **요강 전문**이다
+       (울산연구원 하반기 공고문 HWP = 888줄 · 분야별 표 5개 + 별지 서식).
+     · 2차는 절 경계를 안 보고 문서 전체를 훑으므로, 문서가 길면 **어느 분야의 기준인지가
+       통째로 사라진다.** 실측: 254행의 `직전학기 취득학점 12학점 이상, 성적 4.0/4.5 …` 은
+       **우수장학금 한 분야의 기준**인데(다자녀는 270행에 따로 있다) 그것이 공고 전체의
+       요건으로 승격돼, 다자녀·생활 분야로 지원할 수 있는 학생에게
+       **「지원 자격 미달」 배지가 붙고 신청 버튼이 잠겼다.**
+       그 변경으로 새로 채워진 공고는 저장소 전체에서 이 한 건뿐이었다 — 얻은 것 0, 잃은 것 1.
+     🔴 CLAUDE.md: **틀린 미달은 못 받는 것보다 나쁘다.** 못 뽑으면 '자격 원문 확인'으로
+     정직하게 남기고 버튼을 열어 둔다(푸른등대 기부장학금 22종도 같은 이유로 비워 둔다).
+     ⚠️ 기존 품질·자리·유형 축 셋 다 이 잡음을 못 잡았다 — scoop 이 admit 한 낱말
+     (`다자녀`·`대학생`)로 채점기도 판정하기 때문이다. 눈으로 보기 전엔 아무도 모른다.
+     분야별 요건을 제대로 다루려면 절이 아니라 **분야를 갈라 담는 구조**가 먼저 필요하다. */
   for (const f of (eligDocs[it.id] || {}).files || []) {
     const t = attachmentText(new URL(`extracted/${f}`, HERE).pathname);
-    if (readable(t)) texts.push(t);
+    if (!readable(t)) continue;
+    const got = extractQualifyLines(t);
+    if (got.length) return got;
   }
-  for (const t of texts) { const got = extractQualifyLines(t); if (got.length) return got; }
-  for (const t of texts) { const got = scoopQualifyLines(t); if (got.length) return got; }
   return [];
 }
 
