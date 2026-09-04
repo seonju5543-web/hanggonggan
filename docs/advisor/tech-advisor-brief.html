@@ -414,13 +414,14 @@ footer.end{border-top:1px solid var(--line);margin-top:20px;padding-top:8px;
     <tr><th style="width:20%">층</th><th style="width:26%">무엇</th><th style="width:34%">현재 상태</th><th style="width:20%">비용</th></tr>
     <tr><td>클라이언트</td><td>정적 PWA (HTML/CSS/바닐라 JS)</td><td>빌드·번들러·프레임워크 없음. 파일을 그대로 배포</td><td>0원</td></tr>
     <tr><td>호스팅</td><td>GitHub Pages (main 브랜치)</td><td>공개 저장소여야 무료. 비공개 전환 시 즉시 404</td><td>0원</td></tr>
-    <tr><td>자동화</td><td>GitHub Actions 27 워크플로</td><td>월 약 700분 사용 (무료 한도 2,000분의 35%)</td><td>0원</td></tr>
+    <tr><td>자동화</td><td>GitHub Actions 27 워크플로</td><td>공개 저장소라 <strong>실행 시간 무제한 무료</strong>. 사용량은 월 약 700분</td><td>0원</td></tr>
     <tr><td>서버리스</td><td>Cloudflare Workers ×4</td><td>푸시 1종 가동, 3종 미배포</td><td>0원 (무료 한도 내)</td></tr>
     <tr><td>인증·동기화</td><td>Supabase (fetch 4개 엔드포인트만)</td><td>SDK 미사용 — CSP <span class="mono">script-src 'self'</span> 준수 목적</td><td>0원</td></tr>
     <tr><td>AI</td><td>Claude API (초안 · 스키마화)</td><td>서류 1건 약 47원. 무료 규칙 경로 우선, 실패분만 API</td><td>사용량 과금</td></tr>
     <tr><td>관리자 화면</td><td>Cloudflare Pages + Access</td><td>가동 중 · 이메일 일회용 코드 잠금</td><td>0원</td></tr>
     <tr class="tot"><td>합계</td><td colspan="2">고정비 0원 구조. 상시 서버 없음</td><td>≈ 0원</td></tr>
   </table>
+  <p class="tbl-note">위 두 줄에서 <strong>“공개 저장소”가 두 번 나오는 것이 우연이 아닙니다</strong> — 배포도 로봇 실행도 저장소가 공개라서 공짜입니다. 비공개로 돌리면 앱이 즉시 404가 되고, 로봇의 실행 시간에도 월 2,000분 상한이 생깁니다(현재 700분). 즉 <em>지금은 로봇을 늘려도 예산이 걸리지 않습니다</em> — 질문 09가 비용이 아니라 정확도를 묻는 이유입니다.</p>
   <p class="tbl-note">이 “고정비 0원 · 상시 서버 없음”이 설계 제약의 핵심입니다. 학교와의 연동이 <strong>항상 켜져 있는 수신 서버</strong>를 요구한다면 구조가 처음으로 바뀝니다 — Q1과 Q3에서 이 점을 여쭙습니다.</p>
 
   <h3>2.4 코드 지도</h3>
