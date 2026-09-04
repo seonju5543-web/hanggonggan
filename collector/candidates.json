@@ -1,8 +1,40 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-09-04",
- "count": 2263,
+ "count": 2265,
  "items": [
+  {
+   "title": "[서울][국가근로] 2026학년도 2학기 국가근로장학생 모집 안내(추가)",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/265468/artclView.do",
+   "attachments": [
+    {
+     "name": "(서식)2026학년도 2학기 국가근로(추가모집) 지원서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150031/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간에 신청 하였으며 , &nbsp; 국가근로장학금 장학생 기본요건 ( 소득구간 &nbsp; 9 구간 이하 등",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-09-04"
+  },
+  {
+   "title": "(글로벌)(대청교)2026년 대학생 청소년 AI교육지원장학금 대학생 멘토 모집 안내",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/265542/artclView.do",
+   "attachments": [
+    {
+     "name": "붙임. 멘토 활동계획서 양식.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150070/download.do"
+    },
+    {
+     "name": "(공지)AI 대청교 활동기관-0904.xlsx",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150071/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026. 9. 4( 금 ) ~ 2026. 9. 18( 금 ) 15:00 &nbsp; 3. 신청방법 :",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-09-04"
+  },
   {
    "title": "[공통][대출] 2026년 하반기분 통영시 대학생 학자금 이자 지원 공고(~3/25)",
    "url": "https://dep.hufs.ac.kr/bbs/student/2431/265069/artclView.do",
