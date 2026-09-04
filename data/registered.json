@@ -143,7 +143,23 @@
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322415",
    "sourceKind": "official",
    "formId": "uiam-apply",
-   "aiTries": 1
+   "eligibilityPrev": {
+    "lines": null,
+    "excludes": null,
+    "priority": null,
+    "from": null
+   },
+   "eligibilityLines": [
+    "전국 대학(원)생 (휴학생 제외)"
+   ],
+   "amountLines": [
+    "총 규모 : 논문 4편 (400만원)",
+    "최우수상 1편 상장 및 장학금 (200만원)",
+    "우수상 1편 상장 및 장학금 (100만원)",
+    "장려상 2편 상장 및 장학금 (각 50만원)"
+   ],
+   "eligibilityFrom": "AI(공고 포스터 그림)",
+   "eligibilityReviewed": false
   },
   {
    "id": "reg-hufs-yuheungsu",
@@ -433,7 +449,22 @@
    "sourceUrl": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52884&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "sourceKind": "official",
    "listedAt": "2026-07-16",
-   "aiTries": 1
+   "eligibilityPrev": {
+    "lines": null,
+    "excludes": null,
+    "priority": null,
+    "from": null
+   },
+   "eligibilityLines": [
+    "가. 1) 포항·광양 지역 가정 자녀 중 2026년 대학 신입생",
+    "가. 2) 포항·광양 소재 고등학교 졸업자로서 2026년 대학 신입생",
+    "가. 3) 포항·광양 소재 대학교 2026년 우수성적 신입생",
+    "*북한이탈주민의 경우 경상북도, 전라남도 지역까지 지원 가능",
+    "나. 학업성적: 1학기 성적 3.0/4.5 이상",
+    "다. 소득구간 5분위 이하"
+   ],
+   "eligibilityFrom": "AI(공고 포스터 그림)",
+   "eligibilityReviewed": false
   },
   {
    "id": "reg-kosaf-daecheonggyo",
@@ -617,7 +648,24 @@
    "sourceUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30025&pageNo=1",
    "sourceKind": "official",
    "listedAt": "2026-07-16",
-   "aiTries": 1
+   "eligibilityPrev": {
+    "lines": null,
+    "excludes": null,
+    "priority": null,
+    "from": null
+   },
+   "eligibilityLines": [
+    "① 학업 성적 기준 : 국내 4년제 대학교 재학생으로서 25-2학기 성적의 평점 평균이 3.8/4.5점 이상",
+    "* 만점이 4.3점인 경우, 3.6/4.3점 이상",
+    "* 복학생인 경우, 휴학 직전학기 성적 기준",
+    "② 경제적 기준 : 아래 중 하나에 해당하는 자 · 기초생활수급자 · 차상위복지급여수급자",
+    "※ 두 가지 기준을 모두 충족하는 자"
+   ],
+   "amountLines": [
+    "학업지원 장학금 100만원 (1회 지급)"
+   ],
+   "eligibilityFrom": "AI(공고 포스터 그림)",
+   "eligibilityReviewed": false
   },
   {
    "id": "auto-rnoticedoarticleno154473",
@@ -842,16 +890,35 @@
    "sourceUrl": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52964&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "sourceKind": "official",
    "listedAt": "2026-07-30",
-   "aiTries": 1,
-   "eligibilityFrom": "공고문 첨부",
+   "eligibilityFrom": "AI(공고 포스터 그림)",
    "eligibilityLines": [
-    "◯ 심사기준 : 지원자의 적합성, 지원서의 충실성, 가정의 경제환경, 추천의 적절성 등을 고려하여 선발",
-    "󰊵 접수 및 문의",
-    "◯ 접수주소 : nohsy12@518.org (※우편접수 불가)",
-    "※ 제출서류 순서대로 1개의 pdf 또는 hwp 파일 형식으로 제출 필수",
-    "(서명 누락 또는 여러 파일을 압축하여 제출 시 미제출로 분류)",
-    "◯ 문의 : 5·18기념재단 행정지원실 장학사업 담당자(062-360-0516)"
-   ]
+    "대상 : 국내 대학 재학생(4년제ㆍ전문대 무관, 전공제한 없음) 중이고 국내 거주 중인 자 중 아래 조건에(택1)에 해당하는 자",
+    "① 민주화운동 및 국가폭력 피해자 (유)자녀",
+    "② 5·18정신(민주·인권·평화 등) 계승 공동체 기여 활동자"
+   ],
+   "eligibilityPrev": {
+    "lines": [
+     "◯ 심사기준 : 지원자의 적합성, 지원서의 충실성, 가정의 경제환경, 추천의 적절성 등을 고려하여 선발",
+     "󰊵 접수 및 문의",
+     "◯ 접수주소 : nohsy12@518.org (※우편접수 불가)",
+     "※ 제출서류 순서대로 1개의 pdf 또는 hwp 파일 형식으로 제출 필수",
+     "(서명 누락 또는 여러 파일을 압축하여 제출 시 미제출로 분류)",
+     "◯ 문의 : 5·18기념재단 행정지원실 장학사업 담당자(062-360-0516)"
+    ],
+    "excludes": null,
+    "priority": null,
+    "from": "공고문 첨부"
+   },
+   "eligibilityExcludes": [
+    "① 징계받은 자 또는 징계 의결 중인 자",
+    "② 장학생으로 선발되기에 품위를 손상한 사실이 있는 자",
+    "③ 5·18민주화운동 당사자 본인 및 희생(유)자녀, 국가폭력 피해 당사자 본인",
+    "④ 휴학 중인 자"
+   ],
+   "amountLines": [
+    "지원금액 : 1인당 100만원(생활비 장학금)"
+   ],
+   "eligibilityReviewed": false
   },
   {
    "id": "auto-c839d20ec84a0ebb09c20202",
@@ -1725,14 +1792,32 @@
    "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/264146/artclView.do",
    "sourceKind": "auto",
    "eligibilityLines": [
-    "3. 선발기준 : 100점 만점으로 하여, 50점(학업성적) + 50점(학생의 취창업의지 - 취창업 준비계획, 관련 자격증 및 실적 등)",
-    "+ 가산점(최대 10점, 저소득층 신청 및 서류제출 시)"
+    "대한민국 국적자로 선발학기 사업 참여대학에 재학 중인 자",
+    "일반대 3학년 이상 또는 전문대 2학년 이상 재학생",
+    "대학의 최소 이수 학점 이상을 이수하고, 직전 학기 성적이 백분위 70점(C0) 이상인 자"
    ],
    "excerpts": [
     "2) 신청방법 : ① 한국장학재단 홈페이지 ( www.kosaf.go.kr ) 또는 모바일앱을 통하여신청 →② 장학금신청서 작성",
     "☎ 관련문의 : 한국장학재단취업연계 지원사업 상담센터 1800-0499"
    ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "eligibilityPrev": {
+    "lines": [
+     "3. 선발기준 : 100점 만점으로 하여, 50점(학업성적) + 50점(학생의 취창업의지 - 취창업 준비계획, 관련 자격증 및 실적 등)",
+     "+ 가산점(최대 10점, 저소득층 신청 및 서류제출 시)"
+    ],
+    "excludes": null,
+    "priority": null,
+    "from": null
+   },
+   "eligibilityExcludes": [
+    "재학 학적 유지 (휴학, 자퇴, 제적 등 지원 불가)"
+   ],
+   "amountLines": [
+    "등록금 : 수혜 학기당 등록금 전액"
+   ],
+   "eligibilityFrom": "AI(공고 포스터 그림)",
+   "eligibilityReviewed": false
   },
   {
    "id": "auto-cb2ad20ec9588eb82b482f26",
