@@ -173,14 +173,21 @@ async function onboard(page, school = '외대') {
     await onboard(page);
     await page.waitForSelector('#notify-sheet:not([hidden])', { timeout: 8000 });
     const note = await page.textContent('#notify-sheet .sheet-note');
-    ok(/발송 서버가 없어요/.test(note), '동의 시트가 "아직 서버 없음"으로 정직하게 안내', note.slice(0, 30));
+    /* 🔴 **문구를 박지 말 것** — '발송 서버가 없어요' → '발송 서버 미연결' 로 바뀌면서
+       (78cf8ff 말투 정리) 이 줄이 죽어 있었다. 지켜야 할 것은 표현이 아니라
+       **거짓말을 안 하는 것**이다: 발송 서버가 없으면 '앱을 켜지 않아도 도착'이라고
+       말하면 안 된다. 그 한 문장이 이 검사의 존재 이유다. */
+    ok(/발송 서버/.test(note) && !/앱을 켜지 않아도/.test(note),
+      '동의 시트가 "아직 서버 없음"으로 정직하게 안내', note.slice(0, 40));
     await page.click('#btn-nf-allow');
     await page.waitForSelector('#notify-sheet', { state: 'hidden', timeout: 4000 });
 
     await page.click('.nav-item[data-nav="my"]');
     await page.waitForSelector('#my-notify:not([hidden])');
-    const pushTitle = await page.textContent('.nf-push-title');
-    ok(/준비 중/.test(pushTitle), 'MY에 "앱을 켜지 않아도 받기 — 준비 중"으로 표시', pushTitle);
+    /* ⚠️ 예전엔 MY 에 '앱을 켜지 않아도 받기 — 준비 중' 상자가 있었지만 2026-09-01 에
+       **완전히 없앴다**(da0c14e · CSS 규칙만 남아 있다). 그 상자가 하던 일
+       ('없는 기능을 약속하지 않는다')은 바로 위 동의 시트 문구와 아래 '켜기 버튼이
+       없다'가 이미 지킨다 — 없어진 상자를 다시 찾지 않는다. */
     ok(await page.$('#btn-nf-push') === null, '설정 전에는 켜기 버튼이 없음 (헛된 기대를 주지 않음)');
     ok(received.length === 0, '서버로 아무것도 보내지 않음', received);
     ok(errors.length === 0, '콘솔 오류 없음', errors);
@@ -235,11 +242,14 @@ async function onboard(page, school = '외대') {
   /* ② MY 화면 표시 */
   await page.click('.nav-item[data-nav="my"]');
   await page.waitForSelector('#my-notify:not([hidden])');
-  const onTitle = await page.textContent('.nf-push-title');
-  ok(/받는 중/.test(onTitle), 'MY에 "앱을 켜지 않아도 받는 중"으로 표시', onTitle);
-  ok(await page.$('.nf-push.nf-push-on') !== null, '켜진 상태가 눈에 띄게 표시됨');
-  const privacyNote = await page.textContent('.nf-push');
-  ok(/폰 주소와 학교/.test(privacyNote), '무엇이 서버로 가는지 화면에 밝힘');
+  /* 🔴 상자가 없어졌어도 **두 가지는 계속 지킨다** — 자리만 옮겨서 확인한다.
+     ① 켜진 것을 화면이 말한다 → 이제 맨 위 상태 줄(`.nf-status`)이 맡는다
+        (da0c14e: "켜졌는지는 맨 위 상태 줄이 말한다").
+     ② 무엇이 서버로 가는지 밝힌다 → 이제 **동의 시트**에 있다(같은 커밋: "서버에 무엇이
+        저장되는지는 알림을 처음 켤 때 뜨는 동의 시트에 그대로 있다"). 위에서 읽어 둔 note2 로 본다. */
+  const onStatus = await page.textContent('#my-notify .nf-status');
+  ok(/켜짐/.test(onStatus), 'MY 상태 줄이 "켜짐"으로 말한다', onStatus);
+  ok(/폰 주소·학교|폰 주소와 학교/.test(note2), '무엇이 서버로 가는지 동의 시트에서 밝힘', note2.slice(0, 60));
   await page.screenshot({ path: `${__dirname}/shot-push-03-on.png` });
 
   /* ④ 별도 스위치는 없앴다 (2026-08-06 개발자 지시) — 알림을 켜면 곧 기본값 */
