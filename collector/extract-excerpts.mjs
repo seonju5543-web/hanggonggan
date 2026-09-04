@@ -553,12 +553,19 @@ let hit = 0, none = 0, kept = 0, cleaned = 0, fromDoc = 0, gotDeadline = 0;
    "본문 있을 땐 읽고 없을 땐 안 읽는" 어긋남이 안 생긴다. 스캔 PDF 등 글자가 안 나오는
    것은 조용히 건너뛴다(읽은 척하는 것보다 안 읽는 편이 낫다). */
 function qualFromDocs(it) {
+  /* 🔴 본문 경로와 **같은 2단**을 밟는다 — 1차(절 가르기)를 전부 먼저 보고, 아무 파일에서도
+     안 나올 때만 2차(scoop)로 물러난다. 예전엔 여기만 1차뿐이라, 본문에 있었으면 읽혔을
+     자격이 첨부에 있다는 이유로 조용히 버려졌다(울산연구원 공고문 HWP — 글자 5,167자를
+     멀쩡히 읽고도 `○ 지원대상 :` 줄을 한 줄도 못 건졌다).
+     ⚠️ 파일마다 1차→2차를 돌리면 안 된다 — 첫 파일의 약한 2차가 뒤 파일의 정확한 1차를
+     이겨 버린다. 1차는 언제나 2차보다 정확하다는 순서가 이 두 겹의 존재 이유다. */
+  const texts = [];
   for (const f of (eligDocs[it.id] || {}).files || []) {
     const t = attachmentText(new URL(`extracted/${f}`, HERE).pathname);
-    if (!readable(t)) continue;
-    const got = extractQualifyLines(t);
-    if (got.length) return got;
+    if (readable(t)) texts.push(t);
   }
+  for (const t of texts) { const got = extractQualifyLines(t); if (got.length) return got; }
+  for (const t of texts) { const got = scoopQualifyLines(t); if (got.length) return got; }
   return [];
 }
 

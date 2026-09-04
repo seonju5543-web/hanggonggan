@@ -1966,6 +1966,23 @@ console.log('\n■ AI 자격 읽기 안전장치 (2026-08-20)');
      전부 건너뛴다(실제로 return 으로 썼다가 잡았다). */
   eq('    그 가드는 continue 다 (return 이면 나머지 공고를 다 건너뛴다)',
     /eligibilityFrom \|\| ''\)\) \{ kept \+= 1; continue; \}/.test(xs), true);
+  /* 🔴 **첨부 경로도 본문 경로와 같은 2단을 밟아야 한다** (2026-09-04).
+     본문 경로는 `extractQualifyLines() || scoopQualifyLines()` 두 겹인데 첨부 경로
+     (qualFromDocs)는 1차뿐이었다. 그래서 **본문에 있었으면 읽혔을 자격이 첨부에 있다는
+     이유만으로 조용히 버려졌다** — 울산연구원 공고문 HWP 는 글자 5,167자를 멀쩡히 읽고도
+     `○ 지원대상 : 관내 …` 줄을 한 줄도 못 건졌다(1차가 0줄, 2차는 6줄).
+     파일 첫머리 주석이 "본문 경로와 원문 없는 경로가 같은 함수를 써야 어긋남이 안 생긴다"고
+     적어 두었는데, 정작 코드가 그 말을 반만 지키고 있었다. */
+  {
+    const qfd = xs.slice(xs.indexOf('function qualFromDocs'));
+    const body = qfd.slice(0, qfd.indexOf('\nfunction ', 1));
+    eq('  첨부 경로도 1차(절 가르기)를 쓴다', /extractQualifyLines\(/.test(body), true);
+    eq('    2차(scoop)로 물러날 줄도 안다', /scoopQualifyLines\(/.test(body), true);
+    /* ⚠️ 파일마다 1차→2차를 돌리면 첫 파일의 약한 2차가 뒤 파일의 정확한 1차를 이긴다.
+       1차를 전부 본 뒤에 2차로 넘어가야 한다 — 두 반복문이 갈라져 있는 것이 그 증거다. */
+    eq('    1차를 전부 본 뒤에 2차로 넘어간다',
+      body.indexOf('extractQualifyLines(') < body.indexOf('scoopQualifyLines('), true);
+  }
   /* 🔴 이 경로는 출처를 **'AI(공고문 PDF)'**로 남겨 번호 경로와 구분한다 —
      화면 표식은 같지만, 나중에 되짚을 때 어느 계약으로 들어온 글자인지 알아야 한다. */
   const src = fs.readFileSync(new URL('../collector/eligibility-ai.mjs', import.meta.url), 'utf8');

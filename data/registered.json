@@ -1876,7 +1876,29 @@
     }
    ],
    "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/263952/artclView.do",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "eligibilityPrev": {
+    "lines": null,
+    "excludes": null,
+    "priority": null,
+    "from": null
+   },
+   "eligibilityLines": [
+    "대한민국 국적자로 최종 학력이 고졸인 자",
+    "※ 일부 전문학사 취득자 지원 가능 (상세 내용은 누리집 참고)",
+    "직전 학기 성적이 백분위 70점(C0) 이상인 자",
+    "재직기간이 2년 이상인 자 (※ 현 중소·중견기업 재직자는 1년 이상)",
+    "현재 지원 대상 기업에 재직 중인 자 (※ 지원 대상 기업 : 중소·중견기업, 대기업·비영리기관 / 가족기업, 공공기관 등은 제외)"
+   ],
+   "eligibilityExcludes": [
+    "재학 학적 유지 ※ 휴학, 자퇴, 제적 등 지원 불가, 해당 학기 장학금 전액 반환"
+   ],
+   "amountLines": [
+    "중소·중견기업 : 수혜 학기 등록금 전액",
+    "대기업·비영리기관 : 수혜 학기 등록금 50%"
+   ],
+   "eligibilityFrom": "AI(공고 포스터 그림)",
+   "eligibilityReviewed": false
   },
   {
    "id": "auto-ent2431263956artclviewdo",
@@ -1908,7 +1930,16 @@
     }
    ],
    "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/263956/artclView.do",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "○ 선발분야 : 우수‧다자녀‧생활‧재능‧지역정착청년인재장학금(5종)",
+    "○ 지원대상 : 관내 초‧중‧고등학생, 대학교 신입생 및 재학생",
+    "다자녀장학금",
+    "초‧중‧고등학생, 대학생",
+    "※ 우수‧다자녀 장학금의 경우 본인 부담금(등록금)이 없을 경우 신청불가",
+    "• 직전학기 취득학점이 12학점 이상, 성적이 4.0/4.5 또는 3.7/4.3 이상인 학생"
+   ],
+   "eligibilityFrom": "공고문 첨부"
   },
   {
    "id": "auto-oardid322850menuno200318",
@@ -1953,7 +1984,25 @@
     }
    ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322850",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "eligibilityPrev": {
+    "lines": null,
+    "excludes": null,
+    "priority": null,
+    "from": null
+   },
+   "eligibilityLines": [
+    "선발대상 : 4년제 대학교 3~4학년 재학생",
+    "(1) 시각디자인 전공자 및 판화학과 재학생",
+    "(2) 한국장학재단 \"학자금 지원구간 7구간\" 이내의 학생(2026년 2학기 기준)",
+    "(3) 성적기준 상회하는 자(최근 1년 평균성적 B+학점 이상_ 3.5/4.5 이상)",
+    "(4) 기업체 학술연수 및 입사 조건부 장학금을 받지 않는 자"
+   ],
+   "amountLines": [
+    "장학금액 : 100만원"
+   ],
+   "eligibilityFrom": "AI(공고문 PDF)",
+   "eligibilityReviewed": false
   },
   {
    "id": "auto-oardid321881menuno200318",
@@ -1990,7 +2039,22 @@
     }
    ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=321881",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "eligibilityPrev": {
+    "lines": null,
+    "excludes": null,
+    "priority": null,
+    "from": null
+   },
+   "eligibilityLines": [
+    "(신청자격) 세종특별자치시 초·중·고·대학생(재학생)",
+    "※각 분야별 상이하며, 신청 자격은 장학금 수혜 시까지 지속해야 함"
+   ],
+   "eligibilityExcludes": [
+    "각 분야별 중복 신청은 가능하나 중복 수혜 불가함"
+   ],
+   "eligibilityFrom": "AI(공고 포스터 그림)",
+   "eligibilityReviewed": false
   },
   {
    "id": "auto-ent2431264952artclviewdo",
