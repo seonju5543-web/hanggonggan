@@ -151,7 +151,7 @@ footer.end{border-top:1px solid var(--line);margin-top:20px;padding-top:8px;
     <div class="cover-kicker">한대장 · 기술 고문 요청서 · 2026.09.03</div>
   </div>
   <h1>학교 장학 시스템에<br>신청을 밀어 넣는 방법</h1>
-  <p class="sub">대학생 장학금 앱 <strong>한대장</strong>은 공고 수집·자격 매칭·서류 준비·<strong>공고 원본과 동일한 구조의 신청서 생성</strong>까지 동작합니다. 남은 것은 마지막 한 걸음 — 학교 포털에 실제로 제출하는 일입니다. 이 문서는 그 한 걸음을 설계하기 위해 <strong>앱의 구조·코드·데이터를 전부 공개</strong>하고, 개발 관점에서 답이 필요한 다섯 가지를 정리한 것입니다.</p>
+  <p class="sub">대학생 장학금 앱 <strong>한대장</strong>은 공고 수집·자격 매칭·서류 준비·<strong>공고 원본과 동일한 구조의 신청서 생성</strong>까지 동작합니다. 남은 것은 마지막 한 걸음 — 학교 포털에 실제로 제출하는 일입니다. 이 문서는 그 한 걸음을 설계하기 위해 <strong>앱의 구조·코드·데이터를 전부 공개</strong>하고, 개발 관점에서 답이 필요한 <strong>열 가지</strong>를 정리한 것입니다 — 앞의 다섯은 <strong>학교와 잇는 방법</strong>, 뒤의 다섯은 <strong>지금 만들어 둔 구조가 그 무게를 견디는가</strong>입니다.</p>
 
   <div class="ask-box">
     <h3>이 문서가 요청하는 것</h3>
@@ -161,6 +161,14 @@ footer.end{border-top:1px solid var(--line);margin-top:20px;padding-top:8px;
       <li><strong>신청 데이터 계약과 멱등성</strong> — 재전송·중복·부분 실패·접수 확인을 어떻게 설계하나</li>
       <li><strong>현 구조의 기술 리스크 리뷰</strong> — 이대로 학교와 붙였을 때 터질 곳</li>
       <li><strong>90일 실행 계획</strong> — 협약 없이 지금 작동시킬 수 있는 것의 순서와 최소 구현</li>
+    </ol>
+    <h3 style="margin-top:14px">그리고 지금의 구조에 대하여</h3>
+    <ol start="6">
+      <li><strong>회원 데이터 모델</strong> — 프로필·신청내역을 jsonb 한 칸에 통째로 넣어도 되는가</li>
+      <li><strong>확장성</strong> — 사용자가 늘면 가장 먼저 터지는 곳은 어디인가</li>
+      <li><strong>SDK 없이 직접 호출</strong> — 보안 정책을 지키려 택한 방식의 대가는 무엇인가</li>
+      <li><strong>수집 범위</strong> — 외부 공고를 전부 수집하는 것이 맞는가</li>
+      <li><strong>개발 방식</strong> — AI와 대화하며 만든 코드의 한계선은 어디인가</li>
     </ol>
   </div>
 
@@ -187,9 +195,11 @@ footer.end{border-top:1px solid var(--line);margin-top:20px;padding-top:8px;
       <span class="d">시스템 구성 · 스택 · 코드 지도 · 데이터 파이프라인 · 데이터 모델 · 학생 프로필 33값 · 저장/보안 경계 · 현재 신청 플로우 · 미배포 자산</span></div></li>
     <li><span class="n">03</span><div class="ti"><span class="t">문제 — 실측 121건이 말하는 것</span>
       <span class="d">채널 분포 · 포털형 18건 · 구현 후보 5안 포지셔닝 · 우리 추정치</span></div></li>
-    <li><span class="n">04</span><div class="ti"><span class="t">질문 다섯</span>
+    <li><span class="n">04</span><div class="ti"><span class="t">질문 다섯 — 학교 연동</span>
       <span class="d">Q1 연동 아키텍처 · Q2 인증·세션 · Q3 데이터 계약과 멱등성 · Q4 구조 리스크 리뷰 · Q5 90일 실행 계획</span></div></li>
-    <li><span class="n">05</span><div class="ti"><span class="t">부록</span>
+    <li><span class="n">05</span><div class="ti"><span class="t">질문 다섯 — 지금의 구조</span>
+      <span class="d">Q6 회원 데이터 모델 · Q7 확장성 · Q8 SDK 없이 직접 호출 · Q9 수집 범위 · Q10 개발 방식</span></div></li>
+    <li><span class="n">06</span><div class="ti"><span class="t">부록</span>
       <span class="d">A 답변 후 우리가 정할 것 · B 이 문서 밖의 질문 · C 파일 트리 · D 용어 · E 접근 방법</span></div></li>
   </ol>
 
@@ -939,7 +949,7 @@ await fetch('https://api.resend.com/emails', {
 
 <!-- ════════════════ 04 질문 ════════════════ -->
 <section class="sec" style="page-break-after:avoid">
-  <h2><span class="hn">04</span>질문 다섯</h2>
+  <h2><span class="hn">04</span>질문 다섯 — 학교 연동</h2>
   <p class="sec-lead">각 질문은 <em>답에 따라 우리가 만들 물건이 실제로 달라지는 것</em>만 골랐습니다. 질문마다 ① 여쭙는 문장 ② 우리 상황 ③ 우리 가설 ④ 받고 싶은 답의 형태를 붙였습니다. ③을 적은 이유는, 저희 판단이 틀렸다면 그것을 먼저 알려 주시는 것이 가장 큰 도움이기 때문입니다.</p>
 </section>
 
@@ -1148,9 +1158,191 @@ await fetch('https://api.resend.com/emails', {
   </div>
 </section>
 
-<!-- ════════════════ 05 부록 ════════════════ -->
+<!-- ════════════════ 05 질문 다섯 — 지금의 구조 ════════════════ -->
+<section class="sec" style="page-break-after:avoid">
+  <h2><span class="hn">05</span>질문 다섯 — 지금의 구조</h2>
+  <p class="sec-lead">앞의 다섯이 <em>학교와 어떻게 이을 것인가</em>라면, 이 다섯은 <em>지금 만들어 둔 것이 그 무게를 견디는가</em>입니다. 연동을 시작하면 이 구조 위에 학교 데이터가 얹히므로, 먼저 여쭙는 편이 낫다고 판단했습니다. 형식은 앞과 같습니다 — ① 여쭙는 문장 ② 우리 상황 ③ 우리 가설 ④ 받고 싶은 답의 형태.</p>
+</section>
+
+<!-- Q6 -->
+<section class="q">
+  <div class="q-head">
+    <div class="q-no">질문 06 · 회원 데이터 모델</div>
+    <h3 class="q-title" style="border:0;padding:0">프로필과 신청내역을 jsonb 한 칸에 통째로 넣어도 됩니까</h3>
+  </div>
+
+  <div class="q-ask">
+    <p>회원 데이터를 <strong>표 하나(<span class="mono">profiles</span>)</strong>에 넣고, 학생 프로필 33값과 신청내역 전체를 <strong>각각 jsonb 한 칸</strong>에 통째로 저장하고 있습니다. 이대로 가도 됩니까, 아니면 지금이라도 항목별로 칸을 쪼개야 합니까? <em>쪼개야 한다면 무엇을 기준으로 어디까지</em> 쪼개는 것인지 알고 싶습니다.</p>
+    <p class="q-sub">쪼개지 않은 이유는 <strong>앱의 프로필 구조가 이미 두 번 바뀌었기 때문</strong>입니다(분교·캠퍼스 구분 도입, 적합도 필드 추가 — 앱 안에 이전 코드가 남아 있습니다). 칸으로 쪼개면 앱을 고칠 때마다 DB 설계도 함께 고쳐야 하고, 안 고치면 값이 조용히 사라집니다. 다만 이 선택이 나중에 어떤 대가로 돌아오는지를 저희가 모릅니다.</p>
+  </div>
+
+  <h4>우리 상황</h4>
+  <ul class="b">
+    <li>표는 하나입니다 — <span class="mono">user_id</span>(기본키) · <span class="mono">profile</span> jsonb · <span class="mono">applications</span> jsonb · <span class="mono">sensitive_ok</span> boolean · <span class="mono">updated_at</span>. 그 외 표는 없습니다.</li>
+    <li>방어선은 <strong>행 단위 접근 규칙(RLS) 하나뿐</strong>입니다 — “<span class="mono">auth.uid() = user_id</span>일 때만”. 즉 <strong>서버는 “누구의 행인가”만 보고, 칸 안의 내용은 전혀 검증하지 않습니다.</strong></li>
+    <li>동기화는 <strong>행 통째로 최신이 이깁니다</strong>(<span class="mono">updated_at</span> 비교 · last-write-wins). 저장할 때마다 보내지 않고 2초 묶어 한 번 upsert 합니다.</li>
+    <li>기기가 원본이고 서버는 사본입니다. 주민등록번호·계좌번호는 아예 올라가지 않고, 특별자격은 동의했을 때만 올라갑니다(그림 4).</li>
+  </ul>
+
+  <div class="hyp">
+    <b>우리 가설</b> — 지금 규모에서는 jsonb 통짜가 맞고, <b>자주 찾는 값 몇 개(학교·캠퍼스 정도)만 따로 빼 두면</b> 충분하다고 봅니다. 그러나 두 가지가 걸립니다. ① <b>두 기기에서 각각 다른 곳을 고치면 한쪽 변경이 통째로 사라집니다</b> — 행 전체를 덮어쓰기 때문입니다. ② 서버가 내용을 안 보므로, 학생이 임의의 값을 넣어도 막을 지점이 없습니다. 연동이 되면 이 값이 학교로 넘어갑니다.
+  </div>
+
+  <div class="want">
+    <h4>받고 싶은 답의 형태</h4>
+    <ul class="b">
+      <li><strong>“여기까지는 jsonb, 여기부터는 칸”</strong>의 선. 판단 기준까지 주시면 저희가 이후에 스스로 적용하겠습니다.</li>
+      <li>칸 단위 병합이 <strong>반드시 필요해지는 시점</strong>의 신호 — 그 전에는 안 해도 되는지.</li>
+      <li>내용 검증을 어디에 두어야 합니까 — DB 제약(CHECK)인지, 서버 함수인지, 아니면 클라이언트로 충분한지.</li>
+      <li>나중에 쪼개야 할 때 <strong>이미 쌓인 데이터를 옮기는 방법</strong>(무중단이 가능한지).</li>
+    </ul>
+  </div>
+</section>
+
+<!-- Q7 -->
+<section class="q">
+  <div class="q-head">
+    <div class="q-no">질문 07 · 확장성</div>
+    <h3 class="q-title" style="border:0;padding:0">사용자가 늘면 가장 먼저 터지는 곳은 어디입니까</h3>
+  </div>
+
+  <div class="q-ask">
+    <p>지금은 사용자가 사실상 없습니다. 학생이 100명, 1,000명, 10,000명이 됐을 때 <strong>어느 층이 가장 먼저 무너집니까?</strong> 저희는 짚이는 곳이 몇 군데 있지만, 그것이 정말 첫 번째인지 판단할 근거가 없습니다.</p>
+    <p class="q-sub">함께 여쭙고 싶은 것은 <strong>“터지기 전에 어떻게 알아채는가”</strong>입니다. 지금은 무엇이 얼마나 쓰이는지 재는 장치가 없어서, 문제가 생기면 학생이 알려 주기 전까지 모릅니다. 상시 서버가 없는 구조에서 계측을 어디에 어떻게 붙여야 합니까?</p>
+  </div>
+
+  <h4>우리 상황 — 저희가 아는 한계값</h4>
+  <ul class="b">
+    <li><strong>공고 목록을 통째로 내려받습니다.</strong> 앱은 <span class="mono">notices.json</span> 368 KB를 전부 받아 자기 학교 것만 고릅니다. 학교별로 파일이 나뉘어 있지 않아, 실측 기준 <strong>50~100개교</strong>가 한계입니다(현재 등록 2개교).</li>
+    <li><strong>GitHub Actions</strong> — 공개 저장소인 동안은 무제한이라 제약이 아닙니다. 비공개로 전환하면 그 순간 월 2,000분이 상한이 되고, 현재 사용량은 약 700분입니다.</li>
+    <li><strong>Supabase·Cloudflare 모두 무료 등급</strong>입니다. 어느 지표가 먼저 한도에 닿는지 저희는 모릅니다.</li>
+    <li><strong>푸시 발송</strong>은 2분마다 25대씩 보냅니다 — 수백 명까지는 무해하다고 계산했지만 실제로 겪어 본 적은 없습니다.</li>
+    <li><strong>공고 검수는 사람이 합니다.</strong> 애매한 공고는 자동 등록하지 않고 개발자가 직접 판단합니다(그림 3).</li>
+  </ul>
+
+  <div class="hyp">
+    <b>우리 가설</b> — <b>기술보다 사람이 먼저 막힌다</b>고 봅니다. 서버는 사용자가 늘어도 거의 그대로인데(판단이 전부 학생 기기 안에서 일어나므로), 공고 검수는 학교가 늘수록 선형으로 늘고 한 명이 합니다. 기술 쪽에서 첫 번째는 <b>공고 목록 통짜 다운로드</b>라고 보고, 학교가 40곳쯤 될 때 학교별 파일로 나눌 계획입니다. 이 순서가 맞습니까?
+  </div>
+
+  <div class="want">
+    <h4>받고 싶은 답의 형태</h4>
+    <ul class="b">
+      <li>무너지는 <strong>순서</strong>와, 그렇게 보시는 이유. 저희 가설에서 틀린 것이 있으면 그것부터.</li>
+      <li>100명 · 1,000명 · 10,000명 <strong>각 시점에 무엇이 달라지는지</strong> — 특히 “이때는 구조를 바꿔야 한다”는 지점.</li>
+      <li>상시 서버 없이 <strong>계측을 붙이는 최소 구성</strong>(무엇을 재야 하고, 어디에 남겨야 하는지).</li>
+      <li>저희가 <strong>과하게 걱정하고 있는 것</strong>이 있다면 그것도 알려 주십시오 — 안 해도 될 일에 시간을 쓰고 싶지 않습니다.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- Q8 -->
+<section class="q">
+  <div class="q-head">
+    <div class="q-no">질문 08 · SDK 없이 직접 호출</div>
+    <h3 class="q-title" style="border:0;padding:0">보안 정책을 지키려고 SDK를 안 쓰는데, 그 대가가 무엇입니까</h3>
+  </div>
+
+  <div class="q-ask">
+    <p>로그인·동기화에 Supabase를 쓰지만 <strong>공식 SDK를 쓰지 않고 주소 4개를 fetch로 직접 부릅니다.</strong> 앱의 보안 정책이 <span class="mono">script-src 'self'</span>라 외부 스크립트를 실행할 수 없기 때문입니다 — 그 차단은 “수집한 공고 데이터가 오염돼도 코드 실행으로 이어지지 않는다”는 이 앱의 보안 근거 그 자체라, 풀고 싶지 않았습니다. <strong>이 선택의 위험은 무엇입니까?</strong></p>
+    <p class="q-sub">SDK가 대신 해 주던 일을 저희가 직접 짰습니다 — 토큰 저장, 만료 1분 전 갱신, 401이면 한 번 갱신 후 재시도. <strong>특히 의심스러운 자리가 하나 있습니다</strong>: Supabase는 갱신 토큰을 한 번 쓰면 새것으로 바꾸는데(회전), 탭이 여러 개이거나 여러 요청이 동시에 만료를 맞으면 <em>각자 갱신을 시도해 서로의 토큰을 무효로 만들고 로그인이 통째로 풀리지 않습니까?</em> 이것이 실제 결함인지, 그렇다면 fetch만으로 어떻게 막는지 알고 싶습니다.</p>
+  </div>
+
+  <h4>우리 상황</h4>
+  <ul class="b">
+    <li>부르는 주소는 넷뿐입니다 — 가입/로그인/토큰갱신(<span class="mono">/auth/v1/…</span>), 내 정보, 로그아웃, 프로필 읽기·쓰기(<span class="mono">/rest/v1/profiles</span>). 외부 의존성은 0개입니다.</li>
+    <li>토큰(접속·갱신 둘 다)은 <span class="mono">localStorage</span>에 둡니다. 비밀번호는 저장하지 않고, 이메일 한 줄만 ‘아이디 저장’으로 남깁니다.</li>
+    <li><strong>서비스워커는 로그인을 모릅니다</strong> — 백그라운드 알림이 서버에 붙는 경로를 만들지 않으려고 일부러 그렇게 했습니다.</li>
+    <li>공개 열쇠(anon key)는 브라우저에 그대로 나갑니다. 숨길 수 없는 값이라, 실제 방어는 RLS 하나에 걸려 있습니다(질문 06).</li>
+  </ul>
+
+  <div class="hyp">
+    <b>우리 가설</b> — 보안 정책을 지키는 값이 SDK의 편의보다 크다고 보아 이 선택을 유지하려 합니다. 다만 <b>동시 갱신 문제는 진짜 결함일 가능성이 높다</b>고 의심하고 있고, 갱신 토큰을 <span class="mono">localStorage</span>에 두는 것도 마음에 걸립니다. 그리고 라이브러리가 조용히 고쳐 주던 것(주소 변경·보안 패치)을 저희는 받지 못한다는 점이 장기적으로 어떻게 돌아올지 모르겠습니다.
+  </div>
+
+  <div class="want">
+    <h4>받고 싶은 답의 형태</h4>
+    <ul class="b">
+      <li>이 방식의 <strong>진짜 위험을 순서대로</strong> — 저희가 걱정하는 것과 실제로 위험한 것이 다르다면 그것부터.</li>
+      <li>동시 갱신을 <strong>fetch만으로 막는 표준 방법</strong>(있다면 이름만 알려 주셔도 저희가 찾아 구현하겠습니다).</li>
+      <li>토큰을 어디에 두어야 합니까 — 지금 위치가 괜찮은지, 아니면 옮겨야 하는지.</li>
+      <li>보안 정책을 <strong>깨지 않으면서</strong> SDK를 쓰는 길이 있는지(예: 직접 묶어서 자체 파일로 배포).</li>
+    </ul>
+  </div>
+</section>
+
+<!-- Q9 -->
+<section class="q">
+  <div class="q-head">
+    <div class="q-no">질문 09 · 수집 범위</div>
+    <h3 class="q-title" style="border:0;padding:0">외부 공고를 전부 수집하는 것이 맞습니까</h3>
+  </div>
+
+  <div class="q-ask">
+    <p>김성민 교수님께서 <strong>“외부 공고를 전부 수집하는 것이 좋다”</strong>고 조언해 주셨습니다. 지금은 로봇이 교내 장학 게시판과 한국장학재단만 훑고 있는데, 대상을 전국 외부 공고까지 넓히려 합니다. <strong>이것을 오류 없이 감당할 수 있습니까?</strong> 그리고 “전부”의 현실적인 크기를 어디로 잡아야 합니까?</p>
+    <p class="q-sub">비용부터 정리하면, <strong>공개 저장소인 동안 로봇 실행은 무제한 무료</strong>라 예산은 제약이 아닙니다(비공개로 돌릴 때만 월 2,000분이 상한이 되고, 현재 700분입니다). 그래서 저희가 실제로 걱정하는 것은 비용이 아니라 <strong>정확도</strong>입니다 — 게시판 형식이 제각각인 외부 공고를 대량으로 넣으면, <em>못 읽은 자격 요건과 잘못 만든 신청서 양식이 학생 화면에 그대로 나갑니다.</em></p>
+  </div>
+
+  <h4>우리 상황</h4>
+  <ul class="b">
+    <li>지금도 자격 요건과 양식 스키마화는 <strong>공고 원문의 구조에 크게 좌우됩니다.</strong> 절 머리글이 없거나 첨부 안에만 내용이 있으면 판독률이 떨어집니다.</li>
+    <li>이미 <strong>2층 구조를 쓰고 있습니다</strong> — 한국장학재단 재단 116곳은 목록과 링크만 보여 주고, 자격 진단·양식 작성을 붙이지 않습니다. 재단이 적어 둔 칸을 그대로 옮길 뿐입니다.</li>
+    <li>잘못된 데이터는 <strong>감사 관문</strong>이 막습니다(그림 3). 다만 이 관문은 “규칙에 어긋나는가”를 볼 뿐, <em>“원문을 제대로 읽었는가”는 보지 못합니다.</em></li>
+    <li>공고가 늘면 앱이 내려받는 파일도 함께 커집니다(질문 07의 첫 번째 한계값).</li>
+  </ul>
+
+  <div class="hyp">
+    <b>우리 가설</b> — 대량 수집분은 <b>정식 등록(매칭·자격 진단·양식 작성)에 넣지 않고 ‘목록·링크만 보여 주는 층’으로 따로 둔다</b>는 것이 저희 안입니다. 자격 진단과 양식 작성은 사람이 원문을 검수한 공고에만 붙입니다. 이렇게 하면 수집을 몇 배로 늘려도 <b>틀린 판정이 학생에게 나가지 않습니다</b> — 대신 대부분의 공고에서 앱이 해 주는 일이 “있다고 알려 주는 것”뿐이 됩니다. 이 맞바꿈이 옳은지 판단이 서지 않습니다.
+  </div>
+
+  <div class="want">
+    <h4>받고 싶은 답의 형태</h4>
+    <ul class="b">
+      <li>이 <strong>2층 구조가 맞는지</strong>, 아니면 다른 방식이 있는지.</li>
+      <li>대량 수집에서 <strong>품질을 자동으로 재는 방법</strong> — 사람이 다 볼 수 없는데 무엇이 틀렸는지 알아야 합니다.</li>
+      <li>크롤링을 그만두고 <strong>제휴·제공받기로 넘어가야 하는 지점</strong>이 있다면 그 신호.</li>
+      <li>남의 사이트를 대량으로 읽을 때 <strong>넘으면 안 되는 선</strong>(접속 빈도, robots.txt, 원문 재게시 범위 등) — 기술 관행 수준에서.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- Q10 -->
+<section class="q">
+  <div class="q-head">
+    <div class="q-no">질문 10 · 개발 방식</div>
+    <h3 class="q-title" style="border:0;padding:0">AI와 대화하며 만든 코드의 한계선을 어디로 봐야 합니까</h3>
+  </div>
+
+  <div class="q-ask">
+    <p>이 문서에 적은 것 전부 — 앱, 로봇 47개, 검증 드라이버 42개, 서버 코드까지 — 를 <strong>AI와 대화하며 만들었습니다</strong>(이른바 바이브 코딩). 속도는 빠르지만, <strong>저희 힘으로는 품질을 판단할 수 없습니다.</strong> 이 방식이 어디까지 버티고, 어디부터 사람이 잡아야 합니까?</p>
+    <p class="q-sub">이 질문을 드리는 이유는 실제로 겪은 두 가지 때문입니다. ① <strong>같은 유형의 버그가 반복해서 돌아옵니다</strong> — 고쳤다고 확인한 것이 몇 주 뒤 다른 모습으로 다시 나왔고, 한 유형은 다섯 번까지 반복됐습니다. ② <strong>검사 자체가 조용히 죽어 있었습니다</strong> — 2026-08-29에 세어 보니 검사 31개 중 자동으로 실행되던 것은 5개였고, 손으로 돌려 보니 7개는 이미 깨진 채였습니다. <em>그동안 화면은 계속 초록불이었습니다.</em></p>
+  </div>
+
+  <h4>우리 상황</h4>
+  <ul class="b">
+    <li>지금의 대응은 <strong>“고칠 때마다 그 자리를 지키는 검사를 함께 만든다”</strong>입니다. 그래서 검증 드라이버가 42개, 데이터 감사 관문이 저장 직전에 있습니다. 규칙을 되돌리면 검사가 즉시 실패합니다.</li>
+    <li>판정 규칙은 <strong>절대 복사하지 않습니다</strong> — 화면·서비스워커·감사 도구가 같은 파일을 불러 씁니다. 규칙이 두 벌이 되어 “화면에서 숨긴 공고를 알림이 알리는” 모순이 실제로 났기 때문입니다.</li>
+    <li>그럼에도 <strong>저희는 코드를 읽어 판단하지 못합니다.</strong> 화면에 보이는 것과 검사 결과만 보고 믿습니다.</li>
+    <li>앞으로 개발자를 두거나 외주를 줄 가능성이 있습니다. 지금 코드를 <strong>다른 사람이 이어받을 수 있는 상태인지</strong> 모릅니다.</li>
+  </ul>
+
+  <div class="hyp">
+    <b>우리 가설</b> — <b>보안·개인정보 처리·데이터 구조</b>는 사람이 설계하지 않으면 나중에 크게 물어뜯길 영역이라고 봅니다(그래서 질문 06·08을 따로 드렸습니다). 반대로 화면·문구·수집 로봇은 이 방식으로 계속 가도 된다고 보고 있습니다. 그리고 <b>“검사를 함께 만든다”가 규모가 커져도 통하는 방법</b>이라고 믿고 있는데, 이 믿음 자체가 검증된 적이 없습니다.
+  </div>
+
+  <div class="want">
+    <h4>받고 싶은 답의 형태</h4>
+    <ul class="b">
+      <li><strong>코드를 읽지 못하는 사람이 품질을 판단하는 방법</strong> — 무엇을 보면 “이건 위험하다”를 알 수 있습니까. 이것이 저희에게 가장 필요한 답입니다.</li>
+      <li>이 저장소에서 <strong>“여기는 사람이 다시 설계해야 한다”</strong>는 영역 하나만이라도 짚어 주십시오(코드는 공개돼 있습니다).</li>
+      <li>같은 버그가 반복될 때, <strong>검사를 더 만드는 것 말고</strong> 다른 처방이 있습니까.</li>
+      <li>나중에 사람에게 넘길 때 <strong>주로 무엇이 문제가 되는지</strong> — 지금부터 대비할 수 있게.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ════════════════ 06 부록 ════════════════ -->
 <section class="sec">
-  <h2><span class="hn">05</span>부록</h2>
+  <h2><span class="hn">06</span>부록</h2>
 
   <h3>A. 답변을 받으면 우리가 정할 것</h3>
   <table>
@@ -1161,6 +1353,11 @@ await fetch('https://api.resend.com/emails', {
     <tr><td class="mono">Q3</td><td>앱의 상태 표기 문구 · 학교에 요청할 응답 형식</td><td>“신청 완료”라고 쓸 수 있는 조건을 못 정함</td></tr>
     <tr><td class="mono">Q4</td><td>연동 전 수리 목록과 순서</td><td>고칠 것을 모른 채 연동을 시작하게 됨</td></tr>
     <tr><td class="mono">Q5</td><td>이번 달 개발 순서</td><td>학교 미팅에 보여 줄 것이 없음</td></tr>
+    <tr><td class="mono">Q6</td><td>회원 데이터를 지금 쪼갤지, 그대로 둘지</td><td>사용자가 쌓인 뒤에는 옮기는 비용이 커짐</td></tr>
+    <tr><td class="mono">Q7</td><td>다음에 손볼 곳의 순서 · 계측을 붙일 자리</td><td>무엇이 먼저 터질지 모른 채 학생을 받게 됨</td></tr>
+    <tr><td class="mono">Q8</td><td>로그인 구현을 고칠지 · SDK로 돌아갈지</td><td>세션이 풀리는 결함을 안은 채 연동을 시작함</td></tr>
+    <tr><td class="mono">Q9</td><td>수집을 어디까지 넓힐지 · 2층 구조를 유지할지</td><td>공고를 늘릴수록 틀린 판정도 함께 늘어남</td></tr>
+    <tr><td class="mono">Q10</td><td>사람이 다시 설계할 영역 · 인수인계 준비</td><td>품질을 스스로 판단할 방법이 없는 상태가 계속됨</td></tr>
   </table>
 
   <h3>B. 이 문서에 넣지 않은 질문</h3>
