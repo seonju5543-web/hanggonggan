@@ -1972,19 +1972,29 @@ console.log('\n■ AI 자격 읽기 안전장치 (2026-08-20)');
      qualFromDocs 첫머리에 실측으로 적혀 있다 — 요강 전문(888줄·분야 5종)에서
      **한 분야의 성적 기준이 공고 전체 요건으로 승격돼 틀린 「지원 자격 미달」이 떴다.**
      얻은 공고 0건, 잃은 것 1건. 품질·자리·유형 축 셋 다 못 잡았다. */
-  /* 🔴 **파일 전체에서 센다** — 함수 본문만 보면 헬퍼 한 줄로 우회된다(리뷰에서 재현).
-       function loose(t){ return scoopQualifyLines(t); }   // qualFromDocs 안에서 loose(t)
-     이러면 본문에 'scoopQualifyLines' 가 없어 관문이 초록불인데 버그는 되살아난다.
-     자리 수를 세면 직접·간접을 둘 다 잡고, 함수 경계를 자를 필요도 없다
-     (경계 자르기는 `main` 을 `async function main` 으로 바꾸기만 해도 거짓 실패를 냈다). */
+  /* 🔴 **자리를 못 박는다 — 개수만 세면 옮기기로 뚫린다** (2026-09-04 리뷰에서 실증).
+     되돌린 버그(첨부 경로의 2차)를 넣으면서 합계 3을 유지하는 길이 둘 있었다:
+       ① 본문 경로에서 빼고 qualFromDocs 로 **옮긴다**      → 합계 3, 초록불
+       ② qualFromDocs 에 넣고 export 에서 뺀다("내부용")   → 합계 3, 초록불
+     그래서 개수(간접 헬퍼용)와 **자리 두 곳**을 함께 본다. 본문 경로는 `(body)` 로,
+     첨부 경로는 `(t)` 로 부르므로 인자 이름이 그대로 자리 표식이 된다. */
   {
-    const code = xs.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
-    /* 지금 자리 셋: 정의(function scoopQualifyLines) · export · **본문 경로 호출 한 곳**.
-       늘었다면 첨부 경로나 다른 데서 부르기 시작한 것이다 — 왜 늘었는지 보고 정하라. */
-    eq('  scoop 을 부르는 자리는 본문 경로 한 곳뿐',
+    /* 줄 끝 주석까지 걷어낸다 — 행 첫머리 주석만 걷으면 `const x = 1;  (줄 끝 주석)`
+       안에 든 낱말이 세어져, 평범한 편집 하나가 합계를 늘려 **거짓 실패**를 냈다(리뷰 실측).
+       콜론 뒤 두 빗금(주소의 스킴 구분자)은 건드리지 않는다 — 주소가 잘려 나가면 안 된다. */
+    const code = xs.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+    /* 지금 자리 셋: 정의 · export · 본문 경로 호출. 늘었으면 **왜 늘었는지 보고** 정한다 —
+       정당한 호출이 새로 생긴 것일 수도, 우회 헬퍼일 수도 있다(원인을 여기서 단정하지 않는다). */
+    eq('  scoop 이 나오는 자리는 셋뿐 (정의·export·본문 경로 호출)',
       (code.match(/scoopQualifyLines\b/g) || []).length, 3);
-    eq('    첨부 경로(qualFromDocs)는 1차만 쓴다',
-      /function qualFromDocs[\s\S]*?extractQualifyLines\(/.test(code), true);
+    /* ①을 막는다 — 본문 경로의 그 호출이 제자리에 있어야 한다 */
+    eq('    본문 경로가 2차로 물러나는 자리는 그대로다',
+      /\?\s*extractQualifyLines\(body\)\s*:\s*scoopQualifyLines\(body\);/.test(code), true);
+    /* ②를 막는다 — 첨부 경로는 `(t)` 로 부른다. 1차는 있고 2차는 없어야 한다.
+       ⚠️ `function qualFromDocs[\s\S]*?extractQualifyLines\(` 로 쓰지 말 것 — 게으른
+       무한 매칭이라 함수에서 1차를 통째로 지워도 **아래 본문 경로에 걸려 통과한다**(실증). */
+    eq('    첨부 경로는 1차(t)를 쓴다', /extractQualifyLines\(t\);/.test(code), true);
+    eq('    첨부 경로는 2차(t)로 물러나지 않는다', /scoopQualifyLines\(t\)/.test(code), false);
   }
   /* 🔴 이 경로는 출처를 **'AI(공고문 PDF)'**로 남겨 번호 경로와 구분한다 —
      화면 표식은 같지만, 나중에 되짚을 때 어느 계약으로 들어온 글자인지 알아야 한다. */
