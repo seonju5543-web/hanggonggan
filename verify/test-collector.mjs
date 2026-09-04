@@ -1972,13 +1972,19 @@ console.log('\n■ AI 자격 읽기 안전장치 (2026-08-20)');
      qualFromDocs 첫머리에 실측으로 적혀 있다 — 요강 전문(888줄·분야 5종)에서
      **한 분야의 성적 기준이 공고 전체 요건으로 승격돼 틀린 「지원 자격 미달」이 떴다.**
      얻은 공고 0건, 잃은 것 1건. 품질·자리·유형 축 셋 다 못 잡았다. */
+  /* 🔴 **파일 전체에서 센다** — 함수 본문만 보면 헬퍼 한 줄로 우회된다(리뷰에서 재현).
+       function loose(t){ return scoopQualifyLines(t); }   // qualFromDocs 안에서 loose(t)
+     이러면 본문에 'scoopQualifyLines' 가 없어 관문이 초록불인데 버그는 되살아난다.
+     자리 수를 세면 직접·간접을 둘 다 잡고, 함수 경계를 자를 필요도 없다
+     (경계 자르기는 `main` 을 `async function main` 으로 바꾸기만 해도 거짓 실패를 냈다). */
   {
-    const qfd = xs.slice(xs.indexOf('function qualFromDocs'));
-    const fnBody = qfd.slice(0, qfd.indexOf('\nfunction ', 1));
-    const code = fnBody.replace(/\/\*[\s\S]*?\*\//g, '');   // 주석의 낱말은 세지 않는다
-    eq('  첨부 경로는 1차(절 가르기)를 쓴다', /extractQualifyLines\(/.test(code), true);
-    eq('    2차(scoop)로 물러나지 않는다 (되돌린 이유는 qualFromDocs 주석)',
-      /scoopQualifyLines\(/.test(code), false);
+    const code = xs.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+    /* 지금 자리 셋: 정의(function scoopQualifyLines) · export · **본문 경로 호출 한 곳**.
+       늘었다면 첨부 경로나 다른 데서 부르기 시작한 것이다 — 왜 늘었는지 보고 정하라. */
+    eq('  scoop 을 부르는 자리는 본문 경로 한 곳뿐',
+      (code.match(/scoopQualifyLines\b/g) || []).length, 3);
+    eq('    첨부 경로(qualFromDocs)는 1차만 쓴다',
+      /function qualFromDocs[\s\S]*?extractQualifyLines\(/.test(code), true);
   }
   /* 🔴 이 경로는 출처를 **'AI(공고문 PDF)'**로 남겨 번호 경로와 구분한다 —
      화면 표식은 같지만, 나중에 되짚을 때 어느 계약으로 들어온 글자인지 알아야 한다. */
