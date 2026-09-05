@@ -136,6 +136,12 @@ jobs:
           # 빠뜨리면 registered.json의 formId만 저장되고 양식은 버려져 '없는 양식을 가리키는
           # 연결'이 생긴다 (2026-08-01 감사 실패의 원인 — 이슈 #79).
           git add collector/seen.json collector/browser-report.md data/notices.json data/registered.json data/forms.json
+          # 🔴 학교별 공고 파일 — 앱이 **실제로 읽는 것은 이쪽**이다(data/notices.json 은
+          #    학교별 파일이 아직 없는 학교를 위한 뒷길). 수집기는 매 실행 이 폴더를 새로
+          #    쓰는데 여기에 없어서 **한 번도 저장되지 않았다** — 2026-08-17 에 폴더를
+          #    만든 뒤로 19일 동안 앱의 실시간 공고가 그날 그대로 멈춰 있었다.
+          #    (2026-08-01 이슈 #79 와 같은 유형: 로봇이 고친 파일은 전부 git add 에 넣는다)
+          [ -d data/notices ] && git add data/notices
           # 학교 순서 회전 커서 — 예산에 걸려 건너뛴 학교가 다음 실행의 맨 앞이 된다.
           # 이게 저장 안 되면 매 실행 같은 학교(설정 파일 뒤쪽)만 계속 잘린다.
           [ -f collector/browser-cursor.json ] && git add collector/browser-cursor.json

@@ -1,10 +1,98 @@
 {
  "school": "계명대학교",
- "updatedAt": "2026-08-17",
+ "updatedAt": "2026-09-05",
  "items": [
   {
+   "title": "[국가근로] 2026학년도 2학기 전공 근로장학생 신청 안내",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269943&pageOrder=0&cmd=2&parm_bod_uid=269943&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
+   "attachments": [
+    {
+     "name": "캠퍼스 투어",
+     "url": "http://www.kmu.ac.kr/uni/main/download/sub01/keimyung_univ/index.html"
+    },
+    {
+     "name": "캠퍼스 투어",
+     "url": "http://www.kmu.ac.kr/uni/main/download/sub01/keimyung_univ/index.html"
+    }
+   ],
+   "deadlineHint": "신청기간 :&nbsp; 2026. 8. 27.(목 ) ~ 31.(월 )[ 기한엄수 ] 4.&nbsp; 신청방법 :",
+   "school": "계명대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "[교외] 2026년 손태희장학재단 장학생 선발 안내",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269943&pageOrder=0&cmd=2&parm_bod_uid=269918&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
+   "attachments": [
+    {
+     "name": "캠퍼스 투어",
+     "url": "http://www.kmu.ac.kr/uni/main/download/sub01/keimyung_univ/index.html"
+    },
+    {
+     "name": "캠퍼스 투어",
+     "url": "http://www.kmu.ac.kr/uni/main/download/sub01/keimyung_univ/index.html"
+    },
+    {
+     "name": "2026년 손태희장학재단 4기 장학생 선발 공고문.pdf",
+     "url": "https://www.kmu.ac.kr/programs/common/com_download.jsp?parm_file_uid=128021"
+    },
+    {
+     "name": "2026년 손태희장학재단 4기 장학생 서식.hwpx",
+     "url": "https://www.kmu.ac.kr/programs/common/com_download.jsp?parm_file_uid=128020"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "계명대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "[교외] 2026학년도 2학기 보훈청 보훈(가족)장학 홍보",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269943&pageOrder=0&cmd=2&parm_bod_uid=269917&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
+   "attachments": [
+    {
+     "name": "캠퍼스 투어",
+     "url": "http://www.kmu.ac.kr/uni/main/download/sub01/keimyung_univ/index.html"
+    },
+    {
+     "name": "캠퍼스 투어",
+     "url": "http://www.kmu.ac.kr/uni/main/download/sub01/keimyung_univ/index.html"
+    },
+    {
+     "name": "2026년 2학기 보훈(가족)장학 신청 안내 공고문.hwpx",
+     "url": "https://www.kmu.ac.kr/programs/common/com_download.jsp?parm_file_uid=128019"
+    }
+   ],
+   "deadlineHint": "까지 유효 ○&nbsp; 접 수 처&nbsp; :&nbsp; 교육기관 소재지 관할 보훈 ( 지 ) 청 보훈과 ○",
+   "school": "계명대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
+   "title": "[재학생 필수] ★ 2026-2학기 국가장학금 2차 신청 기간 안내 ★",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269943&pageOrder=0&cmd=2&parm_bod_uid=269836&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
+   "attachments": [
+    {
+     "name": "캠퍼스 투어",
+     "url": "http://www.kmu.ac.kr/uni/main/download/sub01/keimyung_univ/index.html"
+    },
+    {
+     "name": "캠퍼스 투어",
+     "url": "http://www.kmu.ac.kr/uni/main/download/sub01/keimyung_univ/index.html"
+    },
+    {
+     "name": "(포스터) 2026 2학기 2차 국가장학금 신청.jpg",
+     "url": "https://www.kmu.ac.kr/programs/common/com_download.jsp?parm_file_uid=127927"
+    }
+   ],
+   "deadlineHint": "마감) 나. 서류제출 및 가구원 정보제공&nbsp;동의 기간: &nbsp;2026 . 8. 12.(수) 9시 ~",
+   "school": "계명대학교",
+   "campus": "",
+   "foundAt": "2026-08-19"
+  },
+  {
    "title": "[교외]2026년 하반기 군산시 대학생 학자금 이자 지원 공고",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269875&pageOrder=0&cmd=2&parm_bod_uid=269774&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269943&pageOrder=0&cmd=2&parm_bod_uid=269774&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
    "attachments": [
     {
      "name": "캠퍼스 투어",
@@ -26,11 +114,11 @@
    "deadlineHint": null,
    "school": "계명대학교",
    "campus": "",
-   "foundAt": "2026-08-14"
+   "foundAt": "2026-08-19"
   },
   {
    "title": "2026학년도 2학기 2차 주거안정장학금 신청 안내(한국장학재단)",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269875&pageOrder=0&cmd=2&parm_bod_uid=269773&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269943&pageOrder=0&cmd=2&parm_bod_uid=269773&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
    "attachments": [
     {
      "name": "캠퍼스 투어",
@@ -56,11 +144,11 @@
    "deadlineHint": null,
    "school": "계명대학교",
    "campus": "",
-   "foundAt": "2026-08-14"
+   "foundAt": "2026-08-19"
   },
   {
    "title": "[교내] 2026-2학기 장애대학생 지원 도우미 장학생 선발 안내",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269875&pageOrder=0&cmd=2&parm_bod_uid=269744&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269943&pageOrder=0&cmd=2&parm_bod_uid=269744&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
    "attachments": [
     {
      "name": "캠퍼스 투어",
@@ -82,11 +170,11 @@
    "deadlineHint": "신청기간 : 2026. 8. 10.(월) ~ 선발 완료시 까지 &nbsp; 5. 신청방법: &nbsp; &nbsp;",
    "school": "계명대학교",
    "campus": "",
-   "foundAt": "2026-08-14"
+   "foundAt": "2026-08-19"
   },
   {
    "title": "[교외] 2026학년도 5·18희망장학생 모집",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269875&pageOrder=0&cmd=2&parm_bod_uid=269688&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269943&pageOrder=0&cmd=2&parm_bod_uid=269688&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
    "attachments": [
     {
      "name": "캠퍼스 투어",
@@ -104,11 +192,11 @@
    "deadlineHint": null,
    "school": "계명대학교",
    "campus": "",
-   "foundAt": "2026-08-14"
+   "foundAt": "2026-08-19"
   },
   {
    "title": "[교외] 2026학년도 (재)서울미래인재재단 장학생 선발",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269875&pageOrder=0&cmd=2&parm_bod_uid=269687&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269943&pageOrder=0&cmd=2&parm_bod_uid=269687&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
    "attachments": [
     {
      "name": "캠퍼스 투어",
@@ -126,11 +214,11 @@
    "deadlineHint": null,
    "school": "계명대학교",
    "campus": "",
-   "foundAt": "2026-08-14"
+   "foundAt": "2026-08-19"
   },
   {
    "title": "[국가근로] 2026학년도 2학기 국가근로장학금 신청 안내(2차)",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269875&pageOrder=0&cmd=2&parm_bod_uid=269595&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269943&pageOrder=0&cmd=2&parm_bod_uid=269595&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
    "attachments": [
     {
      "name": "캠퍼스 투어",
@@ -148,11 +236,11 @@
    "deadlineHint": "신청기간 내 24시간 신청 가능(단, 마감일 제외) ● 동계방학 집중근로 참여 희망학생 은 반드시 2026년 2학기",
    "school": "계명대학교",
    "campus": "",
-   "foundAt": "2026-08-14"
+   "foundAt": "2026-08-19"
   },
   {
    "title": "2026년 하반기 울산광역시 대학(원)생 학자금대출 이자지원사업 안내",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269875&pageOrder=0&cmd=2&parm_bod_uid=269594&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269943&pageOrder=0&cmd=2&parm_bod_uid=269594&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
    "attachments": [
     {
      "name": "캠퍼스 투어",
@@ -178,11 +266,11 @@
    "deadlineHint": null,
    "school": "계명대학교",
    "campus": "",
-   "foundAt": "2026-08-14"
+   "foundAt": "2026-08-19"
   },
   {
    "title": "2026학년도 1학기 주거안정장학금 7월분 지급요청서 제출 안내",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269875&pageOrder=0&cmd=2&parm_bod_uid=269475&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269943&pageOrder=0&cmd=2&parm_bod_uid=269475&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
    "attachments": [
     {
      "name": "캠퍼스 투어",
@@ -196,11 +284,11 @@
    "deadlineHint": "까지 제출(기간 내 미제출 시 지급 불가) 2. 제출방법: &nbsp; 한국장학재단 홈페이지 &gt; 장학금 &",
    "school": "계명대학교",
    "campus": "",
-   "foundAt": "2026-08-14"
+   "foundAt": "2026-08-19"
   },
   {
    "title": "[교외]2026년 (재)서구인재육성재단 장학생 선발 안내 및 홍보",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269875&pageOrder=0&cmd=2&parm_bod_uid=269438&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269943&pageOrder=0&cmd=2&parm_bod_uid=269438&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
    "attachments": [
     {
      "name": "캠퍼스 투어",
@@ -230,11 +318,11 @@
    "deadlineHint": null,
    "school": "계명대학교",
    "campus": "",
-   "foundAt": "2026-08-14"
+   "foundAt": "2026-08-19"
   },
   {
    "title": "[교외] 2026년 화성시인재육성재단 소상공인 장학금 모집",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269875&pageOrder=0&cmd=2&parm_bod_uid=269418&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269943&pageOrder=0&cmd=2&parm_bod_uid=269418&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
    "attachments": [
     {
      "name": "캠퍼스 투어",
@@ -252,11 +340,11 @@
    "deadlineHint": null,
    "school": "계명대학교",
    "campus": "",
-   "foundAt": "2026-08-14"
+   "foundAt": "2026-08-19"
   },
   {
    "title": "[교외] 2026년 김해시미래인재장학재단 제3회 장학수기 공모전",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269875&pageOrder=0&cmd=2&parm_bod_uid=269417&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269943&pageOrder=0&cmd=2&parm_bod_uid=269417&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
    "attachments": [
     {
      "name": "캠퍼스 투어",
@@ -274,121 +362,7 @@
    "deadlineHint": null,
    "school": "계명대학교",
    "campus": "",
-   "foundAt": "2026-08-14"
-  },
-  {
-   "title": "[교외] 2026학년도 충남평생교육인재육성진흥원 재능키움 장학생 선발",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269875&pageOrder=0&cmd=2&parm_bod_uid=269160&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
-   "attachments": [
-    {
-     "name": "캠퍼스 투어",
-     "url": "http://www.kmu.ac.kr/uni/main/download/sub01/keimyung_univ/index.html"
-    },
-    {
-     "name": "캠퍼스 투어",
-     "url": "http://www.kmu.ac.kr/uni/main/download/sub01/keimyung_univ/index.html"
-    },
-    {
-     "name": "붙임 1. 웹포스터.png",
-     "url": "https://www.kmu.ac.kr/programs/common/com_download.jsp?parm_file_uid=127271"
-    }
-   ],
-   "deadlineHint": null,
-   "school": "계명대학교",
-   "campus": "",
-   "foundAt": "2026-08-14"
-  },
-  {
-   "title": "[교외]2026년도 정읍시민장학재단 장학생 선발 공고",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269875&pageOrder=0&cmd=2&parm_bod_uid=269159&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
-   "attachments": [
-    {
-     "name": "캠퍼스 투어",
-     "url": "http://www.kmu.ac.kr/uni/main/download/sub01/keimyung_univ/index.html"
-    },
-    {
-     "name": "캠퍼스 투어",
-     "url": "http://www.kmu.ac.kr/uni/main/download/sub01/keimyung_univ/index.html"
-    },
-    {
-     "name": "포스터(최종).jpg",
-     "url": "https://www.kmu.ac.kr/programs/common/com_download.jsp?parm_file_uid=127270"
-    }
-   ],
-   "deadlineHint": null,
-   "school": "계명대학교",
-   "campus": "",
-   "foundAt": "2026-08-14"
-  },
-  {
-   "title": "[교외] 2026년 세종이도인재장학금 디딤돌 장학사업 학자금대출 관련분야 신청(원금상환, 이자지원)",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269875&pageOrder=0&cmd=2&parm_bod_uid=268653&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
-   "attachments": [
-    {
-     "name": "캠퍼스 투어",
-     "url": "http://www.kmu.ac.kr/uni/main/download/sub01/keimyung_univ/index.html"
-    },
-    {
-     "name": "캠퍼스 투어",
-     "url": "http://www.kmu.ac.kr/uni/main/download/sub01/keimyung_univ/index.html"
-    },
-    {
-     "name": "학자금대출 관련 분야(원금상환, 이자지원)신청 공고문.zip",
-     "url": "https://www.kmu.ac.kr/programs/common/com_download.jsp?parm_file_uid=126904"
-    }
-   ],
-   "deadlineHint": null,
-   "school": "계명대학교",
-   "campus": "",
-   "foundAt": "2026-08-14"
-  },
-  {
-   "title": "[교외] 2026년 제주평생교육장학진흥원 미래이음 장학금 장학생 선발",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269875&pageOrder=0&cmd=2&parm_bod_uid=268651&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
-   "attachments": [
-    {
-     "name": "캠퍼스 투어",
-     "url": "http://www.kmu.ac.kr/uni/main/download/sub01/keimyung_univ/index.html"
-    },
-    {
-     "name": "캠퍼스 투어",
-     "url": "http://www.kmu.ac.kr/uni/main/download/sub01/keimyung_univ/index.html"
-    },
-    {
-     "name": "(공고문) 2026년 미래이음 장학금 장학생 선발 계획 재공고-2026.07.01.pdf",
-     "url": "https://www.kmu.ac.kr/programs/common/com_download.jsp?parm_file_uid=126903"
-    },
-    {
-     "name": "(신청서식) 2026년 미래이음 장학금.zip",
-     "url": "https://www.kmu.ac.kr/programs/common/com_download.jsp?parm_file_uid=126902"
-    }
-   ],
-   "deadlineHint": "접수기간: 2026. 7. 1.(수) ~ 15.(수) 4. 접수처: (재)제주평생교육장학진흥원 홈페이지 (https",
-   "school": "계명대학교",
-   "campus": "",
-   "foundAt": "2026-08-14"
-  },
-  {
-   "title": "2026학년도 1학기 주거안정장학금 6월분 지급요청서 제출 안내",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=269875&pageOrder=0&cmd=2&parm_bod_uid=268512&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
-   "attachments": [
-    {
-     "name": "캠퍼스 투어",
-     "url": "http://www.kmu.ac.kr/uni/main/download/sub01/keimyung_univ/index.html"
-    },
-    {
-     "name": "캠퍼스 투어",
-     "url": "http://www.kmu.ac.kr/uni/main/download/sub01/keimyung_univ/index.html"
-    },
-    {
-     "name": "장학생 지급요청서 작성 매뉴얼.pdf",
-     "url": "https://www.kmu.ac.kr/programs/common/com_download.jsp?parm_file_uid=127022"
-    }
-   ],
-   "deadlineHint": "기한 안에 제출 시 인정 &nbsp;&nbsp;※ 지급요청서를 미입력하거나 불성실하게 입력한 경우 그에 따른 책",
-   "school": "계명대학교",
-   "campus": "",
-   "foundAt": "2026-08-14"
+   "foundAt": "2026-08-19"
   }
  ]
 }
