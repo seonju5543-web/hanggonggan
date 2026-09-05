@@ -32,6 +32,13 @@ print(t, s)
 ' 2>/dev/null || echo " ")"
 
 case "$tool" in
+  # 노션 백로그에 실제로 **쓴** 것만 적는다 (2026-09-06 개발자 지시).
+  # 🔴 읽기(fetch·search)는 세지 않는다 — 읽기만 해도 면제되면 관문이 뜻을 잃는다.
+  # ⚠️ MCP 서버 이름은 개발자마다 다른 UUID 라 이름을 박으면 안 된다. notion 이라는
+  #    글자로만 가린다(설정의 matcher 도 같은 이유로 정규식이다).
+  *notion-update-page|*notion-create-pages)
+    printf '%s %s\n' "$(date +%s)" "notion-write" >>"$gitdir/claude-skills-used"
+    ;;
   Skill)
     # 🔴 **시각을 함께 적는다.** 이름만 적었더니 세션 앞부분에 한 번 부른 것으로
     #    그 뒤에 난 실패까지 전부 면제됐다(개발자가 "훅이 계속 안 걸린다"고 짚었다).

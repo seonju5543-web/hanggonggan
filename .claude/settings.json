@@ -22,7 +22,7 @@
         ]
       },
       {
-        "matcher": "Skill|Bash",
+        "matcher": "Skill|Bash|mcp__.*notion.*",
         "hooks": [
           {
             "type": "command",

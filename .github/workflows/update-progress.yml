@@ -11,6 +11,12 @@ on:
     - cron: '17 23 * * *'   # 08:17 KST (UTC+9)
     - cron: '17 13 * * *'   # 22:17 KST (UTC+9)
   workflow_dispatch:        # 수동 실행 버튼
+  # 🔴 개발자 브랜치에 push 될 때마다 **노션 「작업 현황」만** 갱신한다 (2026-09-06).
+  #    12시간마다로는 "지금 누가 무엇을 하는지"가 안 보인다는 개발자 지시.
+  #    ⚠️ PROGRESS.md 커밋과 알림 이슈는 이때 돌리지 않는다 — push 마다 main 이 움직여
+  #       배포가 다시 돌고 두 개발자에게 메일이 쏟아진다(그래서 아래 두 단계에 조건이 있다).
+  push:
+    branches: [claude/work-seonju, claude/work-josehyeon, claude/work-eunseo]
 
 permissions:
   contents: write
@@ -61,7 +67,7 @@ jobs:
           node /tmp/upd.mjs
 
       - name: Commit & push to main
-        if: steps.build.outputs.changed == 'true'
+        if: steps.build.outputs.changed == 'true' && github.event_name != 'push'
         run: |
           git config user.name "hanjang-progress-bot"
           git config user.email "actions@github.com"
@@ -80,7 +86,7 @@ jobs:
       # 문서가 실제로 갱신됐을 때만, 수집 리포트와 '동일한 방식'(이슈 배정 → GitHub이
       # 두 개발자에게 자동 메일)으로 알린다. 별도 메일 비밀번호(Secrets) 불필요.
       - name: 진척도 갱신 알림 (이슈 배정 → 두 개발자에게 자동 메일)
-        if: steps.build.outputs.changed == 'true'
+        if: steps.build.outputs.changed == 'true' && github.event_name != 'push'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -94,3 +100,13 @@ jobs:
           📄 **문서 바로 확인**: https://github.com/${{ github.repository }}/blob/main/PROGRESS.md
 
           확인 후 이 이슈는 닫으셔도 됩니다."
+
+      # 보강 단계 — 여기서 넘어져도 위의 PROGRESS 갱신은 이미 끝나 있다.
+      # NOTION_TOKEN 이 없으면 스크립트가 스스로 조용히 끝난다(0으로 종료).
+      - name: 노션 「작업 현황」 갱신
+        if: always()
+        timeout-minutes: 3
+        continue-on-error: true
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node tools/notion-status.mjs
