@@ -314,7 +314,8 @@ saveCandidates(mergeCandidates(loadCandidates().items, freshAll));
 
 /* 🔴 서비스하지 않는 학교의 공고는 여기서 떨군다 (2026-09-05 개발자 지시).
    수집 대상은 이미 경희대·한국외대 둘뿐인데 **예전에 담긴 다른 학교 공고가 그대로 남아**
-   전체 상한을 차지하고(200건 중 173건) 로봇들이 그걸 붙들고 일하고 있었다.
+   (200건 중 173건) 로봇들이 그걸 붙들고 일하고 있었다. ⚠️ '상한을 차지해 새 공고를
+   밀어낸다'는 설명은 **틀렸다** — 재 보니 한 건도 안 잘리고 있었다(2026-09-05 리뷰).
    이유·되돌리는 법은 publish-notices.mjs 의 dropUnserved 첫머리. */
 {
   const before = notices.items.length;

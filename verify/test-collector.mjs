@@ -1915,9 +1915,12 @@ console.log('\n■ 링크 사냥꾼의 제목 대조 (2026-08-23)');
 console.log('\n■ 서비스하지 않는 학교의 공고는 피드에 안 담는다 (2026-09-05)');
 {
   /* 🔴 2026-08-30 에 수집을 경희대·한국외대 둘로 좁혔는데 **예전에 담긴 다른 학교 공고가
-     그대로 남아** 전체 상한(200)을 차지하고 있었다 — 실측 200건 중 173건(87%)이 그것이었다.
-     그래서 정작 두 학교의 새 공고가 밀려나고, 링크 사냥꾼은 아무도 안 보는 학교 게시판을
-     뒤지느라 25분 예산을 썼다(시간초과의 한 원인).
+     그대로 남아** 있었다 — 실측 200건 중 173건(87%)이 그것이었다. 로봇이 그걸 붙들고 일한다.
+     ⚠️ **'상한을 차지해 새 공고를 밀어낸다'고 적지 말 것 — 재 보니 사실이 아니었다**
+     (2026-09-05 리뷰). capNotices 의 전체 상한은 `max(200, 학교수 × 15)` 라 죽은 학교가
+     많을수록 상한이 **커진다**: 35개교일 때 525 라 200건은 한 건도 안 잘렸고,
+     새 공고 30건을 얹어도 30건 전부 살아남았다(실측). 이득은 다른 데 있다 —
+     폰이 받는 파일 120KB → 14KB · 사냥꾼 순찰 후보 237 → 72건 · 표적 게시판 3 → 0곳.
      ⚠️ 목록은 화면·알림과 **같은 것**(match-engine 의 SERVED_SCHOOLS)을 쓴다 — 베끼면
      '화면은 안 보여 주는데 로봇은 계속 모으는' 어긋남이 그대로 돌아온다. */
   const { dropUnserved } = await import(new URL('../collector/publish-notices.mjs', import.meta.url));
@@ -1932,11 +1935,15 @@ console.log('\n■ 서비스하지 않는 학교의 공고는 피드에 안 담�
 
   for (const [name, file] of [['일반 수집', 'collect.mjs'], ['브라우저 수집', 'browser-collect.mjs']]) {
     const src = fs.readFileSync(new URL(`../collector/${file}`, import.meta.url), 'utf8');
-    eq(`  ${name} 로봇이 이것을 쓴다`, /dropUnserved\(notices\.items\)/.test(src), true);
+    /* ⚠️ **대입까지 본다** — `const _unused = dropUnserved(notices.items);` 는 결과를 버려
+       아무 일도 안 하는데, 호출만 세면 그대로 통과한다(2026-09-05 리뷰에서 실증).
+       바로 앞 커밋 69113d0 이 다른 관문에서 배운 것과 같은 유형이다. */
+    eq(`  ${name} 로봇이 이것을 쓴다 (결과를 되받는다)`,
+      /notices\.items\s*=\s*dropUnserved\(notices\.items\)/.test(src), true);
     eq('    가져다 쓴다 (베끼지 않는다)',
       /import \{[^}]*\bdropUnserved\b[^}]*\} from '\.\/publish-notices\.mjs'/.test(src), true);
     /* 🔴 **자르기·발행보다 먼저** 떨궈야 뜻이 있다 — 뒤에 두면 이미 상한을 차지한 뒤다 */
-    const dropAt = src.indexOf('dropUnserved(notices.items)');
+    const dropAt = src.search(/notices\.items\s*=\s*dropUnserved\(notices\.items\)/);
     const pubAt = src.indexOf('publishBySchool(beforeCap)');
     const capAt = src.indexOf('capNotices(notices.items)');
     eq('    학교별 발행보다 먼저 떨군다', dropAt >= 0 && pubAt > dropAt, true);
