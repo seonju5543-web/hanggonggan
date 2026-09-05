@@ -271,6 +271,11 @@ function refreshProgressViews(id) {
 
 function toast(msg, action) {
   const el = $('#toast');
+  /* 🔴 사라지는 중에 새 알림이 뜨면 **옛 숨김 타이머가 새 알림을 지운다** — 2600ms 타이머만
+     껐지 250ms 숨김 타이머는 안 끄고 있었다. 등장 전환이 살아난 지금은 증상이 더 나쁘다
+     (반쯤 뜬 채로 사라진다). 두 타이머를 한자리에서 끈다. */
+  clearTimeout(toast._t);
+  clearTimeout(toast._h);
   el.textContent = msg;
   /* 되돌리기처럼 **되살릴 수 있는 실수**는 단추를 함께 준다.
      터치 타깃 44px은 style.css의 .toast-undo가 지킨다. */
@@ -281,17 +286,23 @@ function toast(msg, action) {
     b.addEventListener('click', () => {
       clearTimeout(toast._t);
       el.classList.remove('show');
-      setTimeout(() => (el.hidden = true), 250);
+      toast._h = setTimeout(() => (el.hidden = true), 250);
       action.run();
     });
     el.appendChild(b);
   }
   el.hidden = false;
+  /* 🔴 `display:none` 에서 **같은 태스크에** .show 를 붙이면 전환이 아예 안 걸린다 —
+     토스트가 페이드 없이 튀어나오고 사라질 때만 부드러웠다(들어올 때/나갈 때가 거꾸로).
+     ⚠️ **rAF 한 번으로는 안 된다** — 실측했다(2026-09-06, 헤드리스 크롬):
+        rAF 로는 opacity 가 그대로 1 이고, `void offsetHeight` 로 배치를 강제로 확정시켜야
+        0.159 → 1 로 전환이 재생된다. `openSheetShell` 이 "rAF 대신"이라고 적어 둔 이유가 이것.
+        notify.js·chat.js 는 아직 rAF 한 번을 쓴다 — 같은 유형인지 따로 확인할 것. */
+  void el.offsetHeight;
   el.classList.add('show');
-  clearTimeout(toast._t);
   toast._t = setTimeout(() => {
     el.classList.remove('show');
-    setTimeout(() => (el.hidden = true), 250);
+    toast._h = setTimeout(() => (el.hidden = true), 250);
   }, 2600);
 }
 
