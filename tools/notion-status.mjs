@@ -17,6 +17,13 @@
  * 🔴 **읽지 못한 것을 '작업 없음'이라고 쓰지 않는다** (원칙 8-1). git 이 실패하면
  *    그렇게 적고 숫자는 비운다 — 확인 안 한 것을 확인했다고 말하지 않는다.
  *
+ * 🔴 **`origin/main..HEAD` 를 세면 안 된다** (2026-09-06 첫 실행에서 드러났다).
+ *    이 저장소는 **세 브랜치에 같은 내용을 동시에 push** 하는 관례라, push 직후엔 main 이
+ *    늘 따라잡아 차이가 0 이 된다 — 커밋 4개를 올린 세션이 '0커밋 · 새 커밋 없음'으로
+ *    찍혔다. 리뷰가 잡았던 '빈 신호'와 같은 유형이다.
+ *    → 최근 커밋은 **그 브랜치의 최근 이력 그대로**, 개수는 **이번 push 에 담긴 커밋**
+ *      (`github.event.before..after`)을 센다. 버튼 실행은 push 가 아니라 개수를 비운다.
+ *
  * 🔴 페이지 id 를 박아 둔 이유: 이름으로 찾으면 노션에서 개발자 이름을 고치는 순간
  *    로봇이 조용히 아무 줄도 못 찾는다. id 는 안 바뀐다.
  *
@@ -54,10 +61,15 @@ if (!who) {
    "최근 14일 작업 없음"이라는 **확인하지 않은 단정**이 노션에 적힌다. */
 const sh = (c) => { try { return { ok: true, out: execSync(c, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim() }; } catch { return { ok: false, out: '' }; } };
 
-const base = sh('git rev-parse --verify -q origin/main').ok ? 'origin/main' : '';
-const range = base && ref !== 'main' ? `${base}..HEAD` : 'HEAD';
-const log = sh(`git log ${range} --no-merges --pretty=format:"%ad · %s" --date=format:"%m-%d %H:%M" -n ${LOG_LINES}`);
-const cnt = sh(`git rev-list --count ${range}`);
+// 최근 이력은 브랜치를 그대로 본다 — 무엇을 하고 있는지는 이게 가장 정직하다.
+const log = sh(`git log --no-merges --pretty=format:"%ad · %s" --date=format:"%m-%d %H:%M" -n ${LOG_LINES}`);
+
+/* 개수는 '이번에 올린 것'만 센다. 새 브랜치의 첫 push 는 before 가 0000… 이라 셀 수 없고,
+   버튼 실행에는 before 자체가 없다 — 그럴 땐 **짐작하지 않고 비운다**. */
+const before = process.env.GITHUB_EVENT_BEFORE || '';
+const pushed = /^[0-9a-f]{40}$/.test(before) && !/^0{40}$/.test(before)
+  ? sh(`git rev-list --count ${before}..HEAD`)
+  : { ok: false, out: '' };
 
 /* 글자 수로 자르면 이모지(🔴 등)가 반 토막 나 깨진 글자가 남는다 — 줄 단위로 자른다.
    이 저장소의 커밋 제목에는 실제로 이모지가 들어 있다. */
@@ -76,14 +88,13 @@ const props = {
   '브랜치': { rich_text: [{ text: { content: ref.slice(0, 200) || '(모름)' } }] },
   '갱신': { rich_text: [{ text: { content: new Date(Date.now() + 9 * 3600 * 1000).toISOString().replace('T', ' ').slice(0, 16) + ' KST' } }] },
 };
-if (log.ok && cnt.ok) {
-  props['최근 커밋'] = { rich_text: [{ text: { content: fitLines(log.out || '(이 브랜치에 새 커밋 없음)', MAX_TEXT) } }] };
-  props['쌓인 커밋'] = { number: Number(cnt.out) || 0 };
+if (log.ok && log.out) {
+  props['최근 커밋'] = { rich_text: [{ text: { content: fitLines(log.out, MAX_TEXT) } }] };
 } else {
   props['최근 커밋'] = { rich_text: [{ text: { content: '⚠️ git 기록을 읽지 못했습니다 — 실행 로그를 확인하세요.' } }] };
-  props['쌓인 커밋'] = { number: null };
-  console.error('✕ git 기록을 읽지 못했습니다 (fetch 실패이거나 origin/main 이 없습니다).');
+  console.error('✕ git 기록을 읽지 못했습니다.');
 }
+props['이번에 올린 커밋'] = { number: pushed.ok ? (Number(pushed.out) || 0) : null };
 
 const res = await fetch(`https://api.notion.com/v1/pages/${who.page}`, {
   method: 'PATCH',
@@ -103,4 +114,4 @@ if (!res.ok) {
   console.error('  노션 통합에 「한대장」 페이지가 공유돼 있는지, NOTION_TOKEN 이 살아 있는지 확인하세요.');
   process.exit(1);
 }
-console.log(`✓ ${who.name} — ${ref} · ${props['쌓인 커밋'].number ?? '?'}커밋`);
+console.log(`✓ ${who.name} — ${ref} · 이번 push ${props['이번에 올린 커밋'].number ?? '(모름)'}커밋`);
