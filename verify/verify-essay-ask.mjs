@@ -428,7 +428,7 @@ head('9) 🔴 맞춤 보기에도 민감 낱말이 없는가 (전수)');
    ─────────────────────────────────────────────────────────────────────────── */
 {
   head('14) 🔴 위험 원문 규정 — 캐기와 관문');
-  const { isFormRule, isBlind, mine } = await import('../collector/essay-house-mine.mjs');
+  const { isFormRule, isBlind, mine, libraryFrom } = await import('../collector/essay-house-mine.mjs');
 
   ok(isBlind(['자기소개서에 소속 대학교를 식별할 수 있는 정보(학교명 등)를 기재한 경우 심사에서 제외']),
     '블라인드 심사 규정을 알아본다');
@@ -448,10 +448,35 @@ head('9) 🔴 맞춤 보기에도 민감 낱말이 없는가 (전수)');
     '🔴 문체 지시(개조식이 아닌 서술식)를 규정으로 잡는다');
   ok(!isFormRule('서술형 문항은 총 3개입니다'), '문항 수 안내는 규정이 아니다');
   ok(!isFormRule('자기소개서 1부, 성적증명서 1부를 방문 제출해 주십시오.'), '접수 안내는 여전히 규정이 아니다');
+  /* 🔴 문체 낱말을 RULEISH 에 그냥 넣으면 `서술식` 안의 `서술` 이 ABOUT 까지 만족시켜
+     두 겹 조건이 한 낱말로 무너진다 (2026-09-05 코드리뷰가 실행으로 증명한 실제 오탐). */
+  ok(!isFormRule('면접은 서술식 답변으로 진행되며 시간은 10분입니다'),
+    '🔴 자기소개서 이야기가 아닌 서술식은 규정이 아니다 (면접 안내)');
+  ok(!isFormRule('연구계획서는 서술식으로 3매 이내 작성'),
+    '🔴 우리가 다루지 않는 문서의 서술식도 규정이 아니다');
+
+  /* ── 등록 목록 밖 원문 훑기 — 픽스처로 실제로 돌려 본다 ──
+     🔴 `Array.isArray(library)` 같은 검사는 훑기를 통째로 지워도 통과한다(리뷰 지적). */
+  const RULE = '자기소개서는 개조식이 아닌 서술식으로 작성';
+  const corpus = [
+    { url: 'https://a.example/n?1', title: '가 공고', school: '가대', text: `안내\n${RULE}\n끝` },
+    { url: 'https://a.example/n?1', title: '가 공고', school: '가대', text: '같은 공고를 다른 파일이 또 갖고 있다' },
+    { url: 'https://b.example/n?2', title: '나 공고', school: '나대', text: '규정 없는 공고' },
+    { url: 'https://c.example/n?3', title: '다 공고', school: '다대', text: '본문에는 규정이 없다' },
+  ];
+  const lib = libraryFrom(corpus, new Set(), (k) => (/c\.example/.test(k) ? [`첨부 서식\n${RULE}`] : []));
+  ok(lib.length === 2, `본문·첨부에서 각각 캔다 (${lib.length}건)`);
+  ok(lib.filter((x) => /a\.example/.test(x.url)).length === 1,
+    '🔴 같은 주소가 두 파일에 있어도 한 건으로 센다 — 안 그러면 한 공고가 공통 규칙 후보를 혼자 만든다');
+  ok(lib.some((x) => /c\.example/.test(x.url)),
+    '🔴 본문에 없고 첨부에만 있는 규정도 캔다 — 등록에서 빠진 공고의 첨부가 사라지지 않게');
+  const { canonUrl } = await import('../collector/canon-url.mjs');
+  const skipped = libraryFrom(corpus, new Set([canonUrl('https://a.example/n?1')]), () => []);
+  ok(skipped.length === 0,
+    `등록이 이미 가져간 주소는 건너뛴다 (남은 ${skipped.length}건)`);
 
   const { perNotice, library } = mine();
-  ok(Array.isArray(library),
-    '🔴 등록 목록 밖의 원문도 훑는다 — 학교를 줄여도 이미 받아 둔 규정이 사라지지 않게');
+  ok(Array.isArray(library), `저장소 코퍼스에서도 돈다 (오늘 ${library.length}건)`);
   const blindCount = Object.values(perNotice).filter((v) => v.blind).length;
   ok(blindCount >= 1, `코퍼스에서 블라인드 심사 공고를 찾는다 (${blindCount}건)`);
 
