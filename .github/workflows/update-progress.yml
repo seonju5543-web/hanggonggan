@@ -133,6 +133,4 @@ jobs:
       - name: 노션 「작업 현황」 갱신
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          # 이번 push 에 담긴 커밋만 세기 위한 기준점. 버튼 실행에는 없다(그럼 개수를 비운다).
-          GITHUB_EVENT_BEFORE: ${{ github.event.before }}
         run: node tools/notion-status.mjs
