@@ -32,3 +32,11 @@ collector/extracted/**       -diff
 
 # 링크 사냥꾼 기록장 — 로봇이 매 실행 갱신하므로 합집합 병합
 collector/link-hunt.json merge=jsonunion
+
+# ── 학교별 공고 파일 (2026-09-05) ──────────────────────────────────
+# 앱이 실제로 읽는 파일이다. 오랫동안 수집 로봇 둘만 썼고 같은 대기줄이라 안 부딪혔는데,
+# 링크 사냥꾼·원문 링크 복구가 여기에 고친 주소를 옮겨 쓰면서 **다른 대기줄 넷**이 됐다.
+# 규칙이 없으면 충돌 → pull --rebase 3회 실패 → 사냥 결과 전량 유실(이슈 #85·#86 계열).
+data/notices/*.json          merge=jsonunion
+# 색인은 매 발행마다 새로 쓰인다 — 합칠 내용이 없다(리포트와 같은 취급).
+data/notices/index.json      merge=ours

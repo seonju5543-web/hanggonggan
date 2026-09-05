@@ -1929,8 +1929,11 @@ console.log('\n■ 주소를 고치는 로봇은 학교별 파일까지 고친�
     eq('  가져다 쓴다 (베끼지 않는다)',
       /import \{[^}]*\bpatchUrlsBySchool\b[^}]*\} from '\.\/publish-notices\.mjs'/.test(src), true);
     /* ⚠️ 재발행은 금지 — 위 주석 참조. 이 검사가 그 실수를 막는 유일한 자리다. */
-    eq('  재발행하지 않는다 (publishBySchool 을 부르면 학교별 파일이 줄어든다)',
-      /publishBySchool\(/.test(src), false);
+    /* ⚠️ **괄호를 붙여 `publishBySchool\(` 로 찾지 말 것** — `import { publishBySchool as
+       republish }` 로 이름만 바꿔 부르면 그대로 통과한다(2026-09-05 리뷰에서 실증).
+       이 두 로봇은 재발행할 이유가 없으므로 **낱말이 나오는 것 자체**를 막는다. */
+    eq('  재발행하지 않는다 (부르면 학교별 파일이 551→200 으로 줄어든다)',
+      /publishBySchool/.test(src), false);
     /* 고치는 것은 **쓴 뒤**여야 한다 — notices.json 을 쓰기 전에 고치면 옛 값으로 고친다 */
     const writeAt = src.indexOf('writeFileSync(noticesPath');
     const patchAt = src.indexOf('patchUrlsBySchool(');
@@ -1939,8 +1942,55 @@ console.log('\n■ 주소를 고치는 로봇은 학교별 파일까지 고친�
   /* 🔴 고쳐도 `git add` 에 없으면 저장되지 않는다 (이슈 #79 계열) */
   for (const wf of ['link-hunter', 'resolve-detail-urls']) {
     const y = fs.readFileSync(new URL(`../.github/workflows/${wf}.yml`, import.meta.url), 'utf8');
-    const line = (y.split('\n').find((l) => /^\s*git add /.test(l)) || '');
-    eq(`  ${wf} 워크플로가 data/notices 를 저장한다`, /\bdata\/notices\b(?!\.json)/.test(line), true);
+    /* ⚠️ **처음 만나는 한 줄만 보지 말 것** — 워크플로에 git add 가 하나 더 생기면
+       조용히 엉뚱한 줄을 검사한다. 전부 모아서 본다. */
+    const lines = y.split('\n').filter((l) => /^\s*git add /.test(l));
+    eq(`  ${wf} 워크플로에 git add 가 있다`, lines.length > 0, true);
+    eq(`  ${wf} 워크플로가 data/notices 를 저장한다`,
+      lines.some((l) => /\bdata\/notices\b(?!\.json)/.test(l)), true);
+  }
+
+  /* 🔴 **글자만 훑지 말고 실제로 돌려 본다** (2026-09-05 리뷰 지적).
+     위 정적 검사들은 `patchUrlsBySchool([])`(무동작)이나 죽은 가지도 통과시킨다 —
+     '부르는가'는 '하는가'가 아니다. CLAUDE.md 매 세션 3번·메모리 verify-the-gate-itself 가
+     이름 붙인 유형이라, 임시 폴더에 진짜 파일을 두고 함수를 불러 결과를 잰다. */
+  {
+    const os = await import('node:os');
+    const pathMod = await import('node:path');
+    const { patchUrlsBySchool } = await import(new URL('../collector/publish-notices.mjs', import.meta.url));
+    const dir = fs.mkdtempSync(pathMod.join(os.tmpdir(), 'notices-'));
+    const dirUrl = new URL(`file://${dir}/`);
+    const before = {
+      school: '경희대학교',
+      items: [
+        { school: '경희대학교', title: '두을장학재단 제29기 장학생 모집', url: 'https://x/list#n-두을' },
+        { school: '경희대학교', title: '학교별 파일에만 있는 옛 공고', url: 'https://x/list#n-옛것' },
+      ],
+    };
+    fs.writeFileSync(new URL('n1.json', dirUrl), JSON.stringify(before, null, 1));
+    fs.writeFileSync(new URL('index.json', dirUrl), JSON.stringify({ files: {} }, null, 1));
+    fs.writeFileSync(new URL('broken.json', dirUrl), '{ 깨진 파일');
+
+    const r = patchUrlsBySchool([
+      { school: '경희대학교', title: '두을장학재단 제29기 장학생 모집', url: 'https://x/view?id=322949' },
+    ], { dir: dirUrl });
+
+    const after = JSON.parse(fs.readFileSync(new URL('n1.json', dirUrl), 'utf8'));
+    eq('  진짜로 고친다 (표식 → 진짜 주소)', after.items[0].url, 'https://x/view?id=322949');
+    eq('    고친 건수를 돌려준다', r.fixed, 1);
+    /* 🔴 **줄지 않는다** — 재발행으로 바꾸면 여기서 걸린다. 이 한 줄이 551→200 축소를
+       막는 진짜 방어선이다(정적 검사는 이름만 바꿔도 뚫린다). */
+    eq('    항목 수가 줄지 않는다 (재발행이면 여기서 걸린다)', after.items.length, before.items.length);
+    eq('    대응이 없는 옛 공고는 건드리지 않는다', after.items[1].url, 'https://x/list#n-옛것');
+    eq('    색인은 건드리지 않는다', JSON.parse(fs.readFileSync(new URL('index.json', dirUrl), 'utf8')).files ? true : false, true);
+    /* 같은 주소면 다시 쓰지 않는다 — 무의미한 커밋을 만들지 않는다 */
+    eq('    바뀔 것이 없으면 파일을 안 쓴다', patchUrlsBySchool([
+      { school: '경희대학교', title: '두을장학재단 제29기 장학생 모집', url: 'https://x/view?id=322949' },
+    ], { dir: dirUrl }).files, 0);
+    /* 폴더가 없어도 넘어지지 않는다 (새 클론·첫 실행) */
+    eq('    폴더가 없어도 넘어지지 않는다',
+      patchUrlsBySchool([], { dir: new URL(`file://${dir}/없는폴더/`) }).fixed, 0);
+    fs.rmSync(dir, { recursive: true, force: true });
   }
 }
 

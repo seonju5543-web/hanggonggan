@@ -773,7 +773,11 @@ if (stillLost.length && !outOfTime()) {
 function saveAll(crashNote) {
   state.updatedAt = today;
   if (!DRY) {
-    if (found) {
+    /* ⚠️ `found` 만 보면 **순찰이 되돌린 것(demoted)이 통째로 버려진다** — demoted 는
+       found 를 올리지 않는다. 그러면 다음 실행이 같은 링크를 또 순찰한다.
+       짝인 resolve-detail-urls 는 `(fixed || reverted)` 로 처음부터 맞게 돼 있었다
+       (2026-09-05 코드 리뷰가 이 비대칭을 잡았다). */
+    if (found || demoted) {
       /* 🔴 사냥 결과를 저장하기 전에 중복을 합친다 — 안 하면 감사가 이 실행의 결과를
          통째로 되돌린다(위 import 주석의 2026-09-03 사고). 표식이 진짜 주소로 풀리면서
          비로소 같은 글이 되는 것이라, 수집 때는 없던 중복이 여기서 처음 생긴다. */
