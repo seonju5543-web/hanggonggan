@@ -11,19 +11,24 @@ on:
     - cron: '17 23 * * *'   # 08:17 KST (UTC+9)
     - cron: '17 13 * * *'   # 22:17 KST (UTC+9)
   workflow_dispatch:        # 수동 실행 버튼
-  # 🔴 개발자 브랜치에 push 될 때마다 **노션 「작업 현황」만** 갱신한다 (2026-09-06).
+  # 🔴 push 될 때마다 **노션 「작업 현황」만** 갱신한다 (2026-09-06).
   #    12시간마다로는 "지금 누가 무엇을 하는지"가 안 보인다는 개발자 지시.
-  #    ⚠️ PROGRESS.md 커밋과 알림 이슈는 이때 돌리지 않는다 — push 마다 main 이 움직여
-  #       배포가 다시 돌고 두 개발자에게 메일이 쏟아진다(그래서 아래 두 단계에 조건이 있다).
+  #    ⚠️ 브랜치를 `claude/work-*` 로 좁히면 안 된다 — 셋 다 기본 브랜치 대비 0커밋인
+  #       죽은 브랜치라 영영 안 돈다(2026-09-06 코드 리뷰가 잡았고 실측으로 확인했다).
+  #       실제 작업은 매번 새로 생기는 주제 브랜치에서 일어난다.
+  #    ⚠️ PROGRESS.md 커밋과 알림 이슈는 push 때 돌리지 않는다(아래 `update` 작업의 if)
+  #       — push 마다 main 이 움직여 배포가 다시 돌고 두 개발자에게 메일이 쏟아진다.
   push:
-    branches: [claude/work-seonju, claude/work-josehyeon, claude/work-eunseo]
+    branches-ignore: [main]
 
 permissions:
   contents: write
 
 jobs:
   update:
+    if: github.event_name != 'push'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout main
         uses: actions/checkout@v4
@@ -67,7 +72,7 @@ jobs:
           node /tmp/upd.mjs
 
       - name: Commit & push to main
-        if: steps.build.outputs.changed == 'true' && github.event_name != 'push'
+        if: steps.build.outputs.changed == 'true'
         run: |
           git config user.name "hanjang-progress-bot"
           git config user.email "actions@github.com"
@@ -86,7 +91,7 @@ jobs:
       # 문서가 실제로 갱신됐을 때만, 수집 리포트와 '동일한 방식'(이슈 배정 → GitHub이
       # 두 개발자에게 자동 메일)으로 알린다. 별도 메일 비밀번호(Secrets) 불필요.
       - name: 진척도 갱신 알림 (이슈 배정 → 두 개발자에게 자동 메일)
-        if: steps.build.outputs.changed == 'true' && github.event_name != 'push'
+        if: steps.build.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -101,12 +106,25 @@ jobs:
 
           확인 후 이 이슈는 닫으셔도 됩니다."
 
-      # 보강 단계 — 여기서 넘어져도 위의 PROGRESS 갱신은 이미 끝나 있다.
-      # NOTION_TOKEN 이 없으면 스크립트가 스스로 조용히 끝난다(0으로 종료).
+  # 노션 「작업 현황」 — push 한 사람의 줄만 갱신한다.
+  # 🔴 PROGRESS 작업과 **분리**한다: 같은 작업에 두면 push 마다 main 이 움직인다.
+  # 🔴 `continue-on-error` 를 걸지 않는다 — 열쇠 만료·공유 해제가 초록불에 묻히면
+  #    '갱신' 칸이 멈춘 것만 보여 아무도 모른 채 몇 주가 지난다.
+  # ⚠️ 로봇 push(수집기 등)는 사람이 아니므로 건너뛴다. 안 그러면 하루 10여 번 헛돈다.
+  notion:
+    if: github.event_name == 'push' && !endsWith(github.actor, '[bot]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # 같은 사람이 연달아 push 하면 마지막 것만 쓰면 된다(오래된 실행이 늦게 끝나 옛 상태를 덮는 것 방지).
+    concurrency:
+      group: notion-status-${{ github.actor }}
+      cancel-in-progress: true
+    steps:
+      - name: Checkout pushed ref
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: 노션 「작업 현황」 갱신
-        if: always()
-        timeout-minutes: 3
-        continue-on-error: true
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
         run: node tools/notion-status.mjs

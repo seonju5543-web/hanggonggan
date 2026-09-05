@@ -34,10 +34,23 @@ print(t, s)
 case "$tool" in
   # 노션 백로그에 실제로 **쓴** 것만 적는다 (2026-09-06 개발자 지시).
   # 🔴 읽기(fetch·search)는 세지 않는다 — 읽기만 해도 면제되면 관문이 뜻을 잃는다.
+  # 🔴 **실패한 쓰기도 세지 않는다** (코드 리뷰 지적). PostToolUse 는 결과와 무관하게
+  #    불리므로, 공유 안 된 페이지에 404 를 받고도 "반영했다"로 남을 수 있었다.
   # ⚠️ MCP 서버 이름은 개발자마다 다른 UUID 라 이름을 박으면 안 된다. notion 이라는
   #    글자로만 가린다(설정의 matcher 도 같은 이유로 정규식이다).
-  *notion-update-page|*notion-create-pages)
-    printf '%s %s\n' "$(date +%s)" "notion-write" >>"$gitdir/claude-skills-used"
+  *notion-update-page|*notion-create-pages|*notion-update-data-source|*notion-create-comment)
+    printf '%s' "$input" | python3 -c '
+import sys, json
+try:
+    d = json.load(sys.stdin)
+except Exception:
+    raise SystemExit(1)
+r = d.get("tool_response")
+# 도구가 실패를 알리는 꼴은 둘이다: isError 플래그, 또는 결과 문자열이 error 로 시작.
+if isinstance(r, dict) and r.get("isError"):
+    raise SystemExit(1)
+raise SystemExit(0)
+' 2>/dev/null && printf '%s %s\n' "$(date +%s)" "notion-write" >>"$gitdir/claude-skills-used"
     ;;
   Skill)
     # 🔴 **시각을 함께 적는다.** 이름만 적었더니 세션 앞부분에 한 번 부른 것으로

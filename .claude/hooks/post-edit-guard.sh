@@ -18,6 +18,13 @@ git rev-parse --git-dir >/dev/null 2>&1 || { echo "⚠️ git 저장소가 아�
 source "$(dirname "$0")/hook-scope.sh"
 cat >/dev/null 2>&1 || true
 
+# 노션 반영 알림의 표식 — **무엇이든** 고쳤으면 남긴다(커밋해도 남는다).
+# Stop 훅이 이걸 보고 "이번 작업을 노션에 적었나"를 묻는다.
+# 🔴 **두 조기 종료보다 위에 둔다** (2026-09-06 red-green 으로 잡음). 아래 뒀더니
+#    좁은 그물(hook_scope)에 안 걸리는 파일 — tools/·server/·index.html — 을 고칠 때
+#    이 줄에 닿기도 전에 exit 0 이 나서 표식이 영영 안 생겼다.
+[ -n "$(hook_touched_any)" ] && date +%s > "$(git rev-parse --git-dir)/claude-work-touched" 2>/dev/null || true
+
 scope="$(hook_scope)"
 [ -z "$scope" ] && exit 0
 

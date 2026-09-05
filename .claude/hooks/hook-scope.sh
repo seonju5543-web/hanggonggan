@@ -28,3 +28,9 @@ hook_scope() {
   echo "$files" | grep -qE "$HOOK_AUDIT_RE" && out="$out audit"
   echo "$out"
 }
+
+# 노션 반영 알림용 — **무엇이든** 바뀌었나 (2026-09-06 코드 리뷰 지적으로 신설)
+# 🔴 위의 hook_scope 를 쓰면 안 된다: 그것은 '검사를 돌려야 하는 파일'만 보는 좁은 그물이라
+#    index.html·style.css·server/·_admin/·tools/·docs/ 는 전부 빠진다.
+#    실제로 그 알림을 만든 커밋 자신이 그 그물에 안 걸렸다(리뷰가 잡았다).
+hook_touched_any() { [ -n "$(hook_changed_files)" ] && echo 1; }
