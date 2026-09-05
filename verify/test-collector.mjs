@@ -5,6 +5,11 @@
 
    실행: node verify/test-collector.mjs   (실패하면 exit 1) */
 import fs from 'node:fs';
+/* 🔴 URL 을 파일 경로로 쓸 때는 .pathname 이 아니라 fileURLToPath 다.
+   윈도우에서 .pathname 은 `/C:/…` 를 주는데 그건 유효한 경로가 아니라 파일을 못 열고
+   자식 프로세스도 못 띄운다. 리눅스(클라우드 검사)에서는 멀쩡해서 **이 검사 5개가
+   개발자 컴퓨터에서만 조용히 실패하고 있었다** — 진짜 실패를 가리는 소음이었다(2026-09-05). */
+import { fileURLToPath } from 'node:url';
 import { urlKey, titleKey, dedupeNotices, preferNotice, capNotices, clickRowKey } from '../collector/url-key.mjs';
 import { mergeCandidates } from '../collector/candidates.mjs';
 import { publishBySchool, splitBySchool } from '../collector/publish-notices.mjs';
@@ -2125,7 +2130,7 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
   const docx = fs.readdirSync(new URL('../collector/extracted/', import.meta.url))
     .filter((f) => /^elig-.*\.docx$/.test(f))[0];
   if (docx) {
-    const t = AT.attachmentText(new URL(`../collector/extracted/${docx}`, import.meta.url).pathname);
+    const t = AT.attachmentText(fileURLToPath(new URL(`../collector/extracted/${docx}`, import.meta.url)));
     eq('  docx는 문단 단위로 읽어 숫자가 안 빠진다', /\d년제/.test(t) || /\d\.\d\/\d\.\d/.test(t), true);
   } else eq('  (docx 표본 없음 — 건너뜀)', true, true);
   eq('  글자가 거의 없으면 읽을 만하지 않다고 답한다', AT.readable('가나다'), false);
@@ -3298,7 +3303,7 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
   const run = (args) => {
     try {
       return execFileSync(process.execPath, ['verify/what-shows.mjs', ...args],
-        { cwd: new URL('..', import.meta.url).pathname, encoding: 'utf8', timeout: 60000 });
+        { cwd: fileURLToPath(new URL('..', import.meta.url)), encoding: 'utf8', timeout: 60000 });
     } catch (e) { return String((e && (e.stdout || e.message)) || ''); }
   };
 
