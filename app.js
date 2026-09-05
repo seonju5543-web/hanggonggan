@@ -185,9 +185,13 @@ function deadlineTs(sch) {
   return sch.deadline ? new Date(sch.deadline).getTime() : Infinity; // 기한 미확정은 뒤로 정렬
 }
 
-/* 마감된 공고를 목록에 며칠 더 남겨 둘지 (2026-08-02 개발자 지시로 30 → 7).
-   0으로 두면 마감 당일 사라져 '내가 신청한 그 공고'를 못 찾으므로 짧게 남긴다. */
-const CLOSED_KEEP_DAYS = 7;
+/* 마감된 공고를 **신청 화면 목록에** 며칠 더 남겨 둘지 (2026-09-05 개발자 지시로 7 → 1).
+   1 = 마감 다음 날까지 '마감'으로 보이고, 그 다음 날 목록에서 내려간다.
+   🔴 사라지는 게 아니라 **자리를 옮기는 것**이다 — 담아 둔 공고는 신청 내역에 그대로
+      남는다(renderApplications 는 이 상수도 dday 도 쓰지 않는다 — 회귀 검사가 못 박음).
+      예전 주석이 걱정한 "'내가 신청한 그 공고'를 못 찾는다"는 그 경로로 해결된다.
+      층2(KOSAF) 목록도 같은 상수를 쓰므로 함께 적용된다 — 규칙이 갈라지지 않게 그대로 둔다. */
+const CLOSED_KEEP_DAYS = 1;
 
 function dday(dateStr) {
   if (!dateStr) return { label: '기한 원문 확인', cls: '', days: 14 }; // 마감을 확정 못 한 공고 — 목록에 유지
@@ -859,7 +863,7 @@ function byMissingLast(va, vb, dir) {
   return va < vb ? -dir : va > vb ? dir : 0;
 }
 /* 🔴 이미 마감된 공고는 '마감 임박순'에서 **뒤로** 보낸다 (2026-08-26 스크린샷으로 발견).
-   마감 7일까지는 목록에 남기는 규칙(CLOSED_KEEP_DAYS) 때문에, 그냥 날짜 오름차순으로 두면
+   마감 다음 날까지는 목록에 남기는 규칙(CLOSED_KEEP_DAYS) 때문에, 그냥 날짜 오름차순으로 두면
    **지나간 공고가 맨 위**에 온다. '임박'은 다가온다는 뜻이지 지나갔다는 뜻이 아니다.
    지난 것끼리는 최근에 마감된 것부터 (아직 접수를 받을 여지가 그나마 크다). */
 const isPastDue = (d) => !!d && dday(d).days < 0;
@@ -925,7 +929,7 @@ function renderExplore() {
     || sorter.cmp(a, b)
   );
 
-  list = list.filter((m) => dday(m.sch.deadline).days >= -CLOSED_KEEP_DAYS); // 마감 1주일 경과 시 자동 숨김
+  list = list.filter((m) => dday(m.sch.deadline).days >= -CLOSED_KEEP_DAYS); // 마감 다음 날까지만 (그 뒤로는 신청 내역에서)
   list = list.filter((m) => notStale(m.sch)); // 마감을 확정 못 한 공고는 등록 후 60일까지만 노출
   if (exploreFilter === '교내' || exploreFilter === '교외') list = list.filter((m) => m.sch.type === exploreFilter);
   /* '신청 가능만'은 **정말 지금 신청할 수 있는 것**만 보여야 한다 (2026-08-02 개발자 지적).
@@ -2354,6 +2358,12 @@ function appCard(app) {
      정작 그 아래 막대가 무엇을 재는 막대인지는 화면 어디에도 안 적혀 있었다.
      이제 이름과 'n/4'가 막대 바로 위에 붙어, 막대와 글자가 같은 것을 말한다. */
   const stepNow = app.pending ? '서류 작성 필요' : stepLabel;
+  /* 🔴 마감된 공고는 여기가 **유일한 자리**다 (2026-09-05 — 목록은 마감 다음 날 내린다).
+     진행 단계만 적으면 제출 안 한 채 마감된 건이 '신청 준비 완료'로만 보여 아직 낼 수 있다고
+     오해한다. 판정을 새로 만들지 않고 dday() 가 이미 내린 cls 를 읽는다 — 목록·상세·알림과
+     같은 함수다. 마감일이 없는 공고(상시 제도·기한 미확인)는 cls 가 비어 배지가 안 뜬다. */
+  const closedBadge = dday(sch.deadline).cls === 'closed'
+    ? '<span class="badge badge-dday closed">마감</span>' : '';
   const stepCount = app.pending ? '' : `${step + 1}/${APP_STEPS.length}`;
   const pct = app.pending ? 6 : ((step + 1) / APP_STEPS.length) * 100;
   return `
@@ -2362,7 +2372,7 @@ function appCard(app) {
          aria-label="${esc(sch.name)} 선택" />` : ''}
       <button class="sch-card" data-detail="${sch.id}" tabindex="-1">
         <div class="sch-top">
-          <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${sch.type}</span>
+          <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${sch.type}</span>${closedBadge}
         </div>
         <p class="sch-name">${esc(sch.name)}</p>
         <div class="app-step app-step-s${step}${app.result === 'lost' ? ' app-step-lost' : ''}${app.pending ? ' app-step-wait' : ''}">

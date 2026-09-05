@@ -2529,6 +2529,32 @@ console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08
   eq('앱을 켠 지 사흘 지나도 그날의 어제는 마감이다', make(t3).dday(어제(t3)).label, '마감');
   eq('사흘 전 기준의 D-2 는 이제 마감이다', make(t3).dday(어제(t0)).label, '마감');
 
+  /* ── 마감 공고의 자리 — 목록에서 내리고 신청 내역에는 남긴다 (2026-09-05 개발자 지시) ──
+     같은 블록에 두는 이유: 위의 grab·appSrc 를 그대로 쓴다(사본을 만들면 갈라진다). */
+  console.log('■ 마감 공고의 자리 — 목록에서 내리고 신청 내역에는 남긴다 (2026-09-05)');
+  eq('마감 공고는 마감 다음 날까지만 목록에 남는다',
+    appSrc.includes('const CLOSED_KEEP_DAYS = 1;'), true);
+  eq('목록 거르기가 그 상수를 그대로 쓴다',
+    appSrc.includes('dday(m.sch.deadline).days >= -CLOSED_KEEP_DAYS'), true);
+  eq('층2(KOSAF)도 같은 상수를 쓴다',
+    appSrc.includes('dday(i.due).days >= -CLOSED_KEEP_DAYS'), true);
+
+  /* 🔴 이 항목이 이 절의 존재 이유다 — 신청 내역은 마감으로 거르면 안 된다.
+     목록에서 내리는 근거가 '신청 내역에는 남아 있다'이므로, 여기에 마감 필터가 들어오는
+     순간 학생이 담아 둔 공고가 통째로 사라진다. 지금 그걸 막는 장치는 이 검사뿐이다. */
+  const appsSrc = grab('renderApplications');
+  eq('신청 내역은 마감으로 거르지 않는다 (CLOSED_KEEP_DAYS 없음)',
+    appsSrc.includes('CLOSED_KEEP_DAYS'), false);
+  eq('신청 내역은 마감으로 거르지 않는다 (dday 판정 없음)',
+    appsSrc.includes('dday('), false);
+
+  /* 마감 배지는 자기만의 잣대를 만들지 않는다 — dday() 가 내린 cls 를 읽는다.
+     새로 `days < 0` 을 쓰면 상시 제도(days:14)·기한 미확인까지 규칙이 갈라진다. */
+  const cardSrc = grab('appCard');
+  eq('신청 내역 카드가 마감을 표시한다', cardSrc.includes('badge-dday closed'), true);
+  eq('마감 판정을 dday().cls 로 한다', cardSrc.includes("dday(sch.deadline).cls === 'closed'"), true);
+  eq('마감 판정을 손으로 다시 쓰지 않는다', cardSrc.includes('.days < 0'), false);
+
   /* 지원 자격을 '단어'로 옮기는 규칙 — 지어내지 않는지 본다(원칙 8-1) */
   /* bulkTags 는 자기 파일의 상수(BULK_TAG_MAX)와 원문 파서(parseLine)를 함께 쓴다.
      파서는 typeof 로 막혀 있어 없으면 건너뛴다 — 여기서는 구조화된 자격만 본다. */
