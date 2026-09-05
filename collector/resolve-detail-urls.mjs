@@ -18,6 +18,8 @@
 import fs from 'node:fs';
 import { chromium } from 'playwright';
 import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, detailCandidates, idsFromSource, looksLikeLoginWall, rowDetailCandidates, looksLikeList} from './detail-url.mjs';
+/* 앱이 읽는 학교별 파일까지 고친 주소를 옮긴다 (2026-09-05) */
+import { patchUrlsBySchool } from './publish-notices.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const DRY = process.argv.includes('--dry');
@@ -489,6 +491,14 @@ function saveAll(crashNote) {
   if (!DRY && (fixed || reverted)) {
     fs.writeFileSync(noticesPath, JSON.stringify(notices, null, 1));
     fs.writeFileSync(registeredPath, JSON.stringify(registered, null, 1));
+    /* 🔴 앱이 읽는 것은 data/notices.json 이 아니라 data/notices/<학교>.json 이다 —
+       여기서 멈추면 고친(또는 되돌린) 주소가 다음 수집까지 학생 화면에 안 닿는다.
+       재발행이 아니라 **그 자리만 고친다**(이유는 publish-notices.mjs patchUrlsBySchool 첫머리). */
+    const patched = patchUrlsBySchool(notices.items);
+    if (patched.fixed) {
+      report.push(`_(학교별 공고 파일 ${patched.files}개에서 주소 ${patched.fixed}건을 함께 고쳤습니다 — 앱이 읽는 것은 이쪽입니다)_`);
+      report.push('');
+    }
   }
   fs.writeFileSync(new URL('resolved-urls.json', HERE), JSON.stringify({ updatedAt: new Date().toISOString().slice(0, 10), map: resolvedMap }, null, 1));
 

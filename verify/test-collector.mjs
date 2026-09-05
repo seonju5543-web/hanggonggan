@@ -1912,6 +1912,38 @@ console.log('\n■ 링크 사냥꾼의 제목 대조 (2026-08-23)');
   eq('    정상 종료를 붙들지 않는다 (unref)', /watchdog\.unref\(\)/.test(lh), true);
 }
 
+console.log('\n■ 주소를 고치는 로봇은 학교별 파일까지 고친다 (2026-09-05)');
+{
+  /* 🔴 앱이 읽는 것은 `data/notices.json` 이 아니라 `data/notices/<학교>.json` 이다
+     (2026-08-17 분리). 주소를 고치는 로봇 둘(링크 사냥꾼·원문 링크 복구)이 옛 파일만
+     고치고 있어서, **고친 주소가 다음 수집까지 학생 화면에 안 닿았다.**
+     실측(2026-09-05): 학교별 파일에 표식(#n-)이 38건 남아 있었고 그중 15건은
+     `notices.json` 에서는 이미 진짜 주소로 고쳐진 것이었다.
+
+     🔴 **재발행(publishBySchool)으로 고치면 더 나빠진다** — 수집기는 `capNotices` 로
+     자르기 **전** 목록을 발행하는데 이 로봇들이 든 것은 이미 잘린 목록이라, 재발행하면
+     학교별 파일이 전체 상한만큼 **줄어든다**. 그래서 `patchUrlsBySchool` 로 그 자리만 고친다. */
+  for (const [name, file] of [['링크 사냥꾼', 'link-hunter.mjs'], ['원문 링크 복구', 'resolve-detail-urls.mjs']]) {
+    const src = fs.readFileSync(new URL(`../collector/${file}`, import.meta.url), 'utf8');
+    eq(`${name}은 학교별 파일도 고친다`, /patchUrlsBySchool\(/.test(src), true);
+    eq('  가져다 쓴다 (베끼지 않는다)',
+      /import \{[^}]*\bpatchUrlsBySchool\b[^}]*\} from '\.\/publish-notices\.mjs'/.test(src), true);
+    /* ⚠️ 재발행은 금지 — 위 주석 참조. 이 검사가 그 실수를 막는 유일한 자리다. */
+    eq('  재발행하지 않는다 (publishBySchool 을 부르면 학교별 파일이 줄어든다)',
+      /publishBySchool\(/.test(src), false);
+    /* 고치는 것은 **쓴 뒤**여야 한다 — notices.json 을 쓰기 전에 고치면 옛 값으로 고친다 */
+    const writeAt = src.indexOf('writeFileSync(noticesPath');
+    const patchAt = src.indexOf('patchUrlsBySchool(');
+    eq('  notices.json 을 쓴 뒤에 고친다', writeAt >= 0 && patchAt > writeAt, true);
+  }
+  /* 🔴 고쳐도 `git add` 에 없으면 저장되지 않는다 (이슈 #79 계열) */
+  for (const wf of ['link-hunter', 'resolve-detail-urls']) {
+    const y = fs.readFileSync(new URL(`../.github/workflows/${wf}.yml`, import.meta.url), 'utf8');
+    const line = (y.split('\n').find((l) => /^\s*git add /.test(l)) || '');
+    eq(`  ${wf} 워크플로가 data/notices 를 저장한다`, /\bdata\/notices\b(?!\.json)/.test(line), true);
+  }
+}
+
 console.log('\n■ 목록 화면인가 상세 화면인가 (2026-08-20)');
 {
   const D = await import(new URL('../collector/detail-url.mjs', import.meta.url));

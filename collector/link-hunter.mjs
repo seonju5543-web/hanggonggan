@@ -64,6 +64,9 @@ import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, titleFinge
    **통째로 되돌린다** — 2026-09-03 실행이 정확히 그랬다(주소를 찾아 놓고 전량 폐기).
    dedupeNotices 는 표식보다 진짜 링크를 남기므로 여기 쓰기에 꼭 맞는다. */
 import { dedupeNotices } from './url-key.mjs';
+/* 앱이 읽는 것은 학교별 파일이다 — 고친 주소를 거기까지 옮긴다(재발행이 아니라 그 자리만 고침).
+   왜 재발행이면 안 되는지는 publish-notices.mjs 의 patchUrlsBySchool 첫머리에 있다. */
+import { patchUrlsBySchool } from './publish-notices.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const DRY = process.argv.includes('--dry');
@@ -781,6 +784,13 @@ function saveAll(crashNote) {
         report.push('');
       }
       fs.writeFileSync(noticesPath, JSON.stringify(notices, null, 1));
+      /* 🔴 여기서 멈추면 고친 주소가 **다음 수집까지 학생 화면에 안 닿는다** —
+         앱은 data/notices.json 이 아니라 data/notices/<학교>.json 을 읽는다. */
+      const patched = patchUrlsBySchool(notices.items);
+      if (patched.fixed) {
+        report.push(`_(학교별 공고 파일 ${patched.files}개에서 주소 ${patched.fixed}건을 함께 고쳤습니다 — 앱이 읽는 것은 이쪽입니다)_`);
+        report.push('');
+      }
       fs.writeFileSync(registeredPath, JSON.stringify(registered, null, 1));
     }
     fs.writeFileSync(statePath, JSON.stringify(state, null, 1));

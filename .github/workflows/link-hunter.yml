@@ -135,7 +135,9 @@ jobs:
         run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/notices.json data/registered.json collector/link-hunt.json collector/link-hunt-report.md
+          # 🔴 `data/notices` 를 빠뜨리면 로봇이 고친 주소가 **저장되지 않는다** — 앱이 읽는 것은
+          #    학교별 파일이다(이슈 #79 계열: 로봇이 고친 파일은 전부 git add 목록에 있어야 한다).
+          git add data/notices.json data/notices data/registered.json collector/link-hunt.json collector/link-hunt-report.md
           if ! git diff --cached --quiet; then
             git commit -m "링크 사냥꾼: 원문 주소 ${{ steps.hunt.outputs.found }}건 확보"
             pushed=0

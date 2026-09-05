@@ -88,7 +88,8 @@ jobs:
         run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/notices.json data/registered.json collector/resolve-report.md collector/resolved-urls.json
+          # 🔴 `data/notices` 를 빠뜨리면 고친 주소가 저장되지 않는다 — 앱이 읽는 것은 학교별 파일이다.
+          git add data/notices.json data/notices data/registered.json collector/resolve-report.md collector/resolved-urls.json
           if ! git diff --cached --quiet; then
             git commit -m "원문 링크 복구 — 목록 주소를 공고 원문 주소로 (${{ steps.run.outputs.fixed }}건)"
             pushed=0
