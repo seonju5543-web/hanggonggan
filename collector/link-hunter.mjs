@@ -57,6 +57,13 @@ import fs from 'node:fs';
 import { chromium } from 'playwright';
 import { cleanTitle } from './clean-title.mjs';
 import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, titleFingerprint, detailCandidates, idsFromSource, looksLikeLoginWall, rowDetailCandidates, looksLikeList } from './detail-url.mjs';
+/* 🔴 발행 직전 중복 정리는 **수집기와 같은 규칙**을 쓴다 (2026-09-04 신설).
+   사냥꾼은 표식(#n-)을 진짜 주소로 바꾸는 로봇이라, 같은 공고가 서로 다른 표식으로
+   두 번 담겨 있으면 **둘 다 같은 주소로 풀려 중복이 된다.** 그 중복 하나 때문에
+   저장 직전 감사가 `실시간 공고에 중복 1건`으로 떨어지고, 워크플로가 사냥해 온 것을
+   **통째로 되돌린다** — 2026-09-03 실행이 정확히 그랬다(주소를 찾아 놓고 전량 폐기).
+   dedupeNotices 는 표식보다 진짜 링크를 남기므로 여기 쓰기에 꼭 맞는다. */
+import { dedupeNotices } from './url-key.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const DRY = process.argv.includes('--dry');
@@ -726,6 +733,15 @@ function saveAll(crashNote) {
   state.updatedAt = today;
   if (!DRY) {
     if (found) {
+      /* 🔴 사냥 결과를 저장하기 전에 중복을 합친다 — 안 하면 감사가 이 실행의 결과를
+         통째로 되돌린다(위 import 주석의 2026-09-03 사고). 표식이 진짜 주소로 풀리면서
+         비로소 같은 글이 되는 것이라, 수집 때는 없던 중복이 여기서 처음 생긴다. */
+      const before = notices.items.length;
+      notices.items = dedupeNotices(notices.items);
+      if (notices.items.length !== before) {
+        report.push(`_(중복 ${before - notices.items.length}건을 합쳤습니다 — 표식이 진짜 주소로 풀리며 같은 글이 된 것)_`);
+        report.push('');
+      }
       fs.writeFileSync(noticesPath, JSON.stringify(notices, null, 1));
       fs.writeFileSync(registeredPath, JSON.stringify(registered, null, 1));
     }

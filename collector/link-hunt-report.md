@@ -1,61 +1,61 @@
-## 🎯 링크 사냥꾼 리포트 (2026-08-26 06:55 KST)
+## 🎯 링크 사냥꾼 리포트 (2026-09-04 22:02 KST)
 
-사냥 대상 **5건** (게시판 2곳) · 포기 처리된 건 9건
+사냥 대상 **42건** (게시판 8곳) · 포기 처리된 건 0건
 
 ## 1단계 · 사냥 (원문 공고가 안 열리는 링크 고치기 — 본업)
-### https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5
-  - ✅ (다빈치) 2026학년도 다빈치캠퍼스 2학기 학기 중 교내•외근로 국가근 → https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOA
-    · 탈락(목록 화면(다른 공고 제목이 여럿 보임)) https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB
-    · 탈락(본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)) https://www.cau.ac.kr/cms/FR_CON/view.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5&BBS_SEQ=30098
-  - ⚠️ 실패(본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)): (서울)2026학년도 2학기 서울캠퍼스 학기중 일반 교내·외 국가근로장학
+### https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318
+  - ✅ 공통 제36기 미레에셋 해외교환 장학생 선발 → https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322953
+  - ✅ 공통 [공통] 두을장학재단 제29기 장학생 모집 → https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322949
+  - ✅ 공통 [공통] 2026학년도 2학기 경희꿈도전장학 신청 안내 → https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322922
+  - ✅ 공통 2026년도 익산사랑 장학생 선발 안내 → https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322917
+  - ✅ 공통 2026년도 하반기 울산연구원 장학생 선발 안내 → https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322916
+  - ✅ 공통 2026학년도 2학기 선원가족 장학생 모집 안내 → https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322915
+  - ✅ 공통 2026-2학기 푸른등대 기부장학금 신규장학생 신청 안내(8/26~ → https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322894
+  - ✅ 공통 희망사다리 장학생 대상 2026 중견기업 일자리 박람회 개최 안내 → https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322893
+  - ✅ 공통 2026년도 익산사랑 장학생 선발 안내 → https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322917
+  - ✅ 공통 2026-2학기 푸른등대 기부장학금 신규장학생 신청 안내(8/26~9/ → https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322894
+  - ✅ 공통 제36기 미레에셋 해외교환 장학생 선발 → https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322953
+  - ✅ 공통 [공통] 두을장학재단 제29기 장학생 모집 → https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322949
+  - ✅ 공통 [공통] 2026학년도 2학기 우정장학(학업장려금) 신청 안내 → https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322875
+  - ✅ 공통 [공통] 2026학년도 2학기 우정장학(가계곤란) 복학생/재입학생 → https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322874
+
+### https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100
+  - ✅ [한국장학재단] 2026년 장학금 부정수급 자진신고 캠페인 → https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOAR
+  - ✅ 2026학년도 2학기 장애학생도우미(국가근로장학생) 모집 (서울캠퍼스) → https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOAR
+  - ✅ 2026년도 제7기 경원장학재단 장학생 선발 공고 → https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOAR
+  - ✅ 2026학년도 손태희장학재단 장학생 선발 공고 → https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOAR
+  - ⚠️ 목록에서 못 찾음 (1회째 · 계속 다시 찾습니다): (서울)2026학년도 2학기 서울캠퍼스 학기중 일반 교내·외 국가근로장학
+
+### https://www.uos.ac.kr/korNotice/list.do?list_id=FA1
+  - ⚠️ 목록에서 못 찾음 (1회째 · 계속 다시 찾습니다): [마감][대외협력과] 2026년 2학기 국가근로장학생 모집
+  - ⚠️ 목록에서 못 찾음 (1회째 · 계속 다시 찾습니다): *****마감*****[근무부서 : 교무과] 2026학년도 2학기 국가근
+  - ⚠️ 목록에서 못 찾음 (1회째 · 계속 다시 찾습니다): **마감** [인공지능융합대학] 2026학년도 2학기 국가근로장학생 모집
+  - ⚠️ 목록에서 못 찾음 (1회째 · 계속 다시 찾습니다): (마감) [일반대학원] 2026학년도 2학기 직장체험인턴장학생 모집
 
 ### https://www.dongguk.edu/article/JANGHAKNOTICE/list
-    · 탈락(page.goto: net::ERR_CONNECTION_CLOSED at https://www.don) https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765890
-  - ⚠️ 실패(page.goto: net::ERR_CONNECTION_CLOSED at https://www.don): [홍보] 2026년 2학기 선원가족장학사업 안내 2026.08.
-  - ✅ [홍보] (재)달서인재육성장학재단 2026년도 하반기 장학생 선 → https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765887
-    · 탈락(제목 불일치(다른 글이 열림)) https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765853
-    · 탈락(HTTP 404) https://www.dongguk.edu/article/JANGHAKNOTICE/view?nttId=26765853
-  - ⚠️ 실패(HTTP 404): 학자금대출 기등록처리 관련 공지 (8/31일 이후가능) 202
+  - ✅ 2026-2학기 중소기업 취업연계 장학(희망사다리 Ⅰ유형) 신 → https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765929
+  - ✅ 2026-2학기 고졸 후학습자 장학사업(희망사다리 Ⅱ유형) 신 → https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765909
+  - ✅ 26-2학기 고졸 후학습자 장학사업(희망사다리 Ⅱ유형) 신규장 → https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765909
+  - ✅ 2026-2학기 고양이엄마(송수경)장학 장학생 선발 안내(1인 → https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765902
+    · 탈락(page.goto: Timeout 20000ms exceeded.) https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765783
+  - ⚠️ 실패(page.goto: Timeout 20000ms exceeded.): [기한연장] 2026학년도 이상호.박순엽 장학 선발 안내(~9
+  - ⚠️ 목록에서 못 찾음 (1회째 · 계속 다시 찾습니다): [홍보] 2026년 2학기 푸른등대 기부장학금 신규장학생 선발
+  - ⚠️ 목록에서 못 찾음 (1회째 · 계속 다시 찾습니다): [홍보] 2026년도 익산사랑 장학생 선발 안내 2026.08.
+  - ⚠️ 목록에서 못 찾음 (1회째 · 계속 다시 찾습니다): [홍보] 한국장학재단 주관 2026 중견기업 일자리 박람회 개최
+  - ⚠️ 목록에서 못 찾음 (1회째 · 계속 다시 찾습니다): 한국장학재단 학자금 지원 구간 개편 안내(2027년 시행) 2
+  - ⚠️ 목록에서 못 찾음 (1회째 · 계속 다시 찾습니다): [홍보] 2026년도 하반기 울산연구원 장학생 선발 안내 202
+  - ⚠️ 목록에서 못 찾음 (1회째 · 계속 다시 찾습니다): [홍보] 2026년 2학기 선원가족장학사업 안내 2026.08.
+  - ⚠️ 목록에서 못 찾음 (3회째 · 계속 다시 찾습니다): 학자금대출 기등록처리 관련 공지 (8/31일 이후가능) 202
+  - ⚠️ 목록에서 못 찾음 (4회째 · 계속 다시 찾습니다): [홍보] 2026년도 (재)광산장학회 장학생 선발 안내 2026
+  - ⚠️ 목록에서 못 찾음 (4회째 · 계속 다시 찾습니다): [홍보] 앨트웰민초장학재단 제27기 장학생 선발 안내 2026.
+  - ⚠️ 목록에서 못 찾음 (4회째 · 계속 다시 찾습니다): [홍보] 2026년도 제7기 경원장학재단 장학생 선발 안내 20
 
-## 3단계 · 끈질기게 (다른 게시판 · 학교 사이트 검색)
-- 아직 못 찾은 3건에 대해 다른 방법을 시도합니다
-  - ⚠️ 다른 경로에서도 못 찾음 (2곳 시도): (서울)2026학년도 2학기 서울캠퍼스 학기중 일반 교내·외 국가근로장학
-  - ⚠️ 다른 경로에서도 못 찾음 (1곳 시도): [홍보] 2026년 2학기 선원가족장학사업 안내 2026.08.
-  - ⚠️ 다른 경로에서도 못 찾음 (1곳 시도): 학자금대출 기등록처리 관련 공지 (8/31일 이후가능) 202
-- 3단계 추가 확보: 0건
+_(시간 상한 — 나머지 게시판은 다음 실행)_
 
-
-## 덤 · 순찰 (멀쩡해 보이는 링크가 정말 그 공고로 가는가)
-### https://www.uos.ac.kr
-- 순찰 3건 · 통과 1 · 못 읽음 2 · **학생이 못 보는 링크 0**
-### https://www.snue.ac.kr
-- 순찰 1건 · 통과 1 · 못 읽음 0 · **학생이 못 보는 링크 0**
-### https://www.yonsei.ac.kr
-- 순찰 1건 · 통과 1 · 못 읽음 0 · **학생이 못 보는 링크 0**
-### https://www.skku.edu
-- 순찰 1건 · 통과 1 · 못 읽음 0 · **학생이 못 보는 링크 0**
-### https://dep.hufs.ac.kr
-- 순찰 1건 · 통과 1 · 못 읽음 0 · **학생이 못 보는 링크 0**
-### https://www.kw.ac.kr
-- 순찰 1건 · 통과 1 · 못 읽음 0 · **학생이 못 보는 링크 0**
-### https://www.gachon.ac.kr
-- 순찰 12건 · 통과 11 · 못 읽음 0 · **학생이 못 보는 링크 1**
-  - ↩️ 표식으로 되돌림(제목 불일치(다른 글이 열림)): [공통] └ RE:(생활비)2026학년도 (재)우강장학재단 장학생 선발 결과 안
-- 순찰 합계: 20건 확인 · 1건을 사냥 대상으로 넘김
-
-### 이번 회차는 쉬는 건 (간격을 두고 다시 시도합니다)
-- ⏳ 2026-08-27 에 다시 시도 (3회 실패) — 2687 [홍보] 2026년도 (재)광산장학회 장학생 선발 안내 2026.08. (HTTP 404)
-- ⏳ 2026-08-28 에 다시 시도 (3회 실패 · 게시판에서 내려간 듯) — 2026학년도 2학기 디딤돌 장학 신청 안내 학생지원팀 2026-08-21 45 (목록에서 못 찾음)
-- ⏳ 2026-08-28 에 다시 시도 (3회 실패) — [공통][국가] 장학금 부정청구 자진신고 안내 새글 (목록 화면(다른 공고 제목이 여럿 보임))
-- ⏳ 2026-08-27 에 다시 시도 (3회 실패) — 2684 [홍보] 앨트웰민초장학재단 제27기 장학생 선발 안내 2026.08.2 (HTTP 404)
-- ⏳ 2026-08-28 에 다시 시도 (3회 실패 · 게시판에서 내려간 듯) — 일반공지 2026학년도 2학기 경방육영회 장학생 선발 신촌/국제 (목록에서 못 찾음)
-- ⏳ 2026-08-27 에 다시 시도 (3회 실패) — 2683 [홍보] 2026년도 제7기 경원장학재단 장학생 선발 안내 2026.0 (HTTP 404)
-- ⏳ 2026-09-22 에 다시 시도 (7회 실패) — 복지장학1(본인장애) (2026-2학기) (HTTP 404)
-- ⏳ 2026-09-22 에 다시 시도 (7회 실패) — 부남장학생 (동국대, 2026-2학기) (HTTP 404)
-- ⏳ 2026-09-04 에 다시 시도 (5회 실패 · 게시판에서 내려간 듯) — (재)가송재단 장학생 (동국대 접수, 2026-2학기) (목록에서 못 찾음)
+_(순찰 생략 — 사냥에 시간을 다 썼습니다)_
 
 ---
-원문 주소 확보 **2건** · 아직 못 찾음 3건 · 사람에게 알릴 건 0건
+원문 주소 확보 **22건** · 아직 못 찾음 16건 · 사람에게 알릴 건 1건
 
 **포기하는 건 없습니다** — 못 찾은 공고는 간격을 늘려 가며(1일→3일→7일→14일→30일) 계속 다시 찾습니다.
 

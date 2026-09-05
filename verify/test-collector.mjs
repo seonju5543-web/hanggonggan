@@ -1867,6 +1867,26 @@ console.log('\n■ 링크 사냥꾼의 제목 대조 (2026-08-23)');
   const regd = JSON.parse(fs.readFileSync(new URL('../data/registered.json', import.meta.url), 'utf8'));
   const dirty = (regd.items || regd).filter((x) => x.boardTitle && CT.cleanTitle(x.boardTitle) !== x.boardTitle);
   eq('  저장된 boardTitle 에도 부스러기가 없다', dirty.length, 0);
+
+  /* 🔴 **사냥꾼은 저장 전에 중복을 합쳐야 한다** (2026-09-05 — 열흘치 결과를 버린 원인).
+     사냥꾼은 표식(#n-)을 진짜 주소로 바꾸는 로봇이라, 같은 글이 서로 다른 표식으로 두 번
+     담겨 있으면 **둘 다 같은 주소로 풀리며 그 순간 중복이 된다**(수집 때는 없던 중복이다).
+     그 중복 하나 때문에 저장 직전 감사가 `실시간 공고에 중복 1건`으로 떨어지고,
+     워크플로는 `steps.audit.outcome == 'success'` 일 때만 저장하므로 **사냥해 온 주소를
+     통째로 되돌린다.** 2026-09-03 실행이 정확히 그랬고(주소를 찾아 놓고 전량 폐기),
+     2026-09-05 에 손으로 돌렸을 때도 동국대 고졸후학습자 2건이 같은 주소로 풀려 재현됐다.
+     ⚠️ 합치기는 수집기와 **같은 함수**여야 한다 — 베끼면 '수집기는 합치는데 사냥꾼은
+     안 합치는' 갈라짐이 그대로 돌아온다. */
+  eq('  사냥꾼도 수집기와 같은 중복 합치기를 쓴다', /from '\.\/url-key\.mjs'/.test(lh), true);
+  {
+    const save = lh.slice(lh.indexOf('function saveAll'));
+    const body = save.slice(0, save.indexOf('\nfunction ', 1));
+    const dedupeAt = body.indexOf('dedupeNotices(');
+    const writeAt = body.indexOf('writeFileSync(noticesPath');
+    eq('    저장 경로에서 실제로 부른다', dedupeAt >= 0, true);
+    eq('    쓰기보다 먼저 합친다 (뒤면 중복이 그대로 저장된다)',
+      dedupeAt >= 0 && writeAt >= 0 && dedupeAt < writeAt, true);
+  }
 }
 
 console.log('\n■ 목록 화면인가 상세 화면인가 (2026-08-20)');
