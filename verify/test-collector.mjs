@@ -367,6 +367,10 @@ function undeclaredNames(src) {
   for (const m of code.matchAll(/import\s*\{([^}]*)\}/g)) {
     m[1].split(',').forEach((s) => { const n = s.trim().split(/\s+as\s+/).pop(); if (n) declared.add(n); });
   }
+  /* 기본 임포트(`import ASK from '...'`)도 선언이다 — 2026-09-05 에 이걸 못 읽어
+     멀쩡한 임포트를 '선언 없는 이름'이라고 잡았다. 검사가 틀리면 다음 사람이 검사를 끈다. */
+  for (const m of code.matchAll(/import\s+([A-Z][A-Z0-9_]{2,})\s*(?:,\s*\{[^}]*\}\s*)?from\b/g)) declared.add(m[1]);
+  for (const m of code.matchAll(/import\s*\*\s*as\s+([A-Z][A-Z0-9_]{2,})\b/g)) declared.add(m[1]);
   const bad = new Set();
   for (const m of code.matchAll(/\b([A-Z][A-Z0-9_]{2,})\b/g)) if (!declared.has(m[1])) bad.add(m[1]);
   return [...bad];
@@ -379,6 +383,10 @@ function undeclaredNames(src) {
   // 이 검사가 실제로 그 사고를 잡는지 스스로 확인한다 (검사가 잠들면 없느니만 못하다)
   eq('검사가 실제로 그 사고를 잡는다',
     undeclaredNames('const A = 1;\nconsole.log(`값 ${A}/${GIVE_UP_AFTER}회`);'), ['GIVE_UP_AFTER']);
+  eq('  기본 임포트는 선언으로 읽는다 (잘못된 빨간불 방지)',
+    undeclaredNames("import ASK from './x.js';\nconsole.log(ASK.p);"), []);
+  eq('  그래도 안 들여온 이름은 잡는다',
+    undeclaredNames("import ASK from './x.js';\nconsole.log(NOPE);"), ['NOPE']);
 }
 
 /* 🔴 재단 서버가 한 번 안 받아 주면 실행 전체가 죽는다 (2026-09-01 이슈 #227).
