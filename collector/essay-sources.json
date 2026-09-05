@@ -103,13 +103,13 @@
       "url": "https://news.incruit.com/news/newsview.asp?newsno=436538",
       "kind": "value",
       "note": "자기소개서 가치관 작성 포인트 (2026-09-05 추가)",
-      "strike": 0
+      "strike": 1
     },
     {
       "url": "https://news.incruit.com/news/newsview.asp?newsno=436729",
       "kind": "value",
       "note": "자소서 인생관 단계별 작성 포인트 (2026-09-05 추가)",
-      "strike": 0
+      "strike": 1
     },
     {
       "url": "https://brunch.co.kr/@designmydesign/11",
@@ -128,15 +128,38 @@
       "kind": "effect",
       "note": "장학금 신청서: 심사위원들이 원하는 것 (2026-09-05 추가 · 출처 s3)",
       "strike": 0
+    },
+    {
+      "url": "https://www.skillagit.com/people/people_view.php?b_id=008&idx=762",
+      "kind": "*",
+      "note": "로봇이 스스로 찾음 — 꼬리 질문 방어까지, 합격 부르는 AI 대화 기술",
+      "addedAt": "2026-09-05",
+      "strike": 0
+    },
+    {
+      "url": "https://owlapply.com/ko/ai-dogu/ibwon-jadong-ipryeog",
+      "kind": "*",
+      "note": "로봇이 스스로 찾음 — 지원서 자동 입력",
+      "addedAt": "2026-09-05",
+      "strike": 0
+    },
+    {
+      "url": "https://brunch.co.kr/@icebergw/6",
+      "kind": "*",
+      "note": "로봇이 스스로 찾음 — 겁나 빠른 자기소개서 ​(자소서에 딱 맞는 공식) 작가의 다음글",
+      "addedAt": "2026-09-05",
+      "strike": 0
+    },
+    {
+      "url": "https://community.linkareer.com/employment_data/5106048",
+      "kind": "*",
+      "note": "로봇이 스스로 찾음 — 성격의 장단점 작성법 3단계｜최신 합격자소서 예시, 주의사항, 체크리스트",
+      "addedAt": "2026-09-05",
+      "strike": 0
     }
   ],
   "_큐": "규칙이 모자란 종류. 로봇이 스스로 채우고, 개발자가 그 종류의 주소를 seeds 에 넣어 주면 비워진다.",
-  "queue": [
-    "intro",
-    "value",
-    "effect",
-    "idea"
-  ],
+  "queue": [],
   "tried": [
     {
       "url": "https://brunch.co.kr/keyword/%EC%9E%A5%ED%95%99%EA%B8%88",
@@ -241,6 +264,16 @@
     {
       "url": "https://owlapply.com/ko/ai-dogu/jagisogeseo-saengseong",
       "seenAt": "2026-09-01",
+      "why": "규칙 0종"
+    },
+    {
+      "url": "https://www.skillagit.com/people/people_view.php?b_id=008&idx=728",
+      "seenAt": "2026-09-05",
+      "why": "규칙 0종"
+    },
+    {
+      "url": "https://community.linkareer.com/employment_data/5101410",
+      "seenAt": "2026-09-05",
       "why": "규칙 0종"
     }
   ],
