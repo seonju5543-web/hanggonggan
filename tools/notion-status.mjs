@@ -28,11 +28,11 @@ const MAX_TEXT = 1900;   // 노션 rich_text 한 조각 상한은 2000자
 const LOG_LINES = 8;
 
 /* GitHub 로그인 → 노션 줄. 🔴 모르는 사람은 **짐작하지 않고 그냥 끝낸다**(로그에 남긴다).
-   ⚠️ 은서 님 GitHub 로그인을 아직 못 받아 비어 있다 — 받으면 여기 한 줄만 채우면 된다. */
+   셋 다 이 저장소 공동작업자임을 API 로 확인했다(2026-09-06). */
 const PEOPLE = {
   'seonju5543-web': { name: '이선주', page: '3d29505a-3ec3-81e0-a77e-df1a93912858' },
   'Se-Hyeon-Jo':    { name: '세현',   page: '3d29505a-3ec3-81d5-8ad2-c11b875e594b' },
-  // '<은서-github-id>': { name: '은서', page: '3d29505a-3ec3-81c1-b647-ef7cb39ca72d' },
+  'didinin-wq':     { name: '은서',   page: '3d29505a-3ec3-81c1-b647-ef7cb39ca72d' },
 };
 
 const token = process.env.NOTION_TOKEN;
