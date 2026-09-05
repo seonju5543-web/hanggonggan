@@ -1,178 +1,60 @@
 {
  "school": "서울대학교",
- "updatedAt": "2026-08-17",
+ "updatedAt": "2026-09-05",
  "items": [
   {
-   "title": "2026학년도 2학기 동행장학금 선발 안내(학부 및 대학원)",
-   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=339",
-   "attachments": [],
-   "deadlineHint": "신청기간:&nbsp;2026. 8. 18.(화) 09:00 ~ 9. 8.(화) 18:00까지 &nbsp;&nbsp;",
-   "school": "서울대학교",
-   "campus": "",
-   "foundAt": "2026-08-14"
-  },
-  {
-   "title": "2026학년도 2학기 국가근로장학사업 희망근로지 신청 안내",
-   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=336",
-   "attachments": [],
-   "deadlineHint": "신청기간 을 아래와 같이 알려드리니 , 근로를 희망하는 학생들이 기간 내에 희망근로지를 반드시 신청할 수 있도록 안",
-   "school": "서울대학교",
-   "campus": "",
-   "foundAt": "2026-08-06"
-  },
-  {
-   "title": "2026학년도 대학생 청소년 AI 교육지원장학생 선발 안내",
-   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=335",
-   "attachments": [
-    {
-     "name": "3.-대학생-청소년-AI-교육지원장학금-활동계획서양식.hwp",
-     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=335#n-3.-%EB%8C%80%ED%95%99%EC%83%9D-%EC%B2%AD%EC%86%8C%EB%85%84-AI-%EA%B5%90%EC%9C%A1%EC%A7%80%EC%9B%90%EC%9E%A5%ED%95%99%EA%B8%88-%ED%99%9C%EB%8F%99%EA%B3%84%ED%9A%8D%EC%84%9C%EC%96%91%EC%8B%9D.hwp"
-    }
-   ],
-   "deadlineHint": "까지 ( [붙임 1] 매뉴얼 참고) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;※ [붙임",
-   "school": "서울대학교",
-   "campus": "",
-   "foundAt": "2026-08-04"
-  },
-  {
-   "title": "2026학년도 대학생 청소년교육지원장학생 추가 선발 안내",
-   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=334",
-   "attachments": [
-    {
-     "name": "3-1.-2026학년도-대학생-청소년교육지원장학금-업무처리기준안.pdf",
-     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=334#n-3-1.-2026%ED%95%99%EB%85%84%EB%8F%84-%EB%8C%80%ED%95%99%EC%83%9D-%EC%B2%AD%EC%86%8C%EB%85%84%EA%B5%90%EC%9C%A1%EC%A7%80%EC%9B%90%EC%9E%A5%ED%95%99%EA%B8%88-%EC%97%85%EB%AC%B4%EC%B2%98%EB%A6%AC%EA%B8%B0%EC%A4%80%EC%95%88.pdf"
-    }
-   ],
-   "deadlineHint": "까지 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- 신청방법: [붙임 1] 매뉴얼 참고하여",
-   "school": "서울대학교",
-   "campus": "",
-   "foundAt": "2026-08-04"
-  },
-  {
-   "title": "2026학년도 2학기 선한인재장학금 신청 안내(1차)",
-   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=333",
-   "attachments": [],
-   "deadlineHint": "신청기간 내 신청 하시기 바랍니다. &nbsp; - 매달 지급 전 학자금지원구간 나온 학생 확인 후 소급 지급 ※",
-   "school": "서울대학교",
-   "campus": "",
-   "foundAt": "2026-08-04"
-  },
-  {
-   "title": "서울미래인재재단 2026년 하반기 서울인재대학장학금 장학생 선발 안내",
-   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&#038;category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&#038;uid=331",
+   "title": "2026년도 하반기 달서인재육성장학재단 장학생 선발 안내",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=348",
    "attachments": [],
    "deadlineHint": null,
    "school": "서울대학교",
    "campus": "",
-   "foundAt": "2026-08-04"
+   "foundAt": "2026-08-29"
   },
   {
-   "title": "2026학년도 2학기 대학원생 생활지원장학금 신청 안내(학자금지원구간 산정 필수)",
-   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=326",
-   "attachments": [],
-   "deadlineHint": "까지 소요될 수 있으므로 산정&nbsp;기간 유의(대출 신청기간: 7.1.(수) ~ ) &nbsp;&nbsp;&",
-   "school": "서울대학교",
-   "campus": "",
-   "foundAt": "2026-08-03"
-  },
-  {
-   "title": "2026학년도 2학기 교내 근로장학금 신청 안내",
-   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=325",
-   "attachments": [],
-   "deadlineHint": "기한 내 신청하여 주시기 바랍니다. &nbsp; &nbsp;&nbsp;가. 선발대상: 2026학년도 2학기 등록",
-   "school": "서울대학교",
-   "campus": "",
-   "foundAt": "2026-08-03"
-  },
-  {
-   "title": "2026학년도 2학기 국가근로장학사업 2차 학생 신청 안내",
-   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=324",
+   "title": "2026년도 (재)광산장학회 장학생 선발 안내",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&#038;category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&#038;uid=346",
    "attachments": [],
    "deadlineHint": null,
    "school": "서울대학교",
    "campus": "",
-   "foundAt": "2026-08-03"
+   "foundAt": "2026-08-25"
   },
   {
-   "title": "2026학년도 2학기 한국장학재단 학자금대출 안내[수료생(연구생)]",
-   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=323",
+   "title": "삼원장학재단 제24기 후기(2026년 2학기) 장학생 선발 안내",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=342",
    "attachments": [
     {
-     "name": "3-1.-2026학년도-2학기-학자금대출-기본계획.hwp",
-     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=323#n-3-1.-2026%ED%95%99%EB%85%84%EB%8F%84-2%ED%95%99%EA%B8%B0-%ED%95%99%EC%9E%90%EA%B8%88%EB%8C%80%EC%B6%9C-%EA%B8%B0%EB%B3%B8%EA%B3%84%ED%9A%8D.hwp"
+     "name": "F_장학생-선발원서제24기-후기_2026년-2학기.pdf",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=342#n-F_%EC%9E%A5%ED%95%99%EC%83%9D-%EC%84%A0%EB%B0%9C%EC%9B%90%EC%84%9C%EC%A0%9C24%EA%B8%B0-%ED%9B%84%EA%B8%B0_2026%EB%85%84-2%ED%95%99%EA%B8%B0.pdf"
     },
     {
-     "name": "3-2.-2026학년도-2학기-학자금대출-업무처리기준.hwp",
-     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=323#n-3-2.-2026%ED%95%99%EB%85%84%EB%8F%84-2%ED%95%99%EA%B8%B0-%ED%95%99%EC%9E%90%EA%B8%88%EB%8C%80%EC%B6%9C-%EC%97%85%EB%AC%B4%EC%B2%98%EB%A6%AC%EA%B8%B0%EC%A4%80.hwp"
+     "name": "F_장학생-선발원서제24기-후기_2026년-2학기.docx",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=342#n-F_%EC%9E%A5%ED%95%99%EC%83%9D-%EC%84%A0%EB%B0%9C%EC%9B%90%EC%84%9C%EC%A0%9C24%EA%B8%B0-%ED%9B%84%EA%B8%B0_2026%EB%85%84-2%ED%95%99%EA%B8%B0.docx"
     }
    ],
    "deadlineHint": null,
    "school": "서울대학교",
    "campus": "",
-   "foundAt": "2026-08-03"
+   "foundAt": "2026-08-20"
   },
   {
-   "title": "2026학년도 2학기 농촌출신대학(원)생 학자금대출 안내",
-   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=317",
-   "attachments": [],
-   "deadlineHint": "까지 가능 &nbsp; &nbsp;(신청마감일은 18:00까지 가능) &nbsp;대출 심사 2026. 7. 29",
-   "school": "서울대학교",
-   "campus": "",
-   "foundAt": "2026-08-03"
-  },
-  {
-   "title": "2026학년도 2학기 한국장학재단 학자금대출 안내[재학생]",
-   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=316",
-   "attachments": [
-    {
-     "name": "3-1.-2026학년도-2학기-학자금대출-기본계획.hwp",
-     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=316#n-3-1.-2026%ED%95%99%EB%85%84%EB%8F%84-2%ED%95%99%EA%B8%B0-%ED%95%99%EC%9E%90%EA%B8%88%EB%8C%80%EC%B6%9C-%EA%B8%B0%EB%B3%B8%EA%B3%84%ED%9A%8D.hwp"
-    },
-    {
-     "name": "3-2.-2026학년도-2학기-학자금대출-업무처리기준.hwp",
-     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=316#n-3-2.-2026%ED%95%99%EB%85%84%EB%8F%84-2%ED%95%99%EA%B8%B0-%ED%95%99%EC%9E%90%EA%B8%88%EB%8C%80%EC%B6%9C-%EC%97%85%EB%AC%B4%EC%B2%98%EB%A6%AC%EA%B8%B0%EC%A4%80.hwp"
-    }
-   ],
-   "deadlineHint": "까지 포함) 󰋼 좌동 &nbsp; &nbsp; 󰋼 자립지원대상 ① 󰋼&nbsp;의무상환 개시 전 (졸업 전",
-   "school": "서울대학교",
-   "campus": "",
-   "foundAt": "2026-08-03"
-  },
-  {
-   "title": "5·18기념재단 2026년 5·18희망장학생 모집 안내",
-   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=328",
+   "title": "2026년도 손태희장학재단 장학생 선발 안내",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&#038;category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&#038;uid=341",
    "attachments": [],
    "deadlineHint": null,
    "school": "서울대학교",
    "campus": "",
-   "foundAt": "2026-08-03"
+   "foundAt": "2026-08-20"
   },
   {
-   "title": "앨트웰민초장학재단 제27기 장학생 선발 안내",
-   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=327",
+   "title": "2026년도 「세종이도인재장학금」 핵심인재육성 장학사업 특기적성 분야 선발 안내",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&#038;category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&#038;uid=340",
    "attachments": [],
    "deadlineHint": null,
    "school": "서울대학교",
    "campus": "",
-   "foundAt": "2026-08-03"
-  },
-  {
-   "title": "사랑의열매 2026년 상반기 바로바로론 사랑나눔 장학생 모집 안내",
-   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=320",
-   "attachments": [],
-   "deadlineHint": null,
-   "school": "서울대학교",
-   "campus": "",
-   "foundAt": "2026-08-03"
-  },
-  {
-   "title": "2026년 화성시인재육성재단 「소상공인 장학금」 선발 안내",
-   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=319",
-   "attachments": [],
-   "deadlineHint": null,
-   "school": "서울대학교",
-   "campus": "",
-   "foundAt": "2026-08-03"
+   "foundAt": "2026-08-20"
   }
  ]
 }

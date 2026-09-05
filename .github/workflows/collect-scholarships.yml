@@ -139,6 +139,12 @@ jobs:
           # 빠뜨리면 registered.json의 formId만 저장되고 양식은 버려져 '없는 양식을 가리키는
           # 연결'이 생긴다 (2026-08-01 감사 실패의 원인 — 이슈 #79).
           git add collector/seen.json data/notices.json data/registered.json data/forms.json
+          # 🔴 학교별 공고 파일 — 앱이 **실제로 읽는 것은 이쪽**이다(data/notices.json 은
+          #    학교별 파일이 아직 없는 학교를 위한 뒷길). 수집기는 매 실행 이 폴더를 새로
+          #    쓰는데 여기에 없어서 **한 번도 저장되지 않았다** — 2026-08-17 에 폴더를
+          #    만든 뒤로 19일 동안 앱의 실시간 공고가 그날 그대로 멈춰 있었다.
+          #    (2026-08-01 이슈 #79 와 같은 유형: 로봇이 고친 파일은 전부 git add 에 넣는다)
+          [ -d data/notices ] && git add data/notices
           # health.json(학교별 연속 실패 장부)도 반드시 — 2026-08-02에 일반 수집기가 이 파일을
           # 쓰기 시작했는데 여기 안 넣어서, 추적 중인 파일이 스테이지 안 된 채 남아
           # 재시도의 git pull --rebase가 "unstaged changes"로 죽고 24분짜리 수집이 통째로 날아갔다.

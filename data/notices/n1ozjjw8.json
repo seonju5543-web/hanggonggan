@@ -1,235 +1,59 @@
 {
  "school": "상명대학교",
- "updatedAt": "2026-08-17",
+ "updatedAt": "2026-09-05",
  "items": [
   {
-   "title": "[학생복지팀] 26-2 교내장학금 선발 안내",
-   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767816&article.offset=0&articleLimit=10",
-   "attachments": [
-    {
-     "name": "26-2 교내장학금 선발안내 20260814.hwp",
-     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=767816&attachNo=560767"
-    }
-   ],
-   "deadlineHint": null,
-   "school": "상명대학교",
-   "campus": "",
-   "foundAt": "2026-08-14"
-  },
-  {
-   "title": "2026년 손태희장학재단 4기 장학생 선발 안내",
-   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767805&article.offset=0&articleLimit=10",
-   "attachments": [
-    {
-     "name": "2026년_손태희장학재단_4기_장학생_선발_공고문.pdf",
-     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=767805&attachNo=560754"
-    },
-    {
-     "name": "2026년_손태희장학재단_4기_장학생_서식.hwpx",
-     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=767805&attachNo=560755"
-    }
-   ],
-   "deadlineHint": null,
-   "school": "상명대학교",
-   "campus": "",
-   "foundAt": "2026-08-14"
-  },
-  {
-   "title": "[학생복지팀] 2026학년도 1학기 교내 근로(행정부서) 장학생 신청 안내",
-   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767731&article.offset=0&articleLimit=10",
-   "attachments": [
-    {
-     "name": "2. (홈페이지 게시글) 2026학년도 2학기 근로(행정부서) 장학생 신청 안내.hwp",
-     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=767731&attachNo=560658"
-    }
-   ],
-   "deadlineHint": "기한연장) 2026-1 캡스톤디자인 만족도 조사 실시(천안) 목록 담당부서: 정보통신팀 (02)-1234-567",
-   "school": "상명대학교",
-   "campus": "",
-   "foundAt": "2026-08-12"
-  },
-  {
-   "title": "[비교과통합지원센터] 2026-1학기 비교과 마일리지 장학생 선발 안내(서울,천안)",
-   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767721&article.offset=0&articleLimit=10",
-   "attachments": [
-    {
-     "name": "(붙임) 2026-1학기 비교과 마일리지 장학생 선발 안내문(홈페이지 게시).pdf",
-     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=767721&attachNo=560637"
-    }
-   ],
-   "deadlineHint": null,
-   "school": "상명대학교",
-   "campus": "",
-   "foundAt": "2026-08-12"
-  },
-  {
-   "title": "[학생복지팀] (2026-2) 근로장학생(학기중) 신청 안내",
-   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767674&article.offset=0&articleLimit=10",
-   "attachments": [
-    {
-     "name": "붙임.근로장학생(학기중)_선발(학생신청)_안내.pdf",
-     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=767674&attachNo=560566"
-    },
-    {
-     "name": "붙임.근로장학생 신청서.hwp",
-     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=767674&attachNo=560567"
-    },
-    {
-     "name": "붙임.근로장학생 포기신청서.hwp",
-     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=767674&attachNo=560568"
-    },
-    {
-     "name": "붙임.샘물근로배정부서 확인.pdf",
-     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=767674&attachNo=560569"
-    }
-   ],
-   "deadlineHint": null,
-   "school": "상명대학교",
-   "campus": "",
-   "foundAt": "2026-08-11"
-  },
-  {
-   "title": "[학생생활관(빌라하우스)] 두레장학생(두레조교) 채용 공고",
-   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767659&article.offset=0&articleLimit=10",
-   "attachments": [],
-   "deadlineHint": "기한: 채용 시까지 ◎ 문의 : 02)2287-6455 페이스북공유하기 트위터공유하기 url복사하기 다음글 다음",
-   "school": "상명대학교",
-   "campus": "",
-   "foundAt": "2026-08-10"
-  },
-  {
-   "title": "[학생복지팀] 한국장학재단 2026년 2학기 국가장학금 2차 신청 안내",
-   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767648&article.offset=0&articleLimit=10",
+   "title": "[학생복지팀] 국가근로장학금 2차 학생 신청 안내(동계방학 집중근로 포함)",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=768116&article.offset=0&articleLimit=10",
    "attachments": [],
    "deadlineHint": null,
    "school": "상명대학교",
    "campus": "",
-   "foundAt": "2026-08-10"
+   "foundAt": "2026-08-28"
   },
   {
-   "title": "[학생복지팀] 2026학년도 2학기 국가장학금 재학생 우선(학비)감면 안내",
-   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767641&article.offset=0&articleLimit=10",
-   "attachments": [],
+   "title": "[학생복지팀] 2026학년도 2학기 국가근로장학생 선발확정 및 사전교육시행",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767880&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "붙임1. 2026-2학기_국가근로장학생_기관별_배정_현황_공지.pdf",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=767880&attachNo=560858"
+    },
+    {
+     "name": "붙임2. (2026-2)_국가근로장학생_근로지침.hwp",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=767880&attachNo=560859"
+    },
+    {
+     "name": "붙임3.2026년 2학기 국가근로장학금 사전교육 자료.pdf",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=767880&attachNo=560860"
+    },
+    {
+     "name": "붙임4. (2026-2)_국가근로장학생_포기신청서.hwp",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=767880&attachNo=560861"
+    }
+   ],
    "deadlineHint": null,
    "school": "상명대학교",
    "campus": "",
-   "foundAt": "2026-08-08"
+   "foundAt": "2026-08-20"
   },
   {
    "title": "[학술정보관] 제2자료실 두레장학생(두레조교) 모집 안내",
-   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767627&article.offset=0&articleLimit=10",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767857&article.offset=0&articleLimit=10",
    "attachments": [],
-   "deadlineHint": "기한: 채용 시까지 ◎ 문의 : 02)2287-6469 페이스북공유하기 트위터공유하기 url복사하기 다음글 [교",
+   "deadlineHint": "기한: 채용 시까지 ◎ 문의 : 02)2287-6469 페이스북공유하기 트위터공유하기 url복사하기 다음글 다음",
    "school": "상명대학교",
    "campus": "",
-   "foundAt": "2026-08-08"
+   "foundAt": "2026-08-18"
   },
   {
-   "title": "[한국장학재단] 2026학년도 2학기 2차 주거안정장학금 신청 홍보",
-   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767610&article.offset=0&articleLimit=10",
-   "attachments": [
-    {
-     "name": "01. (홈페이지) 주거안정장학금 장학생 통합신청 매뉴얼.pdf",
-     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=767610&attachNo=560505"
-    },
-    {
-     "name": "02. (모바일) 주거안정장학금 장학생 통합신청 매뉴얼.pdf",
-     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=767610&attachNo=560506"
-    }
-   ],
-   "deadlineHint": null,
-   "school": "상명대학교",
-   "campus": "",
-   "foundAt": "2026-08-07"
-  },
-  {
-   "title": "2026년 하반기 군산시 대학생 학자금 이자지원 안내",
-   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767603&article.offset=0&articleLimit=10",
-   "attachments": [
-    {
-     "name": "[공고]2026년 하반기 군산시 대학생 학자금 이자지원.hwpx",
-     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=767603&attachNo=560502"
-    }
-   ],
-   "deadlineHint": null,
-   "school": "상명대학교",
-   "campus": "",
-   "foundAt": "2026-08-07"
-  },
-  {
-   "title": "[학생복지팀] 2026학년도 2학기 2차 주거안정장학금 학생 신청 안내",
-   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767590&article.offset=0&articleLimit=10",
+   "title": "[학생복지팀] 2026년 2학기 국가장학금 2차 신청 안내 및 홍보",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767841&article.offset=0&articleLimit=10",
    "attachments": [],
    "deadlineHint": null,
    "school": "상명대학교",
    "campus": "",
-   "foundAt": "2026-08-06"
-  },
-  {
-   "title": "2026년 하반기 울산광역시 대학(원)생 학자금대출 이자지원사업 홍보",
-   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767493&article.offset=0&articleLimit=10",
-   "attachments": [],
-   "deadlineHint": null,
-   "school": "상명대학교",
-   "campus": "",
-   "foundAt": "2026-08-04"
-  },
-  {
-   "title": "2026-2학기 두레장학생(두레 조교) 모집(디지털정보실)",
-   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767490&article.offset=0&articleLimit=10",
-   "attachments": [],
-   "deadlineHint": "까지 4. 지원자격: 본교 대학원 2026-2학기 재학생 5. 급여: 본교 대학원 장학금 지급 규정에 준함 6.",
-   "school": "상명대학교",
-   "campus": "",
-   "foundAt": "2026-08-04"
-  },
-  {
-   "title": "2026년 5·18 희망 장학생 모집",
-   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767487&article.offset=0&articleLimit=10",
-   "attachments": [
-    {
-     "name": "2026년 5·18희망장학생 모집 공고문.hwp",
-     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=767487&attachNo=560299"
-    },
-    {
-     "name": "2026년 5·18희망장학생 모집공고 지원 서식(1~6).hwp",
-     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=767487&attachNo=560300"
-    }
-   ],
-   "deadlineHint": null,
-   "school": "상명대학교",
-   "campus": "",
-   "foundAt": "2026-08-04"
-  },
-  {
-   "title": "2026년 하반기 서울인재대학장학금 장학생 선발",
-   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=767484&article.offset=0&articleLimit=10",
-   "attachments": [
-    {
-     "name": "★ 붙임 1. [공고문] 2026년 하반기 서울인재대학장학금 선발 공고.hwp",
-     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=767484&attachNo=560293"
-    },
-    {
-     "name": "붙임 2. [서식] 2026년 상반기 서울인재대학장학금 자기소개서.hwp",
-     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=767484&attachNo=560294"
-    },
-    {
-     "name": "붙임 3. 2026년 서울인재대학장학금 신청 가능 대학 안내.xlsx",
-     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=767484&attachNo=560295"
-    },
-    {
-     "name": "붙임 4. 2026년 상반기 서울인재대학장학금 자가 체크리스트.hwp",
-     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=767484&attachNo=560296"
-    },
-    {
-     "name": "붙임 5. 2026년 서울인재대학장학금 신청방법 안내.pdf",
-     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=767484&attachNo=560297"
-    }
-   ],
-   "deadlineHint": null,
-   "school": "상명대학교",
-   "campus": "",
-   "foundAt": "2026-08-04"
+   "foundAt": "2026-08-18"
   }
  ]
 }

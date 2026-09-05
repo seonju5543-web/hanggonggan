@@ -1,258 +1,228 @@
 {
  "school": "건국대학교",
- "updatedAt": "2026-08-17",
+ "updatedAt": "2026-09-05",
  "items": [
   {
-   "title": "[교외] 2026학년도 세종연구원 세종이도인재 장학금 장학생 모집(8. 10. ~ 9. 30.)",
-   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1203419/artclView.do",
+   "title": "[교외][등록금] 2026학년도 2학기 한국선원복지고용센터 선원가족 장학생 모집 안내(9. 1. ~ 10. 23.)",
+   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1204731/artclView.do",
    "attachments": [
     {
-     "name": "2026 장학생 선발 공고문.zip",
-     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1223382/download.do"
+     "name": "2026년 2학기 선원가족장학사업 선발요강.pdf",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1224696/download.do"
     },
     {
-     "name": "[최종] 2026 세종이도인재장학금 장학생 모집[A2]포스터.pdf",
-     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1223383/download.do"
+     "name": "2026년 2학기 선원가족 장학사업 안내.pdf",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1224697/download.do"
     }
    ],
    "deadlineHint": null,
    "school": "건국대학교",
    "campus": "",
-   "foundAt": "2026-08-12"
+   "foundAt": "2026-08-27"
   },
   {
-   "title": "[국가] 2026학년도 2학기 국가근로장학금 2차 신청기간 안내(8. 12.(수) ~ 9. 9.(수))",
-   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1203337/artclView.do",
+   "title": "[교외] 2026학년도 익산사랑장학재단 익산사랑 장학생 선발 안내(9. 3. ~ 9. 9.)",
+   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1204672/artclView.do",
    "attachments": [
     {
-     "name": "붙임2. 2026년도 2학기 국가근로장학금 2차 학생 신청 매뉴얼.zip",
-     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1223302/download.do"
+     "name": "2026년도 익산사랑 장학생 선발개요.hwpx",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1224618/download.do"
+    },
+    {
+     "name": "2026년도 익산사랑 장학생 선발 공고문.hwpx",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1224619/download.do"
     }
    ],
-   "deadlineHint": "신청기간 안내(8. 12.(수) ~ 9. 9.(수)) 작성자 장학복지 조회수 131 등록일 2026.08.11 수정",
+   "deadlineHint": "접수기간 : 2026. 9. 3.( 목 ) &sim; 9. 9.( 수 ) 18:00 까지 4. 접 수 처 : 익산사",
    "school": "건국대학교",
    "campus": "",
-   "foundAt": "2026-08-11"
+   "foundAt": "2026-08-27"
   },
   {
-   "title": "[국가] 2026학년도 2학기 국가장학금 2차 신청기간 안내(8. 12.(수) ~ 9. 9.(수))",
-   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1203240/artclView.do",
+   "title": "[교외][등록금 또는 생활비] 2026학년도 2학기 달서인재육성장학재단 장학생 선발 안내(8. 31. ~ 9. 28.)",
+   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1204664/artclView.do",
+   "attachments": [
+    {
+     "name": "2026년도 하반기 장학생 선발계획 공고문.pdf",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1224612/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "건국대학교",
+   "campus": "",
+   "foundAt": "2026-08-27"
+  },
+  {
+   "title": "[교외][생활비] 2026학년도 한국장학재단 푸른등대 기부장학금 신청(8. 26. ~ 9. 10.)",
+   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1204656/artclView.do",
+   "attachments": [
+    {
+     "name": "2. 2026년 2학기 푸른등대 기부장학금 신규장학생 선발 내용 요약표.pdf",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1224605/download.do"
+    },
+    {
+     "name": "3. 2026년 2학기 푸른등대 기부장학금 홍보 포스터.jpg",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1224606/download.do"
+    },
+    {
+     "name": "1. 2026년 2학기 푸른등대 기부장학금 사업 계획서 및 업무처리기준.pdf",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1224607/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "건국대학교",
+   "campus": "",
+   "foundAt": "2026-08-27"
+  },
+  {
+   "title": "[희망사다리] 2026학년도 2학기 고졸후학습자장학금(희망사다리 2유형) 신청 기간 안내(9. 1.(월) 9:00 ~ 9. 18.(금) 18:00)",
+   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1204626/artclView.do",
    "attachments": [],
-   "deadlineHint": "신청기간 안내(8. 12.(수) ~ 9. 9.(수)) 작성자 장학복지팀 조회수 182 등록일 2026.08.10 수",
+   "deadlineHint": "신청기간을 아래와 같이 안내합니다. 1. 장학금명: 고졸 후학습자 장학금(희망사다리 Ⅱ유형) 2. 지원기관: 한국장",
    "school": "건국대학교",
    "campus": "",
-   "foundAt": "2026-08-10"
+   "foundAt": "2026-08-27"
   },
   {
-   "title": "[국가][주거비] 2026학년도 2학기 한국장학재단 주거안정장학금 신청 안내 2차 (8. 12. ~ 9. 9.)",
-   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1203278/artclView.do",
+   "title": "★[국가근로] 2026-2학기 국가근로장학생 선발자 관련 안내",
+   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1204457/artclView.do",
    "attachments": [
     {
-     "name": "01. (홈페이지) 주거안정장학금 장학생 통합신청 매뉴얼.pdf",
-     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1223268/download.do"
+     "name": "붙임1. 2026년 2학기 국가근로장학금 사전교육 자료.pdf",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1224450/download.do"
     },
     {
-     "name": "02. (모바일) 주거안정장학금 장학생 통합신청 매뉴얼.pdf",
-     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1223269/download.do"
+     "name": "붙임2. 국가근로_관련_안내.pdf",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1224460/download.do"
     },
     {
-     "name": "03. 26년 2학기 2차 주거안정장학금 포스터.jpg",
-     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1223270/download.do"
+     "name": "붙임3. 출근부 미입력 사유서(양식).hwp",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1224462/download.do"
+    },
+    {
+     "name": "붙임4. 국가근로 중도포기 사유서(양식).hwp",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1224463/download.do"
     }
    ],
    "deadlineHint": null,
    "school": "건국대학교",
    "campus": "",
-   "foundAt": "2026-08-10"
+   "foundAt": "2026-08-25"
   },
   {
-   "title": "[교내] 2026학년도 2학기 학생회활동, 봉사(공로)장학 대상 학생 유의사항 안내",
-   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1203155/artclView.do",
+   "title": "[교외][생활비] 2026학년도 한국산업기술진흥원 한미 첨단분야 청년교류 지원사업 제6기 장학생 선발 공고",
+   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1204186/artclView.do",
    "attachments": [],
    "deadlineHint": null,
    "school": "건국대학교",
    "campus": "",
-   "foundAt": "2026-08-07"
+   "foundAt": "2026-08-22"
   },
   {
-   "title": "[대출] 2026년 하반기 군산시 대학(원)생 학자금 이자 지원사업 안내",
-   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1203142/artclView.do",
+   "title": "[교외] 2026학년도 광산장학회 장학생 선발 공고(8. 24. ~ 9. 18.)",
+   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1204185/artclView.do",
    "attachments": [
     {
-     "name": "[공고]2026년 하반기 군산시 대학생 학자금 이자지원.hwpx",
-     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1223178/download.do"
-    }
-   ],
-   "deadlineHint": "접수기간 ) 2026. 8. 10.( 월 ) ~ 9. 4.( 금 ) 18:00 까지 ❍ ( 접수방법 ) 온라인접수",
-   "school": "건국대학교",
-   "campus": "",
-   "foundAt": "2026-08-07"
-  },
-  {
-   "title": "[국가][주거비] 2026학년도 2학기 주거안정장학금 월별 지급요청(학생) 및 지급(대학) 일정 안내",
-   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1202929/artclView.do",
-   "attachments": [],
-   "deadlineHint": "마감일 ( 대학 별도 공지 기준 ) 미준수자 지급제외 - 계절수업 수강 중 중도 취소 환불자 지급 제외 - 계절",
-   "school": "건국대학교",
-   "campus": "",
-   "foundAt": "2026-08-05"
-  },
-  {
-   "title": "[교내][등록금] 2026학년도 2학기 건국희망(교내(저소득)) 장학금 신청 및 지급(고지감면, 계좌이체) 안내",
-   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1202919/artclView.do",
-   "attachments": [],
-   "deadlineHint": "신청기간 안내 (5. 22.( 금 ) ~ 6. 22.( 월 )) 참조 &nbsp; 2. 2026 학년도 2 학기 건",
-   "school": "건국대학교",
-   "campus": "",
-   "foundAt": "2026-08-05"
-  },
-  {
-   "title": "[교외] 2026학년도 2학기 서울미래인재재단 장학생 선발 공고(8. 3. ~ 8. 10.)",
-   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1202781/artclView.do",
-   "attachments": [
-    {
-     "name": "공문_붙임) 서울인재대학장학금 공고.jpg",
-     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1222847/download.do"
+     "name": "공문_붙임) (공고)2026년도 (재)광산장학회 장학생 선발계획 공고.pdf",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1224160/download.do"
     },
     {
-     "name": "공문_붙임) 2026년 하반기 서울인재대학장학금 첨부 파일.zip",
-     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1222848/download.do"
+     "name": "공문_붙임) 2026년도 (재)광산장학회 장학생 신청서 및 구비서류 서식.hwpx",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1224161/download.do"
     }
    ],
    "deadlineHint": null,
    "school": "건국대학교",
    "campus": "",
-   "foundAt": "2026-08-04"
+   "foundAt": "2026-08-22"
   },
   {
-   "title": "[교외] 2026학년도 2학기 충북인재평생교육진흥원 장학생 선발공고(8. 4. ~ 8. 27.)",
-   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1202780/artclView.do",
+   "title": "[교외][생활비] 2026학년도 2학기 경원장학재단 장학생 선발 안내(8. 19. ~ 9. 30.)",
+   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1204187/artclView.do",
    "attachments": [
     {
-     "name": "공문_붙임) 2026년 하반기 충북인재평생교육진흥원 장학생 선발공고.png",
-     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1222845/download.do"
-    },
-    {
-     "name": "공문_붙임) 2026년 하반기 장학생 선발 공고문.pdf",
-     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1222846/download.do"
+     "name": "제7기 경원장학재단 장학생 선발 안내 공고문.pdf",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1224162/download.do"
     }
    ],
    "deadlineHint": null,
    "school": "건국대학교",
    "campus": "",
-   "foundAt": "2026-08-04"
+   "foundAt": "2026-08-22"
   },
   {
-   "title": "[교외][생활비] 2026학년도 동산장학회 장학생 신청 안내( ~ 10. 2.(금), 우편 도착분에 한함)",
-   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1202773/artclView.do",
+   "title": "[교외] 2026학년도 세종연구원 세종이도인재장학금 핵심인재육성 장학사업(특기적성) 접수 안내(8. 10. ~ 9. 30.)",
+   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1204054/artclView.do",
    "attachments": [
     {
-     "name": "동산장학회) 장학지원서 및 자기소개서(양식).hwp",
-     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1222838/download.do"
+     "name": "1. 2026년도 세종이도인재장학금 장학생 선발계획 공고.pdf",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1223981/download.do"
     },
     {
-     "name": "동산장학회) 학(과)장 장학생 추천서(양식).hwp",
-     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1222839/download.do"
-    }
-   ],
-   "deadlineHint": "신청기간: ~ 2026. 10. 2.(금), 우편 도착분에 한함 6. 신청방법: 우편접수(접수된 서류는 반환하지 않",
-   "school": "건국대학교",
-   "campus": "",
-   "foundAt": "2026-08-04"
-  },
-  {
-   "title": "[대출] 2026년 제2회 서울시 대학(원)생 학자금대출 이자지원사업",
-   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1202862/artclView.do",
-   "attachments": [
-    {
-     "name": "2026년 제2회 대학생 학자금대출 이자지원 공고문.hwpx",
-     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1222906/download.do"
-    }
-   ],
-   "deadlineHint": "신청기간 : 2026. 8. 3.( 월 ) 10:00 ~ 2026. 9. 15.( 화 ) 18:00 &nbsp; 5",
-   "school": "건국대학교",
-   "campus": "",
-   "foundAt": "2026-08-04"
-  },
-  {
-   "title": "[교외][생활비] 2026학년도 5·18 희망장학생 모집(8. 6. ~ 8. 12.)",
-   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1202782/artclView.do",
-   "attachments": [
-    {
-     "name": "2026년 5·18희망장학생 홍보 이미지.jpg",
-     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1222850/download.do"
+     "name": "2. 2026년도 세종이도인재장학금 장학생 선발계획 공고 붙임자료.pdf",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1223982/download.do"
     },
     {
-     "name": "2026년 5·18희망장학생 모집 공고문.hwp",
-     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1222851/download.do"
+     "name": "3. 별지 서식 제출 서류.hwp",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1223983/download.do"
     },
     {
-     "name": "2026년 5·18희망장학생 모집공고 지원 서식(1~6).hwp",
-     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1222852/download.do"
+     "name": "260511 세종연구원 2026 세종이도인재장학금 장학생 모집[A2]포스터_최종.jpg",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1223984/download.do"
     }
    ],
    "deadlineHint": null,
    "school": "건국대학교",
    "campus": "",
-   "foundAt": "2026-08-04"
+   "foundAt": "2026-08-20"
   },
   {
-   "title": "[교외][등록금+생활비] 2026학년도 2학기 앨트웰민초장학재단 제27기 장학생 선발(8. 18. ~ 9. 18.)",
-   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1202730/artclView.do",
+   "title": "[교외][생활비] 2026학년도 2학기 삼원장학재단 장학생 모집 안내(9. 1. ~ 9. 30.)",
+   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1204056/artclView.do",
    "attachments": [
     {
-     "name": "공문) 앨트웰민초장학재단 27기 선발공문.pdf",
-     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1222793/download.do"
+     "name": "F_장학생 선발요강(제24기 후기_2026년 2학기).pdf",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1223988/download.do"
     },
     {
-     "name": "공문_붙임) 민초27기 장학생 선발공고.pdf",
-     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1222794/download.do"
+     "name": "F_장학생 선발원서(제24기 후기_2026년 2학기).docx",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1223989/download.do"
+    },
+    {
+     "name": "F_장학생 선발원서(제24기 후기_2026년 2학기).pdf",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1223990/download.do"
+    },
+    {
+     "name": "F.2026년 2학기 장학생 모집 포스터.pdf",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1223991/download.do"
+    },
+    {
+     "name": "F_장학생 선발공문(제24기 후기_2026년 2학기_시각디자인).pdf",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1223992/download.do"
     }
    ],
    "deadlineHint": null,
    "school": "건국대학교",
    "campus": "",
-   "foundAt": "2026-08-03"
+   "foundAt": "2026-08-20"
   },
   {
-   "title": "[교외][생활비] 2026학년도 화성시인재육성재단 코나아이 소상공인 장학생 모집(7. 20. ~ 8. 11.)",
-   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1202323/artclView.do",
+   "title": "[교외] 2026학년도 손태희장학재단 장학생 선발 공고문 (8. 24. ~ 9. 8.)",
+   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1204053/artclView.do",
    "attachments": [
     {
-     "name": "[공고문] 2026년 (주)코나아이 소상공인 장학금 장학생 선발 공고.pdf",
-     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1222354/download.do"
+     "name": "2026년 손태희장학재단 4기 장학생 선발 공고문.pdf",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1223979/download.do"
     },
     {
-     "name": "코나아이 소상공인 장학생 모집 포스터.png",
-     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1222355/download.do"
+     "name": "2026년 손태희장학재단 4기 장학생 서식.hwpx",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1223980/download.do"
     }
    ],
    "deadlineHint": null,
    "school": "건국대학교",
    "campus": "",
-   "foundAt": "2026-08-01"
-  },
-  {
-   "title": "[교외][포상성] 2026학년도 김해시미래인재장학재단 제3회 장학수기 공모전(7. 20. ~ 8. 31.)",
-   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1202320/artclView.do",
-   "attachments": [
-    {
-     "name": "참가신청서 및수기작성 서식(누리집게시용).hwpx",
-     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1222348/download.do"
-    },
-    {
-     "name": "공고문(제3회 장학수기 공모전).pdf",
-     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1222349/download.do"
-    },
-    {
-     "name": "웹포스터(제3회 장학수기).jpg",
-     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1222350/download.do"
-    }
-   ],
-   "deadlineHint": null,
-   "school": "건국대학교",
-   "campus": "",
-   "foundAt": "2026-08-01"
+   "foundAt": "2026-08-20"
   }
  ]
 }

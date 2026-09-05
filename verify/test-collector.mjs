@@ -5,6 +5,11 @@
 
    실행: node verify/test-collector.mjs   (실패하면 exit 1) */
 import fs from 'node:fs';
+/* 🔴 URL 을 파일 경로로 쓸 때는 .pathname 이 아니라 fileURLToPath 다.
+   윈도우에서 .pathname 은 `/C:/…` 를 주는데 그건 유효한 경로가 아니라 파일을 못 열고
+   자식 프로세스도 못 띄운다. 리눅스(클라우드 검사)에서는 멀쩡해서 **이 검사 5개가
+   개발자 컴퓨터에서만 조용히 실패하고 있었다** — 진짜 실패를 가리는 소음이었다(2026-09-05). */
+import { fileURLToPath } from 'node:url';
 import { urlKey, titleKey, dedupeNotices, preferNotice, capNotices, clickRowKey } from '../collector/url-key.mjs';
 import { mergeCandidates } from '../collector/candidates.mjs';
 import { publishBySchool, splitBySchool } from '../collector/publish-notices.mjs';
@@ -2145,7 +2150,7 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
   const docx = fs.readdirSync(new URL('../collector/extracted/', import.meta.url))
     .filter((f) => /^elig-.*\.docx$/.test(f))[0];
   if (docx) {
-    const t = AT.attachmentText(new URL(`../collector/extracted/${docx}`, import.meta.url).pathname);
+    const t = AT.attachmentText(fileURLToPath(new URL(`../collector/extracted/${docx}`, import.meta.url)));
     eq('  docx는 문단 단위로 읽어 숫자가 안 빠진다', /\d년제/.test(t) || /\d\.\d\/\d\.\d/.test(t), true);
   } else eq('  (docx 표본 없음 — 건너뜀)', true, true);
   eq('  글자가 거의 없으면 읽을 만하지 않다고 답한다', AT.readable('가나다'), false);
@@ -2543,6 +2548,32 @@ console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08
   const t3 = t0 + 3 * DAY;
   eq('앱을 켠 지 사흘 지나도 그날의 어제는 마감이다', make(t3).dday(어제(t3)).label, '마감');
   eq('사흘 전 기준의 D-2 는 이제 마감이다', make(t3).dday(어제(t0)).label, '마감');
+
+  /* ── 마감 공고의 자리 — 목록에서 내리고 신청 내역에는 남긴다 (2026-09-05 개발자 지시) ──
+     같은 블록에 두는 이유: 위의 grab·appSrc 를 그대로 쓴다(사본을 만들면 갈라진다). */
+  console.log('■ 마감 공고의 자리 — 목록에서 내리고 신청 내역에는 남긴다 (2026-09-05)');
+  eq('마감 공고는 마감 다음 날까지만 목록에 남는다',
+    appSrc.includes('const CLOSED_KEEP_DAYS = 1;'), true);
+  eq('목록 거르기가 그 상수를 그대로 쓴다',
+    appSrc.includes('dday(m.sch.deadline).days >= -CLOSED_KEEP_DAYS'), true);
+  eq('층2(KOSAF)도 같은 상수를 쓴다',
+    appSrc.includes('dday(i.due).days >= -CLOSED_KEEP_DAYS'), true);
+
+  /* 🔴 이 항목이 이 절의 존재 이유다 — 신청 내역은 마감으로 거르면 안 된다.
+     목록에서 내리는 근거가 '신청 내역에는 남아 있다'이므로, 여기에 마감 필터가 들어오는
+     순간 학생이 담아 둔 공고가 통째로 사라진다. 지금 그걸 막는 장치는 이 검사뿐이다. */
+  const appsSrc = grab('renderApplications');
+  eq('신청 내역은 마감으로 거르지 않는다 (CLOSED_KEEP_DAYS 없음)',
+    appsSrc.includes('CLOSED_KEEP_DAYS'), false);
+  eq('신청 내역은 마감으로 거르지 않는다 (dday 판정 없음)',
+    appsSrc.includes('dday('), false);
+
+  /* 마감 배지는 자기만의 잣대를 만들지 않는다 — dday() 가 내린 cls 를 읽는다.
+     새로 `days < 0` 을 쓰면 상시 제도(days:14)·기한 미확인까지 규칙이 갈라진다. */
+  const cardSrc = grab('appCard');
+  eq('신청 내역 카드가 마감을 표시한다', cardSrc.includes('badge-dday closed'), true);
+  eq('마감 판정을 dday().cls 로 한다', cardSrc.includes("dday(sch.deadline).cls === 'closed'"), true);
+  eq('마감 판정을 손으로 다시 쓰지 않는다', cardSrc.includes('.days < 0'), false);
 
   /* 지원 자격을 '단어'로 옮기는 규칙 — 지어내지 않는지 본다(원칙 8-1) */
   /* bulkTags 는 자기 파일의 상수(BULK_TAG_MAX)와 원문 파서(parseLine)를 함께 쓴다.
@@ -3318,7 +3349,7 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
   const run = (args) => {
     try {
       return execFileSync(process.execPath, ['verify/what-shows.mjs', ...args],
-        { cwd: new URL('..', import.meta.url).pathname, encoding: 'utf8', timeout: 60000 });
+        { cwd: fileURLToPath(new URL('..', import.meta.url)), encoding: 'utf8', timeout: 60000 });
     } catch (e) { return String((e && (e.stdout || e.message)) || ''); }
   };
 

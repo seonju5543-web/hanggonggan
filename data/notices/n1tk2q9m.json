@@ -1,246 +1,205 @@
 {
  "school": "이화여자대학교",
- "updatedAt": "2026-08-17",
+ "updatedAt": "2026-09-05",
  "items": [
   {
-   "title": "[학부] 2026년 하반기 군산시 대학생 학자금 대출 이자지원 안내",
-   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366215&article.offset=0&articleLimit=10",
+   "title": "[학부] 2026학년도 2학기 푸른등대 기부장학금 신청 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366533&article.offset=0&articleLimit=10",
    "attachments": [
     {
-     "name": "[공고]2026년 하반기 군산시 대학생 학자금 이자지원.hwpx",
-     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366215&attachNo=352420"
+     "name": "1. 2026년 2학기 푸른등대 기부장학금 사업 계획서 및 업무처리기준.pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366533&attachNo=352743"
     }
    ],
-   "deadlineHint": "신청기간 2026.08.11 ~ 2026.09.04 조회 10 [공고]2026년 하반기 군산시 대학생 학자금 이자지",
+   "deadlineHint": "신청기간 2026.08.26 ~ 2026.09.10 조회 13 1. 2026년 2학기 푸른등대 기부장학금 사업 계획",
    "school": "이화여자대학교",
    "campus": "",
-   "foundAt": "2026-08-11"
+   "foundAt": "2026-08-27"
   },
   {
-   "title": "[학부]앨트웰민초장학재단 제27기 장학생 선발 안내",
-   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366179&article.offset=0&articleLimit=10",
+   "title": "[학부] 2026학년도 2학기 한국장학재단 고졸 후학습자 장학사업 (희망사다리 II유형) 신규장학생 신청 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366522&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "붙임1. 2026년도 고졸 후학습자 장학사업(Ⅱ유형) 업무처리기준(안).pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366522&attachNo=352731"
+    },
+    {
+     "name": "붙임2. 2026학년도 2학기 고졸 후학습자 장학사업 홍보 포스터.jpg",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366522&attachNo=352732"
+    }
+   ],
+   "deadlineHint": "신청기간 2026.09.01 ~ 2026.09.18 조회 26 붙임1. 2026년도 고졸 후학습자 장학사업(Ⅱ유형)",
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-08-27"
+  },
+  {
+   "title": "[학부] 2026학년도 2학기 한국장학재단 중소기업 취업연계 장학사업 (희망사다리 I유형) 신규장학생 신청 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366517&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "붙임1. 2026년 중소기업 취업연계 장학사업(Ⅰ유형) 업무처리기준(안).hwp",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366517&attachNo=352720"
+    },
+    {
+     "name": "붙임2. 2026학년도 2학기 신규장학생 학생신청 매뉴얼.pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366517&attachNo=352721"
+    },
+    {
+     "name": "붙임3. 취창업지원금 사용계획서.hwp",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366517&attachNo=352722"
+    },
+    {
+     "name": "붙임4. 2026학년도 2학기 중소기업 취업연계 장학사업(희망사다리 I유형) 홍보 포스터.jpg",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366517&attachNo=352723"
+    }
+   ],
+   "deadlineHint": "신청기간 2026.09.01 ~ 2026.09.18 조회 33 붙임1. 2026년 중소기업 취업연계 장학사업(Ⅰ유형",
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-08-27"
+  },
+  {
+   "title": "[학부] 2026학년도 2학기 이화미래설계 장학금 신청 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366506&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "양식_이화미래설계장학금 미래설계 계획서.hwp",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366506&attachNo=352706"
+    },
+    {
+     "name": "양식_이화미래설계장학금 교수추천서.hwp",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366506&attachNo=352707"
+    }
+   ],
+   "deadlineHint": "신청기간 2026.09.07 ~ 2026.09.11 조회 13 양식_이화미래설계장학금 미래설계 계획서.hwp 양식_",
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-08-26"
+  },
+  {
+   "title": "[학부] 2026년 2학기 통영시 대학생 등록금 전액 장학금 신청 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366484&article.offset=0&articleLimit=10",
    "attachments": [],
-   "deadlineHint": "신청기간 2026.08.18 ~ 2026.09.18 조회 34 앨트웰민초장학재단 제27기 장학생 선발 안내 장학복지",
+   "deadlineHint": "신청기간 2026.08.25 ~ 2026.09.30 조회 10 2026년 2학기 통영시 대학생 등록금 전액 장학금",
    "school": "이화여자대학교",
    "campus": "",
-   "foundAt": "2026-08-10"
+   "foundAt": "2026-08-25"
   },
   {
-   "title": "[학부] 2026학년도 2학기 이화복지 장학금 2차 신청 안내",
-   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366169&article.offset=0&articleLimit=10",
-   "attachments": [],
-   "deadlineHint": "신청기간 2026.08.12 ~ 2026.09.09 조회 19 2026 학년도 2학기 학부 이화복지 장학금 2차 신",
-   "school": "이화여자대학교",
-   "campus": "",
-   "foundAt": "2026-08-10"
-  },
-  {
-   "title": "[학부] 2026학년도 2학기 한국장학재단 국가장학금 2차 신청 안내",
-   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366166&article.offset=0&articleLimit=10",
+   "title": "[학부]2026년도 (재)광산장학회 장학생 선발 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366481&article.offset=0&articleLimit=10",
    "attachments": [
     {
-     "name": "붙임1 2026년 2학기 국가장학금 2차 신청매뉴얼(홈페이지).pdf",
-     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366166&attachNo=352367"
+     "name": "(공고)2026년도 (재)광산장학회 장학생 선발계획 공고.pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366481&attachNo=352691"
     },
     {
-     "name": "붙임2 2026년 2학기 국가장학금 2차 신청매뉴얼(모바일앱).pdf",
-     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366166&attachNo=352368"
+     "name": "2026년도 (재)광산장학회 장학생 신청서 및 구비서류 서식.hwpx",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366481&attachNo=352692"
     }
    ],
-   "deadlineHint": "신청기간 2026.08.12 ~ 2026.09.09 조회 14 붙임1 2026년 2학기 국가장학금 2차 신청매뉴얼(",
+   "deadlineHint": "신청기간 2026.08.24 ~ 2026.09.18 조회 18 (공고)2026년도 (재)광산장학회 장학생 선발계획",
    "school": "이화여자대학교",
    "campus": "",
-   "foundAt": "2026-08-10"
+   "foundAt": "2026-08-25"
   },
   {
-   "title": "[학부]세종연구원 2026년도 세종이도인재장학금 장학생 선발 안내",
-   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=362541&article.offset=0&articleLimit=10",
+   "title": "[학부] 2026-2 경원장학재단 장학생 선발 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366478&article.offset=0&articleLimit=10",
    "attachments": [
     {
-     "name": "2026 장학생 선발 공고문.zip",
-     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=362541&attachNo=349085"
+     "name": "제7기 경원장학재단 장학생 선발 안내 공고문 (2).pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366478&attachNo=352689"
     }
    ],
-   "deadlineHint": "마감 작성처 장학복지팀 신청기간 2026.05.11 ~ 2026.07.10 조회 947 2026 장학생 선발 공",
+   "deadlineHint": "신청기간 2026.08.25 ~ 2026.09.30 조회 36 제7기 경원장학재단 장학생 선발 안내 공고문 (2).",
    "school": "이화여자대학교",
    "campus": "",
-   "foundAt": "2026-08-07"
+   "foundAt": "2026-08-25"
   },
   {
-   "title": "[학부] 2026학년도 제2학기 한국장학재단 주거안정 장학금 신청 안내(2차)",
-   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366141&article.offset=0&articleLimit=10",
+   "title": "[학부] 2026학년도 제2학기 국가근로장학금 희망근로지 신청 안내(2차)",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366384&article.offset=0&articleLimit=10",
    "attachments": [
-    {
-     "name": "(모바일) 주거안정장학금 장학생 통합신청 매뉴얼.pdf",
-     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366141&attachNo=352341"
-    },
-    {
-     "name": "(홈페이지) 주거안정장학금 장학생 통합신청 매뉴얼.pdf",
-     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366141&attachNo=352342"
-    }
-   ],
-   "deadlineHint": "신청기간 2026.08.12 ~ 2026.09.09 조회 15 (모바일) 주거안정장학금 장학생 통합신청 매뉴얼.pd",
-   "school": "이화여자대학교",
-   "campus": "",
-   "foundAt": "2026-08-07"
-  },
-  {
-   "title": "[학부/대학원] 2026년 제2회 서울시 대학(원)생 학자금대출이자 지원 신청 공고",
-   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366101&article.offset=0&articleLimit=10",
-   "attachments": [
-    {
-     "name": "2026년 제2회 대학생 학자금대출 이자지원 공고문.hwpx",
-     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366101&attachNo=352316"
-    }
-   ],
-   "deadlineHint": "신청기간 2026.08.03 ~ 2026.09.15 조회 30 2026년 제2회 대학생 학자금대출 이자지원 공고문.",
-   "school": "이화여자대학교",
-   "campus": "",
-   "foundAt": "2026-08-05"
-  },
-  {
-   "title": "[학부] 2026학년도 2학기 연재장학재단 장학생 선발 안내",
-   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366048&article.offset=0&articleLimit=10",
-   "attachments": [
-    {
-     "name": "붙임1. 추천서 양식.hwp",
-     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366048&attachNo=352259"
-    },
-    {
-     "name": "붙임2. 개인정보동의서.hwp",
-     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366048&attachNo=352260"
-    }
-   ],
-   "deadlineHint": "신청기간 2026.08.03 ~ 2026.08.07 조회 128 붙임1. 추천서 양식.hwp 붙임2. 개인정보동의서",
-   "school": "이화여자대학교",
-   "campus": "",
-   "foundAt": "2026-08-04"
-  },
-  {
-   "title": "[학부] 2026년 하반기 서울인재대학장학금 장학생 선발 안내",
-   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366032&article.offset=0&articleLimit=10",
-   "attachments": [
-    {
-     "name": "2026년 하반기 서울인재대학장학금 첨부 파일.zip",
-     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366032&attachNo=352225"
-    }
-   ],
-   "deadlineHint": "신청기간 2026.08.03 ~ 2026.08.10 조회 21 2026년 하반기 서울인재대학장학금 첨부 파일.zip",
-   "school": "이화여자대학교",
-   "campus": "",
-   "foundAt": "2026-08-03"
-  },
-  {
-   "title": "[학부] 2026-2학기 옴부즈만 장학금 신청 안내",
-   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=365898&article.offset=0&articleLimit=10",
-   "attachments": [
-    {
-     "name": "붙임1.가계곤란 증빙서류 제출안내.pdf",
-     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=365898&attachNo=352079"
-    },
-    {
-     "name": "붙임2.옴부즈만 장학금 온라인 신청방법 안내.pdf",
-     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=365898&attachNo=352080"
-    }
-   ],
-   "deadlineHint": "신청기간 2026.08.13 ~ 2026.08.20 조회 284 붙임1.가계곤란 증빙서류 제출안내.pdf 붙임2.옴",
-   "school": "이화여자대학교",
-   "campus": "",
-   "foundAt": "2026-08-01"
-  },
-  {
-   "title": "[학부] 2026학년도 제2학기 국가근로장학금 희망근로지 신청 안내(1차)",
-   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=365893&article.offset=0&articleLimit=10",
-   "attachments": [
-    {
-     "name": "2026년도 2학기 희망근로지 신청 매뉴얼_홈페이지.pdf",
-     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=365893&attachNo=352075"
-    },
     {
      "name": "2026년도 2학기 희망근로지 신청 매뉴얼_모바일앱.pdf",
-     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=365893&attachNo=352076"
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366384&attachNo=352567"
+    },
+    {
+     "name": "2026년도 2학기 희망근로지 신청 매뉴얼_홈페이지.pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366384&attachNo=352568"
     }
    ],
-   "deadlineHint": "신청기간 2026.08.10 ~ 2026.08.17 조회 275 2026년도 2학기 희망근로지 신청 매뉴얼_홈페이지",
+   "deadlineHint": "신청기간 2026.09.07 ~ 2026.09.13 조회 55 2026년도 2학기 희망근로지 신청 매뉴얼_모바일앱.",
    "school": "이화여자대학교",
    "campus": "",
-   "foundAt": "2026-08-01"
+   "foundAt": "2026-08-22"
   },
   {
-   "title": "[학부] 2026학년도 제2학기 한국장학재단 국가근로 장학금 신청 안내(2차)",
-   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=365886&article.offset=0&articleLimit=10",
+   "title": "[학부] 2026년도 손태희장학재단 장학생 선발 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366404&article.offset=0&articleLimit=10",
    "attachments": [
     {
-     "name": "2026년 2학기 국가근로장학금 2차 학생신청 매뉴얼(홈페이지).pdf",
-     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=365886&attachNo=352066"
+     "name": "2026년 손태희장학재단 4기 장학생 선발 공고문.pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366404&attachNo=352581"
     },
     {
-     "name": "2026년 2학기 국가근로장학금 2차 학생신청 매뉴얼(모바일).pdf",
-     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=365886&attachNo=352067"
+     "name": "2026년 손태희장학재단 4기 장학생 서식.hwpx",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366404&attachNo=352583"
     }
    ],
-   "deadlineHint": "신청기간 2026.08.12 ~ 2026.09.09 조회 226 2026년 2학기 국가근로장학금 2차 학생신청 매뉴",
+   "deadlineHint": "신청기간 2026.08.24 ~ 2026.09.08 조회 23 2026년 손태희장학재단 4기 장학생 선발 공고문.p",
    "school": "이화여자대학교",
    "campus": "",
-   "foundAt": "2026-08-01"
+   "foundAt": "2026-08-22"
   },
   {
-   "title": "[학부] 2026학년도 2학기 성적우수장학금관련 석차 및 장학금수혜내역 조회 일정 안내",
-   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=365806&article.offset=0&articleLimit=10",
-   "attachments": [],
-   "deadlineHint": "신청기간 2026.08.05 ~ 2026.08.31 조회 500 2026 학년도 2학기 성적우수장학금관련 석차 및",
-   "school": "이화여자대학교",
-   "campus": "",
-   "foundAt": "2026-08-01"
-  },
-  {
-   "title": "[학부] 2026학년도 제2학기 한국장학재단 학자금대출 신청 안내",
-   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=365411&article.offset=0&articleLimit=10",
+   "title": "[학부] 2026년도 「세종이도인재장학금」 핵심인재육성 특기적성 분야 장학금 신청 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366399&article.offset=0&articleLimit=10",
    "attachments": [
     {
-     "name": "2026년 2학기 학자금대출 신청 및 실행 매뉴얼(모바일).pdf",
-     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=365411&attachNo=350135"
-    },
-    {
-     "name": "2026년 2학기 학자금대출 신청 및 실행 매뉴얼(홈페이지).pdf",
-     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=365411&attachNo=350136"
+     "name": "2026 장학생 선발 공고문 (3).zip",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366399&attachNo=352579"
     }
    ],
-   "deadlineHint": "신청기간 2026.07.01 ~ 2026.11.17 조회 973 2026년 2학기 학자금대출 신청 및 실행 매뉴얼(",
+   "deadlineHint": "신청기간 2026.08.21 ~ 2026.09.30 조회 17 2026 장학생 선발 공고문 (3).zip 2026년",
    "school": "이화여자대학교",
    "campus": "",
-   "foundAt": "2026-08-01"
+   "foundAt": "2026-08-22"
   },
   {
-   "title": "[대학원] 2026학년도 2학기 한국장학재단 학자금대출 신청 안내",
-   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=365405&article.offset=0&articleLimit=10",
+   "title": "2026년 2학기 주거안정장학금 이화여자대학교 자체 기준",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366343&article.offset=0&articleLimit=10",
    "attachments": [
     {
-     "name": "붙임1. 2026학년도 2학기 학자금대출 업무처리기준_대학(원).hwp",
-     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=365405&attachNo=350115"
-    },
-    {
-     "name": "붙임2. 2026년_2학기_학자금대출_모바일_실행매뉴얼.zip",
-     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=365405&attachNo=350116"
-    },
-    {
-     "name": "붙임3. 2026년_2학기_학자금대출_홈페이지_실행매뉴얼.zip",
-     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=365405&attachNo=350117"
+     "name": "붙임. 2026년 2학기 주거안정장학금 이화여자대학교 자체 기준.pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366343&attachNo=352527"
     }
    ],
-   "deadlineHint": "신청기간 2026.07.01 ~ 2026.11.17 조회 1192 붙임1. 2026학년도 2학기 학자금대출 업무처리",
+   "deadlineHint": "신청기간 ~ 조회 40 붙임. 2026년 2학기 주거안정장학금 이화여자대학교 자체 기준.pdf 2026년 2학기 주",
    "school": "이화여자대학교",
    "campus": "",
-   "foundAt": "2026-08-01"
+   "foundAt": "2026-08-19"
   },
   {
-   "title": "[학부] 2026학년도 2학기 성적우수장학금 이월수혜 신청 안내",
-   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=365300&article.offset=0&articleLimit=10",
-   "attachments": [],
-   "deadlineHint": "신청기간 2026.07.01 ~ 2026.08.31 조회 1532 2026 학년도 2학기 성적우수장학금 이월수혜 신",
+   "title": "[대학원] 2026-2학기 일반대학원 면학장려금(N)/임파워링/이화플러스 장학금 신청 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366323&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "1. 2026-2 면학장려금(N),임파워링,이화플러스 장학금 신청서 양식.hwp",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366323&attachNo=352513"
+    },
+    {
+     "name": "2. 가계곤란 증빙서류 제출 안내문.pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=366323&attachNo=352514"
+    }
+   ],
+   "deadlineHint": "신청기간 2026.09.07 ~ 2026.09.11 조회 20 1. 2026-2 면학장려금(N),임파워링,이화플러스",
    "school": "이화여자대학교",
    "campus": "",
-   "foundAt": "2026-08-01"
+   "foundAt": "2026-08-18"
   }
  ]
 }
