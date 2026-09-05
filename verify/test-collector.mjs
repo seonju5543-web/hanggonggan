@@ -1912,6 +1912,41 @@ console.log('\n■ 링크 사냥꾼의 제목 대조 (2026-08-23)');
   eq('    정상 종료를 붙들지 않는다 (unref)', /watchdog\.unref\(\)/.test(lh), true);
 }
 
+console.log('\n■ 서비스하지 않는 학교의 공고는 피드에 안 담는다 (2026-09-05)');
+{
+  /* 🔴 2026-08-30 에 수집을 경희대·한국외대 둘로 좁혔는데 **예전에 담긴 다른 학교 공고가
+     그대로 남아** 전체 상한(200)을 차지하고 있었다 — 실측 200건 중 173건(87%)이 그것이었다.
+     그래서 정작 두 학교의 새 공고가 밀려나고, 링크 사냥꾼은 아무도 안 보는 학교 게시판을
+     뒤지느라 25분 예산을 썼다(시간초과의 한 원인).
+     ⚠️ 목록은 화면·알림과 **같은 것**(match-engine 의 SERVED_SCHOOLS)을 쓴다 — 베끼면
+     '화면은 안 보여 주는데 로봇은 계속 모으는' 어긋남이 그대로 돌아온다. */
+  const { dropUnserved } = await import(new URL('../collector/publish-notices.mjs', import.meta.url));
+  const ME = await import(new URL('../match-engine.js', import.meta.url));
+  const served = ME.default ? ME.default.SERVED_SCHOOLS : ME.SERVED_SCHOOLS;
+  const got = dropUnserved([
+    { school: served[0], title: 'ㄱ' }, { school: '동국대학교', title: 'ㄴ' },
+    { school: served[1], title: 'ㄷ' }, { title: '학교 없음' }, null,
+  ]);
+  eq('서비스 학교만 남긴다', got.map((n) => n.school), [served[0], served[1]]);
+  eq('  학교 칸이 빈 공고도 뺀다 (어느 학생에게도 안 보인다)', got.length, 2);
+
+  for (const [name, file] of [['일반 수집', 'collect.mjs'], ['브라우저 수집', 'browser-collect.mjs']]) {
+    const src = fs.readFileSync(new URL(`../collector/${file}`, import.meta.url), 'utf8');
+    eq(`  ${name} 로봇이 이것을 쓴다`, /dropUnserved\(notices\.items\)/.test(src), true);
+    eq('    가져다 쓴다 (베끼지 않는다)',
+      /import \{[^}]*\bdropUnserved\b[^}]*\} from '\.\/publish-notices\.mjs'/.test(src), true);
+    /* 🔴 **자르기·발행보다 먼저** 떨궈야 뜻이 있다 — 뒤에 두면 이미 상한을 차지한 뒤다 */
+    const dropAt = src.indexOf('dropUnserved(notices.items)');
+    const pubAt = src.indexOf('publishBySchool(beforeCap)');
+    const capAt = src.indexOf('capNotices(notices.items)');
+    eq('    학교별 발행보다 먼저 떨군다', dropAt >= 0 && pubAt > dropAt, true);
+    eq('    전체 상한을 매기기 전에 떨군다', dropAt >= 0 && capAt > dropAt, true);
+  }
+  /* 데이터에도 남아 있지 않아야 한다 — 소급 적용 원칙(운영 원칙 7) */
+  const feed = JSON.parse(fs.readFileSync(new URL('../data/notices.json', import.meta.url), 'utf8'));
+  eq('  지금 피드에 서비스 밖 학교가 없다', dropUnserved(feed.items).length, feed.items.length);
+}
+
 console.log('\n■ 주소를 고치는 로봇은 학교별 파일까지 고친다 (2026-09-05)');
 {
   /* 🔴 앱이 읽는 것은 `data/notices.json` 이 아니라 `data/notices/<학교>.json` 이다

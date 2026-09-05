@@ -10,7 +10,7 @@ import fs from 'node:fs';
 import { FETCH_HEADERS } from './http-headers.mjs';
 import { urlKey, dedupeNotices, capNotices } from './url-key.mjs';
 import { loadCandidates, mergeCandidates, saveCandidates } from './candidates.mjs';
-import { publishBySchool } from './publish-notices.mjs';
+import { publishBySchool, dropUnserved } from './publish-notices.mjs';
 import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { cleanTitle, isMenuEntry } from './clean-title.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
@@ -311,6 +311,18 @@ notices.items = dedupeNotices(notices.items);
    예전엔 잘린 공고가 seen.json에만 '봤다'로 남아 다시 수집되지도, 검수되지도 않았다
    (2026-08-17 실측 747건 유실). 경위는 collector/candidates.mjs 첫머리. */
 saveCandidates(mergeCandidates(loadCandidates().items, freshAll));
+
+/* 🔴 서비스하지 않는 학교의 공고는 여기서 떨군다 (2026-09-05 개발자 지시).
+   수집 대상은 이미 경희대·한국외대 둘뿐인데 **예전에 담긴 다른 학교 공고가 그대로 남아**
+   전체 상한을 차지하고(200건 중 173건) 로봇들이 그걸 붙들고 일하고 있었다.
+   이유·되돌리는 법은 publish-notices.mjs 의 dropUnserved 첫머리. */
+{
+  const before = notices.items.length;
+  notices.items = dropUnserved(notices.items);
+  if (notices.items.length !== before) {
+    console.log(`서비스하지 않는 학교의 공고 ${before - notices.items.length}건을 피드에서 뺐습니다 (남은 ${notices.items.length}건)`);
+  }
+}
 
 const beforeCap = notices.items;
 /* 학교별 파일도 함께 발행한다 (2026-08-17) — 앱은 이쪽을 읽는다.
