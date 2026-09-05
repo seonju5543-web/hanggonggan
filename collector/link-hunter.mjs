@@ -106,6 +106,44 @@ function runSetting(key) {
 const ONLY = process.env.HUNT_ONLY_BOARD || runSetting('onlyBoard');
 const MAX_PAGES = Number(process.env.HUNT_MAX_PAGES || runSetting('maxPages') || 10);
 const BUDGET_MS = Number(process.env.HUNT_BUDGET_MS || 25 * 60000);
+
+/* 🔴 **예산을 넘기면 어디서 멈춰 있든 스스로 저장하고 끝낸다** (2026-09-05 신설).
+   왜: 최근 8회 중 5회가 `timeout-minutes: 40` **정각(40.4분)에 취소**됐다. 시간초과는
+   GitHub 이 프로세스를 강제 종료하는 것이라 `saveAll` 도, 워크플로의 저장 단계도 못 간다 —
+   실제로 09-02 회차는 hunt 단계가 표준출력 한 줄도 못 내고 죽었고, 그날 찾은 것이 전부 사라졌다.
+   `uncaughtException` 훅으로는 못 막는다(넘어진 게 아니라 밖에서 죽인 것이다).
+
+   🔴 이게 왜 백오프까지 망가뜨렸나 — `attempts`·`nextTryAt` 은 `link-hunt.json` 에 있고 그건
+   `saveAll` 이 쓴다. 강제 종료된 회차는 아무것도 안 남기므로 **실패가 세어지지 않아
+   다음 실행이 같은 표적을 같은 학교에 또 두드린다.** '영구 포기는 없다'의 간격 늘리기가
+   정작 실패가 잦은 회차에서만 작동하지 않고 있었다.
+
+   예산이 못 끊는 자리가 실제로 여럿이다(게시판 열기 3회 재시도 ≈129초 · 대상 하나의
+   후보 확인 · 3단계의 다른 게시판 뒤지기 · 시한 없는 `browser.close()`). 자리마다
+   withDeadline 을 두르는 것보다, **어디서 매달려도 반드시 저장되는 바깥 시계** 하나가 싸고 확실하다.
+   `unref()` 라 정상 종료는 이 타이머 때문에 늦어지지 않는다. */
+const watchdog = setTimeout(() => {
+  if (crashed) return;
+  crashed = true;                                    // saveAll 을 두 번 부르지 않는다
+  console.error(`\n⏰ 예산(${Math.round(BUDGET_MS / 60000)}분)을 넘겨 스스로 멈춥니다 — 여기까지 찾은 것은 저장합니다.`);
+  /* ⚠️ `saveAll(메모)` 의 메모 칸은 **넘어졌을 때** 쓰는 자리라 리포트에 '🚨 로봇이 도중에
+     넘어졌습니다' 를 찍는다. 이건 넘어진 게 아니라 설계된 멈춤이므로 그렇게 적으면 거짓말이다.
+     그래서 메모 없이 부르고, 사정은 리포트에 제 문장으로 남긴다. */
+  try {
+    report.push(`⏰ **예산(${Math.round(BUDGET_MS / 60000)}분)을 넘겨 스스로 멈췄습니다** — 여기까지 찾은 것은 저장했고, 남은 것은 다음 실행이 이어서 합니다.`);
+    report.push('');
+    saveAll(null);
+  } catch (e) {
+    console.error('저장까지 실패했습니다:', e);
+  }
+  /* 넘어진 것이 아니라 **설계된 멈춤**이라 0 으로 끝낸다 — 워크플로의 저장 단계가
+     `always()` 가 아니라 감사 통과 여부만 보므로, 여기서 1 을 내면 🚨 알림이 매번 뜬다. */
+  process.exit(0);
+/* 유예 90초 — 예산 검사는 '게시판 하나가 끝난 뒤'에만 물어보므로 마지막 한 곳이
+   정상적으로 조금 넘길 수 있다. 그 여유를 준 뒤에도 안 끝나면 매달린 것으로 본다.
+   (검사에서 짧게 줄 수 있게 환경변수로 열어 둔다 — 기본값은 바꾸지 말 것) */
+}, BUDGET_MS + Number(process.env.HUNT_WATCHDOG_GRACE_MS || 90 * 1000));
+watchdog.unref();
 /* 끈질김의 규칙 (2026-08-01 개발자 지시: "어떻게든 원문을 찾아서 올려둬라")
    실패해도 **영영 포기하지 않는다.** 다만 같은 것을 매일 두드리면 학교 서버에 무례하고
    시간도 낭비하므로, 실패가 쌓일수록 **간격을 늘려 가며 계속 시도한다.**

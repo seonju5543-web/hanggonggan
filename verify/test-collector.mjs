@@ -1882,16 +1882,34 @@ console.log('\n■ 링크 사냥꾼의 제목 대조 (2026-08-23)');
      2026-09-05 에 손으로 돌렸을 때도 동국대 고졸후학습자 2건이 같은 주소로 풀려 재현됐다.
      ⚠️ 합치기는 수집기와 **같은 함수**여야 한다 — 베끼면 '수집기는 합치는데 사냥꾼은
      안 합치는' 갈라짐이 그대로 돌아온다. */
-  eq('  사냥꾼도 수집기와 같은 중복 합치기를 쓴다', /from '\.\/url-key\.mjs'/.test(lh), true);
+  /* ⚠️ **가져오는 이름까지 못 박는다** — `url-key.mjs 에서 뭐라도 가져오는가`만 보면
+     같은 파일에서 urlKey 만 가져오고 dedupeNotices 를 **파일 안에 베껴 두는** 우회가 통과한다
+     (2026-09-05 리뷰에서 실제로 뚫렸다). 베끼면 막으려던 갈라짐이 그대로 돌아온다. */
+  eq('  사냥꾼도 수집기와 같은 중복 합치기를 쓴다',
+    /import \{[^}]*\bdedupeNotices\b[^}]*\} from '\.\/url-key\.mjs'/.test(lh), true);
+  eq('    베껴 두지 않는다 (같은 파일에 정의가 또 있으면 안 된다)',
+    /function dedupeNotices\s*\(/.test(lh), false);
   {
+    /* ⚠️ 함수 본문을 `indexOf('\nfunction ', 1)` 로 자르지 말 것 — saveAll 이 **파일의 마지막
+       함수**라 그 검색이 `-1` 을 돌려주고, `slice(0, -1)` 은 본문이 아니라 **파일 끝까지**가 된다.
+       그러면 "저장 경로에서 부른다"가 아무것도 증명하지 못한다(2026-09-05 리뷰에서 확인). */
     const save = lh.slice(lh.indexOf('function saveAll'));
-    const body = save.slice(0, save.indexOf('\nfunction ', 1));
-    const dedupeAt = body.indexOf('dedupeNotices(');
+    const end = save.indexOf('\n}\n');
+    eq('    saveAll 본문을 제대로 잘랐다 (자르기가 깨지면 아래가 무의미해진다)', end > 0, true);
+    const body = save.slice(0, end);
+    /* 🔴 **대입까지** 본다 — `dedupeNotices(notices.items);` 는 호출만 하고 결과를 버려
+       아무 일도 안 하는데, 호출 여부만 세면 그대로 통과한다(리뷰에서 뚫린 두 번째 길). */
+    const dedupeAt = body.indexOf('notices.items = dedupeNotices(notices.items)');
     const writeAt = body.indexOf('writeFileSync(noticesPath');
-    eq('    저장 경로에서 실제로 부른다', dedupeAt >= 0, true);
+    eq('    저장 경로에서 결과를 실제로 되받는다', dedupeAt >= 0, true);
     eq('    쓰기보다 먼저 합친다 (뒤면 중복이 그대로 저장된다)',
       dedupeAt >= 0 && writeAt >= 0 && dedupeAt < writeAt, true);
   }
+  /* 🔴 **워치독** — 예산을 넘기면 어디서 매달려 있든 스스로 저장하고 끝내야 한다.
+     이게 없으면 timeout 이 프로세스를 죽여 그 회차 결과가 통째로 사라지고, 그러면
+     link-hunt.json 이 안 남아 실패 간격(nextTryAt)까지 안 밀린다(위 워크플로 주석 참조). */
+  eq('  예산을 넘기면 스스로 저장하고 끝낸다 (워치독)', /setTimeout\(\(\) => \{[\s\S]{0,600}?saveAll\(/.test(lh), true);
+  eq('    정상 종료를 붙들지 않는다 (unref)', /watchdog\.unref\(\)/.test(lh), true);
 }
 
 console.log('\n■ 목록 화면인가 상세 화면인가 (2026-08-20)');
