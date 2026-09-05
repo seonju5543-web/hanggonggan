@@ -46,7 +46,10 @@ const ABOUT = /(자기소개서|자소서|학업\s*계획서|수학\s*계획서|
 /* 🔴 '어떻게 낼 것인가'가 아니라 '어떻게 쓸 것인가'만 담는다.
    처음 만들 때 이 조건이 느슨해서 방문 제출·등기우편·날인 같은 **접수 안내**가
    45건이나 잡혔다. 초안을 쓰는 데 아무 소용이 없는 줄이다. */
-const RULEISH = /(심사에서\s*제외|감점|분량|페이지|\d{2,4}\s*자\s*(이내|이상)|공란|기재한\s*경우|기재하지|작성\s*요령|기재\s*요령|작성\s*규정|평가\s*기준\s*\d\s*순위|식별할\s*수\s*있는)/;
+/* 🔴 2026-09-05: 문체 지시를 보탰다. 전수조사에서 한국외대 이백장학금의
+   `자기소개서는 개조식이 아닌 서술식으로 작성` 이 여기 걸릴 낱말이 없어 떨어지고 있었다 —
+   초안을 쓰는 데 **직접 쓰이는** 규정인데도 그랬다. 좁게만 넣는다(문체를 말하는 낱말뿐). */
+const RULEISH = /(심사에서\s*제외|감점|분량|페이지|\d{2,4}\s*자\s*(이내|이상)|공란|기재한\s*경우|기재하지|작성\s*요령|기재\s*요령|작성\s*규정|평가\s*기준\s*\d\s*순위|식별할\s*수\s*있는|서술식|개조식|줄글)/;
 /* 규정이 아니라 '무엇을 내라'는 목록 — 서류 체크리스트는 초안과 상관이 없다 */
 const NOT_RULE = /^(\s*[\d①-⑩][.)]?\s*)?(자기소개서|성적증명서|재학증명서|주민등록|가족관계|통장|추천서)[^가-힣]{0,6}(\d\s*부|사본)?\s*$/;
 /* 접수·제출 안내는 규정이 아니다 — 글을 쓰는 데 쓰이지 않는다 */
@@ -219,17 +222,40 @@ export function mine() {
     for (const l of uniq) seenLine.set(l, (seenLine.get(l) || 0) + 1);
   }
 
+  /* ── 등록 목록 밖의 원문도 학습 재료로 본다 (2026-09-05) ──
+     🔴 그동안 이 로봇은 registered.json(지금 서비스하는 공고)만 훑었다. 그래서 학교를
+        경희대·한국외대로 줄이자 **이미 받아 둔 원문에 들어 있던 작성 규정이 함께 사라졌다.**
+        전수조사에서 실제로 그런 것이 나왔다 — 한국외대 이백장학금의
+        `자기소개서는 개조식이 아닌 서술식으로 작성`.
+     🔴 앱이 쓰는 칸(perNotice)에는 넣지 않는다. 학생에게 보여 줄 공고가 아니기 때문이다.
+        여기 모인 것은 **공통 규칙 후보 판정과 사람 검수용**이다(리포트에만). */
+  const covered = new Set();
+  for (const it of items) for (const k of [it.sourceUrl, it.url].filter(Boolean)) covered.add(canonUrl(k));
+  const library = [];
+  const corpus = [
+    ...(Array.isArray(texts) ? texts : Object.values(texts)),
+    ...Object.entries(bodies).map(([url, v]) => ({ url, title: (v && v.title) || '', school: (v && v.school) || '', text: typeof v === 'string' ? v : (v && v.text) })),
+  ];
+  for (const c of corpus) {
+    if (!c || !c.url || covered.has(canonUrl(c.url))) continue;
+    const got = [];
+    for (const l of String(c.text || '').split('\n')) { const r = isFormRule(l); if (r && !got.includes(r)) got.push(r); }
+    if (!got.length) continue;
+    library.push({ school: c.school || '', title: String(c.title || '').slice(0, 60), url: c.url, lines: got.slice(0, 8) });
+    for (const l of got) seenLine.set(l, (seenLine.get(l) || 0) + 1);
+  }
+
   /* 여러 공고에 되풀이되는 문구 = 공통 규칙 후보 (검색 요약과 같은 문턱 2건) */
   const common = [...seenLine.entries()].filter(([, n]) => n >= 2)
     .sort((a, b) => b[1] - a[1]).slice(0, 20)
     .map(([text, n]) => ({ text, notices: n }));
 
-  return { perNotice, common, scanned, total: items.length };
+  return { perNotice, common, scanned, total: items.length, library };
 }
 
 /* ── 실행 ── */
 if (process.argv[1] && process.argv[1].endsWith('essay-house-mine.mjs')) {
-  const { perNotice, common, scanned, total } = mine();
+  const { perNotice, common, scanned, total, library } = mine();
   const blind = Object.values(perNotice).filter((v) => v.blind).length;
   const out = {
     _설명: '공고별 작성 규정 — 재단이 공고·첨부에 직접 적어 둔 문장 그대로. collector/essay-house-mine.mjs 가 만든다.',
@@ -256,6 +282,11 @@ if (process.argv[1] && process.argv[1].endsWith('essay-house-mine.mjs')) {
     common.length
       ? common.map((c) => `- (${c.notices}개 공고) ${c.text}`).join('\n')
       : '없습니다.',
+    '',
+    '## 등록 목록 밖의 원문에서 캔 것 — 학습 재료 (앱에는 안 나감)',
+    library.length
+      ? library.map((x) => `- ${x.school || '(미상)'} · ${x.title}\n${x.lines.map((l) => `    · ${l}`).join('\n')}`).join('\n')
+      : '없습니다. (2026-09-05 전수조사: 저장된 공고 원문 320건·첨부 293개를 훑어 0건 — 대부분의 공고는 자기소개서를 *제출 서류*로만 적고 작성 규정은 첨부 서식 안에 있는데, 그 첨부의 절반 이상이 PDF·DOCX 라 아직 글자를 못 뽑는다)',
     '',
     '## 공고별 규정 (앞 12건)',
     Object.entries(perNotice).slice(0, 12)

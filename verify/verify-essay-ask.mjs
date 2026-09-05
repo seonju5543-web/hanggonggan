@@ -441,7 +441,17 @@ head('9) 🔴 맞춤 보기에도 민감 낱말이 없는가 (전수)');
   ok(!isFormRule('지원서류: 성적증명서 1부'),
     '제출 서류 목록은 작성 규정이 아니다');
 
-  const { perNotice } = mine();
+  /* 🔴 문체 지시도 작성 규정이다 (2026-09-05 전수조사에서 놓치고 있던 것)
+     한국외대 이백장학금의 이 줄이 RULEISH 에 걸릴 낱말이 없어 떨어지고 있었다 —
+     초안을 쓰는 데 직접 쓰이는 규정인데도 그랬다. 되돌리면 캔 공고가 2건 → 1건이 된다. */
+  ok(isFormRule('※ 내용이 길어질 경우 별지첨부 가능 , 자기소개서는 개조식이 아닌 서술식으로 작성'),
+    '🔴 문체 지시(개조식이 아닌 서술식)를 규정으로 잡는다');
+  ok(!isFormRule('서술형 문항은 총 3개입니다'), '문항 수 안내는 규정이 아니다');
+  ok(!isFormRule('자기소개서 1부, 성적증명서 1부를 방문 제출해 주십시오.'), '접수 안내는 여전히 규정이 아니다');
+
+  const { perNotice, library } = mine();
+  ok(Array.isArray(library),
+    '🔴 등록 목록 밖의 원문도 훑는다 — 학교를 줄여도 이미 받아 둔 규정이 사라지지 않게');
   const blindCount = Object.values(perNotice).filter((v) => v.blind).length;
   ok(blindCount >= 1, `코퍼스에서 블라인드 심사 공고를 찾는다 (${blindCount}건)`);
 
