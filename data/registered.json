@@ -1841,7 +1841,17 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-08-30 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "2026년 2학기 푸른등대 기부장학금 홍보 포스터.jpg",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=390b87f7fe82497ca4ca98d9e1e902f3&fileSn=1&bbsId=BMSR00040"
+    },
+    {
+     "name": "본문이미지-2480x3508.jpg",
+     "url": "https://www.khu.ac.kr/upload/cross/images/000064/2026%EB%85%84_2%ED%95%99%EA%B8%B0_%ED%91%B8%EB%A5%B8%EB%93%B1%EB%8C%80_%EA%B8%B0%EB%B6%80%EC%9E%A5%ED%95%99%EA%B8%88_%ED%99%8D%EB%B3%B4_%ED%8F%AC%EC%8A%A4%ED%84%B0_1.jpg",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322894",
    "sourceKind": "auto",
    "excerpts": [
@@ -2116,7 +2126,33 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-09-01 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "본문이미지-527x735.png",
+     "url": "https://www.khu.ac.kr/upload/cross/images/000065/20260901161731877_IMI7V36L.png",
+     "bodyImage": true
+    },
+    {
+     "name": "본문이미지-544x728.png",
+     "url": "https://www.khu.ac.kr/upload/cross/images/000065/20260901161746110_37WAR0IC.png",
+     "bodyImage": true
+    },
+    {
+     "name": "본문이미지-530x771.png",
+     "url": "https://www.khu.ac.kr/upload/cross/images/000065/20260901161759832_FEOJOBPH.png",
+     "bodyImage": true
+    },
+    {
+     "name": "본문이미지-511x773.png",
+     "url": "https://www.khu.ac.kr/upload/cross/images/000065/20260901161812285_45PGQDB8.png",
+     "bodyImage": true
+    },
+    {
+     "name": "본문이미지-552x788.png",
+     "url": "https://www.khu.ac.kr/upload/cross/images/000065/20260901161827877_Y0A369DA.png",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322953",
    "sourceKind": "auto"
   },
@@ -2143,7 +2179,13 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-09-01 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "본문이미지-453x645.png",
+     "url": "https://www.khu.ac.kr/upload/cross/images/000065/20260901152121236_D98JD201.png",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322949",
    "sourceKind": "auto"
   }
