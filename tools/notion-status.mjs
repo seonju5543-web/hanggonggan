@@ -59,20 +59,47 @@ const PEOPLE = {
                       emails: ['dhdp0105@gmail.com'] },
 };
 
-/* '지금 하는 일' 한 낱말 — **만진 파일에서 읽는다.** 커밋 제목을 요약하려 들면 지어내게 되고,
+/* '지금 하는 일' — **만진 파일에서 읽는다.** 커밋 제목을 요약하려 들면 지어내게 되고,
    백로그에서 가져오면 실제로 만진 것과 어긋난다(개발자 지적: "백로그에 있는거 가져와서 쓰는데
-   그러지 말고"). 파일 경로는 지어낼 수 없는 사실이다. 위에서부터 먼저 맞는 것 하나. */
+   그러지 말고"). 파일 경로는 지어낼 수 없는 사실이다.
+   🔴 **기능 이름까지 내려간다** (2026-09-06 개발자 지시: "조금만 더 구체적으로, 자격 매칭
+      개선 이런 식으로"). '수집'·'화면' 은 너무 넓어 누가 봐도 무엇을 하는지 모른다.
+   ⚠️ **위에서부터 먼저 맞는 것**이라 좁은 줄이 넓은 줄보다 위에 있어야 한다
+      (`collector/link-hunter` 가 `collector/` 보다 위).
+   ⚠️ 뒤에 붙는 동사는 **git 이 아는 것만** 쓴다 — 새로 생긴 파일이면 '신설', 지웠으면 '정리',
+      아니면 '수정'. '개선'·'수리' 처럼 잘했는지 못했는지를 말하는 낱말은 경로에도 git 에도
+      없으므로 붙이지 않는다(그건 지어내는 것이다). 무엇을 했는지는 바로 옆 '최근 커밋' 칸이
+      원문 그대로 말한다. */
 const AREAS = [
-  [/^collector\//, '수집'],
-  [/^verify\//, '검사'],
-  [/^\.github\//, '로봇'],
-  [/^server\//, '서버'],
-  [/^_admin\//, '관리자'],
-  [/^data\//, '데이터'],
-  [/^tools\//, '도구'],
+  [/^collector\/(link-hunter|resolve-detail-urls|probe-links|detail-url|canon-url)/, '원문 링크 찾기'],
+  [/^collector\/kosaf|^data\/kosaf/, '한국장학재단 목록'],
+  [/^collector\/(schematize|schema-from-text)/, '양식 스키마화'],
+  [/^collector\/(extract-excerpts|rescue-bodies|notice-source|deepfetch)/, '공고 원문 확보'],
+  [/^collector\/(auto-register|clean-title)/, '공고 자동 등록'],
+  [/^collector\//, '수집 로봇'],
+  [/^data\/registered/, '공고 등록'],
+  [/^data\/forms/, '신청서 양식'],
+  [/^data\//, '공고 데이터'],
+  [/^(match-engine|parse-requirements|section-head)\.js$/, '자격 매칭'],
+  [/^parse-amount\.js$/, '금액 판정'],
+  [/^(forms|form-plan)\.js$/, '신청서 양식'],
+  [/^essay|^server\/essay/, '지원서 초안'],
+  [/^(notify|push-config)|^server\/push/, '알림·푸시'],
+  [/^chat|^server\/chat/, '장학금 도우미'],
+  [/^supabase|^terms\.html$/, '로그인·약관'],
+  [/^_admin\/|admin-apply/, '관리자 화면'],
+  [/^verify\//, '검사 도구'],
+  [/^\.github\//, '로봇 워크플로'],
+  [/^tools\/notion-/, '노션 현황판'],
+  [/^tools\/(merge-json-union|setup-collab)/, '협업 병합'],
+  [/^tools\/(admin-apply|build-admin-preview)/, '관리자 화면'],
+  [/^tools\/link-wanted/, '원문 링크 찾기'],
+  [/^tools\/robot-run/, '수집 로봇'],
+  [/^tools\//, '작업 도구'],
   [/^proposals\//, '제안서'],
-  [/^(match-engine|parse-.*|section-head|essay-quality|essay-submit-check|notify-rules)\.js$/, '판정'],
-  [/^(style\.css|index\.html|app\.js|chat\.js|essay\.js|notify\.js|forms\.js|form-plan\.js|terms\.html)$/, '화면'],
+  [/^(style\.css|index\.html)$/, '화면 디자인'],
+  [/^app\.js$/, '앱 화면'],
+  [/^sw\.js$/, '오프라인·캐시'],
   [/\.md$/, '문서'],
 ];
 
@@ -106,16 +133,46 @@ const log = byAuthor
    이 사람이 여태 무엇을 했는지가 아니다. */
 function nowDoing() {
   if (!byAuthor) return '';
-  const files = sh(`git log --no-merges ${byAuthor} -n 3 --name-only --pretty=format:`);
+  /* `--name-status` 로 받는다 — 무엇을 만졌는지뿐 아니라 **새로 만들었는지 고쳤는지**까지
+     git 이 알려 준다. 그래야 뒤에 붙일 낱말을 지어내지 않아도 된다. */
+  const files = sh(`git log --no-merges ${byAuthor} -n 3 --name-status --pretty=format:`);
   if (!files.ok || !files.out) return '';
-  const count = new Map();
-  for (const path of files.out.split('\n')) {
-    if (!path.trim()) continue;
+  const count = new Map();      // 기능 이름 → 무게 합
+  const marks = new Map();      // 기능 이름 → 본 상태 글자들
+  const first = new Map();      // 기능 이름 → 처음 본 커밋 번호(동점일 때 최신이 이긴다)
+  /* 🔴 **최신 커밋에 무게를 준다** — '지금' 하는 일이지 '요즘' 하는 일이 아니다.
+     그냥 세면 파일을 많이 만진 옛 작업이 방금 한 일을 덮는다(실측: 방금 노션 로봇을
+     고쳤는데 이틀 전 style.css 작업이 이겨서 '화면 디자인'이 떴다).
+     ⚠️ 최신 하나만 보면 오탈자 커밋 하나에 칸이 통째로 흔들린다 — 그래서 3:2:1 이다. */
+  const WEIGHT = [3, 2, 1];
+  /* ⚠️ **0 에서 시작한다.** 앞머리에는 빈 줄이 없다 — `sh` 가 앞뒤를 다듬기 때문이다.
+     -1 로 시작했더니 무게가 3·3·2 로 밀려서, 파일 하나짜리 최신 커밋이 파일 셋짜리
+     옛 커밋에 졌다(실측: 노션 로봇을 고친 날 '화면 디자인'이 떴다). 커밋 사이 빈 줄은 하나다. */
+  let idx = 0;
+  for (const line of files.out.split('\n')) {
+    if (!line.trim()) { idx++; continue; }   // 커밋과 커밋 사이의 빈 줄
+    const w = WEIGHT[Math.min(Math.max(idx, 0), WEIGHT.length - 1)];
+    const cols = line.split('\t');
+    const mark = cols[0][0];                 // A(추가) M(수정) D(삭제) R(이름바꿈)
+    const path = cols[cols.length - 1];      // 이름바꿈은 마지막 칸이 새 이름이다
     const hit = AREAS.find(([re]) => re.test(path));
-    if (hit) count.set(hit[1], (count.get(hit[1]) || 0) + 1);
+    if (!hit) continue;
+    count.set(hit[1], (count.get(hit[1]) || 0) + w);
+    marks.set(hit[1], (marks.get(hit[1]) || '') + mark);
+    if (!first.has(hit[1])) first.set(hit[1], idx);
   }
   if (!count.size) return '';
-  return [...count.entries()].sort((a, b) => b[1] - a[1])[0][0];
+  /* 🔴 **문서는 혼자일 때만 이긴다.** CLAUDE.md 는 거의 모든 작업에 딸려 오는 동반자라,
+     그냥 세면 무엇을 고쳤든 '문서'가 자주 1등이 된다(실제로 동점 1등이었다).
+     문서만 만진 날에는 그대로 '문서'가 뜬다. */
+  const real = [...count.entries()].filter(([k]) => k !== '문서');
+  const pool = real.length ? real : [...count.entries()];
+  /* 동점이면 **더 최근 커밋에서 본 것**이 이긴다 — '지금' 하는 일이 무엇인지가 기준이다.
+     (동점은 자주 난다: 커밋 하나에 파일 하나씩만 만지면 전부 같은 무게가 된다) */
+  const top = pool.sort((a, b) => b[1] - a[1] || first.get(a[0]) - first.get(b[0]))[0][0];
+  const seen = marks.get(top) || '';
+  const verb = seen.includes('A') ? '신설' : /^D+$/.test(seen) ? '정리' : '수정';
+  return `${top} ${verb}`;
 }
 
 /* 글자 수로 자르면 이모지(🔴 등)가 반 토막 나 깨진 글자가 남는다 — 줄 단위로 자른다.
