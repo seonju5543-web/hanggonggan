@@ -29,9 +29,11 @@ on:
   #       main 을 빼면 그 유일한 공통 통로가 막힌다. 로봇 push 는 아래 actor 조건이 거른다.
   push:
 
+# 🔴 이 로봇은 이제 저장소에 아무것도 쓰지 않는다 — 노션 API 로만 말한다.
+#    PROGRESS.md 를 커밋하던 시절의 `contents: write` · 알림 이슈용 `issues: write` 를
+#    같이 뺐다. 남길 이유가 없는 권한은 남기지 않는다(checkout 에는 read 면 충분하다).
 permissions:
-  contents: write
-  issues: write   # 🚨 로봇 넘어짐 알림 (2026-09-06)
+  contents: read
 
 jobs:
   # 노션 「작업 현황」 — push 한 사람의 줄만 갱신한다.
