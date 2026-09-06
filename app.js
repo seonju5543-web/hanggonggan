@@ -2245,10 +2245,15 @@ function scrollableAtTop(target, sheet) {
    (학교 목록에서 손가락이 닿는 순간 선택돼 버리던 것과 같은 계열의 실수를 막는 조건).
    ⚠️ 새로 만드는 시트에도 반드시 붙일 것 — 2026-08-21 개발자 지시. */
 function enableSheetSwipe(sheet, close) {
-  let startY = 0, dy = 0, dragging = false;
+  let startY = 0, dy = 0, dragging = false, startT = 0;
+  /* 🔴 **거리만 보면 안 된다** (2026-09-06). 90px 을 넘겨야만 닫히니 짧고 빠르게 튕기는
+     — 시트를 닫는 가장 자연스러운 손짓 — 이 무시됐다. 빠르기(px/ms)도 함께 본다.
+     0.11 은 '툭 치는 것'과 '천천히 끄는 것'이 갈리는 선이다. */
+  const FLICK = 0.11;
   sheet.addEventListener('touchstart', (e) => {
     if (e.touches.length !== 1) return;
     startY = e.touches[0].clientY;
+    startT = Date.now();
     dy = 0;
     dragging = scrollableAtTop(e.target, sheet);
   }, { passive: true });
@@ -2268,7 +2273,8 @@ function enableSheetSwipe(sheet, close) {
     sheet.style.transition = '';
     void sheet.offsetHeight;          // transition을 되살린 뒤에 transform을 바꿔야 튀지 않는다
     sheet.style.transform = '';
-    if (dy > 90) close();
+    const speed = dy / Math.max(1, Date.now() - startT);
+    if (dy > 90 || (dy > 12 && speed > FLICK)) close();
   }, { passive: true });
 }
 
@@ -2314,8 +2320,10 @@ function dismissSheet() {
      ⏱ 기다리는 시간은 **CSS 에서 읽는다**(style.css `.sheet` transition). 숫자를 여기 적으면
         CSS 를 고칠 때 조용히 어긋난다 — 이 저장소가 반복해 겪은 '베끼면 갈라진다'. */
   const sheet = $('#detail-sheet');
-  const ms = (parseFloat(getComputedStyle(sheet).transitionDuration) || 0.3) * 1000;
+  /* 🔴 **`.show` 를 뗀 뒤에 읽는다** (2026-09-06) — 들어올 때(0.3s)와 나갈 때(0.22s)의
+     시간이 달라졌다. 떼기 전에 읽으면 들어올 때의 값이 나와 80ms 를 헛되이 기다린다. */
   sheet.classList.remove('show');
+  const ms = (parseFloat(getComputedStyle(sheet).transitionDuration) || 0.22) * 1000;
   setTimeout(() => {
     /* 🔴 되돌아가기가 **실패하면 그냥 닫는다.** `renderAmountDetail()` 은 `lastBill` 이
        없으면 아무것도 안 그리고 돌아오는데, 그때 여기서 return 해 버리면 시트가

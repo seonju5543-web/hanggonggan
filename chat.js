@@ -866,6 +866,7 @@ function chatFabPlace(pos) {
   fab.style.top = top + 'px';
   fab.style.right = 'auto';
   fab.style.bottom = 'auto';
+  return { left, top };   /* 놓을 때 FLIP 으로 미끄러뜨리려면 '최종 자리'의 숫자가 필요하다 */
 }
 
 function chatBindFab() {
@@ -881,13 +882,28 @@ function chatBindFab() {
 
   let holdTimer = null, lifted = false, moved = false;
   let startX = 0, startY = 0, offX = 0, offY = 0;
+  /* 🔴 옮기는 동안 `left`/`top` 을 쓰지 않는다 (2026-09-06) — 그것은 배치 속성이라
+     손가락이 움직일 때마다 브라우저가 화면을 다시 재고 다시 그린다. 지금은 **놓인 자리는
+     그대로 두고 `transform` 으로만** 끌고, 놓을 때 최종 자리로 옮긴 뒤 그 차이만큼
+     되돌려 놓고 0 으로 전환한다(FLIP). 눈에 보이는 미끄러짐은 같고, 배치 계산은 0이다. */
+  let baseX = 0, baseY = 0;      // 들어올린 순간의 '놓인 자리'
+  let lastX = 0, lastY = 0;      // 마지막으로 손가락이 가리킨 자리
+  const LIFT_SCALE = 1.14;       // .chat-fab.lifted 의 확대율 — CSS 대신 여기서 준다
+  const drag = (x, y, scaled) => {
+    fab.style.transform = `translate3d(${Math.round(x - baseX)}px, ${Math.round(y - baseY)}px, 0)`
+      + (scaled ? ` scale(${LIFT_SCALE})` : '');
+  };
 
   const cancelHold = () => { clearTimeout(holdTimer); holdTimer = null; };
 
   const lift = () => {
     lifted = true;
+    const r = fab.getBoundingClientRect();
+    baseX = r.left; baseY = r.top;
+    lastX = r.left; lastY = r.top;
     fab.classList.add('lifted');
     fab.classList.remove('dropping');
+    drag(baseX, baseY, true);
     chatHintHide();
     if (navigator.vibrate) { try { navigator.vibrate(12); } catch (e) { /* 진동은 있으면 좋은 것 */ } }
   };
@@ -916,10 +932,8 @@ function chatBindFab() {
     const band = chatFabBand(size);
     const x = Math.min(window.innerWidth - size - CHAT_EDGE, Math.max(CHAT_EDGE, e.clientX - offX));
     const y = Math.min(band.max, Math.max(band.min, e.clientY - offY));
-    fab.style.left = x + 'px';
-    fab.style.top = y + 'px';
-    fab.style.right = 'auto';
-    fab.style.bottom = 'auto';
+    lastX = x; lastY = y;
+    drag(x, y, true);
   });
 
   const finish = (e) => {
@@ -928,14 +942,22 @@ function chatBindFab() {
       lifted = false;
       fab.classList.remove('lifted');
       fab.classList.add('dropping');
-      /* 가까운 쪽 가장자리에 붙인다 — 가운데 떠 있으면 공고 카드를 가린다 */
+      /* 가까운 쪽 가장자리에 붙인다 — 가운데 떠 있으면 공고 카드를 가린다.
+         ⚠️ 자리는 `getBoundingClientRect` 가 아니라 **손가락이 마지막으로 가리킨 값**으로 잰다 —
+            들어올린 동안에는 1.14배로 커져 있어서 그 상자의 모서리는 실제 자리보다 밖에 있다. */
       const size = fab.offsetWidth || 56;
-      const r = fab.getBoundingClientRect();
       const band = chatFabBand(size);
-      const side = (r.left + size / 2) < window.innerWidth / 2 ? 'left' : 'right';
-      const ratio = band.max > band.min ? (r.top - band.min) / (band.max - band.min) : 0;
+      const side = (lastX + size / 2) < window.innerWidth / 2 ? 'left' : 'right';
+      const ratio = band.max > band.min ? (lastY - band.min) / (band.max - band.min) : 0;
       const pos = { side, ratio: Math.min(1, Math.max(0, ratio)) };
-      chatFabPlace(pos);
+      const home = chatFabPlace(pos) || { left: lastX, top: lastY };
+      /* FLIP — 최종 자리로 옮겨 놓고, 눈에는 아직 손끝에 있는 것처럼 되돌린 뒤 0 으로 민다 */
+      fab.style.transition = 'none';
+      drag(lastX + (baseX - home.left), lastY + (baseY - home.top), false);
+      void fab.offsetHeight;
+      fab.style.transition = '';
+      fab.classList.add('dropping');
+      fab.style.transform = '';
       try { localStorage.setItem(CHAT_FAB_KEY, JSON.stringify(pos)); } catch (err) { /* 저장 실패해도 이번 자리는 유지 */ }
       setTimeout(() => fab.classList.remove('dropping'), 260);
       return;
@@ -944,7 +966,11 @@ function chatBindFab() {
   };
 
   fab.addEventListener('pointerup', finish);
-  fab.addEventListener('pointercancel', () => { cancelHold(); lifted = false; fab.classList.remove('lifted'); });
+  fab.addEventListener('pointercancel', () => {
+    cancelHold(); lifted = false;
+    fab.classList.remove('lifted');
+    fab.style.transform = '';   /* 끌던 것을 지우지 않으면 마스코트가 옮겨진 채로 굳는다 */
+  });
 
   /* 키보드로도 열 수 있어야 한다 — pointer 경로로만 열면 버튼이 아닌 것이 된다.
      (옮기기는 키보드로 못 하지만, 자리는 편의 기능이라 못 해도 쓸 수 있다) */
