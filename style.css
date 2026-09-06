@@ -60,6 +60,12 @@
   /* 그림자 — 바탕의 색조를 띠게 한다. 순수 검정 저투명도는 회색 때가 낀 것처럼 보인다.
      빛의 방향은 화면 전체에서 위쪽 하나로 통일했다. */
   --shadow:       0 1px 2px rgba(58, 48, 28, 0.05), 0 8px 22px rgba(58, 48, 28, 0.07);
+  /* 🔴 **색이 들어간** 높낮이 (2026-09-06 이름 붙임). 중립 --shadow 로 누르면 그림자가
+     버튼 색을 잃는다 — 값은 그대로 두고 이름만 줬다(픽셀 변화 0). */
+  --shadow-btn:       0 6px 18px rgba(35, 32, 26, 0.22);
+  --shadow-btn-hover: 0 8px 24px rgba(35, 32, 26, 0.28);
+  --shadow-btn-white: 0 10px 26px rgba(20, 16, 8, 0.32);   /* 어두운 패널 위 흰 버튼 */
+  --shadow-chip:      0 4px 14px rgba(35, 32, 26, 0.20);
   --shadow-lift:  0 2px 6px rgba(58, 48, 28, 0.06), 0 18px 40px rgba(58, 48, 28, 0.13);
   --shadow-sheet: 0 -14px 48px rgba(40, 33, 20, 0.22);
   --ring:         0 0 0 3px rgba(138, 106, 31, 0.20);
@@ -2142,8 +2148,8 @@ body::after {
 html { scroll-behavior: smooth; }
 
 /* ── ④ 색 정리 ── 파랑을 쓰던 자리를 잉크와 놋쇠로 나눈다 */
-.btn-primary { background: var(--primary); color: #fdfbf6; box-shadow: 0 6px 18px rgba(35, 32, 26, 0.22); }
-.btn-primary:hover { background: var(--primary-dark); box-shadow: 0 8px 24px rgba(35, 32, 26, 0.28); }
+.btn-primary { background: var(--primary); color: #fdfbf6; box-shadow: var(--shadow-btn); }
+.btn-primary:hover { background: var(--primary-dark); box-shadow: var(--shadow-btn-hover); }
 .btn-primary:disabled { background: rgba(25, 23, 19, 0.12); color: rgba(25, 23, 19, 0.36); box-shadow: none; }
 .btn-outline { border-color: var(--rule); color: var(--text); }
 .btn-outline:hover { border-color: var(--text); background: var(--primary-weak); }
@@ -2151,7 +2157,7 @@ html { scroll-behavior: smooth; }
 input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: var(--ring); }
 .chip.active, .filter-chip.active {
   background: var(--primary); border-color: var(--primary); color: #fdfbf6;
-  box-shadow: 0 4px 14px rgba(35, 32, 26, 0.20);
+  box-shadow: var(--shadow-chip);
 }
 .check-item:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); box-shadow: none; }
 .check-item input:checked { border-color: var(--accent); background-color: var(--accent); }
@@ -2227,7 +2233,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 .badge-fit.fit-blue   { background: rgba(138, 106, 31, 0.22); color: var(--accent); }
 
 /* 흰 버튼(어두운 패널 위) — 남색 글자를 잉크로 */
-.btn-white { background: #fffefc; color: var(--text); box-shadow: 0 10px 26px rgba(20, 16, 8, 0.32); }
+.btn-white { background: #fffefc; color: var(--text); box-shadow: var(--shadow-btn-white); }
 .btn-white:hover { background: #fff; }
 
 /* 하단 내비 — 활성 표시를 놋쇠 점으로. 파랑 글자 대신 위치를 점이 말한다 */
@@ -2410,7 +2416,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 .link-btn, .btn-link, .my-edit-hint, .acc-on { color: var(--accent); }
 .chip.active, .filter-chip.active {
   background: var(--accent); border-color: var(--accent); color: #fff;
-  box-shadow: 0 4px 14px rgba(39, 80, 143, 0.26);
+  box-shadow: var(--shadow-chip);
 }
 /* 주 버튼은 잉크로 남긴다 — 파랑을 큰 면적에 칠하면 다시 흔한 화면이 된다.
    파랑은 '이것 하나가 중요하다'를 가리키는 데만 쓴다. */
@@ -2465,7 +2471,9 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
   border-radius: 50%;
   background: var(--accent-soft);
   color: var(--accent);
-  font-size: 10px;
+  /* 10px → --t-2xs(11.5px). 15px 원 안의 숫자라 1.5px 커진다 — 스케일에 없는 칸을
+     새로 만드는 쪽이 더 나쁘다(2026-09-06). */
+  font-size: var(--t-2xs);
   font-weight: 800;
   line-height: 1;
 }
@@ -2681,6 +2689,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 
   /* 그림자를 갈색에서 남색 계열로 — 넓은 면에 깔리는 색이라 여기가 제일 크게 보인다 */
   --shadow:       0 1px 2px rgba(24, 35, 56, 0.05), 0 8px 22px rgba(24, 35, 56, 0.07);
+  --shadow-chip:  0 4px 14px rgba(39, 80, 143, 0.26);      /* 남색 판의 칩 — 이 값이 실제로 뜬다 */
   --shadow-lift:  0 2px 6px rgba(24, 35, 56, 0.07), 0 18px 40px rgba(24, 35, 56, 0.14);
   --shadow-sheet: 0 -14px 48px rgba(18, 26, 42, 0.20);
   --knob:         0 1px 3px rgba(24, 35, 56, 0.26);
@@ -2820,7 +2829,7 @@ body::after { opacity: 0.26; }
 #my-notify .wallet-title,
 #my-wallet .wallet-title {
   display: block;
-  font-size: 20px;
+  font-size: var(--t-2xl);   /* 20px → 21px · 위 처방(크기·굵기·막대)은 그대로 산다 */
   font-weight: 800;
   letter-spacing: -0.035em;
   line-height: 1.3;
@@ -2836,7 +2845,8 @@ body::after { opacity: 0.26; }
   position: absolute;
   top: 0; left: 0;
   width: 26px; height: 3px;
-  border-radius: 2px;
+  /* 높이가 3px 이라 반경은 어차피 1.5px 로 잘린다 — 2px 든 3px 든 같게 그려진다 */
+  border-radius: var(--radius-hair);
   background: var(--text);
 }
 /* 제목 바로 아래 딸린 한 줄(상태·설명)은 제목과 붙여 한 덩어리로 읽히게 */
@@ -2952,7 +2962,7 @@ body::after { opacity: 0.26; }
   width: 9px; height: 9px;
   border-right: 2px solid var(--text-weak);
   border-bottom: 2px solid var(--text-weak);
-  border-radius: 1px;
+  border-radius: var(--radius-hair);
   transform: rotate(45deg) translate(-2px, -2px);
   transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.2s;
 }
@@ -2996,7 +3006,7 @@ body::after { opacity: 0.26; }
 .doc-check .dc-ok::before { content: '✓'; color: var(--primary); }
 .doc-check .dc-miss::before, .doc-check .dc-etc::before {
   content: ''; top: 8px; left: 3px;
-  width: 11px; height: 11px; border-radius: 3px;
+  width: 11px; height: 11px; border-radius: var(--radius-hair);
   box-shadow: inset 0 0 0 1.5px var(--text-weak);
 }
 .dc-unknown {
@@ -3024,7 +3034,7 @@ body::after { opacity: 0.26; }
 .app-next-btn {
   flex: none;
   padding: 9px 15px;
-  border: 0; border-radius: 999px;
+  border: 0; border-radius: var(--radius-pill);
   background: var(--primary); color: #fff;
   font-size: var(--t-sm); font-weight: 700;
   cursor: pointer; white-space: nowrap;
@@ -3082,7 +3092,7 @@ a.app-log-more { text-decoration: none; }
 
 
 /* 신청 내역 요약의 금액을 크게 (2026-09-01 개발자 지시) */
-.summary-amount { font-size: 40px; letter-spacing: -0.04em; line-height: 1.1; }
+.summary-amount { font-size: var(--t-hero); letter-spacing: -0.04em; line-height: 1.1; }   /* 40px → 38px, 스케일의 가장 큰 칸 */
 
 
 /* ══ 자간을 두 값으로 통일 (2026-09-01 개발자 지시) ═══════════════════════
