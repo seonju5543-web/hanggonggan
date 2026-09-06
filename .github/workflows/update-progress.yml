@@ -1,15 +1,19 @@
-name: Update PROGRESS doc
+name: 노션 「작업 현황」 갱신
 
-# 공동 개발 진척도 문서(main의 PROGRESS.md)의 '활동 로그'를 매일 2회 자동 갱신하고,
-# 실제 활동 변화가 있을 때만 두 개발자에게 메일로 알린다.
-# 예약 워크플로는 기본 브랜치(claude/nice-heisenberg-WESq5)에 있어야 작동한다.
+# 노션 「작업 현황」의 '지금 하는 일 · 최근 커밋 · 브랜치 · 갱신' 을 push 때마다 채운다.
+#
+# 🔴 예전에는 main 의 PROGRESS.md 도 함께 갱신했다. 2026-09-06 개발자 지시로 그 문서를
+#    폐기했다 — "낡았고 아무도 안 쓰니까 작성 중단하고 노션에 인수인계". 그래서
+#    ① `update` 작업(활동 로그 커밋 + 갱신 알림 이슈) ② 하루 두 번 예약 을 통째로 뺐다.
+#    ⚠️ 되살리지 말 것. 정본은 노션이고, 저장소에 사본을 만들면 두 벌이 되어 갈라진다.
+#    ⚠️ 예약을 뺐어도 로봇 하트비트는 영향이 없다 — robot-heartbeat 는 이 로봇을 안 본다(확인함).
 on:
   # 🔴 08:17·22:17 KST — 예전엔 :07 이었는데 '브라우저형 수집'과 **같은 분**이라
   #    둘이 동시에 같은 저장소에 push 했다(둘 다 재시도가 있어 버티긴 했다).
   #    예약 로봇끼리 분을 겹치지 않게 두는 것이 이 저장소 규칙이다(verify/test-collector '예약 겹침').
-  schedule:
-    - cron: '17 23 * * *'   # 08:17 KST (UTC+9)
-    - cron: '17 13 * * *'   # 22:17 KST (UTC+9)
+  # 🔴 예약을 두지 않는다 — 하루 두 번 돌던 것은 PROGRESS.md 활동 로그 때문이었고
+  #    그 작업이 없어졌다. 남은 notion 작업은 push 때만 뜻이 있다(누가 방금 무엇을 했는가).
+  #    예약만 남기면 할 일이 없는 실행이 하루 두 번 켜졌다 꺼진다.
   workflow_dispatch:        # 수동 실행 버튼
   # 🔴 push 될 때마다 **노션 「작업 현황」만** 갱신한다 (2026-09-06).
   #    12시간마다로는 "지금 누가 무엇을 하는지"가 안 보인다는 개발자 지시.
@@ -30,99 +34,6 @@ permissions:
   issues: write   # 🚨 로봇 넘어짐 알림 (2026-09-06)
 
 jobs:
-  update:
-    if: github.event_name != 'push'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - name: Checkout main
-        uses: actions/checkout@v4
-        with:
-          ref: main
-          fetch-depth: 0
-
-      - name: Fetch branches
-        run: git fetch origin claude/work-seonju claude/work-josehyeon claude/work-eunseo claude/nice-heisenberg-WESq5 2>/dev/null || true
-
-      - name: Rebuild activity section (실제 변화 있을 때만)
-        id: build
-        run: |
-          cat > /tmp/upd.mjs <<'EOF'
-          import { execSync } from 'node:child_process';
-          import fs from 'node:fs';
-          const P = 'PROGRESS.md';
-          if (!fs.existsSync(P)) { console.log('PROGRESS.md 없음'); process.exit(0); }
-          let doc = fs.readFileSync(P, 'utf8');
-          const sh = c => { try { return execSync(c, {encoding:'utf8'}).trim(); } catch { return ''; } };
-          const BASE = 'origin/claude/nice-heisenberg-WESq5';
-          function section(branch, label){
-            const range = `${BASE}..origin/${branch}`;
-            const log = sh(`git log ${range} --since="14 days ago" --no-merges --pretty=format:"- %ad · %s" --date=format:"%m-%d %H:%M" -n 20`);
-            const ahead = sh(`git rev-list --count ${range}`) || '0';
-            return `**${label}** (\`${branch}\`) — 본인 작업 ${ahead}커밋\n${log || '- 아직 이 브랜치의 개별 작업 없음'}\n`;
-          }
-          const activity = `${section('claude/work-seonju','🟦 선주')}\n${section('claude/work-josehyeon','🟩 공동작업자')}\n${section('claude/work-eunseo','🟨 은서 (CTO)')}`;
-          // 타임스탬프 줄을 뺀 '내용'만 비교 — 실제 활동 변화가 없으면 갱신·메일 생략(스팸 방지)
-          const cur = (doc.match(/<!-- AUTO-ACTIVITY-START -->([\s\S]*?)<!-- AUTO-ACTIVITY-END -->/) || [,''])[1]
-                        .replace(/\*\(자동 갱신[^\n]*\n/, '').trim();
-          if (cur === activity.trim()) { console.log('활동 변화 없음 — 갱신 생략'); process.exit(0); }
-          const kst = new Date(Date.now() + 9*3600*1000).toISOString().replace('T',' ').slice(0,16);
-          const block = `*(자동 갱신: ${kst} KST · 최근 14일)*\n\n${activity}`;
-          doc = doc.replace(/<!-- AUTO-ACTIVITY-START -->[\s\S]*?<!-- AUTO-ACTIVITY-END -->/,
-            `<!-- AUTO-ACTIVITY-START -->\n${block}\n<!-- AUTO-ACTIVITY-END -->`);
-          fs.writeFileSync(P, doc);
-          fs.appendFileSync(process.env.GITHUB_OUTPUT, 'changed=true\n');
-          console.log('활동 로그 갱신됨');
-          EOF
-          node /tmp/upd.mjs
-
-      - name: Commit & push to main
-        if: steps.build.outputs.changed == 'true'
-        run: |
-          git config user.name "hanjang-progress-bot"
-          git config user.email "actions@github.com"
-          git add PROGRESS.md
-          git commit -m "PROGRESS: 활동 로그 자동 갱신 (매일 08:17·22:17 KST)"
-          # PROGRESS.md는 두 개발자와 이 로봇이 함께 쓰는 문서라, 그 사이 main이 움직여
-          # push가 튕기는 일이 잦다. 예전엔 그러면 그냥 실패했다(활동 로그가 하루 비었다).
-          # 이제 최신 main을 받아 얹은 뒤 최대 3회 다시 시도한다.
-          for i in 1 2 3; do
-            if git push origin HEAD:main; then exit 0; fi
-            git fetch origin main && git rebase origin/main || { git rebase --abort || true; exit 1; }
-          done
-          echo "::error::PROGRESS 활동 로그 push 실패 — 3회 재시도 모두 실패."
-          exit 1
-
-      # 문서가 실제로 갱신됐을 때만, 수집 리포트와 '동일한 방식'(이슈 배정 → GitHub이
-      # 두 개발자에게 자동 메일)으로 알린다. 별도 메일 비밀번호(Secrets) 불필요.
-      - name: 진척도 갱신 알림 (이슈 배정 → 두 개발자에게 자동 메일)
-        if: steps.build.outputs.changed == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh issue create \
-            --title "📄 개발 진척도 문서 갱신 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST" \
-            --repo "${{ github.repository }}" \
-            --assignee "${{ github.repository_owner }}" \
-            --assignee "Se-Hyeon-Jo" \
-            --body "두 개발자의 개발 진척도(완료 / 개발중 / 구상중)가 갱신되었습니다.
-
-          📄 **문서 바로 확인**: https://github.com/${{ github.repository }}/blob/main/PROGRESS.md
-
-          확인 후 이 이슈는 닫으셔도 됩니다."
-
-      # 🔴 실행 알림 (2026-09-06 신설) — 결과 알림과 다른 것이다.
-      #    결과 알림: "보러 갔더니 상태가 이상하더라"  · 실행 알림: "보러 가다가 내가 넘어졌다"
-      #    이게 없으면 감시 로봇이 죽었을 때 그 로봇이 지키던 것까지 함께 무음이 된다.
-      #    🔴 notion 잡이 아니라 **예약으로 도는 update 잡**에 붙인다 — notion 은 push 로만 돌고
-      #       cancel-in-progress: true 라 자동 취소마다 헛알림이 난다.
-      - name: 🚨 로봇이 넘어졌다
-        if: failure() || cancelled()
-        uses: ./.github/actions/robot-down
-        with:
-          robot: 진척도 갱신
-          token: ${{ github.token }}
-
   # 노션 「작업 현황」 — push 한 사람의 줄만 갱신한다.
   # 🔴 PROGRESS 작업과 **분리**한다: 같은 작업에 두면 push 마다 main 이 움직인다.
   # 🔴 `continue-on-error` 를 걸지 않는다 — 열쇠 만료·공유 해제가 초록불에 묻히면
