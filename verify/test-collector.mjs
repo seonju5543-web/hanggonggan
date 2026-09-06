@@ -408,7 +408,7 @@ function undeclaredNames(src) {
 {
   const wf = fs.readdirSync(new URL('../.github/workflows/', import.meta.url))
     .filter((f) => f.endsWith('.yml'))
-    .map((f) => [f, fs.readFileSync(new URL('../.github/workflows/' + f, import.meta.url), 'utf8')])
+    .map((f) => [f, readText(new URL('../.github/workflows/' + f, import.meta.url))])
     .filter(([, t]) => /pdf-text\.py/.test(t));
   eq('PDF 글자 뽑기를 부르는 워크플로가 있다', wf.length > 0, true);
   for (const [name, text] of wf) {
@@ -421,7 +421,7 @@ function undeclaredNames(src) {
   const pyUrl = new URL('../collector/pdf-text.py', import.meta.url);
   const hasPy = fs.existsSync(pyUrl);
   eq('  collector/pdf-text.py 가 저장소에 있다 (워크플로가 부른다)', hasPy, true);
-  const py = hasPy ? fs.readFileSync(pyUrl, 'utf8') : '';
+  const py = hasPy ? readText(pyUrl) : '';
   eq('  확장자가 아니라 앞 4바이트로 PDF 를 가른다 (.bin 으로 떨어진 PDF 13개가 실제로 있었다)',
     /%PDF/.test(py) && /read\(4\)/.test(py), true);
   eq('  글자가 거의 없으면 빈 .txt 를 남기지 않는다 (다음 실행이 뽑은 줄 알고 건너뛴다)',
