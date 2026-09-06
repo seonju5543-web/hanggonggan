@@ -134,7 +134,7 @@ input:focus, select:focus {
 }
 input::placeholder { color: var(--text-weak); }
 
-.screen { padding: 20px; animation: fade-in 0.3s ease; }
+.screen { padding: 20px; }   /* 등장 애니메이션은 아래 '⑥ 등장' 한 곳 (taste-in) */
 /* 🔴 **숨긴 것은 클릭도 못 받아야 한다 — 이 한 줄이 그 규칙의 원본이다** (2026-09-03)
 
    클래스에 `display` 를 주면 브라우저 기본 규칙 `[hidden]{display:none}` 을 이겨서
@@ -154,7 +154,6 @@ input::placeholder { color: var(--text-weak); }
 [hidden] { display: none !important; }
 
 .screen[hidden] { display: none !important; }
-@keyframes fade-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
 /* ---------------- 버튼 ---------------- */
 .btn {
@@ -164,7 +163,7 @@ input::placeholder { color: var(--text-weak); }
   border-radius: var(--radius-sm);
   font-weight: 700;
   letter-spacing: -0.01em;
-  transition: transform 0.12s, background 0.15s, box-shadow 0.15s, opacity 0.15s;
+  /* 전환은 '③ 상호작용' 묶음 한 곳에서 준다 — 여기 있던 줄은 그 묶음에 덮여 죽어 있었다 */
 }
 .btn:active { transform: scale(0.98); }
 .btn-lg { padding: 17px; font-size: var(--t-lg); }
@@ -722,10 +721,13 @@ input::placeholder { color: var(--text-weak); }
   z-index: 100;
   overflow-y: auto;
   overscroll-behavior: contain;      /* 시트 끝에서 뒤 화면까지 같이 끌려가지 않게 */
-  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  /* 나갈 때(0.22s)를 들어올 때(0.3s)보다 빠르게 — 여는 것은 보여 주는 동작이고 닫는 것은
+     응답이다. dismissSheet 는 이 시간만큼 **실제로 기다렸다가** 이전 화면을 그리므로,
+     줄인 만큼 그대로 체감이 빨라진다. */
+  transition: transform 0.22s cubic-bezier(0.32, 0.72, 0, 1);
   box-shadow: var(--shadow-sheet);
 }
-.sheet.show { transform: translate(-50%, 0); }
+.sheet.show { transform: translate(-50%, 0); transition-duration: 0.3s; }
 .sheet-handle {
   width: 44px;
   height: 5px;
@@ -1221,25 +1223,30 @@ textarea:focus {
   align-items: center;
   justify-content: center;
   z-index: 55;                      /* 하단 탭(50)보다 위, 시트 배경(90)보다 아래 */
-  transition: transform 0.16s cubic-bezier(0.34, 1.4, 0.64, 1), box-shadow 0.16s, left 0.22s, top 0.22s;
+  /* 🔴 `left`/`top` 은 전환하지 않는다 (2026-09-06) — 배치 속성이라 옮기는 동안 매 프레임
+     화면을 다시 재게 만든다. 자리 이동은 chat.js 가 `transform` 으로만 한다(FLIP). */
+  transition: transform 0.16s cubic-bezier(0.34, 1.4, 0.64, 1), box-shadow 0.16s;
   /* 🔴 손가락으로 끌 때 화면이 같이 스크롤되지 않게 — 지우면 드래그가 스크롤에 먹힌다 */
   touch-action: none;
   -webkit-user-select: none;
   user-select: none;
 }
 .chat-fab[hidden] { display: none !important; }
-.chat-fab:active { transform: scale(0.94); }
+.chat-fab:active { transform: scale(0.96); }
 .chat-fab .mascot { width: 38px; height: 38px; pointer-events: none; }
 
 /* 꾹 눌러 '들어올린' 상태 — 지금 옮기는 중이라는 것을 손끝으로 알 수 있게.
    옮기는 동안에는 left/top 전환을 꺼야 손가락을 따라오지 않고 뒤처지지 않는다. */
+/* ⚠️ 확대(1.14배)는 여기서 주지 않는다 — 끌기와 같은 `transform` 칸이라 CSS 가 쥐고 있으면
+   손가락을 따라가는 값이 덮인다. chat.js 의 `LIFT_SCALE` 이 둘을 한 문자열로 쓴다. */
 .chat-fab.lifted {
-  transform: scale(1.14);
   box-shadow: 0 14px 30px rgba(16, 29, 61, 0.42);
-  transition: transform 0.16s, box-shadow 0.16s;
+  /* 🔴 `transform` 을 전환 목록에 넣지 말 것 — 이제 자리도 transform 이라, 전환을 걸면
+     마스코트가 0.16초씩 손가락에 뒤처져 따라온다. 끌기는 손끝이 곧 입력이라 즉시여야 한다. */
+  transition: box-shadow 0.16s;
   cursor: grabbing;
 }
-.chat-fab.dropping { transition: left 0.22s cubic-bezier(0.32, 0.72, 0, 1), top 0.22s cubic-bezier(0.32, 0.72, 0, 1), transform 0.16s; }
+.chat-fab.dropping { transition: transform 0.22s cubic-bezier(0.32, 0.72, 0, 1), box-shadow 0.16s; }
 
 /* 숨은 동작은 알려 주지 않으면 없는 것과 같다 — 처음 한 번만 뜬다 */
 .chat-hint {
@@ -2175,11 +2182,11 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 /* ── ⑥ 등장 ── 한꺼번에 튀어나오지 않고 순서대로 도착한다 */
 @keyframes taste-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 .screen { animation: taste-in var(--dur) var(--ease) both; }
-.card-list > *:nth-child(1) { animation: taste-in 0.4s var(--ease) 0.02s both; }
-.card-list > *:nth-child(2) { animation: taste-in 0.4s var(--ease) 0.07s both; }
-.card-list > *:nth-child(3) { animation: taste-in 0.4s var(--ease) 0.12s both; }
-.card-list > *:nth-child(4) { animation: taste-in 0.4s var(--ease) 0.17s both; }
-.card-list > *:nth-child(5) { animation: taste-in 0.4s var(--ease) 0.22s both; }
+.card-list > *:nth-child(1) { animation: taste-in 0.24s var(--ease) 0.02s both; }
+.card-list > *:nth-child(2) { animation: taste-in 0.24s var(--ease) 0.06s both; }
+.card-list > *:nth-child(3) { animation: taste-in 0.24s var(--ease) 0.10s both; }
+.card-list > *:nth-child(4) { animation: taste-in 0.24s var(--ease) 0.14s both; }
+.card-list > *:nth-child(5) { animation: taste-in 0.24s var(--ease) 0.18s both; }
 
 /* ── ⑦ 빈 화면 ── 아무것도 없는 화면은 기회다. 점선 상자 대신 결로 안내한다 */
 .empty {
@@ -2190,12 +2197,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
   padding: 34px 22px;
   line-height: 1.7;
   text-wrap: pretty;
-}
-
-/* ── ⑧ 손가락 기기 보정 ── hover 가 눌린 채 굳지 않게 */
-@media (hover: none) {
-  .sch-card:hover { transform: none; box-shadow: none; }
-  .icon-btn:hover { background: transparent; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -2482,7 +2483,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 .wallet-pop {
   position: fixed;
   left: 0; right: 0;
-  bottom: 96px;
+  bottom: 108px;   /* 최종 자리. 시작 자리(96px)는 아래 transform 12px 이 만든다 */
   margin-inline: auto;
   width: min(320px, calc(100vw - 44px));
   z-index: 91;
@@ -2492,9 +2493,12 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
   border-radius: var(--radius);
   box-shadow: var(--shadow-lift);
   opacity: 0;
-  transition: opacity var(--dur) var(--ease), bottom var(--dur-slow) var(--ease);
+  /* 🔴 `bottom` 을 움직이지 않는다 (2026-09-06) — 배치 속성이라 그리는 값이 비싸다.
+     같은 12px 을 `transform` 으로 올린다. 시간도 0.42s → 0.22s: 작은 창은 빨라야 한다. */
+  transform: translateY(12px);
+  transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
 }
-.wallet-pop.show { opacity: 1; bottom: 108px; }
+.wallet-pop.show { opacity: 1; transform: none; }
 .wallet-pop[hidden] { display: none !important; }
 .wp-title { font-size: var(--t-lg); font-weight: 800; letter-spacing: -0.028em; }
 .wp-label { font-size: var(--t-2xs); font-weight: 700; letter-spacing: 0.14em; color: var(--text-weak); margin-top: 14px; }
@@ -2606,7 +2610,11 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
   border-radius: var(--radius-sm);
   min-width: 160px;
   padding: 6px;
+  /* 트리거가 오른쪽 위에 있으므로 거기서 자란다 — 가운데에서 커지면 어디서 나왔는지 안 보인다 */
+  transform-origin: top right;
+  animation: menu-in 0.16s var(--ease) both;
 }
+@keyframes menu-in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }
 .sort-opt { color: var(--text); font-weight: 550; }
 .sort-opt:hover { background: var(--surface-2); }
 .sort-opt[aria-checked="true"] { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
@@ -3134,3 +3142,21 @@ button, input, select, textarea { letter-spacing: inherit; }
 .home-updated,
 .wallet-label,
 .wallet-status { letter-spacing: var(--track); }
+
+/* ── ⑧ 손가락 기기 보정 ── hover 가 눌린 채 굳지 않게
+   🔴 **하나씩 되돌리는 방식은 놓친 것을 못 잡는다** (2026-09-06). 여기 두 줄뿐이었는데
+      실제로 hover 를 주는 규칙은 여덟 곳이라, `.btn-primary`·`.link-btn`·`.my-menu-item`·
+      `.sort-opt`·`.wallet-label` 은 손가락으로 누르면 **그 색이 눌린 채 남았다.**
+      이 앱은 대부분 휴대폰에서 쓴다 — 되돌리지 말고 처음부터 손가락 기기에 안 주는 것이 맞다.
+      새 hover 규칙을 만들 때도 아래 묶음 안에 쓰면 이 문제가 애초에 안 생긴다. */
+@media (hover: none) {
+  .sch-card:hover { transform: none; box-shadow: none; }
+  .icon-btn:hover { background: transparent; }
+  .btn-primary:hover { background: var(--primary); box-shadow: 0 6px 18px rgba(35, 32, 26, 0.22); }
+  .btn-outline:hover { border-color: var(--rule); background: transparent; }
+  .link-btn:hover { color: var(--accent); }
+  .my-menu-item:hover { background: transparent; }
+  .sort-opt:hover { background: transparent; }
+  .sort-btn:hover { background: transparent; border-color: var(--line); }
+  .wallet-label:hover { color: var(--text); }
+}
