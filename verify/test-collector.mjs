@@ -401,6 +401,34 @@ function undeclaredNames(src) {
     undeclaredNames("import ASK from './x.js';\nconsole.log(NOPE);"), ['NOPE']);
 }
 
+/* 🔴 PDF 글자 뽑기 (2026-09-05) — 이 단계는 **조용히 아무 일도 안 하기 쉬운** 꼴이다.
+   `pdftotext` 가 없으면 스크립트는 알리고 그냥 끝난다(실행을 죽이지 않는 것이 맞다).
+   그래서 워크플로가 poppler 를 설치하는 것을 잊으면 **매번 0개를 뽑고 초록불**이 된다 —
+   이 저장소가 여러 번 겪은 '못 읽어서 안 터진 것을 잘 된 것으로 읽기' 유형이다. */
+{
+  const wf = fs.readdirSync(new URL('../.github/workflows/', import.meta.url))
+    .filter((f) => f.endsWith('.yml'))
+    .map((f) => [f, readText(new URL('../.github/workflows/' + f, import.meta.url))])
+    .filter(([, t]) => /pdf-text\.py/.test(t));
+  eq('PDF 글자 뽑기를 부르는 워크플로가 있다', wf.length > 0, true);
+  for (const [name, text] of wf) {
+    eq(`  ${name} 가 poppler-utils 를 설치한다 (안 하면 조용히 0개)`, /poppler-utils/.test(text), true);
+    eq(`  ${name} 가 설치 실패를 삼키지 않는다 (|| true 로 덮으면 0개인 채 초록불)`,
+      /poppler-utils\s*\|\|\s*true/.test(text), false);
+  }
+  /* 🔴 없으면 readFileSync 가 던져 **이 아래 모든 검사 절이 통째로 안 돈다.**
+     파일이 빠진 것도 결함이므로, 죽지 말고 그 사실을 실패로 알린다. */
+  const pyUrl = new URL('../collector/pdf-text.py', import.meta.url);
+  const hasPy = fs.existsSync(pyUrl);
+  eq('  collector/pdf-text.py 가 저장소에 있다 (워크플로가 부른다)', hasPy, true);
+  const py = hasPy ? readText(pyUrl) : '';
+  eq('  확장자가 아니라 앞 4바이트로 PDF 를 가른다 (.bin 으로 떨어진 PDF 13개가 실제로 있었다)',
+    /%PDF/.test(py) && /read\(4\)/.test(py), true);
+  eq('  글자가 거의 없으면 빈 .txt 를 남기지 않는다 (다음 실행이 뽑은 줄 알고 건너뛴다)',
+    /MIN_CHARS/.test(py) && /len\(text\)\s*<\s*MIN_CHARS/.test(py), true);
+  eq('  이미 뽑은 것은 다시 안 뽑는다 (원본이 더 새것일 때만)', /getmtime/.test(py), true);
+}
+
 /* 🔴 재단 서버가 한 번 안 받아 주면 실행 전체가 죽는다 (2026-09-01 이슈 #227).
    `ConnectTimeoutError` 하나에 34초 만에 끝나 그날 층2 갱신이 통째로 사라졌다.
    재시도를 붙였으니, 다음 사람이 무심코 맨 `fetch` 를 다시 쓰는 것을 여기서 막는다.

@@ -41,7 +41,7 @@ jobs:
     #    그때의 교훈은 그대로다 — **상한을 키우는 것으로 때우지 말 것**. 단계가 오래 걸리면
     #    그 단계의 예산(HARVEST_BUDGET_MS, 아래 timeout-minutes)을 줄이고, 상한은 그 합을
     #    담는 그릇으로만 쓴다. verify/test-collector.mjs가 이 대소관계를 검사한다.
-    timeout-minutes: 39
+    timeout-minutes: 41
     steps:
       - uses: actions/checkout@v4
 
@@ -109,6 +109,17 @@ jobs:
       # 잘못된 공고가 앱에 하루라도 노출되는 일을 막는 장치 — 사람이 감사를 기억해서 돌릴 필요가 없다.
       # 위치 규칙 (2026-08-01): 관문은 **저장 직전**에 둔다. 예전엔 양식 스키마화보다 앞에 있어서
       # 스키마화가 만든 잘못된 연결이 그 실행에서는 안 잡히고 다음 날 실행에서 터졌다(이슈 #79).
+      # PDF 글자 뽑기 (2026-09-05) — 첨부 293개 중 HWP 138개만 읽히고 있었다.
+      # PDF 94개(262만 자)가 잠들어 있었고 그 안에 자격·금액·작성 규정이 들어 있다.
+      # 🔴 위 '양식 확보' 단계 **안에** 넣으면 그 단계의 예산(6분)을 먹어 뒤따르는
+      #    스키마화가 통째로 안 돈다(2026-08-04 사고와 같은 구조). 그래서 자기 단계로 둔다.
+      - name: PDF 글자 뽑기
+        timeout-minutes: 3
+        continue-on-error: true
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils
+          python3 collector/pdf-text.py
       - name: 데이터 관문 (수집기 규칙 테스트 + 데이터 감사)
         id: audit
         continue-on-error: true
@@ -142,6 +153,9 @@ jobs:
           #    만든 뒤로 19일 동안 앱의 실시간 공고가 그날 그대로 멈춰 있었다.
           #    (2026-08-01 이슈 #79 와 같은 유형: 로봇이 고친 파일은 전부 git add 에 넣는다)
           [ -d data/notices ] && git add data/notices
+          # 🔴 PDF 에서 뽑은 글자(2026-09-05 신설) — 여기 없으면 매 실행 뽑고 매 실행 버린다.
+          #    (이슈 #79 와 같은 유형: 로봇이 고친 파일은 전부 git add 에 넣는다)
+          [ -d collector/extracted ] && git add collector/extracted
           # 학교 순서 회전 커서 — 예산에 걸려 건너뛴 학교가 다음 실행의 맨 앞이 된다.
           # 이게 저장 안 되면 매 실행 같은 학교(설정 파일 뒤쪽)만 계속 잘린다.
           [ -f collector/browser-cursor.json ] && git add collector/browser-cursor.json
