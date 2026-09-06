@@ -15,7 +15,8 @@ user-invocable: false
    실패 상태면 로봇 결과가 하나도 저장 안 되고 있을 수 있다(감사 실패 → 저장 스킵).
 2. `node verify/check-deploy-sync.js` — 지금까지 작업분이 실제 배포된 앱(main)에
    반영됐는지, 밀린 데이터가 있는지.
-3. `git show origin/main:PROGRESS.md` — 두 개발자의 완료/개발중/구상중 최신 상태.
+3. 노션 「개발 업무」 백로그(`60ac025f-edbd-4284-bb57-5e077bab1c3d`) — 세 사람의 상태.
+   (PROGRESS.md 는 2026-09-06 폐기 · 노션이 정본)
 4. `node verify/check-collab.js --brief` — 세션 시작 훅이 이미 돌리지만, 결과를
    못 봤다면 다시 확인(상대가 같은 파일을 만지고 있는지 조기 경보).
 
