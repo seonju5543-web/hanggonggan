@@ -14,6 +14,8 @@ permissions:
 jobs:
   fetch:
     runs-on: ubuntu-latest
+    # 시한이 없으면 GitHub 기본값 **6시간**이다 (2026-09-06 신설). 페이지 하나와 첨부를 받는다.
+    timeout-minutes: 15
     steps:
       - name: 페이지와 첨부 다운로드
         env:

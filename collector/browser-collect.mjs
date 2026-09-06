@@ -429,7 +429,7 @@ async function harvestTarget(t, report) {
            마감·첨부만 뽑고 버리고 있었을 뿐이다. 저장은 추가 페이지 열기가 0회라
            시간 예산에 아무 영향이 없다(이 저장소가 세 번 데인 자리라 일부러 확인했다). */
         if (text.replace(/[^가-힣]/g, '').length >= 120) {
-          bodies[it.url] = { title: it.title, text: text.trim().slice(0, 15000), at: today, via: 'browser' };
+          bodies[it.url] = { title: it.title, text: text.trim().slice(0, 15000), at: todayStr, via: 'browser' };
         }
         const dm = text.match(DEADLINE_RE);
         deadlineHint = dm ? dm[0].trim().slice(0, 80) : null;
