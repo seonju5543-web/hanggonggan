@@ -9,10 +9,14 @@
 import { webcrypto } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
-const worker = await import(path.join(ROOT, 'server/push/worker.js'));
+/* 🔴 동적 import 에는 **파일 경로가 아니라 file:// 주소**를 넘긴다 (2026-09-06).
+   윈도우에서 path.join 은 `C:\…` 를 주는데 ESM 로더가 그걸 `c:` 프로토콜로 읽어
+   ERR_UNSUPPORTED_ESM_URL_SCHEME 로 죽는다 — **74항목이 개발자 컴퓨터에서 한 번도 안 돌았다.**
+   리눅스(클라우드)에서는 멀쩡해서 오래 안 보였다. 2026-09-05 `URL.pathname` 수리와 같은 계열. */
+const worker = await import(pathToFileURL(path.join(ROOT, 'server/push/worker.js')).href);
 
 let fail = 0;
 const ok = (cond, label, extra) => {
