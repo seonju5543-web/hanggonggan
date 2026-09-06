@@ -825,18 +825,22 @@ function chatClose() {
 }
 
 /* ============================================================
-   마스코트 버튼 — 눌러서 열고, **꾹 눌러서 옮긴다**
+   마스코트 버튼 — 눌러서 열고, **손가락으로 바로 끌어서 옮긴다**
    ------------------------------------------------------------
    🔴 '누르기'와 '옮기기'를 반드시 갈라야 한다. 13차 세션의 학교 검색 사고가 이 구분을
    빠뜨려서 났다(손가락이 닿는 순간 선택돼 목록을 못 내렸다). 여기서는 반대 방향의 같은 실수가
    가능하다 — 손이 조금 흔들렸다고 열리지 않으면 버튼이 안 눌리는 것처럼 느껴진다.
    그래서 규칙을 둘로 못 박는다:
-     · 짧게 누르고 뗀다(움직임 8px 미만)      → **연다**
-     · 꾹 누른다(360ms) → 그때부터 손가락을 따라온다 → 떼면 가까운 쪽 가장자리에 붙는다
+     · 짧게 누르고 뗀다(움직임 8px 미만)  → **연다**
+     · 8px 넘게 끈다 → **그 순간부터** 손가락을 따라온다 → 떼면 가까운 쪽 가장자리에 붙는다
+   🔴 기다리는 시간(옛 `CHAT_HOLD_MS` 360ms)은 2026-09-06 개발자 지시로 없앴다 —
+      *"그냥 손가락으로 바로바로 이동시킬 수 있었으면 해."* 기다림이 있으면 끌기 시작이
+      늘 한 박자 늦고, 그 사이 움직인 손가락은 '옮기려는 게 아니다'로 버려져 안 따라왔다.
+      가르는 것은 이제 **시간이 아니라 거리(CHAT_MOVE_TOL)** 하나뿐이다.
+      ⚠️ 이 거리를 0 으로 만들지 말 것 — 손 떨림이 곧 끌기가 되어 버튼이 안 눌린다.
    옮긴 자리는 기기에 기억되고, 화면을 돌리거나 창 크기가 바뀌면 다시 화면 안으로 넣는다.
    ============================================================ */
 const CHAT_FAB_KEY = 'handaejang.chatFab';   // { side:'left'|'right', ratio: 0~1 }
-const CHAT_HOLD_MS = 360;
 const CHAT_MOVE_TOL = 8;                     // 이만큼 움직이기 전까지는 '누른 것'으로 본다
 const CHAT_EDGE = 14;
 
@@ -880,7 +884,11 @@ function chatBindFab() {
     if (s) chatFabPlace(s);          // 화면을 돌려도 마스코트가 화면 밖으로 나가지 않게
   });
 
-  let holdTimer = null, lifted = false, moved = false;
+  let lifted = false, moved = false;
+  /* 🔴 '지금 누르고 있는가'를 반드시 따로 들고 있어야 한다 (2026-09-06) — 옛 코드에서는
+     기다림(360ms 타이머)이 그 구실을 겸했다. 기다림을 없애면서 이걸 안 두면, 마우스로
+     그냥 지나가기만 해도(누르지 않은 pointermove) 8px 을 넘겨 마스코트가 커서를 따라온다. */
+  let pressId = null;
   let startX = 0, startY = 0, offX = 0, offY = 0;
   /* 🔴 옮기는 동안 `left`/`top` 을 쓰지 않는다 (2026-09-06) — 그것은 배치 속성이라
      손가락이 움직일 때마다 브라우저가 화면을 다시 재고 다시 그린다. 지금은 **놓인 자리는
@@ -893,8 +901,6 @@ function chatBindFab() {
     fab.style.transform = `translate3d(${Math.round(x - baseX)}px, ${Math.round(y - baseY)}px, 0)`
       + (scaled ? ` scale(${LIFT_SCALE})` : '');
   };
-
-  const cancelHold = () => { clearTimeout(holdTimer); holdTimer = null; };
 
   const lift = () => {
     lifted = true;
@@ -912,20 +918,23 @@ function chatBindFab() {
     if (e.button != null && e.button !== 0) return;
     moved = false;
     lifted = false;
+    pressId = e.pointerId;
     startX = e.clientX; startY = e.clientY;
     const r = fab.getBoundingClientRect();
     offX = e.clientX - r.left;
     offY = e.clientY - r.top;
     fab.setPointerCapture(e.pointerId);
-    holdTimer = setTimeout(lift, CHAT_HOLD_MS);
   });
 
   fab.addEventListener('pointermove', (e) => {
+    if (pressId === null || e.pointerId !== pressId) return;   // 누르지 않고 지나가는 것은 끌기가 아니다
     const dx = e.clientX - startX, dy = e.clientY - startY;
     if (!lifted) {
-      /* 아직 안 들었는데 많이 움직였다 = 옮기려는 것도, 누르려는 것도 아니다(스크롤 등) */
-      if (Math.hypot(dx, dy) > CHAT_MOVE_TOL) { moved = true; cancelHold(); }
-      return;
+      /* 손 떨림만큼은 아직 '누른 것'이다 — 그 선을 넘는 순간 바로 들어올린다(기다리지 않는다).
+         🔴 여기서 `return` 하고 다음 이벤트를 기다리면 안 된다 — 끌기가 한 번 늦게 시작돼
+            손가락과 마스코트가 벌어진 채로 따라온다. 들어올린 뒤 **같은 이벤트에서** 옮긴다. */
+      if (Math.hypot(dx, dy) <= CHAT_MOVE_TOL) return;
+      lift();
     }
     moved = true;
     const size = fab.offsetWidth || 56;
@@ -937,7 +946,9 @@ function chatBindFab() {
   });
 
   const finish = (e) => {
-    cancelHold();
+    /* 내가 받던 그 손가락이 떨어진 것만 본다 — 누른 적 없는 떼기(오른쪽 버튼 등)로 열리면 안 된다 */
+    if (pressId === null || (e && e.pointerId !== pressId)) return;
+    pressId = null;
     if (lifted) {
       lifted = false;
       fab.classList.remove('lifted');
@@ -967,7 +978,8 @@ function chatBindFab() {
 
   fab.addEventListener('pointerup', finish);
   fab.addEventListener('pointercancel', () => {
-    cancelHold(); lifted = false;
+    pressId = null;
+    lifted = false;
     fab.classList.remove('lifted');
     fab.style.transform = '';   /* 끌던 것을 지우지 않으면 마스코트가 옮겨진 채로 굳는다 */
   });
@@ -981,7 +993,7 @@ function chatBindFab() {
   });
 }
 
-/* 꾹 눌러 옮길 수 있다는 것을 처음 한 번만 알려 준다 — 숨은 동작은 알려 주지 않으면 없는 것과 같다 */
+/* 끌어서 옮길 수 있다는 것을 처음 한 번만 알려 준다 — 숨은 동작은 알려 주지 않으면 없는 것과 같다 */
 const CHAT_HINT_KEY = 'handaejang.chatHint';
 function chatHintHide() {
   const hint = document.querySelector('#chat-hint');
