@@ -49,6 +49,14 @@ const ABOUT = /(자기소개서|자소서|학업\s*계획서|수학\s*계획서|
 const RULEISH = /(심사에서\s*제외|감점|분량|페이지|\d{2,4}\s*자\s*(이내|이상)|공란|기재한\s*경우|기재하지|작성\s*요령|기재\s*요령|작성\s*규정|평가\s*기준\s*\d\s*순위|식별할\s*수\s*있는)/;
 /* 규정이 아니라 '무엇을 내라'는 목록 — 서류 체크리스트는 초안과 상관이 없다 */
 const NOT_RULE = /^(\s*[\d①-⑩][.)]?\s*)?(자기소개서|성적증명서|재학증명서|주민등록|가족관계|통장|추천서)[^가-힣]{0,6}(\d\s*부|사본)?\s*$/;
+/* 🔴 번호가 붙은 **제출서류 목록 항목** (2026-09-05 · PDF 를 열자마자 새어 나왔다)
+   `(2) 자기소개 및 학업계획서(소정양식)` — 삼원장학회 공고의 [필수 제출서류] 두 번째 줄이다.
+   괄호 안의 `1페이지 이상` 때문에 RULEISH 의 '페이지' 에 걸려 작성 규정으로 들어왔다.
+   이건 '무엇을 내라'이지 '어떻게 써라'가 아니다 — 위 NOT_RULE 과 같은 계열인데,
+   괄호가 붙어 그 규칙의 `$` 에 안 걸렸다. 목록 번호로 시작하고 괄호로 끝나는 꼴을 막는다. */
+/* 🔴 목록 번호는 위에서 이미 떼어 낸 뒤 검사한다 — 번호를 조건에 넣으면 안 걸린다.
+   그래서 '문서 이름 + (…양식…)' 만으로 끝나는 줄을 막는다. 서술어가 없으면 규정이 아니다. */
+const DOC_LIST_ITEM = /^[가-힣A-Za-z0-9 ·및\/]{2,30}\([^)]*양식[^)]*\)\s*$/;
 /* 접수·제출 안내는 규정이 아니다 — 글을 쓰는 데 쓰이지 않는다 */
 const SUBMIT_ONLY = /(방문\s*제출|등기우편|우편\s*송부|이메일\s*제출|업로드|날인|서명란|파일명|접수\s*기간|제출\s*기한|홈페이지에서\s*다운)/;
 
@@ -71,7 +79,7 @@ const DOC_NAMED = /(자기소개서|자소서|학업\s*계획서|수학\s*계획
 export function isFormRule(line) {
   const t = String(line || '').replace(/\s+/g, ' ').trim().replace(/^[-–—·•●▶▸◆■□▣①②③④⑤⑥⑦⑧⑨⑩\d]+[.)]?\s*/, '');
   if (t.length < 10 || t.length > 200) return null;
-  if (NOT_RULE.test(t) || SUBMIT_ONLY.test(t) || META_LINE.test(t)) return null;
+  if (NOT_RULE.test(t) || DOC_LIST_ITEM.test(t) || SUBMIT_ONLY.test(t) || META_LINE.test(t)) return null;
   /* 재단이 **심사 순위를 직접 밝힌** 줄은 자기소개서 이야기가 아니어도 담는다.
      실제 문구: `<소득기준 [평가기준1순위]>` `<학업성적 [평가기준2순위]>` `<사회공헌 [평가기준3순위]>`
      B(무엇을 앞세울까)의 근거가 되는 가장 정확한 재료다 — 우리 짐작보다 낫다. */
@@ -153,34 +161,6 @@ export function sameProgram(a, b) {
 export const isInheritable = (line) =>
   /(심사에서\s*제외|식별할\s*수\s*있는|블라인드|(평가|심사)\s*기준\s*\d\s*순위)/.test(String(line || ''));
 
-/** 등록 목록 밖의 원문에서 규정을 캔다 — 순수 함수라 검사가 픽스처로 돌려 볼 수 있다.
- *  corpus: [{url,title,school,text}] · covered: Set(canonUrl) · textsForUrl: (canonUrl) => [첨부 글자]
- *  🔴 같은 주소가 두 파일(notices-text·browser-bodies)에 다 있는 일이 흔하다(오늘 14건).
- *     합치지 않고 각각 세면 **한 공고가 2건으로 세어져** '여러 공고에 되풀이되는 문구'가 거짓이 된다.
- *  🔴 본문만 보면 안 된다 — 규정은 대개 **첨부 서식** 안에 있다. 등록에서 빠진 공고의
- *     이미 받아 둔 첨부가 통째로 사라지는 것이 바로 이 변경이 막으려던 일이다. */
-export function libraryFrom(corpus, covered, textsForUrl = () => []) {
-  const merged = new Map();
-  for (const c of corpus || []) {
-    if (!c || !c.url) continue;
-    const k = canonUrl(c.url);
-    if (covered && covered.has(k)) continue;
-    const prev = merged.get(k);
-    if (prev) { prev.text += '\n' + String(c.text || ''); if (!prev.title && c.title) prev.title = c.title; if (!prev.school && c.school) prev.school = c.school; }
-    else merged.set(k, { url: c.url, title: c.title || '', school: c.school || '', text: String(c.text || '') });
-  }
-  const out = [];
-  for (const [k, c] of merged) {
-    const got = [];
-    const eat = (txt) => { for (const l of String(txt || '').split('\n')) { const r = isFormRule(l); if (r && !got.includes(r)) got.push(r); } };
-    eat(c.text);
-    for (const t of (textsForUrl(k) || [])) eat(t);
-    if (!got.length) continue;
-    out.push({ school: c.school, title: String(c.title).slice(0, 60), url: c.url, lines: got.slice(0, 8) });
-  }
-  return out;
-}
-
 export function mine() {
   const reg = readJson(path.join(ROOT, 'data/registered.json'), { items: [] });
   const items = Array.isArray(reg) ? reg : (reg.items || []);
@@ -222,7 +202,6 @@ export function mine() {
   }
 
   const perNotice = {};
-  const covered = new Set();   /* 등록 공고가 이미 가져간 주소 — library 가 두 번 세지 않게 */
   const seenLine = new Map();   // 같은 문구가 몇 공고에 나오나 — 공통 규칙 후보 판정용
   let scanned = 0;
 
@@ -233,7 +212,6 @@ export function mine() {
     if (src && src.text) for (const l of String(src.text).split('\n')) { const r = isFormRule(l); if (r) lines.push(r); }
     /* ⓑ 그 공고의 첨부 (자기소개서 서식 안에 규정이 들어 있다) — 주소로 잇는다 */
     const keys = [it.sourceUrl, it.url, src && src.url].filter(Boolean).map(canonUrl);
-    for (const k of keys) covered.add(k);   /* 등록 loop 이 실제로 본 열쇠 그대로 (아래 library 와 겹치지 않게) */
     for (const k of [...new Set(keys)]) {
       for (const tf of (byUrl.get(k) || [])) {
         let raw = '';
@@ -261,34 +239,17 @@ export function mine() {
     for (const l of uniq) seenLine.set(l, (seenLine.get(l) || 0) + 1);
   }
 
-  /* ── 등록 목록 밖의 원문도 학습 재료로 본다 (2026-09-05) ──
-     🔴 그동안 이 로봇은 registered.json(지금 서비스하는 공고)만 훑었다. 그래서 학교를
-        경희대·한국외대로 줄이자 **이미 받아 둔 원문의 작성 규정도 함께 시야에서 사라졌다.**
-     🔴 앱이 쓰는 칸(perNotice)에는 넣지 않는다 — 학생에게 보여 줄 공고가 아니다.
-        여기 모인 것은 공통 규칙 후보 판정과 사람 검수용이다(리포트에만). */
-  const corpus = [
-    ...(Array.isArray(texts) ? texts : Object.values(texts)),
-    ...Object.entries(bodies).map(([url, v]) => ({ url, title: (v && v.title) || '', school: (v && v.school) || '', text: typeof v === 'string' ? v : (v && v.text) })),
-  ];
-  const library = libraryFrom(corpus, covered, (k) => (byUrl.get(k) || []).map((tf) => {
-    try { return fs.readFileSync(path.join(EX, tf), 'utf8'); } catch { return ''; }
-  }));
-  for (const x of library) for (const l of x.lines) seenLine.set(l, (seenLine.get(l) || 0) + 1);
-  /* 리포트에 적을 '몇 건을 훑었나' — 주소를 합친 뒤, 등록이 이미 가져간 것을 뺀 수 */
-  const corpusSeen = new Set(corpus.filter((c) => c && c.url).map((c) => canonUrl(c.url))
-    .filter((k) => !covered.has(k))).size;
-
   /* 여러 공고에 되풀이되는 문구 = 공통 규칙 후보 (검색 요약과 같은 문턱 2건) */
   const common = [...seenLine.entries()].filter(([, n]) => n >= 2)
     .sort((a, b) => b[1] - a[1]).slice(0, 20)
     .map(([text, n]) => ({ text, notices: n }));
 
-  return { perNotice, common, scanned, total: items.length, library, corpusSeen };
+  return { perNotice, common, scanned, total: items.length };
 }
 
 /* ── 실행 ── */
 if (process.argv[1] && process.argv[1].endsWith('essay-house-mine.mjs')) {
-  const { perNotice, common, scanned, total, library, corpusSeen } = mine();
+  const { perNotice, common, scanned, total } = mine();
   const blind = Object.values(perNotice).filter((v) => v.blind).length;
   const out = {
     _설명: '공고별 작성 규정 — 재단이 공고·첨부에 직접 적어 둔 문장 그대로. collector/essay-house-mine.mjs 가 만든다.',
@@ -315,11 +276,6 @@ if (process.argv[1] && process.argv[1].endsWith('essay-house-mine.mjs')) {
     common.length
       ? common.map((c) => `- (${c.notices}개 공고) ${c.text}`).join('\n')
       : '없습니다.',
-    '',
-    '## 등록 목록 밖의 원문에서 캔 것 — 학습 재료 (앱에는 안 나감)',
-    library.length
-      ? library.map((x) => `- ${x.school || '(미상)'} · ${x.title}\n${x.lines.map((l) => `    · ${l}`).join('\n')}`).join('\n')
-      : `없습니다 — 등록 목록 밖의 원문 ${corpusSeen}건(그 공고의 첨부 포함)을 훑은 결과입니다.`,
     '',
     '## 공고별 규정 (앞 12건)',
     Object.entries(perNotice).slice(0, 12)
