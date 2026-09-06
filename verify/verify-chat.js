@@ -273,7 +273,7 @@ async function ask(page, q) {
   await page.click('#btn-chat-fab');
   await page.waitForSelector('#chat-sheet:not([hidden])');
 
-  console.log('\n[5-1] 🔴 마스코트 — 짧게 누르면 열리고, 꾹 눌러야 옮겨진다');
+  console.log('\n[5-1] 🔴 마스코트 — 짧게 누르면 열리고, 끌면 바로 옮겨진다');
   await page.evaluate(() => { const s = document.querySelector('#chat-sheet'); if (s && !s.hidden) chatClose(); });
   await page.waitForTimeout(350);
   ok(await page.locator('#btn-chat-fab .mascot').count() > 0, '떠 있는 버튼이 마스코트로 바뀌었다');
@@ -308,15 +308,51 @@ async function ask(page, q) {
   ok(tap.sheetOpen, '짧게 누르면 도우미가 열린다');
   ok(Math.abs(tap.left - before.x) < 2 && Math.abs(tap.top - before.y) < 2, '짧게 눌렀을 때는 자리가 안 움직인다');
 
+  /* 🔴 2026-09-06 개발자 지시 — "그냥 손가락으로 바로바로 이동시킬 수 있었으면 해."
+     기다리는 시간 없이(hold: 0) 끄는 그 순간부터 따라와야 한다. 이 항목이 초록불이면서
+     `hold` 를 늘려야만 옮겨지면 지시가 되돌아간 것이다. */
   await page.evaluate(() => chatClose());
   await page.waitForTimeout(350);
-  const drag = await press({ hold: 500, dx: -260, dy: -220 });   // 꾹 누른 뒤 왼쪽 위로 끌기
-  ok(!drag.sheetOpen, '꾹 눌러 옮긴 뒤에는 도우미가 열리지 않는다(옮기려던 것이지 열려던 게 아니다)');
-  ok(Math.abs(drag.top - before.y) > 40, '꾹 누르면 마스코트가 실제로 옮겨진다', { 전: before.y, 후: drag.top });
-  ok(drag.left < before.x - 40, '떼면 가까운 쪽 가장자리에 붙는다', { 전: before.x, 후: drag.left });
+  const quick = await press({ hold: 0, dx: -260, dy: -220 });     // 누르자마자 왼쪽 위로 끌기
+  ok(!quick.sheetOpen, '끌어서 옮긴 뒤에는 도우미가 열리지 않는다(옮기려던 것이지 열려던 게 아니다)');
+  ok(Math.abs(quick.top - before.y) > 40, '꾹 누르지 않아도 끄는 즉시 옮겨진다', { 전: before.y, 후: quick.top });
+  ok(quick.left < before.x - 40, '떼면 가까운 쪽 가장자리에 붙는다', { 전: before.x, 후: quick.left });
+
+  /* ⚠️ 그렇다고 손 떨림이 끌기가 되면 안 된다 — 그러면 버튼이 안 눌리는 것처럼 느껴진다 */
+  const placedAfterQuick = await page.locator('#btn-chat-fab').boundingBox();
+  const wobble = await press({ hold: 90, dx: 4, dy: 3 });
+  ok(wobble.sheetOpen, '살짝 흔들려도(4px) 여전히 열린다');
+  ok(Math.abs(wobble.left - placedAfterQuick.x) < 2 && Math.abs(wobble.top - placedAfterQuick.y) < 2,
+    '살짝 흔들린 것으로는 자리가 안 움직인다', { 전: placedAfterQuick, 후: { left: wobble.left, top: wobble.top } });
+  await page.evaluate(() => chatClose());
+  await page.waitForTimeout(350);
+
+  /* 꾹 누른 뒤 끄는 것도 그대로 옮겨져야 한다 — 누르는 버릇이 남은 학생이 막히면 안 된다 */
+  const held = await press({ hold: 500, dx: 240, dy: 120 });
+  ok(!held.sheetOpen && held.left > placedAfterQuick.x + 40,
+    '꾹 눌렀다가 끄는 옛 손버릇도 그대로 옮겨진다', { 전: placedAfterQuick.x, 후: held.left });
+
+  /* 🔴 기다림을 없애면 '누르지 않은 움직임'까지 끌기가 될 수 있다 — 마우스로 그냥 지나가는 것.
+     누른 적이 없으면 아무리 멀리 움직여도 마스코트는 제자리에 있어야 한다. */
+  const heldBox = await page.locator('#btn-chat-fab').boundingBox();
+  const hover = await page.evaluate(async () => {
+    const fab = document.querySelector('#btn-chat-fab');
+    const r = fab.getBoundingClientRect();
+    for (let i = 1; i <= 6; i++) {
+      fab.dispatchEvent(new PointerEvent('pointermove', {
+        pointerId: 9, clientX: r.left - i * 40, clientY: r.top - i * 30, bubbles: true, cancelable: true,
+      }));
+      await new Promise((res) => setTimeout(res, 20));
+    }
+    await new Promise((res) => setTimeout(res, 200));
+    const after = fab.getBoundingClientRect();
+    return { left: after.left, top: after.top, lifted: fab.classList.contains('lifted') };
+  });
+  ok(!hover.lifted && Math.abs(hover.left - heldBox.x) < 2 && Math.abs(hover.top - heldBox.y) < 2,
+    '누르지 않고 지나가기만 하면 마스코트가 따라오지 않는다', { 전: heldBox, 후: hover });
 
   /* 하단 탭을 덮어 버리면 학생이 앱을 못 옮겨 다닌다 */
-  const low = await press({ hold: 500, dx: 0, dy: 900 });
+  const low = await press({ hold: 0, dx: 0, dy: 900 });
   const navBox2 = await page.locator('#bottom-nav').boundingBox();
   const fabBox2 = await page.locator('#btn-chat-fab').boundingBox();
   ok(fabBox2.y + fabBox2.height <= navBox2.y + 1, '아무리 아래로 끌어도 하단 탭을 덮지 않는다',
