@@ -1,15 +1,15 @@
 {
  "note": "학교별 실시간 공고 파일 색인. 앱은 match-engine.js의 noticeFileKey로 파일을 직접 찾으므로 이 파일을 읽지 않는다 — 사람이 보기 위한 것.",
- "updatedAt": "2026-09-05",
+ "updatedAt": "2026-09-06",
  "schools": 2,
  "files": {
   "한국외국어대학교": {
    "file": "n19cz03g.json",
-   "count": 22
+   "count": 17
   },
   "경희대학교": {
    "file": "n1w4hprp.json",
-   "count": 18
+   "count": 10
   }
  }
 }
