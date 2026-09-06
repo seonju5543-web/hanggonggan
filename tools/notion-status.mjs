@@ -41,11 +41,40 @@ const LOG_LINES = 8;
 
 /* GitHub 로그인 → 노션 줄. 🔴 모르는 사람은 **짐작하지 않고 그냥 끝낸다**(로그에 남긴다).
    셋 다 이 저장소 공동작업자임을 API 로 확인했다(2026-09-06). */
+/* 🔴 `emails` 는 **줄마다 다른 목록이 나오게 하는 유일한 장치**다 (2026-09-06 개발자 지적:
+   "왜 자꾸 내 최근 커밋이랑 은서 최근 커밋이 똑같은 내용으로 복붙되는지 모르겠고").
+   원인: 예전에는 `git log` 를 필터 없이 읽어 **main 의 최근 8개**를 적었다. 이 로봇은
+   main push 때만 도니까 누가 push 하든 같은 목록이 나온다 — 줄만 다르고 내용이 같았다.
+   ⚠️ 머리말의 "셋 다 작성자가 Claude 라 구분이 안 된다"는 **더 이상 사실이 아니다.**
+      실측(최근 300커밋): 조세현 117 · 유은서 57 · Claude 17 · 나머지는 로봇.
+   ⚠️ 이선주 의 `noreply@anthropic.com` 는 **확인된 값이 아니라 추론이다** — 은서·세현은
+      자기 이름으로 찍히는데 그 계정만 git 설정이 없어 보인다. 본인이 git 설정을 하면
+      여기에 그 주소를 더할 것. 못 찾으면 로봇은 **지어내지 않고 못 찾았다고 적는다.** */
 const PEOPLE = {
-  'seonju5543-web': { name: '이선주', page: '3d29505a-3ec3-81e0-a77e-df1a93912858' },
-  'Se-Hyeon-Jo':    { name: '세현',   page: '3d29505a-3ec3-81d5-8ad2-c11b875e594b' },
-  'didinin-wq':     { name: '은서',   page: '3d29505a-3ec3-81c1-b647-ef7cb39ca72d' },
+  'seonju5543-web': { name: '이선주', page: '3d29505a-3ec3-81e0-a77e-df1a93912858',
+                      emails: ['noreply@anthropic.com'] },
+  'Se-Hyeon-Jo':    { name: '세현',   page: '3d29505a-3ec3-81d5-8ad2-c11b875e594b',
+                      emails: ['josehyeon@josehyeon-ui-MacBookAir.local', 'josehyeon0926@gmail.com'] },
+  'didinin-wq':     { name: '은서',   page: '3d29505a-3ec3-81c1-b647-ef7cb39ca72d',
+                      emails: ['dhdp0105@gmail.com'] },
 };
+
+/* '지금 하는 일' 한 낱말 — **만진 파일에서 읽는다.** 커밋 제목을 요약하려 들면 지어내게 되고,
+   백로그에서 가져오면 실제로 만진 것과 어긋난다(개발자 지적: "백로그에 있는거 가져와서 쓰는데
+   그러지 말고"). 파일 경로는 지어낼 수 없는 사실이다. 위에서부터 먼저 맞는 것 하나. */
+const AREAS = [
+  [/^collector\//, '수집'],
+  [/^verify\//, '검사'],
+  [/^\.github\//, '로봇'],
+  [/^server\//, '서버'],
+  [/^_admin\//, '관리자'],
+  [/^data\//, '데이터'],
+  [/^tools\//, '도구'],
+  [/^proposals\//, '제안서'],
+  [/^(match-engine|parse-.*|section-head|essay-quality|essay-submit-check|notify-rules)\.js$/, '판정'],
+  [/^(style\.css|index\.html|app\.js|chat\.js|essay\.js|notify\.js|forms\.js|form-plan\.js|terms\.html)$/, '화면'],
+  [/\.md$/, '문서'],
+];
 
 const token = process.env.NOTION_TOKEN;
 const actor = process.env.GITHUB_ACTOR || '';
@@ -66,8 +95,28 @@ if (!who) {
    "최근 14일 작업 없음"이라는 **확인하지 않은 단정**이 노션에 적힌다. */
 const sh = (c) => { try { return { ok: true, out: execSync(c, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim() }; } catch { return { ok: false, out: '' }; } };
 
-// 최근 이력은 브랜치를 그대로 본다 — 무엇을 하고 있는지는 이게 가장 정직하다.
-const log = sh(`git log --no-merges --pretty=format:"%ad · %s" --date=format:"%m-%d %H:%M" -n ${LOG_LINES}`);
+/* 🔴 **그 사람이 쓴 커밋만** 본다. 필터 없이 읽으면 세 줄이 전부 main 의 같은 목록이 된다.
+   git 은 `--author` 를 여러 개 주면 '또는'으로 묶는다. */
+const byAuthor = (who.emails || []).map((e) => `--author=${JSON.stringify(e)}`).join(' ');
+const log = byAuthor
+  ? sh(`git log --no-merges ${byAuthor} --pretty=format:"%ad · %s" --date=format:"%m-%d %H:%M" -n ${LOG_LINES}`)
+  : { ok: false, out: '' };
+
+/* 만진 파일 → 한 낱말. 최근 3개만 본다 — 지금 무엇을 하는 중인지가 알고 싶은 것이지
+   이 사람이 여태 무엇을 했는지가 아니다. */
+function nowDoing() {
+  if (!byAuthor) return '';
+  const files = sh(`git log --no-merges ${byAuthor} -n 3 --name-only --pretty=format:`);
+  if (!files.ok || !files.out) return '';
+  const count = new Map();
+  for (const path of files.out.split('\n')) {
+    if (!path.trim()) continue;
+    const hit = AREAS.find(([re]) => re.test(path));
+    if (hit) count.set(hit[1], (count.get(hit[1]) || 0) + 1);
+  }
+  if (!count.size) return '';
+  return [...count.entries()].sort((a, b) => b[1] - a[1])[0][0];
+}
 
 /* 글자 수로 자르면 이모지(🔴 등)가 반 토막 나 깨진 글자가 남는다 — 줄 단위로 자른다.
    이 저장소의 커밋 제목에는 실제로 이모지가 들어 있다. */
@@ -88,9 +137,29 @@ const props = {
 };
 if (log.ok && log.out) {
   props['최근 커밋'] = { rich_text: [{ text: { content: fitLines(log.out, MAX_TEXT) } }] };
+} else if (!byAuthor) {
+  /* 주소를 모르는 사람 — **남의 커밋으로 채우지 않는다.** 그게 복붙의 원인이었다. */
+  props['최근 커밋'] = { rich_text: [{ text: { content: `⚠️ ${who.name} 의 커밋 주소를 모릅니다 — tools/notion-status.mjs 의 PEOPLE 에 emails 를 채우세요.` } }] };
+  console.error(`✕ ${who.name}: emails 가 비어 있습니다.`);
 } else {
-  props['최근 커밋'] = { rich_text: [{ text: { content: '⚠️ git 기록을 읽지 못했습니다 — 실행 로그를 확인하세요.' } }] };
-  console.error('✕ git 기록을 읽지 못했습니다.');
+  props['최근 커밋'] = { rich_text: [{ text: { content: '⚠️ 이 이름으로 된 커밋을 찾지 못했습니다 — git 설정(user.email)을 확인하세요.' } }] };
+  console.error(`✕ ${who.name}: ${who.emails.join(', ')} 로 된 커밋이 없습니다.`);
+}
+
+/* '지금 하는 일' — 예전에는 사람이 채우는 칸이었는데, 백로그를 베껴 붙이게 돼서
+   실제로 만진 것과 어긋났다(2026-09-06 개발자 지시로 로봇이 채운다).
+   ⚠️ **못 읽으면 비우지 않고 그냥 두지도 않는다** — 빈 값을 쓰면 사람이 적어 둔 것을 지운다.
+      읽었을 때만 덮어쓴다. */
+const doing = nowDoing();
+if (doing) props['지금 하는 일'] = { rich_text: [{ text: { content: doing } }] };
+
+/* `--dry` — 노션에 쓰지 않고 무엇을 쓸지만 보여 준다. 이 로봇은 push 때만 도는데,
+   확인하려고 push 하면 그 push 가 또 값을 바꾼다. 손으로 미리 재보는 통로가 필요하다. */
+if (process.argv.includes('--dry')) {
+  console.log(`[시험] ${who.name} (${actor}) → ${who.page}`);
+  for (const [k, v] of Object.entries(props)) console.log(`  ${k}: ${v.rich_text[0].text.content.replace(/\n/g, '\n' + ' '.repeat(k.length + 4))}`);
+  if (!props['지금 하는 일']) console.log('  지금 하는 일: (못 읽어서 그대로 둠)');
+  process.exit(0);
 }
 
 const res = await fetch(`https://api.notion.com/v1/pages/${who.page}`, {
