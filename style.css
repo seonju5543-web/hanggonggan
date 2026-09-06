@@ -3152,7 +3152,9 @@ button, input, select, textarea { letter-spacing: inherit; }
 @media (hover: none) {
   .sch-card:hover { transform: none; box-shadow: none; }
   .icon-btn:hover { background: transparent; }
-  .btn-primary:hover { background: var(--primary); box-shadow: 0 6px 18px rgba(35, 32, 26, 0.22); }
+  /* 그림자는 손대지 않는다 — 굳어 보이는 것은 색이고, 여기서 원래 값을 다시 적으면
+     토큰 밖의 그림자가 한 벌 더 늘어난다(ui-tone 이 세는 그 값이다). */
+  .btn-primary:hover { background: var(--primary); }
   .btn-outline:hover { border-color: var(--rule); background: transparent; }
   .link-btn:hover { color: var(--accent); }
   .my-menu-item:hover { background: transparent; }
