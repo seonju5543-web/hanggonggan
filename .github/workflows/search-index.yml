@@ -21,6 +21,7 @@ on:
 
 permissions:
   contents: write
+  issues: write   # 🚨 로봇 넘어짐 알림 (2026-09-06)
 
 # 수집 로봇과 다른 대기줄 — 같은 줄에 넣으면 GitHub이 오래된 대기분을 취소해
 # 이 로봇이 조용히 사라진다 (되가져오기 로봇에서 겪은 일).
@@ -66,3 +67,13 @@ jobs:
           else
             echo "바뀐 것 없음"
           fi
+
+      # 🔴 실행 알림 (2026-09-06 신설) — 결과 알림과 다른 것이다.
+      #    결과 알림: "보러 갔더니 상태가 이상하더라"  · 실행 알림: "보러 가다가 내가 넘어졌다"
+      #    이게 없으면 감시 로봇이 죽었을 때 그 로봇이 지키던 것까지 함께 무음이 된다.
+      - name: 🚨 로봇이 넘어졌다
+        if: failure() || cancelled()
+        uses: ./.github/actions/robot-down
+        with:
+          robot: 검색용 요약 만들기
+          token: ${{ github.token }}

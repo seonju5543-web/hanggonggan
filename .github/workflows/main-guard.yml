@@ -43,6 +43,10 @@ jobs:
     # 브랜치 삭제 push에는 돌지 않는다
     if: github.event.deleted != true
     runs-on: ubuntu-latest
+    # 시한이 없으면 GitHub 기본값 **6시간**이다 (2026-09-06 신설).
+    # 하는 일은 git merge + push 하나뿐이라 정상이면 1~2분. 매달리면 main 의 수정이
+    timeout-minutes: 15
+    # 기본 브랜치로 안 돌아와 **다음 세션이 옛 코드 위에서** 작업하게 된다.
     steps:
       - name: 기본 브랜치 체크아웃
         uses: actions/checkout@v4
@@ -131,8 +135,9 @@ jobs:
 
       # 조용히 멈추지 않는다. 다만 알림이 쌓이지 않게, 열려 있는 같은 이슈가 있으면 코멘트만 단다.
       - name: 🚨 되가져오기 실패 알림
+        # 🔴 cancelled() 를 함께 본다 (2026-09-06) — 시간 초과는 '실패'가 아니라 '취소'다.
         if: >
-          failure() ||
+          failure() || cancelled() ||
           steps.back.outputs.state == 'conflict' ||
           steps.back.outputs.state == 'auditfail' ||
           steps.back.outputs.state == 'pushfail'

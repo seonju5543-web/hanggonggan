@@ -1,0 +1,98 @@
+# ============================================================
+#  로봇 하트비트 — 예약이 걸러진 것을 잡는다 (2026-09-06 신설)
+# ------------------------------------------------------------
+#  🔴 이건 두 번째 겹이다. 첫 번째 겹(`failure() || cancelled()`)은 로봇이 **시작한 뒤**
+#     넘어진 것만 잡는다. GitHub 이 예약을 통째로 거른 날은 실행 기록이 없어 아무도 모른다
+#     (실제로 2026-07-06 에 완전 누락이 있었다 — CLAUDE.md '예약 실행 혼잡 회피 정책').
+#
+#  하는 일: 워크플로 파일에서 예약을 읽어 기대 간격을 스스로 계산하고,
+#           마지막 성공이 그 3배를 넘었으면 이슈 하나에 모아 알린다.
+#           예약을 고치면 기대 간격도 자동으로 따라간다(설정 파일을 두지 않은 이유).
+# ============================================================
+name: 로봇 하트비트 (예약이 도는지 확인)
+
+on:
+  schedule:
+    - cron: '29 8 * * *'   # 17:29 KST — 그날 예약이 다 돈 뒤에 본다 (홀수 분: 혼잡 회피)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read      # 워크플로 실행 이력을 읽는다
+  issues: write
+
+concurrency:
+  group: robot-heartbeat
+  cancel-in-progress: false
+
+jobs:
+  beat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 예약 로봇들이 실제로 돌았는지 확인
+        id: beat
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          node collector/robot-heartbeat.mjs | tee /tmp/beat.txt || true
+          node collector/robot-heartbeat.mjs --json > /tmp/beat.json
+          n=$(node -e "console.log(JSON.parse(require('fs').readFileSync('/tmp/beat.json','utf8')).stale.length)")
+          echo "stale=$n" >> "$GITHUB_OUTPUT"
+          {
+            echo 'report<<EOF'
+            cat /tmp/beat.txt
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+
+      # 🔴 라벨로 중복을 막는다 — 매일 새 이슈를 만들면 일주일이면 알림을 무시하게 된다
+      - name: 🚨 너무 조용한 로봇이 있으면 알린다
+        if: steps.beat.outputs.stale != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -u
+          body="아래 로봇이 **예정보다 3배 넘게 조용합니다.** 예약이 걸러졌거나 멈춰 있습니다.
+
+          \`\`\`
+          ${{ steps.beat.outputs.report }}
+          \`\`\`
+
+          · 확인: Actions 탭에서 해당 워크플로의 최근 실행을 봅니다.
+          · 실행이 아예 없으면 GitHub 이 예약을 거른 것입니다(정각·자정 부근에서 잦습니다).
+          · 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          gh label create robot-silent --repo "${{ github.repository }}" --color FBCA04 \
+            --description "예약 로봇이 너무 오래 조용함" 2>/dev/null || true
+          n=$(gh issue list --repo "${{ github.repository }}" --label robot-silent --state open \
+                --limit 1 --json number --jq '.[0].number' 2>/dev/null || true)
+          if [ -n "$n" ] && [ "$n" != "null" ]; then
+            gh issue comment "$n" --repo "${{ github.repository }}" --body "$body"
+          else
+            gh issue create --repo "${{ github.repository }}" --label robot-silent \
+              --title "🚨 예약 로봇이 조용합니다" --body "$body"
+          fi
+
+      # 다시 정상이면 스스로 닫는다 (경보가 쌓여 무뎌지지 않게 — admin-lock-check 와 같은 방식)
+      - name: 전부 정상이면 옛 경보를 닫는다
+        if: steps.beat.outputs.stale == '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for n in $(gh issue list --repo "${{ github.repository }}" --label robot-silent \
+                       --state open --json number --jq '.[].number' 2>/dev/null); do
+            gh issue close "$n" --repo "${{ github.repository }}" \
+              --comment "✅ $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 예약 로봇이 모두 정상 간격으로 돌고 있습니다."
+          done
+
+      # 자기 자신이 넘어진 것도 알린다 (감시자를 감시하는 자리는 여기가 마지막이다)
+      - name: 🚨 로봇이 넘어졌다
+        if: failure() || cancelled()
+        uses: ./.github/actions/robot-down
+        with:
+          robot: 로봇 하트비트
+          token: ${{ github.token }}

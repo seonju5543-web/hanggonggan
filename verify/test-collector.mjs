@@ -5,6 +5,8 @@
 
    실행: node verify/test-collector.mjs   (실패하면 exit 1) */
 import fs from 'node:fs';
+// 하트비트 순수 함수 — 예약 간격 계산은 한 곳에만 둔다 (2026-09-06)
+import { hoursFor, cronsOf, isStale } from '../collector/robot-heartbeat.mjs';
 /* 🔴 URL 을 파일 경로로 쓸 때는 .pathname 이 아니라 fileURLToPath 다.
    윈도우에서 .pathname 은 `/C:/…` 를 주는데 그건 유효한 경로가 아니라 파일을 못 열고
    자식 프로세스도 못 띄운다. 리눅스(클라우드 검사)에서는 멀쩡해서 **이 검사 5개가
@@ -3635,6 +3637,64 @@ console.log('\n■ 화면 말투·토큰 관문이 살아 있는가');
   const wf = fs.readFileSync(new URL('../.github/workflows/verify-ui.yml', import.meta.url), 'utf8');
   eq('워크플로가 그것을 실제로 돌린다', /node verify\/ui-tone\.mjs/.test(wf), true);
   eq('style.css 가 바뀔 때도 돈다', /- 'style\.css'/.test(wf), true);
+}
+
+console.log('\n■ 로봇이 조용히 죽지 않는다 (2026-09-06)');
+/* 🔴 이 절이 잡는 사고 셋 — 공통점은 **오류가 하나도 안 난다**는 것이다.
+   ① browser-collect 가 브라우저로 그린 본문을 저장하는 줄에서 선언 없는 이름(`today`)을 써서,
+      2026-08-20 에 그 줄을 넣은 뒤 **한 번도 성공한 적이 없었다** (browser-bodies.json 68건이
+      전부 rescue 가 넣은 것). 게다가 catch 가 학교 단위라 그 학교의 남은 공고까지 함께 날아갔고,
+      리포트는 '학교 서버가 응답하지 않아'라고 **틀린 원인**을 적었다.
+   ② collect 가 학교별 파일을 '새로 주운 것'만으로 발행하면, 링크 사냥꾼·주소 복구가 고친 주소가
+      영영 앱에 안 닿는다 — 그 둘은 publishBySchool 을 부르지 않는다(주소만 고친다).
+   ③ 예약 로봇이 시한 없이 매달리거나(기본 6시간) 넘어져도 알림이 없으면 아무도 모른다.
+   ⚠️ ①은 일반적인 '선언 없는 변수' 검사로는 못 잡는다 — 위 undeclaredNames 는 대문자 상수만 본다.
+      소문자까지 넓히려면 스코프 분석(=린터)이 필요하고, 틀린 빨간불은 다음 사람이 검사를 끄게
+      만든다. 그래서 이 저장소 방식대로 **표적 회귀**로 못 박는다. */
+{
+  const bc = fs.readFileSync(new URL('../collector/browser-collect.mjs', import.meta.url), 'utf8');
+  eq('브라우저가 그린 본문을 저장한다 (뽑고 버리지 않는다)', bc.includes('bodies[it.url] = {'), true);
+  eq('  그 줄의 날짜가 선언된 이름이다 (todayStr)', bc.includes('at: todayStr'), true);
+  eq('  선언되지 않은 today 를 쓰지 않는다', bc.includes('at: today,'), false);
+
+  const cl = fs.readFileSync(new URL('../collector/collect.mjs', import.meta.url), 'utf8');
+  eq('학교별 파일은 전체 목록으로 발행한다 (freshAll 이 아니다)',
+    cl.includes('publishBySchool(beforeCap)'), true);
+
+  /* 예약으로 도는 로봇은 전부 ⓐ시한 ⓑ실행 알림을 갖는다.
+     ⓑ는 failure() 와 cancelled() **둘 다** 봐야 한다 — 시간 초과는 '실패'가 아니라 '취소'라
+     failure() 만 쓰면 알림 단계가 통째로 건너뛰어진다 (2026-08-04 수집 로봇 사고). */
+  const wfDir = new URL('../.github/workflows/', import.meta.url);
+  const noTimeout = [], noAlert = [];
+  for (const f of fs.readdirSync(wfDir).filter((n) => n.endsWith('.yml')).sort()) {
+    const raw = fs.readFileSync(new URL(f, wfDir), 'utf8');
+    const code = raw.split(/\r?\n/).filter((l) => !/^\s*#/.test(l)).join('\n');
+    if (!/^\s*- cron:/m.test(code)) continue;      // 예약이 없으면 이 절의 대상이 아니다
+    if (!code.includes('timeout-minutes:')) noTimeout.push(f);
+    if (!code.includes('failure()') || !code.includes('cancelled()')) noAlert.push(f);
+  }
+  eq('예약 로봇은 모두 시한(timeout-minutes)을 갖는다', noTimeout, []);
+  eq('예약 로봇은 모두 failure() 와 cancelled() 를 함께 본다', noAlert, []);
+
+  /* 두 번째 겹 — '아예 안 돈 것'은 위 두 항목으로 못 잡는다(실행 기록 자체가 없다).
+     GitHub 은 예약을 실제로 거른다(2026-07-06 완전 누락). 하트비트가 그 자리를 맡는다. */
+  eq('하트비트 로봇이 있다', fs.existsSync(new URL('robot-heartbeat.yml', wfDir)), true);
+}
+
+console.log('\n■ 하트비트 간격 계산 (브라우저·인터넷 불필요)');
+{
+  eq('하루 2회면 12시간 간격', hoursFor(['41 22 * * *', '41 2 * * *']), 12);
+  eq('하루 1회면 24시간', hoursFor(['23 5 * * *']), 24);
+  eq('요일이 지정되면 주 1회로 본다', hoursFor(['13 20 * * 1']), 168);
+  eq('예약이 없으면 판정하지 않는다', hoursFor([]), null);
+  /* 주석에 적힌 cron 은 세지 않는다 — 세면 간격이 짧아져 헛알림이 난다 */
+  eq('주석의 cron 은 안 센다',
+    cronsOf("#    - cron: '2 3 * * *'\n    - cron: '4 5 * * *'"), ['4 5 * * *']);
+  const now = Date.parse('2026-09-06T00:00:00Z');
+  eq('간격의 3배를 넘으면 조용한 것', isStale(24, '2026-09-01T00:00:00Z', now), true);
+  eq('  3배 안이면 정상 (GitHub 이 몇 시간 미루는 건 정상이다)',
+    isStale(24, '2026-09-04T12:00:00Z', now), false);
+  eq('  성공 기록이 아예 없으면 조용한 것', isStale(24, null, now), true);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
