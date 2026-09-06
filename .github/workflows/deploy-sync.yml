@@ -41,6 +41,10 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    # 시한이 없으면 GitHub 기본값 **6시간**이다 (2026-09-06 신설).
+    # 하는 일은 git merge + push 하나뿐이라 정상이면 1~2분. concurrency 가 cancel-in-progress: false 라
+    timeout-minutes: 15
+    # 매달리면 **다음 배포가 줄을 선다** — 앱이 그 시간만큼 갱신되지 않는다.
     steps:
       - name: main 체크아웃
         uses: actions/checkout@v4
@@ -92,7 +96,10 @@ jobs:
             console.log('실시간 공고 '+a(n).length+'건 · 정식 등록 '+a(r).length+'건');"
 
       - name: 🚨 동기화 실패 알림 (조용히 멈추지 않는다)
-        if: failure() || steps.sync.outputs.state == 'conflict' || steps.sync.outputs.state == 'pushfail'
+        # 🔴 cancelled() 를 함께 본다 (2026-09-06). 시간 초과는 '실패'가 아니라 **'취소'**로 끝나서
+        #    failure() 만으로는 이 단계가 통째로 건너뛰어진다 — 2026-08-04 수집 로봇에서 실제로 당했다.
+        #    이 워크플로는 cancel-in-progress: false 라 자동 취소가 없어 헛알림 위험도 없다.
+        if: failure() || cancelled() || steps.sync.outputs.state == 'conflict' || steps.sync.outputs.state == 'pushfail'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

@@ -136,3 +136,13 @@ jobs:
       - name: 결과를 실패로 남긴다 (이상한 경우)
         if: steps.probe.outputs.verdict != 'ok'
         run: exit 1
+
+      # 🔴 실행 알림 (2026-09-06 신설) — 결과 알림과 다른 것이다.
+      #    결과 알림: "보러 갔더니 상태가 이상하더라"  · 실행 알림: "보러 가다가 내가 넘어졌다"
+      #    이게 없으면 감시 로봇이 죽었을 때 그 로봇이 지키던 것까지 함께 무음이 된다.
+      - name: 🚨 로봇이 넘어졌다
+        if: cancelled() || (failure() && steps.probe.outcome != 'success')
+        uses: ./.github/actions/robot-down
+        with:
+          robot: 푸시 서버 상태 확인
+          token: ${{ github.token }}

@@ -284,7 +284,8 @@ input::placeholder { color: var(--text-weak); }
   font-size: var(--t-md);
   font-weight: 600;
   color: var(--text-sub);
-  transition: all 0.15s;
+  /* 전환은 아래 '③ 상호작용' 묶음이 정의한다 — 여기 있던 `transition: all` 은
+     그 묶음에 덮여 한 번도 안 걸리던 죽은 줄이었다(2026-09-06). */
 }
 .chip.active {
   background: var(--primary-weak);
@@ -309,7 +310,7 @@ input::placeholder { color: var(--text-weak); }
   font-size: var(--t-md);
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
 }
 .check-item:has(input:checked) {
   border-color: var(--primary);
@@ -325,7 +326,7 @@ input::placeholder { color: var(--text-weak); }
   border: 1.5px solid rgba(18, 22, 31, 0.22);
   border-radius: 50%;
   background: #fff center / 62% no-repeat;
-  transition: all 0.15s;
+  transition: border-color 0.15s, background-color 0.15s;
   cursor: pointer;
 }
 .check-item input:checked {
@@ -566,7 +567,7 @@ input::placeholder { color: var(--text-weak); }
   font-weight: 600;
   color: var(--text-sub);
   white-space: nowrap;
-  transition: all 0.15s;
+  /* 전환은 아래 '③ 상호작용' 묶음이 정의한다(.chip 과 같은 이유). */
 }
 .filter-chip.active {
   background: var(--navy-1);
@@ -1689,7 +1690,8 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
 .bulk-all input, .swipe-row .row-check, .bulk-check {
   width: 24px; height: 24px; padding: 0; flex-shrink: 0;
   border: 1.5px solid rgba(18, 22, 31, 0.22); border-radius: 50%;
-  background: #fff center / 62% no-repeat; transition: all .15s; cursor: pointer;
+  background: #fff center / 62% no-repeat;
+  transition: border-color .15s, background-color .15s; cursor: pointer;
 }
 .bulk-all input:checked, .swipe-row .row-check:checked, .bulk-check:checked {
   border-color: var(--primary); background-color: var(--primary);
@@ -2172,7 +2174,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 
 /* ── ⑥ 등장 ── 한꺼번에 튀어나오지 않고 순서대로 도착한다 */
 @keyframes taste-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-.screen { animation: taste-in var(--dur-slow) var(--ease) both; }
+.screen { animation: taste-in var(--dur) var(--ease) both; }
 .card-list > *:nth-child(1) { animation: taste-in 0.4s var(--ease) 0.02s both; }
 .card-list > *:nth-child(2) { animation: taste-in 0.4s var(--ease) 0.07s both; }
 .card-list > *:nth-child(3) { animation: taste-in 0.4s var(--ease) 0.12s both; }

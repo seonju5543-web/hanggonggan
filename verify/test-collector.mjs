@@ -5,6 +5,18 @@
 
    실행: node verify/test-collector.mjs   (실패하면 exit 1) */
 import fs from 'node:fs';
+
+/* 🔴 파일은 **줄바꿈을 통일해서** 읽는다 (2026-09-06).
+   윈도우에서는 git 의 core.autocrlf 가 체크아웃 때 줄바꿈을 CRLF 로 바꿔 준다(정상 설정이고,
+   올릴 때 LF 로 되돌리므로 저장소는 안 더러워진다). 그런데 검사가 `\n}\n` 같은 LF 를 글자 그대로
+   찾고 있어서, **개발자 컴퓨터에서만 4건이 늘 빨간불**이었다. 로봇은 리눅스라 통과한다.
+   늘 켜져 있는 빨간불은 신호가 아니다 — 진짜 실패가 5건째로 섞여도 눈에 안 띈다.
+   같은 계열의 수리: 2026-09-05 `검사 5건이 개발자 컴퓨터에서만 실패하고 있었다`(URL.pathname).
+   🔴 파일이나 core.autocrlf 를 건드리지 말 것 — 저장소 전 파일이 '바뀐 것'으로 보여 통째로 충돌한다.
+      고칠 곳은 **읽는 쪽**이고, 그 자리는 여기 하나다. */
+const readText = (u) => fs.readFileSync(u, 'utf8').replace(/\r\n/g, '\n');
+// 하트비트 순수 함수 — 예약 간격 계산은 한 곳에만 둔다 (2026-09-06)
+import { hoursFor, cronsOf, isStale } from '../collector/robot-heartbeat.mjs';
 /* 🔴 URL 을 파일 경로로 쓸 때는 .pathname 이 아니라 fileURLToPath 다.
    윈도우에서 .pathname 은 `/C:/…` 를 주는데 그건 유효한 경로가 아니라 파일을 못 열고
    자식 프로세스도 못 띄운다. 리눅스(클라우드 검사)에서는 멀쩡해서 **이 검사 5개가
@@ -108,11 +120,11 @@ console.log('■ 뺀 공고를 주소로 막는다 (id는 주소에서 파생돼
 /* 🔴 2026-08-14에 실제로 당했다: id가 `auto-` + canonUrl 뒷 24자라, 주소 정규화를 고치자
    막아 둔 23건의 id가 전부 바뀌어 **부경대 2014·2016·2021·2024년 공고가 새 id로 되살아났다.** */
 {
-  const ar = fs.readFileSync(new URL('../collector/auto-register.mjs', import.meta.url), 'utf8');
+  const ar = readText(new URL('../collector/auto-register.mjs', import.meta.url));
   eq('되돌리기가 id뿐 아니라 주소로도 막는다', /blockedUrls/.test(ar) && /cfg\.blockUrls/.test(ar), true);
   eq('새로 등록할 때도 막힌 주소는 건너뛴다',
     /if \(blockedIds\.has\(id\) \|\| blockedUrls\.has\(cu\)\) continue;/.test(ar), true);
-  const cfg = JSON.parse(fs.readFileSync(new URL('../collector/auto-register-config.json', import.meta.url), 'utf8'));
+  const cfg = JSON.parse(readText(new URL('../collector/auto-register-config.json', import.meta.url)));
   eq('막은 목록이 주소로도 채워져 있다', (cfg.blockUrls || []).length > 0, true);
 }
 
@@ -122,11 +134,11 @@ console.log('■ HWP 원본은 미리보기가 아니라 본문을 읽는다 (20
    "졸업 후 총동창회 가입 동의(필수)"가 그렇게 사라졌다. 본문(BodyText)을 읽자 같은 91개에서
    글자가 24만 자 늘었다. 아래 두 줄이 그 배선을 지킨다. */
 {
-  const sch = fs.readFileSync(new URL('../collector/schematize-forms.mjs', import.meta.url), 'utf8');
+  const sch = readText(new URL('../collector/schematize-forms.mjs', import.meta.url));
   eq('본문(.body.txt)을 미리보기(.txt)보다 먼저 본다',
     /\['\.body\.txt',\s*'\.txt'\]/.test(sch), true);
   const wf = ['collect-scholarships', 'browser-collect', 'deep-fetch']
-    .map((n) => fs.readFileSync(new URL(`../.github/workflows/${n}.yml`, import.meta.url), 'utf8'));
+    .map((n) => readText(new URL(`../.github/workflows/${n}.yml`, import.meta.url)));
   eq('수집·심층 로봇이 본문 추출기를 실제로 돌린다',
     wf.every((y) => y.includes('hwp-bodytext.py')), true);
 }
@@ -378,7 +390,7 @@ function undeclaredNames(src) {
 {
   const dir = new URL('../collector/', import.meta.url);
   for (const f of fs.readdirSync(dir).filter((n) => n.endsWith('.mjs')).sort()) {
-    eq(`${f} — 선언 없는 이름 없음`, undeclaredNames(fs.readFileSync(new URL(f, dir), 'utf8')), []);
+    eq(`${f} — 선언 없는 이름 없음`, undeclaredNames(readText(new URL(f, dir))), []);
   }
   // 이 검사가 실제로 그 사고를 잡는지 스스로 확인한다 (검사가 잠들면 없느니만 못하다)
   eq('검사가 실제로 그 사고를 잡는다',
@@ -422,7 +434,7 @@ function undeclaredNames(src) {
    재시도를 붙였으니, 다음 사람이 무심코 맨 `fetch` 를 다시 쓰는 것을 여기서 막는다.
    (학교 게시판 수집은 2026-07-30 시립대 유실로 이미 같은 것을 배웠다.) */
 {
-  const src = fs.readFileSync(new URL('../collector/kosaf-fetch.mjs', import.meta.url), 'utf8');
+  const src = readText(new URL('../collector/kosaf-fetch.mjs', import.meta.url));
   const bare = [...src.matchAll(/await\s+fetch\(/g)].length;
   eq('한국장학재단 수확이 맨 fetch 를 쓰지 않는다 (재시도를 거친다)', bare, 1);  // tryFetch 안의 1회뿐
   eq('  재시도 함수가 있다', /async function tryFetch\(/.test(src), true);
@@ -434,7 +446,7 @@ function undeclaredNames(src) {
    덮어쓰고 남은 재시도까지 건너뛴다.** 서울대·가천대·외대·상명대가 이 경로로 죽고 있었다.
    goto 성공 뒤의 '화면 그려질 때까지 대기'는 페이지가 살아 있으므로 정상 — catch 안만 본다. */
 {
-  const src = fs.readFileSync(new URL('../collector/browser-collect.mjs', import.meta.url), 'utf8');
+  const src = readText(new URL('../collector/browser-collect.mjs', import.meta.url));
   const badBackoff = (text) => {
     // 주석은 걷어내고 본다 — 안 그러면 '쓰지 말라'고 적어 둔 주석 자체를 잡는다(실제로 겪음)
     const code = text.replace(/^\s*\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
@@ -460,8 +472,8 @@ function undeclaredNames(src) {
   ];
   const root = new URL('../', import.meta.url);
   for (const [robot, flow] of pairs) {
-    const src = fs.readFileSync(new URL(robot, root), 'utf8');
-    const yml = fs.readFileSync(new URL(flow, root), 'utf8');
+    const src = readText(new URL(robot, root));
+    const yml = readText(new URL(flow, root));
     // writeFileSync(new URL('X', HERE) …) 와 writeFileSync('X' …) 에서 파일 이름을 뽑는다
     const written = [...src.matchAll(/writeFileSync\(\s*(?:new URL\(\s*)?['"]([\w./-]+\.(?:json|md))['"]/g)]
       .map((m) => m[1].split('/').pop());
@@ -477,7 +489,7 @@ function undeclaredNames(src) {
   const root = new URL('../', import.meta.url);
   for (const f of ['collect-scholarships', 'browser-collect', 'deep-fetch', 'resolve-detail-urls', 'link-hunter']) {
     // 주석은 걷어내고 본다 — '이렇게 쓰지 말라'고 적어 둔 설명 자체를 잡는다(두 번째 겪음)
-    const yml = fs.readFileSync(new URL(`.github/workflows/${f}.yml`, root), 'utf8')
+    const yml = readText(new URL(`.github/workflows/${f}.yml`, root))
       .split('\n').filter((l) => !/^\s*#/.test(l)).join('\n');
     const plain = (yml.match(/git pull --rebase(?! --autostash)/g) || []).length;
     eq(`${f}: 맨몸 git pull --rebase 없음(--autostash 필수)`, plain, 0);
@@ -529,7 +541,7 @@ console.log('■ 학교 순서 회전 (잘리는 학교가 매번 같으면 그 
    두 조건 모두 되돌리면 그 학교 학생 화면이 다시 빈다. */
 console.log('■ 클릭 수집이 도는 조건');
 {
-  const src = fs.readFileSync(new URL('../collector/browser-collect.mjs', import.meta.url), 'utf8');
+  const src = readText(new URL('../collector/browser-collect.mjs', import.meta.url));
   const clickable = (src.match(/const CLICKABLE = '([^']+)'/) || [])[1] || '';
   eq('클릭 대상에 해시(#) 가짜 주소 행이 있다 (부산대 유형)', /a\[href\^="#"\]/.test(clickable), true);
   eq('클릭 대상에 onclick·javascript 행도 그대로 있다',
@@ -563,7 +575,7 @@ console.log('\n■ 클릭형 게시판 장부 (아는 행을 다시 누르지 �
   // 제목 다듬기는 중복 판정(titleKey)과 **같은 함수**를 써야 판정이 갈라지지 않는다
   eq('행 번호·새글 표식이 붙어도 같은 글', clickRowKey(board, `1234 ${t} 새글`) === clickRowKey(board, t), true);
   eq('제목이 비면 열쇠를 만들지 않는다 (빈 열쇠로 전부 건너뛰는 사고 방지)', clickRowKey(board, '   '), '');
-  const src = fs.readFileSync(new URL('collector/browser-collect.mjs', new URL('../', import.meta.url)), 'utf8');
+  const src = readText(new URL('collector/browser-collect.mjs', new URL('../', import.meta.url)));
   /* 순서가 중요하다 — 화면에서 40행을 먼저 자르면, 위쪽 40행이 전부 아는 공고인 게시판에서는
      41번째의 새 공고에 영영 닿지 못한다. 걸러낸 **뒤에** 40건을 골라야 한다. */
   eq('아는 행을 걸러낸 뒤에 40건을 고른다',
@@ -688,7 +700,7 @@ console.log('\n■ 누락 감사 (감사가 수집기의 맹점을 물려받지 
     '2026학년도 2학기 주거안정장학금 2차 신청 안내',
   ]).length, 2);
 
-  const src = fs.readFileSync(new URL('collector/audit-coverage.mjs', root), 'utf8');
+  const src = readText(new URL('collector/audit-coverage.mjs', root));
   /* 🔴 감사는 아무것도 고치지 않는다. 데이터를 만지면 감사가 만든 변화를 감사가 다시 재는
      순환이 생긴다. 쓰기는 자기 리포트 둘뿐이어야 한다. */
   /* 쓰기 대상을 **끝까지 따라가서** 확인한다. 인자가 변수면 그 선언을 찾아 실제 파일명을 본다 —
@@ -717,10 +729,10 @@ console.log('\n■ 누락 감사 (감사가 수집기의 맹점을 물려받지 
      갈라지면 '키워드 밖'이라는 진단 자체가 거짓이 된다. */
   const audited = (src.match(/HARVEST_KEYWORDS = (\/[^\n]+\/);/) || [])[1];
   for (const f of ['collector/collect.mjs', 'collector/browser-collect.mjs']) {
-    const k = (fs.readFileSync(new URL(f, root), 'utf8').match(/KEYWORDS = (\/[^\n]+\/);/) || [])[1];
+    const k = (readText(new URL(f, root)).match(/KEYWORDS = (\/[^\n]+\/);/) || [])[1];
     eq(`감사의 수집기 그물 사본이 ${f}와 같다`, audited === k, true);
   }
-  const yml = fs.readFileSync(new URL('.github/workflows/audit-coverage.yml', root), 'utf8');
+  const yml = readText(new URL('.github/workflows/audit-coverage.yml', root));
   eq('감사 워크플로가 리포트만 저장한다',
     [...yml.matchAll(/git add (\S+)/g)].every((m) => m[1].startsWith('collector/coverage')), true);
   // 상한을 넘긴 작업은 '실패'가 아니라 '취소'로 끝난다 — cancelled()가 없으면 알림을 건너뛴다
@@ -770,19 +782,19 @@ console.log('\n■ 목록 페이지 넘기기 (1페이지 밖의 공고도 잡�
     pageCandidates(artcl, 2, { ok: true, way: { kind: 'page', param: 'page' } }).length, 1);
   const root = new URL('../', import.meta.url);
   for (const f of ['collector/collect.mjs', 'collector/browser-collect.mjs']) {
-    const src = fs.readFileSync(new URL(f, root), 'utf8');
+    const src = readText(new URL(f, root));
     eq(`${f}가 2페이지 이후도 읽는다`, /readMorePages\(/.test(src), true);
     // 알아낸 것을 저장하지 않으면 매 실행 처음부터 헤맨다 (이슈 #79와 같은 유형)
     eq(`${f}가 알아낸 방식을 저장한다`, /pagination\.json/.test(src) && /writeFileSync\(pagePath/.test(src), true);
   }
   /* 브라우저 로봇에서는 '덤'이다 — 예산이 모자라면 손대지 않아야 한다.
      2026-08-16에 덤으로 붙는 재시도가 멈춰 그날 수집분 전체를 잃은 것과 같은 계열. */
-  const bsrc = fs.readFileSync(new URL('collector/browser-collect.mjs', root), 'utf8');
+  const bsrc = readText(new URL('collector/browser-collect.mjs', root));
   eq('브라우저 로봇은 예산이 모자라면 페이지를 더 안 읽는다',
     /if \(!budget\.hasRoom\(MIN_PER_TARGET_MS\)\) return \[\];/.test(bsrc), true);
   for (const f of ['.github/workflows/collect-scholarships.yml', '.github/workflows/browser-collect.yml']) {
     eq(`${f} 저장 목록에 페이지 기록이 있다`,
-      /git add collector\/pagination\.json/.test(fs.readFileSync(new URL(f, root), 'utf8')), true);
+      /git add collector\/pagination\.json/.test(readText(new URL(f, root))), true);
   }
 }
 
@@ -808,7 +820,7 @@ console.log('\n■ 학교별 공고 파일 (로봇이 쓴 파일을 앱이 찾�
   eq('로봇이 쓴 파일을 앱의 규칙으로 찾을 수 있다', wrote.includes(wants), true);
   eq('학교 수만큼 파일이 생긴다', wrote.length, 2);
   // 색인은 사람이 읽으려는 것 — 한글 학교명이 파일 이름과 이어져 있어야 디버깅이 된다
-  const idx = JSON.parse(fs.readFileSync(new URL('index.json', tmp), 'utf8'));
+  const idx = JSON.parse(readText(new URL('index.json', tmp)));
   eq('색인이 학교 이름과 파일을 이어 준다', idx.files['경희대학교'].file, wants);
   fs.rmSync(tmp, { recursive: true, force: true });
   /* 학교별 파일은 **다른 학교에 밀려 줄어들지 않는다** — 전체 상한이 없어진 것이 이 작업의 핵심.
@@ -826,15 +838,15 @@ console.log('\n■ 학교별 공고 파일 (로봇이 쓴 파일을 앱이 찾�
   // 화면과 알림이 **같은 규칙**을 써야 한다 — 갈라지면 화면에 있는 공고를 알림이 모른다
   for (const f of ['app.js', 'sw.js']) {
     eq(`${f}가 학교별 파일 규칙을 쓴다`,
-      /noticeFilesForProfile\(/.test(fs.readFileSync(new URL(f, root), 'utf8')), true);
+      /noticeFilesForProfile\(/.test(readText(new URL(f, root))), true);
   }
   // 옛 파일로 물러나는 길 — 아직 자기 학교 파일이 없는 학생의 화면이 비면 안 된다
   for (const f of ['app.js', 'sw.js']) {
     eq(`${f}에 옛 파일 폴백이 남아 있다`,
-      /data\/notices\.json/.test(fs.readFileSync(new URL(f, root), 'utf8')), true);
+      /data\/notices\.json/.test(readText(new URL(f, root))), true);
   }
   for (const f of ['collector/collect.mjs', 'collector/browser-collect.mjs']) {
-    const src = fs.readFileSync(new URL(f, root), 'utf8');
+    const src = readText(new URL(f, root));
     // 자르기 **전** 목록으로 발행해야 한다 — 순서가 뒤집히면 학교별 파일도 16건으로 잘린다
     eq(`${f}가 상한을 적용하기 전 목록으로 발행한다`,
       src.indexOf('publishBySchool(beforeCap)') < src.indexOf('notices.items = capNotices('), true);
@@ -861,17 +873,17 @@ console.log('\n■ 검수 후보 장부 (상한에 밀려도 검수 대상은 �
   eq('입력 순서가 달라도 저장 순서는 같다', JSON.stringify(a) === JSON.stringify(b), true);
   const root = new URL('../', import.meta.url);
   for (const f of ['collector/collect.mjs', 'collector/browser-collect.mjs']) {
-    const src = fs.readFileSync(new URL(f, root), 'utf8');
+    const src = readText(new URL(f, root));
     eq(`${f}가 후보 장부에 남긴다`, /saveCandidates\(mergeCandidates\(loadCandidates\(\)\.items, freshAll\)\)/.test(src), true);
   }
   for (const f of ['.github/workflows/collect-scholarships.yml', '.github/workflows/browser-collect.yml']) {
     // 저장 목록에서 빠지면 매 실행 되살아났다 다시 사라진다 (이슈 #79와 같은 유형)
     eq(`${f} 저장 목록에 후보 장부가 있다`,
-      /git add collector\/candidates\.json/.test(fs.readFileSync(new URL(f, root), 'utf8')), true);
+      /git add collector\/candidates\.json/.test(readText(new URL(f, root))), true);
   }
   // 검수 도구가 앱 파일이 아니라 장부를 봐야 한다 — 안 그러면 되살린 것이 화면에 안 나온다
   eq('검수 도구가 후보 장부를 읽는다',
-    /collector\/candidates\.json/.test(fs.readFileSync(new URL('verify/list-unregistered.js', root), 'utf8')), true);
+    /collector\/candidates\.json/.test(readText(new URL('verify/list-unregistered.js', root))), true);
 }
 
 console.log('\n■ 절대 시한 (답이 안 오는 학교에서 로봇이 멈춰 서지 않게)');
@@ -892,7 +904,7 @@ console.log('\n■ 절대 시한 (답이 안 오는 학교에서 로봇이 멈�
 console.log('\n■ 예산 장치가 실제로 배선돼 있나 (되돌아가면 같은 사고가 난다)');
 {
   const root = new URL('../', import.meta.url);
-  const src = fs.readFileSync(new URL('collector/browser-collect.mjs', root), 'utf8');
+  const src = readText(new URL('collector/browser-collect.mjs', root));
   eq('브라우저 수집기가 예산 모듈을 쓴다', /from '\.\/harvest-budget\.mjs'/.test(src), true);
   eq('학교를 새로 시작하기 전에 남은 시간을 본다', /budget\.hasRoom\(MIN_PER_TARGET_MS\)/.test(src), true);
   eq('상세 방문에도 예산이 있다 (한 학교가 20분을 먹던 자리)', /detailBudgetMs/.test(src), true);
@@ -928,7 +940,7 @@ console.log('\n■ 예산 장치가 실제로 배선돼 있나 (되돌아가면 
      로그는 그 함수 안에서 찍히고 재시도인지는 넘긴 표식으로 구분한다. */
   eq('학교마다 시작·끝을 실행 로그에 남긴다', /console\.log\(`\[\$\{[^`]*\}s\] ▶ \$\{tag\}`\)/.test(src), true);
   eq('실패 학교 재시도에도 실행 로그가 있다', /harvestWithDeadline\(f\.t, lines, f\.name, '\(재시도\)'\)/.test(src), true);
-  const yml = fs.readFileSync(new URL('.github/workflows/browser-collect.yml', root), 'utf8');
+  const yml = readText(new URL('.github/workflows/browser-collect.yml', root));
   eq('워크플로 저장 목록에 회전 커서가 있다', /browser-cursor\.json/.test(yml), true);
   /* 작업(job) 상한은 들여쓰기 4칸, 단계(step) 상한은 8칸이다. 2026-08-04에 단계별 상한이
      생기면서 예전 정규식(`timeout-minutes` 첫 등장)이 단계 상한을 작업 상한으로 잘못 읽을
@@ -970,7 +982,7 @@ console.log('\n■ 원문 자르는 길이 (자격 절이 날아가지 않을 �
     }
     return Number(m[1]);
   };
-  const src = fs.readFileSync(new URL('collector/deepfetch.mjs', root), 'utf8');
+  const src = readText(new URL('collector/deepfetch.mjs', root));
   const lim = cutLimit(src);
   eq('deepfetch: 본문 컷이 10,000자 이상', lim !== null && lim >= 10000, true);
   // 검사가 잠들면 없느니만 못하다 — 옛날 코드를 넣어 보고 정말 잡는지 확인한다
@@ -985,7 +997,7 @@ console.log('\n■ 원문 자르는 길이 (자격 절이 날아가지 않을 �
 console.log('\n■ 자격 요건 발췌 규칙 (2026-08-20 수리분이 되돌려지지 않았는가)');
 {
   const root = new URL('../', import.meta.url);
-  const src = fs.readFileSync(new URL('collector/extract-excerpts.mjs', root), 'utf8');
+  const src = readText(new URL('collector/extract-excerpts.mjs', root));
   const code = src.replace(/^\s*\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
 
   // ① 안 풀린 개체 문자가 절 경계를 막던 문제 — 저장된 원문에 실제로 있던 7종
@@ -1006,7 +1018,7 @@ console.log('\n■ 자격 요건 발췌 규칙 (2026-08-20 수리분이 되돌�
   /* ⑥ 물러선 주소를 영영 버리지 않는다 (2026-08-20).
      '3번 실패하면 제외'만 있고 되돌아오는 길이 없어서, 물러선 주소가 줄지 않고 쌓이기만 했다
      (자격 미확보 81건 중 20건이 그 상태였다). 이 세 줄이 사라지면 그 상태로 되돌아간다. */
-  const df = fs.readFileSync(new URL('collector/deepfetch.mjs', root), 'utf8');
+  const df = readText(new URL('collector/deepfetch.mjs', root));
   const dfCode = df.replace(/^\s*\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
   eq('  물러선 주소를 다시 두드릴 자리가 있다', /RETRY_SLOTS/.test(dfCode), true);
   eq('  실패가 적은 것부터 골라 회전한다', /retired\.sort\(\(a, b\) => a\.fails - b\.fails\)/.test(dfCode), true);
@@ -1018,7 +1030,7 @@ console.log('\n■ 자격 요건 발췌 규칙 (2026-08-20 수리분이 되돌�
 console.log('\n■ 유료 API 크레딧 누수 방지 (2026-08-20)');
 {
   const root = new URL('../', import.meta.url);
-  const sf = fs.readFileSync(new URL('collector/schematize-forms.mjs', root), 'utf8');
+  const sf = readText(new URL('collector/schematize-forms.mjs', root));
   const code = sf.replace(/^\s*\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
   // ① 공고문·안내문은 학생이 채우는 신청서가 아니다 — API로 보내면 반드시 관문에 걸린다
   eq('  신청서가 아닌 첨부를 유료 경로에서 뺀다', /NOT_A_FORM\.test\(row\.attachment\)/.test(code), true);
@@ -1046,8 +1058,8 @@ console.log('\n■ 유료 API 크레딧 누수 방지 (2026-08-20)');
    다시 찾아야 한다. 로봇은 `schools`·`targets` 만 읽으므로 parked 는 아무 일도 하지 않는다. */
 console.log('\n■ 수집망 좁히기 (2026-08-30)');
 {
-  const sc = JSON.parse(fs.readFileSync(new URL('../collector/schools.json', import.meta.url), 'utf8'));
-  const bt = JSON.parse(fs.readFileSync(new URL('../collector/browser-targets.json', import.meta.url), 'utf8'));
+  const sc = JSON.parse(readText(new URL('../collector/schools.json', import.meta.url)));
+  const bt = JSON.parse(readText(new URL('../collector/browser-targets.json', import.meta.url)));
   const names = (a) => a.map((x) => x.school).sort();
   eq('일반 수집은 두 곳', names(sc.schools), ['경희대학교', '한국외국어대학교']);
   eq('브라우저 수집도 두 곳', names(bt.targets), ['경희대학교', '한국외국어대학교']);
@@ -1060,15 +1072,15 @@ console.log('\n■ 수집망 좁히기 (2026-08-30)');
     parked(sc).length > 0 && parked(sc).every((x) => 'boardUrl' in x), true);
   eq('  왜 뺐는지·어떻게 되돌리는지 적혀 있다', /되돌리려면/.test(sc._parked || ''), true);
   /* 로봇이 보관분을 실수로 훑으면 좁힌 뜻이 사라진다 */
-  const cm = fs.readFileSync(new URL('../collector/collect.mjs', import.meta.url), 'utf8');
-  const bc = fs.readFileSync(new URL('../collector/browser-collect.mjs', import.meta.url), 'utf8');
+  const cm = readText(new URL('../collector/collect.mjs', import.meta.url));
+  const bc = readText(new URL('../collector/browser-collect.mjs', import.meta.url));
   eq('로봇은 parked 를 읽지 않는다', /\.parked/.test(cm) || /\.parked/.test(bc), false);
 }
 
 console.log('\n■ 정식 등록 대상 학교 좁히기 (2026-08-30)');
 {
-  const cfg = JSON.parse(fs.readFileSync(new URL('../collector/auto-register-config.json', import.meta.url), 'utf8'));
-  const src = fs.readFileSync(new URL('../collector/auto-register.mjs', import.meta.url), 'utf8');
+  const cfg = JSON.parse(readText(new URL('../collector/auto-register-config.json', import.meta.url)));
+  const src = readText(new URL('../collector/auto-register.mjs', import.meta.url));
   eq('설정에 대상 학교가 적혀 있다', cfg.schools, ['경희대학교', '한국외국어대학교']);
   eq('  왜 좁혔는지도 적혀 있다', /품질|자격 요건 매칭/.test(cfg._schools || ''), true);
   eq('로봇이 그 설정을 실제로 읽는다', /cfg\.schools/.test(src), true);
@@ -1094,7 +1106,7 @@ console.log('\n■ 정식 등록 대상 학교 좁히기 (2026-08-30)');
    (`PR.unaskedAttr is not a function`). 사람이 기억하는 대신 소스를 대조한다. */
 console.log('\n■ 브라우저에서 쓸 이름이 빠지지 않았나 (2026-08-30)');
 {
-  const src = fs.readFileSync(new URL('../match-engine.js', import.meta.url), 'utf8');
+  const src = readText(new URL('../match-engine.js', import.meta.url));
   const listed = new Set((src.match(/:\s*\{\s*parseLine[^}]*\}/) || [''])[0]
     .replace(/[{}:]/g, ' ').split(/[\s,]+/).filter(Boolean));
   const used = [...new Set([...src.matchAll(/\bPR2?\.([A-Za-z_$][\w$]*)/g)].map((m) => m[1]))];
@@ -1344,7 +1356,7 @@ console.log('\n■ 표시 글자를 숫자로 읽지 않는다 (2026-08-30)');
   for (const f of fs.readdirSync(dir).filter((x) => /\.(js|mjs|cjs)$/.test(x))) {
     /* ⚠️ **주석을 걷어내고 본다** — 안 그러면 이 관문이 자기 설명문에 적힌 예시 글자를
        잡는다(처음에 그렇게 만들었다). 코드에 진짜로 있는 것만 봐야 한다. */
-    const src = fs.readFileSync(new URL(f, dir), 'utf8')
+    const src = readText(new URL(f, dir))
       .replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/^\s*\/\/.*$/gm, ' ');
     for (const m of src.matchAll(/Number\(\s*(\w*[Bb]adge\w*|\w*[Cc]ount\w*)\s*\)/g)) bad.push(`${f}: ${m[0]}`);
   }
@@ -1360,7 +1372,7 @@ console.log('\n■ 예약 겹침 (2026-08-30)');
   const wdir = new URL('../.github/workflows/', import.meta.url);
   const slots = new Map();
   for (const f of fs.readdirSync(wdir).filter((x) => x.endsWith('.yml'))) {
-    const src = fs.readFileSync(new URL(f, wdir), 'utf8');
+    const src = readText(new URL(f, wdir));
     if (!/git push/.test(src)) continue;                 // 커밋 안 하는 로봇은 겹쳐도 무해
     for (const m of src.matchAll(/cron:\s*'(\d+)\s+(\d+)/g)) {
       const key = `${m[2]}:${m[1]}`;
@@ -1571,7 +1583,7 @@ console.log('\n■ 게시판 메뉴 걷어내기 (2026-08-20)');
 console.log('\n■ 신청서 질문 설계기 (form-plan.js)');
 {
   const FP = await import(new URL('../form-plan.js', import.meta.url));
-  const T = JSON.parse(fs.readFileSync(new URL('../data/forms.json', import.meta.url), 'utf8')).templates;
+  const T = JSON.parse(readText(new URL('../data/forms.json', import.meta.url))).templates;
 
   // ① 라벨 정규화 — 게시판마다 '성 명'·'성　명'·'1. 성    명'으로 적힌다
   eq('라벨 정규화: 공백·번호를 걷어낸다', FP.formLabelKey('1. 성       명'), '성명');
@@ -1619,7 +1631,7 @@ console.log('\n■ 신청서 질문 설계기 (form-plan.js)');
   eq('같은 항목의 섹션이 되풀이된 양식이 없다', dupes.length, 0);
 
   // ⑦ 감사가 새 타입을 알고 있다 — 모르면 exit 1로 죽어 그날 수집분이 통째로 안 저장된다
-  const audit = fs.readFileSync(new URL('../verify/audit-data.js', import.meta.url), 'utf8');
+  const audit = readText(new URL('../verify/audit-data.js', import.meta.url));
   eq('감사 FIELD_TYPES에 choice·group·static이 들어 있다',
     ['choice', 'group', 'static'].every((t) => audit.includes(`'${t}'`)), true);
 }
@@ -1634,7 +1646,7 @@ console.log('\n■ 공고를 받아올 때 쓰는 머리말 (2026-08-20)');
   eq('  UA에 봇 이름을 붙이지 않는다', /bot/i.test(H.FETCH_HEADERS['User-Agent']), false);
   eq('  대신 From 헤더로 신원을 밝힌다', /@/.test(H.FETCH_HEADERS.From || ''), true);
   for (const f of ['collector/deepfetch.mjs', 'collector/collect.mjs']) {
-    const src = fs.readFileSync(new URL(f, root), 'utf8');
+    const src = readText(new URL(f, root));
     eq(`  ${f.split('/').pop()} 가 같은 머리말을 쓴다`, /FETCH_HEADERS/.test(src), true);
     eq(`  ${f.split('/').pop()} 에 UA를 따로 박아 두지 않았다`, /'User-Agent':\s*'Mozilla[^']*compatible/.test(src), false);
   }
@@ -1697,7 +1709,7 @@ console.log('\n■ 껍데기 페이지와 브라우저 본문 (2026-08-20)');
      ① AI가 줄 번호를 못 매겨 대상에서 빠지고 ② 표의 칸 구분(공통/재학생/신규자)이
      통째로 사라졌다 — 이 작업의 핵심이 그 구조를 살리는 것인데 받는 자리에서 죽였다.
      37건을 그렇게 저장했다가 전부 다시 받았다. */
-  const rb = fs.readFileSync(new URL('collector/rescue-bodies.mjs', root), 'utf8');
+  const rb = readText(new URL('collector/rescue-bodies.mjs', root));
   eq('재수집은 화면에 그려진 줄바꿈을 그대로 받는다', /innerText\(/.test(rb), true);
   /* 본문을 다듬을 때 **가로 공백만** 누른다 — `\s+`로 누르면 줄바꿈까지 사라진다.
      ⚠️ '파일 어디에도 \s+ 가 없다'로 검사하면 안 된다. 첨부 **이름**을 다듬는
@@ -1748,7 +1760,7 @@ console.log('\n■ 껍데기 페이지와 브라우저 본문 (2026-08-20)');
   eq('    아이콘·로고는 담지 않는다 (세로도 본다)', /naturalHeight >= 300/.test(rb), true);
 
   // 브라우저 수집기가 이미 그린 본문을 저장한다 (추가 페이지 열기 0회)
-  const bc = fs.readFileSync(new URL('collector/browser-collect.mjs', root), 'utf8');
+  const bc = readText(new URL('collector/browser-collect.mjs', root));
   eq('브라우저 수집기가 상세 본문을 저장한다', /bodies\[it\.url\]\s*=/.test(bc), true);
   eq('  심층 수집과 다른 파일에 저장한다(서로 지우지 않게)', /browser-bodies\.json/.test(bc), true);
 }
@@ -1772,7 +1784,7 @@ console.log('\n■ 학교 서버에 붙는 워크플로의 인증서 설정 (202
   const dir = new URL('../.github/workflows/', import.meta.url);
   /* collector 의 로봇을 부르는 워크플로만 본다 — 배포·알림 워크플로는 학교에 안 붙는다 */
   const need = fs.readdirSync(dir).filter((f) => /\.ya?ml$/.test(f))
-    .map((f) => ({ f, t: fs.readFileSync(new URL(f, dir), 'utf8') }))
+    .map((f) => ({ f, t: readText(new URL(f, dir)) }))
     .filter((x) => /node collector\/(collect|deepfetch|browser-collect|rescue-bodies|link-hunter|resolve-detail-urls|eligibility-ai|extract-excerpts)/.test(x.t));
   const missing = need.filter((x) => !/NODE_EXTRA_CA_CERTS/.test(x.t)).map((x) => x.f);
   eq(`수집 로봇을 부르는 워크플로 ${need.length}개가 모두 인증서 설정을 갖고 있다`, missing.join(',') || '(없음)', '(없음)');
@@ -1780,7 +1792,7 @@ console.log('\n■ 학교 서버에 붙는 워크플로의 인증서 설정 (202
   const unsafe = need.filter((x) => /NODE_TLS_REJECT_UNAUTHORIZED|rejectUnauthorized:\s*false/.test(x.t)).map((x) => x.f);
   eq('  인증서 검증을 끄는 워크플로는 없다', unsafe.join(',') || '(없음)', '(없음)');
   /* 오류를 낱말 하나로 뭉개면 원인을 영영 못 본다 — Node fetch 의 진짜 이유는 cause 안에 있다 */
-  const df = fs.readFileSync(new URL('../collector/deepfetch.mjs', import.meta.url), 'utf8');
+  const df = readText(new URL('../collector/deepfetch.mjs', import.meta.url));
   eq('  내려받기 실패는 원인(cause)까지 적는다', /e\.cause && \(e\.cause\.code/.test(df), true);
 }
 
@@ -1792,7 +1804,7 @@ console.log('\n■ 학교 서버에 붙는 워크플로의 인증서 설정 (202
    필터가 놓친 것은 영영 0으로 나온다 — 다른 축(문장이 무엇을 말하는가)으로 재야 한다. */
 console.log('\n■ 자격 자리의 잡음을 유형별로 세는가 (2026-08-23)');
 {
-  const rep = fs.readFileSync(new URL('../verify/eligibility-report.mjs', import.meta.url), 'utf8');
+  const rep = readText(new URL('../verify/eligibility-report.mjs', import.meta.url));
   eq('채점기가 잡음을 유형별로 센다', /NOISE_KIND/.test(rep), true);
   eq('  어느 경로가 넣었는지도 센다 (규칙 vs AI)', /발췌기\(규칙\) \$\{hits\.length - byAi\}/.test(rep), true);
   /* 필터의 낱말 목록을 그대로 **가져다 쓰면** 안 된다.
@@ -1803,7 +1815,7 @@ console.log('\n■ 자격 자리의 잡음을 유형별로 세는가 (2026-08-23
   /* 개발자가 짚은 두 유형은 반드시 잡혀야 한다 */
   /* 규칙은 이제 채점기·관문이 **함께 읽는 한 파일**에 있다 (2026-08-24) —
      예전엔 두 곳에 베껴져 있어 한쪽만 고치면 조용히 갈라졌다. */
-  const kinds = fs.readFileSync(new URL('./eligibility-noise.cjs', import.meta.url), 'utf8');
+  const kinds = readText(new URL('./eligibility-noise.cjs', import.meta.url));
   eq('  채점 규칙은 한 곳뿐이다 (채점기·관문이 같이 읽는다)',
     /require\('\.\/eligibility-noise\.cjs'\)/.test(rep), true);
   eq('  배점·평가를 잡는다 (마일리지 산정기간)', /산정\\s\*\(기간/.test(kinds), true);
@@ -1827,7 +1839,7 @@ console.log('\n■ 자격 자리의 잡음을 유형별로 세는가 (2026-08-23
      지금까지 잡음을 찾아내는 일이 개발자가 앱을 눈으로 보는 것뿐이었다. 이제 감사가
      오류로 올리고, 수집 워크플로는 감사가 실패하면 그 실행분을 되돌린다 —
      잡음이 섞인 데이터는 앱에 하루도 못 나간다. */
-  const aud = fs.readFileSync(new URL('../verify/audit-data.js', import.meta.url), 'utf8');
+  const aud = readText(new URL('../verify/audit-data.js', import.meta.url));
   eq('감사가 자격 잡음을 오류로 올린다 (경고가 아니라)', /errors\.push\(`registered:\$\{it\.id\} — 지원 자격에 \[/.test(aud), true);
   eq('  화면과 같은 함수로 본다 (감사만 통과하는 일이 없게)', /require\('\.\.\/match-engine\.js'\)/.test(aud), true);
   eq('  조각난 줄은 경고로 둔다 (버리면 진짜 요건을 잃는다)', /자격 줄이 조각나 보입니다/.test(aud), true);
@@ -1837,7 +1849,7 @@ console.log('\n■ 자격 자리의 잡음을 유형별로 세는가 (2026-08-23
   eq('    원인을 단정하지 않는다 (수집 탓이라고 적지 않는다)', /상했습니다\(수집 단계\)/.test(aud), false);
 
   /* 화면 문 자체가 줄마다 '요건임'을 묻는가 — 이게 없으면 좋은 줄에 잡음이 얹혀 간다 */
-  const eng = fs.readFileSync(new URL('../match-engine.js', import.meta.url), 'utf8');
+  const eng = readText(new URL('../match-engine.js', import.meta.url));
   eq('화면 문이 줄마다 요건 신호를 확인한다', /if \(!REQ_SIGNAL\.test\(t\)\) continue;/.test(eng), true);
   /* 🔴 잣대는 그대로 줄 단위다. 다만 **괄호 안은 부연**이라 떼고 본다 (2026-08-28) —
      `직전학기 C⁰ 수준(70/100점 만점) 이상인 재학생` 의 '만점'이 배점표 표지로 읽혀
@@ -1873,7 +1885,7 @@ console.log('\n■ 자격 자리의 잡음을 유형별로 세는가 (2026-08-23
       "간결하게 쓰자"는 문장은 그 옆에 계속 있었다. 그래서 관문으로 만든다. */
 console.log('\n■ CLAUDE.md 부피 (2026-08-29)');
 {
-  const md = fs.readFileSync(new URL('../CLAUDE.md', import.meta.url), 'utf8');
+  const md = readText(new URL('../CLAUDE.md', import.meta.url));
   const total = md.split('\n').length;
   eq(`문서 전체가 900줄을 넘지 않는다 (지금 ${total}줄)`, total <= 900, true);
   /* 항목 하나가 길어지는 것이 부풀기의 실제 경로다 — 전체 줄 수보다 먼저 걸린다 */
@@ -1889,7 +1901,7 @@ console.log('\n■ 데이터 파일 형식 (2026-08-29)');
   /* 자동 병합에서 뺀 두 파일. 형식이 어긋나면 로봇 커밋과 파일 전체가 충돌한다.
      끝 개행은 로봇마다 달라 보지 않는다 — 보면 사냥꾼 결과를 되돌리게 된다(위 주석). */
   for (const f of ['registered', 'forms']) {
-    const raw = fs.readFileSync(new URL(`../data/${f}.json`, import.meta.url), 'utf8');
+    const raw = readText(new URL(`../data/${f}.json`, import.meta.url));
     eq(`data/${f}.json 은 로봇과 같은 들여쓰기(1칸)다`,
        JSON.stringify(JSON.parse(raw), null, 1) === raw.replace(/\n$/, ''), true);
   }
@@ -1897,7 +1909,7 @@ console.log('\n■ 데이터 파일 형식 (2026-08-29)');
 
 console.log('\n■ 링크 사냥꾼의 제목 대조 (2026-08-23)');
 {
-  const lh = fs.readFileSync(new URL('../collector/link-hunter.mjs', import.meta.url), 'utf8');
+  const lh = readText(new URL('../collector/link-hunter.mjs', import.meta.url));
   eq('사냥꾼은 수집기와 같은 제목 청소 규칙을 쓴다', /from '\.\/clean-title\.mjs'/.test(lh), true);
   eq('  대조할 제목에서 부스러기를 뗀다', /cleanTitle\(\(t\.ref\.boardTitle/.test(lh), true);
   eq('  받아 적을 때도 떼고 담는다', /boardTitle = cleanTitle\(mate\.title\)/.test(lh), true);
@@ -1905,7 +1917,7 @@ console.log('\n■ 링크 사냥꾼의 제목 대조 (2026-08-23)');
   eq('  분류 배지를 뗀다', /^공지/.test(CT.cleanTitle('공지 공지 2026-2학기 복지장학1(본인장애) 신청안내')), false);
   eq('  행 번호를 뗀다', /^2651/.test(CT.cleanTitle('2651 2026-2학기 부남장학생 선발 안내')), false);
   /* 저장된 값에도 부스러기가 남아 있으면 안 된다 — 대조는 저장된 값으로 한다 */
-  const regd = JSON.parse(fs.readFileSync(new URL('../data/registered.json', import.meta.url), 'utf8'));
+  const regd = JSON.parse(readText(new URL('../data/registered.json', import.meta.url)));
   const dirty = (regd.items || regd).filter((x) => x.boardTitle && CT.cleanTitle(x.boardTitle) !== x.boardTitle);
   eq('  저장된 boardTitle 에도 부스러기가 없다', dirty.length, 0);
 
@@ -1970,7 +1982,7 @@ console.log('\n■ 서비스하지 않는 학교의 공고는 피드에 안 담�
   eq('  학교 칸이 빈 공고도 뺀다 (어느 학생에게도 안 보인다)', got.length, 2);
 
   for (const [name, file] of [['일반 수집', 'collect.mjs'], ['브라우저 수집', 'browser-collect.mjs']]) {
-    const src = fs.readFileSync(new URL(`../collector/${file}`, import.meta.url), 'utf8');
+    const src = readText(new URL(`../collector/${file}`, import.meta.url));
     /* ⚠️ **대입까지 본다** — `const _unused = dropUnserved(notices.items);` 는 결과를 버려
        아무 일도 안 하는데, 호출만 세면 그대로 통과한다(2026-09-05 리뷰에서 실증).
        바로 앞 커밋 69113d0 이 다른 관문에서 배운 것과 같은 유형이다. */
@@ -1986,7 +1998,7 @@ console.log('\n■ 서비스하지 않는 학교의 공고는 피드에 안 담�
     eq('    전체 상한을 매기기 전에 떨군다', dropAt >= 0 && capAt > dropAt, true);
   }
   /* 데이터에도 남아 있지 않아야 한다 — 소급 적용 원칙(운영 원칙 7) */
-  const feed = JSON.parse(fs.readFileSync(new URL('../data/notices.json', import.meta.url), 'utf8'));
+  const feed = JSON.parse(readText(new URL('../data/notices.json', import.meta.url)));
   eq('  지금 피드에 서비스 밖 학교가 없다', dropUnserved(feed.items).length, feed.items.length);
 }
 
@@ -2002,7 +2014,7 @@ console.log('\n■ 주소를 고치는 로봇은 학교별 파일까지 고친�
      자르기 **전** 목록을 발행하는데 이 로봇들이 든 것은 이미 잘린 목록이라, 재발행하면
      학교별 파일이 전체 상한만큼 **줄어든다**. 그래서 `patchUrlsBySchool` 로 그 자리만 고친다. */
   for (const [name, file] of [['링크 사냥꾼', 'link-hunter.mjs'], ['원문 링크 복구', 'resolve-detail-urls.mjs']]) {
-    const src = fs.readFileSync(new URL(`../collector/${file}`, import.meta.url), 'utf8');
+    const src = readText(new URL(`../collector/${file}`, import.meta.url));
     eq(`${name}은 학교별 파일도 고친다`, /patchUrlsBySchool\(/.test(src), true);
     eq('  가져다 쓴다 (베끼지 않는다)',
       /import \{[^}]*\bpatchUrlsBySchool\b[^}]*\} from '\.\/publish-notices\.mjs'/.test(src), true);
@@ -2019,7 +2031,7 @@ console.log('\n■ 주소를 고치는 로봇은 학교별 파일까지 고친�
   }
   /* 🔴 고쳐도 `git add` 에 없으면 저장되지 않는다 (이슈 #79 계열) */
   for (const wf of ['link-hunter', 'resolve-detail-urls']) {
-    const y = fs.readFileSync(new URL(`../.github/workflows/${wf}.yml`, import.meta.url), 'utf8');
+    const y = readText(new URL(`../.github/workflows/${wf}.yml`, import.meta.url));
     /* ⚠️ **처음 만나는 한 줄만 보지 말 것** — 워크플로에 git add 가 하나 더 생기면
        조용히 엉뚱한 줄을 검사한다. 전부 모아서 본다. */
     const lines = y.split('\n').filter((l) => /^\s*git add /.test(l));
@@ -2053,14 +2065,14 @@ console.log('\n■ 주소를 고치는 로봇은 학교별 파일까지 고친�
       { school: '경희대학교', title: '두을장학재단 제29기 장학생 모집', url: 'https://x/view?id=322949' },
     ], { dir: dirUrl });
 
-    const after = JSON.parse(fs.readFileSync(new URL('n1.json', dirUrl), 'utf8'));
+    const after = JSON.parse(readText(new URL('n1.json', dirUrl)));
     eq('  진짜로 고친다 (표식 → 진짜 주소)', after.items[0].url, 'https://x/view?id=322949');
     eq('    고친 건수를 돌려준다', r.fixed, 1);
     /* 🔴 **줄지 않는다** — 재발행으로 바꾸면 여기서 걸린다. 이 한 줄이 551→200 축소를
        막는 진짜 방어선이다(정적 검사는 이름만 바꿔도 뚫린다). */
     eq('    항목 수가 줄지 않는다 (재발행이면 여기서 걸린다)', after.items.length, before.items.length);
     eq('    대응이 없는 옛 공고는 건드리지 않는다', after.items[1].url, 'https://x/list#n-옛것');
-    eq('    색인은 건드리지 않는다', JSON.parse(fs.readFileSync(new URL('index.json', dirUrl), 'utf8')).files ? true : false, true);
+    eq('    색인은 건드리지 않는다', JSON.parse(readText(new URL('index.json', dirUrl))).files ? true : false, true);
     /* 같은 주소면 다시 쓰지 않는다 — 무의미한 커밋을 만들지 않는다 */
     eq('    바뀔 것이 없으면 파일을 안 쓴다', patchUrlsBySchool([
       { school: '경희대학교', title: '두을장학재단 제29기 장학생 모집', url: 'https://x/view?id=322949' },
@@ -2087,7 +2099,7 @@ console.log('\n■ 목록 화면인가 상세 화면인가 (2026-08-20)');
   eq('  다른 제목이 적으면 애초에 목록이 아니다', D.looksLikeList(others[0], others), false);
   // ③ 규칙은 한 곳에만 — 복사본이 살아나면 두 로봇이 갈라진다
   for (const f of ['collector/link-hunter.mjs', 'collector/resolve-detail-urls.mjs']) {
-    const src = fs.readFileSync(new URL('../' + f, import.meta.url), 'utf8');
+    const src = readText(new URL('../' + f, import.meta.url));
     eq(`  ${f.split('/').pop()} 는 공용 규칙을 쓴다`, /looksLikeList[^\n]*detail-url|looksLikeList\s*\}/.test(src), true);
     eq(`  ${f.split('/').pop()} 에 복사본이 없다`, /function looksLikeList/.test(src), false);
   }
@@ -2097,17 +2109,17 @@ console.log('\n■ 목록 화면인가 상세 화면인가 (2026-08-20)');
 console.log('\n■ 학교가 빠뜨린 중간 인증서 (2026-08-20)');
 {
   const root = new URL('../', import.meta.url);
-  const pem = fs.readFileSync(new URL('collector/certs/sectigo-server-auth-dv-r36.pem', root), 'utf8');
+  const pem = readText(new URL('collector/certs/sectigo-server-auth-dv-r36.pem', root));
   eq('중간 인증서가 저장소에 있다', /BEGIN CERTIFICATE/.test(pem), true);
   for (const f of ['.github/workflows/collect-scholarships.yml', '.github/workflows/browser-collect.yml']) {
-    const yml = fs.readFileSync(new URL(f, root), 'utf8');
+    const yml = readText(new URL(f, root));
     eq(`  ${f.split('/').pop()} 가 그 인증서를 쓴다`, /NODE_EXTRA_CA_CERTS:\s*collector\/certs\//.test(yml), true);
     /* 🔴 검증을 끄는 것이 아니다 — 이게 들어오면 아무 서버나 믿게 된다 */
     eq(`  ${f.split('/').pop()} 가 인증서 검증을 끄지 않는다`,
       /NODE_TLS_REJECT_UNAUTHORIZED|rejectUnauthorized:\s*false/.test(yml), false);
   }
   for (const f of ['collector/deepfetch.mjs', 'collector/collect.mjs', 'collector/browser-collect.mjs']) {
-    const src = fs.readFileSync(new URL(f, root), 'utf8');
+    const src = readText(new URL(f, root));
     eq(`  ${f.split('/').pop()} 가 인증서 검증을 끄지 않는다`,
       /NODE_TLS_REJECT_UNAUTHORIZED|rejectUnauthorized:\s*false/.test(src), false);
   }
@@ -2136,7 +2148,7 @@ console.log('\n■ AI 자격 읽기 안전장치 (2026-08-20)');
   const made = v({ none: false, lines: [1], text: '최대 987654원 지급' });
   eq('  모델이 보낸 글자는 결과에 섞이지 않는다', JSON.stringify(made.lines).includes('987654'), false);
   // 기본은 꺼져 있어야 한다 — 켠 채로 배포되면 잔액이 조용히 샌다
-  const cfg = JSON.parse(fs.readFileSync(new URL('../collector/eligibility-ai-config.json', import.meta.url), 'utf8'));
+  const cfg = JSON.parse(readText(new URL('../collector/eligibility-ai-config.json', import.meta.url)));
   eq('  기본은 꺼져 있다', cfg.enabled, false);
 
   /* 2026-08-23 — **공고문 PDF 경로.** 게시판 본문이 '붙임 참조'뿐이고 공고문이 PDF인데
@@ -2163,7 +2175,7 @@ console.log('\n■ AI 자격 읽기 안전장치 (2026-08-20)');
      읽은 값까지 지웠다 — 게시판 본문이 비어 있다는 사실은 PDF 안 내용에 대해
      아무 말도 하지 않는다. 실제로 정읍시민·세종이도가 7줄·6줄을 읽어 놓고 지워졌다
      (로그에는 ✓로 남고 데이터는 비어 있었다). */
-  const xs = fs.readFileSync(new URL('../collector/extract-excerpts.mjs', import.meta.url), 'utf8');
+  const xs = readText(new URL('../collector/extract-excerpts.mjs', import.meta.url));
   eq('  발췌기는 AI가 읽은 자격을 건드리지 않는다', /\/\^AI\/\.test\(it\.eligibilityFrom/.test(xs), true);
   /* ⚠️ 그 가드는 **for 반복문 안**이라 continue 여야 한다 — return 을 쓰면 그 뒤 공고를
      전부 건너뛴다(실제로 return 으로 썼다가 잡았다). */
@@ -2201,7 +2213,7 @@ console.log('\n■ AI 자격 읽기 안전장치 (2026-08-20)');
   }
   /* 🔴 이 경로는 출처를 **'AI(공고문 PDF)'**로 남겨 번호 경로와 구분한다 —
      화면 표식은 같지만, 나중에 되짚을 때 어느 계약으로 들어온 글자인지 알아야 한다. */
-  const src = fs.readFileSync(new URL('../collector/eligibility-ai.mjs', import.meta.url), 'utf8');
+  const src = readText(new URL('../collector/eligibility-ai.mjs', import.meta.url));
   eq('  출처를 번호 경로와 구분해 남긴다', /'AI\(공고문 PDF\)'/.test(src), true);
   eq('  기관명을 줄이지 말라고 못 박는다', /줄이지 마세요/.test(src), true);
   /* 🔴 **본문이 그림뿐인 공고**도 같은 길로 읽는다 (2026-08-23). `[홍보]` 계열은 글자 없이
@@ -2218,9 +2230,9 @@ console.log('\n■ AI 자격 읽기 안전장치 (2026-08-20)');
      이번엔 파일 크기(10MB)에 걸렸다. 둘 다 봐야 한다. */
   eq('    파일 10MB 한계도 함께 본다', /9 \* 1024 \* 1024/.test(src), true);
   eq('    PNG 가 아니라 JPEG 로 내보낸다 (PNG 는 포스터에서 몇 배로 부푼다)', /\.jpeg\(\{ quality/.test(src), true);
-  const wf = fs.readFileSync(new URL('../.github/workflows/eligibility-fill.yml', import.meta.url), 'utf8');
+  const wf = readText(new URL('../.github/workflows/eligibility-fill.yml', import.meta.url));
   eq('      줄이는 도구가 워크플로에 설치된다', /npm i @anthropic-ai\/sdk sharp/.test(wf), true);
-  const dfx = fs.readFileSync(new URL('../collector/deepfetch.mjs', import.meta.url), 'utf8');
+  const dfx = readText(new URL('../collector/deepfetch.mjs', import.meta.url));
   eq('  본문 그림도 내려받는다 (이름 규칙에는 안 걸린다)', /a\.bodyImage && IMG_EXT\.test/.test(dfx), true);
 
   /* 2026-08-23 — 자격을 **구조로** 읽는 경로. 종단추천장학처럼 원문이 표인 공고에서
@@ -2293,7 +2305,7 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
   /* 🔴 PDF를 받아야 한다 (2026-08-23). 예전엔 '글자가 정확히 안 나온다'며 제외했는데,
      그건 안 받을 이유가 아니라 받아 보고 안 되면 버릴 이유였다 — 못 읽는 PDF는
      readable()이 조용히 거른다. 안 받으면 그 공고는 영영 자격을 못 읽는다. */
-  const df = fs.readFileSync(new URL('../collector/deepfetch.mjs', import.meta.url), 'utf8');
+  const df = readText(new URL('../collector/deepfetch.mjs', import.meta.url));
   eq('자격용 공고문 첨부에 PDF가 들어간다', /OK_EXT = \/\\\.\(hwp\|hwpx\|docx\?\|pdf\)/.test(df), true);
   /* 🔴 **목록이 갈라지면 파일이 `.bin`으로 저장돼 아무도 못 읽는다.**
      받을 대상(OK_EXT·IMG_EXT)에만 넣고 파일 확장자를 정하는 쪽을 안 고치면,
@@ -2521,7 +2533,7 @@ console.log('\n■ 절 경계 — 제외 대상·선발기준이 자격으로 �
   const vm = createRequire(import.meta.url)('node:vm');
   const ctx = vm.createContext({ console });
   for (const f of ['../section-head.js', '../parse-requirements.js', '../match-engine.js']) {
-    vm.runInContext(fs.readFileSync(new URL(f, import.meta.url), 'utf8'), ctx, { filename: f });
+    vm.runInContext(readText(new URL(f, import.meta.url)), ctx, { filename: f });
   }
   const lines = '["◎ 신청 자격","▶ 서울시립대학교 재학생","◎ 지원 제외 대상","1. 휴학생, 졸업생, 자퇴생"]';
   eq('브라우저 순서로 실어도 자격 블록이 돈다',
@@ -2689,7 +2701,7 @@ console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08
    사흘 전인 채로 남아 **이미 마감된 공고가 D-2로 보이고 일괄 신청 준비 대상에도 들어갔다.**
    되돌아가면 여기서 잡는다. 브라우저 없이 app.js 의 진짜 함수를 떼어 내 돌려 본다. */
 {
-  const appSrc = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+  const appSrc = readText(new URL('../app.js', import.meta.url));
   /* 이름으로 함수 한 덩어리를 떼어 낸다 — 베낀 사본이 아니라 **진짜 코드**를 검사해야
      의미가 있다(사본을 검사하면 원본이 바뀌어도 계속 통과한다). */
   const grab = (name) => {
@@ -2768,7 +2780,7 @@ console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08
 
 console.log('■ 회원가입·로그인 배선 (2026-08-25) — 빠뜨리면 조용히 안 되는 세 가지');
 {
-  const at = (f) => fs.readFileSync(new URL('../' + f, import.meta.url), 'utf8');
+  const at = (f) => readText(new URL('../' + f, import.meta.url));
   const html = at('index.html');
   const sw = at('sw.js');
   const cli = at('supabase-client.js');
@@ -2938,7 +2950,7 @@ console.log('\n■ 금액 산정 — 부풀리지 않는가 (2026-08-27)');
     /* 🔴 이름이 뜻을 지킨다 — 한때 이 값을 `all` 이라고 불렀다. 그 이름을 읽고
        국가장학금까지 막으면 거의 모든 학생이 떨어진다(대부분이 국가장학금을 받는다).
        여기서 '전부'는 **교외(민간) 전부**이지 문자 그대로의 전부가 아니다. */
-    const src2 = fs.readFileSync(new URL('../parse-amount.js', import.meta.url), 'utf8');
+    const src2 = readText(new URL('../parse-amount.js', import.meta.url));
     eq('범위 값 이름이 external 이다 (all 이 아니다)',
       /scope:\s?'external'\|'narrow'/.test(src2) && !/\? 'all' :/.test(src2), true);
   }
@@ -3030,7 +3042,7 @@ console.log('\n■ 금액 산정 — 부풀리지 않는가 (2026-08-27)');
     const vm2 = createRequire(import.meta.url)('node:vm');
     const ctx2 = vm2.createContext({ console });
     for (const f of ['../section-head.js', '../parse-requirements.js', '../parse-amount.js']) {
-      vm2.runInContext(fs.readFileSync(new URL(f, import.meta.url), 'utf8'), ctx2, { filename: f });
+      vm2.runInContext(readText(new URL(f, import.meta.url)), ctx2, { filename: f });
     }
     eq('브라우저 순서로 실어도 금액 절을 찾는다',
       vm2.runInContext(`amountFrom(["장학금액","수업료 70% ( 정규학기 )"]).ratio`, ctx2), 0.7);
@@ -3045,8 +3057,8 @@ console.log('\n■ 금액 산정 — 부풀리지 않는가 (2026-08-27)');
 
   /* ⑩ 🔴 앱이 parse-amount.js 를 실제로 싣고 있는가 — 파일만 만들고 안 실으면 앱이 죽는다 */
   {
-    const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-    const swSrc = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
+    const html = readText(new URL('../index.html', import.meta.url));
+    const swSrc = readText(new URL('../sw.js', import.meta.url));
     eq('index.html 이 parse-amount.js 를 싣는다', html.includes('parse-amount.js'), true);
     eq('section-head.js 가 parse-amount.js 보다 먼저 실린다 (전역을 쓰므로)',
       html.indexOf('section-head.js') < html.indexOf('parse-amount.js'), true);
@@ -3099,7 +3111,7 @@ console.log('\n■ 등록금 비율 환산 — 한 학기 기준인가 (2026-08-
 
 console.log('\n■ 금액 상세 — 승인받은 화면 그대로인가 (2026-08-27)');
 {
-  const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+  const app = readText(new URL('../app.js', import.meta.url));
   /* 줄 하나를 그리는 amountDetailRow 도 같은 화면이라 함께 본다 */
   const body = app.slice(app.indexOf('function amountDetailRow'), app.indexOf('function renderBulkPrep'));
   eq('renderAmountDetail 이 있다', body.length > 200, true);
@@ -3195,7 +3207,7 @@ console.log('\n■ 금액 상세 — 승인받은 화면 그대로인가 (2026-0
   eq('실제로 눌러 보는 드라이버가 있다',
     fs.existsSync(new URL('../verify/verify-sheet-back.js', import.meta.url)), true);
   {
-    const ui = fs.readFileSync(new URL('../.github/workflows/verify-ui.yml', import.meta.url), 'utf8');
+    const ui = readText(new URL('../.github/workflows/verify-ui.yml', import.meta.url));
     eq('  그 드라이버가 CI 관문에 들어 있다', /verify-sheet-back\.js/.test(ui), true);
   }
 
@@ -3245,13 +3257,13 @@ console.log('\n■ 금액 상세 — 승인받은 화면 그대로인가 (2026-0
   eq('같은 학과가 두 번 와도 한 번', TF.buildByField([rows[0], rows[0], rows[1]])['가짜대학교']['인문사회'], 7000000);
 
   /* 앱이 실제로 읽는 이름과 같아야 한다 — 포털이 계열 이름을 바꾸면 앱은 조용히 학교 평균으로 되돌아간다 */
-  const PAsrc = fs.readFileSync(new URL('../parse-amount.js', import.meta.url), 'utf8');
+  const PAsrc = readText(new URL('../parse-amount.js', import.meta.url));
   const mapped = [...PAsrc.slice(PAsrc.indexOf('var TRACK_TO_FIELD')).slice(0, 400).matchAll(/'([^']+)'/g)].map((m) => m[1]);
   eq('KNOWN_TRACKS 가 parse-amount 의 TRACK_TO_FIELD 와 같은 이름을 쓴다',
     TF.KNOWN_TRACKS.every((t) => mapped.includes(t)), true);
 
   /* 쪽 넘김을 `paging` 으로 되돌리면 1쪽만 영원히 긁는다 (실측으로 확인한 함정) */
-  const src = fs.readFileSync(new URL('../collector/fetch-tuition-field.mjs', import.meta.url), 'utf8');
+  const src = readText(new URL('../collector/fetch-tuition-field.mjs', import.meta.url));
   eq('쪽 넘김 파라미터는 no 다', /no: String\(no\)/.test(src), true);
   eq('학과명은 LIKE 와일드카드', /dptNm: '%'/.test(src), true);
   /* 대학원이 섞이면 학기액이 연간액 자리에 들어간다 */
@@ -3294,7 +3306,7 @@ console.log('\n■ 금액 상세 — 승인받은 화면 그대로인가 (2026-0
   eq('신청 일정도 자격이 아니다', where('8월 20일부터 온라인 신청 가능'), '버림');
 
   /* 두 곳이 같은 잣대를 쓰는지 — 베껴 두면 한쪽만 고쳐져 갈라진다 */
-  const meSrc = fs.readFileSync(new URL('../match-engine.js', import.meta.url), 'utf8');
+  const meSrc = readText(new URL('../match-engine.js', import.meta.url));
   eq('AFFIRM_ELIG 를 REQ_SIGNAL 과 ※ 관문이 함께 쓴다',
     /AFFIRM_ELIG\.source/.test(meSrc) && /asideProven = EXCLUDE_LINE\.test\(t\) \|\| AFFIRM_ELIG\.test\(t\)/.test(meSrc), true);
   /* ⚠️ 버리는 것은 ※ 뿐이다 — `*` 까지 버리면 멀쩡한 요건이 같이 죽는다(실제로 그랬다) */
@@ -3330,8 +3342,8 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
 {
   const strip = (t) => t.replace(/\/\*[\s\S]*?\*\//g, '');
   const sec = (src, head) => strip(src.slice(src.indexOf(head)).split(/\n[}\]];/)[0]);
-  const dataSrc = fs.readFileSync(new URL('../data.js', import.meta.url), 'utf8');
-  const majorsSrc = fs.readFileSync(new URL('../collector/majors.mjs', import.meta.url), 'utf8');
+  const dataSrc = readText(new URL('../data.js', import.meta.url));
+  const majorsSrc = readText(new URL('../collector/majors.mjs', import.meta.url));
   const unis = new Set([...sec(dataSrc, 'const UNIVERSITIES = [').matchAll(/'([^']+)'/g)].map((m) => m[1]));
   const targets = [...sec(majorsSrc, 'const BRANCH_MAP = {').matchAll(/:\s*'([^']+)'/g)].map((m) => m[1]);
 
@@ -3350,8 +3362,8 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
    자격만 받아 와서 같은 그림을 금액 때문에 또 읽어야 했다. */
 {
   const AI = await import('../collector/eligibility-ai.mjs').catch(() => null);
-  const src = fs.readFileSync(new URL('../collector/eligibility-ai.mjs', import.meta.url), 'utf8');
-  const ex = fs.readFileSync(new URL('../collector/extract-amounts.mjs', import.meta.url), 'utf8');
+  const src = readText(new URL('../collector/eligibility-ai.mjs', import.meta.url));
+  const ex = readText(new URL('../collector/extract-amounts.mjs', import.meta.url));
   console.log('\n■ 첨부 한 번 읽어 자격·금액 함께 (2026-08-28)');
 
   eq('그림·PDF 응답 스키마에 금액 줄이 있다', /amountLines: \{ type: 'array'/.test(src), true);
@@ -3364,7 +3376,7 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
   eq('미리보기가 첨부 대상 수를 보여 준다', /첨부로 읽을 수 있는 공고/.test(src), true);
   /* 🔴 기본은 꺼져 있어야 한다 — 되돌아가면 수집 로봇이 매 실행 돈을 쓴다 */
   {
-    const cfg = JSON.parse(fs.readFileSync(new URL('../collector/eligibility-ai-config.json', import.meta.url), 'utf8'));
+    const cfg = JSON.parse(readText(new URL('../collector/eligibility-ai-config.json', import.meta.url)));
     eq('AI 자격 읽기는 기본이 꺼짐', cfg.enabled, false);
   }
 
@@ -3401,14 +3413,14 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
         `data-step="N"` 으로 **마지막 단계**를 짚는 것이 금지다 — 중간 단계를 채우는
         용도(0,1,2)는 그 단계에 입력 칸이 있어 어쩔 수 없다. */
   const lastStepUsers = names.filter((f) => {
-    const src = fs.readFileSync(new URL(f, dir), 'utf8');
+    const src = readText(new URL(f, dir));
     return /data-step="[3-9]"\]\s*\[data-next\]/.test(src);
   });
   eq('마지막 온보딩 단계를 번호로 짚는 드라이버가 없다', lastStepUsers, []);
 
   /* ② 브라우저 경로를 박으면 개발자 맥에서 통째로 못 돈다(그 경로는 리눅스 샌드박스용) */
   const hardPath = names.filter((f) => {
-    const src = fs.readFileSync(new URL(f, dir), 'utf8');
+    const src = readText(new URL(f, dir));
     return /=\s*'\/opt\/pw-browsers/.test(src) || /executablePath:\s*'\/opt\/pw-browsers/.test(src);
   });
   eq('브라우저 경로를 박은 드라이버가 없다 (CHROME_PATH 를 먼저 본다)', hardPath, []);
@@ -3420,7 +3432,7 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
      정작 내가 고친 app.js 는 한 번도 실행되지 않았다 — 통과가 거짓이 된다.
      경로 박기·단계 번호 박기와 같은 계열이라 여기에 함께 둔다. */
   const hardPort = names.filter((f) => {
-    const src = fs.readFileSync(new URL(f, dir), 'utf8');
+    const src = readText(new URL(f, dir));
     return /goto\(\s*['"]http:\/\/localhost:\d+/.test(src);
   });
   eq('서버 포트를 박은 드라이버가 없다 (PORT 를 먼저 본다)', hardPort, []);
@@ -3437,15 +3449,15 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
         없어 이미 안전하고, 관문을 붙이면 오히려 없는 포트를 확인하다 죽는다. */
   const SELF_SERVED = ['verify-admin.js', 'verify-supabase.js', 'verify-push-client.js'];
   const browserDrivers = names.filter((f) => {
-    const src = fs.readFileSync(new URL(f, dir), 'utf8');
+    const src = readText(new URL(f, dir));
     return /require\('playwright-core'\)/.test(src) && !SELF_SERVED.includes(f);
   });
   const noGuard = browserDrivers.filter((f) =>
-    !/assertOwnServer\s*\(/.test(fs.readFileSync(new URL(f, dir), 'utf8')));
+    !/assertOwnServer\s*\(/.test(readText(new URL(f, dir))));
   eq(`브라우저 드라이버가 전부 서버를 확인한다 (${browserDrivers.length}개)`, noGuard, []);
   /* 예외로 적어 둔 이름이 실제로 자기 서버를 띄우는지도 본다 — 이유 없이 빠져나가지 못하게 */
   const fakeExempt = SELF_SERVED.filter((f) => {
-    try { return !/createServer/.test(fs.readFileSync(new URL(f, dir), 'utf8')); }
+    try { return !/createServer/.test(readText(new URL(f, dir))); }
     catch { return true; }   // 파일이 없어졌으면 목록에서 빼야 한다
   });
   eq('  예외 목록이 전부 자기 서버를 띄우는 드라이버다', fakeExempt, []);
@@ -3457,7 +3469,7 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
      빈 화면을 본다. 안내문으로는 안 막히므로 여기서 대조한다.
      (학교를 늘리거나 줄일 때는 두 파일을 같이 고치면 된다 — 이 검사가 알려 준다.) */
   const served = createRequire(import.meta.url)('../match-engine.js').SERVED_SCHOOLS;
-  const active = JSON.parse(fs.readFileSync(new URL('../collector/schools.json', import.meta.url), 'utf8'))
+  const active = JSON.parse(readText(new URL('../collector/schools.json', import.meta.url)))
     .schools.map((x) => x.school);
   eq('화면이 보여 주는 학교 = 로봇이 수집하는 학교',
      [...served].sort(), [...new Set(active)].sort());
@@ -3465,13 +3477,13 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
   /* ③ 사람이 미리 준비해야 하는 검사는 언젠가 반드시 안 돌아간다.
         verify-forms-data 가 "더미 양식이 주입된 앱 복사본이 서빙 중이어야 함"을 요구해
         돌리는 족족 실패했다 — 이제 드라이버가 스스로 주입한다. */
-  const fd = fs.readFileSync(new URL('verify-forms-data.js', dir), 'utf8');
+  const fd = readText(new URL('verify-forms-data.js', dir));
   eq('forms-data 가 픽스처를 스스로 주입한다', /page\.route\('\*\*\/data\/forms\.json'/.test(fd), true);
   eq('  살아 있는 데이터에 픽스처가 남아 있기를 기대하지 않는다',
     /registeredList\.find\(\(s\) => s\.formId === 'test-dummy'\)/.test(fd), false);
 
   /* ④ 배지와 정렬이 같은 근거를 쓴다 — 갈라지면 '적합도 33%' 카드가 미달 카드 사이에 앉는다 */
-  const app2 = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+  const app2 = readText(new URL('../app.js', import.meta.url));
   eq('미달 판정이 한 곳(fitVerdict)에 있다', /function fitVerdict\(/.test(app2), true);
   eq('배지가 그 한 곳을 쓴다', /const verdict = fitVerdict\(fit, fd\)/.test(app2), true);
   eq('정렬도 그 한 곳을 쓴다', /fitRank\(a\) - fitRank\(b\)/.test(app2), true);
@@ -3508,7 +3520,7 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
   eq('자격 줄이 없으면 미달이 아니다', ME3.evaluate(sch([]), who()).status !== 'ineligible', true);
 
   /* 판정과 배지가 같은 근거를 쓰는지 — 갈라지면 화면이 스스로 모순된다 */
-  const src3 = fs.readFileSync(new URL('../match-engine.js', import.meta.url), 'utf8');
+  const src3 = readText(new URL('../match-engine.js', import.meta.url));
   eq('판정이 fitDetail 의 fails 를 쓴다', /fitDetail\(sch, p\)\.fails/.test(src3), true);
 }
 
@@ -3532,7 +3544,7 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
   };
 
   /* 🔴 **실제로 돌려서** 앱과 같은 답을 내는지 본다 — 글자만 훑으면 빈 파일도 통과한다 */
-  const reg2 = JSON.parse(fs.readFileSync(new URL('../data/registered.json', import.meta.url), 'utf8'));
+  const reg2 = JSON.parse(readText(new URL('../data/registered.json', import.meta.url)));
   const ME4 = createRequire(import.meta.url)('../match-engine.js');
   /* 목록(상한 5)과 상세(전부)의 줄 수가 **다른** 공고를 골라야 그날의 실수를 재현 검사할 수 있다 */
   const target = reg2.items.find((x) =>
@@ -3552,7 +3564,7 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
   /* app.js 에서 함수 한 덩어리를 **이름으로** 떼어 온다 — 베낀 사본이 아니라 진짜 코드다.
    (같은 방식이 위 '마감 판정' 절에도 있다. 규칙을 두 벌 두지 않으려고 여기서도 이걸 쓴다) */
   const grabApp = (name) => {
-    const src = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+    const src = readText(new URL('../app.js', import.meta.url));
     const start = src.indexOf(`function ${name}(`);
     if (start < 0) throw new Error(`app.js 에서 ${name} 을 못 찾음`);
     let depth = 0, seen = false;
@@ -3589,7 +3601,7 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
   }
 
   /* 배지 문구를 손으로 옮겨 적으면 갈라진다 — 앱 함수를 가져다 쓰는지 소스로도 못 박는다 */
-  const ws = fs.readFileSync(new URL('../verify/what-shows.mjs', import.meta.url), 'utf8');
+  const ws = readText(new URL('../verify/what-shows.mjs', import.meta.url));
   eq('앱 함수를 이름으로 떼어 온다 (사이를 잘라 오지 않는다)', /function takeFn\(name\)/.test(ws), true);
   eq('  배지는 앱의 fitBadgeHtml 이 낸 것을 쓴다', /fitBadgeHtml/.test(ws) && !/지원 자격 미달'/.test(ws), true);
   /* 🔴 주석을 걷어내고 본다 (2026-08-31 규명). 예전에는 `/d\.days >= 0/` 를 파일 전체에서
@@ -3615,7 +3627,7 @@ console.log('\n■ 적합도 상수 — 감사가 match-engine 과 같은 뜻을
 {
   const req = createRequire(import.meta.url);
   const M = req('../match-engine.js');
-  const src = fs.readFileSync(new URL('../verify/eligibility-report.mjs', import.meta.url), 'utf8');
+  const src = readText(new URL('../verify/eligibility-report.mjs', import.meta.url));
 
   /* 상수가 실제로 그 뜻인지부터 — 여기가 바뀌면 아래 검사도 같이 바뀌어야 한다 */
   eq('미달 확정 점수는 0이 아니다 (FIT_MIN)', M.FIT_MIN > 0, true);
@@ -3636,7 +3648,7 @@ console.log('\n■ 적합도 상수 — 감사가 match-engine 과 같은 뜻을
     .replace(/(^|[^:])\/\/[^\n]*/g, '$1')  // 한 줄 주석 (URL 의 // 는 남긴다)
     .replace(/`[^`]*`/g, ' ');             // 템플릿 문자열
   const hard = readers.flatMap((f) => {
-    const t = codeOnly(fs.readFileSync(new URL(`../verify/${f}`, import.meta.url), 'utf8'));
+    const t = codeOnly(readText(new URL(`../verify/${f}`, import.meta.url)));
     return (t.match(/\.pct\s*(===|!==|>=|<=|>|<)\s*\d+/g) || []).map((m) => `${f}: ${m}`);
   });
   eq('적합도를 읽는 도구가 점수를 숫자와 직접 비교하지 않는다', hard.join(' · '), '');
@@ -3644,7 +3656,7 @@ console.log('\n■ 적합도 상수 — 감사가 match-engine 과 같은 뜻을
      (8/26 이후 fit-report 는 '0% 0건'만 답했다. 안 세는 검사는 통과해도 무의미하다) */
   eq('미달을 fails 로 센다 (점수로 세면 상수가 바뀔 때 0건이 된다)',
      /!r\.f\.unread && r\.f\.fails\.length/.test(
-       fs.readFileSync(new URL('../verify/fit-report.mjs', import.meta.url), 'utf8')), true);
+       readText(new URL('../verify/fit-report.mjs', import.meta.url))), true);
 
   /* 확정 미달은 ✕가 있는 것이 **정상**이다 — 그걸 모순이라 부르면 안 된다 */
   const 미달 = M.fitDetail(
@@ -3660,9 +3672,99 @@ console.log('\n■ 적합도 상수 — 감사가 match-engine 과 같은 뜻을
 console.log('\n■ 화면 말투·토큰 관문이 살아 있는가');
 {
   eq('verify/ui-tone.mjs 가 있다', fs.existsSync(new URL('../verify/ui-tone.mjs', import.meta.url)), true);
-  const wf = fs.readFileSync(new URL('../.github/workflows/verify-ui.yml', import.meta.url), 'utf8');
+  const wf = readText(new URL('../.github/workflows/verify-ui.yml', import.meta.url));
   eq('워크플로가 그것을 실제로 돌린다', /node verify\/ui-tone\.mjs/.test(wf), true);
   eq('style.css 가 바뀔 때도 돈다', /- 'style\.css'/.test(wf), true);
+}
+
+console.log('\n■ 로봇이 조용히 죽지 않는다 (2026-09-06)');
+/* 🔴 이 절이 잡는 사고 셋 — 공통점은 **오류가 하나도 안 난다**는 것이다.
+   ① browser-collect 가 브라우저로 그린 본문을 저장하는 줄에서 선언 없는 이름(`today`)을 써서,
+      2026-08-20 에 그 줄을 넣은 뒤 **한 번도 성공한 적이 없었다** (browser-bodies.json 68건이
+      전부 rescue 가 넣은 것). 게다가 catch 가 학교 단위라 그 학교의 남은 공고까지 함께 날아갔고,
+      리포트는 '학교 서버가 응답하지 않아'라고 **틀린 원인**을 적었다.
+   ② collect 가 학교별 파일을 '새로 주운 것'만으로 발행하면, 링크 사냥꾼·주소 복구가 고친 주소가
+      영영 앱에 안 닿는다 — 그 둘은 publishBySchool 을 부르지 않는다(주소만 고친다).
+   ③ 예약 로봇이 시한 없이 매달리거나(기본 6시간) 넘어져도 알림이 없으면 아무도 모른다.
+   ⚠️ ①은 일반적인 '선언 없는 변수' 검사로는 못 잡는다 — 위 undeclaredNames 는 대문자 상수만 본다.
+      소문자까지 넓히려면 스코프 분석(=린터)이 필요하고, 틀린 빨간불은 다음 사람이 검사를 끄게
+      만든다. 그래서 이 저장소 방식대로 **표적 회귀**로 못 박는다. */
+{
+  const bc = readText(new URL('../collector/browser-collect.mjs', import.meta.url));
+  eq('브라우저가 그린 본문을 저장한다 (뽑고 버리지 않는다)', bc.includes('bodies[it.url] = {'), true);
+  eq('  그 줄의 날짜가 선언된 이름이다 (todayStr)', bc.includes('at: todayStr'), true);
+  eq('  선언되지 않은 today 를 쓰지 않는다', bc.includes('at: today,'), false);
+
+  const cl = readText(new URL('../collector/collect.mjs', import.meta.url));
+  eq('학교별 파일은 전체 목록으로 발행한다 (freshAll 이 아니다)',
+    cl.includes('publishBySchool(beforeCap)'), true);
+
+  /* 예약으로 도는 로봇은 전부 ⓐ시한 ⓑ실행 알림을 갖는다.
+     ⓑ는 failure() 와 cancelled() **둘 다** 봐야 한다 — 시간 초과는 '실패'가 아니라 '취소'라
+     failure() 만 쓰면 알림 단계가 통째로 건너뛰어진다 (2026-08-04 수집 로봇 사고). */
+  const wfDir = new URL('../.github/workflows/', import.meta.url);
+  const noTimeout = [], noAlert = [];
+  for (const f of fs.readdirSync(wfDir).filter((n) => n.endsWith('.yml')).sort()) {
+    const raw = readText(new URL(f, wfDir));
+    const code = raw.split(/\r?\n/).filter((l) => !/^\s*#/.test(l)).join('\n');
+    if (!/^\s*- cron:/m.test(code)) continue;      // 예약이 없으면 이 절의 대상이 아니다
+    if (!code.includes('timeout-minutes:')) noTimeout.push(f);
+    if (!code.includes('failure()') || !code.includes('cancelled()')) noAlert.push(f);
+  }
+  eq('예약 로봇은 모두 시한(timeout-minutes)을 갖는다', noTimeout, []);
+  eq('예약 로봇은 모두 failure() 와 cancelled() 를 함께 본다', noAlert, []);
+
+  /* 두 번째 겹 — '아예 안 돈 것'은 위 두 항목으로 못 잡는다(실행 기록 자체가 없다).
+     GitHub 은 예약을 실제로 거른다(2026-07-06 완전 누락). 하트비트가 그 자리를 맡는다. */
+  eq('하트비트 로봇이 있다', fs.existsSync(new URL('robot-heartbeat.yml', wfDir)), true);
+}
+
+console.log('\n■ 하트비트 간격 계산 (브라우저·인터넷 불필요)');
+{
+  eq('하루 2회면 12시간 간격', hoursFor(['41 22 * * *', '41 2 * * *']), 12);
+  eq('하루 1회면 24시간', hoursFor(['23 5 * * *']), 24);
+  eq('요일이 지정되면 주 1회로 본다', hoursFor(['13 20 * * 1']), 168);
+  eq('예약이 없으면 판정하지 않는다', hoursFor([]), null);
+  /* 주석에 적힌 cron 은 세지 않는다 — 세면 간격이 짧아져 헛알림이 난다 */
+  eq('주석의 cron 은 안 센다',
+    cronsOf("#    - cron: '2 3 * * *'\n    - cron: '4 5 * * *'"), ['4 5 * * *']);
+  const now = Date.parse('2026-09-06T00:00:00Z');
+  eq('간격의 3배를 넘으면 조용한 것', isStale(24, '2026-09-01T00:00:00Z', now), true);
+  eq('  3배 안이면 정상 (GitHub 이 몇 시간 미루는 건 정상이다)',
+    isStale(24, '2026-09-04T12:00:00Z', now), false);
+  eq('  성공 기록이 아예 없으면 조용한 것', isStale(24, null, now), true);
+}
+
+console.log('\n■ 검사가 개발자 컴퓨터에서만 실패하지 않는다 (2026-09-06)');
+/* 🔴 이 저장소는 같은 함정에 세 번 빠졌다. 셋 다 **리눅스(클라우드)에서는 멀쩡하고
+   윈도우에서만 죽는다** — 그래서 로봇은 초록불인데 개발자 화면만 늘 빨간불이었다.
+     ① URL.pathname 을 경로로 씀 → `/C:/…` 는 유효한 경로가 아니다 (검사 5건, 2026-09-05 수리)
+     ② import() 에 파일 경로를 넘김 → ESM 로더가 `c:` 를 프로토콜로 읽는다
+        (verify-push-server 74항목이 **한 번도 안 돌았다**, 2026-09-06 수리)
+     ③ 파일을 읽고 LF(`\n`)를 글자 그대로 찾음 → 디스크에는 CRLF 다 (검사 4건, 2026-09-06 수리)
+   🔴 늘 켜져 있는 빨간불은 신호가 아니다. 진짜 실패가 5건째로 섞여도 눈에 안 띈다. */
+{
+  const vDir = new URL('../verify/', import.meta.url);
+  const files = fs.readdirSync(vDir).filter((n) => /\.(mjs|cjs|js)$/.test(n));
+  const badImport = [], badPath = [];
+  for (const f of files) {
+    const src = readText(new URL(f, vDir));
+    /* import(…) 에 경로를 그대로 넘기면 윈도우에서 죽는다 — pathToFileURL 로 감싸야 한다 */
+    for (const m of src.matchAll(/import\(([^)]*)\)/g)) {
+      const arg = m[1];
+      if (/path\.join|__dirname|ROOT/.test(arg) && !/pathToFileURL/.test(arg)) badImport.push(f);
+    }
+    /* .pathname 을 파일 경로로 쓰면 윈도우에서 `/C:/…` 가 된다 */
+    if (/\)\.pathname/.test(src) && !/\/\* *윈도우/.test(src)) badPath.push(f);
+  }
+  eq('import() 에 경로를 그대로 넘기지 않는다 (pathToFileURL)', [...new Set(badImport)], []);
+  eq('URL.pathname 을 파일 경로로 쓰지 않는다 (fileURLToPath)', [...new Set(badPath)], []);
+
+  /* 이 파일 자신도 우회하지 않는다 — 읽는 자리는 readText 하나여야 한다 */
+  const self = readText(new URL('test-collector.mjs', vDir));
+  eq('이 검사는 파일을 readText 로만 읽는다 (줄바꿈 통일)',
+    // 바늘을 쪼개 넣는다 — 통째로 적으면 이 줄 자신이 걸려 영영 2가 된다
+    self.split("fs.read" + "FileSync(").length - 1, 1);   // readText 정의 안의 1회뿐
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
