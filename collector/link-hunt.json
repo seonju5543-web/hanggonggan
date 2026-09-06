@@ -3725,6 +3725,70 @@
   "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322915": {
    "patrolledAt": "2026-09-06",
    "lastWhy": ""
+  },
+  "n:https://dep.hufs.ac.kr/bbs/student/2431/264146/artclView.do": {
+   "patrolledAt": "2026-09-06",
+   "lastWhy": ""
+  },
+  "n:https://dep.hufs.ac.kr/bbs/student/2431/263952/artclView.do": {
+   "patrolledAt": "2026-09-06",
+   "lastWhy": ""
+  },
+  "n:https://dep.hufs.ac.kr/bbs/student/2431/263956/artclView.do": {
+   "patrolledAt": "2026-09-06",
+   "lastWhy": ""
+  },
+  "r:reg-hufs-yuheungsu": {
+   "patrolledAt": "2026-09-06",
+   "lastWhy": "제목 불일치(다른 글이 열림)"
+  },
+  "r:reg-hufs-myeonhak": {
+   "patrolledAt": "2026-09-06",
+   "lastWhy": "제목 불일치(다른 글이 열림)"
+  },
+  "r:reg-hufs-seed": {
+   "patrolledAt": "2026-09-06",
+   "lastWhy": "제목 불일치(다른 글이 열림)"
+  },
+  "r:reg-hufs-ambassador": {
+   "patrolledAt": "2026-09-06",
+   "lastWhy": "제목 불일치(다른 글이 열림)"
+  },
+  "r:reg-kosaf-daecheonggyo": {
+   "patrolledAt": "2026-09-06",
+   "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)"
+  },
+  "r:reg-hufs-alumni": {
+   "patrolledAt": "2026-09-06",
+   "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)"
+  },
+  "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322894": {
+   "patrolledAt": "2026-09-06",
+   "lastWhy": ""
+  },
+  "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322893": {
+   "patrolledAt": "2026-09-06",
+   "lastWhy": ""
+  },
+  "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322875": {
+   "patrolledAt": "2026-09-06",
+   "lastWhy": ""
+  },
+  "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322874": {
+   "patrolledAt": "2026-09-06",
+   "lastWhy": ""
+  },
+  "r:reg-khu-uiam": {
+   "patrolledAt": "2026-09-06",
+   "lastWhy": "제목 불일치(다른 글이 열림)"
+  },
+  "r:reg-hi-jeongeup": {
+   "patrolledAt": "2026-09-06",
+   "lastWhy": "제목 불일치(다른 글이 열림)"
+  },
+  "r:reg-khu-intern": {
+   "patrolledAt": "2026-09-06",
+   "lastWhy": "제목 불일치(다른 글이 열림)"
   }
  }
 }
