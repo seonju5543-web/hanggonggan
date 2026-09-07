@@ -2438,7 +2438,7 @@
    "nextTryAt": "2026-08-21",
    "status": "resolved",
    "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322949",
-   "patrolledAt": "2026-09-06"
+   "patrolledAt": "2026-09-07"
   },
   "r:reg-cau-samil": {
    "attempts": 0,
@@ -3482,7 +3482,7 @@
    "lastWhy": "",
    "status": "resolved",
    "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322953",
-   "patrolledAt": "2026-09-06"
+   "patrolledAt": "2026-09-07"
   },
   "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%20%5B%EA%B3%B5%ED%86%B5%5D%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EC%9A%B0%EC%A0%95%EC%9E%A5%ED%95%99(%ED%95%99%EC%97%85%EC%9E%A5%EB%A0%A4%EA%B8%88)%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4": {
    "attempts": 0,
@@ -3915,23 +3915,31 @@
    "lastWhy": ""
   },
   "r:auto-ent2431263952artclviewdo": {
-   "patrolledAt": "2026-09-06",
+   "patrolledAt": "2026-09-07",
    "lastWhy": ""
   },
   "r:auto-ent2431263956artclviewdo": {
-   "patrolledAt": "2026-09-06",
+   "patrolledAt": "2026-09-07",
    "lastWhy": ""
   },
   "r:auto-ent2431264952artclviewdo": {
-   "patrolledAt": "2026-09-06",
+   "patrolledAt": "2026-09-07",
    "lastWhy": ""
   },
   "r:auto-oardid322850menuno200318": {
-   "patrolledAt": "2026-09-06",
+   "patrolledAt": "2026-09-07",
    "lastWhy": ""
   },
   "r:auto-oardid321881menuno200318": {
-   "patrolledAt": "2026-09-06",
+   "patrolledAt": "2026-09-07",
+   "lastWhy": ""
+  },
+  "n:https://dep.hufs.ac.kr/bbs/student/2431/265695/artclView.do": {
+   "patrolledAt": "2026-09-07",
+   "lastWhy": ""
+  },
+  "n:https://dep.hufs.ac.kr/bbs/student/2431/265667/artclView.do": {
+   "patrolledAt": "2026-09-07",
    "lastWhy": ""
   }
  }
