@@ -1,8 +1,40 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-09-07",
- "count": 2121,
+ "count": 2123,
  "items": [
+  {
+   "title": "[공통][교외]2026년도 (재)포항시장학회 장학생 선발공고",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/265667/artclView.do",
+   "attachments": [
+    {
+     "name": "(재)포항시장학회 2026년도 대학교 장학생 선발 계획.pdf",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150136/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-09-07"
+  },
+  {
+   "title": "[공통][교외] 미래에셋박현주재단 제36기 미래에셋 해외교환 장학생 선발 안내",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/265695/artclView.do",
+   "attachments": [
+    {
+     "name": "붙임1.(공고) 제36기 미래에셋 해외교환 장학생 선발 요강.pdf",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150148/download.do"
+    },
+    {
+     "name": "붙임2.(별첨) 부모 명의 개인정보 제공 및 활용 동의서.pdf",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150149/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-09-07"
+  },
   {
    "title": "[서울][국가근로] 2026학년도 2학기 국가근로장학생 모집 안내(추가)",
    "url": "https://dep.hufs.ac.kr/bbs/student/2431/265468/artclView.do",
