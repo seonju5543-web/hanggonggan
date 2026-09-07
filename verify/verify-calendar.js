@@ -114,7 +114,13 @@ async function seed(page, saved, applied = []) {
     const ym = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}`;
     const now = allScholarships().find((s) => s.deadline && s.deadline.startsWith(ym) && dday(s.deadline).days >= 0);
     const gone = allScholarships().filter((s) => s.deadline && dday(s.deadline).days < 0);
+    /* 🔴 **마감이 코앞인 공고를 반드시 하나 담는다.** 없으면 '점은 두 가지뿐' 검사가
+       잴 것이 없어 조용히 통과한다 — 실제로 그래서 빨간 점을 되살려도 초록불이었다
+       (2026-09-07 red-green 확인에서 잡았다). */
+    const soon = allScholarships().find((s) => s.deadline
+      && dday(s.deadline).days >= 0 && dday(s.deadline).days <= 3);
     return { now: now ? now.id : null, nowDate: now ? now.deadline : null,
+             soon: soon ? soon.id : null,
              past: gone[0] ? gone[0].id : null, past2: gone[1] ? gone[1].id : null };
   });
   if (!pick.now) {
@@ -122,7 +128,7 @@ async function seed(page, saved, applied = []) {
   }
 
   /* 마감이 지난 공고를 **신청분으로** 넣는다 — 발표를 기다리는 것은 신청한 공고뿐이다 */
-  await seed(page, [pick.now, pick.past2].filter(Boolean), [pick.past].filter(Boolean));
+  await seed(page, [pick.now, pick.soon, pick.past2].filter(Boolean), [pick.past].filter(Boolean));
   await page.click('.nav-item[data-nav="applications"]');
   await page.waitForTimeout(250);
 
@@ -142,6 +148,21 @@ async function seed(page, saved, applied = []) {
      따로 세우면 학생이 외워야 할 종류가 넷이 된다. */
   ok('범례는 두 종류다', await page.locator('.cal-legend > span').count() === 2,
     `${await page.locator('.cal-legend > span').count()}종`);
+
+  /* 🔴 격자에 찍히는 점도 **두 가지뿐**이어야 한다 — 마감(●) · 발표 대기(◐).
+     접수 시작과 마감 임박(빨강)을 차례로 뺐다(2026-09-07 개발자 지시). 범례만 줄이고
+     점을 그대로 두면 학생은 범례에 없는 점을 보게 된다. */
+  const kinds = await page.$$eval('.cal-grid .cal-dot', (els) => [...new Set(
+    els.flatMap((e) => [...e.classList].filter((c) => c.startsWith('cal-dot-'))))].sort());
+  /* ⚠️ **점이 하나도 없으면 이 검사는 아무것도 재지 않는다**(빈 배열은 every 가 늘 참이다).
+     그래서 '적어도 한 종류는 있어야 한다'를 함께 요구한다 — 안 그러면 달력이 통째로
+     비어도 초록불이다(이 저장소가 여러 번 겪은 '조용히 무력해진 검사'). */
+  ok('격자의 점은 마감·발표 두 가지뿐이다',
+    kinds.length > 0 && kinds.every((k) => k === 'cal-dot-mine' || k === 'cal-dot-wait'),
+    kinds.length ? kinds.join(' ') : '점이 하나도 없다');
+  /* 잴 거리가 실제로 있었는지 함께 밝힌다 — 없으면 위 검사는 아무 말도 안 한 것이다 */
+  ok('마감 임박 공고를 담은 채로 쟀다', !!pick.soon,
+    '이번 달에 D-3 이내 공고가 없어 위 검사가 헐거워졌다');
 
   if (pick.now) {
     /* ② 저장한 공고가 점으로 찍힌다 */

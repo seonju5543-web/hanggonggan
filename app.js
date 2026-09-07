@@ -2706,9 +2706,11 @@ function calAwaiting(id) {
   return !!app && !app.result;
 }
 
-/* 점의 종류. 🔴 **색만으로 가르지 않는다** — 모양이 먼저다(색각 이상이 있는 학생에게
-   색은 아무 말도 하지 않는다). 모양은 style.css 의 `.cal-dot-*` 이 그린다. */
-const CAL_SOON_DAYS = 3;   // 이 안에 마감하면 빨간 점
+/* 점의 종류는 **둘뿐**이다 — 채운 점(마감) · 반만 채운 점(발표 대기).
+   🔴 색만으로 가르지 않는다: 모양이 먼저다(색각 이상이 있는 학생에게 색은 아무 말도
+      하지 않는다). 모양은 style.css 의 `.cal-dot-*` 이 그린다. */
+/* 보관함이 '마감 임박 n건'을 셀 때 쓰는 기준. 달력은 이제 이것으로 색을 가르지 않는다. */
+const CAL_SOON_DAYS = 3;
 
 /** 한 달치 점을 모은다 → { 'YYYY-MM-DD': [{ kind, id }] }
     `mine` 을 받으면 목록을 다시 만들지 않는다(위 calContext 주석). */
@@ -2726,9 +2728,11 @@ function calMarks(monthStart, mine) {
       /* 마감이 지났는데 결과를 아직 기록하지 않았다 → **발표 대기**.
          🔴 흐리게 하거나 지우지 않는다(개발자 지시): 신청한 공고는 마감 뒤가 진짜
             시작이다 — 발표가 남아 있고 학생은 그걸 확인하러 온다. */
-      if (d.days < 0) put(sch.deadline, waiting ? 'wait' : 'mine', sch.id);
-      else if (d.days <= CAL_SOON_DAYS) put(sch.deadline, 'soon', sch.id);
-      else put(sch.deadline, 'mine', sch.id);
+      /* 🔴 마감 임박(D-3)을 **색으로 가르지 않는다** (2026-09-07 개발자 지시).
+         급한 공고는 홈에서 이미 확인할 수 있어, 달력에까지 두면 종류만 늘고
+         "이 빨강이 무슨 뜻이더라"를 학생이 한 번 더 생각하게 된다.
+         달력에 남는 뜻은 둘뿐이다 — 내야 하는 날, 결과를 기다리는 중. */
+      put(sch.deadline, (d.days < 0 && waiting) ? 'wait' : 'mine', sch.id);
     }
     /* 발표일은 **원문에서 읽은 공고만** 찍는다. 없으면 위의 '발표 대기'로만 말한다. */
     if (sch.announceDate && waiting) put(sch.announceDate, 'wait', sch.id);
@@ -2748,7 +2752,7 @@ function calOthersOn(iso, ctx) {
 }
 
 const CAL_DOW = ['일', '월', '화', '수', '목', '금', '토'];
-const CAL_KIND_ORDER = { soon: 0, wait: 1, mine: 2 };
+const CAL_KIND_ORDER = { wait: 0, mine: 1 };
 const CAL_DOTS_MAX = 3;
 
 function renderCalendar() {
@@ -2796,10 +2800,10 @@ function renderCalendar() {
     <div class="cal-dow">${CAL_DOW.map((w) => `<span>${w}</span>`).join('')}</div>
     <div class="cal-grid">${cells}</div>
     ${/* 🔴 범례는 **두 종류**다 (2026-09-07 개발자 지시: "간단하고 명확히").
-         임박(빨강)은 별개 종류가 아니라 **마감의 급함**이라 같은 줄에서 설명한다 —
-         따로 세우면 학생이 외워야 할 종류가 넷이 된다. */ ''}
+         접수 시작과 마감 임박을 차례로 뺐다 — 전자는 그날 할 일이 없고, 후자는
+         홈에서 이미 확인할 수 있다. 여기에 종류를 다시 늘리지 말 것. */ ''}
     <div class="cal-legend">
-      <span><i class="cal-dot cal-dot-mine"></i><i class="cal-dot cal-dot-soon"></i>마감 (${CAL_SOON_DAYS}일 이내는 빨강)</span>
+      <span><i class="cal-dot cal-dot-mine"></i>마감</span>
       <span><i class="cal-dot cal-dot-wait"></i>발표 대기</span>
     </div>
     <div id="cal-day" class="cal-day">${calPicked ? calDayHtml(calPicked) : ''}</div>`;

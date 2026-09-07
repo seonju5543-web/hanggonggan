@@ -3263,7 +3263,6 @@ button, input, select, textarea { letter-spacing: inherit; }
 /* 점 — 모양이 뜻을 지고 색은 거든다 */
 .cal-dot { width: 7px; height: 7px; border-radius: 50%; flex: none; display: inline-block; position: relative; }
 .cal-dot-mine { background: var(--accent); }                       /* ● 내 공고 마감 */
-.cal-dot-soon { background: var(--red); }                          /* ● 마감 임박 */
 /* ◐ 발표 대기 — 반만 채운 점.
    🔴 그라데이션으로 만들지 않는다(그라데이션은 --grad-navy 한 곳뿐이라는 규칙).
       테두리를 두르고 안쪽 절반만 덮는다. */
@@ -3280,7 +3279,6 @@ button, input, select, textarea { letter-spacing: inherit; }
   border-top: 1px solid var(--line);
 }
 .cal-legend span { display: flex; align-items: center; gap: 5px; font-size: var(--t-2xs); color: var(--text-sub); }
-.cal-legend .cal-dot + .cal-dot { margin-left: -2px; }   /* 한 줄에서 설명하는 두 점은 붙여 둔다 */
 
 /* ── 하루를 펼친 목록 ─────────────────────────────────────── */
 .cal-day:empty { display: none; }
