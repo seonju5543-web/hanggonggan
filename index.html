@@ -357,7 +357,12 @@
     <section id="screen-applications" class="screen" hidden>
       <header class="page-header apps-header">
         <h2>신청 내역</h2>
-        <button id="apps-select-toggle" class="btn-ghost btn-sm" hidden>선택</button>
+        <!-- 달력은 새 탭이 아니라 여기 토글이다 — 하단바 4칸이 이미 꽉 찼고,
+             달력은 결국 '내가 담은 것'의 다른 보기다 (2026-09-07 · 노션 UI-21). -->
+        <div class="apps-header-actions">
+          <button id="apps-view-toggle" class="btn-ghost btn-sm" aria-pressed="false">달력 보기</button>
+          <button id="apps-select-toggle" class="btn-ghost btn-sm" hidden>선택</button>
+        </div>
       </header>
       <div id="apps-summary" class="apps-summary"></div>
       <!-- 선택 모드 막대 — 여러 건을 한 번에 정리할 때만 나온다 -->
@@ -366,6 +371,8 @@
         <button id="apps-delete-selected" class="btn-danger btn-sm" disabled>삭제</button>
       </div>
       <div id="apps-list" class="card-list"></div>
+      <!-- 달력 — app.js renderCalendar()가 채운다 -->
+      <div id="apps-calendar" class="cal" hidden></div>
     </section>
 
     <!-- ============ MY ============ -->
@@ -375,6 +382,8 @@
       <div id="my-account" class="my-card" hidden></div>
       <div id="my-notify" class="my-card" hidden></div>
       <div id="my-wallet" class="my-card"></div>
+      <!-- 보관함 — 저장(북마크)한 공고. app.js renderSaved()가 채운다 (2026-09-07) -->
+      <div id="my-saved" class="my-card"></div>
       <!-- 서류 보관함 줄과 같은 꼴 — 왼쪽에 할 일, 오른쪽에 누를 것 (2026-08-31).
            🔴 id 는 그대로 둔다. app.js 가 이 이름으로 동작을 붙인다. -->
       <!-- 프로필 수정은 맨 위(수정하기 ›)에 이미 있어 여기서는 뺐다 (2026-08-31).

@@ -55,4 +55,27 @@ async function assertOwnServer(port, file = 'app.js') {
   }
 }
 
-module.exports = { nextUntil, assertOwnServer };
+/* ── ③ 알림 동의 시트를 치운다 (2026-09-07 신설) ──
+
+   🔴 이 시트는 온보딩이 끝나고 **2.9초 뒤에** 뜬다(app.js). 그래서 "온보딩 직후에 한 번
+      보고 없으면 넘어간다"는 방식은 안 된다 — 검사가 도는 **도중에** 뒤늦게 떠서 화면을
+      덮고, 그때부터 클릭이 전부 막힌다. 오류 문구는 늘
+      `<div id="notify-backdrop"> intercepts pointer events` 다.
+   🔴 이 유형은 **세 번째 재발**이다: verify-registered(14차) · verify-chat ·
+      그리고 2026-09-07 verify-source-links. 앞의 둘은 각자 제 파일 안에서 고쳤는데,
+      사본이 일곱 벌이 되는 바람에 **못 받은 드라이버가 남아 있었다.** 새 드라이버는
+      제 손으로 짜지 말고 이것을 부른다.
+   ⚠️ 시트가 안 뜨는 경우(이미 물어본 판)도 정상이라 기다림은 전부 조용히 넘긴다 —
+      여기서 던지면 멀쩡한 검사가 죽는다.
+
+   남은 일: 이미 제 사본을 가진 드라이버 일곱(chat·apps-manage·essay-ui·explore-sort·
+   registered·fit-badge·kosaf)은 아직 각자 것을 쓴다. 손볼 때 이쪽으로 옮길 것. */
+async function dismissNotify(page) {
+  await page.waitForSelector('#notify-sheet:not([hidden])', { timeout: 6000 }).catch(() => {});
+  const later = await page.$('#btn-nf-later');
+  if (later) await later.click().catch(() => {});
+  else await page.keyboard.press('Escape').catch(() => {});
+  await page.waitForSelector('#notify-sheet[hidden]', { timeout: 4000 }).catch(() => {});
+}
+
+module.exports = { nextUntil, assertOwnServer, dismissNotify };

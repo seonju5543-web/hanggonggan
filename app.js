@@ -18,6 +18,16 @@ function todayStart() {
 let state = {
   profile: null,          // 온보딩 결과
   applications: [],       // { id, appliedAt, step, docs?, pending? }
+  /* 저장(북마크)한 공고 — { id, savedAt } (2026-09-07 · 노션 UI-21).
+     🔴 `applications` 의 `pending` 과 **절대 합치지 말 것.** 뜻이 다르다:
+        · pending  = 신청을 시작했는데 서류 작성이 남았다
+        · saved    = 아직 신청할 생각은 없고 관심만 있다
+     한 칸에 넣으면 그 값을 읽는 곳이 한꺼번에 오염된다 — 홈의 예상 수혜액 합계에
+     관심만 둔 공고 금액이 섞이고, 진척도 4단계가 시작도 안 한 공고를 1단계로 세고,
+     알림이 신청도 안 한 공고를 재촉한다.
+     ⚠️ 이 목록은 **이 기기에만 남는다.** 서버(profiles 표)에는 profile·applications
+        칸만 있어 동기화되지 않는다 — 칸을 늘리려면 표부터 고쳐야 한다. */
+  saved: [],
   /* 민감정보(기초생활수급·장애 등)를 서버에 올려도 되는가 — 온보딩 Step 3에서 받는다.
      동의 안 하면 그 항목은 기기에만 남는다(supabase-client.js syncSafeProfile). */
   consent: { sensitive: false },
@@ -89,6 +99,7 @@ function loadState() {
     if (!raw) for (const k of LEGACY_KEYS) { raw = localStorage.getItem(k); if (raw) break; }
     if (raw) state = Object.assign(state, JSON.parse(raw));
     if (!state.consent) state.consent = { sensitive: false };   // 로그인 이전에 저장된 판
+    if (!Array.isArray(state.saved)) state.saved = [];          // 저장 기능 이전에 저장된 판
     if (state.profile) { migrateBranchCampus(state.profile); migrateFitFields(state.profile); }
   } catch (e) { /* 손상된 데이터는 무시 */ }
 }
@@ -170,6 +181,51 @@ function getMatches() {
        판정 규칙은 fitVerdict 한 곳 그대로다 — 여기서는 근거만 정직하게 넘긴다. */
     return { sch: s, result, fit: fitScore(s, result, p), fd: fitDetailFor(s, p) };
   });
+}
+
+/* ---------------- 공고 저장(북마크) ----------------
+   인스타그램처럼 공고를 찜해 두는 자리 (2026-09-07 개발자 지시 · 노션 UI-21).
+   신청과는 다른 일이다 — 저장은 "나중에 볼게"이고 신청은 "준비를 시작했다"이다.
+   그래서 저장분은 **홈의 예상 수혜액 합계에 넣지 않는다**(확인 안 한 것을 받을 수
+   있다고 더하지 않는다는 규칙과 같은 정신). 대신 보관함이 저장분 합계를 따로 낸다. */
+function isSaved(id) {
+  return state.saved.some((s) => s.id === id);
+}
+/** 저장/해제. 되돌리기를 붙여 잘못 누른 학생이 한 번에 복구할 수 있게 한다. */
+function toggleSave(id) {
+  const at = state.saved.findIndex((s) => s.id === id);
+  /* 🔴 **해제는 findSch 를 요구하지 않는다** (2026-09-07 코드 리뷰).
+     데이터에서 내려간 공고를 저장해 둔 학생은, 그것을 찾을 수 없다는 이유로
+     영영 지우지 못하게 된다. 없는 것을 새로 담는 것만 막으면 된다. */
+  if (at < 0 && !findSch(id)) return;
+  if (at >= 0) {
+    state.saved.splice(at, 1);
+    saveState();
+    toast('저장을 해제했어요', { label: '되돌리기', run: () => toggleSave(id) });
+  } else {
+    state.saved.push({ id, savedAt: nowStamp() });
+    saveState();
+    toast('보관함에 저장했어요', { label: '보관함', run: () => showScreen('my') });
+  }
+  refreshSaveViews(id);
+}
+/** 저장한 공고를 **최근 저장 순**으로. 못 찾는 것(데이터에서 내려간 공고)은 조용히 뺀다. */
+function savedScholarships() {
+  return state.saved.slice().reverse()
+    .map((s) => findSch(s.id))
+    .filter(Boolean);
+}
+/* 저장 상태가 바뀌면 지금 떠 있는 것만 다시 그린다 — 화면을 통째로 새로 그리면
+   스크롤이 맨 위로 튄다(일괄 준비 목록에서 겪은 것과 같은 유형). */
+function refreshSaveViews(id) {
+  $$(`[data-save="${CSS.escape(id)}"]`).forEach((b) => {
+    const on = isSaved(id);
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', String(on));
+    b.setAttribute('aria-label', on ? '저장 해제' : '공고 저장');
+  });
+  if (!$('#screen-my').hidden) renderSaved();
+  if (!$('#screen-applications').hidden && calMode) renderCalendar();
 }
 
 /* ---------------- 유틸 ---------------- */
@@ -779,6 +835,8 @@ function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
   const d = dday(sch.deadline);
   const applied = state.applications.some((a) => a.id === sch.id);
   return `
+    <div class="sch-card-wrap">
+    ${saveBtnHtml(sch.id)}
     <button class="sch-card" data-detail="${sch.id}">
       ${/* 🔴 적합도를 **맨 앞에 두고 한 줄로** 합쳤다 (2026-08-31 개발자 지시).
            2026-08-30 에 다른 줄로 갈라 뒀던 이유는 줄바꿈이 카드마다 달라 보여서였다.
@@ -799,6 +857,21 @@ function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
            `자격 미확인`인데 `지원 가능`이 함께 떴다. 학생은 '지원 가능'만 보고 들어갔다가
            자격이 안 맞으면 헛걸음한다 — 이 앱이 없애려는 바로 그 피로감이다.
            상세 시트에는 그대로 둔다(거기서는 마감·접수 상태를 함께 읽는다). */ ''}
+    </button>
+    </div>`;
+}
+
+/* 북마크 단추 — 카드·상세 시트가 **같은 함수**를 쓴다 (2026-09-07).
+   🔴 카드 **바깥**에 둔다. `.sch-card` 가 `<button>` 이라 그 안에 단추를 넣으면
+      단추 안의 단추가 되어(허용되지 않는 구조) 브라우저마다 다르게 깨진다.
+      감싸는 `.sch-card-wrap` 이 자리를 잡아 주고, 누름은 서로 안 겹친다. */
+function saveBtnHtml(id) {
+  const on = isSaved(id);
+  return `<button class="save-btn${on ? ' on' : ''}" data-save="${esc(id)}"
+      aria-pressed="${on}" aria-label="${on ? '저장 해제' : '공고 저장'}">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M6 3h12a1 1 0 0 1 1 1v16.2a.8.8 0 0 1-1.25.66L12 17.3l-5.75 3.56A.8.8 0 0 1 5 20.2V4a1 1 0 0 1 1-1z" />
+      </svg>
     </button>`;
 }
 
@@ -1438,7 +1511,11 @@ function kosafAmountLabel(spec, raw) {
 function kosafAsScholarships() {
   return kosafList
     /* 마감 판정을 파일에 굳히지 않는다 — 수확 로봇은 가끔 돌고 앱은 매일 열린다 */
-    .filter((i) => !i.due || dday(i.due).days >= -CLOSED_KEEP_DAYS)
+    /* 🔴 **저장한 공고는 마감이 지나도 남긴다** (2026-09-07). 여기서 떨어뜨리면
+       findSch 가 그 공고를 못 찾아 **보관함에서 통째로 사라지고** 상세도 안 열린다.
+       층1(registeredList)은 이 걸러내기가 없어 원래 남으므로, 층2만 맞춰 주는 것이다.
+       ⚠️ 목록에 되살아나지는 않는다 — 탐색·홈은 각자 dday 로 한 번 더 거른다. */
+    .filter((i) => !i.due || dday(i.due).days >= -CLOSED_KEEP_DAYS || isSaved(`kosaf-${i.code}`))
     .map((i) => {
       const f = i.fields || {};
       /* 한 칸에 여러 항목이 `○` 로 붙어 있다 — 재단이 쓴 대로 줄만 나눈다 */
@@ -1481,6 +1558,9 @@ function kosafAsScholarships() {
         sourceUrl: i.home || '',
         sourceKind: 'kosaf',
         ...(kosafClean(f['문의처']) ? { contact: kosafClean(f['문의처']) } : {}),
+        /* 층2 줄에 함께 보여 줄 **재단이 적어 둔 칸** (2026-09-07 캘린더).
+           자격 판정을 못 붙이는 대신 재단이 쓴 것을 그대로 옮긴다 — 해석하지 않는다. */
+        ...(kosafClean(f['선발인원']) ? { headcount: kosafClean(f['선발인원']) } : {}),
       };
     });
 }
@@ -2087,9 +2167,10 @@ function openDetail(id) {
            판정은 근거 옆이 제자리다 — 아래 '지원 자격' 머리로 내렸다.
            ⚠️ `{ full: true }` 는 공동작업자가 넣은 것 — 상세에서는 퍼센트·'확인 필요'까지
               다 보여 준다는 뜻이라 그대로 살린다(원칙 8-1). */ ''}
-      <div class="sch-top">
+      <div class="sch-top sheet-top">
         ${sch.program ? '<span class="badge badge-program">상시 제도</span>' : `<span class="badge badge-dday ${d.cls}">${d.label}</span>`}
         <span class="badge badge-kind">${esc((sch.type || '장학금') + (sch.auto ? ' · 검수 전' : ''))}</span>
+        ${saveBtnHtml(sch.id)}
       </div>
       ${/* 🔴 순서: 이름 → **금액** → 주관·접수 (2026-09-02 개발자 지시).
            학생이 카드를 열고 가장 먼저 찾는 것은 얼마를 받느냐다. 주관 기관은 제목에
@@ -2102,6 +2183,7 @@ function openDetail(id) {
       <h3 class="sheet-title">${esc(sch.name)}</h3>
       <p class="sheet-amount">${esc(sch.amount)}</p>
       <p class="sheet-provider">${esc(sch.provider)} · ${esc(sch.period)}</p>
+      ${scheduleRowHtml(sch)}
 
       <div class="sheet-verdict">
         <h4>지원 자격</h4>
@@ -2566,6 +2648,266 @@ function deleteApps(ids) {
    되살리려면 이 자리에 enableRowSwipe 를 다시 두는 것이 아니라, 먼저
    '안 보이는 것이 위를 덮지 않는 구조'부터 만들 것. */
 
+/* ============================================================
+   달력 보기 · 보관함 (2026-09-07 · 노션 UI-21)
+
+   설계 근거는 `docs/designs/calendar-and-save.md`. 요약하면 세 가지다:
+   ① **맞춤이 없으면 달력은 그릴 수가 없다.** 전체 공고를 다 찍으면 9월 11일 한 칸에
+      28건이 몰려 무너진다. 그래서 상시로 찍는 것은 **신청·저장한 공고뿐**이고,
+      나머지는 날짜를 눌렀을 때만 펼친다(개발자 지시 4번).
+   ② **층1과 층2를 섞지 않는다.** 그날 마감되는 28건 중 26건은 한국장학재단 목록이라
+      자격 판정이 없다. 한 목록에 쏟으면 학생이 그것도 앱이 추천한 것으로 읽는다.
+   ③ **없는 날짜를 지어내지 않는다.** 발표일은 원문에 있을 때만 찍고, 없으면
+      '발표 대기'라고 상태로만 말한다.
+   🔴 판정은 새로 만들지 않는다 — 마감은 `dday`, 자격은 `evaluateFor`·`fitDetailFor`
+      그대로다. 여기에 규칙을 한 벌 더 두면 달력과 알림이 다른 날을 말한다.
+   ============================================================ */
+
+let calMode = false;      // 신청 내역이 목록/달력 중 무엇을 보이는가
+let calCursor = null;     // 보고 있는 달 (그 달 1일 · null이면 이번 달)
+let calPicked = null;     // 눌러서 펼친 날짜 'YYYY-MM-DD'
+
+/* 🔴 `toISOString()` 을 쓰지 말 것 — 그것은 UTC라 한국 시간 아침에 **하루 전 날짜**가 된다.
+   달력은 날짜가 전부인 화면이라 하루가 밀리면 통째로 틀린다. */
+function isoOf(dt) {
+  return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+}
+function calMonthStart() {
+  if (calCursor) return calCursor;
+  const t = todayStart();
+  return new Date(t.getFullYear(), t.getMonth(), 1);
+}
+
+/* 🔴 **한 번 그릴 때 목록은 한 번만 만든다** (2026-09-07 코드 리뷰).
+   `findSch` 는 부를 때마다 `allScholarships()` 를 새로 만들고, 그 안에서 재단 112곳의
+   원문 칸을 매번 다시 읽는다. 달력 한 번에 그것이 160번 돌고 있었다.
+   그리는 함수들이 이 꾸러미를 만들어 **서로 넘겨 쓴다.** */
+function calContext() {
+  const all = allScholarships();
+  const byId = new Map(all.map((s) => [s.id, s]));
+  const ids = new Set();
+  state.applications.forEach((a) => ids.add(a.id));
+  state.saved.forEach((s) => ids.add(s.id));
+  const mine = [...ids].map((id) => byId.get(id)).filter(Boolean);
+  return { all, byId, mine };
+}
+/** 내 공고 = 신청한 것 + 저장한 것. 달력에 상시로 찍히는 것은 이것뿐이다. */
+function myCalendarScholarships() {
+  return calContext().mine;
+}
+
+/** 결과를 기다리는 중인가 — **신청한 공고만** 발표를 기다린다.
+    🔴 저장만 해 둔 공고를 '발표 대기'로 두면 안 된다 (2026-09-07 코드 리뷰).
+       신청한 적이 없으니 발표될 결과도 없는데, 마감이 지나는 순간 영영
+       '발표 대기'로 남아 보관함의 '이미 마감된 저장 공고'와 서로 다른 말을 한다.
+    결과를 기록하면(선정/미선정) 기다림이 끝난다 — 개발자 지시 4-4 재검토 그대로. */
+function calAwaiting(id) {
+  const app = state.applications.find((a) => a.id === id);
+  return !!app && !app.result;
+}
+
+/* 점의 종류. 🔴 **색만으로 가르지 않는다** — 모양이 먼저다(색각 이상이 있는 학생에게
+   색은 아무 말도 하지 않는다). 모양은 style.css 의 `.cal-dot-*` 이 그린다. */
+const CAL_SOON_DAYS = 3;   // 이 안에 마감하면 빨간 점
+
+/** 한 달치 점을 모은다 → { 'YYYY-MM-DD': [{ kind, id }] }
+    `mine` 을 받으면 목록을 다시 만들지 않는다(위 calContext 주석). */
+function calMarks(monthStart, mine) {
+  const ym = isoOf(monthStart).slice(0, 7);
+  const marks = {};
+  const put = (date, kind, id) => {
+    if (!date || String(date).slice(0, 7) !== ym) return;
+    (marks[date] = marks[date] || []).push({ kind, id });
+  };
+  for (const sch of (mine || myCalendarScholarships())) {
+    const waiting = calAwaiting(sch.id);
+    if (sch.deadline) {
+      const d = dday(sch.deadline);
+      /* 마감이 지났는데 결과를 아직 기록하지 않았다 → **발표 대기**.
+         🔴 흐리게 하거나 지우지 않는다(개발자 지시): 신청한 공고는 마감 뒤가 진짜
+            시작이다 — 발표가 남아 있고 학생은 그걸 확인하러 온다. */
+      if (d.days < 0) put(sch.deadline, waiting ? 'wait' : 'mine', sch.id);
+      else if (d.days <= CAL_SOON_DAYS) put(sch.deadline, 'soon', sch.id);
+      else put(sch.deadline, 'mine', sch.id);
+    }
+    /* 발표일은 **원문에서 읽은 공고만** 찍는다. 없으면 위의 '발표 대기'로만 말한다. */
+    if (sch.announceDate && waiting) put(sch.announceDate, 'wait', sch.id);
+    /* 접수 시작일 — 아직 안 열린 공고라는 뜻이라, 이미 마감된 것에는 안 찍는다 */
+    if (sch.openDate && (!sch.deadline || dday(sch.deadline).days >= 0)) put(sch.openDate, 'open', sch.id);
+  }
+  return marks;
+}
+
+/** 그날 마감되는 공고 전부 (내 공고는 뺀다 — 위에 이미 따로 나온다) */
+function calOthersOn(iso, ctx) {
+  const c = ctx || calContext();
+  const mine = new Set(c.mine.map((s) => s.id));
+  return c.all.filter((s) => s.deadline === iso && !mine.has(s.id));
+}
+
+const CAL_DOW = ['일', '월', '화', '수', '목', '금', '토'];
+const CAL_KIND_ORDER = { soon: 0, wait: 1, mine: 2, open: 3 };
+const CAL_DOTS_MAX = 3;
+
+function renderCalendar() {
+  const box = $('#apps-calendar');
+  if (!box) return;
+  const ms = calMonthStart();
+  const ctx = calContext();
+  const marks = calMarks(ms, ctx.mine);
+  const today = isoOf(todayStart());
+  const days = new Date(ms.getFullYear(), ms.getMonth() + 1, 0).getDate();
+  const lead = new Date(ms.getFullYear(), ms.getMonth(), 1).getDay();
+
+  /* 🔴 **점이 아니라 공고를 센다** (2026-09-07 코드 리뷰). 한 공고가 마감일과 발표일에
+     각각 점을 가지면 '내 공고 2건'이 된다 — 학생은 하나만 담았는데 둘이라고 말하는 셈이다. */
+  const idsOf = (pick) => new Set(Object.values(marks)
+    .flatMap((list) => list.filter(pick).map((m) => m.id)));
+  const mineCount = idsOf((m) => m.kind !== 'open').size;
+  const waitCount = idsOf((m) => m.kind === 'wait').size;
+
+  let cells = '';
+  for (let i = 0; i < lead; i++) cells += '<div class="cal-cell cal-pad" aria-hidden="true"></div>';
+  for (let d = 1; d <= days; d++) {
+    const iso = isoOf(new Date(ms.getFullYear(), ms.getMonth(), d));
+    const list = (marks[iso] || []).slice()
+      .sort((a, b) => CAL_KIND_ORDER[a.kind] - CAL_KIND_ORDER[b.kind]);
+    const shown = list.slice(0, CAL_DOTS_MAX);
+    const more = list.length - shown.length;
+    const dayIds = new Set(list.map((m) => m.id)).size;   // 안내 문구도 공고 수로 센다
+    /* 셀은 늘 누를 수 있다 — 점이 없어도 '그날 마감되는 공고'를 볼 수 있어야 한다 */
+    cells += `<button class="cal-cell${iso === today ? ' cal-today' : ''}${iso === calPicked ? ' cal-picked' : ''}"
+        data-cal-day="${iso}" aria-pressed="${iso === calPicked}"
+        aria-label="${ms.getMonth() + 1}월 ${d}일${dayIds ? ` · 내 공고 ${dayIds}건` : ''}">
+        <span class="cal-num">${d}</span>
+        <span class="cal-dots">${shown.map((m) => `<i class="cal-dot cal-dot-${m.kind}"></i>`).join('')}${more > 0 ? `<em class="cal-more">+${more}</em>` : ''}</span>
+      </button>`;
+  }
+
+  box.innerHTML = `
+    <div class="cal-head">
+      <button class="cal-nav" data-cal-move="-1" aria-label="이전 달">‹</button>
+      <span class="cal-month">${ms.getFullYear()}년 ${ms.getMonth() + 1}월</span>
+      <button class="cal-nav" data-cal-move="1" aria-label="다음 달">›</button>
+    </div>
+    <p class="cal-sum">${mineCount ? `내 공고 ${mineCount}건${waitCount ? ` · 발표 대기 ${waitCount}건` : ''}` : '이 달에는 내 공고가 없어요'}</p>
+    <div class="cal-dow">${CAL_DOW.map((w) => `<span>${w}</span>`).join('')}</div>
+    <div class="cal-grid">${cells}</div>
+    <div class="cal-legend">
+      <span><i class="cal-dot cal-dot-mine"></i>내 공고 마감</span>
+      <span><i class="cal-dot cal-dot-soon"></i>D-${CAL_SOON_DAYS} 이내</span>
+      <span><i class="cal-dot cal-dot-wait"></i>발표 대기</span>
+      <span><i class="cal-dot cal-dot-open"></i>접수 시작</span>
+    </div>
+    <div id="cal-day" class="cal-day">${calPicked ? calDayHtml(calPicked) : ''}</div>`;
+}
+
+/** 공고 한 줄 — 달력 아래 목록에 쓴다. 누르면 상세 시트로 간다(개발자 지시 5번). */
+function calRowHtml(sch, { badge = true, save = false } = {}) {
+  const d = sch.deadline ? dday(sch.deadline) : null;
+  let mark = '';
+  if (badge) {
+    /* 🔴 판정을 새로 만들지 않는다 — 카드·상세와 **같은 함수**를 쓴다.
+       층2(KOSAF)는 evaluateFor 가 이미 '아직 못 읽음'으로 돌려주므로 여기서
+       따로 막을 필요가 없다(그 정직함이 한 곳에 있다는 뜻이다). */
+    const result = evaluateFor(sch, state.profile);
+    mark = fitBadgeHtml(fitScore(sch, result, state.profile), fitDetailFor(sch, state.profile));
+  }
+  const row = `<button class="cal-row" data-detail="${esc(sch.id)}">
+      <span class="cal-row-top">${mark}${d ? `<span class="badge badge-dday ${d.cls}">${d.label}</span>` : ''}${sch.formId ? '<span class="badge badge-form">앱에서 작성</span>' : ''}</span>
+      <span class="cal-row-name">${esc(sch.name)}</span>
+      <span class="cal-row-sub">${esc(sch.amount)}${sch.headcount ? ` · ${esc(sch.headcount)}` : ''}</span>
+    </button>`;
+  /* 보관함에서는 **여기서 바로 해제**할 수 있어야 한다 — 담는 곳과 빼는 곳이 다르면
+     학생이 뺄 방법을 못 찾는다. 카드와 같은 이유로 단추는 줄 **바깥**에 둔다. */
+  return save ? `<div class="cal-row-wrap">${saveBtnHtml(sch.id)}${row}</div>` : row;
+}
+
+/** 하루를 눌렀을 때 아래에 펼치는 목록. 🔴 시트를 띄우지 않는다 — 닫을 때 스크롤이 튄다. */
+function calDayHtml(iso) {
+  const [y, m, d] = iso.split('-').map(Number);
+  const ctx = calContext();
+  const mineAll = ctx.mine;
+  const marks = (calMarks(new Date(y, m - 1, 1), ctx.mine)[iso] || []);
+  const seen = new Set();
+  const mineRows = marks.map((k) => {
+    if (seen.has(k.id)) return '';
+    seen.add(k.id);
+    const sch = mineAll.find((s) => s.id === k.id);
+    if (!sch) return '';
+    const why = k.kind === 'wait'
+      ? (sch.announceDate === iso ? '발표 예정' : '발표 대기 · 발표일은 원문 확인')
+      : k.kind === 'open' ? '접수 시작' : '접수 마감';
+    return `<p class="cal-why">${why}</p>` + calRowHtml(sch, { badge: false });
+  }).join('');
+
+  const others = calOthersOn(iso, ctx);
+  const layer1 = others.filter((s) => s.sourceKind !== 'kosaf');
+  const layer2 = others.filter((s) => s.sourceKind === 'kosaf');
+
+  return `
+    <div class="cal-day-head">
+      <h4>${m}월 ${d}일</h4>
+      <button class="cal-day-close" data-cal-day="">닫기</button>
+    </div>
+    ${mineRows ? `<h5 class="cal-sec">내 공고</h5>${mineRows}` : ''}
+    ${layer1.length ? `<h5 class="cal-sec">이날 마감되는 공고 ${layer1.length}건</h5>${layer1.map((s) => calRowHtml(s)).join('')}` : ''}
+    ${/* 🔴 층2는 **접어 둔다.** 하루에 26건까지 들어오는 데다 자격 판정이 없어,
+         층1과 한 목록에 쏟으면 학생이 그것도 앱이 추천한 것으로 읽는다. */ ''}
+    ${layer2.length ? `<details class="cal-kosaf">
+        <summary>한국장학재단 목록 ${layer2.length}건</summary>
+        <p class="cal-note">재단이 적어 둔 칸을 그대로 보여 줍니다 — 자격은 재단 홈페이지에서 확인하세요.</p>
+        ${layer2.map((s) => calRowHtml(s, { badge: false })).join('')}
+      </details>` : ''}
+    ${!mineRows && !layer1.length && !layer2.length ? '<p class="empty">이날 마감되는 공고가 없어요.</p>' : ''}`;
+}
+
+/* 상세 시트에 접수 시작일·발표일을 한 줄로 (개발자 지시 4-1).
+   🔴 **원문에서 읽은 것만** 적는다. 없으면 그 자리를 비운다 — 발표일을 짐작해 적으면
+      학생이 그날 결과를 보러 갔다가 아무것도 없다(원칙 8-1). */
+function scheduleRowHtml(sch) {
+  const bits = [];
+  if (sch.openDate) bits.push(`접수 시작 ${esc(sch.openDate)}`);
+  if (sch.announceDate) bits.push(`발표 ${esc(sch.announceDate)}`);
+  return bits.length ? `<p class="sheet-schedule">${bits.join(' · ')}</p>` : '';
+}
+
+/* ---------------- 보관함 (MY) ----------------
+   저장한 공고를 모아 보는 자리. 🔴 **금액 합계를 내지 않는다** — 합산은 더하기가 아니라
+   고르기라(같은 장학금 한 번만 + 배타 그룹에서 최대 하나) 여기서 따로 더하면
+   홈과 다른 숫자를 말하게 된다. 건수만 센다. */
+function renderSaved() {
+  const el = $('#my-saved');
+  if (!el) return;
+  const list = savedScholarships();
+  if (!list.length) {
+    el.innerHTML = `<h3 class="my-card-title">보관함</h3>
+      <p class="empty">저장한 공고가 없어요.<br />공고 카드 오른쪽 위 북마크를 누르면 여기에 모입니다.</p>`;
+    return;
+  }
+  const open = list.filter((s) => s.deadline && dday(s.deadline).days >= 0)
+    .sort((a, b) => deadlineTs(a) - deadlineTs(b));
+  const undated = list.filter((s) => !s.deadline);
+  const closed = list.filter((s) => s.deadline && dday(s.deadline).days < 0)
+    .sort((a, b) => deadlineTs(b) - deadlineTs(a));
+  const soon = open.filter((s) => dday(s.deadline).days <= CAL_SOON_DAYS).length;
+
+  el.innerHTML = `
+    <h3 class="my-card-title">보관함</h3>
+    <p class="my-flags">저장 ${list.length}건${soon ? ` · 마감 임박 ${soon}건` : ''}</p>
+    ${open.length ? `<h5 class="cal-sec">마감이 다가오는 순</h5>${open.map((s) => calRowHtml(s, { save: true })).join('')}` : ''}
+    ${/* 🔴 날짜를 못 읽은 공고를 **숨기지 않는다** — 달력에는 찍을 수 없어 사라지는데,
+         사라지면 학생은 그 공고가 없는 줄 안다. 여기가 그 자리다. */ ''}
+    ${undated.length ? `<h5 class="cal-sec">날짜를 아직 읽지 못한 공고 ${undated.length}건</h5>
+      <p class="cal-note">접수 기간이 공고 원문에만 있어요. 원문을 열어 확인해 주세요.</p>
+      ${undated.map((s) => calRowHtml(s, { save: true })).join('')}` : ''}
+    ${closed.length ? `<details class="cal-kosaf">
+        <summary>이미 마감된 저장 공고 ${closed.length}건</summary>
+        <p class="cal-note">지우지 않고 둡니다 — 내년에 다시 열리는 공고가 많아요.</p>
+        ${closed.map((s) => calRowHtml(s, { badge: false, save: true })).join('')}
+      </details>` : ''}`;
+}
+
 function renderApplications() {
   const apps = state.applications.slice().reverse().filter((a) => findSch(a.id));
   const prepared = apps.filter((a) => !a.pending);
@@ -2609,11 +2951,39 @@ function renderApplications() {
     del.disabled = appsSelected.size === 0;
     del.textContent = appsSelected.size ? `삭제 ${appsSelected.size}건` : '삭제';
   }
+
+  /* 목록 ↔ 달력 (2026-09-07 · 노션 UI-21).
+     🔴 새 탭을 만들지 않는다 — 하단바 4칸이 이미 꽉 찼고, 달력은 결국 '내 것'의 다른
+        보기다. 달력일 때는 목록 관리 장치(선택·삭제)를 감춘다: 달력에는 지울 줄이 없다. */
+  const cal = $('#apps-calendar');
+  const tog = $('#apps-view-toggle');
+  if (cal) cal.hidden = !calMode;
+  list.hidden = calMode;
+  if (tog) {
+    tog.textContent = calMode ? '목록 보기' : '달력 보기';
+    tog.setAttribute('aria-pressed', String(calMode));
+  }
+  $('#apps-select-toggle').hidden = !apps.length || calMode;
+  if (calMode) {
+    $('#apps-bulkbar').hidden = true;
+    renderCalendar();
+  }
 }
 
 /* 신청 내역 관리 배선 — 화면이 처음 만들어질 때 한 번만 건다 */
 function wireAppsManage() {
   const list = $('#apps-list');
+
+  /* 목록 ↔ 달력 (2026-09-07 · 노션 UI-21) */
+  const tog = $('#apps-view-toggle');
+  if (tog) tog.addEventListener('click', () => {
+    calMode = !calMode;
+    if (!calMode) calPicked = null;
+    /* 달력을 열 때는 늘 이번 달부터 — 지난달을 보다 나갔다 돌아왔는데 그대로면
+       "내 공고가 하나도 없다"로 보인다 */
+    if (calMode) calCursor = null;
+    renderApplications();
+  });
 
   $('#apps-select-toggle').addEventListener('click', () => {
     appsSelectMode = !appsSelectMode;
@@ -2698,6 +3068,7 @@ function renderMy() {
   renderAccountCard();
   renderNotifyCard();
   renderWallet();
+  renderSaved();
 }
 
 /* 알림 설정 카드 (notify.js가 내용을 만든다) */
@@ -2970,6 +3341,43 @@ function bindEvents() {
     const sch = findSch(id);
     if (!sch) return;
     if (sb) recordSubmitted(sch); else recordResult(sch, !!wb);
+  });
+
+  /* 공고 저장(북마크) — 2026-09-07.
+     🔴 단추가 카드 **바깥**에 있어(saveBtnHtml 주석) 상세 열기와 겹치지 않는다.
+        그래도 stopPropagation 을 둔다: 나중에 누가 카드 안으로 옮겨도 조용히
+        상세가 함께 열리는 일이 없게. */
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-save]');
+    if (!b) return;
+    e.preventDefault();
+    e.stopPropagation();
+    toggleSave(b.dataset.save);
+  });
+
+  /* 달력 — 달 이동과 날짜 펼치기 */
+  document.addEventListener('click', (e) => {
+    const mv = e.target.closest('[data-cal-move]');
+    if (mv) {
+      const ms = calMonthStart();
+      calCursor = new Date(ms.getFullYear(), ms.getMonth() + Number(mv.dataset.calMove), 1);
+      calPicked = null;                      // 달을 옮기면 펼쳐 둔 날은 그 달에 없다
+      renderCalendar();
+      return;
+    }
+    const day = e.target.closest('[data-cal-day]');
+    if (!day) return;
+    const iso = day.dataset.calDay;
+    calPicked = (!iso || iso === calPicked) ? null : iso;
+    /* 🔴 격자를 통째로 다시 그리지 않는다 — 날짜를 누를 때마다 달력이 깜빡이고
+       스크롤이 튄다(일괄 준비 목록에서 겪은 것과 같은 유형). 바뀐 것만 고친다. */
+    $$('.cal-cell[data-cal-day]').forEach((c) => {
+      const on = !!calPicked && c.dataset.calDay === calPicked;
+      c.classList.toggle('cal-picked', on);
+      c.setAttribute('aria-pressed', String(on));
+    });
+    const panel = $('#cal-day');
+    if (panel) panel.innerHTML = calPicked ? calDayHtml(calPicked) : '';
   });
 
   document.addEventListener('click', (e) => {

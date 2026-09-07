@@ -3172,3 +3172,174 @@ button, input, select, textarea { letter-spacing: inherit; }
   .sort-btn:hover { background: transparent; border-color: var(--line); }
   .wallet-label:hover { color: var(--text); }
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   달력 보기 · 공고 저장(북마크) · 보관함 — 2026-09-07 (노션 UI-21)
+
+   🔴 색은 이 앱의 팔레트를 그대로 쓴다. 설계서에는 '파랑'이라 적혀 있지만 이 앱에는
+      파랑이 없다(2026-08-31 팔레트 정리에서 'AI 블루'를 걷어냈다) — 강조는 놋쇠
+      하나뿐이다. 뜻은 그대로 지키고 색만 이 집 것으로 바꾼 것이다.
+   🔴 **색만으로 가르지 않는다.** 점의 모양이 먼저다(채운 점 / 반만 채운 점 / 빈 점) —
+      색각 이상이 있는 학생과 흑백 화면에서 색은 아무 말도 하지 않는다.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── 북마크 단추 ─────────────────────────────────────────────
+   🔴 `.sch-card` 가 <button> 이라 그 **안**에는 단추를 넣을 수 없다.
+      감싸개가 자리를 잡고 단추는 카드 위에 얹힌다. */
+.sch-card-wrap { position: relative; }
+.sch-card-wrap > .sch-card { width: 100%; }
+/* 카드 오른쪽 위는 단추 자리 — 배지가 그 아래로 흐르지 않게 자리를 비운다 */
+.sch-card-wrap > .sch-card .sch-top { padding-right: 34px; }
+
+.save-btn {
+  position: absolute;
+  top: 10px; right: 8px;
+  z-index: 2;
+  width: 40px; height: 40px;          /* 터치 타깃 — 보이는 아이콘보다 크게 */
+  display: flex; align-items: center; justify-content: center;
+  background: none; border: 0; padding: 0;
+  color: var(--text-weak);
+  cursor: pointer;
+  border-radius: var(--radius-xs);
+  transition: color 0.15s, transform 0.12s;
+}
+.save-btn svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linejoin: round; }
+.save-btn:hover { color: var(--text-sub); }
+.save-btn:active { transform: scale(0.9); }
+.save-btn.on { color: var(--accent); }
+.save-btn.on svg { fill: currentColor; }
+/* 상세 시트에서는 배지 줄 오른쪽 끝에 붙는다(카드처럼 떠 있지 않는다) */
+.sheet-top { position: relative; padding-right: 40px; }
+.sheet-top > .save-btn { top: -8px; right: -6px; }
+
+.sheet-schedule {
+  font-size: var(--t-sm);
+  color: var(--text-sub);
+  margin: 2px 0 0;
+}
+
+/* ── 달력 ────────────────────────────────────────────────── */
+.cal { margin-top: 4px; }
+.cal-head {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  margin-bottom: 2px;
+}
+.cal-month { font-size: var(--t-lg); font-weight: 800; letter-spacing: -0.01em; min-width: 8.5em; text-align: center; }
+.cal-nav {
+  width: 40px; height: 40px;
+  background: none; border: 0; cursor: pointer;
+  font-size: var(--t-2xl); line-height: 1; color: var(--text-sub);
+  border-radius: var(--radius-xs);
+}
+.cal-nav:hover { background: var(--surface-2); color: var(--text); }
+.cal-sum { text-align: center; font-size: var(--t-sm); color: var(--text-sub); margin: 0 0 14px; }
+
+.cal-dow { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.cal-dow span {
+  text-align: center; font-size: var(--t-2xs); font-weight: 700;
+  color: var(--text-weak); padding-bottom: 6px;
+}
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+
+.cal-cell {
+  aspect-ratio: 1 / 1;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 6px 0 0;
+  background: none; border: 0; cursor: pointer;
+  border-radius: var(--radius-xs);
+  font-variant-numeric: tabular-nums;
+  transition: background 0.12s;
+}
+.cal-cell:hover { background: var(--surface-2); }
+.cal-pad { pointer-events: none; }
+.cal-num { font-size: var(--t-sm); color: var(--text-sub); line-height: 1; }
+.cal-today { background: var(--surface-2); }
+.cal-today .cal-num { color: var(--text); font-weight: 800; }
+.cal-picked { background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent-line); }
+
+.cal-dots { display: flex; align-items: center; gap: 3px; min-height: 9px; }
+.cal-more { font-size: var(--t-2xs); font-style: normal; color: var(--text-weak); font-weight: 700; line-height: 1; }
+
+/* 점 — 모양이 뜻을 지고 색은 거든다 */
+.cal-dot { width: 7px; height: 7px; border-radius: 50%; flex: none; display: inline-block; position: relative; }
+.cal-dot-mine { background: var(--accent); }                       /* ● 내 공고 마감 */
+.cal-dot-soon { background: var(--red); }                          /* ● 마감 임박 */
+/* ◐ 발표 대기 — 반만 채운 점.
+   🔴 그라데이션으로 만들지 않는다(그라데이션은 --grad-navy 한 곳뿐이라는 규칙).
+      테두리를 두르고 안쪽 절반만 덮는다. */
+.cal-dot-wait { box-shadow: inset 0 0 0 1.2px var(--accent); }
+.cal-dot-wait::before {
+  content: ''; position: absolute; inset: 0;
+  background: var(--accent); border-radius: 50%;
+  clip-path: inset(0 50% 0 0);
+}
+.cal-dot-open {                                                     /* ○ 접수 시작 */
+  background: none;
+  box-shadow: inset 0 0 0 1.4px var(--text-weak);
+}
+
+.cal-legend {
+  display: flex; flex-wrap: wrap; gap: 12px;
+  margin-top: 14px; padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.cal-legend span { display: flex; align-items: center; gap: 5px; font-size: var(--t-2xs); color: var(--text-sub); }
+
+/* ── 하루를 펼친 목록 ─────────────────────────────────────── */
+.cal-day:empty { display: none; }
+.cal-day { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--rule); }
+.cal-day-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.cal-day-head h4 { font-size: var(--t-lg); font-weight: 800; margin: 0; }
+.cal-day-close {
+  background: none; border: 0; cursor: pointer; padding: 6px 4px;
+  font-size: var(--t-sm); font-weight: 700; color: var(--text-sub);
+}
+.cal-sec {
+  font-size: var(--t-2xs); font-weight: 800; letter-spacing: 0.04em;
+  color: var(--text-weak); margin: 16px 0 8px;
+}
+.cal-sec:first-of-type { margin-top: 6px; }
+.cal-why { font-size: var(--t-2xs); font-weight: 700; color: var(--accent); margin: 10px 0 4px; }
+.cal-note { font-size: var(--t-2xs); color: var(--text-weak); margin: 0 0 8px; }
+
+.cal-row {
+  display: flex; flex-direction: column; gap: 3px;
+  width: 100%; text-align: left;
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 12px 13px; margin-bottom: 7px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.cal-row:hover { background: var(--surface-2); }
+.cal-row-top { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+.cal-row-top:empty { display: none; }
+.cal-row-name { font-size: var(--t-md); font-weight: 700; line-height: 1.4; }
+.cal-row-sub { font-size: var(--t-sm); color: var(--text-sub); }
+
+.badge-form { background: var(--accent-soft); color: var(--accent); }
+
+/* 접어 두는 묶음 — 층2(재단 목록)와 마감된 저장 공고가 같은 모양을 쓴다 */
+.cal-kosaf { margin-top: 14px; }
+.cal-kosaf > summary {
+  cursor: pointer; list-style: none;
+  font-size: var(--t-sm); font-weight: 700; color: var(--text-sub);
+  padding: 10px 0;
+}
+.cal-kosaf > summary::-webkit-details-marker { display: none; }
+.cal-kosaf > summary::after { content: ' ▾'; color: var(--text-weak); }
+.cal-kosaf[open] > summary::after { content: ' ▴'; }
+
+/* 신청 내역 머리의 단추 둘은 한 묶음으로 — 셋이 space-between 이면 달력 단추가
+   가운데에 뜬다(2026-09-07 코드 리뷰) */
+.apps-header-actions { display: flex; align-items: center; gap: 8px; }
+
+/* 보관함 줄 — 북마크 단추가 줄 바깥에 얹힌다(카드와 같은 이유) */
+.cal-row-wrap { position: relative; }
+.cal-row-wrap > .cal-row { width: 100%; }
+.cal-row-wrap > .cal-row .cal-row-top { padding-right: 32px; }
+.cal-row-wrap > .save-btn { top: 4px; right: 2px; }
+
+/* ── 보관함 ──────────────────────────────────────────────── */
+.my-card-title { font-size: var(--t-lg); font-weight: 800; letter-spacing: -0.01em; margin: 0 0 4px; }
+#my-saved .cal-sec:first-of-type { margin-top: 14px; }
