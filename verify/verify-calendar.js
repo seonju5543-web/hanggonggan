@@ -134,6 +134,15 @@ async function seed(page, saved, applied = []) {
     !(await page.$eval('#apps-calendar', (e) => e.hidden)) && await page.$eval('#apps-list', (e) => e.hidden));
   ok('달 이름이 보인다', /\d{4}년 \d{1,2}월/.test(await page.textContent('.cal-month')));
 
+  /* 🔴 달력에서는 수혜액 카드를 숨긴다 (2026-09-07 개발자 지시) — 지우는 게 아니라 숨기는 것이라
+     목록으로 돌아오면 다시 나와야 한다. 둘 다 확인한다. */
+  ok('달력에서는 수혜액 카드가 안 보인다', await page.$eval('#apps-summary', (e) => e.hidden));
+
+  /* 🔴 범례는 **두 줄**이다 (마감 · 발표 대기). 임박은 마감의 급함이라 같은 줄에서 설명한다 —
+     따로 세우면 학생이 외워야 할 종류가 넷이 된다. */
+  ok('범례는 두 종류다', await page.locator('.cal-legend > span').count() === 2,
+    `${await page.locator('.cal-legend > span').count()}종`);
+
   if (pick.now) {
     /* ② 저장한 공고가 점으로 찍힌다 */
     const dots = await page.$$eval(`.cal-cell[data-cal-day="${pick.nowDate}"] .cal-dot`, (e) => e.length);
@@ -159,6 +168,13 @@ async function seed(page, saved, applied = []) {
     await page.keyboard.press('Escape');
     await page.waitForTimeout(300);
   }
+
+  /* 목록으로 돌아오면 수혜액 카드가 **다시** 나와야 한다(숨김이지 삭제가 아니다) */
+  await page.click('#apps-view-toggle');
+  await page.waitForTimeout(250);
+  ok('목록으로 돌아오면 수혜액 카드가 다시 보인다', !(await page.$eval('#apps-summary', (e) => e.hidden)));
+  await page.click('#apps-view-toggle');
+  await page.waitForTimeout(250);
 
   /* ③ 마감이 지나도 사라지지 않는다 — 다만 '발표 대기'는 **신청한 것**에만 붙는다 */
   const kindOf = (id) => page.evaluate((x) => {
@@ -188,8 +204,10 @@ async function seed(page, saved, applied = []) {
       for (const k of list) {
         const s = findSch(k.id);
         if (!s) continue;
-        /* 점이 찍힌 날은 반드시 공고가 **가진 날짜** 중 하나여야 한다 */
-        if (date !== s.deadline && date !== s.announceDate && date !== s.openDate) bad++;
+        /* 점이 찍힌 날은 마감일이거나 발표일이어야 한다.
+           🔴 접수 시작일은 2026-09-07부터 **찍지 않는다** — 여기 openDate 를 허용해 두면
+              그 결정이 조용히 되돌아와도 검사가 통과한다. */
+        if (date !== s.deadline && date !== s.announceDate) bad++;
       }
     }
     return bad;

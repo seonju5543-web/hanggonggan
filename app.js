@@ -2732,8 +2732,10 @@ function calMarks(monthStart, mine) {
     }
     /* 발표일은 **원문에서 읽은 공고만** 찍는다. 없으면 위의 '발표 대기'로만 말한다. */
     if (sch.announceDate && waiting) put(sch.announceDate, 'wait', sch.id);
-    /* 접수 시작일 — 아직 안 열린 공고라는 뜻이라, 이미 마감된 것에는 안 찍는다 */
-    if (sch.openDate && (!sch.deadline || dday(sch.deadline).days >= 0)) put(sch.openDate, 'open', sch.id);
+    /* 🔴 접수 시작일은 **달력에 찍지 않는다** (2026-09-07 개발자 지시 — 표시를 둘로 줄임).
+       달력에 남는 것은 '내가 무엇을 해야 하는 날'뿐이다: 마감과 발표.
+       접수 시작은 그날 학생이 할 일이 없고(마감 전에 내면 된다), 아직 안 열린 공고라는
+       사실은 상세 시트의 일정 줄(`scheduleRowHtml`)이 그대로 말한다. */
   }
   return marks;
 }
@@ -2746,7 +2748,7 @@ function calOthersOn(iso, ctx) {
 }
 
 const CAL_DOW = ['일', '월', '화', '수', '목', '금', '토'];
-const CAL_KIND_ORDER = { soon: 0, wait: 1, mine: 2, open: 3 };
+const CAL_KIND_ORDER = { soon: 0, wait: 1, mine: 2 };
 const CAL_DOTS_MAX = 3;
 
 function renderCalendar() {
@@ -2763,7 +2765,7 @@ function renderCalendar() {
      각각 점을 가지면 '내 공고 2건'이 된다 — 학생은 하나만 담았는데 둘이라고 말하는 셈이다. */
   const idsOf = (pick) => new Set(Object.values(marks)
     .flatMap((list) => list.filter(pick).map((m) => m.id)));
-  const mineCount = idsOf((m) => m.kind !== 'open').size;
+  const mineCount = idsOf(() => true).size;
   const waitCount = idsOf((m) => m.kind === 'wait').size;
 
   let cells = '';
@@ -2793,11 +2795,12 @@ function renderCalendar() {
     <p class="cal-sum">${mineCount ? `내 공고 ${mineCount}건${waitCount ? ` · 발표 대기 ${waitCount}건` : ''}` : '이 달에는 내 공고가 없어요'}</p>
     <div class="cal-dow">${CAL_DOW.map((w) => `<span>${w}</span>`).join('')}</div>
     <div class="cal-grid">${cells}</div>
+    ${/* 🔴 범례는 **두 종류**다 (2026-09-07 개발자 지시: "간단하고 명확히").
+         임박(빨강)은 별개 종류가 아니라 **마감의 급함**이라 같은 줄에서 설명한다 —
+         따로 세우면 학생이 외워야 할 종류가 넷이 된다. */ ''}
     <div class="cal-legend">
-      <span><i class="cal-dot cal-dot-mine"></i>내 공고 마감</span>
-      <span><i class="cal-dot cal-dot-soon"></i>D-${CAL_SOON_DAYS} 이내</span>
+      <span><i class="cal-dot cal-dot-mine"></i><i class="cal-dot cal-dot-soon"></i>마감 (${CAL_SOON_DAYS}일 이내는 빨강)</span>
       <span><i class="cal-dot cal-dot-wait"></i>발표 대기</span>
-      <span><i class="cal-dot cal-dot-open"></i>접수 시작</span>
     </div>
     <div id="cal-day" class="cal-day">${calPicked ? calDayHtml(calPicked) : ''}</div>`;
 }
@@ -2837,7 +2840,7 @@ function calDayHtml(iso) {
     if (!sch) return '';
     const why = k.kind === 'wait'
       ? (sch.announceDate === iso ? '발표 예정' : '발표 대기 · 발표일은 원문 확인')
-      : k.kind === 'open' ? '접수 시작' : '접수 마감';
+      : '접수 마감';
     return `<p class="cal-why">${why}</p>` + calRowHtml(sch, { badge: false });
   }).join('');
 
@@ -2959,6 +2962,10 @@ function renderApplications() {
   const tog = $('#apps-view-toggle');
   if (cal) cal.hidden = !calMode;
   list.hidden = calMode;
+  /* 🔴 달력에서는 **수혜액 카드를 숨긴다** (2026-09-07 개발자 지시).
+     달력은 '언제'를 보는 화면이라 금액이 화면 위쪽을 차지하면 정작 달을 못 본다.
+     ⚠️ 지우는 게 아니라 숨기는 것이다 — 목록 보기에서는 그대로 나온다. */
+  $('#apps-summary').hidden = calMode;
   if (tog) {
     tog.textContent = calMode ? '목록 보기' : '달력 보기';
     tog.setAttribute('aria-pressed', String(calMode));
