@@ -103,13 +103,13 @@
       "url": "https://news.incruit.com/news/newsview.asp?newsno=436538",
       "kind": "value",
       "note": "자기소개서 가치관 작성 포인트 (2026-09-05 추가)",
-      "strike": 1
+      "strike": 2
     },
     {
       "url": "https://news.incruit.com/news/newsview.asp?newsno=436729",
       "kind": "value",
       "note": "자소서 인생관 단계별 작성 포인트 (2026-09-05 추가)",
-      "strike": 1
+      "strike": 2
     },
     {
       "url": "https://brunch.co.kr/@designmydesign/11",
@@ -155,6 +155,48 @@
       "kind": "*",
       "note": "로봇이 스스로 찾음 — 성격의 장단점 작성법 3단계｜최신 합격자소서 예시, 주의사항, 체크리스트",
       "addedAt": "2026-09-05",
+      "strike": 0
+    },
+    {
+      "url": "https://community.linkareer.com/employment_data/5109801",
+      "kind": "*",
+      "note": "로봇이 스스로 찾음 — 💯[4일 완성 인턴 자소서 코칭] Part 3: 협업경험&amp;피드백 중심의 적응력 표현법",
+      "addedAt": "2026-09-07",
+      "strike": 0
+    },
+    {
+      "url": "https://owlapply.com/ko/jagisogeseo-yangsig/simpel",
+      "kind": "*",
+      "note": "로봇이 스스로 찾음 — 심플 자기소개서 양식 - 깔끔한 구성으로 핵심을 전달하는 템플릿",
+      "addedAt": "2026-09-07",
+      "strike": 0
+    },
+    {
+      "url": "https://owlapply.com/ko/jagisogeseo-yangsig/hyeondae",
+      "kind": "*",
+      "note": "로봇이 스스로 찾음 — 모던 자기소개서 양식 - IT와 스타트업을 위한 현대적 템플릿",
+      "addedAt": "2026-09-07",
+      "strike": 0
+    },
+    {
+      "url": "https://owlapply.com/ko/jagisogeseo-yangsig/changuijeog",
+      "kind": "*",
+      "note": "로봇이 스스로 찾음 — 크리에이티브 자기소개서 양식 - 개성과 창의력을 담은 자소서 템플릿",
+      "addedAt": "2026-09-07",
+      "strike": 0
+    },
+    {
+      "url": "https://owlapply.com/ko/jagisogeseo-yangsig/jeonmun",
+      "kind": "*",
+      "note": "로봇이 스스로 찾음 — 전문가용 자기소개서 양식 - 경력직 이직을 위한 격식 있는 템플릿",
+      "addedAt": "2026-09-07",
+      "strike": 0
+    },
+    {
+      "url": "https://owlapply.com/ko/blog/jagisogeseo-choegeun-shijak-munan",
+      "kind": "*",
+      "note": "로봇이 스스로 찾음 — 자기소개서 첫 문장 잘 쓰는 법",
+      "addedAt": "2026-09-07",
       "strike": 0
     }
   ],
