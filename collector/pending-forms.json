@@ -661,6 +661,14 @@
    "added": "2026-09-01",
    "fetched": true,
    "schematized": false
+  },
+  {
+   "id": "auto-ent2431265883artclviewdo",
+   "name": "[공통][교내] 2026-2학기 가족장학금 신청 안내 (9/10 ~ 9/28)",
+   "target": "2026-2학기 가족장학금 신청 안내 (9/10 ~ 9",
+   "added": "2026-09-08",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }

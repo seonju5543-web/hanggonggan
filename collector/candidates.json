@@ -1,8 +1,22 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-09-08",
- "count": 2117,
+ "count": 2118,
  "items": [
+  {
+   "title": "[공통][교내] 2026-2학기 가족장학금 신청 안내 (9/10 ~ 9/28)",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/265883/artclView.do",
+   "attachments": [
+    {
+     "name": "2026-2 가족장학금 신청서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150229/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026. 9.&nbsp;10.(목 ) 09:00 ~ 2026. 9. 28.(월 ) 16:00 까지 &",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-09-08"
+  },
   {
    "title": "[공통][교외]2026년도 (재)포항시장학회 장학생 선발공고",
    "url": "https://dep.hufs.ac.kr/bbs/student/2431/265667/artclView.do",
