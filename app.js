@@ -2725,16 +2725,18 @@ function calMarks(monthStart, mine) {
     const waiting = calAwaiting(sch.id);
     if (sch.deadline) {
       const d = dday(sch.deadline);
-      /* 마감이 지났는데 결과를 아직 기록하지 않았다 → **발표 대기**.
-         🔴 흐리게 하거나 지우지 않는다(개발자 지시): 신청한 공고는 마감 뒤가 진짜
-            시작이다 — 발표가 남아 있고 학생은 그걸 확인하러 온다. */
-      /* 🔴 마감 임박(D-3)을 **색으로 가르지 않는다** (2026-09-07 개발자 지시).
-         급한 공고는 홈에서 이미 확인할 수 있어, 달력에까지 두면 종류만 늘고
-         "이 빨강이 무슨 뜻이더라"를 학생이 한 번 더 생각하게 된다.
-         달력에 남는 뜻은 둘뿐이다 — 내야 하는 날, 결과를 기다리는 중. */
-      put(sch.deadline, (d.days < 0 && waiting) ? 'wait' : 'mine', sch.id);
+      /* 🔴 마감일 자리에는 **늘 '마감' 점**이다 (2026-09-07 개발자 지적:
+         "발표대기는 뭐야? 그냥 발표일로 고정하면 안돼?"). 맞는 지적이다 —
+         그날은 마감일이지 발표일이 아닌데 거기에 발표 뜻의 점을 찍으면 헷갈린다.
+         🔴 그래도 **지우지는 않는다**(개발자 지시 4-4): 신청한 공고는 마감 뒤가
+            진짜 시작이라, 마감이 지나도 점은 그대로 남아 학생이 찾아올 자리가 된다.
+         🔴 마감 임박(D-3)도 색으로 가르지 않는다 — 홈에서 이미 확인할 수 있다. */
+      put(sch.deadline, 'mine', sch.id);
     }
-    /* 발표일은 **원문에서 읽은 공고만** 찍는다. 없으면 위의 '발표 대기'로만 말한다. */
+    /* 발표는 **원문에서 읽은 진짜 발표일에만** 찍는다 (실측 45건 중 4건).
+       🔴 모르는 발표일을 마감일 자리로 옮겨 적지 않는다 — 그것이 '발표 대기' 였고,
+          학생에게는 마감일에 발표 점이 찍힌 것으로 보였다.
+       결과를 이미 기록했으면 기다릴 것이 없으므로 찍지 않는다. */
     if (sch.announceDate && waiting) put(sch.announceDate, 'wait', sch.id);
     /* 🔴 접수 시작일은 **달력에 찍지 않는다** (2026-09-07 개발자 지시 — 표시를 둘로 줄임).
        달력에 남는 것은 '내가 무엇을 해야 하는 날'뿐이다: 마감과 발표.
@@ -2796,7 +2798,7 @@ function renderCalendar() {
       <span class="cal-month">${ms.getFullYear()}년 ${ms.getMonth() + 1}월</span>
       <button class="cal-nav" data-cal-move="1" aria-label="다음 달">›</button>
     </div>
-    <p class="cal-sum">${mineCount ? `내 공고 ${mineCount}건${waitCount ? ` · 발표 대기 ${waitCount}건` : ''}` : '이 달에는 내 공고가 없어요'}</p>
+    <p class="cal-sum">${mineCount ? `내 공고 ${mineCount}건${waitCount ? ` · 발표 ${waitCount}건` : ''}` : '이 달에는 내 공고가 없어요'}</p>
     <div class="cal-dow">${CAL_DOW.map((w) => `<span>${w}</span>`).join('')}</div>
     <div class="cal-grid">${cells}</div>
     ${/* 🔴 범례는 **두 종류**다 (2026-09-07 개발자 지시: "간단하고 명확히").
@@ -2804,7 +2806,7 @@ function renderCalendar() {
          홈에서 이미 확인할 수 있다. 여기에 종류를 다시 늘리지 말 것. */ ''}
     <div class="cal-legend">
       <span><i class="cal-dot cal-dot-mine"></i>마감</span>
-      <span><i class="cal-dot cal-dot-wait"></i>발표 대기</span>
+      <span><i class="cal-dot cal-dot-wait"></i>발표</span>
     </div>
     <div id="cal-day" class="cal-day">${calPicked ? calDayHtml(calPicked) : ''}</div>`;
 }
@@ -2842,9 +2844,13 @@ function calDayHtml(iso) {
     seen.add(k.id);
     const sch = mineAll.find((s) => s.id === k.id);
     if (!sch) return '';
-    const why = k.kind === 'wait'
-      ? (sch.announceDate === iso ? '발표 예정' : '발표 대기 · 발표일은 원문 확인')
-      : '접수 마감';
+    /* 🔴 달력에서 뺀 '결과 기다리는 중'을 **여기서** 말한다 (2026-09-07).
+       점의 종류를 줄이는 것과 정보를 없애는 것은 다르다 — 점은 둘로 두되,
+       날짜를 열었을 때는 그 공고가 지금 어떤 상태인지 한 줄로 밝힌다. */
+    const why = k.kind === 'wait' ? '발표 예정'
+      : (calAwaiting(sch.id) && sch.deadline && dday(sch.deadline).days < 0)
+        ? (sch.announceDate ? '접수 마감 · 결과 대기' : '접수 마감 · 결과 대기 (발표일은 원문 확인)')
+        : '접수 마감';
     return `<p class="cal-why">${why}</p>` + calRowHtml(sch, { badge: false });
   }).join('');
 

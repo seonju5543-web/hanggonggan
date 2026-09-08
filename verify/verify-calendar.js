@@ -119,8 +119,11 @@ async function seed(page, saved, applied = []) {
        (2026-09-07 red-green 확인에서 잡았다). */
     const soon = allScholarships().find((s) => s.deadline
       && dday(s.deadline).days >= 0 && dday(s.deadline).days <= 3);
+    /* 발표일을 **원문에서 읽은** 공고 — 발표 점이 찍히는 유일한 경우다(실측 45건 중 4건) */
+    const ann = allScholarships().find((s) => s.announceDate);
     return { now: now ? now.id : null, nowDate: now ? now.deadline : null,
              soon: soon ? soon.id : null,
+             ann: ann ? ann.id : null, annDate: ann ? ann.announceDate : null,
              past: gone[0] ? gone[0].id : null, past2: gone[1] ? gone[1].id : null };
   });
   if (!pick.now) {
@@ -128,7 +131,9 @@ async function seed(page, saved, applied = []) {
   }
 
   /* 마감이 지난 공고를 **신청분으로** 넣는다 — 발표를 기다리는 것은 신청한 공고뿐이다 */
-  await seed(page, [pick.now, pick.soon, pick.past2].filter(Boolean), [pick.past].filter(Boolean));
+  /* 발표일을 아는 공고도 **신청분으로** 넣는다 — 발표 점은 신청한 공고에만 찍힌다 */
+  await seed(page, [pick.now, pick.soon, pick.past2].filter(Boolean),
+                   [pick.past, pick.ann].filter(Boolean));
   await page.click('.nav-item[data-nav="applications"]');
   await page.waitForTimeout(250);
 
@@ -206,15 +211,47 @@ async function seed(page, saved, applied = []) {
     return mk ? mk.kind : 'none';
   }, id);
   if (pick.past) {
+    /* 🔴 마감이 지나도 **사라지지 않는다**(개발자 지시 4-4). 다만 마감일 자리는 늘
+       '마감' 점이다 — 그날은 마감일이지 발표일이 아니다(2026-09-07 개발자 지적). */
     const v = await kindOf(pick.past);
-    ok("마감이 지난 **신청한** 공고는 '발표 대기'로 남는다", v === 'wait', `판정=${v}`);
+    ok('마감이 지나도 신청한 공고는 달력에 남는다', v === 'mine', `판정=${v}`);
   }
   if (pick.past2) {
-    /* 🔴 저장만 한 공고는 신청한 적이 없으니 발표될 결과도 없다. '발표 대기'로 두면
-       보관함의 '이미 마감된 저장 공고'와 서로 다른 말을 한다(2026-09-07 코드 리뷰). */
     const v = await kindOf(pick.past2);
-    ok("저장만 한 공고는 '발표 대기'가 아니다", v === 'mine', `판정=${v}`);
+    ok('저장만 한 공고도 마감일 자리에 그대로 남는다', v === 'mine', `판정=${v}`);
   }
+
+  /* 🔴 발표 점(◐)은 **원문에서 읽은 발표일에만** 찍힌다.
+     예전에는 발표일을 모르는 공고의 **마감일 자리**에 찍혀서, 학생 눈에는
+     마감일에 발표 점이 붙은 것으로 보였다. 그것을 없앤 것이 이 검사의 요지다. */
+  if (pick.ann) {
+    const onAnn = await page.evaluate(([id, date]) => {
+      const [y, m] = date.split('-').map(Number);
+      const mk = (calMarks(new Date(y, m - 1, 1))[date] || []).find((k) => k.id === id);
+      return mk ? mk.kind : 'none';
+    }, [pick.ann, pick.annDate]);
+    ok('발표일을 아는 공고는 그 날짜에 발표 점이 찍힌다', onAnn === 'wait', `판정=${onAnn}`);
+  } else {
+    ok('발표일을 아는 공고가 있어 발표 점을 쟀다', false, '원문 발표일을 가진 공고가 없다');
+  }
+
+  /* 발표일을 모르는 공고에는 발표 점이 **어디에도** 없어야 한다 */
+  const strayWait = await page.evaluate(() => {
+    const t = new Date();
+    let bad = 0;
+    for (let i = -2; i <= 2; i++) {
+      const marks = calMarks(new Date(t.getFullYear(), t.getMonth() + i, 1));
+      for (const [date, list] of Object.entries(marks)) {
+        for (const k of list) {
+          if (k.kind !== 'wait') continue;
+          const s = findSch(k.id);
+          if (!s || s.announceDate !== date) bad++;
+        }
+      }
+    }
+    return bad;
+  });
+  ok('발표 점은 원문 발표일 아닌 곳에는 찍히지 않는다', strayWait === 0, `${strayWait}건`);
 
   /* 없는 날짜를 지어내지 않는다 — 발표일이 없는 공고에 발표 날짜를 찍으면 안 된다 */
   const invented = await page.evaluate(() => {
