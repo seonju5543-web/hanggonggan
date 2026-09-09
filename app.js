@@ -2433,7 +2433,17 @@ function openDetail(id) {
   if (app && !app.pending) btnLabel = '신청 준비 완료됨';
   else if (app && app.pending) btnLabel = '서류 작성 이어서 하기';
   else if (d.days < 0) btnLabel = '마감된 장학금';
-  else if (!canApply) btnLabel = '요건 미충족 — 신청할 수 없음';
+  /* 🔴 **모르는 것을 '미충족'이라고 부르지 않는다** (2026-09-09 · 운영 원칙 8-1).
+     예전에는 판정이 `unknown` 일 때도 이 문구가 떴다. 그런데 unknown 은 '요건에 못 미친다'가
+     아니라 **'우리가 못 읽었다'**는 뜻이다 — 동산장학회(이공계 새터민)에서 실제로 그랬다:
+     새터민이고 이공계이고 성적도 넘는 학생인데 자격 줄 셋 중 둘을 못 읽어 unknown 이 됐고,
+     화면은 그 학생에게 '요건 미충족' 이라고 단정했다(reasons 도 비어 있어 이유조차 없었다).
+     확인하지 않은 것을 확인했다고 말하는 것이라 문구를 가른다. */
+  else if (!canApply) {
+    btnLabel = result.status === 'unknown'
+      ? '자격을 확인하지 못했어요 — 원문에서 확인하세요'
+      : '요건 미충족 — 신청할 수 없음';
+  }
 
   $('#detail-sheet').innerHTML = `
     <div class="sheet-handle"></div>
