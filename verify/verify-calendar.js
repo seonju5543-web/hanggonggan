@@ -36,8 +36,17 @@ async function seed(page, saved, applied = []) {
       applications: ap.map((id) => ({ id, appliedAt: '2026-09-01 00:00', step: 0, pending: false })),
       saved: sv.map((id) => ({ id, savedAt: '2026-09-01 00:00' })),
     }));
+    /* 🔴 이어보기 장부도 함께 지운다 (2026-09-09). 이 함수는 '이 상태에서 새로 시작한다'는
+       뜻인데, 장부를 남겨 두면 앱이 **앞 검사에서 보던 화면**으로 돌아가 홈을 기다리다 죽는다.
+       실제로 이 검사가 그렇게 빨간불이 났다(달력 탭으로 갔다가 다시 심는 대목). */
+    localStorage.removeItem('handaejang.resume');
   }, [PROFILE, saved, applied]);
   await page.reload({ waitUntil: 'networkidle' });
+  /* 🔴 지우는 것만으로는 모자란다 (2026-09-09): 새로고침은 **나가는 것**이기도 해서,
+     앱이 나가는 순간(`pagehide`) 지금 화면을 다시 적는다 — 그게 맞는 동작이라 지워 둔 장부가
+     곧바로 되살아난다. 그러니 어디에서 시작할지는 **검사가 정한다.** */
+  await page.waitForSelector('#bottom-nav:not([hidden])');
+  await page.click('.nav-item[data-nav="home"]');
   await page.waitForSelector('#screen-home:not([hidden])');
   await page.waitForTimeout(250);
   await dismissNotify(page);

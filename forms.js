@@ -334,6 +334,57 @@ function collectFormAnswers(tpl) {
   return ans;
 }
 
+/* ---------- 답변 되돌려 넣기 (2026-09-09 · 이어보기 3겹) ----------
+   `collectFormAnswers` 의 **거울**이다. 잠깐 나갔다 온 학생의 신청서를 쓰던 그대로
+   되살릴 때 쓴다(AI 초안도 같은 `#fq-<id>` 칸에 들어 있어 함께 돌아온다).
+   설계: docs/designs/first-run-and-resume.md
+
+   🔴 위 `collectFormAnswers` 와 **칸 종류가 어긋나면 조용히 빈 칸이 된다.** 한쪽에 종류를
+      더하면 여기도 더할 것. 관문: verify/test-collector.mjs '이어보기' 절이 두 함수가 다루는
+      종류가 같은지 센다. */
+function fillFormAnswers(tpl, ans) {
+  if (!ans) return 0;
+  const plan = formPlanFor(tpl);
+  let filled = 0;
+  const setVal = (sel, v) => {
+    const el = $(sel);
+    if (!el || v === undefined || v === null || v === '') return;
+    el.value = v;
+    filled += 1;
+  };
+  const setChips = (sel, picked) => {
+    const list = Array.isArray(picked) ? picked : [];
+    if (!list.length) return;
+    $$(`${sel} .chip`).forEach((c) => c.classList.toggle('active', list.indexOf(c.dataset.value) >= 0));
+    filled += 1;
+  };
+
+  /* ① 프로필에서 채운 값을 학생이 고쳤으면 그 고친 값 */
+  $$('.fq-auto-in').forEach((el) => { if (ans[el.dataset.f] !== undefined) { el.value = ans[el.dataset.f]; filled += 1; } });
+
+  /* ② 화면에 낸 질문 — collectFormAnswers 와 같은 순서·같은 종류로 되돌린다 */
+  plan.secs.forEach((sec) => sec.items.forEach((f) => {
+    const fid = `fq-${f.id}`;
+    const v = ans[f.id];
+    if (f.type === 'checks' || f.type === 'checks+text') {
+      if (!v) return;
+      setChips(`.fq-checks[data-f="${f.id}"]`, v.checks);
+      if (f.type === 'checks+text') setVal(`#${fid}-t`, v.text);
+    } else if (f.type === 'choice') {
+      if (v) setChips(`.fq-choice[data-f="${f.id}"]`, v.checks);
+    } else if (f.type === 'schedule') {
+      if (!v) return;
+      setChips(`.fq-checks[data-f="${f.id}-days"]`, v.days);
+      setVal(`#${fid}-time`, v.time);
+    } else if (f.type === 'group') {
+      (f.sub || []).forEach((sf) => setVal(`#fq-${sf.id}`, ans[sf.id]));
+    } else {
+      setVal(`#${fid}`, v);
+    }
+  }));
+  return filled;
+}
+
 /* 학생이 새로 적어 준 값을 프로필에 남긴다 ('다음 신청서에도 쓸게요').
    🔴 저장은 기기 안(localStorage)뿐이다 — 밖으로 나가는 코드는 없다. */
 function formKeepToProfile() {

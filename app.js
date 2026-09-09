@@ -598,18 +598,47 @@ function majorSuggestions(q) {
 }
 
 /* ---------------- 화면 전환 ---------------- */
-function showScreen(name) {
+/* 지금 보고 있는 화면 — 이어보기 장부에 적을 때와 스크롤을 갈무리할 때 쓴다 */
+let currentScreen = 'onboarding';
+
+function showScreen(name, opts) {
+  const o = opts || {};
+  /* 떠나기 전 화면의 스크롤을 먼저 갈무리한다 — 다음에 그 탭으로 돌아오면 여기서 이어진다 */
+  if (typeof resumeSaveScroll === 'function' && currentScreen && currentScreen !== name) {
+    resumeSaveScroll(currentScreen, window.scrollY);
+  }
   ['onboarding', 'home', 'explore', 'applications', 'my'].forEach((n) => {
     $(`#screen-${n}`).hidden = n !== name;
   });
   $('#bottom-nav').hidden = name === 'onboarding';
   $$('.nav-item').forEach((b) => b.classList.toggle('active', b.dataset.nav === name));
-  window.scrollTo(0, 0);
+  currentScreen = name;
 
   if (name === 'home') renderHome();
   if (name === 'explore') renderExplore();
   if (name === 'applications') renderApplications();
   if (name === 'my') renderMy();
+
+  /* 🔴 스크롤은 **그린 뒤에** 옮긴다 — 먼저 옮기면 아직 짧은 화면이라 그 자리가 없다.
+     `opts.scroll` 은 이어보기가 되살릴 때만 온다(보통은 늘 맨 위로). */
+  window.scrollTo(0, o.scroll || 0);
+
+  if (typeof resumeSave === 'function' && name !== 'onboarding') resumeSave({ screen: name });
+}
+
+/* 이어보기 장부에 지금 화면·스크롤을 적는다.
+   🔴 `beforeunload` 를 믿지 말 것 — 휴대폰에서는 안 불린다. 앱이 숨는 순간
+      (`visibilitychange` 의 hidden)이 유일하게 믿을 수 있는 신호다. */
+function resumeMark() {
+  if (typeof resumeSave !== 'function') return;
+  if (!currentScreen || currentScreen === 'onboarding') { resumeSave({}); return; }
+  resumeSaveScroll(currentScreen, window.scrollY);
+  /* 🔴 화면 이름도 **여기서 다시** 적는다 (2026-09-09 · 검사를 강화하다 드러났다).
+     예전에는 시각과 스크롤만 찍었는데, 그러면 숨는 순간의 기록이 `showScreen` 이 앞서
+     적어 둔 것에 얹혀야만 온전해진다 — 장부가 그 사이에 비었으면(초기화·저장 공간 정리)
+     **스크롤만 있고 화면이 없는 기록**이 남아 다음에 켤 때 홈으로 간다.
+     앱이 숨는 순간이 가장 믿을 수 있는 신호이므로, 그때 아는 것을 다 적는다. */
+  resumeSave({ screen: currentScreen });
 }
 
 /* ---------------- 온보딩 ---------------- */
@@ -703,6 +732,81 @@ function setChip(groupSel, value) {
 function getChip(groupSel) {
   const el = $(groupSel + ' .chip.active');
   return el ? el.dataset.value : null;
+}
+
+/* ── 쓰다 만 온보딩을 적어 둔다 (2026-09-09 · 개발자 지시 ②) ─────────────
+   학교·학년·성적을 다시 치게 만드는 것이 이 앱에서 가장 큰 손실이다. 그래서 온보딩
+   진행분은 **창(4시간)과 상관없이** 되살린다 — 사흘 뒤에 돌아와도 치던 자리에서 잇는다.
+
+   🔴 `collectProfile()` 로 적지 않는다. 그건 **다 채운 프로필**을 만드는 함수라 빈 칸을
+      기본값으로 메워 버린다(성적 0, 소득 미선택 등) — 학생이 고른 적 없는 값이 프로필에
+      들어가는 것은 원칙 8-1(추론 금지) 위반이다. 화면의 칸을 **그대로** 적었다 그대로 되돌린다. */
+function onboardSnapshot() {
+  const fields = {};
+  $$('#screen-onboarding input, #screen-onboarding select').forEach((el) => {
+    if (!el.id) return;
+    if (el.type === 'checkbox' || el.type === 'radio') { if (el.checked) fields[el.id] = true; return; }
+    if (String(el.value || '').trim()) fields[el.id] = el.value;
+  });
+  /* 🔴 **id 가 없는 체크박스가 있다** (2026-09-09 코드 리뷰). 특별자격(`#in-flags`)과
+     보유 장학금(`#in-scholarships`)의 칸들은 `value` 만 있어서, id 로만 담으면 **매칭을
+     좌우하는 자격이 통째로 안 담긴다**(기초생활수급자·다자녀·국가유공자…).
+     그래서 그 묶음은 **묶음 id + 체크된 value 목록**으로 담는다. */
+  const boxes = {};
+  $$('#screen-onboarding .check-list').forEach((g) => {
+    if (!g.id) return;
+    const on = $$(`#${g.id} input[type="checkbox"]`).filter((c) => c.checked).map((c) => c.value);
+    if (on.length) boxes[g.id] = on;
+  });
+  const chips = {};
+  $$('#screen-onboarding .chip-group').forEach((g) => {
+    if (!g.id) return;
+    const on = $$(`#${g.id} .chip.active`).map((c) => c.dataset.value);
+    if (on.length) chips[g.id] = on;
+  });
+  return { step: onboardStep, fields: fields, boxes: boxes, chips: chips, at: Date.now() };
+}
+
+function onboardRestore(snap) {
+  if (!snap) return false;
+  Object.keys(snap.fields || {}).forEach((id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (el.type === 'checkbox' || el.type === 'radio') el.checked = !!snap.fields[id];
+    else el.value = snap.fields[id];
+  });
+  Object.keys(snap.boxes || {}).forEach((gid) => {
+    const on = snap.boxes[gid] || [];
+    $$(`#${gid} input[type="checkbox"]`).forEach((c) => { c.checked = on.indexOf(c.value) >= 0; });
+  });
+  /* 시·도를 되돌린 뒤에야 그 아래 시·군·구 목록이 채워진다 — 순서가 있다 */
+  fillRegionCities('#in-region', '#in-region-city', (snap.fields || {})['in-region-city']);
+  fillRegionCities('#in-parent-region', '#in-parent-region-city', (snap.fields || {})['in-parent-region-city']);
+  /* 🔴 **학교 칸에 값만 넣으면 캠퍼스 칸이 안 생긴다** (2026-09-09 코드 리뷰). 그 칸은
+     학교를 고를 때 `renderCampusChips()` 가 만드는데, 여기서는 값을 코드로 넣어 그 함수가
+     안 불린다 → `#campus-field` 가 숨은 채라 `collectProfile()` 이 캠퍼스를 빈 값으로 적고,
+     학생이 나중에 학교 칸을 건드리면 **첫 캠퍼스가 골라진 채**로 되살아난다. */
+  const campus = ((snap.chips || {})['in-campus'] || [])[0] || null;
+  if (typeof renderCampusChips === 'function') renderCampusChips(campus);
+  Object.keys(snap.chips || {}).forEach((gid) => {
+    const on = snap.chips[gid] || [];
+    $$(`#${gid} .chip`).forEach((c) => c.classList.toggle('active', on.indexOf(c.dataset.value) >= 0));
+  });
+  if (typeof syncConsentRow === 'function') syncConsentRow();
+  onboardStep = Math.max(0, Math.min(ONBOARD_STEPS - 1, Number(snap.step) || 0));
+  renderOnboardStep();
+  return true;
+}
+
+/* 온보딩에서 무엇을 치거나 고를 때마다 적어 둔다 (디바운스) */
+let onboardSaveTimer = null;
+function onboardProgressSave() {
+  if (typeof resumeSave !== 'function') return;
+  clearTimeout(onboardSaveTimer);
+  onboardSaveTimer = setTimeout(() => {
+    if ($('#screen-onboarding').hidden) return;   /* 이미 끝났으면 안 적는다 */
+    resumeSave({ onboard: onboardSnapshot() });
+  }, 500);
 }
 
 function collectProfile() {
@@ -875,6 +979,48 @@ function saveBtnHtml(id) {
     </button>`;
 }
 
+/* ── 홈 '이어서 쓰기' 줄 (2026-09-09 · 개발자 지시 ②) ────────────────────
+   *"장시간 나갔다가 들어온 경우 해당 프로그레스가 저장되어 있었으면 해."*
+   창(4시간)을 넘겨 들어오면 화면은 홈으로 가지만 **쓰던 것은 안 버린다.** 자동으로
+   신청서를 열지 않는 이유는 하나다 — 며칠 만에 앱을 켰는데 반쯤 쓴 폼이 갑자기 뜨면
+   학생이 자기가 어디 있는지 모른다. 그래서 눌러서 들어오는 한 줄로 둔다.
+
+   🔴 여기서 마감·자격을 보고 숨기지 않는다. 이미 쓴 글은 학생 것이고, 마감됐다는 사실은
+      들어간 화면이 제 손으로 말한다. 숨기면 쓴 글이 사라진 것처럼 보인다. */
+function renderResumeCard() {
+  const el = $('#home-resume');
+  if (!el) return;
+  const saved = typeof resumeLoad === 'function' ? resumeLoad() : null;
+  const prog = saved && saved.form;
+  const alive = typeof resumeProgressAlive === 'function' && resumeProgressAlive(prog, Date.now());
+  const sch = alive && findSch(prog.schId);
+  if (!sch) { el.hidden = true; return; }
+
+  el.hidden = false;
+  el.innerHTML = `
+    <span class="rc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 15h6"/></svg></span>
+    <span class="rc-body">
+      <span class="rc-title">쓰던 신청서가 있어요</span>
+      <span class="rc-sub">${esc(sch.name || sch.title || '')} · ${esc(agoLabel(prog.at))}에 쓰던 것</span>
+    </span>
+    <span class="rc-go">이어서 쓰기</span>`;
+  el.onclick = () => { openSheetShell(); startFormFill(sch, prog); };
+}
+
+/* '5분 전'·'어제' 처럼 사람이 읽는 말로. 🔴 지어내지 않는다 — 못 재면 빈 말을 하지 않고
+   '전에'라고만 한다(원칙 8-1). */
+function agoLabel(ts) {
+  const ms = Date.now() - Number(ts || 0);
+  if (!isFinite(ms) || ms < 0) return '조금 전';
+  const min = Math.floor(ms / 60000);
+  if (min < 1) return '방금';
+  if (min < 60) return `${min}분 전`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `${hr}시간 전`;
+  const day = Math.floor(hr / 24);
+  return day === 1 ? '어제' : `${day}일 전`;
+}
+
 /* ---------------- 홈 ---------------- */
 function renderHome() {
   const p = state.profile;
@@ -911,6 +1057,8 @@ function renderHome() {
      '⚡ 한 번에 모두 신청 준비하기'에서 이모지·'한 번에'·'모두'는 전부 앱의 감탄이지
      학생이 얻는 정보가 아니었다. 남는 것은 건수와 동사뿐이다. */
   btn.textContent = notApplied.length ? `${notApplied.length}건 신청 준비` : '준비할 장학금이 남아 있지 않습니다';
+
+  renderResumeCard();
 
   const upcoming = matches
     .filter((m) => m.result.status !== 'ineligible' && dday(m.sch.deadline).days >= 0 && notStale(m.sch))
@@ -1241,14 +1389,52 @@ function renderDocPrep() {
 /* ---------------- 실제 양식 채움 플로우 ---------------- */
 let formFill = null; // { schId, stage:'q'|'preview', ans }
 
-function startFormFill(sch) {
+function startFormFill(sch, restore) {
   formFill = { schId: sch.id, stage: 'q', ans: null };
   /* 프로필이 바뀌었을 수 있으니 질문 설계를 다시 짠다 */
   if (typeof formInvalidatePlan === 'function') formInvalidatePlan();
-  renderFormFill();
+  renderFormFill(restore);
 }
 
-function renderFormFill() {
+/* ── 쓰던 신청서를 적어 둔다 (2026-09-09 · 이어보기 3겹) ─────────────────
+   개발자 지시: *"신청서 혹은 앱 내에서 어떠한 작업을 진행 중, 장시간 나갔다가 들어온
+   경우 해당 프로그레스가 저장되어 있었으면 해."*
+
+   🔴 **'만들기'를 누를 때 저장하는 것으로는 늦다.** 학생은 아무것도 누르지 않고 나간다
+      (증명서를 떼러 가는 것이 이 앱에서 가장 흔한 이탈이다). 그래서 **치는 동안**
+      적는다 — 그러지 않으면 크레딧을 낸 AI 초안까지 통째로 사라진다.
+   ⚠️ 글자마다 저장하면 긴 자소서에서 버벅인다. 잠깐 멈췄을 때만 적는다(디바운스). */
+let formSaveTimer = null;
+function formProgressSave(now) {
+  if (!formFill || typeof resumeSave !== 'function') return;
+  clearTimeout(formSaveTimer);
+  const run = () => {
+    if (!formFill) return;
+    /* 🔴 **질문 화면이 진짜 떠 있을 때만** 모은다. 시트는 하나를 돌려 쓰므로, 다른 내용이
+       올라온 뒤에 모으면 칸이 하나도 없어 **빈 답이 좋은 답을 덮는다**(코드 리뷰). */
+    if (formFill.stage === 'q' && !$('#btn-ff-generate')) return;
+    const sch = findSch(formFill.schId);
+    const tplId = sch && formTplIdFor(sch);
+    const tpl = tplId && FORM_TEMPLATES[tplId];
+    if (!tpl) return;
+    /* 미리보기 단계에서는 화면에 질문 칸이 없다 — 그때는 이미 모아 둔 답을 그대로 적는다 */
+    const ans = formFill.stage === 'q' ? collectFormAnswers(tpl) : formFill.ans;
+    if (!ans) return;
+    resumeSave({
+      sheet: { kind: 'form', id: formFill.schId },
+      form: { schId: formFill.schId, tplId: tplId, stage: formFill.stage, ans: ans, at: Date.now() },
+    });
+  };
+  if (now) run(); else formSaveTimer = setTimeout(run, 700);
+}
+
+/* 다 썼다 — 쓰던 것 표시를 지운다 (이제 신청내역에 정식으로 들어갔다) */
+function formProgressClear() {
+  clearTimeout(formSaveTimer);
+  if (typeof resumeSave === 'function') resumeSave({ form: null, sheet: null });
+}
+
+function renderFormFill(restore) {
   const sch = findSch(formFill.schId);
   const tpl = FORM_TEMPLATES[formTplIdFor(sch)];
   const sheet = $('#detail-sheet');
@@ -1264,8 +1450,20 @@ function renderFormFill() {
         <button class="btn btn-primary btn-lg" id="btn-ff-generate">양식 문서 만들기</button>
         <p class="dp-note">이미 아는 정보는 묻지 않고 자동으로 채웁니다 — 위 '프로필에서 자동으로 채운 항목'에서 확인·수정할 수 있습니다.</p>
       </div>`;
+    /* 잠깐 나갔다 온 학생의 답을 그대로 되돌려 넣는다 (AI 초안도 같은 칸에 있어 함께 온다).
+       🔴 `essayBind` **앞에** 둔다 — 뒤에 두면 초안 도우미가 이미 읽어 간 값과 어긋난다. */
+    if (restore && restore.ans && typeof fillFormAnswers === 'function') {
+      const n = fillFormAnswers(tpl, restore.ans);
+      /* 되살렸다고 말하는 것은 **앱을 다시 열었을 때뿐**이다. '질문 다시 보기'로 돌아온
+         학생에게는 당연한 일이라 알릴 것이 없다(quiet). */
+      if (n && !restore.quiet) toast('쓰던 신청서를 그대로 불러왔어요');
+    }
     /* AI 초안 버튼 — essay-config.js 의 endpoint 가 비어 있으면 버튼 자체가 없다 */
     if (typeof essayBind === 'function') essayBind(tpl, sch);
+    /* 들어온 순간에도 한 번 적는다 — 자동으로 채운 값부터 남는다.
+       치는 동안의 저장은 bindEvents 의 **위임 리스너 하나**가 맡는다:
+       여기서 걸면 단계를 오갈 때마다 리스너가 쌓인다(시트는 innerHTML 만 갈린다). */
+    formProgressSave(true);
     $('#btn-ff-generate').addEventListener('click', (e) => {
       /* 제출 전 점검(1순위) — 그대로 내면 사고가 나는 것(빈칸 [ ]·블라인드에 학교명)이
          있으면 한 번 세운다. 막지 않는다 — 다시 누르면 진행된다(이 앱의 방식). */
@@ -1294,6 +1492,7 @@ function renderFormFill() {
       if (kept) { saveState(); if (typeof formInvalidatePlan === 'function') formInvalidatePlan(); }
       formFill.stage = 'preview';
       renderFormFill();
+      formProgressSave(true);   /* 미리보기로 넘어간 것도 진행분이다 */
     });
   } else {
     sheet.innerHTML = `
@@ -1308,7 +1507,13 @@ function renderFormFill() {
           <button class="btn btn-outline" id="btn-ff-doc">.doc 저장</button>
         </div>
       </div>`;
-    $('#btn-ff-back').addEventListener('click', () => { formFill.stage = 'q'; renderFormFill(); });
+    /* 🔴 '질문 다시 보기'는 **쓴 답을 들고 돌아가야 한다** (2026-09-09 코드 리뷰).
+       질문 화면을 새로 그리므로 칸이 전부 비는데, 예전에는 그대로 두어 학생이 다시 쳐야 했고,
+       이제는 그 빈 화면이 곧바로 장부에 적혀 **좋은 답을 빈 값으로 덮기까지** 한다. */
+    $('#btn-ff-back').addEventListener('click', () => {
+      formFill.stage = 'q';
+      renderFormFill({ ans: formFill.ans, quiet: true });
+    });
     $('#btn-ff-doc').addEventListener('click', () => downloadFormDoc(tpl, state.profile, formFill.ans));
     $('#btn-ff-confirm').addEventListener('click', () => {
       const existing = state.applications.find((a) => a.id === sch.id);
@@ -1318,6 +1523,7 @@ function renderFormFill() {
       const ch = officialChannel(sch);
       toast(`양식 작성 완료 · 문서를 저장해 ${ch.label}에 제출하세요`);
       formFill = null;
+      formProgressClear();   /* 신청내역에 정식으로 들어갔으니 '쓰던 것' 표시를 지운다 */
       closeSheet();
       const current = $$('.screen').find((s) => !s.hidden);
       if (current) showScreen(current.id.replace('screen-', ''));
@@ -2272,6 +2478,9 @@ function openDetail(id) {
     </div>`;
 
   openSheetShell();
+  /* 이어보기 — 보던 공고를 적어 둔다. 🔴 **판정은 적지 않는다**: 다시 열 때 이 함수가
+     처음부터 다시 돌아 `dday`·`evaluate` 로 새로 판정한다(자리를 비운 사이 마감될 수 있다). */
+  if (typeof resumeSave === 'function') resumeSave({ sheet: { kind: 'detail', id: sch.id } });
 
   if (canApply) {
     $('#btn-apply-one').addEventListener('click', () => applyTo(sch));
@@ -2425,6 +2634,18 @@ function closeSheet() {
   sheetBack = null;          // 흐름이 닫을 때는 돌아갈 곳도 지운다
   docPrep = null;
   bulkPrep = null;
+  /* 🔴 **쓰던 신청서 표시도 함께 내린다** (2026-09-09 코드 리뷰). 안 내리면 시트가 닫힌 뒤에도
+     `formFill` 이 남아, ① 같은 시트를 쓰는 일괄 준비에서 체크만 해도 위임 리스너가
+     `formProgressSave` 를 불러 **칸이 없는 화면에서 답을 모아 빈 값으로 덮어쓰고**
+     ② 앱이 숨을 때 방금 지운 `sheet:{kind:'form'}` 을 다시 적어 다음에 켤 때 학생이
+     닫은 신청서가 도로 열린다. 🔴 장부의 `form`(쓴 글)은 여기서 안 지운다 — 시트를 내린 것과
+     쓴 글을 버리는 것은 다른 일이다. 지우는 곳은 `formProgressClear()` 하나뿐이다. */
+  formFill = null;
+  clearTimeout(formSaveTimer);
+  /* 이어보기 — 시트를 닫았으니 '열려 있던 시트'도 지운다.
+     🔴 쓰던 신청서(`form`)는 **여기서 지우지 않는다.** 학생이 시트를 내렸다고 해서
+        쓴 글을 버리는 것은 아니다 — 그건 '이대로 신청 준비 완료'를 눌렀을 때만 지운다. */
+  if (typeof resumeSave === 'function') resumeSave({ sheet: null });
   $('#sheet-backdrop').classList.remove('show');
   $('#detail-sheet').classList.remove('show');
   setTimeout(() => {
@@ -3201,8 +3422,14 @@ function bindEvents() {
       }
       onboardStep += 1;
       renderOnboardStep();
+      onboardProgressSave();   /* 어느 단계까지 왔는지도 진행분이다 */
     })
   );
+
+  /* 온보딩에서 친 것·고른 것을 적어 둔다 — 위임 하나로(칸이 많고 단계마다 다시 그린다) */
+  ['input', 'change', 'click'].forEach((ev) => {
+    $('#screen-onboarding').addEventListener(ev, () => onboardProgressSave());
+  });
 
   $('#btn-finish-onboard').addEventListener('click', () => {
     onboardEditing = false;
@@ -3212,6 +3439,10 @@ function bindEvents() {
        동의 여부는 '나가도 되는가'를 정하는 값이라 섞으면 헷갈린다. */
     state.consent = { sensitive: !!$('#in-sensitive-ok').checked };
     saveState();
+    /* 온보딩을 마쳤으니 '쓰다 만 온보딩' 표시를 지운다 — 안 지우면 다음에 켤 때
+       이미 만든 프로필을 두고 또 온보딩 진행분을 들고 있게 된다 */
+    clearTimeout(onboardSaveTimer);
+    if (typeof resumeSave === 'function') resumeSave({ onboard: null });
     toast('프로필을 저장했습니다');
     showScreen('home');
     // 프로필을 처음 만든 직후에 알림 동의를 딱 한 번 묻는다 (이후에는 MY 화면에서만)
@@ -3497,6 +3728,12 @@ function bindEvents() {
     if (e.target.checked) bulkPrep.ids.add(id); else bulkPrep.ids.delete(id);
     bulkRefresh();
   });
+  /* 쓰던 신청서를 치는 동안 적어 둔다 (2026-09-09 · 이어보기 3겹).
+     🔴 시트 **하나에 위임**한다 — 시트는 innerHTML 이 계속 갈리므로 그릴 때마다 걸면
+        리스너가 쌓인다(바로 위 일괄 준비 체크가 같은 이유로 위임이다). */
+  ['input', 'change'].forEach((ev) => {
+    $('#detail-sheet').addEventListener(ev, () => { if (formFill) formProgressSave(); });
+  });
   enableSheetSwipe($('#detail-sheet'), dismissSheet);   // 쓸어 내리기 — 개발자가 말한 그 동작
   wireAppsManage();   // 신청 내역 — 왼쪽으로 밀어 삭제 · 선택 모드 (2026-08-24)
   document.addEventListener('keydown', (e) => {
@@ -3567,6 +3804,11 @@ function bindEvents() {
     pop.querySelector('.wp-go').addEventListener('click', () => {
       close();
       [STORAGE_KEY, ...LEGACY_KEYS].forEach((k) => localStorage.removeItem(k));
+      /* 🔴 **이어보기 장부도 함께 지운다** (2026-09-09 코드 리뷰 — 안 지우면 초기화가 거짓말이 된다).
+         그 장부에는 쓰다 만 온보딩(이름·학번·전화·계좌번호)과 신청서에 쓴 글이 들어 있어서,
+         지우지 않으면 다음에 앱을 켤 때 **지웠다고 말한 값이 그대로 되살아난다.** */
+      if (typeof resumeClear === 'function') resumeClear();
+      formFill = null;
       state = { profile: null, applications: [] };
       if (typeof notifyReset === 'function') notifyReset(); // 알림 설정·알림함도 함께 초기화
       initOnboarding();
@@ -3940,12 +4182,53 @@ walletRefresh().then(() => {
 if (typeof notifyInit === 'function') {
   notifyInit().then(() => { if (!$('#screen-my').hidden) renderMy(); }).catch(() => {});
 }
-if (state.profile) {
-  saveState(); // 레거시 키 → 새 키 이관
-  showScreen('home');
-} else {
-  showScreen('onboarding');
+/* ── 다시 열었을 때 어디로 갈 것인가 (2026-09-09 · 노션 원문 목록 4번) ────────
+   예전에는 프로필이 있으면 **늘 홈**이었다 — 탐색 탭을 보다 잠깐 나갔다 와도 홈이었고,
+   브라우저가 이전 화면의 스크롤만 그 홈에 붙여 놓았다(실측 282px).
+   지금은 판정을 `resume.js` 한 곳에 두고 그대로 따른다. 설계·경위는
+   docs/designs/first-run-and-resume.md, 관문은 verify/verify-resume.js. */
+let resumePlan = { screen: 'home', scroll: 0, sheet: null, form: null, onboard: null, resumeCard: null };
+if (state.profile) saveState();   // 레거시 키 → 새 키 이관
+if (typeof resumeDecide === 'function') {
+  resumePlan = resumeDecide({
+    saved: typeof resumeLoad === 'function' ? resumeLoad() : null,
+    now: Date.now(),
+    search: location.search,
+    hash: location.hash,
+    hasProfile: !!state.profile,
+  });
 }
+/* 알림·로그인 복귀로 열렸으면 이어보기가 손을 뗀다 — 그 흐름이 제 화면을 정한다 */
+if (resumePlan.skip) showScreen(state.profile ? 'home' : 'onboarding');
+else if (resumePlan.screen === 'onboarding') {
+  /* 쓰다 만 온보딩을 되살린다(창과 무관 — 학교·학년을 다시 치게 하지 않는다) */
+  if (resumePlan.onboard && onboardRestore(resumePlan.onboard)) toast('쓰다 만 곳부터 이어서 할게요');
+  showScreen('onboarding');
+} else {
+  showScreen(resumePlan.screen, { scroll: resumePlan.scroll });
+  /* 보던 시트·쓰던 신청서는 화면이 그려진 **뒤에** 올린다. 공고·양식 데이터가 아직 오는
+     중일 수 있어 조금 기다린다 — 못 찾으면 조용히 넘어간다(홈은 이미 떠 있다). */
+  if (resumePlan.form || resumePlan.sheet) {
+    setTimeout(() => {
+      if (resumePlan.form) {
+        const sch = findSch(resumePlan.form.schId);
+        /* 🔴 마감·자격은 여기서 다시 보지 않는다 — 이미 쓴 글을 뺏지 않는다.
+           마감된 공고는 시트 안의 판정이 제 손으로 말한다. */
+        if (sch) { openSheetShell(); startFormFill(sch, resumePlan.form); return; }
+      }
+      /* 🔴 공고 상세는 저장해 둔 판정을 쓰지 않고 `openDetail` 이 처음부터 다시 판정한다 */
+      if (resumePlan.sheet && findSch(resumePlan.sheet)) openDetail(resumePlan.sheet);
+    }, 900);
+  }
+}
+/* 부팅 화면을 걷는다 — 화면이 정해진 바로 이 자리다 */
+if (typeof window.bootDone === 'function') window.bootDone();
+
+/* 앱이 숨는 순간에 본 시각·스크롤을 확실히 적어 둔다 (formProgressSave 머리말 참조) */
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') { resumeMark(); formProgressSave(true); }
+});
+window.addEventListener('pagehide', () => { resumeMark(); formProgressSave(true); });
 /* 🔴 소셜 로그인·비밀번호 재설정 메일은 **주소 뒤에 토큰을 붙여** 이 앱으로 돌아온다.
    그걸 먼저 주워 담아야(그리고 주소창에서 지워야) 로그인 상태로 이어진다.
    그 뒤에 서버와 맞춘다 — 기기 우선이라 여기서 기다리지 않는다. 인터넷이 없으면

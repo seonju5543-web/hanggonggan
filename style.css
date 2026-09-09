@@ -3334,3 +3334,99 @@ button, input, select, textarea { letter-spacing: inherit; }
 /* ── 보관함 ──────────────────────────────────────────────── */
 .my-card-title { font-size: var(--t-lg); font-weight: 800; letter-spacing: -0.01em; margin: 0 0 4px; }
 #my-saved .cal-sec:first-of-type { margin-top: 14px; }
+
+/* ══ 부팅 화면 (2026-09-09 · 노션 원문 목록 4번) ═══════════════════════════
+   설계: docs/designs/first-run-and-resume.md
+   🔴 배경은 manifest.json 의 background_color · <meta theme-color> 와 **같은 값**이다.
+      안드로이드 설치형은 그 색으로 제 스플래시를 그리므로, 다르면 켤 때 색이 한 번 튄다.
+   🔴 여기에 태그라인("한 번에 찾고…")을 넣지 말 것 — 매 실행 뜨는 자리라 광고가 된다.
+      그건 환영 화면(온보딩 0단계)의 말이고, 그 화면은 처음 한 번만 뜬다. */
+#boot {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: #fefdfc;   /* = --bg · manifest background_color */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  opacity: 1;
+  transition: opacity 0.12s ease;   /* boot.js 가 이 값을 읽어 걷는 시각을 맞춘다 */
+}
+#boot.boot-out { opacity: 0; pointer-events: none; }
+#boot[hidden] { display: none !important; }
+.boot-logo {
+  width: 88px; height: 88px;
+  border-radius: var(--radius-lg);
+  background: var(--grad-navy);
+  color: #f6f0e2;
+  display: flex; align-items: center; justify-content: center;
+}
+.boot-logo svg { width: 44px; height: 44px; }
+.boot-word {
+  margin: 0;
+  font-size: var(--t-hero);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  color: var(--navy-1);
+  line-height: 1;
+}
+.boot-spin {
+  position: absolute; bottom: 92px;
+  width: 26px; height: 26px;
+  border-radius: var(--radius-pill);
+  border: 2px solid rgba(25, 23, 19, 0.10);
+  border-top-color: rgba(25, 23, 19, 0.34);
+  animation: boot-spin 0.8s linear infinite;
+}
+.boot-spin[hidden] { display: none !important; }
+@keyframes boot-spin { to { transform: rotate(360deg); } }
+/* 시한이 지났을 때 — 무슨 일인지 말하고 다시 시도하게 한다 */
+.boot-fail { position: absolute; bottom: 64px; left: 24px; right: 24px; text-align: center; }
+.boot-fail[hidden] { display: none !important; }
+.boot-fail p {
+  margin: 0 0 14px;
+  font-size: var(--t-md);
+  color: var(--text-sub);
+  line-height: 1.6;
+}
+.boot-fail .btn { width: 100%; }
+/* 움직임을 줄여 달라고 한 기기에서는 돌리지 않는다 */
+@media (prefers-reduced-motion: reduce) {
+  .boot-spin { animation: none; }
+  #boot { transition: none; }
+}
+
+/* ── 홈 '이어서 쓰기' 줄 (2026-09-09) ────────────────────────────────────
+   창(4시간)을 넘겨 들어와도 **쓰던 것은 안 버린다**는 개발자 지시 ②의 자리.
+   자동으로 신청서를 열지 않고 여기 한 줄로 되살린다 — 반쯤 열린 폼을 갑자기 띄우면
+   학생이 자기가 어디 있는지 모른다. */
+.resume-card {
+  width: 100%;
+  margin-top: 14px;
+  background: var(--surface);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--radius);
+  padding: 15px 17px;
+  box-shadow: var(--shadow);
+  display: flex; align-items: center; gap: 13px;
+  text-align: left;
+}
+.resume-card .rc-ico { color: var(--accent); display: flex; flex-shrink: 0; }
+.resume-card .rc-ico svg { width: 22px; height: 22px; }
+/* 🔴 안쪽 두 줄은 `<span>` 이라 **블록으로 만들어야** 한다 (2026-09-09 코드 리뷰):
+   인라인인 채로는 `margin-top`·`overflow`·`text-overflow` 가 전부 무시돼, 두 줄이 한 줄로
+   붙고 긴 공고 이름이 잘리지 않고 카드 밖으로 삐져나온다. */
+.resume-card .rc-body { flex: 1; min-width: 0; }
+.resume-card .rc-title {
+  display: block;
+  font-size: var(--t-md); font-weight: 700; letter-spacing: -0.01em;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.resume-card .rc-sub {
+  display: block;
+  font-size: var(--t-xs); color: var(--text-sub); margin-top: 3px; line-height: 1.45;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.resume-card .rc-go { font-size: var(--t-sm); font-weight: 700; color: var(--accent); white-space: nowrap; }

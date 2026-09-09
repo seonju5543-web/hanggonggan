@@ -3789,5 +3789,144 @@ console.log('\n■ 검사가 개발자 컴퓨터에서만 실패하지 않는다
     self.split("fs.read" + "FileSync(").length - 1, 1);   // readText 정의 안의 1회뿐
 }
 
+
+/* ══ 첫 실행 화면 · 이어보기 (2026-09-09 · 노션 원문 목록 4번) ══════════════
+   설계: docs/designs/first-run-and-resume.md
+
+   지키는 사고 넷 — 전부 2026-09-09에 앱을 띄워 실측한 것이다:
+   ① 프로필이 있는 학생이 다시 켜도 **환영 화면이 먼저 그려졌다**(index.html 에서
+      hidden 이 없는 화면이 그것 하나뿐이라, app.js 가 화면을 정할 때까지 그게 화면이다)
+   ② 탐색 탭에서 나갔다 와도 **늘 홈**이었고 ③ 그 홈에 **이전 화면의 스크롤이 붙었다**
+   ④ 신청서를 쓰다 나가면 **쓴 것이 통째로 사라졌다**(크레딧을 낸 AI 초안까지) */
+console.log('\n■ 첫 실행 화면 (2026-09-09)');
+{
+  const root = new URL('../', import.meta.url);
+  const html = readText(new URL('index.html', root));
+
+  /* ① 화면은 전부 감춰진 채 시작한다 — 하나라도 열려 있으면 그게 '첫 화면'이 된다 */
+  const screens = [...html.matchAll(/<section id="screen-([a-z]+)" class="screen"([^>]*)>/g)]
+    .filter((m) => !/\bhidden\b/.test(m[2])).map((m) => m[1]);
+  eq('열린 채 시작하는 .screen 이 없다', screens, []);
+
+  /* ② 부팅 화면 자체가 있고, 걷는 손잡이가 있다 */
+  eq('부팅 화면이 index.html 에 있다', /id="boot"/.test(html), true);
+  const bootJs = readText(new URL('boot.js', root));
+  eq('boot.js 가 스크롤 되살리기를 끈다', /scrollRestoration\s*=\s*'manual'/.test(bootJs), true);
+  eq('boot.js 에 시한이 있다 (갇히지 않는다)', /BOOT_TIMEOUT_MS/.test(bootJs), true);
+  eq('boot.js 가 걷는 손잡이를 연다', /window\.bootDone/.test(bootJs), true);
+  eq('app.js 가 화면을 정한 뒤 부팅 화면을 걷는다',
+    /window\.bootDone\(\)/.test(readText(new URL('app.js', root))), true);
+
+  /* ③ 🔴 boot.js 는 **다른 스크립트보다 먼저** 실려야 한다. 뒤에 두면 그 사이가
+     그대로 비고, 그게 이 파일이 없애려던 바로 그 틈이다. */
+  const order = [...html.matchAll(/<script src="([^"]+)"/g)].map((m) => m[1]);
+  eq('boot.js 가 첫 스크립트다', order[0], 'boot.js');
+  eq('resume.js 가 app.js 보다 먼저다', order.indexOf('resume.js') < order.indexOf('app.js'), true);
+
+  /* ④ 🔴 인라인 <script> 로 옮기면 CSP(script-src 'self')가 막아 **조용히** 아무 일도 안 난다 */
+  eq('CSP 가 여전히 인라인 스크립트를 막는다 (boot.js 를 인라인으로 옮기면 안 되는 이유)',
+    /script-src 'self'/.test(html) && !/script-src[^;]*unsafe-inline/.test(html), true);
+
+  /* ⑤ 서비스워커가 새 파일을 안 담으면 설치된 앱에서 오프라인에 깨진다 */
+  const sw = readText(new URL('sw.js', root));
+  eq('sw.js ASSETS 에 boot.js 가 있다', /'boot\.js'/.test(sw), true);
+  eq('sw.js ASSETS 에 resume.js 가 있다', /'resume\.js'/.test(sw), true);
+}
+
+console.log('\n■ 이어보기 판정 (2026-09-09)');
+{
+  const req = createRequire(import.meta.url);
+  const R = req('../resume.js');
+  const HOUR = 3600e3;
+  const now = 1757400000000;
+  const base = (o) => Object.assign({ v: 1, at: now - 5 * 60e3, screen: 'explore', scroll: { explore: 240 } }, o || {});
+  const dec = (saved, opts) => R.resumeDecide(Object.assign({ saved, now, hasProfile: true, search: '', hash: '' }, opts || {}));
+
+  /* ── 창 안 = 하던 화면 그대로 (개발자 지시 ①) ── */
+  eq('5분 만에 오면 하던 탭', dec(base()).screen, 'explore');
+  eq('그때 스크롤도 이어진다', dec(base()).scroll, 240);
+  eq('보던 공고가 다시 열린다', dec(base({ sheet: { kind: 'detail', id: 'reg-x' } })).sheet, 'reg-x');
+
+  /* ── 창을 넘기면 홈. 하지만 쓰던 것은 안 버린다 (개발자 지시 ②) ── */
+  const stale = base({ at: now - 5 * HOUR, form: { schId: 'reg-y', ans: { a: 1 }, at: now - 5 * HOUR } });
+  eq('5시간 만에 오면 홈', dec(stale).screen, 'home');
+  eq('그래도 쓰던 신청서는 남아 있다', (dec(stale).resumeCard || {}).schId, 'reg-y');
+  eq('창을 넘겼으니 자동으로 열지는 않는다', dec(stale).form, null);
+
+  /* 🔴 창(어디로 가는가)과 보관 기한(언제 버리는가)은 **다른 값**이다 */
+  eq('창과 보관 기한이 같은 값이 아니다', R.RESUME_WINDOW_MS === R.RESUME_KEEP_MS, false);
+  const ancient = base({ at: now - 30 * 24 * HOUR, form: { schId: 'reg-y', ans: {}, at: now - 30 * 24 * HOUR } });
+  eq('보관 기한(7일)을 넘긴 진행분은 버린다', dec(ancient).resumeCard, null);
+
+  /* ── 창 안에 신청서를 쓰고 있었으면 그 신청서로 ── */
+  const wip = base({ sheet: { kind: 'form', id: 'reg-z' }, form: { schId: 'reg-z', ans: { a: 1 }, at: now - 60e3 } });
+  eq('쓰던 신청서를 그대로 연다', (dec(wip).form || {}).schId, 'reg-z');
+  eq('그때 공고 상세는 안 연다 (둘이 겹치지 않는다)', dec(wip).sheet, null);
+
+  /* ── 알림·로그인 복귀가 이긴다 (나중에 덮으면 화면이 두 번 바뀐다) ── */
+  eq('알림으로 열면 이어보기가 손을 뗀다', dec(base(), { search: '?sch=reg-a' }).skip, true);
+  eq('화면 딥링크도 마찬가지', dec(base(), { search: '?screen=my' }).skip, true);
+  eq('로그인 복귀 토큰도 마찬가지', dec(base(), { hash: '#access_token=abc' }).skip, true);
+
+  /* ── 온보딩 진행분은 창과 상관없이 되살린다 (학교·학년을 다시 치게 하지 않는다) ── */
+  const ob = { step: 3, fields: { 'in-school': '경희대학교' }, at: now - 3 * 24 * HOUR };
+  const noProf = dec(base({ at: now - 3 * 24 * HOUR, onboard: ob }), { hasProfile: false });
+  eq('프로필이 없으면 온보딩으로', noProf.screen, 'onboarding');
+  eq('사흘 뒤에 와도 치던 단계에서 잇는다', (noProf.onboard || {}).step, 3);
+
+  /* ── 없는 장부·손상된 장부에서도 안 죽는다 ── */
+  eq('장부가 없으면 홈', dec(null).screen, 'home');
+  eq('손상된 장부는 없는 것으로', dec({ nope: 1 }).screen, 'home');
+  eq('모르는 화면 이름은 홈으로', dec(base({ screen: 'wat' })).screen, 'home');
+  /* 폰 시각이 뒤로 갔을 때 — 창 판정이 한쪽으로 쏠리면 안 된다 */
+  eq('시계가 미래면 창 밖으로 본다', dec(base({ at: now + 10 * HOUR })).fresh, false);
+
+  /* 🔴 진행분은 **기기 밖으로 안 나간다** — 프로필 장부와 다른 열쇠여야 한다.
+     여기엔 학생이 신청서에 쓴 글이 들어가고, 저쪽은 로그인하면 서버로 올라간다. */
+  const appJs = readText(new URL('../app.js', import.meta.url));
+  eq('이어보기 열쇠가 프로필 열쇠와 다르다', R.RESUME_KEY === 'handaejang.v1', false);
+  eq('이어보기 값을 state 에 넣지 않는다', /state\.resume\b/.test(appJs), false);
+
+  /* 🔴 답을 넣는 함수와 빼는 함수가 **같은 칸 종류**를 다뤄야 한다 —
+     어긋나면 되살릴 때 조용히 빈 칸이 된다. */
+  const formsJs = readText(new URL('../forms.js', import.meta.url));
+  const kindsOf = (fn) => {
+    const i = formsJs.indexOf('function ' + fn);
+    const body = formsJs.slice(i, formsJs.indexOf('\nfunction ', i + 10));
+    return [...new Set([...body.matchAll(/f\.type === '([a-z+]+)'/g)].map((m) => m[1]))].sort();
+  };
+  eq('collectFormAnswers 와 fillFormAnswers 가 같은 칸 종류를 다룬다',
+    kindsOf('fillFormAnswers'), kindsOf('collectFormAnswers'));
+
+  /* 🔴 `beforeunload` 로 저장하면 휴대폰에서 안 불린다 — 이탈한 그 순간을 못 적는다 */
+  eq('앱이 숨는 순간에 적는다 (beforeunload 가 아니라 visibilitychange)',
+    /visibilitychange[\s\S]{0,200}resumeMark/.test(appJs), true);
+
+  /* ── 2026-09-09 코드 리뷰에서 잡힌 다섯 (되돌아오면 조용히 망가지는 것들) ── */
+
+  /* ① 시트를 닫으면 `formFill` 도 내려야 한다. 안 내리면 같은 시트를 쓰는 일괄 준비에서
+     체크만 해도 **칸 없는 화면의 빈 답이 좋은 답을 덮는다.** */
+  const closeBody = appJs.slice(appJs.indexOf('function closeSheet'), appJs.indexOf('function closeSheet') + 1200);
+  eq('closeSheet 가 formFill 을 내린다', /formFill = null/.test(closeBody), true);
+
+  /* ② 질문 화면이 안 떠 있으면 답을 모으지 않는다 (같은 이유) */
+  const saveBody = appJs.slice(appJs.indexOf('function formProgressSave'), appJs.indexOf('function formProgressClear'));
+  eq('질문 화면이 떠 있을 때만 답을 모은다', /btn-ff-generate/.test(saveBody), true);
+
+  /* ③ '질문 다시 보기'는 쓴 답을 들고 돌아간다 (안 그러면 빈 화면이 그대로 장부에 적힌다) */
+  eq("'질문 다시 보기'가 답을 들고 돌아간다",
+    /btn-ff-back[\s\S]{0,260}renderFormFill\(\s*\{\s*ans:/.test(appJs), true);
+
+  /* ④ id 없는 체크박스(특별자격·보유 장학금)도 담는다 — 매칭을 좌우하는 값들이다 */
+  eq('온보딩 갈무리가 id 없는 체크박스도 담는다', /check-list[\s\S]{0,200}checked/.test(appJs), true);
+  eq('되살릴 때 캠퍼스 칸을 다시 그린다', /renderCampusChips\(campus\)/.test(appJs), true);
+
+  /* ⑤ 🔴 데이터 초기화가 이어보기 장부까지 지운다 — 안 지우면 '지웠다'가 거짓말이 된다
+     (그 장부에 이름·학번·전화·계좌번호와 신청서에 쓴 글이 들어 있다) */
+  const resetAt = appJs.indexOf('[STORAGE_KEY, ...LEGACY_KEYS].forEach');
+  eq('데이터 초기화가 이어보기 장부도 지운다',
+    /resumeClear\(\)/.test(appJs.slice(resetAt, resetAt + 600)), true);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);

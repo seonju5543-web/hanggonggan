@@ -80,7 +80,7 @@ jobs:
                    verify-supabase.js verify-essay-ui.js verify-forms-data.js \
                    verify-new-forms.js verify-source-links.js verify-push-client.js \
                    verify-notify.js verify-sheet-back.js verify-kosaf.js \
-                   verify-calendar.js; do
+                   verify-calendar.js verify-resume.js; do
             echo "── $f"
             node "verify/$f"
           done

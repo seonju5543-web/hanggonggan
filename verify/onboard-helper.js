@@ -70,8 +70,15 @@ async function assertOwnServer(port, file = 'app.js') {
 
    남은 일: 이미 제 사본을 가진 드라이버 일곱(chat·apps-manage·essay-ui·explore-sort·
    registered·fit-badge·kosaf)은 아직 각자 것을 쓴다. 손볼 때 이쪽으로 옮길 것. */
+/* 🔴 **시트가 안 떴으면 아무것도 누르지 않는다** (2026-09-09에 잡은 잠재 버그).
+   예전에는 `#btn-nf-later` 가 없으면 무조건 Escape 를 눌렀는데, 동의 시트가 아예 안 뜬 판
+   (프로필을 심어 둔 검사가 그렇다)에서는 그 Escape 가 **열려 있던 공고 상세 시트를 닫았다**
+   — app.js 의 Escape 처리가 `notify-sheet` 가 닫혀 있으면 `detail-sheet` 를 닫기 때문이다.
+   verify-resume 이 되살린 신청서를 이 Escape 가 도로 닫아 빨간불이 났다. 안 뜨면 할 일이 없다. */
 async function dismissNotify(page) {
-  await page.waitForSelector('#notify-sheet:not([hidden])', { timeout: 6000 }).catch(() => {});
+  const up = await page.waitForSelector('#notify-sheet:not([hidden])', { timeout: 6000 })
+    .then(() => true).catch(() => false);
+  if (!up) return;
   const later = await page.$('#btn-nf-later');
   if (later) await later.click().catch(() => {});
   else await page.keyboard.press('Escape').catch(() => {});

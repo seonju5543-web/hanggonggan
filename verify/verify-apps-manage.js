@@ -46,6 +46,8 @@ const eq = (label, got, want) => {
 
   /* 프로필 + 신청 3건을 미리 넣어 둔다 — 온보딩을 매번 태우지 않으려고 */
   await page.addInitScript(() => {
+    /* 이어보기 장부도 지운다 — 남겨 두면 앱이 앞 검사에서 보던 화면으로 돌아간다 (2026-09-09) */
+    localStorage.removeItem('handaejang.resume');
     localStorage.setItem('handaejang.v1', JSON.stringify({
       profile: { name: '김한장', school: '한국외국어대학교', campus: '', track: 'humanities', major: '영어학과',
         year: 3, status: '재학', gpa: 3.5, bracket: 5, credits: 15, region: '서울', parentRegion: '서울',

@@ -39,8 +39,11 @@ const PROFILE = {
   page.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
   page.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push('CONSOLE: ' + m.text()); });
 
-  await page.addInitScript((p) => localStorage.setItem('handaejang.v1',
-    JSON.stringify({ profile: p, applications: [] })), PROFILE);
+  await page.addInitScript((p) => {
+    localStorage.setItem('handaejang.v1', JSON.stringify({ profile: p, applications: [] }));
+    /* 이어보기 장부도 지운다 — 남겨 두면 앱이 앞 검사에서 보던 화면으로 돌아간다 (2026-09-09) */
+    localStorage.removeItem('handaejang.resume');
+  }, PROFILE);
   await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('#screen-home:not([hidden])', { timeout: 8000 });
   await page.waitForSelector('#notify-sheet:not([hidden])', { timeout: 6000 }).catch(() => {});

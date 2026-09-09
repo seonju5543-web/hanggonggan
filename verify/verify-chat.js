@@ -359,7 +359,13 @@ async function ask(page, q) {
     { fab: fabBox2.y + fabBox2.height, nav: navBox2.y });
   ok(fabBox2.x >= 0 && fabBox2.x + fabBox2.width <= 390, '화면 밖으로 나가지 않는다', fabBox2);
 
-  /* 옮긴 자리가 기억되는가 — 앱을 다시 열어도 그대로여야 한다 */
+  /* 옮긴 자리가 기억되는가 — 앱을 다시 열어도 그대로여야 한다.
+     🔴 **다시 열기 전에 홈으로 옮겨 둔다** (2026-09-09). 이 검사는 앞에서 도우미의
+        '행동 버튼'을 눌러 MY 화면으로 갔고(202줄) 돌아온 적이 없다. 예전에는 앱이 다시 열 때
+        무조건 홈으로 가서 그게 가려져 있었는데, 이어보기가 생기면서 **하던 화면(MY)으로**
+        돌아온다 — 앱이 맞고 이 검사의 가정이 낡은 것이다. 어디에 있는지를 검사가 정한다. */
+  await page.click('.nav-item[data-nav="home"]');
+  await page.waitForSelector('#screen-home:not([hidden])');
   const placed = await page.locator('#btn-chat-fab').boundingBox();
   await page.reload({ waitUntil: 'domcontentloaded' });
   await page.waitForSelector('#screen-home:not([hidden])');
