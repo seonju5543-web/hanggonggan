@@ -19,7 +19,7 @@ const PR = (typeof module !== 'undefined' && module.exports)
   /* 🔴 브라우저에서는 **전역 함수**로 쓴다 — 여기에 이름을 빠뜨리면 Node 검사는 전부
      통과하는데 앱은 첫 카드에서 죽는다. `headRest`(section-head)에 이어 `caseBranch`도
      같은 실수를 했다(2026-08-24). 아래 회귀가 브라우저 순서로 실어 실제로 불러 본다. */
-  : { parseLine, gradOnly, caseBranch, unaskedAttr, REGIONS, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM };
+  : { parseLine, gradOnly, gradTarget, mentionsUndergrad, caseBranch, unaskedAttr, REGIONS, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM };
 const PR2 = PR;   // requirementLines가 쓰는 별칭 (선언 순서 때문에 이름만 따로 둔다)
 /* 시·도 이름은 parse-requirements 가 갖고 있다 — 여기 베끼면 두 벌이 된다 */
 const PR_REGIONS = PR.REGIONS || [];
@@ -444,8 +444,29 @@ function fitDetail(sch, p) {
      요건이 **9개**인데 5개만 맞으면 '요건 5개 중 5개 충족 · 100%'가 떴다 —
      확인조차 안 한 요건 4개가 점수에서 통째로 빠진 것이다(실측 15건 · 23줄).
      점수는 `all: true`로 **전부** 세고, 화면에 몇 줄을 띄우는지는 따로 정한다. */
-  const items = requirementLines(sch, lines, { withMeta: true, all: true }).filter((it) => !PR.gradOnly(it.text));
+  const allItems = requirementLines(sch, lines, { withMeta: true, all: true });
+  const items = allItems.filter((it) => !PR.gradOnly(it.text));
   if (!items.length) return { pct: FIT_UNREAD, unread: true, met: 0, total: 0, unknown: 0, fails: [] };
+
+  /* 🔴 **이 장학금이 대학원생 것이라고 문장으로 말한 공고는 점수를 매기지 않는다** (2026-09-09).
+     위에서 대학원 줄을 분모에서 빼는 것은 `일반대학원생 : 평점 4.0` 처럼 **학부/대학원 기준을
+     나란히 적은 표의 한 칸**을 두고 한 조치다(가톨릭대 동문장학금). 그런데 같은 처리가
+     `국내 의과학 대학원 석/박사 과정 재학생` 처럼 **대상 자체를 말하는 문장**에도 걸리면서,
+     그 줄을 지우고 남은 두 줄(국적·소득구간)만 세어 **적합도 95%** 가 나왔다 —
+     동행복지재단 의과학자 장학금이 학부 3학년 컴퓨터공학과 학생의 탐색 목록 **맨 위**에
+     95% 로 떠 있었다(브라우저 실측). 받을 수 없는 장학금을 가장 잘 맞는 것이라 부른 것이다.
+     프로필에 학위 과정 칸이 없어 우리는 그 학생이 대학원생인지 **모른다**.
+     그래서 95% 라고도, 미달이라고도 하지 않고 **'자격 미확인'** 으로 둔다
+     (틀린 미달은 못 받는 것보다 나쁘다 — 원문을 열어 학생이 직접 판단한다).
+     ⚠️ 표의 한 칸(`gradTarget === 'label'`)은 예전 그대로 빼기만 한다. 여기서 막으면
+        2026-08-24 에 고친 가톨릭대 오탐이 되살아난다. */
+  /* ⚠️ **원문 줄에서 본다** — `requirementLines` 가 대학원 줄을 이미 버린 뒤라(1055줄)
+     그 결과에서 찾으면 영영 안 걸린다. 처음에 그렇게 짰다가 브라우저로 재서 잡았다. */
+  const gradBody = lines.some((t) => PR.gradTarget && PR.gradTarget(t) === 'body');
+  const anyUndergrad = lines.some((t) => PR.mentionsUndergrad && PR.mentionsUndergrad(t));
+  if (gradBody && !anyUndergrad) {
+    return { pct: FIT_UNREAD, unread: true, met: 0, total: 0, unknown: 0, fails: [] };
+  }
 
   /* 🔴 **이미 뽑아 둔 제외 줄을 그대로 판정한다** (2026-08-30 전수 대조에서 발견).
      예전에는 제외 목록까지 `requirementLines(onlyExclude)` 에 밀어 넣었는데, 그 함수는

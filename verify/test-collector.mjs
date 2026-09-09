@@ -1308,7 +1308,17 @@ console.log('\n■ 학과·전공·계열 요건 (2026-08-30)');
   eq('띄어 쓴 앞말은 학과명이 아니다 (본교 학부)',
     names('본교 학부 / 대학원 수업연한 내 정규학기 재학생'), null);
   eq('  학년도 아니다', names('도내 대학 2~4학년 학부 재학생'), null);
-  eq('  「관련학과」는 테두리가 흐리다', names('SW 관련학과 2026-2학기 등록 기준 2학년 재학생'), null);
+  /* 🔴 **2026-09-09 에 이 항목의 판정 방식을 바꿨다 — 약화가 아니라 강화다.**
+     원래는 `names` 가 비어 있는지만 봤다. 이 항목이 막으려던 것은 `SW관련` 을 학과명으로 집어
+     **엉뚱한 미달**을 내는 것이었는데, 이름을 아예 안 집으니 **학과 축이 통째로 사라져**
+     아무 학과 학생이나 그 줄에 ✓ 를 받았다(영어학과 학생이 SW 관련학과 줄에 충족으로 떴다).
+     지금은 **흐린 이름(fuzzy)** 으로 담는다 — 맞으면 ✓, 어긋나면 '모른다'. 미달은 여전히 안 낸다.
+     그래서 여기서는 이름의 모양이 아니라 **판정**을 본다(그게 원래 지키려던 것이다). */
+  eq('  「관련학과」는 흐린 이름으로 담는다', (of('SW 관련학과 2026-2학기 등록 기준 2학년 재학생') || {}).fuzzy, true);
+  eq('  그래도 남의 학과에 미달을 내지 않는다 (모른다)',
+    mark('SW 관련학과 2026-2학기 등록 기준 2학년 재학생'), null);
+  eq('  그리고 아무 학과나 충족이 되지도 않는다',
+    mark('SW 관련학과 2026-2학기 등록 기준 2학년 재학생') === 'ok', false);
   /* 꼬리말 **뒤도** 봐야 한다 — 안'전공'사에서 `전공` 을 집어 학과명을 만들고 있었다 */
   eq('  낱말 안에 든 「전공」은 집지 않는다',
     names('(한국가스안전공사장학금) 국내 대학교 재학생(만 39세 이하)'), null);
@@ -4150,6 +4160,70 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
     schools(l).forEach((n) => { if (!KNOWN.test(n) || /^(참여|협약|협력|지정|선정|대상|소속|위탁|인정|수혜|모집|파견|주관|운영|시행|연계|추천|년제|국외)/.test(n)) bogus.push(it.id + '::' + n); });
   }));
   eq('등록 공고 전수에 없는 학교가 없다', bogus, []);
+}
+
+/* ── 학위 과정 (2026-09-09 신설 · 노션 핵심-4) ──────────────────────────────────
+   🔴 프로필에 학위 과정 칸이 없다. 그래서 이 축은 **'모른다'로 두는 것이 정답**이고,
+      95% 라고 말하거나 미달이라고 말하는 것 둘 다 틀렸다. 실제로 겪은 것 셋:
+      ① `국내 의과학 대학원 석/박사 과정 재학생` (동행복지재단 · 대학원 전용)이
+         **학부 3학년 컴퓨터공학과 학생에게 적합도 95%** 로, 탐색 목록 맨 위에 떠 있었다.
+         대학원 줄을 분모에서 빼고 남은 두 줄(국적·소득구간)만 셌기 때문이다.
+      ② 반대로 `미술관련 학과 **대학생 및** 대학원 재학생` 처럼 **학부를 함께 적은 줄**이
+         '대학원 전용'으로 읽혀 통째로 빠졌다 — 그 학생을 자격 있게 만드는 줄이 사라진다.
+         원인은 '학부' 목록에 **`대학생` 이 없던 것** 하나였다(3건이 그랬다).
+      ③ 그 줄에서 `미술관련` 을 학과명으로 집지 않는 것은 일부러 그렇게 둔 것인데
+         (띄어 쓴 앞말은 이름이 아니다), 그러면 학과 축이 통째로 사라져 아무 학과나 통과한다.
+         → **흐린 이름(fuzzy)** 으로 담는다: 맞으면 ✓, 어긋나면 '모른다'(미달 아님). */
+{
+  console.log('\n■ 학위 과정 · 흐린 학과');
+  const req = createRequire(import.meta.url);
+  const PR = req('../parse-requirements.js');
+  const ME = req('../match-engine.js');
+
+  eq('표의 한 칸은 label — 분모에서만 뺀다',
+    PR.gradTarget('일반대학원생 : 2학기 이수자 이상, 평점 4.0 이상'), 'label');
+  eq('대상을 말하는 문장은 body', PR.gradTarget('국내 의과학 대학원 석/박사 과정 재학생'), 'body');
+  eq("'대학생' 이 함께 적힌 줄은 대학원 전용이 아니다",
+    PR.gradTarget('대한민국 국적보유자로 미술관련 학과 대학생 및 대학원 재학생'), null);
+  eq("'학부' 가 함께 적힌 줄도 아니다", PR.gradTarget('본교 재학생 (학부 및 대학원생)'), null);
+  eq("'대학원생' 은 '대학생' 을 품지 않는다 (되돌림 방지)",
+    PR.gradTarget('국내 대학원 박사과정 첫 번째 학기 재학자'), 'body');
+
+  const prof = (major, track) => ({ name: 't', school: '경희대학교', campus: '서울캠퍼스',
+    track, major, year: 3, status: '재학', gpa: 4.0, credits: 15, bracket: 4, region: 'seoul',
+    flags: [], cert: false, exchange: false, common: {} });
+  const sch = (lines) => ({ id: 't', name: 't', type: '교외', eligibility: { selective: true }, eligibilityLines: lines });
+
+  /* ① 대학원 전용 공고는 점수를 매기지 않는다 (95% 금지) */
+  const gradOnlyFd = ME.fitDetail(sch(['국내 의과학 대학원 석/박사 과정 재학생',
+    '대한민국 국적 보유자', '한국장학재단 학자금 지원구간 5구간 이하인 자']), prof('컴퓨터공학과', 'engineering'));
+  eq('대학원 전용 공고는 자격 미확인으로 둔다 (95% 가 아니다)', !!gradOnlyFd.unread, true);
+  eq('그때 충족 개수를 세지 않는다', [gradOnlyFd.met, gradOnlyFd.total], [0, 0]);
+
+  /* ② 표의 한 칸(label)은 예전 그대로 — 여기서 막으면 가톨릭대 오탐이 되살아난다 */
+  const mixedFd = ME.fitDetail(sch(['일반대학원생 : 2학기 이수자 이상, 평점 4.0 이상',
+    '직전학기 평점 3.3 이상인 학부 재학생']), prof('컴퓨터공학과', 'engineering'));
+  eq('학부/대학원 기준을 나란히 적은 공고는 그대로 채점한다', !!mixedFd.unread, false);
+
+  /* ③ 흐린 학과 — 맞으면 ✓, 어긋나면 '모른다'(미달 아님) */
+  const artLine = sch(['미술관련 학과 재학생']);
+  const artHit = ME.fitDetail(artLine, prof('미술학과', 'arts'));
+  const artMiss = ME.fitDetail(artLine, prof('컴퓨터공학과', 'engineering'));
+  eq('흐린 학과가 맞으면 충족', [artHit.met, artHit.total], [1, 1]);
+  eq('어긋나면 미달이 아니라 모른다', [artMiss.unknown, artMiss.fails.length], [1, 0]);
+  /* 🔴 이름이 정확히 적힌 줄은 **미달을 낸다** — 흐린 쪽으로 넓히면 그 판정이 사라진다 */
+  const exact = ME.fitDetail(sch(['미술학과 재학생']), prof('컴퓨터공학과', 'engineering'));
+  eq('정확한 학과 이름은 여전히 미달을 낸다', exact.fails.length, 1);
+
+  /* 🔴 데이터 전수 — 대학원 전용 공고가 높은 적합도로 떠 있지 않은가 */
+  const reg = JSON.parse(readText(new URL('../data/registered.json', import.meta.url))).items;
+  const bad = reg.filter((it) => {
+    const ls = it.eligibilityLines || [];
+    if (!ls.some((t) => PR.gradTarget(t) === 'body')) return false;
+    if (ls.some((t) => PR.mentionsUndergrad(t))) return false;
+    return !ME.fitDetail(it, prof('컴퓨터공학과', 'engineering')).unread;
+  }).map((it) => it.id);
+  eq('등록 공고 전수 — 대학원 전용인데 점수가 매겨진 것이 없다', bad, []);
 }
 
 /* ── 모르는 것을 '미충족'이라 부르지 않는다 (2026-09-09 신설) ───────────────────
