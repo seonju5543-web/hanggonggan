@@ -1,0 +1,23 @@
+{
+  "pages": [
+    { "id": "page-1", "name": "움직임 (눌러 보세요)" },
+    { "id": "page-2", "name": "화면 여섯 장" }
+  ],
+  "artboards": [
+    { "file": "Main.dc.html", "page": "page-1", "x": 0, "y": 0, "w": 940, "h": 940, "title": "앱을 껐다 켜 보세요", "is_interactive": true },
+    { "file": "Before.dc.html", "page": "page-1", "x": 1030, "y": 0, "w": 900, "h": 800, "title": "지금은 반대로 돌아간다 (실측)" },
+
+    { "file": "Boot.dc.html", "page": "page-2", "x": 0, "y": 0, "w": 390, "h": 844, "title": "① 부팅 화면 — 켤 때마다" },
+    { "file": "Welcome.dc.html", "page": "page-2", "x": 480, "y": 0, "w": 390, "h": 844, "title": "② 환영 화면 — 최초 1회" },
+    { "file": "Resume1.dc.html", "page": "page-2", "x": 960, "y": 0, "w": 390, "h": 844, "title": "③ 이어보기 1겹 — 탭·스크롤" },
+    { "file": "Resume2.dc.html", "page": "page-2", "x": 1440, "y": 0, "w": 390, "h": 844, "title": "④ 이어보기 2겹 — 공고 상세" },
+    { "file": "Resume3.dc.html", "page": "page-2", "x": 1920, "y": 0, "w": 390, "h": 844, "title": "⑤ 이어보기 3겹 — 쓰던 신청서" },
+    { "file": "Expired.dc.html", "page": "page-2", "x": 2400, "y": 0, "w": 390, "h": 844, "title": "⑥ 창이 지났을 때 — 홈 + 이어서 쓰기" }
+  ],
+  "annotations": [
+    { "id": "note-1", "page": "page-1", "x": 0, "y": -130, "w": 940, "text": "오른쪽 버튼으로 앱을 껐다 켜 보세요 — 폰이 실제로 움직입니다.\n'쓰던 학생'으로 두고 → 신청서 쓰기 시작 → 앱을 나간다 → 5분 뒤 / 5시간 뒤를 각각 눌러 비교해 보세요." },
+    { "id": "note-2", "page": "page-1", "x": 1030, "y": -130, "w": 900, "text": "2026-09-09에 앱을 실제로 띄워 재현한 값입니다. 짐작이 아닙니다." },
+    { "id": "note-3", "page": "page-2", "x": 0, "y": -130, "w": 900, "text": "①은 켤 때마다, ②는 처음 한 번만. ③④⑤는 '잠깐 나갔다 온' 경우, ⑥은 4시간을 넘긴 경우입니다.\n색·글꼴·간격은 지금 앱의 실제 값을 그대로 가져왔습니다." }
+  ],
+  "launch": { "view": "canvas", "page": "page-1" }
+}
