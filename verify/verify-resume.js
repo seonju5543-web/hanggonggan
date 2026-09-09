@@ -81,9 +81,20 @@ async function openWith(ctx, resume) {
      app.js 를 늦춰 **앱 코드가 오기 전의 화면**을 본다. 이게 실측된 원래 증상이다. */
   console.log('\n■ ① 다시 켜도 환영 화면이 안 보인다');
   {
-    const slow = await ctx.newPage();
+    /* 🔴 **서비스워커를 막은 새 판**에서 잰다 (2026-09-09 · CI 가 잡아냈다).
+       이 블록은 app.js 를 늦춰 '앱 코드가 오기 전의 화면'을 보는 것이 전부인데, 앞 판이
+       등록해 둔 서비스워커가 살아 있으면 **캐시에서 app.js 를 즉시 내주어 늦추기가 무시된다.**
+       그러면 앱은 곧바로 뜨고 '환영 화면이 안 뜬다'는 아무것도 안 재고 통과한다 —
+       빨간불보다 나쁜 **거짓 초록불**이다. ⑧번이 같은 함정에 걸렸던 것과 같은 자리다. */
+    const slowCtx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
+    await slowCtx.addInitScript((prof) => localStorage.setItem('handaejang.v1', JSON.stringify({
+      profile: prof, consent: { sensitive: false }, applications: [], saved: [],
+    })), PROFILE);
+    const slow = await slowCtx.newPage();
     await slow.route('**/app.js', async (r) => { await new Promise((x) => setTimeout(x, 1800)); await r.continue(); });
     await slow.goto(URLBASE, { waitUntil: 'commit' }).catch(() => {});
+    /* DOM 이 생기기 전에 재면 전부 '안 보임'이라 아무것도 못 잰다 — 부팅 화면이 붙기를 기다린다 */
+    await slow.waitForSelector('#boot', { state: 'attached', timeout: 5000 }).catch(() => {});
     /* 🔴 부팅 화면이 떠 있는지도 **이 안에서** 본다 — 반복이 끝난 뒤에 재면 그새 app.js 가
        도착해 걷혀 있어, 멀쩡한 앱에서도 빨간불이 난다(짜면서 실제로 그랬다). */
     let sawOnboarding = false;
@@ -94,12 +105,15 @@ async function openWith(ctx, resume) {
       if (s.includes('onboarding')) sawOnboarding = true;
       if (await slow.isVisible('#boot').catch(() => false)) sawBoot = true;
     }
-    ok('앱 코드가 오기 전에 환영 화면이 안 뜬다', !sawOnboarding);
-    ok('그 사이 부팅 화면이 떠 있다', sawBoot);
+    /* 🔴 부팅 화면을 한 번도 못 봤다면 **늦추기가 안 먹은 것**이다 — 그 판에서는 위의
+       '환영 화면이 안 뜬다'도 아무것도 안 잰 셈이라, 통과로 넘기면 거짓 초록불이 된다. */
+    ok('그 사이 부팅 화면이 떠 있다 (안 보이면 늦추기가 안 먹은 것)', sawBoot);
+    ok('앱 코드가 오기 전에 환영 화면이 안 뜬다', sawBoot && !sawOnboarding);
     await slow.waitForTimeout(2500);
     ok('앱 코드가 오면 부팅 화면이 걷힌다', await slow.isHidden('#boot').catch(() => false));
     ok('그리고 홈이다', (await shown(slow)) === 'home');
     await slow.close();
+    await slowCtx.close();
   }
 
   /* ── ②③ 하던 탭과 스크롤로 돌아온다 ─────────────────────────────── */
