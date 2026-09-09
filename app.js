@@ -664,6 +664,11 @@ function renderOnboardStep() {
   /* 고치러 들어온 경우에만 취소를 보여 준다 — 처음 가입하는 사람에게는 취소할 것이 없다 */
   $$('#screen-onboarding .btn-onboard-cancel').forEach((b) => (b.hidden = !onboardEditing));
   $$('.onboard-step').forEach((el) => (el.hidden = Number(el.dataset.step) !== onboardStep));
+  /* 🔴 **환영 화면(0단계)에서는 진행 막대를 감춘다** (2026-09-09 · 설계 ②).
+     아직 '시작하기'도 안 눌렀는데 막대가 1/6 차 있으면 "벌써 뭔가 하고 있다"로 읽힌다.
+     환영 화면은 앱을 소개하는 자리이지 절차의 첫 칸이 아니다. */
+  const bar = $('.onboard-progress');
+  if (bar) bar.hidden = onboardStep === 0;
   $('#onboard-bar').style.width = `${((onboardStep + 1) / ONBOARD_STEPS) * 100}%`;
   window.scrollTo(0, 0);
 }

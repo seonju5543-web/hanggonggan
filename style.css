@@ -198,6 +198,7 @@ input::placeholder { color: var(--text-weak); }
   flex-direction: column;
   padding-bottom: 24px;
 }
+.onboard-progress[hidden] { display: none !important; }
 .onboard-progress {
   height: 4px;
   background: rgba(18, 22, 31, 0.07);
@@ -3372,16 +3373,50 @@ button, input, select, textarea { letter-spacing: inherit; }
   color: var(--navy-1);
   line-height: 1;
 }
+
+/* ── 등장 움직임 (2026-09-09 개발자 지시) ────────────────────────────────
+   *"로고나 글자가 애니메이션 형태로 나타난다. 하지만 앱의 신뢰성을 떨어뜨리지 않으면서도
+   깔끔해야 한다."* 그 두 조건을 셋으로 옮겼다.
+
+   ① **한 번만 나타나고 멈춘다.** 로고·글자에는 `infinite` 를 절대 쓰지 않는다 —
+      1초 떠 있는 화면에서 계속 움직이는 것은 '들어왔다'가 아니라 '아직도 로딩 중'으로 읽힌다.
+      계속 도는 것은 아래 `.boot-spin` 하나뿐이고, 그건 실제로 오래 걸릴 때만 나온다.
+   ② **바닥값(1초)보다 일찍 끝난다.** 로고 0.02+0.44 · 글자 0.16+0.40 → 둘 다 0.56초에 끝나
+      화면이 걷히기 전 **0.44초가 고요하다.** 그 정지가 '차분하다'는 인상을 만든다 —
+      움직임이 걷히는 순간까지 이어지면 급해 보인다.
+      🔴 이 값을 늘릴 때는 boot.js 의 `BOOT_MIN_SHOW_MS` 보다 작게 유지할 것.
+         관문: verify/test-collector.mjs '첫 실행 화면' 절이 대소를 검사한다.
+   ③ **튀지 않는다.** 되튐(overshoot)·회전·번쩍임·글자 하나씩 나타내기를 쓰지 않는다.
+      그런 것이 장난감처럼 보이게 만든다 — 여기는 학생이 장학금 정보를 맡기는 앱의 첫 화면이다.
+      감속 곡선 하나로 '놓였다'는 느낌만 준다. 바뀌는 것은 opacity·transform 뿐이라
+      레이아웃을 다시 계산하지 않는다(B-3 모션 점검 규칙). */
+.boot-logo { animation: boot-in-logo 0.44s cubic-bezier(0.22, 0.61, 0.36, 1) 0.02s both; }
+.boot-word { animation: boot-in-word 0.40s cubic-bezier(0.22, 0.61, 0.36, 1) 0.16s both; }
+@keyframes boot-in-logo {
+  from { opacity: 0; transform: scale(0.94) translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes boot-in-word {
+  from { opacity: 0; transform: translateY(9px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* 오래 걸릴 때만 나오는 표시.
+   🔴 **바닥값(1초)이 지난 뒤에 나타난다**(1.2초). 앱이 제때 오면 화면이 1.12초에 걷히므로
+      학생은 이걸 아예 못 본다 — 그게 맞다. 이게 보인다는 것은 '평소보다 오래 걸린다'는 뜻이고,
+      그 말이 사실일 때만 해야 한다. 처음부터 띄우면 빠른 기기에서도 매번 '기다리는 화면'이 된다. */
 .boot-spin {
   position: absolute; bottom: 92px;
   width: 26px; height: 26px;
   border-radius: var(--radius-pill);
   border: 2px solid rgba(25, 23, 19, 0.10);
   border-top-color: rgba(25, 23, 19, 0.34);
-  animation: boot-spin 0.8s linear infinite;
+  opacity: 0;
+  animation: boot-spin 0.8s linear infinite, boot-spin-in 0.3s ease 1.2s forwards;
 }
 .boot-spin[hidden] { display: none !important; }
 @keyframes boot-spin { to { transform: rotate(360deg); } }
+@keyframes boot-spin-in { to { opacity: 1; } }
 /* 시한이 지났을 때 — 무슨 일인지 말하고 다시 시도하게 한다 */
 .boot-fail { position: absolute; bottom: 64px; left: 24px; right: 24px; text-align: center; }
 .boot-fail[hidden] { display: none !important; }
@@ -3392,9 +3427,13 @@ button, input, select, textarea { letter-spacing: inherit; }
   line-height: 1.6;
 }
 .boot-fail .btn { width: 100%; }
-/* 움직임을 줄여 달라고 한 기기에서는 돌리지 않는다 */
+/* 움직임을 줄여 달라고 한 기기에서는 돌리지도, 나타나지도 않는다.
+   🔴 `.boot-spin` 은 `opacity: 1` 을 **같이** 되돌려야 한다 — 등장 애니메이션이 opacity 를
+      올리고 있으므로 `animation: none` 만 쓰면 표시가 영영 안 보인다(오래 걸리는 기기에서
+      아무 표시도 없이 빈 화면이 된다). */
 @media (prefers-reduced-motion: reduce) {
-  .boot-spin { animation: none; }
+  .boot-logo, .boot-word { animation: none; }
+  .boot-spin { animation: none; opacity: 1; }
   #boot { transition: none; }
 }
 

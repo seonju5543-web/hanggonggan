@@ -56,6 +56,12 @@
     if (msg) msg.hidden = false;
     var spin = document.getElementById('boot-spin');
     if (spin) spin.hidden = true;
+    /* 🔴 '다시 시도' 는 **여기서** 배선한다. index.html 에 `onclick="location.reload()"` 로
+       두었더니 CSP(`script-src 'self'`)가 인라인 처리기를 막아 **눌러도 아무 일도 안 일어났다**
+       (2026-09-09 브라우저로 확인 — "Refused to execute inline event handler").
+       오류도 화면에 안 나므로, 앱이 안 오는 학생은 죽은 버튼 앞에 갇힌다. */
+    var retry = document.getElementById('boot-retry');
+    if (retry) retry.addEventListener('click', function () { location.reload(); });
   }, BOOT_TIMEOUT_MS);
 
   /* 앱이 화면을 정했다고 알려 오면 걷는다 (app.js 가 부른다).
