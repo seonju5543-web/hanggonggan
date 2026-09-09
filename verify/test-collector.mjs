@@ -3960,5 +3960,49 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
     /resumeClear\(\)/.test(appJs.slice(resetAt, resetAt + 600)), true);
 }
 
+/* ══ 손짓과 움직임 (2026-09-09) ══════════════════════════════════════════
+   브라우저 검사(verify/verify-interactions.js)가 동작을 지키고, 여기서는 **브라우저로는
+   못 보거나 늦게야 보이는 함정 넷**을 실행 전에 잡는다. */
+{
+  console.log('\n■ 손짓과 움직임');
+  const appJs = readText(new URL('../app.js', import.meta.url));
+  const inter = readText(new URL('../interactions.js', import.meta.url));
+  const css = readText(new URL('../style.css', import.meta.url));
+  const html = readText(new URL('../index.html', import.meta.url));
+  const sw = readText(new URL('../sw.js', import.meta.url));
+
+  /* 🔴 ① `.app` 에 transform 을 걸면 그 안의 `position: fixed`(하단 탭·시트·도우미 단추)가
+     화면이 아니라 `.app` 을 기준으로 자리를 잡아 함께 밀린다. 눈으로는 '조금 어긋난' 정도라
+     검사를 통과해 버리기 쉬워서 글자로 못 박는다. */
+  eq('당겨서 새로고침이 .app 을 옮기지 않는다 (그 안에 fixed 가 산다)',
+    /querySelector\('\.app'\)\.style\.transform\s*=/.test(inter), false);
+
+  /* 🔴 ② 튕김 표시를 떼는 시간은 CSS 움직임보다 길어야 한다 — 짧으면 움직임이 중간에 잘린다 */
+  const popClear = Number((inter.match(/POP_CLEAR_MS\s*=\s*(\d+)/) || [])[1]);
+  const cssMs = [...css.matchAll(/animation:\s*save-(?:pop|ring)\s+([\d.]+)s/g)].map((m) => Number(m[1]) * 1000);
+  eq('튕김 표시 제거 시간을 읽어 냈다', Number.isFinite(popClear) && cssMs.length === 2, true);
+  eq('그 시간이 CSS 움직임보다 길다', cssMs.every((v) => popClear > v), true);
+
+  /* 🔴 ③ 새 파일이 서비스워커 목록에서 빠지면 **오프라인에서만** 앱이 죽는다
+     (2026-08-01 로그인 파일에서 겪은 것과 같은 유형). */
+  eq('interactions.js 가 index.html 에 실린다', /src="interactions\.js"/.test(html), true);
+  eq('interactions.js 가 서비스워커 목록에 있다', /'interactions\.js'/.test(sw), true);
+  eq('그리고 app.js 보다 **먼저** 실린다 (app.js 가 카드를 그릴 때 부른다)',
+    html.indexOf('src="interactions.js"') < html.indexOf('src="app.js"'), true);
+
+  /* 🔴 ④ 마감 막대는 판정을 새로 만들지 않는다 — `dday()` 가 낸 값을 받아서 그릴 뿐이다.
+     여기에 날짜 계산이 들어오면 카드의 배지와 막대가 서로 다른 말을 하게 된다. */
+  eq('막대 규칙 파일에 날짜 계산이 없다 (dday 가 낸 값만 받는다)',
+    /new Date\(|Date\.now\(\)\s*[-/]/.test(inter.slice(0, inter.indexOf('function haptic'))), false);
+  eq('막대 문턱이 dday 의 urgent 문턱(7일)과 같다',
+    Number((inter.match(/DEADLINE_WINDOW_DAYS\s*=\s*(\d+)/) || [])[1]) === 7
+    && /d <= 7\) return \{ label: `D-\$\{d\}`, cls: 'urgent'/.test(appJs), true);
+
+  /* 🔴 ⑤ 진동은 **되돌리기 어려운 일**에만 — 화면이 바뀔 때마다 울리면 학생이 앱 진동을
+     통째로 꺼 버린다. 부르는 곳이 늘어나면 여기서 먼저 걸린다(늘릴 거면 이 숫자를 함께 고친다). */
+  const hapticCalls = (appJs.match(/haptic\(/g) || []).length;
+  eq(`앱이 진동을 부르는 곳은 셋뿐이다 (지금 ${hapticCalls}곳)`, hapticCalls <= 3, true);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);

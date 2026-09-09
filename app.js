@@ -218,12 +218,21 @@ function savedScholarships() {
 /* 저장 상태가 바뀌면 지금 떠 있는 것만 다시 그린다 — 화면을 통째로 새로 그리면
    스크롤이 맨 위로 튄다(일괄 준비 목록에서 겪은 것과 같은 유형). */
 function refreshSaveViews(id) {
+  const on = isSaved(id);
   $$(`[data-save="${CSS.escape(id)}"]`).forEach((b) => {
-    const on = isSaved(id);
     b.classList.toggle('on', on);
     b.setAttribute('aria-pressed', String(on));
     b.setAttribute('aria-label', on ? '저장 해제' : '공고 저장');
+    /* 눌린 단추가 튕긴다 (2026-09-09) — 인스타 더블탭 하트와 같은 일이다.
+       🔴 **담을 때만** 튕긴다. 해제까지 축하하듯 튕기면 무슨 일이 일어났는지 흐려진다.
+          해제는 토스트가 '되돌리기'와 함께 말한다. */
+    if (on && typeof popEl === 'function') popEl(b);
+    else b.classList.remove('pop');   // 해제하면 앞서 담을 때의 표시를 즉시 지운다
   });
+  /* 손끝에도 한 번 — 아주 짧게(10ms). 폰 설정에서 진동을 끈 학생에게는 아무 일도 없다.
+     🔴 `toggleSave` 가 아니라 여기 둔다: 저장이 실제로 화면에 반영되는 지점이 여기라
+        "울렸는데 안 담긴" 경우가 생기지 않는다. */
+  if (typeof haptic === 'function') haptic(on ? 12 : 8);
   if (!$('#screen-my').hidden) renderSaved();
   if (!$('#screen-applications').hidden && calMode) renderCalendar();
 }
@@ -291,6 +300,10 @@ function recordSubmitted(sch) {
   if (!confirm(`${officialChannel(sch).label}에서 공식 제출을 마치셨나요?\n\n제출 완료로 기록하면 진행 단계가 '공식 제출'로 넘어가요.`)) return;
   app.submittedAt = nowStamp();
   saveState();
+  /* 손끝에도 한 번 (2026-09-09). 여기까지만 울린다 — 진동은 **되돌리기 어려운 일이 방금
+     일어났다**는 신호로만 쓴다(저장·새로고침·이 기록 셋). 화면이 바뀔 때마다 울리면
+     알림처럼 느껴져서 학생이 폰 설정에서 앱 진동을 통째로 꺼 버린다. */
+  if (typeof haptic === 'function') haptic(14);
   toast('공식 제출 기록 완료 · 접수 마감 후 심사 단계로 자동 전환');
   refreshProgressViews(sch.id);
 }
@@ -956,6 +969,14 @@ function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
       <p class="sch-name">${esc(sch.name)}</p>
       <p class="sch-amount">${esc(sch.amount)}</p>
       ${compact ? '' : `<p class="sch-provider">${esc(sch.provider)}</p>`}
+      ${/* 마감까지 남은 시간 막대 (2026-09-09 개발자 지시: "밑에 빨간색으로 마감 기간 알려주는 것").
+           🔴 판정을 새로 하지 않는다 — 위에서 이미 구한 `d`(dday 결과)를 넘길 뿐이다.
+              여기서 날짜를 다시 계산하면 배지와 막대가 다른 말을 하게 된다.
+           🔴 7일 밖·마감된 공고·마감을 못 읽은 공고에는 아무것도 안 그린다
+              (deadlineMeter 가 빈 문자열을 낸다) — 모르는 것을 그리지 않는다.
+           🔴 **상시 제도는 뺀다** — 위 배지 줄이 'D-3' 이 아니라 '상시 제도'를 내는 공고라,
+              막대를 그리면 한 카드가 "상시로 받는다"와 "3일 뒤 마감"을 같이 말하게 된다. */ ''}
+      ${(!sch.program && typeof deadlineMeterHtml === 'function') ? deadlineMeterHtml(d.days, sch.deadline) : ''}
       ${/* 🔴 옛 판정 배지('지원 가능 · 선발 심사')를 **카드에서** 뺐다 (2026-08-24).
            적합도 배지가 생긴 뒤로 한 카드에 판정이 둘이었고 서로 다른 축을 말해서,
            `자격 미확인`인데 `지원 가능`이 함께 떴다. 학생은 '지원 가능'만 보고 들어갔다가
@@ -1064,6 +1085,11 @@ function renderHome() {
     .filter((m) => m.result.status !== 'ineligible' && dday(m.sch.deadline).days >= 0 && notStale(m.sch))
     .sort((a, b) => deadlineTs(a.sch) - deadlineTs(b.sch))
     .slice(0, 3);
+  /* ⚠️ 여기에는 뼈대를 두지 않는다 (2026-09-09 실측). 처음엔 "공고가 오기 전에 홈이
+     '없음'이라고 말한다"고 보고 뼈대를 넣었는데, 실제로 재 보니 **그런 일이 없었다** —
+     `allScholarships()` 가 data.js 의 상시 제도 6종을 동기로 먼저 내주기 때문에
+     이 목록은 받아오기 중에도 비지 않는다. 뼈대는 실제로 기다림이 보이는
+     `liveNoticesHtml()` 한 곳에만 둔다. */
   $('#home-deadline-list').innerHTML = upcoming.length
     ? upcoming.map((m) => schCard(m.sch, m.result, { compact: true, fit: m.fit, fd: m.fd })).join('')
     : '<p class="empty">지금 신청 가능한 장학금 없음 · 프로필 업데이트 권장</p>';
@@ -1184,6 +1210,8 @@ function renderExplore() {
 
   /* 실시간 공고 피드는 '전체'일 때만 — 검색 중에는 끈다(검색어와 무관한 목록이 아래 붙는다) */
   $('#live-notices').innerHTML = (exploreFilter === 'all' && !q) ? liveNoticesHtml() : '';
+  /* ⚠️ 홈과 같은 이유로 여기에도 뼈대를 두지 않는다 — 이 목록은 받아오기 중에도 비지 않는다
+     (renderHome 의 같은 자리 주석 참조). 뼈대는 `liveNoticesHtml()` 한 곳이다. */
   $('#explore-list').innerHTML = list.length
     ? list.map((m) => schCard(m.sch, m.result, { fit: m.fit, fd: m.fd })).join('')
     : `<p class="empty">${q ? `'${esc(exploreQuery.trim())}'와 맞는 장학금 없음` : '조건에 맞는 장학금 없음'}</p>`;
@@ -1569,11 +1597,19 @@ function loadNotices() {
       };
     })
     : get('data/notices.json');
-  job.then((d) => {
-    if (!d) return;
-    liveNotices = d;
+  /* 🔴 **부르는 쪽이 끝을 기다릴 수 있게 약속을 돌려준다** (2026-09-09).
+     당겨서 새로고침은 '다 받아 왔다'를 알아야 뱅뱅이를 멈춘다 — 예전처럼 아무것도
+     안 돌려주면 손을 떼자마자 멈춰서 학생 눈에는 아무 일도 안 한 것으로 보인다. */
+  /* 🔴 받아오기 실패만 여기서 삼킨다 — 그리기(rerenderVisible)까지 같은 catch 로 감싸면
+     그리다 난 진짜 버그가 조용히 묻히고, 그 안에서 다시 그리려다 두 번 던진다. */
+  return job.catch(() => null).then((d) => {
+    /* 🔴 **못 받아 왔어도 빈 문서를 넣는다** (2026-09-09). `null` 로 두면 화면이
+       '아직 오는 중'(뼈대)으로 읽어 영영 그 상태로 굳는다 — 오프라인 학생에게
+       끝나지 않는 기다림을 보여 주는 것은 '없음'보다 나쁘다.
+       ⚠️ 앞서 받아 둔 것이 있으면 그것을 남긴다(실패했다고 있던 공고를 지우지 않는다). */
+    liveNotices = d || liveNotices || { items: [], updatedAt: null };
     rerenderVisible();
-  }).catch(() => { /* 오프라인 등 — 조용히 무시 */ });
+  });
 }
 
 /* 자유 형식 지원문서 연결 (2026-07-15): 공고가 별도 양식 없이 자유 형식 제출을
@@ -1656,7 +1692,7 @@ function renderHomeUpdated() {
 }
 
 function loadRegistered() {
-  fetch('data/registered.json', { cache: 'no-store' })
+  return fetch('data/registered.json', { cache: 'no-store' })
     .then((r) => (r.ok ? r.json() : null))
     .then((d) => {
       if (!d) return;
@@ -1664,13 +1700,15 @@ function loadRegistered() {
       regUpdatedAt = d.updatedAt || '';
       dataFetchedAt = new Date();
       attachPrepTemplates(registeredList);
-      rerenderVisible();
     })
-    .catch(() => { /* 오프라인 등 — 조용히 무시 */ });
+    .catch(() => { /* 오프라인 등 — 조용히 무시 */ })
+    /* 🔴 **성공이든 실패든 여기를 지난다** — 못 받아 왔을 때도 화면을 한 번 다시 그려야
+       늦게 온 다른 데이터(층2·실시간 공고)와 함께 제자리를 잡는다. */
+    .then(() => { rerenderVisible(); });
 }
 
 function loadKosaf() {
-  fetch('data/kosaf-open.json', { cache: 'no-store' })
+  return fetch('data/kosaf-open.json', { cache: 'no-store' })
     .then((r) => (r.ok ? r.json() : null))
     .then((d) => {
       kosafList = (d && d.items) || [];
@@ -1678,6 +1716,20 @@ function loadKosaf() {
       rerenderVisible();
     })
     .catch(() => { /* 오프라인 등 — 조용히 무시. 층2가 없어도 앱은 그대로 돈다 */ });
+}
+
+/* 데이터를 한꺼번에 다시 받는다 — 당겨서 새로고침과 화면 복귀가 **같은 함수**를 쓴다
+   (2026-09-09). 갈라 두면 한쪽에만 새 로더를 붙이는 일이 반드시 생긴다
+   (rerenderVisible 주석이 말하는 것과 같은 유형의 사고다). */
+function refreshAllData() {
+  const jobs = [loadNotices(), loadRegistered(), loadKosaf()];
+  if (typeof loadFormTemplates === 'function') jobs.push(loadFormTemplates());
+  /* 🔴 `swReg` 는 이 파일 한참 아래(서비스워커 등록 자리)에서 `let` 으로 선언된다.
+     그 줄이 아직 실행되기 전에 여기를 부르면 `typeof` 로 물어봐도 예외가 난다(TDZ).
+     감싸 두지 않으면 새로고침이 통째로 넘어지므로 감싼다 — 새 버전 확인은 덤이고
+     데이터를 다시 받는 것이 본업이다. */
+  try { if (swReg) swReg.update().catch(() => {}); } catch (e) { /* 아직 등록 전 */ }
+  return Promise.all(jobs.map((j) => Promise.resolve(j).catch(() => {})));
 }
 
 /* 층2 — 한국장학재단이 아는 재단 장학금을 **교외 공고와 같은 모양**으로 만든다 (2026-08-30).
@@ -1771,9 +1823,25 @@ function kosafAsScholarships() {
     });
 }
 
+/* 실시간 공고 구역의 머리말 — '아직 안 옴'과 '없음' 이 같은 머리말을 쓰도록 한 곳에 둔다 */
+function liveNoticesHead(updatedAt) {
+  return `<div class="section-head" style="margin-top:4px"><h3>우리 학교 실시간 공고</h3>
+    <span class="link-btn">매일 아침 자동 갱신${updatedAt ? ' · ' + updatedAt : ''}</span></div>`;
+}
+
 function liveNoticesHtml() {
   const p = state.profile;
-  if (!liveNotices || !p) return '';
+  if (!p) return '';
+  /* 🔴 **'아직 안 왔다'와 '없다'는 다른 말이다** (2026-09-09).
+     예전에는 둘 다 빈 문자열이라 이 구역이 통째로 없다가 갑자기 나타났다 — 이 앱에서
+     실제로 기다림이 보이는 거의 유일한 자리다(정식 등록 공고는 data.js 의 상시 제도가
+     동기로 먼저 채워 목록이 빌 틈이 없다 — 실측으로 확인했다).
+     ⚠️ 뼈대가 굳지 않는 것은 `liveNotices` 가 성공·실패와 무관하게 채워지기 때문이 아니라,
+        실패하면 `null` 로 남기 때문이다. 그래서 아래 loadNotices 가 실패해도 **빈 문서**를
+        넣어 이 구역이 '없음'으로 정직하게 내려앉게 한다. */
+  if (!liveNotices) {
+    return liveNoticesHead('') + (typeof skeletonRows === 'function' ? skeletonRows(3) : '');
+  }
   // 정식 등록된 공고(registered.json + data.js 실공고)는 카드로 노출되므로 피드에서 제외
   // URL 뒤에 목록 파라미터가 붙는 경우가 있어 전방일치로 비교한다
   const regUrls = registeredList.map((s) => s.sourceUrl)
@@ -1789,8 +1857,7 @@ function liveNoticesHtml() {
   const scholarships = forMe.filter((n) => !isLoan(n));
   const loans = forMe.filter(isLoan);
   const mine = scholarships.slice(0, loans.length ? 8 : 10).concat(loans.slice(0, 2));
-  const head = `<div class="section-head" style="margin-top:4px"><h3>우리 학교 실시간 공고</h3>
-    <span class="link-btn">매일 아침 자동 갱신${liveNotices.updatedAt ? ' · ' + liveNotices.updatedAt : ''}</span></div>`;
+  const head = liveNoticesHead(liveNotices.updatedAt);
   if (!mine.length) {
     return head + `<p class="empty" style="margin-bottom:16px">아직 ${esc(p.school)} 게시판 연결 전이거나 새 공고 없음<br />연결되면 실제 공고가 여기에 자동으로 떠요.</p>`;
   }
@@ -3851,12 +3918,30 @@ document.addEventListener('visibilitychange', () => {
   if (document.visibilityState !== 'visible') return;
   if (Date.now() - lastFgRefresh < 5 * 60 * 1000) return;
   lastFgRefresh = Date.now();
-  loadNotices();
-  loadRegistered();
-  loadKosaf();
-  if (typeof loadFormTemplates === 'function') loadFormTemplates();
-  if (swReg) swReg.update().catch(() => {});
+  refreshAllData();
 });
+
+/* 당겨서 새로고침 (2026-09-09) — 짝은 interactions.js.
+   🔴 **시트가 떠 있으면 시작하지 않는다.** 알림 동의 시트는 온보딩 2.9초 뒤에 떠서 화면을
+      덮는데, 그 위에서 당기면 시트 뒤 목록이 움직여 보인다. 이 시트는 브라우저 검사를
+      세 번 넘어뜨린 자리이기도 하다(2026-09-07 · onboard-helper 의 dismissNotify).
+   🔴 **온보딩 중에는 끈다** — 아직 받아올 것이 정해지지 않았고(학교 미선택), 단계 사이에서
+      화면이 밀리면 입력하던 칸이 손가락을 따라 움직인다. */
+if (typeof installPullToRefresh === 'function') {
+  installPullToRefresh({
+    onRefresh: () => {
+      lastFgRefresh = Date.now();   // 방금 받았으니 화면 복귀 갱신은 5분 쉰다
+      return refreshAllData();
+    },
+    isBlocked: () => {
+      if (!state.profile) return true;                        // 온보딩 중
+      if (!$('#screen-onboarding').hidden) return true;
+      return !!document.querySelector(
+        '#notify-sheet:not([hidden]), #detail-sheet:not([hidden]), '
+        + '.sheet-backdrop:not([hidden]), .wallet-pop:not([hidden]), #chat-sheet:not([hidden])');
+    },
+  });
+}
 
 /* ══════════════════════════════════════════════════════════════════════════
    회원가입·로그인 — 기기를 바꿔도 이어쓰기 (2026-08-25)

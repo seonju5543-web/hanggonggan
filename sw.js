@@ -17,8 +17,8 @@
    설치된 앱은 옛 CSS 를 계속 내주고 있었다("아직도 각져 있어").
    네트워크 우선이라 결국은 반영되지만, 응답이 3.5초를 넘으면 캐시로 떨어지고
    그 캐시가 옛 판이면 그대로 옛 화면이 보인다. 번호를 올려야 확실히 청소된다. */
-const CACHE = 'handaejang-v150';  /* v150 — 첫 실행 화면·이어보기 (노션 원문 목록 4번) */
-const ASSETS = ['.', 'index.html', 'style.css', 'boot.js', 'resume.js', 'app.js', 'data.js', 'forms.js', 'form-plan.js', 'essay.js', 'essay-config.js', 'essay-ask.js', 'essay-quality.js', 'essay-submit-check.js',
+const CACHE = 'handaejang-v151';  /* v151 — 손짓과 움직임 넷(당겨서 새로고침·저장 튕김·마감 막대·뼈대) */
+const ASSETS = ['.', 'index.html', 'style.css', 'boot.js', 'resume.js', 'interactions.js', 'app.js', 'data.js', 'forms.js', 'form-plan.js', 'essay.js', 'essay-config.js', 'essay-ask.js', 'essay-quality.js', 'essay-submit-check.js',
   'section-head.js', 'parse-requirements.js', 'parse-amount.js', 'match-engine.js', 'notify-rules.js', 'notify.js', 'push-config.js',
   'chat-config.js', 'chat.js',
   /* 로그인 — 목록에서 빠지면 **오프라인에서** 이 파일만 없어 앱이 죽는다.
