@@ -15,6 +15,22 @@
 
 (function () {
   var BOOT_TIMEOUT_MS = 6000;
+  /* 🔴 **최소로 보여 주는 시간** (2026-09-09 개발자 지적: "환영 화면이 나타났지만 사용자가
+     겨우 볼 수 있을 만큼 시간이 짧았어"). 예전에는 바닥값이 없어서, 부팅 화면이 떠 있는 시간이
+     **앱 코드가 실리는 데 걸린 시간 그대로**였다 — 캐시가 없는 첫 실행은 1초 남짓이고
+     설치해 쓰던 폰은 눈에 안 보일 만큼 짧아, 켤 때마다 길이가 들쭉날쭉했다.
+     0.75초는 **시안에서 개발자가 보고 고른 값**이다(docs/designs/mockups/first-run/Main.dc.html).
+     ⚠️ 이 값을 키우면 앱이 그만큼 느려진다 — 기다리게 하는 것이 목적이 아니라
+        '깜빡였다'가 아니라 '봤다'가 되게 하는 것이 목적이다. */
+  var BOOT_MIN_SHOW_MS = 750;
+  /* 🔴 **앱을 켠 순간**부터 센다(`performance.now()` 는 페이지가 열린 시각 기준).
+     이 파일이 실린 시각부터 세면 스크립트를 받아 오는 시간이 앞에 얹혀 총 길이가 들쭉날쭉해진다
+     — 실측으로 750ms 를 걸었는데 화면에는 1,190ms 동안 떠 있었다. 학생이 느끼는 시작점은
+     아이콘을 누른 때이지 우리 코드가 실린 때가 아니다. */
+  var sinceOpen = function () {
+    return (window.performance && performance.now) ? performance.now() : (Date.now() - startedAt);
+  };
+  var startedAt = Date.now();   // performance 를 못 쓰는 옛 브라우저용 대비
 
   /* ① 브라우저의 스크롤 되살리기를 끈다.
      🔴 안 끄면 브라우저가 **이전 화면의 스크롤을 다른 화면에 붙인다** — 탐색 탭에서
@@ -43,16 +59,23 @@
     if (spin) spin.hidden = true;
   }, BOOT_TIMEOUT_MS);
 
-  /* 앱이 화면을 정했다고 알려 오면 걷는다 (app.js 가 부른다) */
+  /* 앱이 화면을 정했다고 알려 오면 걷는다 (app.js 가 부른다).
+     🔴 **곧바로 걷지 않는다** — 뜬 지 0.75초가 안 됐으면 남은 시간만큼 기다렸다 걷는다.
+        앱이 준비되는 시간은 기기마다 다른데, 학생 눈에 보이는 길이는 늘 같아야 한다. */
+  var closing = false;
   window.bootDone = function () {
     clearTimeout(timer);
-    if (document.documentElement.getAttribute('data-boot') === 'done') return;
-    document.documentElement.setAttribute('data-boot', 'done');
-    var el = document.getElementById('boot');
-    if (!el) return;
-    el.classList.add('boot-out');
-    /* 사라지는 시간은 CSS 에서 읽는다 — 숫자를 여기 적으면 CSS 를 고칠 때 조용히 어긋난다 */
-    var ms = (parseFloat(getComputedStyle(el).transitionDuration) || 0.12) * 1000;
-    setTimeout(function () { el.hidden = true; }, ms + 20);
+    if (closing || document.documentElement.getAttribute('data-boot') === 'done') return;
+    closing = true;
+    var wait = Math.max(0, BOOT_MIN_SHOW_MS - sinceOpen());
+    setTimeout(function () {
+      document.documentElement.setAttribute('data-boot', 'done');
+      var el = document.getElementById('boot');
+      if (!el) return;
+      el.classList.add('boot-out');
+      /* 사라지는 시간은 CSS 에서 읽는다 — 숫자를 여기 적으면 CSS 를 고칠 때 조용히 어긋난다 */
+      var ms = (parseFloat(getComputedStyle(el).transitionDuration) || 0.12) * 1000;
+      setTimeout(function () { el.hidden = true; }, ms + 20);
+    }, wait);
   };
 })();

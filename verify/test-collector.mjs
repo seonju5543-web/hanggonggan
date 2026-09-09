@@ -3921,6 +3921,29 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
   eq('온보딩 갈무리가 id 없는 체크박스도 담는다', /check-list[\s\S]{0,200}checked/.test(appJs), true);
   eq('되살릴 때 캠퍼스 칸을 다시 그린다', /renderCampusChips\(campus\)/.test(appJs), true);
 
+  /* ⑥ 🔴 부팅 화면에 **바닥값**이 있어야 한다 (2026-09-09 개발자 지적:
+     "환영 화면이 나타났지만 사용자가 겨우 볼 수 있을 만큼 시간이 짧았어").
+     바닥값이 없으면 보이는 길이가 **앱 코드가 실리는 데 걸린 시간 그대로**라 기기마다
+     들쭉날쭉하고, 캐시가 데워진 폰에서는 깜빡이고 만다. */
+  const bootJs2 = readText(new URL('../boot.js', import.meta.url));
+  const minMs = Number((bootJs2.match(/BOOT_MIN_SHOW_MS\s*=\s*(\d+)/) || [])[1]);
+  eq('부팅 화면에 최소로 보여 주는 시간이 있다', minMs > 0, true);
+  eq('그 시간을 실제로 기다린다 (선언만 해 두지 않는다)',
+    /BOOT_MIN_SHOW_MS\s*-\s*sinceOpen\(\)/.test(bootJs2), true);
+  eq('시한(6초)보다는 짧다', minMs < Number((bootJs2.match(/BOOT_TIMEOUT_MS\s*=\s*(\d+)/) || [])[1]), true);
+  /* 🔴 **시안에서 개발자가 보고 고른 값과 같아야 한다** — 갈라지면 승인받은 것과 다른 것이 나간다.
+     ⚠️ 750 을 못 박지 않는다(2026-09-09 코드 리뷰): 개발자가 나중에 값을 바꾸기로 하고 시안·앱을
+        **함께** 고치면, 못 박아 둔 검사가 '둘이 다르다'는 라벨로 빨간불을 낸다 — 없는 불일치를
+        있다고 말하는 것이라 다음 세션이 엉뚱한 곳을 뒤진다. 재는 것은 '둘이 같은가' 하나다. */
+  const mock = readText(new URL('../docs/designs/mockups/first-run/Main.dc.html', import.meta.url));
+  const mockMs = Number((mock.match(/booting:\s*false\s*\}\);\s*resolve\(\);\s*\},\s*(\d+)\)/) || [])[1]);
+  eq('시안에서 값을 읽어 냈다 (읽기 실패는 NaN 이라 조용히 통과하면 안 된다)', Number.isFinite(mockMs), true);
+  eq('시안이 쓰는 값과 앱이 쓰는 값이 같다', minMs, mockMs);
+
+  /* ⑦ 홈 줄의 말은 개발자가 정한 그대로다 (2026-09-09 지시) */
+  eq("홈 줄의 버튼 문구가 '신청서 마저 쓰기' 다",
+    /rc-go">신청서 마저 쓰기</.test(appJs), true);
+
   /* ⑤ 🔴 데이터 초기화가 이어보기 장부까지 지운다 — 안 지우면 '지웠다'가 거짓말이 된다
      (그 장부에 이름·학번·전화·계좌번호와 신청서에 쓴 글이 들어 있다) */
   const resetAt = appJs.indexOf('[STORAGE_KEY, ...LEGACY_KEYS].forEach');

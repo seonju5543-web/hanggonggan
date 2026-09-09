@@ -103,7 +103,7 @@
               <div style="font-size: 14.5px; font-weight: 700;">쓰던 신청서가 있어요</div>
               <div style="font-size: 12.5px; color: #57524a; margin-top: 3px;">삼성꿈장학재단 · 5시간 전에 쓰던 것</div>
             </div>
-            <span style="font-size: 13.5px; font-weight: 700; color: #8a6a1f; white-space: nowrap;">이어서 쓰기</span>
+            <span style="font-size: 13.5px; font-weight: 700; color: #8a6a1f; white-space: nowrap;">신청서 마저 쓰기</span>
           </div>
         </sc-if>
 
@@ -351,7 +351,7 @@ class Component extends DCLogic {
       } else {
         const hadForm = parked === 'form';
         this.setState({ screen: 'home', restored: hadForm ? 'resumeCard' : null });
-        this.say('마지막으로 본 지 ' + label + ' · 창을 넘었다 → 홈으로.' + (hadForm ? " 쓰던 신청서는 안 버린다 — 홈에 '이어서 쓰기' 한 줄로 남는다." : ''), 'accent');
+        this.say('마지막으로 본 지 ' + label + ' · 창을 넘었다 → 홈으로.' + (hadForm ? " 쓰던 신청서는 안 버린다 — 홈에 '신청서 마저 쓰기' 한 줄로 남는다." : ''), 'accent');
       }
     });
   }
@@ -414,7 +414,7 @@ class Component extends DCLogic {
         if (!this.state.open || this.state.booting) return;
         const fromCard = this.state.restored === 'resumeCard';
         this.setState({ screen: 'form', restored: fromCard ? 'fromCard' : null });
-        if (fromCard) this.say("'이어서 쓰기'를 눌렀다 → 5시간 전 답과 AI 초안이 그대로 돌아온다.", 'accent');
+        if (fromCard) this.say("'신청서 마저 쓰기'를 눌렀다 → 5시간 전 답과 AI 초안이 그대로 돌아온다.", 'accent');
       },
       closeApp: () => this.close(),
       open5m: () => this.openAfter(5, '5분'),

@@ -6,7 +6,7 @@
         (예전엔 app.js 가 올 때까지 그게 화면이었다 — 2.5초 늦추자 2.5초 내내 '시작하기')
      ② 탐색 탭에서 나갔다 오면 **탐색 탭**이다 (예전엔 늘 홈)
      ③ 그때 **스크롤이 남의 화면에 안 붙는다** (예전엔 홈인데 282px 내려가 있었다)
-     ④ 창(4시간)을 넘기면 홈이지만 **쓰던 신청서는 안 버린다** → 홈에 '이어서 쓰기' 줄
+     ④ 창(4시간)을 넘기면 홈이지만 **쓰던 신청서는 안 버린다** → 홈에 '신청서 마저 쓰기' 줄
      ⑤ 쓰던 신청서를 열면 **답이 그대로** 돌아온다 (크레딧을 낸 AI 초안도 같은 칸이다)
      ⑥ 알림(`?sch=`)으로 열면 이어보기가 **손을 뗀다**
      ⑦ 학생이 쓴 글이 **기기 밖으로 안 나간다**
@@ -177,7 +177,7 @@ async function openWith(ctx, resume) {
     });
     await dismissNotify(stale);
     ok('5시간 만에 열면 홈으로 간다', (await shown(stale)) === 'home', await shown(stale));
-    ok("홈에 '이어서 쓰기' 줄이 있다", await stale.isVisible('#home-resume').catch(() => false));
+    ok("홈에 '신청서 마저 쓰기' 줄이 있다", await stale.isVisible('#home-resume').catch(() => false));
     const sub = await stale.textContent('#home-resume').catch(() => '');
     ok('그 줄이 어느 공고인지 말한다', String(sub).includes(target.name.slice(0, 6)), sub && String(sub).slice(0, 40));
 

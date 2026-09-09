@@ -979,7 +979,7 @@ function saveBtnHtml(id) {
     </button>`;
 }
 
-/* ── 홈 '이어서 쓰기' 줄 (2026-09-09 · 개발자 지시 ②) ────────────────────
+/* ── 홈 '신청서 마저 쓰기' 줄 (2026-09-09 · 개발자 지시 ②) ────────────────────
    *"장시간 나갔다가 들어온 경우 해당 프로그레스가 저장되어 있었으면 해."*
    창(4시간)을 넘겨 들어오면 화면은 홈으로 가지만 **쓰던 것은 안 버린다.** 자동으로
    신청서를 열지 않는 이유는 하나다 — 며칠 만에 앱을 켰는데 반쯤 쓴 폼이 갑자기 뜨면
@@ -1003,7 +1003,7 @@ function renderResumeCard() {
       <span class="rc-title">쓰던 신청서가 있어요</span>
       <span class="rc-sub">${esc(sch.name || sch.title || '')} · ${esc(agoLabel(prog.at))}에 쓰던 것</span>
     </span>
-    <span class="rc-go">이어서 쓰기</span>`;
+    <span class="rc-go">신청서 마저 쓰기</span>`;
   el.onclick = () => { openSheetShell(); startFormFill(sch, prog); };
 }
 
