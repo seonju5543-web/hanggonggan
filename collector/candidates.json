@@ -1,8 +1,44 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-09-09",
- "count": 2108,
+ "count": 2110,
  "items": [
+  {
+   "title": "[공통][교외] 2026학년도 여성동문회 장학금 장학생 모집 (~ 9. 17)",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/266140/artclView.do",
+   "attachments": [
+    {
+     "name": "2026 (여성동문회)장학금+신청서(양식).hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150374/download.do"
+    },
+    {
+     "name": "(서식) 개인정보수집이용동의서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150375/download.do"
+    }
+   ],
+   "deadlineHint": "까지 나 . 선발 : 10 월 중순예정 다 . 선발확인 : Hufs Ability 로그인 후 장학금 신청내역에서",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-09-09"
+  },
+  {
+   "title": "[공통][교외] 2026-2학기 정연주 여사 장학금 장학생 모집 (~ 9. 18)",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/266142/artclView.do",
+   "attachments": [
+    {
+     "name": "(서식) 개인정보수집이용동의서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150377/download.do"
+    },
+    {
+     "name": "2026-2학기 정연주여사장학금 신청서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150378/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026. 9. 11( 금 ) ~ 9. 18( 금 ) 15:00 까지 나 . 선발 : 10 월 초순 (",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-09-09"
+  },
   {
    "title": "[공통][교내] 2026-2학기 가족장학금 신청 안내 (9/10 ~ 9/28)",
    "url": "https://dep.hufs.ac.kr/bbs/student/2431/265883/artclView.do",
