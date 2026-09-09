@@ -3,13 +3,13 @@
  "updatedAt": "2026-09-09",
  "schools": 2,
  "files": {
+  "경희대학교": {
+   "file": "n1w4hprp.json",
+   "count": 16
+  },
   "한국외국어대학교": {
    "file": "n19cz03g.json",
    "count": 22
-  },
-  "경희대학교": {
-   "file": "n1w4hprp.json",
-   "count": 15
   }
  }
 }
