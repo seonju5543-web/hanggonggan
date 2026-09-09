@@ -3362,7 +3362,9 @@ function renderMy() {
   const p = state.profile;
   if (!p) return;   // 온보딩을 아직 안 마친 상태 — 그릴 프로필이 없다
   const c = p.common || {};
-  const flagText = p.flags.length ? p.flags.map((f) => FLAG_LABELS[f]).join(', ') : '해당 없음';
+  /* ⚠️ 이름표가 없으면 **열쇠라도 보여 준다** — 다른 두 자리(bulkTags·match-engine)와 같은 방식이다.
+     빈칸을 내놓으면 학생이 고른 것이 화면에서 사라져 '해당 없음'처럼 읽힌다(2026-09-03~09 실제로 그랬다). */
+  const flagText = p.flags.length ? p.flags.map((f) => FLAG_LABELS[f] || f).join(', ') : '해당 없음';
   const trackLabel = (TRACKS.find((t) => t.id === p.track) || {}).label || '-';
   const commonFilled = ['studentId', 'birth', 'phone', 'email', 'account'].filter((k) => c[k]).length;
   $('#my-profile').innerHTML = `

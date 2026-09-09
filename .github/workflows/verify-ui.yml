@@ -32,6 +32,8 @@ on:
       - 'form-plan.js'
       - 'data.js'
       - 'verify/**'
+      - '_admin/**'          # 관리자 화면 (verify-admin.js 가 스스로 빌드해 검사한다)
+      - 'server/push/**'     # 푸시 발송 서버 (verify-push-server.mjs)
   workflow_dispatch:
 
 permissions:
@@ -62,6 +64,20 @@ jobs:
       - name: 제출 관문 판정 검사 (순수 모듈)
         run: node verify/verify-essay-submit.mjs
 
+      # 🔴 아래 셋은 오랫동안 **어떤 워크플로에도 안 걸려 있었다**(2026-09-09 전수 조사에서 발견).
+      #    셋 다 브라우저가 필요 없어 몇 초면 끝나는데, 안 걸어 둔 탓에 깨져도 아무도 몰랐다.
+      #    · notify-rules  — 언제 무엇을 알릴지의 단 하나의 기준 (화면·서비스워커가 공유)
+      #    · push-server   — 발송 서버가 폰 주소·학교·캠퍼스 말고 아무것도 저장하지 않는가
+      #    · form-snapshot — 질문을 줄여도 **문서는 한 글자도 안 바뀐다**는 증명 (운영 원칙 4)
+      - name: 알림 규칙 관문 (순수 모듈)
+        run: node verify/verify-notify-rules.js
+
+      - name: 푸시 발송 서버 관문
+        run: node verify/verify-push-server.mjs
+
+      - name: 양식 문서 동일성 관문 (원칙 4)
+        run: node verify/form-snapshot.mjs
+
       # 드라이버마다 8123·8124 를 쓴다 (verify/README.md)
       - name: 로컬 서버 띄우기
         run: |
@@ -80,7 +96,8 @@ jobs:
                    verify-supabase.js verify-essay-ui.js verify-forms-data.js \
                    verify-new-forms.js verify-source-links.js verify-push-client.js \
                    verify-notify.js verify-sheet-back.js verify-kosaf.js \
-                   verify-calendar.js verify-resume.js verify-interactions.js; do
+                   verify-calendar.js verify-resume.js verify-interactions.js \
+                   verify-admin.js; do
             echo "── $f"
             node "verify/$f"
           done

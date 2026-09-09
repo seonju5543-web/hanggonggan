@@ -4066,5 +4066,40 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
   eq(`앱이 진동을 부르는 곳은 셋뿐이다 (지금 ${hapticCalls}곳)`, hapticCalls <= 3, true);
 }
 
+/* ── 특별자격 이름표 (2026-09-09 신설) ───────────────────────────────────────────
+   🔴 온보딩 체크박스(index.html `#in-flags`)와 이름표 표(data.js `FLAG_LABELS`)는
+      **열쇠가 한 글자도 어긋나면 안 된다.**
+      2026-09-03 에 특별자격을 5종 → 8종으로 늘리면서(백로그 A-4) 체크박스만 늘리고
+      이름표를 안 늘렸다. 그래서 한부모·북한이탈·다문화를 고른 학생의 MY 화면이
+      `특별자격: , ,` 가 됐다 — **자기가 방금 고른 것이 화면에서 통째로 사라진다.**
+      셋만 고른 학생에게 남는 글자는 쉼표 둘뿐이었다(브라우저로 실측).
+      이 유형은 화면이 조용히 비는 것이라 눈으로는 '해당 없음'과 구분되지 않는다.
+      ⚠️ 이 검사는 **이름표 → 체크박스** 방향도 본다. 체크박스에서 뺀 항목의 이름표가
+         남아 있으면 그 자리 역시 어긋난 것이다(고른 적 없는 자격이 살아난다). */
+{
+  console.log('\n■ 특별자격 이름표');
+  const html = readText(new URL('../index.html', import.meta.url));
+  const dataJs = readText(new URL('../data.js', import.meta.url));
+
+  const block = (html.match(/<div class="check-list" id="in-flags">([\s\S]*?)<\/div>/) || [])[1] || '';
+  const boxes = [...block.matchAll(/value="([A-Za-z]+)"/g)].map((m) => m[1]);
+
+  const table = (dataJs.match(/const FLAG_LABELS = \{([\s\S]*?)\n\};/) || [])[1] || '';
+  const labels = [...table.matchAll(/^\s*([A-Za-z]+):\s*'([^']+)'/gm)].map((m) => m[1]);
+
+  eq('온보딩 특별자격 체크박스를 읽어 냈다', boxes.length >= 5, true);
+  eq('이름표 표를 읽어 냈다', labels.length >= 5, true);
+  eq(`체크박스에 있는데 이름표가 없는 자격이 없다 (체크박스 ${boxes.length} · 이름표 ${labels.length})`,
+    boxes.filter((k) => !labels.includes(k)), []);
+  eq('이름표에 있는데 체크박스에 없는 자격이 없다',
+    labels.filter((k) => !boxes.includes(k)), []);
+
+  /* 🔴 화면이 이름표를 못 찾았을 때 **빈칸을 내놓지 않는다** — 열쇠라도 보여 준다.
+     빈칸은 '해당 없음'처럼 읽혀서, 학생이 자기가 입력한 것이 지워진 줄 안다. */
+  const appJs = readText(new URL('../app.js', import.meta.url));
+  eq('MY 화면이 이름표 없는 자격을 빈칸으로 내놓지 않는다',
+    /FLAG_LABELS\[f\]\s*\|\|\s*f/.test(appJs), true);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);
