@@ -15,22 +15,21 @@
 
 (function () {
   var BOOT_TIMEOUT_MS = 6000;
-  /* 🔴 **최소로 보여 주는 시간** (2026-09-09 개발자 지적: "환영 화면이 나타났지만 사용자가
-     겨우 볼 수 있을 만큼 시간이 짧았어"). 예전에는 바닥값이 없어서, 부팅 화면이 떠 있는 시간이
-     **앱 코드가 실리는 데 걸린 시간 그대로**였다 — 캐시가 없는 첫 실행은 1초 남짓이고
-     설치해 쓰던 폰은 눈에 안 보일 만큼 짧아, 켤 때마다 길이가 들쭉날쭉했다.
-     0.75초는 **시안에서 개발자가 보고 고른 값**이다(docs/designs/mockups/first-run/Main.dc.html).
-     ⚠️ 이 값을 키우면 앱이 그만큼 느려진다 — 기다리게 하는 것이 목적이 아니라
-        '깜빡였다'가 아니라 '봤다'가 되게 하는 것이 목적이다. */
-  var BOOT_MIN_SHOW_MS = 750;
-  /* 🔴 **앱을 켠 순간**부터 센다(`performance.now()` 는 페이지가 열린 시각 기준).
-     이 파일이 실린 시각부터 세면 스크립트를 받아 오는 시간이 앞에 얹혀 총 길이가 들쭉날쭉해진다
-     — 실측으로 750ms 를 걸었는데 화면에는 1,190ms 동안 떠 있었다. 학생이 느끼는 시작점은
-     아이콘을 누른 때이지 우리 코드가 실린 때가 아니다. */
-  var sinceOpen = function () {
-    return (window.performance && performance.now) ? performance.now() : (Date.now() - startedAt);
-  };
-  var startedAt = Date.now();   // performance 를 못 쓰는 옛 브라우저용 대비
+  /* 🔴 **최소로 보여 주는 시간 = 1초** (2026-09-09 개발자 지시: "페이드까지 포함하면 최소
+     1초는 머물러 있어야 하는데 아주 잠깐 표시되고 사라져"). 페이드 120ms 를 더해 총 1.12초 —
+     눈에 '깜빡였다'가 아니라 '봤다'로 남는 길이다.
+     바닥값이 없던 시절에는 떠 있는 시간이 **앱 코드가 실리는 데 걸린 시간 그대로**여서,
+     캐시가 데워진 폰에서는 눈에 안 보일 만큼 짧았다(개발자가 그걸 겪고 지적했다).
+     ⚠️ 이 값을 고치면 시안(docs/designs/mockups/first-run/Main.dc.html)도 **같이** 고쳐야 한다.
+        관문이 둘을 대조해 갈라지면 빨간불을 낸다. */
+  var BOOT_MIN_SHOW_MS = 1000;
+  /* 🔴 세는 시작점은 **이 파일이 실린 때**다 — 부팅 화면이 화면에 그려지는 시점과 가장 가깝다
+     (HTML 과 CSS 를 다 읽은 뒤에야 이 스크립트가 돈다).
+     ⚠️ `performance.now()`(페이지가 열린 시각)로 재지 말 것 — 한 번 열어 둔 문서를 다시 쓰는
+        경우(뒤로가기 캐시·설치형 앱의 재개)에는 그 값이 이미 커져 있어서 **기다림이 0이 되고
+        부팅 화면이 깜빡이고 만다.** 여기서는 늘 0부터 시작하는 값이 안전하다. */
+  var startedAt = Date.now();
+  var sinceShown = function () { return Date.now() - startedAt; };
 
   /* ① 브라우저의 스크롤 되살리기를 끈다.
      🔴 안 끄면 브라우저가 **이전 화면의 스크롤을 다른 화면에 붙인다** — 탐색 탭에서
@@ -60,14 +59,14 @@
   }, BOOT_TIMEOUT_MS);
 
   /* 앱이 화면을 정했다고 알려 오면 걷는다 (app.js 가 부른다).
-     🔴 **곧바로 걷지 않는다** — 뜬 지 0.75초가 안 됐으면 남은 시간만큼 기다렸다 걷는다.
+     🔴 **곧바로 걷지 않는다** — 뜬 지 `BOOT_MIN_SHOW_MS` 가 안 됐으면 남은 만큼 기다렸다 걷는다.
         앱이 준비되는 시간은 기기마다 다른데, 학생 눈에 보이는 길이는 늘 같아야 한다. */
   var closing = false;
   window.bootDone = function () {
     clearTimeout(timer);
     if (closing || document.documentElement.getAttribute('data-boot') === 'done') return;
     closing = true;
-    var wait = Math.max(0, BOOT_MIN_SHOW_MS - sinceOpen());
+    var wait = Math.max(0, BOOT_MIN_SHOW_MS - sinceShown());
     setTimeout(function () {
       document.documentElement.setAttribute('data-boot', 'done');
       var el = document.getElementById('boot');

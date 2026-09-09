@@ -220,6 +220,21 @@ async function openWith(ctx, resume) {
     const s = await shown(page);
     ok('마지막 탭(MY)으로 가지 않는다', s !== 'my', s);
     ok('그 공고가 열린다', await page.isVisible('#detail-sheet').catch(() => false));
+
+    /* 🔴 **회선이 느린 폰**을 재현한다 (2026-09-09 개발자 지적: "알림을 눌렀는데 장학금-전체
+       페이지로 이동이 되고 해당 공고로 바로 이동되지는 않아"). 공고 목록은 따로 받아 오는
+       것이라, 예전에는 그게 늦으면 `findSch` 가 한 번 실패하고 곧장 탐색 탭으로 갔다.
+       빠른 회선에서는 절대 안 걸리므로 **늦춰서 재현하지 않으면 이 검사는 아무것도 못 잡는다.** */
+    const slowNet = await ctx.newPage();
+    await slowNet.route('**/data/registered.json', async (r) => {
+      await new Promise((x) => setTimeout(x, 2500));
+      await r.continue();
+    });
+    await slowNet.goto(`${URLBASE}?sch=${encodeURIComponent(target.id)}`, { waitUntil: 'commit' }).catch(() => {});
+    await slowNet.waitForTimeout(6000);
+    ok('공고 목록이 늦게 와도 그 공고가 열린다 (탐색 탭으로 안 샌다)',
+      await slowNet.isVisible('#detail-sheet').catch(() => false), await shown(slowNet));
+    await slowNet.close();
   }
 
   /* ── ⑦ 학생이 쓴 글은 기기 밖으로 안 나간다 ──────────────────────── */

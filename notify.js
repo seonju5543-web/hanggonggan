@@ -669,8 +669,28 @@ function notifyHandleLaunch() {
     if (typeof state === 'undefined' || !state.profile) return;
     if (screen === 'notifications') { openNotifyInbox(); return; }
     if (screen && ['home', 'explore', 'applications', 'my'].includes(screen)) { showScreen(screen); return; }
-    if (sch && typeof findSch === 'function' && findSch(sch)) openDetail(sch);
-    else if (sch) showScreen('explore');
+    if (!sch) return;
+
+    /* 🔴 **공고 목록이 아직 안 왔다고 포기하지 않는다** (2026-09-09 개발자 지적:
+       "알림을 눌러 앱에 접근했는데도 장학금-전체 페이지로 이동이 되고 해당 공고로 바로
+       이동되지는 않아"). 예전에는 이 자리에서 `findSch` 를 **한 번만** 보고 없으면 곧장
+       탐색 탭으로 보냈다. 그런데 공고 목록(`data/registered.json`)은 따로 받아 오는 것이라,
+       회선이 느린 폰에서는 그 순간에 아직 도착해 있지 않다 — 재현: 목록을 2.5초 늦추자
+       **매번** 탐색 탭으로 갔다. 알림을 누른 학생이 보려던 것은 그 공고 하나다.
+       그래서 **올 때까지 기다렸다가** 연다. 끝내 없으면(지워진 공고 등) 그때 탐색 탭으로. */
+    /* 🔴 기다리는 동안 **학생이 딴 데로 갔으면 손을 뗀다.** 몇 초 뒤에 갑자기 시트를 띄우거나
+       탐색 탭으로 끌고 가면, 그때는 학생이 이미 다른 일을 하는 중이라 화면을 뺏는 것이 된다.
+       기준은 딥링크가 내려앉은 화면(`landed`) — 그대로 있을 때만 연다. */
+    const landed = typeof currentScreen !== 'undefined' ? currentScreen : null;
+    const moved = () => landed !== null && typeof currentScreen !== 'undefined' && currentScreen !== landed;
+    const DEADLINE = Date.now() + 8000;   // 무한정 기다리지는 않는다
+    const tryOpen = () => {
+      if (moved()) return;                                     // 학생이 딴 데로 갔다
+      if (typeof findSch === 'function' && findSch(sch)) { openDetail(sch); return; }
+      if (Date.now() > DEADLINE) { showScreen('explore'); return; }
+      setTimeout(tryOpen, 250);
+    };
+    tryOpen();
   }, 400);
 }
 

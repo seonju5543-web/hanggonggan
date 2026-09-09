@@ -3929,7 +3929,7 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
   const minMs = Number((bootJs2.match(/BOOT_MIN_SHOW_MS\s*=\s*(\d+)/) || [])[1]);
   eq('부팅 화면에 최소로 보여 주는 시간이 있다', minMs > 0, true);
   eq('그 시간을 실제로 기다린다 (선언만 해 두지 않는다)',
-    /BOOT_MIN_SHOW_MS\s*-\s*sinceOpen\(\)/.test(bootJs2), true);
+    /BOOT_MIN_SHOW_MS\s*-\s*sinceShown\(\)/.test(bootJs2), true);
   eq('시한(6초)보다는 짧다', minMs < Number((bootJs2.match(/BOOT_TIMEOUT_MS\s*=\s*(\d+)/) || [])[1]), true);
   /* 🔴 **시안에서 개발자가 보고 고른 값과 같아야 한다** — 갈라지면 승인받은 것과 다른 것이 나간다.
      ⚠️ 750 을 못 박지 않는다(2026-09-09 코드 리뷰): 개발자가 나중에 값을 바꾸기로 하고 시안·앱을
@@ -3939,6 +3939,15 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
   const mockMs = Number((mock.match(/booting:\s*false\s*\}\);\s*resolve\(\);\s*\},\s*(\d+)\)/) || [])[1]);
   eq('시안에서 값을 읽어 냈다 (읽기 실패는 NaN 이라 조용히 통과하면 안 된다)', Number.isFinite(mockMs), true);
   eq('시안이 쓰는 값과 앱이 쓰는 값이 같다', minMs, mockMs);
+
+  /* ⑧ 🔴 알림 딥링크는 **공고 목록이 올 때까지 기다린다** (2026-09-09 개발자 지적).
+     한 번 보고 없으면 탐색 탭으로 보내던 것이 원인이었다 — 회선이 느린 폰에서는 늘 그랬다. */
+  const notifyJs = readText(new URL('../notify.js', import.meta.url));
+  const launchBody = notifyJs.slice(notifyJs.indexOf('function notifyHandleLaunch'),
+    notifyJs.indexOf('function notifyHandleLaunch') + 2000);
+  eq('알림 딥링크가 공고를 기다렸다 연다 (한 번 보고 포기하지 않는다)',
+    /setTimeout\(tryOpen/.test(launchBody), true);
+  eq('그래도 무한정 기다리지는 않는다 (시한이 있다)', /DEADLINE/.test(launchBody), true);
 
   /* ⑦ 홈 줄의 말은 개발자가 정한 그대로다 (2026-09-09 지시) */
   eq("홈 줄의 버튼 문구가 '신청서 마저 쓰기' 다",
