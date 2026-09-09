@@ -3827,6 +3827,18 @@ console.log('\n■ 첫 실행 화면 (2026-09-09)');
   eq('CSP 가 여전히 인라인 스크립트를 막는다 (boot.js 를 인라인으로 옮기면 안 되는 이유)',
     /script-src 'self'/.test(html) && !/script-src[^;]*unsafe-inline/.test(html), true);
 
+  /* 🔴 같은 CSP 가 **인라인 이벤트 처리기(`onclick="…"`)도** 막는다. 2026-09-09 에 실제로
+     그래서 부팅 실패 화면의 '다시 시도' 버튼이 죽어 있었다(브라우저로 확인 — "Refused to
+     execute inline event handler"). 오류가 화면에 안 나므로 **눌러도 아무 일이 안 나는** 것이
+     유일한 증상이고, 앱이 안 오는 학생은 거기서 갇힌다.
+     ⚠️ 이 검사는 '고쳤다'를 지키는 것이 아니라 **다음에 누가 또 쓰는 것**을 막는다 —
+        HTML 을 손으로 고치는 순간 가장 쉽게 손이 가는 방법이 그것이다. */
+  const inlineOn = [...html.matchAll(/\son(click|change|input|submit|load|error)\s*=/gi)].map((m) => m[0].trim());
+  eq('index.html 에 인라인 이벤트 처리기가 없다 (CSP 가 막아 조용히 죽는다)', inlineOn, []);
+  eq('부팅 실패 화면의 다시 시도를 boot.js 가 배선한다',
+    /boot-retry[\s\S]{0,160}addEventListener\('click'/.test(bootJs)
+      && /id="boot-retry"/.test(html), true);
+
   /* ⑤ 서비스워커가 새 파일을 안 담으면 설치된 앱에서 오프라인에 깨진다 */
   const sw = readText(new URL('sw.js', root));
   eq('sw.js ASSETS 에 boot.js 가 있다', /'boot\.js'/.test(sw), true);
@@ -3939,6 +3951,56 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
   const mockMs = Number((mock.match(/booting:\s*false\s*\}\);\s*resolve\(\);\s*\},\s*(\d+)\)/) || [])[1]);
   eq('시안에서 값을 읽어 냈다 (읽기 실패는 NaN 이라 조용히 통과하면 안 된다)', Number.isFinite(mockMs), true);
   eq('시안이 쓰는 값과 앱이 쓰는 값이 같다', minMs, mockMs);
+
+  /* ⑨ 🔴 부팅 화면의 **등장 움직임** (2026-09-09 개발자 지시: "로고나 글자가 애니메이션
+     형태로 나타난다. 하지만 앱의 신뢰성을 떨어뜨리지 않으면서도 깔끔해야 한다").
+     지키는 것은 그 두 조건을 옮긴 셋이다 — 셋 다 값이 어긋나면 조용히 나빠지는 유형이라
+     글로만 적어 두면 다음 세션이 되돌린다. */
+  const css = readText(new URL('../style.css', import.meta.url));
+  const bootMock = readText(new URL('../docs/designs/mockups/first-run/Boot.dc.html', import.meta.url));
+  /* 이름으로 그 애니메이션이 쓰인 선언 한 줄을 집어 초 단위 값만 읽는다.
+     shorthand 는 앞의 시간이 길이, 뒤의 시간이 늦추기다. */
+  const useOf = (text, name) => {
+    const decl = (text.match(new RegExp('animation:[^;]*\\b' + name + '\\b[^;]*;')) || [''])[0];
+    const seg = decl.split(',').find((s) => s.includes(name)) || '';
+    /* cubic-bezier 안의 숫자에는 s 가 안 붙으므로 여기서 걸리지 않는다 */
+    const secs = [...seg.matchAll(/([\d.]+)s\b/g)].map((m) => Number(m[1]) * 1000);
+    return { dur: secs[0], delay: secs[1] || 0, decl };
+  };
+  const logoIn = useOf(css, 'boot-in-logo');
+  const wordIn = useOf(css, 'boot-in-word');
+  const spinIn = useOf(css, 'boot-spin-in');
+  eq('로고에 등장 움직임이 있다', Number.isFinite(logoIn.dur), true);
+  eq('글자에 등장 움직임이 있다', Number.isFinite(wordIn.dur), true);
+
+  /* ㉮ **바닥값보다 일찍 끝난다.** 걷히는 순간까지 움직이고 있으면 급해 보인다 —
+     끝나고 고요한 시간이 남아야 '차분히 놓였다'로 읽힌다. */
+  eq('로고 등장이 최소 노출 시간 안에 끝난다', logoIn.dur + logoIn.delay < minMs, true);
+  eq('글자 등장이 최소 노출 시간 안에 끝난다', wordIn.dur + wordIn.delay < minMs, true);
+
+  /* ㉯ **한 번만 나타나고 멈춘다.** 로고·글자가 계속 움직이면 '들어왔다'가 아니라
+     '아직도 로딩 중'으로 읽힌다 — 그게 신뢰를 깎는 자리다. */
+  eq('로고가 계속 움직이지 않는다', /infinite/.test(logoIn.decl), false);
+  eq('글자가 계속 움직이지 않는다', /infinite/.test(wordIn.decl), false);
+
+  /* ㉰ 계속 도는 표시는 **바닥값이 지난 뒤에야** 나온다 — 앱이 제때 오면 학생은 못 본다.
+     처음부터 띄우면 빠른 기기에서도 매번 '기다리는 화면'이 된다. */
+  eq('도는 표시가 최소 노출 시간이 지난 뒤에 나타난다', spinIn.delay > minMs, true);
+
+  /* 🔴 그 표시는 등장 애니메이션이 opacity 를 올리므로, 움직임을 줄인 기기에서
+     `animation: none` 만 주면 **영영 안 보인다**(느린 기기에서 아무 표시도 없는 빈 화면). */
+  const reduce = css.slice(css.indexOf('@media (prefers-reduced-motion: reduce)', css.indexOf('.boot-spin')));
+  eq('움직임을 줄인 기기에서 로고·글자 등장을 끈다',
+    /\.boot-logo,\s*\.boot-word\s*\{\s*animation:\s*none/.test(reduce.slice(0, 400)), true);
+  eq('그때 도는 표시는 보이게 되돌린다 (안 그러면 영영 안 보인다)',
+    /\.boot-spin\s*\{\s*animation:\s*none;\s*opacity:\s*1/.test(reduce.slice(0, 400)), true);
+
+  /* 🔴 시안과 앱이 갈라지지 않는다 — 값을 못 박지 않고 **둘이 같은가**만 잰다(위 ⑥과 같은 이유) */
+  eq('시안의 로고 등장이 앱과 같다',
+    [logoIn.dur, logoIn.delay], [useOf(bootMock, 'boot-in-logo').dur, useOf(bootMock, 'boot-in-logo').delay]);
+  eq('시안의 글자 등장이 앱과 같다',
+    [wordIn.dur, wordIn.delay], [useOf(bootMock, 'boot-in-word').dur, useOf(bootMock, 'boot-in-word').delay]);
+  eq('시안의 도는 표시 지연이 앱과 같다', spinIn.delay, useOf(bootMock, 'boot-spin-in').delay);
 
   /* ⑧ 🔴 알림 딥링크는 **공고 목록이 올 때까지 기다린다** (2026-09-09 개발자 지적).
      한 번 보고 없으면 탐색 탭으로 보내던 것이 원인이었다 — 회선이 느린 폰에서는 늘 그랬다. */

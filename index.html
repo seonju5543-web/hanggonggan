@@ -33,10 +33,13 @@
     <p class="boot-word">한대장</p>
     <div id="boot-spin" class="boot-spin" aria-hidden="true"></div>
     <!-- 시한(6초)이 지나도 앱이 안 오면 — '시작하기'를 남기지 않는다.
-         남기면 이미 쓰던 학생이 프로필을 처음부터 다시 만들게 된다. -->
+         남기면 이미 쓰던 학생이 프로필을 처음부터 다시 만들게 된다.
+         🔴 이 버튼에 `onclick="…"` 을 쓰지 말 것 — CSP(`script-src 'self'`)가 인라인 처리기를
+            막아 **눌러도 아무 일도 안 일어난다**(2026-09-09 브라우저로 확인: "Refused to
+            execute inline event handler"). 배선은 boot.js 가 한다. -->
     <div id="boot-fail" class="boot-fail" hidden>
       <p>앱을 불러오지 못했어요.<br />인터넷 연결을 확인하고 다시 시도해 주세요.</p>
-      <button type="button" class="btn btn-primary" onclick="location.reload()">다시 시도</button>
+      <button type="button" id="boot-retry" class="btn btn-primary">다시 시도</button>
     </div>
   </div>
 
