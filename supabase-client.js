@@ -268,6 +268,30 @@ function syncSafeProfile(profile, sensitiveOk) {
   return p;
 }
 
+/* 🔴 **신청내역도 청소해야 한다** (2026-09-09 코드 리뷰에서 잡았다).
+   주민등록번호를 떼어내는 장치(syncSafeProfile)는 **프로필 칸만** 청소하고 있었다.
+   그런데 서버로 나가는 짐에는 신청내역이 하나 더 실려 있고, 그 안의 `formAns` 에는
+   학생이 신청서에 채운 답이 통째로 들어 있다 — **주민등록번호·계좌번호·자기소개서 초안까지.**
+   프로필에서 애써 떼어낸 그 값이 옆문으로 그대로 나가고 있었다.
+   실측: 등록된 양식 48종 중 **17종에 주민등록번호·계좌 칸이 27개** 있고, 그 답은
+   `state.applications[].formAns` 에 저장된 뒤 로그인한 학생에게서 곧바로 올라간다.
+   🔴 `terms.html` 92·95줄은 정반대를 약속한다 — *"주민등록번호는 신청서를 채우며 입력한
+      경우에도 기기에만 남습니다"* · *"작성 중인 자기소개서·신청서 내용"* 은 전송되지 않습니다.
+      약관에 적어 둔 말과 코드가 어긋나는 것은 법적 책임이 따른다.
+   ⚠️ 기기 간 이어쓰기에 필요한 것은 **어느 공고를 언제 어디까지 했는가**뿐이다 —
+      id·신청일·단계·제출기록·결과. 학생이 쓴 글은 폰에 그대로 남으므로 쓰던 신청서는 그대로다.
+   🔴 이 함수와 syncApplyRemote 의 되살리기는 **한 세트**다. 보내지 않은 칸을 내려받기가
+      덮어쓰면 학생의 신청서가 기기에서 지워진다(프로필의 rrn·account 를 되살리는 것과 같은 이유). */
+const SYNC_OMIT_APP = ['formAns', 'docs'];
+function syncSafeApplications(apps) {
+  if (!Array.isArray(apps)) return [];
+  return apps.map((a) => {
+    const o = Object.assign({}, a);
+    for (const k of SYNC_OMIT_APP) delete o[k];
+    return o;
+  });
+}
+
 /* ---------------- 올리기 · 내려받기 ---------------- */
 /* 서버에 올린다. 실패해도 앱은 아무 일 없이 계속 돈다 — 폰 안 저장이 원본이다. */
 async function syncPush(state) {
@@ -277,7 +301,7 @@ async function syncPush(state) {
   const row = {
     user_id: u.userId,
     profile: syncSafeProfile(state.profile, sensitiveOk),
-    applications: state.applications || [],
+    applications: syncSafeApplications(state.applications),
     sensitive_ok: sensitiveOk,
     updated_at: new Date().toISOString(),
   };
@@ -307,6 +331,7 @@ async function syncPull() {
 
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
-    syncSafeProfile, SYNC_OMIT_COMMON, SYNC_SENSITIVE_KEYS, authErrorText, REMEMBER_KEY,
+    syncSafeProfile, syncSafeApplications, SYNC_OMIT_COMMON, SYNC_OMIT_APP,
+    SYNC_SENSITIVE_KEYS, authErrorText, REMEMBER_KEY,
   };
 }

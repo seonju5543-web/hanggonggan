@@ -4001,7 +4001,20 @@ function syncApplyRemote(remote) {
     migrateFitFields(p);
     state.profile = p;
   }
-  if (Array.isArray(remote.applications)) state.applications = remote.applications;
+  /* 🔴 **학생이 쓴 글은 서버에 없다** — syncSafeApplications 가 `formAns`·`docs` 를 떼고 보낸다
+     (주민등록번호·계좌·자기소개서가 들어 있어서다). 그래서 받은 것으로 통째로 갈아치우면
+     **이 기기에 있던 신청서 답이 지워진다.** 프로필의 rrn·account 를 되살리는 것과 같은 이유로
+     여기서도 기기 것을 되살린다. ⚠️ 서버가 가진 칸(단계·제출기록)은 서버 것이 이긴다. */
+  if (Array.isArray(remote.applications)) {
+    const mineByIdx = new Map((state.applications || []).map((a) => [a.id, a]));
+    state.applications = remote.applications.map((a) => {
+      const local = mineByIdx.get(a.id);
+      if (!local) return a;
+      const merged = Object.assign({}, a);
+      for (const k of ['formAns', 'docs']) if (merged[k] == null && local[k] != null) merged[k] = local[k];
+      return merged;
+    });
+  }
   state.consent = Object.assign({}, state.consent, { sensitive: !!remote.sensitiveOk });
   state.updatedAt = remote.updatedAt || state.updatedAt;
   saveState({ fromServer: true });

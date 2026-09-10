@@ -151,7 +151,16 @@ const SEED = {
     flags: ['basicLiving', 'disabled'], cert: false, exchange: false,
     common: { studentId: '202312345', phone: '010-1234-5678', rrn: RRN, account: ACCOUNT },
   },
-  applications: [],
+  /* 🔴 **빈 신청내역으로 재면 이 경로를 한 번도 안 지나간다** (2026-09-09 코드 리뷰).
+     예전에는 여기가 `[]` 라, 아래 [3] 절의 `"rrn" 이 안 나간다` 검사가 **프로필 쪽만**
+     증명하고 있었다. 그 사이 신청내역의 `formAns` 로 주민등록번호·계좌번호·자기소개서가
+     그대로 서버에 올라가고 있었다(terms.html 92·95줄의 약속과 정반대).
+     그래서 여기에 **진짜로 위험한 신청 건**을 한 벌 넣는다 — 이게 없으면 검사가 헛돈다. */
+  applications: [
+    { id: 'reg-hufs-yangcheon', appliedAt: '2026-09-01T00:00:00.000Z', step: 0, pending: false,
+      formAns: { rrn: RRN, account: ACCOUNT, bank: '국민은행', intro: '저는 어려운 형편에서도…' },
+      docs: { essay: '자기소개서 초안입니다. 저는 …' } },
+  ],
   consent: { sensitive: false },
   updatedAt: '2026-08-25T00:00:00.000Z',
 };
@@ -272,6 +281,16 @@ const seedScript = (seed) => `localStorage.setItem('handaejang.v1', ${JSON.strin
     ok(row && row[0].profile && row[0].profile.school === '한국외국어대학교', '학교는 올라간다(이어쓰기의 핵심)');
     ok(row && row[0].profile && row[0].profile.common && row[0].profile.common.studentId === '202312345',
       '학번처럼 민감하지 않은 서류 정보는 올라간다');
+
+    /* 🔴 **신청내역 쪽도 본다** (2026-09-09). 프로필만 청소하고 신청내역을 그대로 보내던
+       구멍을 막은 자리다 — 위 SEED 의 formAns 에 주민등록번호·계좌·자기소개서가 들어 있다. */
+    ok(!/"formAns"/.test(all), "신청서 답('formAns')이 통째로 안 나간다");
+    ok(!/"docs"/.test(all), "서류·자기소개서('docs')가 안 나간다");
+    ok(!all.includes('자기소개서 초안입니다'), '자기소개서 글자가 요청 본문에 없다');
+    const apps = row && row[0] ? row[0].applications : null;
+    ok(Array.isArray(apps) && apps.length === 1, '신청내역 자체는 올라간다 (기기 간 이어쓰기)', apps && apps.length);
+    ok(apps && apps[0] && apps[0].id === 'reg-hufs-yangcheon' && apps[0].step === 0,
+      '  올라가는 것은 어느 공고를 언제 어디까지 했는가 뿐이다');
   }
 
   console.log('\n[4] 민감정보(특별자격)는 동의했을 때만 나간다');
@@ -321,6 +340,36 @@ const seedScript = (seed) => `localStorage.setItem('handaejang.v1', ${JSON.strin
       '동의한 특별자격도 되살아났다');
     ok(restored && restored.rrn === null, '주민등록번호는 새 기기에 없다(서버에 없었으므로)');
     ok(await page.locator('#screen-home').isVisible(), '온보딩이 아니라 홈이 뜬다');
+    await ctx.close();
+  }
+
+  /* ───────── [6] 서버에 없는 신청서 답이 기기에서 지워지지 않는다 ───────── */
+  /* 🔴 [3] 의 짝이다. 신청서 답(formAns·docs)을 **안 보내기로** 했으므로, 내려받은 것으로
+     신청내역을 통째로 갈아치우면 **학생이 쓰던 신청서가 기기에서 사라진다.**
+     프로필의 rrn·account 를 되살리는 것과 같은 이유로 신청내역도 기기 것을 되살린다.
+     ⚠️ 서버가 가진 칸(단계·제출기록)은 서버 것이 이겨야 한다 — 안 그러면 다른 기기에서
+        '제출했어요' 를 눌러도 이 기기에서 되돌아간다. 그래서 둘 다 본다. */
+  console.log('\n[6] 🔴 서버에 없는 신청서 답이 기기에서 지워지지 않는다');
+  {
+    const { ctx, page } = await newPage();
+    await page.goto(`http://localhost:${APP_PORT}/`, { waitUntil: 'domcontentloaded' });
+    await settle(page);
+    const r = await page.evaluate(() => {
+      state.applications = [{ id: 'reg-x', appliedAt: '2026-09-01T00:00:00.000Z', step: 0, pending: false,
+        formAns: { rrn: '030101-3234567', intro: '이 기기에서 쓰던 글' }, docs: { essay: '초안' } }];
+      /* 서버가 돌려주는 모양 — 청소돼서 formAns·docs 가 없다 */
+      syncApplyRemote({ profile: null, sensitiveOk: false, updatedAt: '2026-09-02T00:00:00.000Z',
+        applications: [{ id: 'reg-x', appliedAt: '2026-09-01T00:00:00.000Z', step: 2, pending: false,
+          submittedAt: '2026-09-02T00:00:00.000Z' }] });
+      const a = (state.applications || [])[0] || {};
+      return { keptIntro: a.formAns && a.formAns.intro, keptDocs: a.docs && a.docs.essay, step: a.step,
+        submitted: !!a.submittedAt, n: (state.applications || []).length };
+    });
+    ok(r.keptIntro === '이 기기에서 쓰던 글', '기기에 쓰던 신청서 답이 그대로 남는다', r.keptIntro);
+    ok(r.keptDocs === '초안', '서류·자기소개서도 그대로 남는다', r.keptDocs);
+    ok(r.step === 2, '서버가 아는 진행 단계는 서버 것이 이긴다', r.step);
+    ok(r.submitted === true, '다른 기기에서 남긴 제출 기록이 들어온다');
+    ok(r.n === 1, '건수가 늘거나 줄지 않는다', r.n);
     await ctx.close();
   }
 
