@@ -60,6 +60,10 @@ for (const w of ['신청 가능한 장학금', '받을 수 있어요', '해당�
     if (/\bclamp/.test(m[0])) fail('C5', '-', `사실 줄을 자른다 — ${m[0].trim().slice(0, 60)}`);
   if (/const clamp\w* = /.test(src)) fail('C5', '-', '자르는 함수가 되살아났다');
   if (!/shrinkToFit/.test(src)) fail('C5', '-', '브라우저 축소를 안 한다 — 긴 줄을 담을 방법이 없다');
+  // 🔴 곁가지 괄호는 context 한 곳에서만 걷는다 — 쓰는 쪽마다 부르면 한 판형만 빠뜨려도
+  //    카드와 캡션이 다른 글을 보여 준다(실제로 카톡만 빠뜨린 적이 있다).
+  if (!/who: whoLines\(f\)\.map\(dropParen\)/.test(src) || !/traps: bullets\(f\['자격제한'\]\)\.map\(dropParen\)/.test(src))
+    fail('C5', '-', 'context 가 who·traps 에 dropParen 을 안 건다');
   // 🔴 축소 규칙은 insta/fit.mjs 한 곳. 베껴 두면 렌더는 초록불인데 검사만 빨간불이 된다.
   for (const f of ['insta/render.mjs', 'insta/sweep-overflow.mjs']) {
     const t = readFileSync(join(ROOT, f), 'utf8');
@@ -115,5 +119,48 @@ if (!/arr\.length > 0/.test(src) || !/document\.fonts\.size > 0/.test(src))
 // I5 · 신청기간을 자르지 않는다
 if (/clamp\(bullets\(f\['신청기간'\]\)\[0\]/.test(src)) fail('I5', '-', '신청기간을 자른다 — 날짜가 사라질 수 있다');
 
-console.log(bad ? `\n🚨 ${bad}건 실패` : '\n✅ 전부 통과');
-process.exit(bad ? 1 : 0);
+// C8 · 캡션 — 카드와 같은 사실 규칙이 걸린다
+// 🔴 캡션은 사람이 눈으로 보는 마지막 관문이 없다(카드는 그림이라 보게 된다).
+//    그래서 여기서 세게 잡는다. 규칙은 caption.mjs 를 **실제로 돌려서** 확인한다.
+(async () => {
+  const cap = await import(new URL('../insta/caption.mjs', `file://${__filename}`).href);
+  const rnd = await import(new URL('../insta/render.mjs', `file://${__filename}`).href);
+  const { caption, LIMIT, SHORTEN } = cap;
+  const meta = JSON.parse(readFileSync(join(ROOT, 'data/kosaf-open.json'), 'utf8'));
+  let made = 0, past = 0;
+  for (const x of items) {
+    const seed = [...(x.org + x.name)].reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) | 0, 7);
+    // 🔴 마감 지난 공고는 캡션이 **만들어지면 안 된다** — 첫 줄이 신청하라는 말이라
+    //    지난 공고에 붙이면 그 자체가 거짓이다. 안 만드는 것까지가 규칙이다.
+    const gone = x.due && new Date(`${x.due}T23:59:59+09:00`).getTime() < today;
+    let t;
+    try { t = caption(x, rnd.context(x, today, rnd.SKINS.blue, seed, null), meta); } catch (e) { past++; continue; }
+    if (gone) { fail('C8', x.org, `마감 지난 공고(${x.due})에 캡션을 만들었다`); continue; }
+    made++;
+    if (t.length > LIMIT.chars) fail('C8', x.org, `캡션이 ${t.length}자 — 인스타 상한 ${LIMIT.chars}`);
+    const tags = t.match(/#[^\s#]+/g) || [];
+    if (tags.length > LIMIT.tags) fail('C8', x.org, `해시태그 ${tags.length}개 — 상한 ${LIMIT.tags}`);
+    if (tags.length < 6) fail('C8', x.org, `해시태그 ${tags.length}개 — 너무 적다`);
+    // 🔴 카드에서 금지한 말은 캡션에서도 금지다(C2·C3).
+    for (const w of ['무조건', '역대급', '꿀팁', '안 보면 손해', '받을 수 있어요', '해당됩니다'])
+      if (t.includes(w)) fail('C8', x.org, `캡션에 금지어 '${w}'`);
+    // 🔴 사실 줄을 자르지 않는다 — 카드와 같은 규칙.
+    if (/…/.test(t)) fail('C8', x.org, '캡션에서 글이 잘렸다(…)');
+    // 🔴 접히기 전 두 줄에 프로필 안내가 없으면 앱으로 가는 통로가 사라진다.
+    if (!t.split('\n').slice(0, 2).join(' ').includes('프로필')) fail('C8', x.org, '1·2줄에 프로필 안내가 없다');
+    // 🔴 지역 태그는 재단 이름으로 확인된 것만 — `#반드시장학금` 이 실제로 나왔다.
+    for (const tag of tags) {
+      const m = tag.match(/^#(.+)장학금$/);
+      if (!m || /^(교외|대학생|경희대|한국외대)$/.test(m[1])) continue;
+      // 긴 이름도 근거로 친다(경상남도장학회 ↔ #경남장학금). 축약표는 caption.mjs 것을 받아 쓴다.
+      const own = `${x.org}${x.name}`.replace(/\s/g, '');
+      const stem = m[1].replace(/(시|군|구)$/, '');
+      const long = Object.keys(SHORTEN).find((k) => SHORTEN[k] === stem);
+      if (!own.includes(stem) && !(long && own.includes(long)))
+        fail('C8', x.org, `근거 없는 지역 태그 ${tag}`);
+    }
+  }
+  console.log(`  · 캡션 ${made}건 · 마감 지나 거부 ${past}건`);
+  console.log(bad ? `\n🚨 ${bad}건 실패` : '\n✅ 전부 통과');
+  process.exit(bad ? 1 : 0);
+})();

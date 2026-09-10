@@ -16,8 +16,9 @@
  */
 import { chromium } from 'playwright';
 import { shrinkToFit, overflowing } from './fit.mjs';
-import { readFileSync, mkdirSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { caption, LIMIT } from './caption.mjs';
+import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -268,16 +269,19 @@ function context(s0, today, k, seed, school) {
   return { s0, f, k, seed, school, m, d, t1, t2, tKind,
     photo: photoFor(school, seed),
     ddText: ddayText(d),
+    moneyLine: tidy(bullets(f['지원금액'])[0] || ''),
     // 🔴 괄호를 지우면 원문이 상한다 — `연 150만원 이내(생활장학금)` 가
     //    `연 150만원 이내생활장학금` 이 됐다(실측 24건). 앞머리 금액만 뗀다.
     amtSub: (bullets(f['지원금액'])[0] || '').replace(/^[0-9,]+\s*만?원\s*/, '').trim(),
     // 🔴 그냥 이어 붙이고 자르면 특정자격이 자리를 다 먹어 **지역·소득 조건이 사라진다**
     //    (실측 145건 중 54건). 칸마다 한 줄씩 먼저 담고, 남는 자리만 더 채운다.
-    who: whoLines(f),
+    // 🔴 곁가지 괄호는 **여기서 한 번만** 걷는다. 쓰는 쪽마다 부르면 한 판형만 빠뜨려도
+    //    카드와 캡션이 다른 글을 보여 준다(실제로 카톡만 빠뜨린 적이 있다).
+    who: whoLines(f).map(dropParen),
     // 🔴 3줄만 싣고 '외 N건' 을 회색으로 달던 것을 없앴다(개발자 지시 — 회색 글씨 금지).
     //    셋으로 자르고 나머지를 흐린 글씨로 미루면, 걸리는 조항이 거기 있어도 안 읽힌다.
     //    실측 최다 6줄·전부 담아도 167자라 **다 싣는다** — 글자 크기는 브라우저가 맞춘다.
-    traps: bullets(f['자격제한']),
+    traps: bullets(f['자격제한']).map(dropParen),
     // 🔴 이 칸에는 서류가 아닌 줄이 섞인다 — `※ … 온라인 접수` 같은 제출 방법(실측 1건).
     //    그리고 `(선택)` 서류를 '내야 할 서류' 로 세면 부풀린 숫자가 된다(한진해운은 11 중 3).
     docs: bullets(f['제출처 및 제출서류'])
@@ -321,7 +325,7 @@ function cards_photo(c) {
     <div><div class="lab">지원 자격</div>
       <h2>나도<br><em style="color:${k.accent}">받을 수 있나?</em></h2>
       ${scribble(430, k.accent)}</div>
-    <div class="items">${who.map(dropParen).map((t) =>
+    <div class="items">${who.map((t) =>
       `<div class="it">${handCheck(k.accent)}<p data-fit style="font-size:58px">${hi(t)}</p></div>`).join('')}</div>
   </div>`;
 
@@ -344,7 +348,7 @@ function cards_photo(c) {
     <div><div class="lab">자격 제한</div>
       <h2>이러면<br><em style="color:#ffe04d">못 받아요</em></h2>
       ${scribble(430, '#ffe04d')}</div>
-    <div class="items">${traps.map(dropParen).map((t, i) =>
+    <div class="items">${traps.map((t, i) =>
       `<div class="it"><span class="no">${i + 1}</span><p data-fit style="font-size:58px">${hi(t)}</p></div>`).join('')}</div>
   </div>`;
 
@@ -491,7 +495,7 @@ function cards_chat(c) {
     //    `너는 된다` 는 개별 판정이라 못 쓴다(자기잠식 선 · 관문 C3).
     wrap([me('나도 받을 수 있어?', '오후 8:42'),
       you('<b>너 이거면 넣을 수 있어</b>', '8:42'),
-      ...who.map((t) => you(hi(dropParen(t)), '8:42'))]),
+      ...who.map((t) => you(hi(t), '8:42'))]),
     wrap([me('얼마 주는데? 언제까지야?', '오후 8:43'),
       you(m && !m.many ? `<b style="font-size:56px;font-weight:900">${esc(m.n)}${esc(m.unit)}</b>`
         + (amtSub ? `<br><span style="font-size:30px;color:#666">${esc(amtSub)}</span>` : '')
@@ -501,7 +505,7 @@ function cards_chat(c) {
     ...(traps.length ? [wrap([me('오케이 바로 넣는다', '오후 8:44'),
       you('아 잠깐', '8:44'),
       you('<b>너 이거에 해당하면 못 받아</b>', '8:44'),
-      ...traps.map((t) => you(hi(dropParen(t)), '8:44'))])] : []),
+      ...traps.map((t) => you(hi(t), '8:44'))])] : []),
     // 🔴 말풍선이 너무 많으면 위가 헤더에 잘린다(아래 정렬이라 넘치면 위부터 사라진다).
     //    줄을 줄이고 '한대장' 을 큰 말풍선으로 세운다.
     wrap([me('이런 거 어디서 봐?', '오후 8:45'),
@@ -569,7 +573,7 @@ function cards_note(c) {
     ${memo ? `<div class="memo">${memo}</div>` : ''}
   </div>`;
   // 자격 = 체크칸(✓) · 제한 = 빈 칸 + 빨간 X. 색 원도 이모지도 안 쓴다.
-  const list = (arr, ok) => arr.map(dropParen).map((t) =>
+  const list = (arr, ok) => arr.map((t) =>
     `<div class="nrow">${ok ? handBox('#2f6be0', true) : handX('#d8442f')}
       <p data-fit style="font-size:50px">${hi(t)}</p></div>`).join('');
 
@@ -609,86 +613,111 @@ const TPL = {
   note:  { css: CSS_note,  cards: cards_note,  fonts: ["700 110px 'Gaegu'", "400 48px 'Gaegu'"] },
 };
 
-// ── 실행 ────────────────────────────────────────────────────
-const args = process.argv.slice(2);
-// 🔴 `--seed=`(빈 값) 은 undefined 로 돌려준다 — 안 그러면 Number('') 가 0 이 돼
-//    "왜 늘 같은 얼굴이지" 가 된다. `--seed`(= 없음) 도 안 준 것으로 본다.
-const val = (k) => {
-  const a = args.find((x) => x.startsWith(`--${k}=`) || x === `--${k}`);
-  if (a === undefined) return undefined;
-  const v = a.split('=').slice(1).join('=');
-  return v === '' ? undefined : v;
-};
-const needle = args.find((a) => !a.startsWith('--'));
-if (!needle) { console.error('공고 이름 일부를 주세요 — 예: node insta/render.mjs 한진해운 --tpl=all'); process.exit(1); }
-const skinName = val('skin') || 'blue';
-const k = SKINS[skinName];
-if (!k) { console.error(`판형 '${skinName}' 없음 (${Object.keys(SKINS).join(' / ')})`); process.exit(1); }
+// ── 밖에서 쓰라고 내주는 것 ─────────────────────────────────
+// 🔴 캡션 생성기·넘침 스윕이 **같은 추출기**를 써야 카드와 캡션이 갈라지지 않는다.
+//    예전엔 이 파일을 통째로 베껴 _lib.mjs 로 쓰고 지웠다 — 꼼수라 걷어냈다.
+export { TPL, SKINS, context, bigTitle, whoLines, bullets, dropParen, money, dday, ddayText, tidy, esc, W, H };
 
-const data = JSON.parse(readFileSync(join(ROOT, 'data/kosaf-open.json'), 'utf8'));
-const s = (data.items || data).find((x) => (x.org + x.name).includes(needle));
-if (!s) { console.error(`'${needle}' 공고를 못 찾았습니다.`); process.exit(1); }
+// ── 실행 (직접 돌릴 때만 — import 하면 안 돈다) ──────────────
+const RUN = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
+if (RUN) {
+  const args = process.argv.slice(2);
+  // 🔴 `--seed=`(빈 값) 은 undefined 로 돌려준다 — 안 그러면 Number('') 가 0 이 돼
+  //    "왜 늘 같은 얼굴이지" 가 된다. `--seed`(= 없음) 도 안 준 것으로 본다.
+  const val = (k) => {
+    const a = args.find((x) => x.startsWith(`--${k}=`) || x === `--${k}`);
+    if (a === undefined) return undefined;
+    const v = a.split('=').slice(1).join('=');
+    return v === '' ? undefined : v;
+  };
+  const needle = args.find((a) => !a.startsWith('--'));
+  if (!needle) { console.error('공고 이름 일부를 주세요 — 예: node insta/render.mjs 한진해운 --tpl=all'); process.exit(1); }
+  const skinName = val('skin') || 'blue';
+  const k = SKINS[skinName];
+  if (!k) { console.error(`판형 '${skinName}' 없음 (${Object.keys(SKINS).join(' / ')})`); process.exit(1); }
 
-// 🔴 씨앗을 안 주면 공고 이름에서 만든다 — 같은 공고는 늘 같은 얼굴, 공고가 바뀌면 얼굴도 바뀐다.
-if (val('seed') !== undefined && !Number.isFinite(Number(val('seed')))) {
-  console.error(`--seed 는 숫자여야 합니다 (받은 값: ${val('seed')})`); process.exit(1);
+  const data = JSON.parse(readFileSync(join(ROOT, 'data/kosaf-open.json'), 'utf8'));
+  const s = (data.items || data).find((x) => (x.org + x.name).includes(needle));
+  if (!s) { console.error(`'${needle}' 공고를 못 찾았습니다.`); process.exit(1); }
+
+  // 🔴 씨앗을 안 주면 공고 이름에서 만든다 — 같은 공고는 늘 같은 얼굴, 공고가 바뀌면 얼굴도 바뀐다.
+  if (val('seed') !== undefined && !Number.isFinite(Number(val('seed')))) {
+    console.error(`--seed 는 숫자여야 합니다 (받은 값: ${val('seed')})`); process.exit(1);
+  }
+  const seed = val('seed') !== undefined ? Number(val('seed'))
+    : [...(s.org + s.name)].reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) | 0, 7);
+  const school = val('school') || s.school || null;
+  const names = Object.keys(TPL);
+  const wantTpl = val('tpl');
+  const list = wantTpl === 'all' ? names
+    : wantTpl ? [wantTpl] : [names[Math.abs(seed) % names.length]];   // 안 주면 씨앗으로 돌린다
+  for (const t of list) if (!TPL[t]) { console.error(`템플릿 '${t}' 없음 (${names.join(' / ')} / all)`); process.exit(1); }
+  // 🔴 조용히 무시하면 '색을 바꿨는데 왜 그대로지' 를 다음 사람이 다시 겪는다.
+  if (val('skin') && list.every((t) => !TPL[t].skin))
+    console.error(`⚠️  --skin 은 photo 판형에만 걸립니다 — ${list.join('/')} 는 색이 고정입니다.`);
+
+  // 🔴 캡션도 여기서 만든다 — 따로 돌리면 다른 씨앗·다른 공고로 짝이 어긋난다.
+//    `--caption` 만 주면 그림 없이 캡션만 찍는다(눈으로 볼 때 빠르다).
+const cap = (() => {
+  try { return caption(s, context(s, new Date(), k, seed, school), data); }
+  catch (e) { console.error(`⚠️  캡션 없음 — ${e.message}`); return null; }
+})();
+if (args.includes('--caption')) {
+  if (!cap) process.exit(1);
+  console.log(cap);
+  const nTag = (cap.match(/#[^\s#]+/g) || []).length;
+  console.error(`\n── ${cap.length}자 / ${LIMIT.chars} · 해시태그 ${nTag}개 / ${LIMIT.tags}`);
+  process.exit(cap.length > LIMIT.chars ? 1 : 0);
 }
-const seed = val('seed') !== undefined ? Number(val('seed'))
-  : [...(s.org + s.name)].reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) | 0, 7);
-const school = val('school') || s.school || null;
-const names = Object.keys(TPL);
-const wantTpl = val('tpl');
-const list = wantTpl === 'all' ? names
-  : wantTpl ? [wantTpl] : [names[Math.abs(seed) % names.length]];   // 안 주면 씨앗으로 돌린다
-for (const t of list) if (!TPL[t]) { console.error(`템플릿 '${t}' 없음 (${names.join(' / ')} / all)`); process.exit(1); }
-// 🔴 조용히 무시하면 '색을 바꿨는데 왜 그대로지' 를 다음 사람이 다시 겪는다.
-if (val('skin') && list.every((t) => !TPL[t].skin))
-  console.error(`⚠️  --skin 은 photo 판형에만 걸립니다 — ${list.join('/')} 는 색이 고정입니다.`);
 
 mkdirSync(OUT, { recursive: true });
-let overflowed = false;
-const browser = await chromium.launch();
-for (const name of list) {
-  const t = TPL[name];
-  const page = await browser.newPage({ viewport: { width: W, height: H } });
-  await page.setContent(`<style>${t.css(k)}</style>${t.cards(context(s, new Date(), k, seed, school)).join('')}`);
-  await page.waitForLoadState('networkidle');
-  // 🔴 폰트가 안 실리면 전부 두부(□)가 되는데 로그는 초록불이다. 시끄럽게 죽인다.
-  //    ⚠️ fonts.check() 는 기본 시험 글자가 라틴이라 한글 서브셋에선 늘 false → 한글로 묻는다.
-  //    ⚠️ check() 만 하면 'unloaded' 로 남는다 — load() 로 불러오라고 시켜야 한다(실측).
-  // 🔴 fonts.check() 는 **맞는 FontFace 가 하나도 없으면 참을 돌려준다**(CSS Font Loading 규격).
-  //    그래서 폰트를 아예 못 받아온 경우 — 두부(□)가 되는 바로 그 경우 — 를 통과시켰다(실측).
-  //    load() 가 돌려주는 배열의 길이를 봐야 '진짜 실렸는지' 를 안다.
-  const ok = await page.evaluate(async (specs) => {
-    const got = await Promise.all(specs.map((x) => document.fonts.load(x, '한글가나')));
-    await document.fonts.ready;
-    return got.every((arr) => arr.length > 0) && document.fonts.size > 0;
-  }, t.fonts);
-  if (!ok) { console.error(`🚨 ${name}: 한글 폰트를 못 실었습니다 — 글자가 깨집니다.`); await browser.close(); process.exit(1); }
-  // 🔴 배경 사진이 404 면 표지가 통째로 까매지는데 로그는 초록불이다(폰트와 같은 유형).
-  //    background-image 는 onerror 가 없으니 같은 주소를 <img> 로 한 번 더 받아 본다.
-  const bgUrl = await page.evaluate(() => {
-    const el = document.querySelector('.photo .bg'); if (!el) return null;
-    return (el.style.backgroundImage.match(/url\("(.+)"\)/) || [])[1] || null;
-  });
-  if (bgUrl) {
-    const w = await page.evaluate((u) => new Promise((ok) => {
-      const i = new Image(); i.onload = () => ok(i.naturalWidth); i.onerror = () => ok(0); i.src = u;
-    }), bgUrl);
-    if (!w) { console.error(`🚨 ${name}: 배경 사진을 못 받았습니다 — 표지가 까맣게 나갑니다\n   ${bgUrl}`); await browser.close(); process.exit(1); }
+  let overflowed = false;
+  const browser = await chromium.launch();
+  for (const name of list) {
+    const t = TPL[name];
+    const page = await browser.newPage({ viewport: { width: W, height: H } });
+    await page.setContent(`<style>${t.css(k)}</style>${t.cards(context(s, new Date(), k, seed, school)).join('')}`);
+    await page.waitForLoadState('networkidle');
+    // 🔴 폰트가 안 실리면 전부 두부(□)가 되는데 로그는 초록불이다. 시끄럽게 죽인다.
+    //    ⚠️ fonts.check() 는 기본 시험 글자가 라틴이라 한글 서브셋에선 늘 false → 한글로 묻는다.
+    //    ⚠️ check() 만 하면 'unloaded' 로 남는다 — load() 로 불러오라고 시켜야 한다(실측).
+    // 🔴 fonts.check() 는 **맞는 FontFace 가 하나도 없으면 참을 돌려준다**(CSS Font Loading 규격).
+    //    그래서 폰트를 아예 못 받아온 경우 — 두부(□)가 되는 바로 그 경우 — 를 통과시켰다(실측).
+    //    load() 가 돌려주는 배열의 길이를 봐야 '진짜 실렸는지' 를 안다.
+    const ok = await page.evaluate(async (specs) => {
+      const got = await Promise.all(specs.map((x) => document.fonts.load(x, '한글가나')));
+      await document.fonts.ready;
+      return got.every((arr) => arr.length > 0) && document.fonts.size > 0;
+    }, t.fonts);
+    if (!ok) { console.error(`🚨 ${name}: 한글 폰트를 못 실었습니다 — 글자가 깨집니다.`); await browser.close(); process.exit(1); }
+    // 🔴 배경 사진이 404 면 표지가 통째로 까매지는데 로그는 초록불이다(폰트와 같은 유형).
+    //    background-image 는 onerror 가 없으니 같은 주소를 <img> 로 한 번 더 받아 본다.
+    const bgUrl = await page.evaluate(() => {
+      const el = document.querySelector('.photo .bg'); if (!el) return null;
+      return (el.style.backgroundImage.match(/url\("(.+)"\)/) || [])[1] || null;
+    });
+    if (bgUrl) {
+      const w = await page.evaluate((u) => new Promise((ok) => {
+        const i = new Image(); i.onload = () => ok(i.naturalWidth); i.onerror = () => ok(0); i.src = u;
+      }), bgUrl);
+      if (!w) { console.error(`🚨 ${name}: 배경 사진을 못 받았습니다 — 표지가 까맣게 나갑니다\n   ${bgUrl}`); await browser.close(); process.exit(1); }
+    }
+    // 🔴 글자 크기를 코드에서 어림하지 않는다 — 넉넉하게 그려 두고 **브라우저가 재서** 줄인다.
+    //    손으로 어림하던 시절엔 짧은 카드에 여백이 남고 긴 카드는 넘쳤다(둘 다 지적받았다).
+    //    규칙은 `insta/fit.mjs` 한 곳 — 검사도 같은 파일을 쓴다.
+    await page.evaluate(shrinkToFit);
+    const over = await page.evaluate(overflowing);
+    if (over.length) { console.error(`🚨 ${name}: ${over.join('·')}번째 카드에서 글자가 잘립니다`); overflowed = true; }
+    const els = await page.$$('.card');
+    for (let i = 0; i < els.length; i++) await els[i].screenshot({ path: join(OUT, `${name}-${i + 1}.png`) });
+    await page.close();
+    console.log(`  ${name} — ${els.length}장`);
   }
-  // 🔴 글자 크기를 코드에서 어림하지 않는다 — 넉넉하게 그려 두고 **브라우저가 재서** 줄인다.
-  //    손으로 어림하던 시절엔 짧은 카드에 여백이 남고 긴 카드는 넘쳤다(둘 다 지적받았다).
-  //    규칙은 `insta/fit.mjs` 한 곳 — 검사도 같은 파일을 쓴다.
-  await page.evaluate(shrinkToFit);
-  const over = await page.evaluate(overflowing);
-  if (over.length) { console.error(`🚨 ${name}: ${over.join('·')}번째 카드에서 글자가 잘립니다`); overflowed = true; }
-  const els = await page.$$('.card');
-  for (let i = 0; i < els.length; i++) await els[i].screenshot({ path: join(OUT, `${name}-${i + 1}.png`) });
-  await page.close();
-  console.log(`  ${name} — ${els.length}장`);
+  // 마감 지난 공고면 캡션이 없다 — '올리면 안 되는 것' 이라는 신호다.
+  if (cap) { writeFileSync(join(OUT, 'caption.txt'), cap + '\n'); console.log('  캡션 — insta/out/caption.txt'); }
+  await browser.close();
+  // 🔴 잘린 채로 올리면 사실이 사라진 게시물이 나간다 — 조용히 끝내지 않는다.
+  if (overflowed) process.exit(2);
+  console.log(`${s.org} · ${s.name} (마감 ${s.due} · 씨앗 ${seed})`);
+
 }
-await browser.close();
-// 🔴 잘린 채로 올리면 사실이 사라진 게시물이 나간다 — 조용히 끝내지 않는다.
-if (overflowed) process.exit(2);
-console.log(`${s.org} · ${s.name} (마감 ${s.due} · 씨앗 ${seed})`);
