@@ -60,6 +60,11 @@ for (const w of ['신청 가능한 장학금', '받을 수 있어요', '해당�
     if (/\bclamp/.test(m[0])) fail('C5', '-', `사실 줄을 자른다 — ${m[0].trim().slice(0, 60)}`);
   if (/const clamp\w* = /.test(src)) fail('C5', '-', '자르는 함수가 되살아났다');
   if (!/shrinkToFit/.test(src)) fail('C5', '-', '브라우저 축소를 안 한다 — 긴 줄을 담을 방법이 없다');
+  // 🔴 render.mjs 를 import 하는 쪽(이 관문·캡션)이 브라우저를 요구하면 안 된다 —
+  //    CI 는 playwright-core 만 깔아서 `Cannot find package 'playwright'` 로 죽는다.
+  //    로컬은 통과하고 CI 만 빨간불인 유형이라 여기서 막는다.
+  if (/^import .*from 'playwright'/m.test(raw))
+    fail('C5', '-', "render.mjs 가 최상단에서 playwright 를 부른다 — CLI 안에서 동적으로 부를 것");
   // 🔴 곁가지 괄호는 context 한 곳에서만 걷는다 — 쓰는 쪽마다 부르면 한 판형만 빠뜨려도
   //    카드와 캡션이 다른 글을 보여 준다(실제로 카톡만 빠뜨린 적이 있다).
   if (!/who: whoLines\(f\)\.map\(dropParen\)/.test(src) || !/traps: bullets\(f\['자격제한'\]\)\.map\(dropParen\)/.test(src))

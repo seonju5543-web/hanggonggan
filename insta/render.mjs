@@ -14,7 +14,6 @@
  *
  * 실행: node insta/render.mjs [공고이름일부] [--tpl=photo|chat|note|all] [--skin=…] [--seed=N] [--school=…]
  */
-import { chromium } from 'playwright';
 import { shrinkToFit, overflowing } from './fit.mjs';
 import { caption, LIMIT } from './caption.mjs';
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
@@ -619,8 +618,13 @@ const TPL = {
 export { TPL, SKINS, context, bigTitle, whoLines, bullets, dropParen, money, dday, ddayText, tidy, esc, W, H };
 
 // ── 실행 (직접 돌릴 때만 — import 하면 안 돈다) ──────────────
+// 🔴 playwright 를 최상단에서 부르면 **이 파일을 import 하는 쪽이 다 브라우저를 요구한다.**
+//    관문(verify-insta.js)이 추출기를 쓰려고 import 했다가 CI 에서 죽었다 —
+//    CI 는 playwright-core 만 깐다. 로컬은 통과하고 CI 만 빨간불인 유형.
+//    브라우저는 **직접 돌릴 때만** 필요하니 그 안에서 부른다.
 const RUN = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
 if (RUN) {
+  const { chromium } = await import('playwright');
   const args = process.argv.slice(2);
   // 🔴 `--seed=`(빈 값) 은 undefined 로 돌려준다 — 안 그러면 Number('') 가 0 이 돼
   //    "왜 늘 같은 얼굴이지" 가 된다. `--seed`(= 없음) 도 안 준 것으로 본다.
