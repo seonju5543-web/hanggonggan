@@ -3904,7 +3904,10 @@ function bindEvents() {
          지우지 않으면 다음에 앱을 켤 때 **지웠다고 말한 값이 그대로 되살아난다.** */
       if (typeof resumeClear === 'function') resumeClear();
       formFill = null;
-      state = emptyState();   // 🔴 손으로 다시 적지 말 것 — 늘어난 칸이 빠진다(위 emptyState 주석)
+      /* 🔴 손으로 다시 적지 말 것 — 늘어난 칸이 빠진다(위 emptyState 주석).
+         ⚠️ 이 설명을 줄 끝 `//` 주석으로 두지 말 것 — verify/ui-tone.mjs 의 주석 제거기는
+            줄 **첫머리** `//` 만 걷어내서, 줄 끝에 둔 🔴 가 '화면에 이모지가 있다'로 잡힌다. */
+      state = emptyState();
       if (typeof notifyReset === 'function') notifyReset(); // 알림 설정·알림함도 함께 초기화
       initOnboarding();
       showScreen('onboarding');

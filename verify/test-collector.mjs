@@ -2969,6 +2969,35 @@ console.log('\n■ 금액 산정 — 부풀리지 않는가 (2026-08-27)');
   /* ⚠️ 순서가 방어선 — 넓은 표지가 있으면 좁은 낱말이 예외로 끼어 있어도 전부다 */
   eq('「국가 장학금 이외의 교외 장학금」은 전부',
     PA.exclusivityFrom(['학교 및 국가 장학금 이외의 교외 장학금 중복 수혜 사실이 없음을 증명함']).scope, 'external');
+
+  /* 🔴 **한정어 없음의 기본값을 좁힌 자리** (2026-09-09 코드 리뷰 · 전수 대조).
+     `타 장학금은 중복 불가` 처럼 **남의 장학금**을 말하는 줄은 예전처럼 '전부' 다(위 검사가 지킨다).
+     그런데 남의 장학금 이야기가 아닌 줄까지 '전부' 로 읽혀, 교외 장학금을 하나라도 받는
+     학생에게 **지원 불가**가 떴다 — 그 학생은 받을 수 있는 돈을 신청조차 안 하게 된다.
+     ⚠️ 합계는 안 바뀐다 — sumAmounts 는 'narrow' 만 예외로 두므로 'unspecified' 도
+        예전처럼 보수적으로 셈한다(홈 합계 실측 1,205만원 그대로). */
+  eq("'동일인 중복 지급 불가' 는 그 재단 이야기다 (교외 전부가 아니다)",
+    PA.exclusivityFrom(['당해연도 내 동일인 중복 지급 불가']).scope, 'unspecified');
+  eq('  장학금 이름을 대면 그것과만',
+    PA.exclusivityFrom(['동일종목 및 동일수상실적으로 춘향인재장학금과 중복 지급 불가']).scope, 'narrow');
+  /* 🔴 되돌림 방지 — 아래 둘은 계속 '전부' 여야 한다 */
+  eq('  그래도 「타 장학금」(한정어 없음)은 여전히 전부',
+    PA.exclusivityFrom(['본 장학금 수혜자는 타 장학금 중복 수혜 불가']).scope, 'external');
+  eq('  「대외 장학금」도 여전히 전부',
+    PA.exclusivityFrom(['대외 장학금과 동일인 중복 지급 불가']).scope, 'external');
+  /* 🔴 화면까지 — 교외 장학금을 받는 학생이 '동일인' 줄 때문에 막히지 않는다 */
+  {
+    const MEx = createRequire(import.meta.url)('../match-engine.js');
+    const held = { school: '경희대학교', campus: '서울캠퍼스', track: 'engineering', major: '컴퓨터공학과',
+      year: 3, status: '재학', gpa: 4.0, credits: 16, bracket: 4, region: '서울',
+      flags: [], scholarships: ['external'], common: {} };
+    const mk = (line) => ({ id: 't', name: 't', type: '교외', eligibility: { selective: true },
+      exclusivity: PA.exclusivityFrom([line]), eligibilityLines: [] });
+    eq("  '동일인' 줄로는 교외 수혜자를 막지 않는다",
+      MEx.evaluate(mk('당해연도 내 동일인 중복 지급 불가'), held).status !== 'ineligible', true);
+    eq("  '타 장학금' 줄로는 여전히 막는다 (되돌림 방지)",
+      MEx.evaluate(mk('본 장학금 수혜자는 타 장학금 중복 수혜 불가'), held).status, 'ineligible');
+  }
   /* 🔴 `민간재단` 은 공기관을 뺀 말이다 (2026-08-28 개발자 확인) —
      국가장학금만 받고 있는 학생은 막히면 안 된다. 거의 모든 학생이 국가장학금을 받는다. */
   {
