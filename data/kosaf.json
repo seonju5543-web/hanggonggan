@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-09-07T23:19:49.262Z",
+ "updatedAt": "2026-09-10T23:05:27.416Z",
  "source": "한국장학재단 학자금지원정보 통합검색",
  "sourceUrl": "https://portal.kosaf.go.kr/CO/jspAction.do?beanName=PTSMCstmDsgnGoodsSVC&methodName=getItgnSrchCstmDsgnGoodsList&inputVOName=kr.go.kosaf.portal.pt.sm.cstmdsgngoods.svc.PTSMCstmDsgnGoodsSVO&forwardOnlyFlag=N&ignoreSession=Y&forwardPage=pt/sm/cstmdsgngoods/PTSMCstmDsgnGoods_10M&naviParam=MK,05,02,01",
  "count": 1850,
