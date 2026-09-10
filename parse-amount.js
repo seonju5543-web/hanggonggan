@@ -403,8 +403,19 @@ function sumAmounts(items, opts) {
     var m = merged[j], a = m.ref.amountSpec || null;
     var won = amountWon(m.ref, tuition);
     m.won = won;
-    if (a && a.kind === 'ratio') { if (won) estimated.push(m); else unknown.push(m); continue; }
+    var isRatio = !!(a && a.kind === 'ratio');
     if (!won) { unknown.push(m); continue; }
+    /* 🔴 **비율형도 이중수혜 갈래를 거친다** (2026-09-10 코드 리뷰에서 잡았다).
+       예전에는 `ratio` 이면 여기서 곧바로 estimated 로 빠져나가 **아래 이중수혜 줄에
+       한 번도 안 닿았다.** 그래서 함께 받을 수 없는 두 공고가 합계에 나란히 더해졌다:
+       등록금 전액(교외 이중수혜 불가) + 500만원(교외 이중수혜 불가) → **900만원**.
+       실제로 받을 수 있는 최대는 500만원이다. 게다가 `dropped` 도 비어 있어 금액 상세의
+       '중복 수혜 불가' 칸에도 안 떠서, 학생이 어긋남을 알아챌 길이 없었다.
+       🔴 이 저장소에서 가장 무거운 실패다 — 받을 수 없는 숫자를 '받을 수 있는 장학금'이라
+          부르는 것은 기망이다(이 파일 첫머리·운영 원칙).
+       ⚠️ '추정' 표시는 그대로 둔다 — `estimated` 는 이제 **화면에 어떻게 적을지**만 정하는
+          목록이고, 합계에 더하는 몫은 added·onlyOne 이 정한다(아래 total 참조). */
+    if (isRatio) estimated.push(m);
     /* 🔴 **전부**와 못 겹치는 것만 골라내기 대상이다 (2026-08-28 개발자 확인).
        `타 인재양성사업 중복 수혜 불가` 처럼 범위가 좁은 것은 다른 장학금과 같이 받을 수
        있으므로 합계에서 빼면 **실제보다 적게** 말하게 된다. 원문은 화면에 그대로 남는다. */
@@ -416,10 +427,12 @@ function sumAmounts(items, opts) {
   exclusive.sort(function (a, b) { return b.won - a.won; });
   var onlyOne = exclusive.slice(0, 1), dropped = exclusive.slice(1);
 
+  /* 🔴 `estimated` 를 여기서 **다시 더하지 않는다** (2026-09-10).
+     비율형도 이제 added·onlyOne 중 하나에 들어가므로, 예전처럼 여기서 또 더하면 두 번 세어진다.
+     `estimated` 는 화면이 '약 400만원 · 추정' 이라고 적기 위한 **표시 목록**이다. */
   var total = 0;
   for (var k = 0; k < added.length; k++)     total += added[k].won;
   for (var l = 0; l < onlyOne.length; l++)   total += onlyOne[l].won;
-  for (var n = 0; n < estimated.length; n++) total += estimated[n].won;
 
   return { total: total, added: added, onlyOne: onlyOne, dropped: dropped,
            estimated: estimated, unknown: unknown };

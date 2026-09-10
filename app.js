@@ -344,8 +344,18 @@ function refreshProgressViews(id) {
      그때는 기록 버튼이 시트에만 있었다. 지금은 신청 내역 패널에도 있어서
      그대로 두면 패널에서 '선정' 을 누를 때마다 엉뚱하게 상세 시트가 튀어나온다(실측). */
   const wasOpen = !$('#detail-sheet').hidden;
-  const current = $$('.screen').find((s) => !s.hidden);
-  if (current) showScreen(current.id.replace('screen-', ''));
+  /* 🔴 **화면을 '바꾸지' 않고 '다시 그리기만' 한다** (2026-09-10 코드 리뷰에서 잡았다).
+     예전에는 지금 화면을 `showScreen()` 으로 다시 열었는데, 그 함수는 마지막에 조건 없이
+     `window.scrollTo(0, o.scroll || 0)` 로 스크롤을 되돌린다. 그래서 신청 내역을 한참
+     내려가 '선정'·'제출했다고 기록'을 누르면 **목록 맨 위로 튀었다**(실측 2527 → 0).
+     학생은 방금 기록한 공고를 찾아 다시 끝까지 내려가야 하고, 여러 건을 이어서 기록할
+     때마다 되풀이된다. 옆의 `deleteApps` 는 처음부터 렌더 함수만 부르고 있었다. */
+  const current = $$('.screen').find((sc) => !sc.hidden);
+  const name = current ? current.id.replace('screen-', '') : '';
+  if (name === 'applications') renderApplications();
+  else if (name === 'home') renderHome();
+  else if (name === 'explore') renderExplore();
+  else if (name === 'my') renderMy();
   if (wasOpen) openDetail(id);
 }
 
@@ -966,7 +976,14 @@ function fitBadgeHtml(fit, fd, { full = false } = {}) {
 function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
   const meta = STATUS_META[result.status];
   const d = dday(sch.deadline);
-  const applied = state.applications.some((a) => a.id === sch.id);
+  /* 🔴 **'담았다'와 '다 했다'를 가른다** (2026-09-10 코드 리뷰에서 잡았다).
+     예전에는 신청내역에 있기만 하면 '신청 완료' 배지를 달았다. 그런데 '한 번에 신청 준비'로
+     담은 건은 `pending: bulkNeedsWork(sch)` 로 **서류 작성이 남은 채** 들어간다(applyAll).
+     그래서 같은 공고를 **신청내역은 '서류 작성 필요', 목록 카드는 '신청 완료'** 라고
+     서로 다르게 말했다 — 학생은 다 끝난 줄 알고 넘어가고 실제로는 아무것도 제출하지 못한다.
+     ⚠️ 낱말은 신청내역(`stepNow`)이 쓰는 것과 **같은 것을 쓴다** — 여기서 새로 지어내면
+        두 화면이 또 다른 말을 하게 된다. */
+  const myApp = state.applications.find((a) => a.id === sch.id);
   return `
     <div class="sch-card-wrap">
     ${saveBtnHtml(sch.id)}
@@ -980,7 +997,9 @@ function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
         <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${sch.type}</span>
         ${sch.program ? '<span class="badge badge-program">상시 제도</span>' : `<span class="badge badge-dday ${d.cls}">${d.label}</span>`}
         ${sch.auto ? '<span class="badge badge-auto">검수 전</span>' : ''}
-        ${applied ? '<span class="badge badge-applied">신청 완료</span>' : ''}
+        ${myApp ? (myApp.pending
+          ? '<span class="badge badge-pending">서류 작성 필요</span>'
+          : '<span class="badge badge-applied">신청 완료</span>') : ''}
       </div>
       <p class="sch-name">${esc(sch.name)}</p>
       <p class="sch-amount">${esc(sch.amount)}</p>
@@ -1306,7 +1325,7 @@ function certStatusListHtml(sch) {
     if (st && st.ok) return `<li class="doc-ok">✓ ${name} — ${st.text}</li>`;
     if (st) return `<li class="doc-miss">□ ${name} — ${st.text}</li>`;
     if (/자동/.test(doc)) return `<li>△ ${name} — 학교·재단 연동 후 자동 첨부 (또는 보관함에 올려두세요)</li>`;
-    return `<li>□ ${doc} — 공식 제출 시 함께 준비하세요</li>`;
+    return `<li>□ ${esc(doc)} — 공식 제출 시 함께 준비하세요</li>`;
   }).join('');
   return `<h4>증명서류 체크리스트</h4><ul class="doc-list">${rows}</ul>
     <p class="dp-note">보관함(MY 탭) 서류는 다음 신청부터 자동 첨부.</p>`;
@@ -1369,10 +1388,10 @@ function renderDocPrep() {
       <div class="sheet-handle"></div>
       <div class="sheet-body">
         <h3 class="sheet-title">서류 작성</h3>
-        <p class="sheet-provider">${sch.name} · 고른 답으로 초안 문장을 엮습니다</p>
+        <p class="sheet-provider">${esc(sch.name)} · 고른 답으로 초안 문장을 엮습니다</p>
         ${docPrep.defs.map((def, di) => `
           <div class="dp-block">
-            <h4>${def.doc}</h4>
+            <h4>${esc(def.doc)}</h4>
             ${def.questions.map((q) => `
               <div class="field">
                 <span class="field-label">${q.label}</span>
@@ -1407,10 +1426,10 @@ function renderDocPrep() {
       <div class="sheet-handle"></div>
       <div class="sheet-body">
         <h3 class="sheet-title">작성 내용 확인</h3>
-        <p class="sheet-provider">${sch.name} · 내용을 직접 수정할 수 있습니다</p>
+        <p class="sheet-provider">${esc(sch.name)} · 내용을 직접 수정할 수 있습니다</p>
         ${docPrep.texts.map((t, i) => `
           <div class="dp-block">
-            <h4>${t.doc}</h4>
+            <h4>${esc(t.doc)}</h4>
             <textarea class="dp-text" data-i="${i}" rows="10">${esc(t.text)}</textarea>
           </div>`).join('')}
         ${certStatusListHtml(sch)}
@@ -2497,7 +2516,7 @@ function openDetail(id) {
       <ul class="doc-list">
         ${sch.documents.map((doc) => {
           const auto = /자동/.test(doc);
-          return `<li>${auto ? '<span class="doc-auto">자동</span>' : '<span class="doc-manual">직접</span>'} ${doc}</li>`;
+          return `<li>${auto ? '<span class="doc-auto">자동</span>' : '<span class="doc-manual">직접</span>'} ${esc(doc)}</li>`;
         }).join('')}
       </ul>
       ${srcNote}
@@ -2539,8 +2558,8 @@ function openDetail(id) {
           </div>` : ''}
         ${step === 3 ? `
           <p class="progress-note ${app.result === 'won' ? 'progress-won' : ''}">${app.result === 'won'
-            ? `${app.resultAt} 선정 · ${sch.amount}`
-            : `${app.resultAt} 미선정으로 기록됨`}</p>
+            ? `${esc(app.resultAt)} 선정 · ${esc(sch.amount)}`
+            : `${esc(app.resultAt)} 미선정으로 기록됨`}</p>
           <button class="link-btn" id="btn-undo-progress" style="margin-bottom:10px">결과 기록 취소</button>` : ''}
         ${app.docs && app.docs.length ? `
           <details class="dp-saved"><summary>작성한 서류 보기 (${app.docs.length})</summary>
@@ -2871,8 +2890,13 @@ function docChecklistHtml(sch) {
     /* 보관함에 칸이 없는 서류 — 있는지 없는지 앱이 알 수 없으므로 그렇게 말한다 */
     return `<li class="dc-etc">${esc(doc)}<em>보관함에서 확인할 수 없는 서류</em></li>`;
   }).join('');
-  /* 머리글은 **학생이 할 일의 개수**를 말한다 — 분수(0/2)는 읽는 데 한 박자 걸린다 */
-  const head = `제출 서류 ${all.length}개`
+  /* 머리글은 **학생이 할 일의 개수**를 말한다 — 분수(0/2)는 읽는 데 한 박자 걸린다.
+     🔴 세는 것은 `known` 이다 (2026-09-10 코드 리뷰). `all` 로 세면 위에서 일부러 갈라낸
+        '아직 못 읽었다' 표시까지 서류로 세어, **머리글은 3개인데 목록은 2줄**이 된다
+        (실측 4건 — reg-hi-jeju 3→2 · reg-hufs-myeonhak 2→1 · reg-hufs-alumni 3→2 ·
+        reg-khu-intern 2→1). 줄은 갈랐는데 숫자만 안 갈랐던 것이다.
+        못 읽은 몫은 바로 아래 `note` 줄이 이미 말한다. */
+  const head = `제출 서류 ${known.length}개`
     + (missing.length ? '' : tracked.length ? ' · 보관함에서 자동 첨부' : '');
   return `
     <details class="doc-check"${missing.length ? ' open' : ''}>
@@ -3389,8 +3413,10 @@ function renderMy() {
   const trackLabel = (TRACKS.find((t) => t.id === p.track) || {}).label || '-';
   const commonFilled = ['studentId', 'birth', 'phone', 'email', 'account'].filter((k) => c[k]).length;
   $('#my-profile').innerHTML = `
-    <p class="my-name">${p.name || '대학생'} 님<span class="my-edit-hint">수정하기 ›</span></p>
-    <p class="my-line">${p.school || '대학 미설정'} · ${trackLabel}${p.major ? ' · ' + p.major : ''}</p>
+    <p class="my-name">${esc(p.name || '대학생')} 님<span class="my-edit-hint">수정하기 ›</span></p>
+    ${/* 🔴 학과 칸은 **학생이 직접 치는 자유 입력**이다 — esc 를 빠뜨리면 `B<b>학과` 같은 글자에
+         MY 화면 아래쪽이 통째로 그 태그 안으로 빨려 들어간다(브라우저 실측). 2026-09-10. */ ''}
+    <p class="my-line">${esc(p.school || '대학 미설정')} · ${esc(trackLabel)}${p.major ? ' · ' + esc(p.major) : ''}</p>
     <div class="my-grid">
       <div><span>학년</span><strong>${p.year}학년 (${esc(p.status || '미설정')})</strong></div>
       <div><span>직전학기 평점</span><strong>${p.gpa != null ? p.gpa.toFixed(2) : '미입력'}</strong></div>

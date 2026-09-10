@@ -2976,6 +2976,36 @@ console.log('\n■ 금액 산정 — 부풀리지 않는가 (2026-08-27)');
      학생에게 **지원 불가**가 떴다 — 그 학생은 받을 수 있는 돈을 신청조차 안 하게 된다.
      ⚠️ 합계는 안 바뀐다 — sumAmounts 는 'narrow' 만 예외로 두므로 'unspecified' 도
         예전처럼 보수적으로 셈한다(홈 합계 실측 1,205만원 그대로). */
+  /* 🔴 **비율형도 '함께 못 받는 것 중 하나만'에 참여한다** (2026-09-10 코드 리뷰).
+     예전에는 `ratio` 이면 곧바로 estimated 로 빠져나가 이중수혜 갈래에 한 번도 안 닿았다.
+     그래서 함께 받을 수 없는 두 공고가 합계에 나란히 더해졌다 —
+     등록금 전액(교외 이중수혜 불가) + 500만원(교외 이중수혜 불가) → **900만원**
+     (실제로 받을 수 있는 최대는 500만원). `dropped` 도 비어 있어 금액 상세의
+     '중복 수혜 불가' 칸에도 안 떠, 학생이 어긋남을 알아챌 길이 없었다.
+     🔴 받을 수 없는 숫자를 '받을 수 있는 장학금'이라 부르는 것은 기망이다(이 파일 첫머리). */
+  {
+    const ex = (k, sc) => ({ kind: k, scope: sc, raw: 'x' });
+    const T = 4000000;
+    const sum = (items) => PA.sumAmounts(items, { tuition: T }).total / 10000;
+    eq('비율형+고정형이 둘 다 교외 배타면 큰 쪽 하나만 센다',
+      sum([{ id: 'a', amountSpec: { kind: 'ratio', ratio: 1 }, exclusivity: ex('forbidden', 'external') },
+        { id: 'b', amountSpec: { kind: 'fixed', value: 5000000 }, exclusivity: ex('forbidden', 'external') }]), 500);
+    /* 🔴 되돌림 방지 셋 — 넓게 빼면 받을 수 있는 돈을 **적게** 말하게 된다 */
+    eq('  배타 조항이 없으면 그대로 더한다',
+      sum([{ id: 'a', amountSpec: { kind: 'ratio', ratio: 1 } },
+        { id: 'b', amountSpec: { kind: 'fixed', value: 5000000 } }]), 900);
+    eq('  좁은 배타는 빼지 않는다',
+      sum([{ id: 'a', amountSpec: { kind: 'ratio', ratio: 1 }, exclusivity: ex('forbidden', 'narrow') },
+        { id: 'b', amountSpec: { kind: 'fixed', value: 5000000 }, exclusivity: ex('forbidden', 'narrow') }]), 900);
+    eq('  비율형 하나만 있으면 그대로 센다 (두 번 세지 않는다)',
+      sum([{ id: 'a', amountSpec: { kind: 'ratio', ratio: 1 } }]), 400);
+    /* '추정' 표시는 남아 있어야 한다 — 화면이 '약 400만원 · 추정' 이라고 적는 근거다 */
+    eq("  그래도 '추정' 목록에는 남는다",
+      PA.sumAmounts([{ id: 'a', amountSpec: { kind: 'ratio', ratio: 1 }, exclusivity: ex('forbidden', 'external') },
+        { id: 'b', amountSpec: { kind: 'fixed', value: 5000000 }, exclusivity: ex('forbidden', 'external') }],
+      { tuition: T }).estimated.length, 1);
+  }
+
   eq("'동일인 중복 지급 불가' 는 그 재단 이야기다 (교외 전부가 아니다)",
     PA.exclusivityFrom(['당해연도 내 동일인 중복 지급 불가']).scope, 'unspecified');
   eq('  장학금 이름을 대면 그것과만',
@@ -4272,6 +4302,83 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
     return !ME.fitDetail(it, prof('컴퓨터공학과', 'engineering')).unread;
   }).map((it) => it.id);
   eq('등록 공고 전수 — 대학원 전용인데 점수가 매겨진 것이 없다', bad, []);
+}
+
+/* ── 화면이 두 곳에서 다른 말을 하지 않는다 (2026-09-10 신설 · 코드 리뷰) ──────────
+   반박 검증까지 통과한 발견 넷을 못 박는다. 공통점은 **같은 사실을 두 곳이 다르게 말하거나,
+   말하는 숫자와 보여 주는 줄이 어긋난 것**이다. */
+{
+  console.log('\n■ 화면이 두 곳에서 다른 말을 하지 않는다');
+  /* ⚠️ **주석을 먼저 걷어낸다.** 이 저장소의 주석은 사고 경위에 옛 코드를 그대로 인용하므로
+     (`예전에는 showScreen() 으로 …`), 안 걷어내면 고쳐 놓은 것을 안 고쳤다고 잡는다. */
+  const strip = (t) => t.replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' '));
+  const appJs = strip(readText(new URL('../app.js', import.meta.url)));
+
+  /* ① 목록 카드가 '담았다'와 '다 했다'를 가른다.
+     '한 번에 신청 준비'로 담은 건은 `pending: bulkNeedsWork(sch)` 로 **서류가 남은 채** 들어간다.
+     그런데 카드는 `state.applications.some(...)` 로 있기만 하면 '신청 완료'라 적었다 —
+     같은 공고를 신청내역은 '서류 작성 필요'라고 말하는데 카드는 다 끝났다고 말한 것이다. */
+  const cardAt = appJs.indexOf('function schCard(');
+  const cardBlk = appJs.slice(cardAt, appJs.indexOf('function ', cardAt + 40));
+  eq('목록 카드가 pending 을 본다 (있기만 하면 완료라 하지 않는다)',
+    /\.find\(\(a\) => a\.id === sch\.id\)/.test(cardBlk) && /myApp\.pending/.test(cardBlk), true);
+  eq("  그때 낱말은 신청내역과 같다 ('서류 작성 필요')",
+    /badge-pending">서류 작성 필요</.test(cardBlk), true);
+  eq('  신청내역도 같은 낱말을 쓴다 (두 벌이 아니다)',
+    /app\.pending \? '서류 작성 필요'/.test(appJs), true);
+
+  /* ② 진척도를 기록해도 화면이 맨 위로 튀지 않는다.
+     `showScreen()` 은 마지막에 조건 없이 스크롤을 되돌린다 — 같은 화면을 다시 그릴 뿐인데
+     화면을 '바꾸는' 함수를 부르면 신청내역을 한참 내려가 기록할 때마다 맨 위로 튄다(실측 2527→0). */
+  const refAt = appJs.indexOf('function refreshProgressViews(');
+  const refBlk = appJs.slice(refAt, appJs.indexOf('function toast(', refAt));
+  eq('진척도 기록이 showScreen 을 부르지 않는다 (스크롤이 안 튄다)',
+    /showScreen\(/.test(refBlk), false);
+  eq('  대신 지금 화면의 렌더 함수만 다시 부른다',
+    /renderApplications\(\)/.test(refBlk) && /renderHome\(\)/.test(refBlk), true);
+
+  /* ③ 제출 서류 개수 머리글이 실제 줄 수와 같다.
+     '아직 못 읽었다' 표시는 줄에서 갈라 냈는데 숫자는 안 갈라서, 머리글 3개 · 목록 2줄이 됐다. */
+  const dcAt = appJs.indexOf('function docChecklistHtml(');
+  const dcBlk = appJs.slice(dcAt, dcAt + 2600);
+  eq('서류 개수 머리글이 실제로 그리는 줄(known)을 센다',
+    /제출 서류 \$\{known\.length\}개/.test(dcBlk), true);
+  eq("  '아직 못 읽었다' 표시를 서류로 세지 않는다",
+    /제출 서류 \$\{all\.length\}개/.test(dcBlk), false);
+
+  /* ④ 화면에 나가는 데이터는 esc 를 거친다.
+     학과 칸은 학생이 직접 치는 자유 입력이라, 빠뜨리면 `B<b>학과` 한 줄에 MY 화면 아래쪽이
+     통째로 그 태그 안으로 빨려 들어간다(브라우저 실측). */
+  /* 🔴 **이 검사는 두 번 헛돌았다 — 그 경위를 남긴다.**
+     ① 처음에는 `${p.school}` 처럼 **딱 그 이름만** 든 칸을 찾게 짜서, 실제 코드
+        (`${p.school || '대학 미설정'}`)를 한 번도 못 잡았다.
+     ② 다음에는 '앞에 태그가 닫혀 있는 칸만' 보게 했는데, 한 줄에 태그가 여러 개거나
+        여는 태그가 **윗줄**에 있으면 못 잡았다(넷 중 둘을 놓쳤다).
+     둘 다 **고친 것을 되돌려도 초록불**이라 알아챘다(red-green). 그래서 자리로 가르는 것을
+     그만두고, **전부 잡고 예외를 이유와 함께 적는** 방식으로 바꿨다.
+     ⚠️ 예외는 줄 번호가 아니라 **코드 한 조각**으로 적는다 — 줄은 움직인다. */
+  const DATA = /(?<![\w.-])(doc|def\.doc|t\.doc|p\.major|p\.school|p\.name|sch\.name|sch\.provider|sch\.amount|app\.resultAt)(?![\w-])/;
+  /* 글자용 자리 — esc 를 쓰면 학생 화면에 `&lt;` 가 그대로 보여 **오히려 틀린다**.
+     전부 HTML 로 해석되지 않는 곳이다(textContent · 토스트 · 공유문 · 메일 제목 · 문서 본문). */
+  const TEXT_OK = [
+    "$('#home-greet').textContent",          // textContent 는 태그를 해석하지 않는다
+    '`[지원 동기]',                            // 앱이 만들어 주는 지원서 본문(글자)
+    'const parts = [`[${sch.name} 지원서류]`', // 공유·메일 본문
+    'parts.push(`',                        // 같은 본문의 서류 절 (같은 글자 묶음)
+    'navigator.share({ title:',              // 공유 시트 제목
+    "toast(`'${sch.name}'",                  // 토스트도 textContent 로 넣는다(app.js el.textContent = msg)
+    'const subject = `[장학금 신청]',           // 메일 제목
+  ];
+  const leaks = [];
+  appJs.split('\n').forEach((line, i) => {
+    if (TEXT_OK.some((k) => line.includes(k))) return;
+    for (const m of line.matchAll(/\$\{([^{}]*)\}/g)) {
+      const expr = m[1];
+      if (!DATA.test(expr) || expr.includes('esc(')) continue;
+      leaks.push(`${i + 1}: ${line.trim().slice(0, 74)}`);
+    }
+  });
+  eq('화면(HTML)에 데이터를 넣을 때 esc 를 빠뜨린 자리가 없다', leaks, []);
 }
 
 /* ── 옛 프로필 값 (2026-09-09 신설) ─────────────────────────────────────────────
