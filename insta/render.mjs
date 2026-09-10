@@ -288,7 +288,9 @@ function context(s0, today, k, seed, school) {
     moneyLine: tidy(bullets(f['지원금액'])[0] || ''),
     // 🔴 괄호를 지우면 원문이 상한다 — `연 150만원 이내(생활장학금)` 가
     //    `연 150만원 이내생활장학금` 이 됐다(실측 24건). 앞머리 금액만 뗀다.
-    amtSub: (bullets(f['지원금액'])[0] || '').replace(/^[0-9,]+\s*만?원\s*/, '').trim(),
+    // 🔴 원문 줄이 그 자체로 '확인하세요' 면 두 번 말하는 것이다 — 교내 공고가 그렇다.
+    amtSub: (bullets(f['지원금액'])[0] || '').replace(/^[0-9,]+\s*만?원\s*/, '')
+      .replace(/^.*(원문 확인|앱에서 확인|기관확인).*$/, '').trim(),
     // 🔴 그냥 이어 붙이고 자르면 특정자격이 자리를 다 먹어 **지역·소득 조건이 사라진다**
     //    (실측 145건 중 54건). 칸마다 한 줄씩 먼저 담고, 남는 자리만 더 채운다.
     // 🔴 곁가지 괄호는 **여기서 한 번만** 걷는다. 쓰는 쪽마다 부르면 한 판형만 빠뜨려도
@@ -355,7 +357,7 @@ function cards_photo(c) {
       <div class="lab" style="margin-top:20px">${esc(bullets(f['지원금액'])[0] || '')}</div>`}</div>
     <div class="kv2">
       <div><b>신청 기간</b><span>${esc(period)}</span></div>
-      <div><b>선발 인원 · 낼 서류</b><span>${esc(pkText)} · 서류 ${docs.length}가지</span></div>
+      <div><b>선발 인원${docs.length ? ' · 낼 서류' : ''}</b><span>${esc(pkText)}${docs.length ? ` · 서류 ${docs.length}가지` : ''}</span></div>
     </div>
   </div>`;
 
@@ -517,7 +519,7 @@ function cards_chat(c) {
         + (amtSub ? `<br><span style="font-size:30px;color:#666">${esc(amtSub)}</span>` : '')
         : `금액은 앱에서 확인<br><span style="font-size:30px;color:#666">${esc(bullets((s0.fields||{})['지원금액'])[0] || '')}</span>`, '8:43'),
       you(`신청 기간 <mark>${esc(period)}</mark>`, '8:43'),
-      you(`선발 ${esc(pkText)} · 낼 서류 <mark>${docs.length}가지</mark>`, '8:43')]),
+      you(`선발 ${esc(pkText)}${docs.length ? ` · 낼 서류 <mark>${docs.length}가지</mark>` : ''}`, '8:43')]),
     ...(traps.length ? [wrap([me('오케이 바로 넣는다', '오후 8:44'),
       you('아 잠깐', '8:44'),
       you('<b>너 이거에 해당하면 못 받아</b>', '8:44'),
@@ -609,7 +611,7 @@ function cards_note(c) {
        <div class="nrow"><span class="key">언제</span>
         <p data-fit style="font-size:50px"><mark>${esc(period)}</mark></p></div>
        <div class="nrow"><span class="key">몇 명</span>
-        <p data-fit style="font-size:50px">${esc(pkText)} · 낼 서류 <mark>${docs.length}가지</mark></p></div>`,
+        <p data-fit style="font-size:50px">${esc(pkText)}${docs.length ? ` · 낼 서류 <mark>${docs.length}가지</mark>` : ''}</p></div>`,
       ''),
     ...(traps.length ? [page('자격 제한', '이러면 <em>못 받아요</em>', '', list(traps, false),
       '신청 전에 꼭 확인')] : []),
@@ -657,9 +659,12 @@ if (RUN) {
   const k = SKINS[skinName];
   if (!k) { console.error(`판형 '${skinName}' 없음 (${Object.keys(SKINS).join(' / ')})`); process.exit(1); }
 
-  const data = JSON.parse(readFileSync(join(ROOT, 'data/kosaf-open.json'), 'utf8'));
-  const s = (data.items || data).find((x) => (x.org + x.name).includes(needle));
+  // 🔴 교외·교내를 **한 목록**으로 본다 — 따로 읽으면 고르기와 렌더러가 갈라진다.
+  const { allNotices, findNotice } = await import('./notices.mjs');
+  const { items, meta: data } = allNotices();
+  const s = findNotice(items, needle);
   if (!s) { console.error(`'${needle}' 공고를 못 찾았습니다.`); process.exit(1); }
+  if (s.school) console.log(`  교내 — ${s.school}`);
 
   // 🔴 씨앗을 안 주면 공고 이름에서 만든다 — 같은 공고는 늘 같은 얼굴, 공고가 바뀌면 얼굴도 바뀐다.
   if (val('seed') !== undefined && !Number.isFinite(Number(val('seed')))) {
@@ -729,6 +734,9 @@ mkdirSync(OUT, { recursive: true });
     await page.evaluate(shrinkToFit);
     const over = await page.evaluate(overflowing);
     if (over.length) { console.error(`🚨 ${name}: ${over.join('·')}번째 카드에서 글자가 잘립니다`); overflowed = true; }
+    // 🔴 옛 그림을 안 지우면 4장짜리 공고에 지난 렌더의 5장이 섞인다(미리보기에서 실제로 봤다).
+    for (const f of await readdir(OUT))
+      if (new RegExp(`^${name}-\\d+\\.(png|jpg)$`).test(f)) rmSync(join(OUT, f));
     const els = await page.$$('.card');
     // 🔴 인스타 게시(Content Publishing)는 **JPEG 만** 받는다 — PNG 로 올리면 컨테이너
     //    만들기에서 막힌다. 눈으로 볼 때는 PNG 가 편하니 둘 다 떨군다.

@@ -45,6 +45,9 @@ export function score(x, today) {
   const f = x.fields || {};
   const why = [];
   let s = 0;
+  // 🔴 교내는 그 학교 학생만 보므로 '넓이' 로는 늘 진다. 그런데 우리가 교내까지 하는
+  //    유일한 서비스라 **그게 차별점**이다 — 넓이에서 잃는 만큼 여기서 돌려준다.
+  if (x.school) { s += 4; why.push(`${x.school} 교내 +4`); }
   if (unrestricted(f, '지역거주구분')) { s += 3; why.push('지역 제한 없음 +3'); }
   const sc = scope(x);
   if (unrestricted(f, '학과구분') && !MAJOR.test(sc)) { s += 3; why.push('전공 제한 없음 +3'); }
@@ -82,8 +85,8 @@ export function candidates(items, today, seen) {
 
 // ── 실행 ────────────────────────────────────────────────────
 if (process.argv[1] && import.meta.url === new URL(process.argv[1], 'file:').href) {
-  const j = JSON.parse(readFileSync(new URL('data/kosaf-open.json', ROOT), 'utf8'));
-  const items = j.items || j;
+  const { allNotices } = await import('./notices.mjs');
+  const { items } = allNotices();
   const { ok, drop } = candidates(items, Date.now(), readSeen());
 
   if (process.argv.includes('--list')) {

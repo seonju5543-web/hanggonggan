@@ -3,10 +3,9 @@
  *     이 도구만 옛 판형을 재게 된다. 실행: node insta/sweep-overflow.mjs — 렌더러의 CSS·카드·재료를 그대로 가져다 쓴다(베끼지 않는다). */
 import { chromium } from 'playwright';
 import { shrinkToFit, overflowing } from './fit.mjs';
-import { readFileSync } from 'node:fs';
 import { TPL, context, SKINS, W, H } from './render.mjs';   // 🔴 베끼지 않고 그대로 쓴다
-const j = JSON.parse(readFileSync(new URL('../data/kosaf-open.json', import.meta.url), 'utf8'));
-const items = j.items || j;
+import { allNotices } from './notices.mjs';                 // 🔴 교외·교내를 같이 잰다
+const { items } = allNotices();
 const b = await chromium.launch();
 const page = await b.newPage({ viewport: { width: W, height: H } });
 let bad = 0;
