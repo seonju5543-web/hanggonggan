@@ -105,12 +105,21 @@ function money(raw) {
 /** 마감까지 남은 날. 🔴 세 상태를 뭉뚱그리지 않는다 —
  *  칸이 비었거나(unknown) 날짜를 못 읽었거나(unknown) 지났거나(past)는 서로 다른 말이다.
  *  예전엔 셋 다 null 이라 **마감 지난 공고가 '모집 중' 으로 나갔다**(145건 중 21건). */
+/** 오늘(KST). 🔴 마감 판정이 `+09:00` 을 쓰는 것과 같은 이유 — 이 서비스의 하루는 KST 다. */
+const kstDay = () => new Date(Date.now() + 9 * 36e5).toISOString().slice(0, 10);
+
 const dday = (due, today) => {
   if (!due) return { state: 'unknown' };
   const t = new Date(due + 'T23:59:59+09:00').getTime();
   if (Number.isNaN(t)) return { state: 'unknown' };
-  const d = Math.round((t - today) / 864e5);
-  return d < 0 ? { state: 'past' } : { state: 'open', d };
+  // 🔴 **반올림 전에 시각으로 먼저 가른다.** `Math.round` 는 몇 시간 전에 지난 마감을
+  //    `-0` 으로 만드는데 `-0 < 0` 은 거짓이라, 지난 공고가 최대 12시간 동안
+  //    '오늘 마감' 으로 살아 있었다(관문 C8 이 잡았다).
+  if (t < today) return { state: 'past' };
+  // 🔴 남은 날은 **달력 날짜 차이**다 — 9/11 에서 9/18 은 D-7 이지 D-8 이 아니다.
+  //    시각 차를 반올림하면 하루씩 밀린다(23:59 마감이라 늘 0.99 가 붙는다).
+  const day = (ms) => Date.parse(`${new Date(ms + 9 * 36e5).toISOString().slice(0, 10)}T00:00:00Z`);
+  return { state: 'open', d: Math.round((day(t) - day(+today)) / 864e5) };
 };
 const ddayText = (x) => x.state === 'unknown' ? '기간 앱에서 확인'
   : x.state === 'past' ? '마감 지남' : x.d === 0 ? '오늘 마감' : `마감 D-${x.d}`;
@@ -286,6 +295,10 @@ function context(s0, today, k, seed, school) {
     photo: photoFor(school, seed),
     ddText: ddayText(d),
     moneyLine: tidy(bullets(f['지원금액'])[0] || ''),
+    // 🔴 금액을 못 읽었을 때 **덧붙일 게 있을 때만** 덧붙인다. 원문 줄이 그 자체로
+    //    `금액 원문 확인` 이면 큰 글씨와 같은 말이라 두 번 말하게 된다(실측 — 교내 공고).
+    moneyRaw: /원문 확인|앱에서 확인|기관확인|미확인/.test(bullets(f['지원금액'])[0] || '')
+      ? '' : tidy(bullets(f['지원금액'])[0] || ''),
     // 🔴 괄호를 지우면 원문이 상한다 — `연 150만원 이내(생활장학금)` 가
     //    `연 150만원 이내생활장학금` 이 됐다(실측 24건). 앞머리 금액만 뗀다.
     // 🔴 원문 줄이 그 자체로 '확인하세요' 면 두 번 말하는 것이다 — 교내 공고가 그렇다.
@@ -326,7 +339,7 @@ const headSize = (t1, t2) => {
 };
 
 function cards_photo(c) {
-  const { s0, k, m, f, t1, t2, photo, amtSub, who, traps, docs, period, pkText, fit, ddText } = c;
+  const { s0, k, m, f, t1, t2, photo, amtSub, moneyRaw, who, traps, docs, period, pkText, fit, ddText } = c;
   // ── 1장 표지: 사진 배경 + 글자만. 🔴 박스·그릇 안 쓴다 ─────────
   const c1 = `<div class="card photo">
     ${photo ? `<div class="bg" style="background-image:url(&quot;${esc(photo.url)}&quot;)"></div>` : ''}
@@ -354,7 +367,7 @@ function cards_photo(c) {
         <span style="position:relative;display:inline-block">${esc(m.n)}${handOval(k.accent)}</span><em style="font-size:80px">${esc(m.unit)}</em></h2>
       <div class="lab" style="margin-top:20px">${esc(amtSub || '')}</div>`
       : `<h2 style="font-size:96px;color:${k.accent}">금액은<br>앱에서 확인</h2>
-      <div class="lab" style="margin-top:20px">${esc(bullets(f['지원금액'])[0] || '')}</div>`}</div>
+      <div class="lab" style="margin-top:20px">${esc(moneyRaw)}</div>`}</div>
     <div class="kv2">
       <div><b>신청 기간</b><span>${esc(period)}</span></div>
       <div><b>선발 인원${docs.length ? ' · 낼 서류' : ''}</b><span>${esc(pkText)}${docs.length ? ` · 서류 ${docs.length}가지` : ''}</span></div>
@@ -466,7 +479,7 @@ mark{background:linear-gradient(transparent 56%, #ffe66b 56%);padding:0 2px}
 `;
 
 function cards_chat(c) {
-  const { s0, m, who, traps, docs, period, pkText, ddText, amtSub, t1, t2 } = c;
+  const { s0, m, who, traps, docs, period, pkText, ddText, amtSub, moneyRaw, t1, t2 } = c;
   const room = s0.org;   // 🔴 축약 금지(실측 최장 20자) — 14자로 자르던 시절 13건이 잘렸다
   const head = `<div class="kh"><span class="bk">‹</span><span>${esc(room)}</span>
     <span class="rt">⌕ ☰</span></div>`;
@@ -517,7 +530,7 @@ function cards_chat(c) {
     wrap([me('얼마 주는데? 언제까지야?', '오후 8:43'),
       you(m && !m.many ? `<b style="font-size:56px;font-weight:900">${esc(m.n)}${esc(m.unit)}</b>`
         + (amtSub ? `<br><span style="font-size:30px;color:#666">${esc(amtSub)}</span>` : '')
-        : `금액은 앱에서 확인<br><span style="font-size:30px;color:#666">${esc(bullets((s0.fields||{})['지원금액'])[0] || '')}</span>`, '8:43'),
+        : `금액은 앱에서 확인${moneyRaw ? `<br><span style="font-size:30px;color:#666">${esc(moneyRaw)}</span>` : ''}`, '8:43'),
       you(`신청 기간 <mark>${esc(period)}</mark>`, '8:43'),
       you(`선발 ${esc(pkText)}${docs.length ? ` · 낼 서류 <mark>${docs.length}가지</mark>` : ''}`, '8:43')]),
     ...(traps.length ? [wrap([me('오케이 바로 넣는다', '오후 8:44'),
@@ -580,7 +593,7 @@ mark{background:linear-gradient(transparent 56%, #ffe36b 56%);padding:0 3px}
 `;
 
 function cards_note(c) {
-  const { s0, m, who, traps, docs, period, pkText, ddText, amtSub, t1, t2 } = c;
+  const { s0, m, who, traps, docs, period, pkText, ddText, amtSub, moneyRaw, t1, t2 } = c;
   // 🔴 5장이 전부 같은 틀이었다(태그 → 제목 → 밑줄 → 검은 막대 → 번호 목록 → ☆ 박스).
   //    검은 막대와 테두리 박스는 노트에 없는 것이라 걷어내고, 장마다 다른 표시를 쓴다.
   const page = (tag, title, sub, inner, memo) => `<div class="card">
@@ -601,7 +614,7 @@ function cards_note(c) {
         style="font-style:normal;font-size:88px">${esc(m.unit)}</i>${handOval('#e0533d')}</span>
         <div class="sub2" style="text-align:center;margin-top:22px">${esc(amtSub || '')}</div></div>`
       : `<div style="text-align:center"><span class="bigN2" style="font-size:110px">금액 앱에서 확인</span>
-        <div class="sub2" style="text-align:center;margin-top:18px">${esc(bullets((s0.fields||{})['지원금액'])[0] || '')}</div></div>`,
+        <div class="sub2" style="text-align:center;margin-top:18px">${esc(moneyRaw)}</div></div>`,
       '저장해두고 마감 전에 다시 보기'),
     page('지원 자격', '나도 <em>받을 수 있나?</em>', '', list(who, true),
       '하나라도 안 맞으면 신청 안 돼요'),
@@ -634,7 +647,7 @@ const TPL = {
 // ── 밖에서 쓰라고 내주는 것 ─────────────────────────────────
 // 🔴 캡션 생성기·넘침 스윕이 **같은 추출기**를 써야 카드와 캡션이 갈라지지 않는다.
 //    예전엔 이 파일을 통째로 베껴 _lib.mjs 로 쓰고 지웠다 — 꼼수라 걷어냈다.
-export { TPL, SKINS, context, bigTitle, whoLines, bullets, dropParen, money, dday, ddayText, tidy, esc, W, H };
+export { TPL, SKINS, context, kstDay, bigTitle, whoLines, bullets, dropParen, money, dday, ddayText, tidy, esc, W, H };
 
 // ── 실행 (직접 돌릴 때만 — import 하면 안 돈다) ──────────────
 // 🔴 playwright 를 최상단에서 부르면 **이 파일을 import 하는 쪽이 다 브라우저를 요구한다.**
@@ -757,7 +770,9 @@ mkdirSync(OUT, { recursive: true });
   if (args.includes('--pub')) {
     if (!cap) { console.error('🚨 캡션이 없어 게시용으로 못 내보냅니다.'); process.exit(1); }
     if (list.length !== 1) { console.error('🚨 --pub 은 판형 하나만 — --tpl=photo 처럼 지정하세요.'); process.exit(1); }
-    const day = new Date().toISOString().slice(0, 10);
+    // 🔴 UTC 로 찍으면 KST 자정~오전 9시에 **어제 폴더**가 된다(실측: 00:15 KST 에 09-10).
+    //    워크플로는 GitHub(UTC)에서 도는데 관리자는 KST 로 생각한다 — 날짜는 KST 로 적는다.
+    const day = kstDay();
     const pub = join(ROOT, 'insta', 'pub', day);
     // ponytail: 지난 날짜를 지워 작업 트리를 한 벌로 유지한다. 히스토리는 계속 자란다
     //           (하루 1MB) — 커지면 GitHub Release 자산으로 옮기는 게 다음 수다.

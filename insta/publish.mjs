@@ -127,10 +127,11 @@ if (process.argv[1] && import.meta.url === new URL(process.argv[1], 'file:').hre
   if (out) {
     // 🔴 올린 것을 기억하지 못하면 내일 같은 공고를 새 공고로 다시 올린다(이슈 #75 유형).
     const { readSeen, writeSeen } = await import('./pick.mjs');
+    const { kstDay } = await import('./render.mjs');
     const meta = JSON.parse(readFileSync(new URL('meta.json', abs), 'utf8'));
     const seen = readSeen();
     seen.posted.push({ code: meta.code, org: meta.org, name: meta.name,
-      at: new Date().toISOString().slice(0, 10), media: out.mediaId, permalink: out.permalink });
+      at: kstDay(), media: out.mediaId, permalink: out.permalink });   // 🔴 KST — UTC 면 새벽에 어제로 찍힌다
     writeSeen(seen);
     say(`  seen.json 에 기록 — 지금까지 ${seen.posted.length}건`);
   }

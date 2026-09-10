@@ -39,6 +39,17 @@ const today = new Date();
       if (!Number.isNaN(t) && t - today < 0) past++;
     }
     if (!/state: 'past'/.test(src)) fail('C1', '-', "dday 가 '지남' 을 따로 안 가른다");
+    // 🔴 몇 시간 전에 지난 마감이 `Math.round` 때문에 `-0` 이 돼 최대 12시간 동안
+    //    '오늘 마감' 으로 살아 있었다(2026-09-11 실측). 시각으로 먼저 갈라야 한다.
+    const dday0 = eval('(' + pick('dday', /const dday = (\(due, today\) => \{[\s\S]*?\n\});/)[1] + ')');
+    const at = new Date('2026-09-11T00:20:00+09:00');
+    for (const [due, want] of [['2026-09-10', 'past'], ['2026-09-11', 'open'], ['2026-09-18', 'open']]) {
+      const got = dday0(due, at).state;
+      if (got !== want) fail('C1', '-', `마감 ${due} 판정이 ${want} 가 아니라 ${got}`);
+    }
+    // 🔴 남은 날은 달력 날짜 차이다 — 9/11 에서 9/18 은 D-7. 시각 차를 반올림하면 하루 밀린다.
+    if (dday0('2026-09-18', at).d !== 7) fail('C1', '-', `9/11→9/18 이 D-7 이 아니라 D-${dday0('2026-09-18', at).d}`);
+    if (dday0('2026-09-11', at).d !== 0) fail('C1', '-', '오늘 마감이 D-0 이 아니다');
     if (/'모집 중'/.test(src)) fail('C1', '-', "'모집 중' 문구가 아직 남아 있다");
     console.log(`  · 마감 지난 공고 ${past}건 — '마감 지남' 으로 표시되는지 확인`);
   }
