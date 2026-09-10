@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap">
+  <style>
+    body { margin: 0; font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', -apple-system, BlinkMacSystemFont, system-ui, sans-serif; }
+    a { color: #8a6a1f; } a:hover { color: #6d541a; }
+    .ex-nav { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11.5px; font-weight: 600; color: #8b857b; padding: 5px 0; }
+  </style>
+</helmet>
+
+<div style="width: 390px; height: 844px; background: #fefdfc; color: #191713; overflow: hidden; position: relative;">
+
+  <div style="position: absolute; top: 0; left: 0; right: 0; z-index: 5; background: #8a6a1f; color: #fdf8ec; font-size: 12.5px; font-weight: 600; padding: 9px 20px; display: flex; align-items: center; gap: 8px;">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg>
+    5시간 만에 열었다 — 홈으로. 쓰던 것은 안 버린다
+  </div>
+
+  <div style="padding: 45px 20px 0; box-sizing: border-box;">
+
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 18px;">
+      <div style="width: 44px; height: 44px; border-radius: 999px; background: #f1eee8; color: #57524a; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700;">학</div>
+      <div style="flex: 1; min-width: 0;">
+        <div style="font-size: 17px; font-weight: 700; letter-spacing: -0.02em;">이름 설정</div>
+        <div style="font-size: 12.5px; color: #8b857b; margin-top: 2px;">경희대학교 · 서울캠퍼스</div>
+      </div>
+      <span style="color: #8b857b; display: flex;"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"/><path d="M10.3 20a2 2 0 0 0 3.4 0"/></svg></span>
+      <span style="color: #8b857b; display: flex;"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2v.2a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.6 1.7 1.7 0 0 0-1.9.4l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0-1.2-2.9H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1.1 1.7 1.7 0 0 0-.4-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3h.1A1.7 1.7 0 0 0 10 3.1V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.4l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9v.1a1.7 1.7 0 0 0 1.6 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></span>
+    </div>
+
+    <!-- 홈 히어로 -->
+    <div style="border-radius: 27px; padding: 24px 22px; color: #f4efe3; background: radial-gradient(120% 130% at 78% -18%, rgba(184, 145, 47, 0.20) 0%, rgba(184, 145, 47, 0) 58%), radial-gradient(90% 90% at -10% 108%, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0) 60%), #23201a;">
+      <div style="font-size: 13.5px; font-weight: 600; opacity: 0.72;">지금 받을 수 있는 장학금</div>
+      <div style="font-size: 38px; font-weight: 800; letter-spacing: -0.035em; margin-top: 5px; line-height: 1.1;">최대 1,240만원</div>
+      <div style="font-size: 12.5px; opacity: 0.66; margin-top: 9px; line-height: 1.5;">바로 신청 6건 · 선발 심사형 9건 · 금액 미확인 15건 제외</div>
+      <button style="width: 100%; margin-top: 17px; border: 0; border-radius: 13px; padding: 16px; font-size: 16px; font-weight: 700; background: rgba(255,255,255,0.97); color: #23201a; font-family: inherit; cursor: pointer;">15건 신청 준비</button>
+    </div>
+
+    <!-- 되살린 줄 — 이 화면의 주인공 -->
+    <div style="margin-top: 14px; background: #ffffff; border: 1px solid rgba(138,106,31,0.26); border-radius: 19px; padding: 15px 17px; box-shadow: 0 1px 2px rgba(24,35,56,0.05), 0 8px 22px rgba(24,35,56,0.07); display: flex; align-items: center; gap: 13px;">
+      <span style="color: #8a6a1f; display: flex; flex-shrink: 0;"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 15h6"/></svg></span>
+      <div style="flex: 1; min-width: 0;">
+        <div style="font-size: 14.5px; font-weight: 700; letter-spacing: -0.01em;">쓰던 신청서가 있어요</div>
+        <div style="font-size: 12.5px; color: #57524a; margin-top: 3px; line-height: 1.45;">삼성꿈장학재단 · 오늘 오전에 쓰던 것</div>
+      </div>
+      <span style="font-size: 13.5px; font-weight: 700; color: #8a6a1f; white-space: nowrap;">신청서 마저 쓰기</span>
+    </div>
+
+    <div style="display: flex; align-items: baseline; justify-content: space-between; margin: 26px 4px 12px;">
+      <div style="font-size: 20px; font-weight: 800; letter-spacing: -0.025em;">마감 임박</div>
+      <div style="font-size: 13.5px; font-weight: 600; color: #8b857b;">전체 보기</div>
+    </div>
+
+    <div style="background: #ffffff; border: 1px solid rgba(25,23,19,0.09); border-radius: 19px; padding: 19px; box-shadow: 0 1px 2px rgba(24,35,56,0.05), 0 8px 22px rgba(24,35,56,0.07);">
+      <div style="display: flex; gap: 6px; margin-bottom: 9px;">
+        <span style="font-size: 11.5px; font-weight: 700; padding: 3.5px 9px; border-radius: 9px; background: rgba(138,106,31,0.10); color: #8a6a1f;">적합도 74%</span>
+        <span style="font-size: 11.5px; font-weight: 700; padding: 3.5px 9px; border-radius: 9px; background: #e9efe8; color: #3d6b47;">교내</span>
+        <span style="font-size: 11.5px; font-weight: 700; padding: 3.5px 9px; border-radius: 9px; background: #f5e9e6; color: #8f3a2e;">D-2</span>
+      </div>
+      <div style="font-size: 17px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.35;">경희대학교 면학장학금 (2학기)</div>
+      <div style="font-size: 13.5px; color: #57524a; margin-top: 6px;">등록금 50% · 성적 우수</div>
+    </div>
+
+  </div>
+
+  <div style="position: absolute; left: 0; right: 0; bottom: 0; display: flex; background: rgba(255,254,252,0.94); border-top: 1px solid rgba(18,22,31,0.06); padding: 8px 0 12px;">
+    <div class="ex-nav" style="color: #23201a;"><svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>홈</div>
+    <div class="ex-nav"><svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg>장학금</div>
+    <div class="ex-nav"><svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>신청내역</div>
+    <div class="ex-nav"><svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>MY</div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

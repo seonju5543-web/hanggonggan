@@ -1,0 +1,424 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap">
+  <style>
+    body { margin: 0; font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', -apple-system, BlinkMacSystemFont, system-ui, sans-serif; }
+    a { color: #8a6a1f; } a:hover { color: #6d541a; }
+
+    .pt-btn {
+      font-family: inherit; font-size: 14px; font-weight: 600; text-align: left;
+      padding: 12px 15px; border-radius: 13px; border: 1px solid rgba(25,23,19,0.14);
+      background: #ffffff; color: #191713; cursor: pointer; line-height: 1.35;
+      transition: background 0.14s, border-color 0.14s, opacity 0.14s;
+    }
+    .pt-btn:hover { background: #f7f6f4; border-color: rgba(25,23,19,0.26); }
+    .pt-btn:disabled { opacity: 0.34; cursor: default; }
+    .pt-btn:disabled:hover { background: #ffffff; border-color: rgba(25,23,19,0.14); }
+    .pt-btn-dark { background: #23201a; color: #fdfbf6; border-color: #23201a; }
+    .pt-btn-dark:hover { background: #0d0c09; border-color: #0d0c09; }
+    .pt-btn-dark:disabled:hover { background: #23201a; border-color: #23201a; }
+    .pt-btn-on { background: #23201a; color: #fdfbf6; border-color: #23201a; }
+    .pt-btn-on:hover { background: #0d0c09; border-color: #0d0c09; }
+
+    .pt-head { font-size: 11.5px; font-weight: 700; letter-spacing: 0.06em; color: #8b857b; text-transform: uppercase; margin-bottom: 9px; }
+    .pt-nav { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11.5px; font-weight: 600; color: #8b857b; padding: 5px 0; }
+    .pt-card { background: #ffffff; border: 1px solid rgba(25,23,19,0.09); border-radius: 19px; padding: 17px; box-shadow: 0 1px 2px rgba(24,35,56,0.05), 0 8px 22px rgba(24,35,56,0.07); }
+    .pt-badge { font-size: 11.5px; font-weight: 700; padding: 3.5px 9px; border-radius: 9px; }
+  </style>
+</helmet>
+
+<div style="width: 940px; height: 940px; background: #fefdfc; color: #191713; padding: 36px 40px; box-sizing: border-box; display: flex; gap: 34px; overflow: hidden;">
+
+  <!-- ══════════ 폰 ══════════ -->
+  <div style="flex-shrink: 0; width: 390px; height: 844px; border-radius: 30px; overflow: hidden; border: 1px solid rgba(25,23,19,0.14); box-shadow: 0 4px 12px rgba(24,35,56,0.06), 0 24px 60px rgba(24,35,56,0.12); position: relative; background: #fefdfc;">
+
+    <!-- 앱을 닫은 상태 -->
+    <sc-if value="{{ isClosed }}" hint-placeholder-val="{{ false }}">
+      <div style="width: 100%; height: 100%; background: #2b2822; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; color: rgba(246,240,226,0.5);">
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="4"/></svg>
+        <div style="font-size: 14px; font-weight: 600;">앱이 백그라운드에 있습니다</div>
+        <div style="font-size: 12.5px; opacity: 0.68; text-align: center; line-height: 1.6; max-width: 250px;">{{ closedNote }}</div>
+      </div>
+    </sc-if>
+
+    <!-- 부팅 화면 -->
+    <sc-if value="{{ isBoot }}" hint-placeholder-val="{{ false }}">
+      <div style="width: 100%; height: 100%; background: #fefdfc; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; position: relative;">
+        <div style="width: 88px; height: 88px; border-radius: 27px; color: #f6f0e2; display: flex; align-items: center; justify-content: center; background: radial-gradient(120% 130% at 78% -18%, rgba(184,145,47,0.20) 0%, rgba(184,145,47,0) 58%), radial-gradient(90% 90% at -10% 108%, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0) 60%), #23201a;">
+          <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/><path d="M22 10v6"/></svg>
+        </div>
+        <div style="font-size: 38px; font-weight: 800; letter-spacing: -0.035em; color: #23201a; line-height: 1;">한대장</div>
+      </div>
+    </sc-if>
+
+    <!-- 환영 화면 -->
+    <sc-if value="{{ isWelcome }}" hint-placeholder-val="{{ false }}">
+      <div style="width: 100%; height: 100%; background: #fefdfc; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column;">
+        <div style="flex: 1; text-align: center; padding-top: 48px;">
+          <div style="width: 88px; height: 88px; border-radius: 27px; margin: 0 auto 18px; color: #f6f0e2; display: flex; align-items: center; justify-content: center; background: radial-gradient(120% 130% at 78% -18%, rgba(184,145,47,0.20) 0%, rgba(184,145,47,0) 58%), radial-gradient(90% 90% at -10% 108%, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0) 60%), #23201a;">
+            <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/><path d="M22 10v6"/></svg>
+          </div>
+          <div style="font-size: 38px; font-weight: 800; letter-spacing: -0.035em; color: #23201a; line-height: 1.1;">한대장</div>
+          <p style="font-size: 18.5px; color: #57524a; margin: 12px 0 0; line-height: 1.5;">한국 대학교 장학금,<br><strong style="color: #191713;">한 번에 찾고 한 번에 신청</strong>하세요</p>
+          <ul style="list-style: none; text-align: left; margin: 36px auto 0; padding: 0; max-width: 330px; display: grid; gap: 12px;">
+            <li style="background: #ffffff; border: 1px solid rgba(25,23,19,0.09); border-radius: 13px; padding: 15px 17px; box-shadow: 0 1px 2px rgba(24,35,56,0.05), 0 8px 22px rgba(24,35,56,0.07); font-size: 14.5px; font-weight: 500; display: flex; align-items: center; gap: 12px;"><span style="color: #8a6a1f; display: flex;"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></span>교내·교외 장학금을 내 조건으로 자동 매칭</li>
+            <li style="background: #ffffff; border: 1px solid rgba(25,23,19,0.09); border-radius: 13px; padding: 15px 17px; box-shadow: 0 1px 2px rgba(24,35,56,0.05), 0 8px 22px rgba(24,35,56,0.07); font-size: 14.5px; font-weight: 500; display: flex; align-items: center; gap: 12px;"><span style="color: #8a6a1f; display: flex;"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 14l2 2 4-4"/></svg></span>증명서 자동 첨부로 신청 준비까지</li>
+            <li style="background: #ffffff; border: 1px solid rgba(25,23,19,0.09); border-radius: 13px; padding: 15px 17px; box-shadow: 0 1px 2px rgba(24,35,56,0.05), 0 8px 22px rgba(24,35,56,0.07); font-size: 14.5px; font-weight: 500; display: flex; align-items: center; gap: 12px;"><span style="color: #8a6a1f; display: flex;"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"/><path d="M10.3 20a2 2 0 0 0 3.4 0"/></svg></span>마감일 관리와 신청 현황 추적</li>
+          </ul>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; padding-bottom: 8px;">
+          <button onClick="{{ finishOnboard }}" style="width: 100%; border: 0; border-radius: 13px; padding: 17px; font-size: 17px; font-weight: 700; background: #23201a; color: #fdfbf6; box-shadow: 0 1px 2px rgba(24,35,56,0.05), 0 8px 22px rgba(24,35,56,0.07); font-family: inherit; cursor: pointer;">시작하기</button>
+          <p style="text-align: center; font-size: 13.5px; color: #8b857b; margin: 6px 0 0;">1분이면 내 장학금 확인</p>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- 홈 -->
+    <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+      <div style="width: 100%; height: 100%; background: #fefdfc; padding: 22px 20px 0; box-sizing: border-box; position: relative;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 18px;">
+          <div style="width: 44px; height: 44px; border-radius: 999px; background: #f1eee8; color: #57524a; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700;">학</div>
+          <div style="flex: 1; min-width: 0;">
+            <div style="font-size: 17px; font-weight: 700; letter-spacing: -0.02em;">이름 설정</div>
+            <div style="font-size: 12.5px; color: #8b857b; margin-top: 2px;">경희대학교 · 서울캠퍼스</div>
+          </div>
+        </div>
+        <div style="border-radius: 27px; padding: 24px 22px; color: #f4efe3; background: radial-gradient(120% 130% at 78% -18%, rgba(184,145,47,0.20) 0%, rgba(184,145,47,0) 58%), radial-gradient(90% 90% at -10% 108%, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0) 60%), #23201a;">
+          <div style="font-size: 13.5px; font-weight: 600; opacity: 0.72;">지금 받을 수 있는 장학금</div>
+          <div style="font-size: 38px; font-weight: 800; letter-spacing: -0.035em; margin-top: 5px; line-height: 1.1;">최대 1,240만원</div>
+          <div style="font-size: 12.5px; opacity: 0.66; margin-top: 9px; line-height: 1.5;">바로 신청 6건 · 선발 심사형 9건 · 금액 미확인 15건 제외</div>
+        </div>
+
+        <sc-if value="{{ showResumeCard }}" hint-placeholder-val="{{ true }}">
+          <div onClick="{{ goForm }}" style="margin-top: 14px; background: #ffffff; border: 1px solid rgba(138,106,31,0.26); border-radius: 19px; padding: 15px 17px; box-shadow: 0 1px 2px rgba(24,35,56,0.05), 0 8px 22px rgba(24,35,56,0.07); display: flex; align-items: center; gap: 13px; cursor: pointer;">
+            <span style="color: #8a6a1f; display: flex; flex-shrink: 0;"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 15h6"/></svg></span>
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-size: 14.5px; font-weight: 700;">쓰던 신청서가 있어요</div>
+              <div style="font-size: 12.5px; color: #57524a; margin-top: 3px;">삼성꿈장학재단 · 5시간 전에 쓰던 것</div>
+            </div>
+            <span style="font-size: 13.5px; font-weight: 700; color: #8a6a1f; white-space: nowrap;">신청서 마저 쓰기</span>
+          </div>
+        </sc-if>
+
+        <div style="font-size: 20px; font-weight: 800; letter-spacing: -0.025em; margin: 24px 4px 12px;">마감 임박</div>
+        <div class="pt-card">
+          <div style="display: flex; gap: 6px; margin-bottom: 9px;">
+            <span class="pt-badge" style="background: rgba(138,106,31,0.10); color: #8a6a1f;">적합도 74%</span>
+            <span class="pt-badge" style="background: #e9efe8; color: #3d6b47;">교내</span>
+            <span class="pt-badge" style="background: #f5e9e6; color: #8f3a2e;">D-2</span>
+          </div>
+          <div style="font-size: 17px; font-weight: 700; letter-spacing: -0.02em;">경희대학교 면학장학금 (2학기)</div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- 장학금(탐색) -->
+    <sc-if value="{{ isExplore }}" hint-placeholder-val="{{ false }}">
+      <div style="width: 100%; height: 100%; background: #fefdfc; padding: 22px 20px 0; box-sizing: border-box;">
+        <div style="opacity: 0.28; font-size: 21px; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 14px;">장학금 찾기</div>
+        <div style="display: flex; gap: 7px; margin-bottom: 14px;">
+          <span style="font-size: 12.5px; font-weight: 700; padding: 7px 13px; border-radius: 999px; background: #23201a; color: #fdfbf6;">전체</span>
+          <span style="font-size: 12.5px; font-weight: 600; padding: 7px 13px; border-radius: 999px; background: #ffffff; border: 1px solid rgba(25,23,19,0.14); color: #57524a;">교내</span>
+          <span style="font-size: 12.5px; font-weight: 600; padding: 7px 13px; border-radius: 999px; background: #ffffff; border: 1px solid rgba(25,23,19,0.14); color: #57524a;">교외</span>
+        </div>
+        <div style="display: grid; gap: 10px;">
+          <div onClick="{{ goDetail }}" class="pt-card" style="cursor: pointer;">
+            <div style="display: flex; gap: 6px; margin-bottom: 9px;"><span class="pt-badge" style="background: rgba(138,106,31,0.10); color: #8a6a1f;">적합도 82%</span><span class="pt-badge" style="background: #f0ecfd; color: #6247d6;">교외</span><span class="pt-badge" style="background: #f5e9e6; color: #8f3a2e;">D-4</span></div>
+            <div style="font-size: 17px; font-weight: 700; letter-spacing: -0.02em;">삼성꿈장학재단 대학생 장학</div>
+            <div style="font-size: 13.5px; color: #57524a; margin-top: 6px;">최대 400만원 · 학기당</div>
+          </div>
+          <div class="pt-card">
+            <div style="display: flex; gap: 6px; margin-bottom: 9px;"><span class="pt-badge" style="background: rgba(138,106,31,0.10); color: #8a6a1f;">적합도 74%</span><span class="pt-badge" style="background: #e9efe8; color: #3d6b47;">교내</span><span class="pt-badge" style="background: rgba(18,22,31,0.05); color: #57524a;">D-11</span></div>
+            <div style="font-size: 17px; font-weight: 700; letter-spacing: -0.02em;">경희대학교 면학장학금 (2학기)</div>
+            <div style="font-size: 13.5px; color: #57524a; margin-top: 6px;">등록금 50% · 성적 우수</div>
+          </div>
+          <div class="pt-card">
+            <div style="display: flex; gap: 6px; margin-bottom: 9px;"><span class="pt-badge" style="background: rgba(138,106,31,0.10); color: #8a6a1f;">적합도 61%</span><span class="pt-badge" style="background: #f0ecfd; color: #6247d6;">교외</span><span class="pt-badge" style="background: rgba(18,22,31,0.05); color: #57524a;">기한 원문 확인</span></div>
+            <div style="font-size: 17px; font-weight: 700; letter-spacing: -0.02em;">익산사랑장학재단 일반장학생</div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- 공고 상세 -->
+    <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+      <div style="width: 100%; height: 100%; background: rgba(10,14,24,0.55); position: relative;">
+        <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 700px; background: #ffffff; border-radius: 27px 27px 0 0; padding: 10px 20px 20px; box-sizing: border-box;">
+          <div style="width: 38px; height: 4px; border-radius: 999px; background: rgba(25,23,19,0.14); margin: 0 auto 16px;"></div>
+          <div style="display: flex; gap: 6px; margin-bottom: 10px;"><span class="pt-badge" style="background: #f0ecfd; color: #6247d6;">교외</span><span class="pt-badge" style="background: #f5e9e6; color: #8f3a2e;">D-4</span></div>
+          <div style="font-size: 21px; font-weight: 800; letter-spacing: -0.025em;">삼성꿈장학재단 대학생 장학</div>
+          <div style="font-size: 13.5px; color: #8b857b; margin-top: 6px;">삼성꿈장학재단 · 최대 400만원</div>
+
+
+          <div style="margin-top: 22px; font-size: 15px; font-weight: 800;">지원 자격</div>
+          <div style="font-size: 11.5px; color: #8b857b; margin-top: 3px; margin-bottom: 11px;">공고 원문 안내 · 원문 그대로</div>
+          <div style="display: grid; gap: 9px; font-size: 13.5px; color: #57524a; line-height: 1.55;">
+            <div style="display: flex; gap: 10px;"><span style="color: #3d6b47; flex-shrink: 0; display: flex; margin-top: 2px;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg></span>국내 4년제 대학 재학생(휴학생 제외)</div>
+            <div style="display: flex; gap: 10px;"><span style="color: #3d6b47; flex-shrink: 0; display: flex; margin-top: 2px;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg></span>직전 학기 성적 평점 3.0 이상</div>
+          </div>
+          <button onClick="{{ goForm }}" style="width: 100%; margin-top: 26px; border: 0; border-radius: 13px; padding: 17px; font-size: 17px; font-weight: 700; background: #23201a; color: #fdfbf6; font-family: inherit; cursor: pointer;">신청서 작성 시작</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- 신청서 -->
+    <sc-if value="{{ isForm }}" hint-placeholder-val="{{ false }}">
+      <div style="width: 100%; height: 100%; background: rgba(10,14,24,0.55); position: relative;">
+        <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 730px; background: #ffffff; border-radius: 27px 27px 0 0; padding: 10px 20px 20px; box-sizing: border-box;">
+          <div style="width: 38px; height: 4px; border-radius: 999px; background: rgba(25,23,19,0.14); margin: 0 auto 16px;"></div>
+          <div style="font-size: 21px; font-weight: 800; letter-spacing: -0.025em;">양식 작성</div>
+          <div style="font-size: 13px; color: #8b857b; margin-top: 5px; line-height: 1.5;">삼성꿈장학재단 장학생 신청서 · 실제 공고 양식과 같은 구조</div>
+
+          <sc-if value="{{ formRestored }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top: 14px; background: rgba(138,106,31,0.10); border-radius: 13px; padding: 12px 14px; display: flex; gap: 10px; align-items: center;">
+              <span style="color: #8a6a1f; display: flex; flex-shrink: 0;"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6.5L9.2 17.5 4 12.3"/></svg></span>
+              <div style="font-size: 13px; color: #57524a; line-height: 1.5;"><strong style="color: #191713;">{{ restoredNote }}</strong> 이어서 쓰면 됩니다</div>
+            </div>
+          </sc-if>
+
+          <div style="margin-top: 20px; font-size: 13.5px; font-weight: 700; margin-bottom: 7px;">지원 동기 (400자 이내)</div>
+          <div style="border: 1px solid rgba(25,23,19,0.14); border-radius: 13px; padding: 13px 14px; min-height: 122px; font-size: 13.5px; line-height: 1.6; background: #ffffff;">저는 물리학과 3학년으로, 학부 연구생으로 참여한 광계측 실험에서 측정 오차를 줄이는 일에 몰두하며 진로를 정했습니다. 다만 지난 학기부터 가계 사정으로 주 20시간 근로를 병행하게 되어 실험실에 남는 시간이<span style="display: inline-block; width: 1.5px; height: 15px; background: #8a6a1f; vertical-align: -3px; margin-left: 1px;"></span></div>
+          <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 11.5px; color: #8b857b;"><span>AI 초안을 고쳐 쓰는 중</span><span>187 / 400</span></div>
+
+          <div style="margin-top: 18px; font-size: 13.5px; font-weight: 700; margin-bottom: 7px;">봉사·대외 활동</div>
+          <div style="border: 1px solid rgba(25,23,19,0.14); border-radius: 13px; padding: 13px 14px; font-size: 13.5px; line-height: 1.6;">교내 물리학과 학습멘토링 (2025.3 ~ 2025.12, 48시간)</div>
+
+          <button style="position: absolute; left: 20px; right: 20px; bottom: 20px; border: 0; border-radius: 13px; padding: 17px; font-size: 17px; font-weight: 700; background: #23201a; color: #fdfbf6; font-family: inherit; cursor: pointer;">양식 문서 만들기</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- 하단 탭 -->
+    <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+      <div style="position: absolute; left: 0; right: 0; bottom: 0; display: flex; background: rgba(255,254,252,0.94); border-top: 1px solid rgba(18,22,31,0.06); padding: 8px 0 12px;">
+        <div onClick="{{ goHome }}" class="pt-nav" style="cursor: pointer; color: {{ navHome }};"><svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>홈</div>
+        <div onClick="{{ goExplore }}" class="pt-nav" style="cursor: pointer; color: {{ navExplore }};"><svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg>장학금</div>
+        <div class="pt-nav"><svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>신청내역</div>
+        <div class="pt-nav"><svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>MY</div>
+      </div>
+    </sc-if>
+
+  </div>
+
+  <!-- ══════════ 조작판 ══════════ -->
+  <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+
+    <div style="font-size: 27px; font-weight: 800; letter-spacing: -0.03em;">앱을 껐다 켜 보세요</div>
+    <div style="font-size: 14px; color: #57524a; margin-top: 8px; line-height: 1.6;">이 작업의 핵심은 화면 그림이 아니라 <strong style="color: #191713;">껐다 켰을 때의 움직임</strong>입니다. 아래 버튼으로 직접 확인해 보세요.</div>
+    <div style="font-size: 12.5px; color: #8b857b; margin-top: 7px; line-height: 1.55;">화면 여섯 장을 보려면 왼쪽 위 <strong style="color: #57524a;">Back to canvas</strong> → 위쪽 <strong style="color: #57524a;">2 pages</strong>. 그 판에서는 아트보드 제목 옆 <strong style="color: #57524a;">▶</strong> 를 눌러야 버튼이 살아납니다.</div>
+
+    <div style="margin-top: 14px; background: rgba(138,106,31,0.10); border-radius: 13px; padding: 12px 14px; font-size: 12.5px; color: #57524a; line-height: 1.6;">
+      <strong style="color: #191713;">시간이 정하는 것은 '어디로 가는가'뿐입니다.</strong> 4시간을 넘겨도, 사흘이 지나도 학생이 친 글자는 안 버립니다 — 신청서 답과 AI 초안은 7일, 쓰다 만 온보딩은 시간과 상관없이 그대로 남습니다.
+    </div>
+
+    <div style="margin-top: 26px;">
+      <div class="pt-head">이 학생은</div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;">
+        <button onClick="{{ setNew }}" class="pt-btn {{ newCls }}">처음 설치한 학생</button>
+        <button onClick="{{ setReturning }}" class="pt-btn {{ oldCls }}">쓰던 학생</button>
+      </div>
+    </div>
+
+    <div style="margin-top: 22px;">
+      <div class="pt-head">앱 안에서 (폰을 직접 눌러도 됩니다)</div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;">
+        <button onClick="{{ goHome }}" class="pt-btn" disabled="{{ notInApp }}">홈으로</button>
+        <button onClick="{{ goExplore }}" class="pt-btn" disabled="{{ notInApp }}">장학금 탭으로</button>
+        <button onClick="{{ goDetail }}" class="pt-btn" disabled="{{ notInApp }}">공고 하나 열기</button>
+        <button onClick="{{ goForm }}" class="pt-btn" disabled="{{ notInApp }}">신청서 쓰기 시작</button>
+      </div>
+    </div>
+
+    <div style="margin-top: 22px;">
+      <div class="pt-head">앱을 나간다</div>
+      <button onClick="{{ closeApp }}" class="pt-btn pt-btn-dark" style="width: 100%;" disabled="{{ notInApp }}">홈 버튼을 눌러 앱을 나간다</button>
+    </div>
+
+    <div style="margin-top: 22px;">
+      <div class="pt-head">다시 연다</div>
+      <div style="display: grid; gap: 8px;">
+        <button onClick="{{ open5m }}" class="pt-btn" disabled="{{ inApp }}">5분 뒤 · 최근 앱 목록에서 다시 연다</button>
+        <button onClick="{{ open5h }}" class="pt-btn" disabled="{{ inApp }}">5시간 뒤 · 저녁에 다시 연다</button>
+        <button onClick="{{ openNotify }}" class="pt-btn" disabled="{{ inApp }}">알림을 눌러서 연다</button>
+      </div>
+    </div>
+
+    <div style="margin-top: 24px; flex: 1; min-height: 0;">
+      <div class="pt-head">무슨 규칙이 움직였나</div>
+      <div style="background: #f7f6f4; border-radius: 13px; padding: 15px 17px; display: grid; gap: 11px;">
+        <sc-for list="{{ log }}" as="line" hint-placeholder-count="3">
+          <div style="display: flex; gap: 10px; align-items: flex-start; font-size: 13px; line-height: 1.55; color: {{ line.color }};">
+            <span style="flex-shrink: 0; width: 5px; height: 5px; border-radius: 999px; background: {{ line.dot }}; margin-top: 7px;"></span>
+            <span>{{ line.text }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script data-dc-script data-props='{"windowHours":{"editor":"int","default":4,"min":1,"max":24,"unit":"시간","section":"이어보기"}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      installed: true,      // 프로필이 있는 학생인가
+      open: true,           // 앱이 켜져 있나
+      booting: false,
+      screen: 'home',
+      parked: null,         // 나갈 때 보던 화면
+      restored: null,       // 이번에 되살린 화면 (표시용)
+      awayLabel: '',
+      viaNotify: false,
+      log: [{ text: '쓰던 학생이 앱을 켠 상태입니다. 아래에서 화면을 옮겨 본 뒤 나갔다 들어와 보세요.', kind: 'plain' }],
+    };
+    this.timer = null;
+  }
+
+  componentWillUnmount() { if (this.timer) clearTimeout(this.timer); }
+
+  /* 🔴 setState 는 곧바로 반영되지 않는다 — 장부를 비운 직후에 say() 를 부르면
+     비우기 전 목록을 읽어 옛 줄이 되살아난다. 비우면서 첫 줄을 함께 넣을 것. */
+  say(text, kind) {
+    const log = [{ text: text, kind: kind || 'plain' }].concat(this.state.log).slice(0, 3);
+    this.setState({ log: log });
+  }
+
+  reset(installed, text) {
+    if (this.timer) clearTimeout(this.timer);
+    this.setState({
+      installed: installed,
+      open: installed,
+      booting: false,
+      parked: null,
+      restored: null,
+      screen: installed ? 'home' : 'welcome',
+      awayLabel: '',
+      viaNotify: false,
+      log: [{ text: text, kind: 'plain' }],
+    });
+  }
+
+  move(screen, note) {
+    if (!this.state.open || this.state.booting) return;
+    this.setState({ screen: screen, restored: null });
+    if (note) this.say(note, 'plain');
+  }
+
+  screenName(s) {
+    const names = { home: '홈', explore: '장학금 탭', detail: '공고 상세', form: '신청서 작성', welcome: '환영 화면' };
+    return names[s] || s;
+  }
+
+  close() {
+    if (!this.state.open) return;
+    const parked = this.state.screen;
+    this.setState({ open: false, parked: parked, restored: null });
+    this.say('앱이 숨는 그 순간에 화면을 적어 둔다 — ' + this.screenName(parked) + '. (visibilitychange 의 hidden. beforeunload 는 휴대폰에서 안 온다)', 'rule');
+  }
+
+  boot(resolve) {
+    if (this.timer) clearTimeout(this.timer);
+    this.setState({ open: true, booting: true });
+    this.timer = setTimeout(() => { this.setState({ booting: false }); resolve(); }, 1000);
+  }
+
+  openAfter(minutes, label) {
+    const win = (this.props.windowHours ?? 4) * 60;
+    this.setState({ awayLabel: label, viaNotify: false });
+    this.boot(() => {
+      if (!this.state.installed) {
+        this.setState({ screen: 'welcome', restored: null });
+        this.say('프로필이 없다 → 환영 화면. 이 화면은 처음 켤 때 한 번뿐이다.', 'accent');
+        return;
+      }
+      const parked = this.state.parked || 'home';
+      if (minutes <= win) {
+        this.setState({ screen: parked, restored: parked });
+        this.say('마지막으로 본 지 ' + label + ' · 창(' + (this.props.windowHours ?? 4) + '시간) 안 → 하던 화면(' + this.screenName(parked) + ') 그대로.', 'accent');
+      } else {
+        const hadForm = parked === 'form';
+        this.setState({ screen: 'home', restored: hadForm ? 'resumeCard' : null });
+        this.say('마지막으로 본 지 ' + label + ' · 창을 넘었다 → 홈으로.' + (hadForm ? " 쓰던 신청서는 안 버린다 — 홈에 '신청서 마저 쓰기' 한 줄로 남는다." : ''), 'accent');
+      }
+    });
+  }
+
+  openViaNotify() {
+    this.setState({ awayLabel: '', viaNotify: true });
+    this.boot(() => {
+      if (!this.state.installed) {
+        this.setState({ screen: 'welcome', restored: null });
+        this.say('프로필이 없다 → 환영 화면.', 'accent');
+        return;
+      }
+      this.setState({ screen: 'detail', restored: null });
+      this.say('주소에 공고가 붙어 있다 → 이어보기가 처음부터 손을 뗀다. 알림을 눌렀는데 딴 화면이 뜨면 안 되고, 나중에 덮으면 화면이 두 번 바뀐다.', 'accent');
+    });
+  }
+
+  renderVals() {
+    const s = this.state;
+    const dots = { plain: '#8b857b', rule: '#57524a', accent: '#8a6a1f' };
+    const cols = { plain: '#57524a', rule: '#57524a', accent: '#191713' };
+    const inApp = s.open && !s.booting;
+    const showNav = inApp && (s.screen === 'home' || s.screen === 'explore');
+
+    return {
+      isClosed: !s.open,
+      isBoot: s.open && s.booting,
+      isWelcome: inApp && s.screen === 'welcome',
+      isHome: inApp && s.screen === 'home',
+      isExplore: inApp && s.screen === 'explore',
+      isDetail: inApp && s.screen === 'detail',
+      isForm: inApp && s.screen === 'form',
+      showNav: showNav,
+      navHome: inApp && s.screen === 'home' ? '#23201a' : '#8b857b',
+      navExplore: inApp && s.screen === 'explore' ? '#23201a' : '#8b857b',
+
+      closedNote: s.parked ? '나가기 직전 화면: ' + this.screenName(s.parked) : '아직 한 번도 열지 않았습니다',
+      showResumeCard: inApp && s.screen === 'home' && s.restored === 'resumeCard',
+      formRestored: inApp && s.screen === 'form' && (s.restored === 'form' || s.restored === 'fromCard'),
+      restoredNote: s.restored === 'fromCard' ? '5시간 전에 쓰던 그대로예요.' : (s.awayLabel ? s.awayLabel + ' 전에 쓰던 그대로예요.' : '쓰던 그대로예요.'),
+
+      notInApp: !inApp,
+      inApp: inApp,
+      newCls: s.installed ? '' : 'pt-btn-on',
+      oldCls: s.installed ? 'pt-btn-on' : '',
+
+      log: s.log.map((l, i) => ({ text: l.text, dot: dots[l.kind], color: cols[l.kind] })),
+
+      setNew: () => this.reset(false, '앱을 지우고 다시 설치한 상태로 돌렸습니다. 아래 「다시 연다」로 앱을 열어 보세요.'),
+      setReturning: () => this.reset(true, '프로필이 있는 학생입니다. 화면을 옮겨 둔 뒤 나갔다 들어와 보세요.'),
+      finishOnboard: () => {
+        this.setState({ installed: true, screen: 'home', restored: null });
+        this.say('온보딩을 마쳤다 → 이제부터 환영 화면은 다시 뜨지 않는다.', 'accent');
+      },
+      goHome: () => this.move('home', null),
+      goExplore: () => this.move('explore', null),
+      goDetail: () => this.move('detail', null),
+      goForm: () => {
+        if (!this.state.open || this.state.booting) return;
+        const fromCard = this.state.restored === 'resumeCard';
+        this.setState({ screen: 'form', restored: fromCard ? 'fromCard' : null });
+        if (fromCard) this.say("'신청서 마저 쓰기'를 눌렀다 → 5시간 전 답과 AI 초안이 그대로 돌아온다.", 'accent');
+      },
+      closeApp: () => this.close(),
+      open5m: () => this.openAfter(5, '5분'),
+      open5h: () => this.openAfter(300, '5시간'),
+      openNotify: () => this.openViaNotify(),
+    };
+  }
+}
+</script>
+</body>
+</html>

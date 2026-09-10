@@ -20,10 +20,36 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <!-- ============ 부팅 화면 ============
+       앱 코드가 다 실릴 때까지 덮어 두는 한 장. 글자를 넣지 않는다 — 매 실행 뜨는 자리에
+       "한 번에 찾고 한 번에 신청하세요"를 두면 학생이 자기 앱에서 매번 광고를 보게 된다.
+       배경색은 manifest.json 의 background_color·<meta theme-color> 와 **같은 값**이어야
+       한다(안드로이드 설치형이 그 색으로 제 스플래시를 그린다 — 다르면 켤 때 색이 튄다).
+       걷는 것은 boot.js 의 window.bootDone(). 설계: docs/designs/first-run-and-resume.md -->
+  <div id="boot">
+    <div class="boot-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/><path d="M22 10v6"/></svg>
+    </div>
+    <p class="boot-word">한대장</p>
+    <div id="boot-spin" class="boot-spin" aria-hidden="true"></div>
+    <!-- 시한(6초)이 지나도 앱이 안 오면 — '시작하기'를 남기지 않는다.
+         남기면 이미 쓰던 학생이 프로필을 처음부터 다시 만들게 된다.
+         🔴 이 버튼에 `onclick="…"` 을 쓰지 말 것 — CSP(`script-src 'self'`)가 인라인 처리기를
+            막아 **눌러도 아무 일도 안 일어난다**(2026-09-09 브라우저로 확인: "Refused to
+            execute inline event handler"). 배선은 boot.js 가 한다. -->
+    <div id="boot-fail" class="boot-fail" hidden>
+      <p>앱을 불러오지 못했어요.<br />인터넷 연결을 확인하고 다시 시도해 주세요.</p>
+      <button type="button" id="boot-retry" class="btn btn-primary">다시 시도</button>
+    </div>
+  </div>
+
   <div id="app" class="app">
 
-    <!-- ============ 온보딩 ============ -->
-    <section id="screen-onboarding" class="screen">
+    <!-- ============ 온보딩 ============
+         🔴 `hidden` 을 빼지 말 것 — 이 화면만 안 감춰져 있어서, 앱 코드가 도착할 때까지
+            **이미 쓰던 학생에게도** 환영 화면이 떠 있었다(2026-09-09 실측).
+            관문: verify/test-collector.mjs '첫 실행 화면' 절 -->
+    <section id="screen-onboarding" class="screen" hidden>
       <div class="onboard-progress"><div id="onboard-bar" class="onboard-bar"></div></div>
 
       <!-- Step 0: 인트로 -->
@@ -301,6 +327,10 @@
         <button class="btn btn-white btn-lg" id="btn-apply-all">신청 준비</button>
       </div>
 
+      <!-- 쓰던 신청서 — 창(4시간)을 넘겨 들어와도 진행분은 안 버린다는 자리.
+           내용은 app.js renderHome() 이 채운다. 설계: docs/designs/first-run-and-resume.md -->
+      <button type="button" class="resume-card" id="home-resume" hidden></button>
+
       <div class="section-head">
         <h3>마감 임박</h3>
         <button class="link-btn" data-goto="explore">전체 보기</button>
@@ -357,7 +387,12 @@
     <section id="screen-applications" class="screen" hidden>
       <header class="page-header apps-header">
         <h2>신청 내역</h2>
-        <button id="apps-select-toggle" class="btn-ghost btn-sm" hidden>선택</button>
+        <!-- 달력은 새 탭이 아니라 여기 토글이다 — 하단바 4칸이 이미 꽉 찼고,
+             달력은 결국 '내가 담은 것'의 다른 보기다 (2026-09-07 · 노션 UI-21). -->
+        <div class="apps-header-actions">
+          <button id="apps-view-toggle" class="btn-ghost btn-sm" aria-pressed="false">달력 보기</button>
+          <button id="apps-select-toggle" class="btn-ghost btn-sm" hidden>선택</button>
+        </div>
       </header>
       <div id="apps-summary" class="apps-summary"></div>
       <!-- 선택 모드 막대 — 여러 건을 한 번에 정리할 때만 나온다 -->
@@ -366,6 +401,8 @@
         <button id="apps-delete-selected" class="btn-danger btn-sm" disabled>삭제</button>
       </div>
       <div id="apps-list" class="card-list"></div>
+      <!-- 달력 — app.js renderCalendar()가 채운다 -->
+      <div id="apps-calendar" class="cal" hidden></div>
     </section>
 
     <!-- ============ MY ============ -->
@@ -375,6 +412,8 @@
       <div id="my-account" class="my-card" hidden></div>
       <div id="my-notify" class="my-card" hidden></div>
       <div id="my-wallet" class="my-card"></div>
+      <!-- 보관함 — 저장(북마크)한 공고. app.js renderSaved()가 채운다 (2026-09-07) -->
+      <div id="my-saved" class="my-card"></div>
       <!-- 서류 보관함 줄과 같은 꼴 — 왼쪽에 할 일, 오른쪽에 누를 것 (2026-08-31).
            🔴 id 는 그대로 둔다. app.js 가 이 이름으로 동작을 붙인다. -->
       <!-- 프로필 수정은 맨 위(수정하기 ›)에 이미 있어 여기서는 뺐다 (2026-08-31).
@@ -474,9 +513,15 @@
     <div id="toast" class="toast" hidden></div>
   </div>
 
+  <!-- 🔴 부팅 화면 — **다른 모든 스크립트보다 먼저** 실어야 한다. 뒤에 두면 그 사이가
+       그대로 비고, 그게 이 파일이 없애려는 바로 그 틈이다(파일 머리말 참조).
+       관문: verify/test-collector.mjs '첫 실행 화면' 절 -->
+  <script src="boot.js"></script>
   <script src="data.js"></script>
   <!-- 절 경계 판정 — match-engine이 전역으로 참조하므로 반드시 먼저 실어야 한다 -->
   <script src="section-head.js"></script>
+  <!-- 이어보기 판정 — app.js 가 전역으로 참조하므로 먼저 실어야 한다 -->
+  <script src="resume.js"></script>
   <script src="parse-requirements.js"></script>
   <script src="parse-amount.js"></script>
   <script src="match-engine.js"></script>
@@ -484,6 +529,8 @@
   <script src="push-config.js"></script>
   <script src="supabase-config.js"></script>
   <script src="supabase-client.js"></script>
+  <!-- 손짓과 움직임 (2026-09-09) — app.js 가 카드를 그릴 때 부르므로 **app.js 보다 먼저** -->
+  <script src="interactions.js"></script>
   <script src="form-plan.js"></script>
   <script src="essay-ask.js"></script>
   <script src="forms.js"></script>

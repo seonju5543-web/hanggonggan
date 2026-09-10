@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-09-01",
+ "updatedAt": "2026-09-09",
  "items": [
   {
    "id": "reg-hi-jeju",
@@ -182,7 +182,7 @@
    "duplicable": true,
    "note": "융합일본지역학부 재학생 대상 장학금이에요. 접수 기간·신청서는 원문 공고에서 확인하세요(1차 선발 8월).",
    "noForm": "융합일본지역학부 재학생 한정 — 신청서·접수 방법은 원문 공고 확인(2026-07-08)",
-   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/259399/artclView.do",
+   "sourceUrl": "https://dep.hufs.ac.kr/student/12767/subview.do#n-%EC%9C%A0%ED%9D%A5%EC%88%98%20%EC%9E%A5%ED%95%99%EA%B8%88%20(%ED%95%9C%EA%B5%AD%EC%99%B8%EB%8C%80%20%EC%9C%B5%ED%95%A9%EC%9D%BC%EB%B3%B8%EC%A7%80%EC%97%AD%ED%95%99%EB%B6%80)",
    "attachments": [],
    "sourceKind": "official",
    "excerpts": [
@@ -214,7 +214,10 @@
     "max": 2500000,
     "raw": "3 ) 금 액 : 250 만 원 ( 등록금 외 장학금 - 생활비성 ) 4) 수여식 : 2026 년 9 월 3 일 ( 목 ) 오전 10 시, 장소 : 본관 203 호 이덕선 회의실 나 . 장학생 선발"
    },
-   "deadlineFrom": "공고 원문"
+   "deadlineFrom": "공고 원문",
+   "openDate": "2026-08-03",
+   "announceDate": "2026-08-28",
+   "boardTitle": "유흥수 장학금 (한국외대 융합일본지역학부)"
   },
   {
    "id": "reg-hufs-myeonhak",
@@ -237,7 +240,7 @@
    "duplicable": false,
    "note": "종합정보시스템 로그인 → 등록/장학정보 → 면학장학 신청. 자격·기간·금액은 원문 공고에서 확인하세요.",
    "noForm": "종합정보시스템(포털) 입력형 — 채울 신청서 양식 없음(2026-07-08). 신청 방법은 원문 공고 확인",
-   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/259473/artclView.do",
+   "sourceUrl": "https://dep.hufs.ac.kr/student/12767/subview.do#n-%EB%A9%B4%ED%95%99%EC%9E%A5%ED%95%99%EA%B8%88%20(%ED%95%9C%EA%B5%AD%EC%99%B8%EB%8C%80%20%EA%B5%90%EB%82%B4)",
    "attachments": [],
    "sourceKind": "official",
    "listedAt": "2026-07-16",
@@ -255,7 +258,9 @@
     "scope": "external",
     "raw": "나 . 면학장학금은 타 장학금과 중복지원 가능하나 , 등록금 범위 내에서 지급합니다 ."
    },
-   "deadlineFrom": "공고 원문"
+   "deadlineFrom": "공고 원문",
+   "openDate": "2026-07-09",
+   "boardTitle": "면학장학금 (한국외대 교내)"
   },
   {
    "id": "reg-hi-jeongeup",
@@ -340,7 +345,7 @@
    "note": "선발 결과는 8/26(수) HUFS Ability에서 확인해요. 세부 자격은 원문 공고를 확인하세요.",
    "noForm": "학교 시스템(HUFS Ability) 신청형으로 확인됨 — 첨부 신청서 없음",
    "attachments": [],
-   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/259826/artclView.do",
+   "sourceUrl": "https://dep.hufs.ac.kr/student/12767/subview.do#n-%EC%99%B8%EB%8C%80%EC%9E%AC%EC%A7%81%EC%A7%81%EC%9B%90%EC%9E%A5%ED%95%99%EA%B8%88(%EC%94%A8%EC%95%97)%20(2026-1)",
    "sourceKind": "official",
    "excerpts": [
     "지원자격 : 2026-1 학기 학부 재학생 ( 서울 및 글로벌 ) 으로 2026-1 학기 평점 및 전체 평점 3.5 이상인 학생으로 아래 항목 중 2 개 이상 해당되는 자",
@@ -362,7 +367,9 @@
     "min": 1000000,
     "max": 1000000,
     "raw": "3. 장학금액 : 1 인 당 1,000,000 원 * 동 장학금은 학업장려금 ( 생활비 ) 으로 등록금 초과 수혜 가능"
-   }
+   },
+   "openDate": "2026-07-27",
+   "boardTitle": "외대재직직원장학금(씨앗) (2026-1)"
   },
   {
    "id": "reg-hufs-ambassador",
@@ -385,7 +392,7 @@
    "note": "신청은 8/3부터 시작돼요(마감 8/12 15:00). 자격 요건은 원문 공고 확인.",
    "noForm": "첨부 신청서 없음 — 신청 방법은 원문 공고 확인(2026-07-15)",
    "attachments": [],
-   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/259734/artclView.do",
+   "sourceUrl": "https://dep.hufs.ac.kr/student/12767/subview.do#n-%ED%95%9C%EA%B5%AD%EC%99%B8%EB%8C%80%20%EB%8F%99%EB%AC%B8%ED%99%8D%EB%B3%B4%EB%8C%80%EC%82%AC%20%EC%9E%A5%ED%95%99%EA%B8%88%20(2026-2)",
    "sourceKind": "official",
    "excerpts": [
     "장학금액 : 1 인 최대 1,500,000 원 ( 생활비 장학금 )",
@@ -406,7 +413,10 @@
     "min": 1500000,
     "max": 1500000,
     "raw": "3. 장학금액 : 1 인 최대 1,500,000 원 ( 생활비 장학금 ) 4. 신청자격 ( 아래 가 &middot; 나 항목을 모두 충족해야 함 ) 구분"
-   }
+   },
+   "openDate": "2026-08-03",
+   "announceDate": "2026-08-28",
+   "boardTitle": "한국외대 동문홍보대사 장학금 (2026-2)"
   },
   {
    "id": "reg-posco-vision",
@@ -509,7 +519,8 @@
     "마 . 초과학기생 (9 학기 이상 ), 졸업 유예자 , 휴학생 참여 불가 ( 초과학기생의 경우 등록금 전액 납부자는 참여가능 )",
     "※ 국가근로장학금사업 및 다문화 ⦁ 탈북학생 멘토링사업과 중복참여 불가",
     "※ 연간 사업이기 때문에 1 학기 졸업예정자 , 2 학기 휴학예정자는 참여 지양"
-   ]
+   ],
+   "openDate": "2026-03-16"
   },
   {
    "id": "reg-hufs-alumni",
@@ -565,7 +576,9 @@
     "max": 1500000,
     "raw": "나 . 금 액 : 1 인 150 만 원 ( 등록금 외 장학금 - 생활비성 ) 다 . 장학금 수여식 : 2026 년 9 월 3 일 ( 목 ) 오전 10 시 장소 : 본관 203 호 이덕선 회의실 2. 장학생 선발"
    },
-   "deadlineFrom": "공고 원문"
+   "deadlineFrom": "공고 원문",
+   "openDate": "2026-08-03",
+   "announceDate": "2026-08-28"
   },
   {
    "id": "reg-khu-intern",
@@ -608,7 +621,8 @@
     "2026년도 2학기 쌍용곰두리장학생 모집 안내(국제C 7/21까지 신청기간 연장)"
    ],
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
-   "boardTitle": "경희인턴(교내장학) 장학생 (2026-2학기)"
+   "boardTitle": "경희인턴(교내장학) 장학생 (2026-2학기)",
+   "openDate": "2026-07-20"
   },
   {
    "id": "auto-tentsno1menuid100siteno2",
@@ -689,7 +703,13 @@
    "duplicable": true,
    "note": "수집 로봇이 찾은 공고를 검수해 등록했어요. 금액·마감·자격은 원문 공고가 정본이니 함께 확인하세요.",
    "noForm": "검수 완료 2026-07-23 — 원문 첨부에 채울 신청서 양식 없음(있으면 다음 수집이 스키마화)",
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "본문이미지-1200x1696.jpg",
+     "url": "https://www.hongik.ac.kr/cms/plugin/editorImage.do?$cms$EwBmDYHoQdkgjAQgCwEoFUBiAvAxogLQGkBRASwGVkBZZAEwBkBPbTADwGdFEA6ABwB2AcyA",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=154473&article.offset=0&articleLimit=10&noCat=501",
    "sourceKind": "official",
    "listedAt": "2026-07-23",
@@ -840,7 +860,8 @@
    "eligibilityPriority": [
     "부서 , 기관 요청시 선호 학년 우선선발"
    ],
-   "deadlineFrom": "공고 원문"
+   "deadlineFrom": "공고 원문",
+   "openDate": "2026-08-04"
   },
   {
    "id": "auto-kolifenoticejspduid52964",
@@ -1063,7 +1084,9 @@
     "scope": "external",
     "raw": "2. 장학금 지급액 : 500 만원 /1 인 ( 학업지원비 ( 생활비 ) 로 지급 ) ( 타 대외 장학금과 이중수혜 금지 )"
    },
-   "sameAs": "가송재단"
+   "sameAs": "가송재단",
+   "openDate": "2026-07-30",
+   "announceDate": "2026-08-21"
   },
   {
    "type": "교외",
@@ -1194,7 +1217,8 @@
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
    "eligibilityLines": [
     "1. 지원대상 : 만3세~만24세 소아·청소년 당뇨인('03.1.1.생부터 '23.12.31.생까지)"
-   ]
+   ],
+   "openDate": "2026-06-15"
   },
   {
    "id": "reg-dongsan",
@@ -1542,7 +1566,8 @@
     "min": 1000000,
     "max": 1000000,
     "raw": "3. 지원금액 : 1 인당 100 만원 ( 생활비성 장학금 )"
-   }
+   },
+   "openDate": "2026-08-26"
   },
   {
    "id": "auto-ent2431263858artclviewdo",
@@ -1588,7 +1613,8 @@
     "min": 3000000,
     "max": 3000000,
     "raw": "3. 지원금액 : 1 인당 300 만원 ( 생활비성 장학금 )"
-   }
+   },
+   "openDate": "2026-09-07"
   },
   {
    "id": "auto-ent2431264156artclviewdo",
@@ -1672,7 +1698,8 @@
     "kind": "allowed",
     "scope": "narrow",
     "raw": "* 국가장학금 , 성적장학금 등 중복수혜가능"
-   }
+   },
+   "openDate": "2026-09-02"
   },
   {
    "id": "auto-84a0ebb09c20ec9588eb82b4",
@@ -1751,7 +1778,8 @@
    "excerpts": [
     "문의처 : 02-2173-2136(서울 장학팀 )"
    ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "openDate": "2026-08-27"
   },
   {
    "id": "auto-ent2431264146artclviewdo",
@@ -1822,7 +1850,8 @@
     "등록금 : 수혜 학기당 등록금 전액"
    ],
    "eligibilityFrom": "AI(공고 포스터 그림)",
-   "eligibilityReviewed": false
+   "eligibilityReviewed": false,
+   "openDate": "2026-09-01"
   },
   {
    "id": "auto-cb2ad20ec9588eb82b482f26",
@@ -2106,7 +2135,8 @@
    "excerpts": [
     "문의처 : 달서인재육성장학재단사무국 053-667-3232"
    ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "openDate": "2026-08-31"
   },
   {
    "id": "auto-9599ec839d20ec84a0ebb09c",
@@ -2192,6 +2222,125 @@
     }
    ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322949",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-ent2431265883artclviewdo",
+   "name": "[공통][교내] 2026-2학기 가족장학금 신청 안내 (9/10 ~ 9/28)",
+   "boardTitle": "[공통][교내] 2026-2학기 가족장학금 신청 안내 (9/10 ~ 9/28)",
+   "type": "교내",
+   "provider": "한국외국어대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-09-28",
+   "period": "접수 ~2026-09-28",
+   "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-08 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026-2 가족장학금 신청서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150229/download.do"
+    }
+   ],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/265883/artclView.do",
+   "sourceKind": "auto",
+   "openDate": "2026-09-10",
+   "eligibilityLines": [
+    "2. 신청자격",
+    "가 . 2026-2 학기 본교 학부에 형제 · 자매가 2 인 이상 동시에 재학하고 있는 자",
+    "나 . 직전 정규학기 취득학점 12 학점 이상 , 평점평균 2.0 이상인 자 ( 단 , 신입생 · 편입생 성적제한 없음 )"
+   ],
+   "excerpts": [
+    "장학금액 : 최대 1,000,000 원 ( 등록금 범위 내 지급 )"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-oardid323027menuno200318",
+   "name": "공통 대전청년내일재단 2026년 성취(대) 장학생 선발 안내",
+   "boardTitle": "공통 대전청년내일재단 2026년 성취(대) 장학생 선발 안내",
+   "type": "교외",
+   "provider": "경희대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-09",
+   "period": "접수 기간 원문 확인",
+   "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경희대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-09 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026년 성취(대) 장학생 선발계획 공고.hwpx",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=2c45e373675242db80e2157e64de34a7&fileSn=1&bbsId=BMSR00040"
+    },
+    {
+     "name": "본문이미지-510x580.png",
+     "url": "https://www.khu.ac.kr/upload/cross/images/000065/20260908141240402_XP36YJVN.png",
+     "bodyImage": true
+    }
+   ],
+   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323027",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-84a0ebb09c20eab3b5eab3a0",
+   "name": "서울 (재) 김해시미래인재장학재단 2026 장학생 선발 공고",
+   "boardTitle": "서울 (재) 김해시미래인재장학재단 2026 장학생 선발 공고",
+   "type": "교외",
+   "provider": "경희대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-09",
+   "period": "접수 기간 원문 확인",
+   "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경희대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-09 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "신청서식.hwpx",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=cee13c58dcaa46049085f5459fbae92c&fileSn=1&bbsId=BMSR00040"
+    },
+    {
+     "name": "선발요강.pdf",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=cee13c58dcaa46049085f5459fbae92c&fileSn=2&bbsId=BMSR00040"
+    },
+    {
+     "name": "본문이미지-620x835.png",
+     "url": "https://www.khu.ac.kr/upload/cross/images/000066/20260909113006844_BB70Y8TB.png",
+     "bodyImage": true
+    }
+   ],
+   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323040",
    "sourceKind": "auto"
   }
  ]

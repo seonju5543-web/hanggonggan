@@ -1,7 +1,99 @@
 {
  "school": "경희대학교",
- "updatedAt": "2026-09-06",
+ "updatedAt": "2026-09-10",
  "items": [
+  {
+   "title": "서울 (재) 김해시미래인재장학재단 2026 장학생 선발 공고",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323040",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "경희대학교",
+   "campus": "",
+   "foundAt": "2026-09-09",
+   "boardTitle": "서울 (재) 김해시미래인재장학재단 2026 장학생 선발 공고"
+  },
+  {
+   "title": "공통 대전청년내일재단 2026년 성취(대) 장학생 선발 안내",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323027",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "경희대학교",
+   "campus": "",
+   "foundAt": "2026-09-08",
+   "boardTitle": "공통 대전청년내일재단 2026년 성취(대) 장학생 선발 안내"
+  },
+  {
+   "title": "공통 2026년도 (재)인천인재평생교육진흥원 하반기 장학생 선발 안내",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323019",
+   "attachments": [
+    {
+     "name": "[붙임2-1]26년 하반기_인천인희망드림 장학생(공고문).hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=654f683f435d49afba0e1cb2dfd510f2&fileSn=1&bbsId=BMSR00040"
+    },
+    {
+     "name": "[붙임2-2]26년 하반기_관외대학 거주비 지원(공고문).hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=654f683f435d49afba0e1cb2dfd510f2&fileSn=2&bbsId=BMSR00040"
+    },
+    {
+     "name": "[붙임2-3]26년 하반기_공익인재(공고문).hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=654f683f435d49afba0e1cb2dfd510f2&fileSn=3&bbsId=BMSR00040"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "경희대학교",
+   "campus": "",
+   "foundAt": "2026-09-07",
+   "boardTitle": "공통 2026년도 (재)인천인재평생교육진흥원 하반기 장학생 선발 안내"
+  },
+  {
+   "title": "공통 2026년 하반기 익산시 대학생 학자금 대출이자 지원 안내",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323018",
+   "attachments": [
+    {
+     "name": "[공고문]2026년 하반기 익산시 대학(원)생 학자금 이자지원 신청자 접수 공고.hwpx",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=2c7469cdca154791886676c56f0641de&fileSn=1&bbsId=BMSR00040"
+    },
+    {
+     "name": "[안내문]2026년 하반기 익산시 대학생 학자금 대출이자 지원 신청.hwpx",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=2c7469cdca154791886676c56f0641de&fileSn=2&bbsId=BMSR00040"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "경희대학교",
+   "campus": "",
+   "foundAt": "2026-09-07",
+   "boardTitle": "공통 2026년 하반기 익산시 대학생 학자금 대출이자 지원 안내"
+  },
+  {
+   "title": "공통 2026년 상반기분 통영시 대학생 학자금 이자 지원 공고(안)",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323015",
+   "attachments": [
+    {
+     "name": "2026년 상반기분 통영시 대학생 학자금 이자 지원 공고(안).hwpx",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=f6384c1f3f0e46bebd4441ad412438c1&fileSn=1&bbsId=BMSR00040"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "경희대학교",
+   "campus": "",
+   "foundAt": "2026-09-07",
+   "boardTitle": "공통 2026년 상반기분 통영시 대학생 학자금 이자 지원 공고(안)"
+  },
+  {
+   "title": "공통 2026년 금신사랑장학생 선발 안내",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323011",
+   "attachments": [
+    {
+     "name": "2026사랑장학생선발안내.pdf",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=b2d705351a2a4da79f2b3597ccf86647&fileSn=1&bbsId=BMSR00040"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "경희대학교",
+   "campus": "",
+   "foundAt": "2026-09-07",
+   "boardTitle": "공통 2026년 금신사랑장학생 선발 안내"
+  },
   {
    "title": "공통 제36기 미레에셋 해외교환 장학생 선발",
    "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322953",

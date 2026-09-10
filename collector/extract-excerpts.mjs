@@ -271,8 +271,12 @@ function dateFrom(value, ctxYear) {
   return /^[^0-9]{0,4}\d{1,2}\s?(:\s?\d{2}|시)/.test(after) ? start : null;
 }
 
-/** 공고 원문에서 신청 마감일 하나. 못 믿으면 null. */
-function extractDeadline(text) {
+/** 이름표에 매단 줄을 훑는 공통 골격.
+    🔴 **베끼지 말 것** — 마감일과 접수 시작일은 `신청기간 : 2026.7.6 ~ 8.31` 처럼
+       대개 **같은 줄**에서 온다. 훑는 규칙이 두 벌이 되면 시작과 끝이 서로 다른 줄에서
+       와 짝이 안 맞는다(다른 공고의 날짜가 섞이는 그 사고 유형이다).
+    `accept(label, value)` 가 이름표를 고르고, `read(value, ctxYear)` 가 날짜를 읽는다. */
+function eachLabeledValue(text, accept, read) {
   if (!text) return null;
   const lines = String(text).split(/\n+/).map((l) => unent(l).replace(/[ \t　]+/g, ' ').trim()).filter(Boolean);
   const ctxYear = soleYear(text);
@@ -283,15 +287,85 @@ function extractDeadline(text) {
     const label = shHead(l.slice(0, i));            // 기호·번호 떼기는 section-head.js 한 곳
     if (label.length > 30) continue;                // 이름표는 짧다. 길면 문장이다
     const value = l.slice(i + 1);
-    const named = PERIOD_LABEL.test(label);
-    /* 이름표가 '방법·접수'면 내용이 마감을 말할 때만 연다 (위 PERIOD_VIA 주석) */
-    const viaValue = (PERIOD_BARE.test(label.replace(/\s/g, '')) || PERIOD_VIA.test(label))
-      && VALUE_DEADLINE.test(value);
-    if (!named && !viaValue) continue;
-    const d = dateFrom(value, ctxYear);
-    if (d) return d;
+    if (!accept(label, value)) continue;
+    const got = read(value, ctxYear);
+    if (got) return got;
   }
   return null;
+}
+
+/** 기간을 말하는 이름표인가 — 마감일과 접수 시작일이 **같은 판정**을 쓴다.
+    이름표가 '방법·접수'면 내용이 마감을 말할 때만 연다 (위 PERIOD_VIA 주석). */
+const PERIOD_ACCEPT = (label, value) => PERIOD_LABEL.test(label)
+  || ((PERIOD_BARE.test(label.replace(/\s/g, '')) || PERIOD_VIA.test(label)) && VALUE_DEADLINE.test(value));
+
+/** 공고 원문에서 신청 마감일 하나. 못 믿으면 null. */
+function extractDeadline(text) {
+  return eachLabeledValue(text, PERIOD_ACCEPT, dateFrom);
+}
+
+/* ============================================================================
+   접수 시작일 · 발표일 (2026-09-07 — 캘린더 UI-21)
+
+   캘린더가 마감일 하나만으로는 "그날까지 뭘 해야 하나"를 다 말하지 못한다.
+   그래서 **원문에 적혀 있을 때만** 접수 시작일과 발표일을 함께 읽는다.
+   🔴 규칙은 마감일과 똑같다: **이름표에 매달고, 못 믿으면 비운다.**
+      지어낸 발표일은 못 읽은 것보다 나쁘다 — 학생이 그날 결과를 확인하러 갔다가
+      아무것도 없으면 앱의 다른 날짜까지 못 믿게 된다(원칙 8-1).
+   ============================================================================ */
+
+/** 범위의 **시작**. `~` 가 있고 **끝도 읽히는** 줄일 때만.
+    🔴 끝을 못 읽는 줄에서 시작만 주우면 안 된다 — 접수 시작일이 마감일과 **다른 줄**에서
+       오게 된다. 실제로 그렇게 2건이 틀렸다(2026-09-07 코드 리뷰):
+       `○ 모집기간: 2026.06.29. ~ 상시신청` 이라는 곁줄에서 6/29 를 주웠는데
+       진짜 신청기간은 6.15~9.11 이었다. `dateFrom` 은 `~` 뒤가 날짜가 아니면
+       (`상시신청`·`선발 완료시`) 일부러 비우는데, 그 판정을 여기서도 그대로 따라야
+       두 값이 같은 줄에서 나온다.
+    ⚠️ 끝이 시작과 같은 날이면 그것은 기간이 아니라 **시각 범위**다
+       (`2026. 8. 24.(월) 10:00 ~ 18:00`) — 접수 시작일로 쓰지 않는다. */
+function rangeStart(value, ctxYear) {
+  const s = unent(value);
+  FULL_DATE.lastIndex = 0;
+  const m = FULL_DATE.exec(s);
+  /* 🔴 해 없는 시작일(`7.6 ~ 8.31`)은 읽지 않는다. 끝 날짜는 시작한 해를 물려받을 수
+     있지만(dateFrom) 시작일에는 물려받을 곳이 없어 ctxYear 를 **짐작**하게 된다. */
+  if (!m) return null;
+  const start = ymd(m[1], m[2], m[3]);
+  if (!start) return null;
+  const tail = s.slice(m.index + m[0].length);
+  if (tail.search(RANGE_SEP) < 0) return null;      // `~` 없이 날짜 하나 = 그날이 마감
+  const end = dateFrom(value, ctxYear);             // 끝을 읽는 규칙은 한 곳뿐이다
+  if (!end || end === start) return null;
+  return start;
+}
+
+/** 공고 원문에서 접수 시작일. 범위로 적혀 있을 때만 읽는다. */
+function extractOpenDate(text) {
+  return eachLabeledValue(text, PERIOD_ACCEPT, rangeStart);
+}
+
+/* 🔴 `발표` 는 뜻이 여럿이다(면접 발표·논문 발표·발표 자료). 그래서 **이름표가 결과를
+   말할 때만** 연다: `선발발표`·`합격자 발표`·`결과 통보`·`선정 결과`·`선발 확정`.
+   맨 `발표`는 이름표 전체가 그것뿐일 때만 받는다.
+   ⚠️ 넓히지 말 것 — `발표 준비물`·`성과 발표회` 같은 행사 일정이 발표일로 둔갑한다. */
+const ANNOUNCE_LABEL = /(선발|선정|합격자?|최종|장학생)\s?(발표|통보|확정|결과)|결과\s?(발표|통보)|^발\s?표(일자?|예정일)?$/;
+const ANNOUNCE_ACCEPT = (label) => ANNOUNCE_LABEL.test(label);
+
+/** 발표일 — 범위면 **앞쪽**을 쓴다(그날부터 결과를 볼 수 있다). */
+function announceOn(value, ctxYear) {
+  const s = unent(value);
+  FULL_DATE.lastIndex = 0;
+  const m = FULL_DATE.exec(s);
+  if (m) return ymd(m[1], m[2], m[3]);
+  if (!ctxYear) return null;
+  BARE_DATE.lastIndex = 0;
+  const b = BARE_DATE.exec(s);
+  return b ? ymd(ctxYear, b[1], b[2]) : null;
+}
+
+/** 공고 원문에서 발표일 하나. 못 믿으면 null. */
+function extractAnnounce(text) {
+  return eachLabeledValue(text, ANNOUNCE_ACCEPT, announceOn);
 }
 
 /* 장학 제외 대상 — "※ 장학제외 대상자" 아래의 항목들을 원문 그대로 모은다.
@@ -534,7 +608,8 @@ function scoopQualifyLines(text) {
    이 파일은 **불러오는 순간 아래 본편이 통째로 실행되던** 구조라 규칙 하나를 시험해 보려면
    비슷한 코드를 따로 베껴야 했고(그러면 규칙이 두 벌이 된다), 검사도 '원본 글자를 읽어
    규칙이 살아 있는지만 보는' 약한 방식에 머물렀다. `EXCERPTS_AS_LIB=1`이면 본편을 건너뛴다. */
-export { extractQualifyLines, scoopQualifyLines, extractFrom, extractExcludeLines, extractPriorityLines, extractDeadline };
+export { extractQualifyLines, scoopQualifyLines, extractFrom, extractExcludeLines, extractPriorityLines,
+         extractDeadline, extractOpenDate, extractAnnounce };
 
 let browserBodies = {};
 try { browserBodies = JSON.parse(fs.readFileSync(new URL('extracted/browser-bodies.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
@@ -548,7 +623,7 @@ const strip = makeStripper(texts);
 let eligDocs = {};
 try { eligDocs = JSON.parse(fs.readFileSync(new URL('extracted/elig-docs.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
 
-let hit = 0, none = 0, kept = 0, cleaned = 0, fromDoc = 0, gotDeadline = 0;
+let hit = 0, none = 0, kept = 0, cleaned = 0, fromDoc = 0, gotDeadline = 0, gotOpen = 0, gotAnnounce = 0;
 /* 공고문 첨부에서 자격 줄을 읽는다. 본문 경로와 원문 없는 경로가 **같은 함수**를 써야
    "본문 있을 땐 읽고 없을 땐 안 읽는" 어긋남이 안 생긴다. 스캔 PDF 등 글자가 안 나오는
    것은 조용히 건너뛴다(읽은 척하는 것보다 안 읽는 편이 낫다). */
@@ -645,6 +720,31 @@ for (const it of reg.items) {
     }
   }
 
+  /* 접수 시작일·발표일 — 캘린더가 쓴다 (2026-09-07). 마감일과 같은 규칙으로,
+     **비어 있을 때만** 채우고 **말이 안 되면 버린다.**
+     🔴 순서 검사가 이 두 값의 방어선이다. 원문에는 다른 공고의 날짜와 지급일·행사일이
+        섞여 있어서, 이름표만으로는 엉뚱한 날이 들어올 수 있다:
+          · 접수 시작일이 마감일보다 **뒤**면 같은 기간의 값이 아니다.
+          · 발표일이 마감일보다 **앞**이면 결과 발표일 리가 없다.
+        어느 쪽이든 고쳐 주지 않고 버린다(해를 고쳐 주지 않는 dateFrom 과 같은 정신). */
+  const known = it.deadline || null;
+  if (!it.openDate) {
+    const od = extractOpenDate(body);
+    if (od && (!known || od <= known)) {
+      gotOpen += 1;
+      if (WRITE) it.openDate = od;
+      else console.log(`   [접수시작] ${it.id} → ${od}`);
+    }
+  }
+  if (!it.announceDate) {
+    const an = extractAnnounce(body);
+    if (an && (!known || an >= known)) {
+      gotAnnounce += 1;
+      if (WRITE) it.announceDate = an;
+      else console.log(`   [발표] ${it.id} → ${an}`);
+    }
+  }
+
   /* 🔴 **AI가 다른 출처에서 읽은 자격은 건드리지 않는다** (2026-08-23).
      아래 `delete it.eligibilityLines`는 '원문은 읽었는데 못 뽑았다 → 낡은 발췌를 남기지 않는다'는
      규칙이라 발췌 결과에는 맞다. 그런데 AI가 **공고문 PDF**에서 읽은 값까지 지웠다 —
@@ -685,6 +785,7 @@ for (const it of reg.items) {
 console.log(`\n게시판 메뉴를 걷어낸 공고 ${cleaned}건`);
 console.log(`발췌 성공 ${hit}건 · 원문은 읽었으나 발췌 불가 ${none}건 · 원문 미확보라 손대지 않음 ${kept}건`);
 console.log(`마감일을 원문에서 새로 읽은 공고 ${gotDeadline}건`);
+console.log(`접수 시작일 ${gotOpen}건 · 발표일 ${gotAnnounce}건 (캘린더용 — 원문에 있을 때만)`);
 if (WRITE) {
   fs.writeFileSync(regPath, JSON.stringify(reg, null, 1) + '\n');
   console.log('registered.json 반영 완료');

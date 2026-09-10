@@ -12,7 +12,7 @@
    실행: (python3 -m http.server 8123 &) 후 node verify/verify-source-links.js */
 const { chromium } = require('playwright-core');
 const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
-const { nextUntil, assertOwnServer } = require('./onboard-helper.js');
+const { nextUntil, assertOwnServer, dismissNotify } = require('./onboard-helper.js');
 const fs = require('fs');
 const path = require('path');
 
@@ -80,7 +80,12 @@ const SCHOOL = process.env.LINKCHECK_SCHOOL || '경희';
   await page.fill('#in-email', 'test@univ.ac.kr');
   await page.click('#btn-finish-onboard');
   await page.waitForSelector('#screen-home:not([hidden])');
-  await page.waitForTimeout(1500);
+  /* 🔴 알림 동의 시트를 **뜰 때까지 기다렸다가** 치운다 (2026-09-07).
+     전에는 1.5초만 기다리고 곧장 카드를 눌렀는데, 시트는 2.9초 뒤에 떠서 그 뒤의
+     클릭을 전부 막았다 — 세 번에 한 번 빨간불이었다(깨끗한 트리에서 실측).
+     기다림·치우기 규칙은 onboard-helper 한 곳이다. */
+  await dismissNotify(page);
+  await page.waitForTimeout(300);
   await page.click('.nav-item[data-nav="explore"]');
   await page.waitForTimeout(800);
 

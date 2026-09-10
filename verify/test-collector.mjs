@@ -1450,6 +1450,28 @@ console.log('\n■ 마감일을 원문에서 읽는다 (2026-08-30)');
   /* 🔴 줄 끝의 전화번호 하이픈을 범위 기호로 읽으면 **멀쩡한 마감일이 통째로 버려진다** */
   eq('날짜 뒤 전화번호가 있어도 마감일을 잃지 않는다',
     D('신청기간: 2026. 8. 20.(목) 까지 · 문의 02-940-5114'), '2026-08-20');
+
+  /* ── 접수 시작일 · 발표일 (2026-09-07 · 캘린더 UI-21) ──
+     🔴 이 둘은 마감일과 **같은 줄**에서 와야 한다. 끝을 못 읽는 줄에서 시작만 주우면
+        접수 시작일이 다른 줄의 것이 된다 — 실제로 그렇게 2건이 틀렸다(코드 리뷰에서 잡음). */
+  const O = (s) => EX.extractOpenDate(s);
+  const A = (s) => EX.extractAnnounce(s);
+
+  eq('기간 줄에서 시작일을 읽는다', O('신청기간 : 2026. 7. 30(목) ~ 8. 7(금) 13:00'), '2026-07-30');
+  eq('끝을 못 읽는 줄에서는 시작일도 읽지 않는다',
+    O('○ 모집기간: 2026.06.29. ~ 상시신청'), null);
+  eq("'선발 완료시'도 마찬가지다", O('신청기간: 2026. 8. 10.(월) ~ 선발 완료시 까지'), null);
+  eq('같은 날 안의 시각 범위는 접수 기간이 아니다',
+    O('신청기간: 2026. 8. 24.(월) 10:00 ~ 18:00'), null);
+  eq('날짜 하나뿐이면 그것은 마감이지 시작이 아니다',
+    O('□ 지원기간: 2026. 7. 22.(수) 16시까지'), null);
+  eq('기간을 말하지 않는 이름표는 안 읽는다', O('근로기간: 2026. 9. 1. ~ 2027. 2. 12.'), null);
+
+  eq('발표 이름표 뒤의 날짜를 읽는다', A('○ 선발발표 : 2026. 8. 26.(수)'), '2026-08-26');
+  eq('결과 통보도 발표다', A('4. 결과 통보: 2026-09-15'), '2026-09-15');
+  /* 🔴 `발표` 는 뜻이 여럿이다 — 행사 일정을 발표일로 읽으면 학생이 헛되이 결과를 보러 간다 */
+  eq('성과 발표회는 발표일이 아니다', A('성과 발표회 : 2026. 10. 5.(월)'), null);
+  eq('면접 발표 순서도 아니다', A('면접 발표 순서 : 2026. 9. 9.(수)'), null);
 }
 
 console.log('\n■ 자격 절을 어디서 끊나 (2026-08-20)');
@@ -3765,6 +3787,283 @@ console.log('\n■ 검사가 개발자 컴퓨터에서만 실패하지 않는다
   eq('이 검사는 파일을 readText 로만 읽는다 (줄바꿈 통일)',
     // 바늘을 쪼개 넣는다 — 통째로 적으면 이 줄 자신이 걸려 영영 2가 된다
     self.split("fs.read" + "FileSync(").length - 1, 1);   // readText 정의 안의 1회뿐
+}
+
+
+/* ══ 첫 실행 화면 · 이어보기 (2026-09-09 · 노션 원문 목록 4번) ══════════════
+   설계: docs/designs/first-run-and-resume.md
+
+   지키는 사고 넷 — 전부 2026-09-09에 앱을 띄워 실측한 것이다:
+   ① 프로필이 있는 학생이 다시 켜도 **환영 화면이 먼저 그려졌다**(index.html 에서
+      hidden 이 없는 화면이 그것 하나뿐이라, app.js 가 화면을 정할 때까지 그게 화면이다)
+   ② 탐색 탭에서 나갔다 와도 **늘 홈**이었고 ③ 그 홈에 **이전 화면의 스크롤이 붙었다**
+   ④ 신청서를 쓰다 나가면 **쓴 것이 통째로 사라졌다**(크레딧을 낸 AI 초안까지) */
+console.log('\n■ 첫 실행 화면 (2026-09-09)');
+{
+  const root = new URL('../', import.meta.url);
+  const html = readText(new URL('index.html', root));
+
+  /* ① 화면은 전부 감춰진 채 시작한다 — 하나라도 열려 있으면 그게 '첫 화면'이 된다 */
+  const screens = [...html.matchAll(/<section id="screen-([a-z]+)" class="screen"([^>]*)>/g)]
+    .filter((m) => !/\bhidden\b/.test(m[2])).map((m) => m[1]);
+  eq('열린 채 시작하는 .screen 이 없다', screens, []);
+
+  /* ② 부팅 화면 자체가 있고, 걷는 손잡이가 있다 */
+  eq('부팅 화면이 index.html 에 있다', /id="boot"/.test(html), true);
+  const bootJs = readText(new URL('boot.js', root));
+  eq('boot.js 가 스크롤 되살리기를 끈다', /scrollRestoration\s*=\s*'manual'/.test(bootJs), true);
+  eq('boot.js 에 시한이 있다 (갇히지 않는다)', /BOOT_TIMEOUT_MS/.test(bootJs), true);
+  eq('boot.js 가 걷는 손잡이를 연다', /window\.bootDone/.test(bootJs), true);
+  eq('app.js 가 화면을 정한 뒤 부팅 화면을 걷는다',
+    /window\.bootDone\(\)/.test(readText(new URL('app.js', root))), true);
+
+  /* ③ 🔴 boot.js 는 **다른 스크립트보다 먼저** 실려야 한다. 뒤에 두면 그 사이가
+     그대로 비고, 그게 이 파일이 없애려던 바로 그 틈이다. */
+  const order = [...html.matchAll(/<script src="([^"]+)"/g)].map((m) => m[1]);
+  eq('boot.js 가 첫 스크립트다', order[0], 'boot.js');
+  eq('resume.js 가 app.js 보다 먼저다', order.indexOf('resume.js') < order.indexOf('app.js'), true);
+
+  /* ④ 🔴 인라인 <script> 로 옮기면 CSP(script-src 'self')가 막아 **조용히** 아무 일도 안 난다 */
+  eq('CSP 가 여전히 인라인 스크립트를 막는다 (boot.js 를 인라인으로 옮기면 안 되는 이유)',
+    /script-src 'self'/.test(html) && !/script-src[^;]*unsafe-inline/.test(html), true);
+
+  /* 🔴 같은 CSP 가 **인라인 이벤트 처리기(`onclick="…"`)도** 막는다. 2026-09-09 에 실제로
+     그래서 부팅 실패 화면의 '다시 시도' 버튼이 죽어 있었다(브라우저로 확인 — "Refused to
+     execute inline event handler"). 오류가 화면에 안 나므로 **눌러도 아무 일이 안 나는** 것이
+     유일한 증상이고, 앱이 안 오는 학생은 거기서 갇힌다.
+     ⚠️ 이 검사는 '고쳤다'를 지키는 것이 아니라 **다음에 누가 또 쓰는 것**을 막는다 —
+        HTML 을 손으로 고치는 순간 가장 쉽게 손이 가는 방법이 그것이다. */
+  const inlineOn = [...html.matchAll(/\son(click|change|input|submit|load|error)\s*=/gi)].map((m) => m[0].trim());
+  eq('index.html 에 인라인 이벤트 처리기가 없다 (CSP 가 막아 조용히 죽는다)', inlineOn, []);
+  eq('부팅 실패 화면의 다시 시도를 boot.js 가 배선한다',
+    /boot-retry[\s\S]{0,160}addEventListener\('click'/.test(bootJs)
+      && /id="boot-retry"/.test(html), true);
+
+  /* ⑤ 서비스워커가 새 파일을 안 담으면 설치된 앱에서 오프라인에 깨진다 */
+  const sw = readText(new URL('sw.js', root));
+  eq('sw.js ASSETS 에 boot.js 가 있다', /'boot\.js'/.test(sw), true);
+  eq('sw.js ASSETS 에 resume.js 가 있다', /'resume\.js'/.test(sw), true);
+}
+
+console.log('\n■ 이어보기 판정 (2026-09-09)');
+{
+  const req = createRequire(import.meta.url);
+  const R = req('../resume.js');
+  const HOUR = 3600e3;
+  const now = 1757400000000;
+  const base = (o) => Object.assign({ v: 1, at: now - 5 * 60e3, screen: 'explore', scroll: { explore: 240 } }, o || {});
+  const dec = (saved, opts) => R.resumeDecide(Object.assign({ saved, now, hasProfile: true, search: '', hash: '' }, opts || {}));
+
+  /* ── 창 안 = 하던 화면 그대로 (개발자 지시 ①) ── */
+  eq('5분 만에 오면 하던 탭', dec(base()).screen, 'explore');
+  eq('그때 스크롤도 이어진다', dec(base()).scroll, 240);
+  eq('보던 공고가 다시 열린다', dec(base({ sheet: { kind: 'detail', id: 'reg-x' } })).sheet, 'reg-x');
+
+  /* ── 창을 넘기면 홈. 하지만 쓰던 것은 안 버린다 (개발자 지시 ②) ── */
+  const stale = base({ at: now - 5 * HOUR, form: { schId: 'reg-y', ans: { a: 1 }, at: now - 5 * HOUR } });
+  eq('5시간 만에 오면 홈', dec(stale).screen, 'home');
+  eq('그래도 쓰던 신청서는 남아 있다', (dec(stale).resumeCard || {}).schId, 'reg-y');
+  eq('창을 넘겼으니 자동으로 열지는 않는다', dec(stale).form, null);
+
+  /* 🔴 창(어디로 가는가)과 보관 기한(언제 버리는가)은 **다른 값**이다 */
+  eq('창과 보관 기한이 같은 값이 아니다', R.RESUME_WINDOW_MS === R.RESUME_KEEP_MS, false);
+  const ancient = base({ at: now - 30 * 24 * HOUR, form: { schId: 'reg-y', ans: {}, at: now - 30 * 24 * HOUR } });
+  eq('보관 기한(7일)을 넘긴 진행분은 버린다', dec(ancient).resumeCard, null);
+
+  /* ── 창 안에 신청서를 쓰고 있었으면 그 신청서로 ── */
+  const wip = base({ sheet: { kind: 'form', id: 'reg-z' }, form: { schId: 'reg-z', ans: { a: 1 }, at: now - 60e3 } });
+  eq('쓰던 신청서를 그대로 연다', (dec(wip).form || {}).schId, 'reg-z');
+  eq('그때 공고 상세는 안 연다 (둘이 겹치지 않는다)', dec(wip).sheet, null);
+
+  /* ── 알림·로그인 복귀가 이긴다 (나중에 덮으면 화면이 두 번 바뀐다) ── */
+  eq('알림으로 열면 이어보기가 손을 뗀다', dec(base(), { search: '?sch=reg-a' }).skip, true);
+  eq('화면 딥링크도 마찬가지', dec(base(), { search: '?screen=my' }).skip, true);
+  eq('로그인 복귀 토큰도 마찬가지', dec(base(), { hash: '#access_token=abc' }).skip, true);
+
+  /* ── 온보딩 진행분은 창과 상관없이 되살린다 (학교·학년을 다시 치게 하지 않는다) ── */
+  const ob = { step: 3, fields: { 'in-school': '경희대학교' }, at: now - 3 * 24 * HOUR };
+  const noProf = dec(base({ at: now - 3 * 24 * HOUR, onboard: ob }), { hasProfile: false });
+  eq('프로필이 없으면 온보딩으로', noProf.screen, 'onboarding');
+  eq('사흘 뒤에 와도 치던 단계에서 잇는다', (noProf.onboard || {}).step, 3);
+
+  /* ── 없는 장부·손상된 장부에서도 안 죽는다 ── */
+  eq('장부가 없으면 홈', dec(null).screen, 'home');
+  eq('손상된 장부는 없는 것으로', dec({ nope: 1 }).screen, 'home');
+  eq('모르는 화면 이름은 홈으로', dec(base({ screen: 'wat' })).screen, 'home');
+  /* 폰 시각이 뒤로 갔을 때 — 창 판정이 한쪽으로 쏠리면 안 된다 */
+  eq('시계가 미래면 창 밖으로 본다', dec(base({ at: now + 10 * HOUR })).fresh, false);
+
+  /* 🔴 진행분은 **기기 밖으로 안 나간다** — 프로필 장부와 다른 열쇠여야 한다.
+     여기엔 학생이 신청서에 쓴 글이 들어가고, 저쪽은 로그인하면 서버로 올라간다. */
+  const appJs = readText(new URL('../app.js', import.meta.url));
+  eq('이어보기 열쇠가 프로필 열쇠와 다르다', R.RESUME_KEY === 'handaejang.v1', false);
+  eq('이어보기 값을 state 에 넣지 않는다', /state\.resume\b/.test(appJs), false);
+
+  /* 🔴 답을 넣는 함수와 빼는 함수가 **같은 칸 종류**를 다뤄야 한다 —
+     어긋나면 되살릴 때 조용히 빈 칸이 된다. */
+  const formsJs = readText(new URL('../forms.js', import.meta.url));
+  const kindsOf = (fn) => {
+    const i = formsJs.indexOf('function ' + fn);
+    const body = formsJs.slice(i, formsJs.indexOf('\nfunction ', i + 10));
+    return [...new Set([...body.matchAll(/f\.type === '([a-z+]+)'/g)].map((m) => m[1]))].sort();
+  };
+  eq('collectFormAnswers 와 fillFormAnswers 가 같은 칸 종류를 다룬다',
+    kindsOf('fillFormAnswers'), kindsOf('collectFormAnswers'));
+
+  /* 🔴 `beforeunload` 로 저장하면 휴대폰에서 안 불린다 — 이탈한 그 순간을 못 적는다 */
+  eq('앱이 숨는 순간에 적는다 (beforeunload 가 아니라 visibilitychange)',
+    /visibilitychange[\s\S]{0,200}resumeMark/.test(appJs), true);
+
+  /* ── 2026-09-09 코드 리뷰에서 잡힌 다섯 (되돌아오면 조용히 망가지는 것들) ── */
+
+  /* ① 시트를 닫으면 `formFill` 도 내려야 한다. 안 내리면 같은 시트를 쓰는 일괄 준비에서
+     체크만 해도 **칸 없는 화면의 빈 답이 좋은 답을 덮는다.** */
+  const closeBody = appJs.slice(appJs.indexOf('function closeSheet'), appJs.indexOf('function closeSheet') + 1200);
+  eq('closeSheet 가 formFill 을 내린다', /formFill = null/.test(closeBody), true);
+
+  /* ② 질문 화면이 안 떠 있으면 답을 모으지 않는다 (같은 이유) */
+  const saveBody = appJs.slice(appJs.indexOf('function formProgressSave'), appJs.indexOf('function formProgressClear'));
+  eq('질문 화면이 떠 있을 때만 답을 모은다', /btn-ff-generate/.test(saveBody), true);
+
+  /* ③ '질문 다시 보기'는 쓴 답을 들고 돌아간다 (안 그러면 빈 화면이 그대로 장부에 적힌다) */
+  eq("'질문 다시 보기'가 답을 들고 돌아간다",
+    /btn-ff-back[\s\S]{0,260}renderFormFill\(\s*\{\s*ans:/.test(appJs), true);
+
+  /* ④ id 없는 체크박스(특별자격·보유 장학금)도 담는다 — 매칭을 좌우하는 값들이다 */
+  eq('온보딩 갈무리가 id 없는 체크박스도 담는다', /check-list[\s\S]{0,200}checked/.test(appJs), true);
+  eq('되살릴 때 캠퍼스 칸을 다시 그린다', /renderCampusChips\(campus\)/.test(appJs), true);
+
+  /* ⑥ 🔴 부팅 화면에 **바닥값**이 있어야 한다 (2026-09-09 개발자 지적:
+     "환영 화면이 나타났지만 사용자가 겨우 볼 수 있을 만큼 시간이 짧았어").
+     바닥값이 없으면 보이는 길이가 **앱 코드가 실리는 데 걸린 시간 그대로**라 기기마다
+     들쭉날쭉하고, 캐시가 데워진 폰에서는 깜빡이고 만다. */
+  const bootJs2 = readText(new URL('../boot.js', import.meta.url));
+  const minMs = Number((bootJs2.match(/BOOT_MIN_SHOW_MS\s*=\s*(\d+)/) || [])[1]);
+  eq('부팅 화면에 최소로 보여 주는 시간이 있다', minMs > 0, true);
+  eq('그 시간을 실제로 기다린다 (선언만 해 두지 않는다)',
+    /BOOT_MIN_SHOW_MS\s*-\s*sinceShown\(\)/.test(bootJs2), true);
+  eq('시한(6초)보다는 짧다', minMs < Number((bootJs2.match(/BOOT_TIMEOUT_MS\s*=\s*(\d+)/) || [])[1]), true);
+  /* 🔴 **시안에서 개발자가 보고 고른 값과 같아야 한다** — 갈라지면 승인받은 것과 다른 것이 나간다.
+     ⚠️ 750 을 못 박지 않는다(2026-09-09 코드 리뷰): 개발자가 나중에 값을 바꾸기로 하고 시안·앱을
+        **함께** 고치면, 못 박아 둔 검사가 '둘이 다르다'는 라벨로 빨간불을 낸다 — 없는 불일치를
+        있다고 말하는 것이라 다음 세션이 엉뚱한 곳을 뒤진다. 재는 것은 '둘이 같은가' 하나다. */
+  const mock = readText(new URL('../docs/designs/mockups/first-run/Main.dc.html', import.meta.url));
+  const mockMs = Number((mock.match(/booting:\s*false\s*\}\);\s*resolve\(\);\s*\},\s*(\d+)\)/) || [])[1]);
+  eq('시안에서 값을 읽어 냈다 (읽기 실패는 NaN 이라 조용히 통과하면 안 된다)', Number.isFinite(mockMs), true);
+  eq('시안이 쓰는 값과 앱이 쓰는 값이 같다', minMs, mockMs);
+
+  /* ⑨ 🔴 부팅 화면의 **등장 움직임** (2026-09-09 개발자 지시: "로고나 글자가 애니메이션
+     형태로 나타난다. 하지만 앱의 신뢰성을 떨어뜨리지 않으면서도 깔끔해야 한다").
+     지키는 것은 그 두 조건을 옮긴 셋이다 — 셋 다 값이 어긋나면 조용히 나빠지는 유형이라
+     글로만 적어 두면 다음 세션이 되돌린다. */
+  const css = readText(new URL('../style.css', import.meta.url));
+  const bootMock = readText(new URL('../docs/designs/mockups/first-run/Boot.dc.html', import.meta.url));
+  /* 이름으로 그 애니메이션이 쓰인 선언 한 줄을 집어 초 단위 값만 읽는다.
+     shorthand 는 앞의 시간이 길이, 뒤의 시간이 늦추기다. */
+  const useOf = (text, name) => {
+    const decl = (text.match(new RegExp('animation:[^;]*\\b' + name + '\\b[^;]*;')) || [''])[0];
+    const seg = decl.split(',').find((s) => s.includes(name)) || '';
+    /* cubic-bezier 안의 숫자에는 s 가 안 붙으므로 여기서 걸리지 않는다 */
+    const secs = [...seg.matchAll(/([\d.]+)s\b/g)].map((m) => Number(m[1]) * 1000);
+    return { dur: secs[0], delay: secs[1] || 0, decl };
+  };
+  const logoIn = useOf(css, 'boot-in-logo');
+  const wordIn = useOf(css, 'boot-in-word');
+  const spinIn = useOf(css, 'boot-spin-in');
+  eq('로고에 등장 움직임이 있다', Number.isFinite(logoIn.dur), true);
+  eq('글자에 등장 움직임이 있다', Number.isFinite(wordIn.dur), true);
+
+  /* ㉮ **바닥값보다 일찍 끝난다.** 걷히는 순간까지 움직이고 있으면 급해 보인다 —
+     끝나고 고요한 시간이 남아야 '차분히 놓였다'로 읽힌다. */
+  eq('로고 등장이 최소 노출 시간 안에 끝난다', logoIn.dur + logoIn.delay < minMs, true);
+  eq('글자 등장이 최소 노출 시간 안에 끝난다', wordIn.dur + wordIn.delay < minMs, true);
+
+  /* ㉯ **한 번만 나타나고 멈춘다.** 로고·글자가 계속 움직이면 '들어왔다'가 아니라
+     '아직도 로딩 중'으로 읽힌다 — 그게 신뢰를 깎는 자리다. */
+  eq('로고가 계속 움직이지 않는다', /infinite/.test(logoIn.decl), false);
+  eq('글자가 계속 움직이지 않는다', /infinite/.test(wordIn.decl), false);
+
+  /* ㉰ 계속 도는 표시는 **바닥값이 지난 뒤에야** 나온다 — 앱이 제때 오면 학생은 못 본다.
+     처음부터 띄우면 빠른 기기에서도 매번 '기다리는 화면'이 된다. */
+  eq('도는 표시가 최소 노출 시간이 지난 뒤에 나타난다', spinIn.delay > minMs, true);
+
+  /* 🔴 그 표시는 등장 애니메이션이 opacity 를 올리므로, 움직임을 줄인 기기에서
+     `animation: none` 만 주면 **영영 안 보인다**(느린 기기에서 아무 표시도 없는 빈 화면). */
+  const reduce = css.slice(css.indexOf('@media (prefers-reduced-motion: reduce)', css.indexOf('.boot-spin')));
+  eq('움직임을 줄인 기기에서 로고·글자 등장을 끈다',
+    /\.boot-logo,\s*\.boot-word\s*\{\s*animation:\s*none/.test(reduce.slice(0, 400)), true);
+  eq('그때 도는 표시는 보이게 되돌린다 (안 그러면 영영 안 보인다)',
+    /\.boot-spin\s*\{\s*animation:\s*none;\s*opacity:\s*1/.test(reduce.slice(0, 400)), true);
+
+  /* 🔴 시안과 앱이 갈라지지 않는다 — 값을 못 박지 않고 **둘이 같은가**만 잰다(위 ⑥과 같은 이유) */
+  eq('시안의 로고 등장이 앱과 같다',
+    [logoIn.dur, logoIn.delay], [useOf(bootMock, 'boot-in-logo').dur, useOf(bootMock, 'boot-in-logo').delay]);
+  eq('시안의 글자 등장이 앱과 같다',
+    [wordIn.dur, wordIn.delay], [useOf(bootMock, 'boot-in-word').dur, useOf(bootMock, 'boot-in-word').delay]);
+  eq('시안의 도는 표시 지연이 앱과 같다', spinIn.delay, useOf(bootMock, 'boot-spin-in').delay);
+
+  /* ⑧ 🔴 알림 딥링크는 **공고 목록이 올 때까지 기다린다** (2026-09-09 개발자 지적).
+     한 번 보고 없으면 탐색 탭으로 보내던 것이 원인이었다 — 회선이 느린 폰에서는 늘 그랬다. */
+  const notifyJs = readText(new URL('../notify.js', import.meta.url));
+  const launchBody = notifyJs.slice(notifyJs.indexOf('function notifyHandleLaunch'),
+    notifyJs.indexOf('function notifyHandleLaunch') + 2000);
+  eq('알림 딥링크가 공고를 기다렸다 연다 (한 번 보고 포기하지 않는다)',
+    /setTimeout\(tryOpen/.test(launchBody), true);
+  eq('그래도 무한정 기다리지는 않는다 (시한이 있다)', /DEADLINE/.test(launchBody), true);
+
+  /* ⑦ 홈 줄의 말은 개발자가 정한 그대로다 (2026-09-09 지시) */
+  eq("홈 줄의 버튼 문구가 '신청서 마저 쓰기' 다",
+    /rc-go">신청서 마저 쓰기</.test(appJs), true);
+
+  /* ⑤ 🔴 데이터 초기화가 이어보기 장부까지 지운다 — 안 지우면 '지웠다'가 거짓말이 된다
+     (그 장부에 이름·학번·전화·계좌번호와 신청서에 쓴 글이 들어 있다) */
+  const resetAt = appJs.indexOf('[STORAGE_KEY, ...LEGACY_KEYS].forEach');
+  eq('데이터 초기화가 이어보기 장부도 지운다',
+    /resumeClear\(\)/.test(appJs.slice(resetAt, resetAt + 600)), true);
+}
+
+/* ══ 손짓과 움직임 (2026-09-09) ══════════════════════════════════════════
+   브라우저 검사(verify/verify-interactions.js)가 동작을 지키고, 여기서는 **브라우저로는
+   못 보거나 늦게야 보이는 함정 넷**을 실행 전에 잡는다. */
+{
+  console.log('\n■ 손짓과 움직임');
+  const appJs = readText(new URL('../app.js', import.meta.url));
+  const inter = readText(new URL('../interactions.js', import.meta.url));
+  const css = readText(new URL('../style.css', import.meta.url));
+  const html = readText(new URL('../index.html', import.meta.url));
+  const sw = readText(new URL('../sw.js', import.meta.url));
+
+  /* 🔴 ① `.app` 에 transform 을 걸면 그 안의 `position: fixed`(하단 탭·시트·도우미 단추)가
+     화면이 아니라 `.app` 을 기준으로 자리를 잡아 함께 밀린다. 눈으로는 '조금 어긋난' 정도라
+     검사를 통과해 버리기 쉬워서 글자로 못 박는다. */
+  eq('당겨서 새로고침이 .app 을 옮기지 않는다 (그 안에 fixed 가 산다)',
+    /querySelector\('\.app'\)\.style\.transform\s*=/.test(inter), false);
+
+  /* 🔴 ② 튕김 표시를 떼는 시간은 CSS 움직임보다 길어야 한다 — 짧으면 움직임이 중간에 잘린다 */
+  const popClear = Number((inter.match(/POP_CLEAR_MS\s*=\s*(\d+)/) || [])[1]);
+  const cssMs = [...css.matchAll(/animation:\s*save-(?:pop|ring)\s+([\d.]+)s/g)].map((m) => Number(m[1]) * 1000);
+  eq('튕김 표시 제거 시간을 읽어 냈다', Number.isFinite(popClear) && cssMs.length === 2, true);
+  eq('그 시간이 CSS 움직임보다 길다', cssMs.every((v) => popClear > v), true);
+
+  /* 🔴 ③ 새 파일이 서비스워커 목록에서 빠지면 **오프라인에서만** 앱이 죽는다
+     (2026-08-01 로그인 파일에서 겪은 것과 같은 유형). */
+  eq('interactions.js 가 index.html 에 실린다', /src="interactions\.js"/.test(html), true);
+  eq('interactions.js 가 서비스워커 목록에 있다', /'interactions\.js'/.test(sw), true);
+  eq('그리고 app.js 보다 **먼저** 실린다 (app.js 가 카드를 그릴 때 부른다)',
+    html.indexOf('src="interactions.js"') < html.indexOf('src="app.js"'), true);
+
+  /* 🔴 ④ 마감 막대는 판정을 새로 만들지 않는다 — `dday()` 가 낸 값을 받아서 그릴 뿐이다.
+     여기에 날짜 계산이 들어오면 카드의 배지와 막대가 서로 다른 말을 하게 된다. */
+  eq('막대 규칙 파일에 날짜 계산이 없다 (dday 가 낸 값만 받는다)',
+    /new Date\(|Date\.now\(\)\s*[-/]/.test(inter.slice(0, inter.indexOf('function haptic'))), false);
+  eq('막대 문턱이 dday 의 urgent 문턱(7일)과 같다',
+    Number((inter.match(/DEADLINE_WINDOW_DAYS\s*=\s*(\d+)/) || [])[1]) === 7
+    && /d <= 7\) return \{ label: `D-\$\{d\}`, cls: 'urgent'/.test(appJs), true);
+
+  /* 🔴 ⑤ 진동은 **되돌리기 어려운 일**에만 — 화면이 바뀔 때마다 울리면 학생이 앱 진동을
+     통째로 꺼 버린다. 부르는 곳이 늘어나면 여기서 먼저 걸린다(늘릴 거면 이 숫자를 함께 고친다). */
+  const hapticCalls = (appJs.match(/haptic\(/g) || []).length;
+  eq(`앱이 진동을 부르는 곳은 셋뿐이다 (지금 ${hapticCalls}곳)`, hapticCalls <= 3, true);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');

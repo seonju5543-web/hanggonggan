@@ -198,6 +198,7 @@ input::placeholder { color: var(--text-weak); }
   flex-direction: column;
   padding-bottom: 24px;
 }
+.onboard-progress[hidden] { display: none !important; }
 .onboard-progress {
   height: 4px;
   background: rgba(18, 22, 31, 0.07);
@@ -3171,4 +3172,454 @@ button, input, select, textarea { letter-spacing: inherit; }
   .sort-opt:hover { background: transparent; }
   .sort-btn:hover { background: transparent; border-color: var(--line); }
   .wallet-label:hover { color: var(--text); }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   달력 보기 · 공고 저장(북마크) · 보관함 — 2026-09-07 (노션 UI-21)
+
+   🔴 색은 이 앱의 팔레트를 그대로 쓴다. 설계서에는 '파랑'이라 적혀 있지만 이 앱에는
+      파랑이 없다(2026-08-31 팔레트 정리에서 'AI 블루'를 걷어냈다) — 강조는 놋쇠
+      하나뿐이다. 뜻은 그대로 지키고 색만 이 집 것으로 바꾼 것이다.
+   🔴 **색만으로 가르지 않는다.** 점의 모양이 먼저다(채운 점 / 반만 채운 점 / 빈 점) —
+      색각 이상이 있는 학생과 흑백 화면에서 색은 아무 말도 하지 않는다.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── 북마크 단추 ─────────────────────────────────────────────
+   🔴 `.sch-card` 가 <button> 이라 그 **안**에는 단추를 넣을 수 없다.
+      감싸개가 자리를 잡고 단추는 카드 위에 얹힌다. */
+.sch-card-wrap { position: relative; }
+.sch-card-wrap > .sch-card { width: 100%; }
+/* 카드 오른쪽 위는 단추 자리 — 배지가 그 아래로 흐르지 않게 자리를 비운다 */
+.sch-card-wrap > .sch-card .sch-top { padding-right: 34px; }
+
+.save-btn {
+  position: absolute;
+  top: 10px; right: 8px;
+  z-index: 2;
+  width: 40px; height: 40px;          /* 터치 타깃 — 보이는 아이콘보다 크게 */
+  display: flex; align-items: center; justify-content: center;
+  background: none; border: 0; padding: 0;
+  color: var(--text-weak);
+  cursor: pointer;
+  border-radius: var(--radius-xs);
+  transition: color 0.15s, transform 0.12s;
+}
+.save-btn svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linejoin: round; }
+.save-btn:hover { color: var(--text-sub); }
+.save-btn:active { transform: scale(0.9); }
+.save-btn.on { color: var(--accent); }
+.save-btn.on svg { fill: currentColor; }
+/* 상세 시트에서는 배지 줄 오른쪽 끝에 붙는다(카드처럼 떠 있지 않는다) */
+.sheet-top { position: relative; padding-right: 40px; }
+.sheet-top > .save-btn { top: -8px; right: -6px; }
+
+.sheet-schedule {
+  font-size: var(--t-sm);
+  color: var(--text-sub);
+  margin: 2px 0 0;
+}
+
+/* ── 달력 ────────────────────────────────────────────────── */
+.cal { margin-top: 4px; }
+.cal-head {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  margin-bottom: 2px;
+}
+.cal-month { font-size: var(--t-lg); font-weight: 800; letter-spacing: -0.01em; min-width: 8.5em; text-align: center; }
+.cal-nav {
+  width: 40px; height: 40px;
+  background: none; border: 0; cursor: pointer;
+  font-size: var(--t-2xl); line-height: 1; color: var(--text-sub);
+  border-radius: var(--radius-xs);
+}
+.cal-nav:hover { background: var(--surface-2); color: var(--text); }
+.cal-sum { text-align: center; font-size: var(--t-sm); color: var(--text-sub); margin: 0 0 14px; }
+
+.cal-dow { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.cal-dow span {
+  text-align: center; font-size: var(--t-2xs); font-weight: 700;
+  color: var(--text-weak); padding-bottom: 6px;
+}
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+
+.cal-cell {
+  aspect-ratio: 1 / 1;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 6px 0 0;
+  background: none; border: 0; cursor: pointer;
+  border-radius: var(--radius-xs);
+  font-variant-numeric: tabular-nums;
+  transition: background 0.12s;
+}
+.cal-cell:hover { background: var(--surface-2); }
+.cal-pad { pointer-events: none; }
+.cal-num { font-size: var(--t-sm); color: var(--text-sub); line-height: 1; }
+.cal-today { background: var(--surface-2); }
+.cal-today .cal-num { color: var(--text); font-weight: 800; }
+.cal-picked { background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent-line); }
+
+.cal-dots { display: flex; align-items: center; gap: 3px; min-height: 9px; }
+.cal-more { font-size: var(--t-2xs); font-style: normal; color: var(--text-weak); font-weight: 700; line-height: 1; }
+
+/* 점 — 모양이 뜻을 지고 색은 거든다 */
+.cal-dot { width: 7px; height: 7px; border-radius: 50%; flex: none; display: inline-block; position: relative; }
+.cal-dot-mine { background: var(--accent); }                       /* ● 내 공고 마감 */
+/* 발표 — **마감과 같은 모양**의 빨간 점 (2026-09-07 개발자 지시).
+   반달(◐)은 작은 점에서 잘 안 보여, 마감 점과 같은 꼴로 두고 색만 가른다.
+   ⚠️ 그래서 이 둘은 **색으로만 갈린다** — 색각 이상이 있는 학생에게는 같아 보인다.
+      범례와, 날짜를 열었을 때의 줄('발표 예정' · '접수 마감')이 그 자리를 메운다. */
+.cal-dot-wait { background: var(--red); }
+
+.cal-legend {
+  display: flex; flex-wrap: wrap; gap: 12px;
+  margin-top: 14px; padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.cal-legend span { display: flex; align-items: center; gap: 5px; font-size: var(--t-2xs); color: var(--text-sub); }
+
+/* ── 하루를 펼친 목록 ─────────────────────────────────────── */
+.cal-day:empty { display: none; }
+.cal-day { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--rule); }
+.cal-day-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.cal-day-head h4 { font-size: var(--t-lg); font-weight: 800; margin: 0; }
+.cal-day-close {
+  background: none; border: 0; cursor: pointer; padding: 6px 4px;
+  font-size: var(--t-sm); font-weight: 700; color: var(--text-sub);
+}
+.cal-sec {
+  font-size: var(--t-2xs); font-weight: 800; letter-spacing: 0.04em;
+  color: var(--text-weak); margin: 16px 0 8px;
+}
+.cal-sec:first-of-type { margin-top: 6px; }
+.cal-why { font-size: var(--t-2xs); font-weight: 700; color: var(--accent); margin: 10px 0 4px; }
+.cal-note { font-size: var(--t-2xs); color: var(--text-weak); margin: 0 0 8px; }
+
+.cal-row {
+  display: flex; flex-direction: column; gap: 3px;
+  width: 100%; text-align: left;
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 12px 13px; margin-bottom: 7px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.cal-row:hover { background: var(--surface-2); }
+.cal-row-top { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+.cal-row-top:empty { display: none; }
+.cal-row-name { font-size: var(--t-md); font-weight: 700; line-height: 1.4; }
+.cal-row-sub { font-size: var(--t-sm); color: var(--text-sub); }
+
+.badge-form { background: var(--accent-soft); color: var(--accent); }
+
+/* 접어 두는 묶음 — 층2(재단 목록)와 마감된 저장 공고가 같은 모양을 쓴다 */
+.cal-kosaf { margin-top: 14px; }
+.cal-kosaf > summary {
+  cursor: pointer; list-style: none;
+  font-size: var(--t-sm); font-weight: 700; color: var(--text-sub);
+  padding: 10px 0;
+}
+.cal-kosaf > summary::-webkit-details-marker { display: none; }
+.cal-kosaf > summary::after { content: ' ▾'; color: var(--text-weak); }
+.cal-kosaf[open] > summary::after { content: ' ▴'; }
+
+/* 신청 내역 머리의 단추 둘은 한 묶음으로 — 셋이 space-between 이면 달력 단추가
+   가운데에 뜬다(2026-09-07 코드 리뷰) */
+.apps-header-actions { display: flex; align-items: center; gap: 8px; }
+
+/* 보관함 줄 — 북마크 단추가 줄 바깥에 얹힌다(카드와 같은 이유) */
+.cal-row-wrap { position: relative; }
+.cal-row-wrap > .cal-row { width: 100%; }
+.cal-row-wrap > .cal-row .cal-row-top { padding-right: 32px; }
+.cal-row-wrap > .save-btn { top: 4px; right: 2px; }
+
+/* ── 보관함 ──────────────────────────────────────────────── */
+.my-card-title { font-size: var(--t-lg); font-weight: 800; letter-spacing: -0.01em; margin: 0 0 4px; }
+#my-saved .cal-sec:first-of-type { margin-top: 14px; }
+
+/* ══ 부팅 화면 (2026-09-09 · 노션 원문 목록 4번) ═══════════════════════════
+   설계: docs/designs/first-run-and-resume.md
+   🔴 배경은 manifest.json 의 background_color · <meta theme-color> 와 **같은 값**이다.
+      안드로이드 설치형은 그 색으로 제 스플래시를 그리므로, 다르면 켤 때 색이 한 번 튄다.
+   🔴 여기에 태그라인("한 번에 찾고…")을 넣지 말 것 — 매 실행 뜨는 자리라 광고가 된다.
+      그건 환영 화면(온보딩 0단계)의 말이고, 그 화면은 처음 한 번만 뜬다. */
+#boot {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: #fefdfc;   /* = --bg · manifest background_color */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  opacity: 1;
+  transition: opacity 0.12s ease;   /* boot.js 가 이 값을 읽어 걷는 시각을 맞춘다 */
+}
+#boot.boot-out { opacity: 0; pointer-events: none; }
+#boot[hidden] { display: none !important; }
+.boot-logo {
+  width: 88px; height: 88px;
+  border-radius: var(--radius-lg);
+  background: var(--grad-navy);
+  color: #f6f0e2;
+  display: flex; align-items: center; justify-content: center;
+}
+.boot-logo svg { width: 44px; height: 44px; }
+.boot-word {
+  margin: 0;
+  font-size: var(--t-hero);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  color: var(--navy-1);
+  line-height: 1;
+}
+
+/* ── 등장 움직임 (2026-09-09 개발자 지시) ────────────────────────────────
+   *"로고나 글자가 애니메이션 형태로 나타난다. 하지만 앱의 신뢰성을 떨어뜨리지 않으면서도
+   깔끔해야 한다."* 그 두 조건을 셋으로 옮겼다.
+
+   ① **한 번만 나타나고 멈춘다.** 로고·글자에는 `infinite` 를 절대 쓰지 않는다 —
+      1초 떠 있는 화면에서 계속 움직이는 것은 '들어왔다'가 아니라 '아직도 로딩 중'으로 읽힌다.
+      계속 도는 것은 아래 `.boot-spin` 하나뿐이고, 그건 실제로 오래 걸릴 때만 나온다.
+   ② **바닥값(1초)보다 일찍 끝난다.** 로고 0.02+0.44 · 글자 0.16+0.40 → 둘 다 0.56초에 끝나
+      화면이 걷히기 전 **0.44초가 고요하다.** 그 정지가 '차분하다'는 인상을 만든다 —
+      움직임이 걷히는 순간까지 이어지면 급해 보인다.
+      🔴 이 값을 늘릴 때는 boot.js 의 `BOOT_MIN_SHOW_MS` 보다 작게 유지할 것.
+         관문: verify/test-collector.mjs '첫 실행 화면' 절이 대소를 검사한다.
+   ③ **튀지 않는다.** 되튐(overshoot)·회전·번쩍임·글자 하나씩 나타내기를 쓰지 않는다.
+      그런 것이 장난감처럼 보이게 만든다 — 여기는 학생이 장학금 정보를 맡기는 앱의 첫 화면이다.
+      감속 곡선 하나로 '놓였다'는 느낌만 준다. 바뀌는 것은 opacity·transform 뿐이라
+      레이아웃을 다시 계산하지 않는다(B-3 모션 점검 규칙). */
+.boot-logo { animation: boot-in-logo 0.44s cubic-bezier(0.22, 0.61, 0.36, 1) 0.02s both; }
+.boot-word { animation: boot-in-word 0.40s cubic-bezier(0.22, 0.61, 0.36, 1) 0.16s both; }
+@keyframes boot-in-logo {
+  from { opacity: 0; transform: scale(0.94) translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes boot-in-word {
+  from { opacity: 0; transform: translateY(9px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* 오래 걸릴 때만 나오는 표시.
+   🔴 **바닥값(1초)이 지난 뒤에 나타난다**(1.2초). 앱이 제때 오면 화면이 1.12초에 걷히므로
+      학생은 이걸 아예 못 본다 — 그게 맞다. 이게 보인다는 것은 '평소보다 오래 걸린다'는 뜻이고,
+      그 말이 사실일 때만 해야 한다. 처음부터 띄우면 빠른 기기에서도 매번 '기다리는 화면'이 된다. */
+.boot-spin {
+  position: absolute; bottom: 92px;
+  width: 26px; height: 26px;
+  border-radius: var(--radius-pill);
+  border: 2px solid rgba(25, 23, 19, 0.10);
+  border-top-color: rgba(25, 23, 19, 0.34);
+  opacity: 0;
+  animation: boot-spin 0.8s linear infinite, boot-spin-in 0.3s ease 1.2s forwards;
+}
+.boot-spin[hidden] { display: none !important; }
+@keyframes boot-spin { to { transform: rotate(360deg); } }
+@keyframes boot-spin-in { to { opacity: 1; } }
+/* 시한이 지났을 때 — 무슨 일인지 말하고 다시 시도하게 한다 */
+.boot-fail { position: absolute; bottom: 64px; left: 24px; right: 24px; text-align: center; }
+.boot-fail[hidden] { display: none !important; }
+.boot-fail p {
+  margin: 0 0 14px;
+  font-size: var(--t-md);
+  color: var(--text-sub);
+  line-height: 1.6;
+}
+.boot-fail .btn { width: 100%; }
+/* 움직임을 줄여 달라고 한 기기에서는 돌리지도, 나타나지도 않는다.
+   🔴 `.boot-spin` 은 `opacity: 1` 을 **같이** 되돌려야 한다 — 등장 애니메이션이 opacity 를
+      올리고 있으므로 `animation: none` 만 쓰면 표시가 영영 안 보인다(오래 걸리는 기기에서
+      아무 표시도 없이 빈 화면이 된다). */
+@media (prefers-reduced-motion: reduce) {
+  .boot-logo, .boot-word { animation: none; }
+  .boot-spin { animation: none; opacity: 1; }
+  #boot { transition: none; }
+}
+
+/* ── 홈 '이어서 쓰기' 줄 (2026-09-09) ────────────────────────────────────
+   창(4시간)을 넘겨 들어와도 **쓰던 것은 안 버린다**는 개발자 지시 ②의 자리.
+   자동으로 신청서를 열지 않고 여기 한 줄로 되살린다 — 반쯤 열린 폼을 갑자기 띄우면
+   학생이 자기가 어디 있는지 모른다. */
+.resume-card {
+  width: 100%;
+  margin-top: 14px;
+  background: var(--surface);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--radius);
+  padding: 15px 17px;
+  box-shadow: var(--shadow);
+  display: flex; align-items: center; gap: 13px;
+  text-align: left;
+}
+.resume-card .rc-ico { color: var(--accent); display: flex; flex-shrink: 0; }
+.resume-card .rc-ico svg { width: 22px; height: 22px; }
+/* 🔴 안쪽 두 줄은 `<span>` 이라 **블록으로 만들어야** 한다 (2026-09-09 코드 리뷰):
+   인라인인 채로는 `margin-top`·`overflow`·`text-overflow` 가 전부 무시돼, 두 줄이 한 줄로
+   붙고 긴 공고 이름이 잘리지 않고 카드 밖으로 삐져나온다. */
+.resume-card .rc-body { flex: 1; min-width: 0; }
+.resume-card .rc-title {
+  display: block;
+  font-size: var(--t-md); font-weight: 700; letter-spacing: -0.01em;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.resume-card .rc-sub {
+  display: block;
+  font-size: var(--t-xs); color: var(--text-sub); margin-top: 3px; line-height: 1.45;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.resume-card .rc-go { font-size: var(--t-sm); font-weight: 700; color: var(--accent); white-space: nowrap; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   손짓과 움직임 (2026-09-09) — 짝은 interactions.js
+
+   개발자 지적: *"인스타그램과 달리 사람냄새가 안나 … 정적이고 ai스럽다."*
+   색은 이미 정리돼 있었고 눌림·hover·focus 도 있었다. 없던 것은 시간과 손짓이다.
+   🔴 여기 넣는 움직임은 전부 위쪽 `prefers-reduced-motion` 묶음이 자동으로 끈다
+      (`*` 로 걸어 둔 곳이 이미 있다) — 그 묶음을 지우면 이것들도 같이 새 나간다.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* 눈에는 안 보이고 화면 낭독기만 읽는 글 — 뼈대가 '불러오는 중'이라고 말하는 자리 */
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+/* ── ③ 마감까지 남은 시간 (컨텍스트 바) ──────────────────────────────────
+   개발자 지시(2026-09-09): "밑에 빨간색으로 마감 기간 알려주는 것".
+   🔴 카드 맨 아래에만 둔다 — 위쪽은 이미 배지 줄이 자리를 쓴다.
+   🔴 색은 `--red` 하나다. 이 앱의 빨강은 채도를 낮춘 벽돌색이라(2026-08-31 팔레트 정리)
+      형광 빨강으로 되돌리면 화면에서 이 막대만 튄다. */
+.dl-meter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.dl-meter-track {
+  flex: 1;
+  height: 3px;
+  border-radius: var(--radius-pill);
+  background: rgba(25, 23, 19, 0.09);
+  overflow: hidden;
+}
+.dl-meter-fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--red);
+  /* 카드가 다시 그려질 때 폭이 스르르 자란다 — 마감이 다가온다는 느낌은 여기서 온다 */
+  transition: width var(--dur-slow) var(--ease);
+}
+.dl-meter-date {
+  font-size: var(--t-2xs);
+  font-weight: 700;
+  color: var(--red);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+/* 마감된 줄은 통째로 흐려지므로(`.sch-card:has(.badge-dday.closed)`) 막대도 함께 흐려진다 */
+
+/* ── ② 저장할 때 튕김 ────────────────────────────────────────────────────
+   인스타 더블탭 하트가 하는 일과 같다: 누른 순간 커졌다 제자리로.
+   진동은 interactions.js 의 haptic() 이 맡는다(CSS 로는 못 한다). */
+@keyframes save-pop {
+  0%   { transform: scale(1) }
+  38%  { transform: scale(1.38) }
+  62%  { transform: scale(0.92) }
+  100% { transform: scale(1) }
+}
+.save-btn.pop svg { animation: save-pop 0.42s var(--ease-spring); }
+/* 담기는 순간 한 번 번지는 고리 — 눈이 '어디를 눌렀는지' 따라가게 한다 */
+@keyframes save-ring {
+  0%   { transform: translate(-50%, -50%) scale(0.5); opacity: 0.5 }
+  100% { transform: translate(-50%, -50%) scale(2.1); opacity: 0 }
+}
+.save-btn.pop.on::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  pointer-events: none;
+  animation: save-ring 0.52s var(--ease) forwards;
+}
+
+/* ── ④ 기다리는 동안의 뼈대 ──────────────────────────────────────────────
+   🔴 이건 꾸밈이 아니다. 공고가 도착하기 전 홈이 "지금 신청 가능한 장학금 없음" 이라고
+      말하고 있었다 — 없는 게 아니라 아직 안 온 것이다. */
+/* 🔴 **그라데이션을 쓰지 않는다.** 흘러가는 빛줄기로 만들고 싶었지만 `ui-tone` 관문이
+   `--grad-navy` 밖의 gradient 를 막는다 — 2026-08-31 팔레트 정리가 "그라데이션은 AI 지문"
+   이라고 판정하고 세워 둔 관문이라, 반짝임 하나 때문에 그것을 느슨하게 하지 않는다.
+   대신 **밝기만 오르내린다**. 뜻(불러오는 중)은 똑같이 전해진다. */
+@keyframes skel-shimmer {
+  0%, 100% { opacity: 1 }
+  50%      { opacity: 0.42 }
+}
+.skel-list { border-top: 1px solid var(--line); }
+.skel-row {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 17px 20px;
+  border-bottom: 1px solid var(--line);
+}
+.skel {
+  display: block;
+  height: 12px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  animation: skel-shimmer 1.5s var(--ease) infinite;
+}
+.skel-badge { width: 84px; height: 17px; border-radius: var(--radius-xs); }
+.skel-title { width: 72%; height: 14px; }
+.skel-sub   { width: 44%; height: 11px; }
+/* 세 줄이 똑같이 반짝이면 기계처럼 보인다 — 아주 조금씩 어긋나게 시작한다 */
+.skel-row:nth-child(3) .skel { animation-delay: 0.12s; }
+.skel-row:nth-child(4) .skel { animation-delay: 0.24s; }
+
+/* ── ① 당겨서 새로고침 ───────────────────────────────────────────────────
+   🔴 `body` 에 붙는다(interactions.js 주석 참조) — `#app` 안에 두면 `position: fixed` 인
+      하단 탭·시트가 함께 밀린다. */
+.ptr {
+  position: fixed;
+  top: 8px;
+  left: 50%;
+  z-index: 60;
+  width: 30px; height: 30px;
+  /* 🔴 `margin-left: -15px` 를 두지 말 것 — 아래 `translateX(-50%)` 가 이미 가운데로 옮기므로
+     둘을 같이 쓰면 **두 번 옮겨져** 15px 왼쪽으로 치우친다 (2026-09-09 코드 리뷰가 실측). */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  opacity: 0;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.ptr-ring {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-line);
+  border-top-color: var(--accent);
+  transition: transform var(--dur) var(--ease);
+}
+/* 충분히 당겼다 — 놓으면 새로고침된다는 신호 */
+.ptr.ready .ptr-ring { transform: scale(1.15); border-color: var(--accent); border-top-color: var(--accent); }
+@keyframes ptr-spin { to { transform: rotate(360deg) } }
+/* 🔴 **당기는 중과 받아오는 중이 눈에 달라야 한다** (2026-09-09 코드 리뷰가 잡았다).
+   처음엔 `.ptr.spin` 의 테두리 색이 기본 `.ptr-ring` 과 **완전히 같아서**, 도는 것 말고는
+   구분이 없었다 — 움직임을 줄인 학생에게는 회전마저 꺼지니 '받아오는 중' 표시가 아예 없었다. */
+.ptr.spin .ptr-ring {
+  border-color: var(--accent);
+  border-right-color: transparent;
+  animation: ptr-spin 0.8s linear infinite;
+}
+/* 회전이 꺼지는 학생에게는 **색을 채워** 상태를 말한다 — 움직임이 아니라 모양으로 전한다 */
+@media (prefers-reduced-motion: reduce) {
+  .ptr.spin .ptr-ring { border-color: var(--accent); background: var(--accent-soft); }
 }
