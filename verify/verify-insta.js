@@ -1,0 +1,119 @@
+/** 인스타 카드 사실 관문 — 145건 전수로 잰다.
+ *  🔴 여기서 잡는 것은 전부 **실제로 났던 사고**다(2026-09-09 코드 리뷰).
+ *     고친 것이 되돌아오면 이 검사가 빨간불이 된다. */
+const { readFileSync } = require('node:fs');
+const { join } = require('node:path');
+const ROOT = join(__dirname, '..');
+const raw = readFileSync(join(ROOT, 'insta/render.mjs'), 'utf8');
+// 🔴 주석을 빼고 본다 — 안 그러면 '이렇게 하면 안 된다' 는 설명까지 위반으로 잡는다(실제로 그랬다).
+const src = raw.replace(/\/\*[\s\S]*?\*\//g, '').split('\n').filter((l) => !/^\s*(\/\/|\*)/.test(l)).join('\n');
+const items = (() => { const j = JSON.parse(readFileSync(join(ROOT, 'data/kosaf-open.json'), 'utf8')); return j.items || j; })();
+
+// 렌더러에서 규칙을 이름으로 떼어 온다 — 베끼면 갈라진다
+const pick = (name, re) => { const m = raw.match(re); if (!m) throw new Error(`${name} 를 render.mjs 에서 못 찾음`); return m; };
+const NEG = eval(pick('NEG', /const NEG = (\/.+?\/);/)[1]);
+const clamp = (s, n) => (s.length > n ? s.slice(0, n - 1).trimEnd() + '…' : s);
+const dropParen = eval('(' + pick('dropParen', /const dropParen = (\(t\) => t[\s\S]*?\.trim\(\));/)[1] + ')');
+const tidy = (s) => String(s || '').replace(/:{2,}/g, ':').replace(/\s{2,}/g, ' ').trim();
+const bullets = (s) => String(s || '').split(/\s*○\s*/)
+  .map((t) => tidy(t.replace(/\s*※\s*자세한 사항은[^○]*$/, ''))).filter(Boolean).filter((t) => !/기관확인필요/.test(t));
+
+let bad = 0;
+const fail = (tag, org, why) => { bad++; console.log(`  ✗ [${tag}] ${org} — ${why}`); };
+const today = new Date();
+
+console.log('■ 인스타 카드 사실 관문 —', items.length, '건');
+
+// C1 · 마감 지난 공고를 '모집 중' 이라 하지 않는다
+{
+  let past = 0;
+  for (const x of items) {
+    if (!x.due) continue;
+    const t = new Date(x.due + 'T23:59:59+09:00').getTime();
+    if (!Number.isNaN(t) && t - today < 0) past++;
+  }
+  if (!/state: 'past'/.test(src)) fail('C1', '-', "dday 가 '지남' 을 따로 안 가른다");
+  if (/'모집 중'/.test(src)) fail('C1', '-', "'모집 중' 문구가 아직 남아 있다");
+  console.log(`  · 마감 지난 공고 ${past}건 — '마감 지남' 으로 표시되는지 확인`);
+}
+// C2 · 금지어 · 학위 조건을 안 보는 표지 문구
+for (const w of ['무조건', '역대급', '꿀팁', '안 보면 손해'])
+  if (src.includes(`'${w}`) || src.includes(`>${w}`)) fail('C2', '-', `금지어 '${w}' 가 남아 있다`);
+// C3 · 개별 학생 판정 문구
+for (const w of ['신청 가능한 장학금', '받을 수 있어요', '해당됩니다'])
+  if (src.includes(w)) fail('C3', '-', `판정 문구 '${w}' 가 남아 있다`);
+// C4 · '분할' 을 '매달' 로 읽지 않는다
+{
+  const monthly = eval(pick('monthly', /const monthly = (\/.+?\/)\.test/)[1]);
+  for (const x of items) {
+    const raw = (x.fields || {})['지원금액'] || '';
+    if (/분할/.test(raw) && !/매월|매달/.test(raw) && monthly.test(raw))
+      fail('C4', x.org, `'분할' 을 매달로 읽음 — ${tidy(raw).slice(0, 40)}`);
+  }
+}
+// C5 · 사실 줄을 자르지 않는다 — 자르면 뜻이 뒤집히거나 조항이 사라진다
+// 🔴 2026-09-09 개발자 지시로 **자르기를 통째로 없앴다**("말 끊기지 말라했지").
+//    버리는 것은 지어내는 것과 같은 거짓이라, 대신 fitAll 이 글자를 줄여 전문을 담는다.
+{
+  // 사실 줄에 자르기가 되살아나면 잡는다 — 이름이 뭐든 `…` 를 붙이는 함수는 못 쓴다.
+  for (const m of raw.matchAll(/(who|traps|arr|L)\.map\(\(t[,)][^\n]*/g))
+    if (/\bclamp/.test(m[0])) fail('C5', '-', `사실 줄을 자른다 — ${m[0].trim().slice(0, 60)}`);
+  if (/const clamp\w* = /.test(src)) fail('C5', '-', '자르는 함수가 되살아났다');
+  if (!/shrinkToFit/.test(src)) fail('C5', '-', '브라우저 축소를 안 한다 — 긴 줄을 담을 방법이 없다');
+  // 🔴 축소 규칙은 insta/fit.mjs 한 곳. 베껴 두면 렌더는 초록불인데 검사만 빨간불이 된다.
+  for (const f of ['insta/render.mjs', 'insta/sweep-overflow.mjs']) {
+    const t = readFileSync(join(ROOT, f), 'utf8');
+    if (/getBoundingClientRect/.test(t)) fail('C5', '-', `${f} 가 축소 규칙을 베꼈다 — fit.mjs 를 쓸 것`);
+    if (!/from '\.\/fit\.mjs'/.test(t)) fail('C5', '-', `${f} 가 fit.mjs 를 안 쓴다`);
+  }
+  // 🔴 괄호를 걷어내다 부정어를 잃으면 그것부터가 사고다.
+  const whoLines0 = eval('(' + pick('whoLines', /const whoLines = (\([^)]*\) => (?:\{[\s\S]*?\n\}|[^\n]+));/)[1] + ')');
+  for (const x of items) {
+    const f = x.fields || {};
+    for (const t of [...bullets(f['자격제한']), ...whoLines0(f)]) {
+      const d = dropParen(t);
+      if (NEG.test(t) && !NEG.test(d)) fail('C5', x.org, `괄호를 걷다 부정어를 잃음 — ${d.slice(0, 40)}`);
+    }
+  }
+}
+// C6 · 지역·소득 조건이 조용히 사라지지 않는다
+// 🔴 규칙을 베껴 쓰면 코드를 되돌려도 초록불이 된다(실제로 그랬다) — 렌더러에서 떼어 온다.
+{
+  const whoLines = eval('(' + pick('whoLines', /const whoLines = (\([^)]*\) => (?:\{[\s\S]*?\n\}|[^\n]+));/)[1] + ')');
+  for (const x of items) {
+    const f = x.fields || {};
+    const who = whoLines(f);
+    for (const [name, key] of [['지역', '지역거주구분'], ['소득', '소득기준']]) {
+      const b = bullets(f[key]);
+      if (b.length && !who.includes(b[0])) fail('C6', x.org, `${name} 조건이 빠짐`);
+    }
+  }
+}
+// C7 · 폰트 가드가 정직한가 (check() 만 쓰면 폰트가 없어도 통과한다)
+if (!/arr\.length > 0/.test(src) || !/document\.fonts\.size > 0/.test(src))
+  fail('C7', '-', 'load() 결과 길이를 안 본다 — 폰트가 없어도 통과한다');
+// I2 · 자격제한 없는 공고에 빈 경고 카드를 그리지 않는다
+{
+  const none = items.filter((x) => !bullets((x.fields || {})['자격제한']).length).length;
+  if (!/traps\.length \?/.test(src)) fail('I2', '-', '조항 없는 공고에도 4장을 그린다');
+  console.log(`  · 자격제한 없는 공고 ${none}건 — 4장을 빼는지 확인`);
+}
+// I8 · CC BY·BY-SA 사진의 저작자·라이선스가 실제로 카드에 나간다
+{
+  const P = JSON.parse(readFileSync(join(ROOT, 'insta/photos.json'), 'utf8'));
+  for (const [k, v] of Object.entries(P)) for (const x of v) {
+    if (!x.by || !x.lic || x.lic === '?') fail('I8', k, `저작자·라이선스가 빈 사진 — ${x.url.slice(0, 60)}`);
+
+  }
+  if (!/photo\.by/.test(src) || !/photo\.lic/.test(src)) fail('I8', '-', '카드가 저작자·라이선스를 안 그린다');
+  // 🔴 잘린 길이를 세면 그때 그 사고 하나만 잡는다. **자르지 않는다는 규칙**을 본다 —
+  //    26자 스텀프를 잡던 검사는 27자짜리를 그냥 통과시켰다.
+  const fp = readFileSync(join(ROOT, 'insta/find-photos.mjs'), 'utf8');
+  for (const m of fp.matchAll(/by:[^\n]*/g))
+    if (/slice\(/.test(m[0])) fail('I8', '-', `저작자 이름을 자른다 — ${m[0].trim().slice(0, 60)}`);
+}
+// I5 · 신청기간을 자르지 않는다
+if (/clamp\(bullets\(f\['신청기간'\]\)\[0\]/.test(src)) fail('I5', '-', '신청기간을 자른다 — 날짜가 사라질 수 있다');
+
+console.log(bad ? `\n🚨 ${bad}건 실패` : '\n✅ 전부 통과');
+process.exit(bad ? 1 : 0);
