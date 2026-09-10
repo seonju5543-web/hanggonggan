@@ -2288,7 +2288,17 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-09-09 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "2026년 성취(대) 장학생 선발계획 공고.hwpx",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=2c45e373675242db80e2157e64de34a7&fileSn=1&bbsId=BMSR00040"
+    },
+    {
+     "name": "본문이미지-510x580.png",
+     "url": "https://www.khu.ac.kr/upload/cross/images/000065/20260908141240402_XP36YJVN.png",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323027",
    "sourceKind": "auto"
   },
@@ -2315,7 +2325,21 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-09-09 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "신청서식.hwpx",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=cee13c58dcaa46049085f5459fbae92c&fileSn=1&bbsId=BMSR00040"
+    },
+    {
+     "name": "선발요강.pdf",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=cee13c58dcaa46049085f5459fbae92c&fileSn=2&bbsId=BMSR00040"
+    },
+    {
+     "name": "본문이미지-620x835.png",
+     "url": "https://www.khu.ac.kr/upload/cross/images/000066/20260909113006844_BB70Y8TB.png",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323040",
    "sourceKind": "auto"
   }

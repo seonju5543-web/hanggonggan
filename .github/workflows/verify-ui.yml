@@ -34,6 +34,7 @@ on:
       - 'verify/**'
       - '_admin/**'          # 관리자 화면 (verify-admin.js 가 스스로 빌드해 검사한다)
       - 'server/push/**'     # 푸시 발송 서버 (verify-push-server.mjs)
+      - 'insta/**'           # 인스타 카드 (verify-insta.js)
       - '.github/workflows/verify-ui.yml'
   workflow_dispatch:
 
@@ -78,6 +79,13 @@ jobs:
 
       - name: 양식 문서 동일성 관문 (원칙 4)
         run: node verify/form-snapshot.mjs
+
+      # 🔴 인스타 카드 사실 관문 — 145건 전수. 브라우저가 필요 없다(파일·JSON 만 읽는다).
+      #    카드가 원문을 상하게 하는 유형(부정어 잘림·지역/소득 조건 증발·마감 지난 공고를
+      #    '모집 중'·저작자 표시 누락)을 잡는다. 규칙은 render.mjs 에서 **이름으로 떼어 온다** —
+      #    베끼면 코드를 되돌려도 초록불로 남는다(실제로 그랬다).
+      - name: 인스타 카드 사실 관문
+        run: node verify/verify-insta.js
 
       # 드라이버마다 8123·8124 를 쓴다 (verify/README.md)
       - name: 로컬 서버 띄우기
