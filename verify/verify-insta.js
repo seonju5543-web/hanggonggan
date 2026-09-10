@@ -148,6 +148,7 @@ const today = new Date();
     const rnd = await import(new URL('../insta/render.mjs', `file://${__filename}`).href);
     const { caption, LIMIT, SHORTEN } = cap;
     let made = 0, past = 0;
+    const caps = [];
     for (const x of items) {
       const seed = [...(x.org + x.name)].reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) | 0, 7);
       // 🔴 마감 지난 공고는 캡션이 **만들어지면 안 된다** — 첫 줄이 신청하라는 말이라
@@ -158,6 +159,7 @@ const today = new Date();
       try { t = caption(x, c0, meta); } catch (e) { past++; continue; }
       if (gone) { fail('C8', x.org, `마감 지난 공고(${x.due})에 캡션을 만들었다`); continue; }
       made++;
+    caps.push(t);
       if (t.length > LIMIT.chars) fail('C8', x.org, `캡션이 ${t.length}자 — 인스타 상한 ${LIMIT.chars}`);
       const tags = t.match(/#[^\s#]+/g) || [];
       if (tags.length > LIMIT.tags) fail('C8', x.org, `해시태그 ${tags.length}개 — 상한 ${LIMIT.tags}`);
@@ -193,7 +195,31 @@ const today = new Date();
           fail('C8', x.org, `근거 없는 지역 태그 ${tag}`);
       }
     }
-    console.log(`  · 캡션 ${made}건 · 마감 지나 거부 ${past}건`);
+    // 🔴 매 게시물이 한 글자도 안 다르면 봇 티가 난다. 자리마다 **실제로 돌아가는지** 잰다 —
+  //    첫 판은 목록마다 같은 씨앗을 써서 변주들이 서로 붙어 다녔다(두 공고가 통째로 같았다).
+  {
+    const slot = (re) => new Set(caps.map((t) => (t.match(re) || [''])[0]).filter(Boolean));
+    for (const [name, re, least] of [
+      ['저장 유도', /^.*저장.*📌.*$/m, 3],
+      ['앱 안내', /^(?:"나는 되나\?" 싶으면|자격 하나하나 보기 귀찮으면|본인이 되는지 3초면 나와요)$/m, 3],
+      ['마무리', /^(?:장학금 찾는 시간|놓쳐서 못 받는|이번 학기 등록금|찾다 지치지).*$/m, 3],
+    ]) {
+      const got = slot(re).size;
+      if (got < least) fail('C8', '-', `캡션 '${name}' 이 ${got}종뿐 — 매번 같은 말이면 봇 티가 난다`);
+    }
+    // 🔴 변주가 서로 붙어 다니면 안 된다 — 두 공고의 저장 줄이 같다고 마무리까지 같으면
+    //    씨앗을 목록마다 안 섞은 것이다(실측으로 겪었다).
+    const pair = new Map();
+    let stuck = 0;
+    for (const t of caps) {
+      const a = (t.match(/^.*저장.*📌.*$/m) || [''])[0];
+      const b = (t.match(/^(?:장학금 찾는 시간|놓쳐서 못 받는|이번 학기 등록금|찾다 지치지).*$/m) || [''])[0];
+      if (pair.has(a) && pair.get(a) !== b) stuck = -1;
+      else if (!pair.has(a)) pair.set(a, b);
+    }
+    if (stuck === 0 && pair.size > 1) fail('C8', '-', '캡션 변주가 서로 붙어 다닌다 — 목록마다 씨앗을 섞을 것');
+  }
+  console.log(`  · 캡션 ${made}건 · 마감 지나 거부 ${past}건`);
 
     // C9 · 게시 경로 — 되돌릴 수 없는 것이라 여기서 세게 막는다
     const pub = readFileSync(join(ROOT, 'insta/publish.mjs'), 'utf8');
