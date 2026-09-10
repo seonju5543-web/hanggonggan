@@ -18,22 +18,23 @@ on:
   push:
     branches: [claude/nice-heisenberg-WESq5, main]
     paths:                     # 화면·판정에 닿는 것이 바뀔 때만 (로봇 데이터 커밋마다 돌지 않게)
-      - 'app.js'
-      - 'match-engine.js'
-      - 'parse-amount.js'
-      - 'section-head.js'
-      - 'parse-requirements.js'
-      - 'forms.js'
-      - 'chat.js'
-      - 'notify*.js'
-      - 'essay*.js'
-      - 'index.html'
-      - 'style.css'
-      - 'form-plan.js'
-      - 'data.js'
+      # 🔴 **파일 이름을 하나씩 적지 말 것** (2026-09-09 전수 대조에서 잡았다).
+      #    손으로 관리하던 목록이라 새 파일이 생길 때마다 어긋났다 — 실측으로 여덟이 빠져 있었다:
+      #    boot.js · resume.js · interactions.js · sw.js · supabase-client.js ·
+      #    push-config.js · supabase-config.js · chat-config.js.
+      #    그래서 `boot.js` 만 고치면 그걸 검사하는 verify-resume.js 가 **한 번도 안 돌았다.**
+      #    2026-09-06 에 ui-tone 이 넉 달 가까이 빨간불인 채 안 보였던 것도 같은 유형이다(B-4).
+      #    ⚠️ 글로브의 `*` 는 `/` 를 안 넘는다 — 그래서 뿌리의 앱 파일만 잡히고
+      #       `collector/*.mjs` 나 `data/*.json`(로봇이 하루 열 번 커밋한다)은 안 걸린다.
+      #    관문: test-collector 'CI 감시 범위' 절이 index.html 의 스크립트와 대조한다.
+      - '*.js'               # 뿌리의 앱 스크립트 전부 (app·match-engine·boot·resume·interactions…)
+      - '*.html'             # index.html · terms.html
+      - '*.css'
+      - 'sw.js'              # 위 '*.js' 에 이미 포함 — 잊지 말라고 남겨 둔다
       - 'verify/**'
       - '_admin/**'          # 관리자 화면 (verify-admin.js 가 스스로 빌드해 검사한다)
       - 'server/push/**'     # 푸시 발송 서버 (verify-push-server.mjs)
+      - '.github/workflows/verify-ui.yml'
   workflow_dispatch:
 
 permissions:

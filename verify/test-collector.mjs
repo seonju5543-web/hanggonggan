@@ -3706,7 +3706,10 @@ console.log('\n■ 화면 말투·토큰 관문이 살아 있는가');
   eq('verify/ui-tone.mjs 가 있다', fs.existsSync(new URL('../verify/ui-tone.mjs', import.meta.url)), true);
   const wf = readText(new URL('../.github/workflows/verify-ui.yml', import.meta.url));
   eq('워크플로가 그것을 실제로 돌린다', /node verify\/ui-tone\.mjs/.test(wf), true);
-  eq('style.css 가 바뀔 때도 돈다', /- 'style\.css'/.test(wf), true);
+  /* ⚠️ 2026-09-09 에 감시 목록을 파일 이름 나열에서 **글로브**로 바꿨다(여덟이 빠져 있었다).
+     그래서 여기서는 글자 그대로 찾지 않는다 — 지키려는 것은 '이름이 적혀 있는가'가 아니라
+     **'css 가 바뀌면 이 관문이 도는가'** 이고, 그 대조는 아래 「CI 감시 범위」 절이 전수로 한다. */
+  eq('style.css 가 바뀔 때도 돈다', /- '(?:style[.]css|[*][.]css)'/.test(wf), true);
 }
 
 console.log('\n■ 로봇이 조용히 죽지 않는다 (2026-09-06)');
@@ -4224,6 +4227,47 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
     return !ME.fitDetail(it, prof('컴퓨터공학과', 'engineering')).unread;
   }).map((it) => it.id);
   eq('등록 공고 전수 — 대학원 전용인데 점수가 매겨진 것이 없다', bad, []);
+}
+
+/* ── CI 감시 범위 (2026-09-09 신설) ─────────────────────────────────────────────
+   🔴 **화면 검사는 `paths:` 에 걸린 파일이 바뀔 때만 돈다.** 그 목록을 손으로 관리하면
+      새 파일이 생길 때마다 어긋나고, **어긋난 것은 조용하다** — 검사가 실패하는 게 아니라
+      아예 안 도는 것이라 초록불도 빨간불도 안 뜬다.
+      실측(2026-09-09): index.html 이 싣는 스크립트 23개 중 **여덟이 감시 밖**이었다
+      (boot · resume · interactions · sw · supabase-client · push-config · supabase-config · chat-config).
+      `boot.js` 만 고치면 그걸 검사하는 verify-resume.js 가 한 번도 안 돌았다.
+      2026-09-06 의 B-4(ui-tone 이 오래 빨간불인 채 안 보였다)와 같은 뿌리다.
+   ⚠️ 이 검사는 목록이 **길어지는지**를 보는 게 아니라 **덮는지**를 본다. */
+{
+  console.log('\n■ CI 감시 범위');
+  const html = readText(new URL('../index.html', import.meta.url));
+  const yml = readText(new URL('../.github/workflows/verify-ui.yml', import.meta.url));
+
+  const block = yml.slice(yml.indexOf('    paths:'), yml.indexOf('  workflow_dispatch:'));
+  const globs = [...block.matchAll(/^\s*-\s*'([^']+)'/gm)].map((m) => m[1]);
+  eq('감시 목록을 읽어 냈다', globs.length > 0, true);
+
+  /* 글로브 → 정규식 (`*` 는 `/` 를 안 넘는다 · `**` 는 넘는다) */
+  const toRe = (g) => new RegExp('^' + g
+    .replace(/[.+^${}()|[\]\\]/g, '\\$&')
+    .replace(/\*\*/g, '\u0000')
+    .replace(/\*/g, '[^/]*')
+    .replace(/\u0000/g, '.*') + '$');
+  const res = globs.map(toRe);
+  const covered = (f) => res.some((r) => r.test(f));
+
+  const scripts = [...html.matchAll(/src="([a-z0-9-]+\.js)"/g)].map((m) => m[1]);
+  eq('index.html 의 스크립트를 읽어 냈다', scripts.length >= 15, true);
+  eq('앱 스크립트가 전부 감시 범위 안에 있다', scripts.filter((f) => !covered(f)), []);
+  eq('서비스워커도 감시한다', covered('sw.js'), true);
+  eq('약관 화면도 감시한다', covered('terms.html'), true);
+  eq('화면 모양(css)도 감시한다 — 말투·토큰 관문이 여기 걸려 있다', covered('style.css'), true);
+  eq('검사 드라이버도 감시한다', covered('verify/verify-resume.js'), true);
+
+  /* 🔴 반대 방향 — 로봇이 하루에 열 번씩 커밋하는 것까지 감시하면 안 된다.
+     그러면 수집 커밋마다 브라우저 검사가 돌아 Actions 한도를 먹는다. */
+  eq('로봇 데이터는 감시하지 않는다', covered('data/notices.json'), false);
+  eq('수집기 코드도 감시하지 않는다 (자기 관문이 따로 있다)', covered('collector/collect.mjs'), false);
 }
 
 /* ── 묻지 않는 처지 · 성씨와 문중 (2026-09-09 신설) ─────────────────────────────
