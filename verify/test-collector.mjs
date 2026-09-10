@@ -4033,6 +4033,22 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
   const resetAt = appJs.indexOf('[STORAGE_KEY, ...LEGACY_KEYS].forEach');
   eq('데이터 초기화가 이어보기 장부도 지운다',
     /resumeClear\(\)/.test(appJs.slice(resetAt, resetAt + 600)), true);
+
+  /* ⑥ 🔴 **초기화가 빈 상태를 제 손으로 다시 적지 않는다** (2026-09-09 코드 리뷰).
+     예전에는 `state = { profile: null, applications: [] }` 라고 손으로 적어, 그 뒤에 늘어난
+     칸(`saved`·`consent`·`updatedAt`)이 빠졌다. 초기화한 뒤 그 자리에서 온보딩을 다시 마치면
+     `state.saved` 가 undefined 라 화면을 그릴 때마다
+     `Cannot read properties of undefined (reading 'some')` 가 났다(브라우저 실측).
+     앱을 껐다 켜면 `loadState` 가 메워 주기 때문에 **눈으로 재현하기 가장 어려운 유형**이다. */
+  eq('초기화가 빈 상태 만드는 함수를 쓴다 (손으로 다시 적지 않는다)',
+    /state = emptyState\(\)/.test(appJs.slice(resetAt, resetAt + 900)), true);
+  eq('  그 함수가 선언부에서도 쓰인다 (두 벌이 아니다)',
+    /let state = emptyState\(\);/.test(appJs), true);
+  /* 빈 상태에 있어야 하는 칸 — 하나라도 빠지면 그 칸을 읽는 곳이 죽는다 */
+  const emptyBlk = appJs.slice(appJs.indexOf('function emptyState()'), appJs.indexOf('let state = emptyState();'));
+  ['profile', 'applications', 'saved', 'consent', 'updatedAt'].forEach((k) => {
+    eq(`  빈 상태에 '${k}' 칸이 있다`, new RegExp('^\\s*' + k + ':', 'm').test(emptyBlk), true);
+  });
 }
 
 /* ══ 손짓과 움직임 (2026-09-09) ══════════════════════════════════════════

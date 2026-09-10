@@ -15,10 +15,19 @@ function todayStart() {
 }
 
 /* ---------------- 상태 ---------------- */
-let state = {
-  profile: null,          // 온보딩 결과
-  applications: [],       // { id, appliedAt, step, docs?, pending? }
-  /* 저장(북마크)한 공고 — { id, savedAt } (2026-09-07 · 노션 UI-21).
+/* 🔴 **빈 상태는 여기 한 곳에서만 만든다** (2026-09-09 코드 리뷰에서 잡았다).
+   예전에는 '데이터 초기화' 버튼이 `state = { profile: null, applications: [] }` 라고
+   **제 손으로 다시 적고** 있었다. 그래서 그 뒤에 늘어난 칸(`saved`·`consent`·`updatedAt`)이
+   빠졌고, 초기화한 뒤 그 자리에서 온보딩을 다시 마치면 `state.saved` 가 undefined 라
+   화면을 그릴 때마다 `Cannot read properties of undefined (reading 'some')` 가 났다
+   (브라우저 실측). 앱을 껐다 켜면 `loadState` 가 메워 주기 때문에 **눈으로 재현하기 가장
+   어려운 유형**이다 — 개발자는 '가끔 이상하다'로만 겪는다.
+   ⚠️ 칸을 새로 늘릴 때는 여기만 고치면 된다. 다른 곳에서 이 모양을 다시 적지 말 것. */
+function emptyState() {
+  return {
+    profile: null,          // 온보딩 결과
+    applications: [],       // { id, appliedAt, step, docs?, pending? }
+    /* 저장(북마크)한 공고 — { id, savedAt } (2026-09-07 · 노션 UI-21).
      🔴 `applications` 의 `pending` 과 **절대 합치지 말 것.** 뜻이 다르다:
         · pending  = 신청을 시작했는데 서류 작성이 남았다
         · saved    = 아직 신청할 생각은 없고 관심만 있다
@@ -27,13 +36,15 @@ let state = {
      알림이 신청도 안 한 공고를 재촉한다.
      ⚠️ 이 목록은 **이 기기에만 남는다.** 서버(profiles 표)에는 profile·applications
         칸만 있어 동기화되지 않는다 — 칸을 늘리려면 표부터 고쳐야 한다. */
-  saved: [],
-  /* 민감정보(기초생활수급·장애 등)를 서버에 올려도 되는가 — 온보딩 Step 3에서 받는다.
+    saved: [],
+    /* 민감정보(기초생활수급·장애 등)를 서버에 올려도 되는가 — 온보딩 Step 3에서 받는다.
      동의 안 하면 그 항목은 기기에만 남는다(supabase-client.js syncSafeProfile). */
-  consent: { sensitive: false },
-  /* 이 기기에서 마지막으로 고친 시각. 서버 것과 견줘 **최신이 이긴다**. */
-  updatedAt: null,
-};
+    consent: { sensitive: false },
+    /* 이 기기에서 마지막으로 고친 시각. 서버 것과 견줘 **최신이 이긴다**. */
+    updatedAt: null,
+  };
+}
+let state = emptyState();
 
 /* 분교를 별개 학교로 나누기 전에 저장된 프로필 고치기 (2026-08-02).
    예전엔 '한양대학교 + ERICA캠퍼스(안산)'처럼 캠퍼스로 골랐는데 이제 학교 자체가 다르다.
@@ -3893,7 +3904,7 @@ function bindEvents() {
          지우지 않으면 다음에 앱을 켤 때 **지웠다고 말한 값이 그대로 되살아난다.** */
       if (typeof resumeClear === 'function') resumeClear();
       formFill = null;
-      state = { profile: null, applications: [] };
+      state = emptyState();   // 🔴 손으로 다시 적지 말 것 — 늘어난 칸이 빠진다(위 emptyState 주석)
       if (typeof notifyReset === 'function') notifyReset(); // 알림 설정·알림함도 함께 초기화
       initOnboarding();
       showScreen('onboarding');
