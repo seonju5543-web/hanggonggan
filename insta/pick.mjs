@@ -1,0 +1,105 @@
+/**
+ * 오늘 올릴 공고 고르기 — 규격 `insta/SCRIPT.md`
+ *
+ * 🔴 **금액순이 아니라 '몇 명이 볼 수 있나'순.** 실측: 지역 제한 없고 200만원 이상이고
+ *    마감 30일 내인 것이 145건 중 9건뿐이었고, 금액 큰 둘은 미술 전공·새터민 이공계였다.
+ *    금액으로 고르면 아무도 못 받는 공고만 올리게 된다.
+ * 🔴 올린 것은 `insta/seen.json` 이 기억한다. 없으면 매일 같은 공고를 새 공고로 올린다
+ *    (수집기 이슈 #75 와 같은 유형).
+ *
+ * 실행: node insta/pick.mjs           오늘 올릴 공고 하나 (JSON)
+ *       node insta/pick.mjs --list    상위 12개를 점수와 함께 (사람이 볼 용도)
+ */
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+
+const ROOT = new URL('../', import.meta.url);
+const SEEN = new URL('insta/seen.json', ROOT);
+
+export const readSeen = () =>
+  existsSync(SEEN) ? JSON.parse(readFileSync(SEEN, 'utf8')) : { posted: [] };
+
+/** 🔴 로봇 기록장과 같은 모양(들여쓰기 1칸)으로 저장한다 — 다르게 저장하면 파일 전체가
+ *  충돌한다(CLAUDE.md 「매 세션 이것만은」 4번). */
+export const writeSeen = (s) => writeFileSync(SEEN, JSON.stringify(s, null, 1) + '\n');
+
+const V = (f, k) => String(f[k] || '');
+/** 칸이 비었거나 '제한없음' 이면 조건이 **없는** 것이다. */
+const unrestricted = (f, k) => { const v = V(f, k); return !v || /제한없음|해당없음/.test(v); };
+
+/** 신분 조건 — 이게 붙으면 볼 수 있는 사람이 확 줄어든다. */
+const IDENTITY = /새터민|북한이탈|국가유공|독립유공|보훈|장애|다문화|한부모|소년소녀|보호시설|기초생활|차상위|선원|해기사|농어촌|귀농/;
+/** ⚠️ **제한은 칸에만 있지 않다** — `특정자격` 문장에도, **공고 이름에도** 숨어 있다.
+ *  실측으로 두 번 뚫렸다:
+ *   · `미술관련 학과` 가 `특정자격` 문장에 있어 넓이 만점을 받았다(SCRIPT.md).
+ *   · `독립유공자 후손 장학금` 이 '신분 조건 없음' 을, `보훈장학금(대학원장학)` 이
+ *     '전공 제한 없음' 을 받았다 — 둘 다 제한이 **이름**에 있었다.
+ *  🔴 그래서 자격 칸·이름을 **다 이어 붙여** 한 번에 본다. */
+const MAJOR = /학과|전공|계열|대학원|의예|사범|예체능|석사|박사/;
+/** 그 공고가 '누구를 제한하는가' 를 말할 수 있는 글자 전부. */
+const scope = (x) => {
+  const f = x.fields || {};
+  return `${x.name} ${V(f, '특정자격')} ${V(f, '학과구분')} ${V(f, '대학구분')} ${V(f, '소득기준')}`;
+};
+
+export function score(x, today) {
+  const f = x.fields || {};
+  const why = [];
+  let s = 0;
+  if (unrestricted(f, '지역거주구분')) { s += 3; why.push('지역 제한 없음 +3'); }
+  const sc = scope(x);
+  if (unrestricted(f, '학과구분') && !MAJOR.test(sc)) { s += 3; why.push('전공 제한 없음 +3'); }
+  if (!IDENTITY.test(sc)) { s += 2; why.push('신분 조건 없음 +2'); }
+  // 🔴 4장(자격제한)이 이 계정의 정체성이다. 재료가 없는 공고는 4장 없이 나간다.
+  if (V(f, '자격제한')) { s += 2; why.push('조항 있음 +2'); }
+  // 마감이 코앞이면 지금 올려야 쓸모가 있다. 너무 멀면 학생이 잊는다.
+  const d = Math.round((new Date(`${x.due}T23:59:59+09:00`).getTime() - today) / 864e5);
+  if (d >= 3 && d <= 21) { s += 2; why.push(`마감 D-${d} +2`); }
+  else if (d < 3) { s -= 2; why.push(`마감 D-${d} 임박 -2`); }
+  return { s, d, why };
+}
+
+/** 고를 수 있는 공고만 남긴다. 🔴 못 고르는 이유를 **버리지 말고 세어서** 돌려준다 —
+ *  "왜 오늘 올릴 게 없지" 를 다음 사람이 다시 조사하지 않게. */
+export function candidates(items, today, seen) {
+  const done = new Set(seen.posted.map((p) => p.code));
+  const drop = { 이미올림: 0, 마감지남: 0, 마감없음: 0, 금액미확인: 0 };
+  const ok = [];
+  for (const x of items) {
+    if (done.has(x.code)) { drop.이미올림++; continue; }
+    if (!x.due) { drop.마감없음++; continue; }
+    const t = new Date(`${x.due}T23:59:59+09:00`).getTime();
+    if (Number.isNaN(t)) { drop.마감없음++; continue; }
+    if (t < today) { drop.마감지남++; continue; }
+    // 🔴 금액을 못 읽은 공고는 아예 안 고른다(SCRIPT.md) — 추정 금액을 걸 수 없다.
+    if (/기관확인필요/.test(V(x.fields || {}, '지원금액'))) { drop.금액미확인++; continue; }
+    ok.push({ x, ...score(x, today) });
+  }
+  // 점수 같으면 마감이 가까운 것 먼저. 그래도 같으면 이름순 — 🔴 순서가 매번 흔들리면
+  // 같은 날 두 번 돌렸을 때 다른 공고가 나온다.
+  ok.sort((a, b) => b.s - a.s || a.d - b.d || (a.x.org + a.x.name).localeCompare(b.x.org + b.x.name));
+  return { ok, drop };
+}
+
+// ── 실행 ────────────────────────────────────────────────────
+if (process.argv[1] && import.meta.url === new URL(process.argv[1], 'file:').href) {
+  const j = JSON.parse(readFileSync(new URL('data/kosaf-open.json', ROOT), 'utf8'));
+  const items = j.items || j;
+  const { ok, drop } = candidates(items, Date.now(), readSeen());
+
+  if (process.argv.includes('--list')) {
+    console.log(`■ 고를 수 있는 공고 ${ok.length} / ${items.length}건`);
+    console.log('  뺀 이유 —', Object.entries(drop).map(([k, v]) => `${k} ${v}`).join(' · '));
+    for (const c of ok.slice(0, 12))
+      console.log(`  ${String(c.s).padStart(3)}점  D-${String(c.d).padStart(3)}  ${c.x.org} · ${c.x.name}\n         ${c.why.join(' · ')}`);
+    process.exit(0);
+  }
+  if (!ok.length) {
+    console.error('오늘 올릴 공고가 없습니다 —', Object.entries(drop).map(([k, v]) => `${k} ${v}`).join(' · '));
+    process.exit(2);           // 🔴 0 으로 끝내면 워크플로가 '올렸다' 고 착각한다
+  }
+  const top = ok[0];
+  // 워크플로가 렌더러에 그대로 넘길 수 있게 이름만 찍는 길도 둔다.
+  if (process.argv.includes('--name')) { console.log(top.x.name); process.exit(0); }
+  console.log(JSON.stringify({ code: top.x.code, org: top.x.org, name: top.x.name,
+    due: top.x.due, score: top.s, dday: top.d, why: top.why }, null, 1));
+}

@@ -139,7 +139,8 @@ if (/clamp\(bullets\(f\['신청기간'\]\)\[0\]/.test(src)) fail('I5', '-', '신
     //    지난 공고에 붙이면 그 자체가 거짓이다. 안 만드는 것까지가 규칙이다.
     const gone = x.due && new Date(`${x.due}T23:59:59+09:00`).getTime() < today;
     let t;
-    try { t = caption(x, rnd.context(x, today, rnd.SKINS.blue, seed, null), meta); } catch (e) { past++; continue; }
+    const c0 = rnd.context(x, today, rnd.SKINS.blue, seed, null);
+    try { t = caption(x, c0, meta); } catch (e) { past++; continue; }
     if (gone) { fail('C8', x.org, `마감 지난 공고(${x.due})에 캡션을 만들었다`); continue; }
     made++;
     if (t.length > LIMIT.chars) fail('C8', x.org, `캡션이 ${t.length}자 — 인스타 상한 ${LIMIT.chars}`);
@@ -151,6 +152,18 @@ if (/clamp\(bullets\(f\['신청기간'\]\)\[0\]/.test(src)) fail('I5', '-', '신
       if (t.includes(w)) fail('C8', x.org, `캡션에 금지어 '${w}'`);
     // 🔴 사실 줄을 자르지 않는다 — 카드와 같은 규칙.
     if (/…/.test(t)) fail('C8', x.org, '캡션에서 글이 잘렸다(…)');
+    // 🔴 게시물은 피드에 남는데 이미지는 굳는다 — '지금' 을 말하면 마감 뒤 거짓이 된다.
+    for (const w of ['현재 모집', '모집 중', '오늘까지', '내일 마감', '이번 주 마감'])
+      if (t.includes(w)) fail('C8', x.org, `캡션이 '지금' 을 말한다 ('${w}') — 게시물은 남는다`);
+    // 🔴 캡션에 자격·조항 **원문을 옮겨 적지 않는다**(2026-09-10 개발자 결정).
+    //    카드가 이미 전부 싣는데 캡션이 또 쓰면 공고문이 되고, 궁금증을 여기서 풀어 주면
+    //    카드를 넘길 이유도 앱을 열 이유도 사라진다. 개수는 사실이라 써도 된다.
+    //    ⚠️ **첫 줄은 뺀다** — 거기는 표지 카드와 같은 후킹이고, 따옴표로 감싼 인용이다.
+    //       빼지 않으면 `자격에 딱 한 줄 "세대주가 만 65세 이하"` 가 위반으로 잡힌다.
+    const body = t.split('\n').slice(1).join('\n');
+    for (const line of [...c0.who, ...c0.traps])
+      if (line.length > 12 && body.includes(line.slice(0, 12)))
+        fail('C8', x.org, `캡션이 원문을 옮겨 적었다 — ${line.slice(0, 24)}…`);
     // 🔴 접히기 전 두 줄에 프로필 안내가 없으면 앱으로 가는 통로가 사라진다.
     if (!t.split('\n').slice(0, 2).join(' ').includes('프로필')) fail('C8', x.org, '1·2줄에 프로필 안내가 없다');
     // 🔴 지역 태그는 재단 이름으로 확인된 것만 — `#반드시장학금` 이 실제로 나왔다.
@@ -166,6 +179,34 @@ if (/clamp\(bullets\(f\['신청기간'\]\)\[0\]/.test(src)) fail('I5', '-', '신
     }
   }
   console.log(`  · 캡션 ${made}건 · 마감 지나 거부 ${past}건`);
+
+  // C9 · 게시 경로 — 되돌릴 수 없는 것이라 여기서 세게 막는다
+  const pub = readFileSync(join(ROOT, 'insta/publish.mjs'), 'utf8');
+  const pick = readFileSync(join(ROOT, 'insta/pick.mjs'), 'utf8');
+  const wf = readFileSync(join(ROOT, '.github/workflows/insta.yml'), 'utf8');
+  const ig = readFileSync(join(ROOT, '.gitignore'), 'utf8');
+  // 🔴 기본이 예행연습이어야 한다 — 실수로 브랜드 계정에 올라가는 길을 안 만든다.
+  if (!/--publish/.test(pub) || !/if \(!live\)/.test(pub))
+    fail('C9', '-', '게시가 기본으로 실행된다 — --publish 를 줘야만 올라가야 한다');
+  // 🔴 인스타는 JPEG 만 받는다. PNG 를 주면 컨테이너 만들기에서 막힌다.
+  if (!/\.jpg/.test(pub) || /\.png/.test(pub))
+    fail('C9', '-', '게시가 PNG 를 올린다 — 인스타는 JPEG 만 받는다');
+  if (!/type: 'jpeg'/.test(src)) fail('C9', '-', '렌더러가 JPEG 를 안 뽑는다');
+  // 🔴 Pages 배포 전에 컨테이너를 만들면 인스타가 404 를 받고 조용히 실패한다.
+  //    ⚠️ 함수가 **있는지**가 아니라 **부르는지**를 봐야 한다 — 주석 처리해도 정의는 남는다.
+  if (!/^\s*await waitLive\(/m.test(pub)) fail('C9', '-', '그림이 공개됐는지 확인하지 않고 올린다');
+  // 🔴 올린 것을 기억 못 하면 내일 같은 공고를 다시 올린다(이슈 #75 유형).
+  if (!/seen\.json/.test(pick) || !/writeSeen/.test(pub))
+    fail('C9', '-', 'seen.json 에 기록하지 않는다 — 같은 공고를 다시 올리게 된다');
+  // 🔴 게시용 그림은 커밋돼야 Pages 가 서빙한다. 무시되면 인스타가 가져갈 주소가 없다.
+  if (/^insta\/pub/m.test(ig)) fail('C9', '-', 'insta/pub 이 .gitignore 에 있다 — 공개 주소가 죽는다');
+  // 🔴 시간 초과는 '실패' 가 아니라 '취소' 다 — 둘 다 잡아야 조용히 안 죽는다.
+  if (!/failure\(\) \|\| cancelled\(\)/.test(wf)) fail('C9', '-', '워크플로가 취소를 안 잡는다');
+  if (!/timeout-minutes/.test(wf)) fail('C9', '-', '워크플로에 timeout-minutes 가 없다');
+  // 🔴 게시 단계가 다시 그리면 관리자가 본 것과 다른 공고가 올라간다.
+  const pubJob = wf.slice(wf.indexOf('  publish:'));
+  if (/render\.mjs/.test(pubJob)) fail('C9', '-', '게시 단계가 다시 그린다 — 준비된 것만 올려야 한다');
+  console.log('  · 게시 경로 — 예행연습 기본 · JPEG · 공개 확인 · seen 기록 · 다시 안 그림');
   console.log(bad ? `\n🚨 ${bad}건 실패` : '\n✅ 전부 통과');
   process.exit(bad ? 1 : 0);
 })();

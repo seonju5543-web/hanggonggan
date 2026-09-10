@@ -157,8 +157,10 @@ data/registered.json ┘  (4장 조항 재료)   │
 
 ### 새로 만드는 것
 - `insta/templates/` 카드 HTML 5장
-- `collector/insta-pick.mjs` — 고르기 + `insta/seen.json`
-- `collector/insta-publish.mjs` — Graph API 2단계 캐러셀
+- ~~`collector/insta-pick.mjs`~~ → **`insta/pick.mjs`** — 고르기 + `insta/seen.json`
+- ~~`collector/insta-publish.mjs`~~ → **`insta/publish.mjs`** — Graph API 2단계 캐러셀
+  🔴 위치를 바꿨다(2026-09-10). 이 갈래의 코드가 `insta/` 에 다 있는데 둘만 `collector/`
+  에 두면 한 덩어리가 갈라진다. `collector/` 는 예약으로 도는 수집 로봇들의 자리다.
 - `.github/workflows/insta.yml` — `timeout-minutes` 필수 · 보강 단계는 `continue-on-error`
 - `verify/verify-insta.js` — 관문(카드 금액·마감이 원문과 일치하는가)
 

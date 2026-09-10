@@ -1,0 +1,178 @@
+# 인스타 카드뉴스 게시 — 관리자가 버튼으로 돌린다 (2026-09-10 신설)
+#
+# 🔴 **예약이 없다.** 브랜드 계정으로 나가는 되돌릴 수 없는 게시라, 사람이 누를 때만 돈다.
+#    익숙해지면 `schedule:` 을 붙이면 되지만 그건 개발자가 정할 일이다.
+#
+# 🔴 **두 번 눌러야 올라간다 — 그리고 두 번째는 다시 그리지 않는다.**
+#    ① 준비(기본)  고르고 · 그리고 · 커밋. 관리자가 그림과 캡션을 눈으로 본다.
+#    ② 게시        **①이 커밋해 둔 그 폴더를 그대로** 올린다.
+#    🔴 ②에서 다시 그리면 그 사이 데이터가 바뀌었을 때 **관리자가 본 것과 다른 공고**가
+#       올라간다. 그래서 ②는 렌더러를 아예 안 부른다.
+#    인스타는 파일 업로드를 안 받고 공개 주소를 요구해서, 어차피 커밋 → Pages 배포가
+#    끝나야 올릴 수 있다. 그 사이가 사람이 확인하는 자리다.
+#
+# 🔴 시크릿 둘이 있어야 ②가 된다: IG_USER_ID · IG_ACCESS_TOKEN
+#    (인스타 **프로 계정** + 페이스북 페이지 연결 + 앱의 Instagram Tester 역할까지 끝난 뒤)
+name: 인스타 카드뉴스 게시
+
+on:
+  workflow_dispatch:
+    inputs:
+      step:
+        description: '무엇을 할까'
+        type: choice
+        options: [준비만 (그리고 커밋), 게시 (준비된 것을 올린다)]
+        default: '준비만 (그리고 커밋)'
+      notice:
+        description: '[준비] 올릴 공고 이름 일부 (비우면 점수로 자동 선택)'
+        type: string
+        default: ''
+      tpl:
+        description: '[준비] 판형 (auto = 공고 이름이 정한다)'
+        type: choice
+        options: [auto, photo, chat, note]
+        default: auto
+
+permissions:
+  contents: write
+
+# 🔴 수집 로봇들과 **다른 대기줄**을 쓴다 — 같은 줄에 넣으면 GitHub 이 대기 중인
+#    실행을 새 실행으로 취소해서 예약 수집이 조용히 사라진다(CLAUDE.md).
+concurrency:
+  group: insta-publish
+  cancel-in-progress: false
+
+env:
+  BASE: claude/nice-heisenberg-WESq5
+
+jobs:
+  # ── ① 준비 — 고르고 그리고 커밋한다 ────────────────────────
+  prepare:
+    if: ${{ !startsWith(inputs.step, '게시') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25          # 🔴 없으면 GitHub 기본값 6시간까지 매달린다
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/nice-heisenberg-WESq5
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm init -y >/dev/null && npm i playwright@1 --no-audit --no-fund
+      - run: npx playwright@1 install --with-deps chromium
+
+      # 🔴 사실 관문을 먼저 통과해야 그린다 — 틀린 카드가 브랜드 계정으로 나가면 못 지운다.
+      - name: 사실 관문
+        run: node verify/verify-insta.js
+
+      - name: 오늘 올릴 공고 고르기
+        id: pick
+        env:
+          NOTICE: ${{ inputs.notice }}
+        run: |
+          if [ -n "$NOTICE" ]; then
+            echo "손으로 지정: $NOTICE"
+          else
+            node insta/pick.mjs --list | head -8
+            NOTICE=$(node insta/pick.mjs --name)
+            echo "자동 선택: $NOTICE"
+          fi
+          echo "needle=$NOTICE" >> "$GITHUB_OUTPUT"
+
+      - name: 카드·캡션 그리기
+        env:
+          NEEDLE: ${{ steps.pick.outputs.needle }}
+          TPL: ${{ inputs.tpl }}
+        run: |
+          # 🔴 `--tpl` 을 안 주면 렌더러가 **씨앗으로** 고른다 — 같은 공고는 늘 같은 얼굴.
+          if [ "$TPL" = "auto" ]; then
+            node insta/render.mjs "$NEEDLE" --pub
+          else
+            node insta/render.mjs "$NEEDLE" --tpl="$TPL" --pub
+          fi
+
+      - name: 관리자가 눈으로 볼 것
+        run: |
+          {
+            echo '## 준비됐습니다 — 확인하고 「게시」로 다시 돌리세요'
+            echo
+            echo '### 캡션'
+            echo '```'
+            cat insta/pub/*/caption.txt
+            echo '```'
+            echo '### 공고'
+            echo '```json'
+            cat insta/pub/*/meta.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: 카드
+          path: insta/pub/
+          retention-days: 7
+
+      # 🔴 커밋해야 GitHub Pages 가 공개 주소로 서빙한다 — 인스타는 그 주소로 가져간다.
+      #    ⚠️ 어제 것을 지웠으므로 `-A` 로 **삭제까지** 담아야 한다.
+      - name: 게시용 그림 커밋
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add -A insta/pub
+          git diff --cached --quiet && { echo '바뀐 게 없습니다'; exit 0; }
+          git commit -m "인스타: $(basename $(ls -d insta/pub/*/)) 게시용 카드 준비"
+          for i in 1 2 3; do
+            git push origin "HEAD:$BASE" && break || { git pull --rebase origin "$BASE"; sleep 5; }
+          done
+          git push origin HEAD:main        # 🔴 Pages 는 main 을 배포한다
+
+      - name: 실패하면 시끄럽게
+        if: ${{ failure() || cancelled() }}
+        run: echo '🚨 준비가 실패했습니다 — 위 단계 로그를 보세요.' >> "$GITHUB_STEP_SUMMARY"
+
+  # ── ② 게시 — ①이 커밋한 것을 그대로 올린다. **다시 안 그린다** ──
+  publish:
+    if: ${{ startsWith(inputs.step, '게시') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/nice-heisenberg-WESq5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 준비된 것이 있는지
+        id: dir
+        run: |
+          D=$(ls -d insta/pub/*/ 2>/dev/null | head -1 | sed 's:/$::')
+          [ -n "$D" ] || { echo '🚨 준비된 게 없습니다 — 「준비만」 으로 먼저 돌리세요.'; exit 1; }
+          echo "준비된 폴더: $D"; cat "$D/meta.json"
+          echo "dir=$D" >> "$GITHUB_OUTPUT"
+
+      - name: 인스타에 올리기
+        env:
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: node insta/publish.mjs --dir=${{ steps.dir.outputs.dir }} --publish
+
+      # 🔴 올린 것을 기억 못 하면 내일 같은 공고를 다시 올린다(이슈 #75 유형).
+      #    `git add` 목록에 넣는 것까지가 한 세트다.
+      - name: 올린 기록 저장
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add insta/seen.json
+          git diff --cached --quiet && { echo 'seen.json 변화 없음'; exit 0; }
+          git commit -m '인스타: 올린 공고 기록'
+          for i in 1 2 3; do
+            git push origin "HEAD:$BASE" && break || { git pull --rebase origin "$BASE"; sleep 5; }
+          done
+          git push origin HEAD:main
+
+      # 🔴 `if: failure()` 는 **시간 초과에 반응하지 않는다** — 상한을 넘긴 작업은
+      #    '실패' 가 아니라 '취소' 다(CLAUDE.md). 둘 다 잡는다.
+      - name: 실패하면 시끄럽게
+        if: ${{ failure() || cancelled() }}
+        run: echo '🚨 게시가 실패했습니다 — 위 단계 로그를 보세요.' >> "$GITHUB_STEP_SUMMARY"

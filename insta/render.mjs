@@ -16,7 +16,8 @@
  */
 import { shrinkToFit, overflowing } from './fit.mjs';
 import { caption, LIMIT } from './caption.mjs';
-import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
+import { readFileSync, mkdirSync, writeFileSync, copyFileSync, rmSync } from 'node:fs';
+import { readdir } from 'node:fs/promises';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -26,9 +27,25 @@ const W = 1080, H = 1350;
 
 // ── 원문 다루기 ─────────────────────────────────────────────
 const tidy = (s) => String(s || '').replace(/:{2,}/g, ':').replace(/\s{2,}/g, ' ').trim();
-/** '※ 자세한 사항은 …' 은 줄 **끝에 꼬리로** 붙으므로 앞만 보면 못 거른다(실측). */
+/** '※ 자세한 사항은 …' 은 줄 **끝에 꼬리로** 붙으므로 앞만 보면 못 거른다(실측).
+ *  🔴 **괄호 안의 `○` 에서 자르면 안 된다** — 원문에 `…재학중인 자 (○ 사이버대 제외)` 가
+ *     있어서 `자 (` 와 `사이버대 제외)` 두 줄로 부서졌다(여는 괄호로 끝나고 닫는 괄호로
+ *     시작하는 줄). 괄호 안에서는 글머리가 아니라 그냥 글자다. */
+//    ⚠️ 다른 글자로 바꿔 두면 안 된다 — 그것도 원문을 고치는 것이다(원칙 8-1).
+//       자르는 동안만 표식으로 숨겼다가 **그대로 되돌린다.**
+const HIDE = '\u0000';
+const unbulletInParens = (s) => {
+  let d = 0, out = '';
+  for (const ch of String(s || '')) {
+    if (ch === '(' || ch === '（') d++;
+    else if (ch === ')' || ch === '）') d = Math.max(0, d - 1);
+    out += (ch === '○' && d > 0) ? HIDE : ch;
+  }
+  return out;
+};
 const bullets = (s) =>
-  String(s || '').split(/\s*○\s*/)
+  unbulletInParens(s).split(/\s*○\s*/)
+    .map((t) => t.split(HIDE).join('○'))
     .map((t) => tidy(t.replace(/\s*※\s*자세한 사항은[^○]*$/, '')))
     .filter(Boolean).filter((t) => !/기관확인필요/.test(t));
 /** 🔴 손으로 그린 표시들 — 선이 전부 반듯하면 사람이 안 만든 티가 난다.
@@ -713,12 +730,39 @@ mkdirSync(OUT, { recursive: true });
     const over = await page.evaluate(overflowing);
     if (over.length) { console.error(`🚨 ${name}: ${over.join('·')}번째 카드에서 글자가 잘립니다`); overflowed = true; }
     const els = await page.$$('.card');
-    for (let i = 0; i < els.length; i++) await els[i].screenshot({ path: join(OUT, `${name}-${i + 1}.png`) });
+    // 🔴 인스타 게시(Content Publishing)는 **JPEG 만** 받는다 — PNG 로 올리면 컨테이너
+    //    만들기에서 막힌다. 눈으로 볼 때는 PNG 가 편하니 둘 다 떨군다.
+    //    (사진 표지는 1MB 가 넘는데 JPEG 로는 1/5 로 준다. 인스타 상한은 8MB.)
+    for (let i = 0; i < els.length; i++) {
+      await els[i].screenshot({ path: join(OUT, `${name}-${i + 1}.png`) });
+      await els[i].screenshot({ path: join(OUT, `${name}-${i + 1}.jpg`), type: 'jpeg', quality: 92 });
+    }
     await page.close();
     console.log(`  ${name} — ${els.length}장`);
   }
   // 마감 지난 공고면 캡션이 없다 — '올리면 안 되는 것' 이라는 신호다.
   if (cap) { writeFileSync(join(OUT, 'caption.txt'), cap + '\n'); console.log('  캡션 — insta/out/caption.txt'); }
+
+  // 🔴 게시용으로 내보내기 — 인스타는 파일 업로드를 안 받고 **공개 주소**를 요구한다.
+  //    그래서 여기만 저장소에 커밋해 GitHub Pages 가 서빙하게 한다(`out/` 은 작업용이라 무시).
+  //    ⚠️ 한 판형만 내보낸다 — 캐러셀은 한 벌이다.
+  if (args.includes('--pub')) {
+    if (!cap) { console.error('🚨 캡션이 없어 게시용으로 못 내보냅니다.'); process.exit(1); }
+    if (list.length !== 1) { console.error('🚨 --pub 은 판형 하나만 — --tpl=photo 처럼 지정하세요.'); process.exit(1); }
+    const day = new Date().toISOString().slice(0, 10);
+    const pub = join(ROOT, 'insta', 'pub', day);
+    // ponytail: 지난 날짜를 지워 작업 트리를 한 벌로 유지한다. 히스토리는 계속 자란다
+    //           (하루 1MB) — 커지면 GitHub Release 자산으로 옮기는 게 다음 수다.
+    rmSync(join(ROOT, 'insta', 'pub'), { recursive: true, force: true });
+    mkdirSync(pub, { recursive: true });
+    const name = list[0];
+    const n = (await readdir(OUT)).filter((f) => f.startsWith(`${name}-`) && f.endsWith('.jpg')).length;
+    for (let i = 1; i <= n; i++) copyFileSync(join(OUT, `${name}-${i}.jpg`), join(pub, `${i}.jpg`));
+    writeFileSync(join(pub, 'caption.txt'), cap + '\n');
+    writeFileSync(join(pub, 'meta.json'), JSON.stringify(
+      { code: s.code, org: s.org, name: s.name, due: s.due, tpl: name, seed, at: day }, null, 1) + '\n');
+    console.log(`  게시용 — insta/pub/${day}/ (${n}장 + 캡션)`);
+  }
   await browser.close();
   // 🔴 잘린 채로 올리면 사실이 사라진 게시물이 나간다 — 조용히 끝내지 않는다.
   if (overflowed) process.exit(2);
