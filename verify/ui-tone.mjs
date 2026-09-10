@@ -120,5 +120,81 @@ console.log('\n■ style.css 가 토큰 밖의 값을 쓰지 않는다');
   eq('그라데이션은 --grad-navy 한 곳에서만 정의한다', grad, []);
 }
 
+/* ── ⑤ 되돌아가지 않게 하는 톱니 (2026-09-10) ───────────────────────────────
+   왜 만들었나 — 개발자 지시 *"디자인 측면에서 AI티를 없앨 수 있는 방법"* 을 검토하다
+   **이미 한 번 고친 것이 그대로 되돌아와 있는 것**을 찾았다. 2026-09-01 에 개발자가
+   *"간격이 맞지 않은 부분이 많다"* 고 지적해 세로 간격을 네 단계(--sp-1~4)로 못 박았는데,
+   실제로 그 토큰을 쓰는 곳은 24군데뿐이고 **토큰을 만든 뒤에 새로 쓴 생 px 여백이 104곳**이었다.
+   style.css 머리말에 "숫자를 직접 쓰지 말 것"이라고 적어 두기만 했기 때문이다.
+
+   🔴 이 저장소의 원칙 그대로다 — **안내문에 적는 것은 리포트고, 강제하는 것은 관문이다.**
+
+   ⚠️ 여기서 0을 요구하지 않는다. 지금 521곳을 한 번에 고치는 것은 화면을 통째로 바꾸는
+      일이라 개발자 승인 없이 할 수 없다(.claude/skills/approved-design). 대신 **톱니**를 건다:
+      지금 값을 천장으로 적어 두고 **늘어나면 실패**시킨다. 줄이면 천장을 같이 내리라고 알린다.
+      그래서 오늘 고치지 않아도 **내일 더 나빠지지는 않는다.**
+
+   ⚠️ 세는 데서 빼는 것 셋 — 이유가 각각 다르다:
+      · `.chat-*`  대장님. 2026-08-29 개발자 지시로 손대지 않기로 한 영역이다.
+      · `.fd-*` `.form-doc`  인쇄되는 신청서 문서다. 흰 종이에 검은 글씨·회색 괘선이 맞다.
+      · `@keyframes`  움직임의 중간값이라 여백 리듬과 무관하다. */
+const CEILING = { space: 521, color: 95, ghost: 4 };
+
+/** 천장 검사 — 늘면 실패, 줄면 천장을 내리라고 알린다(실패는 아니다). */
+const le = (name, got, ceiling, hint) => {
+  const ok = got <= ceiling;
+  if (!ok) fail++;
+  console.log(`  ${ok ? '✓' : '✕'} ${name}: ${got} (천장 ${ceiling})`);
+  if (!ok) console.log(`      ${hint}`);
+  else if (got < ceiling) console.log(`      ↓ ${ceiling - got}곳 줄었습니다 — CEILING 을 ${got} 로 내려 주세요(안 내리면 다시 늘어도 안 잡힙니다).`);
+};
+
+console.log('\n■ 토큰 이탈이 더 늘지 않는다 (톱니 · 2026-09-10)');
+{
+  const lines = R('style.css').split('\n');
+  let sel = '', inRoot = false, inKeyframes = false, depth = 0;
+  const space = [], color = [];
+  for (let i = 0; i < lines.length; i++) {
+    const raw = lines[i];
+    if (/@keyframes/.test(raw)) { inKeyframes = true; depth = 0; }
+    if (inKeyframes) {
+      depth += (raw.match(/\{/g) || []).length - (raw.match(/\}/g) || []).length;
+      if (depth <= 0 && /\}/.test(raw)) inKeyframes = false;
+      continue;
+    }
+    const l = raw.replace(/\/\*[\s\S]*?\*\//g, '');
+    const m = l.match(/^\s*([.#a-zA-Z:[][^{}]*?)\s*\{/);
+    if (m) { sel = m[1].trim(); inRoot = /^:root/.test(sel.split(',')[0].trim()); }
+    if (inRoot) continue;
+    if (/^\s*--/.test(l)) continue;            // 토큰 선언 줄 자체
+    if (/^\.(fd-|form-doc)/.test(sel)) continue;
+    if (/chat/.test(sel)) continue;
+    const sp = l.match(/(?:^|[;{\s])(?:padding|margin|gap|row-gap|column-gap)(?:-top|-bottom|-left|-right|-block|-inline)?\s*:\s*([^;{}]+)/);
+    if (sp) for (const v of sp[1].match(/-?\d+(?:\.\d+)?px/g) || []) space.push(`${i + 1}:${v}`);
+    for (const c of (l.match(/#[0-9a-fA-F]{3,8}\b/g) || [])) {
+      const lc = c.toLowerCase();
+      if (['#fff', '#ffffff', '#000', '#000000'].includes(lc)) continue;   // 순백·순흑은 팔레트 문제가 아니다
+      color.push(`${i + 1}:${lc}`);
+    }
+  }
+  le('여백을 토큰(--sp-1~4) 대신 생 px 로 쓴 곳', space.length, CEILING.space,
+    '새 여백은 var(--sp-1)=8 · var(--sp-2)=14 · var(--sp-3)=24 · var(--sp-4)=34 중에서 고르세요. 마지막 몇 줄: ' + space.slice(-4).join(' '));
+  le('팔레트(:root) 밖에서 직접 쓴 유채색', color.length, CEILING.color,
+    '새 색은 :root 에 토큰으로 먼저 넣고 var() 로 쓰세요. 마지막 몇 줄: ' + color.slice(-4).join(' '));
+}
+
+console.log('\n■ 없는 토큰에 폴백을 달지 않는다');
+{
+  /* 🔴 `var(--없는것, #색)` 은 조용히 **폴백 색이 그대로 화면에 뜬다.** 팔레트를 고쳐도
+     안 따라오므로, 팔레트가 한 벌인 줄 알았는데 화면에는 다른 색이 있는 상태가 된다.
+     실제로 `--chip-bg` 가 없어서 '자격 미확인' 배지가 팔레트에 없는 회색으로 떠 있었다. */
+  const body = R('style.css').replace(/\/\*[\s\S]*?\*\//g, '');
+  const declared = new Set([...body.matchAll(/(--[a-z0-9-]+)\s*:/g)].map((m) => m[1]));
+  const used = new Set([...body.matchAll(/var\(\s*(--[a-z0-9-]+)\s*,/g)].map((m) => m[1]));
+  const ghost = [...used].filter((t) => !declared.has(t)).sort();
+  le('선언된 적 없는 토큰에 단 폴백', ghost.length, CEILING.ghost,
+    '이 토큰들이 :root 에 없습니다 → 폴백 색이 그대로 화면에 뜹니다: ' + ghost.join(' '));
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 되돌아간 곳이 있습니다` : '\n✓ 말투·토큰 관문 전부 통과');
 process.exit(fail ? 1 : 0);
