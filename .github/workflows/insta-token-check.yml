@@ -1,0 +1,95 @@
+# 인스타 토큰 수명 확인 (2026-09-10 신설)
+#
+# 왜 필요한가:
+#   인스타 장기 토큰은 **60일**이면 만료되고, 만료되면 게시가 **조용히** 멈춘다.
+#   노션 F-4(GitHub 열쇠 2026-11-07 만료)와 **같은 유형**이다 — 그때 가서야 안다.
+#   관리자 화면 잠금 확인(admin-lock-check)과 같은 계열: '설정을 보는 것' 이 아니라
+#   **실제로 물어보는 것**만이 증명이다.
+#
+# 🔴 여기서 토큰을 **갱신하지 않는다.** 갱신하려면 앱 시크릿과 시크릿 쓰기 권한을 가진
+#    열쇠를 저장소에 둬야 하는데, 그 열쇠가 새면 남이 우리 계정에 글을 올릴 수 있다.
+#    이 저장소는 관리자 열쇠 권한을 일부러 최소로 둔다(`_admin` 과 같은 판단).
+#    → 남은 날짜만 보고, 짧아지면 🚨 이슈로 사람을 부른다. 갱신은 사람이 한다.
+#
+# 실행: 매일 03:17 KST + Actions 탭에서 수동
+name: 인스타 토큰 수명 확인
+
+on:
+  schedule:
+    # 🔴 UTC 정각·자정 부근은 GitHub 이 지연·생략한다 — 홀수 분으로 피한다(CLAUDE.md).
+    - cron: '17 18 * * *'      # 03:17 KST
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: insta-token-check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 토큰에게 직접 물어본다
+        id: t
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: |
+          if [ -z "$IG_ACCESS_TOKEN" ]; then
+            echo '시크릿이 아직 없습니다 — 계정 연결 전이라 정상입니다.'
+            echo 'state=none' >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          node insta/token-days.mjs >> "$GITHUB_OUTPUT"
+
+      - name: 짧아졌으면 🚨 이슈
+        if: ${{ steps.t.outputs.state == 'expiring' || steps.t.outputs.state == 'dead' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          DAYS: ${{ steps.t.outputs.days }}
+          STATE: ${{ steps.t.outputs.state }}
+        run: |
+          # 🔴 제목으로 찾으면 이모지·한글에서 놓친다 — 라벨로 중복을 막는다(CLAUDE.md).
+          gh label create insta-token --repo "$REPO" --color B60205 --description '인스타 토큰 만료' 2>/dev/null || true
+          if [ -n "$(gh issue list --repo "$REPO" --label insta-token --state open --json number --jq '.[0].number')" ]; then
+            echo '이미 열린 이슈가 있습니다 — 새로 만들지 않습니다.'; exit 0
+          fi
+          if [ "$STATE" = 'dead' ]; then
+            TITLE='🚨 인스타 토큰이 죽었습니다 — 게시가 멈춰 있습니다'
+            BODY='토큰으로 물어봤더니 거부당했습니다. **지금 게시가 안 됩니다.**'
+          else
+            TITLE="🚨 인스타 토큰이 ${DAYS}일 뒤 만료됩니다"
+            BODY="남은 수명 **${DAYS}일**. 만료되면 게시가 **조용히** 멈춥니다."
+          fi
+          gh issue create --repo "$REPO" --label insta-token --title "$TITLE" --body "$BODY
+
+          ## 어떻게 고치나
+          1. Meta 앱 → 도구 → 액세스 토큰 도구에서 **장기 토큰**을 새로 받는다 (60일)
+          2. 저장소 Settings → Secrets → Actions → \`IG_ACCESS_TOKEN\` 을 새 값으로
+          3. 이 워크플로를 수동 실행해 초록불을 확인한다
+
+          이 이슈는 토큰이 넉넉해지면 **자동으로 닫힙니다.**"
+
+      - name: 넉넉해졌으면 이슈를 닫는다
+        if: ${{ steps.t.outputs.state == 'ok' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          DAYS: ${{ steps.t.outputs.days }}
+        run: |
+          for n in $(gh issue list --repo "$REPO" --label insta-token --state open --json number --jq '.[].number'); do
+            gh issue close "$n" --repo "$REPO" --comment "토큰이 갱신됐습니다 — 남은 수명 ${DAYS}일. 자동으로 닫습니다."
+          done
+
+      # 🔴 시간 초과는 '실패' 가 아니라 '취소' 다 — 둘 다 잡는다(CLAUDE.md).
+      - name: 확인 자체가 실패하면
+        if: ${{ failure() || cancelled() }}
+        run: echo '🚨 토큰 확인이 실패했습니다 — 확인 못 한 것을 「괜찮다」로 읽지 마세요.' >> "$GITHUB_STEP_SUMMARY"

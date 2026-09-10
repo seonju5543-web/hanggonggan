@@ -207,10 +207,43 @@ const today = new Date();
     // 🔴 시간 초과는 '실패' 가 아니라 '취소' 다 — 둘 다 잡아야 조용히 안 죽는다.
     if (!/failure\(\) \|\| cancelled\(\)/.test(wf)) fail('C9', '-', '워크플로가 취소를 안 잡는다');
     if (!/timeout-minutes/.test(wf)) fail('C9', '-', '워크플로에 timeout-minutes 가 없다');
+  // 🔴 실패를 단계 요약에만 적으면 **아무도 안 본다** — 수동 실행 워크플로는 더 그렇다.
+  //    이 저장소의 다른 로봇들과 같게 이슈로 사람을 부른다.
+  if (!/gh issue create/.test(wf)) fail('C9', '-', '게시 워크플로가 실패를 이슈로 안 알린다');
+  if (!/issues: write/.test(wf)) fail('C9', '-', '게시 워크플로에 이슈 권한이 없다');
     // 🔴 게시 단계가 다시 그리면 관리자가 본 것과 다른 공고가 올라간다.
     const pubJob = wf.slice(wf.indexOf('  publish:'));
     if (/render\.mjs/.test(pubJob)) fail('C9', '-', '게시 단계가 다시 그린다 — 준비된 것만 올려야 한다');
-    console.log('  · 게시 경로 — 예행연습 기본 · JPEG · 공개 확인 · seen 기록 · 다시 안 그림');
+    // C10 · 토큰 만료 감시 — 🔴 만료되면 **조용히** 게시가 멈춘다(노션 F-4 와 같은 유형).
+  //    못 물어본 것을 '괜찮다' 로 읽으면 두 달 뒤에나 안다. 갈래를 전부 시험한다.
+  {
+    const { tokenState, WARN_DAYS } = await import(new URL('../insta/token-days.mjs', `file://${__filename}`).href);
+    const mk = (body, ok = true) => async () => ({ ok, json: async () => body });
+    const now = Math.floor(Date.now() / 1000);
+    const before = process.env.IG_ACCESS_TOKEN;
+    process.env.IG_ACCESS_TOKEN = 'x';
+    const want = [
+      ['만료 없음', mk({ data: { is_valid: true, expires_at: 0 } }), 'ok'],
+      ['넉넉함', mk({ data: { is_valid: true, expires_at: now + 40 * 86400 } }), 'ok'],
+      ['임박', mk({ data: { is_valid: true, expires_at: now + 5 * 86400 } }), 'expiring'],
+      ['이미 만료', mk({ data: { is_valid: true, expires_at: now - 86400 } }), 'dead'],
+      ['무효', mk({ data: { is_valid: false } }), 'dead'],
+      ['API 오류', mk({ error: { message: 'bad' } }, false), 'dead'],
+      ['못 물어봄', async () => { throw new Error('ENOTFOUND'); }, 'dead'],
+    ];
+    for (const [name, f, expect] of want) {
+      const got = (await tokenState(f)).state;
+      if (got !== expect) fail('C10', '-', `토큰 판정 '${name}' 이 ${expect} 가 아니라 ${got}`);
+    }
+    process.env.IG_ACCESS_TOKEN = '';
+    if ((await tokenState()).state !== 'none') fail('C10', '-', '토큰이 없는데 none 이 아니다');
+    if (before === undefined) delete process.env.IG_ACCESS_TOKEN; else process.env.IG_ACCESS_TOKEN = before;
+    const tw = readFileSync(join(ROOT, '.github/workflows/insta-token-check.yml'), 'utf8');
+    if (!/schedule:/.test(tw)) fail('C10', '-', '토큰 확인이 예약으로 안 돈다 — 사람이 기억해야 하면 안 돈다');
+    if (!/issues: write/.test(tw)) fail('C10', '-', '토큰 확인이 이슈를 못 만든다');
+    console.log(`  · 토큰 감시 — 갈래 ${want.length}가지 · 경고 문턱 ${WARN_DAYS}일 · 매일 예약`);
+  }
+  console.log('  · 게시 경로 — 예행연습 기본 · JPEG · 공개 확인 · seen 기록 · 다시 안 그림');
     console.log(bad ? `\n🚨 ${bad}건 실패` : '\n✅ 전부 통과');
     process.exit(bad ? 1 : 0);
 

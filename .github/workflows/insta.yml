@@ -35,6 +35,7 @@ on:
 
 permissions:
   contents: write
+  issues: write   # 🔴 실패를 요약에만 적으면 아무도 안 본다 — 이슈로 부른다
 
 # 🔴 수집 로봇들과 **다른 대기줄**을 쓴다 — 같은 줄에 넣으면 GitHub 이 대기 중인
 #    실행을 새 실행으로 취소해서 예약 수집이 조용히 사라진다(CLAUDE.md).
@@ -128,7 +129,18 @@ jobs:
 
       - name: 실패하면 시끄럽게
         if: ${{ failure() || cancelled() }}
-        run: echo '🚨 준비가 실패했습니다 — 위 단계 로그를 보세요.' >> "$GITHUB_STEP_SUMMARY"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN: ${{ github.run_id }}
+        run: |
+          echo '🚨 준비가 실패했습니다 — 이슈를 만들었습니다.' >> "$GITHUB_STEP_SUMMARY"
+          gh label create insta-fail --repo "$REPO" --color B60205 --description '인스타 게시 실패' 2>/dev/null || true
+          gh issue create --repo "$REPO" --label insta-fail \
+            --title '🚨 인스타 카드 준비가 실패했습니다' \
+            --body "실행 로그: https://github.com/$REPO/actions/runs/$RUN
+
+          사실 관문이 빨간불이면 카드가 원문을 상하게 하고 있다는 뜻이라, 고치기 전에는 올리면 안 됩니다."
 
   # ── ② 게시 — ①이 커밋한 것을 그대로 올린다. **다시 안 그린다** ──
   publish:
@@ -175,4 +187,18 @@ jobs:
       #    '실패' 가 아니라 '취소' 다(CLAUDE.md). 둘 다 잡는다.
       - name: 실패하면 시끄럽게
         if: ${{ failure() || cancelled() }}
-        run: echo '🚨 게시가 실패했습니다 — 위 단계 로그를 보세요.' >> "$GITHUB_STEP_SUMMARY"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN: ${{ github.run_id }}
+        run: |
+          echo '🚨 게시가 실패했습니다 — 이슈를 만들었습니다.' >> "$GITHUB_STEP_SUMMARY"
+          gh label create insta-fail --repo "$REPO" --color B60205 --description '인스타 게시 실패' 2>/dev/null || true
+          gh issue create --repo "$REPO" --label insta-fail \
+            --title '🚨 인스타 게시가 실패했습니다' \
+            --body "실행 로그: https://github.com/$REPO/actions/runs/$RUN
+
+          자주 나는 원인 셋
+          - 토큰 만료 → IG_ACCESS_TOKEN 갱신 (「인스타 토큰 수명 확인」 참고)
+          - 그림이 아직 공개 안 됨 → Pages 배포를 기다렸다 「게시」 를 다시
+          - 24시간 100건 상한 초과 → 내일 다시"
