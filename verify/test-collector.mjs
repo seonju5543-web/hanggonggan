@@ -4229,6 +4229,61 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
   eq('등록 공고 전수 — 대학원 전용인데 점수가 매겨진 것이 없다', bad, []);
 }
 
+/* ── 옛 프로필 값 (2026-09-09 신설) ─────────────────────────────────────────────
+   🔴 **온보딩이 저장하는 값과 코드가 읽는 값이 어긋나면 그 판정은 조용히 죽는다.**
+      실측으로 일곱 자리가 그랬다 — 저장되는 값은 `신입학`·`복학예정`·`서울`·`경기` 인데
+      코드는 `freshman`·`returning`·`seoul`·`gyeonggi` 를 보고 있었다.
+      app.js 의 `LEGACY_STATUS`·`LEGACY_REGION` 이 옛 프로필까지 새 값으로 바꿔 주므로
+      그 비교는 **영영 참이 안 된다**(죽은 코드다).
+      가장 아팠던 것: 온보딩이 *"직전학기 평점 (4.5 만점 · **신입학은 공란 가능**)"* 이라고
+      직접 안내해 평점을 비운 신입생이, **국가장학금 Ⅰ·Ⅱ유형과 국가근로장학금에서 전부
+      '정보 입력 필요' 로 떨어지고 신청 버튼이 잠겼다**(브라우저로 온보딩을 눌러 실측).
+      이 저장소가 이미 아는 '상수의 뜻이 바뀌면 그 값을 읽는 곳이 조용히 죽는다' 유형이다. */
+{
+  console.log('\n■ 옛 프로필 값');
+  const appJs = readText(new URL('../app.js', import.meta.url));
+  const html = readText(new URL('../index.html', import.meta.url));
+
+  /* 이전표에 적힌 **옛 값**이 곧 '코드에 있으면 안 되는 값'이다 — 목록을 따로 베끼지 않는다 */
+  const legacy = [];
+  for (const name of ['LEGACY_STATUS', 'LEGACY_REGION']) {
+    const blk = (appJs.match(new RegExp(name + '\\s*=\\s*\\{([^}]*)\\}')) || [])[1] || '';
+    [...blk.matchAll(/([A-Za-z_][A-Za-z0-9_]*)\s*:/g)].forEach((m) => legacy.push(m[1]));
+  }
+  eq('이전표에서 옛 값을 읽어 냈다', legacy.length >= 5, true);
+
+  const files = ['app.js', 'match-engine.js', 'data.js', 'notify-rules.js', 'chat.js',
+    'essay-ask.js', 'essay.js', 'form-plan.js', 'forms.js', 'interactions.js', 'resume.js'];
+  /* ⚠️ **주석을 먼저 걷어낸다.** 이 저장소의 주석은 사고 경위를 길게 적어 두므로 그 안에
+     옛 값이 그대로 인용돼 있다(`p.status === 'enrolled'` 처럼). 줄 첫 글자로만 가리면
+     여러 줄 주석의 가운데 줄이 코드로 읽혀 헛경보가 난다(그렇게 짰다가 잡았다).
+     줄 번호를 지키려고 지우는 대신 **같은 길이의 공백으로 덮는다.** */
+  const strip = (src) => src
+    .replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' '))
+    .replace(/(^|[^:])\/\/[^\n]*/g, (m, p1) => p1 + ' '.repeat(m.length - p1.length));
+  const bad = [];
+  for (const f of files) {
+    const src = strip(readText(new URL('../' + f, import.meta.url)));
+    src.split('\n').forEach((line, i) => {
+      if (/LEGACY_STATUS|LEGACY_REGION/.test(line)) return;      // 이전표 자신
+      for (const v of legacy) {
+        if (new RegExp("(status|region|parentRegion)\\s*[!=]==\\s*'" + v + "'").test(line)) {
+          bad.push(`${f}:${i + 1} ${line.trim().slice(0, 60)}`);
+        }
+      }
+    });
+  }
+  eq('옛 값과 견주는 곳이 없다 (있으면 그 판정은 죽어 있다)', bad, []);
+
+  /* 🔴 반대 방향 — 온보딩 칩에 있는 값을 실제로 읽는가. 값이 바뀌면 여기가 먼저 걸린다. */
+  const chips = [...html.matchAll(/id="in-status"[\s\S]*?<\/div>/g)][0] || '';
+  const values = [...String(chips).matchAll(/data-value="([^"]+)"/g)].map((m) => m[1]);
+  eq('온보딩 학적 칩을 읽어 냈다', values.length >= 5, true);
+  eq("'신입학' 이 온보딩에 있다", values.includes('신입학'), true);
+  const me = readText(new URL('../match-engine.js', import.meta.url));
+  eq('판정 엔진이 그 값을 그대로 읽는다', /status === '신입학'/.test(me), true);
+}
+
 /* ── CI 감시 범위 (2026-09-09 신설) ─────────────────────────────────────────────
    🔴 **화면 검사는 `paths:` 에 걸린 파일이 바뀔 때만 돈다.** 그 목록을 손으로 관리하면
       새 파일이 생길 때마다 어긋나고, **어긋난 것은 조용하다** — 검사가 실패하는 게 아니라

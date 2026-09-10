@@ -32,7 +32,15 @@ function evaluate(sch, p) {
   let ok = true;
 
   const flags = (p && p.flags) || [];
-  const gpaExempt = p.status === 'freshman';
+  /* 🔴 **옛 학적상태 값을 보고 있었다** (2026-09-09 코드 리뷰에서 잡았다).
+     온보딩이 저장하는 값은 `신입학` 인데 여기는 `freshman` 을 봤다. app.js 의
+     `LEGACY_STATUS` 가 옛 프로필까지 새 값으로 바꿔 주므로 이 비교는 **영영 참이 안 된다.**
+     결과: 온보딩이 *"직전학기 평점 (4.5 만점 · 신입학은 공란 가능)"* 이라고 직접 안내해
+     평점을 비운 신입생이, 국가장학금 Ⅰ·Ⅱ유형과 국가근로장학금에서 전부 '정보 입력 필요' 로
+     떨어지고 신청 버튼이 잠겼다(브라우저로 온보딩을 끝까지 눌러 실측).
+     이 저장소가 이미 아는 **'상수의 뜻이 바뀌면 그 값을 읽는 곳이 조용히 죽는다'** 유형이다.
+     관문: test-collector '옛 프로필 값' 절이 저장하는 값과 읽는 값을 대조한다. */
+  const gpaExempt = p.status === '신입학';
 
   if (e.minGpa != null && !gpaExempt) {
     if (p.gpa == null) missing.push('직전학기 평점');
@@ -50,7 +58,7 @@ function evaluate(sch, p) {
     ok = false; reasons.push(`${e.years.join('·')}학년만 지원 가능`);
   }
 
-  if (e.freshmanOnly && p.status !== 'freshman') {
+  if (e.freshmanOnly && p.status !== '신입학') {
     ok = false; reasons.push('신입학 첫 학기 학생만 지원 가능');
   }
 
@@ -73,7 +81,7 @@ function evaluate(sch, p) {
   }
 
   if (e.seoulOnly) {
-    if (p.region !== 'seoul') { ok = false; reasons.push('서울 거주자만 지원 가능'); }
+    if (p.region !== '서울') { ok = false; reasons.push('서울 거주자만 지원 가능'); }
     else reasons.push('거주지 요건 충족 (서울)');
   }
 
