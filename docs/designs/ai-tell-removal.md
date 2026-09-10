@@ -137,7 +137,9 @@ Figma 검토본: **한대장 — UI/UX 검토 · AI티 제거 (2026-09-10)**
   개발자 승인 없이 할 수 없다(`.claude/skills/approved-design`). 대신 **오늘 안 고쳐도
   내일 더 나빠지지는 않게** 했다. 줄이면 "천장을 내리라"고 스스로 알린다.
 - **red-green 확인함** — 셋 다 일부러 어겨서 빨간불이 뜨는 것을 보고, 되돌려 초록불을 확인했다.
-- 이미 `.github/workflows/verify-ui.yml` 이 `ui-tone.mjs` 를 돌리므로 **자동으로 걸린다.**
+- `.github/workflows/verify-ui.yml` 이 `ui-tone.mjs` 를 돌리므로 **자동으로 걸린다.**
+  ⚠️ 단, 그 워크플로는 `on.push.branches: [claude/nice-heisenberg-WESq5, main]` 이라
+  **이 검토 브랜치에서는 아직 안 돈다.** 기본 브랜치에 병합되는 순간부터 걸린다.
 - 세는 데서 뺀 것 셋: `.chat-*`(개발자 지시) · `.fd-*`/`.form-doc`(인쇄 문서라 흰 종이·검은 글씨가 맞다) · `@keyframes`.
 
 ---
