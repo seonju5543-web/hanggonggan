@@ -74,15 +74,26 @@
 
   /* 글자 크기 9단 — 그대로 둔다(앞선 세션이 27종에서 줄여 놓은 자산이다).
      히어로만 조금 키우고 자간을 조였다: 큰 글자는 자간을 좁혀야 덩어리로 읽힌다. */
-  --t-2xs: 11.5px;
-  --t-xs:  12.5px;
-  --t-sm:  13.5px;
-  --t-md:  14.5px;
-  --t-lg:  17px;
-  --t-xl:  18.5px;
-  --t-2xl: 21px;
-  --t-3xl: 27px;
-  --t-hero: 38px;
+  /* 🔴 **비율이 있는 척도다** (2026-09-10 페이스리프트로 다시 그었다).
+     전에는 11.5 · 12.5 · 13.5 · 14.5 — 네 단계가 3px 안에 몰려 있어 눈으로 구분이 안 됐고,
+     그래서 화면의 절반이 "그냥 작은 회색 글자" 한 덩어리로 읽혔다(홈 실측: 그 네 크기가
+     400~800 굵기와 뒤섞여 조합만 11가지였다). 지금은 단계마다 최소 1.1배씩 벌어진다.
+     ⚠️ 본문(--t-md)이 14.5 → 17 로 커졌다. 한국어 본문은 16px 아래에서 급격히 읽기 힘들어지고,
+        이 앱은 공고 원문을 그대로 읽히는 앱이라 본문이 주인공이다. */
+  --t-2xs: 12px;    /* 배지 · 메타 */
+  --t-xs:  13.5px;  /* 보조 설명 */
+  --t-sm:  15px;    /* 작은 본문 */
+  --t-md:  17px;    /* 본문 */
+  --t-lg:  20px;    /* 카드 제목 */
+  --t-xl:  24px;    /* 화면 제목 */
+  --t-2xl: 27px;
+  --t-3xl: 30px;
+  --t-hero: 46px;   /* 금액 하나뿐 */
+
+  /* 자간 — 전에는 화면 곳곳에 9가지가 흩어져 있었다. 큰 글자는 좁히고 작은 글자·숫자는 안 좁힌다. */
+  --track-display: -0.03em;   /* 24px 이상 */
+  --track-text:    -0.01em;   /* 본문 */
+  --track-flat:    0;         /* 숫자 · 배지 · 영문 약자 */
 
   /* 움직임 — 스프링에 가까운 곡선 하나로 통일. 요소마다 다른 곡선을 쓰면 '덜 만든 앱'이 된다 */
   --ease: cubic-bezier(0.32, 0.72, 0, 1);
@@ -96,13 +107,24 @@ html { -webkit-text-size-adjust: 100%; }
    pan-x pan-y 는 '손가락으로 밀기는 되고 벌려서 확대는 안 된다' 는 뜻이다 —
    목록 스크롤도, 카드를 옆으로 미는 손짓도 그대로 동작한다(검사로 확인). */
 html { touch-action: pan-x pan-y; }
-body {
-  font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
+/* 서체 (2026-09-10 페이스리프트) — 본문 SUIT · 제목 SUITE · 되돌아갈 자리 Pretendard.
+   🔴 스택 마지막의 Pretendard 를 지우지 말 것. 앞의 둘이 못 실리면 화면은 **지금 그대로** 그려진다.
+      (샌드박스 프록시가 CDN 을 막아 이 세션에서 주소를 확인하지 못했다 — 그래서 이렇게 짰다.)
+   왜 바꿨나 — Pretendard 는 조사로 확인된 **한국 앱의 표준 기본값**이라 그것만 쓰면
+      "서체를 고르지 않았다"로 읽힌다. SUIT 는 숫자와 비율이 정돈된 UI 본문용이고,
+      이 앱은 금액·마감·적합도처럼 **숫자가 화면의 주인공**이라 거기에 맞다. */
+:root {
+  --font-text: 'SUIT Variable', 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
     'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', system-ui, sans-serif;
+  --font-display: 'SUITE Variable', 'SUIT Variable', 'Pretendard Variable', Pretendard,
+    -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
+}
+body {
+  font-family: var(--font-text);
   background: var(--bg);
   color: var(--text);
   line-height: 1.5;
-  letter-spacing: -0.012em;
+  letter-spacing: var(--track-text);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -3778,4 +3800,116 @@ button, input, select, textarea { letter-spacing: inherit; }
   margin: var(--sp-2) auto 0;
   padding: var(--space-12) var(--space-24);
   font-size: var(--t-sm);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   서체의 표정 (2026-09-10 페이스리프트 · 개발자 지시 "폰트와 앱 분위기, 바이브")
+
+   앞의 작업이 구조를 고쳤다면 여기는 **얼굴**이다. 실측으로 드러난 것 셋:
+     · 폰트가 Pretendard 하나 — 조사로 확인된 한국 앱의 표준 기본값이라 "고르지 않았다"로 읽힌다.
+     · 홈에서 칠해진 색 80곳 중 **65곳이 먹색 아니면 회색**이고 브랜드색은 3번 나온다.
+       팔레트는 있는데 안 쓰이니 화면이 '아직 스타일 안 입힌 시안'처럼 보인다.
+     · 글자 크기 네 단계가 3px 안에 몰려 굵기와 뒤섞여 조합만 11가지였다.
+
+   고친 방식 — **팔레트를 늘리지 않고 있는 것을 쓴다.** 새 색을 만들지 않았다.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 제목은 SUITE 로 말한다 ─────────────────────────────────────────────────
+   같은 활자소(Sun)의 짝이라 본문 SUIT 와 어울리면서, 기하학적 골격이라 제목에서
+   확실히 다른 목소리가 난다. 🔴 본문에는 쓰지 않는다 — 제목용 골격이라 길게 읽으면 피로하다. */
+.hero-amount,
+.home-greet,
+.page-header h2,
+.onboard-body h2,
+.onboard-hero h1,
+.section-head h3,
+.sheet-title,
+.list-group-head {
+  font-family: var(--font-display);
+}
+
+/* ── 자간을 세 가지로 ──────────────────────────────────────────────────────
+   전에는 -0.035 · -0.03 · -0.025 · -0.02 · -0.015 · -0.012 · -0.01 · 0 · 0.02 가 흩어져 있었다.
+   큰 글자일수록 좁히고, 숫자·배지는 좁히지 않는다(좁히면 숫자가 붙어 읽기 어려워진다). */
+.hero-amount,
+.onboard-hero h1,
+.onboard-body h2,
+.page-header h2 { letter-spacing: var(--track-display); }
+
+.home-greet,
+.section-head h3,
+.sheet-title,
+.list-group-head,
+.sch-name { letter-spacing: var(--track-text); }
+
+/* ── 숫자가 이 앱의 주인공이다 ─────────────────────────────────────────────
+   금액 · 남은 날 · 적합도 · 건수 — 학생이 실제로 읽는 것은 거의 다 숫자다.
+   🔴 tabular-nums 로 자리를 고정한다. 안 그러면 목록에서 숫자마다 폭이 달라
+      카드가 미세하게 어긋나 보인다(그 어긋남이 '대충 만든 느낌'의 정체다). */
+.sch-amount,
+.sch-due,
+.sch-fit,
+.hero-amount,
+.hero-count,
+.list-group-n,
+.badge {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--track-flat);
+}
+
+/* ── 색을 실제로 쓴다 ──────────────────────────────────────────────────────
+   🔴 **새 색을 만들지 않는다.** 이미 있는 --accent 를 쓰지 않던 자리에 쓸 뿐이다.
+      팔레트를 늘리면 다시 '세 세대 겹침'이 시작된다(2026-09-10 검토에서 본 그것). */
+
+/* 구획 머리의 건수 — 목록에서 눈이 처음 닿는 자리다 */
+.list-group-n { color: var(--accent); font-weight: 700; }
+
+/* 급한 구획만 색으로 말한다 — 전부 칠하면 아무것도 안 급해진다 */
+.list-group:first-child .list-group-head { color: var(--accent); }
+
+/* 화면 제목 아래 얇은 강조선 — 브랜드가 '있다'는 최소한의 표시 */
+.page-header h2 {
+  position: relative;
+  padding-bottom: var(--space-8);
+}
+.page-header h2::after {
+  content: '';
+  position: absolute;
+  left: 0; bottom: 0;
+  width: 28px; height: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+}
+
+/* 눌린 탭 — 전에는 먹색이라 안 눌린 것과 굵기로만 갈렸다 */
+.nav-item.active { color: var(--accent); }
+
+/* 금액은 이 앱이 파는 것이다 — 카드에서 확실히 읽히게 */
+.sch-amount { font-family: var(--font-display); font-weight: 800; }
+.sch-amount.unknown { font-family: var(--font-text); font-weight: 500; }
+
+/* ── 한국어 줄바꿈 (2026-09-10 페이스리프트) ────────────────────────────────
+   🔴 이 앱에 `word-break: keep-all` 이 **한 곳도 없었다.** 그래서 브라우저 기본값이
+      한국어를 글자 단위로 잘라, 온보딩 제목 '…알려주세요' 가 '알려주세 / 요' 로 끊겨
+      마지막 줄에 '요' 한 글자만 남았다(실측 스크린샷).
+      한국어는 **어절 단위**로 끊어야 읽힌다 — 한국어 화면을 만든 사람은 거의 항상 이걸 켠다.
+   ⚠️ `keep-all` 만 켜면 끊을 수 없는 긴 낱말(주소·긴 기관명)이 화면 밖으로 나간다.
+      그래서 `overflow-wrap: break-word` 를 짝으로 둔다 — 어절은 지키되, 한 낱말이
+      한 줄보다 길면 그때만 자른다.
+   ⚠️ 인쇄 문서(.fd-)와 원문 발췌는 원본 줄바꿈이 뜻을 가지므로 건드리지 않는다. */
+body,
+.onboard-hero h1,
+.onboard-body h2,
+.onboard-sub,
+.page-header h2,
+.section-head h3,
+.sheet-title,
+.sch-name,
+.sch-org,
+.empty,
+.empty-sub,
+.hero-label,
+.hero-count {
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }

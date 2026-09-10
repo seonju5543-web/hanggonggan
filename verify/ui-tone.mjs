@@ -198,5 +198,55 @@ console.log('\n■ 없는 토큰에 폴백을 달지 않는다');
     '이 토큰들이 :root 에 없습니다 → 폴백 색이 그대로 화면에 뜹니다: ' + ghost.join(' '));
 }
 
+/* ── ⑥ 서체와 척도 (2026-09-10 페이스리프트) ────────────────────────────────
+   개발자 지시: *"'디자인' 측면인 걸 잊지마. 예시로 폰트와 앱 분위기, 바이브 등을 뽑을 수 있어."*
+
+   여기서 지키는 셋 — 전부 실제로 겪은 것이다:
+   ① **폰트 스택에서 Pretendard 를 빼지 않는다.** SUIT/SUITE 는 CDN 에서 오는데
+      이 저장소 샌드박스는 그 주소를 확인할 수 없다(프록시가 막는다). 스택 마지막의
+      Pretendard 가 **되돌아갈 자리**다 — 그것을 지우면 CDN 이 하루라도 흔들릴 때
+      학생 화면의 글자가 통째로 시스템 폰트로 떨어지고, 아무도 모른다.
+   ② **글자 크기 단계가 붙어 있지 않다.** 전에는 11.5·12.5·13.5·14.5 — 네 단계가 3px 안에
+      몰려 눈으로 구분이 안 됐고, 화면 절반이 '그냥 작은 회색 글자' 한 덩어리로 읽혔다.
+      단계마다 최소 1.08배는 벌어져야 위계가 생긴다.
+   ③ **한국어 줄바꿈(`keep-all`)을 끄지 않는다.** 이게 없어서 온보딩 제목이
+      '알려주세 / 요' 로 끊겨 마지막 줄에 '요' 한 글자만 남아 있었다(실측). */
+console.log('\n■ 서체와 글자 척도 (2026-09-10)');
+{
+  /* 🔴 **주석을 걷어내고 본다.** 처음 짤 때 이 줄이 `R('style.css')` 였는데, 바로 위
+     설명 주석에 `word-break: keep-all` 이라는 글자가 들어 있어서 **주석을 읽고 통과**시켰다
+     (일부러 꺼 보는 red-green 확인에서 잡았다 — 안 했으면 아무것도 안 재는 검사가 됐다).
+     같은 이유로 index.html 도 주석을 걷는다: 거기 붙인 설명에도 'Pretendard' 가 여러 번 나온다. */
+  const css = stripComments(R('style.css'));
+  const html = stripComments(R('index.html'));
+
+  /* ① 되돌아갈 자리 */
+  const stackLines = [...css.matchAll(/--font-(?:text|display):\s*([^;]+);/g)].map((m) => m[1]);
+  eq('폰트 스택이 둘 다 선언돼 있다', stackLines.length, 2);
+  eq('두 스택 모두 마지막 보루로 Pretendard 를 남긴다 (CDN 이 흔들려도 글자가 안 깨진다)',
+    stackLines.filter((v) => /Pretendard/.test(v)).length, 2);
+  eq('index.html 이 Pretendard 를 계속 싣는다',
+    /pretendard/i.test(html), true);
+
+  /* ② 척도 — 단계가 붙어 있으면 위계가 없다 */
+  const scale = ['2xs', 'xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl', 'hero']
+    .map((k) => {
+      const m = css.match(new RegExp('--t-' + k.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&') + ':\\s*([\\d.]+)px'));
+      return m ? parseFloat(m[1]) : null;
+    });
+  eq('글자 크기 아홉 단계가 모두 있다', scale.filter((v) => v !== null).length, 9);
+  const tooClose = [];
+  for (let i = 1; i < scale.length; i++) {
+    const ratio = scale[i] / scale[i - 1];
+    if (ratio < 1.08) tooClose.push(`${scale[i - 1]}px → ${scale[i]}px (${ratio.toFixed(3)}배)`);
+  }
+  eq('단계마다 최소 1.08배는 벌어진다 (붙어 있으면 눈이 구분 못 한다)', tooClose, []);
+
+  /* ③ 한국어 줄바꿈 */
+  eq('한국어 줄바꿈(keep-all)을 켜 둔다', /word-break:\s*keep-all/.test(css), true);
+  eq('  긴 낱말이 화면 밖으로 나가지 않게 짝(overflow-wrap)도 함께 둔다',
+    /overflow-wrap:\s*break-word/.test(css), true);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 되돌아간 곳이 있습니다` : '\n✓ 말투·토큰 관문 전부 통과');
 process.exit(fail ? 1 : 0);
