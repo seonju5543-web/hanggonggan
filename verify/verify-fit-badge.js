@@ -6,6 +6,11 @@
    실행: 이 워크트리에서 `python3 -m http.server <포트>` 를 띄운 뒤
          CHROME_PATH=... PORT=<포트> node verify/verify-fit-badge.js
    🔴 **PORT= 를 반드시 준다** — 8123 에는 다른 워크트리 서버가 떠 있을 수 있다. */
+/* 🔴 2026-09-10 페이스리프트: 카드의 적합도는 **알약이 아니라 글자**(.sch-fit)다.
+   목록에서 이 값이 대부분 33~50% 에 몰려 있어 카드마다 같은 색 덩어리가 반복되면서
+   눈이 제목보다 그것을 먼저 봤다. 숫자는 그대로 보인다(2026-08-31 개발자 지시 유지) —
+   바뀐 것은 무게뿐이라, 이 검사도 **선택자만** 옮기고 재는 뜻은 그대로 둔다.
+   알약은 학생이 멈춰 서야 하는 셋(미달·미확인·신청 완료)에만 남았다. */
 const { chromium } = require('playwright-core');
 const { assertOwnServer } = require('./onboard-helper.js');
 const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
@@ -52,7 +57,7 @@ const PROFILE = (over) => ({
   }
 
   const badges = (page) => page.$$eval('#explore-list .sch-card', (els) => els.map((e) => {
-    const b = e.querySelector('.badge-fit, .badge-fit-unknown, .badge-fit-no');
+    const b = e.querySelector('.sch-fit, .badge-fit, .badge-fit-unknown, .badge-fit-no');
     return { cls: b ? b.className : '', text: b ? b.innerText.replace(/\s+/g, ' ') : '' };
   }));
 
@@ -86,7 +91,7 @@ const PROFILE = (over) => ({
   await page.context().close();
   page = await open({});
   bs = await badges(page);
-  const okBadges = bs.filter((b) => b.cls.includes('badge-fit') && !b.cls.includes('unknown') && !b.cls.includes('-no'));
+  const okBadges = bs.filter((b) => (b.cls.includes('sch-fit') || b.cls.includes('badge-fit')) && !b.cls.includes('unknown') && !b.cls.includes('-no'));
   /* 🔴 카드 배지는 `적합도 50%` **퍼센트뿐**이다 (2026-08-31 개발자 지시).
      요건 개수는 상세로 내려갔다 — 아래 '상세 시트' 절이 거기 남아 있는지 본다.
      ⚠️ 이 두 검사를 짝으로 두는 것이 핵심이다. 카드만 검사하면 "카드는 퍼센트뿐"은 통과하고
@@ -104,10 +109,10 @@ const PROFILE = (over) => ({
         내보내는 줄 수(`requirementLines(sch, null, {all:true})`)와 대조한다. */
   console.log('\n■ 상세 시트가 자격 줄을 빠뜨리지 않는다');
   const idx = await page.$$eval('#explore-list .sch-card',
-    (els) => els.findIndex((e) => /적합도 \d+%/.test((e.querySelector('.badge-fit') || {}).innerText || '')));
+    (els) => els.findIndex((e) => /적합도 \d+%/.test((e.querySelector('.sch-fit, .badge-fit') || {}).innerText || '')));
   if (idx >= 0) {
     const cards = await page.$$('#explore-list .sch-card');
-    const txt = await cards[idx].$eval('.badge-fit', (e) => e.innerText.replace(/\s+/g, ' '));
+    const txt = await cards[idx].$eval('.sch-fit, .badge-fit', (e) => e.innerText.replace(/\s+/g, ' '));
     const id = await cards[idx].evaluate((e) => e.dataset.detail);
     const expected = await page.evaluate((sid) => {
       const s = allScholarships().find((x) => x.id === sid);

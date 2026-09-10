@@ -73,10 +73,13 @@ function shortDate(dateStr) {
 function deadlineMeterHtml(days, deadline) {
   var m = deadlineMeter(days);
   if (!m.show) return '';
-  var when = shortDate(deadline);
+  /* 🔴 2026-09-10 페이스리프트: 막대 옆 날짜('9/10 마감')를 **뗐다.**
+     카드가 이미 '오늘 마감 / 20일 남음'이라고 글로 말하는데 그 옆에 M/D 를 또 두면
+     한 카드가 마감을 두 가지 형식으로 말한다(앱 전체 다섯 형식의 한 축이었다).
+     막대는 남은 시간을 **모양**으로만 전한다. 낭독기용 aria-label 은 그대로 남는다.
+     shortDate 는 다른 곳(검사·달력)이 쓰므로 지우지 않는다. */
   return '<div class="dl-meter" role="img" aria-label="' + m.label + '">'
     + '<span class="dl-meter-track"><span class="dl-meter-fill" style="width:' + m.pct + '%"></span></span>'
-    + (when ? '<span class="dl-meter-date">' + when + ' 마감</span>' : '')
     + '</div>';
 }
 
