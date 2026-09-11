@@ -18,21 +18,24 @@ on:
   push:
     branches: [claude/nice-heisenberg-WESq5, main]
     paths:                     # 화면·판정에 닿는 것이 바뀔 때만 (로봇 데이터 커밋마다 돌지 않게)
-      - 'app.js'
-      - 'match-engine.js'
-      - 'parse-amount.js'
-      - 'section-head.js'
-      - 'parse-requirements.js'
-      - 'forms.js'
-      - 'chat.js'
-      - 'notify*.js'
-      - 'essay*.js'
-      - 'index.html'
-      - 'style.css'
-      - 'form-plan.js'
-      - 'data.js'
+      # 🔴 **파일 이름을 하나씩 적지 말 것** (2026-09-09 전수 대조에서 잡았다).
+      #    손으로 관리하던 목록이라 새 파일이 생길 때마다 어긋났다 — 실측으로 여덟이 빠져 있었다:
+      #    boot.js · resume.js · interactions.js · sw.js · supabase-client.js ·
+      #    push-config.js · supabase-config.js · chat-config.js.
+      #    그래서 `boot.js` 만 고치면 그걸 검사하는 verify-resume.js 가 **한 번도 안 돌았다.**
+      #    2026-09-06 에 ui-tone 이 넉 달 가까이 빨간불인 채 안 보였던 것도 같은 유형이다(B-4).
+      #    ⚠️ 글로브의 `*` 는 `/` 를 안 넘는다 — 그래서 뿌리의 앱 파일만 잡히고
+      #       `collector/*.mjs` 나 `data/*.json`(로봇이 하루 열 번 커밋한다)은 안 걸린다.
+      #    관문: test-collector 'CI 감시 범위' 절이 index.html 의 스크립트와 대조한다.
+      - '*.js'               # 뿌리의 앱 스크립트 전부 (app·match-engine·boot·resume·interactions…)
+      - '*.html'             # index.html · terms.html
+      - '*.css'
+      - 'sw.js'              # 위 '*.js' 에 이미 포함 — 잊지 말라고 남겨 둔다
       - 'verify/**'
-      - 'insta/**'
+      - '_admin/**'          # 관리자 화면 (verify-admin.js 가 스스로 빌드해 검사한다)
+      - 'server/push/**'     # 푸시 발송 서버 (verify-push-server.mjs)
+      - 'insta/**'           # 인스타 카드 (verify-insta.js)
+      - '.github/workflows/verify-ui.yml'
   workflow_dispatch:
 
 permissions:
@@ -63,6 +66,20 @@ jobs:
       - name: 제출 관문 판정 검사 (순수 모듈)
         run: node verify/verify-essay-submit.mjs
 
+      # 🔴 아래 셋은 오랫동안 **어떤 워크플로에도 안 걸려 있었다**(2026-09-09 전수 조사에서 발견).
+      #    셋 다 브라우저가 필요 없어 몇 초면 끝나는데, 안 걸어 둔 탓에 깨져도 아무도 몰랐다.
+      #    · notify-rules  — 언제 무엇을 알릴지의 단 하나의 기준 (화면·서비스워커가 공유)
+      #    · push-server   — 발송 서버가 폰 주소·학교·캠퍼스 말고 아무것도 저장하지 않는가
+      #    · form-snapshot — 질문을 줄여도 **문서는 한 글자도 안 바뀐다**는 증명 (운영 원칙 4)
+      - name: 알림 규칙 관문 (순수 모듈)
+        run: node verify/verify-notify-rules.js
+
+      - name: 푸시 발송 서버 관문
+        run: node verify/verify-push-server.mjs
+
+      - name: 양식 문서 동일성 관문 (원칙 4)
+        run: node verify/form-snapshot.mjs
+
       # 🔴 인스타 카드 사실 관문 — 145건 전수. 브라우저가 필요 없다(파일·JSON 만 읽는다).
       #    카드가 원문을 상하게 하는 유형(부정어 잘림·지역/소득 조건 증발·마감 지난 공고를
       #    '모집 중'·저작자 표시 누락)을 잡는다. 규칙은 render.mjs 에서 **이름으로 떼어 온다** —
@@ -88,7 +105,8 @@ jobs:
                    verify-supabase.js verify-essay-ui.js verify-forms-data.js \
                    verify-new-forms.js verify-source-links.js verify-push-client.js \
                    verify-notify.js verify-sheet-back.js verify-kosaf.js \
-                   verify-calendar.js verify-resume.js verify-interactions.js; do
+                   verify-calendar.js verify-resume.js verify-interactions.js \
+                   verify-admin.js; do
             echo "── $f"
             node "verify/$f"
           done

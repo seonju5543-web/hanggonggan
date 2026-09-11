@@ -182,12 +182,39 @@ function parseNationality(t) {
       학부생도 해당하므로 여기서 빼면 진짜 요건이 사라진다. */
 const GRAD_LABEL = /^\s*(일반)?\s*대학원\s?생?\s*[:：]|^\s*대학원\s?과정\s*[:：]/;
 const GRAD_BODY = /대학원\s?(석사|박사)?\s?과정|석사\s?(과정|학위)|박사\s?(과정|학위)|대학원\s?재학/;
-const UNDERGRAD_TOO = /학부|학사\s?과정|전문대/;
+/* 🔴 **`대학생` 도 학부다** (2026-09-09 전수 대조에서 잡았다).
+   여기에 `대학생` 이 없어서 아래 세 줄이 '대학원 전용'으로 읽혔다 — 셋 다 학부생도 대상인데,
+   판정에서 통째로 빠지는 바람에 **그 학생을 자격 있게 만드는 줄이 사라졌다.**
+     · `… 미술관련 학과 **대학생 및** 대학원 재학생`      (해석정해영선생장학문화재단)
+     · `… 명씨 성을 가진 **대학생 및** 대학원 석·박사과정 재학생` (대하장학회)
+     · `**대학생 또는** 대학원 학·석·박사 과정 재학생`      (파안장학문화재단)
+   해석미술은 그 줄이 유일한 자격 줄이라, 빠지자 공고 전체가 '자격 미확인'이 됐다.
+   ⚠️ `대학원생` 에는 `대학생` 이 없다(대·학·원·생) — 그래서 이 낱말이 대학원 줄을 살려 주지 않는다. */
+const UNDERGRAD_TOO = /학부|학사\s?과정|전문대|대학생/;
 function gradOnly(t) {
   const x = String(t || '');
   if (GRAD_LABEL.test(x)) return true;
   return GRAD_BODY.test(x) && !UNDERGRAD_TOO.test(x);
 }
+
+/* 🔴 **'대학원 줄'에는 뜻이 다른 두 가지가 있다** (2026-09-09).
+   ① `일반대학원생 : 평점 4.0 이상`  ← 학부/대학원 **기준을 나란히 적은 표의 한 칸**.
+      학부생에게는 무관한 칸이라 분모에서 빼는 것이 맞다(가톨릭대 동문장학금 — 2026-08-24).
+   ② `국내 의과학 대학원 석/박사 과정 재학생`  ← **이 장학금이 누구 것인지를 말하는 문장**.
+      이 줄을 빼면 '대상이 아니다'라는 사실 자체가 사라진다. 실제로 동행복지재단 의과학자
+      장학금(대학원 석·박사 전용)이 **학부 3학년 컴퓨터공학과 학생에게 적합도 95%** 로,
+      그것도 탐색 목록 맨 위에 떠 있었다 — 남은 두 줄(국적·소득구간)만 세었기 때문이다.
+   프로필에 학위 과정 칸이 없어 우리는 그 학생이 대학원생인지 **모른다**. 모르는 것을
+   95% 라고 말하지 않고, 미달이라고도 하지 않는다(틀린 미달은 못 받는 것보다 나쁘다).
+   → ②인 공고는 점수를 매기지 않고 '자격 미확인'으로 둔다. 판단은 fitDetail 이 한다. */
+function gradTarget(t) {
+  const x = String(t || '');
+  if (GRAD_LABEL.test(x)) return 'label';
+  return (GRAD_BODY.test(x) && !UNDERGRAD_TOO.test(x)) ? 'body' : null;
+}
+/* 이 줄이 학부생을 대상으로 말하는가. 🔴 판정은 위 UNDERGRAD_TOO **한 곳**에서만 한다 —
+   베껴 두면 `대학생` 을 더한 것 같은 수리가 한쪽에만 들어가 두 벌이 갈라진다. */
+function mentionsUndergrad(t) { return UNDERGRAD_TOO.test(String(t || '')); }
 
 /* ── 나이 ── `만 39세 이하` */
 function parseAge(t) {
@@ -259,7 +286,15 @@ function parseResidence(t) {
       붙었을 때만 집고, 둘레에 `출신·교수·동문·졸업생` 이 있으면 버린다.
    ⚠️ `4년제 대학교`·`관내 대학` 같은 **갈래 이름은 학교가 아니다** — 넣으면 모든 공고가
       "그 학교가 아니다"로 미달이 된다(틀린 미달은 못 받는 것보다 나쁘다). */
-const SCHOOL_GENERIC = /^(4년제|사년제|국내|해외|외국|관내|관외|소재|각급|각종|전문|일반|방송통신|사이버|원격|기술|산업|지방|수도권|정규|전국|국공립|사립|해당|타|본|우리|위|동|기타|상기|아래|모든|기타의)/;
+const SCHOOL_GENERIC = /^(4년제|사년제|국내|국외|해외|외국|관내|관외|소재|각급|각종|전문|일반|방송통신|사이버|원격|기술|산업|지방|수도권|정규|전국|국공립|사립|해당|타|본|우리|위|동|기타|상기|아래|모든|기타의)/;
+/* 🔴 **사업과의 관계를 말하는 말은 학교 이름이 아니다** (2026-09-09 전수 대조에서 잡았다).
+   `대한민국 국적자로 선발학기 **사업 참여대학**에 재학 중인 자` 에서 `참여대학` 을 학교 이름으로
+   읽어, 평점 4.5 · 20학점 · 3학년 재학생이 그 공고에서 **미달 · 신청 버튼 잠김** 이 됐다
+   (중소기업취업연계장학금 — 그때 실제로 모집 중인 공고였다).
+   어느 대학이 '참여대학'인지는 앱이 알 수 없다 — 알 수 없는 것은 미달이 아니라 **모른다**여야 하고,
+   그래서 조건 자체를 만들지 않는다. `4년제 대학`·`공과대학` 을 빼는 것과 같은 이유다.
+   🔴 **틀린 미달은 못 받는 것보다 나쁘다** — 그 학생은 받을 수 있는 장학금을 영영 못 본다. */
+const SCHOOL_ROLE = /^(참여|협약|협력|지정|선정|대상|소속|위탁|인정|수혜|모집|파견|주관|운영|시행|연계|추천)/;
 /* 🔴 **단과대학은 학교가 아니다** (2026-08-30 전수 대조에서 잡았다).
    `가. 공과대학 재학생이며 …` 를 학교 이름으로 읽는 바람에, 자기 학교 공대 장학금인데
    **미달**로 뒤집혔다 — 틀린 미달은 못 받는 것보다 나쁘다. 학교 안의 단위는 전부 뺀다. */
@@ -267,7 +302,12 @@ const SCHOOL_COLLEGE = /^(공과|인문|사범|자연|자연과학|과학|경영
 /* 🔴 안내 문장은 요건이 아니다 — `교환학생/방송대학생 별도 문의` 를 요건으로 읽으면
    방송대가 아닌 학생이 전부 미달이 된다. */
 const SCHOOL_NOT_REQ = /문의|안내\s?사항|참고|별도\s?문의/;
-const SCHOOL_NAME = /([가-힣]{2,12}(?:대학교|대학|대))\s*(?:에서|에|의|를|을)?\s*(?:재학생|재학|학부생|학생|다니는|소속)/g;
+/* 🔴 **숫자 바로 뒤에서 이름을 시작하지 않는다** (2026-09-09).
+   `4년제대학 재학생` 처럼 띄어쓰기가 없으면 한글만 집는 규칙이 `년제` 부터 세기 시작해
+   **`년제대학`** 이라는 없는 학교가 만들어졌다. 위 SCHOOL_GENERIC 의 `4년제` 가 있었는데도
+   숫자를 못 담아 그냥 지나갔다 — 띄어 쓴 `4년제 대학` 은 멀쩡했고 붙여 쓴 것만 샜다.
+   한국장학재단 등재 공고에서 실제로 그 꼴이었다(광산김씨 장학회). */
+const SCHOOL_NAME = /(?<![0-9])([가-힣]{2,12}(?:대학교|대학|대))\s*(?:에서|에|의|를|을)?\s*(?:재학생|재학|학부생|학생|다니는|소속)/g;
 const SCHOOL_NOT_SELF = /(출신|교수|동문|졸업생|추천인|학부모|자녀의)/;
 function parseSchool(t) {
   if (SCHOOL_NOT_REQ.test(t)) return null;
@@ -276,7 +316,7 @@ function parseSchool(t) {
   SCHOOL_NAME.lastIndex = 0;
   while ((m = SCHOOL_NAME.exec(t)) !== null) {
     const name = m[1];
-    if (SCHOOL_GENERIC.test(name) || SCHOOL_COLLEGE.test(name)) continue;
+    if (SCHOOL_GENERIC.test(name) || SCHOOL_COLLEGE.test(name) || SCHOOL_ROLE.test(name)) continue;
     const around = t.slice(Math.max(0, m.index - 10), m.index + m[0].length + 10);
     if (SCHOOL_NOT_SELF.test(around)) continue;
     if (!names.includes(name)) names.push(name);
@@ -356,6 +396,28 @@ function parseMajor(t) {
       names.push(n);
     }
   }
+  /* ④ `미술관련 학과` 처럼 **테두리가 흐린 분야 이름** (2026-09-09).
+     ③은 `미술관련` 을 학과명으로 집지 않는다 — 일부러 그렇게 뒀다(띄어 쓴 앞말은 이름이 아니다).
+     그런데 그 줄에 다른 조건이 없으면 **학과 축이 통째로 사라져** 아무 학과 학생이나 통과한다.
+     실측: 해석미술장학생(`미술관련 학과 대학생 및 대학원 재학생`)이 컴퓨터공학과 3학년에게
+     **적합도 95%** 로 떴다. 남은 조건이 '국적' 하나뿐이었기 때문이다.
+     🔴 그렇다고 이름으로 집으면 안 된다 — 어긋남이 **미달**이 되어 멀쩡한 학생이 잘린다.
+        그래서 **흐린 이름(fuzzy)** 으로 담는다: 맞으면 ✓, 어긋나면 '모른다'(미달 아님).
+     ⚠️ `이공계 관련학과` 처럼 계열 낱말이면 위 ②가 이미 잡았으므로 여기 오지 않는다. */
+  if (!names.length && !tracks.length) {
+    const FIELD_RELATED = /([가-힣A-Za-z]{2,10}?)\s*관련\s*(?:학과|전공|학부)/g;
+    FIELD_RELATED.lastIndex = 0;
+    const fields = [];
+    let fm;
+    while ((fm = FIELD_RELATED.exec(t)) !== null) {
+      const n = fm[1].trim();
+      if (n.length < 2 || MAJOR_GENERIC.test(n) || fields.includes(n)) continue;
+      if (MAJOR_TRACK.some(([re]) => re.test(n))) continue;
+      if (/(대학교|대학|대)$/.test(n)) continue;
+      fields.push(n);
+    }
+    if (fields.length) return { kind: 'major', names: fields, fuzzy: true, conf: LOW };
+  }
   if (!names.length && !tracks.length) return null;
   return {
     kind: 'major',
@@ -379,6 +441,15 @@ function parseMajor(t) {
       flags 조건으로 잡히므로 여기서 막지 않는다 — 막으면 진짜 판정까지 사라진다. */
 /* `입상`·`수상` 은 우리가 묻지 않는 처지다 — 딸린 계열 하나가 맞았다고 ✓ 를 치면
    대회에 나간 적 없는 학생이 「충족」으로 읽는다. */
+/* 🔴 **성씨·문중도 우리가 묻지 않는 처지다** (2026-09-09 전수 대조에서 드러났다).
+   프로필에 성씨 칸이 없는데, 그 줄에 딸린 조건(재학·학년)만 맞으면 높은 점수가 됐다:
+     · `본인 또는 부모가 **명씨 성**을 가진 … 재학생`        (대하장학회 — 적합도 95%)
+     · `**광산김씨 후손**(남/녀자손)으로서 4년제대학 재학생`  (광산김씨대종중장학문화재단 — 67%)
+   ⚠️ `본관` 은 넣지 말 것 — 공고에서 그 낱말은 대개 **건물 이름**이다
+      (`장소 : 본관 203호 이덕선 회의실` 이 실제로 걸렸다).
+   ⚠️ `독립유공자 후손` 처럼 **우리가 묻는 처지**가 함께 적힌 줄은 아래 `has('flags')` 가
+      풀어 준다 — 여기서 막으면 진짜 판정까지 사라진다. */
+const LINEAGE_ATTR = /(문중|종친|종중|후손|자손|[가-힣]{1,3}\s?씨\s?(성|가문|일가)|성씨)/;
 const UNASKED_ATTR = /(입상|수상|둘째|셋째|넷째|막내|손자녀|조손|유자녀|유족|세대주|부양\s?가족|고아|위탁\s?가정|소년소녀|보호\s?종료|자립\s?준비|의사자|의상자|농어촌|농업인|어업인|귀농|귀어|소상공인|중소기업|재직자?|근로자|(도민|시민|군민|구민|주민)의\s?자녀)/;
 /* 🔴 **형편을 말하는 낱말은 소득구간으로 확인된다** — 프로필에 칸이 있다.
    `학자금 지원구간 8구간 이하의 저소득층 학생` 을 `저소득` 이라는 낱말만 보고 막으면,
@@ -390,7 +461,7 @@ function unaskedAttr(text, conds) {
   const cs = conds || [];
   const has = (k) => cs.some((c) => c.kind === k);
   if (INCOME_ATTR.test(t) && (has('bracket') || has('flags'))) return false;
-  if (!UNASKED_ATTR.test(t) && !INCOME_ATTR.test(t)) return false;
+  if (!UNASKED_ATTR.test(t) && !INCOME_ATTR.test(t) && !LINEAGE_ATTR.test(t)) return false;
   return !has('flags');
 }
 
@@ -408,7 +479,7 @@ function parseLine(line, isExclude) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { parseLine, gradOnly, GRADE_SCALE, STATUSES, HIGH, LOW, MULTI_PROGRAM, HAS_EXCEPTION, caseBranch, unaskedAttr, REGIONS};
+  module.exports = { parseLine, gradOnly, gradTarget, mentionsUndergrad, GRADE_SCALE, STATUSES, HIGH, LOW, MULTI_PROGRAM, HAS_EXCEPTION, caseBranch, unaskedAttr, REGIONS};
 }
 
 /* ── 경우별 분기 (2026-08-24 개발자 지적) ─────────────────────────────────

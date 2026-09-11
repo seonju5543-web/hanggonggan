@@ -242,6 +242,19 @@ var DUP_OK   = /(가능|허용|무관|상관\s?없)/;
    온보딩이 국가장학금·교내·교외·근로를 따로 묻는 것이 그 근거다. */
 var DUP_BROAD  = /(대외|교외|외부\s?재단|타\s?재단|타\s?기관|타\s?장학\s?재단|타\s?기관\s?장학|민간\s?재단|타\s?단체)/;
 var DUP_NARROW = /(등록금성|생활비성|인재\s?양성\s?사업|근로\s?장학|교내\s?장학|복지\s?장학|다산\s?장학|성적\s?우수\s?장학|국가\s?장학금)/;
+/* 🔴 **장학금 이름을 대면 그것과만** (2026-09-09 전수 대조에서 잡았다).
+   `동일종목 및 동일수상실적으로 **춘향인재장학금과** 중복 지급 불가` 가 '교외 장학금 전부와
+   못 겹침'으로 읽혀, 교외 장학금을 하나라도 받는 학생에게 **지원 불가**가 떴다.
+   원문은 그 재단의 특정 장학금 하나를 지목했을 뿐이다.
+   ⚠️ `…장학금**과**` (조사 '과')일 때만이다 — `타 장학금**은** 중복 불가` 처럼 범위를 안 좁히는
+      줄과 갈라야 한다. 그 줄은 예전처럼 '전부'로 남는다(기존 검사가 지킨다).
+   ⚠️ DUP_BROAD 를 먼저 보므로 `교외 장학금과 중복 불가` 는 여기 오지 않는다. */
+var DUP_NAMED = /[가-힣]{2,12}장학금과\s*중복/;
+/* 🔴 **'우리가 같은 사람에게 두 번 안 준다'는 말은 남의 장학금 이야기가 아니다** (2026-09-09).
+   `당해연도 내 **동일인** 중복 지급 불가` 가 '교외 장학금 전부와 못 겹침'으로 읽혀,
+   온보딩에서 '교외 장학금(외부 재단)'을 체크한 학생에게 **지원 불가**가 떴다.
+   그 학생은 받을 수 있는 돈을 신청조차 안 하게 된다 — 틀린 미달은 못 받는 것보다 나쁘다. */
+var DUP_SELF = /(동일인|동일\s?학생|본인에게|기\s?수혜자)/;
 
 /**
  * 이 공고를 다른 장학금과 함께 받을 수 있는가.
@@ -264,7 +277,15 @@ function exclusivityFrom(lines) {
     var main = line.replace(/[（(][^）)]*[）)]/g, ' ');
     var probe = DUP_LINE.test(main) ? main : line;
 
-    var scope = DUP_BROAD.test(line) ? 'external' : (DUP_NARROW.test(line) ? 'narrow' : 'external');
+    /* 🔴 **순서가 방어선이다.** 넓은 표지(대외·교외·타 재단…)가 있으면 무조건 '전부'다.
+       그 다음에 좁히는 표지 셋을 본다. 하나도 없으면 예전처럼 '전부' — `타 장학금은 중복 불가`
+       처럼 한정어 없이 남의 장학금을 말하는 줄을 위한 기본값이고, 일부러 그렇게 뒀다.
+       ⚠️ 'unspecified' 는 **자격 판정에서만** 안 막는다. 합계(sumAmounts)는 'narrow' 만
+          예외로 두므로 예전처럼 보수적으로 셈한다 — 받을 수 있는 돈을 부풀리지 않는다. */
+    var scope = DUP_BROAD.test(line) ? 'external'
+      : (DUP_NARROW.test(line) || DUP_NAMED.test(line)) ? 'narrow'
+        : DUP_SELF.test(line) ? 'unspecified'
+          : 'external';
     var raw = line.trim().slice(0, 200);
     if (DUP_NO.test(probe) && !DUP_OK.test(probe)) return { kind: 'forbidden', scope: scope, raw: raw };
     if (DUP_OK.test(probe) && !DUP_NO.test(probe)) return { kind: 'allowed',   scope: scope, raw: raw };
@@ -382,8 +403,19 @@ function sumAmounts(items, opts) {
     var m = merged[j], a = m.ref.amountSpec || null;
     var won = amountWon(m.ref, tuition);
     m.won = won;
-    if (a && a.kind === 'ratio') { if (won) estimated.push(m); else unknown.push(m); continue; }
+    var isRatio = !!(a && a.kind === 'ratio');
     if (!won) { unknown.push(m); continue; }
+    /* 🔴 **비율형도 이중수혜 갈래를 거친다** (2026-09-10 코드 리뷰에서 잡았다).
+       예전에는 `ratio` 이면 여기서 곧바로 estimated 로 빠져나가 **아래 이중수혜 줄에
+       한 번도 안 닿았다.** 그래서 함께 받을 수 없는 두 공고가 합계에 나란히 더해졌다:
+       등록금 전액(교외 이중수혜 불가) + 500만원(교외 이중수혜 불가) → **900만원**.
+       실제로 받을 수 있는 최대는 500만원이다. 게다가 `dropped` 도 비어 있어 금액 상세의
+       '중복 수혜 불가' 칸에도 안 떠서, 학생이 어긋남을 알아챌 길이 없었다.
+       🔴 이 저장소에서 가장 무거운 실패다 — 받을 수 없는 숫자를 '받을 수 있는 장학금'이라
+          부르는 것은 기망이다(이 파일 첫머리·운영 원칙).
+       ⚠️ '추정' 표시는 그대로 둔다 — `estimated` 는 이제 **화면에 어떻게 적을지**만 정하는
+          목록이고, 합계에 더하는 몫은 added·onlyOne 이 정한다(아래 total 참조). */
+    if (isRatio) estimated.push(m);
     /* 🔴 **전부**와 못 겹치는 것만 골라내기 대상이다 (2026-08-28 개발자 확인).
        `타 인재양성사업 중복 수혜 불가` 처럼 범위가 좁은 것은 다른 장학금과 같이 받을 수
        있으므로 합계에서 빼면 **실제보다 적게** 말하게 된다. 원문은 화면에 그대로 남는다. */
@@ -395,10 +427,12 @@ function sumAmounts(items, opts) {
   exclusive.sort(function (a, b) { return b.won - a.won; });
   var onlyOne = exclusive.slice(0, 1), dropped = exclusive.slice(1);
 
+  /* 🔴 `estimated` 를 여기서 **다시 더하지 않는다** (2026-09-10).
+     비율형도 이제 added·onlyOne 중 하나에 들어가므로, 예전처럼 여기서 또 더하면 두 번 세어진다.
+     `estimated` 는 화면이 '약 400만원 · 추정' 이라고 적기 위한 **표시 목록**이다. */
   var total = 0;
   for (var k = 0; k < added.length; k++)     total += added[k].won;
   for (var l = 0; l < onlyOne.length; l++)   total += onlyOne[l].won;
-  for (var n = 0; n < estimated.length; n++) total += estimated[n].won;
 
   return { total: total, added: added, onlyOne: onlyOne, dropped: dropped,
            estimated: estimated, unknown: unknown };

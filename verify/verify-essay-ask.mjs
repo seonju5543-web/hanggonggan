@@ -144,14 +144,22 @@ head('6) 학생마다 다른 보기가 나오는가 (2026-08-23)');
 
   const g = { label: '지원 동기', type: 'textarea', kind: 'story' };
   const now = (p) => (essayAskFor(g, { profile: p }).asks.find((a) => a.id === 'now') || {}).c || [];
-  ok(now({ status: 'freshman', year: 1 }).includes('첫 학기 적응'), '신입생에게는 첫 학기 적응을 보여 준다');
-  ok(now({ status: 'returning', year: 2 }).includes('학업 리듬 되찾기'), '복학생에게는 학업 리듬 되찾기를 보여 준다');
-  ok(now({ status: 'enrolled', year: 4 }).includes('졸업 요건 채우기'), '4학년에게는 졸업 요건을 보여 준다');
-  ok(essayStage({ status: 'returning', year: 3 }) === 'back', '복학은 학년보다 앞선다');
+  /* 🔴 **앱이 실제로 저장하는 값으로 잰다** (2026-09-09).
+     예전에는 여기가 옛 값(freshman·returning·enrolled·seoul·etc)이었다. 그런데 온보딩이
+     저장하는 값은 한글이고(`신입학`·`복학예정`·`재학`·`서울`) app.js 의 `LEGACY_STATUS` 가
+     옛 프로필까지 새 값으로 바꾼다 — 즉 **옛 값은 앱에 존재하지 않는다.**
+     그래서 이 검사는 앱이 한 번도 안 지나가는 길을 재고 있었고, 정작 essay-ask.js 가
+     옛 값을 보고 있던 **죽은 갈래**(복학·수도권 밖)를 그대로 통과시켰다.
+     ⚠️ 값을 되돌리지 말 것 — 되돌리면 이 검사가 다시 죽은 코드를 지킨다. */
+  ok(now({ status: '신입학', year: 1 }).includes('첫 학기 적응'), '신입생에게는 첫 학기 적응을 보여 준다');
+  ok(now({ status: '복학예정', year: 2 }).includes('학업 리듬 되찾기'), '복학생에게는 학업 리듬 되찾기를 보여 준다');
+  ok(now({ status: '재학', year: 4 }).includes('졸업 요건 채우기'), '4학년에게는 졸업 요건을 보여 준다');
+  ok(essayStage({ status: '복학예정', year: 3 }) === 'back', '복학은 학년보다 앞선다');
 
   const need = (p) => (essayAskFor(g, { profile: p }).asks.find((a) => a.id === 'need') || {}).c || [];
-  ok(need({ region: 'etc' }).includes('통학·자취 부담'), '수도권 밖 학생에게는 통학·자취 부담을 보여 준다');
-  ok(!need({ region: 'seoul' }).includes('통학·자취 부담'), '서울 학생에게는 안 보여 준다');
+  ok(need({ region: '강원' }).includes('통학·자취 부담'), '수도권 밖 학생에게는 통학·자취 부담을 보여 준다');
+  ok(!need({ region: '서울' }).includes('통학·자취 부담'), '서울 학생에게는 안 보여 준다');
+  ok(!need({ region: '경기' }).includes('통학·자취 부담'), '경기 학생에게도 안 보여 준다');
   ok(need({ flags: ['multiChild'] }).includes('형제자매와 함께 부담'), '다자녀 가구 신호를 쓴다');
 
   ok(essayAskFor(g).asks === essayAskFor(g).asks || true, '(참고) ctx 없이 부르면 예전과 같다');

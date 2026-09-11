@@ -15,10 +15,19 @@ function todayStart() {
 }
 
 /* ---------------- 상태 ---------------- */
-let state = {
-  profile: null,          // 온보딩 결과
-  applications: [],       // { id, appliedAt, step, docs?, pending? }
-  /* 저장(북마크)한 공고 — { id, savedAt } (2026-09-07 · 노션 UI-21).
+/* 🔴 **빈 상태는 여기 한 곳에서만 만든다** (2026-09-09 코드 리뷰에서 잡았다).
+   예전에는 '데이터 초기화' 버튼이 `state = { profile: null, applications: [] }` 라고
+   **제 손으로 다시 적고** 있었다. 그래서 그 뒤에 늘어난 칸(`saved`·`consent`·`updatedAt`)이
+   빠졌고, 초기화한 뒤 그 자리에서 온보딩을 다시 마치면 `state.saved` 가 undefined 라
+   화면을 그릴 때마다 `Cannot read properties of undefined (reading 'some')` 가 났다
+   (브라우저 실측). 앱을 껐다 켜면 `loadState` 가 메워 주기 때문에 **눈으로 재현하기 가장
+   어려운 유형**이다 — 개발자는 '가끔 이상하다'로만 겪는다.
+   ⚠️ 칸을 새로 늘릴 때는 여기만 고치면 된다. 다른 곳에서 이 모양을 다시 적지 말 것. */
+function emptyState() {
+  return {
+    profile: null,          // 온보딩 결과
+    applications: [],       // { id, appliedAt, step, docs?, pending? }
+    /* 저장(북마크)한 공고 — { id, savedAt } (2026-09-07 · 노션 UI-21).
      🔴 `applications` 의 `pending` 과 **절대 합치지 말 것.** 뜻이 다르다:
         · pending  = 신청을 시작했는데 서류 작성이 남았다
         · saved    = 아직 신청할 생각은 없고 관심만 있다
@@ -27,19 +36,21 @@ let state = {
      알림이 신청도 안 한 공고를 재촉한다.
      ⚠️ 이 목록은 **이 기기에만 남는다.** 서버(profiles 표)에는 profile·applications
         칸만 있어 동기화되지 않는다 — 칸을 늘리려면 표부터 고쳐야 한다. */
-  saved: [],
-  /* 휴지통 — 지운 신청내역이 30일 동안 여기 머문다 (2026-09-11 개발자 지시).
-     { at, app, deletedAt } · at = 지우기 전 목록에서의 자리(되살릴 때 그 자리로 돌려놓는다).
-     🔴 지운 **서류 파일**은 여기 없다 — 파일은 크기 때문에 localStorage 에 못 담아
-        IndexedDB 'trash' 칸에 있다. 화면(renderTrash)이 둘을 합쳐 보여 준다.
-     ⚠️ 이 목록도 saved 와 같이 **이 기기에만** 남는다(서버 표에 칸이 없다). */
-  trash: [],
-  /* 민감정보(기초생활수급·장애 등)를 서버에 올려도 되는가 — 온보딩 Step 3에서 받는다.
+    saved: [],
+    /* 휴지통 — 지운 신청내역이 30일 동안 여기 머문다 (2026-09-11 개발자 지시).
+       { at, app, deletedAt } · at = 지우기 전 목록에서의 자리(되살릴 때 그 자리로 돌려놓는다).
+       🔴 지운 **서류 파일**은 여기 없다 — 파일은 크기 때문에 localStorage 에 못 담아
+          IndexedDB 'trash' 칸에 있다. 화면(renderTrash)이 둘을 합쳐 보여 준다.
+       ⚠️ 이 목록도 saved 와 같이 **이 기기에만** 남는다(서버 표에 칸이 없다). */
+    trash: [],
+    /* 민감정보(기초생활수급·장애 등)를 서버에 올려도 되는가 — 온보딩 Step 3에서 받는다.
      동의 안 하면 그 항목은 기기에만 남는다(supabase-client.js syncSafeProfile). */
-  consent: { sensitive: false },
-  /* 이 기기에서 마지막으로 고친 시각. 서버 것과 견줘 **최신이 이긴다**. */
-  updatedAt: null,
-};
+    consent: { sensitive: false },
+    /* 이 기기에서 마지막으로 고친 시각. 서버 것과 견줘 **최신이 이긴다**. */
+    updatedAt: null,
+  };
+}
+let state = emptyState();
 
 /* 분교를 별개 학교로 나누기 전에 저장된 프로필 고치기 (2026-08-02).
    예전엔 '한양대학교 + ERICA캠퍼스(안산)'처럼 캠퍼스로 골랐는데 이제 학교 자체가 다르다.
@@ -400,8 +411,18 @@ function refreshProgressViews(id) {
      그때는 기록 버튼이 시트에만 있었다. 지금은 신청 내역 패널에도 있어서
      그대로 두면 패널에서 '선정' 을 누를 때마다 엉뚱하게 상세 시트가 튀어나온다(실측). */
   const wasOpen = !$('#detail-sheet').hidden;
-  const current = $$('.screen').find((s) => !s.hidden);
-  if (current) showScreen(current.id.replace('screen-', ''));
+  /* 🔴 **화면을 '바꾸지' 않고 '다시 그리기만' 한다** (2026-09-10 코드 리뷰에서 잡았다).
+     예전에는 지금 화면을 `showScreen()` 으로 다시 열었는데, 그 함수는 마지막에 조건 없이
+     `window.scrollTo(0, o.scroll || 0)` 로 스크롤을 되돌린다. 그래서 신청 내역을 한참
+     내려가 '선정'·'제출했다고 기록'을 누르면 **목록 맨 위로 튀었다**(실측 2527 → 0).
+     학생은 방금 기록한 공고를 찾아 다시 끝까지 내려가야 하고, 여러 건을 이어서 기록할
+     때마다 되풀이된다. 옆의 `deleteApps` 는 처음부터 렌더 함수만 부르고 있었다. */
+  const current = $$('.screen').find((sc) => !sc.hidden);
+  const name = current ? current.id.replace('screen-', '') : '';
+  if (name === 'applications') renderApplications();
+  else if (name === 'home') renderHome();
+  else if (name === 'explore') renderExplore();
+  else if (name === 'my') renderMy();
   if (wasOpen) openDetail(id);
 }
 
@@ -1088,8 +1109,14 @@ function fitBadgeHtml(fit, fd, { full = false } = {}) {
    🔴 판정을 새로 만들지 않는다 — fitVerdict / fitTone 을 그대로 쓴다.
    🔴 뺀 것들이 사라지는 게 아니다: 교내외는 기관명 줄로, 마감은 글로, '검수 전'은 상세 시트로
       옮겼다(상세의 badge-kind 가 '교외 · 검수 전'을 이미 낸다). 정직 표기는 그대로 지켜진다. */
-function cardBadgeHtml(fit, fd, applied) {
-  if (applied) return '<span class="badge badge-applied">신청 완료</span>';
+function cardBadgeHtml(fit, fd, myApp) {
+  /* 🔴 신청내역에 **있기만 한 것**을 '신청 완료'라고 부르지 않는다 (2026-09-10 코드 리뷰).
+     '한 번에 신청 준비'로 담은 건은 `pending` 인 채 들어가므로, 신청내역은 '서류 작성 필요'
+     라고 하는데 목록 카드만 '신청 완료'라고 말하고 있었다 — 학생은 다 끝난 줄 알고 넘어간다.
+     ⚠️ 낱말은 신청내역(`stepNow`)이 쓰는 것과 같은 것을 쓴다. */
+  if (myApp) return myApp.pending
+    ? '<span class="badge badge-pending">서류 작성 필요</span>'
+    : '<span class="badge badge-applied">신청 완료</span>';
   const v = fitVerdict(fit, fd);
   if (v === 'no') return '<span class="badge badge-fit-no">지원 자격 미달</span>';
   if (v === 'unread') return '<span class="badge badge-fit-unknown">자격 미확인</span>';
@@ -1106,8 +1133,15 @@ function cardBadgeHtml(fit, fd, applied) {
 function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
   const meta = STATUS_META[result.status];
   const d = dday(sch.deadline);
-  const applied = state.applications.some((a) => a.id === sch.id);
-  const badge = cardBadgeHtml(fit, fd, applied);
+  /* 🔴 **'담았다'와 '다 했다'를 가른다** (2026-09-10 코드 리뷰에서 잡았다).
+     예전에는 신청내역에 있기만 하면 '신청 완료' 배지를 달았다. 그런데 '한 번에 신청 준비'로
+     담은 건은 `pending: bulkNeedsWork(sch)` 로 **서류 작성이 남은 채** 들어간다(applyAll).
+     그래서 같은 공고를 **신청내역은 '서류 작성 필요', 목록 카드는 '신청 완료'** 라고
+     서로 다르게 말했다 — 학생은 다 끝난 줄 알고 넘어가고 실제로는 아무것도 제출하지 못한다.
+     ⚠️ 낱말은 신청내역(`stepNow`)이 쓰는 것과 **같은 것을 쓴다** — 여기서 새로 지어내면
+        두 화면이 또 다른 말을 하게 된다. */
+  const myApp = state.applications.find((a) => a.id === sch.id);
+  const badge = cardBadgeHtml(fit, fd, myApp);
   const due = sch.program ? '상시 제도' : ddayWords(d);
   /* 금액을 못 읽은 공고가 등록 48건 중 34건(71%)이다. 예전엔 그 자리에 '금액 원문 확인'이
      카드에서 **가장 굵은 줄**로 떴다 — 템플릿이 자기 빈칸을 읽어 주는 모습이었다.
@@ -1510,7 +1544,7 @@ function certStatusListHtml(sch) {
     if (st && st.ok) return `<li class="doc-ok">✓ ${name} — ${st.text}</li>`;
     if (st) return `<li class="doc-miss">□ ${name} — ${st.text}</li>`;
     if (/자동/.test(doc)) return `<li>△ ${name} — 학교·재단 연동 후 자동 첨부 (또는 보관함에 올려두세요)</li>`;
-    return `<li>□ ${doc} — 공식 제출 시 함께 준비하세요</li>`;
+    return `<li>□ ${esc(doc)} — 공식 제출 시 함께 준비하세요</li>`;
   }).join('');
   return `<h4>증명서류 체크리스트</h4><ul class="doc-list">${rows}</ul>
     <p class="dp-note">보관함(MY 탭) 서류는 다음 신청부터 자동 첨부.</p>`;
@@ -1573,10 +1607,10 @@ function renderDocPrep() {
       <div class="sheet-handle"></div>
       <div class="sheet-body">
         <h3 class="sheet-title">서류 작성</h3>
-        <p class="sheet-provider">${sch.name} · 고른 답으로 초안 문장을 엮습니다</p>
+        <p class="sheet-provider">${esc(sch.name)} · 고른 답으로 초안 문장을 엮습니다</p>
         ${docPrep.defs.map((def, di) => `
           <div class="dp-block">
-            <h4>${def.doc}</h4>
+            <h4>${esc(def.doc)}</h4>
             ${def.questions.map((q) => `
               <div class="field">
                 <span class="field-label">${q.label}</span>
@@ -1611,10 +1645,10 @@ function renderDocPrep() {
       <div class="sheet-handle"></div>
       <div class="sheet-body">
         <h3 class="sheet-title">작성 내용 확인</h3>
-        <p class="sheet-provider">${sch.name} · 내용을 직접 수정할 수 있습니다</p>
+        <p class="sheet-provider">${esc(sch.name)} · 내용을 직접 수정할 수 있습니다</p>
         ${docPrep.texts.map((t, i) => `
           <div class="dp-block">
-            <h4>${t.doc}</h4>
+            <h4>${esc(t.doc)}</h4>
             <textarea class="dp-text" data-i="${i}" rows="10">${esc(t.text)}</textarea>
           </div>`).join('')}
         ${certStatusListHtml(sch)}
@@ -2652,7 +2686,17 @@ function openDetail(id) {
   if (app && !app.pending) btnLabel = '신청 준비 완료됨';
   else if (app && app.pending) btnLabel = '서류 작성 이어서 하기';
   else if (d.days < 0) btnLabel = '마감된 장학금';
-  else if (!canApply) btnLabel = '요건 미충족 — 신청할 수 없음';
+  /* 🔴 **모르는 것을 '미충족'이라고 부르지 않는다** (2026-09-09 · 운영 원칙 8-1).
+     예전에는 판정이 `unknown` 일 때도 이 문구가 떴다. 그런데 unknown 은 '요건에 못 미친다'가
+     아니라 **'우리가 못 읽었다'**는 뜻이다 — 동산장학회(이공계 새터민)에서 실제로 그랬다:
+     새터민이고 이공계이고 성적도 넘는 학생인데 자격 줄 셋 중 둘을 못 읽어 unknown 이 됐고,
+     화면은 그 학생에게 '요건 미충족' 이라고 단정했다(reasons 도 비어 있어 이유조차 없었다).
+     확인하지 않은 것을 확인했다고 말하는 것이라 문구를 가른다. */
+  else if (!canApply) {
+    btnLabel = result.status === 'unknown'
+      ? '자격을 확인하지 못했어요 — 원문에서 확인하세요'
+      : '요건 미충족 — 신청할 수 없음';
+  }
 
   $('#detail-sheet').innerHTML = `
     <div class="sheet-handle"></div>
@@ -2695,7 +2739,7 @@ function openDetail(id) {
       <ul class="doc-list">
         ${sch.documents.map((doc) => {
           const auto = /자동/.test(doc);
-          return `<li>${auto ? '<span class="doc-auto">자동</span>' : '<span class="doc-manual">직접</span>'} ${doc}</li>`;
+          return `<li>${auto ? '<span class="doc-auto">자동</span>' : '<span class="doc-manual">직접</span>'} ${esc(doc)}</li>`;
         }).join('')}
       </ul>
       ${srcNote}
@@ -2737,8 +2781,8 @@ function openDetail(id) {
           </div>` : ''}
         ${step === 3 ? `
           <p class="progress-note ${app.result === 'won' ? 'progress-won' : ''}">${app.result === 'won'
-            ? `${app.resultAt} 선정 · ${sch.amount}`
-            : `${app.resultAt} 미선정으로 기록됨`}</p>
+            ? `${esc(app.resultAt)} 선정 · ${esc(sch.amount)}`
+            : `${esc(app.resultAt)} 미선정으로 기록됨`}</p>
           <button class="link-btn" id="btn-undo-progress" style="margin-bottom:10px">결과 기록 취소</button>` : ''}
         ${app.docs && app.docs.length ? `
           <details class="dp-saved"><summary>작성한 서류 보기 (${app.docs.length})</summary>
@@ -3069,8 +3113,13 @@ function docChecklistHtml(sch) {
     /* 보관함에 칸이 없는 서류 — 있는지 없는지 앱이 알 수 없으므로 그렇게 말한다 */
     return `<li class="dc-etc">${esc(doc)}<em>보관함에서 확인할 수 없는 서류</em></li>`;
   }).join('');
-  /* 머리글은 **학생이 할 일의 개수**를 말한다 — 분수(0/2)는 읽는 데 한 박자 걸린다 */
-  const head = `제출 서류 ${all.length}개`
+  /* 머리글은 **학생이 할 일의 개수**를 말한다 — 분수(0/2)는 읽는 데 한 박자 걸린다.
+     🔴 세는 것은 `known` 이다 (2026-09-10 코드 리뷰). `all` 로 세면 위에서 일부러 갈라낸
+        '아직 못 읽었다' 표시까지 서류로 세어, **머리글은 3개인데 목록은 2줄**이 된다
+        (실측 4건 — reg-hi-jeju 3→2 · reg-hufs-myeonhak 2→1 · reg-hufs-alumni 3→2 ·
+        reg-khu-intern 2→1). 줄은 갈랐는데 숫자만 안 갈랐던 것이다.
+        못 읽은 몫은 바로 아래 `note` 줄이 이미 말한다. */
+  const head = `제출 서류 ${known.length}개`
     + (missing.length ? '' : tracked.length ? ' · 보관함에서 자동 첨부' : '');
   return `
     <details class="doc-check"${missing.length ? ' open' : ''}>
@@ -3592,12 +3641,16 @@ function renderMy() {
   const p = state.profile;
   if (!p) return;   // 온보딩을 아직 안 마친 상태 — 그릴 프로필이 없다
   const c = p.common || {};
-  const flagText = p.flags.length ? p.flags.map((f) => FLAG_LABELS[f]).join(', ') : '해당 없음';
+  /* ⚠️ 이름표가 없으면 **열쇠라도 보여 준다** — 다른 두 자리(bulkTags·match-engine)와 같은 방식이다.
+     빈칸을 내놓으면 학생이 고른 것이 화면에서 사라져 '해당 없음'처럼 읽힌다(2026-09-03~09 실제로 그랬다). */
+  const flagText = p.flags.length ? p.flags.map((f) => FLAG_LABELS[f] || f).join(', ') : '해당 없음';
   const trackLabel = (TRACKS.find((t) => t.id === p.track) || {}).label || '-';
   const commonFilled = ['studentId', 'birth', 'phone', 'email', 'account'].filter((k) => c[k]).length;
   $('#my-profile').innerHTML = `
-    <p class="my-name">${p.name || '대학생'} 님<span class="my-edit-hint">수정하기 ›</span></p>
-    <p class="my-line">${p.school || '대학 미설정'} · ${trackLabel}${p.major ? ' · ' + p.major : ''}</p>
+    <p class="my-name">${esc(p.name || '대학생')} 님<span class="my-edit-hint">수정하기 ›</span></p>
+    ${/* 🔴 학과 칸은 **학생이 직접 치는 자유 입력**이다 — esc 를 빠뜨리면 `B<b>학과` 같은 글자에
+         MY 화면 아래쪽이 통째로 그 태그 안으로 빨려 들어간다(브라우저 실측). 2026-09-10. */ ''}
+    <p class="my-line">${esc(p.school || '대학 미설정')} · ${esc(trackLabel)}${p.major ? ' · ' + esc(p.major) : ''}</p>
     <div class="my-grid">
       <div><span>학년</span><strong>${p.year}학년 (${esc(p.status || '미설정')})</strong></div>
       <div><span>직전학기 평점</span><strong>${p.gpa != null ? p.gpa.toFixed(2) : '미입력'}</strong></div>
@@ -4284,7 +4337,10 @@ function bindEvents() {
          지우지 않으면 다음에 앱을 켤 때 **지웠다고 말한 값이 그대로 되살아난다.** */
       if (typeof resumeClear === 'function') resumeClear();
       formFill = null;
-      state = { profile: null, applications: [] };
+      /* 🔴 손으로 다시 적지 말 것 — 늘어난 칸이 빠진다(위 emptyState 주석).
+         ⚠️ 이 설명을 줄 끝 `//` 주석으로 두지 말 것 — verify/ui-tone.mjs 의 주석 제거기는
+            줄 **첫머리** `//` 만 걷어내서, 줄 끝에 둔 🔴 가 '화면에 이모지가 있다'로 잡힌다. */
+      state = emptyState();
       if (typeof notifyReset === 'function') notifyReset(); // 알림 설정·알림함도 함께 초기화
       initOnboarding();
       showScreen('onboarding');
@@ -4392,7 +4448,20 @@ function syncApplyRemote(remote) {
     migrateFitFields(p);
     state.profile = p;
   }
-  if (Array.isArray(remote.applications)) state.applications = remote.applications;
+  /* 🔴 **학생이 쓴 글은 서버에 없다** — syncSafeApplications 가 `formAns`·`docs` 를 떼고 보낸다
+     (주민등록번호·계좌·자기소개서가 들어 있어서다). 그래서 받은 것으로 통째로 갈아치우면
+     **이 기기에 있던 신청서 답이 지워진다.** 프로필의 rrn·account 를 되살리는 것과 같은 이유로
+     여기서도 기기 것을 되살린다. ⚠️ 서버가 가진 칸(단계·제출기록)은 서버 것이 이긴다. */
+  if (Array.isArray(remote.applications)) {
+    const mineByIdx = new Map((state.applications || []).map((a) => [a.id, a]));
+    state.applications = remote.applications.map((a) => {
+      const local = mineByIdx.get(a.id);
+      if (!local) return a;
+      const merged = Object.assign({}, a);
+      for (const k of ['formAns', 'docs']) if (merged[k] == null && local[k] != null) merged[k] = local[k];
+      return merged;
+    });
+  }
   state.consent = Object.assign({}, state.consent, { sensitive: !!remote.sensitiveOk });
   state.updatedAt = remote.updatedAt || state.updatedAt;
   saveState({ fromServer: true });
