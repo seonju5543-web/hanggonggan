@@ -70,6 +70,10 @@
   --shadow-sheet: 0 -14px 48px rgba(40, 33, 20, 0.22);
   --ring:         0 0 0 3px rgba(138, 106, 31, 0.20);
   --cutout:       0 0 0 2px var(--bg);
+  /* 뒤로 쓸기가 손을 따라올 때 JS 가 갈아 끼우는 두 값. 여기 적어 두는 것은 **쉬는 상태**다
+     — 폴백(var(x, 기본값))으로 때우면 '선언을 잊은 토큰'과 구별이 안 된다(ui-tone 이 잡는다). */
+  --swipe-dim: 1;
+  --swipe-dur: 0.26s;
   --knob:         0 1px 3px rgba(58, 48, 28, 0.26);
 
   /* 글자 크기 9단 — 그대로 둔다(앞선 세션이 27종에서 줄여 놓은 자산이다).
@@ -226,6 +230,16 @@ input::placeholder { color: var(--text-weak); }
   flex-direction: column;
   padding-bottom: 24px;
 }
+/* 뒤로가기 + 진행 막대 한 줄 (노션 UI-2) — 막대의 아래 여백은 줄이 들고 간다.
+   🔴 0단계(환영 화면)에서는 **줄째로** 감춘다(app.js renderOnboardStep):
+      빈 줄만 남기면 아래 여백 30px 이 그대로 남아 로고가 밀려 내려간다.
+      감추는 것은 맨 위 `[hidden] { display: none !important }` 가 맡는다 —
+      여기에 또 적으면 같은 말이 두 벌이 된다(실측: 지워도 그대로 감춰진다). */
+.onboard-top { display: flex; align-items: center; gap: var(--space-4); margin-bottom: 30px;
+  /* 뒤로가기가 숨는 칸(고치러 들어온 사람의 1단계)에서도 줄 높이를 지킨다 —
+     안 잡아 두면 1→2 단계에서 아래 내용이 36px 씩 튄다(실측). */
+  min-height: 40px; }
+.onboard-top .onboard-progress { flex: 1; margin-bottom: 0; }
 .onboard-progress[hidden] { display: none !important; }
 .onboard-progress {
   height: 4px;
@@ -4277,8 +4291,33 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
   padding: 0 0 var(--space-16);
 }
 
-/* 권한 안내 — 문단이라 카드 줄(.wallet-row)과 달리 통으로 읽힌다 */
-.perm-how { font-size: var(--t-sm); color: var(--text-sub); line-height: 1.7; margin-top: var(--space-12); }
+/* ── 앱 권한 · 오픈소스 라이선스 (2026-09-11 개발자 지시로 선을 걷어냄) ──────────
+   🔴 **단락을 줄로 나누지 않는다.** 전에는 보관함 목록의 `.wallet-row`(위아래 선)와
+      `.my-card`(절 사이 선)를 빌려 써서, **읽는 글**인데 목록처럼 토막 나 있었다.
+      절은 빈칸으로만 나누고(--space-32) 문단은 제 리듬을 갖는다.
+   🔴 이 화면 전용 이름이다 — 보관함 클래스를 고치면 서류 목록의 선까지 사라진다. */
+.perm-sec + .perm-sec { margin-top: var(--space-32); }
+.perm-title {
+  font-size: var(--t-lg); font-weight: 800; color: var(--text);
+  letter-spacing: -0.02em; margin-bottom: var(--space-12);
+}
+/* 절을 이끄는 글 — 제목 바로 밑이라 제목과 한 덩이로 읽히게 조금만 띄운다 */
+.perm-lead { font-size: var(--t-sm); color: var(--text-sub); line-height: 1.7; margin-bottom: var(--space-16); }
+/* 항목 한 줄(이름 + 상태) — 선 없이 **면과 여백**으로만 구분한다 */
+.perm-state {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-12);
+  background: var(--surface-2); border-radius: var(--radius-sm);
+  padding: var(--space-12) var(--space-16);
+}
+.perm-name { font-size: var(--t-md); font-weight: 700; color: var(--text); }
+.perm-value { font-size: var(--t-sm); color: var(--text-sub); margin-top: var(--space-2); }
+.perm-state .perm-name + .perm-value { margin-top: 0; }
+.perm-link { font-size: var(--t-sm); font-weight: 700; color: var(--primary); white-space: nowrap; }
+/* 덧붙이는 글 — 항목 뒤라 한 칸 더 띄워 '항목에 딸린 설명'으로 읽히게 한다 */
+.perm-how { font-size: var(--t-sm); color: var(--text-sub); line-height: 1.7; margin-top: var(--space-16); }
+.perm-how + .perm-how { margin-top: var(--space-12); }
+/* 폰 설정 찾아가는 길 — 앞 문단의 이어지는 말이라 바짝 붙이고 한 칸 들여 쓴다 */
+.perm-steps { margin-top: var(--space-8); padding-left: var(--space-12); }
 
 /* ── 적합도 알약 (2026-09-11 개발자 지시: "적합도 퍼센테이지 안내가 옅은 회색으로 잘 보이지 않음.
    적합도 퍼센테이지 기능 강조 방안을 검토하고 즉시 실행") ─────────────────────────
@@ -4345,3 +4384,39 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 .fd-photo { float: right; width: 90px; height: 120px; object-fit: cover; border: 1px solid #444; margin: 0 0 8px 12px; }
 .fd-photo.left { float: left; margin: 0 12px 8px 0; }
 .fd-photo-note { clear: both; }
+
+/* ══ 뒤로 쓸기 — 손을 따라오는 패럴랙스 (2026-09-11 개발자 지시) ══════════════════════
+   개발자 지시: *"옆으로 스와이프하면 내 손이 움직이는 대로 페이지가 나가질 수 있도록 …
+   효과 이름이 패럴랙스래."*  앞 화면은 손끝을 1:1로 따라가고, **뒤에 있던 화면이 그보다
+   느리게(0.28배) 따라 들어온다** — 두 겹이 다른 속도로 움직이는 것이 깊이를 만든다.
+
+   🔴 끌던 화면을 제자리로 되돌려 놓고 등장 애니를 새로 트는 짓을 하지 않는다(예전 방식).
+      손을 떼면 **가던 방향 그대로** 끝까지 간다 — 그게 '손이 움직이는 대로'의 뜻이다.
+   🔴 두 화면을 동시에 보여야 하므로 둘 다 잠깐 `fixed` 가 된다. 그동안 문서는 높이를
+      잃어 스크롤이 0으로 떨어지므로, **끌던 화면을 스크롤 상자로 만들고**
+      (`overflow: hidden` + JS 가 `scrollTop` 을 넣는다) 손을 떼면 문서 스크롤을 되돌린다.
+      ⚠️ `top: -스크롤값` 으로 밀어 올리면 안 된다 — 그 방식은 따라다니는 머리줄
+         (`position: sticky`)이 붙을 곳을 잃어 약관을 읽다 끌면 머리줄이 사라진다.
+   🔴 `left/right: 0` + `max-width` + `margin-inline: auto` 로 **앱 기둥 폭에 맞춘다**.
+      `left: 50%; translateX(-50%)` 로 가운데 맞추면 우리가 쓸 transform 과 부딪힌다.
+   🔴 아래 탭(z-index 50)·시트(90)보다 **아래**에 둔다 — 탭바는 제자리에 있어야 한다.
+   관문: `verify/verify-settings.js` '오른쪽으로 쓸어 나가기' 절 */
+.screen.swipe-top,
+.screen.swipe-under {
+  position: fixed;
+  top: 0; bottom: 0; left: 0; right: 0;
+  max-width: 480px;
+  margin-inline: auto;
+  overflow: hidden;
+  background: var(--bg);
+  animation: none;            /* taste-in·screen-in 이 끼어들면 손을 안 따라온다 */
+  will-change: transform;
+}
+.screen.swipe-top {
+  z-index: 40;
+  box-shadow: var(--shadow-sheet);   /* 들려서 떠나는 면 — 경계가 보여야 두 겹으로 읽힌다 */
+}
+/* 뒤 화면은 멀리 있는 것처럼 옅다(0.55 → 1). 바탕색이 같아 **글자만** 흐려 보인다 */
+.screen.swipe-under { z-index: 39; opacity: var(--swipe-dim); }
+/* 손을 뗀 뒤의 마무리 — 남은 거리만 이어서 간다(JS 가 시간을 정한다) */
+.screen.swipe-ease { transition: transform var(--swipe-dur) cubic-bezier(0.32, 0.72, 0, 1), opacity var(--swipe-dur) linear; }
