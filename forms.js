@@ -413,9 +413,26 @@ function renderFormDoc(tpl, p, ans, { editable = false } = {}) {
   const ed = editable ? ' contenteditable="true"' : '';
   const box = (checked) => (checked ? '☑' : '□');
 
+  /* 사진란 (2026-09-11 개발자 지시 — MY 의 프로필 사진을 사진을 요구하는 공고에 쓴다).
+     🔴 들어가는 양식은 **photoNote 가 있는 양식뿐**이다 — 원본 서식에 사진란이 있다고 스키마화 때
+        적어 둔 표식이고, 사진란이 없는 서식에 사진을 붙이는 것은 지어내는 것이다.
+     🔴 사진이 없으면 예전 문구 그대로(인쇄 후 부착). 있으면 원본 서식처럼 **우측 상단**에 넣고
+        문구를 바꾼다 — 단, 규격(크기·배경·촬영 시기)은 우리가 모르므로 공고에서 확인하라고 적는다.
+     🔴 `photoNote` 는 이름과 달리 **사진 이야기가 아닌 안내**도 담고 있다(코드 리뷰 실측: 13건 중 3건이
+        '회색 안내 문구 삭제'·'추천란 서명·시험합격확인서 첨부'). 그래서 문구에 '사진' 이 있을 때만 사진란으로 본다.
+     🔴 원문 안내는 **지우지 않고 그대로 두고** 한 줄을 덧붙인다 — 규격(3cm×4cm·3개월 이내·컬러)은 원문이 말하고
+        우리는 모른다. 원본이 '좌측 상단' 이면 왼쪽에 붙인다(한 서식이 실제로 그렇다).
+     ⚠️ app.js 가 없는 곳(Node 검사·관리자 화면)에서는 함수가 없어 예전 문서와 한 글자도 안 다르다.
+     ⚠️ 사진이 없을 때 글자 하나(공백 포함)도 더하지 않는다 — form-snapshot 이 문서 동일성을 잰다. */
+  const hasPhotoBox = !!(tpl.photoNote && /사진/.test(tpl.photoNote));
+  const photo = (hasPhotoBox && typeof profilePhotoDataUrl === 'function') ? profilePhotoDataUrl() : '';
+  const photoSide = /좌측|왼쪽/.test(tpl.photoNote || '') ? ' left' : '';
   let html = `<div class="form-doc"><p class="fd-tag">${esc(tpl.tag || '<별첨>')}</p>
-    <h2 class="fd-title">${esc(tpl.title)}</h2>`;
-  if (tpl.photoNote) html += `<p class="fd-note">${esc(tpl.photoNote)}</p>`;
+    ${photo ? `<img class="fd-photo${photoSide}" src="${photo}" alt="증명사진" />\n    ` : ''}<h2 class="fd-title">${esc(tpl.title)}</h2>`;
+  if (tpl.photoNote) {
+    html += `<p class="fd-note">${esc(tpl.photoNote)}</p>`;
+    if (photo) html += `<p class="fd-note fd-photo-note">※ 앱이 MY 의 프로필 사진을 사진란에 넣었어요. 위 안내의 규격(크기·배경·촬영 시기)과 다르면 인쇄한 뒤 원본 사진을 붙여 주세요.</p>`;
+  }
 
   tpl.sections.forEach((sec) => {
     if (sec.heading || sec.note) html += `<p class="fd-sec">${esc(sec.heading)}${sec.note ? ` <span class="fd-note">${esc(sec.note)}</span>` : ''}</p>`;
@@ -492,6 +509,9 @@ const FORM_DOC_CSS = `
   .fd-title { text-align:center; font-size:19px; margin:10px 0 16px; }
   .fd-sec { font-weight:700; margin:16px 0 6px; font-size:14.5px; }
   .fd-note { font-weight:400; font-size:11.5px; color:#555; }
+  .fd-photo { float:right; width:3cm; height:4cm; object-fit:cover; border:1px solid #444; margin:0 0 8px 12px; }
+  .fd-photo.left { float:left; margin:0 12px 8px 0; }
+  .fd-photo-note { clear:both; }
   .fd-table { width:100%; border-collapse:collapse; table-layout:fixed; }
   .fd-table th, .fd-table td { border:1px solid #333; padding:7px 8px; font-size:12.5px; vertical-align:top; text-align:left; }
   .fd-table th { background:#f0f0f0; width:26%; font-weight:600; }

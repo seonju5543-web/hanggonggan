@@ -1864,6 +1864,14 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
 .legal p { margin-bottom: 8px; }
 .legal ul { padding-left: 18px; margin-bottom: 10px; }
 .legal li { margin-bottom: 4px; list-style: disc; }
+/* 🔴 조항은 **번호 목록**이다 (2026-09-11 — 국내 앱 약관의 일반적인 꼴).
+   바로 위 `.legal li` 가 모든 줄을 disc 로 만들어 두어서, 번호를 쓰려면
+   ol 안의 줄만 따로 되돌려야 한다. 순서를 바꾸면 번호가 다시 점으로 돌아간다. */
+.legal ol { padding-left: var(--space-24); margin-bottom: var(--space-12); }
+.legal ol > li { list-style: decimal; margin-bottom: var(--space-8); }
+/* 조항에 딸린 설명 불릿 — 번호 줄과 붙여 한 덩어리로 읽히게 */
+.legal ol ul { margin: var(--space-6) 0 0; padding-left: var(--space-16); }
+.legal ol ul li { margin-bottom: var(--space-4); }
 .legal a { color: var(--primary); }
 .legal-note {
   background: var(--orange-weak); color: var(--orange);
@@ -3694,40 +3702,9 @@ button, input, select, textarea { letter-spacing: inherit; }
   clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
 }
 
-/* ── ③ 마감까지 남은 시간 (컨텍스트 바) ──────────────────────────────────
-   개발자 지시(2026-09-09): "밑에 빨간색으로 마감 기간 알려주는 것".
-   🔴 카드 맨 아래에만 둔다 — 위쪽은 이미 배지 줄이 자리를 쓴다.
-   🔴 색은 `--red` 하나다. 이 앱의 빨강은 채도를 낮춘 벽돌색이라(2026-08-31 팔레트 정리)
-      형광 빨강으로 되돌리면 화면에서 이 막대만 튄다. */
-.dl-meter {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 10px;
-}
-.dl-meter-track {
-  flex: 1;
-  height: 3px;
-  border-radius: var(--radius-pill);
-  background: rgba(25, 23, 19, 0.09);
-  overflow: hidden;
-}
-.dl-meter-fill {
-  display: block;
-  height: 100%;
-  border-radius: var(--radius-pill);
-  background: var(--red);
-  /* 카드가 다시 그려질 때 폭이 스르르 자란다 — 마감이 다가온다는 느낌은 여기서 온다 */
-  transition: width var(--dur-slow) var(--ease);
-}
-.dl-meter-date {
-  font-size: var(--t-2xs);
-  font-weight: 700;
-  color: var(--red);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-/* 마감된 줄은 통째로 흐려지므로(`.sch-card:has(.badge-dday.closed)`) 막대도 함께 흐려진다 */
+/* ── ③ 마감까지 남은 시간 막대 — 뺐다 (2026-09-11 개발자 지시) ─────────────
+   "빨간색 마감 인터렉션 바를 지우고 마감 D-DAY 카운트만 남겨놓기." `.dl-meter*` 규칙을
+   통째로 지웠다(interactions.js 의 그리는 함수도 함께). 마감은 카드 아랫줄 `.sch-due` 하나다. */
 
 /* ── ② 저장할 때 튕김 ────────────────────────────────────────────────────
    인스타 더블탭 하트가 하는 일과 같다: 누른 순간 커졌다 제자리로.
@@ -3923,10 +3900,8 @@ button, input, select, textarea { letter-spacing: inherit; }
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
-.sch-fit.fit-green  { color: var(--green); }
-.sch-fit.fit-yellow { color: var(--text-sub); }
-.sch-fit.fit-orange { color: var(--orange); }
-.sch-fit.fit-red    { color: var(--text-weak); }
+/* 🔴 위 글자 방식은 2026-09-11 개발자 지시로 **되돌렸다** — 실효 규칙은 파일 끝
+   '적합도 알약' 절이다(파일 끝 블록이 앞을 덮는다). 이 블록은 자리·크기만 남긴다. */
 
 /* 금액 칸은 **한 줄**이다 — 원문이 통째로 들어온 공고에서 두 줄로 번져
    마감 글자를 위로 밀어 올리던 것을 막는다(실측: 장보고장학회·안양시 카드). */
@@ -4176,7 +4151,7 @@ input:user-invalid:focus, select:user-invalid:focus, textarea:user-invalid:focus
 /* 12 의 후속 — 코드 리뷰가 잡은 '뜻이 섞이는 자리' 둘. 색조를 둘로 줄이자 '모른다'가 '떨어진다'와 같은
    빨강이 됐다. 🔴 틀린 미달은 못 받는 것보다 나쁘다(CLAUDE.md) — 모르는 것은 회색으로 말한다. */
 .r-unk { color: var(--text-sub); }                 /* 상세 시트 자격 줄의 ? */
-.sch-fit.fit-orange { color: var(--text-sub); }    /* 적합도 20~39% — 빨강이면 20% 미만(회색)보다 나빠 보인다 */
+/* (적합도 20~39% 의 색은 아래 '적합도 알약' 절이 정한다 — 빨강은 여전히 안 쓴다) */
 
 /* 18 · 구획 이름표(eyebrow) — 제목 크기를 작은 이름표로 내린다. 🔴 한글이라 양수 자간은 안 준다.
    개발자 지시: 작아진 것 중 **중요한 내용이 든 것은 색으로 강조 — 검은색**. 마감을 말하는 구획만 먹색,
@@ -4249,3 +4224,114 @@ input:user-invalid:focus, select:user-invalid:focus, textarea:user-invalid:focus
    ⚠️ 틀린 칸(:user-invalid)은 뺀다 — 16번이 그 바깥선을 빨강으로 쓰고 링은 끈다. */
 input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid), textarea:focus-visible:not(:user-invalid) { outline: none; }
 
+/* ══ 로그인 활동 · FAQ · 앱 권한 (2026-09-11 개발자 지시 1·2·4번) ═══════════════ */
+
+/* 로그인 카드 — 한 줄에 '무엇으로 · 언제'. 🔴 IP 줄은 없다: 브라우저는 제 IP 를 모른다.
+   지어내느니 적지 않는다(원칙 8-1). 보여 주려면 서버 조각이 하나 더 있어야 한다. */
+.login-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--space-16);
+  margin-bottom: var(--space-8);
+}
+.login-now {
+  display: inline-block;
+  font-size: var(--t-2xs);
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--primary-weak);
+  border-radius: var(--radius-pill);
+  padding: var(--space-2) var(--space-8);
+  margin-bottom: var(--space-6);
+}
+.login-device { font-size: var(--t-lg); font-weight: 800; letter-spacing: -0.02em; }
+.login-meta { font-size: var(--t-sm); color: var(--text-sub); margin-top: var(--space-2); }
+
+/* FAQ — 여닫기는 <details> 에 맡긴다(코드 0줄 · 키보드와 보조기기에서도 저절로 된다) */
+.faq-item { border-bottom: 1px solid var(--line); }
+.faq-item summary {
+  padding: var(--space-16) 0;
+  font-size: var(--t-md);
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after { content: '＋'; float: right; color: var(--text-weak); font-weight: 400; }
+.faq-item[open] summary::after { content: '－'; }
+.faq-a {
+  font-size: var(--t-sm);
+  color: var(--text-sub);
+  line-height: 1.7;
+  padding: 0 0 var(--space-16);
+}
+
+/* 권한 안내 — 문단이라 카드 줄(.wallet-row)과 달리 통으로 읽힌다 */
+.perm-how { font-size: var(--t-sm); color: var(--text-sub); line-height: 1.7; margin-top: var(--space-12); }
+
+/* ── 적합도 알약 (2026-09-11 개발자 지시: "적합도 퍼센테이지 안내가 옅은 회색으로 잘 보이지 않음.
+   적합도 퍼센테이지 기능 강조 방안을 검토하고 즉시 실행") ─────────────────────────
+   2026-09-10 페이스리프트가 알약을 글자로 낮췄는데, 실측으로 카드 대부분이 33~50%(yellow·orange)라
+   그 둘의 색이 --text-sub·--text-weak 여서 **사실상 전부 회색**이었다. 되돌리는 것은 셋:
+   ① 다시 알약(면 + 테두리) ② 글자는 먹색(--text) 이상 — 옅은 회색(--text-weak)은 어디에도 안 쓴다
+   ③ 60% 이상은 강조색 면으로 한 단계 더 띄운다.
+   🔴 '다섯 장 연속 색 덩어리'(2026-09-10 이 글자로 낮춘 이유)는 안 돌아온다 — 카드의 배지는
+      그때부터 **하나뿐**이고 나머지는 상세로 내려간 채다. 🔴 20~39% 를 빨강으로 말하지 않는다
+      (12번 결정: '모른다'는 빨강이 아니다) — 먹색 알약이다. 🔴 여백은 em 으로 쓴다(톱니 관문). */
+.sch-fit {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.22em 0.7em;
+  border-radius: var(--radius-pill);
+  font-weight: 800;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+}
+.sch-fit.fit-red, .sch-fit.fit-orange, .sch-fit.fit-yellow { color: var(--text); }
+.sch-fit.fit-green, .sch-fit.fit-blue {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
+}
+
+/* ── 프로필 사진 (2026-09-11 개발자 지시: "마이페이지에서 프로필사진 교체 기능 추가.
+   해당 기능은 본인의 사진을 요구하는 장학 공고에 쓰일 수 있음") ──────────────────
+   MY 맨 위 카드의 이름 왼쪽에 둥근 사진. 사진이 없으면 홈과 같은 첫 글자.
+   🔴 사진은 서류 보관함과 같은 금고(IndexedDB `files` 의 `photo` 칸)에 **이 기기 안에만** 남고
+      서버로 올라가는 프로필(syncSafeProfile)에는 들어가지 않는다.
+   🔴 단추는 카드 안에 있지만 카드 전체가 '프로필 수정' 버튼이라 app.js 가 캡처 단계에서 먼저 잡는다. */
+.my-head { display: flex; align-items: center; gap: var(--sp-2); margin-bottom: var(--sp-1); }
+.my-head .my-name { flex: 1 1 auto; min-width: 0; }
+.my-photo {
+  width: 64px; height: 64px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--navy-1);
+  color: var(--surface);
+  font-size: var(--t-xl);
+  font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--line);
+}
+.my-photo img, .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.avatar { overflow: hidden; }
+.my-photo-btns { display: flex; flex-wrap: wrap; gap: var(--sp-1); margin-bottom: var(--sp-2); }
+.my-photo-btn {
+  font: inherit;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  padding: 0.35em 0.9em;
+  cursor: pointer;
+}
+.my-photo-btn.danger { color: var(--red); }
+/* 양식 문서의 사진란 — 원본 서식의 우측 상단 증명사진 자리(3cm×4cm 비율) */
+.fd-photo { float: right; width: 90px; height: 120px; object-fit: cover; border: 1px solid #444; margin: 0 0 8px 12px; }
+.fd-photo.left { float: left; margin: 0 12px 8px 0; }
+.fd-photo-note { clear: both; }

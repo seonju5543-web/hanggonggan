@@ -143,7 +143,7 @@ console.log('\n■ style.css 가 토큰 밖의 값을 쓰지 않는다');
       · `.chat-*`  대장님. 2026-08-29 개발자 지시로 손대지 않기로 한 영역이다.
       · `.fd-*` `.form-doc`  인쇄되는 신청서 문서다. 흰 종이에 검은 글씨·회색 괘선이 맞다.
       · `@keyframes`  움직임의 중간값이라 여백 리듬과 무관하다. */
-const CEILING = { space: 519, color: 76, ghost: 0 };
+const CEILING = { space: 517, color: 76, ghost: 0 };   // 2026-09-11 마감 막대 제거로 519 → 517
 
 /** 천장 검사 — 늘면 실패, 줄면 천장을 내리라고 알린다(실패는 아니다). */
 const le = (name, got, ceiling, hint) => {

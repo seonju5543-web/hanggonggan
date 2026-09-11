@@ -384,7 +384,8 @@ function essayCtx(sch) {
     /* 보관함은 walletCache(slot -> {name,type,savedAt}) 에 있다 — 파일 내용은 IndexedDB
        안에 있고 여기서 읽지 않는다. 우리가 보는 것은 '그 칸이 차 있나'뿐이다. */
     const box = (typeof walletCache !== 'undefined' && walletCache) || {};
-    docs = Object.keys(box).filter((k) => k !== 'welfare' && box[k]);
+    /* 'photo' 는 서류가 아니라 프로필 사진 칸(2026-09-11) — 서류 목록에 섞이면 초안 서버가 '서류' 로 부른다 */
+    docs = Object.keys(box).filter((k) => k !== 'welfare' && k !== 'photo' && box[k]);
   } catch (e) { docs = []; }
   return { profile: p, sch, docs };
 }

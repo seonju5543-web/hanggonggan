@@ -291,16 +291,17 @@ function dday(dateStr) {
    왜 — 앱 전체에 마감 표기가 다섯 가지였고 홈 한 화면에 그중 넷이 함께 떴다:
    'D-DAY' 배지 · '9/10 마감' 막대 · '9월 10일 15:25' · '2026-09-09'.
    🔴 **판정을 새로 하지 않는다** — 위 dday() 가 낸 값만 받아 말로 바꾼다.
-      여기서 날짜를 다시 계산하면 배지·막대·달력이 서로 다른 말을 하게 된다.
+      여기서 날짜를 다시 계산하면 배지·달력이 서로 다른 말을 하게 된다.
    🔴 시간 단위를 쓰지 않는다 — 우리가 아는 것은 날짜뿐이라 마감 '시각'을 모른다.
+   🔴 **카드의 말은 D-DAY 카운트다** (2026-09-11 개발자 지시: "빨간색 마감 인터렉션 바를
+      지우고 마감 D-DAY 카운트만 남겨놓기"). '오늘 마감·3일 남음' 으로 풀어 쓰던 것을
+      상세 시트·달력 배지가 이미 쓰는 `dday().label`(D-DAY · D-3 · 마감) 과 **같은 글자**로
+      맞췄다 — 목록과 상세가 마감을 다른 글자로 말하지 않는다.
    ⚠️ 달력은 날짜 자체가 내용이라 이 말을 쓰지 않는다(isoOf 그대로). */
 function ddayWords(d) {
   if (!d) return '';
   if (d.label === '기한 원문 확인') return '기한 확인 중';
-  if (d.days < 0) return '마감';
-  if (d.days === 0) return '오늘 마감';
-  if (d.days === 1) return '내일 마감';
-  return d.days + '일 남음';
+  return d.label;   // '마감' · 'D-DAY' · 'D-n' — dday() 가 낸 글자 그대로
 }
 
 /* 카드 제목에서 기관명 접두어를 지운다 (2026-09-10 페이스리프트).
@@ -308,7 +309,16 @@ function ddayWords(d) {
    + 아래 줄 '재단법인 연수큰재장학재단'. 원본 데이터를 그대로 이어 붙인 흔적이다.
    🔴 **지어내지 않는다** — provider 글자로 시작할 때만 딱 그만큼 잘라 낸다.
    🔴 남는 글자가 2자 미만이면 자르지 않는다(제목이 통째로 사라지는 것을 막는다).
+   🔴 **남는 글자가 '장학생·장학금·모집' 같은 흔한 낱말뿐이면 자르지 않는다** (2026-09-11
+      개발자 지적: "한원장학회 장학생의 공고가 장학금 찾기 탭에서 '장학생'으로만 표시").
+      한국장학재단 목록(층2)은 사업명 칸이 `장학생` 한 낱말인 재단이 118곳 중 11곳이라
+      (실측: 한원·북청읍·금천·앨트웰민초·영축총림·한진해운·부산북구·해기사협회·파주돈재갑진…)
+      기관명을 떼면 카드 제목이 **누구 것인지 모르는 '장학생'** 이 된다. 이 낱말들은
+      기관명이 붙어야 제목이 된다. `특별장학생`·`복지장학금` 처럼 앞에 다른 글자가 붙은
+      것은 그대로 뗀다(기관명은 바로 위 줄에 있다).
    🔴 상세 시트는 **원제목 그대로** 둔다 — 거기는 원문과 대조하는 자리다. */
+/* 기관명을 떼고 남았을 때 제목이 되지 못하는 낱말들 — 이것만으로 이루어진 나머지는 안 뗀다 */
+const GENERIC_TITLE_REST = /^(?:장학생|장학금|장학|모집|선발|신청|안내|공고|지원|사업|[\s·])+$/;   // 안쪽에 + 를 두지 말 것(중첩 반복 → 되돌이 폭주)
 function cardTitle(sch) {
   const name = String(sch.name || '').trim();
   const prov = String(sch.provider || '').trim();
@@ -319,7 +329,7 @@ function cardTitle(sch) {
     for (const t of [name, bare(name)]) {
       if (t.startsWith(p)) {
         const rest = t.slice(p.length).replace(/^[\s·\-–—:,]+/, '').trim();
-        if (rest.length >= 2) return rest;
+        if (rest.length >= 2 && !GENERIC_TITLE_REST.test(rest)) return rest;
       }
     }
   }
@@ -581,6 +591,7 @@ async function walletDeleteSlot(slot) {
       await trashTx('readwrite', (st) => st.put({
         key: `doc:${slot}:${Date.now()}`, kind: 'doc',
         slot, name: rec.name, type: rec.type, blob: rec.blob,
+        ...(rec.dataUrl ? { dataUrl: rec.dataUrl } : {}),   // 프로필 사진의 문서용 사본도 함께 (2026-09-11)
         savedAt: rec.savedAt, deletedAt: Date.now(),
       }));
     }
@@ -594,6 +605,130 @@ async function walletRefresh() {
     walletCache = {};
     (all || []).forEach((r) => { walletCache[r.slot] = { name: r.name, type: r.type, savedAt: r.savedAt }; });
   } catch (e) { walletCache = {}; }
+}
+
+/* ---------------- 프로필 사진 (2026-09-11 개발자 지시) ----------------
+   *"마이페이지에서 프로필사진 교체 기능 추가. 해당 기능은 본인의 사진을 요구하는 장학 공고에 쓰일 수 있음."*
+   🔴 **서류 보관함과 같은 금고**(IndexedDB `files`)의 `photo` 칸에 둔다 — 새 저장소를 만들지
+      않는다. 지우면 서류처럼 휴지통(30일)으로 옮겨진다(walletDeleteSlot 그대로).
+   🔴 **서버로 안 올라간다** — `state.profile` 에 넣지 않으므로 syncSafeProfile 이 볼 일이 없다.
+      verify-supabase 가 나가는 본문을 전부 모아 세는데, 사진은 애초에 그 길에 없다.
+   🔴 **줄여서 저장한다**(긴 변 640px · JPEG). 폰 사진 한 장은 4~8MB 라 그대로 두면 양식 문서 한 장이
+      그 크기가 된다. 줄인 뒤 dataUrl 도 같이 적어 둔다 — 양식 문서(forms.js)는 동기로 그려지고
+      .doc 파일로 나갈 때 blob 주소는 죽으므로, 문서에 들어갈 수 있는 것은 글자로 된 사진뿐이다.
+   ⚠️ 사진이 **어느 양식에 들어가는가**는 짐작하지 않는다 — `data/forms.json` 의 `photoNote`
+      (원본 서식에 사진란이 있다고 스키마화 때 적어 둔 것)가 있는 양식에만 들어간다. */
+const PHOTO_SLOT = 'photo';
+const PHOTO_MAX_W = 480;
+const PHOTO_MAX_H = 640;
+let profilePhoto = null;   // { url, dataUrl, savedAt } — 금고에서 읽어 둔 사본. 없으면 null
+
+/** 양식 문서가 부른다(forms.js) — 사진이 없으면 빈 문자열(지어내지 않는다). */
+function profilePhotoDataUrl() {
+  const d = profilePhoto && profilePhoto.dataUrl;
+  return typeof d === 'string' && d.startsWith('data:image/') ? d : '';
+}
+
+/* blob → data URL (문서용). 옛 기록이나 휴지통을 거친 기록에 dataUrl 이 없을 때만 쓴다. */
+function blobToDataUrl(blob) {
+  return new Promise((res) => {
+    try {
+      const r = new FileReader();
+      r.onload = () => res(typeof r.result === 'string' ? r.result : '');
+      r.onerror = () => res('');
+      r.readAsDataURL(blob);
+    } catch (e) { res(''); }
+  });
+}
+async function photoRefresh() {
+  try {
+    const rec = await walletGetRec(PHOTO_SLOT);
+    if (profilePhoto && profilePhoto.url) { try { URL.revokeObjectURL(profilePhoto.url); } catch (e) { /* 이미 해제됨 */ } }
+    if (rec && rec.blob) {
+      /* 🔴 dataUrl 이 없으면 만들어 채운다 — 없으면 MY 에는 사진이 보이는데 양식 문서에는 조용히 안 들어간다(코드 리뷰) */
+      const dataUrl = rec.dataUrl || await blobToDataUrl(rec.blob);
+      profilePhoto = { url: URL.createObjectURL(rec.blob), dataUrl, savedAt: rec.savedAt };
+    } else profilePhoto = null;
+  } catch (e) { profilePhoto = null; }
+  return profilePhoto;
+}
+
+/* 사진을 줄여 JPEG 로 — 못 읽는 파일(HEIC 를 브라우저가 못 여는 경우 등)이면 null */
+function shrinkPhoto(file) {
+  return new Promise((res) => {
+    const img = new Image();
+    const src = URL.createObjectURL(file);
+    const done = (v) => { try { URL.revokeObjectURL(src); } catch (e) { /* 무시 */ } res(v); };
+    img.onload = () => {
+      try {
+        if (!img.naturalWidth || !img.naturalHeight) return done(null);   // 크기 없는 그림(SVG 등) → 1px 사진이 되는 것을 막는다
+        const r = Math.min(1, PHOTO_MAX_W / img.naturalWidth, PHOTO_MAX_H / img.naturalHeight);
+        const w = Math.max(1, Math.round(img.naturalWidth * r));
+        const h = Math.max(1, Math.round(img.naturalHeight * r));
+        const cv = document.createElement('canvas');
+        cv.width = w; cv.height = h;
+        cv.getContext('2d').drawImage(img, 0, 0, w, h);
+        const dataUrl = cv.toDataURL('image/jpeg', 0.86);
+        cv.toBlob((blob) => done(blob ? { blob, dataUrl } : null), 'image/jpeg', 0.86);
+      } catch (e) { done(null); }
+    };
+    img.onerror = () => done(null);
+    img.src = src;
+  });
+}
+
+async function photoSet(file) {
+  const small = await shrinkPhoto(file);
+  if (!small) return false;
+  await walletTx('readwrite', (st) => st.put({
+    slot: PHOTO_SLOT, name: '증명사진.jpg', type: 'image/jpeg',
+    blob: small.blob, dataUrl: small.dataUrl, savedAt: nowStamp(),
+  }));
+  await walletRefresh();
+  await photoRefresh();
+  return true;
+}
+async function photoRemove() {
+  await walletDeleteSlot(PHOTO_SLOT);   // 서류처럼 휴지통으로 — 30일 안에 되살릴 수 있다
+  await photoRefresh();
+}
+
+/* MY 맨 위 카드의 머리 — 사진(없으면 첫 글자) + 이름 줄 + 단추 두 개 */
+function photoHeadHtml(p, nameLineHtml) {
+  const initial = esc((p.name || '학').charAt(0));
+  /* 겉 상자가 role=img + 이름표를 갖고 있으니 안쪽 그림의 alt 는 비운다 — 낭독기가 두 번 읽지 않게 */
+  const img = profilePhoto && profilePhoto.url ? `<img src="${esc(profilePhoto.url)}" alt="" />` : initial;
+  return `
+    <div class="my-head">
+      <div class="my-photo" id="my-photo" role="img" aria-label="프로필 사진">${img}</div>
+      ${nameLineHtml}
+    </div>
+    <div class="my-photo-btns" data-photo>
+      <label class="my-photo-btn">${profilePhoto ? '사진 교체' : '사진 올리기'}
+        <input type="file" id="my-photo-file" accept="image/*" hidden />
+      </label>
+      ${profilePhoto ? '<button type="button" class="my-photo-btn danger" id="my-photo-del">사진 삭제</button>' : ''}
+    </div>`;
+}
+function bindPhotoButtons() {
+  const inp = $('#my-photo-file');
+  if (inp) inp.addEventListener('change', async () => {
+    const file = inp.files && inp.files[0];
+    if (!file) return;
+    if (file.size > 20 * 1024 * 1024) { toast('20MB 이하 사진만 올릴 수 있어요'); return; }
+    const ok = await photoSet(file);
+    toast(ok ? '프로필 사진 저장 완료 · 이 기기에만 남아요' : '이 사진은 읽을 수 없어요 · JPG·PNG 로 다시 올려 주세요');
+    renderMy();
+    if (!$('#screen-home').hidden) renderHome();
+  });
+  const del = $('#my-photo-del');
+  if (del) del.addEventListener('click', async () => {
+    if (!confirm('프로필 사진을 지울까요? 휴지통에 30일 남아요.')) return;
+    await photoRemove();
+    toast('휴지통으로 옮겼어요');
+    renderMy();
+    if (!$('#screen-home').hidden) renderHome();
+  });
 }
 
 /* 요구 서류의 보관함 상태 한 줄 */
@@ -750,13 +885,13 @@ function showScreen(name, opts) {
   if (typeof resumeSaveScroll === 'function' && currentScreen && currentScreen !== name) {
     resumeSaveScroll(currentScreen, window.scrollY);
   }
-  ['onboarding', 'home', 'explore', 'applications', 'my', 'settings', 'trash', 'terms'].forEach((n) => {
+  ['onboarding', 'home', 'explore', 'applications', 'my', 'settings', 'trash', 'terms', 'logins', 'faq', 'perms'].forEach((n) => {
     $(`#screen-${n}`).hidden = n !== name;
   });
   $('#bottom-nav').hidden = name === 'onboarding';
   /* 설정·휴지통은 MY 안쪽 화면이라 아래 탭에서 **MY 가 켜진 채**로 둔다 —
      아무 탭도 안 켜져 있으면 학생이 지금 어디에 있는지 알 수 없다. */
-  const navOn = (name === 'settings' || name === 'trash' || name === 'terms') ? 'my' : name;
+  const navOn = ['settings', 'trash', 'terms', 'logins', 'faq', 'perms'].includes(name) ? 'my' : name;
   $$('.nav-item').forEach((b) => b.classList.toggle('active', b.dataset.nav === navOn));
 
   /* 🔴 안쪽 화면(설정·휴지통)은 **방향이 있는** 움직임으로 들어온다 (2026-09-11 개발자 지시).
@@ -765,7 +900,7 @@ function showScreen(name, opts) {
         style.css 에서 **이 규칙이 뒤에 와야** 이긴다(같은 굵기면 나중 것이 이긴다).
      ⚠️ 클래스를 떼었다 붙이는 것만으로는 다시 안 돈다 — 브라우저가 '바뀐 게 없다'고 본다.
         중간에 offsetWidth 를 한 번 읽어 강제로 끊어 준다. */
-  const SUB = ['settings', 'trash', 'terms'];
+  const SUB = ['settings', 'trash', 'terms', 'logins', 'faq', 'perms'];
   if (SUB.includes(name) || SUB.includes(currentScreen)) {
     const el = $(`#screen-${name}`);
     if (el) {
@@ -783,6 +918,9 @@ function showScreen(name, opts) {
   if (name === 'settings') renderSettings();
   if (name === 'trash') renderTrash();
   if (name === 'terms') renderTerms();
+  if (name === 'logins') renderLogins();
+  if (name === 'faq') renderFaq();
+  if (name === 'perms') renderPerms();
 
   /* 🔴 스크롤은 **그린 뒤에** 옮긴다 — 먼저 옮기면 아직 짧은 화면이라 그 자리가 없다.
      `opts.scroll` 은 이어보기가 되살릴 때만 온다(보통은 늘 맨 위로). */
@@ -1121,12 +1259,10 @@ function cardBadgeHtml(fit, fd, myApp) {
   const v = fitVerdict(fit, fd);
   if (v === 'no') return '<span class="badge badge-fit-no">지원 자격 미달</span>';
   if (v === 'unread') return '<span class="badge badge-fit-unknown">자격 미확인</span>';
-  /* 🔴 퍼센트는 남기되 **알약이 아니라 글자**로 낸다 (2026-09-10 페이스리프트).
-     2026-08-31 개발자 지시('요건 없애고 퍼센테이지로')는 지킨다 — 숫자는 그대로 보인다.
-     바꾼 것은 무게다: 목록에서 이 값은 대부분 33~50% 에 몰려 있어 카드끼리 구별해 주지
-     못하는데, 알약으로 두면 카드마다 같은 자리에 같은 크기의 색 덩어리가 반복돼
-     **눈이 제목보다 먼저 그것을 본다**(실측 스크린샷에서 다섯 장 연속 같은 알약).
-     알약은 학생이 실제로 멈춰 서야 하는 세 가지(미달·미확인·신청 완료)에만 남긴다. */
+  /* 퍼센트 — 2026-08-31 개발자 지시('요건 없애고 퍼센테이지로')대로 숫자만.
+     2026-09-10 페이스리프트가 이것을 알약이 아닌 **글자**로 낮췄는데(다섯 장 연속 같은 알약이
+     제목보다 먼저 읽혔다), **2026-09-11 개발자 지시로 다시 알약**이 됐다 — "옅은 회색으로 잘
+     보이지 않음". 모양은 style.css 파일 끝 '적합도 알약' 절이 정한다(여기 클래스 이름은 그대로). */
   return fd ? '<span class="sch-fit fit-' + fitTone(fd.pct) + '">적합도 ' + fd.pct + '%</span>' : '';
 }
 
@@ -1166,15 +1302,15 @@ function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
         ${badge}
       </div>
       <p class="sch-name">${esc(cardTitle(sch))}</p>
+      ${/* 🔴 마감(D-DAY 카운트)의 자리는 **맨 아랫줄 오른쪽**이다 (2026-09-11 개발자 지시).
+           맨 윗줄은 적합도가 쓰는 자리라 거기 두면 안 된다("적합도와 같은 곳에 있으면 안됨").
+           금액(왼쪽)과 마감(오른쪽)이 한 줄에 나란히 — 학생이 카드에서 마지막으로 읽는 두 숫자다.
+           2026-09-09 에 카드 밑에 두었던 빨간 막대는 같은 지시로 **뺐다**(interactions.js 에서도
+           지웠다 — 남겨 두면 다음 사람이 다시 붙인다). 7일 안쪽은 글자를 빨갛게(urgent) 한다. */ ''}
       <div class="sch-foot">
         <span class="sch-amount${known ? '' : ' unknown'}">${esc(sch.amount)}</span>
         ${due ? `<span class="sch-due${(!sch.program && d.days >= 0 && d.days <= 7) ? ' urgent' : ''}">${esc(due)}</span>` : ''}
       </div>
-      ${/* 마감까지 남은 시간 막대 (2026-09-09 개발자 지시: "밑에 빨간색으로 마감 기간 알려주는 것").
-           🔴 판정을 새로 하지 않는다 — 위에서 이미 구한 `d`(dday 결과)를 넘길 뿐이다.
-           🔴 7일 밖·마감된 공고·마감을 못 읽은 공고에는 아무것도 안 그린다.
-           🔴 **상시 제도는 뺀다** — 그 카드는 '3일 뒤 마감'을 같이 말하면 안 된다. */ ''}
-      ${(!sch.program && typeof deadlineMeterHtml === 'function') ? deadlineMeterHtml(d.days, sch.deadline) : ''}
     </button>
     </div>`;
 }
@@ -1242,7 +1378,9 @@ function renderHome() {
      비어 있다는 사실 자체를 알려야 한다. 이 줄은 이미 눌러서 프로필로 가는 자리다. */
   $('#home-greet').textContent = p.name ? `${p.name}님` : '이름 설정';
   $('#home-school').textContent = (p.school || '대학 미설정') + (p.campus ? ' · ' + p.campus : '');
-  $('#home-avatar').textContent = (p.name || '학').charAt(0);
+  /* 프로필 사진이 있으면 홈 왼쪽 위 동그라미에도 그 사진 (2026-09-11) — 없으면 첫 글자 그대로 */
+  if (profilePhoto && profilePhoto.url) $('#home-avatar').innerHTML = `<img src="${esc(profilePhoto.url)}" alt="" />`;
+  else $('#home-avatar').textContent = (p.name || '학').charAt(0);
 
   const matches = getMatches();
   /* '지금 받을 수 있는' 이라고 말하려면 **정말 지금 신청할 수 있어야** 한다 (2026-08-02 개발자 지적).
@@ -2918,6 +3056,117 @@ function enableSheetSwipe(sheet, close) {
   }, { passive: true });
 }
 
+/* ── 안쪽 화면을 **오른쪽으로 쓸어** 되돌아가기 (2026-09-11 개발자 요청) ──────────
+   설정·휴지통·이용약관은 MY 안쪽 화면이라 나가는 길이 왼쪽 위 화살표 하나뿐이었다.
+   손가락으로 오른쪽으로 쓸면 그 화면을 나간다 — 시트를 아래로 쓸어 닫는 것과 같은 계열이다.
+
+   🔴 **규칙은 시트 것(enableSheetSwipe)과 같은 뼈대를 쓴다**: 거리만 보지 않고 **튕김
+      빠르기**도 함께 본다(짧고 빠르게 튕기는 것이 가장 자연스러운 손짓인데 거리만 보면
+      무시된다 — 2026-09-06 에 시트에서 겪은 그것). 문턱 값도 같은 뜻으로 맞춰 뒀다.
+
+   🔴 **세로 스크롤을 뺏지 않는다.** 첫 움직임에서 축을 정하고, 세로가 더 크면 그 손짓은
+      통째로 포기한다(다시 붙잡지 않는다). 이 저장소는 '보이지 않는 것이 손가락을 가로채는'
+      사고를 여러 번 냈다 — 밀어서 삭제가 그래서 걷어내졌다(2026-09-01).
+
+   🔴 **가로로 스크롤되는 것 위에서는 안 된다.** 약관의 표처럼 옆으로 밀리는 영역이
+      왼쪽 끝이 아니면 그건 그 영역의 스크롤이다(시트의 `scrollableAtTop` 과 같은 판정).
+
+   ⚠️ iOS 는 **화면 왼쪽 끝**에서 오른쪽으로 끄는 것을 제 '뒤로 가기'로 가로챈다. 그래서
+      왼쪽 끝 24px 에서 시작한 손짓은 건드리지 않고 넘긴다 — 우리가 잡아 봐야 OS 와 둘이
+      같이 반응해 두 번 나가거나 화면이 튄다. 그 자리를 뺀다고 손해가 없다(가운데에서
+      쓸어도 되니까).
+   ⚠️ 회귀는 **반드시 TouchEvent 로** 재현할 것 — 마우스로는 이 유형이 한 번도 재현되지
+      않았다(13차 세션 학교 검색 사고). verify/verify-settings.js 의 '쓸어서 나가기' 절. */
+function scrollableAtLeft(target, screen) {
+  for (let el = target; el && el !== screen.parentNode; el = el.parentElement) {
+    if (el.scrollLeft > 0) return false;
+  }
+  return true;
+}
+
+const SWIPE_EDGE_IOS = 24;   /* iOS 제 뒤로가기에 양보하는 왼쪽 끝 폭 */
+
+/* 🔴 손짓은 **앱 전체**(`#app`)에서 받는다 — 화면 조각에 붙이면 안 된다.
+   빈 휴지통처럼 내용이 짧은 화면은 아래쪽이 통째로 비어 있어서, 그 조각에만 붙이면
+   학생이 화면 가운데를 쓸어도 아무 일도 안 일어난다(검사에서 실제로 그렇게 걸렸다).
+   지금 어느 화면인지는 `currentScreen` 이 말해 주고, 안쪽 화면일 때만 맡는다. */
+const SWIPE_BACK_TO = {
+  settings: 'my',
+  trash: 'settings',
+  terms: 'settings',
+  logins: 'settings',
+  faq: 'settings',
+  perms: 'settings',
+};
+
+function enableScreenSwipeBack(root) {
+  if (!root || root.dataset.swipeBack) return;
+  root.dataset.swipeBack = '1';
+  const screen = () => $(`#screen-${currentScreen}`);
+  let x0 = 0, y0 = 0, dx = 0, t0 = 0;
+  let live = false;      // 이 손짓을 우리가 맡았나
+  let axis = '';         // '' 아직 모름 · 'x' 우리 것 · 'y' 스크롤이라 포기
+  const FLICK = 0.11;    // 시트와 같은 값 — '툭 치는 것'과 '천천히 끄는 것'이 갈리는 선
+
+  const reset = () => {
+    live = false; axis = '';
+    const el = screen();
+    if (!el) return;
+    el.style.transition = '';
+    void el.offsetHeight;
+    el.style.transform = '';
+    el.style.opacity = '';
+  };
+
+  root.addEventListener('touchstart', (e) => {
+    live = false;
+    if (e.touches.length !== 1) return;
+    if (!SWIPE_BACK_TO[currentScreen] || !screen()) return;   // 안쪽 화면일 때만
+    /* 🔴 시트 안에서는 손대지 않는다. 시트(#detail-sheet 등)는 `#app` **안에** 있어서,
+       설정 화면 위에 로그인 시트가 떠 있을 때 그 안의 손짓까지 이 규칙이 가로챈다 —
+       시트는 제 손짓(아래로 쓸어 닫기)이 따로 있다(enableSheetSwipe). */
+    if (e.target.closest && e.target.closest('.sheet, .sheet-backdrop')) return;
+    const t = e.touches[0];
+    if (t.clientX <= SWIPE_EDGE_IOS) return;                   // OS 몫
+    if (!scrollableAtLeft(e.target, root)) return;
+    x0 = t.clientX; y0 = t.clientY; dx = 0; t0 = Date.now();
+    live = true; axis = '';
+  }, { passive: true });
+
+  root.addEventListener('touchmove', (e) => {
+    if (!live) return;
+    const el = screen();
+    if (!el) { live = false; return; }
+    const t = e.touches[0];
+    const mx = t.clientX - x0;
+    const my = t.clientY - y0;
+    if (!axis) {
+      if (Math.abs(mx) < 8 && Math.abs(my) < 8) return;   // 아직 방향을 말하지 않았다
+      /* 세로가 더 크면 목록을 읽으려는 것이다 — 통째로 포기하고 다시 붙잡지 않는다 */
+      axis = Math.abs(mx) > Math.abs(my) ? 'x' : 'y';
+      if (axis === 'y') { live = false; return; }
+    }
+    dx = mx;
+    if (dx <= 0) { el.style.transform = ''; el.style.opacity = ''; return; }
+    e.preventDefault();
+    el.style.transition = 'none';
+    el.style.transform = `translateX(${dx}px)`;
+    /* 멀리 끌수록 옅어진다 — '나가는 중'이 손끝에 보이게 (0.4 아래로는 안 내린다) */
+    el.style.opacity = String(Math.max(0.4, 1 - dx / 520));
+  }, { passive: false });
+
+  const finish = () => {
+    if (!live) { reset(); return; }
+    const moved = dx;
+    const speed = moved / Math.max(1, Date.now() - t0);
+    const to = SWIPE_BACK_TO[currentScreen];
+    reset();
+    if (to && (moved > 90 || (moved > 12 && speed > FLICK))) showScreen(to, { back: true });
+  };
+  root.addEventListener('touchend', finish, { passive: true });
+  root.addEventListener('touchcancel', () => { live = false; reset(); }, { passive: true });
+}
+
 /* 바텀시트를 여는 동작 한 곳 — 상세 시트와 일괄 준비 목록이 **같은 함수**를 쓴다.
    베끼면 열리는 모양이 갈라진다(내용은 부르는 쪽이 innerHTML 로 채운다). */
 function openSheetShell(keepScroll) {
@@ -3660,8 +3909,9 @@ function renderMy() {
   const flagText = p.flags.length ? p.flags.map((f) => FLAG_LABELS[f] || f).join(', ') : '해당 없음';
   const trackLabel = (TRACKS.find((t) => t.id === p.track) || {}).label || '-';
   const commonFilled = ['studentId', 'birth', 'phone', 'email', 'account'].filter((k) => c[k]).length;
+  const nameLine = `<p class="my-name">${esc(p.name || '대학생')} 님<span class="my-edit-hint">학적정보 수정 ›</span></p>`;
   $('#my-profile').innerHTML = `
-    <p class="my-name">${esc(p.name || '대학생')} 님<span class="my-edit-hint">수정하기 ›</span></p>
+    ${photoHeadHtml(p, nameLine)}
     ${/* 🔴 학과 칸은 **학생이 직접 치는 자유 입력**이다 — esc 를 빠뜨리면 `B<b>학과` 같은 글자에
          MY 화면 아래쪽이 통째로 그 태그 안으로 빨려 들어간다(브라우저 실측). 2026-09-10. */ ''}
     <p class="my-line">${esc(p.school || '대학 미설정')} · ${esc(trackLabel)}${p.major ? ' · ' + esc(p.major) : ''}</p>
@@ -3673,7 +3923,9 @@ function renderMy() {
     </div>
     <p class="my-flags">특별자격: ${flagText}</p>
     ${learnedHtml(c)}
-    <p class="my-flags">공통 서류정보(학번·연락처·계좌 등)는 이 기기에만 저장 · 서류 초안에 자동 기입.</p>`;
+    <p class="my-flags">공통 서류정보(학번·연락처·계좌 등)는 이 기기에만 저장 · 서류 초안에 자동 기입.</p>
+    <p class="my-flags">프로필 사진도 이 기기에만 저장 · 사진란이 있는 신청서 문서에 자동으로 들어가요.</p>`;
+  bindPhotoButtons();
   /* 🔴 계정·알림은 여기서 그리지 않는다 — 설정 화면으로 옮겼다 (2026-09-11).
      renderSettings() 가 **같은 함수**를 불러 그린다. */
   renderWallet();
@@ -3690,6 +3942,160 @@ function renderSettings() {
   if (w && !w.dataset.wired) { w.dataset.wired = '1'; w.addEventListener('click', withdrawAccount); }
   const tm = $('#btn-open-terms');
   if (tm && !tm.dataset.wired) { tm.dataset.wired = '1'; tm.addEventListener('click', () => showScreen('terms')); }
+  for (const [id, screen] of [['#btn-open-logins', 'logins'], ['#btn-open-faq', 'faq'], ['#btn-open-perms', 'perms']]) {
+    const b = $(id);
+    if (b && !b.dataset.wired) { b.dataset.wired = '1'; b.addEventListener('click', () => showScreen(screen)); }
+  }
+}
+
+/* ---------------- 로그인 활동 (2026-09-11 개발자 지시 1번) ----------------
+   "내 계정에 언제 어디서 로그인됐나". 낯선 기기가 보이면 비밀번호를 바꾸라고 알려 준다.
+   🔴 '없다'와 '못 읽었다'를 가른다 — 못 읽은 것을 '없다'로 보여 주면 낯선 기기를 놓친다.
+   🔴 **IP 는 적지 않는다.** 브라우저는 제 IP 를 모르고(서버만 안다) Supabase 에 바로 쓰는
+      지금 구조에는 받아 적을 자리가 없다. 지어내느니 줄을 비운다(원칙 8-1).
+   🔴 '현재 기기' 배지는 **기기 이름이 아니라 설치본 식별자**로 붙인다 — 이름으로 견주면
+      같은 기종을 쓰는 남의 로그인에 배지가 붙어, 찾으라고 만든 화면이 안심시킨다. */
+function loginWhen(iso) {
+  const d = new Date(iso);
+  if (isNaN(d)) return '시각 확인 불가';
+  const ap = d.getHours() < 12 ? '오전' : '오후';
+  const h12 = d.getHours() % 12 || 12;
+  const two = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}. ${ap} ${h12}:${two(d.getMinutes())}`;
+}
+
+async function renderLogins() {
+  const el = $('#logins-body');
+  if (!el) return;
+  if (typeof authUser !== 'function' || !authUser()) {
+    el.innerHTML = `<div class="my-card trash-empty">
+        <p class="trash-empty-title">로그인한 계정이 없어요</p>
+        <p class="legal-loading">로그인하면 이 계정에 언제 어느 기기로 접속했는지 여기에 쌓여요.</p>
+      </div>`;
+    return;
+  }
+  el.innerHTML = '<p class="legal-loading">불러오는 중이에요…</p>';
+  const r = await authLoginEvents(20);
+  if (!r.ok) {
+    /* 🔴 못 읽은 것을 '없다'로 말하지 않는다 */
+    el.innerHTML = `<div class="my-card trash-empty">
+        <p class="trash-empty-title">기록을 불러오지 못했어요</p>
+        <p class="legal-loading">인터넷이 끊겼거나 서버 준비가 아직 안 됐어요. 잠시 뒤 다시 열어 주세요.</p>
+      </div>`;
+    return;
+  }
+  if (!r.items.length) {
+    el.innerHTML = `<div class="my-card trash-empty">
+        <p class="trash-empty-title">아직 기록이 없어요</p>
+        <p class="legal-loading">다음 로그인부터 여기에 쌓여요.</p>
+      </div>`;
+    return;
+  }
+  const me = typeof clientId === 'function' ? clientId() : '';
+  el.innerHTML = r.items.map((it) => `
+    <div class="login-card">
+      ${it.client && me && it.client === me ? '<span class="login-now">현재 기기</span>' : ''}
+      <p class="login-device">${esc(it.device || '알 수 없는 기기')}</p>
+      <p class="login-meta">로그인 | ${esc(loginWhen(it.at))}</p>
+    </div>`).join('');
+}
+
+/* ---------------- 자주 묻는 질문 (2026-09-11 개발자 지시 2번) ----------------
+   🔴 **앱이 실제로 하는 일만** 적는다. '곧 됩니다'나 확인 안 한 것을 적으면 그게 가장
+      눈에 잘 띄는 거짓말이 된다(운영 원칙 1·8-1). 답은 전부 지금 동작 기준이고,
+      기능이 바뀌면 이 목록도 같이 고쳐야 한다. */
+const FAQ_ITEMS = [
+  ['이 앱에서 신청까지 끝나나요?',
+    '아니요. 한대장은 <strong>신청 준비까지</strong> 도와줍니다. 최종 신청·접수는 한국장학재단, 각 대학, 각 재단 같은 공식 접수처에서 직접 하셔야 해요. 그래서 앱은 "신청 완료"라고 쓰지 않고 "신청 준비 완료"라고 적습니다.'],
+  ['우리 학교 공고가 안 보여요.',
+    '지금 공고 원문을 모으고 있는 학교가 정해져 있어요. 그 밖의 학교라도 <strong>전국 대상 공고</strong>와 <strong>한국장학재단이 아는 재단 장학금</strong>은 그대로 보입니다.'],
+  ['"지원 자격을 아직 읽지 못했어요"는 무슨 뜻인가요?',
+    '공고 원문에서 자격 요건 문장을 찾지 못했다는 뜻입니다. 앱이 짐작해서 채우지 않습니다 — 틀린 자격 판정은 모른다고 말하는 것보다 나쁘기 때문이에요. 그때는 <strong>원문 보기</strong>로 직접 확인해 주세요.'],
+  ['금액이 "미확인"인 공고가 있어요.',
+    '공고 원문에 금액이 없거나 앱이 읽지 못한 경우입니다. 이런 공고는 홈의 예상 수혜액 <strong>합계에서 빼고</strong> "금액 미확인 n건 제외"라고 적습니다. 지어낸 숫자를 섞지 않습니다.'],
+  ['알림이 안 와요.',
+    '설정 → 알림에서 켜 주세요. <strong>아이폰은 홈 화면에 앱을 추가해야만</strong> 알림이 옵니다(사파리 탭에서는 안 옵니다). 폰에서 알림을 차단해 두었다면 설정 → 앱 권한에 바꾸는 방법이 적혀 있어요.'],
+  ['내 정보는 어디에 저장되나요?',
+    '기본은 <strong>이 기기 안</strong>입니다. 로그인하면 기기를 바꿔도 이어 쓸 수 있도록 프로필과 신청내역이 서버에 저장되고, 낯선 기기를 알아차릴 수 있게 <strong>로그인한 시각과 기기 종류</strong>도 함께 남습니다(설정 → 로그인 활동에서 볼 수 있어요).'],
+  ['주민등록번호·계좌번호·증명서류도 서버에 올라가나요?',
+    '아니요. 이 셋은 <strong>서버로 보내지 않습니다</strong>. 기기 안에만 저장되고, 서버로 나가는 사본에서 떼어냅니다.'],
+  ['기기를 바꾸면 이어서 쓸 수 있나요?',
+    '로그인하면 새 기기에서 프로필과 신청내역을 받아옵니다. 로그인하지 않으면 정보가 그 기기에만 남습니다.'],
+  ['유료인가요?',
+    '공고 검색·추천·알림은 무료입니다. 앞으로 유료 기능이 생기면 쓰기 전에 분명히 안내하고 동의를 받습니다.'],
+  ['잘못 지웠어요. 되살릴 수 있나요?',
+    '설정 → 휴지통에서 되살릴 수 있어요. 지운 신청내역과 서류는 <strong>30일 동안</strong> 남습니다.'],
+];
+
+function renderFaq() {
+  const el = $('#faq-body');
+  if (!el) return;
+  if (el.dataset.filled) return;      // 내용이 고정이라 한 번만 그린다
+  el.dataset.filled = '1';
+  /* <details> 를 쓴다 — 여닫는 코드가 0줄이고 키보드·보조기기에서도 저절로 된다 */
+  el.innerHTML = FAQ_ITEMS.map(([q, a]) => `
+    <details class="faq-item">
+      <summary>${esc(q)}</summary>
+      <div class="faq-a">${a}</div>
+    </details>`).join('');
+}
+
+/* ---------------- 앱 권한 · 오픈소스 라이선스 (2026-09-11 개발자 지시 4번) ----------------
+   🔴 **웹앱은 폰 설정 앱을 열 수 없다.** 그런 길이 브라우저에 없다(앱스토어에 올린 진짜
+      앱만 된다). 그래서 '눌러서 폰 설정으로 이동'은 만들 수 없고, 대신 **지금 권한 상태를
+      보여 주고 어디로 가야 하는지 글로 안내**한다. 있지도 않은 버튼을 만들어 두면
+      눌러도 아무 일이 없어 더 나쁘다.
+   🔴 라이선스 목록은 **실제로 싣는 것만** 적는다. 이 앱은 CSP 가 바깥 스크립트를 막아
+      자바스크립트 라이브러리를 하나도 싣지 않고, 바깥에서 받는 것은 글꼴 하나뿐이다. */
+const OSS_LICENSES = [
+  ['Pretendard', 'SIL Open Font License 1.1', 'https://github.com/orioncactus/pretendard'],
+];
+
+function permLabel() {
+  if (typeof Notification === 'undefined') return { text: '이 브라우저는 알림을 지원하지 않아요', cls: 'off' };
+  if (Notification.permission === 'granted') return { text: '허용됨', cls: 'on' };
+  if (Notification.permission === 'denied') return { text: '차단됨', cls: 'off' };
+  return { text: '아직 묻지 않음', cls: 'off' };
+}
+
+function renderPerms() {
+  const el = $('#perms-body');
+  if (!el) return;
+  const p = permLabel();
+  const blocked = typeof Notification !== 'undefined' && Notification.permission === 'denied';
+  el.innerHTML = `
+    <div class="my-card">
+      <p class="wallet-title">앱 권한</p>
+      <div class="wallet-row">
+        <div class="wallet-info">
+          <p class="trash-title">알림</p>
+          <p class="wallet-status nf-status-${p.cls}">${esc(p.text)}</p>
+        </div>
+      </div>
+      ${blocked ? `<p class="perm-how"><strong>폰에서 차단해 두셨어요.</strong> 앱에서는 다시 물을 수 없고,
+        폰 설정에서 직접 바꿔야 합니다.<br />
+        · 아이폰: 설정 → 알림 → 한대장 → 알림 허용<br />
+        · 안드로이드: 설정 → 앱 → 한대장 → 알림</p>`
+      : `<p class="perm-how">알림을 켜고 끄는 것은 <strong>설정 → 알림</strong>에서 합니다.
+        폰 설정에서 아예 차단해 두면 앱에서는 되돌릴 수 없어요.</p>`}
+      <p class="perm-how">한대장은 <strong>웹앱</strong>이라 사진·카메라·연락처 권한을 쓰지 않습니다.
+        서류 보관함에 파일을 올릴 때만 그때그때 파일을 고르게 되어 있고, 앱이 폰 안을 뒤지지 않습니다.</p>
+    </div>
+    <div class="my-card">
+      <p class="wallet-title">오픈소스 라이선스</p>
+      <p class="perm-how">이 앱은 바깥 자바스크립트 라이브러리를 하나도 싣지 않습니다(보안 설정이 막습니다).
+        바깥에서 받아 쓰는 것은 아래 글꼴 하나뿐이에요.</p>
+      ${OSS_LICENSES.map(([name, lic, url]) => `
+        <div class="wallet-row">
+          <div class="wallet-info">
+            <p class="trash-title">${esc(name)}</p>
+            <p class="wallet-status">${esc(lic)}</p>
+          </div>
+          <div class="wallet-btns">
+            <a class="wallet-btn" href="${esc(url)}" target="_blank" rel="noopener">원문 ↗</a>
+          </div>
+        </div>`).join('')}
+    </div>`;
 }
 
 /* ---------------- 이용약관 · 개인정보처리방침 (2026-09-11) ----------------
@@ -3733,6 +4139,11 @@ async function withdrawAccount() {
   }
   if (!confirm('서버에 저장된 프로필·신청내역을 지울까요?\n이 기기의 정보는 그대로 남습니다.')) return;
   const r = await authDeleteData();
+  /* 🔴 알림 구독도 함께 끊는다 (2026-09-11 코드 리뷰). 약관이 '탈퇴 시 즉시 파기'라고
+     적고 있는데 탈퇴가 발송 서버의 구독을 건드리지 않아, 지웠다는 폰으로 알림이 계속 갔다.
+     ⚠️ 실패해도 탈퇴는 성공으로 둔다 — 프로필은 이미 지워졌고, 죽은 구독은 발송 때
+        404 정리가 받친다. */
+  if (typeof pushUnsubscribe === 'function') { try { await pushUnsubscribe(); } catch (e) { /* 무시 */ } }
   toast(r.ok ? '서버 정보 삭제 완료' : r.error);
   renderSettings();
 }
@@ -3851,10 +4262,13 @@ async function trashRestore(key) {
     if (walletCache[rec.slot]) { toast('그 칸에 이미 다른 서류가 있어요 · 먼저 지우거나 교체해 주세요'); return; }
     await walletTx('readwrite', (st) => st.put({
       slot: rec.slot, name: rec.name, type: rec.type, blob: rec.blob, savedAt: rec.savedAt,
+      ...(rec.dataUrl ? { dataUrl: rec.dataUrl } : {}),
     }));
     await trashTx('readwrite', (st) => st.delete(rest));
     await walletRefresh();
-    toast('서류 보관함으로 되살렸어요');
+    /* 프로필 사진을 되살렸으면 MY·홈·양식 문서가 바로 알아야 한다 — 안 그러면 다시 켤 때까지 첫 글자만 보인다 */
+    if (rec.slot === PHOTO_SLOT) { await photoRefresh(); if (!$('#screen-home').hidden) renderHome(); }
+    toast(rec.slot === PHOTO_SLOT ? '프로필 사진을 되살렸어요' : '서류 보관함으로 되살렸어요');
   }
   renderTrash();
 }
@@ -4319,7 +4733,9 @@ function bindEvents() {
     initOnboarding();
     showScreen('onboarding');
   };
-  $('#btn-edit-profile').addEventListener('click', editProfile);
+  /* 🔴 홈 톱니는 없앴다 (2026-09-11 개발자 지시) — 입구는 MY 프로필 카드 하나다.
+     배선은 남겨 두되 **있을 때만** 건다(없는 요소에 걸면 그 자리에서 죽는다). */
+  { const e = $('#btn-edit-profile'); if (e) e.addEventListener('click', editProfile); }
   { const e = $('#btn-my-edit'); if (e) e.addEventListener('click', editProfile); }
 
   /* 눌러서 넘어가는 영역 — 마우스·손가락뿐 아니라 키보드로도 되어야 한다
@@ -4338,11 +4754,18 @@ function bindEvents() {
   /* 🔴 캡처 단계로 먼저 잡는다 — 카드 전체가 '프로필 수정' 버튼이라
      그냥 두면 '지우기'를 눌러도 수정 화면이 열려 버린다 */
   $('#my-profile').addEventListener('click', (e) => {
+    /* 사진 올리기·삭제 단추 (2026-09-11) — 카드로 번지면 파일 창과 프로필 수정이 같이 열린다.
+       ⚠️ preventDefault 는 하지 않는다: label 의 기본 동작이 파일 창을 여는 것이다. */
+    if (e.target.closest('.my-photo-btns')) { e.stopPropagation(); return; }
     const del = e.target.closest('[data-forget]');
     if (!del) return;
     e.stopPropagation();
     e.preventDefault();
     forgetLearned(del.dataset.forget);
+  }, true);
+  /* 키보드도 같다 — 카드의 Enter/스페이스 = 프로필 수정이라, 단추 위에서 누른 Enter 를 가로챈다 */
+  $('#my-profile').addEventListener('keydown', (e) => {
+    if (e.target.closest('.my-photo-btns')) e.stopPropagation();
   }, true);
   onTap('#my-profile', editProfile);                     // MY 맨 위 카드 → 프로필 수정
 
@@ -4354,6 +4777,15 @@ function bindEvents() {
   $('#btn-settings-back').addEventListener('click', () => showScreen('my', { back: true }));
   $('#btn-trash-back').addEventListener('click', () => showScreen('settings', { back: true }));
   $('#btn-terms-back').addEventListener('click', () => showScreen('settings', { back: true }));
+  for (const id of ['#btn-logins-back', '#btn-faq-back', '#btn-perms-back']) {
+    const b = $(id);
+    if (b) b.addEventListener('click', () => showScreen('settings', { back: true }));
+  }
+
+  /* 🔴 안쪽 화면 셋 다 같은 손짓으로 나간다 (2026-09-11 개발자 요청은 휴지통·약관이었는데,
+     설정만 안 되면 거기서 쓸어 보고 '안 된다'가 된다 — 안쪽 화면이라는 점이 같다).
+     어디로 나가는지는 위 `SWIPE_BACK_TO` 한 곳에 적혀 있다. */
+  enableScreenSwipeBack($('#app'));
 
   $('#btn-reset').addEventListener('click', () => {
     const pop = $('#wallet-pop');
@@ -4805,7 +5237,10 @@ function refreshOpenScreen() {
   if (!$('#screen-my').hidden) renderMy();
   if (!$('#screen-settings').hidden) renderSettings();
 }
-walletRefresh().then(refreshOpenScreen);
+walletRefresh().then(photoRefresh).then(() => {
+  refreshOpenScreen();
+  if (!$('#screen-home').hidden) renderHome();   // 홈 왼쪽 위 동그라미의 사진
+});
 if (typeof notifyInit === 'function') {
   notifyInit().then(refreshOpenScreen).catch(() => {});
 }

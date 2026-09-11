@@ -14,5 +14,5 @@
 # 배포되는 경로: 작업 브랜치 → 기본 브랜치(claude/nice-heisenberg-WESq5) → main → 앱
 # 데이터 관문(node verify/audit-data.js)을 통과하지 못하면 배포하지 않고 🚨 이슈를 남긴다.
 
-branch: claude/sweet-gauss-pmlp54
-메모: 2026-09-11 오후 2차 — CLAUDE.md 900줄 관문 복구분 배포(앞 배포는 903줄 상태로 나감)
+branch: claude/beautiful-volta-rlew71
+메모: 2026-09-11 카드 UI 4건(기본 브랜치 병합 후 재배포) — 마감 막대 삭제·D-DAY 글자 · 적합도 알약 · 한원장학회 제목 · MY 프로필 사진
