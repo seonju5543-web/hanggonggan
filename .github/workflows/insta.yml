@@ -199,6 +199,38 @@ jobs:
             exit 1
           fi
 
+      # **선택** — 우리 주소에서 우리 디자인으로 한 통 더. 시크릿이 없으면 건너뛴다.
+      #    기본 알림은 위 이슈의 담당자 지정으로 **GitHub 이** 보낸다(설정 필요 없음).
+      #    🔴 SMTP 는 보내는 계정으로 로그인해야 한다 — 주소 없이 보내는 길은 없다.
+      #       GitHub 메일이 주소 없이 오는 것처럼 보이는 건 GitHub 이 자기 서버에서
+      #       자기 주소로 보내기 때문이고, 그 서버는 우리가 못 빌린다.
+      #    🔴 제3자 액션을 안 쓰고 curl 로 보낸다 — 메일 열쇠가 남의 코드를 안 거친다.
+      - name: 은서에게 메일 (선택)
+        env:
+          DIR: ${{ steps.commit.outputs.dir }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          MAIL_USER: ${{ secrets.MAIL_USER }}
+          MAIL_PASS: ${{ secrets.MAIL_PASS }}
+          MAIL_TO:   ${{ secrets.MAIL_TO }}
+          MAIL_SMTP: ${{ secrets.MAIL_SMTP }}
+        run: |
+          TO="${MAIL_TO:-dhdp0105@gmail.com}"
+          if [ -z "$MAIL_USER" ] || [ -z "$MAIL_PASS" ]; then
+            # 🔴 이건 고장이 아니다 — **알림은 이미 GitHub 이 보냈다**(위 이슈의 담당자 지정).
+            #    이 단계는 '우리 주소에서 우리 디자인으로' 한 통 더 보내는 선택지일 뿐이라,
+            #    시크릿이 없다고 🚨 를 찍으면 매번 고장난 것처럼 보인다.
+            echo '메일은 GitHub 알림으로 갔습니다(이슈 담당자 지정).' >> "$GITHUB_STEP_SUMMARY"
+            echo '우리 주소에서 직접 보내고 싶으면 시크릿 `MAIL_USER`·`MAIL_PASS` 를 넣으세요.' >> "$GITHUB_STEP_SUMMARY"
+            echo 'MAIL_USER·MAIL_PASS 없음 — GitHub 알림으로만 갑니다(정상).'
+            exit 0
+          fi
+          node insta/mail.mjs --dir="$DIR" --to="$TO" --from="$MAIL_USER" --run="$RUN_URL" > /tmp/mail.txt
+          curl -sS --ssl-reqd --url "smtps://${MAIL_SMTP:-smtp.gmail.com:465}" \
+            --user "$MAIL_USER:$MAIL_PASS" \
+            --mail-from "$MAIL_USER" --mail-rcpt "$TO" --upload-file /tmp/mail.txt
+          echo "✅ $TO 로 메일을 보냈습니다."
+
       - name: 실패하면 시끄럽게
         if: ${{ failure() || cancelled() }}
         env:

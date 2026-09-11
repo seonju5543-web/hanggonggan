@@ -1851,7 +1851,10 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
 /* ============================================================
    약관 · 개인정보처리방침 (terms.html)
    ============================================================ */
-.legal { padding: 20px 18px 60px; }
+/* 위 여백은 .legal-header 가 준다 (따라다니는 머리줄이라 그 안에 있어야 한다) */
+.legal { padding: 0 var(--space-20) 64px; }
+/* 약관 화면은 앱에서 **넘어온** 화면이라, 그냥 뜨지 않고 살짝 미끄러져 들어온다 */
+.legal { animation: screen-in 0.22s ease-out; }
 .legal h3.legal-h {
   font-size: var(--t-lg); font-weight: 800; color: var(--text);
   margin: 28px 0 12px; padding-top: 18px; border-top: 2px solid var(--line);
@@ -1918,7 +1921,22 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
    좌우 여백을 다 먹고 가장자리에 붙는다(320px 에서 실측 280/280 — 여백 0).
    왼쪽에 되돌아가기 화살표까지 들어오므로 **한 단계 줄이고 두 줄을 허용한다.**
    ⚠️ 화살표와 제목은 위를 맞춘다 — 두 줄이 되면 가운데 맞춤은 화살표가 아래로 처진다. */
-.legal-header { align-items: flex-start; margin-bottom: var(--space-16); }
+/* 🔴 머리줄은 **따라다닌다** (2026-09-11 개발자 지시). 약관은 길어서, 읽다가 나가려면
+   예전엔 끝까지 내리거나 맨 위로 되올라가야 했다. 이제 스크롤해도 왼쪽 위에 그대로 있다.
+   ⚠️ 좌우로 화면 끝까지 덮어야 한다 — 안 그러면 글이 머리줄 **옆으로** 비쳐 지나간다.
+      `.legal` 의 좌우 여백만큼 밖으로 빼고(margin 음수) 그만큼 안쪽에 다시 준다.
+   ⚠️ 위 여백은 여기서 준다(`.legal` 은 위를 0으로 뒀다) — 상태표시줄·노치에 붙지 않게
+      safe-area 를 더한다. 개발자 지적 "제목이 위쪽으로 치우쳐져 있다"가 이것이었다. */
+.legal-header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  align-items: flex-start;
+  margin: 0 calc(var(--space-20) * -1) var(--space-16);
+  padding: calc(var(--space-16) + env(safe-area-inset-top)) var(--space-20) var(--space-12);
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
 .legal-header h2 { font-size: var(--t-lg); line-height: 1.35; padding-top: var(--space-6); }
 
 .legal-actions { margin-top: var(--space-24); }
@@ -3976,6 +3994,26 @@ body,
 .sub-back:hover { background: rgba(18, 22, 31, 0.05); }
 .sub-back svg { width: 24px; height: 24px; display: block; }
 .sub-header h2 { font-size: var(--t-2xl); font-weight: 800; letter-spacing: -0.035em; line-height: 1.3; }
+
+/* 🔴 손끝이 스칠 때 **파란 판이 뜨지 않게** (2026-09-11 개발자 지적).
+   휴대폰 브라우저가 기본으로 누른 자리에 파란 사각형을 칠한다(-webkit-tap-highlight-color).
+   이 앱은 누름을 **살짝 줄어드는 것**으로 말하기로 이미 정해 뒀는데(.my-menu-item:active
+   scale 0.975), 그 위에 브라우저 기본 파란 판이 겹쳐 두 가지가 같이 보였다.
+   ⚠️ :active 의 줄어드는 효과는 **남긴다** — 개발자가 "지금처럼 좀 눌리는 효과만" 이라 했다.
+   ⚠️ 키보드로 옮겨 다닐 때의 초점 테두리(:focus-visible)는 손대지 않는다. 그건 손가락이
+      아니라 키보드·보조기기를 쓰는 사람에게 지금 어디인지 알려 주는 유일한 표시다. */
+.my-menu-item, .sub-back, .set-menu a.my-menu-item { -webkit-tap-highlight-color: transparent; }
+/* 누르고 있는 동안의 바탕 — 파란 판 대신 이 앱의 색으로 아주 옅게 */
+.my-menu-item:active { background: var(--surface-2); }
+
+/* 🔴 안쪽 화면은 **옆에서 미끄러져 들어온다** (2026-09-11 개발자 지시 "화면 애니 효과").
+   들어갈 때는 오른쪽에서, 되돌아올 때는 왼쪽에서 — 방향이 '어디로 가는 중인지'를 말한다.
+   방향을 안 가르면 되돌아오는데도 앞으로 가는 것처럼 보여 길을 잃는다.
+   ⚠️ 움직임을 줄인 기기에서는 위쪽 prefers-reduced-motion 묶음이 이것을 끈다. */
+.screen-in { animation: screen-in 0.22s ease-out; }
+.screen-back { animation: screen-back 0.22s ease-out; }
+@keyframes screen-in { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: none; } }
+@keyframes screen-back { from { opacity: 0; transform: translateX(-16px); } to { opacity: 1; transform: none; } }
 
 /* 휴지통·이용약관·탈퇴 — 기존 .my-menu 줄을 그대로 쓰고 간격만 벌린다 */
 .set-menu { margin-top: var(--sp-3); }
