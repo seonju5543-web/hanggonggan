@@ -146,7 +146,7 @@ const today = new Date();
   //    그래서 여기서 세게 잡는다. 규칙은 caption.mjs 를 **실제로 돌려서** 확인한다.
     const cap = await import(new URL('../insta/caption.mjs', `file://${__filename}`).href);
     const rnd = await import(new URL('../insta/render.mjs', `file://${__filename}`).href);
-    const { caption, LIMIT, SHORTEN } = cap;
+    const { caption, LIMIT, SHORTEN, FIXED_TAGS, SCHOOL_TAG } = cap;
     let made = 0, past = 0;
     const caps = [];
     for (const x of items) {
@@ -183,10 +183,24 @@ const today = new Date();
           fail('C8', x.org, `캡션이 원문을 옮겨 적었다 — ${line.slice(0, 24)}…`);
       // 🔴 접히기 전 두 줄에 프로필 안내가 없으면 앱으로 가는 통로가 사라진다.
       if (!t.split('\n').slice(0, 2).join(' ').includes('프로필')) fail('C8', x.org, '1·2줄에 프로필 안내가 없다');
+      // 🔴 **고정 태그도 그 공고에 대해 참이어야 한다.** 2026-09-11 첫 실전 카드가
+      //    한국외대 교내 공고인데 `#교외장학금` 과 `#경희대장학금` 을 달고 나갔다.
+      //    '늘 붙이는 태그' 라는 이유로 사실 검사에서 빠져 있던 자리다.
+      if (x.school) {
+        if (tags.includes('#교외장학금')) fail('C8', x.org, '교내 공고인데 #교외장학금 이 붙었다');
+        for (const [sch, tg] of Object.entries(SCHOOL_TAG))
+          if (sch !== x.school && tags.includes(tg))
+            fail('C8', x.org, `${x.school} 공고인데 ${tg} 이 붙었다`);
+      } else if (tags.includes('#교내장학금')) {
+        fail('C8', x.org, '교외 공고인데 #교내장학금 이 붙었다');
+      }
       // 🔴 지역 태그는 재단 이름으로 확인된 것만 — `#반드시장학금` 이 실제로 나왔다.
       for (const tag of tags) {
+        // 🔴 고정 태그 목록은 caption.mjs 것을 **받아 쓴다** — 여기 베껴 두면
+        //    태그를 바꿀 때 한쪽만 고쳐져, 멀쩡한 태그가 '근거 없음' 으로 잡힌다.
+        if (FIXED_TAGS.includes(tag)) continue;
         const m = tag.match(/^#(.+)장학금$/);
-        if (!m || /^(교외|대학생|경희대|한국외대)$/.test(m[1])) continue;
+        if (!m) continue;
         // 긴 이름도 근거로 친다(경상남도장학회 ↔ #경남장학금). 축약표는 caption.mjs 것을 받아 쓴다.
         const own = `${x.org}${x.name}`.replace(/\s/g, '');
         const stem = m[1].replace(/(시|군|구)$/, '');
