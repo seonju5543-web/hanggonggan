@@ -32,14 +32,54 @@
     }
     @keyframes boot-spin { to { transform: rotate(360deg); } }
     @keyframes boot-spin-in { to { opacity: 1; } }
+    /* 걷힘 움직임 (2026-09-11 개발자 지시 — 카카오웹툰 환영 화면 참고) — 앱(style.css
+       '걷힘 움직임' 절)과 같은 값. ① 접힘: 글자가 내려앉고 로고가 가로로만 눌려 12px 막대가
+       된다 ② 열림: 막대 자리에 폭 0 구멍이 뚫려 화면 전체까지 커진다 — 막대가 그대로 창이 된다.
+       시안에서는 1초 뒤 걷히고 3초마다 되풀이한다(앱은 한 번). */
+    .m-cover { --boot-fold: 260ms; --boot-open: 420ms; --boot-hx: 195px; --boot-hy: 394px; }
+    .m-cover.m-fold .m-word { animation: boot-fold-word 0.18s ease both; }
+    .m-cover.m-fold .m-logo { animation: boot-fold-logo var(--boot-fold) cubic-bezier(0.5, 0, 0.2, 1) both; }
+    .m-cover.m-fold .m-logo svg { animation: boot-fold-glyph 0.1s ease both; }
+    .m-cover.m-fold .m-spin { animation: none; opacity: 0; }
+    @keyframes boot-fold-logo { from { transform: none; } to { transform: scaleX(0.136); } }
+    @keyframes boot-fold-word { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(6px); } }
+    @keyframes boot-fold-glyph { to { opacity: 0; } }
+    .m-cover.m-fold {
+      clip-path: polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0,
+        var(--boot-hx) calc(var(--boot-hy) - 44px), var(--boot-hx) calc(var(--boot-hy) - 44px),
+        var(--boot-hx) calc(var(--boot-hy) + 44px), var(--boot-hx) calc(var(--boot-hy) + 44px),
+        var(--boot-hx) calc(var(--boot-hy) - 44px));
+    }
+    .m-cover.m-open {
+      clip-path: polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0,
+        -5% -5%, 105% -5%, 105% 105%, -5% 105%, -5% -5%);
+      transition: clip-path var(--boot-open) cubic-bezier(0.5, 0, 0.2, 1);
+    }
     @media (prefers-reduced-motion: reduce) {
       .m-logo, .m-word { animation: none; }
       .m-spin { animation: none; opacity: 1; }
+      .m-cover { --boot-fold: 0ms; --boot-open: 0ms; }
+      .m-cover.m-fold .m-logo, .m-cover.m-fold .m-word, .m-cover.m-fold .m-logo svg { animation: none; }
+      .m-cover.m-fold, .m-cover.m-open { clip-path: none; transition: none; }
+      .m-cover.m-open { opacity: 0; }
     }
   </style>
 </helmet>
 
-<div style="width: 390px; height: 844px; background: #fefdfc; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; overflow: hidden; position: relative;">
+<div style="width: 390px; height: 844px; background: #fefdfc; overflow: hidden; position: relative;">
+  <!-- 덮개 밑의 홈 — 걷힘이 '무엇을 드러내는가'를 보이려는 자리표시일 뿐이다 -->
+  <div style="position: absolute; inset: 0; padding: 60px 20px 0; color: #23201a;">
+    <div style="font-size: 15px; font-weight: 700;">이름 설정 <span style="font-weight: 400; color: #7a746a; font-size: 12px;">한국외국어대학교</span></div>
+    <div style="margin-top: 18px; border-radius: 22px; background: #23201a; color: #f6f0e2; padding: 22px 20px 20px;">
+      <div style="font-size: 12px; opacity: .8;">지금 신청할 수 있는 장학금</div>
+      <div style="font-size: 26px; font-weight: 800; margin-top: 4px;">최대 1,405만원</div>
+      <div style="margin-top: 16px; background: #fefdfc; color: #23201a; border-radius: 14px; padding: 12px; text-align: center; font-weight: 700; font-size: 14px;">15건 신청 준비</div>
+    </div>
+    <div style="margin-top: 22px; font-size: 13px; font-weight: 700;">마감 임박</div>
+    <div style="margin-top: 10px; height: 64px; border-bottom: 2px solid #b8552f;"></div>
+    <div style="margin-top: 12px; height: 64px; border-bottom: 2px solid #b8552f;"></div>
+  </div>
+<div class="m-cover" style="position: absolute; inset: 0; background: #fefdfc; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;">
 
   <div class="m-logo" style="width: 88px; height: 88px; border-radius: 27px; color: #f6f0e2; display: flex; align-items: center; justify-content: center; background: radial-gradient(120% 130% at 78% -18%, rgba(184, 145, 47, 0.20) 0%, rgba(184, 145, 47, 0) 58%), radial-gradient(90% 90% at -10% 108%, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0) 60%), #23201a;">
     <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/><path d="M22 10v6"/></svg>
@@ -50,8 +90,23 @@
   <div style="position: absolute; left: 0; right: 0; bottom: 92px; display: flex; justify-content: center;">
     <div class="m-spin" style="width: 26px; height: 26px; border-radius: 999px; border: 2px solid rgba(25, 23, 19, 0.10); border-top-color: rgba(25, 23, 19, 0.34);"></div>
   </div>
+</div>
 
 </div>
+<script>
+  /* 걷힘을 되풀이해 보여 준다 — 앱은 한 번만 한다. 1초(바닥값) → 접힘 → 60ms 쉼 → 열림 */
+  (function () {
+    var c = document.querySelector('.m-cover'); if (!c) return;
+    function cycle() {
+      c.classList.remove('m-fold', 'm-open'); c.style.opacity = '';
+      setTimeout(function () {
+        c.classList.add('m-fold');
+        setTimeout(function () { c.classList.add('m-open'); }, 260 + 60);
+      }, 1000);
+    }
+    cycle(); setInterval(cycle, 3400);
+  })();
+</script>
 </x-dc>
 </body>
 </html>

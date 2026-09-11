@@ -77,10 +77,34 @@
       document.documentElement.setAttribute('data-boot', 'done');
       var el = document.getElementById('boot');
       if (!el) return;
-      el.classList.add('boot-out');
-      /* 사라지는 시간은 CSS 에서 읽는다 — 숫자를 여기 적으면 CSS 를 고칠 때 조용히 어긋난다 */
-      var ms = (parseFloat(getComputedStyle(el).transitionDuration) || 0.12) * 1000;
-      setTimeout(function () { el.hidden = true; }, ms + 20);
+      /* 걷힘 — 페이드가 아니라 **로고가 세로 막대로 접혔다가 그 자리에서 앱이 열린다**
+         (2026-09-11 개발자 지시 · 카카오웹툰 환영 화면 참고). 모양·길이는 전부
+         style.css '걷힘 움직임' 절에 있고 여기는 단계를 넘기기만 한다.
+         🔴 시간은 CSS 에서 읽는다 — 숫자를 여기 적으면 CSS 를 고칠 때 조용히 어긋난다.
+            움직임 줄이기 기기에서는 CSS 가 둘 다 0 을 주므로 곧바로 사라진다. */
+      var style = getComputedStyle(el);
+      var msOf = function (name) {
+        var v = String(style.getPropertyValue(name) || '').trim();
+        var n = parseFloat(v) || 0;
+        return /ms$/.test(v) ? n : n * 1000;
+      };
+      var foldMs = msOf('--boot-fold');
+      var openMs = msOf('--boot-open');
+      /* 열리는 자리는 로고의 **실제** 위치 — 로고는 화면 정중앙이 아니다(밑에 글자가 있다).
+         가로로만 눌리므로 중심은 접힌 뒤에도 그대로다. */
+      var logo = el.querySelector('.boot-logo');
+      if (logo) {
+        var r = logo.getBoundingClientRect();
+        el.style.setProperty('--boot-hx', (r.left + r.width / 2) + 'px');
+        el.style.setProperty('--boot-hy', (r.top + r.height / 2) + 'px');
+      }
+      el.classList.add('boot-fold');
+      /* 접힌 막대를 아주 잠깐(60ms) 세워 둔다 — 참고 영상도 막대에서 한 박자 쉰다.
+         쉼이 없으면 접힘과 열림이 한 동작으로 뭉개져 '막대가 창이 된다'가 안 보인다. */
+      setTimeout(function () {
+        el.classList.add('boot-open');
+        setTimeout(function () { el.hidden = true; }, openMs + 20);
+      }, foldMs + 60);
     }, wait);
   };
 })();

@@ -3487,9 +3487,16 @@ button, input, select, textarea { letter-spacing: inherit; }
   justify-content: center;
   gap: 18px;
   opacity: 1;
-  transition: opacity 0.12s ease;   /* boot.js 가 이 값을 읽어 걷는 시각을 맞춘다 */
+  /* 걷힘 두 단계의 길이 — boot.js 가 **이 두 값을 읽어** 단계를 넘긴다.
+     숫자를 JS 에도 적으면 한쪽만 고쳐져 조용히 어긋난다(아래 '걷힘 움직임' 절). */
+  --boot-fold: 260ms;
+  --boot-open: 420ms;
+  /* 접힌 막대의 중심. boot.js 가 걷기 직전 로고의 실제 위치를 재어 px 로 채운다 —
+     로고는 화면 한가운데가 아니다(밑에 글자가 있어 28px 위). 안 재면 막대와 열리는
+     자리가 어긋나 '막대가 창이 된다'가 아니라 '옆에서 구멍이 난다'로 보인다. */
+  --boot-hx: 50%;
+  --boot-hy: 50%;
 }
-#boot.boot-out { opacity: 0; pointer-events: none; }
 #boot[hidden] { display: none !important; }
 .boot-logo {
   width: 88px; height: 88px;
@@ -3535,6 +3542,64 @@ button, input, select, textarea { letter-spacing: inherit; }
   to   { opacity: 1; transform: none; }
 }
 
+/* ── 걷힘 움직임 (2026-09-11 개발자 지시 — 카카오웹툰 환영 화면을 보여 주며
+   "한대장 또한 스플래시에서 다음과 같은 인터랙션이 있었으면 좋겠어") ──────────
+   참고 영상(1.18초·60fps 전 프레임 실측): 로고가 **세로 막대 하나로 접히고**, 그 막대가
+   창이 되어 그 자리에서 홈 화면이 열린다. 페이드가 아니라 **로고가 앱이 되는** 움직임이다.
+   두 단계 · 등장 규칙 ①②③(한 번만·바닥값 안·튀지 않음)은 그대로 지킨다.
+
+   ① 접힘(`.boot-fold`, --boot-fold): 글자가 내려앉으며 사라지고, 로고 사각형이 **가로로만**
+      눌려 12px 막대가 된다(88 × 0.136). 안의 학사모는 눌리기 전에 먼저 걷는다 —
+      찌그러진 그림이 잠깐 보이면 그게 제일 싸 보인다.
+      🔴 `animation: none` 이 꼭 필요하다 — 등장 애니메이션이 `both` 라 끝난 뒤에도
+         transform 을 쥐고 있어서, 안 풀면 아래 transform 이 **적용조차 안 된다.**
+   ② 열림(`.boot-open`, --boot-open): 덮개(#boot)에 막대 자리의 **폭 0 구멍**을 뚫고
+      화면 전체까지 키운다(`clip-path` polygon evenodd — 바깥 사각형 + 안쪽 구멍).
+      구멍이 막대 폭(12px)을 넘는 순간 막대가 그대로 창이 된다. 앱 화면은 그 밑에
+      이미 그려져 있다(app.js 가 화면을 정한 뒤에야 bootDone 을 부른다).
+      곡선은 ease-in-out — 처음은 천천히(창이 열리는 느낌), 끝은 빠르게 사라진다.
+   🔴 두 단계 합이 0.68초다. 늘리지 말 것 — 바닥값 1초 뒤에 붙는 시간이라 그대로 앱이
+      느려 보인다(설계 문서 ① 절의 "페이드 120ms — 길면 앱이 느려 보인다"와 같은 이유).
+   🔴 시안 `docs/designs/mockups/first-run/Boot.dc.html` 과 값이 같아야 한다 —
+      관문 `test-collector.mjs` '첫 실행 화면' 절 ⑩. */
+/* 🔴 접힘은 transition 이 아니라 **keyframes 애니메이션**이다 — 등장 애니메이션(`both`)이
+   쥐고 있던 transform·opacity 는 브라우저가 transition 으로 이어 주지 않는다. 실제로
+   transition 으로 짰더니 260ms 가 **한 프레임에 툭** 바뀌었다(녹화로 확인). 새 애니메이션이
+   등장 애니메이션을 덮어쓰면(같은 속성) 그 순간의 값에서 이어서 움직인다. */
+#boot.boot-fold .boot-word { animation: boot-fold-word 0.18s ease both; }
+#boot.boot-fold .boot-logo { animation: boot-fold-logo var(--boot-fold) cubic-bezier(0.5, 0, 0.2, 1) both; }
+#boot.boot-fold .boot-logo svg { animation: boot-fold-glyph 0.1s ease both; }
+@keyframes boot-fold-logo { from { transform: none; } to { transform: scaleX(0.136); } }
+@keyframes boot-fold-word {
+  from { opacity: 1; transform: none; }
+  to   { opacity: 0; transform: translateY(6px); }
+}
+@keyframes boot-fold-glyph { to { opacity: 0; } }
+/* 🔴 걷히기 시작하면 도는 표시는 끈다. 걷힘이 0.68초라 바닥값(1초)+걷힘 동안 1.2초를 넘기는데,
+   그때 표시가 스며 나오면 '앱이 제때 왔는데도 기다리는 표시가 보이는' 모순이 된다(실측으로 봤다). */
+#boot.boot-fold .boot-spin { animation: none; opacity: 0; }
+#boot.boot-fold {
+  /* 바깥 사각형 + 막대 자리의 폭 0 구멍(꼭짓점 수는 아래와 같아야 이어서 움직인다) */
+  clip-path: polygon(evenodd,
+    0 0, 100% 0, 100% 100%, 0 100%, 0 0,
+    var(--boot-hx) calc(var(--boot-hy) - 44px),
+    var(--boot-hx) calc(var(--boot-hy) - 44px),
+    var(--boot-hx) calc(var(--boot-hy) + 44px),
+    var(--boot-hx) calc(var(--boot-hy) + 44px),
+    var(--boot-hx) calc(var(--boot-hy) - 44px));
+}
+#boot.boot-open {
+  pointer-events: none;
+  /* 구멍이 화면을 조금 넘게(-5%~105%) 커져야 끝에 테두리가 안 남는다 */
+  clip-path: polygon(evenodd,
+    0 0, 100% 0, 100% 100%, 0 100%, 0 0,
+    -5% -5%, 105% -5%, 105% 105%, -5% 105%, -5% -5%);
+  transition: clip-path var(--boot-open) cubic-bezier(0.5, 0, 0.2, 1);
+}
+/* ⚠️ 여기서 막대(.boot-logo)를 따로 흐리게 하지 말 것 — 덮개의 구멍이 막대까지 같이
+   잘라내므로 구멍이 막대 폭을 넘는 순간 막대가 **그대로 창이 된다.** 따로 흐리면 구멍이
+   아직 좁을 때 막대가 먼저 사라져 '막대가 없어졌다가 옆에서 구멍이 난다'로 보인다(실측). */
+
 /* 오래 걸릴 때만 나오는 표시.
    🔴 **바닥값(1초)이 지난 뒤에 나타난다**(1.2초). 앱이 제때 오면 화면이 1.12초에 걷히므로
       학생은 이걸 아예 못 본다 — 그게 맞다. 이게 보인다는 것은 '평소보다 오래 걸린다'는 뜻이고,
@@ -3568,7 +3633,11 @@ button, input, select, textarea { letter-spacing: inherit; }
 @media (prefers-reduced-motion: reduce) {
   .boot-logo, .boot-word { animation: none; }
   .boot-spin { animation: none; opacity: 1; }
-  #boot { transition: none; }
+  /* 걷힘도 접지 않고 열지 않는다 — 그냥 사라진다. 길이 0 이면 boot.js 도 곧바로 넘긴다 */
+  #boot { --boot-fold: 0ms; --boot-open: 0ms; }
+  #boot.boot-fold .boot-logo, #boot.boot-fold .boot-word, #boot.boot-fold .boot-logo svg { animation: none; }
+  #boot.boot-fold, #boot.boot-open { clip-path: none; transition: none; }
+  #boot.boot-open { opacity: 0; }
 }
 
 /* ── 홈 '이어서 쓰기' 줄 (2026-09-09) ────────────────────────────────────
