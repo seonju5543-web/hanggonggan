@@ -96,15 +96,17 @@ const eq = (label, got, want) => {
   eq("'기타' 절 제목이 있다", (await page.textContent('#set-etc .wallet-title')).trim(), '기타');
   /* 🔴 2026-09-11 개발자 지시 — '기타'와 '알림'의 절 제목은 **같은 모양**이어야 한다.
      이 검사가 없으면 한쪽에만 막대가 남는 오늘 같은 어긋남을 아무도 못 본다. */
-  eq("'알림'과 '기타' 제목 위 막대가 똑같이 있다",
+  /* 🔴 절 제목 위 막대는 **어느 절에도 없다** (2026-09-01 판정 · 2026-09-11 재확인).
+     지키는 것은 '없다'와 '넷이 서로 같다' 둘이다 — 새 절을 만들 때 제거 목록에
+     이름을 빠뜨리면 그 절만 막대가 남는데, 오늘 '기타'가 실제로 그랬다. */
+  eq('절 제목 위 막대는 어느 절에도 없다 (계정·알림·기타)',
     await page.evaluate(() => {
       const bar = (sel) => {
-        const b = getComputedStyle(document.querySelector(sel), '::before');
-        return b.content !== 'none' ? b.width + '/' + b.height + '/' + b.backgroundColor : '없음';
+        const el = document.querySelector(sel);
+        return el ? getComputedStyle(el, '::before').content : '없음';
       };
-      const a = bar('#my-notify .wallet-title');
-      const c = bar('#set-etc .wallet-title');
-      return a !== '없음' && a === c;
+      return ['#my-account .acc-head', '#my-notify .wallet-title', '#set-etc .wallet-title']
+        .map(bar).every((c) => c === 'none');
     }), true);
   /* 🔴 '기타' 제목과 첫 줄(휴지통) 사이에 선이 없어야 한다 (개발자 지시) */
   eq("'기타'와 '휴지통' 사이에 구분선이 없다",
