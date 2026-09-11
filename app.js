@@ -457,6 +457,18 @@ function esc(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+/* 수집한 게시판 글에 남은 HTML 기호를 사람이 읽는 글자로 되돌린다 (2026-09-11).
+   🔴 실시간 공고 39건 중 9건이 화면에 `&nbsp;` 를 **글자 그대로** 띄우고 있었다
+      ('국가근로장학금 장학생 기본요건 ( 소득구간 &nbsp; 9 구간 이하'). 게시판 원문은 빈칸인데
+      수집이 기호를 그대로 담아 온 것이라, 되돌리는 것이 원문에 **더 가깝다**(원칙 8-1 위반 아님).
+   🔴 반드시 `esc()` **앞에** 부른다 — 되돌린 뒤 다시 감싸므로, `&lt;script&gt;` 가 섞여 있어도
+      화면에는 글자로만 뜬다(먼저 esc 하면 `&amp;nbsp;` 가 돼 영영 안 풀린다).
+   🔴 목록은 늘리지 않는다 — 숫자 기호(`&#NN;`)까지 열면 보이지 않는 제어문자가 들어온다. */
+const ENTITIES = { nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", '#39': "'", '#160': ' ' };
+function unent(s) {
+  return String(s == null ? '' : s).replace(/&(nbsp|amp|lt|gt|quot|apos|#39|#160);/g, (m, k) => ENTITIES[k]);
+}
+
 /* 외부 링크 안전화 — http(s)·mailto만 허용한다. 수집 로봇이 받아 온 데이터가 오염되거나
    정식 등록에 오타가 있어도 javascript:·data: 같은 위험한 스킴이 href나 window.open으로
    들어가지 못하게 막는 2차 방어선(CSP가 뚫리거나 완화돼도 안전). 허용 안 되면 빈 문자열. */
@@ -2013,14 +2025,18 @@ function liveNoticesHtml() {
   }
   return head + `<div class="card-list" style="margin-bottom:18px">` + mine.map((n) => `
     <a class="sch-card notice-card" href="${esc(safeUrl(n.url))}" target="_blank" rel="noopener">
+      ${/* 🔴 맨 윗줄은 매칭 카드와 **같은 말투**다 — 기관 글 + 판정 하나 (2026-09-11).
+           예전엔 배지 셋(`교내 공고`·`마감 임박`·`양식 2`)이 한 줄을 채워, 페이스리프트로
+           걷어낸 배지 무더기가 이 경로에만 그대로 남아 있었다(실측 147장 중 9장).
+           🔴 첨부 개수를 `badge-applied` 로 쓰지 말 것 — 그 색은 '신청 완료'의 초록이라
+              첨부가 있다는 말이 신청이 끝났다는 말로 읽혔다. 아래 메타 줄로 내린다. */ ''}
       <div class="sch-top">
-        <span class="badge badge-in">교내 공고</span>
+        <span class="sch-org">교내 공고 · ${esc(n.school)}${n.campus ? ' ' + esc(n.campus) : ''}</span>
         ${n.deadlineHint ? `<span class="badge badge-dday urgent">마감 임박</span>` : ''}
-        ${(n.attachments || []).length ? `<span class="badge badge-applied">양식 ${n.attachments.length}</span>` : ''}
       </div>
-      <p class="sch-name">${esc(n.title)}</p>
-      ${n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? `<p class="sch-provider">${esc(n.deadlineHint)}</p>` : ''}
-      <p class="sch-provider">${esc(n.school)}${n.campus ? ' ' + esc(n.campus) : ''} · ${esc(n.foundAt || '')} 수집 · ${isBoardListLink(n.url) ? '게시판 목록에서 보기 ↗' : '원문 보기 ↗'}</p>
+      <p class="sch-name">${esc(unent(n.title))}</p>
+      ${n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? `<p class="sch-provider">${esc(unent(n.deadlineHint))}</p>` : ''}
+      <p class="sch-provider">${(n.attachments || []).length ? `첨부 ${(n.attachments || []).length}개 · ` : ''}${esc(n.foundAt || '')} 수집 · ${isBoardListLink(n.url) ? '게시판 목록에서 보기 ↗' : '원문 보기 ↗'}</p>
     </a>`).join('') + `</div>`;
 }
 

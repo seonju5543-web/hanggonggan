@@ -248,5 +248,25 @@ console.log('\n■ 서체와 글자 척도 (2026-09-10)');
     /overflow-wrap:\s*break-word/.test(css), true);
 }
 
+/* ── ⑦ 수집한 글의 HTML 기호가 화면에 글자로 새지 않는다 (2026-09-11) ─────────
+   🔴 실시간 공고 39건 중 **9건**이 `&nbsp;` 를 글자 그대로 띄우고 있었다
+      ('국가근로장학금 장학생 기본요건 ( 소득구간 &nbsp; 9 구간 이하'). 게시판 원문은 빈칸인데
+      수집이 기호째 담아 와, `esc()` 가 `&` 를 한 번 더 감싸면서 영영 안 풀린 것이다.
+   🔴 고치는 자리는 **`esc()` 앞**이다 — `unent()` 로 되돌린 뒤 `esc()` 로 다시 감싼다.
+      순서를 뒤집으면 `&amp;nbsp;` 가 돼 화면에 그대로 남는다.
+   ⚠️ 이 검사는 **주석을 걷고** 본다 — 안 걷으면 위 설명 주석의 글자를 읽고 통과한다
+      (2026-09-10 서체 관문에서 실제로 그렇게 새는 것을 red-green 으로 잡았다). */
+console.log('\n■ 수집한 글의 HTML 기호를 글자로 띄우지 않는다 (2026-09-11)');
+{
+  const app = stripComments(R('app.js'));
+  eq('되돌리는 함수(unent)가 있다', /function unent\s*\(/.test(app), true);
+  /* 수집 데이터에서 온 글(n.title · n.deadlineHint)을 unent 없이 esc 만 하는 곳 */
+  const bare = [];
+  app.split('\n').forEach((l, i) => {
+    for (const m of l.matchAll(/esc\(\s*(n\.(?:title|deadlineHint))\s*\)/g)) bare.push(`${i + 1}:${m[1]}`);
+  });
+  eq('게시판에서 온 글은 전부 unent 를 거친다', bare, []);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 되돌아간 곳이 있습니다` : '\n✓ 말투·토큰 관문 전부 통과');
 process.exit(fail ? 1 : 0);
