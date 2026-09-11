@@ -156,6 +156,25 @@ const eq = (label, got, want) => {
       }), true);
     eq('페이지 전체가 가로로 넘치지 않는다',
       await t.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth), true);
+
+    /* 🔴 표는 좁은 화면에서 **펴진다** — 가로 스크롤로 숨기지 않는다.
+       개인정보 고지는 끝까지 읽히는 것이 목적이라 옆으로 밀어 두면 안 된다. */
+    eq('좁은 화면에서 표 머리글 줄이 숨는다 (각 칸이 이름표를 달기 때문)',
+      await t.$$eval('.legal-table .legal-thead', (els) => els.every((e) => e.offsetParent === null)), true);
+    eq('모든 칸이 이름표를 갖고 있다 (없으면 펴진 뒤 무슨 값인지 알 수 없다)',
+      await t.$$eval('.legal-table td', (els) => els.filter((e) => !e.getAttribute('data-label')).length), 0);
+    eq('펴진 칸이 한 줄을 통째로 쓴다 (셋·넷으로 눌리지 않는다)',
+      await t.evaluate(() => {
+        const td = document.querySelector('.legal-table tr:not(.legal-thead) td');
+        const tr = td.closest('tr');
+        return td.getBoundingClientRect().width > tr.getBoundingClientRect().width * 0.8;
+      }), true);
+
+    /* 넓은 화면에서는 표가 표 그대로여야 한다 — 펴는 것은 좁을 때만이다 */
+    await t.setViewportSize({ width: 700, height: 900 });
+    await t.waitForTimeout(200);
+    eq('넓은 화면에서는 표 머리글이 다시 보인다',
+      await t.$eval('.legal-table .legal-thead', (e) => e.offsetParent !== null), true);
     await t.close();
   }
 

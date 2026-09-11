@@ -1876,6 +1876,41 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
 .legal-table th { background: var(--bg); color: var(--text); font-weight: 700; }
 .legal-tmp { color: var(--orange); font-weight: 600; }
 .legal-date { font-size: var(--t-xs); color: var(--text-weak); margin-top: var(--space-20); }
+/* 🔴 약관 표는 좁은 화면에서 **줄줄이 펴진다** (2026-09-11 개발자 지시 "표도 고쳐줘").
+   표가 칸 3~4개인데 폰 폭이 320~390px 이라, 마지막 칸이 60px 남짓으로 눌려
+   '해당 자격이 있어야 지원할 수 있는 장학금 매칭' 이 다섯 줄로 잘려 있었다.
+   ⚠️ 가로 스크롤로 풀지 않는다 — 이 앱은 본문이 가로로 밀리지 않는 것이 규칙이고,
+      개인정보 고지는 **끝까지 읽히는 것**이 목적이라 옆으로 숨기면 안 된다.
+   ⚠️ 머리글 줄은 숨기고, 각 칸이 자기 이름표(data-label)를 달고 나온다.
+      이름표가 없으면 펴진 뒤 그 값이 무엇인지 알 수 없다 — HTML 의 data-label 과 한 세트다.
+   문턱 560px: 그 위(태블릿·PC)에서는 표가 표로 읽히는 편이 낫다. */
+@media (max-width: 560px) {
+  .legal-table, .legal-table tbody, .legal-table tr, .legal-table td { display: block; width: 100%; }
+  .legal-table .legal-thead { display: none; }
+  .legal-table tr {
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--space-8);
+    padding: var(--space-4) var(--space-12);
+    background: var(--surface);
+  }
+  .legal-table td {
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    padding: var(--space-8) 0;
+  }
+  .legal-table tr td:last-child { border-bottom: 0; }
+  /* 이름표 — 값보다 작고 진하게. 값이 주인공이라 이름표가 커지면 안 된다. */
+  .legal-table td::before {
+    content: attr(data-label);
+    display: block;
+    font-size: var(--t-2xs);
+    font-weight: 700;
+    color: var(--text-weak);
+    margin-bottom: var(--space-2);
+  }
+}
+
 /* 🔴 약관 화면 머리줄 (2026-09-11 개발자 지적 — "글자가 박스 안에 맞지 않는다").
    제목이 '이용약관 · 개인정보처리방침' 14 글자라 화면 제목 크기로 두면 좁은 폰에서
    좌우 여백을 다 먹고 가장자리에 붙는다(320px 에서 실측 280/280 — 여백 0).
