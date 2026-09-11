@@ -3204,7 +3204,8 @@ console.log('\n■ 금액 상세 — 승인받은 화면 그대로인가 (2026-0
 {
   const app = readText(new URL('../app.js', import.meta.url));
   /* 줄 하나를 그리는 amountDetailRow 도 같은 화면이라 함께 본다 */
-  const body = app.slice(app.indexOf('function amountDetailRow'), app.indexOf('function renderBulkPrep'));
+  /* estOpt(추정 표시)·amountDetailRow(줄 하나)도 같은 화면이라 함께 본다 */
+  const body = app.slice(app.indexOf('function estOpt'), app.indexOf('function renderBulkPrep'));
   eq('renderAmountDetail 이 있다', body.length > 200, true);
 
   // ① 갈래 넷 — 이름은 개발자가 '명사형으로 조이기'로 정한 것이다
@@ -3212,6 +3213,16 @@ console.log('\n■ 금액 상세 — 승인받은 화면 그대로인가 (2026-0
     eq(`갈래 '${t}' 가 있다`, body.includes(`grp('${t}'`), true);
   }
   eq('제목은 금액 상세다', body.includes('금액 상세'), true);
+
+  /* 🔴 **추정값을 확정값처럼 적지 않는다** (2026-09-11 코드 리뷰에서 잡았다).
+     2026-09-10 수리로 비율형이 이중수혜 갈래를 거치게 되면서 같은 공고가 `added`(또는
+     `onlyOne`)와 `estimated` 양쪽에 들어간다. 합계는 옳지만, 합산 줄이 `400만원` 이라고
+     딱 떨어지게 적으면 학교 평균 등록금에서 뽑은 **추정**이 확정된 금액으로 읽힌다.
+     ⚠️ 계산을 고치지 말 것 — total 은 옳다. 고칠 자리는 '적는 법'(estOpt)뿐이다. */
+  eq('합산 줄이 추정 여부를 거쳐 그려진다', /bill\.added\.map\(\(m\) => amountDetailRow\(m, estOpt\(/.test(body), true);
+  eq('  중복 수혜 불가 줄도 같은 길을 쓴다', /bill\.onlyOne\.map\(\(m\) => amountDetailRow\(m, estOpt\(/.test(body), true);
+  eq("  추정이면 '약' 과 est 를 붙인다", /estimated\.indexOf\(m\)[\s\S]{0,200}text: '약 '/.test(body), true);
+  eq('  비율 환산 갈래가 다시 적은 것임을 밝힌다', body.includes('건수를 더하지 마세요'), true);
 
   // ② 🔴 비어 있어도 갈래를 그린다 — 이게 이번 사고의 재발 방지선이다
   eq('갈래가 비었다고 통째로 숨기지 않는다', /grp = \([^)]*\) => \(rows \?/.test(body), false);
@@ -4322,7 +4333,8 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
      로 옮겨 갔다. 뜻은 그대로 두고 **읽는 자리만** 넓힌다 — schCard 안만 보면 고쳐 둔
      것을 안 고쳤다고 잡는다(검사를 무르게 한 것이 아니라 함수 경계를 따라간 것이다). */
   const cardAt = appJs.indexOf('function cardBadgeHtml(');
-  const cardBlk = appJs.slice(cardAt, appJs.indexOf('function schCard(', cardAt) + 3000);
+  const schAt = appJs.indexOf('function schCard(', cardAt);
+  const cardBlk = appJs.slice(cardAt, appJs.indexOf('function ', schAt + 40));
   eq('목록 카드가 pending 을 본다 (있기만 하면 완료라 하지 않는다)',
     /\.find\(\(a\) => a\.id === sch\.id\)/.test(cardBlk) && /myApp\.pending/.test(cardBlk), true);
   eq("  그때 낱말은 신청내역과 같다 ('서류 작성 필요')",

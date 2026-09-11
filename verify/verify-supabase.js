@@ -360,20 +360,31 @@ const seedScript = (seed) => `localStorage.setItem('handaejang.v1', ${JSON.strin
     await settle(page);
     const r = await page.evaluate(() => {
       state.applications = [{ id: 'reg-x', appliedAt: '2026-09-01T00:00:00.000Z', step: 0, pending: false,
-        formAns: { rrn: '030101-3234567', intro: '이 기기에서 쓰던 글' }, docs: { essay: '초안' } }];
+        formAns: { rrn: '030101-3234567', intro: '이 기기에서 쓰던 글' }, docs: { essay: '초안' } },
+        /* 🔴 아직 못 올린 신청서 — 서버 목록에 없다. 지워지면 학생의 글이 사라진다. */
+        { id: 'reg-unsent', appliedAt: '2026-09-03T00:00:00.000Z', step: 0, pending: true,
+          formAns: { intro: '올리기 전에 지하철에 들어갔다' } },
+        /* 빈 건은 되살리지 않는다 — 다른 기기에서 지운 것이 되살아나면 안 된다 */
+        { id: 'reg-empty', appliedAt: '2026-09-03T00:00:00.000Z', step: 0, pending: true }];
       /* 서버가 돌려주는 모양 — 청소돼서 formAns·docs 가 없다 */
       syncApplyRemote({ profile: null, sensitiveOk: false, updatedAt: '2026-09-02T00:00:00.000Z',
         applications: [{ id: 'reg-x', appliedAt: '2026-09-01T00:00:00.000Z', step: 2, pending: false,
           submittedAt: '2026-09-02T00:00:00.000Z' }] });
-      const a = (state.applications || [])[0] || {};
+      const list = state.applications || [];
+      const a = list[0] || {};
+      const find = (id) => list.find((x) => x.id === id);
       return { keptIntro: a.formAns && a.formAns.intro, keptDocs: a.docs && a.docs.essay, step: a.step,
-        submitted: !!a.submittedAt, n: (state.applications || []).length };
+        submitted: !!a.submittedAt, n: list.length,
+        unsent: (find('reg-unsent') || {}).formAns && find('reg-unsent').formAns.intro,
+        empty: !!find('reg-empty') };
     });
     ok(r.keptIntro === '이 기기에서 쓰던 글', '기기에 쓰던 신청서 답이 그대로 남는다', r.keptIntro);
     ok(r.keptDocs === '초안', '서류·자기소개서도 그대로 남는다', r.keptDocs);
     ok(r.step === 2, '서버가 아는 진행 단계는 서버 것이 이긴다', r.step);
     ok(r.submitted === true, '다른 기기에서 남긴 제출 기록이 들어온다');
-    ok(r.n === 1, '건수가 늘거나 줄지 않는다', r.n);
+    ok(r.unsent === '올리기 전에 지하철에 들어갔다', '아직 못 올린 신청서도 그대로 남는다', r.unsent);
+    ok(r.empty === false, '  글이 없는 건은 되살리지 않는다 (다른 기기에서 지운 것)', r.empty);
+    ok(r.n === 2, '건수는 서버 1건 + 못 올린 1건', r.n);
     await ctx.close();
   }
 

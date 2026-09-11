@@ -106,7 +106,7 @@ jobs:
                    verify-new-forms.js verify-source-links.js verify-push-client.js \
                    verify-notify.js verify-sheet-back.js verify-kosaf.js \
                    verify-calendar.js verify-resume.js verify-interactions.js \
-                   verify-admin.js; do
+                   verify-admin.js verify-settings.js; do
             echo "── $f"
             node "verify/$f"
           done

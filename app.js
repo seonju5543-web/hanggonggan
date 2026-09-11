@@ -2375,6 +2375,19 @@ function bulkRowHtml(sch) {
 
    🔴 여기서 다시 계산하지 않는다. renderHome 이 만든 lastBill 을 그대로 그린다 —
       따로 계산하면 히어로 숫자와 상세가 다른 말을 하게 된다. */
+/* 🔴 **추정값을 확정값처럼 적지 않는다** (2026-09-11 코드 리뷰에서 잡았다).
+   2026-09-10 수리로 비율형(`등록금 100%`)도 이중수혜 갈래를 거치게 되면서, 같은 공고가
+   `added`(또는 `onlyOne`)와 `estimated` **양쪽에** 들어간다 — 합계는 맞지만(한 번만 더한다)
+   화면은 네 갈래를 서로 안 겹치는 것처럼 그리고 있었다. 그래서 ① 건수를 더하면 공고 수보다
+   많아지고 ② 무엇보다 합산 줄이 `400만원` 이라고 **딱 떨어지게** 적었다 — 그 값은 학교 평균
+   등록금에서 뽑은 추정인데 확정된 금액처럼 읽힌다(원칙 8-1 · 이 파일 첫머리의 '기망').
+   ⚠️ 계산은 건드리지 않는다 — `parse-amount.js` 의 total 은 옳다. 적는 법만 고친다. */
+function estOpt(m, opt) {
+  const bill = lastBill && lastBill.bill;
+  if (!bill || bill.estimated.indexOf(m) < 0) return opt;
+  return Object.assign({}, opt, { tone: 'est', text: '약 ' + won(m.won) });
+}
+
 function amountDetailRow(m, opt) {
   const o = opt || {};
   const sch = m.ref, a = sch.amountSpec || null;
@@ -2446,16 +2459,16 @@ function renderAmountDetail(keepScroll) {
         <p class="ad-total-sub">확인된 금액만 합산${bill.unknown.length ? ` · 미확인 ${bill.unknown.length}건 제외` : ''}</p>
       </div>
       ${grp('합산', `${bill.added.length}건 · ${won(sum(bill.added))}`, '',
-        bill.added.map((m) => amountDetailRow(m, { tone: 'on' })).join(''),
+        bill.added.map((m) => amountDetailRow(m, estOpt(m, { tone: 'on' }))).join(''),
         '합산할 공고가 아직 없어요')}
       ${grp('중복 수혜 불가', `${bill.onlyOne.length + bill.dropped.length}건 중 ${bill.onlyOne.length}건`,
         '함께 받을 수 없는 공고입니다. 가장 큰 1건만 합산했습니다.',
-        bill.onlyOne.map((m) => amountDetailRow(m, { tone: 'on', check: true })).join('')
+        bill.onlyOne.map((m) => amountDetailRow(m, estOpt(m, { tone: 'on', check: true }))).join('')
         + (bill.dropped.length ? `<details><summary>함께 못 받는 공고 ${bill.dropped.length}건</summary>
           ${bill.dropped.map((m) => amountDetailRow(m, { dim: true, tone: 'off', note: '위 공고와 동시 수혜 불가' })).join('')}</details>` : ''),
         '모두 함께 받을 수 있는 공고입니다.')}
       ${grp('등록금 비율 환산', `${bill.estimated.length}건 · 추정`,
-        '금액이 등록금 비율로만 적힌 공고입니다. 학교별 한 학기 등록금 기준 추정값이며 실제 금액과 다를 수 있습니다.',
+        '금액이 등록금 비율로만 적힌 공고입니다. 학교별 한 학기 등록금 기준 추정값이며 실제 금액과 다를 수 있습니다. 위 갈래에 이미 들어 있는 공고를 다시 적은 것이라 건수를 더하지 마세요.',
         bill.estimated.map((m) => amountDetailRow(m, { tone: 'est', text: '약 ' + won(m.won) })).join(''),
         '등록금 비율로 적힌 공고는 없어요')}
       ${grp('금액 미확인', `${bill.unknown.length}건 · 0원`,
@@ -4461,6 +4474,18 @@ function syncApplyRemote(remote) {
       for (const k of ['formAns', 'docs']) if (merged[k] == null && local[k] != null) merged[k] = local[k];
       return merged;
     });
+    /* 🔴 **서버가 아직 모르는 신청서도 살린다** (2026-09-11 코드 리뷰에서 잡았다).
+       위 `map` 은 서버 목록을 기준으로 삼으므로, 아직 못 올린 신청서는 **통째로 사라진다.**
+       올리기는 2초 미룬 뒤 조용히 실패할 수 있어서(`syncSchedulePush`) 드문 일이 아니다 —
+       폰 A 에서 신청서를 쓰다 지하철에 들어가고, 폰 B 에서 프로필만 고쳐 `updated_at` 이
+       올라가면, 폰 A 가 다음에 열릴 때 그 글이 지워진다. 위에서 애써 되살린 바로 그 값이다.
+       ⚠️ **학생이 쓴 것이 든 건만** 되살린다 — 빈 건까지 되살리면 다른 기기에서 지운 신청이
+          되살아난다. 글은 다시 쓸 수 없고 빈 건은 다시 지우면 되므로, 잃는 쪽을 막는다. */
+    const remoteIds = new Set(remote.applications.map((a) => a.id));
+    for (const a of mineByIdx.values()) {
+      if (remoteIds.has(a.id)) continue;
+      if (a.formAns || a.docs) state.applications.push(a);
+    }
   }
   state.consent = Object.assign({}, state.consent, { sensitive: !!remote.sensitiveOk });
   state.updatedAt = remote.updatedAt || state.updatedAt;
