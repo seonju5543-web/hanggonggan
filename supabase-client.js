@@ -145,6 +145,7 @@ async function authSignUp(email, password) {
   /* 이메일 확인을 켜 두면 토큰 없이 사용자 정보만 온다 — 그때는 '메일을 확인하세요'로 안내한다 */
   if (!res.json || !res.json.access_token) return { ok: true, needsEmailConfirm: true };
   authStore(res.json);
+  authLogLogin();           // 가입하자마자 토큰이 오면 그것도 로그인이다
   return { ok: true, needsEmailConfirm: false };
 }
 
@@ -152,6 +153,7 @@ async function authSignIn(email, password) {
   const res = await sbFetch('/auth/v1/token?grant_type=password', { method: 'POST', body: { email, password } });
   if (!res.ok) return { ok: false, error: authErrorText(res) };
   authStore(res.json);
+  authLogLogin();           // 기다리지 않는다 — 기록이 로그인을 붙잡으면 안 된다
   return { ok: true };
 }
 
@@ -231,6 +233,10 @@ async function authCaptureFromUrl() {
   await authFetchUser();
   const u = authUser();
   if (u && u.email) setRememberedEmail(u.email);
+  /* 🔴 소셜·메일 링크로 들어온 것도 로그인이다. 여기서 안 남기면 구글로만 쓰는 계정은
+     '로그인 활동'이 늘 비어 있고, 낯선 기기를 찾으라고 만든 화면이 오히려 안심시킨다.
+     ⚠️ 비밀번호 재설정(recovery)은 아직 로그인이 아니라 그 자리는 빼고 센다. */
+  if (kind === 'signin') authLogLogin();
   return kind;
 }
 
@@ -249,8 +255,90 @@ async function authDeleteData() {
   if (!u) return { ok: false, error: '로그인 상태가 아니에요' };
   const res = await sbAuthed(`/rest/v1/profiles?user_id=eq.${encodeURIComponent(u.userId)}`, { method: 'DELETE' });
   if (!res.ok) return { ok: false, error: authErrorText(res) };
+  /* 🔴 로그인 기록도 같이 지운다 — 약관이 '탈퇴 시 지체 없이 파기'라고 적고 있다.
+     계정 껍데기가 남아 cascade 가 안 돌고, 로그아웃하고 나면 학생이 스스로 지울 길도 없다.
+     ⚠️ 프로필을 지운 **뒤**에 지운다. 여기서 실패해도 탈퇴 자체는 성공으로 둔다 —
+        프로필(진짜 개인정보)은 이미 지워졌고, 여기서 막으면 탈퇴가 통째로 안 된다. */
+  try {
+    await sbAuthed(`/rest/v1/login_events?user_id=eq.${encodeURIComponent(u.userId)}`, { method: 'DELETE' });
+  } catch (e) { /* 표가 아직 없을 수 있다(마이그레이션 전) */ }
   authClear();
   return { ok: true };
+}
+
+/* ---------------- 로그인 활동 (2026-09-11) ----------------
+   "내 계정에 언제 어디서 로그인됐나"를 학생이 직접 본다. 낯선 기기가 보이면 비밀번호를
+   바꾸라고 알려 주는 것이 목적이다.
+
+   🔴 **적게 담는다.** 시각과 **거친 기기 이름** 둘뿐이다.
+      · IP·위치는 담지 않는다 — 브라우저에서 알 수도 없고, 담으면 훨씬 민감해진다.
+      · UA 원문을 통째로 담지 않는다 — 그건 기기를 특정하는 지문이 된다. 낱말 몇 개만 뽑는다.
+   🔴 기록 남기기가 **로그인을 막으면 안 된다** — 표가 아직 없거나(마이그레이션 전) 인터넷이
+      끊겨도 로그인 자체는 그대로 되어야 한다. 그래서 실패해도 조용히 지나간다.
+   ⚠️ 담는 것이 늘었으므로 `terms.html` 수집 항목에도 적었다. 한 세트다. */
+
+/* 거친 기기 이름 — '아이폰 · Safari' 정도. 못 알아보면 지어내지 않고 빈 값을 둔다. */
+function deviceLabel(ua) {
+  const s = String(ua || (typeof navigator !== 'undefined' ? navigator.userAgent : ''));
+  if (!s) return '';
+  let os = '';
+  if (/iPhone/i.test(s)) os = '아이폰';
+  else if (/iPad/i.test(s)) os = '아이패드';
+  else if (/Android/i.test(s)) os = '안드로이드';
+  else if (/Mac OS X|Macintosh/i.test(s)) os = '맥';
+  else if (/Windows/i.test(s)) os = '윈도우';
+  /* 🔴 순서가 중요하다 — 엣지·삼성인터넷·크롬은 UA 에 전부 'Chrome' 을 달고 다니고,
+     iOS 의 크롬·엣지는 'Safari' 까지 단다. 좁은 것부터 본다. */
+  let br = '';
+  if (/Edg\//i.test(s)) br = 'Edge';
+  else if (/SamsungBrowser/i.test(s)) br = '삼성 인터넷';
+  else if (/CriOS|Chrome\//i.test(s)) br = 'Chrome';
+  else if (/FxiOS|Firefox\//i.test(s)) br = 'Firefox';
+  else if (/Safari\//i.test(s)) br = 'Safari';
+  return [os, br].filter(Boolean).join(' · ');
+}
+
+/* 이 설치본을 가리키는 **뜻 없는 임의 문자열**. '현재 기기' 배지를 정확히 붙이려고 둔다 —
+   기기 이름만으로 견주면 같은 기종을 쓰는 남의 로그인에 '현재 기기'가 붙어, 낯선 기기를
+   찾으라고 만든 화면이 오히려 안심시킨다. 지우면 새로 만들어지는 난수일 뿐이다. */
+const CLIENT_KEY = 'handaejang.client';
+function clientId() {
+  try {
+    let v = localStorage.getItem(CLIENT_KEY);
+    if (!v) {
+      v = (crypto && crypto.randomUUID) ? crypto.randomUUID()
+        : String(Date.now()) + '-' + Math.random().toString(36).slice(2);
+      localStorage.setItem(CLIENT_KEY, v);
+    }
+    return v;
+  } catch (e) { return ''; }
+}
+
+/* 로그인 직후 한 줄 남긴다. 🔴 실패해도 로그인은 성공으로 둔다. */
+async function authLogLogin() {
+  try {
+    const u = authUser();
+    if (!u || !supabaseConfigured()) return;
+    await sbAuthed('/rest/v1/login_events', {
+      method: 'POST',
+      headers: { Prefer: 'return=minimal' },
+      body: { user_id: u.userId, device: deviceLabel(), client: clientId() },
+    });
+  } catch (e) { /* 표가 아직 없거나 인터넷이 끊겼다 — 로그인은 그대로 된다 */ }
+}
+
+/* 최근 기록을 읽는다. 돌려주는 것은 { ok, items } — 🔴 '없다'와 '못 읽었다'를 가른다.
+   못 읽은 것을 '없다'로 보여 주면 낯선 기기를 놓치게 된다(원칙 8-1과 같은 계열). */
+async function authLoginEvents(limit) {
+  const u = authUser();
+  if (!u || !supabaseConfigured()) return { ok: false, items: [], reason: 'signedout' };
+  const n = Math.min(50, Math.max(1, limit || 20));
+  try {
+    const res = await sbAuthed(
+      `/rest/v1/login_events?user_id=eq.${encodeURIComponent(u.userId)}&select=at,device,client&order=at.desc&limit=${n}`);
+    if (!res.ok) return { ok: false, items: [], reason: 'error' };
+    return { ok: true, items: Array.isArray(res.json) ? res.json : [] };
+  } catch (e) { return { ok: false, items: [], reason: 'error' }; }
 }
 
 /* ---------------- 🔴 나가도 되는 것만 남기기 ---------------- */

@@ -4138,3 +4138,49 @@ input:user-invalid:focus, select:user-invalid:focus, textarea:user-invalid:focus
 /* 11 · 데스크톱 — 개발자 지시(2026-09-11)로 **적용하지 않는다**. 480px 폰 프레임 그대로.
    (한때 ≥1024px 두 칸 배치를 넣었다가 같은 날 되돌렸다 — 다시 넣지 말 것.) */
 }
+
+/* ══ 로그인 활동 · FAQ · 앱 권한 (2026-09-11 개발자 지시 1·2·4번) ═══════════════ */
+
+/* 로그인 카드 — 한 줄에 '무엇으로 · 언제'. 🔴 IP 줄은 없다: 브라우저는 제 IP 를 모른다.
+   지어내느니 적지 않는다(원칙 8-1). 보여 주려면 서버 조각이 하나 더 있어야 한다. */
+.login-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--space-16);
+  margin-bottom: var(--space-8);
+}
+.login-now {
+  display: inline-block;
+  font-size: var(--t-2xs);
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--primary-weak);
+  border-radius: var(--radius-pill);
+  padding: var(--space-2) var(--space-8);
+  margin-bottom: var(--space-6);
+}
+.login-device { font-size: var(--t-lg); font-weight: 800; letter-spacing: -0.02em; }
+.login-meta { font-size: var(--t-sm); color: var(--text-sub); margin-top: var(--space-2); }
+
+/* FAQ — 여닫기는 <details> 에 맡긴다(코드 0줄 · 키보드와 보조기기에서도 저절로 된다) */
+.faq-item { border-bottom: 1px solid var(--line); }
+.faq-item summary {
+  padding: var(--space-16) 0;
+  font-size: var(--t-md);
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after { content: '＋'; float: right; color: var(--text-weak); font-weight: 400; }
+.faq-item[open] summary::after { content: '－'; }
+.faq-a {
+  font-size: var(--t-sm);
+  color: var(--text-sub);
+  line-height: 1.7;
+  padding: 0 0 var(--space-16);
+}
+
+/* 권한 안내 — 문단이라 카드 줄(.wallet-row)과 달리 통으로 읽힌다 */
+.perm-how { font-size: var(--t-sm); color: var(--text-sub); line-height: 1.7; margin-top: var(--space-12); }

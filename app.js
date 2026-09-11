@@ -750,13 +750,13 @@ function showScreen(name, opts) {
   if (typeof resumeSaveScroll === 'function' && currentScreen && currentScreen !== name) {
     resumeSaveScroll(currentScreen, window.scrollY);
   }
-  ['onboarding', 'home', 'explore', 'applications', 'my', 'settings', 'trash', 'terms'].forEach((n) => {
+  ['onboarding', 'home', 'explore', 'applications', 'my', 'settings', 'trash', 'terms', 'logins', 'faq', 'perms'].forEach((n) => {
     $(`#screen-${n}`).hidden = n !== name;
   });
   $('#bottom-nav').hidden = name === 'onboarding';
   /* 설정·휴지통은 MY 안쪽 화면이라 아래 탭에서 **MY 가 켜진 채**로 둔다 —
      아무 탭도 안 켜져 있으면 학생이 지금 어디에 있는지 알 수 없다. */
-  const navOn = (name === 'settings' || name === 'trash' || name === 'terms') ? 'my' : name;
+  const navOn = ['settings', 'trash', 'terms', 'logins', 'faq', 'perms'].includes(name) ? 'my' : name;
   $$('.nav-item').forEach((b) => b.classList.toggle('active', b.dataset.nav === navOn));
 
   /* 🔴 안쪽 화면(설정·휴지통)은 **방향이 있는** 움직임으로 들어온다 (2026-09-11 개발자 지시).
@@ -765,7 +765,7 @@ function showScreen(name, opts) {
         style.css 에서 **이 규칙이 뒤에 와야** 이긴다(같은 굵기면 나중 것이 이긴다).
      ⚠️ 클래스를 떼었다 붙이는 것만으로는 다시 안 돈다 — 브라우저가 '바뀐 게 없다'고 본다.
         중간에 offsetWidth 를 한 번 읽어 강제로 끊어 준다. */
-  const SUB = ['settings', 'trash', 'terms'];
+  const SUB = ['settings', 'trash', 'terms', 'logins', 'faq', 'perms'];
   if (SUB.includes(name) || SUB.includes(currentScreen)) {
     const el = $(`#screen-${name}`);
     if (el) {
@@ -783,6 +783,9 @@ function showScreen(name, opts) {
   if (name === 'settings') renderSettings();
   if (name === 'trash') renderTrash();
   if (name === 'terms') renderTerms();
+  if (name === 'logins') renderLogins();
+  if (name === 'faq') renderFaq();
+  if (name === 'perms') renderPerms();
 
   /* 🔴 스크롤은 **그린 뒤에** 옮긴다 — 먼저 옮기면 아직 짧은 화면이라 그 자리가 없다.
      `opts.scroll` 은 이어보기가 되살릴 때만 온다(보통은 늘 맨 위로). */
@@ -2956,6 +2959,9 @@ const SWIPE_BACK_TO = {
   settings: 'my',
   trash: 'settings',
   terms: 'settings',
+  logins: 'settings',
+  faq: 'settings',
+  perms: 'settings',
 };
 
 function enableScreenSwipeBack(root) {
@@ -3769,7 +3775,7 @@ function renderMy() {
   const trackLabel = (TRACKS.find((t) => t.id === p.track) || {}).label || '-';
   const commonFilled = ['studentId', 'birth', 'phone', 'email', 'account'].filter((k) => c[k]).length;
   $('#my-profile').innerHTML = `
-    <p class="my-name">${esc(p.name || '대학생')} 님<span class="my-edit-hint">수정하기 ›</span></p>
+    <p class="my-name">${esc(p.name || '대학생')} 님<span class="my-edit-hint">학적정보 수정 ›</span></p>
     ${/* 🔴 학과 칸은 **학생이 직접 치는 자유 입력**이다 — esc 를 빠뜨리면 `B<b>학과` 같은 글자에
          MY 화면 아래쪽이 통째로 그 태그 안으로 빨려 들어간다(브라우저 실측). 2026-09-10. */ ''}
     <p class="my-line">${esc(p.school || '대학 미설정')} · ${esc(trackLabel)}${p.major ? ' · ' + esc(p.major) : ''}</p>
@@ -3798,6 +3804,160 @@ function renderSettings() {
   if (w && !w.dataset.wired) { w.dataset.wired = '1'; w.addEventListener('click', withdrawAccount); }
   const tm = $('#btn-open-terms');
   if (tm && !tm.dataset.wired) { tm.dataset.wired = '1'; tm.addEventListener('click', () => showScreen('terms')); }
+  for (const [id, screen] of [['#btn-open-logins', 'logins'], ['#btn-open-faq', 'faq'], ['#btn-open-perms', 'perms']]) {
+    const b = $(id);
+    if (b && !b.dataset.wired) { b.dataset.wired = '1'; b.addEventListener('click', () => showScreen(screen)); }
+  }
+}
+
+/* ---------------- 로그인 활동 (2026-09-11 개발자 지시 1번) ----------------
+   "내 계정에 언제 어디서 로그인됐나". 낯선 기기가 보이면 비밀번호를 바꾸라고 알려 준다.
+   🔴 '없다'와 '못 읽었다'를 가른다 — 못 읽은 것을 '없다'로 보여 주면 낯선 기기를 놓친다.
+   🔴 **IP 는 적지 않는다.** 브라우저는 제 IP 를 모르고(서버만 안다) Supabase 에 바로 쓰는
+      지금 구조에는 받아 적을 자리가 없다. 지어내느니 줄을 비운다(원칙 8-1).
+   🔴 '현재 기기' 배지는 **기기 이름이 아니라 설치본 식별자**로 붙인다 — 이름으로 견주면
+      같은 기종을 쓰는 남의 로그인에 배지가 붙어, 찾으라고 만든 화면이 안심시킨다. */
+function loginWhen(iso) {
+  const d = new Date(iso);
+  if (isNaN(d)) return '시각 확인 불가';
+  const ap = d.getHours() < 12 ? '오전' : '오후';
+  const h12 = d.getHours() % 12 || 12;
+  const two = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}. ${ap} ${h12}:${two(d.getMinutes())}`;
+}
+
+async function renderLogins() {
+  const el = $('#logins-body');
+  if (!el) return;
+  if (typeof authUser !== 'function' || !authUser()) {
+    el.innerHTML = `<div class="my-card trash-empty">
+        <p class="trash-empty-title">로그인한 계정이 없어요</p>
+        <p class="legal-loading">로그인하면 이 계정에 언제 어느 기기로 접속했는지 여기에 쌓여요.</p>
+      </div>`;
+    return;
+  }
+  el.innerHTML = '<p class="legal-loading">불러오는 중이에요…</p>';
+  const r = await authLoginEvents(20);
+  if (!r.ok) {
+    /* 🔴 못 읽은 것을 '없다'로 말하지 않는다 */
+    el.innerHTML = `<div class="my-card trash-empty">
+        <p class="trash-empty-title">기록을 불러오지 못했어요</p>
+        <p class="legal-loading">인터넷이 끊겼거나 서버 준비가 아직 안 됐어요. 잠시 뒤 다시 열어 주세요.</p>
+      </div>`;
+    return;
+  }
+  if (!r.items.length) {
+    el.innerHTML = `<div class="my-card trash-empty">
+        <p class="trash-empty-title">아직 기록이 없어요</p>
+        <p class="legal-loading">다음 로그인부터 여기에 쌓여요.</p>
+      </div>`;
+    return;
+  }
+  const me = typeof clientId === 'function' ? clientId() : '';
+  el.innerHTML = r.items.map((it) => `
+    <div class="login-card">
+      ${it.client && me && it.client === me ? '<span class="login-now">현재 기기</span>' : ''}
+      <p class="login-device">${esc(it.device || '알 수 없는 기기')}</p>
+      <p class="login-meta">로그인 | ${esc(loginWhen(it.at))}</p>
+    </div>`).join('');
+}
+
+/* ---------------- 자주 묻는 질문 (2026-09-11 개발자 지시 2번) ----------------
+   🔴 **앱이 실제로 하는 일만** 적는다. '곧 됩니다'나 확인 안 한 것을 적으면 그게 가장
+      눈에 잘 띄는 거짓말이 된다(운영 원칙 1·8-1). 답은 전부 지금 동작 기준이고,
+      기능이 바뀌면 이 목록도 같이 고쳐야 한다. */
+const FAQ_ITEMS = [
+  ['이 앱에서 신청까지 끝나나요?',
+    '아니요. 한대장은 <strong>신청 준비까지</strong> 도와줍니다. 최종 신청·접수는 한국장학재단, 각 대학, 각 재단 같은 공식 접수처에서 직접 하셔야 해요. 그래서 앱은 "신청 완료"라고 쓰지 않고 "신청 준비 완료"라고 적습니다.'],
+  ['우리 학교 공고가 안 보여요.',
+    '지금 공고 원문을 모으고 있는 학교가 정해져 있어요. 그 밖의 학교라도 <strong>전국 대상 공고</strong>와 <strong>한국장학재단이 아는 재단 장학금</strong>은 그대로 보입니다.'],
+  ['"지원 자격을 아직 읽지 못했어요"는 무슨 뜻인가요?',
+    '공고 원문에서 자격 요건 문장을 찾지 못했다는 뜻입니다. 앱이 짐작해서 채우지 않습니다 — 틀린 자격 판정은 모른다고 말하는 것보다 나쁘기 때문이에요. 그때는 <strong>원문 보기</strong>로 직접 확인해 주세요.'],
+  ['금액이 "미확인"인 공고가 있어요.',
+    '공고 원문에 금액이 없거나 앱이 읽지 못한 경우입니다. 이런 공고는 홈의 예상 수혜액 <strong>합계에서 빼고</strong> "금액 미확인 n건 제외"라고 적습니다. 지어낸 숫자를 섞지 않습니다.'],
+  ['알림이 안 와요.',
+    '설정 → 알림에서 켜 주세요. <strong>아이폰은 홈 화면에 앱을 추가해야만</strong> 알림이 옵니다(사파리 탭에서는 안 옵니다). 폰에서 알림을 차단해 두었다면 설정 → 앱 권한에 바꾸는 방법이 적혀 있어요.'],
+  ['내 정보는 어디에 저장되나요?',
+    '기본은 <strong>이 기기 안</strong>입니다. 로그인하면 기기를 바꿔도 이어 쓸 수 있도록 프로필과 신청내역이 서버에 저장되고, 낯선 기기를 알아차릴 수 있게 <strong>로그인한 시각과 기기 종류</strong>도 함께 남습니다(설정 → 로그인 활동에서 볼 수 있어요).'],
+  ['주민등록번호·계좌번호·증명서류도 서버에 올라가나요?',
+    '아니요. 이 셋은 <strong>서버로 보내지 않습니다</strong>. 기기 안에만 저장되고, 서버로 나가는 사본에서 떼어냅니다.'],
+  ['기기를 바꾸면 이어서 쓸 수 있나요?',
+    '로그인하면 새 기기에서 프로필과 신청내역을 받아옵니다. 로그인하지 않으면 정보가 그 기기에만 남습니다.'],
+  ['유료인가요?',
+    '공고 검색·추천·알림은 무료입니다. 앞으로 유료 기능이 생기면 쓰기 전에 분명히 안내하고 동의를 받습니다.'],
+  ['잘못 지웠어요. 되살릴 수 있나요?',
+    '설정 → 휴지통에서 되살릴 수 있어요. 지운 신청내역과 서류는 <strong>30일 동안</strong> 남습니다.'],
+];
+
+function renderFaq() {
+  const el = $('#faq-body');
+  if (!el) return;
+  if (el.dataset.filled) return;      // 내용이 고정이라 한 번만 그린다
+  el.dataset.filled = '1';
+  /* <details> 를 쓴다 — 여닫는 코드가 0줄이고 키보드·보조기기에서도 저절로 된다 */
+  el.innerHTML = FAQ_ITEMS.map(([q, a]) => `
+    <details class="faq-item">
+      <summary>${esc(q)}</summary>
+      <div class="faq-a">${a}</div>
+    </details>`).join('');
+}
+
+/* ---------------- 앱 권한 · 오픈소스 라이선스 (2026-09-11 개발자 지시 4번) ----------------
+   🔴 **웹앱은 폰 설정 앱을 열 수 없다.** 그런 길이 브라우저에 없다(앱스토어에 올린 진짜
+      앱만 된다). 그래서 '눌러서 폰 설정으로 이동'은 만들 수 없고, 대신 **지금 권한 상태를
+      보여 주고 어디로 가야 하는지 글로 안내**한다. 있지도 않은 버튼을 만들어 두면
+      눌러도 아무 일이 없어 더 나쁘다.
+   🔴 라이선스 목록은 **실제로 싣는 것만** 적는다. 이 앱은 CSP 가 바깥 스크립트를 막아
+      자바스크립트 라이브러리를 하나도 싣지 않고, 바깥에서 받는 것은 글꼴 하나뿐이다. */
+const OSS_LICENSES = [
+  ['Pretendard', 'SIL Open Font License 1.1', 'https://github.com/orioncactus/pretendard'],
+];
+
+function permLabel() {
+  if (typeof Notification === 'undefined') return { text: '이 브라우저는 알림을 지원하지 않아요', cls: 'off' };
+  if (Notification.permission === 'granted') return { text: '허용됨', cls: 'on' };
+  if (Notification.permission === 'denied') return { text: '차단됨', cls: 'off' };
+  return { text: '아직 묻지 않음', cls: 'off' };
+}
+
+function renderPerms() {
+  const el = $('#perms-body');
+  if (!el) return;
+  const p = permLabel();
+  const blocked = typeof Notification !== 'undefined' && Notification.permission === 'denied';
+  el.innerHTML = `
+    <div class="my-card">
+      <p class="wallet-title">앱 권한</p>
+      <div class="wallet-row">
+        <div class="wallet-info">
+          <p class="trash-title">알림</p>
+          <p class="wallet-status nf-status-${p.cls}">${esc(p.text)}</p>
+        </div>
+      </div>
+      ${blocked ? `<p class="perm-how"><strong>폰에서 차단해 두셨어요.</strong> 앱에서는 다시 물을 수 없고,
+        폰 설정에서 직접 바꿔야 합니다.<br />
+        · 아이폰: 설정 → 알림 → 한대장 → 알림 허용<br />
+        · 안드로이드: 설정 → 앱 → 한대장 → 알림</p>`
+      : `<p class="perm-how">알림을 켜고 끄는 것은 <strong>설정 → 알림</strong>에서 합니다.
+        폰 설정에서 아예 차단해 두면 앱에서는 되돌릴 수 없어요.</p>`}
+      <p class="perm-how">한대장은 <strong>웹앱</strong>이라 사진·카메라·연락처 권한을 쓰지 않습니다.
+        서류 보관함에 파일을 올릴 때만 그때그때 파일을 고르게 되어 있고, 앱이 폰 안을 뒤지지 않습니다.</p>
+    </div>
+    <div class="my-card">
+      <p class="wallet-title">오픈소스 라이선스</p>
+      <p class="perm-how">이 앱은 바깥 자바스크립트 라이브러리를 하나도 싣지 않습니다(보안 설정이 막습니다).
+        바깥에서 받아 쓰는 것은 아래 글꼴 하나뿐이에요.</p>
+      ${OSS_LICENSES.map(([name, lic, url]) => `
+        <div class="wallet-row">
+          <div class="wallet-info">
+            <p class="trash-title">${esc(name)}</p>
+            <p class="wallet-status">${esc(lic)}</p>
+          </div>
+          <div class="wallet-btns">
+            <a class="wallet-btn" href="${esc(url)}" target="_blank" rel="noopener">원문 ↗</a>
+          </div>
+        </div>`).join('')}
+    </div>`;
 }
 
 /* ---------------- 이용약관 · 개인정보처리방침 (2026-09-11) ----------------
@@ -4427,7 +4587,9 @@ function bindEvents() {
     initOnboarding();
     showScreen('onboarding');
   };
-  $('#btn-edit-profile').addEventListener('click', editProfile);
+  /* 🔴 홈 톱니는 없앴다 (2026-09-11 개발자 지시) — 입구는 MY 프로필 카드 하나다.
+     배선은 남겨 두되 **있을 때만** 건다(없는 요소에 걸면 그 자리에서 죽는다). */
+  { const e = $('#btn-edit-profile'); if (e) e.addEventListener('click', editProfile); }
   { const e = $('#btn-my-edit'); if (e) e.addEventListener('click', editProfile); }
 
   /* 눌러서 넘어가는 영역 — 마우스·손가락뿐 아니라 키보드로도 되어야 한다
@@ -4462,6 +4624,10 @@ function bindEvents() {
   $('#btn-settings-back').addEventListener('click', () => showScreen('my', { back: true }));
   $('#btn-trash-back').addEventListener('click', () => showScreen('settings', { back: true }));
   $('#btn-terms-back').addEventListener('click', () => showScreen('settings', { back: true }));
+  for (const id of ['#btn-logins-back', '#btn-faq-back', '#btn-perms-back']) {
+    const b = $(id);
+    if (b) b.addEventListener('click', () => showScreen('settings', { back: true }));
+  }
 
   /* 🔴 안쪽 화면 셋 다 같은 손짓으로 나간다 (2026-09-11 개발자 요청은 휴지통·약관이었는데,
      설정만 안 되면 거기서 쓸어 보고 '안 된다'가 된다 — 안쪽 화면이라는 점이 같다).
