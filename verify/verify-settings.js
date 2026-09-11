@@ -94,6 +94,27 @@ const eq = (label, got, want) => {
   eq('탈퇴는 빨간 줄이다', await page.$eval('#btn-withdraw', (e) => e.classList.contains('danger')), true);
   /* 🔴 '기타' 절 제목 — 제목 없이 목록만 두면 위 '알림' 절과의 빈칸이 벌어져 보인다 */
   eq("'기타' 절 제목이 있다", (await page.textContent('#set-etc .wallet-title')).trim(), '기타');
+  /* 🔴 2026-09-11 개발자 지시 — '기타'와 '알림'의 절 제목은 **같은 모양**이어야 한다.
+     이 검사가 없으면 한쪽에만 막대가 남는 오늘 같은 어긋남을 아무도 못 본다. */
+  /* 🔴 절 제목 위 막대는 **어느 절에도 없다** (2026-09-01 판정 · 2026-09-11 재확인).
+     지키는 것은 '없다'와 '넷이 서로 같다' 둘이다 — 새 절을 만들 때 제거 목록에
+     이름을 빠뜨리면 그 절만 막대가 남는데, 오늘 '기타'가 실제로 그랬다. */
+  eq('절 제목 위 막대는 어느 절에도 없다 (계정·알림·기타)',
+    await page.evaluate(() => {
+      const bar = (sel) => {
+        const el = document.querySelector(sel);
+        return el ? getComputedStyle(el, '::before').content : '없음';
+      };
+      return ['#my-account .acc-head', '#my-notify .wallet-title', '#set-etc .wallet-title']
+        .map(bar).every((c) => c === 'none');
+    }), true);
+  /* 🔴 '기타' 제목과 첫 줄(휴지통) 사이에 선이 없어야 한다 (개발자 지시) */
+  eq("'기타'와 '휴지통' 사이에 구분선이 없다",
+    await page.evaluate(() => {
+      const m = getComputedStyle(document.querySelector('.set-menu'));
+      const f = getComputedStyle(document.querySelector('#btn-open-trash'));
+      return parseFloat(m.borderTopWidth) === 0 && parseFloat(f.borderTopWidth) === 0;
+    }), true);
   eq("'기타' 제목이 계정·알림과 같은 크기다 (같은 규칙을 쓴다)",
     await page.evaluate(() => {
       const a = getComputedStyle(document.querySelector('#my-notify .wallet-title')).fontSize;
@@ -111,6 +132,8 @@ const eq = (label, got, want) => {
   await page.waitForTimeout(400);
   eq('제목이 "휴지통"', (await page.textContent('#screen-trash .sub-header h2')).trim(), '휴지통');
   eq('빈 휴지통 안내가 뜬다', await page.$$eval('.trash-empty', (e) => e.length), 1);
+  /* 🔴 설명 한 줄은 뺐다 (2026-09-11 개발자 지시) — 화면 맨 위가 이미 같은 말을 한다 */
+  eq('빈 휴지통에 설명 줄을 덧붙이지 않는다', await page.$$eval('.trash-empty-sub', (e) => e.length), 0);
   await page.screenshot({ path: `${SHOT}/trash-empty.png` });
   await page.click('#btn-trash-back');
   await page.waitForSelector('#screen-settings:not([hidden])');

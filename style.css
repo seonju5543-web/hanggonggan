@@ -2988,13 +2988,21 @@ body::after { opacity: 0.26; }
    ① 제목 위 막대는 뺀다 — 크기(20px)와 굵기(800)만으로 이미 충분히 구분된다.
    ② 제목과 그 아래 내용 사이가 떠 있었다 — 한 덩어리로 붙인다.
    ③ 바탕을 한 단계 더 흰쪽으로. */
+/* 🔴 `#set-etc`(기타)도 이 목록에 **반드시** 있어야 한다 (2026-09-11).
+   '기타' 절을 새로 만들면서 여기에만 이름을 안 넣어, 기타에만 막대가 남아 알림과
+   모양이 달라졌다. 개발자가 그것을 보고 **둘 다 없애기**로 정했다(위 2026-09-01 판정 유지).
+   ⚠️ 절을 새로 만들면 위 '절 제목' 묶음과 이 제거 묶음 **양쪽에** 이름을 넣을 것 —
+      한쪽만 넣으면 그 절만 다른 모양이 된다. 관문: verify-settings 의 '막대' 항목. */
 #my-account .acc-head::before,
 #my-notify .wallet-title::before,
+#set-etc .wallet-title::before,
 #my-wallet .wallet-title::before { content: none; }
 #my-account .acc-head,
 #my-notify .wallet-title,
+#set-etc .wallet-title,
 #my-wallet .wallet-title { padding-top: 0; margin-bottom: 2px; }
 #my-notify .nf-status, #my-wallet .wallet-sub { margin-top: 1px; margin-bottom: 8px; }
+
 .my-card { margin-top: 6px; padding-top: 18px; }
 .my-card:first-of-type { margin-top: 0; padding-top: 0; }
 
@@ -4039,7 +4047,15 @@ body,
 /* 휴지통·이용약관·탈퇴 — '기타' 제목 **바로 아래**에 붙인다 (2026-09-11 개발자 지적:
    제목 없이 목록만 떠 있어 위 '알림' 절과의 빈칸이 크게 벌어져 보였다).
    간격은 알림 절의 스위치 목록과 같은 리듬이라 따로 벌리지 않는다. */
-.set-menu { margin-top: var(--space-8); }
+.set-menu {
+  margin-top: var(--space-8);
+  /* 🔴 상자 테두리를 없앤다 (2026-09-11 개발자 지시 "기타와 휴지통 사이 구분선 삭제").
+     제목 바로 밑에 선이 하나 더 그어져 제목과 목록이 떨어져 보였다. 줄 사이 구분선
+     (.my-menu-item 의 border-bottom)은 남는다 — 알림 절 스위치 목록과 같은 꼴이다. */
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
 .set-menu a.my-menu-item { color: inherit; text-decoration: none; }
 .set-note { font-size: var(--t-xs); color: var(--text-sub); line-height: 1.65; margin-bottom: var(--space-16); }
 
