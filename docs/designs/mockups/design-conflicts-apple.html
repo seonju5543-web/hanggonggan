@@ -175,6 +175,8 @@
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .rules .apl { color: #2997ff; } }
   .alt-apple-chip { --chip-on-bg: var(--surface); --chip-on-fg: var(--text); --chip-on-bd: var(--accent); --chip-on-sh: none; }
   .alt-apple-chip .chip.on { border-width: 2px; padding: 6px 14px; }
+  /* '지금' = 2026-09-11 개발자 결정 7·13 이 적용된 뒤의 앱 */
+  .phone { --chip-on-bg: var(--surface-2); --chip-on-fg: var(--accent); --chip-on-bd: var(--accent-line); --chip-on-sh: none; --ring: 0 0 0 2px rgba(39,80,143,.5); --focus-bd: var(--accent); }
   .alt-touch .chip { padding: 10px 16px; }
   .alt-w700 { --w-title: 700; --w-card: 600; }
   .alt-w700 .chip, .alt-w700 .nav div, .alt-w700 .section .link { font-weight: 600; }
@@ -208,7 +210,7 @@
 <div class="wrap">
   <header class="top">
     <h1>한대장 × Apple 대조판 — 참고안 둘과 견주어 남은 컨펌</h1>
-    <p>왼쪽은 2026-09-11 에 실제 앱을 브라우저로 띄워 실측한 지금 화면, 오른쪽은 첨부한 Apple DESIGN.md 의 규칙을 그 항목에만 적용했을 때입니다. 다른 항목은 건드리지 않고 <b>한 가지씩</b>만 바꿨습니다. 번호는 Linear 대조판·DESIGN.md 「충돌 · 컨펌 대기」표와 같은 번호이고, 14·15 는 이번에 새로 잡은 것입니다. 실제 글꼴(Pretendard)은 이 페이지에 실리지 않아 Noto Sans KR 로 대신 그렸습니다.</p>
+    <p>왼쪽은 2026-09-11 에 실제 앱을 브라우저로 띄워 실측한 지금 화면, 오른쪽은 첨부한 Apple DESIGN.md 의 규칙을 그 항목에만 적용했을 때입니다. 다른 항목은 건드리지 않고 <b>한 가지씩</b>만 바꿨습니다. 번호는 Linear 대조판·DESIGN.md 「충돌 · 컨펌 대기」표와 같은 번호이고, 20·21 은 이번에 새로 잡은 것입니다. 같은 날 개발자 결정으로 **7·12·13·16·18·19 는 이미 앱에 적용**돼 있어 왼쪽 '지금'은 그 뒤의 모습입니다. 실제 글꼴(Pretendard)은 이 페이지에 실리지 않아 Noto Sans KR 로 대신 그렸습니다.</p>
     <div class="legend"><span class="l-rec">바꾸는 쪽을 권함</span><span class="l-keep">지금 유지를 권함</span><span class="l-ask">눈으로 보고 정할 것</span></div>
   </header>
 
@@ -217,14 +219,14 @@
     <div class="plate-head">
       <div class="no">5</div>
       <div><h2>그림자 — 버튼·칩의 색 그림자 vs 그림자 없음</h2>
-        <div class="rules"><span class="apl">Apple: 그림자는 <b>딱 하나</b>, 제품 사진 아래에만 · 카드·버튼·글자에는 절대 없음</span><span class="lin">Linear: 면의 사다리 + 얇은 선 · 거의 안 씀</span><span>지금: 주 버튼 22% · 칩 26% · 히어로 lift · 시트</span></div></div>
+        <div class="rules"><span class="apl">Apple: 그림자는 <b>딱 하나</b>, 제품 사진 아래에만 · 카드·버튼·글자에는 절대 없음</span><span class="lin">Linear: 면의 사다리 + 얇은 선 · 거의 안 씀</span><span>지금: 주 버튼 22% · 히어로 lift · 시트 (칩 그림자는 7번 적용으로 이미 없음)</span></div></div>
       <span class="verdict rec">바꾸는 쪽 권함 · 참고안 둘이 같은 말</span>
     </div>
     <div class="pair">
-      <div class="col"><div class="col-label">지금</div><div class="phone"><div class="hero"><div class="lbl">지금 신청할 수 있는 장학금 15건</div><div class="amt"><small>최대</small> 1,405만원</div><div class="sub">금액을 아직 못 읽은 10건은 뺀 금액이에요</div><div class="btn btn-inverse">15건 신청 준비</div></div><div class="chips"><span class="chip on">전체</span><span class="chip">교내</span><span class="chip">교외</span><span class="chip">신청 가능만</span></div><div class="btn btn-primary">신청 준비 시작</div><div class="sheet"><div class="handle"></div><div class="badges" style="margin:0 0 8px"><span class="badge danger">D-DAY</span><span class="badge">교외</span></div><h4>(재)무안군승달장학회 성적우수장학금</h4><div class="amt">최대 150만원</div><p>(재)무안군승달장학회 · 접수 ~2026-09-11</p><div class="btn btn-primary" style="margin-top:12px">신청 준비 시작</div></div></div><div class="spec"><span>--shadow-btn 22%</span><span>--shadow-chip 26%</span><span>--shadow-lift · --shadow-sheet</span></div></div>
+      <div class="col"><div class="col-label">지금</div><div class="phone"><div class="hero"><div class="lbl">지금 신청할 수 있는 장학금 15건</div><div class="amt"><small>최대</small> 1,405만원</div><div class="sub">금액을 아직 못 읽은 10건은 뺀 금액이에요</div><div class="btn btn-inverse">15건 신청 준비</div></div><div class="chips"><span class="chip on">전체</span><span class="chip">교내</span><span class="chip">교외</span><span class="chip">신청 가능만</span></div><div class="btn btn-primary">신청 준비 시작</div><div class="sheet"><div class="handle"></div><div class="badges" style="margin:0 0 8px"><span class="badge danger">D-DAY</span><span class="badge">교외</span></div><h4>(재)무안군승달장학회 성적우수장학금</h4><div class="amt">최대 150만원</div><p>(재)무안군승달장학회 · 접수 ~2026-09-11</p><div class="btn btn-primary" style="margin-top:12px">신청 준비 시작</div></div></div><div class="spec"><span>--shadow-btn 22%</span><span>--shadow-lift · --shadow-sheet</span></div></div>
       <div class="col"><div class="col-label">바꿨을 때<b>버튼·칩 그림자 제거 · 떠 있는 것(시트·히어로)만 남김</b></div><div class="phone alt-noshadow"><div class="hero"><div class="lbl">지금 신청할 수 있는 장학금 15건</div><div class="amt"><small>최대</small> 1,405만원</div><div class="sub">금액을 아직 못 읽은 10건은 뺀 금액이에요</div><div class="btn btn-inverse">15건 신청 준비</div></div><div class="chips"><span class="chip on">전체</span><span class="chip">교내</span><span class="chip">교외</span><span class="chip">신청 가능만</span></div><div class="btn btn-primary">신청 준비 시작</div><div class="sheet"><div class="handle"></div><div class="badges" style="margin:0 0 8px"><span class="badge danger">D-DAY</span><span class="badge">교외</span></div><h4>(재)무안군승달장학회 성적우수장학금</h4><div class="amt">최대 150만원</div><p>(재)무안군승달장학회 · 접수 ~2026-09-11</p><div class="btn btn-primary" style="margin-top:12px">신청 준비 시작</div></div></div><div class="spec"><span>버튼·칩 그림자 0</span><span>시트는 윗선 1px · 히어로는 선 8%</span></div></div>
     </div>
-    <p class="after-note">참고안 둘이 <b>같은 방향</b>을 가리키는 항목입니다. Apple 은 그림자를 "제품이 바닥에 놓인 무게"에만 쓰고 UI 에는 한 번도 안 씁니다. 이 앱에는 제품 사진이 없으니 그 규칙을 그대로 옮기면 <b>그림자 0</b>이 되는데, 시트가 떠 있다는 것만은 알려야 해서 시트·히어로 둘은 남기는 안입니다. <span>노션 백로그 UI-9(그림자가 너무 많다)와 같은 일입니다. 바꾸면 <code>--shadow-btn</code>·<code>--shadow-chip</code> 을 쓰는 자리를 <code>none</code> 으로 — 토큰 자체는 지우지 않습니다(관문이 이름을 셉니다).</span></p>
+    <p class="after-note">참고안 둘이 <b>같은 방향</b>을 가리키는 항목입니다. Apple 은 그림자를 "제품이 바닥에 놓인 무게"에만 쓰고 UI 에는 한 번도 안 씁니다. 이 앱에는 제품 사진이 없으니 그 규칙을 그대로 옮기면 <b>그림자 0</b>이 되는데, 시트가 떠 있다는 것만은 알려야 해서 시트·히어로 둘은 남기는 안입니다. <span>노션 백로그 UI-9(그림자가 너무 많다)와 같은 일입니다. 바꾸면 <code>--shadow-btn</code> 을 쓰는 자리를 <code>none</code> 으로 — 토큰 자체는 지우지 않습니다(관문이 이름을 셉니다).</span></p>
   </section>
   <!-- 6 -->
   <section class="plate" id="p6">
@@ -245,14 +247,14 @@
     <div class="plate-head">
       <div class="no">7</div>
       <div><h2>선택 칩 — 강조색으로 칠하기 vs 흰 바탕에 2px 테두리</h2>
-        <div class="rules"><span class="apl">Apple: 선택 = <b>흰 바탕 그대로 + 2px 파란 테두리</b>(configurator-option-chip-selected)</span><span class="lin">Linear: 선택 = surface-2 바탕 · 칠하지 않음</span><span>지금: 선택 = 강조색 칠하기 + 색 그림자</span></div></div>
-      <span class="verdict rec">바꾸는 쪽 권함 · Apple 방식</span>
+        <div class="rules"><span class="apl">Apple: 선택 = <b>흰 바탕 그대로 + 2px 파란 테두리</b>(configurator-option-chip-selected)</span><span class="lin">Linear: 선택 = surface-2 바탕 · 칠하지 않음</span><span>지금: 선택 = <b>surface-2 + 강조색 글자 + 얇은 선</b> (Linear 방식 · 2026-09-11 적용)</span></div></div>
+      <span class="verdict keep">적용됨(Linear 방식) · Apple 방식은 참고 — 유지 권함</span>
     </div>
     <div class="pair">
-      <div class="col"><div class="col-label">지금</div><div class="phone"><div class="page-h">장학금 찾기</div><div class="input">장학금·재단 이름으로 찾기</div><div class="chips"><span class="chip on">전체</span><span class="chip">교내</span><span class="chip">교외</span><span class="chip">신청 가능만</span></div><div class="section"><h3>오늘·내일 마감 <span style="color:var(--accent)">27</span></h3></div><div class="card"><div class="org"><span>교외 · (재)무안군승달장학회</span><span class="fit">적합도 50%</span></div><div class="ttl">성적우수장학금</div><div class="row"><span class="amt">최대 150만원</span><span class="due">오늘 마감</span></div><div class="bar"></div></div><div class="nav"><div class=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>홈</div><div class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></svg>장학금</div><div class=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>신청내역</div><div class=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>MY</div></div></div><div class="spec"><span>선택 칩: #27508f 칠 + 그림자 26%</span><span>한 화면에 파랑 넷(제목선·칩·건수·탭)</span></div></div>
-      <div class="col"><div class="col-label">바꿨을 때<b>흰 바탕 + 2px 강조색 테두리 · 그림자 없음</b></div><div class="phone alt-apple-chip"><div class="page-h">장학금 찾기</div><div class="input">장학금·재단 이름으로 찾기</div><div class="chips"><span class="chip on">전체</span><span class="chip">교내</span><span class="chip">교외</span><span class="chip">신청 가능만</span></div><div class="section"><h3>오늘·내일 마감 <span style="color:var(--accent)">27</span></h3></div><div class="card"><div class="org"><span>교외 · (재)무안군승달장학회</span><span class="fit">적합도 50%</span></div><div class="ttl">성적우수장학금</div><div class="row"><span class="amt">최대 150만원</span><span class="due">오늘 마감</span></div><div class="bar"></div></div><div class="nav"><div class=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>홈</div><div class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></svg>장학금</div><div class=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>신청내역</div><div class=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>MY</div></div></div><div class="spec"><span>선택 칩: 흰 바탕 · 테두리 2px #27508f · 먹색 글자</span><span>칠한 파랑이 화면에서 사라짐</span></div></div>
+      <div class="col"><div class="col-label">지금</div><div class="phone"><div class="page-h">장학금 찾기</div><div class="input">장학금·재단 이름으로 찾기</div><div class="chips"><span class="chip on">전체</span><span class="chip">교내</span><span class="chip">교외</span><span class="chip">신청 가능만</span></div><div class="section"><h3>오늘·내일 마감 <span style="color:var(--accent)">27</span></h3></div><div class="card"><div class="org"><span>교외 · (재)무안군승달장학회</span><span class="fit">적합도 50%</span></div><div class="ttl">성적우수장학금</div><div class="row"><span class="amt">최대 150만원</span><span class="due">오늘 마감</span></div><div class="bar"></div></div><div class="nav"><div class=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>홈</div><div class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></svg>장학금</div><div class=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>신청내역</div><div class=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>MY</div></div></div><div class="spec"><span>선택 칩: #f7f6f4 바탕 · 파란 글자 · 선 24% · 그림자 없음</span><span>2026-09-11 적용</span></div></div>
+      <div class="col"><div class="col-label">바꿨을 때<b>흰 바탕 + 2px 강조색 테두리 · 그림자 없음</b></div><div class="phone alt-apple-chip"><div class="page-h">장학금 찾기</div><div class="input">장학금·재단 이름으로 찾기</div><div class="chips"><span class="chip on">전체</span><span class="chip">교내</span><span class="chip">교외</span><span class="chip">신청 가능만</span></div><div class="section"><h3>오늘·내일 마감 <span style="color:var(--accent)">27</span></h3></div><div class="card"><div class="org"><span>교외 · (재)무안군승달장학회</span><span class="fit">적합도 50%</span></div><div class="ttl">성적우수장학금</div><div class="row"><span class="amt">최대 150만원</span><span class="due">오늘 마감</span></div><div class="bar"></div></div><div class="nav"><div class=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>홈</div><div class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></svg>장학금</div><div class=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>신청내역</div><div class=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>MY</div></div></div><div class="spec"><span>선택 칩: 흰 바탕 · 테두리 2px #27508f · 먹색 글자</span><span>면을 올리는 대신 선을 두껍게</span></div></div>
     </div>
-    <p class="after-note">Linear 는 "면을 한 단 올려라", Apple 은 "테두리만 두껍게 하라"인데 <b>둘 다 칠하지 말라는 점은 같습니다.</b> 이 앱의 칩은 이미 Apple 의 옵션 칩과 같은 알약 모양이라 Apple 방식이 더 자연스럽습니다 — 눌러 둔 것이 또렷하게 읽히면서 제목·건수보다 앞서지 않습니다. <span>Linear 대조판 7번의 (b)를 이 안으로 바꿔 제안합니다. 5번(그림자)과 한 세트로 하는 것이 자연스럽습니다.</span></p>
+    <p class="after-note">Linear 는 "면을 한 단 올려라", Apple 은 "테두리만 두껍게 하라"인데 <b>둘 다 칠하지 말라는 점은 같습니다.</b> 개발자가 2026-09-11 에 Linear 방식을 골라 이미 적용됐습니다(왼쪽). Apple 방식(오른쪽)은 눌러 둔 것이 더 또렷하지만 테두리 2px 가 화면에서 한 번 더 진한 선이 됩니다. <span>지금 것이 더 조용해 그대로 두는 것을 권합니다. 바꾸고 싶으시면 (b) 라고만 적어 주세요.</span></p>
   </section>
   <!-- 8 -->
   <section class="plate" id="p8">
@@ -301,19 +303,19 @@
     <div class="plate-head">
       <div class="no">13</div>
       <div><h2>포커스 링 — 3px 18% vs 2px 진하게</h2>
-        <div class="rules"><span class="apl">Apple: <code>outline: 2px solid</code> 포커스 파랑(#0071e3) — 흐리지 않음</span><span class="lin">Linear: 2px · 강조색 50%</span><span>지금: 3px · 강조색 18% (<code>--ring</code>)</span></div></div>
-      <span class="verdict rec">바꾸는 쪽 권함 · 한 줄</span>
+        <div class="rules"><span class="apl">Apple: <code>outline: 2px solid</code> 포커스 파랑(#0071e3) — 흐리지 않음</span><span class="lin">Linear: 2px · 강조색 50%</span><span>지금: <b>2px · 강조색 50%</b> (<code>--ring</code> · 2026-09-11 적용)</span></div></div>
+      <span class="verdict keep">적용됨 · Apple 과 차이 미세 — 유지</span>
     </div>
     <div class="pair">
-      <div class="col"><div class="col-label">지금</div><div class="phone"><div class="input">학교 이름</div><div class="input focus">한국외국어대학교</div><div class="input">학과</div></div><div class="spec"><span>--ring 0 0 0 3px rgba(39,80,143,.18)</span></div></div>
-      <div class="col"><div class="col-label">바꿨을 때<b>2px 불투명 강조색</b></div><div class="phone alt-ring-apple"><div class="input">학교 이름</div><div class="input focus">한국외국어대학교</div><div class="input">학과</div></div><div class="spec"><span>--ring 0 0 0 2px #27508f · 테두리 같은 색</span></div></div>
+      <div class="col"><div class="col-label">지금</div><div class="phone"><div class="input">학교 이름</div><div class="input focus">한국외국어대학교</div><div class="input">학과</div></div><div class="spec"><span>--ring 0 0 0 2px rgba(39,80,143,.5) · 2026-09-11 적용</span></div></div>
+      <div class="col"><div class="col-label">바꿨을 때<b>2px 불투명 강조색</b></div><div class="phone alt-ring-apple"><div class="input">학교 이름</div><div class="input focus">한국외국어대학교</div><div class="input">학과</div></div><div class="spec"><span>Apple: 0 0 0 2px #27508f 불투명 · 테두리 같은 색</span></div></div>
     </div>
-    <p class="after-note">참고안 둘이 <b>"2px · 또렷하게"</b>로 같습니다. 지금 것은 부드럽지만 키보드로 다니는 사용자에게는 어디에 있는지 흐릿합니다. <span>바꾸면 <code>--ring</code> 한 줄입니다. 5번(그림자)과 무관하게 먼저 해도 됩니다.</span></p>
+    <p class="after-note">참고안 둘이 <b>"2px · 또렷하게"</b>로 같고, 개발자 결정으로 Linear 값(50%)이 이미 들어갔습니다. Apple 은 링을 불투명하게 칠하는데 폰에서 두 값의 차이는 거의 보이지 않습니다. <span>그대로 두는 것을 권합니다.</span></p>
   </section>
-  <!-- 14 -->
-  <section class="plate" id="p14">
+  <!-- 20 -->
+  <section class="plate" id="p20">
     <div class="plate-head">
-      <div class="no">14</div>
+      <div class="no">20</div>
       <div><h2>누름 반응 — 0.98 vs 0.95 · 버튼만 vs 전부</h2>
         <div class="rules"><span class="apl">Apple: 모든 버튼의 눌림은 <b><code>transform: scale(0.95)</code></b> 하나 — 시스템 전체 공용 미세 반응</span><span class="lin">Linear: 명시 없음</span><span>지금: <code>.btn:active</code> 만 0.98 · 칩·아이콘·카드는 배경색만 바뀜</span></div></div>
       <span class="verdict rec">바꾸는 쪽 권함 · 규칙 한 곳</span>
@@ -324,10 +326,10 @@
     </div>
     <p class="after-note">차이는 3% 지만 뜻이 다릅니다 — Apple 은 "누를 수 있는 것은 전부 같은 방식으로 반응한다"를 규칙으로 삼고, 지금 앱은 큰 버튼만 살짝 줄어듭니다. <b>칩과 아이콘 버튼이 눌러도 아무 반응이 없는 것</b>이 "AI 스럽다·정적이다"(2026-09-09 개발자 지적)의 한 갈래일 수 있습니다. <span>바꾸면 <code>interactions.js</code>·<code>style.css</code> 「③ 상호작용」 묶음 한 곳입니다. 0.95 가 과하면 0.97 로 — 값보다 <b>전부에 거는 것</b>이 요점입니다.</span></p>
   </section>
-  <!-- 15 -->
-  <section class="plate" id="p15">
+  <!-- 21 -->
+  <section class="plate" id="p21">
     <div class="plate-head">
-      <div class="no">15</div>
+      <div class="no">21</div>
       <div><h2>히어로 금액 — 소형 폰에서 두 줄 vs 폭에 따라 한 단 내림</h2>
         <div class="rules"><span class="apl">Apple: 히어로 글자는 폭에 따라 <b>56 → 40 → 34 → 28</b> 로 내려간다(≤419px 에서 28)</span><span class="lin">Linear: 명시 없음</span><span>지금: 38px 고정 · <b>360px 폰에서 "최대 1,405만원" 이 두 줄</b>(오늘 실측)</span></div></div>
       <span class="verdict rec">바꾸는 쪽 권함 · 한 단계</span>
@@ -362,9 +364,9 @@
       <tr><td>2</td><td>강조색</td><td>#0066cc 하나</td><td>#27508f 하나</td><td>"하나만"이라는 구조는 이미 같습니다. 값을 Apple 파랑으로 바꾸면 형광 파랑에 가까워져 2026-08-31 지시("형광 파랑으로 돌아가지 말 것")와 부딪힙니다.</td></tr>
       <tr><td>3</td><td>서체</td><td>SF Pro · 대체는 Inter</td><td>Pretendard 한 벌</td><td>2026-09-11 개발자 지시로 되돌린 자리. Inter·SF Pro 에는 한글이 없습니다.</td></tr>
       <tr><td>11</td><td>데스크톱</td><td>1440 그릇 · 5→4→3→2→1열</td><td>480 폰 프레임 가운데</td><td>설치형 모바일 PWA. 1440·1068·833·640px 에서 오늘 재 보니 가로 넘침 없이 폰 프레임이 가운데에 섭니다.</td></tr>
-      <tr><td>12</td><td>뜻을 가진 색</td><td>문서에 없음(오류 상태 미기록)</td><td>빨강·주황·초록</td><td>Apple 은 마케팅 페이지라 오류·마감 상태가 없습니다. 이 앱은 마감 임박을 색 없이 말할 방법이 없습니다.</td></tr>
-      <tr><td>16</td><td>본문 크기</td><td>17px · 줄간격 1.47</td><td>14.5px · 1.5</td><td><b>2026-09-11 개발자 지시("글씨 크기도 줄여")로 17 → 14.5 로 되돌린 바로 그 값</b>입니다. 다시 묻지 않습니다.</td></tr>
-      <tr><td>17</td><td>절 가르기</td><td>밝은 판 ↔ 어두운 판을 번갈아 — 색이 바뀌는 것이 곧 구분선</td><td>얇은 선 1px + 40px 여백</td><td>Linear 는 이 앱과 같은 편(얇은 선). 목록 앱에서 판을 번갈아 칠하면 카드가 면을 갖게 되어 「카드는 선으로 가른다」가 무너집니다. 이 앱의 "어두운 판" 은 홈 히어로 하나로 충분합니다.</td></tr>
+      <tr><td>12</td><td>뜻을 가진 색</td><td>문서에 없음(오류 상태 미기록)</td><td>역할 셋 · 색조 둘(빨강·초록 — 2026-09-11 적용)</td><td>Apple 은 마케팅 페이지라 오류·마감 상태가 없어 견줄 것이 없습니다. 이 앱은 마감 임박을 색 없이 말할 방법이 없습니다.</td></tr>
+      <tr><td>22</td><td>본문 크기</td><td>17px · 줄간격 1.47</td><td>14.5px · 1.5</td><td><b>2026-09-11 개발자 지시("글씨 크기도 줄여")로 17 → 14.5 로 되돌린 바로 그 값</b>입니다. 다시 묻지 않습니다.</td></tr>
+      <tr><td>23</td><td>절 가르기</td><td>밝은 판 ↔ 어두운 판을 번갈아 — 색이 바뀌는 것이 곧 구분선</td><td>얇은 선 1px + 40px 여백</td><td>Linear 는 이 앱과 같은 편(얇은 선). 목록 앱에서 판을 번갈아 칠하면 카드가 면을 갖게 되어 「카드는 선으로 가른다」가 무너집니다. 이 앱의 "어두운 판" 은 홈 히어로 하나로 충분합니다.</td></tr>
     </table></div>
   </section>
 
@@ -386,5 +388,5 @@
     </table></div>
   </section>
 
-  <p class="note" style="margin-top:28px">답하실 때는 번호마다 <b>(a) 유지 / (b) 바꿈</b> 만 적어 주시면 됩니다. <b>5·6·7·9·13·14</b> 는 전부 덜어내거나 한 줄 고치는 방향이라 한 번에 하는 것이 자연스럽고, <b>10</b> 은 실제 앱에 임시로 적용해 폰으로 보신 뒤 정하는 것을 권합니다. <b>15</b> 는 360px 폰을 쓰는 학생이 지금도 보고 있는 화면이라 먼저 해도 됩니다. 정하기 전까지 <code>style.css</code> 는 한 줄도 바꾸지 않았습니다.</p>
+  <p class="note" style="margin-top:28px">답하실 때는 번호마다 <b>(a) 유지 / (b) 바꿈</b> 만 적어 주시면 됩니다. <b>5·6·9·20</b> 은 전부 덜어내거나 한 줄 고치는 방향이라 한 번에 하는 것이 자연스럽고, <b>10</b> 은 실제 앱에 임시로 적용해 폰으로 보신 뒤 정하는 것을 권합니다. <b>21</b> 은 360px 폰을 쓰는 학생이 지금도 보고 있는 화면이라 먼저 해도 됩니다. 7·12·13 은 이미 적용돼 있어 다시 물을 것이 없습니다. 이 대조판을 만들면서 <code>style.css</code> 는 한 줄도 바꾸지 않았습니다.</p>
 </div>

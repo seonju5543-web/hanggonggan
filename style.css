@@ -4064,3 +4064,77 @@ body,
 .trash-empty { text-align: center; padding: var(--space-24) 0; }
 .trash-empty-title { font-size: var(--t-lg); font-weight: 800; letter-spacing: -0.02em; }
 .trash-empty-sub { font-size: var(--t-sm); color: var(--text-sub); line-height: 1.65; margin-top: var(--space-8); }
+
+/* ══ 디자인 시스템 반영 — 개발자 결정 7·12·13·16·18·19 (2026-09-11 · 11번은 지시로 뺌) ═══════════════
+   DESIGN.md 「Linear 와 충돌 · 컨펌 대기」와 대조판(docs/designs/mockups/design-conflicts.html)을
+   보고 개발자가 번호별로 정했다. **여기 적힌 번호 밖은 건드리지 않는다**("나머지는 건들지 말아줘").
+   🔴 새 색·새 글자 크기·새 그림자를 만들지 않았다 — 있는 토큰의 값을 바꾸거나 자리를 옮겼을 뿐이다.
+   🔴 지금 값이 궁금하면 이 블록이 아니라 DESIGN.md 를 본다(관문이 CSS 와 같은지 센다). */
+:root {
+  /* 12 · 뜻을 가진 색을 셋 → 둘(빨강·초록). '검수 전 · 컨펌 대기'(orange 역할)는 **그대로 남기고**
+     빨강 색조로 칠한다. 🔴 --orange 를 지우지 말 것 — 스무 곳이 그 이름을 부른다. 값만 --red 와 같다. */
+  --orange:      #8f3a2e;
+  --orange-weak: #f5e9e6;
+  /* 13 · 포커스 링 — Linear 값(2px · 50%). 전엔 3px 18% 라 폰에서 거의 안 보였다 */
+  --ring:        0 0 0 2px rgba(39, 80, 143, 0.5);
+}
+/* 12 · 팔레트 밖에 남아 있던 주황 한 곳도 같은 색조로 */
+.esc-badge.esc-soft { color: var(--orange); }
+
+/* 7 · 선택된 칩 — 칠하지 않고 **면을 한 단 올린다**(surface-2 + 강조색 글자 + 얇은 선).
+   칠한 파랑이 화면에서 제일 진한 덩어리라 눈이 제목보다 필터에 먼저 갔다. */
+.chip.active, .filter-chip.active {
+  background: var(--surface-2);
+  border-color: var(--accent-line);
+  color: var(--accent);
+  box-shadow: none;
+}
+
+/* 16 · 입력칸 오류 상태 — 브라우저가 '틀렸다'고 아는 값(4.5 를 넘긴 평점 · 30 을 넘긴 학점)에만.
+   :user-invalid 는 학생이 손댄 뒤에만 켜져 아직 안 쓴 빈 칸은 빨개지지 않는다.
+   ⚠️ 문구는 새로 만들지 않았다(지시: 텍스트 무변경) — 테두리와 링으로만 말한다.
+   ⚠️ 링은 box-shadow 가 아니라 outline — 그림자 토큰 관문(ui-tone ④)을 지키기 위해서다. */
+input:user-invalid, select:user-invalid, textarea:user-invalid { border-color: var(--red); }
+/* 틀린 칸에 포커스가 오면 링도 빨강 — 파란 링이 빨간 테두리 위에 겹치면 두 말을 동시에 한다(코드 리뷰 지적) */
+input:user-invalid:focus-visible, select:user-invalid:focus-visible, textarea:user-invalid:focus-visible { outline-color: var(--red); }
+input:user-invalid:focus, select:user-invalid:focus, textarea:user-invalid:focus { box-shadow: none; }
+
+/* 12 의 후속 — 코드 리뷰가 잡은 '뜻이 섞이는 자리' 둘. 색조를 둘로 줄이자 '모른다'가 '떨어진다'와 같은
+   빨강이 됐다. 🔴 틀린 미달은 못 받는 것보다 나쁘다(CLAUDE.md) — 모르는 것은 회색으로 말한다. */
+.r-unk { color: var(--text-sub); }                 /* 상세 시트 자격 줄의 ? */
+.sch-fit.fit-orange { color: var(--text-sub); }    /* 적합도 20~39% — 빨강이면 20% 미만(회색)보다 나빠 보인다 */
+
+/* 18 · 구획 이름표(eyebrow) — 제목 크기를 작은 이름표로 내린다. 🔴 한글이라 양수 자간은 안 준다.
+   개발자 지시: 작아진 것 중 **중요한 내용이 든 것은 색으로 강조 — 검은색**. 마감을 말하는 구획만 먹색,
+   나머지 구획은 회색. 건수(.list-group-n)는 강조색 그대로. */
+.section-head h3,
+.list-group-head {
+  font-family: var(--font-text);
+  font-size: var(--t-xs);
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--text-sub);
+}
+.list-group:first-child .list-group-head,
+.section-head:has(+ #home-deadline-list) h3 { color: var(--text); }
+
+/* 18 의 후속 — 개발자 지적 (2026-09-11 폰 실측 화면):
+   ① 홈의 구획 머리(마감 임박 · 전체 보기)와 첫 카드가 붙어 있다 — 아래 여백이 0 이었다 → 16px.
+   ② 탐색의 구획 이름표(이번 주 · 이번 달 · 마감일 확인 중)가 카드 글자보다 왼쪽으로 튀어나온다 —
+      목록은 좌우로 꽉 차게 펼쳐지는데 이름표만 4px 여백이라 그렇다 → 카드 글자와 같은 20px 로. */
+.section-head { margin-bottom: var(--sp-2); }
+.list-group-head { padding-left: var(--space-20); padding-right: var(--space-20); }
+
+/* 19 · 눌린 탭 표시 — 점(4px 원)이 아니라 선. 옅은 글자 대비는 개발자 지시로 건드리지 않는다. */
+.nav-item.active::after {
+  width: 18px;
+  height: 2px;
+  left: calc(50% - 9px);
+  margin-left: 0;
+  border-radius: var(--radius-pill);
+  top: 0;
+}
+
+/* 11 · 데스크톱 — 개발자 지시(2026-09-11)로 **적용하지 않는다**. 480px 폰 프레임 그대로.
+   (한때 ≥1024px 두 칸 배치를 넣었다가 같은 날 되돌렸다 — 다시 넣지 말 것.) */
+}
