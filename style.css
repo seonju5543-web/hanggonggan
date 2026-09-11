@@ -4118,6 +4118,13 @@ input:user-invalid:focus, select:user-invalid:focus, textarea:user-invalid:focus
 .list-group:first-child .list-group-head,
 .section-head:has(+ #home-deadline-list) h3 { color: var(--text); }
 
+/* 18 의 후속 — 개발자 지적 (2026-09-11 폰 실측 화면):
+   ① 홈의 구획 머리(마감 임박 · 전체 보기)와 첫 카드가 붙어 있다 — 아래 여백이 0 이었다 → 16px.
+   ② 탐색의 구획 이름표(이번 주 · 이번 달 · 마감일 확인 중)가 카드 글자보다 왼쪽으로 튀어나온다 —
+      목록은 좌우로 꽉 차게 펼쳐지는데 이름표만 4px 여백이라 그렇다 → 카드 글자와 같은 20px 로. */
+.section-head { margin-bottom: var(--sp-2); }
+.list-group-head { padding-left: var(--space-20); padding-right: var(--space-20); }
+
 /* 19 · 눌린 탭 표시 — 점(4px 원)이 아니라 선. 옅은 글자 대비는 개발자 지시로 건드리지 않는다. */
 .nav-item.active::after {
   width: 18px;
