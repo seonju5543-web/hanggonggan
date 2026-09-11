@@ -73,8 +73,15 @@
   --knob:         0 1px 3px rgba(58, 48, 28, 0.26);
 
   /* 글자 크기 9단 — 그대로 둔다(앞선 세션이 27종에서 줄여 놓은 자산이다).
-     🔴 2026-09-11 개발자 지시로 **페이스리프트의 크기 조정을 전부 되돌렸다.**
-        이 아홉 값은 페이스리프트 이전(2026-09-10 전) 값이다. 임의로 다시 키우지 말 것. */
+     히어로만 조금 키우고 자간을 조였다: 큰 글자는 자간을 좁혀야 덩어리로 읽힌다. */
+  /* 🔴 **페이스리프트 이전 척도로 되돌렸다** (2026-09-11 개발자 지시 — "글씨 크기도 줄여").
+     2026-09-10 에 본문을 14.5 → 17px 로 키웠는데, 배포된 앱을 보고 크다고 하셨다.
+     ⚠️ 되돌리면 아래 네 단계(11.5 · 12.5 · 13.5 · 14.5)가 3px 안에 다시 몰린다.
+        그게 페이스리프트가 키웠던 이유였지만, 화면을 보는 사람이 정한다.
+        그래서 말투·토큰 관문(verify/ui-tone.mjs)의 '단계 간 최소 배율'도 이 척도에
+        맞춰 함께 낮췄다 — 검사만 남겨 두면 통과할 수 없는 관문이 된다.
+     🔴 같은 날 더 넓은 지시가 이어졌다 — "앱 내에서 크기 조정 부분 모두 다시 되돌려".
+        그래서 여백·자간·숫자정렬까지 함께 되돌렸다. 임의로 다시 키우지 말 것. */
   --t-2xs: 11.5px;
   --t-xs:  12.5px;
   --t-sm:  13.5px;
@@ -83,7 +90,12 @@
   --t-xl:  18.5px;
   --t-2xl: 21px;
   --t-3xl: 27px;
-  --t-hero: 38px;
+  --t-hero: 38px;   /* 금액 하나뿐 */
+
+  /* 자간 — 전에는 화면 곳곳에 9가지가 흩어져 있었다. 큰 글자는 좁히고 작은 글자·숫자는 안 좁힌다. */
+  --track-display: -0.03em;   /* 24px 이상 */
+  --track-text:    -0.01em;   /* 본문 */
+  --track-flat:    0;         /* 숫자 · 배지 · 영문 약자 */
 
   /* 움직임 — 스프링에 가까운 곡선 하나로 통일. 요소마다 다른 곡선을 쓰면 '덜 만든 앱'이 된다 */
   --ease: cubic-bezier(0.32, 0.72, 0, 1);
@@ -97,9 +109,24 @@ html { -webkit-text-size-adjust: 100%; }
    pan-x pan-y 는 '손가락으로 밀기는 되고 벌려서 확대는 안 된다' 는 뜻이다 —
    목록 스크롤도, 카드를 옆으로 미는 손짓도 그대로 동작한다(검사로 확인). */
 html { touch-action: pan-x pan-y; }
-body {
-  font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
+/* 서체 — **Pretendard 한 벌** (2026-09-11 개발자 지시로 되돌림).
+   2026-09-10 페이스리프트가 본문 SUIT · 제목 SUITE 로 바꿨는데, 개발자가 배포된 앱을 보고
+   "폰트 바뀌었어 예전으로 돌리고"라고 해서 되돌렸다. 같은 지시로 글자 크기도 줄였다.
+   🔴 다시 바꾸자는 제안이 나오면, 그때는 **개발자에게 화면을 보여 주고** 정한다 —
+      지난번엔 조사만 근거로 바꿨다가 되돌아왔다. */
+:root {
+  /* 🔴 **Pretendard 한 벌이다** (2026-09-11 개발자 지시로 되돌림 — "폰트 바뀌었어 예전으로 돌리고").
+     2026-09-10 페이스리프트가 SUIT(본문)·SUITE(제목)로 바꾼 것을 원래대로 돌렸다.
+     칸 이름(--font-text · --font-display)은 그대로 둔다 — 이 이름을 쓰는 자리가
+     이미 여럿이라(.sch-amount 등) 이름을 지우면 그 자리들이 기본 글꼴로 떨어진다.
+     지금은 둘이 같은 글꼴을 가리키고, 제목은 굵기와 자간으로만 구분한다. */
+  --font-text: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
     'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', system-ui, sans-serif;
+  --font-display: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
+    'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', system-ui, sans-serif;
+}
+body {
+  font-family: var(--font-text);   /* = Pretendard 한 벌 (2026-09-11 되돌림) */
   background: var(--bg);
   color: var(--text);
   line-height: 1.55;
@@ -1850,8 +1877,51 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
 }
 .legal-table th { background: var(--bg); color: var(--text); font-weight: 700; }
 .legal-tmp { color: var(--orange); font-weight: 600; }
-.legal-date { font-size: var(--t-xs); color: var(--text-weak); margin-top: 20px; }
-.legal-actions { margin-top: 24px; }
+.legal-date { font-size: var(--t-xs); color: var(--text-weak); margin-top: var(--space-20); }
+/* 🔴 약관 표는 좁은 화면에서 **줄줄이 펴진다** (2026-09-11 개발자 지시 "표도 고쳐줘").
+   표가 칸 3~4개인데 폰 폭이 320~390px 이라, 마지막 칸이 60px 남짓으로 눌려
+   '해당 자격이 있어야 지원할 수 있는 장학금 매칭' 이 다섯 줄로 잘려 있었다.
+   ⚠️ 가로 스크롤로 풀지 않는다 — 이 앱은 본문이 가로로 밀리지 않는 것이 규칙이고,
+      개인정보 고지는 **끝까지 읽히는 것**이 목적이라 옆으로 숨기면 안 된다.
+   ⚠️ 머리글 줄은 숨기고, 각 칸이 자기 이름표(data-label)를 달고 나온다.
+      이름표가 없으면 펴진 뒤 그 값이 무엇인지 알 수 없다 — HTML 의 data-label 과 한 세트다.
+   문턱 560px: 그 위(태블릿·PC)에서는 표가 표로 읽히는 편이 낫다. */
+@media (max-width: 560px) {
+  .legal-table, .legal-table tbody, .legal-table tr, .legal-table td { display: block; width: 100%; }
+  .legal-table .legal-thead { display: none; }
+  .legal-table tr {
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--space-8);
+    padding: var(--space-4) var(--space-12);
+    background: var(--surface);
+  }
+  .legal-table td {
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    padding: var(--space-8) 0;
+  }
+  .legal-table tr td:last-child { border-bottom: 0; }
+  /* 이름표 — 값보다 작고 진하게. 값이 주인공이라 이름표가 커지면 안 된다. */
+  .legal-table td::before {
+    content: attr(data-label);
+    display: block;
+    font-size: var(--t-2xs);
+    font-weight: 700;
+    color: var(--text-weak);
+    margin-bottom: var(--space-2);
+  }
+}
+
+/* 🔴 약관 화면 머리줄 (2026-09-11 개발자 지적 — "글자가 박스 안에 맞지 않는다").
+   제목이 '이용약관 · 개인정보처리방침' 14 글자라 화면 제목 크기로 두면 좁은 폰에서
+   좌우 여백을 다 먹고 가장자리에 붙는다(320px 에서 실측 280/280 — 여백 0).
+   왼쪽에 되돌아가기 화살표까지 들어오므로 **한 단계 줄이고 두 줄을 허용한다.**
+   ⚠️ 화살표와 제목은 위를 맞춘다 — 두 줄이 되면 가운데 맞춤은 화살표가 아래로 처진다. */
+.legal-header { align-items: flex-start; margin-bottom: var(--space-16); }
+.legal-header h2 { font-size: var(--t-lg); line-height: 1.35; padding-top: var(--space-6); }
+
+.legal-actions { margin-top: var(--space-24); }
 .legal-actions .btn { display: inline-block; text-decoration: none; }
 
 /* 로그인 부속 — 아이디 저장 · 비밀번호 찾기 · 소셜 (2026-08-25) */
@@ -3802,12 +3872,28 @@ button, input, select, textarea { letter-spacing: inherit; }
    고친 방식 — **팔레트를 늘리지 않고 있는 것을 쓴다.** 새 색을 만들지 않았다.
    ══════════════════════════════════════════════════════════════════════════ */
 
-/* ── 서체·자간·숫자정렬 작업은 되돌렸다 (2026-09-11 개발자 지시) ──────────────
-   여기 있던 셋(제목 SUITE · 자간 세 단계 · tabular-nums 확대)은 전부 뺐다.
-   🔴 다시 넣지 말 것 — 개발자가 "글자에서 한국어 줄바꿈 빼고 모두 되돌려" 라고 지시했다.
-      남은 것은 이 파일 맨 끝의 `word-break: keep-all` 한 절뿐이다.
-   ⚠️ 베이스라인에 이미 있던 규칙(`.sch-amount, .fit-pct, .nf-badge` 의 tabular-nums,
+/* ── 제목이 쓰는 칸 ────────────────────────────────────────────────────────
+   🔴 2026-09-11 부터 --font-display 와 --font-text 는 **같은 글꼴(Pretendard)** 이다.
+      그래서 이 규칙은 지금 화면을 바꾸지 않는다 — 제목은 굵기와 자간으로만 구분된다.
+      지우지 않고 두는 이유: 나중에 제목용 글꼴을 따로 쓰기로 하면 **여기 한 곳만**
+      고치면 되고, 지우면 그 자리를 화면 곳곳에서 다시 찾아내야 한다. */
+.hero-amount,
+.home-greet,
+.page-header h2,
+.onboard-body h2,
+.onboard-hero h1,
+.section-head h3,
+.sheet-title,
+.list-group-head {
+  font-family: var(--font-display);
+}
+
+/* ── 자간·숫자정렬 작업은 뺐다 (2026-09-11 개발자 지시) ────────────────────
+   여기 있던 둘(자간 세 단계 · tabular-nums 확대)은 "글자에서 한국어 줄바꿈 작업 빼고
+   모두 다시 되돌려" 지시에 따라 걷어냈다. 🔴 다시 넣지 말 것.
+   ⚠️ 베이스라인에 원래 있던 규칙(`.sch-amount, .fit-pct, .nf-badge` 의 tabular-nums,
       제목의 letter-spacing -0.032em)은 원래 것이라 그대로 살아 있다. */
+
 
 /* ── 색을 실제로 쓴다 ──────────────────────────────────────────────────────
    🔴 **새 색을 만들지 않는다.** 이미 있는 --accent 를 쓰지 않던 자리에 쓸 뿐이다.
@@ -3866,3 +3952,38 @@ body,
   word-break: keep-all;
   overflow-wrap: break-word;
 }
+
+/* ══ 설정 화면 (2026-09-11 · 개발자 목업 승인) ══════════════════════════════
+   MY 오른쪽 위 톱니 → '설정'. 계정·알림은 MY 가 쓰던 #my-account · #my-notify 를
+   **그대로 옮겨 온 것**이라 위의 절 제목·스위치 규칙이 그대로 적용된다.
+   여기서는 새로 생긴 것(머리줄·톱니·메뉴·휴지통)만 적는다. */
+
+/* MY 머리줄 — 제목 왼쪽, 톱니 오른쪽 */
+.page-header-row { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-12); }
+.page-header-row .icon-btn { margin-right: calc(var(--space-8) * -1); flex-shrink: 0; }
+
+/* 안쪽 화면(설정·휴지통) 머리줄 — 뒤로 + 제목.
+   🔴 여기에는 제목 밑 강조선(.page-header h2::after)을 두지 않는다. 그 선은 '탭 하나'를
+      뜻하는 표시라, 안쪽 화면에까지 그으면 뒤로 갈 곳이 없는 화면처럼 보인다. */
+.sub-header { display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-20); }
+.sub-back {
+  margin-left: calc(var(--space-8) * -1);
+  padding: var(--space-8);
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  transition: background 0.15s;
+}
+.sub-back:hover { background: rgba(18, 22, 31, 0.05); }
+.sub-back svg { width: 24px; height: 24px; display: block; }
+.sub-header h2 { font-size: var(--t-2xl); font-weight: 800; letter-spacing: -0.035em; line-height: 1.3; }
+
+/* 휴지통·이용약관·탈퇴 — 기존 .my-menu 줄을 그대로 쓰고 간격만 벌린다 */
+.set-menu { margin-top: var(--sp-3); }
+.set-menu a.my-menu-item { color: inherit; text-decoration: none; }
+.set-note { font-size: var(--t-xs); color: var(--text-sub); line-height: 1.65; margin-bottom: var(--space-16); }
+
+/* 휴지통 목록 — 서류 보관함 줄(.wallet-row)과 같은 꼴이라 새로 만들 게 거의 없다 */
+.trash-title { font-size: var(--t-md); font-weight: 600; }
+.trash-empty { text-align: center; padding: var(--space-24) 0; }
+.trash-empty-title { font-size: var(--t-lg); font-weight: 800; letter-spacing: -0.02em; }
+.trash-empty-sub { font-size: var(--t-sm); color: var(--text-sub); line-height: 1.65; margin-top: var(--space-8); }

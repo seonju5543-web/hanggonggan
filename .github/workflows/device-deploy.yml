@@ -1,0 +1,244 @@
+name: 이 기기에서 배포 (작업 브랜치 → 앱)
+
+# 왜 필요한가 (2026-09-11 개발자 지시 — "이 기기로도 메인에 배포 가능하게"):
+#   앱(GitHub Pages)은 **main 브랜치만** 배포한다. 그동안 배포로 가는 길은 둘뿐이었다.
+#     ① 사람이 세 브랜치(main·기본·작업)에 손으로 같은 내용을 push 하는 관례
+#     ② 로봇이 기본 브랜치에 커밋하면 deploy-sync.yml 이 main 으로 밀어 올리는 길
+#   그런데 **기기마다 세션이 자기 작업 브랜치 하나만 쓰는** 환경(Claude Code 웹 세션 등)에서는
+#   ①이 막힌다. 그 브랜치는 기본 브랜치에도 main 에도 연결된 길이 없어서, 아무리 작업해도
+#   앱에는 한 글자도 안 나간다. 이 워크플로가 그 **세 번째 길**이다.
+#
+# 방향: 작업 브랜치 → 기본 브랜치 → main.  (기본 브랜치를 건너뛰지 않는 이유가 중요하다 —
+#   건너뛰면 그 작업이 기본 브랜치에 없어서 **다음 세션이 그 내용이 빠진 옛 판 위에서** 작업하고,
+#   배포 동기화 로봇이 매번 같은 지점에서 부딪힌다. main-guard.yml 이 존재하는 이유와 같은 문제다.)
+#
+# 🔴 main 까지 이 워크플로가 직접 밀어 올리는 이유: GitHub 규칙상 **로봇이 올린 push 는 다른
+#   워크플로를 깨우지 못한다.** 그래서 기본 브랜치에만 저장하고 deploy-sync 에 맡기면
+#   '하루 2회 보정'에 걸릴 때까지 최대 12시간 앱에 안 나간다. 사람이 배포를 누른 것이므로 기다리게
+#   하지 않는다. (수집 로봇이 main 에 직접 저장하면 안 되는 것과는 다른 이야기다 — 그쪽은 '읽는 곳과
+#   쓰는 곳이 갈리면 seen.json 이 안 늘어난다'는 문제이고, 이 워크플로는 기록장을 쓰지 않는다.)
+
+on:
+  # ① Actions 탭에서 버튼으로 (배포할 브랜치를 골라 실행)
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: '배포할 작업 브랜치 (비우면 이 워크플로를 실행한 브랜치)'
+        required: false
+        default: ''
+  # ② 표식 파일을 고쳐서 push 하면 (push-to-run — collector/run-*.txt 와 같은 방식).
+  #    GitHub 연결이 없는 세션도 버튼 없이 배포할 수 있어야 해서 둘 다 둔다.
+  #    🔴 브랜치를 거르지 않는다 — push 트리거는 **그 브랜치에 있는 파일**로 도는데, 앞으로 생길
+  #    작업 브랜치 이름을 여기 미리 적어 둘 수 없기 때문이다. 대신 아래 '표식 확인' 단계가
+  #    표식 파일의 branch 줄과 실제 push 된 브랜치가 **같을 때만** 배포한다. 그래서 다른 세션이
+  #    기본 브랜치를 병합하며 이 파일을 딸려 받아도 그 사람의 작업이 앱에 나가지 않는다.
+  push:
+    paths: ['deploy/run-deploy.txt']
+
+permissions:
+  contents: write
+  issues: write
+
+# deploy-sync·main-guard 와 **다른** 그룹. 같은 그룹에 넣으면 GitHub 이 대기 중인 오래된 실행을
+# 취소해 버려서, 사람이 누른 배포가 조용히 사라진다.
+concurrency:
+  group: device-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # 브랜치 삭제 push 에는 돌지 않는다
+    if: github.event.deleted != true
+    runs-on: ubuntu-latest
+    # 시한이 없으면 GitHub 기본값 6시간이다. 하는 일은 merge + push 라 정상이면 1~2분.
+    timeout-minutes: 15
+    steps:
+      - name: 기본 브랜치 체크아웃
+        uses: actions/checkout@v4
+        with:
+          ref: claude/nice-heisenberg-WESq5
+          fetch-depth: 0        # 병합 판단에 전체 이력이 필요하다
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # 로봇 기록장(공고 목록·본 공고 장부)이 양쪽에서 달라졌을 때 자동으로 합쳐 준다.
+      # 이게 없으면 아래 병합이 사소한 데이터 차이로도 멈춘다 (COLLAB.md 참조).
+      - name: 협업 병합기 등록
+        run: bash tools/setup-collab.sh
+
+      - name: 작업 브랜치 → 기본 브랜치 → main
+        id: run
+        env:
+          BASE: claude/nice-heisenberg-WESq5
+          EVENT: ${{ github.event_name }}
+          INPUT_BRANCH: ${{ inputs.branch }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          set -u
+          git config user.name "handaejang-device-deploy-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          SRC="${INPUT_BRANCH:-}"
+          [ -z "$SRC" ] && SRC="$REF_NAME"
+          echo "src=$SRC" >> "$GITHUB_OUTPUT"
+          echo "배포 요청: $SRC → $BASE → main"
+
+          if [ "$SRC" = "main" ]; then
+            echo "ℹ️ main 은 앱이 배포되는 브랜치 그 자체라 배포 대상이 아니에요."
+            echo "state=skipped" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+
+          if ! git fetch origin "$SRC" "$BASE" main; then
+            echo "❌ '$SRC' 브랜치를 찾지 못했어요."
+            echo "state=nobranch" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+
+          # ── 표식 확인 (push 로 깨어났을 때만) ──────────────────────────
+          # 표식 파일이 '지금 push 된 브랜치'를 가리킬 때만 배포한다. 다른 세션이 기본 브랜치를
+          # 병합하며 이 파일을 딸려 받는 것만으로 그 사람의 작업이 앱에 나가면 안 되기 때문이다.
+          if [ "$EVENT" = "push" ]; then
+            want="$(git show "origin/$SRC:deploy/run-deploy.txt" 2>/dev/null \
+                    | sed -n 's/^[[:space:]]*branch:[[:space:]]*//p' | head -1 \
+                    | tr -d '\r' | sed 's/[[:space:]]*$//')"
+            if [ "$want" != "$SRC" ]; then
+              echo "ℹ️ 표식 파일이 '$want' 를 가리키고 있어 '$SRC' 는 배포하지 않아요."
+              echo "   (이 브랜치를 배포하려면 deploy/run-deploy.txt 의 branch 줄을 '$SRC' 로 바꾸세요.)"
+              echo "state=skipped" >> "$GITHUB_OUTPUT"; exit 0
+            fi
+          fi
+
+          # ── ① 작업 브랜치 → 기본 브랜치 ────────────────────────────────
+          if git merge-base --is-ancestor "origin/$SRC" HEAD; then
+            echo "기본 브랜치가 이미 이 작업을 담고 있어요 — 합칠 것 없음"
+          else
+            if ! git merge --no-edit "origin/$SRC" \
+                 -m "이 기기에서 배포: $SRC 작업을 기본 브랜치에 반영 (자동)"; then
+              git merge --abort || true
+              echo "state=conflict" >> "$GITHUB_OUTPUT"; exit 0
+            fi
+
+            # 데이터 관문 — 깨진 데이터가 기본 브랜치에 들어가면 다음 수집 로봇이 그걸 읽는다.
+            if ! node verify/audit-data.js; then
+              git reset --hard "origin/$BASE"
+              echo "state=auditfail" >> "$GITHUB_OUTPUT"; exit 0
+            fi
+
+            ok=0
+            for i in 1 2 3; do
+              if git push origin "HEAD:$BASE"; then ok=1; break; fi
+              # 그 사이 수집 로봇이 먼저 썼을 수 있다 — 다시 받아 합치고 재시도.
+              git fetch origin "$BASE" || true
+              if ! git merge --no-edit "origin/$BASE" -m "배포: 그 사이 들어온 수집분과 병합"; then
+                git merge --abort || true
+                echo "state=conflict" >> "$GITHUB_OUTPUT"; exit 0
+              fi
+            done
+            if [ "$ok" != "1" ]; then echo "state=pushfail" >> "$GITHUB_OUTPUT"; exit 0; fi
+          fi
+
+          # ── ② 기본 브랜치 → main (= 앱 배포) ───────────────────────────
+          git fetch origin "$BASE" main
+          git checkout -B deploy-head origin/main
+          if git merge-base --is-ancestor "origin/$BASE" HEAD; then
+            echo "main 이 이미 최신 — 배포할 변경 없음"
+            echo "state=uptodate" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+
+          ok=0
+          for i in 1 2 3; do
+            if ! git merge --no-edit "origin/$BASE" \
+                 -m "이 기기에서 배포: 기본 브랜치 내용을 main에 반영 (자동)"; then
+              git merge --abort || true
+              echo "state=conflict" >> "$GITHUB_OUTPUT"; exit 0
+            fi
+            if git push origin HEAD:main; then ok=1; break; fi
+            git fetch origin main && git reset --hard origin/main
+          done
+          if [ "$ok" != "1" ]; then echo "state=pushfail" >> "$GITHUB_OUTPUT"; exit 0; fi
+
+          echo "state=deployed" >> "$GITHUB_OUTPUT"
+
+      - name: 배포된 내용 요약
+        if: steps.run.outputs.state == 'deployed'
+        run: |
+          echo "✅ 앱 배포 완료 — 설치된 앱도 재설치 없이 자동 반영됩니다."
+          echo "   (실제 화면 반영 확인은 '실제 앱 반영 확인' 워크플로로)"
+          node -e "const n=require('./data/notices.json'),r=require('./data/registered.json');
+            const a=x=>Array.isArray(x)?x:(x.items||[]);
+            console.log('실시간 공고 '+a(n).length+'건 · 정식 등록 '+a(r).length+'건');"
+          git log --oneline -5
+
+      # 조용히 멈추지 않는다. 알림이 쌓이지 않게 열려 있는 같은 이슈가 있으면 코멘트만 단다.
+      - name: 🚨 배포 실패 알림
+        # 🔴 cancelled() 를 함께 본다 — 시간 초과는 '실패'가 아니라 '취소'로 끝나서
+        #    failure() 만 보면 알림 단계까지 통째로 건너뛴다 (2026-08-04 사고와 같은 유형).
+        if: >
+          failure() || cancelled() ||
+          steps.run.outputs.state == 'conflict' ||
+          steps.run.outputs.state == 'auditfail' ||
+          steps.run.outputs.state == 'pushfail' ||
+          steps.run.outputs.state == 'nobranch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          STATE: ${{ steps.run.outputs.state }}
+          SRC: ${{ steps.run.outputs.src }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -u
+          reason="${STATE:-error}"
+          src="${SRC:-?}"
+          case "$reason" in
+            conflict)  detail="작업 브랜치와 기본 브랜치가 같은 곳을 서로 다르게 고쳐서 자동으로 합칠 수 없습니다." ;;
+            auditfail) detail="합치는 것까지는 됐지만 결과가 데이터 검사를 통과하지 못해 배포하지 않았습니다." ;;
+            pushfail)  detail="저장(push)이 3회 모두 실패했습니다." ;;
+            nobranch)  detail="배포할 브랜치를 찾지 못했습니다 (이름이 맞는지 확인해 주세요)." ;;
+            *)         detail="실행 중 오류가 났거나 시간이 초과됐습니다." ;;
+          esac
+
+          body="작업 브랜치 \`$src\` 의 내용을 **앱(main)에 배포하지 못했습니다.**
+          사유: \`$reason\` — $detail
+
+          지금 그 작업은 사용자 앱에 보이지 않는 상태입니다.
+
+          다음 Claude 세션에서 아래를 실행해 손으로 합쳐 주세요.
+
+          \`\`\`
+          git fetch origin main claude/nice-heisenberg-WESq5 $src
+          git checkout -B deploy origin/claude/nice-heisenberg-WESq5
+          bash tools/setup-collab.sh
+          git merge origin/$src
+          # 충돌이 있으면 해결한 뒤
+          node verify/audit-data.js
+          git push origin HEAD:claude/nice-heisenberg-WESq5
+          git push origin HEAD:main
+          \`\`\`
+
+          규칙 문서: [COLLAB.md](https://github.com/$REPO/blob/main/COLLAB.md)
+          실행 기록: $RUN_URL
+
+          ---
+          _Generated by [Claude Code](https://claude.ai/code)_"
+
+          LABEL="device-deploy"
+          gh label create "$LABEL" --repo "$REPO" --color D93F0B \
+             --description "작업 브랜치를 앱(main)에 배포하지 못함" 2>/dev/null || true
+
+          existing=$(gh issue list --repo "$REPO" --state open --label "$LABEL" \
+                       --json number --jq '.[0].number // empty' 2>/dev/null || echo "")
+
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --repo "$REPO" --body "$body"
+            echo "기존 이슈 #$existing 에 코멘트를 남겼습니다 (알림 중복 방지)."
+          else
+            gh issue create --repo "$REPO" \
+              --title "🚨 이 기기에서 배포 실패 ($(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST)" \
+              --label "$LABEL" \
+              --assignee "${{ github.repository_owner }}" \
+              --body "$body" \
+            || gh issue create --repo "$REPO" \
+              --title "🚨 이 기기에서 배포 실패 ($(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST)" \
+              --body "$body"
+          fi

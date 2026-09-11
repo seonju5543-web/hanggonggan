@@ -235,7 +235,13 @@ const today = new Date();
     if (!/type: 'jpeg'/.test(src)) fail('C9', '-', '렌더러가 JPEG 를 안 뽑는다');
     // 🔴 Pages 배포 전에 컨테이너를 만들면 인스타가 404 를 받고 조용히 실패한다.
     //    ⚠️ 함수가 **있는지**가 아니라 **부르는지**를 봐야 한다 — 주석 처리해도 정의는 남는다.
-    if (!/^\s*await waitLive\(/m.test(pub)) fail('C9', '-', '그림이 공개됐는지 확인하지 않고 올린다');
+    //    🔴 그리고 **올리는 길 안에서** 불러야 한다. `--wait-only` 처럼 안 올리는 길에도
+    //       같은 줄이 생기면서, 파일 어디든 한 줄 있으면 통과하던 검사가 그 미끼를 보고
+    //       초록불이 됐다(2026-09-11 리뷰에서 red-green 으로 드러남). publish() 안만 본다.
+    const publishBody = pub.slice(pub.indexOf('export async function publish'));
+    if (!/^\s*await waitLive\(/m.test(publishBody)
+        || publishBody.indexOf('await waitLive(') > publishBody.indexOf('is_carousel_item'))
+      fail('C9', '-', '올리기 전에 그림이 공개됐는지 확인하지 않는다');
     // 🔴 올린 것을 기억 못 하면 내일 같은 공고를 다시 올린다(이슈 #75 유형).
     if (!/seen\.json/.test(pickSrc) || !/writeSeen/.test(pub))
       fail('C9', '-', 'seen.json 에 기록하지 않는다 — 같은 공고를 다시 올리게 된다');
@@ -250,7 +256,22 @@ const today = new Date();
   if (!/issues: write/.test(wf)) fail('C9', '-', '게시 워크플로에 이슈 권한이 없다');
     // 🔴 게시 단계가 다시 그리면 관리자가 본 것과 다른 공고가 올라간다.
     const pubJob = wf.slice(wf.indexOf('  publish:'));
+    const prepJob = wf.slice(wf.indexOf('  prepare:'), wf.indexOf('  publish:'));
     if (/render\.mjs/.test(pubJob)) fail('C9', '-', '게시 단계가 다시 그린다 — 준비된 것만 올려야 한다');
+    // 🔴 **예약은 준비까지만이다.** 예약 실행에는 inputs 가 통째로 없어서 `inputs.step` 이
+    //    빈 값이 된다 — 그러니 게시 작업의 조건은 **긍정형**이어야 꺼진다. `!startsWith`
+    //    로 뒤집는 순간 매주 아무도 안 본 카드가 브랜드 계정으로 나간다. 되돌릴 수 없다.
+    //    안내문에 적는 것은 리포트다(CLAUDE.md) — 여기서 강제한다.
+    if (/schedule:/.test(wf)) {
+      if (!/if: \$\{\{ startsWith\(inputs\.step, '게시'\) \}\}/.test(pubJob))
+        fail('C9', '-', '예약이 게시까지 간다 — 게시 조건이 긍정형 startsWith 가 아니다');
+      if (/--publish/.test(prepJob))
+        fail('C9', '-', '준비 작업이 --publish 를 쓴다 — 예약이 사람 없이 올리게 된다');
+    }
+    // 🔴 주소를 워크플로에 베끼지 말 것 — publish.mjs 가 유일한 집이다(그 파일 머리말).
+    //    베끼면 기다리는 주소와 이슈에 박는 주소가 갈라져, 확인은 초록불인데 깨진 그림이 간다.
+    if (/github\.io\/hanggonggan/.test(wf))
+      fail('C9', '-', '워크플로에 공개 주소가 박혀 있다 — publish.mjs 에서 받아 써야 한다');
     // C10 · 토큰 만료 감시 — 🔴 만료되면 **조용히** 게시가 멈춘다(노션 F-4 와 같은 유형).
   //    못 물어본 것을 '괜찮다' 로 읽으면 두 달 뒤에나 안다. 갈래를 전부 시험한다.
   {
