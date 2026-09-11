@@ -9,6 +9,29 @@ const { assertOwnServer, dismissNotify } = require('./onboard-helper.js');
 const PORT = process.env.PORT || 8123;
 const SHOT = process.env.SHOT_DIR || '/tmp/shots';
 
+
+/* 🔴 진짜 손가락 끌기 — Playwright 의 마우스로는 touchstart/move/end 가 안 난다.
+   이 저장소는 마우스로 재다가 손짓 사고를 세 번 놓쳤다(CLAUDE.md 13차 세션). */
+async function swipe(page, { x, y, dx, dy = 0, steps = 10 }) {
+  await page.evaluate(([x, y, dx, dy, steps]) => {
+    const el = document.elementFromPoint(x, y);
+    if (!el) throw new Error('그 자리에 아무것도 없다: ' + x + ',' + y);
+    const mk = (type, cx, cy) => {
+      const t = new Touch({ identifier: 1, target: el, clientX: cx, clientY: cy });
+      el.dispatchEvent(new TouchEvent(type, {
+        bubbles: true, cancelable: true,
+        touches: type === 'touchend' ? [] : [t],
+        targetTouches: type === 'touchend' ? [] : [t],
+        changedTouches: [t],
+      }));
+    };
+    mk('touchstart', x, y);
+    for (let i = 1; i <= steps; i++) mk('touchmove', x + (dx * i) / steps, y + (dy * i) / steps);
+    mk('touchend', x + dx, y + dy);
+  }, [x, y, dx, dy, steps]);
+  await page.waitForTimeout(320);
+}
+
 let fail = 0;
 const eq = (label, got, want) => {
   const ok = JSON.stringify(got) === JSON.stringify(want);
@@ -88,12 +111,43 @@ const eq = (label, got, want) => {
   eq('스위치가 5개', await page.$$eval('#my-notify .nf-switch', (e) => e.length), 5);
 
   console.log('\n■ 덧붙인 세 줄 — 휴지통 · 이용약관 · 탈퇴');
-  eq('메뉴 세 줄',
+  eq('기타 메뉴 줄 (2026-09-11 개발자 지시 순서대로)',
     await page.$$eval('.set-menu .my-menu-item', (els) => els.map((e) => e.textContent.trim())),
-    ['휴지통', '이용약관 · 개인정보처리방침', '탈퇴']);
+    ['로그인 활동', '자주 묻는 질문', '휴지통', '이용약관 · 개인정보처리방침',
+      '앱 권한 · 오픈소스 라이선스', '탈퇴']);
   eq('탈퇴는 빨간 줄이다', await page.$eval('#btn-withdraw', (e) => e.classList.contains('danger')), true);
-  eq('이용약관은 terms.html 로 간다',
-    await page.$eval('.set-menu a.my-menu-item', (e) => e.getAttribute('href')), 'terms.html');
+  /* 🔴 '기타' 절 제목 — 제목 없이 목록만 두면 위 '알림' 절과의 빈칸이 벌어져 보인다 */
+  eq("'기타' 절 제목이 있다", (await page.textContent('#set-etc .wallet-title')).trim(), '기타');
+  /* 🔴 2026-09-11 개발자 지시 — '기타'와 '알림'의 절 제목은 **같은 모양**이어야 한다.
+     이 검사가 없으면 한쪽에만 막대가 남는 오늘 같은 어긋남을 아무도 못 본다. */
+  /* 🔴 절 제목 위 막대는 **어느 절에도 없다** (2026-09-01 판정 · 2026-09-11 재확인).
+     지키는 것은 '없다'와 '넷이 서로 같다' 둘이다 — 새 절을 만들 때 제거 목록에
+     이름을 빠뜨리면 그 절만 막대가 남는데, 오늘 '기타'가 실제로 그랬다. */
+  eq('절 제목 위 막대는 어느 절에도 없다 (계정·알림·기타)',
+    await page.evaluate(() => {
+      const bar = (sel) => {
+        const el = document.querySelector(sel);
+        return el ? getComputedStyle(el, '::before').content : '없음';
+      };
+      return ['#my-account .acc-head', '#my-notify .wallet-title', '#set-etc .wallet-title']
+        .map(bar).every((c) => c === 'none');
+    }), true);
+  /* 🔴 '기타' 제목과 첫 줄(휴지통) 사이에 선이 없어야 한다 (개발자 지시) */
+  eq("'기타'와 '휴지통' 사이에 구분선이 없다",
+    await page.evaluate(() => {
+      const m = getComputedStyle(document.querySelector('.set-menu'));
+      const f = getComputedStyle(document.querySelector('#btn-open-trash'));
+      return parseFloat(m.borderTopWidth) === 0 && parseFloat(f.borderTopWidth) === 0;
+    }), true);
+  eq("'기타' 제목이 계정·알림과 같은 크기다 (같은 규칙을 쓴다)",
+    await page.evaluate(() => {
+      const a = getComputedStyle(document.querySelector('#my-notify .wallet-title')).fontSize;
+      const b = getComputedStyle(document.querySelector('#set-etc .wallet-title')).fontSize;
+      return a === b;
+    }), true);
+  /* 🔴 링크가 아니라 버튼 — 진짜 페이지 이동이면 되돌아올 때 앱이 처음부터 뜬다(부팅 화면) */
+  eq('이용약관은 링크가 아니라 앱 안 화면 버튼이다',
+    await page.$$eval('.set-menu a[href]', (e) => e.length), 0);
   await page.screenshot({ path: `${SHOT}/settings.png` });
 
   console.log('\n■ 휴지통 — 비어 있을 때');
@@ -102,6 +156,8 @@ const eq = (label, got, want) => {
   await page.waitForTimeout(400);
   eq('제목이 "휴지통"', (await page.textContent('#screen-trash .sub-header h2')).trim(), '휴지통');
   eq('빈 휴지통 안내가 뜬다', await page.$$eval('.trash-empty', (e) => e.length), 1);
+  /* 🔴 설명 한 줄은 뺐다 (2026-09-11 개발자 지시) — 화면 맨 위가 이미 같은 말을 한다 */
+  eq('빈 휴지통에 설명 줄을 덧붙이지 않는다', await page.$$eval('.trash-empty-sub', (e) => e.length), 0);
   await page.screenshot({ path: `${SHOT}/trash-empty.png` });
   await page.click('#btn-trash-back');
   await page.waitForSelector('#screen-settings:not([hidden])');
@@ -162,17 +218,88 @@ const eq = (label, got, want) => {
       })), true);
   }
 
-  console.log('\n■ 이용약관 왕복 — 같은 탭에서 열리고, 나가면 설정으로 돌아온다');
+  console.log('\n■ 이용약관 왕복 — 앱을 떠나지 않고 화면만 바뀐다');
   {
-    await page.click('.set-menu a.my-menu-item');
-    await page.waitForURL(/terms\.html/, { timeout: 8000 });
-    eq('같은 탭에서 약관이 열린다 (새 탭이면 화살표가 앱을 한 벌 더 띄운다)',
-      await page.$$eval('.legal-header', (e) => e.length), 1);
-    await page.click('.legal-header .sub-back');
-    await page.waitForSelector('#screen-settings:not([hidden])', { timeout: 10000 });
-    eq('나가면 홈이 아니라 설정으로 돌아온다',
-      await page.$eval('#screen-settings', (e) => e.hidden), false);
-    eq('홈이 아니다', await page.$eval('#screen-home', (e) => e.hidden), true);
+    /* 🔴 여기서 지키는 것은 '페이지를 떠나지 않는다' 하나다 (2026-09-11 개발자 지적:
+       "나가기 화살표 누르면 한대장 완전 첫페이지가 뜬다"). 진짜 페이지 이동이면
+       되돌아올 때 앱이 처음부터 떠서 부팅 화면이 보인다. */
+    const before = page.url();
+    await page.click('#btn-open-terms');
+    await page.waitForSelector('#screen-terms:not([hidden])', { timeout: 8000 });
+    eq('주소가 그대로다 = 앱을 떠나지 않았다', page.url(), before);
+    await page.waitForFunction(() => {
+      const el = document.querySelector('#terms-body');
+      return el && el.textContent.length > 500;
+    }, { timeout: 8000 });
+    eq('약관 본문이 실제로 들어왔다',
+      await page.$eval('#terms-body', (e) => e.textContent.length > 1000), true);
+    eq('본문을 베껴 두지 않고 terms.html 에서 읽어 온다',
+      await page.$eval('#terms-body', (e) => /제1조/.test(e.textContent)), true);
+    /* 따라다니는 머리줄 — 끝까지 내려도 나가기가 화면에 남아 있어야 한다 */
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(350);
+    eq('맨 아래까지 내려도 나가기 화살표가 화면에 있다',
+      await page.evaluate(() => {
+        const r = document.querySelector('#btn-terms-back').getBoundingClientRect();
+        return r.top >= 0 && r.bottom <= window.innerHeight;
+      }), true);
+    /* 🔴 머리줄은 **순백**이라 글이 밑으로 지나가도 비쳐 보이지 않는다 */
+    eq('머리줄이 순백이고 화면 맨 위를 덮는다',
+      await page.evaluate(() => {
+        const el = document.elementFromPoint(Math.round(window.innerWidth / 2), 8);
+        const h = el && el.closest('.sub-header-stick');
+        return !!h && getComputedStyle(h).backgroundColor === 'rgb(255, 255, 255)';
+      }), true);
+    /* 🔴 제목과 화살표가 세로로 가운데 맞았나 (개발자 지적 "위아래가 올바르지 않다") */
+    eq('제목과 화살표가 세로 가운데로 맞는다',
+      await page.evaluate(() => {
+        const t = document.querySelector('#screen-terms .sub-header-stick h2').getBoundingClientRect();
+        const a = document.querySelector('#btn-terms-back').getBoundingClientRect();
+        return Math.abs((t.top + t.height / 2) - (a.top + a.height / 2)) <= 2;
+      }), true);
+    await page.click('#btn-terms-back');
+    await page.waitForSelector('#screen-settings:not([hidden])', { timeout: 8000 });
+    eq('나가면 설정으로 돌아온다', await page.$eval('#screen-settings', (e) => e.hidden), false);
+    eq('첫 화면(환영)이 뜨지 않는다', await page.$eval('#screen-onboarding', (e) => e.hidden), true);
+  }
+
+  console.log('\n■ 로그인 활동 · FAQ · 앱 권한 (2026-09-11 신설)');
+  {
+    const open = async (btn, screen) => {
+      await page.click('.nav-item[data-nav="my"]');
+      await page.click('#btn-open-settings');
+      await page.waitForSelector('#screen-settings:not([hidden])');
+      await page.click(btn);
+      await page.waitForSelector(screen);
+      await page.waitForTimeout(500);
+    };
+
+    /* 🔴 로그인 안 한 상태에서 **죽지 않고** 무슨 상태인지 말해야 한다 */
+    await open('#btn-open-logins', '#screen-logins:not([hidden])');
+    eq('로그인 안 했으면 그렇게 말한다',
+      /로그인한 계정이 없어요/.test(await page.textContent('#logins-body')), true);
+    eq("'기록이 없다'고 단정하지 않는다 (없는 것과 못 읽은 것은 다르다)",
+      /아직 기록이 없어요|불러오지 못했어요/.test(await page.textContent('#logins-body')), false);
+
+    await open('#btn-open-faq', '#screen-faq:not([hidden])');
+    eq('FAQ 가 열 줄이다', await page.$$eval('.faq-item', (e) => e.length), 10);
+    eq('첫 질문은 신청이 앱에서 끝나는지 (운영 원칙 1을 맨 앞에 둔다)',
+      (await page.textContent('.faq-item summary')).includes('신청까지 끝나나요'), true);
+    /* 접혀 있다가 눌러야 펼쳐진다 — <details> 기본 동작 */
+    eq('처음엔 접혀 있다', await page.$eval('.faq-item', (e) => e.open), false);
+    await page.click('.faq-item summary');
+    await page.waitForTimeout(200);
+    eq('누르면 펼쳐진다', await page.$eval('.faq-item', (e) => e.open), true);
+
+    await open('#btn-open-perms', '#screen-perms:not([hidden])');
+    const perms = await page.textContent('#perms-body');
+    eq('알림 권한 상태를 말한다', /허용됨|차단됨|아직 묻지 않음|지원하지 않아요/.test(perms), true);
+    /* 🔴 웹앱은 폰 설정을 못 연다 — 눌러도 아무 일 없는 가짜 버튼을 두지 않는다 */
+    eq('폰 설정을 여는 가짜 버튼이 없다',
+      await page.$$eval('#perms-body a, #perms-body button', (els) =>
+        els.filter((e) => /설정 앱|폰 설정으로|권한 관리/.test(e.textContent)).length), 0);
+    eq('오픈소스 라이선스가 실제로 싣는 것만 적혀 있다',
+      /Pretendard/.test(perms) && /Open Font License/.test(perms), true);
   }
 
   console.log('\n■ 이용약관 화면 — 되돌아가기는 왼쪽 위, 제목이 화면 안에 든다');
@@ -224,6 +351,72 @@ const eq = (label, got, want) => {
     eq('넓은 화면에서는 표 머리글이 다시 보인다',
       await t.$eval('.legal-table .legal-thead', (e) => e.offsetParent !== null), true);
     await t.close();
+  }
+
+  console.log('\n■ 오른쪽으로 쓸어 나가기 (손가락으로 재현)');
+  {
+    const open = async (btn, screen) => {
+      await page.click('.nav-item[data-nav="my"]');
+      await page.click('#btn-open-settings');
+      await page.waitForSelector('#screen-settings:not([hidden])');
+      if (btn) { await page.click(btn); await page.waitForSelector(screen); }
+      await page.waitForTimeout(400);
+    };
+
+    await open('#btn-open-trash', '#screen-trash:not([hidden])');
+    await swipe(page, { x: 200, y: 400, dx: 160 });
+    eq('휴지통에서 오른쪽으로 쓸면 설정으로 나간다',
+      await page.$eval('#screen-settings', (e) => e.hidden), false);
+
+    await open('#btn-open-terms', '#screen-terms:not([hidden])');
+    await page.waitForTimeout(500);
+    await swipe(page, { x: 200, y: 500, dx: 160 });
+    eq('약관에서 오른쪽으로 쓸면 설정으로 나간다',
+      await page.$eval('#screen-settings', (e) => e.hidden), false);
+
+    /* 🔴 짧고 빠르게 튕기는 것도 먹어야 한다 — 거리만 보면 가장 자연스러운 손짓이 무시된다 */
+    await open('#btn-open-trash', '#screen-trash:not([hidden])');
+    await swipe(page, { x: 200, y: 400, dx: 40, steps: 2 });
+    eq('짧게 튕겨도 나간다 (거리만 보지 않는다)',
+      await page.$eval('#screen-settings', (e) => e.hidden), false);
+
+    /* 🔴 세로로 끄는 것은 목록을 읽으려는 것이다 — 뺏으면 안 된다 */
+    await open('#btn-open-terms', '#screen-terms:not([hidden])');
+    await page.waitForTimeout(500);
+    await swipe(page, { x: 200, y: 500, dx: 20, dy: 180 });
+    eq('세로로 끌면 나가지 않는다 (스크롤을 뺏지 않는다)',
+      await page.$eval('#screen-terms', (e) => e.hidden), false);
+
+    /* 🔴 왼쪽으로 끄는 것은 되돌아가기가 아니다 */
+    await swipe(page, { x: 250, y: 500, dx: -160 });
+    eq('왼쪽으로 끌면 나가지 않는다',
+      await page.$eval('#screen-terms', (e) => e.hidden), false);
+
+    /* ⚠️ 화면 왼쪽 끝은 iOS 제 뒤로가기 몫이라 우리가 잡지 않는다 */
+    await swipe(page, { x: 10, y: 500, dx: 160 });
+    eq('화면 왼쪽 끝에서 시작한 손짓은 우리가 잡지 않는다 (iOS 몫)',
+      await page.$eval('#screen-terms', (e) => e.hidden), false);
+
+    /* 끌다 만 화면에 자국이 남으면 안 된다 */
+    eq('끌다 말면 화면이 제자리로 돌아온다',
+      await page.$eval('#screen-terms', (e) => e.style.transform === '' && e.style.opacity === ''), true);
+
+    await page.click('#btn-terms-back');
+    await page.waitForSelector('#screen-settings:not([hidden])');
+
+    /* 🔴 시트가 떠 있으면 그 안의 손짓을 뺏으면 안 된다 — 시트는 `#app` 안에 있어서
+       막지 않으면 로그인 시트를 옆으로 쓸 때 설정 화면이 통째로 나가 버린다. */
+    await page.click('#btn-acc-in');
+    await page.waitForSelector('#detail-sheet:not([hidden])');
+    await page.waitForTimeout(400);
+    await swipe(page, { x: 200, y: 500, dx: 160 });
+    eq('시트가 열려 있으면 화면이 나가지 않는다 (시트 손짓을 뺏지 않는다)',
+      await page.$eval('#screen-settings', (e) => e.hidden), false);
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(400);
+
+    await swipe(page, { x: 200, y: 400, dx: 160 });
+    eq('설정에서 쓸면 MY 로 나간다', await page.$eval('#screen-my', (e) => e.hidden), false);
   }
 
   console.log(errors.length ? '\n❌ 오류:\n' + errors.join('\n') : '\n✓ 콘솔 오류 없음');

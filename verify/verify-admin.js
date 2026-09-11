@@ -11,9 +11,10 @@
      ④ 양식 미리보기가 43종 전부 오류 없이 문서를 만들어 내는가 (renderFormDoc 재사용 검증)
      ⑤ 분류(상태·학교·경고등)가 실제로 걸러 내는가
 
-   실행: node verify/verify-admin.js      (사전 준비: bash _admin/build.sh)              */
+   실행: node verify/verify-admin.js      (준비 필요 없음 — 관리자 화면을 스스로 빌드한다)  */
 
 const { chromium } = require('playwright-core');
+const { spawnSync } = require('node:child_process');
 const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -47,8 +48,20 @@ function serve() {
 }
 
 (async () => {
+  /* 🔴 **사람이 미리 준비해야 하는 검사는 관문이 못 된다.** 예전엔 dist 가 없으면 여기서 멈춰,
+     이 드라이버를 어떤 워크플로에도 걸 수 없었다 — 그래서 실제로 3항목이 빨간불인 채
+     아무도 모르고 방치돼 있었다(2026-09-09 발견). 지금은 **스스로 빌드한다.**
+     ⚠️ 늘 새로 빌드한다 — 남아 있는 옛 dist 로 돌면 지금 코드가 아니라 옛 화면을 검사한다. */
+  {
+    const r = spawnSync('bash', [path.join(ROOT, '_admin/build.sh')], { cwd: ROOT, encoding: 'utf8' });
+    if (r.status !== 0) {
+      console.error('관리자 화면 빌드 실패 — _admin/build.sh 를 보세요.');
+      console.error((r.stderr || '') + (r.stdout || ''));
+      process.exit(1);
+    }
+  }
   if (!fs.existsSync(DIST)) {
-    console.error('먼저 `bash _admin/build.sh`를 실행하세요.');
+    console.error('빌드는 끝났는데 _admin/dist 가 없습니다 — build.sh 의 출력 경로를 보세요.');
     process.exit(1);
   }
   const srv = await serve();
@@ -62,8 +75,7 @@ function serve() {
 
   /* 바깥 요청 가로채기 — 저장소의 진짜 파일로 응답한다 */
   let apiCalls = 0;
-  let INJECTED_PENDING = null;   // 아래 raw 가로채기가 채운다 (검수 대기 0건일 때 검사가 사라지지 않게)
-  let PAGE_ITEMS = null;
+  let PAGE_ITEMS = null;   // 화면이 실제로 받은 목록 (아래 raw 가로채기가 채운다)
   await page.route('https://api.github.com/**', async (route) => {
     apiCalls += 1;
     const u = route.request().url();
@@ -105,7 +117,6 @@ function serve() {
         body = JSON.stringify(db);
       }
       PAGE_ITEMS = JSON.parse(body).items;   // 화면이 실제로 받은 목록 — 아래 건수 비교는 전부 이걸 기준으로 한다
-      INJECTED_PENDING = PAGE_ITEMS.filter((x) => x.auto).length;
     }
     return route.fulfill({ status: 200, contentType: 'application/json', body });
   });
@@ -154,9 +165,11 @@ function serve() {
   /* '검수 전'은 자동 등록분 중 **아직 마감되지 않은 것**이다.
      마감이 지난 것은 이미 학생에게 의미가 없으므로 '마감·종료'로 간다 (화면의 statusOf와 같은 기준). */
   const TODAY = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
-  const autoN = INJECTED_PENDING != null
-    ? INJECTED_PENDING
-    : reg.items.filter((x) => x.auto && !(x.deadline && x.deadline < TODAY)).length;
+  /* 🔴 화면의 statusOf 와 **같은 기준**으로 센다 — 마감이 지난 자동 등록분은 '검수 전'이 아니라
+     '마감·종료'다. 예전엔 가로채기 안에서 `.filter((x) => x.auto)` 로만 세어 마감분까지 넣었고,
+     그 값이 늘 채워져 아래 마감 조건은 **한 번도 실행되지 않는 죽은 줄**이었다. 그래서 마감된
+     자동 등록분이 하나라도 생기는 날 이 검사가 앱을 탓하며 빨간불이 됐다(실제로 4건이 되자 그랬다). */
+  const autoN = reg.items.filter((x) => x.auto && !(x.deadline && x.deadline < TODAY)).length;
 
   /* ③ 6개 화면 */
   const todoText = await page.textContent('#screen-todo');
@@ -253,15 +266,44 @@ function serve() {
   ok(previewBtns === rowsForPreview && rowsForPreview > 0,
     '양식 목록 줄마다 미리보기 버튼이 보인다', `버튼 ${previewBtns} / 줄 ${rowsForPreview}`);
 
-  await page.click('#screen-forms [data-form-preview]');
+  /* 🔴 **맨 앞 양식을 그냥 누르지 말 것.** 원문 링크는 그 양식을 쓰는 공고가 있을 때만 그려지는데,
+     지금 등록된 양식의 대부분은 연결된 공고가 없다(학교를 둘로 좁히면서 공고만 줄었다).
+     맨 앞을 누르면 '주인 없는 양식'이 걸려 링크가 0개가 되고, 멀쩡한 화면이 실패로 읽힌다.
+     '공고 id를 박지 말 것'(CLAUDE.md)과 같은 유형이라 **그때그때 고른다.** */
+  const pick = await page.evaluate(() => {
+    const rows = [...document.querySelectorAll('#screen-forms tr[data-form]')].map((tr) => tr.dataset.form);
+    const owned = [];
+    for (const id of rows) {
+      const owner = window.__admin.D.reg.find((it) => it.formId === id);
+      if (!owner) continue;
+      owned.push(id);
+      if (window.safeUrl(owner.sourceUrl)) return { id, linked: true, owned: owned.length };
+    }
+    return { id: owned[0] || rows[0] || null, linked: false, owned: owned.length };
+  });
+  ok(pick.id != null, '미리보기를 열 양식을 골랐다', pick.id || '양식이 하나도 없다');
+
+  /* ⚠️ 양식이 하나도 없으면 여기서 **멈춘다** — `[data-form-preview="null"]` 을 누르려다
+     시간초과로 죽으면 뒤 항목이 통째로 안 돌고, 진짜 원인('양식이 0종')이 묻힌다. */
+  if (pick.id == null) {
+    await browser.close(); srv.close();
+    console.log(`\n❌ ${failed}개 항목 실패 — 양식이 하나도 없어 나머지를 재지 못했습니다`);
+    process.exit(1);
+  }
+
+  await page.click(`#screen-forms [data-form-preview="${pick.id}"]`);
   await page.waitForSelector('#sheet:not([hidden])');
   const docLen = await page.locator('#sheet .doc-preview').innerText();
   ok(docLen.length > 80, '양식 화면에서 생성 문서 미리보기가 뜬다', `${docLen.length}자`);
 
-  /* 원본과 대조하려면 원문 주소가 같은 화면에 있어야 한다 */
+  /* 원본과 대조하려면 원문 주소가 같은 화면에 있어야 한다.
+     ⚠️ 링크를 걸 수 있는 양식이 하나도 없으면 **조용히 건너뛰지 않고** 실패시킨다 —
+        그건 화면이 아니라 데이터가 무너진 것이고, 그때야말로 알아야 한다. */
   const sheetLinks = await page.evaluate(() =>
     [...document.querySelectorAll('#sheet a[href^="http"]')].map((a) => a.href));
-  ok(sheetLinks.length > 0, '양식 미리보기 시트에 원본 링크가 있다', `${sheetLinks.length}개`);
+  ok(pick.linked && sheetLinks.length > 0,
+    '양식 미리보기 시트에 원본 링크가 있다',
+    `${sheetLinks.length}개 · 공고가 연결된 양식 ${pick.owned}종`);
   await page.click('#sheet [data-close]');
 
   /* 목록에도 원문 링크가 있어야 한다(시트를 열지 않고 대조 시작) */

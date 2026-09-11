@@ -279,6 +279,59 @@ async function openWith(ctx, resume) {
     await brokeCtx.close();
   }
 
+  /* ── ⑨ 데이터 초기화 뒤에도 앱이 돈다 (2026-09-09 코드 리뷰) ──
+     🔴 '데이터 초기화' 가 빈 상태를 **제 손으로 다시 적고** 있어서, 그 뒤에 늘어난 칸
+        (`saved`·`consent`·`updatedAt`)이 빠졌다. 초기화한 뒤 **앱을 끄지 않고** 그 자리에서
+        온보딩을 다시 마치면 `state.saved` 가 undefined 라 화면을 그릴 때마다
+        `Cannot read properties of undefined (reading 'some')` 가 났다.
+        앱을 껐다 켜면 `loadState` 가 메워 주기 때문에 **눈으로 재현하기 가장 어려운 유형**이다 —
+        개발자는 '가끔 이상하다'로만 겪는다. 그래서 사람 눈이 아니라 여기서 잡는다.
+     ⚠️ 새로고침하면 안 된다 — 새로고침이 증상을 지운다. 그 자리에서 이어서 눌러야 한다. */
+  console.log('\n■ ⑨ 데이터 초기화 뒤에도 앱이 돈다');
+  {
+    const ctx9 = await browser.newContext({ viewport: { width: 400, height: 860 } });
+    const p9 = await ctx9.newPage();
+    const e9 = [];
+    p9.on('pageerror', (e) => e9.push(e.message));
+    p9.on('dialog', async (d) => { await d.accept(); });
+    await p9.addInitScript((prof) => {
+      localStorage.setItem('handaejang.v1', JSON.stringify({
+        profile: prof, applications: [], saved: [], consent: { sensitive: false }, updatedAt: null }));
+    }, PROFILE);
+    await p9.goto(URLBASE, { waitUntil: 'load' });
+    await p9.waitForTimeout(2600);
+    await dismissNotify(p9).catch(() => {});
+
+    await p9.click('[data-nav="my"]');
+    await p9.waitForTimeout(600);
+    await p9.click('#btn-reset');
+    await p9.waitForTimeout(500);
+    await p9.click('.wp-go');
+    await p9.waitForTimeout(1000);
+    ok('초기화하면 온보딩으로 간다', (await shown(p9)) === 'onboarding', await shown(p9));
+
+    const shape = await p9.evaluate(() => ({
+      saved: Array.isArray(state.saved), apps: Array.isArray(state.applications),
+      consent: !!state.consent, keys: Object.keys(state).sort().join(','),
+    }));
+    ok('초기화 뒤 상태에 칸이 다 있다 (saved 가 undefined 가 아니다)',
+      shape.saved && shape.apps && shape.consent, JSON.stringify(shape));
+
+    /* 🔴 새로고침 없이 **그 자리에서** 화면을 그려 본다 — 이게 실제로 죽던 자리다 */
+    e9.length = 0;
+    const drew = await p9.evaluate(() => {
+      try {
+        state.profile = { school: '경희대학교', campus: '서울캠퍼스', track: 'engineering', major: '컴퓨터공학과',
+          year: 3, status: '재학', gpa: 4.0, bracket: 4, region: '서울', flags: [], common: {} };
+        saveState(); renderHome(); renderExplore(); renderMy(); renderApplications();
+        return 'ok';
+      } catch (err) { return String(err && err.message); }
+    });
+    ok('초기화 뒤 화면을 그려도 죽지 않는다', drew === 'ok', drew);
+    ok('  그때 페이지 오류도 없다', e9.length === 0, e9.slice(0, 2).join(' | '));
+    await ctx9.close();
+  }
+
   ok('콘솔 오류 없음', errors.length === 0, errors.slice(0, 2).join(' | '));
 
   await browser.close();

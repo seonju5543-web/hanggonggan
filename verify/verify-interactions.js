@@ -1,21 +1,23 @@
 /* 손짓과 움직임 검증 (2026-09-09) — 짝은 interactions.js · style.css 끝 묶음
 
    개발자 지적에서 시작한 작업이다: *"인스타그램과 달리 사람냄새가 안나 … 정적이고 ai스럽다."*
-   넣은 것 넷을 여기서 지킨다:
-     ① 당겨서 새로고침   ② 저장할 때 튕김과 진동
-     ③ 마감까지 남은 시간 막대(컨텍스트 바)   ④ 기다리는 동안의 뼈대
+   넣은 것 셋을 여기서 지킨다(원래 넷 — ③ 마감 막대는 2026-09-11 개발자 지시로 뺐다):
+     ① 당겨서 새로고침   ② 저장할 때 튕김과 진동   ④ 기다리는 동안의 뼈대
+   ③ 자리는 이제 **막대가 되돌아오지 않는 것**과 **카드의 D-DAY 글자가 dday() 와 같은 것**을 지킨다.
 
    이 검사가 **정말로 막는 것**은 겉모습이 아니라 아래 넷이다:
-     · 막대가 **모르는 것을 그리는 것** — 마감을 못 읽은 공고·상시 제도·마감된 공고
+     · 카드가 마감을 **두 가지로 말하는 것** — 막대가 되살아나거나 글자가 dday 와 어긋나는 것
      · 뼈대가 **굳는 것** — 못 받아 왔을 때 '불러오는 중'만 영영 보이는 상태
      · 당겨서 새로고침이 **시트를 뚫는 것** — 알림 동의 시트는 검사를 세 번 넘어뜨린 자리다
      · `.app` 에 transform 이 걸려 **하단 탭이 함께 밀리는 것** (fixed 가 죽는다)
 
    🔴 공고 id 를 박지 않는다 — 마감된 공고는 목록에서 내려가 그때부터 검사가 죽는다.
-   🔴 판정을 베끼지 않는다 — 앱의 `dday`·`deadlineMeter` 를 그대로 불러 확인한다. */
+   🔴 판정을 베끼지 않는다 — 앱의 `dday`·`ddayWords` 를 그대로 불러 확인한다. */
+const fs = require('fs');
+const path = require('path');
 const { chromium } = require('playwright-core');
 const { assertOwnServer, dismissNotify } = require('./onboard-helper.js');
-const { deadlineMeter, DEADLINE_WINDOW_DAYS } = require('../interactions.js');
+const inter = require('../interactions.js');
 
 const PORT = process.env.PORT || 8123;
 const EXE = process.env.CHROME_PATH;
@@ -49,18 +51,17 @@ async function seed(page) {
 }
 
 (async () => {
-  /* ── ⓪ 브라우저가 필요 없는 것부터 — 막대 수치는 순수 계산이다 ────────── */
-  console.log('\n■ 마감 막대 수치 (브라우저 없이)');
-  ok('마감된 공고에는 안 그린다', deadlineMeter(-1).show === false);
-  ok('창 밖(8일 뒤)에는 안 그린다', deadlineMeter(DEADLINE_WINDOW_DAYS + 1).show === false);
-  ok('마감을 못 읽은 공고에는 안 그린다 (dday 가 내는 14)', deadlineMeter(14).show === false);
-  ok('숫자가 아니면 안 그린다', deadlineMeter(null).show === false && deadlineMeter(NaN).show === false);
-  ok('D-DAY 는 가득 찬다', deadlineMeter(0).pct === 100);
-  ok('창 끝(D-7)에도 눈에 보이는 폭이 남는다', deadlineMeter(DEADLINE_WINDOW_DAYS).pct > 0);
-  ok('가까울수록 길어진다', deadlineMeter(1).pct > deadlineMeter(3).pct
-    && deadlineMeter(3).pct > deadlineMeter(6).pct);
-  ok('폭이 100%를 넘지 않는다', [0, 1, 3, 7].every((d) => deadlineMeter(d).pct <= 100));
-  ok('눈이 아닌 사람에게도 글로 말한다', /마감/.test(deadlineMeter(3).label));
+  /* ── ⓪ 브라우저가 필요 없는 것부터 — 막대가 되돌아오지 않았는가 (2026-09-11) ─────
+     개발자 지시: "빨간색 마감 인터렉션 바를 지우고 마감 D-DAY 카운트만 남겨놓기".
+     red-green: interactions.js 에 deadlineMeter 를 다시 만들거나 app.js 가 그것을 부르면 여기서 빨간불. */
+  console.log('\n■ 마감 막대가 없다 (브라우저 없이)');
+  const appSrc = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+  const cssSrc = fs.readFileSync(path.join(__dirname, '..', 'style.css'), 'utf8');
+  ok('interactions.js 가 막대 함수를 내보내지 않는다', !('deadlineMeter' in inter) && !('deadlineMeterHtml' in inter));
+  ok('app.js 가 막대를 부르지 않는다', !/deadlineMeterHtml|dl-meter/.test(appSrc));
+  ok('style.css 에 막대 규칙이 없다', !/\.dl-meter\s*[{,]/.test(cssSrc));
+  ok('카드의 마감 글자는 dday() 의 label 그대로다 (D-DAY · D-n · 마감)',
+    /function ddayWords\(d\) \{[\s\S]*?return d\.label;/.test(appSrc));
 
   await assertOwnServer(PORT);
   const browser = await chromium.launch({ executablePath: EXE });
@@ -79,78 +80,67 @@ async function seed(page) {
   await seed(page);
   await page.waitForTimeout(1400);          // 홈 합계의 countUp(900ms)이 멈출 때까지
 
-  /* ── ① 컨텍스트 바가 화면에 실제로 나오는가 ───────────────────────── */
-  console.log('\n■ 마감 막대 — 화면');
+  /* ── ① 카드의 마감 글자 — 화면 (2026-09-11) ─────────────────────────────
+     🔴 앱의 `dday`·`ddayWords` 를 그대로 불러 '이 카드에 떠야 할 글자'를 만들고 실제와 대조한다.
+        검사가 규칙을 따로 갖고 있으면 앱이 바뀔 때 조용히 갈라진다. */
+  console.log('\n■ 카드의 D-DAY 글자 — 화면');
   await page.click('.nav-item[data-nav="explore"]');
   await page.waitForTimeout(400);
 
-  /* 🔴 앱의 `dday` 를 그대로 불러 '막대가 나와야 하는 카드'를 센다 — 검사가 규칙을
-     따로 갖고 있으면 앱이 바뀔 때 조용히 갈라진다. */
-  const meterAudit = await page.evaluate((win) => {
+  const dueAudit = await page.evaluate(() => {
     const cards = [...document.querySelectorAll('#explore-list .sch-card')];
-    let expected = 0, drawn = 0, wrong = [];
+    let checked = 0, urgentOk = 0, urgentBad = 0; const wrong = [];
     for (const c of cards) {
       const sch = findSch(c.dataset.detail);
       if (!sch) continue;
       const d = dday(sch.deadline);
-      const should = !sch.program && d.days >= 0 && d.days <= win;
-      const has = !!c.querySelector('.dl-meter');
-      if (should) expected++;
-      if (has) drawn++;
-      if (should !== has) wrong.push(`${sch.id} 기대=${should} 실제=${has} days=${d.days} program=${!!sch.program}`);
+      const want = sch.program ? '상시 제도' : ddayWords(d);
+      const el = c.querySelector('.sch-due');
+      const got = el ? el.textContent.trim() : '';
+      checked++;
+      if (got !== want) wrong.push(`${sch.id} 기대='${want}' 실제='${got}'`);
+      const shouldUrgent = !sch.program && d.days >= 0 && d.days <= 7;
+      if (el && el.classList.contains('urgent') === shouldUrgent) urgentOk++; else urgentBad++;
+      /* 맨 윗줄(적합도 자리)에 마감이 올라가면 안 된다 — 개발자 지시 */
+      if (c.querySelector('.sch-top .sch-due')) wrong.push(`${sch.id} 마감이 맨 윗줄(적합도 자리)에 있다`);
+      if (c.querySelector('.dl-meter')) wrong.push(`${sch.id} 막대가 되살아났다`);
     }
-    return { cards: cards.length, expected, drawn, wrong };
-  }, DEADLINE_WINDOW_DAYS);
+    return { cards: cards.length, checked, urgentOk, urgentBad, wrong };
+  });
+  ok('탐색에 카드가 있다', dueAudit.cards > 0, `${dueAudit.cards}장`);
+  ok('마감 글자가 앱의 dday 와 한 글자도 안 어긋난다 (맨 윗줄에도 없고 막대도 없다)',
+    dueAudit.wrong.length === 0, dueAudit.wrong.slice(0, 3).join(' · '));
+  ok('7일 안쪽만 빨강(urgent) 이다', dueAudit.urgentBad === 0, `${dueAudit.urgentBad}장 어긋남`);
 
-  ok('탐색에 카드가 있다', meterAudit.cards > 0, `${meterAudit.cards}장`);
-  ok('막대는 마감이 가까운 카드에만 붙는다 (앱의 dday 와 한 글자도 안 어긋난다)',
-    meterAudit.wrong.length === 0, meterAudit.wrong.slice(0, 3).join(' · '));
-
-  /* 🔴 상시 제도에 막대가 붙으면 한 카드가 "상시로 받는다"와 "3일 뒤 마감"을 같이 말한다.
-     🔴 **픽스처를 주입해서 잰다.** 지금 데이터에는 마감일이 있는 상시 제도가 하나도 없어
-        (실측: registered 0건 · data.js 의 상시 제도 7종 전부 마감일 없음) 그냥 세면
-        **가드를 없애도 이 검사가 통과한다** — 실제로 그랬다(red-green 확인 중 발견).
-        조용한 검사는 통과가 아니라 무력해진 것이다. */
-  const programWithMeter = await page.evaluate(() => {
+  /* 🔴 **픽스처를 주입해서 잰다** — 지금 데이터에 D-DAY·D-3 공고가 없을 수도 있다.
+     그러면 위 대조가 '마감·D-20' 만 보고 통과한다. 조용한 검사는 통과가 아니라 무력해진 것이다. */
+  const fixture = await page.evaluate(() => {
     const keep = registeredList.slice();
-    registeredList = keep.concat([{
-      id: 'fixture-program-with-deadline',
-      name: '검사용 상시 제도 (마감일 있음)', provider: '검사', type: '교외',
-      amount: '검사', amountValue: 0, program: true,
-      deadline: new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10),
-    }]);
+    const iso = (n) => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
+    registeredList = keep.concat([
+      { id: 'fixture-d0', name: '검사용 오늘 마감', provider: '검사', type: '교외', amount: '검사', amountValue: 0, deadline: iso(0) },
+      { id: 'fixture-d3', name: '검사용 사흘 뒤 마감', provider: '검사', type: '교외', amount: '검사', amountValue: 0, deadline: iso(3) },
+      { id: 'fixture-d20', name: '검사용 스무날 뒤 마감', provider: '검사', type: '교외', amount: '검사', amountValue: 0, deadline: iso(20) },
+      { id: 'fixture-program', name: '검사용 상시 제도 (마감일 있음)', provider: '검사', type: '교외', amount: '검사', amountValue: 0, program: true, deadline: iso(3) },
+    ]);
     renderExplore();
-    const card = document.querySelector('.sch-card[data-detail="fixture-program-with-deadline"]');
-    const out = { rendered: !!card, meter: !!(card && card.querySelector('.dl-meter')) };
+    const read = (id) => {
+      const c = document.querySelector(`.sch-card[data-detail="${id}"]`);
+      const el = c && c.querySelector('.sch-due');
+      return { rendered: !!c, text: el ? el.textContent.trim() : '', urgent: !!(el && el.classList.contains('urgent')),
+        color: el ? getComputedStyle(el).color : '', meter: !!(c && c.querySelector('.dl-meter')) };
+    };
+    const out = { d0: read('fixture-d0'), d3: read('fixture-d3'), d20: read('fixture-d20'), program: read('fixture-program') };
     registeredList = keep; renderExplore();
     return out;
   });
-  ok('검사용 상시 제도가 실제로 그려졌다 (그래야 다음 줄이 뜻을 가진다)', programWithMeter.rendered);
-  ok('상시 제도 카드에는 막대가 없다 (마감일이 3일 뒤여도)', programWithMeter.meter === false);
-
-  /* 마감된 공고에도 없어야 한다 — 다 지난 기한을 빨간 막대로 재촉하면 안 된다 */
-  const closedWithMeter = await page.evaluate(() =>
-    [...document.querySelectorAll('.sch-card')].filter((c) =>
-      c.querySelector('.badge-dday.closed') && c.querySelector('.dl-meter')).length);
-  ok('마감된 카드에는 막대가 없다', closedWithMeter === 0, `${closedWithMeter}장에 붙음`);
-
-  if (meterAudit.drawn > 0) {
-    const shape = await page.evaluate(() => {
-      const m = document.querySelector('.dl-meter');
-      const fill = m.querySelector('.dl-meter-fill');
-      return {
-        label: m.getAttribute('aria-label') || '',
-        width: fill ? fill.style.width : '',
-        color: getComputedStyle(fill).backgroundColor,
-      };
-    });
-    ok('막대에 글로 된 설명이 붙는다', /마감/.test(shape.label), shape.label);
-    ok('폭이 실제로 정해져 있다', /^\d+%$/.test(shape.width), shape.width);
-    /* 개발자 지시: "밑에 **빨간색**으로 마감 기간 알려주는 것" — --red(#8f3a2e) */
-    ok('빨간색이다 (--red)', shape.color === 'rgb(143, 58, 46)', shape.color);
-  } else {
-    console.log('  · 지금 데이터에 7일 안쪽 공고가 없어 화면 모양 검사는 건너뜁니다');
-  }
+  ok('검사용 카드 넷이 실제로 그려졌다', [fixture.d0, fixture.d3, fixture.d20, fixture.program].every((x) => x.rendered));
+  ok('오늘 마감은 D-DAY', fixture.d0.text === 'D-DAY', fixture.d0.text);
+  ok('사흘 뒤는 D-3 · 빨강', fixture.d3.text === 'D-3' && fixture.d3.urgent, `${fixture.d3.text} urgent=${fixture.d3.urgent}`);
+  ok('  빨간색이다 (--red #8f3a2e)', fixture.d3.color === 'rgb(143, 58, 46)', fixture.d3.color);
+  ok('스무날 뒤는 D-20 · 빨강 아님', fixture.d20.text === 'D-20' && !fixture.d20.urgent, `${fixture.d20.text} urgent=${fixture.d20.urgent}`);
+  ok('상시 제도는 마감일이 있어도 "상시 제도"', fixture.program.text === '상시 제도' && !fixture.program.urgent, fixture.program.text);
+  ok('어느 카드에도 막대가 없다', ![fixture.d0, fixture.d3, fixture.d20, fixture.program].some((x) => x.meter));
 
   /* ── ② 저장할 때 튕김 ─────────────────────────────────────────────── */
   console.log('\n■ 저장 튕김');
