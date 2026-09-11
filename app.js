@@ -291,16 +291,17 @@ function dday(dateStr) {
    왜 — 앱 전체에 마감 표기가 다섯 가지였고 홈 한 화면에 그중 넷이 함께 떴다:
    'D-DAY' 배지 · '9/10 마감' 막대 · '9월 10일 15:25' · '2026-09-09'.
    🔴 **판정을 새로 하지 않는다** — 위 dday() 가 낸 값만 받아 말로 바꾼다.
-      여기서 날짜를 다시 계산하면 배지·막대·달력이 서로 다른 말을 하게 된다.
+      여기서 날짜를 다시 계산하면 배지·달력이 서로 다른 말을 하게 된다.
    🔴 시간 단위를 쓰지 않는다 — 우리가 아는 것은 날짜뿐이라 마감 '시각'을 모른다.
+   🔴 **카드의 말은 D-DAY 카운트다** (2026-09-11 개발자 지시: "빨간색 마감 인터렉션 바를
+      지우고 마감 D-DAY 카운트만 남겨놓기"). '오늘 마감·3일 남음' 으로 풀어 쓰던 것을
+      상세 시트·달력 배지가 이미 쓰는 `dday().label`(D-DAY · D-3 · 마감) 과 **같은 글자**로
+      맞췄다 — 목록과 상세가 마감을 다른 글자로 말하지 않는다.
    ⚠️ 달력은 날짜 자체가 내용이라 이 말을 쓰지 않는다(isoOf 그대로). */
 function ddayWords(d) {
   if (!d) return '';
   if (d.label === '기한 원문 확인') return '기한 확인 중';
-  if (d.days < 0) return '마감';
-  if (d.days === 0) return '오늘 마감';
-  if (d.days === 1) return '내일 마감';
-  return d.days + '일 남음';
+  return d.label;   // '마감' · 'D-DAY' · 'D-n' — dday() 가 낸 글자 그대로
 }
 
 /* 카드 제목에서 기관명 접두어를 지운다 (2026-09-10 페이스리프트).
@@ -308,7 +309,16 @@ function ddayWords(d) {
    + 아래 줄 '재단법인 연수큰재장학재단'. 원본 데이터를 그대로 이어 붙인 흔적이다.
    🔴 **지어내지 않는다** — provider 글자로 시작할 때만 딱 그만큼 잘라 낸다.
    🔴 남는 글자가 2자 미만이면 자르지 않는다(제목이 통째로 사라지는 것을 막는다).
+   🔴 **남는 글자가 '장학생·장학금·모집' 같은 흔한 낱말뿐이면 자르지 않는다** (2026-09-11
+      개발자 지적: "한원장학회 장학생의 공고가 장학금 찾기 탭에서 '장학생'으로만 표시").
+      한국장학재단 목록(층2)은 사업명 칸이 `장학생` 한 낱말인 재단이 118곳 중 11곳이라
+      (실측: 한원·북청읍·금천·앨트웰민초·영축총림·한진해운·부산북구·해기사협회·파주돈재갑진…)
+      기관명을 떼면 카드 제목이 **누구 것인지 모르는 '장학생'** 이 된다. 이 낱말들은
+      기관명이 붙어야 제목이 된다. `특별장학생`·`복지장학금` 처럼 앞에 다른 글자가 붙은
+      것은 그대로 뗀다(기관명은 바로 위 줄에 있다).
    🔴 상세 시트는 **원제목 그대로** 둔다 — 거기는 원문과 대조하는 자리다. */
+/* 기관명을 떼고 남았을 때 제목이 되지 못하는 낱말들 — 이것만으로 이루어진 나머지는 안 뗀다 */
+const GENERIC_TITLE_REST = /^(?:장학생|장학금|장학|모집|선발|신청|안내|공고|지원|사업|[\s·])+$/;   // 안쪽에 + 를 두지 말 것(중첩 반복 → 되돌이 폭주)
 function cardTitle(sch) {
   const name = String(sch.name || '').trim();
   const prov = String(sch.provider || '').trim();
@@ -319,7 +329,7 @@ function cardTitle(sch) {
     for (const t of [name, bare(name)]) {
       if (t.startsWith(p)) {
         const rest = t.slice(p.length).replace(/^[\s·\-–—:,]+/, '').trim();
-        if (rest.length >= 2) return rest;
+        if (rest.length >= 2 && !GENERIC_TITLE_REST.test(rest)) return rest;
       }
     }
   }
@@ -581,6 +591,7 @@ async function walletDeleteSlot(slot) {
       await trashTx('readwrite', (st) => st.put({
         key: `doc:${slot}:${Date.now()}`, kind: 'doc',
         slot, name: rec.name, type: rec.type, blob: rec.blob,
+        ...(rec.dataUrl ? { dataUrl: rec.dataUrl } : {}),   // 프로필 사진의 문서용 사본도 함께 (2026-09-11)
         savedAt: rec.savedAt, deletedAt: Date.now(),
       }));
     }
@@ -594,6 +605,130 @@ async function walletRefresh() {
     walletCache = {};
     (all || []).forEach((r) => { walletCache[r.slot] = { name: r.name, type: r.type, savedAt: r.savedAt }; });
   } catch (e) { walletCache = {}; }
+}
+
+/* ---------------- 프로필 사진 (2026-09-11 개발자 지시) ----------------
+   *"마이페이지에서 프로필사진 교체 기능 추가. 해당 기능은 본인의 사진을 요구하는 장학 공고에 쓰일 수 있음."*
+   🔴 **서류 보관함과 같은 금고**(IndexedDB `files`)의 `photo` 칸에 둔다 — 새 저장소를 만들지
+      않는다. 지우면 서류처럼 휴지통(30일)으로 옮겨진다(walletDeleteSlot 그대로).
+   🔴 **서버로 안 올라간다** — `state.profile` 에 넣지 않으므로 syncSafeProfile 이 볼 일이 없다.
+      verify-supabase 가 나가는 본문을 전부 모아 세는데, 사진은 애초에 그 길에 없다.
+   🔴 **줄여서 저장한다**(긴 변 640px · JPEG). 폰 사진 한 장은 4~8MB 라 그대로 두면 양식 문서 한 장이
+      그 크기가 된다. 줄인 뒤 dataUrl 도 같이 적어 둔다 — 양식 문서(forms.js)는 동기로 그려지고
+      .doc 파일로 나갈 때 blob 주소는 죽으므로, 문서에 들어갈 수 있는 것은 글자로 된 사진뿐이다.
+   ⚠️ 사진이 **어느 양식에 들어가는가**는 짐작하지 않는다 — `data/forms.json` 의 `photoNote`
+      (원본 서식에 사진란이 있다고 스키마화 때 적어 둔 것)가 있는 양식에만 들어간다. */
+const PHOTO_SLOT = 'photo';
+const PHOTO_MAX_W = 480;
+const PHOTO_MAX_H = 640;
+let profilePhoto = null;   // { url, dataUrl, savedAt } — 금고에서 읽어 둔 사본. 없으면 null
+
+/** 양식 문서가 부른다(forms.js) — 사진이 없으면 빈 문자열(지어내지 않는다). */
+function profilePhotoDataUrl() {
+  const d = profilePhoto && profilePhoto.dataUrl;
+  return typeof d === 'string' && d.startsWith('data:image/') ? d : '';
+}
+
+/* blob → data URL (문서용). 옛 기록이나 휴지통을 거친 기록에 dataUrl 이 없을 때만 쓴다. */
+function blobToDataUrl(blob) {
+  return new Promise((res) => {
+    try {
+      const r = new FileReader();
+      r.onload = () => res(typeof r.result === 'string' ? r.result : '');
+      r.onerror = () => res('');
+      r.readAsDataURL(blob);
+    } catch (e) { res(''); }
+  });
+}
+async function photoRefresh() {
+  try {
+    const rec = await walletGetRec(PHOTO_SLOT);
+    if (profilePhoto && profilePhoto.url) { try { URL.revokeObjectURL(profilePhoto.url); } catch (e) { /* 이미 해제됨 */ } }
+    if (rec && rec.blob) {
+      /* 🔴 dataUrl 이 없으면 만들어 채운다 — 없으면 MY 에는 사진이 보이는데 양식 문서에는 조용히 안 들어간다(코드 리뷰) */
+      const dataUrl = rec.dataUrl || await blobToDataUrl(rec.blob);
+      profilePhoto = { url: URL.createObjectURL(rec.blob), dataUrl, savedAt: rec.savedAt };
+    } else profilePhoto = null;
+  } catch (e) { profilePhoto = null; }
+  return profilePhoto;
+}
+
+/* 사진을 줄여 JPEG 로 — 못 읽는 파일(HEIC 를 브라우저가 못 여는 경우 등)이면 null */
+function shrinkPhoto(file) {
+  return new Promise((res) => {
+    const img = new Image();
+    const src = URL.createObjectURL(file);
+    const done = (v) => { try { URL.revokeObjectURL(src); } catch (e) { /* 무시 */ } res(v); };
+    img.onload = () => {
+      try {
+        if (!img.naturalWidth || !img.naturalHeight) return done(null);   // 크기 없는 그림(SVG 등) → 1px 사진이 되는 것을 막는다
+        const r = Math.min(1, PHOTO_MAX_W / img.naturalWidth, PHOTO_MAX_H / img.naturalHeight);
+        const w = Math.max(1, Math.round(img.naturalWidth * r));
+        const h = Math.max(1, Math.round(img.naturalHeight * r));
+        const cv = document.createElement('canvas');
+        cv.width = w; cv.height = h;
+        cv.getContext('2d').drawImage(img, 0, 0, w, h);
+        const dataUrl = cv.toDataURL('image/jpeg', 0.86);
+        cv.toBlob((blob) => done(blob ? { blob, dataUrl } : null), 'image/jpeg', 0.86);
+      } catch (e) { done(null); }
+    };
+    img.onerror = () => done(null);
+    img.src = src;
+  });
+}
+
+async function photoSet(file) {
+  const small = await shrinkPhoto(file);
+  if (!small) return false;
+  await walletTx('readwrite', (st) => st.put({
+    slot: PHOTO_SLOT, name: '증명사진.jpg', type: 'image/jpeg',
+    blob: small.blob, dataUrl: small.dataUrl, savedAt: nowStamp(),
+  }));
+  await walletRefresh();
+  await photoRefresh();
+  return true;
+}
+async function photoRemove() {
+  await walletDeleteSlot(PHOTO_SLOT);   // 서류처럼 휴지통으로 — 30일 안에 되살릴 수 있다
+  await photoRefresh();
+}
+
+/* MY 맨 위 카드의 머리 — 사진(없으면 첫 글자) + 이름 줄 + 단추 두 개 */
+function photoHeadHtml(p, nameLineHtml) {
+  const initial = esc((p.name || '학').charAt(0));
+  /* 겉 상자가 role=img + 이름표를 갖고 있으니 안쪽 그림의 alt 는 비운다 — 낭독기가 두 번 읽지 않게 */
+  const img = profilePhoto && profilePhoto.url ? `<img src="${esc(profilePhoto.url)}" alt="" />` : initial;
+  return `
+    <div class="my-head">
+      <div class="my-photo" id="my-photo" role="img" aria-label="프로필 사진">${img}</div>
+      ${nameLineHtml}
+    </div>
+    <div class="my-photo-btns" data-photo>
+      <label class="my-photo-btn">${profilePhoto ? '사진 교체' : '사진 올리기'}
+        <input type="file" id="my-photo-file" accept="image/*" hidden />
+      </label>
+      ${profilePhoto ? '<button type="button" class="my-photo-btn danger" id="my-photo-del">사진 삭제</button>' : ''}
+    </div>`;
+}
+function bindPhotoButtons() {
+  const inp = $('#my-photo-file');
+  if (inp) inp.addEventListener('change', async () => {
+    const file = inp.files && inp.files[0];
+    if (!file) return;
+    if (file.size > 20 * 1024 * 1024) { toast('20MB 이하 사진만 올릴 수 있어요'); return; }
+    const ok = await photoSet(file);
+    toast(ok ? '프로필 사진 저장 완료 · 이 기기에만 남아요' : '이 사진은 읽을 수 없어요 · JPG·PNG 로 다시 올려 주세요');
+    renderMy();
+    if (!$('#screen-home').hidden) renderHome();
+  });
+  const del = $('#my-photo-del');
+  if (del) del.addEventListener('click', async () => {
+    if (!confirm('프로필 사진을 지울까요? 휴지통에 30일 남아요.')) return;
+    await photoRemove();
+    toast('휴지통으로 옮겼어요');
+    renderMy();
+    if (!$('#screen-home').hidden) renderHome();
+  });
 }
 
 /* 요구 서류의 보관함 상태 한 줄 */
@@ -1121,12 +1256,10 @@ function cardBadgeHtml(fit, fd, myApp) {
   const v = fitVerdict(fit, fd);
   if (v === 'no') return '<span class="badge badge-fit-no">지원 자격 미달</span>';
   if (v === 'unread') return '<span class="badge badge-fit-unknown">자격 미확인</span>';
-  /* 🔴 퍼센트는 남기되 **알약이 아니라 글자**로 낸다 (2026-09-10 페이스리프트).
-     2026-08-31 개발자 지시('요건 없애고 퍼센테이지로')는 지킨다 — 숫자는 그대로 보인다.
-     바꾼 것은 무게다: 목록에서 이 값은 대부분 33~50% 에 몰려 있어 카드끼리 구별해 주지
-     못하는데, 알약으로 두면 카드마다 같은 자리에 같은 크기의 색 덩어리가 반복돼
-     **눈이 제목보다 먼저 그것을 본다**(실측 스크린샷에서 다섯 장 연속 같은 알약).
-     알약은 학생이 실제로 멈춰 서야 하는 세 가지(미달·미확인·신청 완료)에만 남긴다. */
+  /* 퍼센트 — 2026-08-31 개발자 지시('요건 없애고 퍼센테이지로')대로 숫자만.
+     2026-09-10 페이스리프트가 이것을 알약이 아닌 **글자**로 낮췄는데(다섯 장 연속 같은 알약이
+     제목보다 먼저 읽혔다), **2026-09-11 개발자 지시로 다시 알약**이 됐다 — "옅은 회색으로 잘
+     보이지 않음". 모양은 style.css 파일 끝 '적합도 알약' 절이 정한다(여기 클래스 이름은 그대로). */
   return fd ? '<span class="sch-fit fit-' + fitTone(fd.pct) + '">적합도 ' + fd.pct + '%</span>' : '';
 }
 
@@ -1166,15 +1299,15 @@ function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
         ${badge}
       </div>
       <p class="sch-name">${esc(cardTitle(sch))}</p>
+      ${/* 🔴 마감(D-DAY 카운트)의 자리는 **맨 아랫줄 오른쪽**이다 (2026-09-11 개발자 지시).
+           맨 윗줄은 적합도가 쓰는 자리라 거기 두면 안 된다("적합도와 같은 곳에 있으면 안됨").
+           금액(왼쪽)과 마감(오른쪽)이 한 줄에 나란히 — 학생이 카드에서 마지막으로 읽는 두 숫자다.
+           2026-09-09 에 카드 밑에 두었던 빨간 막대는 같은 지시로 **뺐다**(interactions.js 에서도
+           지웠다 — 남겨 두면 다음 사람이 다시 붙인다). 7일 안쪽은 글자를 빨갛게(urgent) 한다. */ ''}
       <div class="sch-foot">
         <span class="sch-amount${known ? '' : ' unknown'}">${esc(sch.amount)}</span>
         ${due ? `<span class="sch-due${(!sch.program && d.days >= 0 && d.days <= 7) ? ' urgent' : ''}">${esc(due)}</span>` : ''}
       </div>
-      ${/* 마감까지 남은 시간 막대 (2026-09-09 개발자 지시: "밑에 빨간색으로 마감 기간 알려주는 것").
-           🔴 판정을 새로 하지 않는다 — 위에서 이미 구한 `d`(dday 결과)를 넘길 뿐이다.
-           🔴 7일 밖·마감된 공고·마감을 못 읽은 공고에는 아무것도 안 그린다.
-           🔴 **상시 제도는 뺀다** — 그 카드는 '3일 뒤 마감'을 같이 말하면 안 된다. */ ''}
-      ${(!sch.program && typeof deadlineMeterHtml === 'function') ? deadlineMeterHtml(d.days, sch.deadline) : ''}
     </button>
     </div>`;
 }
@@ -1242,7 +1375,9 @@ function renderHome() {
      비어 있다는 사실 자체를 알려야 한다. 이 줄은 이미 눌러서 프로필로 가는 자리다. */
   $('#home-greet').textContent = p.name ? `${p.name}님` : '이름 설정';
   $('#home-school').textContent = (p.school || '대학 미설정') + (p.campus ? ' · ' + p.campus : '');
-  $('#home-avatar').textContent = (p.name || '학').charAt(0);
+  /* 프로필 사진이 있으면 홈 왼쪽 위 동그라미에도 그 사진 (2026-09-11) — 없으면 첫 글자 그대로 */
+  if (profilePhoto && profilePhoto.url) $('#home-avatar').innerHTML = `<img src="${esc(profilePhoto.url)}" alt="" />`;
+  else $('#home-avatar').textContent = (p.name || '학').charAt(0);
 
   const matches = getMatches();
   /* '지금 받을 수 있는' 이라고 말하려면 **정말 지금 신청할 수 있어야** 한다 (2026-08-02 개발자 지적).
@@ -3660,8 +3795,9 @@ function renderMy() {
   const flagText = p.flags.length ? p.flags.map((f) => FLAG_LABELS[f] || f).join(', ') : '해당 없음';
   const trackLabel = (TRACKS.find((t) => t.id === p.track) || {}).label || '-';
   const commonFilled = ['studentId', 'birth', 'phone', 'email', 'account'].filter((k) => c[k]).length;
+  const nameLine = `<p class="my-name">${esc(p.name || '대학생')} 님<span class="my-edit-hint">수정하기 ›</span></p>`;
   $('#my-profile').innerHTML = `
-    <p class="my-name">${esc(p.name || '대학생')} 님<span class="my-edit-hint">수정하기 ›</span></p>
+    ${photoHeadHtml(p, nameLine)}
     ${/* 🔴 학과 칸은 **학생이 직접 치는 자유 입력**이다 — esc 를 빠뜨리면 `B<b>학과` 같은 글자에
          MY 화면 아래쪽이 통째로 그 태그 안으로 빨려 들어간다(브라우저 실측). 2026-09-10. */ ''}
     <p class="my-line">${esc(p.school || '대학 미설정')} · ${esc(trackLabel)}${p.major ? ' · ' + esc(p.major) : ''}</p>
@@ -3673,7 +3809,9 @@ function renderMy() {
     </div>
     <p class="my-flags">특별자격: ${flagText}</p>
     ${learnedHtml(c)}
-    <p class="my-flags">공통 서류정보(학번·연락처·계좌 등)는 이 기기에만 저장 · 서류 초안에 자동 기입.</p>`;
+    <p class="my-flags">공통 서류정보(학번·연락처·계좌 등)는 이 기기에만 저장 · 서류 초안에 자동 기입.</p>
+    <p class="my-flags">프로필 사진도 이 기기에만 저장 · 사진란이 있는 신청서 문서에 자동으로 들어가요.</p>`;
+  bindPhotoButtons();
   /* 🔴 계정·알림은 여기서 그리지 않는다 — 설정 화면으로 옮겼다 (2026-09-11).
      renderSettings() 가 **같은 함수**를 불러 그린다. */
   renderWallet();
@@ -3851,10 +3989,13 @@ async function trashRestore(key) {
     if (walletCache[rec.slot]) { toast('그 칸에 이미 다른 서류가 있어요 · 먼저 지우거나 교체해 주세요'); return; }
     await walletTx('readwrite', (st) => st.put({
       slot: rec.slot, name: rec.name, type: rec.type, blob: rec.blob, savedAt: rec.savedAt,
+      ...(rec.dataUrl ? { dataUrl: rec.dataUrl } : {}),
     }));
     await trashTx('readwrite', (st) => st.delete(rest));
     await walletRefresh();
-    toast('서류 보관함으로 되살렸어요');
+    /* 프로필 사진을 되살렸으면 MY·홈·양식 문서가 바로 알아야 한다 — 안 그러면 다시 켤 때까지 첫 글자만 보인다 */
+    if (rec.slot === PHOTO_SLOT) { await photoRefresh(); if (!$('#screen-home').hidden) renderHome(); }
+    toast(rec.slot === PHOTO_SLOT ? '프로필 사진을 되살렸어요' : '서류 보관함으로 되살렸어요');
   }
   renderTrash();
 }
@@ -4338,11 +4479,18 @@ function bindEvents() {
   /* 🔴 캡처 단계로 먼저 잡는다 — 카드 전체가 '프로필 수정' 버튼이라
      그냥 두면 '지우기'를 눌러도 수정 화면이 열려 버린다 */
   $('#my-profile').addEventListener('click', (e) => {
+    /* 사진 올리기·삭제 단추 (2026-09-11) — 카드로 번지면 파일 창과 프로필 수정이 같이 열린다.
+       ⚠️ preventDefault 는 하지 않는다: label 의 기본 동작이 파일 창을 여는 것이다. */
+    if (e.target.closest('.my-photo-btns')) { e.stopPropagation(); return; }
     const del = e.target.closest('[data-forget]');
     if (!del) return;
     e.stopPropagation();
     e.preventDefault();
     forgetLearned(del.dataset.forget);
+  }, true);
+  /* 키보드도 같다 — 카드의 Enter/스페이스 = 프로필 수정이라, 단추 위에서 누른 Enter 를 가로챈다 */
+  $('#my-profile').addEventListener('keydown', (e) => {
+    if (e.target.closest('.my-photo-btns')) e.stopPropagation();
   }, true);
   onTap('#my-profile', editProfile);                     // MY 맨 위 카드 → 프로필 수정
 
@@ -4805,7 +4953,10 @@ function refreshOpenScreen() {
   if (!$('#screen-my').hidden) renderMy();
   if (!$('#screen-settings').hidden) renderSettings();
 }
-walletRefresh().then(refreshOpenScreen);
+walletRefresh().then(photoRefresh).then(() => {
+  refreshOpenScreen();
+  if (!$('#screen-home').hidden) renderHome();   // 홈 왼쪽 위 동그라미의 사진
+});
 if (typeof notifyInit === 'function') {
   notifyInit().then(refreshOpenScreen).catch(() => {});
 }

@@ -4151,18 +4151,99 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
   eq('그리고 app.js 보다 **먼저** 실린다 (app.js 가 카드를 그릴 때 부른다)',
     html.indexOf('src="interactions.js"') < html.indexOf('src="app.js"'), true);
 
-  /* 🔴 ④ 마감 막대는 판정을 새로 만들지 않는다 — `dday()` 가 낸 값을 받아서 그릴 뿐이다.
-     여기에 날짜 계산이 들어오면 카드의 배지와 막대가 서로 다른 말을 하게 된다. */
-  eq('막대 규칙 파일에 날짜 계산이 없다 (dday 가 낸 값만 받는다)',
+  /* 🔴 ④ 마감 막대는 **뺐다** (2026-09-11 개발자 지시: "빨간색 마감 인터렉션 바를 지우고
+     마감 D-DAY 카운트만 남겨놓기"). 되살아나면 여기서 잡는다 — 카드가 마감을 두 가지로 말하게 된다. */
+  eq('interactions.js 에 마감 막대 함수가 없다', /function deadlineMeter|DEADLINE_WINDOW_DAYS\s*=/.test(inter), false);
+  eq('app.js 가 막대를 부르지 않는다', /deadlineMeterHtml|dl-meter/.test(appJs), false);
+  eq('style.css 에 막대 규칙이 없다', /\.dl-meter\s*[{,]/.test(css), false);
+  eq('손짓 파일에 날짜 계산이 없다 (판정은 dday 한 곳)',
     /new Date\(|Date\.now\(\)\s*[-/]/.test(inter.slice(0, inter.indexOf('function haptic'))), false);
-  eq('막대 문턱이 dday 의 urgent 문턱(7일)과 같다',
-    Number((inter.match(/DEADLINE_WINDOW_DAYS\s*=\s*(\d+)/) || [])[1]) === 7
-    && /d <= 7\) return \{ label: `D-\$\{d\}`, cls: 'urgent'/.test(appJs), true);
+  eq('카드의 빨강 문턱은 dday 의 urgent 문턱(7일) 그대로다',
+    /d <= 7\) return \{ label: `D-\$\{d\}`, cls: 'urgent'/.test(appJs)
+    && /d\.days >= 0 && d\.days <= 7\) \? ' urgent'/.test(appJs), true);
+  /* 카드의 마감 글자 = dday().label — 앱의 진짜 함수를 떼어 내 돌린다(사본을 검사하면 원본이 바뀌어도 통과한다) */
+  {
+    const src = appJs.match(/function ddayWords\(d\) \{[\s\S]*?\n\}/)[0];
+    const ddayWords = new Function(src + '; return ddayWords;')();
+    eq('D-DAY 는 D-DAY 그대로', ddayWords({ label: 'D-DAY', cls: 'urgent', days: 0 }), 'D-DAY');
+    eq('D-3 은 D-3 그대로 (풀어 쓰지 않는다)', ddayWords({ label: 'D-3', cls: 'urgent', days: 3 }), 'D-3');
+    eq('지난 것은 마감', ddayWords({ label: '마감', cls: 'closed', days: -2 }), '마감');
+    eq('못 읽은 것은 지어내지 않는다', ddayWords({ label: '기한 원문 확인', cls: '', days: 14 }), '기한 확인 중');
+  }
+  /* 마감 자리는 맨 아랫줄(.sch-foot) — 맨 윗줄(.sch-top)은 적합도 자리라 거기 두면 안 된다(개발자 지시) */
+  {
+    const card = appJs.slice(appJs.indexOf('function schCard('), appJs.indexOf('function saveBtnHtml('));
+    const top = card.slice(card.indexOf('class="sch-top"'), card.indexOf('class="sch-name"'));
+    eq('마감(.sch-due)이 맨 윗줄에 없다', /sch-due/.test(top), false);
+    eq('마감(.sch-due)이 맨 아랫줄(.sch-foot)에 있다', /class="sch-foot">[\s\S]*?sch-due/.test(card), true);
+  }
 
   /* 🔴 ⑤ 진동은 **되돌리기 어려운 일**에만 — 화면이 바뀔 때마다 울리면 학생이 앱 진동을
      통째로 꺼 버린다. 부르는 곳이 늘어나면 여기서 먼저 걸린다(늘릴 거면 이 숫자를 함께 고친다). */
   const hapticCalls = (appJs.match(/haptic\(/g) || []).length;
   eq(`앱이 진동을 부르는 곳은 셋뿐이다 (지금 ${hapticCalls}곳)`, hapticCalls <= 3, true);
+}
+
+/* ══ 카드 제목에서 기관명을 뗄 때 (2026-09-11) ══════════════════════════════
+   개발자 지적: "한원장학회 장학생의 공고가 장학금 찾기 탭에서 '장학생'으로만 표시되고 있음."
+   원인은 `cardTitle` 이 제목 앞의 기관명을 떼고 남은 '장학생'(3자)을 그대로 내보낸 것 —
+   한국장학재단 목록은 사업명 칸이 `장학생` 한 낱말인 재단이 118곳 중 11곳이다(실측).
+   🔴 앱의 진짜 함수를 떼어 내 돌린다 — 사본을 검사하면 원본이 바뀌어도 통과한다. */
+{
+  console.log('\n■ 카드 제목 — 기관명을 떼고 흔한 낱말만 남으면 떼지 않는다 (2026-09-11)');
+  const appJs = readText(new URL('../app.js', import.meta.url));
+  const parts = [
+    appJs.match(/const GENERIC_TITLE_REST = .*\n/),
+    appJs.match(/function cardTitle\(sch\) \{[\s\S]*?\n\}\n/),
+    appJs.match(/function cleanCardTitle\(name\) \{[\s\S]*?\n\}\n/),
+  ];
+  eq('cardTitle · cleanCardTitle · GENERIC_TITLE_REST 를 app.js 에서 떼어 냈다', parts.every(Boolean), true);
+  const cardTitle = new Function(parts.map((m) => m[0]).join('\n') + '\nreturn cardTitle;')();
+  const t = (name, provider) => cardTitle({ name, provider });
+  eq('한원장학회 장학생 → 기관명을 남긴다', t('(재)한원장학회 장학생', '(재)한원장학회'), '(재)한원장학회 장학생');
+  eq('파안장학문화재단법인 장학금 → 기관명을 남긴다', t('파안장학문화재단법인 장학금', '파안장학문화재단법인'), '파안장학문화재단법인 장학금');
+  eq("'장학생 모집' 처럼 흔한 낱말 둘도 마찬가지", t('금천장학회 장학생 모집', '금천장학회'), '금천장학회 장학생 모집');
+  eq('앞에 다른 글자가 붙은 것은 예전처럼 뗀다 (기관명은 윗줄에 있다)',
+    t('재단법인 안산인재육성재단 특별장학생', '재단법인 안산인재육성재단'), '특별장학생');
+  eq('기관명으로 시작하지 않으면 손대지 않는다', t('2026-2학기 한원장학회 장학금 신청 안내', '(재)한원장학회'), '2026-2학기 한원장학회 장학금 신청 안내');
+}
+
+/* ══ 프로필 사진 (2026-09-11 개발자 지시) ═══════════════════════════════════
+   "마이페이지에서 프로필사진 교체 기능 추가. 해당 기능은 본인의 사진을 요구하는 장학 공고에 쓰일 수 있음."
+   브라우저 없이 잡을 수 있는 함정 셋 — 서버로 새는 길 · 사진란 없는 양식에 붙는 것 · 카드 클릭으로 번지는 것. */
+{
+  console.log('\n■ 프로필 사진 (2026-09-11)');
+  const appJs = readText(new URL('../app.js', import.meta.url));
+  const formsJs = readText(new URL('../forms.js', import.meta.url));
+  const sbJs = readText(new URL('../supabase-client.js', import.meta.url));
+  const html = readText(new URL('../index.html', import.meta.url));
+  eq('사진은 서류 보관함과 같은 금고의 photo 칸에 둔다 (새 저장소 없음)',
+    /const PHOTO_SLOT = 'photo'/.test(appJs) && /slot: PHOTO_SLOT/.test(appJs) && !/indexedDB\.open\('handaejang-photo/.test(appJs), true);
+  eq('사진이 서버로 나가는 프로필에 안 들어간다 (state.profile 밖 · supabase-client 가 모른다)',
+    /state\.profile\.(photo|profilePhoto)|profile\.photo\s*=/.test(appJs) || /photo|dataUrl/i.test(sbJs), false);
+  /* 🔴 photoNote 는 이름과 달리 사진 이야기가 아닌 안내도 담는다(실측 13건 중 3건) — '사진' 낱말이 있을 때만 사진란 */
+  eq('양식 문서에는 photoNote 에 "사진" 이 있는 양식에만 들어간다',
+    /const hasPhotoBox = !!\(tpl\.photoNote && \/사진\/\.test\(tpl\.photoNote\)\)/.test(formsJs)
+    && /const photo = \(hasPhotoBox && typeof profilePhotoDataUrl === 'function'\)/.test(formsJs), true);
+  eq('원문 안내 문구는 사진이 있어도 지우지 않는다 (규격은 원문이 말한다)',
+    /html \+= `<p class="fd-note">\$\{esc\(tpl\.photoNote\)\}<\/p>`;\n\s*if \(photo\) html \+=/.test(formsJs), true);
+  eq('원본이 좌측 상단이면 왼쪽에 붙인다', /photoSide = \/좌측\|왼쪽\//.test(formsJs) && /\.fd-photo\.left \{ float:left/.test(formsJs), true);
+  {
+    const forms = JSON.parse(readText(new URL('../data/forms.json', import.meta.url)));
+    const notes = Object.values(forms.templates || forms).map((t) => t && t.photoNote).filter(Boolean);
+    const nonPhoto = notes.filter((n) => !/사진/.test(n));
+    eq(`photoNote 에 사진 이야기가 아닌 안내가 실제로 있다 (지금 ${nonPhoto.length}건 — 0이면 위 관문의 뜻이 사라진다)`, nonPhoto.length > 0, true);
+  }
+  eq('휴지통을 거쳐도 문서용 사본(dataUrl)이 따라간다 · 없으면 blob 에서 다시 만든다',
+    /rec\.dataUrl \? \{ dataUrl: rec\.dataUrl \}/.test(appJs) && /rec\.dataUrl \|\| await blobToDataUrl\(rec\.blob\)/.test(appJs), true);
+  eq('초안 서버로 가는 서류 목록에 사진 칸이 섞이지 않는다',
+    /k !== 'welfare' && k !== 'photo'/.test(readText(new URL('../essay.js', import.meta.url))), true);
+  eq('사진 단추 클릭이 카드의 프로필 수정으로 번지지 않는다 (캡처 단계에서 멈춤)',
+    /closest\('\.my-photo-btns'\)\) \{ e\.stopPropagation\(\); return; \}/.test(appJs), true);
+  eq('  키보드 Enter 도 같다', /keydown[\s\S]{0,120}closest\('\.my-photo-btns'\)\) e\.stopPropagation\(\)/.test(appJs), true);
+  eq('지우기는 삭제가 아니라 휴지통으로 옮기기다 (walletDeleteSlot 그대로)', /walletDeleteSlot\(PHOTO_SLOT\)/.test(appJs), true);
+  eq('CSP 가 blob:·data: 그림을 허용한다 (사진이 안 보이면 이 줄부터)', /img-src [^;]*blob:/.test(html) && /img-src [^;]*data:/.test(html), true);
+  eq('시작할 때 사진을 읽어 홈 동그라미까지 채운다', /walletRefresh\(\)\.then\(photoRefresh\)/.test(appJs), true);
 }
 
 /* ── 특별자격 이름표 (2026-09-09 신설) ───────────────────────────────────────────

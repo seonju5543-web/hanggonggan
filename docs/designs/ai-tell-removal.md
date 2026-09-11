@@ -390,4 +390,4 @@ red-green 을 양쪽으로 확인했다 — 호출을 되돌리면 ✕, 함수 �
 | `style.css` 2729줄 | `--sp-1~4` 간격 네 단계 선언 |
 | `app.js` `schCard()` 955줄 | 카드에 배지를 붙이는 곳 |
 | `app.js` `fitBadgeHtml()` 921줄 | 적합도 배지 |
-| `interactions.js` `deadlineMeterHtml()` | 마감 막대 · `shortDate` |
+| `interactions.js` (마감 막대 함수) | 마감 막대 — **2026-09-11 개발자 지시로 막대째 삭제** (D-DAY 글자만 남음) |

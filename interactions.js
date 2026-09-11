@@ -6,82 +6,25 @@
    앱 전체의 움직임이 넷뿐이고(목록 등장·카드 반짝임·메뉴 열림·누름 축소),
    당겨서 새로고침도 저장할 때의 손끝 답도 없었다.
 
-   여기 넣는 것은 넷:
-     ① 당겨서 새로고침  ② 저장할 때 튕김과 진동
-     ③ 마감까지 남은 시간 막대(컨텍스트 바)  ④ 기다리는 동안 보여 줄 뼈대
+   여기 넣는 것은 셋(원래 넷이었다 — ③ 마감 막대는 2026-09-11 개발자 지시로 뺐다):
+     ① 당겨서 새로고침  ② 저장할 때 튕김과 진동  ④ 기다리는 동안 보여 줄 뼈대
 
-   🔴 **판정을 새로 만들지 않는다.** 마감 판정은 `app.js` 의 `dday()` 한 곳이고
-      이 파일은 그것이 낸 `days` 를 **받아서** 그릴 뿐이다. 여기에 날짜 계산을 한 줄이라도
-      옮겨 적으면 카드의 배지와 막대가 서로 다른 말을 하게 된다.
-   🔴 **Node 에서도 불러 쓸 수 있어야 한다** — 막대 수치는 브라우저 없이 검사한다
+   🔴 **판정을 새로 만들지 않는다.** 마감 판정은 `app.js` 의 `dday()` 한 곳이다.
+      이 파일에 날짜 계산을 한 줄이라도 옮겨 적으면 카드와 시트가 서로 다른 말을 하게 된다.
+   🔴 **Node 에서도 불러 쓸 수 있어야 한다** — 상수와 순수 함수는 브라우저 없이 검사한다
       (match-engine.js 와 같은 방식, 파일 끝 module.exports).
 */
 
 /* ──────────────────────────────────────────────────────────────────────────
-   ③ 마감까지 남은 시간 — 컨텍스트 바
+   ③ 마감까지 남은 시간 막대 — **뺐다** (2026-09-11 개발자 지시)
 
-   개발자 지시(2026-09-09): *"홈 화면 수정 사안은 컨텍스트 바(밑에 빨간색으로 마감 기간
-   알려주는 것)까지만."*
-
-   🔴 **'접수 기간의 몇 %' 로 그리지 않는다.** 그렇게 그리려면 접수 시작일이 필요한데
-      등록 공고 46건 중 `openDate` 가 있는 것은 17건뿐이다(실측). 없는 27건에 시작일을
-      짐작해 넣으면 그 순간 앱이 지어낸 숫자가 된다(원칙 8-1). 그래서 이 막대가 말하는 것은
-      **오직 '마감이 얼마나 가까운가'** 하나이고, 재료는 이미 아는 마감일 하나뿐이다.
-
-   🔴 **문턱은 7일 — `dday()` 가 `urgent` 를 붙이는 바로 그 값이다.** 새 문턱을 만들면
-      "배지는 빨간데 막대는 없는" 칸이 생긴다. 여기를 고칠 일이 생기면 `dday()` 를 함께 본다.
-
-   🔴 **시간 단위('6시간 남았어요')는 쓰지 않는다.** 우리가 아는 것은 날짜(`2026-08-31`)뿐이고
-      마감 시각이 23:59 인지 18:00 인지는 모른다. 시간을 붙이는 순간 지어내는 것이 된다.
-*/
-var DEADLINE_WINDOW_DAYS = 7;   // dday() 의 urgent 문턱과 같은 값 — 갈라놓지 말 것
-
-/**
- * 마감 임박 막대의 수치.
- * @param {number} days  dday().days — 오늘부터 마감까지 남은 날짜(음수면 마감)
- * @returns {{show:boolean, pct:number, label:string}}
- *          show=false 면 그리지 않는다(멀거나·마감했거나·마감을 못 읽은 공고).
- */
-function deadlineMeter(days) {
-  var off = { show: false, pct: 0, label: '' };
-  if (typeof days !== 'number' || !isFinite(days)) return off;
-  if (days < 0 || days > DEADLINE_WINDOW_DAYS) return off;
-  /* 바닥을 6% 둔다 — D-7 에 폭이 0이면 '막대가 안 그려졌다'로 보인다.
-     D-7 = 6% · D-DAY = 100% 로 곧게 늘어난다. */
-  var ratio = (DEADLINE_WINDOW_DAYS - days) / DEADLINE_WINDOW_DAYS;
-  var pct = Math.round(6 + ratio * 94);
-  return {
-    show: true,
-    pct: Math.max(0, Math.min(100, pct)),
-    /* 눈이 아니라 소리로 읽는 사람에게 막대는 아무 말도 하지 않는다 — 글로도 적는다 */
-    label: days === 0 ? '오늘 마감' : '마감까지 ' + days + '일',
-  };
-}
-
-/** `2026-08-31` → `8/31`. 못 읽으면 빈 문자열(지어내지 않는다). */
-function shortDate(dateStr) {
-  var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(dateStr || ''));
-  if (!m) return '';
-  return Number(m[2]) + '/' + Number(m[3]);
-}
-
-/**
- * 카드에 붙일 막대 HTML. 그릴 것이 없으면 빈 문자열.
- * @param {number} days      dday().days
- * @param {string} deadline  공고의 마감일 문자열(있으면 오른쪽에 날짜를 적는다)
- */
-function deadlineMeterHtml(days, deadline) {
-  var m = deadlineMeter(days);
-  if (!m.show) return '';
-  /* 🔴 2026-09-10 페이스리프트: 막대 옆 날짜('9/10 마감')를 **뗐다.**
-     카드가 이미 '오늘 마감 / 20일 남음'이라고 글로 말하는데 그 옆에 M/D 를 또 두면
-     한 카드가 마감을 두 가지 형식으로 말한다(앱 전체 다섯 형식의 한 축이었다).
-     막대는 남은 시간을 **모양**으로만 전한다. 낭독기용 aria-label 은 그대로 남는다.
-     shortDate 는 다른 곳(검사·달력)이 쓰므로 지우지 않는다. */
-  return '<div class="dl-meter" role="img" aria-label="' + m.label + '">'
-    + '<span class="dl-meter-track"><span class="dl-meter-fill" style="width:' + m.pct + '%"></span></span>'
-    + '</div>';
-}
+   2026-09-09 에 카드 밑에 빨간 막대(컨텍스트 바)를 그렸는데, 개발자가 배포된 앱을 보고
+   *"빨간색 마감 인터렉션 바를 지우고 마감 D-DAY 카운트만 남겨놓기"* 라고 했다.
+   그래서 `deadlineMeter`·`deadlineMeterHtml`·`shortDate` 를 **지웠다**(주석으로 남기지 않았다 —
+   남겨 두면 다음 사람이 되살린다). 마감은 이제 카드 맨 아랫줄의 D-DAY 글자(`app.js`
+   `ddayWords` → `dday().label`) 하나로만 말한다.
+   🔴 되돌리자는 제안이 나오면 **개발자에게 화면을 보여 주고** 정한다(서체 되돌림과 같은 규칙).
+   관문: `verify/verify-interactions.js` '마감 막대가 없다' + `test-collector.mjs` 손짓 절 ④. */
 
 /* ──────────────────────────────────────────────────────────────────────────
    ② 손끝의 답 — 아주 짧은 진동
@@ -294,8 +237,8 @@ function installPullToRefresh(opts) {
 /* Node(검증 스크립트)에서도 같은 규칙을 불러 쓸 수 있게 — 브라우저에는 영향 없음 */
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
-    deadlineMeter, deadlineMeterHtml, shortDate, skeletonRows,
+    skeletonRows,
     haptic, popEl, installPullToRefresh,
-    DEADLINE_WINDOW_DAYS, PTR_TRIGGER_PX, PTR_MAX_PX, PTR_MIN_SPIN_MS, POP_CLEAR_MS,
+    PTR_TRIGGER_PX, PTR_MAX_PX, PTR_MIN_SPIN_MS, POP_CLEAR_MS,
   };
 }
