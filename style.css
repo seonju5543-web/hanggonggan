@@ -1864,6 +1864,14 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
 .legal p { margin-bottom: 8px; }
 .legal ul { padding-left: 18px; margin-bottom: 10px; }
 .legal li { margin-bottom: 4px; list-style: disc; }
+/* 🔴 조항은 **번호 목록**이다 (2026-09-11 — 국내 앱 약관의 일반적인 꼴).
+   바로 위 `.legal li` 가 모든 줄을 disc 로 만들어 두어서, 번호를 쓰려면
+   ol 안의 줄만 따로 되돌려야 한다. 순서를 바꾸면 번호가 다시 점으로 돌아간다. */
+.legal ol { padding-left: var(--space-24); margin-bottom: var(--space-12); }
+.legal ol > li { list-style: decimal; margin-bottom: var(--space-8); }
+/* 조항에 딸린 설명 불릿 — 번호 줄과 붙여 한 덩어리로 읽히게 */
+.legal ol ul { margin: var(--space-6) 0 0; padding-left: var(--space-16); }
+.legal ol ul li { margin-bottom: var(--space-4); }
 .legal a { color: var(--primary); }
 .legal-note {
   background: var(--orange-weak); color: var(--orange);
@@ -4141,6 +4149,52 @@ input:user-invalid:focus, select:user-invalid:focus, textarea:user-invalid:focus
    검색칸은 알약 안에 네모 선이 하나 더 그려졌다(실측 스크린샷). 버튼·링크의 바깥선은 그대로다(키보드 초점).
    ⚠️ 틀린 칸(:user-invalid)은 뺀다 — 16번이 그 바깥선을 빨강으로 쓰고 링은 끈다. */
 input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid), textarea:focus-visible:not(:user-invalid) { outline: none; }
+
+/* ══ 로그인 활동 · FAQ · 앱 권한 (2026-09-11 개발자 지시 1·2·4번) ═══════════════ */
+
+/* 로그인 카드 — 한 줄에 '무엇으로 · 언제'. 🔴 IP 줄은 없다: 브라우저는 제 IP 를 모른다.
+   지어내느니 적지 않는다(원칙 8-1). 보여 주려면 서버 조각이 하나 더 있어야 한다. */
+.login-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--space-16);
+  margin-bottom: var(--space-8);
+}
+.login-now {
+  display: inline-block;
+  font-size: var(--t-2xs);
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--primary-weak);
+  border-radius: var(--radius-pill);
+  padding: var(--space-2) var(--space-8);
+  margin-bottom: var(--space-6);
+}
+.login-device { font-size: var(--t-lg); font-weight: 800; letter-spacing: -0.02em; }
+.login-meta { font-size: var(--t-sm); color: var(--text-sub); margin-top: var(--space-2); }
+
+/* FAQ — 여닫기는 <details> 에 맡긴다(코드 0줄 · 키보드와 보조기기에서도 저절로 된다) */
+.faq-item { border-bottom: 1px solid var(--line); }
+.faq-item summary {
+  padding: var(--space-16) 0;
+  font-size: var(--t-md);
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after { content: '＋'; float: right; color: var(--text-weak); font-weight: 400; }
+.faq-item[open] summary::after { content: '－'; }
+.faq-a {
+  font-size: var(--t-sm);
+  color: var(--text-sub);
+  line-height: 1.7;
+  padding: 0 0 var(--space-16);
+}
+
+/* 권한 안내 — 문단이라 카드 줄(.wallet-row)과 달리 통으로 읽힌다 */
+.perm-how { font-size: var(--t-sm); color: var(--text-sub); line-height: 1.7; margin-top: var(--space-12); }
 
 /* ── 적합도 알약 (2026-09-11 개발자 지시: "적합도 퍼센테이지 안내가 옅은 회색으로 잘 보이지 않음.
    적합도 퍼센테이지 기능 강조 방안을 검토하고 즉시 실행") ─────────────────────────
