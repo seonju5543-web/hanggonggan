@@ -15,4 +15,4 @@
 # 데이터 관문(node verify/audit-data.js)을 통과하지 못하면 배포하지 않고 🚨 이슈를 남긴다.
 
 branch: claude/device-main-deploy-config-cfodsa
-메모: 2026-09-11 약관 화면 되돌아가기 화살표 · 제목 줄바꿈 배포
+메모: 2026-09-11 약관 표를 좁은 화면에서 펴기 배포
