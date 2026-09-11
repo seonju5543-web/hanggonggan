@@ -4532,5 +4532,49 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
   eq('그때 다른 문구를 쓴다', /확인하지 못했|판단하지 못했/.test(seg), true);
 }
 
+/* ── 🔴 DESIGN.md 가 style.css 와 갈라지지 않게 (2026-09-11) ──
+   `DESIGN.md` 는 style.css 의 값을 사람이 읽게 옮긴 **사본**이다. 사본은 관문이 없으면
+   반드시 썩는다 — 실제로 그랬다: 그 문서는 2026-09-11 04:45 에 만들어졌는데 서체를
+   Pretendard 로 되돌린 커밋이 **3분 뒤인 04:48** 에 들어와, 문서가 `SUIT`/`SUITE` 와
+   46px 척도를 적은 채로 남았다. 개발자가 그날 직접 되돌리라고 말한 바로 그 값이다.
+   🔴 원본은 style.css 하나다. 값을 바꿀 땐 CSS 를 고치고 문서를 따라 고친다.
+   ⚠️ 역할 이름(`body`·`card-title`)까지 맞추려 들지 않는다 — 그 대응은 사람이 정하는 것이라
+      여기서 강제하면 이름을 바꿀 때마다 관문이 막는다. **쓰인 값이 CSS 에 있는가**만 본다. */
+console.log('\n■ DESIGN.md 가 style.css 와 같은 값을 적는가 (2026-09-11)');
+{
+  const css = readText(new URL('../style.css', import.meta.url));
+  const design = readText(new URL('../DESIGN.md', import.meta.url));
+
+  /* :root 가 여러 번 나오고 **뒤에 나온 것이 이긴다** — 첫 덩어리만 읽으면 옛 팔레트를 본다 */
+  const rootVars = {};
+  const re = /(^|\n)\s*:root\s*\{/g;
+  let m;
+  while ((m = re.exec(css))) {
+    const st = css.indexOf('{', m.index) + 1, en = css.indexOf('}', st);
+    for (const d of css.slice(st, en).matchAll(/--([a-z0-9-]+):\s*([^;]+);/g)) {
+      rootVars[d[1]] = d[2].split('/*')[0].trim();
+    }
+  }
+  const scale = Object.keys(rootVars).filter((k) => /^t-/.test(k)).map((k) => rootVars[k]);
+  eq('style.css 에서 글자 척도를 읽어 냈다 (못 읽으면 조용히 통과하면 안 된다)', scale.length >= 5, true);
+
+  const sizes = [...design.matchAll(/fontSize:\s*([0-9.]+px)/g)].map((x) => x[1]);
+  eq('DESIGN.md 에서 글자 크기를 읽어 냈다', sizes.length >= 5, true);
+  eq('  적힌 글자 크기가 전부 style.css 의 --t-* 안에 있다',
+    sizes.filter((v) => !scale.includes(v)), []);
+
+  const family = (rootVars['font-text'] || '').split(',')[0].replace(/['"]/g, '').trim();
+  const fams = [...new Set([...design.matchAll(/fontFamily:\s*([^\n]+)/g)].map((x) => x[1].trim()))];
+  eq(`  적힌 글꼴이 --font-text 와 같다 (지금 ${family})`, fams.filter((f) => f !== family), []);
+
+  /* 색은 이름이 다르므로(canvas↔bg) 짝을 여기 적는다 — 이 여섯이 문서의 주장이다 */
+  for (const [doc, cssName] of [['canvas', 'bg'], ['surface-1', 'surface'], ['surface-2', 'surface-2'],
+                                ['ink', 'text'], ['primary', 'primary'], ['accent', 'accent']]) {
+    const want = rootVars[cssName];
+    const got = (design.match(new RegExp('\\n  ' + doc + ':\\s*"([^"]+)"')) || [])[1];
+    eq(`  ${doc} = --${cssName}`, got && got.toLowerCase(), want && want.toLowerCase());
+  }
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);
