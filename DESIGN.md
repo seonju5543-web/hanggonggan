@@ -1,7 +1,7 @@
 ---
 version: alpha
 name: handaejang-design-system
-description: "한대장(한국 대학교 장학금) 모바일 PWA 의 디자인 시스템. 흰색에 베이지 한 방울을 탄 밝은 바탕(#fefdfc) 위에 먹빛 글자(#17191c), 그리고 채도를 낮춘 잉크블루(#27508f) **하나**만을 강조색으로 쓴다. 동작(누를 수 있음)은 남색 잉크(#1e2b42)가 맡고, 뜻을 가진 색(마감·검수 전·선정)은 셋뿐이며 전부 채도 60% 아래다. 본문은 SUIT, 제목은 SUITE — 숫자(금액·남은 날·적합도)가 화면의 주인공이라 tabular-nums 로 자리를 고정한다. 카드는 흰 면 위의 얇은 선(hairline)으로 가르고, 그림자는 떠 있는 것(시트·주 버튼·마스코트)에만 준다. 첨부된 Linear DESIGN.md 의 **구조**(단일 강조색 · 면의 사다리 · 얇은 선 · 4px 격자 · 이름 붙인 컴포넌트)를 그대로 받되, **값**(어두운 바탕·라벤더·Inter)은 이 앱의 기존 결정(2026-08-31 팔레트 · 2026-09-10 서체)을 지킨다. 값을 바꾸는 항목은 맨 아래 「Linear 와 충돌 · 컨펌 대기」에 모아 두었다."
+description: "한대장(한국 대학교 장학금) 모바일 PWA 의 디자인 시스템. 흰색에 베이지 한 방울을 탄 밝은 바탕(#fefdfc) 위에 먹빛 글자(#17191c), 그리고 채도를 낮춘 잉크블루(#27508f) **하나**만을 강조색으로 쓴다. 동작(누를 수 있음)은 남색 잉크(#1e2b42)가 맡고, 뜻을 가진 색(마감·검수 전·선정)은 셋뿐이며 전부 채도 60% 아래다. 본문도 제목도 Pretendard 한 벌이고 제목은 굵기·자간으로만 구분한다(2026-09-11 개발자 지시로 SUIT·SUITE 에서 되돌림) — 숫자(금액·남은 날·적합도)가 화면의 주인공이라 tabular-nums 로 자리를 고정한다. 카드는 흰 면 위의 얇은 선(hairline)으로 가르고, 그림자는 떠 있는 것(시트·주 버튼·마스코트)에만 준다. 첨부된 Linear DESIGN.md 의 **구조**(단일 강조색 · 면의 사다리 · 얇은 선 · 4px 격자 · 이름 붙인 컴포넌트)를 그대로 받되, **값**(어두운 바탕·라벤더·Inter)은 이 앱의 기존 결정(2026-08-31 팔레트 · 2026-09-11 서체 되돌림)을 지킨다. 값을 바꾸는 항목은 맨 아래 「Linear 와 충돌 · 컨펌 대기」에 모아 두었다."
 
 colors:
   primary: "#1e2b42"
@@ -34,68 +34,68 @@ colors:
 
 typography:
   display-hero:
-    fontFamily: SUITE Variable
-    fontSize: 46px
+    fontFamily: Pretendard Variable
+    fontSize: 38px
     fontWeight: 800
     lineHeight: 1.2
     letterSpacing: -0.03em
   display-lg:
-    fontFamily: SUITE Variable
-    fontSize: 30px
-    fontWeight: 800
-    lineHeight: 1.2
-    letterSpacing: -0.03em
-  headline:
-    fontFamily: SUITE Variable
+    fontFamily: Pretendard Variable
     fontSize: 27px
     fontWeight: 800
     lineHeight: 1.2
     letterSpacing: -0.03em
+  headline:
+    fontFamily: Pretendard Variable
+    fontSize: 21px
+    fontWeight: 800
+    lineHeight: 1.2
+    letterSpacing: -0.03em
   title:
-    fontFamily: SUITE Variable
-    fontSize: 24px
+    fontFamily: Pretendard Variable
+    fontSize: 18.5px
     fontWeight: 800
     lineHeight: 1.35
     letterSpacing: -0.03em
   card-title:
-    fontFamily: SUIT Variable
-    fontSize: 20px
+    fontFamily: Pretendard Variable
+    fontSize: 17px
     fontWeight: 700
     lineHeight: 1.35
     letterSpacing: -0.01em
   body:
-    fontFamily: SUIT Variable
-    fontSize: 17px
+    fontFamily: Pretendard Variable
+    fontSize: 14.5px
     fontWeight: 400
     lineHeight: 1.5
     letterSpacing: -0.014em
   body-sm:
-    fontFamily: SUIT Variable
-    fontSize: 15px
+    fontFamily: Pretendard Variable
+    fontSize: 13.5px
     fontWeight: 400
     lineHeight: 1.5
     letterSpacing: -0.014em
   caption:
-    fontFamily: SUIT Variable
-    fontSize: 13.5px
+    fontFamily: Pretendard Variable
+    fontSize: 12.5px
     fontWeight: 600
     lineHeight: 1.5
     letterSpacing: -0.014em
   meta:
-    fontFamily: SUIT Variable
-    fontSize: 12px
+    fontFamily: Pretendard Variable
+    fontSize: 11.5px
     fontWeight: 600
     lineHeight: 1.5
     letterSpacing: 0
   button:
-    fontFamily: SUIT Variable
-    fontSize: 16px
+    fontFamily: Pretendard Variable
+    fontSize: 17px
     fontWeight: 700
     lineHeight: 1.5
     letterSpacing: -0.014em
   number:
-    fontFamily: SUITE Variable
-    fontSize: 17px
+    fontFamily: Pretendard Variable
+    fontSize: 14.5px
     fontWeight: 800
     lineHeight: 1.5
     letterSpacing: 0

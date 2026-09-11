@@ -267,7 +267,7 @@ function openNotifyInbox() {
     notifyRenderBadge();
     openNotifyInbox();
   });
-  $('#btn-nf-settings').addEventListener('click', () => { closeNotifyPanel(); showScreen('my'); setTimeout(() => { const el = $('#my-notify'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 120); });
+  $('#btn-nf-settings').addEventListener('click', () => { closeNotifyPanel(); showScreen('settings'); setTimeout(() => { const el = $('#my-notify'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 120); });
 
   $$('[data-nf-open]').forEach((btn) => btn.addEventListener('click', async () => {
     const item = items.find((i) => i.key === btn.dataset.nfOpen);

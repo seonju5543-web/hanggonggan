@@ -416,12 +416,21 @@ function officialChannel(sch) {
   return { label: `${sch.provider} 장학공지 (학교 포털)`, guide: SUBMIT_GUIDES.campus };
 }
 
+/* 🔴 **이 표의 열쇠는 `index.html` 의 `#in-flags` 체크박스와 한 글자도 어긋나면 안 된다.**
+   2026-09-03 에 특별자격을 5종 → 8종으로 늘리면서(백로그 A-4) 체크박스만 늘리고 여기를
+   안 늘렸다. 그래서 한부모·북한이탈·다문화를 고른 학생의 MY 화면이 `특별자격: , ,` 이 됐다 —
+   자기가 방금 고른 것이 **화면에서 통째로 사라진다**(app.js renderMy 는 이름표가 없으면 빈칸을
+   내놓는다). 셋만 고른 학생에게는 남는 글자가 쉼표 둘뿐이었다.
+   관문: verify/test-collector.mjs '특별자격 이름표' 절이 체크박스와 대조한다. */
 const FLAG_LABELS = {
   basicLiving: '기초생활수급자',
   nearPoverty: '차상위계층',
   multiChild: '다자녀 가구 (3자녀 이상)',
   merit: '국가유공자 (본인/자녀)',
   disabled: '장애 학생',
+  singleParent: '한부모 가정',
+  defector: '북한이탈주민 (본인/자녀)',
+  multicultural: '다문화 가정',
 };
 
 /* 시·군·구 (2026-08-30 신설 — 개발자 지시).
