@@ -3476,13 +3476,14 @@
    "patrolledAt": "2026-09-11"
   },
   "r:auto-9599ec839d20ec84a0ebb09c": {
-   "attempts": 0,
+   "attempts": 1,
    "title": "공통 제36기 미레에셋 해외교환 장학생 선발",
-   "lastTried": "2026-09-04",
-   "lastWhy": "제목 불일치(다른 글이 열림)",
-   "status": "resolved",
+   "lastTried": "2026-09-11",
+   "lastWhy": "목록에서 못 찾음",
+   "status": "",
    "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322953",
-   "patrolledAt": "2026-09-11"
+   "patrolledAt": "2026-09-11",
+   "nextTryAt": "2026-09-12"
   },
   "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%20%5B%EA%B3%B5%ED%86%B5%5D%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EC%9A%B0%EC%A0%95%EC%9E%A5%ED%95%99(%ED%95%99%EC%97%85%EC%9E%A5%EB%A0%A4%EA%B8%88)%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4": {
    "attempts": 0,
@@ -3708,7 +3709,7 @@
   },
   "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322953": {
    "patrolledAt": "2026-09-11",
-   "lastWhy": ""
+   "lastWhy": "제목 불일치(다른 글이 열림)"
   },
   "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322949": {
    "patrolledAt": "2026-09-11",
