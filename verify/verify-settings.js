@@ -9,6 +9,29 @@ const { assertOwnServer, dismissNotify } = require('./onboard-helper.js');
 const PORT = process.env.PORT || 8123;
 const SHOT = process.env.SHOT_DIR || '/tmp/shots';
 
+
+/* 🔴 진짜 손가락 끌기 — Playwright 의 마우스로는 touchstart/move/end 가 안 난다.
+   이 저장소는 마우스로 재다가 손짓 사고를 세 번 놓쳤다(CLAUDE.md 13차 세션). */
+async function swipe(page, { x, y, dx, dy = 0, steps = 10 }) {
+  await page.evaluate(([x, y, dx, dy, steps]) => {
+    const el = document.elementFromPoint(x, y);
+    if (!el) throw new Error('그 자리에 아무것도 없다: ' + x + ',' + y);
+    const mk = (type, cx, cy) => {
+      const t = new Touch({ identifier: 1, target: el, clientX: cx, clientY: cy });
+      el.dispatchEvent(new TouchEvent(type, {
+        bubbles: true, cancelable: true,
+        touches: type === 'touchend' ? [] : [t],
+        targetTouches: type === 'touchend' ? [] : [t],
+        changedTouches: [t],
+      }));
+    };
+    mk('touchstart', x, y);
+    for (let i = 1; i <= steps; i++) mk('touchmove', x + (dx * i) / steps, y + (dy * i) / steps);
+    mk('touchend', x + dx, y + dy);
+  }, [x, y, dx, dy, steps]);
+  await page.waitForTimeout(320);
+}
+
 let fail = 0;
 const eq = (label, got, want) => {
   const ok = JSON.stringify(got) === JSON.stringify(want);
@@ -288,6 +311,72 @@ const eq = (label, got, want) => {
     eq('넓은 화면에서는 표 머리글이 다시 보인다',
       await t.$eval('.legal-table .legal-thead', (e) => e.offsetParent !== null), true);
     await t.close();
+  }
+
+  console.log('\n■ 오른쪽으로 쓸어 나가기 (손가락으로 재현)');
+  {
+    const open = async (btn, screen) => {
+      await page.click('.nav-item[data-nav="my"]');
+      await page.click('#btn-open-settings');
+      await page.waitForSelector('#screen-settings:not([hidden])');
+      if (btn) { await page.click(btn); await page.waitForSelector(screen); }
+      await page.waitForTimeout(400);
+    };
+
+    await open('#btn-open-trash', '#screen-trash:not([hidden])');
+    await swipe(page, { x: 200, y: 400, dx: 160 });
+    eq('휴지통에서 오른쪽으로 쓸면 설정으로 나간다',
+      await page.$eval('#screen-settings', (e) => e.hidden), false);
+
+    await open('#btn-open-terms', '#screen-terms:not([hidden])');
+    await page.waitForTimeout(500);
+    await swipe(page, { x: 200, y: 500, dx: 160 });
+    eq('약관에서 오른쪽으로 쓸면 설정으로 나간다',
+      await page.$eval('#screen-settings', (e) => e.hidden), false);
+
+    /* 🔴 짧고 빠르게 튕기는 것도 먹어야 한다 — 거리만 보면 가장 자연스러운 손짓이 무시된다 */
+    await open('#btn-open-trash', '#screen-trash:not([hidden])');
+    await swipe(page, { x: 200, y: 400, dx: 40, steps: 2 });
+    eq('짧게 튕겨도 나간다 (거리만 보지 않는다)',
+      await page.$eval('#screen-settings', (e) => e.hidden), false);
+
+    /* 🔴 세로로 끄는 것은 목록을 읽으려는 것이다 — 뺏으면 안 된다 */
+    await open('#btn-open-terms', '#screen-terms:not([hidden])');
+    await page.waitForTimeout(500);
+    await swipe(page, { x: 200, y: 500, dx: 20, dy: 180 });
+    eq('세로로 끌면 나가지 않는다 (스크롤을 뺏지 않는다)',
+      await page.$eval('#screen-terms', (e) => e.hidden), false);
+
+    /* 🔴 왼쪽으로 끄는 것은 되돌아가기가 아니다 */
+    await swipe(page, { x: 250, y: 500, dx: -160 });
+    eq('왼쪽으로 끌면 나가지 않는다',
+      await page.$eval('#screen-terms', (e) => e.hidden), false);
+
+    /* ⚠️ 화면 왼쪽 끝은 iOS 제 뒤로가기 몫이라 우리가 잡지 않는다 */
+    await swipe(page, { x: 10, y: 500, dx: 160 });
+    eq('화면 왼쪽 끝에서 시작한 손짓은 우리가 잡지 않는다 (iOS 몫)',
+      await page.$eval('#screen-terms', (e) => e.hidden), false);
+
+    /* 끌다 만 화면에 자국이 남으면 안 된다 */
+    eq('끌다 말면 화면이 제자리로 돌아온다',
+      await page.$eval('#screen-terms', (e) => e.style.transform === '' && e.style.opacity === ''), true);
+
+    await page.click('#btn-terms-back');
+    await page.waitForSelector('#screen-settings:not([hidden])');
+
+    /* 🔴 시트가 떠 있으면 그 안의 손짓을 뺏으면 안 된다 — 시트는 `#app` 안에 있어서
+       막지 않으면 로그인 시트를 옆으로 쓸 때 설정 화면이 통째로 나가 버린다. */
+    await page.click('#btn-acc-in');
+    await page.waitForSelector('#detail-sheet:not([hidden])');
+    await page.waitForTimeout(400);
+    await swipe(page, { x: 200, y: 500, dx: 160 });
+    eq('시트가 열려 있으면 화면이 나가지 않는다 (시트 손짓을 뺏지 않는다)',
+      await page.$eval('#screen-settings', (e) => e.hidden), false);
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(400);
+
+    await swipe(page, { x: 200, y: 400, dx: 160 });
+    eq('설정에서 쓸면 MY 로 나간다', await page.$eval('#screen-my', (e) => e.hidden), false);
   }
 
   console.log(errors.length ? '\n❌ 오류:\n' + errors.join('\n') : '\n✓ 콘솔 오류 없음');

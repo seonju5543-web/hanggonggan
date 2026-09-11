@@ -2918,6 +2918,114 @@ function enableSheetSwipe(sheet, close) {
   }, { passive: true });
 }
 
+/* ── 안쪽 화면을 **오른쪽으로 쓸어** 되돌아가기 (2026-09-11 개발자 요청) ──────────
+   설정·휴지통·이용약관은 MY 안쪽 화면이라 나가는 길이 왼쪽 위 화살표 하나뿐이었다.
+   손가락으로 오른쪽으로 쓸면 그 화면을 나간다 — 시트를 아래로 쓸어 닫는 것과 같은 계열이다.
+
+   🔴 **규칙은 시트 것(enableSheetSwipe)과 같은 뼈대를 쓴다**: 거리만 보지 않고 **튕김
+      빠르기**도 함께 본다(짧고 빠르게 튕기는 것이 가장 자연스러운 손짓인데 거리만 보면
+      무시된다 — 2026-09-06 에 시트에서 겪은 그것). 문턱 값도 같은 뜻으로 맞춰 뒀다.
+
+   🔴 **세로 스크롤을 뺏지 않는다.** 첫 움직임에서 축을 정하고, 세로가 더 크면 그 손짓은
+      통째로 포기한다(다시 붙잡지 않는다). 이 저장소는 '보이지 않는 것이 손가락을 가로채는'
+      사고를 여러 번 냈다 — 밀어서 삭제가 그래서 걷어내졌다(2026-09-01).
+
+   🔴 **가로로 스크롤되는 것 위에서는 안 된다.** 약관의 표처럼 옆으로 밀리는 영역이
+      왼쪽 끝이 아니면 그건 그 영역의 스크롤이다(시트의 `scrollableAtTop` 과 같은 판정).
+
+   ⚠️ iOS 는 **화면 왼쪽 끝**에서 오른쪽으로 끄는 것을 제 '뒤로 가기'로 가로챈다. 그래서
+      왼쪽 끝 24px 에서 시작한 손짓은 건드리지 않고 넘긴다 — 우리가 잡아 봐야 OS 와 둘이
+      같이 반응해 두 번 나가거나 화면이 튄다. 그 자리를 뺀다고 손해가 없다(가운데에서
+      쓸어도 되니까).
+   ⚠️ 회귀는 **반드시 TouchEvent 로** 재현할 것 — 마우스로는 이 유형이 한 번도 재현되지
+      않았다(13차 세션 학교 검색 사고). verify/verify-settings.js 의 '쓸어서 나가기' 절. */
+function scrollableAtLeft(target, screen) {
+  for (let el = target; el && el !== screen.parentNode; el = el.parentElement) {
+    if (el.scrollLeft > 0) return false;
+  }
+  return true;
+}
+
+const SWIPE_EDGE_IOS = 24;   /* iOS 제 뒤로가기에 양보하는 왼쪽 끝 폭 */
+
+/* 🔴 손짓은 **앱 전체**(`#app`)에서 받는다 — 화면 조각에 붙이면 안 된다.
+   빈 휴지통처럼 내용이 짧은 화면은 아래쪽이 통째로 비어 있어서, 그 조각에만 붙이면
+   학생이 화면 가운데를 쓸어도 아무 일도 안 일어난다(검사에서 실제로 그렇게 걸렸다).
+   지금 어느 화면인지는 `currentScreen` 이 말해 주고, 안쪽 화면일 때만 맡는다. */
+const SWIPE_BACK_TO = {
+  settings: 'my',
+  trash: 'settings',
+  terms: 'settings',
+};
+
+function enableScreenSwipeBack(root) {
+  if (!root || root.dataset.swipeBack) return;
+  root.dataset.swipeBack = '1';
+  const screen = () => $(`#screen-${currentScreen}`);
+  let x0 = 0, y0 = 0, dx = 0, t0 = 0;
+  let live = false;      // 이 손짓을 우리가 맡았나
+  let axis = '';         // '' 아직 모름 · 'x' 우리 것 · 'y' 스크롤이라 포기
+  const FLICK = 0.11;    // 시트와 같은 값 — '툭 치는 것'과 '천천히 끄는 것'이 갈리는 선
+
+  const reset = () => {
+    live = false; axis = '';
+    const el = screen();
+    if (!el) return;
+    el.style.transition = '';
+    void el.offsetHeight;
+    el.style.transform = '';
+    el.style.opacity = '';
+  };
+
+  root.addEventListener('touchstart', (e) => {
+    live = false;
+    if (e.touches.length !== 1) return;
+    if (!SWIPE_BACK_TO[currentScreen] || !screen()) return;   // 안쪽 화면일 때만
+    /* 🔴 시트 안에서는 손대지 않는다. 시트(#detail-sheet 등)는 `#app` **안에** 있어서,
+       설정 화면 위에 로그인 시트가 떠 있을 때 그 안의 손짓까지 이 규칙이 가로챈다 —
+       시트는 제 손짓(아래로 쓸어 닫기)이 따로 있다(enableSheetSwipe). */
+    if (e.target.closest && e.target.closest('.sheet, .sheet-backdrop')) return;
+    const t = e.touches[0];
+    if (t.clientX <= SWIPE_EDGE_IOS) return;                   // OS 몫
+    if (!scrollableAtLeft(e.target, root)) return;
+    x0 = t.clientX; y0 = t.clientY; dx = 0; t0 = Date.now();
+    live = true; axis = '';
+  }, { passive: true });
+
+  root.addEventListener('touchmove', (e) => {
+    if (!live) return;
+    const el = screen();
+    if (!el) { live = false; return; }
+    const t = e.touches[0];
+    const mx = t.clientX - x0;
+    const my = t.clientY - y0;
+    if (!axis) {
+      if (Math.abs(mx) < 8 && Math.abs(my) < 8) return;   // 아직 방향을 말하지 않았다
+      /* 세로가 더 크면 목록을 읽으려는 것이다 — 통째로 포기하고 다시 붙잡지 않는다 */
+      axis = Math.abs(mx) > Math.abs(my) ? 'x' : 'y';
+      if (axis === 'y') { live = false; return; }
+    }
+    dx = mx;
+    if (dx <= 0) { el.style.transform = ''; el.style.opacity = ''; return; }
+    e.preventDefault();
+    el.style.transition = 'none';
+    el.style.transform = `translateX(${dx}px)`;
+    /* 멀리 끌수록 옅어진다 — '나가는 중'이 손끝에 보이게 (0.4 아래로는 안 내린다) */
+    el.style.opacity = String(Math.max(0.4, 1 - dx / 520));
+  }, { passive: false });
+
+  const finish = () => {
+    if (!live) { reset(); return; }
+    const moved = dx;
+    const speed = moved / Math.max(1, Date.now() - t0);
+    const to = SWIPE_BACK_TO[currentScreen];
+    reset();
+    if (to && (moved > 90 || (moved > 12 && speed > FLICK))) showScreen(to, { back: true });
+  };
+  root.addEventListener('touchend', finish, { passive: true });
+  root.addEventListener('touchcancel', () => { live = false; reset(); }, { passive: true });
+}
+
 /* 바텀시트를 여는 동작 한 곳 — 상세 시트와 일괄 준비 목록이 **같은 함수**를 쓴다.
    베끼면 열리는 모양이 갈라진다(내용은 부르는 쪽이 innerHTML 로 채운다). */
 function openSheetShell(keepScroll) {
@@ -4354,6 +4462,11 @@ function bindEvents() {
   $('#btn-settings-back').addEventListener('click', () => showScreen('my', { back: true }));
   $('#btn-trash-back').addEventListener('click', () => showScreen('settings', { back: true }));
   $('#btn-terms-back').addEventListener('click', () => showScreen('settings', { back: true }));
+
+  /* 🔴 안쪽 화면 셋 다 같은 손짓으로 나간다 (2026-09-11 개발자 요청은 휴지통·약관이었는데,
+     설정만 안 되면 거기서 쓸어 보고 '안 된다'가 된다 — 안쪽 화면이라는 점이 같다).
+     어디로 나가는지는 위 `SWIPE_BACK_TO` 한 곳에 적혀 있다. */
+  enableScreenSwipeBack($('#app'));
 
   $('#btn-reset').addEventListener('click', () => {
     const pop = $('#wallet-pop');
