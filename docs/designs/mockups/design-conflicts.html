@@ -1,0 +1,593 @@
+<meta charset="utf-8">
+<title>한대장 × Linear 대조판</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  :root {
+    --pg-bg: #f3f2ee; --pg-fg: #1c1d21; --pg-mute: #62666f; --pg-line: #d9d7d0; --pg-card: #ffffff;
+    --pg-tag: #27508f; --pg-tag-bg: #e6ecf6; --pg-rec: #3d6b47; --pg-rec-bg: #e6efe8; --pg-keep: #6b6f78; --pg-keep-bg: #ebebe8;
+    --pg-lin: #5e6ad2; --pg-lin-bg: #ecedf9;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --pg-bg: #17181b; --pg-fg: #ecedef; --pg-mute: #9a9ea6; --pg-line: #33353b; --pg-card: #1f2024;
+      --pg-tag: #9db4e0; --pg-tag-bg: #26324a; --pg-rec: #9fd1ab; --pg-rec-bg: #23372a; --pg-keep: #b5b8bf; --pg-keep-bg: #2b2d33;
+      --pg-lin: #a3abf0; --pg-lin-bg: #2a2c48;
+    }
+  }
+  :root[data-theme="dark"] {
+    --pg-bg: #17181b; --pg-fg: #ecedef; --pg-mute: #9a9ea6; --pg-line: #33353b; --pg-card: #1f2024;
+    --pg-tag: #9db4e0; --pg-tag-bg: #26324a; --pg-rec: #9fd1ab; --pg-rec-bg: #23372a; --pg-keep: #b5b8bf; --pg-keep-bg: #2b2d33;
+    --pg-lin: #a3abf0; --pg-lin-bg: #2a2c48;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--pg-bg); color: var(--pg-fg); font-family: 'IBM Plex Sans KR', 'Noto Sans KR', 'Apple SD Gothic Neo', system-ui, sans-serif; font-size: 15px; line-height: 1.6; word-break: keep-all; overflow-wrap: break-word; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 72px; }
+  header.top { border-bottom: 1px solid var(--pg-line); padding-bottom: 24px; margin-bottom: 8px; }
+  header.top h1 { font-size: 26px; font-weight: 700; margin: 0 0 6px; letter-spacing: -0.02em; text-wrap: balance; }
+  header.top p { margin: 0; color: var(--pg-mute); max-width: 68ch; }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 14px; margin-top: 14px; font-size: 13px; color: var(--pg-mute); }
+  .legend span::before { content: ''; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+  .legend .l-rec::before { background: var(--pg-rec); } .legend .l-keep::before { background: var(--pg-keep); } .legend .l-ask::before { background: var(--pg-tag); }
+
+  .plate { padding-block: 36px; border-bottom: 1px solid var(--pg-line); }
+  .plate-head { display: grid; grid-template-columns: 44px 1fr auto; gap: 12px 16px; align-items: start; margin-bottom: 18px; }
+  .no { font-variant-numeric: tabular-nums; font-size: 22px; font-weight: 700; color: var(--pg-mute); letter-spacing: -0.02em; line-height: 1.2; padding-top: 2px; }
+  .plate-head h2 { font-size: 19px; font-weight: 700; margin: 0 0 4px; letter-spacing: -0.015em; }
+  .rules { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--pg-mute); }
+  .rules b { font-weight: 600; color: var(--pg-fg); }
+  .rules .lin { color: var(--pg-lin); }
+  .verdict { font-size: 12.5px; font-weight: 600; padding: 4px 10px; border-radius: 4px; white-space: nowrap; align-self: start; }
+  .verdict.rec { color: var(--pg-rec); background: var(--pg-rec-bg); }
+  .verdict.keep { color: var(--pg-keep); background: var(--pg-keep-bg); }
+  .verdict.ask { color: var(--pg-tag); background: var(--pg-tag-bg); }
+
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .col-label { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--pg-mute); }
+  .col-label b { color: var(--pg-fg); font-weight: 600; letter-spacing: 0; text-transform: none; font-size: 13px; margin-left: 8px; }
+  .note { font-size: 13.5px; color: var(--pg-mute); margin: 0; max-width: 60ch; }
+  .note b { color: var(--pg-fg); font-weight: 600; }
+  .after-note { margin-top: 14px; font-size: 14px; color: var(--pg-fg); max-width: 72ch; }
+  .after-note span { color: var(--pg-mute); }
+  @media (max-width: 720px) { .pair { grid-template-columns: 1fr; } .plate-head { grid-template-columns: 36px 1fr; } .verdict { grid-column: 2; justify-self: start; } }
+
+  /* ─────────── 앱 화면 조각 · 지금 값은 style.css 실측 (2026-09-11) ─────────── */
+  .phone {
+    --bg: #fefdfc; --surface: #ffffff; --surface-2: #f7f6f4; --text: #17191c; --text-sub: #545a62; --text-weak: #888e97;
+    --line: rgba(23,25,28,.09); --rule: rgba(23,25,28,.14);
+    --primary: #1e2b42; --on-primary: #fdfbf6; --accent: #27508f; --accent-soft: rgba(39,80,143,.09); --accent-line: rgba(39,80,143,.24);
+    --red: #8f3a2e; --red-weak: #f5e9e6; --orange: #8a5a12; --orange-weak: #f4ede0; --green: #3d6b47; --green-weak: #e9efe8;
+    --inverse: #182338; --inverse-ink: #ffffff; --inverse-mute: rgba(232,239,254,.75);
+    --grad: radial-gradient(120% 130% at 78% -18%, rgba(104,148,216,.30) 0%, rgba(104,148,216,0) 58%), radial-gradient(90% 90% at -10% 108%, rgba(255,255,255,.06) 0%, rgba(255,255,255,0) 60%), #182338;
+    --r-hair: 3px; --r-xs: 9px; --r-sm: 13px; --r-md: 19px; --r-lg: 27px; --r-pill: 999px;
+    --sh-btn: 0 6px 18px rgba(35,32,26,.22); --sh-chip: 0 4px 14px rgba(39,80,143,.26); --sh-lift: 0 2px 6px rgba(24,35,56,.07), 0 18px 40px rgba(24,35,56,.14);
+    --ring: 0 0 0 3px rgba(39,80,143,.18);
+    --w-title: 800; --w-card: 700; --chip-on-bg: var(--accent); --chip-on-fg: #fff; --chip-on-sh: var(--sh-chip);
+    --cta-bg: var(--primary); --cta-fg: var(--on-primary);
+    --ff: 'Noto Sans KR', 'Apple SD Gothic Neo', system-ui, sans-serif; --ff-d: 'Noto Sans KR', 'Apple SD Gothic Neo', system-ui, sans-serif;
+    --icon-size: 38px; --link-pad: 0;
+    font-family: var(--ff); background: var(--bg); color: var(--text); border-radius: 22px; border: 1px solid var(--pg-line);
+    width: 100%; max-width: 380px; padding: 18px 18px 0; overflow: hidden; letter-spacing: -0.014em; line-height: 1.5; font-size: 15px; position: relative;
+  }
+  .phone.tall { padding-bottom: 0; }
+  .app-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--primary); color: #f6f0e2; font-weight: 800; display: grid; place-items: center; font-size: 18px; }
+  .app-bar .who { flex: 1; min-width: 0; }
+  .app-bar .who b { display: block; font-family: var(--ff-d); font-weight: var(--w-title); font-size: 21px; letter-spacing: -0.03em; line-height: 1.2; }
+  .app-bar .who span { font-size: 13px; color: var(--text-weak); }
+  .icon-btn { width: var(--icon-size); height: var(--icon-size); border-radius: var(--r-sm); display: grid; place-items: center; color: var(--text-weak); background: var(--icon-bg, transparent); }
+  .icon-btn svg { width: 22px; height: 22px; }
+  .hero { background: var(--grad); color: var(--inverse-ink); border-radius: var(--r-lg); padding: 26px 22px 20px; box-shadow: var(--hero-sh, var(--sh-lift)); margin-bottom: 18px; }
+  .hero .lbl { font-size: 14px; font-weight: 600; color: var(--inverse-mute); }
+  .hero .amt { font-family: var(--ff-d); font-weight: var(--w-title); font-size: 40px; letter-spacing: -0.03em; line-height: 1.2; font-variant-numeric: tabular-nums; margin: 2px 0 8px; }
+  .hero .amt small { font-size: 26px; }
+  .hero .sub { font-size: 14px; color: var(--inverse-mute); margin-bottom: 16px; }
+  .btn { display: block; width: 100%; text-align: center; font-weight: 700; font-size: 16px; padding: 15px 20px; border-radius: var(--r-sm); }
+  .btn-inverse { background: var(--surface); color: var(--text); box-shadow: var(--btnw-sh, 0 10px 26px rgba(20,16,8,.32)); }
+  .btn-primary { background: var(--cta-bg); color: var(--cta-fg); box-shadow: var(--btn-sh, var(--sh-btn)); }
+  .section { display: flex; justify-content: space-between; align-items: baseline; border-top: 1px solid var(--rule); padding-top: 14px; margin: 6px 0 2px; }
+  .section h3 { margin: 0; font-family: var(--ff-d); font-weight: var(--w-title); font-size: 19px; letter-spacing: -0.01em; }
+  .section .link { color: var(--accent); font-size: 14px; font-weight: 600; padding: var(--link-pad); border-radius: var(--r-xs); background: var(--link-bg, transparent); }
+  .card { padding: 14px 2px; border-bottom: 1px solid var(--line); background: var(--card-bg, transparent); border-radius: var(--card-r, 0); }
+  .card:last-child { border-bottom: 0; }
+  .card.pressed { background: var(--surface-2); }
+  .card .org { display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 600; color: var(--text-weak); }
+  .card .org .fit { font-variant-numeric: tabular-nums; }
+  .card .ttl { font-weight: var(--w-card); font-size: 18px; line-height: 1.35; margin: 2px 0 6px; letter-spacing: -0.01em; }
+  .card .row { display: flex; justify-content: space-between; align-items: baseline; }
+  .card .amt { font-family: var(--ff-d); font-weight: 800; font-size: 16px; font-variant-numeric: tabular-nums; }
+  .card .amt.unknown { font-family: var(--ff); font-weight: 500; color: var(--text-weak); }
+  .card .due { font-size: 12.5px; font-weight: 700; color: var(--due-fg, var(--red)); }
+  .card .due.calm { color: var(--text-weak); font-weight: 600; }
+  .card .bar { height: 2px; background: var(--due-fg, var(--red)); margin-top: 10px; border-radius: var(--r-hair); }
+  .badges { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .badge { font-size: 11.5px; font-weight: 600; padding: 3px 8px; border-radius: var(--r-pill); background: var(--surface-2); color: var(--text-sub); }
+  .badge.danger { background: var(--red-weak); color: var(--red); }
+  .badge.warn { background: var(--orange-weak); color: var(--orange); }
+  .badge.ok { background: var(--green-weak); color: var(--green); }
+  .badge.mono { background: var(--surface-2); color: var(--text-sub); }
+  .page-h { font-family: var(--ff-d); font-weight: var(--w-title); font-size: 23px; letter-spacing: -0.03em; position: relative; padding-bottom: 8px; margin: 2px 0 14px; display: inline-block; }
+  .page-h::after { content: ''; position: absolute; left: 0; bottom: 0; width: 28px; height: 3px; border-radius: var(--r-pill); background: var(--accent); }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .chip { font-size: 15px; font-weight: 600; padding: 7px 15px; border-radius: var(--chip-r, var(--r-pill)); border: 1px solid var(--line); background: var(--surface); color: var(--text-sub); }
+  .chip.on { background: var(--chip-on-bg); color: var(--chip-on-fg); border-color: var(--chip-on-bd, var(--chip-on-bg)); box-shadow: var(--chip-on-sh); }
+  .input { border: 1.5px solid rgba(18,22,31,.10); background: var(--surface); border-radius: var(--r-sm); padding: 14px 16px; font-size: 16px; color: var(--text-weak); margin-bottom: 10px; }
+  .input.focus { border-color: var(--focus-bd, var(--primary)); box-shadow: var(--ring); color: var(--text); }
+  .nav { display: flex; justify-content: space-around; border-top: 1px solid var(--line); background: var(--nav-bg, rgba(255,254,252,.82)); margin: 12px -18px 0; padding: 8px 0 12px; }
+  .nav div { font-size: 11.5px; font-weight: 600; color: var(--text-weak); display: flex; flex-direction: column; align-items: center; gap: 3px; position: relative; padding: 4px 6px; }
+  .nav div svg { width: 22px; height: 22px; }
+  .nav div.on { color: var(--accent); }
+  .nav div.on::after { content: ''; position: absolute; top: -9px; width: 18px; height: 2px; background: var(--accent); border-radius: 2px; }
+  .sheet { background: var(--surface); border-radius: var(--r-lg) var(--r-lg) 0 0; box-shadow: var(--sheet-sh, 0 -14px 48px rgba(18,26,42,.20)); margin: 14px -18px 0; padding: 14px 22px 22px; border-top: 1px solid var(--line); }
+  .sheet .handle { width: 36px; height: 4px; border-radius: 2px; background: var(--line); margin: 0 auto 14px; }
+  .sheet h4 { font-family: var(--ff-d); font-weight: var(--w-title); font-size: 22px; letter-spacing: -0.03em; margin: 0 0 4px; line-height: 1.2; }
+  .sheet .amt { color: var(--accent); font-weight: 800; font-size: 19px; }
+  .sheet p { margin: 4px 0 0; font-size: 13.5px; color: var(--text-weak); }
+  .fab { position: absolute; right: 18px; bottom: 74px; width: 52px; height: 52px; border-radius: 50%; background: var(--inverse); box-shadow: 0 6px 18px rgba(16,29,61,.34); display: grid; place-items: center; color: #f6f0e2; font-size: 20px; }
+  .toast { position: absolute; left: 50%; transform: translateX(-50%); bottom: 82px; background: rgba(16,22,38,.94); color: #fff; font-size: 13.5px; font-weight: 600; padding: 8px 16px; border-radius: var(--r-sm); white-space: nowrap; }
+  .spec { font-size: 12px; color: var(--pg-mute); border-top: 1px dashed var(--pg-line); padding-top: 8px; display: flex; flex-wrap: wrap; gap: 4px 12px; font-variant-numeric: tabular-nums; }
+
+  /* ── 바꿨을 때 · 항목별 값 ── */
+  .alt-dark { --bg: #010102; --surface: #0f1011; --surface-2: #141516; --text: #f7f8f8; --text-sub: #d0d6e0; --text-weak: #8a8f98; --line: #23252a; --rule: #34343a;
+    --accent: #9db4e0; --accent-soft: rgba(157,180,224,.12); --primary: #f7f8f8; --on-primary: #010102; --cta-bg: #f7f8f8; --cta-fg: #010102;
+    --inverse: #141516; --inverse-ink: #f7f8f8; --inverse-mute: #8a8f98; --grad: #0f1011; --hero-sh: none; --sh-lift: none; --sh-btn: none; --btnw-sh: none;
+    --red: #e08a7c; --red-weak: #3a1f1c; --nav-bg: #010102; --surface: #0f1011; }
+  .alt-dark .avatar { background: #5e6ad2; color: #fff; }
+  .alt-dark .hero { border: 1px solid #23252a; }
+  .alt-dark .btn-inverse { background: #5e6ad2; color: #fff; }
+  .alt-lav { --accent: #5e6ad2; --accent-soft: rgba(94,106,210,.10); --chip-on-bg: #5e6ad2; --chip-on-sh: 0 4px 14px rgba(94,106,210,.26);
+    --grad: radial-gradient(120% 130% at 78% -18%, rgba(130,143,255,.30) 0%, rgba(130,143,255,0) 58%), #1d1f3a; --primary: #23254a; --ring: 0 0 0 3px rgba(94,106,210,.2); }
+  .alt-inter { --ff: 'Inter', 'Noto Sans KR', system-ui, sans-serif; --ff-d: 'Inter', 'Noto Sans KR', system-ui, sans-serif; letter-spacing: -0.005em; }
+  .alt-radius { --r-hair: 2px; --r-xs: 4px; --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-pill: 6px; --chip-r: 8px; }
+  .alt-noshadow { --sh-btn: none; --sh-chip: none; --btnw-sh: none; --chip-on-sh: none; --hero-sh: none; --sheet-sh: none; }
+  .alt-noshadow .hero { border: 1px solid rgba(255,255,255,.08); }
+  .alt-nograd { --grad: #182338; }
+  .alt-chip { --chip-on-bg: var(--surface-2); --chip-on-fg: var(--accent); --chip-on-bd: var(--accent-line); --chip-on-sh: none; }
+  .alt-cta { --cta-bg: #27508f; --cta-fg: #fff; --btn-sh: 0 6px 18px rgba(39,80,143,.28); }
+  .alt-cta .btn-inverse { background: #27508f; color: #fff; }
+  .alt-touch { --icon-size: 44px; --link-pad: 10px 12px; --icon-bg: rgba(23,25,28,.035); --link-bg: rgba(39,80,143,.06); }
+  .alt-w600 { --w-title: 600; --w-card: 600; }
+  .alt-semantic { --due-fg: #3d6b47; }
+  .alt-semantic .card .bar { display: none; }
+  .alt-ring { --ring: 0 0 0 2px rgba(39,80,143,.5); --focus-bd: rgba(39,80,143,.5); }
+
+  /* 11 · 데스크톱 */
+  .desk { border: 1px solid var(--pg-line); border-radius: 10px; background: #fefdfc; color: #17191c; font-family: 'Noto Sans KR', system-ui, sans-serif; padding: 14px; overflow: hidden; letter-spacing: -0.014em; }
+  .desk .frame { max-width: 280px; margin: 0 auto; background: #fefdfc; box-shadow: 0 2px 6px rgba(24,35,56,.07), 0 18px 40px rgba(24,35,56,.14); border-radius: 8px; padding: 12px; font-size: 11px; }
+  .desk .mini-hero { background: #182338; color: #fff; border-radius: 14px; padding: 12px; margin-bottom: 10px; }
+  .desk .mini-hero b { display: block; font-size: 20px; font-weight: 800; letter-spacing: -0.03em; }
+  .desk .mini-hero small { color: rgba(232,239,254,.75); font-size: 10px; }
+  .desk .mini-card { border-bottom: 1px solid rgba(23,25,28,.09); padding: 8px 0; font-size: 11px; }
+  .desk .mini-card b { display: block; font-size: 12px; font-weight: 700; }
+  .desk .mini-card span { color: #888e97; font-size: 10px; }
+  .desk .mini-card em { font-style: normal; color: #8f3a2e; font-weight: 700; font-size: 10px; float: right; }
+  .desk .grid { display: grid; grid-template-columns: 150px 1fr; gap: 12px; font-size: 11px; min-width: 0; }
+  .desk .grid .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; align-content: start; min-width: 0; }
+  .desk .grid .cards .mini-card { border: 1px solid rgba(23,25,28,.09); border-radius: 8px; padding: 8px; background: #fff; min-width: 0; } .desk .grid .cards .mini-card em { float: none; display: block; margin-top: 4px; }
+  .desk .side { display: flex; flex-direction: column; gap: 8px; }
+  .desk .side .tab { padding: 6px 8px; border-radius: 6px; color: #545a62; }
+  .desk .side .tab.on { color: #27508f; background: rgba(39,80,143,.08); font-weight: 700; }
+  @media (max-width: 720px) { .desk .grid { grid-template-columns: 1fr; } .desk .grid .cards { grid-template-columns: 1fr 1fr; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>한대장 × Linear 대조판 — 충돌 13건, 지금과 바꿨을 때</h1>
+    <p>왼쪽은 2026-09-11 에 <code>style.css</code> 에서 실측한 지금 앱, 오른쪽은 첨부한 Linear DESIGN.md 의 규칙을 그 항목에만 적용했을 때입니다. 다른 항목은 건드리지 않고 <b>한 가지씩</b>만 바꿨습니다. 글꼴은 이 페이지가 SUIT·SUITE 를 못 실어 Noto Sans KR 로 대신 그렸습니다(3번만 Inter 가 진짜로 실립니다).</p>
+    <div class="legend"><span class="l-rec">바꾸는 쪽을 권함</span><span class="l-keep">지금 유지를 권함</span><span class="l-ask">눈으로 보고 정할 것</span></div>
+  </header>
+
+  <!-- 1 -->
+  <section class="plate" id="p1">
+    <div class="plate-head">
+      <div class="no">1</div>
+      <div><h2>바탕 — 밝은 한 벌 vs 어두운 캔버스</h2>
+        <div class="rules"><span class="lin">Linear: #010102 · "라이트 모드를 내지 말 것"</span><span>지금: <b>#fefdfc</b> 흰색에 베이지 한 방울 · 다크 없음</span></div></div>
+      <span class="verdict keep">지금 유지 · 다크는 별도 한 벌</span>
+    </div>
+    <div class="pair">
+      <div class="col"><div class="col-label">지금</div>
+        <div class="phone">
+          <div class="app-bar"><div class="avatar">학</div><div class="who"><b>이름 설정</b><span>한국외국어대학교</span></div><div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 8a6 6 0 0112 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21h4"/></svg></div></div>
+          <div class="hero"><div class="lbl">지금 신청할 수 있는 장학금 12건</div><div class="amt"><small>최대</small> 805만원</div><div class="sub">금액을 아직 못 읽은 8건은 뺀 금액이에요</div><div class="btn btn-inverse">12건 신청 준비</div></div>
+          <div class="section"><h3>마감 임박</h3><span class="link">전체 보기</span></div>
+          <div class="card"><div class="org"><span>교외 · 한국소아당뇨인협회</span><span class="fit">적합도 15%</span></div><div class="ttl">소아·청소년 당뇨인 푸른빛 희망 장학금 (2027학년도)</div><div class="row"><span class="amt unknown">금액 원문 확인</span><span class="due">오늘 마감</span></div><div class="bar"></div></div>
+          <div class="card"><div class="org"><span>교외 · 홍천군무궁화장학회</span><span class="fit">적합도 15%</span></div><div class="ttl">무궁화장학생(생활비장학금)</div><div class="row"><span class="amt">최대 100만원</span><span class="due">오늘 마감</span></div><div class="bar"></div></div>
+          <div class="nav"><div class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>홈</div><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg>장학금</div><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>신청내역</div><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>MY</div></div>
+        </div>
+        <div class="spec"><span>바탕 #fefdfc</span><span>카드 면 칠하지 않음 · 선 9%</span><span>히어로 남색 #182338</span></div>
+      </div>
+      <div class="col"><div class="col-label">바꿨을 때<b>Linear 캔버스 + 면의 사다리</b></div>
+        <div class="phone alt-dark">
+          <div class="app-bar"><div class="avatar">학</div><div class="who"><b>이름 설정</b><span>한국외국어대학교</span></div><div class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 8a6 6 0 0112 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21h4"/></svg></div></div>
+          <div class="hero"><div class="lbl">지금 신청할 수 있는 장학금 12건</div><div class="amt"><small>최대</small> 805만원</div><div class="sub">금액을 아직 못 읽은 8건은 뺀 금액이에요</div><div class="btn btn-inverse">12건 신청 준비</div></div>
+          <div class="section"><h3>마감 임박</h3><span class="link">전체 보기</span></div>
+          <div class="card"><div class="org"><span>교외 · 한국소아당뇨인협회</span><span class="fit">적합도 15%</span></div><div class="ttl">소아·청소년 당뇨인 푸른빛 희망 장학금 (2027학년도)</div><div class="row"><span class="amt unknown">금액 원문 확인</span><span class="due">오늘 마감</span></div><div class="bar"></div></div>
+          <div class="card"><div class="org"><span>교외 · 홍천군무궁화장학회</span><span class="fit">적합도 15%</span></div><div class="ttl">무궁화장학생(생활비장학금)</div><div class="row"><span class="amt">최대 100만원</span><span class="due">오늘 마감</span></div><div class="bar"></div></div>
+          <div class="nav"><div class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>홈</div><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg>장학금</div><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>신청내역</div><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>MY</div></div>
+        </div>
+        <div class="spec"><span>캔버스 #010102</span><span>패널 surface-1 #0f1011 + 선 #23252a</span><span>히어로 방사광 없음 · 라벤더 CTA</span></div>
+      </div>
+    </div>
+    <p class="after-note">히어로 패널이 바탕과 거의 같은 명도가 되어 <b>"떠 있던 것"이 가라앉습니다.</b> 마감 빨강은 어두운 바탕에서 채도를 올려야 읽힙니다. <span>공고 원문을 몇 분씩 읽는 앱이라 밝은 면이 맞고, 원하시면 폰 설정을 따르는 다크 한 벌을 별도로 만드는 편이 안전합니다.</span></p>
+  </section>
+
+  <!-- 2 -->
+  <section class="plate" id="p2">
+    <div class="plate-head">
+      <div class="no">2</div>
+      <div><h2>강조색 — 잉크블루 vs 라벤더</h2>
+        <div class="rules"><span class="lin">Linear: #5e6ad2 라벤더 · 브랜드 마크·CTA·포커스에만</span><span>지금: <b>#27508f</b> 채도 낮춘 잉크블루 · 다섯 자리에만</span></div></div>
+      <span class="verdict keep">지금 유지</span>
+    </div>
+    <div class="pair">
+      <div class="col"><div class="col-label">지금</div>
+        <div class="phone">
+          <div class="page-h">장학금 찾기</div>
+          <div class="chips"><span class="chip on">전체</span><span class="chip">교내</span><span class="chip">교외</span><span class="chip">신청 가능만</span></div>
+          <div class="section"><h3>오늘·내일 마감 <span style="color:var(--accent)">27</span></h3><span class="link">전체 보기</span></div>
+          <div class="card"><div class="org"><span>교외 · 용산구청</span><span class="fit">적합도 50%</span></div><div class="ttl">용산구 Y-리더 장학생(성적우수)</div><div class="row"><span class="amt">최대 200만원</span><span class="due">오늘 마감</span></div><div class="bar"></div></div>
+          <div class="nav"><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>홈</div><div class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg>장학금</div><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>신청내역</div><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>MY</div></div>
+        </div>
+        <div class="spec"><span>강조 #27508f · 흰 바탕 7.4:1</span><span>남색 패널·주 버튼과 한 계열</span></div>
+      </div>
+      <div class="col"><div class="col-label">바꿨을 때<b>라벤더 #5e6ad2</b></div>
+        <div class="phone alt-lav">
+          <div class="page-h">장학금 찾기</div>
+          <div class="chips"><span class="chip on">전체</span><span class="chip">교내</span><span class="chip">교외</span><span class="chip">신청 가능만</span></div>
+          <div class="section"><h3>오늘·내일 마감 <span style="color:var(--accent)">27</span></h3><span class="link">전체 보기</span></div>
+          <div class="card"><div class="org"><span>교외 · 용산구청</span><span class="fit">적합도 50%</span></div><div class="ttl">용산구 Y-리더 장학생(성적우수)</div><div class="row"><span class="amt">최대 200만원</span><span class="due">오늘 마감</span></div><div class="bar"></div></div>
+          <div class="nav"><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>홈</div><div class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg>장학금</div><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>신청내역</div><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>MY</div></div>
+        </div>
+        <div class="spec"><span>강조 #5e6ad2 · 흰 바탕 4.7:1 (경계)</span><span>남색 패널은 보라 기운으로 같이 옮겨야 함</span></div>
+      </div>
+    </div>
+    <p class="after-note">라벤더는 흰 바탕에서 대비가 4.7:1 이라 작은 글자(12~13.5px)에 쓰기 빠듯하고, 히어로 남색까지 보라 쪽으로 같이 옮기지 않으면 <b>두 계열이 됩니다.</b> <span>바꾸려면 여섯 토큰을 한 번에 옮겨야 합니다(문서 2번).</span></p>
+  </section>
+
+  <!-- 3 -->
+  <section class="plate" id="p3">
+    <div class="plate-head">
+      <div class="no">3</div>
+      <div><h2>서체 — SUIT/SUITE vs Inter</h2>
+        <div class="rules"><span class="lin">Linear: Linear Display/Text · 대체는 Inter 500~700</span><span>지금: 본문 <b>SUIT</b> · 제목 <b>SUITE</b> · 되돌아갈 자리 Pretendard</span></div></div>
+      <span class="verdict keep">지금 유지</span>
+    </div>
+    <div class="pair">
+      <div class="col"><div class="col-label">지금<b>(이 페이지에서는 Noto Sans KR 로 대신 그림)</b></div>
+        <div class="phone">
+          <div class="hero"><div class="lbl">지금 신청할 수 있는 장학금 12건</div><div class="amt"><small>최대</small> 805만원</div><div class="sub">금액을 아직 못 읽은 8건은 뺀 금액이에요</div><div class="btn btn-inverse">12건 신청 준비</div></div>
+          <div class="card"><div class="org"><span>교외 · (재)무안군승달장학회</span><span class="fit">적합도 50%</span></div><div class="ttl">성적우수장학금</div><div class="row"><span class="amt">최대 150만원</span><span class="due">오늘 마감</span></div><div class="bar"></div></div>
+          <div class="card"><div class="org"><span>교외 · Chevron Korea Scholarship</span><span class="fit">Fit 33%</span></div><div class="ttl">2026 Global STEM Scholars Program</div><div class="row"><span class="amt">USD 3,000</span><span class="due calm">12일 남음</span></div></div>
+        </div>
+        <div class="spec"><span>한글 전용 설계 · 숫자 폭 고정</span></div>
+      </div>
+      <div class="col"><div class="col-label">바꿨을 때<b>Inter (진짜로 실림)</b></div>
+        <div class="phone alt-inter">
+          <div class="hero"><div class="lbl">지금 신청할 수 있는 장학금 12건</div><div class="amt"><small>최대</small> 805만원</div><div class="sub">금액을 아직 못 읽은 8건은 뺀 금액이에요</div><div class="btn btn-inverse">12건 신청 준비</div></div>
+          <div class="card"><div class="org"><span>교외 · (재)무안군승달장학회</span><span class="fit">적합도 50%</span></div><div class="ttl">성적우수장학금</div><div class="row"><span class="amt">최대 150만원</span><span class="due">오늘 마감</span></div><div class="bar"></div></div>
+          <div class="card"><div class="org"><span>교외 · Chevron Korea Scholarship</span><span class="fit">Fit 33%</span></div><div class="ttl">2026 Global STEM Scholars Program</div><div class="row"><span class="amt">USD 3,000</span><span class="due calm">12일 남음</span></div></div>
+        </div>
+        <div class="spec"><span>Inter 에는 한글이 없음 → 한글은 대체 글꼴로 떨어짐</span><span>숫자·영문만 Inter</span></div>
+      </div>
+    </div>
+    <p class="after-note">Inter 는 한글 글자가 없어서 <b>한글은 전부 되돌아갈 글꼴로 떨어지고</b> 숫자·영문만 Inter 가 됩니다. 한 줄 안에서 두 글꼴이 섞이는 것이 오른쪽 세 번째 카드에서 보입니다. <span>2026-09-10 에 정한 SUIT/SUITE 를 그대로 두는 것을 권합니다.</span></p>
+  </section>
+
+  <!-- 4 -->
+  <section class="plate" id="p4">
+    <div class="plate-head">
+      <div class="no">4</div>
+      <div><h2>모서리 — 13/19/27 + 알약 vs 8/12/16</h2>
+        <div class="rules"><span class="lin">Linear: 버튼 8 · 카드 12 · 패널 16 · "CTA 를 알약으로 만들지 말 것"</span><span>지금: 버튼 <b>13</b> · 패널 <b>19/27</b> · 칩·배지·정렬 <b>알약</b></span></div></div>
+      <span class="verdict ask">눈으로 보고 정할 것</span>
+    </div>
+    <div class="pair">
+      <div class="col"><div class="col-label">지금</div>
+        <div class="phone">
+          <div class="hero"><div class="lbl">지금 신청할 수 있는 장학금 12건</div><div class="amt"><small>최대</small> 805만원</div><div class="sub">금액을 아직 못 읽은 8건은 뺀 금액이에요</div><div class="btn btn-inverse">12건 신청 준비</div></div>
+          <div class="chips"><span class="chip on">전체</span><span class="chip">교내</span><span class="chip">교외</span></div>
+          <div class="input">장학금·재단 이름으로 찾기</div>
+          <div class="btn btn-primary">신청 준비 시작</div>
+          <div class="sheet"><div class="handle"></div><div class="badges" style="margin:0 0 8px"><span class="badge danger">D-DAY</span><span class="badge">교외</span></div><h4>소아·청소년 당뇨인 푸른빛 희망 장학금</h4><div class="amt">금액 원문 확인</div><p>한국소아당뇨인협회 · 신청 2026.6.15(월) ~ 9.11(금)</p></div>
+        </div>
+        <div class="spec"><span>히어로·시트 27</span><span>버튼·입력 13</span><span>칩·배지 999</span></div>
+      </div>
+      <div class="col"><div class="col-label">바꿨을 때<b>Linear 척도 4/6/8/12/16</b></div>
+        <div class="phone alt-radius">
+          <div class="hero"><div class="lbl">지금 신청할 수 있는 장학금 12건</div><div class="amt"><small>최대</small> 805만원</div><div class="sub">금액을 아직 못 읽은 8건은 뺀 금액이에요</div><div class="btn btn-inverse">12건 신청 준비</div></div>
+          <div class="chips"><span class="chip on">전체</span><span class="chip">교내</span><span class="chip">교외</span></div>
+          <div class="input">장학금·재단 이름으로 찾기</div>
+          <div class="btn btn-primary">신청 준비 시작</div>
+          <div class="sheet"><div class="handle"></div><div class="badges" style="margin:0 0 8px"><span class="badge danger">D-DAY</span><span class="badge">교외</span></div><h4>소아·청소년 당뇨인 푸른빛 희망 장학금</h4><div class="amt">금액 원문 확인</div><p>한국소아당뇨인협회 · 신청 2026.6.15(월) ~ 9.11(금)</p></div>
+        </div>
+        <div class="spec"><span>히어로·시트 16</span><span>버튼·입력 8</span><span>칩 8 · 배지 6</span></div>
+      </div>
+    </div>
+    <p class="after-note">전체가 <b>각지고 도구 같은 인상</b>이 됩니다. 필터 칩이 알약이 아니면 '골라 누르는 것'이 '입력칸'처럼 보이는 게 오른쪽에서 보입니다. <span>바꾼다면 (b) 척도만 8/12/16/24 로 내리고 칩·배지는 알약으로 남기는 절충이 있습니다.</span></p>
+  </section>
+
+  <!-- 5 -->
+  <section class="plate" id="p5">
+    <div class="plate-head">
+      <div class="no">5</div>
+      <div><h2>그림자 — 토큰 10종 vs 거의 없음</h2>
+        <div class="rules"><span class="lin">Linear: 면의 사다리 + 얇은 선으로만 · 그림자 거의 안 씀</span><span>지금: 주 버튼·칩 <b>색 그림자</b> · 히어로 lift · 시트 sheet</span></div></div>
+      <span class="verdict rec">바꾸는 쪽 권장 · UI-9 와 같이</span>
+    </div>
+    <div class="pair">
+      <div class="col"><div class="col-label">지금</div>
+        <div class="phone">
+          <div class="hero"><div class="lbl">지금 신청할 수 있는 장학금 12건</div><div class="amt"><small>최대</small> 805만원</div><div class="sub">금액을 아직 못 읽은 8건은 뺀 금액이에요</div><div class="btn btn-inverse">12건 신청 준비</div></div>
+          <div class="chips"><span class="chip on">전체</span><span class="chip">교내</span><span class="chip">교외</span></div>
+          <div class="btn btn-primary">신청 준비 시작</div>
+          <div class="sheet"><div class="handle"></div><h4>무궁화장학생(생활비장학금)</h4><div class="amt">최대 100만원</div><p>홍천군무궁화장학회 · 오늘 마감</p></div>
+        </div>
+        <div class="spec"><span>--shadow-btn 22%</span><span>--shadow-chip 26%</span><span>--shadow-lift · --shadow-sheet</span></div>
+      </div>
+      <div class="col"><div class="col-label">바꿨을 때<b>버튼·칩 그림자 제거 · 히어로는 선으로</b></div>
+        <div class="phone alt-noshadow">
+          <div class="hero"><div class="lbl">지금 신청할 수 있는 장학금 12건</div><div class="amt"><small>최대</small> 805만원</div><div class="sub">금액을 아직 못 읽은 8건은 뺀 금액이에요</div><div class="btn btn-inverse">12건 신청 준비</div></div>
+          <div class="chips"><span class="chip on">전체</span><span class="chip">교내</span><span class="chip">교외</span></div>
+          <div class="btn btn-primary">신청 준비 시작</div>
+          <div class="sheet"><div class="handle"></div><h4>무궁화장학생(생활비장학금)</h4><div class="amt">최대 100만원</div><p>홍천군무궁화장학회 · 오늘 마감</p></div>
+        </div>
+        <div class="spec"><span>그림자 0 · 시트는 윗선 1px</span><span>면과 선만으로 높낮이</span></div>
+      </div>
+    </div>
+    <p class="after-note">눌리는 것들이 <b>조용해지고 화면이 평평하게 정리됩니다.</b> 잃는 것은 '주 버튼이 떠 있다'는 느낌 하나인데, 남색 면 자체가 이미 무게를 주고 있어 크게 아쉽지 않습니다. <span>노션 백로그 UI-9(그림자가 너무 많다)와 같은 방향이라 함께 처리하기를 권합니다. 시트 그림자는 남겨도 됩니다.</span></p>
+  </section>
+
+  <!-- 6 -->
+  <section class="plate" id="p6">
+    <div class="plate-head">
+      <div class="no">6</div>
+      <div><h2>그라데이션 — 히어로 방사광 하나 vs 없음</h2>
+        <div class="rules"><span class="lin">Linear: "대기 같은 그라데이션 · 스포트라이트 카드 없음"</span><span>지금: 히어로에 <b>방사형 빛 하나</b>(오른쪽 위 파란 기운 30%)</span></div></div>
+      <span class="verdict keep">지금 유지 · 5번과 같이 빼도 됨</span>
+    </div>
+    <div class="pair">
+      <div class="col"><div class="col-label">지금</div>
+        <div class="phone">
+          <div class="hero"><div class="lbl">지금 신청할 수 있는 장학금 12건</div><div class="amt"><small>최대</small> 805만원</div><div class="sub">금액을 아직 못 읽은 8건은 뺀 금액이에요<br>그중 3건은 바로 신청할 수 있어요</div><div class="btn btn-inverse">12건 신청 준비</div></div>
+        </div>
+        <div class="spec"><span>--grad-navy: 방사광 2겹 + #182338</span></div>
+      </div>
+      <div class="col"><div class="col-label">바꿨을 때<b>단색 남색</b></div>
+        <div class="phone alt-nograd">
+          <div class="hero"><div class="lbl">지금 신청할 수 있는 장학금 12건</div><div class="amt"><small>최대</small> 805만원</div><div class="sub">금액을 아직 못 읽은 8건은 뺀 금액이에요<br>그중 3건은 바로 신청할 수 있어요</div><div class="btn btn-inverse">12건 신청 준비</div></div>
+        </div>
+        <div class="spec"><span>#182338 단색</span></div>
+      </div>
+    </div>
+    <p class="after-note">차이가 작습니다. 지금 것은 45도 균일 그라데이션(AI 지문)이 아니라 <b>패널에 깊이를 주는 빛 하나</b>라 Linear 가 금지한 '대기 효과'와는 다릅니다. <span>5번에서 그림자를 빼면 그때 같이 단색으로 가도 어색하지 않습니다.</span></p>
+  </section>
+
+  <!-- 7 -->
+  <section class="plate" id="p7">
+    <div class="plate-head">
+      <div class="no">7</div>
+      <div><h2>선택 칩 — 강조색 칠하기 vs 면을 한 단 올리기</h2>
+        <div class="rules"><span class="lin">Linear: 선택 = surface-2 바탕 + 진한 글자 · 칠하지 않음</span><span>지금: 선택 = <b>강조색으로 칠함</b> + 색 그림자</span></div></div>
+      <span class="verdict rec">바꾸는 쪽 권장 · 5번과 한 세트</span>
+    </div>
+    <div class="pair">
+      <div class="col"><div class="col-label">지금</div>
+        <div class="phone">
+          <div class="page-h">장학금 찾기</div>
+          <div class="input">장학금·재단 이름으로 찾기</div>
+          <div class="chips"><span class="chip on">전체</span><span class="chip">교내</span><span class="chip">교외</span><span class="chip">신청 가능만</span></div>
+          <div class="section"><h3>오늘·내일 마감 <span style="color:var(--accent)">27</span></h3></div>
+          <div class="card"><div class="org"><span>교외 · 재단법인 안산인재육성재단</span><span class="fit">적합도 50%</span></div><div class="ttl">특별장학생(안산상공회의소)</div><div class="row"><span class="amt">최대 150만원</span><span class="due">오늘 마감</span></div><div class="bar"></div></div>
+        </div>
+        <div class="spec"><span>선택 칩: #27508f 칠 + 그림자 26%</span><span>한 화면에 파랑 넷(제목선·칩·건수·탭)</span></div>
+      </div>
+      <div class="col"><div class="col-label">바꿨을 때<b>surface-2 + 강조색 글자 + 얇은 선</b></div>
+        <div class="phone alt-chip">
+          <div class="page-h">장학금 찾기</div>
+          <div class="input">장학금·재단 이름으로 찾기</div>
+          <div class="chips"><span class="chip on">전체</span><span class="chip">교내</span><span class="chip">교외</span><span class="chip">신청 가능만</span></div>
+          <div class="section"><h3>오늘·내일 마감 <span style="color:var(--accent)">27</span></h3></div>
+          <div class="card"><div class="org"><span>교외 · 재단법인 안산인재육성재단</span><span class="fit">적합도 50%</span></div><div class="ttl">특별장학생(안산상공회의소)</div><div class="row"><span class="amt">최대 150만원</span><span class="due">오늘 마감</span></div><div class="bar"></div></div>
+        </div>
+        <div class="spec"><span>선택 칩: #f7f6f4 바탕 · 파란 글자 · 선 24%</span><span>칠한 파랑이 화면에서 사라짐</span></div>
+      </div>
+    </div>
+    <p class="after-note">선택된 칩이 <b>'눌러 둔 것'으로 읽히면서도 제목·건수보다 앞서지 않습니다.</b> 지금은 칩이 화면에서 가장 진한 덩어리라 눈이 제목보다 필터에 먼저 갑니다. <span>5번(그림자 덜기)과 같이 하면 탐색 화면이 한 번에 조용해집니다.</span></p>
+  </section>
+
+  <!-- 8 -->
+  <section class="plate" id="p8">
+    <div class="plate-head">
+      <div class="no">8</div>
+      <div><h2>주 버튼 — 남색 잉크 vs 강조색 CTA</h2>
+        <div class="rules"><span class="lin">Linear: 주 CTA 는 강조색으로 칠한다</span><span>지금: 주 버튼 <b>남색 #1e2b42</b> · 강조색은 링크·탭에만</span></div></div>
+      <span class="verdict keep">지금 유지</span>
+    </div>
+    <div class="pair">
+      <div class="col"><div class="col-label">지금</div>
+        <div class="phone">
+          <div class="page-h">MY</div>
+          <div class="section" style="border:0;padding:0;margin:0 0 10px"><h3>계정</h3></div>
+          <div style="display:flex;gap:10px;margin-bottom:16px"><div class="btn btn-primary" style="flex:1">로그인</div><div class="btn" style="flex:1;border:1px solid var(--line);background:var(--surface)">회원가입</div></div>
+          <div class="section"><h3>알림</h3><span class="link">켜기</span></div>
+          <div class="card"><div class="ttl" style="font-size:16px">내 조건에 맞는 새 장학 공고</div><div class="row"><span style="color:var(--text-weak);font-size:13px">아직 켜지 않음</span></div></div>
+          <div class="btn btn-primary" style="margin-top:14px">12건 신청 준비</div>
+        </div>
+        <div class="spec"><span>주 버튼 #1e2b42 · 화면당 하나</span><span>파랑은 링크·탭·제목선에만</span></div>
+      </div>
+      <div class="col"><div class="col-label">바꿨을 때<b>강조색 #27508f CTA</b></div>
+        <div class="phone alt-cta">
+          <div class="page-h">MY</div>
+          <div class="section" style="border:0;padding:0;margin:0 0 10px"><h3>계정</h3></div>
+          <div style="display:flex;gap:10px;margin-bottom:16px"><div class="btn btn-primary" style="flex:1">로그인</div><div class="btn" style="flex:1;border:1px solid var(--line);background:var(--surface)">회원가입</div></div>
+          <div class="section"><h3>알림</h3><span class="link">켜기</span></div>
+          <div class="card"><div class="ttl" style="font-size:16px">내 조건에 맞는 새 장학 공고</div><div class="row"><span style="color:var(--text-weak);font-size:13px">아직 켜지 않음</span></div></div>
+          <div class="btn btn-primary" style="margin-top:14px">12건 신청 준비</div>
+        </div>
+        <div class="spec"><span>버튼·링크·제목선·탭이 전부 같은 파랑</span></div>
+      </div>
+    </div>
+    <p class="after-note">오른쪽은 한 화면에 파랑이 <b>넷 이상</b>이 되어 "무엇이 중요한가"가 다시 흐려집니다. 8/31 에 "동작은 잉크, 파랑이 아니다"로 정한 이유가 그대로 보입니다. <span>Linear 도 라벤더를 '드물게' 쓰는 것이 핵심이라 규칙의 뜻은 지금 쪽이 더 잘 지키고 있습니다.</span></p>
+  </section>
+
+  <!-- 9 -->
+  <section class="plate" id="p9">
+    <div class="plate-head">
+      <div class="no">9</div>
+      <div><h2>터치 표적 — 38px 아이콘 · 23px 링크 vs 40/44</h2>
+        <div class="rules"><span class="lin">Linear: CTA ≥ 40 · 알약 ≥ 36(손가락 44) · 입력 ≥ 44</span><span>지금: 아이콘 버튼 <b>38×38</b> · '전체 보기' <b>64×23</b> (실측)</span></div></div>
+      <span class="verdict rec">고치기 권장</span>
+    </div>
+    <div class="pair">
+      <div class="col"><div class="col-label">지금</div>
+        <div class="phone">
+          <div class="app-bar"><div class="avatar">학</div><div class="who"><b>이름 설정</b><span>한국외국어대학교</span></div><div class="icon-btn" style="outline:1px dashed #8f3a2e"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 8a6 6 0 0112 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21h4"/></svg></div><div class="icon-btn" style="outline:1px dashed #8f3a2e"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg></div></div>
+          <div class="section"><h3>마감 임박</h3><span class="link" style="outline:1px dashed #8f3a2e">전체 보기</span></div>
+          <div class="card"><div class="org"><span>교외 · 재단법인 강서구장학회(서울)</span><span class="fit">적합도 33%</span></div><div class="ttl">모범장학생</div><div class="row"><span class="amt">최대 200만원</span><span class="due">오늘 마감</span></div><div class="bar"></div></div>
+        </div>
+        <div class="spec"><span>점선 = 실제 눌리는 넓이</span><span>아이콘 38 · 링크 23</span></div>
+      </div>
+      <div class="col"><div class="col-label">바꿨을 때<b>여백만 키움 · 글자 그대로</b></div>
+        <div class="phone alt-touch">
+          <div class="app-bar"><div class="avatar">학</div><div class="who"><b>이름 설정</b><span>한국외국어대학교</span></div><div class="icon-btn" style="outline:1px dashed #3d6b47"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 8a6 6 0 0112 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21h4"/></svg></div><div class="icon-btn" style="outline:1px dashed #3d6b47"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg></div></div>
+          <div class="section"><h3>마감 임박</h3><span class="link" style="outline:1px dashed #3d6b47">전체 보기</span></div>
+          <div class="card"><div class="org"><span>교외 · 재단법인 강서구장학회(서울)</span><span class="fit">적합도 33%</span></div><div class="ttl">모범장학생</div><div class="row"><span class="amt">최대 200만원</span><span class="due">오늘 마감</span></div><div class="bar"></div></div>
+        </div>
+        <div class="spec"><span>아이콘 44 · 링크 약 44 (여백 10/12)</span><span>보이는 글자 크기는 같음</span></div>
+      </div>
+    </div>
+    <p class="after-note">보이는 것은 거의 그대로이고 <b>눌리는 넓이만 커집니다.</b> 링크 버튼은 여백을 주면서 살짝 밝은 바탕을 깔면 '눌리는 것'으로도 읽힙니다. <span>코드 변경은 두 규칙(padding)뿐이라 가장 싼 항목입니다.</span></p>
+  </section>
+
+  <!-- 10 -->
+  <section class="plate" id="p10">
+    <div class="plate-head">
+      <div class="no">10</div>
+      <div><h2>제목 굵기 — 800 vs 600</h2>
+        <div class="rules"><span class="lin">Linear: 제목 600 · 본문 400 · "700 이상을 피한다"</span><span>지금: 히어로·시트·화면 제목 <b>800</b> · 카드 제목 700</span></div></div>
+      <span class="verdict ask">눈으로 보고 정할 것</span>
+    </div>
+    <div class="pair">
+      <div class="col"><div class="col-label">지금<b>800 / 700</b></div>
+        <div class="phone">
+          <div class="page-h">장학금 찾기</div>
+          <div class="hero" style="padding:20px 20px 16px"><div class="lbl">지금 신청할 수 있는 장학금 12건</div><div class="amt"><small>최대</small> 805만원</div></div>
+          <div class="section"><h3>오늘·내일 마감 <span style="color:var(--accent)">27</span></h3></div>
+          <div class="card"><div class="org"><span>교외 · 용산구청</span><span class="fit">적합도 50%</span></div><div class="ttl">용산구 Y-리더 장학생(성적우수)</div><div class="row"><span class="amt">최대 200만원</span><span class="due">오늘 마감</span></div></div>
+          <div class="sheet"><div class="handle"></div><h4>소아·청소년 당뇨인 푸른빛 희망 장학금 (2027학년도)</h4><p>한국소아당뇨인협회</p></div>
+        </div>
+      </div>
+      <div class="col"><div class="col-label">바꿨을 때<b>600 / 600</b></div>
+        <div class="phone alt-w600">
+          <div class="page-h">장학금 찾기</div>
+          <div class="hero" style="padding:20px 20px 16px"><div class="lbl">지금 신청할 수 있는 장학금 12건</div><div class="amt"><small>최대</small> 805만원</div></div>
+          <div class="section"><h3>오늘·내일 마감 <span style="color:var(--accent)">27</span></h3></div>
+          <div class="card"><div class="org"><span>교외 · 용산구청</span><span class="fit">적합도 50%</span></div><div class="ttl">용산구 Y-리더 장학생(성적우수)</div><div class="row"><span class="amt">최대 200만원</span><span class="due">오늘 마감</span></div></div>
+          <div class="sheet"><div class="handle"></div><h4>소아·청소년 당뇨인 푸른빛 희망 장학금 (2027학년도)</h4><p>한국소아당뇨인협회</p></div>
+        </div>
+      </div>
+    </div>
+    <p class="after-note">차분해지지만 <b>카드 제목(600)과 본문(400)의 거리가 줄어</b> 목록에서 제목이 덜 튑니다. 한글 활자는 같은 숫자에서 라틴보다 가늘어 보여 Linear 의 600 이 우리 700 쯤에 해당합니다. <span>절충은 히어로·시트만 700 으로 한 단 내리고 카드는 700 유지. 실제 SUITE 로 봐야 정할 수 있습니다.</span></p>
+  </section>
+
+  <!-- 11 -->
+  <section class="plate" id="p11">
+    <div class="plate-head">
+      <div class="no">11</div>
+      <div><h2>데스크톱 — 480px 폰 프레임 vs 1280px 3열 격자</h2>
+        <div class="rules"><span class="lin">Linear: 그릇 1280 · 카드 3열 → 1024 에서 2열 → 768 아래 1열</span><span>지금: <b>폰 프레임 480</b> 을 가운데 · 항상 1열 · 미디어 쿼리 1개</span></div></div>
+      <span class="verdict keep">지금 유지 · 원하면 별도 항목</span>
+    </div>
+    <div class="pair">
+      <div class="col"><div class="col-label">지금<b>1280px 화면을 축소</b></div>
+        <div class="desk">
+          <div class="frame">
+            <div class="mini-hero"><small>지금 신청할 수 있는 장학금 12건</small><b>최대 805만원</b></div>
+            <div class="mini-card"><span>교외 · 한국소아당뇨인협회</span><b>소아·청소년 당뇨인 푸른빛 희망 장학금</b><em>오늘 마감</em></div>
+            <div class="mini-card"><span>교외 · 홍천군무궁화장학회</span><b>무궁화장학생(생활비장학금)</b><em>오늘 마감</em></div>
+            <div class="mini-card"><span>교외 · 재단법인 강서구장학회</span><b>모범장학생</b><em>오늘 마감</em></div>
+          </div>
+        </div>
+        <div class="spec"><span>양옆 여백이 각각 프레임 폭만큼 빔</span><span>시트·탭바도 480 안에</span></div>
+      </div>
+      <div class="col"><div class="col-label">바꿨을 때<b>왼쪽 탐색 + 카드 3열</b></div>
+        <div class="desk">
+          <div class="grid">
+            <div class="side"><div class="mini-hero"><small>지금 신청할 수 있는 장학금 12건</small><b>최대 805만원</b></div><div class="tab on">홈</div><div class="tab">장학금</div><div class="tab">신청내역</div><div class="tab">MY</div></div>
+            <div class="cards">
+              <div class="mini-card"><span>교외 · 한국소아당뇨인협회</span><b>소아·청소년 당뇨인 푸른빛 희망 장학금</b><em>오늘 마감</em></div>
+              <div class="mini-card"><span>교외 · 홍천군무궁화장학회</span><b>무궁화장학생(생활비장학금)</b><em>오늘 마감</em></div>
+              <div class="mini-card"><span>교외 · 재단법인 강서구장학회</span><b>모범장학생</b><em>오늘 마감</em></div>
+              <div class="mini-card"><span>교외 · 용산구청</span><b>용산구 Y-리더 장학생(성적우수)</b><em>오늘 마감</em></div>
+              <div class="mini-card"><span>교외 · (재)무안군승달장학회</span><b>성적우수장학금</b><em>오늘 마감</em></div>
+              <div class="mini-card"><span>교외 · 안산인재육성재단</span><b>특별장학생(안산상공회의소)</b><em>오늘 마감</em></div>
+            </div>
+          </div>
+        </div>
+        <div class="spec"><span>카드가 면을 가진 타일로 바뀜</span><span>시트·탭바·카드 함수 둘·검사 6종 재작성</span></div>
+      </div>
+    </div>
+    <p class="after-note">넓은 화면을 쓰긴 하지만 <b>카드 두 함수·바텀시트·탭바·검사 드라이버를 전부 다시 짜야 하는 큰 공사</b>입니다. 이 앱은 설치형 PWA 라 데스크톱 이용이 드뭅니다. <span>원하시면 '데스크톱 배치'를 별도 백로그 항목으로 올리고 시안부터 만드는 게 맞습니다.</span></p>
+  </section>
+
+  <!-- 12 -->
+  <section class="plate" id="p12">
+    <div class="plate-head">
+      <div class="no">12</div>
+      <div><h2>뜻을 가진 색 — 빨강·주황·초록 vs 초록 하나</h2>
+        <div class="rules"><span class="lin">Linear: 마케팅에서 의미색은 success 초록 하나</span><span>지금: 마감 <b>빨강</b> · 검수 전 <b>주황</b> · 선정 <b>초록</b> (전부 채도 60% 아래)</span></div></div>
+      <span class="verdict keep">셋 유지</span>
+    </div>
+    <div class="pair">
+      <div class="col"><div class="col-label">지금</div>
+        <div class="phone">
+          <div class="card"><div class="org"><span>교외 · 홍천군무궁화장학회</span><span class="fit">적합도 15%</span></div><div class="ttl">무궁화장학생(생활비장학금)</div><div class="row"><span class="amt">최대 100만원</span><span class="due">오늘 마감</span></div><div class="bar"></div></div>
+          <div class="card"><div class="org"><span>교내 · 경희대학교</span><span class="fit">적합도 70%</span></div><div class="ttl">2026-2 경희 드림 장학금</div><div class="row"><span class="amt">등록금 50%</span><span class="due calm">12일 남음</span></div><div class="badges"><span class="badge warn">자동 등록 · 검수 전</span></div></div>
+          <div class="card"><div class="org"><span>교외 · 미래의동반자재단</span><span class="fit">적합도 85%</span></div><div class="ttl">2026-2 골든벨 장학생</div><div class="row"><span class="amt">최대 300만원</span><span class="due calm">마감</span></div><div class="badges"><span class="badge ok">신청 완료 기록</span></div></div>
+        </div>
+        <div class="spec"><span>빨강 #8f3a2e · 주황 #8a5a12 · 초록 #3d6b47</span></div>
+      </div>
+      <div class="col"><div class="col-label">바꿨을 때<b>초록 하나 · 나머지는 중립</b></div>
+        <div class="phone alt-semantic">
+          <div class="card"><div class="org"><span>교외 · 홍천군무궁화장학회</span><span class="fit">적합도 15%</span></div><div class="ttl">무궁화장학생(생활비장학금)</div><div class="row"><span class="amt">최대 100만원</span><span class="due" style="color:var(--text-sub)">오늘 마감</span></div></div>
+          <div class="card"><div class="org"><span>교내 · 경희대학교</span><span class="fit">적합도 70%</span></div><div class="ttl">2026-2 경희 드림 장학금</div><div class="row"><span class="amt">등록금 50%</span><span class="due calm">12일 남음</span></div><div class="badges"><span class="badge mono">자동 등록 · 검수 전</span></div></div>
+          <div class="card"><div class="org"><span>교외 · 미래의동반자재단</span><span class="fit">적합도 85%</span></div><div class="ttl">2026-2 골든벨 장학생</div><div class="row"><span class="amt">최대 300만원</span><span class="due calm">마감</span></div><div class="badges"><span class="badge ok">신청 완료 기록</span></div></div>
+        </div>
+        <div class="spec"><span>'오늘 마감'이 '12일 남음'과 같은 무게</span></div>
+      </div>
+    </div>
+    <p class="after-note">오른쪽에서는 <b>오늘 마감인 공고와 12일 남은 공고가 같은 무게</b>로 읽힙니다. 이 앱이 파는 것이 '놓치지 않기'라 마감 임박은 색으로 말해야 합니다. <span>Linear 의 규칙은 마케팅 페이지용이고, 그들의 제품 화면도 우선순위에 색을 씁니다(문서의 Known Gaps).</span></p>
+  </section>
+
+  <!-- 13 -->
+  <section class="plate" id="p13">
+    <div class="plate-head">
+      <div class="no">13</div>
+      <div><h2>포커스 링 — 3px 18% vs 2px 50%</h2>
+        <div class="rules"><span class="lin">Linear: 2px · 강조색 50% 불투명</span><span>지금: <b>3px · 강조색 18%</b> + 테두리 남색</span></div></div>
+      <span class="verdict ask">아무 쪽이나 · 한 줄</span>
+    </div>
+    <div class="pair">
+      <div class="col"><div class="col-label">지금</div>
+        <div class="phone">
+          <div class="input">학교 이름</div>
+          <div class="input focus">한국외국어대학교</div>
+          <div class="input">학과</div>
+        </div>
+        <div class="spec"><span>--ring 0 0 0 3px rgba(39,80,143,.18) · 테두리 #1e2b42</span></div>
+      </div>
+      <div class="col"><div class="col-label">바꿨을 때<b>2px 50%</b></div>
+        <div class="phone alt-ring">
+          <div class="input">학교 이름</div>
+          <div class="input focus">한국외국어대학교</div>
+          <div class="input">학과</div>
+        </div>
+        <div class="spec"><span>0 0 0 2px rgba(39,80,143,.5) · 테두리 같은 색</span></div>
+      </div>
+    </div>
+    <p class="after-note">지금 것은 부드럽고 Linear 것은 또렷합니다. 키보드로 다니는 사용자에게는 <b>또렷한 쪽이 유리</b>하지만 폰에서는 거의 안 보입니다. <span>바꾸면 <code>--ring</code> 한 줄입니다.</span></p>
+  </section>
+
+  <p class="note" style="margin-top:28px">답하실 때는 번호마다 <b>(a) 유지 / (b) 바꿈</b> 만 적어 주시면 됩니다. 5·7·9 는 전부 덜어내는 방향이라 한 번에 하는 것이 자연스럽고, 1·4·10·11 은 인상이 크게 바뀌므로 실제 앱에 임시로 적용한 화면을 다시 보여 드린 뒤 확정하는 것이 안전합니다.</p>
+</div>
