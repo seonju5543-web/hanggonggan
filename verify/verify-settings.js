@@ -138,6 +138,43 @@ const eq = (label, got, want) => {
   await page.waitForTimeout(400);
   eq('신청내역이 2건으로 돌아왔다', await page.$$eval('#apps-list .swipe-row', (e) => e.length), 2);
 
+  console.log('\n■ 화면이 오갈 때 — 방향 있는 움직임 · 파란 판 없음');
+  {
+    await page.click('.nav-item[data-nav="my"]');
+    await page.click('#btn-open-settings');
+    await page.waitForSelector('#screen-settings:not([hidden])');
+    await page.click('#btn-open-trash');
+    await page.waitForSelector('#screen-trash:not([hidden])');
+    eq('들어갈 때는 오른쪽에서 들어온다',
+      await page.$eval('#screen-trash', (e) => e.classList.contains('screen-in')), true);
+    await page.click('#btn-trash-back');
+    await page.waitForSelector('#screen-settings:not([hidden])');
+    eq('되돌아올 때는 왼쪽에서 들어온다 (같은 방향이면 길을 잃는다)',
+      await page.$eval('#screen-settings', (e) => e.classList.contains('screen-back')), true);
+    /* 🔴 손끝이 스칠 때 브라우저 기본 파란 판이 뜨지 않아야 한다 (개발자 지적) */
+    eq('메뉴 줄에 브라우저 기본 파란 판이 없다',
+      await page.$eval('#btn-open-trash', (e) => getComputedStyle(e).webkitTapHighlightColor),
+      'rgba(0, 0, 0, 0)');
+    eq('누르는 효과(줄어들기)는 남아 있다',
+      await page.evaluate(() => [...document.styleSheets].some((sh) => {
+        try { return [...sh.cssRules].some((r) => r.selectorText && /\.my-menu-item:active/.test(r.selectorText)); }
+        catch (e) { return false; }
+      })), true);
+  }
+
+  console.log('\n■ 이용약관 왕복 — 같은 탭에서 열리고, 나가면 설정으로 돌아온다');
+  {
+    await page.click('.set-menu a.my-menu-item');
+    await page.waitForURL(/terms\.html/, { timeout: 8000 });
+    eq('같은 탭에서 약관이 열린다 (새 탭이면 화살표가 앱을 한 벌 더 띄운다)',
+      await page.$$eval('.legal-header', (e) => e.length), 1);
+    await page.click('.legal-header .sub-back');
+    await page.waitForSelector('#screen-settings:not([hidden])', { timeout: 10000 });
+    eq('나가면 홈이 아니라 설정으로 돌아온다',
+      await page.$eval('#screen-settings', (e) => e.hidden), false);
+    eq('홈이 아니다', await page.$eval('#screen-home', (e) => e.hidden), true);
+  }
+
   console.log('\n■ 이용약관 화면 — 되돌아가기는 왼쪽 위, 제목이 화면 안에 든다');
   {
     /* 🔴 **좁은 폰(320px)까지 본다.** 개발자가 지적한 것이 '박스 안에 안 맞는다'였고,
@@ -147,7 +184,18 @@ const eq = (label, got, want) => {
     await t.goto(`http://localhost:${PORT}/terms.html`, { waitUntil: 'domcontentloaded' });
     await t.waitForTimeout(300);
     eq('왼쪽 위에 되돌아가기 화살표가 있다', await t.$$eval('.legal-header .sub-back', (e) => e.length), 1);
-    eq('그 화살표가 앱으로 간다', await t.$eval('.legal-header .sub-back', (e) => e.getAttribute('href')), './');
+    eq('그 화살표가 떠났던 자리(설정)로 간다 — 홈이 아니다',
+      await t.$eval('.legal-header .sub-back', (e) => e.getAttribute('href')), './?screen=settings');
+    /* 🔴 길게 내려도 나가기가 남아 있어야 한다 — 읽다 중간에 나갈 수 있게 (개발자 지시) */
+    await t.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await t.waitForTimeout(300);
+    eq('맨 아래까지 내려도 나가기 화살표가 화면에 남아 있다',
+      await t.evaluate(() => {
+        const r = document.querySelector('.legal-header .sub-back').getBoundingClientRect();
+        return r.top >= 0 && r.bottom <= window.innerHeight;
+      }), true);
+    await t.evaluate(() => window.scrollTo(0, 0));
+    await t.waitForTimeout(200);
     eq('맨 아래 되돌아가기 버튼은 없앴다', await t.$$eval('.legal-actions', (e) => e.length), 0);
     eq('제목이 화면 밖으로 나가지 않는다',
       await t.evaluate(() => {

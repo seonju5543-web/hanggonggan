@@ -20,9 +20,11 @@
               history.back() 대신 앱 주소로 가는 **링크**여야 한다. 그래서 <a> 다.
            ⚠️ 설정 화면의 '이용약관' 줄은 이 화살표가 뜻을 갖도록 **같은 탭**에서 연다
               (새 탭에서 열면 이 링크가 앱을 한 벌 더 띄운다). 온보딩 동의 줄은 그대로
-              새 탭이다 — 거기서 페이지를 떠나면 입력하던 것이 날아간다. -->
+              새 탭이다 — 거기서 페이지를 떠나면 입력하던 것이 날아간다.
+           🔴 `?screen=settings` — 홈이 아니라 **떠났던 자리**로 돌아간다(개발자 지시).
+              그냥 `./` 면 앱이 홈으로 뜬다. 읽는 쪽은 app.js 의 backToScreen. -->
       <header class="sub-header legal-header">
-        <a class="sub-back" href="./" aria-label="앱으로 돌아가기">
+        <a class="sub-back" href="./?screen=settings" aria-label="설정으로 돌아가기">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
         </a>
         <h2>이용약관 · 개인정보처리방침</h2>

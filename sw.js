@@ -19,7 +19,7 @@
    그 캐시가 옛 판이면 그대로 옛 화면이 보인다. 번호를 올려야 확실히 청소된다. */
 /* ⚠️ 두 작업이 같은 날 v151 을 각자 올려 부딪혔다 — 번호는 v152 로 올리고 **둘 다** 남긴다.
    번호만 맞추고 한쪽 파일 목록을 버리면, 버린 쪽 파일이 오프라인에서만 없어 앱이 죽는다. */
-const CACHE = 'handaejang-v155';  /* v155 — 약관 표가 좁은 화면에서 줄줄이 펴진다 */
+const CACHE = 'handaejang-v156';  /* v156 — 약관 머리줄 고정·설정으로 복귀 · 화면 전환 움직임 · 탭 하이라이트 제거 */
 const ASSETS = ['.', 'index.html', 'style.css', 'boot.js', 'resume.js', 'interactions.js', 'app.js', 'data.js', 'forms.js', 'form-plan.js', 'essay.js', 'essay-config.js', 'essay-ask.js', 'essay-quality.js', 'essay-submit-check.js',
   'section-head.js', 'parse-requirements.js', 'parse-amount.js', 'match-engine.js', 'notify-rules.js', 'notify.js', 'push-config.js',
   'chat-config.js', 'chat.js',
