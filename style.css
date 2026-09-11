@@ -4049,7 +4049,7 @@ body,
 .trash-empty-title { font-size: var(--t-lg); font-weight: 800; letter-spacing: -0.02em; }
 .trash-empty-sub { font-size: var(--t-sm); color: var(--text-sub); line-height: 1.65; margin-top: var(--space-8); }
 
-/* ══ 디자인 시스템 반영 — 개발자 결정 7·11·12·13·16·18·19 (2026-09-11) ═══════════════
+/* ══ 디자인 시스템 반영 — 개발자 결정 7·12·13·16·18·19 (2026-09-11 · 11번은 지시로 뺌) ═══════════════
    DESIGN.md 「Linear 와 충돌 · 컨펌 대기」와 대조판(docs/designs/mockups/design-conflicts.html)을
    보고 개발자가 번호별로 정했다. **여기 적힌 번호 밖은 건드리지 않는다**("나머지는 건들지 말아줘").
    🔴 새 색·새 글자 크기·새 그림자를 만들지 않았다 — 있는 토큰의 값을 바꾸거나 자리를 옮겼을 뿐이다.
@@ -4108,26 +4108,6 @@ input:user-invalid, select:user-invalid, textarea:user-invalid {
   top: 0;
 }
 
-/* 11 · 데스크톱 — 폰 프레임을 넓히고 홈은 히어로를 왼쪽에 고정한 두 칸으로.
-   🔴 공고 목록은 어느 폭에서도 **세로 한 줄**이다(개발자 지시 "공고가 세로로 표시되게") —
-      카드를 격자로 펴지 않는다. 시트·탭바·마스코트는 같은 프레임 폭을 따라간다.
-   ⚠️ 데스크톱 전용 홈페이지를 따로 만들지는 않는다(DESIGN.md 「11번 검토」 — 또래 앱 셋 다
-      별도 사이트 없이 같은 앱을 웹에서 넓게 보여 준다). */
-@media (min-width: 1024px) {
-  .app { max-width: 960px; }
-  .screen { padding: var(--space-32) var(--space-40); }
-  .bottom-nav { max-width: 960px; }
-  .sheet { max-width: 640px; }
-  .chat-fab { right: max(16px, calc(50% - 480px + 24px)); }
-  #screen-home {
-    display: grid;
-    grid-template-columns: 320px minmax(0, 1fr);
-    column-gap: var(--space-40);
-    align-items: start;
-  }
-  #screen-home > * { grid-column: 2; }
-  #screen-home > .home-header { grid-column: 1 / -1; }
-  /* 🔴 히어로는 2번째 줄부터 아래로 길게 차지한다 — 안 그러면 격자가 '마감 임박' 머리를 히어로와
-     같은 줄(2번째)에 놓아 오른쪽 칸 위에 히어로 높이만큼 빈 공간이 생긴다(실측 250px). */
-  #screen-home > .hero-card { grid-column: 1; grid-row: 2 / span 40; align-self: start; position: sticky; top: var(--space-32); }
+/* 11 · 데스크톱 — 개발자 지시(2026-09-11)로 **적용하지 않는다**. 480px 폰 프레임 그대로.
+   (한때 ≥1024px 두 칸 배치를 넣었다가 같은 날 되돌렸다 — 다시 넣지 말 것.) */
 }
