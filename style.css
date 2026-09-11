@@ -4078,11 +4078,15 @@ body,
    :user-invalid 는 학생이 손댄 뒤에만 켜져 아직 안 쓴 빈 칸은 빨개지지 않는다.
    ⚠️ 문구는 새로 만들지 않았다(지시: 텍스트 무변경) — 테두리와 링으로만 말한다.
    ⚠️ 링은 box-shadow 가 아니라 outline — 그림자 토큰 관문(ui-tone ④)을 지키기 위해서다. */
-input:user-invalid, select:user-invalid, textarea:user-invalid {
-  border-color: var(--red);
-  outline: 2px solid var(--red-weak);
-  outline-offset: 0;
-}
+input:user-invalid, select:user-invalid, textarea:user-invalid { border-color: var(--red); }
+/* 틀린 칸에 포커스가 오면 링도 빨강 — 파란 링이 빨간 테두리 위에 겹치면 두 말을 동시에 한다(코드 리뷰 지적) */
+input:user-invalid:focus-visible, select:user-invalid:focus-visible, textarea:user-invalid:focus-visible { outline-color: var(--red); }
+input:user-invalid:focus, select:user-invalid:focus, textarea:user-invalid:focus { box-shadow: none; }
+
+/* 12 의 후속 — 코드 리뷰가 잡은 '뜻이 섞이는 자리' 둘. 색조를 둘로 줄이자 '모른다'가 '떨어진다'와 같은
+   빨강이 됐다. 🔴 틀린 미달은 못 받는 것보다 나쁘다(CLAUDE.md) — 모르는 것은 회색으로 말한다. */
+.r-unk { color: var(--text-sub); }                 /* 상세 시트 자격 줄의 ? */
+.sch-fit.fit-orange { color: var(--text-sub); }    /* 적합도 20~39% — 빨강이면 20% 미만(회색)보다 나빠 보인다 */
 
 /* 18 · 구획 이름표(eyebrow) — 제목 크기를 작은 이름표로 내린다. 🔴 한글이라 양수 자간은 안 준다.
    개발자 지시: 작아진 것 중 **중요한 내용이 든 것은 색으로 강조 — 검은색**. 마감을 말하는 구획만 먹색,
