@@ -154,6 +154,17 @@ const le = (name, got, ceiling, hint) => {
   else if (got < ceiling) console.log(`      ↓ ${ceiling - got}곳 줄었습니다 — CEILING 을 ${got} 로 내려 주세요(안 내리면 다시 늘어도 안 잡힙니다).`);
 };
 
+/* ── 🔴 괄호 짝 (2026-09-11) ──
+   style.css 끝 블록에서 미디어 쿼리를 걷어내다 닫는 `}` 하나가 남았다. 브라우저는 짝 없는 `}` 를 만나면
+   **그 뒤에 오는 첫 규칙을 통째로 버린다** — 같은 날 오후 덧댄 `:root { --ring }` 이 실제로 안 먹었고
+   (검사도 눈도 모른 채) 실측으로만 드러났다. 주석·문자열을 뺀 뒤 `{` 와 `}` 의 개수가 같아야 한다. */
+console.log('\n■ style.css 의 괄호 짝이 맞는다 (2026-09-11)');
+{
+  const css = R('style.css').replace(/\/\*[\s\S]*?\*\//g, '').replace(/"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/g, '');
+  const open = (css.match(/\{/g) || []).length, close = (css.match(/\}/g) || []).length;
+  eq(`여는 괄호 ${open} = 닫는 괄호 ${close} (짝 없는 } 는 뒤따르는 규칙을 브라우저가 버린다)`, open, close);
+}
+
 console.log('\n■ 토큰 이탈이 더 늘지 않는다 (톱니 · 2026-09-10)');
 {
   const lines = R('style.css').split('\n');
