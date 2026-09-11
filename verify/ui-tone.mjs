@@ -296,5 +296,31 @@ console.log('\n■ 수집한 글의 HTML 기호를 글자로 띄우지 않는다
   eq('게시판에서 온 글은 전부 unent 를 거친다', bare, []);
 }
 
+/* ── ⑧ 다크 규칙이 밝은 화면에 새지 않는다 (2026-09-11 · Vapor 대조에서 발견) ─────────
+   🔴 `:root:not([data-theme="light"]) .x { … }` 는 **data-theme 이 없으면 항상 참**이다. 이 앱은
+      어디에서도 data-theme 을 달지 않으므로(index.html·app.js·boot.js grep 0건) 그 선택자는
+      '시스템이 다크일 때'가 아니라 '언제나'가 된다 — 실제로 밝은 화면에서 .essay-rule-danger 가
+      연어색(#ff8a7a), .esc-badge.esc-ok 가 진초록 바탕(#1f4a2e)으로 떠 있었다(브라우저 실측 ·
+      colorScheme light/dark 둘 다 같은 값). 뜻대로 되려면 그 선택자는 반드시
+      `@media (prefers-color-scheme: dark)` **안**에 있어야 한다. 여기서 밖에 있는 것을 센다. */
+console.log('\n■ 다크 규칙이 밝은 화면에 새지 않는다 (2026-09-11)');
+{
+  /* 주석은 걷되 줄 수는 남긴다 — 줄 번호가 원본과 같아야 바로 찾아간다 */
+  const lines = R('style.css').replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, '')).split('\n');
+  let inDarkMedia = 0, depth = 0;
+  const leaks = [];
+  for (let i = 0; i < lines.length; i++) {
+    const l = lines[i];
+    if (/@media[^{]*prefers-color-scheme:\s*dark/.test(l)) { inDarkMedia = 1; depth = 0; }
+    if (inDarkMedia) {
+      depth += (l.match(/\{/g) || []).length - (l.match(/\}/g) || []).length;
+      if (depth <= 0 && /\}/.test(l)) inDarkMedia = 0;
+      continue;
+    }
+    if (/:root:not\(\[data-theme="light"\]\)/.test(l)) leaks.push(`${i + 1}: ${l.trim().slice(0, 70)}`);
+  }
+  eq('`:root:not([data-theme="light"])` 은 prefers-color-scheme: dark 미디어 안에만 있다', leaks, []);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 되돌아간 곳이 있습니다` : '\n✓ 말투·토큰 관문 전부 통과');
 process.exit(fail ? 1 : 0);

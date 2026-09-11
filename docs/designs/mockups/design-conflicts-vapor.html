@@ -1,0 +1,407 @@
+<meta charset="utf-8">
+<title>한대장 × Apple 대조판</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  :root {
+    --pg-bg: #f3f2ee; --pg-fg: #1c1d21; --pg-mute: #62666f; --pg-line: #d9d7d0; --pg-card: #ffffff;
+    --pg-tag: #27508f; --pg-tag-bg: #e6ecf6; --pg-rec: #3d6b47; --pg-rec-bg: #e6efe8; --pg-keep: #6b6f78; --pg-keep-bg: #ebebe8;
+    --pg-lin: #5e6ad2; --pg-lin-bg: #ecedf9;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --pg-bg: #17181b; --pg-fg: #ecedef; --pg-mute: #9a9ea6; --pg-line: #33353b; --pg-card: #1f2024;
+      --pg-tag: #9db4e0; --pg-tag-bg: #26324a; --pg-rec: #9fd1ab; --pg-rec-bg: #23372a; --pg-keep: #b5b8bf; --pg-keep-bg: #2b2d33;
+      --pg-lin: #a3abf0; --pg-lin-bg: #2a2c48;
+    }
+  }
+  :root[data-theme="dark"] {
+    --pg-bg: #17181b; --pg-fg: #ecedef; --pg-mute: #9a9ea6; --pg-line: #33353b; --pg-card: #1f2024;
+    --pg-tag: #9db4e0; --pg-tag-bg: #26324a; --pg-rec: #9fd1ab; --pg-rec-bg: #23372a; --pg-keep: #b5b8bf; --pg-keep-bg: #2b2d33;
+    --pg-lin: #a3abf0; --pg-lin-bg: #2a2c48;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--pg-bg); color: var(--pg-fg); font-family: 'IBM Plex Sans KR', 'Noto Sans KR', 'Apple SD Gothic Neo', system-ui, sans-serif; font-size: 15px; line-height: 1.6; word-break: keep-all; overflow-wrap: break-word; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 72px; }
+  header.top { border-bottom: 1px solid var(--pg-line); padding-bottom: 24px; margin-bottom: 8px; }
+  header.top h1 { font-size: 26px; font-weight: 700; margin: 0 0 6px; letter-spacing: -0.02em; text-wrap: balance; }
+  header.top p { margin: 0; color: var(--pg-mute); max-width: 68ch; }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 14px; margin-top: 14px; font-size: 13px; color: var(--pg-mute); }
+  .legend span::before { content: ''; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+  .legend .l-rec::before { background: var(--pg-rec); } .legend .l-keep::before { background: var(--pg-keep); } .legend .l-ask::before { background: var(--pg-tag); }
+
+  .plate { padding-block: 36px; border-bottom: 1px solid var(--pg-line); }
+  .plate-head { display: grid; grid-template-columns: 44px 1fr auto; gap: 12px 16px; align-items: start; margin-bottom: 18px; }
+  .no { font-variant-numeric: tabular-nums; font-size: 22px; font-weight: 700; color: var(--pg-mute); letter-spacing: -0.02em; line-height: 1.2; padding-top: 2px; }
+  .plate-head h2 { font-size: 19px; font-weight: 700; margin: 0 0 4px; letter-spacing: -0.015em; }
+  .rules { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--pg-mute); }
+  .rules b { font-weight: 600; color: var(--pg-fg); }
+  .rules .lin { color: var(--pg-lin); }
+  .verdict { font-size: 12.5px; font-weight: 600; padding: 4px 10px; border-radius: 4px; white-space: nowrap; align-self: start; }
+  .verdict.rec { color: var(--pg-rec); background: var(--pg-rec-bg); }
+  .verdict.keep { color: var(--pg-keep); background: var(--pg-keep-bg); }
+  .verdict.ask { color: var(--pg-tag); background: var(--pg-tag-bg); }
+
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .col-label { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--pg-mute); }
+  .col-label b { color: var(--pg-fg); font-weight: 600; letter-spacing: 0; text-transform: none; font-size: 13px; margin-left: 8px; }
+  .note { font-size: 13.5px; color: var(--pg-mute); margin: 0; max-width: 60ch; }
+  .note b { color: var(--pg-fg); font-weight: 600; }
+  .after-note { margin-top: 14px; font-size: 14px; color: var(--pg-fg); max-width: 72ch; }
+  .after-note span { color: var(--pg-mute); }
+  @media (max-width: 720px) { .pair { grid-template-columns: 1fr; } .plate-head { grid-template-columns: 36px 1fr; } .verdict { grid-column: 2; justify-self: start; } }
+
+  /* ─────────── 앱 화면 조각 · 지금 값은 style.css 실측 (2026-09-11) ─────────── */
+  .phone {
+    --bg: #fefdfc; --surface: #ffffff; --surface-2: #f7f6f4; --text: #17191c; --text-sub: #545a62; --text-weak: #888e97;
+    --line: rgba(23,25,28,.09); --rule: rgba(23,25,28,.14);
+    --primary: #1e2b42; --on-primary: #fdfbf6; --accent: #27508f; --accent-soft: rgba(39,80,143,.09); --accent-line: rgba(39,80,143,.24);
+    --red: #8f3a2e; --red-weak: #f5e9e6; --orange: #8a5a12; --orange-weak: #f4ede0; --green: #3d6b47; --green-weak: #e9efe8;
+    --inverse: #182338; --inverse-ink: #ffffff; --inverse-mute: rgba(232,239,254,.75);
+    --grad: radial-gradient(120% 130% at 78% -18%, rgba(104,148,216,.30) 0%, rgba(104,148,216,0) 58%), radial-gradient(90% 90% at -10% 108%, rgba(255,255,255,.06) 0%, rgba(255,255,255,0) 60%), #182338;
+    --r-hair: 3px; --r-xs: 9px; --r-sm: 13px; --r-md: 19px; --r-lg: 27px; --r-pill: 999px;
+    --sh-btn: 0 6px 18px rgba(35,32,26,.22); --sh-chip: 0 4px 14px rgba(39,80,143,.26); --sh-lift: 0 2px 6px rgba(24,35,56,.07), 0 18px 40px rgba(24,35,56,.14);
+    --ring: 0 0 0 3px rgba(39,80,143,.18);
+    --w-title: 800; --w-card: 700; --chip-on-bg: var(--accent); --chip-on-fg: #fff; --chip-on-sh: var(--sh-chip);
+    --cta-bg: var(--primary); --cta-fg: var(--on-primary);
+    --ff: 'Noto Sans KR', 'Apple SD Gothic Neo', system-ui, sans-serif; --ff-d: 'Noto Sans KR', 'Apple SD Gothic Neo', system-ui, sans-serif;
+    --icon-size: 38px; --link-pad: 0;
+    font-family: var(--ff); background: var(--bg); color: var(--text); border-radius: 22px; border: 1px solid var(--pg-line);
+    width: 100%; max-width: 380px; padding: 18px 18px 0; overflow: hidden; letter-spacing: -0.014em; line-height: 1.5; font-size: 15px; position: relative;
+  }
+  .phone.tall { padding-bottom: 0; }
+  .app-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--primary); color: #f6f0e2; font-weight: 800; display: grid; place-items: center; font-size: 18px; }
+  .app-bar .who { flex: 1; min-width: 0; }
+  .app-bar .who b { display: block; font-family: var(--ff-d); font-weight: var(--w-title); font-size: 21px; letter-spacing: -0.03em; line-height: 1.2; }
+  .app-bar .who span { font-size: 13px; color: var(--text-weak); }
+  .icon-btn { width: var(--icon-size); height: var(--icon-size); border-radius: var(--r-sm); display: grid; place-items: center; color: var(--text-weak); background: var(--icon-bg, transparent); }
+  .icon-btn svg { width: 22px; height: 22px; }
+  .hero { background: var(--grad); color: var(--inverse-ink); border-radius: var(--r-lg); padding: 26px 22px 20px; box-shadow: var(--hero-sh, var(--sh-lift)); margin-bottom: 18px; }
+  .hero .lbl { font-size: 14px; font-weight: 600; color: var(--inverse-mute); }
+  .hero .amt { font-family: var(--ff-d); font-weight: var(--w-title); font-size: 40px; letter-spacing: -0.03em; line-height: 1.2; font-variant-numeric: tabular-nums; margin: 2px 0 8px; }
+  .hero .amt small { font-size: 26px; }
+  .hero .sub { font-size: 14px; color: var(--inverse-mute); margin-bottom: 16px; }
+  .btn { display: block; width: 100%; text-align: center; font-weight: 700; font-size: 16px; padding: 15px 20px; border-radius: var(--r-sm); }
+  .btn-inverse { background: var(--surface); color: var(--text); box-shadow: var(--btnw-sh, 0 10px 26px rgba(20,16,8,.32)); }
+  .btn-primary { background: var(--cta-bg); color: var(--cta-fg); box-shadow: var(--btn-sh, var(--sh-btn)); }
+  .section { display: flex; justify-content: space-between; align-items: baseline; border-top: 1px solid var(--rule); padding-top: 14px; margin: 6px 0 2px; }
+  .section h3 { margin: 0; font-family: var(--ff-d); font-weight: var(--w-title); font-size: 19px; letter-spacing: -0.01em; }
+  .section .link { color: var(--accent); font-size: 14px; font-weight: 600; padding: var(--link-pad); border-radius: var(--r-xs); background: var(--link-bg, transparent); }
+  .card { padding: 14px 2px; border-bottom: 1px solid var(--line); background: var(--card-bg, transparent); border-radius: var(--card-r, 0); }
+  .card:last-child { border-bottom: 0; }
+  .card.pressed { background: var(--surface-2); }
+  .card .org { display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 600; color: var(--text-weak); }
+  .card .org .fit { font-variant-numeric: tabular-nums; }
+  .card .ttl { font-weight: var(--w-card); font-size: 18px; line-height: 1.35; margin: 2px 0 6px; letter-spacing: -0.01em; }
+  .card .row { display: flex; justify-content: space-between; align-items: baseline; }
+  .card .amt { font-family: var(--ff-d); font-weight: 800; font-size: 16px; font-variant-numeric: tabular-nums; }
+  .card .amt.unknown { font-family: var(--ff); font-weight: 500; color: var(--text-weak); }
+  .card .due { font-size: 12.5px; font-weight: 700; color: var(--due-fg, var(--red)); }
+  .card .due.calm { color: var(--text-weak); font-weight: 600; }
+  .card .bar { height: 2px; background: var(--due-fg, var(--red)); margin-top: 10px; border-radius: var(--r-hair); }
+  .badges { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .badge { font-size: 11.5px; font-weight: 600; padding: 3px 8px; border-radius: var(--r-pill); background: var(--surface-2); color: var(--text-sub); }
+  .badge.danger { background: var(--red-weak); color: var(--red); }
+  .badge.warn { background: var(--orange-weak); color: var(--orange); }
+  .badge.ok { background: var(--green-weak); color: var(--green); }
+  .badge.mono { background: var(--surface-2); color: var(--text-sub); }
+  .page-h { font-family: var(--ff-d); font-weight: var(--w-title); font-size: 23px; letter-spacing: -0.03em; position: relative; padding-bottom: 8px; margin: 2px 0 14px; display: inline-block; }
+  .page-h::after { content: ''; position: absolute; left: 0; bottom: 0; width: 28px; height: 3px; border-radius: var(--r-pill); background: var(--accent); }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .chip { font-size: 15px; font-weight: 600; padding: 7px 15px; border-radius: var(--chip-r, var(--r-pill)); border: 1px solid var(--line); background: var(--surface); color: var(--text-sub); }
+  .chip.on { background: var(--chip-on-bg); color: var(--chip-on-fg); border-color: var(--chip-on-bd, var(--chip-on-bg)); box-shadow: var(--chip-on-sh); }
+  .input { border: 1.5px solid rgba(18,22,31,.10); background: var(--surface); border-radius: var(--r-sm); padding: 14px 16px; font-size: 16px; color: var(--text-weak); margin-bottom: 10px; }
+  .input.focus { border-color: var(--focus-bd, var(--primary)); box-shadow: var(--ring); color: var(--text); }
+  .nav { display: flex; justify-content: space-around; border-top: 1px solid var(--line); background: var(--nav-bg, rgba(255,254,252,.82)); margin: 12px -18px 0; padding: 8px 0 12px; }
+  .nav div { font-size: 11.5px; font-weight: 600; color: var(--text-weak); display: flex; flex-direction: column; align-items: center; gap: 3px; position: relative; padding: 4px 6px; }
+  .nav div svg { width: 22px; height: 22px; }
+  .nav div.on { color: var(--accent); }
+  .nav div.on::after { content: ''; position: absolute; top: -9px; width: 18px; height: 2px; background: var(--accent); border-radius: 2px; }
+  .sheet { background: var(--surface); border-radius: var(--r-lg) var(--r-lg) 0 0; box-shadow: var(--sheet-sh, 0 -14px 48px rgba(18,26,42,.20)); margin: 14px -18px 0; padding: 14px 22px 22px; border-top: 1px solid var(--line); }
+  .sheet .handle { width: 36px; height: 4px; border-radius: 2px; background: var(--line); margin: 0 auto 14px; }
+  .sheet h4 { font-family: var(--ff-d); font-weight: var(--w-title); font-size: 22px; letter-spacing: -0.03em; margin: 0 0 4px; line-height: 1.2; }
+  .sheet .amt { color: var(--accent); font-weight: 800; font-size: 19px; }
+  .sheet p { margin: 4px 0 0; font-size: 13.5px; color: var(--text-weak); }
+  .fab { position: absolute; right: 18px; bottom: 74px; width: 52px; height: 52px; border-radius: 50%; background: var(--inverse); box-shadow: 0 6px 18px rgba(16,29,61,.34); display: grid; place-items: center; color: #f6f0e2; font-size: 20px; }
+  .toast { position: absolute; left: 50%; transform: translateX(-50%); bottom: 82px; background: rgba(16,22,38,.94); color: #fff; font-size: 13.5px; font-weight: 600; padding: 8px 16px; border-radius: var(--r-sm); white-space: nowrap; }
+  .spec { font-size: 12px; color: var(--pg-mute); border-top: 1px dashed var(--pg-line); padding-top: 8px; display: flex; flex-wrap: wrap; gap: 4px 12px; font-variant-numeric: tabular-nums; }
+
+  /* ── 바꿨을 때 · 항목별 값 ── */
+  .alt-dark { --bg: #010102; --surface: #0f1011; --surface-2: #141516; --text: #f7f8f8; --text-sub: #d0d6e0; --text-weak: #8a8f98; --line: #23252a; --rule: #34343a;
+    --accent: #9db4e0; --accent-soft: rgba(157,180,224,.12); --primary: #f7f8f8; --on-primary: #010102; --cta-bg: #f7f8f8; --cta-fg: #010102;
+    --inverse: #141516; --inverse-ink: #f7f8f8; --inverse-mute: #8a8f98; --grad: #0f1011; --hero-sh: none; --sh-lift: none; --sh-btn: none; --btnw-sh: none;
+    --red: #e08a7c; --red-weak: #3a1f1c; --nav-bg: #010102; --surface: #0f1011; }
+  .alt-dark .avatar { background: #5e6ad2; color: #fff; }
+  .alt-dark .hero { border: 1px solid #23252a; }
+  .alt-dark .btn-inverse { background: #5e6ad2; color: #fff; }
+  .alt-lav { --accent: #5e6ad2; --accent-soft: rgba(94,106,210,.10); --chip-on-bg: #5e6ad2; --chip-on-sh: 0 4px 14px rgba(94,106,210,.26);
+    --grad: radial-gradient(120% 130% at 78% -18%, rgba(130,143,255,.30) 0%, rgba(130,143,255,0) 58%), #1d1f3a; --primary: #23254a; --ring: 0 0 0 3px rgba(94,106,210,.2); }
+  .alt-inter { --ff: 'Inter', 'Noto Sans KR', system-ui, sans-serif; --ff-d: 'Inter', 'Noto Sans KR', system-ui, sans-serif; letter-spacing: -0.005em; }
+  .alt-radius { --r-hair: 2px; --r-xs: 4px; --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-pill: 6px; --chip-r: 8px; }
+  .alt-noshadow { --sh-btn: none; --sh-chip: none; --btnw-sh: none; --chip-on-sh: none; --hero-sh: none; --sheet-sh: none; }
+  .alt-noshadow .hero { border: 1px solid rgba(255,255,255,.08); }
+  .alt-nograd { --grad: #182338; }
+  .alt-chip { --chip-on-bg: var(--surface-2); --chip-on-fg: var(--accent); --chip-on-bd: var(--accent-line); --chip-on-sh: none; }
+  .alt-cta { --cta-bg: #27508f; --cta-fg: #fff; --btn-sh: 0 6px 18px rgba(39,80,143,.28); }
+  .alt-cta .btn-inverse { background: #27508f; color: #fff; }
+  .alt-touch { --icon-size: 44px; --link-pad: 10px 12px; --icon-bg: rgba(23,25,28,.035); --link-bg: rgba(39,80,143,.06); }
+  .alt-w600 { --w-title: 600; --w-card: 600; }
+  .alt-semantic { --due-fg: #3d6b47; }
+  .alt-semantic .card .bar { display: none; }
+  .alt-ring { --ring: 0 0 0 2px rgba(39,80,143,.5); --focus-bd: rgba(39,80,143,.5); }
+
+  /* 11 · 데스크톱 */
+  .desk { border: 1px solid var(--pg-line); border-radius: 10px; background: #fefdfc; color: #17191c; font-family: 'Noto Sans KR', system-ui, sans-serif; padding: 14px; overflow: hidden; letter-spacing: -0.014em; }
+  .desk .frame { max-width: 280px; margin: 0 auto; background: #fefdfc; box-shadow: 0 2px 6px rgba(24,35,56,.07), 0 18px 40px rgba(24,35,56,.14); border-radius: 8px; padding: 12px; font-size: 11px; }
+  .desk .mini-hero { background: #182338; color: #fff; border-radius: 14px; padding: 12px; margin-bottom: 10px; }
+  .desk .mini-hero b { display: block; font-size: 20px; font-weight: 800; letter-spacing: -0.03em; }
+  .desk .mini-hero small { color: rgba(232,239,254,.75); font-size: 10px; }
+  .desk .mini-card { border-bottom: 1px solid rgba(23,25,28,.09); padding: 8px 0; font-size: 11px; }
+  .desk .mini-card b { display: block; font-size: 12px; font-weight: 700; }
+  .desk .mini-card span { color: #888e97; font-size: 10px; }
+  .desk .mini-card em { font-style: normal; color: #8f3a2e; font-weight: 700; font-size: 10px; float: right; }
+  .desk .grid { display: grid; grid-template-columns: 150px 1fr; gap: 12px; font-size: 11px; min-width: 0; }
+  .desk .grid .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; align-content: start; min-width: 0; }
+  .desk .grid .cards .mini-card { border: 1px solid rgba(23,25,28,.09); border-radius: 8px; padding: 8px; background: #fff; min-width: 0; } .desk .grid .cards .mini-card em { float: none; display: block; margin-top: 4px; }
+  .desk .side { display: flex; flex-direction: column; gap: 8px; }
+  .desk .side .tab { padding: 6px 8px; border-radius: 6px; color: #545a62; }
+  .desk .side .tab.on { color: #27508f; background: rgba(39,80,143,.08); font-weight: 700; }
+  @media (max-width: 720px) { .desk .grid { grid-template-columns: 1fr; } .desk .grid .cards { grid-template-columns: 1fr 1fr; } }
+
+  /* ── Apple 참고안 · 바꿨을 때 (2026-09-11) ── */
+  .rules .apl { color: #0066cc; }
+  :root[data-theme="dark"] .rules .apl { color: #2997ff; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .rules .apl { color: #2997ff; } }
+  .alt-apple-chip { --chip-on-bg: var(--surface); --chip-on-fg: var(--text); --chip-on-bd: var(--accent); --chip-on-sh: none; }
+  .alt-apple-chip .chip.on { border-width: 2px; padding: 6px 14px; }
+  /* '지금' = 2026-09-11 개발자 결정 7·13 이 적용된 뒤의 앱 */
+  .phone { --chip-on-bg: var(--surface); --chip-on-fg: var(--text); --chip-on-bd: var(--accent); --chip-on-sh: none; --ring: 0 0 0 2px #27508f; --focus-bd: var(--accent); --press: 0.95; }
+  .phone .chip.on { border-width: 2px; padding: 6px 14px; }
+  .alt-touch .chip { padding: 10px 16px; }
+  .alt-w700 { --w-title: 700; --w-card: 600; }
+  .alt-w700 .chip, .alt-w700 .nav div, .alt-w700 .section .link { font-weight: 600; }
+  .alt-ring-apple { --ring: 0 0 0 2px #27508f; --focus-bd: #27508f; }
+  .alt-apple-radius { --r-xs: 5px; --r-sm: 999px; --r-md: 11px; --r-lg: 18px; }
+  .alt-apple-radius .btn { padding: 12px 22px; }
+  .alt-apple-radius .sheet { border-radius: 18px 18px 0 0; }
+  .alt-apple-radius .input { border-radius: 999px; padding: 12px 20px; }
+  .phone.narrow { max-width: 330px; }
+  .phone.narrow .hero .amt { font-size: 38px; }
+  .alt-hero-sm .hero .amt { font-size: 27px; }
+  .alt-hero-sm .hero .amt small { font-size: 18px; }
+  .press-row { display: flex; gap: 12px; align-items: center; margin: 6px 0 12px; }
+  .press-row .btn { width: auto; flex: 1; }
+  .press-row .btn.pressed { transform: scale(var(--press, 0.98)); }
+  .alt-press { --press: 0.95; }
+  .press-row .cap { font-size: 12px; color: var(--text-weak); flex: 0 0 auto; }
+  .weights { display: grid; gap: 6px; margin: 4px 0 12px; }
+  .weights div { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid var(--line); padding: 6px 0; font-size: 15px; }
+  .weights div span { font-size: 11.5px; color: var(--text-weak); font-variant-numeric: tabular-nums; }
+  .agree { margin-top: 28px; }
+  .agree table, .keeps table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .agree th, .agree td, .keeps th, .keeps td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--pg-line); vertical-align: top; }
+  .agree th, .keeps th { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--pg-mute); font-weight: 600; }
+  .keeps { margin-top: 28px; }
+  .keeps td:first-child { font-variant-numeric: tabular-nums; color: var(--pg-mute); }
+  .tblwrap { overflow-x: auto; }
+  @media (max-width: 720px) { .pair { grid-template-columns: 1fr; } .plate-head { grid-template-columns: 36px 1fr; } .verdict { grid-column: 2; justify-self: start; } }
+</style>
+
+<style>
+  /* ── Vapor 대조판 전용 (2026-09-11) — '지금' 은 오늘 실측값, '바꿨을 때' 는 Vapor 규칙을 그 항목에만 적용 ── */
+  .rules .vap { color: #0957c8; }
+  :root[data-theme="dark"] .rules .vap { color: #56acf9; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .rules .vap { color: #56acf9; } }
+  .phone { position: relative; }
+  /* 24 · 흐림 — 탭바가 목록 위에 떠서 뒤가 비쳐야 흐림이 보인다 */
+  .nav.float { position: relative; margin-top: -30px; background: var(--nav-bg, rgba(255,254,252,.82)); backdrop-filter: var(--nav-blur, blur(20px) saturate(1.6)); -webkit-backdrop-filter: var(--nav-blur, blur(20px) saturate(1.6)); border-top: 1px solid var(--nav-line, rgba(18,22,31,.06)); }
+  .alt-noblur { --nav-bg: #ffffff; --nav-blur: none; --nav-line: rgba(23,25,28,.09); }
+  .scrim-demo { position: relative; border-radius: 12px; overflow: hidden; border: 1px solid var(--pg-line); height: 92px; margin-top: 10px; background: #fefdfc; color: #17191c; font-size: 12px; padding: 10px 12px; line-height: 1.5; }
+  .scrim-demo::after { content: ''; position: absolute; inset: 0; background: var(--scrim, rgba(10,14,24,.55)); backdrop-filter: var(--scrim-blur, blur(2px)); -webkit-backdrop-filter: var(--scrim-blur, blur(2px)); }
+  .scrim-demo .lbl { position: absolute; right: 8px; bottom: 6px; z-index: 1; color: #fff; font-size: 11px; font-weight: 600; background: rgba(0,0,0,.35); padding: 2px 6px; border-radius: 4px; }
+  .alt-vapor-scrim { --scrim: rgba(0,0,0,.32); --scrim-blur: none; }
+  /* 25 · 바탕의 결 — style.css body::after 를 그대로 옮겼다(불투명도 .26) */
+  .phone.noise::after { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .26; border-radius: 22px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E"); }
+  .swatch { display: inline-block; width: 120px; height: 72px; border-radius: 8px; border: 1px solid var(--pg-line); background: #fefdfc; position: relative; vertical-align: top; margin: 8px 8px 0 0; overflow: hidden; }
+  .swatch::after { content: ''; position: absolute; inset: 0; opacity: var(--sw-op, .26);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='var(--sw-a, 0.045)'/%3E%3C/svg%3E"); }
+  .swatch.loud::after { opacity: 1; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E"); }
+  .swatch.none::after { display: none; }
+  .swatch span { position: absolute; left: 8px; bottom: 6px; font-size: 11px; color: #545a62; }
+  /* 26 · 잠김 */
+  .dis-rows { display: grid; gap: 10px; margin: 4px 0 8px; }
+  .dis-rows .btn { width: auto; }
+  .btn.dis-now { background: rgba(25,23,19,.12); color: rgba(25,23,19,.36); box-shadow: none; }
+  .btn.dis-now.ghost { background: transparent; border: 1px solid var(--line); color: var(--text-sub); opacity: .45; }
+  .btn.dis-now.danger { background: #8f3a2e; color: #fff; opacity: .45; box-shadow: none; }
+  .btn.dis-vapor { opacity: .32; box-shadow: none; }
+  .btn.ghost-live { background: transparent; border: 1px solid var(--line); color: var(--text-sub); box-shadow: none; }
+  .btn.danger-live { background: #8f3a2e; color: #fff; box-shadow: none; }
+  /* 27 · 그림자 색 — 남색 틴트 vs 검정 20% 4단 */
+  .alt-blackshadow { --sh-lift: 0 4px 16px rgba(0,0,0,.20); --hero-sh: 0 4px 16px rgba(0,0,0,.20); --sheet-sh: 0 16px 32px rgba(0,0,0,.20); --sh-btn: 0 4px 10px rgba(0,0,0,.20); --btn-sh: 0 4px 10px rgba(0,0,0,.20); --btnw-sh: 0 4px 10px rgba(0,0,0,.20); }
+  /* 28 · 아이콘 선 굵기 */
+  .alt-stroke svg { stroke-width: 1.5; }
+  .icons-row { display: flex; gap: 18px; align-items: center; padding: 10px 4px; }
+  .icons-row svg { width: 28px; height: 28px; color: var(--text); }
+  /* 29 · 데스크톱 hover — 카드 */
+  .card.hovered { box-shadow: 0 2px 6px rgba(24,35,56,.07), 0 18px 40px rgba(24,35,56,.14); transform: translateY(-1px); background: #fff; border-radius: 8px; }
+  .card.hov-overlay { position: relative; }
+  .card.hov-overlay::before { content: ''; position: absolute; inset: 0; background: #17191c; opacity: .06; border-radius: 6px; pointer-events: none; }
+  .card.hov-line { outline: 1px solid rgba(23,25,28,.14); outline-offset: -1px; border-radius: 6px; }
+  .map table td code { font-size: 12px; }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>한대장 × Vapor(구름) 대조판 — 참고안 셋과 견주어 남은 컨펌</h1>
+    <p>왼쪽은 2026-09-11 에 실제 앱을 브라우저로 띄워 실측한 지금 화면, 오른쪽은 첨부한 Vapor UI DESIGN.md 의 규칙을 그 항목에만 적용했을 때입니다. 다른 항목은 건드리지 않고 <b>한 가지씩</b>만 바꿨습니다. 번호 <b>24~29</b> 는 이번 Vapor 대조에서 새로 잡은 것이고, 1~23 은 Linear·Apple 대조판·DESIGN.md 「충돌 · 컨펌 대기」표와 같은 번호입니다(아래 표에 Vapor 가 어느 편인지만 적었습니다). Vapor 는 세 참고안 중 <b>이 앱과 가장 닮은 참고안</b>입니다 — 밝은 바탕의 한국어 제품 UI 이고 Pretendard 를 쓰며, 카드는 얇은 선으로 가르고 그림자는 떠 있는 것에만 줍니다. 실제 글꼴(Pretendard)은 이 페이지에 실리지 않아 Noto Sans KR 로 대신 그렸습니다.</p>
+    <div class="legend"><span class="l-rec">바꾸는 쪽을 권함</span><span class="l-keep">지금 유지를 권함</span><span class="l-ask">눈으로 보고 정할 것</span></div>
+  </header>
+
+  <!-- 24 -->
+  <section class="plate" id="p24">
+    <div class="plate-head">
+      <div class="no">24</div>
+      <div><h2>흐림(backdrop-filter) — 탭바·시트 스크림의 블러 vs 흐림 금지</h2>
+        <div class="rules"><span class="vap">Vapor: "글래스/프로스티드/블러·backdrop-filter 를 쓰지 않는다" · 투명은 스크림(검정 32%)과 상호작용 오버레이에만</span><span class="apl">Apple: frosted(반투명 + 흐림) 고정 바 — 지금 탭바가 이 방식</span><span>지금: 탭바 흰 82% + blur(20px) saturate(1.6) · 시트 뒤 남색 55% + blur(2px)</span></div></div>
+      <span class="verdict ask">참고안이 갈린다 · 눈으로 보고 정할 것</span>
+    </div>
+    <div class="pair">
+      <div class="col"><div class="col-label">지금</div><div class="phone tall"><div class="section"><h3>마감 임박</h3><span class="link">전체 보기</span></div><div class="card"><div class="org"><span>교외 · 한국소아당뇨인협회</span><span class="fit">적합도 15%</span></div><div class="ttl">소아·청소년 당뇨인 푸른빛 희망 장학금</div><div class="row"><span class="amt unknown">금액 원문 확인</span><span class="due">D-DAY</span></div></div><div class="card"><div class="org"><span>교외 · 홍천군무궁화장학회</span><span class="fit">적합도 15%</span></div><div class="ttl">무궁화장학생(생활비장학금)</div><div class="row"><span class="amt">최대 100만원</span><span class="due">D-DAY</span></div></div><div class="card"><div class="org"><span>교외 · 재단법인 강서구장학회</span><span class="fit">적합도 33%</span></div><div class="ttl">모범장학생</div><div class="row"><span class="amt">최대 200만원</span><span class="due">D-DAY</span></div></div><div class="nav float"><div class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>홈</div><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></svg>장학금</div><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>신청내역</div><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>MY</div></div></div><div class="scrim-demo">(재)무안군승달장학회 성적우수장학금<br>최대 150만원 · 접수 ~2026-09-11<br>지원 자격 · 적합도 50%<span class="lbl">시트 뒤 · 남색 55% + blur 2px</span></div><div class="spec"><span>탭바 rgba(255,254,252,.82) + blur(20px) saturate(1.6) (style.css 2299)</span><span>시트 스크림 rgba(10,14,24,.55) + blur(2px) (736)</span></div></div>
+      <div class="col"><div class="col-label">바꿨을 때<b>탭바 순백 불투명 + 위 1px 선 · 스크림 검정 32% · 흐림 0</b></div><div class="phone tall alt-noblur"><div class="section"><h3>마감 임박</h3><span class="link">전체 보기</span></div><div class="card"><div class="org"><span>교외 · 한국소아당뇨인협회</span><span class="fit">적합도 15%</span></div><div class="ttl">소아·청소년 당뇨인 푸른빛 희망 장학금</div><div class="row"><span class="amt unknown">금액 원문 확인</span><span class="due">D-DAY</span></div></div><div class="card"><div class="org"><span>교외 · 홍천군무궁화장학회</span><span class="fit">적합도 15%</span></div><div class="ttl">무궁화장학생(생활비장학금)</div><div class="row"><span class="amt">최대 100만원</span><span class="due">D-DAY</span></div></div><div class="card"><div class="org"><span>교외 · 재단법인 강서구장학회</span><span class="fit">적합도 33%</span></div><div class="ttl">모범장학생</div><div class="row"><span class="amt">최대 200만원</span><span class="due">D-DAY</span></div></div><div class="nav float"><div class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>홈</div><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></svg>장학금</div><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>신청내역</div><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>MY</div></div></div><div class="scrim-demo alt-vapor-scrim">(재)무안군승달장학회 성적우수장학금<br>최대 150만원 · 접수 ~2026-09-11<br>지원 자격 · 적합도 50%<span class="lbl">시트 뒤 · 검정 32% · 흐림 없음</span></div><div class="spec"><span>탭바 #ffffff + 위 1px hairline 9%</span><span>스크림 rgba(0,0,0,.32)</span></div></div>
+    </div>
+    <p class="after-note">세 참고안이 <b>처음으로 갈리는</b> 항목입니다. Apple 은 고정 바를 반투명·흐림으로 만들라고 하고(지금 탭바가 그 방식), Vapor 는 흐림을 통째로 금지합니다(Linear 문서는 이 항목을 적지 않았습니다). 지금 탭바의 흐림은 목록이 탭바 아래로 지나갈 때만 보이고, 폰에서는 GPU 를 조금 더 씁니다. <span>정하실 때 25번(바탕의 결)과 같이 보시면 좋습니다 — 둘 다 "장식적 질감을 남길 것인가" 한 가지 질문입니다.</span></p>
+  </section>
+
+  <!-- 25 -->
+  <section class="plate" id="p25">
+    <div class="plate-head">
+      <div class="no">25</div>
+      <div><h2>바탕의 결(노이즈 텍스처) — 옅은 결 한 겹 vs 텍스처 금지</h2>
+        <div class="rules"><span class="vap">Vapor: "텍스처·반복 패턴·장식 일러스트를 시스템 표면에 쓰지 않는다"</span><span class="apl">Apple: 장식 없음 · <span class="lin">Linear: "대기 같은 그라데이션·질감 없음"</span></span><span>지금: 화면 전체에 SVG 노이즈 한 겹(body::after · 불투명도 26%)</span></div></div>
+      <span class="verdict rec">바꾸는 쪽 권함 · 참고안 셋이 같은 말</span>
+    </div>
+    <div class="pair">
+      <div class="col"><div class="col-label">지금</div><div class="phone noise"><div class="hero"><div class="lbl">지금 신청할 수 있는 장학금 15건</div><div class="amt"><small>최대</small> 1,405만원</div><div class="sub">금액을 아직 못 읽은 10건은 뺀 금액이에요</div><div class="btn btn-inverse">15건 신청 준비</div></div><div class="section"><h3>마감 임박</h3><span class="link">전체 보기</span></div><div class="card"><div class="org"><span>교외 · 홍천군무궁화장학회</span><span class="fit">적합도 15%</span></div><div class="ttl">무궁화장학생(생활비장학금)</div><div class="row"><span class="amt">최대 100만원</span><span class="due">D-DAY</span></div></div><div class="card"><div class="org"><span>교외 · 재단법인 강서구장학회</span><span class="fit">적합도 33%</span></div><div class="ttl">모범장학생</div><div class="row"><span class="amt">최대 200만원</span><span class="due">D-DAY</span></div></div></div><div><span class="swatch"><span>실제 26% — 거의 안 보인다</span></span><span class="swatch loud"><span>같은 결을 진하게 (무엇이 깔려 있는지)</span></span></div><div class="spec"><span>body::after · feTurbulence 0.85 · rect 4.5% · opacity .26 (style.css 2232 · 2816)</span></div></div>
+      <div class="col"><div class="col-label">바꿨을 때<b>결 없음 — 바탕 #fefdfc 평면</b></div><div class="phone"><div class="hero"><div class="lbl">지금 신청할 수 있는 장학금 15건</div><div class="amt"><small>최대</small> 1,405만원</div><div class="sub">금액을 아직 못 읽은 10건은 뺀 금액이에요</div><div class="btn btn-inverse">15건 신청 준비</div></div><div class="section"><h3>마감 임박</h3><span class="link">전체 보기</span></div><div class="card"><div class="org"><span>교외 · 홍천군무궁화장학회</span><span class="fit">적합도 15%</span></div><div class="ttl">무궁화장학생(생활비장학금)</div><div class="row"><span class="amt">최대 100만원</span><span class="due">D-DAY</span></div></div><div class="card"><div class="org"><span>교외 · 재단법인 강서구장학회</span><span class="fit">적합도 33%</span></div><div class="ttl">모범장학생</div><div class="row"><span class="amt">최대 200만원</span><span class="due">D-DAY</span></div></div></div><div><span class="swatch none"><span>결 없음</span></span></div><div class="spec"><span>body::after 규칙 제거 (1규칙 · 데이터 URL 1줄)</span><span>26% 라 눈으로는 거의 같다</span></div></div>
+    </div>
+    <p class="after-note">2026-08-31 에 "완전한 평면은 차갑다"며 깔아 둔 결입니다. 26% 라 두 화면을 나란히 놓아도 <b>눈으로는 구분이 안 됩니다</b>(왼쪽 작은 견본을 진하게 한 것이 그 결의 정체입니다). 참고안 셋이 전부 "질감 없음"이고, 안 보이는 것을 매 프레임 그리는 값이라 빼는 쪽을 권합니다. <span>6번(히어로 방사광)과 함께 정하면 '장식은 히어로 빛 하나뿐' 또는 '장식 0' 둘 중 하나로 화면이 한 방향이 됩니다.</span></p>
+  </section>
+
+  <!-- 26 -->
+  <section class="plate" id="p26">
+    <div class="plate-head">
+      <div class="no">26</div>
+      <div><h2>잠김(disabled) 상태 — 회색 판 · 45% · 죽은 규칙 셋 vs 불투명도 32% 한 가지</h2>
+        <div class="rules"><span class="vap">Vapor: 전 컴포넌트 공통 <b>opacity 0.32</b> · hover 오버레이도 함께 꺼짐 · 읽기 전용은 gray-200 바탕</span><span>지금: 주 버튼 = 잉크 12% 면 + 36% 글자 · 위험 버튼 .45 · 지갑 버튼 .45 · 210줄에 #c9d2de 잔재(뒤에 덮여 안 보이지만 유채색 천장에 세어짐)</span></div></div>
+      <span class="verdict ask">눈으로 보고 정할 것 · 컨펌 없이도 가능</span>
+    </div>
+    <div class="pair">
+      <div class="col"><div class="col-label">지금</div><div class="phone"><div class="dis-rows"><div class="btn btn-primary">신청 준비 시작</div><div class="btn dis-now">신청 준비 시작 <small style="font-weight:500">(자격 미확인 · 잠김)</small></div><div class="btn ghost-live">원문 보기</div><div class="btn dis-now ghost">원문 보기 (잠김)</div><div class="btn danger-live">초기화</div><div class="btn dis-now danger">초기화 (잠김)</div></div></div><div class="spec"><span>.btn-primary:disabled rgba(25,23,19,.12) / .36 (2270)</span><span>.btn-danger:disabled .45 (1747) · wallet .45 (1178)</span></div></div>
+      <div class="col"><div class="col-label">바꿨을 때<b>전부 opacity .32 · 제 색을 유지한 채 흐려진다</b></div><div class="phone"><div class="dis-rows"><div class="btn btn-primary">신청 준비 시작</div><div class="btn btn-primary dis-vapor">신청 준비 시작 <small style="font-weight:500">(자격 미확인 · 잠김)</small></div><div class="btn ghost-live">원문 보기</div><div class="btn ghost-live dis-vapor">원문 보기 (잠김)</div><div class="btn danger-live">초기화</div><div class="btn danger-live dis-vapor">초기화 (잠김)</div></div></div><div class="spec"><span>:disabled { opacity: .32 } 한 규칙 · 색 토큰 0</span><span>#c9d2de 잔재 삭제 → 유채색 천장 76 → 75</span></div></div>
+    </div>
+    <p class="after-note">지금은 잠긴 모양이 <b>세 가지</b>입니다(회색 판 · 45% · 죽은 규칙). Vapor 방식은 "제 색 그대로 32%"라 규칙 하나로 통일되고, 잠긴 주 버튼이 회색 판이 아니라 <b>옅은 남색</b>이 됩니다 — "이 버튼은 남색인데 지금은 못 누른다"가 읽힙니다. <span>어떤 개발자 결정과도 안 부딪혀 컨펌 없이 할 수 있는 종류지만, 잠긴 버튼은 학생이 매일 보는 것이라 한 번 보시고 정하시는 편이 맞습니다.</span></p>
+  </section>
+
+  <!-- 27 -->
+  <section class="plate" id="p27">
+    <div class="plate-head">
+      <div class="no">27</div>
+      <div><h2>그림자의 색과 단 수 — 남색 틴트 10토큰 vs 검정 20% 4단</h2>
+        <div class="rules"><span class="vap">Vapor: sm/md/lg/xl <b>4단 · 전부 검정 20%</b> · 카드·버튼·입력엔 없음 · 떠 있는 것(팝업·메뉴·토스트)에만</span><span class="apl">Apple: 그림자 딱 하나 · <span class="lin">Linear: 거의 안 씀</span></span><span>지금: 남색 rgba(24,35,56) 틴트 · 토큰 10개(--shadow·btn·btn-hover·btn-white·chip·lift·sheet + ring·cutout·knob)</span></div></div>
+      <span class="verdict keep">색은 유지 권함 · 단 수는 5번과 함께</span>
+    </div>
+    <div class="pair">
+      <div class="col"><div class="col-label">지금</div><div class="phone"><div class="hero"><div class="lbl">지금 신청할 수 있는 장학금 15건</div><div class="amt"><small>최대</small> 1,405만원</div><div class="sub">금액을 아직 못 읽은 10건은 뺀 금액이에요</div><div class="btn btn-inverse">15건 신청 준비</div></div><div class="btn btn-primary">신청 준비 시작</div><div class="sheet"><div class="handle"></div><div class="badges" style="margin:0 0 8px"><span class="badge danger">D-DAY</span><span class="badge">교외</span></div><h4>(재)무안군승달장학회 성적우수장학금</h4><div class="amt">최대 150만원</div><p>(재)무안군승달장학회 · 접수 ~2026-09-11</p></div></div><div class="spec"><span>--shadow-lift 남색 7%/14% · --shadow-sheet 20% · --shadow-btn 22%</span></div></div>
+      <div class="col"><div class="col-label">바꿨을 때<b>같은 자리 · 색만 검정 20% · lg/xl/md 세 단</b></div><div class="phone alt-blackshadow"><div class="hero"><div class="lbl">지금 신청할 수 있는 장학금 15건</div><div class="amt"><small>최대</small> 1,405만원</div><div class="sub">금액을 아직 못 읽은 10건은 뺀 금액이에요</div><div class="btn btn-inverse">15건 신청 준비</div></div><div class="btn btn-primary">신청 준비 시작</div><div class="sheet"><div class="handle"></div><div class="badges" style="margin:0 0 8px"><span class="badge danger">D-DAY</span><span class="badge">교외</span></div><h4>(재)무안군승달장학회 성적우수장학금</h4><div class="amt">최대 150만원</div><p>(재)무안군승달장학회 · 접수 ~2026-09-11</p></div></div><div class="spec"><span>lg 0 4px 16px 검정 20% · xl 0 16px 32px · md 0 4px 10px</span></div></div>
+    </div>
+    <p class="after-note">2026-08-31 에 "순수 검정 저투명도는 회색 때가 낀 것처럼 보인다"고 정해 남색 틴트로 통일한 자리입니다. 오른쪽의 검정 20% 는 그 지적 그대로 <b>가장자리가 탁해 보입니다</b>(특히 흰 버튼 아래). 색은 지금 것을 권합니다. <span>다만 토큰이 열 개인 것은 Vapor 의 4단과 견주면 많습니다 — 5번을 (b)로 정해 버튼 그림자를 빼면 btn·btn-hover·btn-white·chip 넷이 함께 빠져 여섯이 되고, 그중 chip 은 7번 뒤로 이미 아무 데도 안 보입니다(2277·2536줄이 4189줄에 덮임).</span></p>
+  </section>
+
+  <!-- 28 -->
+  <section class="plate" id="p28">
+    <div class="plate-head">
+      <div class="no">28</div>
+      <div><h2>아이콘 선 굵기 — 1.8 · 2.2 · 2 · 1.7 네 가지 vs 24×24 선 1.5 하나</h2>
+        <div class="rules"><span class="vap">Vapor: flat 24×24 단색 선 · <b>stroke 1.5px</b> · 크기는 max(16px, 50%) 로 컨트롤을 따라감 · 이모지·유니코드 글리프 대용 금지</span><span>지금: SVG 선 1.8(13곳) · 2.2(6곳) · 2(2곳) · 1.7(2곳) — index.html·app.js 실측</span></div></div>
+      <span class="verdict ask">한 값으로 통일 · 눈으로 보고 정할 것</span>
+    </div>
+    <div class="pair">
+      <div class="col"><div class="col-label">지금</div><div class="phone"><div class="icons-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 8a6 6 0 0 1 12 0v5l2 3H4l2-3z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div><div class="nav"><div class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>홈</div><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></svg>장학금</div><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>신청내역</div><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>MY</div></div></div><div class="spec"><span>탭·알림·설정 1.8 · 화살표류 2.2 · 부팅 로고 1.7</span></div></div>
+      <div class="col"><div class="col-label">바꿨을 때<b>전부 1.5</b></div><div class="phone alt-stroke"><div class="icons-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 8a6 6 0 0 1 12 0v5l2 3H4l2-3z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div><div class="nav"><div class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>홈</div><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></svg>장학금</div><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>신청내역</div><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>MY</div></div></div><div class="spec"><span>stroke-width 1.5 · 23곳을 한 값으로</span><span>글자·크기 무변경</span></div></div>
+    </div>
+    <p class="after-note">이 앱의 아이콘은 이미 Vapor 가 말하는 모양(24×24 · 단색 · 선 · 이모지 없음)입니다. 다른 것은 선 굵기가 <b>네 가지</b>라는 점뿐입니다 — 세 참고안 중 굵기를 못 박은 것은 Vapor 하나(1.5)이고, Apple 은 SF Symbols 라 견줄 수 없습니다. 1.5 로 내리면 12.5px 탭 이름 옆에서 조금 가늘어 보일 수 있어, 1.5 든 1.8 이든 <b>하나로</b> 통일하는 쪽만 권합니다. <span>어떤 개발자 결정과도 안 부딪힙니다.</span></p>
+  </section>
+
+  <!-- 29 -->
+  <section class="plate" id="p29">
+    <div class="plate-head">
+      <div class="no">29</div>
+      <div><h2>데스크톱 hover(마우스만) — 면 색 교체 vs 먹 오버레이 8% · transform 없음</h2>
+        <div class="rules"><span class="vap">Vapor: hover 는 면 색을 갈아끼우지 않고 <b>검정 8% 오버레이</b>만 · transform 없음 · 카드는 hover 규칙 자체가 없음</span><span class="apl">Apple: hover 를 문서화하지 않음 · <span class="lin">Linear: 카드 hover 에 진한 선(17번)</span></span><span>지금(마우스 기기만): 카드 = 눌림과 같은 면(surface-2) · 주 버튼 = 더 짙은 남색(primary-dark) · 아이콘 = 잉크 5.5% 판 — 그림자·들림 없음(2264줄의 lift 는 2431줄이 지웠다 · 브라우저 실측) · 손가락 기기에선 hover 자체가 없음</span></div></div>
+      <span class="verdict keep">유지 권함 · 폰에선 차이 없음 · 면 교체는 눌림과 같은 색</span>
+    </div>
+    <div class="pair">
+      <div class="col"><div class="col-label">지금 (마우스를 올렸을 때 · 카드는 눌림 면과 같다)</div><div class="phone"><div class="section"><h3>마감 임박</h3><span class="link">전체 보기</span></div><div class="card"><div class="org"><span>교외 · 한국소아당뇨인협회</span><span class="fit">적합도 15%</span></div><div class="ttl">소아·청소년 당뇨인 푸른빛 희망 장학금</div><div class="row"><span class="amt unknown">금액 원문 확인</span><span class="due">D-DAY</span></div></div><div class="card pressed"><div class="org"><span>교외 · 홍천군무궁화장학회</span><span class="fit">적합도 15%</span></div><div class="ttl">무궁화장학생(생활비장학금)</div><div class="row"><span class="amt">최대 100만원</span><span class="due">D-DAY</span></div></div><div class="card"><div class="org"><span>교외 · 재단법인 강서구장학회</span><span class="fit">적합도 33%</span></div><div class="ttl">모범장학생</div><div class="row"><span class="amt">최대 200만원</span><span class="due">D-DAY</span></div></div></div><div class="spec"><span>.sch-card:hover { background: var(--surface-2); transform: none; box-shadow: none } (2431 · 실효)</span><span>.btn-primary:hover primary-dark (2269) · .icon-btn:hover primary-weak (2255)</span></div></div>
+      <div class="col"><div class="col-label">바꿨을 때<b>가운데 = Vapor 오버레이 6~8%(::before) · 아래 = 17번 선 14%</b></div><div class="phone"><div class="section"><h3>마감 임박</h3><span class="link">전체 보기</span></div><div class="card"><div class="org"><span>교외 · 한국소아당뇨인협회</span><span class="fit">적합도 15%</span></div><div class="ttl">소아·청소년 당뇨인 푸른빛 희망 장학금</div><div class="row"><span class="amt unknown">금액 원문 확인</span><span class="due">D-DAY</span></div></div><div class="card hov-overlay"><div class="org"><span>교외 · 홍천군무궁화장학회</span><span class="fit">적합도 15%</span></div><div class="ttl">무궁화장학생(생활비장학금)</div><div class="row"><span class="amt">최대 100만원</span><span class="due">D-DAY</span></div></div><div class="card hov-line"><div class="org"><span>교외 · 재단법인 강서구장학회</span><span class="fit">적합도 33%</span></div><div class="ttl">모범장학생</div><div class="row"><span class="amt">최대 200만원</span><span class="due">D-DAY</span></div></div></div><div class="spec"><span>오버레이: ::before 먹 6% (누름 면 surface-2 와 같은 계열)</span><span>선: outline 1px 14% (Linear 17번)</span></div></div>
+    </div>
+    <p class="after-note">처음엔 "마우스를 올리면 카드가 떠오른다(2264줄)"고 적었다가, 브라우저로 재 보니 <b>뒤 규칙(2431줄)이 그것을 지워</b> 카드는 눌림 면(surface-2)으로만 답하고 있었습니다 — 그림자·들림 0. 그래서 이 항목은 충돌이 아니라 <b>방식의 차이</b>입니다: Vapor 는 면 색을 안 바꾸고 먹 오버레이 8% 를 얹고, 이 앱은 면 색을 한 단 바꿉니다(눌림과 같은 색). 손가락 기기에는 hover 가 없어 학생 화면에는 안 나타나므로 지금 방식을 권합니다. <span>17번(카드 hover 진한 선)은 Vapor 가 "카드에 hover 규칙 없음" 편이라 닫아도 되는 근거가 하나 더 생겼습니다.</span></p>
+  </section>
+
+  <section class="keeps">
+    <h2 style="font-size:19px;font-weight:700;margin:0 0 10px">기존 번호 1~23 — Vapor 는 어느 편인가</h2>
+    <p class="note" style="margin-bottom:12px">이미 개발자가 정했거나 컨펌 대기 중인 항목에 Vapor 의 자리를 더한 것입니다. <b>결정을 바꾸자는 것이 아니라</b>, 열린 항목(5·6·9·10·14·15·17·19·21)에 근거가 하나 더 생겼는지를 적었습니다.</p>
+    <div class="tblwrap"><table>
+      <tr><th>#</th><th>항목</th><th>Vapor</th><th>어느 편</th><th>뜻</th></tr>
+      <tr><td>1</td><td>바탕</td><td>밝은 #fff · canvas-200 #F7F7F7 (light-first) + 다크 램프 한 벌</td><td>우리와 같은 편</td><td>다크 한 벌은 별도 작업 그대로</td></tr>
+      <tr><td>2</td><td>강조색</td><td>파랑 원색 Blue-500 #2A72E5 (흰 글자 대비 4.5:1)</td><td>Apple 편</td><td>2026-08-31 지시(형광 파랑 금지) 그대로 유지</td></tr>
+      <tr><td>3</td><td>서체</td><td><b>Pretendard</b> (숫자 표 정렬용 Inter · 코드 Fira Code 는 이 앱에 자리 없음)</td><td>우리와 같음</td><td>세 참고안 중 유일하게 같은 글꼴</td></tr>
+      <tr><td>4</td><td>모서리</td><td>8px 이 기본 · 버튼도 8 · 시트 0 · 알약은 배지·라디오·스위치·원형 아이콘 버튼</td><td>Linear 편(CTA 알약 아님)</td><td>유지(개발자 결정). 시트 0 은 데스크톱 옆 패널 기준이라 폰 바텀시트에 안 맞음</td></tr>
+      <tr><td>5</td><td>그림자</td><td>카드·버튼·입력 없음 · 떠 있는 것만 · 4단 검정 20%</td><td>Apple·Linear 와 같은 편</td><td><b>버튼 그림자 반대가 셋</b> — 5번 (b) 근거가 하나 더</td></tr>
+      <tr><td>6</td><td>그라데이션</td><td>없음 — 단 <b>워드마크·히어로 두 곳 예외</b></td><td>우리와 같은 구조</td><td>세 참고안 중 유일하게 '히어로 하나' 예외를 명시 — 6번 '유지' 근거</td></tr>
+      <tr><td>7</td><td>선택 칩</td><td>탭 활성 = 색만, 무게·배경 안 바꿈 · 페이지네이션 현재 = 옅은 면</td><td>같은 편(칠하지 않음)</td><td>적용됨</td></tr>
+      <tr><td>8</td><td>주 버튼 색</td><td>primary fill = 파랑 + 흰 글자</td><td>Apple·Linear 와 같은 편</td><td>셋 다 강조색 CTA — 2026-08-31 결정(잉크) 유지, 사실만 기록</td></tr>
+      <tr><td>9</td><td>터치 표적</td><td><b>44×44 최소</b> · 모바일은 lg 40(감싸서 44)/xl 48</td><td>Apple 편</td><td>9번 권함 근거가 셋</td></tr>
+      <tr><td>10</td><td>굵기</td><td>400·500·700·800 넷 · <b>600 없음</b> · 제목(heading) 700 · display 만 800</td><td>'제목 700' 편</td><td>10번 (b) 근거 — 지금 600 이 46곳, 650 이 8곳, 550 이 2곳(실측)</td></tr>
+      <tr><td>11</td><td>데스크톱</td><td>≤640 폰 / 641~1023 태블릿 2열 / ≥1024 데스크톱(권장값)</td><td>Apple 편</td><td>유지(개발자 지시). 1440 까지 실측 넘침 없음</td></tr>
+      <tr><td>12</td><td>뜻을 가진 색</td><td>success 초록 · warning 주황 · danger 빨강 · hint 회색 — 색조 넷</td><td>다름</td><td>12번 적용됨(둘). 기록만</td></tr>
+      <tr><td>13</td><td>포커스 링</td><td>2px outline <b>먹색</b>(foreground-normal-200) + offset 2 · 입력은 1px inset 파랑</td><td>두께 같음 · 색 다름</td><td>적용됨(강조색). 기록만</td></tr>
+      <tr><td>14</td><td>드롭다운 면</td><td>메뉴·팝오버 = 흰 면 + 1px 선 + <b>shadow-md</b></td><td>Linear 와 반대</td><td>14번(그림자 0 · 한 단 밝은 면)에 반대 근거 — 눈으로</td></tr>
+      <tr><td>15</td><td>패널 윗변 흰 선</td><td>없음</td><td>—</td><td>기록만</td></tr>
+      <tr><td>16</td><td>오류 상태</td><td>invalid 축 있음(테두리·링 danger)</td><td>같음</td><td>적용됨</td></tr>
+      <tr><td>17</td><td>카드 hover</td><td>규칙 없음 · hover 는 오버레이 8%</td><td>—</td><td>29번으로 이어짐</td></tr>
+      <tr><td>18</td><td>구획 이름표</td><td>subtitle2 12px 500 · 자간 0</td><td>비슷</td><td>적용됨(12.5px 700)</td></tr>
+      <tr><td>19</td><td>옅은 글자 대비</td><td>hint-100 #5D5D5D <b>6.6:1</b> · normal-100 #4C4C4C 8.6:1 · 가장 옅은 gray-500 도 4.5:1</td><td>Apple 편(4.5 이상)</td><td>19번 권함 근거가 셋 — 지금 #888e97 은 흰 바탕 위 <b>3.3:1</b>(실계산 · 문서의 3.6 은 오기)</td></tr>
+      <tr><td>20</td><td>누름 반응</td><td>scale 금지 · 오버레이 16%</td><td>Apple 과 반대</td><td>적용됨(0.95 · 개발자 결정). 기록만</td></tr>
+      <tr><td>21</td><td>히어로 소형 폰</td><td>display 사다리 48/38/32 · 반응형 단계는 미기록</td><td>—</td><td>21번 권함 그대로(오늘 360px 실측 두 줄)</td></tr>
+      <tr><td>22</td><td>본문 크기</td><td>body2 14/22 · body1 16/24</td><td>우리 14.5 에 가까움</td><td>유지 근거</td></tr>
+      <tr><td>23</td><td>절 가르기</td><td>얇은 선 1px gray-100</td><td>Linear 편</td><td>같음</td></tr>
+    </table></div>
+  </section>
+
+  <section class="agree">
+    <h2 style="font-size:19px;font-weight:700;margin:0 0 10px">이미 Vapor 와 같은 것 — 바꿀 것 없음</h2>
+    <div class="tblwrap"><table>
+      <tr><th>Vapor 의 규칙</th><th>지금 앱</th></tr>
+      <tr><td>light-first — 흰 캔버스가 1차 환경</td><td>#fefdfc 한 벌 · 다크 없음</td></tr>
+      <tr><td>Pretendard 한 벌(한글·라틴 같은 metric)</td><td>Pretendard Variable 한 벌(2026-09-11 되돌림)</td></tr>
+      <tr><td>카드는 그림자 대신 1px 헤어라인 · at-rest 그림자 없음</td><td>notice-card 는 면도 그림자도 없이 아래 1px 선</td></tr>
+      <tr><td>그림자는 떠 있는 것(팝업·메뉴·토스트)에만</td><td>시트·히어로·토스트·정렬 메뉴 (주 버튼은 5번)</td></tr>
+      <tr><td>강조색은 상태·링크·CTA 에만 · 절제</td><td>#27508f 다섯 자리(탭·건수·제목선·링크·칩)</td></tr>
+      <tr><td>배지는 옅은 톤 한 가지(진한 변형 없음) · 알약은 리터럴</td><td>status-badge 옅은 바탕 + 진한 글자 · pill 999</td></tr>
+      <tr><td>토큰 전제 — 색은 alias 로만 · 새 값 금지</td><td>ui-tone 관문: 모서리·글자·그림자 토큰만 · 유채색 천장 76 · 없는 토큰 0</td></tr>
+      <tr><td>이모지 금지 · 유니코드 글리프 아이콘 대용 금지</td><td>ui-tone ①: 이모지 0 · 아이콘은 SVG(활자 ✓ ✕ ↗ 만 판정 표시로)</td></tr>
+      <tr><td>큰 글자일수록 자간을 좁힌다(display −0.4px → 본문 −0.1 → 12px 아래 0)</td><td>24px 이상 −0.03em · 본문 −0.014em · 배지·숫자 0</td></tr>
+      <tr><td>Disabled 는 hover 오버레이도 함께 끈다</td><td>잠긴 버튼은 그림자도 hover 도 없음(값은 26번)</td></tr>
+      <tr><td>입력 초점은 테두리 색 + ring 하나</td><td>--ring 2px 불투명 + 테두리 강조색(13번 적용)</td></tr>
+      <tr><td>전환 150~200ms · 바운스는 한 자리(토스트 400ms)만</td><td>--dur 0.22s · 실제 0.15s 23곳 · 스프링은 저장 튕김 한 자리(UI-23 개발자 지시)</td></tr>
+      <tr><td>시트는 가장자리에서 밀려 들어오고 스크림이 뒤를 가린다</td><td>bottom-sheet + sheet-backdrop (값은 24번)</td></tr>
+      <tr><td>텍스트는 항상 최소 4.5:1 (hint 까지)</td><td>본문 잉크 14:1 · 설명 7:1 — 예외는 --text-weak (19번)</td></tr>
+      <tr><td>한국어가 1차 언어 · 버튼은 짧은 동사</td><td>한국어 · 버튼 '시작하기' '다음' '전체 보기' (말투는 '~해요'체 — 텍스트 무변경 지시라 기록만)</td></tr>
+    </table></div>
+  </section>
+
+  <p class="note" style="margin-top:28px">답하실 때는 번호마다 <b>(a) 유지 / (b) 바꿈</b> 만 적어 주시면 됩니다. <b>25·26·28</b> 은 어떤 개발자 결정과도 안 부딪히고 한 줄씩 덜어내는 방향이라 한 번에 하는 것이 자연스럽고, <b>24</b> 는 참고안이 갈려 눈으로 정하실 것, <b>27</b> 은 색은 지금 것을 권하고 단 수는 5번과 함께, <b>29</b> 는 유지를 권합니다(재 보니 충돌이 아니었습니다). 기존 열린 항목(5·6·9·10·14·15·17·19·21)은 Vapor 가 어느 편인지만 위 표에 더했고 결정은 그대로 기다립니다.</p>
+</div>

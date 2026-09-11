@@ -1618,7 +1618,8 @@ textarea.essay-drafted { border-color: var(--primary); background: #fffefc; line
 .essay-rules-banner ul { margin: 6px 0 0; padding-left: 18px; }
 .essay-rules-banner li { font-size: var(--t-xs); line-height: 1.5; margin: 2px 0; }
 .essay-rule-danger { color: #c0392b; font-weight: 600; }
-:root[data-theme="dark"] .essay-rule-danger, :root:not([data-theme="light"]) .essay-rule-danger { color: #ff8a7a; }
+:root[data-theme="dark"] .essay-rule-danger { color: #ff8a7a; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .essay-rule-danger { color: #ff8a7a; } }
 
 /* 적합도 배지 — 숫자 옆 근거(요건 n개 중 m개)를 작게 붙인다 (2026-08-24) */
 .badge-fit em { font-style: normal; opacity: .75; font-size: .92em; margin-left: 4px; }
@@ -1657,7 +1658,8 @@ textarea.essay-drafted { border-color: var(--primary); background: #fffefc; line
   color: var(--text-sub); margin-top: 6px;
 }
 mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radius-hair); padding: 0 1px; }
-:root[data-theme="dark"] mark.essay-add, :root:not([data-theme="light"]) mark.essay-add { background: #1f4a2e; color: #a6e6bb; }
+:root[data-theme="dark"] mark.essay-add { background: #1f4a2e; color: #a6e6bb; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) mark.essay-add { background: #1f4a2e; color: #a6e6bb; } }
 
 /* ── 재료 충분도 게이지 (2026-08-29 · 2순위) ──
    초안을 만들기 전에 '재료가 얼마나 모였나'를 보여 준다. 품질이 아니라 재료다. */
@@ -1697,10 +1699,18 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
 .esc-body > b { display: block; font-size: var(--t-xs); color: var(--text); font-weight: 600; }
 .esc-block .esc-body > b { color: #c0392b; }
 .esc-detail { display: block; font-size: var(--t-2xs); color: var(--text-weak); line-height: 1.5; margin-top: 1px; }
-:root[data-theme="dark"] .esc-badge.esc-ok, :root:not([data-theme="light"]) .esc-badge.esc-ok { background: #1f4a2e; color: #a6e6bb; }
-:root[data-theme="dark"] .esc-badge.esc-block, :root:not([data-theme="light"]) .esc-badge.esc-block { background: #4a1f1f; color: #ff9a8c; }
-:root[data-theme="dark"] .esc-block .esc-mark, :root:not([data-theme="light"]) .esc-block .esc-mark,
-:root[data-theme="dark"] .esc-block .esc-body > b, :root:not([data-theme="light"]) .esc-block .esc-body > b { color: #ff9a8c; }
+:root[data-theme="dark"] .esc-badge.esc-ok { background: #1f4a2e; color: #a6e6bb; }
+:root[data-theme="dark"] .esc-badge.esc-block { background: #4a1f1f; color: #ff9a8c; }
+:root[data-theme="dark"] .esc-block .esc-mark,
+:root[data-theme="dark"] .esc-block .esc-body > b { color: #ff9a8c; }
+/* 🔴 시스템 다크는 반드시 미디어 쿼리 안에 — `:root:not([data-theme="light"])` 만으로는 data-theme 이 없는
+   이 앱에서 **언제나 참**이라 밝은 화면에 다크 색이 그대로 떴다(2026-09-11 실측 · 관문 ui-tone ⑧). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .esc-badge.esc-ok { background: #1f4a2e; color: #a6e6bb; }
+  :root:not([data-theme="light"]) .esc-badge.esc-block { background: #4a1f1f; color: #ff9a8c; }
+  :root:not([data-theme="light"]) .esc-block .esc-mark,
+  :root:not([data-theme="light"]) .esc-block .esc-body > b { color: #ff9a8c; }
+}
 
 /* ── 신청 내역 관리 — 왼쪽으로 밀어 삭제 · 선택 모드 (2026-08-24) ──
    장학 공고가 아니라 **학생이 기록한 신청 진행 상황**을 지우는 자리다.
