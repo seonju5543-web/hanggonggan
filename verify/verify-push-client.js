@@ -183,6 +183,8 @@ async function onboard(page, school = '외대') {
     await page.waitForSelector('#notify-sheet', { state: 'hidden', timeout: 4000 });
 
     await page.click('.nav-item[data-nav="my"]');
+    /* 알림 설정은 MY 안쪽 **설정 화면**으로 옮겼다 (2026-09-11 개발자 목업 승인) */
+    await page.click('#btn-open-settings');
     await page.waitForSelector('#my-notify:not([hidden])');
     /* ⚠️ 예전엔 MY 에 '앱을 켜지 않아도 받기 — 준비 중' 상자가 있었지만 2026-09-01 에
        **완전히 없앴다**(da0c14e · CSS 규칙만 남아 있다). 그 상자가 하던 일
@@ -241,6 +243,8 @@ async function onboard(page, school = '외대') {
 
   /* ② MY 화면 표시 */
   await page.click('.nav-item[data-nav="my"]');
+  /* 알림 설정은 MY 안쪽 **설정 화면**으로 옮겼다 (2026-09-11 개발자 목업 승인) */
+  await page.click('#btn-open-settings');
   await page.waitForSelector('#my-notify:not([hidden])');
   /* 🔴 상자가 없어졌어도 **두 가지는 계속 지킨다** — 자리만 옮겨서 확인한다.
      ① 켜진 것을 화면이 말한다 → 이제 맨 위 상태 줄(`.nf-status`)이 맡는다
@@ -296,6 +300,8 @@ async function onboard(page, school = '외대') {
 
   // 새로고침으로 홈으로 돌아왔으므로 아래 검사를 위해 MY 화면으로 다시 들어간다
   await page.click('.nav-item[data-nav="my"]');
+  /* 알림 설정은 MY 안쪽 **설정 화면**으로 옮겼다 (2026-09-11 개발자 목업 승인) */
+  await page.click('#btn-open-settings');
   await page.waitForSelector('#my-notify:not([hidden])');
 
   /* ④ 학교를 바꾸면 서버 등록도 따라간다 */

@@ -28,6 +28,12 @@ let state = {
      ⚠️ 이 목록은 **이 기기에만 남는다.** 서버(profiles 표)에는 profile·applications
         칸만 있어 동기화되지 않는다 — 칸을 늘리려면 표부터 고쳐야 한다. */
   saved: [],
+  /* 휴지통 — 지운 신청내역이 30일 동안 여기 머문다 (2026-09-11 개발자 지시).
+     { at, app, deletedAt } · at = 지우기 전 목록에서의 자리(되살릴 때 그 자리로 돌려놓는다).
+     🔴 지운 **서류 파일**은 여기 없다 — 파일은 크기 때문에 localStorage 에 못 담아
+        IndexedDB 'trash' 칸에 있다. 화면(renderTrash)이 둘을 합쳐 보여 준다.
+     ⚠️ 이 목록도 saved 와 같이 **이 기기에만** 남는다(서버 표에 칸이 없다). */
+  trash: [],
   /* 민감정보(기초생활수급·장애 등)를 서버에 올려도 되는가 — 온보딩 Step 3에서 받는다.
      동의 안 하면 그 항목은 기기에만 남는다(supabase-client.js syncSafeProfile). */
   consent: { sensitive: false },
@@ -100,6 +106,7 @@ function loadState() {
     if (raw) state = Object.assign(state, JSON.parse(raw));
     if (!state.consent) state.consent = { sensitive: false };   // 로그인 이전에 저장된 판
     if (!Array.isArray(state.saved)) state.saved = [];          // 저장 기능 이전에 저장된 판
+    if (!Array.isArray(state.trash)) state.trash = [];          // 휴지통 이전에 저장된 판
     if (state.profile) { migrateBranchCampus(state.profile); migrateFitFields(state.profile); }
   } catch (e) { /* 손상된 데이터는 무시 */ }
 }
@@ -503,11 +510,28 @@ let walletCache = {}; // slot -> { name, type, savedAt }
 
 function dbOpen() {
   return new Promise((res, rej) => {
-    const rq = indexedDB.open('handaejang-docs', 1);
-    rq.onupgradeneeded = () => rq.result.createObjectStore('files', { keyPath: 'slot' });
+    /* 🔴 판 2 — 'trash'(지운 서류) 보관소가 늘었다 (2026-09-11).
+       이미 판 1 로 만들어진 폰에서는 'files' 가 **이미 있으므로** 그대로 만들면
+       그 자리에서 오류가 나고 서류 보관함이 통째로 안 열린다. 있는지 보고 만든다. */
+    const rq = indexedDB.open('handaejang-docs', 2);
+    rq.onupgradeneeded = () => {
+      const db = rq.result;
+      if (!db.objectStoreNames.contains('files')) db.createObjectStore('files', { keyPath: 'slot' });
+      if (!db.objectStoreNames.contains('trash')) db.createObjectStore('trash', { keyPath: 'key' });
+    };
     rq.onsuccess = () => res(rq.result);
     rq.onerror = () => rej(rq.error);
   });
+}
+
+/* 휴지통 보관소 — 서류와 같은 금고 안의 다른 칸. 파일은 여전히 기기 밖으로 안 나간다. */
+function trashTx(mode, fn) {
+  return dbOpen().then((db) => new Promise((res, rej) => {
+    const tx = db.transaction('trash', mode);
+    const out = fn(tx.objectStore('trash'));
+    tx.oncomplete = () => res(out && out.result);
+    tx.onerror = () => rej(tx.error);
+  }));
 }
 function walletTx(mode, fn) {
   return dbOpen().then((db) => new Promise((res, rej) => {
@@ -526,7 +550,20 @@ async function walletPut(slot, file) {
 function walletGetRec(slot) {
   return walletTx('readonly', (st) => st.get(slot));
 }
+/* 🔴 삭제가 아니라 **옮기기**다 (2026-09-11 개발자 지시로 휴지통 신설).
+   증명서는 학생이 주민센터·학교에 다시 가야 다시 받는 물건이라, 잘못 눌렀을 때
+   되돌릴 길이 없으면 그 손실이 그대로 학생 몫이 된다. */
 async function walletDeleteSlot(slot) {
+  try {
+    const rec = await walletGetRec(slot);
+    if (rec) {
+      await trashTx('readwrite', (st) => st.put({
+        key: `doc:${slot}:${Date.now()}`, kind: 'doc',
+        slot, name: rec.name, type: rec.type, blob: rec.blob,
+        savedAt: rec.savedAt, deletedAt: Date.now(),
+      }));
+    }
+  } catch (e) { /* 휴지통에 못 담아도 삭제 자체는 진행한다 — 학생이 누른 일은 일어나야 한다 */ }
   await walletTx('readwrite', (st) => st.delete(slot));
   await walletRefresh();
 }
@@ -692,17 +729,22 @@ function showScreen(name, opts) {
   if (typeof resumeSaveScroll === 'function' && currentScreen && currentScreen !== name) {
     resumeSaveScroll(currentScreen, window.scrollY);
   }
-  ['onboarding', 'home', 'explore', 'applications', 'my'].forEach((n) => {
+  ['onboarding', 'home', 'explore', 'applications', 'my', 'settings', 'trash'].forEach((n) => {
     $(`#screen-${n}`).hidden = n !== name;
   });
   $('#bottom-nav').hidden = name === 'onboarding';
-  $$('.nav-item').forEach((b) => b.classList.toggle('active', b.dataset.nav === name));
+  /* 설정·휴지통은 MY 안쪽 화면이라 아래 탭에서 **MY 가 켜진 채**로 둔다 —
+     아무 탭도 안 켜져 있으면 학생이 지금 어디에 있는지 알 수 없다. */
+  const navOn = (name === 'settings' || name === 'trash') ? 'my' : name;
+  $$('.nav-item').forEach((b) => b.classList.toggle('active', b.dataset.nav === navOn));
   currentScreen = name;
 
   if (name === 'home') renderHome();
   if (name === 'explore') renderExplore();
   if (name === 'applications') renderApplications();
   if (name === 'my') renderMy();
+  if (name === 'settings') renderSettings();
+  if (name === 'trash') renderTrash();
 
   /* 🔴 스크롤은 **그린 뒤에** 옮긴다 — 먼저 옮기면 아직 짧은 화면이라 그 자리가 없다.
      `opts.scroll` 은 이어보기가 되살릴 때만 온다(보통은 늘 맨 위로). */
@@ -3074,6 +3116,13 @@ function deleteApps(ids) {
   if (!removed.length) return;
   state.applications = state.applications.filter((a) => !ids.includes(a.id));
   appsSelected.clear();
+  /* 🔴 토스트의 '실행 취소'는 **한 번 지나가면 끝**이다 — 다른 화면으로 넘어가거나
+     잠깐 한눈판 사이에 사라진다. 그래서 지운 기록을 휴지통에도 함께 담는다
+     (2026-09-11 개발자 지시). 두 길은 서로를 대신하지 않는다:
+       · 토스트  = 방금 잘못 눌렀을 때 그 자리에서 되돌리기
+       · 휴지통  = 며칠 뒤에야 알아차렸을 때 찾아가 되살리기 */
+  const when = Date.now();
+  removed.forEach((r) => state.trash.push({ at: r.at, app: r.app, deletedAt: when }));
   saveState();
   /* 되돌릴 때 **원래 자리로** 넣는다 — 뒤에 붙이면 목록 순서가 바뀌어
      학생이 "지웠다 살렸더니 딴 데 가 있네" 하고 또 헷갈린다. */
@@ -3084,6 +3133,10 @@ function deleteApps(ids) {
     label: '실행 취소',
     run: () => {
       for (const r of undoBuffer) state.applications.splice(r.at, 0, r.app);
+      /* 되살린 기록은 휴지통에서 뺀다 — 안 그러면 목록에도 있고 휴지통에도 있는
+         같은 기록이 둘이 되어, 나중에 휴지통에서 또 되살리면 중복으로 들어간다. */
+      const back = new Set(undoBuffer.map((r) => r.app && r.app.id));
+      state.trash = state.trash.filter((t) => !(t.deletedAt === when && back.has(t.app && t.app.id)));
       undoBuffer = null;
       saveState();
       renderApplications();
@@ -3538,10 +3591,169 @@ function renderMy() {
     <p class="my-flags">특별자격: ${flagText}</p>
     ${learnedHtml(c)}
     <p class="my-flags">공통 서류정보(학번·연락처·계좌 등)는 이 기기에만 저장 · 서류 초안에 자동 기입.</p>`;
-  renderAccountCard();
-  renderNotifyCard();
+  /* 🔴 계정·알림은 여기서 그리지 않는다 — 설정 화면으로 옮겼다 (2026-09-11).
+     renderSettings() 가 **같은 함수**를 불러 그린다. */
   renderWallet();
   renderSaved();
+}
+
+/* ---------------- 설정 화면 (2026-09-11 · 개발자 목업 승인) ---------------- */
+function renderSettings() {
+  renderAccountCard();
+  renderNotifyCard();
+  const t = $('#btn-open-trash');
+  if (t && !t.dataset.wired) { t.dataset.wired = '1'; t.addEventListener('click', () => showScreen('trash')); }
+  const w = $('#btn-withdraw');
+  if (w && !w.dataset.wired) { w.dataset.wired = '1'; w.addEventListener('click', withdrawAccount); }
+}
+
+/* 탈퇴 — 계정 카드 안의 '탈퇴' 와 **같은 일**을 한다(서버에 저장된 내 정보 삭제).
+   🔴 지우는 것은 서버 사본뿐이고 이 기기의 프로필·신청내역은 그대로 남는다.
+      말과 다르게 굴면 안 되므로 묻는 문장에도 그렇게 적는다. */
+async function withdrawAccount() {
+  if (typeof authUser !== 'function' || !authUser()) {
+    toast('로그인한 계정이 없어요 — 지울 서버 정보가 없습니다');
+    return;
+  }
+  if (!confirm('서버에 저장된 프로필·신청내역을 지울까요?\n이 기기의 정보는 그대로 남습니다.')) return;
+  const r = await authDeleteData();
+  toast(r.ok ? '서버 정보 삭제 완료' : r.error);
+  renderSettings();
+}
+
+/* ---------------- 휴지통 (2026-09-11 · 개발자 지시 "둘 다") ----------------
+   지운 **신청내역**(state.trash)과 지운 **서류 파일**(IndexedDB 'trash')이 함께 모인다.
+   🔴 두 곳에 나눠 담는 이유: 파일은 수 MB 라 localStorage 에 들어가지 않는다.
+      화면에서만 한 목록으로 합친다 — 학생에게는 '지운 것'이 한 군데여야 한다.
+   🔴 보관 기간 30일은 이 앱의 다른 규칙(마감+30일 숨김)과 같은 값으로 맞췄다. */
+const TRASH_KEEP_DAYS = 30;
+
+/* 지운 지 30일이 지난 것을 실제로 지운다. 앱을 열 때 한 번 돈다.
+   '보관 기간이 지나면 사라진다'고 화면에 적어 둔 이상, 정말로 사라져야 한다. */
+async function trashPurgeOld() {
+  const cut = Date.now() - TRASH_KEEP_DAYS * 86400000;
+  const before = state.trash.length;
+  state.trash = state.trash.filter((t) => (t.deletedAt || 0) > cut);
+  if (state.trash.length !== before) saveState();
+  try {
+    const all = await trashTx('readonly', (st) => st.getAll());
+    for (const r of all || []) {
+      if ((r.deletedAt || 0) <= cut) await trashTx('readwrite', (st) => st.delete(r.key));
+    }
+  } catch (e) { /* 금고를 못 열면 다음 실행에서 다시 시도한다 */ }
+}
+
+/* '3일 전' 처럼 읽기 쉬운 말로. 오늘 지운 것은 '오늘'이라고 한다. */
+function trashWhen(ms) {
+  const d = Math.floor((Date.now() - (ms || 0)) / 86400000);
+  if (d <= 0) return '오늘 지움';
+  if (d === 1) return '어제 지움';
+  return `${d}일 전에 지움`;
+}
+
+async function renderTrash() {
+  const el = $('#trash-body');
+  if (!el) return;
+  await trashPurgeOld();
+
+  let docs = [];
+  try { docs = (await trashTx('readonly', (st) => st.getAll())) || []; } catch (e) { docs = []; }
+
+  const rows = [
+    ...state.trash.map((t, i) => {
+      const sch = findSch(t.app && t.app.id);
+      return {
+        at: t.deletedAt || 0,
+        kind: '신청내역',
+        /* 🔴 공고가 목록에서 내려갔으면 이름을 **지어내지 않는다** — 원칙 8-1.
+           그래도 되살릴 수는 있어야 하므로 줄은 남기고 그렇게 적는다. */
+        title: sch ? sch.name : '(목록에서 내려간 공고)',
+        restore: `app:${i}`,
+        drop: `app:${i}`,
+      };
+    }),
+    ...docs.map((d) => {
+      const slot = (typeof DOC_SLOTS !== 'undefined' ? DOC_SLOTS : []).find((x) => x.slot === d.slot);
+      return {
+        at: d.deletedAt || 0,
+        kind: '서류',
+        title: slot ? slot.label : (d.name || '서류'),
+        restore: `doc:${d.key}`,
+        drop: `doc:${d.key}`,
+      };
+    }),
+  ].sort((a, b) => b.at - a.at);
+
+  if (!rows.length) {
+    /* 🔴 목업에 없던 화면이라 이 문구는 이 세션이 지은 것이다 — 개발자 확인 대상. */
+    el.innerHTML = `<div class="my-card trash-empty">
+        <p class="trash-empty-title">휴지통이 비어 있어요</p>
+        <p class="trash-empty-sub">신청내역이나 서류를 지우면 여기에 ${TRASH_KEEP_DAYS}일 동안 남아,
+          잘못 지웠을 때 되살릴 수 있어요.</p>
+      </div>`;
+    return;
+  }
+
+  el.innerHTML = `<div class="my-card">${rows.map((r) => `
+      <div class="wallet-row">
+        <div class="wallet-info">
+          <p class="trash-title">${esc(r.title)}</p>
+          <p class="wallet-status">${esc(r.kind)} · ${esc(trashWhen(r.at))}</p>
+        </div>
+        <div class="wallet-btns">
+          <button class="wallet-btn primary" data-trash-back="${esc(r.restore)}">되살리기</button>
+          <button class="wallet-btn danger" data-trash-drop="${esc(r.drop)}">완전 삭제</button>
+        </div>
+      </div>`).join('')}</div>`;
+
+  $$('#trash-body [data-trash-back]').forEach((b) =>
+    b.addEventListener('click', () => trashRestore(b.dataset.trashBack)));
+  $$('#trash-body [data-trash-drop]').forEach((b) =>
+    b.addEventListener('click', () => trashDrop(b.dataset.trashDrop)));
+}
+
+async function trashRestore(key) {
+  const [kind, rest] = key.split(/:(.+)/);
+  if (kind === 'app') {
+    const t = state.trash[Number(rest)];
+    if (!t) return;
+    /* 지운 뒤 목록이 짧아졌을 수 있으므로 자리를 범위 안으로 눌러 넣는다.
+       (splice 는 범위를 넘으면 맨 뒤에 붙이지만, 그 동작에 기대지 않고 분명히 적는다.) */
+    const at = Math.min(Math.max(0, t.at | 0), state.applications.length);
+    state.applications.splice(at, 0, t.app);
+    state.trash.splice(Number(rest), 1);
+    saveState();
+    renderApplications();
+    renderHome();
+    toast('신청내역으로 되살렸어요');
+  } else {
+    let rec;
+    try { rec = await trashTx('readonly', (st) => st.get(rest)); } catch (e) { rec = null; }
+    if (!rec) { toast('그 파일을 찾지 못했어요'); return; }
+    /* 🔴 그 자리에 다른 파일이 있으면 **덮어쓰지 않는다** — 되살리려다 멀쩡한 서류를
+       잃는 것은 휴지통이 막으려던 바로 그 일이다. */
+    if (walletCache[rec.slot]) { toast('그 칸에 이미 다른 서류가 있어요 · 먼저 지우거나 교체해 주세요'); return; }
+    await walletTx('readwrite', (st) => st.put({
+      slot: rec.slot, name: rec.name, type: rec.type, blob: rec.blob, savedAt: rec.savedAt,
+    }));
+    await trashTx('readwrite', (st) => st.delete(rest));
+    await walletRefresh();
+    toast('서류 보관함으로 되살렸어요');
+  }
+  renderTrash();
+}
+
+async function trashDrop(key) {
+  if (!confirm('완전히 지울까요?\n이 동작은 되돌릴 수 없습니다.')) return;
+  const [kind, rest] = key.split(/:(.+)/);
+  if (kind === 'app') {
+    state.trash.splice(Number(rest), 1);
+    saveState();
+  } else {
+    try { await trashTx('readwrite', (st) => st.delete(rest)); } catch (e) { /* 없으면 그만 */ }
+  }
+  toast('완전히 지웠어요');
+  renderTrash();
 }
 
 /* 알림 설정 카드 (notify.js가 내용을 만든다) */
@@ -4021,6 +4233,11 @@ function bindEvents() {
   /* 🔴 브라우저 confirm 을 쓰지 않는다 — 그 창은 앱이 아니라 브라우저가 만드는 것이라
      무엇이 지워지는지 목록으로 보여 줄 수 없고, 확인·취소 두 버튼밖에 못 넣는다.
      되돌릴 수 없는 동작이므로 **무엇이 사라지는지 적어 두고** 묻는다. */
+  /* 설정 화면 — MY 오른쪽 위 톱니로 들어가고, 왼쪽 위 화살표로 되돌아온다 (2026-09-11). */
+  $('#btn-open-settings').addEventListener('click', () => showScreen('settings'));
+  $('#btn-settings-back').addEventListener('click', () => showScreen('my'));
+  $('#btn-trash-back').addEventListener('click', () => showScreen('settings'));
+
   $('#btn-reset').addEventListener('click', () => {
     const pop = $('#wallet-pop');
     const bg = $('#wallet-pop-backdrop');
@@ -4436,11 +4653,16 @@ if (typeof loadFormTemplates === 'function') loadFormTemplates(); // 정식 등�
   document.addEventListener(t, (e) => e.preventDefault(), { passive: false });
 });
 
-walletRefresh().then(() => {
+/* 🔴 보관함·알림은 **늦게** 준비된다(IndexedDB·권한 확인). 준비되면 지금 보고 있는
+   화면을 다시 그려야 빈 칸이 채워진다. 알림 설정은 이제 **설정 화면**에 있으므로
+   MY 만 다시 그리면 '알림' 절이 영영 안 나온다 — 두 화면을 함께 본다. */
+function refreshOpenScreen() {
   if (!$('#screen-my').hidden) renderMy();
-});
+  if (!$('#screen-settings').hidden) renderSettings();
+}
+walletRefresh().then(refreshOpenScreen);
 if (typeof notifyInit === 'function') {
-  notifyInit().then(() => { if (!$('#screen-my').hidden) renderMy(); }).catch(() => {});
+  notifyInit().then(refreshOpenScreen).catch(() => {});
 }
 /* ── 다시 열었을 때 어디로 갈 것인가 (2026-09-09 · 노션 원문 목록 4번) ────────
    예전에는 프로필이 있으면 **늘 홈**이었다 — 탐색 탭을 보다 잠깐 나갔다 와도 홈이었고,
