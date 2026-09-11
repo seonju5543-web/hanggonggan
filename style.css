@@ -1864,6 +1864,14 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
 .legal p { margin-bottom: 8px; }
 .legal ul { padding-left: 18px; margin-bottom: 10px; }
 .legal li { margin-bottom: 4px; list-style: disc; }
+/* 🔴 조항은 **번호 목록**이다 (2026-09-11 — 국내 앱 약관의 일반적인 꼴).
+   바로 위 `.legal li` 가 모든 줄을 disc 로 만들어 두어서, 번호를 쓰려면
+   ol 안의 줄만 따로 되돌려야 한다. 순서를 바꾸면 번호가 다시 점으로 돌아간다. */
+.legal ol { padding-left: var(--space-24); margin-bottom: var(--space-12); }
+.legal ol > li { list-style: decimal; margin-bottom: var(--space-8); }
+/* 조항에 딸린 설명 불릿 — 번호 줄과 붙여 한 덩어리로 읽히게 */
+.legal ol ul { margin: var(--space-6) 0 0; padding-left: var(--space-16); }
+.legal ol ul li { margin-bottom: var(--space-4); }
 .legal a { color: var(--primary); }
 .legal-note {
   background: var(--orange-weak); color: var(--orange);

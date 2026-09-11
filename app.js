@@ -4001,6 +4001,11 @@ async function withdrawAccount() {
   }
   if (!confirm('서버에 저장된 프로필·신청내역을 지울까요?\n이 기기의 정보는 그대로 남습니다.')) return;
   const r = await authDeleteData();
+  /* 🔴 알림 구독도 함께 끊는다 (2026-09-11 코드 리뷰). 약관이 '탈퇴 시 즉시 파기'라고
+     적고 있는데 탈퇴가 발송 서버의 구독을 건드리지 않아, 지웠다는 폰으로 알림이 계속 갔다.
+     ⚠️ 실패해도 탈퇴는 성공으로 둔다 — 프로필은 이미 지워졌고, 죽은 구독은 발송 때
+        404 정리가 받친다. */
+  if (typeof pushUnsubscribe === 'function') { try { await pushUnsubscribe(); } catch (e) { /* 무시 */ } }
   toast(r.ok ? '서버 정보 삭제 완료' : r.error);
   renderSettings();
 }
