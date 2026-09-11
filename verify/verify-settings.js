@@ -92,8 +92,17 @@ const eq = (label, got, want) => {
     await page.$$eval('.set-menu .my-menu-item', (els) => els.map((e) => e.textContent.trim())),
     ['휴지통', '이용약관 · 개인정보처리방침', '탈퇴']);
   eq('탈퇴는 빨간 줄이다', await page.$eval('#btn-withdraw', (e) => e.classList.contains('danger')), true);
-  eq('이용약관은 terms.html 로 간다',
-    await page.$eval('.set-menu a.my-menu-item', (e) => e.getAttribute('href')), 'terms.html');
+  /* 🔴 '기타' 절 제목 — 제목 없이 목록만 두면 위 '알림' 절과의 빈칸이 벌어져 보인다 */
+  eq("'기타' 절 제목이 있다", (await page.textContent('#set-etc .wallet-title')).trim(), '기타');
+  eq("'기타' 제목이 계정·알림과 같은 크기다 (같은 규칙을 쓴다)",
+    await page.evaluate(() => {
+      const a = getComputedStyle(document.querySelector('#my-notify .wallet-title')).fontSize;
+      const b = getComputedStyle(document.querySelector('#set-etc .wallet-title')).fontSize;
+      return a === b;
+    }), true);
+  /* 🔴 링크가 아니라 버튼 — 진짜 페이지 이동이면 되돌아올 때 앱이 처음부터 뜬다(부팅 화면) */
+  eq('이용약관은 링크가 아니라 앱 안 화면 버튼이다',
+    await page.$$eval('.set-menu a[href]', (e) => e.length), 0);
   await page.screenshot({ path: `${SHOT}/settings.png` });
 
   console.log('\n■ 휴지통 — 비어 있을 때');
@@ -162,17 +171,49 @@ const eq = (label, got, want) => {
       })), true);
   }
 
-  console.log('\n■ 이용약관 왕복 — 같은 탭에서 열리고, 나가면 설정으로 돌아온다');
+  console.log('\n■ 이용약관 왕복 — 앱을 떠나지 않고 화면만 바뀐다');
   {
-    await page.click('.set-menu a.my-menu-item');
-    await page.waitForURL(/terms\.html/, { timeout: 8000 });
-    eq('같은 탭에서 약관이 열린다 (새 탭이면 화살표가 앱을 한 벌 더 띄운다)',
-      await page.$$eval('.legal-header', (e) => e.length), 1);
-    await page.click('.legal-header .sub-back');
-    await page.waitForSelector('#screen-settings:not([hidden])', { timeout: 10000 });
-    eq('나가면 홈이 아니라 설정으로 돌아온다',
-      await page.$eval('#screen-settings', (e) => e.hidden), false);
-    eq('홈이 아니다', await page.$eval('#screen-home', (e) => e.hidden), true);
+    /* 🔴 여기서 지키는 것은 '페이지를 떠나지 않는다' 하나다 (2026-09-11 개발자 지적:
+       "나가기 화살표 누르면 한대장 완전 첫페이지가 뜬다"). 진짜 페이지 이동이면
+       되돌아올 때 앱이 처음부터 떠서 부팅 화면이 보인다. */
+    const before = page.url();
+    await page.click('#btn-open-terms');
+    await page.waitForSelector('#screen-terms:not([hidden])', { timeout: 8000 });
+    eq('주소가 그대로다 = 앱을 떠나지 않았다', page.url(), before);
+    await page.waitForFunction(() => {
+      const el = document.querySelector('#terms-body');
+      return el && el.textContent.length > 500;
+    }, { timeout: 8000 });
+    eq('약관 본문이 실제로 들어왔다',
+      await page.$eval('#terms-body', (e) => e.textContent.length > 1000), true);
+    eq('본문을 베껴 두지 않고 terms.html 에서 읽어 온다',
+      await page.$eval('#terms-body', (e) => /제1조/.test(e.textContent)), true);
+    /* 따라다니는 머리줄 — 끝까지 내려도 나가기가 화면에 남아 있어야 한다 */
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(350);
+    eq('맨 아래까지 내려도 나가기 화살표가 화면에 있다',
+      await page.evaluate(() => {
+        const r = document.querySelector('#btn-terms-back').getBoundingClientRect();
+        return r.top >= 0 && r.bottom <= window.innerHeight;
+      }), true);
+    /* 🔴 머리줄은 **순백**이라 글이 밑으로 지나가도 비쳐 보이지 않는다 */
+    eq('머리줄이 순백이고 화면 맨 위를 덮는다',
+      await page.evaluate(() => {
+        const el = document.elementFromPoint(Math.round(window.innerWidth / 2), 8);
+        const h = el && el.closest('.sub-header-stick');
+        return !!h && getComputedStyle(h).backgroundColor === 'rgb(255, 255, 255)';
+      }), true);
+    /* 🔴 제목과 화살표가 세로로 가운데 맞았나 (개발자 지적 "위아래가 올바르지 않다") */
+    eq('제목과 화살표가 세로 가운데로 맞는다',
+      await page.evaluate(() => {
+        const t = document.querySelector('#screen-terms .sub-header-stick h2').getBoundingClientRect();
+        const a = document.querySelector('#btn-terms-back').getBoundingClientRect();
+        return Math.abs((t.top + t.height / 2) - (a.top + a.height / 2)) <= 2;
+      }), true);
+    await page.click('#btn-terms-back');
+    await page.waitForSelector('#screen-settings:not([hidden])', { timeout: 8000 });
+    eq('나가면 설정으로 돌아온다', await page.$eval('#screen-settings', (e) => e.hidden), false);
+    eq('첫 화면(환영)이 뜨지 않는다', await page.$eval('#screen-onboarding', (e) => e.hidden), true);
   }
 
   console.log('\n■ 이용약관 화면 — 되돌아가기는 왼쪽 위, 제목이 화면 안에 든다');

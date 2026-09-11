@@ -750,13 +750,13 @@ function showScreen(name, opts) {
   if (typeof resumeSaveScroll === 'function' && currentScreen && currentScreen !== name) {
     resumeSaveScroll(currentScreen, window.scrollY);
   }
-  ['onboarding', 'home', 'explore', 'applications', 'my', 'settings', 'trash'].forEach((n) => {
+  ['onboarding', 'home', 'explore', 'applications', 'my', 'settings', 'trash', 'terms'].forEach((n) => {
     $(`#screen-${n}`).hidden = n !== name;
   });
   $('#bottom-nav').hidden = name === 'onboarding';
   /* 설정·휴지통은 MY 안쪽 화면이라 아래 탭에서 **MY 가 켜진 채**로 둔다 —
      아무 탭도 안 켜져 있으면 학생이 지금 어디에 있는지 알 수 없다. */
-  const navOn = (name === 'settings' || name === 'trash') ? 'my' : name;
+  const navOn = (name === 'settings' || name === 'trash' || name === 'terms') ? 'my' : name;
   $$('.nav-item').forEach((b) => b.classList.toggle('active', b.dataset.nav === navOn));
 
   /* 🔴 안쪽 화면(설정·휴지통)은 **방향이 있는** 움직임으로 들어온다 (2026-09-11 개발자 지시).
@@ -765,7 +765,7 @@ function showScreen(name, opts) {
         style.css 에서 **이 규칙이 뒤에 와야** 이긴다(같은 굵기면 나중 것이 이긴다).
      ⚠️ 클래스를 떼었다 붙이는 것만으로는 다시 안 돈다 — 브라우저가 '바뀐 게 없다'고 본다.
         중간에 offsetWidth 를 한 번 읽어 강제로 끊어 준다. */
-  const SUB = ['settings', 'trash'];
+  const SUB = ['settings', 'trash', 'terms'];
   if (SUB.includes(name) || SUB.includes(currentScreen)) {
     const el = $(`#screen-${name}`);
     if (el) {
@@ -782,6 +782,7 @@ function showScreen(name, opts) {
   if (name === 'my') renderMy();
   if (name === 'settings') renderSettings();
   if (name === 'trash') renderTrash();
+  if (name === 'terms') renderTerms();
 
   /* 🔴 스크롤은 **그린 뒤에** 옮긴다 — 먼저 옮기면 아직 짧은 화면이라 그 자리가 없다.
      `opts.scroll` 은 이어보기가 되살릴 때만 온다(보통은 늘 맨 위로). */
@@ -3687,6 +3688,39 @@ function renderSettings() {
   if (t && !t.dataset.wired) { t.dataset.wired = '1'; t.addEventListener('click', () => showScreen('trash')); }
   const w = $('#btn-withdraw');
   if (w && !w.dataset.wired) { w.dataset.wired = '1'; w.addEventListener('click', withdrawAccount); }
+  const tm = $('#btn-open-terms');
+  if (tm && !tm.dataset.wired) { tm.dataset.wired = '1'; tm.addEventListener('click', () => showScreen('terms')); }
+}
+
+/* ---------------- 이용약관 · 개인정보처리방침 (2026-09-11) ----------------
+   🔴 글을 여기 베끼지 않는다 — 원본은 `terms.html` 하나다(법적 문서라 제 주소가 있어야 하고,
+      온보딩 동의 줄은 지금도 새 탭으로 그 파일을 연다). 두 벌이 되면 한쪽만 고쳐져
+      화면과 약관이 다른 말을 하게 된다. 그래서 그 파일을 읽어 와 본문만 옮겨 넣는다.
+   🔴 넣는 것은 **우리 저장소의 정적 파일**이지 수집한 글이 아니다 — 그래서 innerHTML 로
+      넣어도 된다(CSP 가 script-src 'self' 라 혹시 섞여 들어와도 실행되지 않는다).
+   ⚠️ 못 읽어 왔을 때 빈 화면으로 두지 않는다 — 무슨 일인지 말하고 원문 링크를 준다. */
+let termsHtml = null;
+
+async function renderTerms() {
+  const el = $('#terms-body');
+  if (!el) return;
+  if (termsHtml) { el.innerHTML = termsHtml; return; }
+  el.innerHTML = '<p class="legal-loading">약관을 불러오는 중이에요…</p>';
+  try {
+    const res = await fetch('terms.html', { cache: 'no-cache' });
+    if (!res.ok) throw new Error(String(res.status));
+    const doc = new DOMParser().parseFromString(await res.text(), 'text/html');
+    const src = doc.querySelector('.legal');
+    if (!src) throw new Error('본문 없음');
+    /* 그 파일의 제 머리줄(뒤로+제목)은 뺀다 — 이 화면이 이미 갖고 있다 */
+    const head = src.querySelector('.legal-header');
+    if (head) head.remove();
+    termsHtml = src.innerHTML;
+    el.innerHTML = termsHtml;
+  } catch (e) {
+    el.innerHTML = `<p class="legal-loading">약관을 불러오지 못했어요.
+      <a href="terms.html" target="_blank" rel="noopener">따로 열어 보기 ↗</a></p>`;
+  }
 }
 
 /* 탈퇴 — 계정 카드 안의 '탈퇴' 와 **같은 일**을 한다(서버에 저장된 내 정보 삭제).
@@ -4319,6 +4353,7 @@ function bindEvents() {
   $('#btn-open-settings').addEventListener('click', () => showScreen('settings'));
   $('#btn-settings-back').addEventListener('click', () => showScreen('my', { back: true }));
   $('#btn-trash-back').addEventListener('click', () => showScreen('settings', { back: true }));
+  $('#btn-terms-back').addEventListener('click', () => showScreen('settings', { back: true }));
 
   $('#btn-reset').addEventListener('click', () => {
     const pop = $('#wallet-pop');

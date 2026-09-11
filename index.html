@@ -454,13 +454,35 @@
            이미 있어서, 이름을 바꾸면 그 규칙이 전부 떨어져 나가고 화면이 달라진다. -->
       <div id="my-account" class="my-card" hidden></div>
       <div id="my-notify" class="my-card" hidden></div>
-      <div class="my-menu set-menu">
-        <button class="my-menu-item" id="btn-open-trash">휴지통</button>
-        <!-- 🔴 새 탭으로 열지 않는다 — 약관 화면 왼쪽 위 화살표로 되돌아오기 때문이다
-             (새 탭이면 그 화살표가 앱을 한 벌 더 띄운다). 2026-09-11 개발자 지시. -->
-        <a class="my-menu-item" href="terms.html">이용약관 · 개인정보처리방침</a>
-        <button class="my-menu-item danger" id="btn-withdraw">탈퇴</button>
+      <!-- 🔴 '기타' 절 (2026-09-11 개발자 지시 — 제목 없이 목록만 있어서 위 '알림' 절과의
+           빈칸이 크게 벌어져 보였다). 계정·알림과 **같은 .my-card 리듬**을 쓰고 제목도
+           같은 규칙(style.css 의 절 제목 묶음)에 이름을 더해 붙였다 — 베끼지 않는다. -->
+      <div id="set-etc" class="my-card">
+        <p class="wallet-title">기타</p>
+        <div class="my-menu set-menu">
+          <button class="my-menu-item" id="btn-open-trash">휴지통</button>
+          <!-- 🔴 링크가 아니라 **버튼**이다 (2026-09-11 개발자 지시 "휴지통처럼 그냥 화면 전환").
+               예전엔 terms.html 로 진짜 페이지 이동이라, 되돌아올 때 앱이 처음부터 떠서
+               부팅 화면이 보였다. 지금은 앱 안 화면(#screen-terms)으로 바뀐다. -->
+          <button class="my-menu-item" id="btn-open-terms">이용약관 · 개인정보처리방침</button>
+          <button class="my-menu-item danger" id="btn-withdraw">탈퇴</button>
+        </div>
       </div>
+    </section>
+
+    <!-- ============ 이용약관 · 개인정보처리방침 (2026-09-11 · 앱 안 화면으로 전환) ============
+         🔴 **글을 여기 베끼지 않는다.** 원본은 terms.html 하나다(법적 문서라 제 주소도 있어야 하고,
+            온보딩 동의 줄은 여전히 새 탭으로 그 파일을 연다). 앱은 그 파일을 읽어 와 넣는다 —
+            두 벌이 되면 한쪽만 고쳐져 화면과 약관이 다른 말을 하게 된다.
+         🔴 머리줄은 **따라다닌다**(.sub-header-stick) — 긴 글이라 읽다가 중간에 나갈 수 있어야 한다. -->
+    <section id="screen-terms" class="screen" hidden>
+      <header class="sub-header sub-header-stick">
+        <button class="sub-back" id="btn-terms-back" aria-label="뒤로">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <h2>이용약관 · 개인정보처리방침</h2>
+      </header>
+      <div id="terms-body" class="legal"></div>
     </section>
 
     <!-- ============ 휴지통 (2026-09-11) ============

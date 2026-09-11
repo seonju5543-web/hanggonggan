@@ -1927,17 +1927,36 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
       `.legal` 의 좌우 여백만큼 밖으로 빼고(margin 음수) 그만큼 안쪽에 다시 준다.
    ⚠️ 위 여백은 여기서 준다(`.legal` 은 위를 0으로 뒀다) — 상태표시줄·노치에 붙지 않게
       safe-area 를 더한다. 개발자 지적 "제목이 위쪽으로 치우쳐져 있다"가 이것이었다. */
-.legal-header {
+/* 🔴 따라다니는 머리줄은 **순백**이어야 한다 (2026-09-11 개발자 지적 "글자가 비쳐서").
+   원인은 투명이 아니라 **같은 색**이었다 — 머리줄도 바탕도 똑같이 `--bg` 라, 글이 아래로
+   지나갈 때 경계가 없어 글자가 머리줄을 통과하는 것처럼 보였다.
+   (⚠️ 이 주석에 색 코드를 적지 말 것 — ui-tone 관문이 주석 속 색까지 센다.)
+   순백(`--surface`)으로 한 단계 띄우고 아래에 옅은 그림자를 둬 '글이 이 밑으로 지나간다'를
+   눈에 보이게 한다. ⚠️ 새 색을 만들지 않는다 — 이미 있는 토큰이다.
+   🔴 세로 가운데 맞춤(`center`) — 예전엔 `flex-start` + 제목에 padding-top 이라 화살표와
+      제목이 어긋나 보였다(개발자 지적 "위아래 크기가 올바르지 않다"). 두 줄이 돼도 가운데다. */
+.legal-header,
+.sub-header-stick {
   position: sticky;
   top: 0;
   z-index: 5;
-  align-items: flex-start;
+  align-items: center;
   margin: 0 calc(var(--space-20) * -1) var(--space-16);
-  padding: calc(var(--space-16) + env(safe-area-inset-top)) var(--space-20) var(--space-12);
-  background: var(--bg);
+  /* 🔴 노치·상태표시줄만큼 위를 더 준다 (viewport-fit=cover 라 내용이 그 밑까지 간다).
+     세로 가운데 맞춤은 안 깨진다 — 패딩은 내용 상자를 통째로 내릴 뿐이고,
+     화살표와 제목은 그 상자 안에서 서로 가운데로 맞는다. */
+  padding: calc(var(--space-12) + env(safe-area-inset-top)) var(--space-20) var(--space-12);
+  background: var(--surface);
   border-bottom: 1px solid var(--line);
+  box-shadow: var(--shadow);   /* 토큰만 쓴다 — 새 그림자를 만들지 않는다 (ui-tone 관문) */
 }
-.legal-header h2 { font-size: var(--t-lg); line-height: 1.35; padding-top: var(--space-6); }
+.legal-header h2,
+.sub-header-stick h2 { font-size: var(--t-lg); line-height: 1.35; }
+
+/* 앱 안 약관 화면 — 글자 규칙은 `.legal` 을 그대로 물려받고(베끼지 않는다) 바깥 여백만 끈다.
+   그 여백은 화면(.screen)이 이미 갖고 있어, 안 끄면 좌우가 두 겹이 된다. */
+#terms-body.legal { padding: 0; animation: none; }
+.legal-loading { font-size: var(--t-sm); color: var(--text-sub); padding: var(--space-24) 0; }
 
 .legal-actions { margin-top: var(--space-24); }
 .legal-actions .btn { display: inline-block; text-decoration: none; }
@@ -2933,6 +2952,7 @@ body::after { opacity: 0.26; }
    🔴 막대는 잉크로 긋는다. 이 앱에서 파랑은 '누를 수 있음'이라, 장식에 쓰면 신호가 흐려진다. */
 #my-account .acc-head,
 #my-notify .wallet-title,
+#set-etc .wallet-title,
 #my-wallet .wallet-title {
   display: block;
   font-size: var(--t-2xl);   /* 20px → 21px · 위 처방(크기·굵기·막대)은 그대로 산다 */
@@ -2946,6 +2966,7 @@ body::after { opacity: 0.26; }
 }
 #my-account .acc-head::before,
 #my-notify .wallet-title::before,
+#set-etc .wallet-title::before,
 #my-wallet .wallet-title::before {
   content: '';
   position: absolute;
@@ -4015,8 +4036,10 @@ body,
 @keyframes screen-in { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: none; } }
 @keyframes screen-back { from { opacity: 0; transform: translateX(-16px); } to { opacity: 1; transform: none; } }
 
-/* 휴지통·이용약관·탈퇴 — 기존 .my-menu 줄을 그대로 쓰고 간격만 벌린다 */
-.set-menu { margin-top: var(--sp-3); }
+/* 휴지통·이용약관·탈퇴 — '기타' 제목 **바로 아래**에 붙인다 (2026-09-11 개발자 지적:
+   제목 없이 목록만 떠 있어 위 '알림' 절과의 빈칸이 크게 벌어져 보였다).
+   간격은 알림 절의 스위치 목록과 같은 리듬이라 따로 벌리지 않는다. */
+.set-menu { margin-top: var(--space-8); }
 .set-menu a.my-menu-item { color: inherit; text-decoration: none; }
 .set-note { font-size: var(--t-xs); color: var(--text-sub); line-height: 1.65; margin-bottom: var(--space-16); }
 
