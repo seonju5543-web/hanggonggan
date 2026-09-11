@@ -737,6 +737,22 @@ function showScreen(name, opts) {
      아무 탭도 안 켜져 있으면 학생이 지금 어디에 있는지 알 수 없다. */
   const navOn = (name === 'settings' || name === 'trash') ? 'my' : name;
   $$('.nav-item').forEach((b) => b.classList.toggle('active', b.dataset.nav === navOn));
+
+  /* 🔴 안쪽 화면(설정·휴지통)은 **방향이 있는** 움직임으로 들어온다 (2026-09-11 개발자 지시).
+     들어갈 때는 오른쪽에서, 되돌아올 때는 왼쪽에서 — 방향이 '어디로 가는 중인지'를 말한다.
+     ⚠️ `.screen` 에는 이미 taste-in(위로 떠오르기)이 걸려 있다. 그 위에 덮어쓰는 것이라
+        style.css 에서 **이 규칙이 뒤에 와야** 이긴다(같은 굵기면 나중 것이 이긴다).
+     ⚠️ 클래스를 떼었다 붙이는 것만으로는 다시 안 돈다 — 브라우저가 '바뀐 게 없다'고 본다.
+        중간에 offsetWidth 를 한 번 읽어 강제로 끊어 준다. */
+  const SUB = ['settings', 'trash'];
+  if (SUB.includes(name) || SUB.includes(currentScreen)) {
+    const el = $(`#screen-${name}`);
+    if (el) {
+      el.classList.remove('screen-in', 'screen-back');
+      void el.offsetWidth;
+      el.classList.add(o.back ? 'screen-back' : 'screen-in');
+    }
+  }
   currentScreen = name;
 
   if (name === 'home') renderHome();
@@ -4235,8 +4251,8 @@ function bindEvents() {
      되돌릴 수 없는 동작이므로 **무엇이 사라지는지 적어 두고** 묻는다. */
   /* 설정 화면 — MY 오른쪽 위 톱니로 들어가고, 왼쪽 위 화살표로 되돌아온다 (2026-09-11). */
   $('#btn-open-settings').addEventListener('click', () => showScreen('settings'));
-  $('#btn-settings-back').addEventListener('click', () => showScreen('my'));
-  $('#btn-trash-back').addEventListener('click', () => showScreen('settings'));
+  $('#btn-settings-back').addEventListener('click', () => showScreen('my', { back: true }));
+  $('#btn-trash-back').addEventListener('click', () => showScreen('settings', { back: true }));
 
   $('#btn-reset').addEventListener('click', () => {
     const pop = $('#wallet-pop');
@@ -4681,7 +4697,19 @@ if (typeof resumeDecide === 'function') {
   });
 }
 /* 알림·로그인 복귀로 열렸으면 이어보기가 손을 뗀다 — 그 흐름이 제 화면을 정한다 */
-if (resumePlan.skip) showScreen(state.profile ? 'home' : 'onboarding');
+/* 🔴 약관 화면에서 나가기를 누르면 **떠났던 자리(설정)** 로 되돌아온다 (2026-09-11 개발자 지시:
+   "나가면 홈화면으로 이어지는게 아니라 마이페이지로"). terms.html 은 앱 밖의 진짜 페이지라
+   돌아올 때 앱이 처음부터 뜨는데, 그때 이어보기는 `?screen=` 이 붙어 있으면 손을 떼고
+   (resumeHijacked) 홈으로 보내고 있었다 — 그래서 늘 홈이었다.
+   ⚠️ 'settings'·'trash' 는 탭이 아니라서 이어보기 장부가 기억하지 못한다(RESUME_TABS).
+      그래서 기억에 기대지 않고 **주소에 적어 보내고** 여기서 그대로 읽는다. */
+const backToScreen = (() => {
+  try { return new URLSearchParams(location.search).get('screen'); } catch (e) { return null; }
+})();
+if (resumePlan.skip && state.profile && (backToScreen === 'settings' || backToScreen === 'trash')) {
+  showScreen(backToScreen, { back: true });
+}
+else if (resumePlan.skip) showScreen(state.profile ? 'home' : 'onboarding');
 else if (resumePlan.screen === 'onboarding') {
   /* 쓰다 만 온보딩을 되살린다(창과 무관 — 학교·학년을 다시 치게 하지 않는다) */
   if (resumePlan.onboard && onboardRestore(resumePlan.onboard)) toast('쓰다 만 곳부터 이어서 할게요');
