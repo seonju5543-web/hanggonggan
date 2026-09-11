@@ -960,8 +960,13 @@ function renderOnboardStep() {
   /* 🔴 **환영 화면(0단계)에서는 진행 막대를 감춘다** (2026-09-09 · 설계 ②).
      아직 '시작하기'도 안 눌렀는데 막대가 1/6 차 있으면 "벌써 뭔가 하고 있다"로 읽힌다.
      환영 화면은 앱을 소개하는 자리이지 절차의 첫 칸이 아니다. */
-  const bar = $('.onboard-progress');
+  const bar = $('.onboard-top') || $('.onboard-progress');
   if (bar) bar.hidden = onboardStep === 0;
+  /* 뒤로가기는 **돌아갈 곳이 있을 때만** 보인다 (노션 UI-2).
+     🔴 고치러 들어온 사람의 첫 칸은 1단계다(initOnboarding) — 그 사람에게 0단계는
+        '시작하기' 인사말이라 돌아갈 곳이 아니다. 취소 버튼이 그 자리를 이미 맡고 있다. */
+  const back = $('#btn-onboard-back');
+  if (back) back.hidden = onboardStep <= (onboardEditing ? 1 : 0);
   $('#onboard-bar').style.width = `${((onboardStep + 1) / ONBOARD_STEPS) * 100}%`;
   window.scrollTo(0, 0);
 }
@@ -4520,6 +4525,16 @@ function bindEvents() {
       showScreen('my');
     })
   );
+
+  /* 뒤로 — 친 값은 그대로 두고 단계만 되돌린다 (노션 UI-2).
+     앞으로 갈 때의 확인(학교·학년)은 여기서 하지 않는다: 돌아가는 길을 막으면
+     못 채운 칸에 갇힌다. 어디까지 왔는지는 이어보기 장부에도 적는다. */
+  $('#btn-onboard-back').addEventListener('click', () => {
+    if (onboardStep <= 0) return;
+    onboardStep -= 1;
+    renderOnboardStep();
+    onboardProgressSave();
+  });
 
   $$('.onboard-step [data-next]').forEach((btn) =>
     btn.addEventListener('click', () => {

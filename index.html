@@ -56,7 +56,15 @@
             **이미 쓰던 학생에게도** 환영 화면이 떠 있었다(2026-09-09 실측).
             관문: verify/test-collector.mjs '첫 실행 화면' 절 -->
     <section id="screen-onboarding" class="screen" hidden>
-      <div class="onboard-progress"><div id="onboard-bar" class="onboard-bar"></div></div>
+      <!-- 🔴 뒤로가기는 **단계마다 하나씩 두지 않는다** (노션 UI-2). 진행 막대와 한 줄에
+           놓인 이 버튼 하나가 전부이고, 어느 단계인지는 app.js renderOnboardStep 이 정한다.
+           단계 안에 넣으면 단계가 늘 때마다 또 베껴야 하고 그중 하나가 빠진다. -->
+      <div class="onboard-top">
+        <button class="sub-back" id="btn-onboard-back" type="button" aria-label="이전 단계" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <div class="onboard-progress"><div id="onboard-bar" class="onboard-bar"></div></div>
+      </div>
 
       <!-- Step 0: 인트로 -->
       <div class="onboard-step" data-step="0">
