@@ -311,10 +311,10 @@ input::placeholder { color: var(--text-weak); }
 
 .chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip {
-  padding: 10px 16px;
+  padding: 9px 15px;   /* 선 1.5 → 2px(7번 Apple 방식 · 2026-09-11). 크롬은 1.5px 선을 1px 로 놓았으므로 1px 만큼 뺀다 — 칩 크기 그대로(실측) */
   border-radius: var(--radius-pill);
   background: var(--surface);
-  border: 1.5px solid rgba(18, 22, 31, 0.10);
+  border: 2px solid rgba(18, 22, 31, 0.10);
   font-size: var(--t-md);
   font-weight: 600;
   color: var(--text-sub);
@@ -593,10 +593,10 @@ input::placeholder { color: var(--text-weak); }
 }
 .filter-row::-webkit-scrollbar { display: none; }
 .filter-chip {
-  padding: 8.5px 15px;
+  padding: 7.5px 14px;   /* 선 1.5 → 2px(7번 Apple 방식 · 2026-09-11). 크롬은 1.5px 선을 1px 로 놓았으므로 1px 만큼 뺀다 — 칩 41.5 그대로(실측) */
   border-radius: var(--radius-pill);
   background: var(--surface);
-  border: 1.5px solid rgba(18, 22, 31, 0.10);
+  border: 2px solid rgba(18, 22, 31, 0.10);
   font-size: var(--t-md);
   font-weight: 600;
   color: var(--text-sub);
@@ -4136,5 +4136,42 @@ input:user-invalid:focus, select:user-invalid:focus, textarea:user-invalid:focus
 }
 
 /* 11 · 데스크톱 — 개발자 지시(2026-09-11)로 **적용하지 않는다**. 480px 폰 프레임 그대로.
-   (한때 ≥1024px 두 칸 배치를 넣었다가 같은 날 되돌렸다 — 다시 넣지 말 것.) */
+   (한때 ≥1024px 두 칸 배치를 넣었다가 같은 날 되돌렸다 — 다시 넣지 말 것.)
+   🔴 여기 있던 짝 없는 `}` 하나(되돌릴 때 남은 것)가 **그 뒤에 오는 첫 규칙을 브라우저가 버리게** 했다 —
+      오후에 덧댄 `:root { --ring }` 이 실제로 안 먹었다(실측 · 2026-09-11). 블록을 지울 땐 여는 괄호와 닫는 괄호를 함께 센다. */
+
+/* ══ 디자인 결정 2차 — 7(Apple 방식)·13(불투명)·20 (2026-09-11 오후 · 개발자 "7,13,14 진행") ═════════════
+   Apple 대조판(docs/designs/mockups/design-conflicts-apple.html)을 보고 정했다. 그 판의 14 는 DESIGN.md 의
+   20(누름 반응)이다 — 기본 브랜치의 14~19 와 번호가 겹쳐 20~23 으로 옮겼다.
+   🔴 새 색·새 글자 크기·새 그림자를 만들지 않았다. 여백 생 px 도 늘리지 않았다(칩 여백은 위 원 선언에서
+      선 두께만큼 줄여 넣었다 — 새 줄을 더하면 ui-tone 톱니(519)를 넘긴다). */
+:root {
+  /* 13 · 포커스 링 — Apple 값(2px · 불투명). 아침에 넣은 50% 는 흰 입력칸 위에서 옅은 하늘색으로 보였다.
+     🔴 값에 var() 를 쓰지 않는다 — 이 토큰은 :root 안이라 팔레트 밖 유채색으로 세지 않는다. */
+  --ring: 0 0 0 2px #27508f;
 }
+
+/* 7 · 선택 칩 — Apple 방식(configurator-option-chip-selected): 칠하지도(8/31) 올리지도(오늘 아침 Linear 방식)
+   않고 **테두리만 강조색 2px**, 글자는 먹. 그래서 기본 칩의 선을 1.5 → 2px 로 미리 두껍게 해 두었다 —
+   누를 때 칩이 0.5px 씩 커지면 옆 칩이 밀린다. ⚠️ 텍스트·동작 무변경. */
+.chip.active, .filter-chip.active {
+  background: var(--surface);
+  border-color: var(--accent);
+  color: var(--text);
+  box-shadow: none;
+}
+
+/* 20 · 누름 반응 — 누를 수 있는 것 전부 **같은 값**(Apple scale 0.95).
+   전엔 둘로 갈라져 있었다: .btn 0.98(202줄) 위에 ③ 상호작용 묶음이 0.975 를 덮었고, 정렬·링크·ghost 버튼은
+   그 묶음에 빠져 있어 눌러도 아무 반응이 없었다. ⚠️ DESIGN.md 첫 판이 "칩·아이콘은 반응 없음"이라 적은 것은
+   틀렸다 — 0.975 로 반응하고 있었다(202줄만 보고 단정한 것). 행(.my-menu-item)은 버튼이 아니라 면(surface-2)으로 답한다. */
+.btn:active, .chip:active, .filter-chip:active, .icon-btn:active, .wallet-btn:active,
+.sort-btn:active, .link-btn:active, .btn-ghost:active { transform: scale(0.95); }
+.my-menu-item:active { transform: none; }
+
+/* 13 의 후속 — 입력칸은 **링 하나로만** 초점을 말한다. 전엔 셋이 겹쳤다: 강조색 테두리 1px + --ring + ③ 상호작용의
+   :focus-visible 바깥선 2px(2px 띄움). 링이 50% 일 땐 안쪽이 흐려 한 줄로 보였는데 불투명이 되자 **두 줄**이 됐고,
+   검색칸은 알약 안에 네모 선이 하나 더 그려졌다(실측 스크린샷). 버튼·링크의 바깥선은 그대로다(키보드 초점).
+   ⚠️ 틀린 칸(:user-invalid)은 뺀다 — 16번이 그 바깥선을 빨강으로 쓰고 링은 끈다. */
+input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid), textarea:focus-visible:not(:user-invalid) { outline: none; }
+
