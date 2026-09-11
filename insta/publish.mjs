@@ -18,7 +18,9 @@
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
-const API = process.env.IG_API_BASE || 'https://graph.facebook.com/v21.0';
+// 🔴 Instagram Login 경로 — **페이스북 페이지가 필요 없다**(2026-09-11 문서 확인).
+//    엔드포인트 경로는 Facebook Login 과 똑같고 호스트만 다르다.
+const API = process.env.IG_API_BASE || 'https://graph.instagram.com';
 const ROOT = new URL('../', import.meta.url);
 /** 🔴 주소를 여기 한 곳에만 둔다 — 앱 주소가 여덟 군데 박혀 있어서 옮길 때 샜던 전례가 있다. */
 const SITE = process.env.INSTA_PUBLIC_BASE || 'https://seonju5543-web.github.io/hanggonggan';
@@ -58,13 +60,13 @@ export async function waitLive(urls, tries = 20, gapMs = 15000) {
   throw new Error('그림이 공개 주소에서 안 열립니다 — Pages 배포를 확인하세요.');
 }
 
-/** 남은 토큰 수명. 🔴 만료되면 **조용히** 멈추므로 매번 찍는다. */
+/** 남은 토큰 수명. 🔴 만료되면 **조용히** 멈추므로 매번 찍는다.
+ *  판정은 `token-days.mjs` 한 곳 — 여기 규칙을 한 벌 더 두면 감시 로봇과 갈라진다. */
 async function tokenDays() {
   try {
-    const j = await graph('debug_token', { input_token: process.env.IG_ACCESS_TOKEN }, 'GET');
-    const exp = j?.data?.expires_at;
-    if (!exp) return null;                       // 0 이면 만료 없음
-    return Math.round((exp * 1000 - Date.now()) / 864e5);
+    const { tokenState } = await import('./token-days.mjs');
+    const s = await tokenState();
+    return s.state === 'none' ? null : s.days;
   } catch { return null; }                       // 못 물어봐도 게시는 막지 않는다
 }
 

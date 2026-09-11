@@ -6,8 +6,9 @@
 #   관리자 화면 잠금 확인(admin-lock-check)과 같은 계열: '설정을 보는 것' 이 아니라
 #   **실제로 물어보는 것**만이 증명이다.
 #
-# 🔴 여기서 토큰을 **갱신하지 않는다.** 갱신하려면 앱 시크릿과 시크릿 쓰기 권한을 가진
-#    열쇠를 저장소에 둬야 하는데, 그 열쇠가 새면 남이 우리 계정에 글을 올릴 수 있다.
+# 🔴 여기서 토큰을 **갱신하지 않는다.** Instagram Login 의 갱신은 앱 시크릿 없이 토큰만으로
+#    되지만, 받은 새 토큰을 **시크릿에 써 넣으려면** 시크릿 쓰기 열쇠를 저장소에 둬야 한다.
+#    그 열쇠가 새면 남이 우리 계정에 글을 올릴 수 있다.
 #    이 저장소는 관리자 열쇠 권한을 일부러 최소로 둔다(`_admin` 과 같은 판단).
 #    → 남은 날짜만 보고, 짧아지면 🚨 이슈로 사람을 부른다. 갱신은 사람이 한다.
 #
@@ -21,12 +22,18 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  # 🔴 write 인 이유 — `graph.instagram.com` 에는 debug_token 이 없어 만료일을 못 묻는다.
+  #    그래서 '이 토큰을 언제 처음 봤나'를 우리가 적어 둔다(insta/token-seen.json).
+  #    적히는 것은 토큰이 아니라 **지문 8자리**다(공개 저장소다).
+  contents: write
   issues: write
 
 concurrency:
   group: insta-token-check
   cancel-in-progress: false
+
+env:
+  BASE: claude/nice-heisenberg-WESq5
 
 jobs:
   check:
@@ -49,6 +56,21 @@ jobs:
           fi
           node insta/token-days.mjs >> "$GITHUB_OUTPUT"
 
+      # 🔴 처음 본 날을 **저장하는 것까지가 한 세트**다 — 안 적으면 매일 '오늘이 1일째'가 돼
+      #    남은 날이 영영 60일로 굳고, 만료를 조용히 지나친다(로봇 저장 규칙과 같은 유형).
+      - name: 처음 본 날 기록
+        if: ${{ steps.t.outputs.state != 'none' }}
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add insta/token-seen.json 2>/dev/null || true
+          git diff --cached --quiet && { echo '변화 없음'; exit 0; }
+          git commit -m '인스타: 토큰 지문 기록'
+          for i in 1 2 3; do
+            git push origin "HEAD:$BASE" && break || { git pull --rebase origin "$BASE"; sleep 5; }
+            [ "$i" = 3 ] && { echo '🚨 기록을 못 올렸습니다'; exit 1; }
+          done
+
       - name: 짧아졌으면 🚨 이슈
         if: ${{ steps.t.outputs.state == 'expiring' || steps.t.outputs.state == 'dead' }}
         env:
@@ -67,12 +89,14 @@ jobs:
             BODY='토큰으로 물어봤더니 거부당했습니다. **지금 게시가 안 됩니다.**'
           else
             TITLE="🚨 인스타 토큰이 ${DAYS}일 뒤 만료됩니다"
-            BODY="남은 수명 **${DAYS}일**. 만료되면 게시가 **조용히** 멈춥니다."
+            BODY="우리가 아는 한 **${DAYS}일** 남았습니다. 만료되면 게시가 **조용히** 멈춥니다.
+            (\`graph.instagram.com\` 에는 만료일을 묻는 길이 없어, 이 토큰을 처음 본 날에서 셉니다.)"
           fi
           gh issue create --repo "$REPO" --label insta-token --title "$TITLE" --body "$BODY
 
           ## 어떻게 고치나
-          1. Meta 앱 → 도구 → 액세스 토큰 도구에서 **장기 토큰**을 새로 받는다 (60일)
+          1. Meta 앱 → Instagram → API 설정에서 **장기 토큰**을 새로 받는다 (60일)
+             ⚠️ 반드시 **새로 받은** 토큰을 넣는다 — 묵은 토큰을 넣으면 우리는 그걸 알 길이 없다
           2. 저장소 Settings → Secrets → Actions → \`IG_ACCESS_TOKEN\` 을 새 값으로
           3. 이 워크플로를 수동 실행해 초록불을 확인한다
 

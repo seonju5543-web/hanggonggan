@@ -289,31 +289,70 @@ const today = new Date();
     // C10 · 토큰 만료 감시 — 🔴 만료되면 **조용히** 게시가 멈춘다(노션 F-4 와 같은 유형).
   //    못 물어본 것을 '괜찮다' 로 읽으면 두 달 뒤에나 안다. 갈래를 전부 시험한다.
   {
-    const { tokenState, WARN_DAYS } = await import(new URL('../insta/token-days.mjs', `file://${__filename}`).href);
+    const { tokenState, WARN_DAYS, LIFE_DAYS, fingerprint } =
+      await import(new URL('../insta/token-days.mjs', `file://${__filename}`).href);
     const mk = (body, ok = true) => async () => ({ ok, json: async () => body });
-    const now = Math.floor(Date.now() / 1000);
+    // 🔴 `graph.instagram.com` 에는 debug_token 이 없다 — 살아 있는지는 **물어서** 알고,
+    //    남은 날은 **우리가 처음 본 날**에서 센다. 두 축을 따로 시험한다.
     const before = process.env.IG_ACCESS_TOKEN;
-    process.env.IG_ACCESS_TOKEN = 'x';
+    process.env.IG_ACCESS_TOKEN = 'tok-시험';
+    const T0 = Date.parse('2026-09-11T00:00:00Z');
+    const mem = (v) => ({ read: () => v, write: (x) => Object.assign(v, x) });
+    const aged = (n) => ({ fp: fingerprint('tok-시험'),
+      firstSeen: new Date(T0 - n * 864e5).toISOString().slice(0, 10) });
+    const live = mk({ user_id: '1' });
     const want = [
-      ['만료 없음', mk({ data: { is_valid: true, expires_at: 0 } }), 'ok'],
-      ['넉넉함', mk({ data: { is_valid: true, expires_at: now + 40 * 86400 } }), 'ok'],
-      ['임박', mk({ data: { is_valid: true, expires_at: now + 5 * 86400 } }), 'expiring'],
-      ['이미 만료', mk({ data: { is_valid: true, expires_at: now - 86400 } }), 'dead'],
-      ['무효', mk({ data: { is_valid: false } }), 'dead'],
-      ['API 오류', mk({ error: { message: 'bad' } }, false), 'dead'],
-      ['못 물어봄', async () => { throw new Error('ENOTFOUND'); }, 'dead'],
+      ['처음 보는 토큰', live, {}, 'ok'],
+      ['넉넉함', live, aged(LIFE_DAYS - 40), 'ok'],
+      ['문턱 하루 전', live, aged(LIFE_DAYS - WARN_DAYS - 1), 'ok'],
+      ['문턱 당일', live, aged(LIFE_DAYS - WARN_DAYS), 'expiring'],
+      ['우리가 본 지 60일', live, aged(LIFE_DAYS), 'dead'],
+      ['토큰이 거부됨', mk({ error: { message: 'bad' } }, false), {}, 'dead'],
+      ['계정을 못 가리킴', mk({}), {}, 'dead'],
+      ['못 물어봄', async () => { throw new Error('ENOTFOUND'); }, {}, 'dead'],
     ];
-    for (const [name, f, expect] of want) {
-      const got = (await tokenState(f)).state;
+    for (const [name, f, store, expect] of want) {
+      const got = (await tokenState(f, mem({ ...store }), T0)).state;
       if (got !== expect) fail('C10', '-', `토큰 판정 '${name}' 이 ${expect} 가 아니라 ${got}`);
     }
+    // 🔴 **토큰 자체를 파일에 적으면 안 된다** — 공개 저장소다. 지문만 남는지 본다.
+    {
+      const box = {};
+      await tokenState(live, { read: () => ({}), write: (v) => Object.assign(box, v) }, T0);
+      if (JSON.stringify(box).includes('tok-시험')) fail('C10', '-', '기록장에 토큰이 그대로 적힌다');
+      if (box.fp !== fingerprint('tok-시험')) fail('C10', '-', '토큰 지문을 안 적는다 — 바뀐 것을 못 알아챈다');
+    }
+    // 🔴 토큰이 바뀌면 **날수를 다시 센다** — 안 그러면 새 토큰이 하루 만에 죽었다고 한다.
+    {
+      const r = await tokenState(live, mem({ fp: 'ffffffff', firstSeen: '2026-01-01' }), T0);
+      if (r.days !== LIFE_DAYS) fail('C10', '-', `새 토큰인데 ${r.days}일로 센다 — 60일이어야 한다`);
+    }
     process.env.IG_ACCESS_TOKEN = '';
-    if ((await tokenState()).state !== 'none') fail('C10', '-', '토큰이 없는데 none 이 아니다');
+    if ((await tokenState(live, mem({}), T0)).state !== 'none') fail('C10', '-', '토큰이 없는데 none 이 아니다');
     if (before === undefined) delete process.env.IG_ACCESS_TOKEN; else process.env.IG_ACCESS_TOKEN = before;
+    // 🔴 Instagram Login 경로다 — 페이스북 호스트로 돌아가면 페이지 없는 계정에서 죽는다.
+    const tdSrc = readFileSync(join(ROOT, 'insta/token-days.mjs'), 'utf8');
+    const pubSrc2 = readFileSync(join(ROOT, 'insta/publish.mjs'), 'utf8');
+    for (const [f, src] of [['token-days.mjs', tdSrc], ['publish.mjs', pubSrc2]]) {
+      if (!/graph\.instagram\.com/.test(src)) fail('C10', '-', `${f} 가 graph.instagram.com 을 안 쓴다`);
+      if (/graph\.facebook\.com/.test(src)) fail('C10', '-', `${f} 에 graph.facebook.com 이 남아 있다`);
+      // ⚠️ 낱말이 아니라 **부르는 꼴**을 본다 — 주석에 "debug_token 은 없다" 라고 적어 둔 것이
+      //    걸려서 빨간불이 났다. 부르는 곳은 `graph('debug_token'` 이거나 `debug_token?` 이다.
+      if (/debug_token['"]|debug_token\?/.test(src))
+        fail('C10', '-', `${f} 가 debug_token 을 부른다 — 그 경로엔 없다`);
+    }
     const tw = readFileSync(join(ROOT, '.github/workflows/insta-token-check.yml'), 'utf8');
     if (!/schedule:/.test(tw)) fail('C10', '-', '토큰 확인이 예약으로 안 돈다 — 사람이 기억해야 하면 안 돈다');
     if (!/issues: write/.test(tw)) fail('C10', '-', '토큰 확인이 이슈를 못 만든다');
-    console.log(`  · 토큰 감시 — 갈래 ${want.length}가지 · 경고 문턱 ${WARN_DAYS}일 · 매일 예약`);
+    // 🔴 **로봇이 고친 파일은 저장 목록에 넣는 것까지가 한 세트다**(CLAUDE.md · 이슈 #79 유형).
+    //    처음 본 날을 안 적으면 매일 '오늘이 1일째'가 돼 남은 날이 영영 60일로 굳고,
+    //    만료를 조용히 지나친다 — 이 로봇이 막으라고 있는 바로 그 일이다.
+    if (!/contents: write/.test(tw)) fail('C10', '-', '토큰 확인이 기록을 저장할 권한이 없다');
+    if (!/git add insta\/token-seen\.json/.test(tw))
+      fail('C10', '-', '토큰 확인이 처음 본 날을 저장하지 않는다 — 남은 날이 영영 60일로 굳는다');
+    if (!/git push/.test(tw)) fail('C10', '-', '토큰 확인이 기록을 올리지 않는다');
+    if (/^insta\/token-seen/m.test(ig)) fail('C10', '-', 'token-seen.json 이 .gitignore 에 있다');
+    console.log(`  · 토큰 감시 — 갈래 ${want.length}가지 · 수명 ${LIFE_DAYS}일 · 경고 ${WARN_DAYS}일 · 매일 예약`);
   }
   console.log('  · 게시 경로 — 예행연습 기본 · JPEG · 공개 확인 · seen 기록 · 다시 안 그림');
     console.log(bad ? `\n🚨 ${bad}건 실패` : '\n✅ 전부 통과');
