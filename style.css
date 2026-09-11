@@ -2995,6 +2995,15 @@ body::after { opacity: 0.26; }
 #my-notify .wallet-title,
 #my-wallet .wallet-title { padding-top: 0; margin-bottom: 2px; }
 #my-notify .nf-status, #my-wallet .wallet-sub { margin-top: 1px; margin-bottom: 8px; }
+
+/* 🔴 알림 절의 막대만 **되살린다** (2026-09-11 개발자 지시 "기타 위에 남색선 있는것처럼
+   알림 위에도 동일한것"). 바로 위 2026-09-01 지시가 막대를 통째로 뺐었는데, 그 뒤
+   '기타' 절이 생기면서 그쪽에만 막대가 남아 두 절의 모양이 달라졌다 — 개발자가 화면을
+   보고 **기타 쪽을 기준으로** 맞추라고 정했다. 그래서 지운 게 아니라 맞춘 것이다.
+   ⚠️ 계정·서류 보관함은 그대로 막대가 없다(지시에 없었다). 셋을 같게 하려면 여기에
+      이름을 더하면 된다 — 규칙은 이 한 곳이라 갈라지지 않는다. */
+#my-notify .wallet-title::before { content: ''; }
+#my-notify .wallet-title { padding-top: var(--space-16); }
 .my-card { margin-top: 6px; padding-top: 18px; }
 .my-card:first-of-type { margin-top: 0; padding-top: 0; }
 
@@ -4039,7 +4048,15 @@ body,
 /* 휴지통·이용약관·탈퇴 — '기타' 제목 **바로 아래**에 붙인다 (2026-09-11 개발자 지적:
    제목 없이 목록만 떠 있어 위 '알림' 절과의 빈칸이 크게 벌어져 보였다).
    간격은 알림 절의 스위치 목록과 같은 리듬이라 따로 벌리지 않는다. */
-.set-menu { margin-top: var(--space-8); }
+.set-menu {
+  margin-top: var(--space-8);
+  /* 🔴 상자 테두리를 없앤다 (2026-09-11 개발자 지시 "기타와 휴지통 사이 구분선 삭제").
+     제목 바로 밑에 선이 하나 더 그어져 제목과 목록이 떨어져 보였다. 줄 사이 구분선
+     (.my-menu-item 의 border-bottom)은 남는다 — 알림 절 스위치 목록과 같은 꼴이다. */
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
 .set-menu a.my-menu-item { color: inherit; text-decoration: none; }
 .set-note { font-size: var(--t-xs); color: var(--text-sub); line-height: 1.65; margin-bottom: var(--space-16); }
 

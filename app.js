@@ -3802,10 +3802,10 @@ async function renderTrash() {
 
   if (!rows.length) {
     /* 🔴 목업에 없던 화면이라 이 문구는 이 세션이 지은 것이다 — 개발자 확인 대상. */
+    /* 🔴 설명 한 줄은 뺐다 (2026-09-11 개발자 지시). 화면 맨 위 `.set-note` 가 이미
+       '30일 뒤 사라진다'를 말하고 있어 같은 말이 두 번이었다. */
     el.innerHTML = `<div class="my-card trash-empty">
         <p class="trash-empty-title">휴지통이 비어 있어요</p>
-        <p class="trash-empty-sub">신청내역이나 서류를 지우면 여기에 ${TRASH_KEEP_DAYS}일 동안 남아,
-          잘못 지웠을 때 되살릴 수 있어요.</p>
       </div>`;
     return;
   }
