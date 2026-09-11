@@ -199,6 +199,32 @@ jobs:
             exit 1
           fi
 
+      # 🔴 **은서 메일함으로 직접 보낸다.** 위 이슈는 기록과 대조용이고, 알림은 이쪽이다 —
+      #    GitHub 이슈 알림은 GitHub 알림함으로 가고 꺼 둘 수도 있다.
+      #    제3자 액션을 안 쓰고 curl 로 보낸다(열쇠가 남의 코드를 거치지 않는다).
+      - name: 은서에게 메일
+        env:
+          DIR: ${{ steps.commit.outputs.dir }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          MAIL_USER: ${{ secrets.MAIL_USER }}
+          MAIL_PASS: ${{ secrets.MAIL_PASS }}
+          MAIL_TO:   ${{ secrets.MAIL_TO }}
+          MAIL_SMTP: ${{ secrets.MAIL_SMTP }}
+        run: |
+          TO="${MAIL_TO:-dhdp0105@gmail.com}"
+          if [ -z "$MAIL_USER" ] || [ -z "$MAIL_PASS" ]; then
+            echo "🚨 **메일을 못 보냈습니다** — 시크릿 \`MAIL_USER\`·\`MAIL_PASS\` 가 없습니다." >> "$GITHUB_STEP_SUMMARY"
+            echo '카드는 준비됐고 이슈도 열렸지만, 은서 메일함으로는 아무것도 안 갔습니다.' >> "$GITHUB_STEP_SUMMARY"
+            echo '🚨 MAIL_USER · MAIL_PASS 가 없어 메일을 못 보냈습니다.'
+            exit 0
+          fi
+          node insta/mail.mjs --dir="$DIR" --to="$TO" --from="$MAIL_USER" --run="$RUN_URL" > /tmp/mail.txt
+          curl -sS --ssl-reqd --url "smtps://${MAIL_SMTP:-smtp.gmail.com:465}" \
+            --user "$MAIL_USER:$MAIL_PASS" \
+            --mail-from "$MAIL_USER" --mail-rcpt "$TO" --upload-file /tmp/mail.txt
+          echo "✅ $TO 로 메일을 보냈습니다."
+
       - name: 실패하면 시끄럽게
         if: ${{ failure() || cancelled() }}
         env:
