@@ -235,7 +235,10 @@ input::placeholder { color: var(--text-weak); }
       빈 줄만 남기면 아래 여백 30px 이 그대로 남아 로고가 밀려 내려간다.
       감추는 것은 맨 위 `[hidden] { display: none !important }` 가 맡는다 —
       여기에 또 적으면 같은 말이 두 벌이 된다(실측: 지워도 그대로 감춰진다). */
-.onboard-top { display: flex; align-items: center; gap: var(--space-4); margin-bottom: 30px; }
+.onboard-top { display: flex; align-items: center; gap: var(--space-4); margin-bottom: 30px;
+  /* 뒤로가기가 숨는 칸(고치러 들어온 사람의 1단계)에서도 줄 높이를 지킨다 —
+     안 잡아 두면 1→2 단계에서 아래 내용이 36px 씩 튄다(실측). */
+  min-height: 40px; }
 .onboard-top .onboard-progress { flex: 1; margin-bottom: 0; }
 .onboard-progress[hidden] { display: none !important; }
 .onboard-progress {

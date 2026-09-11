@@ -116,15 +116,11 @@ async function seed(page) {
      그러면 위 대조가 '마감·D-20' 만 보고 통과한다. 조용한 검사는 통과가 아니라 무력해진 것이다. */
   const fixture = await page.evaluate(() => {
     const keep = registeredList.slice();
-    /* 🔴 `toISOString()` 은 **UTC 날짜**다 — 앱의 dday 는 폰의 오늘(현지)을 본다.
-       한국 시간 자정~오전 9시 사이에는 UTC 가 아직 어제라 픽스처가 하루씩 밀려
-       'D-DAY 인데 마감으로 뜬다'는 **가짜 빨간불**이 났다(2026-09-12 00:12 KST 실측).
-       CI 는 UTC 라 그 시간대에 안 걸려 아무도 못 봤다. 현지 날짜로 만든다. */
-    const iso = (n) => {
-      const d = new Date(Date.now() + n * 86400000);
-      d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-      return d.toISOString().slice(0, 10);
-    };
+    /* 🔴 `toISOString()` 을 쓰지 말 것 — 그건 **UTC 날짜**이고 앱의 dday 는 폰의 오늘(현지)을 본다.
+       한국 시간 자정~오전 9시에는 UTC 가 아직 어제라 픽스처가 하루씩 밀려 'D-DAY 인데 마감'
+       이라는 **가짜 빨간불**이 났다(2026-09-12 00:12 KST 실측 3건). CI 는 UTC 라 아무도 못 봤다.
+       `sv-SE` 는 현지 날짜를 YYYY-MM-DD 로 준다. */
+    const iso = (n) => new Date(Date.now() + n * 86400000).toLocaleDateString('sv-SE');
     registeredList = keep.concat([
       { id: 'fixture-d0', name: '검사용 오늘 마감', provider: '검사', type: '교외', amount: '검사', amountValue: 0, deadline: iso(0) },
       { id: 'fixture-d3', name: '검사용 사흘 뒤 마감', provider: '검사', type: '교외', amount: '검사', amountValue: 0, deadline: iso(3) },

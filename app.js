@@ -960,7 +960,7 @@ function renderOnboardStep() {
   /* 🔴 **환영 화면(0단계)에서는 진행 막대를 감춘다** (2026-09-09 · 설계 ②).
      아직 '시작하기'도 안 눌렀는데 막대가 1/6 차 있으면 "벌써 뭔가 하고 있다"로 읽힌다.
      환영 화면은 앱을 소개하는 자리이지 절차의 첫 칸이 아니다. */
-  const bar = $('.onboard-top') || $('.onboard-progress');
+  const bar = $('.onboard-top');
   if (bar) bar.hidden = onboardStep === 0;
   /* 뒤로가기는 **돌아갈 곳이 있을 때만** 보인다 (노션 UI-2).
      🔴 고치러 들어온 사람의 첫 칸은 1단계다(initOnboarding) — 그 사람에게 0단계는
