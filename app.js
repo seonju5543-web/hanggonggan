@@ -900,8 +900,11 @@ function showScreen(name, opts) {
         style.css 에서 **이 규칙이 뒤에 와야** 이긴다(같은 굵기면 나중 것이 이긴다).
      ⚠️ 클래스를 떼었다 붙이는 것만으로는 다시 안 돈다 — 브라우저가 '바뀐 게 없다'고 본다.
         중간에 offsetWidth 를 한 번 읽어 강제로 끊어 준다. */
+  /* 🔴 `opts.anim === false` 는 **손으로 끌어서 온 경우**다 (2026-09-11 패럴랙스).
+     그때 화면은 이미 손끝을 따라 제자리까지 와 있으므로, 여기서 등장 애니를 또 틀면
+     다 온 화면이 한 번 더 움직인다(끌어 놓고 나면 튀어 보인다). */
   const SUB = ['settings', 'trash', 'terms', 'logins', 'faq', 'perms'];
-  if (SUB.includes(name) || SUB.includes(currentScreen)) {
+  if (o.anim !== false && (SUB.includes(name) || SUB.includes(currentScreen))) {
     const el = $(`#screen-${name}`);
     if (el) {
       el.classList.remove('screen-in', 'screen-back');
@@ -3103,20 +3106,103 @@ function enableScreenSwipeBack(root) {
   if (!root || root.dataset.swipeBack) return;
   root.dataset.swipeBack = '1';
   const screen = () => $(`#screen-${currentScreen}`);
-  let x0 = 0, y0 = 0, dx = 0, t0 = 0;
+  let x0 = 0, y0 = 0, dx = 0, t0 = 0, sy = 0, W = 1;
+  /* 🔴 속도는 **마지막 짧은 구간**으로 잰다 (2026-09-11 검사가 잡았다). 손짓 전체로
+     나누면 '조금 끌고 → 멈췄다가 → 뗀다' 가 툭 치기로 읽혀, 되돌리려던 화면이 나가 버린다
+     (40px 끌고 0.3초 멈춰도 평균 속도는 문턱을 넘는다). 손을 멈췄으면 속도는 0이다. */
+  let vs = [];           // 최근 몇 점 {t, x}
+  const VWIN = 100;      // 속도를 재는 구간 (ms)
+  const VREST = 90;      // 이만큼 멈춰 있었으면 '놓은 것'이지 '친 것'이 아니다
   let live = false;      // 이 손짓을 우리가 맡았나
   let axis = '';         // '' 아직 모름 · 'x' 우리 것 · 'y' 스크롤이라 포기
+  let top = null;        // 떠나는 화면
+  let under = null;      // 뒤에서 따라 들어오는 화면
+  let toName = '';
   const FLICK = 0.11;    // 시트와 같은 값 — '툭 치는 것'과 '천천히 끄는 것'이 갈리는 선
+  const TAKE = 0.32;     // 이만큼 끌면 놓아도 나간다 (화면 너비의 몫)
+  /* 🔴 뒤 화면은 앞 화면의 **0.28배**로 움직인다 — 두 겹이 다른 속도로 가는 것이
+     패럴랙스다. 1.0 이면 한 장처럼 보이고, 0 이면 뒤가 멈춰 있어 깊이가 안 생긴다. */
+  const PARALLAX = 0.28;
+  const DIM = 0.55;      // 멀리 있을 때의 옅기(글자만 흐려 보인다)
 
-  const reset = () => {
-    live = false; axis = '';
-    const el = screen();
-    if (!el) return;
-    el.style.transition = '';
-    void el.offsetHeight;
-    el.style.transform = '';
-    el.style.opacity = '';
+  const slow = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* 두 화면을 무대에 올린다. 문서 스크롤은 이 순간 0으로 떨어지므로, 끌던 화면을
+     **제 스크롤 상자**로 바꿔 보던 자리를 그대로 들고 간다(따라다니는 머리줄도 살아남는다). */
+  const mount = () => {
+    /* 🔴 **앞 손짓의 마무리를 먼저 끝낸다** (2026-09-11 검사가 잡음). 손을 뗀 뒤 0.3초는
+       아직 미끄러지는 중인데, 그동안 다시 쓸면 두 손짓이 같은 요소를 두고 겹친다 —
+       예전 판은 그 자리에서 뒤 손짓의 무대를 앞 손짓의 타이머가 걷어 버려, 두 번째로
+       쓴 화면이 20px 만 움직이고 멎었다. */
+    if (pendingEnd) pendingEnd();
+    top = screen();
+    toName = SWIPE_BACK_TO[currentScreen];
+    under = toName ? $(`#screen-${toName}`) : null;
+    if (!top || !under) return false;
+    sy = window.scrollY;
+    W = Math.max(1, top.getBoundingClientRect().width);
+    under.hidden = false;
+    under.classList.add('swipe-under');
+    top.classList.add('swipe-top');
+    /* 🔴 **남이 걸어 둔 전환을 끈다** (2026-09-11 — 검사가 잡았다. 이걸 빠뜨려 화면이
+       손보다 0.28초 늦게 따라왔다). 당겨서 새로고침(`interactions.js` release)이
+       손을 뗀 화면에 `transition: transform 0.28s` 를 **인라인으로** 남기는데,
+       인라인은 클래스 규칙을 이기므로 CSS 에 `transition: none` 을 적어도 소용없다 —
+       같은 자리(인라인)에 덮어써야 한다. 세로로 한 번 당겼다 옆으로 쓰는 것은
+       폰에서 아주 흔한 손놀림이라, 이게 없으면 대부분의 손짓이 미끄러진다. */
+    top.style.transition = 'none';
+    under.style.transition = 'none';
+    top.scrollTop = sy;
+    /* 되돌아가면 앱은 늘 맨 위를 보여 주므로(showScreen 의 scrollTo) 뒤 화면도 맨 위에서 시작한다 */
+    under.scrollTop = 0;
+    draw(0);
+    return true;
   };
+
+  function draw2(t, u, px) {
+    if (!t || !u) return;
+    const d = Math.max(0, Math.min(W, px));
+    const pr = d / W;
+    t.style.transform = `translateX(${d}px)`;
+    u.style.transform = `translateX(${-W * PARALLAX * (1 - pr)}px)`;
+    u.style.setProperty('--swipe-dim', String(DIM + (1 - DIM) * pr));
+  }
+  const draw = (px) => draw2(top, under, px);
+
+  /* 무대를 걷는다. 나갔으면(go) 화면을 바꾸고, 아니면 보던 자리로 문서를 되돌린다.
+     🔴 순서가 중요하다 — 클래스를 먼저 떼면 떠난 화면이 한 프레임 제자리로 튄다. */
+  const unmount = (go, t, u, name, back) => {
+    if (!t || !u) return;
+    const strip = (el) => {
+      el.classList.remove('swipe-top', 'swipe-under', 'swipe-ease');
+      el.style.transition = '';
+      el.style.transform = '';
+      el.style.removeProperty('--swipe-dim');
+      el.style.removeProperty('--swipe-dur');
+    };
+    if (go) {
+      /* 뒤 화면은 이미 제자리(0)에 와 있다 — 등장 애니를 또 틀면 한 번 더 움직인다 */
+      showScreen(name, { back: true, anim: false });
+      strip(t); strip(u);
+    } else {
+      strip(t); strip(u);
+      u.hidden = true;
+      window.scrollTo(0, back);
+    }
+  };
+
+  const reset = () => { live = false; axis = ''; };
+  /* 🔴 손짓이 우리 손을 떠났을 때 **무대를 반드시 걷는다** (2026-09-11 코드 리뷰).
+     끄는 도중 두 번째 손가락이 닿으면 touchstart 가 live 를 끄는데, 그때 걷지 않으면
+     두 화면이 `position: fixed` 인 채 얼어붙고 문서 스크롤도 0으로 주저앉는다. */
+  const abort = () => {
+    if (!top) return;
+    const t1 = top, u1 = under, n1 = toName, s1 = sy;
+    top = under = null;
+    unmount(false, t1, u1, n1, s1);
+  };
+  /* 아직 미끄러지는 중인 마무리 — 다음 손짓이 시작되면 이것부터 끝낸다 */
+  let pendingEnd = null;
 
   root.addEventListener('touchstart', (e) => {
     live = false;
@@ -3130,13 +3216,16 @@ function enableScreenSwipeBack(root) {
     if (t.clientX <= SWIPE_EDGE_IOS) return;                   // OS 몫
     if (!scrollableAtLeft(e.target, root)) return;
     x0 = t.clientX; y0 = t.clientY; dx = 0; t0 = Date.now();
+    /* 🔴 너비는 **여기서** 잰다 (2026-09-11 코드 리뷰). mount() 안에서만 정하면,
+       움직임을 줄여 둔 기기(prefers-reduced-motion)는 무대를 안 세우므로 W 가 1로 남아
+       문턱(W * TAKE)이 **0.32px** 이 된다 — 9px 만 스쳐도 화면이 나가 버린다. */
+    W = Math.max(1, screen().getBoundingClientRect().width);
+    vs = [{ t: t0, x: 0 }];
     live = true; axis = '';
   }, { passive: true });
 
   root.addEventListener('touchmove', (e) => {
     if (!live) return;
-    const el = screen();
-    if (!el) { live = false; return; }
     const t = e.touches[0];
     const mx = t.clientX - x0;
     const my = t.clientY - y0;
@@ -3145,26 +3234,68 @@ function enableScreenSwipeBack(root) {
       /* 세로가 더 크면 목록을 읽으려는 것이다 — 통째로 포기하고 다시 붙잡지 않는다 */
       axis = Math.abs(mx) > Math.abs(my) ? 'x' : 'y';
       if (axis === 'y') { live = false; return; }
+      /* 움직임이 느린 기기·설정에서는 두 겹을 끌지 않는다 — 문턱만 보고 바로 바꾼다 */
+      if (!slow() && !mount()) { live = false; return; }
     }
     dx = mx;
-    if (dx <= 0) { el.style.transform = ''; el.style.opacity = ''; return; }
-    e.preventDefault();
-    el.style.transition = 'none';
-    el.style.transform = `translateX(${dx}px)`;
-    /* 멀리 끌수록 옅어진다 — '나가는 중'이 손끝에 보이게 (0.4 아래로는 안 내린다) */
-    el.style.opacity = String(Math.max(0.4, 1 - dx / 520));
+    const now = Date.now();
+    vs.push({ t: now, x: mx });
+    while (vs.length > 2 && now - vs[0].t > VWIN) vs.shift();
+    if (top) { e.preventDefault(); draw(dx); }
   }, { passive: false });
 
   const finish = () => {
-    if (!live) { reset(); return; }
+    if (!live) { reset(); abort(); return; }
     const moved = dx;
-    const speed = moved / Math.max(1, Date.now() - t0);
+    const nowMs = Date.now();
+    const a = vs[0], z = vs[vs.length - 1];
+    const speed = (!z || nowMs - z.t > VREST || !a || z.t <= a.t)
+      ? 0                                           // 손이 멈춰 있었다 — 친 게 아니다
+      : (z.x - a.x) / (z.t - a.t);
     const to = SWIPE_BACK_TO[currentScreen];
     reset();
-    if (to && (moved > 90 || (moved > 12 && speed > FLICK))) showScreen(to, { back: true });
+    const go = !!to && (moved > W * TAKE || (moved > 12 && speed > FLICK));
+    if (!top) {                       // 무대 없이(움직임 최소화) 온 경우
+      if (go) showScreen(to, { back: true });
+      return;
+    }
+    /* 🔴 **남은 거리만 이어서 간다.** 손을 뗀 자리에서 끝까지 가는 시간을 남은 거리로
+       정하므로, 거의 다 끌고 놓으면 툭 끝나고 조금만 끌고 놓으면 천천히 돌아온다.
+       예전처럼 제자리로 되돌린 뒤 등장 애니를 새로 트는 것은 '손을 따라온다'가 아니다. */
+    const rest = go ? Math.max(0, W - moved) : Math.max(0, moved);
+    const dur = Math.max(0.12, Math.min(0.34, rest / W * 0.34 + 0.08));
+    /* 🔴 **여기서 요소의 주인이 바뀐다** — 마무리가 제 요소를 들고 가고 무대는 비운다.
+       모듈 칸(top·under)을 그대로 들여다보면, 미끄러지는 동안 시작된 다음 손짓의
+       요소를 앞 손짓의 타이머가 걷어 버린다(실제로 그랬다). */
+    const t1 = top, u1 = under, n1 = toName, s1 = sy;
+    top = under = null;
+    draw2(t1, u1, moved);
+    /* 인라인 'none' 을 비워야 아래 `.swipe-ease`(CSS)가 걸린다 — 인라인이 클래스를 이긴다 */
+    t1.style.transition = '';
+    u1.style.transition = '';
+    t1.style.setProperty('--swipe-dur', dur + 's');
+    u1.style.setProperty('--swipe-dur', dur + 's');
+    t1.classList.add('swipe-ease');
+    u1.classList.add('swipe-ease');
+    /* 두 번 걷지 않도록 한 번만 부른다 — transitionend 는 transform·opacity 둘 다 온다 */
+    let done = false;
+    const end = (ev) => {
+      /* 🔴 `transitionend` 는 **거슬러 올라온다** (2026-09-11 코드 리뷰). 화면 안 카드의
+         누름 전환(0.12s)이 손을 뗀 뒤 끝나면 그 신호로 무대를 걷어, 미끄러지던 화면이
+         중간에서 뚝 끊긴다. 우리가 건 전환만 듣는다. */
+      if (ev && ev.target !== t1) return;
+      if (done) return;
+      done = true; pendingEnd = null;
+      t1.removeEventListener('transitionend', end);
+      unmount(go, t1, u1, n1, s1);
+    };
+    pendingEnd = end;
+    t1.addEventListener('transitionend', end);
+    setTimeout(() => end(), dur * 1000 + 80);   /* transitionend 가 안 오는 경우의 보험 */
+    requestAnimationFrame(() => draw2(t1, u1, go ? W : 0));
   };
   root.addEventListener('touchend', finish, { passive: true });
-  root.addEventListener('touchcancel', () => { live = false; reset(); }, { passive: true });
+  root.addEventListener('touchcancel', () => { reset(); abort(); }, { passive: true });
 }
 
 /* 바텀시트를 여는 동작 한 곳 — 상세 시트와 일괄 준비 목록이 **같은 함수**를 쓴다.
@@ -4063,39 +4194,40 @@ function renderPerms() {
   if (!el) return;
   const p = permLabel();
   const blocked = typeof Notification !== 'undefined' && Notification.permission === 'denied';
+  /* 🔴 **줄을 긋지 않는다** (2026-09-11 개발자 지시 — "단락 나누는 용으로 줄 그어져 있는 거 없애고").
+     전에는 서류 보관함의 `.wallet-row`·`.my-card` 를 빌려 써서 그 목록의 구분선이 딸려 왔다.
+     목록이 아니라 **읽는 글**이라 선이 문단을 토막 냈다. 이제 절은 **빈칸으로만** 나누고
+     (`.perm-sec` 사이 --space-32), 문단은 제 리듬을 갖는다 — 이끄는 글 → 항목 → 덧붙이는 글.
+     🔴 이 화면 전용 이름을 쓴다: 보관함 클래스를 여기서 고치면 서류 목록의 선까지 사라진다. */
   el.innerHTML = `
-    <div class="my-card">
-      <p class="wallet-title">앱 권한</p>
-      <div class="wallet-row">
-        <div class="wallet-info">
-          <p class="trash-title">알림</p>
-          <p class="wallet-status nf-status-${p.cls}">${esc(p.text)}</p>
-        </div>
+    <section class="perm-sec">
+      <p class="perm-title">앱 권한</p>
+      <div class="perm-state">
+        <p class="perm-name">알림</p>
+        <p class="perm-value nf-status-${p.cls}">${esc(p.text)}</p>
       </div>
       ${blocked ? `<p class="perm-how"><strong>폰에서 차단해 두셨어요.</strong> 앱에서는 다시 물을 수 없고,
-        폰 설정에서 직접 바꿔야 합니다.<br />
-        · 아이폰: 설정 → 알림 → 한대장 → 알림 허용<br />
-        · 안드로이드: 설정 → 앱 → 한대장 → 알림</p>`
+        폰 설정에서 직접 바꿔야 합니다.</p>
+      <p class="perm-how perm-steps">아이폰: 설정 → 알림 → 한대장 → 알림 허용<br />
+        안드로이드: 설정 → 앱 → 한대장 → 알림</p>`
       : `<p class="perm-how">알림을 켜고 끄는 것은 <strong>설정 → 알림</strong>에서 합니다.
         폰 설정에서 아예 차단해 두면 앱에서는 되돌릴 수 없어요.</p>`}
       <p class="perm-how">한대장은 <strong>웹앱</strong>이라 사진·카메라·연락처 권한을 쓰지 않습니다.
         서류 보관함에 파일을 올릴 때만 그때그때 파일을 고르게 되어 있고, 앱이 폰 안을 뒤지지 않습니다.</p>
-    </div>
-    <div class="my-card">
-      <p class="wallet-title">오픈소스 라이선스</p>
-      <p class="perm-how">이 앱은 바깥 자바스크립트 라이브러리를 하나도 싣지 않습니다(보안 설정이 막습니다).
+    </section>
+    <section class="perm-sec">
+      <p class="perm-title">오픈소스 라이선스</p>
+      <p class="perm-lead">이 앱은 바깥 자바스크립트 라이브러리를 하나도 싣지 않습니다(보안 설정이 막습니다).
         바깥에서 받아 쓰는 것은 아래 글꼴 하나뿐이에요.</p>
       ${OSS_LICENSES.map(([name, lic, url]) => `
-        <div class="wallet-row">
-          <div class="wallet-info">
-            <p class="trash-title">${esc(name)}</p>
-            <p class="wallet-status">${esc(lic)}</p>
+        <div class="perm-state">
+          <div>
+            <p class="perm-name">${esc(name)}</p>
+            <p class="perm-value">${esc(lic)}</p>
           </div>
-          <div class="wallet-btns">
-            <a class="wallet-btn" href="${esc(url)}" target="_blank" rel="noopener">원문 ↗</a>
-          </div>
+          <a class="perm-link" href="${esc(url)}" target="_blank" rel="noopener">원문 ↗</a>
         </div>`).join('')}
-    </div>`;
+    </section>`;
 }
 
 /* ---------------- 이용약관 · 개인정보처리방침 (2026-09-11) ----------------
