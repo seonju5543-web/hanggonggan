@@ -1876,6 +1876,14 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
 .legal-table th { background: var(--bg); color: var(--text); font-weight: 700; }
 .legal-tmp { color: var(--orange); font-weight: 600; }
 .legal-date { font-size: var(--t-xs); color: var(--text-weak); margin-top: var(--space-20); }
+/* 🔴 약관 화면 머리줄 (2026-09-11 개발자 지적 — "글자가 박스 안에 맞지 않는다").
+   제목이 '이용약관 · 개인정보처리방침' 14 글자라 화면 제목 크기로 두면 좁은 폰에서
+   좌우 여백을 다 먹고 가장자리에 붙는다(320px 에서 실측 280/280 — 여백 0).
+   왼쪽에 되돌아가기 화살표까지 들어오므로 **한 단계 줄이고 두 줄을 허용한다.**
+   ⚠️ 화살표와 제목은 위를 맞춘다 — 두 줄이 되면 가운데 맞춤은 화살표가 아래로 처진다. */
+.legal-header { align-items: flex-start; margin-bottom: var(--space-16); }
+.legal-header h2 { font-size: var(--t-lg); line-height: 1.35; padding-top: var(--space-6); }
+
 .legal-actions { margin-top: var(--space-24); }
 .legal-actions .btn { display: inline-block; text-decoration: none; }
 

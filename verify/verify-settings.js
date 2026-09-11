@@ -138,6 +138,27 @@ const eq = (label, got, want) => {
   await page.waitForTimeout(400);
   eq('신청내역이 2건으로 돌아왔다', await page.$$eval('#apps-list .swipe-row', (e) => e.length), 2);
 
+  console.log('\n■ 이용약관 화면 — 되돌아가기는 왼쪽 위, 제목이 화면 안에 든다');
+  {
+    /* 🔴 **좁은 폰(320px)까지 본다.** 개발자가 지적한 것이 '박스 안에 안 맞는다'였고,
+       390px 에서는 아슬아슬하게 들어가 눈에 안 띄었다 — 좁은 쪽에서 재야 보인다. */
+    const t = await ctx.newPage();
+    await t.setViewportSize({ width: 320, height: 900 });
+    await t.goto(`http://localhost:${PORT}/terms.html`, { waitUntil: 'domcontentloaded' });
+    await t.waitForTimeout(300);
+    eq('왼쪽 위에 되돌아가기 화살표가 있다', await t.$$eval('.legal-header .sub-back', (e) => e.length), 1);
+    eq('그 화살표가 앱으로 간다', await t.$eval('.legal-header .sub-back', (e) => e.getAttribute('href')), './');
+    eq('맨 아래 되돌아가기 버튼은 없앴다', await t.$$eval('.legal-actions', (e) => e.length), 0);
+    eq('제목이 화면 밖으로 나가지 않는다',
+      await t.evaluate(() => {
+        const r = document.querySelector('.legal-header h2').getBoundingClientRect();
+        return r.right <= document.documentElement.clientWidth && r.left >= 0;
+      }), true);
+    eq('페이지 전체가 가로로 넘치지 않는다',
+      await t.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth), true);
+    await t.close();
+  }
+
   console.log(errors.length ? '\n❌ 오류:\n' + errors.join('\n') : '\n✓ 콘솔 오류 없음');
   if (errors.length) fail++;
   await browser.close();

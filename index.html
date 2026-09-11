@@ -456,7 +456,9 @@
       <div id="my-notify" class="my-card" hidden></div>
       <div class="my-menu set-menu">
         <button class="my-menu-item" id="btn-open-trash">휴지통</button>
-        <a class="my-menu-item" href="terms.html" target="_blank" rel="noopener">이용약관 · 개인정보처리방침</a>
+        <!-- 🔴 새 탭으로 열지 않는다 — 약관 화면 왼쪽 위 화살표로 되돌아오기 때문이다
+             (새 탭이면 그 화살표가 앱을 한 벌 더 띄운다). 2026-09-11 개발자 지시. -->
+        <a class="my-menu-item" href="terms.html">이용약관 · 개인정보처리방침</a>
         <button class="my-menu-item danger" id="btn-withdraw">탈퇴</button>
       </div>
     </section>
