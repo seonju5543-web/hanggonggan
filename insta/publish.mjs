@@ -47,7 +47,7 @@ async function graph(path, params, method = 'POST') {
 
 /** 🔴 인스타가 가져가기 전에 **우리가 먼저 열어 본다.** Pages 배포가 안 끝났으면
  *  인스타는 404 를 받고 컨테이너를 못 만드는데, 그 오류는 원인을 안 알려 준다. */
-async function waitLive(urls, tries = 20, gapMs = 15000) {
+export async function waitLive(urls, tries = 20, gapMs = 15000) {
   for (let n = 1; n <= tries; n++) {
     const got = await Promise.all(urls.map((u) =>
       fetch(u, { method: 'HEAD' }).then((r) => r.ok).catch(() => false)));
@@ -119,6 +119,13 @@ if (process.argv[1] && import.meta.url === new URL(process.argv[1], 'file:').hre
   const caption = readFileSync(new URL('caption.txt', abs), 'utf8').trim();
   const images = files.map((f) => `${SITE}/${dir}/${f}`);
   say(`■ ${dir} — 그림 ${files.length}장`);
+
+  // 🔴 준비 단계는 **올리지 않고** 그림이 공개됐는지만 본다 — 이슈에 박을 그림 주소가
+  //    아직 404 면 GitHub 이 깨진 그림을 캐시해 버려서 은서가 영영 못 본다.
+  if (process.argv.includes('--wait-only')) {
+    await waitLive(images).catch((e) => { console.error(`\n🚨 ${e.message}`); process.exit(1); });
+    process.exit(0);
+  }
 
   const live = process.argv.includes('--publish');
   // 🔴 스택 트레이스를 뱉으면 무엇이 잘못됐는지 안 보인다. 한 줄로 말하고 죽는다.

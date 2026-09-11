@@ -16,6 +16,15 @@
 name: 인스타 카드뉴스 게시
 
 on:
+  # 🔴 **예약은 '준비' 까지만이다.** 게시는 여전히 사람이 누른다 —
+  #    자동으로 올리면 은서가 카드를 보는 자리가 사라진다(사실 관문이 못 잡는
+  #    종류의 사고: 사진이 공고와 안 어울린다·말투가 이상하다 는 눈으로만 보인다).
+  #    예약 실행에는 inputs 가 통째로 비어 있어서 `prepare` 만 켜지고 `publish` 는 꺼진다.
+  # 🔴 예약은 **기본 브랜치에 있는 파일로만** 돈다 — 작업 브랜치에만 올리면 영영 안 돈다.
+  schedule:
+    # 08:41 KST. 🔴 UTC 정각·자정 부근은 GitHub 이 지연·생략한다(CLAUDE.md) — 홀수 분으로 피한다.
+    #    9시에 메일이 도착해 있으려면 그리기(3~4분) + Pages 배포 기다림(~2분)을 앞당겨 둬야 한다.
+    - cron: '41 23 * * 0,3'    # 일·수 23:41 UTC = 월·목 08:41 KST
   workflow_dispatch:
     inputs:
       step:
@@ -87,7 +96,7 @@ jobs:
           TPL: ${{ inputs.tpl }}
         run: |
           # 🔴 `--tpl` 을 안 주면 렌더러가 **씨앗으로** 고른다 — 같은 공고는 늘 같은 얼굴.
-          if [ "$TPL" = "auto" ]; then
+          if [ "$TPL" = "auto" ] || [ -z "$TPL" ]; then
             node insta/render.mjs "$NEEDLE" --pub
           else
             node insta/render.mjs "$NEEDLE" --tpl="$TPL" --pub
@@ -116,16 +125,64 @@ jobs:
       # 🔴 커밋해야 GitHub Pages 가 공개 주소로 서빙한다 — 인스타는 그 주소로 가져간다.
       #    ⚠️ 어제 것을 지웠으므로 `-A` 로 **삭제까지** 담아야 한다.
       - name: 게시용 그림 커밋
+        id: commit
         run: |
+          D=$(ls -d insta/pub/*/ | tail -1 | sed 's:/$::')   # 🔴 tail — 둘 남으면 새 것을 집는다
+          echo "dir=$D" >> "$GITHUB_OUTPUT"
           git config user.name  'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           git add -A insta/pub
           git diff --cached --quiet && { echo '바뀐 게 없습니다'; exit 0; }
-          git commit -m "인스타: $(basename $(ls -d insta/pub/*/)) 게시용 카드 준비"
+          git commit -m "인스타: $(basename "$D") 게시용 카드 준비"
           for i in 1 2 3; do
             git push origin "HEAD:$BASE" && break || { git pull --rebase origin "$BASE"; sleep 5; }
           done
           git push origin HEAD:main        # 🔴 Pages 는 main 을 배포한다
+
+      # 🔴 Pages 가 서빙을 시작해야 이슈에 박은 그림이 뜬다. 아직 404 인 채로 이슈를
+      #    만들면 GitHub 의 그림 중계(camo)가 **그 404 를 캐시해** 나중에도 안 보인다.
+      - name: 그림이 공개될 때까지 기다린다
+        run: node insta/publish.mjs --dir=${{ steps.commit.outputs.dir }} --wait-only
+
+      # 🔴 여기가 사람이 들어오는 자리다 — 담당자로 지정하면 GitHub 이 **메일을 보낸다**
+      #    (이 저장소가 이미 여덟 군데서 쓰는 방식. 새 열쇠도 메일 서버도 필요 없다).
+      - name: 은서에게 알린다
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN: ${{ github.run_id }}
+          DIR: ${{ steps.commit.outputs.dir }}
+        run: |
+          ORG=$(jq -r .org  "$DIR/meta.json")
+          NAME=$(jq -r .name "$DIR/meta.json")
+          SITE='https://seonju5543-web.github.io/hanggonggan'
+          {
+            printf '**%s** · %s\n\n' "$ORG" "$NAME"
+            echo '카드가 준비됐습니다. 보고 괜찮으면 **「게시」** 로 다시 돌려 주세요.'
+            echo; echo '## 카드'
+            for f in "$DIR"/*.jpg; do printf '![%s](%s/%s)\n' "$(basename "$f")" "$SITE" "$f"; done
+            echo; echo '## 캡션'; echo '```'; cat "$DIR/caption.txt"; echo '```'
+            echo; echo '## 올리는 법'
+            echo "Actions → 「인스타 카드뉴스 게시」 → Run workflow → **게시 (준비된 것을 올린다)**"
+            echo
+            echo '- 마음에 안 들면 **그냥 두세요** — 아무것도 안 올라갑니다.'
+            echo '- 판형을 바꾸려면 「준비만」 을 `tpl` 을 photo·chat·note 로 지정해 다시 돌리면 됩니다.'
+            echo "- 원본 PNG 는 실행 화면의 아티팩트: https://github.com/$REPO/actions/runs/$RUN"
+            echo
+            echo '올리고 나면 이 이슈는 **저절로 닫힙니다.**'
+          } > /tmp/ready.md
+          gh label create insta-ready --repo "$REPO" --color 0E8A16 --description '인스타 카드 준비됨' 2>/dev/null || true
+          # 🔴 「준비만」 을 다시 누르면 폴더를 덮어쓰므로, 옛 이슈는 **이미 없는 것을 가리킨다.**
+          for n in $(gh issue list --repo "$REPO" --label insta-ready --state open --json number --jq '.[].number'); do
+            gh issue close "$n" --repo "$REPO" --comment '새로 준비된 카드가 있어 이 건은 닫습니다.'
+          done
+          gh issue create --repo "$REPO" --label insta-ready \
+            --assignee didinin-wq \
+            --title "📸 인스타 카드 준비됐습니다 — $ORG $NAME" \
+            --body-file /tmp/ready.md \
+          || gh issue create --repo "$REPO" --label insta-ready \
+            --title "📸 인스타 카드 준비됐습니다 — $ORG $NAME (담당자 지정 실패)" \
+            --body-file /tmp/ready.md
 
       - name: 실패하면 시끄럽게
         if: ${{ failure() || cancelled() }}
@@ -158,7 +215,7 @@ jobs:
       - name: 준비된 것이 있는지
         id: dir
         run: |
-          D=$(ls -d insta/pub/*/ 2>/dev/null | head -1 | sed 's:/$::')
+          D=$(ls -d insta/pub/*/ 2>/dev/null | tail -1 | sed 's:/$::')   # 🔴 tail — 옛 폴더를 올리면 못 지운다
           [ -n "$D" ] || { echo '🚨 준비된 게 없습니다 — 「준비만」 으로 먼저 돌리세요.'; exit 1; }
           echo "준비된 폴더: $D"; cat "$D/meta.json"
           echo "dir=$D" >> "$GITHUB_OUTPUT"
@@ -168,6 +225,15 @@ jobs:
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
         run: node insta/publish.mjs --dir=${{ steps.dir.outputs.dir }} --publish
+
+      - name: 준비 이슈를 닫는다
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          for n in $(gh issue list --repo "$REPO" --label insta-ready --state open --json number --jq '.[].number'); do
+            gh issue close "$n" --repo "$REPO" --comment '올렸습니다 — 자동으로 닫습니다.'
+          done
 
       # 🔴 올린 것을 기억 못 하면 내일 같은 공고를 다시 올린다(이슈 #75 유형).
       #    `git add` 목록에 넣는 것까지가 한 세트다.
