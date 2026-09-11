@@ -28,6 +28,12 @@ let state = {
      ⚠️ 이 목록은 **이 기기에만 남는다.** 서버(profiles 표)에는 profile·applications
         칸만 있어 동기화되지 않는다 — 칸을 늘리려면 표부터 고쳐야 한다. */
   saved: [],
+  /* 휴지통 — 지운 신청내역이 30일 동안 여기 머문다 (2026-09-11 개발자 지시).
+     { at, app, deletedAt } · at = 지우기 전 목록에서의 자리(되살릴 때 그 자리로 돌려놓는다).
+     🔴 지운 **서류 파일**은 여기 없다 — 파일은 크기 때문에 localStorage 에 못 담아
+        IndexedDB 'trash' 칸에 있다. 화면(renderTrash)이 둘을 합쳐 보여 준다.
+     ⚠️ 이 목록도 saved 와 같이 **이 기기에만** 남는다(서버 표에 칸이 없다). */
+  trash: [],
   /* 민감정보(기초생활수급·장애 등)를 서버에 올려도 되는가 — 온보딩 Step 3에서 받는다.
      동의 안 하면 그 항목은 기기에만 남는다(supabase-client.js syncSafeProfile). */
   consent: { sensitive: false },
@@ -100,6 +106,7 @@ function loadState() {
     if (raw) state = Object.assign(state, JSON.parse(raw));
     if (!state.consent) state.consent = { sensitive: false };   // 로그인 이전에 저장된 판
     if (!Array.isArray(state.saved)) state.saved = [];          // 저장 기능 이전에 저장된 판
+    if (!Array.isArray(state.trash)) state.trash = [];          // 휴지통 이전에 저장된 판
     if (state.profile) { migrateBranchCampus(state.profile); migrateFitFields(state.profile); }
   } catch (e) { /* 손상된 데이터는 무시 */ }
 }
@@ -269,6 +276,66 @@ function dday(dateStr) {
   return { label: `D-${d}`, cls: '', days: d };
 }
 
+/* 마감을 학생에게 보이는 **한 가지 말**로 옮긴다 (2026-09-10 페이스리프트).
+   왜 — 앱 전체에 마감 표기가 다섯 가지였고 홈 한 화면에 그중 넷이 함께 떴다:
+   'D-DAY' 배지 · '9/10 마감' 막대 · '9월 10일 15:25' · '2026-09-09'.
+   🔴 **판정을 새로 하지 않는다** — 위 dday() 가 낸 값만 받아 말로 바꾼다.
+      여기서 날짜를 다시 계산하면 배지·막대·달력이 서로 다른 말을 하게 된다.
+   🔴 시간 단위를 쓰지 않는다 — 우리가 아는 것은 날짜뿐이라 마감 '시각'을 모른다.
+   ⚠️ 달력은 날짜 자체가 내용이라 이 말을 쓰지 않는다(isoOf 그대로). */
+function ddayWords(d) {
+  if (!d) return '';
+  if (d.label === '기한 원문 확인') return '기한 확인 중';
+  if (d.days < 0) return '마감';
+  if (d.days === 0) return '오늘 마감';
+  if (d.days === 1) return '내일 마감';
+  return d.days + '일 남음';
+}
+
+/* 카드 제목에서 기관명 접두어를 지운다 (2026-09-10 페이스리프트).
+   한 카드에 기관명이 두 번 나오고 있었다 — 제목 '재단법인 연수큰재장학재단 학업우수장학생'
+   + 아래 줄 '재단법인 연수큰재장학재단'. 원본 데이터를 그대로 이어 붙인 흔적이다.
+   🔴 **지어내지 않는다** — provider 글자로 시작할 때만 딱 그만큼 잘라 낸다.
+   🔴 남는 글자가 2자 미만이면 자르지 않는다(제목이 통째로 사라지는 것을 막는다).
+   🔴 상세 시트는 **원제목 그대로** 둔다 — 거기는 원문과 대조하는 자리다. */
+function cardTitle(sch) {
+  const name = String(sch.name || '').trim();
+  const prov = String(sch.provider || '').trim();
+  if (!prov) return name;
+  const bare = (t) => t.replace(/^(재단법인|사단법인|학교법인|의료법인|\(재\)|\(사\)|재\)|사\))\s*/, '').trim();
+  for (const p of [prov, bare(prov)]) {
+    if (!p || p.length < 3) continue;
+    for (const t of [name, bare(name)]) {
+      if (t.startsWith(p)) {
+        const rest = t.slice(p.length).replace(/^[\s·\-–—:,]+/, '').trim();
+        if (rest.length >= 2) return rest;
+      }
+    }
+  }
+  return cleanCardTitle(name);
+}
+
+/* 카드 제목에서 **게시판 표식**을 걷어낸다 (2026-09-10 페이스리프트).
+   실측: '[공통][국가]2026년 2학기 푸른등대 기부장학금 장학생 선발(~9/10)'.
+   앞의 대괄호 분류표는 그 게시판 안에서만 뜻이 있고, 뒤의 '(~9/10)'은 카드가 이미
+   '오늘 마감'이라고 말하는 것과 **같은 사실을 두 번** 적는 것이다.
+   🔴 지어내지 않는다 — 지우기만 하고 아무 글자도 더하지 않는다.
+   🔴 짧은 표식만 뗀다(12자 이하) — 긴 대괄호는 제목의 일부일 수 있다.
+   🔴 뒤 괄호는 **날짜·기간처럼 보일 때만** 뗀다. '(서울캠퍼스)' 같은 것은 남겨야 한다
+      (느슨하게 떼면 캠퍼스가 사라져 다른 공고와 구별이 안 된다 — 2026-08-21 사고 유형).
+   🔴 남는 글자가 4자 미만이면 아무것도 떼지 않는다(제목이 사라지는 것을 막는다).
+   ⚠️ 상세 시트는 원제목 그대로다 — 게시판에서 찾을 때 쓰는 글자라 바꾸면 안 된다. */
+function cleanCardTitle(name) {
+  let t = String(name || '').trim();
+  const before = t;
+  /* 🔴 앞 표식은 **대괄호만** 뗀다 — 소괄호를 넣으면 '(재)무안군승달장학회'의 법인 표기와
+     '(서울캠퍼스)' 같은 구분자가 사라진다(실측으로 확인하고 좁혔다). */
+  t = t.replace(/^(?:[[【]\s*[^\]】]{1,12}\s*[\]】]\s*)+/, '').trim();
+  t = t.replace(/[(（]\s*(?:~|-|—|\d)[\d\s.~\-—/월일년까지]*\s*[)）]\s*$/, '').trim();
+  t = t.replace(/[\s·\-–—:,]+$/, '').trim();
+  return t.length >= 4 ? t : before;
+}
+
 /* notStale(오래된 공고 숨김)은 match-engine.js에 있다 — 화면에서 숨긴 공고를
    알림으로는 알리는 모순이 생기지 않도록 알림 규칙도 같은 함수를 쓴다. */
 
@@ -397,6 +464,18 @@ function esc(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+/* 수집한 게시판 글에 남은 HTML 기호를 사람이 읽는 글자로 되돌린다 (2026-09-11).
+   🔴 실시간 공고 39건 중 9건이 화면에 `&nbsp;` 를 **글자 그대로** 띄우고 있었다
+      ('국가근로장학금 장학생 기본요건 ( 소득구간 &nbsp; 9 구간 이하'). 게시판 원문은 빈칸인데
+      수집이 기호를 그대로 담아 온 것이라, 되돌리는 것이 원문에 **더 가깝다**(원칙 8-1 위반 아님).
+   🔴 반드시 `esc()` **앞에** 부른다 — 되돌린 뒤 다시 감싸므로, `&lt;script&gt;` 가 섞여 있어도
+      화면에는 글자로만 뜬다(먼저 esc 하면 `&amp;nbsp;` 가 돼 영영 안 풀린다).
+   🔴 목록은 늘리지 않는다 — 숫자 기호(`&#NN;`)까지 열면 보이지 않는 제어문자가 들어온다. */
+const ENTITIES = { nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", '#39': "'", '#160': ' ' };
+function unent(s) {
+  return String(s == null ? '' : s).replace(/&(nbsp|amp|lt|gt|quot|apos|#39|#160);/g, (m, k) => ENTITIES[k]);
+}
+
 /* 외부 링크 안전화 — http(s)·mailto만 허용한다. 수집 로봇이 받아 온 데이터가 오염되거나
    정식 등록에 오타가 있어도 javascript:·data: 같은 위험한 스킴이 href나 window.open으로
    들어가지 못하게 막는 2차 방어선(CSP가 뚫리거나 완화돼도 안전). 허용 안 되면 빈 문자열. */
@@ -431,11 +510,28 @@ let walletCache = {}; // slot -> { name, type, savedAt }
 
 function dbOpen() {
   return new Promise((res, rej) => {
-    const rq = indexedDB.open('handaejang-docs', 1);
-    rq.onupgradeneeded = () => rq.result.createObjectStore('files', { keyPath: 'slot' });
+    /* 🔴 판 2 — 'trash'(지운 서류) 보관소가 늘었다 (2026-09-11).
+       이미 판 1 로 만들어진 폰에서는 'files' 가 **이미 있으므로** 그대로 만들면
+       그 자리에서 오류가 나고 서류 보관함이 통째로 안 열린다. 있는지 보고 만든다. */
+    const rq = indexedDB.open('handaejang-docs', 2);
+    rq.onupgradeneeded = () => {
+      const db = rq.result;
+      if (!db.objectStoreNames.contains('files')) db.createObjectStore('files', { keyPath: 'slot' });
+      if (!db.objectStoreNames.contains('trash')) db.createObjectStore('trash', { keyPath: 'key' });
+    };
     rq.onsuccess = () => res(rq.result);
     rq.onerror = () => rej(rq.error);
   });
+}
+
+/* 휴지통 보관소 — 서류와 같은 금고 안의 다른 칸. 파일은 여전히 기기 밖으로 안 나간다. */
+function trashTx(mode, fn) {
+  return dbOpen().then((db) => new Promise((res, rej) => {
+    const tx = db.transaction('trash', mode);
+    const out = fn(tx.objectStore('trash'));
+    tx.oncomplete = () => res(out && out.result);
+    tx.onerror = () => rej(tx.error);
+  }));
 }
 function walletTx(mode, fn) {
   return dbOpen().then((db) => new Promise((res, rej) => {
@@ -454,7 +550,20 @@ async function walletPut(slot, file) {
 function walletGetRec(slot) {
   return walletTx('readonly', (st) => st.get(slot));
 }
+/* 🔴 삭제가 아니라 **옮기기**다 (2026-09-11 개발자 지시로 휴지통 신설).
+   증명서는 학생이 주민센터·학교에 다시 가야 다시 받는 물건이라, 잘못 눌렀을 때
+   되돌릴 길이 없으면 그 손실이 그대로 학생 몫이 된다. */
 async function walletDeleteSlot(slot) {
+  try {
+    const rec = await walletGetRec(slot);
+    if (rec) {
+      await trashTx('readwrite', (st) => st.put({
+        key: `doc:${slot}:${Date.now()}`, kind: 'doc',
+        slot, name: rec.name, type: rec.type, blob: rec.blob,
+        savedAt: rec.savedAt, deletedAt: Date.now(),
+      }));
+    }
+  } catch (e) { /* 휴지통에 못 담아도 삭제 자체는 진행한다 — 학생이 누른 일은 일어나야 한다 */ }
   await walletTx('readwrite', (st) => st.delete(slot));
   await walletRefresh();
 }
@@ -473,7 +582,7 @@ function docWalletStatus(doc) {
   const rec = walletCache[s.slot];
   return rec
     ? { ok: true, slot: s, text: `보관함에서 자동 첨부 · ${rec.name}` }
-    : { ok: false, slot: s, text: `보관함에 없음 · 발급처: ${s.issue}` };
+    : { ok: false, slot: s, text: `아직 안 올렸어요 · 발급처: ${s.issue}` };
 }
 
 /* ---------------- 자동추천 (autocomplete) ---------------- */
@@ -620,17 +729,22 @@ function showScreen(name, opts) {
   if (typeof resumeSaveScroll === 'function' && currentScreen && currentScreen !== name) {
     resumeSaveScroll(currentScreen, window.scrollY);
   }
-  ['onboarding', 'home', 'explore', 'applications', 'my'].forEach((n) => {
+  ['onboarding', 'home', 'explore', 'applications', 'my', 'settings', 'trash'].forEach((n) => {
     $(`#screen-${n}`).hidden = n !== name;
   });
   $('#bottom-nav').hidden = name === 'onboarding';
-  $$('.nav-item').forEach((b) => b.classList.toggle('active', b.dataset.nav === name));
+  /* 설정·휴지통은 MY 안쪽 화면이라 아래 탭에서 **MY 가 켜진 채**로 둔다 —
+     아무 탭도 안 켜져 있으면 학생이 지금 어디에 있는지 알 수 없다. */
+  const navOn = (name === 'settings' || name === 'trash') ? 'my' : name;
+  $$('.nav-item').forEach((b) => b.classList.toggle('active', b.dataset.nav === navOn));
   currentScreen = name;
 
   if (name === 'home') renderHome();
   if (name === 'explore') renderExplore();
   if (name === 'applications') renderApplications();
   if (name === 'my') renderMy();
+  if (name === 'settings') renderSettings();
+  if (name === 'trash') renderTrash();
 
   /* 🔴 스크롤은 **그린 뒤에** 옮긴다 — 먼저 옮기면 아직 짧은 화면이라 그 자리가 없다.
      `opts.scroll` 은 이어보기가 되살릴 때만 온다(보통은 늘 맨 위로). */
@@ -951,42 +1065,65 @@ function fitBadgeHtml(fit, fd, { full = false } = {}) {
   return `<span class="badge badge-fit fit-${fitTone(fd.pct)}">적합도 ${fd.pct}% <em>요건 ${fd.total}개 중 ${fd.met}개 충족${note}</em></span>`;
 }
 
+/* 카드에 붙는 판정은 **하나뿐**이다 (2026-09-10 페이스리프트).
+   왜 — 한 카드에 최대 5개가 동시에 붙고 있었다: 적합도 · 교내외 · 마감 · 검수 전 · 신청 완료.
+   배지는 넣기 쉽고 아무도 빼자고 하지 않아 계속 늘었고, 전부 같은 무게라 우선순위가 안 보였다.
+   실측으로 '검수 전'은 등록 48건 중 20건(42%)에 붙어 **내부 검수 공정 상태**가 학생 화면에 나갔다.
+   🔴 판정을 새로 만들지 않는다 — fitVerdict / fitTone 을 그대로 쓴다.
+   🔴 뺀 것들이 사라지는 게 아니다: 교내외는 기관명 줄로, 마감은 글로, '검수 전'은 상세 시트로
+      옮겼다(상세의 badge-kind 가 '교외 · 검수 전'을 이미 낸다). 정직 표기는 그대로 지켜진다. */
+function cardBadgeHtml(fit, fd, applied) {
+  if (applied) return '<span class="badge badge-applied">신청 완료</span>';
+  const v = fitVerdict(fit, fd);
+  if (v === 'no') return '<span class="badge badge-fit-no">지원 자격 미달</span>';
+  if (v === 'unread') return '<span class="badge badge-fit-unknown">자격 미확인</span>';
+  /* 🔴 퍼센트는 남기되 **알약이 아니라 글자**로 낸다 (2026-09-10 페이스리프트).
+     2026-08-31 개발자 지시('요건 없애고 퍼센테이지로')는 지킨다 — 숫자는 그대로 보인다.
+     바꾼 것은 무게다: 목록에서 이 값은 대부분 33~50% 에 몰려 있어 카드끼리 구별해 주지
+     못하는데, 알약으로 두면 카드마다 같은 자리에 같은 크기의 색 덩어리가 반복돼
+     **눈이 제목보다 먼저 그것을 본다**(실측 스크린샷에서 다섯 장 연속 같은 알약).
+     알약은 학생이 실제로 멈춰 서야 하는 세 가지(미달·미확인·신청 완료)에만 남긴다. */
+  return fd ? '<span class="sch-fit fit-' + fitTone(fd.pct) + '">적합도 ' + fd.pct + '%</span>' : '';
+}
+
 /* ---------------- 카드 렌더링 ---------------- */
 function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
   const meta = STATUS_META[result.status];
   const d = dday(sch.deadline);
   const applied = state.applications.some((a) => a.id === sch.id);
+  const badge = cardBadgeHtml(fit, fd, applied);
+  const due = sch.program ? '상시 제도' : ddayWords(d);
+  /* 금액을 못 읽은 공고가 등록 48건 중 34건(71%)이다. 예전엔 그 자리에 '금액 원문 확인'이
+     카드에서 **가장 굵은 줄**로 떴다 — 템플릿이 자기 빈칸을 읽어 주는 모습이었다.
+     🔴 감추지 않는다(원칙 8-1). 대신 **무게를 낮춘다** — 아는 금액은 굵게, 모르는 것은 옅게. */
+  /* 🔴 숫자가 있다고 다 '아는 금액'이 아니다 — 원문이 통째로 들어온 칸이 있다.
+     실측: '예산 총 5억원 1천만원 범위 내 최소 50만원 최대 400만원'(1인당 금액이 아니다),
+     '등록금 실납부액에 따라 차등지급 자세한 사항은 첨부파일 또는 홈페이지 참…'(잘린 본문).
+     이런 줄을 굵게 쓰면 카드가 확정되지 않은 금액을 확정된 것처럼 말한다.
+     그래서 **짧고 숫자가 있는 것만** 굵게 쓴다. 나머지는 지우지 않고 옅게 남긴다(원칙 8-1). */
+  const amountText = String(sch.amount || '');
+  const known = /\d/.test(amountText) && amountText.length <= 20;
   return `
     <div class="sch-card-wrap">
     ${saveBtnHtml(sch.id)}
     <button class="sch-card" data-detail="${sch.id}">
-      ${/* 🔴 적합도를 **맨 앞에 두고 한 줄로** 합쳤다 (2026-08-31 개발자 지시).
-           2026-08-30 에 다른 줄로 갈라 뒀던 이유는 줄바꿈이 카드마다 달라 보여서였다.
-           맨 앞에 고정하면 그 문제가 사라진다 — 자리가 흔들리는 것은 뒤에 붙는 짧은
-           분류 배지들뿐이고, 그것들은 길이가 고르다. */ ''}
+      ${/* 🔴 맨 윗줄은 **기관명 + 판정 하나**다 (2026-09-10 페이스리프트).
+           교내·교외는 배지를 빼고 기관명 앞에 글로 붙인다 — 배지 줄이 카드를 지배하던 것을
+           끝내면서도 학생이 알아야 할 구분은 남긴다. */ ''}
       <div class="sch-top">
-        ${fitBadgeHtml(fit, fd)}
-        <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${sch.type}</span>
-        ${sch.program ? '<span class="badge badge-program">상시 제도</span>' : `<span class="badge badge-dday ${d.cls}">${d.label}</span>`}
-        ${sch.auto ? '<span class="badge badge-auto">검수 전</span>' : ''}
-        ${applied ? '<span class="badge badge-applied">신청 완료</span>' : ''}
+        <span class="sch-org">${esc(sch.type)} · ${esc(sch.provider)}</span>
+        ${badge}
       </div>
-      <p class="sch-name">${esc(sch.name)}</p>
-      <p class="sch-amount">${esc(sch.amount)}</p>
-      ${compact ? '' : `<p class="sch-provider">${esc(sch.provider)}</p>`}
+      <p class="sch-name">${esc(cardTitle(sch))}</p>
+      <div class="sch-foot">
+        <span class="sch-amount${known ? '' : ' unknown'}">${esc(sch.amount)}</span>
+        ${due ? `<span class="sch-due${(!sch.program && d.days >= 0 && d.days <= 7) ? ' urgent' : ''}">${esc(due)}</span>` : ''}
+      </div>
       ${/* 마감까지 남은 시간 막대 (2026-09-09 개발자 지시: "밑에 빨간색으로 마감 기간 알려주는 것").
            🔴 판정을 새로 하지 않는다 — 위에서 이미 구한 `d`(dday 결과)를 넘길 뿐이다.
-              여기서 날짜를 다시 계산하면 배지와 막대가 다른 말을 하게 된다.
-           🔴 7일 밖·마감된 공고·마감을 못 읽은 공고에는 아무것도 안 그린다
-              (deadlineMeter 가 빈 문자열을 낸다) — 모르는 것을 그리지 않는다.
-           🔴 **상시 제도는 뺀다** — 위 배지 줄이 'D-3' 이 아니라 '상시 제도'를 내는 공고라,
-              막대를 그리면 한 카드가 "상시로 받는다"와 "3일 뒤 마감"을 같이 말하게 된다. */ ''}
+           🔴 7일 밖·마감된 공고·마감을 못 읽은 공고에는 아무것도 안 그린다.
+           🔴 **상시 제도는 뺀다** — 그 카드는 '3일 뒤 마감'을 같이 말하면 안 된다. */ ''}
       ${(!sch.program && typeof deadlineMeterHtml === 'function') ? deadlineMeterHtml(d.days, sch.deadline) : ''}
-      ${/* 🔴 옛 판정 배지('지원 가능 · 선발 심사')를 **카드에서** 뺐다 (2026-08-24).
-           적합도 배지가 생긴 뒤로 한 카드에 판정이 둘이었고 서로 다른 축을 말해서,
-           `자격 미확인`인데 `지원 가능`이 함께 떴다. 학생은 '지원 가능'만 보고 들어갔다가
-           자격이 안 맞으면 헛걸음한다 — 이 앱이 없애려는 바로 그 피로감이다.
-           상세 시트에는 그대로 둔다(거기서는 마감·접수 상태를 함께 읽는다). */ ''}
     </button>
     </div>`;
 }
@@ -1075,14 +1212,27 @@ function renderHome() {
   lastBill = { bill, count: applyable.length };
 
   countUp($('#hero-amount'), total, (v) => `최대 ${won(v)}`);
-  $('#hero-count').textContent = `바로 신청 ${applyable.filter((m) => m.result.status === 'eligible').length}건 · 선발 심사형 ${applyable.filter((m) => m.result.status === 'selective').length}건${unknownAmt ? ` · 금액 미확인 ${unknownAmt}건 제외` : ''}`;
+  /* 🔴 히어로 아랫줄을 **한 문장**으로 바꿨다 (2026-09-10 페이스리프트).
+     예전: '바로 신청 0건 · 선발 심사형 12건 · 금액 미확인 11건 제외'
+     — 중간점으로 이어 붙인 세 토막짜리 **감사 로그**였다. 학생이 처음 보는 화면에서
+     가장 먼저 읽는 문장이 앱의 내부 사정이었고, 게다가 맨 앞이 '0건'이라 시작부터
+     "없다"고 말했다(실측: eligible 0 · selective 12).
+     🔴 정직함은 그대로다 — 뺀 건수를 감추지 않고 **문장으로** 말한다(원칙 8-1).
+     🔴 건수는 라벨로 올린다 — 금액보다 먼저 읽히는 것이 '몇 건인가'여야 행동이 된다. */
+  const nEligible = applyable.filter((m) => m.result.status === 'eligible').length;
+  $('#hero-label').textContent = `지금 신청할 수 있는 장학금 ${applyable.length}건`;
+  const heroLines = [];
+  if (unknownAmt) heroLines.push(`금액을 아직 못 읽은 ${unknownAmt}건은 뺀 금액이에요`);
+  else if (applyable.length) heroLines.push('확인된 금액만 더한 금액이에요');
+  if (nEligible) heroLines.push(`그중 ${nEligible}건은 바로 신청할 수 있어요`);
+  $('#hero-count').textContent = heroLines.join(' ');
 
   const btn = $('#btn-apply-all');
   btn.disabled = notApplied.length === 0;
   /* 버튼은 **누르면 무슨 일이 나는지**만 말한다 (2026-08-30 개발자 지시).
      '⚡ 한 번에 모두 신청 준비하기'에서 이모지·'한 번에'·'모두'는 전부 앱의 감탄이지
      학생이 얻는 정보가 아니었다. 남는 것은 건수와 동사뿐이다. */
-  btn.textContent = notApplied.length ? `${notApplied.length}건 신청 준비` : '준비할 장학금이 남아 있지 않습니다';
+  btn.textContent = notApplied.length ? `${notApplied.length}건 신청 준비` : '준비할 장학금이 남아 있지 않아요';
 
   renderResumeCard();
 
@@ -1097,13 +1247,13 @@ function renderHome() {
      `liveNoticesHtml()` 한 곳에만 둔다. */
   $('#home-deadline-list').innerHTML = upcoming.length
     ? upcoming.map((m) => schCard(m.sch, m.result, { compact: true, fit: m.fit, fd: m.fd })).join('')
-    : '<p class="empty">지금 신청 가능한 장학금 없음 · 프로필 업데이트 권장</p>';
+    : '<p class="empty">지금 신청할 수 있는 장학금이 없어요<br /><span class=\"empty-sub\">프로필을 채우면 더 많이 찾을 수 있어요</span></p>';
 
   const recent = state.applications.slice(-2).reverse().filter((a) => findSch(a.id));
   renderHomeUpdated();
   $('#home-apps').innerHTML = recent.length
     ? recent.map(appCard).join('')
-    : '<p class="empty">담아 둔 장학금 없음</p>';
+    : '<p class="empty">아직 담아 둔 장학금이 없어요</p>';
 }
 
 /* ---------------- 탐색 ---------------- */
@@ -1218,8 +1368,57 @@ function renderExplore() {
   /* ⚠️ 홈과 같은 이유로 여기에도 뼈대를 두지 않는다 — 이 목록은 받아오기 중에도 비지 않는다
      (renderHome 의 같은 자리 주석 참조). 뼈대는 `liveNoticesHtml()` 한 곳이다. */
   $('#explore-list').innerHTML = list.length
-    ? list.map((m) => schCard(m.sch, m.result, { fit: m.fit, fd: m.fd })).join('')
-    : `<p class="empty">${q ? `'${esc(exploreQuery.trim())}'와 맞는 장학금 없음` : '조건에 맞는 장학금 없음'}</p>`;
+    ? exploreGroupsHtml(list)
+    : `<p class="empty">${q ? `'${esc(exploreQuery.trim())}'와 맞는 장학금이 없어요` : '조건에 맞는 장학금이 없어요'}</p>`;
+}
+
+/* ── 목록 구획 (2026-09-10 페이스리프트) ────────────────────────────────────
+   왜 — 탐색 탭 전체 높이가 실측 **46,626px**(390×844 화면으로 약 55번)인데 구획이
+   한 곳도 없고 카드가 전부 같은 높이·같은 구조였다. 눈이 쉴 곳도, "여기까지가 급한 것"
+   이라고 말해 주는 자리도 없었다.
+
+   🔴 **마감일 하나로만 가른다.** 접수 시작일(openDate)은 등록 48건 중 17건에만 있어
+      '접수 기간의 몇 %' 같은 것을 만들면 지어내는 것이 된다(원칙 8-1).
+   🔴 **판정을 새로 하지 않는다** — dday() 가 낸 days 만 본다. 다만 '마감일이 없는 공고'는
+      dday 가 days:14 를 주므로(목록에 남기려는 값이다) days 로는 구분할 수 없다.
+      그래서 `sch.deadline` 유무를 **직접** 본다 — 안 그러면 기한 미상이 '이번 달'로 섞인다.
+   🔴 고른 정렬(적합도순·마감순·최신순)은 **구획 안에서** 그대로 적용된다. 위 sort 가 이미
+      끝난 배열의 순서를 여기서 흩뜨리지 않고 담기만 한다.
+      → 적합도순이면 "이번 주에 마감하는 것 중 나와 가장 맞는 것"이 각 구획 맨 위에 온다. */
+/* 🔴 순서가 곧 뜻이다 — **급한 것이 위, 끝난 것이 맨 아래**.
+   처음 짤 때 'closed' 를 맨 앞에 뒀다가 검사(verify-explore-sort '이미 지난 마감은
+   목록 끝에 있다')에 잡혔다. 마감된 공고가 목록 첫 줄에 오면 학생이 맨 먼저 보는 것이
+   이미 못 하는 일이 된다. 기한을 못 읽은 것은 아직 할 수 있는 일이라 그 위에 둔다. */
+const EXPLORE_GROUPS = [
+  { key: 'now',    label: '오늘·내일 마감' },
+  { key: 'week',   label: '이번 주' },
+  { key: 'month',  label: '이번 달' },
+  { key: 'later',  label: '여유 있음' },
+  { key: 'always', label: '상시 신청' },
+  { key: 'unknown', label: '마감일 확인 중' },
+  { key: 'closed', label: '마감' },
+];
+
+function exploreGroupOf(sch) {
+  if (sch.program) return 'always';
+  if (!sch.deadline) return 'unknown';
+  const days = dday(sch.deadline).days;
+  if (days < 0) return 'closed';
+  if (days <= 1) return 'now';
+  if (days <= 7) return 'week';
+  if (days <= 30) return 'month';
+  return 'later';
+}
+
+function exploreGroupsHtml(list) {
+  const bucket = {};
+  for (const m of list) (bucket[exploreGroupOf(m.sch)] = bucket[exploreGroupOf(m.sch)] || []).push(m);
+  return EXPLORE_GROUPS
+    .filter((g) => bucket[g.key] && bucket[g.key].length)
+    .map((g) => `<div class="list-group">
+        <div class="list-group-head"><span>${esc(g.label)}</span><span class="list-group-n">${bucket[g.key].length}</span></div>
+        ${bucket[g.key].map((m) => schCard(m.sch, m.result, { fit: m.fit, fd: m.fd })).join('')}
+      </div>`).join('');
 }
 
 /* ---------------- 서류 도우미 (AI 초안 작성) ---------------- */
@@ -1864,18 +2063,22 @@ function liveNoticesHtml() {
   const mine = scholarships.slice(0, loans.length ? 8 : 10).concat(loans.slice(0, 2));
   const head = liveNoticesHead(liveNotices.updatedAt);
   if (!mine.length) {
-    return head + `<p class="empty" style="margin-bottom:16px">아직 ${esc(p.school)} 게시판 연결 전이거나 새 공고 없음<br />연결되면 실제 공고가 여기에 자동으로 떠요.</p>`;
+    return head + `<p class="empty" style="margin-bottom:16px">아직 ${esc(p.school)} 게시판 연결 전이거나 새 공고가 없어요<br />연결되면 실제 공고가 여기에 자동으로 떠요.</p>`;
   }
   return head + `<div class="card-list" style="margin-bottom:18px">` + mine.map((n) => `
     <a class="sch-card notice-card" href="${esc(safeUrl(n.url))}" target="_blank" rel="noopener">
+      ${/* 🔴 맨 윗줄은 매칭 카드와 **같은 말투**다 — 기관 글 + 판정 하나 (2026-09-11).
+           예전엔 배지 셋(`교내 공고`·`마감 임박`·`양식 2`)이 한 줄을 채워, 페이스리프트로
+           걷어낸 배지 무더기가 이 경로에만 그대로 남아 있었다(실측 147장 중 9장).
+           🔴 첨부 개수를 `badge-applied` 로 쓰지 말 것 — 그 색은 '신청 완료'의 초록이라
+              첨부가 있다는 말이 신청이 끝났다는 말로 읽혔다. 아래 메타 줄로 내린다. */ ''}
       <div class="sch-top">
-        <span class="badge badge-in">교내 공고</span>
+        <span class="sch-org">교내 공고 · ${esc(n.school)}${n.campus ? ' ' + esc(n.campus) : ''}</span>
         ${n.deadlineHint ? `<span class="badge badge-dday urgent">마감 임박</span>` : ''}
-        ${(n.attachments || []).length ? `<span class="badge badge-applied">양식 ${n.attachments.length}</span>` : ''}
       </div>
-      <p class="sch-name">${esc(n.title)}</p>
-      ${n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? `<p class="sch-provider">${esc(n.deadlineHint)}</p>` : ''}
-      <p class="sch-provider">${esc(n.school)}${n.campus ? ' ' + esc(n.campus) : ''} · ${esc(n.foundAt || '')} 수집 · ${isBoardListLink(n.url) ? '게시판 목록에서 보기 ↗' : '원문 보기 ↗'}</p>
+      <p class="sch-name">${esc(unent(n.title))}</p>
+      ${n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? `<p class="sch-provider">${esc(unent(n.deadlineHint))}</p>` : ''}
+      <p class="sch-provider">${(n.attachments || []).length ? `첨부 ${(n.attachments || []).length}개 · ` : ''}${esc(n.foundAt || '')} 수집 · ${isBoardListLink(n.url) ? '게시판 목록에서 보기 ↗' : '원문 보기 ↗'}</p>
     </a>`).join('') + `</div>`;
 }
 
@@ -2194,7 +2397,7 @@ function renderAmountDetail(keepScroll) {
       </div>
       ${grp('합산', `${bill.added.length}건 · ${won(sum(bill.added))}`, '',
         bill.added.map((m) => amountDetailRow(m, { tone: 'on' })).join(''),
-        '합산할 공고가 아직 없습니다.')}
+        '합산할 공고가 아직 없어요')}
       ${grp('중복 수혜 불가', `${bill.onlyOne.length + bill.dropped.length}건 중 ${bill.onlyOne.length}건`,
         '함께 받을 수 없는 공고입니다. 가장 큰 1건만 합산했습니다.',
         bill.onlyOne.map((m) => amountDetailRow(m, { tone: 'on', check: true })).join('')
@@ -2204,7 +2407,7 @@ function renderAmountDetail(keepScroll) {
       ${grp('등록금 비율 환산', `${bill.estimated.length}건 · 추정`,
         '금액이 등록금 비율로만 적힌 공고입니다. 학교별 한 학기 등록금 기준 추정값이며 실제 금액과 다를 수 있습니다.',
         bill.estimated.map((m) => amountDetailRow(m, { tone: 'est', text: '약 ' + won(m.won) })).join(''),
-        '등록금 비율로 적힌 공고는 없습니다.')}
+        '등록금 비율로 적힌 공고는 없어요')}
       ${grp('금액 미확인', `${bill.unknown.length}건 · 0원`,
         '원문에 금액이 없거나 첨부파일에만 있는 공고입니다.',
         bill.unknown.length ? `<details><summary>공고 ${bill.unknown.length}건 보기</summary>
@@ -2265,7 +2468,7 @@ function bulkStart() {
   const go = picked.filter((sch) => live.has(sch.id));
   if (!go.length) {
     closeSheet();
-    toast(gone.length ? '고른 장학금 전부 그 사이 마감' : '준비 가능한 장학금 없음');
+    toast(gone.length ? '고른 장학금 전부 그 사이 마감' : '준비할 수 있는 장학금이 없어요');
     return;
   }
   const need = go.filter(bulkNeedsWork);
@@ -2283,7 +2486,7 @@ function bulkStart() {
 
 function applyAll() {
   const targets = bulkTargets();
-  if (!targets.length) { toast('준비 가능한 장학금 없음'); return; }
+  if (!targets.length) { toast('준비할 수 있는 장학금이 없어요'); return; }
   bulkPrep = { list: targets, ids: new Set(targets.map((sch) => sch.id)) };
   openSheetShell();
   renderBulkPrep();
@@ -2913,6 +3116,13 @@ function deleteApps(ids) {
   if (!removed.length) return;
   state.applications = state.applications.filter((a) => !ids.includes(a.id));
   appsSelected.clear();
+  /* 🔴 토스트의 '실행 취소'는 **한 번 지나가면 끝**이다 — 다른 화면으로 넘어가거나
+     잠깐 한눈판 사이에 사라진다. 그래서 지운 기록을 휴지통에도 함께 담는다
+     (2026-09-11 개발자 지시). 두 길은 서로를 대신하지 않는다:
+       · 토스트  = 방금 잘못 눌렀을 때 그 자리에서 되돌리기
+       · 휴지통  = 며칠 뒤에야 알아차렸을 때 찾아가 되살리기 */
+  const when = Date.now();
+  removed.forEach((r) => state.trash.push({ at: r.at, app: r.app, deletedAt: when }));
   saveState();
   /* 되돌릴 때 **원래 자리로** 넣는다 — 뒤에 붙이면 목록 순서가 바뀌어
      학생이 "지웠다 살렸더니 딴 데 가 있네" 하고 또 헷갈린다. */
@@ -2923,6 +3133,10 @@ function deleteApps(ids) {
     label: '실행 취소',
     run: () => {
       for (const r of undoBuffer) state.applications.splice(r.at, 0, r.app);
+      /* 되살린 기록은 휴지통에서 뺀다 — 안 그러면 목록에도 있고 휴지통에도 있는
+         같은 기록이 둘이 되어, 나중에 휴지통에서 또 되살리면 중복으로 들어간다. */
+      const back = new Set(undoBuffer.map((r) => r.app && r.app.id));
+      state.trash = state.trash.filter((t) => !(t.deletedAt === when && back.has(t.app && t.app.id)));
       undoBuffer = null;
       saveState();
       renderApplications();
@@ -3167,7 +3381,7 @@ function calDayHtml(iso) {
         <p class="cal-note">재단이 적어 둔 칸을 그대로 보여 줍니다 — 자격은 재단 홈페이지에서 확인하세요.</p>
         ${layer2.map((s) => calRowHtml(s, { badge: false })).join('')}
       </details>` : ''}
-    ${!mineRows && !layer1.length && !layer2.length ? '<p class="empty">이날 마감되는 공고가 없어요.</p>' : ''}`;
+    ${!mineRows && !layer1.length && !layer2.length ? '<p class="empty">이날 마감되는 공고가 없어요</p>' : ''}`;
 }
 
 /* 상세 시트에 접수 시작일·발표일을 한 줄로 (개발자 지시 4-1).
@@ -3190,7 +3404,7 @@ function renderSaved() {
   const list = savedScholarships();
   if (!list.length) {
     el.innerHTML = `<h3 class="my-card-title">보관함</h3>
-      <p class="empty">저장한 공고가 없어요.<br />공고 카드 오른쪽 위 북마크를 누르면 여기에 모입니다.</p>`;
+      <p class="empty">아직 담아 둔 장학금이 없어요<br /><span class="empty-sub">공고 카드의 북마크를 누르면 여기에 모여요</span></p><button class="btn btn-ghost btn-empty" data-go="explore">장학금 둘러보기</button>`;
     return;
   }
   const open = list.filter((s) => s.deadline && dday(s.deadline).days >= 0)
@@ -3240,7 +3454,7 @@ function renderApplications() {
   list.classList.toggle('selecting', appsSelectMode);
   list.innerHTML = apps.length
     ? apps.map(appCard).join('')
-    : '<p class="empty">아직 준비한 장학금이 없습니다.<br />홈 화면에서 한 번에 준비할 수 있습니다.</p>';
+    : '<p class="empty">아직 준비한 장학금이 없어요<br /><span class="empty-sub">공고를 고르면 서류 준비가 여기에 쌓여요</span></p><button class="btn btn-ghost btn-empty" data-go="explore">장학금 둘러보기</button>';
 
   /* 항목이 없으면 관리 장치를 통째로 숨긴다 — 빈 화면에 쓸 수 없는 버튼을 두지 않는다 */
   $('#apps-select-toggle').hidden = !apps.length;
@@ -3377,10 +3591,169 @@ function renderMy() {
     <p class="my-flags">특별자격: ${flagText}</p>
     ${learnedHtml(c)}
     <p class="my-flags">공통 서류정보(학번·연락처·계좌 등)는 이 기기에만 저장 · 서류 초안에 자동 기입.</p>`;
-  renderAccountCard();
-  renderNotifyCard();
+  /* 🔴 계정·알림은 여기서 그리지 않는다 — 설정 화면으로 옮겼다 (2026-09-11).
+     renderSettings() 가 **같은 함수**를 불러 그린다. */
   renderWallet();
   renderSaved();
+}
+
+/* ---------------- 설정 화면 (2026-09-11 · 개발자 목업 승인) ---------------- */
+function renderSettings() {
+  renderAccountCard();
+  renderNotifyCard();
+  const t = $('#btn-open-trash');
+  if (t && !t.dataset.wired) { t.dataset.wired = '1'; t.addEventListener('click', () => showScreen('trash')); }
+  const w = $('#btn-withdraw');
+  if (w && !w.dataset.wired) { w.dataset.wired = '1'; w.addEventListener('click', withdrawAccount); }
+}
+
+/* 탈퇴 — 계정 카드 안의 '탈퇴' 와 **같은 일**을 한다(서버에 저장된 내 정보 삭제).
+   🔴 지우는 것은 서버 사본뿐이고 이 기기의 프로필·신청내역은 그대로 남는다.
+      말과 다르게 굴면 안 되므로 묻는 문장에도 그렇게 적는다. */
+async function withdrawAccount() {
+  if (typeof authUser !== 'function' || !authUser()) {
+    toast('로그인한 계정이 없어요 — 지울 서버 정보가 없습니다');
+    return;
+  }
+  if (!confirm('서버에 저장된 프로필·신청내역을 지울까요?\n이 기기의 정보는 그대로 남습니다.')) return;
+  const r = await authDeleteData();
+  toast(r.ok ? '서버 정보 삭제 완료' : r.error);
+  renderSettings();
+}
+
+/* ---------------- 휴지통 (2026-09-11 · 개발자 지시 "둘 다") ----------------
+   지운 **신청내역**(state.trash)과 지운 **서류 파일**(IndexedDB 'trash')이 함께 모인다.
+   🔴 두 곳에 나눠 담는 이유: 파일은 수 MB 라 localStorage 에 들어가지 않는다.
+      화면에서만 한 목록으로 합친다 — 학생에게는 '지운 것'이 한 군데여야 한다.
+   🔴 보관 기간 30일은 이 앱의 다른 규칙(마감+30일 숨김)과 같은 값으로 맞췄다. */
+const TRASH_KEEP_DAYS = 30;
+
+/* 지운 지 30일이 지난 것을 실제로 지운다. 앱을 열 때 한 번 돈다.
+   '보관 기간이 지나면 사라진다'고 화면에 적어 둔 이상, 정말로 사라져야 한다. */
+async function trashPurgeOld() {
+  const cut = Date.now() - TRASH_KEEP_DAYS * 86400000;
+  const before = state.trash.length;
+  state.trash = state.trash.filter((t) => (t.deletedAt || 0) > cut);
+  if (state.trash.length !== before) saveState();
+  try {
+    const all = await trashTx('readonly', (st) => st.getAll());
+    for (const r of all || []) {
+      if ((r.deletedAt || 0) <= cut) await trashTx('readwrite', (st) => st.delete(r.key));
+    }
+  } catch (e) { /* 금고를 못 열면 다음 실행에서 다시 시도한다 */ }
+}
+
+/* '3일 전' 처럼 읽기 쉬운 말로. 오늘 지운 것은 '오늘'이라고 한다. */
+function trashWhen(ms) {
+  const d = Math.floor((Date.now() - (ms || 0)) / 86400000);
+  if (d <= 0) return '오늘 지움';
+  if (d === 1) return '어제 지움';
+  return `${d}일 전에 지움`;
+}
+
+async function renderTrash() {
+  const el = $('#trash-body');
+  if (!el) return;
+  await trashPurgeOld();
+
+  let docs = [];
+  try { docs = (await trashTx('readonly', (st) => st.getAll())) || []; } catch (e) { docs = []; }
+
+  const rows = [
+    ...state.trash.map((t, i) => {
+      const sch = findSch(t.app && t.app.id);
+      return {
+        at: t.deletedAt || 0,
+        kind: '신청내역',
+        /* 🔴 공고가 목록에서 내려갔으면 이름을 **지어내지 않는다** — 원칙 8-1.
+           그래도 되살릴 수는 있어야 하므로 줄은 남기고 그렇게 적는다. */
+        title: sch ? sch.name : '(목록에서 내려간 공고)',
+        restore: `app:${i}`,
+        drop: `app:${i}`,
+      };
+    }),
+    ...docs.map((d) => {
+      const slot = (typeof DOC_SLOTS !== 'undefined' ? DOC_SLOTS : []).find((x) => x.slot === d.slot);
+      return {
+        at: d.deletedAt || 0,
+        kind: '서류',
+        title: slot ? slot.label : (d.name || '서류'),
+        restore: `doc:${d.key}`,
+        drop: `doc:${d.key}`,
+      };
+    }),
+  ].sort((a, b) => b.at - a.at);
+
+  if (!rows.length) {
+    /* 🔴 목업에 없던 화면이라 이 문구는 이 세션이 지은 것이다 — 개발자 확인 대상. */
+    el.innerHTML = `<div class="my-card trash-empty">
+        <p class="trash-empty-title">휴지통이 비어 있어요</p>
+        <p class="trash-empty-sub">신청내역이나 서류를 지우면 여기에 ${TRASH_KEEP_DAYS}일 동안 남아,
+          잘못 지웠을 때 되살릴 수 있어요.</p>
+      </div>`;
+    return;
+  }
+
+  el.innerHTML = `<div class="my-card">${rows.map((r) => `
+      <div class="wallet-row">
+        <div class="wallet-info">
+          <p class="trash-title">${esc(r.title)}</p>
+          <p class="wallet-status">${esc(r.kind)} · ${esc(trashWhen(r.at))}</p>
+        </div>
+        <div class="wallet-btns">
+          <button class="wallet-btn primary" data-trash-back="${esc(r.restore)}">되살리기</button>
+          <button class="wallet-btn danger" data-trash-drop="${esc(r.drop)}">완전 삭제</button>
+        </div>
+      </div>`).join('')}</div>`;
+
+  $$('#trash-body [data-trash-back]').forEach((b) =>
+    b.addEventListener('click', () => trashRestore(b.dataset.trashBack)));
+  $$('#trash-body [data-trash-drop]').forEach((b) =>
+    b.addEventListener('click', () => trashDrop(b.dataset.trashDrop)));
+}
+
+async function trashRestore(key) {
+  const [kind, rest] = key.split(/:(.+)/);
+  if (kind === 'app') {
+    const t = state.trash[Number(rest)];
+    if (!t) return;
+    /* 지운 뒤 목록이 짧아졌을 수 있으므로 자리를 범위 안으로 눌러 넣는다.
+       (splice 는 범위를 넘으면 맨 뒤에 붙이지만, 그 동작에 기대지 않고 분명히 적는다.) */
+    const at = Math.min(Math.max(0, t.at | 0), state.applications.length);
+    state.applications.splice(at, 0, t.app);
+    state.trash.splice(Number(rest), 1);
+    saveState();
+    renderApplications();
+    renderHome();
+    toast('신청내역으로 되살렸어요');
+  } else {
+    let rec;
+    try { rec = await trashTx('readonly', (st) => st.get(rest)); } catch (e) { rec = null; }
+    if (!rec) { toast('그 파일을 찾지 못했어요'); return; }
+    /* 🔴 그 자리에 다른 파일이 있으면 **덮어쓰지 않는다** — 되살리려다 멀쩡한 서류를
+       잃는 것은 휴지통이 막으려던 바로 그 일이다. */
+    if (walletCache[rec.slot]) { toast('그 칸에 이미 다른 서류가 있어요 · 먼저 지우거나 교체해 주세요'); return; }
+    await walletTx('readwrite', (st) => st.put({
+      slot: rec.slot, name: rec.name, type: rec.type, blob: rec.blob, savedAt: rec.savedAt,
+    }));
+    await trashTx('readwrite', (st) => st.delete(rest));
+    await walletRefresh();
+    toast('서류 보관함으로 되살렸어요');
+  }
+  renderTrash();
+}
+
+async function trashDrop(key) {
+  if (!confirm('완전히 지울까요?\n이 동작은 되돌릴 수 없습니다.')) return;
+  const [kind, rest] = key.split(/:(.+)/);
+  if (kind === 'app') {
+    state.trash.splice(Number(rest), 1);
+    saveState();
+  } else {
+    try { await trashTx('readwrite', (st) => st.delete(rest)); } catch (e) { /* 없으면 그만 */ }
+  }
+  toast('완전히 지웠어요');
+  renderTrash();
 }
 
 /* 알림 설정 카드 (notify.js가 내용을 만든다) */
@@ -3702,6 +4075,15 @@ function bindEvents() {
     if (panel) panel.innerHTML = calPicked ? calDayHtml(calPicked) : '';
   });
 
+  /* 빈 상태의 '다음 동작' 단추 (2026-09-10 페이스리프트).
+     빈 화면이 "홈 화면에서 준비할 수 있습니다"처럼 **다른 데로 보내기만** 하고
+     정작 갈 단추는 없었다. 여기서 그 한 걸음을 받는다. */
+  document.addEventListener('click', (e) => {
+    const go = e.target.closest('[data-go]');
+    if (!go) return;
+    showScreen(go.dataset.go);
+  });
+
   document.addEventListener('click', (e) => {
     /* 🔴 카드를 민 직후에 오는 click은 '열기'가 아니다 — 밀었는데 상세가 열리면
        삭제 버튼을 보려던 학생이 매번 시트를 닫아야 한다. 선택 모드에서도 열지 않는다. */
@@ -3851,6 +4233,11 @@ function bindEvents() {
   /* 🔴 브라우저 confirm 을 쓰지 않는다 — 그 창은 앱이 아니라 브라우저가 만드는 것이라
      무엇이 지워지는지 목록으로 보여 줄 수 없고, 확인·취소 두 버튼밖에 못 넣는다.
      되돌릴 수 없는 동작이므로 **무엇이 사라지는지 적어 두고** 묻는다. */
+  /* 설정 화면 — MY 오른쪽 위 톱니로 들어가고, 왼쪽 위 화살표로 되돌아온다 (2026-09-11). */
+  $('#btn-open-settings').addEventListener('click', () => showScreen('settings'));
+  $('#btn-settings-back').addEventListener('click', () => showScreen('my'));
+  $('#btn-trash-back').addEventListener('click', () => showScreen('settings'));
+
   $('#btn-reset').addEventListener('click', () => {
     const pop = $('#wallet-pop');
     const bg = $('#wallet-pop-backdrop');
@@ -4266,11 +4653,16 @@ if (typeof loadFormTemplates === 'function') loadFormTemplates(); // 정식 등�
   document.addEventListener(t, (e) => e.preventDefault(), { passive: false });
 });
 
-walletRefresh().then(() => {
+/* 🔴 보관함·알림은 **늦게** 준비된다(IndexedDB·권한 확인). 준비되면 지금 보고 있는
+   화면을 다시 그려야 빈 칸이 채워진다. 알림 설정은 이제 **설정 화면**에 있으므로
+   MY 만 다시 그리면 '알림' 절이 영영 안 나온다 — 두 화면을 함께 본다. */
+function refreshOpenScreen() {
   if (!$('#screen-my').hidden) renderMy();
-});
+  if (!$('#screen-settings').hidden) renderSettings();
+}
+walletRefresh().then(refreshOpenScreen);
 if (typeof notifyInit === 'function') {
-  notifyInit().then(() => { if (!$('#screen-my').hidden) renderMy(); }).catch(() => {});
+  notifyInit().then(refreshOpenScreen).catch(() => {});
 }
 /* ── 다시 열었을 때 어디로 갈 것인가 (2026-09-09 · 노션 원문 목록 4번) ────────
    예전에는 프로필이 있으면 **늘 홈**이었다 — 탐색 탭을 보다 잠깐 나갔다 와도 홈이었고,

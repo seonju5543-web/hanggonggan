@@ -67,6 +67,23 @@ const PROFILE = {
         days: s.deadline ? dday(s.deadline).days : null }; });
   });
 
+  /* 🔴 2026-09-10 페이스리프트로 목록이 **마감 구획**으로 나뉘었다.
+     구획 순서(오늘·내일 → 이번 주 → 이번 달 → 여유 → 상시 → 기한 미확정 → 마감)는 고정이고,
+     학생이 고른 정렬은 **구획 안에서** 지켜진다. 그래서 아래 정렬 검사도 구획 안에서 잰다 —
+     전체 DOM 순서로 재면 "적합도순인데 왜 마감 임박이 위에 있냐"를 묻게 되는데,
+     그건 이제 어긋난 게 아니라 설계다. 구획 자체의 순서는 따로 검사한다. */
+  const groupKeys = () => page.evaluate(() => {
+    const find = (id) => (typeof allScholarships === 'function' ? allScholarships() : []).find((s) => s.id === id) || {};
+    return [...document.querySelectorAll('#explore-list .list-group')].map((g) => ({
+      label: (g.querySelector('.list-group-head span') || {}).textContent || '',
+      rows: [...g.querySelectorAll('.sch-card')].map((e) => {
+        const s = find(e.dataset.detail);
+        return { id: e.dataset.detail, deadline: s.deadline || null, listedAt: s.listedAt || null,
+          no: !!e.querySelector('.badge-fit-no') };
+      }),
+    }));
+  });
+
   console.log('■ 기본 상태');
   eq('버튼 라벨이 적합도순이다', await page.$eval('#explore-sort-label', (e) => e.textContent.trim()), '적합도순');
   const box = await page.$eval('#explore-sort-btn', (e) => { const r = e.getBoundingClientRect(); return { w: Math.round(r.width), h: Math.round(r.height) }; });
@@ -134,21 +151,31 @@ const PROFILE = {
   await page.click('#explore-sort-btn'); await page.waitForTimeout(300);
   await page.click('#explore-sort-menu [data-sort="listed"]'); await page.waitForTimeout(600);
   eq('라벨이 바뀐다', await page.$eval('#explore-sort-label', (e) => e.textContent.trim()), '등록 최신순');
-  rows = await orderKeys();
+  const groups = await groupKeys();
   const key = (r) => r.listedAt || r.deadline || '';
-  const withK = rows.filter((r) => key(r)).length;
-  eq('값 없는 카드가 앞으로 오지 않는다', rows.slice(0, withK).every((r) => key(r)), true);
-  eq('등록일 내림차순이다',
-    rows.slice(0, withK).every((r, i, arr) => i === 0 || key(arr[i - 1]) >= key(r)), true);
+  eq('구획 안에서 값 없는 카드가 앞으로 오지 않는다',
+    groups.every((g) => { const withK = g.rows.filter((r) => key(r)).length;
+      return g.rows.slice(0, withK).every((r) => key(r)); }), true);
+  eq('구획 안에서 등록일 내림차순이다',
+    groups.every((g) => { const withK = g.rows.filter((r) => key(r)).length;
+      return g.rows.slice(0, withK).every((r, i, arr) => i === 0 || key(arr[i - 1]) >= key(r)); }), true);
+  eq('구획이 마감 순서대로 있다 (급한 것이 위 · 마감은 맨 아래)', (() => {
+    const ORDER = ['오늘·내일 마감', '이번 주', '이번 달', '여유 있음', '상시 신청', '마감일 확인 중', '마감'];
+    const seen = groups.map((g) => g.label).filter((l) => ORDER.includes(l));
+    return seen.every((l, i, arr) => i === 0 || ORDER.indexOf(arr[i - 1]) < ORDER.indexOf(l));
+  })(), true);
 
   console.log('\n■ 적합도순 — 미달은 맨 아래 (개발자 결정)');
   await page.click('#explore-sort-btn'); await page.waitForTimeout(300);
   await page.click('#explore-sort-menu [data-sort="fit"]'); await page.waitForTimeout(600);
-  const noIdx = await page.$$eval('#explore-list .sch-card',
-    (els) => els.map((e, i) => (e.querySelector('.badge-fit-no') ? i : -1)).filter((i) => i >= 0));
-  const total = await page.$$eval('#explore-list .sch-card', (e) => e.length);
-  eq('미달 카드가 목록 끝에 모여 있다',
-    noIdx.length === 0 || noIdx[0] + noIdx.length === total, true);
+  /* 미달은 **구획 안에서** 맨 아래로 모인다 — 2026-08-26 개발자 결정("적합도를 기준으로
+     했을 때는 맨 아래에 두는 게 맞지")은 그대로고, 재는 자리만 구획 안으로 옮겼다. */
+  const fitGroups = await groupKeys();
+  eq('구획마다 미달 카드가 그 구획 끝에 모여 있다',
+    fitGroups.every((g) => {
+      const idx = g.rows.map((r, i) => (r.no ? i : -1)).filter((i) => i >= 0);
+      return idx.length === 0 || idx[0] + idx.length === g.rows.length;
+    }), true);
 
   console.log('\n■ 필터 칩과 서로 간섭하지 않는다 (.filter-chip 전역 선택 함정)');
   await page.click('.filter-chip[data-filter="교외"]'); await page.waitForTimeout(500);
@@ -156,9 +183,11 @@ const PROFILE = {
   await page.click('#explore-sort-menu [data-sort="deadline"]'); await page.waitForTimeout(600);
   eq('정렬을 바꿔도 필터 칩 active가 그대로다',
     await page.$$eval('.filter-chip.active', (e) => e.map((x) => x.dataset.filter)), ['교외']);
+  /* 🔴 2026-09-10 페이스리프트로 교내·교외가 **배지에서 기관명 줄의 글자**로 옮겨졌다
+     (한 카드에 배지가 최대 5개 붙던 것을 1개로 줄이면서). 뜻은 그대로라 재는 곳만 바꾼다. */
   eq('필터도 그대로 걸려 있다',
-    await page.$$eval('#explore-list .sch-card .badge-out, #explore-list .sch-card .badge-in',
-      (e) => [...new Set(e.map((x) => x.textContent.trim()))]), ['교외']);
+    await page.$$eval('#explore-list .sch-card .sch-org',
+      (e) => [...new Set(e.map((x) => x.textContent.split('·')[0].trim()))]), ['교외']);
 
   console.log('\nERRORS:', errors.length ? errors : 'none');
   if (errors.length) fail++;

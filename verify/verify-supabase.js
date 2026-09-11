@@ -202,6 +202,8 @@ const seedScript = (seed) => `localStorage.setItem('handaejang.v1', ${JSON.strin
     await page.reload({ waitUntil: 'domcontentloaded' });
     await settle(page);
     await page.click('.nav-item[data-nav="my"]');
+    /* 계정 카드는 MY 안쪽 **설정** 화면으로 옮겼다 (2026-09-11 개발자 목업 승인) */
+    await page.click('#btn-open-settings');
     await page.waitForTimeout(300);
     ok(await page.locator('#my-account').isHidden(), '계정 카드가 안 나온다');
     ok(await page.evaluate(() => supabaseConfigured() === false), 'supabaseConfigured()가 false');
@@ -219,6 +221,8 @@ const seedScript = (seed) => `localStorage.setItem('handaejang.v1', ${JSON.strin
     await page.reload({ waitUntil: 'domcontentloaded' });
     await settle(page);
     await page.click('.nav-item[data-nav="my"]');
+    /* 계정 카드는 MY 안쪽 **설정** 화면으로 옮겼다 (2026-09-11 개발자 목업 승인) */
+    await page.click('#btn-open-settings');
     await page.waitForTimeout(300);
     ok(await page.locator('#my-account').isVisible(), 'MY에 계정 카드가 뜬다');
     ok(await page.locator('#btn-acc-up').count() === 1, '회원가입 버튼이 있다');
@@ -333,6 +337,8 @@ const seedScript = (seed) => `localStorage.setItem('handaejang.v1', ${JSON.strin
     await page.reload({ waitUntil: 'domcontentloaded' });
     await settle(page);
     await page.click('.nav-item[data-nav="my"]');
+    /* 계정 카드는 MY 안쪽 **설정** 화면으로 옮겼다 (2026-09-11 개발자 목업 승인) */
+    await page.click('#btn-open-settings');
     await page.waitForTimeout(300);
     await page.click('#btn-acc-in');
     await page.waitForSelector('#btn-auth-go');

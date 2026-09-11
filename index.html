@@ -16,6 +16,12 @@
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link rel="manifest" href="manifest.json" />
+  <!-- 서체 — **Pretendard 하나다** (2026-09-11 개발자 지시로 되돌림)
+       🔴 2026-09-10 페이스리프트가 SUIT(본문)·SUITE(제목) 두 벌로 바꿨는데, 개발자가
+          배포된 앱을 보고 "폰트 바뀌었어 예전으로 돌리고"라고 지시해 되돌렸다.
+          SUIT·SUITE 를 다시 싣지 말 것 — 되돌리라는 지시가 이 두 줄을 두고 한 말이다.
+       🔴 글자 크기도 함께 예전 척도로 되돌렸다(style.css --t-*). 서체만 되돌리면
+          본문 17px 이 그대로 남아 "여전히 크다"가 된다 — 둘은 한 세트다. -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -321,7 +327,7 @@
       </header>
 
       <div class="hero-card">
-        <p class="hero-label">지금 받을 수 있는 장학금</p>
+        <p class="hero-label" id="hero-label">지금 신청할 수 있는 장학금</p>
         <p class="hero-amount tappable" id="hero-amount" role="button" tabindex="0" aria-label="금액 상세 보기">0원</p>
         <p class="hero-count" id="hero-count"></p>
         <button class="btn btn-white btn-lg" id="btn-apply-all">신청 준비</button>
@@ -407,10 +413,16 @@
 
     <!-- ============ MY ============ -->
     <section id="screen-my" class="screen" hidden>
-      <header class="page-header"><h2>MY</h2></header>
+      <!-- 🔴 오른쪽 위 톱니 = 설정 화면 (2026-09-11 개발자 지시 · 목업 승인).
+           계정·알림 카드는 여기서 **빼서** 설정 화면으로 옮겼다 — 같은 스위치가 두 곳에
+           보이면 어느 쪽이 진짜인지 알 수 없다(개발자가 '뺀다'로 결정). -->
+      <header class="page-header page-header-row">
+        <h2>MY</h2>
+        <button class="icon-btn" id="btn-open-settings" aria-label="설정" title="설정">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.9 19.3a1.7 1.7 0 0 0-1.88.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.7 15a1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.7 8.9a1.7 1.7 0 0 0-.34-1.88l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.7a1.7 1.7 0 0 0 1.03-1.56V3a2 2 0 1 1 4 0v.09A1.7 1.7 0 0 0 15 4.7a1.7 1.7 0 0 0 1.88-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.3 9v.01a1.7 1.7 0 0 0 1.56 1.02H21a2 2 0 1 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15z"/></svg>
+        </button>
+      </header>
       <div id="my-profile" class="my-card tappable" role="button" tabindex="0" aria-label="프로필 수정"></div>
-      <div id="my-account" class="my-card" hidden></div>
-      <div id="my-notify" class="my-card" hidden></div>
       <div id="my-wallet" class="my-card"></div>
       <!-- 보관함 — 저장(북마크)한 공고. app.js renderSaved()가 채운다 (2026-09-07) -->
       <div id="my-saved" class="my-card"></div>
@@ -423,6 +435,46 @@
         <button class="my-danger-line" id="btn-reset">데이터 초기화</button>
       </div>
       <p class="data-note">한대장 v0.3 (MVP) · 전국 대학 지원</p>
+    </section>
+
+    <!-- ============ 설정 (2026-09-11 · 개발자 목업 승인) ============
+         승인받은 화면 = ① 뒤로 + '설정' ② 계정(로그인/회원가입) ③ 알림(상태줄 + 켜기 + 스위치 5개).
+         ④ 휴지통·이용약관·탈퇴는 같은 지시에서 개발자가 말로 덧붙인 것이라 목록으로 뒀다.
+         🔴 계정·알림의 내용은 **MY 가 쓰던 함수 그대로**다(renderAccountCard·notifySettingsHtml).
+            베끼면 두 화면이 다른 말을 하게 된다 — 이 저장소가 반복해 겪은 사고다. -->
+    <section id="screen-settings" class="screen" hidden>
+      <header class="sub-header">
+        <button class="sub-back" id="btn-settings-back" aria-label="뒤로">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <h2>설정</h2>
+      </header>
+      <!-- 🔴 id 를 그대로 둔다 (my-account · my-notify). 자리만 MY 에서 여기로 옮겼다 —
+           이 이름에 붙은 style.css 규칙(절 제목 21px·위 짧은 막대·줄 간격)과 app.js 동작이
+           이미 있어서, 이름을 바꾸면 그 규칙이 전부 떨어져 나가고 화면이 달라진다. -->
+      <div id="my-account" class="my-card" hidden></div>
+      <div id="my-notify" class="my-card" hidden></div>
+      <div class="my-menu set-menu">
+        <button class="my-menu-item" id="btn-open-trash">휴지통</button>
+        <!-- 🔴 새 탭으로 열지 않는다 — 약관 화면 왼쪽 위 화살표로 되돌아오기 때문이다
+             (새 탭이면 그 화살표가 앱을 한 벌 더 띄운다). 2026-09-11 개발자 지시. -->
+        <a class="my-menu-item" href="terms.html">이용약관 · 개인정보처리방침</a>
+        <button class="my-menu-item danger" id="btn-withdraw">탈퇴</button>
+      </div>
+    </section>
+
+    <!-- ============ 휴지통 (2026-09-11) ============
+         지운 신청내역과 지운 서류 파일이 30일 동안 여기 남는다(개발자가 '둘 다'로 결정).
+         🔴 목업에 없던 화면이라 문구는 이 세션이 지은 것 — 개발자 확인 대상. -->
+    <section id="screen-trash" class="screen" hidden>
+      <header class="sub-header">
+        <button class="sub-back" id="btn-trash-back" aria-label="뒤로">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <h2>휴지통</h2>
+      </header>
+      <p class="set-note">지운 지 30일이 지나면 자동으로 완전히 사라져요.</p>
+      <div id="trash-body"></div>
     </section>
 
     <!-- ============ 하단 내비게이션 ============ -->

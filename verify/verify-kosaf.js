@@ -173,8 +173,12 @@ const PROFILE = {
   eq('카드와 상세가 같은 적합도를 말한다', await page.evaluate(async () => {
     const card = document.querySelector('#explore-list [data-detail^="kosaf-"]');
     if (!card) return 'no-card';
+    /* 🔴 2026-09-10 페이스리프트: 카드의 적합도는 알약(.badge-fit)이 아니라 **글자**(.sch-fit)다.
+       상세 시트는 알약 그대로다(거기서는 '요건 n개 중 m개 충족'까지 함께 말한다).
+       재는 뜻은 그대로 — **판정 갈래와 퍼센트가 카드·상세에서 갈리지 않는다.**
+       ⚠️ .sch-fit 을 안 넣으면 카드가 'none' 으로 읽혀 멀쩡한 화면이 빨간불이 된다(실제로 그랬다). */
     const read = (root) => {
-      const el = root.querySelector('.badge-fit, .badge-fit-unknown, .badge-fit-no');
+      const el = root.querySelector('.sch-fit, .badge-fit, .badge-fit-unknown, .badge-fit-no');
       if (!el) return { kind: 'none', pct: null };
       const t = el.textContent.replace(/\s+/g, ' ').trim();
       const kind = el.className.includes('badge-fit-no') ? 'no'

@@ -115,7 +115,10 @@ async function onboard(page) {
     ok(await page.isHidden('#notify-sheet'), '새로고침해도 동의 시트가 다시 뜨지 않음 (최초 1회)');
 
     // MY 화면 설정
+    /* 알림 설정은 MY 안쪽 **설정 화면**으로 옮겼다 (2026-09-11 개발자 목업 승인).
+       MY 에서 톱니를 눌러야 나온다 — 예전처럼 MY 에서 바로 찾으면 영영 안 뜬다. */
     await page.click('.nav-item[data-nav="my"]');
+    await page.click('#btn-open-settings');
     await page.waitForSelector('#my-notify:not([hidden])');
     const status = await page.textContent('#my-notify .nf-status');
     /* 문구가 '켜지 않았어요' → '아직 켜지 않음' 으로 바뀌었다. 지키는 것은 표현이 아니라
@@ -296,6 +299,7 @@ async function onboard(page) {
   // ⑥ 항목별 설정 저장 · 실제 차단
   console.log('\n  [설정] 항목별 켜기/끄기');
   await page.click('.nav-item[data-nav="my"]');
+  await page.click('#btn-open-settings');
   await page.waitForSelector('#my-notify:not([hidden])');
   const prefCount = await page.$$eval('.nf-switch', (els) => els.length);
   ok(prefCount === 5, '알림 종류 5가지를 개별로 켜고 끌 수 있음', prefCount);
@@ -308,6 +312,7 @@ async function onboard(page) {
   await page.reload({ waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(2500);
   await page.click('.nav-item[data-nav="my"]');
+  await page.click('#btn-open-settings');
   await page.waitForSelector('#my-notify:not([hidden])');
   const persisted = await page.isChecked('[data-nf-pref="deadline"]');
   ok(persisted === false, '끈 설정이 새로고침 후에도 유지됨');

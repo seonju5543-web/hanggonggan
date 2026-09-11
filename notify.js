@@ -248,7 +248,7 @@ function openNotifyInbox() {
         <span class="nf-time">${notifyTimeText(it.ts)}</span>
       </span>
     </button>`).join('')
-    : `<p class="empty">받은 알림 없음<br />새 공고가 등록되거나 마감이 다가오면 여기에 쌓여요.</p>`;
+    : `<p class="empty">받은 알림이 없어요<br /><span class="empty-sub">새 공고가 등록되거나 마감이 다가오면 여기에 쌓여요</span></p>`;
 
   openNotifyPanel(`
     <div class="nf-head">
@@ -267,7 +267,7 @@ function openNotifyInbox() {
     notifyRenderBadge();
     openNotifyInbox();
   });
-  $('#btn-nf-settings').addEventListener('click', () => { closeNotifyPanel(); showScreen('my'); setTimeout(() => { const el = $('#my-notify'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 120); });
+  $('#btn-nf-settings').addEventListener('click', () => { closeNotifyPanel(); showScreen('settings'); setTimeout(() => { const el = $('#my-notify'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 120); });
 
   $$('[data-nf-open]').forEach((btn) => btn.addEventListener('click', async () => {
     const item = items.find((i) => i.key === btn.dataset.nfOpen);
@@ -423,7 +423,7 @@ function bindNotifySettings() {
   { const e = $('#btn-nf-inbox'); if (e) e.addEventListener('click', openNotifyInbox); }
   if ($('#btn-nf-recheck')) $('#btn-nf-recheck').addEventListener('click', async () => {
     const n = await notifyCheck({ quiet: true });
-    toast(n ? `새 알림 ${n}건` : '새로 온 알림이 없습니다');
+    toast(n ? `새 알림 ${n}건` : '새로 온 알림이 없어요');
   });
   if ($('#btn-nf-test')) $('#btn-nf-test').addEventListener('click', async () => {
     const ev = {

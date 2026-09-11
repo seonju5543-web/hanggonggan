@@ -201,7 +201,10 @@ async function seed(page) {
     liveNotices = { items: [], updatedAt: null }; renderExplore();   // 받았는데 빈손
     const after = {
       skeleton: !!read().querySelector('.skel-list'),
-      empty: /없음/.test(read().textContent),
+      /* 🔴 2026-09-10 페이스리프트로 빈 상태 말투를 '없어요' 하나로 모았다
+         (같은 '없다'를 없음/없어요/없습니다 세 가지로 말하고 있었다).
+         재는 뜻은 그대로다 — **빈손으로 끝났으면 '없다'고 말한다**(뼈대가 굳지 않는다). */
+      empty: /없어요|없음/.test(read().textContent),
     };
 
     liveNotices = keep; renderExplore();
