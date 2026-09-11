@@ -36,7 +36,7 @@
        '걷힘 움직임' 절)과 같은 값. ① 접힘: 글자가 내려앉고 로고가 가로로만 눌려 12px 막대가
        된다 ② 열림: 막대 자리에 폭 0 구멍이 뚫려 화면 전체까지 커진다 — 막대가 그대로 창이 된다.
        시안에서는 1초 뒤 걷히고 3초마다 되풀이한다(앱은 한 번). */
-    .m-cover { --boot-fold: 260ms; --boot-open: 420ms; --boot-hx: 195px; --boot-hy: 394px; }
+    .m-cover { --boot-fold: 260ms; --boot-hold: 60ms; --boot-open: 420ms; --boot-hx: 195px; --boot-hy: 394px; }
     .m-cover.m-fold .m-word { animation: boot-fold-word 0.18s ease both; }
     .m-cover.m-fold .m-logo { animation: boot-fold-logo var(--boot-fold) cubic-bezier(0.5, 0, 0.2, 1) both; }
     .m-cover.m-fold .m-logo svg { animation: boot-fold-glyph 0.1s ease both; }
@@ -58,7 +58,7 @@
     @media (prefers-reduced-motion: reduce) {
       .m-logo, .m-word { animation: none; }
       .m-spin { animation: none; opacity: 1; }
-      .m-cover { --boot-fold: 0ms; --boot-open: 0ms; }
+      .m-cover { --boot-fold: 0ms; --boot-hold: 0ms; --boot-open: 0ms; }
       .m-cover.m-fold .m-logo, .m-cover.m-fold .m-word, .m-cover.m-fold .m-logo svg { animation: none; }
       .m-cover.m-fold, .m-cover.m-open { clip-path: none; transition: none; }
       .m-cover.m-open { opacity: 0; }
@@ -94,14 +94,19 @@
 
 </div>
 <script>
-  /* 걷힘을 되풀이해 보여 준다 — 앱은 한 번만 한다. 1초(바닥값) → 접힘 → 60ms 쉼 → 열림 */
+  /* 걷힘을 되풀이해 보여 준다 — 앱은 한 번만 한다. 1초(바닥값) → 접힘 → 쉼 → 열림.
+     시간은 boot.js 처럼 CSS 에서 읽는다 — 숫자를 여기 적으면 위 값을 고칠 때 어긋난다. */
   (function () {
     var c = document.querySelector('.m-cover'); if (!c) return;
+    var ms = function (name) {
+      var v = String(getComputedStyle(c).getPropertyValue(name) || '').trim();
+      var n = parseFloat(v) || 0; return /[^m]s$/.test(v) ? n * 1000 : n;
+    };
     function cycle() {
       c.classList.remove('m-fold', 'm-open'); c.style.opacity = '';
       setTimeout(function () {
         c.classList.add('m-fold');
-        setTimeout(function () { c.classList.add('m-open'); }, 260 + 60);
+        setTimeout(function () { c.classList.add('m-open'); }, ms('--boot-fold') + ms('--boot-hold'));
       }, 1000);
     }
     cycle(); setInterval(cycle, 3400);

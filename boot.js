@@ -16,8 +16,9 @@
 (function () {
   var BOOT_TIMEOUT_MS = 6000;
   /* 🔴 **최소로 보여 주는 시간 = 1초** (2026-09-09 개발자 지시: "페이드까지 포함하면 최소
-     1초는 머물러 있어야 하는데 아주 잠깐 표시되고 사라져"). 페이드 120ms 를 더해 총 1.12초 —
-     눈에 '깜빡였다'가 아니라 '봤다'로 남는 길이다.
+     1초는 머물러 있어야 하는데 아주 잠깐 표시되고 사라져"). 그 뒤에 걷힘(접힘·쉼·열림 0.74초 —
+     style.css `--boot-fold/--boot-hold/--boot-open`)이 붙는다. 눈에 '깜빡였다'가 아니라
+     '봤다'로 남는 길이다.
      바닥값이 없던 시절에는 떠 있는 시간이 **앱 코드가 실리는 데 걸린 시간 그대로**여서,
      캐시가 데워진 폰에서는 눈에 안 보일 만큼 짧았다(개발자가 그걸 겪고 지적했다).
      ⚠️ 이 값을 고치면 시안(docs/designs/mockups/first-run/Main.dc.html)도 **같이** 고쳐야 한다.
@@ -86,9 +87,12 @@
       var msOf = function (name) {
         var v = String(style.getPropertyValue(name) || '').trim();
         var n = parseFloat(v) || 0;
-        return /ms$/.test(v) ? n : n * 1000;
+        /* 초 단위(`0.26s`)만 1000배 한다. ⚠️ 단위 없는 값은 ms 로 본다 — `s$` 만 보면 `260` 이
+           260초가 되어 덮개가 4분 넘게 남는다. 못 읽으면(`''`) 0 이라 곧바로 걷힌다. */
+        return /[^m]s$/.test(v) ? n * 1000 : n;
       };
       var foldMs = msOf('--boot-fold');
+      var holdMs = msOf('--boot-hold');
       var openMs = msOf('--boot-open');
       /* 열리는 자리는 로고의 **실제** 위치 — 로고는 화면 정중앙이 아니다(밑에 글자가 있다).
          가로로만 눌리므로 중심은 접힌 뒤에도 그대로다. */
@@ -99,12 +103,13 @@
         el.style.setProperty('--boot-hy', (r.top + r.height / 2) + 'px');
       }
       el.classList.add('boot-fold');
-      /* 접힌 막대를 아주 잠깐(60ms) 세워 둔다 — 참고 영상도 막대에서 한 박자 쉰다.
-         쉼이 없으면 접힘과 열림이 한 동작으로 뭉개져 '막대가 창이 된다'가 안 보인다. */
+      /* 접힌 막대를 아주 잠깐(`--boot-hold`) 세워 둔다 — 참고 영상도 막대에서 한 박자 쉰다.
+         쉼이 없으면 접힘과 열림이 한 동작으로 뭉개져 '막대가 창이 된다'가 안 보인다.
+         🔴 쉼의 길이도 CSS 에서 읽는다 — 여기 숫자로 두면 관문이 세 단계 합을 못 잰다. */
       setTimeout(function () {
         el.classList.add('boot-open');
         setTimeout(function () { el.hidden = true; }, openMs + 20);
-      }, foldMs + 60);
+      }, foldMs + holdMs);
     }, wait);
   };
 })();

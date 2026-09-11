@@ -3490,6 +3490,7 @@ button, input, select, textarea { letter-spacing: inherit; }
   /* 걷힘 두 단계의 길이 — boot.js 가 **이 두 값을 읽어** 단계를 넘긴다.
      숫자를 JS 에도 적으면 한쪽만 고쳐져 조용히 어긋난다(아래 '걷힘 움직임' 절). */
   --boot-fold: 260ms;
+  --boot-hold: 60ms;    /* 접힌 막대에서 쉬는 한 박자 — 참고 영상도 막대에서 쉰다 */
   --boot-open: 420ms;
   /* 접힌 막대의 중심. boot.js 가 걷기 직전 로고의 실제 위치를 재어 px 로 채운다 —
      로고는 화면 한가운데가 아니다(밑에 글자가 있어 28px 위). 안 재면 막대와 열리는
@@ -3558,8 +3559,9 @@ button, input, select, textarea { letter-spacing: inherit; }
       구멍이 막대 폭(12px)을 넘는 순간 막대가 그대로 창이 된다. 앱 화면은 그 밑에
       이미 그려져 있다(app.js 가 화면을 정한 뒤에야 bootDone 을 부른다).
       곡선은 ease-in-out — 처음은 천천히(창이 열리는 느낌), 끝은 빠르게 사라진다.
-   🔴 두 단계 합이 0.68초다. 늘리지 말 것 — 바닥값 1초 뒤에 붙는 시간이라 그대로 앱이
+   🔴 접힘+쉼+열림 합이 0.74초다. 늘리지 말 것 — 바닥값 1초 뒤에 붙는 시간이라 그대로 앱이
       느려 보인다(설계 문서 ① 절의 "페이드 120ms — 길면 앱이 느려 보인다"와 같은 이유).
+      쉼(--boot-hold)도 여기 CSS 에 있어야 관문이 셋을 합쳐 잰다(JS 에 숫자로 두면 빠진다).
    🔴 시안 `docs/designs/mockups/first-run/Boot.dc.html` 과 값이 같아야 한다 —
       관문 `test-collector.mjs` '첫 실행 화면' 절 ⑩. */
 /* 🔴 접힘은 transition 이 아니라 **keyframes 애니메이션**이다 — 등장 애니메이션(`both`)이
@@ -3589,7 +3591,9 @@ button, input, select, textarea { letter-spacing: inherit; }
     var(--boot-hx) calc(var(--boot-hy) - 44px));
 }
 #boot.boot-open {
-  pointer-events: none;
+  /* ⚠️ `pointer-events: none` 을 두지 말 것 — 구멍 밖(아직 덮인 곳)을 누르면 밑의 보이지 않는
+     버튼이 눌린다. clip-path 는 잘라낸 영역의 터치도 같이 통과시키므로, 그냥 두면 덮인 곳은
+     덮개가 받고 열린 곳은 앱이 받는다(맞는 동작). */
   /* 구멍이 화면을 조금 넘게(-5%~105%) 커져야 끝에 테두리가 안 남는다 */
   clip-path: polygon(evenodd,
     0 0, 100% 0, 100% 100%, 0 100%, 0 0,
@@ -3601,9 +3605,10 @@ button, input, select, textarea { letter-spacing: inherit; }
    아직 좁을 때 막대가 먼저 사라져 '막대가 없어졌다가 옆에서 구멍이 난다'로 보인다(실측). */
 
 /* 오래 걸릴 때만 나오는 표시.
-   🔴 **바닥값(1초)이 지난 뒤에 나타난다**(1.2초). 앱이 제때 오면 화면이 1.12초에 걷히므로
-      학생은 이걸 아예 못 본다 — 그게 맞다. 이게 보인다는 것은 '평소보다 오래 걸린다'는 뜻이고,
-      그 말이 사실일 때만 해야 한다. 처음부터 띄우면 빠른 기기에서도 매번 '기다리는 화면'이 된다. */
+   🔴 **바닥값(1초)이 지난 뒤에 나타난다**(1.2초). 앱이 제때 오면 1초에 걷히기 시작하고 그
+      순간 `.boot-fold` 가 이 표시를 끄므로 학생은 이걸 아예 못 본다 — 그게 맞다. 이게 보인다는
+      것은 '평소보다 오래 걸린다'는 뜻이고, 그 말이 사실일 때만 해야 한다. 처음부터 띄우면
+      빠른 기기에서도 매번 '기다리는 화면'이 된다. */
 .boot-spin {
   position: absolute; bottom: 92px;
   width: 26px; height: 26px;
@@ -3633,8 +3638,8 @@ button, input, select, textarea { letter-spacing: inherit; }
 @media (prefers-reduced-motion: reduce) {
   .boot-logo, .boot-word { animation: none; }
   .boot-spin { animation: none; opacity: 1; }
-  /* 걷힘도 접지 않고 열지 않는다 — 그냥 사라진다. 길이 0 이면 boot.js 도 곧바로 넘긴다 */
-  #boot { --boot-fold: 0ms; --boot-open: 0ms; }
+  /* 걷힘도 접지 않고 열지 않는다 — 그냥 사라진다. 셋 다 0 이면 boot.js 도 곧바로 넘긴다 */
+  #boot { --boot-fold: 0ms; --boot-hold: 0ms; --boot-open: 0ms; }
   #boot.boot-fold .boot-logo, #boot.boot-fold .boot-word, #boot.boot-fold .boot-logo svg { animation: none; }
   #boot.boot-fold, #boot.boot-open { clip-path: none; transition: none; }
   #boot.boot-open { opacity: 0; }
