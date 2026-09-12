@@ -2139,11 +2139,16 @@ const KOSAF_ELIG = ['특정자격', '성적기준', '소득기준', '지역거�
 /* 🔴 재단이 쓴 글에는 `○`·`ㅇ`·`※` 같은 **머리 기호**가 그대로 들어 있다. 뜻이 아니라
    서식이므로 화면에서는 떼어낸다(문장 자체는 한 글자도 바꾸지 않는다).
    개발자 지적: "동그라미 기호니 … 너무 원문 그대로 가져오는 거 아니야?" */
-const kosafClean = (t) => String(t || '').replace(/[○ㅇ●◦※]/g, ' ').replace(/\s+/g, ' ').trim();
+/* 🔴 머리 기호는 **머리 자리에 있을 때만** 뗀다 (2026-09-12 코드 리뷰).
+   `ㅇ` 은 한글 자모라 그냥 지우면 낱말 속 글자를 지운다 — 한국장학재단 원본에는 실제로
+   떨어져 나온 자모가 섞여 있어(실측 7곳), 그걸 지우면 `LG스플레이` 처럼 **다르게 틀린**
+   글자가 된다. 지우는 것도 지어내는 것과 같다(원칙 8-1). */
+const kosafClean = (t) => String(t || '').replace(/(^|\s)[○ㅇ●◦※]+/g, '$1').replace(/\s+/g, ' ').trim();
 
 /* 카드·시트에 보이는 **혜택 한 줄**. 원문 문단을 통째로 띄우지 않는다 —
    금액은 이미 parse-amount 가 읽어 뒀으니 그 숫자로 짧게 말하고, 조건은 상세 칸에서 본다.
    개발자 지적: "받을 수 있는 혜택만 간편하게 적어놔야지 원문 그대로 배껴놨네." */
+const KOSAF_AMOUNT_UNKNOWN = '금액은 재단 홈페이지에서 확인';
 function kosafAmountLabel(spec) {
   if (spec && spec.kind === 'fixed' && spec.value) return `최대 ${won(spec.value)}`;
   if (spec && spec.kind === 'range' && spec.max) {
@@ -2164,7 +2169,7 @@ function kosafAmountLabel(spec) {
         원문은 버리지 않고 상세 시트에 '재단이 적어 둔 것'으로 그대로 남긴다(원칙 8-1).
      ⚠️ 여기서 원문을 다듬어 보여 주려 하지 말 것 — 지우면 `LG스플레이` 처럼 **다르게 틀린**
         글자가 되고, 그건 지어낸 것과 같다. */
-  return '금액은 재단 홈페이지에서 확인';
+  return KOSAF_AMOUNT_UNKNOWN;
 }
 function kosafAsScholarships() {
   return kosafList
@@ -2197,7 +2202,9 @@ function kosafAsScholarships() {
         amount: kosafAmountLabel(aSpec),
         /* 금액을 못 읽었을 때만 원문을 함께 넘긴다 — 상세 시트에서 '재단이 적어 둔 것'으로 보여 준다.
            읽은 경우에는 카드 문구가 이미 그 숫자라 두 번 말할 뿐이다. */
-        ...((aSpec && (aSpec.kind === 'fixed' || aSpec.kind === 'range' || aSpec.kind === 'ratio'))
+        /* 🔴 조건을 **라벨과 같은 식으로** 쓴다 — 따로 적었다가 `{kind:'fixed', value:0}`
+           에서 라벨은 폴백인데 원문은 버려지는 어긋남이 있었다(2026-09-12 코드 리뷰). */
+        ...(kosafAmountLabel(aSpec) !== KOSAF_AMOUNT_UNKNOWN && kosafClean(f['지원금액'])
           ? {} : (kosafClean(f['지원금액']) ? { amountNote: kosafClean(f['지원금액']) } : {})),
         /* 🔴 금액은 **손으로 박지 않는다** — `parse-amount.js` 한 곳을 그대로 통과시킨다
            (2026-08-30 개발자 지적). 처음엔 amountValue 를 0 으로 박아 뒀는데, 그러면
@@ -2735,7 +2742,12 @@ function openDetail(id) {
   const judged = result.reasons.filter((r) => !isScopeOk(r));
 
   const checkRows = judged.map((r) => {
-    const bad = /필요|아니에요|가능$/.test(r) && !/충족|확인/.test(r);
+    /* 🔴 `미달`을 빠뜨려 **미달 근거 줄에 초록 ✓ 가 붙어 있었다** (2026-09-12 코드 리뷰).
+       `공고에 적힌 요건에 미달해요: …` 가 '필요·아니에요·가능' 중 어디에도 안 걸려
+       충족으로 그려졌다 — 화면이 스스로 모순된 말을 한 것이다.
+       ⚠️ `!/충족|확인/` 이 뒤에 있어 '확인'이 든 미달 줄은 여전히 ✓ 가 된다 — 그건
+          '확인 필요'(모름)를 ✓ 로 두지 않으려던 장치라, 미달을 먼저 본다. */
+    const bad = /미달/.test(r) || (/필요|아니에요|가능$/.test(r) && !/충족|확인/.test(r));
     return `<li class="${bad ? 'r-bad' : 'r-ok'}">${bad ? '✕' : '✓'} ${esc(r)}</li>`;
   }).join('')
     + result.missing.map((m) => `<li class="r-unk">? ${esc(m)} 정보를 입력하면 정확히 판단할 수 있습니다</li>`).join('');

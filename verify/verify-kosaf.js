@@ -165,9 +165,23 @@ const PROFILE = {
         띄우지 않는 것**이 우리가 할 수 있는 일이고, 원문은 버리지 않고 상세에 남긴다.
      ⚠️ 재단 이름·사업명은 여기서 검사하지 않는다 — 그건 원문 그대로 써야 하는 자리라
         오타가 와도 우리가 손댈 수 없다(관문으로 만들면 고칠 수 없는 빨간불이 된다). */
+  /* 🔴 **오늘 데이터에 기대지 않는다** — 지금은 못 읽는 금액이 8곳이지만, 월·목 수확에서
+     전부 읽히는 날이 오면 아래 '원문을 상세로 내린다' 가 앱은 멀쩡한데 빨간불이 된다.
+     그래서 읽을 수 없는 금액을 가진 재단을 하나 심어 둔다(verify-explore-sort 와 같은 방식). */
+  await page.evaluate(() => {
+    kosafList = kosafList.concat([{ code: 'fixture-amt', org: '검사용재단', name: '검사용 장학금',
+      kind: '기타', due: null, home: 'https://example.org',
+      fields: { 지원금액: '○ 예산범위 내에서 이사회에서 결정한 금액', 신청기간: '○ 상시' } }]);
+    renderExplore();
+  });
+  await page.waitForTimeout(300);
   const amt = await page.evaluate(() => {
     const ks = allScholarships().filter((s) => s.sourceKind === 'kosaf');
-    const OK = /^(최대 |등록금의 \d+%$|[\d,]+원 ~ )|^금액은 재단 홈페이지에서 확인$/;
+    /* 🔴 라벨 모양을 **앱이 실제로 쓰는 꼴 그대로** 적는다 — 처음엔 `[\d,]+원 ~` 로 적었다가
+       `won()` 이 만 단위를 `200만원` 으로 쓰는 것을 놓쳐, 범위형이 하나라도 들어오는 날
+       멀쩡한 화면이 빨간불이 될 뻔했다(2026-09-12 코드 리뷰). 끝도 묶는다 —
+       안 묶으면 `최대 400만원 범위 내에서 이사회 결정` 같은 원문 문단이 그대로 통과한다. */
+    const OK = /^최대 [\d,]+(만|억)?원$|^[\d,]+(만|억)?원 ~ [\d,]+(만|억)?원$|^등록금의 \d+%$|^금액은 재단 홈페이지에서 확인$/;
     const bad = ks.filter((s) => !OK.test(s.amount));
     const fallback = ks.filter((s) => s.amount === '금액은 재단 홈페이지에서 확인');
     return { n: ks.length, bad: bad.map((s) => s.amount).slice(0, 5),
@@ -187,6 +201,21 @@ const PROFILE = {
     const t = document.querySelector('#detail-sheet').innerText;
     return t.includes('재단이 적어 둔 지원금액') ? 'shown' : 'missing';
   }), 'shown');
+  /* 🔴 **미달 근거 줄에 초록 ✓ 가 붙어 있었다** (2026-09-12 코드 리뷰가 화면에서 잡았다).
+     `공고에 적힌 요건에 미달해요: …` 가 ✕ 판정 낱말 어디에도 안 걸려 충족으로 그려졌다 —
+     배지는 '지원 자격 미달'인데 그 아래 근거에는 ✓ 라, 화면이 스스로 모순된 말을 했다.
+     ⚠️ 데이터(`fails`)만 보는 검사로는 못 잡는다 — **그려진 줄의 클래스**를 본다. */
+  eq('미달 근거 줄은 ✕ 로 그린다 (배지와 같은 말을 한다)', await page.evaluate(async () => {
+    const s = allScholarships().find((x) => (fitDetail(x, state.profile).fails || []).length);
+    if (!s) return 'no-item';
+    openDetail(s.id);
+    await new Promise((r) => setTimeout(r, 250));
+    const li = [...document.querySelectorAll('#detail-sheet .reason-list li')]
+      .find((e) => /미달해요/.test(e.textContent));
+    if (!li) return 'no-line';
+    return li.className.includes('r-bad') && li.textContent.trim().startsWith('✕') ? 'bad' : `wrong:${li.className}`;
+  }), 'bad');
+
   /* 🔴 바로 위에서 "신청서 작성은 지원하지 않아요"라고 해 놓고 아래에서
      "앱에서 바로 작성할 수 있어요"가 같이 떠 있었다 — 한 시트 안에서 말이 엇갈렸다. */
   eq('  같은 시트 안에서 말이 엇갈리지 않는다', clean.contradiction, false);

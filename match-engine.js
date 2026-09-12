@@ -473,9 +473,23 @@ function fitDetail(sch, p) {
         `학사 : 학비보조금 / 석사 : …` 로 둘 다 받는 공고가 미달이 되면 그게 틀린 미달이다. */
   /* ⚠️ **원문 줄에서 본다** — `requirementLines` 가 대학원 줄을 이미 버린 뒤라
      그 결과에서 찾으면 영영 안 걸린다. 처음에 그렇게 짰다가 브라우저로 재서 잡았다. */
-  const gradLines = lines.filter((t) => PR.gradTarget && PR.gradTarget(t) === 'body');
+  /* 🔴 **막기 전에 두 가지를 먼저 뺀다** (2026-09-12 코드 리뷰가 실측으로 잡았다).
+     벌은 무거워졌는데(35% 카드 → 미달·버튼 잠김·홈에서 사라짐) 집는 규칙은 그대로라,
+     아래 두 모양에서 **틀린 미달**이 났다. 층2는 월·목에 사람 손 없이 새로 들어온다:
+     ① **뜻이 반대인 줄** — `대학원 재학생은 지원할 수 없음` 은 이 장학금이 학부생 것이라는
+        말인데, 그 줄로 학부생을 떨어뜨리고 근거랍시고 그 줄을 보여 줬다.
+     ② **여러 장학금이 묶인 공고** — `(연구장학금) 대학원 석/박사 과정 재학생` 한 줄 때문에
+        같은 공고의 `(우수장학금) 평점 3.0 이상` 이 통째로 막혔다. 이 저장소에 이미 있는
+        규칙(설계 조건 ⑧ · `MULTI_PROGRAM`)이 아래쪽에만 있어 이 갈래는 지나쳐 갔다. */
+  /* ⚠️ `EXCLUDE_LINE` 만으로는 부족하다 — `대학원 재학생은 지원할 수 없음` 을 안 잡는다(실측).
+     그래서 **줄 끝의 배제 말**을 한 번 더 본다. 넓게 봐서 생기는 결과는 '막지 않는 것'뿐이라
+     안전한 방향이다(틀린 미달이 못 받는 것보다 나쁘다 — 이 저장소의 오랜 기준). */
+  const NOT_TARGET = /(제외|불가(능)?|할\s*수\s*없(음|습니다)?|아님)\s*[.)\]]?\s*$/;
+  const gradLines = lines.filter((t) => PR.gradTarget && PR.gradTarget(t) === 'body'
+    && !EXCLUDE_LINE.test(t) && !NOT_TARGET.test(t));
   const anyUndergrad = lines.some((t) => PR.mentionsUndergrad && PR.mentionsUndergrad(t));
-  if (gradLines.length && !anyUndergrad) {
+  const bundled = lines.some((t) => PR.MULTI_PROGRAM.test(t));
+  if (gradLines.length && !anyUndergrad && !bundled) {
     return { pct: FIT_MIN, unread: false, met: 0, total: gradLines.length, unknown: 0, fails: gradLines };
   }
 
