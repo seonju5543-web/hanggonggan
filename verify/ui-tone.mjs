@@ -296,30 +296,27 @@ console.log('\n■ 수집한 글의 HTML 기호를 글자로 띄우지 않는다
   eq('게시판에서 온 글은 전부 unent 를 거친다', bare, []);
 }
 
-/* ── ⑧ 다크 규칙이 밝은 화면에 새지 않는다 (2026-09-11 · Vapor 대조에서 발견) ─────────
-   🔴 `:root:not([data-theme="light"]) .x { … }` 는 **data-theme 이 없으면 항상 참**이다. 이 앱은
-      어디에서도 data-theme 을 달지 않으므로(index.html·app.js·boot.js grep 0건) 그 선택자는
-      '시스템이 다크일 때'가 아니라 '언제나'가 된다 — 실제로 밝은 화면에서 .essay-rule-danger 가
-      연어색(#ff8a7a), .esc-badge.esc-ok 가 진초록 바탕(#1f4a2e)으로 떠 있었다(브라우저 실측 ·
-      colorScheme light/dark 둘 다 같은 값). 뜻대로 되려면 그 선택자는 반드시
-      `@media (prefers-color-scheme: dark)` **안**에 있어야 한다. 여기서 밖에 있는 것을 센다. */
-console.log('\n■ 다크 규칙이 밝은 화면에 새지 않는다 (2026-09-11)');
+/* ── ⑧ 다크 규칙이 없다 — 앱은 밝은 한 벌 (2026-09-11 Vapor 대조에서 발견 · 2026-09-12 코드 리뷰로 재정의) ──
+   🔴 2026-08-24 개발자 지시(style.css '적합도 색깔' 절 머리말): **"다크모드 규칙을 넣지 말 것.** 이 앱은 전체가
+      밝은 화면 한 벌뿐이라, 일부만 `prefers-color-scheme: dark` 를 따르면 폰 설정이 다크인 학생에게 흰 바탕 위에
+      어두운 조각만 떠서 튄다. 앱 전체가 다크모드를 갖추기 전에는 넣지 않는다."
+   그런데 초안 도우미(essay-*) 쪽에 다크 규칙 여섯이 들어와 있었고, 그마저 `:root:not([data-theme="light"])`
+   (data-theme 을 안 다는 이 앱에서 **언제나 참**)이라 밝은 화면에도 새고 있었다 — .essay-rule-danger 연어색
+   #ff8a7a · .esc-badge.esc-ok 진초록 바탕 #1f4a2e (브라우저 실측 · colorScheme light/dark 둘 다).
+   첫 수리는 그 선택자를 미디어 쿼리 안으로 옮기는 것이었는데, 코드 리뷰가 잡았다: 그러면 **다크 폰의 학생에게만**
+   흰 시트 위에 진초록 배지가 뜬다 — 8/24 지시가 금지한 바로 그 모습이다. 그래서 여섯 규칙을 **지웠고**,
+   여기서는 다크 규칙이 **하나도 없는지** 센다(미디어 블록 · [data-theme="dark"] · :root:not([data-theme="light"]) 전부).
+   앱 전체 다크모드를 만드는 날 이 관문을 함께 걷어낸다(DESIGN.md 「아직 없는 것」·충돌 1번). */
+console.log('\n■ style.css 에 다크 규칙이 없다 — 앱은 밝은 한 벌 (2026-08-24 지시 · 2026-09-12)');
 {
   /* 주석은 걷되 줄 수는 남긴다 — 줄 번호가 원본과 같아야 바로 찾아간다 */
   const lines = R('style.css').replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, '')).split('\n');
-  let inDarkMedia = 0, depth = 0;
-  const leaks = [];
-  for (let i = 0; i < lines.length; i++) {
-    const l = lines[i];
-    if (/@media[^{]*prefers-color-scheme:\s*dark/.test(l)) { inDarkMedia = 1; depth = 0; }
-    if (inDarkMedia) {
-      depth += (l.match(/\{/g) || []).length - (l.match(/\}/g) || []).length;
-      if (depth <= 0 && /\}/.test(l)) inDarkMedia = 0;
-      continue;
-    }
-    if (/:root:not\(\[data-theme="light"\]\)/.test(l)) leaks.push(`${i + 1}: ${l.trim().slice(0, 70)}`);
-  }
-  eq('`:root:not([data-theme="light"])` 은 prefers-color-scheme: dark 미디어 안에만 있다', leaks, []);
+  const dark = [];
+  lines.forEach((l, i) => {
+    if (/prefers-color-scheme\s*:\s*dark/.test(l) || /\[data-theme="dark"\]/.test(l) || /:root:not\(\[data-theme="light"\]\)/.test(l))
+      dark.push(`${i + 1}: ${l.trim().slice(0, 70)}`);
+  });
+  eq('다크 규칙 0줄 (prefers-color-scheme: dark · [data-theme="dark"] · :root:not([data-theme="light"]))', dark, []);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 되돌아간 곳이 있습니다` : '\n✓ 말투·토큰 관문 전부 통과');
