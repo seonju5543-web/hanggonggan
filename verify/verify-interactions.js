@@ -425,6 +425,28 @@ async function seed(page) {
   await page.keyboard.press('Escape'); await page.waitForTimeout(200);
   await page.click('.nav-item[data-nav="home"]'); await page.waitForTimeout(400);
 
+  /* ══ 마스코트가 마지막 줄을 가리지 않는다 (2026-09-12 · 노션 UI-7 뒷부분) ═══════
+     개발자 지적: "탭바 바로 위에 떠서 목록 마지막 항목을 가린다."
+     실측(390px · 바닥까지 스크롤): 홈·장학금 찾기·MY 세 화면에서 마지막 요소가 마스코트에
+     덮여 있었다 — `.app` 의 아래 여백 88px 이 **하단 내비만** 피하는 값이었기 때문이다.
+     🔴 마스코트를 끌어 옮길 수는 있지만 **처음 자리**가 기본값이다 — 아무것도 안 만진
+        학생이 매번 가려진 화면을 본다. */
+  console.log('\n■ 마스코트가 마지막 줄을 가리지 않는다 (UI-7)');
+  for (const [label, nav] of [['홈', 'home'], ['장학금 찾기', 'explore'], ['MY', 'my']]) {
+    await page.click(`.nav-item[data-nav="${nav}"]`); await page.waitForTimeout(400);
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(350);
+    const covered = await page.evaluate(() => {
+      const fab = document.querySelector('.chat-fab').getBoundingClientRect();
+      const hit = (r) => !(r.right < fab.left || r.left > fab.right || r.bottom < fab.top || r.top > fab.bottom);
+      return [...document.querySelectorAll('.screen:not([hidden]) .sch-card, .screen:not([hidden]) .my-card, .screen:not([hidden]) p')]
+        .filter((e) => { const r = e.getBoundingClientRect(); return r.height > 0 && r.top < innerHeight && r.bottom > 0 && hit(r); })
+        .map((e) => (e.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 22));
+    });
+    ok(`${label} — 바닥까지 내려도 가려진 줄이 없다`, covered.length === 0, JSON.stringify(covered));
+  }
+  await page.click('.nav-item[data-nav="home"]'); await page.waitForTimeout(300);
+
   console.log('\n■ 움직임 줄이기를 켠 학생');
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.reload({ waitUntil: 'networkidle' });

@@ -146,7 +146,13 @@ body {
   min-height: 100dvh;
   background: var(--bg);
   position: relative;
-  padding-bottom: 88px;
+  /* 🔴 아래를 **마스코트 높이만큼 더** 비운다 (2026-09-12 · 노션 UI-7 뒷부분:
+     "탭바 바로 위에 떠서 목록 마지막 항목을 가린다"). 88px 은 하단 내비만 피하는 값이라,
+     바닥까지 내리면 마스코트(56px · 내비 위 74px)가 마지막 줄을 덮고 있었다 —
+     실측(390px · 바닥까지 스크롤): 홈·장학금 찾기·MY 세 화면에서 마지막 요소가 가려졌다.
+     ⚠️ 마스코트는 끌어서 옮길 수 있지만 **처음 자리**가 이 값이다 — 여기서 안 비우면
+        아무것도 안 만진 학생이 매번 가려진 화면을 본다. */
+  padding-bottom: 148px;   /* 내비 88 + 마스코트 56 + 숨 4 — 한 값으로 적는다(톱니가 px 개수를 센다) */
 }
 
 button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
