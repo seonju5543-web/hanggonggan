@@ -185,9 +185,27 @@ const FIT_MIN = 5;       // 미달이어도 5 — 파싱이 틀렸을 수 있다
 /* 등급 → 4.5 만점 평점 (2026-08-30). `B0` 는 `B` 와 같은 뜻이다(학교가 둘 다 쓴다). */
 const LETTER_GPA = { 'A+': 4.5, A: 4.0, A0: 4.0, 'B+': 3.5, B: 3.0, B0: 3.0, 'C+': 2.5, C: 2.0, C0: 2.0 };
 
+/* 🔴 **이 앱의 프로필은 학부다** (2026-09-12 · 노션 핵심-4). 온보딩이 받는 학적은
+   1~4학년 + 재학·신입학·복학예정·휴학·초과학기·졸업유예뿐이라(index.html `#in-year`·
+   `#in-status`) 학위 과정을 따로 묻지 않는다. 그 사실을 **여기 한 곳에서만** 말한다 —
+   온보딩에 학위 칸이 생기면 이 함수만 그 값을 읽으면 된다(그때 `p.degree` 를 쓴다).
+   ⚠️ 여기서 'unknown' 을 내지 말 것 — 모른다고 하면 학위 축이 통째로 죽어, 대학원 전용
+      공고가 다시 '자격 미확인'으로 목록 위에 뜬다(2026-09-12 개발자 지적으로 고친 자리). */
+function degreeOf(p) {
+  const d = p && p.degree;
+  return (d === 'grad' || d === 'undergrad') ? d : 'undergrad';
+}
+
 function judgeCond(c, p, ctx) {
   const S = PR.GRADE_SCALE;
   switch (c.kind) {
+    case 'degree': {
+      const mine = degreeOf(p);
+      if (c.want === 'both') return 'pass';
+      /* 공고의 다른 줄이 학부를 대상으로 말했으면, 이 줄만 보고 떨어뜨리지 않는다(noticeCtx) */
+      if (c.want === 'grad' && ctx && ctx.anyUndergrad) return 'unknown';
+      return c.want === mine ? 'pass' : 'fail';
+    }
     case 'grade': {
       if (p.gpa == null) return 'unknown';
       /* 🔴 단위가 다르면 **떨어뜨리지 않는다**(설계 조건 ⑥). 백분위 70을 평점 70으로 읽으면
@@ -361,7 +379,11 @@ function judgeCond(c, p, ctx) {
    ⚠️ **'no'는 확신이 높을 때만** 낸다. ✕는 0%와 같은 무게의 판정이다. */
 function lineVerdict(text, p, isExclude, ctx) {
   if (!p) return null;
-  if (PR.gradOnly(text)) return null;          // 대학원 전용 줄 — 학부생과 무관
+  /* 🔴 **표의 한 칸만** 건너뛴다 (2026-09-12 · 노션 핵심-4). 예전에는 `gradOnly` 로
+     대학원을 말하는 줄을 **전부** 지나쳤다 — 그래서 `국내 … 대학원 석/박사 과정 재학생`
+     처럼 대상을 말하는 문장이 화면에서 아무 표시 없이 사라졌다. 지금은 학위 축(parseDegree)이
+     판정하고, 학부/대학원 기준을 나란히 적은 표(`일반대학원생 : 평점 4.0`)만 무관하다. */
+  if (PR.gradTarget(text) === 'label') return null;
   /* 🔴 경우별 분기(`신입생:` `재학생:` `복학생 및 편입생:`)는 **내 경우만** 판정한다
      (2026-08-24 개발자 지적). 안 그러면 재학생인데 `신입생:` 줄에도 ✓가 붙는다.
      프로필에 없는 경우(편입생·학년제)는 해당 여부를 모르므로 아무 표시도 안 한다. */
@@ -438,7 +460,14 @@ function noticeCtx(sch) {
   }
   /* 여러 장학금이 묶인 공고 — 하나에 미달해도 다른 것에 지원한다(설계 조건 ⑧) */
   const multi = items.some((it) => PR.MULTI_PROGRAM.test(it.text));
-  return { bracketTable: brackets.size > 1, inAnyOf, multi, homeCity: homeCityOf(sch) };
+  /* 🔴 **공고 어딘가에 학부가 대상이라고 적혀 있으면** 다른 줄의 대학원 표현으로 미달을 내지
+     않는다 (2026-09-12 · 핵심-4). 대상을 여러 줄에 나눠 적는 공고가 있다:
+       `4년제 대학 재학생` / `대학원 석·박사 과정 재학생`  ← 둘 중 하나면 된다는 뜻이다.
+     줄마다 따로 보면 뒤 줄이 학부생을 떨어뜨린다 — 축을 만들면서 실제로 그렇게 됐고
+     회귀 검사('띄어 쓴 「대학 재학생」도 학부를 말한 것으로 본다')가 잡았다.
+     ⚠️ 이건 '모른다'이지 '충족'이 아니다 — 학부가 대상인지 확실치 않아 ✓ 를 주지는 않는다. */
+  const anyUndergrad = lines.some((t) => PR.mentionsUndergrad && PR.mentionsUndergrad(t));
+  return { bracketTable: brackets.size > 1, inAnyOf, multi, anyUndergrad, homeCity: homeCityOf(sch) };
 }
 
 /* 공고 하나에 대한 적합도 **내역**. 카드가 "요건 6개 중 4개 충족"을 띄우려면 숫자가 필요하다. */
@@ -453,45 +482,18 @@ function fitDetail(sch, p) {
      확인조차 안 한 요건 4개가 점수에서 통째로 빠진 것이다(실측 15건 · 23줄).
      점수는 `all: true`로 **전부** 세고, 화면에 몇 줄을 띄우는지는 따로 정한다. */
   const allItems = requirementLines(sch, lines, { withMeta: true, all: true });
-  const items = allItems.filter((it) => !PR.gradOnly(it.text));
+  /* 표의 한 칸만 분모에서 뺀다 — 대상을 말하는 문장은 학위 축이 판정한다(핵심-4) */
+  const items = allItems.filter((it) => PR.gradTarget(it.text) !== 'label');
   if (!items.length) return { pct: FIT_UNREAD, unread: true, met: 0, total: 0, unknown: 0, fails: [] };
 
-  /* 🔴 **이 장학금이 대학원생 것이라고 문장으로 말한 공고는 학부생에게 미달이다** (2026-09-12
-     개발자 지시로 판정을 바꿨다: "의과확지 장학금은 자격 미확인으로 뜸").
-     경위 — 2026-08-24 에 `일반대학원생 : 평점 4.0` 같은 **표의 한 칸**을 분모에서 빼기로 했는데,
-     같은 처리가 `국내 의과학 대학원 석/박사 과정 재학생` 처럼 **대상 자체를 말하는 문장**에도
-     걸려 남은 두 줄(국적·소득구간)만 세는 바람에 동행복지재단 의과학자 장학금이 학부 3학년에게
-     **95%** 로 떴다. 2026-09-09 에 그것을 '자격 미확인'으로 낮췄지만(fit 35), 개발자가 화면에서
-     보고 그것도 틀렸다고 했다 — 맞는 지적이다. **우리는 모르는 게 아니다:**
-     온보딩이 받는 학적은 1~4학년 + 재학·신입학·복학예정·휴학·초과학기·졸업유예로 **학부뿐**이라
-     (index.html `#in-year`·`#in-status`), 이 앱의 프로필은 정의상 학부생이다.
-     그래서 미달로 판정하고 **그 사실을 말한 원문 줄을 근거로 보여 준다**(지어내지 않는다).
-     ⚠️ 되돌리려거든 온보딩에 학위 과정 칸을 먼저 만들 것 — 그 칸이 생기면 여기도 그 값을 봐야 한다.
-     ⚠️ 표의 한 칸(`gradTarget === 'label'`)은 예전 그대로 빼기만 한다. 여기서 막으면
-        2026-08-24 에 고친 가톨릭대 오탐이 되살아난다.
-     ⚠️ 학부를 함께 말한 공고(`mentionsUndergrad`)는 건드리지 않는다 — LG디스플레이처럼
-        `학사 : 학비보조금 / 석사 : …` 로 둘 다 받는 공고가 미달이 되면 그게 틀린 미달이다. */
-  /* ⚠️ **원문 줄에서 본다** — `requirementLines` 가 대학원 줄을 이미 버린 뒤라
-     그 결과에서 찾으면 영영 안 걸린다. 처음에 그렇게 짰다가 브라우저로 재서 잡았다. */
-  /* 🔴 **막기 전에 두 가지를 먼저 뺀다** (2026-09-12 코드 리뷰가 실측으로 잡았다).
-     벌은 무거워졌는데(35% 카드 → 미달·버튼 잠김·홈에서 사라짐) 집는 규칙은 그대로라,
-     아래 두 모양에서 **틀린 미달**이 났다. 층2는 월·목에 사람 손 없이 새로 들어온다:
-     ① **뜻이 반대인 줄** — `대학원 재학생은 지원할 수 없음` 은 이 장학금이 학부생 것이라는
-        말인데, 그 줄로 학부생을 떨어뜨리고 근거랍시고 그 줄을 보여 줬다.
-     ② **여러 장학금이 묶인 공고** — `(연구장학금) 대학원 석/박사 과정 재학생` 한 줄 때문에
-        같은 공고의 `(우수장학금) 평점 3.0 이상` 이 통째로 막혔다. 이 저장소에 이미 있는
-        규칙(설계 조건 ⑧ · `MULTI_PROGRAM`)이 아래쪽에만 있어 이 갈래는 지나쳐 갔다. */
-  /* ⚠️ `EXCLUDE_LINE` 만으로는 부족하다 — `대학원 재학생은 지원할 수 없음` 을 안 잡는다(실측).
-     그래서 **줄 끝의 배제 말**을 한 번 더 본다. 넓게 봐서 생기는 결과는 '막지 않는 것'뿐이라
-     안전한 방향이다(틀린 미달이 못 받는 것보다 나쁘다 — 이 저장소의 오랜 기준). */
-  const NOT_TARGET = /(제외|불가(능)?|할\s*수\s*없(음|습니다)?|아님)\s*[.)\]]?\s*$/;
-  const gradLines = lines.filter((t) => PR.gradTarget && PR.gradTarget(t) === 'body'
-    && !EXCLUDE_LINE.test(t) && !NOT_TARGET.test(t));
-  const anyUndergrad = lines.some((t) => PR.mentionsUndergrad && PR.mentionsUndergrad(t));
-  const bundled = lines.some((t) => PR.MULTI_PROGRAM.test(t));
-  if (gradLines.length && !anyUndergrad && !bundled) {
-    return { pct: FIT_MIN, unread: false, met: 0, total: gradLines.length, unknown: 0, fails: gradLines };
-  }
+  /* 🔴 대학원 전용 판정은 **학위 축**(parse-requirements 의 parseDegree)이 한다 — 2026-09-12.
+     여기 있던 '대학원 전용이면 통째로 미달' 갈래는 지웠다. 그 갈래는 축이 없던 시절의 우회였고,
+     축이 생기면서 같은 일을 두 곳이 하게 됐다(이 저장소가 반복해 겪은 '규칙 두 벌' 사고).
+     축으로 옮기면서 그 갈래가 들고 있던 방어도 제자리를 찾았다:
+       · 뜻이 반대인 줄(`대학원생 지원 불가`) → parseDegree 가 말끝을 보고 뒤집는다.
+       · 여러 장학금이 묶인 공고 → 아래 `multi` 가 이미 fails 를 안 쌓는다(설계 조건 ⑧).
+       · 학부를 함께 말한 줄 → 축이 'both' 로 읽어 충족이다.
+     실측(2026-09-12): 학위를 말하는 자격 줄 157 중 이 축이 잡던 것은 7줄뿐이었다. */
 
   /* 🔴 **이미 뽑아 둔 제외 줄을 그대로 판정한다** (2026-08-30 전수 대조에서 발견).
      예전에는 제외 목록까지 `requirementLines(onlyExclude)` 에 밀어 넣었는데, 그 함수는
@@ -1079,9 +1081,11 @@ function requirementLines(sch, lines, opts) {
        `(자|생|중|상|하|명|원)$`처럼 느슨해서 `지원 제외 대상`의 '상'까지 자격으로 봤다.
        제목에서 지켜야 할 것은 **진짜 자격 범주 이름뿐**이므로 좁게 적는다. */
     if (SUB_HEAD.test(t) && !/수급|차상위|보훈|유공|장애|다자녀|한부모|새터민|북한이탈|다문화|국적/.test(t)) continue;
-    /* 대학원 전용 줄(`일반대학원생 : …`)은 학부생에게 해당이 없다. 화면에 남겨 두면
-       100%인데 아무 표시도 없는 줄이 되어 학생이 혼란스럽다(2026-08-24 개발자 지적). */
-    if (!loose && PR2.gradOnly(t)) continue;
+    /* 학부/대학원 기준을 나란히 적은 표의 칸(`일반대학원생 : …`)은 학부생에게 해당이 없다.
+       화면에 남겨 두면 100%인데 아무 표시도 없는 줄이 되어 혼란스럽다(2026-08-24 개발자 지적).
+       ⚠️ **대상을 말하는 문장은 지우지 않는다** — 그 줄이 사라지면 '내 것이 아니다'라는
+          사실 자체가 화면에서 없어진다(2026-09-12 · 핵심-4). 학위 축이 ✓/✕ 를 붙인다. */
+    if (!loose && PR2.gradTarget(t) === 'label') continue;
     if (POINTER_LINE.test(t)) {
       /* 안내 줄 자신은 화면에 안 내보내되, '여기부터 n줄은 선택지'라는 사실은 남긴다 */
       const n = anyOfCount(t);

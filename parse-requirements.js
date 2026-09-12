@@ -316,6 +316,58 @@ const SCHOOL_NOT_REQ = /문의|안내\s?사항|참고|별도\s?문의/;
    한국장학재단 등재 공고에서 실제로 그 꼴이었다(광산김씨 장학회). */
 const SCHOOL_NAME = /(?<![0-9])([가-힣]{2,12}(?:대학교|대학|대))\s*(?:에서|에|의|를|을)?\s*(?:재학생|재학|학부생|학생|다니는|소속)/g;
 const SCHOOL_NOT_SELF = /(출신|교수|동문|졸업생|추천인|학부모|자녀의)/;
+/* ── 학위 과정 (학사·석사·박사) ── 노션 핵심-4 · 2026-09-12 신설 ──────────────
+   개발자 지시: "학석사 구별하는 방법". 백로그 원문: *"학위 과정을 판정하는 축이 아예 없어서
+   '대학원생 지원 불가' 같은 조건을 읽지 못한다. 학과·전공 축이 없어서 생겼던 '무지성 체크'와
+   같은 유형이다 — 안 잡힌 절은 보이지 않으므로 같은 줄의 쉬운 조건 하나가 맞으면 줄 전체에
+   체크가 붙는다."*
+
+   실측(2026-09-12 · 등록 + 한국장학재단 자격 줄 1,011): 학위를 말하는 줄이 **157**인데
+   이 축이 잡던 것은 **7줄**뿐이었다(gradTarget='body'). 나머지 150줄 중 97줄은 아무 축도
+   없어 '확인 필요'로만 남았다 — `학부 재학생` 처럼 **학생이 맞는다고 말해 주는 줄**까지
+   아무 말 없이 지나갔다.
+
+   🔴 판정의 근거는 **프로필이 학부라는 사실**이다 — 온보딩이 받는 학적은 1~4학년 +
+      재학·신입학·복학예정·휴학·초과학기·졸업유예로 학부뿐이다(index.html `#in-year`·`#in-status`).
+      match-engine 의 `degreeOf(p)` 한 곳이 그 값을 낸다. 온보딩에 학위 칸이 생기면 거기만 고친다.
+   🔴 표의 한 칸(`일반대학원생 : 평점 4.0`)은 **요건이 아니다** — 학부/대학원 기준을 나란히
+      적은 표라 학부생과 무관하다(2026-08-24 가톨릭대 오탐). 그래서 GRAD_LABEL 은 null 이다.
+   🔴 제외 줄에서는 **뜻이 뒤집힌다** — `대학원생 지원 불가` 는 '학부여야 한다'는 말이다.
+      2026-09-12 코드 리뷰가 이 줄로 학부생이 미달이 되던 것을 잡았다. */
+/* 줄 스스로 '아니다'라고 말하는 꼴 — `대학원생은 지원할 수 없음` · `… 제외`.
+   🔴 제외 절이 아니라 **자격 줄 안에** 이런 문장이 섞여 있는 경우가 많아서(이 저장소가
+      이미 아는 사실 — 제외 줄은 자격 줄 목록에도 섞인다), 줄의 말끝을 직접 본다.
+      안 보면 `대학원 재학생은 지원할 수 없음` 이 **학부생을 떨어뜨린다**(2026-09-12 실측). */
+const DEGREE_NEGATED = /(제외|불가(능)?|할\s*수\s*없(음|습니다)?|아님|안\s*됨)\s*[.)\]]?\s*$/;
+/* 🔴 **대상을 말하는 줄만 판정한다** (2026-09-12 회귀 검사가 잡아 준 선).
+   낱말이 문장 안에 스쳐 지나가는 줄로 ✓ 를 주면, 개발자가 네 번 지적한 '무지성 체크'를
+   내가 다시 만드는 것이다 — `교환학생/방송대학생 별도 문의` 가 그렇게 ✓ 를 받았다.
+   그래서 **줄이 무엇을 하려는 문장인지**를 말끝으로 본다: 안내·지급·문의로 끝나는 줄은
+   대상을 정하는 줄이 아니다.
+   ⚠️ 처음에는 반대로 '대상 낱말로 끝나는 줄만' 받게 했다가, `대학원 석/박사과정 재학 중인
+      자로서 …인 자` 처럼 **`자` 로 끝나는 흔한 대상 문장**이 통째로 빠져 대학원 전용 공고가
+      미달을 잃었다(실측). 한국어 공고에서 대상은 `…자`·`…학생`·`…대상자` 로 끝난다. */
+/* ⚠️ 꼬리 조사까지 본다 — 실제 원문에 `… 별도 문의의` 처럼 조사가 붙어 끝나는 줄이 있다. */
+const DEGREE_NOT_TARGET = /(지급|지원함|문의|참고|바랍니다|안내|권장|우대)[의를은는이가]?\s*[.)\]]?\s*$/;
+function parseDegree(t, isExclude) {
+  const x = String(t || '');
+  if (GRAD_LABEL.test(x)) return null;               // 표의 한 칸
+  if (DEGREE_NOT_TARGET.test(x)) return null;
+  const grad = GRAD_BODY.test(x);
+  const under = UNDERGRAD_TOO.test(x);
+  if (!grad && !under) return null;
+  /* 🔴 **제외 줄에서는 판정하지 않는다** (2026-09-12 실측으로 정한 선).
+     처음에는 뜻을 뒤집어 판정했다(`대학원생 지원 불가` → '학부여야 한다'). 그런데 제외 줄에는
+     학위 낱말이 **딴 뜻으로** 섞여 있는 경우가 많아 **틀린 미달**이 났다(등록+층2 전수 실측):
+       · `2027-1학부터 타재단 … 장학금 중복수혜 불가`   ← '1학부터' 의 '학부'
+       · `경상남도장학회 2025년 도내 대학 재학생 장학금 수해자 및 …` ← 빠지는 것은 '수혜자'다
+     여기서 얻는 것(대학원생을 빼는 공고를 학부생에게 '충족'으로 세는 것)보다 잃는 것이 크다 —
+     **틀린 미달은 못 받는 것보다 나쁘다.** 대상을 말하는 줄(제외가 아닌 줄)만 판정한다. */
+  if (isExclude || DEGREE_NEGATED.test(x)) return null;
+  if (grad && under) return { kind: 'degree', want: 'both', conf: HIGH };
+  return { kind: 'degree', want: grad ? 'grad' : 'undergrad', conf: HIGH };
+}
+
 function parseSchool(t) {
   if (SCHOOL_NOT_REQ.test(t)) return null;
   const names = [];
@@ -481,12 +533,13 @@ function parseLine(line, isExclude) {
   push(parseGrade(t)); push(parseBracket(t)); push(parseCredits(t)); push(parseYear(t));
   push(parseStatus(t, isExclude)); push(parseFlags(t)); push(parseNationality(t));
   push(parseAge(t)); push(parseResidence(t)); push(parseSchool(t)); push(parseMajor(t));
+  push(parseDegree(t, isExclude));
   if (isExclude) conds.forEach((c) => { c.exclude = true; });
   return { conds, multiProgram: MULTI_PROGRAM.test(t) };
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { parseLine, gradOnly, gradTarget, mentionsUndergrad, GRADE_SCALE, STATUSES, HIGH, LOW, MULTI_PROGRAM, HAS_EXCEPTION, caseBranch, unaskedAttr, REGIONS};
+  module.exports = { parseLine, parseDegree, gradOnly, gradTarget, mentionsUndergrad, GRADE_SCALE, STATUSES, HIGH, LOW, MULTI_PROGRAM, HAS_EXCEPTION, caseBranch, unaskedAttr, REGIONS};
 }
 
 /* ── 경우별 분기 (2026-08-24 개발자 지적) ─────────────────────────────────
