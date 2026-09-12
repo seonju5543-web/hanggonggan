@@ -388,8 +388,12 @@ async function seed(page) {
   const shadowScan = async (label, nav) => {
     if (nav) { await page.click(`.nav-item[data-nav="${nav}"]`); await page.waitForTimeout(500); }
     return page.evaluate(() => {
-      /* `ptr` = 당겨서 새로고침 뱅뱅이 — 내용 위에 떠서 따라 내려온다(interactions.js) */
-      const ALLOW = ['bottom-nav', 'chat-fab', 'sheet', 'toast', 'btn-primary', 'btn-white', 'bell-badge', 'ptr'];
+      /* 떠 있는 것 · 주 버튼 · 기능적 테두리(알림 배지의 cutout)만 허용한다.
+         · `ptr` = 당겨서 새로고침 뱅뱅이(interactions.js) — 내용 위에 떠서 따라 내려온다
+         · `sort-menu` = 정렬 팝오버 — 목록 위에 뜬다(2026-09-12 코드 리뷰가 빠진 것을 짚었다)
+         ⚠️ `bottom-nav` 는 뺐다 — 그 줄의 그림자는 **안쪽 실선**(inset)이라 아래 걸러내기에
+            이미 걸린다. 목록에 남겨 두면 '허용했다'고 잘못 읽힌다. */
+      const ALLOW = ['chat-fab', 'sheet', 'toast', 'btn-primary', 'btn-white', 'bell-badge', 'ptr', 'sort-menu'];
       const bad = [];
       for (const el of document.querySelectorAll('*')) {
         const r = el.getBoundingClientRect(); const cs = getComputedStyle(el);
@@ -403,12 +407,22 @@ async function seed(page) {
       return [...new Set(bad)];
     });
   };
-  ok('홈 — 떠 있지 않은 것에 그림자가 없다', (await shadowScan('홈')).length === 0,
-    JSON.stringify(await shadowScan('홈')));
+  /* 🔴 **훑은 것이 있는지부터** 본다 — 빈 화면을 훑고 '그림자 없음'이라고 말하면 그건
+     통과가 아니라 무력해진 것이다(2026-09-12 코드 리뷰가 floor 가 없다고 짚었다). */
+  const homeBad = await shadowScan('홈');
+  ok('홈 — 훑은 요소가 충분히 많다', (await page.evaluate(() => document.querySelectorAll('#screen-home *').length)) > 30);
+  ok('홈 — 떠 있지 않은 것에 그림자가 없다', homeBad.length === 0, JSON.stringify(homeBad));
   for (const [label, nav] of [['장학금 찾기', 'explore'], ['신청내역', 'applications'], ['MY', 'my']]) {
     const bad = await shadowScan(label, nav);
     ok(`${label} — 떠 있지 않은 것에 그림자가 없다`, bad.length === 0, JSON.stringify(bad));
   }
+  /* 🔴 **상태도 훑는다** — 정렬 팝오버·시트·토스트는 열어야 화면에 있다. 안 열면 그 안의
+     그림자는 검사에 영영 안 보인다(코드 리뷰가 sort-menu 로 실증). */
+  await page.click('.nav-item[data-nav="explore"]'); await page.waitForTimeout(400);
+  await page.click('#explore-sort-btn'); await page.waitForTimeout(300);
+  ok('정렬 팝오버를 연 상태에서도', (await shadowScan('정렬 팝오버')).length === 0,
+    JSON.stringify(await shadowScan('정렬 팝오버')));
+  await page.keyboard.press('Escape'); await page.waitForTimeout(200);
   await page.click('.nav-item[data-nav="home"]'); await page.waitForTimeout(400);
 
   console.log('\n■ 움직임 줄이기를 켠 학생');

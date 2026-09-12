@@ -19,7 +19,7 @@ const PR = (typeof module !== 'undefined' && module.exports)
   /* 🔴 브라우저에서는 **전역 함수**로 쓴다 — 여기에 이름을 빠뜨리면 Node 검사는 전부
      통과하는데 앱은 첫 카드에서 죽는다. `headRest`(section-head)에 이어 `caseBranch`도
      같은 실수를 했다(2026-08-24). 아래 회귀가 브라우저 순서로 실어 실제로 불러 본다. */
-  : { parseLine, gradOnly, gradTarget, mentionsUndergrad, caseBranch, unaskedAttr, REGIONS, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM };
+  : { parseLine, parseDegree, gradOnly, gradTarget, mentionsUndergrad, caseBranch, unaskedAttr, REGIONS, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM };
 const PR2 = PR;   // requirementLines가 쓰는 별칭 (선언 순서 때문에 이름만 따로 둔다)
 /* 시·도 이름은 parse-requirements 가 갖고 있다 — 여기 베끼면 두 벌이 된다 */
 const PR_REGIONS = PR.REGIONS || [];
