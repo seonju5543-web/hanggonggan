@@ -17,6 +17,15 @@
    "at": "2026-09-13",
    "media": "18129374602599684",
    "permalink": "https://www.instagram.com/p/DdMcZipoNjQ/"
+  },
+  {
+   "code": "2700787001",
+   "org": "LG디스플레이",
+   "name": "LGenius(산학장학생)",
+   "tplNo": 1,
+   "at": "2026-09-13",
+   "media": "18624158749041013",
+   "permalink": "https://www.instagram.com/p/DdMkqOelTfI/"
   }
  ],
  "prepared": [
@@ -96,7 +105,7 @@
    "at": "2026-09-13"
   },
   {
-   "status": "prepared",
+   "status": "posted",
    "code": "2700787001",
    "org": "LG디스플레이",
    "name": "LGenius(산학장학생)",
@@ -105,7 +114,8 @@
    "tplNo": 1,
    "cards": 4,
    "dir": "insta/pub/2700787001",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "postedAt": "2026-09-13"
   },
   {
    "status": "prepared",
