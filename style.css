@@ -1136,15 +1136,13 @@ textarea:focus {
 .bell-badge[hidden] { display: none; }
 
 /* 동의 안내 시트 */
-.nf-consent-hero { text-align: center; padding-top: 8px; }
-.nf-bell {
-  width: 62px; height: 62px;
-  margin: 0 auto;
-  border-radius: 50%;
-  background: var(--primary-weak);
-  font-size: var(--t-3xl);
-  display: flex; align-items: center; justify-content: center;
-}
+/* 🔴 **원 안의 아이콘을 뺐다** (2026-09-12 개발자 지시 · 노션 UI-5: "원 안에 아이콘 + 설명
+   + 버튼 형태 = 'Icon in colored circle as section decoration' 블랙리스트 패턴").
+   그 원(62px · 종 아이콘)은 아무 정보도 나르지 않았다 — 제목이 이미 '장학금 알림 받기'다.
+   가운데 정렬도 함께 풀었다: 이 앱의 다른 시트는 전부 왼쪽 정렬이라(상세 시트의 sheet-title)
+   여기만 가운데였던 것이 '따로 만든 화면'처럼 보이게 했다.
+   ⚠️ 목록의 줄별 아이콘(.nf-ico)은 남긴다 — 그건 장식이 아니라 **어떤 알림인지**를 말한다. */
+.nf-consent-hero { padding-top: 4px; }
 .nf-type-list { list-style: none; display: grid; gap: 12px; margin: 4px 0 18px; }
 .nf-type-list li {
   display: flex; gap: 11px; align-items: flex-start;

@@ -292,10 +292,11 @@ function notifyConsentSheet() {
     <li><span class="nf-ico">${t.icon}</span><span><strong>${esc(t.label)}</strong></span></li>`).join('');
 
   openNotifyPanel(`
+    ${/* 🔴 원 안의 종 아이콘을 뺐다 (노션 UI-5 · style.css .nf-consent-hero 주석 참조).
+         장식이라 정보가 없었고, 이 앱의 다른 시트와 달리 가운데 정렬이라 더 눈에 띄었다. */ ''}
     <div class="nf-consent-hero">
-      <div class="nf-bell"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"/><path d="M10.3 20a2 2 0 0 0 3.4 0"/></svg></div>
-      <h3 class="sheet-title" style="margin-top:10px">장학금 알림 받기</h3>
-      <p class="sheet-summary" style="margin-top:6px">마감을 놓쳐서 못 받는 장학금이 가장 아깝습니다.<br />꼭 필요한 것만 골라서 알립니다.</p>
+      <h3 class="sheet-title">장학금 알림 받기</h3>
+      <p class="sheet-summary" style="margin-top:6px">마감을 놓쳐서 못 받는 장학금이 가장 아깝습니다. 꼭 필요한 것만 골라서 알립니다.</p>
     </div>
     <ul class="nf-type-list">${typeRows}</ul>
     <p class="sheet-note">${pushConfigured()
