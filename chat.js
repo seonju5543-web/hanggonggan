@@ -731,7 +731,12 @@ function chatPushBot(a) {
 /* ⑥ 답에서 바로 다음 행동 — 도우미를 닫고 그 화면으로 보낸다 */
 function chatDoAction(act) {
   const go = (screen) => { chatClose(); setTimeout(() => chatSafe(() => showScreen(screen)), 180); };
-  if (act === 'explore') return go('explore');
+  /* 🔴 '전체 보기'라고 적어 놓고 '우리 학교' 칸을 띄우지 않는다 — app.js 가 칸을 되돌린다 */
+  if (act === 'explore') {
+    chatClose();
+    setTimeout(() => chatSafe(() => (typeof exploreShowAll === 'function' ? exploreShowAll() : showScreen('explore'))), 180);
+    return;
+  }
   if (act === 'applications') return go('applications');
   if (act === 'wallet') return go('my');
   if (act === 'notify') {

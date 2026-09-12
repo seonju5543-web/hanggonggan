@@ -1160,8 +1160,8 @@ console.log('\n■ 성적 단위 환산 (2026-08-30)');
      · `까지 나 . 선발 : 10 월 중순예정 다 . 선발확인 : Hufs Ability 로그인 후…`
      · `마감 안내 작성일 2026.08.31 수정일 2026.08.31 작성자 2026085 조회수 5…`
    옛 규칙이 `/(마감|까지|기한|접수기간|신청기간)[^\n<]{0,60}/` 라, 본문 아무 데나 있는
-   `까지` 가 걸리면 거기서 60자를 잘라 왔기 때문이다(저장된 본문 86건 실측: 41건 중
-   20건이 문장 중간에서 시작 · 5건은 게시판 껍데기).
+   `까지` 가 걸리면 거기서 60자를 잘라 왔기 때문이다(`collector/extracted/notices-text.json`
+   86건 실측: 41건 중 20건이 문장 중간에서 시작 · 5건은 게시판 껍데기).
    🔴 지금은 **기간을 말하는 이름표**에서 시작한다 — 이 저장소가 마감일에 이미 쓰는 방식이다
       (2026-08-30 extract-excerpts). 규칙은 `collector/deadline-hint.mjs` **한 곳**이고
       수집기 둘이 그것을 가져다 쓴다(예전에는 정규식이 두 벌이었다). */
@@ -1197,10 +1197,32 @@ console.log('\n■ 접수 기간 한 줄 (2026-09-12)');
   eq('  수집기에 옛 정규식이 되살아나지 않았다',
     [col, br].some((t) => /DEADLINE_RE\s*=/.test(t)), false);
 
-  /* 🔴 발행된 데이터에도 옛 힌트가 남아 있지 않다 (2026-09-12 에 한 번 청소했다) */
-  const notices = JSON.parse(readText(new URL('../data/notices.json', import.meta.url)));
-  const bad = (notices.items || []).map((n) => n.deadlineHint).filter(Boolean).filter((h) => !looksLikeHint(h));
-  eq('발행된 공고의 기간 줄이 전부 이름표로 시작한다', bad.slice(0, 3), []);
+  /* 🔴 발행된 데이터에도 옛 힌트가 남아 있지 않다 (2026-09-12 에 한 번 청소했다).
+     🔴 **앱이 읽는 것은 학교별 파일**(`data/notices/<열쇠>.json`)이다 — `notices.json` 은
+        폴백일 뿐이다(app.js loadNotices · match-engine noticeFilesForProfile).
+        처음엔 폴백만 보고 초록불을 받았는데, 그동안 학생 화면에는 `마감 안내 작성일 …
+        조회수 5` 가 그대로 떠 있었다(2026-09-12 코드 리뷰가 브라우저로 잡았다).
+        **관문이 학생이 보는 파일을 봐야 한다** — 이 저장소가 몇 번이나 데인 유형이다. */
+  const noticeFiles = ['../data/notices.json',
+    ...fs.readdirSync(new URL('../data/notices/', import.meta.url))
+      .filter((f) => f.endsWith('.json') && f !== 'index.json').map((f) => `../data/notices/${f}`)];
+  eq('학교별 공고 파일을 실제로 찾았다 (폴백만 보고 통과하지 않는다)', noticeFiles.length >= 2, true);
+  const bad = noticeFiles.flatMap((rel) => {
+    const doc = JSON.parse(readText(new URL(rel, import.meta.url)));
+    return (doc.items || []).map((n) => n.deadlineHint).filter(Boolean)
+      .filter((h) => !looksLikeHint(h)).map((h) => `${rel.split('/').pop()}: ${h.slice(0, 30)}`);
+  });
+  eq('발행된 공고의 기간 줄이 전부 이름표로 시작한다 (학교별 파일 포함)', bad.slice(0, 3), []);
+
+  /* 🔴 청소가 **병합에서 되살아나지 않는다** — 공고 파일은 합집합 병합이라 옛 판과 합쳐진다.
+     점수가 '힌트가 있기만 하면'이었을 때는 버린 쓰레기가 이겼다(실측). */
+  /* 🔴 **다리(.cjs)로 부른다** — `audit-data.js` 가 쓰는 길이 그것이다. url-key.mjs 에 import 를
+     더했을 때 그 다리가 `new Function` 에서 터져 감사가 통째로 죽은 적이 있다(2026-09-12).
+     여기서 다리를 지나가면 그 사고가 관문에 걸린다. */
+  const UK = createRequire(import.meta.url)('../collector/url-key.cjs');
+  const junk = { url: 'https://x/1', deadlineHint: '까지 나 . 선발 : 10 월 중순예정' };
+  const clean = { url: 'https://x/1' };
+  eq('병합이 쓰레기 힌트를 되살리지 않는다', (UK.preferNotice(clean, junk) || {}).deadlineHint, undefined);
 }
 
 console.log('\n■ 대학원 전용 공고는 학부 프로필에 미달 (2026-09-12)');

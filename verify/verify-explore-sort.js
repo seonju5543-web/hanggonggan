@@ -201,6 +201,17 @@ const PROFILE = {
      이 칸의 내용은 **수집 로봇이 학교 게시판에서 줍는 글 목록**이다(등록 공고가 아니다).
      예전에는 '전체' 목록 아래에 붙어 카드 수십 장을 지나야 보였다. */
   console.log('\n■ 우리 학교 칸 (UI-16)');
+  /* 🔴 **오늘 수집분에 기대지 않는다** — 실시간 공고는 60일이 지나면 지워지고(collect.mjs),
+     한 학교의 수집이 며칠 멈추면 0건이 된다. 그러면 앱은 멀쩡한데 이 절이 빨간불이 되고,
+     이 저장소는 그런 관문이 통째로 꺼진 적이 있다. 그래서 한 건을 심어 둔다. */
+  await page.evaluate(() => {
+    const p = state.profile;
+    liveNotices = { updatedAt: '2026-09-12', items: (liveNotices && liveNotices.items || []).concat([{
+      title: '검사용 우리 학교 공고', school: p.school, campus: p.campus || '',
+      url: 'https://example.ac.kr/notice/1', attachments: [], foundAt: '2026-09-12',
+    }]) };
+    renderExplore();
+  });
   await page.click('.filter-chip[data-filter="notice"]'); await page.waitForTimeout(500);
   const nt = await page.evaluate(() => ({
     카드: document.querySelectorAll('#explore-list .sch-card:not(.notice-card)').length,
@@ -221,6 +232,13 @@ const PROFILE = {
     빈말: !!document.querySelector('#live-notices .empty'),
   })), { 공고: 0, 빈말: true });
   await page.fill('#explore-search', ''); await page.waitForTimeout(300);
+  /* 🔴 도우미·알림이 '전체 보기'라고 적어 놓고 이 칸을 띄우면 카드 0장짜리 화면이 된다
+     (2026-09-12 코드 리뷰가 실측으로 잡았다). 그 길은 exploreShowAll 한 곳을 지난다. */
+  eq('「전체 보기」로 오면 칸이 전체로 돌아온다', await page.evaluate(() => {
+    exploreShowAll();
+    return { 칩: (document.querySelector('.filter-chip.active') || {}).dataset.filter,
+      카드: document.querySelectorAll('#explore-list .sch-card').length > 0 };
+  }), { 칩: 'all', 카드: true });
   /* 🔴 '전체'에서는 **빠져 있어야** 한다 — 그게 '별도 칸으로 뺀다'의 뜻이다 */
   await page.click('.filter-chip[data-filter="all"]'); await page.waitForTimeout(500);
   eq('전체 목록 아래에는 더 이상 붙지 않는다',

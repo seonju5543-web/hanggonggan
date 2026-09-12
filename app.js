@@ -1622,6 +1622,17 @@ function renderExplore() {
     : `<p class="empty">${q ? `'${esc(exploreQuery.trim())}'와 맞는 장학금이 없어요` : '조건에 맞는 장학금이 없어요'}</p>`;
 }
 
+/* 🔴 '전체 목록을 보여 주겠다'고 **말한 곳**에서 부른다 (도우미의 '장학금 탭에서 전체 보기' ·
+   알림이 공고를 못 찾았을 때). 고른 칸은 화면을 옮겨도 그대로 남는 것이 맞지만(교내·교외도
+   그렇다), 그 칸이 '우리 학교'면 전체 목록을 약속해 놓고 **학교 게시판 글 목록**을 띄우게 된다
+   — 2026-09-12 코드 리뷰가 실측으로 잡은 길이다(카드 0장짜리 화면이 떴다). */
+function exploreShowAll() {
+  exploreFilter = 'all';
+  $$('#explore-filters .filter-chip').forEach((c) => c.classList.toggle('active', c.dataset.filter === 'all'));
+  showScreen('explore');
+  renderExplore();
+}
+
 /* ---------------- 서류 도우미 (AI 초안 작성) ---------------- */
 const ESSAY_DEFS = [
   {
