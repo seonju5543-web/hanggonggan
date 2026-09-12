@@ -1,0 +1,79 @@
+# 인스타 댓글 — 받아 적기(3시간마다) · 답글/숨기기/삭제(관리자 화면 버튼) (2026-09-12)
+#
+# 관리자 화면 「인스타 › 댓글」 이 insta/comments.json 을 읽고, 버튼은 이 워크플로를 깨운다.
+# 🔴 토큰은 서버(여기)에만 있다. 🔴 답글·숨김·삭제는 되돌릴 수 없어 `--do` 를 붙여야 실제로 한다 —
+#    버튼이 아닌 손 실행에서 실수로 안 나가게 action 기본값은 fetch 다.
+name: 인스타 댓글 관리
+
+on:
+  schedule:
+    - cron: '29 */3 * * *'     # 3시간마다 (:29 — UTC 정각을 피한다)
+  workflow_dispatch:
+    inputs:
+      action:
+        description: '작업'
+        type: choice
+        options: [fetch, reply, hide, unhide, delete]
+        default: fetch
+      comment:
+        description: '댓글 ID (reply·hide·unhide·delete)'
+        type: string
+        default: ''
+      text:
+        description: '답글 글 (reply)'
+        type: string
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  group: insta-comments
+  cancel-in-progress: false
+
+env:
+  BASE: claude/nice-heisenberg-WESq5
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/nice-heisenberg-WESq5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: 작업
+        id: a
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          ACTION: ${{ inputs.action }}
+          COMMENT: ${{ inputs.comment }}
+          TEXT: ${{ inputs.text }}
+        run: |
+          case "${ACTION:-fetch}" in
+            fetch)  node insta/comments.mjs fetch | tee /tmp/out.txt
+                    grep -q '^state=none' /tmp/out.txt && echo 'changed=no' >> "$GITHUB_OUTPUT" || echo 'changed=yes' >> "$GITHUB_OUTPUT" ;;
+            reply)  node insta/comments.mjs reply  --comment="$COMMENT" --text="$TEXT" --do; echo 'changed=yes' >> "$GITHUB_OUTPUT" ;;
+            hide)   node insta/comments.mjs hide   --comment="$COMMENT" --do;             echo 'changed=yes' >> "$GITHUB_OUTPUT" ;;
+            unhide) node insta/comments.mjs hide   --comment="$COMMENT" --unhide --do;    echo 'changed=yes' >> "$GITHUB_OUTPUT" ;;
+            delete) node insta/comments.mjs delete --comment="$COMMENT" --do;             echo 'changed=yes' >> "$GITHUB_OUTPUT" ;;
+            *) echo "모르는 작업 $ACTION"; exit 1 ;;
+          esac
+      - name: 저장
+        if: ${{ steps.a.outputs.changed == 'yes' }}
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add insta/comments.json
+          git diff --cached --quiet && { echo '변화 없음'; exit 0; }
+          git commit -m "인스타: 댓글 ${{ inputs.action || 'fetch' }}"
+          for i in 1 2 3; do
+            git push origin "HEAD:$BASE" && break || { git pull --rebase origin "$BASE"; sleep 5; }
+            [ "$i" = 3 ] && { echo '🚨 기록을 못 올렸습니다'; exit 1; }
+          done
+      - name: 실패하면 시끄럽게
+        if: ${{ failure() || cancelled() }}
+        run: echo '🚨 댓글 작업이 실패했습니다.' >> "$GITHUB_STEP_SUMMARY"

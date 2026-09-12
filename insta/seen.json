@@ -1,3 +1,54 @@
 {
- "posted": []
+ "posted": [],
+ "prepared": [
+  {
+   "status": "prepared",
+   "code": "auto-ent2431264146artclviewdo",
+   "org": "한국외국어대학교",
+   "name": "2026-2 중소기업취업연계장학금 신규장학생 신청안내",
+   "due": "2026-09-18",
+   "tplNo": 4,
+   "dir": "insta/pub/auto-ent2431264146artclviewdo",
+   "at": "2026-09-12",
+   "revisedAt": "2026-09-12",
+   "school": "한국외대",
+   "cards": 4
+  },
+  {
+   "status": "prepared",
+   "code": "auto-ent2431265883artclviewdo",
+   "org": "한국외국어대학교",
+   "name": "2026-2학기 가족장학금 신청 안내",
+   "due": "2026-09-28",
+   "school": "한국외대",
+   "tplNo": 1,
+   "cards": 4,
+   "dir": "insta/pub/auto-ent2431265883artclviewdo",
+   "at": "2026-09-12"
+  },
+  {
+   "status": "prepared",
+   "code": "2704055001",
+   "org": "재단법인 광산김씨대종중장학문화재단",
+   "name": "수산장학생",
+   "due": "2026-09-19",
+   "school": null,
+   "tplNo": 3,
+   "cards": 5,
+   "dir": "insta/pub/2704055001",
+   "at": "2026-09-12"
+  },
+  {
+   "status": "prepared",
+   "code": "2703591003",
+   "org": "한진해운장학재단",
+   "name": "장학생",
+   "due": "2026-09-30",
+   "school": null,
+   "tplNo": 3,
+   "cards": 5,
+   "dir": "insta/pub/2703591003",
+   "at": "2026-09-12"
+  }
+ ]
 }

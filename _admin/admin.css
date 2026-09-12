@@ -492,3 +492,37 @@ td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space
   cursor: pointer; font-size: .9rem; line-height: 1.45; min-height: 40px; }
 .pick-line:hover { background: var(--paper-3); }
 .pick-line input { margin-top: 3px; width: 18px; height: 18px; accent-color: var(--navy); flex: 0 0 auto; }
+
+/* ---------------- 인스타 (2026-09-12) ----------------
+   게시물 행은 표지 한 장(54×68)을 왼쪽에 둔다 — 글자만으로는 어느 카드인지 못 알아본다. */
+.ig-main { display: flex; gap: 12px; align-items: flex-start; min-width: 0; }
+.ig-thumb { width: 54px; height: 68px; object-fit: cover; border-radius: 4px; border: 1px solid var(--rule-soft); background: var(--paper-2); flex: 0 0 54px; }
+.ig-acts { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 8px; }
+.ig-tpl { font: inherit; font-size: .85rem; padding: 4px 6px; border: 1px solid var(--rule); border-radius: 4px; background: var(--paper); color: var(--ink); }
+.dd.past { color: var(--ink-3); }
+.ig-strip { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; }
+.ig-strip img { width: 200px; height: 250px; object-fit: cover; border-radius: 6px; border: 1px solid var(--rule-soft); flex: 0 0 auto; }
+.ig-caption { white-space: pre-wrap; font: inherit; font-size: .875rem; line-height: 1.6; background: var(--paper-2); padding: 12px; border-radius: 5px; max-height: 40vh; overflow: auto; }
+.ig-tpls { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.ig-tpl-card { margin: 0; border: 1px solid var(--rule-soft); border-radius: 5px; background: var(--paper); overflow: hidden; }
+.ig-tpl-card img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; display: block; }
+.ig-tpl-none { aspect-ratio: 4 / 5; display: flex; align-items: center; justify-content: center; text-align: center; color: var(--ink-3); font-size: .85rem; background: var(--paper-2); }
+.ig-tpl-card figcaption { padding: 8px 10px; font-size: .85rem; display: flex; flex-direction: column; gap: 2px; }
+.ig-tpl-card figcaption span { color: var(--ink-2); font-size: .78rem; }
+.ig-h3 { font-size: .95rem; margin: 0 0 6px; color: var(--ink-2); font-weight: 650; }
+/* 그래프 — 축·눈금은 뒤로 물러나고(--ink-3), 선 하나는 남색 2px. 글자는 글자 색(계열 색을 입히지 않는다) */
+.ig-chart { width: 100%; height: auto; display: block; }
+.ig-chart .axis { stroke: var(--rule); stroke-width: 1; }
+.ig-chart .tick { font-size: 11px; fill: var(--ink-3); font-family: var(--mono); }
+.ig-chart .line { fill: none; stroke: var(--navy); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.ig-chart .dot { fill: var(--navy); stroke: var(--paper); stroke-width: 2; }
+.ig-bars { display: flex; flex-direction: column; gap: 6px; }
+.ig-bar { display: grid; grid-template-columns: 9rem 1fr 3rem; gap: 8px; align-items: center; font-size: .82rem; }
+.ig-bar-l { color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ig-bar-t { height: 10px; background: var(--paper-3); border-radius: 4px; overflow: hidden; }
+.ig-bar-t i { display: block; height: 100%; background: var(--navy); border-radius: 4px; }
+.ig-bar-v { font-family: var(--mono); text-align: right; }
+.ig-cmt-text { margin: 4px 0; white-space: pre-wrap; }
+.ig-replies { margin: 6px 0 0 8px; font-size: .85rem; color: var(--ink-2); display: flex; flex-direction: column; gap: 2px; }
+.ig-reply-box { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.ig-reply-box input { flex: 1 1 220px; min-width: 0; font: inherit; font-size: .875rem; padding: 6px 8px; border: 1px solid var(--rule); border-radius: 4px; background: var(--paper); color: var(--ink); }

@@ -4,19 +4,38 @@
  * 🔴 **금액순이 아니라 '몇 명이 볼 수 있나'순.** 실측: 지역 제한 없고 200만원 이상이고
  *    마감 30일 내인 것이 145건 중 9건뿐이었고, 금액 큰 둘은 미술 전공·새터민 이공계였다.
  *    금액으로 고르면 아무도 못 받는 공고만 올리게 된다.
- * 🔴 올린 것은 `insta/seen.json` 이 기억한다. 없으면 매일 같은 공고를 새 공고로 올린다
- *    (수집기 이슈 #75 와 같은 유형).
+ * 🔴 올린 것·준비한 것은 `insta/seen.json` 이 기억한다. 없으면 매일 같은 공고를 새 공고로
+ *    올린다(수집기 이슈 #75 와 같은 유형). 장부는 둘이다 —
+ *    `posted`   올린 것(되돌릴 수 없는 사실 · 게시 단계만 적는다)
+ *    `prepared` 카드를 그려 개발자에게 보낸 것(`insta/pub/<코드>/` 와 짝 · 상태 prepared/skipped)
  *
- * 실행: node insta/pick.mjs           오늘 올릴 공고 하나 (JSON)
+ * 🔴 **공고 하나에 게시물 하나 · 생기면 바로**(2026-09-12 개발자 지시). 예전엔 월·목에 점수
+ *    1등 하나만 골랐다. 지금은 아직 준비 안 한 공고를 **전부** 후보로 보되, 한 실행에서
+ *    그리는 수만 `--max` 로 막는다(그리기가 한 건에 30초쯤이라 첫 실행에 98건을 다 그리면
+ *    시간 상한에 걸려 통째로 죽는다 — CLAUDE.md 의 '넘어져도 저장' 유형). 남은 것은 다음 실행.
+ *
+ * 실행: node insta/pick.mjs           점수 1등 하나 (JSON)
  *       node insta/pick.mjs --list    상위 12개를 점수와 함께 (사람이 볼 용도)
+ *       node insta/pick.mjs --new [--max=6]   아직 준비 안 한 공고를 점수순으로 (JSON 배열)
  */
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 
 const ROOT = new URL('../', import.meta.url);
 const SEEN = new URL('insta/seen.json', ROOT);
 
-export const readSeen = () =>
-  existsSync(SEEN) ? JSON.parse(readFileSync(SEEN, 'utf8')) : { posted: [] };
+export const readSeen = () => {
+  const s = existsSync(SEEN) ? JSON.parse(readFileSync(SEEN, 'utf8')) : {};
+  return { posted: s.posted || [], prepared: s.prepared || [] };
+};
+/** 준비 장부에서 이 공고의 줄. */
+export const preparedOf = (seen, code) => seen.prepared.find((p) => p.code === code) || null;
+/** 준비했다고 적는다(같은 공고는 덮어쓴다 — 다시 그리면 최신이 정답이다). */
+export function markPrepared(seen, rec) {
+  const i = seen.prepared.findIndex((p) => p.code === rec.code);
+  const row = { status: 'prepared', ...rec };
+  if (i >= 0) seen.prepared[i] = { ...seen.prepared[i], ...row }; else seen.prepared.push(row);
+  return seen;
+}
 
 /** 🔴 로봇 기록장과 같은 모양(들여쓰기 1칸)으로 저장한다 — 다르게 저장하면 파일 전체가
  *  충돌한다(CLAUDE.md 「매 세션 이것만은」 4번). */
@@ -63,12 +82,19 @@ export function score(x, today) {
 
 /** 고를 수 있는 공고만 남긴다. 🔴 못 고르는 이유를 **버리지 말고 세어서** 돌려준다 —
  *  "왜 오늘 올릴 게 없지" 를 다음 사람이 다시 조사하지 않게. */
-export function candidates(items, today, seen) {
+export function candidates(items, today, seen, { unpreparedOnly = false } = {}) {
   const done = new Set(seen.posted.map((p) => p.code));
-  const drop = { 이미올림: 0, 마감지남: 0, 마감없음: 0, 금액미확인: 0 };
+  // 준비돼 있거나(개발자 메일함에 있다) 건너뛰기로 정한 것은 다시 그리지 않는다.
+  // 🔴 못 그린 것(failed)은 **7일 쉬었다** 다시 — 바로 다시 뽑으면 같은 공고가 매 실행 1등으로 나머지를 굶긴다.
+  const RETRY_MS = 7 * 864e5;
+  const prepped = new Set((seen.prepared || [])
+    .filter((p) => p.status !== 'failed' || (today - Date.parse(`${p.failedAt}T00:00:00+09:00`)) < RETRY_MS)
+    .map((p) => p.code));
+  const drop = { 이미올림: 0, 이미준비: 0, 마감지남: 0, 마감없음: 0, 금액미확인: 0 };
   const ok = [];
   for (const x of items) {
     if (done.has(x.code)) { drop.이미올림++; continue; }
+    if (unpreparedOnly && prepped.has(x.code)) { drop.이미준비++; continue; }
     if (!x.due) { drop.마감없음++; continue; }
     const t = new Date(`${x.due}T23:59:59+09:00`).getTime();
     if (Number.isNaN(t)) { drop.마감없음++; continue; }
@@ -87,7 +113,21 @@ export function candidates(items, today, seen) {
 if (process.argv[1] && import.meta.url === new URL(process.argv[1], 'file:').href) {
   const { allNotices } = await import('./notices.mjs');
   const { items } = allNotices();
-  const { ok, drop } = candidates(items, Date.now(), readSeen());
+  const isNew = process.argv.includes('--new');
+  const { ok, drop } = candidates(items, Date.now(), readSeen(), { unpreparedOnly: isNew });
+
+  // 🔴 새 공고 전부 — 워크플로가 이 목록을 돌며 한 건씩 그린다. 0건이면 빈 배열(정상 종료).
+  //    상한을 넘긴 나머지는 버리는 게 아니라 **다음 실행 몫**이다(장부에 안 적혔으니 다시 뜬다).
+  if (isNew) {
+    const a = process.argv.find((x) => x.startsWith('--max='));
+    const max = a ? Number(a.slice(6)) : 6;
+    if (!Number.isInteger(max) || max < 1) { console.error('--max 는 1 이상의 정수'); process.exit(1); }
+    console.error(`■ 준비 안 한 공고 ${ok.length}건 (이번에 ${Math.min(max, ok.length)}건) — 뺀 이유: `
+      + Object.entries(drop).map(([k, v]) => `${k} ${v}`).join(' · '));
+    console.log(JSON.stringify(ok.slice(0, max).map((c) => ({ code: c.x.code, org: c.x.org, name: c.x.name,
+      due: c.x.due, school: c.x.school || null, score: c.s, dday: c.d })), null, 1));
+    process.exit(0);
+  }
 
   if (process.argv.includes('--list')) {
     console.log(`■ 고를 수 있는 공고 ${ok.length} / ${items.length}건`);

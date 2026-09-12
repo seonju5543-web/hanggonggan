@@ -1,0 +1,53 @@
+# 인스타 판형 견본 — 판형마다 표지 한 장씩 insta/samples/<번호>.jpg 로 (2026-09-12)
+#
+# 관리자 화면 「인스타 › 판형」 과 메일이 이 그림으로 "3번은 이렇게 생겼다" 를 보여 준다.
+# 판형 파일·목록이 바뀔 때만 돈다(push paths). 견본 공고는 고정 — 판형끼리 비교가 되게.
+name: 인스타 판형 견본
+
+on:
+  push:
+    branches: ['claude/nice-heisenberg-WESq5']
+    paths: ['insta/templates.json', 'insta/templates/**', 'insta/render.mjs']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: insta-samples
+  cancel-in-progress: true      # 견본은 최신 것만 뜻이 있다 — 밀린 실행은 버려도 된다
+
+env:
+  BASE: claude/nice-heisenberg-WESq5
+
+jobs:
+  draw:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/nice-heisenberg-WESq5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm init -y >/dev/null && npm i playwright@1 --no-audit --no-fund
+      - run: npx playwright@1 install --with-deps chromium
+      - name: 판형마다 표지 한 장
+        run: node insta/samples.mjs
+      - name: 저장
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add -A insta/samples
+          git diff --cached --quiet && { echo '변화 없음'; exit 0; }
+          git commit -m '인스타: 판형 견본 갱신'
+          for i in 1 2 3; do
+            git push origin "HEAD:$BASE" && break || { git pull --rebase origin "$BASE"; sleep 5; }
+            [ "$i" = 3 ] && { echo '🚨 기록을 못 올렸습니다'; exit 1; }
+          done
+          # main 에는 밀지 않는다 — 로봇 저장 위치 원칙(CLAUDE.md): 로봇은 기본 브랜치에만 쓰고 배포는 deploy-sync 가 맡는다.
+          #   관리자 화면은 기본 브랜치의 raw 주소로 견본을 본다(코드 리뷰).
+      - name: 실패하면 시끄럽게
+        if: ${{ failure() || cancelled() }}
+        run: echo '🚨 판형 견본을 못 그렸습니다 — 새 판형 파일이 깨졌을 가능성이 큽니다.' >> "$GITHUB_STEP_SUMMARY"

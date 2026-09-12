@@ -3,10 +3,17 @@
  *     고친 것이 되돌아오면 이 검사가 빨간불이 된다. */
 const { readFileSync } = require('node:fs');
 const { join } = require('node:path');
+const { spawnSync } = require('node:child_process');
 const ROOT = join(__dirname, '..');
 const raw = readFileSync(join(ROOT, 'insta/render.mjs'), 'utf8');
+// 🔴 바깥 판형 파일(insta/templates/*.mjs)도 같은 잣대로 본다 — 새 출처를 붙일 때 관문이 안 따라가면 그 판형은 아무도 안 보는 것과 같다.
+const TPL_DIR = join(ROOT, 'insta/templates');
+const tplFiles = require('node:fs').existsSync(TPL_DIR) ? require('node:fs').readdirSync(TPL_DIR).filter((f) => f.endsWith('.mjs')).map((f) => join(TPL_DIR, f)) : [];
+const tplRaw = tplFiles.map((f) => readFileSync(f, 'utf8')).join('\n');
 // 🔴 주석을 빼고 본다 — 안 그러면 '이렇게 하면 안 된다' 는 설명까지 위반으로 잡는다(실제로 그랬다).
-const src = raw.replace(/\/\*[\s\S]*?\*\//g, '').split('\n').filter((l) => !/^\s*(\/\/|\*)/.test(l)).join('\n');
+const strip = (t) => t.replace(/\/\*[\s\S]*?\*\//g, '').split('\n').filter((l) => !/^\s*(\/\/|\*)/.test(l)).join('\n');
+const src = strip(raw);
+const tplSrc = strip(tplRaw);
 // 🔴 교외만 재면 교내가 무방비다 — 새 출처를 붙일 때 관문이 안 따라가면 그 출처는
 //    아무도 안 보는 것과 같다. `insta/notices.mjs` 가 '무엇을 올릴 수 있나' 의 한 곳이다.
 let items = [], meta = {};
@@ -53,12 +60,14 @@ const today = new Date();
     if (/'모집 중'/.test(src)) fail('C1', '-', "'모집 중' 문구가 아직 남아 있다");
     console.log(`  · 마감 지난 공고 ${past}건 — '마감 지남' 으로 표시되는지 확인`);
   }
-  // C2 · 금지어 · 학위 조건을 안 보는 표지 문구
+  // C2 · 금지어 · 학위 조건을 안 보는 표지 문구 (바깥 판형 파일도 같이)
   for (const w of ['무조건', '역대급', '꿀팁', '안 보면 손해'])
-    if (src.includes(`'${w}`) || src.includes(`>${w}`)) fail('C2', '-', `금지어 '${w}' 가 남아 있다`);
+    for (const [name, t] of [['render.mjs', src], ['templates/', tplSrc]])
+      if (t.includes(`'${w}`) || t.includes(`>${w}`)) fail('C2', name, `금지어 '${w}' 가 남아 있다`);
   // C3 · 개별 학생 판정 문구
   for (const w of ['신청 가능한 장학금', '받을 수 있어요', '해당됩니다'])
-    if (src.includes(w)) fail('C3', '-', `판정 문구 '${w}' 가 남아 있다`);
+    for (const [name, t] of [['render.mjs', src], ['templates/', tplSrc]])
+      if (t.includes(w)) fail('C3', name, `판정 문구 '${w}' 가 남아 있다`);
   // C4 · '분할' 을 '매달' 로 읽지 않는다
   {
     const monthly = eval(pick('monthly', /const monthly = (\/.+?\/)\.test/)[1]);
@@ -122,6 +131,7 @@ const today = new Date();
   {
     const none = items.filter((x) => !bullets((x.fields || {})['자격제한']).length).length;
     if (!/traps\.length \?/.test(src)) fail('I2', '-', '조항 없는 공고에도 4장을 그린다');
+    for (const f of tplFiles) if (!/traps\.length \?/.test(strip(readFileSync(f, 'utf8')))) fail('I2', f.split('/').pop(), '바깥 판형이 조항 없는 공고에도 경고 장을 그린다');
     console.log(`  · 자격제한 없는 공고 ${none}건 — 4장을 빼는지 확인`);
   }
   // I8 · CC BY·BY-SA 사진의 저작자·라이선스가 실제로 카드에 나간다
@@ -330,6 +340,20 @@ const today = new Date();
     process.env.IG_ACCESS_TOKEN = '';
     if ((await tokenState(live, mem({}), T0)).state !== 'none') fail('C10', '-', '토큰이 없는데 none 이 아니다');
     if (before === undefined) delete process.env.IG_ACCESS_TOKEN; else process.env.IG_ACCESS_TOKEN = before;
+    /* 🔴 **토큰이 없는 것을 '살아 있음' 이라고 말하지 않는다** (2026-09-12 인수인계 중 발견).
+       위 줄은 `state` 만 본다. 그런데 손으로 돌려 보는 사람이 읽는 것은 그 아래 **한국어 줄**이고,
+       그 줄이 `none` 에서도 '살아 있음 · null일 남음 (처음 본 날 undefined)' 이라고 답했다 —
+       시크릿을 아직 안 넣은 사람에게 넣었다고 말하는 것이다(원칙 8-1 · 「매 세션」 5번).
+       ⚠️ 워크플로는 셸에서 먼저 걸러 이 줄에 안 닿으므로 **초록불로는 안 드러난다.**
+       그래서 파일을 읽지 않고 **실제로 돌려서** 사람이 보는 글자를 본다. */
+    {
+      const r = spawnSync(process.execPath, [join(ROOT, 'insta/token-days.mjs')],
+        { encoding: 'utf8', env: { ...process.env, IG_ACCESS_TOKEN: '' } });
+      const said = `${r.stdout || ''}${r.stderr || ''}`;
+      if (!/state=none/.test(said)) fail('C10', '-', '토큰 없이 돌렸는데 state=none 이 아니다 (검사가 헛돈다)');
+      if (/살아 있음/.test(said)) fail('C10', '-', '토큰이 없는데 「살아 있음」이라고 말한다');
+      if (/undefined|null일/.test(said)) fail('C10', '-', '토큰이 없을 때 빈 값을 그대로 찍는다');
+    }
     // 🔴 Instagram Login 경로다 — 페이스북 호스트로 돌아가면 페이지 없는 계정에서 죽는다.
     const tdSrc = readFileSync(join(ROOT, 'insta/token-days.mjs'), 'utf8');
     const pubSrc2 = readFileSync(join(ROOT, 'insta/publish.mjs'), 'utf8');
@@ -355,6 +379,125 @@ const today = new Date();
     console.log(`  · 토큰 감시 — 갈래 ${want.length}가지 · 수명 ${LIFE_DAYS}일 · 경고 ${WARN_DAYS}일 · 매일 예약`);
   }
   console.log('  · 게시 경로 — 예행연습 기본 · JPEG · 공개 확인 · seen 기록 · 다시 안 그림');
+
+  // C11 · 2026-09-12 개발자 지시 여섯 — 공고당 게시물 하나 · 생기면 바로 · 개발자 셋 · 번호 판형 · 채팅 수정 · 관리자 화면
+  {
+    const { loadTemplates, resolveTpl } = rnd;
+    const reg = JSON.parse(readFileSync(join(ROOT, 'insta/templates.json'), 'utf8')).templates;
+    // 번호는 고정 · 1부터 빈틈없이 · 파일이 실제로 있고 모양이 맞는가 (loadTemplates 가 던지면 그것이 실패다)
+    const nos = reg.map((t) => t.no);
+    if (nos.join() !== nos.map((_, i) => i + 1).join()) fail('C11', '-', `판형 번호가 1부터 빈틈없이 이어지지 않는다 — ${nos.join(',')}`);
+    let ALL = null;
+    try { ALL = await loadTemplates(); } catch (e) { fail('C11', '-', `판형 목록을 못 읽는다 — ${e.message}`); }
+    if (ALL) {
+      for (const t of reg) {
+        const got = resolveTpl(ALL, String(t.no));
+        if (!got || got.id !== t.id) fail('C11', '-', `${t.no}번이 ${t.id} 를 가리키지 않는다`);
+        if (!Array.isArray(got?.fonts) || got.fonts.length < 1) fail('C11', t.id, '확인할 글꼴이 없다 — 두부(□)가 나가도 초록불이 된다');
+        // 바깥 판형은 카드를 실제로 만들어 본다 — 사실 재료 밖의 글자를 지어내지 않는지는 사람이 보지만, 최소한 2~10장은 나와야 한다
+        if (!got.builtin) {
+          const x = items.find((y) => y.due && !((y.fields || {})['자격제한'] === '')) || items[0];
+          const c0 = rnd.context(x, today, rnd.SKINS.blue, 7, x.school || null);
+          const cards = got.cards(c0, rnd.KIT);
+          if (!Array.isArray(cards) || cards.length < 2 || cards.length > 10) fail('C11', t.id, `카드가 ${cards?.length}장 — 캐러셀은 2~10장`);
+          if (!/\.card/.test(got.css(rnd.SKINS.blue, rnd.KIT))) fail('C11', t.id, 'css 에 .card 가 없다 — 렌더러가 카드를 못 찾는다');
+          if (!cards.some((h) => /data-fit/.test(h))) fail('C11', t.id, '사실 줄에 data-fit 이 없다 — 긴 원문이 잘린다');
+        }
+      }
+    }
+    // 팀 셋 — 이슈 담당자(github)와 메일(email) 둘 다
+    const team = JSON.parse(readFileSync(join(ROOT, 'insta/team.json'), 'utf8')).people;
+    if (team.length < 3) fail('C11', '-', `팀이 ${team.length}명 — 개발자 셋 전부여야 한다`);
+    for (const p of team) if (!p.github || !/@/.test(p.email || '')) fail('C11', p.name, 'github 또는 email 이 비었다');
+    // 워크플로 — 수집 뒤 바로 · 담당자는 team.json 에서 · 예약이 게시까지 안 간다(C9) · 알림 push-to-run
+    if (!/workflow_run:/.test(wf) || !/'장학공고 수집 로봇'/.test(wf)) fail('C11', '-', '수집 로봇이 끝나도 카드를 안 그린다 — workflow_run 이 없다');
+    if (!/team\.json/.test(wf) || /--assignee didinin-wq/.test(wf)) fail('C11', '-', '담당자를 team.json 에서 읽지 않는다(한 사람만 지정)');
+    if (!/insta\/run-notify\.txt/.test(wf)) fail('C11', '-', '채팅에서 고친 카드를 다시 알리는 push-to-run 통로가 없다');
+    if (!/ledger\.mjs prepared/.test(wf)) fail('C11', '-', '그린 것을 준비 장부에 안 적는다 — 다음 실행이 같은 공고를 또 그린다');
+    if (!/pick\.mjs --new/.test(wf)) fail('C11', '-', '새 공고 전부가 아니라 하나만 고른다');
+    const ml = readFileSync(join(ROOT, 'insta/mail.mjs'), 'utf8');
+    if (!/team\.json/.test(ml)) fail('C11', '-', 'mail.mjs 가 받는 사람을 team.json 에서 읽지 않는다');
+    // 관리자 화면 — step 글자가 워크플로 선택지와 한 글자도 다르지 않은가 (다르면 422 로 조용히 죽는다)
+    const adm = readFileSync(join(ROOT, '_admin/admin.js'), 'utf8');
+    const opts = (wf.match(/options: \[([^\]]*)\]/) || ['', ''])[1].split(',').map((x) => x.trim());
+    for (const m of adm.matchAll(/INSTA_STEP = \{([\s\S]*?)\};/g)) for (const v of m[1].matchAll(/'([^']+)'/g))
+      if (!opts.includes(v[1])) fail('C11', '-', `관리자 화면의 step '${v[1]}' 이 insta.yml 선택지에 없다`);
+    if (!/screen-insta/.test(readFileSync(join(ROOT, '_admin/index.html'), 'utf8'))) fail('C11', '-', '관리자 화면에 인스타 탭이 없다');
+    // 채팅 수정 도구·스킬 — 그림을 보여 주고 **묻는다**
+    const rv = readFileSync(join(ROOT, 'insta/revise.mjs'), 'utf8');
+    if (/--publish|smtps:|mail\.mjs/.test(rv)) fail('C11', '-', 'revise.mjs 가 메일을 보내거나 게시한다 — 보여 주고 묻는 것까지가 이 도구다');
+    if (!/preview\.mjs/.test(rv)) fail('C11', '-', 'revise.mjs 가 미리보기 그림을 안 만든다 — 보여 줄 것이 없다');
+    for (const sk of ['insta-revise', 'insta-template']) {
+      const f = join(ROOT, `.claude/skills/${sk}/SKILL.md`);
+      if (!require('node:fs').existsSync(f)) { fail('C11', '-', `스킬 ${sk} 이 없다`); continue; }
+      const t = readFileSync(f, 'utf8');
+      if (sk === 'insta-revise' && !/보낼까요/.test(t)) fail('C11', '-', 'insta-revise 스킬이 메일 발송 전에 묻지 않는다');
+      if (sk === 'insta-template' && !/new-template\.mjs/.test(t)) fail('C11', '-', 'insta-template 스킬이 시작 파일 도구를 안 쓴다');
+    }
+    // 트랙션·댓글 — 가짜 서버로 한 바퀴 (토큰은 서버에만 · 한 게시물 실패가 전체를 비우지 않는다 · 답글은 --do 없이는 안 나간다)
+    {
+      const st = await import(new URL('../insta/stats.mjs', `file://${__filename}`).href);
+      const cm = await import(new URL('../insta/comments.mjs', `file://${__filename}`).href);
+      const before = process.env.IG_ACCESS_TOKEN;
+      process.env.IG_ACCESS_TOKEN = 'tok-시험';
+      const box = {};
+      const store = { read: () => ({ history: [{ at: '2026-09-11', followers: 10 }], posts: [] }), write: (v) => Object.assign(box, v), seen: () => ({ posted: [{ code: 'A', media: '111', org: 'o', name: 'n' }] }) };
+      const fk = async (u) => {
+        const s = String(u);
+        const j = (b) => ({ ok: true, json: async () => b });
+        if (/\/me\?/.test(s)) return j({ username: 'handaejang', followers_count: 12, media_count: 1 });
+        if (/me\/media/.test(s)) return j({ data: [{ id: '111', permalink: 'https://www.instagram.com/p/x/', timestamp: '2026-09-12T00:00:00+0000', like_count: 3, comments_count: 1, media_type: 'CAROUSEL_ALBUM' }, { id: '222', timestamp: '2026-09-10T00:00:00+0000', like_count: 1 }] });
+        if (/111\/insights/.test(s)) return j({ data: [{ name: 'reach', values: [{ value: 40 }] }, { name: 'saved', values: [{ value: 5 }] }] });
+        if (/222\/insights/.test(s)) return { ok: false, json: async () => ({ error: { message: 'no insights' } }) };
+        if (/111\/comments/.test(s)) return j({ data: [{ id: '9', text: '되나요?', username: 'stu', timestamp: '2026-09-12T01:00:00+0000', like_count: 0, hidden: false, replies: { data: [] } }] });
+        if (/9\/replies/.test(s)) return j({ id: '99' });
+        throw new Error('unexpected ' + s);
+      };
+      const r = await st.harvest(fk, store, Date.parse('2026-09-12T03:00:00Z'));
+      if (r.state !== 'ok' || box.posts?.length !== 2) fail('C11', '-', `트랙션 수확이 게시물 2건을 안 적는다 (${r.state} · ${box.posts?.length})`);
+      const bad = (box.posts || []).find((p) => p.id === '222');
+      if (!bad || !bad.error || bad.reach !== null) fail('C11', '-', '반응을 못 받은 게시물을 0 으로 적거나 버린다 — 실패는 error 칸에 남아야 한다');
+      if ((box.posts || []).find((p) => p.id === '111')?.code !== 'A') fail('C11', '-', '올린 장부(seen.posted)의 공고 코드를 게시물에 잇지 않는다');
+      if ((box.history || []).length !== 2 || box.history[1].followers !== 12) fail('C11', '-', '팔로워 이력을 하루 한 줄로 덧붙이지 않는다');
+      if (JSON.stringify(box).includes('tok-시험')) fail('C11', '-', 'stats.json 에 토큰이 적힌다');
+      const cbox = {};
+      const cstore = { read: () => ({ items: [{ id: '9', handledAt: '2026-09-11 10:00' }] }), write: (v) => Object.assign(cbox, v), seen: store.seen };
+      const cr = await cm.fetchAll(fk, cstore, Date.parse('2026-09-12T03:00:00Z'));
+      if (cr.state !== 'ok' || cbox.items?.[0]?.id !== '9') fail('C11', '-', '댓글을 받아 적지 않는다');
+      if (cbox.items?.[0]?.handledAt !== '2026-09-11 10:00') fail('C11', '-', '받아 적을 때 우리 표식(handledAt)을 지운다 — 답한 댓글이 매번 새 댓글로 되살아난다');
+      const dry = await cm.act('reply', { comment: '9', text: '안녕하세요' }, false, fk, cstore);
+      if (!dry.dry) fail('C11', '-', '--do 없이 답글이 나간다');
+      const live = await cm.act('reply', { comment: '9', text: '안녕하세요' }, true, fk, { read: () => ({ items: [{ id: '9' }] }), write: (v) => Object.assign(cbox, v), seen: store.seen }, Date.parse('2026-09-12T03:00:00Z'));
+      if (live.dry || live.id !== '99' || !cbox.items?.[0]?.handledAt) fail('C11', '-', '답글을 보낸 뒤 처리 표식을 안 남긴다');
+      let threw = false; try { await cm.act('reply', { comment: 'x9', text: 'a' }, true, fk, cstore); } catch { threw = true; }
+      if (!threw) fail('C11', '-', '댓글 ID 가 숫자가 아닌데 보낸다');
+      if (before === undefined) delete process.env.IG_ACCESS_TOKEN; else process.env.IG_ACCESS_TOKEN = before;
+      // 토큰은 서버에만 — 관리자 화면이 인스타에 직접 묻지 않는다
+      // ⚠️ 시크릿 **이름**은 안내 문구에 나와도 된다 — 부르는 꼴(호스트·access_token 파라미터)만 본다
+      if (/graph\.instagram\.com|access_token=/.test(adm)) fail('C11', '-', '관리자 화면이 인스타에 직접 묻거나 토큰을 쓴다');
+      for (const f of ['insta-stats.yml', 'insta-comments.yml', 'insta-samples.yml']) {
+        const w = readFileSync(join(ROOT, `.github/workflows/${f}`), 'utf8');
+        if (!/timeout-minutes/.test(w)) fail('C11', f, 'timeout-minutes 가 없다');
+        if (!/failure\(\) \|\| cancelled\(\)/.test(w)) fail('C11', f, '취소를 안 잡는다');
+      }
+      const cw = readFileSync(join(ROOT, '.github/workflows/insta-comments.yml'), 'utf8');
+      if (!/reply.*--do/.test(cw)) fail('C11', '-', '댓글 워크플로가 --do 없이 답글을 부른다(예행연습만 된다)');
+    }
+    // 못 그린 공고는 7일 쉬었다 다시 뜬다 — 바로 다시 뽑히면 나머지를 굶긴다(코드 리뷰)
+    {
+      const { candidates } = await import(new URL('../insta/pick.mjs', `file://${__filename}`).href);
+      const t0 = Date.parse('2026-09-12T03:00:00Z');
+      const fake = [{ code: 'F1', org: 'o', name: 'n', due: '2026-09-30', fields: { 지원금액: '100만원' } },
+        { code: 'F2', org: 'o', name: 'n', due: '2026-09-30', fields: { 지원금액: '100만원' } }];
+      const seenF = { posted: [], prepared: [
+        { code: 'F1', status: 'failed', failedAt: '2026-09-11' },   // 어제 실패 — 아직 쉰다
+        { code: 'F2', status: 'failed', failedAt: '2026-09-01' }] };  // 열하루 전 — 다시 뜬다
+      const got = candidates(fake, t0, seenF, { unpreparedOnly: true }).ok.map((c) => c.x.code);
+      if (got.includes('F1') || !got.includes('F2')) fail('C11', '-', `실패한 공고의 재시도 간격이 틀리다 — 뽑힌 것 ${got.join(',') || '없음'}`);
+      if (!/ledger\.mjs failed/.test(wf)) fail('C11', '-', '워크플로가 못 그린 공고를 장부에 안 적는다');
+    }
+    console.log(`  · 2026-09-12 지시 — 판형 ${reg.length}벌(번호 고정) · 팀 ${team.length}명 · 수집 뒤 바로 · 관리자 화면 · 트랙션·댓글 가짜 서버 한 바퀴`);
+  }
     console.log(bad ? `\n🚨 ${bad}건 실패` : '\n✅ 전부 통과');
     process.exit(bad ? 1 : 0);
 

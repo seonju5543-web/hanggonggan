@@ -93,6 +93,8 @@ function serve() {
       ? u.pathname.slice(RAW_PREFIX.length)
       : u.pathname.split('/').slice(4).join('/');
     const f = path.join(ROOT, rel);
+    /* 검사용 준비 카드(아래)의 그림은 저장소에 없다 — 404 가 콘솔 오류로 남지 않게 빈 그림으로 답한다 */
+    if (rel.startsWith('insta/pub/verify-insta-1/')) return route.fulfill({ status: 200, contentType: 'image/jpeg', body: '' });
     if (!f.startsWith(ROOT) || !fs.existsSync(f)) return route.fulfill({ status: 404, body: '' });
     let body = fs.readFileSync(f, 'utf8');
     /* 🔴 검수 대기가 0건이면 '컨펌 작업대'와 '다중 선택' 검사가 **조용히 사라진다**
@@ -117,6 +119,16 @@ function serve() {
         body = JSON.stringify(db);
       }
       PAGE_ITEMS = JSON.parse(body).items;   // 화면이 실제로 받은 목록 — 아래 건수 비교는 전부 이걸 기준으로 한다
+    }
+    /* 인스타 — 게시 대기가 0건이면 '게시·카드 보기' 검사가 조용히 사라진다(위 검수 대기와 같은 유형).
+       검사용 준비 카드를 끼워 넣는다. 저장소 장부는 건드리지 않는다. */
+    if (rel === 'insta/seen.json') {
+      const db = JSON.parse(body);
+      db.prepared = db.prepared || [];
+      if (!db.prepared.some((x) => x.status === 'prepared')) db.prepared.push({
+        status: 'prepared', code: 'verify-insta-1', org: '검사용', name: '검사용 카드', due: new Date(Date.now() + 9 * 3600e3 + 5 * 86400e3).toISOString().slice(0, 10),
+        tplNo: 1, dir: 'insta/pub/verify-insta-1', at: '2026-09-12', cards: 4 });
+      body = JSON.stringify(db);
     }
     return route.fulfill({ status: 200, contentType: 'application/json', body });
   });
@@ -211,6 +223,37 @@ function serve() {
   await page.click('.tab[data-tab="quality"]');
   await page.waitForSelector('#screen-quality:not([hidden])');
   ok(/데이터 품질/.test(await page.textContent('#screen-quality')), '⑥ 데이터 품질 화면이 그려진다');
+
+  /* ⑦ 인스타 (2026-09-12) — 게시 대기 · 판형 번호 · 트랙션 · 댓글이 한 화면에 */
+  await page.click('.tab[data-tab="insta"]');
+  await page.waitForSelector('#screen-insta:not([hidden])');
+  const igText = await page.textContent('#screen-insta');
+  ok(/게시 대기/.test(igText) && /트랙션/.test(igText) && /댓글/.test(igText) && /판형/.test(igText),
+    '⑦ 인스타 화면에 게시 대기·판형·트랙션·댓글 구획이 다 있다');
+  const igTpls = JSON.parse(fs.readFileSync(path.join(ROOT, 'insta/templates.json'), 'utf8')).templates;
+  const igTplCards = await page.locator('#screen-insta .ig-tpl-card').count();
+  ok(igTplCards === igTpls.length, '⑦ 판형이 번호 전부 보인다', `${igTplCards}/${igTpls.length}벌`);
+  for (const t of igTpls) ok(igText.includes(`${t.no}번 ${t.name}`), `⑦ ${t.no}번 ${t.name} 이 번호와 함께 적힌다`);
+  const igRows = await page.locator('#screen-insta [data-ig-publish]').count();
+  ok(igRows >= 1, '⑦ 게시 대기 카드에 게시 버튼이 있다', `${igRows}건`);
+  /* 게시 버튼은 바로 쏘지 않고 **한 번 더 묻는다** — 되돌릴 수 없는 일이다 */
+  const apiBefore = apiCalls;
+  await page.locator('#screen-insta [data-ig-publish]').first().click();
+  await page.waitForSelector('#sheet:not([hidden])');
+  ok(/인스타에 게시/.test(await page.textContent('#sheet')), '⑦ 게시 버튼이 먼저 확인 시트를 연다');
+  ok(apiCalls === apiBefore, '⑦ 확인 전에는 워크플로를 깨우지 않는다');
+  await page.click('#sheet [data-close]');
+  await page.waitForSelector('#sheet', { state: 'hidden' });
+  /* 카드 보기 시트 — 그림 줄 + 캡션 자리 */
+  await page.locator('#screen-insta [data-ig-view]').first().click();
+  await page.waitForSelector('#sheet:not([hidden])');
+  ok(await page.locator('#sheet .ig-strip').count() === 1 && await page.locator('#sheet #ig-caption').count() === 1,
+    '⑦ 카드 보기 시트에 그림 줄과 캡션이 있다');
+  await page.click('#sheet [data-close]');
+  await page.waitForSelector('#sheet', { state: 'hidden' });
+  /* 판형 고르기 — 관리자 화면의 step 글자가 워크플로 선택지와 같은가는 verify-insta C11 이 본다 */
+  const igSel = await page.locator('#screen-insta select.ig-tpl').first().locator('option').count();
+  ok(igSel === igTpls.length, '⑦ 판형 고르기에 번호가 전부 있다', `${igSel}개`);
 
   /* 지원 자격 미확보 — 고치는 자리는 상세에 있었는데 **몇 건인지 세는 자리가 없어서**
      76건이 밀려 있어도 화면이 조용했다(2026-08-12). 학생 앱과 같은 칸으로 센다. */

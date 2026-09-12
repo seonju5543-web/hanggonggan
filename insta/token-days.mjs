@@ -74,6 +74,11 @@ if (process.argv[1] && import.meta.url === new URL(process.argv[1], 'file:').hre
   const s = await tokenState();
   console.log(`state=${s.state}`);
   console.log(`days=${s.days ?? ''}`);
-  console.error(s.why ? `⚠️  ${s.why}`
-    : `살아 있음 · 우리가 아는 한 ${s.days}일 남음 (처음 본 날 ${s.firstSeen}) — ${s.state}`);
+  /* 🔴 **토큰이 없는 것을 '살아 있음' 이라고 말하지 않는다** (2026-09-12 인수인계 중 발견).
+     `none` 에는 `why` 가 없어 아래 갈래로 떨어졌고, 시크릿을 안 넣은 사람에게
+     `살아 있음 · … null일 남음 (처음 본 날 undefined)` 라고 답했다 — 확인하지 않은 것을
+     확인했다고 말하는 것이다(원칙 8-1). 상태는 셋이니 갈래도 셋이어야 한다. */
+  console.error(s.state === 'none' ? '토큰이 없습니다 — IG_ACCESS_TOKEN 을 넣어야 물어볼 수 있습니다.'
+    : s.why ? `⚠️  ${s.why}`
+      : `살아 있음 · 우리가 아는 한 ${s.days}일 남음 (처음 본 날 ${s.firstSeen}) — ${s.state}`);
 }
