@@ -709,9 +709,10 @@
   **관리자 화면만** Cloudflare에 올린다. ① Access가 '허용 이메일에 일회용 코드 발송' 로그인을 코드 없이 제공
   (개발자 원안 그대로) + 접근 기록 ② 도메인이 달라 앱1과 브라우저 저장 공간이 분리 ③ 무료(푸시 서버와 같은 계정).
   빌드 명령 `bash _admin/build.sh`, 출력 폴더 `_admin/dist`, 프로덕션 브랜치 = 기본 브랜치.
-- **관리자 화면의 공용 코드는 복사하지 말 것**: `_admin/build.sh` 가 빌드 때 `data.js`·`forms.js`·
-  `verify/entry-rules.cjs`·`collector/url-key.mjs` 를 `dist/vendor/` 로 복사한다. **원본은 한 곳뿐**
-  — 베끼면 로봇·감사·관리자 화면이 서로 다른 규칙으로 판단한다(entry-rules 는 앞뒤만 감싼다).
+- **관리자 화면의 공용 코드는 복사하지 말 것**: `_admin/build.sh` 가 빌드 때 공용 원본 여섯을
+  `dist/vendor/` 로 복사한다. **원본은 한 곳뿐** — 베끼면 로봇·감사·관리자 화면이 서로 다른
+  규칙으로 판단한다. 🔴 **부르는 이웃까지 옮긴다 (2026-09-13 사고)** — 안 옮기면 `admin.js` 가
+  통째로 안 돌아 버튼이 죽는다(문구조차 안 뜬다). 관문 `verify/verify-admin-vendor.js` · `SESSIONS.md`.
 - **관리자 버튼이 작동하려면 워크플로가 기본 브랜치에 있어야 한다 (2026-08-03)**: GitHub의
   `workflow_dispatch`는 **워크플로 파일이 기본 브랜치에 있을 때만** 실행을 받아 준다. 작업 브랜치에만
   올려 두면 관리자 화면의 컨펌·수정·되돌리기가 **전부 404로 죽는다**(실제로 그 상태였다).
@@ -722,7 +723,7 @@
   써야 한다. 둘 다 `Authorization: Bearer`로 동작해 화면 코드는 같다.
 - **Cloudflare Pages에 빌드 감시 경로를 꼭 넣을 것 (2026-08-03)**: 수집 로봇이 기본 브랜치에 하루
   10번쯤 커밋하는데, 그대로 두면 그때마다 관리자 화면을 다시 빌드해 **무료 한도(월 500회)를 며칠 만에
-  쓴다.** Settings → Build → Build watch paths 에 `_admin/*` + 공용 원본 4개만 넣는다.
+  쓴다.** Build watch paths 에 `_admin/*` + **build.sh 가 옮기는 공용 원본**만 넣는다(지금 여섯).
   Access는 **Subdomain 칸에 `*`** 를 넣어야 운영 주소까지 잠긴다(빼면 미리보기 주소만 잠긴다).
   일회용 코드 메일은 `noreply@notify.cloudflare.com` — **Gmail 스팸함·프로모션 탭으로 자주 간다.**
 - **Cloudflare 없이 화면을 먼저 보는 법**: `node tools/build-admin-preview.mjs` → `_admin/preview.html`
