@@ -18,8 +18,10 @@
 import os
 import shutil
 import subprocess
+import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+REPO = os.path.dirname(HERE)
 OUT = os.path.join(HERE, 'extracted')
 MIN_CHARS = 40          # 이보다 적으면 스캔 이미지로 본다 (표지만 있는 PDF 도 이쯤이다)
 
@@ -42,6 +44,29 @@ def needs_work(pdf_path, txt_path):
         return True
 
 
+def targets(roots):
+    """훑을 파일 목록.
+
+    기본(인자 없음)은 예전 그대로 collector/extracted 한 겹만 본다 — 동작을 바꾸지 않는다.
+    인자로 폴더를 주면 **그 아래를 재귀로** 훑는다: 한국장학재단 공고문 사본은
+    data/kosaf-files/<재단코드>/ 처럼 재단별 폴더에 들어 있어(2026-09-12) 한 겹만
+    보면 한 개도 못 찾는다.
+    """
+    if not roots:
+        if not os.path.isdir(OUT):
+            return None
+        return [os.path.join(OUT, n) for n in sorted(os.listdir(OUT))]
+    found = []
+    for root in roots:
+        full = root if os.path.isabs(root) else os.path.join(REPO, root)
+        if not os.path.isdir(full):
+            print(f'{root} 이 없습니다 — 건너뜁니다.')
+            continue
+        for dirpath, _dirs, names in os.walk(full):
+            found += [os.path.join(dirpath, n) for n in sorted(names)]
+    return found
+
+
 def main():
     if not shutil.which('pdftotext'):
         # 🔴 조용히 넘어가면 '매번 0개 + 초록불' 이 된다. Actions 로그에 경고로 남긴다.
@@ -49,14 +74,15 @@ def main():
               '— 워크플로의 poppler-utils 설치 단계를 확인하세요.')
         print('pdftotext 가 없습니다 — 이번 실행은 PDF 를 건너뜁니다.')
         return
-    if not os.path.isdir(OUT):
+    paths = targets(sys.argv[1:])
+    if paths is None:
         print(f'{OUT} 이 없습니다.')
         return
 
     ok = skipped = empty = failed = 0
     chars = 0
-    for name in sorted(os.listdir(OUT)):
-        path = os.path.join(OUT, name)
+    for path in paths:
+        name = os.path.basename(path)
         if not os.path.isfile(path) or name.endswith('.txt') or name.endswith('.json'):
             continue
         if not is_pdf(path):

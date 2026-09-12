@@ -29,7 +29,9 @@ cp forms.js "$OUT/vendor/forms.js"
 # 질문 설계기 — 양식별 질문 개수(클릭/입력/합계)를 화면과 감사가 같은 규칙으로 센다
 cp form-plan.js "$OUT/vendor/form-plan.js"
 # 공고 주소 정규화 (ES 모듈이라 브라우저에서 그대로 import 된다)
+# 🔴 이 파일이 또 부르는 것까지 함께 옮겨야 한다 — 아래 '빠진 이웃' 검사가 강제한다.
 cp collector/url-key.mjs "$OUT/vendor/url-key.mjs"
+cp collector/deadline-hint.mjs "$OUT/vendor/deadline-hint.mjs"
 
 # 등록 규칙 — Node용 파일이라 브라우저에서 읽히도록 앞뒤만 감싼다.
 # (내용은 손대지 않는다. 규칙이 바뀌면 다음 빌드에 그대로 따라온다)
@@ -39,6 +41,13 @@ cp collector/url-key.mjs "$OUT/vendor/url-key.mjs"
   cat verify/entry-rules.cjs
   printf '\nwindow.ENTRY_RULES = module.exports;\n'
 } > "$OUT/vendor/entry-rules.js"
+
+# ── 빠진 이웃 검사 (2026-09-13 실사고) ──────────────────────────
+# 🔴 규칙은 verify/verify-admin-vendor.js 하나다 — 여기에 베끼지 말 것.
+#    CI(verify-ui.yml)도 같은 파일을 부른다. 두 벌이 되면 갈라진다.
+#    빌드를 실패시키는 이유: Cloudflare 는 빌드가 실패하면 **옛 판을 그대로 둔다**.
+#    깨진 화면(버튼이 안 눌리는 화면)을 내보내는 것보다 낫다.
+node "$(dirname "$0")/../verify/verify-admin-vendor.js" "$OUT" || exit 1
 
 echo "빌드 완료 → $OUT"
 ls -la "$OUT" "$OUT/vendor"

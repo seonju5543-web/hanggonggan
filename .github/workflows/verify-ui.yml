@@ -33,6 +33,16 @@ on:
       - 'sw.js'              # 위 '*.js' 에 이미 포함 — 잊지 말라고 남겨 둔다
       - 'verify/**'
       - '_admin/**'          # 관리자 화면 (verify-admin.js 가 스스로 빌드해 검사한다)
+      # 🔴 관리자 화면은 collector 의 공용 원본을 vendor 로 옮겨 쓴다(build.sh).
+      #    그 원본이 새 이웃을 부르기 시작하면 화면이 통째로 죽는데, 여기 없으면
+      #    그 커밋에서 이 검사가 **한 번도 안 돈다**(2026-09-13 실사고가 정확히 그랬다).
+      #    ⚠️ `collector/**` 로 넓히면 안 된다 — 로봇이 seen.json·extracted 를 하루 열 번
+      #       커밋해서 25분짜리 브라우저 검사가 그때마다 돈다(test-collector 'CI 감시 범위'
+      #       절이 그걸 막는다). 그래서 **vendor 로 옮기는 파일만** 적는다.
+      #    이 목록이 build.sh 와 어긋나면 verify-admin-vendor.js 가 실패시킨다 — 손으로
+      #    맞출 필요 없이, 새 파일을 vendor 에 넣으면 그 관문이 여기 적으라고 말해 준다.
+      - 'collector/url-key.mjs'
+      - 'collector/deadline-hint.mjs'
       - 'server/push/**'     # 푸시 발송 서버 (verify-push-server.mjs)
       - 'insta/**'           # 인스타 카드 (verify-insta.js)
       - '.github/workflows/verify-ui.yml'
@@ -86,6 +96,14 @@ jobs:
       #    베끼면 코드를 되돌려도 초록불로 남는다(실제로 그랬다).
       - name: 인스타 카드 사실 관문
         run: node verify/verify-insta.js
+
+      # 🔴 관리자 화면 빠진 이웃 — 브라우저가 필요 없다(파일만 읽는다). 몇 초면 끝난다.
+      #    admin.js 는 ES 모듈이라 import 하나가 404 나면 파일 전체가 안 돌고,
+      #    버튼에 동작이 안 붙어 "눌러도 아무 일이 없는" 화면이 된다(오류 문구도 안 뜬다).
+      #    build.sh 가 같은 파일을 부르지만 그건 Cloudflare 빌드 때다 — 여기서 먼저 잡는다.
+      - name: 관리자 화면 빠진 이웃 관문
+        run: |
+          bash _admin/build.sh
 
       # 드라이버마다 8123·8124 를 쓴다 (verify/README.md)
       - name: 로컬 서버 띄우기

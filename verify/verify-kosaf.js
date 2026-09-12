@@ -128,7 +128,12 @@ const PROFILE = {
         사실이 아닌 문장을 요구하던 검사라, 되살리는 것이 아니라 **아직 참인 것**으로 바꾼다.
      지키는 것: 이 앱은 kosaf 공고의 **원문을 읽지 않았다.** 그러니 링크를 '원문 공고'라고
      부르면 눌러 본 학생에게 거짓말이 된다(원칙 8-1 · 2f9ef9b 커밋 설명 그대로). */
-  eq('출처를 밝힌다 (링크가 한국장학재단을 가리킨다)', /한국장학재단\s*↗/.test(sheet), true);
+  /* ⚠️ 2026-09-12: 이 줄이 요구하던 '한국장학재단 ↗' 은 **그 자체가 틀린 이름**이었다.
+     층2의 sourceUrl 은 KOSAF 가 아니라 그 재단 자기 홈페이지다(예: `namgu.gwangju.kr`) —
+     눌러 보면 한국장학재단이 안 열린다. 위 문단의 **뜻**(링크 이름은 그 주소가 실제로
+     여는 화면을 말한다)은 그대로 두고, 이름만 사실에 맞춘다. 이름을 지키려고 화면을
+     되돌리면 그게 거짓말이 된다. */
+  eq('출처를 밝힌다 (링크가 재단 홈페이지를 가리킨다)', /재단 홈페이지\s*↗/.test(sheet), true);
   eq('  원문을 읽은 것처럼 「원문 공고」라고 부르지 않는다', /원문 공고\s*↗/.test(sheet), false);
   eq('  「앱에서 작성」 버튼이 없다',
     await page.$$eval('#detail-sheet button', (b) => b.filter((x) => /양식|작성하기/.test(x.textContent)).length), 0);
@@ -284,6 +289,58 @@ const PROFILE = {
     ] }, '2026-09-03');
     const codes = ruled.items.map((i) => i.code).sort();
     eq('마감일 칸이 비어도 기간이 있으면 버리지 않는다', codes, ['T1', 'T3']);
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════
+     선발공고문 사본 (2026-09-12 개발자 지시) — 층2가 재단 홈페이지 하나만 주던 구조의 수리.
+     🔴 **픽스처를 스스로 주입한다.** 지금 저장소에 받아 둔 사본이 0개라, 그냥 재면
+        이 검사가 빈 화면을 상대로 통과한다(이 작업에서 실제로 그 함정에 한 번 빠졌다 —
+        상세 파서가 엉뚱한 칸을 집어 96%가 0건이 됐는데 관문 셋이 전부 초록불이었다).
+     ══════════════════════════════════════════════════════════════════════ */
+  console.log('\n■ 선발공고문 사본이 학생 화면에 닿는가');
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(400);
+  const inj = await page.evaluate((id) => {
+    /* 앱이 받은 층2 목록에 사본 한 벌을 얹고 다시 그린다 — 화면 코드를 그대로 통과시킨다.
+       ⚠️ **이미 목록에 떠 있는 공고**에 얹는다. 아무 항목에나 얹으면 그 카드가 화면에
+          없어서(마감·필터) 클릭할 수 없다. */
+    const code = String(id).replace(/^kosaf-/, '');
+    const it = kosafList.find((x) => x.code === code);
+    if (!it) return null;
+    it.files = [{ name: '선발공고문.pdf', path: 'data/kosaf-files/TEST/선발공고문.pdf', bytes: 204800 }];
+    renderExplore();
+    return id;
+  }, info.first);
+  if (!inj) { fail++; console.log('  ✕ 층2 목록이 비어 픽스처를 못 넣었다'); }
+  else {
+    await page.click(`#explore-list [data-detail="${inj}"]`);
+    await page.waitForSelector('#detail-sheet.show', { timeout: 4000 });
+    await page.waitForTimeout(200);
+    const att = await page.$$eval('#detail-sheet a', (as) => as
+      .filter((a) => /kosaf-files/.test(a.getAttribute('href') || ''))
+      .map((a) => ({ href: a.href, text: a.textContent.trim() })));
+    eq('공고문 링크가 상세 시트에 뜬다', att.length, 1);
+    /* 🔴 주소가 **우리 도메인 + 앱이 놓인 자리** 로 풀려야 한다. `location.origin` 기준으로
+       풀면 `/data/…` 가 사이트 뿌리로 가서 404 다(앱은 /hanggonggan/ 아래에 있다). */
+    eq('  우리 도메인에서 받는다 (KOSAF 원주소가 아니다)',
+      att.length === 1 && att[0].href.startsWith(`http://localhost:${PORT}/data/kosaf-files/`), true);
+    /* 🔴 **앱이 하위 경로에 놓인 상태로 재야 한다** — 이 검사는 처음에 무력했다(2026-09-12).
+       검사 서버는 앱을 뿌리(`localhost:8123/`)에 두는데 진짜 앱은
+       `…github.io/hanggonggan/` 아래에 있다. 뿌리에서는 `location.origin` 기준으로
+       풀어도 결과가 같아서, safeUrl 을 되돌려도 위 줄이 초록불이었다(실측).
+       그래서 배포 자리를 흉내 내 **그때만** 다시 푼다. */
+    const based = await page.evaluate(() => {
+      Object.defineProperty(document, 'baseURI', { configurable: true, get: () => `${location.origin}/hanggonggan/` });
+      const got = safeUrl('data/kosaf-files/TEST/선발공고문.pdf');
+      delete document.baseURI;
+      return got;
+    });
+    eq('  하위 경로에 배포돼도 주소가 맞는다 (사이트 뿌리로 새지 않는다)',
+      /\/hanggonggan\/data\/kosaf-files\//.test(based), true);
+    const sheet2 = await page.$eval('#detail-sheet', (e) => e.textContent);
+    /* 🔴 공고문을 '첨부 양식'이라 부르면, 받은 학생이 신청서인 줄 알고 빈칸을 찾는다 */
+    eq('  그 파일이 무엇인지 이름을 붙인다 (선발 공고문)', /선발 공고문/.test(sheet2), true);
+    eq('  신청서 양식이라고 부르지 않는다', /공고 원본 첨부 양식/.test(sheet2), false);
   }
 
   eq('콘솔 오류 없음', errors, []);

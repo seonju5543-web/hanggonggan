@@ -296,6 +296,97 @@ const today = new Date();
     //    베끼면 기다리는 주소와 이슈에 박는 주소가 갈라져, 확인은 초록불인데 깨진 그림이 간다.
     if (/github\.io\/hanggonggan/.test(wf))
       fail('C9', '-', '워크플로에 공개 주소가 박혀 있다 — publish.mjs 에서 받아 써야 한다');
+    /* 🔴 **컨테이너가 다 처리되기 전에 올리면 안 된다** — 2026-09-13 첫 게시가 이걸 안 해서 죽었다
+       (run 34704614904): 토큰 60일·그림 4장 공개 확인·한도 0/100 이 전부 멀쩡했는데, 캐러셀 컨테이너를
+       만든 지 **0.1초 만에** media_publish 를 불러 400 `Media ID is not available` 로 튕겼다.
+       그래서 **가짜 인스타를 세워 한 바퀴 돌린다** — 글자로 순서를 재지 않고, 진짜 서버처럼
+       '안 끝났는데 부르면 400' 으로 굴게 해서 **실제로 안 부르는지**를 잰다. */
+    {
+      const P = await import(new URL('../insta/publish.mjs', `file://${__filename}`).href);
+      const beforeU = process.env.IG_USER_ID, beforeT = process.env.IG_ACCESS_TOKEN;
+      process.env.IG_USER_ID = '77'; process.env.IG_ACCESS_TOKEN = 'tok-시험';
+      const fast = { ...P.WAITS, liveGapMs: 0, readyGapMs: 0, pubGapMs: 0 };
+      // 🔴 진짜 token-seen.json 을 건드리면 안 된다 — 시험용 지문이 남으면 감시 로봇이
+      //    '토큰이 바뀌었다' 고 보고 남은 날을 60일로 되돌려, 만료를 조용히 지나친다.
+      const mem = { read: () => ({}), write: () => {} };
+      const fakeIG = ({ readyAt = 2, childBad = null, pubErr = [], askErr = false } = {}) => {
+        const ids = [], hit = [], asks = {};
+        let made = 0, sent = 0, tried = 0, early = false;
+        // 물어볼 수 있으면 '몇 번 물었나' 로, 못 물어보면 '몇 번 올려 봤나' 로 준비를 센다(시간이 흐르는 셈).
+        const done = (id) => (asks[id] || 0) >= readyAt;
+        const ready = () => (askErr ? tried >= readyAt : ids.every(done));
+        const f = async (u, o) => {
+          const s2 = String(u);
+          const p2 = o?.body ? Object.fromEntries(o.body) : {};
+          const ok = (b) => ({ ok: true, json: async () => b });
+          const err = (status, message, error_user_msg) =>
+            ({ ok: false, status, json: async () => ({ error: { message, error_user_msg } }) });
+          if (o?.method === 'HEAD') return { ok: true };
+          if (/\/me\?/.test(s2)) return ok({ user_id: '77' });
+          if (/content_publishing_limit/.test(s2)) return ok({ data: [{ quota_usage: 0, config: { quota_total: 100 } }] });
+          if (/\/77\/media_publish$/.test(s2)) {
+            hit.push('publish'); tried++;
+            // 진짜 인스타처럼 군다 — 하나라도 안 끝났으면 400 으로 튕기고, 우리가 일찍 불렀다고 적어 둔다.
+            if (!ready()) { early = true; return err(400, 'Media ID is not available', 'The media is not ready for publishing, please wait for a moment'); }
+            const e = pubErr[sent++];
+            return e ? err(e[0], e[1], e[2]) : ok({ id: 'M1' });
+          }
+          if (/\/77\/media$/.test(s2)) { const id = `c${++made}`; ids.push(id); hit.push(`media ${p2.media_type || 'child'}`); return ok({ id }); }
+          if (/\/M1\?/.test(s2)) return ok({ permalink: 'https://www.instagram.com/p/x/' });
+          const m = s2.match(/\/(c\d+)\?/);
+          if (m) {
+            asks[m[1]] = (asks[m[1]] || 0) + 1; hit.push(`ask ${m[1]}`);
+            if (askErr) return err(400, 'Unsupported get request', '');
+            if (childBad === m[1]) return ok({ status_code: 'ERROR', status: 'Error: 그림을 못 받았습니다' });
+            return ok({ status_code: done(m[1]) ? 'FINISHED' : 'IN_PROGRESS' });
+          }
+          throw new Error(`뜻밖의 주소 ${s2}`);
+        };
+        return { f, hit, ids, sent: () => hit.filter((h) => h === 'publish').length, early: () => early };
+      };
+      const run = (srv) => P.publish({ dir: 'x', images: ['https://i/1.jpg', 'https://i/2.jpg'],
+        caption: 'c', live: true, f: srv.f, waits: fast, tokenStore: mem, log: () => {} });
+      const threw = async (srv) => { try { await run(srv); return false; } catch { return true; } };
+
+      // ① 정상 — 처리될 때까지 기다렸다 올린다
+      const A = fakeIG();
+      const rA = await run(A).catch((e) => ({ err: e.message }));
+      if (A.early()) fail('C9', '-', '컨테이너가 처리 중인데 media_publish 를 불렀다 — 2026-09-13 첫 게시가 죽은 그 자리다');
+      if (rA?.mediaId !== 'M1') fail('C9', '-', `가짜 인스타 한 바퀴가 안 돈다 — ${rA?.err || JSON.stringify(rA)}`);
+      if (!A.hit.some((h) => h.startsWith('ask '))) fail('C9', '-', '컨테이너 상태를 한 번도 안 물어본다');
+      if (A.ids.filter((i) => A.hit.includes(`ask ${i}`)).length !== A.ids.length)
+        fail('C9', '-', '상태를 안 물어본 컨테이너가 있다 — 장 하나가 처리 중이면 캐러셀이 못 올라간다');
+      if (A.sent() !== 1) fail('C9', '-', `한 번 올리는데 media_publish 를 ${A.sent()}번 불렀다`);
+
+      // ② 인스타가 ERROR 라고 하면 **올리지 않는다** (기다려도 안 바뀐다)
+      const B = fakeIG({ childBad: 'c1' });
+      if (!await threw(B)) fail('C9', '-', '장 컨테이너가 ERROR 인데 그냥 올린다');
+      if (B.sent()) fail('C9', '-', 'ERROR 를 보고도 media_publish 를 불렀다');
+
+      // ③ FINISHED 인데도 400 「아직」 이면 다시 부른다 (400 은 올라간 것이 없으니 안전하다)
+      const C2 = fakeIG({ pubErr: [[400, 'Media ID is not available', 'The media is not ready for publishing'],
+        [400, 'Media ID is not available', '']] });
+      if ((await run(C2).catch((e) => ({ err: e.message })))?.mediaId !== 'M1')
+        fail('C9', '-', '400 「아직 준비 중」 을 다시 안 부른다');
+      if (C2.sent() !== 3) fail('C9', '-', `400 「아직」 을 ${C2.sent() - 1}번만 다시 불렀다`);
+
+      // ④ 🔴 그 밖의 실패는 **절대** 다시 안 부른다 — 올라갔는지 모르면서 또 부르면 같은 글이 두 번 올라간다
+      for (const [why, e] of [['다른 400', [400, 'Invalid parameter', '']], ['5xx', [500, 'Internal error', '']]]) {
+        const D = fakeIG({ pubErr: [e] });
+        if (!await threw(D)) fail('C9', '-', `${why} 실패를 성공으로 친다`);
+        if (D.sent() !== 1) fail('C9', '-', `${why} 인데 media_publish 를 ${D.sent()}번 불렀다 — 같은 글이 두 번 올라간다`);
+      }
+      /* ⑤ 🔴 '아직 안 됐다' 와 **'물어볼 수가 없다'** 를 가른다 — 인스타가 상태 물음을 거부해도
+         우리가 게시를 죽이면 안 된다(고치려던 것을 우리 손으로 다시 만드는 꼴이다).
+         물어볼 수 없으면 400 재시도가 받아 주어 **결국 올라가야** 한다. */
+      const E = fakeIG({ askErr: true, readyAt: 2 });
+      const rE = await run(E).catch((e) => ({ err: e.message }));
+      if (rE?.mediaId !== 'M1')
+        fail('C9', '-', `상태를 못 물어봤다고 게시를 포기한다 — ${rE?.err || JSON.stringify(rE)}`);
+
+      if (beforeU === undefined) delete process.env.IG_USER_ID; else process.env.IG_USER_ID = beforeU;
+      if (beforeT === undefined) delete process.env.IG_ACCESS_TOKEN; else process.env.IG_ACCESS_TOKEN = beforeT;
+    }
     // C10 · 토큰 만료 감시 — 🔴 만료되면 **조용히** 게시가 멈춘다(노션 F-4 와 같은 유형).
   //    못 물어본 것을 '괜찮다' 로 읽으면 두 달 뒤에나 안다. 갈래를 전부 시험한다.
   {
@@ -378,7 +469,7 @@ const today = new Date();
     if (/^insta\/token-seen/m.test(ig)) fail('C10', '-', 'token-seen.json 이 .gitignore 에 있다');
     console.log(`  · 토큰 감시 — 갈래 ${want.length}가지 · 수명 ${LIFE_DAYS}일 · 경고 ${WARN_DAYS}일 · 매일 예약`);
   }
-  console.log('  · 게시 경로 — 예행연습 기본 · JPEG · 공개 확인 · seen 기록 · 다시 안 그림');
+  console.log('  · 게시 경로 — 예행연습 기본 · JPEG · 공개 확인 · 컨테이너 처리 대기 · seen 기록 · 다시 안 그림');
 
   // C11 · 2026-09-12 개발자 지시 여섯 — 공고당 게시물 하나 · 생기면 바로 · 개발자 셋 · 번호 판형 · 채팅 수정 · 관리자 화면
   {
