@@ -68,15 +68,8 @@
   --shadow-chip:      0 4px 14px rgba(35, 32, 26, 0.20);
   --shadow-lift:  0 2px 6px rgba(58, 48, 28, 0.06), 0 18px 40px rgba(58, 48, 28, 0.13);
   --shadow-sheet: 0 -14px 48px rgba(40, 33, 20, 0.22);
-  /* 옆으로 미끄러지는 화면의 **왼쪽 모서리** 그림자. --shadow-sheet 는 위로 지는 것이라
-     (0 -14px) 옆으로 가는 면에 쓰면 그늘이 엉뚱한 쪽에 생긴다(실제로 그랬다). */
-  --shadow-page:  -12px 0 28px rgba(40, 33, 20, 0.16);
   --ring:         0 0 0 3px rgba(138, 106, 31, 0.20);
   --cutout:       0 0 0 2px var(--bg);
-  /* 뒤로 쓸기가 손을 따라올 때 JS 가 갈아 끼우는 두 값. 여기 적어 두는 것은 **쉬는 상태**다
-     — 폴백(var(x, 기본값))으로 때우면 '선언을 잊은 토큰'과 구별이 안 된다(ui-tone 이 잡는다). */
-  --swipe-dim: 1;
-  --swipe-dur: 0.26s;
   --knob:         0 1px 3px rgba(58, 48, 28, 0.26);
 
   /* 글자 크기 9단 — 그대로 둔다(앞선 세션이 27종에서 줄여 놓은 자산이다).
@@ -2826,7 +2819,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
   --shadow-chip:  0 4px 14px rgba(39, 80, 143, 0.26);      /* 남색 판의 칩 — 이 값이 실제로 뜬다 */
   --shadow-lift:  0 2px 6px rgba(24, 35, 56, 0.07), 0 18px 40px rgba(24, 35, 56, 0.14);
   --shadow-sheet: 0 -14px 48px rgba(18, 26, 42, 0.20);
-  --shadow-page:  -12px 0 28px rgba(18, 26, 42, 0.15);
   --knob:         0 1px 3px rgba(24, 35, 56, 0.26);
   --primary-weak: rgba(23, 25, 28, 0.055);
 }
@@ -4392,50 +4384,14 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 .fd-photo.left { float: left; margin: 0 12px 8px 0; }
 .fd-photo-note { clear: both; }
 
-/* ══ 뒤로 쓸기 — 손을 따라오는 패럴랙스 (2026-09-11 개발자 지시) ══════════════════════
-   개발자 지시: *"옆으로 스와이프하면 내 손이 움직이는 대로 페이지가 나가질 수 있도록 …
-   효과 이름이 패럴랙스래."*  앞 화면은 손끝을 1:1로 따라가고, **뒤에 있던 화면이 그보다
-   느리게(0.28배) 따라 들어온다** — 두 겹이 다른 속도로 움직이는 것이 깊이를 만든다.
-
-   🔴 끌던 화면을 제자리로 되돌려 놓고 등장 애니를 새로 트는 짓을 하지 않는다(예전 방식).
-      손을 떼면 **가던 방향 그대로** 끝까지 간다 — 그게 '손이 움직이는 대로'의 뜻이다.
-   🔴 두 화면을 동시에 보여야 하므로 둘 다 잠깐 `fixed` 가 된다. 그동안 문서는 높이를
-      잃어 스크롤이 0으로 떨어지므로, **끌던 화면을 스크롤 상자로 만들고**
-      (`overflow: hidden` + JS 가 `scrollTop` 을 넣는다) 손을 떼면 문서 스크롤을 되돌린다.
-      ⚠️ `top: -스크롤값` 으로 밀어 올리면 안 된다 — 그 방식은 따라다니는 머리줄
-         (`position: sticky`)이 붙을 곳을 잃어 약관을 읽다 끌면 머리줄이 사라진다.
-   🔴 `left/right: 0` + `max-width` + `margin-inline: auto` 로 **앱 기둥 폭에 맞춘다**.
-      `left: 50%; translateX(-50%)` 로 가운데 맞추면 우리가 쓸 transform 과 부딪힌다.
-   🔴 아래 탭(z-index 50)·시트(90)보다 **아래**에 둔다 — 탭바는 제자리에 있어야 한다.
-   관문: `verify/verify-settings.js` '오른쪽으로 쓸어 나가기' 절 */
-.screen.swipe-top,
-.screen.swipe-under {
-  position: fixed;
-  top: 0; bottom: 0; left: 0; right: 0;
-  max-width: 480px;
-  margin-inline: auto;
-  overflow: hidden;
-  background: var(--bg);
-  animation: none;            /* taste-in·screen-in 이 끼어들면 손을 안 따라온다 */
-  will-change: transform;
-}
-.screen.swipe-top {
-  z-index: 40;
-  box-shadow: var(--shadow-page);   /* 떠나는 면의 **왼쪽** 모서리 — 경계가 보여야 두 겹으로 읽힌다 */
-}
-/* 뒤 화면은 멀리 있는 것처럼 조금 옅다(0.82 → 1). 바탕색이 같아 **글자만** 살짝 흐려 보인다.
-   🔴 많이 내리지 말 것 — 0.55 였을 때는 깊이가 아니라 **흐려졌다 나타나는 것**으로 보였다
-      (2026-09-12 개발자: "화면도 부자연스러워"). 멀리 있는 종이는 사라지지 않는다. */
-.screen.swipe-under { z-index: 39; opacity: var(--swipe-dim); }
-/* 손을 뗀 뒤의 마무리 — 남은 거리만 이어서 간다(JS 가 시간을 정한다).
-   ⚠️ 옅기도 **위치와 같은 곡선**으로 간다. linear 로 두면 다 와서도 색이 아직 변하는 중이라
-      두 겹이 따로 논다. */
-.screen.swipe-ease { transition: transform var(--swipe-dur) cubic-bezier(0.32, 0.72, 0, 1), opacity var(--swipe-dur) cubic-bezier(0.32, 0.72, 0, 1); }
-
-/* 🔴 **가로 손짓은 우리 것이라고 브라우저에 알린다** (2026-09-12 개발자 지적 "잘 인식도 안되고").
-   이게 없으면 브라우저가 먼저 세로 스크롤로 판정해 버려, 손가락이 조금이라도 비스듬하면
-   그 뒤 touchmove 가 우리에게 안 온다 — 학생 입장에서는 "쓸었는데 아무 일도 안 난다"가 된다.
-   `pan-y` 는 '세로는 브라우저 몫, 가로는 내 몫'이라는 뜻이다.
+/* ══ 뒤로 쓸기 — 가로 손짓은 우리 것이라고 브라우저에 말해 둔다 ═══════════════════
+   🔴 **패럴랙스(두 겹)는 2026-09-12 개발자 지시로 전부 걷어냈다** — "패럴렉스 지금까지한거
+      전부 지워". 남은 것은 손짓 **인식**뿐이고, 화면은 끌리는 동안 제 자리에서 따라 움직였다가
+      (app.js `enableScreenSwipeBack`) 나갈 때 `screen-back` 으로 들어온다. 뒤 화면을 미리
+      끌어다 놓지 않는다 · `--shadow-page`·`--swipe-dim`·`--swipe-dur` 도 함께 지웠다.
+   🔴 이게 없으면 브라우저가 먼저 세로 스크롤로 판정해 버려, 손가락이 조금이라도 비스듬하면
+      그 뒤 touchmove 가 우리에게 안 온다 — 학생 입장에서는 "쓸었는데 아무 일도 안 난다"가 된다.
+      `pan-y` 는 '세로는 브라우저 몫, 가로는 내 몫'이라는 뜻이다.
    ⚠️ 안쪽 화면 여섯에만 준다. 가로로 스크롤되는 영역이 생기면 그 요소에 `touch-action: auto`
       를 따로 줘야 한다 — 지금은 여섯 화면 어디에도 없다(실측). */
 #screen-settings, #screen-trash, #screen-terms,
@@ -4447,3 +4403,10 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
    ⚠️ 안쪽 화면일 때만 켠다 — 늘 켜 두면 홈·탐색의 **옆으로 넘기는 칩 줄**과 양식 미리보기
       (`.chat-chips`·`.fd-wrap`)가 손으로 안 밀린다. 켜고 끄는 곳은 `showScreen` 한 곳. */
 #app.on-sub-screen { touch-action: pan-y; }
+/* 🔴 **시트가 떠 있는 동안은 풀어 준다** (2026-09-12 코드 리뷰 · 실측으로 확인).
+   시트(`#chat-sheet` 등)는 `#app` **안에** 있고, `touch-action` 은 조상 것과 교집합이라
+   자손에 `auto` 를 줘도 넓혀지지 않는다. 도우미 시트의 칩 줄(`.chat-chips`)은 실제로
+   가로로 넘치는데(실측 517 > 430) 안쪽 화면에서 시트를 열면 그게 손으로 안 밀렸다.
+   ⚠️ 이때 뒤로 쓸기를 잃지 않는다 — 시트 안 손짓은 어차피 우리가 안 맡는다
+      (app.js 가 `.sheet` 를 걸러낸다). 시트 밖은 배경이라 쓸 일이 없다. */
+#app.on-sub-screen:has(.sheet:not([hidden])) { touch-action: auto; }

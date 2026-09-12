@@ -15,4 +15,4 @@
 # 데이터 관문(node verify/audit-data.js)을 통과하지 못하면 배포하지 않고 🚨 이슈를 남긴다.
 
 branch: claude/device-main-deploy-config-cfodsa
-메모: 2026-09-12 — 누를 때 회색 판 제거 · 패럴랙스 인식/움직임 손봄
+메모: 2026-09-12 (2) — 패럴랙스 전량 철거 · MY 프로필 줄 셋 삭제
