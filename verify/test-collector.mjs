@@ -4098,6 +4098,26 @@ console.log('\n■ 첫 실행 화면 (2026-09-09)');
       히어로 건수다(11 · 13 · 5건 — 같은 최소 경로로 실측).
    지키는 것 둘: ① 문구가 시간을 약속하지 않는다 ② 온보딩에서 **앞으로 못 가게 막는 칸**이
    문구가 말하는 둘과 같다. 셋째 필수 칸이 생기면 문구가 거짓이 되므로 여기서 잡는다. */
+/* ══ 도구들의 기준 학생이 갈라지지 않는다 (2026-09-12 · 노션 UI-1) ═══════════
+   개발자 백로그: "적합도가 실제로 맞게 계산되는지 정밀하게 검사하는 방법을 확인한다."
+   확인하다 **도구 자신이 틀린 학생으로 재고 있는 것**을 찾았다 — `fit-report.mjs` 의 기준
+   학생이 `track: '인문'` 이었는데 계열 값은 `humanities` 같은 **id** 다(data.js TRACKS).
+   그래서 계열 축이 통째로 어긋나 미달이 6건으로 나왔다(제대로 주면 4건).
+   demo-profile.js 는 이미 "what-shows.mjs 의 기준 학생과 같은 값"이라고 적어 두고 있었는데,
+   fit-report 만 그 약속 밖에 있었다. 사람이 기억하는 대신 여기서 센다. */
+console.log('\n■ 도구들의 기준 학생 (2026-09-12 · UI-1)');
+{
+  const root = new URL('../', import.meta.url);
+  const files = ['verify/fit-report.mjs', 'verify/what-shows.mjs', 'verify/demo-profile.js'];
+  const track = files.map((f) => (readText(new URL(f, root)).match(/track:\s*(?:arg\('track',\s*)?'([^']+)'/) || [])[1]);
+  eq('세 도구가 같은 계열 값을 쓴다', [...new Set(track)], ['humanities']);
+  const school = files.map((f) => (readText(new URL(f, root)).match(/school:\s*(?:arg\('school',\s*)?'([^']+)'/) || [])[1]);
+  eq('  같은 학교를 기준 학생으로 쓴다', [...new Set(school)], ['한국외국어대학교']);
+  /* 🔴 계열 값은 **data.js 의 id** 여야 한다 — 라벨('인문·어문')을 넣으면 축이 조용히 죽는다 */
+  const ids = [...readText(new URL('data.js', root)).matchAll(/\{\s*id:\s*'([a-z]+)',\s*label:/g)].map((m) => m[1]);
+  eq('  그 값이 data.js 의 계열 id 다', ids.includes(track[0]), true);
+}
+
 console.log('\n■ 환영 화면 문구 (2026-09-12 · UI-22)');
 {
   const root = new URL('../', import.meta.url);

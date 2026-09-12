@@ -14,14 +14,43 @@ const M = require('../match-engine.js');
 const d = require('../data/registered.json');
 
 const ZERO = process.argv.includes('--zero');   // 미달 공고의 자격 원문까지 함께 본다
-/* 대표 학생 — 아주 평범한 프로필로 잡는다(극단값이면 0%가 과하게 나온다) */
-const p = { school: '한국외국어대학교', gpa: 3.5, bracket: 5, year: 3, track: '인문', flags: [],
-            status: '재학', credits: 15, nationality: 'korean', region: '서울', parentRegion: '서울', birthYear: 2004 };
+
+/* 🔴 **학생을 바꿔 가며 잴 수 있어야 한다** (2026-09-12 · 노션 UI-1 "적합도 정밀 검사 방법").
+   그전에는 대표 학생 한 명이 코드에 박혀 있어, 다른 학교·다른 성적에서 판정이 어떻게 되는지
+   이 도구로는 볼 수 없었다. 자격 축은 학교·지역·계열마다 다르게 걸리므로 한 명만 재는 것은
+   '정밀 검사'가 아니다. 칸 이름은 `what-shows.mjs` 와 **같게** 맞췄다(두 도구를 번갈아 쓴다).
+     node verify/fit-report.mjs --school=경희대학교 --gpa=4.2 --bracket=3 --year=4 --track=engineering */
+const arg = (k, d) => {
+  const hit = process.argv.find((a) => a.startsWith(`--${k}=`));
+  return hit ? hit.slice(k.length + 3) : d;
+};
+/* 숫자 칸에 숫자가 아닌 것이 오면 **멈춘다** — `평점 NaN` 인 채 그럴듯한 답을 내놓는 것이
+   가장 나쁘다(what-shows.mjs 와 같은 규칙). */
+const num = (k, d) => {
+  const v = arg(k, String(d));
+  if (!/^-?\d+(\.\d+)?$/.test(v)) { console.error(`--${k}=${v} 는 숫자가 아닙니다.`); process.exit(1); }
+  return Number(v);
+};
+const p = { school: arg('school', '한국외국어대학교'), campus: arg('campus', ''),
+            gpa: num('gpa', 3.5), bracket: num('bracket', 5), year: num('year', 3),
+            track: arg('track', 'humanities'), major: arg('major', '영어학과'), flags: [],
+            status: arg('status', '재학'), credits: num('credits', 15), nationality: 'korean',
+            region: arg('region', '서울'), parentRegion: arg('parentRegion', arg('region', '서울')),
+            birthYear: num('birthYear', 2004), common: {} };
 
 const rows = d.items.map((s) => ({ s, f: M.fitDetail(s, p) }));
 const bucket = {};
 for (const { f } of rows) { const k = f.unread ? '자격 미확인' : f.fails.length ? `${f.pct}% (미달)` : `${f.pct}%`; bucket[k] = (bucket[k] || 0) + 1; }
-console.log(`■ 적합도 분포 — 등록 ${d.items.length}건 (기준 학생: 외대 3학년·평점 3.5·5구간·재학)`);
+console.log(`■ 적합도 분포 — 등록 ${d.items.length}건`);
+console.log(`   학생: ${p.school}${p.campus ? ' ' + p.campus : ''} ${p.track} ${p.year}학년 ${p.status}`
+  + ` · 평점 ${p.gpa} · ${p.credits}학점 · ${p.bracket}구간 · ${p.region}`);
+/* 🔴 **이 리포트가 안 보는 것을 먼저 말한다** (2026-09-12 · UI-1). 학생 화면의 공고는 두 층인데
+   여기서 읽는 것은 층1(우리가 원문을 읽어 등록한 공고)뿐이다. 층2(한국장학재단 목록)는
+   `app.js` 가 화면에서 만들어 내므로 Node 에서는 안 보인다 — 그쪽은 브라우저 검사가 맡는다.
+   안 적어 두면 "48건을 다 봤다"가 "학생이 보는 것을 다 봤다"로 읽힌다(실제 매칭은 133건). */
+console.log(`   ⚠️ 이 리포트는 층1(data/registered.json)만 본다 — 층2(한국장학재단 ${(() => {
+  try { return require('../data/kosaf-open.json').items.length; } catch { return '?'; }
+})()}건)은 verify-kosaf.js·verify-fit-badge.js 가 브라우저에서 잰다.`);
 Object.entries(bucket).sort((a, b) => (parseInt(b[0]) || -1) - (parseInt(a[0]) || -1))
   .forEach(([k, n]) => console.log(`   ${k.padStart(12)} : ${n}건`));
 
