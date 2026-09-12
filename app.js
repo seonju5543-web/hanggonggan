@@ -513,7 +513,12 @@ function unent(s) {
 function safeUrl(u) {
   if (!u) return '';
   try {
-    const parsed = new URL(String(u), location.origin);
+    /* 🔴 기준은 `location.origin` 이 아니라 **앱이 놓인 자리**(`document.baseURI`) 다
+       (2026-09-12). 앱은 `…github.io/hanggonggan/` 에 있는데 origin 을 기준으로 풀면
+       `data/kosaf-files/…` 같은 **우리 파일 경로가 사이트 뿌리**로 풀려 404 가 된다.
+       밖으로 나가는 주소(http/https/mailto)는 기준이 무엇이든 결과가 같으므로,
+       지금까지의 링크는 한 글자도 안 바뀐다. */
+    const parsed = new URL(String(u), document.baseURI);
     if (parsed.protocol === 'http:' || parsed.protocol === 'https:' || parsed.protocol === 'mailto:') return parsed.href;
   } catch (e) { /* 잘못된 URL */ }
   return '';
@@ -2251,6 +2256,17 @@ function kosafAsScholarships() {
         documents: docs.length ? docs : ['재단 공고문에서 확인'],
         sourceUrl: i.home || '',
         sourceKind: 'kosaf',
+        /* 🔴 **층2의 유일한 '공고 원문'** (2026-09-12 개발자 지시로 신설).
+           그전까지 층2 재단이 학생에게 주는 것은 **재단 홈페이지 주소 하나**뿐이었다 —
+           들어가도 그 공고가 어디 있는지는 학생이 다시 찾아야 했다. KOSAF 상세 화면은
+           POST 전용이라 줄 주소가 아예 없고, KOSAF 첨부 원주소는 Referer 검사라
+           앱에서 누르면 "비정상적인 접근"이 뜬다.
+           → `collector/kosaf-attach.mjs` 가 리퍼러를 붙여 받아 둔 **우리 쪽 사본**을 준다.
+           ⚠️ 여기 들어오는 것은 `data/kosaf-files/…` 뿐이다(kosaf-open.mjs 가 거른다).
+              kosaf.go.kr 주소가 섞이면 학생이 못 받는다 — 관문 kosaf-check.mjs. */
+        ...((i.files || []).length
+          ? { attachments: i.files.map((f) => ({ name: f.name, url: f.path, bytes: f.bytes || 0 })) }
+          : {}),
         ...(kosafClean(f['문의처']) ? { contact: kosafClean(f['문의처']) } : {}),
         /* 층2 줄에 함께 보여 줄 **재단이 적어 둔 칸** (2026-09-07 캘린더).
            자격 판정을 못 붙이는 대신 재단이 쓴 것을 그대로 옮긴다 — 해석하지 않는다. */
@@ -2894,7 +2910,13 @@ function openDetail(id) {
      (발췌 출처 설명 · 전국 공고 회색 상자 · 제출 서류 부연) 셋 다 결국 '원문을 보라'였다.
      🔴 링크 이름은 그 주소가 **실제로 여는 화면**을 말한다 — 목록 주소밖에 못 찾은
         공고를 '원문 공고'라고 적으면 눌러 본 학생에게 거짓말이 된다(원칙 8-1). */
-  const srcLabel = (sch.program || sch.sourceKind === 'kosaf') ? '한국장학재단 ↗'
+  /* 🔴 **층2 링크를 '한국장학재단'이라고 부르면 안 된다** (2026-09-12).
+     층2의 sourceUrl 은 KOSAF 가 아니라 **그 재단 자기 홈페이지**다(예: `namgu.gwangju.kr`).
+     '한국장학재단 ↗'이라 적어 두면 눌러 본 학생에게 거짓말이 된다 — 이 규칙(링크 이름은
+     그 주소가 **실제로 여는 화면**을 말한다)은 바로 윗 문단이 이미 적어 둔 것이다.
+     KOSAF 를 가리키는 것은 `program`(data.js 의 상시 제도)뿐이다. */
+  const srcLabel = sch.program ? '한국장학재단 ↗'
+    : sch.sourceKind === 'kosaf' ? '재단 홈페이지 ↗'
     : isBoardListLink(sch.sourceUrl) ? '게시판 목록 ↗' : '원문 공고 ↗';
   const srcNote = sch.sourceUrl
     ? `<p class="doc-legend">자세한 내용은 <a href="${esc(safeUrl(sch.sourceUrl))}" target="_blank" rel="noopener">${srcLabel}</a>에서 확인</p>`
@@ -2970,9 +2992,13 @@ function openDetail(id) {
       <ul class="doc-list">${sch.excerpts.map((e) => `<li>${esc(e)}</li>`).join('')}</ul>
       ${srcNote}` : ''}
       ${(sch.attachments && sch.attachments.length) ? `
-      <h4>공고 원본 첨부 양식</h4>
+      ${/* 🔴 머리말이 **그 파일이 실제로 무엇인지**를 말해야 한다 (2026-09-12).
+           층1은 학교 게시판에 붙어 있던 신청서 양식이고, 층2는 재단이 KOSAF 에 올린
+           선발 공고문이다. 둘을 '첨부 양식' 한 이름으로 부르면, 공고문을 받은 학생이
+           신청서인 줄 알고 그 안에서 빈칸을 찾는다(원칙 8-1 — 확인 안 한 것을 말하지 않는다). */ ''}
+      <h4>${sch.sourceKind === 'kosaf' ? '선발 공고문 <span class="channel-tag">재단 원문</span>' : '공고 원본 첨부 양식'}</h4>
       <ul class="doc-list">
-        ${sch.attachments.map((a) => `<li class="att"><a href="${esc(safeUrl(a.url))}" target="_blank" rel="noopener" style="color:var(--primary)">${esc(a.name)}</a></li>`).join('')}
+        ${sch.attachments.map((a) => `<li class="att"><a href="${esc(safeUrl(a.url))}" target="_blank" rel="noopener" style="color:var(--primary)">${esc(a.name)}</a>${a.bytes ? ` <span class="doc-legend">${Math.max(1, Math.round(a.bytes / 1024))}KB</span>` : ''}</li>`).join('')}
       </ul>` : ''}
       <p class="sheet-deadline">${sch.program ? '신청 기간: 한국장학재단 공지 확인' : `마감일 ${sch.deadline || '원문 공고 확인'}`} · ${sch.duplicable ? '타 장학금과 중복 수혜 가능' : '중복 수혜 제한 있음'}</p>
       ${(!sch.program && isBoardListLink(sch.sourceUrl)) ? `<p class="doc-legend">이 학교 게시판은 목록에서 글을 눌러야 열리는 방식이라 공고 하나로 바로 가는 주소를 확인하지 못했습니다. 열리는 목록에서 <strong>${esc(boardListTitle(sch.sourceUrl))}</strong>을(를) 찾아 눌러 주세요.</p>` : ''}

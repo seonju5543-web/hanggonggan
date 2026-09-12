@@ -22,6 +22,7 @@ collector/report.md          merge=ours
 collector/browser-report.md  merge=ours
 collector/deepfetch-report.md merge=ours
 collector/link-hunt-report.md merge=ours
+collector/kosaf-attach-report.md merge=ours
 
 # ── 수집된 원본 첨부: 내용 비교가 의미 없는 이진 파일로 취급 ──────────
 collector/extracted/**       -diff
@@ -40,3 +41,9 @@ collector/link-hunt.json merge=jsonunion
 data/notices/*.json          merge=jsonunion
 # 색인은 매 발행마다 새로 쓰인다 — 합칠 내용이 없다(리포트와 같은 취급).
 data/notices/index.json      merge=ours
+
+# ── 한국장학재단 선발공고문 사본 (2026-09-12) ──────────────────────────────
+# 층2 재단이 학생에게 주는 유일한 '공고 원문'이다(KOSAF 상세는 POST 전용이라 줄 주소가
+# 없고, KOSAF 첨부 원주소는 Referer 검사라 앱에서 누르면 "비정상적인 접근"이 뜬다).
+# 내용 비교가 의미 없는 이진 파일이라 diff 를 끈다 — collector/extracted 와 같은 취급.
+data/kosaf-files/**          -diff

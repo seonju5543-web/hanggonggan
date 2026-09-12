@@ -36,6 +36,9 @@ import { canonUrl } from '../collector/canon-url.mjs';
 import { checkFormQuality } from '../collector/form-quality.mjs';
 import { checkFormCoverage } from '../collector/form-coverage.mjs';
 import { canonUrl as nsCanonUrl, hasText, looksLikeErrorPage } from '../collector/notice-source.mjs';
+/* 층2 첨부 — KOSAF 포털과 말하는 규칙은 kosaf-session.mjs 한 곳이다(베끼면 갈라진다) */
+import { parseFiles, filenameFrom, safeFileName, looksLikeHtml, sniffKind } from '../collector/kosaf-session.mjs';
+import { slimKosaf } from '../collector/kosaf-open.mjs';
 
 let fail = 0;
 const eq = (label, got, want) => {
@@ -433,12 +436,20 @@ function undeclaredNames(src) {
    `ConnectTimeoutError` 하나에 34초 만에 끝나 그날 층2 갱신이 통째로 사라졌다.
    재시도를 붙였으니, 다음 사람이 무심코 맨 `fetch` 를 다시 쓰는 것을 여기서 막는다.
    (학교 게시판 수집은 2026-07-30 시립대 유실로 이미 같은 것을 배웠다.) */
+/* ⚠️ 2026-09-12에 포털과 말하는 규칙이 `kosaf-session.mjs` 한 곳으로 모였다(로봇 셋이
+   같은 파일을 쓴다). 검사의 **뜻은 그대로 두고 자리만** 옮긴다 — 옛 파일을 재던 것을
+   그냥 지우면 재시도가 사라져도 아무도 모른다. */
 {
-  const src = readText(new URL('../collector/kosaf-fetch.mjs', import.meta.url));
-  const bare = [...src.matchAll(/await\s+fetch\(/g)].length;
+  const sess = readText(new URL('../collector/kosaf-session.mjs', import.meta.url));
+  const bare = [...sess.matchAll(/await\s+fetch\(/g)].length;
   eq('한국장학재단 수확이 맨 fetch 를 쓰지 않는다 (재시도를 거친다)', bare, 1);  // tryFetch 안의 1회뿐
-  eq('  재시도 함수가 있다', /async function tryFetch\(/.test(src), true);
-  eq('  넘어지면 성공으로 위장하지 않는다 (끝내 못 받으면 던진다)', /\n\s*throw last;/.test(src), true);
+  eq('  재시도 함수가 있다', /export async function tryFetch\(/.test(sess), true);
+  eq('  넘어지면 성공으로 위장하지 않는다 (끝내 못 받으면 던진다)', /\n\s*throw last;/.test(sess), true);
+  /* 로봇들은 세션을 거쳐야 한다 — 자기 자리에서 fetch 를 부르면 재시도도 쿠키도 리퍼러도 없다 */
+  for (const f of ['kosaf-fetch.mjs', 'kosaf-attach.mjs']) {
+    const src = readText(new URL(`../collector/${f}`, import.meta.url));
+    eq(`  ${f} 는 포털을 직접 부르지 않는다`, /await\s+fetch\(/.test(src), false);
+  }
 }
 
 /* 재시도 대기에 page.waitForTimeout을 쓰면 안 된다 (2026-08-02 이슈 #89).
@@ -4975,6 +4986,122 @@ console.log('\n■ DESIGN.md 가 style.css 와 같은 값을 적는가 (2026-09-
     const got = (design.match(new RegExp('\\n  ' + doc + ':\\s*"([^"]+)"')) || [])[1];
     eq(`  ${doc} = --${cssName}`, got && got.toLowerCase(), want && want.toLowerCase());
   }
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   한국장학재단(층2) 첨부 — 재단 홈페이지 하나만 주던 구조를 고친 자리 (2026-09-12)
+
+   🔴 개발자 지적: *"KOSAF 에서 크롤링 해오는 외부 공고들은 신청 양식 / 첨부파일 /
+      원문 공고 링크만 없고 해당 장학 재단으로만 이동할 수 있는 구조"*.
+      원인은 상세 파서가 `strip()` 으로 태그를 지우면서 **첨부로 가는 유일한 길을
+      `[다운로드]` 라는 글자로 뭉갠 것**이었다. 넉 달 동안 그 글자만 갖고 있었다.
+   여기 있는 것은 전부 그 수리가 되돌아가면 빨간불이 되는 것들이다.
+   ══════════════════════════════════════════════════════════════════════════ */
+console.log('\n■ 층2 첨부 — 상세 화면에서 공고문 링크를 읽는다');
+{
+  const row = (cell) => `<table><tr><th>선발공고문</th><td>${cell}</td></tr></table>`;
+
+  /* ① 진짜 주소 — 경로만 온 것은 KOSAF 본주소에 붙인다 */
+  const a1 = parseFiles(row(`<a href="/CO/fileDown.do?atchFileId=FILE_000123&fileSn=0">[다운로드]</a>`));
+  eq('경로형 첨부를 절대 주소로 읽는다', a1.map((f) => f.url),
+    ['https://portal.kosaf.go.kr/CO/fileDown.do?atchFileId=FILE_000123&fileSn=0']);
+
+  /* ② 클릭형 — 주소가 없으면 **지어내지 않고** 호출을 그대로 남긴다(원칙 8-1).
+        리포트가 이 날것을 보여 주고, 그걸 보고 다음 수리를 한다. */
+  const a2 = parseFiles(row(`<a href="#" onclick="fn_fileDown('FILE_000999','2'); return false;">[다운로드]</a>`));
+  eq('클릭형은 주소를 지어내지 않는다', a2.map((f) => f.url), [undefined]);
+  eq('  대신 호출을 그대로 남긴다', a2.map((f) => f.call), [{ fn: 'fn_fileDown', args: ['FILE_000999', '2'] }]);
+
+  /* ③ 빈 앵커는 첨부가 아니다 — 걸러 두지 않으면 '못 받은 첨부'로 리포트에 쌓여
+        진짜 못 받은 것이 그 잡음에 묻힌다 */
+  eq('javascript:void(0) 는 첨부가 아니다', parseFiles(row(`<a href="javascript:void(0);">미리보기</a>`)), []);
+  eq('첨부 칸이 없으면 빈 목록', parseFiles('<table><tr><th>성적기준</th><td>평점 3.0</td></tr></table>'), []);
+
+  /* ④ 이름은 본문이 아니라 **헤더**에 있다(링크 글자는 `[다운로드]` 하나뿐이라 이름이 없다).
+        관공서 서버는 세 가지 꼴을 섞어 쓰는데, 마지막 것을 그냥 쓰면 이름이 깨진다. */
+  eq('RFC5987 이름', filenameFrom("attachment; filename*=UTF-8''%EA%B3%B5%EA%B3%A0%EB%AC%B8.pdf", 'x'), '공고문.pdf');
+  eq('퍼센트 인코딩 이름', filenameFrom('attachment; filename="%EA%B3%B5%EA%B3%A0.hwp"', 'x'), '공고.hwp');
+  eq('EUC-KR 바이트를 latin1 로 실어 보낸 이름',
+    filenameFrom(`attachment; filename="${Buffer.from('공고문.pdf', 'utf8').toString('latin1')}"`, 'x'), '공고문.pdf');
+  eq('이름이 없으면 우리가 정한 이름', filenameFrom('', '선발공고문-1'), '선발공고문-1');
+
+  /* ⑤ 🔴 재단이 붙인 이름을 그대로 디스크에 쓰면 저장소 아무 데나 쓰게 된다 */
+  eq('상위 경로를 이름으로 못 쓴다', safeFileName('../../.github/workflows/deploy.yml'), 'deploy.yml');
+  eq('경로 구분자를 떼어 낸다', safeFileName('a/b/공고문.pdf'), '공고문.pdf');
+  eq('이름이 통째로 비면 대체 이름', safeFileName('   ', 'fallback'), 'fallback');
+
+  /* ⑥ 🔴 KOSAF 는 막을 때 404 가 아니라 **200 에 HTML** 로 답한다. 그걸 저장하면
+        학생이 '공고문'을 눌러 오류 화면을 내려받는다. */
+  eq('HTML 응답을 파일로 착각하지 않는다', looksLikeHtml(Buffer.from('<!DOCTYPE html><html><head>')), true);
+  eq('  진짜 PDF 는 통과', looksLikeHtml(Buffer.from('%PDF-1.7 ...')), false);
+  /* ⑦ 확장자를 믿지 않는다 — 첨부 주소에 확장자가 없으면 이름이 비어 온다 */
+  eq('앞 바이트로 PDF 를 가른다', sniffKind(Buffer.from('%PDF-1.4')), 'pdf');
+  eq('앞 바이트로 HWP(OLE) 를 가른다', sniffKind(Buffer.from('d0cf11e0a1b11ae1', 'hex')), 'ole');
+  eq('앞 바이트로 hwpx·docx(zip) 를 가른다', sniffKind(Buffer.from('504b0304', 'hex')), 'zip');
+
+  /* ⑧ 🔴 **실제 표 순서로 재는 회귀** — 2026-09-12 코드 리뷰가 잡은 치명적 버그.
+        `선발공고문` 은 상세표의 **맨 마지막 칸**이고, 그보다 앞 칸(`자격제한`·`제출처 및
+        제출서류`)에는 `※ 자세한 사항은 첨부파일 또는 홈페이지 참고` 라는 상투구가 거의
+        항상 들어 있다(실측: 선발공고문 칸이 있는 1,587곳 중 **1,525곳**).
+        낱말로 줄을 찾으면 96%가 엉뚱한 행을 집고, 그러면 첨부가 0건이 되면서
+        **관문 셋이 전부 빈 목록을 상대로 통과한다**(조용한 초록불). */
+  const real = `<table>
+    <tr><th>자격제한</th><td>휴학생 제외 ㅁ※ 자세한 사항은 첨부파일 또는 홈페이지 참고</td></tr>
+    <tr><th>제출처 및 제출서류</th><td>장학생 신청서 ※ 자세한 사항은 첨부파일 또는 홈페이지 참고</td></tr>
+    <tr><th>문의처</th><td>062-607-2414</td><th>선발공고문</th><td><a href="/CO/fileDown.do?id=Z9">[다운로드]</a></td></tr>
+  </table>`;
+  eq('앞 칸의 「첨부파일 참고」 상투구에 속지 않는다', parseFiles(real).map((f) => f.url),
+    ['https://portal.kosaf.go.kr/CO/fileDown.do?id=Z9']);
+  /* 한 줄에 이름표·내용이 두 쌍씩 오는 표라, 줄이 아니라 **칸 자리**로 짚어야 한다 */
+  eq('  같은 줄의 앞 칸(문의처)을 첨부로 착각하지 않는다',
+    /062-607/.test(JSON.stringify(parseFiles(real))), false);
+}
+
+console.log('\n■ 층2 첨부 — 학생이 실제로 받을 수 있는 주소만 앱에 나간다');
+{
+  /* 🔴 KOSAF 첨부 원주소는 Referer 검사가 있어 앱에서 누르면 "비정상적인 접근"이 뜬다.
+     앱 파일에 담기는 것은 **우리가 받아 둔 사본 경로**뿐이어야 한다. */
+  const src = {
+    updatedAt: '2026-09-12T00:00:00Z', source: 't',
+    items: [{
+      code: '111', org: '테스트장학회', name: '장학생', kind: '민간', goods: '장학금',
+      due: '2999-12-31', home: 'https://example.or.kr',
+      detail: { 신청기간: '2026-09-01~2999-12-31' },
+      files: [{ text: '[다운로드]', url: 'https://portal.kosaf.go.kr/CO/fileDown.do?x=1' }],
+      mirror: { at: '2026-09-12', files: [
+        { name: '선발공고문.pdf', path: 'data/kosaf-files/111/선발공고문.pdf', bytes: 12345 },
+        { name: '나쁜 것', path: 'https://portal.kosaf.go.kr/CO/fileDown.do?x=1', bytes: 1 },
+      ] },
+    }],
+  };
+  const out = slimKosaf(src, '2026-09-12');
+  eq('받아 둔 사본을 앱 파일에 담는다', (out.items[0].files || []).map((f) => f.path),
+    ['data/kosaf-files/111/선발공고문.pdf']);
+  eq('  KOSAF 원주소는 담지 않는다', /kosaf\.go\.kr/.test(JSON.stringify(out.items)), false);
+  eq('  받아 둔 것이 없으면 칸 자체가 없다',
+    'files' in slimKosaf({ ...src, items: [{ ...src.items[0], mirror: undefined }] }, '2026-09-12').items[0], false);
+}
+
+console.log('\n■ 층2 첨부 — 앱이 그 파일을 실제로 열 수 있게 배선돼 있다');
+{
+  const appjs = readText(new URL('../app.js', import.meta.url));
+  const swjs = readText(new URL('../sw.js', import.meta.url));
+  /* 🔴 `location.origin` 을 기준으로 풀면 `data/…` 가 **사이트 뿌리**로 풀려 404 다
+     (앱은 …github.io/hanggonggan/ 에 있다). 되돌리면 공고문 링크가 전부 죽는다. */
+  eq('safeUrl 이 앱이 놓인 자리를 기준으로 푼다', /new URL\(String\(u\), document\.baseURI\)/.test(appjs), true);
+  /* 🔴 서비스워커가 가로채면 느린 회선에서 **3.5초 시한에 걸려 index.html 이 대신 나간다** —
+     공고문을 눌렀는데 앱이 또 열린다. */
+  const guard = 'if (/\\/data\\/kosaf-files\\//.test(url.pathname)) return;';
+  eq('서비스워커가 공고문 사본을 가로채지 않는다', swjs.includes(guard), true);
+  /* ⚠️ 위치를 **낱말**로 재지 말 것 (2026-09-12 코드 리뷰) — 'kosaf-files' 는 파일 맨 위
+     CACHE 주석에도 있어서, 가드를 navigate 분기 **아래로 옮겨도** 영원히 초록불이었다.
+     가드 줄 자체의 자리를 잰다. */
+  eq('  그 줄이 navigate 분기보다 위에 있다',
+    swjs.indexOf(guard) >= 0 && swjs.indexOf(guard) < swjs.indexOf("e.request.mode === 'navigate'"), true);
+  /* 🔴 층2 의 sourceUrl 은 KOSAF 가 아니라 그 재단 홈페이지다 — 이름을 틀리면 거짓말이 된다 */
+  eq('층2 원문 링크를 재단 홈페이지라고 부른다', /sourceKind === 'kosaf' \? '재단 홈페이지 ↗'/.test(appjs), true);
+  eq('층2 사본을 첨부로 넘긴다', /attachments: i\.files\.map/.test(appjs), true);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');

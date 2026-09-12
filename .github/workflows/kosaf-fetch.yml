@@ -20,6 +20,16 @@ on:
     - cron: '53 20 * * 1,4'   # 월·목 05:53 KST (홀수 분 · 05:23 은 '공고 본문 재수집'과 겹쳐 피했다 —
     #                          둘 다 같은 브랜치에 커밋해서 push 가 부딪힌다)
   workflow_dispatch:
+    inputs:
+      mode:
+        description: '무엇을 할까요'
+        type: choice
+        required: false
+        default: 'full'
+        options:
+          - full        # 목록·상세 수확 → 공고문 사본 → 저장 (예약 실행과 같음)
+          - attach      # 공고문 사본만 (수확은 건너뜀 — 사본만 이어 받을 때 빠르다)
+          - probe       # 첨부 칸이 어떻게 생겼는지 **보기만** 한다 (저장 없음)
   push:
     branches: ['claude/nice-heisenberg-WESq5']
     paths:
@@ -38,8 +48,10 @@ concurrency:
 jobs:
   fetch:
     runs-on: ubuntu-latest
-    # 작업 상한은 아래 단계 예산(15분)을 담는 그릇이다 — 목록 받기·저장까지 여유를 둔다
-    timeout-minutes: 25
+    # 작업 상한은 **아래 단계 상한의 합을 담는 그릇**이다 (수확 20 + 사본 8 + 글자 4 + 여유).
+    # 이게 깨지면 마지막 단계(저장·리포트)가 시작도 못 하고 취소되고, 취소는 그날 결과를
+    # 통째로 버린다 — 2026-08-04에 실제로 이렇게 이틀치가 사라졌다.
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
         with:
@@ -50,24 +62,61 @@ jobs:
         with:
           node-version: 20
 
+      # 🔴 정찰 — 첨부 칸이 실제로 어떻게 생겼는지 **눈으로 본다**. 짐작으로 주소를 만들면
+      #    조용히 0건이 되고 원인을 토큰·헤더로 잘못 짚게 된다(CLAUDE.md '정찰' 규칙).
+      - name: 정찰 — 첨부 칸이 어떻게 생겼나 (보기만 함)
+        if: inputs.mode == 'probe'
+        timeout-minutes: 6
+        run: node collector/kosaf-attach.mjs --probe --max=5
+
       - name: 한국장학재단 통합검색 수확
+        if: inputs.mode != 'probe' && inputs.mode != 'attach'
         timeout-minutes: 20
         run: node collector/kosaf-fetch.mjs --budget-min=15 --write
 
+      # ── 여기부터는 **보강**이다 (2026-08-04 규칙: 본업은 수확·저장·리포트).
+      #    넘어져도 그날 수확분은 저장되어야 하므로 continue-on-error 를 단다.
+      - name: 선발공고문 사본 받기 (층2의 유일한 공고 원문)
+        if: inputs.mode != 'probe'
+        timeout-minutes: 8
+        continue-on-error: true
+        run: node collector/kosaf-attach.mjs --budget-min=6 --write
+
+      # HWP·PDF 글자 뽑기 — 받아 둔 공고문이 마감일·자격·검색·양식 스키마화의 재료가 된다.
+      # 🔴 `|| true` 로 설치 실패를 삼키지 말 것 — '매번 0개 + 초록불'이 된다(2026-09-05).
+      - name: 공고문에서 글자 뽑기
+        if: inputs.mode != 'probe'
+        timeout-minutes: 4
+        continue-on-error: true
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+          python3 -m pip install --quiet olefile
+          # 🔴 hwp 를 **먼저** 돌린다 — 이 스크립트가 zip 을 풀어 안의 pdf 를 꺼내므로,
+          #    순서를 바꾸면 그 pdf 가 그 실행에서 안 읽힌다.
+          python3 collector/hwp-prvtext.py data/kosaf-files
+          python3 collector/pdf-text.py data/kosaf-files
+
       - name: 관문 — 층2가 비거나 대출이 섞이지 않았나
+        if: inputs.mode != 'probe'
         run: node collector/kosaf-check.mjs
 
       # 🔴 관문이 실패하면 **저장하지 않는다**(always() 를 쓰지 말 것) — 이미 올라가 있는
       #    멀쩡한 데이터가 이긴다. 이 로봇은 한 번 걸러도 다음 실행에 다시 받으면 그만이다.
       - name: 저장
+        if: inputs.mode != 'probe'
         run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           [ -f data/kosaf.json ] && git add data/kosaf.json
           [ -f data/kosaf-open.json ] && git add data/kosaf-open.json
+          # 🔴 **로봇이 고친 파일은 전부 여기 있어야 한다** (2026-08-01 이슈 #79).
+          #    사본을 빠뜨리면 장부(kosaf.json)에는 '받았다'고 적히는데 파일이 없어,
+          #    학생 화면에 **죽은 링크**가 뜨고 다음 실행은 '이미 받았다'고 건너뛴다.
+          [ -d data/kosaf-files ] && git add -A data/kosaf-files
+          [ -f collector/kosaf-attach-report.md ] && git add collector/kosaf-attach-report.md
           true
           if ! git diff --cached --quiet; then
-            git commit -m "kosaf: 재단 장학금 목록 갱신 (층2)"
+            git commit -m "kosaf: 재단 장학금 목록·선발공고문 사본 갱신 (층2)"
             pushed=0
             for i in 1 2 3; do
               if git push; then pushed=1; break; fi

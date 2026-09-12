@@ -50,8 +50,17 @@ export function slimKosaf(data, today) {
         /* '해당없음'은 정보가 아니라 빈칸이다 — 화면에 줄만 늘린다 */
         if (v && !/^[○ㅇ\s]*해당\s?없음$/.test(v)) fields[k] = v;
       }
+      /* 🔴 **우리가 받아 둔 사본만** 담는다 (2026-09-12 — kosaf-attach.mjs).
+         KOSAF 첨부 원주소는 Referer 검사가 있어 앱에서 누르면 "비정상적인 접근"이 뜬다.
+         그래서 담는 것은 `data/kosaf-files/…` — 학생이 **우리 도메인에서** 받는 경로다.
+         이것이 층2 재단에 붙는 유일한 '공고 원문'이다(KOSAF 상세는 POST 전용이라
+         학생에게 줄 주소가 아예 없다). */
+      const files = ((i.mirror || {}).files || [])
+        .filter((f) => f && f.path && /^data\/kosaf-files\//.test(f.path))
+        .map((f) => ({ name: f.name, path: f.path, bytes: f.bytes || 0 }));
       return { code: i.code, org: i.org, name: i.name, kind: i.kind,
-        due: i.due || null, home: fixHome(i.home), fields };
+        due: i.due || null, home: fixHome(i.home), fields,
+        ...(files.length ? { files } : {}) };
     })
     /* 마감일을 모르는 것은 맨 뒤 — 앞에 두면 급한 공고를 밀어낸다 */
     .sort((a, b) => (!a.due) - (!b.due) || (a.due < b.due ? -1 : a.due > b.due ? 1 : 0));

@@ -21,7 +21,7 @@
    번호만 맞추고 한쪽 파일 목록을 버리면, 버린 쪽 파일이 오프라인에서만 없어 앱이 죽는다. */
 /* ⚠️ 두 작업이 같은 날 v172 를 각자 올려 부딪혔다 — 번호는 v173 으로 올리고 **둘 다** 남긴다
    (파일 머리말의 규칙 그대로). */
-const CACHE = 'handaejang-v179';  /* v179 — 알림 동의 시트의 장식용 원 제거 (UI-5) */
+const CACHE = 'handaejang-v180';  /* v180 — 층2 재단 공고문 사본(data/kosaf-files/)은 가로채지 않는다 */
 const ASSETS = ['.', 'index.html', 'style.css', 'boot.js', 'resume.js', 'interactions.js', 'app.js', 'data.js', 'forms.js', 'form-plan.js', 'essay.js', 'essay-config.js', 'essay-ask.js', 'essay-quality.js', 'essay-submit-check.js',
   'section-head.js', 'parse-requirements.js', 'parse-amount.js', 'match-engine.js', 'notify-rules.js', 'notify.js', 'push-config.js',
   'chat-config.js', 'chat.js',
@@ -100,6 +100,16 @@ self.addEventListener('fetch', (e) => {
   let url;
   try { url = new URL(e.request.url); } catch { return; }
   if (url.origin !== self.location.origin) return; /* 외부(폰트 CDN 등)는 브라우저에 맡긴다 */
+
+  /* 🔴 **받아 둔 공고문 원본은 우리가 가로채지 않는다** (2026-09-12 — data/kosaf-files/).
+     이유 둘, 둘 다 실제로 깨지는 길이다:
+       ① 학생이 `target="_blank"` 로 여는 PDF·HWP 는 `mode === 'navigate'` 라 아래
+          '화면 자체' 가지로 들어간다. 그러면 느린 회선에서 **3.5초 시한에 걸려
+          index.html 이 대신 나간다** — 공고문을 눌렀는데 앱이 또 열린다.
+       ② 네트워크 우선은 받은 것을 캐시에 넣는다. 공고문은 건당 0.2~2MB 라
+          몇 개만 눌러도 폰 캐시가 앱 전체보다 커진다(오프라인에 쓸 것도 아니다).
+     브라우저에 맡기면 둘 다 없다 — 내려받기는 브라우저가 원래 잘하는 일이다. */
+  if (/\/data\/kosaf-files\//.test(url.pathname)) return;
 
   /* 화면 자체 */
   if (e.request.mode === 'navigate') {
