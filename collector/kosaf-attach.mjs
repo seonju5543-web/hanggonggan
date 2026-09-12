@@ -73,6 +73,8 @@ const byCode = new Map((full.items || []).map((i) => [i.code, i]));
 const log = [];
 const say = (s) => { console.log(s); log.push(s); };
 /* 리포트에 주소를 통째로 실으면(재단마다 400자) 읽을 수 없게 된다 — 파일 이름만 남긴다 */
+/* 받은 것이 파일이 아닐 때 **속을 조금 보여 준다** — 원인을 짐작하지 않기 위한 유일한 근거다 */
+const peek = (buf) => `「${buf.subarray(0, 300).toString('utf8').replace(/\s+/g, ' ').trim().slice(0, 120)}」`;
 const short = (u) => {
   try { return (new URL(u).searchParams.get('FileNameDn') || u).split('/').pop().slice(0, 60); }
   catch { return String(u).slice(0, 60); }
@@ -97,7 +99,7 @@ async function probe(session) {
 
 /* ── 사본 받기 ───────────────────────────────────────────────────────────── */
 let runBytes = 0;
-const stat = { got: 0, skipped: 0, blocked: 0, tooBig: 0, unresolved: 0, pruned: 0 };
+const stat = { got: 0, skipped: 0, blocked: 0, tooBig: 0, unresolved: 0, pruned: 0, noFile: 0 };
 const unresolvedSamples = [];
 
 function mirrorAlive(it) {
@@ -138,6 +140,11 @@ async function mirrorOne(session, it) {
        재시도(건당 최대 60초×3)를 타는 동안 단계 상한을 넘겨 **취소**되고, 취소는
        실패가 아니라서 saveAll() 도 안 돈다(2026-08-04에 배운 것). */
     if (runBytes >= MAX_RUN || budget.expired()) { keep(); return; }
+    /* 🔴 **'못 받았다'와 '올린 것이 없다'는 다른 일이다** (2026-09-12 두 번째 실행에서 드러남).
+       KOSAF 는 첨부가 없는 재단에도 링크를 걸어 두고 `첨부파일 없음.txt` 라는 72바이트짜리
+       자리표시 파일을 내려 준다. 이걸 '막힘'으로 세면 고칠 것이 없는 실패가 리포트에 쌓여,
+       **진짜 못 받은 것이 그 잡음에 묻힌다**(이 저장소가 자격 줄 잡음에서 배운 것과 같다). */
+    if (/첨부파일\s*없음/.test(short(f.url))) { stat.noFile += 1; continue; }
     /* 🔴 **막힌 이유를 반드시 남긴다** (2026-09-12 첫 실행에서 18개가 이유 없이 '막힘'이었다).
        이유 없는 실패는 다음 사람이 **원인을 짐작하게** 만든다 — 이 저장소가 가장 비싸게
        배운 실수다(CLAUDE.md 매 세션 5번). 아래 네 갈래 전부 한 줄씩 적는다. */
@@ -154,13 +161,15 @@ async function mirrorOne(session, it) {
     /* 🔴 막힐 때 200 에 HTML 이 온다 — 그걸 저장하면 학생이 오류 화면을 '공고문'으로 받는다 */
     if (looksLikeHtml(buf)) {
       stat.blocked += 1;
-      say(`  ✕ ${it.org} — 파일 대신 HTML 이 왔습니다 (리퍼러 검사에 걸렸을 수 있습니다)`);
+      say(`  ✕ ${it.org} — 파일 대신 HTML 이 왔습니다 · ${peek(buf)}`);
       continue;
     }
     if (buf.length > MAX_FILE) { stat.tooBig += 1; say(`  · ${it.org} — ${(buf.length / (1 << 20)).toFixed(1)}MB 라 건너뜁니다`); continue; }
     if (buf.length < 512) {
       stat.blocked += 1;
-      say(`  ✕ ${it.org} — ${buf.length}바이트밖에 안 옵니다 (파일이 아닙니다) · ${short(f.url)}`);
+      /* 🔴 **속을 보여 준다.** 첫 판은 크기만 적었는데, 그러면 다음 사람이 원인을 짐작하게 된다
+         (CLAUDE.md 매 세션 5번). 재단 서버가 뭐라고 답했는지가 유일한 근거다. */
+      say(`  ✕ ${it.org} — ${buf.length}바이트밖에 안 옵니다 · ${short(f.url)} · 받은 것: ${peek(buf)}`);
       continue;
     }
 
@@ -209,6 +218,7 @@ function saveAll() {
   const head = `# 한국장학재단 첨부 사본 — ${new Date().toISOString().slice(0, 16).replace('T', ' ')}\n\n`
     + `| | |\n|---|---|\n`
     + `| 새로 받음 | ${stat.got}개 |\n| 이미 있던 것 | ${stat.skipped}곳 |\n`
+    + `| 재단이 첨부를 안 올림 | ${stat.noFile}개 |\n`
     + `| 못 받음(막힘) | ${stat.blocked}개 |\n| 주소를 못 만듦 | ${stat.unresolved}개 |\n`
     + `| 너무 큼 | ${stat.tooBig}개 |\n| 지난 회차 정리 | ${stat.pruned}곳 |\n`
     + `| **앱에서 공고문을 볼 수 있는 재단** | **${withFile} / ${slim.count}곳** |\n\n`
@@ -261,5 +271,6 @@ if (left) say(`⏱ 예산을 다 써 ${left}곳은 다음 실행으로 넘깁니
 
 prune();
 say(`\n새로 ${stat.got}개(${Math.round(runBytes / 1024)}KB) · 이미 있던 곳 ${stat.skipped} · `
-  + `막힘 ${stat.blocked} · 주소 못 만듦 ${stat.unresolved} · 큰 파일 ${stat.tooBig} · 정리 ${stat.pruned}곳`);
+  + `재단이 안 올림 ${stat.noFile} · 막힘 ${stat.blocked} · 주소 못 만듦 ${stat.unresolved} · `
+  + `큰 파일 ${stat.tooBig} · 정리 ${stat.pruned}곳`);
 saveAll();
