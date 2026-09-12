@@ -600,19 +600,31 @@ input::placeholder { color: var(--text-weak); }
 .page-header h2 { font-size: var(--t-2xl); font-weight: 800; letter-spacing: -0.025em; }
 .filter-row {
   display: flex;
-  /* 🔴 칩이 넘치면 **줄을 바꾼다** (2026-08-30). 예전엔 가로 스크롤이라 다섯 번째 칩이
-     화면 밖에 반쯤 잘려 있었고, 개발자가 "앱에 하나도 안 뜬다"고 했다 — 반쯤 보이는 것은
-     안 보이는 것이다. 넘치지 않으면 아무것도 안 바뀐다(한 줄 그대로). */
-  flex-wrap: wrap;
-  gap: 8px;
+  /* 🔴 **칩은 한 줄이다** (2026-09-12 개발자 지시: "신청가능만 밑으로 내리지 말고 일렬로").
+     경위 — 2026-08-30 에는 줄바꿈으로 바꿨다. 그때 가로 스크롤이 문제였던 것은 다섯째 칩이
+     **화면 밖에 반쯤 잘려** 있었기 때문이다("앱에 하나도 안 뜬다"). 그래서 이번엔 스크롤로
+     되돌리는 대신 **다섯이 실제로 들어가게** 만들었다: 칸 여백 14 → 10px · 칩 사이 8 → 6px ·
+     좌우로 화면 끝까지 펼치기(아래 margin/padding 짝). 글자 크기는 **안 건드렸다** —
+     2026-09-11 에 개발자가 크기 조정을 전부 되돌리라고 했다.
+     실측(칩 5개): 360px 한 줄(칩 오른쪽 끝 355 < 360) · 390px · 430px 한 줄 · 세로 스크롤 그대로.
+     ⚠️ 칩을 더 늘리면 다시 잘린다 — 그때는 이름을 줄이거나 칩을 줄일 것(줄바꿈으로 돌아가지 말 것). */
+  flex-wrap: nowrap;
+  gap: 6px;
   margin-bottom: 16px;
+  /* 좌우 화면 끝까지 — 마지막 칩이 화면 가장자리에 닿지 않게 하는 여유가 여기서 나온다 */
+  margin-left: calc(var(--space-20) * -1);
+  margin-right: calc(var(--space-20) * -1);
+  padding-left: var(--space-20);
+  padding-right: var(--space-20);
   overflow-x: auto;
   padding-bottom: 4px;
   scrollbar-width: none;
 }
+/* 칩은 글자에 맞춰 그대로 — 줄이거나 늘리지 않는다(줄이면 글자가 두 줄로 접힌다) */
+.filter-chip { flex: 0 0 auto; }
 .filter-row::-webkit-scrollbar { display: none; }
 .filter-chip {
-  padding: 7.5px 14px;   /* 선 1.5 → 2px(7번 Apple 방식 · 2026-09-11). 크롬은 1.5px 선을 1px 로 놓았으므로 1px 만큼 뺀다 — 칩 41.5 그대로(실측) */
+  padding: 7.5px 10px;   /* 가로 14 → 10 (2026-09-12 '일렬로'). 세로는 그대로 — 누르는 높이 41.5 유지 */
   border-radius: var(--radius-pill);
   background: var(--surface);
   border: 2px solid rgba(18, 22, 31, 0.10);

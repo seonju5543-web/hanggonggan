@@ -200,6 +200,26 @@ const PROFILE = {
      개발자 지시: "교내/교외가 있는 것처럼 칸을 하나 더 만들어 뺀다."
      이 칸의 내용은 **수집 로봇이 학교 게시판에서 줍는 글 목록**이다(등록 공고가 아니다).
      예전에는 '전체' 목록 아래에 붙어 카드 수십 장을 지나야 보였다. */
+  /* 🔴 **필터 칩은 한 줄이다** (2026-09-12 개발자 지시: "신청가능만 밑으로 내리지 말고 일렬로").
+     칩이 다섯이 되면서 줄바꿈으로 접혔다. 다시 스크롤로 돌리지 않고 **들어가게** 만들었으니
+     (여백 14 → 10 · 칩 사이 8 → 6 · 좌우 화면 끝까지), 좁은 화면에서 실제로 한 줄인지 잰다.
+     ⚠️ 글자 크기는 재지 않는다 — 2026-09-11 개발자 지시로 크기 조정은 전부 되돌린 상태다. */
+  console.log('\n■ 필터 칩 한 줄 (2026-09-12)');
+  for (const w of [360, 390]) {
+    await page.setViewportSize({ width: w, height: 900 });
+    await page.waitForTimeout(250);
+    const row = await page.evaluate(() => {
+      const rects = [...document.querySelectorAll('#explore-filters .filter-chip')]
+        .map((c) => c.getBoundingClientRect());
+      return { n: rects.length, 줄수: new Set(rects.map((r) => Math.round(r.top))).size,
+        전부보임: rects.every((r) => r.left >= 0 && r.right <= window.innerWidth) };
+    });
+    eq(`${w}px — 칩 ${row.n}개가 한 줄이다`, row.줄수, 1);
+    eq(`  ${w}px — 잘린 칩이 없다 (2026-08-30 에 스크롤로 반쯤 잘렸던 자리)`, row.전부보임, true);
+  }
+  await page.setViewportSize({ width: 390, height: 900 });
+  await page.waitForTimeout(250);
+
   console.log('\n■ 우리 학교 칸 (UI-16)');
   /* 🔴 **오늘 수집분에 기대지 않는다** — 실시간 공고는 60일이 지나면 지워지고(collect.mjs),
      한 학교의 수집이 며칠 멈추면 0건이 된다. 그러면 앱은 멀쩡한데 이 절이 빨간불이 되고,
