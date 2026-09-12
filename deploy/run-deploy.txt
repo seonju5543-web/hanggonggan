@@ -15,4 +15,4 @@
 # 데이터 관문(node verify/audit-data.js)을 통과하지 못하면 배포하지 않고 🚨 이슈를 남긴다.
 
 branch: claude/device-main-deploy-config-cfodsa
-메모: 2026-09-12 (4) — 불필요한 구분선 삭제 (sw v170)
+메모: 2026-09-12 (4) — 불필요한 구분선 삭제 · 동료 작업과 병합 (sw v172)

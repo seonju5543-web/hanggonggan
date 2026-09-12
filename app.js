@@ -1381,6 +1381,12 @@ function agoLabel(ts) {
 }
 
 /* ---------------- 홈 ---------------- */
+/* 홈 '마감 임박'에 펴 두는 장수 (노션 UI-14). 접으면 셋, 펴면 열까지 —
+   그 위는 '전체 보기'(장학금 찾기)가 맡는다. */
+const HOME_DEADLINE_TOP = 3;
+const HOME_DEADLINE_MORE = 10;
+let homeDeadlineOpen = false;
+
 function renderHome() {
   const p = state.profile;
   /* 🔴 이름이 없으면 인사말로 때우지 않는다 — 이름은 신청서에도 들어가는 값이라
@@ -1434,18 +1440,39 @@ function renderHome() {
 
   renderResumeCard();
 
-  const upcoming = matches
+  /* 🔴 이 자리는 **마감만** 보고 있었다 (노션 UI-14 · 개발자 지적: "적합도가 낮아도 마감이
+     임박하면 홈에 뜬다 — 학생 입장에서는 '굳이…' 다"). 실측(2026-09-12 · 한국외대·경희대):
+     옛 규칙의 석 장은 D-1 15% · D-2 15% · D-2 50% 로, 맨 위 둘이 적합도 15% 였다.
+     지금은 **임박한 것 안에서 나에게 맞는 것**부터 올린다 → D-6 67% · D-6 67% · D-2 50%.
+     임박 후보는 두 학교 모두 27·25건이라 '마감 임박'이라는 이름이 빈말이 될 일은 없다.
+     🔴 판정을 새로 만들지 않는다 — 임박은 `dday()` 가 낸 것(cls 'urgent' = 7일 안쪽),
+        적합도 순위는 배지·탐색 정렬과 같은 `fitRank`, 날짜 비교는 탐색의 `byDeadline` 이다.
+        여기서 문턱이나 순위를 새로 정하면 홈과 장학금 찾기가 다른 말을 한다. */
+  const urgentRank = (m) => (dday(m.sch.deadline).cls === 'urgent' ? 0 : 1);
+  const upcomingAll = matches
     .filter((m) => m.result.status !== 'ineligible' && dday(m.sch.deadline).days >= 0 && notStale(m.sch))
-    .sort((a, b) => deadlineTs(a.sch) - deadlineTs(b.sch))
-    .slice(0, 3);
+    .sort((a, b) => urgentRank(a) - urgentRank(b) || fitRank(a) - fitRank(b)
+      || b.fit - a.fit || byDeadline(a, b));
+  /* 석 장만 펴 두고 나머지는 '더보기' 로 편다 — 그려는 두고 CSS 가 가린다(style.css).
+     ⚠️ `HOME_DEADLINE_MORE` 를 넘는 것은 '전체 보기'(장학금 찾기)가 맡는다. */
+  const upcoming = upcomingAll.slice(0, HOME_DEADLINE_MORE);
   /* ⚠️ 여기에는 뼈대를 두지 않는다 (2026-09-09 실측). 처음엔 "공고가 오기 전에 홈이
      '없음'이라고 말한다"고 보고 뼈대를 넣었는데, 실제로 재 보니 **그런 일이 없었다** —
      `allScholarships()` 가 data.js 의 상시 제도 6종을 동기로 먼저 내주기 때문에
      이 목록은 받아오기 중에도 비지 않는다. 뼈대는 실제로 기다림이 보이는
      `liveNoticesHtml()` 한 곳에만 둔다. */
-  $('#home-deadline-list').innerHTML = upcoming.length
+  const deadlineList = $('#home-deadline-list');
+  deadlineList.innerHTML = upcoming.length
     ? upcoming.map((m) => schCard(m.sch, m.result, { compact: true, fit: m.fit, fd: m.fd })).join('')
     : '<p class="empty">지금 신청할 수 있는 장학금이 없어요<br /><span class=\"empty-sub\">프로필을 채우면 더 많이 찾을 수 있어요</span></p>';
+  /* 앞의 HOME_DEADLINE_TOP 장을 뺀 나머지에 표를 붙인다 — 가리는 것은 style.css 가 한다.
+     '몇 장'은 이 상수 하나에만 산다(CSS 에 숫자를 두면 둘이 갈라진다). */
+  [...deadlineList.children].forEach((el, i) => el.classList.toggle('home-extra', i >= HOME_DEADLINE_TOP));
+  deadlineList.classList.toggle('more-open', homeDeadlineOpen);
+  const moreBtn = $('#home-deadline-more');
+  moreBtn.hidden = upcoming.length <= HOME_DEADLINE_TOP;
+  moreBtn.textContent = homeDeadlineOpen ? '접기' : '더보기';
+  moreBtn.setAttribute('aria-expanded', homeDeadlineOpen ? 'true' : 'false');
 
   const recent = state.applications.slice(-2).reverse().filter((a) => findSch(a.id));
   renderHomeUpdated();
@@ -1565,58 +1592,16 @@ function renderExplore() {
   $('#live-notices').innerHTML = (exploreFilter === 'all' && !q) ? liveNoticesHtml() : '';
   /* ⚠️ 홈과 같은 이유로 여기에도 뼈대를 두지 않는다 — 이 목록은 받아오기 중에도 비지 않는다
      (renderHome 의 같은 자리 주석 참조). 뼈대는 `liveNoticesHtml()` 한 곳이다. */
+  /* 🔴 **구획 없이 한 목록이다** (2026-09-12 개발자 지시: "오늘 내일 마감 이번 주 마감
+     이번 달 마감 삭제 후 하나로 통합, 적합도 순 마감 임박순 이런 거 하나도 안 지켜짐").
+     2026-09-10 페이스리프트가 마감으로 7구획을 나눴는데, 구획이 **마감 순서로 고정**이라
+     학생이 고른 정렬은 구획 **안에서만** 살아 있었다 — 적합도순을 골라도 화면 맨 위는
+     늘 '오늘·내일 마감' 구획이라 정렬이 통째로 안 먹는 것처럼 보였다(그게 지적 그대로다).
+     정렬은 이제 위 sort 하나가 목록 전체에 그대로 적용된다.
+     ⚠️ 구획을 되살리려면 정렬을 어떻게 살릴지부터 정할 것 — 둘은 같은 자리를 두고 다툰다. */
   $('#explore-list').innerHTML = list.length
-    ? exploreGroupsHtml(list)
+    ? list.map((m) => schCard(m.sch, m.result, { fit: m.fit, fd: m.fd })).join('')
     : `<p class="empty">${q ? `'${esc(exploreQuery.trim())}'와 맞는 장학금이 없어요` : '조건에 맞는 장학금이 없어요'}</p>`;
-}
-
-/* ── 목록 구획 (2026-09-10 페이스리프트) ────────────────────────────────────
-   왜 — 탐색 탭 전체 높이가 실측 **46,626px**(390×844 화면으로 약 55번)인데 구획이
-   한 곳도 없고 카드가 전부 같은 높이·같은 구조였다. 눈이 쉴 곳도, "여기까지가 급한 것"
-   이라고 말해 주는 자리도 없었다.
-
-   🔴 **마감일 하나로만 가른다.** 접수 시작일(openDate)은 등록 48건 중 17건에만 있어
-      '접수 기간의 몇 %' 같은 것을 만들면 지어내는 것이 된다(원칙 8-1).
-   🔴 **판정을 새로 하지 않는다** — dday() 가 낸 days 만 본다. 다만 '마감일이 없는 공고'는
-      dday 가 days:14 를 주므로(목록에 남기려는 값이다) days 로는 구분할 수 없다.
-      그래서 `sch.deadline` 유무를 **직접** 본다 — 안 그러면 기한 미상이 '이번 달'로 섞인다.
-   🔴 고른 정렬(적합도순·마감순·최신순)은 **구획 안에서** 그대로 적용된다. 위 sort 가 이미
-      끝난 배열의 순서를 여기서 흩뜨리지 않고 담기만 한다.
-      → 적합도순이면 "이번 주에 마감하는 것 중 나와 가장 맞는 것"이 각 구획 맨 위에 온다. */
-/* 🔴 순서가 곧 뜻이다 — **급한 것이 위, 끝난 것이 맨 아래**.
-   처음 짤 때 'closed' 를 맨 앞에 뒀다가 검사(verify-explore-sort '이미 지난 마감은
-   목록 끝에 있다')에 잡혔다. 마감된 공고가 목록 첫 줄에 오면 학생이 맨 먼저 보는 것이
-   이미 못 하는 일이 된다. 기한을 못 읽은 것은 아직 할 수 있는 일이라 그 위에 둔다. */
-const EXPLORE_GROUPS = [
-  { key: 'now',    label: '오늘·내일 마감' },
-  { key: 'week',   label: '이번 주' },
-  { key: 'month',  label: '이번 달' },
-  { key: 'later',  label: '여유 있음' },
-  { key: 'always', label: '상시 신청' },
-  { key: 'unknown', label: '마감일 확인 중' },
-  { key: 'closed', label: '마감' },
-];
-
-function exploreGroupOf(sch) {
-  if (sch.program) return 'always';
-  if (!sch.deadline) return 'unknown';
-  const days = dday(sch.deadline).days;
-  if (days < 0) return 'closed';
-  if (days <= 1) return 'now';
-  if (days <= 7) return 'week';
-  if (days <= 30) return 'month';
-  return 'later';
-}
-
-function exploreGroupsHtml(list) {
-  const bucket = {};
-  for (const m of list) (bucket[exploreGroupOf(m.sch)] = bucket[exploreGroupOf(m.sch)] || []).push(m);
-  return EXPLORE_GROUPS
-    .filter((g) => bucket[g.key] && bucket[g.key].length)
-    .map((g) => `<div class="list-group">
-        <div class="list-group-head"><span>${esc(g.label)}</span><span class="list-group-n">${bucket[g.key].length}</span></div>
-        ${bucket[g.key].map((m) => schCard(m.sch, m.result, { fit: m.fit, fd: m.fd })).join('')}
-      </div>`).join('');
 }
 
 /* ---------------- 서류 도우미 (AI 초안 작성) ---------------- */
@@ -2154,19 +2139,37 @@ const KOSAF_ELIG = ['특정자격', '성적기준', '소득기준', '지역거�
 /* 🔴 재단이 쓴 글에는 `○`·`ㅇ`·`※` 같은 **머리 기호**가 그대로 들어 있다. 뜻이 아니라
    서식이므로 화면에서는 떼어낸다(문장 자체는 한 글자도 바꾸지 않는다).
    개발자 지적: "동그라미 기호니 … 너무 원문 그대로 가져오는 거 아니야?" */
-const kosafClean = (t) => String(t || '').replace(/[○ㅇ●◦※]/g, ' ').replace(/\s+/g, ' ').trim();
+/* 🔴 머리 기호는 **머리 자리에 있을 때만** 뗀다 (2026-09-12 코드 리뷰).
+   `ㅇ` 은 한글 자모라 그냥 지우면 낱말 속 글자를 지운다 — 한국장학재단 원본에는 실제로
+   떨어져 나온 자모가 섞여 있어(실측 7곳), 그걸 지우면 `LG스플레이` 처럼 **다르게 틀린**
+   글자가 된다. 지우는 것도 지어내는 것과 같다(원칙 8-1). */
+const kosafClean = (t) => String(t || '').replace(/(^|\s)[○ㅇ●◦※]+/g, '$1').replace(/\s+/g, ' ').trim();
 
 /* 카드·시트에 보이는 **혜택 한 줄**. 원문 문단을 통째로 띄우지 않는다 —
    금액은 이미 parse-amount 가 읽어 뒀으니 그 숫자로 짧게 말하고, 조건은 상세 칸에서 본다.
    개발자 지적: "받을 수 있는 혜택만 간편하게 적어놔야지 원문 그대로 배껴놨네." */
-function kosafAmountLabel(spec, raw) {
+const KOSAF_AMOUNT_UNKNOWN = '금액은 재단 홈페이지에서 확인';
+function kosafAmountLabel(spec) {
   if (spec && spec.kind === 'fixed' && spec.value) return `최대 ${won(spec.value)}`;
   if (spec && spec.kind === 'range' && spec.max) {
     return spec.min && spec.min !== spec.max ? `${won(spec.min)} ~ ${won(spec.max)}` : `최대 ${won(spec.max)}`;
   }
   if (spec && spec.kind === 'ratio' && spec.ratio) return `등록금의 ${Math.round(spec.ratio * 100)}%`;
-  const t = kosafClean(raw);
-  return t ? (t.length > 40 ? `${t.slice(0, 40)}…` : t) : '금액은 재단 홈페이지에서 확인';
+  /* 🔴 **못 읽은 금액 자리에 원문 문단을 흘리지 않는다** (2026-09-12 개발자 지적:
+     "lg ㄷ 스플레이 이런 식으로 글자 깨짐"). 예전에는 숫자를 못 읽으면 원문 40자를 잘라
+     그대로 띄웠다. 실측(열려 있는 116곳): 109곳은 숫자가 읽히고 **7곳만** 이 길로 갔는데,
+     그 7곳이 전부 금액이 아니었다 — `예산범위 내에서 이사회에서 결정한 금액`,
+     `기관확인필요`, `예산 총 5억원…`(총 사업규모다), 그리고 한국장학재단 원본의 오타가
+     그대로 드러난 `LGㄷ스플레이 입사 자격 부여…`.
+     🔴 오타는 **우리가 만든 것이 아니다** — `data/kosaf.json` 원본이 이미 그렇고
+        (겹친 글자 822곳·홀자모 7곳 실측: `프로그램램`·`유효효기간`·`기관확인필요요`),
+        같은 재단의 `운영기관명` 은 `LG디스플레이` 로 멀쩡하다. 우리 코드에는 글자를
+        복제하거나 지우는 자리가 없다(strip 은 태그·엔티티·공백만 만진다).
+        고칠 수 없는 남의 오타를 **카드 머리**에 띄우지 않는 것이 우리가 할 수 있는 일이고,
+        원문은 버리지 않고 상세 시트에 '재단이 적어 둔 것'으로 그대로 남긴다(원칙 8-1).
+     ⚠️ 여기서 원문을 다듬어 보여 주려 하지 말 것 — 지우면 `LG스플레이` 처럼 **다르게 틀린**
+        글자가 되고, 그건 지어낸 것과 같다. */
+  return KOSAF_AMOUNT_UNKNOWN;
 }
 function kosafAsScholarships() {
   return kosafList
@@ -2196,7 +2199,13 @@ function kosafAsScholarships() {
         name: `${i.org} ${i.name}`,
         provider: i.org,
         type: '교외',
-        amount: kosafAmountLabel(aSpec, f['지원금액']),
+        amount: kosafAmountLabel(aSpec),
+        /* 금액을 못 읽었을 때만 원문을 함께 넘긴다 — 상세 시트에서 '재단이 적어 둔 것'으로 보여 준다.
+           읽은 경우에는 카드 문구가 이미 그 숫자라 두 번 말할 뿐이다. */
+        /* 🔴 조건을 **라벨과 같은 식으로** 쓴다 — 따로 적었다가 `{kind:'fixed', value:0}`
+           에서 라벨은 폴백인데 원문은 버려지는 어긋남이 있었다(2026-09-12 코드 리뷰). */
+        ...(kosafAmountLabel(aSpec) !== KOSAF_AMOUNT_UNKNOWN && kosafClean(f['지원금액'])
+          ? {} : (kosafClean(f['지원금액']) ? { amountNote: kosafClean(f['지원금액']) } : {})),
         /* 🔴 금액은 **손으로 박지 않는다** — `parse-amount.js` 한 곳을 그대로 통과시킨다
            (2026-08-30 개발자 지적). 처음엔 amountValue 를 0 으로 박아 뒀는데, 그러면
            ① 재단이 적어 둔 금액이 홈 합계에서 통째로 빠지고 ② 앞으로 들어올 재단도
@@ -2733,7 +2742,12 @@ function openDetail(id) {
   const judged = result.reasons.filter((r) => !isScopeOk(r));
 
   const checkRows = judged.map((r) => {
-    const bad = /필요|아니에요|가능$/.test(r) && !/충족|확인/.test(r);
+    /* 🔴 `미달`을 빠뜨려 **미달 근거 줄에 초록 ✓ 가 붙어 있었다** (2026-09-12 코드 리뷰).
+       `공고에 적힌 요건에 미달해요: …` 가 '필요·아니에요·가능' 중 어디에도 안 걸려
+       충족으로 그려졌다 — 화면이 스스로 모순된 말을 한 것이다.
+       ⚠️ `!/충족|확인/` 이 뒤에 있어 '확인'이 든 미달 줄은 여전히 ✓ 가 된다 — 그건
+          '확인 필요'(모름)를 ✓ 로 두지 않으려던 장치라, 미달을 먼저 본다. */
+    const bad = /미달/.test(r) || (/필요|아니에요|가능$/.test(r) && !/충족|확인/.test(r));
     return `<li class="${bad ? 'r-bad' : 'r-ok'}">${bad ? '✕' : '✓'} ${esc(r)}</li>`;
   }).join('')
     + result.missing.map((m) => `<li class="r-unk">? ${esc(m)} 정보를 입력하면 정확히 판단할 수 있습니다</li>`).join('');
@@ -2884,6 +2898,9 @@ function openDetail(id) {
            ('한국장학재단 ↗')이 말한다. */ ''}
       <h3 class="sheet-title">${esc(sch.name)}</h3>
       <p class="sheet-amount">${esc(sch.amount)}</p>
+      ${/* 금액을 숫자로 못 읽은 층2 공고 — 재단이 그 칸에 적어 둔 말을 그대로 옮긴다.
+           카드 머리에는 안 띄운다(위 kosafAmountLabel 주석). */ ''}
+      ${sch.amountNote ? `<p class="doc-legend">재단이 적어 둔 지원금액 — ${esc(sch.amountNote)}</p>` : ''}
       <p class="sheet-provider">${esc(sch.provider)} · ${esc(sch.period)}</p>
       ${scheduleRowHtml(sch)}
 
@@ -4795,6 +4812,18 @@ function bindEvents() {
   });
 
   $('#btn-apply-all').addEventListener('click', applyAll);
+
+  /* '마감 임박' 더보기 (노션 UI-14) — 다시 그리지 않고 **가려 둔 카드를 편다**.
+     renderHome() 을 부르면 히어로 금액이 또 세어 올라가고(countUp 900ms) 스크롤이 튄다. */
+  {
+    const btn = $('#home-deadline-more');
+    if (btn) btn.addEventListener('click', () => {
+      homeDeadlineOpen = !homeDeadlineOpen;
+      $('#home-deadline-list').classList.toggle('more-open', homeDeadlineOpen);
+      btn.textContent = homeDeadlineOpen ? '접기' : '더보기';
+      btn.setAttribute('aria-expanded', homeDeadlineOpen ? 'true' : 'false');
+    });
+  }
 
   const editProfile = () => {
     onboardEditing = !!state.profile;   /* 이미 프로필이 있으면 '고치는 중'이다 */

@@ -67,22 +67,22 @@ const PROFILE = {
         days: s.deadline ? dday(s.deadline).days : null }; });
   });
 
-  /* 🔴 2026-09-10 페이스리프트로 목록이 **마감 구획**으로 나뉘었다.
-     구획 순서(오늘·내일 → 이번 주 → 이번 달 → 여유 → 상시 → 기한 미확정 → 마감)는 고정이고,
-     학생이 고른 정렬은 **구획 안에서** 지켜진다. 그래서 아래 정렬 검사도 구획 안에서 잰다 —
-     전체 DOM 순서로 재면 "적합도순인데 왜 마감 임박이 위에 있냐"를 묻게 되는데,
-     그건 이제 어긋난 게 아니라 설계다. 구획 자체의 순서는 따로 검사한다. */
-  const groupKeys = () => page.evaluate(() => {
+  /* 🔴 **구획은 2026-09-12 개발자 지시로 없앴다** ("오늘 내일 마감 이번 주 마감 이번 달 마감
+     삭제 후 하나로 통합, 적합도 순 마감 임박순 이런 거 하나도 안 지켜짐").
+     2026-09-10 페이스리프트가 마감으로 7구획을 나눈 뒤, 구획 순서가 마감으로 고정이라
+     고른 정렬은 구획 **안에서만** 살아 있었다 — 화면에서는 정렬이 통째로 안 먹는 것으로 보였다.
+     그래서 이 드라이버도 **목록 전체의 DOM 순서**로 되돌아간다(2026-09-10 이전 방식).
+     ⚠️ 구획을 다시 만들려거든 정렬을 어떻게 살릴지부터 정할 것 — 둘은 같은 자리를 다툰다. */
+  const cardRows = () => page.evaluate(() => {
     const find = (id) => (typeof allScholarships === 'function' ? allScholarships() : []).find((s) => s.id === id) || {};
-    return [...document.querySelectorAll('#explore-list .list-group')].map((g) => ({
-      label: (g.querySelector('.list-group-head span') || {}).textContent || '',
-      rows: [...g.querySelectorAll('.sch-card')].map((e) => {
-        const s = find(e.dataset.detail);
-        return { id: e.dataset.detail, deadline: s.deadline || null, listedAt: s.listedAt || null,
-          no: !!e.querySelector('.badge-fit-no') };
-      }),
-    }));
+    return [...document.querySelectorAll('#explore-list .sch-card')].map((e) => {
+      const s = find(e.dataset.detail);
+      return { id: e.dataset.detail, deadline: s.deadline || null, listedAt: s.listedAt || null,
+        no: !!e.querySelector('.badge-fit-no') };
+    });
   });
+  eq('목록에 구획이 없다 (한 목록이다)',
+    await page.$$eval('#explore-list .list-group', (e) => e.length), 0);
 
   console.log('■ 기본 상태');
   eq('버튼 라벨이 적합도순이다', await page.$eval('#explore-sort-label', (e) => e.textContent.trim()), '적합도순');
@@ -151,31 +151,33 @@ const PROFILE = {
   await page.click('#explore-sort-btn'); await page.waitForTimeout(300);
   await page.click('#explore-sort-menu [data-sort="listed"]'); await page.waitForTimeout(600);
   eq('라벨이 바뀐다', await page.$eval('#explore-sort-label', (e) => e.textContent.trim()), '등록 최신순');
-  const groups = await groupKeys();
+  const listedRows = await cardRows();
   const key = (r) => r.listedAt || r.deadline || '';
-  eq('구획 안에서 값 없는 카드가 앞으로 오지 않는다',
-    groups.every((g) => { const withK = g.rows.filter((r) => key(r)).length;
-      return g.rows.slice(0, withK).every((r) => key(r)); }), true);
-  eq('구획 안에서 등록일 내림차순이다',
-    groups.every((g) => { const withK = g.rows.filter((r) => key(r)).length;
-      return g.rows.slice(0, withK).every((r, i, arr) => i === 0 || key(arr[i - 1]) >= key(r)); }), true);
-  eq('구획이 마감 순서대로 있다 (급한 것이 위 · 마감은 맨 아래)', (() => {
-    const ORDER = ['오늘·내일 마감', '이번 주', '이번 달', '여유 있음', '상시 신청', '마감일 확인 중', '마감'];
-    const seen = groups.map((g) => g.label).filter((l) => ORDER.includes(l));
-    return seen.every((l, i, arr) => i === 0 || ORDER.indexOf(arr[i - 1]) < ORDER.indexOf(l));
-  })(), true);
+  const withKey = listedRows.filter((r) => key(r)).length;
+  eq('값 없는 카드가 앞으로 오지 않는다', listedRows.slice(0, withKey).every((r) => key(r)), true);
+  eq('등록일 내림차순이다 (목록 전체에서)',
+    listedRows.slice(0, withKey).every((r, i, arr) => i === 0 || key(arr[i - 1]) >= key(r)), true);
 
   console.log('\n■ 적합도순 — 미달은 맨 아래 (개발자 결정)');
   await page.click('#explore-sort-btn'); await page.waitForTimeout(300);
   await page.click('#explore-sort-menu [data-sort="fit"]'); await page.waitForTimeout(600);
-  /* 미달은 **구획 안에서** 맨 아래로 모인다 — 2026-08-26 개발자 결정("적합도를 기준으로
-     했을 때는 맨 아래에 두는 게 맞지")은 그대로고, 재는 자리만 구획 안으로 옮겼다. */
-  const fitGroups = await groupKeys();
-  eq('구획마다 미달 카드가 그 구획 끝에 모여 있다',
-    fitGroups.every((g) => {
-      const idx = g.rows.map((r, i) => (r.no ? i : -1)).filter((i) => i >= 0);
-      return idx.length === 0 || idx[0] + idx.length === g.rows.length;
-    }), true);
+  /* 미달은 **목록 맨 아래**로 모인다 — 2026-08-26 개발자 결정("적합도를 기준으로 했을 때는
+     맨 아래에 두는 게 맞지") 그대로다. 구획이 없어졌으니 재는 자리도 목록 전체로 돌아왔다. */
+  const fitRows = await cardRows();
+  const noIdx = fitRows.map((r, i) => (r.no ? i : -1)).filter((i) => i >= 0);
+  eq('미달 카드가 목록 끝에 모여 있다',
+    noIdx.length === 0 || noIdx[0] + noIdx.length === fitRows.length, true);
+  /* 🔴 **고른 정렬이 목록 전체에 걸리는가** — 2026-09-12 지적의 본체다("정렬 이런 거
+     하나도 안 지켜짐"). 구획이 있을 때는 이 성질이 성립할 수 없었다.
+     기대값은 앱의 정렬 함수 그대로 만든다(규칙을 여기 베끼면 갈라진다). */
+  const fitOrder = await page.evaluate(() => {
+    const shown = [...document.querySelectorAll('#explore-list .sch-card')].map((e) => e.dataset.detail);
+    const ms = getMatches().filter((m) => shown.includes(m.sch.id));
+    const want = ms.slice().sort((a, b) => fitRank(a) - fitRank(b) || EXPLORE_SORTS.fit.cmp(a, b))
+      .map((m) => m.sch.id);
+    return { shown, want };
+  });
+  eq('적합도순이 목록 전체에 그대로 걸린다', fitOrder.shown, fitOrder.want);
 
   console.log('\n■ 필터 칩과 서로 간섭하지 않는다 (.filter-chip 전역 선택 함정)');
   await page.click('.filter-chip[data-filter="교외"]'); await page.waitForTimeout(500);
@@ -188,6 +190,81 @@ const PROFILE = {
   eq('필터도 그대로 걸려 있다',
     await page.$$eval('#explore-list .sch-card .sch-org',
       (e) => [...new Set(e.map((x) => x.textContent.split('·')[0].trim()))]), ['교외']);
+
+  /* ══ 홈 '마감 임박' 차례 (2026-09-12 · 노션 UI-14) ═══════════════════════════
+     개발자 지적: "적합도가 낮아도 마감이 임박하면 홈에 뜬다 — 학생 입장에서는 '굳이…' 다."
+     옛 규칙은 마감 오름차순뿐이라 실측(한국외대)에서 맨 위 둘이 **적합도 15%** 였다.
+     🔴 기대 순서를 여기서 **손으로 적지 않는다** — 앱의 getMatches·fitRank·dday·byDeadline 을
+        그대로 불러 만든다. 검사가 규칙을 한 벌 더 가지면 앱이 바뀔 때 조용히 갈라진다. */
+  console.log('\n■ 홈 마감 임박 — 임박한 것 안에서 나에게 맞는 것부터 (UI-14)');
+  await page.click('.nav-item[data-nav="home"]');
+  await page.waitForSelector('#screen-home:not([hidden])');
+  await page.waitForTimeout(1500);            // 히어로 countUp(900ms)이 멈출 때까지
+  /* 🔴 **오늘 데이터에 기대지 않는다** (2026-09-12 코드 리뷰). 지금은 마감 7일 안쪽 공고가
+     27건이지만 한가한 주에는 0이 될 수 있고, 그러면 이 절이 앱은 멀쩡한데 빨간불이 된다
+     (조용히 건너뛰는 것도 나쁘다 — 그물이 걷힌 줄 아무도 모른다). verify-interactions 가
+     쓰는 방식 그대로 임박 공고를 심어 둔다. 심어도 규칙은 그대로라 아래 대조는 유효하다. */
+  await page.evaluate(() => {
+    const iso = (n) => new Date(Date.now() + n * 86400000).toLocaleDateString('sv-SE');
+    registeredList = registeredList.concat([1, 2, 3, 4].map((n) => ({
+      id: `fixture-home-d${n}`, name: `검사용 마감 임박 ${n}`, provider: '검사', type: '교외',
+      amount: '검사', amountValue: 0, deadline: iso(n),
+    })));
+    renderHome();
+  });
+  await page.waitForTimeout(1200);
+  const home = await page.evaluate(() => {
+    const cand = getMatches().filter((m) => m.result.status !== 'ineligible'
+      && dday(m.sch.deadline).days >= 0 && notStale(m.sch));
+    const urgent = (m) => (dday(m.sch.deadline).cls === 'urgent' ? 0 : 1);
+    const want = cand.slice().sort((a, b) => urgent(a) - urgent(b) || fitRank(a) - fitRank(b)
+      || b.fit - a.fit || byDeadline(a, b));
+    const shown = [...document.querySelectorAll('#home-deadline-list > *')]
+      .filter((e) => e.offsetParent !== null)
+      .map((e) => (e.querySelector('[data-detail]') || {}).dataset?.detail || null);
+    return {
+      후보: cand.length,
+      임박: cand.filter((m) => dday(m.sch.deadline).cls === 'urgent').length,
+      보임: shown,
+      그려둠: document.querySelectorAll('#home-deadline-list > *').length,
+      기대: want.slice(0, HOME_DEADLINE_TOP).map((m) => m.sch.id),
+      금액: (document.querySelector('#hero-amount') || {}).textContent,
+      펴는장수: HOME_DEADLINE_TOP,   /* '셋'을 여기 박지 않는다 — 앱이 쓰는 상수를 그대로 읽는다 */
+    };
+  });
+  /* ⚠️ 이 줄은 **픽스처를 심은 뒤**라 사실상 늘 참이다 — 실제 데이터의 양을 말하지 않는다.
+     뜻은 '아래 대조가 빈 목록을 보고 통과하지는 않는다' 하나뿐이다(2026-09-12 코드 리뷰). */
+  eq('홈에 띄울 후보가 있다 (아래 대조가 빈 목록을 보고 통과하지 않는다)',
+    home.후보 > home.펴는장수 && home.임박 > home.펴는장수, true);
+  eq('상수가 말하는 장수만 편다', home.보임.length, home.펴는장수);
+  eq('나머지는 그려 두고 가린다 (다시 그리지 않으려고)', home.그려둠 > home.펴는장수, true);
+  /* 🔴 차례는 **앱의 규칙으로 만든 기대값**과 통째로 대조한다. 예전엔 여기에 '오른 카드의
+     적합도가 못 오른 임박 카드보다 낮지 않다'를 덧붙였는데, 그건 앱이 `fitRank` 를 먼저 보는
+     것을 무시한 규칙이라 **앱이 맞는 날에도 빨간불**이 될 수 있었다(자격 미확인 35점이
+     확인된 33점보다 위로 가는 날). 이 한 줄이 이미 순서 전체를 지킨다. */
+  eq('편 카드가 앱의 규칙과 같은 차례다', home.보임, home.기대);
+
+  /* 더보기 — **다시 그리지 않고 편다**(히어로 금액이 또 세어 올라가면 안 된다).
+     🔴 클릭을 page.click 으로 하면 Playwright 가 버튼을 화면 안으로 스크롤해서
+        '스크롤이 튀었다'로 잘못 읽힌다. 눌리는 것만 보려면 요소에 직접 건다. */
+  const before = await page.evaluate(() => ({ y: window.scrollY, won: $('#hero-amount').textContent }));
+  await page.$eval('#home-deadline-more', (b) => b.click());
+  await page.waitForTimeout(250);
+  const open = await page.evaluate(() => ({
+    보임: [...document.querySelectorAll('#home-deadline-list > *')].filter((e) => e.offsetParent !== null).length,
+    글자: $('#home-deadline-more').textContent.trim(),
+    aria: $('#home-deadline-more').getAttribute('aria-expanded'),
+    y: window.scrollY, won: $('#hero-amount').textContent,
+  }));
+  eq('더보기를 누르면 나머지가 펴진다', open.보임 > 3, true);
+  eq('그때 버튼은 접기가 된다', [open.글자, open.aria], ['접기', 'true']);
+  eq('히어로 금액은 다시 세지 않는다 (목록을 다시 그리지 않는다)', open.won, before.won);
+  eq('스크롤도 그대로다', open.y, before.y);
+  await page.$eval('#home-deadline-more', (b) => b.click());
+  await page.waitForTimeout(250);
+  eq('다시 누르면 상수가 말하는 장수로 접힌다',
+    await page.$$eval('#home-deadline-list > *', (e) => e.filter((x) => x.offsetParent !== null).length),
+    home.펴는장수);
 
   console.log('\nERRORS:', errors.length ? errors : 'none');
   if (errors.length) fail++;

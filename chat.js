@@ -162,7 +162,9 @@ function chatSearch(q, limit = 4) {
     const s = m.sch;
     const name = String(s.name || '').toLowerCase();
     const provider = String(s.provider || '').toLowerCase();
-    const body = [s.summary, s.amount, s.note, ...(s.excerpts || []), ...(s.eligibilityLines || [])]
+    /* `amountNote` — 금액을 숫자로 못 읽은 층2 공고에서 재단이 적어 둔 원문(app.js).
+       카드에는 안 뜨지만 상세에는 뜨므로, 도우미도 같은 재료를 봐야 화면과 말이 갈라지지 않는다. */
+    const body = [s.summary, s.amount, s.amountNote, s.note, ...(s.excerpts || []), ...(s.eligibilityLines || [])]
       .join(' ').toLowerCase();
     /* 원문 전문은 앱이 통째로 갖고 있기엔 너무 크다 — 로봇이 만들어 둔 검색용 요약만 본다 */
     const deep = chatDeepText(s.id);
@@ -542,6 +544,7 @@ function chatAiCandidates(q) {
       .map((t) => String(t).trim()).filter((t) => t.length >= 6).slice(0, 6);
     return { m, payload: {
       id: s.id, name: s.name, provider: s.provider, amount: s.amount,
+      ...(s.amountNote ? { amountNote: s.amountNote } : {}),
       period: s.period, summary: s.summary, deadline: s.deadline || null,
       sourceUrl: s.sourceUrl || null, quotes,
     } };
@@ -589,7 +592,7 @@ function chatVerifyAI(data, cand) {
   let lead = typeof data.lead === 'string' ? data.lead.trim().slice(0, 200) : '';
   if (lead) {
     const known = picks.map(({ m }) => [
-      m.sch.name, m.sch.provider, m.sch.amount, m.sch.period, m.sch.summary,
+      m.sch.name, m.sch.provider, m.sch.amount, m.sch.amountNote, m.sch.period, m.sch.summary,
       m.sch.deadline, m.sch.amountValue, ...(m.sch.excerpts || []), ...(m.sch.eligibilityLines || []),
     ].join(' ')).join(' ').replace(/[,\s]/g, '');
     const nums = lead.replace(/[,\s]/g, '').match(/\d+/g) || [];

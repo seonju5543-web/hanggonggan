@@ -361,6 +361,10 @@
         <button class="link-btn" data-goto="explore">전체 보기</button>
       </div>
       <div id="home-deadline-list" class="card-list"></div>
+      <!-- 더보기 — 목록을 다시 그리지 않고 **가려 둔 카드를 펴기만** 한다(노션 UI-14).
+           다시 그리면 히어로 금액이 또 세어 올라가고 스크롤이 튄다. -->
+      <button type="button" class="link-btn home-more" id="home-deadline-more"
+              aria-controls="home-deadline-list" aria-expanded="false" hidden>더보기</button>
 
       <div class="section-head">
         <h3>신청 현황</h3>
