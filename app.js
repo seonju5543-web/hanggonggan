@@ -1474,11 +1474,7 @@ function renderHome() {
   moreBtn.textContent = homeDeadlineOpen ? '접기' : '더보기';
   moreBtn.setAttribute('aria-expanded', homeDeadlineOpen ? 'true' : 'false');
 
-  const recent = state.applications.slice(-2).reverse().filter((a) => findSch(a.id));
   renderHomeUpdated();
-  $('#home-apps').innerHTML = recent.length
-    ? recent.map(appCard).join('')
-    : '<p class="empty">아직 담아 둔 장학금이 없어요</p>';
 }
 
 /* ---------------- 탐색 ---------------- */

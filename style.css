@@ -2848,7 +2848,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 
 /* 홈의 '신청 현황'도 이미 담은 것들이다 — 신청 내역과 같이 체크 동그라미를 뺀다.
    (빈 동그라미가 '아직 안 했다'로 읽히던 것과 같은 이유) */
-#home-apps .sch-card { padding-left: 20px; }
 
 /* ══ 누런 기운 빼기 (2026-08-31 · "배경이 누렇다" 의견) ═══════════════════
    원인은 셋이었다 — 셋 다 파랑 성분(B)이 빨강(R)보다 낮아 노랗게 보였다:
@@ -2891,7 +2890,7 @@ body::after { opacity: 0.26; }
 .card-list > .sch-card:last-child,
 .card-list > *:last-child .sch-card { border-bottom: 0; }
 .section-head { margin: 32px 0 4px; padding-top: 16px; }
-#home-deadline-list, #home-apps { margin-bottom: 4px; }
+#home-deadline-list { margin-bottom: 4px; }
 
 /* 배지 줄 — 적합도까지 한 줄이므로 간격을 하나로 못 박는다 */
 .sch-top { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 9px; }

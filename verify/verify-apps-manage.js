@@ -128,6 +128,27 @@ const eq = (label, got, want) => {
   await page.waitForTimeout(400);
   eq('일괄 삭제도 되돌아온다', await page.$$eval('#apps-list .swipe-row', (e) => e.length), 3);
 
+  /* ══ 신청 현황은 홈이 아니라 여기다 (2026-09-12 · 노션 UI-15) ═══════════════
+     개발자 지시: "홈의 신청 현황을 지우고 신청 내역 칸에 반영한다."
+     같은 카드(appCard)를 두 화면이 그리고 있었고 홈은 최근 2건만 보여 주는 사본이었다.
+     🔴 **잃은 정보가 없어야** 옮긴 것이다 — 홈에서 뺐다면 이 화면이 그 건들을 다 보여 줘야 한다. */
+  console.log('\n■ 신청 현황은 신청내역 화면에만 (UI-15)');
+  const moved = await page.evaluate(() => {
+    const home = document.querySelector('#screen-home');
+    return {
+      홈에구획: [...home.querySelectorAll('.section-head h3')].map((h) => h.textContent.trim()),
+      홈에목록: !!document.querySelector('#home-apps'),
+      신청내역카드: document.querySelectorAll('#apps-list .sch-card').length,
+      요약있음: !!(document.querySelector('#apps-summary') || {}).textContent?.trim(),
+      담은건수: (typeof state !== 'undefined' && state.applications || []).length,
+    };
+  });
+  eq('담은 신청이 있다 (검사가 헛돌지 않는다)', moved.담은건수 > 0, true);
+  eq('홈에는 「신청 현황」 구획이 없다', moved.홈에구획.includes('신청 현황'), false);
+  eq('  홈에 그 목록 자리도 없다 (#home-apps)', moved.홈에목록, false);
+  eq('신청내역 화면이 담은 건을 다 보여 준다', moved.신청내역카드, moved.담은건수);
+  eq('  요약 카드도 함께 있다 (홈이 하던 말을 여기가 한다)', moved.요약있음, true);
+
   console.log('\n■ 터치 타깃 (44px 이상)');
   const small = await page.$$eval('#apps-delete-selected, .toast-undo, .bulk-all',
     (els) => els.filter((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && (r.width < 44 || r.height < 44); })
