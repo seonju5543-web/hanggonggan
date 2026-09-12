@@ -157,6 +157,36 @@ const PROFILE = {
   eq('  자격 요건에 칸 이름(`특정자격:`)을 붙이지 않는다', clean.labelPrefix, 0);
   eq('  요건 자리에 코드 나열(`대학2학기 대학3학기…`)을 넣지 않는다', clean.dumpLine, 0);
   eq('  혜택은 한 줄로 짧게 말한다 (원문 문단을 통째로 안 쓴다)', clean.longAmount, 0);
+  /* 🔴 **금액 줄에 원문 문단을 흘리지 않는다** (2026-09-12 개발자 지적: "lg ㄷ 스플레이
+     이런 식으로 글자 깨짐"). 예전에는 숫자를 못 읽으면 원문 40자를 잘라 그대로 띄웠고,
+     한국장학재단 원본의 오타(`LGㄷ스플레이`)가 카드 머리에 그대로 떴다.
+     🔴 그 오타는 우리가 만든 것이 아니다 — `data/kosaf.json` 원본이 이미 그렇고, 같은 재단의
+        `운영기관명` 은 `LG디스플레이` 로 멀쩡하다. 고칠 수 없는 남의 오타를 **헤드라인에
+        띄우지 않는 것**이 우리가 할 수 있는 일이고, 원문은 버리지 않고 상세에 남긴다.
+     ⚠️ 재단 이름·사업명은 여기서 검사하지 않는다 — 그건 원문 그대로 써야 하는 자리라
+        오타가 와도 우리가 손댈 수 없다(관문으로 만들면 고칠 수 없는 빨간불이 된다). */
+  const amt = await page.evaluate(() => {
+    const ks = allScholarships().filter((s) => s.sourceKind === 'kosaf');
+    const OK = /^(최대 |등록금의 \d+%$|[\d,]+원 ~ )|^금액은 재단 홈페이지에서 확인$/;
+    const bad = ks.filter((s) => !OK.test(s.amount));
+    const fallback = ks.filter((s) => s.amount === '금액은 재단 홈페이지에서 확인');
+    return { n: ks.length, bad: bad.map((s) => s.amount).slice(0, 5),
+      폴백: fallback.length, 폴백에원문있음: fallback.filter((s) => s.amountNote).length,
+      읽은건에원문안붙임: ks.filter((s) => s.amount !== '금액은 재단 홈페이지에서 확인' && s.amountNote).length };
+  });
+  eq('층2 카드가 있다 (검사가 헛돌지 않는다)', amt.n > 20, true);
+  eq('  금액 줄은 읽어 낸 금액이거나 정해진 한 문구다 (원문 문단 금지)', amt.bad, []);
+  eq('  못 읽은 금액의 원문은 버리지 않고 상세로 내린다', amt.폴백 > 0 && amt.폴백에원문있음 > 0, true);
+  eq('  읽어 낸 금액에는 원문을 덧붙이지 않는다 (같은 말 두 번 금지)', amt.읽은건에원문안붙임, 0);
+  /* 상세 시트에 실제로 그려지는지 — 데이터만 보면 렌더가 빠져도 통과한다 */
+  eq('  상세 시트가 그 원문을 보여 준다', await page.evaluate(async () => {
+    const s = allScholarships().find((x) => x.sourceKind === 'kosaf' && x.amountNote);
+    if (!s) return 'no-item';
+    openDetail(s.id);
+    await new Promise((r) => setTimeout(r, 250));
+    const t = document.querySelector('#detail-sheet').innerText;
+    return t.includes('재단이 적어 둔 지원금액') ? 'shown' : 'missing';
+  }), 'shown');
   /* 🔴 바로 위에서 "신청서 작성은 지원하지 않아요"라고 해 놓고 아래에서
      "앱에서 바로 작성할 수 있어요"가 같이 떠 있었다 — 한 시트 안에서 말이 엇갈렸다. */
   eq('  같은 시트 안에서 말이 엇갈리지 않는다', clean.contradiction, false);

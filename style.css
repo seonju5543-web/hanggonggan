@@ -3952,30 +3952,6 @@ button, input, select, textarea { letter-spacing: inherit; }
   white-space: nowrap;
 }
 
-/* 목록 구획 머리 (2026-09-10) — 46,626px 한 덩어리를 끊는 자리.
-   🔴 배경을 깔지 않는다. 얇은 선 하나와 글자만으로 끊는다 — 색 띠를 넣으면
-      카드보다 구획이 더 눈에 띄어 목록의 주인공이 바뀐다. */
-.list-group + .list-group { margin-top: var(--sp-3); }
-.list-group-head {
-  display: flex;
-  align-items: baseline;
-  gap: var(--sp-1);
-  padding: 0 var(--space-4) var(--space-8);
-  border-bottom: 1px solid var(--line);
-  margin-bottom: var(--sp-1);
-  font-size: var(--t-sm);
-  font-weight: 700;
-  color: var(--text);
-  letter-spacing: -0.01em;
-}
-.list-group-n {
-  font-size: var(--t-xs);
-  font-weight: 600;
-  color: var(--text-weak);
-  font-variant-numeric: tabular-nums;
-}
-/* 급한 두 구획만 색으로 말한다 — 나머지는 먹색이다 */
-.list-group:first-child .list-group-head { color: var(--text); }
 
 /* 빈 상태 (2026-09-10 페이스리프트)
    같은 '없다'를 화면마다 없음/없어요/없습니다 세 말투로 말하던 것을 '없어요' 하나로 모았고,
@@ -4019,8 +3995,7 @@ button, input, select, textarea { letter-spacing: inherit; }
 .onboard-body h2,
 .onboard-hero h1,
 .section-head h3,
-.sheet-title,
-.list-group-head {
+.sheet-title {
   font-family: var(--font-display);
 }
 
@@ -4035,11 +4010,7 @@ button, input, select, textarea { letter-spacing: inherit; }
    🔴 **새 색을 만들지 않는다.** 이미 있는 --accent 를 쓰지 않던 자리에 쓸 뿐이다.
       팔레트를 늘리면 다시 '세 세대 겹침'이 시작된다(2026-09-10 검토에서 본 그것). */
 
-/* 구획 머리의 건수 — 목록에서 눈이 처음 닿는 자리다 */
-.list-group-n { color: var(--accent); font-weight: 700; }
 
-/* 급한 구획만 색으로 말한다 — 전부 칠하면 아무것도 안 급해진다 */
-.list-group:first-child .list-group-head { color: var(--accent); }
 
 /* 화면 제목 아래 얇은 강조선 — 브랜드가 '있다'는 최소한의 표시 */
 .page-header h2 {
@@ -4207,25 +4178,22 @@ input:user-invalid:focus, select:user-invalid:focus, textarea:user-invalid:focus
 /* (적합도 20~39% 의 색은 아래 '적합도 알약' 절이 정한다 — 빨강은 여전히 안 쓴다) */
 
 /* 18 · 구획 이름표(eyebrow) — 제목 크기를 작은 이름표로 내린다. 🔴 한글이라 양수 자간은 안 준다.
-   개발자 지시: 작아진 것 중 **중요한 내용이 든 것은 색으로 강조 — 검은색**. 마감을 말하는 구획만 먹색,
-   나머지 구획은 회색. 건수(.list-group-n)는 강조색 그대로. */
-.section-head h3,
-.list-group-head {
+   개발자 지시: 작아진 것 중 **중요한 내용이 든 것은 색으로 강조 — 검은색**.
+   ⚠️ 탐색 목록의 마감 구획(.list-group)은 2026-09-12 개발자 지시로 없앴다(정렬을 먹어치웠다).
+      여기 남은 것은 홈·MY 의 절 머리(.section-head)뿐이다. */
+.section-head h3 {
   font-family: var(--font-text);
   font-size: var(--t-xs);
   font-weight: 700;
   letter-spacing: 0;
   color: var(--text-sub);
 }
-.list-group:first-child .list-group-head,
 .section-head:has(+ #home-deadline-list) h3 { color: var(--text); }
 
 /* 18 의 후속 — 개발자 지적 (2026-09-11 폰 실측 화면):
    ① 홈의 구획 머리(마감 임박 · 전체 보기)와 첫 카드가 붙어 있다 — 아래 여백이 0 이었다 → 16px.
-   ② 탐색의 구획 이름표(이번 주 · 이번 달 · 마감일 확인 중)가 카드 글자보다 왼쪽으로 튀어나온다 —
-      목록은 좌우로 꽉 차게 펼쳐지는데 이름표만 4px 여백이라 그렇다 → 카드 글자와 같은 20px 로. */
+   ② (탐색의 구획 이름표 여백 — 구획 자체가 2026-09-12 에 없어져 함께 지웠다.) */
 .section-head { margin-bottom: var(--sp-2); }
-.list-group-head { padding-left: var(--space-20); padding-right: var(--space-20); }
 
 /* 19 · 눌린 탭 표시 — 점(4px 원)이 아니라 선. 옅은 글자 대비는 개발자 지시로 건드리지 않는다. */
 .nav-item.active::after {

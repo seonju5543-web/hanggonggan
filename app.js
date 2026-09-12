@@ -1592,58 +1592,16 @@ function renderExplore() {
   $('#live-notices').innerHTML = (exploreFilter === 'all' && !q) ? liveNoticesHtml() : '';
   /* ⚠️ 홈과 같은 이유로 여기에도 뼈대를 두지 않는다 — 이 목록은 받아오기 중에도 비지 않는다
      (renderHome 의 같은 자리 주석 참조). 뼈대는 `liveNoticesHtml()` 한 곳이다. */
+  /* 🔴 **구획 없이 한 목록이다** (2026-09-12 개발자 지시: "오늘 내일 마감 이번 주 마감
+     이번 달 마감 삭제 후 하나로 통합, 적합도 순 마감 임박순 이런 거 하나도 안 지켜짐").
+     2026-09-10 페이스리프트가 마감으로 7구획을 나눴는데, 구획이 **마감 순서로 고정**이라
+     학생이 고른 정렬은 구획 **안에서만** 살아 있었다 — 적합도순을 골라도 화면 맨 위는
+     늘 '오늘·내일 마감' 구획이라 정렬이 통째로 안 먹는 것처럼 보였다(그게 지적 그대로다).
+     정렬은 이제 위 sort 하나가 목록 전체에 그대로 적용된다.
+     ⚠️ 구획을 되살리려면 정렬을 어떻게 살릴지부터 정할 것 — 둘은 같은 자리를 두고 다툰다. */
   $('#explore-list').innerHTML = list.length
-    ? exploreGroupsHtml(list)
+    ? list.map((m) => schCard(m.sch, m.result, { fit: m.fit, fd: m.fd })).join('')
     : `<p class="empty">${q ? `'${esc(exploreQuery.trim())}'와 맞는 장학금이 없어요` : '조건에 맞는 장학금이 없어요'}</p>`;
-}
-
-/* ── 목록 구획 (2026-09-10 페이스리프트) ────────────────────────────────────
-   왜 — 탐색 탭 전체 높이가 실측 **46,626px**(390×844 화면으로 약 55번)인데 구획이
-   한 곳도 없고 카드가 전부 같은 높이·같은 구조였다. 눈이 쉴 곳도, "여기까지가 급한 것"
-   이라고 말해 주는 자리도 없었다.
-
-   🔴 **마감일 하나로만 가른다.** 접수 시작일(openDate)은 등록 48건 중 17건에만 있어
-      '접수 기간의 몇 %' 같은 것을 만들면 지어내는 것이 된다(원칙 8-1).
-   🔴 **판정을 새로 하지 않는다** — dday() 가 낸 days 만 본다. 다만 '마감일이 없는 공고'는
-      dday 가 days:14 를 주므로(목록에 남기려는 값이다) days 로는 구분할 수 없다.
-      그래서 `sch.deadline` 유무를 **직접** 본다 — 안 그러면 기한 미상이 '이번 달'로 섞인다.
-   🔴 고른 정렬(적합도순·마감순·최신순)은 **구획 안에서** 그대로 적용된다. 위 sort 가 이미
-      끝난 배열의 순서를 여기서 흩뜨리지 않고 담기만 한다.
-      → 적합도순이면 "이번 주에 마감하는 것 중 나와 가장 맞는 것"이 각 구획 맨 위에 온다. */
-/* 🔴 순서가 곧 뜻이다 — **급한 것이 위, 끝난 것이 맨 아래**.
-   처음 짤 때 'closed' 를 맨 앞에 뒀다가 검사(verify-explore-sort '이미 지난 마감은
-   목록 끝에 있다')에 잡혔다. 마감된 공고가 목록 첫 줄에 오면 학생이 맨 먼저 보는 것이
-   이미 못 하는 일이 된다. 기한을 못 읽은 것은 아직 할 수 있는 일이라 그 위에 둔다. */
-const EXPLORE_GROUPS = [
-  { key: 'now',    label: '오늘·내일 마감' },
-  { key: 'week',   label: '이번 주' },
-  { key: 'month',  label: '이번 달' },
-  { key: 'later',  label: '여유 있음' },
-  { key: 'always', label: '상시 신청' },
-  { key: 'unknown', label: '마감일 확인 중' },
-  { key: 'closed', label: '마감' },
-];
-
-function exploreGroupOf(sch) {
-  if (sch.program) return 'always';
-  if (!sch.deadline) return 'unknown';
-  const days = dday(sch.deadline).days;
-  if (days < 0) return 'closed';
-  if (days <= 1) return 'now';
-  if (days <= 7) return 'week';
-  if (days <= 30) return 'month';
-  return 'later';
-}
-
-function exploreGroupsHtml(list) {
-  const bucket = {};
-  for (const m of list) (bucket[exploreGroupOf(m.sch)] = bucket[exploreGroupOf(m.sch)] || []).push(m);
-  return EXPLORE_GROUPS
-    .filter((g) => bucket[g.key] && bucket[g.key].length)
-    .map((g) => `<div class="list-group">
-        <div class="list-group-head"><span>${esc(g.label)}</span><span class="list-group-n">${bucket[g.key].length}</span></div>
-        ${bucket[g.key].map((m) => schCard(m.sch, m.result, { fit: m.fit, fd: m.fd })).join('')}
-      </div>`).join('');
 }
 
 /* ---------------- 서류 도우미 (AI 초안 작성) ---------------- */
@@ -2186,14 +2144,27 @@ const kosafClean = (t) => String(t || '').replace(/[○ㅇ●◦※]/g, ' ').rep
 /* 카드·시트에 보이는 **혜택 한 줄**. 원문 문단을 통째로 띄우지 않는다 —
    금액은 이미 parse-amount 가 읽어 뒀으니 그 숫자로 짧게 말하고, 조건은 상세 칸에서 본다.
    개발자 지적: "받을 수 있는 혜택만 간편하게 적어놔야지 원문 그대로 배껴놨네." */
-function kosafAmountLabel(spec, raw) {
+function kosafAmountLabel(spec) {
   if (spec && spec.kind === 'fixed' && spec.value) return `최대 ${won(spec.value)}`;
   if (spec && spec.kind === 'range' && spec.max) {
     return spec.min && spec.min !== spec.max ? `${won(spec.min)} ~ ${won(spec.max)}` : `최대 ${won(spec.max)}`;
   }
   if (spec && spec.kind === 'ratio' && spec.ratio) return `등록금의 ${Math.round(spec.ratio * 100)}%`;
-  const t = kosafClean(raw);
-  return t ? (t.length > 40 ? `${t.slice(0, 40)}…` : t) : '금액은 재단 홈페이지에서 확인';
+  /* 🔴 **못 읽은 금액 자리에 원문 문단을 흘리지 않는다** (2026-09-12 개발자 지적:
+     "lg ㄷ 스플레이 이런 식으로 글자 깨짐"). 예전에는 숫자를 못 읽으면 원문 40자를 잘라
+     그대로 띄웠다. 실측(열려 있는 116곳): 109곳은 숫자가 읽히고 **7곳만** 이 길로 갔는데,
+     그 7곳이 전부 금액이 아니었다 — `예산범위 내에서 이사회에서 결정한 금액`,
+     `기관확인필요`, `예산 총 5억원…`(총 사업규모다), 그리고 한국장학재단 원본의 오타가
+     그대로 드러난 `LGㄷ스플레이 입사 자격 부여…`.
+     🔴 오타는 **우리가 만든 것이 아니다** — `data/kosaf.json` 원본이 이미 그렇고
+        (겹친 글자 822곳·홀자모 7곳 실측: `프로그램램`·`유효효기간`·`기관확인필요요`),
+        같은 재단의 `운영기관명` 은 `LG디스플레이` 로 멀쩡하다. 우리 코드에는 글자를
+        복제하거나 지우는 자리가 없다(strip 은 태그·엔티티·공백만 만진다).
+        고칠 수 없는 남의 오타를 **카드 머리**에 띄우지 않는 것이 우리가 할 수 있는 일이고,
+        원문은 버리지 않고 상세 시트에 '재단이 적어 둔 것'으로 그대로 남긴다(원칙 8-1).
+     ⚠️ 여기서 원문을 다듬어 보여 주려 하지 말 것 — 지우면 `LG스플레이` 처럼 **다르게 틀린**
+        글자가 되고, 그건 지어낸 것과 같다. */
+  return '금액은 재단 홈페이지에서 확인';
 }
 function kosafAsScholarships() {
   return kosafList
@@ -2223,7 +2194,11 @@ function kosafAsScholarships() {
         name: `${i.org} ${i.name}`,
         provider: i.org,
         type: '교외',
-        amount: kosafAmountLabel(aSpec, f['지원금액']),
+        amount: kosafAmountLabel(aSpec),
+        /* 금액을 못 읽었을 때만 원문을 함께 넘긴다 — 상세 시트에서 '재단이 적어 둔 것'으로 보여 준다.
+           읽은 경우에는 카드 문구가 이미 그 숫자라 두 번 말할 뿐이다. */
+        ...((aSpec && (aSpec.kind === 'fixed' || aSpec.kind === 'range' || aSpec.kind === 'ratio'))
+          ? {} : (kosafClean(f['지원금액']) ? { amountNote: kosafClean(f['지원금액']) } : {})),
         /* 🔴 금액은 **손으로 박지 않는다** — `parse-amount.js` 한 곳을 그대로 통과시킨다
            (2026-08-30 개발자 지적). 처음엔 amountValue 를 0 으로 박아 뒀는데, 그러면
            ① 재단이 적어 둔 금액이 홈 합계에서 통째로 빠지고 ② 앞으로 들어올 재단도
@@ -2911,6 +2886,9 @@ function openDetail(id) {
            ('한국장학재단 ↗')이 말한다. */ ''}
       <h3 class="sheet-title">${esc(sch.name)}</h3>
       <p class="sheet-amount">${esc(sch.amount)}</p>
+      ${/* 금액을 숫자로 못 읽은 층2 공고 — 재단이 그 칸에 적어 둔 말을 그대로 옮긴다.
+           카드 머리에는 안 띄운다(위 kosafAmountLabel 주석). */ ''}
+      ${sch.amountNote ? `<p class="doc-legend">재단이 적어 둔 지원금액 — ${esc(sch.amountNote)}</p>` : ''}
       <p class="sheet-provider">${esc(sch.provider)} · ${esc(sch.period)}</p>
       ${scheduleRowHtml(sch)}
 

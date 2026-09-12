@@ -67,22 +67,22 @@ const PROFILE = {
         days: s.deadline ? dday(s.deadline).days : null }; });
   });
 
-  /* 🔴 2026-09-10 페이스리프트로 목록이 **마감 구획**으로 나뉘었다.
-     구획 순서(오늘·내일 → 이번 주 → 이번 달 → 여유 → 상시 → 기한 미확정 → 마감)는 고정이고,
-     학생이 고른 정렬은 **구획 안에서** 지켜진다. 그래서 아래 정렬 검사도 구획 안에서 잰다 —
-     전체 DOM 순서로 재면 "적합도순인데 왜 마감 임박이 위에 있냐"를 묻게 되는데,
-     그건 이제 어긋난 게 아니라 설계다. 구획 자체의 순서는 따로 검사한다. */
-  const groupKeys = () => page.evaluate(() => {
+  /* 🔴 **구획은 2026-09-12 개발자 지시로 없앴다** ("오늘 내일 마감 이번 주 마감 이번 달 마감
+     삭제 후 하나로 통합, 적합도 순 마감 임박순 이런 거 하나도 안 지켜짐").
+     2026-09-10 페이스리프트가 마감으로 7구획을 나눈 뒤, 구획 순서가 마감으로 고정이라
+     고른 정렬은 구획 **안에서만** 살아 있었다 — 화면에서는 정렬이 통째로 안 먹는 것으로 보였다.
+     그래서 이 드라이버도 **목록 전체의 DOM 순서**로 되돌아간다(2026-09-10 이전 방식).
+     ⚠️ 구획을 다시 만들려거든 정렬을 어떻게 살릴지부터 정할 것 — 둘은 같은 자리를 다툰다. */
+  const cardRows = () => page.evaluate(() => {
     const find = (id) => (typeof allScholarships === 'function' ? allScholarships() : []).find((s) => s.id === id) || {};
-    return [...document.querySelectorAll('#explore-list .list-group')].map((g) => ({
-      label: (g.querySelector('.list-group-head span') || {}).textContent || '',
-      rows: [...g.querySelectorAll('.sch-card')].map((e) => {
-        const s = find(e.dataset.detail);
-        return { id: e.dataset.detail, deadline: s.deadline || null, listedAt: s.listedAt || null,
-          no: !!e.querySelector('.badge-fit-no') };
-      }),
-    }));
+    return [...document.querySelectorAll('#explore-list .sch-card')].map((e) => {
+      const s = find(e.dataset.detail);
+      return { id: e.dataset.detail, deadline: s.deadline || null, listedAt: s.listedAt || null,
+        no: !!e.querySelector('.badge-fit-no') };
+    });
   });
+  eq('목록에 구획이 없다 (한 목록이다)',
+    await page.$$eval('#explore-list .list-group', (e) => e.length), 0);
 
   console.log('■ 기본 상태');
   eq('버튼 라벨이 적합도순이다', await page.$eval('#explore-sort-label', (e) => e.textContent.trim()), '적합도순');
@@ -151,31 +151,33 @@ const PROFILE = {
   await page.click('#explore-sort-btn'); await page.waitForTimeout(300);
   await page.click('#explore-sort-menu [data-sort="listed"]'); await page.waitForTimeout(600);
   eq('라벨이 바뀐다', await page.$eval('#explore-sort-label', (e) => e.textContent.trim()), '등록 최신순');
-  const groups = await groupKeys();
+  const listedRows = await cardRows();
   const key = (r) => r.listedAt || r.deadline || '';
-  eq('구획 안에서 값 없는 카드가 앞으로 오지 않는다',
-    groups.every((g) => { const withK = g.rows.filter((r) => key(r)).length;
-      return g.rows.slice(0, withK).every((r) => key(r)); }), true);
-  eq('구획 안에서 등록일 내림차순이다',
-    groups.every((g) => { const withK = g.rows.filter((r) => key(r)).length;
-      return g.rows.slice(0, withK).every((r, i, arr) => i === 0 || key(arr[i - 1]) >= key(r)); }), true);
-  eq('구획이 마감 순서대로 있다 (급한 것이 위 · 마감은 맨 아래)', (() => {
-    const ORDER = ['오늘·내일 마감', '이번 주', '이번 달', '여유 있음', '상시 신청', '마감일 확인 중', '마감'];
-    const seen = groups.map((g) => g.label).filter((l) => ORDER.includes(l));
-    return seen.every((l, i, arr) => i === 0 || ORDER.indexOf(arr[i - 1]) < ORDER.indexOf(l));
-  })(), true);
+  const withKey = listedRows.filter((r) => key(r)).length;
+  eq('값 없는 카드가 앞으로 오지 않는다', listedRows.slice(0, withKey).every((r) => key(r)), true);
+  eq('등록일 내림차순이다 (목록 전체에서)',
+    listedRows.slice(0, withKey).every((r, i, arr) => i === 0 || key(arr[i - 1]) >= key(r)), true);
 
   console.log('\n■ 적합도순 — 미달은 맨 아래 (개발자 결정)');
   await page.click('#explore-sort-btn'); await page.waitForTimeout(300);
   await page.click('#explore-sort-menu [data-sort="fit"]'); await page.waitForTimeout(600);
-  /* 미달은 **구획 안에서** 맨 아래로 모인다 — 2026-08-26 개발자 결정("적합도를 기준으로
-     했을 때는 맨 아래에 두는 게 맞지")은 그대로고, 재는 자리만 구획 안으로 옮겼다. */
-  const fitGroups = await groupKeys();
-  eq('구획마다 미달 카드가 그 구획 끝에 모여 있다',
-    fitGroups.every((g) => {
-      const idx = g.rows.map((r, i) => (r.no ? i : -1)).filter((i) => i >= 0);
-      return idx.length === 0 || idx[0] + idx.length === g.rows.length;
-    }), true);
+  /* 미달은 **목록 맨 아래**로 모인다 — 2026-08-26 개발자 결정("적합도를 기준으로 했을 때는
+     맨 아래에 두는 게 맞지") 그대로다. 구획이 없어졌으니 재는 자리도 목록 전체로 돌아왔다. */
+  const fitRows = await cardRows();
+  const noIdx = fitRows.map((r, i) => (r.no ? i : -1)).filter((i) => i >= 0);
+  eq('미달 카드가 목록 끝에 모여 있다',
+    noIdx.length === 0 || noIdx[0] + noIdx.length === fitRows.length, true);
+  /* 🔴 **고른 정렬이 목록 전체에 걸리는가** — 2026-09-12 지적의 본체다("정렬 이런 거
+     하나도 안 지켜짐"). 구획이 있을 때는 이 성질이 성립할 수 없었다.
+     기대값은 앱의 정렬 함수 그대로 만든다(규칙을 여기 베끼면 갈라진다). */
+  const fitOrder = await page.evaluate(() => {
+    const shown = [...document.querySelectorAll('#explore-list .sch-card')].map((e) => e.dataset.detail);
+    const ms = getMatches().filter((m) => shown.includes(m.sch.id));
+    const want = ms.slice().sort((a, b) => fitRank(a) - fitRank(b) || EXPLORE_SORTS.fit.cmp(a, b))
+      .map((m) => m.sch.id);
+    return { shown, want };
+  });
+  eq('적합도순이 목록 전체에 그대로 걸린다', fitOrder.shown, fitOrder.want);
 
   console.log('\n■ 필터 칩과 서로 간섭하지 않는다 (.filter-chip 전역 선택 함정)');
   await page.click('.filter-chip[data-filter="교외"]'); await page.waitForTimeout(500);
