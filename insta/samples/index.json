@@ -1,5 +1,34 @@
 {
- "notice": null,
- "at": null,
- "templates": []
+ "notice": {
+  "code": "2701009001",
+  "org": "(사)한국해기사협회",
+  "name": "장학생"
+ },
+ "at": "2026-09-12",
+ "templates": [
+  {
+   "no": 1,
+   "id": "photo",
+   "name": "사진 배경",
+   "cards": 5
+  },
+  {
+   "no": 2,
+   "id": "chat",
+   "name": "카카오톡 대화",
+   "cards": 5
+  },
+  {
+   "no": 3,
+   "id": "note",
+   "name": "굿노트 필기",
+   "cards": 5
+  },
+  {
+   "no": 4,
+   "id": "poster",
+   "name": "포스터",
+   "cards": 5
+  }
+ ]
 }
