@@ -3928,6 +3928,32 @@ console.log('\n■ 첫 실행 화면 (2026-09-09)');
   eq('sw.js ASSETS 에 resume.js 가 있다', /'resume\.js'/.test(sw), true);
 }
 
+/* ══ 환영 화면 문구 (2026-09-12 · 노션 UI-22) ═════════════════════════════
+   옛 문구는 "1분이면 내 장학금 확인" 이었다. 재 보니 **그 말이 참인 길은 전부 건너뛰는
+   길 하나뿐**이었다 — 앱이 실제로 막는 것은 1단계의 학교·학년 둘뿐이라 8번 누르고
+   5글자 치면 홈까지 간다(로봇 2.8초). 칸을 다 채우는 길은 입력 10 · 고르기 6 · 칩 3묶음 ·
+   체크 15개라 1분이 아니다. 단계는 넷 → 여섯으로 늘었고, **시간을 적어 두면 그때마다
+   조용히 거짓말이 된다** — 실제로 그렇게 틀렸다(원칙 5).
+   그래서 지키는 것 둘: ① 문구가 시간을 약속하지 않는다 ② 문구가 말하는 '학교와 학년'이
+   앱이 진짜로 요구하는 것과 같다(1단계 검증이 그 둘만 본다). 셋째 필수 칸이 생기면
+   문구가 거짓이 되므로 여기서 잡는다. */
+console.log('\n■ 환영 화면 문구 (2026-09-12 · UI-22)');
+{
+  const root = new URL('../', import.meta.url);
+  const html = readText(new URL('index.html', root));
+  const note = (html.match(/<p class="onboard-note">([^<]*)<\/p>/) || [])[1] || '';
+  eq('환영 화면에 안내 한 줄이 있다', note.length > 0, true);
+  /* '1분'·'30초'·'5분이면' 같은 약속 — 우리가 재지 않는 것을 적지 않는다 */
+  eq('걸리는 시간을 약속하지 않는다', /\d+\s*(분|초)/.test(note), false);
+
+  /* 문구가 말하는 것과 앱이 막는 것이 같은가 — 1단계 검증이 보는 칸을 센다 */
+  const app = readText(new URL('app.js', root));
+  const guard = (app.match(/if \(onboardStep === 1\) \{([\s\S]*?)\n    \}/) || [])[1] || '';
+  const musts = [...guard.matchAll(/#in-([a-z-]+)/g)].map((m) => m[1]).filter((v, i, a) => a.indexOf(v) === i);
+  eq('1단계가 막는 것은 학교와 학년 둘뿐이다 (늘면 문구가 거짓이 된다)', musts.sort(), ['school', 'year']);
+  eq('문구가 그 둘을 그대로 말한다', /학교/.test(note) && /학년/.test(note), true);
+}
+
 console.log('\n■ 이어보기 판정 (2026-09-09)');
 {
   const req = createRequire(import.meta.url);
