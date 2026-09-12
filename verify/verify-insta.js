@@ -3,6 +3,7 @@
  *     고친 것이 되돌아오면 이 검사가 빨간불이 된다. */
 const { readFileSync } = require('node:fs');
 const { join } = require('node:path');
+const { spawnSync } = require('node:child_process');
 const ROOT = join(__dirname, '..');
 const raw = readFileSync(join(ROOT, 'insta/render.mjs'), 'utf8');
 // 🔴 바깥 판형 파일(insta/templates/*.mjs)도 같은 잣대로 본다 — 새 출처를 붙일 때 관문이 안 따라가면 그 판형은 아무도 안 보는 것과 같다.
@@ -339,6 +340,20 @@ const today = new Date();
     process.env.IG_ACCESS_TOKEN = '';
     if ((await tokenState(live, mem({}), T0)).state !== 'none') fail('C10', '-', '토큰이 없는데 none 이 아니다');
     if (before === undefined) delete process.env.IG_ACCESS_TOKEN; else process.env.IG_ACCESS_TOKEN = before;
+    /* 🔴 **토큰이 없는 것을 '살아 있음' 이라고 말하지 않는다** (2026-09-12 인수인계 중 발견).
+       위 줄은 `state` 만 본다. 그런데 손으로 돌려 보는 사람이 읽는 것은 그 아래 **한국어 줄**이고,
+       그 줄이 `none` 에서도 '살아 있음 · null일 남음 (처음 본 날 undefined)' 이라고 답했다 —
+       시크릿을 아직 안 넣은 사람에게 넣었다고 말하는 것이다(원칙 8-1 · 「매 세션」 5번).
+       ⚠️ 워크플로는 셸에서 먼저 걸러 이 줄에 안 닿으므로 **초록불로는 안 드러난다.**
+       그래서 파일을 읽지 않고 **실제로 돌려서** 사람이 보는 글자를 본다. */
+    {
+      const r = spawnSync(process.execPath, [join(ROOT, 'insta/token-days.mjs')],
+        { encoding: 'utf8', env: { ...process.env, IG_ACCESS_TOKEN: '' } });
+      const said = `${r.stdout || ''}${r.stderr || ''}`;
+      if (!/state=none/.test(said)) fail('C10', '-', '토큰 없이 돌렸는데 state=none 이 아니다 (검사가 헛돈다)');
+      if (/살아 있음/.test(said)) fail('C10', '-', '토큰이 없는데 「살아 있음」이라고 말한다');
+      if (/undefined|null일/.test(said)) fail('C10', '-', '토큰이 없을 때 빈 값을 그대로 찍는다');
+    }
     // 🔴 Instagram Login 경로다 — 페이스북 호스트로 돌아가면 페이지 없는 계정에서 죽는다.
     const tdSrc = readFileSync(join(ROOT, 'insta/token-days.mjs'), 'utf8');
     const pubSrc2 = readFileSync(join(ROOT, 'insta/publish.mjs'), 'utf8');
