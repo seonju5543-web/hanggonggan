@@ -189,6 +189,65 @@ const PROFILE = {
     await page.$$eval('#explore-list .sch-card .sch-org',
       (e) => [...new Set(e.map((x) => x.textContent.split('·')[0].trim()))]), ['교외']);
 
+  /* ══ 홈 '마감 임박' 차례 (2026-09-12 · 노션 UI-14) ═══════════════════════════
+     개발자 지적: "적합도가 낮아도 마감이 임박하면 홈에 뜬다 — 학생 입장에서는 '굳이…' 다."
+     옛 규칙은 마감 오름차순뿐이라 실측(한국외대)에서 맨 위 둘이 **적합도 15%** 였다.
+     🔴 기대 순서를 여기서 **손으로 적지 않는다** — 앱의 getMatches·fitRank·dday·byDeadline 을
+        그대로 불러 만든다. 검사가 규칙을 한 벌 더 가지면 앱이 바뀔 때 조용히 갈라진다. */
+  console.log('\n■ 홈 마감 임박 — 임박한 것 안에서 나에게 맞는 것부터 (UI-14)');
+  await page.click('.nav-item[data-nav="home"]');
+  await page.waitForSelector('#screen-home:not([hidden])');
+  await page.waitForTimeout(1500);            // 히어로 countUp(900ms)이 멈출 때까지
+  const home = await page.evaluate(() => {
+    const cand = getMatches().filter((m) => m.result.status !== 'ineligible'
+      && dday(m.sch.deadline).days >= 0 && notStale(m.sch));
+    const urgent = (m) => (dday(m.sch.deadline).cls === 'urgent' ? 0 : 1);
+    const want = cand.slice().sort((a, b) => urgent(a) - urgent(b) || fitRank(a) - fitRank(b)
+      || b.fit - a.fit || byDeadline(a, b));
+    const shown = [...document.querySelectorAll('#home-deadline-list > *')]
+      .filter((e) => e.offsetParent !== null)
+      .map((e) => (e.querySelector('[data-detail]') || {}).dataset?.detail || null);
+    return {
+      후보: cand.length,
+      임박: cand.filter((m) => dday(m.sch.deadline).cls === 'urgent').length,
+      보임: shown,
+      그려둠: document.querySelectorAll('#home-deadline-list > *').length,
+      기대: want.slice(0, 3).map((m) => m.sch.id),
+      /* 🔴 **화면에 실제로 오른 카드**의 적합도를 본다 — 여기서 want 를 쓰면 검사가
+         제 계산을 제 계산과 대조하는 동어반복이 된다(고쳐 봐도 영영 초록불). */
+      오른최저: Math.min(...shown.map((id) => (cand.find((m) => m.sch.id === id) || { fit: 0 }).fit)),
+      임박최고미게재: Math.max(0, ...cand.filter((m) => dday(m.sch.deadline).cls === 'urgent'
+        && !shown.includes(m.sch.id)).map((m) => m.fit)),
+      금액: (document.querySelector('#hero-amount') || {}).textContent,
+    };
+  });
+  eq('홈에 띄울 후보가 있다 (검사가 헛돌지 않는다)', home.후보 > 3 && home.임박 > 3, true);
+  eq('석 장만 편다', home.보임.length, 3);
+  eq('나머지는 그려 두고 가린다 (다시 그리지 않으려고)', home.그려둠 > 3, true);
+  eq('그 석 장이 앱의 규칙과 같은 차례다', home.보임, home.기대);
+  eq('임박한데 적합도가 더 높은 카드를 두고 내려가지 않는다', home.오른최저 >= home.임박최고미게재, true);
+
+  /* 더보기 — **다시 그리지 않고 편다**(히어로 금액이 또 세어 올라가면 안 된다).
+     🔴 클릭을 page.click 으로 하면 Playwright 가 버튼을 화면 안으로 스크롤해서
+        '스크롤이 튀었다'로 잘못 읽힌다. 눌리는 것만 보려면 요소에 직접 건다. */
+  const before = await page.evaluate(() => ({ y: window.scrollY, won: $('#hero-amount').textContent }));
+  await page.$eval('#home-deadline-more', (b) => b.click());
+  await page.waitForTimeout(250);
+  const open = await page.evaluate(() => ({
+    보임: [...document.querySelectorAll('#home-deadline-list > *')].filter((e) => e.offsetParent !== null).length,
+    글자: $('#home-deadline-more').textContent.trim(),
+    aria: $('#home-deadline-more').getAttribute('aria-expanded'),
+    y: window.scrollY, won: $('#hero-amount').textContent,
+  }));
+  eq('더보기를 누르면 나머지가 펴진다', open.보임 > 3, true);
+  eq('그때 버튼은 접기가 된다', [open.글자, open.aria], ['접기', 'true']);
+  eq('히어로 금액은 다시 세지 않는다 (목록을 다시 그리지 않는다)', open.won, before.won);
+  eq('스크롤도 그대로다', open.y, before.y);
+  await page.$eval('#home-deadline-more', (b) => b.click());
+  await page.waitForTimeout(250);
+  eq('다시 누르면 석 장으로 접힌다',
+    await page.$$eval('#home-deadline-list > *', (e) => e.filter((x) => x.offsetParent !== null).length), 3);
+
   console.log('\nERRORS:', errors.length ? errors : 'none');
   if (errors.length) fail++;
   await browser.close();

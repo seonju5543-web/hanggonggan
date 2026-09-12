@@ -1381,6 +1381,12 @@ function agoLabel(ts) {
 }
 
 /* ---------------- 홈 ---------------- */
+/* 홈 '마감 임박'에 펴 두는 장수 (노션 UI-14). 접으면 셋, 펴면 열까지 —
+   그 위는 '전체 보기'(장학금 찾기)가 맡는다. */
+const HOME_DEADLINE_TOP = 3;
+const HOME_DEADLINE_MORE = 10;
+let homeDeadlineOpen = false;
+
 function renderHome() {
   const p = state.profile;
   /* 🔴 이름이 없으면 인사말로 때우지 않는다 — 이름은 신청서에도 들어가는 값이라
@@ -1434,18 +1440,36 @@ function renderHome() {
 
   renderResumeCard();
 
-  const upcoming = matches
+  /* 🔴 이 자리는 **마감만** 보고 있었다 (노션 UI-14 · 개발자 지적: "적합도가 낮아도 마감이
+     임박하면 홈에 뜬다 — 학생 입장에서는 '굳이…' 다"). 실측(2026-09-12 · 한국외대·경희대):
+     옛 규칙의 석 장은 D-1 15% · D-2 15% · D-2 50% 로, 맨 위 둘이 적합도 15% 였다.
+     지금은 **임박한 것 안에서 나에게 맞는 것**부터 올린다 → D-6 67% · D-6 67% · D-2 50%.
+     임박 후보는 두 학교 모두 27·25건이라 '마감 임박'이라는 이름이 빈말이 될 일은 없다.
+     🔴 판정을 새로 만들지 않는다 — 임박은 `dday()` 가 낸 것(cls 'urgent' = 7일 안쪽),
+        적합도 순위는 배지·탐색 정렬과 같은 `fitRank`, 날짜 비교는 탐색의 `byDeadline` 이다.
+        여기서 문턱이나 순위를 새로 정하면 홈과 장학금 찾기가 다른 말을 한다. */
+  const urgentRank = (m) => (dday(m.sch.deadline).cls === 'urgent' ? 0 : 1);
+  const upcomingAll = matches
     .filter((m) => m.result.status !== 'ineligible' && dday(m.sch.deadline).days >= 0 && notStale(m.sch))
-    .sort((a, b) => deadlineTs(a.sch) - deadlineTs(b.sch))
-    .slice(0, 3);
+    .sort((a, b) => urgentRank(a) - urgentRank(b) || fitRank(a) - fitRank(b)
+      || b.fit - a.fit || byDeadline(a, b));
+  /* 석 장만 펴 두고 나머지는 '더보기' 로 편다 — 그려는 두고 CSS 가 가린다(style.css).
+     ⚠️ `HOME_DEADLINE_MORE` 를 넘는 것은 '전체 보기'(장학금 찾기)가 맡는다. */
+  const upcoming = upcomingAll.slice(0, HOME_DEADLINE_MORE);
   /* ⚠️ 여기에는 뼈대를 두지 않는다 (2026-09-09 실측). 처음엔 "공고가 오기 전에 홈이
      '없음'이라고 말한다"고 보고 뼈대를 넣었는데, 실제로 재 보니 **그런 일이 없었다** —
      `allScholarships()` 가 data.js 의 상시 제도 6종을 동기로 먼저 내주기 때문에
      이 목록은 받아오기 중에도 비지 않는다. 뼈대는 실제로 기다림이 보이는
      `liveNoticesHtml()` 한 곳에만 둔다. */
-  $('#home-deadline-list').innerHTML = upcoming.length
+  const deadlineList = $('#home-deadline-list');
+  deadlineList.innerHTML = upcoming.length
     ? upcoming.map((m) => schCard(m.sch, m.result, { compact: true, fit: m.fit, fd: m.fd })).join('')
     : '<p class="empty">지금 신청할 수 있는 장학금이 없어요<br /><span class=\"empty-sub\">프로필을 채우면 더 많이 찾을 수 있어요</span></p>';
+  deadlineList.classList.toggle('more-open', homeDeadlineOpen);
+  const moreBtn = $('#home-deadline-more');
+  moreBtn.hidden = upcoming.length <= HOME_DEADLINE_TOP;
+  moreBtn.textContent = homeDeadlineOpen ? '접기' : '더보기';
+  moreBtn.setAttribute('aria-expanded', homeDeadlineOpen ? 'true' : 'false');
 
   const recent = state.applications.slice(-2).reverse().filter((a) => findSch(a.id));
   renderHomeUpdated();
@@ -4795,6 +4819,18 @@ function bindEvents() {
   });
 
   $('#btn-apply-all').addEventListener('click', applyAll);
+
+  /* '마감 임박' 더보기 (노션 UI-14) — 다시 그리지 않고 **가려 둔 카드를 편다**.
+     renderHome() 을 부르면 히어로 금액이 또 세어 올라가고(countUp 900ms) 스크롤이 튄다. */
+  {
+    const btn = $('#home-deadline-more');
+    if (btn) btn.addEventListener('click', () => {
+      homeDeadlineOpen = !homeDeadlineOpen;
+      $('#home-deadline-list').classList.toggle('more-open', homeDeadlineOpen);
+      btn.textContent = homeDeadlineOpen ? '접기' : '더보기';
+      btn.setAttribute('aria-expanded', homeDeadlineOpen ? 'true' : 'false');
+    });
+  }
 
   const editProfile = () => {
     onboardEditing = !!state.profile;   /* 이미 프로필이 있으면 '고치는 중'이다 */

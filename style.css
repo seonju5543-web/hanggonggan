@@ -502,6 +502,12 @@ input::placeholder { color: var(--text-weak); }
 
 /* ---------------- 카드 ---------------- */
 .card-list { display: grid; gap: 12px; }
+/* 홈 '마감 임박' 은 석 장만 펴 두고 나머지는 '더보기' 로 편다 (노션 UI-14).
+   🔴 카드를 **그려 둔 채 가린다** — 누를 때마다 다시 그리면 히어로 금액이 또 세어
+      올라가고(countUp 900ms) 스크롤이 튄다. 여는 것은 app.js 가 붙이는 이 클래스 하나. */
+#home-deadline-list:not(.more-open) > :nth-child(n+4) { display: none; }
+.home-more { display: block; margin: var(--sp-2) auto 0; }   /* 생 px 대신 여백 토큰 — ui-tone 톱니 */
+.home-more[hidden] { display: none; }
 .sch-card {
   display: block;
   width: 100%;
