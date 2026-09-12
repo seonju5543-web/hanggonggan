@@ -900,11 +900,12 @@ function showScreen(name, opts) {
         style.css 에서 **이 규칙이 뒤에 와야** 이긴다(같은 굵기면 나중 것이 이긴다).
      ⚠️ 클래스를 떼었다 붙이는 것만으로는 다시 안 돈다 — 브라우저가 '바뀐 게 없다'고 본다.
         중간에 offsetWidth 를 한 번 읽어 강제로 끊어 준다. */
-  /* 🔴 `opts.anim === false` 는 **손으로 끌어서 온 경우**다 (2026-09-11 패럴랙스).
-     그때 화면은 이미 손끝을 따라 제자리까지 와 있으므로, 여기서 등장 애니를 또 틀면
-     다 온 화면이 한 번 더 움직인다(끌어 놓고 나면 튀어 보인다). */
   const SUB = ['settings', 'trash', 'terms', 'logins', 'faq', 'perms'];
-  if (o.anim !== false && (SUB.includes(name) || SUB.includes(currentScreen))) {
+  /* 🔴 안쪽 화면에서는 **가로 손짓이 우리 것**이라고 앱 전체에 표시해 둔다 (2026-09-12).
+     짧은 화면 아래 빈 자리는 화면이 아니라 `#app` 이라, 화면에만 주면 거기서 시작한
+     손짓을 브라우저가 세로 스크롤로 가져간다. 안쪽 화면일 때만 켜는 이유는 style.css 에. */
+  $('#app').classList.toggle('on-sub-screen', SUB.includes(name));
+  if (SUB.includes(name) || SUB.includes(currentScreen)) {
     const el = $(`#screen-${name}`);
     if (el) {
       el.classList.remove('screen-in', 'screen-back');
@@ -3111,103 +3112,35 @@ function enableScreenSwipeBack(root) {
   if (!root || root.dataset.swipeBack) return;
   root.dataset.swipeBack = '1';
   const screen = () => $(`#screen-${currentScreen}`);
-  let x0 = 0, y0 = 0, dx = 0, t0 = 0, sy = 0, W = 1;
-  /* 🔴 속도는 **마지막 짧은 구간**으로 잰다 (2026-09-11 검사가 잡았다). 손짓 전체로
-     나누면 '조금 끌고 → 멈췄다가 → 뗀다' 가 툭 치기로 읽혀, 되돌리려던 화면이 나가 버린다
-     (40px 끌고 0.3초 멈춰도 평균 속도는 문턱을 넘는다). 손을 멈췄으면 속도는 0이다. */
+  let x0 = 0, y0 = 0, dx = 0, t0 = 0, W = 1;
+  let live = false;      // 이 손짓을 우리가 맡았나
+  let axis = '';         // '' 아직 모름 · 'x' 우리 것 · 'y' 스크롤이라 포기
+  /* 🔴 속도는 **마지막 짧은 구간**으로 잰다. 손짓 전체로 나누면 '조금 끌고 → 멈췄다가 →
+     뗀다' 가 툭 치기로 읽혀, 되돌리려던 화면이 나가 버린다. 손을 멈췄으면 속도는 0이다. */
   let vs = [];           // 최근 몇 점 {t, x}
   const VWIN = 100;      // 속도를 재는 구간 (ms)
   const VREST = 90;      // 이만큼 멈춰 있었으면 '놓은 것'이지 '친 것'이 아니다
-  let live = false;      // 이 손짓을 우리가 맡았나
-  let axis = '';         // '' 아직 모름 · 'x' 우리 것 · 'y' 스크롤이라 포기
-  let top = null;        // 떠나는 화면
-  let under = null;      // 뒤에서 따라 들어오는 화면
-  let toName = '';
-  const FLICK = 0.11;    // 시트와 같은 값 — '툭 치는 것'과 '천천히 끄는 것'이 갈리는 선
-  const TAKE = 0.32;     // 이만큼 끌면 놓아도 나간다 (화면 너비의 몫)
-  /* 🔴 뒤 화면은 앞 화면의 **0.28배**로 움직인다 — 두 겹이 다른 속도로 가는 것이
-     패럴랙스다. 1.0 이면 한 장처럼 보이고, 0 이면 뒤가 멈춰 있어 깊이가 안 생긴다. */
-  const PARALLAX = 0.28;
-  const DIM = 0.55;      // 멀리 있을 때의 옅기(글자만 흐려 보인다)
+  const FLICK = 0.08;    // 튕김으로 볼 빠르기 (px/ms)
+  const TAKE = 0.22;     // 이만큼 끌면 놓아도 나간다 (화면 너비의 몫 · 430px 폰에서 95px)
 
-  const slow = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  /* 두 화면을 무대에 올린다. 문서 스크롤은 이 순간 0으로 떨어지므로, 끌던 화면을
-     **제 스크롤 상자**로 바꿔 보던 자리를 그대로 들고 간다(따라다니는 머리줄도 살아남는다). */
-  const mount = () => {
-    /* 🔴 **앞 손짓의 마무리를 먼저 끝낸다** (2026-09-11 검사가 잡음). 손을 뗀 뒤 0.3초는
-       아직 미끄러지는 중인데, 그동안 다시 쓸면 두 손짓이 같은 요소를 두고 겹친다 —
-       예전 판은 그 자리에서 뒤 손짓의 무대를 앞 손짓의 타이머가 걷어 버려, 두 번째로
-       쓴 화면이 20px 만 움직이고 멎었다. */
-    if (pendingEnd) pendingEnd();
-    top = screen();
-    toName = SWIPE_BACK_TO[currentScreen];
-    under = toName ? $(`#screen-${toName}`) : null;
-    if (!top || !under) return false;
-    sy = window.scrollY;
-    W = Math.max(1, top.getBoundingClientRect().width);
-    under.hidden = false;
-    under.classList.add('swipe-under');
-    top.classList.add('swipe-top');
-    /* 🔴 **남이 걸어 둔 전환을 끈다** (2026-09-11 — 검사가 잡았다. 이걸 빠뜨려 화면이
-       손보다 0.28초 늦게 따라왔다). 당겨서 새로고침(`interactions.js` release)이
-       손을 뗀 화면에 `transition: transform 0.28s` 를 **인라인으로** 남기는데,
-       인라인은 클래스 규칙을 이기므로 CSS 에 `transition: none` 을 적어도 소용없다 —
-       같은 자리(인라인)에 덮어써야 한다. 세로로 한 번 당겼다 옆으로 쓰는 것은
-       폰에서 아주 흔한 손놀림이라, 이게 없으면 대부분의 손짓이 미끄러진다. */
-    top.style.transition = 'none';
-    under.style.transition = 'none';
-    top.scrollTop = sy;
-    /* 되돌아가면 앱은 늘 맨 위를 보여 주므로(showScreen 의 scrollTo) 뒤 화면도 맨 위에서 시작한다 */
-    under.scrollTop = 0;
-    draw(0);
-    return true;
+  /* 🔴 **우리가 그린 적 없으면 지우지 않는다** (2026-09-12 코드 리뷰가 잡았다).
+     손짓이 끝날 때마다 화면의 transform 을 비우고 있었는데, 그 자리엔 **당겨서 새로고침**
+     (`interactions.js`)이 붙잡아 둔 `translateY` 가 들어 있을 수 있다. 우리 손짓 판정은
+     `#app` 에 붙어 있어 document 보다 먼저 돌기 때문에, 안쪽 화면에서 아래로 당기면
+     놓는 순간 우리가 먼저 자국을 지워 **되돌아가는 움직임이 통째로 사라졌다**
+     (실측: 당기는 중 translateY(50px) → 뗀 직후 빈 값). */
+  let painted = false;
+  const reset = () => {
+    live = false; axis = '';
+    if (!painted) return;
+    painted = false;
+    const el = screen();
+    if (!el) return;
+    el.style.transition = '';
+    void el.offsetHeight;
+    el.style.transform = '';
+    el.style.opacity = '';
   };
-
-  function draw2(t, u, px) {
-    if (!t || !u) return;
-    const d = Math.max(0, Math.min(W, px));
-    const pr = d / W;
-    t.style.transform = `translateX(${d}px)`;
-    u.style.transform = `translateX(${-W * PARALLAX * (1 - pr)}px)`;
-    u.style.setProperty('--swipe-dim', String(DIM + (1 - DIM) * pr));
-  }
-  const draw = (px) => draw2(top, under, px);
-
-  /* 무대를 걷는다. 나갔으면(go) 화면을 바꾸고, 아니면 보던 자리로 문서를 되돌린다.
-     🔴 순서가 중요하다 — 클래스를 먼저 떼면 떠난 화면이 한 프레임 제자리로 튄다. */
-  const unmount = (go, t, u, name, back) => {
-    if (!t || !u) return;
-    const strip = (el) => {
-      el.classList.remove('swipe-top', 'swipe-under', 'swipe-ease');
-      el.style.transition = '';
-      el.style.transform = '';
-      el.style.removeProperty('--swipe-dim');
-      el.style.removeProperty('--swipe-dur');
-    };
-    if (go) {
-      /* 뒤 화면은 이미 제자리(0)에 와 있다 — 등장 애니를 또 틀면 한 번 더 움직인다 */
-      showScreen(name, { back: true, anim: false });
-      strip(t); strip(u);
-    } else {
-      strip(t); strip(u);
-      u.hidden = true;
-      window.scrollTo(0, back);
-    }
-  };
-
-  const reset = () => { live = false; axis = ''; };
-  /* 🔴 손짓이 우리 손을 떠났을 때 **무대를 반드시 걷는다** (2026-09-11 코드 리뷰).
-     끄는 도중 두 번째 손가락이 닿으면 touchstart 가 live 를 끄는데, 그때 걷지 않으면
-     두 화면이 `position: fixed` 인 채 얼어붙고 문서 스크롤도 0으로 주저앉는다. */
-  const abort = () => {
-    if (!top) return;
-    const t1 = top, u1 = under, n1 = toName, s1 = sy;
-    top = under = null;
-    unmount(false, t1, u1, n1, s1);
-  };
-  /* 아직 미끄러지는 중인 마무리 — 다음 손짓이 시작되면 이것부터 끝낸다 */
-  let pendingEnd = null;
 
   root.addEventListener('touchstart', (e) => {
     live = false;
@@ -3221,9 +3154,7 @@ function enableScreenSwipeBack(root) {
     if (t.clientX <= SWIPE_EDGE_IOS) return;                   // OS 몫
     if (!scrollableAtLeft(e.target, root)) return;
     x0 = t.clientX; y0 = t.clientY; dx = 0; t0 = Date.now();
-    /* 🔴 너비는 **여기서** 잰다 (2026-09-11 코드 리뷰). mount() 안에서만 정하면,
-       움직임을 줄여 둔 기기(prefers-reduced-motion)는 무대를 안 세우므로 W 가 1로 남아
-       문턱(W * TAKE)이 **0.32px** 이 된다 — 9px 만 스쳐도 화면이 나가 버린다. */
+    /* 문턱에 쓸 너비는 **여기서** 잰다 — 안 재면 1로 남아 문턱이 0.22px 이 된다 */
     W = Math.max(1, screen().getBoundingClientRect().width);
     vs = [{ t: t0, x: 0 }];
     live = true; axis = '';
@@ -3231,76 +3162,60 @@ function enableScreenSwipeBack(root) {
 
   root.addEventListener('touchmove', (e) => {
     if (!live) return;
+    const el = screen();
+    if (!el) { live = false; return; }
     const t = e.touches[0];
     const mx = t.clientX - x0;
     const my = t.clientY - y0;
     if (!axis) {
-      if (Math.abs(mx) < 8 && Math.abs(my) < 8) return;   // 아직 방향을 말하지 않았다
-      /* 세로가 더 크면 목록을 읽으려는 것이다 — 통째로 포기하고 다시 붙잡지 않는다 */
-      axis = Math.abs(mx) > Math.abs(my) ? 'x' : 'y';
-      if (axis === 'y') { live = false; return; }
-      /* 움직임이 느린 기기·설정에서는 두 겹을 끌지 않는다 — 문턱만 보고 바로 바꾼다 */
-      if (!slow() && !mount()) { live = false; return; }
+      /* 🔴 **엄지는 곧게 못 움직인다.** 8px 움직인 순간 `|가로| > |세로|` 하나로 정하면
+         엄지를 굴려 세로가 먼저 나가는 흔한 손짓을 통째로 버린다("쓸었는데 안 된다").
+         뚜렷해질 때까지 기다리되, **맡는 순간에는 가로가 이겨 있어야** 한다 —
+         비스듬한 손짓은 브라우저가 이미 세로로 굴리는 중이라 늦게 끼어들면 화면이 튄다. */
+      if (Math.abs(my) > 12 && Math.abs(my) > Math.abs(mx) * 1.4) { live = false; return; }
+      if (mx <= -10) { live = false; return; }
+      if (mx < 10 || Math.abs(my) >= mx) return;   // 아직 방향을 말하지 않았다
+      axis = 'x';
     }
     dx = mx;
     const now = Date.now();
     vs.push({ t: now, x: mx });
     while (vs.length > 2 && now - vs[0].t > VWIN) vs.shift();
-    if (top) { e.preventDefault(); draw(dx); }
+    if (dx <= 0) { if (painted) { el.style.transform = ''; el.style.opacity = ''; } return; }
+    e.preventDefault();
+    /* 🔴 **인라인으로 끈다.** 당겨서 새로고침(`interactions.js release`)이 이 화면에
+       `transition: transform 0.28s` 를 인라인으로 남기는데, 인라인은 클래스를 이기므로
+       CSS 로는 못 끈다 — 안 끄면 화면이 손보다 0.28초 늦게 따라온다. */
+    painted = true;
+    el.style.transition = 'none';
+    el.style.transform = `translateX(${dx}px)`;
+    /* 멀리 끌수록 옅어진다 — '나가는 중'이 손끝에 보이게 (0.4 아래로는 안 내린다) */
+    el.style.opacity = String(Math.max(0.4, 1 - dx / 520));
   }, { passive: false });
 
   const finish = () => {
-    if (!live) { reset(); abort(); return; }
+    if (!live) { reset(); return; }
     const moved = dx;
     const nowMs = Date.now();
     const a = vs[0], z = vs[vs.length - 1];
-    const speed = (!z || nowMs - z.t > VREST || !a || z.t <= a.t)
+    /* 🔴 '멈췄다'와 '너무 빨라서 시간이 0'을 **가르는 것**이 여기다 (2026-09-12).
+       멈춤의 증거는 오직 **마지막 점 이후의 빈 시간**(VREST)이다. 구간 길이가 0인 것은
+       그 반대 — 그 짧은 사이에 손이 그만큼 갔다는 뜻이라 오히려 빠른 것이다.
+       ⚠️ 둘을 한 줄에 뭉쳐 `z.t <= a.t → 0` 으로 두었더니, 점들이 **같은 밀리초**에
+          몰린 빠른 튕김이 '멈춤'으로 읽혀 검사가 세 번에 한 번 빨간불이었다(실측).
+          브라우저는 touchmove 를 묶어 보내고 Date.now() 는 1ms 눈금이라 실제로 생긴다. */
+    let span = z && a ? z.t - a.t : 0;
+    let dist = z && a ? z.x - a.x : 0;
+    if (span <= 0) { span = nowMs - t0; dist = moved; }   // 한 틱에 몰렸다 — 손짓 전체로 다시 본다
+    const speed = (!z || nowMs - z.t > VREST)
       ? 0                                           // 손이 멈춰 있었다 — 친 게 아니다
-      : (z.x - a.x) / (z.t - a.t);
+      : (span > 0 ? dist / span : Infinity);        // 0ms 에 그만큼 갔다 = 아주 빠른 튕김
     const to = SWIPE_BACK_TO[currentScreen];
     reset();
-    const go = !!to && (moved > W * TAKE || (moved > 12 && speed > FLICK));
-    if (!top) {                       // 무대 없이(움직임 최소화) 온 경우
-      if (go) showScreen(to, { back: true });
-      return;
-    }
-    /* 🔴 **남은 거리만 이어서 간다.** 손을 뗀 자리에서 끝까지 가는 시간을 남은 거리로
-       정하므로, 거의 다 끌고 놓으면 툭 끝나고 조금만 끌고 놓으면 천천히 돌아온다.
-       예전처럼 제자리로 되돌린 뒤 등장 애니를 새로 트는 것은 '손을 따라온다'가 아니다. */
-    const rest = go ? Math.max(0, W - moved) : Math.max(0, moved);
-    const dur = Math.max(0.12, Math.min(0.34, rest / W * 0.34 + 0.08));
-    /* 🔴 **여기서 요소의 주인이 바뀐다** — 마무리가 제 요소를 들고 가고 무대는 비운다.
-       모듈 칸(top·under)을 그대로 들여다보면, 미끄러지는 동안 시작된 다음 손짓의
-       요소를 앞 손짓의 타이머가 걷어 버린다(실제로 그랬다). */
-    const t1 = top, u1 = under, n1 = toName, s1 = sy;
-    top = under = null;
-    draw2(t1, u1, moved);
-    /* 인라인 'none' 을 비워야 아래 `.swipe-ease`(CSS)가 걸린다 — 인라인이 클래스를 이긴다 */
-    t1.style.transition = '';
-    u1.style.transition = '';
-    t1.style.setProperty('--swipe-dur', dur + 's');
-    u1.style.setProperty('--swipe-dur', dur + 's');
-    t1.classList.add('swipe-ease');
-    u1.classList.add('swipe-ease');
-    /* 두 번 걷지 않도록 한 번만 부른다 — transitionend 는 transform·opacity 둘 다 온다 */
-    let done = false;
-    const end = (ev) => {
-      /* 🔴 `transitionend` 는 **거슬러 올라온다** (2026-09-11 코드 리뷰). 화면 안 카드의
-         누름 전환(0.12s)이 손을 뗀 뒤 끝나면 그 신호로 무대를 걷어, 미끄러지던 화면이
-         중간에서 뚝 끊긴다. 우리가 건 전환만 듣는다. */
-      if (ev && ev.target !== t1) return;
-      if (done) return;
-      done = true; pendingEnd = null;
-      t1.removeEventListener('transitionend', end);
-      unmount(go, t1, u1, n1, s1);
-    };
-    pendingEnd = end;
-    t1.addEventListener('transitionend', end);
-    setTimeout(() => end(), dur * 1000 + 80);   /* transitionend 가 안 오는 경우의 보험 */
-    requestAnimationFrame(() => draw2(t1, u1, go ? W : 0));
+    if (to && (moved > W * TAKE || (moved > 12 && speed > FLICK))) showScreen(to, { back: true });
   };
   root.addEventListener('touchend', finish, { passive: true });
-  root.addEventListener('touchcancel', () => { reset(); abort(); }, { passive: true });
+  root.addEventListener('touchcancel', () => { live = false; reset(); }, { passive: true });
 }
 
 /* 바텀시트를 여는 동작 한 곳 — 상세 시트와 일괄 준비 목록이 **같은 함수**를 쓴다.
@@ -4042,7 +3957,6 @@ function renderMy() {
   const c = p.common || {};
   /* ⚠️ 이름표가 없으면 **열쇠라도 보여 준다** — 다른 두 자리(bulkTags·match-engine)와 같은 방식이다.
      빈칸을 내놓으면 학생이 고른 것이 화면에서 사라져 '해당 없음'처럼 읽힌다(2026-09-03~09 실제로 그랬다). */
-  const flagText = p.flags.length ? p.flags.map((f) => FLAG_LABELS[f] || f).join(', ') : '해당 없음';
   const trackLabel = (TRACKS.find((t) => t.id === p.track) || {}).label || '-';
   const commonFilled = ['studentId', 'birth', 'phone', 'email', 'account'].filter((k) => c[k]).length;
   const nameLine = `<p class="my-name">${esc(p.name || '대학생')} 님<span class="my-edit-hint">학적정보 수정 ›</span></p>`;
@@ -4057,10 +3971,12 @@ function renderMy() {
       <div><span>지원구간</span><strong>${p.bracket != null ? p.bracket + '구간' : '모름'}</strong></div>
       <div><span>공통 서류정보</span><strong>${commonFilled}/5 입력됨</strong></div>
     </div>
-    <p class="my-flags">특별자격: ${flagText}</p>
-    ${learnedHtml(c)}
-    <p class="my-flags">공통 서류정보(학번·연락처·계좌 등)는 이 기기에만 저장 · 서류 초안에 자동 기입.</p>
-    <p class="my-flags">프로필 사진도 이 기기에만 저장 · 사진란이 있는 신청서 문서에 자동으로 들어가요.</p>`;
+    ${/* 🔴 줄 셋을 뺐다 (2026-09-12 개발자 지시) — '특별자격: 해당 없음' · 공통 서류정보
+         안내 · 프로필 사진 안내. 대부분의 학생에게 '해당 없음' 한 줄이고, 나머지 둘은
+         온보딩에서 이미 같은 말을 했다(index.html '모두 선택 사항이며 이 기기에만
+         저장됩니다'). ⚠️ 저장 위치 고지 자체가 사라진 것은 아니다 — 온보딩 그 줄과
+         약관 「③ 서버로 보내지 않는 정보」가 원본이다. */ ''}
+    ${learnedHtml(c)}`;
   bindPhotoButtons();
   /* 🔴 계정·알림은 여기서 그리지 않는다 — 설정 화면으로 옮겼다 (2026-09-11).
      renderSettings() 가 **같은 함수**를 불러 그린다. */

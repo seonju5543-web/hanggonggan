@@ -456,12 +456,11 @@ const eq = (label, got, want) => {
     eq('설정에서 쓸면 MY 로 나간다', await page.$eval('#screen-my', (e) => e.hidden), false);
   }
 
-  /* ══ 패럴랙스 — 개발자 지시 "내 손이 움직이는 대로 페이지가 나가질 수 있도록" (2026-09-11) ══
-     🔴 여기 있는 것은 **끄는 도중**에만 보인다. 위 절은 '결국 나갔는가'만 보므로
-        패럴랙스를 통째로 빼도 전부 초록이다(실제로 그랬다) — 그래서 이 절이 따로 있다.
-     🔴 red-green 확인함: PARALLAX 를 1.0 으로 두면 '느리게'가, mount() 를 끄면
-        '뒤 화면이 보인다'가 빨간불이 된다. */
-  console.log('\n■ 패럴랙스 — 뒤 화면이 손보다 느리게 따라온다');
+  /* ══ 뒤로 쓸기 — 손짓 인식 (2026-09-12 개발자 지시로 패럴랙스는 걷어냈다) ═══════
+     *"패럴렉스 지금까지한거 전부 지워"* — 두 겹(뒤 화면을 미리 끌어다 놓는 것)은 없앴다.
+     남은 것은 **손짓을 알아보는 것**이고, 아래 둘이 그걸 지킨다.
+     🔴 그전 '쓸어 나가기' 절은 결과(나갔는가)만 봐서, 아래 두 경우를 못 잡았다. */
+  console.log('\n■ 뒤로 쓸기 — 손짓 인식');
   {
     const go = async (btn, screen) => {
       await page.click('.nav-item[data-nav="my"]');
@@ -470,142 +469,218 @@ const eq = (label, got, want) => {
       await page.click(btn); await page.waitForSelector(screen);
       await page.waitForTimeout(450);
     };
-    const read = () => page.evaluate(() => {
-      const t = document.querySelector('#screen-terms');
-      const u = document.querySelector('#screen-settings');
-      const nav = document.querySelector('.bottom-nav');
-      return {
-        앞: Math.round(t.getBoundingClientRect().left),
-        뒤: Math.round(u.getBoundingClientRect().left),
-        뒤숨김: u.hidden,
-        뒤옅기: Number(getComputedStyle(u).opacity),
-        폭: Math.round(t.getBoundingClientRect().width),
-        탭: Math.round(nav.getBoundingClientRect().left),
-        머리줄: Math.round(t.querySelector('.sub-header').getBoundingClientRect().top),
-        앞스크롤: t.scrollTop,
-      };
+
+    /* ① **엄지는 곧게 못 움직인다.** 엄지를 굴려 쓸면 첫 몇 px 이 세로로 먼저 나간다.
+       예전 판은 8px 움직인 순간 `|가로| > |세로|` 하나로 정해서 그 손짓을 통째로
+       버렸다 — 아래 점들은 그 손놀림을 **진짜 시간 간격으로** 재현한 것이고,
+       고치기 전에는 여기서 화면이 안 나갔다(실측). */
+    await go('#btn-open-trash', '#screen-trash:not([hidden])');
+    {
+      const pts = [[2, -7], [6, -11], [18, -13], [45, -12], [80, -9], [120, -5], [150, 0]];
+      await page.evaluate(() => { const el = document.elementFromPoint(200, 500); window.__el = el;
+        const t = new Touch({ identifier: 1, target: el, clientX: 200, clientY: 500 });
+        el.dispatchEvent(new TouchEvent('touchstart', { bubbles: true, cancelable: true, touches: [t], targetTouches: [t], changedTouches: [t] })); });
+      for (const [dx, dy] of pts) {
+        await page.evaluate(([dx, dy]) => { const el = window.__el;
+          const t = new Touch({ identifier: 1, target: el, clientX: 200 + dx, clientY: 500 + dy });
+          el.dispatchEvent(new TouchEvent('touchmove', { bubbles: true, cancelable: true, touches: [t], targetTouches: [t], changedTouches: [t] })); }, [dx, dy]);
+        await page.waitForTimeout(16);           // 진짜 프레임 간격 — 한 틱에 몰면 전부 '툭 치기'가 된다
+      }
+      await page.evaluate(() => { const el = window.__el;
+        const t = new Touch({ identifier: 1, target: el, clientX: 350, clientY: 500 });
+        el.dispatchEvent(new TouchEvent('touchend', { bubbles: true, cancelable: true, touches: [], targetTouches: [], changedTouches: [t] })); });
+      await page.waitForTimeout(650);
+      eq('🔴 엄지를 굴려 세로가 먼저 나간 손짓도 알아본다', await page.$eval('#screen-settings', (e) => e.hidden), false);
+    }
+
+    /* ② 가로 손짓이 우리 것이라고 브라우저에 말해 둔다 — 이게 없으면 브라우저가 먼저
+       세로 스크롤로 판정해 그 뒤 움직임이 우리에게 오지 않는다(합성 이벤트로는 재현이
+       안 되는 자리라, 선언이 살아 있는지를 본다). */
+    const ta = await page.evaluate(() => ['settings', 'trash', 'terms', 'logins', 'faq', 'perms']
+      .map((n) => getComputedStyle(document.querySelector('#screen-' + n)).touchAction));
+    eq('🔴 안쪽 화면 여섯 모두 가로 손짓을 우리가 맡는다 (touch-action: pan-y)',
+      ta.every((v) => v === 'pan-y'), true);
+    /* 🔴 짧은 화면(앱 권한·빈 휴지통)은 아래쪽이 통째로 비고 그 자리는 `#app` 이다 —
+       화면에만 주면 거기서 시작한 손짓을 브라우저가 가져간다(실측으로 잡았다). */
+    await page.click('.nav-item[data-nav="my"]'); await page.click('#btn-open-settings');
+    await page.waitForSelector('#screen-settings:not([hidden])');
+    await page.click('#btn-open-perms'); await page.waitForSelector('#screen-perms:not([hidden])');
+    await page.waitForTimeout(400);
+    const 빈자리 = await page.evaluate(() => {
+      const el = document.elementFromPoint(215, 800);
+      return { ta: el ? getComputedStyle(el).touchAction : null };
     });
+    eq('🔴 짧은 화면 아래 빈 자리에서 쓸어도 우리 것이다', 빈자리.ta, 'pan-y');
+    await page.click('.nav-item[data-nav="home"]');
+    await page.waitForSelector('#screen-home:not([hidden])'); await page.waitForTimeout(300);
+    eq('  홈으로 나가면 도로 풀린다 (옆으로 넘기는 칩 줄을 막지 않게)',
+      await page.$eval('#app', (e) => getComputedStyle(e).touchAction), 'auto');
 
+    /* ③ 🔴 **패럴랙스가 정말 사라졌는가** — 끄는 동안 뒤 화면이 딸려 나오면 안 된다.
+       개발자가 "전부 지워"라고 했으므로 되살아나면 빨간불이어야 한다. */
     await go('#btn-open-terms', '#screen-terms:not([hidden])');
-    /* 약관을 한참 내려 둔다 — 끌기 시작할 때 보던 자리를 잃지 않는지 봐야 한다 */
-    await page.evaluate(() => { document.documentElement.style.scrollBehavior = 'auto'; window.scrollTo(0, 1600); });
-    await page.waitForTimeout(300);
-    const sy = await page.evaluate(() => window.scrollY);
-
-    const navBefore = (await read()).탭;
     await dragHold(page, { x: 200, y: 500, dx: 120 });
-    const a = await read();
-    eq('끄는 동안 뒤 화면이 함께 보인다 (한 장이 아니라 두 겹)', a.뒤숨김, false);
-    eq('앞 화면은 손끝을 그대로 따라온다 (120px 끌면 120px)', a.앞, 120);
-    eq('뒤 화면은 아직 왼쪽에 물러나 있다', a.뒤 < 0, true);
-    /* 🔴 **이 한 줄이 패럴랙스 그 자체다.** 뒤 화면이 제자리에서 얼마나 왔는지를
-       앞 화면이 온 거리로 나눈다 — 1 이면 두 장이 한 장처럼 붙어 가고(효과 없음),
-       0 이면 뒤가 멈춰 있다(깊이 없음). 그 사이여야 두 겹으로 읽힌다. */
-    const 뒤가온거리 = a.뒤 - (-a.폭 * 0.28);
-    const 비율 = 뒤가온거리 / a.앞;
-    eq('🔴 뒤 화면이 앞 화면보다 느리게 따라온다 (이게 패럴랙스다)', 비율 > 0.15 && 비율 < 0.45, true);
-    eq('뒤 화면은 아직 옅다 (멀리 있는 것처럼)', a.뒤옅기 < 1, true);
-    eq('아래 탭은 따라 움직이지 않는다', a.탭, navBefore);
-    eq('끌기 시작해도 보던 자리를 잃지 않는다 (따라다니는 머리줄도 그대로)', a.앞스크롤, sy);
-    eq('  그래서 머리줄이 화면 위에 그대로 있다', a.머리줄 < 60, true);
-
-    /* 더 끌면 뒤 화면이 제자리에 가까워진다 — 값 하나만 재면 '멈춰 있는 뒤 화면'도 통과한다 */
-    await dragHold(page, { x: 200, y: 500, dx: 300 });
-    const b = await read();
-    eq('더 끌수록 뒤 화면이 제자리로 다가온다', b.뒤 > a.뒤 && b.뒤 <= 0, true);
-    eq('  옅던 것도 함께 진해진다', b.뒤옅기 > a.뒤옅기, true);
-
-    await dragRelease(page, { x: 200, y: 500, dx: 300 });
-    const c = await page.evaluate(() => {
+    const 겹 = await page.evaluate(() => {
       const t = document.querySelector('#screen-terms');
       const u = document.querySelector('#screen-settings');
-      return {
-        떠난화면숨김: t.hidden, 온화면숨김: u.hidden,
-        자국: (t.className + ' ' + u.className).includes('swipe') ||
-              t.style.transform !== '' || u.style.transform !== '',
-        뒤왼쪽: Math.round(u.getBoundingClientRect().left),
-        문서스크롤: window.scrollY,
-      };
+      return { 앞: Math.round(t.getBoundingClientRect().left), 뒤숨김: u.hidden,
+        자국: /swipe-(top|under|ease)/.test(t.className + ' ' + u.className),
+        무대: getComputedStyle(t).position };
     });
-    eq('손을 떼면 가던 방향 그대로 끝까지 간다', [c.떠난화면숨김, c.온화면숨김], [true, false]);
-    eq('무대를 걷는다 (클래스·인라인 자국이 남지 않는다)', c.자국, false);
-    eq('온 화면이 제자리에 선다', c.뒤왼쪽 <= 1, true);
+    eq('끄는 동안 앞 화면은 손끝을 그대로 따라온다', 겹.앞, 120);
+    eq('🔴 뒤 화면을 미리 끌어다 놓지 않는다 (패럴랙스 없음)', 겹.뒤숨김, true);
+    eq('  무대를 세우지 않는다 (화면이 fixed 가 되지 않는다)', 겹.무대 !== 'fixed', true);
+    eq('  swipe-top·under·ease 자국이 없다', 겹.자국, false);
+    await dragRelease(page, { x: 200, y: 500, dx: 120, rest: 0 });
 
-    /* 🔴 **세로로 살짝 당겼다가 곧바로 옆으로 쓴다** — 폰에서 아주 흔한 손놀림이고,
-       여기서 실제 버그가 나왔다. 당겨서 새로고침(`interactions.js` release)이 손을 뗀
-       화면에 `transition: transform 0.28s` 를 **인라인으로** 남기는데, 인라인은 클래스
-       규칙을 이기므로 그대로 두면 화면이 손보다 0.28초 늦게 따라온다.
-       ⚠️ 이 검사를 지우면 그 버그가 조용히 되살아난다 — 다른 항목들은 못 잡는다
-          (실측: transition 끄는 줄만 되돌렸더니 이 절이 통째로 초록이었다). */
+    /* ④ 🔴 **점이 전부 같은 밀리초에 몰린 빠른 튕김**도 알아본다 (2026-09-12).
+       브라우저는 touchmove 를 묶어 보내고 `Date.now()` 는 1ms 눈금이라 실제로 생긴다.
+       예전 판은 구간 길이가 0이면 '멈춤'으로 읽어 그 튕김을 버렸다 — 검사가 세 번에
+       한 번 빨간불이던 것이 이 경합이었다.
+       ⚠️ 경합에 기대면 red-green 이 안 되므로 **시계를 묶어** 반드시 그 조건이 되게 한다. */
     await go('#btn-open-trash', '#screen-trash:not([hidden])');
-    await page.evaluate(() => window.scrollTo(0, 0));
-    await page.waitForTimeout(200);
-    await swipe(page, { x: 200, y: 400, dx: 0, dy: 30 });   // 세로로 살짝 당겼다 놓는다
-    await dragHold(page, { x: 200, y: 400, dx: 120 });
-    const e = await page.evaluate(() => ({
-      앞: Math.round(document.querySelector('#screen-trash').getBoundingClientRect().left),
-      인라인전환: document.querySelector('#screen-trash').style.transition,
-    }));
-    eq('🔴 세로로 당겼다 옆으로 쓸어도 손끝을 그대로 따라온다 (남이 건 전환을 끈다)', e.앞, 120);
-    eq('  끄는 동안에는 전환이 꺼져 있다', e.인라인전환, 'none');
-    await dragRelease(page, { x: 200, y: 400, dx: 120, rest: 0 });
-
-    /* ── 2026-09-11 코드 리뷰가 잡은 셋 (전부 실제로 화면이 굳거나 튀는 것들) ── */
-
-    /* ① 끄는 도중 **두 번째 손가락**이 닿으면 우리 손을 떠난다 — 그때 무대를 안 걷으면
-       두 화면이 fixed 인 채 얼어붙고 학생은 아무것도 누를 수 없다. */
-    await go('#btn-open-trash', '#screen-trash:not([hidden])');
-    await dragHold(page, { x: 200, y: 400, dx: 80 });
     await page.evaluate(() => {
-      const el = window.__dragEl;
-      const a = new Touch({ identifier: 1, target: el, clientX: 280, clientY: 400 });
-      const b = new Touch({ identifier: 2, target: el, clientX: 120, clientY: 600 });
-      el.dispatchEvent(new TouchEvent('touchstart', { bubbles: true, cancelable: true,
-        touches: [a, b], targetTouches: [a, b], changedTouches: [b] }));
-      el.dispatchEvent(new TouchEvent('touchend', { bubbles: true, cancelable: true,
-        touches: [], targetTouches: [], changedTouches: [a] }));
+      const el = document.elementFromPoint(200, 400);
+      const real = Date.now;
+      const frozen = real();
+      Date.now = () => frozen;                     // 손짓 내내 같은 밀리초
+      const mk = (type, cx) => { const t = new Touch({ identifier: 1, target: el, clientX: cx, clientY: 400 });
+        el.dispatchEvent(new TouchEvent(type, { bubbles: true, cancelable: true,
+          touches: type === 'touchend' ? [] : [t], targetTouches: type === 'touchend' ? [] : [t], changedTouches: [t] })); };
+      mk('touchstart', 200); mk('touchmove', 220); mk('touchmove', 240); mk('touchend', 240);
+      Date.now = real;
     });
-    await page.waitForTimeout(450);
-    const f = await page.evaluate(() => {
-      const t = document.querySelector('#screen-trash');
-      return { 굳었나: getComputedStyle(t).position === 'fixed',
-        자국: t.className.includes('swipe'), 문서스크롤가능: document.documentElement.scrollHeight > 0 };
-    });
-    eq('🔴 끄는 도중 두 번째 손가락이 닿아도 화면이 얼어붙지 않는다', [f.굳었나, f.자국], [false, false]);
-
-    /* ② `transitionend` 는 거슬러 올라온다 — 화면 **안쪽** 요소의 전환이 끝났다고
-       미끄러지던 무대를 걷으면 화면이 중간에서 뚝 끊긴다.
-       🔴 손을 **뗀 뒤**에 봐야 한다 — 그 신호를 듣는 자리가 그때 생긴다(끄는 동안에는
-          듣는 사람이 없어, 여기서 재면 무엇을 해도 초록인 헛검사가 된다). */
-    await go('#btn-open-trash', '#screen-trash:not([hidden])');
-    await dragHold(page, { x: 200, y: 400, dx: 200 });
-    await dragRelease(page, { x: 200, y: 400, dx: 200, rest: 0, wait: 0 });
-    const g = await page.evaluate(() => {
-      const t = document.querySelector('#screen-trash');
-      const 미끄러지는중 = t.classList.contains('swipe-ease');
-      const kid = t.querySelector('.sub-back') || t.firstElementChild;
-      kid.dispatchEvent(new TransitionEvent('transitionend', { bubbles: true, propertyName: 'transform' }));
-      return { 미끄러지는중, 무대살아있나: t.classList.contains('swipe-top') };
-    });
-    eq('  (검사가 무력하지 않은지 — 이때 화면이 실제로 미끄러지는 중이다)', g.미끄러지는중, true);
-    eq('🔴 화면 안쪽 요소의 전환 신호로 무대를 걷지 않는다', g.무대살아있나, true);
     await page.waitForTimeout(600);
+    eq('🔴 점이 전부 같은 밀리초여도 빠른 튕김으로 본다 (멈춤이 아니다)',
+      await page.$eval('#screen-settings', (e) => e.hidden), false);
 
-    /* 끌다 말면 — 문서 스크롤이 보던 자리로 돌아와야 한다 (fixed 로 올렸다 내리므로) */
+    /* ⑤ 🔴 **남의 자국을 지우지 않는다** (2026-09-12 코드 리뷰 · 실측으로 잡았다).
+       안쪽 화면에서 아래로 당기면 '당겨서 새로고침'이 화면에 translateY 를 걸어 두는데,
+       우리 손짓 판정이 `#app` 에 붙어 document 보다 먼저 돌기 때문에, 놓는 순간 우리가
+       먼저 그 자국을 지워 되돌아가는 움직임이 통째로 사라졌다. */
+    /* ⚠️ '놓은 뒤에 자국이 남아 있나' 로 재면 안 된다 — 당겨서 새로고침은 **스스로**
+       transition 을 걸고 transform 을 비워 되돌아간다(그게 그 움직임이다). 봐야 하는 것은
+       **두 손 사이의 이음매**다: 손짓 판정은 `#app` 에, 당겨서 새로고침은 `document` 에
+       달려 있으니 그 사이인 `body` 에서 한 번 들여다보면 우리가 지웠는지가 드러난다. */
+    await go('#btn-open-trash', '#screen-trash:not([hidden])');
+    const ptr = await page.evaluate(() => new Promise((done) => {
+      const el = document.elementFromPoint(215, 300);
+      const scr = document.querySelector('#screen-trash');
+      let 이음매 = null;
+      const spy = () => { 이음매 = scr.style.transform; };
+      document.body.addEventListener('touchend', spy);
+      const mk = (type, y) => { const t = new Touch({ identifier: 1, target: el, clientX: 215, clientY: y });
+        el.dispatchEvent(new TouchEvent(type, { bubbles: true, cancelable: true,
+          touches: type === 'touchend' ? [] : [t], targetTouches: type === 'touchend' ? [] : [t], changedTouches: [t] })); };
+      window.scrollTo(0, 0);
+      mk('touchstart', 200); mk('touchmove', 240); mk('touchmove', 300);
+      const 당기는중 = scr.style.transform;
+      mk('touchend', 300);
+      document.body.removeEventListener('touchend', spy);
+      done({ 당기는중, 이음매, 되돌림전환: scr.style.transition });
+    }));
+    eq('  (검사가 무력하지 않은지 — 당길 때 실제로 자국이 생긴다)', /translateY/.test(ptr.당기는중), true);
+    eq('🔴 아래로 당겼다 놓아도 우리가 먼저 그 자국을 지우지 않는다', /translateY/.test(ptr.이음매), true);
+    eq('  그래서 당겨서 새로고침이 제 움직임으로 되돌아간다', /transform/.test(ptr.되돌림전환), true);
+    await page.waitForTimeout(500);
+
+    /* ⑥ 🔴 **시트가 떠 있으면 가로 손짓을 풀어 준다** — 시트는 `#app` 안에 있고
+       touch-action 은 조상과의 교집합이라, 안 풀면 도우미 시트의 칩 줄(실측 517 > 430)이
+       안쪽 화면에서 손으로 안 밀린다. */
+    await page.click('.nav-item[data-nav="my"]'); await page.click('#btn-open-settings');
+    await page.waitForSelector('#screen-settings:not([hidden])'); await page.waitForTimeout(300);
+    await page.click('#btn-chat-fab');
+    await page.waitForSelector('#chat-sheet:not([hidden])'); await page.waitForTimeout(700);
+    const 시트 = await page.evaluate(() => ({
+      칩줄_넘침: (() => { const c = document.querySelector('.chat-chips');
+        return c ? c.scrollWidth > c.clientWidth + 2 : null; })(),
+      app: getComputedStyle(document.querySelector('#app')).touchAction,
+    }));
+    eq('  (검사가 무력하지 않은지 — 칩 줄이 실제로 가로로 넘친다)', 시트.칩줄_넘침, true);
+    eq('🔴 시트가 떠 있는 동안 가로 손짓을 막지 않는다', 시트.app, 'auto');
+    await page.keyboard.press('Escape'); await page.waitForTimeout(500);
+    eq('  시트를 닫으면 도로 우리 것이 된다',
+      await page.$eval('#app', (e) => getComputedStyle(e).touchAction), 'pan-y');
+
+    /* ⑦ 조금만 끌다 놓으면 안 나간다 (손을 멈췄으면 툭 치기가 아니다) */
     await go('#btn-open-terms', '#screen-terms:not([hidden])');
-    await page.evaluate(() => { document.documentElement.style.scrollBehavior = 'auto'; window.scrollTo(0, 1600); });
-    await page.waitForTimeout(300);
-    const sy2 = await page.evaluate(() => window.scrollY);
     await dragHold(page, { x: 200, y: 500, dx: 40 });
     await dragRelease(page, { x: 200, y: 500, dx: 40, rest: 300 });
     const d = await page.evaluate(() => ({
       약관그대로: !document.querySelector('#screen-terms').hidden,
-      설정숨김: document.querySelector('#screen-settings').hidden,
-      문서스크롤: window.scrollY,
+      자국: document.querySelector('#screen-terms').style.transform,
     }));
     eq('조금만 끌다 놓으면 안 나간다', d.약관그대로, true);
-    eq('  뒤 화면은 도로 숨는다', d.설정숨김, true);
-    eq('🔴 보던 자리로 문서가 되돌아온다 (맨 위로 튀지 않는다)', Math.abs(d.문서스크롤 - sy2) < 4, true);
+    eq('  끌던 자국이 남지 않는다', d.자국, '');
+  }
+
+  /* ══ 누를 때의 표시 (2026-09-12 개발자 지적) ═══════════════════════════════════
+     *"자주묻는 질문에서 클릭하면 클릭한 부분이 회색으로 변하는데 이 효과 없애줘 …
+       알림과 기타도 마찬가지로 회색박스로 채워지는 효과 없애주고 알림은 기타처럼
+       누를때 파랗게 표시되게해줘"*
+     🔴 회색은 두 갈래였다 — 알림·FAQ 는 **브라우저 기본 판**(rgba(0,0,0,0.18))이 그대로
+        칠해졌고(그 목록에 안 들어 있었다), 기타는 우리가 :active 에 칠하던 면이었다.
+     ⚠️ 누른 뒤 **전환이 끝나기를 기다려야** 한다 — 색에 전환이 걸려 있어서 바로 재면
+        중간값(먹색과 남색 사이)이 나온다. 실제로 그걸 보고 "기타는 안 파래진다"고
+        잘못 읽었다. */
+  console.log('\n■ 누를 때의 표시 — 회색 판 없이 글자만 남색');
+  {
+    /* 🔴 손가락 대신 **`:active` 만 켜서** 잰다 (2026-09-12 코드 리뷰가 잡았다).
+       마우스를 눌러 재면 `:hover` 도 같이 켜지는데, 이 앱에는 `.my-menu-item:hover` 가
+       이미 같은 남색을 준다 — 그래서 우리가 새로 넣은 `:active` 규칙을 **통째로 지워도
+       검사가 초록이었다**(실측). 폰에는 hover 가 없으니 그때 학생이 보는 것은 `:active`
+       쪽이고, 그것을 재야 진짜 검사다. CDP 로 그 상태만 켠다. */
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send('DOM.enable'); await cdp.send('CSS.enable');
+    const press = async (sel) => {
+      const { root } = await cdp.send('DOM.getDocument');
+      const { nodeId } = await cdp.send('DOM.querySelector', { nodeId: root.nodeId, selector: sel });
+      if (!nodeId) return { 없음: true };
+      await cdp.send('CSS.forcePseudoState', { nodeId, forcedPseudoClasses: ['active'] });
+      await page.waitForTimeout(420);            // 색 전환이 끝나기를 기다린다
+      const r = await page.evaluate((s) => {
+        const el = document.querySelector(s); const cs = getComputedStyle(el);
+        return { 눌렸나: el.matches(':active'), 바탕: cs.backgroundColor,
+          글자: cs.color, 기본판: cs.webkitTapHighlightColor };
+      }, sel);
+      await cdp.send('CSS.forcePseudoState', { nodeId, forcedPseudoClasses: [] });
+      await page.waitForTimeout(120);
+      return r;
+    };
+    const 투명 = (c) => /rgba\(0, 0, 0, 0\)|transparent/.test(c);
+    const ACCENT = 'rgb(39, 80, 143)';           // --accent (남색)
+
+    await page.click('.nav-item[data-nav="my"]');
+    await page.click('#btn-open-settings');
+    await page.waitForSelector('#screen-settings:not([hidden])');
+    await page.waitForTimeout(400);
+
+    for (const [name, sel] of [['알림 줄', '#my-notify .nf-pref'], ['기타 줄', '#set-etc .my-menu-item']]) {
+      const r = await press(sel);
+      eq(`${name} — 정말 눌린 상태로 쟀다 (아니면 이 절이 통째로 헛검사다)`, r.눌렸나, true);
+      eq(`${name} — 브라우저 기본 회색 판이 꺼져 있다`, 투명(r.기본판), true);
+      eq(`${name} — 누를 때 바탕을 칠하지 않는다 (회색 박스 없음)`, 투명(r.바탕), true);
+      eq(`🔴 ${name} — 누르면 글자가 남색이 된다`, r.글자, ACCENT);
+    }
+
+    /* 🔴 탈퇴만은 빨강 그대로 — 빨강이 '되돌릴 수 없는 일'이라는 표시다 */
+    const 탈퇴 = await press('#btn-withdraw');
+    const RED = await page.evaluate(() => {
+      const d = document.createElement('span'); d.style.color = 'var(--red)';
+      document.body.appendChild(d); const v = getComputedStyle(d).color; d.remove(); return v;
+    });
+    /* ⚠️ '남색이 아니다' 로 재면 무슨 색이 되든 통과한다 — **빨강인지**를 본다 */
+    eq('🔴 탈퇴는 눌러도 빨강 그대로다 (경고가 사라지면 안 된다)', 탈퇴.글자, RED);
+
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(200);
+    await page.click('#btn-open-faq');
+    await page.waitForSelector('#screen-faq:not([hidden])');
+    await page.waitForTimeout(400);
+    const faq = await press('.faq-item summary');
+    eq('자주 묻는 질문 — 정말 눌린 상태로 쟀다', faq.눌렸나, true);
+    eq('🔴 자주 묻는 질문 — 회색으로 변하지 않는다', 투명(faq.기본판) && 투명(faq.바탕), true);
+    eq('  대신 글자가 남색이 된다 (다른 줄과 같은 말투)', faq.글자, ACCENT);
   }
 
   /* ③ 움직임을 줄여 둔 기기 — 무대를 안 세우므로 **너비를 모르는 채** 문턱을 재기 쉽다.
@@ -635,8 +710,13 @@ const eq = (label, got, want) => {
     await p2.click('#btn-open-trash');
     await p2.waitForSelector('#screen-trash:not([hidden])');
     await p2.waitForTimeout(400);
-    await swipe(p2, { x: 200, y: 400, dx: 9, steps: 3 });
-    eq('🔴 살짝 스친 것(9px)으로는 나가지 않는다 (문턱이 너비를 알아야 한다)',
+    /* 🔴 **9px 로 재면 헛검사다** (2026-09-12 코드 리뷰). 축을 잡는 데 가로 10px 이
+       필요하므로 9px 은 시작도 안 되고, 그러면 문턱(W × 0.22)을 **한 번도 안 건드린다** —
+       너비를 안 재는 버그(문턱이 0.22px 이 되는 것)를 넣어도 통과한다.
+       축은 잡히되 문턱엔 못 미치는 **20px + 멈췄다 놓기**로 재야 그 버그가 드러난다. */
+    await dragHold(p2, { x: 200, y: 400, dx: 20 });
+    await dragRelease(p2, { x: 200, y: 400, dx: 20, rest: 300 });
+    eq('🔴 살짝(20px) 끌다 놓으면 나가지 않는다 (문턱이 화면 너비를 알아야 한다)',
       await p2.$eval('#screen-trash', (e) => e.hidden), false);
     await swipe(p2, { x: 200, y: 400, dx: 200 });
     eq('  제대로 쓸면 움직임 없이도 나간다', await p2.$eval('#screen-settings', (e) => e.hidden), false);
