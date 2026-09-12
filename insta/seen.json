@@ -8,6 +8,15 @@
    "at": "2026-09-13",
    "media": "18390052138161575",
    "permalink": "https://www.instagram.com/p/DdMcAtIm8kJ/"
+  },
+  {
+   "code": "auto-ent2431265883artclviewdo",
+   "org": "한국외국어대학교",
+   "name": "2026-2학기 가족장학금 신청 안내",
+   "tplNo": 1,
+   "at": "2026-09-13",
+   "media": "18129374602599684",
+   "permalink": "https://www.instagram.com/p/DdMcZipoNjQ/"
   }
  ],
  "prepared": [
@@ -26,7 +35,7 @@
    "postedAt": "2026-09-13"
   },
   {
-   "status": "prepared",
+   "status": "posted",
    "code": "auto-ent2431265883artclviewdo",
    "org": "한국외국어대학교",
    "name": "2026-2학기 가족장학금 신청 안내",
@@ -35,7 +44,8 @@
    "tplNo": 1,
    "cards": 4,
    "dir": "insta/pub/auto-ent2431265883artclviewdo",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "postedAt": "2026-09-13"
   },
   {
    "status": "prepared",
