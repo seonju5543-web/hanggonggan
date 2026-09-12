@@ -22,6 +22,15 @@ export const LIST = `${BASE}/CO/jspAction.do?beanName=PTSMCstmDsgnGoodsSVC&metho
   + '&inputVOName=kr.go.kosaf.portal.pt.sm.cstmdsgngoods.svc.PTSMCstmDsgnGoodsSVO'
   + '&forwardOnlyFlag=N&ignoreSession=Y&forwardPage=pt/sm/cstmdsgngoods/PTSMCstmDsgnGoods_10M&naviParam=MK,05,02,01';
 
+/* 태그는 두고 **글자 실체만** 되돌린다 — 주소를 읽을 때 쓴다.
+   🔴 없으면 안 되는 이유(2026-09-12 정찰로 드러남): KOSAF 의 첨부 href 는
+   `…?filename=…&FileNameDn=…&amp;path=KOSAF_COMMON&amp;encVal=…` 처럼
+   **중간부터 `&amp;` 로 적혀 있다.** 그대로 부르면 칸 이름이 `amp;path`·`amp;encVal` 이 되어
+   서버가 알아듣지 못한다(그리고 그 실패는 200 에 HTML 로 돌아온다 — 조용하다). */
+export const unent = (s) => String(s)
+  .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+  .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, ' ');
+
 export const strip = (s) => String(s).replace(/<[^>]+>/g, ' ')
   .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<')
   .replace(/&gt;/g, '>').replace(/&#39;/g, "'").replace(/&quot;/g, '"')
@@ -218,12 +227,16 @@ export function parseFiles(htmlText) {
   if (!cell) return [];
   const out = [];
   for (const a of cell.match(/<a\b[\s\S]*?<\/a>/g) || []) {
-    const href = (a.match(/href\s*=\s*"([^"]*)"/i) || a.match(/href\s*=\s*'([^']*)'/i) || [])[1] || '';
+    const href = unent((a.match(/href\s*=\s*"([^"]*)"/i) || a.match(/href\s*=\s*'([^']*)'/i) || [])[1] || '');
     const onclick = (a.match(/onclick\s*=\s*"([^"]*)"/i) || a.match(/onclick\s*=\s*'([^']*)'/i) || [])[1] || '';
     const text = strip(a);
-    /* 진짜 주소인가 — `javascript:` 와 빈 앵커(`#`)는 주소가 아니다 */
-    const real = /^https?:\/\//i.test(href) ? href
+    /* 진짜 주소인가 — `javascript:` 와 빈 앵커(`#`)는 주소가 아니다.
+       ⚠️ 주소에 **공백과 한글이 날것으로** 들어 있다(실측: `…F_장학생 선발요강제24기 후기…pdf`).
+          `new URL(...).href` 로 한 번 통과시켜 규격대로 인코딩한다 — 안 하면 fetch 가 던진다. */
+    const raw0 = /^https?:\/\//i.test(href) ? href
       : (/^\/(?!\/)/.test(href) ? BASE + href : '');
+    let real = '';
+    if (raw0) { try { real = new URL(raw0).href; } catch { real = ''; } }
     /* ⚠️ `javascript:void(0)` 도 '호출'로 읽힌다 — 인자 없는 호출은 내려받기가 아니다.
        걸러 두지 않으면 빈 앵커 하나하나가 '주소를 못 만든 첨부'로 리포트에 쌓여,
        진짜 못 받은 것이 그 잡음에 묻힌다. */
@@ -231,7 +244,9 @@ export function parseFiles(htmlText) {
     const cand = [parseCall(onclick), parseCall(href.replace(/^javascript:/i, ''))].find(hasArgs);
     const call = real ? null : (cand || null);
     if (!real && !call) continue;
-    out.push({ text, ...(real ? { url: real } : {}), ...(call ? { call } : {}), raw: a.slice(0, 300) });
+    /* 날것은 **주소를 못 만들었을 때만** 남긴다 — 전부 담으면 재단 1,587곳 × 300자로
+       data/kosaf.json 이 0.5MB 불어난다(읽을 사람도 없다). 리포트가 이것을 보여 준다. */
+    out.push({ text, ...(real ? { url: real } : { raw: a.slice(0, 300) }), ...(call ? { call } : {}) });
   }
   return out;
 }
@@ -240,6 +255,18 @@ export function parseFiles(htmlText) {
    하나뿐이라 이름이 없다). 한국 관공서 서버는 여기서 세 가지 꼴을 섞어 쓴다 —
    RFC5987(`filename*=UTF-8''…`) · 퍼센트 인코딩 · **EUC-KR 바이트를 latin1 로 실어 보내기**.
    마지막 것을 그냥 쓰면 이름이 `Ãªí` 꼴로 깨진다. */
+/* 🔴 KOSAF 는 **주소 안에 보여 줄 이름을 같이 준다**(`FileNameDn=`) — 실측으로 확인.
+   헤더(Content-Disposition)보다 이쪽을 먼저 쓴다: 헤더는 관공서 서버마다 인코딩이 제각각이라
+   깨질 길이 셋인데, 이 칸은 KOSAF 가 링크를 만들 때 적어 둔 것이라 깨끗하다.
+   ⚠️ 질의 문자열이라 `+` 는 공백이다 — URLSearchParams 가 알아서 푼다. */
+export function nameFromUrl(u) {
+  try {
+    const q = new URL(u).searchParams;
+    const n = q.get('FileNameDn') || q.get('filename') || '';
+    return n.split('/').pop().trim();
+  } catch { return ''; }
+}
+
 export function filenameFrom(disposition, fallback) {
   const d = String(disposition || '');
   const star = d.match(/filename\*\s*=\s*([^']*)'[^']*'([^;]+)/i);

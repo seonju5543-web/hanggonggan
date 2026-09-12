@@ -33,7 +33,7 @@ import { fileURLToPath } from 'node:url';
 import { makeBudget } from './harvest-budget.mjs';
 import { slimKosaf } from './kosaf-open.mjs';
 import {
-  createSession, parseFiles, fileCellHtml, filenameFrom, safeFileName,
+  createSession, parseFiles, fileCellHtml, filenameFrom, nameFromUrl, safeFileName,
   looksLikeHtml, sniffKind,
 } from './kosaf-session.mjs';
 
@@ -146,7 +146,10 @@ async function mirrorOne(session, it) {
     if (buf.length > MAX_FILE) { stat.tooBig += 1; say(`  · ${it.org} — ${(buf.length / (1 << 20)).toFixed(1)}MB 라 건너뜁니다`); continue; }
     if (buf.length < 512) { stat.blocked += 1; continue; }
 
-    const shown = filenameFrom(res.headers.get('content-disposition'), `선발공고문-${n + 1}`);
+    /* 이름은 **주소에 적힌 것을 먼저** 쓴다(KOSAF 가 `FileNameDn=` 에 넣어 준다) —
+       헤더는 관공서 서버마다 인코딩이 제각각이라 깨질 길이 셋이다. 둘 다 없으면 우리가 짓는다. */
+    const shown = nameFromUrl(f.url) || filenameFrom(res.headers.get('content-disposition'), '')
+      || `선발공고문-${n + 1}`;
     let name = safeFileName(shown, `선발공고문-${n + 1}`);
     /* 확장자가 없으면 앞 바이트로 정한다 — 확장자를 믿지 않는다(PDF 가 .bin 으로 오던 일) */
     const kind = sniffKind(buf);

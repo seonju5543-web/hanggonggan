@@ -37,7 +37,7 @@ import { checkFormQuality } from '../collector/form-quality.mjs';
 import { checkFormCoverage } from '../collector/form-coverage.mjs';
 import { canonUrl as nsCanonUrl, hasText, looksLikeErrorPage } from '../collector/notice-source.mjs';
 /* 층2 첨부 — KOSAF 포털과 말하는 규칙은 kosaf-session.mjs 한 곳이다(베끼면 갈라진다) */
-import { parseFiles, filenameFrom, safeFileName, looksLikeHtml, sniffKind } from '../collector/kosaf-session.mjs';
+import { parseFiles, filenameFrom, nameFromUrl, safeFileName, looksLikeHtml, sniffKind } from '../collector/kosaf-session.mjs';
 import { slimKosaf } from '../collector/kosaf-open.mjs';
 
 let fail = 0;
@@ -5056,6 +5056,29 @@ console.log('\n■ 층2 첨부 — 상세 화면에서 공고문 링크를 읽�
   /* 한 줄에 이름표·내용이 두 쌍씩 오는 표라, 줄이 아니라 **칸 자리**로 짚어야 한다 */
   eq('  같은 줄의 앞 칸(문의처)을 첨부로 착각하지 않는다',
     /062-607/.test(JSON.stringify(parseFiles(real))), false);
+
+  /* ⑨ 🔴 **실제 KOSAF 첨부 주소로 재는 회귀** (2026-09-12 정찰 run 34708636409 에서 그대로 가져왔다).
+        정찰하지 않았으면 못 봤을 함정 둘이 이 한 줄에 다 들어 있다:
+          · href 가 **중간부터 `&amp;` 로 적혀 있다** — 안 풀면 칸 이름이 `amp;path`·`amp;encVal`
+            이 되어 서버가 알아듣지 못하고, 그 실패는 **200 에 HTML** 로 조용히 돌아온다.
+          · 주소에 **공백과 한글이 날것으로** 들어 있다 — 규격대로 인코딩하지 않으면 fetch 가 던진다. */
+  const realHref = 'https://portal.kosaf.go.kr/FL/downloadServletEcm.do'
+    + '?filename=SS/SL/goods/2.+2026년+울진군+대학생+장학금+신청+및+선발공고_260708 (1)_2026090214255200.hwp'
+    + '&FileNameDn=2.+2026년+울진군+대학생+장학금+신청+및+선발공고_260708 (1).hwp'
+    + '&amp;path=KOSAF_COMMON&amp;encVal=c7f33ce75b6106012d1d04958826fa63';
+  const realOut = parseFiles(`<table><tr><th>선발공고문</th><td><a href="${realHref}" /><strong>[다운로드]</strong></a></td></tr></table>`);
+  const realUrl = new URL(realOut[0].url);
+  eq('KOSAF 주소의 &amp; 를 푼다 (안 풀면 칸 이름이 amp;path 가 된다)',
+    [realUrl.searchParams.get('path'), !!realUrl.searchParams.get('encVal')], ['KOSAF_COMMON', true]);
+  eq('  공백·한글을 규격대로 인코딩한다 (날것이면 fetch 가 던진다)',
+    /\s|[가-힣]/.test(realOut[0].url), false);
+  /* 🔴 이름은 **주소에 적힌 것**(`FileNameDn=`)을 먼저 쓴다 — 헤더는 인코딩이 제각각이다.
+        질의 문자열이라 `+` 는 공백이다. */
+  eq('  보여 줄 이름을 주소에서 읽는다',
+    nameFromUrl(realOut[0].url), '2. 2026년 울진군 대학생 장학금 신청 및 선발공고_260708 (1).hwp');
+  /* 날것(raw)은 주소를 못 만들었을 때만 남긴다 — 전부 담으면 재단 1,587곳 × 300자로
+     data/kosaf.json 이 0.5MB 불어난다 */
+  eq('  주소를 만들었으면 날것을 담지 않는다', 'raw' in realOut[0], false);
 }
 
 console.log('\n■ 층2 첨부 — 학생이 실제로 받을 수 있는 주소만 앱에 나간다');
