@@ -59,6 +59,12 @@
 
   /* 그림자 — 바탕의 색조를 띠게 한다. 순수 검정 저투명도는 회색 때가 낀 것처럼 보인다.
      빛의 방향은 화면 전체에서 위쪽 하나로 통일했다. */
+  /* 🔴 **그림자는 '떠 있는 것'에만** (2026-09-12 개발자 지시 · 노션 UI-9: "그림자가 과해서
+     생성된 뒤 손보지 않은 인상을 준다"). 떠 있는 것은 넷 — 하단 내비 · 도우미 버튼(FAB) ·
+     시트 · 토스트. 그리고 주 버튼 하나까지. 면 위에 **놓인** 것(아바타 · 히어로 패널 ·
+     온보딩 로고와 기능 카드 · 목록 카드)은 선과 면으로 구분한다.
+     ⚠️ 토큰을 지우지는 않았다 — 쓰는 자리만 줄였다. '새 그림자를 만들지 않는다'는 규칙은
+        그대로다(ui-tone '그림자도 토큰만 쓴다'). 관문: verify-interactions '그림자'. */
   --shadow:       0 1px 2px rgba(58, 48, 28, 0.05), 0 8px 22px rgba(58, 48, 28, 0.07);
   /* 🔴 **색이 들어간** 높낮이 (2026-09-06 이름 붙임). 중립 --shadow 로 누르면 그림자가
      버튼 색을 잃는다 — 값은 그대로 두고 이름만 줬다(픽셀 변화 0). */
@@ -270,7 +276,6 @@ input::placeholder { color: var(--text-weak); }
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--shadow-lift);
 }
 .onboard-logo svg { width: 44px; height: 44px; }
 .onboard-hero h1 {
@@ -297,7 +302,6 @@ input::placeholder { color: var(--text-weak); }
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   padding: 15px 17px;
-  box-shadow: var(--shadow);
   font-size: var(--t-md);
   font-weight: 500;
   display: flex;
@@ -448,7 +452,6 @@ input::placeholder { color: var(--text-weak); }
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--shadow);
 }
 .home-greet { font-size: var(--t-xl); font-weight: 800; letter-spacing: -0.02em; }
 .home-school { font-size: var(--t-sm); color: var(--text-weak); font-weight: 500; }
@@ -464,7 +467,6 @@ input::placeholder { color: var(--text-weak); }
   padding: 28px 24px 24px;
   color: #fff;
   margin-bottom: 30px;
-  box-shadow: var(--shadow-lift);
 }
 .hero-card::after {
   content: '';

@@ -375,6 +375,42 @@ async function seed(page) {
     `${refreshed.before} → ${refreshed.after}`);
 
   /* ── ⑤ 움직임을 줄인 학생 ─────────────────────────────────────────── */
+  /* ══ 그림자는 '떠 있는 것'에만 (2026-09-12 · 노션 UI-9) ═══════════════════════
+     개발자 지적: "그림자가 과해서 생성된 뒤 손보지 않은 인상을 준다."
+     2026-09-10 페이스리프트가 목록 카드의 그림자는 이미 껐지만, 화면에 **놓여 있는** 것들에
+     남아 있었다(실측 · 390px): 홈 5개(아바타·히어로 패널·주 버튼·FAB·알림 배지) ·
+     온보딩 5개(로고·기능 카드 3장·버튼).
+     🔴 규칙: 떠 있는 것 넷(하단 내비 · 도우미 FAB · 시트 · 토스트)과 **주 버튼**만 그림자를 갖는다.
+        알림 배지의 `--cutout` 은 그림자가 아니라 **종 아이콘에서 배지를 떼어 내는 테두리**다.
+     ⚠️ 이 검사는 이름표를 세지 않고 **화면에 그려진 것**을 훑는다 — CSS 를 고쳐 놓고
+        다른 곳에 새 그림자를 붙이면 여기서 걸린다. */
+  console.log('\n■ 그림자는 떠 있는 것에만 (UI-9)');
+  const shadowScan = async (label, nav) => {
+    if (nav) { await page.click(`.nav-item[data-nav="${nav}"]`); await page.waitForTimeout(500); }
+    return page.evaluate(() => {
+      /* `ptr` = 당겨서 새로고침 뱅뱅이 — 내용 위에 떠서 따라 내려온다(interactions.js) */
+      const ALLOW = ['bottom-nav', 'chat-fab', 'sheet', 'toast', 'btn-primary', 'btn-white', 'bell-badge', 'ptr'];
+      const bad = [];
+      for (const el of document.querySelectorAll('*')) {
+        const r = el.getBoundingClientRect(); const cs = getComputedStyle(el);
+        if (!r.width || !r.height || cs.visibility === 'hidden') continue;
+        const sh = cs.boxShadow;
+        if (!sh || sh === 'none' || /inset/.test(sh)) continue;
+        const cls = typeof el.className === 'string' ? el.className.split(/\s+/) : [];
+        if (ALLOW.some((a) => cls.includes(a) || el.id === a)) continue;
+        bad.push(`${el.tagName.toLowerCase()}${el.id ? '#' + el.id : ''}.${cls[0] || ''}`);
+      }
+      return [...new Set(bad)];
+    });
+  };
+  ok('홈 — 떠 있지 않은 것에 그림자가 없다', (await shadowScan('홈')).length === 0,
+    JSON.stringify(await shadowScan('홈')));
+  for (const [label, nav] of [['장학금 찾기', 'explore'], ['신청내역', 'applications'], ['MY', 'my']]) {
+    const bad = await shadowScan(label, nav);
+    ok(`${label} — 떠 있지 않은 것에 그림자가 없다`, bad.length === 0, JSON.stringify(bad));
+  }
+  await page.click('.nav-item[data-nav="home"]'); await page.waitForTimeout(400);
+
   console.log('\n■ 움직임 줄이기를 켠 학생');
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.reload({ waitUntil: 'networkidle' });
