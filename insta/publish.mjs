@@ -13,7 +13,8 @@
  *    매 실행 찍고, 7일 안이면 시끄럽게 경고한다(노션 F-4 와 같은 유형).
  *
  * 필요한 것: IG_USER_ID · IG_ACCESS_TOKEN (저장소 시크릿)
- * 실행: node insta/publish.mjs --dir=insta/pub/2026-09-10 [--publish]
+ * 실행: node insta/publish.mjs --code=<공고 코드> [--publish]      (= --dir=insta/pub/<코드>)
+ *       node insta/publish.mjs --dir=insta/pub/<코드> --urls | --wait-only
  */
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -112,8 +113,11 @@ export async function publish({ dir, images, caption, live }) {
 
 // ── 실행 ────────────────────────────────────────────────────
 if (process.argv[1] && import.meta.url === new URL(process.argv[1], 'file:').href) {
-  const dir = arg('dir');
-  if (!dir) { console.error('--dir=insta/pub/<날짜> 를 주세요.'); process.exit(1); }
+  // 🔴 공고 하나에 폴더 하나(`insta/pub/<코드>/`) — `--code` 가 폴더를 정한다. 2026-09-12.
+  const code = arg('code');
+  if (code && !/^[A-Za-z0-9_-]+$/.test(code)) { console.error(`공고 코드 '${code}' 가 이상합니다.`); process.exit(1); }
+  const dir = arg('dir') || (code ? `insta/pub/${code}` : null);
+  if (!dir) { console.error('--code=<공고 코드> 또는 --dir=insta/pub/<코드> 를 주세요.'); process.exit(1); }
   const abs = new URL(dir + '/', ROOT);
   if (!existsSync(abs)) { console.error(`${dir} 가 없습니다 — 먼저 렌더하세요.`); process.exit(1); }
 
@@ -146,8 +150,11 @@ if (process.argv[1] && import.meta.url === new URL(process.argv[1], 'file:').hre
     const { kstDay } = await import('./render.mjs');
     const meta = JSON.parse(readFileSync(new URL('meta.json', abs), 'utf8'));
     const seen = readSeen();
-    seen.posted.push({ code: meta.code, org: meta.org, name: meta.name,
+    seen.posted.push({ code: meta.code, org: meta.org, name: meta.name, tplNo: meta.tplNo ?? null,
       at: kstDay(), media: out.mediaId, permalink: out.permalink });   // 🔴 KST — UTC 면 새벽에 어제로 찍힌다
+    // 준비 장부의 줄도 '올림' 으로 — 관리자 화면이 두 장부를 같이 본다.
+    const pr = seen.prepared.find((p) => p.code === meta.code);
+    if (pr) { pr.status = 'posted'; pr.postedAt = kstDay(); }
     writeSeen(seen);
     say(`  seen.json 에 기록 — 지금까지 ${seen.posted.length}건`);
   }

@@ -1,0 +1,34 @@
+{
+ "_readme": "판형에 붙은 번호는 고정이다 — 한 번 붙은 번호는 지우거나 바꾸지 않는다(2026-09-12 개발자 지시). 개발자가 '3번으로'라고 말하면 늘 같은 판형이어야 한다. 새 판형은 다음 번호로 끝에 더한다. 내장 3벌은 insta/render.mjs 안에 있고, 그 뒤는 insta/templates/<번호>-<id>.mjs 파일 하나가 판형 하나다(만드는 법: .claude/skills/insta-template/SKILL.md).",
+ "templates": [
+  {
+   "no": 1,
+   "id": "photo",
+   "name": "사진 배경",
+   "ref": "개발자가 준 Go.Designer 카드뉴스 — 사진 위에 글자만",
+   "builtin": true,
+   "skin": true
+  },
+  {
+   "no": 2,
+   "id": "chat",
+   "name": "카카오톡 대화",
+   "ref": "개발자가 준 레퍼런스 — 잠금화면 알림으로 열고 대화로 푼다",
+   "builtin": true
+  },
+  {
+   "no": 3,
+   "id": "note",
+   "name": "굿노트 필기",
+   "ref": "개발자가 준 레퍼런스 — 아이패드 필기 노트",
+   "builtin": true
+  },
+  {
+   "no": 4,
+   "id": "poster",
+   "name": "포스터",
+   "ref": "먹색 바탕에 큰 글자만 — 바깥 판형 파일의 첫 예시 (2026-09-12)",
+   "builtin": false
+  }
+ ]
+}

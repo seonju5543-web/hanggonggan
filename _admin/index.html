@@ -10,7 +10,7 @@
        바깥으로 나가는 통신은 GitHub 두 곳으로만 제한한다. -->
   <!-- frame-ancestors(다른 사이트가 이 화면을 액자처럼 품는 것 막기)는 메타 태그로는 무시된다.
        그건 _headers 파일로 Cloudflare가 진짜 응답 헤더에 실어 보낸다. -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://handaejang-push.seonju5543.workers.dev; object-src 'none'; base-uri 'self'; form-action 'none'" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://raw.githubusercontent.com; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://handaejang-push.seonju5543.workers.dev; object-src 'none'; base-uri 'self'; form-action 'none'" />
   <meta name="referrer" content="no-referrer" />
   <meta name="robots" content="noindex, nofollow" />
   <meta name="theme-color" content="#141a2b" />
@@ -83,6 +83,7 @@
       <button class="tab" data-tab="forms" role="tab" aria-selected="false" aria-controls="screen-forms">양식 <span class="tab-n" id="n-forms"></span></button>
       <button class="tab" data-tab="network" role="tab" aria-selected="false" aria-controls="screen-network">수집망 <span class="tab-n" id="n-network"></span></button>
       <button class="tab" data-tab="robots" role="tab" aria-selected="false" aria-controls="screen-robots">로봇 <span class="tab-n" id="n-robots"></span></button>
+      <button class="tab" data-tab="insta" role="tab" aria-selected="false" aria-controls="screen-insta">인스타 <span class="tab-n" id="n-insta"></span></button>
       <button class="tab" data-tab="quality" role="tab" aria-selected="false" aria-controls="screen-quality">데이터 품질 <span class="tab-n" id="n-quality"></span></button>
     </nav>
 
@@ -106,6 +107,7 @@
     <section id="screen-forms" role="tabpanel" tabindex="-1"   class="screen" hidden></section>
     <section id="screen-network" role="tabpanel" tabindex="-1" class="screen" hidden></section>
     <section id="screen-robots" role="tabpanel" tabindex="-1"  class="screen" hidden></section>
+    <section id="screen-insta" role="tabpanel" tabindex="-1"   class="screen" hidden></section>
     <section id="screen-quality" role="tabpanel" tabindex="-1" class="screen" hidden></section>
   </main>
 

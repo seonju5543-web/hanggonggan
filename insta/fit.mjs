@@ -13,6 +13,27 @@ export function shrinkToFit() {
       return b.height > 0 && (b.top < r.top - 2 || b.bottom > r.bottom + 2);
     });
   };
+  // 🔴 옆으로 넘친 글자도 잘린다 — 4번 판형 표지에서 긴 재단명이 오른쪽으로 나갔는데 위아래만
+  //    재던 검사가 초록불이었다(2026-09-12 실측). 줄바꿈 못 하는 낱말은 글자를 줄여야 들어간다.
+  const fitsWide = (card) => {
+    const r = card.getBoundingClientRect();
+    return ![...card.querySelectorAll('*')].some((el) => {
+      const b = el.getBoundingClientRect();
+      return b.height > 0 && b.width > 0 && (b.left < r.left - 2 || b.right > r.right + 2);
+    }) && !sideOverflowText(card, r);
+  };
+  // 인라인 글자는 요소 상자 안에 안 잡히므로 글자 자체의 범위를 잰다(Range).
+  const sideOverflowText = (card, r) => {
+    const rng = document.createRange();
+    const w = document.createTreeWalker(card, NodeFilter.SHOW_TEXT);
+    let n;
+    while ((n = w.nextNode())) {
+      if (!n.nodeValue.trim()) continue;
+      rng.selectNodeContents(n);
+      for (const b of rng.getClientRects()) if (b.width > 0 && (b.left < r.left - 2 || b.right > r.right + 2)) return true;
+    }
+    return false;
+  };
   for (const card of document.querySelectorAll('.card')) {
     const box = card.querySelector('[data-fit-box]');
     // 🔴 한 카드 안의 글자는 **같이** 움직인다 — 줄마다 크기가 다르면 지저분하다.
@@ -25,15 +46,37 @@ export function shrinkToFit() {
       if (fits(card)) break;
     }
   }
+  // 표지처럼 data-fit 이 없는 큰 글자도 옆으로 넘치면 줄인다 — 아래 overflowing 이 같은 잣대로 본다.
+  for (const card of document.querySelectorAll('.card')) {
+    if (fitsWide(card)) continue;
+    const big = [...card.querySelectorAll('*')].filter((el) => parseFloat(getComputedStyle(el).fontSize) >= 60 && el.children.length <= 3 && el.textContent.trim());
+    for (const el of big) {
+      const base = parseFloat(getComputedStyle(el).fontSize);
+      for (let f = base; f >= 40; f -= 2) { el.style.fontSize = `${f}px`; if (fitsWide(card)) break; }
+      if (fitsWide(card)) break;
+    }
+  }
 }
 
 /** 그래도 넘친 카드의 번호. 잘린 채로 올리면 사실이 사라진 게시물이 나간다. */
 export function overflowing() {
+  const textOut = (card, r) => {
+    const rng = document.createRange();
+    const w = document.createTreeWalker(card, NodeFilter.SHOW_TEXT);
+    let n;
+    while ((n = w.nextNode())) {
+      if (!n.nodeValue.trim()) continue;
+      rng.selectNodeContents(n);
+      for (const b of rng.getClientRects()) if (b.width > 0 && (b.left < r.left - 2 || b.right > r.right + 2)) return true;
+    }
+    return false;
+  };
   return [...document.querySelectorAll('.card')].map((card, i) => {
     const r = card.getBoundingClientRect();
-    return [...card.querySelectorAll('*')].some((el) => {
+    const boxOut = [...card.querySelectorAll('*')].some((el) => {
       const b = el.getBoundingClientRect();
       return b.height > 0 && (b.top < r.top - 2 || b.bottom > r.bottom + 2);
-    }) ? i + 1 : 0;
+    });
+    return boxOut || textOut(card, r) ? i + 1 : 0;   // 🔴 옆으로 넘친 글자도 잘림이다
   }).filter(Boolean);
 }
