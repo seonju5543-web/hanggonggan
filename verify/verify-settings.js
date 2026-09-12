@@ -119,6 +119,66 @@ const eq = (label, got, want) => {
   eq('MY 안에서는 알림 절이 안 보인다', await page.$eval('#my-notify', (e) => e.offsetParent !== null), false);
   await page.screenshot({ path: `${SHOT}/my.png` });
 
+  /* 🔴 **학적정보 수정은 그 글자만 눌러야 간다** (2026-09-12 개발자 지시 — "전체 표를 눌러도
+     수정하는 걸로 넘어가는데 학적정보수정 부분만 눌렀을 때 수정가능하게").
+     전에는 카드 전체가 버튼이라, 학생이 제 성적·구간 표를 짚기만 해도 화면이 바뀌었다. */
+  {
+    eq('프로필 카드 자체는 버튼이 아니다 (보조기기가 "버튼"이라 읽지 않는다)',
+      await page.$eval('#my-profile', (e) => e.getAttribute('role')), null);
+    eq('  카드에 Tab 이 멈추지 않는다',
+      await page.$eval('#my-profile', (e) => e.hasAttribute('tabindex')), false);
+    eq('  「학적정보 수정」은 진짜 버튼이라 키보드로 닿는다',
+      await page.$eval('.my-edit-hint', (e) => e.tagName + ':' + e.tabIndex), 'BUTTON:0');
+
+    await page.click('#my-profile .my-grid div:nth-child(3)');   // 지원구간 칸
+    await page.waitForTimeout(400);
+    eq('🔴 표(지원구간 칸)를 눌러도 수정으로 넘어가지 않는다',
+      await page.evaluate(() => currentScreen), 'my');
+    await page.click('#my-profile .my-line');                    // 학교·학과 줄
+    await page.waitForTimeout(400);
+    eq('🔴 학교 줄을 눌러도 넘어가지 않는다',
+      await page.evaluate(() => currentScreen), 'my');
+
+    /* 🔴 사진 단추를 눌러도 수정으로 안 넘어간다 — 예전엔 카드가 버튼이라 파일 창과
+       수정 화면이 **같이** 열렸고, 그걸 캡처 단계 가로채기로 막고 있었다. 그 장치를 걷은
+       지금은 '카드가 버튼이 아니다'가 근거라, 실제 동작으로 한 번 확인해 둔다. */
+    /* ⚠️ 없으면 **건너뛰지 않고 빨간불** — `if (photoBtn)` 로 감싸 두면 단추가 사라진 날
+       이 줄이 조용히 초록이 된다(2026-09-12 코드 리뷰). 누르기 실패도 삼키지 않는다. */
+    const photoBtn = await page.$('.my-photo-btns button, .my-photo-btns label');
+    eq('사진 단추가 화면에 있다 (없으면 아래 줄이 헛돈다)', !!photoBtn, true);
+    if (photoBtn) {
+      await photoBtn.click();
+      await page.waitForTimeout(400);
+      eq('🔴 사진 단추를 눌러도 수정으로 넘어가지 않는다',
+        await page.evaluate(() => currentScreen), 'my');
+    }
+
+    /* 🔴 **닿는 자리를 재 둔다** (2026-09-12 코드 리뷰) — 수정으로 가는 문이 이 글자 하나뿐인데
+       글자 높이는 21px 밖에 안 된다. 여백으로 넓히고 음수 여백으로 되돌려 **보이는 자리는 그대로**
+       두었으니, 여기서 재는 것은 **손가락이 닿는 크기**다(44px 권고에 닿는지). */
+    const hint = await page.$eval('.my-edit-hint', (e) => {
+      const r = e.getBoundingClientRect();
+      return { h: Math.round(r.height), w: Math.round(r.width) };
+    });
+    eq(`🔴 「학적정보 수정」이 손가락에 닿는 크기다 (지금 ${hint.h}px 높이)`, hint.h >= 44, true);
+
+    await page.click('.my-edit-hint');
+    await page.waitForTimeout(600);
+    eq('🔴 「학적정보 수정」을 누르면 넘어간다',
+      await page.evaluate(() => currentScreen), 'onboarding');
+    /* 되돌아와서 다음 절이 MY 에서 시작하게 둔다.
+       ⚠️ 온보딩에서는 **아래 탭이 숨는다** — 탭을 누르려 하면 30초를 기다리다 죽는다.
+          보이는 '취소' 버튼을 누르고, 그래도 안 되면 화면을 직접 부른다. */
+    const cancel = await page.$('[data-onboard-cancel]:not([hidden])');
+    if (cancel) await cancel.click();
+    await page.waitForTimeout(600);
+    if (await page.$eval('#screen-my', (e) => e.hidden)) {
+      await page.evaluate(() => showScreen('my'));
+      await page.waitForSelector('#screen-my:not([hidden])');
+    }
+    await page.waitForTimeout(300);
+  }
+
   console.log('\n■ 설정 화면 — 승인받은 목업 그대로인가');
   await page.click('#btn-open-settings');
   await page.waitForSelector('#screen-settings:not([hidden])');
@@ -146,6 +206,26 @@ const eq = (label, got, want) => {
     ['내 조건에 맞는 새 장학 공고', '마감 하루 전 · 마감 당일', '제출 기록 안 한 공고',
       '우리 학교 게시판 새 공고', '마감 지난 공고 결과 기록']);
   eq('스위치가 5개', await page.$$eval('#my-notify .nf-switch', (e) => e.length), 5);
+
+  /* 🔴 **절 사이 빈칸은 눈에 보이는 것끼리 재야 한다** (2026-09-12 개발자 지시 "알림과
+     기타 사이 간격이 너무 커서 줄여"). 상자끼리 재면 둘 다 49px 로 **똑같아서 아무 문제가
+     없어 보인다** — 실제로 그렇게 재고 한 번 헷갈렸다. 알림의 마지막 줄은 제 여백 11px 을
+     이미 갖고 그 밑에 구분선도 없어서, 눈에는 62px 로 보였다(계정→알림 은 49px). */
+  {
+    const 빈칸 = await page.evaluate(() => {
+      const btn = document.querySelector('#my-account .btn, #my-account button');
+      const rows = [...document.querySelectorAll('#my-notify .nf-pref')];
+      const sw = rows[rows.length - 1].querySelector('.nf-switch');
+      const t1 = document.querySelector('#my-notify .wallet-title').getBoundingClientRect().top;
+      const t2 = document.querySelector('#set-etc .wallet-title').getBoundingClientRect().top;
+      return { 계정_알림: Math.round(t1 - btn.getBoundingClientRect().bottom),
+        알림_기타: Math.round(t2 - sw.getBoundingClientRect().bottom) };
+    });
+    eq('  (검사가 무력하지 않은지 — 두 빈칸을 실제로 쟀다)',
+      빈칸.계정_알림 > 20 && 빈칸.알림_기타 > 20, true);
+    eq(`🔴 알림→기타 빈칸이 계정→알림과 같은 리듬이다 (${빈칸.계정_알림}px vs ${빈칸.알림_기타}px)`,
+      Math.abs(빈칸.알림_기타 - 빈칸.계정_알림) <= 4, true);
+  }
 
   console.log('\n■ 덧붙인 세 줄 — 휴지통 · 이용약관 · 탈퇴');
   eq('기타 메뉴 줄 (2026-09-11 개발자 지시 순서대로)',

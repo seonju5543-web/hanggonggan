@@ -15,7 +15,7 @@
    실행: 이 워크트리에서 `python3 -m http.server <포트>` 를 띄운 뒤
          CHROME_PATH=... PORT=<포트> node verify/verify-sheet-back.js */
 const { chromium } = require('playwright-core');
-const { assertOwnServer } = require('./onboard-helper');
+const { assertOwnServer, dismissNotify } = require('./onboard-helper');
 const EXE = process.env.CHROME_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 const PORT = process.env.PORT || 8123;
 
@@ -54,9 +54,11 @@ async function swipeDown(page, sel) {
     applications: [], docs: {}, notify: {} })));
   await page.reload({ waitUntil: 'networkidle' });
   await page.waitForTimeout(1500);
-  // 알림 동의 시트가 홈을 덮는다 — 먼저 치운다
-  await page.evaluate(() => { for (const id of ['#notify-sheet', '#notify-backdrop']) {
-    const e = document.querySelector(id); if (e) { e.classList.remove('show'); e.hidden = true; } } });
+  /* 🔴 알림 동의 시트가 홈을 덮는다 — **규칙은 `onboard-helper` 한 곳**(2026-09-12 이관).
+     예전엔 여기서 직접 `hidden` 을 씌웠는데, 그 시트는 온보딩 2.9초 뒤에 뜨므로 **치운 뒤에
+     다시 떠서** 뒤의 클릭을 전부 막았다(3번 중 1번 빨간불 · 실측). 헬퍼는 뜰 때까지 기다렸다
+     '나중에'를 눌러 **다시 뜨지 않게** 닫는다. */
+  await dismissNotify(page);
 
   const head = () => page.$eval('#detail-sheet .sheet-body', (e) => e.textContent.replace(/\s+/g, ' ').trim().slice(0, 30));
   const isOpen = () => page.evaluate(() => !document.querySelector('#detail-sheet').hidden);

@@ -3959,7 +3959,12 @@ function renderMy() {
      빈칸을 내놓으면 학생이 고른 것이 화면에서 사라져 '해당 없음'처럼 읽힌다(2026-09-03~09 실제로 그랬다). */
   const trackLabel = (TRACKS.find((t) => t.id === p.track) || {}).label || '-';
   const commonFilled = ['studentId', 'birth', 'phone', 'email', 'account'].filter((k) => c[k]).length;
-  const nameLine = `<p class="my-name">${esc(p.name || '대학생')} 님<span class="my-edit-hint">학적정보 수정 ›</span></p>`;
+  /* 🔴 **누를 수 있는 것은 이 버튼 하나다** (2026-09-12 개발자 지시). 전에는 카드 전체가
+     '프로필 수정' 버튼이라 표 아무 데나 눌러도 수정 화면으로 넘어갔다 — 학생이 제 성적을
+     확인하려고 표를 짚기만 해도 화면이 바뀌었다. span 이 아니라 button 이라야 키보드
+     Tab 으로 닿고 보조기기가 읽는다. 배선은 `#my-profile` 에 위임해 뒀다(다시 그려도 산다). */
+  const nameLine = `<p class="my-name">${esc(p.name || '대학생')} 님`
+    + `<button type="button" class="my-edit-hint">학적정보 수정 ›</button></p>`;
   $('#my-profile').innerHTML = `
     ${photoHeadHtml(p, nameLine)}
     ${/* 🔴 학과 칸은 **학생이 직접 치는 자유 입력**이다 — esc 를 빠뜨리면 `B<b>학과` 같은 글자에
@@ -4814,23 +4819,19 @@ function bindEvents() {
     });
   };
   onTap('#btn-home-profile', () => showScreen('my'));   // 홈 왼쪽 위 프로필 → MY
-  /* 🔴 캡처 단계로 먼저 잡는다 — 카드 전체가 '프로필 수정' 버튼이라
-     그냥 두면 '지우기'를 눌러도 수정 화면이 열려 버린다 */
+  /* 🔴 **카드 전체를 버튼으로 두지 않는다** (2026-09-12 개발자 지시 — "학적정보수정 부분만
+     눌렀을 때 수정가능하게"). 전에는 `onTap('#my-profile', …)` 로 카드 아무 데나 누르면
+     수정 화면이 열려, 학생이 성적·구간 표를 짚기만 해도 화면이 바뀌었다.
+     ⚠️ 그때 필요했던 **캡처 단계 가로채기 둘도 함께 걷었다** — 사진 단추·'지우기'가 카드로
+        번지는 것을 막던 장치라, 카드가 버튼이 아니게 된 지금은 할 일이 없다. 남은 것은
+        '지우기'가 실제로 하는 일 하나뿐이고, 위임이라 카드를 다시 그려도 산다. */
   $('#my-profile').addEventListener('click', (e) => {
-    /* 사진 올리기·삭제 단추 (2026-09-11) — 카드로 번지면 파일 창과 프로필 수정이 같이 열린다.
-       ⚠️ preventDefault 는 하지 않는다: label 의 기본 동작이 파일 창을 여는 것이다. */
-    if (e.target.closest('.my-photo-btns')) { e.stopPropagation(); return; }
+    if (e.target.closest('.my-edit-hint')) { editProfile(); return; }
     const del = e.target.closest('[data-forget]');
     if (!del) return;
-    e.stopPropagation();
     e.preventDefault();
     forgetLearned(del.dataset.forget);
-  }, true);
-  /* 키보드도 같다 — 카드의 Enter/스페이스 = 프로필 수정이라, 단추 위에서 누른 Enter 를 가로챈다 */
-  $('#my-profile').addEventListener('keydown', (e) => {
-    if (e.target.closest('.my-photo-btns')) e.stopPropagation();
-  }, true);
-  onTap('#my-profile', editProfile);                     // MY 맨 위 카드 → 프로필 수정
+  });
 
   /* 🔴 브라우저 confirm 을 쓰지 않는다 — 그 창은 앱이 아니라 브라우저가 만드는 것이라
      무엇이 지워지는지 목록으로 보여 줄 수 없고, 확인·취소 두 버튼밖에 못 넣는다.

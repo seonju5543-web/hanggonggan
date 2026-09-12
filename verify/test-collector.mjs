@@ -4296,9 +4296,26 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
     /rec\.dataUrl \? \{ dataUrl: rec\.dataUrl \}/.test(appJs) && /rec\.dataUrl \|\| await blobToDataUrl\(rec\.blob\)/.test(appJs), true);
   eq('초안 서버로 가는 서류 목록에 사진 칸이 섞이지 않는다',
     /k !== 'welfare' && k !== 'photo'/.test(readText(new URL('../essay.js', import.meta.url))), true);
-  eq('사진 단추 클릭이 카드의 프로필 수정으로 번지지 않는다 (캡처 단계에서 멈춤)',
-    /closest\('\.my-photo-btns'\)\) \{ e\.stopPropagation\(\); return; \}/.test(appJs), true);
-  eq('  키보드 Enter 도 같다', /keydown[\s\S]{0,120}closest\('\.my-photo-btns'\)\) e\.stopPropagation\(\)/.test(appJs), true);
+  /* 🔴 **뜻은 그대로, 재는 자리를 옮겼다** (2026-09-12). 예전엔 캡처 단계 가로채기가
+     코드에 있는지를 봤는데, 그 장치는 **카드 전체가 버튼이던 시절**에 사진 단추를 눌러도
+     수정 화면이 같이 열리는 것을 막으려던 것이다. 개발자 지시로 카드가 버튼이 아니게 되어
+     그 가로채기를 걷었으니, 이제는 **겹칠 수 없다는 것 자체**를 본다.
+     ⚠️ 카드를 다시 버튼으로 만들면 이 줄이 빨간불이 되고, 그때 가로채기도 같이 살려야 한다.
+     '사진 단추를 눌러도 안 넘어간다'는 실제 동작은 `verify-settings.js` 가 브라우저로 잰다. */
+  eq('프로필 카드가 통째로 버튼이 아니다 (그래야 사진 단추와 겹칠 일이 없다)',
+    /id="my-profile" class="my-card"><\/div>/.test(html), true);
+  /* 🔴 **마크업만 보면 반쪽이다** (2026-09-12 코드 리뷰가 잡았다) — `role`·`tabindex` 를
+     안 붙여도 app.js 에서 카드에 `onTap` 을 다시 걸면 버그가 그대로 돌아오는데 위 줄은
+     초록이다. 그 배선까지 없는지 함께 본다. */
+  /* ⚠️ **주석까지 세면 안 된다** — app.js 의 그 자리 주석이 걷어낸 옛 배선을
+     `onTap('#my-profile', …)` 로 **인용**하고 있어, 날글자로 재면 제대로 고쳐 놓고도
+     빨간불이 된다(만들면서 실제로 그랬다). 블록 주석을 지우고 진짜 코드만 본다.
+     🔴 **줄머리 `/*` 만 주석으로 본다** — 아무 `/*` 나 주석 시작으로 읽으면
+     `accept` 의 `image/` 뒤에 붙은 별표(app.js)에 걸려 **거기서 다음 닫는 표시까지 진짜 코드가 통째로
+     지워진다**(실측: `bindPhotoButtons` 가 사라져 이 관문의 눈이 멀었다). 2026-09-12 코드 리뷰. */
+  const appCode = appJs.replace(/^[ \t]*\/\*[\s\S]*?\*\//gm, '');
+  eq('  app.js 도 카드 전체에 손짓을 걸지 않는다',
+    /onTap\(\s*'#my-profile'/.test(appCode), false);
   eq('지우기는 삭제가 아니라 휴지통으로 옮기기다 (walletDeleteSlot 그대로)', /walletDeleteSlot\(PHOTO_SLOT\)/.test(appJs), true);
   eq('CSP 가 blob:·data: 그림을 허용한다 (사진이 안 보이면 이 줄부터)', /img-src [^;]*blob:/.test(html) && /img-src [^;]*data:/.test(html), true);
   eq('시작할 때 사진을 읽어 홈 동그라미까지 채운다', /walletRefresh\(\)\.then\(photoRefresh\)/.test(appJs), true);

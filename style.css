@@ -672,7 +672,22 @@ input::placeholder { color: var(--text-weak); }
   margin-bottom: 16px;
 }
 .my-name { font-size: var(--t-2xl); font-weight: 800; letter-spacing: -0.02em; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
-.my-edit-hint { font-size: var(--t-sm); font-weight: 700; color: var(--primary); white-space: nowrap; }
+/* 🔴 **이 자리만 눌러서 학적정보 수정으로 간다** (2026-09-12 개발자 지시 — 전에는 카드
+   전체가 버튼이라 표 아무 데나 눌러도 넘어갔다). 그래서 span 이 아니라 진짜 `<button>` 이다 —
+   버튼이어야 키보드 Tab 으로 닿고 보조기기가 '누를 수 있는 것'이라고 읽는다.
+   ⚠️ 전역 `button` 초기화(146줄)가 글꼴·색·바탕·테두리·손모양까지 이미 지운다 — 여기서
+      더 지울 것은 **브라우저 기본 여백**뿐이다(안 지우면 글자 옆이 벌어진다). */
+.my-edit-hint {
+  font-size: var(--t-sm); font-weight: 700; color: var(--primary); white-space: nowrap;
+  /* 🔴 **손가락이 닿을 만큼 넓힌다 · 다만 글자는 제자리** (2026-09-12 코드 리뷰) — 이제
+     수정으로 가는 문이 이 글자 하나뿐인데 글자 높이는 21px 이라 폰에서 자주 빗나간다.
+     여백으로 누를 자리를 넓히고 같은 크기의 음수 여백으로 되돌려, **보이는 자리는 그대로**
+     두면서 닿는 자리만 44px 쪽으로 키운다. ⚠️ 전역 `button` 초기화(146줄)가 글꼴·색·바탕·
+     테두리·손모양은 이미 지웠다 — 여기서 정하는 것은 누를 자리뿐이다. */
+  padding: var(--sp-2) var(--sp-1); margin: calc(var(--sp-2) * -1) calc(var(--sp-1) * -1);
+  -webkit-tap-highlight-color: transparent;
+}
+.my-edit-hint:active { opacity: 0.6; }
 .my-line { font-size: var(--t-md); color: var(--text-sub); margin: 4px 0 18px; }
 .my-grid {
   display: grid;
@@ -2456,6 +2471,12 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 .swipe-row > .sch-card { background: var(--surface); }
 
 /* ── ② MY의 네모 타일 → 정의 목록 ───────────────────────────────── */
+/* 🔴 **알림 절만 아래 여백을 줄인다** (2026-09-12 개발자 지시 "알림과 기타 사이 간격이 너무
+   커서 줄여"). 실측: 계정→알림 은 눈에 보이는 것끼리 49px 인데 알림→기타 는 **62px** 이었다.
+   구조상 두 칸의 간격은 똑같은데(24 + 6 + 1 + 18), **알림의 마지막 줄이 제 여백 11px 을
+   이미 갖고 있고 그 밑에 구분선도 없어서** 그만큼 더 벌어져 보인 것이다. 그 겹친 몫만 뺀다. */
+#my-notify { padding-bottom: var(--space-12); }
+
 .my-card {
   background: transparent;
   border: 0;

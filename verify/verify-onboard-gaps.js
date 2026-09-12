@@ -100,7 +100,9 @@ const eq = (label, got, want) => {
   await page.click('#btn-finish-onboard');
   await dismissNotify(page);
   await page.click('.nav-item[data-nav="my"]');
-  await page.click('#my-profile');
+  /* ⚠️ 2026-09-12 부터 **카드가 아니라 그 안의 버튼**을 눌러야 수정으로 간다
+     (개발자 지시 — 표를 짚기만 해도 넘어가던 것을 막았다). */
+  await page.click('.my-edit-hint');
   await page.waitForTimeout(300);
   eq('고치러 들어오면 1단계부터', await stepNow(), 1);
   eq('그 자리에는 취소가 있다', await page.isVisible('.onboard-step[data-step="1"] .btn-onboard-cancel'), true);
