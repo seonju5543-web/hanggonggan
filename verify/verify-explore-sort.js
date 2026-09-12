@@ -198,6 +198,19 @@ const PROFILE = {
   await page.click('.nav-item[data-nav="home"]');
   await page.waitForSelector('#screen-home:not([hidden])');
   await page.waitForTimeout(1500);            // 히어로 countUp(900ms)이 멈출 때까지
+  /* 🔴 **오늘 데이터에 기대지 않는다** (2026-09-12 코드 리뷰). 지금은 마감 7일 안쪽 공고가
+     27건이지만 한가한 주에는 0이 될 수 있고, 그러면 이 절이 앱은 멀쩡한데 빨간불이 된다
+     (조용히 건너뛰는 것도 나쁘다 — 그물이 걷힌 줄 아무도 모른다). verify-interactions 가
+     쓰는 방식 그대로 임박 공고를 심어 둔다. 심어도 규칙은 그대로라 아래 대조는 유효하다. */
+  await page.evaluate(() => {
+    const iso = (n) => new Date(Date.now() + n * 86400000).toLocaleDateString('sv-SE');
+    registeredList = registeredList.concat([1, 2, 3, 4].map((n) => ({
+      id: `fixture-home-d${n}`, name: `검사용 마감 임박 ${n}`, provider: '검사', type: '교외',
+      amount: '검사', amountValue: 0, deadline: iso(n),
+    })));
+    renderHome();
+  });
+  await page.waitForTimeout(1200);
   const home = await page.evaluate(() => {
     const cand = getMatches().filter((m) => m.result.status !== 'ineligible'
       && dday(m.sch.deadline).days >= 0 && notStale(m.sch));
@@ -212,20 +225,20 @@ const PROFILE = {
       임박: cand.filter((m) => dday(m.sch.deadline).cls === 'urgent').length,
       보임: shown,
       그려둠: document.querySelectorAll('#home-deadline-list > *').length,
-      기대: want.slice(0, 3).map((m) => m.sch.id),
-      /* 🔴 **화면에 실제로 오른 카드**의 적합도를 본다 — 여기서 want 를 쓰면 검사가
-         제 계산을 제 계산과 대조하는 동어반복이 된다(고쳐 봐도 영영 초록불). */
-      오른최저: Math.min(...shown.map((id) => (cand.find((m) => m.sch.id === id) || { fit: 0 }).fit)),
-      임박최고미게재: Math.max(0, ...cand.filter((m) => dday(m.sch.deadline).cls === 'urgent'
-        && !shown.includes(m.sch.id)).map((m) => m.fit)),
+      기대: want.slice(0, HOME_DEADLINE_TOP).map((m) => m.sch.id),
       금액: (document.querySelector('#hero-amount') || {}).textContent,
+      펴는장수: HOME_DEADLINE_TOP,   /* '셋'을 여기 박지 않는다 — 앱이 쓰는 상수를 그대로 읽는다 */
     };
   });
-  eq('홈에 띄울 후보가 있다 (검사가 헛돌지 않는다)', home.후보 > 3 && home.임박 > 3, true);
-  eq('석 장만 편다', home.보임.length, 3);
-  eq('나머지는 그려 두고 가린다 (다시 그리지 않으려고)', home.그려둠 > 3, true);
-  eq('그 석 장이 앱의 규칙과 같은 차례다', home.보임, home.기대);
-  eq('임박한데 적합도가 더 높은 카드를 두고 내려가지 않는다', home.오른최저 >= home.임박최고미게재, true);
+  eq('홈에 띄울 후보가 있다 (검사가 헛돌지 않는다)',
+    home.후보 > home.펴는장수 && home.임박 > home.펴는장수, true);
+  eq('상수가 말하는 장수만 편다', home.보임.length, home.펴는장수);
+  eq('나머지는 그려 두고 가린다 (다시 그리지 않으려고)', home.그려둠 > home.펴는장수, true);
+  /* 🔴 차례는 **앱의 규칙으로 만든 기대값**과 통째로 대조한다. 예전엔 여기에 '오른 카드의
+     적합도가 못 오른 임박 카드보다 낮지 않다'를 덧붙였는데, 그건 앱이 `fitRank` 를 먼저 보는
+     것을 무시한 규칙이라 **앱이 맞는 날에도 빨간불**이 될 수 있었다(자격 미확인 35점이
+     확인된 33점보다 위로 가는 날). 이 한 줄이 이미 순서 전체를 지킨다. */
+  eq('편 카드가 앱의 규칙과 같은 차례다', home.보임, home.기대);
 
   /* 더보기 — **다시 그리지 않고 편다**(히어로 금액이 또 세어 올라가면 안 된다).
      🔴 클릭을 page.click 으로 하면 Playwright 가 버튼을 화면 안으로 스크롤해서
@@ -245,8 +258,9 @@ const PROFILE = {
   eq('스크롤도 그대로다', open.y, before.y);
   await page.$eval('#home-deadline-more', (b) => b.click());
   await page.waitForTimeout(250);
-  eq('다시 누르면 석 장으로 접힌다',
-    await page.$$eval('#home-deadline-list > *', (e) => e.filter((x) => x.offsetParent !== null).length), 3);
+  eq('다시 누르면 상수가 말하는 장수로 접힌다',
+    await page.$$eval('#home-deadline-list > *', (e) => e.filter((x) => x.offsetParent !== null).length),
+    home.펴는장수);
 
   console.log('\nERRORS:', errors.length ? errors : 'none');
   if (errors.length) fail++;

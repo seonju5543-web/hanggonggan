@@ -1465,6 +1465,9 @@ function renderHome() {
   deadlineList.innerHTML = upcoming.length
     ? upcoming.map((m) => schCard(m.sch, m.result, { compact: true, fit: m.fit, fd: m.fd })).join('')
     : '<p class="empty">지금 신청할 수 있는 장학금이 없어요<br /><span class=\"empty-sub\">프로필을 채우면 더 많이 찾을 수 있어요</span></p>';
+  /* 앞의 HOME_DEADLINE_TOP 장을 뺀 나머지에 표를 붙인다 — 가리는 것은 style.css 가 한다.
+     '몇 장'은 이 상수 하나에만 산다(CSS 에 숫자를 두면 둘이 갈라진다). */
+  [...deadlineList.children].forEach((el, i) => el.classList.toggle('home-extra', i >= HOME_DEADLINE_TOP));
   deadlineList.classList.toggle('more-open', homeDeadlineOpen);
   const moreBtn = $('#home-deadline-more');
   moreBtn.hidden = upcoming.length <= HOME_DEADLINE_TOP;
