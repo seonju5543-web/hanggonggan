@@ -803,6 +803,101 @@ const eq = (label, got, want) => {
     await c2.close();
   }
 
+  /* ── 구분선 — 불필요한 것이 되돌아오지 않는다 (2026-09-12 개발자 지시) ──
+     *"현재 불필요한 구분선 삭제 부탁해. 구분선이 너무 많은 느낌이 들어"*
+     🔴 **눈으로 세지 말고 그려 놓고 센다** — 처음엔 CSS 를 읽고 짐작했는데, 실제로 그려
+        보니 MY 한 화면에 가로줄이 21개였고 그중 다섯은 **다른 줄 바로 옆에 붙은 중복**이었다.
+     🔴 이 절이 막는 것은 **세 가지 되돌림**이다: ① 학적정보 표에 칸마다 줄을 다시 긋는 것
+        ② 빈 안내문이 이미 줄이 있는 자리에서 제 윗줄을 또 긋는 것 ③ 그 둘이 아니더라도
+        MY 의 가로줄 수가 지금보다 **늘어나는 것**(톱니 — 지금 값이 천장이다).
+     ⚠️ 알약·버튼의 테두리는 위아래가 같은 요소라 함께 세어진다. 천장은 그 상태로 잰 값이다. */
+  console.log('\n■ 구분선 — 불필요한 줄이 되돌아오지 않는다');
+  {
+    const 가로줄 = (pg) => pg.evaluate(() => {
+      let n = 0;
+      const 보이는줄 = (cs, side) => parseFloat(cs[`border${side}Width`])
+        && cs[`border${side}Style`] !== 'none'
+        && cs[`border${side}Color`] !== 'rgba(0, 0, 0, 0)';
+      for (const el of document.querySelectorAll('*')) {
+        const r = el.getBoundingClientRect();
+        if (!r.width || !r.height) continue;
+        if (el.offsetParent === null && getComputedStyle(el).position !== 'fixed') continue;
+        const cs = getComputedStyle(el);
+        /* 🔴 **테두리와 구분선을 가른다** — 알약·동그라미·테두리 버튼은 네 면이 다 있고,
+           구분선은 위나 아래 **한쪽뿐**이다. 안 가르면 사진 동그라미·적합도 알약·당겨서
+           새로고침의 고리까지 '구분선'으로 세어져 이 숫자가 뜻을 잃는다(실측으로 드러났다). */
+        if (보이는줄(cs, 'Left') && 보이는줄(cs, 'Right')) continue;
+        for (const side of ['Top', 'Bottom']) {
+          if (!parseFloat(cs[`border${side}Width`])) continue;
+          if (cs[`border${side}Style`] === 'none') continue;
+          if (cs[`border${side}Color`] === 'rgba(0, 0, 0, 0)') continue;
+          n += 1;
+        }
+      }
+      return n;
+    });
+
+    await page.click('.nav-item[data-nav="my"]');
+    await page.waitForSelector('#screen-my:not([hidden])');
+    await page.waitForTimeout(600);
+
+    /* ① 학적정보 표 — 칸마다 긋던 줄이 없다(윗줄 하나는 남는다) */
+    const 표 = await page.$$eval('.my-grid > div', (els) => els.map((e) =>
+      parseFloat(getComputedStyle(e).borderBottomWidth)));
+    eq(`  (검사가 무력하지 않은지 — 표의 칸을 실제로 찾았다: ${표.length}칸)`, 표.length >= 3, true);
+    eq('🔴 학적정보 표에 칸마다 줄을 긋지 않는다', 표.every((w) => !w), true);
+    eq('  다만 표를 윗블록과 가르는 줄 하나는 남는다',
+      parseFloat(await page.$eval('.my-grid', (e) => getComputedStyle(e).borderTopWidth)) > 0, true);
+
+    /* ② 빈 안내문이 이미 줄이 있는 자리에서 윗줄을 또 긋지 않는다 */
+    const 빈안내 = await page.$$eval('.empty', (els) => els
+      .filter((e) => e.offsetParent)
+      .map((e) => ({
+        첫자식: e.previousElementSibling === null,
+        마이카드: !!e.closest('.my-card'),
+        윗줄: parseFloat(getComputedStyle(e).borderTopWidth) || 0,
+      })));
+    eq(`  (검사가 무력하지 않은지 — 빈 안내문을 실제로 찾았다: ${빈안내.length}개)`, 빈안내.length > 0, true);
+    eq('🔴 이미 줄이 있는 자리의 빈 안내문은 제 윗줄을 안 그린다',
+      빈안내.filter((x) => (x.첫자식 || x.마이카드) && x.윗줄).length, 0);
+
+    /* ②-b 🔴 **MY 만 보면 반쪽이다** (2026-09-12 코드 리뷰) — MY 에 보이는 빈 안내문은
+       `.my-card` 안의 것 하나뿐이라, `.empty:first-child` 를 통째로 지워도 위 줄이 초록이다.
+       그 쪽이 실제로 일하는 자리는 **홈**이다(빈 목록이 `.card-list` 의 첫 자식이고,
+       바로 위 `.section-head` 가 이미 줄을 그었다). 그래서 홈까지 가서 본다. */
+    await page.click('.nav-item[data-nav="home"]');
+    await page.waitForSelector('#screen-home:not([hidden])');
+    await page.waitForTimeout(600);
+    /* ⚠️ 그 자리는 **목록이 비었을 때만** 생기므로 세션 상태에 기대면 안 된다(실측: 이
+       드라이버의 홈에는 0개였다). 앱이 실제로 그리는 모양(`.section-head` + `.card-list`
+       첫 자식 `.empty`)을 그대로 넣어 재고 바로 치운다 — 재는 것은 CSS 규칙 하나다. */
+    const 홈빈안내 = await page.evaluate(() => {
+      const host = document.createElement('div');
+      host.innerHTML = '<div class="section-head"><h3>검사용</h3></div>'
+        + '<div class="card-list"><p class="empty" id="__probe">비었어요</p></div>';
+      document.querySelector('#screen-home').append(host);
+      const probe = document.querySelector('#__probe');
+      const got = {
+        붙었나: !!probe.offsetParent && probe.previousElementSibling === null,
+        윗줄: parseFloat(getComputedStyle(probe).borderTopWidth) || 0,
+      };
+      host.remove();
+      return got;
+    });
+    eq('  (검사가 무력하지 않은지 — 홈에 빈 목록 모양을 실제로 넣어 쟀다)', 홈빈안내.붙었나, true);
+    eq('🔴 홈에서도 첫 자식 빈 안내문은 제 윗줄을 안 그린다', 홈빈안내.윗줄, 0);
+    await page.click('.nav-item[data-nav="my"]');
+    await page.waitForSelector('#screen-my:not([hidden])');
+    await page.waitForTimeout(600);
+
+    /* ③ 톱니 — MY 의 가로줄이 지금보다 늘지 않는다 */
+    const MY천장 = 10;   /* 톱니 — 줄이면 이 숫자도 같이 내린다. 이 세는 법(테두리 제외)으로
+                            재면 고치기 전이 15개였다. ⚠️ 21 은 테두리까지 세던 옛 숫자다. */
+    const my = await 가로줄(page);
+    eq(`🔴 MY 의 가로줄이 ${MY천장}개를 넘지 않는다 (지금 ${my}개 · 줄이면 이 숫자도 같이 내린다)`,
+      my <= MY천장, true);
+  }
+
   console.log(errors.length ? '\n❌ 오류:\n' + errors.join('\n') : '\n✓ 콘솔 오류 없음');
   if (errors.length) fail++;
   await browser.close();

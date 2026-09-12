@@ -2492,6 +2492,11 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
   margin: 14px 0 10px;
   border-top: 1px solid var(--line);
 }
+/* 🔴 **칸마다 줄을 긋지 않는다** (2026-09-12 개발자 지시 "구분선이 너무 많은 느낌") —
+   학적정보는 네 줄짜리 요약표라 **이름은 왼쪽·값은 굵게 오른쪽**으로 이미 갈라져 있는데,
+   칸마다 밑줄을 그으니 작은 블록에 줄이 다섯(윗줄 + 칸 넷)이라 장부처럼 보였다.
+   구역을 가르는 `.my-grid` 윗줄 하나만 남긴다. ⚠️ 서류 보관함·설정 목록의 줄은 **남긴다** —
+   거기는 눌러서 쓰는 목록이라 줄이 항목의 경계를 맡는다. */
 .my-grid > div {
   display: flex;
   align-items: baseline;
@@ -2499,10 +2504,17 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
   gap: 12px;
   background: transparent;
   border: 0;
-  border-bottom: 1px solid var(--line);
   border-radius: 0;
   padding: 11px 0;
 }
+/* 🔴 **빈 안내문은 제 윗줄을 그리지 않는다** (2026-09-12 개발자 지시 "구분선이 너무 많은 느낌").
+   `.empty` 는 목록이 비었을 때 목록 자리에 들어가므로 윗줄로 목록의 시작을 표시했는데,
+   그 위에 이미 줄이 있는 자리가 둘 있었다 — MY 「보관함」은 `.my-card` 윗줄 바로 아래라
+   제목이 **선 두 개 사이에** 끼었고, 홈의 빈 목록은 `.section-head` 윗줄과 겹쳤다.
+   ⚠️ `.section-head + .empty` 로는 안 잡힌다(실측) — 홈의 빈 안내문은 머리글의 형제가
+      아니라 `.card-list` 의 **첫 자식**이다. 구역 경계는 그 위에서 이미 그려져 있다. */
+.my-card .empty,
+.empty:first-child { border-top: 0; }
 .my-grid span { font-size: var(--t-sm); color: var(--text-sub); }
 .my-grid strong { font-size: var(--t-md); font-weight: 650; }
 .my-menu { border-top: 1px solid var(--line); }
