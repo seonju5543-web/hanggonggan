@@ -110,6 +110,8 @@ const D = {
   reg: [], notices: [], forms: {}, health: {}, schools: [], targets: [],
   linkHunt: {}, pending: [], autoCfg: { enabled: true, blockIds: [] }, log: [],
   updatedAt: '', deployAhead: null,
+  /* 인스타(2026-09-12) — 장부·판형·통계·댓글·토큰 지문·견본. 전부 파일이다(인스타에 직접 안 묻는다) */
+  insta: { seen: { posted: [], prepared: [] }, templates: [], stats: { history: [], posts: [] }, comments: { items: [] }, token: null, samples: { templates: [] } },
   failed: [],   // 읽지 못한 파일 — 비어 있지 않으면 화면 숫자를 믿으면 안 된다
 };
 
@@ -207,6 +209,23 @@ async function loadAll() {
   D.pending = pending.items || [];
   D.autoCfg = autoCfg || { enabled: true, blockIds: [] };
   D.log = (log.items || []).slice().reverse();   // 최신이 위로
+
+  /* 인스타 — stats·comments·token-seen·samples 는 **아직 없을 수 있는** 파일이라(계정 연결 전·견본 전)
+     404 를 '못 읽음' 경고로 세지 않는다. seen·templates 는 저장소에 늘 있으니 실패하면 경고에 든다. */
+  const quiet = async (path, fallback) => {
+    try { const r = await fetch(raw(path), { cache: 'no-store' }); return r.ok ? await r.json() : fallback; }
+    catch (e) { return fallback; }
+  };
+  const [igSeen, igTpl, igStats, igCmts, igTok, igSamples] = await Promise.all([
+    readJson('insta/seen.json', { posted: [], prepared: [] }),
+    readJson('insta/templates.json', { templates: [] }),
+    quiet('insta/stats.json', { history: [], posts: [] }),
+    quiet('insta/comments.json', { items: [] }),
+    quiet('insta/token-seen.json', null),
+    quiet('insta/samples/index.json', { templates: [] }),
+  ]);
+  D.insta = { seen: { posted: igSeen.posted || [], prepared: igSeen.prepared || [] }, templates: igTpl.templates || [],
+    stats: igStats || { history: [], posts: [] }, comments: igCmts || { items: [] }, token: igTok, samples: igSamples || { templates: [] } };
 
   /* 앱1(main)까지 반영됐는지 — 기본 브랜치가 앞서 있으면 배포 대기 */
   try {
@@ -422,7 +441,7 @@ async function applyAction(action, payload, label) {
 }
 
 /* ---------------- 화면 전환 ---------------- */
-const SCREENS = ['todo', 'list', 'review', 'forms', 'network', 'robots', 'quality'];
+const SCREENS = ['todo', 'list', 'review', 'forms', 'network', 'robots', 'insta', 'quality'];
 let current = 'todo';
 
 function show(name) {
@@ -452,7 +471,7 @@ const screenFromHash = () => {
 function renderScreen(name) {
   ({ todo: renderTodo, list: renderList, review: renderReview,
     forms: renderForms, network: renderNetwork, robots: renderRobots,
-    quality: renderQuality }[name] || (() => {}))();
+    insta: renderInsta, quality: renderQuality }[name] || (() => {}))();
   markScrollers(byId(`screen-${name}`));
 }
 
@@ -553,6 +572,7 @@ function renderCounts() {
   const rb = byId('n-robots');
   if (rb && !rb.dataset.filled) { rb.textContent = '—'; rb.className = 'tab-n'; }
   set('n-quality', probs, true);
+  set('n-insta', instaGroups().prepared.length + instaNewComments().length, true);   // 눌러야 할 것 = 게시 대기 + 답 안 한 댓글
 }
 
 /* ---------------- ① 오늘 할 일 ---------------- */
@@ -1297,6 +1317,304 @@ function issueKind(t) {
   return { k: 'other', label: '기타', tone: '' };
 }
 
+/* ================= 인스타 (2026-09-12 개발자 지시 ⑥) =================
+   "채팅 말고도 게시물 관리·업로드 관리·트랙션·댓글까지 관리자 페이지에서."
+   원칙은 다른 화면과 같다 —
+   ① 화면은 **파일만 읽는다**(insta/seen.json · stats.json · comments.json · templates.json).
+      인스타에 직접 묻지 않는다: 토큰은 워크플로(서버)에만 있고, 화면에 주면 여는 사람 전부가 계정에 글을 쓸 수 있다.
+   ② 버튼은 **워크플로를 깨운다**(insta.yml · insta-stats.yml · insta-comments.yml). 게시·답글·삭제는
+      되돌릴 수 없어 askSheet 로 한 번 더 묻는다.
+   ③ 그림은 기본 브랜치의 raw 주소로 본다 — Pages 배포(약 2분) 전에도 보이고, 이 화면이 읽는 장부와 같은 판이다. */
+const WF_INSTA = 'insta.yml';
+const WF_INSTA_STATS = 'insta-stats.yml';
+const WF_INSTA_COMMENTS = 'insta-comments.yml';
+/* 🔴 이 글자들은 insta.yml 의 step 선택지와 **한 글자도** 다르면 안 된다 — 다르면 GitHub 이 422 로 거부한다.
+   관문: verify-insta.js C11 이 워크플로 파일과 대조한다. */
+const INSTA_STEP = {
+  prepare: '준비 (새 공고를 그리고 알린다)',
+  publish: '게시 (준비된 것을 올린다)',
+  notify: '알림 (준비된 카드를 다시 보낸다)',
+  skip: '건너뛰기 (이 공고는 안 올린다)',
+};
+const IG_LIFE_DAYS = 60;   // insta/token-days.mjs 의 LIFE_DAYS 와 같은 뜻 — 화면은 '우리가 아는 한' 만 말한다
+
+function instaTplName(no) {
+  const t = (D.insta.templates || []).find((x) => x.no === no);
+  return t ? `${t.no}번 ${t.name}` : (no ? `${no}번` : '판형 ?');
+}
+function instaDday(due) {
+  if (!due) return { cls: '', label: '마감 원문 확인' };
+  const d = Math.round((Date.parse(`${due}T23:59:59+09:00`) - Date.now()) / 864e5);
+  if (Number.isNaN(d)) return { cls: '', label: '마감 원문 확인' };
+  if (d < 0) return { cls: 'past', label: '마감 지남' };
+  return { cls: d <= 3 ? 'near' : d <= 7 ? 'soon' : '', label: d === 0 ? '오늘 마감' : `D-${d}` };
+}
+function instaGroups() {
+  const seen = D.insta.seen || { posted: [], prepared: [] };
+  const postedCodes = new Set((seen.posted || []).map((p) => p.code));
+  const prepared = (seen.prepared || []).filter((p) => p.status === 'prepared' && !postedCodes.has(p.code));
+  const skipped = (seen.prepared || []).filter((p) => p.status === 'skipped' && !postedCodes.has(p.code));
+  const posted = (seen.posted || []).slice().reverse();
+  return { prepared, skipped, posted };
+}
+function instaNewComments() {
+  return (D.insta.comments.items || []).filter((c) => !c.error && !c.handledAt && !c.hidden);
+}
+
+function instaPostRow(p, kind) {
+  const dd = instaDday(p.due);
+  const stat = kind === 'posted' ? (D.insta.stats.posts || []).find((s) => s.code === p.code || s.id === String(p.media)) : null;
+  const tpls = D.insta.templates || [];
+  const meta = [
+    `<span>${esc(p.org || '')}</span>`,
+    p.school ? `<span>${esc(p.school)} 교내</span>` : '',
+    `<span>${esc(instaTplName(p.tplNo))}</span>`,
+    kind === 'posted' ? `<span>올림 ${esc(p.at || '')}</span>` : `<span>준비 ${esc(p.at || '')}${p.revisedAt && p.revisedAt !== p.at ? ` · 고침 ${esc(p.revisedAt)}` : ''}</span>`,
+    kind === 'skipped' ? `<span>건너뜀 ${esc(p.skippedAt || '')}${p.skippedBy ? ` · ${esc(p.skippedBy)}` : ''}</span>` : '',
+    stat ? `<span>좋아요 ${stat.likes ?? '—'} · 댓글 ${stat.comments ?? '—'} · 저장 ${stat.saved ?? '—'} · 도달 ${stat.reach ?? '—'}</span>` : '',
+  ].filter(Boolean).join('');
+  const thumb = `<img class="ig-thumb" src="${raw(`insta/pub/${p.code}/1.jpg`)}" alt="" loading="lazy" width="54" height="68">`;
+  const acts = kind === 'prepared' ? `
+      <button class="btn btn-sm btn-primary" data-ig-publish="${esc(p.code)}">게시</button>
+      <button class="btn btn-sm" data-ig-view="${esc(p.code)}">카드 보기</button>
+      <select class="ig-tpl" data-ig-tpl-for="${esc(p.code)}" aria-label="판형 바꾸기">
+        ${tpls.map((t) => `<option value="${t.no}"${t.no === p.tplNo ? ' selected' : ''}>${t.no}번 ${esc(t.name)}</option>`).join('')}
+      </select>
+      <button class="btn btn-sm" data-ig-redraw="${esc(p.code)}">이 판형으로 다시 그리기</button>
+      <button class="btn btn-sm danger" data-ig-skip="${esc(p.code)}">건너뛰기</button>`
+    : kind === 'skipped' ? `
+      <button class="btn btn-sm" data-ig-view="${esc(p.code)}">카드 보기</button>
+      <button class="btn btn-sm" data-ig-redraw="${esc(p.code)}">다시 그려서 되살리기</button>`
+    : `${p.permalink ? `<a class="btn btn-sm" href="${safeUrl(p.permalink)}" target="_blank" rel="noreferrer noopener">인스타에서 보기 ↗</a>` : ''}
+      <button class="btn btn-sm" data-ig-view="${esc(p.code)}">카드 보기</button>`;
+  return `
+    <div class="row ig-row" data-noclick style="cursor:default" data-ig-code="${esc(p.code)}">
+      <div class="ig-main">${thumb}<div>
+        <div class="t">${esc(p.name || p.code)}</div>
+        <div class="m">${meta}</div>
+        <div class="btn-row ig-acts">${acts}</div>
+      </div></div>
+      <div class="dd ${dd.cls}">${esc(dd.label)}</div>
+      <div></div>
+    </div>`;
+}
+
+/* 트랙션 — 단일 계열 선 그래프(팔로워) + 게시물별 막대(저장). 축은 하나, 색은 남색 하나. */
+function instaLine(hist, key, label) {
+  const pts = (hist || []).filter((h) => typeof h[key] === 'number');
+  if (pts.length < 2) return `<p class="muted">${esc(label)} — 이틀 이상 쌓이면 선이 그려집니다 (지금 ${pts.length}일치).</p>`;
+  const W = 640, H = 160, L = 36, R = 12, T = 14, B = 26;
+  const xs = (i) => L + (i * (W - L - R)) / (pts.length - 1);
+  const vals = pts.map((p) => p[key]);
+  const lo = Math.min(...vals), hi = Math.max(...vals);
+  const ys = (v) => hi === lo ? T + (H - T - B) / 2 : T + ((hi - v) * (H - T - B)) / (hi - lo);
+  const d = pts.map((p, i) => `${i ? 'L' : 'M'}${xs(i).toFixed(1)},${ys(p[key]).toFixed(1)}`).join(' ');
+  const last = pts[pts.length - 1];
+  return `<svg class="ig-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(label)} 추이">
+    <line x1="${L}" y1="${H - B}" x2="${W - R}" y2="${H - B}" class="axis"/>
+    <text x="${L - 6}" y="${T + 4}" class="tick" text-anchor="end">${hi}</text>
+    <text x="${L - 6}" y="${H - B}" class="tick" text-anchor="end">${lo}</text>
+    <text x="${L}" y="${H - 8}" class="tick">${esc(pts[0].at)}</text>
+    <text x="${W - R}" y="${H - 8}" class="tick" text-anchor="end">${esc(last.at)}</text>
+    <path d="${d}" class="line"/>
+    ${pts.map((p, i) => `<circle cx="${xs(i).toFixed(1)}" cy="${ys(p[key]).toFixed(1)}" r="4" class="dot"><title>${esc(p.at)} · ${esc(label)} ${p[key]}</title></circle>`).join('')}
+  </svg>`;
+}
+function instaBars(posts, key, label) {
+  const rows = (posts || []).filter((p) => typeof p[key] === 'number').slice(0, 12);
+  if (!rows.length) return `<p class="muted">${esc(label)} — 올린 게시물의 반응이 들어오면 막대가 그려집니다.</p>`;
+  const hi = Math.max(...rows.map((p) => p[key]), 1);
+  return `<div class="ig-bars" role="img" aria-label="게시물별 ${esc(label)}">${rows.map((p) => `
+    <div class="ig-bar"><span class="ig-bar-l" title="${esc(p.name || p.id)}">${esc((p.name || p.org || p.id).slice(0, 18))}</span>
+      <span class="ig-bar-t"><i style="width:${Math.max(2, Math.round((p[key] / hi) * 100))}%"></i></span>
+      <span class="ig-bar-v">${p[key]}</span></div>`).join('')}</div>`;
+}
+
+function renderInsta() {
+  const box = byId('screen-insta');
+  const { prepared, skipped, posted } = instaGroups();
+  const tk = D.insta.token;
+  const st = D.insta.stats;
+  const newC = instaNewComments();
+  const tokenCard = !tk || !tk.firstSeen
+    ? `<div class="card is-warn"><div class="v">연결 전</div><div class="k">인스타 계정</div>
+        <div class="d">시크릿 IG_USER_ID·IG_ACCESS_TOKEN 이 아직 없습니다. 카드 준비·메일은 되지만 <b>게시는 안 됩니다.</b> 절차는 insta/README.md 「처음 한 번」.</div></div>`
+    : (() => {
+      const days = IG_LIFE_DAYS - Math.round((Date.now() - Date.parse(`${tk.firstSeen}T00:00:00+09:00`)) / 864e5);
+      return `<div class="card ${days <= 0 ? 'is-bad' : days <= 14 ? 'is-warn' : 'is-ok'}"><div class="v">${days <= 0 ? '만료' : `${days}일`}</div>
+        <div class="k">토큰 남은 수명 (우리가 아는 한)</div>
+        <div class="d">처음 본 날 ${esc(tk.firstSeen)} 에서 60일을 셉니다 — 인스타는 만료일을 안 알려 줍니다. 매일 03:17 「인스타 토큰 수명 확인」이 살아 있는지 묻습니다.</div></div>`;
+    })();
+  const nf = (v) => (v == null ? '—' : String(v));
+
+  box.innerHTML = `
+    <div class="sec-head">
+      <h2>인스타</h2>
+      <p>새 공고가 수집되면 로봇이 카드를 그려 개발자 셋에게 이슈·메일로 보냅니다. 여기서 보고 <b>게시</b>를 누르면 올라갑니다 —
+         자동으로는 안 올립니다. 고치고 싶으면 Claude Code 채팅에 말하면 됩니다(수정본 그림을 보여 주고, 다시 보낼지 물어본 뒤 보냅니다).</p>
+    </div>
+
+    <div class="cards">
+      <div class="card ${prepared.length ? 'is-warn' : 'is-ok'}"><div class="v">${prepared.length}</div><div class="k">게시 대기</div><div class="d">개발자가 보고 올릴 차례인 카드</div></div>
+      <div class="card"><div class="v">${posted.length}</div><div class="k">올린 게시물</div><div class="d">건너뜀 ${skipped.length}건</div></div>
+      <div class="card ${newC.length ? 'is-warn' : ''}"><div class="v">${newC.length}</div><div class="k">답 안 한 댓글</div><div class="d">${D.insta.comments.updatedAt ? `받아 온 시각 ${esc(String(D.insta.comments.updatedAt).slice(0, 16).replace('T', ' '))} UTC` : '아직 받아 온 적 없음'}</div></div>
+      <div class="card"><div class="v">${nf(st.account && st.account.followers)}</div><div class="k">팔로워${st.account && st.account.username ? ` · @${esc(st.account.username)}` : ''}</div><div class="d">${st.updatedAt ? `수확 ${esc(String(st.updatedAt).slice(0, 10))}` : '트랙션 수확 전'}</div></div>
+      ${tokenCard}
+    </div>
+
+    <div class="filter-row" style="margin-top:12px">
+      <button class="btn btn-sm" data-ig-run="prepare">새 공고 카드 지금 그리기</button>
+      <button class="btn btn-sm" data-ig-run="stats">트랙션 지금 수확</button>
+      <button class="btn btn-sm" data-ig-run="comments">댓글 지금 받아오기</button>
+      <a class="btn btn-sm" href="https://github.com/${OWNER}/${REPO}/actions/workflows/${WF_INSTA}" target="_blank" rel="noreferrer noopener">실행 기록 ↗</a>
+    </div>
+
+    <div class="sec-head" style="margin-top:14px"><h2>게시 대기 ${prepared.length}건</h2>
+      <p>판형을 바꿔 다시 그리면 로봇이 새 카드를 그려 이슈·메일로 다시 보냅니다(약 3분). 건너뛰기는 폴더를 지우지 않아 나중에 되살릴 수 있습니다.</p></div>
+    ${prepared.length ? `<div class="rows">${prepared.map((p) => instaPostRow(p, 'prepared')).join('')}</div>`
+    : '<div class="allclear"><span class="allclear-mark">✓</span> 기다리는 카드가 없습니다 — 새 공고가 수집되면 로봇이 그립니다.</div>'}
+
+    <div class="sec-head" style="margin-top:14px"><h2>올린 게시물 ${posted.length}건</h2></div>
+    ${posted.length ? `<div class="rows">${posted.map((p) => instaPostRow(p, 'posted')).join('')}</div>` : '<p class="muted">아직 올린 게시물이 없습니다.</p>'}
+
+    ${skipped.length ? `<details style="margin-top:14px"><summary class="muted">건너뛴 게시물 ${skipped.length}건</summary>
+      <div class="rows" style="margin-top:8px">${skipped.map((p) => instaPostRow(p, 'skipped')).join('')}</div></details>` : ''}
+
+    <div class="sec-head" style="margin-top:14px"><h2>판형 ${(D.insta.templates || []).length}벌 — 번호는 고정</h2>
+      <p>"3번으로" 라고 말하면 늘 같은 판형입니다. 새 판형은 좋은 예시를 채팅에 붙여 넣고 "번호에 추가해 줘" 라고 하면 다음 번호로 더해집니다(insta/templates.json).</p></div>
+    <div class="ig-tpls">${(D.insta.templates || []).map((t) => {
+      const s = (D.insta.samples.templates || []).find((x) => x.no === t.no);
+      return `<figure class="ig-tpl-card">
+        ${s && s.cards ? `<img src="${raw(`insta/samples/${t.no}-1.jpg`)}" alt="${esc(t.name)} 표지 견본" loading="lazy">` : '<div class="ig-tpl-none">견본 없음<br><small>「인스타 판형 견본」 실행</small></div>'}
+        <figcaption><b>${t.no}번 ${esc(t.name)}</b><span>${esc(t.ref || '')}</span></figcaption></figure>`;
+    }).join('')}</div>
+
+    <div class="sec-head" style="margin-top:14px"><h2>트랙션</h2>
+      <p>매일 06:37 「인스타 트랙션 수확」이 팔로워·게시물 반응을 insta/stats.json 에 적습니다. 못 받은 것은 0이 아니라 '—' 로 둡니다.</p></div>
+    <div class="grid2">
+      <div><h3 class="ig-h3">팔로워</h3>${instaLine(st.history, 'followers', '팔로워')}</div>
+      <div><h3 class="ig-h3">게시물별 저장 수</h3>${instaBars(st.posts, 'saved', '저장')}</div>
+    </div>
+    ${(st.posts || []).length ? `<div class="scroller" style="margin-top:10px"><table>
+      <thead><tr><th>게시물</th><th>올린 날</th><th class="n">좋아요</th><th class="n">댓글</th><th class="n">저장</th><th class="n">도달</th><th class="n">공유</th></tr></thead>
+      <tbody>${st.posts.map((p) => `<tr><td>${p.permalink ? `<a href="${safeUrl(p.permalink)}" target="_blank" rel="noreferrer noopener">${esc(p.name || p.org || p.id)}</a>` : esc(p.name || p.org || p.id)}${p.error ? ` <span class="pill warn" title="${esc(p.error)}">반응 못 받음</span>` : ''}</td>
+        <td>${esc(p.at || '')}</td><td class="n">${nf(p.likes)}</td><td class="n">${nf(p.comments)}</td><td class="n">${nf(p.saved)}</td><td class="n">${nf(p.reach)}</td><td class="n">${nf(p.shares)}</td></tr>`).join('')}</tbody>
+    </table></div>` : ''}
+
+    <div class="sec-head" style="margin-top:14px"><h2>댓글 ${(D.insta.comments.items || []).filter((c) => !c.error).length}건</h2>
+      <p>3시간마다 받아 옵니다. 답글·숨기기·삭제는 워크플로가 대신 합니다(토큰은 서버에만). 답한 댓글은 '처리됨' 으로 접힙니다.</p></div>
+    ${instaCommentsHtml()}
+  `;
+}
+
+function instaCommentsHtml() {
+  const items = (D.insta.comments.items || []);
+  if (!items.length) return '<p class="muted">받아 온 댓글이 없습니다 — 올린 게시물이 없거나 아직 받아 오기 전입니다.</p>';
+  const errs = items.filter((c) => c.error);
+  const fresh = items.filter((c) => !c.error && !c.handledAt);
+  const done = items.filter((c) => !c.error && c.handledAt);
+  const row = (c) => `
+    <div class="row ig-cmt" data-noclick style="cursor:default">
+      <div>
+        <div class="t"><b>@${esc(c.username || '?')}</b> <span class="muted">${esc(c.at || '')}${c.hidden ? ' · 숨김' : ''}</span></div>
+        <div class="ig-cmt-text">${esc(c.text)}</div>
+        <div class="m"><span>${esc(c.org || '')} ${esc(c.name || '')}</span><span>좋아요 ${c.likes ?? 0}</span>${c.handledAt ? `<span>처리 ${esc(c.handledAt)}</span>` : ''}</div>
+        ${(c.replies || []).length ? `<div class="ig-replies">${c.replies.map((r) => `<div>↳ <b>@${esc(r.username || '')}</b> ${esc(r.text)} <span class="muted">${esc(r.at || '')}</span></div>`).join('')}</div>` : ''}
+        <div class="ig-reply-box">
+          <input type="text" data-ig-reply-text="${esc(c.id)}" placeholder="답글 쓰기 (원문에 없는 사실은 적지 않습니다)" aria-label="답글">
+          <button class="btn btn-sm btn-primary" data-ig-reply="${esc(c.id)}">답글</button>
+          <button class="btn btn-sm" data-ig-hide="${esc(c.id)}" data-ig-hidden="${c.hidden ? '1' : ''}">${c.hidden ? '다시 보이기' : '숨기기'}</button>
+          <button class="btn btn-sm danger" data-ig-delete="${esc(c.id)}">삭제</button>
+        </div>
+      </div>
+      <div></div><div></div>
+    </div>`;
+  return `
+    ${errs.length ? `<p class="muted">⚠️ 게시물 ${errs.length}건의 댓글을 못 받았습니다 — ${esc(errs[0].error || '')}</p>` : ''}
+    ${fresh.length ? `<div class="rows">${fresh.map(row).join('')}</div>` : '<div class="allclear"><span class="allclear-mark">✓</span> 답 안 한 댓글이 없습니다.</div>'}
+    ${done.length ? `<details style="margin-top:10px"><summary class="muted">처리한 댓글 ${done.length}건</summary><div class="rows" style="margin-top:8px">${done.map(row).join('')}</div></details>` : ''}`;
+}
+
+function instaCardSheet(code) {
+  const seen = D.insta.seen;
+  const p = (seen.prepared || []).find((x) => x.code === code) || (seen.posted || []).find((x) => x.code === code) || { code };
+  const n = Math.max(2, Math.min(10, Number(p.cards) || 5));
+  openSheet(`
+    <div class="sheet-head"><h3>${esc(p.org || '')} · ${esc(p.name || code)}</h3><button class="sheet-close" data-close aria-label="닫기">×</button></div>
+    <p class="muted">${esc(instaTplName(p.tplNo))} · 코드 <code class="mono">${esc(code)}</code> · 그림은 기본 브랜치 기준(없는 장은 빈 칸으로 보입니다)</p>
+    <div class="ig-strip">${Array.from({ length: n }, (_, i) => `<img src="${raw(`insta/pub/${code}/${i + 1}.jpg`)}" alt="${i + 1}장" loading="lazy">`).join('')}</div>
+    <h4 style="margin:14px 0 6px">캡션</h4>
+    <pre class="ig-caption" id="ig-caption">불러오는 중…</pre>
+    <div class="sheet-foot"><button class="btn" data-close>닫기</button></div>`);
+  readText(`insta/pub/${code}/caption.txt`).then((t) => { const el = byId('ig-caption'); if (el) el.textContent = t || '(캡션을 읽지 못했습니다)'; });
+  /* 없는 장(4장짜리 공고의 5장)은 조용히 뺀다 — 🔴 인라인 onerror= 는 CSP(script-src 'self')가 막는다(CLAUDE.md) */
+  byId('sheet').querySelectorAll('.ig-strip img').forEach((img) => img.addEventListener('error', () => img.remove()));
+}
+
+/* 버튼 → 워크플로. 되돌릴 수 없는 것(게시·삭제)은 danger 로 한 번 더 묻는다. */
+async function instaDispatch(file, inputs, label, note, danger = false, lines = []) {
+  askSheet({
+    title: label, goLabel: '실행', danger, note, lines,
+    run: async () => {
+      try {
+        jobShow(`${label} — 요청을 보냈어요`);
+        await dispatchWorkflow(file, inputs);
+        jobShow(`${label} — 로봇이 돌기 시작했습니다. 끝나면 새로고침으로 확인하세요`, 'ok',
+          `https://github.com/${OWNER}/${REPO}/actions/workflows/${file}`);
+      } catch (err) { jobShow(err.message, 'bad'); }
+    },
+  });
+}
+
+/* 화면 안 위임 — bindGlobal 의 클릭 처리 맨 앞에서 부른다. 처리했으면 true. */
+async function handleInstaClick(e) {
+  const t = e.target;
+  const q = (attr) => { const el = t.closest(`[${attr}]`); return el ? el.getAttribute(attr) : null; };
+  const nameOf = (code) => { const { prepared, skipped, posted } = instaGroups(); const p = [...prepared, ...skipped, ...posted].find((x) => x.code === code); return p ? `${p.org} · ${p.name}` : code; };
+  let v;
+  if ((v = q('data-ig-view')) !== null) { instaCardSheet(v); return true; }
+  if ((v = q('data-ig-publish')) !== null) {
+    await instaDispatch(WF_INSTA, { step: INSTA_STEP.publish, code: v }, '인스타에 게시',
+      '되돌릴 수 없습니다. 준비된 그 카드를 그대로 올립니다(다시 그리지 않습니다). 시크릿이 없으면 실패 이슈가 옵니다.', true, [{ t: nameOf(v), m: v }]);
+    return true;
+  }
+  if ((v = q('data-ig-skip')) !== null) {
+    await instaDispatch(WF_INSTA, { step: INSTA_STEP.skip, code: v }, '이 공고 건너뛰기',
+      '올리지 않는다고 장부에 적습니다. 카드 파일은 남아서 나중에 다시 그리면 되살아납니다.', false, [{ t: nameOf(v), m: v }]);
+    return true;
+  }
+  if ((v = q('data-ig-redraw')) !== null) {
+    const sel = document.querySelector(`[data-ig-tpl-for="${CSS.escape(v)}"]`);
+    const tpl = sel ? sel.value : '';
+    await instaDispatch(WF_INSTA, { step: INSTA_STEP.prepare, code: v, tpl }, `${tpl ? `${tpl}번 판형으로 ` : ''}다시 그리기`,
+      '로봇이 이 공고만 다시 그려 커밋하고 개발자 셋에게 이슈·메일로 보냅니다(약 3분).', false, [{ t: nameOf(v), m: tpl ? instaTplName(Number(tpl)) : '판형은 씨앗이 정함' }]);
+    return true;
+  }
+  if ((v = q('data-ig-run')) !== null) {
+    if (v === 'prepare') await instaDispatch(WF_INSTA, { step: INSTA_STEP.prepare }, '새 공고 카드 그리기', '아직 준비 안 한 새 공고를 점수순으로 최대 6건 그려 개발자 셋에게 보냅니다.');
+    else if (v === 'stats') await instaDispatch(WF_INSTA_STATS, {}, '트랙션 수확', '팔로워·게시물 반응을 받아 insta/stats.json 에 적습니다. 토큰이 없으면 조용히 끝납니다.');
+    else if (v === 'comments') await instaDispatch(WF_INSTA_COMMENTS, { action: 'fetch' }, '댓글 받아오기', '올린 게시물 전부의 댓글을 받아 insta/comments.json 에 적습니다.');
+    return true;
+  }
+  if ((v = q('data-ig-reply')) !== null) {
+    const inp = document.querySelector(`[data-ig-reply-text="${CSS.escape(v)}"]`);
+    const text = inp ? inp.value.trim() : '';
+    if (!text) { jobShow('답글 글을 먼저 적어 주세요', 'bad'); if (inp) inp.focus(); return true; }
+    await instaDispatch(WF_INSTA_COMMENTS, { action: 'reply', comment: v, text }, '댓글에 답글', '브랜드 계정 이름으로 올라갑니다. 되돌릴 수 없습니다.', true, [{ t: text, m: `댓글 ${v}` }]);
+    return true;
+  }
+  if ((v = q('data-ig-hide')) !== null) {
+    const hidden = t.closest('[data-ig-hide]').getAttribute('data-ig-hidden') === '1';
+    await instaDispatch(WF_INSTA_COMMENTS, { action: hidden ? 'unhide' : 'hide', comment: v }, hidden ? '댓글 다시 보이기' : '댓글 숨기기', '숨긴 댓글은 쓴 사람에게만 보입니다.', false, [{ t: `댓글 ${v}` }]);
+    return true;
+  }
+  if ((v = q('data-ig-delete')) !== null) {
+    await instaDispatch(WF_INSTA_COMMENTS, { action: 'delete', comment: v }, '댓글 삭제', '되돌릴 수 없습니다.', true, [{ t: `댓글 ${v}` }]);
+    return true;
+  }
+  return false;
+}
+
 function renderRobots() {
   const box = byId('screen-robots');
   const runRow = (r) => `
@@ -1970,6 +2288,7 @@ function bindGlobal() {
 
   /* 화면 안 위임 */
   byId('app').addEventListener('click', async (e) => {
+    if (await handleInstaClick(e)) return;   // 인스타 화면의 버튼 (2026-09-12)
     const go = e.target.closest('[data-go]');
     if (go) { show(go.dataset.go); return; }
 

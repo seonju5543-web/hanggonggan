@@ -12,7 +12,8 @@
  * 🔴 사실 문장은 전부 kosaf-open.json 원문. 요약·의역·추정 금지(원칙 8-1).
  * 🔴 개별 학생 판정('당신은 받을 수 있어요')은 안 쓴다 — 앱 몫이다(자기잠식 선).
  *
- * 실행: node insta/render.mjs [공고이름일부] [--tpl=photo|chat|note|all] [--skin=…] [--seed=N] [--school=…]
+ * 실행: node insta/render.mjs [공고이름일부·코드] [--tpl=번호|id|all] [--skin=…] [--seed=N] [--font="구글 폰트"] [--pub]
+ *   판형 번호는 `insta/templates.json` — 개발자가 "2번으로" 라고 말하면 늘 같은 판형이다.
  */
 import { shrinkToFit, overflowing } from './fit.mjs';
 import { caption, LIMIT } from './caption.mjs';
@@ -637,17 +638,63 @@ function cards_note(c) {
   ];
 }
 
-// ── 템플릿 등록 ─────────────────────────────────────────────
+// ── 템플릿 등록 — 내장 3벌 ────────────────────────────────────
 const TPL = {
   photo: { css: CSS_photo, cards: cards_photo, skin: true, fonts: ["900 100px 'Noto Sans KR'", "500 30px 'Noto Sans KR'"] },
   chat:  { css: CSS_chat,  cards: cards_chat,  fonts: ["900 60px 'Noto Sans KR'", "400 38px 'Noto Sans KR'"] },
   note:  { css: CSS_note,  cards: cards_note,  fonts: ["700 110px 'Gaegu'", "400 48px 'Gaegu'"] },
 };
 
+/** 판형이 같이 쓰는 연장 — 바깥 판형 파일(`insta/templates/<번호>-<id>.mjs`)이
+ *  `cards(ctx, kit)` · `css(skin, kit)` 두 번째 인자로 받는다.
+ *  🔴 판형 파일이 이 파일을 import 하지 않는다 — 렌더러가 판형을 import 하므로
+ *     거꾸로 부르면 순환 import 가 된다(캡션 CLI 가 실제로 그렇게 멈췄다). */
+const KIT = { esc, hi, scribble, handCheck, handX, handBox, handOval, headSize, money, dday, ddayText, tidy, bullets, W, H };
+
+/** 번호 붙은 판형 목록 (2026-09-12 개발자 지시 — "정해진 번호를 고정으로 박아 놓고 고르게").
+ *  🔴 번호는 `insta/templates.json` 이 정하고 **한 번 붙은 번호는 안 바뀐다.**
+ *     내장 3벌은 위 TPL, 그 뒤는 파일 하나가 판형 하나다. 파일이 없거나 모양이 틀리면
+ *     조용히 빼지 않고 **여기서 죽는다** — 목록에 있는데 못 그리는 판형은 아무도 못 본다. */
+const TPL_FILE = join(ROOT, 'insta', 'templates.json');
+async function loadTemplates() {
+  const reg = JSON.parse(readFileSync(TPL_FILE, 'utf8')).templates;
+  const out = {};
+  const seenNo = new Set();
+  for (const t of reg) {
+    if (!Number.isInteger(t.no) || t.no < 1) throw new Error(`templates.json: '${t.id}' 의 번호가 이상합니다 (${t.no})`);
+    if (seenNo.has(t.no)) throw new Error(`templates.json: 번호 ${t.no} 이 두 번 있습니다`);
+    seenNo.add(t.no);
+    if (t.builtin) {
+      if (!TPL[t.id]) throw new Error(`templates.json: 내장 판형 '${t.id}' 이 render.mjs 에 없습니다`);
+      out[t.id] = { ...TPL[t.id], no: t.no, id: t.id, name: t.name, builtin: true };
+      continue;
+    }
+    const file = join(ROOT, 'insta', 'templates', `${t.no}-${t.id}.mjs`);
+    const m = await import(pathToFileURL(file).href);
+    for (const k of ['css', 'cards', 'fonts'])
+      if (!m[k]) throw new Error(`${file} 에 ${k} 가 없습니다 — 판형 파일은 css·cards·fonts 를 내줘야 합니다`);
+    out[t.id] = { css: m.css, cards: m.cards, fonts: m.fonts, skin: !!m.skin, no: t.no, id: t.id, name: t.name, file };
+  }
+  return out;
+}
+/** `2` · `'2'` · `'chat'` 어느 것으로 불러도 같은 판형. 없으면 null. */
+function resolveTpl(all, key) {
+  const n = Number(key);
+  return Object.values(all).find((t) => (Number.isInteger(n) && t.no === n) || t.id === key) || null;
+}
+const tplLabel = (t) => `${t.no}번 ${t.name}(${t.id})`;
+
+/** 글꼴 바꿔 끼우기 (`--font="Nanum Pen Script"`) — 개발자가 채팅에서 "폰트 바꿔" 라고 할 때
+ *  판형 코드를 안 건드리고 시험해 보는 길. 구글 폰트 이름 그대로.
+ *  🔴 카드 안 글자 전부에 걸린다(!important) — 판형이 정한 굵기는 그대로 둔다. */
+const fontOverrideCss = (family) => `
+@import url('https://fonts.googleapis.com/css2?family=${encodeURIComponent(family).replace(/%20/g, '+')}:wght@400;500;700;900&display=swap');
+.card, .card * { font-family: '${family.replace(/'/g, '')}', 'Apple SD Gothic Neo', sans-serif !important; }`;
+
 // ── 밖에서 쓰라고 내주는 것 ─────────────────────────────────
 // 🔴 캡션 생성기·넘침 스윕이 **같은 추출기**를 써야 카드와 캡션이 갈라지지 않는다.
 //    예전엔 이 파일을 통째로 베껴 _lib.mjs 로 쓰고 지웠다 — 꼼수라 걷어냈다.
-export { TPL, SKINS, context, kstDay, bigTitle, whoLines, bullets, dropParen, money, dday, ddayText, tidy, esc, W, H };
+export { TPL, KIT, SKINS, loadTemplates, resolveTpl, tplLabel, fontOverrideCss, context, kstDay, bigTitle, whoLines, bullets, dropParen, money, dday, ddayText, tidy, esc, W, H };
 
 // ── 실행 (직접 돌릴 때만 — import 하면 안 돈다) ──────────────
 // 🔴 playwright 를 최상단에서 부르면 **이 파일을 import 하는 쪽이 다 브라우저를 요구한다.**
@@ -667,10 +714,10 @@ if (RUN) {
     return v === '' ? undefined : v;
   };
   const needle = args.find((a) => !a.startsWith('--'));
-  if (!needle) { console.error('공고 이름 일부를 주세요 — 예: node insta/render.mjs 한진해운 --tpl=all'); process.exit(1); }
+  if (!needle) { console.error('공고 이름 일부(또는 코드)를 주세요 — 예: node insta/render.mjs 한진해운 --tpl=2'); process.exit(1); }
   const skinName = val('skin') || 'blue';
   const k = SKINS[skinName];
-  if (!k) { console.error(`판형 '${skinName}' 없음 (${Object.keys(SKINS).join(' / ')})`); process.exit(1); }
+  if (!k) { console.error(`색 '${skinName}' 없음 (${Object.keys(SKINS).join(' / ')})`); process.exit(1); }
 
   // 🔴 교외·교내를 **한 목록**으로 본다 — 따로 읽으면 고르기와 렌더러가 갈라진다.
   const { allNotices, findNotice } = await import('./notices.mjs');
@@ -686,36 +733,63 @@ if (RUN) {
   const seed = val('seed') !== undefined ? Number(val('seed'))
     : [...(s.org + s.name)].reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) | 0, 7);
   const school = val('school') || s.school || null;
-  const names = Object.keys(TPL);
+
+  // 판형 — 번호(`--tpl=2`)·이름(`--tpl=chat`)·전부(`--tpl=all`). 안 주면 씨앗으로 돌린다.
+  const ALL = await loadTemplates();
+  const order = Object.values(ALL).sort((a, b) => a.no - b.no);
   const wantTpl = val('tpl');
-  const list = wantTpl === 'all' ? names
-    : wantTpl ? [wantTpl] : [names[Math.abs(seed) % names.length]];   // 안 주면 씨앗으로 돌린다
-  for (const t of list) if (!TPL[t]) { console.error(`템플릿 '${t}' 없음 (${names.join(' / ')} / all)`); process.exit(1); }
+  let list;
+  if (wantTpl === 'all') list = order;
+  else if (wantTpl === undefined) list = [order[Math.abs(seed) % order.length]];
+  else {
+    const t = resolveTpl(ALL, wantTpl);
+    if (!t) { console.error(`판형 '${wantTpl}' 없음 — ${order.map(tplLabel).join(' / ')} / all`); process.exit(1); }
+    list = [t];
+  }
   // 🔴 조용히 무시하면 '색을 바꿨는데 왜 그대로지' 를 다음 사람이 다시 겪는다.
-  if (val('skin') && list.every((t) => !TPL[t].skin))
-    console.error(`⚠️  --skin 은 photo 판형에만 걸립니다 — ${list.join('/')} 는 색이 고정입니다.`);
+  if (val('skin') && list.every((t) => !t.skin))
+    console.error(`⚠️  --skin 은 사진 판형(1번)에만 걸립니다 — ${list.map(tplLabel).join('/')} 는 색이 고정입니다.`);
+  const font = val('font') || null;
+  if (font) console.log(`  글꼴 바꿔 끼움 — ${font}`);
 
   // 🔴 캡션도 여기서 만든다 — 따로 돌리면 다른 씨앗·다른 공고로 짝이 어긋난다.
-//    `--caption` 만 주면 그림 없이 캡션만 찍는다(눈으로 볼 때 빠르다).
-const cap = (() => {
-  try { return caption(s, context(s, new Date(), k, seed, school), data); }
-  catch (e) { console.error(`⚠️  캡션 없음 — ${e.message}`); return null; }
-})();
-if (args.includes('--caption')) {
-  if (!cap) process.exit(1);
-  console.log(cap);
-  const nTag = (cap.match(/#[^\s#]+/g) || []).length;
-  console.error(`\n── ${cap.length}자 / ${LIMIT.chars} · 해시태그 ${nTag}개 / ${LIMIT.tags}`);
-  process.exit(cap.length > LIMIT.chars ? 1 : 0);
-}
+  //    `--caption` 만 주면 그림 없이 캡션만 찍는다(눈으로 볼 때 빠르다).
+  const cap = (() => {
+    try { return caption(s, context(s, new Date(), k, seed, school), data); }
+    catch (e) { console.error(`⚠️  캡션 없음 — ${e.message}`); return null; }
+  })();
+  if (args.includes('--caption')) {
+    if (!cap) process.exit(1);
+    console.log(cap);
+    const nTag = (cap.match(/#[^\s#]+/g) || []).length;
+    console.error(`\n── ${cap.length}자 / ${LIMIT.chars} · 해시태그 ${nTag}개 / ${LIMIT.tags}`);
+    process.exit(cap.length > LIMIT.chars ? 1 : 0);
+  }
 
-mkdirSync(OUT, { recursive: true });
+  mkdirSync(OUT, { recursive: true });
   let overflowed = false;
-  const browser = await chromium.launch();
-  for (const name of list) {
-    const t = TPL[name];
+  // 🔴 브라우저 경로를 박지 않는다 — Mac 과 샌드박스가 다르다(CLAUDE.md). CHROME_PATH 를 먼저 본다.
+  const browser = await chromium.launch(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {});
+  // ⚠️ 개발용 — Claude 검사 샌드박스는 브라우저의 바깥 통신이 끊겨(프록시가 TLS 를 자른다)
+  //    구글 폰트·위키미디어 사진을 못 받고 렌더러가 (정직하게) 죽는다. `INSTA_DEV_FONT_RELAY=1`
+  //    이면 브라우저 대신 **Node 의 fetch 가 받아서** 넘겨준다(그쪽은 프록시를 탄다 —
+  //    `NODE_USE_ENV_PROXY=1 NODE_EXTRA_CA_CERTS=/root/.ccr/ca-bundle.crt` 와 같이 쓴다).
+  //    워크플로에는 두지 않는다 — 거기선 브라우저가 직접 받는 것이 맞고, 실제로 받는다.
+  const relay = !!process.env.INSTA_DEV_FONT_RELAY;
+  const drawn = {};                                   // 판형 id → 그린 장수
+  for (const t of list) {
+    const name = t.id;
     const page = await browser.newPage({ viewport: { width: W, height: H } });
-    await page.setContent(`<style>${t.css(k)}</style>${t.cards(context(s, new Date(), k, seed, school)).join('')}`);
+    if (relay) await page.route(/^https:\/\//, async (route, req) => {
+      try {
+        const r = await fetch(req.url(), { headers: { 'user-agent': await page.evaluate(() => navigator.userAgent) } });
+        route.fulfill({ status: r.status, headers: { 'content-type': r.headers.get('content-type') || '' }, body: Buffer.from(await r.arrayBuffer()) });
+      } catch (e) { route.abort(); }
+    });
+    // 🔴 글꼴 바꿔 끼우기는 **따로 <style>** 로 — 같은 시트 뒤쪽에 @import 를 붙이면 브라우저가
+    //    버린다(@import 는 시트 맨 앞에만 · 크로미움 실측: 두 번째 @import 가 cssRules 에 없다).
+    //    그러면 글꼴이 영영 안 실려 `--font` 가 매번 죽었다(2026-09-12 코드 리뷰).
+    await page.setContent(`<style>${t.css(k, KIT)}</style>${font ? `<style>${fontOverrideCss(font)}</style>` : ''}${t.cards(context(s, new Date(), k, seed, school), KIT).join('')}`);
     await page.waitForLoadState('networkidle');
     // 🔴 폰트가 안 실리면 전부 두부(□)가 되는데 로그는 초록불이다. 시끄럽게 죽인다.
     //    ⚠️ fonts.check() 는 기본 시험 글자가 라틴이라 한글 서브셋에선 늘 false → 한글로 묻는다.
@@ -723,12 +797,14 @@ mkdirSync(OUT, { recursive: true });
     // 🔴 fonts.check() 는 **맞는 FontFace 가 하나도 없으면 참을 돌려준다**(CSS Font Loading 규격).
     //    그래서 폰트를 아예 못 받아온 경우 — 두부(□)가 되는 바로 그 경우 — 를 통과시켰다(실측).
     //    load() 가 돌려주는 배열의 길이를 봐야 '진짜 실렸는지' 를 안다.
+    //    글꼴을 바꿔 끼웠으면 **그 글꼴**이 실렸는지 본다 — 판형 글꼴만 보면 바꾼 것이 두부여도 초록불이다.
+    const specs = font ? [`900 60px '${font}'`, `400 38px '${font}'`] : t.fonts;
     const ok = await page.evaluate(async (specs) => {
       const got = await Promise.all(specs.map((x) => document.fonts.load(x, '한글가나')));
       await document.fonts.ready;
       return got.every((arr) => arr.length > 0) && document.fonts.size > 0;
-    }, t.fonts);
-    if (!ok) { console.error(`🚨 ${name}: 한글 폰트를 못 실었습니다 — 글자가 깨집니다.`); await browser.close(); process.exit(1); }
+    }, specs);
+    if (!ok) { console.error(`🚨 ${tplLabel(t)}: 한글 폰트를 못 실었습니다${font ? ` (${font})` : ''} — 글자가 깨집니다.`); await browser.close(); process.exit(1); }
     // 🔴 배경 사진이 404 면 표지가 통째로 까매지는데 로그는 초록불이다(폰트와 같은 유형).
     //    background-image 는 onerror 가 없으니 같은 주소를 <img> 로 한 번 더 받아 본다.
     const bgUrl = await page.evaluate(() => {
@@ -739,14 +815,14 @@ mkdirSync(OUT, { recursive: true });
       const w = await page.evaluate((u) => new Promise((ok) => {
         const i = new Image(); i.onload = () => ok(i.naturalWidth); i.onerror = () => ok(0); i.src = u;
       }), bgUrl);
-      if (!w) { console.error(`🚨 ${name}: 배경 사진을 못 받았습니다 — 표지가 까맣게 나갑니다\n   ${bgUrl}`); await browser.close(); process.exit(1); }
+      if (!w) { console.error(`🚨 ${tplLabel(t)}: 배경 사진을 못 받았습니다 — 표지가 까맣게 나갑니다\n   ${bgUrl}`); await browser.close(); process.exit(1); }
     }
     // 🔴 글자 크기를 코드에서 어림하지 않는다 — 넉넉하게 그려 두고 **브라우저가 재서** 줄인다.
     //    손으로 어림하던 시절엔 짧은 카드에 여백이 남고 긴 카드는 넘쳤다(둘 다 지적받았다).
     //    규칙은 `insta/fit.mjs` 한 곳 — 검사도 같은 파일을 쓴다.
     await page.evaluate(shrinkToFit);
     const over = await page.evaluate(overflowing);
-    if (over.length) { console.error(`🚨 ${name}: ${over.join('·')}번째 카드에서 글자가 잘립니다`); overflowed = true; }
+    if (over.length) { console.error(`🚨 ${tplLabel(t)}: ${over.join('·')}번째 카드에서 글자가 잘립니다`); overflowed = true; }
     // 🔴 옛 그림을 안 지우면 4장짜리 공고에 지난 렌더의 5장이 섞인다(미리보기에서 실제로 봤다).
     for (const f of await readdir(OUT))
       if (new RegExp(`^${name}-\\d+\\.(png|jpg)$`).test(f)) rmSync(join(OUT, f));
@@ -758,8 +834,9 @@ mkdirSync(OUT, { recursive: true });
       await els[i].screenshot({ path: join(OUT, `${name}-${i + 1}.png`) });
       await els[i].screenshot({ path: join(OUT, `${name}-${i + 1}.jpg`), type: 'jpeg', quality: 92 });
     }
+    drawn[name] = els.length;
     await page.close();
-    console.log(`  ${name} — ${els.length}장`);
+    console.log(`  ${tplLabel(t)} — ${els.length}장`);
   }
   // 마감 지난 공고면 캡션이 없다 — '올리면 안 되는 것' 이라는 신호다.
   if (cap) { writeFileSync(join(OUT, 'caption.txt'), cap + '\n'); console.log('  캡션 — insta/out/caption.txt'); }
@@ -767,28 +844,31 @@ mkdirSync(OUT, { recursive: true });
   // 🔴 게시용으로 내보내기 — 인스타는 파일 업로드를 안 받고 **공개 주소**를 요구한다.
   //    그래서 여기만 저장소에 커밋해 GitHub Pages 가 서빙하게 한다(`out/` 은 작업용이라 무시).
   //    ⚠️ 한 판형만 내보낸다 — 캐러셀은 한 벌이다.
+  //    🔴 **공고 하나에 폴더 하나**(`insta/pub/<공고 코드>/`) — 2026-09-12 개발자 지시
+  //       "공고당 1게시물". 날짜 폴더 하나를 통째로 갈아엎던 시절엔 하루에 한 공고만 담겼다.
+  //       다른 공고의 폴더는 건드리지 않는다 — 준비돼 있는 카드가 남의 준비에 지워지면 안 된다.
   if (args.includes('--pub')) {
     if (!cap) { console.error('🚨 캡션이 없어 게시용으로 못 내보냅니다.'); process.exit(1); }
-    if (list.length !== 1) { console.error('🚨 --pub 은 판형 하나만 — --tpl=photo 처럼 지정하세요.'); process.exit(1); }
-    // 🔴 UTC 로 찍으면 KST 자정~오전 9시에 **어제 폴더**가 된다(실측: 00:15 KST 에 09-10).
-    //    워크플로는 GitHub(UTC)에서 도는데 관리자는 KST 로 생각한다 — 날짜는 KST 로 적는다.
-    const day = kstDay();
-    const pub = join(ROOT, 'insta', 'pub', day);
-    // ponytail: 지난 날짜를 지워 작업 트리를 한 벌로 유지한다. 히스토리는 계속 자란다
-    //           (하루 1MB) — 커지면 GitHub Release 자산으로 옮기는 게 다음 수다.
-    rmSync(join(ROOT, 'insta', 'pub'), { recursive: true, force: true });
+    // 🔴 잘린 카드로 멀쩡한 준비 폴더를 덮지 않는다 — 예전엔 폴더를 지우고 쓴 뒤에야 종료 2 로 죽어서,
+    //    개발자가 본 카드가 잘린 카드로 바뀐 채 '준비됨' 으로 남을 수 있었다(코드 리뷰).
+    if (overflowed) { console.error('🚨 글자가 잘려 게시용으로 내보내지 않습니다 — 있던 폴더는 그대로 둡니다.'); await browser.close(); process.exit(2); }
+    if (list.length !== 1) { console.error('🚨 --pub 은 판형 하나만 — --tpl=2 처럼 지정하세요.'); process.exit(1); }
+    if (!/^[A-Za-z0-9_-]+$/.test(s.code)) { console.error(`🚨 공고 코드 '${s.code}' 에 폴더 이름으로 못 쓰는 글자가 있습니다.`); process.exit(1); }
+    const day = kstDay();      // 🔴 KST — UTC 면 새벽에 어제로 찍힌다
+    const t = list[0];
+    const pub = join(ROOT, 'insta', 'pub', s.code);
+    rmSync(pub, { recursive: true, force: true });
     mkdirSync(pub, { recursive: true });
-    const name = list[0];
-    const n = (await readdir(OUT)).filter((f) => f.startsWith(`${name}-`) && f.endsWith('.jpg')).length;
-    for (let i = 1; i <= n; i++) copyFileSync(join(OUT, `${name}-${i}.jpg`), join(pub, `${i}.jpg`));
+    const n = drawn[t.id];
+    for (let i = 1; i <= n; i++) copyFileSync(join(OUT, `${t.id}-${i}.jpg`), join(pub, `${i}.jpg`));
     writeFileSync(join(pub, 'caption.txt'), cap + '\n');
     writeFileSync(join(pub, 'meta.json'), JSON.stringify(
-      { code: s.code, org: s.org, name: s.name, due: s.due, tpl: name, seed, at: day }, null, 1) + '\n');
-    console.log(`  게시용 — insta/pub/${day}/ (${n}장 + 캡션)`);
+      { code: s.code, org: s.org, name: s.name, due: s.due, school: s.school || null,
+        tpl: t.id, tplNo: t.no, seed, skin: t.skin ? skinName : null, font, cards: n, at: day }, null, 1) + '\n');
+    console.log(`  게시용 — insta/pub/${s.code}/ (${tplLabel(t)} · ${n}장 + 캡션)`);
   }
   await browser.close();
   // 🔴 잘린 채로 올리면 사실이 사라진 게시물이 나간다 — 조용히 끝내지 않는다.
   if (overflowed) process.exit(2);
   console.log(`${s.org} · ${s.name} (마감 ${s.due} · 씨앗 ${seed})`);
-
 }

@@ -36,6 +36,13 @@ const DATA = {
   'collector/pending-forms.json': readJson('collector/pending-forms.json'),
   'collector/auto-register-config.json': readJson('collector/auto-register-config.json'),
   'data/admin-log.json': readJson('data/admin-log.json'),
+  /* 인스타 화면 (2026-09-12) — 없는 파일은 null 그대로(화면이 빈 값으로 그린다) */
+  'insta/seen.json': readJson('insta/seen.json'),
+  'insta/templates.json': readJson('insta/templates.json'),
+  'insta/stats.json': readJson('insta/stats.json'),
+  'insta/comments.json': readJson('insta/comments.json'),
+  'insta/token-seen.json': readJson('insta/token-seen.json'),
+  'insta/samples/index.json': readJson('insta/samples/index.json'),
 };
 
 const css = read('_admin/admin.css');
@@ -60,6 +67,11 @@ const adminInline = adminJs
   const v = window.__PREVIEW_DATA[path];
   return v === undefined ? fallback : v;
 }`,
+  )
+  /* 인스타 화면의 '없어도 되는 파일' 읽기도 파일 안 데이터를 본다 */
+  .replace(
+    /const quiet = async \(path, fallback\) => \{[\s\S]*?\n  \};/,
+    `const quiet = async (path, fallback) => { const v = window.__PREVIEW_DATA[path]; return v == null ? fallback : v; };`,
   )
   .replace(
     /async function readText\(path\) \{[\s\S]*?\n\}/,
