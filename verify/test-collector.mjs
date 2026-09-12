@@ -140,9 +140,12 @@ console.log('■ HWP 원본은 미리보기가 아니라 본문을 읽는다 (20
   const sch = readText(new URL('../collector/schematize-forms.mjs', import.meta.url));
   eq('본문(.body.txt)을 미리보기(.txt)보다 먼저 본다',
     /\['\.body\.txt',\s*'\.txt'\]/.test(sch), true);
-  const wf = ['collect-scholarships', 'browser-collect', 'deep-fetch']
+  /* ⚠️ 2026-09-12: 한국장학재단 로봇을 여기 넣는 것을 처음에 빠뜨렸다 — 그래서 받아 둔
+     공고문 HWP 를 **미리보기 1023자만** 읽고 있었다. 첨부를 받는 로봇이 새로 생기면
+     이 목록에도 넣어야 한다(안 넣으면 그 로봇만 조용히 앞 1000자만 본다). */
+  const wf = ['collect-scholarships', 'browser-collect', 'deep-fetch', 'kosaf-fetch']
     .map((n) => readText(new URL(`../.github/workflows/${n}.yml`, import.meta.url)));
-  eq('수집·심층 로봇이 본문 추출기를 실제로 돌린다',
+  eq('첨부를 받는 로봇이 전부 본문 추출기를 실제로 돌린다',
     wf.every((y) => y.includes('hwp-bodytext.py')), true);
 }
 

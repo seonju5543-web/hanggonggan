@@ -72,6 +72,11 @@ const byCode = new Map((full.items || []).map((i) => [i.code, i]));
 
 const log = [];
 const say = (s) => { console.log(s); log.push(s); };
+/* 리포트에 주소를 통째로 실으면(재단마다 400자) 읽을 수 없게 된다 — 파일 이름만 남긴다 */
+const short = (u) => {
+  try { return (new URL(u).searchParams.get('FileNameDn') || u).split('/').pop().slice(0, 60); }
+  catch { return String(u).slice(0, 60); }
+};
 
 /* ── 정찰 모드 — 첨부 칸이 실제로 어떻게 생겼는지 **눈으로 본다** ──────────────
    🔴 이 저장소의 규칙이다: 짐작으로 주소를 만들지 말 것(CLAUDE.md '원문 링크'·'정찰').
@@ -133,9 +138,18 @@ async function mirrorOne(session, it) {
        재시도(건당 최대 60초×3)를 타는 동안 단계 상한을 넘겨 **취소**되고, 취소는
        실패가 아니라서 saveAll() 도 안 돈다(2026-08-04에 배운 것). */
     if (runBytes >= MAX_RUN || budget.expired()) { keep(); return; }
+    /* 🔴 **막힌 이유를 반드시 남긴다** (2026-09-12 첫 실행에서 18개가 이유 없이 '막힘'이었다).
+       이유 없는 실패는 다음 사람이 **원인을 짐작하게** 만든다 — 이 저장소가 가장 비싸게
+       배운 실수다(CLAUDE.md 매 세션 5번). 아래 네 갈래 전부 한 줄씩 적는다. */
     let res;
-    try { res = await session.download(f.url); } catch { stat.blocked += 1; continue; }
-    if (!res.ok) { stat.blocked += 1; say(`  ✕ ${it.org} — HTTP ${res.status}`); continue; }
+    try {
+      res = await session.download(f.url);
+    } catch (e) {
+      stat.blocked += 1;
+      say(`  ✕ ${it.org} — 받다가 끊겼습니다 (${e && e.name ? e.name : e}) · ${short(f.url)}`);
+      continue;
+    }
+    if (!res.ok) { stat.blocked += 1; say(`  ✕ ${it.org} — HTTP ${res.status} · ${short(f.url)}`); continue; }
     const buf = Buffer.from(await res.arrayBuffer());
     /* 🔴 막힐 때 200 에 HTML 이 온다 — 그걸 저장하면 학생이 오류 화면을 '공고문'으로 받는다 */
     if (looksLikeHtml(buf)) {
@@ -144,7 +158,11 @@ async function mirrorOne(session, it) {
       continue;
     }
     if (buf.length > MAX_FILE) { stat.tooBig += 1; say(`  · ${it.org} — ${(buf.length / (1 << 20)).toFixed(1)}MB 라 건너뜁니다`); continue; }
-    if (buf.length < 512) { stat.blocked += 1; continue; }
+    if (buf.length < 512) {
+      stat.blocked += 1;
+      say(`  ✕ ${it.org} — ${buf.length}바이트밖에 안 옵니다 (파일이 아닙니다) · ${short(f.url)}`);
+      continue;
+    }
 
     /* 이름은 **주소에 적힌 것을 먼저** 쓴다(KOSAF 가 `FileNameDn=` 에 넣어 준다) —
        헤더는 관공서 서버마다 인코딩이 제각각이라 깨질 길이 셋이다. 둘 다 없으면 우리가 짓는다. */

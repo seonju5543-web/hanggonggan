@@ -14,11 +14,13 @@
 # 실행: python3 collector/hwp-bodytext.py   (deepfetch가 원본을 받아 둔 뒤)
 import os
 import struct
+import sys
 import zlib
 
 import olefile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+REPO = os.path.dirname(HERE)
 OUT = os.path.join(HERE, 'extracted')
 
 HWPTAG_PARA_TEXT = 0x10 + 51          # 문단의 글자가 들어 있는 레코드
@@ -108,9 +110,29 @@ def extract(path):
         ole.close()
 
 
+def targets(roots):
+    """훑을 파일 목록.
+
+    기본(인자 없음)은 예전 그대로 collector/extracted 한 겹만 본다 — 동작을 바꾸지 않는다.
+    인자로 폴더를 주면 **그 아래를 재귀로** 훑는다: 한국장학재단 공고문 사본은
+    data/kosaf-files/<재단코드>/ 처럼 재단별 폴더에 들어 있다 (2026-09-12).
+    """
+    if not roots:
+        if not os.path.isdir(OUT):
+            raise SystemExit('collector/extracted 없음 — deepfetch.mjs 먼저 실행')
+        return [os.path.join(OUT, n) for n in sorted(os.listdir(OUT))]
+    found = []
+    for root in roots:
+        full = root if os.path.isabs(root) else os.path.join(REPO, root)
+        if not os.path.isdir(full):
+            print(f'{root} 이 없습니다 — 건너뜁니다.')
+            continue
+        for dirpath, _dirs, names in os.walk(full):
+            found += [os.path.join(dirpath, n) for n in sorted(names)]
+    return found
+
+
 if __name__ == '__main__':
-    if not os.path.isdir(OUT):
-        raise SystemExit('collector/extracted 없음 — deepfetch.mjs 먼저 실행')
-    for name in sorted(os.listdir(OUT)):
-        if name.lower().endswith('.hwp'):
-            extract(os.path.join(OUT, name))
+    for path in targets(sys.argv[1:]):
+        if path.lower().endswith('.hwp'):
+            extract(path)

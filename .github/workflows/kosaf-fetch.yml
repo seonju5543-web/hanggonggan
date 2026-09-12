@@ -94,6 +94,10 @@ jobs:
           # 🔴 hwp 를 **먼저** 돌린다 — 이 스크립트가 zip 을 풀어 안의 pdf 를 꺼내므로,
           #    순서를 바꾸면 그 pdf 가 그 실행에서 안 읽힌다.
           python3 collector/hwp-prvtext.py data/kosaf-files
+          # 🔴 **본문 전체**를 뽑는다 — 미리보기(PrvText)는 1023자에서 잘린다(2026-08-14 실측).
+          #    공고문은 신청 방법·자격·붙임 서식이 뒷부분에 있어, 앞 1000자만 보면
+          #    "읽었다"고 착각한 채 정작 필요한 것을 통째로 못 본다.
+          python3 collector/hwp-bodytext.py data/kosaf-files || true
           python3 collector/pdf-text.py data/kosaf-files
 
       - name: 관문 — 층2가 비거나 대출이 섞이지 않았나
