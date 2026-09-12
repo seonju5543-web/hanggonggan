@@ -99,7 +99,7 @@ async function probe(session) {
 
 /* ── 사본 받기 ───────────────────────────────────────────────────────────── */
 let runBytes = 0;
-const stat = { got: 0, skipped: 0, blocked: 0, tooBig: 0, unresolved: 0, pruned: 0, noFile: 0 };
+const stat = { got: 0, skipped: 0, blocked: 0, tooBig: 0, unresolved: 0, pruned: 0, noFile: 0, gone: 0 };
 const unresolvedSamples = [];
 
 function mirrorAlive(it) {
@@ -165,6 +165,17 @@ async function mirrorOne(session, it) {
       continue;
     }
     if (buf.length > MAX_FILE) { stat.tooBig += 1; say(`  · ${it.org} — ${(buf.length / (1 << 20)).toFixed(1)}MB 라 건너뜁니다`); continue; }
+    /* 🔴 **KOSAF 쪽에서 이미 사라진 파일** — 우리가 고칠 수 있는 것이 아니다 (2026-09-12 실측).
+       재단 서버가 400바이트짜리 본문에 `[portal] 파일이 존재하지 않습니다.` 라고 그대로 적어
+       보낸다(울진군·상주시·포항시·세종연구원 등 12건). '막힘'으로 세면 매 실행 같은 숫자가
+       리포트에 남아 다음 사람이 **고칠 수 없는 것을 쫓는다.** 칸을 나눠 사실대로 적는다:
+       학생에게는 재단 홈페이지 링크가 그대로 남으므로, 이 재단은 이전보다 나빠지지 않는다. */
+    const body = buf.subarray(0, 400).toString('utf8');
+    if (/파일이\s*존재하지\s*않습니다/.test(body)) {
+      stat.gone += 1;
+      say(`  · ${it.org} — KOSAF 에 파일이 없습니다(재단이 올린 뒤 지워진 듯) · ${short(f.url)}`);
+      continue;
+    }
     if (buf.length < 512) {
       stat.blocked += 1;
       /* 🔴 **속을 보여 준다.** 첫 판은 크기만 적었는데, 그러면 다음 사람이 원인을 짐작하게 된다
@@ -219,6 +230,7 @@ function saveAll() {
     + `| | |\n|---|---|\n`
     + `| 새로 받음 | ${stat.got}개 |\n| 이미 있던 것 | ${stat.skipped}곳 |\n`
     + `| 재단이 첨부를 안 올림 | ${stat.noFile}개 |\n`
+    + `| KOSAF 에 파일이 없음(우리가 못 고침) | ${stat.gone}개 |\n`
     + `| 못 받음(막힘) | ${stat.blocked}개 |\n| 주소를 못 만듦 | ${stat.unresolved}개 |\n`
     + `| 너무 큼 | ${stat.tooBig}개 |\n| 지난 회차 정리 | ${stat.pruned}곳 |\n`
     + `| **앱에서 공고문을 볼 수 있는 재단** | **${withFile} / ${slim.count}곳** |\n\n`
@@ -271,6 +283,7 @@ if (left) say(`⏱ 예산을 다 써 ${left}곳은 다음 실행으로 넘깁니
 
 prune();
 say(`\n새로 ${stat.got}개(${Math.round(runBytes / 1024)}KB) · 이미 있던 곳 ${stat.skipped} · `
-  + `재단이 안 올림 ${stat.noFile} · 막힘 ${stat.blocked} · 주소 못 만듦 ${stat.unresolved} · `
+  + `재단이 안 올림 ${stat.noFile} · KOSAF 에 없음 ${stat.gone} · 막힘 ${stat.blocked} · `
+  + `주소 못 만듦 ${stat.unresolved} · `
   + `큰 파일 ${stat.tooBig} · 정리 ${stat.pruned}곳`);
 saveAll();
