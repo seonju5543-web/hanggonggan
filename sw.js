@@ -21,7 +21,7 @@
    번호만 맞추고 한쪽 파일 목록을 버리면, 버린 쪽 파일이 오프라인에서만 없어 앱이 죽는다. */
 /* ⚠️ 두 작업이 같은 날 v172 를 각자 올려 부딪혔다 — 번호는 v173 으로 올리고 **둘 다** 남긴다
    (파일 머리말의 규칙 그대로). */
-const CACHE = 'handaejang-v175';  /* v175 — 홈의 신청 현황을 신청내역으로 (UI-15) */
+const CACHE = 'handaejang-v175';  /* v175 — 필터 칩 한 줄(320px 은 접음) + 홈의 신청 현황을 신청내역으로 (UI-15) */
 const ASSETS = ['.', 'index.html', 'style.css', 'boot.js', 'resume.js', 'interactions.js', 'app.js', 'data.js', 'forms.js', 'form-plan.js', 'essay.js', 'essay-config.js', 'essay-ask.js', 'essay-quality.js', 'essay-submit-check.js',
   'section-head.js', 'parse-requirements.js', 'parse-amount.js', 'match-engine.js', 'notify-rules.js', 'notify.js', 'push-config.js',
   'chat-config.js', 'chat.js',

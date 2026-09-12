@@ -138,8 +138,14 @@ const eq = (label, got, want) => {
     return {
       홈에구획: [...home.querySelectorAll('.section-head h3')].map((h) => h.textContent.trim()),
       홈에목록: !!document.querySelector('#home-apps'),
-      신청내역카드: document.querySelectorAll('#apps-list .sch-card').length,
-      요약있음: !!(document.querySelector('#apps-summary') || {}).textContent?.trim(),
+      /* 🔴 **보이는지까지 본다** — `hidden` 만 걸어도 innerHTML 은 남는다(달력 보기가 실제로
+         그렇게 감춘다: renderApplications 의 `list.hidden = calMode`). 개수만 세면 화면이
+         텅 빈 채로 초록불이다(2026-09-12 코드 리뷰 실측). 이 파일이 12줄 위에서 이미
+         `offsetParent !== null` 로 재고 있었다 — 같은 잣대를 쓴다. */
+      신청내역카드: [...document.querySelectorAll('#apps-list .sch-card')]
+        .filter((e) => e.offsetParent !== null).length,
+      요약있음: (() => { const el = document.querySelector('#apps-summary');
+        return !!(el && el.offsetParent !== null && el.textContent.trim()); })(),
       담은건수: (typeof state !== 'undefined' && state.applications || []).length,
     };
   });

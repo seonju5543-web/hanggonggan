@@ -205,7 +205,10 @@ const PROFILE = {
      (여백 14 → 10 · 칩 사이 8 → 6 · 좌우 화면 끝까지), 좁은 화면에서 실제로 한 줄인지 잰다.
      ⚠️ 글자 크기는 재지 않는다 — 2026-09-11 개발자 지시로 크기 조정은 전부 되돌린 상태다. */
   console.log('\n■ 필터 칩 한 줄 (2026-09-12)');
-  for (const w of [360, 390]) {
+  /* 🔴 **320px 도 잰다** — 거기서는 한 줄을 요구하지 않고 **잘리지 않는 것**만 요구한다.
+     처음엔 360·390 만 재서, 320px 에서 마지막 칩이 35px 잘린 채 초록불이었다(코드 리뷰 실측).
+     '잘린 칩이 없다' 가 이 절의 본뜻이고 '한 줄' 은 개발자가 정한 목표 폭에서의 요구다. */
+  for (const w of [320, 360, 390, 430]) {
     await page.setViewportSize({ width: w, height: 900 });
     await page.waitForTimeout(250);
     const row = await page.evaluate(() => {
@@ -214,7 +217,8 @@ const PROFILE = {
       return { n: rects.length, 줄수: new Set(rects.map((r) => Math.round(r.top))).size,
         전부보임: rects.every((r) => r.left >= 0 && r.right <= window.innerWidth) };
     });
-    eq(`${w}px — 칩 ${row.n}개가 한 줄이다`, row.줄수, 1);
+    if (w >= 360) eq(`${w}px — 칩 ${row.n}개가 한 줄이다`, row.줄수, 1);
+    else eq(`${w}px — 여기서는 접는다 (한 줄을 요구하지 않는다)`, row.줄수 >= 1, true);
     eq(`  ${w}px — 잘린 칩이 없다 (2026-08-30 에 스크롤로 반쯤 잘렸던 자리)`, row.전부보임, true);
   }
   await page.setViewportSize({ width: 390, height: 900 });

@@ -620,10 +620,16 @@ input::placeholder { color: var(--text-weak); }
   padding-bottom: 4px;
   scrollbar-width: none;
 }
-/* 칩은 글자에 맞춰 그대로 — 줄이거나 늘리지 않는다(줄이면 글자가 두 줄로 접힌다) */
-.filter-chip { flex: 0 0 auto; }
+/* 🔴 **320px 에서는 접는다** (2026-09-12 코드 리뷰가 실측으로 잡았다).
+   다섯이 한 줄에 들어가는 것은 360px 부터다 — 320px(아이폰 SE 1세대 · iOS 화면 확대 · 폴드
+   겉화면)에서는 마지막 칩이 **35px 잘렸다.** 그건 2026-08-30 에 줄바꿈으로 바꾼 바로 그
+   증상이라("반쯤 보이는 것은 안 보이는 것이다") 거기서는 접는 쪽이 맞다.
+   ⚠️ 문턱을 360 보다 올리지 말 것 — 360 은 갤럭시 S·픽셀의 폭이라 거기서 접으면 지시("일렬로")를
+      어기는 것이 된다. 관문이 320·360·390 셋을 다 잰다(verify-explore-sort '필터 칩 한 줄'). */
+@media (max-width: 359px) { .filter-row { flex-wrap: wrap; } }
 .filter-row::-webkit-scrollbar { display: none; }
 .filter-chip {
+  flex: 0 0 auto;        /* 줄이지 않는다 — 줄이면 글자가 칸 밖으로 새거나 두 줄로 접힌다 */
   padding: 7.5px 10px;   /* 가로 14 → 10 (2026-09-12 '일렬로'). 세로는 그대로 — 누르는 높이 41.5 유지 */
   border-radius: var(--radius-pill);
   background: var(--surface);
