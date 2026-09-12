@@ -1,21 +1,36 @@
 {
- "updatedAt": "2026-09-12T17:55:32.703Z",
+ "updatedAt": "2026-09-12T23:27:38.377Z",
  "account": {
   "username": "handaejang_",
   "followers": 3,
-  "media": 2
+  "media": 3
  },
  "history": [
   {
    "at": "2026-09-13",
    "followers": 3,
-   "media": 2,
-   "likes": 6,
+   "media": 3,
+   "likes": 9,
    "comments": 0,
    "saved": 0
   }
  ],
  "posts": [
+  {
+   "id": "18624158749041013",
+   "code": "2700787001",
+   "org": "LG디스플레이",
+   "name": "LGenius(산학장학생)",
+   "permalink": "https://www.instagram.com/p/DdMkqOelTfI/",
+   "at": "2026-09-12",
+   "likes": 1,
+   "comments": 0,
+   "type": "CAROUSEL_ALBUM",
+   "reach": 4,
+   "saved": 0,
+   "shares": 0,
+   "error": null
+  },
   {
    "id": "18129374602599684",
    "code": "auto-ent2431265883artclviewdo",
@@ -23,10 +38,10 @@
    "name": "2026-2학기 가족장학금 신청 안내",
    "permalink": "https://www.instagram.com/p/DdMcZipoNjQ/",
    "at": "2026-09-12",
-   "likes": 3,
+   "likes": 4,
    "comments": 0,
    "type": "CAROUSEL_ALBUM",
-   "reach": 3,
+   "reach": 6,
    "saved": 0,
    "shares": 0,
    "error": null
@@ -38,10 +53,10 @@
    "name": "2026-2 중소기업취업연계장학금 신규장학생 신청안내",
    "permalink": "https://www.instagram.com/p/DdMcAtIm8kJ/",
    "at": "2026-09-12",
-   "likes": 3,
+   "likes": 4,
    "comments": 0,
    "type": "CAROUSEL_ALBUM",
-   "reach": 2,
+   "reach": 4,
    "saved": 0,
    "shares": 0,
    "error": null
