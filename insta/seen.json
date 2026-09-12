@@ -1,8 +1,18 @@
 {
- "posted": [],
+ "posted": [
+  {
+   "code": "auto-ent2431264146artclviewdo",
+   "org": "한국외국어대학교",
+   "name": "2026-2 중소기업취업연계장학금 신규장학생 신청안내",
+   "tplNo": 1,
+   "at": "2026-09-13",
+   "media": "18390052138161575",
+   "permalink": "https://www.instagram.com/p/DdMcAtIm8kJ/"
+  }
+ ],
  "prepared": [
   {
-   "status": "prepared",
+   "status": "posted",
    "code": "auto-ent2431264146artclviewdo",
    "org": "한국외국어대학교",
    "name": "2026-2 중소기업취업연계장학금 신규장학생 신청안내",
@@ -12,7 +22,8 @@
    "at": "2026-09-13",
    "revisedAt": "2026-09-12",
    "school": "한국외대",
-   "cards": 4
+   "cards": 4,
+   "postedAt": "2026-09-13"
   },
   {
    "status": "prepared",
