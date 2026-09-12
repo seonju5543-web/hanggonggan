@@ -904,6 +904,10 @@ function showScreen(name, opts) {
      그때 화면은 이미 손끝을 따라 제자리까지 와 있으므로, 여기서 등장 애니를 또 틀면
      다 온 화면이 한 번 더 움직인다(끌어 놓고 나면 튀어 보인다). */
   const SUB = ['settings', 'trash', 'terms', 'logins', 'faq', 'perms'];
+  /* 🔴 안쪽 화면에서는 **가로 손짓이 우리 것**이라고 앱 전체에 표시해 둔다 (2026-09-12).
+     짧은 화면 아래 빈 자리는 화면이 아니라 `#app` 이라, 화면에만 주면 거기서 시작한
+     손짓을 브라우저가 세로 스크롤로 가져간다. 안쪽 화면일 때만 켜는 이유는 style.css 에. */
+  $('#app').classList.toggle('on-sub-screen', SUB.includes(name));
   if (o.anim !== false && (SUB.includes(name) || SUB.includes(currentScreen))) {
     const el = $(`#screen-${name}`);
     if (el) {
@@ -3123,12 +3127,16 @@ function enableScreenSwipeBack(root) {
   let top = null;        // 떠나는 화면
   let under = null;      // 뒤에서 따라 들어오는 화면
   let toName = '';
-  const FLICK = 0.11;    // 시트와 같은 값 — '툭 치는 것'과 '천천히 끄는 것'이 갈리는 선
-  const TAKE = 0.32;     // 이만큼 끌면 놓아도 나간다 (화면 너비의 몫)
+  /* 🔴 문턱을 낮췄다 (2026-09-12 개발자 지적 "잘 인식도 안되고"). 전에는 화면 너비의
+     **32%**(430px 폰에서 138px)를 끌어야 나갔는데, 그만큼 끌려면 엄지가 화면을 가로질러야
+     한다. 손을 멈췄다 놓으면 속도가 0이라(VREST) 거리만 남는데 그 거리가 너무 멀었다.
+     22% 는 95px — 엄지 한 마디 거리다. 튕김 문턱도 함께 낮춘다. */
+  const FLICK = 0.08;    // 튕김으로 볼 빠르기 (px/ms)
+  const TAKE = 0.22;     // 이만큼 끌면 놓아도 나간다 (화면 너비의 몫)
   /* 🔴 뒤 화면은 앞 화면의 **0.28배**로 움직인다 — 두 겹이 다른 속도로 가는 것이
      패럴랙스다. 1.0 이면 한 장처럼 보이고, 0 이면 뒤가 멈춰 있어 깊이가 안 생긴다. */
   const PARALLAX = 0.28;
-  const DIM = 0.55;      // 멀리 있을 때의 옅기(글자만 흐려 보인다)
+  const DIM = 0.82;      // 멀리 있을 때의 옅기 — 살짝만(0.55 는 '흐려졌다 나타나는 것'으로 보였다)
 
   const slow = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -3235,10 +3243,22 @@ function enableScreenSwipeBack(root) {
     const mx = t.clientX - x0;
     const my = t.clientY - y0;
     if (!axis) {
-      if (Math.abs(mx) < 8 && Math.abs(my) < 8) return;   // 아직 방향을 말하지 않았다
-      /* 세로가 더 크면 목록을 읽으려는 것이다 — 통째로 포기하고 다시 붙잡지 않는다 */
-      axis = Math.abs(mx) > Math.abs(my) ? 'x' : 'y';
-      if (axis === 'y') { live = false; return; }
+      /* 🔴 **엄지는 곧게 못 움직인다** (2026-09-12 개발자 지적 "잘 인식도 안되고").
+         전에는 8px 움직인 순간 `|가로| > |세로|` 하나로 정했는데, 엄지 손짓은 호를 그려
+         첫 8px 이 세로로 더 큰 경우가 흔하다 — 그 순간 손짓을 통째로 버렸고 다시 잡지 않아
+         학생에게는 "쓸었는데 안 된다"가 됐다. 지금은 **둘 중 하나가 뚜렷해질 때까지 기다린다**:
+         · 세로가 가로의 1.4배를 넘고 12px 이상 → 목록을 읽으려는 것이다(포기)
+         · 가로가 오른쪽으로 10px 이상 → 우리 것
+         · 왼쪽으로 10px 이상 → 되돌아가기가 아니다(포기)
+         그 전에는 아무 판정도 하지 않고 다음 움직임을 기다린다. */
+      if (Math.abs(my) > 12 && Math.abs(my) > Math.abs(mx) * 1.4) { live = false; return; }
+      if (mx <= -10) { live = false; return; }
+      /* 🔴 **맡는 순간에는 가로가 이겨 있어야 한다** (2026-09-12 코드 리뷰).
+         `pan-y` 를 줘 두었으므로 비스듬한 손짓은 브라우저가 **이미 세로로 굴리는 중**이고,
+         그때 우리가 끼어들면 늦은 preventDefault 는 안 먹어 화면이 스크롤 도중에 튄다.
+         아직 흐릿하면 판정하지 않고 다음 움직임을 기다린다(포기하는 게 아니다). */
+      if (mx < 10 || Math.abs(my) >= mx) return;
+      axis = 'x';
       /* 움직임이 느린 기기·설정에서는 두 겹을 끌지 않는다 — 문턱만 보고 바로 바꾼다 */
       if (!slow() && !mount()) { live = false; return; }
     }

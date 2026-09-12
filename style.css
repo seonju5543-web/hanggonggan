@@ -68,6 +68,9 @@
   --shadow-chip:      0 4px 14px rgba(35, 32, 26, 0.20);
   --shadow-lift:  0 2px 6px rgba(58, 48, 28, 0.06), 0 18px 40px rgba(58, 48, 28, 0.13);
   --shadow-sheet: 0 -14px 48px rgba(40, 33, 20, 0.22);
+  /* 옆으로 미끄러지는 화면의 **왼쪽 모서리** 그림자. --shadow-sheet 는 위로 지는 것이라
+     (0 -14px) 옆으로 가는 면에 쓰면 그늘이 엉뚱한 쪽에 생긴다(실제로 그랬다). */
+  --shadow-page:  -12px 0 28px rgba(40, 33, 20, 0.16);
   --ring:         0 0 0 3px rgba(138, 106, 31, 0.20);
   --cutout:       0 0 0 2px var(--bg);
   /* 뒤로 쓸기가 손을 따라올 때 JS 가 갈아 끼우는 두 값. 여기 적어 두는 것은 **쉬는 상태**다
@@ -2823,6 +2826,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
   --shadow-chip:  0 4px 14px rgba(39, 80, 143, 0.26);      /* 남색 판의 칩 — 이 값이 실제로 뜬다 */
   --shadow-lift:  0 2px 6px rgba(24, 35, 56, 0.07), 0 18px 40px rgba(24, 35, 56, 0.14);
   --shadow-sheet: 0 -14px 48px rgba(18, 26, 42, 0.20);
+  --shadow-page:  -12px 0 28px rgba(18, 26, 42, 0.15);
   --knob:         0 1px 3px rgba(24, 35, 56, 0.26);
   --primary-weak: rgba(23, 25, 28, 0.055);
 }
@@ -4094,9 +4098,22 @@ body,
    ⚠️ :active 의 줄어드는 효과는 **남긴다** — 개발자가 "지금처럼 좀 눌리는 효과만" 이라 했다.
    ⚠️ 키보드로 옮겨 다닐 때의 초점 테두리(:focus-visible)는 손대지 않는다. 그건 손가락이
       아니라 키보드·보조기기를 쓰는 사람에게 지금 어디인지 알려 주는 유일한 표시다. */
-.my-menu-item, .sub-back, .set-menu a.my-menu-item { -webkit-tap-highlight-color: transparent; }
-/* 누르고 있는 동안의 바탕 — 파란 판 대신 이 앱의 색으로 아주 옅게 */
-.my-menu-item:active { background: var(--surface-2); }
+.my-menu-item, .sub-back, .set-menu a.my-menu-item,
+.nf-pref, .faq-item, .faq-item summary { -webkit-tap-highlight-color: transparent; }
+
+/* 🔴 **회색 판으로 채우지 않는다** (2026-09-12 개발자 지적: "회색박스로 채워지는 효과
+   없애주고 … 기타처럼 누를때 파랗게"). 두 갈래로 회색이 나고 있었다 —
+   ① 알림 줄(`.nf-pref`)과 자주 묻는 질문(`.faq-item summary`)은 위 목록에 없어서
+      **브라우저 기본 판**(rgba(0,0,0,0.18))이 그대로 칠해졌다(실측).
+   ② 기타 줄은 우리가 `:active` 에 `--surface-2` 를 칠하고 있었다.
+   이제 셋 다 **글자가 강조색(남색)으로 바뀌는 것**으로만 답한다 — 기타가 이미 그랬고
+   (`.my-menu-item:hover` 의 color), 개발자가 그 모습을 기준으로 잡아 줬다.
+   ⚠️ 면을 칠하지 않으므로 줄 사이 구분선·여백은 그대로다. */
+.my-menu-item:not(.danger):active,
+.nf-pref:active,
+.faq-item summary:active { color: var(--accent); }
+/* 🔴 **탈퇴는 뺀다** — 그 줄은 빨강이 '되돌릴 수 없는 일'이라는 표시다. 누를 때만 남색이
+   되면 가장 위험한 줄에서 그 경고가 사라진다. */
 
 /* 🔴 안쪽 화면은 **옆에서 미끄러져 들어온다** (2026-09-11 개발자 지시 "화면 애니 효과").
    들어갈 때는 오른쪽에서, 되돌아올 때는 왼쪽에서 — 방향이 '어디로 가는 중인지'를 말한다.
@@ -4404,9 +4421,29 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 }
 .screen.swipe-top {
   z-index: 40;
-  box-shadow: var(--shadow-sheet);   /* 들려서 떠나는 면 — 경계가 보여야 두 겹으로 읽힌다 */
+  box-shadow: var(--shadow-page);   /* 떠나는 면의 **왼쪽** 모서리 — 경계가 보여야 두 겹으로 읽힌다 */
 }
-/* 뒤 화면은 멀리 있는 것처럼 옅다(0.55 → 1). 바탕색이 같아 **글자만** 흐려 보인다 */
+/* 뒤 화면은 멀리 있는 것처럼 조금 옅다(0.82 → 1). 바탕색이 같아 **글자만** 살짝 흐려 보인다.
+   🔴 많이 내리지 말 것 — 0.55 였을 때는 깊이가 아니라 **흐려졌다 나타나는 것**으로 보였다
+      (2026-09-12 개발자: "화면도 부자연스러워"). 멀리 있는 종이는 사라지지 않는다. */
 .screen.swipe-under { z-index: 39; opacity: var(--swipe-dim); }
-/* 손을 뗀 뒤의 마무리 — 남은 거리만 이어서 간다(JS 가 시간을 정한다) */
-.screen.swipe-ease { transition: transform var(--swipe-dur) cubic-bezier(0.32, 0.72, 0, 1), opacity var(--swipe-dur) linear; }
+/* 손을 뗀 뒤의 마무리 — 남은 거리만 이어서 간다(JS 가 시간을 정한다).
+   ⚠️ 옅기도 **위치와 같은 곡선**으로 간다. linear 로 두면 다 와서도 색이 아직 변하는 중이라
+      두 겹이 따로 논다. */
+.screen.swipe-ease { transition: transform var(--swipe-dur) cubic-bezier(0.32, 0.72, 0, 1), opacity var(--swipe-dur) cubic-bezier(0.32, 0.72, 0, 1); }
+
+/* 🔴 **가로 손짓은 우리 것이라고 브라우저에 알린다** (2026-09-12 개발자 지적 "잘 인식도 안되고").
+   이게 없으면 브라우저가 먼저 세로 스크롤로 판정해 버려, 손가락이 조금이라도 비스듬하면
+   그 뒤 touchmove 가 우리에게 안 온다 — 학생 입장에서는 "쓸었는데 아무 일도 안 난다"가 된다.
+   `pan-y` 는 '세로는 브라우저 몫, 가로는 내 몫'이라는 뜻이다.
+   ⚠️ 안쪽 화면 여섯에만 준다. 가로로 스크롤되는 영역이 생기면 그 요소에 `touch-action: auto`
+      를 따로 줘야 한다 — 지금은 여섯 화면 어디에도 없다(실측). */
+#screen-settings, #screen-trash, #screen-terms,
+#screen-logins, #screen-faq, #screen-perms { touch-action: pan-y; }
+/* 🔴 **화면 아래 빈 자리도 같이** (2026-09-12 코드 리뷰). 앱 권한·빈 휴지통처럼 짧은 화면은
+   아래쪽이 통째로 비는데 그 자리는 `#app` 이라, 화면에만 주면 거기서 시작한 손짓은 여전히
+   브라우저가 세로 스크롤로 가져간다(실측: 그 자리의 touch-action 이 auto 였다).
+   손짓 자체를 `#app` 에서 받는 이유와 똑같은 자리다.
+   ⚠️ 안쪽 화면일 때만 켠다 — 늘 켜 두면 홈·탐색의 **옆으로 넘기는 칩 줄**과 양식 미리보기
+      (`.chat-chips`·`.fd-wrap`)가 손으로 안 밀린다. 켜고 끄는 곳은 `showScreen` 한 곳. */
+#app.on-sub-screen { touch-action: pan-y; }
