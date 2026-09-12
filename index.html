@@ -405,6 +405,11 @@
         <button class="filter-chip active" data-filter="all">전체</button>
         <button class="filter-chip" data-filter="교내">교내</button>
         <button class="filter-chip" data-filter="교외">교외</button>
+        <!-- 🔴 '우리 학교' 는 **다른 종류의 목록**이다 (노션 UI-16 · 2026-09-12).
+             교내·교외는 우리가 원문을 읽고 등록한 공고이고, 이 칸은 수집 로봇이 학교
+             게시판에서 매일 줍는 **글 목록**이다(적합도도 마감 판정도 없다).
+             예전에는 '전체' 목록 **아래에** 붙어 있어 스크롤 끝까지 가야 보였다. -->
+        <button class="filter-chip" data-filter="notice">우리 학교</button>
         <button class="filter-chip" data-filter="eligible">신청 가능만</button>
       </div>
       <div id="explore-list" class="card-list"></div>

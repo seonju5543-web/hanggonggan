@@ -2,6 +2,7 @@
    화면을 나중에 그리는 학교 게시판에서 장학 공고를 수집한다.
    결과는 일반 수집기와 같은 data/notices.json에 합쳐진다. */
 import fs from 'node:fs';
+import { deadlineHintFrom } from './deadline-hint.mjs';
 import { chromium } from 'playwright';
 import { urlKey, dedupeNotices, capNotices, clickRowKey } from './url-key.mjs';
 import { loadCandidates, mergeCandidates, saveCandidates } from './candidates.mjs';
@@ -69,7 +70,7 @@ try { notices = JSON.parse(fs.readFileSync(noticesPath, 'utf8')); } catch { /* �
 const KEYWORDS = /장학|학자금|등록금 감면|학업장려|근로장학/;
 /* 메뉴/공고 판정은 clean-title.mjs의 isMenuEntry 한 곳에만 둔다 — 여기 있던 MENU_NOISE·NOTICE_SIGNAL을
    그 모듈로 옮겼다. 일반 수집기와 갈라져 있어서 사고가 났다(2026-08-02 '…안내' 공고 대량 유실) */
-const DEADLINE_RE = /(마감|까지|기한|접수기간|신청기간)[^\n<]{0,60}/;
+/* 접수 기간 한 줄을 뽑는 규칙은 collector/deadline-hint.mjs 한 곳 — 일반 수집기와 공용이다. */
 
 const browser = await chromium.launch({
   args: ['--no-sandbox'],
@@ -235,7 +236,7 @@ async function loadPage(url, { attempts = 3, lines = report, retryClosed = 1 } =
           const dHtml = await detailPage.content().catch(() => '');
           const dText = dHtml.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ')
             .replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
-          const dm = dText.match(DEADLINE_RE);
+
           const atts = (await detailPage.$$eval('a[href]', (as) => as.map((a) => ({
             title: (a.textContent || '').replace(/\s+/g, ' ').trim(), url: a.href,
           }))).catch(() => []))
@@ -286,7 +287,7 @@ async function loadPage(url, { attempts = 3, lines = report, retryClosed = 1 } =
              새로 수집되는 행은 상세 루프가 적는다(그쪽이 '진짜 저장됐다'는 확증). */
           const known = seen[urlKey(recUrl)] || seen[recUrl];
           if (known) seen[clickRowKey(url, title)] = known;
-          clickDetails[title] = { deadlineHint: dm ? dm[0].trim().slice(0, 80) : null, attachments: atts };
+          clickDetails[title] = { deadlineHint: deadlineHintFrom(dText), attachments: atts };
           if (popup) await popup.close().catch(() => {});
           else if (page.url() !== url) await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 }).catch(() => {});
           else { await page.goBack({ waitUntil: 'domcontentloaded', timeout: 10000 }).catch(() => {}); }
@@ -431,8 +432,7 @@ async function harvestTarget(t, report) {
         if (text.replace(/[^가-힣]/g, '').length >= 120) {
           bodies[it.url] = { title: it.title, text: text.trim().slice(0, 15000), at: todayStr, via: 'browser' };
         }
-        const dm = text.match(DEADLINE_RE);
-        deadlineHint = dm ? dm[0].trim().slice(0, 80) : null;
+        deadlineHint = deadlineHintFrom(text);
         attachments = d.links
           .filter((l) => /\.(hwp|hwpx|doc|docx|pdf|xls|xlsx)(\?|$)/i.test(l.url) || /download|fileDown/i.test(l.url))
           .filter((l) => l.title.length >= 4 && l.title.length <= 120)

@@ -19,7 +19,7 @@
    그 캐시가 옛 판이면 그대로 옛 화면이 보인다. 번호를 올려야 확실히 청소된다. */
 /* ⚠️ 두 작업이 같은 날 v151 을 각자 올려 부딪혔다 — 번호는 v152 로 올리고 **둘 다** 남긴다.
    번호만 맞추고 한쪽 파일 목록을 버리면, 버린 쪽 파일이 오프라인에서만 없어 앱이 죽는다. */
-const CACHE = 'handaejang-v171';  /* v171 — 탐색 구획 삭제(정렬 되살림) · 대학원 전용 미달 · 층2 금액 줄 */
+const CACHE = 'handaejang-v172';  /* v172 — '우리 학교' 칸 분리 (UI-16) · 접수 기간 한 줄 정리 */
 const ASSETS = ['.', 'index.html', 'style.css', 'boot.js', 'resume.js', 'interactions.js', 'app.js', 'data.js', 'forms.js', 'form-plan.js', 'essay.js', 'essay-config.js', 'essay-ask.js', 'essay-quality.js', 'essay-submit-check.js',
   'section-head.js', 'parse-requirements.js', 'parse-amount.js', 'match-engine.js', 'notify-rules.js', 'notify.js', 'push-config.js',
   'chat-config.js', 'chat.js',

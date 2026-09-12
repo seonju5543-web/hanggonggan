@@ -1556,6 +1556,23 @@ function applySort(key) {
 function renderExplore() {
   const matches = getMatches();
   const sorter = EXPLORE_SORTS[exploreSort] || EXPLORE_SORTS.fit;
+  /* 🔴 **'우리 학교' 는 별도 칸이다** (2026-09-12 개발자 지시 · 노션 UI-16:
+     "교내/교외가 있는 것처럼 칸을 하나 더 만들어 뺀다").
+     이 칸에 담기는 것은 우리가 등록한 공고가 아니라 **수집 로봇이 학교 게시판에서 매일 줍는
+     글 목록**이다 — 적합도도, 마감 판정도, 신청 준비도 없다(원문 링크만 준다).
+     예전에는 '전체' 목록 **아래에** 붙어 있어 카드 수십 장을 지나야 보였다.
+     🔴 이 칸에서는 **정렬 버튼을 감춘다** — 적합도·마감이 없는 목록에 '적합도순'을 띄우면
+        방금(같은 날) 고친 지적("정렬 이런 거 하나도 안 지켜짐")을 그대로 되풀이하는 것이다.
+     🔴 검색은 그대로 걸린다(liveNoticesHtml 이 제목·학교로 거른다) — 화면에 검색창이
+        떠 있는데 안 걸리면 그것도 앱이 제 말을 안 지키는 것이다. */
+  const noticeTab = exploreFilter === 'notice';
+  { const b = $('#explore-sort-btn'); if (b) b.hidden = noticeTab; }
+  if (noticeTab) {
+    $('#explore-list').innerHTML = '';
+    $('#live-notices').innerHTML = liveNoticesHtml(exploreQuery);
+    closeSortMenu();
+    return;
+  }
   /* 🔴 판정 3단(가능/정보부족/미달)은 **적합도순일 때만** 1차 키다 (2026-08-26 개발자 결정:
      "적합도를 기준으로 했을 때는 맨 아래에 두는 게 맞지"). 마감순·최신순에서는 고른 기준이
      곧이곧대로 적용된다 — 마감 임박순인데 미달이라고 뒤로 밀면 그 정렬은 거짓말이 된다.
@@ -1588,8 +1605,9 @@ function renderExplore() {
       .filter(Boolean).join(' ').toLowerCase().includes(q));
   }
 
-  /* 실시간 공고 피드는 '전체'일 때만 — 검색 중에는 끈다(검색어와 무관한 목록이 아래 붙는다) */
-  $('#live-notices').innerHTML = (exploreFilter === 'all' && !q) ? liveNoticesHtml() : '';
+  /* 실시간 공고는 이제 **제 칸('우리 학교')에서만** 나온다 — 위에서 먼저 돌려보낸다.
+     예전에는 '전체' 목록 아래에 붙였는데, 개발자 지시로 칸을 나눴다(노션 UI-16). */
+  $('#live-notices').innerHTML = '';
   /* ⚠️ 홈과 같은 이유로 여기에도 뼈대를 두지 않는다 — 이 목록은 받아오기 중에도 비지 않는다
      (renderHome 의 같은 자리 주석 참조). 뼈대는 `liveNoticesHtml()` 한 곳이다. */
   /* 🔴 **구획 없이 한 목록이다** (2026-09-12 개발자 지시: "오늘 내일 마감 이번 주 마감
@@ -2240,7 +2258,7 @@ function liveNoticesHead(updatedAt) {
     <span class="link-btn">매일 아침 자동 갱신${updatedAt ? ' · ' + updatedAt : ''}</span></div>`;
 }
 
-function liveNoticesHtml() {
+function liveNoticesHtml(query) {
   const p = state.profile;
   if (!p) return '';
   /* 🔴 **'아직 안 왔다'와 '없다'는 다른 말이다** (2026-09-09).
@@ -2267,10 +2285,23 @@ function liveNoticesHtml() {
   const isLoan = (n) => /대출|융자/.test(n.title);
   const scholarships = forMe.filter((n) => !isLoan(n));
   const loans = forMe.filter(isLoan);
-  const mine = scholarships.slice(0, loans.length ? 8 : 10).concat(loans.slice(0, 2));
+  /* 🔴 **상한을 걷었다** (2026-09-12 · UI-16). 8+2 는 이 목록이 '전체' 카드 **아래에**
+     얹혀 있던 시절의 자리 다툼 때문이었다 — 제 칸이 생겼으니 학생이 보러 온 것을 잘라서
+     보여 줄 이유가 없다(실측: 한국외국어대학교 22건 · 경희대학교 17건).
+     ⚠️ 차례는 그대로 둔다 — 학자금 대출·융자는 장학금이 아니라서 **뒤에** 둔다
+        (정직 원칙 · 2026-07-30 조정). 없애지는 않는다: 앱에 대출 안내가 여기뿐이다. */
+  let mine = scholarships.concat(loans);
+  /* 🔴 검색은 **여기에도 걸어야 한다** (2026-09-12 · UI-16). 이 목록이 제 칸을 갖게 되면서
+     검색창이 그 화면에도 떠 있는데, 안 걸면 "검색했는데 그대로"가 된다 — 방금 구획에서
+     고친 것과 같은 유형(화면이 스스로 한 말을 안 지키는 것)이다. */
+  const q = String(query || '').trim().toLowerCase();
+  if (q) mine = mine.filter((n) => [n.title, n.school, n.campus].filter(Boolean)
+    .join(' ').toLowerCase().includes(q));
   const head = liveNoticesHead(liveNotices.updatedAt);
   if (!mine.length) {
-    return head + `<p class="empty" style="margin-bottom:16px">아직 ${esc(p.school)} 게시판 연결 전이거나 새 공고가 없어요<br />연결되면 실제 공고가 여기에 자동으로 떠요.</p>`;
+    return head + (q
+      ? `<p class="empty" style="margin-bottom:16px">'${esc(String(query).trim())}'와 맞는 우리 학교 공고가 없어요</p>`
+      : `<p class="empty" style="margin-bottom:16px">아직 ${esc(p.school)} 게시판 연결 전이거나 새 공고가 없어요<br />연결되면 실제 공고가 여기에 자동으로 떠요.</p>`);
   }
   return head + `<div class="card-list" style="margin-bottom:18px">` + mine.map((n) => `
     <a class="sch-card notice-card" href="${esc(safeUrl(n.url))}" target="_blank" rel="noopener">
@@ -2281,7 +2312,12 @@ function liveNoticesHtml() {
               첨부가 있다는 말이 신청이 끝났다는 말로 읽혔다. 아래 메타 줄로 내린다. */ ''}
       <div class="sch-top">
         <span class="sch-org">교내 공고 · ${esc(n.school)}${n.campus ? ' ' + esc(n.campus) : ''}</span>
-        ${n.deadlineHint ? `<span class="badge badge-dday urgent">마감 임박</span>` : ''}
+        ${/* 🔴 **'마감 임박' 배지를 여기 달지 않는다** (2026-09-12 · UI-16 으로 이 카드가 제 칸을
+             갖게 되면서 드러났다). 그 배지는 `deadlineHint` 가 **있기만 하면** 붙었다 — 본문에
+             '까지'·'마감' 이라는 낱말이 한 번이라도 나오면 붙는다는 뜻이라, `마감 안내 작성일
+             2026.08.31 … 조회수 5` 같은 게시판 껍데기에도 빨간 '마감 임박' 이 달려 있었다.
+             우리는 이 글의 마감일을 **모른다**(수집한 것은 제목·링크·기간 문장 한 줄뿐이다).
+             모르는 것을 단정하지 않는다(원칙 8-1) — 기간은 아래 줄이 원문 그대로 말한다. */ ''}
       </div>
       <p class="sch-name">${esc(unent(n.title))}</p>
       ${n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? `<p class="sch-provider">${esc(unent(n.deadlineHint))}</p>` : ''}

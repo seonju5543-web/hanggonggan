@@ -179,10 +179,14 @@ async function seed(page) {
         data.js 의 상시 제도 6종을 동기로 먼저 내주므로 그 목록은 받아오기 중에도 비지 않는다.
         (처음에 "공고 오기 전 홈이 '없음'이라고 말한다"고 보고 뼈대를 넣었다가, 재 보고 걷어냈다.)
         기다림이 실제로 보이는 곳은 실시간 공고 구역 하나다 — 거기를 지킨다. */
-  console.log('\n■ 기다리는 동안의 뼈대 (실시간 공고 구역)');
+  /* 🔴 **재는 자리를 옮겼다** (2026-09-12 · 노션 UI-16). 실시간 공고는 '전체' 목록 아래가
+     아니라 **'우리 학교' 칸**에서만 그려진다(개발자 지시로 칸을 뺐다). 뜻은 그대로다 —
+     기다리는 동안 뼈대, 빈손이면 '없어요'. 필터를 안 옮기면 이 절이 통째로 빈손을 잰다. */
+  console.log('\n■ 기다리는 동안의 뼈대 (우리 학교 칸)');
   const skel = await page.evaluate(() => {
     const keep = liveNotices;
     const read = () => document.querySelector('#live-notices');
+    exploreFilter = 'notice';                               // 실시간 공고가 그려지는 칸
 
     liveNotices = null; renderExplore();                    // 아직 안 온 상태
     const during = {
@@ -201,7 +205,7 @@ async function seed(page) {
       empty: /없어요|없음/.test(read().textContent),
     };
 
-    liveNotices = keep; renderExplore();
+    liveNotices = keep; exploreFilter = 'all'; renderExplore();
     return { during, after };
   });
   ok('공고가 오기 전에는 뼈대를 보여 준다', skel.during.skeleton);

@@ -196,6 +196,36 @@ const PROFILE = {
      옛 규칙은 마감 오름차순뿐이라 실측(한국외대)에서 맨 위 둘이 **적합도 15%** 였다.
      🔴 기대 순서를 여기서 **손으로 적지 않는다** — 앱의 getMatches·fitRank·dday·byDeadline 을
         그대로 불러 만든다. 검사가 규칙을 한 벌 더 가지면 앱이 바뀔 때 조용히 갈라진다. */
+  /* ══ '우리 학교' 칸 (2026-09-12 · 노션 UI-16) ═════════════════════════════
+     개발자 지시: "교내/교외가 있는 것처럼 칸을 하나 더 만들어 뺀다."
+     이 칸의 내용은 **수집 로봇이 학교 게시판에서 줍는 글 목록**이다(등록 공고가 아니다).
+     예전에는 '전체' 목록 아래에 붙어 카드 수십 장을 지나야 보였다. */
+  console.log('\n■ 우리 학교 칸 (UI-16)');
+  await page.click('.filter-chip[data-filter="notice"]'); await page.waitForTimeout(500);
+  const nt = await page.evaluate(() => ({
+    카드: document.querySelectorAll('#explore-list .sch-card:not(.notice-card)').length,
+    공고: document.querySelectorAll('#live-notices .notice-card').length,
+    정렬버튼: !document.querySelector('#explore-sort-btn').hidden,
+    /* 🔴 '마감 임박' 배지는 여기 없어야 한다 — 우리는 이 글의 마감일을 모른다(원칙 8-1) */
+    임박배지: document.querySelectorAll('#live-notices .badge-dday').length,
+  }));
+  eq('그 칸에는 등록 공고 카드가 없다', nt.카드, 0);
+  eq('  대신 우리 학교 글이 나온다', nt.공고 > 0, true);
+  /* 🔴 적합도·마감이 없는 목록에 '적합도순'을 띄우면 같은 날 고친 지적을 되풀이하는 것이다 */
+  eq('  정렬 버튼은 감춘다 (걸리지 않는 정렬을 띄우지 않는다)', nt.정렬버튼, false);
+  eq('  마감일을 모르므로 「마감 임박」이라고 하지 않는다', nt.임박배지, 0);
+  /* 검색창이 떠 있으니 검색은 여기에도 걸려야 한다 */
+  await page.fill('#explore-search', 'ㅁㄴㅇㄹ'); await page.waitForTimeout(400);
+  eq('  검색이 이 칸에도 걸린다', await page.evaluate(() => ({
+    공고: document.querySelectorAll('#live-notices .notice-card').length,
+    빈말: !!document.querySelector('#live-notices .empty'),
+  })), { 공고: 0, 빈말: true });
+  await page.fill('#explore-search', ''); await page.waitForTimeout(300);
+  /* 🔴 '전체'에서는 **빠져 있어야** 한다 — 그게 '별도 칸으로 뺀다'의 뜻이다 */
+  await page.click('.filter-chip[data-filter="all"]'); await page.waitForTimeout(500);
+  eq('전체 목록 아래에는 더 이상 붙지 않는다',
+    await page.$$eval('#live-notices .notice-card', (e) => e.length), 0);
+
   console.log('\n■ 홈 마감 임박 — 임박한 것 안에서 나에게 맞는 것부터 (UI-14)');
   await page.click('.nav-item[data-nav="home"]');
   await page.waitForSelector('#screen-home:not([hidden])');

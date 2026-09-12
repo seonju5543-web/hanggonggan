@@ -7,6 +7,7 @@
    4) 컨펌용 리포트 이슈 생성 (양식 스키마화·정식 등록은 개발자 컨펌 후)
    ============================================================ */
 import fs from 'node:fs';
+import { deadlineHintFrom } from './deadline-hint.mjs';
 import { FETCH_HEADERS } from './http-headers.mjs';
 import { urlKey, dedupeNotices, capNotices } from './url-key.mjs';
 import { loadCandidates, mergeCandidates, saveCandidates } from './candidates.mjs';
@@ -30,7 +31,8 @@ const KEYWORDS = /장학|학자금|등록금 감면|학업장려|근로장학/;
 /* 메뉴/공고 판정은 clean-title.mjs의 isMenuEntry 한 곳에만 둔다 — 브라우저 수집기와 갈라지면
    같은 게시판을 두 로봇이 다르게 읽는다(2026-08-02 '…안내' 공고 대량 유실 사고) */
 const ATTACH_RE = /\.(hwp|hwpx|doc|docx|pdf|xls|xlsx)(\?|$)/i;
-const DEADLINE_RE = /(마감|까지|기한|접수기간|신청기간)[^\n<]{0,60}/;
+/* 접수 기간 한 줄을 뽑는 규칙은 collector/deadline-hint.mjs 한 곳 — 브라우저 수집기와 공용이다.
+   여기 정규식을 되살리지 말 것(두 벌이 갈라져 학생 화면에 게시판 껍데기가 떴다 · 2026-09-12). */
 
 const UA = FETCH_HEADERS;   // 규칙은 http-headers.mjs 한 곳 (2026-08-20)
 
@@ -73,10 +75,10 @@ async function fetchDetail(item) {
       if (attachments.length >= 8) break;
     }
     const text = html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
-    const dm = text.match(DEADLINE_RE);
+
     const uniq = new Map();
     attachments.forEach((a) => { if (!uniq.has(a.url)) uniq.set(a.url, a); });
-    return { attachments: [...uniq.values()], deadlineHint: dm ? dm[0].trim().slice(0, 80) : null };
+    return { attachments: [...uniq.values()], deadlineHint: deadlineHintFrom(text) };
   } catch {
     return { attachments: [], deadlineHint: null };
   }
