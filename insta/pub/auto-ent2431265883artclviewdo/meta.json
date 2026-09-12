@@ -4,11 +4,11 @@
  "name": "2026-2학기 가족장학금 신청 안내",
  "due": "2026-09-28",
  "school": "한국외대",
- "tpl": "photo",
- "tplNo": 1,
+ "tpl": "chat",
+ "tplNo": 2,
  "seed": -832143408,
- "skin": "blue",
+ "skin": null,
  "font": null,
  "cards": 4,
- "at": "2026-09-12"
+ "at": "2026-09-13"
 }
