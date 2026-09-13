@@ -118,9 +118,12 @@ const D = {
 /* 로봇 리포트 원문 캐시 — loadAll()에서 비운다(로봇을 돌린 뒤 옛 리포트가 보이면 안 된다) */
 let reportCache = {};
 
-/* ---------------- 밝게/어둡게 (B8) ----------------
-   CSS에 `[data-theme]` 훅이 처음부터 있었는데 **아무도 값을 넣지 않아 죽어 있었다.**
-   값을 안 넣으면 브라우저·운영체제 설정을 따른다(그게 기본이고, 그대로 두어도 된다). */
+/* 🔴 밝게/어둡게는 **없앴다** (2026-09-13 개발자 지시 — 앱1과 같은 체계).
+   앱1은 밝은 화면 한 벌뿐이고, 그건 우연이 아니라 지시다(style.css 2067 — "다크모드 규칙을
+   넣지 말 것. 이 앱은 전체가 밝은 화면 한 벌뿐"). 관리자만 어두운 화면을 두니 실제로
+   어긋남이 있었다 — `--shadow` 가 어두운 정의 두 벌 중 한 벌에만 있어, 밝은 OS 에서
+   어둡게 바꾸면 어두운 바탕에 밝은 화면용 그림자가 남았다.
+   ⚠️ 되살리려면 앱1과 **함께** 해야 한다. 여기만 되살리면 같은 어긋남이 돌아온다. */
 /* 밀도 (B0-7) — 훑을 때와 검수할 때 필요한 밀도가 다르다 */
 const DENSITY_KEY = 'handaejang.admin.density';
 function currentDensity() {
@@ -136,29 +139,6 @@ function cycleDensity() {
   try { localStorage.setItem(DENSITY_KEY, next); } catch { /* 저장 못 해도 이번 화면엔 적용된다 */ }
   applyDensity(next);
   toast(`목록 밀도: ${next === 'compact' ? '촘촘하게' : '편안하게'}`);
-}
-
-const THEME_KEY = 'handaejang.admin.theme';
-const THEME_ORDER = ['auto', 'light', 'dark'];
-const THEME_LABEL = { auto: '◐', light: '☀', dark: '☾' };
-const THEME_NAME = { auto: '기기 설정 따름', light: '밝게', dark: '어둡게' };
-
-function applyTheme(mode) {
-  const root = document.documentElement;
-  if (mode === 'auto') root.removeAttribute('data-theme');
-  else root.setAttribute('data-theme', mode);
-  const b = byId('btn-theme');
-  if (b) { b.textContent = THEME_LABEL[mode]; b.title = `화면 밝기: ${THEME_NAME[mode]} (눌러서 전환)`; }
-}
-function currentTheme() {
-  try { return THEME_ORDER.includes(localStorage.getItem(THEME_KEY)) ? localStorage.getItem(THEME_KEY) : 'auto'; }
-  catch { return 'auto'; }
-}
-function cycleTheme() {
-  const next = THEME_ORDER[(THEME_ORDER.indexOf(currentTheme()) + 1) % THEME_ORDER.length];
-  try { localStorage.setItem(THEME_KEY, next); } catch { /* 저장 못 해도 이번 화면엔 적용된다 */ }
-  applyTheme(next);
-  toast(`화면 밝기: ${THEME_NAME[next]}`);
 }
 
 /* 읽기에 실패해도 화면은 계속 그려야 한다(한 파일 때문에 전부 못 보면 더 나쁘다).
@@ -1107,7 +1087,7 @@ function renderForms() {
          미리 보고 컨펌해야 의미가 있습니다.</p>
     </div>
 
-    ${broken.length ? `<div class="empty" style="border-color:var(--bad);color:var(--bad);text-align:left">
+    ${broken.length ? `<div class="empty" style="border-color:var(--red);color:var(--red);text-align:left">
       <p><b>없는 양식을 가리키는 공고 ${broken.length}건</b> — 학생이 '앱에서 작성'을 눌러도 아무것도 안 뜹니다.</p>
       <p class="mono" style="margin:6px 0">${broken.map((b) => `${esc(b.id)} → ${esc(b.formId)}`).join(' · ')}</p>
       <button class="btn btn-sm danger" data-unlink="${esc(broken.map((b) => b.id).join(','))}">연결 끊기</button>
@@ -1219,7 +1199,7 @@ function renderNetwork() {
       <thead><tr><th>학교</th><th class="n">연속 실패</th><th class="n">마지막 성공</th></tr></thead>
       <tbody>${fails.map((f) => `<tr>
         <td>${esc(f.school)}</td>
-        <td class="n" style="color:var(--bad);font-weight:700">${f.fails}회</td>
+        <td class="n" style="color:var(--red);font-weight:700">${f.fails}회</td>
         <td class="n">${esc(f.lastOk || '기록 없음')}</td></tr>`).join('')}</tbody>
     </table></div>` : '<p class="empty">모든 게시판이 정상입니다.</p>'}
 
@@ -1246,7 +1226,7 @@ function renderNetwork() {
     return `<tr>
           <td>${esc(s.school)}</td><td>${esc(s.campus || '')}</td>
           <td class="n">${esc(h.lastOk || '—')}</td>
-          <td class="n">${h.fails ? `<span style="color:var(--bad)">${h.fails}</span>` : '0'}</td>
+          <td class="n">${h.fails ? `<span style="color:var(--red)">${h.fails}</span>` : '0'}</td>
         </tr>`;
   }).join('')}</tbody>
     </table></div>
@@ -1768,7 +1748,7 @@ async function loadRobotIssues() {
       </details>` : ''}
       ${g.other.length ? `<p class="muted">그 밖의 열린 이슈 ${g.other.length}건</p>` : ''}`;
   } catch (e) {
-    box.innerHTML = `<p class="empty" style="border-color:var(--bad);color:var(--bad)">
+    box.innerHTML = `<p class="empty" style="border-color:var(--red);color:var(--red)">
       로봇이 남긴 것을 읽지 못했습니다 (${esc(e.message)}) — <b>'아무 말 없음'이 아닙니다.</b>
       잠시 후 새로고침해 주세요.</p>`;
   }
@@ -2623,7 +2603,6 @@ function bindGlobal() {
     location.reload();
   });
   byId('job-close').addEventListener('click', () => { byId('job').hidden = true; });
-  byId('btn-theme').addEventListener('click', cycleTheme);
   byId('btn-density').addEventListener('click', cycleDensity);
 
   /* 화면 폭이 바뀌면 헤더 높이도 표가 넘치는지 여부도 달라진다 —
@@ -2706,7 +2685,6 @@ async function enter(key, remember) {
 }
 
 function boot() {
-  applyTheme(currentTheme());   // 열쇠 화면부터 적용한다
   applyDensity(currentDensity());
   current = screenFromHash() || current;   // 주소로 들어온 화면을 첫 화면으로
   window.addEventListener('hashchange', () => {

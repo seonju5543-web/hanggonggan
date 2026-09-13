@@ -679,14 +679,19 @@ function serve() {
   await page.keyboard.press('Escape');
   await page.waitForTimeout(200);
 
-  /* ⑭ 밝게/어둡게 (B8) — CSS 훅은 있었는데 아무도 값을 안 넣어 죽어 있었다 */
-  const themeStart = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
-  await page.click('#btn-theme');
-  await page.waitForTimeout(200);
-  const themeNext = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
-  ok(themeStart !== themeNext, '테마 버튼이 실제로 화면 밝기를 바꾼다', `${themeStart} → ${themeNext}`);
-  ok(await page.evaluate(() => localStorage.getItem('handaejang.admin.theme')) === themeNext,
-    '고른 밝기를 기억한다');
+  /* ⑭ 밝게/어둡게 — 🔴 **검사를 지웠다. 고장이 아니라 결정의 결과다** (2026-09-13).
+     개발자 지시 *"디자인 측면에서도 앱1과 같은 체계를 맞춰줘"* 에 따라 관리자 화면의
+     어두운 화면을 없앴다. 앱1이 밝은 한 벌뿐이기 때문이고(style.css 2067 — "다크모드 규칙을
+     넣지 말 것"), 관리자만 어두운 화면을 두니 실제로 어긋남이 있었다 — `--shadow` 가 어두운
+     정의 두 벌 중 한 벌에만 있어 밝은 OS 에서 어둡게 바꾸면 밝은 화면용 그림자가 남았다.
+     그래서 여기 있던 검사 둘('테마 버튼이 실제로 화면 밝기를 바꾼다' · '고른 밝기를 기억한다')이
+     가리키던 `#btn-theme` 가 더는 없다.
+     ⚠️ 되살리려면 **앱1과 함께** 해야 한다. 관리자만 되살리면 같은 어긋남이 돌아온다.
+     그 대신 지금 지켜야 하는 것은 '어두운 화면이 다시 생기지 않는 것' 이라, 아래에서 그것을 센다. */
+  ok(await page.locator('#btn-theme').count() === 0,
+    '밝기 전환 버튼이 없다 (앱1과 같은 밝은 화면 한 벌)');
+  ok(await page.evaluate(() => document.documentElement.getAttribute('data-theme')) === null,
+    '화면에 밝기 속성이 붙지 않는다');
 
   /* ⑮ 시트가 끝까지 스크롤되는가 (2026-08-09 개발자 제보)
      flex 세로 배치는 내용이 넘치면 **자식을 눌러 줄인다**. 그래서 안쪽 스크롤 상자만
