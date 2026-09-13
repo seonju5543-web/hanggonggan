@@ -16,7 +16,7 @@
 const fs = require('fs');
 const path = require('path');
 const { chromium } = require('playwright-core');
-const { assertOwnServer, dismissNotify } = require('./onboard-helper.js');
+const { assertOwnServer, dismissNotify, webfontBanner } = require('./onboard-helper.js');
 const inter = require('../interactions.js');
 
 const PORT = process.env.PORT || 8123;
@@ -464,8 +464,11 @@ async function seed(page) {
   ok('뼈대 반짝임이 꺼진다', /^0(\.0+)?0?1?m?s$/.test(reduced) || parseFloat(reduced) < 0.01, reduced);
 
   console.log('\n' + (errors.length ? 'ERRORS:\n' + errors.join('\n') : 'ERRORS: none'));
+  /* 폭에 민감한 항목이 있다 — 글꼴이 안 실린 환경이면 그 사실을 먼저 말한다.
+     🔴 browser.close() **앞**이어야 한다 — 닫은 뒤에는 page 가 죽어 조용히 빈 문자열이 된다. */
+  const wfBanner = fails.length ? await webfontBanner(page) : '';
   await browser.close();
-
+  if (wfBanner) console.log(wfBanner);
   console.log(`\n통과 ${pass} · 실패 ${fails.length}`);
   if (fails.length || errors.length) {
     if (fails.length) console.log('실패:\n - ' + fails.join('\n - '));

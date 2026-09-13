@@ -10,7 +10,7 @@
    🔴 **PORT= 를 반드시 준다** — 8123 에는 다른 워크트리 서버가 떠 있을 수 있고,
       그러면 남의 코드를 재게 된다(2026-09-02에 실제로 겪었다). */
 const { chromium } = require('playwright-core');
-const { assertOwnServer } = require('./onboard-helper.js');
+const { assertOwnServer, webfontBanner } = require('./onboard-helper.js');
 const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
 
 
@@ -340,7 +340,12 @@ const PROFILE = {
 
   console.log('\nERRORS:', errors.length ? errors : 'none');
   if (errors.length) fail++;
+  /* 폭에 민감한 항목이 있다 — 글꼴이 안 실린 환경이면 그 사실을 먼저 말한다.
+     🔴 browser.close() **앞**이어야 한다 — 닫은 뒤에는 page 가 죽어 조용히 빈 문자열이 된다
+        (처음에 뒤에 뒀다가 아무 말도 안 해서 잡았다). */
+  const wfBanner = fail ? await webfontBanner(page) : '';
   await browser.close();
+  if (wfBanner) console.log(wfBanner);
   console.log(fail ? `\n✕ 실패 ${fail}건` : '\n✓ 정렬 전부 통과');
   process.exit(fail ? 1 : 0);
 })();

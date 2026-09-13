@@ -93,4 +93,34 @@ async function dismissNotify(page) {
   await page.waitForSelector('#notify-sheet[hidden]', { timeout: 4000 }).catch(() => {});
 }
 
-module.exports = { nextUntil, assertOwnServer, dismissNotify };
+/* 🔴 **글꼴이 안 실린 환경에서는 '폭' 검사를 믿지 말 것** (2026-09-13 · 내가 직접 밟은 함정).
+   이 앱의 글꼴(Pretendard)은 `cdn.jsdelivr.net` 에서 온다. 바깥이 막힌 샌드박스에서는
+   그 요청이 `ERR_TUNNEL_CONNECTION_FAILED` 로 죽고 한글이 다른 글꼴로 **더 넓게** 그려진다.
+   그러면 폭에 민감한 항목만 거짓으로 빨간불이 된다 — 실측:
+     · verify-explore-sort '360px 잘린 칩이 없다'  → 샌드박스 ❌ · CI ✅
+     · verify-interactions '마스코트가 마지막 줄을 가리지 않는다' 2건 → 샌드박스 ❌ · CI ✅
+   나는 이걸 모르고 **"관문 3항목이 main 에서 빨간불"이라고 개발자에게 보고했다.** 틀렸다.
+   CI 로그를 보니 그 셋은 초록불이었고 진짜 빨간불은 다른 한 건이었다.
+
+   🔴 **빨간불을 초록으로 바꾸지 않는다** — 이 저장소가 사고로 배운 금지 사항이다
+      ("검사만 고치고 화면을 바꾸지 말 것"). 대신 **왜 그런지 화면에 크게 적어 준다.**
+      다음 사람이 없는 버그를 쫓지 않게 하는 것이 목적이고, 판정은 그대로 둔다.
+   ⚠️ CI 에서는 글꼴이 실리므로 이 문구가 아예 안 뜬다(빈 문자열). 그래서 CI 의 판정에는
+      아무 영향이 없다 — 관문을 무르게 하는 장치가 아니다. */
+async function webfontBanner(page) {
+  const loaded = await page.evaluate(
+    () => (document.fonts ? document.fonts.size : -1),
+  ).catch(() => -1);
+  if (loaded !== 0) return '';
+  return [
+    '',
+    '⚠️  이 환경에는 **웹 글꼴이 한 벌도 안 실렸습니다** (document.fonts.size === 0).',
+    '    Pretendard 가 cdn.jsdelivr.net 에서 오는데 바깥이 막혀 있습니다.',
+    '    한글이 더 넓은 대체 글꼴로 그려지므로 **폭에 민감한 항목은 거짓으로 빨간불이 날 수 있습니다**',
+    '    (칩 잘림 · 마스코트 가림 등). 같은 항목이 GitHub Actions 에서는 초록불일 수 있습니다.',
+    '    🔴 여기 결과만 보고 "화면이 깨졌다"고 단정하지 마세요 — CI 로그를 먼저 보세요.',
+    '',
+  ].join('\n');
+}
+
+module.exports = { nextUntil, assertOwnServer, dismissNotify, webfontBanner };

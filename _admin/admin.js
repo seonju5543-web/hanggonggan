@@ -515,6 +515,18 @@ function renderDataFail() {
    예전엔 검색칸만 손으로 초점·커서를 되살리고 있었는데(그 자체가 증상이었다),
    여기서 한 번에 지킨다 — 새로 만드는 방식은 그대로 두고 '잃는 것'만 되돌린다. */
 function rerender(name = current) {
+  /* 🔴 **'필터 더보기'가 펼쳐져 있었는지는 살아 있는 DOM 에서 읽는다** (2026-09-13).
+     아래 toggle 이벤트만으로 F.open 을 기억했더니, <details> 의 toggle 이 **비동기**라
+     펼치자마자 필터를 고르면 change → rerender 가 그 이벤트를 앞질렀다. 그때 F.open 은
+     아직 false 라 새로 그린 패널이 접혔고, 연달아 고를 수가 없었다.
+     🔴 로컬에서는 거의 안 나고 **CI 에서만** 났다 — verify-admin 이 8회 연속 빨간불이었는데
+        (runs 273~282 · 2026-09-12~13) 아무도 안 읽었다. 관문: verify-admin
+        '펼치자마자 골라도 접히지 않는다' — 이 두 줄을 지우면 빨간불이다(확인함).
+     ⚠️ 아래 toggle 리스너를 지우지 말 것 — 이 화면에 .filters-more 가 없을 때
+        (다른 탭에서 돌아오는 길)의 값은 그쪽이 지킨다. */
+  const moreEl = document.querySelector('.filters-more');
+  if (moreEl) F.open = moreEl.open;
+
   const y = window.scrollY;
   const a = document.activeElement;
   const keep = a && a.id ? { id: a.id, start: a.selectionStart, end: a.selectionEnd } : null;

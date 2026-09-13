@@ -630,6 +630,35 @@ function serve() {
     await page.waitForTimeout(250);
     ok(await page.locator('#screen-list [data-row]').count() === reg.items.length,
       '태그를 누르면 그 필터가 풀린다');
+
+    /* 🔴 **접혀 있던 패널을 펼치자마자 고르는 경우** (2026-09-13 · CI 8회 연속 빨간불의 정체).
+       <details> 의 toggle 이벤트는 **비동기**다. 그래서 펼치자마자 필터를 고르면
+       change → rerender 가 toggle 을 앞질러, F.open 이 아직 false 인 채로 다시 그려진다 —
+       패널이 접혀 버려 연달아 고를 수가 없다.
+       ⚠️ 위 항목은 사이에 기다림이 있어 이 경합을 못 잡는다. 로컬은 초록불인데
+          **CI 에서만** 빨간불이었다(runs 273~282 · 8회 연속). 그래서 여기서는
+          **한 태스크 안에서** 펼치고 고르는 것을 만들어 순서와 무관하게 재현한다.
+       ⚠️ 먼저 진짜로 접어 둬야 한다 — 이미 펼쳐진 것을 같은 태스크에서 false→true 로
+          되돌리면 브라우저가 toggle 을 아예 안 낸다(값이 안 바뀐 셈이라 경합이 안 생긴다). */
+    await page.evaluate(() => { document.querySelector('.filters-more').open = false; });
+    await page.waitForTimeout(200);          // toggle 이 도착해 F.open=false 가 되게 둔다
+    const schoolV = schools[0];
+    await page.evaluate((v) => {
+      const d = document.querySelector('.filters-more');
+      d.open = true;                                                // toggle 은 다음 태스크
+      const sel = document.querySelector('#f-school');
+      sel.value = v;
+      sel.dispatchEvent(new Event('change', { bubbles: true }));     // 같은 태스크에서 다시 그린다
+    }, schoolV);
+    await page.waitForTimeout(250);
+    ok(await page.locator('.filters-more').evaluate((el) => el.open),
+      '펼치자마자 골라도 접히지 않는다 (toggle 을 앞질러 다시 그려도)');
+    await page.evaluate(() => {                                      // 뒤 검사를 위해 되돌린다
+      const sel = document.querySelector('#f-school');
+      sel.value = 'all';
+      sel.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    await page.waitForTimeout(250);
   }
 
   /* ⑦ 다중 선택 (B3) — 87건을 한 줄씩 누르는 것을 끝내는 기능이라 여기서 실제로 눌러 본다 */

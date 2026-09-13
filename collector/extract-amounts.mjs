@@ -165,6 +165,18 @@ const sameAsOf = new Map();
 for (const m of merges) for (const g of m.group) sameAsOf.set(g.id, m.key);
 
 let wrote = 0;
+/* 🔴 **사람이 넣은 값을 덮거나 지우지 않는다** (2026-09-13 코드 리뷰가 잡았다).
+   이 로봇은 amountSpec·exclusivity·sameAs 를 **조건 없이** 덮고, 못 읽으면 **지웠다.**
+   손으로 돌리던 동안에는 드물었지만 2026-09-13 에 수집 워크플로에 걸면서 매일 돌게 됐다 —
+   그러면 관리자 화면에서 고친 값이 다음 날 아침에 조용히 되돌아간다. 실제로 이번 실행이
+   `sameAs: "가송재단"` 을 지웠다.
+   → `deadlineFrom` 과 같은 방식으로 **주인 표식**을 둔다. 이 로봇이 쓴 값에만 표식이 붙고,
+     표식이 없는 값(= 사람이 넣은 값)은 건드리지 않는다.
+   ⚠️ 그래서 파서를 고치면 **로봇이 쓴 값은 그대로 따라 갱신된다** — 사람 값만 고정이다.
+      (안 그러면 파서를 고쳐도 옛 값이 영영 남는다.) */
+const OWN_AMOUNT = '공고 원문';
+const OWN_SAME = '자동';
+let keptHuman = 0;
 for (const it of items) {
   const got = parsed.get(it.id);
   if (got) {
@@ -172,14 +184,17 @@ for (const it of items) {
     /* 🔴 `amount` 가 아니라 `amountSpec` 이다 — `amount` 는 이미 금액 문구 문자열 칸이다.
        처음에 `amount` 에 객체를 넣었다가 entry-rules.cjs 의 `it.amount.slice()` 가 죽어
        감사가 통째로 멈췄다. 앱·챗봇·알림도 전부 문자열로 읽는다. */
-    if (a.kind === 'unknown') delete it.amountSpec;
-    else { it.amountSpec = a; wrote++; }
+    /* 사람이 넣은 금액이면 손대지 않는다 (표식이 없고 값이 이미 있는 경우) */
+    const humanAmount = !it.amountFrom && (it.amountSpec || Number(it.amountValue) > 0);
+    if (humanAmount) keptHuman += 1;
+    else if (a.kind === 'unknown') { delete it.amountSpec; delete it.amountFrom; }
+    else { it.amountSpec = a; it.amountFrom = OWN_AMOUNT; wrote++; }
 
     /* 🔴 amountValue 는 남겨 둔다 — 앱·챗봇·관리자 화면이 아직 이걸 읽는다.
        amount 를 읽는 쪽으로 다 옮기기 전에 지우면 금액이 통째로 사라진다.
        비율형·시급형은 학생 등록금을 모르면 원으로 못 바꾸므로 0 그대로 둔다
        (지어내지 않는다 — 원칙 8-1). */
-    if (a.kind === 'fixed' || a.kind === 'range') {
+    if (!humanAmount && (a.kind === 'fixed' || a.kind === 'range')) {
       it.amountValue = a.value;
       /* 🔴 화면 문구도 같이 고쳐야 한다. 숫자만 채우고 `금액 원문 확인` 을 그대로 두면
          **카드는 "금액 원문 확인", 합계는 500만원**이라고 서로 다른 말을 한다.
@@ -189,13 +204,23 @@ for (const it of items) {
       if (!/\d/.test(String(it.amount || ''))) it.amount = amountText(a);
     }
 
-    if (e.kind === 'unknown') delete it.exclusivity;
-    else it.exclusivity = e;
+    /* 이중수혜도 같은 규칙 — 사람이 넣은 것은 그대로 둔다 */
+    const humanExcl = !it.exclusivityFrom && it.exclusivity;
+    if (humanExcl) { /* 그대로 */ }
+    else if (e.kind === 'unknown') { delete it.exclusivity; delete it.exclusivityFrom; }
+    else { it.exclusivity = e; it.exclusivityFrom = OWN_AMOUNT; }
   }
+  /* 🔴 동일성도 마찬가지다 — 이번 실행이 사람이 넣은 `sameAs: "가송재단"` 을 지웠다.
+     이 로봇이 붙인 것만 지운다. */
   const key = sameAsOf.get(it.id);
-  if (key) it.sameAs = key; else delete it.sameAs;
+  if (key) { it.sameAs = key; it.sameAsFrom = OWN_SAME; }
+  else if (it.sameAsFrom === OWN_SAME) { delete it.sameAs; delete it.sameAsFrom; }
 }
 
-reg.updatedAt = new Date().toISOString();
+if (keptHuman) console.log(`   사람이 넣은 금액 ${keptHuman}건은 그대로 뒀습니다 (표식 없는 값은 안 덮습니다)`);
+/* 🔴 날짜만 적는다 — 다른 로봇이 전부 `slice(0,10)` 이라, 여기만 시각까지 적으면
+   registered.json 이 매 실행 더러워지고 관리자 화면의 '데이터 기준일' 에 시각이 뜬다
+   (2026-09-13 코드 리뷰). */
+reg.updatedAt = new Date().toISOString().slice(0, 10);
 fs.writeFileSync(regPath, JSON.stringify(reg, null, 1) + '\n');
 console.log(`\nregistered.json 반영 완료 — 금액 ${wrote}건 · 동일성 ${sameAsOf.size}건`);

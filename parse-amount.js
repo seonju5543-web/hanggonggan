@@ -256,6 +256,18 @@ var DUP_NAMED = /[가-힣]{2,12}장학금과\s*중복/;
    그 학생은 받을 수 있는 돈을 신청조차 안 하게 된다 — 틀린 미달은 못 받는 것보다 나쁘다. */
 var DUP_SELF = /(동일인|동일\s?학생|본인에게|기\s?수혜자)/;
 
+/* 🔴 **'동시 수혜 불가' 가 늘 그 학생 이야기인 것은 아니다** (2026-09-13 코드 리뷰가 잡았다).
+   실제 원문: `1 가족당 형제 · 자매 합산하여 총 2 회에 한하여 지급 ( 동일 학기에 2 명 동시 수혜 불가 )`
+   이건 **한 가족 안에서 두 사람이 같이 받지 못한다**는 말이지, 그 학생이 다른 교외 장학금을
+   갖고 있으면 안 된다는 말이 아니다. 그런데 한정어가 하나도 없어서 아래 기본값(external)에
+   떨어졌고, 교외 장학금을 받는 학생이 이 공고에서 **미달**이 됐다(실측 — 마감 9/28 인 살아
+   있는 공고였다). 틀린 미달은 못 받는 것보다 나쁘다.
+   → 가족 안의 이야기는 `narrow` 로 둔다. narrow 는 자격 판정에 쓰이지 않고(match-engine 은
+     external 만 본다), 원문은 화면에 그대로 보이므로 학생이 직접 읽는다.
+   ⚠️ 넓은 표지(대외·교외·타 재단)가 함께 있으면 그쪽이 이긴다 — 그 줄은 진짜로 남의
+      장학금을 말하는 줄이다. 그래서 아래 순서에서 BROAD 뒤에 둔다. */
+var DUP_FAMILY = /(가족\s?당|세대\s?당|가구\s?당|형제|자매|남매|자녀\s?간|한\s?가정)/;
+
 /**
  * 이 공고를 다른 장학금과 함께 받을 수 있는가.
  * @returns {{kind:'forbidden'|'allowed'|'unknown', scope:'external'|'narrow', raw:string}}
@@ -285,7 +297,8 @@ function exclusivityFrom(lines) {
     var scope = DUP_BROAD.test(line) ? 'external'
       : (DUP_NARROW.test(line) || DUP_NAMED.test(line)) ? 'narrow'
         : DUP_SELF.test(line) ? 'unspecified'
-          : 'external';
+          : DUP_FAMILY.test(line) ? 'narrow'
+            : 'external';
     var raw = line.trim().slice(0, 200);
     if (DUP_NO.test(probe) && !DUP_OK.test(probe)) return { kind: 'forbidden', scope: scope, raw: raw };
     if (DUP_OK.test(probe) && !DUP_NO.test(probe)) return { kind: 'allowed',   scope: scope, raw: raw };
