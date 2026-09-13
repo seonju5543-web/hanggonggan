@@ -75,7 +75,14 @@ try:
 except Exception:
     raise SystemExit(1)
 cmd = (d.get("tool_input") or {}).get("command", "") or ""
-if not re.search(r"verify/\S+\.(js|mjs|cjs)", cmd):
+# 🔴 **돌렸을 때만 본다 — 이름이 나오는 것으로는 부족하다** (2026-09-13 · 네 번째 재발).
+#    예전엔 verify/….js 라는 **글자가 명령에 있기만** 하면 봤다. 그래서
+#    sed -n 270,274p verify/audit-data.js 처럼 검사 소스를 **읽기만** 해도 빚이 쌓였다
+#    — 그 파일 속에 실패 표시 ✕ 글자가 들어 있기 때문이다(audit-data.js:161·162·272).
+#    서브에이전트가 소스를 훑는 것도 이 세션으로 잡혀 실제로 헛걸렸다(재현함).
+#    앞의 셋과 **뿌리가 같다** — 섞인 출력에서 ✕ 가 누구 것인지 가릴 수 없다.
+#    ⚠️ 지우는 쪽은 그대로 둔다 — 아래 주석의 '지울 때는 넬넘게' 규칙.
+if not re.search(r"(?:^|[;&|]|\s)node\s+(?:--\S+\s+)*verify/\S+\.(?:js|mjs|cjs)", cmd):
     raise SystemExit(1)
 # 🔴 **검사만 돌린 명령일 때만 본다** (2026-08-30 · 같은 판정기를 세 번째 고치며 세운 규칙).
 #    ⚠️ 이 주석에 작은따옴표를 쓰지 말 것 — 이 파이썬은 python3 -c 뒤 홑따옴표 안에 있어서
