@@ -597,6 +597,34 @@ function serve() {
   ok(await page.locator('#n-robots').textContent() === '2', '탭 배지가 경보 건수를 센다 (리포트는 안 센다)');
   ok(await page.locator('#screen-robots [data-run]').count() >= 16, '로봇 16종 이상에 실행 버튼이 있다');
 
+  /* 로봇이 마지막에 언제 돌았나 (2026-09-13)
+     🔴 예전에는 '지금 실행'·'기록 ↗' 두 버튼뿐이라 **"어제 수집 잘 됐나"를 알려면
+     GitHub 으로 나가야 했다.** 이제 줄마다 마지막 실행이 적힌다.
+     ⚠️ 이 검사 환경은 바깥 통신이 막혀 있어 '읽지 못했습니다' 가 뜨는 것이 정상이다 —
+        그래서 **'정상으로 보이지 않는가'** 를 본다(못 읽은 것을 성공으로 위장하지 않는지). */
+  {
+    /* ⚠️ 로봇 줄만 센다 — 수집망이 이 화면으로 들어와 `.row` 가 그것 말고도 있다.
+       로봇 줄의 표식은 '실행 버튼을 가진 줄' 이다. */
+    const counts = await page.evaluate(() => {
+      const rows = [...document.querySelectorAll('#screen-robots .rows .row')]
+        .filter((r) => r.querySelector('[data-run]'));
+      const said = rows.filter((r) => /마지막 실행|도는 중|실행 기록 없음/.test(r.textContent));
+      return { rows: rows.length, said: said.length };
+    });
+    ok(counts.rows >= 16 && counts.said === counts.rows,
+      '로봇 줄마다 마지막 실행이 적힌다', `${counts.said}/${counts.rows}줄`);
+    const t = await page.textContent('#screen-robots');
+    /* 🔴 이 검사 환경은 바깥 통신이 막혀 있다. 그래서 **'못 읽었다고 말하는가'** 를 본다 —
+       못 읽은 것을 성공으로 위장하면(초록으로 보이면) 그게 가장 나쁘다. */
+    const said = /마지막 실행을 읽지 못했습니다|실행 기록 없음|마지막 실행 (성공|실패|취소됨)|도는 중/.test(t);
+    ok(said, '마지막 실행을 글자로 말한다 (색만으로 말하지 않는다)');
+    ok(!(/읽지 못했습니다/.test(t) && /마지막 실행 성공/.test(t)),
+      "못 읽었을 때 '성공'으로 위장하지 않는다");
+    /* 수집망을 로봇 화면으로 흡수했다 — 학교가 둘로 줄어 탭 하나를 차지할 이유가 없어졌다 */
+    ok(/수집망/.test(t) && /게시판 주소가 없는 학교/.test(t),
+      '수집망 내용이 로봇 화면 안에 있다');
+  }
+
   /* 🔴 버튼 **개수**만 세던 검사가 2026-08-12까지 진짜 결함을 놓쳤다 — 리포트 버튼 5개 중
      2개(일반 수집·심층 수집)가 저장소에 없는 파일을 가리켜 **영원히 빈 화면**이었는데,
      개수는 5였으므로 통과했다. 이제 **가리키는 파일이 실제로 있는지**를 본다. */

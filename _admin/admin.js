@@ -1241,7 +1241,9 @@ function renderForms() {
 }
 
 /* ---------------- ⑤ 수집망 ---------------- */
-function renderNetwork() {
+/* 수집망 내용 — 🔴 **베끼지 않는다.** 로봇 화면이 이 조각을 그대로 가져다 쓴다.
+   학교가 경희대·한국외대 둘로 줄어 표 두 줄이 탭 하나를 차지하고 있었다(실측). */
+function networkSectionHtml() {
   const fails = failingSchools();
   const noBoard = D.schools.filter((s) => !s.boardUrl);
   const withBoard = D.schools.filter((s) => s.boardUrl);
@@ -1251,18 +1253,7 @@ function renderNetwork() {
   const hEntry = (school, campus) =>
     D.health[campus ? `${school} ${campus}` : school] ?? D.health[school] ?? {};
 
-  byId('screen-network').innerHTML = `
-    <div class="sec-head">
-      <h2>수집망</h2>
-      <p>학교 ${D.schools.length}곳 (일반 수집) · 브라우저형 ${D.targets.length}곳.
-         어제부터 공고가 안 들어오는 학교를 여기서 발견합니다.</p>
-    </div>
-
-    <div class="filter-row">
-      <button class="btn btn-sm" id="btn-run-collect">일반 수집 로봇 지금 실행</button>
-      <button class="btn btn-sm" id="btn-run-browser">브라우저형 수집 로봇 지금 실행</button>
-    </div>
-
+  return `
     ${fails.length ? `
     <div class="sec-head"><h2>실패 중인 게시판 ${fails.length}곳</h2></div>
     <div class="scroller"><table>
@@ -1308,6 +1299,23 @@ function renderNetwork() {
       <button class="btn btn-sm" data-report="collector/resolve-report.md">원문 링크 복구 리포트</button>
     </div>
     <div id="report-box"></div>
+  `;
+}
+
+function renderNetwork() {
+  byId('screen-network').innerHTML = `
+    <div class="sec-head">
+      <h2>수집망</h2>
+      <p>학교 ${D.schools.length}곳 (일반 수집) · 브라우저형 ${D.targets.length}곳.
+         어제부터 공고가 안 들어오는 학교를 여기서 발견합니다.</p>
+    </div>
+
+    <div class="filter-row">
+      <button class="btn btn-sm" id="btn-run-collect">일반 수집 로봇 지금 실행</button>
+      <button class="btn btn-sm" id="btn-run-browser">브라우저형 수집 로봇 지금 실행</button>
+    </div>
+
+    ${networkSectionHtml()}
   `;
 }
 
@@ -1665,6 +1673,65 @@ async function handleInstaClick(e) {
   return false;
 }
 
+/* ---------------- 로봇이 마지막에 언제 돌았나 (2026-09-13) ----------------
+   🔴 예전에는 로봇 줄에 '지금 실행'과 '기록 ↗' 두 버튼뿐이라,
+   **"어제 수집 잘 됐나"를 알려면 GitHub 으로 나가야 했다.** 화면에는 성공·실패·시각이 없었다.
+   ⚠️ 로봇마다 한 번씩 물으면 20번을 부른다 — 저장소 전체의 최근 실행을 **한 번에** 받아
+      파일 이름으로 가른다(GitHub 이 주는 것은 `.github/workflows/<파일>` 경로다).
+   🔴 못 읽었을 때 '정상'으로 보이게 하지 않는다 — 못 읽었다고 적는다(푸시 상태와 같은 규칙). */
+let RUNS = null;          // 파일이름 → 마지막 실행
+let RUNS_STATE = 'idle';  // idle · loading · ready · failed
+
+async function loadRuns() {
+  RUNS_STATE = 'loading';
+  try {
+    const r = await fetch(`${API}/repos/${OWNER}/${REPO}/actions/runs?per_page=100`, { headers: ghHeaders() });
+    if (!r.ok) throw new Error(String(r.status));
+    const d = await r.json();
+    const m = new Map();
+    (d.workflow_runs || []).forEach((run) => {
+      const file = String(run.path || '').split('/').pop();
+      if (!file || m.has(file)) return;          // 목록이 최신순이라 처음 만난 것이 마지막 실행
+      m.set(file, {
+        status: run.status, conclusion: run.conclusion,
+        at: run.updated_at || run.created_at, url: run.html_url,
+      });
+    });
+    RUNS = m;
+    RUNS_STATE = 'ready';
+  } catch (e) {
+    RUNS = null;
+    RUNS_STATE = 'failed';
+  }
+  if (current === 'robots') renderRobots();
+}
+
+/** 언제였는지 사람 말로. 날짜만 안다고 시간 단위를 지어내지 않는다. */
+function agoText(iso) {
+  const t = Date.parse(iso || '');
+  if (!Number.isFinite(t)) return '';
+  const mins = Math.floor((Date.now() - t) / 60000);
+  if (mins < 1) return '방금';
+  if (mins < 60) return `${mins}분 전`;
+  const h = Math.floor(mins / 60);
+  if (h < 24) return `${h}시간 전`;
+  const d = Math.floor(h / 24);
+  return d === 1 ? '어제' : `${d}일 전`;
+}
+
+/** 로봇 한 종의 마지막 실행 표시.
+ *  🔴 색만으로 말하지 않는다 — '성공'·'실패' 라는 **글자**로 적는다(색을 못 가리는 사람도 읽는다). */
+function runStateHtml(file) {
+  if (RUNS_STATE === 'loading') return '<span class="hint">마지막 실행을 읽는 중…</span>';
+  if (RUNS_STATE === 'failed') return '<span class="pill">마지막 실행을 읽지 못했습니다</span>';
+  const v = RUNS && RUNS.get(file);
+  if (!v) return '<span class="pill">최근 100번 안에 실행 기록 없음</span>';
+  if (v.status !== 'completed') return `<span class="pill">지금 도는 중 · ${esc(agoText(v.at))} 시작</span>`;
+  const okRun = v.conclusion === 'success';
+  const word = okRun ? '성공' : (v.conclusion === 'cancelled' ? '취소됨' : '실패');
+  return `<span class="pill ${okRun ? 'good' : 'bad'}">마지막 실행 ${esc(word)} · ${esc(agoText(v.at))}</span>`;
+}
+
 function renderRobots() {
   const box = byId('screen-robots');
   const runRow = (r) => `
@@ -1672,6 +1739,7 @@ function renderRobots() {
       <div>
         <div class="t">${esc(r.n)}</div>
         <div class="m"><span>${esc(r.d)}</span><span>${esc(r.when)}</span></div>
+        <div class="badges">${runStateHtml(r.f)}</div>
         ${r.input ? `<input type="url" data-run-input="${esc(r.f)}" style="margin-top:6px;width:100%"
             placeholder="${esc(r.input.ph)}" aria-label="${esc(r.input.label)}" />` : ''}
       </div>
@@ -1705,6 +1773,14 @@ function renderRobots() {
     </div>
     <div class="rows" data-rows>${ROBOTS.map(runRow).join('')}</div>
 
+    <!-- 수집망 — 학교가 둘로 줄어 탭 하나를 차지할 이유가 없어졌다. 여기로 들어온다.
+         🔴 베끼지 않고 networkSectionHtml() 한 곳을 쓴다(수집망 탭과 같은 내용). -->
+    <div class="sec-head" style="margin-top:var(--space-20)">
+      <h2>수집망 — 게시판 ${D.schools.length}곳</h2>
+      <p>어제부터 공고가 안 들어오는 학교를 여기서 발견합니다.</p>
+    </div>
+    ${networkSectionHtml()}
+
     <div class="sec-head" style="margin-top:12px"><h2>로봇 리포트 전문</h2></div>
     <div class="filter-row">
       ${REPORTS.map(([p, n]) => `<button class="btn btn-sm" data-report="${esc(p)}">${esc(n)}</button>`).join('')}
@@ -1731,6 +1807,10 @@ function renderRobots() {
   loadRobotIssues();
   loadPushHealth();
   loadApiHealth();
+  /* 마지막 실행은 한 번만 받아 둔다 — 다시 그릴 때마다 부르면 화면을 열 때마다 API 를 쓴다.
+     🔴 loadRuns 가 끝나면 스스로 renderRobots 를 다시 부르므로 여기서 또 부르면 무한이 된다.
+        (그래서 'idle 일 때만' 부른다 — 만들면서 실제로 그렇게 만들 뻔했다) */
+  if (RUNS_STATE === 'idle') loadRuns();
 }
 
 /* 양식 변환 API가 살아 있는지 (2026-08-12 신설).
