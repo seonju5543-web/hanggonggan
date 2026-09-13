@@ -347,6 +347,18 @@ function judgeCond(c, p, ctx) {
             공고를 낸 곳(주관 기관 이름)에서 뽑아 ctx.homeCity 로 받는다.
          ⚠️ 시·군을 못 맞춰도 **'fail' 이 아니라 'unknown'** 이다 — 거주 요건은 예외가 많고
             (`관외 거주 인정`), 틀린 미달은 못 받는 것보다 나쁘다. 시·도도 같은 규칙이다. */
+      /* 🔴 **지역 이름이 늘 거주지인 것은 아니다 — 판정하지 않는 갈래가 둘 있다**
+         (2026-09-13 · 노션 백로그 G-6. 가르는 곳은 parse-requirements 의 parseResidence).
+           about:'school' = `울산시 소재 대학에 재학 중인 학생` → 앱은 **학교 소재지를 모른다**
+           about:'origin' = `울산시 소재 고등학교 졸업자`       → 앱은 **출신 고교를 안 묻는다**
+         거주지로 읽으면 **서울 학생이 포항공대에 다니는 경우**가 틀린 미달이 된다 —
+         틀린 미달은 못 받는 것보다 나쁘다.
+         ⚠️ 이 줄을 지우면 아래 시·군 규칙이 이어받아 **'fail' 을 낸다.** 지금은 conf 가 LOW 라
+            줄 단위에서는 '모른다'로 누그러지지만, 그건 이 갈래를 위해 만든 장치가 아니다 —
+            누가 conf 를 올리는 순간 조용히 틀린 미달이 된다. 뜻을 여기에 적어 둔다.
+         ⚠️ 그리고 **울산 사는 학생에게 ✓ 를 주지도 않는다** — 그 학생의 학교가 울산에 있는지
+            우리는 여전히 모른다. 사는 곳이 맞는 것과 학교가 거기 있는 것은 다른 이야기다. */
+      if (c.about && c.about !== 'home') return 'unknown';
       const cities = (c.cities || []).concat(c.inArea && ctx && ctx.homeCity ? [ctx.homeCity] : []);
       const myCities = [p.regionCity, p.parentRegionCity].filter(Boolean);
       if (cities.length) {

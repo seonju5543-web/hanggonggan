@@ -343,6 +343,38 @@ const PROFILE = {
     eq('  신청서 양식이라고 부르지 않는다', /공고 원본 첨부 양식/.test(sheet2), false);
   }
 
+  /* ══ 층2도 신청 버튼이 열린다 (2026-09-13 · 노션 백로그 핵심-2) ═══════════════════
+     🔴 왜 여기에 두나 — 층2는 `evaluateFor`(app.js) 가 판정을 통째로 `unknown` 으로 눌러서,
+        자격 잠금이 있던 동안 **마감 전 90건이 100% 잠겨 있었다**(실측). 학생이 한국장학재단
+        목록에서 할 수 있는 일이 '재단 홈페이지 열기' 하나뿐이었다는 뜻이다.
+        층1과 달리 이 층은 **전부** 영향을 받으므로 화면에서 따로 못 박는다.
+     ⚠️ 여는 것으로 끝내면 안 된다 — 무엇을 확인해야 하는지 함께 말해야 한다(원칙 8-1). */
+  {
+    const target = await page.evaluate(() => {
+      const k = kosafAsScholarships().filter((s) => dday(s.deadline).days >= 0);
+      if (!k.length) return null;
+      openDetail(k[0].id);
+      return k[0].id;
+    });
+    eq('마감 전 층2 공고가 실제로 있다 (없으면 이 검사는 무의미하다)', !!target, true);
+    if (target) {
+      await page.waitForSelector('#detail-sheet.show', { timeout: 4000 });
+      const st = await page.evaluate(() => {
+        const b = document.querySelector('#btn-apply-one');
+        const c = document.querySelector('#detail-sheet .dp-caution');
+        return { locked: b ? b.disabled : null, label: b ? b.textContent.trim() : null,
+          note: c ? c.textContent.trim() : '' };
+      });
+      eq('  층2 공고도 신청 버튼이 열린다', st.locked, false);
+      eq('  버튼 문구가 「신청할 수 없음」이 아니다', /신청할 수 없음/.test(st.label || ''), false);
+      /* 🔴 층2는 자격을 **읽은 적이 없다** — '미충족'이 아니라 '못 읽었다'고 말해야 한다 */
+      eq('  자격을 못 읽었다고 정직하게 알린다', /읽지 못했/.test(st.note), true);
+      eq('  「요건 미충족」이라 단정하지 않는다', /미충족/.test(st.note), false);
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(250);
+    }
+  }
+
   eq('콘솔 오류 없음', errors, []);
   await browser.close();
   console.log(fail ? `\n✕ 실패 ${fail}건` : '\n✓ 한국장학재단 등록분 검증 통과');
