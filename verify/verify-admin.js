@@ -28,6 +28,18 @@ const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/jav
   '.css': 'text/css', '.json': 'application/json', '.txt': 'text/plain' };
 
 let failed = 0;
+/* 🔴 **화면을 찾아가는 주소는 '모양'이 아니라 '표식'으로 쓴다** (2026-09-13).
+   이 검사 124개가 지키는 것은 대부분 *뜻*이다 — "확인하지 않은 금액은 보내지 않는다",
+   "시트를 닫으면 초점이 원래 줄로 돌아온다" 처럼 화면이 어떻게 생겼든 성립해야 하는 것들이다.
+   그런데 그 뜻에 닿는 주소를 `.row`·`.card`·`.group-head` 같은 **클래스 이름**으로 적어 두면,
+   화면을 다시 짜는 순간 검사가 통째로 깨진다(전면 교체 전 실측: 모양에 묶인 주소 35곳).
+   그래서 admin.js 가 뜻을 가진 표식을 내보내고 여기서는 그것만 쓴다:
+     [data-row] 공고 한 줄 · [data-row-title] 그 줄의 이름 · [data-rows] 줄 묶음
+     [data-group] 구획 · [data-group-head] 구획 제목 · [data-selbar] 선택 바
+     [data-pane="app"|"source"] 대조 두 칸 · [data-stat] 숫자 카드
+     (이미 있던 것) [data-id] [data-pick] [data-sort] [data-f] [data-act]
+   ⚠️ 표식을 새로 만들 때는 **화면이 바뀌어도 남을 이름**인지 먼저 묻는다.
+      `data-blue-card` 같은 건 모양이라 또 깨진다. */
 const ok = (cond, label, extra = '') => {
   console.log(`${cond ? '✅' : '❌'} ${label}${extra ? ` — ${extra}` : ''}`);
   if (!cond) failed += 1;
@@ -190,12 +202,12 @@ function serve() {
 
   await page.click('.tab[data-tab="list"]');
   await page.waitForSelector('#screen-list:not([hidden])');
-  const rows = await page.locator('#screen-list .row').count();
+  const rows = await page.locator('#screen-list [data-row]').count();
   ok(rows === total, '② 공고 전체가 조건 없이 전부 보인다', `${rows}/${total}건`);
 
   await page.click('.tab[data-tab="review"]');
   await page.waitForSelector('#screen-review:not([hidden])');
-  const revRows = await page.locator('#screen-review .row[data-id]').count();
+  const revRows = await page.locator('#screen-review [data-row]').count();
   ok(revRows === autoN, '③ 컨펌 작업대에 검수 전 공고만 온다', `${revRows}건`);
 
   /* 미등록 피드 — 이미 등록한 공고가 '아직 등록 안 함'으로 다시 올라오면 안 된다
@@ -258,7 +270,7 @@ function serve() {
   /* 지원 자격 미확보 — 고치는 자리는 상세에 있었는데 **몇 건인지 세는 자리가 없어서**
      76건이 밀려 있어도 화면이 조용했다(2026-08-12). 학생 앱과 같은 칸으로 센다. */
   const noEligN = reg.items.filter((x) => !(x.eligibilityLines || []).length && !x.eligibilityVerified).length;
-  const eligCard = await page.locator('#screen-quality .card', { hasText: '지원 자격 미확보' }).first().textContent();
+  const eligCard = await page.locator('#screen-quality [data-stat]', { hasText: '지원 자격 미확보' }).first().textContent();
   ok(/지원 자격 미확보/.test(eligCard || ''), '⑥ 지원 자격 미확보 건수를 센다');
   ok((eligCard || '').includes(String(noEligN)), '⑥ 그 건수가 실제 데이터와 같다', `${noEligN}건`);
 
@@ -356,12 +368,12 @@ function serve() {
   /* ⑥ 분류가 실제로 걸러 내는가 */
   await page.click('.tab[data-tab="list"]');
   await page.waitForSelector('#screen-list:not([hidden])');
-  await page.click('.chip[data-f="status"][data-v="unreviewed"]');
+  await page.click('[data-f="status"][data-v="unreviewed"]');
   await page.waitForTimeout(200);
-  const filtered = await page.locator('#screen-list .row').count();
+  const filtered = await page.locator('#screen-list [data-row]').count();
   ok(filtered === autoN, '상태 분류가 실제로 걸러 낸다', `검수 전 ${filtered}건`);
 
-  await page.click('.chip[data-f="status"][data-v="all"]');
+  await page.click('[data-f="status"][data-v="all"]');
   await page.waitForTimeout(200);
 
   /* 소속·성격·접수·경고등 필터는 '필터 더보기' 안에 접혀 있다 (2026-08-09).
@@ -375,7 +387,7 @@ function serve() {
   if (schools.length) {
     await page.selectOption('#f-school', schools[0]);
     await page.waitForTimeout(250);
-    const n = await page.locator('#screen-list .row').count();
+    const n = await page.locator('#screen-list [data-row]').count();
     const expect = reg.items.filter((x) => (x.eligibility || {}).schoolOnly === schools[0]).length;
     ok(n === expect, `학교 분류가 실제로 걸러 낸다 (${schools[0]})`, `${n}/${expect}건`);
 
@@ -388,7 +400,7 @@ function serve() {
 
     await page.click('.ftag[data-clear="school"]');
     await page.waitForTimeout(250);
-    ok(await page.locator('#screen-list .row').count() === reg.items.length,
+    ok(await page.locator('#screen-list [data-row]').count() === reg.items.length,
       '태그를 누르면 그 필터가 풀린다');
   }
 
@@ -396,18 +408,18 @@ function serve() {
   await page.click('.tab[data-tab="review"]');
   await page.waitForSelector('#screen-review:not([hidden])');
 
-  ok(await page.locator('#screen-review .row.has-pick input[data-pick]').count() > 0,
+  ok(await page.locator('#screen-review [data-row] input[data-pick]').count() > 0,
     '컨펌 작업대의 줄마다 선택 네모가 있다');
-  ok(await page.locator('.selbar').count() === 0, '아무것도 안 골랐을 땐 선택 바가 없다');
+  ok(await page.locator('[data-selbar]').count() === 0, '아무것도 안 골랐을 땐 선택 바가 없다');
 
   await page.locator('#screen-review input[data-pick]').first().check();
   await page.waitForTimeout(120);
-  ok(await page.locator('.selbar').count() === 1, '하나 고르면 선택 바가 나타난다');
+  ok(await page.locator('[data-selbar]').count() === 1, '하나 고르면 선택 바가 나타난다');
   ok(!(await page.locator('#sheet').isVisible()), '네모를 눌러도 상세 시트가 열리지 않는다');
 
   await page.click('[data-sel="urgent"]');
   await page.waitForTimeout(200);
-  const urgentN = Number((await page.locator('.selbar-n').innerText()).replace(/\D/g, ''));
+  const urgentN = Number((await page.locator('[data-selbar-n]').innerText()).replace(/\D/g, ''));
   ok(urgentN > 1, '마감 임박만 고르기가 여러 건을 선택한다', `${urgentN}건`);
 
   /* 실제로 여러 id를 보내는지 — 이 검사가 이 기능의 핵심이다.
@@ -434,7 +446,7 @@ function serve() {
   });
   await page.click('[data-sel="confirm"]');
   await page.waitForSelector('#sheet:not([hidden])');
-  const listedN = await page.locator('#sheet .rows .row').count();
+  const listedN = await page.locator('#sheet [data-rows] [data-row]').count();
   ok(listedN === urgentN, '실행 전에 대상 목록을 실제로 보여 준다', `${listedN}건 표시`);
 
   await page.click('#sheet [data-bulk-go]');
@@ -458,7 +470,7 @@ function serve() {
   await page.waitForSelector('#sheet:not([hidden])');
   ok((await page.locator('#sheet #rg-name').inputValue()).length > 5,
     '등록 시트에 수집된 제목이 미리 채워진다');
-  ok(await page.locator('#sheet .pane').count() === 2, '왼쪽 앱1 내용 · 오른쪽 공고 원문 두 칸으로 대조한다');
+  ok(await page.locator('#sheet [data-pane]').count() === 2, '왼쪽 앱1 내용 · 오른쪽 공고 원문 두 칸으로 대조한다');
   ok(await page.locator('#sheet #rg-amountValue').inputValue() === '',
     '금액은 비워 둔다 (지어내지 않는다)');
 
@@ -482,10 +494,10 @@ function serve() {
   await page.waitForSelector('#screen-review:not([hidden])');
   const moreBtns = await page.locator('#screen-review [data-more]').count();
   if (moreBtns) {
-    const before = await page.locator('#screen-review .rows .row').count();
+    const before = await page.locator('#screen-review [data-rows] [data-row]').count();
     await page.locator('#screen-review [data-more]').first().click();
     await page.waitForTimeout(250);
-    const after = await page.locator('#screen-review .rows .row').count();
+    const after = await page.locator('#screen-review [data-rows] [data-row]').count();
     ok(after > before, '더 보기를 누르면 잘려 있던 줄이 실제로 늘어난다', `${before} → ${after}줄`);
   } else {
     ok(true, '더 보기 버튼 — 지금 데이터에선 잘린 목록이 없어 건너뜀');
@@ -588,7 +600,7 @@ function serve() {
   await page.waitForSelector('#screen-list:not([hidden])');
 
   const openedByKey = await page.evaluate(() => {
-    const row = document.querySelector('#screen-list .row[data-id]');
+    const row = document.querySelector('#screen-list [data-row]');
     if (!row) return 'no-row';
     row.focus();
     if (document.activeElement !== row) return 'not-focusable';
@@ -620,7 +632,7 @@ function serve() {
   await page.waitForTimeout(250);
   ok(await page.evaluate(() => {
     const a = document.activeElement;
-    return !!(a && a.matches && a.matches('#screen-list .row[data-id]'));
+    return !!(a && a.matches && a.matches('#screen-list [data-row]'));
   }), '시트를 닫으면 초점이 원래 줄로 돌아온다');
 
   /* 탭 줄 — 좌우 화살표와 aria-selected */
@@ -644,7 +656,7 @@ function serve() {
   await page.waitForSelector('#screen-list:not([hidden])');
   ok(await page.locator('[data-sort]').count() >= 4, '정렬 버튼이 있다');
 
-  const firstBy = async () => (await page.locator('#screen-list .row .t').first().innerText()).trim();
+  const firstBy = async () => (await page.locator('#screen-list [data-row] [data-row-title]').first().innerText()).trim();
   await page.click('[data-sort="name"]');
   await page.waitForTimeout(250);
   const asc = await firstBy();
@@ -665,7 +677,7 @@ function serve() {
     window.confirm = () => { window.__confirmUsed += 1; return false; }; window.__origConfirm = o; });
   await page.click('.tab[data-tab="review"]');
   await page.waitForSelector('#screen-review:not([hidden])');
-  await page.click('#screen-review .row[data-id]');
+  await page.click('#screen-review [data-row]');
   await page.waitForSelector('#sheet:not([hidden])');
   await page.click('#sheet [data-act="revert"]');
   await page.waitForTimeout(400);
@@ -675,7 +687,7 @@ function serve() {
   ok(usedConfirm === 0, '되돌리기에 브라우저 기본 confirm을 쓰지 않는다');
   ok(/차단/.test(askText) && /되돌리기/.test(askText),
     '되돌리기 확인 화면이 무엇을 하는지 보여 준다');
-  ok(await page.locator('#sheet .rows .row').count() >= 1, '어느 공고인지 목록으로 보여 준다');
+  ok(await page.locator('#sheet [data-rows] [data-row]').count() >= 1, '어느 공고인지 목록으로 보여 준다');
   await page.keyboard.press('Escape');
   await page.waitForTimeout(200);
 
@@ -704,7 +716,7 @@ function serve() {
     await page.waitForSelector('#sheet:not([hidden])');
     const geom = await page.evaluate(() => {
       const sh = document.querySelector('#sheet');
-      const last = sh.querySelector('.rows:last-of-type');
+      const last = sh.querySelector('[data-rows]:last-of-type');
       return {
         scrollable: sh.scrollHeight > sh.clientHeight + 4,
         lastH: last ? Math.round(last.getBoundingClientRect().height) : -1,
@@ -724,7 +736,7 @@ function serve() {
   await page.click('[data-sel="urgent"]');
   await page.waitForTimeout(250);
   const barGeom = await page.evaluate(() => {
-    const bar = document.querySelector('.selbar');
+    const bar = document.querySelector('[data-selbar]');
     if (!bar) return null;
     const top = document.querySelector('.topbar').getBoundingClientRect();
     const b = bar.getBoundingClientRect();
@@ -743,7 +755,7 @@ function serve() {
      매칭·알림·홈 합계가 조용히 망가진다. 보내는 내용에서 그 분리를 확인한다. */
   await page.click('.tab[data-tab="review"]');
   await page.waitForSelector('#screen-review:not([hidden])');
-  await page.click('#screen-review .row[data-id]');
+  await page.click('#screen-review [data-row]');
   await page.waitForSelector('#sheet:not([hidden])');
 
   ok(await page.locator('#sheet [data-eg]').count() >= 6, '자격을 화면에서 고칠 수 있다 (읽기 전용이 아니다)');
@@ -828,7 +840,7 @@ function serve() {
   /* 🔴 Playwright의 click()은 누르기 전에 그 요소를 화면 안으로 **끌어온다** —
      그러면 우리가 재려는 스크롤 위치를 검사 도구가 먼저 망가뜨린다.
      실제 사용자는 이미 보이는 칩을 누르므로, 여기서는 끌어오지 않고 그대로 누른다. */
-  await page.evaluate(() => document.querySelector('#screen-list .chip[data-sort="listed"]').click());
+  await page.evaluate(() => document.querySelector('#screen-list [data-sort="listed"]').click());
   await page.waitForTimeout(120);
   const afterY = await page.evaluate(() => window.scrollY);
   ok(beforeY > 300 && Math.abs(afterY - beforeY) < 60,
@@ -848,33 +860,33 @@ function serve() {
 
   /* ⑳ 스캔 지점 (B0-6) — 마감 임박순일 때만 구획으로 나눈다 */
   await page.evaluate(() => window.scrollTo(0, 0));
-  await page.evaluate(() => document.querySelector('#screen-list .chip[data-sort="deadline"]').click());
+  await page.evaluate(() => document.querySelector('#screen-list [data-sort="deadline"]').click());
   await page.waitForTimeout(150);
-  if (await page.locator('#screen-list .chip[data-sort="deadline"].on .c').textContent() !== '↑') {
-    await page.evaluate(() => document.querySelector('#screen-list .chip[data-sort="deadline"]').click());
+  if (await page.locator('#screen-list [data-sort="deadline"].on .c').textContent() !== '↑') {
+    await page.evaluate(() => document.querySelector('#screen-list [data-sort="deadline"]').click());
     await page.waitForTimeout(150);
   }
-  const groups = await page.locator('#screen-list .group-head').count();
+  const groups = await page.locator('#screen-list [data-group-head]').count();
   ok(groups >= 2, '마감 임박순에서는 기한 구획으로 나뉜다', `${groups}구획`);
   const grouped = await page.evaluate(() => {
-    const heads = [...document.querySelectorAll('#screen-list .group-head')];
-    const sum = [...document.querySelectorAll('#screen-list .group .rows')]
+    const heads = [...document.querySelectorAll('#screen-list [data-group-head]')];
+    const sum = [...document.querySelectorAll('#screen-list [data-group] [data-rows]')]
       .reduce((a, b) => a + b.children.length, 0);
-    const all = document.querySelectorAll('#screen-list .row').length;
+    const all = document.querySelectorAll('#screen-list [data-row]').length;
     const sticky = heads[0] && getComputedStyle(heads[0]).position;
     return { sum, all, sticky, labels: heads.map((h) => h.firstChild.textContent.trim()) };
   });
   ok(grouped.sum === grouped.all, '구획으로 나눠도 공고가 한 건도 사라지지 않는다',
     `${grouped.sum}/${grouped.all}건`);
   ok(grouped.sticky === 'sticky', '구획 제목은 스크롤 중에도 화면에 남는다', grouped.sticky);
-  await page.evaluate(() => document.querySelector('#screen-list .chip[data-sort="name"]').click());
+  await page.evaluate(() => document.querySelector('#screen-list [data-sort="name"]').click());
   await page.waitForTimeout(150);
-  ok(await page.locator('#screen-list .group-head').count() === 0,
+  ok(await page.locator('#screen-list [data-group-head]').count() === 0,
     '제목순에서는 구획을 만들지 않는다 (기한 구획이 뜻을 잃으므로)');
 
   /* ㉑ 밀도 (B0-7) — 글자를 줄이지 않고 줄 간격만 줄인다 */
   const dens = await page.evaluate(() => {
-    const row = document.querySelector('#screen-list .row');
+    const row = document.querySelector('#screen-list [data-row]');
     const before = { pad: getComputedStyle(row).paddingTop,
       font: getComputedStyle(row.querySelector('.t')).fontSize };
     document.querySelector('#btn-density').click();
@@ -914,7 +926,7 @@ function serve() {
   /* ㉓ 시트 하단 바 (B0-11) — 저장 버튼이 스크롤에 묻히면 안 된다 */
   await page.click('.tab[data-tab="list"]');
   await page.waitForSelector('#screen-list:not([hidden])');
-  await page.locator('#screen-list .row').first().click();
+  await page.locator('#screen-list [data-row]').first().click();
   await page.waitForSelector('#sheet:not([hidden])');
   const foot = await page.evaluate(() => {
     const f = document.querySelector('#sheet .sheet-foot');

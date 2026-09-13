@@ -568,7 +568,7 @@ function renderTodo() {
   const noBoard = D.schools.filter((s) => !s.boardUrl);
 
   const card = (c) => `
-    <div class="card ${c.cls}">
+    <div class="card ${c.cls}" data-stat>
       <div class="v">${c.v}</div>
       <div class="k">${esc(c.k)}</div>
       <div class="d">${c.d}</div>
@@ -630,7 +630,7 @@ function renderTodo() {
       <div class="sec-head" style="margin-top:8px">
         <h2>지금 처리할 것 — 마감 임박 + 검수 전</h2>
       </div>
-      <div class="rows">${urgent.map(rowHtml).join('')}</div>` : ''}
+      <div class="rows" data-rows>${urgent.map(rowHtml).join('')}</div>` : ''}
   `;
 }
 
@@ -683,11 +683,11 @@ function rowHtml(it, opt = {}) {
   /* 키보드로도 열려야 한다 — 예전엔 **마우스로만** 상세를 열 수 있었다.
      읽어 주기에도 '버튼'으로 잡히도록 role을 준다. */
   return `
-    <div class="row${opt.pick ? ' has-pick' : ''}" data-id="${esc(it.id)}"
+    <div class="row${opt.pick ? ' has-pick' : ''}" data-row data-id="${esc(it.id)}"
          tabindex="0" role="button" aria-label="${esc(it.name)} 상세 열기">
       ${pick}
       <div>
-        <div class="t">${esc(it.name)}</div>
+        <div class="t" data-row-title>${esc(it.name)}</div>
         <div class="m">
           <span>${esc(schoolOf(it))}</span>
           <span>${esc(it.provider || '')}</span>
@@ -725,7 +725,7 @@ async function bulkAction(kind) {
       <button class="sheet-close" data-close aria-label="닫기">×</button>
     </div>
     <p class="muted">${esc(meta.note)}</p>
-    <div class="rows">${items.map((it) => rowHtml(it)).join('')}</div>
+    <div class="rows" data-rows>${items.map((it) => rowHtml(it)).join('')}</div>
     <div class="btn-row sheet-foot">
       <button class="btn ${meta.danger ? 'danger' : 'btn-primary'}" data-bulk-go="${esc(kind)}">
         ${esc(items.length)}건 ${esc(meta.label)}
@@ -761,9 +761,9 @@ function askSheet({ title, note, lines = [], goLabel, danger = false, run }) {
       <button class="sheet-close" data-close aria-label="닫기">×</button>
     </div>
     ${note ? `<p class="muted">${esc(note)}</p>` : ''}
-    ${lines.length ? `<div class="rows">${lines.map((l) => `
-      <div class="row" data-noclick style="cursor:default">
-        <div><div class="t">${esc(l.t)}</div>
+    ${lines.length ? `<div class="rows" data-rows>${lines.map((l) => `
+      <div class="row" data-row data-noclick style="cursor:default">
+        <div><div class="t" data-row-title>${esc(l.t)}</div>
           ${l.m ? `<div class="m"><span>${esc(l.m)}</span></div>` : ''}</div>
         <div></div><div></div>
       </div>`).join('')}</div>` : ''}
@@ -777,8 +777,8 @@ function askSheet({ title, note, lines = [], goLabel, danger = false, run }) {
 function selBarHtml() {
   if (!SEL.size) return '';
   return `
-    <div class="selbar" role="region" aria-label="선택한 공고 처리">
-      <span class="selbar-n">선택 ${SEL.size}건</span>
+    <div class="selbar" data-selbar role="region" aria-label="선택한 공고 처리">
+      <span class="selbar-n" data-selbar-n>선택 ${SEL.size}건</span>
       <button class="btn btn-sm" data-sel="none">선택 해제</button>
       <span class="selbar-sp"></span>
       <button class="btn btn-sm btn-primary" data-sel="confirm">검수 완료로</button>
@@ -940,7 +940,7 @@ const BUCKETS = [
 ];
 
 function groupedRows(items) {
-  if (F.sort !== 'deadline') return `<div class="rows">${items.map(rowHtml).join('')}</div>`;
+  if (F.sort !== 'deadline') return `<div class="rows" data-rows>${items.map(rowHtml).join('')}</div>`;
   const groups = new Map();
   items.forEach((it) => {
     const d = dday(it.deadline);
@@ -949,9 +949,9 @@ function groupedRows(items) {
     groups.get(b.k).list.push(it);
   });
   return [...groups.values()].map((g) => `
-    <div class="group">
-      <h3 class="group-head">${esc(g.label)} <span class="group-n">${g.list.length}</span></h3>
-      <div class="rows">${g.list.map(rowHtml).join('')}</div>
+    <div class="group" data-group>
+      <h3 class="group-head" data-group-head>${esc(g.label)} <span class="group-n" data-group-n>${g.list.length}</span></h3>
+      <div class="rows" data-rows>${g.list.map(rowHtml).join('')}</div>
     </div>`).join('');
 }
 
@@ -990,13 +990,13 @@ function unregHtml() {
       <p>로봇이 게시판에서 가져왔지만 정식 등록에는 들어가지 않은 것들입니다.
          <b>원문 ↗</b>으로 확인한 뒤 <b>등록하기</b>를 누르면 학생 앱에 카드로 나갑니다.</p>
     </div>
-    ${cand.length ? `<div class="rows">${cand.slice(0, shown('cand', 80)).map(row).join('')}</div>`
+    ${cand.length ? `<div class="rows" data-rows>${cand.slice(0, shown('cand', 80)).map(row).join('')}</div>`
     : '<p class="empty">등록 후보가 없습니다.</p>'}
     ${moreBtn('cand', cand.length, 80)}
 
     ${skipped.length ? `<details style="margin-top:8px">
       <summary class="muted" style="cursor:pointer">등록 대상이 아닌 것 ${skipped.length}건 — 대출·대학원·파일명 등 (펼쳐 보기)</summary>
-      <div class="rows" style="margin-top:8px">${skipped.slice(0, shown('skip', 60)).map(row).join('')}</div>
+      <div class="rows" data-rows style="margin-top:8px">${skipped.slice(0, shown('skip', 60)).map(row).join('')}</div>
       ${moreBtn('skip', skipped.length, 60)}
       <p class="muted">규칙이 잘못 걸렀다고 보이면 알려 주세요 — 규칙은 <code class="mono">verify/entry-rules.cjs</code> 한 곳에 있습니다.</p>
     </details>` : ''}
@@ -1042,7 +1042,7 @@ function renderReview() {
       </div>
     </div>
 
-    ${unrev.length ? `<div class="rows">${unrev.map((it) => rowHtml(it, { pick: true, act: true })).join('')}</div>`
+    ${unrev.length ? `<div class="rows" data-rows>${unrev.map((it) => rowHtml(it, { pick: true, act: true })).join('')}</div>`
     : '<p class="empty">검수 전 공고가 없습니다. 모두 확인되었습니다.</p>'}
 
     ${unregHtml()}
@@ -1051,7 +1051,7 @@ function renderReview() {
       <h2>중복 의심 ${dups.length}쌍</h2>
       <p>같은 장학금이 여러 학교 게시판에 올라온 경우입니다. 따로 두면 학생에게 같은 것이 여러 번 보입니다.</p>
     </div>
-    ${dups.length ? `<div class="rows">${dups.map(([a, b]) => `
+    ${dups.length ? `<div class="rows" data-rows>${dups.map(([a, b]) => `
       <div class="row" data-noclick style="cursor:default">
         <div>
           <div class="t">${esc(a.name)}</div>
@@ -1417,11 +1417,11 @@ function renderInsta() {
   const st = D.insta.stats;
   const newC = instaNewComments();
   const tokenCard = !tk || !tk.firstSeen
-    ? `<div class="card is-warn"><div class="v">연결 전</div><div class="k">인스타 계정</div>
+    ? `<div class="card is-warn" data-stat><div class="v">연결 전</div><div class="k">인스타 계정</div>
         <div class="d">시크릿 IG_USER_ID·IG_ACCESS_TOKEN 이 아직 없습니다. 카드 준비·메일은 되지만 <b>게시는 안 됩니다.</b> 절차는 insta/README.md 「처음 한 번」.</div></div>`
     : (() => {
       const days = IG_LIFE_DAYS - Math.round((Date.now() - Date.parse(`${tk.firstSeen}T00:00:00+09:00`)) / 864e5);
-      return `<div class="card ${days <= 0 ? 'is-bad' : days <= 14 ? 'is-warn' : 'is-ok'}"><div class="v">${days <= 0 ? '만료' : `${days}일`}</div>
+      return `<div class="card ${days <= 0 ? 'is-bad' : days <= 14 ? 'is-warn' : 'is-ok'}" data-stat><div class="v">${days <= 0 ? '만료' : `${days}일`}</div>
         <div class="k">토큰 남은 수명 (우리가 아는 한)</div>
         <div class="d">처음 본 날 ${esc(tk.firstSeen)} 에서 60일을 셉니다 — 인스타는 만료일을 안 알려 줍니다. 매일 03:17 「인스타 토큰 수명 확인」이 살아 있는지 묻습니다.</div></div>`;
     })();
@@ -1435,10 +1435,10 @@ function renderInsta() {
     </div>
 
     <div class="cards">
-      <div class="card ${prepared.length ? 'is-warn' : 'is-ok'}"><div class="v">${prepared.length}</div><div class="k">게시 대기</div><div class="d">개발자가 보고 올릴 차례인 카드</div></div>
-      <div class="card"><div class="v">${posted.length}</div><div class="k">올린 게시물</div><div class="d">건너뜀 ${skipped.length}건</div></div>
-      <div class="card ${newC.length ? 'is-warn' : ''}"><div class="v">${newC.length}</div><div class="k">답 안 한 댓글</div><div class="d">${D.insta.comments.updatedAt ? `받아 온 시각 ${esc(String(D.insta.comments.updatedAt).slice(0, 16).replace('T', ' '))} UTC` : '아직 받아 온 적 없음'}</div></div>
-      <div class="card"><div class="v">${nf(st.account && st.account.followers)}</div><div class="k">팔로워${st.account && st.account.username ? ` · @${esc(st.account.username)}` : ''}</div><div class="d">${st.updatedAt ? `수확 ${esc(String(st.updatedAt).slice(0, 10))}` : '트랙션 수확 전'}</div></div>
+      <div class="card ${prepared.length ? 'is-warn' : 'is-ok'}" data-stat><div class="v">${prepared.length}</div><div class="k">게시 대기</div><div class="d">개발자가 보고 올릴 차례인 카드</div></div>
+      <div class="card" data-stat><div class="v">${posted.length}</div><div class="k">올린 게시물</div><div class="d">건너뜀 ${skipped.length}건</div></div>
+      <div class="card ${newC.length ? 'is-warn' : ''}" data-stat><div class="v">${newC.length}</div><div class="k">답 안 한 댓글</div><div class="d">${D.insta.comments.updatedAt ? `받아 온 시각 ${esc(String(D.insta.comments.updatedAt).slice(0, 16).replace('T', ' '))} UTC` : '아직 받아 온 적 없음'}</div></div>
+      <div class="card" data-stat><div class="v">${nf(st.account && st.account.followers)}</div><div class="k">팔로워${st.account && st.account.username ? ` · @${esc(st.account.username)}` : ''}</div><div class="d">${st.updatedAt ? `수확 ${esc(String(st.updatedAt).slice(0, 10))}` : '트랙션 수확 전'}</div></div>
       ${tokenCard}
     </div>
 
@@ -1451,14 +1451,14 @@ function renderInsta() {
 
     <div class="sec-head" style="margin-top:14px"><h2>게시 대기 ${prepared.length}건</h2>
       <p>판형을 바꿔 다시 그리면 로봇이 새 카드를 그려 이슈·메일로 다시 보냅니다(약 3분). 건너뛰기는 폴더를 지우지 않아 나중에 되살릴 수 있습니다.</p></div>
-    ${prepared.length ? `<div class="rows">${prepared.map((p) => instaPostRow(p, 'prepared')).join('')}</div>`
+    ${prepared.length ? `<div class="rows" data-rows>${prepared.map((p) => instaPostRow(p, 'prepared')).join('')}</div>`
     : '<div class="allclear"><span class="allclear-mark">✓</span> 기다리는 카드가 없습니다 — 새 공고가 수집되면 로봇이 그립니다.</div>'}
 
     <div class="sec-head" style="margin-top:14px"><h2>올린 게시물 ${posted.length}건</h2></div>
-    ${posted.length ? `<div class="rows">${posted.map((p) => instaPostRow(p, 'posted')).join('')}</div>` : '<p class="muted">아직 올린 게시물이 없습니다.</p>'}
+    ${posted.length ? `<div class="rows" data-rows>${posted.map((p) => instaPostRow(p, 'posted')).join('')}</div>` : '<p class="muted">아직 올린 게시물이 없습니다.</p>'}
 
     ${skipped.length ? `<details style="margin-top:14px"><summary class="muted">건너뛴 게시물 ${skipped.length}건</summary>
-      <div class="rows" style="margin-top:8px">${skipped.map((p) => instaPostRow(p, 'skipped')).join('')}</div></details>` : ''}
+      <div class="rows" data-rows style="margin-top:8px">${skipped.map((p) => instaPostRow(p, 'skipped')).join('')}</div></details>` : ''}
 
     <div class="sec-head" style="margin-top:14px"><h2>판형 ${(D.insta.templates || []).length}벌 — 번호는 고정</h2>
       <p>"3번으로" 라고 말하면 늘 같은 판형입니다. 새 판형은 좋은 예시를 채팅에 붙여 넣고 "번호에 추가해 줘" 라고 하면 다음 번호로 더해집니다(insta/templates.json).</p></div>
@@ -1511,8 +1511,8 @@ function instaCommentsHtml() {
     </div>`;
   return `
     ${errs.length ? `<p class="muted">⚠️ 게시물 ${errs.length}건의 댓글을 못 받았습니다 — ${esc(errs[0].error || '')}</p>` : ''}
-    ${fresh.length ? `<div class="rows">${fresh.map(row).join('')}</div>` : '<div class="allclear"><span class="allclear-mark">✓</span> 답 안 한 댓글이 없습니다.</div>'}
-    ${done.length ? `<details style="margin-top:10px"><summary class="muted">처리한 댓글 ${done.length}건</summary><div class="rows" style="margin-top:8px">${done.map(row).join('')}</div></details>` : ''}`;
+    ${fresh.length ? `<div class="rows" data-rows>${fresh.map(row).join('')}</div>` : '<div class="allclear"><span class="allclear-mark">✓</span> 답 안 한 댓글이 없습니다.</div>'}
+    ${done.length ? `<details style="margin-top:10px"><summary class="muted">처리한 댓글 ${done.length}건</summary><div class="rows" data-rows style="margin-top:8px">${done.map(row).join('')}</div></details>` : ''}`;
 }
 
 function instaCardSheet(code) {
@@ -1633,7 +1633,7 @@ function renderRobots() {
       <p>예약 시간과 무관하게 한 번 더 돌립니다. <b>같은 학교를 하루에 여러 번 두드리면</b>
          학교 서버가 막아 멀쩡한 주소까지 실패로 뜰 수 있으니, 수집 계열은 필요할 때만 누르세요.</p>
     </div>
-    <div class="rows">${ROBOTS.map(runRow).join('')}</div>
+    <div class="rows" data-rows>${ROBOTS.map(runRow).join('')}</div>
 
     <div class="sec-head" style="margin-top:12px"><h2>로봇 리포트 전문</h2></div>
     <div class="filter-row">
@@ -1642,7 +1642,7 @@ function renderRobots() {
     <div id="report-box"></div>
 
     <div class="sec-head" style="margin-top:12px"><h2>로봇 설정</h2></div>
-    <div class="rows">
+    <div class="rows" data-rows>
       <div class="row" data-noclick style="cursor:default">
         <div>
           <div class="t">자동 등록 로봇</div>
@@ -1691,13 +1691,13 @@ async function loadApiHealth() {
     return;
   }
   if (!found.length) {
-    box.innerHTML = '<div class="cards"><div class="card is-ok"><div class="v">정상</div>'
+    box.innerHTML = '<div class="cards"><div class="card is-ok" data-stat><div class="v">정상</div>'
       + '<div class="k">양식 변환 API</div>'
       + '<div class="d">최근 리포트에 호출 실패가 없습니다</div></div></div>';
     return;
   }
   const credit = found.some((m) => /cred/i.test(m));
-  box.innerHTML = `<div class="cards"><div class="card is-bad"><div class="v">${found.length}</div>
+  box.innerHTML = `<div class="cards"><div class="card is-bad" data-stat><div class="v">${found.length}</div>
       <div class="k">API 호출 실패</div>
       <div class="d">${credit ? '<b>잔액 부족으로 보입니다</b> — 충전 전까지 유료 변환(스캔 PDF·표 서식)이 멈춥니다.'
     : '최근 리포트에 실패가 기록돼 있습니다.'}
@@ -1740,11 +1740,11 @@ async function loadRobotIssues() {
     if (rb) { rb.textContent = urgent.length; rb.className = `tab-n${urgent.length ? ' hot' : ''}`; rb.dataset.filled = '1'; }
     box.innerHTML = `
       ${urgent.length
-    ? `<div class="rows">${urgent.map(row).join('')}</div>`
+    ? `<div class="rows" data-rows>${urgent.map(row).join('')}</div>`
     : '<p class="empty">🚨 경보도 조치 요청도 없습니다 — 로봇이 조용합니다.</p>'}
       ${g.report.length ? `<details style="margin-top:8px">
         <summary class="muted" style="cursor:pointer">수집 리포트 ${g.report.length}건 (펼쳐 보기)</summary>
-        <div class="rows" style="margin-top:8px">${g.report.slice(0, 20).map(row).join('')}</div>
+        <div class="rows" data-rows style="margin-top:8px">${g.report.slice(0, 20).map(row).join('')}</div>
       </details>` : ''}
       ${g.other.length ? `<p class="muted">그 밖의 열린 이슈 ${g.other.length}건</p>` : ''}`;
   } catch (e) {
@@ -1764,7 +1764,7 @@ async function loadPushHealth() {
     if (!r.ok) throw new Error(`응답 ${r.status}`);
     const h = await r.json();
     const bad = !!h.lastError;
-    box.innerHTML = `<div class="cards"><div class="card ${bad ? 'is-bad' : 'is-ok'}">
+    box.innerHTML = `<div class="cards"><div class="card ${bad ? 'is-bad' : 'is-ok'}" data-stat>
       <div class="v">${h.subs == null ? '—' : esc(String(h.subs))}</div>
       <div class="k">등록된 폰</div>
       <div class="d">${bad ? `마지막 오류: ${esc(JSON.stringify(h.lastError)).slice(0, 90)}`
@@ -1816,27 +1816,27 @@ function renderQuality() {
     </div>
 
     <div class="cards">
-      <div class="card ${errors.length ? 'is-bad' : 'is-ok'}"><div class="v">${errors.length}</div>
+      <div class="card ${errors.length ? 'is-bad' : 'is-ok'}" data-stat><div class="v">${errors.length}</div>
         <div class="k">규칙 위반 (오류)</div><div class="d">앱1에 잘못 나갈 수 있는 항목</div></div>
-      <div class="card ${warns.length ? 'is-warn' : 'is-ok'}"><div class="v">${warns.length}</div>
+      <div class="card ${warns.length ? 'is-warn' : 'is-ok'}" data-stat><div class="v">${warns.length}</div>
         <div class="k">규칙 경고</div><div class="d">손봐야 하지만 치명적이지는 않음</div></div>
-      <div class="card is-warn"><div class="v">${noAmount}</div>
+      <div class="card is-warn" data-stat><div class="v">${noAmount}</div>
         <div class="k">금액 미확인</div><div class="d">학생이 얼마인지 모르는 공고</div></div>
-      <div class="card is-warn"><div class="v">${noDeadline}</div>
+      <div class="card is-warn" data-stat><div class="v">${noDeadline}</div>
         <div class="k">마감일 없음</div><div class="d">언제까지인지 모르는 공고</div></div>
-      <div class="card ${noForm ? 'is-warn' : 'is-ok'}"><div class="v">${noForm}</div>
+      <div class="card ${noForm ? 'is-warn' : 'is-ok'}" data-stat><div class="v">${noForm}</div>
         <div class="k">신청서 첨부는 있는데 양식 미등록</div><div class="d">앱에서 작성하게 만들 수 있는 후보</div></div>
-      <div class="card ${noElig ? 'is-warn' : 'is-ok'}"><div class="v">${noElig}</div>
+      <div class="card ${noElig ? 'is-warn' : 'is-ok'}" data-stat><div class="v">${noElig}</div>
         <div class="k">지원 자격 미확보</div>
         <div class="d">학생에게 "자격을 아직 읽지 못했어요"로 나가는 공고 — 상세에서 원문 문장을 골라 주면 사라집니다</div></div>
-      <div class="card ${dead.length ? 'is-warn' : 'is-ok'}"><div class="v">${dead.length}</div>
+      <div class="card ${dead.length ? 'is-warn' : 'is-ok'}" data-stat><div class="v">${dead.length}</div>
         <div class="k">원문 링크 실패 기록</div><div class="d">링크 사냥꾼이 못 연 주소</div></div>
     </div>
 
     ${errors.length ? `<div class="sec-head"><h2>오류 ${errors.length}건</h2></div>
-      <div class="rows">${errors.map(probRow).join('')}</div>` : ''}
+      <div class="rows" data-rows>${errors.map(probRow).join('')}</div>` : ''}
     ${warns.length ? `<div class="sec-head"><h2>경고 ${warns.length}건</h2></div>
-      <div class="rows">${warns.map(probRow).join('')}</div>` : ''}
+      <div class="rows" data-rows>${warns.map(probRow).join('')}</div>` : ''}
     ${!withProb.length ? '<p class="empty">규칙 위반이 없습니다.</p>' : ''}
 
     ${dead.length ? `
@@ -1947,7 +1947,7 @@ function registerSheet(n) {
       비어 있는 편이 틀린 숫자보다 낫습니다.</p>
 
     <div class="compare">
-      <div class="pane">
+      <div class="pane" data-pane="app">
         <h4>앱1에 나갈 내용</h4>
         <div class="pane-body">
           <div class="field">
@@ -1975,7 +1975,7 @@ function registerSheet(n) {
         </div>
       </div>
 
-      <div class="pane">
+      <div class="pane" data-pane="source">
         <h4>공고 원문</h4>
         <div class="pane-body">
           <p><b>${esc(n.title || '')}</b></p>
@@ -2039,7 +2039,7 @@ function detailSheet(it) {
     `<div class="pill ${p.level === 'error' ? 'bad' : ''}" style="display:block;margin-bottom:4px">${esc(p.msg)}</div>`).join('')}</div>` : ''}
 
     <div class="compare">
-      <div class="pane">
+      <div class="pane" data-pane="app">
         <h4>앱1에 나가는 내용 (고칠 수 있습니다)</h4>
         <div class="pane-body">
           ${EDIT_FIELDS.map(field).join('')}
@@ -2099,7 +2099,7 @@ function detailSheet(it) {
         </div>
       </div>
 
-      <div class="pane">
+      <div class="pane" data-pane="source">
         <h4>공고 원문 — 지어내지 않고 그대로</h4>
         <div class="pane-body">
           ${url ? `<a class="btn btn-sm" href="${esc(url)}" target="_blank" rel="noreferrer noopener">원문 공고 열기 ↗</a>`
@@ -2214,7 +2214,7 @@ function formSheet(id) {
     </table></div>
 
     ${used.length ? `<div class="sec-head"><h2>이 양식을 쓰는 공고</h2></div>
-      <div class="rows">${used.map(rowHtml).join('')}</div>` : ''}
+      <div class="rows" data-rows>${used.map(rowHtml).join('')}</div>` : ''}
   `;
 }
 
