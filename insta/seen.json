@@ -512,6 +512,78 @@
    "cards": 5,
    "dir": "insta/pub/0625002",
    "at": "2026-09-13"
+  },
+  {
+   "status": "prepared",
+   "code": "0625004",
+   "org": "울진군장학재단",
+   "name": "학업우수(직장인포함)장학금",
+   "due": "2026-09-18",
+   "school": null,
+   "tplNo": 1,
+   "cards": 5,
+   "dir": "insta/pub/0625004",
+   "at": "2026-09-13"
+  },
+  {
+   "status": "prepared",
+   "code": "2703752010",
+   "org": "재단법인 김해시미래인재장학재단",
+   "name": "김해시의사회 지정기탁 장학금",
+   "due": "2026-09-18",
+   "school": null,
+   "tplNo": 1,
+   "cards": 5,
+   "dir": "insta/pub/2703752010",
+   "at": "2026-09-13"
+  },
+  {
+   "status": "prepared",
+   "code": "2700096001",
+   "org": "한국광산장학회",
+   "name": "우수장학생(성적우수자)",
+   "due": "2026-09-18",
+   "school": null,
+   "tplNo": 2,
+   "cards": 5,
+   "dir": "insta/pub/2700096001",
+   "at": "2026-09-13"
+  },
+  {
+   "status": "prepared",
+   "code": "2700096002",
+   "org": "한국광산장학회",
+   "name": "일반장학생",
+   "due": "2026-09-18",
+   "school": null,
+   "tplNo": 1,
+   "cards": 5,
+   "dir": "insta/pub/2700096002",
+   "at": "2026-09-13"
+  },
+  {
+   "status": "prepared",
+   "code": "2701197001",
+   "org": "강원인재원",
+   "name": "미래인재",
+   "due": "2026-09-21",
+   "school": null,
+   "tplNo": 3,
+   "cards": 4,
+   "dir": "insta/pub/2701197001",
+   "at": "2026-09-13"
+  },
+  {
+   "status": "prepared",
+   "code": "2700076002",
+   "org": "포항시장학회",
+   "name": "문화·예술·기능 특기생",
+   "due": "2026-09-22",
+   "school": null,
+   "tplNo": 2,
+   "cards": 5,
+   "dir": "insta/pub/2700076002",
+   "at": "2026-09-13"
   }
  ]
 }
