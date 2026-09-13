@@ -427,7 +427,14 @@ async function applyAction(action, payload, label) {
 }
 
 /* ---------------- 화면 전환 ---------------- */
-const SCREENS = ['todo', 'list', 'review', 'forms', 'network', 'robots', 'insta', 'quality'];
+/* 🔴 화면 다섯 (2026-09-13 개발자 결정 — 8개에서 줄였다).
+   · 데이터 품질 → **할 일** ('지금 뭐가 잘못됐나' 는 곧 '오늘 할 일' 이다)
+   · 양식       → **목록** 의 보기 전환 (양식은 '어느 공고에 붙는가' 를 보는 것이다)
+   · 수집망     → **로봇** (학교가 둘로 줄어 표 두 줄이 탭 하나를 차지하고 있었다)
+   넷을 '같은 48건을 네 번 다르게 자른 화면' 으로 두던 것을 끝냈다.
+   ⚠️ 화면을 지운 것이 아니라 **품은 것**이다 — 그 내용을 그리는 함수는 그대로 살아 있고
+      renderQuality('todo-quality-slot') 처럼 그릴 자리만 받는다(베끼지 않는다). */
+const SCREENS = ['todo', 'review', 'list', 'robots', 'insta'];
 let current = 'todo';
 
 function show(name) {
@@ -456,8 +463,7 @@ const screenFromHash = () => {
 
 function renderScreen(name) {
   ({ todo: renderTodo, list: renderList, review: renderReview,
-    forms: renderForms, network: renderNetwork, robots: renderRobots,
-    insta: renderInsta, quality: renderQuality }[name] || (() => {}))();
+    robots: renderRobots, insta: renderInsta }[name] || (() => {}))();
   markScrollers(byId(`screen-${name}`));
 }
 
@@ -552,13 +558,11 @@ function renderCounts() {
   set('n-todo', todo, true);
   set('n-list', D.reg.length);
   set('n-review', unrev, true);
-  set('n-forms', Object.keys(D.forms).length);
-  set('n-network', failingSchools().length, true);
+
   /* 로봇 탭 배지는 열린 경보 수 — loadRobotIssues가 읽어 채운다.
      읽기 전에는 '—'로 둔다. 0으로 두면 **못 읽은 것이 '이상 없음'으로 보인다.** */
   const rb = byId('n-robots');
   if (rb && !rb.dataset.filled) { rb.textContent = '—'; rb.className = 'tab-n'; }
-  set('n-quality', probs, true);
   set('n-insta', instaGroups().prepared.length + instaNewComments().length, true);   // 눌러야 할 것 = 게시 대기 + 답 안 한 댓글
 }
 
@@ -618,12 +622,21 @@ function renderTodo() {
 
     ${todo.length ? statCardsHtml(all) : '<p class="empty">지금 처리할 일이 없습니다. 모든 항목이 정상입니다.</p>'}
 
-    ${urgent.length ? `
-      <div class="sec-head" style="margin-top:8px">
+    ${urgent.length ? (() => {
+    const cm = commonMeta(urgent);
+    return `
+      <div class="sec-head" style="margin-top:var(--space-8)">
         <h2>지금 처리할 것 — 마감 임박 + 검수 전</h2>
       </div>
-      <div class="rows" data-rows>${urgent.map(rowHtml).join('')}</div>` : ''}
+      ${commonMetaHtml(cm)}
+      <div class="rows" data-rows>${urgent.map((it) => rowHtml(it, { common: cm })).join('')}</div>`;
+  })() : ''}
+
+    <!-- 데이터 품질을 여기로 흡수한다 — '지금 뭐가 잘못됐나' 는 곧 '오늘 할 일' 이다.
+         🔴 베끼지 않고 renderQuality 를 그대로 부른다(같은 숫자·같은 묶음). -->
+    <div id="todo-quality-slot"></div>
   `;
+  renderQuality('todo-quality-slot');
 }
 
 /* ---------------- 저장된 공고 원문 (2026-09-13) ----------------
@@ -905,6 +918,10 @@ const F = { status: 'all', school: 'all', nature: 'all', channel: 'all', badge: 
    예전엔 **어디에도 사용자 정렬이 없었다.** 166건이 늘 같은 순서로만 나왔다.
    마감 없는 공고는 어느 방향으로 정렬하든 **항상 뒤로** 보낸다 —
    '기한 미확인'이 맨 위를 차지하면 급한 것이 안 보인다. */
+/* 「공고 전체」의 보기 — 공고 목록 / 양식 목록 (2026-09-13).
+   양식은 결국 '어느 공고에 붙는가' 를 보는 것이라 같은 화면에 있는 것이 맞다. */
+let LIST_VIEW = 'notices';
+
 const SORTS = {
   deadline: { label: '마감 임박순', get: (it) => it.deadline || '' },
   listed: { label: '등록 최신순', get: (it) => it.listedAt || it.deadline || '', dir: 'desc' },
@@ -985,11 +1002,33 @@ function renderList() {
 
   const items = sortItems(filteredList());
 
+  /* 보기 전환 — 공고 / 양식. 🔴 양식 화면을 베끼지 않고 renderForms 를 그대로 부른다. */
+  const viewTabs = `
+    <div class="filter-row" style="margin-bottom:var(--space-8)">
+      <span class="lb">보기</span>
+      <button class="chip ${LIST_VIEW === 'notices' ? 'on' : ''}" data-lview="notices">공고<span class="c">${D.reg.length}</span></button>
+      <button class="chip ${LIST_VIEW === 'forms' ? 'on' : ''}" data-lview="forms">양식<span class="c">${Object.keys(D.forms).length}</span></button>
+    </div>`;
+
+  if (LIST_VIEW === 'forms') {
+    byId('screen-list').innerHTML = `
+      <div class="sec-head">
+        <h2>양식 (신청서) ${Object.keys(D.forms).length}종</h2>
+        <p>줄을 누르면 스키마와 <b>실제로 생성되는 문서</b>를 미리 볼 수 있습니다.</p>
+      </div>
+      ${viewTabs}
+      <div id="list-forms-slot"></div>`;
+    renderForms('list-forms-slot');
+    markScrollers(byId('screen-list'));
+    return;
+  }
+
   byId('screen-list').innerHTML = `
     <div class="sec-head">
       <h2>공고 전체</h2>
       <p>학생 조건과 상관없이 등록된 ${D.reg.length}건을 모두 봅니다. 줄을 누르면 상세·수정이 열립니다.</p>
     </div>
+    ${viewTabs}
 
     <div class="filters">
       <div class="filter-row">
@@ -1201,7 +1240,10 @@ function renderReview() {
 }
 
 /* ---------------- ④ 양식 ---------------- */
-function renderForms() {
+/* 🔴 target 을 받는 이유: 「공고 전체」의 '양식' 보기가 **같은 함수**를 불러 그린다.
+   조각을 떼어 내려다 중첩 템플릿에서 잘못 잘린 적이 있어(만들면서 겪었다),
+   함수를 나누지 않고 **그릴 자리만** 받는다. 베끼는 것보다 안전하다. */
+function renderForms(target) {
   const ids = Object.keys(D.forms).sort();
   const used = {};
   D.reg.forEach((it) => { if (it.formId) used[it.formId] = (used[it.formId] || 0) + 1; });
@@ -1211,7 +1253,7 @@ function renderForms() {
   const orphan = ids.filter((id) => !used[id]);
   const broken = D.reg.filter((it) => it.formId && !D.forms[it.formId]);
 
-  byId('screen-forms').innerHTML = `
+  byId(target).innerHTML = `
     <div class="sec-head">
       <h2>양식 (신청서) ${ids.length}종</h2>
       <p>줄을 누르면 스키마와 <b>실제로 생성되는 문서</b>를 미리 볼 수 있습니다.
@@ -1363,22 +1405,6 @@ function networkSectionHtml() {
   `;
 }
 
-function renderNetwork() {
-  byId('screen-network').innerHTML = `
-    <div class="sec-head">
-      <h2>수집망</h2>
-      <p>학교 ${D.schools.length}곳 (일반 수집) · 브라우저형 ${D.targets.length}곳.
-         어제부터 공고가 안 들어오는 학교를 여기서 발견합니다.</p>
-    </div>
-
-    <div class="filter-row">
-      <button class="btn btn-sm" id="btn-run-collect">일반 수집 로봇 지금 실행</button>
-      <button class="btn btn-sm" id="btn-run-browser">브라우저형 수집 로봇 지금 실행</button>
-    </div>
-
-    ${networkSectionHtml()}
-  `;
-}
 
 /* ---------------- ⑥ 로봇 통제판 (E단계, 2026-08-09) ----------------
    왜 만들었나: 로봇이 13종인데 화면에서 돌릴 수 있는 건 3종뿐이었고, 로봇이 뭐라고
@@ -1796,7 +1822,7 @@ function runStateHtml(file) {
 function renderRobots() {
   const box = byId('screen-robots');
   const runRow = (r) => `
-    <div class="row" data-noclick style="cursor:default">
+    <div class="row" data-row data-noclick style="cursor:default">
       <div>
         <div class="t">${esc(r.n)}</div>
         <div class="m"><span>${esc(r.d)}</span><span>${esc(r.when)}</span></div>
@@ -2062,7 +2088,9 @@ function problemGroupHtml(grp, key) {
     </div>`;
 }
 
-function renderQuality() {
+/* 🔴 target 을 받는 이유는 renderForms 와 같다 — 「할 일」 화면이 이 함수를 그대로 부른다.
+   '지금 뭐가 잘못됐나' 는 곧 '오늘 할 일' 이라 두 화면으로 나눌 이유가 없었다. */
+function renderQuality(target) {
   const fi = formIdSet();
   const withProb = D.reg.map((it) => ({ it, ps: problemsOf(it, fi) })).filter((x) => x.ps.length);
   const errors = withProb.filter((x) => x.ps.some((p) => p.level === 'error'));
@@ -2089,7 +2117,7 @@ function renderQuality() {
       <div>${ddayHtml(x.it)}</div>
     </div>`;
 
-  byId('screen-quality').innerHTML = `
+  byId(target).innerHTML = `
     <div class="sec-head">
       <h2>데이터 품질</h2>
       <p>로봇이 매일 쓰는 등록 규칙을 이 화면에서 그대로 돌린 결과입니다. 줄을 누르면 바로 고칠 수 있습니다.</p>
@@ -2613,6 +2641,9 @@ function bindGlobal() {
       renderPendingBar();
       return;
     }
+
+    const lv = e.target.closest('[data-lview]');
+    if (lv) { LIST_VIEW = lv.dataset.lview; rerender('list'); return; }
 
     const go = e.target.closest('[data-go]');
     if (go) { show(go.dataset.go); return; }

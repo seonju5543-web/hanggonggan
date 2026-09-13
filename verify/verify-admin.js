@@ -40,6 +40,28 @@ let failed = 0;
      (이미 있던 것) [data-id] [data-pick] [data-sort] [data-f] [data-act]
    ⚠️ 표식을 새로 만들 때는 **화면이 바뀌어도 남을 이름**인지 먼저 묻는다.
       `data-blue-card` 같은 건 모양이라 또 깨진다. */
+
+/* 🔴 **화면이 줄어도 검사가 지키는 '뜻' 은 그대로다** (2026-09-13 · 탭 8개 → 5개).
+   양식은 「목록」의 보기 전환으로, 수집망은 「로봇」 안으로, 데이터 품질은 「할 일」 안으로
+   들어갔다. 그래서 아래 검사들은 **주장 문장을 한 글자도 안 바꾸고** 가는 길만 바꾼다.
+   ⚠️ 검사를 지우지 않았다 — 지우면 그만큼 덜 보는 것이다. */
+async function openList(page) {
+  await page.click('.tab[data-tab="list"]');
+  await page.waitForSelector('#screen-list:not([hidden])');
+}
+async function gotoForms(page) {
+  await openList(page);
+  await page.click('[data-lview="forms"]');
+  await page.waitForSelector('#screen-list tr[data-form]', { timeout: 5000 }).catch(() => {});
+}
+/* 🔴 보기 전환('공고'/'양식')은 화면을 옮겨도 남는다 — 앞선 검사가 '양식' 으로 두고 갔으면
+   목록 탭만 눌러서는 공고 줄이 없다(실제로 여기서 멈췄다). 공고 보기까지 확실히 간다. */
+async function gotoNotices(page) {
+  await openList(page);
+  await page.click('[data-lview="notices"]');
+  await page.waitForSelector('#screen-list [data-row]', { timeout: 5000 }).catch(() => {});
+}
+
 const ok = (cond, label, extra = '') => {
   console.log(`${cond ? '✅' : '❌'} ${label}${extra ? ` — ${extra}` : ''}`);
   if (!cond) failed += 1;
@@ -200,8 +222,7 @@ function serve() {
   ok(/오늘 할 일/.test(todoText), '① 오늘 할 일 화면이 그려진다');
   ok(todoText.includes(String(autoN)), '① 검수 전 건수가 실제 데이터와 같다', `검수 전 ${autoN}건`);
 
-  await page.click('.tab[data-tab="list"]');
-  await page.waitForSelector('#screen-list:not([hidden])');
+  await gotoNotices(page);   /* 🔴 보기 전환이 '양식' 으로 남아 있을 수 있다 — 공고 보기까지 확실히 간다 */
   const rows = await page.locator('#screen-list [data-row]').count();
   ok(rows === total, '② 공고 전체가 조건 없이 전부 보인다', `${rows}/${total}건`);
 
@@ -223,18 +244,17 @@ function serve() {
   ok(unreg.overlap === 0, '③ 이미 등록한 공고가 미등록으로 다시 올라오지 않는다',
     `표시 ${unreg.shown}건 · 중복 ${unreg.overlap}건`);
 
-  await page.click('.tab[data-tab="forms"]');
-  await page.waitForSelector('#screen-forms:not([hidden])');
-  const formRows = await page.locator('#screen-forms tr[data-form]').count();
+  await gotoForms(page);
+  const formRows = await page.locator('#screen-list tr[data-form]').count();
   ok(formRows === Object.keys(forms.templates).length, '④ 양식 목록이 전부 보인다', `${formRows}종`);
 
-  await page.click('.tab[data-tab="network"]');
-  await page.waitForSelector('#screen-network:not([hidden])');
-  ok(/수집망/.test(await page.textContent('#screen-network')), '⑤ 수집망 화면이 그려진다');
+  await page.click('.tab[data-tab="robots"]');
+  await page.waitForSelector('#screen-robots:not([hidden])');
+  ok(/수집망/.test(await page.textContent('#screen-robots')), '⑤ 수집망 화면이 그려진다');
 
-  await page.click('.tab[data-tab="quality"]');
-  await page.waitForSelector('#screen-quality:not([hidden])');
-  ok(/데이터 품질/.test(await page.textContent('#screen-quality')), '⑥ 데이터 품질 화면이 그려진다');
+  await page.click('.tab[data-tab="todo"]');
+  await page.waitForSelector('#screen-todo:not([hidden])');
+  ok(/데이터 품질/.test(await page.textContent('#screen-todo')), '⑥ 데이터 품질 화면이 그려진다');
 
   /* 줄마다 같은 말을 되풀이하지 않는다 (2026-09-13)
      🔴 실측: 「컨펌 작업대」 14줄이 전부 '검수 전' 이었고, 10줄이 '마감일 없음' 을
@@ -261,29 +281,29 @@ function serve() {
      🔴 실측으로 경고 11건 = 서로 다른 원인 2개였고, 그중 하나가 10건이었다.
      예전에는 한 글자도 안 다른 같은 문장이 열 줄을 채웠다. */
   {
-    const q = await page.textContent('#screen-quality');
-    const groups = await page.locator('#screen-quality [data-pgroup]').count();
+    const q = await page.textContent('#screen-todo');
+    const groups = await page.locator('#screen-todo [data-pgroup]').count();
     /* 규칙을 베끼지 않고 원본을 불러 센다 — 화면이 쓰는 것과 같은 파일이다 */
     const { checkEntry } = require('./entry-rules.cjs');
     const formIdSet = new Set(Object.keys(forms.templates));
     const warnN = reg.items.reduce((n, it) => n + (checkEntry(it, { formIds: formIdSet }) || []).length, 0);
     ok(groups > 0 && groups < warnN,
       '같은 원인은 한 줄로 묶는다', `원인 ${groups}가지 / 지적 ${warnN}건`);
-    ok(await page.locator('#screen-quality [data-fixrun]').count() >= 1,
+    ok(await page.locator('#screen-todo [data-fixrun]').count() >= 1,
       '로봇이 고칠 수 있는 원인에는 그 자리에 버튼이 있다');
     /* 🔴 코드 지식이 없는 개발자가 읽는 화면이다 — 파일 이름과 push 를 시키지 않는다 */
     ok(!/run-[a-z-]+\.txt|수정 후 push|git |커밋/.test(q),
       "화면이 '파일을 고쳐서 push 하라'고 시키지 않는다");
     /* 0건은 카드로 자리를 먹지 않는다 — 두 화면에 같은 규칙이 적용되는지 본다 */
-    for (const [tab, name] of [['todo', '오늘 할 일'], ['quality', '데이터 품질']]) {
+    for (const [tab, name] of [['todo', '오늘 할 일'], ['todo', '할 일(데이터 품질 포함)']]) {
       await page.click(`.tab[data-tab="${tab}"]`);
       await page.waitForSelector(`#screen-${tab}:not([hidden])`);
       const zero = await page.evaluate((t) => [...document.querySelectorAll(`#screen-${t} [data-stat] .v`)]
         .filter((el) => el.textContent.trim() === '0').length, tab);
       ok(zero === 0, `${name} — 0건은 카드로 자리를 먹지 않는다`);
     }
-    await page.click('.tab[data-tab="quality"]');
-    await page.waitForSelector('#screen-quality:not([hidden])');
+    await page.click('.tab[data-tab="todo"]');
+  await page.waitForSelector('#screen-todo:not([hidden])');
   }
 
   /* ⑦ 인스타 (2026-09-12) — 게시 대기 · 판형 번호 · 트랙션 · 댓글이 한 화면에 */
@@ -320,16 +340,18 @@ function serve() {
   /* 지원 자격 미확보 — 고치는 자리는 상세에 있었는데 **몇 건인지 세는 자리가 없어서**
      76건이 밀려 있어도 화면이 조용했다(2026-08-12). 학생 앱과 같은 칸으로 센다. */
   const noEligN = reg.items.filter((x) => !(x.eligibilityLines || []).length && !x.eligibilityVerified).length;
-  const eligCard = await page.locator('#screen-quality [data-stat]', { hasText: '지원 자격 미확보' }).first().textContent();
+  const eligCard = await page.locator('#screen-todo [data-stat]', { hasText: '지원 자격 미확보' }).first().textContent();
   ok(/지원 자격 미확보/.test(eligCard || ''), '⑥ 지원 자격 미확보 건수를 센다');
   ok((eligCard || '').includes(String(noEligN)), '⑥ 그 건수가 실제 데이터와 같다', `${noEligN}건`);
 
   /* ④ 원문 대조 */
-  await page.click('.tab[data-tab="list"]');
-  await page.waitForSelector('#screen-list:not([hidden])');
+  await gotoNotices(page);   /* 🔴 보기 전환이 '양식' 으로 남아 있을 수 있다 — 공고 보기까지 확실히 간다 */
   const withExcerpt = reg.items.find((x) => (x.excerpts || []).length);
   if (withExcerpt) {
-    await page.click(`.row[data-id="${withExcerpt.id}"]`);
+    /* 🔴 **화면을 정해서 집는다.** 「할 일」이 데이터 품질을 품으면서 같은 공고 줄이
+       접힌 <details> 안에도 생겼고, 화면을 안 정하면 그 **안 보이는 줄**을 집어 멈춘다
+       (실제로 여기서 멈췄다). 보고 있는 화면 안에서 찾는다. */
+    await page.click(`#screen-list [data-row][data-id="${withExcerpt.id}"]`);
     await page.waitForSelector('#sheet:not([hidden])');
     const sheet = await page.textContent('#sheet');
     ok(sheet.includes('앱1에 나가는 내용'), '원문 대조 — 왼쪽에 앱1 내용');
@@ -407,12 +429,11 @@ function serve() {
     preview.bad.slice(0, 3).join(' / '));
 
   /* 화면에서도 미리보기가 실제로 뜨는지 (1종) */
-  await page.click('.tab[data-tab="forms"]');
-  await page.waitForSelector('#screen-forms:not([hidden])');
+  await gotoForms(page);
 
   /* 미리보기는 '눈에 보이는 버튼'이어야 한다 — 줄 클릭만으로는 개발자가 찾지 못했다(2026-08-14) */
-  const previewBtns = await page.locator('#screen-forms [data-form-preview]').count();
-  const rowsForPreview = await page.locator('#screen-forms tr[data-form]').count();
+  const previewBtns = await page.locator('#screen-list [data-form-preview]').count();
+  const rowsForPreview = await page.locator('#screen-list tr[data-form]').count();
   ok(previewBtns === rowsForPreview && rowsForPreview > 0,
     '양식 목록 줄마다 미리보기 버튼이 보인다', `버튼 ${previewBtns} / 줄 ${rowsForPreview}`);
 
@@ -421,7 +442,7 @@ function serve() {
      맨 앞을 누르면 '주인 없는 양식'이 걸려 링크가 0개가 되고, 멀쩡한 화면이 실패로 읽힌다.
      '공고 id를 박지 말 것'(CLAUDE.md)과 같은 유형이라 **그때그때 고른다.** */
   const pick = await page.evaluate(() => {
-    const rows = [...document.querySelectorAll('#screen-forms tr[data-form]')].map((tr) => tr.dataset.form);
+    const rows = [...document.querySelectorAll('#screen-list tr[data-form]')].map((tr) => tr.dataset.form);
     const owned = [];
     for (const id of rows) {
       const owner = window.__admin.D.reg.find((it) => it.formId === id);
@@ -441,7 +462,7 @@ function serve() {
     process.exit(1);
   }
 
-  await page.click(`#screen-forms [data-form-preview="${pick.id}"]`);
+  await page.click(`#screen-list [data-form-preview="${pick.id}"]`);
   await page.waitForSelector('#sheet:not([hidden])');
   const docLen = await page.locator('#sheet .doc-preview').innerText();
   ok(docLen.length > 80, '양식 화면에서 생성 문서 미리보기가 뜬다', `${docLen.length}자`);
@@ -457,12 +478,11 @@ function serve() {
   await page.click('#sheet [data-close]');
 
   /* 목록에도 원문 링크가 있어야 한다(시트를 열지 않고 대조 시작) */
-  const rowLinks = await page.locator('#screen-forms tr[data-form] a[href^="http"]').count();
+  const rowLinks = await page.locator('#screen-list tr[data-form] a[href^="http"]').count();
   ok(rowLinks > 0, '양식 목록 줄에 원문·첨부 링크가 있다', `${rowLinks}개`);
 
   /* ⑥ 분류가 실제로 걸러 내는가 */
-  await page.click('.tab[data-tab="list"]');
-  await page.waitForSelector('#screen-list:not([hidden])');
+  await gotoNotices(page);   /* 🔴 보기 전환이 '양식' 으로 남아 있을 수 있다 — 공고 보기까지 확실히 간다 */
   await page.click('[data-f="status"][data-v="unreviewed"]');
   await page.waitForTimeout(200);
   const filtered = await page.locator('#screen-list [data-row]').count();
@@ -627,7 +647,7 @@ function serve() {
     /* ⚠️ 로봇 줄만 센다 — 수집망이 이 화면으로 들어와 `.row` 가 그것 말고도 있다.
        로봇 줄의 표식은 '실행 버튼을 가진 줄' 이다. */
     const counts = await page.evaluate(() => {
-      const rows = [...document.querySelectorAll('#screen-robots .rows .row')]
+      const rows = [...document.querySelectorAll('#screen-robots [data-rows] [data-row]')]
         .filter((r) => r.querySelector('[data-run]'));
       const said = rows.filter((r) => /마지막 실행|도는 중|실행 기록 없음/.test(r.textContent));
       return { rows: rows.length, said: said.length };
@@ -719,8 +739,7 @@ function serve() {
 
   /* ⑪ 키보드·읽어 주기 (B6) — 예전엔 상세를 **마우스로만** 열 수 있었다.
      마우스를 한 번도 쓰지 않고 조작되는지 실제로 눌러 본다. */
-  await page.click('.tab[data-tab="list"]');
-  await page.waitForSelector('#screen-list:not([hidden])');
+  await gotoNotices(page);   /* 🔴 보기 전환이 '양식' 으로 남아 있을 수 있다 — 공고 보기까지 확실히 간다 */
 
   const openedByKey = await page.evaluate(() => {
     const row = document.querySelector('#screen-list [data-row]');
@@ -775,8 +794,7 @@ function serve() {
     '진행·알림 표시가 읽어 주기에 잡힌다 (aria-live)');
 
   /* ⑫ 정렬 (B2) — 예전엔 어디에도 사용자 정렬이 없었다 */
-  await page.click('.tab[data-tab="list"]');
-  await page.waitForSelector('#screen-list:not([hidden])');
+  await gotoNotices(page);   /* 🔴 보기 전환이 '양식' 으로 남아 있을 수 있다 — 공고 보기까지 확실히 간다 */
   ok(await page.locator('[data-sort]').count() >= 4, '정렬 버튼이 있다');
 
   const firstBy = async () => (await page.locator('#screen-list [data-row] [data-row-title]').first().innerText()).trim();
@@ -831,11 +849,10 @@ function serve() {
   /* ⑮ 시트가 끝까지 스크롤되는가 (2026-08-09 개발자 제보)
      flex 세로 배치는 내용이 넘치면 **자식을 눌러 줄인다**. 그래서 안쪽 스크롤 상자만
      스크롤되고 시트는 넘치지 않아 **맨 아래 칸이 납작하게 눌려 보이지 않았다.** */
-  await page.click('.tab[data-tab="forms"]');
-  await page.waitForSelector('#screen-forms:not([hidden])');
+  await gotoForms(page);
   const withUse = Object.keys(forms.templates).find((id) => reg.items.some((x) => x.formId === id));
   if (withUse) {
-    await page.click(`#screen-forms tr[data-form="${withUse}"]`);
+    await page.click(`#screen-list tr[data-form="${withUse}"]`);
     await page.waitForSelector('#sheet:not([hidden])');
     const geom = await page.evaluate(() => {
       const sh = document.querySelector('#sheet');
@@ -944,8 +961,7 @@ function serve() {
   await page.waitForTimeout(200);
 
   /* ⑱ 양식 큐 조작 (D2) — 예전엔 알려만 주고 못 고쳤다 */
-  await page.click('.tab[data-tab="forms"]');
-  await page.waitForSelector('#screen-forms:not([hidden])');
+  await gotoForms(page);
   const pend = JSON.parse(fs.readFileSync(path.join(ROOT, 'collector/pending-forms.json'), 'utf8')).items || [];
   const waiting = pend.filter((q) => q.fetched && !q.schematized && !q.retired).length;
   if (waiting) {
@@ -962,13 +978,12 @@ function serve() {
     ok(true, '양식 큐 — 대기 건이 없어 건너뜀');
   }
   /* 스키마 자체는 화면에서 만들지 않는다 — 원본과 같은 구조여야 하므로(운영 원칙 4) */
-  ok(/스키마 자체는 화면에서 만들지 않습니다/.test(await page.textContent('#screen-forms')),
+  ok(/스키마 자체는 화면에서 만들지 않습니다/.test(await page.textContent('#screen-list')),
     '스키마를 화면에서 만들지 않는 이유를 밝힌다');
 
   /* ⑲ 다시 그릴 때 잃는 것 (B7) — 필터를 누르면 스크롤·입력 중이던 값이 날아갔다.
         166줄을 훑다가 칩 하나 눌렀는데 맨 위로 튀면 훑던 자리를 다시 찾아야 한다. */
-  await page.click('.tab[data-tab="list"]');
-  await page.waitForSelector('#screen-list:not([hidden])');
+  await gotoNotices(page);   /* 🔴 보기 전환이 '양식' 으로 남아 있을 수 있다 — 공고 보기까지 확실히 간다 */
   await page.setViewportSize({ width: 420, height: 720 });
   await page.evaluate(() => window.scrollTo(0, 900));
   await page.waitForTimeout(60);
@@ -1060,12 +1075,16 @@ function serve() {
         전 화면을 돌며 재는 이유: 한 화면만 보면 그 화면의 표가 안 넘칠 때
         **안내가 한 번도 안 뜨는데도 검사는 통과**한다(뜻 없는 검사가 된다). */
   const hints = {};
-  for (const n of ['todo', 'list', 'review', 'forms', 'network', 'robots', 'quality']) {
-    await page.click(`.tab[data-tab="${n}"]`);
+  /* ⚠️ 화면이 다섯으로 줄었다 — 양식은 「목록」의 보기 전환이라 따로 한 번 더 돈다.
+     그래야 예전에 보던 표(양식 표)를 계속 본다. */
+  for (const n of ['todo', 'list', 'listForms', 'review', 'robots']) {
+    if (n === 'listForms') await gotoForms(page);
+    else await page.click(`.tab[data-tab="${n}"]`);
     await page.waitForTimeout(200);
     hints[n] = await page.evaluate((s2) => [...document.querySelectorAll(`#screen-${s2} .scroller`)]
       .map((sc) => ({ over: sc.scrollWidth > sc.clientWidth + 4,
-        hint: sc.nextElementSibling?.classList.contains('scroll-hint') || false })), n);
+        hint: sc.nextElementSibling?.classList.contains('scroll-hint') || false })),
+    n === 'listForms' ? 'list' : n);
   }
   const flat = Object.values(hints).flat();
   ok(flat.some((x) => x.over), '좁은 화면에서 실제로 넘치는 표가 있다 (검사가 헛돌지 않는다)',
@@ -1075,8 +1094,7 @@ function serve() {
     JSON.stringify(hints));
 
   /* ㉓ 시트 하단 바 (B0-11) — 저장 버튼이 스크롤에 묻히면 안 된다 */
-  await page.click('.tab[data-tab="list"]');
-  await page.waitForSelector('#screen-list:not([hidden])');
+  await gotoNotices(page);   /* 🔴 보기 전환이 '양식' 으로 남아 있을 수 있다 — 공고 보기까지 확실히 간다 */
   await page.locator('#screen-list [data-row]').first().click();
   await page.waitForSelector('#sheet:not([hidden])');
   const foot = await page.evaluate(() => {
@@ -1119,9 +1137,15 @@ function serve() {
 
   /* 화면 이름이 주소에 남는가 — "로봇 탭 보세요"를 링크로 전할 수 있어야 한다 */
   ok(/#robots$/.test(page.url()), '지금 보는 화면이 주소에 남는다', page.url().split('/').pop());
+  await page.evaluate(() => { location.hash = '#list'; });
+  await page.waitForTimeout(300);
+  ok(await page.isVisible('#screen-list'), '주소의 화면 이름으로 그 화면이 열린다');
+  /* 🔴 없어진 화면 이름으로 들어와도 **갇히지 않는다** — 예전 링크('#quality')를
+     아직 쓰는 사람이 있다. 모르는 이름이면 기본 화면이 열려야 한다. */
   await page.evaluate(() => { location.hash = '#quality'; });
   await page.waitForTimeout(300);
-  ok(await page.isVisible('#screen-quality'), '주소의 화면 이름으로 그 화면이 열린다');
+  ok(await page.evaluate(() => [...document.querySelectorAll('section.screen')]
+    .some((el) => !el.hidden)), '없어진 옛 화면 이름으로 들어와도 빈 화면에 갇히지 않는다');
 
   /* 콘솔 오류 */
   ok(errors.length === 0, '콘솔·페이지 오류 없음', errors.slice(0, 3).join(' | '));
