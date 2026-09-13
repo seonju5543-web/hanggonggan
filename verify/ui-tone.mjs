@@ -310,5 +310,55 @@ console.log('\n■ 수집한 글의 HTML 기호를 글자로 띄우지 않는다
   eq('게시판에서 온 글은 전부 unent 를 거친다', bare, []);
 }
 
+/* ── ⑧ 관리자 화면도 같은 체계다 (2026-09-13 개발자 지시) ────────────────────
+   *"디자인 측면에서도 앱1과 같은 체계를 맞춰줘"* 로 `_admin/admin.css` 를 앱1 토큰으로 옮겼다.
+   🔴 **사본은 관문이 없으면 썩는다** — 이 저장소가 이미 겪었다(DESIGN.md 가 만들어진 3분 뒤
+   서체 되돌림 커밋이 들어와 옛 값을 적은 채 남아 있었다). 그래서 두 가지를 센다:
+     ① 관리자 CSS 가 토큰 밖의 생 값을 쓰지 않는가
+     ② 관리자가 적어 둔 색·글자·모서리 값이 **style.css 의 실효값과 같은가**
+   ⚠️ 앱1은 `:root` 를 여러 벌 겹쳐 쓴다 — **마지막에 이긴 값**이 실효값이다. */
+console.log('\n■ 관리자 화면이 앱1과 같은 체계를 쓴다 (2026-09-13)');
+{
+  const admin = stripComments(R('_admin/admin.css'));
+
+  /* ① 토큰 밖의 생 값 */
+  const rawRadius = [], rawFont = [], rawSpace = [];
+  admin.split('\n').forEach((l, i) => {
+    if (/border-radius:\s*[0-9.]+px/.test(l)) rawRadius.push(`${i + 1}: ${l.trim().slice(0, 46)}`);
+    if (/font-size:\s*[0-9.]+(px|rem)/.test(l)) rawFont.push(`${i + 1}: ${l.trim().slice(0, 46)}`);
+    if (/\b(padding|margin|gap)[a-z-]*:\s*[^;{}]*[0-9]+px/.test(l)) rawSpace.push(`${i + 1}: ${l.trim().slice(0, 46)}`);
+  });
+  eq('모서리는 --radius-* 토큰만 쓴다', rawRadius, []);
+  eq('글자 크기는 --t-* 토큰만 쓴다', rawFont, []);
+  eq('여백은 --space-* 토큰만 쓴다', rawSpace, []);
+
+  /* ② 어두운 화면이 되살아나지 않았는가 — 앱1은 밝은 한 벌뿐이다(style.css 의 지시) */
+  eq('어두운 화면 정의가 없다 (앱1과 같은 밝은 한 벌)',
+    /prefers-color-scheme|\[data-theme=/.test(admin), false);
+
+  /* ③ 값이 앱1과 같은가 — 이름이 같은 토큰끼리 대조한다 */
+  const effective = (css) => {
+    const out = {};
+    for (const m of stripComments(css).matchAll(/:root\s*\{([^{}]*)\}/g)) {
+      for (const d of m[1].matchAll(/(--[a-z0-9-]+)\s*:\s*([^;]+);/g)) {
+        out[d[1]] = d[2].trim().replace(/\s+/g, ' ');
+      }
+    }
+    return out;
+  };
+  const app1 = effective(R('style.css'));
+  const adm = effective(R('_admin/admin.css'));
+  /* 관리자만 쓰는 것은 뺀다 — 경고 놋쇠(--warn*)와 자릿수 맞춤 글꼴(--mono) */
+  const ADMIN_ONLY = new Set(['--warn', '--warn-weak', '--mono']);
+  const drift = Object.keys(adm)
+    .filter((k) => !ADMIN_ONLY.has(k) && app1[k] !== undefined && app1[k] !== adm[k])
+    .map((k) => `${k}: 관리자 ${adm[k]} / 앱1 ${app1[k]}`);
+  eq('색·글자·모서리 값이 앱1(style.css)과 같다', drift, []);
+  const shared = Object.keys(adm).filter((k) => !ADMIN_ONLY.has(k) && app1[k] !== undefined).length;
+  console.log(`      대조한 토큰 ${shared}개 (관리자 전용 ${ADMIN_ONLY.size}개는 뺐다)`);
+  /* 🔴 대조할 것이 거의 없으면 이 검사는 헛돈다 — 실제로 겹치는지 하한을 둔다 */
+  eq('대조할 토큰이 충분하다 (헛도는 검사가 아니다)', shared >= 15, true);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 되돌아간 곳이 있습니다` : '\n✓ 말투·토큰 관문 전부 통과');
 process.exit(fail ? 1 : 0);
