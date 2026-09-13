@@ -17,6 +17,10 @@ import { indexTexts, sourceFor, hasText, isCut, looksLikeErrorPage } from './ven
 /* 학교 홈페이지 메뉴를 걷어내는 규칙 — '같은 학교의 여러 공고에 똑같이 나오는 줄 = 메뉴'.
    🔴 베끼지 않는다. 발췌기·본문 분량 판정이 쓰는 것과 같은 파일이다. */
 import { makeStripper } from './vendor/page-boilerplate.mjs';
+/* 관리자 수정 한 건이 '무엇을 바꾸는가' 를 정하는 규칙 — 🔴 베끼지 않는다.
+   저장소(tools/admin-apply.mjs)가 실제로 넣는 값과 **같은 파일**로 계산해야
+   '반영 전 전후 대조' 가 거짓말을 하지 않는다(화면은 '1,2' 를 보내고 저장소는 [1,2] 로 넣는다). */
+import { diffPatch, showValue } from './vendor/edit-diff.mjs';
 
 /* ---------------- 설정 ---------------- */
 const OWNER = 'seonju5543-web';
@@ -270,6 +274,9 @@ const CHANNEL_LABEL = {
 const RULES = (window.ENTRY_RULES && window.ENTRY_RULES.RULES) || {};
 const checkEntry = (window.ENTRY_RULES && window.ENTRY_RULES.checkEntry) || (() => []);
 const isDuplicatePair = (window.ENTRY_RULES && window.ENTRY_RULES.isDuplicatePair) || (() => false);
+/* 경고를 고칠 로봇을 **어떤 모양으로** 부르는가 — 원본은 verify/entry-rules.cjs 하나다.
+   🔴 여기 베껴 두면 로봇 규칙과 갈라진다(값이 곧 돈이라 갈라지면 전수가 돈다). */
+const FIX_PLAN = (window.ENTRY_RULES && window.ENTRY_RULES.FIX_PLAN) || {};
 
 function formIdSet() { return new Set(Object.keys(D.forms)); }
 
@@ -632,6 +639,10 @@ function renderTodo() {
   const todo = all.filter((c) => c.n > 0);
   const clear = all.filter((c) => c.n === 0);
 
+  /* 🔴 `<details>` 가 펼쳐져 있었는지는 **살아 있는 DOM 에서** 읽는다 — 이벤트로만 기억하면
+     다시 그릴 때 접힌다(`.filters-more` 에서 이미 겪은 유형). innerHTML 을 덮기 전에 읽는다. */
+  const scanWasOpen = !!(byId('todo-src-scan') && byId('todo-src-scan').open);
+
   byId('screen-todo').innerHTML = `
     <div class="sec-head">
       <h2>오늘 할 일</h2>
@@ -650,11 +661,197 @@ function renderTodo() {
       <div class="rows" data-rows>${urgent.map((it) => rowHtml(it, { common: cm })).join('')}</div>`;
   })() : ''}
 
+    <!-- 공고 원문을 열어 봐야 아는 것 — 펼칠 때만 800KB 원문을 받는다 -->
+    <details id="todo-src-scan" data-src-scan${scanWasOpen ? ' open' : ''}>
+      <summary>공고 원문을 열어 봐야 아는 것 — 자격 미확보 ${noEligItems().length}건 ·
+        교외인데 한 학교에만 보이는 ${scopeWideItems().length}건</summary>
+      <div id="src-scan-slot"><p class="muted">펼치면 저장된 공고 원문을 읽어 옵니다.</p></div>
+    </details>
+
     <!-- 데이터 품질을 여기로 흡수한다 — '지금 뭐가 잘못됐나' 는 곧 '오늘 할 일' 이다.
          🔴 베끼지 않고 renderQuality 를 그대로 부른다(같은 숫자·같은 묶음). -->
     <div id="todo-quality-slot"></div>
   `;
   renderQuality('todo-quality-slot');
+  const det = byId('todo-src-scan');
+  if (det) {
+    det.addEventListener('toggle', () => { if (det.open) openSrcScan(); });
+    if (det.open) openSrcScan();
+  }
+}
+
+/* ============================================================
+   공고 원문을 열어 봐야 아는 것 (2026-09-14 · 개발자 컨펌 C2 + 「지금 바로 ④」)
+   ------------------------------------------------------------
+   🔴 **이 구획은 판정하지 않는다.** 원문에서 학교 이름이 몇 번 나오는지 **센 결과**와
+      그 문장을 원문 그대로 인용할 뿐이고, '전국이다/아니다'는 사람이 정한다(운영 원칙 8-1).
+   🔴 **날것 원문에서 세면 안 된다** — 학교 게시판 페이지는 메뉴·머리말에 학교 이름이 늘
+      들어 있어 17건 중 16건이 걸린다(실측). 반드시 `SRC_STRIP`(메뉴 걷어내기) 뒤에 센다.
+   ============================================================ */
+
+/** 교외인데 한 학교에만 보이는 공고 */
+function scopeWideItems() {
+  return D.reg.filter((it) => it.type === '교외' && (it.eligibility || {}).schoolOnly);
+}
+/** 지원 자격을 아직 못 읽은 공고 — 판정 기준은 학생 앱과 같은 칸이다 */
+function noEligItems() {
+  return D.reg.filter((it) => !(it.eligibilityLines || []).length && !it.eligibilityVerified);
+}
+
+/** 이 학교의 별칭들 — 🔴 지어내지 않고 앱1의 `UNIV_ALIASES` 를 뒤집어 쓴다 */
+function aliasesOf(school) {
+  const map = (typeof UNIV_ALIASES !== 'undefined' && UNIV_ALIASES) || {};
+  return Object.keys(map).filter((k) => map[k] === school);
+}
+
+/** 그 낱말이 나온 자리를 원문 그대로 앞뒤 40자 */
+function quoteLine(body, word) {
+  const i = body.indexOf(word);
+  if (i < 0) return '';
+  return body.slice(Math.max(0, i - 40), i + word.length + 40).replace(/\s+/g, ' ').trim();
+}
+
+/** 메뉴를 걷어낸 본문에서 학교 이름이 몇 번 나오는가.
+ *  🔴 긴 낱말부터 지워 가며 센다 — '경희대' 를 '경희' 로 두 번 세지 않는다. */
+function scopeCount(it) {
+  if (SRC_STATE === 'failed') return { state: 'failed' };
+  const src = storedSource(it);
+  if (!src) return { state: 'nosrc' };
+  const body = SRC_STRIP ? SRC_STRIP(src.url || '', src.text) : src.text;
+  const school = (it.eligibility || {}).schoolOnly || '';
+  const words = [school, ...aliasesOf(school)].filter(Boolean).sort((a, b) => b.length - a.length);
+  const hits = [];
+  let rest = body;
+  for (const w of words) {
+    const n = rest.split(w).length - 1;
+    if (n) { hits.push({ w, n, short: w.length <= 2 }); rest = rest.split(w).join('\u0000'); }
+  }
+  return {
+    state: hits.length ? 'hit' : 'zero',
+    chars: body.replace(/\s/g, '').length,
+    hits,
+    line: hits.length ? quoteLine(body, hits[0].w) : '',
+  };
+}
+
+/** 지금 화면에서 모아 둔 수정까지 반영한 모습 — 상세에서 고친 값 위에 겹쳐 읽는다 */
+function stagedOf(id) {
+  const rawItem = D.reg.find((x) => x.id === id) || {};
+  return { ...rawItem, ...(PENDING_EDITS.get(id) || {}) };
+}
+
+/** 고른 공고를 '전국'으로 — 학교·캠퍼스 한정만 빼고 **나머지 자격은 그대로 둔다**.
+ *  🔴 `PENDING_EDITS.set` 이 아니라 **덮어쓰기 병합**이다 — 상세에서 마감일을 고쳐 둔 것이
+ *     여기서 통째로 날아가면 안 된다. */
+function goNationwide(ids) {
+  ids.forEach((id) => {
+    const cur = stagedOf(id).eligibility || {};
+    const keep = { ...cur };
+    delete keep.schoolOnly; delete keep.campusOnly;
+    PENDING_EDITS.set(id, { ...(PENDING_EDITS.get(id) || {}), eligibility: keep });
+  });
+  renderPendingBar();
+  toast(`${ids.length}건을 모아 뒀습니다 — '한꺼번에 반영' 을 누르면 저장됩니다`);
+}
+
+async function openSrcScan() {
+  const slot = byId('src-scan-slot');
+  if (!slot) return;
+  slot.innerHTML = '<p class="muted">저장된 공고 원문을 읽는 중…</p>';
+  await ensureSources();
+  renderSrcScan();
+}
+
+function renderSrcScan() {
+  const slot = byId('src-scan-slot');
+  if (!slot) return;
+  /* 🔴 못 받아 왔으면 **실패를 실패라고 적는다** — 빈 목록으로 두면 '전부 0회' 로 보인다 */
+  if (SRC_STATE !== 'ready') {
+    slot.innerHTML = `<p class="empty" data-src-fail>저장된 공고 원문을 읽지 못했습니다 —
+      셀 수 없습니다. <button class="btn btn-sm" data-src-rescan>다시 읽기</button></p>`;
+    return;
+  }
+
+  /* ── ① 자격 미확보를 '원문이 있는가'로 가른다 ────────────────────────
+     🔴 AI 자격 읽기 로봇은 원문이 없는 공고를 **조용히** 건너뛴다
+        (collector/eligibility-ai.mjs 의 `.filter((t) => t.lines.length)`).
+        화면이 9건이라고 말하고 로봇이 7건만 읽으면 다음 사람이 없는 버그를 쫓는다. */
+  const elig = noEligItems();
+  const have = elig.filter((it) => storedSource(it));
+  const none = elig.filter((it) => !storedSource(it));
+  const eligHtml = `
+    <div class="sec-head"><h2>지원 자격을 아직 못 읽은 ${elig.length}건</h2>
+      <p>원문이 저장된 ${have.length}건만 AI 자격 읽기가 읽습니다 ·
+         원문이 없는 ${none.length}건은 먼저 「공고 본문 재수집」이 필요합니다.</p></div>
+    <div class="pgroup" data-pgroup data-elig-split>
+      <div class="pgroup-head">
+        <span class="pill">원문 있음 ${have.length}건</span>
+        <span class="pgroup-msg">AI 자격 읽기가 읽을 수 있습니다</span>
+        <button class="btn btn-sm btn-primary" data-fixrun="eligibility-fill.yml" data-fixplan="main"
+          data-fixn="${have.length}">시범 3건만 읽기 — AI 자격 읽기 · 약 50원</button>
+        <button class="btn btn-sm" data-fixrun="eligibility-fill.yml" data-fixplan="all"
+          data-fixn="${have.length}">전부 읽기 — AI 자격 읽기 · 전수 약 2,229원</button>
+      </div>
+      ${none.length ? `
+      <div class="pgroup-head">
+        <span class="pill warn">원문 없음 ${none.length}건</span>
+        <span class="pgroup-msg">먼저 본문을 받아 와야 합니다</span>
+        <button class="btn btn-sm" data-run="rescue-bodies.yml" data-run-name="공고 본문 재수집">
+          공고 본문 재수집 — 지금 실행</button>
+      </div>
+      <div class="rows" data-rows>${none.slice(0, 20).map((it) => rowHtml(it)).join('')}</div>` : ''}
+    </div>`;
+
+  /* ── ② 교외인데 한 학교에만 보이는 공고 ─────────────────────────── */
+  const wide = scopeWideItems();
+  const counted = wide.map((it) => ({ it, c: scopeCount(it) }));
+  const zero = counted.filter((x) => x.c.state === 'zero').length;
+  const nosrc = counted.filter((x) => x.c.state === 'nosrc').length;
+
+  const countLine = (c, school) => {
+    if (c.state === 'nosrc') return '저장된 원문이 없습니다 — 셀 수 없습니다';
+    if (c.state === 'failed') return '원문을 읽지 못했습니다 — 셀 수 없습니다';
+    if (c.state === 'zero') {
+      return `메뉴·머리말을 걷어낸 본문 ${c.chars}자에서 「${school}」 계열 낱말을 한 번도 찾지 못했습니다`;
+    }
+    return `메뉴·머리말을 걷어낸 본문 ${c.chars}자에서 ${c.hits.map((h) => `「${h.w}」 ${h.n}회${
+      h.short ? ' (짧은 줄임말 — 다른 낱말과 겹칠 수 있습니다)' : ''}`).join(' · ')}`;
+  };
+
+  const wideRow = ({ it, c }) => {
+    const school = (it.eligibility || {}).schoolOnly || '';
+    return `
+    <div class="row" data-row data-noclick data-scope-row style="cursor:default">
+      <div>
+        <div class="t" data-row-title>${esc(it.name || it.id)}</div>
+        <div class="m"><span class="mono">${esc(it.id)}</span><span>${esc(school)}</span></div>
+        <div class="scope-count" data-scope-count>${esc(countLine(c, school))}</div>
+        ${c.line ? `<div class="excerpt">${esc(c.line)}</div>` : ''}
+        ${c.state === 'nosrc' ? `<div class="btn-row">
+          <button class="btn btn-sm" data-run="rescue-bodies.yml" data-run-name="공고 본문 재수집">
+            공고 본문 재수집 — 지금 실행</button>
+          <button class="btn btn-sm" data-run="link-hunter.yml" data-run-name="링크 사냥꾼">
+            링크 사냥꾼 — 지금 실행</button></div>` : ''}
+      </div>
+      <div><label class="pickbox"><input type="checkbox" data-scope-pick="${esc(it.id)}" />
+        <span>고르기</span></label></div>
+      <div></div>
+    </div>`;
+  };
+
+  slot.innerHTML = `
+    ${eligHtml}
+    <div class="sec-head" style="margin-top:var(--space-12)">
+      <h2>교외인데 한 학교에만 보이는 공고 ${wide.length}건</h2>
+      <p data-scope-note><b>센 결과만 적었습니다. 전국인지 아닌지는 원문을 읽고 사람이 정합니다.</b>
+        한 번도 안 나온 것 ${zero}건 · 원문이 없어 못 센 것 ${nosrc}건.</p>
+    </div>
+    <div class="pgroup" data-scope-wide>
+      <div class="rows" data-rows>${counted.map(wideRow).join('')}</div>
+      <div class="btn-row" style="margin-top:var(--space-8)">
+        <button class="btn btn-sm btn-primary" data-scope-go>고른 것을 전국으로 (모아 두기)</button>
+      </div>
+    </div>`;
 }
 
 /* ---------------- 저장된 공고 원문 (2026-09-13) ----------------
@@ -748,13 +945,52 @@ function pendingPrune() {
   return dropped;
 }
 
-async function flushEdits() {
+/** 지금 모아 둔 수정이 **실제로** 무엇을 바꾸는가.
+ *  🔴 `diffPatch` 로 센다 — 화면이 보낸 날것(`years:'1,2'`)과 저장소가 넣는 값(`[1,2]`)이
+ *     다르므로 키 개수를 세면 '안 바뀐 칸' 이 바뀜으로 뜬다.
+ *  🔴 없어진 공고의 수정은 **보여 주기 전에** 뺀다 — 보여 준 뒤 빼면 숫자가 어긋난다. */
+function flushPlan() {
   const dropped = pendingPrune();
+  const rows = [];
+  for (const [id, patch] of PENDING_EDITS) {
+    const it = D.reg.find((x) => x.id === id);
+    if (!it) continue;                         // pendingPrune 이 이미 뺐다 (방어)
+    rows.push({ id, name: it.name || id, diff: diffPatch(it, patch) });
+  }
+  return { dropped, rows };
+}
+
+/** 모아 둔 수정을 보내기 **전에** 무엇이 바뀌는지 보여 주고 묻는다. */
+async function flushEdits() {
+  const { dropped, rows } = flushPlan();
   if (dropped) toast(`없어진 공고 ${dropped}건의 수정은 뺐습니다`);
-  if (!PENDING_EDITS.size) { toast('모아 둔 수정이 없습니다'); return false; }
-  const edits = [...PENDING_EDITS.entries()].map(([id, patch]) => ({ id, patch }));
+  if (!rows.length) { toast('모아 둔 수정이 없습니다'); return false; }
+
+  /* 바뀌는 칸이 하나도 없는 건은 안 보낸다 — 저장소도 어차피 건너뛰지만,
+     전부 그런 경우 저장소가 '바뀐 내용이 없습니다' 로 실패해 한 번 헛왕복한다. */
+  const live = rows.filter((r) => r.diff.length);
+  if (!live.length) { toast('바뀌는 내용이 없습니다'); return false; }
+  const blocked = live.filter((r) => r.diff.some((d) => d.block));
+  const fields = live.reduce((a, r) => a + r.diff.length, 0);
+
+  askSheet({
+    title: `공고 ${live.length}건 · 칸 ${fields}개를 바꿉니다`,
+    note: blocked.length
+      ? `${blocked.length}건은 저장 때 막히는 값이 있어 지금은 보낼 수 없습니다. 빨간 줄을 고쳐 주세요.`
+      : '아래가 실제로 바뀌는 전부입니다. 여기 없는 칸은 그대로 둡니다.',
+    lines: live.map((r) => ({ t: r.name, m: r.id, diff: r.diff })),
+    goLabel: `${live.length}건 반영`,
+    blocked: blocked.length > 0,
+    run: () => flushSend(live.map((r) => ({ id: r.id, patch: PENDING_EDITS.get(r.id) }))),
+  });
+  return true;
+}
+
+/** 실제로 보낸다 — 성공하면 장부를 비운다. */
+async function flushSend(edits) {
   const okDone = await applyAction('edit', { edits }, `공고 수정 ${edits.length}건`);
   if (okDone) pendingClear();
+  renderPendingBar();
   return okDone;
 }
 
@@ -917,8 +1153,25 @@ function refreshSelBar() {
    실행할 일은 여기 담아 두고, 확인 버튼이 눌리면 그때 꺼내 돌린다. */
 let pendingGo = null;
 
-function askSheet({ title, note, lines = [], goLabel, danger = false, run }) {
-  pendingGo = run;
+/** 한 줄이 '무엇을 무엇으로' 바꾸는지 — 전후를 나란히 (2026-09-14).
+ *  🔴 `esc()` 를 반드시 거친다 — 수집한 공고 제목에 `<`·`&` 가 들어 있다. */
+function diffRowsHtml(diff) {
+  if (!diff || !diff.length) return '';
+  return `<div class="diffs">${diff.map((d) => `
+    <div class="diffrow${d.block ? ' is-bad' : ''}" data-diff-row data-diff-key="${esc(d.key)}">
+      <span class="diff-k">${esc(d.label)}</span>
+      <span class="diff-a">${esc(showValue(d.before))}</span>
+      <span class="diff-arrow" aria-hidden="true">→</span>
+      <span class="diff-b">${esc(showValue(d.after))}</span>
+      ${d.block ? `<span class="pill bad">${esc(d.block)}</span>` : ''}
+    </div>`).join('')}</div>`;
+}
+
+/* `lines[].diff` 를 주면 그 줄 밑에 전후 표가 붙는다. `blocked` 면 실행 버튼이 잠긴다.
+   ⚠️ 되돌릴 수 없는 6종(merge·autoRegister·formQueue·unlinkForm·revert·remove)의 문구는
+      그대로다 — 이 변경은 줄에 칸 하나를 **더하는 것**이지 기존 모양을 바꾸는 게 아니다. */
+function askSheet({ title, note, lines = [], goLabel, danger = false, blocked = false, run }) {
+  pendingGo = blocked ? null : run;
   openSheet(`
     <div class="sheet-head">
       <h3>${esc(title)}</h3>
@@ -928,11 +1181,13 @@ function askSheet({ title, note, lines = [], goLabel, danger = false, run }) {
     ${lines.length ? `<div class="rows" data-rows>${lines.map((l) => `
       <div class="row" data-row data-noclick style="cursor:default">
         <div><div class="t" data-row-title>${esc(l.t)}</div>
-          ${l.m ? `<div class="m"><span>${esc(l.m)}</span></div>` : ''}</div>
+          ${l.m ? `<div class="m"><span>${esc(l.m)}</span></div>` : ''}
+          ${diffRowsHtml(l.diff)}</div>
         <div></div><div></div>
       </div>`).join('')}</div>` : ''}
     <div class="btn-row sheet-foot">
-      <button class="btn ${danger ? 'danger' : 'btn-primary'}" data-ask-go>${esc(goLabel)}</button>
+      <button class="btn ${danger ? 'danger' : 'btn-primary'}" data-ask-go
+        ${blocked ? 'disabled aria-disabled="true"' : ''}>${esc(goLabel)}</button>
       <button class="btn" data-close>취소</button>
     </div>`);
 }
@@ -1451,35 +1706,124 @@ function networkSectionHtml() {
    같은 날 실제로 겪은 일: 건강 기록의 고아 키를 보고 **멀쩡한 학교 4곳을 '멈췄다'고
    오진**했다. 화면이 진짜 신호(열린 경보·마지막 실행)를 보여 줬으면 바로 알았을 것이다. */
 
+/* 🔴 **로봇 목록은 화면이 부를 수 있는 전부다.** 여기 없으면 그 로봇은 화면에서 존재하지 않는다.
+   관문(test-collector '관리자 화면 로봇 목록')이 `.github/workflows/` 와 대조해
+   ⓐ 여기 적힌 파일이 실재하고 수동 실행을 받는지 ⓑ 입력 이름·선택지가 yml 과 같은지
+   ⓒ **화면이 못 부르는 워크플로가 몇 개인지**를 센다(새 로봇이 생기면 넣으라고 말해 준다).
+
+   입력 칸(`inputs`)의 뜻 — 🔴 옛 이름 `input`(객체 하나)에서 **배열로 바뀌었다.**
+     kind:'url'    http(s) 주소만 받는다      kind:'num'    숫자만 받는다
+     kind:'choice' yml 의 options 를 그대로   kind:'text'   자유 입력
+     def           화면에 미리 골라 두는 값
+   🔴 **`def` 는 가장 싼 쪽·가장 안전한 쪽으로 둔다.** yml 의 기본값을 그대로 베끼면
+      `eligibility-fill` 이 '전부'(전수 약 2,229원)로 **선택된 채** 뜬다.
+   🔴 설명에 건수를 박아 쓰지 않는다 — '게시판 37곳' 이라고 적혀 있었는데 실제는 2곳이었다.
+      숫자가 필요하면 함수로 적어 **셀 때 센다**(현황 숫자를 사본으로 두지 않는다). */
 const ROBOTS = [
-  { f: 'collect-scholarships.yml', n: '일반 수집 로봇', d: '게시판 37곳을 훑어 새 공고를 담습니다', when: '매일 07:41·11:41' },
-  { f: 'browser-collect.yml', n: '브라우저형 수집 로봇', d: '봇차단·동적 게시판 17곳을 진짜 브라우저로 봅니다', when: '매일 08:07·12:07' },
+  { f: 'collect-scholarships.yml', n: '일반 수집 로봇', d: () => `게시판 ${D.schools.length}곳을 훑어 새 공고를 담습니다`, when: '매일 07:41·11:41' },
+  { f: 'browser-collect.yml', n: '브라우저형 수집 로봇', d: () => `봇차단·동적 게시판 ${D.targets.length}곳을 진짜 브라우저로 봅니다`, when: '매일 08:07·12:07' },
   { f: 'link-hunter.yml', n: '링크 사냥꾼', d: '원문 주소를 못 찾은 공고를 계속 다시 찾습니다', when: '매일 06:37' },
   { f: 'resolve-detail-urls.yml', n: '원문 링크 복구', d: '목록 주소로 남은 공고를 게시판에서 찾아 고칩니다', when: '주 1회' },
-  { f: 'deep-fetch.yml', n: '심층 수집', d: '공고 본문 전문과 첨부 원본을 받아 옵니다', when: '수동' },
+  /* 🔴 **지금 보는 공고가 아니라 `form_targets` 에 적힌 공고**의 첨부를 받아 온다.
+     값을 안 보내면 워크플로 기본값('조병두')이 이겨 엉뚱한 공고를 받아 온다(실측). */
+  {
+    f: 'deep-fetch.yml',
+    n: '심층 수집',
+    d: '공고 본문 전문과 첨부 원본을 받아 옵니다',
+    when: '수동',
+    inputs: [{ name: 'form_targets', kind: 'text', label: '첨부 원본까지 받을 공고 (쉼표로 여러 개 · 제목 일부)', ph: '조병두' }],
+  },
+  {
+    f: 'rescue-bodies.yml',
+    n: '공고 본문 재수집',
+    d: '원문을 못 받은 공고의 본문을 진짜 브라우저로 다시 받습니다',
+    when: '매일 05:23',
+    inputs: [{ name: 'cap', kind: 'num', label: '이번에 최대 몇 건', def: '25', min: 1, max: 200 }],
+  },
+  /* 돈이 나가는 로봇 — `def` 는 가장 싼 쪽이다 */
+  {
+    f: 'eligibility-fill.yml',
+    n: 'AI 자격 읽기',
+    d: '공고 원문에서 지원 자격을 구조로 읽습니다 (돈이 나갑니다)',
+    when: '수동',
+    inputs: [
+      { name: 'mode', kind: 'choice', label: '무엇을 할까요', def: '미리보기만',
+        options: ['전부', '미리보기만', '시범 3건만', '공고 하나만', '첨부만'] },
+      { name: 'only', kind: 'text', label: "'공고 하나만' 일 때 그 공고 id", ph: 'reg-hufs-gasong' },
+    ],
+  },
+  {
+    f: 'kosaf-fetch.yml',
+    n: '한국장학재단 수확 로봇',
+    d: '층2(재단 장학금) 목록·상세·선발공고문 사본을 받아 옵니다',
+    when: '월·목 05:53',
+    inputs: [{ name: 'mode', kind: 'choice', label: '무엇을 할까요', def: 'full',
+      options: ['full', 'attach', 'probe'],
+      hint: { full: '수확 → 공고문 사본 → 저장 (예약과 같음)', attach: '공고문 사본만',
+        probe: '첨부 칸이 어떻게 생겼는지 보기만 (저장 없음)' } }],
+  },
+  { f: 'search-index.yml', n: '검색용 요약 만들기', d: '도우미가 읽을 공고별 낱말 요약을 다시 만듭니다', when: '매일 07:37' },
+  { f: 'audit-coverage.yml', n: '공고 누락 감사', d: '게시판에 있는데 못 담은 공고가 있는지 대조합니다', when: '매주 월 06:23' },
+  { f: 'refresh-tuition.yml', n: '등록금 갱신', d: '학교별·계열별 등록금을 다시 받습니다 (25분쯤 걸립니다)', when: '수동' },
+  { f: 'refresh-majors.yml', n: '학과 목록 갱신', d: '커리어넷에서 학교별 개설 학과를 다시 받습니다', when: '수동' },
   { f: 'deploy-sync.yml', n: '배포 동기화', d: '지금 내용을 학생 앱으로 내보냅니다', when: '수집 후 자동' },
   { f: 'check-live.yml', n: '실제 앱 반영 확인', d: '학생 앱이 저장소와 같은지 대조합니다', when: '매일 13:11' },
+  { f: 'verify-ui.yml', n: '앱 화면 검사', d: '학생 앱과 이 관리자 화면을 브라우저로 열어 검사합니다 (25분쯤)', when: '수동' },
   { f: 'push-check.yml', n: '푸시 알림 검사', d: '등록된 모든 폰에 시험 알림을 보냅니다', when: '수동' },
+  { f: 'push-health.yml', n: '푸시 서버 상태 확인', d: '발송하지 않고 서버가 살아 있는지만 봅니다', when: '매일 06:17' },
+  { f: 'robot-heartbeat.yml', n: '로봇 하트비트', d: '예약 로봇이 제때 돌고 있는지 확인합니다', when: '매일 17:29' },
   { f: 'admin-lock-check.yml', n: '관리자 화면 잠금 확인', d: '이 화면이 정말 잠겨 있는지 밖에서 열어 봅니다', when: '매일 14:23' },
   { f: 'close-old-reports.yml', n: '오래된 리포트 닫기', d: '지난 수집 리포트를 닫아 경보가 묻히지 않게 합니다', when: '매주 월' },
   { f: 'probe-links.yml', n: '링크 정찰', d: '이 주소가 학생 눈에 어떻게 보이는지 확인합니다', when: '수동' },
   { f: 'probe-boards.yml', n: '게시판 후보 정찰', d: '새 학교의 장학 게시판 주소 후보를 찾아 리포트로 올립니다', when: '수동' },
-  { f: 'refresh-majors.yml', n: '학과 목록 갱신', d: '커리어넷에서 학교별 개설 학과를 다시 받습니다', when: '수동' },
+  { f: 'insta-token-check.yml', n: '인스타 토큰 수명 확인', d: '인스타 열쇠가 며칠 남았는지 봅니다', when: '매일 03:17' },
+  { f: 'insta-samples.yml', n: '인스타 판형 견본', d: '판형별 견본 그림을 다시 그립니다', when: '수동' },
+  /* 돈이 나가는 로봇 둘 — `def` 는 가장 싼 쪽이다 */
+  {
+    f: 'essay-smoke.yml',
+    n: '초안 서버 실물 확인',
+    d: 'AI 초안 서버가 실제로 답하는지 한 번 불러 봅니다 (돈이 나갑니다)',
+    when: '수동',
+    inputs: [
+      { name: 'mode', kind: 'choice', label: '어디까지 할까요', def: '요청 모양만 확인 (호출 1회 · 약 50원)',
+        options: ['요청 모양만 확인 (호출 1회 · 약 50원)', '실제 사용 시연 (호출 2회 · 약 100원)'] },
+      { name: 'model', kind: 'choice', label: '어느 모델로', def: 'claude-sonnet-5',
+        options: ['claude-sonnet-5', 'claude-opus-5'] },
+    ],
+  },
+  {
+    f: 'essay-playbook.yml',
+    n: '작성 규칙 학습',
+    d: '공고 원문에서 작성 규정을 읽어 초안 규칙을 갱신합니다',
+    when: '매주 월 05:37',
+    inputs: [{ name: 'mode', kind: 'choice', label: '무엇을 할까요', def: '미리보기만',
+      options: ['읽고 저장', '미리보기만'] }],
+  },
   /* 아래 둘은 '데이터를 고치는 로봇'이 아니라 **브랜치를 맞추는 로봇**이다.
      평소엔 자동으로 돌지만, 손으로 올린 변경이 반대쪽에 안 넘어간 것 같을 때 여기서 한 번
      돌릴 수 있어야 한다 — 2026-08-12에 관리자 화면 수리분을 세 브랜치에 손으로 밀어야 했다. */
   { f: 'main-guard.yml', n: 'main 직접 수정 되가져오기', d: 'main에만 올라간 변경을 로봇 브랜치로 가져옵니다', when: '자동 + 하루 2회' },
   { f: 'update-progress.yml', n: '노션 작업 현황 갱신', d: '노션 「작업 현황」에 지금 하는 일·최근 커밋을 씁니다', when: 'push 때마다' },
-  /* 입력칸이 있는 유일한 로봇 — 이 워크플로는 `url`을 **필수 입력**으로 받는다.
-     입력 없이 그냥 던지면 GitHub이 422로 거부하므로, 버튼만 달면 안 된다. */
+  /* 이 워크플로는 `url` 을 **필수 입력**으로 받는다 — 빈 값으로 던지면 GitHub 이 422 로 거부한다 */
   {
     f: 'fetch-page.yml',
     n: '페이지 원격 열람',
     d: '막힌 주소를 대신 열어 본문·첨부를 받아 옵니다 (결과는 실행 기록의 artifact)',
     when: '수동',
-    input: { name: 'url', label: '가져올 페이지 주소', ph: 'https://…' },
+    inputs: [{ name: 'url', kind: 'url', label: '가져올 페이지 주소', ph: 'https://…', required: true }],
   },
 ];
+
+/* 🔴 **여기 넣지 않은 것 둘 — 되돌리지 말 것.**
+   · `device-deploy.yml`('이 기기에서 배포') — 브랜치 안전장치가 `if [ "$EVENT" = "push" ]` 라
+     화면이 부르는 수동 실행에서는 통째로 건너뛴다(실측). 버튼을 달면 '눌렀는데 아무 일도
+     안 일어나는' 버튼이 된다.
+   · `two-school-scan.yml` — 일회용이고 push 트리거가 남의 브랜치를 본다.
+   관문(test-collector)이 이 둘이 목록에 **없는지** 확인한다. */
+const ROBOT_NOT_LISTED = ['device-deploy.yml', 'two-school-scan.yml'];
+
+/** 설명은 함수일 수 있다 — 건수를 사본으로 두지 않고 셀 때 센다 */
+const robotDesc = (r) => (typeof r.d === 'function' ? r.d() : r.d);
 
 /* ⚠️ **로봇이 실제로 저장하는 리포트만 넣는다.**
    2026-08-12까지 여기 '심층 수집'(collector/deepfetch-report.md)이 있었는데
@@ -1860,18 +2204,31 @@ function runStateHtml(file) {
 
 function renderRobots() {
   const box = byId('screen-robots');
+  /* 입력 칸 하나. 고르는 상자는 yml 의 선택지를 **그대로** 쓰고, 뜻풀이는 옆에 덧붙인다
+     (보내는 값은 선택지 글자 그대로다 — 한 글자만 달라도 GitHub 이 422 로 거부한다). */
+  const runInput = (r, i) => `
+    <label class="runin" data-run-in>
+      <span>${esc(i.label)}${i.required ? ' (필수)' : ''}</span>
+      ${i.kind === 'choice'
+    ? `<select data-run-input="${esc(r.f)}" data-run-key="${esc(i.name)}">${i.options.map((o) => `
+          <option value="${esc(o)}"${o === i.def ? ' selected' : ''}>${esc(o)}${
+  i.hint && i.hint[o] ? ` — ${esc(i.hint[o])}` : ''}</option>`).join('')}</select>`
+    : `<input type="${i.kind === 'num' ? 'number' : i.kind === 'url' ? 'url' : 'text'}"
+          data-run-input="${esc(r.f)}" data-run-key="${esc(i.name)}"
+          ${i.kind === 'num' ? `min="${esc(i.min)}" max="${esc(i.max)}"` : ''}
+          value="${esc(i.def || '')}" placeholder="${esc(i.ph || '')}" />`}
+    </label>`;
+
   const runRow = (r) => `
-    <div class="row" data-row data-noclick style="cursor:default">
+    <div class="row" data-row data-noclick data-robot="${esc(r.f)}" style="cursor:default">
       <div>
         <div class="t">${esc(r.n)}</div>
-        <div class="m"><span>${esc(r.d)}</span><span>${esc(r.when)}</span></div>
+        <div class="m"><span>${esc(robotDesc(r))}</span><span>${esc(r.when)}</span></div>
         <div class="badges">${runStateHtml(r.f)}</div>
-        ${r.input ? `<input type="url" data-run-input="${esc(r.f)}" style="margin-top:6px;width:100%"
-            placeholder="${esc(r.input.ph)}" aria-label="${esc(r.input.label)}" />` : ''}
+        ${(r.inputs || []).map((i) => runInput(r, i)).join('')}
       </div>
       <div class="btn-row">
-        <button class="btn btn-sm" data-run="${esc(r.f)}" data-run-name="${esc(r.n)}"
-          ${r.input ? `data-run-input-name="${esc(r.input.name)}"` : ''}>지금 실행</button>
+        <button class="btn btn-sm" data-run="${esc(r.f)}" data-run-name="${esc(r.n)}">지금 실행</button>
         <a class="btn btn-sm" href="https://github.com/${OWNER}/${REPO}/actions/workflows/${esc(r.f)}"
            target="_blank" rel="noreferrer noopener">기록 ↗</a>
       </div>
@@ -1898,6 +2255,8 @@ function renderRobots() {
          학교 서버가 막아 멀쩡한 주소까지 실패로 뜰 수 있으니, 수집 계열은 필요할 때만 누르세요.</p>
     </div>
     <div class="rows" data-rows>${ROBOTS.map(runRow).join('')}</div>
+    <p class="hint" data-robot-skip>여기서 부르지 않는 것: ${ROBOT_NOT_LISTED.map(esc).join(' · ')}
+       — 화면에서 누르면 아무 일도 일어나지 않거나(브랜치 안전장치) 일회용 로봇이라 일부러 뺐습니다.</p>
 
     <!-- 수집망 — 학교가 둘로 줄어 탭 하나를 차지할 이유가 없어졌다. 여기로 들어온다.
          🔴 베끼지 않고 networkSectionHtml() 한 곳을 쓴다(수집망 탭과 같은 내용). -->
@@ -2108,16 +2467,43 @@ function problemGroupHtml(grp, key) {
   /* 🔴 로봇 이름을 베끼지 않는다 — 로봇 화면(ROBOTS)이 원본이다. 베끼면 이름이 갈라진다. */
   const robot = ROBOTS.find((r) => r.f === grp.fix);
   const label = robot ? robot.n : grp.fix;
+  /* 🔴 **입력 없이 부르지 않는다** — eligibility-fill 의 기본값은 '전부'(전수 약 2,229원)이고
+     deep-fetch 의 기본값은 엉뚱한 공고('조병두')다. 부르는 모양은 규칙 파일(FIX_PLAN)에 있다. */
+  const plan = FIX_PLAN[grp.fix] || {};
+  /* 공고 제목을 넘겨야 하는 로봇(deep-fetch)은 **이 원인에 걸린 공고들의 제목**을 보낸다.
+     길이 상한을 넘으면 앞에서 끊고 **버튼 글자에 몇 건인지 적는다**(말없이 자르지 않는다). */
+  const argOf = (p) => {
+    if (!p || p.argFrom !== 'names') return null;
+    const picked = [];
+    let len = 0;
+    for (const it of grp.items) {
+      const nm = String(it.name || '').trim();
+      if (!nm) continue;
+      if (len + nm.length + 1 > 900) break;
+      picked.push(nm); len += nm.length + 1;
+    }
+    return { value: picked.join(','), k: picked.length };
+  };
+  const fixBtn = (which) => {
+    const p = plan[which];
+    if (which === 'all' && !p) return '';
+    const arg = argOf(p);
+    const text = (p && p.label) ? `${p.label}${arg && arg.k < n ? ` (먼저 ${arg.k}건)` : ''}` : `이 ${n}건 고치기`;
+    const cls = which === 'main' ? 'btn-primary' : '';
+    return `<button class="btn btn-sm ${cls}" data-fixrun="${esc(grp.fix)}" data-fixplan="${which}"
+        data-fixn="${n}"${arg ? ` data-fixarg="${esc(arg.value)}"` : ''}>${esc(text)} — ${esc(label)}${
+  p && p.cost ? ` · ${esc(p.cost)}` : ''}</button>`;
+  };
   return `
     <div class="pgroup" data-pgroup>
       <div class="pgroup-head">
         <span class="pill ${tone}">${grp.level === 'error' ? '오류' : '경고'} ${n}건</span>
         <span class="pgroup-msg">${esc(grp.msg)}</span>
         ${grp.fix
-    ? `<button class="btn btn-sm btn-primary" data-fixrun="${esc(grp.fix)}" data-fixn="${n}">
-             이 ${n}건 고치기 — ${esc(label)}</button>`
+    ? `${fixBtn('main')}${fixBtn('all')}`
     : '<span class="hint">한 건씩 보고 고쳐야 합니다</span>'}
       </div>
+      ${grp.fix && plan.note ? `<p class="hint">${esc(plan.note)}</p>` : ''}
       <details>
         <summary class="hint">어떤 공고인지 보기 (${n}건)</summary>
         <div class="rows" data-rows>${grp.items.slice(0, shown(`pg-${key}`, 20))
@@ -2737,6 +3123,23 @@ function bindGlobal() {
       return;
     }
 
+    /* 저장된 공고 원문을 못 받았을 때 다시 읽기 */
+    if (e.target.closest('[data-src-rescan]')) {
+      SRC_STATE = 'idle'; SRC_PROMISE = null;
+      await openSrcScan();
+      return;
+    }
+
+    /* 교외 · 학교 한정 — 고른 것을 전국으로 (🔴 누르는 것은 사람이다) */
+    const pickScope = e.target.closest('[data-scope-pick]');
+    if (pickScope) { e.stopPropagation(); return; }     // 체크만 한다 — 다시 그리지 않는다
+    if (e.target.closest('[data-scope-go]')) {
+      const ids = $$('[data-scope-pick]:checked').map((el) => el.dataset.scopePick);
+      if (!ids.length) { toast('먼저 공고를 고르세요'); return; }
+      goNationwide(ids);
+      return;
+    }
+
     const lv = e.target.closest('[data-lview]');
     if (lv) { LIST_VIEW = lv.dataset.lview; rerender('list'); return; }
 
@@ -2843,27 +3246,41 @@ function bindGlobal() {
     const fix = e.target.closest('[data-fixrun]');
     if (fix) {
       const file = fix.dataset.fixrun;
+      const plan = (FIX_PLAN[file] || {})[fix.dataset.fixplan || 'main'] || null;
       const robot = ROBOTS.find((r) => r.f === file);
-      await runCollector(file, robot ? robot.n : file);
+      const inputs = { ...((plan && plan.inputs) || {}) };
+      if (plan && plan.arg && fix.dataset.fixarg) inputs[plan.arg] = fix.dataset.fixarg;
+      /* 돈이 나가는 로봇은 **금액을 글자로** 한 줄 더 보여 준다 — 되돌릴 수 없다 */
+      const extra = (plan && plan.cost)
+        ? [{ t: `이 로봇은 돈이 나갑니다 — ${plan.cost}`, m: '실행하면 취소할 수 없습니다' }]
+        : [];
+      await runCollector(file, robot ? robot.n : file, inputs, extra);
       return;
     }
 
     const run = e.target.closest('[data-run]');
     if (run) {
-      /* 입력이 필요한 로봇은 빈 값으로 던지면 GitHub이 422로 거부한다 — 먼저 막는다 */
-      const inputName = run.dataset.runInputName;
-      let inputs = {};
-      if (inputName) {
-        const el = $(`[data-run-input="${run.dataset.run}"]`);
-        const v = ((el && el.value) || '').trim();
-        if (!/^https?:\/\//i.test(v)) {
-          jobShow('먼저 http로 시작하는 주소를 입력하세요', 'bad');
-          if (el) el.focus();
-          return;
+      const file = run.dataset.run;
+      const spec = ROBOTS.find((x) => x.f === file) || {};
+      const inputs = {};
+      /* ⚠️ `CSS.escape` 를 빼지 말 것 — 파일 이름의 `-`·`.` 때문에 선택자가 어긋난다 */
+      for (const el of $$(`[data-run-input="${CSS.escape(file)}"]`)) {
+        const key = el.dataset.runKey;
+        const spec1 = (spec.inputs || []).find((i) => i.name === key) || {};
+        const v = String(el.value || '').trim();
+        if (spec1.kind === 'url' && v && !/^https?:\/\//i.test(v)) {
+          jobShow('http 로 시작하는 주소를 넣어 주세요', 'bad'); el.focus(); return;
         }
-        inputs = { [inputName]: v };
+        if (spec1.kind === 'num' && v && !/^\d+$/.test(v)) {
+          jobShow('숫자만 넣어 주세요', 'bad'); el.focus(); return;
+        }
+        /* 🔴 빈 값은 **보내지 않는다** — `mode:''` 를 던지면 고르는 상자가 거부당한다.
+           키 자체를 빼야 워크플로의 기본값이 이긴다. */
+        if (v) inputs[key] = v;
       }
-      await runCollector(run.dataset.run, run.dataset.runName || '로봇', inputs);
+      const need = (spec.inputs || []).filter((i) => i.required && !inputs[i.name]);
+      if (need.length) { jobShow(`${need[0].label} 를 먼저 채우세요`, 'bad'); return; }
+      await runCollector(file, run.dataset.runName || '로봇', inputs);
       return;
     }
 
@@ -3126,15 +3543,24 @@ function bindGlobal() {
     const sheet = byId('sheet');
     if (sheet && !sheet.hidden) markScrollers(sheet);
   });
+
+  /* 🔴 모아 둔 수정을 **기기에 저장하지 않는다**(위 PENDING_EDITS 주석) — 남겨 두면
+     '반영한 줄 알았는데 안 된' 상태가 조용히 이어진다. 그래서 지키는 방법은 이 경고 하나뿐이다.
+     ⚠️ 문구는 브라우저가 정한다(우리 글자는 안 뜬다) — `returnValue` 는 '물어봐 달라'는 신호일 뿐. */
+  window.addEventListener('beforeunload', (e) => {
+    if (!pendingCount()) return;
+    e.preventDefault();
+    e.returnValue = '';
+  });
 }
 
-async function runCollector(file, label, inputs = {}) {
+async function runCollector(file, label, inputs = {}, extraLines = []) {
   const extra = Object.entries(inputs).map(([k, v]) => ({ t: k, m: v }));
   askSheet({
     title: `${label} 지금 실행`, goLabel: '실행',
     note: '몇 분 걸립니다. 수집 계열은 같은 학교를 짧은 시간에 여러 번 두드리면 '
       + '학교 서버가 막아 멀쩡한 주소까지 실패로 뜰 수 있습니다.',
-    lines: [{ t: label, m: file }, ...extra],
+    lines: [...extraLines, { t: label, m: file }, ...extra],
     run: () => reallyRun(file, label, inputs),
   });
 }
@@ -3198,7 +3624,11 @@ async function enter(key, remember) {
        빈 목록을 상대로 조용히 통과하는 일이 없다. */
     ensureSources, storedSource, srcState: () => SRC_STATE,
     /* 모아 둔 수정 — 검사가 '보내기 전에는 안 보낸다'를 확인한다 */
-    pendingCount };
+    pendingCount,
+    /* 반영 전 전후 대조·C2 (2026-09-14) — 검사가 **화면이 센 것**과 저장소 계산을 대 볼 수 있게.
+       🔴 검사용 창구일 뿐 화면 동작은 여기 없다(규칙을 두 벌로 만들지 않는다). */
+    pendingMap: () => PENDING_EDITS, flushPlan, goNationwide, scopeWideItems, noEligItems, scopeCount,
+    robots: () => ROBOTS, jobBusy: () => jobBusy };
 }
 
 function boot() {

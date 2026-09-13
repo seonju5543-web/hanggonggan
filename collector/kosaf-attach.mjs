@@ -31,7 +31,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { makeBudget } from './harvest-budget.mjs';
-import { slimKosaf } from './kosaf-open.mjs';
+import { slimKosaf, loadBlock } from './kosaf-open.mjs';
 import {
   createSession, parseFiles, fileCellHtml, filenameFrom, nameFromUrl, safeFileName,
   looksLikeHtml, sniffKind,
@@ -67,6 +67,9 @@ const full = JSON.parse(fs.readFileSync(KOSAF_JSON, 'utf8'));
 /* 🔴 '지금 열려 있는 재단'의 정의를 **베끼지 않는다** — 앱이 받는 파일을 만드는
    slimKosaf 를 그대로 불러 같은 답을 쓴다. 베끼면 앱엔 있는데 사본은 없는(또는 그 반대)
    재단이 생긴다. */
+/* 🔴 여기엔 **장부를 넘기지 않는다** (2026-09-13). 이 줄의 뜻은 '지금 열려 있는 재단'이지
+   '학생에게 보이는 재단'이 아니다. 넘기면 내려 둔 재단의 사본을 안 받게 되어,
+   사람이 '되살리기'를 눌러도 다음 수확까지 빈손이 된다. */
 const openCodes = new Set(slimKosaf(full, today).items.map((i) => i.code));
 const byCode = new Map((full.items || []).map((i) => [i.code, i]));
 
@@ -223,7 +226,8 @@ function saveAll() {
   if (!WRITE || savedOnce) return;
   savedOnce = true;
   fs.writeFileSync(KOSAF_JSON, `${JSON.stringify(full, null, 1)}\n`);
-  const slim = slimKosaf(full, today);
+  /* 앱 파일에는 장부를 적용한다(읽기만 — 장부를 새로 쓰는 곳은 kosaf-open.mjs --write) */
+  const slim = slimKosaf(full, today, loadBlock());
   fs.writeFileSync(path.join(ROOT_DIR, 'data', 'kosaf-open.json'), `${JSON.stringify(slim, null, 1)}\n`);
   const withFile = slim.items.filter((i) => (i.files || []).length).length;
   const head = `# 한국장학재단 첨부 사본 — ${new Date().toISOString().slice(0, 16).replace('T', ' ')}\n\n`

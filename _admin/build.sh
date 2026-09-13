@@ -40,6 +40,11 @@ cp collector/notice-source.mjs "$OUT/vendor/notice-source.mjs"
 cp collector/canon-url.mjs "$OUT/vendor/canon-url.mjs"
 cp collector/page-boilerplate.mjs "$OUT/vendor/page-boilerplate.mjs"
 
+# 관리자 수정 한 건이 '무엇을 바꾸는가' 를 정하는 규칙 (2026-09-14)
+#   🔴 화면의 '반영 전 전후 대조' 와 저장소(tools/admin-apply.mjs)가 **같은 파일**을 봐야 한다.
+#      베끼면 미리보기가 거짓말을 한다(화면은 '1,2' 를 보내고 저장소는 [1,2] 로 넣는다).
+cp tools/edit-diff.mjs "$OUT/vendor/edit-diff.mjs"
+
 # 등록 규칙 — Node용 파일이라 브라우저에서 읽히도록 앞뒤만 감싼다.
 # (내용은 손대지 않는다. 규칙이 바뀌면 다음 빌드에 그대로 따라온다)
 {

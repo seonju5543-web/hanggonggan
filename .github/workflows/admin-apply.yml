@@ -16,7 +16,10 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: '작업 (confirm / revert / remove / edit / merge / autoRegister / addBoard)'
+        # 기능이 아니라 **읽는 사람**을 위한 줄이다 — 새 동작을 만들면 여기에도 더한다.
+        # unblock = 되돌리기(revert)의 짝. 잘못 막은 공고의 차단을 푼다(공고가 되살아나지는
+        # 않는다 — 다음 수집 때 로봇이 다시 판단한다).
+        description: '작업 (confirm / revert / unblock / remove / edit / merge / register / unlinkForm / formQueue / autoRegister / addBoard)'
         required: true
         type: string
       payload:
@@ -82,6 +85,8 @@ jobs:
           # 빠뜨리면 화면엔 "✅ 반영 완료"가 뜨는데 그 파일만 조용히 버려진다 —
           # 2026-08-01 이슈 #79가 정확히 그 사고였다(연결만 저장되고 양식은 버려짐).
           # 양식 큐 조작(D2)이 pending-forms.json을, 연결 끊기가 registered.json을 고친다.
+          # 되돌리기(revert)와 차단 풀기(unblock)는 auto-register-config.json을 고친다 — 이미 아래에 있다.
+          # ⚠️ 2026-09-13 점검: 이번에 새로 쓰는 파일은 없다(원문 대조는 **읽기만** 한다).
           git add data/registered.json data/admin-log.json \
                   collector/auto-register-config.json collector/schools.json \
                   collector/pending-forms.json data/forms.json

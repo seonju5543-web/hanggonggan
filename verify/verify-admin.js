@@ -121,11 +121,15 @@ function serve() {
   /* /owner/repo/<브랜치>/<경로> → 저장소의 그 파일.
      기본 브랜치 이름에 슬래시가 들어 있어(claude/nice-…) 칸 수로 자르면 안 된다. */
   const RAW_PREFIX = '/seonju5543-web/hanggonggan/claude/nice-heisenberg-WESq5/';
+  /* 🔴 **일부러 못 읽게 만들 파일** — 맨 끝의 「못 읽은 파일」 절이 채운다.
+     그 절이 없으면 늘 비어 있어 아무 영향이 없다(평소 검사는 그대로 돈다). */
+  const FORCE_FAIL = new Set();
   await page.route('https://raw.githubusercontent.com/**', async (route) => {
     const u = new URL(route.request().url());
     const rel = u.pathname.startsWith(RAW_PREFIX)
       ? u.pathname.slice(RAW_PREFIX.length)
       : u.pathname.split('/').slice(4).join('/');
+    if (FORCE_FAIL.has(rel)) return route.fulfill({ status: 500, body: '' });
     const f = path.join(ROOT, rel);
     /* 검사용 준비 카드(아래)의 그림은 저장소에 없다 — 404 가 콘솔 오류로 남지 않게 빈 그림으로 답한다 */
     if (rel.startsWith('insta/pub/verify-insta-1/')) return route.fulfill({ status: 200, contentType: 'image/jpeg', body: '' });
@@ -511,7 +515,10 @@ function serve() {
       return hit ? hit.id : null;
     });
     if (someId) {
-      await page.click(`[data-row][data-id="${someId}"]`);
+      /* 🔴 화면을 **지정해서** 찾는다 (2026-09-14) — `[data-id]` 만 쓰면 숨은 화면(할 일)의
+         같은 줄이 먼저 잡혀 '보이지 않는 요소'를 30초 기다리다 죽는다. 지금 보는 화면은 목록이다.
+         뜻은 그대로다: '원문이 붙는 공고를 열면 글자가 보인다'. */
+      await page.click(`#screen-list [data-row][data-id="${someId}"]`);
       await page.waitForSelector('#sheet:not([hidden])');
       await page.waitForSelector('#sheet .src-body', { timeout: 5000 }).catch(() => {});
       const bodyLen = await page.evaluate(() => (document.querySelector('#sheet .src-body')?.textContent || '').length);
@@ -829,8 +836,16 @@ function serve() {
      ⚠️ **누르는 검사는 맨 끝에서 한다** — 아래 관리자 조정 검사들이 '앞 작업이 끝났나'를
      알림 띠(#job-text)의 문구로 판단하기 때문에, 여기서 띠 문구를 덮어쓰면 그 판단이
      빗나가 뒤 항목이 줄줄이 실패한다(실제로 겪음). 여기서는 **붙어 있는지만** 본다. */
-  ok(await page.locator('#screen-robots [data-run-input-name]').count() === 1,
-    '입력이 필요한 로봇에 입력칸이 붙어 있다');
+  /* 🔴 로봇마다 입력이 여럿이다 (2026-09-14) — 숫자를 박지 않고 **목록과 대 본다**.
+     옛 판은 `[data-run-input-name]` 하나만 셌는데, 그 표식이 없어지는 순간 조용히 0을 세고
+     '입력이 필요한 로봇' 이 늘어도 알 수 없었다. */
+  const inputCheck = await page.evaluate(() => window.__admin.robots()
+    .filter((r) => (r.inputs || []).length)
+    .map((r) => ({ f: r.f, want: r.inputs.length,
+      got: document.querySelectorAll(`#screen-robots [data-robot="${r.f}"] [data-run-input]`).length })));
+  ok(inputCheck.length >= 1 && inputCheck.every((x) => x.got === x.want),
+    '입력이 필요한 로봇에 입력칸이 붙어 있다',
+    `${inputCheck.length}종 · ${inputCheck.filter((x) => x.got !== x.want).map((x) => `${x.f} ${x.got}/${x.want}`).join(', ') || '전부 일치'}`);
 
   /* 양식 변환 API가 멈춘 것을 화면이 말하는가 (2026-08-12 신설).
      8/11에 잔액이 떨어져 유료 변환이 멈췄는데 실패가 리포트 '건너뜀'에 한 줄로 섞여
@@ -1083,7 +1098,31 @@ function serve() {
   ok(editSent === null, '저장을 눌러도 아직 보내지 않는다 (모아 뒀다가 한 번에)');
   ok(await page.locator('#pending-bar:not([hidden])').count() === 1,
     '모아 둔 수정이 있다고 화면이 말한다');
+  /* 🔴 '한꺼번에 반영' 은 이제 **바로 안 보낸다** (2026-09-14) — 무엇이 바뀌는지 전후로
+     보여 주고 한 번 더 묻는다. 화면이 '전부 몇 칸' 을 늘어놓지 않는지까지 본다:
+     화면은 `years:'1,2'` 를 보내는데 저장소는 `[1,2]` 로 넣으므로 날것끼리 대 보면
+     **안 바뀐 칸이 '바뀜' 으로** 뜬다(그래서 tools/edit-diff.mjs 한 곳으로 센다). */
   await page.click('[data-act="flush"]');
+  await page.waitForTimeout(400);
+  ok(editSent === null, '「한꺼번에 반영」도 바로 보내지 않는다 — 먼저 무엇이 바뀌는지 보여 준다');
+  /* 🔴 화면이 센 것을 화면에게 다시 묻지 않는다 — 같은 함수를 두 번 부르면 어떤 규칙을 써도
+     늘 같은 수가 나와 이 검사가 헛돈다(만들면서 실제로 그랬다). **Node 에서** 공용 원본
+     `tools/edit-diff.mjs` 로 따로 세어 댄다. */
+  const staged = await page.evaluate(() => [...window.__admin.pendingMap().entries()]
+    .map(([id, patch]) => ({ id, patch })));
+  const { diffPatch } = await import(
+    require('node:url').pathToFileURL(path.join(ROOT, 'tools/edit-diff.mjs')).href);
+  const calcN = staged.reduce((a, x) => a
+    + diffPatch((PAGE_ITEMS || []).find((it) => it.id === x.id) || {}, x.patch).length, 0);
+  const shownN = await page.locator('#sheet [data-diff-row]').count();
+  const stagedKeys = staged.reduce((a, x) => a + Object.keys(x.patch).length, 0);
+  ok(shownN >= 1, '바뀌는 칸을 전후로 보여 준다', `${shownN}칸`);
+  ok(shownN === calcN,
+    '보여 주는 칸 수가 저장소가 실제로 바꾸는 칸 수와 같다 (보낸 키를 다 늘어놓지 않는다)',
+    `화면 ${shownN} / Node 계산 ${calcN} / 보낸 키 ${stagedKeys}`);
+  ok(stagedKeys > calcN,
+    '  (보낸 키가 바뀌는 칸보다 많다 — 이 검사가 헛돌지 않는다)', `${stagedKeys} > ${calcN}`);
+  await page.click('#sheet [data-ask-go]');
   await page.waitForTimeout(700);
   const sentPayload = (() => { try { return JSON.parse(editSent?.inputs?.payload || '{}'); } catch { return {}; } })();
   ok(Array.isArray(sentPayload.edits) && sentPayload.edits.length >= 1,
@@ -1273,9 +1312,18 @@ function serve() {
   /* 입력이 필요한 로봇 — 실제로 눌러 본다 (알림 띠를 덮어쓰므로 맨 끝에서) */
   await page.click('.tab[data-tab="robots"]');
   await page.waitForSelector('#screen-robots:not([hidden])');
-  await page.locator('#screen-robots [data-run-input-name]').first().click();
-  ok(/주소를 입력/.test(await page.textContent('#job') || ''),
+  /* 🔴 입력 칸은 이제 로봇마다 여러 개다(`[data-run-key]`) — 옛 표식 `data-run-input-name`
+     하나만 보던 검사는 그 이름이 없어지는 순간 조용히 0건을 눌렀다. */
+  await page.fill('#screen-robots [data-run-input="fetch-page.yml"]', '');
+  await page.click('#screen-robots [data-run="fetch-page.yml"]');
+  await page.waitForTimeout(200);
+  ok(/먼저 채우세요|주소를 넣어/.test(await page.textContent('#job') || ''),
     '주소 없이 누르면 실행하지 않고 알려 준다');
+  await page.fill('#screen-robots [data-run-input="fetch-page.yml"]', 'ftp://x');
+  await page.click('#screen-robots [data-run="fetch-page.yml"]');
+  await page.waitForTimeout(200);
+  ok(/http/.test(await page.textContent('#job') || ''),
+    'http 가 아닌 주소도 막는다');
 
   /* 화면 이름이 주소에 남는가 — "로봇 탭 보세요"를 링크로 전할 수 있어야 한다 */
   ok(/#robots$/.test(page.url()), '지금 보는 화면이 주소에 남는다', page.url().split('/').pop());
@@ -1289,8 +1337,309 @@ function serve() {
   ok(await page.evaluate(() => [...document.querySelectorAll('section.screen')]
     .some((el) => !el.hidden)), '없어진 옛 화면 이름으로 들어와도 빈 화면에 갇히지 않는다');
 
+  /* ══ 경고마다 고치는 로봇 (2026-09-14 · 「지금 바로 ④」) ═══════════════════
+     예전엔 원인 한 줄에 버튼 하나였고, 그 버튼이 **입력 없이** 로봇을 깨웠다.
+     `eligibility-fill.yml` 의 mode 기본값은 '전부' 라 한 번 누르면 전수(약 2,229원)가 돌고,
+     `deep-fetch.yml` 의 form_targets 기본값은 엉뚱한 공고('조병두')다. */
+  /* 🔴 앞선 관리자 조정이 '실행 결과'를 기다리며 `jobBusy` 를 붙들고 있으면 아래 저장이
+     전부 막힌다 — 제품이 옳다(반만 반영되면 안 된다). 그러니 **먼저 끝나게 해 준다**.
+     ⚠️ 이걸 빼면 아래 세 항목이 '0건' 으로 조용히 실패한다(실제로 겪었다). */
+  await page.route('**/actions/workflows/**/runs**', (route) => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify({
+      workflow_runs: [{
+        id: 9, status: 'completed', conclusion: 'success',
+        created_at: new Date(Date.now() + 5000).toISOString(),
+        html_url: 'https://example.invalid/run',
+      }],
+    }),
+  }));
+  await page.waitForFunction(() => !window.__admin.jobBusy(), null, { timeout: 30000 }).catch(() => {});
+
+  await page.click('.tab[data-tab="todo"]');
+  await page.waitForSelector('#screen-todo:not([hidden])');
+  const fixBtns = await page.locator('#screen-todo [data-fixrun]').count();
+  const fixCauses = await page.evaluate(() => new Set([...document.querySelectorAll('#screen-todo [data-fixrun]')]
+    .map((b) => b.dataset.fixrun)).size);
+  ok(fixBtns >= 1, '경고 줄에 고치는 로봇 버튼이 있다', `${fixBtns}개 · 원인 ${fixCauses}가지`);
+  /* 화면 어디에도 '사람에게 시키는 말' 이 없다 — 개발자는 코드 지식이 없다 */
+  const todoText2 = await page.textContent('#screen-todo');
+  ok(!/push\s*하세요|파일을\s*고쳐/.test(todoText2), "'파일을 고쳐서 push 하세요' 같은 말이 없다");
+
+  let fixSent = null;
+  await page.route('**/actions/workflows/**/dispatches', (route) => {
+    try { fixSent = JSON.parse(route.request().postData() || '{}'); } catch { fixSent = 'parse-fail'; }
+    route.fulfill({ status: 204, body: '' });
+  });
+  const mainFix = page.locator('#screen-todo [data-fixrun="eligibility-fill.yml"][data-fixplan="main"]').first();
+  if (await mainFix.count()) {
+    await mainFix.click();
+    await page.waitForSelector('#sheet:not([hidden])');
+    ok(/원/.test(await page.textContent('#sheet') || ''),
+      '돈이 나가는 로봇은 금액을 글자로 한 번 더 말한다');
+    await page.click('#sheet [data-ask-go]');
+    await page.waitForTimeout(400);
+    const inp = (fixSent && fixSent.inputs) || {};
+    ok(inp.mode === '시범 3건만',
+      "눈에 띄는 버튼은 '시범 3건만' 으로 부른다 (기본값 '전부' 가 그대로 나가지 않는다)", JSON.stringify(inp));
+    fixSent = null;
+    await page.locator('#screen-todo [data-fixrun="eligibility-fill.yml"][data-fixplan="all"]').first().click();
+    await page.waitForSelector('#sheet:not([hidden])');
+    await page.click('#sheet [data-ask-go]');
+    await page.waitForTimeout(400);
+    ok(((fixSent && fixSent.inputs) || {}).mode === '전부', "흐린 버튼만 '전부' 로 부른다");
+    /* 🔴 심층 수집은 **지금 걸린 공고**의 첨부를 받아야 한다 — 값을 안 보내면 워크플로
+       기본값('조병두')이 이겨 엉뚱한 공고를 받아 온다(실측). */
+    const deep = page.locator('#screen-todo [data-fixrun="deep-fetch.yml"]').first();
+    if (await deep.count()) {
+      fixSent = null;
+      await deep.click();
+      await page.waitForSelector('#sheet:not([hidden])');
+      await page.click('#sheet [data-ask-go]');
+      await page.waitForTimeout(400);
+      const ft = ((fixSent && fixSent.inputs) || {}).form_targets || '';
+      ok(ft.length > 1 && ft !== '조병두',
+        '심층 수집은 지금 걸린 공고 제목을 보낸다 (워크플로 기본값이 그대로 나가지 않는다)',
+        ft.slice(0, 40));
+    } else {
+      ok(true, '양식 정보가 빠진 공고가 0건이라 심층 수집 버튼을 못 눌렀다');
+    }
+  } else {
+    ok(false, "자격 미확보 경고가 0건이라 '고치는 로봇' 버튼을 못 눌렀다 (규칙이 되돌아갔는지 보세요)");
+  }
+  await page.unroute('**/actions/workflows/**/dispatches');
+
+  /* ══ 교외인데 한 학교에만 보이는 공고 — 센 결과만 (C2) ══════════════════
+     🔴 **날것 원문에서 세면 안 된다.** 학교 게시판 페이지는 메뉴·머리말에 학교 이름이 늘
+        들어 있어 17건 중 16건이 걸린다(실측). 아래가 그것을 잡는다 —
+        메뉴를 걷어내지 않으면 '한 번도 안 나온 건수'가 화면과 Node 계산에서 갈라진다. */
+  {
+    const { pathToFileURL } = require('node:url');
+    const ns = await import(pathToFileURL(path.join(ROOT, 'collector/notice-source.mjs')).href);
+    const pb = await import(pathToFileURL(path.join(ROOT, 'collector/page-boilerplate.mjs')).href);
+    const rd = (rel) => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, rel), 'utf8')); } catch { return null; } };
+    const texts = rd('collector/extracted/notices-text.json') || [];
+    const bodies = rd('collector/extracted/browser-bodies.json') || {};
+    const idx = ns.indexTexts(texts, bodies);
+    const strip = pb.makeStripper(texts);
+    /* 별칭은 앱1의 UNIV_ALIASES 하나다 — 지어내지 않는다 */
+    const dataJs = fs.readFileSync(path.join(ROOT, 'data.js'), 'utf8');
+    const at = dataJs.indexOf('const UNIV_ALIASES = {');
+    // eslint-disable-next-line no-new-func
+    const ALIAS = new Function(`return ${dataJs.slice(dataJs.indexOf('{', at), dataJs.indexOf('\n};', at) + 2)}`)();
+    const MARK = String.fromCharCode(0);
+
+    const wide = (PAGE_ITEMS || []).filter((it) => it.type === '교외' && (it.eligibility || {}).schoolOnly);
+    const calc = wide.map((it) => {
+      const src = ns.sourceFor(it, idx);
+      if (!ns.hasText(src) || ns.looksLikeErrorPage(src.text)) return 'nosrc';
+      const body = strip(src.url || '', src.text);
+      const school = it.eligibility.schoolOnly;
+      const words = [school, ...Object.keys(ALIAS).filter((k) => ALIAS[k] === school)]
+        .sort((a, b) => b.length - a.length);
+      let rest = body; let hit = 0;
+      for (const w of words) { const n = rest.split(w).length - 1; if (n) { hit += n; rest = rest.split(w).join(MARK); } }
+      return hit ? 'hit' : 'zero';
+    });
+    const calcZero = calc.filter((x) => x === 'zero').length;
+    const calcNosrc = calc.filter((x) => x === 'nosrc').length;
+
+    await page.click('#todo-src-scan > summary');
+    await page.waitForSelector('[data-scope-wide]', { timeout: 20000 });
+    const shown = await page.locator('[data-scope-wide] [data-scope-row]').count();
+    ok(shown === wide.length, '교외인데 한 학교에만 보이는 공고를 전부 줄로 보여 준다',
+      `화면 ${shown} / 계산 ${wide.length}`);
+    const seen = await page.evaluate(() => {
+      const w = window.__admin;
+      const st = w.scopeWideItems().map((it) => w.scopeCount(it).state);
+      return { zero: st.filter((x) => x === 'zero').length, nosrc: st.filter((x) => x === 'nosrc').length };
+    });
+    ok(seen.zero === calcZero,
+      '🔴 한 번도 안 나온 건수가 화면과 저장소 계산에서 같다 (메뉴를 걷어내고 센다)',
+      `화면 ${seen.zero} / 계산 ${calcZero}`);
+    ok(seen.nosrc === calcNosrc, '원문이 없어 못 센 건수도 같다', `화면 ${seen.nosrc} / 계산 ${calcNosrc}`);
+    const scopeText = await page.textContent('[data-scope-wide]');
+    /* 🔴 **'보고도 못 찾았다' 와 '볼 것이 없었다' 를 갈라 적는가** — 모르는 것을 0으로 적으면
+       사람이 '이건 전국이구나' 로 읽는다. 줄마다 어느 쪽인지 실제로 센다. */
+    const lineKinds = await page.evaluate(() => {
+      const w = window.__admin;
+      return w.scopeWideItems().map((it, i) => ({
+        state: w.scopeCount(it).state,
+        text: (document.querySelectorAll('[data-scope-wide] [data-scope-count]')[i] || {}).textContent || '',
+      }));
+    });
+    const nosrcLines = lineKinds.filter((x) => x.state === 'nosrc');
+    const zeroLines = lineKinds.filter((x) => x.state === 'zero');
+    ok(nosrcLines.every((x) => /셀 수 없습니다/.test(x.text) && !/찾지 못했습니다/.test(x.text)),
+      '원문이 없는 줄은 「셀 수 없습니다」라고만 적는다 (안 세어 본 것을 0으로 적지 않는다)',
+      `${nosrcLines.length}줄`);
+    ok(zeroLines.every((x) => /한 번도 찾지 못했습니다/.test(x.text)),
+      '한 번도 안 나온 줄은 본문 글자 수와 함께 그렇게 적는다', `${zeroLines.length}줄`);
+    /* 🔴 화면이 판정하지 않는다 — 숫자와 인용문만 적는다 (운영 원칙 8-1) */
+    ok(!/전국입니다|해당 없음|바꿔야 합니다|전국으로 바꿔야/.test(scopeText),
+      '화면이 「전국이다/아니다」를 단정하지 않는다');
+    ok(/사람이 정합니다/.test(await page.textContent('[data-scope-note]')),
+      '누가 정하는지 화면이 말한다');
+
+    /* 고른 것을 전국으로 — 나가는 payload 를 본다 */
+    let scopeSent = null;
+    await page.route('**/actions/workflows/**/dispatches', (route) => {
+      try { scopeSent = JSON.parse(route.request().postData() || '{}'); } catch { scopeSent = 'parse-fail'; }
+      route.fulfill({ status: 204, body: '' });
+    });
+    await page.evaluate(() => { window.__admin.pendingMap().clear(); });
+    const picks = page.locator('[data-scope-wide] [data-scope-pick]');
+    await picks.nth(0).check(); await picks.nth(1).check();
+    await page.click('[data-scope-go]');
+    await page.waitForTimeout(200);
+    /* 상세에서 고쳐 둔 것이 살아 있는가 — 부분 patch 는 **덮어쓰기 병합**이어야 한다 */
+    const merged = await page.evaluate(() => {
+      const w = window.__admin;
+      const id = [...w.pendingMap().keys()][0];
+      w.pendingMap().set(id, { ...w.pendingMap().get(id), deadline: '2026-12-31' });
+      w.goNationwide([id]);
+      const p = w.pendingMap().get(id);
+      return { id, deadline: p.deadline, elig: p.eligibility };
+    });
+    ok(merged.deadline === '2026-12-31', '먼저 고쳐 둔 마감일이 살아 있다 (덮어쓰기 병합)', JSON.stringify(merged));
+    ok(merged.elig && !('schoolOnly' in merged.elig), '학교 한정이 빠진다');
+    ok(merged.elig && merged.elig.selective === true, '다른 자격 칸은 그대로 남는다');
+
+    await page.click('[data-act="flush"]');
+    await page.waitForTimeout(400);
+    ok(await page.locator('#sheet [data-diff-row]').count() >= 2,
+      'C2 로 모아 둔 것도 전후 대조에 그대로 뜬다');
+    await page.click('#sheet [data-ask-go]');
+    await page.waitForTimeout(700);
+    const sp = (() => { try { return JSON.parse(scopeSent?.inputs?.payload || '{}'); } catch { return {}; } })();
+    const ed = (sp.edits || []).find((x) => x.id === merged.id) || {};
+    ok((sp.edits || []).length >= 2, '고른 만큼 한 번에 나간다', `${(sp.edits || []).length}건`);
+    ok(ed.patch && ed.patch.eligibility && !('schoolOnly' in ed.patch.eligibility),
+      '나가는 payload 의 자격에 학교 한정이 없다', JSON.stringify(ed.patch && ed.patch.eligibility));
+    ok(ed.patch && ed.patch.eligibility && ed.patch.eligibility.selective === true,
+      '나가는 payload 에 다른 자격 칸은 남아 있다');
+    await page.unroute('**/actions/workflows/**/dispatches');
+    await page.unroute('**/actions/workflows/**/runs**');
+    await page.evaluate(() => { window.__admin.pendingMap().clear(); });
+  }
+
+  /* ══ 저장 때 막히는 값은 **그 줄에서** 막는다 (2026-09-14) ═══════════════
+     🔴 한 건이라도 규칙을 어기면 저장소는 **묶음 전체**를 멈춘다(그게 맞다 — 반만 반영되면
+        안 된다). 그러면 멀쩡한 12건까지 함께 죽는다. 화면이 **어느 줄이 막혔는지** 보여 주고
+        보내기 버튼을 잠가야, 사람이 그 줄만 고쳐서 다시 누를 수 있다.
+     ⚠️ `2026-13-99` 는 달력에 없는 날이다 — 모양 검사만으로는 통과한다(저장소가 겪은 구멍). */
+  await page.click('.tab[data-tab="review"]');
+  await page.waitForSelector('#screen-review:not([hidden])');
+  await page.click('#screen-review [data-row]');
+  await page.waitForSelector('#sheet:not([hidden])');
+  if (await page.locator('#sheet [data-ed="deadline"]').count()) {
+    await page.fill('#sheet [data-ed="deadline"]', '2026-13-99');
+    await page.click('#sheet [data-act="save"]');
+    await page.waitForTimeout(250);
+    let blockedSent = null;
+    await page.route('**/actions/workflows/**/dispatches', (route) => {
+      blockedSent = route.request().postData() || '';
+      route.fulfill({ status: 204, body: '' });
+    });
+    await page.click('[data-act="flush"]');
+    await page.waitForTimeout(400);
+    ok(await page.locator('#sheet [data-diff-row].is-bad').count() >= 1,
+      '저장 때 막히는 값은 그 줄이 빨갛게 뜬다');
+    ok(await page.locator('#sheet [data-ask-go]').isDisabled(),
+      '막힌 값이 있으면 보내기 버튼이 잠긴다 (한 줄이 묶음 전체를 죽이지 않게)');
+    await page.click('#sheet [data-ask-go]', { force: true }).catch(() => {});
+    await page.waitForTimeout(250);
+    ok(blockedSent === null, '잠긴 버튼을 눌러도 아무것도 나가지 않는다');
+    await page.unroute('**/actions/workflows/**/dispatches');
+    await page.click('#sheet [data-close]').catch(() => {});
+    await page.evaluate(() => { window.__admin.pendingMap().clear(); });
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(150);
+  } else {
+    ok(false, '상세에 마감일 칸이 없어 막힘 검사를 못 했다');
+  }
+
   /* 콘솔 오류 */
   ok(errors.length === 0, '콘솔·페이지 오류 없음', errors.slice(0, 3).join(' | '));
+
+  /* ══ 못 읽은 파일 — 화면이 그 숫자를 단정하지 않는가 (2026-09-14) ═══════════
+     🔴 관리자 화면이 말하는 「게시판 2곳」은 파일에서 센 것이다. 그 파일을 못 읽었을 때
+        조용히 빈 값으로 바꾸면 인터넷이 끊겨도 화면은 **「게시판 0곳 · 모든 게시판 정상」**
+        이라고 말한다 — 확인하지 않은 것을 확인했다고 말하는 것이다(운영 원칙 8-1).
+        층2(한국장학재단)를 화면에 붙일 때도 똑같은 자리가 생긴다.
+     ⚠️ 이 저장소에 이미 배너 검사가 있었지만 그것은 `D.failed` 를 **손으로 넣고** 그리는
+        함수만 불렀다 — 읽기 쪽이 실패를 안 적게 바뀌어도 그대로 통과한다(무력해진 관문).
+        여기서는 **진짜로 못 읽게 만들고** 화면을 처음부터 다시 연다. */
+  {
+    /* ⚠️ 다시 열 때 열쇠를 **또 넣으면 안 된다** — 기억해 둔 열쇠가 있으면 잠금 화면이
+       아예 안 뜨고, 안 보이는 '들어가기' 버튼을 기다리다 죽는다(만들면서 실제로 그랬다).
+       잠금 화면이 떠 있을 때만 넣는다. */
+    const reopen = async () => {
+      await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
+      await page.waitForTimeout(300);
+      if (await page.locator('#gate:not([hidden])').count()) {
+        await page.fill('#gate-key', 'github_pat_testtoken');
+        await page.click('#gate-enter');
+      }
+      await page.waitForSelector('#app:not([hidden])', { timeout: 15000 });
+      await page.waitForTimeout(500);
+    };
+
+    /* 🔴 일부러 낸 500 은 브라우저가 콘솔에 한 줄 찍는다 — 그것만 골라 뺀다.
+       통째로 비우면 이 절에서 생긴 **진짜** 오류까지 사라진다. */
+    const errAt = errors.length;
+    FORCE_FAIL.add('collector/schools.json');
+    await reopen();
+
+    const recorded = await page.evaluate(() => (window.__admin.D.failed || []).map((f) => f.path));
+    ok(recorded.includes('collector/schools.json'),
+      '못 읽은 파일을 읽기 쪽이 실제로 장부에 적는다 (조용한 읽기로 옮기면 여기서 걸린다)',
+      JSON.stringify(recorded));
+
+    const banner = await page.evaluate(() => {
+      const b = document.querySelector('#datafail');
+      return { hidden: !b || b.hidden, text: b ? b.textContent : '' };
+    });
+    ok(!banner.hidden, '화면 맨 위에 경고가 뜬다');
+    ok(/믿지 마세요/.test(banner.text), '  아래 숫자를 믿지 말라고 말한다');
+    ok(banner.text.includes('collector/schools.json'),
+      '  어느 파일을 못 읽었는지 이름을 댄다 (사람이 고칠 수 있게)');
+
+    /* 🔴 그 파일에서 센 숫자가 **경고 없이** 나오면 안 된다.
+       로봇 화면은 「게시판 N곳」이라고 말한다 — 못 읽은 회차에는 0이 되므로,
+       그 자리에 갈 때 경고가 함께 떠 있어야 한다. */
+    await page.click('.tab[data-tab="robots"]');
+    await page.waitForSelector('#screen-robots:not([hidden])');
+    await page.waitForTimeout(200);
+    const counted = await page.evaluate(() => {
+      const t = document.querySelector('#screen-robots').textContent || '';
+      const b = document.querySelector('#datafail');
+      return { zero: /게시판\s*0\s*곳/.test(t), warned: !!b && !b.hidden };
+    });
+    ok(!counted.zero || counted.warned,
+      '파일에서 센 숫자를 말할 때는 경고가 함께 떠 있다 (0곳을 맨몸으로 말하지 않는다)',
+      JSON.stringify(counted));
+    ok(counted.zero,
+      '  (못 읽으면 실제로 0이 된다 — 이 검사가 헛돌지 않는다)', JSON.stringify(counted));
+
+    /* 다시 읽히면 경고가 스스로 걷힌다 — 안 걷히면 사람이 배너를 무시하게 된다 */
+    FORCE_FAIL.clear();
+    await reopen();
+    const cleared = await page.evaluate(() => {
+      const b = document.querySelector('#datafail');
+      return { failed: (window.__admin.D.failed || []).length, hidden: !b || b.hidden };
+    });
+    ok(cleared.failed === 0 && cleared.hidden,
+      '다시 읽히면 경고가 스스로 걷힌다', JSON.stringify(cleared));
+
+    /* 일부러 낸 500 한 줄만 걷어 낸다 (그 외에 이 절에서 난 오류는 그대로 남는다) */
+    const mine = errors.splice(errAt).filter((e) => !/status of 500/.test(e));
+    errors.push(...mine);
+  }
+
+  /* 콘솔 오류 — 화면을 다시 연 뒤에도 깨끗한가 */
+  ok(errors.length === 0, '콘솔·페이지 오류 없음 (다시 연 뒤에도)', errors.slice(0, 3).join(' | '));
 
   /* 열쇠 지우기 */
   await page.click('#btn-logout');

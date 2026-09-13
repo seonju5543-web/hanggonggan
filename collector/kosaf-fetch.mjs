@@ -23,7 +23,7 @@
  * 결과: data/kosaf.json
  */
 import fs from 'node:fs';
-import { slimKosaf } from './kosaf-open.mjs';
+import { slimKosaf, loadBlock } from './kosaf-open.mjs';
 /* 예산 시계는 수집 로봇과 같은 것을 쓴다 — 시간초과는 '넘어져도 저장'으로 못 막는다.
    GitHub 이 프로세스를 강제 종료하면 저장 단계까지 통째로 죽는다(2026-08-03 사고). */
 import { makeBudget } from './harvest-budget.mjs';
@@ -156,7 +156,10 @@ if (WRITE) {
   console.log('→ data/kosaf.json 저장');
   /* 앱이 받는 것은 이 큰 파일이 아니라 **마감 전만 추린 것**이다 — 같이 갱신하지 않으면
      앱의 층2가 낡은 채로 남는다(둘을 따로 돌리게 두면 반드시 잊는다). */
-  const slim = slimKosaf(out, today);
+  /* 🔴 내려 둔 공고문 장부를 **읽기만** 한다 (2026-09-13) — 장부를 새로 쓰는 곳은
+     `kosaf-open.mjs --write` 한 곳이다. 여기서 안 읽으면 이 로봇만 따로 돌린 날
+     내려 둔 빈 껍데기가 앱에 되살아난다. */
+  const slim = slimKosaf(out, today, loadBlock());
   fs.writeFileSync(new URL('../data/kosaf-open.json', import.meta.url), `${JSON.stringify(slim, null, 1)}\n`);
   console.log(`→ data/kosaf-open.json 저장 (마감 전 ${slim.count}건)`);
 } else {

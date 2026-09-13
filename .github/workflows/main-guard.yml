@@ -152,7 +152,9 @@ jobs:
           case "$reason" in
             conflict)  detail="양쪽이 같은 곳을 서로 다르게 고쳐서 자동으로 합칠 수 없습니다." ;;
             auditfail) detail="합치는 것까지는 됐지만 결과가 데이터 검사를 통과하지 못해 저장하지 않았습니다." ;;
-            pushfail)  detail="저장(push)이 3회 모두 실패했습니다." ;;
+            # 🔴 세 사유 가운데 **pushfail 하나만** 다시 돌려서 풀린다(다른 로봇과 저장이 부딪힌 것).
+            #    conflict·auditfail 은 다시 돌려도 같은 자리에서 또 막히므로 화면으로 부르지 않는다.
+            pushfail)  detail="저장(push)이 3회 모두 실패했습니다. 다른 로봇과 같은 순간에 저장하려다 부딪힌 것뿐이라면 한 번 더 돌리는 것으로 끝납니다 — 관리자 화면 → 로봇 (https://hanggonggan-admin.pages.dev/#robots) 의 「main 직접 수정 되가져오기」에서 지금 실행을 눌러 보세요." ;;
             *)         detail="실행 중 오류가 났습니다." ;;
           esac
 

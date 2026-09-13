@@ -105,12 +105,18 @@ jobs:
         run: |
           reason="${{ steps.sync.outputs.state }}"
           [ -z "$reason" ] && reason="error"
+          # 🔴 두 사유 가운데 **pushfail 하나만** 다시 돌려서 풀린다(다른 로봇과 저장이 부딪힌 것).
+          #    conflict 는 다시 돌려도 같은 자리에서 또 막히므로 화면으로 부르지 않는다 — 헛걸음 한 번이면
+          #    사람이 화면을 안 믿게 된다. $retry 에는 **상수 문자열만** 담는다(워크플로 입력이 셸에 흘러들지 않게).
+          retry=""
+          [ "$reason" = "pushfail" ] && retry="저장이 부딪힌 것뿐이라면 한 번 더 돌리는 것으로 끝납니다 — 관리자 화면 → 로봇 (https://hanggonggan-admin.pages.dev/#robots) 의 「배포 동기화」에서 지금 실행을 눌러 보세요."
           gh issue create \
             --title "🚨 앱 배포 동기화 실패 ($(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST)" \
             --repo "${{ github.repository }}" \
             --assignee "${{ github.repository_owner }}" \
             --body "기본 브랜치(claude/nice-heisenberg-WESq5)의 내용을 **main**(앱이 배포되는 브랜치)에
           자동으로 옮기지 못했습니다. 사유: \`$reason\`
+          $retry
 
           그동안 수집된 새 장학 공고가 **앱에 보이지 않는 상태**입니다.
           다음 Claude 세션에서 아래를 실행해 손으로 병합해 주세요.

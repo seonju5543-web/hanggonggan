@@ -130,6 +130,7 @@ const VENDOR_SRC = {
   'notice-source.mjs': 'collector/notice-source.mjs',
   'canon-url.mjs': 'collector/canon-url.mjs',
   'page-boilerplate.mjs': 'collector/page-boilerplate.mjs',
+  'edit-diff.mjs': 'tools/edit-diff.mjs',        // 관리자 수정 전후 대조 규칙 (2026-09-14)
 };
 const wantedVendor = [...adminJs.matchAll(/from\s+['"]\.\/vendor\/([^'"]+)['"]/g)].map((m) => m[1]);
 const unknownVendor = wantedVendor.filter((n) => !VENDOR_SRC[n]);

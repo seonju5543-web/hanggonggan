@@ -145,8 +145,11 @@ if (fs.existsSync(shPath) && fs.existsSync(wfPath)) {
    *   전부 build.sh 안에 실제로 쓰이는 꼴이다. 그래서 vendor 로 가는 cp 줄을 통째로 잡고
    *   그 줄 안에서 collector/ 로 시작하는 조각을 고른다. */
   const vendorCpLines = [...sh.matchAll(/^\s*cp\s+[^\n]*\$OUT"?\/vendor\b[^\n]*$/gm)].map((m) => m[0]);
+  /* 🔴 `tools/` 까지 본다 (2026-09-14) — 관리자 수정 전후 대조 규칙(tools/edit-diff.mjs)이
+   *   vendor 로 간다. `collector/` 만 보면 **tools 아래만 고치는 커밋**에서 이 대조가
+   *   그 파일을 아예 못 보고, verify-ui.yml 감시 목록에서 빠진 채 조용히 지나간다. */
   const fromCollector = [...new Set(
-    vendorCpLines.flatMap((line) => [...line.matchAll(/(?:^|[\s"'])(collector\/[^\s"']+)/g)].map((m) => m[1]))
+    vendorCpLines.flatMap((line) => [...line.matchAll(/(?:^|[\s"'])((?:collector|tools)\/[^\s"']+)/g)].map((m) => m[1]))
   )];
 
   /* 🔴 0개는 '없다'가 아니라 '못 읽었다'로 본다 — 옛 판은 0개일 때 조용히 초록불이었다.

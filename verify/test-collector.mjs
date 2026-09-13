@@ -5,6 +5,11 @@
 
    실행: node verify/test-collector.mjs   (실패하면 exit 1) */
 import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { spawnSync } from 'node:child_process';
+/* 관리자 수정 전후 대조 규칙 — 화면·저장소 공용 원본 (2026-09-14) */
+import { diffPatch } from '../tools/edit-diff.mjs';
 
 /* 🔴 파일은 **줄바꿈을 통일해서** 읽는다 (2026-09-06).
    윈도우에서는 git 의 core.autocrlf 가 체크아웃 때 줄바꿈을 CRLF 로 바꿔 준다(정상 설정이고,
@@ -16,7 +21,7 @@ import fs from 'node:fs';
       고칠 곳은 **읽는 쪽**이고, 그 자리는 여기 하나다. */
 const readText = (u) => fs.readFileSync(u, 'utf8').replace(/\r\n/g, '\n');
 // 하트비트 순수 함수 — 예약 간격 계산은 한 곳에만 둔다 (2026-09-06)
-import { hoursFor, cronsOf, isStale } from '../collector/robot-heartbeat.mjs';
+import { hoursFor, cronsOf, isStale, countField, runsPerWeek, everyWords } from '../collector/robot-heartbeat.mjs';
 /* 🔴 URL 을 파일 경로로 쓸 때는 .pathname 이 아니라 fileURLToPath 다.
    윈도우에서 .pathname 은 `/C:/…` 를 주는데 그건 유효한 경로가 아니라 파일을 못 열고
    자식 프로세스도 못 띄운다. 리눅스(클라우드 검사)에서는 멀쩡해서 **이 검사 5개가
@@ -38,7 +43,9 @@ import { checkFormCoverage } from '../collector/form-coverage.mjs';
 import { canonUrl as nsCanonUrl, hasText, looksLikeErrorPage } from '../collector/notice-source.mjs';
 /* 층2 첨부 — KOSAF 포털과 말하는 규칙은 kosaf-session.mjs 한 곳이다(베끼면 갈라진다) */
 import { parseFiles, filenameFrom, nameFromUrl, safeFileName, looksLikeHtml, sniffKind } from '../collector/kosaf-session.mjs';
-import { slimKosaf } from '../collector/kosaf-open.mjs';
+import { slimKosaf, blockKey } from '../collector/kosaf-open.mjs';
+/* 층2 빈 껍데기 — '비었나'의 판정은 collector/kosaf-empty.mjs 한 곳이다 */
+import { emptyVerdict, emptyShells, charsOfText, MIN_BODY_CHARS } from '../collector/kosaf-empty.mjs';
 
 let fail = 0;
 const eq = (label, got, want) => {
@@ -4230,8 +4237,29 @@ console.log('\n■ 하트비트 간격 계산 (브라우저·인터넷 불필요
 {
   eq('하루 2회면 12시간 간격', hoursFor(['41 22 * * *', '41 2 * * *']), 12);
   eq('하루 1회면 24시간', hoursFor(['23 5 * * *']), 24);
-  eq('요일이 지정되면 주 1회로 본다', hoursFor(['13 20 * * 1']), 168);
+  eq('요일이 **하나**면 주 1회', hoursFor(['13 20 * * 1']), 168);
   eq('예약이 없으면 판정하지 않는다', hoursFor([]), null);
+
+  /* 🔴 2026-09-13 수리 — 옛 판은 요일 칸이 `*` 가 아니기만 하면 무조건 168시간으로 봤다.
+     그래서 아래 둘이 조용히 틀렸고, **위 검사 넷은 그때도 전부 통과했다**(그게 이 버그가
+     오래 산 이유다). 요일·시각 칸에 **적힌 개수**를 세야 한다.
+     · 한국장학재단 수확은 월·목 주 2회인데 7일에 1회로 읽혀 경보 문턱이 21일이었다.
+       21일이면 층2 90곳 중 72곳이 이미 마감이다(실측) — 목록이 거의 빈 뒤에 알림이 온다.
+     · 인스타 댓글은 세 시간마다인데 '하루 1회'로 읽혔다(문턱 3일 → 9시간). */
+  eq('요일이 둘이면 주 2회 (kosaf-fetch: 월·목)', hoursFor(['53 20 * * 1,4']), 84);
+  eq('시각 칸의 건너뛰기를 센다 (insta-comments: 세 시간마다)', hoursFor(['29 */3 * * *']), 3);
+  eq('요일 범위를 센다 (평일만)', hoursFor(['0 9 * * 1-5']), 33.6);
+  eq('달이 지정되면 판정하지 않는다', hoursFor(['0 9 1 1 *']), null);
+  eq('  칸 하나 세기 — 전부', countField('*', 'hour'), 24);
+  eq('  칸 하나 세기 — 건너뛰기', countField('*/3', 'hour'), 8);
+  eq('  칸 하나 세기 — 나열', countField('1,4', 'dow'), 2);
+  eq('  칸 하나 세기 — 범위', countField('1-5', 'dow'), 5);
+  eq('  한 줄이 주당 몇 번', runsPerWeek('53 20 * * 1,4'), 2);
+  /* 🔴 84시간을 '4일에 1회'라고 적으면 사람이 읽는 뜻이 어긋난다 */
+  eq('사람이 읽는 간격 문구 — 주 2회', everyWords(84), '주 2회');
+  eq('  하루 8회', everyWords(3), '하루 8회');
+  eq('  7일에 1회', everyWords(168), '7일에 1회');
+  eq('  판정 못 한 것은 그렇게 적는다', everyWords(null), '판정 안 함');
   /* 주석에 적힌 cron 은 세지 않는다 — 세면 간격이 짧아져 헛알림이 난다 */
   eq('주석의 cron 은 안 센다',
     cronsOf("#    - cron: '2 3 * * *'\n    - cron: '4 5 * * *'"), ['4 5 * * *']);
@@ -4240,6 +4268,20 @@ console.log('\n■ 하트비트 간격 계산 (브라우저·인터넷 불필요
   eq('  3배 안이면 정상 (GitHub 이 몇 시간 미루는 건 정상이다)',
     isStale(24, '2026-09-04T12:00:00Z', now), false);
   eq('  성공 기록이 아예 없으면 조용한 것', isStale(24, null, now), true);
+
+  /* 🔴 위 검사들은 **글자로 쓴 cron** 을 본다 — 셈이 되돌아가면 잡히지만, 저장소의 진짜
+     예약이 어떻게 읽히는지는 못 본다. 층2 수확이 정확히 그 자리에서 조용히 틀렸다:
+     월·목(주 2회)인데 '주 1회'로 읽혀 경보 문턱이 21일이었고, 21일이면 층2 90곳 중
+     72곳이 이미 마감이다(실측). 그래서 **진짜 파일**로 한 번 더 잰다. */
+  const wfOf = (f) => readText(new URL(`../.github/workflows/${f}`, import.meta.url));
+  const kosafH = hoursFor(cronsOf(wfOf('kosaf-fetch.yml')));
+  eq('한국장학재단 수확의 예약을 진짜 파일에서 읽는다', typeof kosafH === 'number', true);
+  eq('  주 1회보다 자주 도는 것으로 읽는다 (요일 셈이 되돌아가면 여기서 걸린다)',
+    kosafH < 168, true);
+  eq('  사람이 읽는 문구도 주 1회가 아니다', everyWords(kosafH) !== '7일에 1회', true);
+  /* 인스타 댓글은 세 시간마다다 — '하루 1회'로 읽히면 문턱이 3일이 된다 */
+  const cmtH = hoursFor(cronsOf(wfOf('insta-comments.yml')));
+  eq('  인스타 댓글은 하루 한 번보다 자주 도는 것으로 읽는다', typeof cmtH === 'number' && cmtH < 24, true);
 }
 
 console.log('\n■ 검사가 개발자 컴퓨터에서만 실패하지 않는다 (2026-09-06)');
@@ -5394,6 +5436,659 @@ console.log('\n■ 층2 첨부 — 앱이 그 파일을 실제로 열 수 있게
   /* 🔴 층2 의 sourceUrl 은 KOSAF 가 아니라 그 재단 홈페이지다 — 이름을 틀리면 거짓말이 된다 */
   eq('층2 원문 링크를 재단 홈페이지라고 부른다', /sourceKind === 'kosaf' \? '재단 홈페이지 ↗'/.test(appjs), true);
   eq('층2 사본을 첨부로 넘긴다', /attachments: i\.files\.map/.test(appjs), true);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   층2 빈 껍데기 — 재단이 '선발공고문' 자리에 올려 둔 **속이 빈 파일** (2026-09-13)
+
+   학생이 층2의 유일한 공고 원문을 눌렀는데 빈 문서가 열리는 것은 안내가 아니라 헛걸음이다.
+   실측(사본 70개 전수): 증명된 빈 것 5개(0·0·5·8·29자) · 진짜 공고문의 최소 823자 ·
+   **못 읽은 것 10개**(스캔 PDF 5 · 포스터 JPG 5 — 학생은 그림으로 읽는다).
+   ══════════════════════════════════════════════════════════════════════════ */
+console.log('\n■ 층2 빈 껍데기 판정 (collector/kosaf-empty.mjs)');
+{
+  /* ① 열어 본 글자로 가른다 — 문턱은 증명된 빈 것(29자)과 진짜 공고문(823자) 사이 */
+  eq('글자가 0자면 빈 것', emptyVerdict({ name: '공고문 없음.hwp', chars: 0 }).empty, true);
+  eq('글자가 29자여도 빈 것', emptyVerdict({ name: '선발 공고문 없음.hwp', chars: 29 }).empty, true);
+  eq('글자가 823자면 진짜 공고문', emptyVerdict({ name: '영축총림 장학금 신청 안내.hwp', chars: 823 }).empty, false);
+  eq('문턱은 200자', MIN_BODY_CHARS, 200);
+  /* ② 🔴 **'못 읽음'은 '비었음'이 아니다** — 이 한 줄을 지우면 스캔 PDF·포스터 JPG 10건이
+        학생 화면에서 통째로 사라진다(원칙 8-1: 확인 안 한 것을 단정하지 않는다). */
+  eq('못 읽은 것은 숨기지 않는다 (스캔 PDF)',
+    emptyVerdict({ name: '2026년도_하반기_장학생_선발계획_공고문.pdf', chars: null }).empty, false);
+  eq('  포스터 JPG 도 마찬가지', emptyVerdict({ name: '석성2026.jpg', chars: null }).empty, false);
+  eq('  왜 안 숨겼는지 말한다', emptyVerdict({ name: 'x.pdf', chars: null }).why, '열지 못함(이미지·스캔)');
+  /* ③ 🔴 이름은 증거일 뿐 근거가 아니다 — 이름이 멀쩡해도 속이 비면 내린다 */
+  eq('이름이 멀쩡해도 속이 비면 내린다', emptyVerdict({ name: '2026 선발계획 공고.hwp', chars: 3 }).empty, true);
+  eq('이름이 "공고문 없음"이어도 내용이 있으면 안 내린다',
+    emptyVerdict({ name: '공고문 없음.hwp', chars: 1200 }).empty, false);
+  /* ④ 사유는 사람이 읽고 되살릴지 정하는 근거라 **숫자를 적는다**(지어내지 않는다) */
+  eq('사유에 글자 수를 적는다', emptyVerdict({ name: '공고문 없음.hwp', chars: 5 }).why,
+    "열어 보니 글자가 5자 · 파일 이름도 '공고문 없음.hwp'");
+  /* ⑤ 공백은 빼고 센다 — 개행 두 바이트를 '2자'로 세면 빈 파일이 안 걸린다 */
+  eq('공백은 글자로 세지 않는다', charsOfText('\n \t\r\n'), 0);
+  /* ⑥ 목록에서 뽑기 — 파일이 없는 재단은 아무것도 내놓지 않는다 */
+  const items = [
+    { code: 'A', org: '가재단', files: [{ name: '공고문 없음.hwp', path: 'p/a' }, { name: '진짜.hwp', path: 'p/b' }] },
+    { code: 'B', org: '나재단' },
+  ];
+  const chars = (p) => ({ 'p/a': 4, 'p/b': 5000 }[p] ?? null);
+  eq('빈 첨부만 골라낸다', emptyShells(items, chars).map((x) => [x.code, x.file]), [['A', '공고문 없음.hwp']]);
+}
+
+console.log('\n■ 층2 제외 장부 (collector/kosaf-block.json → slimKosaf)');
+{
+  const today = '2026-09-13';
+  const data = { items: [
+    { code: 'A', org: '가재단', name: '장학생', goods: '장학금', due: '2026-12-01',
+      detail: { 신청기간: '~12/1' },
+      mirror: { files: [{ name: '공고문 없음.hwp', path: 'data/kosaf-files/A/공고문 없음.hwp', bytes: 1 },
+                        { name: '진짜.hwp', path: 'data/kosaf-files/A/진짜.hwp', bytes: 2 }] } },
+    { code: 'B', org: '나재단', name: '장학생', goods: '장학금', due: '2026-12-01',
+      detail: { 신청기간: '~12/1' },
+      mirror: { files: [{ name: '공고.hwp', path: 'data/kosaf-files/B/공고.hwp', bytes: 3 }] } },
+  ] };
+  /* 🔴 장부가 비면 **예전과 글자 하나까지 같아야** 한다 — 아니면 이 장치가 기존 동작을 바꾼 것이다 */
+  eq('장부가 비면 예전과 똑같다',
+    JSON.stringify(slimKosaf(data, today)) === JSON.stringify(slimKosaf(data, today, { hidden: [], keep: [] })), true);
+  /* 🔴 첨부 하나를 내려도 **재단은 남는다** — 재단째 내리면 멀쩡히 모집 중인 장학금이 사라진다 */
+  const one = slimKosaf(data, today, { hidden: [{ code: 'A', file: '공고문 없음.hwp' }] });
+  eq('내린 첨부만 빠진다', one.items.find((i) => i.code === 'A').files.map((f) => f.name), ['진짜.hwp']);
+  eq('  재단은 그대로 남는다', one.count, 2);
+  /* 재단의 마지막 첨부를 내리면 files 키 자체가 안 생긴다 → 앱이 '선발 공고문' 머리말을 안 그린다 */
+  const gone = slimKosaf(data, today, { hidden: [{ code: 'B', file: '공고.hwp' }] });
+  eq('마지막 첨부를 내리면 files 키가 안 생긴다', 'files' in gone.items.find((i) => i.code === 'B'), false);
+  eq('  그래도 재단은 목록에 있다', gone.items.some((i) => i.code === 'B'), true);
+  /* 🔴 사람이 '자동 판정이 틀렸다'고 적은 것(keep)이 이긴다 */
+  const kept = slimKosaf(data, today, {
+    hidden: [{ code: 'A', file: '공고문 없음.hwp' }], keep: [{ code: 'A', file: '공고문 없음.hwp' }] });
+  eq('되살린 것이 내린 것을 이긴다', kept.items.find((i) => i.code === 'A').files.length, 2);
+  /* 파일 이름 없이 적으면 재단째 내린다(앞으로 쓸 자리) */
+  eq('파일 이름이 없으면 재단째 내린다', slimKosaf(data, today, { hidden: [{ code: 'B' }] }).count, 1);
+  /* 열쇠는 코드 + 파일 이름 둘이다 — 코드만 보면 같은 재단의 다른 첨부까지 내려간다 */
+  eq('열쇠는 코드와 파일 이름 둘', blockKey('A', '진짜.hwp') === blockKey('A', '공고문 없음.hwp'), false);
+}
+
+console.log('\n■ 층2 제외 장치가 배선돼 있다 (장부를 아무도 안 읽으면 장치가 없는 것이다)');
+/* 🔴 위 두 절은 **함수가 제대로 판정하는가**를 본다. 그런데 그 함수를 아무도 부르지 않으면
+   판정이 아무리 옳아도 빈 껍데기가 그대로 학생에게 나간다 — 그 경우 위 두 절은 **전부 초록**이다.
+   그래서 여기서는 「누가 부르는가」를 본다. 되돌아가는 길이 실제로 셋 있다:
+     ⓐ 앱 파일을 만드는 쪽(kosaf-fetch·kosaf-attach)이 장부를 안 넘긴다 → 내린 첨부가 되살아난다
+     ⓑ 저장 직전 관문(kosaf-check)에서 그 절이 사라진다 → 다음 회차가 조용히 나간다
+     ⓒ 장부 파일이 사라지거나 로봇과 다른 모양으로 저장된다 → 로봇 커밋과 파일 전체가 충돌한다 */
+{
+  const ROOT_K = fileURLToPath(new URL('..', import.meta.url));
+  const src = (f) => readText(path.join(ROOT_K, f));
+  /* ⚠️ 주석은 '부르는 자리'가 아니다 — 걷고 본다 (아래 ⓑ 주석 참조) */
+  const noComment = (t) => t.replace(/\/\*[\s\S]*?\*\//g, '')
+    .split('\n').filter((l) => !/^\s*\/\//.test(l)).join('\n');
+  /* ⓐ 앱 파일을 만드는 두 자리가 장부를 넘긴다 — 넘기지 않으면 slimKosaf 이 전부 통과시킨다 */
+  for (const f of ['collector/kosaf-fetch.mjs', 'collector/kosaf-attach.mjs']) {
+    eq(`  ${f} 가 장부를 읽어 넘긴다`, /slimKosaf\([^)]*loadBlock\(\)/.test(noComment(src(f))), true);
+  }
+  /* ⓑ 저장 직전 관문이 그 절을 갖고 있다.
+     ⚠️ **주석까지 세지 말 것** — 이 파일 머리말에 `판정은 emptyVerdict 한 곳에 있다` 라고
+        적혀 있어서, 부르는 자리를 통째로 들어내도 그 한 줄 때문에 초록불이었다(실측).
+        그래서 주석을 걷고 **부르는 모양**(`emptyVerdict(`)으로 본다. */
+  const check = noComment(src('collector/kosaf-check.mjs'));
+  eq('  저장 직전 관문이 빈 공고문을 본다',
+    /emptyVerdict\s*\(/.test(check) && /loadBlock\s*\(/.test(check), true);
+  eq('    사람이 되살린 것(keep)은 빼고 센다 (되살리기가 수확을 막으면 안 된다)',
+    /\bkeep\b/.test(check), true);
+  /* ⓒ 장부 파일 — 있고, 모양이 로봇과 같고, 줄마다 사유·날짜·주체가 있다.
+     🔴 들여쓰기 1칸은 취향이 아니다 — 자동 병합에서 뺀 파일과 같은 계열이라, 다르게 저장하면
+        로봇 커밋과 파일 전체가 충돌한다. */
+  const bp = path.join(ROOT_K, 'collector/kosaf-block.json');
+  eq('  내려 둔 공고문 장부가 있다', fs.existsSync(bp), true);
+  if (fs.existsSync(bp)) {
+    const raw = readText(bp);
+    const b = JSON.parse(raw);
+    eq('    들여쓰기 1칸으로 저장돼 있다 (로봇과 같은 모양)', raw === `${JSON.stringify(b, null, 1)}\n`, true);
+    eq('    내림·되살림 두 칸이 있다', Array.isArray(b.hidden) && Array.isArray(b.keep), true);
+    eq('    로봇이 실제로 내린 것이 있다 (빈 장부를 상대로 통과하지 않는다)', b.hidden.length > 0, true);
+    eq('    줄마다 코드·사유·날짜·주체가 있다',
+      b.hidden.concat(b.keep).filter((x) => !(x.code && x.why && x.at && x.by)), []);
+    /* 같은 첨부가 양쪽에 있으면 사람이 장부를 읽고 결과를 못 맞힌다 */
+    const keys = new Set(b.keep.map((x) => blockKey(x.code, x.file)));
+    eq('    같은 첨부가 내림·되살림에 동시에 있지 않다',
+      b.hidden.filter((x) => keys.has(blockKey(x.code, x.file))), []);
+  }
+  /* 판정의 원본은 한 곳 — 베끼면 로봇과 관문이 다른 말을 한다 */
+  eq('  판정을 베낀 곳이 없다 (원본은 kosaf-empty.mjs 하나)',
+    ['collector/kosaf-fetch.mjs', 'collector/kosaf-attach.mjs', 'collector/kosaf-check.mjs',
+      'collector/kosaf-open.mjs']
+      .filter((f) => /function\s+emptyVerdict\b/.test(noComment(src(f)))), []);
+  eq('  못 읽은 첨부는 숨기지 않는다 (스캔 PDF·포스터를 통째로 잃지 않게)',
+    emptyVerdict({ name: '선발공고문.pdf', chars: null }).empty, false);
+  eq('  MIN_BODY_CHARS 가 남아 있다 (문턱이 사라지면 전부 통과한다)',
+    typeof MIN_BODY_CHARS === 'number' && MIN_BODY_CHARS > 0, true);
+}
+
+console.log('\n■ 층2 — 앱 파일을 「열어 본 뒤」에 만든다 (워크플로 순서)');
+{
+  const yml = readText(new URL('../.github/workflows/kosaf-fetch.yml', import.meta.url));
+  /* 🔴 **이 순서가 이 장치의 전부다.** 글자 뽑기보다 앞에서 앱 파일을 만들면 사본이 처음
+     내려온 회차에 .txt 가 아직 없어 아무것도 안 걸러지고, 빈 껍데기가 한 회차 그대로 나간다.
+     관문보다 뒤면 관문이 옛 파일을 본다. */
+  const textStep = yml.indexOf('- name: 공고문에서 글자 뽑기');
+  const rebuild = yml.indexOf('- name: 앱 파일 다시 만들기');
+  const gate = yml.indexOf('- name: 관문 — 층2가 비거나');
+  eq('앱 파일 다시 만들기 단계가 있다', rebuild > 0, true);
+  eq('  글자 뽑기보다 뒤에 있다', textStep > 0 && rebuild > textStep, true);
+  eq('  관문보다 앞에 있다', gate > 0 && rebuild < gate, true);
+  eq('  그 단계가 kosaf-open.mjs --write 를 부른다',
+    /앱 파일 다시 만들기[\s\S]{0,200}node collector\/kosaf-open\.mjs --write/.test(yml), true);
+  /* 🔴 저장 목록에 없으면 매 실행 장부가 버려진다 — 사람이 내린 것이 되살아난다(이슈 #79 유형) */
+  eq('저장 목록에 내려 둔 공고문 장부가 있다', /git add collector\/kosaf-block\.json/.test(yml), true);
+  /* 로봇이 쓰는 파일은 전부 저장 목록에 있어야 한다 */
+  for (const f of ['data/kosaf.json', 'data/kosaf-open.json', 'data/kosaf-files'])
+    eq(`  저장 목록에 ${f}`, yml.includes(`git add ${f}`) || yml.includes(`git add -A ${f}`), true);
+}
+
+
+/* ══════════════════════════════════════════════════════════════════
+   관리자 화면 — 「무엇이 바뀌는가」·「무엇을 부를 수 있는가」 (2026-09-14)
+   ══════════════════════════════════════════════════════════════════ */
+
+/* 워크플로 yml 의 수동 실행(workflow_dispatch) 부분만 떼어 낸다.
+   🔴 yaml 라이브러리를 새로 끌어오지 않는다 — 이 검사는 의존성 0으로 도는 것이 값이다. */
+function dispatchSpec(yml) {
+  const lines = yml.split('\n');
+  /* ⚠️ 꼬리 주석(`workflow_dispatch:   # 수동 실행 버튼`)을 놓치면 멀쩡한 로봇을
+     '수동 실행이 안 된다'고 부른다 — 실제로 update-progress.yml 이 그 꼴이다. */
+  const start = lines.findIndex((l) => /^\s{0,2}workflow_dispatch:\s*(#.*)?$/.test(l));
+  if (start < 0) return null;
+  const base = lines[start].match(/^\s*/)[0].length;
+  const body = [];
+  for (let i = start + 1; i < lines.length; i++) {
+    const l = lines[i];
+    if (!l.trim() || /^\s*#/.test(l)) { body.push(l); continue; }
+    if (l.match(/^\s*/)[0].length <= base) break;
+    body.push(l);
+  }
+  const scalar = (rawText) => {
+    const t = String(rawText).trim();
+    const q = t.match(/^'((?:[^']|'')*)'/) || t.match(/^"((?:[^"\\]|\\.)*)"/);
+    if (q) return q[1].replace(/''/g, "'");
+    return t.replace(/\s+#.*$/, '').trim();
+  };
+  const inputs = {};
+  const iAt = body.findIndex((l) => /^\s*inputs:\s*$/.test(l));
+  if (iAt >= 0) {
+    const ind = body[iAt].match(/^\s*/)[0].length;
+    let cur = null;
+    for (let i = iAt + 1; i < body.length; i++) {
+      const l = body[i];
+      if (!l.trim() || /^\s*#/.test(l)) continue;
+      const at = l.match(/^\s*/)[0].length;
+      if (at <= ind) break;
+      const nameHit = l.match(/^\s*([A-Za-z_][\w-]*):\s*$/);
+      if (nameHit && at === ind + 2) { cur = nameHit[1]; inputs[cur] = { options: [] }; continue; }
+      if (!cur) continue;
+      const kv = l.match(/^\s*(type|default|required):\s*(.+)$/);
+      if (kv) { inputs[cur][kv[1]] = scalar(kv[2]); continue; }
+      if (/^\s*-\s+/.test(l)) inputs[cur].options.push(scalar(l.replace(/^\s*-\s+/, '')));
+    }
+  }
+  return { inputs };
+}
+
+/* admin.js 안의 배열 리터럴을 그대로 평가한다 — 설명이 함수(`() => …D.schools…`)라도
+   **부르지 않으므로** 안전하다. 정규식으로 칸을 긁으면 곧 어긋난다. */
+function arrayFromSource(src, name) {
+  const at = src.indexOf(`const ${name} = [`);
+  if (at < 0) return null;
+  const end = src.indexOf('\n];\n', at);
+  if (end < 0) return null;
+  const lit = src.slice(src.indexOf('[', at), end + 2);
+  // eslint-disable-next-line no-new-func
+  return new Function('D', `return ${lit};`)({ schools: [], targets: [] });
+}
+
+console.log('\n■ 관리자 수정 규칙이 한 벌인가 (화면 미리보기 ↔ 저장소)');
+{
+  const adminJs = readText(new URL('../_admin/admin.js', import.meta.url));
+  const applyJs = readText(new URL('../tools/admin-apply.mjs', import.meta.url));
+  const diffJs = readText(new URL('../tools/edit-diff.mjs', import.meta.url));
+
+  /* ① 화면이 규칙을 **스스로 정의하지 않는다** — 가져다 쓸 뿐이다 */
+  eq('화면이 EDIT_LABEL 을 스스로 정의하지 않는다', /(const|let|var)\s+EDIT_LABEL\s*=/.test(adminJs), false);
+  eq('화면이 diffPatch 를 스스로 정의하지 않는다', /function\s+diffPatch\b/.test(adminJs), false);
+  eq('화면이 공용 파일에서 가져온다', /from\s+'\.\/vendor\/edit-diff\.mjs'/.test(adminJs), true);
+  eq('build.sh 가 그 파일을 vendor 로 옮긴다',
+    /cp\s+tools\/edit-diff\.mjs\s+"\$OUT\/vendor\/edit-diff\.mjs"/.test(
+      readText(new URL('../_admin/build.sh', import.meta.url))), true);
+
+  /* ② 고칠 수 있는 칸 목록이 저장소와 같은가 — 한쪽에만 칸을 더하면 화면이 보낸 값이
+     **조용히 버려지거나**(ALLOWED 밖) 미리보기에 안 뜬다. */
+  const allowedOf = (src) => {
+    const at = src.indexOf('ALLOWED = new Set([');
+    const end = src.indexOf(']);', at);
+    return [...src.slice(at, end).matchAll(/'([a-zA-Z]+)'/g)].map((m) => m[1]).sort();
+  };
+  /* ⚠️ 이 파일에는 이름표 표가 둘 있다(EDIT_LABEL·ELIG_LABEL) — 블록을 잘라 내지 않으면
+     자격 칸 이름까지 섞여 들어와 늘 빨간불이다(만들면서 실제로 그랬다). */
+  const labelBlock = diffJs.slice(diffJs.indexOf('EDIT_LABEL = {'), diffJs.indexOf('\n};', diffJs.indexOf('EDIT_LABEL = {')));
+  const labelKeys = [...labelBlock.matchAll(/^  ([a-zA-Z]+):\s*'/gm)].map((m) => m[1]);
+  eq('고칠 수 있는 칸 목록이 저장소와 같다', allowedOf(applyJs), [...new Set(labelKeys)].sort());
+  const eligKeysOf = (src) => {
+    const at = src.indexOf('ELIG_KEYS = {');
+    const end = src.indexOf('};', at);
+    return [...src.slice(at, end).matchAll(/^\s{2}([a-zA-Z]+):/gm)].map((m) => m[1]).sort();
+  };
+  eq('기계 판정용 자격 칸 목록도 같다', eligKeysOf(applyJs), eligKeysOf(diffJs));
+
+  /* ③ 🔴 **진짜 대조** — 같은 patch 를 넣어 저장소를 실제로 돌리고, 화면이 예고한
+     '바뀌는 칸'과 '바뀐 뒤 값'이 그대로인지 본다. 칸 이름만 대면 안 된다:
+     `'0'` 과 `0` 은 칸 이름이 같아도 값이 다르다(되돌림 실험으로 확인했다). */
+  const base = {
+    id: 'x1', name: '테스트 장학금', type: '교외', provider: '테스트재단',
+    amount: '100만원', amountValue: 1000000, summary: '요약', sourceUrl: 'https://example.com/a',
+    eligibility: { schoolOnly: '경희대학교', years: [1, 2] }, documents: ['재학증명서'],
+    deadline: '2026-12-01', noForm: '양식 없음',
+  };
+  const CASES = [
+    ['years 문자열이 같은 배열로 풀리면 안 바뀐 것이다', { eligibility: { schoolOnly: '경희대학교', years: '1,2' } }],
+    ['years 가 실제로 달라지면 바뀐 것이다', { eligibility: { schoolOnly: '경희대학교', years: '1,2,3' } }],
+    ['빈 문자열은 칸을 지운다', { note: '' }],
+    ["amountValue 는 숫자로 들어간다 ('0')", { amountValue: '0' }],
+    ['학교 한정만 빼기 (C2)', { eligibility: { years: [1, 2] } }],
+    ['같은 값이면 아무것도 안 바뀐다', { name: '테스트 장학금' }],
+    ['마감일', { deadline: '2026-11-30' }],
+    ['자격 문장', { eligibilityLines: '재학생\n성적 3.0 이상' }],
+  ];
+  const script = fileURLToPath(new URL('../tools/admin-apply.mjs', import.meta.url));
+  for (const [label, patch] of CASES) {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'admdiff-'));
+    fs.mkdirSync(path.join(dir, 'data'), { recursive: true });
+    fs.writeFileSync(path.join(dir, 'data/registered.json'),
+      `${JSON.stringify({ items: [JSON.parse(JSON.stringify(base))] }, null, 1)}\n`);
+    fs.writeFileSync(path.join(dir, 'data/forms.json'), JSON.stringify({ forms: {} }));
+    const r = spawnSync(process.execPath, [script], {
+      cwd: dir, encoding: 'utf8',
+      env: { ...process.env, ACTION: 'edit', ACTOR: 'gate', PAYLOAD: JSON.stringify({ edits: [{ id: 'x1', patch }] }) },
+    });
+    const out = `${r.stdout || ''}${r.stderr || ''}`;
+    const m = out.match(/x1 — ([^\n]*)/);
+    const repoKeys = (r.status === 0 && m) ? m[1].split(',').map((x) => x.trim()).sort() : [];
+    const rows = diffPatch(base, patch);
+    eq(`  ${label}`, rows.map((d) => d.key).sort(), repoKeys);
+    if (r.status === 0) {
+      const after = JSON.parse(readText(path.join(dir, 'data/registered.json'))).items[0];
+      const wrong = rows.filter((d) => JSON.stringify(after[d.key]) !== JSON.stringify(d.after))
+        .map((d) => `${d.key}: 저장소 ${JSON.stringify(after[d.key])} / 화면 ${JSON.stringify(d.after)}`);
+      eq('    바뀐 뒤 값까지 같다', wrong, []);
+    }
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+}
+
+console.log('\n■ 경고를 고치는 로봇은 실재하고, 부르는 모양이 있다');
+{
+  const { checkEntry, FIX_PLAN } = createRequire(import.meta.url)('./entry-rules.cjs');
+  const wfDir = fileURLToPath(new URL('../.github/workflows/', import.meta.url));
+  /* 규칙이 내주는 `fix` 를 전부 모은다 — 픽스처로 모든 가지를 한 번씩 켠다 */
+  const fixes = new Set();
+  const probes = [
+    {}, { sourceUrl: 'https://x.kr/list.do?bbs=1' }, { sourceUrl: 'https://x.kr/a#n-제목' },
+    { eligibilityLines: ['재학생'], formId: 'a' },
+  ];
+  probes.forEach((p) => (checkEntry(p) || []).forEach((x) => { if (x.fix) fixes.add(x.fix); }));
+  /* 🔴 **개수가 아니라 이름으로 못 박는다** (2026-09-14). `>= 3` 만 보던 판은 하나를 떼고
+     다른 하나를 더하면 그대로 통과했다 — 그러면 화면의 '고치기' 버튼이 조용히 사라진다
+     (경고는 그대로 뜨는데 고칠 길만 없어지므로 아무도 못 알아챈다).
+     새 원인에 `fix` 를 붙이는 것은 환영이다 — 그때 이 목록에 이름을 더하면 된다. */
+  eq('경고를 고치는 로봇 이름이 그대로다', [...fixes].sort(),
+    ['deep-fetch.yml', 'eligibility-fill.yml', 'resolve-detail-urls.yml']);
+  eq('  fix 를 붙인 원인이 있다 (헛도는 검사가 아니다)', fixes.size >= 3, true);
+  for (const f of fixes) {
+    const file = path.join(wfDir, f);
+    eq(`  ${f} 가 실재한다`, fs.existsSync(file), true);
+    if (!fs.existsSync(file)) continue;
+    const spec = dispatchSpec(readText(file));
+    eq(`  ${f} 를 손으로 부를 수 있다`, !!spec, true);
+    /* 🔴 **기본값이 위험한 로봇은 화면이 값을 보내야 한다.** eligibility-fill 의 mode 기본값은
+       '전부'(전수 약 2,229원)이고 deep-fetch 의 form_targets 기본값은 엉뚱한 공고('조병두')다.
+       입력이 있는데 FIX_PLAN 이 없으면 버튼 한 번이 그 기본값을 그대로 돌린다. */
+    /* 🔴 **화면이 뜻을 정해 보내야 하는 입력**만 따진다 —
+       고르는 상자 · 필수 · '빈칸이 아닌 기본값'(deep-fetch 의 '조병두', eligibility-fill 의 '전부').
+       기본값이 false·빈칸인 boolean(resolve-detail-urls 의 dry)은 그냥 눌러도 안전하다. */
+    const names = Object.keys((spec && spec.inputs) || {}).filter((k) => {
+      const d = spec.inputs[k];
+      return d.type === 'choice' || String(d.required) === 'true'
+        || (d.type === 'string' && d.default && d.default !== "''" && d.default !== '');
+    });
+    if (names.length) {
+      const plan = FIX_PLAN[f];
+      eq(`  ${f} 에 부르는 모양(FIX_PLAN)이 있다`, !!(plan && plan.main), true);
+      const sends = { ...((plan && plan.main && plan.main.inputs) || {}) };
+      if (plan && plan.main && plan.main.arg) sends[plan.main.arg] = '(화면이 채운다)';
+      eq(`  ${f} 가 첫 입력 '${names[0]}' 을 빈칸으로 두지 않는다`, names[0] in sends, true);
+    }
+  }
+  /* FIX_PLAN 이 보내는 고르는 값은 yml 의 선택지와 한 글자도 달라선 안 된다 */
+  Object.keys(FIX_PLAN).forEach((f) => {
+    const spec = dispatchSpec(readText(path.join(wfDir, f)));
+    ['main', 'all'].forEach((which) => {
+      const p = FIX_PLAN[f][which];
+      Object.keys((p && p.inputs) || {}).forEach((k) => {
+        const decl = (spec.inputs || {})[k];
+        eq(`  ${f} ${which}.${k} 가 워크플로의 선택지 안에 있다`,
+          !decl || decl.type !== 'choice' || decl.options.includes(p.inputs[k]), true);
+      });
+    });
+  });
+}
+
+console.log('\n■ 관리자 화면 로봇 목록 — 화면이 부를 수 있는 것이 전부다');
+{
+  const adminJs = readText(new URL('../_admin/admin.js', import.meta.url));
+  const wfDir = fileURLToPath(new URL('../.github/workflows/', import.meta.url));
+  const robots = arrayFromSource(adminJs, 'ROBOTS');
+  eq('ROBOTS 목록을 읽어 냈다 (못 읽으면 아래가 헛돈다)', Array.isArray(robots) && robots.length > 20, true);
+  /* 🔴 **여기서 빠지면 그 로봇은 사람이 손으로 못 부른다** — 예약만 남으므로 층2처럼
+     '다음 월·목까지 기다린다'가 된다. 목록이 27종이라 하나가 빠져도 길이로는 안 보인다.
+     아래 다섯은 화면에서 부를 일이 실제로 있는 것들이라 이름으로 못 박는다.
+     ⚠️ 새 로봇을 더하는 것은 막지 않는다 — 이 다섯이 **빠지는 것**만 막는다. */
+  for (const f of ['kosaf-fetch.yml', 'collect-scholarships.yml', 'browser-collect.yml',
+    'deep-fetch.yml', 'eligibility-fill.yml']) {
+    eq(`  ${f} 가 화면 목록에 있다`, robots.some((r) => r.f === f), true);
+  }
+
+  const specs = new Map();
+  robots.forEach((r) => {
+    const file = path.join(wfDir, r.f);
+    eq(`  ${r.f} 가 실재한다`, fs.existsSync(file), true);
+    if (!fs.existsSync(file)) return;
+    const spec = dispatchSpec(readText(file));
+    specs.set(r.f, spec);
+    eq(`  ${r.f} 를 손으로 부를 수 있다`, !!spec, true);
+    if (!spec) return;
+    (r.inputs || []).forEach((i) => {
+      const decl = spec.inputs[i.name];
+      eq(`  ${r.f} 의 입력 '${i.name}' 이 워크플로에 있다`, !!decl, true);
+      if (!decl) return;
+      if (i.kind === 'choice') {
+        eq(`  ${r.f} '${i.name}' 의 선택지가 워크플로와 한 글자도 다르지 않다`, i.options, decl.options);
+        eq(`  ${r.f} '${i.name}' 의 미리 고른 값이 선택지 안에 있다`, decl.options.includes(i.def), true);
+      }
+    });
+    /* 🔴 필수 입력을 화면이 모르면 GitHub 이 422 로 거부한다 — 눌러 봐야만 보이는 실패다 */
+    Object.keys(spec.inputs).filter((k) => String(spec.inputs[k].required) === 'true').forEach((k) => {
+      eq(`  ${r.f} 의 필수 입력 '${k}' 을 화면이 선언했다`,
+        (r.inputs || []).some((i) => i.name === k), true);
+    });
+  });
+
+  /* 🔴 일부러 안 넣은 둘 — 되돌리지 말 것 */
+  const notListed = [...((adminJs.match(/const ROBOT_NOT_LISTED = \[([^\]]*)\]/) || [])[1] || '')
+    .matchAll(/'([^']+)'/g)].map((m) => m[1]);
+  eq("'이 기기에서 배포' 는 목록에 없다 (수동 실행에서는 아무것도 배포하지 않는다)",
+    robots.some((r) => r.f === 'device-deploy.yml'), false);
+  eq('일회용 로봇도 목록에 없다', robots.some((r) => r.f === 'two-school-scan.yml'), false);
+  eq('  그 둘을 화면이 정직하게 밝힌다',
+    notListed.includes('device-deploy.yml') && notListed.includes('two-school-scan.yml'), true);
+
+  /* ⑥ 화면이 **아예 못 부르는** 워크플로를 센다 — 새 로봇이 생기면 여기서 말해 준다.
+     인스타·관리자 조정은 ROBOTS 에 없지만 화면이 다른 자리에서 부른다(파일 이름이 admin.js 에 있다). */
+  const all = fs.readdirSync(wfDir).filter((f) => f.endsWith('.yml'))
+    .filter((f) => dispatchSpec(readText(path.join(wfDir, f))));
+  /* 🔴 '일부러 안 넣었다'고 적어 둔 줄은 **부르는 자리가 아니다** — 빼고 센다.
+     안 빼면 그 줄 때문에 못 부르는 워크플로가 0개로 보여 이 검사가 통째로 무력해진다. */
+  const calls = adminJs
+    .replace(/\/\*[\s\S]*?\*\//g, '')            // 주석은 부르는 자리가 아니다
+    .split('\n').filter((l) => !/^\s*\/\//.test(l)).join('\n')
+    .replace(/const ROBOT_NOT_LISTED = \[[^\]]*\]/, '');
+  const unreachable = all.filter((f) => !calls.includes(f));
+  eq(`화면이 못 부르는 워크플로 (지금 ${unreachable.length}개: ${unreachable.join(' · ')})`,
+    unreachable.sort(), ['device-deploy.yml', 'two-school-scan.yml']);
+}
+
+console.log('\n■ 안내문이 사람을 화면으로 부른다 (채팅으로 되돌아가면 실패)');
+/* 🔴 2026-09-14 — 로봇이 넘어지거나 컨펌을 기다릴 때 안내문이 "다음 세션에 이렇게 말하세요"
+   라고만 적고 있었다. 그런데 그 일들은 **관리자 화면에 이미 버튼이 있다**(작업대 · 로봇 ·
+   인스타). 그래서 안내문을 화면 주소로 바꿨다.
+   되돌아가는 길은 셋이다 — ⓐ 문장이 다시 채팅으로 돌아간다 ⓑ 링크가 **없는 화면 이름**을
+   가리킨다(화면은 조용히 첫 화면으로 보낸다 — 아무도 깨진 줄 모른다) ⓒ 「」 안의 로봇
+   이름이 화면의 이름과 어긋난다(사람이 그 이름을 화면에서 못 찾는다). 셋 다 여기서 막는다. */
+{
+  const adminJs = readText(new URL('../_admin/admin.js', import.meta.url));
+  const ROOT_DIR = fileURLToPath(new URL('..', import.meta.url));
+  const SCREENS = JSON.parse((adminJs.match(/const SCREENS = (\[[^\]]*\])/) || [])[1].replace(/'/g, '"'));
+  const robotNames = (arrayFromSource(adminJs, 'ROBOTS') || []).map((r) => r.n);
+
+  /* 사람에게 뜨는 안내문이 사는 곳 — 워크플로 · 공용 액션 · 수집 로봇 · 인스타 */
+  const files = [];
+  const walk = (rel) => {
+    for (const e of fs.readdirSync(path.join(ROOT_DIR, rel), { withFileTypes: true })) {
+      const next = `${rel}/${e.name}`;
+      /* extracted·pub·node_modules 는 **로봇이 받아 온 남의 글**이라 안내문이 아니다 */
+      if (e.isDirectory()) { if (!['extracted', 'node_modules', 'pub', 'kosaf-files'].includes(e.name)) walk(next); }
+      else if (/\.(yml|yaml|mjs|js|json|md|txt)$/.test(e.name)) files.push(next);
+    }
+  };
+  ['.github/workflows', '.github/actions', 'collector', 'insta'].forEach(walk);
+  const read = (f) => readText(path.join(ROOT_DIR, f));
+  eq('안내문이 사는 파일을 실제로 훑었다 (빈 목록을 상대로 통과하지 않는다)', files.length > 40, true);
+
+  /* ① 링크가 가리키는 화면 이름이 실재하는가.
+     🔴 admin.js 의 show()·screenFromHash() 는 모르는 이름을 **오류 없이** 기본 화면으로
+        보낸다 — 그래서 오타 난 링크는 눌러도 아무 표시가 없다. 여기서만 잡힌다. */
+  let linked = 0;
+  for (const f of files) {
+    for (const [, name] of read(f).matchAll(/hanggonggan-admin\.pages\.dev\/?#([A-Za-z-]+)/g)) {
+      linked += 1;
+      eq(`  ${f}: #${name} 은 실재하는 화면이다 (SCREENS=${SCREENS.join(',')})`, SCREENS.includes(name), true);
+    }
+  }
+  eq('  화면으로 부르는 링크가 하나라도 있다', linked > 0, true);
+
+  /* ② 정식 등록 컨펌 — 채팅이 아니라 작업대로 부른다 (양식·자격은 여전히 채팅이다) */
+  const collect = read('collector/collect.mjs');
+  const confirmLine = collect.split('\n').find((l) => l.includes('등록하는 곳'));
+  eq('수집 리포트의 컨펌 안내가 작업대(#review)를 가리킨다',
+    !!confirmLine && confirmLine.includes('hanggonggan-admin.pages.dev/#review'), true);
+  /* ⚠️ 전부 화면으로 보내면 거짓말이 된다 — 양식 스키마화·자격 판정은 화면에 버튼이 없다 */
+  eq('  화면에 버튼이 없는 일(양식·자격)은 채팅이라고 함께 적는다',
+    /양식|자격/.test(collect.split('\n').filter((l) => l.trimStart().startsWith("'> ")).join('')), true);
+
+  /* ③ '지금 실행' 을 시키는 줄은 화면에 **실제로 있는 로봇 이름**을 댄다 */
+  eq('  화면의 로봇 이름을 읽어 냈다', robotNames.length > 20, true);
+  let called = 0;
+  for (const f of files) {
+    for (const line of read(f).split('\n')) {
+      if (!line.includes('#robots') || !line.includes('지금 실행')) continue;
+      called += 1;
+      const quoted = [...line.matchAll(/「([^」]+)」/g)].map((m) => m[1]);
+      eq(`  ${f}: 어느 로봇인지 「」 로 댄다`, quoted.length > 0, true);
+      quoted.forEach((n) => eq(`  ${f}: 「${n}」 은 화면에 있는 로봇 이름이다`, robotNames.includes(n), true));
+    }
+  }
+  eq('  로봇 화면으로 부르는 안내문이 하나라도 있다', called > 0, true);
+  /* 🔴 **어느 파일이 부르는지까지 못 박는다.** 개수만 세면 하나가 채팅으로 되돌아가도
+     나머지 셋이 남아 그대로 통과한다 — 되돌아간 그 로봇만 조용히 옛길로 돌아간다.
+     아래 넷은 넘어졌을 때 **다시 돌리는 것이 해법**이고 화면에 버튼이 있다.
+     ⚠️ 여기 없는 워크플로(push-health·robot-heartbeat·search-index·verify-ui)는
+        아직 화면 목록에 없어서 일부러 안 넣었다 — 넣으면 없는 버튼을 누르라고 하는 것이다. */
+  const callers = files.filter((f) => read(f).split('\n')
+    .some((l) => l.includes('#robots') && l.includes('지금 실행'))).sort();
+  eq('  로봇 화면으로 부르는 안내문이 있어야 할 곳에 그대로 있다', callers, [
+    '.github/workflows/browser-collect.yml', '.github/workflows/collect-scholarships.yml',
+    '.github/workflows/deploy-sync.yml', '.github/workflows/main-guard.yml',
+  ]);
+
+  /* ④ 🔴 **다시 돌려도 안 풀리는 사유를 화면으로 보내지 않는다.**
+     되가져오기가 실패하는 사유는 셋인데 재실행이 해법인 것은 pushfail 하나뿐이다.
+     conflict(내용이 부딪힘)·auditfail(데이터 관문 불통)은 사람이 파일을 고쳐야 하므로,
+     거기에 '화면에서 다시 실행' 을 적으면 사람이 버튼만 되풀이 누르게 된다. */
+  for (const f of ['.github/workflows/main-guard.yml', '.github/workflows/deploy-sync.yml',
+    '.github/workflows/device-deploy.yml']) {
+    for (const line of read(f).split('\n')) {
+      if (!/^\s*(conflict|auditfail)\)/.test(line)) continue;
+      eq(`  ${f}: ${line.trim().split(')')[0]} 가지는 화면으로 부르지 않는다`,
+        line.includes('hanggonggan-admin'), false);
+    }
+  }
+
+  /* ⑤ 톱니 — 관리자 주소가 박힌 파일 수. 늘어나면 '한 곳으로 모을 때인가'를 사람이 본다
+     (앱 주소가 8군데에 박혀 있다 하나를 놓쳐 메일 접수가 조용히 막힌 전례가 있다). */
+  const PINNED = [
+    '.github/workflows/admin-lock-check.yml', '.github/workflows/browser-collect.yml',
+    '.github/workflows/collect-scholarships.yml', '.github/workflows/deploy-sync.yml',
+    '.github/workflows/insta.yml', '.github/workflows/main-guard.yml',
+    'collector/collect.mjs', 'collector/report.md', 'insta/mail.mjs',
+  ].sort();
+  const found = files.filter((f) => read(f).includes('hanggonggan-admin.pages.dev')).sort();
+  eq(`관리자 주소가 박힌 파일은 ${PINNED.length}개 그대로다`, found, PINNED);
+
+  /* ⑥ 인스타 — 안내문이 대는 버튼 글자가 화면에 그대로 있는가 */
+  const insta = read('.github/workflows/insta.yml');
+  eq('인스타 안내문이 화면 버튼 글자를 그대로 인용한다', insta.includes('「이 판형으로 다시 그리기」'), true);
+  eq('  그 글자가 admin.js 버튼에 그대로 있다', adminJs.includes('이 판형으로 다시 그리기'), true);
+}
+
+console.log('\n■ 관리자 쓰기 — 되돌릴 수 없는 일 앞의 안전장치 (저장소를 실제로 돌려 본다)');
+/* 🔴 이 절은 **글자를 훑지 않는다** — `tools/admin-apply.mjs` 를 진짜 자식 프로세스로 돌려
+   파일이 어떻게 바뀌었는지 본다. 함수 이름만 찾는 검사는 그 함수를 부르지 않게 바꾸는
+   순간 조용히 통과한다(실제로 그렇게 무력해진 관문이 이 저장소에 있었다).
+
+   왜 여기서만 막을 수 있나 — 감사(`verify/audit-data.js`)는 **남은 것**만 본다.
+   사본 저장소에서 items 를 48 → 0 으로 비워도 감사는 종료코드 0이었다(실측).
+   그리고 감사를 고쳐 막으면 수집 워크플로가 그 감사를 관문으로 쓰므로, 로봇이 차단 목록을
+   반영해 지우는 **정상 삭제까지** 걸려 그날 수집분 저장이 통째로 멈춘다. */
+{
+  const script = fileURLToPath(new URL('../tools/admin-apply.mjs', import.meta.url));
+  /* 공고 N건짜리 사본 저장소를 만들고 한 가지 일을 시킨다 */
+  const run = (action, payload, n = 20) => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'admwrite-'));
+    fs.mkdirSync(path.join(dir, 'data'), { recursive: true });
+    fs.mkdirSync(path.join(dir, 'collector'), { recursive: true });
+    const items = Array.from({ length: n }, (_, i) => ({
+      id: `reg-t${i}`, name: `테스트 장학금 ${i}`, type: '교외', provider: '테스트재단',
+      amount: '금액 원문 확인', amountValue: 0, summary: '요약',
+      sourceUrl: `https://example.ac.kr/view.do?seq=${100 + i}`,
+      eligibility: { selective: true }, documents: ['재학증명서'],
+      deadline: '2026-12-01', noForm: '양식 없음', auto: true, listedAt: '2026-09-01',
+    }));
+    fs.writeFileSync(path.join(dir, 'data/registered.json'), `${JSON.stringify({ items }, null, 1)}\n`);
+    fs.writeFileSync(path.join(dir, 'data/forms.json'), JSON.stringify({ forms: {}, templates: {} }));
+    fs.writeFileSync(path.join(dir, 'collector/auto-register-config.json'),
+      `${JSON.stringify({ enabled: true, blockIds: [], blockUrls: [] }, null, 1)}\n`);
+    const r = spawnSync(process.execPath, [script], {
+      cwd: dir, encoding: 'utf8',
+      env: { ...process.env, ACTION: action, ACTOR: 'gate', PAYLOAD: JSON.stringify(payload) },
+    });
+    const after = JSON.parse(readText(path.join(dir, 'data/registered.json'))).items;
+    const cfg = JSON.parse(readText(path.join(dir, 'collector/auto-register-config.json')));
+    const out = `${r.stdout || ''}${r.stderr || ''}`;
+    fs.rmSync(dir, { recursive: true, force: true });
+    return { status: r.status, out, after, cfg, left: after.length };
+  };
+  const ids = (a, b) => Array.from({ length: b - a }, (_, i) => `reg-t${a + i}`);
+
+  /* ① 많이 지우기 — 건수를 숫자로 한 번 더 받지 않으면 **한 건도** 안 지운다 */
+  const big = run('remove', { ids: ids(0, 6) });
+  eq('여섯 건을 지우려는데 건수를 안 적으면 멈춘다', big.status !== 0, true);
+  eq('  그때 파일은 한 글자도 안 바뀐다 (반만 지워지지 않는다)', big.left, 20);
+  eq('  사람이 무엇을 해야 하는지 말한다 (지울 건수를 적는다)',
+    /한 번에 6건을 지우는 요청/.test(big.out) && /숫자로 한 번 더/.test(big.out), true);
+  const wrongN = run('remove', { ids: ids(0, 6), expect: 5 });
+  eq('  건수가 틀리면 멈춘다', wrongN.status !== 0 && wrongN.left === 20, true);
+  const okN = run('remove', { ids: ids(0, 6), expect: 6 });
+  eq('  건수가 맞으면 지운다', okN.status === 0 && okN.left === 14, true);
+  /* 🔴 '요청한 id 개수'가 아니라 **실제로 지워질 건수**와 댄다 — 없는 id 가 섞였으면
+     사람이 생각한 것과 다른 일이 벌어지는 중이다. */
+  const ghost = run('remove', { ids: [...ids(0, 6), 'reg-없는것', 'reg-없는것2'], expect: 8 });
+  eq('  없는 id 를 세어 준 건수는 안 받는다', ghost.status !== 0 && ghost.left === 20, true);
+  /* 작은 삭제까지 막으면 매번 숫자를 적게 돼 사람이 그 확인을 안 읽게 된다.
+     ⚠️ 목록이 50건일 때의 세 건이다 — 20건에서는 15%라 아래 비율 관문에 걸린다(실측). */
+  eq('작은 삭제(50건 중 세 건)는 그냥 지운다', run('remove', { ids: ids(0, 3) }, 50).left, 47);
+  /* 목록이 작으면 비율로도 걸린다 — 다섯 건 중 두 건은 40%다 */
+  eq('목록이 작을 때는 비율로 막는다 (다섯 중 둘)', run('remove', { ids: ids(0, 2) }, 5).status !== 0, true);
+  /* 되돌리기(revert)도 같은 관문을 지난다 — 한쪽만 막으면 뚫린 길이 남는다 */
+  const rv = run('revert', { ids: ids(0, 6) });
+  eq('되돌리기도 같은 관문을 지난다', rv.status !== 0 && rv.left === 20, true);
+
+  /* ② 되돌리기는 id 와 **주소를 함께** 막는다 — id 는 주소에서 파생돼 규칙이 바뀌면 무효가 된다
+     (2026-08-14 부경대: 규칙이 바뀌자 막아 둔 23건이 새 id 를 달고 돌아왔다). */
+  const rv1 = run('revert', { ids: ['reg-t0'] });
+  eq('되돌리면 id 를 차단 목록에 넣는다', (rv1.cfg.blockIds || []).includes('reg-t0'), true);
+  eq('  주소도 함께 넣는다 (id 파생 규칙이 바뀌어도 되살아나지 않게)',
+    (rv1.cfg.blockUrls || []).length, 1);
+
+  /* ③ 필수 칸을 빈칸으로 지우지 않는다 — 비면 학생 앱이 그 자리에서 죽는다 */
+  const blank = run('edit', { edits: [{ id: 'reg-t0', patch: { documents: '' } }] });
+  eq('요구 서류를 빈칸으로 지우려 하면 멈춘다', blank.status !== 0, true);
+  eq('  그때 옛 값이 그대로 남는다', blank.after[0].documents, ['재학증명서']);
+  eq('  이름도 마찬가지', run('edit', { edits: [{ id: 'reg-t0', patch: { name: '' } }] }).status !== 0, true);
+  /* 막기만 하고 고치는 길을 안 내주면 사람이 갇힌다 */
+  const fill = run('edit', { edits: [{ id: 'reg-t0', patch: { documents: '재학증명서\n성적증명서' } }] });
+  eq('  제대로 채우면 줄 단위로 저장된다', fill.after[0].documents, ['재학증명서', '성적증명서']);
+
+  /* ④ 달력에 없는 날을 저장하지 않는다 — 모양만 보면 `2026-13-01` 이 통과한다(실제 구멍이었다) */
+  eq('달력에 없는 달은 막는다', run('edit', { edits: [{ id: 'reg-t0', patch: { deadline: '2026-13-01' } }] }).status !== 0, true);
+  eq('달력에 없는 날은 막는다', run('edit', { edits: [{ id: 'reg-t0', patch: { deadline: '2026-02-30' } }] }).status !== 0, true);
+  eq('  있는 날은 저장된다',
+    run('edit', { edits: [{ id: 'reg-t0', patch: { deadline: '2026-11-30' } }] }).after[0].deadline, '2026-11-30');
+
+  /* ⑤ 자유 형식 제출 스위치는 **저장된 원문에 그 문장이 있을 때만** 켜진다 (운영 원칙 8-1·8-2) */
+  const made = run('edit', { edits: [{ id: 'reg-t0', patch: { prepDoc: true, prepDocBasis: '지어낸 문장입니다 자유 양식' } }] });
+  eq('원문에 없는 문장을 근거로 자유 형식 스위치를 켜지 않는다', made.status !== 0, true);
+  eq('  근거 없이 켜는 것도 막는다',
+    run('edit', { edits: [{ id: 'reg-t0', patch: { prepDoc: true } }] }).status !== 0, true);
+
+  /* ⑥ 새 동작을 더할 때 저장 목록에 넣는 것까지가 한 세트 (이슈 #79 유형 —
+     화면엔 "✅ 성공" 이 뜨는데 파일은 그대로) */
+  const applySrc = readText(new URL('../tools/admin-apply.mjs', import.meta.url));
+  const cases = [...applySrc.matchAll(/^\s{2}case '([a-zA-Z]+)':/gm)].map((m) => m[1]);
+  const writes = [...((applySrc.match(/const WRITES_REG = \[([^\]]*)\]/) || [])[1] || '')
+    .matchAll(/'([^']+)'/g)].map((m) => m[1]);
+  eq('저장소가 할 줄 아는 일을 읽어 냈다', cases.length > 8, true);
+  /* 🔴 `unblock`·`autoRegister`·`addBoard`·`formQueue` 는 공고 목록을 안 건드려 일부러 빠져 있다.
+     목록이 바뀌면 사람이 '이 동작도 공고 목록을 고치는가'를 한 번 본다. */
+  eq('공고 목록을 안 고치는 동작 목록이 그대로다',
+    cases.filter((c) => !writes.includes(c)).sort(),
+    ['addBoard', 'autoRegister', 'formQueue', 'unblock']);
+}
+
+console.log('\n■ 못 읽은 파일의 숫자를 화면이 단정하지 않는다');
+/* 🔴 관리자 화면이 말하는 「게시판 2곳」·「재단 90곳」은 전부 **파일에서 센 것**이다.
+   그 파일을 못 읽었을 때 조용히 빈 값으로 바꾸면 인터넷이 끊겨도 화면은 「0곳 · 모든
+   게시판 정상」이라고 말한다 — 확인하지 않은 것을 확인했다고 말하는 것이다(운영 원칙 8-1).
+   그래서 admin.js 의 `readJson` 은 실패를 **`D.failed` 에 적고**, 화면 맨 위가
+   「아래 숫자를 믿지 마세요」라고 말한다.
+   되돌아가는 길은 하나뿐이다 — 데이터 파일을 조용한 읽기(`quiet`)로 옮기는 것.
+   그러면 `D.failed` 가 비어 경고가 안 뜨고, 숫자만 0으로 남는다.
+   🔴 층2(한국장학재단) 파일을 화면에 붙일 때 정확히 이 길로 가기 쉽다 —
+      「아직 없을 수 있는 파일」처럼 보이기 때문이다. 여기서 막는다.
+   ⚠️ 이 절은 글자만 본다. **정말로 못 읽게 만들어 경고가 뜨는지**는 브라우저로 재야 하고
+      그 자리는 `verify/verify-admin.js` 의 「못 읽은 파일」 절이다. */
+{
+  const adminJs = readText(new URL('../_admin/admin.js', import.meta.url));
+  /* 실패를 적는 두 자리가 살아 있는가 — 응답이 나쁠 때와 아예 못 닿을 때 */
+  const readJsonBody = adminJs.slice(adminJs.indexOf('async function readJson('),
+    adminJs.indexOf('async function readText('));
+  eq('읽기 실패를 장부에 적는 자리가 둘이다 (응답이 나쁠 때 · 아예 못 닿을 때)',
+    (readJsonBody.match(/D\.failed\.push\(/g) || []).length, 2);
+  eq('  못 읽은 파일이 있으면 숫자를 믿지 말라고 말한다', /믿지 마세요/.test(adminJs), true);
+
+  /* 🔴 톱니 — 조용히 읽는 파일은 「아직 없을 수 있는 것」 넷뿐이다(계정 연결 전·견본 전).
+     data/ 나 collector/ 의 파일이 여기 들어오면 그 숫자는 못 읽어도 0으로 뜬다. */
+  const QUIET_OK = ['insta/comments.json', 'insta/samples/index.json',
+    'insta/stats.json', 'insta/token-seen.json'].sort();
+  const quietFiles = [...adminJs.matchAll(/\bquiet\('([^']+)'/g)].map((m) => m[1]).sort();
+  eq('조용히 읽는 파일은 「아직 없을 수 있는 것」 넷뿐이다', quietFiles, QUIET_OK);
+  eq('  그중 data/·collector/ 파일은 하나도 없다',
+    quietFiles.filter((f) => /^(data|collector)\//.test(f)), []);
+
+  /* loadAll 이 읽는 나머지는 전부 장부에 적히는 읽기여야 한다 */
+  const loadAll = adminJs.slice(adminJs.indexOf('async function loadAll()'),
+    adminJs.indexOf('\n}\n', adminJs.indexOf('D.log = ')));
+  const loud = [...loadAll.matchAll(/\breadJson\('([^']+)'/g)].map((m) => m[1]);
+  eq('장부에 적히는 읽기가 여럿이다 (헛도는 검사가 아니다)', loud.length >= 10, true);
+  eq('  data/·collector/ 파일은 전부 그쪽으로 읽는다',
+    [...loadAll.matchAll(/\b(readJson|quiet)\('((?:data|collector)\/[^']+)'/g)]
+      .filter((m) => m[1] !== 'readJson').map((m) => m[2]), []);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');

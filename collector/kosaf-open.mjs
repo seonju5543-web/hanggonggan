@@ -12,6 +12,28 @@
 
    실행: node collector/kosaf-open.mjs [--write]   (kosaf-fetch --write 가 자동으로 부른다) */
 import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { emptyShells, readChars } from './kosaf-empty.mjs';
+
+const ROOT = fileURLToPath(new URL('../', import.meta.url));
+/* 🔴 '층2에서 무엇을 학생에게 안 보일 것인가'는 **이 파일 하나**가 정한다.
+   로봇이 적은 줄(by:'로봇')과 사람이 적은 줄(by:<메일>)이 한 장부에 같이 산다. */
+export const BLOCK_PATH = path.join(ROOT, 'collector', 'kosaf-block.json');
+
+export const blockKey = (code, file) => `${code}\u0000${file || ''}`;
+
+export function loadBlock(file = BLOCK_PATH) {
+  try {
+    const j = JSON.parse(fs.readFileSync(file, 'utf8'));
+    return { updatedAt: j.updatedAt || '', hidden: j.hidden || [], keep: j.keep || [] };
+  } catch { return { updatedAt: '', hidden: [], keep: [] }; }
+}
+
+/* 로봇 기록장과 같은 모양으로 저장한다 — 들여쓰기 1칸(CLAUDE.md '데이터 파일 형식') */
+export function saveBlock(block, file = BLOCK_PATH) {
+  fs.writeFileSync(file, `${JSON.stringify(block, null, 1)}\n`);
+}
 
 /* 앱에 보여 줄 칸. KOSAF 가 채워 둔 20칸 중 **학생이 판단에 쓰는 것만** 남긴다.
    운영기관명·상품구분처럼 카드에 이미 있는 것과, 늘 '해당없음'인 칸은 뺀다. */
@@ -28,9 +50,19 @@ export function fixHome(u) {
   return '';
 }
 
-/** 마감 전인 것만, 앱이 쓰는 칸만 */
-export function slimKosaf(data, today) {
+/** 마감 전인 것만, 앱이 쓰는 칸만.
+    `block` 을 주면 거기 적힌 것을 학생 화면에서 내린다(장부가 비면 예전과 똑같이 동작한다).
+    🔴 내리는 단위는 둘이다 — `file` 이 있으면 **그 첨부 하나만**, 없으면 그 재단 통째로.
+       속이 빈 공고문 때문에 재단째 내리면, 멀쩡히 모집 중인 장학금 5건이 학생에게서
+       사라진다(실측: 가천문화재단·한진해운·동산·한국해기사협회·영국문화원).
+    🔴 `keep`(사람이 '자동 판정이 틀렸다'고 적은 것)은 `hidden` 을 이긴다. */
+export function slimKosaf(data, today, block = {}) {
+  const keep = new Set((block.keep || []).map((b) => blockKey(b.code, b.file)));
+  const hid = new Set((block.hidden || []).map((b) => blockKey(b.code, b.file))
+    .filter((k) => !keep.has(k)));
   const items = (data.items || [])
+    /* 재단째 내린 것 (지금은 안 쓰지만 앞으로 쓸 자리) */
+    .filter((i) => !hid.has(blockKey(i.code, '')))
     /* 🔴 `학자금`은 장학금이 아니라 **대여(대출)** 다 — 열려 있는 126건 중 14건이 그렇고,
        금액 칸에 `연 이율 4.0% / 상환기간: 5년`·`대여한도액`이 그대로 적혀 있다.
        갚아야 하는 돈을 '받을 수 있는 장학금' 목록에 넣는 것은 기망이다(운영 원칙 2·
@@ -57,6 +89,9 @@ export function slimKosaf(data, today) {
          학생에게 줄 주소가 아예 없다). */
       const files = ((i.mirror || {}).files || [])
         .filter((f) => f && f.path && /^data\/kosaf-files\//.test(f.path))
+        /* 🔴 내린 첨부는 앱 파일에 **실리지 않는다** — 그래서 앱 코드는 한 글자도 안 바뀐다.
+           files 가 비면 아래에서 키 자체가 안 생기고, 화면의 '선발 공고문' 머리말도 안 그려진다. */
+        .filter((f) => !hid.has(blockKey(i.code, f.name)))
         .map((f) => ({ name: f.name, path: f.path, bytes: f.bytes || 0 }));
       return { code: i.code, org: i.org, name: i.name, kind: i.kind,
         due: i.due || null, home: fixHome(i.home), fields,
@@ -67,12 +102,49 @@ export function slimKosaf(data, today) {
   return { updatedAt: data.updatedAt, source: data.source, count: items.length, items };
 }
 
+/* ── 장부를 새로 쓰는 곳은 **여기 하나**다 ──────────────────────────────────
+   순서가 이 설계의 전부다:
+     ① 장부 없이 한 번 추린다(마감·대출 거르기만) — 이것이 '지금 열려 있는 재단'의 정의다
+     ② 그 재단들의 첨부를 **열어 보고** 속이 빈 것을 고른다
+     ③ 사람이 적어 둔 줄 중 **이미 끝난 회차**의 것을 지운다(장부가 영영 쌓이지 않게)
+     ④ 로봇 줄을 ②로 통째로 갈아끼우고 장부를 저장한다
+     ⑤ 장부를 적용해 앱 파일을 만든다
+   🔴 ②는 글자 뽑기(.txt)가 끝난 **뒤**에 돌아야 한다 — 워크플로 단계 순서가 그래서 중요하다.
+      사본이 처음 내려온 회차에 이 단계를 먼저 돌리면 아무것도 안 걸러진다. */
 if (import.meta.url === `file://${process.argv[1]}`) {
+  const today = new Date().toISOString().slice(0, 10);
   const src = JSON.parse(fs.readFileSync(new URL('../data/kosaf.json', import.meta.url), 'utf8'));
-  const out = slimKosaf(src, new Date().toISOString().slice(0, 10));
+
+  const openBefore = slimKosaf(src, today);                                      // ①
+  const auto = emptyShells(openBefore.items, (f) => readChars(ROOT, f));         // ②
+
+  const block = loadBlock();
+  const openCodes = new Set(openBefore.items.map((i) => i.code));
+  const fullCodes = new Set((src.items || []).map((i) => i.code));
+  /* 🔴 지우는 근거는 '마감일'이 아니라 **'지금 열린 목록에 없다 + 전체 목록에는 있다'** 둘이다.
+     전체 목록에도 없으면(목록 파싱 실패·재단 삭제) **안 지운다** — 못 읽은 것을
+     '끝났다'로 읽지 않는다. 마감일 칸이 빈 재단(푸른등대 4곳)은 ①에 남아 있어 안 걸린다. */
+  const stale = (b) => !openCodes.has(b.code) && fullCodes.has(b.code);
+  const humanHidden = (block.hidden || []).filter((b) => b.by !== '로봇' && !stale(b));  // ③
+  const keep = (block.keep || []).filter((b) => !stale(b));
+  /* 🔴 사람이 적어 둔 줄은 로봇이 덮지 않는다 — 내린 것(hidden)도, 되살린 것(keep)도.
+     keep 을 안 거르면 로봇이 매 실행 같은 줄을 hidden 에 다시 적어, 장부에 '내림'과
+     '되살림'이 나란히 쌓인다(결과는 keep 이 이겨 같지만, 사람이 읽고 결과를 못 맞힌다). */
+  const taken = new Set([...humanHidden, ...keep].map((b) => blockKey(b.code, b.file)));
+  const robotRows = auto                                                          // ④
+    .filter((a) => !taken.has(blockKey(a.code, a.file)))
+    .map((a) => ({ code: a.code, file: a.file, org: a.org, why: a.why, by: '로봇', at: today }));
+  const next = { updatedAt: today, hidden: [...humanHidden, ...robotRows], keep };
+
+  const out = slimKosaf(src, today, next);                                        // ⑤
+  const hiddenFiles = next.hidden.filter((b) => b.file).length;
   console.log(`마감 전 ${out.count}건 (전체 ${src.items.length}건 중)`);
+  console.log(`첨부: ${openBefore.items.reduce((n, i) => n + (i.files || []).length, 0)}개 중 `
+    + `${hiddenFiles}개를 내렸다 (로봇 ${robotRows.length} · 사람 ${humanHidden.length} · 되살림 ${keep.length})`);
+  for (const b of next.hidden) console.log(`  · ${b.org || b.code} / ${b.file || '(재단째)'} — ${b.why}`);
   if (process.argv.includes('--write')) {
+    saveBlock(next);
     fs.writeFileSync(new URL('../data/kosaf-open.json', import.meta.url), `${JSON.stringify(out, null, 1)}\n`);
-    console.log('→ data/kosaf-open.json 저장');
+    console.log('→ collector/kosaf-block.json · data/kosaf-open.json 저장');
   } else console.log('(미리보기 — 저장하려면 --write)');
 }

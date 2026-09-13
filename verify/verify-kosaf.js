@@ -9,6 +9,8 @@
         · 상세 시트가 출처를 밝힌다
         · 첨부(선발공고문) 주소가 화면에 없다 — Referer 검사라 학생이 못 받는다
    실행: node verify/verify-kosaf.js   (CHROME_PATH + PORT) */
+const fs = require('node:fs');
+const path = require('node:path');
 const { chromium } = require('playwright-core');
 const { assertOwnServer } = require('./onboard-helper.js');
 const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
@@ -377,6 +379,73 @@ const PROFILE = {
       eq('  「요건 미충족」이라 단정하지 않는다', /미충족/.test(st.note), false);
       await page.keyboard.press('Escape');
       await page.waitForTimeout(250);
+    }
+  }
+
+  /* ══ 속이 빈 공고문은 학생 화면에 닿지 않는다 (2026-09-13) ═══════════════════
+     🔴 재단이 '선발공고문' 자리에 **속이 빈 파일**을 올려 둔 것이 실측 5건 있었다
+        (`공고문 없음.hwp` — 열어 보니 0·0·5·8·29자). 층2의 유일한 공고 원문을 눌렀는데
+        빈 문서가 열리는 것은 안내가 아니라 헛걸음이다.
+     🔴 내리는 것은 **첨부 하나**이지 재단이 아니다 — 재단째 내리면 멀쩡히 모집 중인
+        장학금 5건이 학생에게서 사라진다. 그래서 둘을 같이 잰다.
+     ⚠️ **조용히 건너뛰지 않는다** — 장부가 비는 날(그 재단들이 마감되면 온다)에는
+        같은 일을 픽스처로 흉내 내 같은 두 가지를 잰다. */
+  console.log('\n■ 속이 빈 공고문이 학생 화면에 닿지 않는가');
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(300);
+  {
+    const ledger = JSON.parse(fs.readFileSync(
+      path.join(__dirname, '..', 'collector', 'kosaf-block.json'), 'utf8'));
+    const rows = (ledger.hidden || []).filter((b) => b.file);
+    /* 앱 목록에 실제로 떠 있는 것만 고른다(마감·필터로 빠진 재단은 클릭할 수 없다) */
+    const pick = await page.evaluate((rs) => {
+      for (const r of rs) {
+        const it = kosafList.find((x) => x.code === r.code);
+        if (it) return { code: r.code, file: r.file, org: it.org,
+          hasFile: ((it.files || []).some((f) => f.name === r.file)) };
+      }
+      return null;
+    }, rows);
+    let target = pick;
+    if (pick) {
+      eq(`내려 둔 첨부가 앱 파일에 없다 (${pick.org} / ${pick.file})`, pick.hasFile, false);
+      eq('  그 재단은 층2 목록에 그대로 있다', true, true);
+    } else {
+      /* 장부가 비었거나 그 재단들이 마감됐다 — 같은 일을 흉내 내 **같은 것을** 잰다 */
+      console.log('  · 장부에 내려 둔 첨부가 지금 목록에 없어 픽스처로 잰다');
+      target = await page.evaluate(() => {
+        const it = kosafList.find((x) => (x.files || []).length);
+        if (!it) return null;
+        delete it.files;                     // slimKosaf 가 내렸을 때와 같은 모양
+        renderExplore();
+        return { code: it.code, org: it.org, file: '(픽스처)' };
+      });
+      eq('픽스처를 넣을 층2 재단이 있다', !!target, true);
+    }
+    if (target) {
+      const card = await page.$(`#explore-list [data-detail="kosaf-${target.code}"]`);
+      if (!card) { fail++; console.log(`  ✕ 그 재단 카드가 목록에 없다 (kosaf-${target.code})`); }
+      else {
+        await card.click();
+        await page.waitForSelector('#detail-sheet.show', { timeout: 4000 });
+        await page.waitForTimeout(200);
+        const got = await page.evaluate(() => {
+          const sheet = document.querySelector('#detail-sheet');
+          return {
+            links: [...sheet.querySelectorAll('a')]
+              .filter((a) => /kosaf-files/.test(a.getAttribute('href') || '')).length,
+            head: /선발 공고문/.test(sheet.textContent),
+            /* 재단 자체는 그대로 — 홈페이지 링크와 이름이 살아 있어야 한다 */
+            title: (sheet.querySelector('h2, h3, .ds-title') || {}).textContent || sheet.textContent.slice(0, 40),
+          };
+        });
+        eq('  상세 시트에 공고문 링크가 없다', got.links, 0);
+        /* 🔴 빈 목록만 남은 **껍데기 머리말**도 안 된다 — 학생이 '있다는데 없네' 를 겪는다 */
+        eq('  「선발 공고문」 머리말이 아예 없다', got.head, false);
+        eq('  그래도 재단 카드는 열린다 (장학금까지 내리지 않았다)', got.title.length > 0, true);
+        await page.keyboard.press('Escape');
+        await page.waitForTimeout(250);
+      }
     }
   }
 

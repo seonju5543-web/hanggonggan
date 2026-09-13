@@ -12,8 +12,30 @@
    실행: ACTION=<이름> PAYLOAD='<json>' node tools/admin-apply.mjs            */
 
 import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
-import { canonUrl } from '../collector/canon-url.mjs';
+import * as canon from '../collector/canon-url.mjs';
+import { indexTexts, sourceFor, hasText } from '../collector/notice-source.mjs';
+import { attachmentText, readable } from '../collector/attachment-text.mjs';
+
+/* 저장소 뿌리. 데이터 파일은 지금까지처럼 **작업 폴더 기준**으로 읽고 쓰지만(워크플로가
+   저장소 안에서 돈다), 아래 '저장된 공고 원문'은 이 파일 기준으로 읽는다 — 검사도 같은 원문을
+   봐야 "화면에선 통과, 검사에선 실패" 가 안 생긴다.
+   🔴 디스크 경로를 URL 로 다루지 않는다(이름 속 `%`·`#` 에서 깨진다 — CLAUDE.md 층2 사고). */
+const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+
+const canonUrl = canon.canonUrl;
+/* 🔴 '주소 → id' 파생식의 원본은 `collector/canon-url.mjs` **한 곳**이다 — 베끼지 않는다.
+   로봇(auto-register)과 이 파일이 각자 계산하면 차단 목록이 어긋나 뺀 공고가 되살아난다
+   (2026-08-14 부경대: 규칙이 바뀌자 막아 둔 23건이 새 id 를 달고 돌아왔다).
+   공용 파일이 옛 판이면 **조용히 다른 식으로 계산하지 않고 멈춘다.** */
+const idFromUrl = (prefix, raw) => {
+  if (typeof canon.idFromUrl !== 'function') {
+    fail('collector/canon-url.mjs 에 idFromUrl 이 없습니다 — 공용 규칙 파일이 옛 판입니다 (같이 배포돼야 합니다)');
+  }
+  return canon.idFromUrl(prefix, raw);
+};
 
 /* 등록 규칙은 로봇이 쓰는 그 파일 하나뿐이다 — 화면이 따로 판단하게 만들지 않는다 */
 const { checkEntry } = createRequire(import.meta.url)('../verify/entry-rules.cjs');
@@ -53,7 +75,22 @@ const ALLOWED = new Set([
   /* 자격 요건 (2026-08-09 추가) — 학생 앱이 이미 읽는 칸들이라 앱 코드 변경은 필요 없다
      (`app.js`의 qBlock·reasonRows, `match-engine.js`의 tidyRequirement). */
   'eligibilityLines', 'eligibilityVerified', 'eligibility', 'documents',
+  /* 앱이 이미 읽는데 화면에만 칸이 없던 넷 (2026-09-13 · C4) — 달력 발표 점(app.js 의
+     announceDate) · '이런 학생은 못 받아요'(eligibilityExcludes) · '먼저 뽑는 기준'
+     (eligibilityPriority) · 이중수혜(exclusivity).
+     🔴 `amountSpec`(금액 구조)은 **일부러 안 넣는다** — 손으로 적으면 홈 합계가 틀어지고,
+        그건 학생에게 받을 수 없는 숫자를 보여 주는 일이다(기망). */
+  'announceDate', 'eligibilityExcludes', 'eligibilityPriority', 'exclusivity',
+  /* 자유 형식 제출 스위치 — 아래에서 **근거 문장과 짝으로만** 다룬다 */
+  'prepDoc', 'prepDocBasis',
 ]);
+
+/* 🔴 **빈칸으로 지울 수 없는 칸.** 지금까지는 빈 값이 오면 칸을 지웠는데,
+   `verify/entry-rules.cjs` 의 REQUIRED 가 사라지면 감사가 오류를 내고 **그 묶음 전체**가
+   되돌려진다(같이 보낸 남의 수정까지). 게다가 documents 가 없으면 학생 앱이
+   `for (const doc of sch.documents)` 에서 그대로 죽는다.
+   감사가 잡기 전에, 읽을 수 있는 말로 여기서 멈춘다. */
+const NEVER_EMPTY = new Set(['name', 'type', 'provider', 'amount', 'summary', 'sourceUrl', 'documents']);
 
 /* 🔴 `eligibility`(기계 판정용)와 `eligibilityLines`(사람이 읽는 문장)를 **섞지 말 것.**
    매칭·알림·홈 합계는 전부 `eligibility`를 보고 판정한다. 여기에 자유 문장이 들어가면
@@ -93,6 +130,15 @@ function cleanEligibility(v) {
   return out;
 }
 
+/* 달력에 **실제로 있는 날**인가 (2026-09-13).
+   모양만 보면 `2026-13-01`·`2026-02-30` 이 통과하는데, 브라우저는 그런 날을 조용히 다음 달로
+   굴려 버린다 — 학생 달력에 엉뚱한 날짜로 점이 찍힌다. 되읽어서 같은 글자가 나오는지 본다. */
+const isDay = (v) => {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return false;
+  const d = new Date(`${v}T00:00:00Z`);
+  return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === v;
+};
+
 /* 사람이 읽는 자격 문장 — 줄 수·길이에 상한을 둔다(브라우저에서 오는 값을 믿지 않는다) */
 function cleanLines(v) {
   const arr = Array.isArray(v) ? v : String(v || '').split('\n');
@@ -100,11 +146,102 @@ function cleanLines(v) {
     .map((x) => x.slice(0, 300));
 }
 
+/* ── 저장된 공고 원문 — '이 문장이 정말 원문에 있나'를 확인할 때만 읽는다 ───────────
+   🔴 근거를 안 보고 켜는 칸을 만들면 운영 원칙 8-1(추론 금지)이 그 자리에서 깨진다.
+      그래서 화면이 적어 온 문장을 **저장된 원문에서 그대로 찾아** 확인한다.
+   ⚠️ 두 파일이 840KB라 근거 확인이 필요할 때만 읽고, 한 번 읽은 것은 그 실행 안에서 다시 안 읽는다. */
+let SRC = null;
+function corpus(it) {
+  if (!SRC) {
+    const rd = (rel) => JSON.parse(fs.readFileSync(path.join(ROOT, rel), 'utf8'));
+    let texts = [];
+    let bodies = {};
+    let docs = {};
+    try { texts = rd('collector/extracted/notices-text.json'); } catch { /* 아직 없음 */ }
+    try { bodies = rd('collector/extracted/browser-bodies.json'); } catch { /* 아직 없음 */ }
+    try { docs = rd('collector/extracted/elig-docs.json'); } catch { /* 아직 없음 */ }
+    /* 원문 잇는 규칙은 `collector/notice-source.mjs` 한 곳이다 — 베끼면
+       "발췌기는 찾았는데 여기선 못 찾는" 어긋남이 생긴다. */
+    SRC = { idx: indexTexts(texts, bodies), docs };
+  }
+  const parts = [];
+  let hasSource = false;                 // 저장된 '공고 원문'을 실제로 찾았는가
+  const src = sourceFor(it, SRC.idx);
+  if (hasText(src)) { parts.push(src.text); hasSource = true; }
+  /* 자유 형식 제출이 **첨부에만** 적힌 공고가 있다 — 공고문 첨부까지 본다(elig-docs 가 그 연결).
+     글자가 안 나오는 스캔 PDF 등은 조용히 건너뛴다(읽은 척하지 않는다). */
+  for (const f of ((SRC.docs[it.id] || {}).files || [])) {
+    const t = attachmentText(path.join(ROOT, 'collector/extracted', f));
+    if (readable(t)) { parts.push(t); hasSource = true; }
+  }
+  /* 발췌·자격 줄은 로봇이 **원문에서 그대로 뽑아 둔 것**이라 근거로 쓸 수 있다.
+     다만 이것만 있는 상태는 '원문을 갖고 있다'가 아니다 — 아래에서 사유를 가를 때 쓴다. */
+  parts.push(...(it.excerpts || []), ...(it.eligibilityLines || []));
+  return { text: parts.join('\n'), hasSource };
+}
+
+/* 🔴 대조는 **공백을 지우고** 한다 — 수집 원문은 `취 · 창업` 처럼 띄어쓰기가 상해 있다 */
+const squash = (s) => String(s || '').replace(/\s+/g, '').toLowerCase();
+
+/** 원문에 그 문장이 실제로 있는가 — 빈 문자열이면 확인된 것, 아니면 사람이 읽을 사유를 돌려준다 */
+function basisProblem(it, quote) {
+  const q = squash(quote);
+  if (q.length < 12) return '근거 문장이 너무 짧습니다 (원문에서 12자 이상 그대로 복사해 주세요)';
+  const c = corpus(it);
+  if (squash(c.text).includes(q)) return '';
+  /* 🔴 **못 찾은 사유를 짐작해 적지 않는다**(원칙 5). 저장된 원문이 아예 없으면 사유는
+     '문장이 틀렸다'가 아니라 '대조할 원문이 없다'이고, 사람이 할 수 있는 일도 다르다. */
+  if (!c.hasSource) return '이 공고의 원문이 저장돼 있지 않아 확인할 수 없습니다 — 먼저 워크플로 "공고 본문 재수집"을 돌려 주세요';
+  return '적어 주신 문장을 저장된 공고 원문에서 찾지 못했습니다 (원문 대조 칸에서 그대로 복사해 주세요)';
+}
+
+/* 이중수혜 — 학생이 받을 수 있는 돈의 합계를 정하는 값이라 형태를 못 박는다.
+   🔴 원문의 **한정어**로만 정한다: 한정어 없는 '타 대외/타 장학금' → external
+      (= 교외 민간 장학금 전부. 학교·국가장학금은 안 들어간다) · '타 인재양성사업' 같이
+      좁은 것 → narrow(합계에서 빼지 않는다).
+   🔴 값 이름을 'all' 로 바꾸지 말 것 — 그 이름을 읽고 국가장학금까지 막으면 거의 모든 학생이 떨어진다.
+   🔴 화면에서 'allowed'(중복 가능)를 만들지 않는다 — 확인 못 한 허용에 학생이 기댄다.
+      조항이 없거나 못 읽으면 **칸을 비운다.** */
+function cleanExclusivity(it, v) {
+  if (v === null || v === '' || v === undefined) return null;
+  if (!v || typeof v !== 'object' || Array.isArray(v)) fail('이중수혜 값의 형식이 올바르지 않습니다');
+  if (v.kind !== 'forbidden') fail("이중수혜는 '중복 불가'만 화면에서 정합니다 (가능·모름은 칸을 비우세요)");
+  if (!['external', 'narrow'].includes(v.scope)) fail(`이중수혜 범위는 external·narrow 둘뿐입니다: ${v.scope}`);
+  const raw = String(v.raw || '').replace(/\s+/g, ' ').trim().slice(0, 200);
+  /* 이 문장은 학생 화면의 '원문 보기'에 **그대로** 뜬다(app.js) — 요약·의역이 아니라 원문이어야 한다 */
+  const why = basisProblem(it, raw);
+  if (why) fail(`${it.id} — 이중수혜 근거를 확인하지 못했습니다: ${why}`);
+  return { kind: 'forbidden', scope: v.scope, raw };
+}
+
 const reg = readJson(REG, null);
 if (!reg || !Array.isArray(reg.items)) fail(`${REG} 를 읽지 못했습니다`);
 
 const byId = (id) => reg.items.find((x) => x.id === id);
 const ids = Array.isArray(payload.ids) ? payload.ids : (payload.id ? [payload.id] : []);
+
+/* ── 많이 지울 때는 지울 건수를 손으로 한 번 더 받는다 (2026-09-13) ───────────────
+   🔴 감사(verify/audit-data.js)는 **'남은 것'만 본다** — 없어진 것은 못 본다.
+      실측: 사본 저장소에서 items 를 48 → 0 으로 비우고 감사를 돌리니 **종료코드 0** 이었다.
+      그래서 '실수로 목록을 통째로 지우는 일'은 여기서만 막을 수 있다.
+   🔴 이 관문을 감사로 옮기지 말 것 — 같은 감사를 **수집 워크플로가 관문으로** 쓰므로,
+      감사가 실패하면 그날 수집분 저장이 통째로 멈춘다(로봇이 차단 목록을 반영해 지우는
+      정상 삭제까지 걸린다). */
+const BULK_MIN = 5;         // 이보다 많이 지우거나
+const BULK_RATIO = 0.1;     // 지금 목록의 10%를 넘게 지우면 → 지울 건수를 숫자로 한 번 더 받는다
+function guardBulkRemove(targetIds) {
+  const before = reg.items.length;
+  /* 🔴 요청한 id 개수가 아니라 **실제로 지워질 건수**와 대조한다 — 없는 id 가 섞였으면 둘이
+     다르고, 그때는 멈추는 것이 맞다(사람이 생각한 것과 다른 일이 벌어지고 있다는 뜻이다). */
+  const willRemove = reg.items.filter((x) => targetIds.includes(x.id)).length;
+  if (!(willRemove > BULK_MIN || willRemove > before * BULK_RATIO)) return { before, willRemove };
+  const expect = Number(payload.expect);
+  if (!Number.isInteger(expect) || expect !== willRemove) {
+    fail(`한 번에 ${willRemove}건을 지우는 요청입니다(지금 ${before}건). 실수로 목록을 통째로 지우는 것을 막으려고 `
+      + `지울 건수를 숫자로 한 번 더 받습니다 — 받은 값: ${payload.expect === undefined ? '없음' : payload.expect}`);
+  }
+  return { before, willRemove };
+}
 
 let detail = '';
 let touched = false;
@@ -129,16 +266,61 @@ switch (action) {
   /* ── 되돌리기 — 등록에서 빼고, 로봇이 다시 넣지 않게 차단 목록에 올린다 ── */
   case 'revert': {
     if (!ids.length) fail('대상이 지정되지 않았습니다');
-    const before = reg.items.length;
-    const removed = reg.items.filter((x) => ids.includes(x.id)).map((x) => x.id);
+    const { before } = guardBulkRemove(ids);
+    /* 🔴 지우기 **전에** 주소를 챙긴다 — 지운 뒤에는 registered.json 에 아무 흔적도 없다 */
+    const dropped = reg.items.filter((x) => ids.includes(x.id));
+    const removed = dropped.map((x) => x.id);
     reg.items = reg.items.filter((x) => !ids.includes(x.id));
     if (reg.items.length === before) fail('되돌릴 대상을 찾지 못했습니다');
 
-    const cfg = readJson(CFG, { enabled: true, blockIds: [] });
+    const cfg = readJson(CFG, { enabled: true, blockIds: [], blockUrls: [] });
     cfg.blockIds = Array.from(new Set([...(cfg.blockIds || []), ...removed]));
+    /* 🔴 **주소로도 막는다.** id 는 canonUrl 에서 파생되므로 정규화 규칙이 바뀌면 통째로
+       무효가 된다 — 2026-08-14 에 실제로 그래서 막아 둔 23건이 새 id 를 달고 되살아났다.
+       로봇이 읽을 때 canonUrl 로 맞추므로 **원본 주소 문자열 그대로** 넣는다(사람이 눈으로
+       알아볼 수 있어야 하고, 규칙이 또 바뀌어도 살아남는다).
+       ⚠️ 정렬하지 말고 뒤에 붙인다 — 이 파일은 자동 병합 대상이 아니라, 정렬하면 diff 가
+          파일 전체가 되어 로봇 커밋과 부딪힌다. */
+    const have = new Set((cfg.blockUrls || []).map((u) => canonUrl(u)));
+    const addUrls = [];
+    dropped.forEach((x) => {
+      const u = String(x.sourceUrl || '').trim();
+      if (!u) return;
+      const cu = canonUrl(u);
+      if (have.has(cu)) return;
+      have.add(cu);                       // 같은 묶음 안에서 겹치는 것도 한 번만
+      addUrls.push(u);
+    });
+    cfg.blockUrls = [...(cfg.blockUrls || []), ...addUrls];
+    /* 주소가 없는 항목은 id 로만 막힌다 — 조용히 넘기지 않고 사람에게 말한다 */
+    const noUrl = dropped.filter((x) => !x.sourceUrl).map((x) => x.id);
     writeJson(CFG, cfg);
 
-    detail = `${removed.length}건 제거 + 재등록 차단: ${removed.join(', ')}`;
+    detail = `${removed.length}건 제거(${before} → ${reg.items.length}건) · 재등록 차단 id ${removed.length}·주소 ${addUrls.length}`
+      + (noUrl.length ? ` · ⚠️ 주소가 없어 id 로만 막은 것 ${noUrl.length}건: ${noUrl.join(', ')}` : '');
+    touched = true;
+    break;
+  }
+
+  /* ── 차단 풀기 — 되돌리기의 짝 (2026-09-13 신설) ──────────────
+     이게 없으면 잘못 막은 공고를 **영영 되살릴 수 없다**(사람이 파일을 못 고치는 구조라
+     차단 목록에 한 번 들어가면 끝이었다).
+     ⚠️ 차단을 풀어도 공고가 되살아나지는 않는다 — 다음 수집 때 로봇이 다시 판단한다. */
+  case 'unblock': {
+    const urls = Array.isArray(payload.urls) ? payload.urls : [];
+    if (!ids.length && !urls.length) fail('풀 대상이 지정되지 않았습니다');
+    const cfg = readJson(CFG, { enabled: true, blockIds: [], blockUrls: [] });
+    const wantUrl = new Set(urls.map((u) => canonUrl(u)));
+    const bI = (cfg.blockIds || []).length;
+    const bU = (cfg.blockUrls || []).length;
+    cfg.blockIds = (cfg.blockIds || []).filter((x) => !ids.includes(x));
+    /* 🔴 id 로 풀면 **그 id 가 파생된 주소도 같이** 푼다 — 한쪽만 풀면 계속 막힌 채 남는다 */
+    cfg.blockUrls = (cfg.blockUrls || []).filter((u) => !wantUrl.has(canonUrl(u))
+      && !ids.includes(idFromUrl('auto-', u)));
+    const gone = (bI - cfg.blockIds.length) + (bU - cfg.blockUrls.length);
+    if (!gone) fail('차단 목록에서 그 대상을 찾지 못했습니다');
+    writeJson(CFG, cfg);
+    detail = `차단 해제 ${gone}줄 (id ${bI - cfg.blockIds.length}·주소 ${bU - cfg.blockUrls.length})`;
     touched = true;
     break;
   }
@@ -146,10 +328,12 @@ switch (action) {
   /* ── 등록 삭제 (차단 목록에는 넣지 않는다) ───────────────────── */
   case 'remove': {
     if (!ids.length) fail('대상이 지정되지 않았습니다');
-    const before = reg.items.length;
+    const { before } = guardBulkRemove(ids);
     reg.items = reg.items.filter((x) => !ids.includes(x.id));
     if (reg.items.length === before) fail('삭제할 대상을 찾지 못했습니다');
-    detail = `${before - reg.items.length}건 삭제: ${ids.join(', ')}`;
+    /* ⚠️ 여기서는 **일부러 차단하지 않는다** — 로봇이 내일 다시 등록할 수 있다.
+       영영 빼려는 것이면 `revert` 다. 화면 문구에서 이 차이를 지우지 말 것. */
+    detail = `${before - reg.items.length}건 삭제(${before} → ${reg.items.length}건): ${ids.join(', ')}`;
     touched = true;
     break;
   }
@@ -173,7 +357,9 @@ switch (action) {
     const dup = reg.items.find((x) => x.sourceUrl && canonUrl(x.sourceUrl) === cu);
     if (dup) fail(`이미 등록된 공고입니다 (${dup.id})`);
 
-    const id = `adm-${cu.replace(/[^a-z0-9]/gi, '').slice(-24).toLowerCase()}`;
+    /* 🔴 파생식은 공용 원본(`collector/canon-url.mjs`)만 쓴다 — 로봇과 갈라지면
+       차단 목록과 중복 판정이 동시에 어긋난다 */
+    const id = idFromUrl('adm-', url);
     if (byId(id)) fail(`같은 id가 이미 있습니다 (${id})`);
 
     const school = String(n.school || '').trim();
@@ -278,10 +464,49 @@ switch (action) {
       ? payload.edits
       : [{ id: payload.id, patch: payload.patch }];
 
+    /* 🔴 **짝으로만 다루는 칸** — 아래 일반 루프가 건드리면 안 된다.
+       스위치(prepDoc)와 근거 문장(prepDocBasis)은 따로 저장되면 뜻이 없다. 키 순서에
+       기대지 않으려고 루프보다 **먼저** 처리한다. */
+    const PAIRED = new Set(['prepDoc', 'prepDocBasis']);
+
+    /* 자유 형식 제출 스위치 — 운영 원칙 8-2. '자유 형식으로 낼 수 있다'가 **원문으로 확인된**
+       공고에만 켠다. 그래서 근거 문장을 함께 받아 저장된 원문에서 실제로 찾아본다.
+       🔴 근거 검사를 경고로 낮추지 말 것 — 경고는 아무도 안 읽는다. */
+    const applyPrepDoc = (it, patch, changed) => {
+      if (!('prepDoc' in patch)) {
+        if (!('prepDocBasis' in patch)) return;
+        /* 근거만 왔다 = 이미 켜 둔 공고의 **근거 문장을 고친다**는 뜻이다.
+           꺼져 있는데 근거만 오면 조용히 버리지 않고 말한다 — 화면엔 아무 말이 없는데
+           아무 일도 안 일어나는 것이 이 저장소가 여러 번 데인 자리다. */
+        if (!it.prepDoc) fail(`${it.id} — 자유 형식 제출 근거만 왔습니다. 스위치(prepDoc)를 함께 보내 주세요`);
+      }
+      const on = ('prepDoc' in patch) ? (patch.prepDoc === true || patch.prepDoc === 'true') : true;
+      if (!on) {
+        if (it.prepDoc !== undefined || it.prepDocBasis !== undefined) {
+          delete it.prepDoc; delete it.prepDocBasis; changed.push('prepDoc');
+        }
+        return;
+      }
+      /* 🔴 앱은 `!s.prepDoc || s.formId || s.program` 이면 아무것도 안 한다 —
+         조용한 무효 대신 멈춰서 왜인지 말한다. */
+      if (it.formId) fail(`${it.id} — 이 공고에는 양식(${it.formId})이 연결돼 있어 준비용 문서가 뜨지 않습니다 (양식 연결을 먼저 끊으세요)`);
+      if (it.program) fail(`${it.id} — 상시 제도에는 준비용 문서가 뜨지 않습니다`);
+      const basis = String(patch.prepDocBasis || it.prepDocBasis || '').replace(/\s+/g, ' ').trim();
+      const why = basisProblem(it, basis);
+      if (why) fail(`${it.id} — 자유 형식 제출 근거를 확인하지 못했습니다: ${why}`);
+      /* 🔴 근거는 학생 화면에 안 나가지만 **남긴다** — 나중에 '왜 켰나'를 되물을 수 있는 유일한 자리다 */
+      const next = basis.slice(0, 300);
+      if (it.prepDoc !== true || it.prepDocBasis !== next) {
+        it.prepDoc = true; it.prepDocBasis = next; changed.push('prepDoc');
+      }
+    };
+
     /** 한 건에 patch 를 입힌다. 바뀐 칸 이름들을 돌려준다. */
     const applyPatch = (it, patch) => {
       const changed = [];
+      applyPrepDoc(it, patch || {}, changed);
       Object.keys(patch || {}).forEach((k) => {
+        if (PAIRED.has(k)) return;                         // 위에서 짝으로 처리했다
         if (!ALLOWED.has(k)) return;                       // 모르는 키는 버린다
         let v = patch[k];
         if (typeof v === 'string') v = v.trim();
@@ -294,18 +519,34 @@ switch (action) {
         } else if (k === 'eligibilityVerified') {
           v = v === true || v === 'true';
           if (!v) v = null;                                // 거짓이면 칸 자체를 지운다
-        } else if (k === 'documents') {
+        } else if (k === 'documents' || k === 'eligibilityExcludes' || k === 'eligibilityPriority') {
           v = cleanLines(v);
           if (!v.length) v = null;
+        } else if (k === 'exclusivity') {
+          v = cleanExclusivity(it, v);
+        } else if (k === 'announceDate' && v) {
+          if (!isDay(v)) fail(`발표일 형식이 올바르지 않습니다: ${v} (YYYY-MM-DD · 달력에 있는 날)`);
+          /* 🔴 로봇과 같은 순서 검사(extract-excerpts) — 발표일이 마감일보다 앞이면 결과
+             발표일일 리가 없다. 해를 고쳐 주지 않고 멈춘다(지어내지 않는다). */
+          if (it.deadline && v < it.deadline) fail(`${it.id} — 발표일(${v})이 마감일(${it.deadline})보다 앞섭니다`);
         } else if (k === 'amountValue') {
           v = Number(v) || 0;
         } else if (k === 'deadline' && v) {
-          if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) fail(`마감일 형식이 올바르지 않습니다: ${v} (YYYY-MM-DD)`);
+          if (!isDay(v)) fail(`마감일 형식이 올바르지 않습니다: ${v} (YYYY-MM-DD · 달력에 있는 날)`);
         } else if (k === 'type' && v && !['교내', '교외'].includes(v)) {
           fail(`구분은 '교내' 또는 '교외'만 가능합니다: ${v}`);
         } else if ((k === 'sourceUrl' || k === 'applyEmail') && v) {
           if (k === 'sourceUrl' && !/^https?:\/\//i.test(v)) fail(`원문 주소는 http(s)로 시작해야 합니다: ${v}`);
           if (k === 'applyEmail' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) fail(`이메일 형식이 올바르지 않습니다: ${v}`);
+        }
+
+        /* 필수 칸을 빈칸으로 지우려는 요청은 여기서 멈춘다 (위 NEVER_EMPTY 주석 참조).
+           🔴 문구에 `it.id` 를 반드시 넣는다 — 한 건이라도 걸리면 묶음 전체가 멈추므로,
+              어느 공고인지 말해 주지 않으면 사람이 찾을 방법이 없다. */
+        if ((v === null || v === '') && NEVER_EMPTY.has(k)) {
+          fail(k === 'documents'
+            ? `${it.id} — 요구 서류는 비울 수 없습니다. 모르면 "제출 서류는 공고 원문에서 확인" 처럼 한 줄이라도 남겨 주세요`
+            : `${it.id} — '${k}' 는 비울 수 없는 칸입니다 (비우면 학생 화면이 깨집니다)`);
         }
 
         const old = it[k];
@@ -317,6 +558,23 @@ switch (action) {
           it[k] = v; changed.push(k);
         }
       });
+
+      /* ── 주인 표식 ────────────────────────────────────────────
+         🔴 로봇이 **내일 아침에 덮지 않게** 누가 넣은 값인지 남긴다. 이 표식이 없으면
+            `extract-excerpts` 가 매 실행 제외·우선 줄을 통째로 다시 쓰고 지운다 —
+            화면에 칸만 생기고 값은 하루도 안 남는다.
+         🔴 비우면 표식도 함께 지워 **로봇에게 돌려준다**(다음 수집 때 원문에서 다시 읽는다).
+         ⚠️ `exclusivityFrom` 은 뜻이 거꾸로였다(표식이 **없는** 값이 사람 값) — 로봇 쪽
+            판정 한 줄(`extract-amounts.mjs`)이 같이 고쳐져야 이 표식이 일한다. */
+      const OWNER = `관리자 ${TODAY}`;
+      const mark = (key, from) => {
+        if (!changed.includes(key)) return;
+        if (it[key] !== undefined) it[from] = OWNER; else delete it[from];
+      };
+      mark('exclusivity', 'exclusivityFrom');
+      mark('eligibilityExcludes', 'eligibilityExcludesFrom');
+      mark('eligibilityPriority', 'eligibilityPriorityFrom');
+      mark('eligibilityLines', 'eligibilityFrom');   // 이미 열려 있던 칸 — 지금은 매일 지워진다
       return changed;
     };
 
@@ -404,7 +662,9 @@ if (!touched) fail('아무것도 바뀌지 않았습니다');
 /* 공고 목록을 건드린 작업만 저장 (설정·게시판은 위에서 이미 저장했다).
    ⚠️ **새 동작을 추가하면 이 목록에도 반드시 넣을 것.** 빠뜨리면 화면에는 "✅ 성공"이
    뜨는데 파일은 그대로다 — 2026-08-09에 `register`가 실제로 이 상태였고, 로컬 시험에서
-   "등록했다고 하는데 목록에 없다"로 잡혔다. 이슈 #79('로봇이 고친 파일은 전부 git add')와 같은 유형이다. */
+   "등록했다고 하는데 목록에 없다"로 잡혔다. 이슈 #79('로봇이 고친 파일은 전부 git add')와 같은 유형이다.
+   ⚠️ `unblock`(차단 풀기)은 **일부러 여기 없다** — 공고 목록을 건드리지 않고 설정 파일만 고치며,
+      그 저장은 위 case 안에서 이미 끝났다. */
 const WRITES_REG = ['confirm', 'revert', 'remove', 'edit', 'merge', 'register', 'unlinkForm'];
 if (WRITES_REG.includes(action)) {
   reg.updatedAt = kstNow().slice(0, 10);

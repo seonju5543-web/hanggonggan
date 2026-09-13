@@ -29,16 +29,67 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const WF_DIR = path.join(HERE, '..', '.github', 'workflows');
 export const STALE_FACTOR = 3;
 
-/* cron 다섯 칸에서 '며칠에 한 번인가'를 읽는다.
-   요일 칸이 지정돼 있으면 주 1회로 본다(월요일만 도는 로봇이 그렇다). */
+/* cron 다섯 칸에서 '몇 시간에 한 번 도는가'를 읽는다.
+
+   🔴 **요일 칸이 적혔다고 무조건 주 1회로 보면 안 된다** (2026-09-13 수리).
+      옛 판은 요일이 `*` 가 아니기만 하면 168시간으로 봤다. 그래서 한국장학재단
+      수확(`53 20 * * 1,4` — 월·목 **주 2회**)이 7일에 1회로 읽혀 경보 문턱이
+      **21일**이었다. 21일이면 층2 90곳 중 72곳이 이미 마감이라(실측), 로봇이
+      멈춰도 목록이 거의 빈 뒤에야 알림이 온다. 같은 자리에서 인스타 댓글 로봇
+      (시각 칸이 「슬래시 3」 — 세 시간마다)도 '하루 1회'로 읽히고 있었다.
+      → 칸에 **실제로 적힌 개수**를 센다.
+
+   ⚠️ 달(4번째 칸)이 지정된 줄은 판정하지 않는다(null) — '1년에 한 번' 같은 것을
+      주 단위로 환산하면 뜻이 없다. null 은 '조용한 것'이 아니라 '판정 안 함'이다. */
+const SIZE = { min: 60, hour: 24, dom: 31, mon: 12, dow: 7 };
+
+/** cron 한 칸이 **몇 번**을 뜻하는지 센다 — `*`(전부) · `1,4`(둘) · `1-5`(범위) ·
+    「별 슬래시 3」(건너뛰기) 네 꼴을 읽는다 */
+export function countField(f, kind) {
+  const size = SIZE[kind];
+  return String(f).split(',').reduce((n, part) => {
+    const [range, stepRaw] = part.split('/');
+    const step = stepRaw ? Number(stepRaw) : 1;
+    if (!Number.isFinite(step) || step <= 0) return n + 1;
+    if (range === '*') return n + Math.ceil(size / step);
+    const m = range.match(/^(\d+)-(\d+)$/);
+    if (m) return n + Math.floor((Number(m[2]) - Number(m[1])) / step) + 1;
+    return n + 1;
+  }, 0);
+}
+
+/** cron 한 줄이 **주당 몇 번** 도는가 (판정할 수 없으면 null) */
+export function runsPerWeek(cron) {
+  const [mi, ho, dom, mon, dow] = cron.trim().split(/\s+/);
+  if (mon == null || mon !== '*') return null;   // 특정 달만 도는 로봇 — 판정하지 않는다
+  const perDay = countField(mi, 'min') * countField(ho, 'hour');
+  let days;
+  if (dow === '*' && dom === '*') days = 7;
+  else if (dow !== '*' && dom === '*') days = countField(dow, 'dow');
+  else if (dow === '*' && dom !== '*') days = (7 * countField(dom, 'dom')) / 30.44;
+  /* 표준 cron 은 요일·날짜가 둘 다 적히면 **둘 중 하나라도 맞으면** 돈다(합집합).
+     지금 저장소엔 그런 줄이 없지만, 생기면 적게 세어 문턱을 넓히는 쪽이 위험하다. */
+  else days = Math.min(7, countField(dow, 'dow') + (7 * countField(dom, 'dom')) / 30.44);
+  return perDay * days;
+}
+
 export function hoursFor(cronLines) {
   if (!cronLines.length) return null;
-  const weekly = cronLines.some((c) => {
-    const dow = c.trim().split(/\s+/)[4];
-    return dow && dow !== '*';
-  });
-  if (weekly) return 24 * 7;
-  return 24 / cronLines.length;          // 하루 n회 → 24/n 시간
+  let total = 0;
+  for (const c of cronLines) {
+    const r = runsPerWeek(c);
+    if (r == null) return null;
+    total += r;
+  }
+  return total > 0 ? (24 * 7) / total : null;
+}
+
+/** 사람이 읽는 간격 문구 — 84시간을 '4일에 1회'라고 적으면 뜻이 어긋난다 */
+export function everyWords(h) {
+  if (h == null) return '판정 안 함';
+  if (h <= 24) return `하루 ${Math.round(24 / h)}회`;
+  if (h < 24 * 7) return `주 ${Math.round((24 * 7) / h)}회`;
+  return `${Math.round(h / 24)}일에 1회`;
 }
 
 /* 워크플로 파일에서 예약 줄만 뽑는다 — 주석(#로 시작하는 줄)은 세지 않는다 */
@@ -109,7 +160,7 @@ async function main() {
   console.log(`예약 로봇 ${rows.length}대 · 문턱 = 기대 간격 × ${STALE_FACTOR}`);
   for (const r of rows.sort((a, b) => (b.ageHours || 1e9) - (a.ageHours || 1e9))) {
     const mark = r.stale ? '🚨' : (r.error ? '· ' : '✓ ');
-    const every = r.everyHours >= 24 ? `${Math.round(r.everyHours / 24)}일에 1회` : `하루 ${Math.round(24 / r.everyHours)}회`;
+    const every = everyWords(r.everyHours);
     const age = r.error ? r.error : (r.ageHours == null ? '성공 기록 없음' : `${r.ageHours}시간 전`);
     console.log(`${mark} ${r.name.padEnd(24)} ${every.padEnd(10)} 마지막 성공 ${age}`);
   }

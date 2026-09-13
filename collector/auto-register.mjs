@@ -39,7 +39,7 @@ const TODAY = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
    같은 함수를 써야 '이미 등록된 공고를 로봇이 다시 등록하는' 일이 안 생긴다.
    이 파일은 불러오는 즉시 실행되므로 남이 여기서 가져갈 수 없어 따로 뺐다. */
 export { canonUrl } from './canon-url.mjs';
-import { canonUrl } from './canon-url.mjs';
+import { canonUrl, idFromUrl } from './canon-url.mjs';
 
 /* 제목 유사도 — 4글자 조각(4-gram) 겹침 비율. 재게시·접수분 중복 감지용 */
 function titleSim(a, b) {
@@ -199,7 +199,8 @@ if (!cfg.enabled) {
     const atts = (n.attachments || [])
       .filter((a) => /신청서|지원서|신청양식|원서|서식|양식|동의서|서약서|추천서|공고/.test(a.name) && /\.(hwp|hwpx|doc|docx|pdf|zip|xlsx?)(\?|$)?/i.test(a.name + a.url))
       .slice(0, 6);
-    const id = 'auto-' + cu.replace(/[^a-z0-9]/gi, '').slice(-24).toLowerCase();
+    // 🔴 공식은 canon-url.mjs 하나 — 베끼면 관리자 화면의 register 와 갈라진다(2026-08-14 부경대 유형)
+    const id = idFromUrl('auto-', n.url);
     if (registered.items.some((i) => i.id === id)) continue;
     /* 사람이 한 번 '이건 아니다'라고 뺀 공고는 다시 등록하지 않는다.
        위 되돌리기와 같은 이유로 주소도 함께 본다 — 지우기만 하면 다음 실행에 또 들어온다. */

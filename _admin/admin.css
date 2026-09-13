@@ -609,3 +609,58 @@ td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space
 .ig-replies { margin: var(--space-6) 0 0 var(--space-8); font-size: var(--t-sm); color: var(--text-sub); display: flex; flex-direction: column; gap: var(--space-2); }
 .ig-reply-box { display: flex; flex-wrap: wrap; gap: var(--space-6); margin-top: var(--space-8); }
 .ig-reply-box input { flex: 1 1 220px; min-width: 0; font: inherit; font-size: var(--t-sm); padding: var(--space-6) var(--space-8); border: 1px solid var(--rule); border-radius: var(--radius-xs); background: var(--bg); color: var(--text); }
+
+/* ══ 반영 전 전후 대조 (2026-09-14) ══════════════════════════════
+   '한꺼번에 반영' 전에 **무엇이 무엇으로 바뀌는지** 한 줄씩 보여 준다.
+   🔴 옛 값은 흐리게 + 취소선, 새 값은 굵게 — 색만으로 가르지 않는다(색을 못 보는 사람).
+   ⚠️ `--text-weak` 는 3.30:1 이라 14px 미만에 쓰면 안 된다 → 이 줄은 --t-md(14.5px)다. */
+.diffs { margin-top: var(--space-6); display: flex; flex-direction: column; gap: var(--space-2); }
+.diffrow {
+  display: grid;
+  grid-template-columns: minmax(6em, auto) 1fr auto 1fr auto;
+  gap: var(--space-4) var(--space-8);
+  align-items: baseline;
+  font-size: var(--t-md);
+  padding: var(--space-4) 0;
+  border-top: 1px solid var(--line);
+}
+.diff-k { color: var(--text-sub); font-weight: 650; }
+.diff-a { color: var(--text-weak); text-decoration: line-through; word-break: break-all; }
+.diff-arrow { color: var(--text-weak); }
+.diff-b { font-weight: 700; word-break: break-all; }
+.diffrow.is-bad .diff-b { color: var(--red); }
+.diffrow.is-bad { background: var(--red-weak); }
+/* 좁은 화면에서는 한 칸으로 접는다 — 다섯 칸이 들어갈 자리가 없다 */
+@media (max-width: 720px) {
+  .diffrow { grid-template-columns: 1fr; }
+  .diff-arrow { display: none; }
+}
+/* 실행 버튼이 잠겼을 때 — '왜 안 눌리지' 가 되지 않게 눈에 보이게 */
+.btn[aria-disabled='true'], .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ══ 로봇 입력 칸 (2026-09-14) ══════════════════════════════════
+   입력을 받는 로봇이 여럿이라 한 줄에 칸이 여러 개 붙는다. */
+.runin {
+  display: flex; flex-direction: column; gap: var(--space-4);
+  margin-top: var(--space-6); font-size: var(--t-md); color: var(--text-sub);
+}
+.runin select, .runin input { width: 100%; }
+
+/* ══ 교외인데 한 학교에만 보이는 공고 (C2) ══════════════════════ */
+[data-src-scan] > summary {
+  cursor: pointer; font-size: var(--t-lg); font-weight: 650;
+  padding: var(--space-12) 0; border-top: 1px solid var(--rule);
+}
+.scope-count { margin-top: var(--space-4); font-size: var(--t-md); color: var(--text-sub); }
+.pickbox {
+  display: inline-flex; align-items: center; gap: var(--space-6);
+  font-size: var(--t-md); color: var(--text-sub); cursor: pointer;
+}
+/* 앱 공용 네모 — 전역 appearance 를 끄지 않아도 보이게 크기·색을 준다(.pick 과 같은 값) */
+.pickbox input { width: 19px; height: 19px; accent-color: var(--accent); cursor: pointer; }
+/* 원인 줄 아래 한 줄 설명 · 로봇 목록 아래 '여기서 부르지 않는 것'
+   (`.hint` 는 지금 `.field .hint` 에만 값이 있어 그대로 두면 본문 크기로 뜬다) */
+.pgroup > .hint, [data-robot-skip] {
+  display: block; margin: var(--space-4) 0 0;
+  font-size: var(--t-md); color: var(--text-sub);
+}

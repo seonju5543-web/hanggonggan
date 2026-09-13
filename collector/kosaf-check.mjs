@@ -11,6 +11,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
+/* 🔴 '비었나'를 여기서 새로 판정하지 않는다 — 로봇과 **같은 함수**를 쓴다.
+   베끼면 "로봇은 내렸는데 관문은 못 보는" 갈라짐이 생긴다. */
+import { emptyVerdict, readChars } from './kosaf-empty.mjs';
+import { loadBlock, blockKey } from './kosaf-open.mjs';
 
 let fail = 0;
 const ok = (label, cond, extra = '') => {
@@ -109,6 +113,52 @@ else {
   /* 마감으로 빠지는 재단이 있으니 '한 건도 줄면 안 된다'로는 못 본다. **반토막**을 본다. */
   ok(`공고문을 가진 재단이 반토막 나지 않았다 (${prevMirrored} → ${mirrored.length}곳)`,
     mirrored.length * 2 >= prevMirrored, '이어받기(mirror)가 끊긴 것부터 의심하세요');
+}
+
+/* ── 속이 빈 공고문 (2026-09-13 — collector/kosaf-empty.mjs · kosaf-block.json) ──
+   🔴 재단 일부가 '선발공고문' 자리에 **속이 빈 파일**을 올려 둔다(`공고문 없음.hwp`).
+      학생이 층2의 유일한 공고 원문을 눌러 빈 문서를 받는 것은 안내가 아니라 헛걸음이다.
+   🔴 여기서 '못 읽음'(스캔 PDF·포스터 JPG 10건)은 **비었다고 하지 않는다** — 학생은
+      그림으로 읽는다. 판정은 emptyVerdict 한 곳에 있다. */
+console.log('\n■ 속이 빈 공고문을 학생에게 주지 않는다');
+const block = loadBlock();
+const hiddenFiles = (block.hidden || []).filter((b) => b.file);
+/* 🔴 **분모를 먼저 본다** — 첨부가 0건이면 아래 검사가 빈 목록을 상대로 조용히 통과한다
+   (2026-09-12 '조용한 0건' 함정과 같은 자리). */
+ok(`판정할 첨부가 있다 (앱 파일 ${allFiles.length}개 + 내려 둔 ${hiddenFiles.length}개)`,
+  allFiles.length + hiddenFiles.length > 0, '첨부가 통째로 0건입니다 — 상세 파서부터 보세요');
+/* 🔴 사람이 '자동 판정이 틀렸다'고 되살린 것(keep)은 여기서 빼고 센다.
+   안 빼면 되살리기를 누르는 순간 이 관문이 **영영 빨간불**이 되어, 그날부터 층2
+   수확이 통째로 저장되지 않는다(관문이 사람의 결정을 이겨 버린다). 이 관문이 잡는 것은
+   '로봇이 거르지 못했다'이지 '사람이 틀렸다'가 아니다. */
+const keptKeys = new Set((block.keep || []).map((b) => blockKey(b.code, b.file)));
+const stillEmpty = mirrored.flatMap((i) => (i.files || [])
+  .filter((f) => !keptKeys.has(blockKey(i.code, f.name)))
+  .map((f) => ({ org: i.org, name: f.name, ...emptyVerdict({ name: f.name, chars: readChars(REPO, f.path) }) }))
+  .filter((v) => v.empty));
+ok(`앱 파일에 빈 공고문이 없다 (${allFiles.length}개 중 0개 · 사람이 되살린 ${keptKeys.size}개 제외)`,
+  stillEmpty.length === 0,
+  stillEmpty.slice(0, 3).map((v) => `${v.org} / ${v.name} — ${v.why}`).join(' · '));
+/* 내린 것이 첨부의 3분의 1을 넘으면 판정이 망가진 것이다(글자 뽑기가 통째로 실패한 날 등) */
+const total = allFiles.length + hiddenFiles.length;
+ok(`내린 공고문이 지나치게 많지 않다 (${hiddenFiles.length}/${total}개)`,
+  hiddenFiles.length * 3 <= total, '글자 뽑기 단계가 통째로 실패한 것부터 의심하세요');
+/* 장부는 사람이 읽는 것이다 — '왜 내렸나'와 '누가 언제'가 없으면 되살릴 판단을 못 한다 */
+const badRows = (block.hidden || []).concat(block.keep || [])
+  .filter((b) => !(b.code && b.why && b.at && b.by));
+ok('장부의 모든 줄에 코드·사유·날짜·주체가 있다', badRows.length === 0,
+  badRows.slice(0, 3).map((b) => JSON.stringify(b)).join(' · '));
+/* 🔴 로봇 기록장과 같은 모양(들여쓰기 1칸)이어야 한다 — 다르면 파일 전체가 충돌한다 */
+{
+  const raw = fs.readFileSync(path.join(REPO, 'collector', 'kosaf-block.json'), 'utf8');
+  ok('장부가 들여쓰기 1칸으로 저장돼 있다', raw === `${JSON.stringify(JSON.parse(raw), null, 1)}\n`);
+}
+/* 같은 첨부를 hidden 과 keep 에 동시에 적어 두면 사람이 장부를 읽고도 결과를 못 맞힌다
+   (규칙은 'keep 이 이긴다' — 그 규칙은 살리되, 이 상태를 오래 두지 않게 알린다) */
+{
+  const both = (block.hidden || []).filter((b) => keptKeys.has(blockKey(b.code, b.file)));
+  ok('같은 첨부가 내림·되살림에 동시에 적혀 있지 않다', both.length === 0,
+    both.map((b) => `${b.org || b.code} / ${b.file}`).join(' · '));
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 저장하지 않습니다` : '\n✓ 한국장학재단 수확 관문 통과');
