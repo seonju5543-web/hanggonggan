@@ -46,6 +46,9 @@ on:
       #    맞출 필요 없이, 새 파일을 vendor 에 넣으면 그 관문이 여기 적으라고 말해 준다.
       - 'collector/url-key.mjs'
       - 'collector/deadline-hint.mjs'
+      - 'collector/notice-source.mjs'      # 저장된 공고 원문 ↔ 등록 공고 잇기 (2026-09-13)
+      - 'collector/canon-url.mjs'          #   그 파일이 부르는 이웃
+      - 'collector/page-boilerplate.mjs'   #   그 파일이 부르는 이웃
       - 'server/push/**'     # 푸시 발송 서버 (verify-push-server.mjs)
       - 'insta/**'           # 인스타 카드 (verify-insta.js)
       - '.github/workflows/verify-ui.yml'

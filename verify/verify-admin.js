@@ -292,6 +292,51 @@ function serve() {
     ok(false, '원문 발췌가 있는 공고를 찾지 못함');
   }
 
+  /* ④-2 저장해 둔 공고 원문 (2026-09-13)
+     🔴 **집에 있는 원문을 두고 새 탭으로 학교 게시판을 다시 찾아가고 있었다.**
+     `collector/extracted/notices-text.json` 에 공고 전문이 있는데 화면이 안 읽고 있었다.
+     ⚠️ 여기서 **건수를 센다** — '원문 칸이 있다' 만 보면 한 건도 안 뜨는 상태로 통과한다
+        (이 저장소가 여러 번 당한 '조용한 실패'). 최소 건수를 못 박는다. */
+  const srcCount = await page.evaluate(async () => {
+    const A = window.__admin;
+    if (!A || !A.ensureSources) return null;
+    const st = await A.ensureSources();
+    if (st !== 'ready') return { state: st };
+    const reg2 = A.D.reg;
+    const noExc = reg2.filter((x) => !(x.excerpts || []).length);
+    return {
+      state: st,
+      all: reg2.length,
+      withSrc: reg2.filter((x) => !!A.storedSource(x)).length,
+      noExc: noExc.length,
+      noExcWithSrc: noExc.filter((x) => !!A.storedSource(x)).length,
+    };
+  });
+  ok(srcCount && srcCount.state === 'ready', '저장해 둔 공고 원문을 읽어 온다', JSON.stringify(srcCount));
+  if (srcCount && srcCount.state === 'ready') {
+    ok(srcCount.withSrc >= 20,
+      '등록 공고 상당수에 저장해 둔 원문이 붙는다', `${srcCount.withSrc}/${srcCount.all}건`);
+    ok(srcCount.noExcWithSrc >= 10,
+      '발췌가 없던 공고에도 읽을 원문이 생긴다 (새 탭 왕복이 사라지는 자리)',
+      `${srcCount.noExcWithSrc}/${srcCount.noExc}건`);
+    /* 원문이 붙는 공고를 실제로 열어 화면에 글자가 보이는지 본다 — 숫자만 맞고 화면은 빈 경우를 막는다 */
+    const someId = await page.evaluate(() => {
+      const A = window.__admin;
+      const hit = A.D.reg.find((x) => !(x.excerpts || []).length && !!A.storedSource(x));
+      return hit ? hit.id : null;
+    });
+    if (someId) {
+      await page.click(`[data-row][data-id="${someId}"]`);
+      await page.waitForSelector('#sheet:not([hidden])');
+      await page.waitForSelector('#sheet .src-body', { timeout: 5000 }).catch(() => {});
+      const bodyLen = await page.evaluate(() => (document.querySelector('#sheet .src-body')?.textContent || '').length);
+      ok(bodyLen > 100, '그 공고를 열면 원문 글자가 실제로 보인다', `${bodyLen}자`);
+      await page.click('#sheet [data-close]');
+    } else {
+      ok(false, '원문이 붙는 발췌 없는 공고를 찾지 못함');
+    }
+  }
+
   /* ⑤ 양식 미리보기 — 등록된 전 양식이 오류 없이 문서를 만들어 내는가 */
   const preview = await page.evaluate(() => {
     const bad = [];

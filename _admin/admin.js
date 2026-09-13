@@ -11,6 +11,12 @@
    ============================================================ */
 
 import { urlKey } from './vendor/url-key.mjs';
+/* 저장된 공고 원문을 등록 공고와 잇는 규칙 — 🔴 베끼지 않는다.
+   로봇·발췌기·감사가 같은 파일을 쓴다(collector/notice-source.mjs). */
+import { indexTexts, sourceFor, hasText, isCut, looksLikeErrorPage } from './vendor/notice-source.mjs';
+/* 학교 홈페이지 메뉴를 걷어내는 규칙 — '같은 학교의 여러 공고에 똑같이 나오는 줄 = 메뉴'.
+   🔴 베끼지 않는다. 발췌기·본문 분량 판정이 쓰는 것과 같은 파일이다. */
+import { makeStripper } from './vendor/page-boilerplate.mjs';
 
 /* ---------------- 설정 ---------------- */
 const OWNER = 'seonju5543-web';
@@ -633,6 +639,50 @@ function renderTodo() {
       </div>
       <div class="rows" data-rows>${urgent.map(rowHtml).join('')}</div>` : ''}
   `;
+}
+
+/* ---------------- 저장된 공고 원문 (2026-09-13) ----------------
+   🔴 **집에 있는 원문을 두고 새 탭으로 학교 게시판을 다시 찾아가고 있었다.**
+   실측: 검수 대기 14건 중 10건은 화면에 보여 줄 발췌가 없는데, 그 10건 **전부** 공고
+   원문이 이미 저장소에 있다(`collector/extracted/notices-text.json` 86건·546KB +
+   `browser-bodies.json` 273KB). 등록 48건으로 넓히면 42건이 원문을 갖고 있다.
+
+   ⚠️ 두 파일이 합쳐 800KB 라 **화면을 열 때마다 받지 않는다** — 상세를 처음 열 때 한 번만
+      받아 두고 그 뒤로는 그대로 쓴다.
+   🔴 **못 받아 왔을 때 '비어 있음'으로 두지 말 것** — 화면이 '아직 오는 중' 으로 읽어
+      기다림 표시가 영영 굳는다(앱1이 실제로 겪은 일). 실패는 실패라고 적는다. */
+let SRC_IDX = null;          // indexTexts 결과 (byUrl · byTitle)
+let SRC_STRIP = null;        // 메뉴를 걷어내는 함수
+let SRC_STATE = 'idle';      // idle · loading · ready · failed
+
+async function ensureSources() {
+  if (SRC_STATE === 'ready' || SRC_STATE === 'loading') return SRC_STATE;
+  SRC_STATE = 'loading';
+  try {
+    const [texts, bodies] = await Promise.all([
+      readJson('collector/extracted/notices-text.json', null),
+      readJson('collector/extracted/browser-bodies.json', {}),
+    ]);
+    if (!texts) throw new Error('원문 파일을 받지 못했습니다');
+    SRC_IDX = indexTexts(texts, bodies || {});
+    SRC_STRIP = makeStripper(texts);
+    SRC_STATE = 'ready';
+  } catch (e) {
+    SRC_IDX = null;
+    SRC_STATE = 'failed';
+  }
+  return SRC_STATE;
+}
+
+/** 이 공고의 저장된 원문. 없거나 못 읽었으면 null.
+ *  🔴 오류·점검 화면은 원문이 아니다 — notice-source 의 판정을 그대로 쓴다
+ *     (서울대 점검 날 '장애 조치 안내' 16건이 공고 원문으로 저장된 적이 있다). */
+function storedSource(it) {
+  if (SRC_STATE !== 'ready' || !SRC_IDX) return null;
+  const src = sourceFor(it, SRC_IDX);
+  if (!hasText(src)) return null;
+  if (looksLikeErrorPage(src.text)) return null;
+  return src;
 }
 
 /* ---------------- 모아 두는 수정 (2026-09-13) ----------------
@@ -2034,6 +2084,63 @@ function registerSheet(n) {
 
 let currentSheetItem = null;
 
+/** 상세를 연다. 저장된 원문이 아직 없으면 뒤에서 받아 오고, 오면 그 칸만 다시 그린다.
+ *  🔴 여는 것을 기다리게 하지 않는다 — 800KB 를 받는 동안 화면이 멈추면 더 나쁘다. */
+function openDetail(it) {
+  currentSheetItem = it;
+  openSheet(detailSheet(it));
+  if (SRC_STATE === 'ready') return;
+  ensureSources().then(() => {
+    /* 그새 시트를 닫았거나 다른 공고를 열었으면 그리지 않는다 */
+    if (byId('sheet').hidden || currentSheetItem !== it) return;
+    openSheet(detailSheet(it));
+  });
+}
+
+/** 저장된 공고 원문을 보여 주는 칸.
+ *  🔴 여기 적는 것은 **원문 그대로**이고, 옳다·그르다를 말하지 않는다(운영 원칙 8-1).
+ *  🔴 못 읽었을 때 조용히 비우지 않는다 — '아직 오는 중' 으로 읽히면 기다림이 영영 굳는다. */
+function sourceBlock(it) {
+  if (SRC_STATE === 'loading') {
+    return '<p class="muted">저장해 둔 공고 원문을 읽는 중입니다…</p>';
+  }
+  if (SRC_STATE === 'failed') {
+    return `<p class="muted">저장해 둔 원문을 읽지 못했습니다.
+      <button class="btn btn-sm" data-act="src-retry" data-id="${esc(it.id)}">다시 읽기</button></p>`;
+  }
+  const src = storedSource(it);
+  if (!src) {
+    return `<p class="muted">저장소에 이 공고의 원문이 없습니다.
+      ${(it.excerpts || []).length ? '' : '없는 내용을 지어내지 말고 위 원문 링크로 확인하세요.'}</p>`;
+  }
+  const raw = String(src.text || '');
+  /* 🔴 학교 홈페이지 메뉴를 걷어낸다 — 안 걷으면 맨 위가 '바로가기 메뉴 · 설립자 · 상징 · UI …'
+     라 정작 공고를 읽으려면 한참 내려야 한다(실측으로 그랬다).
+     ⚠️ 너무 많이 걷혔으면(본문이 거의 안 남으면) 걷지 않은 것을 보여 준다 —
+        걷는 규칙이 헛돌아 공고를 통째로 지우는 것보다 메뉴가 좀 섞이는 편이 낫다. */
+  let body = raw;
+  let stripped = false;
+  try {
+    const cut = SRC_STRIP ? SRC_STRIP(src.url || '', raw) : raw;
+    if (cut && cut.length >= 200) { body = cut; stripped = cut.length < raw.length; }
+  } catch { /* 못 걷으면 원문 그대로 */ }
+  /* 🔴 숫자를 **둘 다** 적는다. 많이 줄었다는 것은 뜻이 있는 신호다 —
+     저장된 쪽이 상세가 아니라 **게시판 목록 페이지**일 때 이렇게 된다(실측으로 3,068 → 207자).
+     한쪽 숫자만 보이면 '원문을 다 받았다'고 잘못 읽는다. 걷기 전 원문도 열어 볼 수 있게 둔다. */
+  const thin = stripped && raw.length > 1200 && body.length < raw.length * 0.2;
+  return `<div class="field">
+      <label>저장해 둔 공고 원문 — 원문 그대로 (${body.length.toLocaleString()}자${
+  stripped ? ` · 학교 홈페이지 메뉴 걷어내기 전 ${raw.length.toLocaleString()}자` : ''}${
+  isCut(src) ? ' · 뒷부분이 잘려 있습니다' : ''})</label>
+      <div class="src-body" tabindex="0" role="region" aria-label="저장해 둔 공고 원문">${esc(body)}</div>
+      ${thin ? `<p class="hint">🔴 걷어내고 남은 글자가 많이 줄었습니다. 저장된 쪽이 공고 상세가 아니라
+        <b>게시판 목록</b>일 수 있습니다 — 위 '원문 공고 열기'로 확인하세요.</p>` : ''}
+      ${stripped ? `<details><summary class="hint">걷어내기 전 원문 보기</summary>
+        <div class="src-body" tabindex="0">${esc(raw)}</div></details>` : ''}
+      <p class="hint">여기 글자는 로봇이 받아 둔 원문입니다. 이 화면이 옳다·그르다를 판단하지 않습니다.</p>
+    </div>`;
+}
+
 function detailSheet(it) {
   currentSheetItem = it;
   const fi = formIdSet();
@@ -2140,8 +2247,10 @@ function detailSheet(it) {
           ${url ? `<a class="btn btn-sm" href="${esc(url)}" target="_blank" rel="noreferrer noopener">원문 공고 열기 ↗</a>`
     : '<p class="muted">원문 주소가 없습니다.</p>'}
           ${(it.excerpts || []).length
-    ? (it.excerpts || []).map((x) => `<div class="excerpt">${esc(x)}</div>`).join('')
-    : '<p class="muted">확보된 원문 발췌가 없습니다. 없는 내용을 지어내지 말고 원문 링크로 확인하세요.</p>'}
+    ? `<div class="field"><label>뽑아 둔 발췌</label>
+        ${(it.excerpts || []).map((x) => `<div class="excerpt">${esc(x)}</div>`).join('')}</div>`
+    : ''}
+          ${sourceBlock(it)}
           ${(it.attachments || []).length ? `<div class="field"><label>첨부</label>
             ${(it.attachments || []).map((a) => {
     const au = safeUrl(a.url);
@@ -2330,7 +2439,7 @@ function bindGlobal() {
     const row = e.target.closest('[data-row][data-id]');
     if (row) {
       const it = D.reg.find((x) => x.id === row.dataset.id);
-      if (it) openSheet(detailSheet(it));
+      if (it) openDetail(it);
       return;
     }
 
@@ -2601,7 +2710,7 @@ function bindGlobal() {
     const row = e.target.closest('[data-row][data-id]');
     if (row) {
       const it = D.reg.find((x) => x.id === row.dataset.id);
-      if (it) openSheet(detailSheet(it));
+      if (it) openDetail(it);
       return;
     }
 
@@ -2609,6 +2718,13 @@ function bindGlobal() {
     if (!act) return;
     const id = act.dataset.id;
     const kind = act.dataset.act;
+
+    if (kind === 'src-retry') {
+      SRC_STATE = 'idle';
+      const cur = D.reg.find((x) => x.id === id);
+      if (cur) openDetail(cur);
+      return;
+    }
 
     if (kind === 'save') {
       const patch = collectEdits();
@@ -2734,7 +2850,12 @@ async function enter(key, remember) {
      검증 드라이버(verify/verify-admin.js)와 브라우저 콘솔에서 상태를 들여다볼 때 쓴다.
      열쇠를 통과한 뒤에만 만들어지므로 이것으로 잠금이 느슨해지지는 않는다. */
   window.__admin = { D, previewDoc, blankAnswers, statusOf, badgesOf, channelOf, naturesOf,
-    renderDataFail, pendingForms, loadRobotIssues, loadPushHealth };
+    renderDataFail, pendingForms, loadRobotIssues, loadPushHealth,
+    /* 저장해 둔 공고 원문 (2026-09-13) — 검사가 '몇 건에 원문이 뜨는가'를 셀 수 있어야
+       빈 목록을 상대로 조용히 통과하는 일이 없다. */
+    ensureSources, storedSource, srcState: () => SRC_STATE,
+    /* 모아 둔 수정 — 검사가 '보내기 전에는 안 보낸다'를 확인한다 */
+    pendingCount };
 }
 
 function boot() {

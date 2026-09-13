@@ -36,6 +36,11 @@ const DATA = {
   'collector/pending-forms.json': readJson('collector/pending-forms.json'),
   'collector/auto-register-config.json': readJson('collector/auto-register-config.json'),
   'data/admin-log.json': readJson('data/admin-log.json'),
+  /* 저장해 둔 공고 원문 (2026-09-13) — 상세 시트의 오른쪽 칸이 이걸 읽는다.
+     ⚠️ 둘이 합쳐 800KB 라 미리보기 파일이 그만큼 커진다. 그래도 담는 이유:
+        안 담으면 미리보기가 '원문이 없습니다'라고 **거짓으로** 말한다. */
+  'collector/extracted/notices-text.json': readJson('collector/extracted/notices-text.json'),
+  'collector/extracted/browser-bodies.json': readJson('collector/extracted/browser-bodies.json'),
   /* 인스타 화면 (2026-09-12) — 없는 파일은 null 그대로(화면이 빈 값으로 그린다) */
   'insta/seen.json': readJson('insta/seen.json'),
   'insta/templates.json': readJson('insta/templates.json'),
@@ -60,25 +65,89 @@ const urlKeyMjs = read('collector/url-key.mjs');
    `<script type="module">` 안의 상대 경로는 preview.html 옆을 가리키므로 파일을 못 찾아
    **모듈 전체가 실행되지 않았다**(미리보기가 통째로 죽었다 — 관리자 화면과 똑같은 증상).
    그래서 이름을 하나씩 적지 않고 **상대 import 를 따라가며 모아 온다.** */
+/** 모듈 하나를 **제 방(IIFE)에 담아** 한 파일로 모은다.
+ *  🔴 예전에는 본문을 그냥 이어 붙였다. 그래서 서로 다른 모듈이 같은 이름을 쓰면
+ *  '이미 선언됨' 으로 모듈 전체가 죽었다 — 실제로 `url-key.mjs` 와 `canon-url.mjs` 가
+ *  둘 다 `VOLATILE` 을, `url-key.mjs` 와 `notice-source.mjs` 가 둘 다 `normTitle` 을 쓴다.
+ *  진짜 모듈이면 각자 방이 있어 괜찮은 것이라, 여기서도 방을 만들어 준다.
+ *  내보내는 이름만 밖으로 나오고, 그 이름은 `__ns__<파일이름>` 아래에 모인다. */
+const nsName = (rel) => `__ns__${rel.replace(/[^A-Za-z0-9]/g, '_')}`;
+
 function inlineModule(startRel, seen = new Set()) {
   if (seen.has(startRel)) return '';
   seen.add(startRel);
   const text = read(startRel);
   const dir = path.posix.dirname(startRel);
-  let deps = '';
-  for (const m of text.matchAll(/^\s*import\s+(?:[^'"]*\sfrom\s+)?['"](\.[^'"]+)['"];?\s*$/gm)) {
-    deps += inlineModule(path.posix.normalize(path.posix.join(dir, m[1])), seen);
+
+  /* 이웃부터 먼저 담는다 */
+  let out = '';
+  const deps = [];
+  for (const m of text.matchAll(/^\s*import\s+\{([^}]*)\}\s+from\s+['"](\.[^'"]+)['"];?\s*$/gm)) {
+    const rel = path.posix.normalize(path.posix.join(dir, m[2]));
+    deps.push({ names: m[1], rel });
+    out += inlineModule(rel, seen);
   }
-  const body = text
-    .replace(/^\s*import\s+(?:[^'"]*\sfrom\s+)?['"]\.[^'"]+['"];?\s*$/gm, '')
+
+  /* 내보내는 이름을 먼저 센다 (export 를 지우기 전에) */
+  const names = new Set();
+  for (const m of text.matchAll(/^export\s+(?:const|let|var|async\s+function|function|class)\s+([A-Za-z_$][\w$]*)/gm)) names.add(m[1]);
+  for (const m of text.matchAll(/^export\s*\{([^}]*)\}/gm)) {
+    m[1].split(',').forEach((n) => {
+      const t = n.trim().split(/\s+as\s+/).pop().trim();
+      if (t) names.add(t);
+    });
+  }
+
+  /* 🔴 `export { x } from './dep.mjs'` (재수출) 를 먼저 지운다.
+     나중에 `^export ` 만 떼면 `{ x } from './dep.mjs';` 라는 **문법 오류**가 남는다
+     (notice-source.mjs 가 실제로 이 꼴이라 모듈이 통째로 죽었다 — 만들면서 겪었다).
+     그 이름은 바로 아래 import 줄로 이미 방 안에 들어오므로 잃는 것이 없다. */
+  let body = text
+    .replace(/^\s*export\s*\{[^}]*\}\s*from\s+['"][^'"]+['"];?\s*$/gm, '')      // 재수출(from) 줄 제거
+    .replace(/^\s*import\s+(?:[^'"]*\sfrom\s+)?['"]\.[^'"]+['"];?\s*$/gm, '')   // 이웃 import 줄 제거
+    .replace(/^export\s*\{[^}]*\};?\s*$/gm, '')                                  // 재수출 줄 제거
+    .replace(/^export default [\s\S]*?;\s*$/m, '')
     .replace(/^export default .*$/m, '')
     .replace(/^export /gm, '');
-  return deps + body + '\n';
+
+  /* 이웃이 내보낸 것을 이 방 안으로 들여온다 */
+  const bring = deps.map((d) => `const {${d.names}} = ${nsName(d.rel)};`).join('\n');
+
+  out += `const ${nsName(startRel)} = (() => {\n${bring}\n${body}\nreturn { ${[...names].join(', ')} };\n})();\n`;
+  return out;
 }
-const urlKeyInline = inlineModule('collector/url-key.mjs');
+
+/* admin.js 가 `./vendor/…` 에서 가져오는 것들을 **이름을 적지 않고** 찾아 한 파일로 모은다.
+   🔴 예전에는 `url-key.mjs` 하나만 이름으로 지웠다. 그래서 admin.js 가 vendor 에서
+   무언가를 새로 가져오기 시작하면 그 import 줄이 인라인 사본에 그대로 남고,
+   `<script type="module">` 안의 상대 경로는 preview.html 옆을 가리켜 파일을 못 찾아
+   **모듈 전체가 조용히 안 돈다** — 오류 한 줄 없이 화면이 죽는다(2026-09-13 에 실제로 겪었고,
+   notice-source.mjs 를 더하다 같은 방식으로 또 겪었다).
+   이제 import 를 읽어 vendor 이름을 뽑고, build.sh 의 복사 규칙과 같은 자리에서 원본을 찾는다. */
+const VENDOR_SRC = {
+  'url-key.mjs': 'collector/url-key.mjs',
+  'deadline-hint.mjs': 'collector/deadline-hint.mjs',
+  'notice-source.mjs': 'collector/notice-source.mjs',
+  'canon-url.mjs': 'collector/canon-url.mjs',
+  'page-boilerplate.mjs': 'collector/page-boilerplate.mjs',
+};
+const wantedVendor = [...adminJs.matchAll(/from\s+['"]\.\/vendor\/([^'"]+)['"]/g)].map((m) => m[1]);
+const unknownVendor = wantedVendor.filter((n) => !VENDOR_SRC[n]);
+if (unknownVendor.length) {
+  console.error(`✕ admin.js 가 가져오는 vendor 모듈을 미리보기가 모릅니다: ${unknownVendor.join(', ')}`);
+  console.error('  tools/build-admin-preview.mjs 의 VENDOR_SRC 에 더해 주세요 (build.sh 도 함께 확인).');
+  process.exit(1);
+}
+const seenModules = new Set();
+const urlKeyInline = wantedVendor.map((n) => inlineModule(VENDOR_SRC[n], seenModules)).join('\n');
 
 const adminInline = adminJs
-  .replace(/^import\s+\{[^}]*\}\s+from\s+'\.\/vendor\/url-key\.mjs';\s*$/m, '')
+  /* vendor 에서 가져오던 줄은 **지우지 않고** 그 방에서 꺼내 쓰는 줄로 바꾼다.
+     지우면 이름이 없어져 admin.js 가 죽고, 그대로 두면 파일을 못 찾아 모듈이 죽는다. */
+  .replace(
+    /^\s*import\s+\{([^}]*)\}\s+from\s+['"]\.\/vendor\/([^'"]+)['"];?\s*$/gm,
+    (_, names, file) => `const {${names}} = ${nsName(VENDOR_SRC[file])};`,
+  )
   /* 바깥으로 나가지 않고 파일 안 데이터를 읽는다 */
   .replace(
     /async function readJson\(path, fallback\) \{[\s\S]*?\n\}/,

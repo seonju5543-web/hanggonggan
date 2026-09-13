@@ -33,6 +33,13 @@ cp form-plan.js "$OUT/vendor/form-plan.js"
 cp collector/url-key.mjs "$OUT/vendor/url-key.mjs"
 cp collector/deadline-hint.mjs "$OUT/vendor/deadline-hint.mjs"
 
+# 저장된 공고 원문을 등록 공고와 잇는 규칙 (2026-09-13)
+#   화면이 '이 공고의 원문이 저장소에 있는가'를 스스로 판단하면 로봇·발췌기와 갈라진다.
+#   🔴 이 파일도 이웃 둘을 부른다 — 아래 '빠진 이웃' 검사가 빠뜨림을 잡는다.
+cp collector/notice-source.mjs "$OUT/vendor/notice-source.mjs"
+cp collector/canon-url.mjs "$OUT/vendor/canon-url.mjs"
+cp collector/page-boilerplate.mjs "$OUT/vendor/page-boilerplate.mjs"
+
 # 등록 규칙 — Node용 파일이라 브라우저에서 읽히도록 앞뒤만 감싼다.
 # (내용은 손대지 않는다. 규칙이 바뀌면 다음 빌드에 그대로 따라온다)
 {
