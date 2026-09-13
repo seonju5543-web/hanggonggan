@@ -103,6 +103,19 @@ async function onboard(page) {
     const honesty = await page.textContent('#notify-sheet .sheet-note');
     // 발송 서버가 붙기 전/후로 문구가 달라진다 — 어느 쪽이든 '전달 시점'을 정직하게 밝혀야 한다
     ok(/발송 서버가 없어요|앱을 켜지 않아도/.test(honesty), '전달 방식을 정직하게 안내', honesty.slice(0, 40));
+    /* 🔴 **장식용 원이 없다** (2026-09-12 개발자 지시 · 노션 UI-5: "원 안에 아이콘 + 설명 +
+       버튼 형태 = 'Icon in colored circle as section decoration' 블랙리스트 패턴").
+       글자를 나르지 않는 동그라미(지름 32px 이상)가 이 시트에 있으면 실패다.
+       ⚠️ 줄별 아이콘(.nf-ico)은 동그라미가 아니고 **어떤 알림인지**를 말하므로 걸리지 않는다. */
+    const deco = await page.$$eval('#notify-sheet *', (els) => els.filter((e) => {
+      const cs = getComputedStyle(e); const r = e.getBoundingClientRect();
+      const round = /50%|9999px/.test(cs.borderRadius) || (parseFloat(cs.borderRadius) >= r.width / 2 - 1 && r.width > 0);
+      return round && r.width >= 32 && Math.abs(r.width - r.height) < 4 && !e.textContent.trim();
+    }).map((e) => e.className || e.tagName));
+    ok(deco.length === 0, '동의 시트에 장식용 원이 없다 (UI-5)', deco);
+    /* 이 앱의 다른 시트는 왼쪽 정렬이다 — 여기만 가운데면 '따로 만든 화면'으로 읽힌다 */
+    const align = await page.$eval('#notify-sheet .sheet-title', (e) => getComputedStyle(e).textAlign);
+    ok(align !== 'center', '제목이 다른 시트와 같은 왼쪽 정렬이다', align);
     await page.screenshot({ path: SHOT('01-consent') });
 
     await page.click('#btn-nf-later');

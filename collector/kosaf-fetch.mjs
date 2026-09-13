@@ -27,11 +27,8 @@ import { slimKosaf } from './kosaf-open.mjs';
 /* 예산 시계는 수집 로봇과 같은 것을 쓴다 — 시간초과는 '넘어져도 저장'으로 못 막는다.
    GitHub 이 프로세스를 강제 종료하면 저장 단계까지 통째로 죽는다(2026-08-03 사고). */
 import { makeBudget } from './harvest-budget.mjs';
-
-const BASE = 'https://portal.kosaf.go.kr';
-const LIST = `${BASE}/CO/jspAction.do?beanName=PTSMCstmDsgnGoodsSVC&methodName=getItgnSrchCstmDsgnGoodsList`
-  + '&inputVOName=kr.go.kosaf.portal.pt.sm.cstmdsgngoods.svc.PTSMCstmDsgnGoodsSVO'
-  + '&forwardOnlyFlag=N&ignoreSession=Y&forwardPage=pt/sm/cstmdsgngoods/PTSMCstmDsgnGoods_10M&naviParam=MK,05,02,01';
+/* 포털과 말하는 규칙은 한 곳 — 로봇 셋(수확·첨부·정찰)이 같은 파일을 쓴다 */
+import { createSession, parseList, parseDetailFields, parseFiles, LIST } from './kosaf-session.mjs';
 
 const arg = (k, d) => {
   const a = process.argv.find((x) => x.startsWith(`--${k}=`));
@@ -41,149 +38,26 @@ const MAX = Number(arg('max', 0));
 const WRITE = process.argv.includes('--write');
 const LIST_ONLY = process.argv.includes('--list-only');
 
-/* 쿠키를 손으로 이어 붙인다 — 의존성을 늘리지 않는다 */
-/* 🔴 재단 서버가 한 번 안 받아 주면 **실행 전체가 죽었다** (2026-09-01 이슈 #227).
-   그날 로그는 `ConnectTimeoutError: portal.kosaf.go.kr:443, timeout: 10000ms` 하나였고
-   34초 만에 끝났다 — 우리 버그가 아니라 재단 쪽이 잠깐 안 받은 것인데, 재시도가 없어
-   그 실행이 통째로 사라졌다. 다음 예약은 사흘 뒤라 그동안 층2 가 늙는다
-   (안 받으면 1주에 43곳·2주에 69곳이 마감돼 목록이 빈다).
-   학교 게시판 수집이 2026-07-30 시립대 유실로 이미 배운 것과 **같은 유형**이다.
+/* 🔴 포털과 말하는 규칙(쿠키·토큰·form2·첨부 Referer)은 **`kosaf-session.mjs` 한 곳**에 있다.
+   여기 베껴 두면 첨부 로봇·정찰과 갈라져, 한쪽만 고친 날 조용히 껍데기를 받게 된다. */
+const S = createSession();
 
-   ⚠️ **응답을 못 받은 요청만 다시 보낸다.** 응답이 왔으면 `post()` 가 토큰을 갱신하므로
-      같은 몸통으로 다시 보내면 껍데기가 온다(파일 첫머리의 form2 함정과 같은 뿌리).
-      여기서 잡는 것은 fetch 자체가 던지는 경우 = 응답이 아예 없는 경우뿐이다. */
-async function tryFetch(url, opts = {}, attempts = 3) {
-  let last;
-  for (let i = 1; i <= attempts; i += 1) {
-    try {
-      /* 30초 — 평소 목록은 2초, 상세(1.3MB)는 8초다(실측). 넉넉하되 무한정은 아니다.
-         ⚠️ 여기를 크게 잡으면 포털이 **느릴 때** 185쪽을 도는 동안 작업 상한(20분)에 걸려
-            취소된다. 취소는 실패가 아니라서 `if: failure()` 도 안 잡는다. */
-      return await fetch(url, { ...opts, signal: AbortSignal.timeout(30000) });
-    } catch (e) {
-      last = e;
-      if (i < attempts) {
-        console.log(`  · 재단 서버가 응답하지 않습니다 (${i}/${attempts}) — ${i * 5}초 뒤 다시 겁니다`);
-        await new Promise((r) => setTimeout(r, i * 5000));
-      }
-    }
-  }
-  throw last;
-}
-
-const cookies = new Map();
-function keep(res) {
-  const set = typeof res.headers.getSetCookie === 'function' ? res.headers.getSetCookie() : [];
-  for (const c of set) {
-    const kv = c.split(';')[0];
-    const i = kv.indexOf('=');
-    if (i > 0) cookies.set(kv.slice(0, i).trim(), kv.slice(i + 1));
-  }
-}
-const jar = () => [...cookies].map(([k, v]) => `${k}=${v}`).join('; ');
-
-const strip = (s) => s.replace(/<[^>]+>/g, ' ')
-  .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<')
-  .replace(/&gt;/g, '>').replace(/&#39;/g, "'").replace(/&quot;/g, '"')
-  .replace(/\s+/g, ' ').trim();
-
-let token = '';
-let formFields = [];
-function readForm(htmlText) {
-  const t = htmlText.match(/id="csrfTokenPortal" value="([^"]*)"/);
-  if (t) token = t[1];
-  const f = htmlText.match(/<form[^>]*name="form2"[\s\S]*?<\/form>/);
-  if (!f) return;
-  formFields = [...f[0].matchAll(/<input[^>]*>/g)].map((m) => {
-    const n = m[0].match(/name="([^"]+)"/);
-    const v = m[0].match(/value="([^"]*)"/);
-    return n ? [n[1], v ? v[1] : ''] : null;
-  }).filter(Boolean);
-}
-
-/* 목록 표에서 행을 읽는다. 상세 코드는 fn_goDtl('…') 에 들어 있다 */
-function parseList(htmlText) {
-  const tables = htmlText.match(/<table[\s\S]*?<\/table>/g) || [];
-  const tb = tables.find((x) => x.includes('모집마감일'));
-  if (!tb) return [];
-  const body = tb.match(/<tbody[^>]*>([\s\S]*?)<\/tbody>/);
-  if (!body) return [];
-  const out = [];
-  for (const tr of body[1].match(/<tr[\s\S]*?<\/tr>/g) || []) {
-    const tds = [...tr.matchAll(/<td[^>]*>([\s\S]*?)<\/td>/g)].map((m) => strip(m[1]));
-    const code = tr.match(/fn_goDtl\('(\d+)'\)/);
-    const home = tr.match(/fn_goHome\('([^']*)'\)/);
-    if (tds.length >= 7 && /^\d+$/.test(tds[0]) && code) {
-      out.push({
-        no: Number(tds[0]), code: code[1], org: tds[1], name: tds[2],
-        kind: tds[3], goods: tds[4], tel: tds[5], due: tds[6], home: home ? home[1] : '',
-      });
-    }
-  }
-  return out;
-}
-
-function baseBody() {
-  const body = new URLSearchParams();
-  for (const [k, v] of formFields) body.set(k, v);
-  body.set('csrfTokenPortal', token);
-  body.set('beanName', 'PTSMCstmDsgnGoodsSVC');
-  return body;
-}
-async function post(body) {
-  const r = await tryFetch(`${BASE}/CO/jspActionSafe.do`, {
-    method: 'POST',
-    headers: { cookie: jar(), 'content-type': 'application/x-www-form-urlencoded' },
-    body,
-  });
-  keep(r);
-  const t = await r.text();
-  /* 🔴 토큰은 응답마다 새로 온다 — 처음 것만 들고 있으면 쪽을 넘기는 동안 낡아서
-     그 뒤의 상세 요청이 전부 껍데기로 돌아온다(실제로 상세 0건이 나왔다).
-     ⚠️ 토큰만 새로 읽는다. 폼 칸까지 덮으면 상세 화면의 폼이 들어와 다음 요청이 깨진다. */
-  const nt = t.match(/id="csrfTokenPortal" value="([^"]*)"/);
-  if (nt) token = nt[1];
-  return t;
-}
-
-async function page(no) {
-  const body = baseBody();
-  body.set('methodName', 'getItgnSrchCstmDsgnGoodsList');
-  body.set('inputVOName', 'kr.go.kosaf.portal.pt.sm.cstmdsgngoods.svc.PTSMCstmDsgnGoodsSVO');
-  body.set('forwardPage', 'pt/sm/cstmdsgngoods/PTSMCstmDsgnGoods_10M');
-  body.set('no', String(no));
-  return post(body);
-}
-
-/* 🔴 상세는 form2 의 칸을 **전부, 그대로** 실어야 한다.
-   ⚠️ **덮어쓰지 말 것.** form2 는 이미 상세용으로 채워져 있고, 특히
-      `inputVOName` 이 `…PTSMCstmDsgnGoods` 가 아니라 **`…PTSMCstmDsgnGoodsDtlSVO`** 다.
-      한 글자(`Dtl`) 차이로 200 이 오지만 **본문 없는 껍데기(67KB)** 가 온다 —
-      실제로 이걸 몰라 상세 0건이 나왔고, 원인을 '토큰'·'헤더'로 두 번 잘못 짚었다.
-      바꿀 것은 `cstmDsgnGoodsCd` 하나뿐이다. */
+/* 상세 한 건 — 칸(자격 20칸)과 **첨부 링크**를 같이 돌려준다.
+   🔴 첨부를 여기서 버리면 안 된다: parseDetailFields 는 strip() 으로 태그를 지우는데
+      유일한 공고 원문(선발공고문 파일)로 가는 길이 그 태그 안에 있다. 실제로 그래서
+      `선발공고문: "[다운로드]"` 라는 글자만 넉 달 동안 갖고 있었다(2026-09-12 수리). */
 async function detail(code) {
-  const body = baseBody();
-  body.set('cstmDsgnGoodsCd', code);
-  const t = await post(body);
-  const tables = t.match(/<table[\s\S]*?<\/table>/g) || [];
-  const tb = tables.find((x) => x.includes('성적기준') || x.includes('운영기관명'));
-  if (!tb) return null;                                   // 껍데기가 왔다
-  const f = {};
-  for (const tr of tb.match(/<tr[\s\S]*?<\/tr>/g) || []) {
-    const cells = [...tr.matchAll(/<(th|td)[^>]*>([\s\S]*?)<\/\1>/g)].map((m) => strip(m[2]));
-    for (let i = 0; i + 1 < cells.length; i += 2) {
-      if (cells[i] && cells[i].length <= 14) f[cells[i]] = cells[i + 1];
-    }
-  }
-  return Object.keys(f).length ? f : null;
+  const t = await S.detailHtml(code);
+  const fields = parseDetailFields(t);
+  if (!fields) return null;                               // 껍데기가 왔다
+  return { fields, files: parseFiles(t) };
 }
 
-const first = await tryFetch(LIST, { headers: { cookie: jar() } });
-keep(first);
-const firstHtml = await first.text();
-readForm(firstHtml);
-if (!token || !formFields.length) {
-  console.error('✕ 토큰·폼을 못 읽었습니다 — 화면 구조가 바뀐 듯합니다');
+let firstHtml;
+try {
+  firstHtml = await S.open();
+} catch (e) {
+  console.error(`✕ ${e.message}`);
   process.exit(1);
 }
 
@@ -191,7 +65,7 @@ let rows = parseList(firstHtml);
 const last = Math.max(...[...firstHtml.matchAll(/fn_page\('(\d+)'\)/g)].map((m) => Number(m[1])), 1);
 console.log(`목록: 마지막 쪽 ${last} · 1쪽 ${rows.length}건`);
 for (let p = 2; p <= last; p += 1) {
-  rows = rows.concat(parseList(await page(p)));
+  rows = rows.concat(parseList(await S.page(p)));
   if (p % 40 === 0) console.log(`  …${p}/${last}쪽 (${rows.length}건)`);
   await new Promise((r) => setTimeout(r, 200));
 }
@@ -211,7 +85,8 @@ const today = new Date().toISOString().slice(0, 10);
 let prevDetail = new Map();
 try {
   const prev = JSON.parse(fs.readFileSync(new URL('../data/kosaf.json', import.meta.url), 'utf8'));
-  prevDetail = new Map((prev.items || []).filter((i) => i.detail).map((i) => [i.code, i.detail]));
+  prevDetail = new Map((prev.items || []).filter((i) => i.detail)
+    .map((i) => [i.code, { detail: i.detail, files: i.files, mirror: i.mirror }]));
   console.log(`지난 실행의 상세 ${prevDetail.size}건을 이어받습니다`);
 } catch { /* 처음 실행 */ }
 
@@ -249,8 +124,9 @@ if (!LIST_ONLY) {
   let ranOut = 0;
   for (const [i, r] of target.entries()) {
     if (budget.expired()) { ranOut = target.length - i; break; }
-    try { r.detail = await detail(r.code); } catch { r.detail = null; }
-    if (r.detail) got += 1;
+    let d = null;
+    try { d = await detail(r.code); } catch { d = null; }
+    if (d) { r.detail = d.fields; if (d.files.length) r.files = d.files; got += 1; }
     if ((i + 1) % 25 === 0) console.log(`  상세 ${i + 1}/${target.length} (성공 ${got})`);
     await new Promise((x) => setTimeout(x, 250));
   }
@@ -259,9 +135,14 @@ if (!LIST_ONLY) {
 /* 이번에 못 받은 것은 지난 실행 값을 그대로 쓴다 */
 let carried = 0;
 for (const r of list) {
-  if (!r.detail && prevDetail.has(r.code)) { r.detail = prevDetail.get(r.code); carried += 1; }
+  const prev = prevDetail.get(r.code);
+  if (!r.detail && prev) { r.detail = prev.detail; if (prev.files) r.files = prev.files; carried += 1; }
+  /* 🔴 **받아 둔 사본(mirror)은 상세를 새로 받아도 이어받는다** — 여기서 떨어뜨리면
+     첨부 로봇이 매 실행 같은 파일을 다시 받고, 그 사이 앱은 링크를 잃는다. */
+  if (prev && prev.mirror) r.mirror = prev.mirror;
 }
 console.log(`상세 확보: 새로 ${got}건 · 이어받음 ${carried}건 · 합계 ${list.filter((r) => r.detail).length}건`);
+console.log(`첨부 링크를 가진 재단: ${list.filter((r) => (r.files || []).length).length}곳`);
 
 if (WRITE) {
   const out = {

@@ -59,6 +59,12 @@
 
   /* 그림자 — 바탕의 색조를 띠게 한다. 순수 검정 저투명도는 회색 때가 낀 것처럼 보인다.
      빛의 방향은 화면 전체에서 위쪽 하나로 통일했다. */
+  /* 🔴 **그림자는 '떠 있는 것'에만** (2026-09-12 개발자 지시 · 노션 UI-9: "그림자가 과해서
+     생성된 뒤 손보지 않은 인상을 준다"). 떠 있는 것은 넷 — 하단 내비 · 도우미 버튼(FAB) ·
+     시트 · 토스트. 그리고 주 버튼 하나까지. 면 위에 **놓인** 것(아바타 · 히어로 패널 ·
+     온보딩 로고와 기능 카드 · 목록 카드)은 선과 면으로 구분한다.
+     ⚠️ 토큰을 지우지는 않았다 — 쓰는 자리만 줄였다. '새 그림자를 만들지 않는다'는 규칙은
+        그대로다(ui-tone '그림자도 토큰만 쓴다'). 관문: verify-interactions '그림자'. */
   --shadow:       0 1px 2px rgba(58, 48, 28, 0.05), 0 8px 22px rgba(58, 48, 28, 0.07);
   /* 🔴 **색이 들어간** 높낮이 (2026-09-06 이름 붙임). 중립 --shadow 로 누르면 그림자가
      버튼 색을 잃는다 — 값은 그대로 두고 이름만 줬다(픽셀 변화 0). */
@@ -270,7 +276,6 @@ input::placeholder { color: var(--text-weak); }
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--shadow-lift);
 }
 .onboard-logo svg { width: 44px; height: 44px; }
 .onboard-hero h1 {
@@ -297,7 +302,6 @@ input::placeholder { color: var(--text-weak); }
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   padding: 15px 17px;
-  box-shadow: var(--shadow);
   font-size: var(--t-md);
   font-weight: 500;
   display: flex;
@@ -448,7 +452,6 @@ input::placeholder { color: var(--text-weak); }
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--shadow);
 }
 .home-greet { font-size: var(--t-xl); font-weight: 800; letter-spacing: -0.02em; }
 .home-school { font-size: var(--t-sm); color: var(--text-weak); font-weight: 500; }
@@ -464,7 +467,6 @@ input::placeholder { color: var(--text-weak); }
   padding: 28px 24px 24px;
   color: #fff;
   margin-bottom: 30px;
-  box-shadow: var(--shadow-lift);
 }
 .hero-card::after {
   content: '';
@@ -1134,15 +1136,13 @@ textarea:focus {
 .bell-badge[hidden] { display: none; }
 
 /* 동의 안내 시트 */
-.nf-consent-hero { text-align: center; padding-top: 8px; }
-.nf-bell {
-  width: 62px; height: 62px;
-  margin: 0 auto;
-  border-radius: 50%;
-  background: var(--primary-weak);
-  font-size: var(--t-3xl);
-  display: flex; align-items: center; justify-content: center;
-}
+/* 🔴 **원 안의 아이콘을 뺐다** (2026-09-12 개발자 지시 · 노션 UI-5: "원 안에 아이콘 + 설명
+   + 버튼 형태 = 'Icon in colored circle as section decoration' 블랙리스트 패턴").
+   그 원(62px · 종 아이콘)은 아무 정보도 나르지 않았다 — 제목이 이미 '장학금 알림 받기'다.
+   가운데 정렬도 함께 풀었다: 이 앱의 다른 시트는 전부 왼쪽 정렬이라(상세 시트의 sheet-title)
+   여기만 가운데였던 것이 '따로 만든 화면'처럼 보이게 했다.
+   ⚠️ 목록의 줄별 아이콘(.nf-ico)은 남긴다 — 그건 장식이 아니라 **어떤 알림인지**를 말한다. */
+.nf-consent-hero { padding-top: 4px; }
 .nf-type-list { list-style: none; display: grid; gap: 12px; margin: 4px 0 18px; }
 .nf-type-list li {
   display: flex; gap: 11px; align-items: flex-start;
@@ -4041,16 +4041,24 @@ button, input, select, textarea { letter-spacing: inherit; }
 
 
 
-/* 화면 제목 아래 얇은 강조선 — 브랜드가 '있다'는 최소한의 표시 */
+/* 화면 제목 아래 얇은 강조선 — 브랜드가 '있다'는 최소한의 표시.
+   🔴 **글자 폭만큼만 긋는다** (2026-09-13 개발자 지시 — "같은 길이로 하지 말고 글자 크기에
+      맞춰서"). 전에는 28px 고정이라 「장학금 찾기」(109px)·「신청 내역」(88px)·「MY」(35px)
+      밑에 똑같은 토막이 붙어, 긴 제목에서는 밑줄이 글자 중간에서 끊기고 짧은 제목에서는
+      글자보다 길었다(실측).
+   🔴 `width: fit-content` 를 **빼지 말 것** — 지금은 세 머리줄이 전부 flex 라 h2 가 이미
+      글자 폭이지만, flex 아닌 머리줄이 하나라도 생기면 h2 가 줄 전체로 늘어나
+      밑줄이 화면 끝까지 그어진다. 그때 원인을 찾기 어렵다. */
 .page-header h2 {
   position: relative;
+  width: fit-content;
   padding-bottom: var(--space-8);
 }
 .page-header h2::after {
   content: '';
   position: absolute;
   left: 0; bottom: 0;
-  width: 28px; height: 3px;
+  width: 100%; height: 3px;
   border-radius: var(--radius-pill);
   background: var(--accent);
 }

@@ -118,6 +118,20 @@ console.log('\n■ style.css 가 토큰 밖의 값을 쓰지 않는다');
   /* 그림자는 기능적으로 리터럴이 필요한 것이 하나 있다(스위치 손잡이) — 그 하나까지만 봐준다 */
   eq('그림자도 토큰만 쓴다 (--shadow · --shadow-lift · --shadow-sheet · --ring · --cutout · --knob)', shadow, []);
   eq('그라데이션은 --grad-navy 한 곳에서만 정의한다', grad, []);
+
+  /* 🔴 **면 위에 놓인 것에는 그림자를 다시 붙이지 않는다** (2026-09-12 · 노션 UI-9).
+     개발자 지적: "그림자가 과해서 생성된 뒤 손보지 않은 인상을 준다." 걷어낸 넷을 여기서 지킨다.
+     ⚠️ 브라우저 검사(verify-interactions)는 **프로필이 있는 화면만** 훑어서 온보딩의 둘
+        (로고·기능 카드)을 못 본다 — 코드 리뷰가 그 구멍을 실증했다. 그래서 CSS 에서 본다. */
+  const FLAT = [['.avatar', '홈·MY 프로필 원'], ['.hero-card', '홈 히어로 패널'],
+    ['.onboard-logo', '온보딩 로고'], ['.onboard-points li', '온보딩 기능 카드']];
+  const withShadow = [];
+  for (const [sel, name] of FLAT) {
+    /* 그 선택자로 시작하는 블록 안에 box-shadow 가 있으면 잡는다(hover·active 는 다른 블록이다) */
+    const re = new RegExp(`(^|\\n)${sel.replace(/[.*+?^$()|[\]\\]/g, '\\$&')}\\s*\\{[^}]*\\}`, 'g');
+    for (const m of R('style.css').matchAll(re)) if (/box-shadow:\s*[^;]*(--shadow|rgba|0 )/.test(m[0])) withShadow.push(name);
+  }
+  eq('면 위에 놓인 것(아바타·히어로·온보딩 로고와 카드)에 그림자가 없다', withShadow, []);
 }
 
 /* ── ⑤ 되돌아가지 않게 하는 톱니 (2026-09-10) ───────────────────────────────

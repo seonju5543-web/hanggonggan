@@ -898,6 +898,47 @@ const eq = (label, got, want) => {
       my <= MY천장, true);
   }
 
+  /* ── 화면 제목 밑줄 — 글자 폭만큼만 (2026-09-13 개발자 지시) ──
+     *"장학금찾기랑 신청내역 my 아래 같은 길이로 남색이 있는데 … 글자 크기에 맞춰서"*
+     🔴 전에는 `width: 28px` 고정이라 「장학금 찾기」(109px)·「신청 내역」(88px)·「MY」(35px)
+        밑에 똑같은 토막이 붙었다. 지금은 `fit-content` + `100%` 로 글자를 따라간다.
+     🔴 **CSS 를 읽지 말고 그려서 잰다** — `width:100%` 는 h2 상자 기준이라, h2 가 줄 전체로
+        늘어나면 규칙은 그대로인데 밑줄만 화면 끝까지 간다(그게 이 절이 막는 진짜 사고다).
+        그래서 글자(Range)와 밑줄(::after)을 **따로 재서** 맞대 본다. */
+  console.log('\n■ 화면 제목 밑줄 — 글자 폭만큼만 그어진다');
+  {
+    const 잰다 = async (nav, sel) => {
+      await page.click(`.nav-item[data-nav="${nav}"]`);
+      await page.waitForTimeout(450);
+      return page.$eval(sel, (h) => {
+        const rg = document.createRange();
+        rg.selectNodeContents(h);
+        return {
+          글자: h.textContent.trim(),
+          글자폭: rg.getBoundingClientRect().width,
+          밑줄: parseFloat(getComputedStyle(h, '::after').width) || 0,
+        };
+      });
+    };
+    const 머리줄 = [
+      await 잰다('explore', '#screen-explore .page-header h2'),
+      await 잰다('applications', '#screen-applications .page-header h2'),
+      await 잰다('my', '#screen-my .page-header h2'),
+    ];
+    /* 🔴 무력해지지 않게: 제목 셋의 **폭이 서로 달라야** 이 검사가 뜻을 가진다.
+       셋이 우연히 같아지면 '고정 28px' 로 되돌려도 초록이 된다. */
+    const 폭들 = 머리줄.map((m) => Math.round(m.글자폭));
+    eq(`  (검사가 무력하지 않은지 — 제목 폭이 서로 다르다: ${폭들.join(' · ')}px)`,
+      new Set(폭들).size, 3);
+    for (const m of 머리줄) {
+      eq(`🔴 「${m.글자}」 밑줄이 글자 폭과 같다 (글자 ${Math.round(m.글자폭)}px · 밑줄 ${Math.round(m.밑줄)}px)`,
+        Math.abs(m.밑줄 - m.글자폭) <= 2, true);
+    }
+    await page.click('.nav-item[data-nav="my"]');
+    await page.waitForSelector('#screen-my:not([hidden])');
+    await page.waitForTimeout(400);
+  }
+
   console.log(errors.length ? '\n❌ 오류:\n' + errors.join('\n') : '\n✓ 콘솔 오류 없음');
   if (errors.length) fail++;
   await browser.close();
