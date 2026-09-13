@@ -65,9 +65,15 @@ import sys, json, re
 # 🔴 **"실패" 라는 낱말만 보면 안 된다** (2026-08-30). 검사 요약이 `실패: 없음` 이라고
 #    적는데 그 글자 때문에 통과한 실행이 실패로 잡혀, 관문이 헛으로 걸렸다.
 #    ✕ 표시나 **1건 이상**을 말하는 문장만 실패로 본다.
-def FAILED(out):
+def FAILED(out, cmd=""):
     import re
-    if "✕" in out or "❌" in out or "FAIL " in out or "FAIL:" in out:
+    # 🔴 **명령이 스스로 찍은 글자를 근거로 삼지 않는다** (2026-09-13 · 다섯 번째 재발).
+    #    node verify/audit-data.js; echo "audit: $? (X $(grep -c X file))" 처럼
+    #    ✕ 를 **세어 보여 주는** 명령이 자기 출력 때문에 실패로 잡혔다(실측 — 그때 검사 8종은 전부 초록이었다).
+    #    명령문 안에 그 글자가 있으면 출력의 그 글자는 증거가 못 된다 — 건수 문장만 본다.
+    glyphs = [g for g in ("✕", "❌") if g not in cmd]
+    marks = [m for m in ("FAIL ", "FAIL:") if m not in cmd]
+    if any(g in out for g in glyphs) or any(m in out for m in marks):
         return True
     return bool(re.search(r"실패\s*[1-9]\d*\s*건", out))
 try:
@@ -81,7 +87,7 @@ cmd = (d.get("tool_input") or {}).get("command", "") or ""
 #    — 그 파일 속에 실패 표시 ✕ 글자가 들어 있기 때문이다(audit-data.js:161·162·272).
 #    서브에이전트가 소스를 훑는 것도 이 세션으로 잡혀 실제로 헛걸렸다(재현함).
 #    앞의 셋과 **뿌리가 같다** — 섞인 출력에서 ✕ 가 누구 것인지 가릴 수 없다.
-#    ⚠️ 지우는 쪽은 그대로 둔다 — 아래 주석의 '지울 때는 넬넘게' 규칙.
+#    ⚠️ 지우는 쪽은 그대로 둔다 — 아래 주석의 '지울 때는 넉넉하게' 규칙.
 if not re.search(r"(?:^|[;&|]|\s)node\s+(?:--\S+\s+)*verify/\S+\.(?:js|mjs|cjs)", cmd):
     raise SystemExit(1)
 # 🔴 **검사만 돌린 명령일 때만 본다** (2026-08-30 · 같은 판정기를 세 번째 고치며 세운 규칙).
@@ -96,7 +102,7 @@ if re.search(r"\bgit\b|\bfor\b|\bwhile\b|&&\s*git", cmd):
     raise SystemExit(1)
 r = d.get("tool_response")
 out = json.dumps(r, ensure_ascii=False) if not isinstance(r, str) else r
-raise SystemExit(0 if FAILED(out) else 1)
+raise SystemExit(0 if FAILED(out, cmd) else 1)
 ' 2>/dev/null && date +%s >"$gitdir/claude-debug-owed"
     # 🔴 **초록으로 돌아오면 빚을 지운다** (2026-08-30). 이 저장소는 관문을 만들 때마다
     #    **일부러 망가뜨려 빨간불을 확인**한다(red-green). 그 ✕ 까지 빚으로 남기면
