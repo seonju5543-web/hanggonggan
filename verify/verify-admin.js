@@ -364,6 +364,74 @@ function serve() {
     ok(false, '원문 발췌가 있는 공고를 찾지 못함');
   }
 
+  /* ④-1a 코드 리뷰가 잡은 일곱 (2026-09-13) — 전부 내가 전면 교체하며 만든 것이다.
+     되돌아오면 빨간불이 뜨게 못 박는다. */
+  {
+    /* ① 화면이 사라진 곳을 가리키는 버튼 → 누르면 **빈 화면**(오류도 안 난다) */
+    await page.click('.tab[data-tab="todo"]');
+    await page.waitForSelector('#screen-todo:not([hidden])');
+    const goTargets = await page.evaluate(() => [...document.querySelectorAll('#app [data-go]')]
+      .map((b) => b.dataset.go));
+    const known = ['todo', 'review', 'list', 'robots', 'insta'];
+    ok(goTargets.every((g) => known.includes(g)),
+      '화면으로 보내는 버튼이 전부 살아 있는 화면을 가리킨다', goTargets.join(',') || '없음');
+    /* 그리고 모르는 이름이 와도 갇히지 않는다 */
+    const survived = await page.evaluate(() => {
+      const el = document.createElement('button');
+      el.dataset.go = '없는화면';
+      document.getElementById('screen-todo').appendChild(el);
+      el.click();
+      const v = [...document.querySelectorAll('section.screen')].filter((x) => !x.hidden).length;
+      el.remove();
+      return v;
+    });
+    ok(survived >= 1, '모르는 화면 이름을 눌러도 빈 화면에 갇히지 않는다', `보이는 화면 ${survived}개`);
+
+    /* ② 같은 id 가 둘이면 byId 가 첫 번째만 집어, 누른 버튼 아래는 빈 채로 남는다 */
+    await page.click('.tab[data-tab="robots"]');
+    await page.waitForSelector('#screen-robots:not([hidden])');
+    const dupIds = await page.evaluate(() => {
+      const seen = {}, dup = [];
+      document.querySelectorAll('#app [id]').forEach((el) => {
+        if (seen[el.id]) dup.push(el.id); else seen[el.id] = 1;
+      });
+      return [...new Set(dup)];
+    });
+    ok(dupIds.length === 0, '화면 안에 같은 id 가 두 번 나오지 않는다', dupIds.join(',') || '없음');
+
+    /* ⑦ 성공이 '못 읽음' 과 같은 색으로 보이면 안 된다 */
+    const pillGood = await page.evaluate(() => {
+      const el = document.createElement('span');
+      el.className = 'pill good'; el.textContent = 'x';
+      document.body.appendChild(el);
+      const c = getComputedStyle(el).backgroundColor;
+      el.remove();
+      const p2 = document.createElement('span');
+      p2.className = 'pill'; p2.textContent = 'x';
+      document.body.appendChild(p2);
+      const base = getComputedStyle(p2).backgroundColor;
+      p2.remove();
+      return { c, base };
+    });
+    ok(pillGood.c !== pillGood.base, "'성공' 알약이 보통 알약과 다른 색이다", pillGood.c);
+
+    /* ⑤ 모아 둔 수정을 시트가 보여 준다 — 안 보이면 다음 저장이 옛 값으로 덮어쓴다 */
+    await gotoNotices(page);
+    const tid = await page.evaluate(() => window.__admin.D.reg[0].id);
+    await page.click(`#screen-list [data-row][data-id="${tid}"]`);
+    await page.waitForSelector('#sheet:not([hidden])');
+    await page.fill('#sheet [data-ed="note"]', '리뷰 확인용 메모');
+    await page.click('#sheet [data-act="save"]');
+    await page.waitForTimeout(300);
+    await page.click(`#screen-list [data-row][data-id="${tid}"]`);
+    await page.waitForSelector('#sheet:not([hidden])');
+    const shown = await page.inputValue('#sheet [data-ed="note"]');
+    ok(shown === '리뷰 확인용 메모', '다시 열면 모아 둔 수정이 그대로 보인다', shown.slice(0, 20));
+    await page.click('#sheet [data-close]');
+    await page.click('[data-act="flush-drop"]');
+    await page.waitForTimeout(200);
+  }
+
   /* ④-1b 작업대 — 대조 폭 · 이어서 처리 · 모르는 칸 (2026-09-13) */
   {
     await gotoNotices(page);

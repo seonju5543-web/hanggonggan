@@ -399,6 +399,10 @@ input[type="search"] { min-width: 190px; flex: 1 1 190px; }
 .pill.bad        { background: var(--red-weak);  color: var(--red); }
 .pill.warn       { background: var(--warn-weak); color: var(--warn); }
 .pill.info       { background: var(--accent-soft); color: var(--accent); }
+/* 🔴 `.pill.good` 이 없어서 **성공이 '못 읽음' 과 똑같아 보였다**(코드 리뷰가 잡았다).
+   실패만 빨갛고 성공은 회색이면, 로봇이 잘 돌았는지가 색으로 안 드러난다.
+   ⚠️ 색만으로 말하지 않는 규칙은 그대로다 — 글자로도 '성공'·'실패' 를 적는다. */
+.pill.good       { background: var(--green-weak); color: var(--green); }
 
 /* ── 밀도 (B0-7) ──────────────────────────────
    훑을 때와 검수할 때 필요한 밀도가 다르다. '촘촘하게'는 한 화면에 들어오는 줄 수를 늘리는

@@ -438,6 +438,11 @@ const SCREENS = ['todo', 'review', 'list', 'robots', 'insta'];
 let current = 'todo';
 
 function show(name) {
+  /* 🔴 **모르는 화면 이름으로 오면 갇힌다** — 모든 화면을 숨기고 아무것도 안 그리게 된다.
+     2026-09-13 에 화면을 다섯으로 줄이면서 `data-go="quality"` 같은 옛 버튼이 남아
+     누르면 **빈 화면**이 됐다(오류도 안 난다 — 코드 리뷰가 잡았다).
+     주소(`screenFromHash`)에는 방어선이 있었는데 버튼 경로에는 없었다. 여기서 막는다. */
+  if (!SCREENS.includes(name)) name = SCREENS[0];
   current = name;
   SCREENS.forEach((n) => { byId(`screen-${n}`).hidden = n !== name; });
   $$('.tab').forEach((b) => {
@@ -530,6 +535,7 @@ function rerender(name = current) {
 
 function renderAll() {
   renderDataFail();
+  pendingPrune();          // 데이터를 다시 읽었으면 사라진 공고의 수정을 먼저 뺀다
   renderPendingBar();
   renderCounts();
   renderScreen(current);
@@ -591,22 +597,22 @@ function renderTodo() {
       btn: '<button class="btn btn-sm" data-go="review">확인하기</button>' },
     { n: probs.length, tone: 'is-bad', k: '규칙 위반 (오류)',
       d: '앱1에 잘못 표시될 수 있는 항목입니다',
-      btn: '<button class="btn btn-sm" data-go="quality">품질 화면으로</button>' },
+      btn: '<button class="btn btn-sm" data-go="todo">아래에서 보기</button>' },
     { n: warns.length, tone: 'is-warn', k: '규칙 경고',
       d: '치명적이지는 않지만 손봐야 할 항목입니다',
-      btn: '<button class="btn btn-sm" data-go="quality">보기</button>' },
+      btn: '<button class="btn btn-sm" data-go="todo">아래에서 보기</button>' },
     { n: dead.length, tone: 'is-warn', k: '원문 링크 실패 기록',
       d: '학생이 원문 보기를 눌렀을 때 안 열리는 주소입니다',
-      btn: '<button class="btn btn-sm" data-go="quality">보기</button>' },
+      btn: '<button class="btn btn-sm" data-go="todo">아래에서 보기</button>' },
     { n: fails.length, tone: 'is-bad', k: '수집 실패 중인 학교',
       d: '이 학교 공고가 앱1에 들어오지 않고 있습니다',
-      btn: '<button class="btn btn-sm" data-go="network">수집망 보기</button>' },
+      btn: '<button class="btn btn-sm" data-go="robots">수집망 보기</button>' },
     { n: queue.length, tone: 'is-warn', k: '양식 스키마화 대기',
       d: '원본은 확보됐고 앱에서 작성 가능하게 만드는 일이 남았습니다',
-      btn: '<button class="btn btn-sm" data-go="forms">양식 화면으로</button>' },
+      btn: '<button class="btn btn-sm" data-go="list" data-go-view="forms">양식 보기</button>' },
     { n: noBoard.length, tone: 'is-warn', k: '게시판 주소 없는 학교',
       d: '주소를 넣으면 그 학교 학생에게 공고가 보이기 시작합니다',
-      btn: '<button class="btn btn-sm" data-go="network">주소 넣기</button>' },
+      btn: '<button class="btn btn-sm" data-go="robots">주소 넣기</button>' },
     { n: D.deployAhead || 0, tone: 'is-warn', k: '앱1 반영 대기',
       d: '배포 로봇이 아직 올리지 않은 변경입니다', btn: '',
       okD: '학생 앱이 최신입니다', v: D.deployAhead == null ? '—' : D.deployAhead },
@@ -652,10 +658,17 @@ function renderTodo() {
 let SRC_IDX = null;          // indexTexts 결과 (byUrl · byTitle)
 let SRC_STRIP = null;        // 메뉴를 걷어내는 함수
 let SRC_STATE = 'idle';      // idle · loading · ready · failed
+/* 🔴 받아 오는 중일 때 **그 약속을 돌려준다.** 예전에는 'loading' 이라는 글자만 돌려줘서,
+   받아 오는 동안 다른 공고를 열면(= '다음 공고 ▸') 그 시트가 영영 '읽는 중' 에 멈췄다
+   — 두 번째 호출은 기다리지 않고 끝나고, 첫 호출의 뒷정리는 '지금 보는 공고가 다르다' 며
+   그리지 않기 때문이다(코드 리뷰가 잡았다). 약속을 같이 기다리면 둘 다 제대로 그려진다. */
+let SRC_PROMISE = null;
 
 async function ensureSources() {
-  if (SRC_STATE === 'ready' || SRC_STATE === 'loading') return SRC_STATE;
+  if (SRC_STATE === 'ready') return SRC_STATE;
+  if (SRC_PROMISE) return SRC_PROMISE;
   SRC_STATE = 'loading';
+  SRC_PROMISE = (async () => {
   try {
     const [texts, bodies] = await Promise.all([
       readJson('collector/extracted/notices-text.json', null),
@@ -669,7 +682,10 @@ async function ensureSources() {
     SRC_IDX = null;
     SRC_STATE = 'failed';
   }
+  SRC_PROMISE = null;
   return SRC_STATE;
+  })();
+  return SRC_PROMISE;
 }
 
 /** 이 공고의 저장된 원문. 없거나 못 읽었으면 null.
@@ -709,7 +725,20 @@ function renderPendingBar() {
 }
 
 /** 모아 둔 수정을 한 번에 보낸다. 보낼 게 없으면 아무 일도 하지 않는다. */
+/** 지금 없는 공고의 수정은 장부에서 뺀다.
+ *  🔴 저장소 쪽(`admin-apply.mjs`)은 모르는 id 를 만나면 **묶음 전체를 멈춘다**(그게 맞다 —
+ *  반만 반영되면 안 된다). 그래서 되돌리기·삭제·새로고침으로 사라진 공고의 수정이 장부에
+ *  남아 있으면 **멀쩡한 다른 수정까지 하나도 안 나간다**(코드 리뷰가 잡았다). */
+function pendingPrune() {
+  const live = new Set(D.reg.map((x) => x.id));
+  let dropped = 0;
+  [...PENDING_EDITS.keys()].forEach((id) => { if (!live.has(id)) { PENDING_EDITS.delete(id); dropped += 1; } });
+  return dropped;
+}
+
 async function flushEdits() {
+  const dropped = pendingPrune();
+  if (dropped) toast(`없어진 공고 ${dropped}건의 수정은 뺐습니다`);
   if (!PENDING_EDITS.size) { toast('모아 둔 수정이 없습니다'); return false; }
   const edits = [...PENDING_EDITS.entries()].map(([id, patch]) => ({ id, patch }));
   const okDone = await applyAction('edit', { edits }, `공고 수정 ${edits.length}건`);
@@ -1201,7 +1230,7 @@ function renderReview() {
       </div>
       <div class="filter-row">
         <span class="lb">자동등록</span>
-        <button class="btn btn-sm ${D.autoCfg.enabled ? 'danger' : 'good'}" id="btn-auto-toggle">
+        <button class="btn btn-sm ${D.autoCfg.enabled ? 'danger' : 'good'}" data-auto-toggle>
           ${D.autoCfg.enabled ? '자동 등록 로봇 끄기' : '자동 등록 로봇 켜기'}
         </button>
         <span class="muted">현재 ${D.autoCfg.enabled ? '켜짐 — 로봇이 스스로 등록합니다' : '꺼짐 — 로봇은 리포트만 올립니다'}</span>
@@ -1346,6 +1375,11 @@ function renderForms(target) {
 /* ---------------- ⑤ 수집망 ---------------- */
 /* 수집망 내용 — 🔴 **베끼지 않는다.** 로봇 화면이 이 조각을 그대로 가져다 쓴다.
    학교가 경희대·한국외대 둘로 줄어 표 두 줄이 탭 하나를 차지하고 있었다(실측). */
+/* 🔴 리포트 전문 블록은 여기 두지 않는다 — 로봇 화면이 이미 갖고 있어서 id="report-box" 가
+   **둘**이 되고, byId 는 첫 번째만 집는다. 그러면 누른 버튼 아래 상자는 빈 채로 두고
+   저 위 상자에 글이 뜬다(코드 리뷰가 잡았다).
+   ⚠️ 설명을 템플릿 문자열 **안**에 두지 말 것 — 주석 속 백틱이 그 문자열을 닫아 버려
+      모듈이 통째로 죽는다(방금 그렇게 만들었다가 잡았다). */
 function networkSectionHtml() {
   const fails = failingSchools();
   const noBoard = D.schools.filter((s) => !s.boardUrl);
@@ -1395,13 +1429,6 @@ function networkSectionHtml() {
   }).join('')}</tbody>
     </table></div>
 
-    <div class="sec-head" style="margin-top:12px"><h2>로봇 리포트 전문</h2></div>
-    <div class="filter-row">
-      <button class="btn btn-sm" data-report="collector/browser-report.md">브라우저 수집 리포트</button>
-      <button class="btn btn-sm" data-report="collector/link-hunt-report.md">링크 사냥꾼 리포트</button>
-      <button class="btn btn-sm" data-report="collector/resolve-report.md">원문 링크 복구 리포트</button>
-    </div>
-    <div id="report-box"></div>
   `;
 }
 
@@ -1884,7 +1911,7 @@ function renderRobots() {
             <span>재등록 차단 ${(D.autoCfg.blockIds || []).length}건</span></div>
         </div>
         <div class="btn-row">
-          <button class="btn btn-sm ${D.autoCfg.enabled ? 'danger' : 'good'}" id="btn-auto-toggle">
+          <button class="btn btn-sm ${D.autoCfg.enabled ? 'danger' : 'good'}" data-auto-toggle>
             ${D.autoCfg.enabled ? '끄기' : '켜기'}</button>
         </div>
         <div></div>
@@ -2331,7 +2358,12 @@ function openDetail(it) {
   ensureSources().then(() => {
     /* 그새 시트를 닫았거나 다른 공고를 열었으면 그리지 않는다 */
     if (byId('sheet').hidden || currentSheetItem !== it) return;
-    openSheet(detailSheet(it));
+    /* 🔴 **시트 전체를 다시 그리지 않는다** — 원문이 오는 동안 '먼저 채울 것' 칸에
+       치고 있던 글이 통째로 날아가고 초점도 맨 앞으로 튄다(코드 리뷰가 잡았다).
+       원문 칸 하나만 갈아 끼운다. */
+    const slot = byId('src-slot');
+    if (slot) slot.innerHTML = sourceBlock(it);
+    else openSheet(detailSheet(it));
   });
 }
 
@@ -2379,8 +2411,14 @@ function sourceBlock(it) {
     </div>`;
 }
 
-function detailSheet(it) {
-  currentSheetItem = it;
+function detailSheet(itRaw) {
+  /* 🔴 **모아 둔 수정을 얹어서 보여 준다.** 안 그러면 다시 열었을 때 칸이 옛 값으로 보이고,
+     거기서 다시 저장하면 모아 둔 것을 **조용히 덮어쓴다**(코드 리뷰가 잡았다 —
+     2026-12-31 로 모아 둔 뒤 다시 열면 2026-09-15 가 보였고, 저장하면 그 값이 나갔다).
+     ⚠️ 얹는 것은 화면에 보여 줄 때뿐이다 — `D.reg` 는 건드리지 않는다(저장소가 진짜다). */
+  const staged = PENDING_EDITS.get(itRaw.id);
+  const it = staged ? { ...itRaw, ...staged } : itRaw;
+  currentSheetItem = itRaw;
   const fi = formIdSet();
   const ps = problemsOf(it, fi);
   const st = statusOf(it);
@@ -2504,7 +2542,7 @@ function detailSheet(it) {
     ? `<div class="field"><label>뽑아 둔 발췌</label>
         ${(it.excerpts || []).map((x) => `<div class="excerpt">${esc(x)}</div>`).join('')}</div>`
     : ''}
-          ${sourceBlock(it)}
+          <div id="src-slot">${sourceBlock(it)}</div>
           ${(it.attachments || []).length ? `<div class="field"><label>첨부</label>
             ${(it.attachments || []).map((a) => {
     const au = safeUrl(a.url);
@@ -2691,7 +2729,11 @@ function bindGlobal() {
     if (lv) { LIST_VIEW = lv.dataset.lview; rerender('list'); return; }
 
     const go = e.target.closest('[data-go]');
-    if (go) { show(go.dataset.go); return; }
+    if (go) {
+      if (go.dataset.goView) LIST_VIEW = go.dataset.goView;   // '양식 보기' 처럼 보기까지 정해 주는 버튼
+      show(go.dataset.go);
+      return;
+    }
 
     /* 체크박스는 상세를 열지 않는다 — 줄을 누르면 상세, 네모를 누르면 선택 */
     const pick = e.target.closest('[data-pick]');
@@ -2819,7 +2861,7 @@ function bindGlobal() {
     if (e.target.closest('#btn-run-browser')) {
       await runCollector(WF_BROWSER, '브라우저형 수집 로봇'); return;
     }
-    if (e.target.closest('#btn-auto-toggle')) {
+    if (e.target.closest('[data-auto-toggle]')) {
       const next = !D.autoCfg.enabled;
       askSheet({
         title: next ? '자동 등록 로봇 켜기' : '자동 등록 로봇 끄기',
