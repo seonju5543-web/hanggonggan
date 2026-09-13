@@ -47,7 +47,10 @@ cp collector/deadline-hint.mjs "$OUT/vendor/deadline-hint.mjs"
 #    CI(verify-ui.yml)도 같은 파일을 부른다. 두 벌이 되면 갈라진다.
 #    빌드를 실패시키는 이유: Cloudflare 는 빌드가 실패하면 **옛 판을 그대로 둔다**.
 #    깨진 화면(버튼이 안 눌리는 화면)을 내보내는 것보다 낫다.
-node "$(dirname "$0")/../verify/verify-admin-vendor.js" "$OUT" || exit 1
+# ⚠️ 위에서 이미 저장소 최상위로 `cd` 했으므로 **그냥 상대 경로**를 쓴다.
+#    여기서 `$(dirname "$0")` 를 다시 쓰면 _admin/ 안에서 `bash build.sh` 로 부를 때
+#    경로가 한 칸 더 올라가 저장소 밖을 가리킨다(감사에서 잡혔다).
+node verify/verify-admin-vendor.js "$OUT" || exit 1
 
 echo "빌드 완료 → $OUT"
 ls -la "$OUT" "$OUT/vendor"

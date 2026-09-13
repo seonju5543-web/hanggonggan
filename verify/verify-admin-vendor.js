@@ -87,9 +87,29 @@ for (const file of files) {
   }
 }
 
+/* 🔴 ES import 만 보면 절반만 막힌다 (감사 지적) — index.html 이 `<script src>` 로 싣는
+ *   고전 스크립트 넷(data.js·form-plan.js·forms.js·entry-rules.js)은 import 그래프에 없다.
+ *   그중 하나를 build.sh 가 안 옮겨도 admin.js 는 전역(UNIVERSITIES 등)을 못 찾아 죽는다.
+ *   원인이 똑같으므로 같은 관문이 봐야 한다. 목록은 손으로 적지 않고 index.html 에서 읽는다. */
+const indexPath = path.join(out, 'index.html');
+if (fs.existsSync(indexPath)) {
+  const html = fs.readFileSync(indexPath, 'utf8');
+  for (const m of html.matchAll(/<script[^>]*\ssrc\s*=\s*["']([^"']+)["']/g)) {
+    const src = m[1];
+    if (/^[a-z]+:\/\/|^\/\//i.test(src)) continue;            // 바깥 주소는 이 관문의 일이 아니다
+    const target = path.resolve(path.dirname(indexPath), src.split(/[?#]/)[0]);
+    if (!fs.existsSync(target)) {
+      missing.push({ from: 'index.html', dep: src, target: path.relative(out, target) });
+    }
+  }
+} else {
+  missing.push({ from: '(빌드 폴더)', dep: 'index.html', target: 'index.html' });
+}
+
 const shown = files.map((f) => path.relative(out, f)).sort();
 console.log(`■ 관리자 화면 빠진 이웃 검사 — ${out}`);
 console.log(`  훑은 스크립트 ${files.length}개: ${shown.join(' · ')}`);
+console.log('  index.html 의 <script src> 도 함께 본다 (고전 스크립트는 import 그래프에 없다)');
 
 if (missing.length) {
   console.error('');
@@ -104,8 +124,10 @@ console.log('✓ 빠진 이웃 없음 — 모든 import 가 짝을 찾았습니�
 
 /* ── ② vendor 로 옮기는 collector 원본이 CI 감시 범위 안에 있는가 ──────────────
  * 위 검사가 있어도, 그 커밋에서 **검사가 돌지 않으면** 아무 소용이 없다.
- * 2026-09-13 사고가 정확히 그랬다: 이웃을 부르기 시작한 것은 `collector/url-key.mjs` 인데
- * verify-ui.yml 은 collector 를 안 보고 있어서 push 때 어떤 관문도 울리지 않았다.
+ * ⚠️ 2026-09-13 사고는 이 경우가 **아니었다** — 처음에 그렇게 적었다가 감사에서 잡혔다.
+ *   그 커밋은 `*.js`·`verify/**` 에 걸려 워크플로가 돌았고, `verify-admin.js` 가 같은 증상으로
+ *   8회 연속 빨간불이었다(run 34699910328 등). 아무도 로그를 안 읽었을 뿐이다.
+ *   이 절이 막는 것은 **`collector/` 아래만 고치는 커밋** — 그때는 정말로 아무 관문도 안 돈다.
  * 🔴 `collector/**` 로 넓히면 안 된다 — 로봇이 하루 열 번 커밋해서 25분짜리 브라우저 검사가
  *    그때마다 돈다(test-collector 'CI 감시 범위' 절이 그것을 막는다). 그래서 목록은 좁게 두되,
  *    **build.sh 에서 읽어 대조**한다. 새 파일을 vendor 에 넣고 여기 안 적으면 이 관문이 말해 준다.
@@ -118,11 +140,31 @@ if (fs.existsSync(shPath) && fs.existsSync(wfPath)) {
   const sh = fs.readFileSync(shPath, 'utf8');
   const wf = fs.readFileSync(wfPath, 'utf8');
 
-  /* build.sh 가 vendor 로 옮기는 원본 중 collector/ 아래 것만 (뿌리 파일은 '*.js' 가 이미 잡는다) */
-  const fromCollector = [...sh.matchAll(/^\s*cp\s+(collector\/\S+)\s+"\$OUT\/vendor\//gm)].map((m) => m[1]);
+  /* build.sh 가 vendor 로 옮기는 원본 중 collector/ 아래 것만 (뿌리 파일은 '*.js' 가 이미 잡는다).
+   * 🔴 철자 하나만 잡으면 안 된다 (감사 지적) — `cp -p`, 원본 여럿, 따옴표 친 원본, `"$OUT"/vendor/`
+   *   전부 build.sh 안에 실제로 쓰이는 꼴이다. 그래서 vendor 로 가는 cp 줄을 통째로 잡고
+   *   그 줄 안에서 collector/ 로 시작하는 조각을 고른다. */
+  const vendorCpLines = [...sh.matchAll(/^\s*cp\s+[^\n]*\$OUT"?\/vendor\b[^\n]*$/gm)].map((m) => m[0]);
+  const fromCollector = [...new Set(
+    vendorCpLines.flatMap((line) => [...line.matchAll(/(?:^|[\s"'])(collector\/[^\s"']+)/g)].map((m) => m[1]))
+  )];
 
-  /* verify-ui.yml 의 push paths 목록 (따옴표 안의 글로브만 본다) */
-  const globs = [...wf.matchAll(/^\s*-\s*'([^']+)'\s*$/gm)].map((m) => m[1]);
+  /* 🔴 0개는 '없다'가 아니라 '못 읽었다'로 본다 — 옛 판은 0개일 때 조용히 초록불이었다.
+   *   build.sh 를 다른 철자로 정리하는 순간 이 관문이 통째로 죽는 길이었다(감사가 실증했다). */
+  if (!vendorCpLines.length) {
+    console.error('\n✕ build.sh 에서 vendor 로 옮기는 cp 줄을 한 줄도 못 읽었습니다.');
+    console.error('   철자가 바뀌었거나 이 관문의 정규식이 낡았습니다 — 둘 중 하나를 맞춰야 합니다.');
+    console.error('   (0개를 그냥 통과시키면 이 검사가 조용히 무력해집니다.)');
+    process.exit(1);
+  }
+
+  /* verify-ui.yml 의 push paths 목록.
+   * 🔴 '작은따옴표 + 줄 끝' 만 읽으면 안 된다 (감사 지적) — 이 파일의 다수 스타일이 **꼬리 주석**이고
+   *   큰따옴표·따옴표 없음도 YAML 로 멀쩡하다. 못 읽으면 감시 중인 파일을 '밖'이라 부르며
+   *   빌드를 통째로 막는다(거짓 양성이 거짓 음성보다 나쁜 자리다). */
+  const globs = [...wf.matchAll(/^\s*-\s*(?:'([^']*)'|"([^"]*)"|([^'"#\s][^#\n]*?))\s*(?:#.*)?$/gm)]
+    .map((m) => (m[1] ?? m[2] ?? m[3] ?? '').trim())
+    .filter(Boolean);
   const toRe = (g) => new RegExp('^' + g
     .replace(/[.+^${}()|[\]\\]/g, '\\$&')
     .replace(/\*\*/g, '\u0000')

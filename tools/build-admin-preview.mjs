@@ -53,10 +53,29 @@ const entryRules = read('verify/entry-rules.cjs');
 const urlKeyMjs = read('collector/url-key.mjs');
 
 /* admin.js는 ES 모듈이라 url-key를 import한다. 한 장짜리 파일에서는 파일이 없으므로
-   import 줄을 지우고, 같은 이름의 함수를 앞에 붙여 준다. */
-const urlKeyInline = urlKeyMjs
-  .replace(/^export default .*$/m, '')
-  .replace(/^export /gm, '');
+   import 줄을 지우고, 같은 이름의 함수를 앞에 붙여 준다.
+
+   🔴 **그 파일이 또 부르는 이웃까지 데려와야 한다 (2026-09-13 사고)** — url-key.mjs 가
+   `./deadline-hint.mjs` 를 부르기 시작하자 그 import 줄이 인라인 사본에 그대로 남았고,
+   `<script type="module">` 안의 상대 경로는 preview.html 옆을 가리키므로 파일을 못 찾아
+   **모듈 전체가 실행되지 않았다**(미리보기가 통째로 죽었다 — 관리자 화면과 똑같은 증상).
+   그래서 이름을 하나씩 적지 않고 **상대 import 를 따라가며 모아 온다.** */
+function inlineModule(startRel, seen = new Set()) {
+  if (seen.has(startRel)) return '';
+  seen.add(startRel);
+  const text = read(startRel);
+  const dir = path.posix.dirname(startRel);
+  let deps = '';
+  for (const m of text.matchAll(/^\s*import\s+(?:[^'"]*\sfrom\s+)?['"](\.[^'"]+)['"];?\s*$/gm)) {
+    deps += inlineModule(path.posix.normalize(path.posix.join(dir, m[1])), seen);
+  }
+  const body = text
+    .replace(/^\s*import\s+(?:[^'"]*\sfrom\s+)?['"]\.[^'"]+['"];?\s*$/gm, '')
+    .replace(/^export default .*$/m, '')
+    .replace(/^export /gm, '');
+  return deps + body + '\n';
+}
+const urlKeyInline = inlineModule('collector/url-key.mjs');
 
 const adminInline = adminJs
   .replace(/^import\s+\{[^}]*\}\s+from\s+'\.\/vendor\/url-key\.mjs';\s*$/m, '')
