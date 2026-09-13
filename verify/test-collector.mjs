@@ -4132,6 +4132,27 @@ console.log('\n■ 도구들의 기준 학생 (2026-09-12 · UI-1)');
   eq('  그 값이 data.js 의 계열 id 다', ids.includes(track[0]), true);
 }
 
+/* ══ 화면이 '전국'을 약속하지 않는다 (2026-09-13) ══════════════════════════
+   두 자리가 **전국 모든 대학을 지원한다**고 적고 있었다 — 온보딩 1단계 부제("전국 모든 대학
+   지원")와 MY 맨 아래("한대장 v0.3 (MVP) · 전국 대학 지원").
+   학교는 전국에서 고를 수 있는 것이 맞지만, **교내 공고가 있는 학교는 두 곳뿐**이다
+   (실측: 등록 48건 = 한국외국어대학교 22 · 경희대학교 12 · 학교 무관 14 · 층2 전국 재단 90곳).
+   '모든 대학 지원'은 그 학생이 교내 공고도 받는다는 말로 읽힌다 — 확인 안 한 것을 단정하지
+   않는다(원칙 5 · UI-22 에서 시간 약속을 지운 것과 같은 유형).
+   ⚠️ 학교 목록을 줄일지는 노션 A-6(개발자 판단 대기)다 — 여기서 지키는 것은 **말**뿐이다. */
+console.log('\n■ 화면이 「전국 모든 대학」을 약속하지 않는다 (2026-09-13)');
+{
+  const root = new URL('../', import.meta.url);
+  const html = readText(new URL('index.html', root));
+  const app = readText(new URL('app.js', root));
+  const strip = (t) => t.replace(/<!--[\s\S]*?-->/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
+  eq('화면 문구에 「전국 모든 대학」이 없다', /전국\s*모든\s*대학/.test(strip(html) + strip(app)), false);
+  eq('  MY 아래줄이 「전국 대학 지원」이라고 하지 않는다', /전국 대학 지원/.test(strip(app)), false);
+  /* 🔴 숫자를 손으로 적지 않는다 — 학교가 늘면 저절로 맞아야 한다(데이터가 세어 말한다) */
+  eq('  대신 데이터에서 센다 (교내 학교 수 · 층2 재단 수)',
+    /schoolOnly\)\.filter\(Boolean\)/.test(app) && /kosafList\.length/.test(app), true);
+}
+
 console.log('\n■ 환영 화면 문구 (2026-09-12 · UI-22)');
 {
   const root = new URL('../', import.meta.url);

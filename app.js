@@ -4047,7 +4047,19 @@ function forgetLearned(key) {
 function renderMy() {
   /* 판 번호는 APP_VERSION 한 곳에서 온다 — 프로필이 없어 일찍 돌아가더라도 적어 둔다 */
   const ver = $('#my-version');
-  if (ver) ver.textContent = `한대장 ${APP_VERSION} · 전국 대학 지원`;
+  /* 🔴 "· 전국 대학 지원" 이라고 적혀 있었다 (2026-09-13 수정). 학교는 전국에서 고를 수
+     있지만 **교내 공고가 있는 학교는 두 곳뿐**이라, 그 말은 학생이 확인할 수 없는 약속이다.
+     지금은 **데이터가 세어 말한다** — 숫자를 손으로 적지 않으므로 학교가 늘면 저절로 맞는다.
+     ⚠️ 층2(한국장학재단)는 전국 재단이라 학교와 무관하다 — 그래서 따로 센다. */
+  if (ver) {
+    const inSchools = new Set(registeredList
+      .map((s) => s.eligibility && s.eligibility.schoolOnly).filter(Boolean));
+    const kosafN = kosafList.length;
+    const parts = [`한대장 ${APP_VERSION}`];
+    if (inSchools.size) parts.push(`교내 공고 ${inSchools.size}개교`);
+    if (kosafN) parts.push(`한국장학재단 ${kosafN}곳`);
+    ver.textContent = parts.join(' · ');
+  }
 
   const p = state.profile;
   if (!p) return;   // 온보딩을 아직 안 마친 상태 — 그릴 프로필이 없다
