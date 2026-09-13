@@ -791,9 +791,22 @@ function serve() {
     try { editSent = JSON.parse(route.request().postData() || '{}'); } catch { editSent = 'parse-fail'; }
     route.fulfill({ status: 204, body: '' });
   });
+  /* 🔴 저장은 이제 **바로 보내지 않는다** (2026-09-13) — 장부에 모았다가
+     '한꺼번에 반영' 한 번으로 나간다. 한 건마다 GitHub 작업이 끝나기를 기다리던 것이
+     하루치 대기의 대부분이었기 때문이다(건당 30~60초 × 13건).
+     그래서 검사도 저장 → 한꺼번에 반영 두 걸음으로 간다. **보는 것은 그대로다** —
+     어떤 값이 어느 칸으로 나가는가. */
   await page.click('#sheet [data-act="save"]');
+  await page.waitForTimeout(300);
+  ok(editSent === null, '저장을 눌러도 아직 보내지 않는다 (모아 뒀다가 한 번에)');
+  ok(await page.locator('#pending-bar:not([hidden])').count() === 1,
+    '모아 둔 수정이 있다고 화면이 말한다');
+  await page.click('[data-act="flush"]');
   await page.waitForTimeout(700);
-  const ep = (() => { try { return JSON.parse(editSent?.inputs?.payload || '{}').patch || {}; } catch { return {}; } })();
+  const sentPayload = (() => { try { return JSON.parse(editSent?.inputs?.payload || '{}'); } catch { return {}; } })();
+  ok(Array.isArray(sentPayload.edits) && sentPayload.edits.length >= 1,
+    '여러 건을 한 번에 보낼 수 있는 모양으로 나간다', `${(sentPayload.edits || []).length}건`);
+  const ep = (sentPayload.edits && sentPayload.edits[0] && sentPayload.edits[0].patch) || {};
 
   ok(ep.eligibility && ep.eligibility.minGpa === '3.5' && ep.eligibility.years === '1,2',
     '기계 판정용 값이 eligibility로 간다');

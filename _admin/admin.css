@@ -175,6 +175,18 @@ a { color: var(--accent); }
   display: flex; align-items: center; gap: var(--space-12); font-size: var(--t-sm);
 }
 
+/* ── 모아 둔 수정 (2026-09-13) ────────────────
+   아직 저장되지 않았다는 것이 한눈에 보여야 한다 — 놋쇠(경고)로 칠하고 문구로도 말한다.
+   🔴 색만으로 말하지 않는다: '아직 저장되지 않았습니다' 를 글자로 적는다. */
+.pending-bar {
+  display: flex; gap: var(--space-8); align-items: center; flex-wrap: wrap;
+  padding: var(--space-8) var(--space-16);
+  background: var(--warn-weak); color: var(--warn);
+  border-top: 1px solid var(--rule); font-size: var(--t-md); font-weight: 650;
+}
+.pending-bar .btn { margin-left: auto; }
+.pending-bar .btn + .btn { margin-left: 0; }
+
 /* ── 데이터 읽기 실패 경고 ───────────────────── */
 .datafail {
   max-width: 1148px; margin: var(--space-16) auto calc(-1 * var(--space-4)); padding: var(--space-12) var(--space-16);   /* .wrap(1180 - 좌우 16)과 폭을 맞춘다 */

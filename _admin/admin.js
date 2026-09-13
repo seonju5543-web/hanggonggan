@@ -518,6 +518,7 @@ function rerender(name = current) {
 
 function renderAll() {
   renderDataFail();
+  renderPendingBar();
   renderCounts();
   renderScreen(current);
   const dep = byId('deploy-state');
@@ -632,6 +633,40 @@ function renderTodo() {
       </div>
       <div class="rows" data-rows>${urgent.map(rowHtml).join('')}</div>` : ''}
   `;
+}
+
+/* ---------------- 모아 두는 수정 (2026-09-13) ----------------
+   🔴 **왜 모으는가** — 저장은 GitHub 작업을 깨워 그것이 끝날 때까지 기다린다
+   (`applyAction` → `waitForRun`, 최대 6분). 게다가 `jobBusy` 가 화면 전체를 잠근다.
+   그래서 검수하며 마감·금액을 채우면 **공고 수만큼 차례로 기다려야** 했다 —
+   실측으로 한 번이 21초이고 큐·폴링까지 건당 30~60초라, 13건이면 순수 대기만 7~13분이다.
+   이제 저장 버튼은 장부에 적기만 하고, '한꺼번에 반영'이 한 번에 보낸다(저장소 쪽
+   `admin-apply.mjs` 의 edit 가 `payload.edits` 배열을 받는다).
+   ⚠️ 장부는 **기기에 남기지 않는다** — 새로고침하면 사라지는 게 맞다. 남겨 두면
+      '반영한 줄 알았는데 안 된' 상태가 조용히 이어진다. */
+const PENDING_EDITS = new Map();   // id → patch (같은 공고를 또 고치면 덮어쓴다)
+
+function pendingCount() { return PENDING_EDITS.size; }
+function pendingClear() { PENDING_EDITS.clear(); }
+
+/** 모아 둔 수정이 몇 건인지 화면에 알린다. 0건이면 줄 자체를 감춘다. */
+function renderPendingBar() {
+  const bar = byId('pending-bar');
+  if (!bar) return;
+  const n = pendingCount();
+  bar.hidden = n === 0;
+  if (n) byId('pending-text').textContent = `수정 ${n}건을 모아 뒀습니다 — 아직 저장되지 않았습니다`;
+  /* 줄이 나타나고 사라지면 머리 높이가 달라진다 — 구획 제목이 머리 아래에 멈추게 다시 잰다 */
+  measureHead();
+}
+
+/** 모아 둔 수정을 한 번에 보낸다. 보낼 게 없으면 아무 일도 하지 않는다. */
+async function flushEdits() {
+  if (!PENDING_EDITS.size) { toast('모아 둔 수정이 없습니다'); return false; }
+  const edits = [...PENDING_EDITS.entries()].map(([id, patch]) => ({ id, patch }));
+  const okDone = await applyAction('edit', { edits }, `공고 수정 ${edits.length}건`);
+  if (okDone) pendingClear();
+  return okDone;
 }
 
 /* ---------------- 다중 선택 ----------------
@@ -2269,6 +2304,17 @@ function bindGlobal() {
   /* 화면 안 위임 */
   byId('app').addEventListener('click', async (e) => {
     if (await handleInstaClick(e)) return;   // 인스타 화면의 버튼 (2026-09-12)
+
+    /* 모아 둔 수정 — 이 버튼은 **머리줄에 있어 시트 밖**이다.
+       🔴 시트 핸들러(#sheet)에 두면 영영 안 눌린다(만들면서 실제로 그렇게 만들었다가 잡았다). */
+    const fl = e.target.closest('[data-act="flush"], [data-act="flush-drop"]');
+    if (fl) {
+      if (fl.dataset.act === 'flush') await flushEdits();
+      else { pendingClear(); toast('모아 둔 수정을 버렸습니다'); }
+      renderPendingBar();
+      return;
+    }
+
     const go = e.target.closest('[data-go]');
     if (go) { show(go.dataset.go); return; }
 
@@ -2281,7 +2327,7 @@ function bindGlobal() {
       return;
     }
 
-    const row = e.target.closest('.row[data-id]');
+    const row = e.target.closest('[data-row][data-id]');
     if (row) {
       const it = D.reg.find((x) => x.id === row.dataset.id);
       if (it) openSheet(detailSheet(it));
@@ -2552,7 +2598,7 @@ function bindGlobal() {
       return;
     }
 
-    const row = e.target.closest('.row[data-id]');
+    const row = e.target.closest('[data-row][data-id]');
     if (row) {
       const it = D.reg.find((x) => x.id === row.dataset.id);
       if (it) openSheet(detailSheet(it));
@@ -2567,8 +2613,15 @@ function bindGlobal() {
     if (kind === 'save') {
       const patch = collectEdits();
       closeSheet();
-      await applyAction('edit', { id, patch }, '공고 수정');
-    } else if (kind === 'confirm') {
+      /* 🔴 바로 보내지 않는다 — 위 '모아 두는 수정' 주석 참조. 한 건만 고칠 때도
+         '한꺼번에 반영'을 누르면 되므로 조작은 한 번 더 늘지 않는다(바로 옆에 뜬다). */
+      PENDING_EDITS.set(id, patch);
+      renderPendingBar();
+      toast(`수정을 모아 뒀습니다 (${pendingCount()}건) — '한꺼번에 반영'을 누르면 한 번에 저장됩니다`);
+      return;
+    }
+
+    if (kind === 'confirm') {
       closeSheet();
       await applyAction('confirm', { ids: [id] }, '컨펌');
     } else if (kind === 'revert') {

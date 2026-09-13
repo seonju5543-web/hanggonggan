@@ -261,52 +261,77 @@ switch (action) {
     break;
   }
 
-  /* ── 개별 항목 수정 ─────────────────────────────────────────── */
+  /* ── 항목 수정 ──────────────────────────────────────────────
+     🔴 **여러 건을 한 번에 받는다** (2026-09-13). 예전에는 `payload.id` 한 건만 받아서,
+     검수하며 마감·금액을 채우는 일이 **공고 수만큼 GitHub 작업을 깨웠다.** 화면 쪽은
+     `applyAction` 의 `jobBusy` 가 한 번에 하나만 돌리고 그 작업이 끝날 때까지 화면 전체를
+     잠그므로(그리고 `waitForRun` 은 최대 6분 기다린다), 13건을 고치면 13번을 **차례로**
+     기다려야 했다. 실측으로 '관리자 조정' 한 번이 21초이고 큐·폴링까지 더하면 건당
+     30~60초라, 하루치가 순수 대기만 7~13분이었다.
+     이제 `payload.edits = [{ id, patch }, …]` 로 받아 한 번에 끝낸다.
+     ⚠️ 옛 모양(`payload.id` + `payload.patch`)도 그대로 받는다 — 화면을 단계적으로 옮기므로
+        둘 다 살아 있어야 중간에 배포해도 안 깨진다.
+     🔴 한 건이라도 규칙을 어기면 **전부 멈춘다**(fail). 감사가 저장 직전에 다시 보고
+        실패하면 통째로 되돌리므로, 반만 반영되는 상태가 생기지 않는다. */
   case 'edit': {
-    const it = byId(payload.id);
-    if (!it) fail(`수정할 공고를 찾지 못했습니다: ${payload.id}`);
-    const patch = payload.patch || {};
-    const changed = [];
+    const edits = Array.isArray(payload.edits) && payload.edits.length
+      ? payload.edits
+      : [{ id: payload.id, patch: payload.patch }];
 
-    Object.keys(patch).forEach((k) => {
-      if (!ALLOWED.has(k)) return;                       // 모르는 키는 버린다
-      let v = patch[k];
-      if (typeof v === 'string') v = v.trim();
+    /** 한 건에 patch 를 입힌다. 바뀐 칸 이름들을 돌려준다. */
+    const applyPatch = (it, patch) => {
+      const changed = [];
+      Object.keys(patch || {}).forEach((k) => {
+        if (!ALLOWED.has(k)) return;                       // 모르는 키는 버린다
+        let v = patch[k];
+        if (typeof v === 'string') v = v.trim();
 
-      if (k === 'eligibility') {
-        v = cleanEligibility(v);
-      } else if (k === 'eligibilityLines') {
-        v = cleanLines(v);
-        if (!v.length) v = null;
-      } else if (k === 'eligibilityVerified') {
-        v = v === true || v === 'true';
-        if (!v) v = null;                                // 거짓이면 칸 자체를 지운다
-      } else if (k === 'documents') {
-        v = cleanLines(v);
-        if (!v.length) v = null;
-      } else if (k === 'amountValue') {
-        v = Number(v) || 0;
-      } else if (k === 'deadline' && v) {
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) fail(`마감일 형식이 올바르지 않습니다: ${v} (YYYY-MM-DD)`);
-      } else if (k === 'type' && v && !['교내', '교외'].includes(v)) {
-        fail(`구분은 '교내' 또는 '교외'만 가능합니다: ${v}`);
-      } else if ((k === 'sourceUrl' || k === 'applyEmail') && v) {
-        if (k === 'sourceUrl' && !/^https?:\/\//i.test(v)) fail(`원문 주소는 http(s)로 시작해야 합니다: ${v}`);
-        if (k === 'applyEmail' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) fail(`이메일 형식이 올바르지 않습니다: ${v}`);
-      }
+        if (k === 'eligibility') {
+          v = cleanEligibility(v);
+        } else if (k === 'eligibilityLines') {
+          v = cleanLines(v);
+          if (!v.length) v = null;
+        } else if (k === 'eligibilityVerified') {
+          v = v === true || v === 'true';
+          if (!v) v = null;                                // 거짓이면 칸 자체를 지운다
+        } else if (k === 'documents') {
+          v = cleanLines(v);
+          if (!v.length) v = null;
+        } else if (k === 'amountValue') {
+          v = Number(v) || 0;
+        } else if (k === 'deadline' && v) {
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) fail(`마감일 형식이 올바르지 않습니다: ${v} (YYYY-MM-DD)`);
+        } else if (k === 'type' && v && !['교내', '교외'].includes(v)) {
+          fail(`구분은 '교내' 또는 '교외'만 가능합니다: ${v}`);
+        } else if ((k === 'sourceUrl' || k === 'applyEmail') && v) {
+          if (k === 'sourceUrl' && !/^https?:\/\//i.test(v)) fail(`원문 주소는 http(s)로 시작해야 합니다: ${v}`);
+          if (k === 'applyEmail' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) fail(`이메일 형식이 올바르지 않습니다: ${v}`);
+        }
 
-      const old = it[k];
-      const same = (a, b) => (typeof a === 'object' || typeof b === 'object')
-        ? JSON.stringify(a) === JSON.stringify(b) : a === b;
-      if (v === null || v === '') {
-        if (old !== undefined) { delete it[k]; changed.push(k); }
-      } else if (!same(old, v)) {
-        it[k] = v; changed.push(k);
-      }
+        const old = it[k];
+        const same = (a, b) => (typeof a === 'object' || typeof b === 'object')
+          ? JSON.stringify(a) === JSON.stringify(b) : a === b;
+        if (v === null || v === '') {
+          if (old !== undefined) { delete it[k]; changed.push(k); }
+        } else if (!same(old, v)) {
+          it[k] = v; changed.push(k);
+        }
+      });
+      return changed;
+    };
+
+    const parts = [];
+    edits.forEach((e) => {
+      const it = byId(e && e.id);
+      if (!it) fail(`수정할 공고를 찾지 못했습니다: ${e && e.id}`);
+      const changed = applyPatch(it, e.patch);
+      /* 바뀐 게 없는 건은 **묶음을 죽이지 않고 건너뛴다** — 여러 건을 보낼 때는
+         그중 하나가 이미 같은 값인 일이 흔하다. 전부 그대로면 아래에서 멈춘다. */
+      if (changed.length) parts.push(`${e.id} — ${changed.join(', ')}`);
     });
 
-    if (!changed.length) fail('바뀐 내용이 없습니다');
-    detail = `${payload.id} — ${changed.join(', ')}`;
+    if (!parts.length) fail('바뀐 내용이 없습니다');
+    detail = parts.length === 1 ? parts[0] : `${parts.length}건 — ${parts.join(' / ')}`;
     touched = true;
     break;
   }

@@ -86,6 +86,14 @@
       <button class="tab" data-tab="quality" role="tab" aria-selected="false" aria-controls="screen-quality">데이터 품질 <span class="tab-n" id="n-quality"></span></button>
     </nav>
 
+    <!-- 모아 둔 수정 (2026-09-13) — 저장은 GitHub 작업 한 번이고 그동안 화면이 잠기므로,
+         여러 건을 모았다가 한 번에 보낸다. 헤더 안에 두는 이유는 아래 #job 과 같다. -->
+    <div id="pending-bar" class="pending-bar" role="status" aria-live="polite" hidden>
+      <span id="pending-text"></span>
+      <button class="btn btn-sm btn-primary" data-act="flush">한꺼번에 반영</button>
+      <button class="btn btn-sm" data-act="flush-drop">버리기</button>
+    </div>
+
     <!-- 작업 진행 표시 (변경 요청 → 검사 → 반영).
          **헤더 안에 둔다** — 밖에 두고 각자 sticky를 걸면 스크롤할 때 이 띠가 탭 줄을 덮는다. -->
     <div id="job" class="job" role="status" aria-live="polite" hidden>
