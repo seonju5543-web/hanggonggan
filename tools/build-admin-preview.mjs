@@ -119,103 +119,109 @@ const stamp = new Date(Date.now() + 9 * 3600e3).toISOString().replace('T', ' ').
 const reg = DATA['data/registered.json'];
 const nReg = (reg && reg.items ? reg.items.length : 0);
 
-const head = FRAGMENT ? '<title>한대장 관리자 — 미리보기</title>\n' : `<!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>한대장 관리자 — 미리보기</title>
-<meta name="robots" content="noindex, nofollow" />
-</head>
-<body>`;
-const tail = FRAGMENT ? '' : '\n</body>\n</html>';
+/* ── 화면 껍데기는 _admin/index.html 에서 만든다 (2026-09-13) ────────────────────
+   🔴 **베끼지 않는다.** 예전에는 이 파일이 index.html 을 손으로 옮겨 적은 사본을 들고
+   있었고, 그 사본이 낡아서 실제로 이런 일이 있었다(실측으로 드러남):
+     · 화면 8개 중 **robots·insta 두 개가 통째로 빠져** 그 탭이 미리보기에 아예 없었다.
+     · `form-plan.js` 를 안 실어서 `planFormQuestions` 가 없고, 그것을 부르는
+       `forms.js`  → `renderFormDoc` 이 죽어 **양식 미리보기가 통째로 안 떴다.**
+     · 셸에 없는 버튼(`btn-density`·`btn-theme`)을 `bindGlobal()` 이 배선하려다
+       `null.addEventListener` 로 넘어져 **`enter()` 가 중간에 멈췄다** — 그래서
+       `window.__admin` 이 안 만들어지고 뒤의 배선이 통째로 날아갔다.
+   그래서 지금은 진짜 파일을 읽어 바꿔치기만 한다. index.html 에 화면을 더하면
+   미리보기에도 저절로 따라온다. */
 
-const html = `${head}
-<style>
-${css}
+/** vendor/<이름> → 저장소 원본. build.sh 의 복사 목록과 같아야 한다.
+ *  🔴 여기 없는 vendor 파일이 index.html 에 새로 실리면 **조용히 빠지지 않고 실패한다**(아래 검사). */
+const VENDOR = {
+  'vendor/data.js': () => read('data.js'),
+  'vendor/forms.js': () => read('forms.js'),
+  'vendor/form-plan.js': () => read('form-plan.js'),
+  'vendor/entry-rules.js': () => [
+    'var module = { exports: {} }; var exports = module.exports;',
+    read('verify/entry-rules.cjs'),
+    'window.ENTRY_RULES = module.exports;',
+  ].join('\n'),
+};
+
+const PREVIEW_CSS = `
 /* 미리보기 표시 — 이 파일에만 있는 스타일 */
 .preview-bar {
   position: sticky; top: 0; z-index: 50; background: var(--warn); color: #17140b;
   padding: 9px 16px; font-size: .85rem; font-weight: 650; text-align: center;
 }
 .preview-bar b { font-weight: 800; }
-</style>
+`;
 
-<div class="preview-bar">
+const PREVIEW_BAR = `<div class="preview-bar">
   미리보기 — <b>바꾸기 버튼은 동작하지 않습니다.</b>
   ${stamp} KST 기준 데이터 (정식 등록 ${nReg}건)
-</div>
+</div>`;
 
-<div id="gate" class="gate">
-  <div class="gate-box">
-    <h1>한대장 관리자 <span style="font-size:.7em;color:var(--ink-3)">미리보기</span></h1>
-    <p class="gate-lede">실제 화면에서는 여기에 GitHub 열쇠를 넣어야 들어갑니다.
-      미리보기라 아무 글자나 넣고 눌러도 열립니다.</p>
-    <label class="gate-label" for="gate-key">GitHub 개인 열쇠</label>
-    <input id="gate-key" type="password" value="preview" autocomplete="off" />
-    <label class="gate-check"><input id="gate-remember" type="checkbox" /><span>이 기기에 기억하기</span></label>
-    <button id="gate-enter" class="btn btn-primary btn-lg">둘러보기</button>
-    <p id="gate-msg" class="gate-msg" hidden></p>
-  </div>
-</div>
+let shell = read('_admin/index.html');
 
-<div id="app" hidden>
-  <header class="topbar">
-    <div class="topbar-in">
-      <div class="brand"><span class="brand-mark">한대장</span><span class="brand-sub">관리자</span></div>
-      <div class="topbar-actions">
-        <span id="deploy-state" class="deploy-state"></span>
-        <button id="btn-reload" class="btn btn-ghost btn-sm">새로고침</button>
-        <button id="btn-logout" class="btn btn-ghost btn-sm danger">열쇠 지우기</button>
-      </div>
-    </div>
-    <nav class="tabs" id="tabs">
-      <button class="tab active" data-tab="todo">오늘 할 일 <span class="tab-n" id="n-todo"></span></button>
-      <button class="tab" data-tab="list">공고 전체 <span class="tab-n" id="n-list"></span></button>
-      <button class="tab" data-tab="review">컨펌 작업대 <span class="tab-n" id="n-review"></span></button>
-      <button class="tab" data-tab="forms">양식 <span class="tab-n" id="n-forms"></span></button>
-      <button class="tab" data-tab="network">수집망 <span class="tab-n" id="n-network"></span></button>
-      <button class="tab" data-tab="quality">데이터 품질 <span class="tab-n" id="n-quality"></span></button>
-    </nav>
-  </header>
+/* ① 보안 설정(CSP)을 뺀다 — 미리보기는 코드를 파일 안에 넣으므로 'self' 규칙에 걸린다.
+      진짜 화면은 index.html 의 CSP 를 그대로 쓴다(여기서 빼는 것은 이 사본뿐이다). */
+shell = shell.replace(/\s*<meta http-equiv="Content-Security-Policy"[\s\S]*?\/>/, '');
 
-  <div id="job" class="job" hidden>
-    <span class="job-dot"></span><span id="job-text"></span>
-    <a id="job-link" href="#" target="_blank" rel="noreferrer noopener" hidden>실행 기록 보기 ↗</a>
-    <button id="job-close" class="job-close" aria-label="닫기">×</button>
-  </div>
+/* ② 스타일을 파일 안으로 */
+/* 🔴 치환 '문자열' 을 쓰지 말 것 — 파일 내용 안의 `$$` 를 자바스크립트가 `$` 로 바꿔 먹는다.
+   실제로 그래서 `const $$ =` 가 `const $ =` 가 되어 **'$ 가 이미 선언됐다'** 로 모듈이 통째로
+   죽었다(2026-09-13). 내용을 끼워 넣을 때는 **함수**로 돌려준다(함수 반환값은 그대로 들어간다). */
+shell = shell.replace(
+  /<link rel="stylesheet" href="admin\.css"\s*\/?>/,
+  () => `<style>\n${css}\n${PREVIEW_CSS}</style>`,
+);
 
-  <main class="wrap">
-    <section id="screen-todo" class="screen"></section>
-    <section id="screen-list" class="screen" hidden></section>
-    <section id="screen-review" class="screen" hidden></section>
-    <section id="screen-forms" class="screen" hidden></section>
-    <section id="screen-network" class="screen" hidden></section>
-    <section id="screen-quality" class="screen" hidden></section>
-  </main>
+/* ③ vendor 스크립트를 파일 안으로. 모르는 것이 나오면 **조용히 넘기지 않고 멈춘다.** */
+const missing = [];
+shell = shell.replace(/<script src="(vendor\/[^"]+)"><\/script>/g, (_, rel) => {
+  if (!VENDOR[rel]) { missing.push(rel); return ''; }
+  return `<script>\n${VENDOR[rel]()}\n</script>`;
+});
+if (missing.length) {
+  console.error(`✕ index.html 이 싣는 vendor 파일을 미리보기가 모릅니다: ${missing.join(', ')}`);
+  console.error('  tools/build-admin-preview.mjs 의 VENDOR 목록에 더해 주세요 (build.sh 도 함께 확인).');
+  process.exit(1);
+}
 
-  <footer class="foot"><span id="foot-info"></span></footer>
-</div>
+/* ④ admin.js 본체 — ES 모듈이라 import 를 따라가며 이웃까지 모아 넣는다 */
+shell = shell.replace(
+  /<script type="module" src="admin\.js"><\/script>/,
+  () => `<script type="module">\n${urlKeyInline}\n${adminInline}\n</script>`,
+);
 
-<div id="sheet-back" class="sheet-back" hidden></div>
-<aside id="sheet" class="sheet" hidden aria-label="상세"></aside>
-<div id="toast" class="toast" hidden></div>
+/* ⑤ 데이터를 파일 안에 심는다 — 다른 스크립트보다 먼저 있어야 한다 */
+shell = shell.replace(/<body>/, () => `<body>\n${PREVIEW_BAR}\n<script>window.__PREVIEW_DATA = ${JSON.stringify(DATA)};</script>`);
 
-<script>window.__PREVIEW_DATA = ${JSON.stringify(DATA)};</script>
-<script>${dataJs}</script>
-<script>${formsJs}</script>
-<script>
-var module = { exports: {} }; var exports = module.exports;
-${entryRules}
-window.ENTRY_RULES = module.exports;
-</script>
-<script type="module">
-${urlKeyInline}
-${adminInline}
-</script>${tail}
-`;
+/* ⑥ 입장 화면을 미리보기용으로 — 열쇠를 미리 채우고 문구를 바꾼다.
+      화면을 새로 짜지 않고 있는 것을 고쳐 쓴다(다시 베끼면 또 낡는다). */
+shell = shell
+  .replace(/(<h1>한대장 관리자)(<\/h1>)/, '$1 <span style="font-size:.7em;color:var(--ink-3)">미리보기</span>$2')
+  .replace(/(<p class="gate-lede">)[\s\S]*?(<\/p>)/,
+    '$1실제 화면에서는 여기에 GitHub 열쇠를 넣어야 들어갑니다. 미리보기라 아무 글자나 넣고 눌러도 열립니다.$2')
+  .replace(/(<input id="gate-key"[^>]*?)\s*\/>/, '$1 value="preview" />')
+  .replace(/(<button id="gate-enter"[^>]*>)들어가기(<\/button>)/, '$1둘러보기$2');
+
+/* ⑦ 조각으로 내보낼 때는 바깥 껍데기를 벗긴다 (공유 문서용) */
+const html = FRAGMENT
+  ? `<title>한대장 관리자 — 미리보기</title>\n${
+    shell.replace(/^[\s\S]*?<body>/, '').replace(/<\/body>[\s\S]*$/, '')}`
+  : shell;
+
+/* ⑧ 베끼기로 되돌아가지 않게 하는 관문 — 화면 개수가 진짜 파일과 같아야 한다.
+      (예전 사본은 6개였고 진짜는 8개였는데 아무도 몰랐다) */
+const screensIn = (s) => [...s.matchAll(/id="screen-([a-z]+)"/g)].map((m) => m[1]);
+const want = screensIn(read('_admin/index.html'));
+const got = screensIn(html);
+const lost = want.filter((n) => !got.includes(n));
+if (lost.length) {
+  console.error(`✕ 화면이 빠졌습니다: ${lost.join(', ')} — 껍데기를 index.html 에서 만들지 않았다는 뜻입니다.`);
+  process.exit(1);
+}
 
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
 fs.writeFileSync(OUT, html);
 console.log(`미리보기 생성 → ${OUT}`);
 console.log(`  크기 ${(Buffer.byteLength(html) / 1024).toFixed(0)}KB · 정식 등록 ${nReg}건 · 기준 ${stamp} KST`);
+console.log(`  화면 ${got.length}개: ${got.join(' · ')}`);
