@@ -2777,6 +2777,35 @@ function applyAll() {
   renderBulkPrep();
 }
 
+/* 🔴 **'신청 버튼을 누를 수 있는가'의 단 하나의 기준** (2026-09-13 · 노션 백로그 핵심-2).
+   화면(openDetail)과 검사 도구(verify/what-shows.mjs)가 **같은 함수**를 쓴다.
+   ⚠️ 베껴 두면 갈라진다 — 실제로 갈라져 있었다: 이 규칙이 openDetail 안의 지역 변수라
+      what-shows 가 제 사본을 들고 있었고, 잠금을 푼 뒤에도 계속 '잠김'이라 보고했다.
+      (그 파일 머리말은 "앱 규칙을 한 줄도 베끼지 않는다"고 적어 둔 채였다.)
+
+   🔴 **자격 판정으로는 막지 않는다.** 예전에는 `['eligible','selective']` 가 이 식에
+   함께 있어서 미달·미확인이면 버튼이 통째로 잠겼다. 그런데 우리 판정은 100% 가 아니다 —
+   원문을 못 받았거나(`unknown`) 축이 없어서 미달이 된 공고가 실제로는 신청 가능하고,
+   막아 버리면 그 학생은 받을 수 있는 장학금을 **영영 못 본다**. 판정은 참고로 보여 주고
+   **결정은 학생이 한다**(caution 이 무엇을 확인해야 하는지 말한다).
+
+   ⚠️ 마감(`d.days >= 0`)과 이미 신청함(`app.pending`)은 **그대로 막는다** — 그 둘은
+      우리 판정이 아니라 **사실**이다. 마감된 공고를 신청하게 하는 것은 정직하지 않다(원칙 1).
+   ⚠️ 일괄 신청 준비(`bulkTargets`)는 일부러 안 열었다 — 거기는 여러 건을 한꺼번에 고르는
+      자리라 미달까지 섞으면 학생이 무엇을 고른 것인지 알 수 없게 된다.
+
+   caution — 자격이 확인되지 않은 채 신청하는 경우에만 값이 있다(없으면 빈 문자열).
+   🔴 **모르는 것을 '미충족'이라고 부르지 않는다** (2026-09-09 에 배운 것을 여기로 옮겼다).
+      `unknown` 은 '요건에 못 미친다'가 아니라 **'우리가 못 읽었다'**는 뜻이다 — 동산장학회
+      (이공계 새터민)에서 실제로 그랬다: 새터민이고 이공계이고 성적도 넘는 학생인데 자격 줄
+      셋 중 둘을 못 읽어 unknown 이 됐고, 화면은 그 학생에게 '요건 미충족'이라 단정했다.
+      그때는 **버튼 문구만** 갈랐고 잠금은 안 갈라서, 그 학생은 여전히 못 눌렀다. */
+function applyLock(result, app, d) {
+  const canApply = (!app || app.pending) && d.days >= 0;
+  const unsure = !['eligible', 'selective'].includes((result && result.status) || '');
+  return { canApply, caution: canApply && unsure ? result.status : '' };
+}
+
 /* ---------------- 상세 바텀시트 ---------------- */
 function openDetail(id) {
   const sch = findSch(id);
@@ -2787,7 +2816,7 @@ function openDetail(id) {
   const meta = STATUS_META[result.status];
   const d = dday(sch.deadline);
   const app = state.applications.find((a) => a.id === id);
-  const canApply = ['eligible', 'selective'].includes(result.status) && (!app || app.pending) && d.days >= 0;
+  const { canApply, caution: applyCaution } = applyLock(result, app, d);
   const ch = officialChannel(sch);
 
   /* 공고 원문에 적힌 자격 문장을 **그대로** 덧붙인다 (2026-08-02 개발자 지시).
@@ -2932,17 +2961,10 @@ function openDetail(id) {
   if (app && !app.pending) btnLabel = '신청 준비 완료됨';
   else if (app && app.pending) btnLabel = '서류 작성 이어서 하기';
   else if (d.days < 0) btnLabel = '마감된 장학금';
-  /* 🔴 **모르는 것을 '미충족'이라고 부르지 않는다** (2026-09-09 · 운영 원칙 8-1).
-     예전에는 판정이 `unknown` 일 때도 이 문구가 떴다. 그런데 unknown 은 '요건에 못 미친다'가
-     아니라 **'우리가 못 읽었다'**는 뜻이다 — 동산장학회(이공계 새터민)에서 실제로 그랬다:
-     새터민이고 이공계이고 성적도 넘는 학생인데 자격 줄 셋 중 둘을 못 읽어 unknown 이 됐고,
-     화면은 그 학생에게 '요건 미충족' 이라고 단정했다(reasons 도 비어 있어 이유조차 없었다).
-     확인하지 않은 것을 확인했다고 말하는 것이라 문구를 가른다. */
-  else if (!canApply) {
-    btnLabel = result.status === 'unknown'
-      ? '자격을 확인하지 못했어요 — 원문에서 확인하세요'
-      : '요건 미충족 — 신청할 수 없음';
-  }
+  /* 🔴 여기에 '요건 미충족 — 신청할 수 없음' 문구를 **되살리지 말 것** (2026-09-13).
+     자격 판정은 이제 버튼을 잠그지 않는다(위 canApply). 못 미더운 판정은 버튼 위
+     `applyCaution` 줄이 말하고, 누를지는 학생이 정한다. 문구를 여기로 되돌리면
+     '신청할 수 없음'이라는 **사실이 아닌 말**이 화면에 다시 뜬다. */
 
   $('#detail-sheet').innerHTML = `
     <div class="sheet-handle"></div>
@@ -3061,6 +3083,13 @@ function openDetail(id) {
         ${sch.applyEmail ? `<button class="btn btn-primary btn-lg" id="btn-mail-apply" style="margin-bottom:14px">접수 메일 열기 (내용 자동 완성)</button>` : ''}`;
       })() : ''}
 
+      ${/* 🔴 판정이 못 미더울 때 **막는 대신 말한다** (2026-09-13 · 핵심-2).
+           문구는 두 갈래다 — 못 읽은 것(unknown)과 안 맞아 보이는 것(ineligible)은
+           학생이 해야 할 일이 다르다: 앞은 '원문을 읽어 보라', 뒤는 '그래도 내가 맞는지
+           따져 보라'. 뭉뚱그리면 둘 다 '안 된다'로 읽힌다. */ ''}
+      ${applyCaution ? `<p class="dp-note dp-caution">${applyCaution === 'unknown'
+        ? '이 공고는 지원 자격을 아직 읽지 못했습니다. 원문에서 확인한 뒤 신청하세요.'
+        : '입력한 정보로는 요건이 맞지 않아 보입니다. 판정이 틀릴 수 있으니 원문을 확인한 뒤 신청하세요.'}</p>` : ''}
       <button class="btn btn-primary btn-lg" id="btn-apply-one" ${canApply ? '' : 'disabled'}>${btnLabel}</button>
       ${canApply ? `<p class="dp-note">준비를 마치면 최종 제출처(${ch.label})가 표시됩니다.${(!sch.formId && sch.prepFormId) ? ' 이 공고는 별도 양식 없이 자유 형식 제출을 받으므로, 앱에서 제출용 지원문서를 작성할 수 있습니다.' : ''}</p>` : ''}
     </div>`;

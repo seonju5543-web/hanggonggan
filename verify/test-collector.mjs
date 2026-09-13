@@ -3882,9 +3882,181 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
      찾았는데 **머리말 주석 두 줄에 그 글자가 있어**, 실제 판정 줄에서 지워도 통과했다.
      "검사가 조용하면 통과가 아니라 무력해진 것부터 의심한다"의 표본이다. */
   const wsCode = ws.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
-  eq('  신청 버튼은 앱처럼 마감도 본다 (주석 말고 코드에서)',
-     /const canApply = [^;]*d\.days >= 0/.test(wsCode), true);
+  /* 🔴 뜻은 그대로, 자리만 옮겼다 (2026-09-13). 예전에는 이 도구가 신청 버튼 조건을
+     **제 사본**으로 들고 있었고(`const canApply = [...].includes(result.status) && d.days >= 0`),
+     그래서 app.js 의 자격 잠금을 푼 뒤에도 이 도구만 계속 '잠김'이라 보고했다.
+     지금은 앱의 `applyLock` 을 이름으로 가져다 부른다 — 검사는 '사본이 없는가'를 본다. */
+  eq('  신청 버튼 판정은 앱의 applyLock 을 가져다 쓴다 (사본이 아니다)',
+     /appFn\('applyLock'\)/.test(wsCode), true);
+  eq('  제 사본을 다시 들지 않는다 (자격 목록을 직접 적지 않는다)',
+     /\['eligible', ?'selective'\]/.test(wsCode), false);
   eq('  못 가져오면 조용히 넘어가지 않고 멈춘다', /throw new Error\(`app\.js 에서/.test(ws), true);
+}
+
+console.log('\n■ 지역 요건 — 거주지·학교 위치·출신 고교를 가른다 (2026-09-13 · 노션 백로그 G-6)');
+{
+  const MEg = createRequire(import.meta.url)('../match-engine.js');
+  const PRg = createRequire(import.meta.url)('../parse-requirements.js');
+  const res = (t) => PRg.parseLine(t, false).conds.find((c) => c.kind === 'residence') || null;
+  const about = (t) => (res(t) || {}).about || null;
+
+  /* 🔴 왜 있나 — 지역 이름이 있는데 지역 조건이 **아예 안 만들어지는** 줄이 6건이었다.
+     안 잡힌 절은 보이지 않으므로, 같은 줄의 쉬운 절 하나(`재학생`)가 맞으면 줄 전체에
+     ✓ 가 붙는다. 실측: 다섯 줄이 전부 서울 학생에게 **✓ 충족**이었다(틀린 안심).
+     아래 여덟 줄은 **전부 실제 원문**이다(등록 + 한국장학재단). */
+
+  /* ① 거주지 — 프로필에 칸이 있다. 판정한다. */
+  eq('① 낱말 없이 지역만 적은 줄도 거주지로 읽는다 (세종)',
+     about('(신청자격) 세종특별자치시 초·중·고·대학생(재학생)'), 'home');
+  eq('  「완도군 청소년」도 거주지다', about('완도군 청소년으로서 만29세 이하인 자'), 'home');
+  eq('  예전 낱말 문턱도 그대로 (거주·주소)',
+     about('공고일 현재 부 또는 모가 1년 이상 계속하여 정읍시에 주소를 두고 있는 국내 대학의 재학생'), 'home');
+
+  /* ② 학교 위치 — **앱은 학교 소재지를 모른다**(data.js 의 UNIVERSITIES 는 이름 목록뿐) */
+  eq('② 「○○시 소재 대학」은 학교 위치다 (거주지가 아니다)',
+     about('울산시 소재 대학에 재학 중인 학생'), 'school');
+  eq('  「연접 지역에 있는 대학교」도 학교 위치다',
+     about('포항시 및 포항시와 연접 지역에 있는 대학교 재학생'), 'school');
+
+  /* ③ 출신 고교 — 앱이 묻지 않는 항목이다 */
+  eq('③ 「○○시 소재 고등학교 졸업자」는 출신 고교다',
+     about('울산시 소재 고등학교 졸업자인 대학교 재학생'), 'origin');
+  eq('  「○○ 소재 고등 및 중등 과정을 마친 자」도 출신 고교다',
+     about('2. 장학생 신청 조건 : 전남 목포 소재 고등 및 중등 과정을 마친 자'), 'origin');
+
+  /* 🔴 **거주를 말하는 낱말이 있으면 그것이 이긴다** — 이걸 빠뜨려 회귀를 만들었다.
+     `…정읍시에 주소를 두고 **있는** 국내 **대학**의 재학생` 이 ②로 떨어져 원래 ✕ 던 것이
+     '모른다'가 됐다. 정읍 사람이 아닌 학생이 자기가 된다고 읽게 되는 후퇴다. */
+  eq('🔴 「주소를 두고 있는 … 대학」은 학교 위치가 아니라 거주지다 (회귀 방지)',
+     about('공고일 현재 본인이 포항시에 1년 이상 계속하여 주민등록이 되어 있는 자'), 'home');
+
+  /* ── 판정 — ②③ 은 '모른다'다. ✕ 를 만들지 않는다. ── */
+  const mk = (line) => ({ id: 'x', name: '장학생', provider: '재단', type: '교외', amount: '-',
+    amountValue: 0, deadline: '2026-12-31', period: '-', summary: '-',
+    eligibility: { selective: true }, documents: [], eligibilityLines: [line] });
+  const seoul = { school: '한국외국어대학교', campus: '', track: 'humanities', major: '영어',
+    year: 3, status: '재학', gpa: 3.5, bracket: 5, credits: 15, region: '서울', regionCity: '동대문구',
+    parentRegion: '서울', parentRegionCity: '동대문구', nationality: 'korean', birthYear: 2004,
+    flags: [], cert: false, exchange: false, common: {} };
+  const verdict = (line, over) => {
+    const fd = MEg.fitDetail(mk(line), { ...seoul, ...over });
+    return fd.fails.length ? '미달' : (fd.met > 0 ? '충족' : '모른다');
+  };
+
+  /* 🔴 이 넷이 이 절의 핵심이다 — 고치기 전에는 **전부 '충족'** 이었다(실측).
+     되돌리면 여기가 빨간불이다. */
+  eq('🔴 서울 학생에게 세종 공고가 「충족」이 아니다',
+     verdict('(신청자격) 세종특별자치시 초·중·고·대학생(재학생)') !== '충족', true);
+  eq('🔴 학교 위치는 「모른다」다 (미달로 단정하지 않는다)',
+     verdict('울산시 소재 대학에 재학 중인 학생'), '모른다');
+  eq('  서울 학생이 포항공대에 다닐 수 있다 — 그래서 ✕ 를 치지 않는다',
+     verdict('포항시 및 포항시와 연접 지역에 있는 대학교 재학생'), '모른다');
+  eq('🔴 출신 고교도 「모른다」다 (앱이 묻지 않는 항목이다)',
+     verdict('울산시 소재 고등학교 졸업자인 대학교 재학생'), '모른다');
+
+  /* ① 은 실제로 판정한다 — 사는 곳이 다르면 미달, 맞으면 충족 */
+  eq('완도 학생은 완도 공고에 충족',
+     verdict('완도군 청소년으로서 만29세 이하인 자',
+       { region: '전남', regionCity: '완도군', parentRegion: '전남', parentRegionCity: '완도군' }), '충족');
+  eq('  서울 학생은 미달 (사는 곳이 다르다)', verdict('완도군 청소년으로서 만29세 이하인 자'), '미달');
+
+  /* ── 🔴 넓히다가 실제로 만든 회귀 둘 — 되돌아오면 여기서 잡는다 ── */
+  /* ⚠️ `자녀를 둔 **가구** 학생에 배정` 의 `가구` 를 시·군·구로 읽어 상주시장학회가
+     **모든 학생에게 틀린 미달**이 됐다. 틀린 미달은 못 받는 것보다 나쁘다. */
+  eq('🔴 「가구 학생」의 가구를 시·군·구로 읽지 않는다 (틀린 미달을 만들었다)',
+     verdict('직전 학기 10학점 이상 이수하고 성적이 B+학점 이상인 자 - 다자녀: 선발인원 중 일부를 3명 이상의 자녀를 둔 가구 학생에 배정') !== '미달', true);
+  /* ⚠️ **다리가 낱말을 자르면 안 된다** — `장학생` 가운데의 `학생` 이 걸려
+     `불참시` 가 지역이 됐고, 그 공고가 모든 학생에게 틀린 미달이 됐다(코드 리뷰). */
+  eq('🔴 「장학생」 가운데의 「학생」을 집지 않는다 (불참시)',
+     res('장학금 수여식 불참시 장학생 선발 취소'), null);
+  /* ⚠️ **흔한 낱말(학생·자녀)은 시·도 공식 표기와 함께일 때만** — 안 그러면 시·군·구 꼬리말로
+     끝나는 보통명사가 전부 지역이 된다(`다자녀가구`·`발생시`). */
+  eq('🔴 「다자녀가구 자녀」의 가구를 지역으로 읽지 않는다',
+     res('가정형편이 어려운 자 또는 다자녀가구 자녀로서 셋째이상인 자'), null);
+  eq('  「울주군 대학생 장학금 수혜자」도 (장학금 이름이지 거주 요건이 아니다)',
+     res('2025년도 울주군 대학생 장학금 수혜자'), null);
+  /* 🔴 그러면서도 진짜 둘은 계속 받는다 — 위 ① 항목들이 그것을 못 박는다 */
+
+  /* ── 🔴 제외 줄의 지역 이름은 판정하지 않는다 (코드 리뷰 · 실측으로 확인) ── */
+  {
+    const exSch = { id: 'x', name: '장학생', provider: '(재)영동군민장학회', type: '교외',
+      amount: '-', amountValue: 0, deadline: '2026-12-31', period: '-', summary: '-',
+      eligibility: { selective: true }, documents: [], eligibilityLines: ['국내 4년제 대학 재학생'],
+      eligibilityExcludes: ['(재)영동군민장학회 장학생으로 선발되어 재학 중 2회 이상 장학금을 받은 자'] };
+    const vOf = (over) => MEg.fitDetail(exSch, { ...seoul, ...over }).fails.length;
+    /* 이 줄은 '이미 두 번 받은 사람을 뺀다'는 뜻인데, 시·군 규칙이 '영동군에 살아야 한다'로
+       읽어 서울 학생이 미달이 됐다 — 한 번도 받은 적 없는 학생이다. */
+    eq('🔴 제외 줄의 기관 이름을 거주 요건으로 읽지 않는다 (서울 학생)', vOf({}), 0);
+    /* ⚠️ 뒤집어서 '안 살면 통과'로 만들지도 않는다 — 그러면 이번엔 그 지역 학생이 미달이 된다 */
+    eq('  그 지역 학생도 미달이 아니다 (뒤집어 고치지 않았다)',
+       vOf({ region: '충북', regionCity: '영동군', parentRegion: '충북', parentRegionCity: '영동군' }), 0);
+  }
+
+  /* ⚠️ `서울캠퍼스` 는 지역이 아니라 캠퍼스 이름이다 — 지역으로 읽으면 한국외대 서울캠퍼스
+     공고가 경기 사는 학생에게 틀린 미달이 된다. 방어선은 '이름 바로 뒤가 띄어쓰기인가'다. */
+  eq('🔴 「서울캠퍼스」를 지역으로 읽지 않는다', res('가. 2026년도 2학기 서울캠퍼스 재학생'), null);
+  eq('  「( 서울 및 글로벌 )」도 캠퍼스 이야기다',
+     res('2. 지원자격 : 2026-1 학기 학부 재학생 ( 서울 및 글로벌 ) 으로 평점 3.5 이상인 학생'), null);
+  /* ⚠️ 재단 주소 줄에 시·군·구가 잔뜩 들어 있다 — 요건이 아니다 */
+  eq('  재단 주소 줄을 요건으로 읽지 않는다',
+     res('[13620] 경기도 성남시 분당구 구미로 173번길 82 분당서울대학교병원 2동 7층 외과 7714호 (동산장학회)'), null);
+}
+
+console.log('\n■ 신청 잠금 — 자격 판정으로는 막지 않는다 (2026-09-13 · 노션 백로그 핵심-2)');
+{
+  /* 🔴 왜 있나 — 우리 판정은 100% 가 아니다. 원문을 못 받았거나(`unknown`) 축이 없어서
+     미달이 된 공고가 실제로는 신청 가능한데, 버튼을 잠가 버리면 그 학생은 받을 수 있는
+     장학금을 **영영 못 본다**(개발자가 백로그에 적어 둔 이유 그대로).
+     ⚠️ 그렇다고 **전부** 열면 안 된다 — 마감은 우리 판정이 아니라 사실이므로 계속 막는다.
+        이 절은 '무엇이 열렸는가'와 '무엇이 여전히 막히는가'를 **둘 다** 못 박는다.
+
+     🔴 규칙을 베끼지 않는다 — app.js 의 `applyLock` 을 이름으로 떼어 내 그대로 돌린다.
+        (손으로 옮겨 적으면 app.js 가 바뀌어도 이 검사는 계속 통과한다.) */
+  const src = readText(new URL('../app.js', import.meta.url));
+  const grab = (name) => {
+    const m = src.match(new RegExp(`^function ${name}\\([\\s\\S]*?^\\}`, 'm'));
+    if (!m) throw new Error(`app.js 에서 ${name}() 을 못 찾았습니다 — 최상위 함수가 아니거나 이름이 바뀌었습니다.`);
+    return m[0];
+  };
+  const applyLock = new Function(`${grab('applyLock')}\nreturn applyLock;`)();
+
+  const open = { days: 5 }, closed = { days: -1 };
+  const R = (status) => ({ status });
+
+  eq('자격 통과는 열린다', applyLock(R('eligible'), null, open).canApply, true);
+  eq('선발 심사도 열린다', applyLock(R('selective'), null, open).canApply, true);
+  /* 🔴 이 둘이 이 절의 핵심이다 — 되돌리면(자격 목록을 canApply 에 다시 넣으면) 여기가 빨간불이다 */
+  eq('🔴 요건 미달이어도 열린다 (판정은 참고, 결정은 학생)', applyLock(R('ineligible'), null, open).canApply, true);
+  eq('🔴 자격을 못 읽었어도 열린다 (unknown 은 미달이 아니다)', applyLock(R('unknown'), null, open).canApply, true);
+
+  /* 🔴 열었다고 **아무 말 없이** 열면 안 된다 — 무엇을 확인해야 하는지 말해야 한다(원칙 8-1) */
+  eq('미달일 때는 안내가 붙는다', applyLock(R('ineligible'), null, open).caution, 'ineligible');
+  eq('  못 읽었을 때도 안내가 붙는다', applyLock(R('unknown'), null, open).caution, 'unknown');
+  /* 🔴 **둘을 뭉뚱그리지 않는다** — 학생이 해야 할 일이 다르다(읽어 보라 ↔ 따져 보라).
+     2026-09-09 에 버튼 문구는 갈랐는데 잠금은 안 갈랐던 것이 이 업무의 출발점이다. */
+  eq('  두 갈래가 서로 다른 값이다 (뭉뚱그리지 않는다)',
+     applyLock(R('ineligible'), null, open).caution !== applyLock(R('unknown'), null, open).caution, true);
+  eq('자격 통과에는 안내를 붙이지 않는다 (없는 걱정을 만들지 않는다)',
+     applyLock(R('eligible'), null, open).caution, '');
+
+  /* 🔴 **여기는 계속 막힌다** — 우리 판정이 아니라 사실이라서다 */
+  eq('마감된 공고는 여전히 잠긴다', applyLock(R('eligible'), null, closed).canApply, false);
+  eq('  마감이면 안내도 안 붙는다 (누를 수 없는 버튼에 붙는 안내는 잡음이다)',
+     applyLock(R('ineligible'), null, closed).caution, '');
+  eq('이미 신청 준비를 마친 공고는 잠긴다', applyLock(R('eligible'), { pending: false }, open).canApply, false);
+  eq('  쓰다 만 것은 이어서 할 수 있다', applyLock(R('eligible'), { pending: true }, open).canApply, true);
+
+  /* 🔴 화면 문구가 되돌아가는 것도 막는다 — '신청할 수 없음'은 이제 **사실이 아니다** */
+  const appCode = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  eq("버튼 문구에 '신청할 수 없음'이 없다 (주석 말고 코드에서)",
+     /신청할 수 없음/.test(appCode), false);
+  eq('자격이 못 미더우면 버튼 위에 안내를 그린다', /dp-caution/.test(appCode), true);
+
+  /* 🔴 **일괄 신청 준비는 일부러 안 열었다** — 여러 건을 한꺼번에 고르는 자리라 미달까지
+     섞으면 학생이 무엇을 고른 것인지 알 수 없게 된다. 누가 '일관성'을 이유로 여기까지
+     열어 버리는 것을 막는다(열려면 화면 설계부터 다시 해야 한다). */
+  eq('일괄 신청 준비는 자격 통과분만 담는다 (여기는 안 열었다)',
+     /function bulkTargets\(\)[\s\S]{0,400}?\['eligible', 'selective'\]/.test(appCode), true);
 }
 
 /* ── 🔴 적합도 상수와 감사가 갈라지지 않는가 (2026-08-29) ──
@@ -4959,13 +5131,28 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
   const appJs = readText(new URL('../app.js', import.meta.url));
   /* ⚠️ 끝을 찾을 때 **시작 뒤부터** 찾는다 — `$('#detail-sheet')` 는 파일 앞쪽에도 나와서
      그냥 indexOf 하면 시작보다 앞을 가리키고 잘라 낸 조각이 빈다(그렇게 짰다가 잡았다). */
-  const from = appJs.indexOf("let btnLabel = '신청 준비 시작'");
-  const to = appJs.indexOf("$('#detail-sheet').innerHTML", from);
+  /* 🔴 **뜻은 그대로, 자리만 옮겼다** (2026-09-13). 2026-09-09 에 이 검사는 버튼 문구
+     (`btnLabel`)를 쟀다 — 그때는 자격이 못 미더우면 버튼이 잠겨 있었고, 문구가 학생에게
+     닿는 유일한 말이었기 때문이다. 지금은 자격으로 버튼을 잠그지 않으므로(핵심-2)
+     그 갈래가 **버튼 위 안내(`applyLock` 의 caution)** 로 옮겨 갔다.
+     ⚠️ 검사만 고쳐 통과시킨 것이 아니다 — 재는 대상을 옮겼고, 지키는 규칙은 같다:
+        **모르는 것(`unknown`)을 '미충족'이라고 부르지 않는다.** */
+  const from = appJs.indexOf('function applyLock(');
+  const to = appJs.indexOf("/* ---------------- 상세 바텀시트", from);
   const seg = from >= 0 && to > from ? appJs.slice(from, to) : '';
-  eq('신청 버튼 문구 자리를 찾았다', seg.length > 0 && seg.length < 2000, true);
-  eq("unknown 일 때 '요건 미충족'이라고 하지 않는다",
-    /status\s*===\s*'unknown'/.test(seg), true);
-  eq('그때 다른 문구를 쓴다', /확인하지 못했|판단하지 못했/.test(seg), true);
+  eq('신청 잠금 판정 자리를 찾았다', seg.length > 0 && seg.length < 800, true);
+  eq('  갈래를 실제로 가른다 (뭉뚱그린 불리언이 아니다)', /result\.status/.test(seg), true);
+
+  /* 학생에게 닿는 **문구** 쪽도 같은 규칙을 지키는지 본다 — 화면 문구는 상세 시트에 있다 */
+  const noteFrom = appJs.indexOf('dp-note dp-caution');
+  const noteTo = appJs.indexOf('id="btn-apply-one"', noteFrom);
+  const note = noteFrom >= 0 && noteTo > noteFrom ? appJs.slice(noteFrom, noteTo) : '';
+  eq('버튼 위 안내 문구 자리를 찾았다', note.length > 0 && note.length < 800, true);
+  eq("  unknown 일 때 '요건 미충족'이라고 하지 않는다",
+    /'unknown'/.test(note) && !/미충족/.test(note), true);
+  eq('  그때 다른 문구를 쓴다 (못 읽었다고 말한다)', /읽지 못했/.test(note), true);
+  /* 🔴 미달 쪽 문구도 **단정하지 않는다** — 우리 판정이 틀릴 수 있다는 것이 이 업무의 전제다 */
+  eq('  미달 쪽도 단정하지 않는다 (틀릴 수 있다고 말한다)', /틀릴 수 있/.test(note), true);
 }
 
 /* ── 🔴 DESIGN.md 가 style.css 와 갈라지지 않게 (2026-09-11) ──

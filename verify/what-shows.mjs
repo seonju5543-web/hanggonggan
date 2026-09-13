@@ -81,7 +81,7 @@ function takeFn(name) {
   return m[0];
 }
 /* 의존 순서대로 — dday 는 todayStart 를, fitBadgeHtml 은 fitTone·fitVerdict 를 쓴다 */
-const NEED = ['todayStart', 'dday', 'fitTone', 'fitVerdict', 'fitBadgeHtml'];
+const NEED = ['todayStart', 'dday', 'fitTone', 'fitVerdict', 'fitBadgeHtml', 'applyLock'];
 const ctx = vm.createContext({ Date, Math, Number, String, JSON, console });
 vm.runInContext(NEED.map(takeFn).join('\n\n'), ctx, { filename: 'app.js(발췌)' });
 const appFn = (n) => vm.runInContext(n, ctx);
@@ -93,9 +93,12 @@ for (const sch of hits) {
   const fd = ME.fitDetail(sch, p);
   /* 배지는 앱의 fitBadgeHtml 이 낸 그대로 (문구·'확인 필요 N' 까지 같다) */
   const badge = stripTags(appFn('fitBadgeHtml')(fit, fd)) || '(배지 없음)';
-  /* 신청 버튼도 앱과 같은 조건 — **마감(d.days >= 0)까지 본다** */
   const d = appFn('dday')(sch.deadline);
-  const canApply = ['eligible', 'selective'].includes(result.status) && d.days >= 0;
+  /* 🔴 신청 버튼 판정은 **앱의 applyLock 을 그대로 부른다** (2026-09-13).
+     여기에 조건을 손으로 적어 두었더니, 자격 잠금을 푼 뒤에도 이 도구만 계속
+     '잠김'이라고 보고했다 — 이 파일 머리말이 경고한 바로 그 갈라짐이다.
+     `app` 은 '이미 신청한 기록'인데 이 도구는 저장소 데이터만 보므로 항상 없다(null). */
+  const { canApply, caution } = appFn('applyLock')(result, null, d);
 
   const listLines = ME.requirementLines(sch, null);                    // 목록 카드 — 5줄 상한
   const allLines = ME.requirementLines(sch, null, { all: true });      // 상세 시트 — 전부
@@ -105,6 +108,12 @@ for (const sch of hits) {
   console.log(`   학생: ${p.school} ${p.track} ${p.year}학년 · 평점 ${p.gpa} · ${p.credits}학점 · ${p.bracket}구간`);
   console.log(`   판정 ${result.status}  ·  배지 「${badge}」`);
   console.log(`   신청 버튼 ${canApply ? '열림' : '잠김'}  (마감: ${d.label || '?'})`);
+  /* 막지 않는 대신 무엇을 알리는가 — 이것까지 보여야 '화면에 무엇이 보이는가'가 완성된다 */
+  if (caution) {
+    console.log(`   ⚠️ 버튼 위 안내: ${caution === 'unknown'
+      ? '지원 자격을 아직 읽지 못했습니다 — 원문에서 확인한 뒤 신청하세요'
+      : '입력한 정보로는 요건이 맞지 않아 보입니다 — 원문을 확인한 뒤 신청하세요'}`);
+  }
   console.log(`   ─ 목록 카드에 보이는 자격 줄 (${listLines.length}줄 · 5줄 상한)`);
   for (const l of listLines) console.log(`       · ${String(l).slice(0, 84)}`);
   console.log(`   ─ 상세 시트에 보이는 자격 줄 (${allLines.length}줄 · 전부)`);

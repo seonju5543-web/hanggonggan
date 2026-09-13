@@ -22,7 +22,7 @@
 /* ⚠️ 두 작업이 같은 날 v172 를 각자 올려 부딪혔다 — 번호는 v173 으로 올리고 **둘 다** 남긴다
    (파일 머리말의 규칙 그대로). */
 /* ⚠️ 오늘 여러 작업이 같은 번호를 각자 올렸다 — 번호는 올리고 **한 일은 다 남긴다**(파일 머리말 규칙). */
-const CACHE = 'handaejang-v184';  /* v184 — 화면이 '전국 모든 대학'을 약속하지 않는다 */
+const CACHE = 'handaejang-v185';  /* v185 — 화면이 '전국 모든 대학'을 약속하지 않는다 (+ 같은 날 다른 작업들) */
 const ASSETS = ['.', 'index.html', 'style.css', 'boot.js', 'resume.js', 'interactions.js', 'app.js', 'data.js', 'forms.js', 'form-plan.js', 'essay.js', 'essay-config.js', 'essay-ask.js', 'essay-quality.js', 'essay-submit-check.js',
   'section-head.js', 'parse-requirements.js', 'parse-amount.js', 'match-engine.js', 'notify-rules.js', 'notify.js', 'push-config.js', 'support-config.js',
   'chat-config.js', 'chat.js',
