@@ -350,13 +350,18 @@ const PROFILE = {
         층1과 달리 이 층은 **전부** 영향을 받으므로 화면에서 따로 못 박는다.
      ⚠️ 여는 것으로 끝내면 안 된다 — 무엇을 확인해야 하는지 함께 말해야 한다(원칙 8-1). */
   {
+    /* 🔴 **맨 앞 공고를 그냥 집으면 안 된다** (2026-09-13 코드 리뷰). 층2 중에도 `ineligible`
+       이 있고(마감 전 90건 중 절반 이상 — 프로필에 따라 다르다) 그건 안내 문구가 다르다.
+       마감이 굴러가면 맨 앞이 바뀌므로, 그렇게 두면 **어느 날 갑자기** 빨간불이 된다.
+       앱의 `evaluateFor` 로 상태를 보고 `unknown` 인 것을 그때그때 고른다. */
     const target = await page.evaluate(() => {
-      const k = kosafAsScholarships().filter((s) => dday(s.deadline).days >= 0);
+      const k = kosafAsScholarships().filter((s) => dday(s.deadline).days >= 0)
+        .filter((s) => evaluateFor(s, state.profile).status === 'unknown');
       if (!k.length) return null;
       openDetail(k[0].id);
       return k[0].id;
     });
-    eq('마감 전 층2 공고가 실제로 있다 (없으면 이 검사는 무의미하다)', !!target, true);
+    eq('마감 전 · 자격 미확인인 층2 공고가 실제로 있다 (없으면 이 검사는 무의미하다)', !!target, true);
     if (target) {
       await page.waitForSelector('#detail-sheet.show', { timeout: 4000 });
       const st = await page.evaluate(() => {

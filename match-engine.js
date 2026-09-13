@@ -359,6 +359,15 @@ function judgeCond(c, p, ctx) {
          ⚠️ 그리고 **울산 사는 학생에게 ✓ 를 주지도 않는다** — 그 학생의 학교가 울산에 있는지
             우리는 여전히 모른다. 사는 곳이 맞는 것과 학교가 거기 있는 것은 다른 이야기다. */
       if (c.about && c.about !== 'home') return 'unknown';
+      /* 🔴 **제외 줄의 지역 이름은 판정하지 않는다** (2026-09-13 코드 리뷰가 잡은 것을 실측해 고침).
+         `(재)영동군민장학회 장학생으로 선발되어 재학 중 2회 이상 장학금을 받은 자` 는
+         **이미 두 번 받은 사람을 빼는 줄**인데, 아래 시·군 규칙이 이걸 '영동군에 살아야 한다'로
+         읽어 서울 학생이 **미달**이 됐다(실측 — 한 번도 받은 적 없는 학생이다).
+         제외 줄에 나오는 지역 이름은 대개 **주관 기관 이름**이지 학생의 거주 요건이 아니다.
+         ⚠️ 뒤집어서 '안 살면 통과'로 만들지도 않는다 — 그러면 이번엔 영동군 학생이 미달이 된다.
+            줄은 '지원 제외 대상' 칸에 **원문 그대로** 보이므로(원칙 8-1) 학생이 직접 읽는다.
+            판정하지 않는 쪽이 안전한 실패다. */
+      if (c.exclude) return 'unknown';
       const cities = (c.cities || []).concat(c.inArea && ctx && ctx.homeCity ? [ctx.homeCity] : []);
       const myCities = [p.regionCity, p.parentRegionCity].filter(Boolean);
       if (cities.length) {
