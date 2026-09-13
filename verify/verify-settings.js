@@ -230,7 +230,7 @@ const eq = (label, got, want) => {
   console.log('\n■ 덧붙인 세 줄 — 휴지통 · 이용약관 · 탈퇴');
   eq('기타 메뉴 줄 (2026-09-11 개발자 지시 순서대로)',
     await page.$$eval('.set-menu .my-menu-item', (els) => els.map((e) => e.textContent.trim())),
-    ['로그인 활동', '자주 묻는 질문', '휴지통', '이용약관 · 개인정보처리방침',
+    ['로그인 활동', '고객센터', '자주 묻는 질문', '휴지통', '이용약관 · 개인정보처리방침',
       '앱 권한 · 오픈소스 라이선스', '탈퇴']);
   eq('탈퇴는 빨간 줄이다', await page.$eval('#btn-withdraw', (e) => e.classList.contains('danger')), true);
   /* 🔴 '기타' 절 제목 — 제목 없이 목록만 두면 위 '알림' 절과의 빈칸이 벌어져 보인다 */
@@ -399,7 +399,10 @@ const eq = (label, got, want) => {
       /아직 기록이 없어요|불러오지 못했어요/.test(await page.textContent('#logins-body')), false);
 
     await open('#btn-open-faq', '#screen-faq:not([hidden])');
-    eq('FAQ 가 열 줄이다', await page.$$eval('.faq-item', (e) => e.length), 10);
+    /* 🔴 개수를 못 박는 이유는 '줄었는지'가 아니라 **화면이 실제로 그려졌는지**다.
+       갈래·검색을 넣으면서 목록을 다시 그리는 길이 생겼으므로, 0건으로 조용히 비는 것을 막는다.
+       (2026-09-13: 10 → 18. 질문을 더할 때 이 숫자도 같이 고친다) */
+    eq('FAQ 가 열여덟 줄이다', await page.$$eval('.faq-item', (e) => e.length), 18);
     eq('첫 질문은 신청이 앱에서 끝나는지 (운영 원칙 1을 맨 앞에 둔다)',
       (await page.textContent('.faq-item summary')).includes('신청까지 끝나나요'), true);
     /* 접혀 있다가 눌러야 펼쳐진다 — <details> 기본 동작 */
@@ -417,6 +420,124 @@ const eq = (label, got, want) => {
         els.filter((e) => /설정 앱|폰 설정으로|권한 관리/.test(e.textContent)).length), 0);
     eq('오픈소스 라이선스가 실제로 싣는 것만 적혀 있다',
       /Pretendard/.test(perms) && /Open Font License/.test(perms), true);
+  }
+
+  /* ── 고객센터 · 자주 묻는 질문 강화 (2026-09-13 개발자 지시 · 아파트너 참고안) ──
+     🔴 이 절이 막는 것은 넷이다:
+       ① **가짜 문의 버튼** — 문의처가 비어 있는데 메일 버튼을 내면 눌러도 아무 일이 없다.
+       ② **진단 정보에 개인정보가 섞이는 것** — 학생이 그대로 복사해 남에게 보내는 값이다.
+       ③ **없는 질문을 가리키는 TOP** — 눌러도 아무 일이 없는 줄.
+       ④ **옛 검색어가 남아 빈 화면이 뜨는 것** — 만들면서 실제로 그랬고, 여기서 잡았다. */
+  console.log('\n■ 고객센터 (2026-09-13 신설)');
+  {
+    const open = async (btn, screen) => {
+      await page.click('.nav-item[data-nav="my"]');
+      await page.click('#btn-open-settings');
+      await page.waitForSelector('#screen-settings:not([hidden])');
+      await page.click(btn);
+      await page.waitForSelector(screen);
+      await page.waitForTimeout(400);
+    };
+
+    await open('#btn-open-support', '#screen-support:not([hidden])');
+
+    eq('자주 찾는 질문이 다섯 줄이다', await page.$$eval('.sup-top-item', (e) => e.length), 5);
+    /* 🔴 TOP 이 **실제로 있는 질문**을 가리키는가 — 오타 하나로 눌러도 안 열리는 줄이 된다 */
+    eq('TOP 다섯이 전부 FAQ 에 있는 질문이다', await page.evaluate(() =>
+      FAQ_TOP.every((q) => FAQ_ITEMS.some((it) => it[1] === q))), true);
+
+    /* 🔴 문의처(support-config.js)가 비어 있으면 메일 버튼이 없어야 한다 */
+    const 문의처있음 = await page.evaluate(() => supportConfigured());
+    eq(`문의처가 ${문의처있음 ? '있으면 메일 버튼이 있다' : '비었으면 메일 버튼이 없다'}`,
+      !!(await page.$('#btn-support-mail')), 문의처있음);
+    if (!문의처있음) {
+      eq('  대신 지금 할 수 있는 것을 적는다 (빈칸으로 두지 않는다)',
+        /문의처를 두지 않았어요/.test(await page.textContent('#screen-support')), true);
+    }
+
+    /* 🔴 진단 정보 — 학생이 복사해 남에게 보내는 값이라 개인정보가 한 줄도 없어야 한다.
+       픽스처의 이름·학교·학과로 재므로, 실수로 프로필을 담으면 여기서 바로 걸린다. */
+    const 진단 = await page.evaluate(() => supportDiagText());
+    eq('진단 정보에 이름이 없다', /김한장/.test(진단), false);
+    eq('진단 정보에 학교가 없다', /한국외국어대학교/.test(진단), false);
+    eq('진단 정보에 학과가 없다', /영어학과/.test(진단), false);
+    eq('  대신 앱 버전은 들어 있다', 진단.includes('앱 버전'), true);
+    /* 🔴 판 번호는 한 곳(APP_VERSION)에서 온다 — MY 아래 줄과 같은 값이어야 한다 */
+    eq('판 번호가 MY 화면과 같은 값이다', await page.evaluate(() =>
+      supportDiagText().includes(APP_VERSION)), true);
+
+    /* TOP 을 누르면 그 질문이 펼쳐진 채로 열린다 */
+    await page.click('.sup-top-item');
+    await page.waitForSelector('#screen-faq:not([hidden])');
+    await page.waitForTimeout(500);
+    eq('TOP 을 누르면 그 질문이 펼쳐진 FAQ 로 간다',
+      await page.$$eval('.faq-item[open]', (e) => e.length), 1);
+
+    console.log('\n■ 자주 묻는 질문 — 검색 · 갈래 (2026-09-13 강화)');
+
+    await open('#btn-open-faq', '#screen-faq:not([hidden])');
+    /* 갈래 칩은 목록에 실제로 있는 갈래만 — 0건짜리 칩이 생기면 안 된다 */
+    const 칩 = await page.$$eval('#faq-cats .filter-chip', (e) => e.map((x) => x.textContent));
+    eq('갈래 칩이 전체 + 실제 갈래다', 칩, await page.evaluate(() => ['전체', ...faqCats()]));
+    eq('처음엔 전체가 켜져 있다',
+      await page.$eval('#faq-cats .filter-chip', (e) => e.classList.contains('active')), true);
+
+    for (const c of 칩.slice(1)) {
+      await page.click(`[data-faq-cat="${c}"]`);
+      await page.waitForTimeout(150);
+      const n = await page.$$eval('.faq-item', (e) => e.length);
+      eq(`  갈래 '${c}' 는 눌렀을 때 비지 않는다 (${n}건)`, n > 0, true);
+    }
+    await page.click('[data-faq-cat="전체"]');
+    await page.waitForTimeout(150);
+
+    /* 🔴 검색은 **질문뿐 아니라 답도** 본다 — '주민등록번호'는 질문에도 있지만
+       '기초생활수급'은 답에만 있다. 질문만 보면 그 학생은 영영 못 찾는다. */
+    await page.fill('#faq-search', '기초생활수급');
+    await page.waitForTimeout(300);
+    eq('답에만 있는 낱말도 찾는다', await page.$$eval('.faq-item', (e) => e.length) > 0, true);
+    eq('  몇 건인지 말해 준다', /결과가 \d+개입니다/.test(await page.textContent('#faq-result')), true);
+
+    /* 찾은 낱말에 표시가 남는가 — 질문과 답 둘 다 */
+    await page.fill('#faq-search', '알림');
+    await page.waitForTimeout(300);
+    eq('질문에서 찾은 낱말에 표시가 남는다',
+      await page.$$eval('.faq-item summary mark', (e) => e.length) > 0, true);
+    await page.$$eval('.faq-item', (els) => els.forEach((e) => { e.open = true; }));
+    await page.waitForTimeout(200);
+    eq('답에서 찾은 낱말에도 표시가 남는다',
+      await page.$$eval('.faq-a mark', (e) => e.length) > 0, true);
+    /* 🔴 답은 HTML 이라 통째로 바꾸면 태그가 깨진다 — 굵은 글씨가 살아 있어야 한다 */
+    eq('  답의 HTML 이 깨지지 않았다 (굵은 글씨가 남아 있다)',
+      await page.$$eval('.faq-a strong', (e) => e.length) > 0, true);
+    eq('  화면에 <mark> 글자가 그대로 뜨지 않는다',
+      (await page.textContent('#faq-list')).includes('<mark>'), false);
+
+    /* 결과가 없을 때 — 막다른 길로 두지 않는다 */
+    await page.fill('#faq-search', '없는낱말zzz');
+    await page.waitForTimeout(300);
+    eq('결과가 없으면 그렇게 말한다',
+      (await page.textContent('.faq-empty-title')).trim(), '검색결과가 없습니다');
+    eq('  고객센터로 가는 길을 준다 (막다른 길이 아니다)',
+      !!(await page.$('#btn-faq-to-support')), true);
+    await page.click('#btn-faq-to-support');
+    await page.waitForSelector('#screen-support:not([hidden])');
+    eq('  그 버튼이 정말 고객센터로 간다', await page.evaluate(() => currentScreen), 'support');
+
+    /* 🔴 다시 들어오면 처음부터 — 이걸 안 하면 옛 검색어가 남아 **또 빈 화면**이 뜬다.
+       만들면서 실제로 그랬다(검색어 '없는낱말zzz' 가 남아 목록이 0건이었다). */
+    await open('#btn-open-faq', '#screen-faq:not([hidden])');
+    eq('🔴 다시 열면 옛 검색어가 남지 않는다', await page.inputValue('#faq-search'), '');
+    eq('  목록도 처음 상태로 돌아온다', await page.$$eval('.faq-item', (e) => e.length), 18);
+
+    /* 🔴 브라우저가 제 손으로 그리는 ✕ 를 껐다 — 안 끄면 ✕ 가 나란히 둘 뜬다 */
+    eq('지우기 ✕ 가 하나뿐이다 (브라우저 기본 ✕ 를 껐다)', await page.evaluate(() => {
+      const sh = [...document.styleSheets].flatMap((s) => { try { return [...s.cssRules]; } catch { return []; } });
+      return sh.some((r) => r.selectorText && /::-webkit-search-cancel-button/.test(r.selectorText)
+        && /none/.test(r.style.display));
+    }), true);
+
+    await page.screenshot({ path: `${SHOT}/support.png` });
   }
 
   console.log('\n■ 이용약관 화면 — 되돌아가기는 왼쪽 위, 제목이 화면 안에 든다');

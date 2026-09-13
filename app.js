@@ -369,6 +369,11 @@ const STATUS_META = {
 
 const APP_STEPS = ['신청 준비 완료', '공식 제출', '심사', '선정 발표'];
 
+/* 🔴 앱 판 번호는 **여기 한 곳**이다 (2026-09-13 고객센터 신설).
+   MY 아래 줄과 고객센터의 진단 정보가 같은 값을 써야 한다 — 두 곳에 적어 두면
+   한쪽만 고쳐져 학생이 알려 준 판 번호가 실제와 달라진다. */
+const APP_VERSION = 'v0.3 (MVP)';
+
 /* 진척도 판정 — 앱이 학교·재단 시스템을 들여다볼 수 없으므로(정직 원칙)
    '공식 제출'과 '발표 결과'는 사용자가 직접 기록하고,
    '심사'만 객관적 사실(제출 기록 + 접수 마감 경과)로 자동 표시한다. */
@@ -890,13 +895,13 @@ function showScreen(name, opts) {
   if (typeof resumeSaveScroll === 'function' && currentScreen && currentScreen !== name) {
     resumeSaveScroll(currentScreen, window.scrollY);
   }
-  ['onboarding', 'home', 'explore', 'applications', 'my', 'settings', 'trash', 'terms', 'logins', 'faq', 'perms'].forEach((n) => {
+  ['onboarding', 'home', 'explore', 'applications', 'my', 'settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms'].forEach((n) => {
     $(`#screen-${n}`).hidden = n !== name;
   });
   $('#bottom-nav').hidden = name === 'onboarding';
   /* 설정·휴지통은 MY 안쪽 화면이라 아래 탭에서 **MY 가 켜진 채**로 둔다 —
      아무 탭도 안 켜져 있으면 학생이 지금 어디에 있는지 알 수 없다. */
-  const navOn = ['settings', 'trash', 'terms', 'logins', 'faq', 'perms'].includes(name) ? 'my' : name;
+  const navOn = ['settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms'].includes(name) ? 'my' : name;
   $$('.nav-item').forEach((b) => b.classList.toggle('active', b.dataset.nav === navOn));
 
   /* 🔴 안쪽 화면(설정·휴지통)은 **방향이 있는** 움직임으로 들어온다 (2026-09-11 개발자 지시).
@@ -905,7 +910,7 @@ function showScreen(name, opts) {
         style.css 에서 **이 규칙이 뒤에 와야** 이긴다(같은 굵기면 나중 것이 이긴다).
      ⚠️ 클래스를 떼었다 붙이는 것만으로는 다시 안 돈다 — 브라우저가 '바뀐 게 없다'고 본다.
         중간에 offsetWidth 를 한 번 읽어 강제로 끊어 준다. */
-  const SUB = ['settings', 'trash', 'terms', 'logins', 'faq', 'perms'];
+  const SUB = ['settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms'];
   /* 🔴 안쪽 화면에서는 **가로 손짓이 우리 것**이라고 앱 전체에 표시해 둔다 (2026-09-12).
      짧은 화면 아래 빈 자리는 화면이 아니라 `#app` 이라, 화면에만 주면 거기서 시작한
      손짓을 브라우저가 세로 스크롤로 가져간다. 안쪽 화면일 때만 켜는 이유는 style.css 에. */
@@ -929,6 +934,7 @@ function showScreen(name, opts) {
   if (name === 'terms') renderTerms();
   if (name === 'logins') renderLogins();
   if (name === 'faq') renderFaq();
+  if (name === 'support') renderSupport();
   if (name === 'perms') renderPerms();
 
   /* 🔴 스크롤은 **그린 뒤에** 옮긴다 — 먼저 옮기면 아직 짧은 화면이라 그 자리가 없다.
@@ -3191,6 +3197,7 @@ const SWIPE_BACK_TO = {
   terms: 'settings',
   logins: 'settings',
   faq: 'settings',
+  support: 'settings',
   perms: 'settings',
 };
 
@@ -4038,6 +4045,10 @@ function forgetLearned(key) {
 }
 
 function renderMy() {
+  /* 판 번호는 APP_VERSION 한 곳에서 온다 — 프로필이 없어 일찍 돌아가더라도 적어 둔다 */
+  const ver = $('#my-version');
+  if (ver) ver.textContent = `한대장 ${APP_VERSION} · 전국 대학 지원`;
+
   const p = state.profile;
   if (!p) return;   // 온보딩을 아직 안 마친 상태 — 그릴 프로필이 없다
   const c = p.common || {};
@@ -4085,7 +4096,7 @@ function renderSettings() {
   if (w && !w.dataset.wired) { w.dataset.wired = '1'; w.addEventListener('click', withdrawAccount); }
   const tm = $('#btn-open-terms');
   if (tm && !tm.dataset.wired) { tm.dataset.wired = '1'; tm.addEventListener('click', () => showScreen('terms')); }
-  for (const [id, screen] of [['#btn-open-logins', 'logins'], ['#btn-open-faq', 'faq'], ['#btn-open-perms', 'perms']]) {
+  for (const [id, screen] of [['#btn-open-logins', 'logins'], ['#btn-open-support', 'support'], ['#btn-open-faq', 'faq'], ['#btn-open-perms', 'perms']]) {
     const b = $(id);
     if (b && !b.dataset.wired) { b.dataset.wired = '1'; b.addEventListener('click', () => showScreen(screen)); }
   }
@@ -4143,44 +4154,358 @@ async function renderLogins() {
     </div>`).join('');
 }
 
-/* ---------------- 자주 묻는 질문 (2026-09-11 개발자 지시 2번) ----------------
+/* ---------------- 자주 묻는 질문 (2026-09-11 개발자 지시 2번 · 2026-09-13 고도화) ----------------
    🔴 **앱이 실제로 하는 일만** 적는다. '곧 됩니다'나 확인 안 한 것을 적으면 그게 가장
       눈에 잘 띄는 거짓말이 된다(운영 원칙 1·8-1). 답은 전부 지금 동작 기준이고,
-      기능이 바뀌면 이 목록도 같이 고쳐야 한다. */
+      기능이 바뀌면 이 목록도 같이 고쳐야 한다.
+   🔴 여기 적은 사실은 **코드에서 하나씩 확인한 것**이다 — 알림 5종은 `notify-rules.js`,
+      진척도 4단계는 `APP_STEPS`, 저장 목록이 기기 안에만 남는 것은 `supabase-client.js`
+      가 그 값을 안 보낸다는 것으로 확인했다. 새 항목을 더할 때도 같은 방식으로 확인한다.
+
+   칸은 셋이다 — [갈래, 질문, 답].
+   🔴 **갈래를 지어내지 않는다** — 칩 줄은 이 목록에 실제로 있는 갈래만 나온다(`faqCats`).
+      목록에 없는 갈래를 칩에 박아 두면 눌러도 0건인 칩이 생긴다.
+   🔴 `FAQ_TOP` 은 고객센터의 '자주 찾는 질문 TOP 5'가 쓰는 **같은 원본**이다. 두 화면이
+      제각기 목록을 들고 있으면 한쪽만 고쳐져 갈라진다(이 저장소가 반복해 겪은 사고다). */
 const FAQ_ITEMS = [
-  ['이 앱에서 신청까지 끝나나요?',
+  ['신청', '이 앱에서 신청까지 끝나나요?',
     '아니요. 한대장은 <strong>신청 준비까지</strong> 도와줍니다. 최종 신청·접수는 한국장학재단, 각 대학, 각 재단 같은 공식 접수처에서 직접 하셔야 해요. 그래서 앱은 "신청 완료"라고 쓰지 않고 "신청 준비 완료"라고 적습니다.'],
-  ['우리 학교 공고가 안 보여요.',
+  ['신청', '신청 준비를 끝내면 그다음은 어떻게 되나요?',
+    '신청내역에 <strong>신청 준비 완료 → 공식 제출 → 심사 → 선정 발표</strong> 네 단계로 남습니다. 앱은 학교·재단 전산을 볼 수 없어서 <strong>제출과 결과는 학생이 직접 기록</strong>합니다("제출했어요", "선정·미선정" 버튼). 심사 단계만 제출 기록과 마감 경과로 앱이 표시해요.'],
+  ['신청', '대장님(도우미)은 무엇을 답해 주나요?',
+    '앱이 <strong>이미 알고 있는 것</strong>만 답합니다 — 등록된 공고, 필요한 서류, 내 신청 현황, 공고 원문에서 뽑아 둔 문장이에요. 모르는 것은 지어내지 않고 "못 찾았다"고 말합니다. 그게 이 도우미를 만든 이유예요.'],
+
+  ['공고·매칭', '우리 학교 공고가 안 보여요.',
     '지금 공고 원문을 모으고 있는 학교가 정해져 있어요. 그 밖의 학교라도 <strong>전국 대상 공고</strong>와 <strong>한국장학재단이 아는 재단 장학금</strong>은 그대로 보입니다.'],
-  ['"지원 자격을 아직 읽지 못했어요"는 무슨 뜻인가요?',
+  ['공고·매칭', '"지원 자격을 아직 읽지 못했어요"는 무슨 뜻인가요?',
     '공고 원문에서 자격 요건 문장을 찾지 못했다는 뜻입니다. 앱이 짐작해서 채우지 않습니다 — 틀린 자격 판정은 모른다고 말하는 것보다 나쁘기 때문이에요. 그때는 <strong>원문 보기</strong>로 직접 확인해 주세요.'],
-  ['금액이 "미확인"인 공고가 있어요.',
+  ['공고·매칭', '금액이 "미확인"인 공고가 있어요.',
     '공고 원문에 금액이 없거나 앱이 읽지 못한 경우입니다. 이런 공고는 홈의 예상 수혜액 <strong>합계에서 빼고</strong> "금액 미확인 n건 제외"라고 적습니다. 지어낸 숫자를 섞지 않습니다.'],
-  ['알림이 안 와요.',
+  ['공고·매칭', '저장(북마크)한 공고는 어디에 남나요?',
+    '<strong>이 기기에만</strong> 남습니다. 로그인해도 저장 목록은 서버로 올라가지 않아서, 기기를 바꾸면 다시 저장하셔야 해요.'],
+  ['공고·매칭', '달력에 왜 몇 개만 표시되나요?',
+    '상시로 찍는 것은 <strong>신청하거나 저장한 공고</strong>의 마감일(파랑)과 발표일(빨강)뿐입니다. 전부 찍으면 하루에 스무 건이 넘는 날이 있어 달력이 읽히지 않아요. 나머지는 <strong>날짜를 누르면</strong> 그날 것만 펼쳐집니다.'],
+
+  ['알림', '알림이 안 와요.',
     '설정 → 알림에서 켜 주세요. <strong>아이폰은 홈 화면에 앱을 추가해야만</strong> 알림이 옵니다(사파리 탭에서는 안 옵니다). 폰에서 알림을 차단해 두었다면 설정 → 앱 권한에 바꾸는 방법이 적혀 있어요.'],
-  ['내 정보는 어디에 저장되나요?',
+  ['알림', '어떤 알림이 오나요?',
+    '다섯 가지입니다 — <strong>내 조건에 맞는 새 공고</strong>, <strong>마감 하루 전·당일</strong>, <strong>제출 기록을 안 한 공고</strong>, <strong>우리 학교 게시판 새 공고</strong>, <strong>마감 지난 공고의 결과 기록</strong>. 설정 → 알림에서 항목마다 따로 끄고 켤 수 있어요.'],
+
+  ['계정·기기', '내 정보는 어디에 저장되나요?',
     '기본은 <strong>이 기기 안</strong>입니다. 로그인하면 기기를 바꿔도 이어 쓸 수 있도록 프로필과 신청내역이 서버에 저장되고, 낯선 기기를 알아차릴 수 있게 <strong>로그인한 시각과 기기 종류</strong>도 함께 남습니다(설정 → 로그인 활동에서 볼 수 있어요).'],
-  ['주민등록번호·계좌번호·증명서류도 서버에 올라가나요?',
-    '아니요. 이 셋은 <strong>서버로 보내지 않습니다</strong>. 기기 안에만 저장되고, 서버로 나가는 사본에서 떼어냅니다.'],
-  ['기기를 바꾸면 이어서 쓸 수 있나요?',
+  ['계정·기기', '기기를 바꾸면 이어서 쓸 수 있나요?',
     '로그인하면 새 기기에서 프로필과 신청내역을 받아옵니다. 로그인하지 않으면 정보가 그 기기에만 남습니다.'],
-  ['유료인가요?',
+  ['계정·기기', '로그인하지 않아도 쓸 수 있나요?',
+    '네. 공고 검색·추천·알림·서류 보관함까지 <strong>로그인 없이 그대로</strong> 됩니다. 로그인은 기기를 바꿀 때 이어 쓰기 위한 것이에요.'],
+
+  ['개인정보', '주민등록번호·계좌번호·증명서류도 서버에 올라가나요?',
+    '아니요. 이 셋은 <strong>서버로 보내지 않습니다</strong>. 기기 안에만 저장되고, 서버로 나가는 사본에서 떼어냅니다.'],
+  ['개인정보', '기초생활수급·장애 같은 정보는요?',
+    '민감정보라 <strong>따로 동의하셨을 때만</strong> 서버에 올라갑니다. 동의하지 않으셔도 기기 안에는 그대로 남아 <strong>매칭은 똑같이</strong> 됩니다.'],
+
+  ['요금·기타', '유료인가요?',
     '공고 검색·추천·알림은 무료입니다. 앞으로 유료 기능이 생기면 쓰기 전에 분명히 안내하고 동의를 받습니다.'],
-  ['잘못 지웠어요. 되살릴 수 있나요?',
+  ['요금·기타', '잘못 지웠어요. 되살릴 수 있나요?',
     '설정 → 휴지통에서 되살릴 수 있어요. 지운 신청내역과 서류는 <strong>30일 동안</strong> 남습니다.'],
+  ['요금·기타', '인터넷이 없어도 열리나요?',
+    '한 번 열어 본 뒤로는 <strong>비행기 모드에서도</strong> 앱이 열리고 저장해 둔 공고·서류를 볼 수 있어요. 다만 새 공고를 받아오는 것은 연결됐을 때만 됩니다.'],
 ];
+
+/* 고객센터의 '자주 찾는 질문 TOP 5' — 질문 글자로 가리킨다(번호로 가리키면 목록 순서가
+   바뀌는 순간 엉뚱한 질문이 TOP 에 오른다). 🔴 없는 질문을 적으면 관문이 잡는다. */
+const FAQ_TOP = [
+  '이 앱에서 신청까지 끝나나요?',
+  '우리 학교 공고가 안 보여요.',
+  '알림이 안 와요.',
+  '"지원 자격을 아직 읽지 못했어요"는 무슨 뜻인가요?',
+  '유료인가요?',
+];
+
+/* 목록에 실제로 있는 갈래만, 나온 순서대로 */
+function faqCats() {
+  const seen = [];
+  for (const [cat] of FAQ_ITEMS) if (!seen.includes(cat)) seen.push(cat);
+  return seen;
+}
+
+let faqCat = '전체';
+let faqQuery = '';
+
+/* 검색은 **질문과 답 둘 다** 본다 — '주민번호'는 질문에 없고 답에만 있다.
+   답에 섞인 <strong> 같은 표시는 빼고 글자만 견준다(안 빼면 'strong'이 검색된다). */
+function faqPlain(html) {
+  return String(html).replace(/<[^>]*>/g, '');
+}
+function faqHit(item, q) {
+  if (!q) return true;
+  const hay = `${item[1]} ${faqPlain(item[2])}`.toLowerCase();
+  /* 띄어쓰기로 끊어 **전부 들어 있는 것**만 — '알림 아이폰'처럼 두 낱말로 좁힐 수 있다 */
+  return q.toLowerCase().split(/\s+/).filter(Boolean).every((w) => hay.includes(w));
+}
+
+/* 찾은 낱말에 표시를 남긴다. 🔴 반드시 `esc()` **뒤에** 넣는다 — 먼저 넣으면 우리가 넣은
+   태그까지 글자로 바뀌어 화면에 `<mark>` 가 그대로 뜬다. */
+function faqWords(q) {
+  return String(q).toLowerCase().split(/\s+/).filter(Boolean);
+}
+function faqMarkPlain(text, q) {
+  let out = esc(text);
+  for (const w of faqWords(q)) {
+    const re = new RegExp(esc(w).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+    out = out.replace(re, (m) => `<mark>${m}</mark>`);
+  }
+  return out;
+}
+function faqMark(text, q) { return faqMarkPlain(text, q); }
+
+/* 답은 이미 HTML(`<strong>` 등)이라 통째로 바꾸면 **태그 속 글자까지** 건드려 문서가 깨진다.
+   그래서 태그와 글자를 갈라 **글자 조각에만** 표시를 남긴다.
+   🔴 이 표시가 필요한 이유: 검색은 질문뿐 아니라 **답도** 본다(‘주민번호’는 답에만 있다).
+      그래서 질문에는 안 걸린 결과가 목록에 뜨는데, 표시가 없으면 학생이 "왜 이게 나왔지?"
+      하고 만다 — 펼치면 걸린 자리가 보이게 해 준다. */
+function faqMarkHtml(html, q) {
+  if (!q) return html;
+  return String(html).split(/(<[^>]*>)/).map((piece) => {
+    if (piece.startsWith('<')) return piece;      // 태그는 손대지 않는다
+    for (const w of faqWords(q)) {
+      const re = new RegExp(w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+      piece = piece.replace(re, (m) => `<mark>${m}</mark>`);
+    }
+    return piece;
+  }).join('');
+}
+
+function faqListHtml() {
+  const items = FAQ_ITEMS.filter((it) => (faqCat === '전체' || it[0] === faqCat) && faqHit(it, faqQuery));
+
+  /* 🔴 결과가 없을 때 — 아파트너 참고안 그대로 '검색결과가 없습니다' + 고객센터로 보내는 길.
+     여기서 막다른 길로 두면 학생이 앱을 닫는다. */
+  if (!items.length) {
+    return `<div class="faq-empty">
+      <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="28" cy="28" r="17"/><path d="M40.5 40.5L54 54"/>
+        <path d="M22.5 25.5h.02M33.5 25.5h.02"/><path d="M22 34c3.6-2.6 8.4-2.6 12 0"/>
+      </svg>
+      <p class="faq-empty-title">검색결과가 없습니다</p>
+      <p class="faq-empty-sub">찾으시는 답이 없다면 고객센터에서<br />도우미에게 물어보거나 문의를 남기실 수 있어요.</p>
+      <button type="button" class="btn btn-outline" id="btn-faq-to-support">고객센터 가기</button>
+    </div>`;
+  }
+
+  const q = faqQuery;
+  return items.map(([cat, question, answer]) => `
+    <details class="faq-item">
+      <summary><span class="faq-cat">${esc(cat)}</span>${faqMark(question, q)}</summary>
+      <div class="faq-a">${faqMarkHtml(answer, q)}</div>
+    </details>`).join('');
+}
+
+/* 목록만 다시 그린다 — 검색창까지 다시 그리면 글자를 칠 때마다 **커서가 튄다**.
+   그래서 renderFaq(틀)과 faqRefresh(목록)를 갈라 두었다. */
+function faqRefresh() {
+  const list = $('#faq-list');
+  const banner = $('#faq-result');
+  if (!list) return;
+  list.innerHTML = faqListHtml();
+
+  /* 검색 중일 때만 몇 건인지 말한다(아파트너 참고안의 파란 ⓘ 줄) */
+  if (banner) {
+    const n = list.querySelectorAll('.faq-item').length;
+    banner.hidden = !faqQuery;
+    if (faqQuery) banner.innerHTML = `<strong>"${esc(faqQuery)}"</strong>에 대한 결과가 ${n}개입니다.`;
+  }
+
+  const go = $('#btn-faq-to-support');
+  if (go) go.addEventListener('click', () => showScreen('support'));
+}
+
+/* 화면을 **열 때마다** 검색어와 갈래를 처음으로 되돌린다.
+   🔴 이게 없으면 옛 검색어가 남는다 — 실제로 없는 낱말을 찾아 빈 화면을 본 학생이 설정으로
+      나갔다 '자주 묻는 질문'을 다시 눌렀을 때 **또 빈 화면**이 떴다(실측으로 잡았다).
+      목록에서 다시 들어오는 것은 "처음부터 보겠다"는 뜻이다. */
+function faqReset() {
+  faqCat = '전체';
+  faqQuery = '';
+  const input = $('#faq-search');
+  if (input) input.value = '';
+  const clear = $('#faq-search-clear');
+  if (clear) clear.hidden = true;
+  $$('#faq-cats .filter-chip').forEach((c) => c.classList.toggle('active', c.dataset.faqCat === '전체'));
+  faqRefresh();
+}
 
 function renderFaq() {
   const el = $('#faq-body');
   if (!el) return;
-  if (el.dataset.filled) return;      // 내용이 고정이라 한 번만 그린다
+  /* 틀(검색창·칩)은 한 번만 그린다 — 글자를 칠 때마다 다시 그리면 커서가 튄다.
+     되돌리기는 틀이 이미 있어도 매번 한다(위 faqReset 주석). */
+  if (el.dataset.filled) { faqReset(); return; }
   el.dataset.filled = '1';
-  /* <details> 를 쓴다 — 여닫는 코드가 0줄이고 키보드·보조기기에서도 저절로 된다 */
-  el.innerHTML = FAQ_ITEMS.map(([q, a]) => `
-    <details class="faq-item">
-      <summary>${esc(q)}</summary>
-      <div class="faq-a">${a}</div>
-    </details>`).join('');
+
+  /* 갈래 칩 — '전체'가 맨 앞이고 처음에 켜져 있다 */
+  const chips = ['전체', ...faqCats()]
+    .map((c) => `<button type="button" class="filter-chip${c === faqCat ? ' active' : ''}" data-faq-cat="${esc(c)}">${esc(c)}</button>`)
+    .join('');
+
+  /* 검색창은 탐색 화면과 **같은 부품**(.search-box)을 쓴다 — 베끼면 두 검색창이 따로 논다 */
+  el.innerHTML = `
+    <div class="search-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input type="search" id="faq-search" placeholder="질문을 입력해주세요" maxlength="40" autocomplete="off" aria-label="자주 묻는 질문 검색" />
+      <button type="button" id="faq-search-clear" class="search-clear" aria-label="검색어 지우기" hidden>✕</button>
+    </div>
+    <div class="faq-cats" id="faq-cats">${chips}</div>
+    <p class="faq-result" id="faq-result" hidden></p>
+    <div id="faq-list"></div>`;
+
+  const input = $('#faq-search');
+  const clear = $('#faq-search-clear');
+  input.addEventListener('input', () => {
+    faqQuery = input.value.trim();
+    clear.hidden = !input.value;
+    faqRefresh();
+  });
+  clear.addEventListener('click', () => {
+    input.value = ''; faqQuery = ''; clear.hidden = true;
+    faqRefresh(); input.focus();
+  });
+  /* 폰 자판의 '검색'을 누르면 자판을 내린다 — 결과는 이미 글자를 칠 때마다 좁혀졌다 */
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); input.blur(); } });
+
+  $('#faq-cats').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-faq-cat]');
+    if (!b) return;
+    faqCat = b.dataset.faqCat;
+    $$('#faq-cats .filter-chip').forEach((c) => c.classList.toggle('active', c === b));
+    faqRefresh();
+  });
+
+  faqRefresh();
+}
+
+/* 고객센터에서 특정 질문으로 들어올 때 — 그 질문을 펼쳐 준다.
+   🔴 갈래·검색어 되돌리기는 renderFaq(→ faqReset)이 이미 한다. 여기에 한 벌 더 두면
+      한쪽만 고쳐져 갈라진다 — 이 저장소가 반복해 겪은 사고다. */
+function faqOpenQuestion(question) {
+  showScreen('faq');
+  for (const d of $$('#faq-list .faq-item')) {
+    if (d.querySelector('summary').textContent.includes(question)) {
+      d.open = true;
+      d.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      break;
+    }
+  }
+}
+
+/* ---------------- 고객센터 (2026-09-13 개발자 지시 · 아파트너·라이프캐치 참고안) ----------------
+   "설정 안에 고객센터를 두고, FAQ 는 강화해 달라"는 지시로 만들었다.
+
+   🔴 **여기 있는 길은 전부 실제로 가는 길이다.** 라이프캐치 참고안에는 '나의 문의 내역'
+      탭이 있지만 우리는 문의를 받아 두는 서버가 없다 — 없는 것을 탭으로 만들어 두면
+      눌렀을 때 빈 화면이 나오고, 그게 이 앱이 가장 하지 말아야 할 일이다(운영 원칙 1).
+      그래서 넣은 것은 넷뿐이고 넷 다 지금 동작한다:
+        ① 자주 찾는 질문 TOP 5 → 누르면 그 질문이 펼쳐진 FAQ 로 간다
+        ② 대장님(도우미)에게 묻기 → chat.js 의 chatOpen() 을 그대로 부른다
+        ③ 문의 메일 쓰기 → **문의처가 정해졌을 때만** 나온다(support-config.js)
+        ④ 진단 정보 복사 → 문의에 붙일 값. 개인정보는 한 줄도 담지 않는다.
+
+   🔴 문의처가 비어 있을 때 '문의하기' 자리를 **빈칸으로 두지 않는다** — 대신 지금 할 수
+      있는 것을 적는다. terms.html 9번과 **같은 사실**을 말해야 한다(약관과 앱이 다른 말을
+      하면 안 된다). 그 문장을 여기에 베끼지는 않는다 — 원본은 terms.html 하나다. */
+
+/* 문의·진단에 붙일 값. 🔴 이름·학교·성적·이메일 같은 개인정보는 **한 줄도 담지 않는다**.
+   담는 것은 '어느 앱을 어떤 환경에서 쓰는가'뿐이라 그대로 남에게 보여 줘도 된다. */
+function supportDiagnostics() {
+  const cap = typeof notifySupport === 'function' ? notifySupport() : {};
+  const perm = cap.hasApi ? cap.permission : '지원 안 함';
+  return [
+    ['앱 버전', APP_VERSION],
+    ['설치 형태', cap.standalone ? '홈 화면에 설치함' : '브라우저에서 열었음'],
+    ['알림 권한', perm === 'granted' ? '허용됨' : perm === 'denied' ? '차단됨' : perm === 'default' ? '아직 묻지 않음' : perm],
+    ['로그인', (typeof authLoad === 'function' && authLoad()) ? '로그인함' : '로그인 안 함'],
+    ['브라우저', navigator.userAgent],
+  ];
+}
+
+function supportDiagText() {
+  return supportDiagnostics().map(([k, v]) => `${k}: ${v}`).join('\n');
+}
+
+function renderSupport() {
+  const el = $('#support-body');
+  if (!el) return;
+
+  /* TOP 5 — FAQ_TOP 이 가리키는 질문을 FAQ_ITEMS 에서 찾는다.
+     🔴 못 찾으면 **번호를 비우지 않고 그 줄을 뺀다** — 없는 질문으로 가는 줄을 그려 두면
+        눌러도 아무 일이 없다. (관문이 '다섯 줄인가'를 세므로 빠지면 바로 드러난다) */
+  const top = FAQ_TOP
+    .map((q) => FAQ_ITEMS.find((it) => it[1] === q))
+    .filter(Boolean);
+
+  const topHtml = top.map((it, i) => `
+    <button type="button" class="sup-top-item" data-q="${esc(it[1])}">
+      <span class="sup-top-no">${i + 1}</span>
+      <span class="sup-top-q">${esc(it[1])}</span>
+      <span class="sup-top-go" aria-hidden="true">›</span>
+    </button>`).join('');
+
+  /* 문의처가 정해졌을 때만 메일 버튼을 낸다 — 없으면 정직하게 무엇이 되는지 적는다 */
+  const 문의 = supportConfigured()
+    ? `<p class="sup-desc">답변은 적어 주신 메일 주소로 받으실 수 있어요.${SUPPORT_CONFIG.hours ? ` 응대 시간은 ${esc(SUPPORT_CONFIG.hours)}입니다.` : ''}</p>
+       <button type="button" class="btn btn-outline" id="btn-support-mail">문의 메일 쓰기</button>`
+    : `<p class="sup-desc">한대장은 아직 시범 개발 중이라 <strong>따로 받아 볼 문의처를 두지 않았어요.</strong>
+         정해지면 이 자리에 적고 그때부터 받습니다(이용약관 9번과 같은 내용이에요).</p>
+       <p class="sup-desc">그때까지는 위의 <strong>대장님</strong>에게 물어봐 주세요.
+         내 정보를 지우는 것은 문의 없이 바로 하실 수 있어요 — 설정의 <strong>탈퇴</strong>(서버 정보),
+         MY 의 <strong>데이터 초기화</strong>(이 기기 정보)입니다.</p>`;
+
+  el.innerHTML = `
+    <div class="my-card">
+      <p class="wallet-title">자주 찾는 질문</p>
+      <div class="sup-top">${topHtml}</div>
+      <button type="button" class="sup-more" id="btn-support-faq">질문 전체 보기 · 검색</button>
+    </div>
+
+    <div class="my-card">
+      <p class="wallet-title">바로 물어보기</p>
+      <p class="sup-desc">대장님은 앱이 <strong>이미 아는 것</strong>(등록된 공고·서류·내 신청 현황·공고 원문)을 찾아 줍니다. 모르면 지어내지 않고 못 찾았다고 말해요.</p>
+      <button type="button" class="btn btn-outline" id="btn-support-chat">대장님에게 물어보기</button>
+    </div>
+
+    <div class="my-card">
+      <p class="wallet-title">문의하기</p>
+      ${문의}
+    </div>
+
+    <div class="my-card">
+      <p class="wallet-title">진단 정보</p>
+      <p class="sup-desc">문제를 알려 주실 때 아래를 함께 보내 주시면 원인을 훨씬 빨리 찾을 수 있어요.
+        <strong>이름·학교·성적 같은 개인정보는 들어 있지 않습니다.</strong></p>
+      <div class="sup-diag">${supportDiagnostics()
+        .map(([k, v]) => `<div class="sup-diag-row"><span>${esc(k)}</span><b>${esc(v)}</b></div>`).join('')}</div>
+      <button type="button" class="btn btn-outline" id="btn-support-copy">진단 정보 복사</button>
+    </div>`;
+
+  el.querySelectorAll('[data-q]').forEach((b) => {
+    b.addEventListener('click', () => faqOpenQuestion(b.dataset.q));
+  });
+  $('#btn-support-faq').addEventListener('click', () => showScreen('faq'));
+  $('#btn-support-chat').addEventListener('click', () => {
+    if (typeof chatOpen === 'function') chatOpen();
+    else toast('도우미를 열지 못했어요');
+  });
+  $('#btn-support-copy').addEventListener('click', () => copyText(supportDiagText(), '진단 정보를 복사했어요'));
+
+  const mail = $('#btn-support-mail');
+  if (mail) {
+    mail.addEventListener('click', () => {
+      /* 🔴 메일 앱을 여는 것뿐이다 — 앱이 대신 보내지 않는다. 학생이 내용을 보고 직접 보낸다.
+         진단 정보를 본문에 미리 넣어 두되, 보내기 전에 눈으로 볼 수 있는 자리에 둔다. */
+      const body = `\n\n\n--- 아래는 문제를 찾는 데 쓰는 정보입니다 (개인정보 없음) ---\n${supportDiagText()}\n`;
+      location.href = `mailto:${encodeURIComponent(SUPPORT_CONFIG.email)}`
+        + `?subject=${encodeURIComponent('[한대장] 문의')}&body=${encodeURIComponent(body)}`;
+    });
+  }
 }
 
 /* ---------------- 앱 권한 · 오픈소스 라이선스 (2026-09-11 개발자 지시 4번) ----------------
@@ -4939,7 +5264,7 @@ function bindEvents() {
   $('#btn-settings-back').addEventListener('click', () => showScreen('my', { back: true }));
   $('#btn-trash-back').addEventListener('click', () => showScreen('settings', { back: true }));
   $('#btn-terms-back').addEventListener('click', () => showScreen('settings', { back: true }));
-  for (const id of ['#btn-logins-back', '#btn-faq-back', '#btn-perms-back']) {
+  for (const id of ['#btn-logins-back', '#btn-faq-back', '#btn-support-back', '#btn-perms-back']) {
     const b = $(id);
     if (b) b.addEventListener('click', () => showScreen('settings', { back: true }));
   }

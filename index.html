@@ -466,7 +466,9 @@
       <div class="my-menu">
         <button class="my-danger-line" id="btn-reset">데이터 초기화</button>
       </div>
-      <p class="data-note">한대장 v0.3 (MVP) · 전국 대학 지원</p>
+      <!-- 🔴 판 번호를 여기 적지 않는다 — app.js 의 APP_VERSION 한 곳에서 온다.
+           고객센터 진단 정보가 같은 값을 쓰므로, 두 곳에 적으면 갈라진다. -->
+      <p class="data-note" id="my-version"></p>
     </section>
 
     <!-- ============ 설정 (2026-09-11 · 개발자 목업 승인) ============
@@ -493,6 +495,10 @@
         <p class="wallet-title">기타</p>
         <div class="my-menu set-menu">
           <button class="my-menu-item" id="btn-open-logins">로그인 활동</button>
+          <!-- 🔴 고객센터는 자주 묻는 질문 **바로 위**에 둔다 (2026-09-13 개발자 지시).
+               둘은 한 쌍이다 — 고객센터가 TOP 5 로 FAQ 를 가리키고, FAQ 는 답이 없을 때
+               고객센터로 보낸다. 떨어뜨려 놓으면 학생이 둘을 다른 기능으로 읽는다. -->
+          <button class="my-menu-item" id="btn-open-support">고객센터</button>
           <button class="my-menu-item" id="btn-open-faq">자주 묻는 질문</button>
           <button class="my-menu-item" id="btn-open-trash">휴지통</button>
           <!-- 🔴 링크가 아니라 **버튼**이다 (2026-09-11 개발자 지시 "휴지통처럼 그냥 화면 전환").
@@ -532,6 +538,21 @@
         <h2>자주 묻는 질문</h2>
       </header>
       <div id="faq-body" class="faq"></div>
+    </section>
+
+    <!-- ============ 고객센터 (2026-09-13 개발자 지시 · 아파트너·라이프캐치 참고안) ============
+         🔴 여기 있는 길은 **전부 실제로 가는 길**이다. 참고안의 '나의 문의 내역' 탭은
+            받아 두는 서버가 없어 넣지 않았다 — 눌러서 빈 화면이 나오는 탭이 가장 나쁘다.
+         🔴 내용은 app.js renderSupport() 가 채운다. 문의 메일 버튼은 support-config.js 의
+            email 이 채워졌을 때만 나온다(push-config·chat-config 와 같은 방식). -->
+    <section id="screen-support" class="screen" hidden>
+      <header class="sub-header sub-header-stick">
+        <button class="sub-back" id="btn-support-back" aria-label="뒤로">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <h2>고객센터</h2>
+      </header>
+      <div id="support-body"></div>
     </section>
 
     <!-- ============ 앱 권한 · 오픈소스 라이선스 (2026-09-11 개발자 지시 4번) ============ -->
@@ -676,6 +697,7 @@
   <script src="match-engine.js"></script>
   <script src="notify-rules.js"></script>
   <script src="push-config.js"></script>
+  <script src="support-config.js"></script>
   <script src="supabase-config.js"></script>
   <script src="supabase-client.js"></script>
   <!-- 손짓과 움직임 (2026-09-09) — app.js 가 카드를 그릴 때 부르므로 **app.js 보다 먼저** -->
