@@ -236,6 +236,35 @@ function serve() {
   await page.waitForSelector('#screen-quality:not([hidden])');
   ok(/데이터 품질/.test(await page.textContent('#screen-quality')), '⑥ 데이터 품질 화면이 그려진다');
 
+  /* ⑥-2 같은 원인을 한 줄로 묶는다 (2026-09-13)
+     🔴 실측으로 경고 11건 = 서로 다른 원인 2개였고, 그중 하나가 10건이었다.
+     예전에는 한 글자도 안 다른 같은 문장이 열 줄을 채웠다. */
+  {
+    const q = await page.textContent('#screen-quality');
+    const groups = await page.locator('#screen-quality [data-pgroup]').count();
+    /* 규칙을 베끼지 않고 원본을 불러 센다 — 화면이 쓰는 것과 같은 파일이다 */
+    const { checkEntry } = require('./entry-rules.cjs');
+    const formIdSet = new Set(Object.keys(forms.templates));
+    const warnN = reg.items.reduce((n, it) => n + (checkEntry(it, { formIds: formIdSet }) || []).length, 0);
+    ok(groups > 0 && groups < warnN,
+      '같은 원인은 한 줄로 묶는다', `원인 ${groups}가지 / 지적 ${warnN}건`);
+    ok(await page.locator('#screen-quality [data-fixrun]').count() >= 1,
+      '로봇이 고칠 수 있는 원인에는 그 자리에 버튼이 있다');
+    /* 🔴 코드 지식이 없는 개발자가 읽는 화면이다 — 파일 이름과 push 를 시키지 않는다 */
+    ok(!/run-[a-z-]+\.txt|수정 후 push|git |커밋/.test(q),
+      "화면이 '파일을 고쳐서 push 하라'고 시키지 않는다");
+    /* 0건은 카드로 자리를 먹지 않는다 — 두 화면에 같은 규칙이 적용되는지 본다 */
+    for (const [tab, name] of [['todo', '오늘 할 일'], ['quality', '데이터 품질']]) {
+      await page.click(`.tab[data-tab="${tab}"]`);
+      await page.waitForSelector(`#screen-${tab}:not([hidden])`);
+      const zero = await page.evaluate((t) => [...document.querySelectorAll(`#screen-${t} [data-stat] .v`)]
+        .filter((el) => el.textContent.trim() === '0').length, tab);
+      ok(zero === 0, `${name} — 0건은 카드로 자리를 먹지 않는다`);
+    }
+    await page.click('.tab[data-tab="quality"]');
+    await page.waitForSelector('#screen-quality:not([hidden])');
+  }
+
   /* ⑦ 인스타 (2026-09-12) — 게시 대기 · 판형 번호 · 트랙션 · 댓글이 한 화면에 */
   await page.click('.tab[data-tab="insta"]');
   await page.waitForSelector('#screen-insta:not([hidden])');

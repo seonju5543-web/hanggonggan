@@ -413,6 +413,19 @@ input[type="search"] { min-width: 190px; flex: 1 1 190px; }
 :root[data-density="compact"] td { padding: var(--space-6) var(--space-12); }
 :root[data-density="compact"] .card { padding: var(--space-12) var(--space-16); }
 
+/* ── 원인 묶음 (2026-09-13) ────────────────────
+   같은 원인 10건을 10줄로 늘어놓지 않는다. 한 줄 + 그 자리 버튼. */
+.pgroup {
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
+  background: var(--surface); padding: var(--space-12) var(--space-16);
+  display: flex; flex-direction: column; gap: var(--space-8);
+}
+.pgroup + .pgroup { margin-top: var(--space-8); }
+.pgroup-head { display: flex; gap: var(--space-8); align-items: center; flex-wrap: wrap; }
+.pgroup-msg { flex: 1 1 320px; font-size: var(--t-md); font-weight: 600; }
+.pgroup-head .btn { flex: 0 0 auto; }
+.pgroup details > summary { cursor: pointer; }
+
 /* ── 표 ──────────────────────────────────────── */
 /* 좁은 화면에서 표는 옆으로 밀어야 나머지 칸이 보이는데, 그 사실이 화면에 드러나지 않아
    **오른쪽 칸이 아예 없는 것처럼 보였다**(B0-10). 두 가지로 알린다:

@@ -27,8 +27,13 @@ const REQUIRED = ['id', 'name', 'type', 'provider', 'amount', 'summary', 'eligib
    opts.formIds: data/forms.json에 있는 양식 id 집합 (없으면 formId 존재 검사 생략) */
 function checkEntry(it, opts = {}) {
   const out = [];
-  const err = (msg) => out.push({ level: 'error', msg });
-  const warn = (msg) => out.push({ level: 'warn', msg });
+  /* `fix` 는 **누가 고칠 수 있는가**를 기계가 읽을 수 있게 적어 둔 이름이다 (2026-09-13).
+     🔴 사람에게 시키는 말("…파일을 고쳐서 push 하세요")을 문구에 넣지 않는다 —
+     이 저장소의 개발자는 코드 지식이 없고, 그 문구를 읽어도 할 수 있는 일이 없다.
+     대신 화면이 이 이름을 보고 **그 자리에 버튼**을 띄운다(관리자 화면 '할 일').
+     값은 워크플로 파일 이름이다. 없으면 사람이 하나씩 봐야 하는 일이다. */
+  const err = (msg, fix) => out.push(fix ? { level: 'error', msg, fix } : { level: 'error', msg });
+  const warn = (msg, fix) => out.push(fix ? { level: 'warn', msg, fix } : { level: 'warn', msg });
   const name = it.name || '';
   const url = it.sourceUrl || '';
 
@@ -49,9 +54,10 @@ function checkEntry(it, opts = {}) {
        공고가 아니라 **학교 장학 공지 목록 전체**가 열린다(사용자가 목록에서 다시 찾아야 하고,
        글이 뒤로 밀리면 아예 못 찾는다). 표식은 '아직 원문 주소를 못 찾았다'는 임시 표시일 뿐이므로
        감사에 남긴다 — 복구 로봇(collector/resolve-detail-urls.mjs)이 원문 주소로 바꿔 준다. */
-    warn('sourceUrl이 게시판 목록 주소(#n- 표식) — 원문 공고로 바로 못 갑니다. 복구 로봇 실행: collector/run-resolve-urls.txt 수정 후 push');
+    warn('학생이 원문 보기를 눌러도 그 공고로 못 가고 게시판 목록이 열립니다 (원문 주소를 아직 못 찾았습니다)',
+      'resolve-detail-urls.yml');
   } else if (RULES.BOARD_LIST.test(url)) {
-    warn('sourceUrl이 게시판 목록 주소 — 개별 공고 주소가 필요합니다');
+    warn('sourceUrl이 게시판 목록 주소 — 개별 공고 주소가 필요합니다', 'resolve-detail-urls.yml');
   }
   // 장학금이 아닌 것
   if (RULES.FILENAME_TITLE.test(name)) err(`제목이 첨부 파일 이름입니다: '${name.slice(0, 36)}'`);

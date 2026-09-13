@@ -574,13 +574,6 @@ function renderTodo() {
   const queue = pendingForms();
   const noBoard = D.schools.filter((s) => !s.boardUrl);
 
-  const card = (c) => `
-    <div class="card ${c.cls}" data-stat>
-      <div class="v">${c.v}</div>
-      <div class="k">${esc(c.k)}</div>
-      <div class="d">${c.d}</div>
-      ${c.btn ? `<div class="btn-row">${c.btn}</div>` : ''}
-    </div>`;
 
   /* 카드 9장이 전부 같은 크기·같은 무게라 급한 것과 참고가 구별되지 않았고,
      **0건인 초록 카드가 첫 화면의 2/3를 먹었다.** 이제 할 일이 있는 것만 카드로 올리고
@@ -623,15 +616,7 @@ function renderTodo() {
       <p>눌러야 할 것만 모았습니다. 숫자를 구경하는 화면이 아닙니다.</p>
     </div>
 
-    ${todo.length ? `<div class="cards">
-      ${todo.map((c) => card({ cls: c.tone, v: c.v ?? c.n, k: c.k, d: c.d, btn: c.btn })).join('')}
-    </div>` : '<p class="empty">지금 처리할 일이 없습니다. 모든 항목이 정상입니다.</p>'}
-
-    ${clear.length ? `<div class="allclear">
-      <span class="allclear-mark">✓</span>
-      <span>정상 ${clear.length}항목</span>
-      <span class="allclear-list">${clear.map((c) => esc(c.k)).join(' · ')}</span>
-    </div>` : ''}
+    ${todo.length ? statCardsHtml(all) : '<p class="empty">지금 처리할 일이 없습니다. 모든 항목이 정상입니다.</p>'}
 
     ${urgent.length ? `
       <div class="sec-head" style="margin-top:8px">
@@ -1867,6 +1852,75 @@ async function loadPushHealth() {
 }
 
 /* ---------------- ⑦ 데이터 품질 ---------------- */
+/** 숫자 카드 묶음. 🔴 **0건은 카드로 자리를 먹지 않는다** — 손봐야 할 것만 카드로 올리고
+ *  0건은 아래 한 줄 띠로 접는다.
+ *  예전에는 이 규칙이 「오늘 할 일」에만 있었고 「데이터 품질」은 '0 규칙 위반' 카드를 그대로
+ *  띄웠다 — 같은 규칙이 화면마다 다르면 읽는 사람이 규칙을 배울 수 없다. */
+function statCardsHtml(list) {
+  const card = (c) => `
+    <div class="card ${c.tone || ''}" data-stat>
+      <div class="v">${c.v ?? c.n}</div>
+      <div class="k">${esc(c.k)}</div>
+      ${c.d ? `<div class="d">${c.d}</div>` : ''}
+      ${c.btn ? `<div class="btn-row">${c.btn}</div>` : ''}
+    </div>`;
+  const todo = list.filter((c) => c.n > 0);
+  const clear = list.filter((c) => c.n === 0);
+  return `${todo.length ? `<div class="cards">${todo.map(card).join('')}</div>` : ''}
+    ${clear.length ? `<div class="allclear">
+      <span class="allclear-mark">✓</span>
+      <span>정상 ${clear.length}항목</span>
+      <span class="allclear-list">${clear.map((c) => esc(c.k)).join(' · ')}</span>
+    </div>` : ''}`;
+}
+
+/* ---------------- 원인별로 묶기 (2026-09-13) ----------------
+   🔴 **같은 원인 10건을 10줄로 늘어놓지 않는다.**
+   실측: 경고 11건 = 서로 다른 원인 **2개**이고, 그중 하나가 10건이다. 예전에는 그 10건이
+   한 글자도 안 다른 같은 문장으로 열 줄을 채웠고, 문구가 시키는 일은 '파일을 고쳐서 push'라
+   **코드 지식 없는 개발자가 할 수 없는 말**이었으며, 그 로봇 버튼은 다른 탭에 있었다.
+   이제 규칙이 `fix`(고칠 수 있는 로봇 이름)를 같이 내주고, 여기서 원인 한 줄 + 그 자리 버튼으로 그린다. */
+function problemGroups(items, formIds) {
+  const g = new Map();
+  items.forEach((it) => {
+    (problemsOf(it, formIds) || []).forEach((p) => {
+      const k = `${p.level}|${p.msg}`;
+      if (!g.has(k)) g.set(k, { level: p.level, msg: p.msg, fix: p.fix || null, items: [] });
+      g.get(k).items.push(it);
+    });
+  });
+  /* 오류를 먼저, 그다음 건수가 많은 것부터 — 손대면 가장 많이 줄어드는 것이 위로 온다 */
+  return [...g.values()].sort((a, b) => (a.level === b.level
+    ? b.items.length - a.items.length
+    : (a.level === 'error' ? -1 : 1)));
+}
+
+/** 원인 한 줄. 펼치면 그 원인에 걸린 공고들이 나온다. */
+function problemGroupHtml(grp, key) {
+  const n = grp.items.length;
+  const tone = grp.level === 'error' ? 'bad' : '';
+  /* 🔴 로봇 이름을 베끼지 않는다 — 로봇 화면(ROBOTS)이 원본이다. 베끼면 이름이 갈라진다. */
+  const robot = ROBOTS.find((r) => r.f === grp.fix);
+  const label = robot ? robot.n : grp.fix;
+  return `
+    <div class="pgroup" data-pgroup>
+      <div class="pgroup-head">
+        <span class="pill ${tone}">${grp.level === 'error' ? '오류' : '경고'} ${n}건</span>
+        <span class="pgroup-msg">${esc(grp.msg)}</span>
+        ${grp.fix
+    ? `<button class="btn btn-sm btn-primary" data-fixrun="${esc(grp.fix)}" data-fixn="${n}">
+             이 ${n}건 고치기 — ${esc(label)}</button>`
+    : '<span class="hint">한 건씩 보고 고쳐야 합니다</span>'}
+      </div>
+      <details>
+        <summary class="hint">어떤 공고인지 보기 (${n}건)</summary>
+        <div class="rows" data-rows>${grp.items.slice(0, shown(`pg-${key}`, 20))
+    .map((it) => rowHtml(it)).join('')}</div>
+        ${moreBtn(`pg-${key}`, n, 20)}
+      </details>
+    </div>`;
+}
+
 function renderQuality() {
   const fi = formIdSet();
   const withProb = D.reg.map((it) => ({ it, ps: problemsOf(it, fi) })).filter((x) => x.ps.length);
@@ -1900,29 +1954,24 @@ function renderQuality() {
       <p>로봇이 매일 쓰는 등록 규칙을 이 화면에서 그대로 돌린 결과입니다. 줄을 누르면 바로 고칠 수 있습니다.</p>
     </div>
 
-    <div class="cards">
-      <div class="card ${errors.length ? 'is-bad' : 'is-ok'}" data-stat><div class="v">${errors.length}</div>
-        <div class="k">규칙 위반 (오류)</div><div class="d">앱1에 잘못 나갈 수 있는 항목</div></div>
-      <div class="card ${warns.length ? 'is-warn' : 'is-ok'}" data-stat><div class="v">${warns.length}</div>
-        <div class="k">규칙 경고</div><div class="d">손봐야 하지만 치명적이지는 않음</div></div>
-      <div class="card is-warn" data-stat><div class="v">${noAmount}</div>
-        <div class="k">금액 미확인</div><div class="d">학생이 얼마인지 모르는 공고</div></div>
-      <div class="card is-warn" data-stat><div class="v">${noDeadline}</div>
-        <div class="k">마감일 없음</div><div class="d">언제까지인지 모르는 공고</div></div>
-      <div class="card ${noForm ? 'is-warn' : 'is-ok'}" data-stat><div class="v">${noForm}</div>
-        <div class="k">신청서 첨부는 있는데 양식 미등록</div><div class="d">앱에서 작성하게 만들 수 있는 후보</div></div>
-      <div class="card ${noElig ? 'is-warn' : 'is-ok'}" data-stat><div class="v">${noElig}</div>
-        <div class="k">지원 자격 미확보</div>
-        <div class="d">학생에게 "자격을 아직 읽지 못했어요"로 나가는 공고 — 상세에서 원문 문장을 골라 주면 사라집니다</div></div>
-      <div class="card ${dead.length ? 'is-warn' : 'is-ok'}" data-stat><div class="v">${dead.length}</div>
-        <div class="k">원문 링크 실패 기록</div><div class="d">링크 사냥꾼이 못 연 주소</div></div>
-    </div>
+    ${statCardsHtml([
+    { n: errors.length, tone: 'is-bad', k: '규칙 위반 (오류)', d: '앱1에 잘못 나갈 수 있는 항목' },
+    { n: warns.length, tone: 'is-warn', k: '규칙 경고', d: '손봐야 하지만 치명적이지는 않음' },
+    { n: noAmount, tone: 'is-warn', k: '금액 미확인', d: '학생이 얼마인지 모르는 공고' },
+    { n: noDeadline, tone: 'is-warn', k: '마감일 없음', d: '언제까지인지 모르는 공고' },
+    { n: noForm, tone: 'is-warn', k: '신청서 첨부는 있는데 양식 미등록', d: '앱에서 작성하게 만들 수 있는 후보' },
+    { n: noElig, tone: 'is-warn', k: '지원 자격 미확보',
+      d: '학생에게 "자격을 아직 읽지 못했어요"로 나가는 공고 — 상세에서 원문 문장을 골라 주면 사라집니다' },
+    { n: dead.length, tone: 'is-warn', k: '원문 링크 실패 기록', d: '링크 사냥꾼이 못 연 주소' },
+  ])}
 
-    ${errors.length ? `<div class="sec-head"><h2>오류 ${errors.length}건</h2></div>
-      <div class="rows" data-rows>${errors.map(probRow).join('')}</div>` : ''}
-    ${warns.length ? `<div class="sec-head"><h2>경고 ${warns.length}건</h2></div>
-      <div class="rows" data-rows>${warns.map(probRow).join('')}</div>` : ''}
-    ${!withProb.length ? '<p class="empty">규칙 위반이 없습니다.</p>' : ''}
+    ${(() => {
+    const groups = problemGroups(D.reg, fi);
+    if (!groups.length) return '<p class="empty">규칙 위반이 없습니다.</p>';
+    return `<div class="sec-head"><h2>손봐야 할 것 — 원인 ${groups.length}가지</h2>
+        <p>같은 원인은 한 줄로 묶었습니다. 로봇이 고칠 수 있는 것은 그 자리에서 누르면 됩니다.</p></div>
+      ${groups.map((g, i) => problemGroupHtml(g, i)).join('')}`;
+  })()}
 
     ${dead.length ? `
       <div class="sec-head" style="margin-top:12px"><h2>원문 링크 실패 ${dead.length}건</h2></div>
@@ -2512,6 +2561,16 @@ function bindGlobal() {
     }
 
     /* 로봇 통제판의 '지금 실행' — 어떤 로봇이든 같은 경로로 돈다 */
+    /* 원인 한 줄에 붙은 '이 N건 고치기' — 로봇을 그 자리에서 깨운다.
+       🔴 '파일을 고쳐서 push 하세요' 라는 말을 화면에서 없애기 위한 자리다. */
+    const fix = e.target.closest('[data-fixrun]');
+    if (fix) {
+      const file = fix.dataset.fixrun;
+      const robot = ROBOTS.find((r) => r.f === file);
+      await runCollector(file, robot ? robot.n : file);
+      return;
+    }
+
     const run = e.target.closest('[data-run]');
     if (run) {
       /* 입력이 필요한 로봇은 빈 값으로 던지면 GitHub이 422로 거부한다 — 먼저 막는다 */
