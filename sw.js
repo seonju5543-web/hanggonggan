@@ -21,11 +21,10 @@
    번호만 맞추고 한쪽 파일 목록을 버리면, 버린 쪽 파일이 오프라인에서만 없어 앱이 죽는다. */
 /* ⚠️ 두 작업이 같은 날 v172 를 각자 올려 부딪혔다 — 번호는 v173 으로 올리고 **둘 다** 남긴다
    (파일 머리말의 규칙 그대로). */
-/* ⚠️ 오늘 세 작업이 같은 번호를 각자 올렸다 — 번호는 올리고 **한 일은 다 남긴다**
-   (파일 머리말 규칙). */
-const CACHE = 'handaejang-v182';  /* v182 — 마스코트 가림(UI-7) + 층2 공고문 사본 + 제목 밑줄 */
+/* ⚠️ 오늘 여러 작업이 같은 번호를 각자 올렸다 — 번호는 올리고 **한 일은 다 남긴다**(파일 머리말 규칙). */
+const CACHE = 'handaejang-v183';  /* v183 — 마스코트 가림(UI-7) + 층2 공고문 사본 + 제목 밑줄 */
 const ASSETS = ['.', 'index.html', 'style.css', 'boot.js', 'resume.js', 'interactions.js', 'app.js', 'data.js', 'forms.js', 'form-plan.js', 'essay.js', 'essay-config.js', 'essay-ask.js', 'essay-quality.js', 'essay-submit-check.js',
-  'section-head.js', 'parse-requirements.js', 'parse-amount.js', 'match-engine.js', 'notify-rules.js', 'notify.js', 'push-config.js',
+  'section-head.js', 'parse-requirements.js', 'parse-amount.js', 'match-engine.js', 'notify-rules.js', 'notify.js', 'push-config.js', 'support-config.js',
   'chat-config.js', 'chat.js',
   /* 로그인 — 목록에서 빠지면 **오프라인에서** 이 파일만 없어 앱이 죽는다.
      ⚠️ importScripts 에는 넣지 않는다: 서비스워커는 로그인을 모른다(푸시는 지금처럼

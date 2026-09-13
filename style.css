@@ -2208,6 +2208,12 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
   font-size: var(--t-lg);              /* 🔴 16px 미만이면 iOS 가 칸을 누를 때 화면을 확대한다 */
 }
 .search-box input:focus { border: 0; box-shadow: none; }
+/* 🔴 ✕ 가 **둘** 뜨던 것을 끈다 (2026-09-13 · 자주 묻는 질문을 만들다 눈으로 발견).
+   `type="search"` 는 브라우저가 지우기 ✕ 를 제 손으로 하나 더 그린다. 우리는 이미
+   `.search-clear` 를 두고 있어서 글자를 치면 ✕ 가 나란히 두 개 떴다(탐색 화면도 같았다).
+   ⚠️ `appearance: none` 만으로는 안 사라진다 — 실측으로 계산값이 none 인데도 그려졌다. */
+.search-box input::-webkit-search-cancel-button,
+.search-box input::-webkit-search-decoration { -webkit-appearance: none; appearance: none; display: none; }
 .search-clear {
   flex: none; width: 28px; height: 28px; border-radius: 50%;
   color: var(--text-sub); font-size: var(--t-sm); line-height: 1;
@@ -4451,3 +4457,159 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
    ⚠️ 이때 뒤로 쓸기를 잃지 않는다 — 시트 안 손짓은 어차피 우리가 안 맡는다
       (app.js 가 `.sheet` 를 걸러낸다). 시트 밖은 배경이라 쓸 일이 없다. */
 #app.on-sub-screen:has(.sheet:not([hidden])) { touch-action: auto; }
+
+/* ============================================================
+   고객센터 · 자주 묻는 질문 강화 (2026-09-13 개발자 지시 · 아파트너 참고안)
+   ------------------------------------------------------------
+   참고안(아파트너)의 구성 그대로다 — 검색창 · 갈래 칩 · 아코디언 · 결과 줄 · 빈 화면.
+   부품은 앱에 이미 있는 것을 쓴다: 검색창은 `.search-box`(탐색 화면과 같은 것),
+   칩은 `.filter-chip`, 카드는 `.my-card`, 버튼은 `.btn.btn-outline`.
+   ============================================================ */
+
+/* 🔴 갈래 칩은 **접는다**(`.filter-row` 를 쓰지 않는 이유).
+   `.filter-row` 는 가로 스크롤인데, 안쪽 화면은 뒤로 쓸기 때문에 `#app.on-sub-screen`
+   에 `touch-action: pan-y` 가 걸려 있어 **손가락으로 옆으로 밀 수가 없다**(이 파일 맨
+   끝 주석이 도우미 칩 줄에서 겪은 바로 그 문제다). 갈래가 일곱이라 한 줄에 안 들어가므로
+   여기서는 접는 쪽이 맞다 — 참고안도 두 줄로 접혀 있다.
+   ⚠️ 탐색 화면의 '일렬로'(2026-09-12 개발자 지시)와 어긋나지 않는다. 그 지시는 칩이
+      다섯인 탐색 필터 이야기이고, 저기는 안쪽 화면이 아니라 손으로 밀 수 있다. */
+.faq-cats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  margin: var(--space-12) 0 var(--space-16);
+}
+
+/* 검색 결과 줄 — 참고안의 파란 ⓘ 줄. 검색 중일 때만 나온다 */
+.faq-result {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-12) var(--space-16);
+  margin-bottom: var(--space-12);
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  color: var(--text-sub);
+  font-size: var(--t-sm);
+  line-height: 1.5;
+}
+.faq-result::before {
+  content: 'ⓘ';
+  color: var(--accent);
+  font-size: var(--t-md);
+  flex: none;
+}
+.faq-result[hidden] { display: none !important; }
+.faq-result strong { color: var(--accent); font-weight: 700; }
+
+/* 찾은 낱말 — 바탕을 칠하면 줄이 얼룩덜룩해져서 글자만 진하게 한다 */
+.faq-item mark {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 700;
+  border-radius: var(--radius-hair);
+  padding: 0 var(--space-2);
+}
+
+/* 갈래 이름표 — 질문 위 작은 글씨(참고안 볼트업과 같은 자리). 무엇에 대한 답인지
+   목록을 훑는 것만으로 알 수 있게 한다. `＋` 표시와 겹치지 않게 블록으로 둔다. */
+.faq-cat {
+  display: block;
+  font-size: var(--t-2xs);
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.01em;
+  margin-bottom: var(--space-4);
+}
+
+/* 찾는 답이 없을 때 — 🔴 막다른 길로 두지 않는다. 고객센터로 가는 길을 같이 준다. */
+.faq-empty {
+  text-align: center;
+  padding: var(--space-40) var(--space-16) var(--space-24);
+}
+.faq-empty > svg {
+  width: 64px;
+  height: 64px;
+  color: var(--text-weak);
+  opacity: 0.55;
+  margin-bottom: var(--space-16);
+}
+.faq-empty-title { font-size: var(--t-lg); font-weight: 800; letter-spacing: -0.02em; }
+.faq-empty-sub {
+  font-size: var(--t-sm);
+  color: var(--text-weak);
+  line-height: 1.7;
+  margin: var(--space-8) 0 var(--space-20);
+}
+.faq-empty .btn { max-width: 220px; margin: 0 auto; }
+
+/* ---------------- 고객센터 ---------------- */
+.sup-desc {
+  font-size: var(--t-sm);
+  color: var(--text-sub);
+  line-height: 1.7;
+  margin: var(--space-8) 0 var(--space-16);
+}
+.sup-desc:last-child { margin-bottom: 0; }
+
+/* 자주 찾는 질문 TOP — 번호 + 질문 + 화살표 (참고안 라이프캐치) */
+.sup-top { margin-top: var(--space-12); }
+.sup-top-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  width: 100%;
+  text-align: left;
+  padding: var(--space-12) 0;
+  border-top: 1px solid var(--line);
+  font-size: var(--t-md);
+  font-weight: 600;
+  color: var(--text);
+}
+.sup-top-item:first-child { border-top: 0; }
+.sup-top-no {
+  flex: none;
+  width: 22px;
+  font-size: var(--t-md);
+  font-weight: 800;
+  color: var(--accent);
+  text-align: center;
+}
+.sup-top-q { flex: 1; line-height: 1.5; }
+.sup-top-go { flex: none; color: var(--text-weak); font-size: var(--t-lg); }
+/* 누르면 글자가 남색이 된다 — 설정 목록·FAQ 와 같은 말투 (2026-09-12 개발자 지시) */
+.sup-top-item:active, .sup-more:active { color: var(--accent); }
+.sup-top-item:active .sup-top-go { color: var(--accent); }
+
+.sup-more {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: var(--space-12) 0 0;
+  margin-top: var(--space-4);
+  border-top: 1px solid var(--line);
+  font-size: var(--t-sm);
+  font-weight: 700;
+  color: var(--accent);
+}
+
+/* 진단 정보 — 이름·학교·성적은 한 줄도 담지 않는다(renderSupport 주석 참조) */
+.sup-diag {
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  padding: var(--space-12) var(--space-16);
+  margin-bottom: var(--space-16);
+}
+.sup-diag-row {
+  display: flex;
+  gap: var(--space-12);
+  padding: var(--space-4) 0;
+  font-size: var(--t-xs);
+  line-height: 1.6;
+}
+.sup-diag-row > span { flex: none; width: 68px; color: var(--text-weak); }
+/* 🔴 브라우저 이름(UA)은 아주 길다 — 안 접으면 카드가 옆으로 새서 화면이 가로로 스크롤된다 */
+.sup-diag-row > b { flex: 1; font-weight: 600; word-break: break-all; }
+
+/* 손가락으로 눌렀을 때 회색 판이 뜨지 않게 — 설정 목록과 같은 규칙 */
+.sup-top-item, .sup-more { -webkit-tap-highlight-color: transparent; }
