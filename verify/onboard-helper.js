@@ -39,17 +39,25 @@ async function nextUntil(page, selector, max = 8) {
    정상적으로 달라지는 경우는 없다. */
 async function assertOwnServer(port, file = 'app.js') {
   const mine = fs.readFileSync(path.join(__dirname, '..', file), 'utf8');
+  /* 🔴 **'못 돌렸다'를 '실패'라고 부르지 않는다** (2026-09-13).
+     예전엔 서버가 없어 검사를 시작도 못 했을 때 `FAIL` 이라고 적었다. 그러면
+     ① 사람이 '검사가 깨졌다'고 읽고 ② 스킬 장부 훅(skill-ledger.sh)이 그 글자를
+     보고 '디버깅 빚'을 쌓아 Stop 관문이 헛걸렸다(실제로 겪었다 — 서버를 띄워
+     다시 돌리니 셋 다 통과였다).
+     이 저장소가 이미 세운 규칙 그대로다 — '못 읽음'과 '읽었는데 틀림'을 뭉뚱그리지
+     말 것(detail-url · 동국대 사례). 종료코드는 1 그대로 두어 CI 는 여전히 막는다 —
+     바뀌는 것은 부르는 이름뿐이다. */
   /* ⚠️ 시한을 걸어야 한다 — 응답 없는 서버를 만나면 fetch 는 **영영 기다린다**(실측).
      예전엔 page.goto 의 30초 시한이 대신 끊어 줬으므로, 시한이 없으면 이 관문이
      오히려 검사를 매달아 놓는 셈이 된다. */
   const served = await fetch(`http://localhost:${port}/${file}`, { signal: AbortSignal.timeout(10000) })
     .then((r) => r.text()).catch(() => null);
   if (served === null) {
-    console.error(`FAIL localhost:${port} 에서 앱을 받지 못했습니다 (서버가 없거나 응답하지 않습니다).\n     이 워크트리에서 앱을 띄우고 PORT=<그 포트> 로 주세요.`);
+    console.error(`판정 불가 — localhost:${port} 에서 앱을 받지 못했습니다 (서버가 없거나 응답하지 않습니다).\n     이 워크트리에서 앱을 띄우고 PORT=<그 포트> 로 주세요.`);
     process.exit(1);
   }
   if (served !== mine) {
-    console.error(`FAIL localhost:${port} 는 **다른 워크트리**를 서빙 중입니다 (${file} 가 디스크와 다릅니다).\n`
+    console.error(`판정 불가 — localhost:${port} 는 **다른 워크트리**를 서빙 중입니다 (${file} 가 디스크와 다릅니다).\n`
       + `     여기서 잰 결과는 내 코드의 판정이 아닙니다 — 이 워크트리에서 앱을 띄우고 PORT=<그 포트> 로 주세요.`);
     process.exit(1);
   }
