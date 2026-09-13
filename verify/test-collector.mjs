@@ -3893,6 +3893,37 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
   eq('  못 가져오면 조용히 넘어가지 않고 멈춘다', /throw new Error\(`app\.js 에서/.test(ws), true);
 }
 
+console.log('\n■ 이중수혜 — 가족 안의 이야기를 「다른 장학금 금지」로 읽지 않는다 (2026-09-13)');
+{
+  const PAx = createRequire(import.meta.url)('../parse-amount.js');
+  const sc = (l) => { const r = PAx.exclusivityFrom([l]); return r.kind + '/' + r.scope; };
+  /* 🔴 실제 원문이다. 한정어가 하나도 없어 기본값(external)에 떨어졌고, 교외 장학금을
+     받는 학생이 이 공고에서 **미달**이 됐다(마감 9/28 인 살아 있는 공고였다).
+     한 가족 안에서 두 사람이 같이 못 받는다는 말이지, 그 학생이 다른 장학금을 갖고
+     있으면 안 된다는 말이 아니다. 틀린 미달은 못 받는 것보다 나쁘다. */
+  eq('🔴 「1 가족당 형제·자매 … 동시 수혜 불가」는 자격을 막지 않는다 (narrow)',
+     sc('나 . 1 가족당 형제 · 자매 합산하여 총 2 회에 한하여 지급 ( 동일 학기에 2 명 동시 수혜 불가 )'),
+     'forbidden/narrow');
+  /* ⚠️ 그러면서 **원래 막던 것은 계속 막아야 한다** — 여기가 무르면 이미 다른 재단
+     장학금을 받는 학생이 서류를 다 준비하고 탈락한다(이 축을 만든 이유). */
+  eq('  한정어 없이 남의 장학금을 말하는 줄은 그대로 external',
+     sc('타 장학금과 중복 수혜 불가'), 'forbidden/external');
+  eq('  넓은 표지(교외)도 그대로', sc('교외 장학금과 중복 수혜 불가'), 'forbidden/external');
+  /* 🔴 가족 이야기 **더하기** 넓은 표지면 넓은 쪽이 이긴다 — 그 줄은 진짜 남의 장학금 이야기다 */
+  eq('  가족 + 넓은 표지는 넓은 쪽이 이긴다',
+     sc('형제·자매가 타 재단 장학금을 받는 경우 중복 수혜 불가'), 'forbidden/external');
+  eq('  좁은 표지는 예전처럼 narrow', sc('근로장학금과 중복 수혜 불가'), 'forbidden/narrow');
+
+  /* 로봇이 사람 값을 덮지 않는다 — 매일 돌게 되면서 생긴 위험이다 */
+  const ea = readText(new URL('../collector/extract-amounts.mjs', import.meta.url));
+  eq('금액 로봇이 사람이 넣은 값을 덮지 않는다 (주인 표식을 본다)',
+     /const humanAmount = !it\.amountFrom/.test(ea), true);
+  eq('  sameAs 도 제가 붙인 것만 지운다', /it\.sameAsFrom === OWN_SAME/.test(ea), true);
+  /* 🔴 다른 로봇은 전부 날짜만 적는다 — 여기만 시각까지 적으면 매 실행 파일이 더러워진다 */
+  eq('  updatedAt 은 날짜만 적는다 (매 실행 더러워지지 않게)',
+     /toISOString\(\)\.slice\(0, 10\)/.test(ea), true);
+}
+
 console.log('\n■ 만들어 놓고 안 돌리는 로봇이 없는가 (2026-09-13 · 노션 F-9)');
 {
   /* 🔴 왜 있나 — `collector/extract-amounts.mjs` 는 2026-08-27 에 만들어졌는데

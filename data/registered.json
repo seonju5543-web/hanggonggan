@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-09-13T15:09:08.830Z",
+ "updatedAt": "2026-09-13",
  "items": [
   {
    "id": "reg-hi-jeju",
@@ -217,7 +217,8 @@
    "deadlineFrom": "공고 원문",
    "openDate": "2026-08-03",
    "announceDate": "2026-08-28",
-   "boardTitle": "유흥수 장학금 (한국외대 융합일본지역학부)"
+   "boardTitle": "유흥수 장학금 (한국외대 융합일본지역학부)",
+   "amountFrom": "공고 원문"
   },
   {
    "id": "reg-hufs-myeonhak",
@@ -260,7 +261,8 @@
    },
    "deadlineFrom": "공고 원문",
    "openDate": "2026-07-09",
-   "boardTitle": "면학장학금 (한국외대 교내)"
+   "boardTitle": "면학장학금 (한국외대 교내)",
+   "exclusivityFrom": "공고 원문"
   },
   {
    "id": "reg-hi-jeongeup",
@@ -369,7 +371,8 @@
     "raw": "3. 장학금액 : 1 인 당 1,000,000 원 * 동 장학금은 학업장려금 ( 생활비 ) 으로 등록금 초과 수혜 가능"
    },
    "openDate": "2026-07-27",
-   "boardTitle": "외대재직직원장학금(씨앗) (2026-1)"
+   "boardTitle": "외대재직직원장학금(씨앗) (2026-1)",
+   "amountFrom": "공고 원문"
   },
   {
    "id": "reg-hufs-ambassador",
@@ -416,7 +419,8 @@
    },
    "openDate": "2026-08-03",
    "announceDate": "2026-08-28",
-   "boardTitle": "한국외대 동문홍보대사 장학금 (2026-2)"
+   "boardTitle": "한국외대 동문홍보대사 장학금 (2026-2)",
+   "amountFrom": "공고 원문"
   },
   {
    "id": "reg-posco-vision",
@@ -578,7 +582,8 @@
    },
    "deadlineFrom": "공고 원문",
    "openDate": "2026-08-03",
-   "announceDate": "2026-08-28"
+   "announceDate": "2026-08-28",
+   "amountFrom": "공고 원문"
   },
   {
    "id": "reg-khu-intern",
@@ -690,7 +695,8 @@
     "min": 1000000,
     "max": 1000000,
     "raw": "장학금액 학업지원 장학금 100만원 (1회 지급)"
-   }
+   },
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-rnoticedoarticleno154473",
@@ -772,7 +778,8 @@
     "min": 0,
     "max": 0,
     "raw": "2. 장학금액 : 등록금 전액 ( 등록금범위 장학금 ) * 장학생 선정후 성적유지시 8 학기까지 수혜가능"
-   }
+   },
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-ent2431260214artclviewdo",
@@ -823,7 +830,8 @@
     "min": 2500000,
     "max": 2500000,
     "raw": "2. 장학금액: 한학기 2,500,000원 등록금 한도내 3. 추천인원: 1명"
-   }
+   },
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-ent2431260269artclviewdo",
@@ -958,7 +966,8 @@
     "min": 1000000,
     "max": 1000000,
     "raw": "장학금액 지원금액 : 1인당 100만원(생활비 장학금)"
-   }
+   },
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-c839d20ec84a0ebb09c20202",
@@ -1049,7 +1058,8 @@
     "max": 1449399,
     "raw": "나 . 금 액 : 1 인 1,449,399 원 ( 등록금 외 장학금 - 생활비성 ) 다 . 장학금 수여식 : 2026 년 9 월 3 일 ( 목 ) 10 시 , 장소 : 본관 203 호 이덕선 회의실 2. 장학생 선발"
    },
-   "boardTitle": "남가주동문장학회 장학생 (한국외대, 2026-2학기)"
+   "boardTitle": "남가주동문장학회 장학생 (한국외대, 2026-2학기)",
+   "amountFrom": "공고 원문"
   },
   {
    "type": "교외",
@@ -1101,7 +1111,10 @@
     "raw": "2. 장학금 지급액 : 500 만원 /1 인 ( 학업지원비 ( 생활비 ) 로 지급 ) ( 타 대외 장학금과 이중수혜 금지 )"
    },
    "openDate": "2026-07-30",
-   "announceDate": "2026-08-21"
+   "announceDate": "2026-08-21",
+   "sameAs": "가송재단",
+   "amountFrom": "공고 원문",
+   "exclusivityFrom": "공고 원문"
   },
   {
    "type": "교외",
@@ -1155,7 +1168,8 @@
     "max": 1500000,
     "raw": "3. 장학금액 가 . 일반장학금 : 150 만원 ( 예상 , 등록금 범위 내 ) 나 . 면학장학금 : 100 만원 ( 예상 , 등록금 범위 외 ) 4. 추천인원 : 5 명"
    },
-   "boardTitle": "양천장학회 장학금 (한국외대 접수, 2026 후기)"
+   "boardTitle": "양천장학회 장학금 (한국외대 접수, 2026 후기)",
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-09c6eab8b020ec9ea5ed9599",
@@ -1282,7 +1296,8 @@
     "kind": "forbidden",
     "scope": "external",
     "raw": "* 자유 양식(학교 및 국가 장학금 이외의 교외 장학금 중복 수혜 사실이 없음을 증명함) 또는 장학수혜증명서 제출"
-   }
+   },
+   "exclusivityFrom": "공고 원문"
   },
   {
    "id": "reg-partner-foundation",
@@ -1326,7 +1341,8 @@
     "kind": "forbidden",
     "scope": "narrow",
     "raw": "- 전액 장학금 지원 (등록금성) 타 등록금성 장학금과 중복 수혜 불가"
-   }
+   },
+   "exclusivityFrom": "공고 원문"
   },
   {
    "id": "auto-kuk2351202780artclviewdo",
@@ -1439,7 +1455,9 @@
     "kind": "allowed",
     "scope": "narrow",
     "raw": "3. 장학금액 : 50만원 ( 생활비성 장학, 중복수혜 가능)"
-   }
+   },
+   "amountFrom": "공고 원문",
+   "exclusivityFrom": "공고 원문"
   },
   {
    "id": "auto-oardid322606menuno200318",
@@ -1538,7 +1556,8 @@
     "min": 3000000,
     "max": 3000000,
     "raw": "2. 장학금액 : 생활비 ( 학습보조비 ) 300 만원 / 학기 ( 매월 (2026 년 9 월 ~ 2027 년 2 월까지 ) 50 만원 지급 ) - 등록금 범위 외로 수혜가능 3. 선발인원 : 1 명"
-   }
+   },
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-ent2431263714artclviewdo",
@@ -1582,7 +1601,8 @@
     "max": 1000000,
     "raw": "3. 지원금액 : 1 인당 100 만원 ( 생활비성 장학금 )"
    },
-   "openDate": "2026-08-26"
+   "openDate": "2026-08-26",
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-ent2431263858artclviewdo",
@@ -1629,7 +1649,8 @@
     "max": 3000000,
     "raw": "3. 지원금액 : 1 인당 300 만원 ( 생활비성 장학금 )"
    },
-   "openDate": "2026-09-07"
+   "openDate": "2026-09-07",
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-ent2431264156artclviewdo",
@@ -1714,7 +1735,8 @@
     "scope": "narrow",
     "raw": "* 국가장학금 , 성적장학금 등 중복수혜가능"
    },
-   "openDate": "2026-09-02"
+   "openDate": "2026-09-02",
+   "exclusivityFrom": "공고 원문"
   },
   {
    "id": "auto-84a0ebb09c20ec9588eb82b4",
@@ -1874,7 +1896,8 @@
     "min": 2000000,
     "max": 2000000,
     "raw": "2. 지원내용 : 매학기 등록금 전액 및 취 &middot; 창업지원금 200 만원 * 수혜학기 중복지원 여부와 등록금액에 따라 장학금액 변동 가능하며 , 장학생 요건 미충족 시 지원중단"
-   }
+   },
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-cb2ad20ec9588eb82b482f26",
@@ -1977,7 +2000,8 @@
     "min": 0,
     "max": 0,
     "raw": "장학금액 중소·중견기업 : 수혜 학기 등록금 전액 대기업·비영리기관 : 수혜 학기 등록금 50%"
-   }
+   },
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-ent2431263956artclviewdo",
@@ -2080,7 +2104,8 @@
     "min": 1000000,
     "max": 1000000,
     "raw": "장학금액 : 100만원"
-   }
+   },
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-oardid321881menuno200318",
@@ -2313,9 +2338,11 @@
    },
    "exclusivity": {
     "kind": "forbidden",
-    "scope": "external",
+    "scope": "narrow",
     "raw": "나 . 1 가족당 형제 &middot; 자매 합산하여 총 2 회에 한하여 지급 ( 동일 학기에 2 명 동시 수혜 불가 )"
-   }
+   },
+   "amountFrom": "공고 원문",
+   "exclusivityFrom": "공고 원문"
   },
   {
    "id": "auto-oardid323027menuno200318",

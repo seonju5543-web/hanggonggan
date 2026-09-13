@@ -322,7 +322,16 @@ console.log('\n■ 수집한 글의 HTML 기호를 글자로 띄우지 않는다
      /new RegExp\('&\(' \+ Object\.keys\(ENTITIES\)/.test(app), true);
 
   const seen = new Set();
-  for (const f of ['data/registered.json', 'data/notices.json', 'data/kosaf-open.json']) {
+  /* 🔴 **앱이 실제로 받아 가는 파일을 전부 본다** (2026-09-13 코드 리뷰).
+     처음엔 뿌리의 json 셋만 훑었는데, 학교별로 나뉜 `data/notices/*.json` 도 앱이 받는다
+     (loadNotices). 손으로 적은 목록은 새 파일이 생기면 그대로 썩는다 — 디렉터리를 읽는다. */
+  const dataFiles = ['data/registered.json', 'data/notices.json', 'data/kosaf-open.json'];
+  try {
+    for (const n of fs.readdirSync(path.join(ROOT, 'data/notices')).filter((x) => x.endsWith('.json'))) {
+      dataFiles.push('data/notices/' + n);
+    }
+  } catch { /* 그 폴더가 없는 판도 있다 */ }
+  for (const f of dataFiles) {
     let raw = '';
     try { raw = R(f); } catch { continue; }   // 이 파일이 이미 쓰는 읽기 함수 (경로 규칙 한 벌)
     for (const m of raw.matchAll(/&(#?[a-zA-Z0-9]{2,8});/g)) seen.add(m[1]);
