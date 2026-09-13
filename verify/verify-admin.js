@@ -364,6 +364,51 @@ function serve() {
     ok(false, '원문 발췌가 있는 공고를 찾지 못함');
   }
 
+  /* ④-1b 작업대 — 대조 폭 · 이어서 처리 · 모르는 칸 (2026-09-13) */
+  {
+    await gotoNotices(page);
+    /* 비어 있는 칸이 있는 공고를 고른다 — 없으면 이 검사가 헛돈다 */
+    const missId = await page.evaluate(() => {
+      const A = window.__admin;
+      const hit = A.D.reg.find((x) => !x.deadline || !x.amountValue);
+      return hit ? hit.id : null;
+    });
+    if (missId) {
+      await page.click(`#screen-list [data-row][data-id="${missId}"]`);
+      await page.waitForSelector('#sheet:not([hidden])');
+      ok(await page.locator('#sheet .field-first').count() === 1,
+        '모르는 칸이 맨 위에 선다 (배지로 알리지 않고 그 자리를 준다)');
+      const order = await page.evaluate(() => {
+        const first = document.querySelector('#sheet .field-first');
+        const eds = [...document.querySelectorAll('#sheet [data-ed]')];
+        return { top: eds.findIndex((e) => first && first.contains(e)), total: eds.length };
+      });
+      ok(order.top === 0, '그 칸이 다른 칸보다 먼저 온다', `${order.total}칸 중 ${order.top + 1}번째`);
+      /* 🔴 대조 폭 — 이 도구의 본업이 '원문과 등록 내용을 나란히 보는 것' 이다.
+         예전에는 760px 서랍 안 2단이라 한 칸이 약 355px 이었다. */
+      const w = await page.evaluate(() => {
+        const p2 = document.querySelector('#sheet [data-pane="source"]');
+        return p2 ? Math.round(p2.getBoundingClientRect().width) : 0;
+      });
+      ok(w >= 480, '넓은 화면에서 원문 읽는 폭이 넉넉하다', `${w}px`);
+      /* 이어서 처리 — 시트를 닫고 목록에서 같은 줄을 다시 찾지 않아도 된다 */
+      const hasNext = await page.locator('#sheet [data-act="next"]').count();
+      if (hasNext) {
+        const before = await page.textContent('#sheet .sheet-head h3');
+        await page.click('#sheet [data-act="next"]');
+        await page.waitForTimeout(400);
+        const after = await page.textContent('#sheet .sheet-head h3');
+        ok(before !== after, '다음 공고로 바로 넘어간다');
+        ok(!(await page.isHidden('#sheet')), '넘어갈 때 시트가 닫히지 않는다');
+      } else {
+        ok(false, '다음 공고 버튼이 없다');
+      }
+      await page.click('#sheet [data-close]');
+    } else {
+      ok(false, '비어 있는 칸이 있는 공고를 찾지 못함 (검사가 헛돈다)');
+    }
+  }
+
   /* ④-2 저장해 둔 공고 원문 (2026-09-13)
      🔴 **집에 있는 원문을 두고 새 탭으로 학교 게시판을 다시 찾아가고 있었다.**
      `collector/extracted/notices-text.json` 에 공고 전문이 있는데 화면이 안 읽고 있었다.

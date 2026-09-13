@@ -2302,6 +2302,26 @@ function registerSheet(n) {
 
 let currentSheetItem = null;
 
+/* ---------------- 이어서 처리하기 (2026-09-13) ----------------
+   🔴 예전에는 한 건을 끝낼 때마다 **시트가 닫히고 목록에서 같은 줄을 다시 찾아야** 했다.
+   14건을 처리하면 그 찾기가 14번이다. 이제 시트 안에서 '다음 공고 ▸' 로 바로 넘어간다.
+   ⚠️ 줄 목록은 **시트를 열 때의 순서를 그대로** 쓴다 — 처리하는 동안 목록이 다시 정렬되면
+      방금 본 것으로 되돌아가거나 건너뛴다. */
+let SHEET_QUEUE = [];
+
+function sheetQueueSet(ids) { SHEET_QUEUE = ids.slice(); }
+
+/** 지금 보는 공고의 다음 것. 마지막이면 null. */
+function sheetNext(id) {
+  const i = SHEET_QUEUE.indexOf(id);
+  if (i < 0 || i + 1 >= SHEET_QUEUE.length) return null;
+  return D.reg.find((x) => x.id === SHEET_QUEUE[i + 1]) || null;
+}
+function sheetPos(id) {
+  const i = SHEET_QUEUE.indexOf(id);
+  return i < 0 ? null : { n: i + 1, of: SHEET_QUEUE.length };
+}
+
 /** 상세를 연다. 저장된 원문이 아직 없으면 뒤에서 받아 오고, 오면 그 칸만 다시 그린다.
  *  🔴 여는 것을 기다리게 하지 않는다 — 800KB 를 받는 동안 화면이 멈추면 더 나쁘다. */
 function openDetail(it) {
@@ -2402,7 +2422,23 @@ function detailSheet(it) {
       <div class="pane" data-pane="app">
         <h4>앱1에 나가는 내용 (고칠 수 있습니다)</h4>
         <div class="pane-body">
-          ${EDIT_FIELDS.map(field).join('')}
+          ${(() => {
+    /* 🔴 **모르는 것이 곧 입력칸으로 선다** (2026-09-13).
+       실측: 검수 대기 14건 중 10건이 마감일·금액을 **둘 다** 모르고, 경고등 없이 그냥
+       눌러 넘길 수 있는 것은 1건뿐이었다. 예전에는 '금액 미확인'·'마감일 없음' 이라는
+       배지를 줄마다 읽은 뒤, 시트를 열어 21칸 중에서 그 칸을 찾아야 했다.
+       이제 **비어 있는 칸을 맨 위로** 올린다 — 무엇을 하면 되는지가 곧 화면이 된다.
+       ⚠️ 값을 지어내지 않는다. 빈 칸을 보여 줄 뿐이고, 채우는 것은 사람이다(원칙 8-1). */
+    const KEY = new Set(['deadline', 'amount', 'amountValue']);
+    const missing = EDIT_FIELDS.filter(([k]) => KEY.has(k)
+      && (it[k] == null || it[k] === '' || (k === 'amountValue' && !it[k])));
+    const rest = EDIT_FIELDS.filter((f) => !missing.includes(f));
+    return `${missing.length ? `<div class="field-first">
+        <label class="field-first-h">먼저 채울 것 ${missing.length}칸 — 지금 비어 있습니다</label>
+        ${missing.map(field).join('')}
+        <p class="hint">오른쪽 공고 원문에서 찾아 적으세요. <b>확인하지 못한 값을 짐작해 넣지 마세요.</b></p>
+      </div>` : ''}${rest.map(field).join('')}`;
+  })()}
           <div class="field">
             <label>자격 — 기계 판정용 (매칭·알림이 이 값을 봅니다)</label>
             <div class="grid2">
@@ -2484,6 +2520,15 @@ function detailSheet(it) {
     <p class="muted">저장을 누르면 검사를 거쳐 반영됩니다. 검사를 통과하지 못하면 아무것도 바뀌지 않습니다.</p>
     <div class="btn-row sheet-foot">
       <button class="btn btn-primary" data-act="save" data-id="${esc(it.id)}">수정 내용 저장</button>
+      ${(() => {
+    const pos = sheetPos(it.id);
+    const nx = sheetNext(it.id);
+    if (!pos) return '';
+    return nx
+      ? `<button class="btn" data-act="next" data-id="${esc(it.id)}">다음 공고 ▸</button>
+         <span class="hint" style="align-self:center">${pos.n} / ${pos.of}</span>`
+      : `<span class="hint" style="align-self:center">${pos.n} / ${pos.of} — 마지막입니다</span>`;
+  })()}
       ${st === 'unreviewed'
     ? `<button class="btn good" data-act="confirm" data-id="${esc(it.id)}">검수 완료로 컨펌</button>
          <button class="btn danger" data-act="revert" data-id="${esc(it.id)}">잘못 등록됨 — 되돌리기</button>`
@@ -2660,6 +2705,12 @@ function bindGlobal() {
     const row = e.target.closest('[data-row][data-id]');
     if (row) {
       const it = D.reg.find((x) => x.id === row.dataset.id);
+      /* 🔴 지금 **보이는 줄 순서**를 그대로 큐로 삼는다 — 접힌 것은 빼야
+         '다음 공고' 가 안 보이던 줄로 건너뛰지 않는다. */
+      const screen = row.closest('section.screen') || document;
+      sheetQueueSet([...screen.querySelectorAll('[data-row][data-id]')]
+        .filter((el) => el.offsetParent !== null)
+        .map((el) => el.dataset.id));
       if (it) openDetail(it);
       return;
     }
@@ -2949,6 +3000,13 @@ function bindGlobal() {
     if (!act) return;
     const id = act.dataset.id;
     const kind = act.dataset.act;
+
+    if (kind === 'next') {
+      const nx = sheetNext(id);
+      if (nx) openDetail(nx);
+      else toast('마지막 공고입니다');
+      return;
+    }
 
     if (kind === 'src-retry') {
       SRC_STATE = 'idle';
