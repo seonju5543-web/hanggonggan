@@ -963,6 +963,20 @@ textarea:focus {
   margin-top: 10px;
   line-height: 1.6;
 }
+
+/* 판정이 못 미더운 채 신청할 때의 안내 (2026-09-13 · 핵심-2).
+   🔴 **경고가 아니라 안내다** — 빨강은 이 앱에서 '되돌릴 수 없는 일'의 색이다(탈퇴).
+      신청은 되돌릴 수 있으므로 주황(뜻을 가진 색 중 '살펴보라')을 쓴다.
+   ⚠️ 가운데 맞춤을 물려받으면 두 줄짜리 문장이 읽기 어렵다 — 왼쪽으로 되돌린다. */
+.dp-caution {
+  color: var(--orange);
+  background: var(--orange-weak);
+  text-align: left;
+  margin-top: 0;
+  margin-bottom: var(--space-12);
+  padding: var(--space-12);
+  border-radius: var(--radius-sm);
+}
 .doc-legend a { color: var(--primary); font-weight: 700; text-decoration: none; }
 .doc-legend {
   font-size: var(--t-xs);
