@@ -507,9 +507,17 @@ function esc(s) {
    🔴 반드시 `esc()` **앞에** 부른다 — 되돌린 뒤 다시 감싸므로, `&lt;script&gt;` 가 섞여 있어도
       화면에는 글자로만 뜬다(먼저 esc 하면 `&amp;nbsp;` 가 돼 영영 안 풀린다).
    🔴 목록은 늘리지 않는다 — 숫자 기호(`&#NN;`)까지 열면 보이지 않는 제어문자가 들어온다. */
-const ENTITIES = { nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", '#39': "'", '#160': ' ' };
+/* 🔴 여기 없는 기호는 학생 화면에 **글자 그대로** 뜬다 — 데이터에 실제로 있는 것만 담는다.
+   `middot` 는 2026-09-13 에 더했다: 금액 근거 줄(`amountSpec.raw`)에 게시판이 담아 온
+   `취 &middot; 창업지원금` 이 그대로 들어 있었다(실측 4건). 관문 ui-tone ⑦ 이
+   **데이터에 나오는 기호를 전부 아는지** 세므로, 새 기호가 들어오면 그때 빨간불이 된다. */
+const ENTITIES = { nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", '#39': "'", '#160': ' ', middot: '·' };
+/* 🔴 **목록을 두 벌 두지 않는다** (2026-09-13). 예전에는 정규식에 이름이 한 벌 더 박혀 있어서,
+   ENTITIES 에 `middot` 를 더해도 정규식이 그걸 몰라 **아무 일도 안 일어났다**(실측).
+   이 저장소가 여러 번 데인 자리다 — 목록에서 정규식을 만든다. */
+const ENTITY_RE = new RegExp('&(' + Object.keys(ENTITIES).join('|') + ');', 'g');
 function unent(s) {
-  return String(s == null ? '' : s).replace(/&(nbsp|amp|lt|gt|quot|apos|#39|#160);/g, (m, k) => ENTITIES[k]);
+  return String(s == null ? '' : s).replace(ENTITY_RE, (m, k) => ENTITIES[k]);
 }
 
 /* 외부 링크 안전화 — http(s)·mailto만 허용한다. 수집 로봇이 받아 온 데이터가 오염되거나
@@ -2622,8 +2630,14 @@ function amountDetailRow(m, opt) {
      안쪽 `원문 보기` 를 여닫는 클릭은 이동이 아니다 — 아래 핸들러가 details·a 를 걸러낸다. */
   const cls = (o.dim ? 'ad-row dim' : 'ad-row') + ' tappable';
   const merged = (m.mergedFrom || []).length;
-  const raw = a && a.raw ? a.raw : '';
-  const exRaw = sch.exclusivity && sch.exclusivity.raw ? sch.exclusivity.raw : '';
+  /* 🔴 **수집한 글이므로 `esc()` 앞에서 기호를 되돌린다** (2026-09-13).
+     이 두 줄은 게시판 원문에서 그대로 온다 — `취 &middot; 창업지원금` 처럼 HTML 기호가
+     섞여 있고, `esc()` 만 하면 `&` 가 한 번 더 감싸져 학생 화면에 **글자로** 뜬다.
+     ⚠️ 순서를 뒤집지 말 것 — `esc()` 뒤에 되돌리면 `&amp;middot;` 가 돼 영영 안 풀린다.
+     (2026-09-11 에 `n.title`·`n.deadlineHint` 에서 같은 사고가 있었다. 그때 관문은
+      **칸 이름 두 개만** 보는 손 목록이라 이 자리를 못 잡았다 — 관문도 함께 넓혔다.) */
+  const raw = a && a.raw ? unent(a.raw) : '';
+  const exRaw = sch.exclusivity && sch.exclusivity.raw ? unent(sch.exclusivity.raw) : '';
   return `<div class="${cls}" data-goto="${esc(sch.id)}" role="button" tabindex="0">
     <div class="ad-top"><p class="ad-name">${esc(sch.name || '')}</p>
       <p class="ad-val ${o.tone || ''}">${o.check ? '<span class="ad-chk">✓</span>' : ''}${esc(val)}</p></div>

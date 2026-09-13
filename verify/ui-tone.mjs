@@ -308,6 +308,27 @@ console.log('\n■ 수집한 글의 HTML 기호를 글자로 띄우지 않는다
     for (const m of l.matchAll(/esc\(\s*(n\.(?:title|deadlineHint))\s*\)/g)) bare.push(`${i + 1}:${m[1]}`);
   });
   eq('게시판에서 온 글은 전부 unent 를 거친다', bare, []);
+
+  /* 🔴 **칸 이름을 손으로 적는 목록은 썩는다** (2026-09-13에 실제로 썩은 것을 잡았다).
+     위 검사는 `n.title`·`n.deadlineHint` 둘만 본다. 그래서 금액 근거 줄
+     (`amountSpec.raw`·`exclusivity.raw`)이 `&middot;` 를 글자 그대로 띄우는 것을 못 잡았다.
+     → 이제 **데이터에 실제로 나오는 기호를 앱이 전부 아는지** 센다. 칸 이름을 안 적으므로
+        새 칸이 생겨도, 새 기호가 들어와도 그때 빨간불이 된다. */
+  const ENT_LIST = (app.match(/const ENTITIES = \{(.*?)\};/) || [, ''])[1];
+  const knownEnt = [...ENT_LIST.matchAll(/(?:'([^']+)'|([A-Za-z]+))\s*:/g)].map((m) => m[1] || m[2]);
+  eq('앱이 아는 기호 목록을 읽어 냈다 (못 읽으면 아래가 헛돈다)', knownEnt.length > 0, true);
+  /* 🔴 정규식에 목록이 한 벌 더 있으면 갈라진다 — ENTITIES 에 더해도 안 먹던 자리다 */
+  eq('되돌리는 정규식을 그 목록에서 만든다 (두 벌로 두지 않는다)',
+     /new RegExp\('&\(' \+ Object\.keys\(ENTITIES\)/.test(app), true);
+
+  const seen = new Set();
+  for (const f of ['data/registered.json', 'data/notices.json', 'data/kosaf-open.json']) {
+    let raw = '';
+    try { raw = R(f); } catch { continue; }   // 이 파일이 이미 쓰는 읽기 함수 (경로 규칙 한 벌)
+    for (const m of raw.matchAll(/&(#?[a-zA-Z0-9]{2,8});/g)) seen.add(m[1]);
+  }
+  eq('데이터에 나오는 HTML 기호를 앱이 전부 안다',
+     [...seen].filter((k) => !knownEnt.includes(k)), []);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 되돌아간 곳이 있습니다` : '\n✓ 말투·토큰 관문 전부 통과');

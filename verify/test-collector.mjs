@@ -3893,6 +3893,33 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
   eq('  못 가져오면 조용히 넘어가지 않고 멈춘다', /throw new Error\(`app\.js 에서/.test(ws), true);
 }
 
+console.log('\n■ 만들어 놓고 안 돌리는 로봇이 없는가 (2026-09-13 · 노션 F-9)');
+{
+  /* 🔴 왜 있나 — `collector/extract-amounts.mjs` 는 2026-08-27 에 만들어졌는데
+     **어느 워크플로에도 걸려 있지 않았다.** 그래서 원문에 `장학금액 : 최대 1,000,000 원`
+     이라고 또렷이 적혀 있는데도 registered.json 은 '금액 원문 확인' 인 채였다 —
+     실측으로 마감 전 20건 중 금액을 아는 것이 **2건**뿐이었고, 한 번 돌리니 14건이 찼다.
+     이 저장소가 이미 배운 문장 그대로다: **안내문에 적는 것은 리포트고, 강제하는 것은
+     워크플로와 훅뿐이다.** 같은 일이 또 생기지 않게 여기서 못 박는다.
+     ⚠️ 목록을 넓히려면 '데이터를 고쳐 저장하는 로봇' 만 넣는다 — 조회·리포트 로봇까지
+        넣으면 관문이 잡음이 되고, 잡음이 된 관문은 꺼진다. */
+  const MUST_RUN = [
+    ['collector/extract-amounts.mjs', '금액·이중수혜를 원문에서 읽어 registered.json 에 넣는다'],
+    ['collector/extract-excerpts.mjs', '원문 발췌·마감일을 registered.json 에 넣는다'],
+  ];
+  /* 🔴 **주석을 걷고 본다** — 안 걷으면 "이 로봇이 안 걸려 있었다" 고 적어 둔 **설명 주석**의
+     글자를 읽고 통과한다. 만들면서 실제로 그랬다: 단계를 통째로 지웠는데도 초록불이었다.
+     (2026-09-10 서체 관문·2026-08-31 what-shows 관문이 똑같이 새던 자리다.) */
+  const stripYmlComments = (t) => t.split('\n').filter((l) => !/^\s*#/.test(l)).join('\n');
+  const wf = fs.readdirSync(new URL('../.github/workflows/', import.meta.url))
+    .filter((f) => f.endsWith('.yml'))
+    .map((f) => stripYmlComments(readText(new URL('../.github/workflows/' + f, import.meta.url))))
+    .join('\n');
+  for (const [file, what] of MUST_RUN) {
+    eq(`${file} 을 실제로 돌리는 워크플로가 있다 (${what})`, wf.includes(file), true);
+  }
+}
+
 console.log('\n■ 지역 요건 — 거주지·학교 위치·출신 고교를 가른다 (2026-09-13 · 노션 백로그 G-6)');
 {
   const MEg = createRequire(import.meta.url)('../match-engine.js');
