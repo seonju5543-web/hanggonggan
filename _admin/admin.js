@@ -743,7 +743,40 @@ function cleanIds() {
 }
 
 /* ---------------- 목록 한 줄 ---------------- */
+/** 이 목록의 **모든 줄이 같은 값**인 칸을 찾는다.
+ *  🔴 실측: 「컨펌 작업대」 14줄이 전부 '검수 전' 이었고, 거의 전부 '금액 미확인' 이었으며,
+ *  10줄이 '마감일 없음' 을 배지와 오른쪽 칸에 **두 번** 달고 있었다. 학교도 거의 전부 같았다.
+ *  줄마다 다른 것은 제목뿐인데 같은 말이 줄 수만큼 반복돼 정작 제목이 묻혔다.
+ *  전부 같은 값은 줄에서 빼고 **머리줄에 한 번** 적는다. */
+function commonMeta(items) {
+  const out = {};
+  if (items.length < 3) return out;              // 몇 줄 안 되면 묶는 이득이 없다
+  const same = (get) => {
+    const first = get(items[0]);
+    return items.every((x) => get(x) === first) ? first : null;
+  };
+  const st = same((x) => statusOf(x));
+  if (st) out.status = STATUS_LABEL[st];
+  const sc = same((x) => schoolOf(x));
+  if (sc) out.school = sc;
+  const ch = same((x) => channelOf(x));
+  if (ch) out.channel = CHANNEL_LABEL[ch];
+  return out;
+}
+
+/** 머리줄에 '이 목록은 전부 …' 라고 한 번 적는다 */
+function commonMetaHtml(common) {
+  const parts = [];
+  if (common.status) parts.push(common.status);
+  if (common.school) parts.push(common.school);
+  if (common.channel) parts.push(common.channel);
+  return parts.length
+    ? `<p class="muted">이 목록은 전부 <b>${parts.map(esc).join(' · ')}</b> 입니다 — 줄마다 되풀이하지 않습니다.</p>`
+    : '';
+}
+
 function rowHtml(it, opt = {}) {
+  const cm = opt.common || {};
   const fi = formIdSet();
   const st = statusOf(it);
   const badges = badgesOf(it, fi);
@@ -759,13 +792,20 @@ function rowHtml(it, opt = {}) {
       <div>
         <div class="t" data-row-title>${esc(it.name)}</div>
         <div class="m">
-          <span>${esc(schoolOf(it))}</span>
+          ${cm.school ? '' : `<span>${esc(schoolOf(it))}</span>`}
           <span>${esc(it.provider || '')}</span>
-          <span>${esc(CHANNEL_LABEL[channelOf(it)])}</span>
+          ${cm.channel ? '' : `<span>${esc(CHANNEL_LABEL[channelOf(it)])}</span>`}
         </div>
-        ${badges.length ? `<div class="badges">${badges.map((b) => `<span class="pill ${badgeTone(b)}">${esc(b)}</span>`).join('')}</div>` : ''}
+        ${(() => {
+    /* 🔴 **같은 말을 한 줄에 두 번 하지 않는다** — '마감일 없음' 은 바로 오른쪽 칸(ddayHtml)이
+       이미 말한다. 배지로 또 달면 한 줄에서 같은 사실이 두 번 읽힌다(실측으로 10줄이 그랬다). */
+    const shownB = badges.filter((b) => b !== '마감일 없음');
+    return shownB.length
+      ? `<div class="badges">${shownB.map((b) => `<span class="pill ${badgeTone(b)}">${esc(b)}</span>`).join('')}</div>`
+      : '';
+  })()}
       </div>
-      <div><span class="pill ${st}">${STATUS_LABEL[st]}</span></div>
+      <div>${cm.status ? '' : `<span class="pill ${st}">${STATUS_LABEL[st]}</span>`}</div>
       <div>${ddayHtml(it)}</div>
       ${opt.act ? `<div class="row-act"><button class="btn btn-sm btn-primary" data-quick-confirm="${esc(it.id)}">컨펌</button></div>` : ''}
     </div>`;
@@ -875,7 +915,17 @@ const SORTS = {
 function sortItems(items) {
   const s = SORTS[F.sort] || SORTS.deadline;
   const sign = F.dir === 'desc' ? -1 : 1;
+  /* 🔴 **마감이 지난 것은 '임박'이 아니다** (2026-09-13).
+     예전에는 기본 화면(마감 임박순)의 첫 구획이 「마감 지남 28건」이었다 —
+     48건 중 28건이 이미 끝난 공고인데 그게 맨 위를 차지하고, 정작 봐야 할 검수 전 14건은
+     한참 스크롤해야 나왔다. 끝난 것은 '값이 없는 것' 과 같이 **뒤로** 보낸다.
+     ⚠️ 숨기지는 않는다 — 필터로 '마감·종료' 를 고르면 그대로 보인다. 자리만 옮긴다. */
+  const past = (it) => { const d = dday(it.deadline); return d != null && d < 0; };
   return items.slice().sort((a, b) => {
+    if (F.sort === 'deadline') {
+      const pa = past(a), pb = past(b);
+      if (pa !== pb) return pa ? 1 : -1;
+    }
     const va = s.get(a), vb = s.get(b);
     if (!va && !vb) return 0;
     if (!va) return 1;          // 값이 없는 것은 방향과 무관하게 뒤로
@@ -1000,17 +1050,24 @@ function renderList() {
 /* ---------------- 스캔 지점 (B0-6) ----------------
    166줄이 똑같은 높이·색으로 이어지면 눈이 멈출 자리가 없어 '어디까지 봤는지'를 잃는다.
    마감 임박순으로 볼 때만 기한 구획으로 나눈다 — 다른 정렬에서는 구획이 뜻을 잃는다. */
+/* 🔴 순서가 곧 화면의 첫인상이다. '마감 지남' 은 **맨 아래**다 —
+   위 sortItems 가 끝난 공고를 뒤로 보내므로 구획도 그 순서로 나온다.
+   ⚠️ test 는 위에서부터 처음 맞는 것을 쓰므로 좁은 것이 먼저 와야 한다(오늘·내일 → 이번 주 → …).
+      'over' 를 아래로 내리면서 다른 칸의 `d != null && d <= n` 이 음수도 잡게 되므로
+      **'지나지 않았다'(d >= 0)를 함께 본다.** 안 그러면 마감 지난 것이 '오늘·내일' 로 들어간다. */
 const BUCKETS = [
+  { k: 'now', label: '오늘·내일', test: (d) => d != null && d >= 0 && d <= 1 },
+  { k: 'week', label: '이번 주 (7일 이내)', test: (d) => d != null && d >= 0 && d <= 7 },
+  { k: 'month', label: '이번 달 (30일 이내)', test: (d) => d != null && d >= 0 && d <= 30 },
+  { k: 'later', label: '그 뒤', test: (d) => d != null && d >= 0 },
   { k: 'over', label: '마감 지남', test: (d) => d != null && d < 0 },
-  { k: 'now', label: '오늘·내일', test: (d) => d != null && d <= 1 },
-  { k: 'week', label: '이번 주 (7일 이내)', test: (d) => d != null && d <= 7 },
-  { k: 'month', label: '이번 달 (30일 이내)', test: (d) => d != null && d <= 30 },
-  { k: 'later', label: '그 뒤', test: (d) => d != null },
   { k: 'none', label: '기한 미확인', test: () => true },
 ];
 
 function groupedRows(items) {
-  if (F.sort !== 'deadline') return `<div class="rows" data-rows>${items.map(rowHtml).join('')}</div>`;
+  const cm = commonMeta(items);
+  const row = (it) => rowHtml(it, { common: cm });
+  if (F.sort !== 'deadline') return `${commonMetaHtml(cm)}<div class="rows" data-rows>${items.map(row).join('')}</div>`;
   const groups = new Map();
   items.forEach((it) => {
     const d = dday(it.deadline);
@@ -1018,10 +1075,10 @@ function groupedRows(items) {
     if (!groups.has(b.k)) groups.set(b.k, { label: b.label, list: [] });
     groups.get(b.k).list.push(it);
   });
-  return [...groups.values()].map((g) => `
+  return commonMetaHtml(cm) + [...groups.values()].map((g) => `
     <div class="group" data-group>
       <h3 class="group-head" data-group-head>${esc(g.label)} <span class="group-n" data-group-n>${g.list.length}</span></h3>
-      <div class="rows" data-rows>${g.list.map(rowHtml).join('')}</div>
+      <div class="rows" data-rows>${g.list.map(row).join('')}</div>
     </div>`).join('');
 }
 
@@ -1090,7 +1147,7 @@ function renderReview() {
     ${selBarHtml()}
     <div class="sec-head">
       <h2>컨펌 작업대</h2>
-      <p>왼쪽에 앱1에 나갈 내용, 오른쪽에 공고 원문을 나란히 놓고 확인합니다.
+      <p>줄을 누르면 <b>왼쪽에 앱1에 나갈 내용, 오른쪽에 저장해 둔 공고 원문</b>을 나란히 놓고 확인합니다.
          마감이 급한 것부터 위에 옵니다.</p>
     </div>
 
@@ -1112,7 +1169,11 @@ function renderReview() {
       </div>
     </div>
 
-    ${unrev.length ? `<div class="rows" data-rows>${unrev.map((it) => rowHtml(it, { pick: true, act: true })).join('')}</div>`
+    ${unrev.length ? (() => {
+    const cm = commonMeta(unrev);
+    return `${commonMetaHtml(cm)}
+      <div class="rows" data-rows>${unrev.map((it) => rowHtml(it, { pick: true, act: true, common: cm })).join('')}</div>`;
+  })()
     : '<p class="empty">검수 전 공고가 없습니다. 모두 확인되었습니다.</p>'}
 
     ${unregHtml()}

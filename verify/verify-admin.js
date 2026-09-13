@@ -236,6 +236,27 @@ function serve() {
   await page.waitForSelector('#screen-quality:not([hidden])');
   ok(/데이터 품질/.test(await page.textContent('#screen-quality')), '⑥ 데이터 품질 화면이 그려진다');
 
+  /* 줄마다 같은 말을 되풀이하지 않는다 (2026-09-13)
+     🔴 실측: 「컨펌 작업대」 14줄이 전부 '검수 전' 이었고, 10줄이 '마감일 없음' 을
+     배지와 오른쪽 칸에 **두 번** 달고 있었다. 줄마다 다른 것은 제목뿐인데 같은 말이
+     줄 수만큼 반복돼 정작 제목이 묻혔다. */
+  {
+    await page.click('.tab[data-tab="review"]');
+    await page.waitForSelector('#screen-review:not([hidden])');
+    const rep = await page.evaluate(() => {
+      const rows = [...document.querySelectorAll('#screen-review [data-row]')];
+      const n = rows.length;
+      const withStatus = rows.filter((r) => /검수 전/.test(r.textContent)).length;
+      const twice = rows.filter((r) => (r.textContent.match(/마감일 없음/g) || []).length > 1).length;
+      return { n, withStatus, twice };
+    });
+    ok(rep.n >= 3 && rep.withStatus === 0,
+      '전부 같은 상태면 줄마다 되풀이하지 않는다', `${rep.n}줄 중 상태를 되풀이한 줄 ${rep.withStatus}`);
+    ok(/이 목록은 전부/.test(await page.textContent('#screen-review')),
+      '대신 머리줄에 한 번 적는다');
+    ok(rep.twice === 0, "한 줄 안에서 '마감일 없음' 을 두 번 말하지 않는다", `${rep.twice}줄`);
+  }
+
   /* ⑥-2 같은 원인을 한 줄로 묶는다 (2026-09-13)
      🔴 실측으로 경고 11건 = 서로 다른 원인 2개였고, 그중 하나가 10건이었다.
      예전에는 한 글자도 안 다른 같은 문장이 열 줄을 채웠다. */
@@ -983,6 +1004,21 @@ function serve() {
   }
   const groups = await page.locator('#screen-list [data-group-head]').count();
   ok(groups >= 2, '마감 임박순에서는 기한 구획으로 나뉜다', `${groups}구획`);
+  /* 🔴 **끝난 공고가 첫 화면을 차지하지 않는다** (2026-09-13).
+     실측으로 48건 중 28건이 마감 지난 것이었고, 기본 정렬(마감 임박순)의 첫 구획이
+     「마감 지남 28건」이었다 — 정작 봐야 할 검수 전 14건은 한참 스크롤해야 나왔다.
+     ⚠️ 숨긴 것이 아니다. 자리만 뒤로 옮겼는지 본다(건수는 위 검사가 48/48로 지킨다). */
+  {
+    const heads = await page.evaluate(() => [...document.querySelectorAll('#screen-list [data-group-head]')]
+      .map((h) => h.textContent.trim()));
+    const over = heads.findIndex((h) => /마감 지남/.test(h));
+    ok(over !== 0, '마감 임박순에서 끝난 공고가 맨 위에 오지 않는다',
+      heads.length ? heads.map((h) => h.split(' ')[0]).join(' → ') : '구획 없음');
+    if (over >= 0) {
+      ok(over === heads.length - 1 || /기한 미확인/.test(heads[heads.length - 1] || ''),
+        "'마감 지남' 은 맨 아래 구획이다");
+    }
+  }
   const grouped = await page.evaluate(() => {
     const heads = [...document.querySelectorAll('#screen-list [data-group-head]')];
     const sum = [...document.querySelectorAll('#screen-list [data-group] [data-rows]')]
