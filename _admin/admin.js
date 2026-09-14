@@ -652,7 +652,7 @@ function renderTodo() {
   const scanWasOpen = !!(byId('todo-src-scan') && byId('todo-src-scan').open);
 
   byId('screen-todo').innerHTML = `
-    <div class="sec-head">
+    <div class="sec-head" data-screen-title>
       <h2>오늘 할 일</h2>
       <p>눌러야 할 것만 모았습니다. 숫자를 구경하는 화면이 아닙니다.</p>
     </div>
@@ -1328,7 +1328,7 @@ function renderList() {
   }
 
   byId('screen-list').innerHTML = `
-    <div class="sec-head">
+    <div class="sec-head" data-screen-title>
       <h2>공고 전체</h2>
       <p>학생 조건과 상관없이 등록된 ${D.reg.length}건을 모두 봅니다. 줄을 누르면 상세·수정이 열립니다.</p>
     </div>
@@ -1488,7 +1488,7 @@ function renderReview() {
 
   byId('screen-review').innerHTML = `
     ${selBarHtml()}
-    <div class="sec-head">
+    <div class="sec-head" data-screen-title>
       <h2>컨펌 작업대</h2>
       <p>줄을 누르면 <b>왼쪽에 앱1에 나갈 내용, 오른쪽에 저장해 둔 공고 원문</b>을 나란히 놓고 확인합니다.
          마감이 급한 것부터 위에 옵니다.</p>
@@ -1984,7 +1984,7 @@ function renderInsta() {
   const nf = (v) => (v == null ? '—' : String(v));
 
   box.innerHTML = `
-    <div class="sec-head">
+    <div class="sec-head" data-screen-title>
       <h2>인스타</h2>
       <p>새 공고가 수집되면 로봇이 카드를 그려 개발자 셋에게 이슈·메일로 보냅니다. 여기서 보고 <b>게시</b>를 누르면 올라갑니다 —
          자동으로는 안 올립니다. 고치고 싶으면 Claude Code 채팅에 말하면 됩니다(수정본 그림을 보여 주고, 다시 보낼지 물어본 뒤 보냅니다).</p>
@@ -2244,7 +2244,7 @@ function renderRobots() {
     </div>`;
 
   box.innerHTML = `
-    <div class="sec-head">
+    <div class="sec-head" data-screen-title>
       <h2>로봇</h2>
       <p>로봇이 무슨 말을 하고 있는지 먼저 보고, 필요하면 여기서 바로 돌립니다.</p>
     </div>

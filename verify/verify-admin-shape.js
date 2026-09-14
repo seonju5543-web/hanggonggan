@@ -32,12 +32,20 @@ const eq = (name, got, want) => {
   console.log(`  ${ok ? '✓' : '✕'} ${name}${ok ? '' : `\n      받은 값 ${JSON.stringify(got)} / 앱1 ${JSON.stringify(want)}`}`);
 };
 
-/* 짝 — [관리자 표본 이름, 앱1 표본 이름, 볼 것들] */
+/* 짝 — [관리자 표본 이름, 앱1 표본 이름, 볼 것들]
+   ⚠️ `btn ↔ btn` 은 **모양만** 댄다 — 관리자의 기본 버튼은 흰 면 + 1px 테두리라
+      앱1 `.btn-outline` 에 해당한다(앱1 `.btn` 은 면도 테두리도 없다). 일부러 면을 안 댄다.
+   ⚠️ 글자 크기와 여백은 어디서도 대지 않는다 — 관리자는 앱1 척도에서 한 단 위를 쓰기로
+      개발자가 정했다(2026-09-13). */
 const PAIRS = [
   ['btn',       'btn',       ['borderRadius', 'fontWeight']],
-  ['btnPrimary', 'btnPrimary', ['borderRadius', 'backgroundColor', 'hasShadow']],
+  ['btnPrimary', 'btnPrimary', ['borderRadius', 'backgroundColor', 'boxShadow']],
   ['btnSm',     'btnSm',     ['borderRadius']],
   ['chip',      'chip',      ['borderRadius', 'borderTopWidth', 'fontWeight']],
+  /* 🔴 **켜진 칩까지 댄다** — 2026-09-14 에 여기가 비어 있어서, 이 파일이 초록불인 채로
+     개발자가 정한 값(Apple 7번 · style.css:4295)이 관리자에서만 옛 값으로 되돌아가 있었다.
+     상태(:hover·:active·.on)를 안 대면 '모양 관문'이라는 이름이 절반만 참이 된다. */
+  ['chipOn',    'chipOn',    ['borderRadius', 'backgroundColor', 'borderTopColor', 'color', 'boxShadow']],
   ['pill',      'badge',     ['borderRadius']],
   ['empty',     'empty',     ['borderRadius', 'backgroundColor', 'borderTopWidth']],
   ['row',       'schCard',   ['borderRadius', 'backgroundColor', 'borderBottomWidth', 'borderTopWidth']],
@@ -45,12 +53,19 @@ const PAIRS = [
   ['textarea',  'textarea',  ['borderRadius']],
 ];
 
+/* 누름 반응 — 같은 비율이어야 한다 (앱1 Apple 20번 · style.css:4306).
+   🔴 **마우스로 재지 말 것** — page.hover() 는 :hover 를 같이 켜므로 :active 를 지워도
+   초록불이 난다(CLAUDE.md 2026-09-12 '누를 때의 표시' 절과 같은 함정).
+   CDP 로 :active 만 켜서 잰다. */
+const PRESSED = [['btn', 'btn'], ['chip', 'chip']];
+
 /* 표본 — 두 CSS 가 같은 뜻으로 쓰는 것끼리 짝짓는다 */
 const ADMIN_HTML = `
   <button id="btn" class="btn">a</button>
   <button id="btnPrimary" class="btn btn-primary">a</button>
   <button id="btnSm" class="btn btn-sm">a</button>
   <button id="chip" class="chip">a</button>
+  <button id="chipOn" class="chip on">a</button>
   <span id="pill" class="pill">a</span>
   <div id="empty" class="empty">a</div>
   <div class="rows"><div id="row" class="row">a</div><div class="row">b</div></div>
@@ -63,6 +78,7 @@ const APP1_HTML = `
   <button id="btnPrimary" class="btn btn-primary">a</button>
   <button id="btnSm" class="btn btn-sm">a</button>
   <button id="chip" class="chip">a</button>
+  <button id="chipOn" class="chip active">a</button>
   <span id="badge" class="badge">a</span>
   <div id="empty" class="empty">a</div>
   <button id="schCard" class="sch-card">a</button>
@@ -70,7 +86,8 @@ const APP1_HTML = `
   <input id="input" type="text"><textarea id="textarea"></textarea>
   </div></div>`;
 
-const PROPS = ['borderRadius', 'backgroundColor', 'fontWeight', 'borderTopWidth', 'borderBottomWidth', 'borderLeftWidth'];
+const PROPS = ['borderRadius', 'backgroundColor', 'color', 'fontWeight', 'boxShadow',
+  'borderTopWidth', 'borderBottomWidth', 'borderLeftWidth', 'borderTopColor'];
 
 (async () => {
   const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH });
@@ -83,11 +100,29 @@ const PROPS = ['borderRadius', 'backgroundColor', 'fontWeight', 'borderTopWidth'
         const c = getComputedStyle(el);
         const o = {};
         for (const p of props) o[p] = c[p];
-        o.hasShadow = c.boxShadow !== 'none';
         r[el.id] = o;
       }
+      /* 🔴 모서리 토큰은 **글자로 읽지 않는다** — 이 파일 머리말이 그렇게 적어 놓고
+         예전엔 여기서만 정규식으로 첫 선언을 집었다(겹쳐 쓰는 집에서는 언제든 깨진다). */
+      const rs = getComputedStyle(document.documentElement);
+      r.__radii = Object.fromEntries(['--radius-xs', '--radius-sm', '--radius', '--radius-lg', '--radius-pill']
+        .map((k) => [k, rs.getPropertyValue(k).trim()]));
       return r;
     }, PROPS);
+
+    /* 누름(:active) 은 CDP 로만 켠다 */
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send('DOM.enable'); await cdp.send('CSS.enable');
+    const { root } = await cdp.send('DOM.getDocument');
+    for (const [, id] of [['', 'btn'], ['', 'chip']]) {
+      const { nodeId } = await cdp.send('DOM.querySelector', { nodeId: root.nodeId, selector: `#${id}` });
+      if (!nodeId) continue;
+      await cdp.send('CSS.forcePseudoState', { nodeId, forcedPseudoClasses: ['active'] });
+      await page.waitForTimeout(250);   // 전환이 끝난 뒤에 잰다
+      out[`${id}:active`] = { transform: await page.evaluate((x) => getComputedStyle(document.querySelector(`#${x}`)).transform, id) };
+      await cdp.send('CSS.forcePseudoState', { nodeId, forcedPseudoClasses: [] });
+      await page.waitForTimeout(250);
+    }
     await page.close();
     return out;
   };
@@ -114,12 +149,16 @@ const PROPS = ['borderRadius', 'backgroundColor', 'fontWeight', 'borderTopWidth'
   eq('목록 그릇에 테두리가 없다', adm.rowsBox.borderTopWidth, app.cardList.borderTopWidth);
   eq('목록 그릇에 모서리가 없다', adm.rowsBox.borderRadius, app.cardList.borderRadius);
 
+  /* 누름 반응 — 앱1과 같은 비율인가 */
+  console.log('\n■ 누르면 앱1과 같은 비율로 들어간다 (:active · CDP 로만 켠다)');
+  for (const [a, b] of PRESSED) {
+    eq(`${a}:active 의 transform`, adm[`${a}:active`], app[`${b}:active`]);
+  }
+
   /* 관리자만의 확장은 값을 대지 않고 **앱1 어휘 안인지**만 본다 */
   console.log('\n■ 관리자 확장(요약 카드)도 앱1 어휘 안에 있다');
-  const radii = Object.fromEntries(['--radius-xs', '--radius-sm', '--radius', '--radius-lg', '--radius-pill']
-    .map((k) => [k, (R('style.css').match(new RegExp(`${k}:\\s*([^;]+);`)) || [])[1]?.trim()]));
   eq('요약 카드 모서리가 앱1 모서리 여섯 단 안에 있다',
-    Object.values(radii).includes(adm.card.borderRadius), true);
+    Object.values(app.__radii).includes(adm.card.borderRadius), true);
   eq('요약 카드에 테두리를 두르지 않는다 (앱1 은 면으로 세운다)', adm.card.borderLeftWidth, '0px');
 
   console.log(fail ? `\n✕ 실패 ${fail}건 — 앱1과 모양이 갈라졌습니다` : '\n✓ 모양 관문 전부 통과');

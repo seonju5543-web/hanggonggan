@@ -1044,7 +1044,112 @@ function serve() {
   ok(barGeom && barGeom.inView, '선택 바가 화면 안에 보인다');
   /* 화면 안내 문구와 실제 위치가 어긋나면 안 된다 (예전엔 '아래'라 적고 위에 붙였다) */
   ok(/화면 아래/.test(await page.textContent('#screen-review')), '안내 문구가 실제 위치와 맞다');
+
+  /* 🔴 ⑯-2 **화면 제목 밑줄은 고른 뒤에도 남아야 한다** (2026-09-14 코드 리뷰가 잡았다).
+     이 화면은 제목 **앞에** 선택 바를 그리는데 그 바는 고른 것이 있을 때만 나온다. 밑줄을
+     `:first-child` 로 찾고 있었더니, 체크를 하나 누르는 순간 밑줄이 사라지고 대신 제목 위에
+     가로줄이 그어졌다(잰 값: 96.73px → 0 · border-top 0 → 1px). 지금은 표식으로 찾는다. */
+  const titleNow = await page.evaluate(() => {
+    const h = document.querySelector('#screen-review [data-screen-title] h2');
+    if (!h) return null;
+    return { under: getComputedStyle(h, '::after').width,
+             rule: getComputedStyle(h.parentElement).borderTopWidth };
+  });
+  ok(titleNow && parseFloat(titleNow.under) > 10, '고른 뒤에도 화면 제목 밑줄이 남는다', JSON.stringify(titleNow));
+  ok(titleNow && parseFloat(titleNow.rule) === 0, '고른 뒤에도 화면 제목 위에 줄이 안 생긴다', JSON.stringify(titleNow));
+
+  /* 🔴 ⑯-3 **탭을 연 직후에도** 선택 바가 화면 안에 있어야 한다 (2026-09-14).
+     화면(.screen)에 등장 애니메이션이 있고 그것이 transform 을 쓰면, 도는 동안 그 화면이
+     `position: fixed` 의 기준을 가로채 선택 바가 화면 밖으로 밀린다. 처음엔 `both` 라
+     **영구히** 4,054px 아래였고(이 검사가 잡았다), `backwards` 로 고친 뒤에도 **0.22초 동안은**
+     같았다. 지금은 등장에서 transform 을 뺐다 — 이 검사는 그것이 되돌아오면 빨간불이 된다.
+     ⚠️ 기다리지 않고 잰다. 기다리면 애니가 끝나 버려 이 검사가 헛돈다. */
+  await page.click('.tab[data-tab="list"]');
+  await page.waitForTimeout(300);
+  await page.click('.tab[data-tab="review"]');
+  const barEarly = await page.evaluate(() => {
+    const bar = document.querySelector('[data-selbar]');
+    if (!bar) return null;
+    const b = bar.getBoundingClientRect();
+    return { inView: b.bottom <= window.innerHeight + 2, bottom: Math.round(b.bottom),
+             screenTransform: getComputedStyle(bar.closest('.screen')).transform };
+  });
+  ok(barEarly && barEarly.inView, '탭을 연 직후에도 선택 바가 화면 안에 있다', JSON.stringify(barEarly));
+  ok(barEarly && barEarly.screenTransform === 'none',
+    '  화면에 transform 이 없다 (있으면 화면 안의 fixed 가 전부 기준을 잃는다)', JSON.stringify(barEarly));
+
+  /* 🔴 ⑯-4 유리(backdrop-filter) 도 **transform 과 같은 함정**이다 — 그 안에 fixed 를 두면
+     기준이 화면이 아니라 그 유리가 된다. 지금은 하나도 없다(2026-09-14 실측). 나중에 머리줄
+     안에 고정 요소를 하나 넣는 순간 조용히 같은 일이 나므로 여기서 센다. */
+  const glassFixed = await page.evaluate(() => {
+    const out = [];
+    document.querySelectorAll('.topbar, .group-head').forEach((g) => {
+      g.querySelectorAll('*').forEach((e) => {
+        const pos = getComputedStyle(e).position;
+        if (pos === 'fixed' || pos === 'absolute') out.push((g.className || '?') + ' > ' + (e.className || e.tagName));
+      });
+    });
+    return out;
+  });
+  ok(glassFixed.length === 0, '유리(머리줄·구획 머리) 안에 화면 고정 요소가 없다', JSON.stringify(glassFixed));
+
   await page.click('[data-sel="none"]');
+  await page.waitForTimeout(200);
+
+  /* 🔴 ⑯-5 **구획 머리 글자와 줄 제목이 같은 자리에 선다** (2026-09-14 코드 리뷰).
+     구획 머리의 좌우 여백을 0 으로 두었더니 제목이 줄보다 16px 왼쪽에 섰다(66 vs 82).
+     앱1 은 둘이 정확히 같은 x 에 선다. 밀도를 바꿔도 같아야 한다. */
+  await page.click('.tab[data-tab="list"]');
+  await page.waitForSelector('#screen-list:not([hidden])');
+  /* 🔴 앞 단계가 '양식 보기'로 바꿔 놓았을 수 있다 — 공고 보기로 되돌리고 필터도 푼다.
+     안 그러면 잴 것이 없어 이 검사가 **영영 건너뛴 채 초록불**이 된다. */
+  const back = await page.$('#screen-list [data-lview="notices"]');
+  if (back) { await back.click(); await page.waitForTimeout(300); }
+  const all = await page.$('#screen-list [data-st="all"], #screen-list .ftag-all');
+  if (all) { await all.click(); await page.waitForTimeout(300); }
+  await page.waitForTimeout(400);
+  /* 🔴 모양(클래스)이 아니라 **표식**으로 찾는다 — 이 화면의 규칙이다 */
+  const alignAt = async () => page.evaluate(() => {
+    const sc = document.querySelector('#screen-list');
+    const g = sc.querySelector('[data-group-head]'); const t = sc.querySelector('[data-row-title]');
+    if (!g || !t) return { missing: { head: !g, rowTitle: !t } };
+    return { head: Math.round(g.getBoundingClientRect().x + parseFloat(getComputedStyle(g).paddingLeft)),
+             row: Math.round(t.getBoundingClientRect().x) };
+  });
+  const alignNormal = await alignAt();
+  await page.evaluate(() => document.documentElement.setAttribute('data-density', 'compact'));
+  await page.waitForTimeout(250);
+  const alignCompact = await alignAt();
+  await page.evaluate(() => document.documentElement.removeAttribute('data-density'));
+  await page.waitForTimeout(200);
+  /* ⚠️ **없으면 조용히 통과시키지 않는다** — 무엇이 없었는지 적고 건너뛴다(이 저장소가
+     'ㅇㅇ이 없어 0건인 채 초록불'로 여러 번 당했다). 픽스처에 구획이 생기면 저절로 켜진다. */
+  if (alignNormal && alignNormal.missing) {
+    ok(true, `구획 머리 정렬 — 잴 것이 없어 건너뜀 ${JSON.stringify(alignNormal.missing)}`);
+  } else {
+    ok(alignNormal && alignNormal.head === alignNormal.row,
+      '구획 머리 글자가 줄 제목과 같은 자리에 선다', JSON.stringify(alignNormal));
+    ok(alignCompact && !alignCompact.missing && alignCompact.head === alignCompact.row,
+      '  촘촘히 볼 때도 같다 (밀도를 바꿔도 제목이 옆으로 안 움직인다)', JSON.stringify(alignCompact));
+  }
+
+  /* 🔴 ⑯-6 **구역 머리 바로 밑의 빈 안내가 선을 또 긋지 않는다** (2026-09-14).
+     `선(구역 머리) → 제목 → 선(빈 안내)` 샌드위치가 세 곳 있었다. 앱1 이 똑같이 겪고
+     `.empty:first-child` 로 고쳤는데, 이 화면에서는 앞에 `.sec-head` 가 있어 그것만으로는
+     안 잡힌다(`.sec-head + .empty` 가 필요하다). */
+  const sandwich = await page.evaluate(() => {
+    const bad = [];
+    for (const t of ['todo', 'list', 'review', 'robots', 'insta']) {
+      document.querySelectorAll(`#screen-${t} .empty`).forEach((e) => {
+        const prev = e.previousElementSibling;
+        if (prev && parseFloat(getComputedStyle(prev).borderTopWidth) > 0
+            && parseFloat(getComputedStyle(e).borderTopWidth) > 0) bad.push(t + ': ' + e.textContent.trim().slice(0, 20));
+      });
+    }
+    return bad;
+  });
+  ok(sandwich.length === 0, '제목이 선 두 개 사이에 끼지 않는다', JSON.stringify(sandwich));
+  await page.click('.tab[data-tab="review"]');
   await page.waitForTimeout(200);
 
   /* ⑰ 자격 요건 편집 (D1) — 예전엔 화면에서 **읽기 전용**이라 못 읽은 자격을 채울 수 없었다.

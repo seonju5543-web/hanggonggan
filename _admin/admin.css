@@ -72,10 +72,9 @@
   --shadow:       0 1px 2px rgba(24, 35, 56, 0.05), 0 8px 22px rgba(24, 35, 56, 0.07);
   --shadow-sheet: 0 -14px 48px rgba(18, 26, 42, 0.20);
   --ring:         0 0 0 2px #27508f;
-  /* 앱1 의 '떠 있는 버튼'·'들리는 카드' 그림자 — 값은 style.css 실효값 그대로 */
+  /* 앱1 의 '떠 있는 버튼' 그림자 — 값은 style.css 실효값 그대로 */
   --shadow-btn:       0 6px 18px rgba(35, 32, 26, 0.22);
   --shadow-btn-hover: 0 8px 24px rgba(35, 32, 26, 0.28);
-  --shadow-lift:  0 2px 6px rgba(24, 35, 56, 0.07), 0 18px 40px rgba(24, 35, 56, 0.14);
 
   /* 움직임 — 앱1 그대로. 누르는 것 전부가 같은 속도로 답한다 */
   --dur:  0.22s;
@@ -230,15 +229,20 @@ a { color: var(--accent); }
    🔴 `width: fit-content` 를 빼지 말 것 — 앱1 이 실측으로 겪었다(빼면 밑줄이 화면 끝까지 간다). */
 .sec-head { display: flex; flex-direction: column; gap: var(--space-4); }
 .sec-head h2 { font-size: var(--t-xl); font-weight: 800; letter-spacing: -.02em; }
-.screen > .sec-head:first-child h2 {
+/* 🔴 **형제 순서(:first-child)로 찾지 말 것** (2026-09-14 코드 리뷰가 실측으로 잡았다).
+   작업대는 제목 **앞에** 선택 바를 그리는데(admin.js `${'$'}{selBarHtml()}`) 그 바는 **고른
+   것이 있을 때만** 나온다 — 그래서 체크를 하나 누르는 순간 「컨펌 작업대」 밑줄이 사라지고
+   대신 윗줄이 그어졌다(잰 값: 밑줄 96.73px → 0 · border-top 0 → 1px).
+   이 저장소 규칙 그대로 **표식**으로 찾는다(admin.js 가 다는 data-screen-title). */
+.sec-head[data-screen-title] h2 {
   position: relative; width: fit-content; padding-bottom: var(--space-8);
 }
-.screen > .sec-head:first-child h2::after {
+.sec-head[data-screen-title] h2::after {
   content: ''; position: absolute; left: 0; bottom: 0;
   width: 100%; height: 3px; border-radius: var(--radius-pill); background: var(--accent);
 }
 /* 구역 머리 — 앱1 .section-head (상자가 없으니 윗줄과 제목이 구조를 맡는다) */
-.screen > .sec-head:not(:first-child) {
+.screen > .sec-head:not([data-screen-title]) {
   border-top: 1px solid var(--rule); padding-top: var(--space-16); margin-top: var(--space-16);
 }
 .sec-head p { font-size: var(--t-sm); color: var(--text-sub); }
@@ -247,8 +251,11 @@ a { color: var(--accent); }
 .empty { color: var(--text-sub); font-size: var(--t-md); padding: var(--space-32) var(--space-20); text-align: center;
          border: 0; border-top: 1px solid var(--line); border-radius: 0; background: transparent; line-height: 1.7; }
 /* 🔴 구역 머리 바로 밑에 오면 **선 두 개 사이에 제목이 끼었다** — 앱1 이 똑같이 겪고
-   똑같이 고쳤다(style.css `.empty:first-child`). 맨 앞이면 자기 윗줄을 긋지 않는다. */
-.empty:first-child { border-top: 0; }
+   똑같이 고쳤다(style.css `.empty:first-child`). 맨 앞이면 자기 윗줄을 긋지 않는다.
+   ⚠️ **`:first-child` 만으로는 이 화면에서 안 잡힌다** — 구역 머리(.sec-head)가 앞에 있어
+   빈 안내는 둘째 자식이다. 실제로 세 곳이 `선-제목-선` 샌드위치였다(2026-09-14 코드 리뷰). */
+.empty:first-child,
+.sec-head + .empty { border-top: 0; }
 
 /* ── 버튼 ────────────────────────────────────── */
 /* 🔴 앱1 과 **같은 모양 언어**다 (2026-09-14 개발자 지시 — *"디자인 측면에서 전혀 바뀌지
@@ -298,7 +305,6 @@ a { color: var(--accent); }
   background: var(--surface-2); padding: var(--space-20) var(--space-20);
   display: flex; flex-direction: column; gap: var(--space-6);
 }
-.card:hover { box-shadow: var(--shadow-lift); }
 .card .k { font-size: var(--t-md); color: var(--text); font-weight: 650; }
 /* 숫자를 1.75rem(28px)에서 줄였다 — 제목의 2배라 눈이 숫자에만 가고
    '무엇에 대한 숫자인가'가 안 읽혔다 */
@@ -316,7 +322,9 @@ a { color: var(--accent); }
   border-radius: var(--radius-lg); background: var(--green-weak); font-size: var(--t-md); color: var(--text-sub);
 }
 .allclear-mark { color: var(--green); font-weight: 800; }
-.allclear-list { color: var(--text-weak); font-size: var(--t-sm); }
+/* ⚠️ 면을 --green-weak 로 칠하면서 --text-weak 는 2.83:1 이 됐다(흰 면에서도 3.30 이라
+   원래 14px 미만 금지였다). --text-sub 는 이 면 위에서 5.96:1 이다. */
+.allclear-list { color: var(--text-sub); font-size: var(--t-sm); }
 
 /* ── 필터 ────────────────────────────────────── */
 .filters {
@@ -330,8 +338,11 @@ a { color: var(--accent); }
 }
 /* 터치 목표 40px — 예전엔 약 26px이라 손가락으로 필터를 고를 수 없었다 */
 /* 앱1 의 칩은 **알약**이다(999px · 2px 테두리 · 글자 --text-sub).
-   켜진 칩도 면을 통째로 칠하지 않고 **흐린 면 + 짙은 테두리 + 2px 고리**로 말한다
-   (앱1 .chip.active). 예전 관리자 칩은 모서리 19px 에 켜지면 밝은 파랑을 꽉 칠했다. */
+   🔴 켜진 칩은 **칠하지도 올리지도 않고 테두리만 강조색 2px, 글자는 먹**이다
+   — `style.css:4295` (2026-09-11 개발자가 번호로 정한 Apple 7번). **줄 번호를 적어 두는
+   이유**: `.chip.active` 는 style.css 에 다섯 벌 있고(344 · 2358 · 2635 · 4227 · 4295)
+   앞엣것들은 전부 죽어 있다. 실제로 이 파일 첫 판이 344줄(2026-08-31 판 — 흐린 면 + 고리)을
+   베껴 와서, 개발자가 정한 값을 관리자 화면에서만 되돌린 꼴이 됐다(2026-09-14 코드 리뷰). */
 .chip {
   border: 2px solid rgba(18, 22, 31, 0.10); background: var(--surface); border-radius: var(--radius-pill);
   padding: var(--space-8) var(--space-16); font-size: var(--t-sm); font-weight: 550; color: var(--text-sub);
@@ -340,11 +351,12 @@ a { color: var(--accent); }
 }
 .chip:hover { background: var(--primary-weak); color: var(--text); }
 .chip:active { background: var(--primary-weak); }
-.chip.on { background: var(--primary-weak); border-color: var(--primary); color: var(--primary); box-shadow: var(--ring); }
+.chip.on { background: var(--surface); border-color: var(--accent); color: var(--text); box-shadow: none; }
 .chip .c { font-family: var(--mono); opacity: .85; margin-left: var(--space-4); font-size: var(--t-xs); }
-/* 뜻이 다른 칩도 **같은 짜임**으로 — 색만 갈아 끼운다(칠하지 않는다) */
-.chip.st-unreviewed.on { background: var(--warn-weak); border-color: var(--warn); color: var(--warn); box-shadow: 0 0 0 2px var(--warn); }
-.chip.st-closed.on { background: var(--surface-2); border-color: var(--text-sub); color: var(--text-sub); box-shadow: 0 0 0 2px var(--text-sub); }
+/* 뜻이 다른 칩도 **같은 짜임**으로 — 면은 그대로 두고 테두리 색만 갈아 끼운다.
+   ⚠️ 면을 칠하면 글자 대비가 같이 떨어진다(놋쇠 칩이 실제로 4.47:1 까지 내려갔었다). */
+.chip.st-unreviewed.on { background: var(--surface); border-color: var(--warn); color: var(--text); }
+.chip.st-closed.on { background: var(--surface); border-color: var(--text-sub); color: var(--text); }
 
 /* 접어 둔 필터 */
 /* 앱1 은 접는 묶음에도 상자를 두르지 않는다 — 윗줄 하나와 제목이 구조를 맡는다 */
@@ -439,7 +451,9 @@ input[type="search"] { min-width: 190px; flex: 1 1 190px; }
   -webkit-backdrop-filter: blur(20px) saturate(1.6);
   backdrop-filter: blur(20px) saturate(1.6);
   border: 0; border-top: 1px solid var(--rule); border-radius: 0;
-  padding: var(--space-12) 0 var(--space-8);
+  /* 🔴 좌우는 **줄(.row)과 같은 값**이어야 글자가 한 줄에 선다 — 0 으로 두었더니 구획 제목이
+     줄 제목보다 16px 왼쪽에 섰다(잰 값 66 vs 82). 앱1 은 둘이 정확히 같은 x 에 선다(20/20). */
+  padding: var(--space-12) var(--space-16) var(--space-8);
 }
 .group-n {
   font-family: var(--mono); font-size: var(--t-xs); font-weight: 700;
@@ -489,7 +503,7 @@ input[type="search"] { min-width: 190px; flex: 1 1 190px; }
 :root[data-density="compact"] .row { padding: var(--space-8) var(--space-12); gap: var(--space-4); }
 :root[data-density="compact"] .row .m { gap: var(--space-2) var(--space-12); }
 :root[data-density="compact"] .group + .group { margin-top: var(--space-12); }
-:root[data-density="compact"] .group-head { padding: var(--space-6) var(--space-12); }
+:root[data-density="compact"] .group-head { padding: var(--space-6) var(--space-12); }   /* 촘촘히 볼 때의 .row 좌우와 같은 값 */
 :root[data-density="compact"] th,
 :root[data-density="compact"] td { padding: var(--space-6) var(--space-12); }
 :root[data-density="compact"] .card { padding: var(--space-12) var(--space-16); }
@@ -758,24 +772,60 @@ td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space
               border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease),
               transform 0.14s var(--ease);
 }
-/* 누르면 살짝 들어간다 — 앱1 과 같은 비율 */
-.btn:active, .chip:active, .ftag:active, .sheet-close:active, .job-close:active { transform: scale(0.975); }
+/* 누르면 살짝 들어간다 — 앱1 과 같은 비율 **0.95**(`style.css:4306` · 2026-09-11 개발자가
+   정한 Apple 20번 "누를 수 있는 것 전부 같은 값"). ⚠️ 0.975 는 그 위에서 **덮인 옛 값**이다
+   — 이 파일 첫 판이 그것을 베껴 왔다(2026-09-14 코드 리뷰). */
+.btn:active, .chip:active, .ftag:active, .sheet-close:active, .job-close:active { transform: scale(0.95); }
 .card:active, .pgroup:active { transform: scale(0.99); }
 /* 🔴 목록 줄(.row)은 줄이지 않는다 — 테두리 안에 꽉 찬 줄이라 줄어들면 가장자리가 잘린다.
-   눌리는 느낌은 면 색(--primary-weak)이 이미 맡고 있다. */
-.card:hover { transform: translateY(-1px); }
+   눌리는 느낌은 면 색(--primary-weak)이 이미 맡고 있다.
+   🔴 **요약 카드를 손이 닿을 때 들어 올리지 않는다** — 앱1 은 그 들림을 `style.css:2504`
+   에서 **일부러 껐다**(`.sch-card:hover { transform: none; box-shadow: none }`). 앞쪽 2337줄의
+   `translateY(-1px) + --shadow-lift` 는 죽은 규칙이고, 이 파일 첫 판이 그것을 근거로 삼았다
+   (2026-09-14 코드 리뷰). 게다가 카드는 통째로 누르는 것이 아니라 안의 버튼을 누른다. */
 
 /* ── 등장 — 앱1 '⑥ 등장'과 같다. 화면이 툭 튀어나오지 않고 살짝 올라오며 도착한다.
    🔴 **화면(.screen)에만 건다.** 앱1 은 목록 카드에도 차례로 걸지만, 이 화면은 버튼 하나를
    누를 때마다 카드를 다시 그리므로 거기 걸면 **누를 때마다 전부 다시 깜빡인다.**
    탭을 바꿀 때만 도착하는 것이 맞다(display:none → flex 에서만 다시 돈다).
    ⚠️ 움직임을 줄이는 설정에서는 위쪽 `*{animation:none!important}` 이 이미 끈다. */
-@keyframes taste-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-/* 🔴 채우기는 `backwards` 다 — `both` 를 쓰지 말 것 (2026-09-14 실측으로 잡았다).
-   `both` 는 **끝난 뒤에도 마지막 칸을 계속 적용**하는데, 크롬은 그 `transform: none` 을
-   키워드가 아니라 **단위행렬(matrix(1,0,0,1,0,0))** 로 계산한다. 단위행렬이라도 transform 이
-   있으면 그 요소가 `position: fixed` 의 기준이 되어, 화면 안에 떠 있어야 할 **선택 바가
-   4,054px 아래**로 밀려났다(관문 verify-admin '선택 바가 화면 안에 보인다' 가 잡았다).
-   `backwards` 는 시작 전에만 첫 칸을 적용하고 끝난 뒤엔 아무것도 남기지 않는다 — 보이는
-   움직임은 같고 기준만 제자리로 돌아온다. */
+/* 🔴 **이 움직임에는 transform 을 쓰지 않는다** — 앱1 의 taste-in 은 10px 떠오르지만,
+   이 화면에는 `position: fixed` 인 선택 바가 화면(.screen) **안에** 있어서 transform 이
+   그 기준(containing block)을 가로챈다.
+   겪은 순서(전부 실측):
+     ① `both` 로 두었더니 끝난 뒤에도 크롬이 `transform: none` 을 **단위행렬**로 남겨
+        선택 바가 영구히 4,054px 아래로 밀렸다(관문 verify-admin 이 잡았다).
+     ② `backwards` 로 고치니 영구 문제는 사라졌는데, **도는 0.22초 동안은 그대로**여서
+        작업대 탭을 열 때마다 선택 바가 사라졌다 나타났다(잰 값: 70ms 에 top 3,993 →
+        470ms 에 top 822 · 2026-09-14 코드 리뷰).
+   그래서 **떠오름을 버리고 밝아짐만 남겼다.** 앱1 과 다른 유일한 자리이고, 이렇게 두면
+   나중에 이 화면 안에 fixed 를 하나 더 넣어도 같은 일이 안 난다. 되돌리지 말 것. */
+@keyframes taste-in { from { opacity: 0; } to { opacity: 1; } }
 .screen { animation: taste-in var(--dur) var(--ease) backwards; }
+
+/* ── 손가락 기기 보정 — hover 가 눌린 채 굳지 않게 (앱1 '⑧ 손가락 기기 보정' 과 같은 방식)
+   🔴 **새 hover 규칙은 반드시 이 묶음에도 적는다.** 앱1 이 그 안내를 style.css 에 적어 두었고,
+   이 파일은 그것을 안 지켜서 실측에서 잡혔다 — 390×844 · hasTouch 로 카드를 탭하니 손을
+   떼었는데도 들린 채(matrix(1,0,0,1,0,-1) + 그림자) 남아 있었다(2026-09-14 코드 리뷰).
+   ⚠️ 그림자·여백은 다시 적지 않는다 — 여기서 원래 값을 되풀이하면 토큰 밖 값이 한 벌 는다. */
+@media (hover: none) {
+  /* 🔴 **적는 차례가 곧 규칙이다** — 아래 다섯은 특이도가 같아 뒤엣것이 이긴다.
+     차례를 섞으면 빨간 '지우기' 버튼의 테두리나 으뜸 버튼의 남색이 손가락 기기에서만
+     회색으로 풀린다(모양이 같은 특이도끼리 부딪히는 자리다). */
+  .btn:hover { border-color: var(--rule); background: var(--surface); }
+  .btn.danger:hover { border-color: color-mix(in srgb, var(--red) 40%, transparent); }
+  .btn.good:hover { border-color: color-mix(in srgb, var(--green) 45%, transparent); }
+  .btn-ghost:hover { background: transparent; border-color: var(--line); }
+  .btn-primary:hover { background: var(--primary); border-color: var(--primary); box-shadow: var(--shadow-btn); }
+
+  .chip:hover { background: var(--surface); color: var(--text-sub); }
+  .chip.on:hover { color: var(--text); }
+
+  .tab:hover { color: var(--text-sub); }
+  .tab.active:hover { color: var(--text); }
+
+  .pick-line:hover { background: transparent; }
+  /* 🔴 목록 줄은 앱1 과 다르게 **면까지 되돌린다** — 이 화면에서는 체크로 줄을 고르므로,
+     눌린 채 남은 회색이 '고른 줄'로 읽힌다(앱1 의 공고 카드에는 그런 뜻이 없다). */
+  .row:hover { background: transparent; }
+}
