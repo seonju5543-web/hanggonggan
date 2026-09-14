@@ -10,10 +10,22 @@
        바깥으로 나가는 통신은 GitHub 두 곳으로만 제한한다. -->
   <!-- frame-ancestors(다른 사이트가 이 화면을 액자처럼 품는 것 막기)는 메타 태그로는 무시된다.
        그건 _headers 파일로 Cloudflare가 진짜 응답 헤더에 실어 보낸다. -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://raw.githubusercontent.com; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://handaejang-push.seonju5543.workers.dev; object-src 'none'; base-uri 'self'; form-action 'none'" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://cdn.jsdelivr.net; img-src 'self' data: https://raw.githubusercontent.com; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://handaejang-push.seonju5543.workers.dev; object-src 'none'; base-uri 'self'; form-action 'none'" />
   <meta name="referrer" content="no-referrer" />
   <meta name="robots" content="noindex, nofollow" />
   <meta name="theme-color" content="#fefdfc" />
+  <!-- 서체 — **앱1 과 같은 한 벌**이다 (2026-09-14 개발자 지시 *"서체만 앱1에 맞추고"*).
+       🔴 이 줄이 없으면 `admin.css` 의 `--font-text: 'Pretendard Variable', …` 은 **이름만**
+          이고 브라우저는 그 다음 대체 글꼴(system-ui · Apple SD Gothic Neo · 맑은 고딕)로
+          그린다. 토큰 값이 같아도 **글자 모양이 다르다** — 관리자 화면을 앱1 옆에 놓고
+          보면 그것 하나가 남아 있었다.
+       🔴 CSP 도 같이 열어야 한다(`style-src`·`font-src` 에 cdn.jsdelivr.net) — 둘 중
+          하나만 하면 **조용히 막힌다**(CSP 는 화면에 오류를 안 띄운다).
+       🔴 주소는 앱1 `index.html` 과 **글자까지 같아야 한다** — 다르면 두 화면이 다른 판의
+          같은 글꼴을 쓰게 된다. 관문 `verify/ui-tone.mjs` 이 두 파일을 대조한다.
+       ⚠️ `script-src` 는 건드리지 않았다 — 이 화면의 열쇠가 있는 곳이라 실행 코드는
+          여전히 'self' 뿐이다. -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
   <link rel="stylesheet" href="admin.css" />
 </head>
 <body>

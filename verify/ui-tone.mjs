@@ -388,6 +388,27 @@ console.log('\n■ 관리자 화면이 앱1과 같은 체계를 쓴다 (2026-09-
   console.log(`      대조한 토큰 ${shared}개 (관리자 전용 ${ADMIN_ONLY.size}개는 뺐다)`);
   /* 🔴 대조할 것이 거의 없으면 이 검사는 헛돈다 — 실제로 겹치는지 하한을 둔다 */
   eq('대조할 토큰이 충분하다 (헛도는 검사가 아니다)', shared >= 15, true);
+
+  /* ④ **서체는 이름이 아니라 실제로 실려야 같다** (2026-09-14 개발자 지시 "서체만 앱1에 맞추고")
+     🔴 `admin.css` 는 처음부터 `--font-text: 'Pretendard Variable', …` 이라 적고 있었고
+        위 ③ 토큰 대조도 초록불이었다. 그런데 관리자 `index.html` 에는 그 글꼴을 **내려받는
+        줄이 없었고** CSP 도 막고 있어, 브라우저는 이름을 건너뛰고 다음 대체 글꼴로 그렸다.
+        값이 같아도 **글자 모양이 달랐다** — 두 화면을 나란히 놓았을 때 마지막으로 남은 차이다.
+     ⚠️ 이 샌드박스는 cdn.jsdelivr.net 이 막혀 있어 **그려 놓고는 못 잰다**(둘 다 대체
+        글꼴로 뜬다). 그래서 '같은 주소를 싣는가'와 'CSP 가 그것을 허용하는가'를 센다. */
+  const app1Html = R('index.html');
+  const admHtml = R('_admin/index.html');
+  const fontUrl = (h) => (h.match(/<link[^>]+href="(https:\/\/cdn\.jsdelivr\.net\/[^"]*pretendard[^"]*)"/i) || [])[1] || null;
+  eq('앱1이 싣는 서체 주소를 읽었다 (못 읽으면 아래가 헛돈다)', typeof fontUrl(app1Html), 'string');
+  eq('관리자도 **같은 주소**로 같은 서체를 싣는다', fontUrl(admHtml), fontUrl(app1Html));
+  /* 🔴 링크와 CSP 는 **한 세트**다 — 하나만 하면 조용히 막힌다(CSP 는 화면에 오류를 안 띄운다) */
+  const admCsp = (admHtml.match(/Content-Security-Policy"\s+content="([^"]+)"/) || [])[1] || '';
+  const dir = (name) => (admCsp.match(new RegExp(`${name}\\s+([^;]*)`)) || [])[1] || '';
+  eq('  관리자 CSP 의 style-src 가 그 서체를 허용한다', /cdn\.jsdelivr\.net/.test(dir('style-src')), true);
+  eq('  관리자 CSP 의 font-src 가 그 서체를 허용한다', /cdn\.jsdelivr\.net/.test(dir('font-src')), true);
+  /* 🔴 열어 준 것은 **모양뿐**이다 — 실행 코드는 그대로 self 여야 한다(이 화면엔 열쇠가 있다) */
+  eq('  그래도 script-src 는 self 뿐이다 (서체 때문에 코드까지 열지 않았다)',
+    dir('script-src').trim(), "'self'");
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 되돌아간 곳이 있습니다` : '\n✓ 말투·토큰 관문 전부 통과');
