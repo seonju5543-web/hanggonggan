@@ -103,13 +103,13 @@
       "url": "https://news.incruit.com/news/newsview.asp?newsno=436538",
       "kind": "value",
       "note": "자기소개서 가치관 작성 포인트 (2026-09-05 추가)",
-      "strike": 2
+      "strike": 3
     },
     {
       "url": "https://news.incruit.com/news/newsview.asp?newsno=436729",
       "kind": "value",
       "note": "자소서 인생관 단계별 작성 포인트 (2026-09-05 추가)",
-      "strike": 2
+      "strike": 3
     },
     {
       "url": "https://brunch.co.kr/@designmydesign/11",
@@ -197,6 +197,41 @@
       "kind": "*",
       "note": "로봇이 스스로 찾음 — 자기소개서 첫 문장 잘 쓰는 법",
       "addedAt": "2026-09-07",
+      "strike": 0
+    },
+    {
+      "url": "https://owlapply.com/ko/blog/jagisogeseo-jig-jeon-hwan",
+      "kind": "*",
+      "note": "로봇이 스스로 찾음 — 직종 전환 시 자기소개서 쓰는 법",
+      "addedAt": "2026-09-14",
+      "strike": 0
+    },
+    {
+      "url": "https://brunch.co.kr/@coachjenny/77",
+      "kind": "*",
+      "note": "로봇이 스스로 찾음 — 작가의 이전글 자소서 [지원 동기] 작성 가이드",
+      "addedAt": "2026-09-14",
+      "strike": 0
+    },
+    {
+      "url": "https://admit-lab.com/ko/%EA%B0%9C%EC%9D%B8-%EC%84%B1%EB%AA%85%EC%84%9C/",
+      "kind": "*",
+      "note": "로봇이 스스로 찾음 — 자기소개서 작성 완벽 가이드",
+      "addedAt": "2026-09-14",
+      "strike": 0
+    },
+    {
+      "url": "https://admit-lab.com/ko/%EC%9E%90%EC%9B%90/%ED%95%99%EC%97%85%EA%B3%84%ED%9A%8D%EC%84%9C%EB%9E%80-%EB%AC%B4%EC%97%87%EC%9D%B8%EA%B0%80%EC%9A%94/",
+      "kind": "*",
+      "note": "로봇이 스스로 찾음 — 자기소개서란 무엇일까요? 입학사정위원회는 실제로 어떻게 읽을까요?",
+      "addedAt": "2026-09-14",
+      "strike": 0
+    },
+    {
+      "url": "https://admit-lab.com/ko/%EB%B8%94%EB%A1%9C%EA%B7%B8/%EC%9E%90%EA%B8%B0%EC%86%8C%EA%B0%9C%EC%84%9C-%EC%98%88%EC%8B%9C/",
+      "kind": "*",
+      "note": "로봇이 스스로 찾음 — 자기소개서 예시: 훌륭한 지원서에는 무엇이 담겨 있을까요?",
+      "addedAt": "2026-09-14",
       "strike": 0
     }
   ],
@@ -316,6 +351,11 @@
     {
       "url": "https://community.linkareer.com/employment_data/5101410",
       "seenAt": "2026-09-05",
+      "why": "규칙 0종"
+    },
+    {
+      "url": "https://admit-lab.com/ko/%EB%8C%80%ED%95%99%EC%9B%90-%EC%9E%85%ED%95%99%EC%9D%84-%EC%9C%84%ED%95%9C-%EC%9E%90%EA%B8%B0%EC%86%8C%EA%B0%9C%EC%84%9C-%EC%98%88%EC%8B%9C/",
+      "seenAt": "2026-09-14",
       "why": "규칙 0종"
     }
   ],

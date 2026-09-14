@@ -1,6 +1,6 @@
-# 작성 규칙 학습 — 2026-09-07
+# 작성 규칙 학습 — 2026-09-14
 
-읽은 곳 26곳 · 못 읽은 곳 0곳 · 규칙에 붙은 출처 25건
+읽은 곳 26곳 · 못 읽은 곳 0곳 · 규칙에 붙은 출처 17건
 
 ## 읽은 곳
   ✓ https://community.linkareer.com/employment_data/4250237
@@ -21,7 +21,7 @@
       줄 1378 · 규칙을 뒷받침한 것 12종 (effect-why-this, proofread, no-cliche, motive-need-then-plan, episode-star, concrete-scene, character-evidence, consistency, value-evidence, share-specific, direction, no-self-pity)
       🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
   ✓ https://owlapply.com/ko/blog/jagisogeseo-jal-sseuneun-beob
-      줄 274 · 규칙을 뒷받침한 것 6종 (intro-hook, growth-lesson, value-evidence, concrete-scene, motive-need-then-plan, message-short)
+      줄 263 · 규칙을 뒷받침한 것 6종 (intro-hook, growth-lesson, value-evidence, concrete-scene, motive-need-then-plan, message-short)
       🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
   ✓ https://brunch.co.kr/@icebergw/4
       줄 72 · 규칙을 뒷받침한 것 5종 (plain-sentence, proofread, direction, no-cliche, no-self-pity)
@@ -33,10 +33,10 @@
       줄 135 · 규칙을 뒷받침한 것 1종 (know-the-foundation)
       🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
   ✓ https://linkareer.com/activity/284206
-      줄 122 · 규칙을 뒷받침한 것 1종 (know-the-foundation)
-      🆕 어느 규칙에도 안 붙은 문장 4개 — 컨펌 대기
+      줄 123 · 규칙을 뒷받침한 것 1종 (know-the-foundation)
+      🆕 어느 규칙에도 안 붙은 문장 5개 — 컨펌 대기
   ✓ https://owlapply.com/ko/jagisogeseo-yangsig
-      줄 380 · 규칙을 뒷받침한 것 8종 (intro-hook, episode-star, concrete-scene, growth-lesson, character-evidence, value-evidence, motive-need-then-plan, message-short)
+      줄 373 · 규칙을 뒷받침한 것 8종 (intro-hook, episode-star, concrete-scene, growth-lesson, character-evidence, value-evidence, motive-need-then-plan, message-short)
       🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
   ✓ https://owlapply.com/ko/blog/jagisogeseo
       줄 182 · 규칙을 뒷받침한 것 4종 (intro-hook, lead-first, no-cliche, character-evidence)
@@ -48,9 +48,9 @@
       줄 88 · 규칙을 뒷받침한 것 1종 (concrete-scene)
       🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
   ✓ https://news.incruit.com/news/newsview.asp?newsno=436538
-      줄 274 · 규칙을 뒷받침한 것 0종
+      줄 280 · 규칙을 뒷받침한 것 0종
   ✓ https://news.incruit.com/news/newsview.asp?newsno=436729
-      줄 290 · 규칙을 뒷받침한 것 0종
+      줄 296 · 규칙을 뒷받침한 것 0종
   ✓ https://brunch.co.kr/@designmydesign/11
       줄 135 · 규칙을 뒷받침한 것 1종 (idea-problem-first)
       🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
@@ -58,26 +58,26 @@
       줄 74 · 규칙을 뒷받침한 것 2종 (concrete-scene, lead-first)
       🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
   ✓ https://admit-lab.com/ko/%EB%B8%94%EB%A1%9C%EA%B7%B8/%EC%9E%A5%ED%95%99%EA%B8%88-%EB%AA%A9%EC%A0%81%EC%84%9C/
-      줄 288 · 규칙을 뒷받침한 것 4종 (know-the-foundation, direction, future-steps, concrete-scene)
+      줄 290 · 규칙을 뒷받침한 것 4종 (know-the-foundation, direction, future-steps, concrete-scene)
       🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
-  ✓ https://community.linkareer.com/employment_data/5109801
-      줄 334 · 규칙을 뒷받침한 것 1종 (concrete-scene)
+  ✓ https://owlapply.com/ko/blog/jagisogeseo-jig-jeon-hwan
+      줄 243 · 규칙을 뒷받침한 것 5종 (intro-hook, character-evidence, concrete-scene, direction, share-specific)
+      🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
+  ✓ https://brunch.co.kr/@coachjenny/77
+      줄 56 · 규칙을 뒷받침한 것 4종 (concrete-scene, motive-need-then-plan, share-specific, direction)
+      🆕 어느 규칙에도 안 붙은 문장 2개 — 컨펌 대기
+  ✓ https://admit-lab.com/ko/%EA%B0%9C%EC%9D%B8-%EC%84%B1%EB%AA%85%EC%84%9C/
+      줄 320 · 규칙을 뒷받침한 것 4종 (direction, study-measurable, growth-lesson, share-specific)
+      🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
+  ✓ https://admit-lab.com/ko/%EB%8C%80%ED%95%99%EC%9B%90-%EC%9E%85%ED%95%99%EC%9D%84-%EC%9C%84%ED%95%9C-%EC%9E%90%EA%B8%B0%EC%86%8C%EA%B0%9C%EC%84%9C-%EC%98%88%EC%8B%9C/
+      줄 186 · 규칙을 뒷받침한 것 0종
+      🆕 어느 규칙에도 안 붙은 문장 2개 — 컨펌 대기
+  ✓ https://admit-lab.com/ko/%EC%9E%90%EC%9B%90/%ED%95%99%EC%97%85%EA%B3%84%ED%9A%8D%EC%84%9C%EB%9E%80-%EB%AC%B4%EC%97%87%EC%9D%B8%EA%B0%80%EC%9A%94/
+      줄 196 · 규칙을 뒷받침한 것 2종 (concrete-scene, direction)
+      🆕 어느 규칙에도 안 붙은 문장 3개 — 컨펌 대기
+  ✓ https://admit-lab.com/ko/%EB%B8%94%EB%A1%9C%EA%B7%B8/%EC%9E%90%EA%B8%B0%EC%86%8C%EA%B0%9C%EC%84%9C-%EC%98%88%EC%8B%9C/
+      줄 234 · 규칙을 뒷받침한 것 2종 (direction, motive-need-then-plan)
       🆕 어느 규칙에도 안 붙은 문장 5개 — 컨펌 대기
-  ✓ https://owlapply.com/ko/jagisogeseo-yangsig/simpel
-      줄 287 · 규칙을 뒷받침한 것 8종 (intro-hook, growth-lesson, motive-need-then-plan, message-short, concrete-scene, answer-the-question, episode-star, proofread)
-      🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
-  ✓ https://owlapply.com/ko/jagisogeseo-yangsig/hyeondae
-      줄 320 · 규칙을 뒷받침한 것 4종 (intro-hook, episode-star, answer-the-question, growth-lesson)
-      🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
-  ✓ https://owlapply.com/ko/jagisogeseo-yangsig/changuijeog
-      줄 306 · 규칙을 뒷받침한 것 1종 (intro-hook)
-      🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
-  ✓ https://owlapply.com/ko/jagisogeseo-yangsig/jeonmun
-      줄 303 · 규칙을 뒷받침한 것 6종 (intro-hook, concrete-scene, growth-lesson, no-self-pity, share-specific, motive-need-then-plan)
-      🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
-  ✓ https://owlapply.com/ko/blog/jagisogeseo-choegeun-shijak-munan
-      줄 251 · 규칙을 뒷받침한 것 5종 (intro-hook, lead-first, no-cliche, concrete-scene, message-short)
-      🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
 
 ## 🆕 어느 규칙에도 안 붙은 문장 — 개발자 컨펌 대기
 아래는 **규칙 후보**입니다. 규칙집에 넣을지는 사람이 정합니다(운영 원칙 2).
@@ -164,25 +164,27 @@
   <sub>https://community.linkareer.com/employment_data/5118788</sub>
 
 ## 스스로 넓히기 — 로봇이 읽은 글에서 다음에 읽을 곳을 주웠습니다
-주운 곳 15곳 · 이번에 읽은 곳 6곳 · robots.txt 가 막아 건너뛴 곳 0곳
+주운 곳 9곳 · 이번에 읽은 곳 6곳 · robots.txt 가 막아 건너뛴 곳 0곳
 
-- ⬆️ seeds 로 승격 https://community.linkareer.com/employment_data/5109801
-  <sub>💯[4일 완성 인턴 자소서 코칭] Part 3: 협업경험&amp;피드백 중심의 적응력 표현법</sub>
-- ⬆️ seeds 로 승격 https://owlapply.com/ko/jagisogeseo-yangsig/simpel
-  <sub>심플 자기소개서 양식 - 깔끔한 구성으로 핵심을 전달하는 템플릿</sub>
-- ⬆️ seeds 로 승격 https://owlapply.com/ko/jagisogeseo-yangsig/hyeondae
-  <sub>모던 자기소개서 양식 - IT와 스타트업을 위한 현대적 템플릿</sub>
-- ⬆️ seeds 로 승격 https://owlapply.com/ko/jagisogeseo-yangsig/changuijeog
-  <sub>크리에이티브 자기소개서 양식 - 개성과 창의력을 담은 자소서 템플릿</sub>
-- ⬆️ seeds 로 승격 https://owlapply.com/ko/jagisogeseo-yangsig/jeonmun
-  <sub>전문가용 자기소개서 양식 - 경력직 이직을 위한 격식 있는 템플릿</sub>
-- ⬆️ seeds 로 승격 https://owlapply.com/ko/blog/jagisogeseo-choegeun-shijak-munan
-  <sub>자기소개서 첫 문장 잘 쓰는 법</sub>
+- ⬆️ seeds 로 승격 https://owlapply.com/ko/blog/jagisogeseo-jig-jeon-hwan
+  <sub>직종 전환 시 자기소개서 쓰는 법</sub>
+- ⬆️ seeds 로 승격 https://brunch.co.kr/@coachjenny/77
+  <sub>작가의 이전글 자소서 [지원 동기] 작성 가이드</sub>
+- ⬆️ seeds 로 승격 https://admit-lab.com/ko/%EA%B0%9C%EC%9D%B8-%EC%84%B1%EB%AA%85%EC%84%9C/
+  <sub>자기소개서 작성 완벽 가이드</sub>
+- · 규칙 0종 — 30일 뒤 다시 시도 https://admit-lab.com/ko/%EB%8C%80%ED%95%99%EC%9B%90-%EC%9E%85%ED%95%99%EC%9D%84-%EC%9C%84%ED%95%9C-%EC%9E%90%EA%B8%B0%EC%86%8C%EA%B0%9C%EC%84%9C-%EC%98%88%EC%8B%9C/
+  <sub>학업계획서 예시</sub>
+- ⬆️ seeds 로 승격 https://admit-lab.com/ko/%EC%9E%90%EC%9B%90/%ED%95%99%EC%97%85%EA%B3%84%ED%9A%8D%EC%84%9C%EB%9E%80-%EB%AC%B4%EC%97%87%EC%9D%B8%EA%B0%80%EC%9A%94/
+  <sub>자기소개서란 무엇일까요? 입학사정위원회는 실제로 어떻게 읽을까요?</sub>
+- ⬆️ seeds 로 승격 https://admit-lab.com/ko/%EB%B8%94%EB%A1%9C%EA%B7%B8/%EC%9E%90%EA%B8%B0%EC%86%8C%EA%B0%9C%EC%84%9C-%EC%98%88%EC%8B%9C/
+  <sub>자기소개서 예시: 훌륭한 지원서에는 무엇이 담겨 있을까요?</sub>
 
 ## 🩺 seed 건강 (지속가능성)
-살아 있는 seed 30개 (상한 60) · 이번 실행에서 규칙을 준 곳 24개
+살아 있는 seed 35개 (상한 60) · 이번 실행에서 규칙을 준 곳 23개
 
-시든 seed 없음.
+**시든 seed — 3회 연속 규칙 0종.** 사람이 확인해 지워 주세요(자동 삭제 안 함):
+- (3회) https://news.incruit.com/news/newsview.asp?newsno=436538
+- (3회) https://news.incruit.com/news/newsview.asp?newsno=436729
 
 
 ## 📌 다음에 크롤링할 출처 — 개발자 확인용 (정직 보고)
