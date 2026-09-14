@@ -104,23 +104,22 @@ function serve() {
 
   const errors = [];
   page.on('pageerror', (e) => errors.push(`PAGEERROR: ${e.message}`));
-  page.on('console', (m) => { if (m.type() === 'error') errors.push(`CONSOLE: ${m.text()}`); });
+  /* 🔴 **바깥에서 못 받은 것은 '화면 오류'가 아니다** — 드라이버 일곱이 이미 이 한 줄을 쓴다
+     (drive · calendar · chat · essay-ui · explore-sort · personas · apps-manage). 이 파일만
+     빠져 있어서, 관리자 화면이 앱1과 같은 서체를 밖에서 받게 되자(2026-09-14) 통신이 막힌
+     곳에서 멀쩡한 화면이 빨간불이 됐다.
+     ⚠️ 그때 **가짜 CSS 를 물려 주는 가로채기**로 막았었는데 되돌렸다 — 그러면 통신이 되는
+     곳(CI·진짜 브라우저)에서도 서체 없이 그려져, 아래 '표가 넘치는가' 같은 **글자 폭에
+     기대는 검사**가 실제로 배포되는 화면이 아닌 것을 재게 된다(2026-09-14 코드 리뷰).
+     빨간불을 초록으로 바꾸지 않는다는 `onboard-helper.js webfontBanner` 의 방침과도 같다. */
+  page.on('console', (m) => {
+    if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push(`CONSOLE: ${m.text()}`);
+  });
   page.on('dialog', async (d) => { await d.accept(); });
 
   /* 바깥 요청 가로채기 — 저장소의 진짜 파일로 응답한다 */
   let apiCalls = 0;
   let PAGE_ITEMS = null;   // 화면이 실제로 받은 목록 (아래 raw 가로채기가 채운다)
-  /* 🔴 **서체는 밖에서 받아 오지 않는다 — 검사에서만** (2026-09-14).
-     관리자 화면은 앱1과 같은 Pretendard 를 cdn.jsdelivr.net 에서 받는데, 검사 환경이 바깥
-     통신을 막으면 그 실패가 '콘솔 오류'로 잡혀 **멀쩡한 화면이 빨간불**이 된다(실제로 그랬다:
-     ERR_TUNNEL_CONNECTION_FAILED). 바깥 CDN 이 살아 있는지는 이 검사가 볼 일이 아니다 —
-     '서체를 같은 주소로 싣는가'는 `verify/ui-tone.mjs` 가 글자로 대조한다.
-     그래서 여기서는 **가로채서 빈 CSS 를 돌려준다.** 그러면 어느 환경에서도 같은 결과가 나오고,
-     진짜 오류(스크립트 오류·같은 출처 파일 실패)는 그대로 잡힌다.
-     ⚠️ 이 줄을 지우면 인터넷이 막힌 곳에서 검사가 통째로 빨간불이 된다. */
-  await page.route('https://cdn.jsdelivr.net/**', (route) =>
-    route.fulfill({ status: 200, contentType: 'text/css', body: '/* 검사용 빈 서체 */' }));
-
   await page.route('https://api.github.com/**', async (route) => {
     apiCalls += 1;
     const u = route.request().url();

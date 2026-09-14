@@ -396,19 +396,41 @@ console.log('\n■ 관리자 화면이 앱1과 같은 체계를 쓴다 (2026-09-
         값이 같아도 **글자 모양이 달랐다** — 두 화면을 나란히 놓았을 때 마지막으로 남은 차이다.
      ⚠️ 이 샌드박스는 cdn.jsdelivr.net 이 막혀 있어 **그려 놓고는 못 잰다**(둘 다 대체
         글꼴로 뜬다). 그래서 '같은 주소를 싣는가'와 'CSP 가 그것을 허용하는가'를 센다. */
-  const app1Html = R('index.html');
-  const admHtml = R('_admin/index.html');
-  const fontUrl = (h) => (h.match(/<link[^>]+href="(https:\/\/cdn\.jsdelivr\.net\/[^"]*pretendard[^"]*)"/i) || [])[1] || null;
-  eq('앱1이 싣는 서체 주소를 읽었다 (못 읽으면 아래가 헛돈다)', typeof fontUrl(app1Html), 'string');
-  eq('관리자도 **같은 주소**로 같은 서체를 싣는다', fontUrl(admHtml), fontUrl(app1Html));
-  /* 🔴 링크와 CSP 는 **한 세트**다 — 하나만 하면 조용히 막힌다(CSP 는 화면에 오류를 안 띄운다) */
-  const admCsp = (admHtml.match(/Content-Security-Policy"\s+content="([^"]+)"/) || [])[1] || '';
-  const dir = (name) => (admCsp.match(new RegExp(`${name}\\s+([^;]*)`)) || [])[1] || '';
-  eq('  관리자 CSP 의 style-src 가 그 서체를 허용한다', /cdn\.jsdelivr\.net/.test(dir('style-src')), true);
-  eq('  관리자 CSP 의 font-src 가 그 서체를 허용한다', /cdn\.jsdelivr\.net/.test(dir('font-src')), true);
-  /* 🔴 열어 준 것은 **모양뿐**이다 — 실행 코드는 그대로 self 여야 한다(이 화면엔 열쇠가 있다) */
+  /* 🔴 **주석을 걷고 읽는다** — 이 파일 ① 이 이미 같은 함정을 적어 뒀는데(설명에도 'Pretendard'
+     가 여러 번 나온다) ④ 가 그것을 되풀이했다. 실측: 링크를 주석 안에만 남겨도 다섯 항목이
+     전부 통과했다(2026-09-14 코드 리뷰). CSP 는 주석 안에 있을 리 없지만 같은 사본을 쓴다. */
+  const app1Html = stripComments(R('index.html'));
+  const admHtml = stripComments(R('_admin/index.html'));
+  /* 🔴 **'주소가 적혀 있다'와 '그 서체가 적용된다'는 다르다** — `rel="preload"` 는 받아만 두고
+     적용하지 않고, `media="print"` 는 화면에서 빠진다. 실측으로 둘 다 통과했다. 그래서
+     **`rel="stylesheet"` 이고 화면에 적용되는 링크**만 센다. */
+  const fontLink = (h) => {
+    for (const m of h.matchAll(/<link\b[^>]*>/gi)) {
+      const tag = m[0];
+      const href = (tag.match(/href="([^"]+)"/i) || [])[1] || '';
+      if (!/cdn\.jsdelivr\.net\/.*pretendard/i.test(href)) continue;
+      if (!/rel="stylesheet"/i.test(tag)) continue;
+      const media = (tag.match(/media="([^"]+)"/i) || [])[1];
+      if (media && !/^(all|screen)$/i.test(media.trim())) continue;
+      return href;
+    }
+    return null;
+  };
+  eq('앱1이 싣는 서체 주소를 읽었다 (못 읽으면 아래가 헛돈다)', typeof fontLink(app1Html), 'string');
+  eq('관리자도 **같은 주소**로 같은 서체를 싣는다', fontLink(admHtml), fontLink(app1Html));
+  /* 🔴 링크와 CSP 는 **한 세트**다 — 하나만 하면 조용히 막힌다(CSP 는 화면에 오류를 안 띄운다).
+     🔴 **두 화면 다 본다** — 관리자만 보면, 앱1 쪽이 닫히는 날 두 화면이 반대 방향으로
+     갈라지는데도 초록불이 난다(2026-09-14 코드 리뷰). */
+  const cspOf = (h) => (h.match(/Content-Security-Policy"\s+content="([^"]+)"/) || [])[1] || '';
+  const dirOf = (csp, name) => (csp.match(new RegExp(`${name}\\s+([^;]*)`)) || [])[1] || '';
+  for (const [who, html] of [['관리자', admHtml], ['앱1', app1Html]]) {
+    const csp = cspOf(html);
+    eq(`  ${who} CSP 의 style-src 가 그 서체를 허용한다`, /cdn\.jsdelivr\.net/.test(dirOf(csp, 'style-src')), true);
+    eq(`  ${who} CSP 의 font-src 가 그 서체를 허용한다`, /cdn\.jsdelivr\.net/.test(dirOf(csp, 'font-src')), true);
+  }
+  /* 🔴 열어 준 것은 **모양뿐**이다 — 실행 코드는 그대로 self 여야 한다(관리자 화면엔 열쇠가 있다) */
   eq('  그래도 script-src 는 self 뿐이다 (서체 때문에 코드까지 열지 않았다)',
-    dir('script-src').trim(), "'self'");
+    dirOf(cspOf(admHtml), 'script-src').trim(), "'self'");
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 되돌아간 곳이 있습니다` : '\n✓ 말투·토큰 관문 전부 통과');
