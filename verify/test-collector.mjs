@@ -2387,7 +2387,14 @@ console.log('\n■ AI 자격 읽기 안전장치 (2026-08-20)');
      아무 말도 하지 않는다. 실제로 정읍시민·세종이도가 7줄·6줄을 읽어 놓고 지워졌다
      (로그에는 ✓로 남고 데이터는 비어 있었다). */
   const xs = readText(new URL('../collector/extract-excerpts.mjs', import.meta.url));
-  eq('  발췌기는 AI가 읽은 자격을 건드리지 않는다', /\/\^AI\/\.test\(it\.eligibilityFrom/.test(xs), true);
+  /* 🔴 AI 뿐 아니라 **사람이 고른 줄도** 건드리면 안 된다 (2026-09-14).
+     관리자 화면이 `eligibilityFrom = '관리자 <날짜>'` 를 붙이는데 발췌기가 안 읽어,
+     사람이 고른 자격 문장이 다음 수집에 통째로 지워지고 **이름표만 남았다** —
+     그러면 로봇이 다시 채울 때 로봇 줄에 관리자 이름이 붙는다(거짓 출처 · 원칙 8-1).
+     그래서 둘 다 지키는지 본다. 한쪽만 남기면 그쪽이 다시 지워진다. */
+  eq('  발췌기는 AI가 읽은 자격을 건드리지 않는다',
+    /\.test\(it\.eligibilityFrom/.test(xs) && /\^\(?AI/.test(xs), true);
+  eq('  발췌기는 사람이 고른 자격도 건드리지 않는다', /관리자\)?\/\.test\(it\.eligibilityFrom/.test(xs), true);
   /* ⚠️ 그 가드는 **for 반복문 안**이라 continue 여야 한다 — return 을 쓰면 그 뒤 공고를
      전부 건너뛴다(실제로 return 으로 썼다가 잡았다). */
   eq('    그 가드는 continue 다 (return 이면 나머지 공고를 다 건너뛴다)',

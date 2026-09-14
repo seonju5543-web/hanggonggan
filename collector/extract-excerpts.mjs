@@ -751,7 +751,12 @@ for (const it of reg.items) {
      게시판 본문이 비어 있다는 사실은 PDF 안 내용에 대해 아무 말도 하지 않는데도.
      실제로 정읍시민장학재단·세종이도가 PDF에서 7줄·6줄을 읽어 놓고, 다음 실행의
      발췌 단계에 통째로 지워졌다(로그에는 ✓로 남고 데이터는 비어 있었다). */
-  if (WRITE && /^AI/.test(it.eligibilityFrom || '')) { kept += 1; continue; }
+  /* 🔴 **사람이 고른 자격 문장도 건드리지 않는다** (2026-09-14 수리).
+     관리자 화면이 `eligibilityFrom = '관리자 <날짜>'` 를 붙이는데 여기서 안 읽어,
+     사람이 고른 줄이 다음 수집에 통째로 지워지고 **이름표만 남았다**. 그러면 나중에
+     로봇이 다시 채울 때 **로봇이 뽑은 줄에 관리자 이름이 붙는다** — 원칙 8-1 이 금지하는
+     거짓 출처다. 위 AI 줄과 같은 규칙으로 건너뛴다. */
+  if (WRITE && /^(AI|관리자)/.test(it.eligibilityFrom || '')) { kept += 1; continue; }
   if (WRITE) {
     if (viaDoc) it.eligibilityFrom = '공고문 첨부';
     else if (it.eligibilityFrom === '공고문 첨부') delete it.eligibilityFrom;
@@ -759,15 +764,20 @@ for (const it of reg.items) {
     else delete it.eligibilityLines;   // 원문은 읽었는데 못 뽑았다 → 옛 값을 남기지 않는다
 
     /* '제외 대상'도 자격 정보다 (2026-08-03 개발자 지적 — 동국인재육성장학).
-       "누가 받을 수 있나"만큼 "누가 못 받나"도 학생이 알아야 한다. 원문 그대로 뽑는다. */
-    const excl = extractExcludeLines(body);
-    if (excl.length) it.eligibilityExcludes = excl;
-    else delete it.eligibilityExcludes;
+       "누가 받을 수 있나"만큼 "누가 못 받나"도 학생이 알아야 한다. 원문 그대로 뽑는다.
+       🔴 사람이 넣은 줄은 그대로 둔다 — 칸마다 주인 표식을 따로 본다(2026-09-14). */
+    if (!/^관리자/.test(it.eligibilityExcludesFrom || '')) {
+      const excl = extractExcludeLines(body);
+      if (excl.length) it.eligibilityExcludes = excl;
+      else delete it.eligibilityExcludes;
+    }
 
     /* 우선 선발 기준 — 자격이 아니지만 학생에게 쓸모가 있어 따로 모은다 (위 주석) */
-    const pri = extractPriorityLines(body);
-    if (pri.length) it.eligibilityPriority = pri;
-    else delete it.eligibilityPriority;
+    if (!/^관리자/.test(it.eligibilityPriorityFrom || '')) {
+      const pri = extractPriorityLines(body);
+      if (pri.length) it.eligibilityPriority = pri;
+      else delete it.eligibilityPriority;
+    }
   }
   if (ex.length) {
     hit++;

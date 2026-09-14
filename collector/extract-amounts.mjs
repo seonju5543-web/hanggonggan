@@ -204,8 +204,14 @@ for (const it of items) {
       if (!/\d/.test(String(it.amount || ''))) it.amount = amountText(a);
     }
 
-    /* 이중수혜도 같은 규칙 — 사람이 넣은 것은 그대로 둔다 */
-    const humanExcl = !it.exclusivityFrom && it.exclusivity;
+    /* 이중수혜도 같은 규칙 — 사람이 넣은 것은 그대로 둔다.
+       🔴 **주인은 '표식이 있나'가 아니라 '누구 표식인가'로 가른다** (2026-09-14 수리).
+          옛 판은 `!it.exclusivityFrom` — 표식이 **없는** 값을 사람 값으로 봤다. 그런데
+          관리자 화면이 사람 값을 지키려고 `관리자 <날짜>` 표식을 붙이기 시작하자,
+          그 표식 때문에 '로봇 것'으로 읽혀 **다음 실행에 지워졌다**(실측으로 재현).
+          표식이 지키는 게 아니라 표식 때문에 지워지던 것이다.
+       ⚠️ 표식이 없는 옛 데이터도 여전히 사람 값이다(undefined !== OWN_AMOUNT). */
+    const humanExcl = it.exclusivity && it.exclusivityFrom !== OWN_AMOUNT;
     if (humanExcl) { /* 그대로 */ }
     else if (e.kind === 'unknown') { delete it.exclusivity; delete it.exclusivityFrom; }
     else { it.exclusivity = e; it.exclusivityFrom = OWN_AMOUNT; }

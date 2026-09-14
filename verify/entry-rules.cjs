@@ -131,7 +131,7 @@ function isDuplicatePair(A, B) {
 const FIX_PLAN = {
   'eligibility-fill.yml': {
     main: { label: '시범 3건만 읽기', inputs: { mode: '시범 3건만' }, cost: '약 50원' },
-    all: { label: '전부 읽기', inputs: { mode: '전부' }, cost: '전수 약 2,229원', danger: true },
+    all: { label: '전부 읽기', inputs: { mode: '전부' }, cost: '건당 약 13원 (2026-08-23 실측 2,229원/169건)', danger: true },
     note: '원문이 저장된 공고만 읽습니다 — 원문이 없는 공고는 로봇이 조용히 건너뜁니다.',
   },
   'deep-fetch.yml': {

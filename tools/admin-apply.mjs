@@ -174,9 +174,15 @@ function corpus(it) {
     const t = attachmentText(path.join(ROOT, 'collector/extracted', f));
     if (readable(t)) { parts.push(t); hasSource = true; }
   }
-  /* 발췌·자격 줄은 로봇이 **원문에서 그대로 뽑아 둔 것**이라 근거로 쓸 수 있다.
-     다만 이것만 있는 상태는 '원문을 갖고 있다'가 아니다 — 아래에서 사유를 가를 때 쓴다. */
-  parts.push(...(it.excerpts || []), ...(it.eligibilityLines || []));
+  /* 발췌는 로봇이 **원문에서 그대로 뽑아 둔 것**이라 근거로 쓸 수 있다(ALLOWED 밖이라 사람이 못 고친다).
+     다만 이것만 있는 상태는 '원문을 갖고 있다'가 아니다 — 아래에서 사유를 가를 때 쓴다.
+     🔴 **자격 줄은 사람이 방금 쓴 것일 수 있다** (2026-09-14 수리). `eligibilityLines` 는
+        같은 관리자 화면이 고칠 수 있는 칸이라, 근거로 인정하면 **자기가 쓴 글을 근거로**
+        prepDoc·exclusivity 를 켤 수 있었다 — 한 묶음 안에서 ①자격 줄에 문장을 적고
+        ②그 문장을 근거로 스위치를 켜면 통과했다(실측). 원칙 8-2 를 정면으로 깬다.
+        그래서 **로봇이 넣은 자격 줄만** 근거로 쓴다(관리자 표식이 붙은 것은 뺀다). */
+  parts.push(...(it.excerpts || []));
+  if (!/^관리자/.test(it.eligibilityFrom || '')) parts.push(...(it.eligibilityLines || []));
   return { text: parts.join('\n'), hasSource };
 }
 
@@ -292,6 +298,18 @@ switch (action) {
       addUrls.push(u);
     });
     cfg.blockUrls = [...(cfg.blockUrls || []), ...addUrls];
+    /* 🔴 **id 와 주소의 짝을 적어 둔다** (2026-09-14 신설).
+       차단을 푸는 쪽이 id 만 받으면 주소를 되찾을 방법이 없다 — id 가 주소에서
+       파생되는 것은 `auto-`·`adm-` 뿐이고, 손으로 큐레이션한 `reg-` 는 주소와 아무
+       관계가 없다(지금 등록 48건 중 18건). 그래서 파생으로 맞추려던 옛 코드는
+       그 18건에서 **영원히 안 맞았고**, 화면은 '✅ 차단 해제'라고 말하면서 주소는
+       남겨 두어 그 공고가 다시는 등록되지 않았다.
+       ⚠️ 로봇(auto-register)은 이 칸을 안 읽는다 — blockIds·blockUrls 만 본다. */
+    cfg.blockPairs = { ...(cfg.blockPairs || {}) };
+    dropped.forEach((x) => {
+      const u = String(x.sourceUrl || '').trim();
+      if (u) cfg.blockPairs[x.id] = u;
+    });
     /* 주소가 없는 항목은 id 로만 막힌다 — 조용히 넘기지 않고 사람에게 말한다 */
     const noUrl = dropped.filter((x) => !x.sourceUrl).map((x) => x.id);
     writeJson(CFG, cfg);
@@ -314,9 +332,18 @@ switch (action) {
     const bI = (cfg.blockIds || []).length;
     const bU = (cfg.blockUrls || []).length;
     cfg.blockIds = (cfg.blockIds || []).filter((x) => !ids.includes(x));
-    /* 🔴 id 로 풀면 **그 id 가 파생된 주소도 같이** 푼다 — 한쪽만 풀면 계속 막힌 채 남는다 */
-    cfg.blockUrls = (cfg.blockUrls || []).filter((u) => !wantUrl.has(canonUrl(u))
-      && !ids.includes(idFromUrl('auto-', u)));
+    /* 🔴 id 로 풀면 **그 id 가 파생된 주소도 같이** 푼다 — 한쪽만 풀면 계속 막힌 채 남는다.
+       푸는 순서: ①막을 때 적어 둔 짝(blockPairs) ②주소에서 파생되는 id 를 쓰는 공고는 파생으로.
+       🔴 **접두사를 하나로 박지 말 것** — 옛 판은 `idFromUrl('auto-', u)` 로만 봐서
+          `reg-`(손 큐레이션 18건)·`adm-`(화면이 만든 것)은 절대 안 맞았다. */
+    const paired = new Set(ids.map((x) => (cfg.blockPairs || {})[x]).filter(Boolean).map(canonUrl));
+    const prefixOf = (x) => (String(x).match(/^[a-z]+-/) || ['auto-'])[0];
+    const derived = (u) => ids.some((x) => x === idFromUrl(prefixOf(x), u));
+    cfg.blockUrls = (cfg.blockUrls || []).filter((u) => {
+      const cu = canonUrl(u);
+      return !wantUrl.has(cu) && !paired.has(cu) && !derived(u);
+    });
+    if (cfg.blockPairs) ids.forEach((x) => { delete cfg.blockPairs[x]; });
     const gone = (bI - cfg.blockIds.length) + (bU - cfg.blockUrls.length);
     if (!gone) fail('차단 목록에서 그 대상을 찾지 못했습니다');
     writeJson(CFG, cfg);

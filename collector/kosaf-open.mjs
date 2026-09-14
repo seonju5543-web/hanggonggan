@@ -23,11 +23,27 @@ export const BLOCK_PATH = path.join(ROOT, 'collector', 'kosaf-block.json');
 
 export const blockKey = (code, file) => `${code}\u0000${file || ''}`;
 
+/* 🔴 **못 읽은 것과 비어 있는 것을 가른다** (2026-09-14 수리).
+   옛 판은 읽기·파싱 오류를 전부 삼켜 빈 장부를 돌려줬다. 그런데 같은 실행 끝의
+   saveBlock 이 **로봇 줄만 담아 덮어써서**, 사람이 내려 둔 줄(hidden)과 '로봇이 틀렸다'고
+   되살려 둔 줄(keep)이 통째로 사라지고 **종료코드 0 · 초록불**로 저장됐다(실측으로 재현).
+   되살릴 길은 git 이력뿐인데 사람에게는 아무 신호도 안 갔다.
+   지금은 `ok:false` 로 알리고, 부르는 쪽이 **저장을 건너뛴다**. 파일이 아예 없는 것은
+   정상이다(처음 실행) — 그건 ok:true 로 본다. */
 export function loadBlock(file = BLOCK_PATH) {
+  let raw;
   try {
-    const j = JSON.parse(fs.readFileSync(file, 'utf8'));
-    return { updatedAt: j.updatedAt || '', hidden: j.hidden || [], keep: j.keep || [] };
-  } catch { return { updatedAt: '', hidden: [], keep: [] }; }
+    raw = fs.readFileSync(file, 'utf8');
+  } catch (e) {
+    if (e && e.code === 'ENOENT') return { ok: true, updatedAt: '', hidden: [], keep: [] };
+    return { ok: false, why: `장부를 읽지 못했습니다: ${e.message}`, updatedAt: '', hidden: [], keep: [] };
+  }
+  try {
+    const j = JSON.parse(raw);
+    return { ok: true, updatedAt: j.updatedAt || '', hidden: j.hidden || [], keep: j.keep || [] };
+  } catch (e) {
+    return { ok: false, why: `장부가 깨졌습니다: ${e.message}`, updatedAt: '', hidden: [], keep: [] };
+  }
 }
 
 /* 로봇 기록장과 같은 모양으로 저장한다 — 들여쓰기 1칸(CLAUDE.md '데이터 파일 형식') */
@@ -119,6 +135,15 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const auto = emptyShells(openBefore.items, (f) => readChars(ROOT, f));         // ②
 
   const block = loadBlock();
+  /* 🔴 **장부를 못 읽었으면 저장하지 않는다** (2026-09-14). 그냥 이어서 저장하면 사람이
+     내려 둔 줄과 되살려 둔 줄을 로봇 줄로 덮어써 없앤다 — 그것도 초록불로. 멈추는 쪽이
+     낫다: 데이터는 그대로 남고, 사람이 장부를 고치면 다음 실행이 정상으로 돈다. */
+  if (block.ok === false) {
+    console.error(`::error::층2 내림 장부를 읽지 못해 저장을 건너뜁니다 — ${block.why}`);
+    console.error('   collector/kosaf-block.json 을 고친 뒤 다시 실행하세요.'
+      + ' (그대로 저장하면 사람이 내려 둔 줄과 되살려 둔 줄이 사라집니다)');
+    process.exit(1);          // 여기는 모듈 맨 위의 if 블록이라 return 을 못 쓴다
+  }
   const openCodes = new Set(openBefore.items.map((i) => i.code));
   const fullCodes = new Set((src.items || []).map((i) => i.code));
   /* 🔴 지우는 근거는 '마감일'이 아니라 **'지금 열린 목록에 없다 + 전체 목록에는 있다'** 둘이다.

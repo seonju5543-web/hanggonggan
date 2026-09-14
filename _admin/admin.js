@@ -59,6 +59,14 @@ window.esc = esc;          // vendor/forms.js·data.js가 쓰는 전역
 window.safeUrl = safeUrl;
 
 const $ = (s, r = document) => r.querySelector(s);
+
+/* 🔴 **건수를 박아 쓰지 않는다** (2026-09-14). '전수 약 2,229원' 은 2026-08-23 에
+   등록이 169건일 때 잰 값인데, 지금은 48건이고 그 버튼이 읽는 것은 7건뿐이다.
+   화면이 지금 데이터에서 나오지 않은 숫자를 현재 값처럼 말하고 있었다
+   (CLAUDE.md 「현황 숫자는 여기 적지 않는다 — 반드시 낡는다」).
+   단가만 남기고 곱한다: 2,229원 / 169건 ≈ 건당 13원. */
+const AI_WON_PER_ITEM = 13;
+const aiCost = (n) => (n * AI_WON_PER_ITEM).toLocaleString('ko-KR');
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const byId = (id) => document.getElementById(id);
 
@@ -790,7 +798,7 @@ function renderSrcScan() {
         <button class="btn btn-sm btn-primary" data-fixrun="eligibility-fill.yml" data-fixplan="main"
           data-fixn="${have.length}">시범 3건만 읽기 — AI 자격 읽기 · 약 50원</button>
         <button class="btn btn-sm" data-fixrun="eligibility-fill.yml" data-fixplan="all"
-          data-fixn="${have.length}">전부 읽기 — AI 자격 읽기 · 전수 약 2,229원</button>
+          data-fixn="${have.length}">전부 읽기 — AI 자격 읽기 · ${have.length}건 약 ${aiCost(have.length)}원</button>
       </div>
       ${none.length ? `
       <div class="pgroup-head">
@@ -1795,7 +1803,7 @@ const ROBOTS = [
     f: 'essay-playbook.yml',
     n: '작성 규칙 학습',
     d: '공고 원문에서 작성 규정을 읽어 초안 규칙을 갱신합니다',
-    when: '매주 월 05:37',
+    when: '매주 화 05:37',
     inputs: [{ name: 'mode', kind: 'choice', label: '무엇을 할까요', def: '미리보기만',
       options: ['읽고 저장', '미리보기만'] }],
   },
@@ -2287,6 +2295,27 @@ function renderRobots() {
         </div>
         <div></div>
       </div>
+      ${/* 🔴 **막은 것을 풀 자리** (2026-09-14 신설). 저장소 쪽에 unblock 이 있는데 화면에
+           버튼이 없어서, 잘못 막은 공고를 개발자가 영영 되살릴 수 없었다 — 파일을 직접
+           못 고치는 구조라 GitHub Actions 에서 손으로 payload 를 적는 수밖에 없었다.
+           차단은 '이 공고를 다시는 담지 마라'는 뜻이라, 실수로 막으면 로봇이 매일 다시
+           가져와도 영영 등록되지 않고 그 사실조차 화면에 안 뜬다. */''}
+      ${(D.autoCfg.blockIds || []).length ? `
+      <details class="row" data-noclick data-blocklist style="cursor:default;display:block">
+        <summary class="t">막아 둔 공고 ${(D.autoCfg.blockIds || []).length}건 — 펼쳐서 풀기</summary>
+        <p class="hint">로봇이 이 공고들을 다시 담지 않습니다. 잘못 막은 것이 있으면 푸세요 —
+          푼 뒤에는 다음 수집 때 다시 후보로 올라옵니다.</p>
+        <div class="rows">
+          ${(D.autoCfg.blockIds || []).map((bid) => `
+            <div class="row" data-noclick style="cursor:default">
+              <div><div class="m"><code>${esc(bid)}</code></div></div>
+              <div class="btn-row">
+                <button class="btn btn-sm" data-unblock="${esc(bid)}">차단 풀기</button>
+              </div>
+              <div></div>
+            </div>`).join('')}
+        </div>
+      </details>` : ''}
     </div>`;
 
   loadRobotIssues();
@@ -2649,6 +2678,14 @@ const EDIT_FIELDS = [
   ['formId', '연결된 양식 id (없으면 비움)', 'text'],
   ['noForm', '양식이 없는 사유', 'textarea'],
   ['applyEmail', '이메일 접수 주소', 'text'],
+  /* 🔴 아래 넷은 **앱1이 이미 읽는 칸**인데 화면에 입력할 자리가 없었다 (2026-09-14 신설).
+     비어 있던 건수(실측): 발표일 44/48 · 제외 대상 41 · 우선 기준 46.
+     달력의 발표 점이 4건뿐이던 이유가 이것이다.
+     ⚠️ 지어내지 말 것 — 오른쪽 원문에서 찾은 것만 적는다(원칙 8-1). */
+  ['documents', '준비할 서류 (한 줄에 하나씩)', 'lines'],
+  ['announceDate', '발표일 (YYYY-MM-DD, 모르면 비움)', 'text'],
+  ['eligibilityExcludes', '이런 학생은 못 받아요 — 제외 대상 (한 줄에 하나씩)', 'lines'],
+  ['eligibilityPriority', '먼저 뽑는 기준 — 우선 선발 (한 줄에 하나씩)', 'lines'],
 ];
 
 /* 등록 시트 (C2) — 왼쪽에 앱1로 나갈 내용, 오른쪽에 공고 원문.
@@ -2822,6 +2859,7 @@ function detailSheet(itRaw) {
   const st = statusOf(it);
   const url = safeUrl(it.sourceUrl);
   const e = it.eligibility || {};
+  const exc = it.exclusivity || {};   // 이중수혜 — 없으면 빈 객체(칸이 비어 뜬다)
 
   const field = ([k, label, type, opts]) => {
     const v = it[k] == null ? '' : it[k];
@@ -2833,6 +2871,15 @@ function detailSheet(itRaw) {
     if (type === 'textarea') {
       return `<div class="field"><label for="ed-${k}">${esc(label)}</label>
         <textarea id="ed-${k}" data-ed="${k}" rows="3">${esc(v)}</textarea></div>`;
+    }
+    /* 여러 줄 칸 — 앱이 배열로 읽는 것(서류·제외 대상·우선 기준)을 한 줄에 하나씩 보여 준다.
+       🔴 쉼표로 잇지 말 것 — 서류 이름에 쉼표가 들어간다(`성적증명서(1,2학기)`).
+          저장소 쪽 cleanLines 도 줄바꿈으로 가른다. */
+    if (type === 'lines') {
+      const text = Array.isArray(v) ? v.join('\n') : String(v || '');
+      return `<div class="field"><label for="ed-${k}">${esc(label)}</label>
+        <textarea id="ed-${k}" data-ed="${k}" data-lines rows="4"
+          placeholder="한 줄에 하나씩">${esc(text)}</textarea></div>`;
     }
     return `<div class="field"><label for="ed-${k}">${esc(label)}</label>
       <input type="text" id="ed-${k}" data-ed="${k}" value="${esc(v)}" /></div>`;
@@ -2899,6 +2946,33 @@ function detailSheet(itRaw) {
             <p class="hint">비우면 그 조건은 없는 것으로 봅니다. <b>확인하지 못한 값을 짐작해 넣지 마세요</b> —
               틀린 자격 판정은 '모른다'보다 나쁩니다(자격도 안 되는 학생이 서류를 준비하게 됩니다).</p>
 
+
+            <!-- 🔴 이중수혜·자유 형식 — 둘 다 **원문 문장을 근거로 적어야** 저장된다 (2026-09-14).
+                 저장소 쪽(admin-apply.mjs)이 그 문장을 저장된 공고 원문에서 그대로 찾아 확인하고,
+                 못 찾으면 거부한다. 화면이 지어낸 값으로 학생 판정을 바꾸지 못하게 하는 자리다. -->
+            <label style="margin-top:10px">함께 못 받는 범위 — 이중수혜</label>
+            <div class="field">
+              <select id="ex-scope" data-ex-scope>
+                <option value="">정하지 않음 (칸을 비움)</option>
+                <option value="external"${exc.scope === 'external' ? ' selected' : ''}>교외 민간 장학금 전부와 중복 불가</option>
+                <option value="narrow"${exc.scope === 'narrow' ? ' selected' : ''}>좁은 범위만 중복 불가 (특정 사업 등)</option>
+              </select>
+              <textarea id="ex-raw" data-ex-raw rows="2"
+                placeholder="근거가 된 원문 문장을 그대로 복사해 주세요">${esc(exc.raw || '')}</textarea>
+              <p class="hint">원문에 <b>한정어가 없으면</b>(예: “타 대외 장학금과 중복 수혜 불가”) 교외 전부이고,
+                “타 인재양성사업” 처럼 <b>대상을 좁히면</b> 좁은 범위입니다.
+                넓게 잘못 고르면 학생 화면의 받을 수 있는 금액이 줄어듭니다.</p>
+            </div>
+
+            <label style="margin-top:10px">앱에서 준비문서를 만들어 줄까요 — 자유 형식 제출</label>
+            <div class="field">
+              <label class="row-check"><input type="checkbox" id="pd-on" data-pd${it.prepDoc ? ' checked' : ''} />
+                <span>이 공고는 <b>지정 양식이 없고 자유 형식으로 낸다</b>고 원문에서 확인했습니다</span></label>
+              <textarea id="pd-basis" data-pd-basis rows="2"
+                placeholder="자유 형식 제출이라고 적힌 원문 문장을 그대로 복사해 주세요">${esc(it.prepDocBasis || '')}</textarea>
+              <p class="hint">체크하면 학생 화면에 ‘준비용 문서 만들기’가 생깁니다.
+                <b>제출할 수 없는 공고에 붙이면 학생이 헛일을 합니다</b> — 원문에서 확인한 것만 켜세요.</p>
+            </div>
             <label style="margin-top:10px">학생에게 보여 줄 자격 문장</label>
             ${(() => {
     /* 후보 = 공고 원문에서 뽑아 둔 조각(excerpts, 문자열 배열) + 이미 담아 둔 문장.
@@ -3096,9 +3170,33 @@ function collectEdits() {
     const k = el.dataset.ed;
     let v = el.value;
     if (k === 'amountValue') v = Number(v) || 0;
+    /* 🔴 여러 줄 칸은 **배열로 보낸다** (2026-09-14). 글자 그대로 보내면 모아 둔 수정을
+       시트에 다시 얹을 때 `it.documents` 가 문자열이 되어, 그 칸을 배열로 읽는 다른 자리가
+       `(it.documents || []).map is not a function` 으로 죽는다 — 시트가 아예 안 열렸다.
+       저장소 쪽 cleanLines 는 둘 다 받지만, **화면 안에서도 모양이 같아야** 한다. */
+    if (el.dataset.lines !== undefined) {
+      const arr = String(v || '').split('\n').map((x) => x.trim()).filter(Boolean);
+      patch[k] = arr.length ? arr : null;
+      return;
+    }
     if (v === '' && k !== 'note' && k !== 'summary') v = null;
     patch[k] = v;
   });
+
+  /* ── 이중수혜 · 자유 형식 제출 (2026-09-14) ──────────────────────────
+     🔴 둘 다 **근거 문장을 같이 보낸다** — 저장소 쪽이 저장된 공고 원문에서 그대로 찾아
+        확인하고 못 찾으면 거부한다. 화면이 지어낸 값으로 학생 판정을 바꾸지 못하게 하는 자리다.
+     🔴 범위를 비우면 `null` 을 보내 **칸을 지운다**(로봇에게 돌려준다 — 다음 수집 때 원문에서 다시 읽는다). */
+  const exScope = $('#sheet [data-ex-scope]');
+  if (exScope) {
+    const raw = (($('#sheet [data-ex-raw]') || {}).value || '').trim();
+    patch.exclusivity = exScope.value ? { kind: 'forbidden', scope: exScope.value, raw } : null;
+  }
+  const pd = $('#sheet [data-pd]');
+  if (pd) {
+    patch.prepDoc = pd.checked ? true : null;
+    if (pd.checked) patch.prepDocBasis = (($('#sheet [data-pd-basis]') || {}).value || '').trim();
+  }
   return patch;
 }
 
@@ -3289,6 +3387,20 @@ function bindGlobal() {
     }
     if (e.target.closest('#btn-run-browser')) {
       await runCollector(WF_BROWSER, '브라우저형 수집 로봇'); return;
+    }
+    /* 🔴 막아 둔 공고를 푼다 (2026-09-14). 저장소 쪽 unblock 은 id 로 풀면서
+       **막을 때 적어 둔 짝(blockPairs)으로 주소까지** 같이 푼다 — 한쪽만 풀면
+       로봇이 주소로 계속 막아 그 공고가 영영 다시 등록되지 않는다. */
+    const unb = e.target.closest('[data-unblock]');
+    if (unb) {
+      const bid = unb.dataset.unblock;
+      askSheet({
+        title: '재등록 차단 풀기', goLabel: '풀기',
+        lines: [bid],
+        note: '이 공고를 로봇이 다시 담을 수 있게 됩니다. 다음 수집 때 후보로 올라옵니다.',
+        run: () => applyAction('unblock', { ids: [bid] }, '차단 풀기'),
+      });
+      return;
     }
     if (e.target.closest('[data-auto-toggle]')) {
       const next = !D.autoCfg.enabled;
