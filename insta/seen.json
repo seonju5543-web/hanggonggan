@@ -1088,6 +1088,42 @@
    "cards": 5,
    "dir": "insta/pub/2000421001",
    "at": "2026-09-14"
+  },
+  {
+   "status": "prepared",
+   "code": "2700724005",
+   "org": "경상남도장학회",
+   "name": "도내 대학 해외교환 장학생",
+   "due": "2026-12-18",
+   "school": null,
+   "tplNo": 4,
+   "cards": 4,
+   "dir": "insta/pub/2700724005",
+   "at": "2026-09-14"
+  },
+  {
+   "status": "prepared",
+   "code": "2701084002",
+   "org": "청송양수발전소장학회",
+   "name": "사회적배려장학생",
+   "due": "2026-09-14",
+   "school": null,
+   "tplNo": 3,
+   "cards": 5,
+   "dir": "insta/pub/2701084002",
+   "at": "2026-09-14"
+  },
+  {
+   "status": "prepared",
+   "code": "2000319002",
+   "org": "경상북도 영주시청",
+   "name": "귀농인 대학생 자녀 장학금",
+   "due": "2026-12-31",
+   "school": null,
+   "tplNo": 2,
+   "cards": 4,
+   "dir": "insta/pub/2000319002",
+   "at": "2026-09-14"
   }
  ]
 }
