@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-09-14",
- "count": 2071,
+ "count": 2074,
  "items": [
   {
    "title": "[공통][교외] 2026년 고속도로 장학생 선발(~10/11)",
@@ -74,6 +74,46 @@
    "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%20%ED%91%B8%EB%A5%B8%EB%93%B1%EB%8C%80%20%ED%95%9C%EA%B5%AD%EC%88%98%EB%A0%A5%EC%9B%90%EC%9E%90%EB%A0%A5%20k-%EC%9B%90%EC%A0%84%20%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%8B%A0%EC%B2%AD%EC%95%88%EB%82%B4%20(9.11~9.28",
    "attachments": [],
    "deadlineHint": null,
+   "school": "경희대학교",
+   "campus": "",
+   "foundAt": "2026-09-14"
+  },
+  {
+   "title": "공통 2026년 (재)경주시장학회 장학생 선발 안내",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%202026%EB%85%84%20(%EC%9E%AC)%EA%B2%BD%EC%A3%BC%EC%8B%9C%EC%9E%A5%ED%95%99%ED%9A%8C%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "경희대학교",
+   "campus": "",
+   "foundAt": "2026-09-14"
+  },
+  {
+   "title": "공통 2026년 고속도로 장학생 선발 안내",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%202026%EB%85%84%20%EA%B3%A0%EC%86%8D%EB%8F%84%EB%A1%9C%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "경희대학교",
+   "campus": "",
+   "foundAt": "2026-09-14"
+  },
+  {
+   "title": "서울 2027학년도 미래인재육성재단 장학생 모집",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EC%84%9C%EC%9A%B8%202027%ED%95%99%EB%85%84%EB%8F%84%20%EB%AF%B8%EB%9E%98%EC%9D%B8%EC%9E%AC%EC%9C%A1%EC%84%B1%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91",
+   "attachments": [
+    {
+     "name": "개인정보 수집 동의서.hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=bc52143fb0a44466b1c9ae203b60b4b8&fileSn=1&bbsId=BMSR00040"
+    },
+    {
+     "name": "미래인재장학생 자기소개서.hwpx",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=bc52143fb0a44466b1c9ae203b60b4b8&fileSn=2&bbsId=BMSR00040"
+    },
+    {
+     "name": "장학생 신청서.hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=bc52143fb0a44466b1c9ae203b60b4b8&fileSn=3&bbsId=BMSR00040"
+    }
+   ],
+   "deadlineHint": "모집기간 2026년 9월 23일(수)까지 ■ 신청대상 2027학년도 1학기 2학년 1학기 진학(복학 포함) 예정자 직전학기 학업성적 백분위 90",
    "school": "경희대학교",
    "campus": "",
    "foundAt": "2026-09-14"
