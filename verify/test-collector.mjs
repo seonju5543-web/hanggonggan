@@ -6099,16 +6099,20 @@ console.log('\n■ 못 읽은 파일의 숫자를 화면이 단정하지 않는�
 }
 
 /* ── 학교 장학 신청 포털 (백로그 UI-20 · 2026-09-14) ─────────────────────────
-   학교마다 장학금을 신청하는 시스템이 다르다(경희대 인포21 · 한국외국어대학교 HUFSAbility).
-   그전까지 교내 공고의 '최종 제출처'는 원문 공고 하나였는데, 게시판 글은 읽는 곳이지
-   신청하는 곳이 아니다.
-   🔴 이 절은 **data.js 의 진짜 `officialChannel` 을 떼어 내** 돌린다 — 규칙을 베끼면
-      원본이 바뀌어도 계속 통과한다.
-   🔴 주소를 짐작으로 채우는 것을 막는다: 실제로 열어 확인하지 않은 `info.khu.ac.kr`·
-      `ability.hufs.ac.kr` 은 **없는 주소**였다(DNS 조회 실패). 되돌아오면 여기서 잡는다. */
-console.log('■ 학교 장학 신청 포털 — 교내 공고의 제출처 (2026-09-14 · 백로그 UI-20)');
+   제출 안내 1단계가 예전부터 "학교 포털 장학 메뉴에서 접수 방법 확인"이라고 말해 왔는데
+   그 포털이 어디인지는 앱 어디에도 없었다. 그 한 줄을 누를 수 있게 만든 것이 이 표다.
+
+   🔴 이 절이 지키는 가장 큰 것은 **포털이 '제출처'로 돌아오지 않는 것**이다.
+      첫 판이 그렇게 짰다가 코드 리뷰에서 되돌렸다 — `eligibility.schoolOnly` 는 '이 학교
+      학생에게만 보인다'(노출 범위)이지 '이 학교에 낸다'가 아니라, 학교 게시판에 올라온
+      교외·국가 공고 12건이 전부 틀린 제출처를 받았다. 그중 중소기업취업연계장학금은
+      같은 화면의 원문 발췌가 `www.kosaf.go.kr … 를 통하여 신청` 이었다(원칙 8-1 위반).
+   🔴 그리고 **짐작한 주소가 들어오는 것**을 막는다 — 확인 기록(verifiedTitle·verifiedAt)이
+      없으면 표에 못 들어온다. 주석은 관문이 아니다(「관문이 없는 규칙은 되돌아간다」). */
+console.log('■ 학교 장학 신청 포털 — 「학교 포털」이 어디인지 (2026-09-14 · 백로그 UI-20)');
 {
   const dataSrc = readText(new URL('../data.js', import.meta.url));
+  const appSrc2 = readText(new URL('../app.js', import.meta.url));
   const lit = (name) => {
     const at = dataSrc.indexOf(`const ${name} = {`);
     if (at < 0) throw new Error(`data.js 에서 ${name} 을 못 찾음`);
@@ -6116,67 +6120,85 @@ console.log('■ 학교 장학 신청 포털 — 교내 공고의 제출처 (202
     if (end < 0) throw new Error(`${name} 의 끝을 못 찾음`);
     return dataSrc.slice(at, end + 3);
   };
-  const grabData = (name) => {
-    const start = dataSrc.indexOf(`function ${name}(`);
-    if (start < 0) throw new Error(`data.js 에서 ${name} 을 못 찾음`);
+  /* 🔴 규칙을 베끼지 않는다 — data.js 의 진짜 함수를 이름으로 떼어 내 돌린다 */
+  const grabData = (src, name) => {
+    const start = src.indexOf(`function ${name}(`);
+    if (start < 0) throw new Error(`${name} 을 못 찾음`);
     let depth = 0, seen = false;
-    for (let i = dataSrc.indexOf('{', start); i < dataSrc.length; i++) {
-      if (dataSrc[i] === '{') { depth++; seen = true; }
-      else if (dataSrc[i] === '}') { depth--; if (seen && depth === 0) return dataSrc.slice(start, i + 1); }
+    for (let i = src.indexOf('{', start); i < src.length; i++) {
+      if (src[i] === '{') { depth++; seen = true; }
+      else if (src[i] === '}') { depth--; if (seen && depth === 0) return src.slice(start, i + 1); }
     }
     throw new Error(`${name} 의 끝을 못 찾음`);
   };
-  const { officialChannel, SCHOOL_PORTALS } = new Function(
+  const { officialChannel, schoolPortal, SCHOOL_PORTALS } = new Function(
     [lit('OFFICIAL_CHANNELS'), lit('SCHOOL_PORTALS'), lit('SUBMIT_GUIDES'),
-      grabData('officialChannel'),
-      'return { officialChannel, SCHOOL_PORTALS };'].join('\n'))();
+      grabData(dataSrc, 'officialChannel'), grabData(dataSrc, 'schoolPortal'),
+      'return { officialChannel, schoolPortal, SCHOOL_PORTALS };'].join('\n'))();
 
   const names = Object.keys(SCHOOL_PORTALS);
   eq('학교 포털 표를 실제로 읽었다', names.length >= 2, true);
 
   /* 열쇠는 registered.json 의 schoolOnly 와 같은 글자여야 한다 = data.js UNIVERSITIES 의 이름 */
-  const uniBlock = dataSrc.slice(dataSrc.indexOf('const UNIVERSITIES = ['),
-    dataSrc.indexOf('\n];', dataSrc.indexOf('const UNIVERSITIES = [')));
-  const unis = new Set([...uniBlock.matchAll(/'([^']+)'/g)].map((m) => m[1]));
+  const uniAt = dataSrc.indexOf('const UNIVERSITIES = [');
+  const unis = new Set([...dataSrc.slice(uniAt, dataSrc.indexOf('\n];', uniAt))
+    .matchAll(/'([^']+)'/g)].map((m) => m[1]));
   eq('  data.js 학교 목록을 실제로 읽었다', unis.size > 100, true);
   eq('  포털 표의 학교가 전부 UNIVERSITIES 안에 있다', names.filter((n) => !unis.has(n)), []);
 
-  /* 🔴 짐작으로 지은 주소가 되돌아오는 것을 막는다 (둘 다 DNS 조회부터 실패했다) */
-  const urls = names.map((n) => SCHOOL_PORTALS[n].url);
-  eq('  주소가 전부 https 다', urls.filter((u) => !/^https:\/\//.test(u)), []);
+  /* 🔴 짐작으로 지은 주소를 막는다 — 확인 기록이 없으면 못 들어온다.
+     (주소 둘을 이름으로 막는 것만으로는 다음 사람이 다른 학교를 짐작으로 넣는 것을 못 막는다) */
+  const bad = names.filter((n) => {
+    const p = SCHOOL_PORTALS[n];
+    return !/^https:\/\//.test(p.url || '')
+      || !(p.verifiedTitle || '').trim()
+      || !/^\d{4}-\d{2}-\d{2}$/.test(p.verifiedAt || '');
+  });
+  eq('  주소마다 실제로 열어 본 기록(제목·날짜)이 있다', bad, []);
   eq('  확인해 보니 없던 주소가 돌아오지 않았다',
-    urls.filter((u) => /^https:\/\/(info|ability)\./.test(u)), []);
+    names.map((n) => SCHOOL_PORTALS[n].url)
+      .filter((u) => /^https:\/\/(info|ability)\.(khu|hufs)\.ac\.kr/.test(u)), []);
   eq('  이름을 줄이지 않는다 (학생이 자기 학교로 못 알아본다)',
     names.filter((n) => !SCHOOL_PORTALS[n].label.startsWith(n)), []);
 
-  /* 교내 공고 → 제출처는 학교 포털 (원문 공고가 아니다) */
+  /* 🔴 되돌리지 말 것 — 포털은 **제출처가 아니다**.
+     schoolOnly 는 노출 범위일 뿐이라, 교외·국가 공고가 학교 포털을 제출처로 받게 된다. */
   const khu = { id: 'reg-x', provider: '경희대학교', sourceUrl: 'https://news.khu.ac.kr/list',
     eligibility: { schoolOnly: '경희대학교' } };
-  eq('교내 공고의 제출처가 학교 포털이다', officialChannel(khu).url, SCHOOL_PORTALS['경희대학교'].url);
-  eq('  이름이 그 학교 것으로 나온다', officialChannel(khu).label, SCHOOL_PORTALS['경희대학교'].label);
-  eq('  제출 단계 안내가 비어 있지 않다', (officialChannel(khu).guide || []).length > 0, true);
-
-  /* 🔴 이메일 접수 공고에는 포털을 붙이지 않는다 — 제출처가 메일이라 거짓말이 된다 */
-  const mailed = { ...khu, applyEmail: 'a@b.ac.kr' };
-  eq('이메일 접수 공고는 포털을 가리키지 않는다', officialChannel(mailed).url, khu.sourceUrl);
-
-  /* 표에 없는 학교는 아무것도 지어내지 않고 예전 그대로 */
-  const other = { ...khu, provider: '서울대학교', eligibility: { schoolOnly: '서울대학교' } };
-  eq('표에 없는 학교는 원문 공고 그대로다', officialChannel(other).url, khu.sourceUrl);
-
-  /* 한국장학재단 상시 제도는 예전 그대로 (포털이 가로채지 않는다) */
-  eq('한국장학재단 제도는 예전 그대로다',
+  eq('교내 게시 공고의 제출처는 여전히 원문 공고다 (포털이 가로채지 않는다)',
+    officialChannel(khu).url, khu.sourceUrl);
+  eq('  한국장학재단 제도도 예전 그대로다',
     officialChannel({ id: 'kosaf-type1', provider: '한국장학재단' }).url, 'https://www.kosaf.go.kr');
+  /* ⚠️ 이름 하나만 막으면 샌다 — `schoolPortal(sch)` 로 우회해도 같은 사고다(직접 겪었다) */
+  eq('  officialChannel 이 포털을 아예 안 본다',
+    /SCHOOL_PORTALS|schoolPortal\s*\(/.test(grabData(dataSrc, 'officialChannel')), false);
 
-  /* 등록된 교내 공고가 실제로 포털을 받는지 — 픽스처가 아니라 진짜 데이터로 한 번 */
+  /* 실제로 그런 공고가 등록돼 있다 — 위 규칙이 가상의 걱정이 아니라는 증거(사라지면 알려 준다) */
   const regd = JSON.parse(readText(new URL('../data/registered.json', import.meta.url))).items || [];
   const scoped = regd.filter((i) => (i.eligibility || {}).schoolOnly);
-  eq('등록된 교내 공고가 있다 (헛도는 검사가 아니다)', scoped.length > 0, true);
-  eq('  그중 포털 표에 있는 학교는 전부 포털을 제출처로 받는다',
-    scoped.filter((i) => SCHOOL_PORTALS[i.eligibility.schoolOnly])
-      .filter((i) => officialChannel(i).url !== SCHOOL_PORTALS[i.eligibility.schoolOnly].url).length, 0);
-}
+  eq('등록된 교내 게시 공고가 있다 (헛도는 검사가 아니다)', scoped.length > 0, true);
+  eq('  그중 교외·국가 공고가 실제로 섞여 있다 (제출처로 쓰면 안 되는 이유)',
+    scoped.filter((i) => /\[교외\]|\[국가/.test(i.name)).length > 0, true);
 
+  /* 표에 있는 학교의 공고는 전부 포털 한 줄을 받는다 — 학교별로 센다.
+     🔴 전체를 한 번에 세면 그 학교 공고가 0건일 때 0 === 0 으로 조용히 통과한다. */
+  for (const n of names) {
+    const mine = scoped.filter((i) => i.eligibility.schoolOnly === n);
+    if (!mine.length) continue;   // 아직 공고가 없는 학교는 실데이터로 잴 것이 없다
+    eq(`  ${n} 공고 ${mine.length}건이 전부 포털 한 줄을 받는다`,
+      mine.filter((i) => (schoolPortal(i) || {}).url !== SCHOOL_PORTALS[n].url).length, 0);
+  }
+  eq('  표에 없는 학교는 아무것도 지어내지 않는다',
+    schoolPortal({ eligibility: { schoolOnly: '서울대학교' } }), null);
+  eq('  자격 칸이 없어도 죽지 않는다', schoolPortal({}), null);
+
+  /* 화면 — 한 줄이 실제로 제출 안내 블록에 그려지고, 단정하지 않는다 */
+  const note = grabData(appSrc2, 'schoolPortalNote');
+  eq('화면이 그 한 줄을 그린다', /\$\{schoolPortalNote\(sch\)\}/.test(appSrc2), true);
+  eq('  주소를 safeUrl·esc 를 거쳐 낸다', /esc\(safeUrl\(p\.url\)\)/.test(note), true);
+  eq('  "이 공고를 여기 제출하라"고 단정하지 않는다', /이 공고의 접수 방법은/.test(note), true);
+  eq('  교내 장학금으로 한정해 말한다', /교내 장학금은/.test(note), true);
+}
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);

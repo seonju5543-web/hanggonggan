@@ -2821,6 +2821,24 @@ function applyLock(result, app, d) {
 }
 
 /* ---------------- 상세 바텀시트 ---------------- */
+/* 「학교 포털」이 어디인지 알려 주는 한 줄 (백로그 UI-20 · 2026-09-14)
+
+   바로 위 안내 1단계가 예전부터 "학교 포털 장학 메뉴에서 접수 방법 확인"이라고 말해 왔는데
+   그 포털이 어디인지는 앱 어디에도 없었다 — 학교마다 다르다(data.js `SCHOOL_PORTALS`).
+
+   🔴 **이 공고의 제출처라고 말하지 않는다.** `eligibility.schoolOnly` 는 '이 학교 학생에게만
+      보인다'는 뜻이라, 학교 게시판에 올라온 교외·국가 공고가 전부 여기 들어 있다(실측 35건 중
+      12건). 그래서 문장은 '교내 장학금은 여기서 신청한다' + '이 공고의 접수 방법은 원문을
+      따르라' 둘로 나뉜다. 하나로 합쳐 "여기에 제출하세요"가 되면 앱이 같은 화면에 인용한
+      원문(`www.kosaf.go.kr 을 통하여 신청`)과 반대되는 말을 단정하게 된다(원칙 8-1).
+   🔴 표에 없는 학교는 지어내지 않고 **아무것도 안 띄운다.**
+   관문: verify/test-collector.mjs '학교 장학 신청 포털' 절. */
+function schoolPortalNote(sch) {
+  const p = schoolPortal(sch);
+  if (!p) return '';
+  return `<p class="dp-note">교내 장학금은 <a href="${esc(safeUrl(p.url))}" target="_blank" rel="noopener">${esc(p.label)} ↗</a>에서 신청합니다. 이 공고의 접수 방법은 위 안내와 공고 원문을 따라 주세요.</p>`;
+}
+
 function openDetail(id) {
   const sch = findSch(id);
   if (!sch) return;
@@ -3088,6 +3106,7 @@ function openDetail(id) {
         ${certStatusListHtml(sch)}
         <h4>최종 제출 방법 <span class="channel-tag">${submitChannelLabel(sch)}</span></h4>
         <ol class="guide-list">${ch.guide.map((g) => `<li>${g}</li>`).join('')}</ol>
+        ${schoolPortalNote(sch)}
         ${(ch.url || sch.sourceUrl) && step < 1 ? `
         <button class="btn btn-primary" id="btn-go-submit" style="width:100%;margin-bottom:8px">내용 복사하고 제출처 열기 ↗</button>` : ''}
         <div class="submit-actions">

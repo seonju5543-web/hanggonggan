@@ -369,20 +369,39 @@ const OFFICIAL_CHANNELS = {
   'kosaf-ai-mentor':  { label: '한국장학재단', url: 'https://www.kosaf.go.kr' },
 };
 /* 학교별 장학 신청 포털 (백로그 UI-20 · 2026-09-14)
-   학교마다 장학금을 실제로 신청하는 시스템이 다르다 — 경희대는 '인포', 한국외국어대학교는
-   'HUFSAbility' 다. 그전까지 교내 공고의 최종 제출처는 원문 공고(게시판 글) 하나였는데,
-   게시판 글은 '읽는 곳'이지 '신청하는 곳'이 아니라 학생이 어디서 신청하는지 알 수 없었다.
-   🔴 주소는 **실제로 열어 제목으로 확인한 것만** 적는다(짐작 금지 · 운영 원칙 8-1).
-      2026-09-14 확인: info21.khu.ac.kr → <title>경희대학교 인포21</title> ·
-      hufsability.hufs.ac.kr → <title>한국외대 HUFSAbility</title>.
+   `SUBMIT_GUIDES.campus` 1단계가 예전부터 "학교 포털 장학 메뉴에서 접수 방법 확인"이라고
+   말해 왔는데 **그 포털이 어디인지는 아무 데도 없었다.** 학교마다 다르다 — 경희대는 '인포',
+   한국외국어대학교는 'HUFSAbility' 다. 그 한 줄을 누를 수 있게 만드는 표다.
+
+   🔴 **제출처가 아니다.** 처음엔 `officialChannel` 이 이 표를 최종 제출처로 돌려주게 짰다가
+      코드 리뷰에서 되돌렸다. `eligibility.schoolOnly` 는 '이 학교 학생에게만 보인다'(노출
+      범위)이지 '이 학교에 낸다'가 아니다 — 실측으로 35건 중 12건이 학교 게시판에 올라온
+      **교외·국가 공고**이고, 그중 중소기업취업연계장학금은 같은 화면의 원문 발췌가
+      `한국장학재단 홈페이지(www.kosaf.go.kr)…를 통하여 신청` 이라고 적고 있었다.
+      제출처로 쓰면 앱이 **자기가 인용한 원문과 반대되는 말**을 단정한다(운영 원칙 8-1).
+      정직한 모름을 자신 있는 오답으로 바꾸는 것이라 바꾸기 전보다 나쁘다.
+   🔴 그래서 화면에도 "교내 장학금은 여기서 신청한다 · **이 공고의 접수 방법은 원문을
+      따르라**"로만 적는다(app.js `schoolPortalNote`).
+
+   🔴 주소는 **실제로 열어 제목으로 확인한 것만** 적는다(짐작 금지). 확인 기록을 칸으로
+      남겨 두는 이유는 다음 사람이 짐작으로 한 줄 더 넣는 것을 관문이 막게 하려는 것이다.
       ⚠️ 흔히 떠올리는 `info.khu.ac.kr`·`ability.hufs.ac.kr` 은 **없는 주소**다(DNS 조회 실패).
-   🔴 여기 없는 학교는 아무것도 지어내지 않고 예전 그대로 원문 공고를 가리킨다.
    ⚠️ 열쇠는 `registered.json` 의 `eligibility.schoolOnly` 와 같은 글자여야 한다
       (= data.js UNIVERSITIES 의 이름). 관문: test-collector '학교 장학 신청 포털' 절. */
 const SCHOOL_PORTALS = {
-  '경희대학교':        { label: '경희대학교 인포21',        url: 'https://info21.khu.ac.kr' },
-  '한국외국어대학교':  { label: '한국외국어대학교 HUFSAbility', url: 'https://hufsability.hufs.ac.kr' },
+  '경희대학교': {
+    label: '경희대학교 인포21', url: 'https://info21.khu.ac.kr',
+    verifiedTitle: '경희대학교 인포21', verifiedAt: '2026-09-14',
+  },
+  '한국외국어대학교': {
+    label: '한국외국어대학교 HUFSAbility', url: 'https://hufsability.hufs.ac.kr',
+    verifiedTitle: '한국외대 HUFSAbility', verifiedAt: '2026-09-14',
+  },
 };
+/* 그 공고를 보는 학생의 학교 포털 — 없으면 null(지어내지 않는다) */
+function schoolPortal(sch) {
+  return SCHOOL_PORTALS[((sch || {}).eligibility || {}).schoolOnly] || null;
+}
 
 /* 접수 채널별 최종 제출 단계 가이드 */
 const SUBMIT_GUIDES = {
@@ -426,11 +445,6 @@ function officialChannel(sch) {
     const kind = sch.id.startsWith('kosaf') ? 'kosaf' : 'foundation';
     return { ...ch, guide: SUBMIT_GUIDES[kind] };
   }
-  /* 교내 공고는 학교 포털에서 신청한다 — 게시판 글이 아니라 그 시스템을 제출처로 준다.
-     🔴 이메일 접수 공고는 제외한다 — 제출처가 메일이라 포털을 가리키면 거짓말이 된다.
-     원문 공고 링크는 이 자리와 별개로 화면에 그대로 남는다(app.js `srcNote`·`ad-link`). */
-  const portal = !sch.applyEmail && SCHOOL_PORTALS[(sch.eligibility || {}).schoolOnly];
-  if (portal) return { ...portal, guide: SUBMIT_GUIDES.campus };
   if (sch.sourceUrl) {
     return { label: `${sch.provider} (원문 공고의 접수 방법)`, url: sch.sourceUrl, guide: SUBMIT_GUIDES.campus };
   }
