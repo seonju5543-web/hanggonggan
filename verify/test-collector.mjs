@@ -3736,9 +3736,16 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
      ⚠️ 예외 셋은 **자기가 앱 서버를 직접 띄운다**(`http.createServer`). 남의 앱을 잴 수가
         없어 이미 안전하고, 관문을 붙이면 오히려 없는 포트를 확인하다 죽는다. */
   const SELF_SERVED = ['verify-admin.js', 'verify-supabase.js', 'verify-push-client.js'];
+  /* ⚠️ 두 번째 예외 갈래 — **서버를 아예 안 쓰는 드라이버** (2026-09-14 신설).
+     `verify-admin-shape.js` 는 CSS 두 벌을 디스크에서 읽어 `page.setContent` 로 직접 넣는다.
+     남의 서버를 잴 길이 처음부터 없어 `assertOwnServer` 를 붙일 자리도 없다(없는 포트를
+     확인하다 죽는다). 대신 **정말 서버를 안 쓰는지**를 아래에서 증명한다 —
+     주소로 열지 않는가(goto http) + 화면을 스스로 넣는가(setContent). */
+  const NO_SERVER = ['verify-admin-shape.js'];
   const browserDrivers = names.filter((f) => {
     const src = readText(new URL(f, dir));
-    return /require\('playwright-core'\)/.test(src) && !SELF_SERVED.includes(f);
+    return /require\('playwright-core'\)/.test(src)
+      && !SELF_SERVED.includes(f) && !NO_SERVER.includes(f);
   });
   const noGuard = browserDrivers.filter((f) =>
     !/assertOwnServer\s*\(/.test(readText(new URL(f, dir))));
@@ -3749,6 +3756,14 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
     catch { return true; }   // 파일이 없어졌으면 목록에서 빼야 한다
   });
   eq('  예외 목록이 전부 자기 서버를 띄우는 드라이버다', fakeExempt, []);
+  /* 서버를 안 쓴다고 적어 둔 드라이버가 정말 그런지 — 주소로 열면 남의 앱을 잴 수 있다 */
+  const fakeNoServer = NO_SERVER.filter((f) => {
+    try {
+      const src = readText(new URL(f, dir));
+      return /goto\(\s*[`'"]https?:/.test(src) || !/setContent\s*\(/.test(src);
+    } catch { return true; }
+  });
+  eq('  서버를 안 쓴다고 적은 드라이버가 정말 주소를 안 연다', fakeNoServer, []);
 
   /* 🔴 **화면이 숨기는 학교와 로봇이 수집하는 학교가 갈라지면 안 된다** (2026-09-02 코드 리뷰).
      `match-engine.js` 의 `SERVED_SCHOOLS` 는 `collector/schools.json` 의 활성 학교를
