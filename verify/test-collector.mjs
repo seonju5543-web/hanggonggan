@@ -6098,5 +6098,85 @@ console.log('\n■ 못 읽은 파일의 숫자를 화면이 단정하지 않는�
       .filter((m) => m[1] !== 'readJson').map((m) => m[2]), []);
 }
 
+/* ── 학교 장학 신청 포털 (백로그 UI-20 · 2026-09-14) ─────────────────────────
+   학교마다 장학금을 신청하는 시스템이 다르다(경희대 인포21 · 한국외국어대학교 HUFSAbility).
+   그전까지 교내 공고의 '최종 제출처'는 원문 공고 하나였는데, 게시판 글은 읽는 곳이지
+   신청하는 곳이 아니다.
+   🔴 이 절은 **data.js 의 진짜 `officialChannel` 을 떼어 내** 돌린다 — 규칙을 베끼면
+      원본이 바뀌어도 계속 통과한다.
+   🔴 주소를 짐작으로 채우는 것을 막는다: 실제로 열어 확인하지 않은 `info.khu.ac.kr`·
+      `ability.hufs.ac.kr` 은 **없는 주소**였다(DNS 조회 실패). 되돌아오면 여기서 잡는다. */
+console.log('■ 학교 장학 신청 포털 — 교내 공고의 제출처 (2026-09-14 · 백로그 UI-20)');
+{
+  const dataSrc = readText(new URL('../data.js', import.meta.url));
+  const lit = (name) => {
+    const at = dataSrc.indexOf(`const ${name} = {`);
+    if (at < 0) throw new Error(`data.js 에서 ${name} 을 못 찾음`);
+    const end = dataSrc.indexOf('\n};', at);
+    if (end < 0) throw new Error(`${name} 의 끝을 못 찾음`);
+    return dataSrc.slice(at, end + 3);
+  };
+  const grabData = (name) => {
+    const start = dataSrc.indexOf(`function ${name}(`);
+    if (start < 0) throw new Error(`data.js 에서 ${name} 을 못 찾음`);
+    let depth = 0, seen = false;
+    for (let i = dataSrc.indexOf('{', start); i < dataSrc.length; i++) {
+      if (dataSrc[i] === '{') { depth++; seen = true; }
+      else if (dataSrc[i] === '}') { depth--; if (seen && depth === 0) return dataSrc.slice(start, i + 1); }
+    }
+    throw new Error(`${name} 의 끝을 못 찾음`);
+  };
+  const { officialChannel, SCHOOL_PORTALS } = new Function(
+    [lit('OFFICIAL_CHANNELS'), lit('SCHOOL_PORTALS'), lit('SUBMIT_GUIDES'),
+      grabData('officialChannel'),
+      'return { officialChannel, SCHOOL_PORTALS };'].join('\n'))();
+
+  const names = Object.keys(SCHOOL_PORTALS);
+  eq('학교 포털 표를 실제로 읽었다', names.length >= 2, true);
+
+  /* 열쇠는 registered.json 의 schoolOnly 와 같은 글자여야 한다 = data.js UNIVERSITIES 의 이름 */
+  const uniBlock = dataSrc.slice(dataSrc.indexOf('const UNIVERSITIES = ['),
+    dataSrc.indexOf('\n];', dataSrc.indexOf('const UNIVERSITIES = [')));
+  const unis = new Set([...uniBlock.matchAll(/'([^']+)'/g)].map((m) => m[1]));
+  eq('  data.js 학교 목록을 실제로 읽었다', unis.size > 100, true);
+  eq('  포털 표의 학교가 전부 UNIVERSITIES 안에 있다', names.filter((n) => !unis.has(n)), []);
+
+  /* 🔴 짐작으로 지은 주소가 되돌아오는 것을 막는다 (둘 다 DNS 조회부터 실패했다) */
+  const urls = names.map((n) => SCHOOL_PORTALS[n].url);
+  eq('  주소가 전부 https 다', urls.filter((u) => !/^https:\/\//.test(u)), []);
+  eq('  확인해 보니 없던 주소가 돌아오지 않았다',
+    urls.filter((u) => /^https:\/\/(info|ability)\./.test(u)), []);
+  eq('  이름을 줄이지 않는다 (학생이 자기 학교로 못 알아본다)',
+    names.filter((n) => !SCHOOL_PORTALS[n].label.startsWith(n)), []);
+
+  /* 교내 공고 → 제출처는 학교 포털 (원문 공고가 아니다) */
+  const khu = { id: 'reg-x', provider: '경희대학교', sourceUrl: 'https://news.khu.ac.kr/list',
+    eligibility: { schoolOnly: '경희대학교' } };
+  eq('교내 공고의 제출처가 학교 포털이다', officialChannel(khu).url, SCHOOL_PORTALS['경희대학교'].url);
+  eq('  이름이 그 학교 것으로 나온다', officialChannel(khu).label, SCHOOL_PORTALS['경희대학교'].label);
+  eq('  제출 단계 안내가 비어 있지 않다', (officialChannel(khu).guide || []).length > 0, true);
+
+  /* 🔴 이메일 접수 공고에는 포털을 붙이지 않는다 — 제출처가 메일이라 거짓말이 된다 */
+  const mailed = { ...khu, applyEmail: 'a@b.ac.kr' };
+  eq('이메일 접수 공고는 포털을 가리키지 않는다', officialChannel(mailed).url, khu.sourceUrl);
+
+  /* 표에 없는 학교는 아무것도 지어내지 않고 예전 그대로 */
+  const other = { ...khu, provider: '서울대학교', eligibility: { schoolOnly: '서울대학교' } };
+  eq('표에 없는 학교는 원문 공고 그대로다', officialChannel(other).url, khu.sourceUrl);
+
+  /* 한국장학재단 상시 제도는 예전 그대로 (포털이 가로채지 않는다) */
+  eq('한국장학재단 제도는 예전 그대로다',
+    officialChannel({ id: 'kosaf-type1', provider: '한국장학재단' }).url, 'https://www.kosaf.go.kr');
+
+  /* 등록된 교내 공고가 실제로 포털을 받는지 — 픽스처가 아니라 진짜 데이터로 한 번 */
+  const regd = JSON.parse(readText(new URL('../data/registered.json', import.meta.url))).items || [];
+  const scoped = regd.filter((i) => (i.eligibility || {}).schoolOnly);
+  eq('등록된 교내 공고가 있다 (헛도는 검사가 아니다)', scoped.length > 0, true);
+  eq('  그중 포털 표에 있는 학교는 전부 포털을 제출처로 받는다',
+    scoped.filter((i) => SCHOOL_PORTALS[i.eligibility.schoolOnly])
+      .filter((i) => officialChannel(i).url !== SCHOOL_PORTALS[i.eligibility.schoolOnly].url).length, 0);
+}
+
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);
