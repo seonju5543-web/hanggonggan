@@ -38,7 +38,7 @@ const eq = (name, got, want) => {
    ⚠️ 글자 크기와 여백은 어디서도 대지 않는다 — 관리자는 앱1 척도에서 한 단 위를 쓰기로
       개발자가 정했다(2026-09-13). */
 const PAIRS = [
-  ['btn',       'btn',       ['borderRadius', 'fontWeight']],
+  ['btn',       'btn',       ['borderRadius', 'fontWeight', 'fontFamily']],
   ['btnPrimary', 'btnPrimary', ['borderRadius', 'backgroundColor', 'boxShadow']],
   ['btnSm',     'btnSm',     ['borderRadius']],
   ['chip',      'chip',      ['borderRadius', 'borderTopWidth', 'fontWeight']],
@@ -86,7 +86,10 @@ const APP1_HTML = `
   <input id="input" type="text"><textarea id="textarea"></textarea>
   </div></div>`;
 
-const PROPS = ['borderRadius', 'backgroundColor', 'color', 'fontWeight', 'boxShadow',
+/* ⚠️ `fontFamily` 는 **글꼴 스택이 갈라지지 않았는가**만 본다 — 그 글꼴이 실제로 내려받아졌는지는
+   여기서 못 잰다(두 표본 다 링크 없이 그리고, 이 샌드박스는 그 CDN 이 막혀 있다).
+   '같은 주소로 싣는가 · CSP 가 허용하는가'는 `verify/ui-tone.mjs` ④ 가 본다. */
+const PROPS = ['borderRadius', 'backgroundColor', 'color', 'fontWeight', 'fontFamily', 'boxShadow',
   'borderTopWidth', 'borderBottomWidth', 'borderLeftWidth', 'borderTopColor'];
 
 (async () => {
