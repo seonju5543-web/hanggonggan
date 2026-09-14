@@ -1,13 +1,119 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-09-14",
- "count": 2067,
+ "count": 2074,
  "items": [
+  {
+   "title": "[공통][교외] 2026년 고속도로 장학생 선발(~10/11)",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/266533/artclView.do",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-09-14"
+  },
+  {
+   "title": "[서울][국가근로] 2026학년도 2학기 국가근로장학생 모집 안내(추가)",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/266575/artclView.do",
+   "attachments": [
+    {
+     "name": "(서식)2026학년도 2학기 국가근로(추가모집) 지원서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150585/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간 : &nbsp; 2026. 9. 14.(월 ) ~ 2026. 9. 21.(월 ) 10:00 &nbsp; ※ &nbsp; 선발 완료시 마",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-09-14"
+  },
+  {
+   "title": "[서울][교외]2026년 2학기 故구종서 장학금 장학생 모집 안내(~9/23)",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/266612/artclView.do",
+   "attachments": [],
+   "deadlineHint": "지원기간 : 2026. 9.&nbsp;16(수 ) ~&nbsp;9.&nbsp;23(수 ) 15:00 까지 &nbsp;&nbsp;나 . 선발 :",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-09-14"
+  },
+  {
+   "title": "[공통][교외](재)인천인재평생교육진흥원 장학생 선발 안내 (~10/8)",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/266630/artclView.do",
+   "attachments": [
+    {
+     "name": "[붙임1]26년 하반기_인천인희망드림 장학생(공고문).hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150595/download.do"
+    },
+    {
+     "name": "[붙임2]26년 하반기_관외대학 거주비 지원(공고문).hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150596/download.do"
+    },
+    {
+     "name": "[붙임3]26년 하반기_공익인재(공고문).hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150597/download.do"
+    },
+    {
+     "name": "[붙임4]26년 하반기_재외동포 자녀지원 장학생(공고문).hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150598/download.do"
+    },
+    {
+     "name": "[붙임5]26년 하반기_SK행복(공고문).hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150599/download.do"
+    },
+    {
+     "name": "[붙임6]26년 하반기_iHUG 인천도시공사 장학생(공고문).hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150600/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-09-14"
+  },
   {
    "title": "공통 푸른등대 한국수력원자력 k-원전 장학금 신청안내 (9.11~9.28)",
    "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%20%ED%91%B8%EB%A5%B8%EB%93%B1%EB%8C%80%20%ED%95%9C%EA%B5%AD%EC%88%98%EB%A0%A5%EC%9B%90%EC%9E%90%EB%A0%A5%20k-%EC%9B%90%EC%A0%84%20%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%8B%A0%EC%B2%AD%EC%95%88%EB%82%B4%20(9.11~9.28",
    "attachments": [],
    "deadlineHint": null,
+   "school": "경희대학교",
+   "campus": "",
+   "foundAt": "2026-09-14"
+  },
+  {
+   "title": "공통 2026년 (재)경주시장학회 장학생 선발 안내",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%202026%EB%85%84%20(%EC%9E%AC)%EA%B2%BD%EC%A3%BC%EC%8B%9C%EC%9E%A5%ED%95%99%ED%9A%8C%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "경희대학교",
+   "campus": "",
+   "foundAt": "2026-09-14"
+  },
+  {
+   "title": "공통 2026년 고속도로 장학생 선발 안내",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%202026%EB%85%84%20%EA%B3%A0%EC%86%8D%EB%8F%84%EB%A1%9C%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "경희대학교",
+   "campus": "",
+   "foundAt": "2026-09-14"
+  },
+  {
+   "title": "서울 2027학년도 미래인재육성재단 장학생 모집",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EC%84%9C%EC%9A%B8%202027%ED%95%99%EB%85%84%EB%8F%84%20%EB%AF%B8%EB%9E%98%EC%9D%B8%EC%9E%AC%EC%9C%A1%EC%84%B1%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91",
+   "attachments": [
+    {
+     "name": "개인정보 수집 동의서.hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=bc52143fb0a44466b1c9ae203b60b4b8&fileSn=1&bbsId=BMSR00040"
+    },
+    {
+     "name": "미래인재장학생 자기소개서.hwpx",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=bc52143fb0a44466b1c9ae203b60b4b8&fileSn=2&bbsId=BMSR00040"
+    },
+    {
+     "name": "장학생 신청서.hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=bc52143fb0a44466b1c9ae203b60b4b8&fileSn=3&bbsId=BMSR00040"
+    }
+   ],
+   "deadlineHint": "모집기간 2026년 9월 23일(수)까지 ■ 신청대상 2027학년도 1학기 2학년 1학기 진학(복학 포함) 예정자 직전학기 학업성적 백분위 90",
    "school": "경희대학교",
    "campus": "",
    "foundAt": "2026-09-14"
