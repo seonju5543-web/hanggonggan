@@ -872,6 +872,78 @@
    "cards": 5,
    "dir": "insta/pub/0653002",
    "at": "2026-09-14"
+  },
+  {
+   "status": "prepared",
+   "code": "auto-b2adec9588eb82b420911928",
+   "org": "경희대학교",
+   "name": "푸른등대 한국수력원자력 k-원전 장학금 신청안내",
+   "due": "2026-09-28",
+   "school": "경희대",
+   "tplNo": 3,
+   "cards": 4,
+   "dir": "insta/pub/auto-b2adec9588eb82b420911928",
+   "at": "2026-09-14"
+  },
+  {
+   "status": "prepared",
+   "code": "2000458002",
+   "org": "재단법인 상주시장학회",
+   "name": "희망장학금",
+   "due": "2026-09-23",
+   "school": null,
+   "tplNo": 3,
+   "cards": 5,
+   "dir": "insta/pub/2000458002",
+   "at": "2026-09-14"
+  },
+  {
+   "status": "prepared",
+   "code": "2703305005",
+   "org": "재단법인 울산연구원",
+   "name": "생활장학금",
+   "due": "2026-09-23",
+   "school": null,
+   "tplNo": 2,
+   "cards": 5,
+   "dir": "insta/pub/2703305005",
+   "at": "2026-09-14"
+  },
+  {
+   "status": "prepared",
+   "code": "0800002",
+   "org": "(재)전남광주통합특별시 서구 장학재단",
+   "name": "행복(생활비)장학금",
+   "due": "2026-09-30",
+   "school": null,
+   "tplNo": 1,
+   "cards": 5,
+   "dir": "insta/pub/0800002",
+   "at": "2026-09-14"
+  },
+  {
+   "status": "prepared",
+   "code": "2703381003",
+   "org": "재단법인 연수큰재장학재단",
+   "name": "복지장학생",
+   "due": "2026-09-30",
+   "school": null,
+   "tplNo": 1,
+   "cards": 5,
+   "dir": "insta/pub/2703381003",
+   "at": "2026-09-14"
+  },
+  {
+   "status": "prepared",
+   "code": "2000389001",
+   "org": "(재)부산북구장학회",
+   "name": "장학생",
+   "due": "2026-10-08",
+   "school": null,
+   "tplNo": 3,
+   "cards": 5,
+   "dir": "insta/pub/2000389001",
+   "at": "2026-09-14"
   }
  ]
 }
