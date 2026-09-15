@@ -150,10 +150,20 @@ console.log('■ HWP 원본은 미리보기가 아니라 본문을 읽는다 (20
   /* ⚠️ 2026-09-12: 한국장학재단 로봇을 여기 넣는 것을 처음에 빠뜨렸다 — 그래서 받아 둔
      공고문 HWP 를 **미리보기 1023자만** 읽고 있었다. 첨부를 받는 로봇이 새로 생기면
      이 목록에도 넣어야 한다(안 넣으면 그 로봇만 조용히 앞 1000자만 본다). */
-  const wf = ['collect-scholarships', 'browser-collect', 'deep-fetch', 'kosaf-fetch']
-    .map((n) => readText(new URL(`../.github/workflows/${n}.yml`, import.meta.url)));
+  /* ⚠️ 2026-09-15: eligibility-fill 도 빠져 있었다 — `deepfetch --elig-attach` 가 파생 .txt 를
+     지우고 원본만 다시 놓는데 글자를 뽑는 단계가 없어, 울산연구원 HWP 본문 20KB 를 지운 채
+     커밋했다(실측). **`--elig-attach` 를 부르는 워크플로는 이 목록에서 자동으로 찾는다** —
+     이름을 손으로 적으면 다음 로봇도 또 빠진다. */
+  const wfDir = new URL('../.github/workflows/', import.meta.url);
+  const fetchers = fs.readdirSync(wfDir).filter((f) => f.endsWith('.yml'))
+    .filter((f) => /deepfetch\.mjs --elig-attach/.test(readText(new URL(f, wfDir))));
+  eq('  --elig-attach 를 부르는 워크플로를 찾는다 (eligibility-fill 포함)',
+    fetchers.includes('eligibility-fill.yml'), true);
+  const wf = [...new Set(['collect-scholarships', 'browser-collect', 'deep-fetch', 'kosaf-fetch']
+    .map((n) => `${n}.yml`).concat(fetchers))]
+    .map((n) => [n, readText(new URL(n, wfDir))]);
   eq('첨부를 받는 로봇이 전부 본문 추출기를 실제로 돌린다',
-    wf.every((y) => y.includes('hwp-bodytext.py')), true);
+    wf.filter(([, y]) => !y.includes('hwp-bodytext.py')).map(([n]) => n), []);
 }
 
 console.log('■ 원본 항목이 양식에서 빠지지 않았나 (2026-08-14 — 조용한 누락이 진짜 위험이다)');
@@ -1785,6 +1795,10 @@ console.log('\n■ 게시판 메뉴 걷어내기 (2026-08-20)');
   const allBoiler = new Set(['가', '나', '다']);
   eq('본문이 통째로 사라질 상황이면 원문을 그대로 둔다',
     stripBoilerplate('가\n나\n다', allBoiler), '가\n나\n다');
+  /* 🔴 그 안전판은 읽을 때의 것이다 — 잴 때는 끌 수 있어야 한다 (2026-09-15).
+     끄는 길이 없으면 빈 본문이 메뉴 분량으로 '있음'이 된다(notice-source 주석). */
+  eq('  잴 때는 안전판을 끄고 남은 것만 돌려준다',
+    stripBoilerplate('가\n나\n다', allBoiler, { fallback: false }), '');
 }
 
 /* ── 신청서 질문 방식 최적화 (2026-08-18 개발자 지시) ──────────────
@@ -1914,6 +1928,43 @@ console.log('\n■ 껍데기 페이지와 브라우저 본문 (2026-08-20)');
      AI가 "못 읽겠다"고 답하고 끝나 0.2원이다. 처음에 300으로 잡았다가
      동국대 교내장학(전체)(본문 정상, 한글 237자)을 버리는 것을 보고 내렸다. */
   eq('  문턱은 100자다 (올리면 멀쩡한 짧은 공고를 버린다)', NS.MIN_BODY, 100);
+
+  /* 🔴 2026-09-15 — **안전판이 빈 본문을 '있음'으로 뒤집었다** (노션 UI-10 · F-9).
+     메뉴 걷어내기의 안전판('다 지워지면 원문을 그대로 돌려준다')은 읽을 때의 것인데
+     잴 때도 걸려서, 본문이 그림뿐인 경희대 공고의 메뉴 1,400자가 본문 분량으로 세어졌다.
+     재수집 로봇은 그걸 '본문 확보 ✅'라고 적었고 발췌기·금액 로봇은 메뉴를 읽었다.
+     아래 셋은 그 경위의 세 조각이다 — 하나라도 되돌리면 껍데기가 다시 통과한다. */
+  {
+    const menuK = ['로그인', '사이트맵', '학사일정', '전체메뉴', '개인정보처리방침', '찾아오시는길',
+      '대학 입학 연구 교류 대학생활 교육 발전기금 웹메일', '공지사항 커뮤니티 학생지원 장학 도서관'];
+    const shellK = (n, extra) => ({ url: `https://k.ac.kr/view?id=${n}`, title: `공고 ${n} 제목입니다`,
+      text: [...menuK, `공고 ${n} 제목입니다`, `2026-09-0${n}조회수 15${n}`, ...(extra || [])].join('\n') });
+    /* ① 메뉴 밑에 제목·조회수뿐인 페이지 넷 — 걷어내면 120자가 안 돼 안전판이 켜지는 크기다 */
+    const i5 = NS.indexTexts([1, 2, 3, 4].map((n) => shellK(n)), {});
+    eq('메뉴를 걷어낸 뒤 남는 것이 제목뿐이면 원문으로 세지 않는다',
+      NS.hasText(i5.byUrl.get(NS.canonUrl('https://k.ac.kr/view?id=1'))), false);
+    /* ② 저장된 bodyChars 를 믿지 않는다 — 옛 규칙으로 잰 값이 파일에 남아 있다 */
+    const stale = [1, 2, 3, 4].map((n) => ({ ...shellK(n), bodyChars: 1400 }));
+    const i6 = NS.indexTexts(stale, {});
+    eq('  파일에 남은 옛 본문 분량을 믿지 않고 다시 잰다',
+      NS.hasText(i6.byUrl.get(NS.canonUrl('https://k.ac.kr/view?id=1'))), false);
+    /* ③ 이전글·다음글 줄은 다른 공고의 제목이다 — 본문으로 세지 않는다 */
+    const nav = [1, 2, 3, 4].map((n) => shellK(n, [`공고 ${(n % 4) + 1} 제목입니다`, `[공통] 공고 ${((n + 1) % 4) + 1} 제목입니다`]));
+    const i7 = NS.indexTexts(nav, {});
+    eq('  이전글·다음글(다른 공고 제목) 줄은 본문으로 세지 않는다',
+      NS.hasText(i7.byUrl.get(NS.canonUrl('https://k.ac.kr/view?id=1'))), false);
+    /* ④ 브라우저가 그린 판에만 있는 메뉴도 따로 배운다 — 한 통에 섞으면 비율 문턱에 못 미친다 */
+    /* 본문은 공고마다 달라야 한다 — 같은 문장을 일곱 쪽에 넣으면 그게 메뉴로 배워진다(실제로 그랬다) */
+    const plain = [1, 2, 3, 4, 5, 6, 7].map((n) => shellK(n, real.split('\n').map((l) => `${l} — ${n}번 공고만의 문장`)));
+    const browserMenu = ['일반 학사 장학 근로 시간표 변경 교내학점교류 행사', '서울캠퍼스 02447 서울특별시 동대문구 경희대로 26 국제캠퍼스 17104 경기도 용인시 기흥구'];
+    const bBodies = {};
+    for (const n of [8, 9, 10]) bBodies[`https://k.ac.kr/view?id=${n}`] = { title: `공고 ${n} 제목입니다`, text: [...browserMenu, `공고 ${n} 제목입니다`].join('\n'), via: 'rescue' };
+    const i8 = NS.indexTexts(plain, bBodies);
+    eq('  브라우저 판에만 있는 메뉴 줄도 걷어낸다(말뭉치별로 따로 배운다)',
+      NS.hasText(i8.byUrl.get(NS.canonUrl('https://k.ac.kr/view?id=8'))), false);
+    eq('    본문이 딸린 일반 수집분은 그대로 통과',
+      NS.hasText(i8.byUrl.get(NS.canonUrl('https://k.ac.kr/view?id=1'))), true);
+  }
 
   /* 🔴 2026-08-23 — **줄바꿈을 없애면 본문이 있으나 마나다.** 재수집 로봇을 처음
      만들 때 태그를 벗기고 `\s+ → ' '`로 눌렀더니 본문이 통짜 한 줄이 됐고,
@@ -2553,6 +2604,20 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
   /* ② PDF는 자격 경로에서 쓰지 않는다 — 글자가 정확히 안 나온다.
         실측: 원문 `3년 이상`이 `년이상`으로 뽑혔다. 숫자 하나가 결론을 바꾸는 글이다. */
   eq('  PDF는 자격 경로에서 쓰지 않는다', AT.attachmentText('없는파일.pdf'), '');
+  /* ②-2 🔴 HWPX 조각 안의 자식 태그를 벗긴다 (2026-09-15 — 익산사랑 장학생 공고문).
+        `<hp:t>` 안에 `<hp:sz …/>` 가 와서 `3. 지급액 및 접수 방법 <hp:sz width=…` 처럼
+        태그가 글자에 섞여 나왔고 금액·자격 규칙이 한 줄도 못 읽었다. 저장된 실제 파일로 잰다. */
+  {
+    const hwpx = fs.readdirSync(new URL('../collector/extracted/', import.meta.url))
+      .filter((f) => /^elig-.*\.hwpx$/.test(f))
+      .map((f) => AT.attachmentText(fileURLToPath(new URL(`../collector/extracted/${f}`, import.meta.url))))
+      .filter((t) => t.length > 1000);
+    if (hwpx.length) {
+      eq('  HWPX 글자에 태그가 섞여 나오지 않는다', hwpx.some((t) => /<hp:[a-zA-Z]/.test(t)), false);
+    } else {
+      console.log('   (저장된 HWPX 공고문이 없어 태그 검사를 건너뜀)');
+    }
+  }
   /* ③ 문단 단위로 이어 붙인다 — 조각마다 줄을 나누면 `4년제`의 `4`가 버려져
         `년제 대학교 재학생`만 남는다(실제로 그렇게 나와서 고쳤다) */
   const docx = fs.readdirSync(new URL('../collector/extracted/', import.meta.url))
@@ -3059,6 +3124,30 @@ console.log('\n■ 금액 산정 — 부풀리지 않는가 (2026-08-27)');
     kindOf(['- 총 장학금액: 총 5천만원', '- 지급기준']), 'unknown');
   eq('총액과 1인당이 같이 있으면 1인당을 쓴다',
     wonOf(['장학금액 : 총상금 3천만원, 1인당 200만원 기준']), 2000000);
+  /* ①-2 🔴 인원 × 예산 표 (2026-09-15 — 울산연구원 하반기 공고문 HWP · 노션 F-9).
+        `총·예산` 낱말이 없는 지급 계획표가 글자로 뽑히면 칸마다 줄이 갈라져 나온다.
+        그대로 읽으면 1억 8천만원이 1인당 장학금이 됐다(실측). 아래는 실제 원문 줄이다. */
+  eq('인원과 금액이 칸으로 갈라진 예산표는 읽지 않는다',
+    kindOf(['지급금액', '계', '311명', '421백만원', '우수장학금', '대 학 생', '115명', '180백만원']), 'unknown');
+  eq('  한 줄에 붙어 있어도 마찬가지다',
+    kindOf(['지급금액 계 311명 421백만원 우수장학금 대학생 115명 180백만원']), 'unknown');
+  /* 넓힐 때 잃으면 안 되는 것 — 1인당·각 표시가 있으면 인원이 같이 있어도 읽는다 */
+  eq('  1인당 표시가 있으면 인원이 있어도 읽는다',
+    wonOf(['장학금액', '선발인원 20명', '1인당 100만원']), 1000000);
+  eq('  `각` 이 있으면 읽는다', wonOf(['장학금액 : 선발인원 12명, 각 100만원']), 1000000);
+  eq('  한 자리 인원은 예산표로 보지 않는다', wonOf(['장학금액 : 3명, 100만원']), 1000000);
+  /* ①-3 AI 가 포스터·PDF 에서 옮겨 온 실제 줄 (2026-09-15) — 표기가 넓다 */
+  eq('소수점 백만원을 읽는다 (2.5백만원 — 5백만원이 아니다)',
+    wonOf(['장학금액', '1. 가수 윤하 장학금액(학기당) 2.5백만원']), 2500000);
+  eq('천원 단위를 읽는다 (12,420천원)',
+    wonOf(['장학금액', '한 학기 장학금 12,420천원 (약 $0.9만), 4개월 이상 체류']), 12420000);
+  eq('  천만원이 천원보다 먼저다', wonOf(['장학금액 : 5천만원(1인당)']), 50000000);
+  eq('  수수료 5천원은 금액이 아니다', kindOf(['장학금액', '발급 수수료 5천원']), 'unknown');
+  /* 넓히면서 드러난 옛 구멍 둘 — 둘 다 실제 원문 줄이다 */
+  eq('숫자 속 쉼표에서 조각을 가르지 않는다 (1인당 최대 1,000,000원)',
+    wonOf(['장학금액', '1인당 최대 1,000,000원', '(인당 지원액) 개인별 상이(최대 500천원) ※대출이자 금액에 따라 상이']), 1000000);
+  eq('311명 은 1명 이 아니다 — 인원·예산 한 줄은 읽지 않는다',
+    kindOf(['○ 선발 예정인원 및 지급금액 : 311명, 421,000천원 예정']), 'unknown');
 
   /* ② 🔴 금액 절이 다음 절을 삼키면 자격 줄의 숫자를 금액으로 줍는다 — 중앙대 성림장학금.
         `5. 신청자격: … 건강보험료 지역 17만원 이하`의 17만원이 장학금액이 될 뻔했다. */
@@ -3672,6 +3761,14 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
      그래야 총액/1인당 가르기·유의사항 절 차단·자릿수 관문이 그대로 걸린다. */
   eq('금액 판정은 parse-amount 가 한다', /PA\.amountFrom\(\['장학금액', \.\.\.aiLines\]\)/.test(ex), true);
   eq('본문이 있으면 본문이 먼저다', /bodyLines\.length \? PA\.amountFrom\(bodyLines\)/.test(ex), true);
+  /* 🔴 공고문 첨부(HWP·DOCX)를 **글자로** 읽는 길 (2026-09-15 · 노션 F-9).
+     이 로봇은 2026-09-15 까지 첨부를 한 번도 안 열었다 — 게시판 본문이 '붙임 참조'뿐인 공고는
+     영영 '금액 원문 확인'이었다. 자격 발췌기와 **같은 색인(elig-docs)·같은 함수(attachmentText)**
+     를 써야 "발췌기는 읽는데 금액 로봇은 못 읽는" 어긋남이 안 생긴다. */
+  eq('금액 로봇이 공고문 첨부 색인을 연다', /elig-docs\.json/.test(ex), true);
+  eq('  첨부 글자는 발췌기와 같은 함수로 읽는다', /import \{ attachmentText, readable \} from '\.\/attachment-text\.mjs'/.test(ex), true);
+  eq('  본문·AI 줄로 못 읽었을 때만 첨부를 본다', /a\.kind === 'unknown' && hasDocs/.test(ex), true);
+  eq('  첨부 금액도 parse-amount 가 정한다', /PA\.amountFrom\(t\.split/.test(ex), true);
 
   /* 검산기가 금액 줄을 실제로 돌려주는지 — 가짜 응답으로 돌려 본다(돈 0원) */
   if (AI && AI.verifyPdfLines) {
