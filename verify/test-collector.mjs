@@ -28,6 +28,10 @@ import { hoursFor, cronsOf, isStale, countField, runsPerWeek, everyWords } from 
    개발자 컴퓨터에서만 조용히 실패하고 있었다** — 진짜 실패를 가리는 소음이었다(2026-09-05). */
 import { fileURLToPath } from 'node:url';
 import { urlKey, titleKey, dedupeNotices, preferNotice, capNotices, clickRowKey } from '../collector/url-key.mjs';
+/* extract-excerpts 는 **불러오면 그 자리에서 실행된다** — EXCERPTS_AS_LIB 가 그걸 막는 스위치다
+   (이 저장소의 알려진 함정: `node -e "import('./x.mjs')"` 로 문법 검사를 하면 안 되는 이유와 같다). */
+process.env.EXCERPTS_AS_LIB = '1';
+const AWAIT_EE = await import('../collector/extract-excerpts.mjs');
 import { mergeCandidates } from '../collector/candidates.mjs';
 import { publishBySchool, splitBySchool } from '../collector/publish-notices.mjs';
 import { pageCandidates, pageUrl, existingPageParam, samePage, shouldRetry } from '../collector/paginate.mjs';
@@ -2665,6 +2669,104 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
     eq('  docx는 문단 단위로 읽어 숫자가 안 빠진다', /\d년제/.test(t) || /\d\.\d\/\d\.\d/.test(t), true);
   } else eq('  (docx 표본 없음 — 건너뜀)', true, true);
   eq('  글자가 거의 없으면 읽을 만하지 않다고 답한다', AT.readable('가나다'), false);
+
+  /* ④ 🔴 **글자 조각 태그를 이름 앞머리로 찾지 말 것** (2026-09-15 · 백로그 G-3 파다가 나옴)
+        `<w:t[^>]*>` 는 `<w:t>` 만이 아니라 **이름이 `w:t` 로 시작하는 형제 태그 전부**에
+        걸린다 — `<w:tbl>`·`<w:tblPr>`·`<w:tc>`·`<w:tr>`·`<w:trPr>`·`<w:tcW …/>`,
+        hwpx 쪽은 `<hp:tc>`·`<hp:tbl>`·`<hp:table>`. 그러면 표가 열리는 자리마다 그 태그를
+        '글자'로 읽고 다음 `</w:t>` 까지를 통째로 삼켜, **XML 속성과 글꼴 이름이 본문이 된다.**
+        장학 공고는 표투성이라 영향이 컸다 — 저장된 docx·hwpx 23개에서 찌꺼기 줄 2,583줄.
+        그 탓에 표 안에 적힌 `신청기간`·`접수` 줄이 태그에 묻혀 마감일 파서가 못 읽었다.
+        ⚠️ 잃는 것처럼 보이는 한글은 내용이 아니라 `<w:rFonts w:ascii="나눔고딕">` 의
+           **글꼴 이름**이다(실측으로 확인 — 진짜 낱말은 하나도 안 준다).
+        🔴 검사는 `xmlDocText` 로 **진짜 함수**를 부른다. 정규식을 여기 베끼면 갈라진다. */
+  {
+    const docxXml = '<w:tbl><w:tblPr><w:tblW w:w="9354"/></w:tblPr><w:tr><w:trPr/>'
+      + '<w:tc><w:tcPr><w:tcW w:w="3118"/></w:tcPr>'
+      + '<w:p><w:r><w:rPr><w:rFonts w:ascii="나눔고딕"/></w:rPr>'
+      + '<w:t>신청기간</w:t></w:r><w:r><w:t xml:space="preserve"> : 2026.9.1 ~ 9.30</w:t></w:r></w:p>'
+      + '</w:tc></w:tr></w:tbl>';
+    const got = AT.xmlDocText(docxXml, 'docx');
+    eq('  docx — 표 태그를 글자로 읽지 않는다', /<w:|w:w=|w:ascii=/.test(got), false);
+    eq('    표 칸 안의 진짜 글자는 그대로 나온다', got.includes('신청기간 : 2026.9.1 ~ 9.30'), true);
+    eq('    글꼴 이름이 본문에 섞이지 않는다', got.includes('나눔고딕'), false);
+
+    const hwpxXml = '<hp:tbl><hp:tr><hp:tc name=""><hp:subList id="" textDirection="HORIZONTAL">'
+      + '<hp:p><hp:run><hp:t>접수기한</hp:t></hp:run>'
+      + '<hp:run><hp:t> : 2026. 9. 30.</hp:t></hp:run></hp:p>'
+      + '</hp:subList></hp:tc></hp:tr></hp:tbl>';
+    const gotH = AT.xmlDocText(hwpxXml, 'hwpx');
+    eq('  hwpx — 표 태그를 글자로 읽지 않는다', /<hp:|textDirection=/.test(gotH), false);
+    eq('    표 칸 안의 진짜 글자는 그대로 나온다', gotH.includes('접수기한 : 2026. 9. 30.'), true);
+
+    /* 🔴 hwpx 는 **`<hp:t>` 안에 서식 기호를 넣는다** — 고정폭 공백·줄바꿈·탭.
+       위 ④ 를 고친 뒤에도 이것들이 글자로 남아 `2. 접 수 처<hp:fwSpace/>` 처럼 나왔다.
+       뜻대로 바꿔 준다: 공백·탭 → 빈칸, 줄바꿈 → 진짜 줄바꿈. 나머지 표시는 버린다.
+       ⚠️ 글자에 든 `&lt;` 는 살아남아야 한다 — 표시를 걷는 것은 **`unent` 보다 먼저**여야
+          한다(뒤에 하면 `&lt;3년 이상&gt;` 이 태그로 보여 통째로 사라진다). */
+    eq('  hwpx — 고정폭 공백은 빈칸이 된다',
+      AT.xmlDocText('<hp:p><hp:t>접 수 처<hp:fwSpace/>서울</hp:t></hp:p>', 'hwpx'), '접 수 처 서울');
+    eq('    탭도 빈칸이 된다',
+      AT.xmlDocText('<hp:p><hp:t>202<hp:tab width="1136" leader="0" type="1"/>년</hp:t></hp:p>', 'hwpx'),
+      '202 년');
+    eq('    줄바꿈은 줄을 나눈다',
+      AT.xmlDocText('<hp:p><hp:t>항목 : 성명<hp:lineBreak/>기간 : 2026년</hp:t></hp:p>', 'hwpx'),
+      '항목 : 성명\n기간 : 2026년');
+    eq('    글자에 든 부등호는 살아남는다',
+      AT.xmlDocText('<hp:p><hp:t>&lt;3년 이상&gt; 거주자</hp:t></hp:p>', 'hwpx'), '<3년 이상> 거주자');
+
+    /* 🔴 **좁히기 자체를 재는 자리** (2026-09-15 · 코드 리뷰가 잡았다).
+       위 검사들은 `inlineMarks` 의 통짜 태그 제거가 증상을 **가려서**, 정규식을
+       `<w:t[^>]*>` 로 되돌려도 전부 초록이었다 — 관문이 조용히 무력해진 것이다
+       (내 red-green 은 inlineMarks 를 넣기 전에 한 것이라 그때만 진짜였다).
+       가려지지 않는 것은 **삼킨 구간 안에 '지워진 글'이 있을 때**다:
+         · `<w:delText>` = 편집자가 **삭제한** 글. 표 태그부터 삼키면 되살아난다.
+         · `<w:instrText>` = 필드 코드(HYPERLINK …). 주소가 본문에 섞인다.
+       지워진 옛 마감일이 진짜 마감일 앞에 붙는 것이라 이 저장소에서 가장 나쁜 꼴이다. */
+    const 삭제된글 = '<w:tbl><w:tr><w:tc><w:p>'
+      + '<w:r><w:delText>2025년 마감 8.31</w:delText></w:r>'
+      + '<w:r><w:t>접수기간 : 2026.9.9</w:t></w:r></w:p></w:tc></w:tr></w:tbl>';
+    eq('    지워진 글(w:delText)이 되살아나지 않는다',
+      AT.xmlDocText(삭제된글, 'docx'), '접수기간 : 2026.9.9');
+    const 필드코드 = '<w:tbl><w:tc><w:p>'
+      + '<w:r><w:instrText> HYPERLINK "http://x.kr/abc" </w:instrText></w:r>'
+      + '<w:r><w:t>접수기간 : 2026.9.9</w:t></w:r></w:p></w:tc></w:tbl>';
+    eq('    필드 코드(w:instrText)가 본문에 섞이지 않는다',
+      AT.xmlDocText(필드코드, 'docx'), '접수기간 : 2026.9.9');
+    const 표제목 = '<hp:tbl><hp:caption><hp:p><hp:t>표 제목</hp:t></hp:p></hp:caption>'
+      + '<hp:tc><hp:p><hp:t>접수기한 : 2026. 9. 9.</hp:t></hp:p></hp:tc></hp:tbl>';
+    eq('    hwpx 표 캡션이 칸 글자에 붙지 않는다',
+      AT.xmlDocText(표제목, 'hwpx').split('\n').pop(), '접수기한 : 2026. 9. 9.');
+    eq('    docx 쪽도 같은 규칙이다',
+      AT.xmlDocText('<w:p><w:t>&lt;3년&gt; 이상</w:t></w:p>', 'docx'), '<3년> 이상');
+
+    /* 🔴 **학생이 보는 양식에 찌꺼기가 없어야 한다** (2026-09-15 · 코드 리뷰가 파급을 짚었다).
+       이 글자 뽑기는 마감·자격만 쓰는 게 아니라 **양식 스키마화**도 쓴다
+       (`collector/schematize-forms.mjs`). 찌꺼기가 있던 시절엔 콜론형 인식기가
+       `hp:t` 의 콜론에 반응해 **`hp:t 대상자`·`hp:t 성 명` 같은 가짜 칸**을 만들었다
+       (정읍 서식 실측 40칸 — 전부 가짜). 지금은 기존 관문 셋(변환 보류·품질·항목 누락)이
+       전부 막아 승격되는 것이 0건이지만, 이미 등록된 48종에 남아 있으면 학생이 그걸 본다. */
+    const tpls = JSON.parse(readText(new URL('../data/forms.json', import.meta.url))).templates;
+    /* ⚠️ 경계를  로 쓰면 JSON 안에서는 앞이 따옴표라  을 놓친다
+       (실제로 그렇게 짰다가 가짜 라벨을 못 잡는 걸 확인하고 고쳤다). */
+    const 찌꺼기 = /\b(hp|w):[a-z]+[\s>]|w:val=|나눔고딕|함초롬|맑은 고딕/;
+    eq(`등록된 양식 ${Object.keys(tpls).length}종에 XML 찌꺼기·글꼴 이름이 없다`,
+      Object.entries(tpls).filter(([, t]) => 찌꺼기.test(JSON.stringify(t))).map(([k]) => k), []);
+
+    /* 🔴 실제로 저장된 문서에도 찌꺼기가 안 남아야 한다 — 합성 XML 만 재면
+       진짜 문서의 다른 태그 모양을 놓친다(합성은 내가 만든 것이라 늘 통과한다). */
+    const dir = new URL('../collector/extracted/', import.meta.url);
+    const real = fs.existsSync(fileURLToPath(dir))
+      ? fs.readdirSync(fileURLToPath(dir)).filter((f) => /\.(docx|hwpx)$/i.test(f)) : [];
+    if (real.length) {
+      const SOUP = /<\/?(w|hp):[a-zA-Z]|w:val=|widthRelTo=/;
+      const dirty = real.map((f) => [f, AT.attachmentText(fileURLToPath(new URL(f, dir)))])
+        .map(([f, t]) => [f, t.split('\n').filter((l) => SOUP.test(l)).length])
+        .filter(([, n]) => n > 0);
+      eq(`  저장된 문서 ${real.length}개에 XML 찌꺼기 줄이 없다`,
+        dirty.map(([f, n]) => `${f}:${n}`), []);
+    } else eq('  (저장된 docx·hwpx 표본 없음 — 건너뜀)', true, true);
+  }
 }
 
 /* 2026-08-20 — 개발자 지적: "지원 자격·공고 원문 안내가 전혀 말에 맞지 않는다."
@@ -6364,27 +6466,72 @@ console.log('■ 학교 장학 신청 포털 — 「학교 포털」이 어디�
   eq('  교내 장학금으로 한정해 말한다', /교내 장학금은/.test(note), true);
 }
 
-/* ── 2026-09-15 · 노션 G-3 — 마감일도 공고문 첨부에서 읽는다 ──
-   마감 미상 14건을 열어 보니 본문이 그림·'붙임 참조'뿐이고 접수기간은 첨부 HWP·DOCX 안에 있었다.
-   자격은 첨부에서 읽으면서 날짜는 본문에서만 읽고 있었다 — 같은 색인·같은 함수로 읽는다. */
-console.log('\n■ 마감일도 공고문 첨부에서 읽는다 (2026-09-15 · 노션 G-3)');
+/* ── 첨부에서 마감일 (2026-09-15 · 백로그 G-3) ──────────────────────────────
+   자격은 예전부터 공고문 첨부를 봤는데(`qualFromDocs`) **마감일은 본문만 봤다.**
+   경희대처럼 게시판 본문이 껍데기이고 내용이 첨부 HWPX 안에 있는 유형은, 첨부를 받아
+   놓고도 마감을 영영 못 읽어 학생 화면에 '기한 원문 확인'으로 남았다 — 끝난 공고가
+   목록에 계속 떴다(G-3 이 말한 증상).
+
+   🔴 이 절이 지키는 둘:
+     ① **두 갈래 다** 첨부를 본다 — 본문이 있는 길과 본문이 아예 없는 길. 한쪽만 붙이면
+        '본문 껍데기' 게시판이 갈림길에서 통째로 빠져나간다(실제로 그 유형이 대상이다).
+     ② **긴 요강에서 엉뚱한 날을 줍지 않는다.** 첨부는 본문과 달리 요강 전문이라
+        `실적 인정 기간`·`지급기간`·발급 안내 날짜가 잔뜩 섞여 있다. 방어선은 이름표다. */
+console.log('■ 첨부에서 마감일 — 본문이 껍데기인 게시판 (2026-09-15 · G-3)');
 {
-  const ex = readText(new URL('../collector/extract-excerpts.mjs', import.meta.url));
-  eq('첨부 글자를 모으는 함수가 있다', /function docsTextOf\(it\)/.test(ex), true);
-  eq('  본문과 첨부가 같은 함수로 날짜를 채운다 (두 벌이면 갈라진다)', /function fillDates\(it, text, from\)/.test(ex), true);
-  eq('  본문이 먼저, 본문에 마감이 없을 때만 첨부',
-    /const dlFromBody = fillDates\(it, body, '공고 원문'\);\s*\n\s*if \(!it\.deadline && !dlFromBody\) fillDates\(it, docsTextOf\(it\), '공고문 첨부'\)/.test(ex), true);
-  eq('  본문이 없는 공고도 첨부에서 날짜를 읽는다 (두 갈래 모두)',
-    (ex.match(/fillDates\(it, docsTextOf\(it\), '공고문 첨부'\)/g) || []).length, 2);
-  eq('  첨부에서 읽은 마감은 주인 표식이 다르다', /it\.deadlineFrom = from;/.test(ex), true);
-  process.env.EXCERPTS_AS_LIB = '1';
-  const EX = await import(new URL('../collector/extract-excerpts.mjs', import.meta.url));
-  /* 전부 실제 첨부에서 뽑힌 줄이다 */
-  eq('울산연구원 공고문 HWP 의 실제 줄에서 마감을 읽는다',
-    EX.extractDeadline('□ 신청기간 및 방법\n○ 신청기간 : 2026. 9. 16.(수) 10:00 ~ 9. 23.(금) 18:00까지'), '2026-09-23');
-  eq('  익산사랑 공고문 HWPX 의 실제 줄', EX.extractDeadline('1. 접수기간 : 2026. 9. 3.(목) ∼ 9. 9.(수) 18:00까지'), '2026-09-09');
-  eq('  마감 시한만 말하는 줄에서는 지어내지 않는다 (사랑나눔 DOCX)',
-    EX.extractDeadline('- 서류는 반드시 마감 시한 내 제출해 주세요.'), null);
+  const ee = readText(new URL('../collector/extract-excerpts.mjs', import.meta.url));
+  /* ① 🔴 **진짜로 불러서 잰다** (2026-09-15 · 코드 리뷰가 잡았다).
+     처음엔 이 절이 전부 소스 글자 grep 이었다 — `deadlineFromDocs` 의 **속을 통째로
+     `return null` 로 비워도 다섯 항목이 전부 초록**이었다. 부르는 자리만 세고 있었던 것이다.
+     게다가 grep 하나는 변수 이름과 중괄호 위치까지 박아 둬서, 뜻이 같은 리팩터에는
+     빨간불이 되고 뜻이 죽은 코드에는 초록불이었다 — 관문이 지켜야 할 방향의 정반대다.
+     ⚠️ 저장된 첨부는 60일마다 갈리므로, 표본이 없으면 '통과'가 아니라 **건너뜀**이라고 적는다. */
+  /* 🔴 래치는 **배포된 데이터**에 묶는다 — '표본이 없으면 건너뜀' 만 두면 함수를 비웠을 때
+     표본이 0이 되어 그대로 통과한다(실제로 그렇게 새는 걸 확인하고 고쳤다).
+     `deadlineFrom: '공고문 첨부'` 로 적힌 공고는 **그 첨부에서 그 날짜가 나와야 한다**.
+     함수가 죽으면 이 왕복이 깨진다. */
+  const reg = JSON.parse(readText(new URL('../data/registered.json', import.meta.url))).items;
+  const 첨부마감 = reg.filter((i) => i.deadlineFrom === '공고문 첨부' && i.deadline);
+  if (첨부마감.length) {
+    eq(`첨부에서 읽었다고 적힌 공고 ${첨부마감.length}건이 실제로 다시 읽힌다`,
+      첨부마감.filter((i) => AWAIT_EE.deadlineFromDocs({ id: i.id }) !== i.deadline).map((i) => i.id), []);
+  } else {
+    /* 표본이 없다 — 그래도 **함수가 살아 있는지**는 잰다(첨부가 60일마다 갈려 0건일 수 있다) */
+    const 색인 = JSON.parse(readText(new URL('../collector/extracted/elig-docs.json', import.meta.url)));
+    const 읽힌것 = Object.keys(색인).filter((id) => AWAIT_EE.deadlineFromDocs({ id }));
+    eq('(첨부 마감 표본 없음) 그래도 첨부에서 읽어 내는 힘은 살아 있다',
+      읽힌것.length > 0 || Object.keys(색인).length === 0, true);
+  }
+  eq('첨부에서 마감을 읽는 함수가 있다', typeof AWAIT_EE.deadlineFromDocs, 'function');
+  /* ⚠️ 변수 이름·중괄호 자리를 박지 않는다 — 뜻이 같은 리팩터에 빨간불이 되면 다음 사람이 관문을 끈다.
+     재는 것은 '본문을 먼저 보고, 못 읽었을 때 첨부로 물러나는 순서' 하나다. */
+  const 본문먼저 = ee.indexOf('extractDeadline(body)');
+  eq('  본문을 먼저 보고 못 읽었을 때만 첨부로 물러난다',
+    본문먼저 > 0 && ee.indexOf('deadlineFromDocs(it)', 본문먼저) > 본문먼저, true);
+  /* 본문이 아예 없는 길(= `if (!hasText(src))` 블록) 안에서도 불러야 한다 */
+  const noBody = ee.slice(ee.indexOf('if (!hasText(src)) {'), ee.indexOf('const body = strip('));
+  eq('  본문이 아예 없는 길에서도 첨부를 본다', /deadlineFromDocs\(it\)/.test(noBody), true);
+  eq('  채우는 자리는 한 곳이다 (period 처리가 갈라지지 않게)',
+    (ee.match(/function putDeadline\(/g) || []).length, 1);
+  eq('  출처를 정직하게 적는다', /putDeadline\(it, dl, '공고문 첨부'\)/.test(ee), true);
+
+  /* ② 긴 요강의 함정 — 전부 **실제 문서에서 가져온 줄**이다
+     ((재)익산사랑장학재단 2026년도 선발 공고 hwpx · 768줄). 진짜 함수를 부른다. */
+  const { extractDeadline } = AWAIT_EE;
+  const 함정 = [
+    '- 실적 인정 기간 : 2025. 7. 1. ~ 2026. 6. 30.',
+    '- 수상실적 인정 기간 : 2025. 7. 1. ~ 2026. 6. 30.',
+    '2. 모든 제출 서류는 공고일(2026년 8월 26일) 이후 발급한 원본으로 제출하여야 함',
+    '- 2026년 5월 ~ 7월까지 가입상태(변동사항)를 확인가능하도록 발급',
+  ];
+  eq('요강에 널린 날짜를 마감으로 줍지 않는다',
+    함정.filter((l) => extractDeadline(l)), []);
+  eq('  그 넷을 한 덩어리로 줘도 마감이 없다고 답한다', extractDeadline(함정.join('\n')) || '(없음)', '(없음)');
+  /* 🔴 그런데 진짜 접수기간 줄은 읽어야 한다 — 위 검사만 두면 "늘 null" 로도 통과한다 */
+  const 진짜 = '1. 접수기간 : 2026. 9. 3.(목) ∼ 9. 9.(수) 18:00까지';
+  eq('  진짜 접수기간 줄은 읽는다 (헛도는 검사가 아니다)', extractDeadline(진짜), '2026-09-09');
+  eq('  요강 전체(함정 + 진짜)에서도 진짜만 집는다',
+    extractDeadline([...함정, 진짜].join('\n')), '2026-09-09');
 }
 
 /* ── 2026-09-15 · 노션 UI-11 — 도우미가 자주 묻는 질문을 답한다 ──

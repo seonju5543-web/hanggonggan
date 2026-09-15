@@ -623,10 +623,42 @@ const strip = makeStripper(texts);
 let eligDocs = {};
 try { eligDocs = JSON.parse(fs.readFileSync(new URL('extracted/elig-docs.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
 
-let hit = 0, none = 0, kept = 0, cleaned = 0, fromDoc = 0, gotDeadline = 0, gotOpen = 0, gotAnnounce = 0;
+let hit = 0, none = 0, kept = 0, cleaned = 0, fromDoc = 0, gotDeadline = 0, dlFromDoc = 0, gotOpen = 0, gotAnnounce = 0;
 /* 공고문 첨부에서 자격 줄을 읽는다. 본문 경로와 원문 없는 경로가 **같은 함수**를 써야
    "본문 있을 땐 읽고 없을 땐 안 읽는" 어긋남이 안 생긴다. 스캔 PDF 등 글자가 안 나오는
    것은 조용히 건너뛴다(읽은 척하는 것보다 안 읽는 편이 낫다). */
+/* 공고문 첨부에서 마감일을 읽는다 (2026-09-15 · 백로그 G-3)
+
+   자격은 예전부터 첨부를 봤는데(`qualFromDocs`) **마감일은 본문만 봤다.** 그래서
+   경희대처럼 본문이 껍데기이고 내용이 첨부 HWPX 안에 있는 게시판은, 첨부를 받아 놓고도
+   마감을 영영 못 읽어 학생 화면에 '기한 원문 확인'으로 남았다(끝난 공고가 목록에 계속 떴다).
+
+   🔴 자격 쪽 주석이 경고한 '긴 문서' 문제는 여기엔 해당하지 않는다 — 마감일은 절이 아니라
+      **이름표**(`신청기간 :`·`접수기한 :`)에 매달아 읽으므로 문서가 길어도 엉뚱한 날을
+      줍지 않는다. 실측: (재)익산사랑장학재단 2026년도 선발 공고 요강(768줄)에서 668행의
+      `1. 접수기간 : 2026. 9. 3.(목) ∼ 9. 9.(수) 18:00까지` 만 집었다.
+   🔴 **본문이 먼저다** — 본문에서 읽었으면 첨부를 보지 않는다(본문이 그 게시글의 말이다).
+   관문: verify/test-collector.mjs '첨부에서 마감일' 절. */
+export function deadlineFromDocs(it) {
+  for (const f of (eligDocs[it.id] || {}).files || []) {
+    const t = attachmentText(new URL(`extracted/${f}`, HERE).pathname);
+    if (!readable(t)) continue;
+    const dl = extractDeadline(t);
+    if (dl) return dl;
+  }
+  return null;
+}
+
+/* 마감일을 채우는 자리 **한 곳** — 본문 경로와 첨부 경로가 같은 규칙을 쓰게 한다.
+   🔴 period 는 화면에 그대로 보이는 안내문이다. 통째로 갈아치우면 '2026-2학기 1차 신청'
+      같은 맥락이 사라지므로, 몰라서 적어 둔 '원문 확인' 자리에만 날짜를 끼운다. */
+function putDeadline(it, dl, from) {
+  it.deadline = dl;
+  it.deadlineFrom = from;
+  if (!it.period) it.period = `접수 ~${dl}`;
+  else if (/원문\s*확인/.test(it.period)) it.period = it.period.replace(/원문\s*확인/, `~${dl}`);
+}
+
 function qualFromDocs(it) {
   /* 🔴 여기는 **1차(절 가르기)뿐이다. 2차(scoop)를 붙이지 말 것** (2026-09-04, 붙였다가 되돌렸다).
      본문 경로에는 `extractQualifyLines() || scoopQualifyLines()` 두 겹이 있어서 "첨부 경로도
@@ -658,72 +690,6 @@ function qualFromDocs(it) {
   return [];
 }
 
-/* 공고문 첨부의 글자 전부 (2026-09-15 · 노션 G-3 마감일).
-   마감 미상 14건을 열어 보니 본문이 그림·'붙임 참조'뿐이고 **접수기간은 첨부 HWP·DOCX 안에**
-   있었다(울산연구원 `○ 신청기간 : 2026. 9. 16.(수) 10:00 ~ 9. 23.(금) 18:00까지`). 자격은
-   첨부에서 읽으면서 날짜는 본문에서만 읽고 있었다. 자격과 같은 색인·같은 함수를 쓴다. */
-function docsTextOf(it) {
-  const out = [];
-  for (const f of (eligDocs[it.id] || {}).files || []) {
-    const t = attachmentText(new URL(`extracted/${f}`, HERE).pathname);
-    if (readable(t)) out.push(t);
-  }
-  return out.join('\n');
-}
-
-/* 마감·접수 시작·발표일을 한 글에서 읽어 **비어 있을 때만** 채운다. 본문과 첨부가 같은 함수를
-   쓴다 — 두 벌이면 한쪽만 고쳐져 갈라진다. `from` 은 주인 표식(공고 원문 / 공고문 첨부).
-   돌려주는 값: 마감일을 읽었는가(미리보기에서도 참) — 첨부로 한 번 더 볼지 정하는 데 쓴다. */
-function fillDates(it, text, from) {
-  if (!text) return false;
-  let found = false;
-  /* 마감일 — 사람이 넣은 값도, auto-register 가 제목에서 읽은 값도 덮지 않는다
-     (더 많이 본 쪽이 이기는 게 아니라 먼저 정해진 쪽이 이긴다). */
-  if (!it.deadline) {
-    const dl = extractDeadline(text);
-    if (dl) {
-      found = true;
-      gotDeadline += 1;
-      if (WRITE) {
-        it.deadline = dl;
-        it.deadlineFrom = from;
-        /* period 는 화면에 그대로 보이는 안내문이다 — 통째로 갈아치우면 '2026-2학기 1차 신청'
-           같은 맥락이 사라진다. 몰라서 적어 둔 '원문 확인' 자리에만 날짜를 끼운다. */
-        if (!it.period) it.period = `접수 ~${dl}`;
-        else if (/원문\s*확인/.test(it.period)) it.period = it.period.replace(/원문\s*확인/, `~${dl}`);
-      } else {
-        console.log(`   [마감${from === '공고문 첨부' ? '·첨부' : ''}] ${it.id} → ${dl}`);
-      }
-    }
-  }
-
-  /* 접수 시작일·발표일 — 캘린더가 쓴다 (2026-09-07). 마감일과 같은 규칙으로,
-     **비어 있을 때만** 채우고 **말이 안 되면 버린다.**
-     🔴 순서 검사가 이 두 값의 방어선이다. 원문에는 다른 공고의 날짜와 지급일·행사일이
-        섞여 있어서, 이름표만으로는 엉뚱한 날이 들어올 수 있다:
-          · 접수 시작일이 마감일보다 **뒤**면 같은 기간의 값이 아니다.
-          · 발표일이 마감일보다 **앞**이면 결과 발표일 리가 없다.
-        어느 쪽이든 고쳐 주지 않고 버린다(해를 고쳐 주지 않는 dateFrom 과 같은 정신). */
-  const known = it.deadline || null;
-  if (!it.openDate) {
-    const od = extractOpenDate(text);
-    if (od && (!known || od <= known)) {
-      gotOpen += 1;
-      if (WRITE) it.openDate = od;
-      else console.log(`   [접수시작] ${it.id} → ${od}`);
-    }
-  }
-  if (!it.announceDate) {
-    const an = extractAnnounce(text);
-    if (an && (!known || an >= known)) {
-      gotAnnounce += 1;
-      if (WRITE) it.announceDate = an;
-      else console.log(`   [발표] ${it.id} → ${an}`);
-    }
-  }
-  return found;
-}
-
 if (!process.env.EXCERPTS_AS_LIB) main();
 function main() {
 for (const it of reg.items) {
@@ -749,8 +715,17 @@ for (const it of reg.items) {
       it.eligibilityFrom = '공고문 첨부';
       fromDoc += 1;
     }
-    /* 본문이 없어도 마감·접수 시작·발표일은 첨부에서 읽는다 (노션 G-3) */
-    if (!it.deadline) fillDates(it, docsTextOf(it), '공고문 첨부');
+    /* 🔴 원문이 없어도 **첨부는 있을 수 있다** — 마감일도 여기서 채운다.
+       안 하면 '본문 껍데기 + 첨부에 요강' 게시판(경희대 유형)이 이 갈림길에서
+       통째로 빠져나가, 첨부를 받아 놓고도 영영 '기한 원문 확인'으로 남는다. */
+    if (!it.deadline) {
+      const dl = deadlineFromDocs(it);
+      if (dl) {
+        gotDeadline += 1; dlFromDoc += 1;
+        if (WRITE) putDeadline(it, dl, '공고문 첨부');
+        else console.log(`   [마감] ${it.id} → ${dl} (공고문 첨부)`);
+      }
+    }
     kept += 1; continue;
   }
 
@@ -769,10 +744,44 @@ for (const it of reg.items) {
     const got = qualFromDocs(it);
     if (got.length) { qual = got; viaDoc = true; fromDoc += 1; }
   }
-  /* 마감·접수 시작·발표일 — 본문이 먼저, 본문에 마감이 없으면 공고문 첨부(fillDates 주석).
-     🔴 순서를 뒤집지 말 것 — 첨부에는 붙임·서식이 섞인다. */
-  const dlFromBody = fillDates(it, body, '공고 원문');
-  if (!it.deadline && !dlFromBody) fillDates(it, docsTextOf(it), '공고문 첨부');
+  /* 마감일 — **비어 있을 때만** 채운다. 사람이 넣은 값도, auto-register 가 제목에서
+     읽은 값도 덮지 않는다(더 많이 본 쪽이 이기는 게 아니라 먼저 정해진 쪽이 이긴다). */
+  if (!it.deadline) {
+    /* 본문이 먼저 · 못 읽으면 공고문 첨부 (2026-09-15 · G-3) */
+    let dl = extractDeadline(body);
+    let from = '공고 원문';
+    if (!dl) { dl = deadlineFromDocs(it); if (dl) { from = '공고문 첨부'; dlFromDoc += 1; } }
+    if (dl) {
+      gotDeadline += 1;
+      if (WRITE) putDeadline(it, dl, from);
+      else console.log(`   [마감] ${it.id} → ${dl} (${from})`);
+    }
+  }
+
+  /* 접수 시작일·발표일 — 캘린더가 쓴다 (2026-09-07). 마감일과 같은 규칙으로,
+     **비어 있을 때만** 채우고 **말이 안 되면 버린다.**
+     🔴 순서 검사가 이 두 값의 방어선이다. 원문에는 다른 공고의 날짜와 지급일·행사일이
+        섞여 있어서, 이름표만으로는 엉뚱한 날이 들어올 수 있다:
+          · 접수 시작일이 마감일보다 **뒤**면 같은 기간의 값이 아니다.
+          · 발표일이 마감일보다 **앞**이면 결과 발표일 리가 없다.
+        어느 쪽이든 고쳐 주지 않고 버린다(해를 고쳐 주지 않는 dateFrom 과 같은 정신). */
+  const known = it.deadline || null;
+  if (!it.openDate) {
+    const od = extractOpenDate(body);
+    if (od && (!known || od <= known)) {
+      gotOpen += 1;
+      if (WRITE) it.openDate = od;
+      else console.log(`   [접수시작] ${it.id} → ${od}`);
+    }
+  }
+  if (!it.announceDate) {
+    const an = extractAnnounce(body);
+    if (an && (!known || an >= known)) {
+      gotAnnounce += 1;
+      if (WRITE) it.announceDate = an;
+      else console.log(`   [발표] ${it.id} → ${an}`);
+    }
+  }
 
   /* 🔴 **AI가 다른 출처에서 읽은 자격은 건드리지 않는다** (2026-08-23).
      아래 `delete it.eligibilityLines`는 '원문은 읽었는데 못 뽑았다 → 낡은 발췌를 남기지 않는다'는
@@ -823,7 +832,7 @@ for (const it of reg.items) {
 }
 console.log(`\n게시판 메뉴를 걷어낸 공고 ${cleaned}건`);
 console.log(`발췌 성공 ${hit}건 · 원문은 읽었으나 발췌 불가 ${none}건 · 원문 미확보라 손대지 않음 ${kept}건`);
-console.log(`마감일을 원문에서 새로 읽은 공고 ${gotDeadline}건`);
+console.log(`마감일을 새로 읽은 공고 ${gotDeadline}건 (그중 공고문 첨부에서 ${dlFromDoc}건)`);
 console.log(`접수 시작일 ${gotOpen}건 · 발표일 ${gotAnnounce}건 (캘린더용 — 원문에 있을 때만)`);
 if (WRITE) {
   fs.writeFileSync(regPath, JSON.stringify(reg, null, 1) + '\n');
