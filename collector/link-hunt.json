@@ -2438,7 +2438,7 @@
    "nextTryAt": "2026-08-21",
    "status": "resolved",
    "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322949",
-   "patrolledAt": "2026-09-14"
+   "patrolledAt": "2026-09-15"
   },
   "r:reg-cau-samil": {
    "attempts": 0,
@@ -4043,7 +4043,7 @@
    "lastWhy": ""
   },
   "r:auto-ent2431265883artclviewdo": {
-   "patrolledAt": "2026-09-14",
+   "patrolledAt": "2026-09-15",
    "lastWhy": ""
   },
   "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323027": {
@@ -4051,7 +4051,7 @@
    "lastWhy": ""
   },
   "r:auto-oardid323027menuno200318": {
-   "patrolledAt": "2026-09-14",
+   "patrolledAt": "2026-09-15",
    "lastWhy": ""
   },
   "n:https://dep.hufs.ac.kr/bbs/student/2431/266142/artclView.do": {
@@ -4077,7 +4077,7 @@
    "lastWhy": "",
    "status": "resolved",
    "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323040",
-   "patrolledAt": "2026-09-14"
+   "patrolledAt": "2026-09-15"
   },
   "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323040": {
    "patrolledAt": "2026-09-15",
@@ -4110,7 +4110,7 @@
    "lastWhy": "",
    "status": "resolved",
    "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323070",
-   "patrolledAt": "2026-09-14"
+   "patrolledAt": "2026-09-15"
   },
   "n:https://dep.hufs.ac.kr/bbs/student/2431/266612/artclView.do": {
    "patrolledAt": "2026-09-15",
@@ -4129,11 +4129,11 @@
    "lastWhy": ""
   },
   "r:auto-ent2431266612artclviewdo": {
-   "patrolledAt": "2026-09-14",
+   "patrolledAt": "2026-09-15",
    "lastWhy": ""
   },
   "r:auto-ent2431266533artclviewdo": {
-   "patrolledAt": "2026-09-14",
+   "patrolledAt": "2026-09-15",
    "lastWhy": ""
   },
   "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323070": {
@@ -4179,6 +4179,14 @@
   "n:https://dep.hufs.ac.kr/bbs/student/2431/266737/artclView.do": {
    "patrolledAt": "2026-09-15",
    "lastWhy": ""
+  },
+  "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%202027%ED%95%99%EB%85%84%EB%8F%84%20%EB%AF%B8%EB%9E%98%EC%9D%B8%EC%9E%AC%EC%9C%A1%EC%84%B1%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91": {
+   "attempts": 0,
+   "title": "공통 2027학년도 미래인재육성재단 장학생 모집",
+   "lastTried": "2026-09-15",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323075"
   }
  }
 }

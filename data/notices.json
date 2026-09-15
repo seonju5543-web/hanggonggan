@@ -2,13 +2,27 @@
  "updatedAt": "2026-09-15",
  "items": [
   {
-   "title": "공통 2027학년도 미래인재육성재단 장학생 모집",
-   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%202027%ED%95%99%EB%85%84%EB%8F%84%20%EB%AF%B8%EB%9E%98%EC%9D%B8%EC%9E%AC%EC%9C%A1%EC%84%B1%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91",
-   "attachments": [],
-   "deadlineHint": null,
+   "title": "서울 2027학년도 미래인재육성재단 장학생 모집",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323075",
+   "attachments": [
+    {
+     "name": "개인정보 수집 동의서.hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=bc52143fb0a44466b1c9ae203b60b4b8&fileSn=1&bbsId=BMSR00040"
+    },
+    {
+     "name": "미래인재장학생 자기소개서.hwpx",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=bc52143fb0a44466b1c9ae203b60b4b8&fileSn=2&bbsId=BMSR00040"
+    },
+    {
+     "name": "장학생 신청서.hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=bc52143fb0a44466b1c9ae203b60b4b8&fileSn=3&bbsId=BMSR00040"
+    }
+   ],
+   "deadlineHint": "모집기간 2026년 9월 23일(수)까지 ■ 신청대상 2027학년도 1학기 2학년 1학기 진학(복학 포함) 예정자 직전학기 학업성적 백분위 90",
    "school": "경희대학교",
    "campus": "",
-   "foundAt": "2026-09-15"
+   "foundAt": "2026-09-14",
+   "boardTitle": "서울 2027학년도 미래인재육성재단 장학생 모집"
   },
   {
    "title": "[서울]2026년 대학생 청소년 AI교육지원장학금 대학생 멘토 모집 안내(~10/30)",
@@ -47,29 +61,6 @@
    "campus": "",
    "foundAt": "2026-09-14",
    "boardTitle": "공통 2026년 고속도로 장학생 선발 안내"
-  },
-  {
-   "title": "서울 2027학년도 미래인재육성재단 장학생 모집",
-   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323075",
-   "attachments": [
-    {
-     "name": "개인정보 수집 동의서.hwp",
-     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=bc52143fb0a44466b1c9ae203b60b4b8&fileSn=1&bbsId=BMSR00040"
-    },
-    {
-     "name": "미래인재장학생 자기소개서.hwpx",
-     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=bc52143fb0a44466b1c9ae203b60b4b8&fileSn=2&bbsId=BMSR00040"
-    },
-    {
-     "name": "장학생 신청서.hwp",
-     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=bc52143fb0a44466b1c9ae203b60b4b8&fileSn=3&bbsId=BMSR00040"
-    }
-   ],
-   "deadlineHint": "모집기간 2026년 9월 23일(수)까지 ■ 신청대상 2027학년도 1학기 2학년 1학기 진학(복학 포함) 예정자 직전학기 학업성적 백분위 90",
-   "school": "경희대학교",
-   "campus": "",
-   "foundAt": "2026-09-14",
-   "boardTitle": "서울 2027학년도 미래인재육성재단 장학생 모집"
   },
   {
    "title": "[서울][교외]2026년 2학기 故구종서 장학금 장학생 모집 안내(~9/23)",
