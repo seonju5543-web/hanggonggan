@@ -639,7 +639,7 @@ let hit = 0, none = 0, kept = 0, cleaned = 0, fromDoc = 0, gotDeadline = 0, dlFr
       `1. 접수기간 : 2026. 9. 3.(목) ∼ 9. 9.(수) 18:00까지` 만 집었다.
    🔴 **본문이 먼저다** — 본문에서 읽었으면 첨부를 보지 않는다(본문이 그 게시글의 말이다).
    관문: verify/test-collector.mjs '첨부에서 마감일' 절. */
-function deadlineFromDocs(it) {
+export function deadlineFromDocs(it) {
   for (const f of (eligDocs[it.id] || {}).files || []) {
     const t = attachmentText(new URL(`extracted/${f}`, HERE).pathname);
     if (!readable(t)) continue;

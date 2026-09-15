@@ -96,8 +96,13 @@ export function xmlDocText(xml, kind) {
       그때는 진짜 부등호라 태그로 보여 통째로 사라진다(원문보다 나쁜 글이 된다). */
 const inlineMarks = (raw) => raw
   .replace(/<[a-z]+[0-9]*:lineBreak\b[^>]*\/?>/gi, '\n')
-  .replace(/<[a-z]+[0-9]*:(fwSpace|tab)\b[^>]*\/?>/gi, ' ')
-  .replace(/<[^>]*>/g, '');   /* 남은 표시(밑줄 시작·끝 같은 것)는 뜻이 없으니 버린다 */
+  .replace(/<[a-z]+[0-9]*:(fwSpace|nbSpace|tab)\b[^>]*\/?>/gi, ' ')
+  .replace(/<[a-z]+[0-9]*:hyphen\b[^>]*\/?>/gi, '-')
+  /* 남은 표시(밑줄 시작·끝 같은 것)는 뜻이 없으니 버린다.
+     ⚠️ 딱 하나 예외가 있다 — `<![CDATA[…]]>` 안의 글자는 뜻이 있는데 여기서 사라진다.
+        저장분 32개에 0건이고 한글·Word 가 만들지도 않아 실무 위험은 없다고 보고 안 막았다.
+        막아야 할 날이 오면 여기다(확인한 사실이라 적어 둔다 — 짐작이 아니다). */
+  .replace(/<[^>]*>/g, '');
 
 function paraText(xml, paraTag, runRe) {
   return xml.split(new RegExp(`</${paraTag}>`))

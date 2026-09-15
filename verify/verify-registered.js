@@ -40,11 +40,15 @@ async function driveAnyLiveForm(page) {
   if (!ids.length) return { id: null, ok: false };
   const tried = [];
   for (const id of ids) {
-    const r = await driveOneForm(page, id);
+    /* 🔴 **예외도 '다음 후보'다** (2026-09-15 코드 리뷰). `return` 으로 넘어가는 길은
+       셋뿐이고(카드 없음·버튼 잠김·문서 비었다) 나머지 세 자리는 waitForSelector 의
+       throw 다. 감싸지 않으면 첫 후보가 **느리게** 실패하는 순간 뒤 후보는 시도조차
+       못 한다 — 이번에 고치려던 증상이 모양만 바꿔 남는다. */
+    const r = await driveOneForm(page, id).catch((e) => ({ id, ok: false, why: String(e.message || e).split('\n')[0].slice(0, 80) }));
     if (r.ok) return r;
     tried.push(`${id}(${r.why})`);
     await page.keyboard.press('Escape').catch(() => {});
-    await page.waitForTimeout(200);
+    await page.waitForTimeout(400);   /* 시트 퇴장 0.22s — 같은 파일의 다른 자리와 맞춘다 */
   }
   return { id: tried.join(', '), ok: false };
 }
@@ -54,7 +58,7 @@ async function driveOneForm(page, id) {
   const card = await page.$(`#explore-list [data-detail="${id}"]`);
   if (!card) return { id, ok: false, why: '카드 없음' };
   await card.click();
-  await page.waitForSelector('#detail-sheet.show');
+  await page.waitForSelector('#detail-sheet.show', { timeout: 8000 });   /* 기본 30초는 순회를 통째로 잡아먹는다 */
   await page.waitForTimeout(300);
   if (await page.$eval('#btn-apply-one', (el) => el.disabled)) return { id, ok: false, why: '신청 버튼 잠김' };
   await page.click('#btn-apply-one');
