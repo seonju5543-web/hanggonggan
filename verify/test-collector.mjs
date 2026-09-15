@@ -6364,5 +6364,58 @@ console.log('■ 학교 장학 신청 포털 — 「학교 포털」이 어디�
   eq('  교내 장학금으로 한정해 말한다', /교내 장학금은/.test(note), true);
 }
 
+/* ── 2026-09-15 · 노션 G-3 — 마감일도 공고문 첨부에서 읽는다 ──
+   마감 미상 14건을 열어 보니 본문이 그림·'붙임 참조'뿐이고 접수기간은 첨부 HWP·DOCX 안에 있었다.
+   자격은 첨부에서 읽으면서 날짜는 본문에서만 읽고 있었다 — 같은 색인·같은 함수로 읽는다. */
+console.log('\n■ 마감일도 공고문 첨부에서 읽는다 (2026-09-15 · 노션 G-3)');
+{
+  const ex = readText(new URL('../collector/extract-excerpts.mjs', import.meta.url));
+  eq('첨부 글자를 모으는 함수가 있다', /function docsTextOf\(it\)/.test(ex), true);
+  eq('  본문과 첨부가 같은 함수로 날짜를 채운다 (두 벌이면 갈라진다)', /function fillDates\(it, text, from\)/.test(ex), true);
+  eq('  본문이 먼저, 본문에 마감이 없을 때만 첨부',
+    /const dlFromBody = fillDates\(it, body, '공고 원문'\);\s*\n\s*if \(!it\.deadline && !dlFromBody\) fillDates\(it, docsTextOf\(it\), '공고문 첨부'\)/.test(ex), true);
+  eq('  본문이 없는 공고도 첨부에서 날짜를 읽는다 (두 갈래 모두)',
+    (ex.match(/fillDates\(it, docsTextOf\(it\), '공고문 첨부'\)/g) || []).length, 2);
+  eq('  첨부에서 읽은 마감은 주인 표식이 다르다', /it\.deadlineFrom = from;/.test(ex), true);
+  process.env.EXCERPTS_AS_LIB = '1';
+  const EX = await import(new URL('../collector/extract-excerpts.mjs', import.meta.url));
+  /* 전부 실제 첨부에서 뽑힌 줄이다 */
+  eq('울산연구원 공고문 HWP 의 실제 줄에서 마감을 읽는다',
+    EX.extractDeadline('□ 신청기간 및 방법\n○ 신청기간 : 2026. 9. 16.(수) 10:00 ~ 9. 23.(금) 18:00까지'), '2026-09-23');
+  eq('  익산사랑 공고문 HWPX 의 실제 줄', EX.extractDeadline('1. 접수기간 : 2026. 9. 3.(목) ∼ 9. 9.(수) 18:00까지'), '2026-09-09');
+  eq('  마감 시한만 말하는 줄에서는 지어내지 않는다 (사랑나눔 DOCX)',
+    EX.extractDeadline('- 서류는 반드시 마감 시한 내 제출해 주세요.'), null);
+}
+
+/* ── 2026-09-15 · 노션 UI-11 — 도우미가 자주 묻는 질문을 답한다 ──
+   고객센터 화면과 **같은 원본**(app.js FAQ_ITEMS)을 읽고 답 문장을 그대로 낸다. 공고 검색보다
+   뒤에 오고(그대로 물은 것만 앞), 낱말 하나로는 답하지 않는다 — '지원금 있어?' 사고의 FAQ 판. */
+console.log('\n■ 도우미가 자주 묻는 질문을 답한다 (2026-09-15 · 노션 UI-11)');
+{
+  const appSrc = readText(new URL('../app.js', import.meta.url));
+  const a = appSrc.indexOf('const FAQ_ITEMS = [');
+  const b = appSrc.indexOf('\n];', a);
+  eq('FAQ 원본은 app.js 하나다', a > 0 && b > a, true);
+  const faq = new Function(`return ${appSrc.slice(a + 'const FAQ_ITEMS = '.length, b + 2)}`)();
+  const chatSrc = readText(new URL('../chat.js', import.meta.url));
+  eq('  chat.js 에 FAQ 사본이 없다', /const FAQ_ITEMS\s*=/.test(chatSrc), false);
+  globalThis.FAQ_ITEMS = faq;
+  const C = createRequire(import.meta.url)('../chat.js');
+  const isFaq = (r) => !!(r && r.actions && r.actions.some((x) => x.act === 'faq'));
+  eq('그대로 물으면 답한다 (알림이 안 와요)', isFaq(C.chatRoute('알림이 안 와요')), true);
+  eq('  답 문장은 원본 그대로, 태그만 벗긴다', C.chatRoute('알림이 안 와요').text,
+    faq.find(([, q]) => q === '알림이 안 와요.')[2].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim());
+  eq('  짧은 질문도 (유료인가요?)', isFaq(C.chatRoute('유료인가요?')), true);
+  eq('  말이 달라도 (앱에서 신청까지 끝나?)', isFaq(C.chatRoute('앱에서 신청까지 끝나?')), true);
+  eq('  동점이면 물은 글자와 길게 이어지는 질문이 이긴다 (내 정보는 어디에 저장돼?)',
+    String((C.chatRoute('내 정보는 어디에 저장돼?') || {}).note || '').includes('내 정보는 어디에 저장되나요'), true);
+  eq('  공고 낱말이 든 질문은 FAQ 로 새지 않는다 (기숙사 알림)', isFaq(C.chatRoute('기숙사 알림')), false);
+  eq('  모르는 것은 모른다 (쿼카 사육 지원금)', C.chatRoute('쿼카 사육 지원금 있어?'), null);
+  eq('  FAQ 는 공고 검색보다 뒤에 온다 (그대로 물은 것만 앞)',
+    chatSrc.indexOf('const faq = chatAnswerFaq(s);') > chatSrc.indexOf('const cards = chatSearch(s);'), true);
+  eq('  버튼이 자주 묻는 질문 화면으로 간다', /act === 'faq'\) return go\('faq'\)/.test(chatSrc) && /'faq'/.test(appSrc), true);
+  delete globalThis.FAQ_ITEMS;
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);
