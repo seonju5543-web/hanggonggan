@@ -6354,6 +6354,29 @@ console.log('■ 첨부에서 마감일 — 본문이 껍데기인 게시판 (20
       읽힌것.length > 0 || Object.keys(색인).length === 0, true);
   }
   eq('첨부에서 마감을 읽는 함수가 있다', typeof AWAIT_EE.deadlineFromDocs, 'function');
+
+  /* 🔴 **포스터 이미지는 로봇이 못 읽는다 — 사람이 읽은 값은 근거를 적어 둔다** (2026-09-16)
+     마감 없는 13건 중 7건은 첨부가 **공고 포스터 이미지**라 글자층이 없다(무료 경로로는
+     방법이 없고 AI 경로 몫이다). 그 7건은 세션에서 사람이 이미지를 열어 읽었다.
+     지어낸 값과 구분되려면 **어디서 읽었는지와 원문 문구**가 남아야 한다 —
+     `deadlineFrom: "공고문 이미지 <날짜> · <원문 기간 문구>"`.
+     🔴 문구 없이 '공고문 이미지' 만 적는 것을 막는다. 그러면 다음 사람이 확인할 길이 없다.
+     🔴 그리고 **정말 이미지 첨부가 있는 공고여야** 한다 — 없으면 근거가 허공이다.
+     ⚠️ 하나의 접수기간이 또렷한 것만 채웠다. 세종이도인재처럼 **분야별로 기간이 다른**
+        공고(디딤돌·무지개 7/10 · 핵심인재육성 9/30)는 비워 뒀다 — 하나로 납작하게 만들면
+        다른 분야 지원자에게 거짓말이 된다(자격 쪽의 같은 함정과 같은 이유). */
+  {
+    const 이미지발 = reg.filter((i) => /^공고문 이미지/.test(i.deadlineFrom || ''));
+    if (이미지발.length) {
+      eq(`사람이 이미지에서 읽은 마감 ${이미지발.length}건에 원문 문구가 붙어 있다`,
+        이미지발.filter((i) => !/ · .*\d/.test(i.deadlineFrom)).map((i) => i.id), []);
+      const 색인2 = JSON.parse(readText(new URL('../collector/extracted/elig-docs.json', import.meta.url)));
+      const IMG = /\.(png|jpe?g|webp|gif)$/i;
+      eq('  그 공고들에 실제로 이미지 첨부가 있다',
+        이미지발.filter((i) => !((색인2[i.id] || {}).files || []).some((f) => IMG.test(f))).map((i) => i.id), []);
+      eq('  마감일이 실제로 채워져 있다', 이미지발.filter((i) => !i.deadline).map((i) => i.id), []);
+    } else eq('(이미지에서 읽은 마감 없음 — 건너뜀)', true, true);
+  }
   /* ⚠️ 변수 이름·중괄호 자리를 박지 않는다 — 뜻이 같은 리팩터에 빨간불이 되면 다음 사람이 관문을 끈다.
      재는 것은 '본문을 먼저 보고, 못 읽었을 때 첨부로 물러나는 순서' 하나다. */
   const 본문먼저 = ee.indexOf('extractDeadline(body)');

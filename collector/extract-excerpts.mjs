@@ -662,7 +662,7 @@ export function deadlineFromDocs(it) {
 /* 마감일을 채우는 자리 **한 곳** — 본문 경로와 첨부 경로가 같은 규칙을 쓰게 한다.
    🔴 period 는 화면에 그대로 보이는 안내문이다. 통째로 갈아치우면 '2026-2학기 1차 신청'
       같은 맥락이 사라지므로, 몰라서 적어 둔 '원문 확인' 자리에만 날짜를 끼운다. */
-function putDeadline(it, dl, from) {
+export function putDeadline(it, dl, from) {
   it.deadline = dl;
   it.deadlineFrom = from;
   if (!it.period) it.period = `접수 ~${dl}`;
