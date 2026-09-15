@@ -204,10 +204,30 @@ const PERIOD_VIA = /(신청|접수|모집|제출|지원서?)\s?(방법|접수|�
 const VALUE_DEADLINE = /(까지|마감)/;
 /* `서류 접수 : 2026.7.27 (월) ~ 7.30 (목)` — 이름표는 기간을 말하는데 값이 `까지`로 안 끝난다.
    `까지`만 요구하다 실제 공고를 놓치고 있었다(사랑의열매 사랑나눔장학생 2건 · 포스터와 docx 둘 다).
-   🔴 **날짜 범위 자체가 기간이라는 증거다** — `신청방법: 포털에서 신청` 처럼 날짜가 딴 뜻인 줄은
-      범위가 아니라 안 열린다. 넓힌 것은 딱 이것뿐이고, 앞머리 동사 방어선(`근로기간`·`지급기간`이
-      PERIOD_VIA 에 애초에 안 걸린다)은 그대로다. */
+
+   🔴 **범위가 있다는 것만으로는 모자란다** (2026-09-16 코드 리뷰 · 되돌리지 말 것).
+      처음엔 '날짜 범위 자체가 기간이라는 증거'라고 적고 범위만 봤는데, 저장된 원문 전수로
+      재 보니 **기간이 아닌 줄이 같이 열렸다**:
+        · `○ 한국장학재단 신청 : … 1차 신청(2026.5.22 ~ 6.22) 완료한 자`  ← 자격 요건
+        · `○ 신청 : 2026학년도 성적 3.5 ~ 4.5 이상인 자`                  ← 성적이 3월 5일이 됐다
+        · `신청 : 봉사활동 실적 2025. 1. 1. ~ 2025. 12. 31. 인정`          ← 실적 기간
+      한국항공대 공고는 그 자격 줄이 진짜 기간 줄보다 **위**에 있어 첫 승자 규칙 때문에
+      진짜 마감 8/13 을 **6/22 로 뒤집었다** — 살아 있는 공고가 끝난 것이 된다.
+   🔴 가르는 것은 이름표가 아니라 **값의 꼬리**다. 진짜 기간 줄은 끝 날짜 뒤에 요일·시각·
+      `까지` 밖에 안 붙는다. 한글 산문이 남으면 그 줄은 조건을 말하는 것이다.
+   관문: `test-collector.mjs` '첨부에서 마감일' 절 ③. */
 const VALUE_RANGE = /\d\s?[.\-/월]\s?\d[^~∼〜～–—]{0,20}[~∼〜～–—][^0-9]{0,12}\d/;
+/* 끝 날짜 뒤 꼬리에 한글 산문이 없는가 — 요일·시각·`까지`·`오전/오후` 만 허용한다 */
+const TAIL_OK = (value) => {
+  const v = String(value);
+  const at = v.search(RANGE_SEP);
+  if (at < 0) return false;
+  const after = v.slice(at + 1);
+  let i = after.length;
+  while (i > 0 && !/[0-9]/.test(after[i - 1])) i -= 1;   // 마지막 숫자 뒤부터가 꼬리
+  const tail = after.slice(i).replace(/[월화수목금토일시분초]|오전|오후|까지|이내|마감/g, '');
+  return !/[가-힣]/.test(tail);
+};
 
 /* 🔴 두 자리 해는 `(?<!\d)`로 감싼다 — 안 그러면 전화번호 `054-748-7760`의 조각이 날짜가 된다. */
 const FULL_DATE = /(?<!\d)(\d{4}|\d{2})\s?[.\-/년]\s?(\d{1,2})\s?[.\-/월]\s?(\d{1,2})(?!\d)/g;
@@ -307,7 +327,7 @@ const PERIOD_ACCEPT = (label, value) => PERIOD_LABEL.test(label)
      일하는 기간이라 범위를 근거로 열면 안 된다(관문이 실제로 이 회귀를 잡았다). */
   || (PERIOD_BARE.test(label.replace(/\s/g, '')) && VALUE_DEADLINE.test(value))
   /* 동사가 든 이름표(`서류 접수`·`접수`)는 날짜 **범위**도 근거로 받는다 */
-  || (PERIOD_VIA.test(label) && (VALUE_DEADLINE.test(value) || VALUE_RANGE.test(value)));
+  || (PERIOD_VIA.test(label) && (VALUE_DEADLINE.test(value) || (VALUE_RANGE.test(value) && TAIL_OK(value))));
 
 /** 공고 원문에서 신청 마감일 하나. 못 믿으면 null. */
 function extractDeadline(text) {
@@ -662,7 +682,7 @@ export function deadlineFromDocs(it) {
 /* 마감일을 채우는 자리 **한 곳** — 본문 경로와 첨부 경로가 같은 규칙을 쓰게 한다.
    🔴 period 는 화면에 그대로 보이는 안내문이다. 통째로 갈아치우면 '2026-2학기 1차 신청'
       같은 맥락이 사라지므로, 몰라서 적어 둔 '원문 확인' 자리에만 날짜를 끼운다. */
-export function putDeadline(it, dl, from) {
+function putDeadline(it, dl, from) {
   it.deadline = dl;
   it.deadlineFrom = from;
   if (!it.period) it.period = `접수 ~${dl}`;
