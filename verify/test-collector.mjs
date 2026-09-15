@@ -6558,9 +6558,15 @@ console.log('\n■ 도우미가 자주 묻는 질문을 답한다 (2026-09-15 ·
     String((C.chatRoute('내 정보는 어디에 저장돼?') || {}).note || '').includes('내 정보는 어디에 저장되나요'), true);
   eq('  공고 낱말이 든 질문은 FAQ 로 새지 않는다 (기숙사 알림)', isFaq(C.chatRoute('기숙사 알림')), false);
   eq('  모르는 것은 모른다 (쿼카 사육 지원금)', C.chatRoute('쿼카 사육 지원금 있어?'), null);
+  /* 🔴 코드 리뷰(2026-09-15)가 잡은 새는 자리 둘 — 되돌리면 여기서 빨간불 */
+  eq('  낱말 하나로는 답하지 않는다 (공고 없어 → 인터넷 FAQ 가 아니다)', C.chatRoute('공고 없어'), null);
+  eq('    이름 바꾸기 → 기기 바꾸기 FAQ 가 아니다', C.chatRoute('이름 바꾸기'), null);
+  eq('    유료? 한 낱말은 모른다 (그대로 물어야 답한다)', C.chatRoute('유료?'), null);
+  eq('  4글자 부분일치로 삼키지 않는다 (학교 공고 → 우리 학교 공고 FAQ 가 아니다)', isFaq(C.chatRoute('학교 공고')), false);
+  eq('    공고 안 보여 도 마찬가지', isFaq(C.chatRoute('공고 안 보여')), false);
   eq('  FAQ 는 공고 검색보다 뒤에 온다 (그대로 물은 것만 앞)',
     chatSrc.indexOf('const faq = chatAnswerFaq(s);') > chatSrc.indexOf('const cards = chatSearch(s);'), true);
-  eq('  버튼이 자주 묻는 질문 화면으로 간다', /act === 'faq'\) return go\('faq'\)/.test(chatSrc) && /'faq'/.test(appSrc), true);
+  eq('  버튼이 자주 묻는 질문 화면으로 간다', /act === 'faq'\) return go\('faq'\)/.test(chatSrc) && /name === 'faq'\) renderFaq\(\)/.test(appSrc), true);
   delete globalThis.FAQ_ITEMS;
 }
 

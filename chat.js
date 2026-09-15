@@ -516,16 +516,23 @@ function chatAnswerFaq(q, opts) {
   if (!items.length) return null;
   const s = String(q || '');
   const nq = chatFaqNorm(s);
-  /* 그대로 물었는가 — `유료인가요?` 처럼 짧은 질문도 있어 4글자부터 본다 */
-  const exact = nq.length >= 4 && items.find(([, question]) => {
+  /* 그대로 물었는가 — `유료인가요?` 처럼 짧은 질문도 있어 5글자부터 보되, 물은 글자가
+     FAQ 질문의 **60% 이상**을 덮어야 한다. 🔴 4글자 부분일치로 두었더니 `학교 공고` 가
+     '우리 학교 공고가 안 보여요' 에 삼켜져 우리 학교 공고를 찾는 학생이 FAQ 를 받았다(코드 리뷰). */
+  const exact = nq.length >= 5 && items.find(([, question]) => {
     const nf = chatFaqNorm(question);
-    return nf.length >= 4 && (nf.includes(nq) || nq.includes(nf));
+    if (nf.length < 5) return false;
+    if (nf.includes(nq)) return nq.length >= nf.length * 0.6;
+    return nq.includes(nf);
   });
   if (opts && opts.exactOnly) return exact ? chatFaqReply(exact) : null;
   if (exact) return chatFaqReply(exact);
 
   const toks = chatTokens(s);
-  if (!toks.length) return null;
+  /* 🔴 낱말 하나로는 답하지 않는다 — 그대로 물은 것(`유료인가요?`)은 위에서 이미 잡혔다.
+     낱말 하나·뚜렷한 낱말 하나에도 답하게 두었더니 `공고 없어` 가 '인터넷이 없어도 열리나요' 로,
+     `이름 바꾸기` 가 '기기를 바꾸면' 으로 갔다(코드 리뷰 실측). 모르면 모른다고 한다. */
+  if (toks.length < 2) return null;
   /* 어미 하나까지는 봐준다 — `저장돼`·`저장한` 은 `저장` 이다(chatTail 은 조사만 뗀다).
      세 글자 이상에서만 마지막 글자를 뗀 줄기도 같이 본다. */
   const stems = (t) => (t.length >= 3 ? [t, t.slice(0, -1)] : [t]);
@@ -542,25 +549,24 @@ function chatAnswerFaq(q, opts) {
     }
     return best;
   };
-  let best = null, bestScore = 0, bestRun = 0, strong = false;
+  let best = null, bestScore = 0, bestRun = 0;
   for (const item of items) {
     const [, question, answer] = item;
     const qText = chatFaqNorm(question), aText = chatFaqNorm(chatStripTags(answer));
-    let score = 0, hitStrong = false;
+    let score = 0;
     for (const t of toks) {
-      if (stems(t).some((x) => qText.includes(x))) { score += 2; if (t.length >= 3) hitStrong = true; }
+      if (stems(t).some((x) => qText.includes(x))) score += 2;
       else if (stems(t).some((x) => aText.includes(x))) score += 1;
     }
     const run = longestRun(nq, qText);
     if (score > bestScore || (score === bestScore && score > 0 && run > bestRun)) {
-      best = item; bestScore = score; bestRun = run; strong = hitStrong;
+      best = item; bestScore = score; bestRun = run;
     }
   }
-  /* 문턱 — 낱말이 하나뿐이거나(`유료?`) 세 글자 이상의 뚜렷한 낱말(`로그인`)이 FAQ 질문에
-     있으면 2점, 아니면 질문 쪽 낱말 둘(4점). 그보다 약하면 모른다고 한다 —
-     `기숙사 알림` 은 `알림`(두 글자) 하나뿐이라 FAQ 로 새지 않는다. */
-  const need = toks.length === 1 || strong ? 2 : 4;
-  return best && bestScore >= need ? chatFaqReply(best) : null;
+  /* 문턱 — FAQ **질문** 쪽 낱말 둘(4점) 이상. 그보다 약하면 모른다고 한다.
+     `기숙사 알림` 은 `알림` 하나뿐이라 FAQ 로 새지 않고, `로그인 안 해도 돼` 도 `로그인`
+     하나뿐이라 모른다고 한다(그대로 물으면 위 exact 가 답한다). 축소가 안전하다. */
+  return best && bestScore >= 4 ? chatFaqReply(best) : null;
 }
 function chatFaqReply([cat, question, answer]) {
   return {
