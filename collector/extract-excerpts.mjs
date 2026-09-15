@@ -202,6 +202,12 @@ const PERIOD_BARE = /^(기\s?간|기\s?한|마\s?감)$/;
    날짜가 딴 뜻인 줄이 안 걸린다. */
 const PERIOD_VIA = /(신청|접수|모집|제출|지원서?)\s?(방법|접수|서류)?$|^(신청|접수|제출|지원서)\s/;
 const VALUE_DEADLINE = /(까지|마감)/;
+/* `서류 접수 : 2026.7.27 (월) ~ 7.30 (목)` — 이름표는 기간을 말하는데 값이 `까지`로 안 끝난다.
+   `까지`만 요구하다 실제 공고를 놓치고 있었다(사랑의열매 사랑나눔장학생 2건 · 포스터와 docx 둘 다).
+   🔴 **날짜 범위 자체가 기간이라는 증거다** — `신청방법: 포털에서 신청` 처럼 날짜가 딴 뜻인 줄은
+      범위가 아니라 안 열린다. 넓힌 것은 딱 이것뿐이고, 앞머리 동사 방어선(`근로기간`·`지급기간`이
+      PERIOD_VIA 에 애초에 안 걸린다)은 그대로다. */
+const VALUE_RANGE = /\d\s?[.\-/월]\s?\d[^~∼〜～–—]{0,20}[~∼〜～–—][^0-9]{0,12}\d/;
 
 /* 🔴 두 자리 해는 `(?<!\d)`로 감싼다 — 안 그러면 전화번호 `054-748-7760`의 조각이 날짜가 된다. */
 const FULL_DATE = /(?<!\d)(\d{4}|\d{2})\s?[.\-/년]\s?(\d{1,2})\s?[.\-/월]\s?(\d{1,2})(?!\d)/g;
@@ -297,7 +303,11 @@ function eachLabeledValue(text, accept, read) {
 /** 기간을 말하는 이름표인가 — 마감일과 접수 시작일이 **같은 판정**을 쓴다.
     이름표가 '방법·접수'면 내용이 마감을 말할 때만 연다 (위 PERIOD_VIA 주석). */
 const PERIOD_ACCEPT = (label, value) => PERIOD_LABEL.test(label)
-  || ((PERIOD_BARE.test(label.replace(/\s/g, '')) || PERIOD_VIA.test(label)) && VALUE_DEADLINE.test(value));
+  /* 맨 이름표(`기간 :`)는 **`까지`로 끝날 때만** — 근로장학생의 `가. 기간: 9.1 ~ 2027.2.12` 이
+     일하는 기간이라 범위를 근거로 열면 안 된다(관문이 실제로 이 회귀를 잡았다). */
+  || (PERIOD_BARE.test(label.replace(/\s/g, '')) && VALUE_DEADLINE.test(value))
+  /* 동사가 든 이름표(`서류 접수`·`접수`)는 날짜 **범위**도 근거로 받는다 */
+  || (PERIOD_VIA.test(label) && (VALUE_DEADLINE.test(value) || VALUE_RANGE.test(value)));
 
 /** 공고 원문에서 신청 마감일 하나. 못 믿으면 null. */
 function extractDeadline(text) {
