@@ -378,7 +378,9 @@ function extractOpenDate(text) {
    말할 때만** 연다: `선발발표`·`합격자 발표`·`결과 통보`·`선정 결과`·`선발 확정`.
    맨 `발표`는 이름표 전체가 그것뿐일 때만 받는다.
    ⚠️ 넓히지 말 것 — `발표 준비물`·`성과 발표회` 같은 행사 일정이 발표일로 둔갑한다. */
-const ANNOUNCE_LABEL = /(선발|선정|합격자?|최종|장학생)\s?(발표|통보|확정|결과)|결과\s?(발표|통보)|^발\s?표(일자?|예정일)?$/;
+/* ⚠️ `발표` 와 꼬리말 사이 **빈칸**을 허용한다 — `1. 발표 예정일 : 2026. 11. 13.(금)` 을
+   못 읽고 있었다(2026-09-16 · 선주 세션 리뷰 ③. 익산사랑 요강에 실제로 그 꼴이 있다). */
+const ANNOUNCE_LABEL = /(선발|선정|합격자?|최종|장학생)\s?(발표|통보|확정|결과)|결과\s?(발표|통보)|^발\s?표\s?(일자?|예정일)?$/;
 const ANNOUNCE_ACCEPT = (label) => ANNOUNCE_LABEL.test(label);
 
 /** 발표일 — 범위면 **앞쪽**을 쓴다(그날부터 결과를 볼 수 있다). */
@@ -669,11 +671,26 @@ let hit = 0, none = 0, kept = 0, cleaned = 0, fromDoc = 0, gotDeadline = 0, dlFr
       `1. 접수기간 : 2026. 9. 3.(목) ∼ 9. 9.(수) 18:00까지` 만 집었다.
    🔴 **본문이 먼저다** — 본문에서 읽었으면 첨부를 보지 않는다(본문이 그 게시글의 말이다).
    관문: verify/test-collector.mjs '첨부에서 마감일' 절. */
+/* 🔴 **「붙임」 뒤는 견본 양식이다** (2026-09-16 · 선주 세션 리뷰 ①).
+   공고문 첨부에는 신청서가 같은 파일로 붙어 있는 일이 흔한데(`elig-1xmn1p-1.docx` 는
+   `form-1xmn1p-1.docx` 와 같은 파일이다) 그 견본에는 **작년 기간**이 예시로 적혀 있다.
+   본문에 기간 줄이 없고 붙임에만 있으면 그게 이겨, 살아 있는 공고가 작년 날짜로 마감된다.
+   ⚠️ 저장된 첨부 441개로 재 보니 잘라도 판정이 달라지는 것이 **0개**다(잃는 것이 없다).
+   관문: `test-collector.mjs` '첨부에서 마감일' 절 '붙임 뒤의 견본 기간'. */
+const APPENDIX_HEAD = /^\s*[[【(]?\s*(붙임|별지|별첨|서식)\s*\d*\s*[\]】)]?\s*[.:·]?\s/m;
+
+/** 글자 한 덩어리에서 마감일 — 붙임 앞까지만 본다 (검사가 직접 부른다) */
+export function deadlineFromText(text) {
+  const t = String(text || '');
+  const m = t.match(APPENDIX_HEAD);
+  return extractDeadline(m ? t.slice(0, m.index) : t);
+}
+
 export function deadlineFromDocs(it) {
   for (const f of (eligDocs[it.id] || {}).files || []) {
     const t = attachmentText(new URL(`extracted/${f}`, HERE).pathname);
     if (!readable(t)) continue;
-    const dl = extractDeadline(t);
+    const dl = deadlineFromText(t);
     if (dl) return dl;
   }
   return null;

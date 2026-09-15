@@ -602,6 +602,13 @@ switch (action) {
       mark('eligibilityExcludes', 'eligibilityExcludesFrom');
       mark('eligibilityPriority', 'eligibilityPriorityFrom');
       mark('eligibilityLines', 'eligibilityFrom');   // 이미 열려 있던 칸 — 지금은 매일 지워진다
+      /* 🔴 마감일도 주인을 남긴다 (2026-09-16 · 선주 세션 리뷰 ②).
+         `deadlineFrom` 은 로봇이 '공고 원문'·'공고문 첨부' 라고 적는 칸인데, 관리자가 마감일을
+         고쳐도 그 글자가 그대로 남아 **사람이 넣은 값에 로봇 출처가 붙어 있었다**(원칙 8-1 이
+         금지하는 거짓 출처 — 자격 쪽에서 이미 같은 사고를 겪었다).
+         ⚠️ 로봇이 덮을 걱정은 없다 — `extract-excerpts` 는 `if (!it.deadline)` 일 때만 채운다.
+            비우면 표식도 지워져 로봇에게 돌아간다(위 규약 그대로). */
+      mark('deadline', 'deadlineFrom');
       return changed;
     };
 
