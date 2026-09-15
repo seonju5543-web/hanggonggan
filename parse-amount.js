@@ -45,8 +45,10 @@ var WON_PATTERNS = [
   { re: /(\d[\d,]*(?:\.\d+)?)\s*천\s*만\s*원/,                  mul: 10000000 },
   { re: /(\d[\d,]*(?:\.\d+)?)\s*백\s*만\s*원/,                  mul: 1000000 },
   { re: /(\d[\d,]*(?:\.\d+)?)\s*만\s*원/,                       mul: 10000 },
-  { re: /(\d[\d,]*)\s*천\s*원/,                                 mul: 1000 },
-  { re: /(\d[\d,]{5,})\s*원/,                                   mul: 1 }
+  { re: /(\d[\d,]{5,})\s*원/,                                   mul: 1 },
+  /* 천원은 **맨 뒤** — 첫 번째로 맞는 '무늬'가 이기지 '자리'가 이기는 게 아니라서, 앞에 두면
+     `장학금 3,000,000원 (교재비 100천원 별도)` 에서 교재비가 장학금이 된다(코드 리뷰가 잡았다). */
+  { re: /(\d[\d,]*)\s*천\s*원/,                                 mul: 1000 }
 ];
 
 /* 등록금 비율 — `전액`은 100%, `반액`은 50%로 읽는다(원문이 그 뜻으로 쓴다). */
@@ -109,7 +111,10 @@ function perPersonWon(blockLines) {
       전수로 확인할 것(TOTAL_RE 주석과 같은 주의).
    축소는 안전하고 과장은 기망이다(위 PERSON_RE 주석과 같은 원칙). */
 var HEADCOUNT_RE = /\d{2,}\s*명/;
-var EACH_RE = /각\s*[\d,]|각각|매\s*인|인\s*당|명\s*당/;
+/* '한 사람 몫'이라는 증거 — 인원이 옆에 있어도 이게 있으면 예산표가 아니다.
+   `각`·`매월`·`학기당`·`연 n회`·`1회` 는 학생 한 명이 받는 단위이고, `~` 범위(`1백만원 ~ 2백만원`)는
+   예산표에 나오지 않는 표기다(코드 리뷰 2026-09-15 — 이게 없으면 `선발인원 20명 · 학기당 100만원` 이 미확인이 됐다). */
+var EACH_RE = /각\s*[\d,]|각각|매\s*인|인\s*당|명\s*당|매\s*월|매\s*학기|매\s*년|학기\s*당|월\s*[\d,]+\s*[만천]?\s*원|연\s*[\d,]+\s*[만천]?\s*원|\d\s*회|[\d,]+\s*[백천]?\s*만?\s*원\s*[~〜∼\-–—]\s*[\d,]/;
 function budgetOnly(blockLines) {
   var arr = blockLines || [], heads = false, seen = 0;
   for (var i = 0; i < arr.length; i++) {
@@ -117,7 +122,7 @@ function budgetOnly(blockLines) {
     if (HEADCOUNT_RE.test(s)) heads = true;
     if (!wonIn(s)) continue;
     seen += 1;
-    if (PERSON_RE.test(s) || EACH_RE.test(s)) return false;   // 1인당이 적힌 금액이 있다
+    if (PERSON_RE.test(s) || EACH_RE.test(s)) return false;   // 한 사람 몫이 적힌 금액이 있다
   }
   return heads && seen > 0;
 }
@@ -228,7 +233,8 @@ function amountFrom(lines) {
 
   if (won) {
     /* 범위 — `1백만원 ~ 2백만원`. 뒤쪽(큰 값)도 읽어 둔다. */
-    var rangeM = body.match(/([\d,]+\s*[백천]?\s*만?\s*원)\s*[~〜∼\-–—]\s*([\d,]+\s*[백천]?\s*만?\s*원)/);
+    /* 소수점도 범위다 — `2.5백만원 ~ 3백만원` (2026-09-15 코드 리뷰) */
+    var rangeM = body.match(/([\d,]+(?:\.\d+)?\s*[백천]?\s*만?\s*원)\s*[~〜∼\-–—]\s*([\d,]+(?:\.\d+)?\s*[백천]?\s*만?\s*원)/);
     if (rangeM) {
       var lo = wonIn(rangeM[1]), hi = wonIn(rangeM[2]);
       if (lo && hi && hi > lo) {

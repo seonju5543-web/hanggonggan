@@ -1935,11 +1935,22 @@ console.log('\n■ 껍데기 페이지와 브라우저 본문 (2026-08-20)');
      재수집 로봇은 그걸 '본문 확보 ✅'라고 적었고 발췌기·금액 로봇은 메뉴를 읽었다.
      아래 셋은 그 경위의 세 조각이다 — 하나라도 되돌리면 껍데기가 다시 통과한다. */
   {
+    /* ⚠️ 픽스처 크기가 곧 검사다 (코드 리뷰 2026-09-15 — 처음 판은 셋이 옛 코드에서도 통과했다).
+       메뉴는 **한글 100자를 넘겨야** 안전판이 되돌린 메뉴가 '본문 있음'이 되고, 제목은 정규화
+       뒤 **10자를 넘겨야** 제목 규칙이 켜진다. 줄이면 검사가 문턱만 재고 규칙은 안 잰다. */
     const menuK = ['로그인', '사이트맵', '학사일정', '전체메뉴', '개인정보처리방침', '찾아오시는길',
-      '대학 입학 연구 교류 대학생활 교육 발전기금 웹메일', '공지사항 커뮤니티 학생지원 장학 도서관'];
-    const shellK = (n, extra) => ({ url: `https://k.ac.kr/view?id=${n}`, title: `공고 ${n} 제목입니다`,
-      text: [...menuK, `공고 ${n} 제목입니다`, `2026-09-0${n}조회수 15${n}`, ...(extra || [])].join('\n') });
-    /* ① 메뉴 밑에 제목·조회수뿐인 페이지 넷 — 걷어내면 120자가 안 돼 안전판이 켜지는 크기다 */
+      '대학 입학 연구 교류 대학생활 교육 발전기금 웹메일 인포 채용시스템',
+      '공지사항 커뮤니티 학생지원 장학 도서관 박물관 정보서비스 미디어',
+      '대학소개 총장인사말 연혁 상징 비전 캠퍼스안내 부속기관 규정집',
+      '학사안내 수강신청 성적 졸업 학적변동 교직 복수전공 부전공 안내'];
+    const menuKo = menuK.join('').replace(/[^가-힣]/g, '').length;
+    eq('  (픽스처) 메뉴가 문턱을 넘긴다', menuKo >= 100, true);
+    const titleK = (n) => `${n}번째 공고 — 2026학년도 2학기 장학생 선발 안내문`;
+    eq('  (픽스처) 제목이 제목 규칙의 최소 길이를 넘긴다', NS.normTitle(titleK(1)).length >= 10, true);
+    const shellK = (n, extra) => ({ url: `https://k.ac.kr/view?id=${n}`, title: titleK(n),
+      text: [...menuK, titleK(n), `2026-09-0${n}조회수 15${n}`, ...(extra || [])].join('\n') });
+    /* ① 메뉴 밑에 제목·조회수뿐인 페이지 넷 — 걷어내면 120자가 안 돼 안전판이 켜지는 크기다.
+          안전판이 잴 때도 켜지면 메뉴 100자+가 본문이 돼 true 로 돌아간다. */
     const i5 = NS.indexTexts([1, 2, 3, 4].map((n) => shellK(n)), {});
     eq('메뉴를 걷어낸 뒤 남는 것이 제목뿐이면 원문으로 세지 않는다',
       NS.hasText(i5.byUrl.get(NS.canonUrl('https://k.ac.kr/view?id=1'))), false);
@@ -1948,17 +1959,24 @@ console.log('\n■ 껍데기 페이지와 브라우저 본문 (2026-08-20)');
     const i6 = NS.indexTexts(stale, {});
     eq('  파일에 남은 옛 본문 분량을 믿지 않고 다시 잰다',
       NS.hasText(i6.byUrl.get(NS.canonUrl('https://k.ac.kr/view?id=1'))), false);
-    /* ③ 이전글·다음글 줄은 다른 공고의 제목이다 — 본문으로 세지 않는다 */
-    const nav = [1, 2, 3, 4].map((n) => shellK(n, [`공고 ${(n % 4) + 1} 제목입니다`, `[공통] 공고 ${((n + 1) % 4) + 1} 제목입니다`]));
+    /* ③ 이전글·다음글 줄은 다른 공고의 제목이다 — 본문으로 세지 않는다.
+          다른 공고 제목 넷(한글 90자+)과 자기 제목만으로 100자를 넘기게 해서, 제목 규칙이
+          꺼지면 true 로 돌아가게 한다(메뉴는 이미 걷어내진 상태라 안전판과 무관하다). */
+    const nav = [1, 2, 3, 4].map((n) => shellK(n, [1, 2, 3, 4].filter((m) => m !== n).map(titleK).concat([`[공통] ${titleK(((n + 1) % 4) + 1)}`])));
     const i7 = NS.indexTexts(nav, {});
     eq('  이전글·다음글(다른 공고 제목) 줄은 본문으로 세지 않는다',
       NS.hasText(i7.byUrl.get(NS.canonUrl('https://k.ac.kr/view?id=1'))), false);
-    /* ④ 브라우저가 그린 판에만 있는 메뉴도 따로 배운다 — 한 통에 섞으면 비율 문턱에 못 미친다 */
+    /* ④ 브라우저가 그린 판에만 있는 메뉴도 따로 배운다 — 한 통에 섞으면 비율 문턱에 못 미친다.
+          브라우저 메뉴만으로 한글 100자를 넘겨야, 따로 배우지 않으면 true 로 돌아간다. */
     /* 본문은 공고마다 달라야 한다 — 같은 문장을 일곱 쪽에 넣으면 그게 메뉴로 배워진다(실제로 그랬다) */
     const plain = [1, 2, 3, 4, 5, 6, 7].map((n) => shellK(n, real.split('\n').map((l) => `${l} — ${n}번 공고만의 문장`)));
-    const browserMenu = ['일반 학사 장학 근로 시간표 변경 교내학점교류 행사', '서울캠퍼스 02447 서울특별시 동대문구 경희대로 26 국제캠퍼스 17104 경기도 용인시 기흥구'];
+    const browserMenu = ['일반 학사 장학 근로 시간표 변경 교내학점교류 행사 채용 국제교류 취업',
+      '서울캠퍼스 서울특별시 동대문구 경희대로 국제캠퍼스 경기도 용인시 기흥구 덕영대로 광릉캠퍼스 남양주시',
+      '개인정보처리방침 이메일무단수집거부 교내전화번호 대학정보공시 예결산공고 입찰공고 관련기관',
+      '확대 축소 프린트 주소복사 목록 이전글 다음글 파일첨부 작성자 조회수 등록일 담당부서'];
+    eq('  (픽스처) 브라우저 메뉴가 문턱을 넘긴다', browserMenu.join('').replace(/[^가-힣]/g, '').length >= 100, true);
     const bBodies = {};
-    for (const n of [8, 9, 10]) bBodies[`https://k.ac.kr/view?id=${n}`] = { title: `공고 ${n} 제목입니다`, text: [...browserMenu, `공고 ${n} 제목입니다`].join('\n'), via: 'rescue' };
+    for (const n of [8, 9, 10]) bBodies[`https://k.ac.kr/view?id=${n}`] = { title: titleK(n), text: [...browserMenu, titleK(n)].join('\n'), via: 'rescue' };
     const i8 = NS.indexTexts(plain, bBodies);
     eq('  브라우저 판에만 있는 메뉴 줄도 걷어낸다(말뭉치별로 따로 배운다)',
       NS.hasText(i8.byUrl.get(NS.canonUrl('https://k.ac.kr/view?id=8'))), false);
@@ -1990,7 +2008,9 @@ console.log('\n■ 껍데기 페이지와 브라우저 본문 (2026-08-20)');
      실제로 정읍시민장학재단(한글 387자가 전부 메뉴)이 '확보 ✅'로 통과했고,
      되찾았다던 37건 중 24건이 그런 가짜였다. 발췌기·AI와 같은 말뭉치를 써야
      "재수집기는 됐다는데 발췌기는 못 읽는" 어긋남이 안 생긴다. */
-  eq('  본문 판정은 발췌기와 같은 말뭉치로 한다', /indexTexts\(texts, \{ \[t\.url\]/.test(rb), true);
+  /* 🔴 브라우저 본문도 같이 넣는다 (2026-09-15 코드 리뷰) — 메뉴는 브라우저 판에서도 따로 배우므로
+     이 한 건만 넣으면 표본이 없어 '여기선 확보, 발췌기에선 껍데기'로 갈린다(의암 손병희 163자 vs 85자). */
+  eq('  본문 판정은 발췌기와 같은 말뭉치로 한다 (브라우저 본문 포함)', /indexTexts\(texts, \{ \.\.\.bodies, \[t\.url\]/.test(rb), true);
   /* 🔴 동국대는 '오늘 하루 보지 않기' 팝업이 본문을 덮어, 받아 온 글자가
      `불교동아리 소식 · 공양기도문 · POPUP`뿐이었다. 그리고 일부 학교는 본문을
      iframe에 그린다 — 주 프레임만 보면 메뉴와 팝업만 손에 남는다.
@@ -2608,15 +2628,33 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
         `<hp:t>` 안에 `<hp:sz …/>` 가 와서 `3. 지급액 및 접수 방법 <hp:sz width=…` 처럼
         태그가 글자에 섞여 나왔고 금액·자격 규칙이 한 줄도 못 읽었다. 저장된 실제 파일로 잰다. */
   {
-    const hwpx = fs.readdirSync(new URL('../collector/extracted/', import.meta.url))
-      .filter((f) => /^elig-.*\.hwpx$/.test(f))
-      .map((f) => AT.attachmentText(fileURLToPath(new URL(`../collector/extracted/${f}`, import.meta.url))))
-      .filter((t) => t.length > 1000);
-    if (hwpx.length) {
-      eq('  HWPX 글자에 태그가 섞여 나오지 않는다', hwpx.some((t) => /<hp:[a-zA-Z]/.test(t)), false);
-    } else {
-      console.log('   (저장된 HWPX 공고문이 없어 태그 검사를 건너뜀)');
-    }
+    /* 저장된 파일에 기대지 않는다 — `deepfetch --elig-attach` 가 elig-* 를 갈아엎으면 검사가
+       조용히 건너뛴다(코드 리뷰). 압축(저장 방식 0)만 쓴 HWPX 를 검사 안에서 만든다. */
+    const storedZip = (entries) => {
+      const locals = [], centrals = []; let off = 0;
+      for (const { name, data } of entries) {
+        const n = Buffer.from(name), d = Buffer.from(data);
+        const lh = Buffer.alloc(30); lh.writeUInt32LE(0x04034b50, 0); lh.writeUInt16LE(20, 4);
+        lh.writeUInt32LE(d.length, 18); lh.writeUInt32LE(d.length, 22); lh.writeUInt16LE(n.length, 26);
+        const ch = Buffer.alloc(46); ch.writeUInt32LE(0x02014b50, 0); ch.writeUInt16LE(20, 4); ch.writeUInt16LE(20, 6);
+        ch.writeUInt32LE(d.length, 20); ch.writeUInt32LE(d.length, 24); ch.writeUInt16LE(n.length, 28); ch.writeUInt32LE(off, 42);
+        locals.push(lh, n, d); centrals.push(ch, n); off += 30 + n.length + d.length;
+      }
+      const cd = Buffer.concat(centrals);
+      const eocd = Buffer.alloc(22); eocd.writeUInt32LE(0x06054b50, 0); eocd.writeUInt16LE(entries.length, 8);
+      eocd.writeUInt16LE(entries.length, 10); eocd.writeUInt32LE(cd.length, 12); eocd.writeUInt32LE(off, 16);
+      return Buffer.concat([...locals, cd, eocd]);
+    };
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hwpx-'));
+    const file = path.join(dir, 'notice.hwpx');
+    fs.writeFileSync(file, storedZip([{ name: 'Contents/section0.xml',
+      data: '<hp:p><hp:t>3. 지급액 및 접수 방법 <hp:sz width="49169" widthRelTo="ABSOLUTE"/>대학생 2백만원</hp:t></hp:p>'
+        + '<hp:p><hp:t>&lt;참고&gt; 4</hp:t><hp:t>년제 재학생</hp:t></hp:p>' }]));
+    const t = AT.attachmentText(file);
+    eq('  HWPX 조각 안의 자식 태그를 벗긴다', /<hp:/.test(t), false);
+    eq('    태그 자리의 글자는 붙어서 읽힌다', /3\. 지급액 및 접수 방법 대학생 2백만원/.test(t), true);
+    eq('    원문의 &lt; 는 글자라 남긴다 · 조각은 붙여 읽는다', /<참고> 4년제 재학생/.test(t), true);
+    fs.rmSync(dir, { recursive: true, force: true });
   }
   /* ③ 문단 단위로 이어 붙인다 — 조각마다 줄을 나누면 `4년제`의 `4`가 버려져
         `년제 대학교 재학생`만 남는다(실제로 그렇게 나와서 고쳤다) */
@@ -3148,6 +3186,20 @@ console.log('\n■ 금액 산정 — 부풀리지 않는가 (2026-08-27)');
     wonOf(['장학금액', '1인당 최대 1,000,000원', '(인당 지원액) 개인별 상이(최대 500천원) ※대출이자 금액에 따라 상이']), 1000000);
   eq('311명 은 1명 이 아니다 — 인원·예산 한 줄은 읽지 않는다',
     kindOf(['○ 선발 예정인원 및 지급금액 : 311명, 421,000천원 예정']), 'unknown');
+  /* 🔴 예산표 관문이 진짜 1인당 금액까지 지우면 안 된다 (코드 리뷰 2026-09-15 — 처음 판이 그랬다).
+     범위(`~`)·학기당·매월은 한 사람 몫의 표기라 인원이 옆에 있어도 읽는다. */
+  {
+    const r = PA.amountFrom(['장학금액 : 1백만원 ~ 2백만원 (선발인원 20명)']);
+    eq('범위가 적혀 있으면 인원이 옆에 있어도 읽는다 (1백만원 ~ 2백만원 · 20명)', `${r.kind} ${r.value}`, 'range 2000000');
+  }
+  eq('  학기당은 한 사람 몫이다 (선발인원 20명 · 학기당 100만원)', wonOf(['장학금액', '선발인원 20명', '학기당 100만원']), 1000000);
+  eq('  매월도 한 사람 몫이다 (20명 내외 · 매월 50만원)', wonOf(['장학금액', '선발인원 20명 내외', '매월 50만원']), 500000);
+  /* 천원은 무늬 순서에서 맨 뒤 — 앞에 두면 괄호 안 교재비가 장학금이 된다 */
+  eq('천원이 뒤에 있는 교재비를 장학금으로 읽지 않는다', wonOf(['장학금액 : 3,000,000원 (교재비 100천원 별도)']), 3000000);
+  {
+    const r = PA.amountFrom(['장학금액 : 1인당 2.5백만원 ~ 3백만원']);
+    eq('소수점 범위도 범위다 (2.5백만원 ~ 3백만원)', `${r.kind} ${r.min} ${r.max}`, 'range 2500000 3000000');
+  }
 
   /* ② 🔴 금액 절이 다음 절을 삼키면 자격 줄의 숫자를 금액으로 줍는다 — 중앙대 성림장학금.
         `5. 신청자격: … 건강보험료 지역 17만원 이하`의 17만원이 장학금액이 될 뻔했다. */

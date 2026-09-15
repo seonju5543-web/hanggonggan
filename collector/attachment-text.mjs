@@ -74,11 +74,11 @@ function paraText(xml, paraTag, runRe) {
       let m;
       const re = new RegExp(runRe.source, 'g');
       while ((m = re.exec(chunk))) parts.push(m[1]);
-      /* \ud83d\udd34 \uc870\uac01 \uc548\uc5d0 \ub0a8\uc740 \ud0dc\uadf8\ub97c \ubc97\uae34\ub2e4 (2026-09-15 \u2014 \uc775\uc0b0\uc0ac\ub791 \uc7a5\ud559\uc0dd \uacf5\uace0\ubb38 HWPX \uc5d0\uc11c \uac78\ub838\ub2e4).
-         `<hp:t>` \uc548\uc5d0 `<hp:sz \u2026/>`\u00b7`<hp:tab/>` \uac19\uc740 \uc790\uc2dd \ud0dc\uadf8\uac00 \uc624\ub294 \ubb38\uc11c\uac00 \uc788\uc5b4
-         `3. \uc9c0\uae09\uc561 \ubc0f \uc811\uc218 \ubc29\ubc95 <hp:sz width="49169" \u2026` \ucc98\ub7fc \ud0dc\uadf8\uac00 \uae00\uc790\uc5d0 \uc11e\uc5ec \ub098\uc654\ub2e4.
-         \ud0dc\uadf8\uac00 \uc11e\uc778 \uc904\uc740 \uae08\uc561\u00b7\uc790\uaca9 \uaddc\uce59\uc774 \ud558\ub098\ub3c4 \ubabb \uc77d\ub294\ub2e4. \uc5d4\ud2f0\ud2f0\ub97c \ub418\ub3cc\ub9ac\uae30 **\uc804\uc5d0**
-         \ubc97\uaca8\uc57c \ud55c\ub2e4 \u2014 \uc6d0\ubb38\uc758 `&lt;` \ub294 \uae00\uc790\uc774\uc9c0 \ud0dc\uadf8\uac00 \uc544\ub2c8\ub2e4. */
+      /* 🔴 조각 안에 남은 태그를 벗긴다 (2026-09-15 — 익산사랑 장학생 공고문 HWPX 에서 걸렸다).
+         `<hp:t>` 안에 `<hp:sz …/>`·`<hp:tab/>` 같은 자식 태그가 오는 문서가 있어
+         `3. 지급액 및 접수 방법 <hp:sz width="49169" …` 처럼 태그가 글자에 섞여 나왔다.
+         태그가 섞인 줄은 금액·자격 규칙이 하나도 못 읽는다. 엔티티를 되돌리기 **전에**
+         벗겨야 한다 — 원문의 `&lt;` 는 글자이지 태그가 아니다. */
       return unent(parts.join('').replace(/<[^>]+>/g, ' ')).replace(/[ \t\u00a0]+/g, ' ').trim();
     })
     .filter(Boolean).join('\n');
