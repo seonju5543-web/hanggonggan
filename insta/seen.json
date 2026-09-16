@@ -1124,6 +1124,42 @@
    "cards": 4,
    "dir": "insta/pub/2000319002",
    "at": "2026-09-14"
+  },
+  {
+   "status": "prepared",
+   "code": "auto-ent2431263952artclviewdo",
+   "org": "한국외국어대학교",
+   "name": "2026년 2학기 고졸 후학습자 장학금 신청안내",
+   "due": "2026-09-18",
+   "school": "한국외대",
+   "tplNo": 3,
+   "cards": 4,
+   "dir": "insta/pub/auto-ent2431263952artclviewdo",
+   "at": "2026-09-16"
+  },
+  {
+   "status": "prepared",
+   "code": "auto-9599ec839d20ec84a0ebb09c",
+   "org": "경희대학교",
+   "name": "제36기 미레에셋 해외교환 장학생 선발",
+   "due": "2026-10-06",
+   "school": "경희대",
+   "tplNo": 1,
+   "cards": 4,
+   "dir": "insta/pub/auto-9599ec839d20ec84a0ebb09c",
+   "at": "2026-09-16"
+  },
+  {
+   "status": "prepared",
+   "code": "auto-oardid322850menuno200318",
+   "org": "경희대학교",
+   "name": "2026년 2학기 제24기 후기 삼원장학생 선발 안내",
+   "due": "2026-09-30",
+   "school": "경희대",
+   "tplNo": 4,
+   "cards": 4,
+   "dir": "insta/pub/auto-oardid322850menuno200318",
+   "at": "2026-09-16"
   }
  ]
 }
