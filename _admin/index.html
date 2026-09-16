@@ -42,6 +42,12 @@
     <input id="gate-key" type="password" autocomplete="off" spellcheck="false"
            placeholder="github_pat_..." />
 
+    <!-- 열쇠 만료일 (2026-09-16 · 백로그 F-4) — GitHub 은 브라우저에 만료일을 안 알려 준다
+         (Access-Control-Expose-Headers 에 없음 · 실측). 그래서 사람이 만들 때 정한 날을 여기 적어 두고
+         「할 일」이 남은 날을 센다. 비워 두면 화면은 '모른다'고 말한다(원칙 8-1). -->
+    <label class="gate-label" for="gate-expires">열쇠 만료일 <em>(선택 — GitHub 에서 만들 때 정한 날)</em></label>
+    <input id="gate-expires" type="date" />
+
     <label class="gate-check">
       <input id="gate-remember" type="checkbox" />
       <span>이 기기에 기억하기 <em>(체크하지 않으면 탭을 닫을 때 지워집니다)</em></span>

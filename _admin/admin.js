@@ -101,13 +101,42 @@ const ghHeaders = (tk = TOKEN) => ({
 function readStoredKey() {
   return sessionStorage.getItem(KEY_NAME) || localStorage.getItem(KEY_NAME) || '';
 }
-function storeKey(k, remember) {
+/* 열쇠 만료일 (2026-09-16 · 백로그 F-4)
+   🔴 화면이 만료일을 **스스로 알아낼 방법이 없다** — GitHub 이 브라우저에 열어 주는 응답 머리줄
+      19개에 `Github-Authentication-Token-Expiration` 이 없다(2026-09-14 실측). 그래서 열쇠를 넣을 때
+      사람이 적어 둔 날을 **열쇠와 같은 자리**에 보관하고, 「할 일」이 그 날짜에서 남은 날을 센다.
+      안 적어 두었으면 '모른다'고 말한다 — 지어내지 않는다(원칙 8-1).
+   🔴 열쇠를 지우면 만료일도 같이 지운다 — 다음 열쇠에 옛 날짜가 붙으면 그게 거짓 안심이다. */
+const KEY_EXP_NAME = 'handaejang.admin.key.expires';
+const isDay = (v) => /^\d{4}-\d{2}-\d{2}$/.test(v || '') && !Number.isNaN(Date.parse(`${v}T00:00:00Z`));
+function readKeyExpiry() {
+  const v = sessionStorage.getItem(KEY_EXP_NAME) || localStorage.getItem(KEY_EXP_NAME) || '';
+  return isDay(v) ? v : '';
+}
+/** 만료일은 **열쇠가 있는 곳**에 둔다 — 열쇠는 기억해 두고 날짜만 탭과 함께 사라지면 안 된다. */
+function storeKeyExpiry(day) {
+  sessionStorage.removeItem(KEY_EXP_NAME);
+  localStorage.removeItem(KEY_EXP_NAME);
+  if (!isDay(day)) return;
+  (localStorage.getItem(KEY_NAME) ? localStorage : sessionStorage).setItem(KEY_EXP_NAME, day);
+}
+function storeKey(k, remember, expires) {
+  /* 같은 열쇠를 날짜 없이 다시 넣으면 적어 둔 날짜를 잃지 않는다 · 다른 열쇠면 옛 날짜는 뜻이 없다 */
+  const keep = !expires && readStoredKey() === k ? readKeyExpiry() : '';
   clearStoredKey();
   (remember ? localStorage : sessionStorage).setItem(KEY_NAME, k);
+  storeKeyExpiry(expires || keep);
 }
 function clearStoredKey() {
   sessionStorage.removeItem(KEY_NAME);
   localStorage.removeItem(KEY_NAME);
+  sessionStorage.removeItem(KEY_EXP_NAME);
+  localStorage.removeItem(KEY_EXP_NAME);
+}
+/** 관리자 열쇠가 며칠 남았나 — 모르면 null (적어 둔 날이 없다). 날짜 셈은 화면의 dday 한 곳. */
+function keyExpiryDays() {
+  const d = readKeyExpiry();
+  return d ? dday(d) : null;
 }
 /* 열쇠가 진짜인지 GitHub에 물어본다 — 화면 잠금이 흉내가 아니라 실제가 되는 지점 */
 async function verifyKey(k) {
@@ -643,6 +672,12 @@ function renderTodo() {
     { n: D.deployAhead || 0, tone: 'is-warn', k: '앱1 반영 대기',
       d: '배포 로봇이 아직 올리지 않은 변경입니다', btn: '',
       okD: '학생 앱이 최신입니다', v: D.deployAhead == null ? '—' : D.deployAhead },
+    /* 열쇠 둘의 만료 (2026-09-16 · 백로그 F-4) — 「인스타」 탭에만 있던 토큰 카드는 「할 일」만 보는
+       날엔 안 보였고, 정작 이 화면을 여는 GitHub 열쇠는 401 을 받은 뒤에야 만료를 말했다.
+       🔴 GitHub 열쇠는 적어 둔 날이 없으면 '모른다' 로 올린다 — 조용히 초록으로 두면 만료를
+          컨펌이 죽는 날에나 안다. 인스타는 연결 전이면 여기 올리지 않는다(그 카드는 「인스타」 탭에). */
+    keyExpiryCard(),
+    ...(igTokenDays() == null ? [] : [igTokenCard()]),
   ];
   const todo = all.filter((c) => c.n > 0);
   const clear = all.filter((c) => c.n === 0);
@@ -657,7 +692,8 @@ function renderTodo() {
       <p>눌러야 할 것만 모았습니다. 숫자를 구경하는 화면이 아닙니다.</p>
     </div>
 
-    ${todo.length ? statCardsHtml(all) : '<p class="empty">지금 처리할 일이 없습니다. 모든 항목이 정상입니다.</p>'}
+    ${todo.length ? '' : '<p class="empty">지금 처리할 일이 없습니다. 모든 항목이 정상입니다.</p>'}
+    ${statCardsHtml(all)}
 
     ${urgent.length ? (() => {
     const cm = commonMeta(urgent);
@@ -681,11 +717,55 @@ function renderTodo() {
     <div id="todo-quality-slot"></div>
   `;
   renderQuality('todo-quality-slot');
+  /* 열쇠 만료일 적기 — 카드 안 칸 하나. 저장은 열쇠가 있는 곳(위 storeKeyExpiry)에, 저장소에는 아무것도 안 보낸다. */
+  const keySave = byId('todo-key-save');
+  if (keySave) keySave.addEventListener('click', () => {
+    const v = (byId('todo-key-expires') || {}).value || '';
+    if (!isDay(v)) { jobShow('만료일을 YYYY-MM-DD 로 골라 주세요', 'bad'); return; }
+    storeKeyExpiry(v);
+    renderTodo();
+  });
   const det = byId('todo-src-scan');
   if (det) {
     det.addEventListener('toggle', () => { if (det.open) openSrcScan(); });
     if (det.open) openSrcScan();
   }
+}
+
+/** 「할 일」의 관리자 열쇠 카드 (F-4). `n` 이 1이면 카드로 올라오고 0이면 아래 정상 띠로 접힌다. */
+function keyExpiryCard() {
+  const d = readKeyExpiry();
+  const days = keyExpiryDays();
+  const ask = `<div class="key-exp" data-key-expiry><input id="todo-key-expires" type="date" value="${esc(d)}" aria-label="열쇠 만료일" />
+      <button id="todo-key-save" class="btn btn-sm">${d ? '고치기' : '적어 두기'}</button></div>`;
+  if (days == null) return {
+    n: 1, tone: 'is-warn', v: '?', k: '관리자 열쇠 (GitHub) 만료일 모름',
+    d: '만료일을 안 적어 두었습니다. GitHub 은 브라우저에 만료일을 알려 주지 않아 화면이 스스로 알 수 없습니다 — 열쇠를 만들 때 정한 날을 여기 적어 두면 14일 전에 알립니다.',
+    btn: ask,
+  };
+  if (days <= 0) return {
+    n: 1, tone: 'is-bad', v: '만료', k: '관리자 열쇠 (GitHub) 만료',
+    d: `적어 둔 만료일 ${esc(d)} 이 지났습니다. 컨펌·수정 버튼이 전부 멈춥니다 — 같은 방법으로 새 열쇠를 만들어 「열쇠 지우기」 뒤 다시 넣으세요(2분).`,
+    btn: ask,
+  };
+  return {
+    n: days <= 14 ? 1 : 0, tone: 'is-warn', v: `${days}일`, k: days <= 14 ? '관리자 열쇠 (GitHub) 만료 임박' : '관리자 열쇠 (GitHub)',
+    d: `적어 둔 만료일 ${esc(d)}. 지나면 컨펌·수정 버튼이 전부 멈춥니다 — 미리 새 열쇠를 만들어 두세요.`,
+    btn: ask, okD: `만료 ${esc(d)} · ${days}일 남음`,
+  };
+}
+/** 「할 일」의 인스타 토큰 카드 (F-4) — 「인스타」 탭 카드와 같은 셈(igTokenDays). 연결 전이면 부르지 않는다. */
+function igTokenCard() {
+  const days = igTokenDays();
+  return {
+    n: days <= 14 ? 1 : 0, tone: days <= 0 ? 'is-bad' : 'is-warn',
+    v: days <= 0 ? '만료' : `${days}일`, k: days <= 0 ? '인스타 토큰 만료' : days <= 14 ? '인스타 토큰 만료 임박' : '인스타 토큰',
+    d: days <= 0
+      ? '우리가 아는 한 60일이 지났습니다 — 게시가 조용히 멈춥니다. 새 토큰을 받아 시크릿을 갈아 넣으세요(insta/README.md).'
+      : '처음 본 날에서 60일을 셉니다 — 인스타는 만료일을 안 알려 줍니다. 새 토큰을 받아 시크릿을 갈아 넣으세요(insta/README.md).',
+    btn: '<button class="btn btn-sm" data-go="insta">인스타 화면으로</button>',
+    okD: `${days}일 남음 (우리가 아는 한)`,
+  };
 }
 
 /* ============================================================
@@ -1873,6 +1953,12 @@ const INSTA_STEP = {
   skip: '건너뛰기 (이 공고는 안 올린다)',
 };
 const IG_LIFE_DAYS = 60;   // insta/token-days.mjs 의 LIFE_DAYS 와 같은 뜻 — 화면은 '우리가 아는 한' 만 말한다
+/** 인스타 토큰이 며칠 남았나 (우리가 아는 한) — 연결 전이면 null. 「인스타」 탭과 「할 일」이 같은 셈을 쓴다. */
+function igTokenDays() {
+  const tk = D.insta.token;
+  if (!tk || !tk.firstSeen) return null;
+  return IG_LIFE_DAYS - Math.round((Date.now() - Date.parse(`${tk.firstSeen}T00:00:00+09:00`)) / 864e5);
+}
 
 function instaTplName(no) {
   const t = (D.insta.templates || []).find((x) => x.no === no);
@@ -1976,7 +2062,7 @@ function renderInsta() {
     ? `<div class="card is-warn" data-stat><div class="v">연결 전</div><div class="k">인스타 계정</div>
         <div class="d">시크릿 IG_USER_ID·IG_ACCESS_TOKEN 이 아직 없습니다. 카드 준비·메일은 되지만 <b>게시는 안 됩니다.</b> 절차는 insta/README.md 「처음 한 번」.</div></div>`
     : (() => {
-      const days = IG_LIFE_DAYS - Math.round((Date.now() - Date.parse(`${tk.firstSeen}T00:00:00+09:00`)) / 864e5);
+      const days = igTokenDays();
       return `<div class="card ${days <= 0 ? 'is-bad' : days <= 14 ? 'is-warn' : 'is-ok'}" data-stat><div class="v">${days <= 0 ? '만료' : `${days}일`}</div>
         <div class="k">토큰 남은 수명 (우리가 아는 한)</div>
         <div class="d">처음 본 날 ${esc(tk.firstSeen)} 에서 60일을 셉니다 — 인스타는 만료일을 안 알려 줍니다. 매일 03:17 「인스타 토큰 수명 확인」이 살아 있는지 묻습니다.</div></div>`;
@@ -3689,7 +3775,7 @@ async function reallyRun(file, label, inputs = {}) {
 }
 
 /* ---------------- 입장 ---------------- */
-async function enter(key, remember) {
+async function enter(key, remember, expires = '') {
   const msg = byId('gate-msg');
   const btn = byId('gate-enter');
   btn.disabled = true;
@@ -3702,7 +3788,7 @@ async function enter(key, remember) {
     return;
   }
   TOKEN = key;
-  if (remember !== null) storeKey(key, remember);
+  if (remember !== null) storeKey(key, remember, expires);
 
   msg.textContent = '데이터를 읽는 중…';
   try {
@@ -3753,11 +3839,12 @@ function boot() {
   byId('gate-enter').addEventListener('click', () => {
     const k = byId('gate-key').value.trim();
     if (!k) { const m = byId('gate-msg'); m.hidden = false; m.className = 'gate-msg'; m.textContent = '열쇠를 넣어 주세요.'; return; }
-    enter(k, byId('gate-remember').checked);
+    enter(k, byId('gate-remember').checked, (byId('gate-expires') || {}).value || '');
   });
-  byId('gate-key').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') byId('gate-enter').click();
-  });
+  for (const id of ['gate-key', 'gate-expires']) {
+    const el = byId(id);
+    if (el) el.addEventListener('keydown', (e) => { if (e.key === 'Enter') byId('gate-enter').click(); });
+  }
 
   const stored = readStoredKey();
   if (stored) enter(stored, null);   // 이미 저장된 열쇠 — 저장 위치는 그대로 둔다

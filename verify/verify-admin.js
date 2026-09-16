@@ -209,12 +209,14 @@ function serve() {
     (await page.textContent('#gate-msg')).trim());
   errors.length = 0;   // 위에서 일부러 낸 401은 오류로 세지 않는다
 
-  /* ② 올바른 열쇠로 입장 */
+  /* ② 올바른 열쇠로 입장 — 만료일 칸은 일부러 비운다(아래 「할 일」이 '모른다'를 말하는지 본다) */
+  const gateHadExpiry = await page.isVisible('#gate-expires');
   await page.fill('#gate-key', 'github_pat_testtoken');
   await page.click('#gate-enter');
   await page.waitForSelector('#app:not([hidden])', { timeout: 15000 });
   ok(true, '올바른 열쇠로 입장');
   ok(apiCalls > 0, '열쇠를 GitHub에 실제로 확인한다 (흉내가 아님)');
+  const apiCallsBeforeExpiry = apiCalls;
 
   const regFile = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/registered.json'), 'utf8'));
   /* 화면이 받은 목록으로 비교한다 — 검사용 대기 공고를 끼워 넣었을 수 있다(위 참조).
@@ -235,6 +237,46 @@ function serve() {
   const todoText = await page.textContent('#screen-todo');
   ok(/오늘 할 일/.test(todoText), '① 오늘 할 일 화면이 그려진다');
   ok(todoText.includes(String(autoN)), '① 검수 전 건수가 실제 데이터와 같다', `검수 전 ${autoN}건`);
+
+  /* ①-열쇠 만료 (2026-09-16 · 백로그 F-4) — GitHub 은 만료일을 안 알려 주므로 사람이 적어 둔 날을 센다.
+     🔴 안 적어 두었으면 '모른다' 카드가 **할 일**에 올라와야 한다 — 조용한 초록이면 만료를 컨펌이
+        죽는 날에나 안다. 적어 두면 남은 날을 세고, 열쇠를 지우면 날짜도 같이 사라진다(맨 끝 검사). */
+  {
+    ok(gateHadExpiry, '입장 화면에 열쇠 만료일 칸이 있다 (선택)');
+    const card = page.locator('#screen-todo [data-stat]', { hasText: '관리자 열쇠' }).first();
+    ok(await card.count() === 1, '만료일을 안 적어 두면 「할 일」에 열쇠 카드가 올라온다');
+    ok(await card.count() === 1 && /만료일을 안 적어 두었습니다/.test(await card.textContent()),
+      '  카드가 「모른다」고 말한다 (지어내지 않는다)');
+    const TEN = new Date(Date.now() + 9 * 3600e3 + 10 * 864e5).toISOString().slice(0, 10);
+    /* 🔴 칸이 없으면 fill 이 시간초과로 **드라이버를 통째로 죽인다** — 그러면 뒤 항목 190개가 못 돈다.
+       없을 때는 이 항목만 빨간불로 적고 지나간다(카드를 빼고 돌려 실제로 그렇게 죽는 것을 봤다). */
+    if (await page.locator('#todo-key-expires').count()) {
+      await page.fill('#todo-key-expires', TEN);
+      await page.click('#todo-key-save');
+      await page.waitForTimeout(200);
+    } else ok(false, '  카드에 만료일을 적는 칸이 있다');
+    const card2 = page.locator('#screen-todo [data-stat]', { hasText: '관리자 열쇠' }).first();
+    ok(/10일/.test(await card2.textContent()), '  만료일을 적어 두면 남은 날을 센다', (await card2.textContent()).trim().slice(0, 60));
+    ok(/임박/.test(await card2.textContent()), '  14일 안이면 임박이라고 부른다');
+    const where = await page.evaluate(() => ({
+      s: sessionStorage.getItem('handaejang.admin.key.expires'), l: localStorage.getItem('handaejang.admin.key.expires'),
+      keyS: !!sessionStorage.getItem('handaejang.admin.key'),
+    }));
+    ok(where.s === TEN && !where.l && where.keyS, '  만료일은 열쇠가 있는 곳(이번엔 세션)에 같이 산다', JSON.stringify(where));
+    ok(apiCalls === apiCallsBeforeExpiry, '  적어 두는 일은 저장소에 아무것도 보내지 않는다');
+    /* 멀리 두면 정상 띠로 접힌다 — 카드가 아니라 아래 정상 목록에 이름만 */
+    const FAR = new Date(Date.now() + 9 * 3600e3 + 80 * 864e5).toISOString().slice(0, 10);
+    if (await page.locator('#todo-key-expires').count()) {
+      await page.fill('#todo-key-expires', FAR);
+      await page.click('#todo-key-save');
+      await page.waitForTimeout(200);
+    }
+    const strip = await page.locator('#screen-todo .allclear').count()
+      ? await page.textContent('#screen-todo .allclear') : '';
+    ok(await page.locator('#screen-todo [data-stat]', { hasText: '관리자 열쇠' }).count() === 0
+      && /관리자 열쇠/.test(strip),
+      '  80일 남았으면 카드가 아니라 정상 띠에 접힌다');
+  }
 
   await gotoNotices(page);   /* 🔴 보기 전환이 '양식' 으로 남아 있을 수 있다 — 공고 보기까지 확실히 간다 */
   const rows = await page.locator('#screen-list [data-row]').count();
@@ -1762,6 +1804,9 @@ function serve() {
   const stored = await page.evaluate(() => localStorage.getItem('handaejang.admin.key')
     || sessionStorage.getItem('handaejang.admin.key'));
   ok(!stored, '열쇠 지우기를 누르면 기기에서 실제로 사라진다');
+  const storedExp = await page.evaluate(() => localStorage.getItem('handaejang.admin.key.expires')
+    || sessionStorage.getItem('handaejang.admin.key.expires'));
+  ok(!storedExp, '  적어 둔 만료일도 같이 사라진다 (다음 열쇠에 옛 날짜가 붙지 않게)');
 
   await browser.close();
   srv.close();
