@@ -531,6 +531,7 @@ switch (action) {
     /** 한 건에 patch 를 입힌다. 바뀐 칸 이름들을 돌려준다. */
     const applyPatch = (it, patch) => {
       const changed = [];
+      const oldDeadline = it.deadline;   // 마감을 비울 때 period 에 남은 그 날짜를 같이 걷어내려고
       applyPrepDoc(it, patch || {}, changed);
       Object.keys(patch || {}).forEach((k) => {
         if (PAIRED.has(k)) return;                         // 위에서 짝으로 처리했다
@@ -602,6 +603,20 @@ switch (action) {
       mark('eligibilityExcludes', 'eligibilityExcludesFrom');
       mark('eligibilityPriority', 'eligibilityPriorityFrom');
       mark('eligibilityLines', 'eligibilityFrom');   // 이미 열려 있던 칸 — 지금은 매일 지워진다
+      /* 🔴 마감일은 **비울 때도 표식을 남긴다** (2026-09-16 · G-3 ②). 다른 칸은 비우면 로봇에게
+         돌려주는 게 맞지만, 마감은 로봇이 **같은 줄을 다시 읽어 같은 값을 되채우므로** 사람이
+         틀린 마감을 지운 조치가 다음 날 조용히 무효가 됐다. `관리자 <날짜> · 비움` 이 남아 있으면
+         extract-excerpts 가 채우지 않는다. 로봇에게 다시 맡기려면 이 표식을 지운다. */
+      if (changed.includes('deadline')) {
+        it.deadlineFrom = it.deadline ? OWNER : `${OWNER} · 비움`;
+        /* 🔴 비웠는데 `period` 가 `접수 ~2025-09-10` 처럼 **방금 지운 그 날짜**를 학생 화면에 계속
+           보여 주면 안 된다(로봇이 putDeadline 으로 써 둔 문구 — 이제 로봇은 이 공고를 안 건드린다). */
+        if (!it.deadline && oldDeadline && new RegExp(`~\\s*${oldDeadline}`).test(it.period || '')) {
+          it.period = '접수 기간 원문 확인'; if (!changed.includes('period')) changed.push('period');
+        }
+      }
+      /* 발표일도 같은 규칙 — 로봇(fillCalendarDates)이 이 표식을 본다 */
+      if (changed.includes('announceDate')) it.announceDateFrom = it.announceDate ? OWNER : `${OWNER} · 비움`;
       return changed;
     };
 
@@ -639,7 +654,11 @@ switch (action) {
       promoted = true;
     }
     /* 남기는 쪽에 없는 정보는 지우는 쪽에서 살려 온다 (링크·첨부·발췌를 잃지 않게) */
-    if (!keep.deadline && drop.deadline) keep.deadline = drop.deadline;
+    /* 사람이 일부러 비운 마감(`관리자 … · 비움`)은 합칠 때도 되살리지 않는다 */
+    if (!keep.deadline && drop.deadline && !/^(AI|관리자)/.test(keep.deadlineFrom || '')) {
+      keep.deadline = drop.deadline;
+      if (drop.deadlineFrom) keep.deadlineFrom = drop.deadlineFrom;
+    }
     if (!(keep.attachments || []).length && (drop.attachments || []).length) keep.attachments = drop.attachments;
     if (!(keep.excerpts || []).length && (drop.excerpts || []).length) {
       keep.excerpts = drop.excerpts;
