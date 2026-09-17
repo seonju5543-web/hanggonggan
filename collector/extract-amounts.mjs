@@ -43,7 +43,7 @@ const idx = indexTexts(texts, browserBodies);
    본문 → AI 가 옮긴 줄 → 첨부 순서다(본문이 있으면 본문이 언제나 정확하다 — 첨부에는
    붙임·서식이 섞인다). 신청서·동의서는 색인 단계(deepfetch `isNoticeDoc`)에서 이미 걸러져 있다.
    ⚠️ 여기서도 얼마인지는 parse-amount 가 정한다 — 예산표(`115명 180백만원`)를 1인당으로
-      읽지 않는 관문(`budgetOnly`)이 첨부에서 처음 걸렸다. */
+      읽지 않는 관문(`TOTAL_TABLE` — 표의 합계 행)이 첨부에서 처음 걸렸다. */
 let eligDocs = {};
 try { eligDocs = JSON.parse(fs.readFileSync(new URL('extracted/elig-docs.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
 function amountFromDocs(it) {
