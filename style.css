@@ -3150,6 +3150,18 @@ body::after { opacity: 0.26; }
 .my-card { margin-top: 6px; padding-top: 18px; }
 .my-card:first-of-type { margin-top: 0; padding-top: 0; }
 
+/* 🔴 「공통 서류정보」 아래 ~ 「서류 보관함」 사이의 빈 띠를 줄인다 (2026-09-17 개발자 지시
+   "쓸데없는 빈칸이 있는데 이거 없애줘"). 한 곳이 아니라 **여백 넷이 연달아 쌓여서** 생긴
+   자리였다(실측 56px): 학적정보 표의 아래 여백 8 + 내 정보 카드의 아래 안쪽 여백 24 +
+   카드 사이 6 + 서류 보관함 카드의 위 안쪽 여백 18.
+   그중 **카드의 안쪽 여백 둘만** 줄인다 — 표의 아래 여백과 카드 사이 6px 은 구분선이
+   글자에 닿지 않게 하는 몫이라 없애면 줄과 글자가 붙는다. 결과 56 → 32px.
+   🔴 `.my-card` 를 통째로 고치면 안 된다 — 설정 화면(#my-account·#my-notify·#set-etc)과
+      MY 아래쪽 카드들이 **같은 클래스**를 써서 화면 전체 리듬이 같이 바뀐다. 그래서
+      첫 카드와 그 **바로 다음 카드** 한 쌍만 짚는다. */
+#my-profile { padding-bottom: 6px; }
+#my-profile + .my-card { padding-top: 12px; }
+
 :root {
   --bg:        #fefdfc;   /* #fdfcfa 에서 한 단계 더 흰쪽 (R254 G253 B252) */
   --surface-2: #f7f6f4;
