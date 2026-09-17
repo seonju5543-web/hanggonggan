@@ -353,7 +353,6 @@
       <div class="hero-card">
         <p class="hero-label" id="hero-label">지금 신청할 수 있는 장학금</p>
         <p class="hero-amount tappable" id="hero-amount" role="button" tabindex="0" aria-label="금액 상세 보기">0원</p>
-        <p class="hero-count" id="hero-count"></p>
         <button class="btn btn-white btn-lg" id="btn-apply-all">신청 준비</button>
       </div>
 
@@ -393,7 +392,7 @@
       <header class="page-header apps-header">
         <h2>장학금 찾기</h2>
         <!-- 정렬 — 아이콘 하나(↑↓) + 지금 기준 글자. 필터 아이콘(☰)은 쓰지 않는다:
-             거르는 일은 아래 칩(전체/교내/교외/신청 가능만)이 이미 한다.
+             거르는 일은 아래 칩(전체/교내/교외)이 이미 한다.
              누르면 다음 기준으로 넘어가고, 길게 누르면 아래에 목록이 뜬다. -->
         <div class="sort-wrap">
           <button id="explore-sort-btn" class="sort-btn" aria-haspopup="menu" aria-expanded="false"
@@ -418,12 +417,14 @@
         <button class="filter-chip active" data-filter="all">전체</button>
         <button class="filter-chip" data-filter="교내">교내</button>
         <button class="filter-chip" data-filter="교외">교외</button>
-        <!-- 🔴 '우리 학교' 는 **다른 종류의 목록**이다 (노션 UI-16 · 2026-09-12).
-             교내·교외는 우리가 원문을 읽고 등록한 공고이고, 이 칸은 수집 로봇이 학교
-             게시판에서 매일 줍는 **글 목록**이다(적합도도 마감 판정도 없다).
-             예전에는 '전체' 목록 **아래에** 붙어 있어 스크롤 끝까지 가야 보였다. -->
-        <button class="filter-chip" data-filter="notice">우리 학교</button>
-        <button class="filter-chip" data-filter="eligible">신청 가능만</button>
+        <!-- 🔴 **칩은 셋이다** (2026-09-17 개발자 지시 · 되돌리지 말 것).
+             · '우리 학교' 를 없애 **'교내' 에 합쳤다** — 학교 게시판 글이 교내 등록 공고와
+               같은 자리에 나오니, 학생이 같은 공고를 두 칸에서 두 번 보던 일이 없어진다.
+               게시판 글은 여전히 **다른 종류의 목록**이라(적합도도 마감 판정도 없다)
+               '우리 학교 실시간 공고' 머리말 아래 제 구역에 모여 나온다.
+             · '신청 가능만' 을 없앴다 — 2026-09-13 에 `applyLock` 이 **자격 판정으로
+               신청을 막지 않게** 된 뒤로는(우리 판정이 100% 가 아니라서) 이 칸이
+               '신청 가능'을 뜻하지 못했다. 미달로 잘못 읽은 공고를 통째로 감추던 자리다. -->
       </div>
       <div id="explore-list" class="card-list"></div>
       <div id="live-notices"></div>

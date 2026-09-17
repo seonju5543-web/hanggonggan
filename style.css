@@ -498,7 +498,6 @@ input::placeholder { color: var(--text-weak); }
   margin: 6px 0 2px;
   font-variant-numeric: tabular-nums;
 }
-.hero-count { font-size: var(--t-sm); color: rgba(232, 239, 254, 0.72); margin-bottom: 20px; }
 
 .section-head {
   display: flex;
@@ -615,6 +614,9 @@ input::placeholder { color: var(--text-weak); }
      좌우로 화면 끝까지 펼치기(아래 margin/padding 짝). 글자 크기는 **안 건드렸다** —
      2026-09-11 에 개발자가 크기 조정을 전부 되돌리라고 했다.
      실측(칩 5개): 360px 한 줄(칩 오른쪽 끝 355 < 360) · 390px · 430px 한 줄 · 세로 스크롤 그대로.
+     🔴 **2026-09-17 에 칩이 셋이 됐다**('우리 학교'는 '교내'에 합치고 '신청 가능만'은 없앴다).
+        자리가 남지만 **이 조임값을 되돌리지 않는다** — 되돌리면 칩이 다시 늘 때 잘린 자리로
+        돌아가고, 여백은 ui-tone 관문이 지키는 값이라 이 지시와 무관하게 바꿀 것이 아니다.
      ⚠️ 칩을 더 늘리면 다시 잘린다 — 그때는 이름을 줄이거나 칩을 줄일 것(줄바꿈으로 돌아가지 말 것). */
   flex-wrap: nowrap;
   gap: 6px;
@@ -1215,9 +1217,7 @@ textarea:focus {
   /* 🔴 읽은 알림의 색이다 — 회색으로 가라앉힌다 (아래 nf-unread 주석 참조) */
   background: var(--surface-2);
   border: 1px solid var(--line);
-  transition: background 0.15s;
 }
-.nf-item:hover { border-color: rgba(138, 106, 31, 0.24); }
 .nf-item .nf-title { color: var(--text-sub); }
 /* 🔴 읽음/안 읽음의 색을 뒤집었다 (2026-09-17 개발자 지시) — 예전엔 **안 읽은 알림이
    색 배경(회색으로 보임)** 이고 읽은 알림이 흰색이라, 처리할 것이 가라앉고 끝난 것이
@@ -1232,8 +1232,13 @@ textarea:focus {
   box-shadow: var(--shadow);
 }
 .nf-item.nf-unread .nf-title { color: var(--text); }
+/* 🔴 누를 때는 **글자가 강조색**이 된다 — 면을 칠하지 않는다(2026-09-12 개발자 지시와 같은 규칙:
+   `.nf-pref`·`.faq-item summary`·기타 줄이 이미 그렇다). 예전 `:hover` 는 면을 옅게 칠했는데
+   `.nf-item.nf-unread` 와 **특정도가 같아 뒤엣것이 이겨서**, 학생이 실제로 누르는 안 읽은 알림은
+   아무 반응이 없었다. 이 줄은 읽음/안 읽음 규칙보다 **뒤에 둬야** 둘 다에서 이긴다. */
+.nf-item:active .nf-title { color: var(--accent); }
 .nf-text { display: grid; gap: 3px; min-width: 0; }
-.nf-title { font-size: var(--t-md); font-weight: 700; letter-spacing: -0.015em; }
+.nf-title { font-size: var(--t-md); font-weight: 700; letter-spacing: -0.015em; transition: color 0.15s; }
 .nf-body { font-size: var(--t-sm); color: var(--text-sub); line-height: 1.5; }
 .nf-time { font-size: var(--t-2xs); color: var(--text-weak); font-weight: 600; }
 
@@ -3023,7 +3028,6 @@ body::after { opacity: 0.26; }
 /* 홈 — 절 사이를 하나로 */
 .alog-sum, .ledger-hero { margin-bottom: var(--sp-4); }
 .section-head { margin: var(--sp-4) 0 0; padding-top: 16px; }
-.hero-count { margin-top: var(--sp-1); padding-top: var(--sp-1); }
 .home-header { margin-bottom: var(--sp-3); padding-bottom: var(--sp-2); }
 
 /* 목록 줄 — 안쪽 간격을 하나로 */
@@ -3152,6 +3156,18 @@ body::after { opacity: 0.26; }
 .my-card { margin-top: 6px; padding-top: 18px; }
 .my-card:first-of-type { margin-top: 0; padding-top: 0; }
 
+/* 🔴 「공통 서류정보」 아래 ~ 「서류 보관함」 사이의 빈 띠를 줄인다 (2026-09-17 개발자 지시
+   "쓸데없는 빈칸이 있는데 이거 없애줘"). 한 곳이 아니라 **여백 넷이 연달아 쌓여서** 생긴
+   자리였다(실측 56px): 학적정보 표의 아래 여백 8 + 내 정보 카드의 아래 안쪽 여백 24 +
+   카드 사이 6 + 서류 보관함 카드의 위 안쪽 여백 18.
+   그중 **카드의 안쪽 여백 둘만** 줄인다 — 표의 아래 여백과 카드 사이 6px 은 구분선이
+   글자에 닿지 않게 하는 몫이라 없애면 줄과 글자가 붙는다. 결과 56 → 32px.
+   🔴 `.my-card` 를 통째로 고치면 안 된다 — 설정 화면(#my-account·#my-notify·#set-etc)과
+      MY 아래쪽 카드들이 **같은 클래스**를 써서 화면 전체 리듬이 같이 바뀐다. 그래서
+      첫 카드와 그 **바로 다음 카드** 한 쌍만 짚는다. */
+#my-profile { padding-bottom: var(--space-6); }
+#my-profile + .my-card { padding-top: var(--space-12); }
+
 :root {
   --bg:        #fefdfc;   /* #fdfcfa 에서 한 단계 더 흰쪽 (R254 G253 B252) */
   --surface-2: #f7f6f4;
@@ -3203,13 +3219,6 @@ body::after { opacity: 0.26; }
 }
 .home-updated span { display: block; }
 .home-updated:empty { display: none; }
-/* 🔴 홈 히어로 아랫줄 (2026-09-17) — 금액 회계 문장을 걷어내면서 이 칸이 **빌 수 있게**
-   됐다(바로 신청 가능한 공고가 0건인 학생). 규칙이 없으면 빈 채로 글 높이 29px + 위 여백을
-   먹어 금액과 버튼 사이가 벌어진다(실측: 금액→버튼 57px).
-   ⚠️ `.home-updated` 처럼 `display: none` 으로 통째로 지우면 이번엔 **아래 여백까지 사라져**
-      금액과 버튼이 2px 로 붙는다(실측). 그래서 글과 위 여백만 죽이고 `margin-bottom` 은
-      남긴다 — 버튼은 어느 쪽이든 같은 자리에서 숨 쉰다(빈 경우 22px). */
-.hero-count:empty { margin-top: 0; padding-top: 0; font-size: 0; line-height: 0; }
 
 /* 🔴 위아래 여백은 **같은 값**이어야 한다 — 11/12 로 1px 어긋나 있었고,
    높이를 실제로 정하던 것은 여백이 아니라 버튼의 min-height 였다(30px).
@@ -4167,8 +4176,7 @@ body,
 .sch-org,
 .empty,
 .empty-sub,
-.hero-label,
-.hero-count {
+.hero-label {
   word-break: keep-all;
   overflow-wrap: break-word;
 }
@@ -4678,6 +4686,7 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 /* 손가락으로 눌렀을 때 회색 판이 뜨지 않게 — 설정 목록과 같은 규칙 */
 .sup-top-item, .sup-more { -webkit-tap-highlight-color: transparent; }
 
+<<<<<<< HEAD
 /* ── 자격 확인 도우미 (2026-09-17 · 노션 AI-1 · 2026-09-18 개발자 지시로 재단장) ──
    🔴 앱이 하는 말은 「미확인 자격 n」뿐이다. 설명 문장을 넣지 말 것(설계 3-2).
    🔴 **미확인 줄을 여기 다시 나열하지 않는다** — 위 자격 블록이 이미 보여 준다.
@@ -4756,3 +4765,13 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
   font: inherit; font-size: var(--t-xs); font-weight: 600;
 }
 .elig-ask-later:active, .elig-ask-save:active { transform: scale(0.95); }
+=======
+/* ══ 홈 히어로 (2026-09-17 개발자 지시 2차) ═══════════════════════════════════
+   아랫줄(`.hero-count`)을 통째로 없앴다 — '그중 n건은 바로 신청할 수 있어요' 가
+   마지막 한 줄이었고 개발자가 그것도 지우라고 했다(그 앞에 금액 회계 두 줄을 걷었다).
+   🔴 그 칸이 주던 **아래 여백을 여기서 물려받는다.** 안 물려받으면 금액과 버튼 사이가
+      실측 57px → 2px 로 붙는다(`.hero-amount` 자신의 margin-bottom 은 2px 뿐이다).
+   🔴 이 파일은 **뒤 블록이 앞을 덮으므로** 값은 여기 적어야 실제로 먹는다
+      (CLAUDE.md '파일 끝 카드 블록이 앞의 규칙을 전부 덮는다' 와 같은 이유). */
+.hero-amount { margin-bottom: 20px; }
+>>>>>>> origin/claude/nice-heisenberg-WESq5

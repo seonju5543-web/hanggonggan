@@ -150,8 +150,35 @@ export function attachmentText(filePath) {
      게다가 한 낱말이 한 줄로 쪼개져 나와 절 구분도 안 된다.
      스캔·CID PDF는 무료로는 방법이 없다 — **AI 경로의 몫**이다(eligibility-ai.mjs가
      원본을 그림째 읽는다). pdfText는 양식 스키마화 쪽에서 계속 쓰므로 함수는 남겨 둔다. */
-  if (lower.endsWith('.pdf')) return '';
+  if (lower.endsWith('.pdf')) return ocrText(filePath);
+  /* 그림 첨부(포스터·스캔)도 같은 길 — 글자층이 없으니 OCR 이 넘겨준 것뿐이다 */
+  if (/\.(png|jpe?g|webp|bin)$/.test(lower)) return ocrText(filePath);
   return '';
+}
+
+/* 🔴 OCR 로 읽은 글자는 **품질 관문을 넘은 것만** 파일로 남아 있다 (2026-09-17 · collector/ocr-text.py).
+   `.ocr.txt` 가 없으면 '못 읽었다'다 — pdf-text.py 의 `.pdf.txt` 는 여기서 **일부러 안 읽는다**
+   (위 2026-08-20 결정: 글자층 PDF 는 숫자가 빠진 채 나와 자격 줄이 원문보다 나빠진다.
+   OCR 은 픽셀을 읽으므로 그 문제가 없고, 대신 오독을 관문(한글 비율·줄 단위)으로 거른다). */
+function ocrText(filePath) {
+  try { return fs.readFileSync(filePath + '.ocr.txt', 'utf8'); } catch { return ''; }
+}
+
+/* 이 파일의 글자가 OCR 에서 온 것인가 — 출처 표식(`공고문 첨부(OCR)`)을 붙이는 데 쓴다.
+   관리자·감사가 오독 가능성을 알아보게 하려는 것이다(ocr-text.py 머리말의 이유 ②). */
+export function isOcrSource(filePath) {
+  const lower = String(filePath).toLowerCase();
+  if (!/\.(pdf|png|jpe?g|webp|bin)$/.test(lower)) return false;
+  return fs.existsSync(filePath + '.ocr.txt');
+}
+
+/* 🔴 첨부를 읽는 순서 — **원문 글자(HWP·HWPX·DOCX)가 OCR 보다 먼저**다 (2026-09-17 코드 리뷰).
+   발췌기·금액 로봇은 '처음 읽히는 첨부' 하나를 쓰는데, 예전에는 PDF·그림이 늘 빈 문자열이라
+   HWP 가 저절로 이겼다. OCR 이 글자를 내기 시작하면 색인 순서(PDF 가 앞)만으로 OCR 이 이긴다.
+   같은 공고문이면 원문 글자가 늘 낫다 — 그래서 순서를 여기서 한 번만 정한다. */
+export function docOrder(files) {
+  const rank = (f) => (/\.(hwpx?|docx)$/i.test(String(f)) ? 0 : 1);
+  return [...(files || [])].sort((a, b) => rank(a) - rank(b));
 }
 
 /* 읽을 만한 글자인가 — 한글이 이만큼은 나와야 자격을 찾아볼 가치가 있다 */

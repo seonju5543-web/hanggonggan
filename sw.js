@@ -22,7 +22,11 @@
 /* ⚠️ 두 작업이 같은 날 v172 를 각자 올려 부딪혔다 — 번호는 v173 으로 올리고 **둘 다** 남긴다
    (파일 머리말의 규칙 그대로). */
 /* ⚠️ 오늘 여러 작업이 같은 번호를 각자 올렸다 — 번호는 올리고 **한 일은 다 남긴다**(파일 머리말 규칙). */
-const CACHE = 'handaejang-v189';  /* v189 — 자격 확인 도우미: 못 읽은 자격을 그 자리에서 묻는다 (노션 AI-1) */
+/* ⚠️ 또 부딪혔다 — 내 v189 와 원격 v190. 규칙대로 **번호는 올리고 한 일은 다 남긴다**. */
+const CACHE = 'handaejang-v191';  /* v191 — 세 갈래가 부딪혀 합쳤다:
+                                     ① MY 「공통 서류정보」 아래 ~ 「서류 보관함」 빈 띠 줄이기 (v188 알림함 색·제출 서류 점 포함)
+                                     ② 장학금 찾기 칩 둘 제거 — '우리 학교'를 '교내'에 합치고 '신청 가능만' 폐지
+                                     ③ 자격 확인 도우미 — 못 읽은 자격을 공고 팝업 안에서 묻는다 (노션 AI-1) */
 const ASSETS = ['.', 'index.html', 'style.css', 'boot.js', 'resume.js', 'interactions.js', 'app.js', 'data.js', 'forms.js', 'form-plan.js', 'essay.js', 'essay-config.js', 'essay-ask.js', 'essay-quality.js', 'essay-submit-check.js',
   'elig-ask.js',
   'section-head.js', 'parse-requirements.js', 'parse-amount.js', 'match-engine.js', 'notify-rules.js', 'notify.js', 'push-config.js', 'support-config.js',

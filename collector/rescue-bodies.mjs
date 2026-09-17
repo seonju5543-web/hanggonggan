@@ -266,7 +266,11 @@ for (const t of targets) {
      세어져 정읍시민장학재단(한글 387자가 전부 메뉴)이 '확보 ✅'로 통과했다.
      같은 말뭉치를 써야 재수집기·발췌기·AI가 같은 판정을 한다 — 갈라지면
      "재수집기는 됐다는데 발췌기는 못 읽는" 일이 생긴다. */
-  const probe = indexTexts(texts, { [t.url]: entry });
+  /* 🔴 지금까지 받아 둔 브라우저 본문도 같이 넣는다 (2026-09-15 코드 리뷰). 메뉴 목록은 브라우저가
+     그린 판에서도 따로 배우는데(page-boilerplate `makeStripperMulti`), 이 한 건만 넣으면 표본이
+     한 쪽뿐이라 아무것도 못 배워 **여기서는 '본문 확보', 발췌기에서는 '껍데기'** 로 갈린다
+     (의암 손병희: 163자 vs 85자 실측). 같은 말뭉치여야 같은 판정이다. */
+  const probe = indexTexts(texts, { ...bodies, [t.url]: entry });
   const ok = text && hasText(probe.byUrl.get(key) || entry);
 
   if (ok) {

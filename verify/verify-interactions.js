@@ -179,14 +179,15 @@ async function seed(page) {
         data.js 의 상시 제도 6종을 동기로 먼저 내주므로 그 목록은 받아오기 중에도 비지 않는다.
         (처음에 "공고 오기 전 홈이 '없음'이라고 말한다"고 보고 뼈대를 넣었다가, 재 보고 걷어냈다.)
         기다림이 실제로 보이는 곳은 실시간 공고 구역 하나다 — 거기를 지킨다. */
-  /* 🔴 **재는 자리를 옮겼다** (2026-09-12 · 노션 UI-16). 실시간 공고는 '전체' 목록 아래가
-     아니라 **'우리 학교' 칸**에서만 그려진다(개발자 지시로 칸을 뺐다). 뜻은 그대로다 —
-     기다리는 동안 뼈대, 빈손이면 '없어요'. 필터를 안 옮기면 이 절이 통째로 빈손을 잰다. */
-  console.log('\n■ 기다리는 동안의 뼈대 (우리 학교 칸)');
+  /* 🔴 **재는 자리를 옮겼다** (2026-09-12 · 노션 UI-16 → 2026-09-17 칸 합침). 실시간 공고는
+     '전체' 목록 아래가 아니라 **'교내' 칸**에서만 그려진다(UI-16 이 '우리 학교' 칸으로 뺐고,
+     2026-09-17 개발자 지시로 그 칸을 '교내'에 합쳤다). 뜻은 그대로다 — 기다리는 동안 뼈대,
+     빈손이면 '없어요'. 필터를 안 옮기면 이 절이 통째로 빈손을 잰다. */
+  console.log('\n■ 기다리는 동안의 뼈대 (교내 칸)');
   const skel = await page.evaluate(() => {
     const keep = liveNotices;
     const read = () => document.querySelector('#live-notices');
-    exploreFilter = 'notice';                               // 실시간 공고가 그려지는 칸
+    exploreFilter = '교내';                                 // 실시간 공고가 그려지는 칸
 
     liveNotices = null; renderExplore();                    // 아직 안 온 상태
     const during = {
@@ -215,16 +216,23 @@ async function seed(page) {
   ok('받아오기가 끝나면 뼈대가 걷힌다', !skel.after.skeleton);
   ok('빈손으로 끝났으면 "없음" 이 맞는 답이다 (뼈대가 굳지 않는다)', skel.after.empty);
 
-  /* 🔴 못 받아 와도 뼈대가 굳으면 안 된다 — loadNotices 가 실패해도 빈 문서를 넣는지 본다 */
+  /* 🔴 못 받아 와도 뼈대가 굳으면 안 된다 — loadNotices 가 실패해도 빈 문서를 넣는지 본다.
+     🔴 **여기서도 칸을 '교내'로 두어야 한다** (2026-09-17 코드 리뷰가 잡았다).
+        위 블록이 끝에서 `exploreFilter = 'all'` 로 되돌리는데, 칸을 합친 뒤로는
+        '교내' 밖에서 `#live-notices` 가 **늘 빈칸**이라 `.skel-list` 가 있을 수 없다 —
+        그러면 이 검사는 `loadNotices` 를 되돌려도 통과하는 **무력한 관문**이 된다
+        (실측으로 확인: 옛 `liveNotices = d;` 로 되돌려도 초록불이었다). */
   const failClears = await page.evaluate(async () => {
     const keep = liveNotices;
+    const keepFilter = exploreFilter;
+    exploreFilter = '교내';
     liveNotices = null;
     const realFetch = window.fetch;
     window.fetch = () => Promise.reject(new Error('오프라인 흉내'));
     await loadNotices();
     window.fetch = realFetch;
     const stuck = !!document.querySelector('#live-notices .skel-list');
-    liveNotices = keep; renderExplore();
+    liveNotices = keep; exploreFilter = keepFilter; renderExplore();
     return stuck;
   });
   ok('받아오기가 실패해도 뼈대가 굳지 않는다', failClears === false);

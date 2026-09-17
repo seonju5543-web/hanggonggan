@@ -20,6 +20,7 @@
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { indexTexts, sourceFor, hasText } from './notice-source.mjs';
+import { attachmentText, readable, docOrder } from './attachment-text.mjs';
 
 const require = createRequire(import.meta.url);
 const PA = require('../parse-amount.js');
@@ -34,6 +35,26 @@ const texts = JSON.parse(fs.readFileSync(new URL('extracted/notices-text.json', 
 let browserBodies = {};
 try { browserBodies = JSON.parse(fs.readFileSync(new URL('extracted/browser-bodies.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
 const idx = indexTexts(texts, browserBodies);
+
+/* 공고문 첨부 색인 — 자격 발췌기(extract-excerpts `qualFromDocs`)와 **같은 색인·같은 함수**다.
+   🔴 2026-09-15 까지 이 로봇은 첨부를 한 번도 안 열어 봤다. 게시판 본문이 '붙임 참조'뿐이고
+   금액이 공고문 HWP·DOCX 안에만 있는 공고는 영영 '금액 원문 확인'이었다 — 마감 전 20건 중
+   금액 모르는 18건을 원문을 열어 가른 F-9 실측에서 그 유형이 가장 컸다.
+   본문 → AI 가 옮긴 줄 → 첨부 순서다(본문이 있으면 본문이 언제나 정확하다 — 첨부에는
+   붙임·서식이 섞인다). 신청서·동의서는 색인 단계(deepfetch `isNoticeDoc`)에서 이미 걸러져 있다.
+   ⚠️ 여기서도 얼마인지는 parse-amount 가 정한다 — 예산표(`115명 180백만원`)를 1인당으로
+      읽지 않는 관문(`TOTAL_TABLE` — 표의 합계 행)이 첨부에서 처음 걸렸다. */
+let eligDocs = {};
+try { eligDocs = JSON.parse(fs.readFileSync(new URL('extracted/elig-docs.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
+function amountFromDocs(it) {
+  for (const f of docOrder((eligDocs[it.id] || {}).files)) {   // 원문 글자(HWP)가 OCR 보다 먼저
+    const t = attachmentText(new URL(`extracted/${f}`, HERE).pathname);
+    if (!readable(t)) continue;
+    const got = PA.amountFrom(t.split('\n').map((s) => s.trim()).filter(Boolean));
+    if (got.kind !== 'unknown') return got;
+  }
+  return null;
+}
 
 /* ── 동일성 ────────────────────────────────────────────────────
    같은 재단이 여러 학교에서 접수하는 공고는 **하나의 장학금**이다.
@@ -73,7 +94,8 @@ let read = 0, noText = 0;
 const stat = { fixed: 0, ratio: 0, range: 0, hourly: 0, unknown: 0 };
 const excl = { forbidden: 0, allowed: 0, unknown: 0 };
 const parsed = new Map();
-let fromAi = 0;   // 첨부(그림·PDF)를 읽어 둔 줄에서 건진 금액
+let fromAi = 0;   // AI 가 첨부(그림·PDF)를 읽어 둔 줄에서 건진 금액
+let fromDoc = 0;  // 공고문 첨부(HWP·DOCX) 글자에서 직접 건진 금액
 
 for (const it of items) {
   const src = sourceFor(it, idx);
@@ -86,7 +108,8 @@ for (const it of items) {
         총액/1인당 가르기·유의사항 절 차단·'전액'의 닻·자릿수 관문이 그대로 걸린다. */
   const aiLines = Array.isArray(it.amountLines) ? it.amountLines : [];
   const bodyLines = hasText(src) ? String(src.text).split('\n').map((s) => s.trim()).filter(Boolean) : [];
-  if (!bodyLines.length && !aiLines.length) { noText++; continue; }
+  const hasDocs = ((eligDocs[it.id] || {}).files || []).length > 0;
+  if (!bodyLines.length && !aiLines.length && !hasDocs) { noText++; continue; }
   read++;
   /* 본문이 있으면 본문이 먼저다. 본문으로 못 읽었을 때만 AI 가 옮겨 둔 줄로 한 번 더 본다 —
      읽어 둔 것을 안 쓰는 것이 지금까지 같은 그림을 두 번 읽게 만든 원인이었다. */
@@ -95,6 +118,11 @@ for (const it of items) {
     /* 금액 절만 뽑아 온 줄이라 머리글이 없을 수 있다 — 머리글을 붙여 절로 읽히게 한다 */
     const b = PA.amountFrom(['장학금액', ...aiLines]);
     if (b.kind !== 'unknown') { a = b; fromAi++; }
+  }
+  /* 본문으로도 AI 줄로도 못 읽었으면 공고문 첨부를 연다 (위 amountFromDocs 주석) */
+  if (a.kind === 'unknown' && hasDocs) {
+    const d = amountFromDocs(it);
+    if (d) { a = d; fromDoc++; }
   }
   const e = PA.exclusivityFrom(bodyLines.length ? bodyLines : aiLines);
   stat[a.kind]++; excl[e.kind]++;
@@ -145,7 +173,7 @@ const wonText = (n) => (n % 10000 === 0
 const amountText = (a) => (a.kind === 'range'
   ? `${wonText(a.min)} ~ ${wonText(a.max)}`
   : wonText(a.value));
-console.log(`\n■ 금액 읽기 — 등록 ${items.length}건 (원문 있음 ${read} · 없음 ${noText}${fromAi ? ` · 그중 첨부를 읽어 건진 것 ${fromAi}건` : ''})`);
+console.log(`\n■ 금액 읽기 — 등록 ${items.length}건 (원문 있음 ${read} · 없음 ${noText}${fromAi ? ` · 그중 AI 가 읽어 둔 첨부에서 건진 것 ${fromAi}건` : ''}${fromDoc ? ` · 공고문 첨부 글자에서 건진 것 ${fromDoc}건` : ''})`);
 console.log(`   절대액 ${stat.fixed + stat.range}건 · 등록금 비율 ${stat.ratio}건 · 시급 ${stat.hourly}건 · 미확인 ${stat.unknown}건`);
 console.log(`\n■ 이중수혜`);
 console.log(`   함께 못 받음 ${excl.forbidden}건 · 함께 받을 수 있음 ${excl.allowed}건 · 원문에 없음 ${excl.unknown}건`);
