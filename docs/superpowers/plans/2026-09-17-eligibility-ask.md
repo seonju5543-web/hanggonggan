@@ -4,7 +4,7 @@
 
 **Goal:** 학생이 온보딩에서 비워 둔 프로필 칸을, 그 칸이 필요해진 공고 상세 화면에서 물어 채우게 한다. 답은 프로필에 저장돼 모든 공고에 자동으로 쓰인다.
 
-**Architecture:** 새 순수 모듈 `elig-ask.js`(브라우저·Node 겸용, `essay-ask.js` 와 같은 방식)가 "이 줄을 푸는 프로필 칸이 무엇인가"를 **탐침 값을 넣고 `judgeCond` 를 다시 돌려** 정한다. 화면은 `app.js` 의 `reqRow` 한 자리에 단추를 달고, 시트는 이미 있는 `openSheetShell()` 그릇을 쓴다. 저장은 `state.profile` → `saveState()` 기존 경로 그대로라 서버 전송·알림 판정이 저절로 따라온다.
+**Architecture:** 새 순수 모듈 `elig-ask.js`(브라우저·Node 겸용, `essay-ask.js` 와 같은 방식)가 "이 줄을 푸는 프로필 칸이 무엇인가"를 **탐침 값을 넣고 화면이 쓰는 `requirementMatch` 를 다시 돌려** 정한다. 화면은 `app.js` 의 `reqRow` 한 자리에 단추를 달고, 시트는 이미 있는 `openSheetShell()` 그릇을 쓴다. 저장은 `state.profile` → `saveState()` 기존 경로 그대로라 서버 전송·알림 판정이 저절로 따라온다.
 
 **Tech Stack:** 순수 정적 파일(빌드 없음) · CommonJS/전역 겸용 JS · Node 18+ 검사(`verify/test-collector.mjs`) · Playwright 브라우저 검사(`verify/*.js`)
 
@@ -15,7 +15,7 @@
 이 저장소의 규칙이다. **모든 태스크의 요구사항에 이것이 포함된다.**
 
 - **작업 브랜치**: `claude/notion-task-search-5e1ec5` (현재 워크트리). 기본 브랜치는 `claude/nice-heisenberg-WESq5`, 배포는 `main`. 푸시는 세 브랜치 관례를 따른다.
-- **화면에 새로 넣는 한국어는 이것뿐**: `미확인 자격` · `저장` · `저장됨` · 칸 라벨(`평점`·`직전 학기 이수학점`·`학자금 지원구간`·`거주 시·군`·`학과`). **설명 문장·안내 문장을 새로 넣지 않는다.**
+- **화면에 새로 넣는 한국어는 이것뿐**: `미확인 자격` · `저장` · `저장됨` · 칸 라벨(`평점`·`직전 학기 이수학점`·`학자금 지원구간`·`태어난 해`·`국적`·`학과`·`거주 시·군·구`). **설명 문장·안내 문장을 새로 넣지 않는다.**
 - **느낌표 0개** · **1인칭 서비스 말투 0개**(`드릴게요`·`드려요`·`챙겨드`·`알려드`·`찾아드`·`보내 드`·`해 드리`) — `verify/ui-tone.mjs` 가 막는다.
 - **"받을 수 있는지 알 수 있어요" 류 장담 금지.** 앱은 공고에 적힌 요건 중 자기가 읽어낸 것만 안다.
 - **색 토큰은 이미 있는 것만**: 충족 `var(--green)`(#3d6b47) · 미달 `var(--red)`(#8f3a2e) · 흐린 글자 `var(--text-weak)`. 모서리는 `--radius-sm`(13px)·`--radius-pill`. **새 토큰·토큰 밖 값 금지** — `verify/ui-tone.mjs` '토큰 이탈' 톱니가 지금 값을 천장으로 잡고 있다.
@@ -56,11 +56,12 @@
 - Test: `verify/test-collector.mjs` (파일 끝에 절 추가)
 
 **Interfaces:**
-- Consumes: `parse-requirements.js` 의 `parseLine(line, isExclude)` → `{ conds, multiProgram }` · `match-engine.js` 의 `judgeCond(cond, profile, ctx)` → `'pass' | 'fail' | 'unknown'`
+- Consumes: `match-engine.js` 의 `requirementMatch(line, profile, sch)` → `'ok' | 'no' | null` — **화면(`reqRow`)이 쓰는 바로 그 함수다**
 - Produces:
-  - `FIELD_PROBE` — `{ [profileKey]: any[] }` 탐침 값 표
-  - `KIND_FIELD` — `{ [condKind]: profileKey }` 조건 종류 → 프로필 칸
-  - `askableFields(line, profile, ctx)` → `string[]` (프로필 칸 이름, 중복 없음, `KIND_FIELD` 등장 순서)
+  - `FIELD_PROBE` — `{ [profileKey]: any[] }` 물어볼 수 있는 칸과 그 탐침 값
+  - `askableFields(line, profile, sch)` → `string[]` (프로필 칸 이름, `FIELD_PROBE` 키 순서)
+
+🔴 **`judgeCond` 를 조건마다 부르지 않는다** (사전 점검 2026-09-17 에서 잡았다). `judgeCond` 로 바로 가면 화면이 쓰는 관문들(경우별 분기 `caseBranch` · 표 라벨 `gradTarget` · 선택지 묶음 · `unaskedAttr`)을 건너뛴다. 실제로 `신입생: 2026년 1학기 85점 이상` 줄이 **재학생에게 「평점을 물어라」** 를 냈다 — 그 줄은 평점을 적어도 영영 판정되지 않는다(재학생의 줄이 아니니까). `requirementMatch` 를 탐침하면 규칙이 **갈라질 수가 없다.**
 
 - [ ] **Step 1: 실패하는 회귀를 먼저 쓴다**
 
@@ -68,40 +69,48 @@
 
 ```js
 /* ── 자격 묻기 — 채워도 판정이 안 바뀌는 줄에는 묻지 않는다 (2026-09-17 · 노션 AI-1) ──
-   🔴 이 절이 이 기능의 심장이다. `백분율환산 85점` 은 평점을 적어도 judgeCond 가
-      'unknown' 을 유지한다(환산표가 학교마다 달라 일부러 그렇게 만든 자리다).
-      거기에 단추를 달면 **학생이 적었는데 화면이 그대로다** — 묻지 않는 것보다 나쁘다.
-   ⚠️ 줄은 전부 data/registered.json 에 실제로 있는 원문이다. 지어내지 말 것. */
+   🔴 이 절이 이 기능의 심장이다. 적어도 안 풀리는 줄에 단추를 달면
+      **학생이 적었는데 화면이 그대로다** — 묻지 않는 것보다 나쁘다.
+   🔴 판정은 화면이 쓰는 `requirementMatch` 를 그대로 탐침해서 낸다. judgeCond 로
+      바로 가면 경우별 분기·표 라벨·선택지 묶음 관문을 건너뛴다(사전 점검에서 실제로
+      `신입생:` 줄이 재학생에게 '평점을 물어라'를 냈다).
+   ⚠️ 아래 줄과 기대값은 **실제로 재서 얻은 것**이다(2026-09-17). 지어내지 말 것.
+      기대값이 안 맞으면 코드를 의심하기 전에 이 값을 다시 재 볼 것. */
 console.log('\n■ 자격 묻기 — 무엇을 물을 수 있나');
 {
   const EA = createRequire(import.meta.url)('../elig-ask.js');
-  /* 온보딩을 하나도 안 채운 학생 — 필수(학교·학년·학적)만 있다 */
+  /* 온보딩 선택 칸을 하나도 안 채운 학생 — 필수(학교·캠퍼스·학년·학적)만 있다 */
   const bare = { school: '경희대학교', campus: '서울', year: 3, status: '재학' };
+  const sch = { id: 't', name: '두을장학재단', provider: '두을장학재단' };
+  const L45 = '26년 정규 1학기를 총 15학점 이상 이수하고, 성적을 3.5/4.5 이상 취득한 자';
 
-  eq('평점을 묻는다 (4.5 만점으로 적힌 줄)',
-    EA.askableFields('26년 정규 1학기를 총 15학점 이상 이수하고, 성적을 3.5/4.5 이상 취득한 자', bare),
-    ['gpa', 'credits']);
+  eq('평점과 이수학점을 묻는다 (4.5 만점으로 적힌 줄)',
+    EA.askableFields(L45, bare, sch), ['gpa', 'credits']);
 
-  /* 🔴 되돌림 방지 — 백분위는 적어도 안 풀린다 */
-  eq('백분율환산 성적은 묻지 않는다 (적어도 판정이 안 생긴다)',
-    EA.askableFields('학기별 최소 9학점 이상 이수하고 평점평균(백분율환산)이 85점 이상인 자', bare),
+  /* 🔴 되돌림 방지 — 백분위 성적은 평점을 적어도 그 줄이 안 풀린다(줄이 풀리려면
+     조건이 **전부** 풀려야 하는데 환산 조건이 막혀 있다). 학점만 묻는 것이 맞다. */
+  eq('백분율환산 줄에서는 평점을 묻지 않는다 (학점만)',
+    EA.askableFields('학기별 최소 9학점 이상 이수하고 평점평균(백분율환산)이 85점 이상인 자', bare, sch),
     ['credits']);
 
-  eq('경우별 분기 줄은 묻지 않는다', EA.askableFields('신입생: 2026년 1학기 85점 이상', bare), []);
+  /* 🔴 되돌림 방지 — 재학생에게 `신입생:` 줄은 영영 판정되지 않는다 */
+  eq('내 경우가 아닌 분기 줄은 묻지 않는다',
+    EA.askableFields('신입생: 2026년 1학기 85점 이상', bare, sch), []);
+
   eq('자격이 아닌 줄은 묻지 않는다 (접수 주소)',
-    EA.askableFields('[13620] 경기도 성남시 분당구 구미로 173번길 82 분당서울대학교병원 2동 7층', bare), []);
-  eq('절 제목은 묻지 않는다', EA.askableFields('2. 신청자격', bare), []);
+    EA.askableFields('[13620] 경기도 성남시 분당구 구미로 173번길 82 분당서울대학교병원 2동 7층', bare, sch), []);
+  eq('절 제목은 묻지 않는다', EA.askableFields('2. 신청자격', bare, sch), []);
 
   eq('소득구간을 묻는다',
-    EA.askableFields('한국장학재단 학자금 지원구간 8구간 이내인 자', bare), ['bracket']);
+    EA.askableFields('한국장학재단 학자금 지원구간 8구간 이내인 자', bare, sch), ['bracket']);
+  eq('국적을 묻는다',
+    EA.askableFields('대한민국 국적을 가진 자에 한함', bare, sch), ['nationality']);
 
   /* 🔴 이미 채운 칸은 다시 묻지 않는다 */
   eq('이미 적은 칸은 묻지 않는다',
-    EA.askableFields('26년 정규 1학기를 총 15학점 이상 이수하고, 성적을 3.5/4.5 이상 취득한 자',
-      { ...bare, gpa: 3.42 }), ['credits']);
-  eq('  둘 다 적었으면 물을 것이 없다',
-    EA.askableFields('26년 정규 1학기를 총 15학점 이상 이수하고, 성적을 3.5/4.5 이상 취득한 자',
-      { ...bare, gpa: 3.42, credits: 15 }), []);
+    EA.askableFields(L45, { ...bare, gpa: 3.42 }, sch), ['credits']);
+  eq('  둘 다 적었으면 물을 것이 없다 (판정이 났으므로)',
+    EA.askableFields(L45, { ...bare, gpa: 3.42, credits: 15 }, sch), []);
 }
 ```
 
@@ -123,12 +132,12 @@ Expected: `Cannot find module '../elig-ask.js'` 로 죽는다.
      아니라 **학생이 비워 둔 프로필 칸**이었다. 그 칸을 필요해진 자리에서 묻는다.
 
    🔴 이 파일의 심장 — **채워도 판정이 안 바뀌는 줄에는 묻지 않는다.**
-     `평점평균(백분율환산)이 85점 이상` 은 평점을 적어도 judgeCond 가 'unknown' 을
-     유지한다(환산표가 학교마다 달라 미달 판정을 일부러 안 낸다). 거기에 단추를 달면
+     `평점평균(백분율환산)이 85점 이상` 은 평점을 적어도 그 줄이 안 풀리고,
+     `신입생:` 줄은 재학생에게 영영 판정되지 않는다. 거기에 단추를 달면
      학생이 적었는데 화면이 그대로다 — 묻지 않는 것보다 나쁘다.
 
-     그래서 규칙표를 손으로 적지 않고 **탐침 값을 넣어 다시 판정해 본다.**
-     파서가 좋아지면 물을 수 있는 줄이 저절로 는다.
+     그래서 규칙표를 손으로 적지 않고 **화면이 쓰는 `requirementMatch` 를 그대로
+     탐침한다.** 규칙이 갈라질 수가 없고, 파서가 좋아지면 물을 수 있는 줄이 저절로 는다.
 
    🔴 여기서 사실을 만들지 않는다. 정하는 것은 **무엇을 물을까**이지 답이 아니다.
 
@@ -137,38 +146,24 @@ Expected: `Cannot find module '../elig-ask.js'` 로 죽는다.
    설계: docs/designs/eligibility-ask.md
    ============================================================ */
 
-/* 요건 파서와 판정기 — 브라우저는 전역, Node는 require.
-   ⚠️ `window.parseLine` 으로 찾으면 안 된다(서비스워커에는 window 가 없다).
+/* 판정기 — 브라우저는 전역, Node는 require.
+   ⚠️ `window.requirementMatch` 로 찾으면 안 된다(서비스워커에는 window 가 없다).
    🔴 아래 전역 이름 목록에 빠뜨리면 **Node 검사는 다 통과하는데 앱이 죽는다** —
       match-engine 이 `unaskedAttr` 로 실제로 그렇게 죽었다(2026-08-24).
-      관문: test-collector 「자격 묻기」 절의 '브라우저에서 쓸 이름' 항목. */
-const EA_PR = (typeof module !== 'undefined' && module.exports)
-  ? require('./parse-requirements.js')
-  : { parseLine };
+   🔴 **화면이 쓰는 그 함수 하나만** 쓴다. judgeCond 로 내려가면 경우별 분기·표 라벨·
+      선택지 묶음 관문을 건너뛰어, 재학생에게 `신입생:` 줄의 평점을 묻게 된다. */
 const EA_ME = (typeof module !== 'undefined' && module.exports)
   ? require('./match-engine.js')
-  : { judgeCond };
+  : { requirementMatch };
 
-/* 조건 종류 → 그 조건을 푸는 프로필 칸.
-   🔴 칸 이름은 app.js `collectProfile()` 이 만드는 이름과 **반드시 같아야 한다** —
-      다르면 시트가 엉뚱한 칸에 저장하고 판정은 영영 안 바뀐다.
-      관문이 collectProfile 과 대조한다(test-collector 「자격 묻기」 절).
-   ⚠️ 여기 없는 종류(degree·status·year·school)는 온보딩 필수라 늘 차 있거나
-      물어서 풀 수 있는 것이 아니다. 늘리려면 FIELD_PROBE·FIELD_META 도 같이 늘린다. */
-const KIND_FIELD = {
-  grade: 'gpa',
-  credits: 'credits',
-  bracket: 'bracket',
-  age: 'birthYear',
-  nationality: 'nationality',
-  major: 'major',
-  residence: 'regionCity',
-};
-
-/* 탐침 — 그 칸에 넣어 볼 값. 판정이 'unknown' 을 벗어나면 물을 수 있는 칸이다.
-   🔴 양 끝을 둘 다 넣는다. 한쪽만 넣으면 `4.0 이상` 줄에 4.5 만 넣어 보고
-      '물을 수 있다' 고 답하는데, 실제로는 맞다/아니다 둘 다 나와야 진짜다.
-   ⚠️ 이 값들은 **화면에 안 나간다.** 판정이 달라지는지 보려고 잠깐 넣어 보는 것뿐이다. */
+/* 물어볼 수 있는 칸과 그 **탐침 값**.
+   🔴 칸 이름은 app.js `collectProfile()` 이 만드는 이름과 반드시 같아야 한다 —
+      다르면 시트가 엉뚱한 칸에 저장하고 판정은 영영 안 바뀐다(관문이 대조한다).
+   🔴 값은 양 끝을 넣는다. 한쪽이라도 줄을 풀면 물을 수 있는 칸이다.
+      ⚠️ 양쪽 다 요구하면(엄격) 멀쩡한 경우가 통째로 죽는다 — `3.5/4.5 이상` 줄에
+         평점 0 을 넣으면 judgeCond 가 'fail' 이 아니라 'unknown' 을 내기 때문이다(실측).
+   ⚠️ 이 값들은 **화면에 안 나간다.** 판정이 달라지는지 보려고 잠깐 넣어 보는 것뿐이다.
+   ⚠️ 여기 없는 것(학교·학년·학적)은 온보딩 필수라 늘 차 있다. */
 const FIELD_PROBE = {
   gpa: [0, 4.5],
   credits: [0, 24],
@@ -180,33 +175,28 @@ const FIELD_PROBE = {
 };
 
 /* 이 줄을 푸는 프로필 칸이 무엇인가 → ['gpa', 'credits']
-   빈 배열이면 물을 것이 없다(= 단추를 달지 않는다). */
-function askableFields(line, profile, ctx) {
+   빈 배열이면 물을 것이 없다(= 단추를 달지 않는다).
+
+   ⚠️ 알려진 천장: 어떤 칸은 **탐침 값으로는 풀리는데 학생의 실제 값으로는 안 풀릴** 수
+      있다. 그때는 적어도 그 줄이 흐린 채 남는다(틀린 말을 하지는 않는다). 실측 8줄에서는
+      그런 경우가 없었고, 막으려면 칸마다 판정 가능 구간을 적어야 해서 하지 않는다. */
+function askableFields(line, profile, sch) {
   const p = profile || {};
-  const parsed = EA_PR.parseLine(String(line || ''), false);
-  const conds = (parsed && parsed.conds) || [];
+  if (EA_ME.requirementMatch(line, p, sch)) return [];   // 지금도 판정된다
   const out = [];
-  for (const c of conds) {
-    const key = KIND_FIELD[c.kind];
-    if (!key) continue;                       // 물어서 풀 수 있는 종류가 아니다
-    if (out.indexOf(key) !== -1) continue;    // 같은 칸을 두 번 담지 않는다
+  for (const key of Object.keys(FIELD_PROBE)) {
     if (p[key] !== null && p[key] !== undefined && p[key] !== '') continue;  // 이미 적었다
-    if (EA_ME.judgeCond(c, p, ctx) !== 'unknown') continue;  // 지금도 판정된다
-    /* 🔴 탐침 — 넣어 보고 판정이 생기는 칸만 담는다 */
-    const probes = FIELD_PROBE[key] || [];
-    let helps = false;
-    for (const v of probes) {
+    for (const v of FIELD_PROBE[key]) {
       const trial = Object.assign({}, p);
       trial[key] = v;
-      if (EA_ME.judgeCond(c, trial, ctx) !== 'unknown') { helps = true; break; }
+      if (EA_ME.requirementMatch(line, trial, sch)) { out.push(key); break; }
     }
-    if (helps) out.push(key);
   }
   return out;
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { askableFields, KIND_FIELD, FIELD_PROBE };
+  module.exports = { askableFields, FIELD_PROBE };
 }
 ```
 
@@ -219,16 +209,16 @@ Expected: 8항목 모두 `✓`.
 
 - [ ] **Step 5: red-green 으로 관문이 살아 있는지 확인한다**
 
-`elig-ask.js` 의 탐침 검사 한 줄을 잠시 무력화한다:
+`askableFields` 의 탐침 고리를 잠시 무력화한다 — 탐침 없이 **빈 칸이면 무조건** 묻게 만든다:
 
 ```js
-    if (helps) out.push(key);      // ← 이 줄을
-    out.push(key);                 // ← 로 바꿔 본다 (탐침 무시)
+    if (p[key] !== null && p[key] !== undefined && p[key] !== '') continue;
+    out.push(key); continue;       // ← 이 줄을 넣어 탐침을 건너뛴다
+    for (const v of FIELD_PROBE[key]) {
 ```
 
-Run: `node verify/test-collector.mjs 2>&1 | grep "백분율환산"`
-Expected: `✕ 백분율환산 성적은 묻지 않는다` — **빨간불이 나와야 진짜다.**
-확인했으면 되돌린다.
+Run: `node verify/test-collector.mjs 2>&1 | grep "백분율환산\|분기 줄\|절 제목"`
+Expected: 세 항목 모두 `✕` — **빨간불이 나와야 진짜다.** 확인했으면 넣은 줄을 지운다.
 
 - [ ] **Step 6: 커밋**
 
@@ -236,9 +226,10 @@ Expected: `✕ 백분율환산 성적은 묻지 않는다` — **빨간불이 �
 git add elig-ask.js verify/test-collector.mjs
 git commit -m "자격 묻기 ① 채우면 판정이 달라지는 칸만 고른다 (노션 AI-1)
 
-규칙표를 손으로 적지 않고 탐침 값을 넣어 judgeCond 를 다시 돌린다 —
-'평점평균(백분율환산) 85점' 은 평점을 적어도 안 풀리므로 묻지 않는다.
-관문 8항목, red-green 확인(탐침을 무시하게 바꾸면 빨간불).
+규칙표를 손으로 적지 않고 **화면이 쓰는 requirementMatch 를 그대로 탐침**한다.
+그래서 경우별 분기·표 라벨·선택지 묶음 관문이 저절로 지켜진다 —
+재학생에게 '신입생:' 줄의 평점을 묻지 않고, 백분율환산 줄에서는 학점만 묻는다.
+관문 9항목, red-green 확인(탐침을 건너뛰게 바꾸면 세 항목이 빨간불).
 
 Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 ```
@@ -254,9 +245,9 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 - Test: `verify/test-collector.mjs` (Task 1 이 만든 절 안에 이어 붙인다)
 
 **Interfaces:**
-- Consumes: Task 1 의 `askableFields`·`KIND_FIELD`
+- Consumes: Task 1 의 `askableFields(line, profile, sch)`·`FIELD_PROBE`
 - Produces:
-  - `FIELD_META` — `{ [key]: { label, kind, suffix?, min?, max?, step?, options? } }` · `kind` 는 `'number' | 'select'`
+  - `FIELD_META` — `{ [key]: { label, kind, suffix?, min?, max?, step?, options? } }` · `kind` 는 `'number' | 'text' | 'select'`
   - `askableForSch(sch, profile)` → `string[]` — 그 공고의 자격 줄 전부에서 모은 칸(중복 없음)
   - `coerceField(key, raw)` → `number | string | null` — 입력 문자열을 프로필 값으로. 빈 값·못 읽는 값은 `null`
 
@@ -269,9 +260,9 @@ Task 1 이 만든 절의 닫는 `}` **앞**에 이어 붙인다:
      🔴 칸 이름이 온보딩(app.js collectProfile)과 갈라지면 시트가 엉뚱한 칸에
         저장하고 판정은 영영 안 바뀐다. 사람이 기억하는 대신 소스를 대조한다. */
   eq('물을 수 있는 칸에는 전부 이름표가 있다',
-    Object.keys(EA.KIND_FIELD).map((k) => EA.KIND_FIELD[k]).filter((f) => !EA.FIELD_META[f]), []);
-  eq('탐침도 전부 있다',
-    Object.keys(EA.KIND_FIELD).map((k) => EA.KIND_FIELD[k]).filter((f) => !EA.FIELD_PROBE[f]), []);
+    Object.keys(EA.FIELD_PROBE).filter((f) => !EA.FIELD_META[f]), []);
+  eq('  이름표만 있고 탐침이 없는 칸은 없다 (물을 수 없는 칸을 화면에 그리지 않는다)',
+    Object.keys(EA.FIELD_META).filter((f) => !EA.FIELD_PROBE[f]), []);
 
   {
     const appJs = readText(new URL('../app.js', import.meta.url));
@@ -292,15 +283,15 @@ Task 1 이 만든 절의 닫는 `}` **앞**에 이어 붙인다:
 
   /* 공고 단위로 모은다 — 같은 칸을 두 번 담지 않는다 */
   {
-    const sch = { eligibilityLines: [
-      '26년 정규 1학기를 총 15학점 이상 이수하고, 성적을 3.5/4.5 이상 취득한 자',
+    const many = { id: 't', name: '두을장학재단', provider: '두을장학재단', eligibilityLines: [
+      L45,
       '직전 학기 평점 3.0 이상인 자',
       '대한민국 국적을 가진 자에 한함',
     ] };
     eq('공고의 자격 줄 전부에서 모으고 중복은 뺀다',
-      EA.askableForSch(sch, bare), ['gpa', 'credits']);
-    eq('  다 적은 학생에게는 물을 것이 없다',
-      EA.askableForSch(sch, { ...bare, gpa: 3.42, credits: 15 }), []);
+      EA.askableForSch(many, bare), ['gpa', 'credits', 'nationality']);
+    eq('  자격 줄이 없는 공고에서도 죽지 않는다 (층2·상시 제도)',
+      EA.askableForSch({ id: 'k', name: '상시' }, bare), []);
   }
 ```
 
@@ -348,12 +339,13 @@ function coerceField(key, raw) {
   return s;
 }
 
-/* 이 공고에서 물을 수 있는 칸 전부 (자격 줄을 다 훑어 중복 제거) */
+/* 이 공고에서 물을 수 있는 칸 전부 (자격 줄을 다 훑어 중복 제거).
+   ⚠️ 자격 줄이 없는 공고(층2 KOSAF·상시 제도)에서도 죽지 않아야 한다 — 빈 배열을 낸다. */
 function askableForSch(sch, profile) {
   const lines = (sch && sch.eligibilityLines) || [];
   const out = [];
   for (const line of lines) {
-    for (const k of askableFields(line, profile)) {
+    for (const k of askableFields(line, profile, sch)) {
       if (out.indexOf(k) === -1) out.push(k);
     }
   }
@@ -365,7 +357,7 @@ function askableForSch(sch, profile) {
 
 ```js
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { askableFields, askableForSch, coerceField, FIELD_META, KIND_FIELD, FIELD_PROBE };
+  module.exports = { askableFields, askableForSch, coerceField, FIELD_META, FIELD_PROBE };
 }
 ```
 
@@ -420,7 +412,7 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
     <script src="elig-ask.js"></script>
 ```
 
-🔴 `match-engine.js` 보다 **뒤**여야 한다 — `judgeCond` 전역이 먼저 있어야 한다. `section-head.js` 를 `match-engine.js` 보다 먼저 싣지 않아 앱이 첫 카드에서 죽은 적이 있다(2026-08-24).
+🔴 `match-engine.js` 보다 **뒤**여야 한다 — `requirementMatch` 전역이 먼저 있어야 한다. `section-head.js` 를 `match-engine.js` 보다 먼저 싣지 않아 앱이 첫 카드에서 죽은 적이 있다(2026-08-24).
 
 `sw.js` 의 `ASSETS` 배열 첫 줄, `'essay-submit-check.js',` 뒤에 `'elig-ask.js',` 를 넣고 `CACHE` 를 한 단 올린다:
 
@@ -457,7 +449,7 @@ Expected: `match-engine` < `elig-ask` < `app` 순서의 숫자.
           자리라 손가락이 엉뚱한 곳을 친다. */
     let ask = '';
     if (!m && typeof askableFields === 'function'
-        && askableFields(e, state.profile).length) {
+        && askableFields(e, state.profile, sch).length) {
       ask = `<button type="button" class="elig-ask-btn" data-elig-ask="${esc(sch.id)}">적어서 확인</button>`;
     }
     return `<li class="${cls}${extra ? ' ' + extra : ''}">${mark}${esc(e)}${ask}</li>`;
@@ -835,7 +827,7 @@ node verify/check-deploy-sync.js 2>&1 | tail -10
 
 | 설계 | 태스크 |
 |---|---|
-| 1절 과녁(비운 프로필 칸) | Task 1·2 (`KIND_FIELD`·`FIELD_META`) |
+| 1절 과녁(비운 프로필 칸) | Task 1·2 (`FIELD_PROBE`·`FIELD_META`) |
 | 2절 확정 모양(단추→시트·접기·세로 칸·색만) | Task 3 Step 3~6 |
 | 3-1 채워도 안 바뀌면 안 묻는다 | Task 1 전체 + Task 3 Step 3 · Task 4 Step 4 red-green |
 | 3-2 장담 금지 | Global Constraints + Task 3 Step 6 주석 |
@@ -847,6 +839,6 @@ node verify/check-deploy-sync.js 2>&1 | tail -10
 | 6절 관문 4종 | Task 1·2(test-collector) · Task 4(브라우저·워크플로) · Task 3 Step 8(ui-tone) · Task 5 Step 1(supabase 는 기존 검사가 그대로 잡는다) |
 | 7절 안 하는 것 | 어느 태스크에도 없다 — Task 5 Step 3 이 노션에 적는다 |
 
-**이름 일관성** — `askableFields` · `askableForSch` · `coerceField` · `FIELD_META` · `KIND_FIELD` · `FIELD_PROBE` · `openEligAsk` · `eligAskSave` · `eligAskHtml` · `data-elig-ask` / `data-elig-toggle` / `data-elig-save` / `data-elig-field` · CSS `.elig-ask*`. Task 1→4 에서 철자가 같다.
+**이름 일관성** — `askableFields` · `askableForSch` · `coerceField` · `FIELD_META` · `FIELD_PROBE` · `openEligAsk` · `eligAskSave` · `eligAskHtml` · `data-elig-ask` / `data-elig-toggle` / `data-elig-save` / `data-elig-field` · CSS `.elig-ask*`. Task 1→4 에서 철자가 같다.
 
 **미확정 하나** — 설계 5절 4번(재사용을 화면이 말해 줄지)은 일부러 안 정했다. Task 3 Step 7 에서 화면을 보고, Task 5 Step 3 에서 개발자에게 묻는다.
