@@ -230,7 +230,7 @@ for (const it of items) {
   else if (it.sameAsFrom === OWN_SAME) { delete it.sameAs; delete it.sameAsFrom; }
 }
 
-if (keptHuman) console.log(`   사람이 넣은 금액 ${keptHuman}건은 그대로 뒀습니다 (표식 없는 값은 안 덮습니다)`);
+if (keptHuman) console.log(`   사람이 넣은 금액 ${keptHuman}건은 그대로 뒀습니다 (로봇 표식 '${OWN_AMOUNT}' 이 아닌 값은 안 덮습니다)`);
 /* 🔴 날짜만 적는다 — 다른 로봇이 전부 `slice(0,10)` 이라, 여기만 시각까지 적으면
    registered.json 이 매 실행 더러워지고 관리자 화면의 '데이터 기준일' 에 시각이 뜬다
    (2026-09-13 코드 리뷰). */
