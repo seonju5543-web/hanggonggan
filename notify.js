@@ -278,7 +278,7 @@ function openNotifyInbox() {
     closeNotifyPanel();
     setTimeout(() => {
       if (item.schId && typeof findSch === 'function' && findSch(item.schId)) openDetail(item.schId);
-      /* 공고를 못 찾았으면 **전체 목록**으로 — 학생이 '우리 학교' 칸에 있었으면 거기엔 없다 */
+      /* 공고를 못 찾았으면 **전체 목록**으로 — 학생이 '교내'·'교외' 칸에 있었으면 거기엔 없다 */
       else if (typeof exploreShowAll === 'function') exploreShowAll();
       else showScreen('explore');
     }, 260);

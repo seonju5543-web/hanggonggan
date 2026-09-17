@@ -169,6 +169,57 @@ export function sameTitle(a, b) {
   return longT.includes(shortT);
 }
 
+/* ── 알맹이 낱말로 한 번 더 찾기 (2026-09-18) ──────────────────────────────
+   🔴 왜 필요한가: 앱 이름은 사람이 다듬은 것이라 게시판 행과 글자가 달라
+      `sameTitle` 이 애초에 안 맞는다. 실측 — 한국외대 6건이 이 이유로 4회 연속
+      `목록에서 못 찾음` 이 되어 `likelyGone` 처리됐다:
+        앱  `면학장학금 (한국외대 교내)`
+        행  `[공통][교내] 2026학년도 2학기 면학장학금 신청 안내`
+      서로를 품지 않아 지문 대조로는 영영 안 붙는다. 그런데 게시판에서 `면학` 으로
+      검색하면 그 글이 **멀쩡히 있다**(/bbs/student/2431/259473/artclView.do).
+
+   🔴 **느슨하게 풀면 안 된다.** 예전에 `복지장학금 (서울캠퍼스)` 가 `(다빈치캠퍼스)`
+      공고에 붙은 적이 있다. 그래서 세 겹으로 좁힌다:
+        ① 알맹이는 괄호·대괄호·학기·연도를 떼고 남은 **장학금 이름**이고 4글자 이상
+        ② 그 알맹이를 품은 행이 **딱 하나**일 때만 (여럿이면 지어내지 않는다)
+        ③ 앱 이름에 캠퍼스 말이 있으면 행에도 **같은 캠퍼스**여야 한다 */
+const CAMPUS_WORDS = ['서울', '글로벌', '용인', 'erica', '다빈치', '안성', '천안', '제2'];
+
+export function titleCore(raw) {
+  const s = String(raw || '')
+    .replace(/\([^)]*\)/g, ' ')                       // (한국외대 교내)
+    .replace(/\[[^\]]*\]/g, ' ')                      // [공통][교내]
+    .replace(/20\d{2}\s*(학년도|년도|년)?/g, ' ')
+    .replace(/\d\s*학기/g, ' ')
+    .replace(/(신청|모집|선발|지급)\s*(안내|공고)?/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  /* 장학금 이름은 대개 `…장학금`·`…장학생` 으로 끝난다 — 그 덩어리를 집는다 */
+  const m = s.match(/([가-힣A-Za-z0-9]{2,20}(?:장학금|장학생|장학))/);
+  return m ? m[1] : '';
+}
+
+function campusOf(raw) {
+  const t = String(raw || '').toLowerCase();
+  return CAMPUS_WORDS.filter((w) => t.includes(w));
+}
+
+/* 행 목록에서 알맹이로 딱 하나를 고른다. 못 고르면 null — 지어내지 않는다.
+   rows: [{ t, ... }] (t = 행에 보이는 글자) */
+export function rowByCore(want, rows) {
+  const core = titleCore(want);
+  if (core.length < 4) return null;                   // 짧으면 우연히 겹친다
+  const hit = (rows || []).filter((r) => String(r.t || '').includes(core));
+  if (hit.length !== 1) return null;                  // 여럿이면 판단하지 않는다
+  const wantCampus = campusOf(want);
+  if (wantCampus.length) {
+    const rowCampus = campusOf(hit[0].t);
+    /* 행이 캠퍼스를 말하는데 다른 캠퍼스면 버린다 (복지장학금 사고) */
+    if (rowCampus.length && !wantCampus.some((w) => rowCampus.includes(w))) return null;
+  }
+  return hit[0];
+}
+
 /* 상세 화면 문서(HTML)에서 'GET으로도 열리는 원문 주소' 후보를 뽑는다.
    경희대처럼 클릭이 form POST라 주소창이 안 바뀌는 게시판 대응.
    dom: { url, html, canonical, ogUrl, hiddenInputs: {name: value}, listUrl } */

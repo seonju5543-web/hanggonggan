@@ -196,13 +196,13 @@ const PROFILE = {
      옛 규칙은 마감 오름차순뿐이라 실측(한국외대)에서 맨 위 둘이 **적합도 15%** 였다.
      🔴 기대 순서를 여기서 **손으로 적지 않는다** — 앱의 getMatches·fitRank·dday·byDeadline 을
         그대로 불러 만든다. 검사가 규칙을 한 벌 더 가지면 앱이 바뀔 때 조용히 갈라진다. */
-  /* ══ '우리 학교' 칸 (2026-09-12 · 노션 UI-16) ═════════════════════════════
-     개발자 지시: "교내/교외가 있는 것처럼 칸을 하나 더 만들어 뺀다."
-     이 칸의 내용은 **수집 로봇이 학교 게시판에서 줍는 글 목록**이다(등록 공고가 아니다).
-     예전에는 '전체' 목록 아래에 붙어 카드 수십 장을 지나야 보였다. */
+  /* ══ '교내' 칸 = 등록 공고 + 학교 게시판 글 (2026-09-17 개발자 지시) ══════════
+     "교내와 우리학교 탭에서 같은 공고가 계속 발견되고 있는데 우리학교 탭을 없애 교내로 합병."
+     2026-09-12(노션 UI-16)에 뺐던 '우리 학교' 칸을 '교내'에 합쳤다 — 칸만 합치고
+     **구역은 남긴다**(게시판 글은 적합도·마감 판정이 없어 같은 목록으로 정렬할 수 없다). */
   /* 🔴 **필터 칩은 한 줄이다** (2026-09-12 개발자 지시: "신청가능만 밑으로 내리지 말고 일렬로").
-     칩이 다섯이 되면서 줄바꿈으로 접혔다. 다시 스크롤로 돌리지 않고 **들어가게** 만들었으니
-     (여백 14 → 10 · 칩 사이 8 → 6 · 좌우 화면 끝까지), 좁은 화면에서 실제로 한 줄인지 잰다.
+     칩이 다섯이던 시절 줄바꿈으로 접혔다. 다시 스크롤로 돌리지 않고 **들어가게** 만들었고
+     (여백 14 → 10 · 칩 사이 8 → 6 · 좌우 화면 끝까지), 2026-09-17 에 둘을 없애 셋이 됐다.
      ⚠️ 글자 크기는 재지 않는다 — 2026-09-11 개발자 지시로 크기 조정은 전부 되돌린 상태다. */
   console.log('\n■ 필터 칩 한 줄 (2026-09-12)');
   /* 🔴 **320px 도 잰다** — 거기서는 한 줄을 요구하지 않고 **잘리지 않는 것**만 요구한다.
@@ -224,7 +224,14 @@ const PROFILE = {
   await page.setViewportSize({ width: 390, height: 900 });
   await page.waitForTimeout(250);
 
-  console.log('\n■ 우리 학교 칸 (UI-16)');
+  /* 🔴 **없앤 칩 둘이 되돌아오면 빨간불** (2026-09-17 개발자 지시 · 관문).
+     '우리 학교'는 '교내'에 합쳤고, '신청 가능만'은 `applyLock` 이 자격으로 신청을 막지
+     않게 된 뒤(2026-09-13) 뜻이 어긋나 없앴다. 조사로 되살리지 말 것. */
+  console.log('\n■ 칩은 셋 — 없앤 둘이 돌아오지 않는다 (2026-09-17)');
+  eq('전체·교내·교외 셋뿐이다', await page.$$eval('#explore-filters .filter-chip',
+    (els) => els.map((e) => e.dataset.filter)), ['all', '교내', '교외']);
+
+  console.log('\n■ 교내 칸 — 등록 공고와 게시판 글이 한 자리 (2026-09-17)');
   /* 🔴 **오늘 수집분에 기대지 않는다** — 실시간 공고는 60일이 지나면 지워지고(collect.mjs),
      한 학교의 수집이 며칠 멈추면 0건이 된다. 그러면 앱은 멀쩡한데 이 절이 빨간불이 되고,
      이 저장소는 그런 관문이 통째로 꺼진 적이 있다. 그래서 한 건을 심어 둔다. */
@@ -236,19 +243,40 @@ const PROFILE = {
     }]) };
     renderExplore();
   });
-  await page.click('.filter-chip[data-filter="notice"]'); await page.waitForTimeout(500);
+  await page.click('.filter-chip[data-filter="교내"]'); await page.waitForTimeout(500);
   const nt = await page.evaluate(() => ({
-    카드: document.querySelectorAll('#explore-list .sch-card:not(.notice-card)').length,
+    교외섞임: [...document.querySelectorAll('#explore-list .sch-card:not(.notice-card)')]
+      .map((e) => e.dataset.detail)
+      .filter((id) => ((allScholarships() || []).find((s) => s.id === id) || {}).type === '교외').length,
     공고: document.querySelectorAll('#live-notices .notice-card').length,
     정렬버튼: !document.querySelector('#explore-sort-btn').hidden,
     /* 🔴 '마감 임박' 배지는 여기 없어야 한다 — 우리는 이 글의 마감일을 모른다(원칙 8-1) */
     임박배지: document.querySelectorAll('#live-notices .badge-dday').length,
   }));
-  eq('그 칸에는 등록 공고 카드가 없다', nt.카드, 0);
-  eq('  대신 우리 학교 글이 나온다', nt.공고 > 0, true);
-  /* 🔴 적합도·마감이 없는 목록에 '적합도순'을 띄우면 같은 날 고친 지적을 되풀이하는 것이다 */
-  eq('  정렬 버튼은 감춘다 (걸리지 않는 정렬을 띄우지 않는다)', nt.정렬버튼, false);
+  eq('우리 학교 게시판 글이 교내 칸에 나온다 (칸을 합쳤다)', nt.공고 > 0, true);
+  eq('  등록 공고 자리에 교외가 섞이지 않는다', nt.교외섞임, 0);
+  /* 🔴 감췄던 이유는 그 칸에 게시판 글'만' 있어서였다 — 등록 공고가 함께 있으니 보여야 한다 */
+  eq('  정렬 버튼은 보인다 (등록 공고가 함께 있으므로)', nt.정렬버튼, true);
   eq('  마감일을 모르므로 「마감 임박」이라고 하지 않는다', nt.임박배지, 0);
+  /* 🔴 **'없어요' 라고 적어 놓고 그 아래에 공고를 늘어놓지 않는다** (2026-09-17).
+     교내 등록분이 0건이어도 게시판 글 구역이 제 빈 상태를 말하므로 여기는 비워 둔다.
+     🔴 **등록분을 실제로 0건으로 만들어 재야 한다** — 이 프로필에는 교내 등록 공고가
+        있어서, 그냥 재면 빈 상태가 아예 안 일어나 되돌려도 초록불이 된다(실측으로 걸렸다).
+        그래서 registeredList 에서 교내를 잠시 빼고 그 화면을 잰 뒤 되돌린다. */
+  eq('  등록분이 0건이어도 「없어요」와 공고가 같이 뜨지 않는다', await page.evaluate(() => {
+    const keep = registeredList;
+    registeredList = registeredList.filter((s) => s.type !== '교내');
+    renderExplore();
+    const got = {
+      등록카드: document.querySelectorAll('#explore-list .sch-card').length,
+      /* 🔴 건수를 박지 않는다 — 실시간 공고는 60일이 지나면 지워진다(위 주석 참조).
+         '있다'만 요구하면 심어 둔 한 건이 늘 받쳐 준다. */
+      공고있음: document.querySelectorAll('#live-notices .notice-card').length > 0,
+      없어요: !!document.querySelector('#explore-list .empty'),
+    };
+    registeredList = keep; renderExplore();
+    return got;
+  }), { 등록카드: 0, 공고있음: true, 없어요: false });
   /* 검색창이 떠 있으니 검색은 여기에도 걸려야 한다 */
   await page.fill('#explore-search', 'ㅁㄴㅇㄹ'); await page.waitForTimeout(400);
   eq('  검색이 이 칸에도 걸린다', await page.evaluate(() => ({
@@ -256,8 +284,9 @@ const PROFILE = {
     빈말: !!document.querySelector('#live-notices .empty'),
   })), { 공고: 0, 빈말: true });
   await page.fill('#explore-search', ''); await page.waitForTimeout(300);
-  /* 🔴 도우미·알림이 '전체 보기'라고 적어 놓고 이 칸을 띄우면 카드 0장짜리 화면이 된다
-     (2026-09-12 코드 리뷰가 실측으로 잡았다). 그 길은 exploreShowAll 한 곳을 지난다. */
+  /* 🔴 도우미·알림이 '전체 보기'라고 적어 놓고 걸린 칸을 그대로 두면 약속을 안 지킨다
+     (2026-09-12 코드 리뷰가 '우리 학교' 칸에서 실측으로 잡았다: 카드 0장짜리 화면).
+     그 길은 exploreShowAll 한 곳을 지난다 — 칸을 합친 뒤에도 그대로 필요하다. */
   eq('「전체 보기」로 오면 칸이 전체로 돌아온다', await page.evaluate(() => {
     exploreShowAll();
     return { 칩: (document.querySelector('.filter-chip.active') || {}).dataset.filter,

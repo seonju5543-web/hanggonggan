@@ -20,7 +20,7 @@
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { indexTexts, sourceFor, hasText } from './notice-source.mjs';
-import { attachmentText, readable } from './attachment-text.mjs';
+import { attachmentText, readable, docOrder } from './attachment-text.mjs';
 
 const require = createRequire(import.meta.url);
 const PA = require('../parse-amount.js');
@@ -47,7 +47,7 @@ const idx = indexTexts(texts, browserBodies);
 let eligDocs = {};
 try { eligDocs = JSON.parse(fs.readFileSync(new URL('extracted/elig-docs.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
 function amountFromDocs(it) {
-  for (const f of (eligDocs[it.id] || {}).files || []) {
+  for (const f of docOrder((eligDocs[it.id] || {}).files)) {   // 원문 글자(HWP)가 OCR 보다 먼저
     const t = attachmentText(new URL(`extracted/${f}`, HERE).pathname);
     if (!readable(t)) continue;
     const got = PA.amountFrom(t.split('\n').map((s) => s.trim()).filter(Boolean));

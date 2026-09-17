@@ -212,6 +212,9 @@ function prune() {
   if (!fs.existsSync(FILES_DIR)) return;
   for (const code of fs.readdirSync(FILES_DIR)) {
     if (openCodes.has(code)) continue;
+    /* 재단 폴더만 지운다 — 폴더 옆의 장부(`ocr-ledger.json` · OCR 이 같은 파일을 다시 안 읽게 두는 것)는
+       재단 코드가 아니라서 여기서 매 회차 지워지고 있었다(2026-09-17 코드 리뷰). */
+    if (!fs.statSync(path.join(FILES_DIR, code)).isDirectory()) continue;
     fs.rmSync(path.join(FILES_DIR, code), { recursive: true, force: true });
     const it = byCode.get(code);
     if (it) delete it.mirror;
