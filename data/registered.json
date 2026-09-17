@@ -2787,6 +2787,14 @@
      "name": "본문이미지-552x788.png",
      "url": "https://www.khu.ac.kr/upload/cross/images/000065/20260901161827877_Y0A369DA.png",
      "bodyImage": true
+    },
+    {
+     "name": "붙임1.(공고) 제36기 미래에셋 해외교환 장학생 선발 요강.pdf",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150148/download.do"
+    },
+    {
+     "name": "붙임2.(별첨) 부모 명의 개인정보 제공 및 활용 동의서.pdf",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150149/download.do"
     }
    ],
    "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/265695/artclView.do",
@@ -3335,7 +3343,21 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-09-17 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "(신청서식)2026년 하반기 문주장학재단 주관 장학생 지원서식.hwpx",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=73bc6dbb1e164e7fa26a8cd7a358fc82&fileSn=1&bbsId=BMSR00040"
+    },
+    {
+     "name": "(공고문)2026년 하반기 문주장학재단 주관 AI ICT 장학생 선발 공고문.pdf",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=73bc6dbb1e164e7fa26a8cd7a358fc82&fileSn=2&bbsId=BMSR00040"
+    },
+    {
+     "name": "본문이미지-465x656.png",
+     "url": "https://www.khu.ac.kr/upload/cross/images/000066/20260917144325597_G8VUNIED.png",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323111",
    "sourceKind": "auto"
   }
