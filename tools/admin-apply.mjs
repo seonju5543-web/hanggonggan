@@ -18,7 +18,7 @@ import { createRequire } from 'node:module';
 import * as canon from '../collector/canon-url.mjs';
 import { indexTexts, sourceFor, hasText } from '../collector/notice-source.mjs';
 import { attachmentText, readable } from '../collector/attachment-text.mjs';
-import { periodAfterDeadline } from './edit-diff.mjs';
+import { periodAfterDeadline, amountAfterValue } from './edit-diff.mjs';
 
 /* 저장소 뿌리. 데이터 파일은 지금까지처럼 **작업 폴더 기준**으로 읽고 쓰지만(워크플로가
    저장소 안에서 돈다), 아래 '저장된 공고 원문'은 이 파일 기준으로 읽는다 — 검사도 같은 원문을
@@ -620,6 +620,27 @@ switch (action) {
       }
       /* 발표일도 같은 규칙 — 로봇(fillCalendarDates)이 이 표식을 본다 */
       if (changed.includes('announceDate')) it.announceDateFrom = it.announceDate ? OWNER : `${OWNER} · 비움`;
+      /* 금액도 같은 규칙 (2026-09-17 · F-9 컨펌 2 · 개발자 결정 '나' — 관리자가 손으로 채운다).
+         🔴 **문구를 같이 고치지 않으면 감사가 이 묶음을 통째로 되돌린다** — entry-rules 는
+            `amountValue > 0` 인데 문구에 숫자가 없으면 오류로 잡는다(카드는 '금액 원문 확인',
+            합계는 500만원이라고 서로 다른 말을 하기 때문이다). 규칙은 화면의 전후 대조와
+            **같은 함수**(edit-diff amountAfterValue)를 쓴다 — 갈라지면 미리보기가 거짓말을 한다.
+         🔴 표식이 없으면 로봇(extract-amounts)이 **다음 날 아침에 덮는다**. 비울 때도 남긴다 —
+            사람이 지운 틀린 금액을 로봇이 같은 줄에서 다시 읽어 되채우기 때문이다(마감일과 같다). */
+      if (changed.includes('amountValue')) {
+        it.amountFrom = Number(it.amountValue) > 0 ? OWNER : `${OWNER} · 비움`;
+        /* 🔴 **비울 때는 로봇이 읽어 둔 금액 구조(amountSpec)도 함께 지운다.** 안 지우면
+           지운 티가 하나도 안 난다 — 합계를 내는 `amountWon` 은 amountSpec 을 **먼저** 보고
+           amountValue 는 그것이 없을 때만 본다. 사람이 '이 금액은 틀렸다' 고 지웠는데
+           학생 화면에는 그대로 250만원이 떠 있는 것이다(받을 수 없는 숫자를 보여 주는 일).
+           ⚠️ 카드 문구(amount)는 건드리지 않는다 — 무엇으로 되돌릴지 우리가 모른다.
+              같은 수정 시트의 '금액 문구' 칸에서 사람이 고친다. */
+        if (!(Number(it.amountValue) > 0) && it.amountSpec) { delete it.amountSpec; changed.push('amountSpec'); }
+        if (!('amount' in (patch || {}))) {
+          const after = amountAfterValue(it.amount, it.amountValue);
+          if (after !== (it.amount || '')) { it.amount = after; if (!changed.includes('amount')) changed.push('amount'); }
+        }
+      }
       return changed;
     };
 

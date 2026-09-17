@@ -20,6 +20,10 @@
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { indexTexts, sourceFor, hasText } from './notice-source.mjs';
+/* 🔴 금액 문구(`500만원`)를 만드는 규칙은 **한 곳**이다 — 관리자 화면이 손으로 금액을 적을
+   때도 같은 문구가 붙어야 한다(2026-09-17 · F-9 컨펌 2). 여기에 다시 적으면 로봇이 쓴 카드와
+   사람이 쓴 카드가 다른 꼴로 뜬다. */
+import { amountText } from '../tools/edit-diff.mjs';
 
 const require = createRequire(import.meta.url);
 const PA = require('../parse-amount.js');
@@ -138,13 +142,6 @@ for (const [key, group] of byFoundation) {
 /* ── 보고 ─────────────────────────────────────────────────── */
 const man = (n) => (n ? (n / 10000).toLocaleString('ko-KR') + '만원' : '-');
 
-/* 카드에 뜰 금액 문구. 만원으로 딱 떨어지면 `500만원`, 아니면 `1,234,000원`. */
-const wonText = (n) => (n % 10000 === 0
-  ? (n / 10000).toLocaleString('ko-KR') + '만원'
-  : n.toLocaleString('ko-KR') + '원');
-const amountText = (a) => (a.kind === 'range'
-  ? `${wonText(a.min)} ~ ${wonText(a.max)}`
-  : wonText(a.value));
 console.log(`\n■ 금액 읽기 — 등록 ${items.length}건 (원문 있음 ${read} · 없음 ${noText}${fromAi ? ` · 그중 첨부를 읽어 건진 것 ${fromAi}건` : ''})`);
 console.log(`   절대액 ${stat.fixed + stat.range}건 · 등록금 비율 ${stat.ratio}건 · 시급 ${stat.hourly}건 · 미확인 ${stat.unknown}건`);
 console.log(`\n■ 이중수혜`);
@@ -185,7 +182,16 @@ for (const it of items) {
        처음에 `amount` 에 객체를 넣었다가 entry-rules.cjs 의 `it.amount.slice()` 가 죽어
        감사가 통째로 멈췄다. 앱·챗봇·알림도 전부 문자열로 읽는다. */
     /* 사람이 넣은 금액이면 손대지 않는다 (표식이 없고 값이 이미 있는 경우) */
-    const humanAmount = !it.amountFrom && (it.amountSpec || Number(it.amountValue) > 0);
+    /* 🔴 **주인은 '표식이 있나' 가 아니라 '누구 표식인가' 로 가른다** (2026-09-17 · F-9 컨펌 2).
+       옛 판은 `!it.amountFrom` — 표식이 **없는** 값을 사람 값으로 봤다. 그런데 관리자 화면이
+       금액을 적기 시작하면 `관리자 <날짜>` 표식이 붙고, 그 표식 때문에 '로봇 것' 으로 읽혀
+       **다음 날 아침에 조용히 덮인다.** 이중수혜(아래 humanExcl)에서 2026-09-14 에 똑같이
+       겪은 자리다 — 표식이 지키는 게 아니라 표식 때문에 지워지던 것이다.
+       🔴 `· 비움` 은 사람이 **틀린 금액을 지운** 조치다 — 값이 비어 있다고 로봇에게 돌려주면
+          다음 실행이 같은 줄을 다시 읽어 같은 틀린 금액을 되채운다(마감일에서 겪었다). */
+    const amountCleared = /^관리자 .*· 비움$/.test(it.amountFrom || '');
+    const humanAmount = amountCleared
+      || (it.amountFrom !== OWN_AMOUNT && (it.amountSpec || Number(it.amountValue) > 0));
     if (humanAmount) keptHuman += 1;
     else if (a.kind === 'unknown') { delete it.amountSpec; delete it.amountFrom; }
     else { it.amountSpec = a; it.amountFrom = OWN_AMOUNT; wrote++; }

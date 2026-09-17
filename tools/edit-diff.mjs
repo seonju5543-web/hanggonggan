@@ -243,6 +243,33 @@ export function periodAfterDeadline(period, deadline, oldDeadline) {
   return p;
 }
 
+/** 금액 숫자 → 카드에 뜰 문구. 만원으로 딱 떨어지면 `500만원`, 아니면 `1,234,000원`.
+ *  🔴 원본은 여기 하나다 — 로봇(collector/extract-amounts.mjs)·저장소(admin-apply)·화면이
+ *     전부 이걸 부른다. 베끼면 로봇이 적는 문구와 사람이 적을 때 붙는 문구가 갈라진다. */
+export function wonText(n) {
+  const v = Number(n) || 0;
+  return v % 10000 === 0
+    ? `${(v / 10000).toLocaleString('ko-KR')}만원`
+    : `${v.toLocaleString('ko-KR')}원`;
+}
+export function amountText(a) {
+  return a && a.kind === 'range' ? `${wonText(a.min)} ~ ${wonText(a.max)}` : wonText(a && a.value);
+}
+
+/** 금액 숫자가 바뀌면 카드 문구(amount)가 따라 바뀐다 (2026-09-17 · F-9 컨펌 2 · 개발자 결정 '나').
+ *  🔴 **숫자만 넣으면 감사가 막는다** — `verify/entry-rules.cjs` 는 `amountValue > 0` 인데
+ *     문구에 숫자가 없으면 **오류**로 잡는다(카드는 '금액 원문 확인', 합계는 500만원이라고
+ *     서로 다른 말을 하기 때문이다). 그래서 문구를 같이 고치는 것이 이 함수다.
+ *  규칙은 로봇(extract-amounts)과 같다: **이미 숫자가 든 문구는 건드리지 않는다**
+ *  (`등록금 + 영농정착 지원` 처럼 사람이 다듬은 뜻을 맨 숫자로 덮지 않는다).
+ *  숫자를 비우는 조치는 문구를 건드리지 않는다 — 무엇으로 되돌릴지 우리가 모른다. */
+export function amountAfterValue(amount, won) {
+  const cur = String(amount || '');
+  if (!(Number(won) > 0)) return cur;
+  if (/\d/.test(cur)) return cur;
+  return wonText(won);
+}
+
 /**
  * 한 건의 patch 가 실제로 바꾸는 칸만 고른다.
  * @returns {{key:string,label:string,before:*,after:*,block:(string|null)}[]}
@@ -280,6 +307,13 @@ export function diffPatch(item, patch) {
   if (dl && !('period' in (patch || {}))) {
     const after = periodAfterDeadline(it.period, dl.after, it.deadline);
     if (after !== (it.period || '')) rows.push({ key: 'period', label: EDIT_LABEL.period, before: it.period, after, block: null });
+  }
+  /* 금액 숫자가 들어오면 카드 문구(amount)도 따라 바뀐다 — 사람이 문구를 직접 적었으면 그쪽이 이긴다.
+     🔴 이 줄이 없으면 미리보기가 '금액 숫자' 한 칸만 예고하는데 저장소는 문구까지 고친다. */
+  const av = rows.find((r) => r.key === 'amountValue' && !r.block);
+  if (av && !('amount' in (patch || {}))) {
+    const after = amountAfterValue(it.amount, av.after);
+    if (after !== (it.amount || '')) rows.push({ key: 'amount', label: EDIT_LABEL.amount, before: it.amount, after, block: null });
   }
   return rows;
 }

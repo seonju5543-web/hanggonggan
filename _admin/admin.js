@@ -20,7 +20,7 @@ import { makeStripper } from './vendor/page-boilerplate.mjs';
 /* 관리자 수정 한 건이 '무엇을 바꾸는가' 를 정하는 규칙 — 🔴 베끼지 않는다.
    저장소(tools/admin-apply.mjs)가 실제로 넣는 값과 **같은 파일**로 계산해야
    '반영 전 전후 대조' 가 거짓말을 하지 않는다(화면은 '1,2' 를 보내고 저장소는 [1,2] 로 넣는다). */
-import { diffPatch, showValue } from './vendor/edit-diff.mjs';
+import { diffPatch, showValue, wonText } from './vendor/edit-diff.mjs';
 
 /* ---------------- 설정 ---------------- */
 const OWNER = 'seonju5543-web';
@@ -707,6 +707,8 @@ function renderTodo() {
 
     ${deadlineFillHtml()}
 
+    ${amountFillHtml()}
+
     <!-- 공고 원문을 열어 봐야 아는 것 — 펼칠 때만 800KB 원문을 받는다 -->
     <details id="todo-src-scan" data-src-scan${scanWasOpen ? ' open' : ''}>
       <summary>공고 원문을 열어 봐야 아는 것 — 자격 미확보 ${noEligItems().length}건 ·
@@ -728,6 +730,7 @@ function renderTodo() {
     renderTodo();
   });
   bindDeadlineFill();
+  bindAmountFill();
   const det = byId('todo-src-scan');
   if (det) {
     det.addEventListener('toggle', () => { if (det.open) openSrcScan(); });
@@ -750,17 +753,31 @@ function noDeadlineItems() {
 }
 
 const IMG_ATT = /\.(png|jpe?g|webp|gif)(\?|$)/i;
+/** 원문·첨부를 여는 줄 — 마감 적기와 금액 적기가 **같은 것**을 쓴다.
+ *  첨부가 그림(포스터·스캔)이면 그렇다고 적는다: 로봇이 글자를 못 뽑은 이유가 대개 그것이라,
+ *  사람이 눈으로 읽어야 한다는 뜻이 된다. */
+function fillSourceBtns(it) {
+  const src = safeUrl(it.sourceUrl);
+  const atts = (it.attachments || []).map((a) => {
+    const u = safeUrl(a.url);
+    if (!u) return '';
+    const img = IMG_ATT.test(a.name || '') || IMG_ATT.test(a.url || '');
+    return `<a href="${esc(u)}" target="_blank" rel="noreferrer noopener">${esc((a.name || '첨부').slice(0, 24))}${img ? ' (그림)' : ''} ↗</a>`;
+  }).filter(Boolean).join(' ');
+  return `
+        <div class="btn-row" style="margin-top:var(--space-4)">
+          ${src
+    ? (/#n-/.test(it.sourceUrl || '')
+      ? `<a class="btn btn-sm" href="${esc(src)}" target="_blank" rel="noreferrer noopener">게시판 목록 열기 ↗</a><span class="muted">찾을 제목: ${esc(it.boardTitle || it.name || '')}</span>`
+      : `<a class="btn btn-sm" href="${esc(src)}" target="_blank" rel="noreferrer noopener">원문 공고 열기 ↗</a>`)
+    : '<span class="muted">원문 주소 없음</span>'}
+          ${atts ? `<span class="muted">${atts}</span>` : ''}
+        </div>`;
+}
 /** 한 줄 — 적어 두기 뒤에는 **이 줄만** 다시 그린다(다른 줄에 치던 날짜를 잃지 않게 · 코드 리뷰). */
 function deadlineFillRow(it) {
     const staged = (PENDING_EDITS.get(it.id) || {}).deadline || '';
     const n = D.notices.find((x) => x.url === it.sourceUrl);
-    const src = safeUrl(it.sourceUrl);
-    const atts = (it.attachments || []).map((a) => {
-      const u = safeUrl(a.url);
-      if (!u) return '';
-      const img = IMG_ATT.test(a.name || '') || IMG_ATT.test(a.url || '');
-      return `<a href="${esc(u)}" target="_blank" rel="noreferrer noopener">${esc((a.name || '첨부').slice(0, 24))}${img ? ' (그림)' : ''} ↗</a>`;
-    }).filter(Boolean).join(' ');
     const cleared = /^관리자 .*· 비움$/.test(it.deadlineFrom || '');
     return `
     <div class="row" data-row data-noclick data-dl-row="${esc(it.id)}" style="cursor:default">
@@ -770,14 +787,7 @@ function deadlineFillRow(it) {
         ${it.period ? `<div class="scope-count">원문 기간 문구: ${esc(it.period)}</div>` : ''}
         ${n && n.deadlineHint ? `<div class="scope-count">게시판 기한 단서: ${esc(String(n.deadlineHint).slice(0, 80))}</div>` : ''}
         ${cleared ? `<div class="scope-count">사람이 비운 마감입니다 (${esc(it.deadlineFrom)}) — 로봇은 다시 채우지 않습니다</div>` : ''}
-        <div class="btn-row" style="margin-top:var(--space-4)">
-          ${src
-            ? (/#n-/.test(it.sourceUrl || '')
-              ? `<a class="btn btn-sm" href="${esc(src)}" target="_blank" rel="noreferrer noopener">게시판 목록 열기 ↗</a><span class="muted">찾을 제목: ${esc(it.boardTitle || it.name || '')}</span>`
-              : `<a class="btn btn-sm" href="${esc(src)}" target="_blank" rel="noreferrer noopener">원문 공고 열기 ↗</a>`)
-            : '<span class="muted">원문 주소 없음</span>'}
-          ${atts ? `<span class="muted">${atts}</span>` : ''}
-        </div>
+        ${fillSourceBtns(it)}
       </div>
       <div><div class="key-exp">
         <input type="date" data-dl-input="${esc(it.id)}" value="${esc(staged)}" aria-label="${esc(it.name || it.id)} 마감일" />
@@ -824,6 +834,104 @@ function bindDeadlineFill(root = byId('screen-todo')) {
       tmp.innerHTML = deadlineFillRow(it);
       const fresh = tmp.firstElementChild;
       if (fresh) { line.replaceWith(fresh); bindDeadlineFill(fresh); }
+    }
+  }));
+}
+
+/* ============================================================
+   금액을 로봇이 못 읽은 공고 — 사람이 적는다 (2026-09-17 · F-9 컨펌 2 · 개발자 결정 '나')
+   ------------------------------------------------------------
+   로봇(collector/extract-amounts.mjs)이 매 수집 때 원문에서 금액을 읽지만, 포스터 그림·
+   스캔 PDF·'별도 안내' 인 공고는 끝내 못 읽는다. 개발자가 "관리자 화면에서 손으로 채운다"로
+   정했다(다른 안이던 '본문 재수집 로봇'은 고르지 않았다).
+   🔴 **화면은 금액을 짐작하지 않는다** — 원문·첨부만 나란히 두고 사람이 읽고 적는다(원칙 8-1).
+   🔴 **숫자만 적으면 감사가 막는다** — 카드 문구(`금액 원문 확인`)가 그대로면 카드와 합계가
+      서로 다른 말을 한다. 문구는 저장 때 `edit-diff amountAfterValue` 가 같이 고치고,
+      아래 '한꺼번에 반영' 의 전후 대조에도 **그 칸이 함께 뜬다**(같은 함수를 쓴다).
+   ⚠️ 등록금 비율형(`수업료 100%`)·시급형은 숫자 한 칸으로 표현되지 않는다 — 여기서 적지 말고
+      비워 둔다. 0원인 채로 두는 것이 지어낸 숫자보다 낫다.
+   ============================================================ */
+
+/** 금액을 모르는 공고 — **학생이 지금 보는 것만**. 마감이 지난 공고는 학생 화면에 없으므로
+ *  여기 올리면 할 일이 아니라 잡음이 된다(마감 목록과 달리 마감일로 가를 수 있다). */
+function noAmountItems() {
+  return D.reg.filter((it) => !(Number(it.amountValue) > 0) && !it.amountSpec
+    && (dday(it.deadline) == null || dday(it.deadline) >= 0));
+}
+
+/** 만원 → 원. 사람은 공고를 '300만원' 으로 읽지 '3,000,000원' 으로 읽지 않는다. */
+const MAN = 10000;
+/** 🔴 자릿수 실수를 여기서 막는다 — 만원 칸에 `3000000` 을 치면 300억이 된다.
+ *  위쪽은 1억(10,000만원), 아래쪽은 1만원. 벗어나면 적지 않고 말해 준다. */
+const MAN_MAX = 10000;
+function manToWon(v) {
+  const n = Number(String(v).replace(/,/g, '').trim());
+  if (!isFinite(n) || n <= 0 || n > MAN_MAX) return 0;
+  return Math.round(n * MAN);
+}
+
+/** 한 줄 — 적어 두기 뒤에는 **이 줄만** 다시 그린다(다른 줄에 치던 숫자를 잃지 않게). */
+function amountFillRow(it) {
+  const staged = Number((PENDING_EDITS.get(it.id) || {}).amountValue) || 0;
+  const cleared = /^관리자 .*· 비움$/.test(it.amountFrom || '');
+  return `
+    <div class="row" data-row data-noclick data-am-row="${esc(it.id)}" style="cursor:default">
+      <div>
+        <div class="t" data-row-title>${esc(it.name || it.id)}</div>
+        <div class="m"><span class="mono">${esc(it.id)}</span><span>${esc(schoolOf(it))}</span><span>${esc(it.type || '')}</span></div>
+        <div class="scope-count">지금 카드에 뜨는 문구: ${esc(it.amount || '(없음)')}</div>
+        ${cleared ? `<div class="scope-count">사람이 비운 금액입니다 (${esc(it.amountFrom)}) — 로봇은 다시 채우지 않습니다</div>` : ''}
+        ${fillSourceBtns(it)}
+      </div>
+      <div><div class="key-exp">
+        <input type="number" inputmode="decimal" min="0" max="${MAN_MAX}" step="any"
+          data-am-input="${esc(it.id)}" value="${staged ? esc(String(staged / MAN)) : ''}"
+          aria-label="${esc(it.name || it.id)} 금액 (만원)" /><span class="muted">만원</span>
+        <button class="btn btn-sm${staged ? '' : ' btn-primary'}" data-am-save="${esc(it.id)}">${staged ? '고치기' : '적어 두기'}</button>
+      </div></div>
+      <div>${staged ? `<span class="pill good">모아 둠 · ${esc(wonText(staged))}</span>` : '<span class="dd none">금액 미확인</span>'}</div>
+    </div>`;
+}
+function amountFillHtml() {
+  const items = noAmountItems();
+  if (!items.length) return '';
+  return `
+    <div class="sec-head" style="margin-top:var(--space-8)">
+      <h2>금액을 로봇이 못 읽은 공고 ${items.length}건 — 사람이 적는 자리</h2>
+      <p data-am-note><b>화면은 금액을 짐작하지 않습니다.</b> 원문과 첨부(포스터 그림)를 열어 1인당 지급액을
+        <b>만원 단위</b>로 적으면, 카드 문구도 같이 바뀌고 '받을 수 있는 금액' 합계에 들어갑니다.
+        <b>등록금 전액·수업료 %·시급</b>처럼 숫자 한 칸으로 표현되지 않는 공고는 비워 두세요 —
+        0원인 채로 두는 편이 지어낸 숫자보다 낫습니다. 적어 두기 → 위 '한꺼번에 반영'으로 저장됩니다.</p>
+    </div>
+    <div class="pgroup" data-amount-fill>
+      <div class="rows" data-rows>${items.map(amountFillRow).join('')}</div>
+    </div>`;
+}
+
+/** 적어 두기 — 장부(PENDING_EDITS)에 덮어쓰기 병합. 저장소에는 '한꺼번에 반영'이 보낸다. */
+function stageAmount(id, won) {
+  PENDING_EDITS.set(id, { ...(PENDING_EDITS.get(id) || {}), amountValue: won });
+  renderPendingBar();
+}
+
+/** 줄마다 '적어 두기' 버튼. 🔴 구획 전체가 아니라 **그 줄만** 다시 그린다(마감 쪽과 같은 이유 —
+ *  다시 그리면 다른 줄에 쳐 두고 아직 안 누른 숫자가 사라진다). */
+function bindAmountFill(root = byId('screen-todo')) {
+  $$('[data-am-save]', root).forEach((b) => b.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const id = b.dataset.amSave;
+    const line = byId('screen-todo').querySelector(`[data-am-row="${CSS.escape(id)}"]`);
+    const inp = line && line.querySelector('[data-am-input]');
+    const won = manToWon((inp && inp.value) || '');
+    if (!won) { toast(`금액을 만원 단위 숫자로 적어 주세요 (1 ~ ${MAN_MAX.toLocaleString('ko-KR')}만원)`); return; }
+    stageAmount(id, won);
+    toast(`${wonText(won)} 로 모아 뒀습니다 — '한꺼번에 반영' 을 누르면 저장됩니다`);
+    const it = D.reg.find((x) => x.id === id);
+    if (line && it) {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = amountFillRow(it);
+      const fresh = tmp.firstElementChild;
+      if (fresh) { line.replaceWith(fresh); bindAmountFill(fresh); }
     }
   }));
 }
@@ -2732,7 +2840,7 @@ function renderQuality(target) {
   const errors = withProb.filter((x) => x.ps.some((p) => p.level === 'error'));
   const warns = withProb.filter((x) => !x.ps.some((p) => p.level === 'error'));
   const dead = deadLinks();
-  const noAmount = D.reg.filter((it) => !it.amountValue).length;
+  const noAmount = noAmountItems().length;   // 「할 일」 구획과 같은 셈 (마감 지난 공고는 학생 화면에 없다)
   const noDeadline = noDeadlineItems().length;   // 「할 일」 구획과 같은 셈 — 카드 숫자와 줄 수가 갈라지지 않게
   const noForm = D.reg.filter((it) => typeof hasFormAttachment === 'function'
     && hasFormAttachment(it) && !it.formId).length;
@@ -2769,7 +2877,7 @@ function renderQuality(target) {
     ${statCardsHtml([
     { n: errors.length, tone: 'is-bad', k: '규칙 위반 (오류)', d: '앱1에 잘못 나갈 수 있는 항목' },
     { n: warns.length, tone: 'is-warn', k: '규칙 경고', d: '손봐야 하지만 치명적이지는 않음' },
-    { n: noAmount, tone: 'is-warn', k: '금액 미확인', d: '학생이 얼마인지 모르는 공고' },
+    { n: noAmount, tone: 'is-warn', k: '금액 미확인', d: '학생이 얼마인지 모르는 공고 — 「할 일」 위쪽 「금액을 로봇이 못 읽은 공고」에서 금액을 적을 수 있습니다' },
     { n: noDeadline, tone: 'is-warn', k: '마감일 없음', d: '언제까지인지 모르는 공고 — 「할 일」 위쪽 「마감을 로봇이 못 읽은 공고」에서 날짜를 적을 수 있습니다' },
     { n: noForm, tone: 'is-warn', k: '신청서 첨부는 있는데 양식 미등록', d: '앱에서 작성하게 만들 수 있는 후보' },
     { n: noElig, tone: 'is-warn', k: '지원 자격 미확보',
