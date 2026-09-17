@@ -3011,7 +3011,7 @@
    "lastWhy": ""
   },
   "r:auto-tentsno1menuid100siteno2": {
-   "patrolledAt": "2026-09-16",
+   "patrolledAt": "2026-09-17",
    "lastWhy": ""
   },
   "r:auto-tentsno5menuid100siteno2": {
@@ -3709,7 +3709,7 @@
    "lastWhy": ""
   },
   "n:https://dep.hufs.ac.kr/bbs/student/2431/264156/artclView.do": {
-   "patrolledAt": "2026-09-16",
+   "patrolledAt": "2026-09-17",
    "lastWhy": ""
   },
   "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322953": {
@@ -3737,15 +3737,15 @@
    "lastWhy": ""
   },
   "n:https://dep.hufs.ac.kr/bbs/student/2431/264146/artclView.do": {
-   "patrolledAt": "2026-09-16",
+   "patrolledAt": "2026-09-17",
    "lastWhy": ""
   },
   "n:https://dep.hufs.ac.kr/bbs/student/2431/263952/artclView.do": {
-   "patrolledAt": "2026-09-16",
+   "patrolledAt": "2026-09-17",
    "lastWhy": ""
   },
   "n:https://dep.hufs.ac.kr/bbs/student/2431/263956/artclView.do": {
-   "patrolledAt": "2026-09-16",
+   "patrolledAt": "2026-09-17",
    "lastWhy": ""
   },
   "r:reg-hufs-yuheungsu": {
@@ -3789,27 +3789,27 @@
    "likelyGone": true
   },
   "r:reg-kosaf-daecheonggyo": {
-   "patrolledAt": "2026-09-16",
+   "patrolledAt": "2026-09-17",
    "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)"
   },
   "r:reg-hufs-alumni": {
-   "patrolledAt": "2026-09-16",
+   "patrolledAt": "2026-09-17",
    "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)"
   },
   "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322894": {
-   "patrolledAt": "2026-09-16",
+   "patrolledAt": "2026-09-17",
    "lastWhy": ""
   },
   "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322893": {
-   "patrolledAt": "2026-09-16",
+   "patrolledAt": "2026-09-17",
    "lastWhy": ""
   },
   "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322875": {
-   "patrolledAt": "2026-09-16",
+   "patrolledAt": "2026-09-17",
    "lastWhy": ""
   },
   "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322874": {
-   "patrolledAt": "2026-09-16",
+   "patrolledAt": "2026-09-17",
    "lastWhy": ""
   },
   "r:reg-khu-uiam": {
@@ -3843,35 +3843,35 @@
    "likelyGone": true
   },
   "r:reg-hi-jeju": {
-   "patrolledAt": "2026-09-16",
+   "patrolledAt": "2026-09-17",
    "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)"
   },
   "r:auto-rnoticedoarticleno154473": {
-   "patrolledAt": "2026-09-16",
-   "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)"
+   "patrolledAt": "2026-09-17",
+   "lastWhy": ""
   },
   "r:reg-sejong-didim": {
-   "patrolledAt": "2026-09-16",
+   "patrolledAt": "2026-09-17",
    "lastWhy": "제목 불일치(다른 글이 열림)"
   },
   "r:reg-posco-vision": {
-   "patrolledAt": "2026-09-16",
+   "patrolledAt": "2026-09-17",
    "lastWhy": "제목 불일치(다른 글이 열림)"
   },
   "r:auto-kolifenoticejspduid52964": {
-   "patrolledAt": "2026-09-16",
+   "patrolledAt": "2026-09-17",
    "lastWhy": ""
   },
   "r:auto-ent2431260146artclviewdo": {
-   "patrolledAt": "2026-09-16",
+   "patrolledAt": "2026-09-17",
    "lastWhy": ""
   },
   "r:auto-ent2431260214artclviewdo": {
-   "patrolledAt": "2026-09-16",
+   "patrolledAt": "2026-09-17",
    "lastWhy": ""
   },
   "r:auto-ent2431260269artclviewdo": {
-   "patrolledAt": "2026-09-16",
+   "patrolledAt": "2026-09-17",
    "lastWhy": ""
   },
   "r:reg-hufs-namgaju": {
@@ -4206,6 +4206,10 @@
    "patrolledAt": "2026-09-17"
   },
   "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323098": {
+   "patrolledAt": "2026-09-17",
+   "lastWhy": ""
+  },
+  "n:https://dep.hufs.ac.kr/bbs/student/2431/267001/artclView.do": {
    "patrolledAt": "2026-09-17",
    "lastWhy": ""
   }
