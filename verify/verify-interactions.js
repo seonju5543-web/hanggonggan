@@ -216,16 +216,23 @@ async function seed(page) {
   ok('받아오기가 끝나면 뼈대가 걷힌다', !skel.after.skeleton);
   ok('빈손으로 끝났으면 "없음" 이 맞는 답이다 (뼈대가 굳지 않는다)', skel.after.empty);
 
-  /* 🔴 못 받아 와도 뼈대가 굳으면 안 된다 — loadNotices 가 실패해도 빈 문서를 넣는지 본다 */
+  /* 🔴 못 받아 와도 뼈대가 굳으면 안 된다 — loadNotices 가 실패해도 빈 문서를 넣는지 본다.
+     🔴 **여기서도 칸을 '교내'로 두어야 한다** (2026-09-17 코드 리뷰가 잡았다).
+        위 블록이 끝에서 `exploreFilter = 'all'` 로 되돌리는데, 칸을 합친 뒤로는
+        '교내' 밖에서 `#live-notices` 가 **늘 빈칸**이라 `.skel-list` 가 있을 수 없다 —
+        그러면 이 검사는 `loadNotices` 를 되돌려도 통과하는 **무력한 관문**이 된다
+        (실측으로 확인: 옛 `liveNotices = d;` 로 되돌려도 초록불이었다). */
   const failClears = await page.evaluate(async () => {
     const keep = liveNotices;
+    const keepFilter = exploreFilter;
+    exploreFilter = '교내';
     liveNotices = null;
     const realFetch = window.fetch;
     window.fetch = () => Promise.reject(new Error('오프라인 흉내'));
     await loadNotices();
     window.fetch = realFetch;
     const stuck = !!document.querySelector('#live-notices .skel-list');
-    liveNotices = keep; renderExplore();
+    liveNotices = keep; exploreFilter = keepFilter; renderExplore();
     return stuck;
   });
   ok('받아오기가 실패해도 뼈대가 굳지 않는다', failClears === false);

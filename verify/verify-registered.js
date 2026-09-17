@@ -140,6 +140,28 @@ async function driveOneForm(page, id) {
   // 마감이 한참 지난 공고는 목록에서 지워지므로(2026-08-02 마감 36건 정리 때 실제로 사라졌다)
   // 카드가 없으면 이 구간을 통째로 건너뛰고 마감 전 양식 공고로 같은 경로를 구동한다.
   // 검증 대상을 코드에 박아 두면 데이터가 정리될 때마다 검사가 깨진다 — README의 규칙과 같은 이유다.
+  /* 실시간 피드에서 등록 공고 중복 제거 확인.
+     🔴 **아래 조병두 분기보다 위에 둔다** (2026-09-17 코드 리뷰). 예전에는 파일 맨 끝에
+        있었는데, 조병두가 마감돼 목록에서 내려간 뒤로 그 분기가 `process.exit` 로 먼저
+        끝나서 이 검사가 **한 번도 실행되지 않았다**(오늘 실측: 한 줄도 안 찍혔다).
+     🔴 **'교내' 칸으로 옮겨야 피드가 보인다.** 실시간 공고는 '우리 학교' 칸(2026-09-12)을
+        거쳐 이제 '교내' 칸에서만 그려진다 — 칸을 안 옮기면 `#live-notices` 가 늘 빈칸이라
+        이 줄이 **무엇을 재든 '제거됨 OK'** 라고 답한다(중복이 돌아와도 초록불). */
+  {
+    const backFilter = await page.evaluate(() => {
+      const on = document.querySelector('#explore-filters .filter-chip.active');
+      return on ? on.dataset.filter : 'all';
+    });
+    await page.click('.filter-chip[data-filter="교내"]').catch(() => {});
+    await page.waitForTimeout(600);
+    const feed = await page.$$eval('#live-notices .notice-card .sch-name', (els) => els.map((e) => e.textContent)).catch(() => []);
+    if (!feed.length) console.log('🚨 피드가 비어 있어 중복 판정을 못 했습니다 (칸을 못 열었거나 수집분이 0건)');
+    console.log('피드 항목:', feed.length, '| 조병두 중복:', feed.some((f) => f.includes('조병두')) ? 'DUP!' : '제거됨 OK');
+    /* 🔴 고른 칸을 되돌린다 — 아래 검사들이 '전체' 목록에서 카드를 찾는다 */
+    await page.click(`.filter-chip[data-filter="${backFilter}"]`).catch(() => {});
+    await page.waitForTimeout(400);
+  }
+
   if (!(await page.$('#explore-list [data-detail="reg-skku-jobyungdu"]'))) {
     console.log('조병두 구간 건너뜀 — 마감돼 목록에서 내려간 공고입니다. 마감 전 양식 공고로 대체 구동합니다.');
     const drove = await driveAnyLiveForm(page);
@@ -196,12 +218,6 @@ async function driveOneForm(page, id) {
   console.log('별첨 확인서 포함:', doc.includes('타장학금 수혜 여부 확인서'));
   await page.screenshot({ path: SHOT('33-jobyungdu-doc'), fullPage: false });
   }
-
-  // 실시간 피드에서 등록 공고 중복 제거 확인
-  await page.keyboard.press('Escape');
-  await page.waitForTimeout(400);
-  const feed = await page.$$eval('#live-notices .notice-card .sch-name', (els) => els.map((e) => e.textContent)).catch(() => []);
-  console.log('피드 항목:', feed.length, '| 조병두 중복:', feed.some((f) => f.includes('조병두')) ? 'DUP!' : '제거됨 OK');
 
   console.log('ERRORS:', errors.length ? errors.join(' ; ') : 'none');
   await browser.close();
