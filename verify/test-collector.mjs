@@ -3096,6 +3096,71 @@ console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08
     ['기초생활수급자', '평점 3 이상', '소득 8구간 이하', '2·3학년']);
   eq('자격을 모르면 지어내지 않는다', bulkTags({ eligibility: {} }), ['자격 원문 확인']);
   eq('자격 칸이 아예 없어도 지어내지 않는다', bulkTags({}), ['자격 원문 확인']);
+
+  /* ── 🔴 홈 차례 — 적합도와 마감일을 한 점수로 (2026-09-17 개발자 지시) ──
+     "홈화면 장학금 적합도순으로 된것같은데 제목은 마감임박이야. 마감임박이라는 수치를 지우고
+      앞으로 홈화면에는 적합도와 마감일을 모두 고려하여 내림차순으로 공고를 정렬하고 싶어."
+     옛 규칙은 '마감 7일 안쪽인가'가 **1차 키**라 그 안쪽이면 적합도 15% 도 바깥의 50% 위였고,
+     칸 이름('마감 임박')과 안쪽 차례(적합도순)가 서로 다른 말을 했다.
+     이 절이 지키는 것은 **규칙의 뜻**이다 — 그린 차례가 앱 규칙과 같은지는
+     verify-explore-sort 가 본다(그쪽은 앱의 비교 함수를 그대로 불러 대조한다).
+     같은 블록에 두는 이유: 위의 grab·appSrc 를 그대로 쓴다(사본을 만들면 갈라진다). */
+  console.log('■ 홈 차례 — 적합도와 마감일을 한 점수로 (2026-09-17 개발자 지시)');
+
+  eq('마감 7일 문턱으로 줄을 가르지 않는다 (urgentRank 가 없다)', /urgentRank/.test(appSrc), false);
+  eq('홈 목록이 비교 함수 하나로 정렬한다', appSrc.includes('.sort(byHomeOrder)'), true);
+  {
+    const i = appSrc.indexOf('const byHomeOrder');
+    const src = i < 0 ? '' : appSrc.slice(i, appSrc.indexOf(';', i) + 1);
+    /* 🔴 미달·자격 미확인이 점수 위로 올라오면 '마감이 가까운 지원 자격 미달' 카드가
+       홈 맨 위에 앉는다 — 적합도를 고려한다면서 미달을 맨 위에 두는 셈이다. */
+    eq('미달·자격 미확인은 점수와 무관하게 아래다 (fitRank 가 1차 키)',
+      src.includes('fitRank(a) - fitRank(b)'), true);
+    eq('  그 다음이 적합도+마감 한 점수다', src.includes('homeScore(b) - homeScore(a)'), true);
+  }
+
+  /* 규칙을 베끼지 않는다 — app.js 의 **진짜** homeScore 를 떼어 내 가짜 시계 위에서 돌린다 */
+  const HORIZON = Number((appSrc.match(/const HOME_FIT_DAY_HORIZON = (\d+);/) || [])[1]);
+  eq('지평선 상수를 app.js 에서 그대로 읽었다', HORIZON > 0, true);
+  const nowHome = Date.UTC(2026, 8, 17, 3, 0, 0);          // 2026-09-17 (KST 정오쯤)
+  class HomeDate extends Date {
+    constructor(...a) { super(...(a.length ? a : [nowHome])); }
+    static now() { return nowHome; }
+  }
+  const { homeScore } = new Function('Date', 'HOME_FIT_DAY_HORIZON',
+    `${grab('todayStart')}\n${grab('dday')}\n${grab('homeScore')}\nreturn { homeScore };`)(HomeDate, HORIZON);
+  /* fit 과 '며칠 뒤 마감'만 있는 최소 픽스처 — 카드 한 장이 홈에서 갖는 값 그대로다 */
+  const 공고 = (fit, n) => ({ fit, sch: { deadline: n === null ? '' :
+    new Date(nowHome + n * 86400000).toISOString().slice(0, 10) } });
+  const 위 = (a, b) => homeScore(a) > homeScore(b);
+
+  eq('같은 적합도면 마감이 가까운 쪽이 위다', 위(공고(33, 1), 공고(33, 6)), true);
+  /* 🔴 지시의 핵심 — 마감이 **동점 처리에 그치지 않는다**. 적합도가 조금 뒤져도
+     마감 차이가 크면 순서가 뒤집힌다(옛 규칙에서는 둘 다 임박 밖이면 40% 가 이겼다). */
+  eq('적합도가 조금 낮아도 마감이 훨씬 가까우면 위로 온다', 위(공고(33, 1), 공고(40, 20)), true);
+  /* 🔴 그러나 적합도가 크게 앞서면 마감이 며칠 멀어도 위에 남는다 — 2026-09-12 지적
+     ("적합도가 낮아도 마감이 임박하면 홈에 뜬다 — 굳이…")의 재발 방지. 실측 그 짝이다. */
+  eq('적합도가 크게 앞서면 마감이 며칠 멀어도 위에 남는다', 위(공고(50, 11), 공고(15, 1)), true);
+  eq('  20% D-1 도 50% D-11 을 못 넘는다', 위(공고(50, 11), 공고(20, 1)), true);
+  /* 🔴 마감을 모르는 공고에 dday() 의 **가짜 14일**을 주지 않는다 — 그 값은 목록에서
+     안 사라지게 하려는 장치라 순서에 쓰면 모르는 날짜를 아는 척하게 된다(원칙 8-1). */
+  eq('마감을 모르는 공고는 지평선으로 둔다 (가짜 14일을 쓰지 않는다)',
+    homeScore(공고(40, null)), 40 - HORIZON);
+  eq('  그래서 같은 적합도의 15일 뒤 마감보다 위가 아니다 (가짜 14 면 여기서 뒤집힌다)',
+    위(공고(40, null), 공고(40, 15)), false);
+  /* 한 달 너머는 다 같이 '아직 멀다' — 지평선 밖에서 날짜로 더 가르지 않는다 */
+  eq('지평선 너머끼리는 마감으로 더 가르지 않는다',
+    homeScore(공고(40, HORIZON + 5)), homeScore(공고(40, HORIZON + 40)));
+
+  /* 🔴 지시의 앞 절반 — "마감임박이라는 수치를 지우고". 구획 제목이 되돌아오면 잡는다.
+     ⚠️ `<h3>` 안만 본다 — 이 변경을 설명하는 주석에도 그 낱말이 들어 있다. */
+  {
+    const h = readText(new URL('../index.html', import.meta.url));
+    const head = h.slice(h.indexOf('id="screen-home"'), h.indexOf('id="home-deadline-list"'));
+    eq('홈 구획 제목이 더 이상 「마감 임박」이 아니다',
+      /<h3>[^<]*마감\s*임박[^<]*<\/h3>/.test(head), false);
+    eq('  그래도 이름은 있다 (빈 제목으로 지우지 않았다)', /<h3>\s*\S[^<]*<\/h3>/.test(head), true);
+  }
 }
 
 console.log('■ 회원가입·로그인 배선 (2026-08-25) — 빠뜨리면 조용히 안 되는 세 가지');

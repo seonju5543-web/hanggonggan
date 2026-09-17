@@ -1400,11 +1400,45 @@ function agoLabel(ts) {
 }
 
 /* ---------------- 홈 ---------------- */
-/* 홈 '마감 임박'에 펴 두는 장수 (노션 UI-14). 접으면 셋, 펴면 열까지 —
-   그 위는 '전체 보기'(장학금 찾기)가 맡는다. */
+/* 홈 목록에 펴 두는 장수 (노션 UI-14). 접으면 셋, 펴면 열까지 —
+   그 위는 '전체 보기'(장학금 찾기)가 맡는다.
+   ⚠️ 이름의 DEADLINE 과 `#home-deadline-list` 표식은 **일부러 그대로 둔다** — 구획 이름이
+      '마감 임박'이던 시절의 이름이지만, 여기에 붙은 style.css 규칙과 검사 드라이버가 이미
+      있어 이름을 바꾸면 통째로 떨어져 나간다(설정 화면의 `#my-account` 와 같은 이유). */
 const HOME_DEADLINE_TOP = 3;
 const HOME_DEADLINE_MORE = 10;
 let homeDeadlineOpen = false;
+
+/* 🔴 홈의 차례는 **적합도와 마감일을 한 점수로 묶어** 내림차순이다 (2026-09-17 개발자 지시:
+   "마감임박이라는 수치를 지우고 … 적합도와 마감일을 모두 고려하여 내림차순으로 정렬").
+   그전에는 '마감 7일 안쪽인가'(dday 의 cls 'urgent')가 **1차 키**라, 7일 안쪽이기만 하면
+   적합도가 아무리 낮아도 바깥의 어떤 공고보다 위였다 — 실측(한국외대 프로필)에서
+   `50% D-11` 이 `15% D-1`·`20% D-1` **아래**였다. 게다가 그 칸 안은 적합도순이라
+   구획 제목('마감 임박')과 실제 차례가 서로 다른 말을 하고 있었다(개발자 지적).
+   지금은 둘을 한 자로 잰다 — **적합도 1%p 를 마감 하루로 친다.**
+       점수 = 적합도 − 남은 날   (한 달 너머로 남은 것은 다 같이 '아직 멀다')
+   같은 적합도면 마감이 가까운 것이 위로 오고(옛 동점 규칙 그대로), 적합도가 크게 앞서면
+   마감이 조금 멀어도 위에 남는다. 2026-09-12 지적("적합도가 낮아도 마감이 임박하면 홈에
+   뜬다 — 학생 입장에서는 '굳이…' 다")과 이번 지시를 **식 하나**가 함께 지킨다.
+   🔴 **판정을 새로 만들지 않는다** — 적합도는 카드 배지·탐색 정렬과 같은 `m.fit`·`fitRank`,
+      남은 날은 `dday()` 다. 여기서 문턱을 새로 정하면 홈과 장학금 찾기가 다른 말을 한다.
+   🔴 **마감을 모르는 공고에 `dday().days` 를 쓰지 말 것** — 그 값은 목록에서 안 사라지게
+      하려고 주는 **가짜 14**다(dday() 주석·CLAUDE.md). 순서에 쓰면 '한 달 뒤 마감'보다
+      위로 올라가 우리가 모르는 날짜를 아는 척하게 된다(원칙 8-1). 그래서 마감이 **적힌**
+      공고만 남은 날을 세고, 안 적힌 공고(상시 제도·기한 원문 확인)는 지평선으로 둔다. */
+const HOME_FIT_DAY_HORIZON = 30;
+function homeScore(m) {
+  const left = m.sch.deadline
+    ? Math.min(HOME_FIT_DAY_HORIZON, Math.max(0, dday(m.sch.deadline).days))
+    : HOME_FIT_DAY_HORIZON;
+  return m.fit - left;
+}
+/* 🔴 미달·자격 미확인은 점수와 무관하게 **아래**다 (2026-08-26 개발자 결정 — 탐색
+   '적합도순'과 같은 `fitRank`). 이게 없으면 마감이 가까운 '지원 자격 미달' 카드가
+   홈 맨 위에 앉는다 — 적합도를 고려한다면서 미달을 맨 위에 두는 셈이 된다.
+   ⚠️ 이 함수를 베끼지 말 것 — 검사 드라이버도 이것을 그대로 불러 차례를 대조한다. */
+const byHomeOrder = (a, b) =>
+  fitRank(a) - fitRank(b) || homeScore(b) - homeScore(a) || byDeadline(a, b);
 
 function renderHome() {
   const p = state.profile;
@@ -1459,19 +1493,11 @@ function renderHome() {
 
   renderResumeCard();
 
-  /* 🔴 이 자리는 **마감만** 보고 있었다 (노션 UI-14 · 개발자 지적: "적합도가 낮아도 마감이
-     임박하면 홈에 뜬다 — 학생 입장에서는 '굳이…' 다"). 실측(2026-09-12 · 한국외대·경희대):
-     옛 규칙의 석 장은 D-1 15% · D-2 15% · D-2 50% 로, 맨 위 둘이 적합도 15% 였다.
-     지금은 **임박한 것 안에서 나에게 맞는 것**부터 올린다 → D-6 67% · D-6 67% · D-2 50%.
-     임박 후보는 두 학교 모두 27·25건이라 '마감 임박'이라는 이름이 빈말이 될 일은 없다.
-     🔴 판정을 새로 만들지 않는다 — 임박은 `dday()` 가 낸 것(cls 'urgent' = 7일 안쪽),
-        적합도 순위는 배지·탐색 정렬과 같은 `fitRank`, 날짜 비교는 탐색의 `byDeadline` 이다.
-        여기서 문턱이나 순위를 새로 정하면 홈과 장학금 찾기가 다른 말을 한다. */
-  const urgentRank = (m) => (dday(m.sch.deadline).cls === 'urgent' ? 0 : 1);
+  /* 담을 것은 그대로다 — 자격이 확실히 미달인 것과 이미 마감된 것, 오래된 것만 뺀다.
+     차례는 위 `byHomeOrder`(적합도 + 마감일 한 점수) 하나가 정한다. */
   const upcomingAll = matches
     .filter((m) => m.result.status !== 'ineligible' && dday(m.sch.deadline).days >= 0 && notStale(m.sch))
-    .sort((a, b) => urgentRank(a) - urgentRank(b) || fitRank(a) - fitRank(b)
-      || b.fit - a.fit || byDeadline(a, b));
+    .sort(byHomeOrder);
   /* 석 장만 펴 두고 나머지는 '더보기' 로 편다 — 그려는 두고 CSS 가 가린다(style.css).
      ⚠️ `HOME_DEADLINE_MORE` 를 넘는 것은 '전체 보기'(장학금 찾기)가 맡는다. */
   const upcoming = upcomingAll.slice(0, HOME_DEADLINE_MORE);
