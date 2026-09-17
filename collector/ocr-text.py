@@ -66,7 +66,7 @@ LATIN_OK = re.compile(r'^(PDF|HWP|HWPX|DOCX?|JPG|JPEG|PNG|ZIP|XLSX?|PPTX?|TOEIC|
                       r'ID|IT|AI|SW|OT|TV|MOU|CEO|URL|QR|KT|LG|SK|CJ|GS|E-?MAIL|EMAIL|FAX|TEL|HTTP|HTTPS|WWW|COM|KR|NET|OR|GO|AC|'
                       r'NGO|NPO|IBK|KB|NH|MG|KDB|HRD|KEB|BC|IC|KAIST|POSTECH|UNIST|DGIST|GIST|K|SKY|PC|PT|R&?D|ROTC)$', re.I)
 LATIN_TOKEN = re.compile(r'(?<![가-힣A-Za-z])[A-Za-z][A-Za-z&-]{1,}(?![가-힣A-Za-z])')
-LINK_LINE = re.compile(r'https?://|www\.|@|\.(kr|com|net|org)\b', re.I)
+LINK_LINE = re.compile(r'https?://|www\.|\S+@\S+\.\S+|\.(kr|com|net|org)\b', re.I)   # `@` 하나로는 주소가 아니다(`128 @ | yscaraw` 는 표선 오독)
 THRESHOLD = re.compile(r'(이상|이하|미만|초과|만점)')
 BULLET_SQUARE = re.compile(r'^(?:ㅁ|\[\s?\])\s+')
 BULLET_ROUND = re.compile(r'^(?:[ㅇO0@]|\(\d|\(\))\s+')
