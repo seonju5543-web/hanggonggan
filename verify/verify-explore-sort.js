@@ -268,7 +268,7 @@ const PROFILE = {
   eq('전체 목록 아래에는 더 이상 붙지 않는다',
     await page.$$eval('#live-notices .notice-card', (e) => e.length), 0);
 
-  console.log('\n■ 홈 마감 임박 — 임박한 것 안에서 나에게 맞는 것부터 (UI-14)');
+  console.log('\n■ 홈 차례 — 적합도와 마감일을 한 점수로 (2026-09-17 개발자 지시)');
   await page.click('.nav-item[data-nav="home"]');
   await page.waitForSelector('#screen-home:not([hidden])');
   await page.waitForTimeout(1500);            // 히어로 countUp(900ms)이 멈출 때까지
@@ -288,9 +288,11 @@ const PROFILE = {
   const home = await page.evaluate(() => {
     const cand = getMatches().filter((m) => m.result.status !== 'ineligible'
       && dday(m.sch.deadline).days >= 0 && notStale(m.sch));
-    const urgent = (m) => (dday(m.sch.deadline).cls === 'urgent' ? 0 : 1);
-    const want = cand.slice().sort((a, b) => urgent(a) - urgent(b) || fitRank(a) - fitRank(b)
-      || b.fit - a.fit || byDeadline(a, b));
+    /* 🔴 기대 차례는 **앱의 비교 함수 그대로** 만든다 — 예전엔 여기에 정렬식을 베껴 뒀는데,
+       그러면 앱이 바뀔 때 검사가 조용히 갈라진다(2026-09-17 에 실제로 같이 고쳐야 했다).
+       이 절이 지키는 것은 '그린 차례가 앱의 규칙과 같은가'이고, 규칙 **자체**의 뜻은
+       test-collector 의 '홈 차례' 절이 픽스처로 못 박는다(둘의 역할이 다르다). */
+    const want = cand.slice().sort(byHomeOrder);
     const shown = [...document.querySelectorAll('#home-deadline-list > *')]
       .filter((e) => e.offsetParent !== null)
       .map((e) => (e.querySelector('[data-detail]') || {}).dataset?.detail || null);
@@ -300,6 +302,7 @@ const PROFILE = {
       보임: shown,
       그려둠: document.querySelectorAll('#home-deadline-list > *').length,
       기대: want.slice(0, HOME_DEADLINE_TOP).map((m) => m.sch.id),
+      제목: (document.querySelector('#screen-home .section-head h3') || {}).textContent,
       금액: (document.querySelector('#hero-amount') || {}).textContent,
       펴는장수: HOME_DEADLINE_TOP,   /* '셋'을 여기 박지 않는다 — 앱이 쓰는 상수를 그대로 읽는다 */
     };
@@ -315,6 +318,20 @@ const PROFILE = {
      것을 무시한 규칙이라 **앱이 맞는 날에도 빨간불**이 될 수 있었다(자격 미확인 35점이
      확인된 33점보다 위로 가는 날). 이 한 줄이 이미 순서 전체를 지킨다. */
   eq('편 카드가 앱의 규칙과 같은 차례다', home.보임, home.기대);
+  /* 🔴 개발자 지시의 앞 절반 — "마감임박이라는 수치를 지우고" (2026-09-17).
+     칸 이름이 '마감 임박'인데 안쪽 차례는 적합도라 화면이 제 제목과 다른 말을 했다.
+     되돌아오면 여기서 잡는다. 마감은 카드마다 붙는 D-n 글자가 그대로 전한다. */
+  eq('구획 제목이 더 이상 「마감 임박」이 아니다', /마감\s*임박/.test(home.제목 || ''), false);
+  eq('  그래도 이름이 있다 (빈 제목으로 지우지 않았다)', (home.제목 || '').trim().length > 1, true);
+  /* 🔴 지시의 뒷 절반 — 마감일이 **동점 처리로만** 쓰이지 않는가. 같은 적합도의 카드 둘을
+     마감만 다르게 심어, 가까운 쪽이 위로 오는지 본다(여기까지는 옛 규칙도 통과한다).
+     ⚠️ 규칙의 뜻 전체(적합도가 앞서면 마감이 멀어도 위)는 test-collector 가 잰다 —
+        여기서는 실제 데이터에 그런 짝이 있으리라 보장할 수 없다. */
+  eq('같은 적합도면 마감이 가까운 쪽이 위다', await page.evaluate(() => {
+    const mk = (id, d) => ({ sch: { id, deadline: new Date(Date.now() + d * 86400000)
+      .toLocaleDateString('sv-SE') }, fit: 40, fd: { unread: false, fails: [] } });
+    return [mk('먼', 9), mk('가까운', 2)].sort(byHomeOrder).map((m) => m.sch.id);
+  }), ['가까운', '먼']);
 
   /* 더보기 — **다시 그리지 않고 편다**(히어로 금액이 또 세어 올라가면 안 된다).
      🔴 클릭을 page.click 으로 하면 Playwright 가 버튼을 화면 안으로 스크롤해서

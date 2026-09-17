@@ -361,8 +361,15 @@
            내용은 app.js renderHome() 이 채운다. 설계: docs/designs/first-run-and-resume.md -->
       <button type="button" class="resume-card" id="home-resume" hidden></button>
 
+      <!-- 🔴 제목이 '마감 임박' 이던 자리 (2026-09-17 개발자 지시: "마감임박이라는 수치를
+           지우고 … 적합도와 마감일을 모두 고려하여 내림차순"). 그 이름은 **차례와 달랐다** —
+           칸 이름은 마감인데 안쪽 정렬은 적합도였다(개발자가 화면을 보고 짚은 그대로).
+           지금은 적합도와 마감일을 한 점수로 묶어 정렬하므로(app.js `byHomeOrder`) 이름도
+           그 점수를 말한다. 마감은 카드마다 붙는 `D-n` 글자가 그대로 전한다.
+           ⚠️ `#home-deadline-list`·`#home-deadline-more` 표식은 옛 이름 그대로 둔다 —
+              style.css 규칙과 검사 드라이버가 이 이름에 붙어 있다(app.js 같은 자리 주석). -->
       <div class="section-head">
-        <h3>마감 임박</h3>
+        <h3>나에게 맞는 장학금</h3>
         <button class="link-btn" data-goto="explore">전체 보기</button>
       </div>
       <div id="home-deadline-list" class="card-list"></div>

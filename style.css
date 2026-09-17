@@ -3165,6 +3165,13 @@ body::after { opacity: 0.26; }
 }
 .home-updated span { display: block; }
 .home-updated:empty { display: none; }
+/* 🔴 홈 히어로 아랫줄 (2026-09-17) — 금액 회계 문장을 걷어내면서 이 칸이 **빌 수 있게**
+   됐다(바로 신청 가능한 공고가 0건인 학생). 규칙이 없으면 빈 채로 글 높이 29px + 위 여백을
+   먹어 금액과 버튼 사이가 벌어진다(실측: 금액→버튼 57px).
+   ⚠️ `.home-updated` 처럼 `display: none` 으로 통째로 지우면 이번엔 **아래 여백까지 사라져**
+      금액과 버튼이 2px 로 붙는다(실측). 그래서 글과 위 여백만 죽이고 `margin-bottom` 은
+      남긴다 — 버튼은 어느 쪽이든 같은 자리에서 숨 쉰다(빈 경우 22px). */
+.hero-count:empty { margin-top: 0; padding-top: 0; font-size: 0; line-height: 0; }
 
 /* 🔴 위아래 여백은 **같은 값**이어야 한다 — 11/12 로 1px 어긋나 있었고,
    높이를 실제로 정하던 것은 여백이 아니라 버튼의 min-height 였다(30px).

@@ -209,12 +209,14 @@ function serve() {
     (await page.textContent('#gate-msg')).trim());
   errors.length = 0;   // 위에서 일부러 낸 401은 오류로 세지 않는다
 
-  /* ② 올바른 열쇠로 입장 */
+  /* ② 올바른 열쇠로 입장 — 만료일 칸은 일부러 비운다(아래 「할 일」이 '모른다'를 말하는지 본다) */
+  const gateHadExpiry = await page.isVisible('#gate-expires');
   await page.fill('#gate-key', 'github_pat_testtoken');
   await page.click('#gate-enter');
   await page.waitForSelector('#app:not([hidden])', { timeout: 15000 });
   ok(true, '올바른 열쇠로 입장');
   ok(apiCalls > 0, '열쇠를 GitHub에 실제로 확인한다 (흉내가 아님)');
+  const apiCallsBeforeExpiry = apiCalls;
 
   const regFile = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/registered.json'), 'utf8'));
   /* 화면이 받은 목록으로 비교한다 — 검사용 대기 공고를 끼워 넣었을 수 있다(위 참조).
@@ -235,6 +237,46 @@ function serve() {
   const todoText = await page.textContent('#screen-todo');
   ok(/오늘 할 일/.test(todoText), '① 오늘 할 일 화면이 그려진다');
   ok(todoText.includes(String(autoN)), '① 검수 전 건수가 실제 데이터와 같다', `검수 전 ${autoN}건`);
+
+  /* ①-열쇠 만료 (2026-09-16 · 백로그 F-4) — GitHub 은 만료일을 안 알려 주므로 사람이 적어 둔 날을 센다.
+     🔴 안 적어 두었으면 '모른다' 카드가 **할 일**에 올라와야 한다 — 조용한 초록이면 만료를 컨펌이
+        죽는 날에나 안다. 적어 두면 남은 날을 세고, 열쇠를 지우면 날짜도 같이 사라진다(맨 끝 검사). */
+  {
+    ok(gateHadExpiry, '입장 화면에 열쇠 만료일 칸이 있다 (선택)');
+    const card = page.locator('#screen-todo [data-stat]', { hasText: '관리자 열쇠' }).first();
+    ok(await card.count() === 1, '만료일을 안 적어 두면 「할 일」에 열쇠 카드가 올라온다');
+    ok(await card.count() === 1 && /만료일을 안 적어 두었습니다/.test(await card.textContent()),
+      '  카드가 「모른다」고 말한다 (지어내지 않는다)');
+    const TEN = new Date(Date.now() + 9 * 3600e3 + 10 * 864e5).toISOString().slice(0, 10);
+    /* 🔴 칸이 없으면 fill 이 시간초과로 **드라이버를 통째로 죽인다** — 그러면 뒤 항목 190개가 못 돈다.
+       없을 때는 이 항목만 빨간불로 적고 지나간다(카드를 빼고 돌려 실제로 그렇게 죽는 것을 봤다). */
+    if (await page.locator('#todo-key-expires').count()) {
+      await page.fill('#todo-key-expires', TEN);
+      await page.click('#todo-key-save');
+      await page.waitForTimeout(200);
+    } else ok(false, '  카드에 만료일을 적는 칸이 있다');
+    const card2 = page.locator('#screen-todo [data-stat]', { hasText: '관리자 열쇠' }).first();
+    ok(/10일/.test(await card2.textContent()), '  만료일을 적어 두면 남은 날을 센다', (await card2.textContent()).trim().slice(0, 60));
+    ok(/임박/.test(await card2.textContent()), '  14일 안이면 임박이라고 부른다');
+    const where = await page.evaluate(() => ({
+      s: sessionStorage.getItem('handaejang.admin.key.expires'), l: localStorage.getItem('handaejang.admin.key.expires'),
+      keyS: !!sessionStorage.getItem('handaejang.admin.key'),
+    }));
+    ok(where.s === TEN && !where.l && where.keyS, '  만료일은 열쇠가 있는 곳(이번엔 세션)에 같이 산다', JSON.stringify(where));
+    ok(apiCalls === apiCallsBeforeExpiry, '  적어 두는 일은 저장소에 아무것도 보내지 않는다');
+    /* 멀리 두면 정상 띠로 접힌다 — 카드가 아니라 아래 정상 목록에 이름만 */
+    const FAR = new Date(Date.now() + 9 * 3600e3 + 80 * 864e5).toISOString().slice(0, 10);
+    if (await page.locator('#todo-key-expires').count()) {
+      await page.fill('#todo-key-expires', FAR);
+      await page.click('#todo-key-save');
+      await page.waitForTimeout(200);
+    }
+    const strip = await page.locator('#screen-todo .allclear').count()
+      ? await page.textContent('#screen-todo .allclear') : '';
+    ok(await page.locator('#screen-todo [data-stat]', { hasText: '관리자 열쇠' }).count() === 0
+      && /관리자 열쇠/.test(strip),
+      '  80일 남았으면 카드가 아니라 정상 띠에 접힌다');
+  }
 
   await gotoNotices(page);   /* 🔴 보기 전환이 '양식' 으로 남아 있을 수 있다 — 공고 보기까지 확실히 간다 */
   const rows = await page.locator('#screen-list [data-row]').count();
@@ -1639,6 +1681,87 @@ function serve() {
     await page.evaluate(() => { window.__admin.pendingMap().clear(); });
   }
 
+  /* ══ 마감을 로봇이 못 읽은 공고 — 사람이 적는다 (2026-09-17 · G-3 컨펌 C) ══════════
+     포스터 그림·스캔 PDF 는 무료 경로로 글자가 안 나온다. 개발자가 "API 대신 관리자가 수동
+     입력"으로 정했다. 🔴 화면은 날짜를 짐작하지 않는다 — 링크와 원문 문구만 주고 사람이 적는다. */
+  {
+    const noDl = (PAGE_ITEMS || regFile.items).filter((it) => !it.deadline);
+    /* 🔴 앞선 C2 반영이 '실행 결과'를 기다리는 동안 여기서 적어 두면, 그 반영이 끝나는 순간
+       장부(pendingClear)가 통째로 비워져 적어 둔 마감이 사라진다 — 실제로 그렇게 빨간불이었다.
+       실행 결과를 바로 돌려주고, 끝나기를 기다린 뒤에 시작한다. */
+    await page.route('**/actions/workflows/**/runs**', (route) => route.fulfill({
+      status: 200, contentType: 'application/json',
+      body: JSON.stringify({ workflow_runs: [{ id: 11, status: 'completed', conclusion: 'success',
+        created_at: new Date(Date.now() + 5000).toISOString(), html_url: 'https://example.invalid/run' }] }),
+    }));
+    const idle = await page.waitForFunction(() => !window.__admin.jobBusy(), null, { timeout: 30000 }).then(() => true, () => false);
+    ok(idle, '앞선 반영이 끝나 화면이 잠겨 있지 않다 (안 끝나면 아래가 엉뚱한 이유로 빨간불이 된다)');
+    await page.evaluate(() => { window.__admin.pendingMap().clear(); });
+    await page.click('.tab[data-tab="todo"]');
+    await page.waitForSelector('#screen-todo:not([hidden])');
+    const dlRows = await page.locator('[data-deadline-fill] [data-dl-row]').count();
+    ok(dlRows === noDl.length, '마감을 모르는 공고를 전부 줄로 보여 준다', `화면 ${dlRows} / 데이터 ${noDl.length}`);
+    if (dlRows) {
+      const t = await page.textContent('[data-dl-note]');
+      ok(/짐작하지 않습니다/.test(t) && /사람이/.test(t), '화면이 날짜를 짐작하지 않는다고 말한다 (누가 적는지도)');
+      ok(!/\d{4}-\d{2}-\d{2}/.test(await page.locator('[data-deadline-fill] input[type=date]').first().inputValue()),
+        '  날짜 칸이 비어서 시작한다 (미리 채워 넣지 않는다)');
+      const linked = await page.locator('[data-deadline-fill] [data-dl-row]:has(a[href^="http"])').count();
+      ok(linked === dlRows, '  줄마다 원문·첨부 링크가 있다', `${linked}/${dlRows}`);
+      const id = await page.locator('[data-deadline-fill] [data-dl-row]').first().getAttribute('data-dl-row');
+      await page.fill(`[data-dl-input="${id}"]`, '2026-12-31');
+      await page.click(`[data-dl-save="${id}"]`);
+      await page.waitForTimeout(250);
+      const staged = await page.evaluate((x) => window.__admin.pendingMap().get(x), id);
+      ok(staged && staged.deadline === '2026-12-31', '적어 두기가 모아 둔 수정에 마감일로 들어간다', JSON.stringify(staged));
+      ok(await page.locator('#pending-bar:not([hidden])').count() === 1, '  모아 둔 수정 줄이 뜬다');
+      ok(/모아 둠 · 2026-12-31/.test(await page.textContent(`[data-dl-row="${id}"]`)), '  줄에 적어 둔 날짜가 보인다');
+      ok(await page.locator('[data-deadline-fill] [data-dl-row]').count() === dlRows,
+        '  적어 둔 뒤에도 줄 수가 그대로다 (저장 전엔 사라지지 않는다)');
+      /* 🔴 다른 줄에 쳐 두고 아직 안 누른 날짜가 살아 있는가 — 구획을 통째로 다시 그리면 사라진다 */
+      if (dlRows >= 2) {
+        const other = await page.locator('[data-deadline-fill] [data-dl-row]').nth(1).getAttribute('data-dl-row');
+        await page.fill(`[data-dl-input="${other}"]`, '2026-11-30');
+        await page.fill(`[data-dl-input="${id}"]`, '2026-12-30');
+        await page.click(`[data-dl-save="${id}"]`);
+        await page.waitForTimeout(200);
+        ok(await page.inputValue(`[data-dl-input="${other}"]`) === '2026-11-30',
+          '  한 줄을 적어 둬도 다른 줄에 쳐 둔 날짜는 그대로 있다');
+        await page.fill(`[data-dl-input="${id}"]`, '2026-12-31');
+        await page.click(`[data-dl-save="${id}"]`);
+        await page.waitForTimeout(200);
+      }
+      /* 달력에 없는 날은 그 자리에서 막는다 */
+      await page.fill(`[data-dl-input="${id}"]`, '');
+      await page.click(`[data-dl-save="${id}"]`);
+      await page.waitForTimeout(150);
+      const still = await page.evaluate((x) => window.__admin.pendingMap().get(x), id);
+      ok(still && still.deadline === '2026-12-31', '  빈 값으로 누르면 먼저 적어 둔 것을 지우지 않는다');
+
+      /* 나가는 payload 에 실리는가 */
+      let dlSent = null;
+      await page.route('**/actions/workflows/**/dispatches', (route) => {
+        try { dlSent = JSON.parse(route.request().postData() || '{}'); } catch { dlSent = 'parse-fail'; }
+        route.fulfill({ status: 204, body: '' });
+      });
+      await page.click('[data-act="flush"]');
+      await page.waitForSelector('#sheet:not([hidden]) [data-ask-go]', { timeout: 8000 }).catch(() => {});
+      ok(await page.locator('#sheet [data-diff-row]').count() >= 1, '  전후 대조에 마감일 줄이 뜬다');
+      await page.click('#sheet [data-ask-go]');
+      await page.waitForTimeout(700);
+      const sp = (() => { try { return JSON.parse(dlSent?.inputs?.payload || '{}'); } catch { return {}; } })();
+      const ed = (sp.edits || []).find((x) => x.id === id) || {};
+      ok(ed.patch && ed.patch.deadline === '2026-12-31', '  나가는 payload 에 마감일이 실린다 (저장소가 관리자 표식을 붙인다)',
+        JSON.stringify(ed.patch));
+      await page.waitForFunction(() => !window.__admin.jobBusy(), null, { timeout: 30000 }).catch(() => {});
+      await page.unroute('**/actions/workflows/**/dispatches');
+      await page.evaluate(() => { window.__admin.pendingMap().clear(); });
+    } else {
+      ok(true, '마감을 모르는 공고가 0건이라 적어 두기를 못 눌렀다');
+    }
+    await page.unroute('**/actions/workflows/**/runs**');
+  }
+
   /* ══ 저장 때 막히는 값은 **그 줄에서** 막는다 (2026-09-14) ═══════════════
      🔴 한 건이라도 규칙을 어기면 저장소는 **묶음 전체**를 멈춘다(그게 맞다 — 반만 반영되면
         안 된다). 그러면 멀쩡한 12건까지 함께 죽는다. 화면이 **어느 줄이 막혔는지** 보여 주고
@@ -1762,6 +1885,9 @@ function serve() {
   const stored = await page.evaluate(() => localStorage.getItem('handaejang.admin.key')
     || sessionStorage.getItem('handaejang.admin.key'));
   ok(!stored, '열쇠 지우기를 누르면 기기에서 실제로 사라진다');
+  const storedExp = await page.evaluate(() => localStorage.getItem('handaejang.admin.key.expires')
+    || sessionStorage.getItem('handaejang.admin.key.expires'));
+  ok(!storedExp, '  적어 둔 만료일도 같이 사라진다 (다음 열쇠에 옛 날짜가 붙지 않게)');
 
   await browser.close();
   srv.close();

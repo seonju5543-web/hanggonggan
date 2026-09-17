@@ -1400,11 +1400,45 @@ function agoLabel(ts) {
 }
 
 /* ---------------- 홈 ---------------- */
-/* 홈 '마감 임박'에 펴 두는 장수 (노션 UI-14). 접으면 셋, 펴면 열까지 —
-   그 위는 '전체 보기'(장학금 찾기)가 맡는다. */
+/* 홈 목록에 펴 두는 장수 (노션 UI-14). 접으면 셋, 펴면 열까지 —
+   그 위는 '전체 보기'(장학금 찾기)가 맡는다.
+   ⚠️ 이름의 DEADLINE 과 `#home-deadline-list` 표식은 **일부러 그대로 둔다** — 구획 이름이
+      '마감 임박'이던 시절의 이름이지만, 여기에 붙은 style.css 규칙과 검사 드라이버가 이미
+      있어 이름을 바꾸면 통째로 떨어져 나간다(설정 화면의 `#my-account` 와 같은 이유). */
 const HOME_DEADLINE_TOP = 3;
 const HOME_DEADLINE_MORE = 10;
 let homeDeadlineOpen = false;
+
+/* 🔴 홈의 차례는 **적합도와 마감일을 한 점수로 묶어** 내림차순이다 (2026-09-17 개발자 지시:
+   "마감임박이라는 수치를 지우고 … 적합도와 마감일을 모두 고려하여 내림차순으로 정렬").
+   그전에는 '마감 7일 안쪽인가'(dday 의 cls 'urgent')가 **1차 키**라, 7일 안쪽이기만 하면
+   적합도가 아무리 낮아도 바깥의 어떤 공고보다 위였다 — 실측(한국외대 프로필)에서
+   `50% D-11` 이 `15% D-1`·`20% D-1` **아래**였다. 게다가 그 칸 안은 적합도순이라
+   구획 제목('마감 임박')과 실제 차례가 서로 다른 말을 하고 있었다(개발자 지적).
+   지금은 둘을 한 자로 잰다 — **적합도 1%p 를 마감 하루로 친다.**
+       점수 = 적합도 − 남은 날   (한 달 너머로 남은 것은 다 같이 '아직 멀다')
+   같은 적합도면 마감이 가까운 것이 위로 오고(옛 동점 규칙 그대로), 적합도가 크게 앞서면
+   마감이 조금 멀어도 위에 남는다. 2026-09-12 지적("적합도가 낮아도 마감이 임박하면 홈에
+   뜬다 — 학생 입장에서는 '굳이…' 다")과 이번 지시를 **식 하나**가 함께 지킨다.
+   🔴 **판정을 새로 만들지 않는다** — 적합도는 카드 배지·탐색 정렬과 같은 `m.fit`·`fitRank`,
+      남은 날은 `dday()` 다. 여기서 문턱을 새로 정하면 홈과 장학금 찾기가 다른 말을 한다.
+   🔴 **마감을 모르는 공고에 `dday().days` 를 쓰지 말 것** — 그 값은 목록에서 안 사라지게
+      하려고 주는 **가짜 14**다(dday() 주석·CLAUDE.md). 순서에 쓰면 '한 달 뒤 마감'보다
+      위로 올라가 우리가 모르는 날짜를 아는 척하게 된다(원칙 8-1). 그래서 마감이 **적힌**
+      공고만 남은 날을 세고, 안 적힌 공고(상시 제도·기한 원문 확인)는 지평선으로 둔다. */
+const HOME_FIT_DAY_HORIZON = 30;
+function homeScore(m) {
+  const left = m.sch.deadline
+    ? Math.min(HOME_FIT_DAY_HORIZON, Math.max(0, dday(m.sch.deadline).days))
+    : HOME_FIT_DAY_HORIZON;
+  return m.fit - left;
+}
+/* 🔴 미달·자격 미확인은 점수와 무관하게 **아래**다 (2026-08-26 개발자 결정 — 탐색
+   '적합도순'과 같은 `fitRank`). 이게 없으면 마감이 가까운 '지원 자격 미달' 카드가
+   홈 맨 위에 앉는다 — 적합도를 고려한다면서 미달을 맨 위에 두는 셈이 된다.
+   ⚠️ 이 함수를 베끼지 말 것 — 검사 드라이버도 이것을 그대로 불러 차례를 대조한다. */
+const byHomeOrder = (a, b) =>
+  fitRank(a) - fitRank(b) || homeScore(b) - homeScore(a) || byDeadline(a, b);
 
 function renderHome() {
   const p = state.profile;
@@ -1429,26 +1463,31 @@ function renderHome() {
      5번 세고 ② 원문이 '함께 받을 수 없다'고 적은 공고까지 다 더한다.
      학생이 실제로 받을 수 없는 숫자를 '지금 받을 수 있는 장학금'이라 부르는 것은
      기망이고 법적 책임이 따른다(개발자 지적). sumAmounts 가 그 둘을 걸러 준다. */
-  const bill = sumAmounts(applyable.map((m) => m.sch), { tuition: tuitionFor(p, tuitionTable) });
+  /* 🔴 `estimate: true` — 못 읽은 금액을 **우리가 읽은 금액들의 중앙값**으로 어림잡아
+     합계에 넣는다 (2026-09-17 개발자 지시). 켜는 곳은 여기 하나다: 금액 상세·관리자
+     화면·감사는 켜지 않으므로 거기서는 확인된 금액만 더한 숫자가 그대로 보인다.
+     짐작이 데이터에 남지 않는 이유와 근거는 parse-amount.js sumAmounts ④ 참조. */
+  const bill = sumAmounts(applyable.map((m) => m.sch),
+    { tuition: tuitionFor(p, tuitionTable), estimate: true });
   const total = bill.total;
-  const unknownAmt = bill.unknown.length;
   lastBill = { bill, count: applyable.length };
 
-  countUp($('#hero-amount'), total, (v) => `최대 ${won(v)}`);
-  /* 🔴 히어로 아랫줄을 **한 문장**으로 바꿨다 (2026-09-10 페이스리프트).
-     예전: '바로 신청 0건 · 선발 심사형 12건 · 금액 미확인 11건 제외'
-     — 중간점으로 이어 붙인 세 토막짜리 **감사 로그**였다. 학생이 처음 보는 화면에서
-     가장 먼저 읽는 문장이 앱의 내부 사정이었고, 게다가 맨 앞이 '0건'이라 시작부터
-     "없다"고 말했다(실측: eligible 0 · selective 12).
-     🔴 정직함은 그대로다 — 뺀 건수를 감추지 않고 **문장으로** 말한다(원칙 8-1).
-     🔴 건수는 라벨로 올린다 — 금액보다 먼저 읽히는 것이 '몇 건인가'여야 행동이 된다. */
+  /* 🔴 어림잡은 몫이 섞였으면 **'약'** 을 붙인다 (2026-09-17). 설명 문장은 개발자 지시로
+     걷어냈지만, 짐작한 숫자를 확인한 숫자처럼 적는 것은 다른 문제다(원칙 8-1) — 글자
+     하나로 그 선을 지킨다. 어떻게 어림잡았는지는 금액 상세를 열면 나온다. */
+  const heroPre = bill.assumedWon > 0 ? '약 ' : '최대 ';
+  countUp($('#hero-amount'), total, (v) => `${heroPre}${won(v)}`);
+  /* 🔴 아랫줄에서 **금액 회계 이야기를 뺐다** (2026-09-17 개발자 지시: "'금액을 아직 못
+     읽은 4건은 뺀 금액~' 와 같은 설명을 전체 삭제"). '금액을 아직 못 읽은 4건은 뺀
+     금액이에요'·'확인된 금액만 더한 금액이에요' 둘 다 **우리 수집 공정 이야기**였다 —
+     학생이 홈에서 가장 먼저 읽는 문장이 앱의 내부 사정일 이유가 없다.
+     🔴 정직함은 자리를 옮긴 것이지 사라진 게 아니다: 어림잡은 몫은 위의 '약'이,
+        무엇을 못 읽었는지는 **금액 상세**가, 몇 건인지는 **관리자 화면**이 말한다.
+     ⚠️ 남는 한 줄('그중 n건은 바로 신청할 수 있어요')은 내부 사정이 아니라 **학생이 할 수
+        있는 일**이라 그대로 둔다. 되돌려 금액 문장을 다시 넣지 말 것 — 관문이 막는다. */
   const nEligible = applyable.filter((m) => m.result.status === 'eligible').length;
   $('#hero-label').textContent = `지금 신청할 수 있는 장학금 ${applyable.length}건`;
-  const heroLines = [];
-  if (unknownAmt) heroLines.push(`금액을 아직 못 읽은 ${unknownAmt}건은 뺀 금액이에요`);
-  else if (applyable.length) heroLines.push('확인된 금액만 더한 금액이에요');
-  if (nEligible) heroLines.push(`그중 ${nEligible}건은 바로 신청할 수 있어요`);
-  $('#hero-count').textContent = heroLines.join(' ');
+  $('#hero-count').textContent = nEligible ? `그중 ${nEligible}건은 바로 신청할 수 있어요` : '';
 
   const btn = $('#btn-apply-all');
   btn.disabled = notApplied.length === 0;
@@ -1459,19 +1498,11 @@ function renderHome() {
 
   renderResumeCard();
 
-  /* 🔴 이 자리는 **마감만** 보고 있었다 (노션 UI-14 · 개발자 지적: "적합도가 낮아도 마감이
-     임박하면 홈에 뜬다 — 학생 입장에서는 '굳이…' 다"). 실측(2026-09-12 · 한국외대·경희대):
-     옛 규칙의 석 장은 D-1 15% · D-2 15% · D-2 50% 로, 맨 위 둘이 적합도 15% 였다.
-     지금은 **임박한 것 안에서 나에게 맞는 것**부터 올린다 → D-6 67% · D-6 67% · D-2 50%.
-     임박 후보는 두 학교 모두 27·25건이라 '마감 임박'이라는 이름이 빈말이 될 일은 없다.
-     🔴 판정을 새로 만들지 않는다 — 임박은 `dday()` 가 낸 것(cls 'urgent' = 7일 안쪽),
-        적합도 순위는 배지·탐색 정렬과 같은 `fitRank`, 날짜 비교는 탐색의 `byDeadline` 이다.
-        여기서 문턱이나 순위를 새로 정하면 홈과 장학금 찾기가 다른 말을 한다. */
-  const urgentRank = (m) => (dday(m.sch.deadline).cls === 'urgent' ? 0 : 1);
+  /* 담을 것은 그대로다 — 자격이 확실히 미달인 것과 이미 마감된 것, 오래된 것만 뺀다.
+     차례는 위 `byHomeOrder`(적합도 + 마감일 한 점수) 하나가 정한다. */
   const upcomingAll = matches
     .filter((m) => m.result.status !== 'ineligible' && dday(m.sch.deadline).days >= 0 && notStale(m.sch))
-    .sort((a, b) => urgentRank(a) - urgentRank(b) || fitRank(a) - fitRank(b)
-      || b.fit - a.fit || byDeadline(a, b));
+    .sort(byHomeOrder);
   /* 석 장만 펴 두고 나머지는 '더보기' 로 편다 — 그려는 두고 CSS 가 가린다(style.css).
      ⚠️ `HOME_DEADLINE_MORE` 를 넘는 것은 '전체 보기'(장학금 찾기)가 맡는다. */
   const upcoming = upcomingAll.slice(0, HOME_DEADLINE_MORE);
@@ -2583,7 +2614,10 @@ function bulkRowHtml(sch) {
           <div class="bulk-badges">
             <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${esc(sch.type)}</span>
             ${sch.program ? '<span class="badge badge-program">상시 제도</span>' : `<span class="badge badge-dday ${d.cls}">${d.label}</span>`}
-            ${sch.auto ? '<span class="badge badge-auto">자동 등록 · 검수 전</span>' : ''}
+            ${/* 🔴 '자동 등록 · 검수 전' 배지를 뺐다 (2026-09-17 개발자 지시 — 내부 공정은
+                 관리자에게만). 운영 원칙 2 의 '정직한 표시'는 **학생이 판단에 쓸 수 있는 것**을
+                 감추지 말라는 뜻이고, 우리 검수 공정의 단계는 거기 해당하지 않는다.
+                 세는 곳은 관리자 '오늘 할 일'의 검수 전 카드 둘이다(_admin/admin.js). */ ''}
           </div>
           <p class="bulk-meta">${sch.deadline
             ? `마감 ${esc(sch.deadline.replace(/-/g, '.'))}`
@@ -2591,7 +2625,7 @@ function bulkRowHtml(sch) {
           <p class="bulk-meta">${esc(submitChannelLabel(sch))}</p>
           ${reqs.length
             ? `<p class="bulk-meta-head">지원자격 (공고 원문)</p><ul class="bulk-reqs">${reqs.map((r) => `<li>${esc(r)}</li>`).join('')}</ul>`
-            : '<p class="bulk-meta">지원 자격을 아직 읽지 못했습니다 — 공고 원문에서 확인하세요</p>'}
+            : '<p class="bulk-meta">지원 자격은 공고 원문에서 확인하세요</p>'}
         </details>
       </div>
     </div>`;
@@ -2691,8 +2725,10 @@ function renderAmountDetail(keepScroll) {
       <p class="sheet-provider">${esc(p.school || '')}${p.campus ? ' · ' + esc(p.campus) : ''} · 신청 가능 ${count}건</p>
       <div class="ad-total">
         <p class="ad-total-lb">지금 받을 수 있는 장학금</p>
-        <p class="ad-total-amt">최대 ${won(bill.total)}</p>
-        <p class="ad-total-sub">확인된 금액만 합산${bill.unknown.length ? ` · 미확인 ${bill.unknown.length}건 제외` : ''}</p>
+        <p class="ad-total-amt">${bill.assumedWon > 0 ? '약' : '최대'} ${won(bill.total)}</p>
+        <p class="ad-total-sub">${bill.assumedWon > 0
+          ? `금액을 못 읽은 ${bill.assumed.length}건은 어림잡아 더함`
+          : `확인된 금액만 합산${bill.unknown.length ? ` · 미확인 ${bill.unknown.length}건 제외` : ''}`}</p>
       </div>
       ${grp('합산', `${bill.added.length}건 · ${won(sum(bill.added))}`, '',
         bill.added.map((m) => amountDetailRow(m, estOpt(m, { tone: 'on' }))).join(''),
@@ -2707,8 +2743,16 @@ function renderAmountDetail(keepScroll) {
         '금액이 등록금 비율로만 적힌 공고입니다. 학교별 한 학기 등록금 기준 추정값이며 실제 금액과 다를 수 있습니다. 위 갈래에 이미 들어 있는 공고를 다시 적은 것이라 건수를 더하지 마세요.',
         bill.estimated.map((m) => amountDetailRow(m, { tone: 'est', text: '약 ' + won(m.won) })).join(''),
         '등록금 비율로 적힌 공고는 없어요')}
-      ${grp('금액 미확인', `${bill.unknown.length}건 · 0원`,
-        '원문에 금액이 없거나 첨부파일에만 있는 공고입니다.',
+      ${/* 🔴 홈 히어로가 이 몫을 어림잡아 더하므로(2026-09-17 개발자 지시) 이 칸도 그렇게
+           적어야 한다 — 합계에 넣어 놓고 '0원'이라고 적으면 두 숫자가 서로 다른 말을 한다.
+           🔴 줄마다의 금액은 여전히 '금액 원문 확인'이다: 어림잡은 것은 **합계 한 곳**이지
+              그 공고의 금액이 아니다(원칙 8-1 · parse-amount.js sumAmounts ④). */ ''}
+      ${grp('금액 미확인', bill.assumedWon > 0
+          ? `${bill.unknown.length}건 · 어림 ${won(bill.assumedWon)}`
+          : `${bill.unknown.length}건 · 0원`,
+        bill.assumedWon > 0
+          ? `원문에 금액이 없거나 첨부파일에만 있는 공고입니다. 이 중 ${bill.assumed.length}건은 위 합계에 한 건당 ${won(bill.assumedEach)}(확인된 공고들의 중앙값)으로 어림잡아 더했습니다 — 실제 금액과 다를 수 있습니다.`
+          : '원문에 금액이 없거나 첨부파일에만 있는 공고입니다.',
         bill.unknown.length ? `<details><summary>공고 ${bill.unknown.length}건 보기</summary>
           ${bill.unknown.map((m) => amountDetailRow(m, { dim: true, tone: 'off', text: '금액 원문 확인' })).join('')}</details>` : '',
         '모든 공고의 금액을 확인했습니다.')}
@@ -2885,7 +2929,6 @@ function openDetail(id) {
   /* 'AI가 읽음 · 검수 전' — '자동 등록 · 검수 전' 배지와 같은 규칙(2026-08-23).
      사람이 검수하지 않았다는 사실을 숨기지 않는다. 관리자 화면에서 컨펌하면
      eligibilityReviewed 가 true 가 되어 사라진다. */
-  const aiRead = /^AI/.test(sch.eligibilityFrom || '') && sch.eligibilityReviewed !== true;
   /* 요건은 원문을 통째로 붙이지 않고 **짧게 다듬어 번호를 매겨** 보여 준다.
      프로필과 확실히 맞으면 ✓, 확실히 안 맞으면 ✕, 판정할 수 없으면 색 없이 둔다
      (2026-08-02 개발자 지시). 판정 규칙은 match-engine에 있어 알림과 갈라지지 않는다. */
@@ -2958,9 +3001,14 @@ function openDetail(id) {
     reasonRows += `<li class="r-head">지원 제외 대상</li>`
       + exLines.map((e) => `<li class="r-req">${esc(e)}</li>`).join('');
   }
-  if (aiRead && reasonRows) {
-    reasonRows = `<li class="r-ai">이 자격은 AI가 공고 원문에서 읽은 것입니다 · 사람 검수 전</li>` + reasonRows;
-  }
+  /* 🔴 '이 자격은 AI가 공고 원문에서 읽은 것입니다 · 사람 검수 전' 줄을 **뺐다**
+     (2026-09-17 개발자 지시 — 앱 내부 사정은 관리자에게만). 누가 읽었고 사람이 검수했는지는
+     우리 공정 이야기이고, 학생이 그 줄을 보고 할 수 있는 일이 하나도 없다.
+     🔴 사라진 게 아니라 **자리를 옮겼다** — 관리자 화면 '데이터 품질'의
+        'AI가 읽은 자격 · 사람 검수 전' 카드가 같은 것을 센다(`_admin/admin.js` aiReadCount).
+     ⚠️ 그 줄을 만들던 `aiRead` 상수도 함께 지웠다 — 여기서 쓰는 곳이 더는 없다.
+        판정식(`/^AI/.test(eligibilityFrom) && eligibilityReviewed !== true`)의 원본은
+        이제 관리자 쪽 한 곳이다. 되살린다면 베끼지 말고 그 함수를 부를 것. */
   if (checkRows) {
     reasonRows += `<li class="r-head">내 정보로 확인한 항목</li>` + checkRows;
   }
@@ -2969,7 +3017,7 @@ function openDetail(id) {
        원문에서 '제한 없음'을 확인한 공고만 eligibilityVerified로 확신 문구를 낸다. */
     reasonRows = sch.eligibilityVerified
       ? `<li class="r-ok">✓ 별도 자격 제한이 없는 공고입니다${result.status === 'selective' ? ' — 지원자 중 선발 심사로 결정됩니다' : ''}</li>`
-      : `<li class="r-unk">? 지원 자격을 아직 읽지 못했습니다 — 아래 원문에서 확인해 주세요${result.status === 'selective' ? ' (지원자 중 선발 심사로 결정됩니다)' : ''}</li>`;
+      : `<li class="r-unk">? 지원 자격은 아래 공고 원문에서 확인해 주세요${result.status === 'selective' ? ' (지원자 중 선발 심사로 결정됩니다)' : ''}</li>`;
   }
   const missingRows = '';
 
@@ -3010,7 +3058,9 @@ function openDetail(id) {
               다 보여 준다는 뜻이라 그대로 살린다(원칙 8-1). */ ''}
       <div class="sch-top sheet-top">
         ${sch.program ? '<span class="badge badge-program">상시 제도</span>' : `<span class="badge badge-dday ${d.cls}">${d.label}</span>`}
-        <span class="badge badge-kind">${esc((sch.type || '장학금') + (sch.auto ? ' · 검수 전' : ''))}</span>
+        ${/* 🔴 '· 검수 전' 을 뗐다 (2026-09-17 개발자 지시). 남는 것은 교내/교외처럼
+             **학생이 쓰는 갈래**뿐이다. 검수 상태는 관리자 화면이 센다. */ ''}
+        <span class="badge badge-kind">${esc(sch.type || '장학금')}</span>
         ${saveBtnHtml(sch.id)}
       </div>
       ${/* 🔴 순서: 이름 → **금액** → 주관·접수 (2026-09-02 개발자 지시).
@@ -3120,8 +3170,15 @@ function openDetail(id) {
            문구는 두 갈래다 — 못 읽은 것(unknown)과 안 맞아 보이는 것(ineligible)은
            학생이 해야 할 일이 다르다: 앞은 '원문을 읽어 보라', 뒤는 '그래도 내가 맞는지
            따져 보라'. 뭉뚱그리면 둘 다 '안 된다'로 읽힌다. */ ''}
+      ${/* 🔴 앞 갈래에서 **우리 사정을 뺐다** (2026-09-17 개발자 지시: "'이 공고는 지원자격을
+           아직 읽지 못했습니다' 와 같은 설명이 나타나지 않게 전부 삭제 … 앱 내부 사정에 대한
+           설명은 학생이 아니라 관리자에게만"). 학생이 할 일은 그대로 남는다 — 남은 한 문장은
+           '우리가 뭘 못 했다'가 아니라 '원문에서 자격을 보고 신청하라'는 안내다.
+           🔴 문장을 통째로 지우지는 않았다: 지우면 자격을 한 줄도 못 읽은 공고가 아무 말 없이
+              신청 버튼만 내밀어, 앱이 자격을 확인해 준 것처럼 읽힌다(원칙 8-1).
+           🔴 몇 건이 그런 상태인지는 관리자 화면 '지원 자격 미확보'가 센다. */ ''}
       ${applyCaution ? `<p class="dp-note dp-caution">${applyCaution === 'unknown'
-        ? '이 공고는 지원 자격을 아직 읽지 못했습니다. 원문에서 확인한 뒤 신청하세요.'
+        ? '신청 전에 공고 원문에서 지원 자격을 확인하세요.'
         : '입력한 정보로는 요건이 맞지 않아 보입니다. 판정이 틀릴 수 있으니 원문을 확인한 뒤 신청하세요.'}</p>` : ''}
       <button class="btn btn-primary btn-lg" id="btn-apply-one" ${canApply ? '' : 'disabled'}>${btnLabel}</button>
       ${canApply ? `<p class="dp-note">준비를 마치면 최종 제출처(${ch.label})가 표시됩니다.${(!sch.formId && sch.prepFormId) ? ' 이 공고는 별도 양식 없이 자유 형식 제출을 받으므로, 앱에서 제출용 지원문서를 작성할 수 있습니다.' : ''}</p>` : ''}
@@ -3954,7 +4011,9 @@ function renderSaved() {
     ${open.length ? `<h5 class="cal-sec">마감이 다가오는 순</h5>${open.map((s) => calRowHtml(s, { save: true })).join('')}` : ''}
     ${/* 🔴 날짜를 못 읽은 공고를 **숨기지 않는다** — 달력에는 찍을 수 없어 사라지는데,
          사라지면 학생은 그 공고가 없는 줄 안다. 여기가 그 자리다. */ ''}
-    ${undated.length ? `<h5 class="cal-sec">날짜를 아직 읽지 못한 공고 ${undated.length}건</h5>
+    ${/* 🔴 '날짜를 아직 읽지 못한' → '기한은 원문에서 확인' (2026-09-17 개발자 지시).
+         앞은 우리가 못 한 일이고 뒤는 학생이 할 일이다. 건수는 관리자 '마감일 없음'이 센다. */ ''}
+    ${undated.length ? `<h5 class="cal-sec">기한을 원문에서 확인할 공고 ${undated.length}건</h5>
       <p class="cal-note">접수 기간이 공고 원문에만 있어요. 원문을 열어 확인해 주세요.</p>
       ${undated.map((s) => calRowHtml(s, { save: true })).join('')}` : ''}
     ${closed.length ? `<details class="cal-kosaf">
@@ -4251,10 +4310,10 @@ const FAQ_ITEMS = [
 
   ['공고·매칭', '우리 학교 공고가 안 보여요.',
     '지금 공고 원문을 모으고 있는 학교가 정해져 있어요. 그 밖의 학교라도 <strong>전국 대상 공고</strong>와 <strong>한국장학재단이 아는 재단 장학금</strong>은 그대로 보입니다.'],
-  ['공고·매칭', '"지원 자격을 아직 읽지 못했어요"는 무슨 뜻인가요?',
-    '공고 원문에서 자격 요건 문장을 찾지 못했다는 뜻입니다. 앱이 짐작해서 채우지 않습니다 — 틀린 자격 판정은 모른다고 말하는 것보다 나쁘기 때문이에요. 그때는 <strong>원문 보기</strong>로 직접 확인해 주세요.'],
-  ['공고·매칭', '금액이 "미확인"인 공고가 있어요.',
-    '공고 원문에 금액이 없거나 앱이 읽지 못한 경우입니다. 이런 공고는 홈의 예상 수혜액 <strong>합계에서 빼고</strong> "금액 미확인 n건 제외"라고 적습니다. 지어낸 숫자를 섞지 않습니다.'],
+  ['공고·매칭', '자격 요건이 안 적힌 공고가 있어요.',
+    '그 공고에서는 자격 요건을 <strong>공고 원문에서 직접 확인</strong>해 주세요. 앱이 짐작해서 채우지 않습니다 — 틀린 자격 판정은 모른다고 말하는 것보다 나쁘기 때문이에요.'],
+  ['공고·매칭', '금액이 "원문 확인"인 공고가 있어요.',
+    '공고 원문에 금액이 적혀 있지 않거나 첨부파일에만 있는 경우입니다. 그 공고의 카드에는 지어낸 숫자를 적지 않고 <strong>"금액 원문 확인"</strong> 그대로 둡니다. 다만 홈의 합계는 이런 공고를 빼 버리면 실제보다 작아지므로, <strong>금액을 확인한 공고들의 중앙값</strong>으로 어림잡아 더하고 숫자 앞에 "약"을 붙입니다. 자세한 내역은 홈의 금액을 눌러 <strong>금액 상세</strong>에서 볼 수 있어요.'],
   ['공고·매칭', '저장(북마크)한 공고는 어디에 남나요?',
     '<strong>이 기기에만</strong> 남습니다. 로그인해도 저장 목록은 서버로 올라가지 않아서, 기기를 바꾸면 다시 저장하셔야 해요.'],
   ['공고·매칭', '달력에 왜 몇 개만 표시되나요?',
@@ -4291,7 +4350,7 @@ const FAQ_TOP = [
   '이 앱에서 신청까지 끝나나요?',
   '우리 학교 공고가 안 보여요.',
   '알림이 안 와요.',
-  '"지원 자격을 아직 읽지 못했어요"는 무슨 뜻인가요?',
+  '자격 요건이 안 적힌 공고가 있어요.',
   '유료인가요?',
 ];
 

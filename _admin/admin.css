@@ -126,7 +126,8 @@ a { color: var(--accent); }
 .gate-box h1 { font-size: var(--t-2xl); font-weight: 800; }
 .gate-lede { color: var(--text-sub); font-size: var(--t-md); }
 .gate-label { font-size: var(--t-xs); font-weight: 700; color: var(--text-sub); margin-top: var(--space-4); }
-.gate-box input[type="password"] {
+.gate-label em { font-style: normal; font-weight: 500; color: var(--text-weak); }
+.gate-box input[type="password"], .gate-box input[type="date"] {
   width: 100%; padding: var(--space-12) var(--space-12); border: 1px solid var(--rule); border-radius: var(--radius-sm);
   background: var(--surface-2); color: var(--text); font-family: var(--mono); font-size: var(--t-sm);
 }
@@ -314,6 +315,9 @@ a { color: var(--accent); }
 .card.is-ok .v   { color: var(--green); }
 .card .d { font-size: var(--t-sm); color: var(--text-sub); }
 .card .btn-row { margin-top: var(--space-4); }
+/* 날짜를 적는 칸 (F-4 열쇠 만료일 · 마감 적어 두기) — 날짜 칸과 단추가 한 줄 */
+.key-exp { display: flex; flex-wrap: wrap; gap: var(--space-8); align-items: center; }
+.key-exp input[type="date"] { min-height: 36px; }
 
 /* 이상 없는 항목은 카드로 자리를 먹지 않고 한 줄 띠로 접는다 */
 .allclear {

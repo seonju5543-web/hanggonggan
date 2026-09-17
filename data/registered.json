@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-09-15",
+ "updatedAt": "2026-09-17",
  "items": [
   {
    "id": "reg-hi-jeju",
@@ -446,8 +446,8 @@
    "provider": "포스코청암재단",
    "amount": "생활장학금 (세부 원문 확인)",
    "amountValue": 0,
-   "deadline": null,
-   "period": "2026년도 선발 (기간 원문 확인)",
+   "deadline": "2026-07-19",
+   "period": "2026년도 선발 (기간 ~2026-07-19)",
    "summary": "포스코청암재단의 포스코비전장학생 선발 공고입니다. 광운대·경희대·동국대 등 여러 대학에 게시된 재단 장학이에요. 자격·기간·신청 방법은 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true
@@ -497,7 +497,8 @@
     "다. 소득구간 5분위 이하"
    ],
    "eligibilityFrom": "AI(공고 포스터 그림)",
-   "eligibilityReviewed": false
+   "eligibilityReviewed": false,
+   "deadlineFrom": "공고문 이미지 2026-09-15 · 지원기간 2026. 6.15(월) ~ 7.19(일)"
   },
   {
    "id": "reg-kosaf-daecheonggyo",
@@ -653,8 +654,8 @@
    "provider": "중앙대학교 게시 공고",
    "amount": "100만원",
    "amountValue": 1000000,
-   "deadline": null,
-   "period": "접수 기간 원문 확인",
+   "deadline": "2026-07-30",
+   "period": "접수 기간 ~2026-07-30",
    "summary": "중앙대학교 게시판에서 수집돼 검수를 마친 공고예요. 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true
@@ -713,7 +714,8 @@
     "max": 1000000,
     "raw": "장학금액 학업지원 장학금 100만원 (1회 지급)"
    },
-   "amountFrom": "공고 원문"
+   "amountFrom": "공고 원문",
+   "deadlineFrom": "공고문 이미지 2026-09-15 · 서류 접수 2026.7.27(월) ~ 7.30(목)"
   },
   {
    "id": "auto-rnoticedoarticleno154473",
@@ -984,7 +986,8 @@
     "max": 1000000,
     "raw": "장학금액 지원금액 : 1인당 100만원(생활비 장학금)"
    },
-   "amountFrom": "공고 원문"
+   "amountFrom": "공고 원문",
+   "openDate": "2026-08-06"
   },
   {
    "id": "auto-c839d20ec84a0ebb09c20202",
@@ -1391,8 +1394,8 @@
    "name": "충북인재평생교육진흥원 장학생 (2026 하반기)",
    "type": "교외",
    "provider": "충북인재평생교육진흥원",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
+   "amount": "100만원",
+   "amountValue": 1000000,
    "deadline": "2026-08-27",
    "listedAt": "2026-08-04",
    "period": "접수 기간 원문 확인",
@@ -1514,9 +1517,9 @@
    "provider": "경희대학교 게시 공고",
    "amount": "금액 원문 확인",
    "amountValue": 0,
-   "deadline": null,
+   "deadline": "2026-07-30",
    "listedAt": "2026-08-17",
-   "period": "접수 기간 원문 확인",
+   "period": "접수 기간 ~2026-07-30",
    "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true,
@@ -1552,7 +1555,10 @@
     "※ 정규학기 내 재학생만 지원 가능 (건축학과 등 예외 인정 / 초과학기생 제외)",
     "2) 경제적 기준",
     "- 기초생활수급자/ 차상위복지급여수급자 (※ 관련 증빙서류 제출 필수)"
-   ]
+   ],
+   "deadlineFrom": "공고문 첨부",
+   "openDate": "2026-07-27",
+   "announceDate": "2026-08-14"
   },
   {
    "id": "auto-ent2431261572artclviewdo",
@@ -1705,7 +1711,7 @@
    "name": "[공통][국가]2026년 2학기 푸른등대 기부장학금 장학생 선발(~9/10)",
    "type": "교내",
    "provider": "한국외국어대학교 게시 공고",
-   "amount": "250만원",
+   "amount": "500만원",
    "amountValue": 2500000,
    "deadline": "2026-09-10",
    "period": "접수 ~2026-09-10",
@@ -1859,7 +1865,9 @@
     "※ 초·중·고등학생은 학교장 추천서 및 학교 직인 날인 제출 [별지1] 장학생 신청서 서식",
     "※ 학교장 추천은 *개인별 신청 불가"
    ],
-   "deadlineFrom": "공고문 첨부"
+   "deadlineFrom": "공고문 첨부",
+   "openDate": "2026-09-03",
+   "announceDate": "2026-11-13"
   },
   {
    "id": "auto-ent2431264135artclviewdo",
@@ -2042,9 +2050,9 @@
    "provider": "한국외국어대학교 게시 공고",
    "amount": "금액 원문 확인",
    "amountValue": 0,
-   "deadline": null,
+   "deadline": "2026-09-18",
    "listedAt": "2026-08-30",
-   "period": "접수 기간 원문 확인",
+   "period": "접수 기간 ~2026-09-18",
    "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true,
@@ -2096,7 +2104,8 @@
     "max": 0,
     "raw": "장학금액 중소·중견기업 : 수혜 학기 등록금 전액 대기업·비영리기관 : 수혜 학기 등록금 50%"
    },
-   "amountFrom": "공고 원문"
+   "amountFrom": "공고 원문",
+   "deadlineFrom": "공고문 이미지 2026-09-15 · 신청기간 '26. 9. 1.(화) 09시 ~ 9. 18.(금) 18시"
   },
   {
    "id": "auto-ent2431263956artclviewdo",
@@ -2129,7 +2138,8 @@
    ],
    "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/263956/artclView.do",
    "sourceKind": "auto",
-   "deadlineFrom": "공고문 첨부"
+   "deadlineFrom": "공고문 첨부",
+   "openDate": "2026-09-16"
   },
   {
    "id": "auto-oardid322850menuno200318",
@@ -2139,9 +2149,9 @@
    "provider": "경희대학교 게시 공고",
    "amount": "100만원",
    "amountValue": 1000000,
-   "deadline": null,
+   "deadline": "2026-09-30",
    "listedAt": "2026-08-30",
-   "period": "접수 기간 원문 확인",
+   "period": "접수 기간 ~2026-09-30",
    "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true,
@@ -2201,7 +2211,8 @@
     "max": 1000000,
     "raw": "장학금액 : 100만원"
    },
-   "amountFrom": "공고 원문"
+   "amountFrom": "공고 원문",
+   "deadlineFrom": "공고문 이미지 2026-09-15 · 접수 2026년 9월 1일(화) - 30일(수)"
   },
   {
    "id": "auto-oardid321881menuno200318",
@@ -2312,9 +2323,9 @@
    "provider": "경희대학교 게시 공고",
    "amount": "금액 원문 확인",
    "amountValue": 0,
-   "deadline": null,
+   "deadline": "2026-10-06",
    "listedAt": "2026-09-01",
-   "period": "접수 기간 원문 확인",
+   "period": "접수 기간 ~2026-10-06",
    "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true,
@@ -2356,7 +2367,8 @@
    ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%20%EC%A0%9C36%EA%B8%B0%20%EB%AF%B8%EB%A0%88%EC%97%90%EC%85%8B%20%ED%95%B4%EC%99%B8%EA%B5%90%ED%99%98%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C",
    "sourceKind": "auto",
-   "aiTries": 1
+   "aiTries": 1,
+   "deadlineFrom": "공고문 이미지 2026-09-15 · 온라인 지원(서류 접수) 9.30(수) 오전 10시 ~ 10.6(화) 오후 3시"
   },
   {
    "id": "auto-9599ec839d20ebaaa8eca791",
@@ -2366,9 +2378,9 @@
    "provider": "경희대학교 게시 공고",
    "amount": "금액 원문 확인",
    "amountValue": 0,
-   "deadline": null,
+   "deadline": "2026-09-30",
    "listedAt": "2026-09-01",
-   "period": "접수 기간 원문 확인",
+   "period": "접수 기간 ~2026-09-30",
    "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true,
@@ -2403,7 +2415,8 @@
     "대한민국 국적을 가진 자에 한함"
    ],
    "eligibilityFrom": "AI(공고 포스터 그림)",
-   "eligibilityReviewed": false
+   "eligibilityReviewed": false,
+   "deadlineFrom": "공고문 이미지 2026-09-15 · 접수기간 2026년 9월 1일(화) ~ 9월 30일(수) 18:00"
   },
   {
    "id": "auto-ent2431265883artclviewdo",
@@ -2496,7 +2509,20 @@
     }
    ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323027",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "eligibilityFrom": "공고문 첨부",
+   "eligibilityLines": [
+    "신청자격 및 선발 제외사항",
+    "ㅇ (신청자격) 아래 ①, ②, ③을 모두 충족하는 자",
+    "대전 소재 대학",
+    "① 공고일(‘26.9.1.) 기준 본인이 1년 전부터 계속해서 대전광역시에 주소를 두고 있는 대한민국 국적의 학생",
+    "② 대전광역시에 소재한 대학교에 재학 중인 학교(총)장 또는 단과대학장의 추천을 받은 대학교 2학년 이상 학생",
+    "③ 직전 학기까지의 전체 평균 평점 3.5 이상(4.5 만점 기준) 또는 3.3 이상(4.3 만점 기준) 성적을 가진 학생",
+    "타지역 소재 대학",
+    "① 공고일(‘26.9.1.) 기준 본인 또는 부모가 1년 전부터 계속해서 대전광역시에 주소를 두고 있는 대한민국 국적의 학생",
+    "② 타지역에 소재한 국내 대학교에 재학 중인 학교(총)장 또는 단과대학장의 추천을 받은 대학교 2학년 이상 학생",
+    "③ 직전 학기까지의 전체 평균 평점 3.5 이상(4.5 만점 기준) 또는 3.3 이상(4.3 만점 기준) 성적을 가진 학생"
+   ]
   },
   {
    "id": "auto-84a0ebb09c20eab3b5eab3a0",
@@ -2674,6 +2700,80 @@
     }
    ],
    "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/266533/artclView.do",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-9d20ec84a0ebb09c20ec9588",
+   "name": "서울 [서울C] 2026학년도 2학기 하나금융나눔재단 하나장학생 선발 안내",
+   "boardTitle": "서울 [서울C] 2026학년도 2학기 하나금융나눔재단 하나장학생 선발 안내",
+   "type": "교외",
+   "provider": "경희대학교 게시 공고",
+   "amount": "80만원",
+   "amountValue": 800000,
+   "deadline": "2026-09-23",
+   "listedAt": "2026-09-16",
+   "period": "접수 기간 ~2026-09-23",
+   "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경희대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-16 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323098",
+   "sourceKind": "auto",
+   "deadlineFrom": "공고 원문",
+   "eligibilityLines": [
+    "2. 지원자격",
+    "2026학년도 2학기 정규학기 재학생",
+    "※ 휴학생 및 2년 미만 교육과정, 방송통신대학·사이버대학(원격대학) 등 제외",
+    "직전학기 12학점 이상 이수 및 학업성적 2.9/4.3 이상",
+    "※ 복학생은 휴학 직전학기 성적 기준",
+    "※ 본인이 장애인인 경우 성적 요건 미적용",
+    "한국장학재단 학자금 지원구간 5구간 이내",
+    "대한민국 국적자"
+   ],
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 800000,
+    "ratio": 0,
+    "min": 800000,
+    "max": 800000,
+    "raw": "1. 장학금액 1인 80만원 (생활비성 장학금)"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-99ec839d20ec84a0ebb09c20",
+   "name": "공통 2026년 하반기 문주장학재단 AI·ICT 분야 인재 장학생 선발 안내",
+   "boardTitle": "공통 2026년 하반기 문주장학재단 AI·ICT 분야 인재 장학생 선발 안내",
+   "type": "교외",
+   "provider": "경희대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-17",
+   "period": "접수 기간 원문 확인",
+   "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경희대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-17 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323111",
    "sourceKind": "auto"
   }
  ]

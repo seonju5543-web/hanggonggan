@@ -110,9 +110,11 @@ for (const sch of hits) {
   console.log(`   신청 버튼 ${canApply ? '열림' : '잠김'}  (마감: ${d.label || '?'})`);
   /* 막지 않는 대신 무엇을 알리는가 — 이것까지 보여야 '화면에 무엇이 보이는가'가 완성된다 */
   if (caution) {
-    console.log(`   ⚠️ 버튼 위 안내: ${caution === 'unknown'
-      ? '지원 자격을 아직 읽지 못했습니다 — 원문에서 확인한 뒤 신청하세요'
-      : '입력한 정보로는 요건이 맞지 않아 보입니다 — 원문을 확인한 뒤 신청하세요'}`);
+    /* 🔴 문구를 **베끼지 않는다** — app.js 에서 그 자리의 두 갈래를 읽어 온다.
+       2026-09-17 에 개발자 지시로 문구가 바뀌었을 때, 여기 베껴 둔 사본은 그대로 남아
+       이 도구가 **화면에 없는 문장**을 '화면에 보인다'고 보고하고 있었다. 이 파일의 첫머리
+       규칙(앱 규칙을 한 줄도 베끼지 않는다)이 글자에도 그대로 적용된다. */
+    console.log(`   ⚠️ 버튼 위 안내: ${cautionText(caution)}`);
   }
   console.log(`   ─ 목록 카드에 보이는 자격 줄 (${listLines.length}줄 · 5줄 상한)`);
   for (const l of listLines) console.log(`       · ${String(l).slice(0, 84)}`);
@@ -123,4 +125,20 @@ for (const sch of hits) {
   for (const l of exLines) console.log(`       ✗ ${String(l).slice(0, 84)}`);
   const why = (result.reasons || []).filter((r) => /미달|없어|불가/.test(r));
   if (why.length) console.log(`   ─ 미달 사유\n       ${why.map((w) => w.slice(0, 90)).join('\n       ')}`);
+}
+
+/* 버튼 위 안내 문구를 **app.js 에서 그대로** 읽어 온다 (2026-09-17).
+   app.js 의 그 자리는 삼항 하나다:
+       ${applyCaution === 'unknown' ? '…' : '…'}
+   🔴 못 찾으면 **지어내지 않고 그렇게 말한다** — 이 도구의 존재 이유가 '화면에 실제로
+      무엇이 보이는가'를 틀리지 않게 답하는 것이라, 모르면서 아는 척하면 도구가 해롭다. */
+function cautionText(kind) {
+  const src = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+  const from = src.indexOf('dp-note dp-caution');
+  const to = from < 0 ? -1 : src.indexOf('id="btn-apply-one"', from);
+  const seg = from >= 0 && to > from ? src.slice(from, to) : '';
+  const unk = (seg.match(/\?\s*'([^']+)'/) || [])[1];
+  const bad = (seg.match(/:\s*'([^']+)'/) || [])[1];
+  if (!unk || !bad) return '(app.js 에서 안내 문구를 못 찾았습니다 — 이 도구를 고쳐 주세요)';
+  return kind === 'unknown' ? unk : bad;
 }
