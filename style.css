@@ -4715,33 +4715,45 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 .elig-ask-lines li.ok  { color: var(--green); }
 .elig-ask-lines li.bad { color: var(--red); }
 
-.elig-ask-row { display: block; margin-bottom: var(--space-16); }
+/* 입력칸 — 라벨을 **박스 안에** 넣어 한 덩어리로 (2026-09-18 개발자 지시: "조금 더 이쁘게").
+   라벨을 밖에 두면 글자 줄과 네모가 따로 놀아 목록이 성글어 보인다. */
+.elig-ask-row {
+  display: block; margin-bottom: var(--space-8);
+  background: var(--surface-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  padding: var(--space-12) var(--space-16);
+  transition: background .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+.elig-ask-row:focus-within {
+  background: var(--surface); border-color: var(--accent); box-shadow: var(--ring);
+}
 .elig-ask-row > span:first-child {
-  display: block; font-size: var(--t-xs); color: var(--text-sub);
-  font-weight: 500; margin-bottom: var(--space-8);
+  display: block; font-size: var(--t-2xs); color: var(--text-weak);
+  font-weight: 500; margin-bottom: var(--space-2);
 }
-.elig-ask-wrap { position: relative; display: block; }
+.elig-ask-wrap { position: relative; display: flex; align-items: baseline; gap: var(--space-6); }
 .elig-ask-wrap em {
-  position: absolute; right: var(--space-16); top: 50%; transform: translateY(-50%);
-  font-style: normal; font-size: var(--t-xs); color: var(--text-weak);
+  flex: none; font-style: normal; font-size: var(--t-xs); color: var(--text-weak);
 }
-/* 입력칸 — 테두리 대신 옅은 면. 누르는 자리를 크게 잡는다 */
+/* 칸 자체는 테두리도 면도 없다 — 박스가 그 일을 한다 */
 .elig-ask-in {
-  width: 100%; box-sizing: border-box;
-  background: var(--surface-2); border: 1px solid transparent;
-  border-radius: var(--radius-sm); padding: var(--space-16);
-  font: inherit; font-size: var(--t-lg); font-weight: 600; color: var(--text);
-  transition: background .15s ease, border-color .15s ease;
+  flex: 1 1 auto; min-width: 0; width: 100%;
+  background: none; border: 0; padding: 0;
+  font: inherit; font-size: var(--t-xl); font-weight: 700; color: var(--text);
+  letter-spacing: var(--track-display); font-variant-numeric: tabular-nums;
 }
-.elig-ask-in:focus {
-  outline: none; background: var(--surface);
-  border-color: var(--accent); box-shadow: var(--ring);
-}
+.elig-ask-in:focus { outline: none; }
+/* 숫자 칸의 증감 화살표는 숨긴다 — 눌러서 올릴 값이 아니다 */
+.elig-ask-in::-webkit-outer-spin-button,
+.elig-ask-in::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.elig-ask-in[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 
 .elig-ask-save {
   width: 100%; background: var(--accent); color: #fff; border: 0;
-  border-radius: var(--radius-sm); padding: var(--space-16);
+  border-radius: var(--radius); padding: var(--space-16);
   font: inherit; font-size: var(--t-md); font-weight: 700;
+  margin-top: var(--space-8);
 }
 .elig-ask-save:active { transform: scale(0.95); }
 /* 접는 또 하나의 길 — 눌러서 나갈 자리를 아래에도 둔다 */
