@@ -4675,3 +4675,47 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 
 /* 손가락으로 눌렀을 때 회색 판이 뜨지 않게 — 설정 목록과 같은 규칙 */
 .sup-top-item, .sup-more { -webkit-tap-highlight-color: transparent; }
+
+/* ── 자격 확인 도우미 (2026-09-17 · 노션 AI-1) ─────────────────────────────
+   🔴 앱이 하는 말은 「미확인 자격 n」뿐이다. 설명 문장을 넣지 말 것(설계 3-2).
+   🔴 저장 뒤 줄은 **글자 색만** 바뀐다 — 마커(✓·✕)도 배경도 안 넣는다(개발자 지시).
+   🔴 토큰 밖의 값을 쓰지 않는다 — ui-tone.mjs '토큰 이탈' 톱니가 지금 값을 천장으로 잡는다. */
+.elig-ask-btn {
+  background: none; border: 0; padding: 0;
+  color: var(--accent); font: inherit; font-size: var(--t-xs); font-weight: 500;
+}
+.elig-ask-head {
+  display: flex; align-items: center; gap: var(--space-4);
+  background: none; border: 0; padding: 0; margin: 0 0 var(--space-12);
+  color: var(--text-weak); font: inherit; font-size: var(--t-2xs);
+}
+.elig-ask-head b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+.elig-ask-head i { color: var(--text-weak); font-style: normal; font-size: var(--t-2xs); }
+.elig-ask-lines { list-style: none; margin: 0 0 var(--space-12); padding: 0; }
+.elig-ask-lines li {
+  font-size: var(--t-sm); line-height: 1.55; padding: var(--space-2) 0;
+  color: var(--text-weak);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.elig-ask-lines li.ok  { color: var(--green); }
+.elig-ask-lines li.bad { color: var(--red); }
+.elig-ask-row { display: block; margin-bottom: var(--space-12); }
+.elig-ask-row > span:first-child {
+  display: block; font-size: var(--t-xs); color: var(--text-sub); margin-bottom: var(--space-6);
+}
+.elig-ask-wrap { position: relative; display: block; }
+.elig-ask-wrap em {
+  position: absolute; right: var(--space-12); top: 50%; transform: translateY(-50%);
+  font-style: normal; font-size: var(--t-xs); color: var(--text-weak);
+}
+.elig-ask-in {
+  width: 100%; box-sizing: border-box;
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius-sm); padding: var(--space-8) var(--space-12);
+  font: inherit; font-size: var(--t-md); color: var(--text);
+}
+.elig-ask-save {
+  width: 100%; background: var(--accent); color: #fff; border: 0;
+  border-radius: var(--radius-pill); padding: var(--space-12);
+  font: inherit; font-size: var(--t-md); font-weight: 600;
+}

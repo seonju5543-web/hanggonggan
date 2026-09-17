@@ -2945,7 +2945,18 @@ function openDetail(id) {
        자격 줄에만 `r-elig`를 달아 구분한다. 보이는 모양은 그대로다. */
     const cls = m === 'ok' ? 'r-elig r-ok' : m === 'no' ? 'r-elig r-bad' : 'r-elig r-req';
     const mark = m === 'ok' ? '✓ ' : m === 'no' ? '✕ ' : '';
-    return `<li class="${cls}${extra ? ' ' + extra : ''}">${mark}${esc(e)}</li>`;
+    /* 🔴 판정이 없고 **적으면 판정이 생기는** 줄에만 단추를 단다 (2026-09-17 · 노션 AI-1).
+       적어도 안 풀리는 줄(`백분율환산 85점`·재학생에게 `신입생:`)에 달면 학생이 적었는데
+       화면이 그대로다 — 묻지 않는 것보다 나쁘다. 판정은 elig-ask.js 한 곳이고
+       여기서 규칙을 새로 만들지 않는다.
+       ⚠️ 목록 카드(schCard)에는 달지 않는다 — 카드는 5줄 상한이고 카드 전체가 누르는
+          자리라 손가락이 엉뚱한 곳을 친다. 상세 시트에만 단다. */
+    let ask = '';
+    if (!m && typeof askableFields === 'function'
+        && askableFields(e, state.profile, sch).length) {
+      ask = ` <button type="button" class="elig-ask-btn" data-elig-ask="${esc(sch.id)}">적어서 확인</button>`;
+    }
+    return `<li class="${cls}${extra ? ' ' + extra : ''}">${mark}${esc(e)}${ask}</li>`;
   };
 
   /* 원문이 표인 공고 — 공통 / 둘 중 하나 / 성적을 갈라서 그린다 (2026-08-23).
@@ -3196,6 +3207,15 @@ function openDetail(id) {
   if (canApply) {
     $('#btn-apply-one').addEventListener('click', () => applyTo(sch));
   }
+  /* 자격 묻기 — 못 읽은 줄 아래 단추 (2026-09-17 · 노션 AI-1).
+     🔴 인라인 onclick 은 CSP 가 막으므로 innerHTML 을 채운 뒤 여기서 배선한다. */
+  $$('[data-elig-ask]', $('#detail-sheet')).forEach((b) => {
+    b.addEventListener('click', (ev) => {
+      ev.stopPropagation();      /* 줄·카드가 누르는 자리라 위로 안 새게 막는다 */
+      rememberEligBack(sch.id);
+      openEligAsk(b.dataset.eligAsk, false, true);   /* 단추로 처음 여는 것 */
+    });
+  });
   /* 진척도 기록 버튼 (있을 때만) */
   const markBtn = $('#btn-mark-submitted');
   if (markBtn) markBtn.addEventListener('click', () => recordSubmitted(sch));
@@ -3495,8 +3515,113 @@ function rememberAmountBack() {
   sheetBack = () => renderAmountDetail(y);
 }
 
+/* ── 자격 확인 도우미 — 못 읽은 자격을 그 자리에서 묻는다 (2026-09-17 · 노션 AI-1) ──
+   🔴 앱이 하는 말은 「미확인 자격 n」 하나다. 설명·약속 문장을 넣지 말 것 —
+      앱이 아는 것은 공고에 적힌 요건 중 **자기가 읽어낸 것**뿐이고, 적는다고
+      좋은 소식이 는 것도 아니다(적은 결과가 ✕ 일 수 있다). 설계 3-2.
+   🔴 `#detail-sheet` 은 innerHTML 이 통째로 갈리는 그릇이라(금액 상세와 같은 방식)
+      「시트 뒤」라는 것이 없다. 돌아갈 곳은 `sheetBack` 에 건다 — 안 걸면 쓸어 내렸을 때
+      공고가 아니라 목록으로 튄다.
+   설계: docs/designs/eligibility-ask.md · 관문: verify/verify-elig-ask.js */
+
+/* 자격 묻기 시트에서 쓸어 내리면 보던 공고로 돌아간다 (금액 상세와 같은 방식) */
+function rememberEligBack(schId) {
+  const y = $('#detail-sheet').scrollTop;
+  sheetBack = () => { openDetail(schId); $('#detail-sheet').scrollTop = y; };
+}
+
+/* 🔴 시트를 **열 때 본 줄**을 기억한다 (2026-09-17 실측으로 잡은 버그).
+   매번 '아직 판정 없는 줄'로 다시 세면, 저장해서 풀린 줄이 초록으로 바뀌는 게 아니라
+   목록에서 **사라진다** — 학생 눈에는 방금 적은 그 줄이 없어진 것이다.
+   승인받은 화면은 '그 자리에서 색만 바뀐다 · 시트가 흔들리지 않는다' 였다. */
+let eligAskShown = null;
+
+function eligAskHtml(sch, open) {
+  const keys = askableForSch(sch, state.profile);
+  /* 미확인 = 이 공고의 자격 줄 중 아직 판정이 없는 줄. 세는 것과 펼쳐 보여 주는 것이
+     같아야 한다 — 따로 세면 숫자와 목록이 어긋난다. */
+  const unread = eligAskShown || requirementLines(sch, null, { all: true })
+    .filter((l) => !requirementMatch(l, state.profile, sch));
+  eligAskShown = unread;
+  const rows = keys.map((k) => {
+    const f = FIELD_META[k];
+    const val = state.profile && state.profile[k] != null ? String(state.profile[k]) : '';
+    const input = f.kind === 'select'
+      ? `<select class="elig-ask-in" data-elig-field="${k}"><option value=""></option>`
+        + f.options.map((o) => `<option${o === val ? ' selected' : ''}>${esc(o)}</option>`).join('')
+        + `</select>`
+      : `<input class="elig-ask-in" data-elig-field="${k}" value="${esc(val)}"`
+        + (f.kind === 'number'
+          ? ` type="number" inputmode="decimal" step="${f.step}" min="${f.min}" max="${f.max}"`
+          : ' type="text"') + `>`;
+    return `<label class="elig-ask-row"><span>${esc(f.label)}</span>`
+      + `<span class="elig-ask-wrap">${input}`
+      + (f.suffix ? `<em>${esc(f.suffix)}</em>` : '') + `</span></label>`;
+  }).join('');
+  /* 줄 목록은 접어 둔다 — 라벨을 누르면 펼친다. 저장 뒤에는 **글자 색만** 바뀐다
+     (개발자 지시 — 마커 ✓·✕ 도 배경도 붙이지 않는다). */
+  const list = open
+    ? `<ul class="elig-ask-lines">` + unread.map((l) => {
+        const m = requirementMatch(l, state.profile, sch);
+        return `<li${m === 'ok' ? ' class="ok"' : m === 'no' ? ' class="bad"' : ''}>${esc(l)}</li>`;
+      }).join('') + `</ul>`
+    : '';
+  /* 🔴 숫자는 **아직 안 풀린 줄 수**다 — 보여 주는 목록(눈금)과 뜻이 다르다.
+     목록은 열 때 본 줄을 자리 그대로 두고 색만 바꾸고, 숫자는 그중 남은 것을 센다. */
+  const left = unread.filter((l) => !requirementMatch(l, state.profile, sch)).length;
+  /* 물을 칸이 없으면 저장 단추를 그리지 않는다 — 누를 것이 없는 단추는 두지 않는다 */
+  const save = keys.length
+    ? `<button type="button" class="elig-ask-save" data-elig-save="${esc(sch.id)}">저장</button>`
+    : '';
+  return `<div class="elig-ask">`
+    + `<button type="button" class="elig-ask-head" data-elig-toggle="${esc(sch.id)}"`
+    + ` aria-expanded="${open ? 'true' : 'false'}">미확인 자격 <b>${left}</b>`
+    + `<i>${open ? '▴' : '▾'}</i></button>`
+    + list + rows + save
+    + `</div>`;
+}
+
+/* `fresh` 면 보여 줄 줄을 새로 고른다(단추로 처음 열 때). 접기·저장 뒤 다시 그릴 때는
+   열 때 본 줄을 그대로 둔다 — 그래야 풀린 줄이 사라지지 않고 색만 바뀐다. */
+function openEligAsk(schId, open, fresh) {
+  const sch = allScholarships().find((s) => s.id === schId);
+  if (!sch) return;
+  if (fresh) eligAskShown = null;
+  openSheetShell();
+  $('#detail-sheet').innerHTML = `
+    <div class="sheet-handle"></div>
+    <div class="sheet-body">${eligAskHtml(sch, !!open)}</div>`;
+  eligAskWire(schId);
+}
+
+/* innerHTML 을 채운 **뒤에** 배선한다 — openDetail 이 쓰는 방식 그대로.
+   🔴 인라인 `onclick` 은 CSP(`script-src 'self'`)가 조용히 막는다(2026-09-09 boot.js). */
+function eligAskWire(schId) {
+  const sheet = $('#detail-sheet');
+  const tog = $('[data-elig-toggle]', sheet);
+  if (tog) tog.addEventListener('click',
+    () => { const o = tog.getAttribute('aria-expanded') !== 'true'; openEligAsk(schId, o); });
+  const save = $('[data-elig-save]', sheet);
+  if (save) save.addEventListener('click', () => eligAskSave(schId));
+}
+
+function eligAskSave(schId) {
+  const sheet = $('#detail-sheet');
+  $$('[data-elig-field]', sheet).forEach((el) => {
+    state.profile[el.dataset.eligField] = coerceField(el.dataset.eligField, el.value);
+  });
+  saveState();
+  /* 적은 것이 **다른 공고에도 쓰이므로** 목록·홈도 다시 그린다 */
+  renderHome();
+  renderExplore();
+  const back = sheetBack;        /* 되돌아갈 곳은 그대로 둔다 */
+  openEligAsk(schId, true);      /* 줄이 펼쳐진 채로 색이 바뀐 것을 보여 준다 */
+  sheetBack = back;
+}
+
 function closeSheet() {
   sheetBack = null;          // 흐름이 닫을 때는 돌아갈 곳도 지운다
+  eligAskShown = null;       // 자격 묻기 시트가 본 줄 — 다음에 열면 새로 고른다
   docPrep = null;
   bulkPrep = null;
   /* 🔴 **쓰던 신청서 표시도 함께 내린다** (2026-09-09 코드 리뷰). 안 내리면 시트가 닫힌 뒤에도
