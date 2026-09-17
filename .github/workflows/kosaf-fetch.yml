@@ -109,7 +109,7 @@ jobs:
         continue-on-error: true
         run: |
           sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-kor poppler-utils
-          python3 collector/ocr-text.py data/kosaf-files --budget-sec=180
+          python3 collector/ocr-text.py data/kosaf-files --budget-sec=150
 
       # 🔴 **여기서 앱 파일을 다시 만든다 — 이 순서가 이 장치의 전부다** (2026-09-13).
       #    첨부 사본은 바로 위 두 단계에서 처음 내려오고 글자도 그때 뽑힌다. 그 전에 만든

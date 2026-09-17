@@ -142,7 +142,7 @@ jobs:
         continue-on-error: true
         run: |
           sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-kor poppler-utils
-          python3 collector/ocr-text.py --budget-sec=180
+          python3 collector/ocr-text.py --budget-sec=150
       - name: 데이터 관문 (수집기 규칙 테스트 + 데이터 감사)
         id: audit
         continue-on-error: true

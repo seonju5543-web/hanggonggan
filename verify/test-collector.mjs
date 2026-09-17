@@ -4011,7 +4011,7 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
      영영 '금액 원문 확인'이었다. 자격 발췌기와 **같은 색인(elig-docs)·같은 함수(attachmentText)**
      를 써야 "발췌기는 읽는데 금액 로봇은 못 읽는" 어긋남이 안 생긴다. */
   eq('금액 로봇이 공고문 첨부 색인을 연다', /elig-docs\.json/.test(ex), true);
-  eq('  첨부 글자는 발췌기와 같은 함수로 읽는다', /import \{ attachmentText, readable \} from '\.\/attachment-text\.mjs'/.test(ex), true);
+  eq('  첨부 글자는 발췌기와 같은 함수로 읽는다', /import \{ attachmentText, readable, docOrder \} from '\.\/attachment-text\.mjs'/.test(ex), true);
   eq('  본문·AI 줄로 못 읽었을 때만 첨부를 본다', /a\.kind === 'unknown' && hasDocs/.test(ex), true);
   eq('  첨부 금액도 parse-amount 가 정한다', /PA\.amountFrom\(t\.split/.test(ex), true);
 
@@ -6796,7 +6796,8 @@ console.log('■ 첨부에서 마감일 — 본문이 껍데기인 게시판 (20
   eq('  본문이 아예 없는 길에서도 첨부를 본다', /deadlineFromDocs\(it\)/.test(noBody), true);
   eq('  채우는 자리는 한 곳이다 (period 처리가 갈라지지 않게)',
     (ee.match(/function putDeadline\(/g) || []).length, 1);
-  eq('  출처를 정직하게 적는다', /putDeadline\(it, dl, '공고문 첨부'\)/.test(ee), true);
+  /* 2026-09-17: 표식은 docLabel 이 정한다 — 원문 글자면 '공고문 첨부', OCR 이면 '공고문 첨부(OCR)' */
+  eq('  출처를 정직하게 적는다', /putDeadline\(it, dl, docLabel\(fromDocs\.lastFile\)\)/.test(ee) && /'공고문 첨부\(OCR\)' : '공고문 첨부'/.test(ee), true);
 
   /* ③ 🔴 **동사가 든 이름표는 날짜 '범위'도 근거로 받는다** (2026-09-15 · G-3 이어서).
      `서류 접수 : 2026.7.27 (월) ~ 7.30 (목)` 를 놓치고 있었다 — 이름표는 통과하는데
@@ -7160,6 +7161,11 @@ console.log('\n■ OCR — 그림·스캔 첨부 글자 읽기 (2026-09-17)');
   const st = spawnSync('python3', ['collector/ocr-text.py', '--self-test'],
     { cwd: fileURLToPath(new URL('..', import.meta.url)), encoding: 'utf8' });
   eq('  자가 검사 통과', st.status === 0 && /"ok": true/.test(st.stdout || ''), true);
+  /* 코드 리뷰(2026-09-17)가 잡은 자리 셋 — 반쪽 굳힘 · 장부 유실 · 관문 상수 변경 뒤 영영 건너뜀 */
+  eq('  예산이 문서 중간에 바닥나면 반쪽을 굳히지 않는다 (Budget 예외)', /raise Budget\(/.test(ocrSrc) && /except Budget/.test(ocrSrc), true);
+  eq('  파일마다 장부를 저장한다 (단계가 죽어도 남게)', (ocrSrc.match(/save_ledger\(root, ledger\)/g) || []).length >= 2, true);
+  eq('  장부에 관문 판(gate)을 적어 상수가 바뀌면 다시 읽는다', /entry\.get\('gate'\) != GATE/.test(ocrSrc), true);
+  eq('  바깥 명령의 대기 시간을 남은 예산으로 깎는다', /timeout=remaining\(deadline/.test(ocrSrc), true);
   /* 워크플로 — PDF 글자를 뽑는 로봇 전부가 OCR 도 돌리고, 설치 실패를 삼키지 않는다 */
   const wfs = fs.readdirSync(new URL('../.github/workflows', import.meta.url))
     .filter((f) => f.endsWith('.yml'))
@@ -7189,7 +7195,18 @@ console.log('\n■ OCR — 그림·스캔 첨부 글자 읽기 (2026-09-17)');
     fs.writeFileSync(pdf, '%PDF-1.4');
     fs.writeFileSync(pdf + '.txt', '글자층 평점 3.0 이상');
     eq('  PDF 의 .pdf.txt 는 여전히 안 읽는다', AT.attachmentText(pdf), '');
+    /* 코드 리뷰(2026-09-17): OCR 이 글자를 내기 시작하면 색인 순서(PDF 가 앞)만으로 HWP 를 이긴다 */
+    eq('첨부 읽는 차례 — HWP·DOCX 가 OCR(PDF·그림)보다 먼저', AT.docOrder(['a.pdf', 'b.jpg', 'c.hwp', 'd.docx']), ['c.hwp', 'd.docx', 'a.pdf', 'b.jpg']);
+    eq('  OCR 에서 온 글자인지 알 수 있다 (출처 표식용)', [AT.isOcrSource(img), AT.isOcrSource(pdf), AT.isOcrSource(path.join(tmp, 'x.hwp'))], [true, false, false]);
   }
+  const exSrc2 = readText(new URL('../collector/extract-excerpts.mjs', import.meta.url));
+  eq('발췌기가 그 차례로 읽고 OCR 출처를 「공고문 첨부(OCR)」로 적는다',
+    (exSrc2.match(/docOrder\(/g) || []).length >= 2 && (exSrc2.match(/docLabel\(/g) || []).length >= 4 && /'공고문 첨부\(OCR\)'/.test(exSrc2), true);
+  eq('  옛 표식을 지울 때 (OCR) 판도 같이 본다', /\/\^공고문 첨부\/\.test\(it\.eligibilityFrom/.test(exSrc2), true);
+  eq('  금액 로봇도 같은 차례', /docOrder\(/.test(readText(new URL('../collector/extract-amounts.mjs', import.meta.url))), true);
+  /* KOSAF 쪽 — 사본 정리가 장부를 지우지 않고, 빈 껍데기 판정이 .ocr.txt 도 연다 */
+  eq('KOSAF 사본 정리가 재단 폴더만 지운다 (장부는 남긴다)', /isDirectory\(\)\) continue;/.test(readText(new URL('../collector/kosaf-attach.mjs', import.meta.url))), true);
+  eq('  KOSAF 빈 껍데기 판정이 .ocr.txt 도 연다', /'\.ocr\.txt'/.test(readText(new URL('../collector/kosaf-empty.mjs', import.meta.url))), true);
   /* 🔴 무료 경로가 AI·관리자 값을 덮지 않는다 — OCR 을 붙인 첫 실행에서 의암 손병희의
      `AI(공고 포스터 그림)` 자격 줄이 거친 OCR 줄로 갈렸다(본문 없는 갈림길에 관문이 없었다). */
   const exSrc = readText(new URL('../collector/extract-excerpts.mjs', import.meta.url));

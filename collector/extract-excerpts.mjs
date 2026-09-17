@@ -23,7 +23,7 @@ const { isExcludeHead: shExclude, headText: shHead } = _cr(import.meta.url)('../
 /* 공고문 첨부에서 글자 뽑기 — 본문이 "붙임 참조"뿐인 공고가 있다.
    🔴 **공고문만** 본다(attachment-text.mjs 첫머리 참조) — 신청서·동의서를 읽으면
    개인정보 수집 항목이 지원 자격 자리에 앉는다(실제로 겪고 되돌린 적이 있다). */
-import { attachmentText, readable } from './attachment-text.mjs';
+import { attachmentText, readable, docOrder, isOcrSource } from './attachment-text.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const texts = JSON.parse(fs.readFileSync(new URL('extracted/notices-text.json', HERE), 'utf8'));
@@ -720,19 +720,26 @@ export function annexCut(text) {
 /** 공고문 첨부의 글자들 — 못 읽는 것(스캔·그림)은 조용히 뺀다. */
 function docTexts(it) {
   const out = [];
-  for (const f of (eligDocs[it.id] || {}).files || []) {
+  out.files = [];                       // 글자와 같은 차례의 파일 이름 — 어느 첨부에서 읽었는지 표식에 쓴다
+  for (const f of docOrder((eligDocs[it.id] || {}).files)) {   // 원문 글자(HWP)가 OCR 보다 먼저
     const t = attachmentText(new URL(`extracted/${f}`, HERE).pathname);
-    if (readable(t)) out.push(t);
+    if (readable(t)) { out.push(t); out.files.push(f); }
   }
   return out;
 }
 
+/* OCR 로 읽은 첨부는 출처에 그렇게 적는다(`공고문 첨부(OCR)`) — 관리자·감사가 오독 가능성을
+   알아보게. 같은 이름표를 읽는 곳(아래 923행 · 감사)은 앞머리 `공고문 첨부` 로 맞춘다. */
+const docLabel = (file) => (file && isOcrSource(new URL(`extracted/${file}`, HERE).pathname) ? '공고문 첨부(OCR)' : '공고문 첨부');
+
 /** 첨부들에서 하나를 읽는 공통 골격 — 마감·접수 시작·발표가 **같은 자르기**를 거친다.
-    `texts` 를 주면 파일 대신 그것을 읽는다(관문이 합성 글로 빨간불을 확인하는 자리). */
+    `texts` 를 주면 파일 대신 그것을 읽는다(관문이 합성 글로 빨간불을 확인하는 자리).
+    읽어 낸 첨부의 이름은 `fromDocs.lastFile` 에 남긴다(출처 표식용 · 못 읽으면 null). */
 function fromDocs(it, extract, texts = docTexts(it)) {
-  for (const t of texts) {
-    const got = extract(annexCut(t));
-    if (got) return got;
+  fromDocs.lastFile = null;
+  for (let i = 0; i < texts.length; i += 1) {
+    const got = extract(annexCut(texts[i]));
+    if (got) { fromDocs.lastFile = (texts.files || [])[i] || null; return got; }
   }
   return null;
 }
@@ -781,11 +788,12 @@ function qualFromDocs(it) {
      ⚠️ 기존 품질·자리·유형 축 셋 다 이 잡음을 못 잡았다 — scoop 이 admit 한 낱말
      (`다자녀`·`대학생`)로 채점기도 판정하기 때문이다. 눈으로 보기 전엔 아무도 모른다.
      분야별 요건을 제대로 다루려면 절이 아니라 **분야를 갈라 담는 구조**가 먼저 필요하다. */
-  for (const f of (eligDocs[it.id] || {}).files || []) {
+  qualFromDocs.lastFile = null;
+  for (const f of docOrder((eligDocs[it.id] || {}).files)) {   // 원문 글자(HWP)가 OCR 보다 먼저
     const t = attachmentText(new URL(`extracted/${f}`, HERE).pathname);
     if (!readable(t)) continue;
     const got = extractQualifyLines(t);
-    if (got.length) return got;
+    if (got.length) { qualFromDocs.lastFile = f; return got; }
   }
   return [];
 }
@@ -843,7 +851,7 @@ for (const it of reg.items) {
        무료 경로가 읽게 되자 **더 거친 줄로 갈아 끼웠다**. 아래 본문 갈림길의 917행 규칙과 같은 규칙이다. */
     if (got.length && WRITE && !humanOwned(it.eligibilityFrom)) {
       it.eligibilityLines = got;
-      it.eligibilityFrom = '공고문 첨부';
+      it.eligibilityFrom = docLabel(qualFromDocs.lastFile);
       fromDoc += 1;
     }
     /* 🔴 원문이 없어도 **첨부는 있을 수 있다** — 마감일도 여기서 채운다.
@@ -853,8 +861,8 @@ for (const it of reg.items) {
       const dl = deadlineFromDocs(it);
       if (dl) {
         gotDeadline += 1; dlFromDoc += 1;
-        if (WRITE) putDeadline(it, dl, '공고문 첨부');
-        else console.log(`   [마감] ${it.id} → ${dl} (공고문 첨부)`);
+        if (WRITE) putDeadline(it, dl, docLabel(fromDocs.lastFile));
+        else console.log(`   [마감] ${it.id} → ${dl} (${docLabel(fromDocs.lastFile)})`);
       }
     }
     /* 접수 시작일·발표일도 첨부에서 (2026-09-16 · G-3 ③) — 본문이 있는 길과 **같은 순서 검사**.
@@ -885,7 +893,7 @@ for (const it of reg.items) {
     /* 본문이 먼저 · 못 읽으면 공고문 첨부 (2026-09-15 · G-3) */
     let dl = extractDeadline(body);
     let from = '공고 원문';
-    if (!dl) { dl = deadlineFromDocs(it); if (dl) { from = '공고문 첨부'; dlFromDoc += 1; } }
+    if (!dl) { dl = deadlineFromDocs(it); if (dl) { from = docLabel(fromDocs.lastFile); dlFromDoc += 1; } }
     if (dl) {
       gotDeadline += 1;
       if (WRITE) putDeadline(it, dl, from);
@@ -919,8 +927,8 @@ for (const it of reg.items) {
      거짓 출처다. 위 AI 줄과 같은 규칙으로 건너뛴다. */
   if (WRITE && /^(AI|관리자)/.test(it.eligibilityFrom || '')) { kept += 1; continue; }
   if (WRITE) {
-    if (viaDoc) it.eligibilityFrom = '공고문 첨부';
-    else if (it.eligibilityFrom === '공고문 첨부') delete it.eligibilityFrom;
+    if (viaDoc) it.eligibilityFrom = docLabel(qualFromDocs.lastFile);
+    else if (/^공고문 첨부/.test(it.eligibilityFrom || '')) delete it.eligibilityFrom;
     if (qual.length) it.eligibilityLines = qual;
     else delete it.eligibilityLines;   // 원문은 읽었는데 못 뽑았다 → 옛 값을 남기지 않는다
 

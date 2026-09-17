@@ -60,7 +60,7 @@ jobs:
         continue-on-error: true
         run: |
           sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-kor poppler-utils
-          python3 collector/ocr-text.py --budget-sec=180
+          python3 collector/ocr-text.py --budget-sec=150
       - run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

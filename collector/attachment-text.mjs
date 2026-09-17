@@ -164,5 +164,22 @@ function ocrText(filePath) {
   try { return fs.readFileSync(filePath + '.ocr.txt', 'utf8'); } catch { return ''; }
 }
 
+/* 이 파일의 글자가 OCR 에서 온 것인가 — 출처 표식(`공고문 첨부(OCR)`)을 붙이는 데 쓴다.
+   관리자·감사가 오독 가능성을 알아보게 하려는 것이다(ocr-text.py 머리말의 이유 ②). */
+export function isOcrSource(filePath) {
+  const lower = String(filePath).toLowerCase();
+  if (!/\.(pdf|png|jpe?g|webp|bin)$/.test(lower)) return false;
+  return fs.existsSync(filePath + '.ocr.txt');
+}
+
+/* 🔴 첨부를 읽는 순서 — **원문 글자(HWP·HWPX·DOCX)가 OCR 보다 먼저**다 (2026-09-17 코드 리뷰).
+   발췌기·금액 로봇은 '처음 읽히는 첨부' 하나를 쓰는데, 예전에는 PDF·그림이 늘 빈 문자열이라
+   HWP 가 저절로 이겼다. OCR 이 글자를 내기 시작하면 색인 순서(PDF 가 앞)만으로 OCR 이 이긴다.
+   같은 공고문이면 원문 글자가 늘 낫다 — 그래서 순서를 여기서 한 번만 정한다. */
+export function docOrder(files) {
+  const rank = (f) => (/\.(hwpx?|docx)$/i.test(String(f)) ? 0 : 1);
+  return [...(files || [])].sort((a, b) => rank(a) - rank(b));
+}
+
 /* 읽을 만한 글자인가 — 한글이 이만큼은 나와야 자격을 찾아볼 가치가 있다 */
 export const readable = (text, min = 300) => String(text || '').replace(/[^가-힣]/g, '').length >= min;
