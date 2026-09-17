@@ -2376,7 +2376,7 @@
    "boardTitle": "공통 [공통] 두을장학재단 제29기 장학생 모집",
    "type": "교외",
    "provider": "경희대학교 게시 공고",
-   "amount": "금액 원문 확인",
+   "amount": "등록금 전액",
    "amountValue": 0,
    "deadline": "2026-09-30",
    "listedAt": "2026-09-01",
@@ -2416,7 +2416,16 @@
    ],
    "eligibilityFrom": "AI(공고 포스터 그림)",
    "eligibilityReviewed": false,
-   "deadlineFrom": "공고문 이미지 2026-09-15 · 접수기간 2026년 9월 1일(화) ~ 9월 30일(수) 18:00"
+   "deadlineFrom": "공고문 이미지 2026-09-15 · 접수기간 2026년 9월 1일(화) ~ 9월 30일(수) 18:00",
+   "amountSpec": {
+    "kind": "ratio",
+    "value": 0,
+    "ratio": 1,
+    "min": 0,
+    "max": 0,
+    "raw": "2학년 1학기~졸업 시 등록금 전액"
+   },
+   "amountFrom": "공고문 이미지 2026-09-17 · 2학년 1학기~졸업 시 등록금 전액 (학점 및 활동평가 후 계속지원 평가)"
   },
   {
    "id": "auto-ent2431265883artclviewdo",

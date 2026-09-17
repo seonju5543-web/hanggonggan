@@ -3249,6 +3249,7 @@ console.log('\n■ 금액 산정 — 부풀리지 않는가 (2026-08-27)');
   eq('  「선발 계획 30명」의 계획을 합계로 오인하지 않는다',
     wonOf(['장학금액 : 200만원', '선발 계획 30명']), 2000000);
 
+
   /* ② 🔴 금액 절이 다음 절을 삼키면 자격 줄의 숫자를 금액으로 줍는다 — 중앙대 성림장학금.
         `5. 신청자격: … 건강보험료 지역 17만원 이하`의 17만원이 장학금액이 될 뻔했다. */
   eq('자격 절의 숫자를 금액으로 줍지 않는다',
@@ -4134,8 +4135,14 @@ console.log('\n■ 이중수혜 — 가족 안의 이야기를 「다른 장학�
 
   /* 로봇이 사람 값을 덮지 않는다 — 매일 돌게 되면서 생긴 위험이다 */
   const ea = readText(new URL('../collector/extract-amounts.mjs', import.meta.url));
+  /* 🔴 **뜻으로 잰다 — 글자를 박지 않는다** (2026-09-17 고침). 예전엔 `!it.amountFrom`
+     이라는 **옛 규칙의 생김새**를 박아 뒀는데, 그 규칙 자체가 거꾸로였다: 사람이 출처를
+     적는 순간 로봇이 제 것으로 알고 지웠다. 관문이 그 결함을 지키고 있었던 셈이다.
+     지금은 「로봇 표식이 아니면 사람」 — 옆 칸(exclusivityFrom·sameAsFrom)과 같은 뜻이다. */
   eq('금액 로봇이 사람이 넣은 값을 덮지 않는다 (주인 표식을 본다)',
-     /const humanAmount = !it\.amountFrom/.test(ea), true);
+     /amountFrom !== OWN_AMOUNT/.test(ea), true);
+  eq('  표식이 없어야 사람이라던 옛 판정이 남아 있지 않다',
+     /humanAmount = !it\.amountFrom &&/.test(ea), false);
   eq('  sameAs 도 제가 붙인 것만 지운다', /it\.sameAsFrom === OWN_SAME/.test(ea), true);
   /* 🔴 다른 로봇은 전부 날짜만 적는다 — 여기만 시각까지 적으면 매 실행 파일이 더러워진다 */
   eq('  updatedAt 은 날짜만 적는다 (매 실행 더러워지지 않게)',
