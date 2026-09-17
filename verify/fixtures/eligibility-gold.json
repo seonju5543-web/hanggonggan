@@ -1,0 +1,1071 @@
+{
+ "note": "자격 판정 정답표 — verify/verdict-table.mjs --write-gold 로 굳힌다. 사람이 표를 읽은 뒤에만.",
+ "profiles": [
+  {
+   "id": "P1",
+   "label": "외대 인문 3학년 · 평점 3.5 · 5구간 · 서울"
+  },
+  {
+   "id": "P2",
+   "label": "경희 공학 2학년 · 평점 4.2 · 2구간 · 서울 · 기초수급"
+  },
+  {
+   "id": "P3",
+   "label": "경희 인문 4학년 · 평점 2.8 · 8구간 · 경기"
+  },
+  {
+   "id": "P4",
+   "label": "외대 자연 1학년 신입 · 성적 없음 · 4구간 · 부산"
+  },
+  {
+   "id": "P5",
+   "label": "경희 예체능 3학년 · 평점 3.9 · 6구간 · 대구 · 다자녀"
+  },
+  {
+   "id": "P6",
+   "label": "외대 사회 2학년 휴학 · 평점 3.2 · 1구간 · 전남 · 장애"
+  }
+ ],
+ "rows": [
+  {
+   "id": "reg-sejong-didim",
+   "text": "한국장학재단에서 학자금대출을 받은 국내 대학교 재학생",
+   "exclude": false,
+   "verdict": {
+    "P1": null,
+    "P2": null,
+    "P3": null,
+    "P4": null,
+    "P5": null,
+    "P6": "no"
+   }
+  },
+  {
+   "id": "reg-sejong-didim",
+   "text": "한국장학재단에서 학자금 지원 구간이 6구간 이하인 자 ※2026-1학기 기준",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "no",
+    "P4": "ok",
+    "P5": "ok",
+    "P6": "ok"
+   }
+  },
+  {
+   "id": "reg-sejong-didim",
+   "text": "또는 ② 해당자 ① 국내 대학·대학원 학생(재학생 및 휴학생) ② 대학교 졸업(수료) 후 2년 이내 미취업자",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "ok",
+    "P4": "ok",
+    "P5": "ok",
+    "P6": "ok"
+   }
+  },
+  {
+   "id": "reg-sejong-didim",
+   "text": "휴학생, 수료생 지원 불가",
+   "exclude": true,
+   "verdict": {
+    "P1": null,
+    "P2": null,
+    "P3": null,
+    "P4": null,
+    "P5": null,
+    "P6": "no"
+   }
+  },
+  {
+   "id": "reg-khu-uiam",
+   "text": "전국 대학(원)생 (휴학생 제외)",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "ok",
+    "P4": "ok",
+    "P5": "ok",
+    "P6": "no"
+   }
+  },
+  {
+   "id": "reg-hufs-yuheungsu",
+   "text": "일본학대학 융합일본지역학부 재학생",
+   "exclude": false,
+   "verdict": {
+    "P1": "no",
+    "P2": "no",
+    "P3": "no",
+    "P4": "no",
+    "P5": "no",
+    "P6": "no"
+   }
+  },
+  {
+   "id": "reg-hufs-yuheungsu",
+   "text": "2026년 2학기 재학생 (2026-2학기 휴학예정자 지원불가)",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "ok",
+    "P4": "ok",
+    "P5": "ok",
+    "P6": "no"
+   }
+  },
+  {
+   "id": "reg-hufs-myeonhak",
+   "text": "직전 정규학기 12학점 이상, 평점평균 2.0 이상인 자",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "ok",
+    "P4": null,
+    "P5": "ok",
+    "P6": "ok"
+   }
+  },
+  {
+   "id": "reg-hi-jeongeup",
+   "text": "공고일 현재 부 또는 모가 1년 이상 계속하여 정읍시에 주소를 두고 있는 국내 대학(고등교육법 제2조의 학교)의 재학생",
+   "exclude": false,
+   "verdict": {
+    "P1": null,
+    "P2": null,
+    "P3": null,
+    "P4": null,
+    "P5": null,
+    "P6": "no"
+   }
+  },
+  {
+   "id": "reg-hufs-seed",
+   "text": "2026-1학기 학부 재학생 (서울 및 글로벌) 으로 2026-1학기 평점 및 전체 평점 3.5 이상인 학생으로 아래 항목 중 2 개 이상 해당되는 자",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "no",
+    "P4": null,
+    "P5": "ok",
+    "P6": "no"
+   }
+  },
+  {
+   "id": "reg-posco-vision",
+   "text": "학업성적: 1학기 성적 3.0/4.5 이상",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "no",
+    "P4": null,
+    "P5": "ok",
+    "P6": "ok"
+   }
+  },
+  {
+   "id": "reg-posco-vision",
+   "text": "소득구간 5분위 이하",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "no",
+    "P4": "ok",
+    "P5": "no",
+    "P6": "ok"
+   }
+  },
+  {
+   "id": "reg-kosaf-daecheonggyo",
+   "text": "직전학기 성적 백분위 70 점 이상인 재학생 (학자금 지원구간 무관 [10구간 지원 가능 ])",
+   "exclude": false,
+   "verdict": {
+    "P1": null,
+    "P2": "ok",
+    "P3": null,
+    "P4": null,
+    "P5": "ok",
+    "P6": null
+   }
+  },
+  {
+   "id": "reg-hufs-alumni",
+   "text": "2026년 2학기 재학생 (2026-2학기 휴학예정자 지원불가)",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "ok",
+    "P4": "ok",
+    "P5": "ok",
+    "P6": "no"
+   }
+  },
+  {
+   "id": "reg-hufs-alumni",
+   "text": "직전학기 18학점 이상, 전체 학년 총 평점평균 4.0/4.5 이상인 학생",
+   "exclude": false,
+   "verdict": {
+    "P1": "no",
+    "P2": "ok",
+    "P3": "no",
+    "P4": null,
+    "P5": "no",
+    "P6": "no"
+   }
+  },
+  {
+   "id": "reg-khu-intern",
+   "text": "본교 학부 / 대학원 수업연한 내 정규학기 재학생",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "ok",
+    "P4": "ok",
+    "P5": "ok",
+    "P6": "no"
+   }
+  },
+  {
+   "id": "reg-khu-intern",
+   "text": "학부생의 경우 직전학기 12학점 이상, 학점 2.0 이상",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "ok",
+    "P4": null,
+    "P5": "ok",
+    "P6": "ok"
+   }
+  },
+  {
+   "id": "auto-tentsno1menuid100siteno2",
+   "text": "학업 성적 기준 : 국내 4년제 대학교 재학생으로서 25-2학기 성적의 평점 평균이 3.8/4.5점 이상",
+   "exclude": false,
+   "verdict": {
+    "P1": "no",
+    "P2": "ok",
+    "P3": "no",
+    "P4": null,
+    "P5": "ok",
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-tentsno1menuid100siteno2",
+   "text": "경제적 기준 : 아래 중 하나에 해당하는 자 · 기초생활수급자 · 차상위복지급여수급자",
+   "exclude": false,
+   "verdict": {
+    "P1": null,
+    "P2": "ok",
+    "P3": null,
+    "P4": null,
+    "P5": null,
+    "P6": null
+   }
+  },
+  {
+   "id": "auto-ent2431260146artclviewdo",
+   "text": "글로벌캠퍼스 재학생",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "ok",
+    "P4": "ok",
+    "P5": "ok",
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-ent2431260146artclviewdo",
+   "text": "직전학기 이수학점 15학점이상, 평점평균 3.5/4.5 이상인 자",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "no",
+    "P4": null,
+    "P5": "ok",
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-ent2431260214artclviewdo",
+   "text": "2026년도 2학기 서울캠퍼스 재학생",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "ok",
+    "P4": "ok",
+    "P5": "ok",
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-ent2431260214artclviewdo",
+   "text": "전 학년 평균 성적이 3.0 이상",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "no",
+    "P4": null,
+    "P5": "ok",
+    "P6": "ok"
+   }
+  },
+  {
+   "id": "auto-ent2431260269artclviewdo",
+   "text": "9구간 이하 학생",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "ok",
+    "P4": "ok",
+    "P5": "ok",
+    "P6": "ok"
+   }
+  },
+  {
+   "id": "auto-ent2431260269artclviewdo",
+   "text": "직전학기 백분위 성적 70 점 이상",
+   "exclude": false,
+   "verdict": {
+    "P1": null,
+    "P2": "ok",
+    "P3": null,
+    "P4": null,
+    "P5": "ok",
+    "P6": null
+   }
+  },
+  {
+   "id": "auto-kolifenoticejspduid52964",
+   "text": "국내 대학 재학생(4년제ㆍ전문대 무관, 전공제한 없음) 중이고 국내 거주 중인 자 중 아래 조건에(택1)에 해당하는 자",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "ok",
+    "P4": "ok",
+    "P5": "ok",
+    "P6": null
+   }
+  },
+  {
+   "id": "auto-kolifenoticejspduid52964",
+   "text": "④ 휴학 중인 자",
+   "exclude": true,
+   "verdict": {
+    "P1": null,
+    "P2": null,
+    "P3": null,
+    "P4": null,
+    "P5": null,
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-c839d20ec84a0ebb09c20202",
+   "text": "서울 소재 대학교 또는 비서울 소재 대학교(서울시민) 재학생 228명 내외",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": null,
+    "P4": null,
+    "P5": null,
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-c839d20ec84a0ebb09c20202",
+   "text": "2026년 2학기 기준 1학년",
+   "exclude": false,
+   "verdict": {
+    "P1": null,
+    "P2": null,
+    "P3": null,
+    "P4": "ok",
+    "P5": null,
+    "P6": null
+   }
+  },
+  {
+   "id": "reg-hufs-namgaju",
+   "text": "2026-2학기 재학예정자",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "ok",
+    "P4": "ok",
+    "P5": "ok",
+    "P6": "no"
+   }
+  },
+  {
+   "id": "reg-hufs-gasong",
+   "text": "2026-2학기 재학예정 (8학기 이내) 학생",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "ok",
+    "P4": "ok",
+    "P5": "ok",
+    "P6": "no"
+   }
+  },
+  {
+   "id": "reg-hufs-gasong",
+   "text": "학업성적이 평균 평점 80 점 또는 평균평점 B 학점 이상인 학생 (F 학점이 있는 경우 지원 불가)",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": null,
+    "P4": null,
+    "P5": "ok",
+    "P6": "ok"
+   }
+  },
+  {
+   "id": "reg-hufs-yangcheon",
+   "text": "대학교 2학년 이상 재학 중인 자에 한함",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "ok",
+    "P4": "no",
+    "P5": "ok",
+    "P6": "no"
+   }
+  },
+  {
+   "id": "reg-hufs-yangcheon",
+   "text": "전 (全) 학년 각 학기 수강학점 16학점 이상인 자에 한함",
+   "exclude": false,
+   "verdict": {
+    "P1": "no",
+    "P2": "ok",
+    "P3": "no",
+    "P4": null,
+    "P5": "ok",
+    "P6": "no"
+   }
+  },
+  {
+   "id": "reg-hufs-yangcheon",
+   "text": "직전 이수학점 3.5 이상 (4.5 만점) 인 자에 한함",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "no",
+    "P4": null,
+    "P5": "ok",
+    "P6": "no"
+   }
+  },
+  {
+   "id": "reg-hufs-yangcheon",
+   "text": "전 (全) 학년 각 학기 수강학점 16학점 이상",
+   "exclude": false,
+   "verdict": {
+    "P1": "no",
+    "P2": "ok",
+    "P3": "no",
+    "P4": null,
+    "P5": "ok",
+    "P6": "no"
+   }
+  },
+  {
+   "id": "reg-hufs-yangcheon",
+   "text": "직전 이수학점 3.0 이상 (4.5 만점) 인 자에 한함",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "no",
+    "P4": null,
+    "P5": "ok",
+    "P6": "ok"
+   }
+  },
+  {
+   "id": "reg-hufs-yangcheon",
+   "text": "소득분위 등급 3구간 이하인 자에 한함",
+   "exclude": false,
+   "verdict": {
+    "P1": "no",
+    "P2": "ok",
+    "P3": "no",
+    "P4": "no",
+    "P5": "no",
+    "P6": "ok"
+   }
+  },
+  {
+   "id": "reg-dongsan",
+   "text": "4년제 대학교 이공계 전공 새터민 (북한 출생)으로 2026년도 2학기 재학 예정인 대학생",
+   "exclude": false,
+   "verdict": {
+    "P1": null,
+    "P2": null,
+    "P3": null,
+    "P4": null,
+    "P5": null,
+    "P6": "no"
+   }
+  },
+  {
+   "id": "reg-partner-foundation",
+   "text": "2026년 2학기 기준 1학년 또는2학년 학생 (2026년 2학기 휴학생 및 휴학 예정자 지원 불가)",
+   "exclude": false,
+   "verdict": {
+    "P1": null,
+    "P2": null,
+    "P3": null,
+    "P4": "ok",
+    "P5": null,
+    "P6": "no"
+   }
+  },
+  {
+   "id": "reg-partner-foundation",
+   "text": "총 평균 평점 3.0 이상",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "no",
+    "P4": null,
+    "P5": "ok",
+    "P6": "ok"
+   }
+  },
+  {
+   "id": "reg-partner-foundation",
+   "text": "한국장학재단 산정 기준 소득분위 9분위 이하 (2026년 2학기 기준을 원칙으로 하며, 미확정 시 최근 학기 기준 자료 제출 가능)",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "ok",
+    "P4": "ok",
+    "P5": "ok",
+    "P6": "ok"
+   }
+  },
+  {
+   "id": "auto-kuk2351202780artclviewdo",
+   "text": "대한민국 국적자로서 공고일 기준(2026. 7. 30) 1년 이상 도내에 주소를 두고 계속 거주하는 도민 또는 도민의 자녀 중 국내 고등학교‧국내외 대학교 재학생",
+   "exclude": false,
+   "verdict": {
+    "P1": null,
+    "P2": null,
+    "P3": null,
+    "P4": null,
+    "P5": null,
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-kuk2351202780artclviewdo",
+   "text": "국내 대학교 재학생(만 39세 이하), 충청북도 소재 고등학교 졸업자, 직전학기 12학점 이상 이수한 자(성적 평가 9학점 이상)(한국가스안전공사장학금)",
+   "exclude": false,
+   "verdict": {
+    "P1": null,
+    "P2": null,
+    "P3": null,
+    "P4": null,
+    "P5": null,
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-kuk2351202780artclviewdo",
+   "text": "2026년 2학기 휴학 예정인 자",
+   "exclude": true,
+   "verdict": {
+    "P1": null,
+    "P2": null,
+    "P3": null,
+    "P4": null,
+    "P5": null,
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-oardid322606menuno200318",
+   "text": "국내 4년제 대학교 재학생으로서, 25-2학기 성적의 평균이 3.8/4.5점 이상",
+   "exclude": false,
+   "verdict": {
+    "P1": "no",
+    "P2": "ok",
+    "P3": "no",
+    "P4": null,
+    "P5": "ok",
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-oardid322606menuno200318",
+   "text": "기초생활수급자/ 차상위복지급여수급자 (※ 관련 증빙서류 제출 필수)",
+   "exclude": false,
+   "verdict": {
+    "P1": null,
+    "P2": "ok",
+    "P3": null,
+    "P4": null,
+    "P5": null,
+    "P6": null
+   }
+  },
+  {
+   "id": "auto-ent2431261572artclviewdo",
+   "text": "SW 관련학과 2026-2학기 등록 기준 2학년 ~ 3학년 재학생 (4~6학기)",
+   "exclude": false,
+   "verdict": {
+    "P1": null,
+    "P2": null,
+    "P3": null,
+    "P4": null,
+    "P5": null,
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-ent2431261572artclviewdo",
+   "text": "직전학기 평점 및 총 평점 3.5/4.5 이상",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "no",
+    "P4": null,
+    "P5": "ok",
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-ent2431261572artclviewdo",
+   "text": "한국장학재단 국가장학금 소득분위 6분위 이하인 자 (2026년 2학기 기준)",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "no",
+    "P4": "ok",
+    "P5": "ok",
+    "P6": "ok"
+   }
+  },
+  {
+   "id": "auto-ent2431263714artclviewdo",
+   "text": "전체평점 3.0/4.5 이상인 자",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "no",
+    "P4": null,
+    "P5": "ok",
+    "P6": "ok"
+   }
+  },
+  {
+   "id": "auto-ent2431263858artclviewdo",
+   "text": "2026-2학기 재학생",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "ok",
+    "P4": "ok",
+    "P5": "ok",
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-ent2431263858artclviewdo",
+   "text": "직전학기 12학점이상, 직전학기 평점평균 3.0 이상 취득한 자 (계절학기 제외)",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "no",
+    "P4": null,
+    "P5": "ok",
+    "P6": "ok"
+   }
+  },
+  {
+   "id": "auto-ent2431264197artclviewdo",
+   "text": "공과대학 재학생이며, 2026-2학기 등록 기준 2학년 ~ 4학년 재학생 (3~8학기)",
+   "exclude": false,
+   "verdict": {
+    "P1": null,
+    "P2": "ok",
+    "P3": null,
+    "P4": null,
+    "P5": null,
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-ent2431264197artclviewdo",
+   "text": "직전학기 평점 및 총 평점 3.5/4.5 이상",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "no",
+    "P4": null,
+    "P5": "ok",
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-84a0ebb09c20ec9588eb82b4",
+   "text": "초·중·고·대학교 재학생(휴학생제외)",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "ok",
+    "P4": "ok",
+    "P5": "ok",
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-ent2431264146artclviewdo",
+   "text": "대한민국 국적자로 선발학기 사업 참여대학에 재학 중인 자",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "ok",
+    "P4": "ok",
+    "P5": "ok",
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-ent2431264146artclviewdo",
+   "text": "일반대 3학년 이상 또는 전문대 2학년 이상 재학생",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": null,
+    "P3": "ok",
+    "P4": null,
+    "P5": "ok",
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-ent2431264146artclviewdo",
+   "text": "재학 학적 유지 (휴학, 자퇴, 제적 등 지원 불가)",
+   "exclude": true,
+   "verdict": {
+    "P1": null,
+    "P2": null,
+    "P3": null,
+    "P4": null,
+    "P5": null,
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-cb2ad20ec9588eb82b482f26",
+   "text": "대한민국 국적의 국내 대학교 재학생",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "ok",
+    "P4": "ok",
+    "P5": "ok",
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-ent2431263952artclviewdo",
+   "text": "대한민국 국적자로 최종 학력이 고졸인 자",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "ok",
+    "P4": "ok",
+    "P5": "ok",
+    "P6": "ok"
+   }
+  },
+  {
+   "id": "auto-ent2431263952artclviewdo",
+   "text": "재학 학적 유지 ※ 휴학, 자퇴, 제적 등 지원 불가, 해당 학기 장학금 전액 반환",
+   "exclude": true,
+   "verdict": {
+    "P1": null,
+    "P2": null,
+    "P3": null,
+    "P4": null,
+    "P5": null,
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-oardid322850menuno200318",
+   "text": "4년제 대학교 3~4학년 재학생",
+   "exclude": false,
+   "verdict": {
+    "P1": null,
+    "P2": null,
+    "P3": "ok",
+    "P4": null,
+    "P5": null,
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-oardid322850menuno200318",
+   "text": "시각디자인 전공자 및 판화학과 재학생",
+   "exclude": false,
+   "verdict": {
+    "P1": "no",
+    "P2": "no",
+    "P3": "no",
+    "P4": "no",
+    "P5": "ok",
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-oardid322850menuno200318",
+   "text": "성적기준 상회하는 자(최근 1년 평균성적 B+학점 이상_ 3.5/4.5 이상)",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": null,
+    "P4": null,
+    "P5": "ok",
+    "P6": null
+   }
+  },
+  {
+   "id": "auto-oardid321881menuno200318",
+   "text": "장애인 모범: 초·중·고·대학생",
+   "exclude": false,
+   "verdict": {
+    "P1": null,
+    "P2": null,
+    "P3": null,
+    "P4": null,
+    "P5": null,
+    "P6": "ok"
+   }
+  },
+  {
+   "id": "auto-oardid321881menuno200318",
+   "text": "장애인 특기적성: 초·중·고·대학생",
+   "exclude": false,
+   "verdict": {
+    "P1": null,
+    "P2": null,
+    "P3": null,
+    "P4": null,
+    "P5": null,
+    "P6": "ok"
+   }
+  },
+  {
+   "id": "auto-9599ec839d20ebaaa8eca791",
+   "text": "26년 정규 1학기를 총 15학점 이상 이수하고, 성적을 3.5/4.5 이상 취득한 자",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "no",
+    "P4": null,
+    "P5": "ok",
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-9599ec839d20ebaaa8eca791",
+   "text": "대한민국 국적을 가진 자에 한함",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "ok",
+    "P4": "ok",
+    "P5": "ok",
+    "P6": "ok"
+   }
+  },
+  {
+   "id": "auto-ent2431265883artclviewdo",
+   "text": "2026-2학기 본교 학부에 형제 · 자매가 2 인 이상 동시에 재학하고 있는 자",
+   "exclude": false,
+   "verdict": {
+    "P1": null,
+    "P2": null,
+    "P3": null,
+    "P4": null,
+    "P5": null,
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-oardid323027menuno200318",
+   "text": "대전광역시에 소재한 대학교에 재학 중인 학교(총)장 또는 단과대학장의 추천을 받은 대학교 2학년 이상 학생",
+   "exclude": false,
+   "verdict": {
+    "P1": null,
+    "P2": null,
+    "P3": null,
+    "P4": "no",
+    "P5": null,
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-oardid323027menuno200318",
+   "text": "직전 학기까지의 전체 평균 평점 3.5 이상(4.5 만점 기준) 또는 3.3 이상(4.3 만점 기준) 성적을 가진 학생",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "no",
+    "P4": null,
+    "P5": "ok",
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-oardid323027menuno200318",
+   "text": "타지역에 소재한 국내 대학교에 재학 중인 학교(총)장 또는 단과대학장의 추천을 받은 대학교 2학년 이상 학생",
+   "exclude": false,
+   "verdict": {
+    "P1": null,
+    "P2": null,
+    "P3": null,
+    "P4": "no",
+    "P5": null,
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-ent2431266612artclviewdo",
+   "text": "2026-2학기 서울캠퍼스 재학생",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "ok",
+    "P4": "ok",
+    "P5": "ok",
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-ent2431266612artclviewdo",
+   "text": "직전학기 평점평균 3.5/4.5 이상인 학생",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "no",
+    "P4": null,
+    "P5": "ok",
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-9d20ec84a0ebb09c20ec9588",
+   "text": "2026학년도 2학기 정규학기 재학생",
+   "exclude": false,
+   "verdict": {
+    "P1": null,
+    "P2": null,
+    "P3": null,
+    "P4": null,
+    "P5": null,
+    "P6": "no"
+   }
+  },
+  {
+   "id": "auto-9d20ec84a0ebb09c20ec9588",
+   "text": "직전학기 12학점 이상 이수 및 학업성적 2.9/4.3 이상",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "no",
+    "P4": null,
+    "P5": "ok",
+    "P6": "ok"
+   }
+  },
+  {
+   "id": "auto-9d20ec84a0ebb09c20ec9588",
+   "text": "한국장학재단 학자금 지원구간 5구간 이내",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "no",
+    "P4": "ok",
+    "P5": "no",
+    "P6": "ok"
+   }
+  },
+  {
+   "id": "auto-9d20ec84a0ebb09c20ec9588",
+   "text": "대한민국 국적자",
+   "exclude": false,
+   "verdict": {
+    "P1": "ok",
+    "P2": "ok",
+    "P3": "ok",
+    "P4": "ok",
+    "P5": "ok",
+    "P6": "ok"
+   }
+  },
+  {
+   "id": "auto-9d20ec84a0ebb09c20ec9588",
+   "text": "휴학생 및 2년 미만 교육과정, 방송통신대학·사이버대학(원격대학) 등 제외",
+   "exclude": true,
+   "verdict": {
+    "P1": null,
+    "P2": null,
+    "P3": null,
+    "P4": null,
+    "P5": null,
+    "P6": "no"
+   }
+  }
+ ]
+}

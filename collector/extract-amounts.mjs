@@ -20,6 +20,7 @@
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { indexTexts, sourceFor, hasText } from './notice-source.mjs';
+import { attachmentText, readable } from './attachment-text.mjs';
 
 const require = createRequire(import.meta.url);
 const PA = require('../parse-amount.js');
@@ -34,6 +35,26 @@ const texts = JSON.parse(fs.readFileSync(new URL('extracted/notices-text.json', 
 let browserBodies = {};
 try { browserBodies = JSON.parse(fs.readFileSync(new URL('extracted/browser-bodies.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
 const idx = indexTexts(texts, browserBodies);
+
+/* 공고문 첨부 색인 — 자격 발췌기(extract-excerpts `qualFromDocs`)와 **같은 색인·같은 함수**다.
+   🔴 2026-09-15 까지 이 로봇은 첨부를 한 번도 안 열어 봤다. 게시판 본문이 '붙임 참조'뿐이고
+   금액이 공고문 HWP·DOCX 안에만 있는 공고는 영영 '금액 원문 확인'이었다 — 마감 전 20건 중
+   금액 모르는 18건을 원문을 열어 가른 F-9 실측에서 그 유형이 가장 컸다.
+   본문 → AI 가 옮긴 줄 → 첨부 순서다(본문이 있으면 본문이 언제나 정확하다 — 첨부에는
+   붙임·서식이 섞인다). 신청서·동의서는 색인 단계(deepfetch `isNoticeDoc`)에서 이미 걸러져 있다.
+   ⚠️ 여기서도 얼마인지는 parse-amount 가 정한다 — 예산표(`115명 180백만원`)를 1인당으로
+      읽지 않는 관문(`TOTAL_TABLE` — 표의 합계 행)이 첨부에서 처음 걸렸다. */
+let eligDocs = {};
+try { eligDocs = JSON.parse(fs.readFileSync(new URL('extracted/elig-docs.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
+function amountFromDocs(it) {
+  for (const f of (eligDocs[it.id] || {}).files || []) {
+    const t = attachmentText(new URL(`extracted/${f}`, HERE).pathname);
+    if (!readable(t)) continue;
+    const got = PA.amountFrom(t.split('\n').map((s) => s.trim()).filter(Boolean));
+    if (got.kind !== 'unknown') return got;
+  }
+  return null;
+}
 
 /* ── 동일성 ────────────────────────────────────────────────────
    같은 재단이 여러 학교에서 접수하는 공고는 **하나의 장학금**이다.
@@ -73,7 +94,8 @@ let read = 0, noText = 0;
 const stat = { fixed: 0, ratio: 0, range: 0, hourly: 0, unknown: 0 };
 const excl = { forbidden: 0, allowed: 0, unknown: 0 };
 const parsed = new Map();
-let fromAi = 0;   // 첨부(그림·PDF)를 읽어 둔 줄에서 건진 금액
+let fromAi = 0;   // AI 가 첨부(그림·PDF)를 읽어 둔 줄에서 건진 금액
+let fromDoc = 0;  // 공고문 첨부(HWP·DOCX) 글자에서 직접 건진 금액
 
 for (const it of items) {
   const src = sourceFor(it, idx);
@@ -86,7 +108,8 @@ for (const it of items) {
         총액/1인당 가르기·유의사항 절 차단·'전액'의 닻·자릿수 관문이 그대로 걸린다. */
   const aiLines = Array.isArray(it.amountLines) ? it.amountLines : [];
   const bodyLines = hasText(src) ? String(src.text).split('\n').map((s) => s.trim()).filter(Boolean) : [];
-  if (!bodyLines.length && !aiLines.length) { noText++; continue; }
+  const hasDocs = ((eligDocs[it.id] || {}).files || []).length > 0;
+  if (!bodyLines.length && !aiLines.length && !hasDocs) { noText++; continue; }
   read++;
   /* 본문이 있으면 본문이 먼저다. 본문으로 못 읽었을 때만 AI 가 옮겨 둔 줄로 한 번 더 본다 —
      읽어 둔 것을 안 쓰는 것이 지금까지 같은 그림을 두 번 읽게 만든 원인이었다. */
@@ -95,6 +118,11 @@ for (const it of items) {
     /* 금액 절만 뽑아 온 줄이라 머리글이 없을 수 있다 — 머리글을 붙여 절로 읽히게 한다 */
     const b = PA.amountFrom(['장학금액', ...aiLines]);
     if (b.kind !== 'unknown') { a = b; fromAi++; }
+  }
+  /* 본문으로도 AI 줄로도 못 읽었으면 공고문 첨부를 연다 (위 amountFromDocs 주석) */
+  if (a.kind === 'unknown' && hasDocs) {
+    const d = amountFromDocs(it);
+    if (d) { a = d; fromDoc++; }
   }
   const e = PA.exclusivityFrom(bodyLines.length ? bodyLines : aiLines);
   stat[a.kind]++; excl[e.kind]++;
@@ -145,7 +173,7 @@ const wonText = (n) => (n % 10000 === 0
 const amountText = (a) => (a.kind === 'range'
   ? `${wonText(a.min)} ~ ${wonText(a.max)}`
   : wonText(a.value));
-console.log(`\n■ 금액 읽기 — 등록 ${items.length}건 (원문 있음 ${read} · 없음 ${noText}${fromAi ? ` · 그중 첨부를 읽어 건진 것 ${fromAi}건` : ''})`);
+console.log(`\n■ 금액 읽기 — 등록 ${items.length}건 (원문 있음 ${read} · 없음 ${noText}${fromAi ? ` · 그중 AI 가 읽어 둔 첨부에서 건진 것 ${fromAi}건` : ''}${fromDoc ? ` · 공고문 첨부 글자에서 건진 것 ${fromDoc}건` : ''})`);
 console.log(`   절대액 ${stat.fixed + stat.range}건 · 등록금 비율 ${stat.ratio}건 · 시급 ${stat.hourly}건 · 미확인 ${stat.unknown}건`);
 console.log(`\n■ 이중수혜`);
 console.log(`   함께 못 받음 ${excl.forbidden}건 · 함께 받을 수 있음 ${excl.allowed}건 · 원문에 없음 ${excl.unknown}건`);
@@ -184,8 +212,15 @@ for (const it of items) {
     /* 🔴 `amount` 가 아니라 `amountSpec` 이다 — `amount` 는 이미 금액 문구 문자열 칸이다.
        처음에 `amount` 에 객체를 넣었다가 entry-rules.cjs 의 `it.amount.slice()` 가 죽어
        감사가 통째로 멈췄다. 앱·챗봇·알림도 전부 문자열로 읽는다. */
-    /* 사람이 넣은 금액이면 손대지 않는다 (표식이 없고 값이 이미 있는 경우) */
-    const humanAmount = !it.amountFrom && (it.amountSpec || Number(it.amountValue) > 0);
+    /* 사람이 넣은 금액이면 손대지 않는다.
+       🔴 **로봇이 소유하는 표식은 `OWN_AMOUNT` 하나뿐**이고 그 밖은 전부 남의 것이다
+       (2026-09-17 · 노션 UI-12). 예전엔 `!it.amountFrom` 즉 **표식이 없어야** 사람 값이라
+       봐서, 사람이 근거를 적는 순간(`공고문 이미지 … · <원문 문구>`) 로봇이 제 것으로 알고
+       다음 실행에 지웠다 — **근거를 남길수록 사라지는** 구조였다.
+       바로 아래 `exclusivityFrom` 은 이미 `!== OWN_*` 로 판정한다(그 주석이 "표식이 없는
+       옛 데이터도 여전히 사람 값이다" 라고 적어 뒀다) — 금액만 어긋나 있었다.
+       ⚠️ 표식이 없는 옛 데이터는 그대로 사람 값이다(undefined !== OWN_AMOUNT). */
+    const humanAmount = (it.amountSpec || Number(it.amountValue) > 0) && it.amountFrom !== OWN_AMOUNT;
     if (humanAmount) keptHuman += 1;
     else if (a.kind === 'unknown') { delete it.amountSpec; delete it.amountFrom; }
     else { it.amountSpec = a; it.amountFrom = OWN_AMOUNT; wrote++; }
@@ -223,7 +258,7 @@ for (const it of items) {
   else if (it.sameAsFrom === OWN_SAME) { delete it.sameAs; delete it.sameAsFrom; }
 }
 
-if (keptHuman) console.log(`   사람이 넣은 금액 ${keptHuman}건은 그대로 뒀습니다 (표식 없는 값은 안 덮습니다)`);
+if (keptHuman) console.log(`   사람이 넣은 금액 ${keptHuman}건은 그대로 뒀습니다 (로봇 표식 '${OWN_AMOUNT}' 이 아닌 값은 안 덮습니다)`);
 /* 🔴 날짜만 적는다 — 다른 로봇이 전부 `slice(0,10)` 이라, 여기만 시각까지 적으면
    registered.json 이 매 실행 더러워지고 관리자 화면의 '데이터 기준일' 에 시각이 뜬다
    (2026-09-13 코드 리뷰). */
