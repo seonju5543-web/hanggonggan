@@ -22,7 +22,7 @@
 /* ⚠️ 두 작업이 같은 날 v172 를 각자 올려 부딪혔다 — 번호는 v173 으로 올리고 **둘 다** 남긴다
    (파일 머리말의 규칙 그대로). */
 /* ⚠️ 오늘 여러 작업이 같은 번호를 각자 올렸다 — 번호는 올리고 **한 일은 다 남긴다**(파일 머리말 규칙). */
-const CACHE = 'handaejang-v190';  /* v190 — 검색창 글자 17→16px · MY 「데이터 초기화」를 보관함 쪽으로 당김(2026-09-17 개발자 지시) */
+const CACHE = 'handaejang-v191';  /* v191 — 좁은 화면(360px)에서 잘리던 필터 칩 수리(2026-09-17 개발자 지시) */
 const ASSETS = ['.', 'index.html', 'style.css', 'boot.js', 'resume.js', 'interactions.js', 'app.js', 'data.js', 'forms.js', 'form-plan.js', 'essay.js', 'essay-config.js', 'essay-ask.js', 'essay-quality.js', 'essay-submit-check.js',
   'section-head.js', 'parse-requirements.js', 'parse-amount.js', 'match-engine.js', 'notify-rules.js', 'notify.js', 'push-config.js', 'support-config.js',
   'chat-config.js', 'chat.js',
