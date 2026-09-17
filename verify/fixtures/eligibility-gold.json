@@ -536,6 +536,19 @@
   },
   {
    "id": "reg-partner-foundation",
+   "text": "2026년 2학기 기준 1학년 또는2학년 학생 (2026년 2학기 휴학생 및 휴학 예정자 지원 불가)",
+   "exclude": false,
+   "verdict": {
+    "P1": null,
+    "P2": null,
+    "P3": null,
+    "P4": "ok",
+    "P5": null,
+    "P6": "no"
+   }
+  },
+  {
+   "id": "reg-partner-foundation",
    "text": "총 평균 평점 3.0 이상",
    "exclude": false,
    "verdict": {
@@ -1039,6 +1052,19 @@
     "P4": "ok",
     "P5": "ok",
     "P6": "ok"
+   }
+  },
+  {
+   "id": "auto-9d20ec84a0ebb09c20ec9588",
+   "text": "휴학생 및 2년 미만 교육과정, 방송통신대학·사이버대학(원격대학) 등 제외",
+   "exclude": true,
+   "verdict": {
+    "P1": null,
+    "P2": null,
+    "P3": null,
+    "P4": null,
+    "P5": null,
+    "P6": "no"
    }
   }
  ]

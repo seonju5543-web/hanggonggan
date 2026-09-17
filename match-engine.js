@@ -246,8 +246,9 @@ function judgeCond(c, p, ctx) {
     }
     case 'status': {
       if (!p.status) return 'unknown';
-      if (c.not) return c.not.includes(p.status) ? 'fail' : 'pass';
-      if (!c.anyOf) return 'unknown';
+      /* 금지 목록에 있으면 미달. 허용 목록이 같이 있으면(`재학생(휴학생 제외)`) 그쪽도 본다 */
+      if (c.not && c.not.includes(p.status)) return 'fail';
+      if (!c.anyOf) return c.not ? 'pass' : 'unknown';
       if (c.anyOf.includes(p.status)) return 'pass';
       /* 🔴 학적상태는 **평평한 이름표가 아니라 포함 관계**다 (2026-08-24 개발자 지적):
          *"재학 = 신입생 첫 학기 똑같잖아. 신입생도 재학생인데."*
@@ -421,10 +422,14 @@ function lineVerdict(text, p, isExclude, ctx) {
        2026-08-30 에 이미 고친 것과 같은 규칙이다. 떨어져도 ✕ 는 여전히 안 친다. */
     let pass = 0;
     for (const c of cs) {
+      if (ctx.bracketTable && c.kind === 'bracket') continue;     // 본 경로와 같은 예외(지급액 구간표)
       const v = judgeCond(c, p, ctx);
       if (v !== 'pass') return null;
       pass += 1;
     }
+    /* 🔴 본 경로의 '묻지 않은 처지' 관문도 **여기서 똑같이** 건다 (2026-09-17 코드 리뷰).
+       빠뜨리면 `학자금대출을 받은 … 재학생` 같은 줄이 택1 묶음 안에서만 ✓ 로 되살아난다. */
+    if (pass && PR.unaskedAttr(text, cs)) return null;
     return pass ? 'ok' : null;
   }
   const { conds } = PR.parseLine(text, !!isExclude);

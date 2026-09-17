@@ -68,13 +68,19 @@ function docsOf(it) {
 export function lastDateIn(text, year) {
   /* `모집 ~2026.8.5 · 선발 발표 8.26(수)` — 발표·지급 날짜는 마감이 아니다. 그 말 앞까지만 본다 */
   const p = String(text || '').split(/발표|지급|공고일|게시/)[0];
-  const re = /(?<!\d)(?:(20\d{2})\s?[-./년]\s?)?(\d{1,2})\s?[-./월]\s?(\d{1,2})(?!\d)/g;
-  let last = null, y = year;
+  /* ⚠️ 뒤에 소수점 자리가 더 오면 날짜가 아니다 — `평점 3.5 ~ 4.5` 를 3월 5일로 읽지 않는다 */
+  const re = /(?<!\d)(?:(20\d{2})\s?[-./년]\s?)?(\d{1,2})\s?[-./월]\s?(\d{1,2})(?![\d.]\d)(?!\d)/g;
+  let last = null, y = year, prevMo = 0;
   for (const m of p.matchAll(re)) {
     if (m[1]) y = m[1];
     if (!y) continue;
     const mo = Number(m[2]), da = Number(m[3]);
     if (mo < 1 || mo > 12 || da < 1 || da > 31) continue;
+    /* 성적 이야기 속 소수(`평점 3.5 ~ 4.5`)는 날짜가 아니다 — 앞 10자에 성적 낱말이 있거나 뒤에 `점·이상` 이 붙는다 */
+    if (/평점|성적|학점|점수|GPA/i.test(p.slice(Math.max(0, m.index - 10), m.index)) || /^\s*(점|이상|이하|만점)/.test(p.slice(m.index + m[0].length))) continue;
+    /* 해가 안 적힌 채 달이 거꾸로 가면(`12.20 ~ 1.10`) 해가 넘어간 것이다(2026-09-17 코드 리뷰) */
+    if (!m[1] && prevMo && mo < prevMo) y = String(Number(y) + 1);
+    prevMo = mo;
     last = `${y}-${String(mo).padStart(2, '0')}-${String(da).padStart(2, '0')}`;
   }
   return last;

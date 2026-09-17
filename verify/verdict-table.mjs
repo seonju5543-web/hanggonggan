@@ -55,8 +55,14 @@ export function verdictRows() {
       for (const p of PROFILES) v[p.id] = M.requirementMatch(it.text, p, sch) || null;
       rows.push({ id: sch.id, name: sch.name, text: it.text, group: it.group || 0, verdict: v });
     }
-    /* 제외 줄은 ✓ 표시가 없다 — fitDetail 의 fails 에 들어갔는지로 본다 */
-    for (const ex of (sch.eligibilityExcludes || [])) {
+    /* 제외 줄은 ✓ 표시가 없다 — fitDetail 의 fails 에 들어갔는지로 본다.
+       목록은 fitDetail 과 **같은 두 출처**(발췌기의 제외 절 + 자격 줄에 섞인 제외)에서 만든다 —
+       앞쪽만 보면 `대학원생 지원 불가` 류의 틀린 ✗ 가 표에 안 나온다(2026-09-17 코드 리뷰). */
+    const exLines = [...new Set([
+      ...(sch.eligibilityExcludes || []).map((x) => String(x || '').trim()).filter(Boolean),
+      ...M.requirementLines(sch, lines, { onlyExclude: true }),
+    ])];
+    for (const ex of exLines) {
       const v = {};
       for (const p of PROFILES) v[p.id] = fails.get(p.id).has(ex) ? 'no' : null;
       rows.push({ id: sch.id, name: sch.name, text: ex, group: 0, exclude: true, verdict: v });

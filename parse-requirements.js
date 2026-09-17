@@ -52,7 +52,9 @@ function parseGrade(t) {
      `평점 3.5 이상(4.5 만점 기준) 또는 3.3 이상(4.3 만점 기준)` 을 `3.5 · 4.3 척도` 로 읽어
      평점 3.5(4.5 만점) 학생이 ✗ 를 받았다 — 첫 숫자에 뒤쪽 척도를 붙인 것이다.
      프로필 평점은 4.5 만점이므로 그 척도의 숫자가 곧 답이고 환산이 필요 없다. */
-  const mBoth = has45 && has43 && t.match(/(\d\.\d{1,2})\s*점?\s*(?:이상|이상인)[^()]{0,12}\(\s*4\.5/);
+  /* ⚠️ 괄호는 **척도만** 적은 것이어야 한다 — `3.0 이상 (4.5 만점 3.2 이상)` 처럼 괄호 안에
+     제 문턱이 따로 있으면 앞 숫자(4.3 척도)를 집어 3.1 학생이 ✓ 가 된다(2026-09-17 코드 리뷰). */
+  const mBoth = has45 && has43 && t.match(/(\d\.\d{1,2})\s*점?\s*(?:이상|이상인)[^()]{0,12}\(\s*4\.5\s*(?:점\s*)?만점[^)\d]*\)/);
   if (mBoth) {
     const v = parseFloat(mBoth[1]);
     if (v <= 4.5) return { kind: 'grade', scale: GRADE_SCALE.gpa45, min: v, conf: HAS_EXCEPTION.test(t) ? LOW : HIGH };
@@ -131,15 +133,32 @@ function parseStatus(t, isExclude) {
      `2026년 2학기 재학생 (휴학예정자 지원불가)` 에서 `휴학` 을 **허용 목록**에 담아,
      휴학 중인 학생에게 ✓ 가 떴다(실측 4줄 — 틀린 안심). 낱말 뒤 여덟 글자 안에
      `제외·불가·불인정·안 됨` 이 오면 그 학적은 금지 쪽이다. */
-  const denied = (word) => new RegExp(`${word}[가-힣]{0,4}\\s?[^가-힣]{0,3}(제외|불가|불인정|안\\s?됨|지원\\s?불가)`).test(t);
+  /* 부정어의 **사정거리**는 낱말 바로 뒤가 아니라 그 절 전체다 (2026-09-17 코드 리뷰) —
+     `재학생(휴학생, 졸업유예자 제외)`·`휴학생 및 휴학 예정자 지원 불가`·`수료생 및 졸업생 제외`
+     에서 앞쪽 낱말이 허용으로 새고 있었다. 절의 시작은 마지막 여는 괄호 또는 마지막
+     긍정어(`가능·포함·우대`) 뒤 — `휴학생은 신청 가능, 수료생은 신청 불가` 에서 휴학까지
+     금지로 읽지 않으려는 경계다. ⚠️ `제한 없음` 은 부정이 아니다. */
+  const NEG = /(제외|불가|불인정|안\s?됨|할\s?수\s?없|(?<!제한\s?)없음)/g;
+  const deniedWords = new Set();
+  for (const m of t.matchAll(NEG)) {
+    const before = t.slice(0, m.index);
+    const start = Math.max(before.lastIndexOf('('), before.search(/(가능|포함|우대)(?![\s\S]*(가능|포함|우대))/));
+    const scope = before.slice(start < 0 ? 0 : start);
+    for (const w of ['휴학', '수료', '졸업', '자퇴', '졸업유예']) {
+      if (w === '졸업유예' ? /졸업\s?유예|학사학위취득유예/.test(scope) : new RegExp(w).test(scope)) deniedWords.add(w);
+    }
+  }
+  const denied = (word) => deniedWords.has(word);
   const not = [];
   if (/재학/.test(t) && !isExclude && !/비재학|초과\s?재학|외국\s?대학에\s?재학/.test(t)) hit.push('재학');
   if (/휴학/.test(t)) (denied('휴학') ? not : hit).push('휴학');
   if (/복학\s?예정/.test(t)) hit.push('복학예정');
   if (/초과\s?학기|수업연한\s?초과/.test(t)) hit.push('초과학기');
-  if (/졸업\s?유예|학사학위취득유예/.test(t)) hit.push('졸업유예');
+  if (/졸업\s?유예|학사학위취득유예/.test(t)) (denied('졸업유예') ? not : hit).push('졸업유예');
   if (/수료(생|자)/.test(t)) (denied('수료') ? not : hit).push('수료');
-  if (/졸업(생|자|\s?예정)/.test(t) && !/졸업\s?유예/.test(t)) (denied('졸업') ? not : hit).push('졸업');
+  /* 졸업생·졸업예정자는 다른 처지다 — `졸업예정자 신청 가능(단, 졸업생 제외)` 에서 예정자까지 금지되면 안 된다 */
+  if (/졸업\s?예정/.test(t)) hit.push('졸업예정');
+  if (/졸업(생|자)/.test(t) && !/졸업\s?유예/.test(t)) (denied('졸업') ? not : hit).push('졸업');
   if (/자퇴/.test(t)) (denied('자퇴') ? not : hit).push('자퇴');
   if (/대학원(생|\s?재학)/.test(t)) hit.push('대학원');
   /* 허용 학적이 하나도 없고 금지만 있으면(`전국 대학(원)생 (휴학생 제외)`) 금지 조건으로 낸다 */
@@ -150,7 +169,10 @@ function parseStatus(t, isExclude) {
   const list = hit.includes('복학예정') ? hit.filter((h) => h !== '휴학') : hit;
   /* `정규학기 재학생`은 초과학기생·졸업유예자를 뺀 말이다(실측 14줄).
      그냥 `재학생`(120줄)이면 그들도 재학생이므로 포함한다 — 판정은 judgeCond가 한다. */
+  /* 허용과 금지가 한 줄에 같이 있으면(`재학생(휴학생 제외)`) **둘 다** 낸다 — 금지를 버리면
+     그 학적이 허용 목록 밖이라는 사실만 남아 '모름'이 되고, 휴학생이 재학생 줄에서 ✗ 를 못 받는다 */
   return { kind: 'status', [isExclude ? 'not' : 'anyOf']: list,
+           ...(not.length && !isExclude ? { not } : {}),
            regularOnly: /정규\s?학기/.test(t),
            conf: HAS_EXCEPTION.test(t) ? LOW : HIGH };
 }
@@ -370,11 +392,15 @@ const SCHOOL_PLACE = /(소재|있는|위치한|연접)[^,.]{0,12}(대학교|대�
    지역 낱말(`지역·소재·시민·도민·군민`) 앞에 우리가 모르는 고유명사가 붙어 있으면,
    판정은 못 해도 **'모른다'로 남겨 ✓ 를 막는다.** 값은 담아 두어 감사가 볼 수 있게 한다.
    ⚠️ `해당 지역`·`전국`·`국내`·`타 지역` 처럼 고유명사가 아닌 것은 요건이 아니다. */
-const PLACE_GENERIC = /^(해당|전국|국내|국외|타|동일|각|위|아래|상기|본|이|그|해외|지방|수도권|비수도권|인근|지정|일정|특정|모든|기타)$/;
+const PLACE_GENERIC = /^(해당|전국|국내|국외|타|타지역|동일|각|위|아래|상기|본|이|그|해외|지방|수도권|비수도권|인근|지정|일정|특정|모든|기타|지역|도시|읍면|농어촌|우리|학교|본교|대학|낙후|관내|거주|주소|소재)$/;
+/* 서술어·조사로 끝나는 것은 고유명사가 아니다 — `계속 거주하는 도민`·`거주한 사실이 있는 도민` 에서
+   `거주하는`·`있는` 을 지역 이름으로 담았다(2026-09-17 코드 리뷰) */
+const PLACE_NOT_NOUN = /(하는|되는|있는|없는|이는|한|된|의|을|를|에|과|와)$/;   // ⚠️ `인`·`로` 는 넣지 않는다 — 용인·구로
 function unnamedPlace(t, about) {
   /* ⚠️ `융합일본지역학부` 의 `지역` 은 지역이 아니다 — 낱말 뒤에 곧바로 한글이 이어지면 안 본다 */
   const m = String(t).match(/(?:^|[\s(,])([가-힣]{2,4}(?:\s?[·,/]\s?[가-힣]{2,4})*)\s?(?:지역|소재|시민|도민|군민)(?=[\s(,.·]|$|(?:에서|에|의|을|를|이|가|은|는|내|과|와)(?![가-힣]))/);
   if (!m) return null;
+  if (PLACE_NOT_NOUN.test(m[1].split(/\s?[·,/]\s?/).pop() || '')) return null;
   const words = m[1].split(/\s?[·,/]\s?/).map((w) => w.trim()).filter((w) => w && !PLACE_GENERIC.test(w));
   if (!words.length) return null;
   return { kind: 'residence', about: about || 'home', anyOf: [], cities: words, inArea: false, unnamed: true, conf: LOW };
@@ -620,11 +646,15 @@ function parseMajor(t) {
      (2026-09-17 전수 대조: 시각디자인학과 학생이 이 줄에 ✗ 를 받았다 — 이름이 `전공자` 로 잡혀서).
      `X 전공자` 꼴은 X 를 이름으로 담고, 아래 일반 규칙이 `전공자` 를 이름으로 집는 것은 막는다. */
   const MAJOR_HOLDER = /([가-힣A-Za-z]{2,12})\s+전공자/g;
+  /* ⚠️ `해당 학과 전공자`·`동일 계열 전공자`·`타 학과 전공자 지원 불가` 의 앞말은 이름이 아니다 —
+     담으면 모든 학생이 ✗ 를 받는다(2026-09-17 코드 리뷰). 뒤에 `불가·제외` 가 오는 줄도 요건이 아니다. */
+  const HOLDER_GENERIC = /^(학과|학부|계열|전공|관련학과|해당|동일|위|타|본|각|모든|기타)$/;
   MAJOR_HOLDER.lastIndex = 0;
   let h;
   while ((h = MAJOR_HOLDER.exec(t)) !== null) {
     const n = h[1].trim();
-    if (n.length >= 2 && !MAJOR_GENERIC.test(n) && !MAJOR_TRACK.some(([re]) => re.test(n)) && !names.includes(n)) names.push(n);
+    if (/전공자[^.]{0,8}(불가|제외)/.test(t.slice(h.index))) continue;
+    if (n.length >= 2 && !MAJOR_GENERIC.test(n) && !HOLDER_GENERIC.test(n) && !MAJOR_TRACK.some(([re]) => re.test(n)) && !names.includes(n)) names.push(n);
   }
   MAJOR_NAME.lastIndex = 0;
   let m;
@@ -713,7 +743,8 @@ function unaskedAttr(text, conds) {
   const t = String(text || '');
   const cs = conds || [];
   const has = (k) => cs.some((c) => c.kind === k);
-  if (ACHIEVE_ATTR.test(t)) return true;   // 처지 낱말이 있어도 풀리지 않는다 (위 주석)
+  /* `경력 무관`·`수상 여부 무관` 은 묻는 것이 아니다(2026-09-17 코드 리뷰) */
+  if (ACHIEVE_ATTR.test(t) && !/(무관|불문|관계\s?없)/.test(t)) return true;   // 처지 낱말이 있어도 풀리지 않는다 (위 주석)
   if (INCOME_ATTR.test(t) && (has('bracket') || has('flags'))) return false;
   if (!UNASKED_ATTR.test(t) && !INCOME_ATTR.test(t) && !LINEAGE_ATTR.test(t)) return false;
   return !has('flags');

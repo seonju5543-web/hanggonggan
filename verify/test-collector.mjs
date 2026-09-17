@@ -6995,10 +6995,42 @@ console.log('\n■ 자격 판정 전수 대조 — 틀린 ✓·틀린 ✗ (2026-
     const sch = JSON.parse(readText(new URL('../data/registered.json', import.meta.url))).items.find((x) => x.id === 'reg-hi-jeongeup');
     if (sch) {
       const line = (sch.eligibilityLines || []).find((l) => /재학생:.*85점/.test(l));
-      eq('  (실데이터) 정읍 「재학생: … 85점 이상」이 평점 2.8 학생에게 ✓ 가 아니다',
-        line ? mark(line, { gpa: 2.8, school: '경희대학교' }, sch) : null, null);
+      if (line) eq('  (실데이터) 정읍 「재학생: … 85점 이상」이 평점 2.8 학생에게 ✓ 가 아니다', mark(line, { gpa: 2.8, school: '경희대학교' }, sch), null);
+      else console.log('   (정읍 공고의 그 줄이 바뀌어 실데이터 항목을 건너뜀)');   // 줄이 없으면 null===null 로 조용히 통과하지 않게
     } else console.log('   (정읍 공고가 등록 목록에 없어 실데이터 항목을 건너뜀)');
   }
+  /* ⑤-2 선택지 묶음 안에서도 '묻지 않은 처지'·구간표 예외는 본 경로와 같다 (2026-09-17 코드 리뷰) */
+  {
+    const sch = { eligibilityLines: ['다음 두 가지 중 하나에 해당하는 국내 대학 재학생',
+      '한국장학재단에서 학자금대출을 받은 국내 대학교 재학생', '학과장 추천을 받은 재학생 (4분위 이하)', '5~6분위 재학생'] };
+    eq('  택1 묶음 안의 「학자금대출을 받은 … 재학생」도 ✓ 가 아니다', mark(sch.eligibilityLines[1], {}, sch), null);
+    eq('  택1 묶음 안의 「추천을 받은 재학생」도', mark(sch.eligibilityLines[2], { bracket: 3 }, sch), null);
+  }
+  /* ⑤-3 부정어의 사정거리는 절 전체다 — 목록·`및` 앞쪽 낱말이 허용으로 새고 있었다 */
+  eq('「재학생(휴학생, 졸업유예자 제외)」는 휴학생을 막는다', mark('재학생(휴학생, 졸업유예자 제외)', onLeave), 'no');
+  eq('  졸업유예자도', mark('재학생(휴학생, 졸업유예자 제외)', { status: '졸업유예' }), 'no');
+  eq('  「재학생 (휴학생·수료생·졸업생 제외)」의 수료생', mark('재학생 (휴학생·수료생·졸업생 제외)', { status: '수료' }), 'no');
+  eq('  「휴학생 및 휴학 예정자 지원 불가」의 휴학생 (실데이터 꼴)',
+    mark('1학년 또는 2학년 학생 (2026년 2학기 휴학생 및 휴학 예정자 지원 불가)', { ...onLeave, year: 2 }), 'no');
+  eq('  「수료생 및 졸업생 제외」— 앞쪽 수료생도 금지',
+    (PRq.parseLine('수료생 및 졸업생 제외', false).conds.find((c) => c.kind === 'status') || {}).not, ['수료', '졸업']);
+  eq('  「휴학생은 신청할 수 없음」', mark('휴학생은 신청할 수 없음', onLeave), 'no');
+  eq('  「휴학생은 신청 가능, 수료생은 신청 불가」에서 휴학생은 금지가 아니다',
+    (PRq.parseLine('휴학생은 신청 가능, 수료생은 신청 불가', false).conds.find((c) => c.kind === 'status') || {}).anyOf, ['휴학']);
+  eq('  「학적 제한 없음」은 부정이 아니다', (PRq.parseLine('휴학생 포함 학적 제한 없음', false).conds.find((c) => c.kind === 'status') || {}).not, undefined);
+  eq('  재학생은 「재학생(휴학생 제외)」에 여전히 ✓', mark('재학생(휴학생, 졸업유예자 제외)'), 'ok');
+  /* ⑤-4 `X 전공자` 의 X 가 일반 낱말이면 이름이 아니다 — 모든 학생이 ✗ 였다 */
+  eq('「해당 학과 전공자」는 ✗ 가 아니다', mark('해당 학과 전공자'), null);
+  eq('  「타 학과 전공자 지원 불가」도 ✗ 가 아니다', mark('타 학과 전공자 지원 불가'), null);
+  eq('  이름 목록이 빈다', (PRq.parseLine('동일 계열 전공자 우대', false).conds.find((c) => c.kind === 'major') || { names: [] }).names, []);
+  /* ⑤-5 괄호 안에 제 문턱이 있으면 4.5 쪽 숫자를 쓴다 */
+  eq('「4.3 만점 3.0 이상 (4.5 만점 3.2 이상)」은 평점 3.1 에게 ✗',
+    mark('평점 4.3 만점 3.0 이상 (4.5 만점 3.2 이상)', { gpa: 3.1 }), 'no');
+  /* ⑤-6 서술어는 지역 이름이 아니다 */
+  eq('「계속 거주하는 도민」의 지역 이름이 「거주하는」이 아니다',
+    (PRq.parseLine('충북에 3년 이상 계속 거주하는 도민의 자녀', false).conds.filter((c) => c.kind === 'residence' && c.unnamed)).length, 0);
+  eq('  「용인 지역」은 여전히 지역이다', (PRq.parseLine('용인 지역 거주자', false).conds.find((c) => c.kind === 'residence') || {}).unnamed, true);
+  eq('  「경력 무관」은 묻는 것이 아니다', PRq.unaskedAttr('경력 무관 · 재학생', [{ kind: 'status' }]), false);
   /* ⑥ 이름 모르는 곳도 지역 요건이다 — 부산 신입생에게 포항·광양 줄이 ✓ 였다 */
   const fresh = { status: '신입학', year: 1, gpa: null, credits: null, region: '부산', parentRegion: '부산' };
   eq('「포항·광양 지역 가정 자녀 … 신입생」은 부산 신입생에게 ✓ 가 아니다', mark('포항·광양 지역 가정 자녀 중 2026년 대학 신입생', fresh), null);
@@ -7032,7 +7064,9 @@ console.log('\n■ 자격 판정 전수 대조 — 틀린 ✓·틀린 ✗ (2026-
       if ((g.verdict[p] || null) !== (v[p] || null)) drift.push(`${g.id} · ${p} · ${g.text.slice(0, 40)} : ${g.verdict[p] || '·'} → ${v[p] || '·'}`);
     }
   }
-  eq(`정답표 ${gold.rows.length}줄 중 아직 목록에 있는 줄을 실제로 쟀다`, seen > 0, true);
+  /* ⚠️ 열쇠(줄 글자)가 하나도 안 맞으면 전부 건너뛰어 조용히 통과한다 — 그래서 절반 넘게는 맞아야 한다
+     (목록에서 빠진 공고는 있어도 되지만, requirementLines 의 글자 다듬기가 바뀌면 여기서 드러난다) */
+  eq(`정답표 ${gold.rows.length}줄 중 아직 목록에 있는 줄을 실제로 쟀다 (${seen}줄)`, seen >= Math.ceil(gold.rows.length / 2), true);
   eq('  엔진 판정이 정답표와 같다 (다르면 표를 읽고 --write-gold)', drift, []);
   eq('  정답표는 사람이 읽은 뒤 굳힌다고 적혀 있다', /사람이 표를 읽은 뒤에만/.test(gold.note || ''), true);
 }
@@ -7050,6 +7084,8 @@ console.log('\n■ 마감일 감사 — 근거 없는 마감이 늘지 않는다
   eq('문구의 마지막 날짜를 끝으로 읽는다 (신청 2026.7.6 ~ 8.31)', DA.lastDateIn('신청 2026.7.6(월) ~ 8.31(월) 18:00', '2026'), '2026-08-31');
   eq('  발표 날짜는 마감이 아니다 (모집 ~2026.8.5 · 선발 발표 8.26)', DA.lastDateIn('모집 ~2026.8.5 · 선발 발표 8.26(수)', '2026'), '2026-08-05');
   eq('  해가 없으면 빌린다 (~9/18)', DA.lastDateIn('접수 ~9/18', '2026'), '2026-09-18');
+  eq('  달이 거꾸로 가면 해가 넘어간 것이다 (12.20 ~ 1.10)', DA.lastDateIn('접수 2026.12.20 ~ 1.10', '2026'), '2027-01-10');
+  eq('  소수는 날짜가 아니다 (평점 3.5 ~ 4.5)', DA.lastDateIn('접수 ~ 2026. 9. 18.(금) 18:00 · 평점 3.5 ~ 4.5', '2026'), '2026-09-18');
   eq('  날짜가 없으면 null', DA.lastDateIn('접수 기간 원문 확인', '2026'), null);
   /* ② 전수 — 톱니. 근거 없는 마감이 지금(4건)보다 늘면 빨간불.
         줄이면 천장을 내릴 것 · 올리려면 그 마감이 어디서 왔는지 먼저 적을 것. */
