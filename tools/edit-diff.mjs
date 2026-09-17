@@ -226,6 +226,23 @@ function prepDocRow(item, patch) {
   };
 }
 
+/** 마감일이 바뀌면 학생 화면 문구(period)가 따라 바뀐다 (2026-09-17 · G-3 컨펌 C).
+ *  🔴 저장소(admin-apply)와 화면(전후 대조)이 **이 한 함수**를 쓴다 — 갈라지면 화면이 예고한
+ *     것과 저장된 것이 다르다(관문 '화면이 예고한 바뀌는 칸'이 그 어긋남을 잡는다).
+ *  규칙은 로봇(extract-excerpts putDeadline)과 같다: 문구가 없으면 `접수 ~날짜`, '원문 확인'
+ *  자리에는 `~날짜`. 마감을 비우면 방금 지운 그 날짜가 든 문구를 '원문 확인'으로 되돌린다.
+ *  사람이 적은 날짜는 짐작이 아니므로 학생 문구에 넣어도 원칙 8-1 에 어긋나지 않는다. */
+export function periodAfterDeadline(period, deadline, oldDeadline) {
+  const p = period || '';
+  if (deadline) {
+    if (!p) return `접수 ~${deadline}`;
+    if (/원문\s*확인/.test(p)) return p.replace(/원문\s*확인/, `~${deadline}`);
+    return p;
+  }
+  if (oldDeadline && p.includes(`~${oldDeadline}`)) return '접수 기간 원문 확인';
+  return p;
+}
+
 /**
  * 한 건의 patch 가 실제로 바꾸는 칸만 고른다.
  * @returns {{key:string,label:string,before:*,after:*,block:(string|null)}[]}
@@ -258,5 +275,11 @@ export function diffPatch(item, patch) {
     if (sameValue(old, v) && !block) return;
     rows.push({ key: k, label: EDIT_LABEL[k] || k, before: old, after: v, block });
   });
+  /* 마감일이 바뀌면 문구(period)도 따라 바뀐다 — 사람이 문구를 직접 적었으면 그쪽이 이긴다 */
+  const dl = rows.find((r) => r.key === 'deadline' && !r.block);
+  if (dl && !('period' in (patch || {}))) {
+    const after = periodAfterDeadline(it.period, dl.after, it.deadline);
+    if (after !== (it.period || '')) rows.push({ key: 'period', label: EDIT_LABEL.period, before: it.period, after, block: null });
+  }
   return rows;
 }

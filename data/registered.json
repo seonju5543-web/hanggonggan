@@ -986,7 +986,8 @@
     "max": 1000000,
     "raw": "장학금액 지원금액 : 1인당 100만원(생활비 장학금)"
    },
-   "amountFrom": "공고 원문"
+   "amountFrom": "공고 원문",
+   "openDate": "2026-08-06"
   },
   {
    "id": "auto-c839d20ec84a0ebb09c20202",
@@ -1555,7 +1556,9 @@
     "2) 경제적 기준",
     "- 기초생활수급자/ 차상위복지급여수급자 (※ 관련 증빙서류 제출 필수)"
    ],
-   "deadlineFrom": "공고문 첨부"
+   "deadlineFrom": "공고문 첨부",
+   "openDate": "2026-07-27",
+   "announceDate": "2026-08-14"
   },
   {
    "id": "auto-ent2431261572artclviewdo",
@@ -1862,7 +1865,9 @@
     "※ 초·중·고등학생은 학교장 추천서 및 학교 직인 날인 제출 [별지1] 장학생 신청서 서식",
     "※ 학교장 추천은 *개인별 신청 불가"
    ],
-   "deadlineFrom": "공고문 첨부"
+   "deadlineFrom": "공고문 첨부",
+   "openDate": "2026-09-03",
+   "announceDate": "2026-11-13"
   },
   {
    "id": "auto-ent2431264135artclviewdo",
@@ -2133,7 +2138,8 @@
    ],
    "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/263956/artclView.do",
    "sourceKind": "auto",
-   "deadlineFrom": "공고문 첨부"
+   "deadlineFrom": "공고문 첨부",
+   "openDate": "2026-09-16"
   },
   {
    "id": "auto-oardid322850menuno200318",
@@ -2742,6 +2748,33 @@
     "raw": "1. 장학금액 1인 80만원 (생활비성 장학금)"
    },
    "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-99ec839d20ec84a0ebb09c20",
+   "name": "공통 2026년 하반기 문주장학재단 AI·ICT 분야 인재 장학생 선발 안내",
+   "boardTitle": "공통 2026년 하반기 문주장학재단 AI·ICT 분야 인재 장학생 선발 안내",
+   "type": "교외",
+   "provider": "경희대학교 게시 공고",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-17",
+   "period": "접수 기간 원문 확인",
+   "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경희대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-17 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323111",
+   "sourceKind": "auto"
   }
  ]
 }
