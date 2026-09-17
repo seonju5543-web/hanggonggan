@@ -498,7 +498,6 @@ input::placeholder { color: var(--text-weak); }
   margin: 6px 0 2px;
   font-variant-numeric: tabular-nums;
 }
-.hero-count { font-size: var(--t-sm); color: rgba(232, 239, 254, 0.72); margin-bottom: 20px; }
 
 .section-head {
   display: flex;
@@ -3021,7 +3020,6 @@ body::after { opacity: 0.26; }
 /* 홈 — 절 사이를 하나로 */
 .alog-sum, .ledger-hero { margin-bottom: var(--sp-4); }
 .section-head { margin: var(--sp-4) 0 0; padding-top: 16px; }
-.hero-count { margin-top: var(--sp-1); padding-top: var(--sp-1); }
 .home-header { margin-bottom: var(--sp-3); padding-bottom: var(--sp-2); }
 
 /* 목록 줄 — 안쪽 간격을 하나로 */
@@ -3201,13 +3199,6 @@ body::after { opacity: 0.26; }
 }
 .home-updated span { display: block; }
 .home-updated:empty { display: none; }
-/* 🔴 홈 히어로 아랫줄 (2026-09-17) — 금액 회계 문장을 걷어내면서 이 칸이 **빌 수 있게**
-   됐다(바로 신청 가능한 공고가 0건인 학생). 규칙이 없으면 빈 채로 글 높이 29px + 위 여백을
-   먹어 금액과 버튼 사이가 벌어진다(실측: 금액→버튼 57px).
-   ⚠️ `.home-updated` 처럼 `display: none` 으로 통째로 지우면 이번엔 **아래 여백까지 사라져**
-      금액과 버튼이 2px 로 붙는다(실측). 그래서 글과 위 여백만 죽이고 `margin-bottom` 은
-      남긴다 — 버튼은 어느 쪽이든 같은 자리에서 숨 쉰다(빈 경우 22px). */
-.hero-count:empty { margin-top: 0; padding-top: 0; font-size: 0; line-height: 0; }
 
 /* 🔴 위아래 여백은 **같은 값**이어야 한다 — 11/12 로 1px 어긋나 있었고,
    높이를 실제로 정하던 것은 여백이 아니라 버튼의 min-height 였다(30px).
@@ -4165,8 +4156,7 @@ body,
 .sch-org,
 .empty,
 .empty-sub,
-.hero-label,
-.hero-count {
+.hero-label {
   word-break: keep-all;
   overflow-wrap: break-word;
 }
@@ -4675,3 +4665,12 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 
 /* 손가락으로 눌렀을 때 회색 판이 뜨지 않게 — 설정 목록과 같은 규칙 */
 .sup-top-item, .sup-more { -webkit-tap-highlight-color: transparent; }
+
+/* ══ 홈 히어로 (2026-09-17 개발자 지시 2차) ═══════════════════════════════════
+   아랫줄(`.hero-count`)을 통째로 없앴다 — '그중 n건은 바로 신청할 수 있어요' 가
+   마지막 한 줄이었고 개발자가 그것도 지우라고 했다(그 앞에 금액 회계 두 줄을 걷었다).
+   🔴 그 칸이 주던 **아래 여백을 여기서 물려받는다.** 안 물려받으면 금액과 버튼 사이가
+      실측 57px → 2px 로 붙는다(`.hero-amount` 자신의 margin-bottom 은 2px 뿐이다).
+   🔴 이 파일은 **뒤 블록이 앞을 덮으므로** 값은 여기 적어야 실제로 먹는다
+      (CLAUDE.md '파일 끝 카드 블록이 앞의 규칙을 전부 덮는다' 와 같은 이유). */
+.hero-amount { margin-bottom: 20px; }
