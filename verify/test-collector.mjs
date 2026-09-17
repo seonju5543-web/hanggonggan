@@ -6804,5 +6804,96 @@ console.log('■ 첨부에서 마감일 — 본문이 껍데기인 게시판 (20
   }
 }
 
+/* ── 자격 묻기 — 채워도 판정이 안 바뀌는 줄에는 묻지 않는다 (2026-09-17 · 노션 AI-1) ──
+   🔴 이 절이 이 기능의 심장이다. 적어도 안 풀리는 줄에 단추를 달면
+      **학생이 적었는데 화면이 그대로다** — 묻지 않는 것보다 나쁘다.
+   🔴 판정은 화면이 쓰는 `requirementMatch` 를 그대로 탐침해서 낸다. judgeCond 로
+      바로 가면 경우별 분기·표 라벨·선택지 묶음 관문을 건너뛴다(사전 점검에서 실제로
+      `신입생:` 줄이 재학생에게 '평점을 물어라'를 냈다).
+   ⚠️ 아래 줄과 기대값은 **실제로 재서 얻은 것**이다(2026-09-17). 지어내지 말 것.
+      기대값이 안 맞으면 코드를 의심하기 전에 이 값을 다시 재 볼 것. */
+console.log('\n■ 자격 묻기 — 무엇을 물을 수 있나');
+{
+  const EA = createRequire(import.meta.url)('../elig-ask.js');
+  /* 온보딩 선택 칸을 하나도 안 채운 학생 — 필수(학교·캠퍼스·학년·학적)만 있다 */
+  const bare = { school: '경희대학교', campus: '서울', year: 3, status: '재학' };
+  const sch = { id: 't', name: '두을장학재단', provider: '두을장학재단' };
+  const L45 = '26년 정규 1학기를 총 15학점 이상 이수하고, 성적을 3.5/4.5 이상 취득한 자';
+
+  eq('평점과 이수학점을 묻는다 (4.5 만점으로 적힌 줄)',
+    EA.askableFields(L45, bare, sch), ['gpa', 'credits']);
+
+  /* 🔴 되돌림 방지 — 백분위 성적은 평점을 적어도 그 줄이 안 풀린다(줄이 풀리려면
+     조건이 **전부** 풀려야 하는데 환산 조건이 막혀 있다). 학점만 묻는 것이 맞다. */
+  eq('백분율환산 줄에서는 평점을 묻지 않는다 (학점만)',
+    EA.askableFields('학기별 최소 9학점 이상 이수하고 평점평균(백분율환산)이 85점 이상인 자', bare, sch),
+    ['credits']);
+
+  /* 🔴 되돌림 방지 — 재학생에게 `신입생:` 줄은 영영 판정되지 않는다 */
+  eq('내 경우가 아닌 분기 줄은 묻지 않는다',
+    EA.askableFields('신입생: 2026년 1학기 85점 이상', bare, sch), []);
+
+  eq('자격이 아닌 줄은 묻지 않는다 (접수 주소)',
+    EA.askableFields('[13620] 경기도 성남시 분당구 구미로 173번길 82 분당서울대학교병원 2동 7층', bare, sch), []);
+  eq('절 제목은 묻지 않는다', EA.askableFields('2. 신청자격', bare, sch), []);
+
+  eq('소득구간을 묻는다',
+    EA.askableFields('한국장학재단 학자금 지원구간 8구간 이내인 자', bare, sch), ['bracket']);
+  eq('국적을 묻는다',
+    EA.askableFields('대한민국 국적을 가진 자에 한함', bare, sch), ['nationality']);
+
+  /* 🔴 이미 채운 칸은 다시 묻지 않는다 — 남은 칸만 묻는다 */
+  eq('이미 적은 칸은 묻지 않는다 (남은 칸만)',
+    EA.askableFields(L45, { ...bare, gpa: 4.0 }, sch), ['credits']);
+  eq('  둘 다 적었으면 물을 것이 없다 (판정이 났으므로)',
+    EA.askableFields(L45, { ...bare, gpa: 4.0, credits: 15 }, sch), []);
+
+  /* 🔴 이미 **미달**로 판정된 줄에도 묻지 않는다 — 단추를 달면 이미 답이 난 줄에
+     또 적으라고 하는 것이다. (판정 유무로 보지 'ok' 인지로 보지 않는다)
+     ⚠️ 여기서 평점만 적어도 판정이 끝난다 — 확신 높은 미달은 나머지 조건을 안 보고
+        그 자리에서 'no' 다. 그래서 학점을 안 적었는데도 물을 것이 없다(실측). */
+  eq('미달로 판정된 줄에도 묻지 않는다', EA.askableFields(L45, { ...bare, gpa: 2.0 }, sch), []);
+  eq('  학점을 안 적었어도 마찬가지다', EA.askableFields(L45, { ...bare, gpa: 3.42 }, sch), []);
+
+  /* ── 칸의 이름·단위 ─────────────────────────────────────────────
+     🔴 칸 이름이 온보딩(app.js collectProfile)과 갈라지면 시트가 엉뚱한 칸에
+        저장하고 판정은 영영 안 바뀐다. 사람이 기억하는 대신 소스를 대조한다. */
+  eq('물을 수 있는 칸에는 전부 이름표가 있다',
+    Object.keys(EA.FIELD_PROBE).filter((f) => !EA.FIELD_META[f]), []);
+  eq('  이름표만 있고 탐침이 없는 칸은 없다 (물을 수 없는 칸을 화면에 그리지 않는다)',
+    Object.keys(EA.FIELD_META).filter((f) => !EA.FIELD_PROBE[f]), []);
+
+  {
+    const appJs = readText(new URL('../app.js', import.meta.url));
+    const at = appJs.indexOf('function collectProfile()');
+    const body = appJs.slice(at, at + 2600);
+    const made = new Set([...body.matchAll(/^\s{4}([A-Za-z_$][\w$]*):/gm)].map((m) => m[1]));
+    eq('FIELD_META 의 칸 이름이 전부 온보딩이 만드는 칸이다',
+      Object.keys(EA.FIELD_META).filter((k) => !made.has(k)), []);
+  }
+
+  /* 입력 문자열 → 프로필 값. 🔴 못 읽으면 0 이 아니라 null 이다(모르면 판정하지 않는다) */
+  eq('평점은 숫자로 바뀐다', EA.coerceField('gpa', '3.42'), 3.42);
+  eq('  빈 칸은 null', EA.coerceField('gpa', '  '), null);
+  eq('  글자는 null (0 이 아니다)', EA.coerceField('gpa', '몰라요'), null);
+  eq('  4.5 를 넘으면 4.5 로 깎는다 (온보딩과 같은 규칙)', EA.coerceField('gpa', '5.0'), 4.5);
+  eq('  음수는 0 으로', EA.coerceField('gpa', '-1'), 0);
+  eq('소득구간은 정수', EA.coerceField('bracket', '8'), 8);
+  eq('  0 은 null 이 아니다 (0 구간·0 학점은 유효한 값이다)', EA.coerceField('credits', '0'), 0);
+
+  /* 공고 단위로 모은다 — 같은 칸을 두 번 담지 않는다 */
+  {
+    const many = { id: 't', name: '두을장학재단', provider: '두을장학재단', eligibilityLines: [
+      L45,
+      '직전 학기 평점 3.0 이상인 자',
+      '대한민국 국적을 가진 자에 한함',
+    ] };
+    eq('공고의 자격 줄 전부에서 모으고 중복은 뺀다',
+      EA.askableForSch(many, bare), ['gpa', 'credits', 'nationality']);
+    eq('  자격 줄이 없는 공고에서도 죽지 않는다 (층2·상시 제도)',
+      EA.askableForSch({ id: 'k', name: '상시' }, bare), []);
+  }
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);
