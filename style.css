@@ -888,7 +888,7 @@ input::placeholder { color: var(--text-weak); }
 .doc-list.doc-badged li {
   padding-left: 0;
   display: flex;
-  gap: 6px;
+  gap: var(--space-6);
   align-items: baseline;
 }
 .doc-list.doc-badged .doc-auto,
@@ -1215,9 +1215,7 @@ textarea:focus {
   /* 🔴 읽은 알림의 색이다 — 회색으로 가라앉힌다 (아래 nf-unread 주석 참조) */
   background: var(--surface-2);
   border: 1px solid var(--line);
-  transition: background 0.15s;
 }
-.nf-item:hover { border-color: rgba(138, 106, 31, 0.24); }
 .nf-item .nf-title { color: var(--text-sub); }
 /* 🔴 읽음/안 읽음의 색을 뒤집었다 (2026-09-17 개발자 지시) — 예전엔 **안 읽은 알림이
    색 배경(회색으로 보임)** 이고 읽은 알림이 흰색이라, 처리할 것이 가라앉고 끝난 것이
@@ -1227,11 +1225,16 @@ textarea:focus {
 .nf-item.nf-unread {
   background: var(--surface);
   border-color: rgba(138, 106, 31, 0.28);
-  box-shadow: 0 1px 2px rgba(58, 48, 28, 0.05), 0 6px 16px rgba(58, 48, 28, 0.08);
+  box-shadow: var(--shadow);
 }
 .nf-item.nf-unread .nf-title { color: var(--text); }
+/* 🔴 누를 때는 **글자가 강조색**이 된다 — 면을 칠하지 않는다(2026-09-12 개발자 지시와 같은 규칙:
+   `.nf-pref`·`.faq-item summary`·기타 줄이 이미 그렇다). 예전 `:hover` 는 면을 옅게 칠했는데
+   `.nf-item.nf-unread` 와 **특정도가 같아 뒤엣것이 이겨서**, 학생이 실제로 누르는 안 읽은 알림은
+   아무 반응이 없었다. 이 줄은 읽음/안 읽음 규칙보다 **뒤에 둬야** 둘 다에서 이긴다. */
+.nf-item:active .nf-title { color: var(--accent); }
 .nf-text { display: grid; gap: 3px; min-width: 0; }
-.nf-title { font-size: var(--t-md); font-weight: 700; letter-spacing: -0.015em; }
+.nf-title { font-size: var(--t-md); font-weight: 700; letter-spacing: -0.015em; transition: color 0.15s; }
 .nf-body { font-size: var(--t-sm); color: var(--text-sub); line-height: 1.5; }
 .nf-time { font-size: var(--t-2xs); color: var(--text-weak); font-weight: 600; }
 
@@ -3159,8 +3162,8 @@ body::after { opacity: 0.26; }
    🔴 `.my-card` 를 통째로 고치면 안 된다 — 설정 화면(#my-account·#my-notify·#set-etc)과
       MY 아래쪽 카드들이 **같은 클래스**를 써서 화면 전체 리듬이 같이 바뀐다. 그래서
       첫 카드와 그 **바로 다음 카드** 한 쌍만 짚는다. */
-#my-profile { padding-bottom: 6px; }
-#my-profile + .my-card { padding-top: 12px; }
+#my-profile { padding-bottom: var(--space-6); }
+#my-profile + .my-card { padding-top: var(--space-12); }
 
 :root {
   --bg:        #fefdfc;   /* #fdfcfa 에서 한 단계 더 흰쪽 (R254 G253 B252) */
