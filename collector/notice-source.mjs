@@ -18,7 +18,7 @@
    canon-url은 순수 함수만 담고 있어(불러도 아무것도 실행되지 않아) 안전하게 가져다 쓴다. */
 export { canonUrl } from './canon-url.mjs';
 import { canonUrl } from './canon-url.mjs';
-import { makeStripper } from './page-boilerplate.mjs';
+import { makeStripperMulti } from './page-boilerplate.mjs';
 
 export const normTitle = (t) => (t || '')
   .replace(/\[[^\]]*\]/g, '')
@@ -32,10 +32,43 @@ export function indexTexts(texts, browserBodies) {
   /* 각 원문에 '메뉴를 걷어내고 남는 본문이 몇 글자인가'를 붙여 둔다.
      이게 있어야 아래 hasText가 **본문 없는 껍데기**를 가려낸다 — 자세한 사정은 MIN_BODY 참조.
      스트리퍼는 '같은 학교의 여러 공고에 똑같이 나오는 줄 = 메뉴'라는 원리라 원문 전체가 필요하다. */
-  const strip = makeStripper(texts);
+  /* 🔴 메뉴 표본은 **브라우저가 그린 본문에서도** 따로 배워 합친다 (2026-09-15).
+     일반 수집이 받은 글자와 브라우저(재수집)가 그린 글자는 같은 게시판이라도 모양이 다르다 —
+     경희대 news 게시판의 탭 줄(`일반 학사 장학 근로 …`)과 주소 꼬리말은 브라우저 판에만 있어,
+     일반 수집분으로만 배운 메뉴 목록이 그 줄을 못 지우고 본문으로 세고 있었다.
+     ⚠️ 한 통에 섞으면 안 된다 — 비율 문턱에 못 미쳐 둘 다 못 배운다(page-boilerplate 주석). */
+  const browserList = Object.entries(browserBodies || {})
+    .map(([url, v]) => (v && v.text ? { url, ...v } : null)).filter(Boolean);
+  const corpus = [...Object.values(texts || {}), ...browserList];
+  const strip = makeStripperMulti([Object.values(texts || {}), browserList]);
+  /* 게시판의 '이전글·다음글' 줄은 **다른 공고의 제목**이다 — 메뉴처럼 매 페이지 똑같지 않아
+     걷어내기가 못 지우고, 한 줄에 20~40자라 두 줄이면 문턱(100자)의 반을 먹는다.
+     저장된 원문 전체의 제목을 모아 두고, 그 제목을 담은 줄은 본문으로 세지 않는다
+     (자기 제목 줄도 같이 빠진다 — 제목은 본문이 아니다). 담았는가로 보는 이유: 목록에 저장된
+     제목은 `공통 [공통] 두을장학재단 …` 처럼 분류 낱말이 앞에 붙어 화면의 줄과 글자가 다르다. */
+  const titles = [];
+  for (const v of corpus) {
+    const t = v && v.title ? normTitle(v.title) : '';
+    if (t.length >= 10) titles.push(t);
+  }
+  const isTitleLine = (line) => {
+    const n = normTitle(line);
+    if (n.length < 10) return false;
+    return titles.some((t) => t.includes(n) || n.includes(t));
+  };
   const measure = (v) => {
-    if (!v || typeof v.text !== 'string' || v.bodyChars !== undefined) return v;
-    try { v.bodyChars = strip(v.url || '', v.text).replace(/[^가-힣]/g, '').length; } catch { /* 재지 못하면 안 잰다 */ }
+    if (!v || typeof v.text !== 'string') return v;
+    /* 🔴 저장된 값이 있어도 **다시 잰다** (2026-09-15). 수집 로봇이 이 칸을 파일에 함께 저장하는데,
+       그건 '그때의 규칙'으로 잰 값이다 — 규칙을 고쳐도 옛 값이 남아 경희대 껍데기 3건이
+       1,400자짜리 '본문'으로 계속 통과했다(실측). 재는 값은 싸다. rescue-ledger 의 minBody 와
+       같은 함정이다.
+       🔴 잴 때는 안전판을 끈다 — 켜 두면 메뉴뿐인 페이지가 메뉴 분량으로 '본문 있음'이 된다
+       (page-boilerplate `stripBoilerplate` 주석). */
+    try {
+      const body = strip(v.url || '', v.text, { fallback: false })
+        .split('\n').filter((l) => !isTitleLine(l)).join('\n');
+      v.bodyChars = body.replace(/[^가-힣]/g, '').length;
+    } catch { /* 재지 못하면 안 잰다 */ }
     return v;
   };
   for (const v of Object.values(texts || {}).map(measure)) {

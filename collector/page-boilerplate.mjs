@@ -52,16 +52,38 @@ export function buildBoilerplate(texts, { minPages = 3, ratio = 0.4 } = {}) {
    표본이 치우쳐 본문까지 지워 버리는 경우가 있을 수 있는데, 그때 '조금 지저분한 원문'은
    고쳐 읽을 수 있지만 '내용이 사라진 원문'은 손쓸 수가 없다.
    실패는 안심되는 쪽으로 틀리면 안 된다(이 저장소의 되풀이되는 원칙). */
-export function stripBoilerplate(text, boiler) {
+export function stripBoilerplate(text, boiler, { fallback = true } = {}) {
   if (!text || !boiler || !boiler.size) return text;
   const all = linesOf(text);
   const kept = all.filter((l) => !boiler.has(l));
-  if (kept.length < 3 || kept.join('\n').length < 120) return text;
+  /* 🔴 안전판은 **읽을 때**의 것이다 — **잴 때** 쓰면 빈 본문이 '있음'이 된다 (2026-09-15).
+     경희대 게시판은 본문이 그림이라 메뉴를 걷어내면 제목·첨부 이름만 남는데, 그게 120자가
+     안 돼 안전판이 **메뉴째 원문을 되돌려 줬고**, 그 메뉴 1,400자를 본문 분량으로 세어
+     두을장학재단·익산사랑·서울인재대학 3건이 '본문 확보 ✅'로 통과했다(실측).
+     읽는 쪽은 그대로 안전판을 쓰고, 분량을 재는 쪽(notice-source `measure`)만 끈다. */
+  if (fallback && (kept.length < 3 || kept.join('\n').length < 120)) return text;
   return kept.join('\n');
 }
 
 /* 편의: 저장된 원문 배열로 '주소 하나를 넣으면 걷어낸 글자를 주는' 함수를 만든다 */
 export function makeStripper(texts, opts) {
   const boiler = buildBoilerplate(texts, opts);
-  return (url, text) => stripBoilerplate(text, boiler.get(hostOf(url)));
+  return (url, text, stripOpts) => stripBoilerplate(text, boiler.get(hostOf(url)), stripOpts);
+}
+
+/* 🔴 말뭉치가 둘이면 **따로 배워서 합친다** — 섞어서 배우면 둘 다 못 배운다 (2026-09-15).
+   같은 게시판이라도 일반 수집이 받은 글자와 브라우저(재수집)가 그린 글자는 모양이 다르다.
+   경희대 news 게시판은 일반 수집분 36쪽에는 없는 탭 줄·주소 꼬리말이 브라우저분 11쪽 전부에
+   있는데, 47쪽을 한 통에 넣으면 11/47 = 23% 라 문턱(40%)에 못 미쳐 메뉴로 안 잡히고,
+   그 두 줄(한글 60자)이 본문 분량에 들어가 껍데기가 '본문 있음'으로 통과했다.
+   말뭉치별로 배운 메뉴 목록을 호스트마다 합집합으로 합친다 — 어느 쪽 모양이든 걷어낸다. */
+export function makeStripperMulti(corpora, opts) {
+  const merged = new Map();
+  for (const texts of corpora || []) {
+    for (const [h, set] of buildBoilerplate(texts, opts)) {
+      if (!merged.has(h)) merged.set(h, new Set());
+      for (const l of set) merged.get(h).add(l);
+    }
+  }
+  return (url, text, stripOpts) => stripBoilerplate(text, merged.get(hostOf(url)), stripOpts);
 }

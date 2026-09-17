@@ -11,3 +11,11 @@
 #   → 진짜 브라우저로 목록에서 '상세보기'를 눌러 그 화면의 **항목 이름과 글자**를 받아 적는다.
 #   자격요건이 있으면 교외 장학금 자격 매칭의 재료가 생긴다(지금 67건이 '자격 미확인').
 findBoard: https://portal.kosaf.go.kr/CO/jspAction.do?beanName=PTSMCstmDsgnGoodsSVC&methodName=getItgnSrchCstmDsgnGoodsList&inputVOName=kr.go.kosaf.portal.pt.sm.cstmdsgngoods.svc.PTSMCstmDsgnGoodsSVO&forwardOnlyFlag=N&ignoreSession=Y&forwardPage=pt/sm/cstmdsgngoods/PTSMCstmDsgnGoods_10M&naviParam=MK,05,02,01 | 상세보기
+
+# 2026-09-17 — 마감일 감사(verify/deadline-audit.mjs)가 '근거 없음'으로 잡은 4건.
+#   마감이 게시판 요약(deadlineHint)에서 읽혔는데 그 요약은 저장되지 않아 대조할 원문이 없다.
+#   학생이 보는 그대로 열어 화면 글자에 그 날짜(09-18 · 08-27 · 08-10 · 08-11)가 있는지 본다.
+checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765595
+checkUrl: https://www.konkuk.ac.kr/bbs/konkuk/235/1202780/artclView.do
+checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765586
+checkUrl: https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=154473&article.offset=0&articleLimit=10&noCat=501

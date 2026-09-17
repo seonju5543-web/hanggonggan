@@ -3,10 +3,17 @@
    ② 장학금 상세 — 제출 서류 목록에서 왼쪽 점이 사라졌고 '자동/직접' 배지가 그 자리를 대신하는가
    실행: CHROME_PATH=... node verify/shot-ui-check.mjs   (앱 서버 8123 필요) */
 import { chromium } from 'playwright-core';
+import { createRequire } from 'node:module';
+const { assertOwnServer } = createRequire(import.meta.url)('./onboard-helper.js');
 
 const EXE = process.env.CHROME_PATH;
-const BASE = 'http://127.0.0.1:8123';
+/* 🔴 포트를 박지 않는다 — 이 저장소는 작업 폴더를 여럿 두고 써서 8123 에 **남의 워크트리
+   서버**가 떠 있을 수 있다(CLAUDE.md 「매 세션 이것만은」 2번). 내 코드를 재고 있는지는
+   drive.js 와 같은 `assertOwnServer` 로 확인한다 — 안 하면 '실측했다'는 근거가 남의 화면이 된다. */
+const PORT = process.env.PORT || 8123;
+const BASE = `http://localhost:${PORT}`;
 
+await assertOwnServer(PORT);
 const browser = await chromium.launch({ executablePath: EXE });
 const ctx = await browser.newContext({ viewport: { width: 390, height: 900 }, deviceScaleFactor: 2 });
 const page = await ctx.newPage();
