@@ -7074,8 +7074,9 @@ console.log('\n■ 자격 판정 전수 대조 — 틀린 ✓·틀린 ✗ (2026-
 /* ── 2026-09-17 · 노션 G-3 — 마감일 감사 (틀린 마감은 못 읽은 것보다 나쁘다) ──
    개발자 지적: "마감일이 아직 지나지 않았음에도 마감된 공고라고 뜨면서 신청 불가로 뜨는 문제".
    verify/deadline-audit.mjs 가 마감마다 **근거 줄**을 찾고 말이 되는지 본다. 전수 조사 결과:
-   마감 47건 중 43건은 근거가 있고, 4건은 2026-09-12 자동 등록이 **게시판 요약 한 줄**에서 읽었는데
-   그 요약이 어디에도 저장되지 않아 근거를 잃었다(아래 톱니의 천장 4가 그것이다). */
+   근거 없는 마감은 전부 2026-09-12 자동 등록이 **게시판 요약 한 줄**에서 읽었는데 그 요약이
+   어디에도 저장되지 않아 근거를 잃은 것이다(아래 톱니의 천장이 그것이다 — 건국 1건은 2026-09-17
+   링크 정찰 run 35207443601 로 게시판 제목에서 확인해 deadlineFrom 에 적었다 · 4 → 3). */
 console.log('\n■ 마감일 감사 — 근거 없는 마감이 늘지 않는다 (2026-09-17 · 노션 G-3)');
 {
   process.env.DEADLINE_AUDIT_AS_LIB = '1';
@@ -7091,8 +7092,8 @@ console.log('\n■ 마감일 감사 — 근거 없는 마감이 늘지 않는다
         줄이면 천장을 내릴 것 · 올리려면 그 마감이 어디서 왔는지 먼저 적을 것. */
   const rows = DA.auditDeadlines(new Date('2026-09-17T00:00:00'));
   const noEvidence = rows.filter((r) => r.flags.some((f) => /근거를 못 찾음/.test(f)));
-  eq(`근거 없는 마감이 4건을 넘지 않는다 (지금 ${noEvidence.length}건: ${noEvidence.map((r) => r.id).join(', ') || '없음'})`,
-    noEvidence.length <= 4, true);
+  eq(`근거 없는 마감이 3건을 넘지 않는다 (지금 ${noEvidence.length}건: ${noEvidence.map((r) => r.id).join(', ') || '없음'})`,
+    noEvidence.length <= 3, true);
   const wrongLabel = rows.filter((r) => r.flags.some((f) => /화면 문구의 끝 날짜/.test(f)));
   eq('화면 문구의 끝 날짜와 마감이 어긋난 공고가 없다', wrongLabel.map((r) => `${r.id} ${r.deadline} vs 문구 「${r.period}」`), []);
   const farAway = rows.filter((r) => r.flags.some((f) => /1년 넘게/.test(f)));
