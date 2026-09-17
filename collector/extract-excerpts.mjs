@@ -838,7 +838,10 @@ for (const it of reg.items) {
        🔴 못 뽑았을 때 기존 값을 지우지 않는 것은 그대로다 — '원문이 없다'는 '모른다'이지
        '자격이 없다'가 아니다(위 2026-08-03 주석과 같은 정신). */
     const got = qualFromDocs(it);
-    if (got.length && WRITE) {
+    /* 🔴 AI·관리자가 채운 자격은 여기서도 덮지 않는다 (2026-09-17 · OCR 을 붙이자 바로 드러났다):
+       본문 없는 공고의 포스터를 AI 가 읽어 둔 값(`AI(공고 포스터 그림)`)을, 같은 포스터의 OCR 글자를
+       무료 경로가 읽게 되자 **더 거친 줄로 갈아 끼웠다**. 아래 본문 갈림길의 917행 규칙과 같은 규칙이다. */
+    if (got.length && WRITE && !humanOwned(it.eligibilityFrom)) {
       it.eligibilityLines = got;
       it.eligibilityFrom = '공고문 첨부';
       fromDoc += 1;

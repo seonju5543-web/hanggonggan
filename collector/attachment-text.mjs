@@ -150,8 +150,18 @@ export function attachmentText(filePath) {
      게다가 한 낱말이 한 줄로 쪼개져 나와 절 구분도 안 된다.
      스캔·CID PDF는 무료로는 방법이 없다 — **AI 경로의 몫**이다(eligibility-ai.mjs가
      원본을 그림째 읽는다). pdfText는 양식 스키마화 쪽에서 계속 쓰므로 함수는 남겨 둔다. */
-  if (lower.endsWith('.pdf')) return '';
+  if (lower.endsWith('.pdf')) return ocrText(filePath);
+  /* 그림 첨부(포스터·스캔)도 같은 길 — 글자층이 없으니 OCR 이 넘겨준 것뿐이다 */
+  if (/\.(png|jpe?g|webp|bin)$/.test(lower)) return ocrText(filePath);
   return '';
+}
+
+/* 🔴 OCR 로 읽은 글자는 **품질 관문을 넘은 것만** 파일로 남아 있다 (2026-09-17 · collector/ocr-text.py).
+   `.ocr.txt` 가 없으면 '못 읽었다'다 — pdf-text.py 의 `.pdf.txt` 는 여기서 **일부러 안 읽는다**
+   (위 2026-08-20 결정: 글자층 PDF 는 숫자가 빠진 채 나와 자격 줄이 원문보다 나빠진다.
+   OCR 은 픽셀을 읽으므로 그 문제가 없고, 대신 오독을 관문(한글 비율·줄 단위)으로 거른다). */
+function ocrText(filePath) {
+  try { return fs.readFileSync(filePath + '.ocr.txt', 'utf8'); } catch { return ''; }
 }
 
 /* 읽을 만한 글자인가 — 한글이 이만큼은 나와야 자격을 찾아볼 가치가 있다 */

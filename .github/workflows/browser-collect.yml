@@ -41,7 +41,7 @@ jobs:
     #    그때의 교훈은 그대로다 — **상한을 키우는 것으로 때우지 말 것**. 단계가 오래 걸리면
     #    그 단계의 예산(HARVEST_BUDGET_MS, 아래 timeout-minutes)을 줄이고, 상한은 그 합을
     #    담는 그릇으로만 쓴다. verify/test-collector.mjs가 이 대소관계를 검사한다.
-    timeout-minutes: 44   # 단계 합 40 + 준비·저장 여유 3 (2026-09-13 금액 단계 3분 추가로 41→44)
+    timeout-minutes: 48   # 단계 합 44 + 준비·저장 여유 3 (2026-09-17 OCR 단계 4분 추가로 44→48)
     steps:
       - uses: actions/checkout@v4
 
@@ -134,6 +134,15 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq poppler-utils
           python3 collector/pdf-text.py
+      # 그림·스캔 첨부 글자 읽기 (OCR · 2026-09-17 개발자 지시 "직접 할 수 있으면 사용") — 무료 tesseract.
+      # 품질 관문(한글 비율)을 넘은 것만 .ocr.txt 로 남기고, 장부(ocr-ledger.json)가 같은 파일을 다시 안 읽는다.
+      # 🔴 `|| true` 로 설치 실패를 삼키지 말 것 — '매번 0개 + 초록불'(pdf-text 와 같은 규칙 · test-collector 관문).
+      - name: 그림·스캔 첨부 글자 읽기 (OCR)
+        timeout-minutes: 4
+        continue-on-error: true
+        run: |
+          sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-kor poppler-utils
+          python3 collector/ocr-text.py --budget-sec=180
       - name: 데이터 관문 (수집기 규칙 테스트 + 데이터 감사)
         id: audit
         continue-on-error: true

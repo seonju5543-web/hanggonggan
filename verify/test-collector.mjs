@@ -7142,5 +7142,60 @@ console.log('\n■ 마감일 감사 — 근거 없는 마감이 늘지 않는다
   eq('자동 등록이 마감을 읽으면 그 문구를 deadlineFrom 에 남긴다', /deadlineFrom: `게시판 요약 · \$\{/.test(ar), true);
 }
 
+/* ── 2026-09-17 · OCR — 그림·스캔 첨부 글자 읽기 (개발자 지시 "직접 할 수 있으면 사용") ──
+   무료 tesseract 로 글자층 없는 PDF·그림을 읽되 **품질 관문을 넘은 것만** `.ocr.txt` 로 남긴다.
+   실측: 스캔 공고문 0.92~0.98 통과 · 포스터 0.41~0.86 탈락(39개 중 8개). 틀린 자격 줄은 못 읽는 것보다
+   나쁘므로(원칙 8-1) 관문·글머리 기호 되돌림·AI 값 보호 셋이 이 절의 심장이다. */
+console.log('\n■ OCR — 그림·스캔 첨부 글자 읽기 (2026-09-17)');
+{
+  const ocrSrc = readText(new URL('../collector/ocr-text.py', import.meta.url));
+  eq('OCR 스크립트가 품질 관문을 가진다 (문서 한글 비율 0.9 · 살아남은 한글 200자)',
+    /ACCEPT_RATIO = 0\.90/.test(ocrSrc) && /ACCEPT_HANGUL = 200/.test(ocrSrc), true);
+  eq('  결과는 .ocr.txt 로만 남긴다 (.txt 면 pdf-text 의 "이미 뽑았다" 판정과 섞인다)',
+    /\+ '\.ocr\.txt'/.test(ocrSrc) && !/path \+ '\.txt', 'w'/.test(ocrSrc), true);
+  eq('  장부는 훑는 폴더 안에 둔다 (git add <폴더> 가 담는다 — 이슈 #79 유형)', /os\.path\.join\(root, LEDGER\)/.test(ocrSrc), true);
+  eq('  tesseract 가 없으면 경고를 남긴다 (조용히 0개 금지)', /::warning::tesseract/.test(ocrSrc), true);
+  /* 자가 검사 — 실제 OCR 출력 두 조각으로 관문이 살아 있는지(좋은 스캔은 남기고 포스터는 버리고
+     글머리 기호 오독(`ㅁ`·`(2`)을 되돌린다). python3 은 워크플로 러너와 개발 컴퓨터에 다 있다. */
+  const st = spawnSync('python3', ['collector/ocr-text.py', '--self-test'],
+    { cwd: fileURLToPath(new URL('..', import.meta.url)), encoding: 'utf8' });
+  eq('  자가 검사 통과', st.status === 0 && /"ok": true/.test(st.stdout || ''), true);
+  /* 워크플로 — PDF 글자를 뽑는 로봇 전부가 OCR 도 돌리고, 설치 실패를 삼키지 않는다 */
+  const wfs = fs.readdirSync(new URL('../.github/workflows', import.meta.url))
+    .filter((f) => f.endsWith('.yml'))
+    .map((f) => [f, readText(new URL('../.github/workflows/' + f, import.meta.url))]);
+  eq('PDF 글자를 뽑는 워크플로 전부가 OCR 도 돌린다',
+    wfs.filter(([, t]) => /ocr-text\.py/.test(t)).map(([f]) => f).sort(),
+    wfs.filter(([, t]) => /pdf-text\.py/.test(t)).map(([f]) => f).sort());
+  for (const [f, t] of wfs.filter(([, t]) => /ocr-text\.py/.test(t))) {
+    eq(`  ${f} 가 tesseract-ocr-kor 를 설치한다 (안 하면 조용히 0개)`, /tesseract-ocr-kor/.test(t), true);
+    eq(`  ${f} 가 설치 실패를 삼키지 않는다`, /tesseract-ocr-kor[^\n]*\|\|\s*true/.test(t), false);
+    eq(`  ${f} 의 OCR 단계는 자기 예산 + continue-on-error 다 (보강 단계 규칙)`,
+      /name: 그림·스캔 첨부 글자 읽기 \(OCR\)\n(?:\s+if:[^\n]*\n)?\s+timeout-minutes: \d+\n\s+continue-on-error: true/.test(t), true);
+  }
+  /* 읽는 쪽 — PDF·그림에서 .ocr.txt 만 읽는다(.pdf.txt 는 2026-08-20 결정대로 안 읽는다) */
+  const at = readText(new URL('../collector/attachment-text.mjs', import.meta.url));
+  eq('attachmentText 가 PDF·그림에서 .ocr.txt 를 읽고 .pdf.txt 는 안 읽는다',
+    /\.ocr\.txt/.test(at) && !/'\.pdf\.txt'/.test(at), true);
+  {
+    const AT = await import(new URL('../collector/attachment-text.mjs', import.meta.url));
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ocr-'));
+    const img = path.join(tmp, 'elig-x-1.png');
+    fs.writeFileSync(img, 'not an image');
+    eq('  .ocr.txt 가 없으면 빈 문자열(모른다)', AT.attachmentText(img), '');
+    fs.writeFileSync(img + '.ocr.txt', '○ 전국 대학(원)생 (휴학생 제외)\n');
+    eq('  있으면 그 글자', AT.attachmentText(img).trim(), '○ 전국 대학(원)생 (휴학생 제외)');
+    const pdf = path.join(tmp, 'form-x-1.pdf');
+    fs.writeFileSync(pdf, '%PDF-1.4');
+    fs.writeFileSync(pdf + '.txt', '글자층 평점 3.0 이상');
+    eq('  PDF 의 .pdf.txt 는 여전히 안 읽는다', AT.attachmentText(pdf), '');
+  }
+  /* 🔴 무료 경로가 AI·관리자 값을 덮지 않는다 — OCR 을 붙인 첫 실행에서 의암 손병희의
+     `AI(공고 포스터 그림)` 자격 줄이 거친 OCR 줄로 갈렸다(본문 없는 갈림길에 관문이 없었다). */
+  const exSrc = readText(new URL('../collector/extract-excerpts.mjs', import.meta.url));
+  eq('본문 없는 갈림길도 AI·관리자가 채운 자격을 덮지 않는다',
+    /got\.length && WRITE && !humanOwned\(it\.eligibilityFrom\)/.test(exSrc), true);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);
