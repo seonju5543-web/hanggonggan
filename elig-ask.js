@@ -51,8 +51,19 @@ const FIELD_PROBE = {
   birthYear: [1980, 2010],
   nationality: ['대한민국', '기타'],
   major: ['국어국문학과', '기계공학과'],
+  region: ['서울', '전남'],
   regionCity: ['종로구', '무안군'],
+  parentRegion: ['서울', '전남'],
+  parentRegionCity: ['종로구', '무안군'],
 };
+
+/* 🔴 학적정보에 **있는데 여기 없는 칸**과 그 이유 (2026-09-18 개발자 지시):
+     · 특별자격(flags)·보유 장학금(scholarships) — **온보딩에서 이미 고르는 것**이라
+       여기서 또 띄우지 않는다("굳이 또 화면을 두번 띄울 필요는 없을 것 같고").
+       여러 개를 고르는 칸이라 화면도 무겁고, 프로필 수정으로 가면 될 일이다.
+     · school·campus·year·status·track — 온보딩 필수라 늘 차 있다
+     · cert·exchange — 체크박스 한 칸이라 `false` 가 '아니오'인지 '안 답함'인지
+       값만으로 갈리지 않는다. 실측으로 여는 줄도 0이라 넣지 않았다. */
 
 /* 칸 하나를 화면에 그리는 데 필요한 것.
    🔴 `label` 은 칸 이름이지 문장이 아니다. 여기에 설명을 넣지 말 것
@@ -64,8 +75,21 @@ const FIELD_META = {
   birthYear:   { label: '태어난 해', kind: 'number', min: 1950, max: 2015, step: 1 },
   nationality: { label: '국적', kind: 'select', options: ['대한민국', '기타'] },
   major:       { label: '학과', kind: 'text' },
+  region:      { label: '거주 시·도', kind: 'text' },
   regionCity:  { label: '거주 시·군·구', kind: 'text' },
+  parentRegion:     { label: '부모 거주 시·도', kind: 'text' },
+  parentRegionCity: { label: '부모 거주 시·군·구', kind: 'text' },
 };
+
+/* 이 칸에 학생이 **답을 준 적이 있나**.
+   🔴 여러 개를 고르는 칸은 `[]` 가 두 가지 뜻이다 — '해당 없음' 과 '아직 안 물음'.
+      값만으로는 갈리지 않으므로 답한 사실을 `<칸>Asked` 표식으로 따로 적는다.
+      (`scholarships` 는 온보딩이 이미 `null`=안 물음 / `[]`=없음 으로 갈라 둔다) */
+function answered(p, key) {
+  const v = p[key];
+  if (Array.isArray(v)) return v.length > 0 || p[key + 'Asked'] === true;
+  return v !== null && v !== undefined && v !== '';
+}
 
 /* 이 줄을 푸는 프로필 칸이 무엇인가 → ['gpa', 'credits']
    빈 배열이면 물을 것이 없다(= 단추를 달지 않는다).
@@ -81,7 +105,7 @@ function askableFields(line, profile, sch) {
   if (EA_ME.requirementMatch(line, p, sch)) return [];   // 지금도 판정된다
   const out = [];
   for (const key of Object.keys(FIELD_PROBE)) {
-    if (p[key] !== null && p[key] !== undefined && p[key] !== '') continue;  // 이미 적었다
+    if (answered(p, key)) continue;                        // 이미 답했다
     for (const v of FIELD_PROBE[key]) {
       const trial = Object.assign({}, p);
       trial[key] = v;
@@ -111,6 +135,9 @@ function askableForSch(sch, profile) {
 function coerceField(key, raw) {
   const meta = FIELD_META[key];
   if (!meta) return null;
+  /* 여러 개를 고르는 칸은 고른 것들의 배열이 그대로 값이다 — 아무것도 안 골랐으면
+     `[]`(= 해당 없음)이고, 답했다는 사실은 화면이 `<칸>Asked` 로 적는다. */
+  if (meta.kind === 'checks') return Array.isArray(raw) ? raw.slice() : [];
   const s = String(raw == null ? '' : raw).trim();
   if (s === '') return null;
   if (meta.kind === 'number') {
@@ -125,5 +152,5 @@ function coerceField(key, raw) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { askableFields, askableForSch, coerceField, FIELD_META, FIELD_PROBE };
+  module.exports = { askableFields, askableForSch, coerceField, answered, FIELD_META, FIELD_PROBE };
 }

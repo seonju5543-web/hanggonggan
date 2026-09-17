@@ -888,7 +888,7 @@ input::placeholder { color: var(--text-weak); }
 .doc-list.doc-badged li {
   padding-left: 0;
   display: flex;
-  gap: 6px;
+  gap: var(--space-6);
   align-items: baseline;
 }
 .doc-list.doc-badged .doc-auto,
@@ -1227,7 +1227,9 @@ textarea:focus {
 .nf-item.nf-unread {
   background: var(--surface);
   border-color: rgba(138, 106, 31, 0.28);
-  box-shadow: 0 1px 2px rgba(58, 48, 28, 0.05), 0 6px 16px rgba(58, 48, 28, 0.08);
+  /* 🔴 토큰을 쓴다 — 손으로 적었던 값은 rgba(58,48,28) 갈색이라 페이스리프트 전
+     옛 팔레트가 남아 있던 것이다(지금 체계는 남색). --shadow 가 바로 이 자리다. */
+  box-shadow: var(--shadow);
 }
 .nf-item.nf-unread .nf-title { color: var(--text); }
 .nf-text { display: grid; gap: 3px; min-width: 0; }
@@ -4676,46 +4678,76 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 /* 손가락으로 눌렀을 때 회색 판이 뜨지 않게 — 설정 목록과 같은 규칙 */
 .sup-top-item, .sup-more { -webkit-tap-highlight-color: transparent; }
 
-/* ── 자격 확인 도우미 (2026-09-17 · 노션 AI-1) ─────────────────────────────
+/* ── 자격 확인 도우미 (2026-09-17 · 노션 AI-1 · 2026-09-18 개발자 지시로 재단장) ──
    🔴 앱이 하는 말은 「미확인 자격 n」뿐이다. 설명 문장을 넣지 말 것(설계 3-2).
    🔴 저장 뒤 줄은 **글자 색만** 바뀐다 — 마커(✓·✕)도 배경도 안 넣는다(개발자 지시).
+   🔴 **공고 팝업 안의 구획**이다. 시트를 갈아치우지 않는다 — 갈아치우면 보던 공고가
+      사라지고 뒤에 홈이 비친다.
+   🔴 **접혔을 때는 파란 글씨 한 줄과 화살표뿐이다** (2026-09-18 개발자 지시).
+      면도 선도 두르지 않는다 — 판을 깔면 공고 안에 또 다른 상자가 생겨 어수선하다.
    🔴 토큰 밖의 값을 쓰지 않는다 — ui-tone.mjs '토큰 이탈' 톱니가 지금 값을 천장으로 잡는다. */
-.elig-ask-btn {
-  background: none; border: 0; padding: 0;
-  color: var(--accent); font: inherit; font-size: var(--t-xs); font-weight: 500;
-}
+.elig-ask { margin: var(--space-12) 0 0; }
+
+/* 접혔을 때 — 「미확인 자격 4 ⌄」 그것뿐 */
+.elig-ask-open,
 .elig-ask-head {
-  display: flex; align-items: center; gap: var(--space-4);
-  background: none; border: 0; padding: 0; margin: 0 0 var(--space-12);
-  color: var(--text-weak); font: inherit; font-size: var(--t-2xs);
+  display: inline-flex; align-items: center; gap: var(--space-4);
+  background: none; border: 0; padding: 0;
+  color: var(--accent); font: inherit; font-size: var(--t-xs); font-weight: 600;
 }
-.elig-ask-head b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
-.elig-ask-head i { color: var(--text-weak); font-style: normal; font-size: var(--t-2xs); }
-.elig-ask-lines { list-style: none; margin: 0 0 var(--space-12); padding: 0; }
+.elig-ask-open b, .elig-ask-head b { font-variant-numeric: tabular-nums; }
+.elig-chev { flex: none; transition: transform .18s ease; }
+.elig-ask-head .elig-chev { transform: rotate(180deg); }
+.elig-ask-open:active, .elig-ask-head:active { transform: scale(0.95); }
+
+/* 펼쳤을 때 — 머리줄 아래로 내용이 열린다 */
+.elig-ask-on { margin-top: var(--space-16); }
+.elig-ask-head { margin-bottom: var(--space-16); }
+
+/* 미확인 줄 — 눈금이자 원문. 자르지 않고 그대로 보여 준다 */
+.elig-ask-lines { list-style: none; margin: 0 0 var(--space-20); padding: 0; }
 .elig-ask-lines li {
-  font-size: var(--t-sm); line-height: 1.55; padding: var(--space-2) 0;
+  font-size: var(--t-sm); line-height: 1.5; padding: var(--space-6) 0;
   color: var(--text-weak);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  word-break: keep-all; overflow-wrap: break-word;
 }
+.elig-ask-lines li + li { border-top: 1px solid var(--line); }
 .elig-ask-lines li.ok  { color: var(--green); }
 .elig-ask-lines li.bad { color: var(--red); }
-.elig-ask-row { display: block; margin-bottom: var(--space-12); }
+
+.elig-ask-row { display: block; margin-bottom: var(--space-16); }
 .elig-ask-row > span:first-child {
-  display: block; font-size: var(--t-xs); color: var(--text-sub); margin-bottom: var(--space-6);
+  display: block; font-size: var(--t-xs); color: var(--text-sub);
+  font-weight: 500; margin-bottom: var(--space-8);
 }
 .elig-ask-wrap { position: relative; display: block; }
 .elig-ask-wrap em {
-  position: absolute; right: var(--space-12); top: 50%; transform: translateY(-50%);
+  position: absolute; right: var(--space-16); top: 50%; transform: translateY(-50%);
   font-style: normal; font-size: var(--t-xs); color: var(--text-weak);
 }
+/* 입력칸 — 테두리 대신 옅은 면. 누르는 자리를 크게 잡는다 */
 .elig-ask-in {
   width: 100%; box-sizing: border-box;
-  background: var(--surface); border: 1px solid var(--line);
-  border-radius: var(--radius-sm); padding: var(--space-8) var(--space-12);
-  font: inherit; font-size: var(--t-md); color: var(--text);
+  background: var(--surface-2); border: 1px solid transparent;
+  border-radius: var(--radius-sm); padding: var(--space-16);
+  font: inherit; font-size: var(--t-lg); font-weight: 600; color: var(--text);
+  transition: background .15s ease, border-color .15s ease;
 }
+.elig-ask-in:focus {
+  outline: none; background: var(--surface);
+  border-color: var(--accent); box-shadow: var(--ring);
+}
+
 .elig-ask-save {
   width: 100%; background: var(--accent); color: #fff; border: 0;
-  border-radius: var(--radius-pill); padding: var(--space-12);
-  font: inherit; font-size: var(--t-md); font-weight: 600;
+  border-radius: var(--radius-sm); padding: var(--space-16);
+  font: inherit; font-size: var(--t-md); font-weight: 700;
 }
+.elig-ask-save:active { transform: scale(0.95); }
+/* 접는 또 하나의 길 — 눌러서 나갈 자리를 아래에도 둔다 */
+.elig-ask-later {
+  display: block; width: 100%; background: none; border: 0;
+  padding: var(--space-12) 0 0;
+  color: var(--text-weak); font: inherit; font-size: var(--t-xs);
+}
+.elig-ask-later:active { transform: scale(0.95); }

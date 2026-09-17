@@ -38,7 +38,7 @@ import { pageCandidates, pageUrl, existingPageParam, samePage, shouldRetry } fro
 import { looseCandidate, sameNotice, findMissing, classifyMiss, coverageOf, looksLikeBoardChrome, looksLikeAttachmentName, dedupeNear } from '../collector/coverage-rules.mjs';
 import { createRequire } from 'node:module';
 import { isAttachmentEntry, isHtmlPayload } from '../collector/attachment-link.mjs';
-import { isDetailUrl, isMarkerUrl, markerTitle, sameTitle, detailCandidates, looksLikeLoginWall, rowDetailCandidates } from '../collector/detail-url.mjs';
+import { isDetailUrl, isMarkerUrl, markerTitle, sameTitle, titleCore, rowByCore, detailCandidates, looksLikeLoginWall, rowDetailCandidates } from '../collector/detail-url.mjs';
 import { cleanTitle, isMenuEntry } from '../collector/clean-title.mjs';
 import { makeBudget, rotateOrder, nextCursor, withDeadline, TIMED_OUT } from '../collector/harvest-budget.mjs';
 import { canonUrl } from '../collector/canon-url.mjs';
@@ -6893,6 +6893,30 @@ console.log('\n■ 자격 묻기 — 무엇을 물을 수 있나');
     eq('  자격 줄이 없는 공고에서도 죽지 않는다 (층2·상시 제도)',
       EA.askableForSch({ id: 'k', name: '상시' }, bare), []);
   }
+}
+
+/* ── 링크 사냥꾼 — 앱 이름과 게시판 제목이 달라도 찾는다 (2026-09-18) ──
+   🔴 실측: 한국외대 6건이 `목록에서 못 찾음` 4회로 likelyGone 처리됐는데, 게시판에
+      그 글이 **멀쩡히 있었다**. 앱 이름(사람이 다듬음)과 행 글자가 달라 지문이 안 맞은 것이다.
+   🔴 **느슨하게 풀면 안 된다** — 예전에 `복지장학금 (서울캠퍼스)` 가 `(다빈치캠퍼스)`
+      공고에 붙었다. 딱 하나일 때만, 캠퍼스가 어긋나면 버린다. */
+console.log('\n■ 링크 사냥꾼 — 알맹이 낱말로 한 번 더 찾기');
+{
+  const HUFS = '[공통][교내] 2026학년도 2학기 면학장학금 신청 안내';
+  eq('앱 이름에서 장학금 이름만 집는다', titleCore('면학장학금 (한국외대 교내)'), '면학장학금');
+  eq('  학기·연도·「신청 안내」는 알맹이가 아니다', titleCore(HUFS), '면학장학금');
+  eq('지문이 안 맞아도 알맹이로 찾는다 (실제로 못 찾던 줄)',
+    !sameTitle('면학장학금 (한국외대 교내)', HUFS)
+      && !!rowByCore('면학장학금 (한국외대 교내)', [{ t: HUFS }, { t: '[공통][교내] 2026-2학기 가족장학금 신청 안내' }]),
+    true);
+  eq('  여럿이면 지어내지 않는다',
+    rowByCore('면학장학금 (한국외대 교내)', [{ t: HUFS }, { t: '2025 면학장학금 안내' }]), null);
+  eq('  캠퍼스가 어긋나면 버린다 (복지장학금 사고)',
+    rowByCore('복지장학금 (서울캠퍼스)', [{ t: '[다빈치캠퍼스] 복지장학금 안내' }]), null);
+  eq('  같은 캠퍼스면 고른다',
+    !!rowByCore('복지장학금 (서울캠퍼스)', [{ t: '[서울캠퍼스] 복지장학금 안내' }]), true);
+  eq('  알맹이가 짧으면 안 고른다 (우연히 겹친다)',
+    rowByCore('장학 (안내)', [{ t: '아무 장학 공고' }]), null);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
