@@ -447,8 +447,46 @@ function sumAmounts(items, opts) {
   for (var k = 0; k < added.length; k++)     total += added[k].won;
   for (var l = 0; l < onlyOne.length; l++)   total += onlyOne[l].won;
 
+  /* ④ 못 읽은 금액 어림잡기 — **부르는 쪽이 켤 때만** (2026-09-17 개발자 지시:
+     "'금액을 아직 못 읽은 4건은 뺀 금액' 설명을 삭제하고 금액을 추정하여 합산").
+     🔴 **데이터에는 한 글자도 안 적는다.** 2026-07-30 에 확인한 적 없는 `amountValue: 500000`
+        을 전 공고에 박아 넣었다가 '지어낸 숫자'라고 걷어낸 자리이고, `audit-data.js` 가
+        지금도 '금액 문구에 숫자가 없는데 amountValue 가 있으면' 실패시킨다(원칙 8-1).
+        여기서 만드는 숫자는 **이 합계 한 곳**에서만 살고, 카드와 금액 상세의 그 공고 줄은
+        여전히 '금액 원문 확인'이라고 말한다 — 어림잡은 것을 확인한 것처럼 적지 않는다.
+     🔴 짐작의 근거는 **우리가 실제로 읽은 금액들의 중앙값**이다. 상수는 근거가 없고,
+        평균은 큰 한 건에 끌려간다(실측: 등록 24건의 중앙값 150만 · 평균 210만).
+     🔴 **읽은 금액이 하나도 없으면 짐작하지 않는다** — 근거가 0건인 추정은 지어내는 것이다.
+     🔴 이중수혜가 넓게 막힌 공고는 짐작에서도 뺀다 — 위 onlyOne 이 그런 공고 중 하나만
+        세는데 여기서 또 더하면 '함께 받을 수 없는 돈'을 더하는 셈이 된다(이 파일 첫머리).
+     ⚠️ **이 가드는 지금 거의 안 걸린다** (2026-09-17 코드 리뷰 실측: 금액을 못 읽은 등록
+        28건 중 `exclusivity` 칸이 있는 것이 4건, 그중 넓은 것이 1건). 금액을 못 읽은 공고는
+        이중수혜 조항도 못 읽은 경우가 대부분이라 그렇다 — **가드가 일을 한다고 믿지 말 것.**
+        지금 홈 합계에서 어림잡은 몫이 차지하는 비율은 작지 않다(아래 관문이 세고, 실측 한
+        프로필에서 1,968만원 중 800만원). 그래서 화면은 '약'을 붙이고 금액 상세가 내역을 연다.
+     ⚠️ `unknown` 에서 빼지 않는다 — 금액 상세가 그 목록을 '금액 원문 확인'으로 그대로
+        보여 줘야 무엇을 어림잡았는지 학생이 짚어 볼 수 있다. */
+  var assumed = [], assumedWon = 0, assumedEach = 0;
+  if (o.estimate && unknown.length) {
+    var knowns = [];
+    for (var n = 0; n < added.length; n++)     knowns.push(added[n].won);
+    for (var q = 0; q < exclusive.length; q++) knowns.push(exclusive[q].won);
+    if (knowns.length) {
+      knowns.sort(function (x, y) { return x - y; });
+      assumedEach = knowns[Math.floor(knowns.length / 2)];
+      for (var u = 0; u < unknown.length; u++) {
+        var ux = unknown[u].ref.exclusivity;
+        if (ux && ux.kind === 'forbidden' && ux.scope !== 'narrow') continue;
+        assumed.push(unknown[u]);
+        assumedWon += assumedEach;
+      }
+    }
+  }
+  total += assumedWon;
+
   return { total: total, added: added, onlyOne: onlyOne, dropped: dropped,
-           estimated: estimated, unknown: unknown };
+           estimated: estimated, unknown: unknown,
+           assumed: assumed, assumedWon: assumedWon, assumedEach: assumedEach };
 }
 
 /* Node(수집기·감사·검사)와 브라우저·서비스워커가 같은 파일을 쓴다.

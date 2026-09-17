@@ -2558,6 +2558,13 @@ function renderQuality(target) {
      판정 기준은 **학생 앱과 같은 칸**(eligibilityLines)이다. 고치는 자리는 상세 시트에
      있었는데 '몇 건인지'를 세는 자리가 어디에도 없어서, 76건이 밀려 있어도 화면이 조용했다. */
   const noElig = D.reg.filter((it) => !(it.eligibilityLines || []).length && !it.eligibilityVerified).length;
+  /* 🔴 2026-09-17 개발자 지시로 **앱1에서 내려온** 표시들이 여기로 왔다 —
+     "앱 내부 사정에 대한 설명은 학생이 아니라 관리자에게만 나타나야 한다."
+     앱1 상세 시트에 있던 '이 자격은 AI가 공고 원문에서 읽은 것입니다 · 사람 검수 전' 줄이
+     그것이다. 학생이 그 줄로 할 수 있는 일은 없지만 **우리는 이걸 보고 검수해야 한다.**
+     🔴 판정식의 원본은 이제 여기 하나다(앱1에서는 지웠다) — 베끼지 말 것. */
+  const aiReadCount = D.reg.filter((it) =>
+    /^AI/.test(it.eligibilityFrom || '') && it.eligibilityReviewed !== true).length;
 
   const probRow = (x) => `
     <div class="row" data-id="${esc(x.it.id)}" tabindex="0" role="button" aria-label="${esc(x.it.name)} 상세 열기">
@@ -2584,7 +2591,9 @@ function renderQuality(target) {
     { n: noDeadline, tone: 'is-warn', k: '마감일 없음', d: '언제까지인지 모르는 공고' },
     { n: noForm, tone: 'is-warn', k: '신청서 첨부는 있는데 양식 미등록', d: '앱에서 작성하게 만들 수 있는 후보' },
     { n: noElig, tone: 'is-warn', k: '지원 자격 미확보',
-      d: '학생에게 "자격을 아직 읽지 못했어요"로 나가는 공고 — 상세에서 원문 문장을 골라 주면 사라집니다' },
+      d: '앱1이 자격을 한 줄도 못 읽은 공고 — 상세에서 원문 문장을 골라 주면 사라집니다 (학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다)' },
+    { n: aiReadCount, tone: 'is-warn', k: 'AI가 읽은 자격 · 사람 검수 전',
+      d: '자격 문장을 AI가 공고 원문에서 읽었고 아직 사람이 확인하지 않았습니다 — 2026-09-17 전에는 이 사실이 학생 상세 시트에 그대로 떴습니다' },
     { n: dead.length, tone: 'is-warn', k: '원문 링크 실패 기록', d: '링크 사냥꾼이 못 연 주소' },
   ])}
 

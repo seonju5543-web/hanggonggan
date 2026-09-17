@@ -5439,9 +5439,147 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
   eq('버튼 위 안내 문구 자리를 찾았다', note.length > 0 && note.length < 800, true);
   eq("  unknown 일 때 '요건 미충족'이라고 하지 않는다",
     /'unknown'/.test(note) && !/미충족/.test(note), true);
-  eq('  그때 다른 문구를 쓴다 (못 읽었다고 말한다)', /읽지 못했/.test(note), true);
+  /* 🔴 **문구는 바뀌었고 뜻은 그대로다** (2026-09-17 개발자 지시: "'이 공고는 지원자격을
+     아직 읽지 못했습니다' 와 같은 설명이 나타나지 않게 전부 삭제 … 앱 내부 사정에 대한
+     설명은 학생이 아니라 관리자에게만 나타나야 해"). 예전 이 줄은 `/읽지 못했/` 를
+     요구했는데, 그건 **우리 사정**을 학생 화면에 적으라고 못 박은 것이었다.
+     지키려던 규칙은 그게 아니라 '모르는 것을 미충족이라 부르지 않는다'이므로,
+     규칙은 그대로 두고 잣대만 옮긴다 — 두 갈래가 서로 다른 말을 하고, unknown 쪽은
+     원문에서 자격을 보라고 말하며, 우리 공정 이야기는 하지 않는다.
+     ⚠️ 검사만 고쳐 통과시킨 것이 아니다 — 문구를 지운 것은 개발자 지시이고,
+        '자격을 확인해 준 척하지 않는다'는 요구는 아래 세 줄이 그대로 지킨다. */
+  const unkNote = (note.match(/\?\s*'([^']+)'/) || [])[1] || '';
+  const badNote = (note.match(/:\s*'([^']+)'/) || [])[1] || '';
+  eq('  두 갈래가 서로 다른 말을 한다', !!unkNote && !!badNote && unkNote !== badNote, true);
+  eq('  unknown 쪽은 원문에서 자격을 보라고 말한다',
+    /원문/.test(unkNote) && /자격/.test(unkNote), true);
+  eq('  그러면서 우리 공정 이야기는 하지 않는다 (2026-09-17 개발자 지시)',
+    /읽지 못|검수|AI가/.test(unkNote), false);
   /* 🔴 미달 쪽 문구도 **단정하지 않는다** — 우리 판정이 틀릴 수 있다는 것이 이 업무의 전제다 */
   eq('  미달 쪽도 단정하지 않는다 (틀릴 수 있다고 말한다)', /틀릴 수 있/.test(note), true);
+}
+
+/* ── 🔴 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시) ──
+   "금액을 읽지 못한 공고에 대해서는 앞으로 금액 추정하여 해당 인터페이스에 합산되도록 해줘."
+   🔴 이 저장소는 **정확히 반대 방향의 사고**를 이미 겪었다 — 2026-07-30 에 확인한 적 없는
+      `amountValue: 500000` 을 전 공고에 박아 넣어 홈 합계가 부풀어 있었고, 그걸 '지어낸
+      숫자'라고 걷어내면서 `audit-data.js` 에 관문을 세웠다. 그래서 이번 추정은 **데이터가
+      아니라 합계 한 곳**에서만 산다. 이 절이 그 선을 지킨다.
+   🔴 짐작의 근거는 우리가 **실제로 읽은 금액들의 중앙값**이다 — 상수를 박으면 그게
+      2026-07-30 의 500,000 과 같은 물건이 된다. */
+console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)');
+{
+  const req2 = createRequire(import.meta.url);
+  const PA = req2('../parse-amount.js');
+  const mk = (id, won, extra) => Object.assign({ id: id, amount: won ? won + '원' : '',
+    amountValue: won || 0 }, extra || {});
+  /* 읽은 금액 셋(100·200·900만) + 못 읽은 둘 — 중앙값은 200만이다 */
+  const pool = [mk('a', 1000000), mk('b', 2000000), mk('c', 9000000), mk('u1', 0), mk('u2', 0)];
+
+  const off = PA.sumAmounts(pool, {});
+  eq('기본값은 그대로다 — 켜지 않으면 한 푼도 어림잡지 않는다',
+    [off.total, off.assumedWon, off.assumed.length], [12000000, 0, 0]);
+
+  const on = PA.sumAmounts(pool, { estimate: true });
+  eq('켜면 못 읽은 건마다 중앙값을 더한다', on.assumedEach, 2000000);
+  eq('  그래서 합계가 두 건 몫만큼 늘어난다', on.total, 12000000 + 2 * 2000000);
+  eq('  어림잡은 건수를 셀 수 있다', on.assumed.length, 2);
+  /* 🔴 금액 상세가 그 목록을 '금액 원문 확인'으로 그대로 보여 줘야 짚어 볼 수 있다 */
+  eq('  미확인 목록에서 빼지 않는다 (금액 상세가 그대로 보여 준다)', on.unknown.length, 2);
+
+  /* 🔴 근거가 0건이면 짐작하지 않는다 — 근거 없는 추정은 지어내는 것이다 */
+  const none = PA.sumAmounts([mk('u1', 0), mk('u2', 0)], { estimate: true });
+  eq('읽은 금액이 하나도 없으면 어림잡지 않는다', [none.total, none.assumedWon], [0, 0]);
+
+  /* 🔴 이중수혜가 넓게 막힌 공고는 짐작에서도 뺀다 — onlyOne 이 이미 하나만 세는데
+     여기서 또 더하면 '함께 받을 수 없는 돈'을 더하는 셈이다(parse-amount 첫머리). */
+  const exc = PA.sumAmounts(pool.concat([
+    mk('x', 0, { exclusivity: { kind: 'forbidden', scope: 'external' } }),
+  ]), { estimate: true });
+  eq('함께 못 받는 공고는 어림잡지 않는다', exc.assumed.length, 2);
+  /* 반대로 좁은 이중수혜는 함께 받을 수 있으므로 어림잡는다 (scope 값을 뭉뚱그리지 않는다) */
+  const nar = PA.sumAmounts(pool.concat([
+    mk('y', 0, { exclusivity: { kind: 'forbidden', scope: 'narrow' } }),
+  ]), { estimate: true });
+  eq('  범위가 좁은 이중수혜는 어림잡는다', nar.assumed.length, 3);
+
+  /* ── 🔴 짐작이 데이터로 새지 않는가 ── */
+  /* ⚠️ 주석은 코드가 아니다 — 안 걸러내면 이 변경을 설명하는 주석이 '켜는 곳'으로 세어진다
+     (실제로 그렇게 짰다가 2건으로 나왔다). '적합도 상수' 절이 쓰는 방식 그대로다. */
+  const appSrc2 = readText(new URL('../app.js', import.meta.url))
+    .replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/[^\n]*/g, '$1');
+  eq('켜는 곳은 홈 히어로 한 곳뿐이다 (금액 상세·감사는 확인된 금액만 본다)',
+    (appSrc2.match(/estimate:\s*true/g) || []).length, 1);
+  eq('  그리고 그 자리는 renderHome 이다',
+    appSrc2.indexOf('estimate: true') > appSrc2.indexOf('function renderHome(')
+    && appSrc2.indexOf('estimate: true') < appSrc2.indexOf('function renderExplore('), true);
+  /* 🔴 2026-07-30 의 재발 방지 — 등록 데이터에 확인 안 한 금액이 들어가면 감사가 잡지만,
+     여기서도 한 번 본다(관문이 하나뿐이면 그 하나가 꺼졌을 때 아무도 모른다). */
+  const regItems = req2('../data/registered.json').items;
+  const madeUp = regItems.filter((it) => it.amountValue > 0 && !/[0-9０-９]/.test(it.amount || ''));
+  eq('등록 데이터에는 어림잡은 금액이 한 건도 안 들어갔다',
+    madeUp.map((it) => it.id), []);
+
+  /* 🔴 짐작이 섞이면 학생 화면은 '최대'가 아니라 '약'이라고 적는다 — 어림잡은 숫자를
+     확인한 숫자처럼 적지 않는다(원칙 8-1). 문장은 지웠어도 이 선은 남는다. */
+  eq("어림잡은 몫이 있으면 '약'을 붙인다", /assumedWon > 0 \? '약 ' : '최대 '/.test(appSrc2), true);
+}
+
+/* ── 🔴 앱 내부 사정은 학생 화면에 적지 않는다 (2026-09-17 개발자 지시) ──
+   "이와 같이 앱 내부 사정에 대한 설명은 학생이 아니라 관리자에게만 나타나야 해.
+    현재 앱 내에 존재하는 다음과 같은 설명들을 모두 찾아 삭제하고 필요하다면 해당 내용을
+    관리자 페이지에 추가해."
+   🔴 **없어진 게 아니라 자리를 옮긴 것**이라, 이 절은 양쪽을 같이 본다 —
+      앱1(app.js)에서 사라졌는가 **그리고** 관리자 화면이 그것을 세는가.
+      한쪽만 보면 '학생에게도 안 보이고 우리도 모르는' 상태가 조용히 만들어진다.
+   ⚠️ 지우면 안 되는 것도 못 박는다 — '자격 미확인' 배지와 unknown 안내 문구는 남아야
+      한다(2026-09-17 개발자 확인). 없으면 자격을 한 줄도 못 읽은 공고가 아무 말 없이
+      신청 버튼만 내밀어, 앱이 확인해 준 것처럼 읽힌다(원칙 8-1). */
+console.log('\n■ 앱 내부 사정은 학생 화면에 적지 않는다 (2026-09-17 개발자 지시)');
+{
+  const app = readText(new URL('../app.js', import.meta.url));
+  const adm = readText(new URL('../_admin/admin.js', import.meta.url));
+  /* 주석은 화면이 아니다 — 이 변경을 설명하는 주석마다 걸리면 관문이 못 쓰게 된다.
+     (바로 위 '적합도 상수' 절이 같은 이유로 쓰는 방식 그대로다.) */
+  const codeOnly = (t) => t
+    .replace(/\/\*[\s\S]*?\*\//g, ' ')
+    .replace(/(^|[^:])\/\/[^\n]*/g, '$1');
+  const appCode = codeOnly(app);
+
+  /* ① 학생 화면에서 사라졌는가 — 지시가 콕 집은 문장부터 */
+  eq('「지원 자격을 아직 읽지 못했습니다」가 학생 화면에 없다',
+    /지원 자격을 아직 읽지 못했습니다/.test(appCode), false);
+  eq('「AI가 공고 원문에서 읽은 것입니다」가 학생 화면에 없다',
+    /AI가 공고 원문에서 읽은 것입니다/.test(appCode), false);
+  eq('「자동 등록 · 검수 전」 배지가 학생 화면에 없다',
+    /자동 등록 · 검수 전/.test(appCode), false);
+  eq('  상세 시트 갈래 배지에도 「검수 전」을 붙이지 않는다',
+    /' · 검수 전'/.test(appCode), false);
+  eq('「날짜를 아직 읽지 못한 공고」가 학생 화면에 없다',
+    /날짜를 아직 읽지 못한/.test(appCode), false);
+  /* 홈 히어로의 금액 회계 두 줄 — 개발자가 스크린샷으로 짚은 자리 */
+  eq('홈 히어로가 「금액을 아직 못 읽은 n건은 뺀 금액」이라고 말하지 않는다',
+    /못 읽은 \$\{unknownAmt\}건은 뺀 금액|건은 뺀 금액이에요/.test(appCode), false);
+  eq('  「확인된 금액만 더한 금액이에요」도 없다',
+    /확인된 금액만 더한 금액이에요/.test(appCode), false);
+
+  /* ② 관리자 화면이 그것을 세는가 — 옮긴 자리가 실제로 있는지 본다 */
+  eq('관리자 화면이 「AI가 읽은 자격 · 사람 검수 전」을 센다',
+    /AI가 읽은 자격 · 사람 검수 전/.test(adm) && /aiReadCount/.test(adm), true);
+  eq('  그 판정식이 관리자 쪽에 있다',
+    /eligibilityFrom[\s\S]{0,80}eligibilityReviewed/.test(adm), true);
+  eq('  그리고 앱1 에는 더 이상 없다 (원본이 둘이면 갈라진다)',
+    /eligibilityReviewed/.test(appCode), false);
+  eq('관리자 화면이 「검수 전」 공고를 여전히 센다',
+    /검수 전/.test(adm), true);
+  eq('관리자 화면이 금액·마감·자격 미확보를 여전히 센다',
+    /금액 미확인/.test(adm) && /마감일 없음/.test(adm) && /지원 자격 미확보/.test(adm), true);
+
+  /* ③ 🔴 지워서는 안 되는 것 — 여기까지 지우면 앱이 '확인해 줬다'고 말하는 셈이 된다 */
+  eq('그래도 「자격 미확인」 배지는 남아 있다 (원칙 8-1)',
+    /badge-fit-unknown">자격 미확인</.test(appCode), true);
+  eq('  자격을 못 읽은 공고는 신청 전에 원문을 보라고 말한다',
+    /공고 원문에서 지원 자격을 확인하세요/.test(appCode), true);
 }
 
 /* ── 🔴 DESIGN.md 가 style.css 와 갈라지지 않게 (2026-09-11) ──
