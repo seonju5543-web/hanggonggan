@@ -5701,9 +5701,40 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
   eq('등록 데이터에는 어림잡은 금액이 한 건도 안 들어갔다',
     madeUp.map((it) => it.id), []);
 
-  /* 🔴 짐작이 섞이면 학생 화면은 '최대'가 아니라 '약'이라고 적는다 — 어림잡은 숫자를
-     확인한 숫자처럼 적지 않는다(원칙 8-1). 문장은 지웠어도 이 선은 남는다. */
-  eq("어림잡은 몫이 있으면 '약'을 붙인다", /assumedWon > 0 \? '약 ' : '최대 '/.test(appSrc2), true);
+  /* 🔴 **홈 히어로는 '약' 을 붙이지 않는다** (2026-09-17 개발자 지시 2차).
+     한때 어림잡은 몫이 섞이면 '약' 을 붙였는데 개발자가 걷으라고 했다 — *"어차피 사용자가
+     직접 공고 내 들어가면 금액 있는 원문은 최대 ~ 라고 표시되고 추정치는 금액 원문 확인으로
+     표시되므로"*. 어느 공고가 확인된 것인지는 카드와 상세가 이미 말한다.
+     🔴 그 대신 **금액 상세는 내역을 그대로 말해야 한다** — 둘 다 걷으면 어림잡은 숫자를
+        확인한 숫자처럼 내놓게 된다(원칙 8-1). 아래 두 줄이 그 자리를 지킨다. */
+  /* ⚠️ **파일 전체를 훑지 말 것** — 금액 상세(renderAmountDetail)는 '약' 을 **일부러**
+     쓴다(바로 아래 줄에서 어림잡았다고 밝히므로 짝이 맞다). 홈 히어로 안만 본다. */
+  const homeBody = appSrc2.slice(appSrc2.indexOf('function renderHome('),
+    appSrc2.indexOf('function renderExplore('));
+  eq('renderHome 구간을 찾았다', homeBody.length > 500, true);
+  eq("홈 히어로가 '약' 을 붙이지 않는다", /'약 '/.test(homeBody), false);
+  eq('  홈 히어로는 countUp 에 최대만 넘긴다',
+    /countUp\(\$\('#hero-amount'\), total, \(v\) => `최대 \$\{won\(v\)\}`\)/.test(appSrc2), true);
+  eq('금액 상세는 어림잡은 몫을 그대로 밝힌다 (여기까지 걷으면 안 된다)',
+    /금액을 못 읽은 \$\{bill\.assumed\.length\}건은 어림잡아 더함/.test(appSrc2)
+    && /확인된 공고들의 중앙값/.test(appSrc2), true);
+
+  /* 🔴 히어로 아랫줄은 **요소째로 없앴다** (2026-09-17 개발자 지시 2차: "금액 밑에 있는
+     '그중 N건은 바로 신청할 수 있어요' 안내도 삭제해줘"). 금액 회계 두 줄에 이어 마지막
+     한 줄까지 걷어, 히어로는 건수·금액·버튼 셋뿐이다. */
+  {
+    const h2 = readText(new URL('../index.html', import.meta.url));
+    eq("히어로에 '그중 n건은 바로 신청할 수 있어요' 가 없다",
+      /바로 신청할 수 있어요/.test(appSrc2), false);
+    eq('  #hero-count 요소 자체가 없다 (채우는 곳 없는 빈 칸을 남기지 않는다)',
+      /id="hero-count"/.test(h2), false);
+    /* 🔴 그 칸이 주던 아래 여백을 물려받지 않으면 금액과 버튼이 2px 로 붙는다(실측 57 → 2).
+       style.css 는 뒤 블록이 앞을 덮으므로 파일 끝 '히어로' 절에 있어야 먹는다. */
+    const css = readText(new URL('../style.css', import.meta.url));
+    const tail = css.slice(css.lastIndexOf('홈 히어로 (2026-09-17'));
+    eq('  금액 아래 여백을 .hero-amount 가 물려받는다 (파일 끝 블록에서)',
+      /\.hero-amount \{ margin-bottom: 20px; \}/.test(tail), true);
+  }
 }
 
 /* ── 🔴 앱 내부 사정은 학생 화면에 적지 않는다 (2026-09-17 개발자 지시) ──
