@@ -1,8 +1,35 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
- "updatedAt": "2026-09-16",
- "count": 2058,
+ "updatedAt": "2026-09-17",
+ "count": 2060,
  "items": [
+  {
+   "title": "[공통][교외]2026-2학기 정영오(Luke) 장학금 장학생 모집안내",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/267001/artclView.do",
+   "attachments": [
+    {
+     "name": "2026-2학기 정영오 장학금+신청서(양식).hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150782/download.do"
+    },
+    {
+     "name": "개인정보수집이용동의서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150783/download.do"
+    }
+   ],
+   "deadlineHint": "지원기간 : 2026. 9. 21( 월 ) ~ 9. 30( 수 ) 15:00 까지 나 . 선발 : 10월말 ( 예정 ) 다 . 선발확인 : HU",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-09-17"
+  },
+  {
+   "title": "서울 [서울C] 2026학년도 2학기 하나금융나눔재단 하나장학생 선발 안내",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EC%84%9C%EC%9A%B8%20%5B%EC%84%9C%EC%9A%B8C%5D%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%ED%95%98%EB%82%98%EA%B8%88%EC%9C%B5%EB%82%98%EB%88%94%EC%9E%AC%EB%8B%A8%20%ED%95%98%EB%82%98%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "경희대학교",
+   "campus": "",
+   "foundAt": "2026-09-16"
+  },
   {
    "title": "[서울]2026년 대학생 청소년 AI교육지원장학금 대학생 멘토 모집 안내(~10/30)",
    "url": "https://dep.hufs.ac.kr/bbs/student/2431/266737/artclView.do",
