@@ -705,6 +705,8 @@ function renderTodo() {
       <div class="rows" data-rows>${urgent.map((it) => rowHtml(it, { common: cm })).join('')}</div>`;
   })() : ''}
 
+    ${deadlineFillHtml()}
+
     <!-- 공고 원문을 열어 봐야 아는 것 — 펼칠 때만 800KB 원문을 받는다 -->
     <details id="todo-src-scan" data-src-scan${scanWasOpen ? ' open' : ''}>
       <summary>공고 원문을 열어 봐야 아는 것 — 자격 미확보 ${noEligItems().length}건 ·
@@ -725,11 +727,105 @@ function renderTodo() {
     storeKeyExpiry(v);
     renderTodo();
   });
+  bindDeadlineFill();
   const det = byId('todo-src-scan');
   if (det) {
     det.addEventListener('toggle', () => { if (det.open) openSrcScan(); });
     if (det.open) openSrcScan();
   }
+}
+
+/* ============================================================
+   마감을 로봇이 못 읽은 공고 — 사람이 적는다 (2026-09-17 · G-3 컨펌 C · 개발자 결정)
+   ------------------------------------------------------------
+   포스터 그림·스캔 PDF 첨부는 무료 경로로 글자가 안 나온다. 개발자가 "API 대신 관리자가
+   수동으로 입력"으로 정했다. 🔴 **화면은 날짜를 짐작하지 않는다** — 원문·첨부 링크와 원문
+   기간 문구만 나란히 두고, 사람이 읽고 적는다(원칙 8-1). 적은 값은 모아 둔 수정으로 나가고
+   저장소 쪽(admin-apply)이 `관리자 <날짜>` 표식을 붙여 로봇이 되채우지 않는다.
+   ============================================================ */
+
+/** 마감을 모르는 공고 — 학생 앱이 '기한 원문 확인'으로 보여 주는 바로 그 칸 */
+function noDeadlineItems() {
+  return D.reg.filter((it) => !it.deadline);
+}
+
+const IMG_ATT = /\.(png|jpe?g|webp|gif)(\?|$)/i;
+/** 한 줄 — 적어 두기 뒤에는 **이 줄만** 다시 그린다(다른 줄에 치던 날짜를 잃지 않게 · 코드 리뷰). */
+function deadlineFillRow(it) {
+    const staged = (PENDING_EDITS.get(it.id) || {}).deadline || '';
+    const n = D.notices.find((x) => x.url === it.sourceUrl);
+    const src = safeUrl(it.sourceUrl);
+    const atts = (it.attachments || []).map((a) => {
+      const u = safeUrl(a.url);
+      if (!u) return '';
+      const img = IMG_ATT.test(a.name || '') || IMG_ATT.test(a.url || '');
+      return `<a href="${esc(u)}" target="_blank" rel="noreferrer noopener">${esc((a.name || '첨부').slice(0, 24))}${img ? ' (그림)' : ''} ↗</a>`;
+    }).filter(Boolean).join(' ');
+    const cleared = /^관리자 .*· 비움$/.test(it.deadlineFrom || '');
+    return `
+    <div class="row" data-row data-noclick data-dl-row="${esc(it.id)}" style="cursor:default">
+      <div>
+        <div class="t" data-row-title>${esc(it.name || it.id)}</div>
+        <div class="m"><span class="mono">${esc(it.id)}</span><span>${esc(schoolOf(it))}</span><span>${esc(it.type || '')}</span></div>
+        ${it.period ? `<div class="scope-count">원문 기간 문구: ${esc(it.period)}</div>` : ''}
+        ${n && n.deadlineHint ? `<div class="scope-count">게시판 기한 단서: ${esc(String(n.deadlineHint).slice(0, 80))}</div>` : ''}
+        ${cleared ? `<div class="scope-count">사람이 비운 마감입니다 (${esc(it.deadlineFrom)}) — 로봇은 다시 채우지 않습니다</div>` : ''}
+        <div class="btn-row" style="margin-top:var(--space-4)">
+          ${src
+            ? (/#n-/.test(it.sourceUrl || '')
+              ? `<a class="btn btn-sm" href="${esc(src)}" target="_blank" rel="noreferrer noopener">게시판 목록 열기 ↗</a><span class="muted">찾을 제목: ${esc(it.boardTitle || it.name || '')}</span>`
+              : `<a class="btn btn-sm" href="${esc(src)}" target="_blank" rel="noreferrer noopener">원문 공고 열기 ↗</a>`)
+            : '<span class="muted">원문 주소 없음</span>'}
+          ${atts ? `<span class="muted">${atts}</span>` : ''}
+        </div>
+      </div>
+      <div><div class="key-exp">
+        <input type="date" data-dl-input="${esc(it.id)}" value="${esc(staged)}" aria-label="${esc(it.name || it.id)} 마감일" />
+        <button class="btn btn-sm${staged ? '' : ' btn-primary'}" data-dl-save="${esc(it.id)}">${staged ? '고치기' : '적어 두기'}</button>
+      </div></div>
+      <div>${staged ? `<span class="pill good">모아 둠 · ${esc(staged)}</span>` : ddayHtml(it)}</div>
+    </div>`;
+}
+function deadlineFillHtml() {
+  const items = noDeadlineItems();
+  if (!items.length) return '';
+  return `
+    <div class="sec-head" style="margin-top:var(--space-8)">
+      <h2>마감을 로봇이 못 읽은 공고 ${items.length}건 — 사람이 적는 자리</h2>
+      <p data-dl-note><b>화면은 날짜를 짐작하지 않습니다.</b> 원문과 첨부(포스터 그림)를 열어 보고 사람이 적으면,
+        저장 때 '관리자' 표식이 붙어 로봇이 되채우지 않습니다. 적어 두기 → 위 '한꺼번에 반영'으로 저장됩니다.</p>
+    </div>
+    <div class="pgroup" data-deadline-fill>
+      <div class="rows" data-rows>${items.map(deadlineFillRow).join('')}</div>
+    </div>`;
+}
+
+/** 적어 두기 — 장부(PENDING_EDITS)에 덮어쓰기 병합. 저장소에는 '한꺼번에 반영'이 보낸다. */
+function stageDeadline(id, day) {
+  PENDING_EDITS.set(id, { ...(PENDING_EDITS.get(id) || {}), deadline: day });
+  renderPendingBar();
+}
+
+/** 줄마다 '적어 두기' 버튼. 🔴 목록 전체를 다시 그리지 않고 **그 줄만** 바꾼다 — 구획을 통째로
+ *  다시 그리면 다른 줄에 쳐 두고 아직 안 누른 날짜가 사라진다(코드 리뷰가 잡았다). */
+function bindDeadlineFill(root = byId('screen-todo')) {
+  $$('[data-dl-save]', root).forEach((b) => b.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const id = b.dataset.dlSave;
+    const line = byId('screen-todo').querySelector(`[data-dl-row="${CSS.escape(id)}"]`);
+    const inp = line && line.querySelector('[data-dl-input]');
+    const v = ((inp && inp.value) || '').trim();
+    if (!isDay(v)) { toast('마감일을 YYYY-MM-DD 로 골라 주세요'); return; }
+    stageDeadline(id, v);
+    toast(`${v} 로 모아 뒀습니다 — '한꺼번에 반영' 을 누르면 저장됩니다`);
+    const it = D.reg.find((x) => x.id === id);
+    if (line && it) {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = deadlineFillRow(it);
+      const fresh = tmp.firstElementChild;
+      if (fresh) { line.replaceWith(fresh); bindDeadlineFill(fresh); }
+    }
+  }));
 }
 
 /** 「할 일」의 관리자 열쇠 카드 (F-4). `n` 이 1이면 카드로 올라오고 0이면 아래 정상 띠로 접힌다. */
@@ -2637,7 +2733,7 @@ function renderQuality(target) {
   const warns = withProb.filter((x) => !x.ps.some((p) => p.level === 'error'));
   const dead = deadLinks();
   const noAmount = D.reg.filter((it) => !it.amountValue).length;
-  const noDeadline = D.reg.filter((it) => !it.deadline).length;
+  const noDeadline = noDeadlineItems().length;   // 「할 일」 구획과 같은 셈 — 카드 숫자와 줄 수가 갈라지지 않게
   const noForm = D.reg.filter((it) => typeof hasFormAttachment === 'function'
     && hasFormAttachment(it) && !it.formId).length;
   /* 지원 자격 미확보 — 학생 화면에 "지원 자격을 아직 읽지 못했어요"로 나가는 공고.
@@ -2667,7 +2763,7 @@ function renderQuality(target) {
     { n: errors.length, tone: 'is-bad', k: '규칙 위반 (오류)', d: '앱1에 잘못 나갈 수 있는 항목' },
     { n: warns.length, tone: 'is-warn', k: '규칙 경고', d: '손봐야 하지만 치명적이지는 않음' },
     { n: noAmount, tone: 'is-warn', k: '금액 미확인', d: '학생이 얼마인지 모르는 공고' },
-    { n: noDeadline, tone: 'is-warn', k: '마감일 없음', d: '언제까지인지 모르는 공고' },
+    { n: noDeadline, tone: 'is-warn', k: '마감일 없음', d: '언제까지인지 모르는 공고 — 「할 일」 위쪽 「마감을 로봇이 못 읽은 공고」에서 날짜를 적을 수 있습니다' },
     { n: noForm, tone: 'is-warn', k: '신청서 첨부는 있는데 양식 미등록', d: '앱에서 작성하게 만들 수 있는 후보' },
     { n: noElig, tone: 'is-warn', k: '지원 자격 미확보',
       d: '학생에게 "자격을 아직 읽지 못했어요"로 나가는 공고 — 상세에서 원문 문장을 골라 주면 사라집니다' },
@@ -3825,7 +3921,7 @@ async function enter(key, remember, expires = '') {
     pendingCount,
     /* 반영 전 전후 대조·C2 (2026-09-14) — 검사가 **화면이 센 것**과 저장소 계산을 대 볼 수 있게.
        🔴 검사용 창구일 뿐 화면 동작은 여기 없다(규칙을 두 벌로 만들지 않는다). */
-    pendingMap: () => PENDING_EDITS, flushPlan, goNationwide, scopeWideItems, noEligItems, scopeCount,
+    pendingMap: () => PENDING_EDITS, flushPlan, goNationwide, scopeWideItems, noEligItems, scopeCount, noDeadlineItems,
     robots: () => ROBOTS, jobBusy: () => jobBusy };
 }
 

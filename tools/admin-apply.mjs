@@ -18,6 +18,7 @@ import { createRequire } from 'node:module';
 import * as canon from '../collector/canon-url.mjs';
 import { indexTexts, sourceFor, hasText } from '../collector/notice-source.mjs';
 import { attachmentText, readable } from '../collector/attachment-text.mjs';
+import { periodAfterDeadline } from './edit-diff.mjs';
 
 /* 저장소 뿌리. 데이터 파일은 지금까지처럼 **작업 폴더 기준**으로 읽고 쓰지만(워크플로가
    저장소 안에서 돈다), 아래 '저장된 공고 원문'은 이 파일 기준으로 읽는다 — 검사도 같은 원문을
@@ -609,10 +610,12 @@ switch (action) {
          extract-excerpts 가 채우지 않는다. 로봇에게 다시 맡기려면 이 표식을 지운다. */
       if (changed.includes('deadline')) {
         it.deadlineFrom = it.deadline ? OWNER : `${OWNER} · 비움`;
-        /* 🔴 비웠는데 `period` 가 `접수 ~2025-09-10` 처럼 **방금 지운 그 날짜**를 학생 화면에 계속
-           보여 주면 안 된다(로봇이 putDeadline 으로 써 둔 문구 — 이제 로봇은 이 공고를 안 건드린다). */
-        if (!it.deadline && oldDeadline && new RegExp(`~\\s*${oldDeadline}`).test(it.period || '')) {
-          it.period = '접수 기간 원문 확인'; if (!changed.includes('period')) changed.push('period');
+        /* 학생 화면 문구(period)가 마감을 따라간다 — 규칙은 화면과 같은 함수(edit-diff periodAfterDeadline).
+           적으면 D-14 옆에 '원문 확인'이 남지 않게, 비우면 방금 지운 날짜가 남지 않게.
+           사람이 문구를 직접 보냈으면(patch.period) 그쪽이 이긴다. */
+        if (!('period' in (patch || {}))) {
+          const after = periodAfterDeadline(it.period, it.deadline, oldDeadline);
+          if (after !== (it.period || '')) { it.period = after; if (!changed.includes('period')) changed.push('period'); }
         }
       }
       /* 발표일도 같은 규칙 — 로봇(fillCalendarDates)이 이 표식을 본다 */

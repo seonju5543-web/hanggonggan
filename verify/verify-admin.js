@@ -1681,6 +1681,87 @@ function serve() {
     await page.evaluate(() => { window.__admin.pendingMap().clear(); });
   }
 
+  /* ══ 마감을 로봇이 못 읽은 공고 — 사람이 적는다 (2026-09-17 · G-3 컨펌 C) ══════════
+     포스터 그림·스캔 PDF 는 무료 경로로 글자가 안 나온다. 개발자가 "API 대신 관리자가 수동
+     입력"으로 정했다. 🔴 화면은 날짜를 짐작하지 않는다 — 링크와 원문 문구만 주고 사람이 적는다. */
+  {
+    const noDl = (PAGE_ITEMS || regFile.items).filter((it) => !it.deadline);
+    /* 🔴 앞선 C2 반영이 '실행 결과'를 기다리는 동안 여기서 적어 두면, 그 반영이 끝나는 순간
+       장부(pendingClear)가 통째로 비워져 적어 둔 마감이 사라진다 — 실제로 그렇게 빨간불이었다.
+       실행 결과를 바로 돌려주고, 끝나기를 기다린 뒤에 시작한다. */
+    await page.route('**/actions/workflows/**/runs**', (route) => route.fulfill({
+      status: 200, contentType: 'application/json',
+      body: JSON.stringify({ workflow_runs: [{ id: 11, status: 'completed', conclusion: 'success',
+        created_at: new Date(Date.now() + 5000).toISOString(), html_url: 'https://example.invalid/run' }] }),
+    }));
+    const idle = await page.waitForFunction(() => !window.__admin.jobBusy(), null, { timeout: 30000 }).then(() => true, () => false);
+    ok(idle, '앞선 반영이 끝나 화면이 잠겨 있지 않다 (안 끝나면 아래가 엉뚱한 이유로 빨간불이 된다)');
+    await page.evaluate(() => { window.__admin.pendingMap().clear(); });
+    await page.click('.tab[data-tab="todo"]');
+    await page.waitForSelector('#screen-todo:not([hidden])');
+    const dlRows = await page.locator('[data-deadline-fill] [data-dl-row]').count();
+    ok(dlRows === noDl.length, '마감을 모르는 공고를 전부 줄로 보여 준다', `화면 ${dlRows} / 데이터 ${noDl.length}`);
+    if (dlRows) {
+      const t = await page.textContent('[data-dl-note]');
+      ok(/짐작하지 않습니다/.test(t) && /사람이/.test(t), '화면이 날짜를 짐작하지 않는다고 말한다 (누가 적는지도)');
+      ok(!/\d{4}-\d{2}-\d{2}/.test(await page.locator('[data-deadline-fill] input[type=date]').first().inputValue()),
+        '  날짜 칸이 비어서 시작한다 (미리 채워 넣지 않는다)');
+      const linked = await page.locator('[data-deadline-fill] [data-dl-row]:has(a[href^="http"])').count();
+      ok(linked === dlRows, '  줄마다 원문·첨부 링크가 있다', `${linked}/${dlRows}`);
+      const id = await page.locator('[data-deadline-fill] [data-dl-row]').first().getAttribute('data-dl-row');
+      await page.fill(`[data-dl-input="${id}"]`, '2026-12-31');
+      await page.click(`[data-dl-save="${id}"]`);
+      await page.waitForTimeout(250);
+      const staged = await page.evaluate((x) => window.__admin.pendingMap().get(x), id);
+      ok(staged && staged.deadline === '2026-12-31', '적어 두기가 모아 둔 수정에 마감일로 들어간다', JSON.stringify(staged));
+      ok(await page.locator('#pending-bar:not([hidden])').count() === 1, '  모아 둔 수정 줄이 뜬다');
+      ok(/모아 둠 · 2026-12-31/.test(await page.textContent(`[data-dl-row="${id}"]`)), '  줄에 적어 둔 날짜가 보인다');
+      ok(await page.locator('[data-deadline-fill] [data-dl-row]').count() === dlRows,
+        '  적어 둔 뒤에도 줄 수가 그대로다 (저장 전엔 사라지지 않는다)');
+      /* 🔴 다른 줄에 쳐 두고 아직 안 누른 날짜가 살아 있는가 — 구획을 통째로 다시 그리면 사라진다 */
+      if (dlRows >= 2) {
+        const other = await page.locator('[data-deadline-fill] [data-dl-row]').nth(1).getAttribute('data-dl-row');
+        await page.fill(`[data-dl-input="${other}"]`, '2026-11-30');
+        await page.fill(`[data-dl-input="${id}"]`, '2026-12-30');
+        await page.click(`[data-dl-save="${id}"]`);
+        await page.waitForTimeout(200);
+        ok(await page.inputValue(`[data-dl-input="${other}"]`) === '2026-11-30',
+          '  한 줄을 적어 둬도 다른 줄에 쳐 둔 날짜는 그대로 있다');
+        await page.fill(`[data-dl-input="${id}"]`, '2026-12-31');
+        await page.click(`[data-dl-save="${id}"]`);
+        await page.waitForTimeout(200);
+      }
+      /* 달력에 없는 날은 그 자리에서 막는다 */
+      await page.fill(`[data-dl-input="${id}"]`, '');
+      await page.click(`[data-dl-save="${id}"]`);
+      await page.waitForTimeout(150);
+      const still = await page.evaluate((x) => window.__admin.pendingMap().get(x), id);
+      ok(still && still.deadline === '2026-12-31', '  빈 값으로 누르면 먼저 적어 둔 것을 지우지 않는다');
+
+      /* 나가는 payload 에 실리는가 */
+      let dlSent = null;
+      await page.route('**/actions/workflows/**/dispatches', (route) => {
+        try { dlSent = JSON.parse(route.request().postData() || '{}'); } catch { dlSent = 'parse-fail'; }
+        route.fulfill({ status: 204, body: '' });
+      });
+      await page.click('[data-act="flush"]');
+      await page.waitForSelector('#sheet:not([hidden]) [data-ask-go]', { timeout: 8000 }).catch(() => {});
+      ok(await page.locator('#sheet [data-diff-row]').count() >= 1, '  전후 대조에 마감일 줄이 뜬다');
+      await page.click('#sheet [data-ask-go]');
+      await page.waitForTimeout(700);
+      const sp = (() => { try { return JSON.parse(dlSent?.inputs?.payload || '{}'); } catch { return {}; } })();
+      const ed = (sp.edits || []).find((x) => x.id === id) || {};
+      ok(ed.patch && ed.patch.deadline === '2026-12-31', '  나가는 payload 에 마감일이 실린다 (저장소가 관리자 표식을 붙인다)',
+        JSON.stringify(ed.patch));
+      await page.waitForFunction(() => !window.__admin.jobBusy(), null, { timeout: 30000 }).catch(() => {});
+      await page.unroute('**/actions/workflows/**/dispatches');
+      await page.evaluate(() => { window.__admin.pendingMap().clear(); });
+    } else {
+      ok(true, '마감을 모르는 공고가 0건이라 적어 두기를 못 눌렀다');
+    }
+    await page.unroute('**/actions/workflows/**/runs**');
+  }
+
   /* ══ 저장 때 막히는 값은 **그 줄에서** 막는다 (2026-09-14) ═══════════════
      🔴 한 건이라도 규칙을 어기면 저장소는 **묶음 전체**를 멈춘다(그게 맞다 — 반만 반영되면
         안 된다). 그러면 멀쩡한 12건까지 함께 죽는다. 화면이 **어느 줄이 막혔는지** 보여 주고

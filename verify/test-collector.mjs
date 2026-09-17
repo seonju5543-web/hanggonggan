@@ -6550,8 +6550,15 @@ console.log('■ 첨부에서 마감일 — 본문이 껍데기인 게시판 (20
     const aa = readText(new URL('../tools/admin-apply.mjs', import.meta.url));
     eq('  관리자 화면이 마감을 고치면 표식을 남긴다', /changed\.includes\('deadline'\)/.test(aa) && /it\.deadlineFrom = it\.deadline \? OWNER/.test(aa), true);
     eq('  🔴 마감을 비울 때도 표식이 남는다 (되채움 차단)', /`\$\{OWNER\} · 비움`/.test(aa), true);
-    eq('  비울 때 period 에 남은 그 날짜도 걷어낸다 (학생 화면이 지운 날짜를 계속 보이지 않게)',
-      /it\.period = '접수 기간 원문 확인'/.test(aa) && /oldDeadline/.test(aa), true);
+    /* period 가 마감을 따라가는 규칙은 화면·저장소가 **같은 함수**(edit-diff periodAfterDeadline)를 쓴다 */
+    const { periodAfterDeadline: pad } = await import('../tools/edit-diff.mjs');
+    eq('  저장소가 그 함수를 쓴다', /periodAfterDeadline\(it\.period, it\.deadline, oldDeadline\)/.test(aa), true);
+    eq('  사람이 적은 마감은 「원문 확인」 자리에 들어간다 (D-14 옆에 「원문 확인」이 남지 않게)',
+      [pad('접수 기간 원문 확인', '2026-11-30'), pad('', '2026-11-30'), pad('2026-2학기 1차 ~2026-10-01', '2026-11-30')],
+      ['접수 기간 ~2026-11-30', '접수 ~2026-11-30', '2026-2학기 1차 ~2026-10-01']);
+    eq('  비울 때 방금 지운 그 날짜가 든 문구는 「원문 확인」으로 되돌린다',
+      [pad('접수 ~2025-09-10', undefined, '2025-09-10'), pad('접수 ~2026-10-01', undefined, '2025-09-10')],
+      ['접수 기간 원문 확인', '접수 ~2026-10-01']);
     eq('  발표일도 같은 표식을 남기고 로봇이 존중한다',
       /it\.announceDateFrom = it\.announceDate \? OWNER/.test(aa) && /!it\.announceDate && !humanOwned\(it\.announceDateFrom\)/.test(ee), true);
     eq('  합칠 때 사람이 비운 마감을 되살리지 않는다', /!keep\.deadline && drop\.deadline && !\/\^\(AI\|관리자\)\//.test(aa), true);

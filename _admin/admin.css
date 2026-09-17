@@ -315,7 +315,7 @@ a { color: var(--accent); }
 .card.is-ok .v   { color: var(--green); }
 .card .d { font-size: var(--t-sm); color: var(--text-sub); }
 .card .btn-row { margin-top: var(--space-4); }
-/* 열쇠 만료일 적는 칸 (F-4) — 카드 안에서 날짜 칸과 단추가 한 줄 */
+/* 날짜를 적는 칸 (F-4 열쇠 만료일 · 마감 적어 두기) — 날짜 칸과 단추가 한 줄 */
 .key-exp { display: flex; flex-wrap: wrap; gap: var(--space-8); align-items: center; }
 .key-exp input[type="date"] { min-height: 36px; }
 
