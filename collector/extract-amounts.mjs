@@ -212,8 +212,15 @@ for (const it of items) {
     /* 🔴 `amount` 가 아니라 `amountSpec` 이다 — `amount` 는 이미 금액 문구 문자열 칸이다.
        처음에 `amount` 에 객체를 넣었다가 entry-rules.cjs 의 `it.amount.slice()` 가 죽어
        감사가 통째로 멈췄다. 앱·챗봇·알림도 전부 문자열로 읽는다. */
-    /* 사람이 넣은 금액이면 손대지 않는다 (표식이 없고 값이 이미 있는 경우) */
-    const humanAmount = !it.amountFrom && (it.amountSpec || Number(it.amountValue) > 0);
+    /* 사람이 넣은 금액이면 손대지 않는다.
+       🔴 **로봇이 소유하는 표식은 `OWN_AMOUNT` 하나뿐**이고 그 밖은 전부 남의 것이다
+       (2026-09-17 · 노션 UI-12). 예전엔 `!it.amountFrom` 즉 **표식이 없어야** 사람 값이라
+       봐서, 사람이 근거를 적는 순간(`공고문 이미지 … · <원문 문구>`) 로봇이 제 것으로 알고
+       다음 실행에 지웠다 — **근거를 남길수록 사라지는** 구조였다.
+       바로 아래 `exclusivityFrom` 은 이미 `!== OWN_*` 로 판정한다(그 주석이 "표식이 없는
+       옛 데이터도 여전히 사람 값이다" 라고 적어 뒀다) — 금액만 어긋나 있었다.
+       ⚠️ 표식이 없는 옛 데이터는 그대로 사람 값이다(undefined !== OWN_AMOUNT). */
+    const humanAmount = (it.amountSpec || Number(it.amountValue) > 0) && it.amountFrom !== OWN_AMOUNT;
     if (humanAmount) keptHuman += 1;
     else if (a.kind === 'unknown') { delete it.amountSpec; delete it.amountFrom; }
     else { it.amountSpec = a; it.amountFrom = OWN_AMOUNT; wrote++; }
@@ -251,7 +258,7 @@ for (const it of items) {
   else if (it.sameAsFrom === OWN_SAME) { delete it.sameAs; delete it.sameAsFrom; }
 }
 
-if (keptHuman) console.log(`   사람이 넣은 금액 ${keptHuman}건은 그대로 뒀습니다 (표식 없는 값은 안 덮습니다)`);
+if (keptHuman) console.log(`   사람이 넣은 금액 ${keptHuman}건은 그대로 뒀습니다 (로봇 표식 '${OWN_AMOUNT}' 이 아닌 값은 안 덮습니다)`);
 /* 🔴 날짜만 적는다 — 다른 로봇이 전부 `slice(0,10)` 이라, 여기만 시각까지 적으면
    registered.json 이 매 실행 더러워지고 관리자 화면의 '데이터 기준일' 에 시각이 뜬다
    (2026-09-13 코드 리뷰). */
