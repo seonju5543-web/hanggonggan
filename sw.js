@@ -22,7 +22,7 @@
 /* ⚠️ 두 작업이 같은 날 v172 를 각자 올려 부딪혔다 — 번호는 v173 으로 올리고 **둘 다** 남긴다
    (파일 머리말의 규칙 그대로). */
 /* ⚠️ 오늘 여러 작업이 같은 번호를 각자 올렸다 — 번호는 올리고 **한 일은 다 남긴다**(파일 머리말 규칙). */
-const CACHE = 'handaejang-v187';  /* v187 — 「학교 포털」이 어디인지 알려 주는 한 줄(UI-20 · 경희대 인포21 · 한국외대 HUFSAbility) */
+const CACHE = 'handaejang-v188';  /* v188 — 알림함 읽음/안 읽음 색 뒤집기 · 제출 서류 목록의 점 제거(2026-09-17 개발자 지시) */
 const ASSETS = ['.', 'index.html', 'style.css', 'boot.js', 'resume.js', 'interactions.js', 'app.js', 'data.js', 'forms.js', 'form-plan.js', 'essay.js', 'essay-config.js', 'essay-ask.js', 'essay-quality.js', 'essay-submit-check.js',
   'section-head.js', 'parse-requirements.js', 'parse-amount.js', 'match-engine.js', 'notify-rules.js', 'notify.js', 'push-config.js', 'support-config.js',
   'chat-config.js', 'chat.js',
