@@ -95,14 +95,24 @@ if (bottom) {
     fullPage: true, clip: { x: 0, y: Math.max(0, bottom.보관함카드아래 - 190), width: 390, height: 260 } });
 }
 
-/* 장학금 찾기 — 검색창 글자 크기 */
-await page.click('[data-nav="explore"]').catch(() => {});
-await page.waitForTimeout(1200);
+/* 장학금 찾기 — 검색창 글자 크기
+   🔴 클릭 실패를 삼키면 안 된다 — 숨은 화면(#screen-explore[hidden])에서도 computed
+      font-size 는 멀쩡히 나와서, 탭이 안 눌려도 '16px 실측'이라고 **거짓 보고**하고
+      엉뚱한 화면을 찍는다. 그래서 화면이 실제로 보이는지 먼저 기다린다. */
+await page.click('[data-nav="explore"]');
+await page.waitForSelector('#screen-explore:not([hidden])', { timeout: 5000 });
+await page.waitForTimeout(800);
 const search = await page.evaluate(() => {
   const el = document.querySelector('#explore-search');
-  if (!el) return null;
+  if (!el) return { error: '#explore-search 가 없다' };
+  const box = el.closest('.search-box');   /* 🔴 없을 수 있다 — 여기서 던지면 browser.close() 를 건너뛰어 크로미움이 남는다 */
   const cs = getComputedStyle(el);
-  return { fontSize: cs.fontSize, placeholder: el.placeholder, boxMinHeight: getComputedStyle(el.closest('.search-box')).minHeight };
+  return {
+    fontSize: cs.fontSize,
+    placeholder: el.placeholder,
+    보이는가: !!el.offsetParent,
+    boxMinHeight: box ? getComputedStyle(box).minHeight : '(.search-box 를 못 찾음)',
+  };
 });
 console.log('검색창:', JSON.stringify(search));
 await page.screenshot({ path: `${import.meta.dirname}/shot-search.png`, clip: { x: 0, y: 0, width: 390, height: 300 } });

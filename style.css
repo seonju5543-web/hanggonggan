@@ -1550,7 +1550,7 @@ textarea:focus {
   border: 1px solid var(--line);
   border-radius: var(--radius-pill);
   background: var(--bg);
-  font-size: 16px;                  /* 🔴 16px 미만으로 낮추지 말 것 — iOS가 입력을 시작할 때 화면을 확대해 버린다 */
+  font-size: var(--t-input);        /* 🔴 iOS 자동 확대 바닥값 — 뜻과 값은 --t-input 한 곳에 적혀 있다 */
   font-family: inherit;
   color: var(--text);
 }
@@ -3208,7 +3208,7 @@ body::after { opacity: 0.26; }
 /* 🔴 「데이터 초기화」가 보관함에서 너무 떨어져 있었다 (2026-09-17 개발자 지시 "너무
    동떨어져있어 … 사이 줄여줘"). 빈 띠의 정체는 셋이 이어진 것이다(실측 64px):
    보관함 카드의 아래 안쪽 여백 24 + `.my-menu` 의 위 여백 34(--sp-4 '절과 절 사이')
-   + 그 안쪽 여백 6. 그중 **위 여백만** 덩어리 사이(--sp-1 8px)로 줄인다 → 38px.
+   + 그 안쪽 여백 6. 그중 **위 여백만** 가장 좁은 단계(--sp-1 8px · '같은 덩어리 안')로 줄인다 → 38px.
    🔴 `.my-menu` 를 통째로 고치면 안 된다 — 설정 화면(#screen-settings)의 메뉴가 같은
       클래스라 거기 리듬까지 같이 바뀐다. 그래서 MY 화면으로 한정한다.
    ⚠️ 이 줄 위에는 구분선이 없다(바로 위 규칙이 뗐다) — 그래서 여백이 유일한 경계다.
