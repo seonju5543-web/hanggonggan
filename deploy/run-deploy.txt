@@ -14,5 +14,5 @@
 # 배포되는 경로: 작업 브랜치 → 기본 브랜치(claude/nice-heisenberg-WESq5) → main → 앱
 # 데이터 관문(node verify/audit-data.js)을 통과하지 못하면 배포하지 않고 🚨 이슈를 남긴다.
 
-branch: claude/intelligent-bardeen-lwnbvh
-메모: 2026-09-17 — 마감일(G-3) 후속 셋 · 관리자 열쇠 만료 카드(F-4) · 마감 수동 입력 구획(컨펌 C) — 개발자 배포 승인
+branch: claude/dazzling-gauss-omlfik
+메모: 2026-09-17 — 홈 정렬(적합도+마감 한 점수) · 앱 내부 사정 문구를 관리자로 이관 · 못 읽은 금액 어림 합산
