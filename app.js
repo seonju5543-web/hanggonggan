@@ -3089,7 +3089,11 @@ function openDetail(id) {
         ? `<p class="doc-legend">문의 ${esc(sch.contact)}</p>` : ''}
 
       <h4>제출 서류</h4>
-      <ul class="doc-list">
+      ${/* 🔴 doc-badged — 줄마다 '자동'·'직접' 배지가 붙는 목록이라는 표시.
+           style.css 가 이 클래스를 보고 **왼쪽 점을 뺀다**(2026-09-17 개발자 지시:
+           배지가 이미 항목을 가르므로 점은 표식이 두 겹). 아래 map 이 배지를 항상
+           하나씩 붙이는 것이 그 전제다 — 배지를 빼면 이 클래스도 같이 빼야 한다. */ ''}
+      <ul class="doc-list doc-badged">
         ${sch.documents.map((doc) => {
           const auto = /자동/.test(doc);
           return `<li>${auto ? '<span class="doc-auto">자동</span>' : '<span class="doc-manual">직접</span>'} ${esc(doc)}</li>`;
