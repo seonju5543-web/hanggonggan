@@ -20,7 +20,8 @@
    ============================================================ */
 import fs from 'node:fs';
 import path from 'node:path';
-import { isCandidate, linkCandidates, parseRobots, robotsBlocks, toLines, naverMobile } from './essay-rule-line.mjs';
+import { isCandidate, linkCandidates, matchRule, parseRobots, robotsBlocks, toLines, naverMobile } from './essay-rule-line.mjs';
+import ASK from '../essay-ask.js';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const rd = (p) => JSON.parse(fs.readFileSync(path.join(ROOT, p), 'utf8'));
@@ -30,40 +31,11 @@ const LIMIT = Number((process.argv.find((a) => a.startsWith('--limit=')) || '').
 const SOURCES = rd('collector/essay-sources.json');
 const PLAYBOOK = rd('data/essay-playbook.json');
 
-/* ── 우리 규칙 어휘 ──
-   글에서 뽑은 문장이 **이미 아는 규칙**을 말하고 있으면 그 규칙에 출처만 붙인다.
-   어느 규칙에도 안 붙으면 '새 규칙 후보'로 리포트에만 올린다(운영 원칙 2 — 컨펌).
-   🔴 여기서 규칙 문장을 새로 쓰지 않는다. 사람이 컨펌한 것만 규칙집에 들어간다. */
-const VOCAB = {
-  'lead-first': [/두괄식/, /결론부터/, /첫\s*문장/, /맨\s*앞에.*핵심/, /핵심을?\s*먼저/],
-  'show-dont-tell': [/성실합니다/, /공허/, /말하기만/, /~한\s*사람입니다/, /규정하지/, /단정적/],
-  'concrete-scene': [/구체적/, /수치/, /장면/, /사례/, /경험을?\s*들어/, /에피소드/],
-  'answer-the-question': [/질문을?\s*(꼼꼼히|정확히)/, /묻는\s*것에/, /문항/, /질문에\s*맞는/],
-  'know-the-foundation': [/재단/, /취지/, /설립\s*목적/, /인재상/, /선발\s*기준/, /미리\s*공부/],
-  'direction': [/방향성/, /목표/, /계획/, /진로/, /포부/],
-  'no-cliche': [/진부/, /상투/, /흔한\s*표현/, /남발/, /속담/, /명언/, /금칙어/, /금지어/],
-  'no-self-pity': [/부정적인\s*표현/, /자기\s*비하/, /낮추는/, /겸손/],
-  'motive-need-then-plan': [/지원\s*동기/, /신청\s*사유/, /왜\s*필요/],
-  'growth-lesson': [/성장\s*과정/, /가정\s*환경/, /어린\s*시절/],
-  'character-evidence': [/장단점|장\s*·?\s*단점/, /성격/, /강점/],
-  'future-steps': [/장래/, /향후/, /졸업\s*후/],
-  'study-measurable': [/학업\s*계획/, /학습\s*계획/],
-  'share-specific': [/나눔/, /환원/, /사회\s*공헌/, /기여/],
-  'use-itemized': [/사용\s*계획/, /사용처/, /어디에\s*쓸/],
-  'episode-star': [/STAR/i, /상황.*행동.*결과/, /경험\s*기술/],
-  'message-short': [/간결/, /짧게/, /담백/],
-  'consistency': [/통일성/, /일관성/, /한\s*방향/, /끝까지\s*이어/],
-  'plain-sentence': [/군더더기/, /주어와\s*서술어/, /수식어/, /간결한\s*문장/],
-};
-
-/** 이 문장이 어느 규칙을 말하고 있나 */
-function matchRule(text) {
-  const hits = [];
-  for (const [code, pats] of Object.entries(VOCAB)) {
-    if (pats.some((re) => re.test(text))) hits.push(code);
-  }
-  return hits;
-}
+/* ── 규칙 어휘와 판정은 순수 모듈에 있다 (2026-09-05 이동) ──
+   VOCAB · matchRule 을 collector/essay-rule-line.mjs 로 옮겼다. 이 파일은 불러오는 순간
+   인터넷을 두드려서 **검사가 규칙 어휘를 돌려 볼 수 없었고**, 그래서 "왜 어떤 종류는
+   영영 안 배워지나"를 아무도 기계로 확인하지 못했다(원인: 그 종류 어휘가 아예 없었다).
+   🔴 여기에 다시 베끼지 말 것 — 베끼면 로봇과 검사가 다른 어휘로 판정한다. */
 
 /* 우리가 누구인지 밝힌다 — 몰래 읽지 않는다 */
 const UA = 'Mozilla/5.0 (compatible; handaejang-playbook/1.0; +https://github.com/seonju5543-web/hanggonggan)';
@@ -117,7 +89,11 @@ const candidates = [];         // 어느 규칙에도 안 붙은 것 — 컨펌 
 let okCount = 0, failCount = 0;
 
 const existingUrls = new Set((PLAYBOOK.sources || []).map((s) => s.url));
-let nextId = (PLAYBOOK.sources || []).length + 1;
+/* 🔴 개수가 아니라 **가장 큰 번호 다음**으로 매긴다 (2026-09-05 코드리뷰).
+   개수로 매기면 출처를 하나라도 빼는 순간 이미 쓰는 번호를 다시 발급한다 —
+   광고 4곳을 뺐더니 s17~s20 이 겹칠 뻔했고, 그러면 규칙이 엉뚱한 글을 근거로 달게 된다. */
+let nextId = Math.max(0, ...(PLAYBOOK.sources || [])
+  .map((s) => Number(String(s.id || '').replace(/^s/, '')) || 0)) + 1;
 
 const grow = [];               // 읽은 글에서 주운, 다음에 읽을 만한 곳
 const yieldedUrls = new Set();  // 이번 실행에서 규칙을 하나라도 준 주소 (seed 건강 점검용)
@@ -235,7 +211,9 @@ const overCap = (SOURCES.seeds || []).length > MAX_SEEDS
 
 /* ── 규칙이 모자란 종류를 큐에 올린다 (미학습 양식이 생기면 계속 배운다) ── */
 const kindsWithRules = new Set(PLAYBOOK.rules.filter((r) => r.kind !== '*').map((r) => r.kind));
-const ALL_KINDS = ['motive', 'intro', 'growth', 'character', 'value', 'study', 'future', 'share', 'use', 'effect', 'idea', 'episode', 'message'];
+/* 🔴 종류 목록을 여기 적지 않는다 — 화면(essay-ask.js)이 가르는 그 목록을 그대로 쓴다.
+   베껴 두면 화면에는 있는 종류를 로봇이 '모자란 종류'로 세지 못한다. */
+const ALL_KINDS = ASK.ESSAY_KINDS.map(([k]) => k);
 const thin = ALL_KINDS.filter((k) => !kindsWithRules.has(k));
 
 /* ── 저장 ── */

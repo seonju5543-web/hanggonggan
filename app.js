@@ -15,15 +15,42 @@ function todayStart() {
 }
 
 /* ---------------- 상태 ---------------- */
-let state = {
-  profile: null,          // 온보딩 결과
-  applications: [],       // { id, appliedAt, step, docs?, pending? }
-  /* 민감정보(기초생활수급·장애 등)를 서버에 올려도 되는가 — 온보딩 Step 3에서 받는다.
+/* 🔴 **빈 상태는 여기 한 곳에서만 만든다** (2026-09-09 코드 리뷰에서 잡았다).
+   예전에는 '데이터 초기화' 버튼이 `state = { profile: null, applications: [] }` 라고
+   **제 손으로 다시 적고** 있었다. 그래서 그 뒤에 늘어난 칸(`saved`·`consent`·`updatedAt`)이
+   빠졌고, 초기화한 뒤 그 자리에서 온보딩을 다시 마치면 `state.saved` 가 undefined 라
+   화면을 그릴 때마다 `Cannot read properties of undefined (reading 'some')` 가 났다
+   (브라우저 실측). 앱을 껐다 켜면 `loadState` 가 메워 주기 때문에 **눈으로 재현하기 가장
+   어려운 유형**이다 — 개발자는 '가끔 이상하다'로만 겪는다.
+   ⚠️ 칸을 새로 늘릴 때는 여기만 고치면 된다. 다른 곳에서 이 모양을 다시 적지 말 것. */
+function emptyState() {
+  return {
+    profile: null,          // 온보딩 결과
+    applications: [],       // { id, appliedAt, step, docs?, pending? }
+    /* 저장(북마크)한 공고 — { id, savedAt } (2026-09-07 · 노션 UI-21).
+     🔴 `applications` 의 `pending` 과 **절대 합치지 말 것.** 뜻이 다르다:
+        · pending  = 신청을 시작했는데 서류 작성이 남았다
+        · saved    = 아직 신청할 생각은 없고 관심만 있다
+     한 칸에 넣으면 그 값을 읽는 곳이 한꺼번에 오염된다 — 홈의 예상 수혜액 합계에
+     관심만 둔 공고 금액이 섞이고, 진척도 4단계가 시작도 안 한 공고를 1단계로 세고,
+     알림이 신청도 안 한 공고를 재촉한다.
+     ⚠️ 이 목록은 **이 기기에만 남는다.** 서버(profiles 표)에는 profile·applications
+        칸만 있어 동기화되지 않는다 — 칸을 늘리려면 표부터 고쳐야 한다. */
+    saved: [],
+    /* 휴지통 — 지운 신청내역이 30일 동안 여기 머문다 (2026-09-11 개발자 지시).
+       { at, app, deletedAt } · at = 지우기 전 목록에서의 자리(되살릴 때 그 자리로 돌려놓는다).
+       🔴 지운 **서류 파일**은 여기 없다 — 파일은 크기 때문에 localStorage 에 못 담아
+          IndexedDB 'trash' 칸에 있다. 화면(renderTrash)이 둘을 합쳐 보여 준다.
+       ⚠️ 이 목록도 saved 와 같이 **이 기기에만** 남는다(서버 표에 칸이 없다). */
+    trash: [],
+    /* 민감정보(기초생활수급·장애 등)를 서버에 올려도 되는가 — 온보딩 Step 3에서 받는다.
      동의 안 하면 그 항목은 기기에만 남는다(supabase-client.js syncSafeProfile). */
-  consent: { sensitive: false },
-  /* 이 기기에서 마지막으로 고친 시각. 서버 것과 견줘 **최신이 이긴다**. */
-  updatedAt: null,
-};
+    consent: { sensitive: false },
+    /* 이 기기에서 마지막으로 고친 시각. 서버 것과 견줘 **최신이 이긴다**. */
+    updatedAt: null,
+  };
+}
+let state = emptyState();
 
 /* 분교를 별개 학교로 나누기 전에 저장된 프로필 고치기 (2026-08-02).
    예전엔 '한양대학교 + ERICA캠퍼스(안산)'처럼 캠퍼스로 골랐는데 이제 학교 자체가 다르다.
@@ -68,12 +95,29 @@ function migrateFitFields(p) {
   return p;
 }
 
+/* 시·도를 고르면 그 아래 시·군·구를 채운다 (2026-08-30).
+   🔴 표는 data.js 의 REGION_CITIES 하나뿐이다 — 여기에 목록을 베끼지 말 것.
+   ⚠️ 시·도를 바꾸면 전에 고른 시·군은 뜻이 없어지므로 비운다(경기 성남시를 골라 두고
+      시·도만 부산으로 바꾸면 '부산 성남시'가 된다). */
+function fillRegionCities(provSel, citySel, keep) {
+  const prov = $(provSel) && $(provSel).value;
+  const el = $(citySel);
+  if (!el) return;
+  const first = el.querySelector('option') ? el.querySelector('option').textContent : '선택 안 함';
+  const list = (typeof REGION_CITIES !== 'undefined' && REGION_CITIES[prov]) || [];
+  el.innerHTML = `<option value="">${esc(first)}</option>`
+    + list.map((c) => `<option${keep === c ? ' selected' : ''}>${esc(c)}</option>`).join('');
+  el.disabled = !list.length;
+}
+
 function loadState() {
   try {
     let raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) for (const k of LEGACY_KEYS) { raw = localStorage.getItem(k); if (raw) break; }
     if (raw) state = Object.assign(state, JSON.parse(raw));
     if (!state.consent) state.consent = { sensitive: false };   // 로그인 이전에 저장된 판
+    if (!Array.isArray(state.saved)) state.saved = [];          // 저장 기능 이전에 저장된 판
+    if (!Array.isArray(state.trash)) state.trash = [];          // 휴지통 이전에 저장된 판
     if (state.profile) { migrateBranchCampus(state.profile); migrateFitFields(state.profile); }
   } catch (e) { /* 손상된 데이터는 무시 */ }
 }
@@ -91,6 +135,12 @@ function saveState(opts) {
 
 /* ---------------- 장학금 목록 (한국장학재단 상시 제도 + 정식 등록 실공고) ---------------- */
 let registeredList = []; // data/registered.json — 수집 로봇이 확보한 실공고를 큐레이션해 정식 등록한 목록
+/* 층2 — 한국장학재단(KOSAF) 통합검색에서 받은 **마감 전** 재단 장학금 (2026-08-30).
+   🔴 층1(registeredList)과 절대 섞지 않는다. 우리가 원문을 읽은 것이 아니라 재단이
+      KOSAF 에 적어 둔 칸이라, 자격 진단도 양식 작성도 붙이지 않는다 — 그대로 보여 주고
+      "자격은 재단 홈페이지에서 확인"이라고 밝힌다(설계: docs/designs/kosaf-and-narrowing.md ②). */
+let kosafList = [];
+let kosafUpdatedAt = '';
 
 function registeredFor(p) {
   return scopedToProfile(registeredList, p); // match-engine.js — 알림도 같은 기준을 쓴다
@@ -99,7 +149,10 @@ function registeredFor(p) {
 function allScholarships() {
   const p = state.profile;
   if (!p || !p.school) return NATIONAL_SCHOLARSHIPS;
-  return NATIONAL_SCHOLARSHIPS.concat(registeredFor(p));
+  /* 한국장학재단 등록분은 **교외 공고로 함께** 낸다 (2026-08-30 개발자 지시:
+     "한국장학재단에 뜬 장학금이라고 하지 말고 그냥 교외에 포함시켜줘").
+     따로 두면 아무도 못 찾고, 화면도 두 벌이 된다. */
+  return NATIONAL_SCHOLARSHIPS.concat(registeredFor(p), kosafAsScholarships());
 }
 function findSch(id) {
   return allScholarships().find((s) => s.id === id) || null;
@@ -109,12 +162,97 @@ function findSch(id) {
    자격 판정(evaluate)·적합도(fitScore)·학교 한정 필터(scopedToProfile)는 match-engine.js에 있다.
    서비스워커(백그라운드 알림)도 같은 파일을 읽어, 화면과 알림의 기준이 갈라지지 않는다. */
 
+/* 🔴 한국장학재단 등록분의 자격은 **우리가 확인한 것이 아니다** (2026-08-30).
+   그대로 두면 evaluate 가 `selective`(선발형 = 신청 가능)로 읽고, 그 status 를 믿는 곳이
+   전부 딸려 온다 — 실측: 홈 히어로 합계가 **2억 2,420만원**으로 부풀고, 일괄 신청 준비
+   118건 중 **104건이 KOSAF** 였다. 앱이 준비해 줄 수도 없는 것들이다.
+   확인 안 한 것을 '받을 수 있다'고 더하는 것은 기망이다(운영 원칙 · parse-amount 첫머리).
+   🔴 호출자마다 막지 않고 **여기 한 곳**에서 정직한 값으로 바꾼다 — getMatches 와
+      openDetail 이 같은 함수를 쓴다. 베끼면 카드와 상세가 갈라진다.
+   ⚠️ 확정된 미달(`ineligible`)은 그대로 둔다 — evaluate 가 근거를 갖고 내린 판정이라
+      '미확인'으로 덮으면 그것도 거짓말이다(배지 규칙과 같은 이유). */
+function evaluateFor(s, p) {
+  const r = evaluate(s, p);
+  return (s && s.sourceKind === 'kosaf' && r.status !== 'ineligible')
+    ? { ...r, status: 'unknown' } : r;
+}
+/* 🔴 적합도는 **한 곳**에서 낸다 (2026-08-30). getMatches 만 고치고 openDetail 을 안 고쳐서
+   카드는 「자격 미확인」인데 시트는 「적합도 25%」였다 — 개발자가 바로 눌러 보고 잡았다.
+   ⚠️ 한때 여기서 한국장학재단 등록분을 **무조건 '자격 미확인'** 으로 눌러 뒀다.
+      지역 요건(83곳)을 판정할 수 없어 서울 학생에게 안양시 장학금이 95%로 뜨던 때의
+      임시 조치였다. 시·군을 받아 지역을 판정하게 된 뒤로는 그 눌림이 **오히려 거짓말**이라
+      걷어냈다(실측: 미달 79 · 적합 33 · 미확인 4로 갈린다). */
+function fitDetailFor(s, p) {
+  return fitDetail(s, p);
+}
+
 function getMatches() {
   const p = state.profile;
   return allScholarships().map((s) => {
-    const result = evaluate(s, p);
-    return { sch: s, result, fit: fitScore(s, result, p), fd: fitDetail(s, p) };
+    const result = evaluateFor(s, p);
+    /* 🔴 한국장학재단 등록분은 **적합도를 단정하지 않는다** (2026-08-30).
+       재단이 적어 둔 칸에는 `지역거주구분: 안양시에 주소를 두고…` 처럼 기계가 못 읽는 요건이
+       섞여 있는데, 그 줄은 판정에서 조용히 빠진다. 그러면 서울 학생에게 안양시 장학금이
+       **「적합도 95% · 요건 3개 중 3개 충족」** 으로 뜬다 — 실제로 그렇게 떠 있었다.
+       틀린 미달이 못 받는 것보다 나쁜 것처럼, **틀린 안심도 그만큼 나쁘다.**
+       그래서 배지·정렬이 보는 fd 를 '아직 못 읽음'으로 준다(자격 줄은 그대로 보여 준다).
+       판정 규칙은 fitVerdict 한 곳 그대로다 — 여기서는 근거만 정직하게 넘긴다. */
+    return { sch: s, result, fit: fitScore(s, result, p), fd: fitDetailFor(s, p) };
   });
+}
+
+/* ---------------- 공고 저장(북마크) ----------------
+   인스타그램처럼 공고를 찜해 두는 자리 (2026-09-07 개발자 지시 · 노션 UI-21).
+   신청과는 다른 일이다 — 저장은 "나중에 볼게"이고 신청은 "준비를 시작했다"이다.
+   그래서 저장분은 **홈의 예상 수혜액 합계에 넣지 않는다**(확인 안 한 것을 받을 수
+   있다고 더하지 않는다는 규칙과 같은 정신). 대신 보관함이 저장분 합계를 따로 낸다. */
+function isSaved(id) {
+  return state.saved.some((s) => s.id === id);
+}
+/** 저장/해제. 되돌리기를 붙여 잘못 누른 학생이 한 번에 복구할 수 있게 한다. */
+function toggleSave(id) {
+  const at = state.saved.findIndex((s) => s.id === id);
+  /* 🔴 **해제는 findSch 를 요구하지 않는다** (2026-09-07 코드 리뷰).
+     데이터에서 내려간 공고를 저장해 둔 학생은, 그것을 찾을 수 없다는 이유로
+     영영 지우지 못하게 된다. 없는 것을 새로 담는 것만 막으면 된다. */
+  if (at < 0 && !findSch(id)) return;
+  if (at >= 0) {
+    state.saved.splice(at, 1);
+    saveState();
+    toast('저장을 해제했어요', { label: '되돌리기', run: () => toggleSave(id) });
+  } else {
+    state.saved.push({ id, savedAt: nowStamp() });
+    saveState();
+    toast('보관함에 저장했어요', { label: '보관함', run: () => showScreen('my') });
+  }
+  refreshSaveViews(id);
+}
+/** 저장한 공고를 **최근 저장 순**으로. 못 찾는 것(데이터에서 내려간 공고)은 조용히 뺀다. */
+function savedScholarships() {
+  return state.saved.slice().reverse()
+    .map((s) => findSch(s.id))
+    .filter(Boolean);
+}
+/* 저장 상태가 바뀌면 지금 떠 있는 것만 다시 그린다 — 화면을 통째로 새로 그리면
+   스크롤이 맨 위로 튄다(일괄 준비 목록에서 겪은 것과 같은 유형). */
+function refreshSaveViews(id) {
+  const on = isSaved(id);
+  $$(`[data-save="${CSS.escape(id)}"]`).forEach((b) => {
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', String(on));
+    b.setAttribute('aria-label', on ? '저장 해제' : '공고 저장');
+    /* 눌린 단추가 튕긴다 (2026-09-09) — 인스타 더블탭 하트와 같은 일이다.
+       🔴 **담을 때만** 튕긴다. 해제까지 축하하듯 튕기면 무슨 일이 일어났는지 흐려진다.
+          해제는 토스트가 '되돌리기'와 함께 말한다. */
+    if (on && typeof popEl === 'function') popEl(b);
+    else b.classList.remove('pop');   // 해제하면 앞서 담을 때의 표시를 즉시 지운다
+  });
+  /* 손끝에도 한 번 — 아주 짧게(10ms). 폰 설정에서 진동을 끈 학생에게는 아무 일도 없다.
+     🔴 `toggleSave` 가 아니라 여기 둔다: 저장이 실제로 화면에 반영되는 지점이 여기라
+        "울렸는데 안 담긴" 경우가 생기지 않는다. */
+  if (typeof haptic === 'function') haptic(on ? 12 : 8);
+  if (!$('#screen-my').hidden) renderSaved();
+  if (!$('#screen-applications').hidden && calMode) renderCalendar();
 }
 
 /* ---------------- 유틸 ---------------- */
@@ -130,9 +268,13 @@ function deadlineTs(sch) {
   return sch.deadline ? new Date(sch.deadline).getTime() : Infinity; // 기한 미확정은 뒤로 정렬
 }
 
-/* 마감된 공고를 목록에 며칠 더 남겨 둘지 (2026-08-02 개발자 지시로 30 → 7).
-   0으로 두면 마감 당일 사라져 '내가 신청한 그 공고'를 못 찾으므로 짧게 남긴다. */
-const CLOSED_KEEP_DAYS = 7;
+/* 마감된 공고를 **신청 화면 목록에** 며칠 더 남겨 둘지 (2026-09-05 개발자 지시로 7 → 1).
+   1 = 마감 다음 날까지 '마감'으로 보이고, 그 다음 날 목록에서 내려간다.
+   🔴 사라지는 게 아니라 **자리를 옮기는 것**이다 — 담아 둔 공고는 신청 내역에 그대로
+      남는다(renderApplications 는 이 상수도 dday 도 쓰지 않는다 — 회귀 검사가 못 박음).
+      예전 주석이 걱정한 "'내가 신청한 그 공고'를 못 찾는다"는 그 경로로 해결된다.
+      층2(KOSAF) 목록도 같은 상수를 쓰므로 함께 적용된다 — 규칙이 갈라지지 않게 그대로 둔다. */
+const CLOSED_KEEP_DAYS = 1;
 
 function dday(dateStr) {
   if (!dateStr) return { label: '기한 원문 확인', cls: '', days: 14 }; // 마감을 확정 못 한 공고 — 목록에 유지
@@ -143,6 +285,76 @@ function dday(dateStr) {
   if (d === 0) return { label: 'D-DAY', cls: 'urgent', days: d };
   if (d <= 7) return { label: `D-${d}`, cls: 'urgent', days: d };
   return { label: `D-${d}`, cls: '', days: d };
+}
+
+/* 마감을 학생에게 보이는 **한 가지 말**로 옮긴다 (2026-09-10 페이스리프트).
+   왜 — 앱 전체에 마감 표기가 다섯 가지였고 홈 한 화면에 그중 넷이 함께 떴다:
+   'D-DAY' 배지 · '9/10 마감' 막대 · '9월 10일 15:25' · '2026-09-09'.
+   🔴 **판정을 새로 하지 않는다** — 위 dday() 가 낸 값만 받아 말로 바꾼다.
+      여기서 날짜를 다시 계산하면 배지·달력이 서로 다른 말을 하게 된다.
+   🔴 시간 단위를 쓰지 않는다 — 우리가 아는 것은 날짜뿐이라 마감 '시각'을 모른다.
+   🔴 **카드의 말은 D-DAY 카운트다** (2026-09-11 개발자 지시: "빨간색 마감 인터렉션 바를
+      지우고 마감 D-DAY 카운트만 남겨놓기"). '오늘 마감·3일 남음' 으로 풀어 쓰던 것을
+      상세 시트·달력 배지가 이미 쓰는 `dday().label`(D-DAY · D-3 · 마감) 과 **같은 글자**로
+      맞췄다 — 목록과 상세가 마감을 다른 글자로 말하지 않는다.
+   ⚠️ 달력은 날짜 자체가 내용이라 이 말을 쓰지 않는다(isoOf 그대로). */
+function ddayWords(d) {
+  if (!d) return '';
+  if (d.label === '기한 원문 확인') return '기한 확인 중';
+  return d.label;   // '마감' · 'D-DAY' · 'D-n' — dday() 가 낸 글자 그대로
+}
+
+/* 카드 제목에서 기관명 접두어를 지운다 (2026-09-10 페이스리프트).
+   한 카드에 기관명이 두 번 나오고 있었다 — 제목 '재단법인 연수큰재장학재단 학업우수장학생'
+   + 아래 줄 '재단법인 연수큰재장학재단'. 원본 데이터를 그대로 이어 붙인 흔적이다.
+   🔴 **지어내지 않는다** — provider 글자로 시작할 때만 딱 그만큼 잘라 낸다.
+   🔴 남는 글자가 2자 미만이면 자르지 않는다(제목이 통째로 사라지는 것을 막는다).
+   🔴 **남는 글자가 '장학생·장학금·모집' 같은 흔한 낱말뿐이면 자르지 않는다** (2026-09-11
+      개발자 지적: "한원장학회 장학생의 공고가 장학금 찾기 탭에서 '장학생'으로만 표시").
+      한국장학재단 목록(층2)은 사업명 칸이 `장학생` 한 낱말인 재단이 118곳 중 11곳이라
+      (실측: 한원·북청읍·금천·앨트웰민초·영축총림·한진해운·부산북구·해기사협회·파주돈재갑진…)
+      기관명을 떼면 카드 제목이 **누구 것인지 모르는 '장학생'** 이 된다. 이 낱말들은
+      기관명이 붙어야 제목이 된다. `특별장학생`·`복지장학금` 처럼 앞에 다른 글자가 붙은
+      것은 그대로 뗀다(기관명은 바로 위 줄에 있다).
+   🔴 상세 시트는 **원제목 그대로** 둔다 — 거기는 원문과 대조하는 자리다. */
+/* 기관명을 떼고 남았을 때 제목이 되지 못하는 낱말들 — 이것만으로 이루어진 나머지는 안 뗀다 */
+const GENERIC_TITLE_REST = /^(?:장학생|장학금|장학|모집|선발|신청|안내|공고|지원|사업|[\s·])+$/;   // 안쪽에 + 를 두지 말 것(중첩 반복 → 되돌이 폭주)
+function cardTitle(sch) {
+  const name = String(sch.name || '').trim();
+  const prov = String(sch.provider || '').trim();
+  if (!prov) return name;
+  const bare = (t) => t.replace(/^(재단법인|사단법인|학교법인|의료법인|\(재\)|\(사\)|재\)|사\))\s*/, '').trim();
+  for (const p of [prov, bare(prov)]) {
+    if (!p || p.length < 3) continue;
+    for (const t of [name, bare(name)]) {
+      if (t.startsWith(p)) {
+        const rest = t.slice(p.length).replace(/^[\s·\-–—:,]+/, '').trim();
+        if (rest.length >= 2 && !GENERIC_TITLE_REST.test(rest)) return rest;
+      }
+    }
+  }
+  return cleanCardTitle(name);
+}
+
+/* 카드 제목에서 **게시판 표식**을 걷어낸다 (2026-09-10 페이스리프트).
+   실측: '[공통][국가]2026년 2학기 푸른등대 기부장학금 장학생 선발(~9/10)'.
+   앞의 대괄호 분류표는 그 게시판 안에서만 뜻이 있고, 뒤의 '(~9/10)'은 카드가 이미
+   '오늘 마감'이라고 말하는 것과 **같은 사실을 두 번** 적는 것이다.
+   🔴 지어내지 않는다 — 지우기만 하고 아무 글자도 더하지 않는다.
+   🔴 짧은 표식만 뗀다(12자 이하) — 긴 대괄호는 제목의 일부일 수 있다.
+   🔴 뒤 괄호는 **날짜·기간처럼 보일 때만** 뗀다. '(서울캠퍼스)' 같은 것은 남겨야 한다
+      (느슨하게 떼면 캠퍼스가 사라져 다른 공고와 구별이 안 된다 — 2026-08-21 사고 유형).
+   🔴 남는 글자가 4자 미만이면 아무것도 떼지 않는다(제목이 사라지는 것을 막는다).
+   ⚠️ 상세 시트는 원제목 그대로다 — 게시판에서 찾을 때 쓰는 글자라 바꾸면 안 된다. */
+function cleanCardTitle(name) {
+  let t = String(name || '').trim();
+  const before = t;
+  /* 🔴 앞 표식은 **대괄호만** 뗀다 — 소괄호를 넣으면 '(재)무안군승달장학회'의 법인 표기와
+     '(서울캠퍼스)' 같은 구분자가 사라진다(실측으로 확인하고 좁혔다). */
+  t = t.replace(/^(?:[[【]\s*[^\]】]{1,12}\s*[\]】]\s*)+/, '').trim();
+  t = t.replace(/[(（]\s*(?:~|-|—|\d)[\d\s.~\-—/월일년까지]*\s*[)）]\s*$/, '').trim();
+  t = t.replace(/[\s·\-–—:,]+$/, '').trim();
+  return t.length >= 4 ? t : before;
 }
 
 /* notStale(오래된 공고 숨김)은 match-engine.js에 있다 — 화면에서 숨긴 공고를
@@ -156,6 +368,11 @@ const STATUS_META = {
 };
 
 const APP_STEPS = ['신청 준비 완료', '공식 제출', '심사', '선정 발표'];
+
+/* 🔴 앱 판 번호는 **여기 한 곳**이다 (2026-09-13 고객센터 신설).
+   MY 아래 줄과 고객센터의 진단 정보가 같은 값을 써야 한다 — 두 곳에 적어 두면
+   한쪽만 고쳐져 학생이 알려 준 판 번호가 실제와 달라진다. */
+const APP_VERSION = 'v0.3 (MVP)';
 
 /* 진척도 판정 — 앱이 학교·재단 시스템을 들여다볼 수 없으므로(정직 원칙)
    '공식 제출'과 '발표 결과'는 사용자가 직접 기록하고,
@@ -176,7 +393,11 @@ function recordSubmitted(sch) {
   if (!confirm(`${officialChannel(sch).label}에서 공식 제출을 마치셨나요?\n\n제출 완료로 기록하면 진행 단계가 '공식 제출'로 넘어가요.`)) return;
   app.submittedAt = nowStamp();
   saveState();
-  toast('공식 제출로 기록했어요. 접수 마감 후에는 자동으로 심사 단계로 표시돼요');
+  /* 손끝에도 한 번 (2026-09-09). 여기까지만 울린다 — 진동은 **되돌리기 어려운 일이 방금
+     일어났다**는 신호로만 쓴다(저장·새로고침·이 기록 셋). 화면이 바뀔 때마다 울리면
+     알림처럼 느껴져서 학생이 폰 설정에서 앱 진동을 통째로 꺼 버린다. */
+  if (typeof haptic === 'function') haptic(14);
+  toast('공식 제출 기록 완료 · 접수 마감 후 심사 단계로 자동 전환');
   refreshProgressViews(sch.id);
 }
 
@@ -186,7 +407,7 @@ function recordResult(sch, won) {
   app.result = won ? 'won' : 'lost';
   app.resultAt = nowStamp();
   saveState();
-  toast(won ? '🎉 선정 축하드려요! 결과를 기록했어요' : '결과를 기록했어요. 다음 기회를 함께 찾아봐요');
+  toast(won ? '선정 결과를 기록했습니다' : '결과를 기록했습니다');
   refreshProgressViews(sch.id);
 }
 
@@ -201,13 +422,32 @@ function undoProgress(sch) {
 
 /* 진척도 기록 후 시트와 뒤 화면(내역·홈)을 함께 갱신 */
 function refreshProgressViews(id) {
-  const current = $$('.screen').find((s) => !s.hidden);
-  if (current) showScreen(current.id.replace('screen-', ''));
-  openDetail(id);
+  /* 🔴 시트 **안에서** 기록했을 때만 시트를 다시 연다. 예전엔 무조건 열었는데,
+     그때는 기록 버튼이 시트에만 있었다. 지금은 신청 내역 패널에도 있어서
+     그대로 두면 패널에서 '선정' 을 누를 때마다 엉뚱하게 상세 시트가 튀어나온다(실측). */
+  const wasOpen = !$('#detail-sheet').hidden;
+  /* 🔴 **화면을 '바꾸지' 않고 '다시 그리기만' 한다** (2026-09-10 코드 리뷰에서 잡았다).
+     예전에는 지금 화면을 `showScreen()` 으로 다시 열었는데, 그 함수는 마지막에 조건 없이
+     `window.scrollTo(0, o.scroll || 0)` 로 스크롤을 되돌린다. 그래서 신청 내역을 한참
+     내려가 '선정'·'제출했다고 기록'을 누르면 **목록 맨 위로 튀었다**(실측 2527 → 0).
+     학생은 방금 기록한 공고를 찾아 다시 끝까지 내려가야 하고, 여러 건을 이어서 기록할
+     때마다 되풀이된다. 옆의 `deleteApps` 는 처음부터 렌더 함수만 부르고 있었다. */
+  const current = $$('.screen').find((sc) => !sc.hidden);
+  const name = current ? current.id.replace('screen-', '') : '';
+  if (name === 'applications') renderApplications();
+  else if (name === 'home') renderHome();
+  else if (name === 'explore') renderExplore();
+  else if (name === 'my') renderMy();
+  if (wasOpen) openDetail(id);
 }
 
 function toast(msg, action) {
   const el = $('#toast');
+  /* 🔴 사라지는 중에 새 알림이 뜨면 **옛 숨김 타이머가 새 알림을 지운다** — 2600ms 타이머만
+     껐지 250ms 숨김 타이머는 안 끄고 있었다. 등장 전환이 살아난 지금은 증상이 더 나쁘다
+     (반쯤 뜬 채로 사라진다). 두 타이머를 한자리에서 끈다. */
+  clearTimeout(toast._t);
+  clearTimeout(toast._h);
   el.textContent = msg;
   /* 되돌리기처럼 **되살릴 수 있는 실수**는 단추를 함께 준다.
      터치 타깃 44px은 style.css의 .toast-undo가 지킨다. */
@@ -218,21 +458,34 @@ function toast(msg, action) {
     b.addEventListener('click', () => {
       clearTimeout(toast._t);
       el.classList.remove('show');
-      setTimeout(() => (el.hidden = true), 250);
+      toast._h = setTimeout(() => (el.hidden = true), 250);
       action.run();
     });
     el.appendChild(b);
   }
   el.hidden = false;
+  /* 🔴 `display:none` 에서 **같은 태스크에** .show 를 붙이면 전환이 아예 안 걸린다 —
+     토스트가 페이드 없이 튀어나오고 사라질 때만 부드러웠다(들어올 때/나갈 때가 거꾸로).
+     ⚠️ **rAF 한 번으로는 안 된다** — 실측했다(2026-09-06, 헤드리스 크롬):
+        rAF 로는 opacity 가 그대로 1 이고, `void offsetHeight` 로 배치를 강제로 확정시켜야
+        0.159 → 1 로 전환이 재생된다. `openSheetShell` 이 "rAF 대신"이라고 적어 둔 이유가 이것.
+        notify.js·chat.js 는 아직 rAF 한 번을 쓴다 — 같은 유형인지 따로 확인할 것. */
+  void el.offsetHeight;
   el.classList.add('show');
-  clearTimeout(toast._t);
   toast._t = setTimeout(() => {
     el.classList.remove('show');
-    setTimeout(() => (el.hidden = true), 250);
+    toast._h = setTimeout(() => (el.hidden = true), 250);
   }, 2600);
 }
 
 function countUp(el, target, formatter, duration = 900) {
+  /* 🔴 '모션 줄이기'를 켠 사람에게는 숫자를 굴리지 않는다 (2026-08-30).
+     어지럼증·전정기관 질환 때문에 켜는 설정이라, 히어로 금액이 900ms 동안 튀어오르는 것이
+     정확히 그 사람들이 끄고 싶어 한 움직임이다. 값은 그대로 보여 준다 — 정보는 안 줄인다. */
+  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    el.textContent = formatter(target);
+    return;
+  }
   const start = performance.now();
   function tick(now) {
     const t = Math.min(1, (now - start) / duration);
@@ -247,13 +500,38 @@ function esc(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+/* 수집한 게시판 글에 남은 HTML 기호를 사람이 읽는 글자로 되돌린다 (2026-09-11).
+   🔴 실시간 공고 39건 중 9건이 화면에 `&nbsp;` 를 **글자 그대로** 띄우고 있었다
+      ('국가근로장학금 장학생 기본요건 ( 소득구간 &nbsp; 9 구간 이하'). 게시판 원문은 빈칸인데
+      수집이 기호를 그대로 담아 온 것이라, 되돌리는 것이 원문에 **더 가깝다**(원칙 8-1 위반 아님).
+   🔴 반드시 `esc()` **앞에** 부른다 — 되돌린 뒤 다시 감싸므로, `&lt;script&gt;` 가 섞여 있어도
+      화면에는 글자로만 뜬다(먼저 esc 하면 `&amp;nbsp;` 가 돼 영영 안 풀린다).
+   🔴 목록은 늘리지 않는다 — 숫자 기호(`&#NN;`)까지 열면 보이지 않는 제어문자가 들어온다. */
+/* 🔴 여기 없는 기호는 학생 화면에 **글자 그대로** 뜬다 — 데이터에 실제로 있는 것만 담는다.
+   `middot` 는 2026-09-13 에 더했다: 금액 근거 줄(`amountSpec.raw`)에 게시판이 담아 온
+   `취 &middot; 창업지원금` 이 그대로 들어 있었다(실측 4건). 관문 ui-tone ⑦ 이
+   **데이터에 나오는 기호를 전부 아는지** 세므로, 새 기호가 들어오면 그때 빨간불이 된다. */
+const ENTITIES = { nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", '#39': "'", '#160': ' ', middot: '·' };
+/* 🔴 **목록을 두 벌 두지 않는다** (2026-09-13). 예전에는 정규식에 이름이 한 벌 더 박혀 있어서,
+   ENTITIES 에 `middot` 를 더해도 정규식이 그걸 몰라 **아무 일도 안 일어났다**(실측).
+   이 저장소가 여러 번 데인 자리다 — 목록에서 정규식을 만든다. */
+const ENTITY_RE = new RegExp('&(' + Object.keys(ENTITIES).join('|') + ');', 'g');
+function unent(s) {
+  return String(s == null ? '' : s).replace(ENTITY_RE, (m, k) => ENTITIES[k]);
+}
+
 /* 외부 링크 안전화 — http(s)·mailto만 허용한다. 수집 로봇이 받아 온 데이터가 오염되거나
    정식 등록에 오타가 있어도 javascript:·data: 같은 위험한 스킴이 href나 window.open으로
    들어가지 못하게 막는 2차 방어선(CSP가 뚫리거나 완화돼도 안전). 허용 안 되면 빈 문자열. */
 function safeUrl(u) {
   if (!u) return '';
   try {
-    const parsed = new URL(String(u), location.origin);
+    /* 🔴 기준은 `location.origin` 이 아니라 **앱이 놓인 자리**(`document.baseURI`) 다
+       (2026-09-12). 앱은 `…github.io/hanggonggan/` 에 있는데 origin 을 기준으로 풀면
+       `data/kosaf-files/…` 같은 **우리 파일 경로가 사이트 뿌리**로 풀려 404 가 된다.
+       밖으로 나가는 주소(http/https/mailto)는 기준이 무엇이든 결과가 같으므로,
+       지금까지의 링크는 한 글자도 안 바뀐다. */
+    const parsed = new URL(String(u), document.baseURI);
     if (parsed.protocol === 'http:' || parsed.protocol === 'https:' || parsed.protocol === 'mailto:') return parsed.href;
   } catch (e) { /* 잘못된 URL */ }
   return '';
@@ -281,11 +559,28 @@ let walletCache = {}; // slot -> { name, type, savedAt }
 
 function dbOpen() {
   return new Promise((res, rej) => {
-    const rq = indexedDB.open('handaejang-docs', 1);
-    rq.onupgradeneeded = () => rq.result.createObjectStore('files', { keyPath: 'slot' });
+    /* 🔴 판 2 — 'trash'(지운 서류) 보관소가 늘었다 (2026-09-11).
+       이미 판 1 로 만들어진 폰에서는 'files' 가 **이미 있으므로** 그대로 만들면
+       그 자리에서 오류가 나고 서류 보관함이 통째로 안 열린다. 있는지 보고 만든다. */
+    const rq = indexedDB.open('handaejang-docs', 2);
+    rq.onupgradeneeded = () => {
+      const db = rq.result;
+      if (!db.objectStoreNames.contains('files')) db.createObjectStore('files', { keyPath: 'slot' });
+      if (!db.objectStoreNames.contains('trash')) db.createObjectStore('trash', { keyPath: 'key' });
+    };
     rq.onsuccess = () => res(rq.result);
     rq.onerror = () => rej(rq.error);
   });
+}
+
+/* 휴지통 보관소 — 서류와 같은 금고 안의 다른 칸. 파일은 여전히 기기 밖으로 안 나간다. */
+function trashTx(mode, fn) {
+  return dbOpen().then((db) => new Promise((res, rej) => {
+    const tx = db.transaction('trash', mode);
+    const out = fn(tx.objectStore('trash'));
+    tx.oncomplete = () => res(out && out.result);
+    tx.onerror = () => rej(tx.error);
+  }));
 }
 function walletTx(mode, fn) {
   return dbOpen().then((db) => new Promise((res, rej) => {
@@ -304,7 +599,21 @@ async function walletPut(slot, file) {
 function walletGetRec(slot) {
   return walletTx('readonly', (st) => st.get(slot));
 }
+/* 🔴 삭제가 아니라 **옮기기**다 (2026-09-11 개발자 지시로 휴지통 신설).
+   증명서는 학생이 주민센터·학교에 다시 가야 다시 받는 물건이라, 잘못 눌렀을 때
+   되돌릴 길이 없으면 그 손실이 그대로 학생 몫이 된다. */
 async function walletDeleteSlot(slot) {
+  try {
+    const rec = await walletGetRec(slot);
+    if (rec) {
+      await trashTx('readwrite', (st) => st.put({
+        key: `doc:${slot}:${Date.now()}`, kind: 'doc',
+        slot, name: rec.name, type: rec.type, blob: rec.blob,
+        ...(rec.dataUrl ? { dataUrl: rec.dataUrl } : {}),   // 프로필 사진의 문서용 사본도 함께 (2026-09-11)
+        savedAt: rec.savedAt, deletedAt: Date.now(),
+      }));
+    }
+  } catch (e) { /* 휴지통에 못 담아도 삭제 자체는 진행한다 — 학생이 누른 일은 일어나야 한다 */ }
   await walletTx('readwrite', (st) => st.delete(slot));
   await walletRefresh();
 }
@@ -316,14 +625,138 @@ async function walletRefresh() {
   } catch (e) { walletCache = {}; }
 }
 
+/* ---------------- 프로필 사진 (2026-09-11 개발자 지시) ----------------
+   *"마이페이지에서 프로필사진 교체 기능 추가. 해당 기능은 본인의 사진을 요구하는 장학 공고에 쓰일 수 있음."*
+   🔴 **서류 보관함과 같은 금고**(IndexedDB `files`)의 `photo` 칸에 둔다 — 새 저장소를 만들지
+      않는다. 지우면 서류처럼 휴지통(30일)으로 옮겨진다(walletDeleteSlot 그대로).
+   🔴 **서버로 안 올라간다** — `state.profile` 에 넣지 않으므로 syncSafeProfile 이 볼 일이 없다.
+      verify-supabase 가 나가는 본문을 전부 모아 세는데, 사진은 애초에 그 길에 없다.
+   🔴 **줄여서 저장한다**(긴 변 640px · JPEG). 폰 사진 한 장은 4~8MB 라 그대로 두면 양식 문서 한 장이
+      그 크기가 된다. 줄인 뒤 dataUrl 도 같이 적어 둔다 — 양식 문서(forms.js)는 동기로 그려지고
+      .doc 파일로 나갈 때 blob 주소는 죽으므로, 문서에 들어갈 수 있는 것은 글자로 된 사진뿐이다.
+   ⚠️ 사진이 **어느 양식에 들어가는가**는 짐작하지 않는다 — `data/forms.json` 의 `photoNote`
+      (원본 서식에 사진란이 있다고 스키마화 때 적어 둔 것)가 있는 양식에만 들어간다. */
+const PHOTO_SLOT = 'photo';
+const PHOTO_MAX_W = 480;
+const PHOTO_MAX_H = 640;
+let profilePhoto = null;   // { url, dataUrl, savedAt } — 금고에서 읽어 둔 사본. 없으면 null
+
+/** 양식 문서가 부른다(forms.js) — 사진이 없으면 빈 문자열(지어내지 않는다). */
+function profilePhotoDataUrl() {
+  const d = profilePhoto && profilePhoto.dataUrl;
+  return typeof d === 'string' && d.startsWith('data:image/') ? d : '';
+}
+
+/* blob → data URL (문서용). 옛 기록이나 휴지통을 거친 기록에 dataUrl 이 없을 때만 쓴다. */
+function blobToDataUrl(blob) {
+  return new Promise((res) => {
+    try {
+      const r = new FileReader();
+      r.onload = () => res(typeof r.result === 'string' ? r.result : '');
+      r.onerror = () => res('');
+      r.readAsDataURL(blob);
+    } catch (e) { res(''); }
+  });
+}
+async function photoRefresh() {
+  try {
+    const rec = await walletGetRec(PHOTO_SLOT);
+    if (profilePhoto && profilePhoto.url) { try { URL.revokeObjectURL(profilePhoto.url); } catch (e) { /* 이미 해제됨 */ } }
+    if (rec && rec.blob) {
+      /* 🔴 dataUrl 이 없으면 만들어 채운다 — 없으면 MY 에는 사진이 보이는데 양식 문서에는 조용히 안 들어간다(코드 리뷰) */
+      const dataUrl = rec.dataUrl || await blobToDataUrl(rec.blob);
+      profilePhoto = { url: URL.createObjectURL(rec.blob), dataUrl, savedAt: rec.savedAt };
+    } else profilePhoto = null;
+  } catch (e) { profilePhoto = null; }
+  return profilePhoto;
+}
+
+/* 사진을 줄여 JPEG 로 — 못 읽는 파일(HEIC 를 브라우저가 못 여는 경우 등)이면 null */
+function shrinkPhoto(file) {
+  return new Promise((res) => {
+    const img = new Image();
+    const src = URL.createObjectURL(file);
+    const done = (v) => { try { URL.revokeObjectURL(src); } catch (e) { /* 무시 */ } res(v); };
+    img.onload = () => {
+      try {
+        if (!img.naturalWidth || !img.naturalHeight) return done(null);   // 크기 없는 그림(SVG 등) → 1px 사진이 되는 것을 막는다
+        const r = Math.min(1, PHOTO_MAX_W / img.naturalWidth, PHOTO_MAX_H / img.naturalHeight);
+        const w = Math.max(1, Math.round(img.naturalWidth * r));
+        const h = Math.max(1, Math.round(img.naturalHeight * r));
+        const cv = document.createElement('canvas');
+        cv.width = w; cv.height = h;
+        cv.getContext('2d').drawImage(img, 0, 0, w, h);
+        const dataUrl = cv.toDataURL('image/jpeg', 0.86);
+        cv.toBlob((blob) => done(blob ? { blob, dataUrl } : null), 'image/jpeg', 0.86);
+      } catch (e) { done(null); }
+    };
+    img.onerror = () => done(null);
+    img.src = src;
+  });
+}
+
+async function photoSet(file) {
+  const small = await shrinkPhoto(file);
+  if (!small) return false;
+  await walletTx('readwrite', (st) => st.put({
+    slot: PHOTO_SLOT, name: '증명사진.jpg', type: 'image/jpeg',
+    blob: small.blob, dataUrl: small.dataUrl, savedAt: nowStamp(),
+  }));
+  await walletRefresh();
+  await photoRefresh();
+  return true;
+}
+async function photoRemove() {
+  await walletDeleteSlot(PHOTO_SLOT);   // 서류처럼 휴지통으로 — 30일 안에 되살릴 수 있다
+  await photoRefresh();
+}
+
+/* MY 맨 위 카드의 머리 — 사진(없으면 첫 글자) + 이름 줄 + 단추 두 개 */
+function photoHeadHtml(p, nameLineHtml) {
+  const initial = esc((p.name || '학').charAt(0));
+  /* 겉 상자가 role=img + 이름표를 갖고 있으니 안쪽 그림의 alt 는 비운다 — 낭독기가 두 번 읽지 않게 */
+  const img = profilePhoto && profilePhoto.url ? `<img src="${esc(profilePhoto.url)}" alt="" />` : initial;
+  return `
+    <div class="my-head">
+      <div class="my-photo" id="my-photo" role="img" aria-label="프로필 사진">${img}</div>
+      ${nameLineHtml}
+    </div>
+    <div class="my-photo-btns" data-photo>
+      <label class="my-photo-btn">${profilePhoto ? '사진 교체' : '사진 올리기'}
+        <input type="file" id="my-photo-file" accept="image/*" hidden />
+      </label>
+      ${profilePhoto ? '<button type="button" class="my-photo-btn danger" id="my-photo-del">사진 삭제</button>' : ''}
+    </div>`;
+}
+function bindPhotoButtons() {
+  const inp = $('#my-photo-file');
+  if (inp) inp.addEventListener('change', async () => {
+    const file = inp.files && inp.files[0];
+    if (!file) return;
+    if (file.size > 20 * 1024 * 1024) { toast('20MB 이하 사진만 올릴 수 있어요'); return; }
+    const ok = await photoSet(file);
+    toast(ok ? '프로필 사진 저장 완료 · 이 기기에만 남아요' : '이 사진은 읽을 수 없어요 · JPG·PNG 로 다시 올려 주세요');
+    renderMy();
+    if (!$('#screen-home').hidden) renderHome();
+  });
+  const del = $('#my-photo-del');
+  if (del) del.addEventListener('click', async () => {
+    if (!confirm('프로필 사진을 지울까요? 휴지통에 30일 남아요.')) return;
+    await photoRemove();
+    toast('휴지통으로 옮겼어요');
+    renderMy();
+    if (!$('#screen-home').hidden) renderHome();
+  });
+}
+
 /* 요구 서류의 보관함 상태 한 줄 */
 function docWalletStatus(doc) {
   const s = slotForDoc(doc);
   if (!s) return null;
   const rec = walletCache[s.slot];
   return rec
-    ? { ok: true, slot: s, text: `보관함에서 자동 첨부 ✓ (${rec.name})` }
-    : { ok: false, slot: s, text: `보관함에 없음 · 발급처: ${s.issue}` };
+    ? { ok: true, slot: s, text: `보관함에서 자동 첨부 · ${rec.name}` }
+    : { ok: false, slot: s, text: `아직 안 올렸어요 · 발급처: ${s.issue}` };
 }
 
 /* ---------------- 자동추천 (autocomplete) ---------------- */
@@ -461,26 +894,99 @@ function majorSuggestions(q) {
 }
 
 /* ---------------- 화면 전환 ---------------- */
-function showScreen(name) {
-  ['onboarding', 'home', 'explore', 'applications', 'my'].forEach((n) => {
+/* 지금 보고 있는 화면 — 이어보기 장부에 적을 때와 스크롤을 갈무리할 때 쓴다 */
+let currentScreen = 'onboarding';
+
+function showScreen(name, opts) {
+  const o = opts || {};
+  /* 떠나기 전 화면의 스크롤을 먼저 갈무리한다 — 다음에 그 탭으로 돌아오면 여기서 이어진다 */
+  if (typeof resumeSaveScroll === 'function' && currentScreen && currentScreen !== name) {
+    resumeSaveScroll(currentScreen, window.scrollY);
+  }
+  ['onboarding', 'home', 'explore', 'applications', 'my', 'settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms'].forEach((n) => {
     $(`#screen-${n}`).hidden = n !== name;
   });
   $('#bottom-nav').hidden = name === 'onboarding';
-  $$('.nav-item').forEach((b) => b.classList.toggle('active', b.dataset.nav === name));
-  window.scrollTo(0, 0);
+  /* 설정·휴지통은 MY 안쪽 화면이라 아래 탭에서 **MY 가 켜진 채**로 둔다 —
+     아무 탭도 안 켜져 있으면 학생이 지금 어디에 있는지 알 수 없다. */
+  const navOn = ['settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms'].includes(name) ? 'my' : name;
+  $$('.nav-item').forEach((b) => b.classList.toggle('active', b.dataset.nav === navOn));
+
+  /* 🔴 안쪽 화면(설정·휴지통)은 **방향이 있는** 움직임으로 들어온다 (2026-09-11 개발자 지시).
+     들어갈 때는 오른쪽에서, 되돌아올 때는 왼쪽에서 — 방향이 '어디로 가는 중인지'를 말한다.
+     ⚠️ `.screen` 에는 이미 taste-in(위로 떠오르기)이 걸려 있다. 그 위에 덮어쓰는 것이라
+        style.css 에서 **이 규칙이 뒤에 와야** 이긴다(같은 굵기면 나중 것이 이긴다).
+     ⚠️ 클래스를 떼었다 붙이는 것만으로는 다시 안 돈다 — 브라우저가 '바뀐 게 없다'고 본다.
+        중간에 offsetWidth 를 한 번 읽어 강제로 끊어 준다. */
+  const SUB = ['settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms'];
+  /* 🔴 안쪽 화면에서는 **가로 손짓이 우리 것**이라고 앱 전체에 표시해 둔다 (2026-09-12).
+     짧은 화면 아래 빈 자리는 화면이 아니라 `#app` 이라, 화면에만 주면 거기서 시작한
+     손짓을 브라우저가 세로 스크롤로 가져간다. 안쪽 화면일 때만 켜는 이유는 style.css 에. */
+  $('#app').classList.toggle('on-sub-screen', SUB.includes(name));
+  if (SUB.includes(name) || SUB.includes(currentScreen)) {
+    const el = $(`#screen-${name}`);
+    if (el) {
+      el.classList.remove('screen-in', 'screen-back');
+      void el.offsetWidth;
+      el.classList.add(o.back ? 'screen-back' : 'screen-in');
+    }
+  }
+  currentScreen = name;
 
   if (name === 'home') renderHome();
   if (name === 'explore') renderExplore();
   if (name === 'applications') renderApplications();
   if (name === 'my') renderMy();
+  if (name === 'settings') renderSettings();
+  if (name === 'trash') renderTrash();
+  if (name === 'terms') renderTerms();
+  if (name === 'logins') renderLogins();
+  if (name === 'faq') renderFaq();
+  if (name === 'support') renderSupport();
+  if (name === 'perms') renderPerms();
+
+  /* 🔴 스크롤은 **그린 뒤에** 옮긴다 — 먼저 옮기면 아직 짧은 화면이라 그 자리가 없다.
+     `opts.scroll` 은 이어보기가 되살릴 때만 온다(보통은 늘 맨 위로). */
+  window.scrollTo(0, o.scroll || 0);
+
+  if (typeof resumeSave === 'function' && name !== 'onboarding') resumeSave({ screen: name });
+}
+
+/* 이어보기 장부에 지금 화면·스크롤을 적는다.
+   🔴 `beforeunload` 를 믿지 말 것 — 휴대폰에서는 안 불린다. 앱이 숨는 순간
+      (`visibilitychange` 의 hidden)이 유일하게 믿을 수 있는 신호다. */
+function resumeMark() {
+  if (typeof resumeSave !== 'function') return;
+  if (!currentScreen || currentScreen === 'onboarding') { resumeSave({}); return; }
+  resumeSaveScroll(currentScreen, window.scrollY);
+  /* 🔴 화면 이름도 **여기서 다시** 적는다 (2026-09-09 · 검사를 강화하다 드러났다).
+     예전에는 시각과 스크롤만 찍었는데, 그러면 숨는 순간의 기록이 `showScreen` 이 앞서
+     적어 둔 것에 얹혀야만 온전해진다 — 장부가 그 사이에 비었으면(초기화·저장 공간 정리)
+     **스크롤만 있고 화면이 없는 기록**이 남아 다음에 켤 때 홈으로 간다.
+     앱이 숨는 순간이 가장 믿을 수 있는 신호이므로, 그때 아는 것을 다 적는다. */
+  resumeSave({ screen: currentScreen });
 }
 
 /* ---------------- 온보딩 ---------------- */
 let onboardStep = 0;
-const ONBOARD_STEPS = 5;
+/* 프로필을 **고치러** 들어왔나 (처음 가입이 아니라) — 취소 버튼을 띄울지 정한다 */
+let onboardEditing = false;
+const ONBOARD_STEPS = 6;   /* 2026-08-27 — '지금 받고 있는 장학금'(이중수혜) 단계 추가 */
 
 function renderOnboardStep() {
+  /* 고치러 들어온 경우에만 취소를 보여 준다 — 처음 가입하는 사람에게는 취소할 것이 없다 */
+  $$('#screen-onboarding .btn-onboard-cancel').forEach((b) => (b.hidden = !onboardEditing));
   $$('.onboard-step').forEach((el) => (el.hidden = Number(el.dataset.step) !== onboardStep));
+  /* 🔴 **환영 화면(0단계)에서는 진행 막대를 감춘다** (2026-09-09 · 설계 ②).
+     아직 '시작하기'도 안 눌렀는데 막대가 1/6 차 있으면 "벌써 뭔가 하고 있다"로 읽힌다.
+     환영 화면은 앱을 소개하는 자리이지 절차의 첫 칸이 아니다. */
+  const bar = $('.onboard-top');
+  if (bar) bar.hidden = onboardStep === 0;
+  /* 뒤로가기는 **돌아갈 곳이 있을 때만** 보인다 (노션 UI-2).
+     🔴 고치러 들어온 사람의 첫 칸은 1단계다(initOnboarding) — 그 사람에게 0단계는
+        '시작하기' 인사말이라 돌아갈 곳이 아니다. 취소 버튼이 그 자리를 이미 맡고 있다. */
+  const back = $('#btn-onboard-back');
+  if (back) back.hidden = onboardStep <= (onboardEditing ? 1 : 0);
   $('#onboard-bar').style.width = `${((onboardStep + 1) / ONBOARD_STEPS) * 100}%`;
   window.scrollTo(0, 0);
 }
@@ -491,6 +997,10 @@ function initOnboarding() {
   ).join('');
 
   const p = state.profile;
+  /* 계좌 칸은 **처음 가입할 때는 감춘다** (2026-08-31). 프로필을 고치러 들어온
+     사람에게만 보인다 — 그때는 이미 앱을 써 보고 신뢰가 생긴 뒤다. */
+  const acField = $('#in-account-field');
+  if (acField) acField.hidden = !p;
   if (p) {
     const c = p.common || {};
     $('#in-name').value = p.name || '';
@@ -511,10 +1021,16 @@ function initOnboarding() {
     setChip('#in-status', p.status);
     $('#in-region').value = p.region || '';
     $('#in-parent-region').value = p.parentRegion || '';
+    fillRegionCities('#in-region', '#in-region-city', p.regionCity);
+    fillRegionCities('#in-parent-region', '#in-parent-region-city', p.parentRegionCity);
     $('#in-nationality').value = p.nationality || 'korean';
     $('#in-credits').value = p.credits != null ? p.credits : '';
     $('#in-birth-year').value = p.birthYear || '';
     $$('#in-flags input').forEach((cb) => (cb.checked = p.flags.includes(cb.value)));
+    if (Array.isArray(p.scholarships)) {
+      $$('#in-scholarships input').forEach((cb) => (cb.checked = p.scholarships.includes(cb.value)));
+      if ($('#in-schol-none')) $('#in-schol-none').checked = p.scholarships.length === 0;
+    }
     $('#in-sensitive-ok').checked = !!(state.consent && state.consent.sensitive);
   } else {
     setChip('#in-track', 'humanities');
@@ -554,6 +1070,81 @@ function getChip(groupSel) {
   return el ? el.dataset.value : null;
 }
 
+/* ── 쓰다 만 온보딩을 적어 둔다 (2026-09-09 · 개발자 지시 ②) ─────────────
+   학교·학년·성적을 다시 치게 만드는 것이 이 앱에서 가장 큰 손실이다. 그래서 온보딩
+   진행분은 **창(4시간)과 상관없이** 되살린다 — 사흘 뒤에 돌아와도 치던 자리에서 잇는다.
+
+   🔴 `collectProfile()` 로 적지 않는다. 그건 **다 채운 프로필**을 만드는 함수라 빈 칸을
+      기본값으로 메워 버린다(성적 0, 소득 미선택 등) — 학생이 고른 적 없는 값이 프로필에
+      들어가는 것은 원칙 8-1(추론 금지) 위반이다. 화면의 칸을 **그대로** 적었다 그대로 되돌린다. */
+function onboardSnapshot() {
+  const fields = {};
+  $$('#screen-onboarding input, #screen-onboarding select').forEach((el) => {
+    if (!el.id) return;
+    if (el.type === 'checkbox' || el.type === 'radio') { if (el.checked) fields[el.id] = true; return; }
+    if (String(el.value || '').trim()) fields[el.id] = el.value;
+  });
+  /* 🔴 **id 가 없는 체크박스가 있다** (2026-09-09 코드 리뷰). 특별자격(`#in-flags`)과
+     보유 장학금(`#in-scholarships`)의 칸들은 `value` 만 있어서, id 로만 담으면 **매칭을
+     좌우하는 자격이 통째로 안 담긴다**(기초생활수급자·다자녀·국가유공자…).
+     그래서 그 묶음은 **묶음 id + 체크된 value 목록**으로 담는다. */
+  const boxes = {};
+  $$('#screen-onboarding .check-list').forEach((g) => {
+    if (!g.id) return;
+    const on = $$(`#${g.id} input[type="checkbox"]`).filter((c) => c.checked).map((c) => c.value);
+    if (on.length) boxes[g.id] = on;
+  });
+  const chips = {};
+  $$('#screen-onboarding .chip-group').forEach((g) => {
+    if (!g.id) return;
+    const on = $$(`#${g.id} .chip.active`).map((c) => c.dataset.value);
+    if (on.length) chips[g.id] = on;
+  });
+  return { step: onboardStep, fields: fields, boxes: boxes, chips: chips, at: Date.now() };
+}
+
+function onboardRestore(snap) {
+  if (!snap) return false;
+  Object.keys(snap.fields || {}).forEach((id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (el.type === 'checkbox' || el.type === 'radio') el.checked = !!snap.fields[id];
+    else el.value = snap.fields[id];
+  });
+  Object.keys(snap.boxes || {}).forEach((gid) => {
+    const on = snap.boxes[gid] || [];
+    $$(`#${gid} input[type="checkbox"]`).forEach((c) => { c.checked = on.indexOf(c.value) >= 0; });
+  });
+  /* 시·도를 되돌린 뒤에야 그 아래 시·군·구 목록이 채워진다 — 순서가 있다 */
+  fillRegionCities('#in-region', '#in-region-city', (snap.fields || {})['in-region-city']);
+  fillRegionCities('#in-parent-region', '#in-parent-region-city', (snap.fields || {})['in-parent-region-city']);
+  /* 🔴 **학교 칸에 값만 넣으면 캠퍼스 칸이 안 생긴다** (2026-09-09 코드 리뷰). 그 칸은
+     학교를 고를 때 `renderCampusChips()` 가 만드는데, 여기서는 값을 코드로 넣어 그 함수가
+     안 불린다 → `#campus-field` 가 숨은 채라 `collectProfile()` 이 캠퍼스를 빈 값으로 적고,
+     학생이 나중에 학교 칸을 건드리면 **첫 캠퍼스가 골라진 채**로 되살아난다. */
+  const campus = ((snap.chips || {})['in-campus'] || [])[0] || null;
+  if (typeof renderCampusChips === 'function') renderCampusChips(campus);
+  Object.keys(snap.chips || {}).forEach((gid) => {
+    const on = snap.chips[gid] || [];
+    $$(`#${gid} .chip`).forEach((c) => c.classList.toggle('active', on.indexOf(c.dataset.value) >= 0));
+  });
+  if (typeof syncConsentRow === 'function') syncConsentRow();
+  onboardStep = Math.max(0, Math.min(ONBOARD_STEPS - 1, Number(snap.step) || 0));
+  renderOnboardStep();
+  return true;
+}
+
+/* 온보딩에서 무엇을 치거나 고를 때마다 적어 둔다 (디바운스) */
+let onboardSaveTimer = null;
+function onboardProgressSave() {
+  if (typeof resumeSave !== 'function') return;
+  clearTimeout(onboardSaveTimer);
+  onboardSaveTimer = setTimeout(() => {
+    if ($('#screen-onboarding').hidden) return;   /* 이미 끝났으면 안 적는다 */
+    resumeSave({ onboard: onboardSnapshot() });
+  }, 500);
+}
+
 function collectProfile() {
   const gpaRaw = $('#in-gpa').value.trim();
   const gpa = gpaRaw === '' ? null : Math.min(4.5, Math.max(0, parseFloat(gpaRaw)));
@@ -572,11 +1163,19 @@ function collectProfile() {
        빈 칸은 null로 둔다. **모르면 판정하지 않는 것**이 이 앱의 규칙이라, 0이나 기본값을
        넣으면 안 된다(엉뚱한 0% 판정이 난다). 설계: docs/designs/fit-score.md */
     region: $('#in-region').value || null,
+    regionCity: $('#in-region-city').value || null,
     parentRegion: $('#in-parent-region').value || null,
+    parentRegionCity: $('#in-parent-region-city').value || null,
     nationality: $('#in-nationality').value || null,
     credits: $('#in-credits').value.trim() === '' ? null : Number($('#in-credits').value),
     birthYear: $('#in-birth-year').value.trim() === '' ? null : Number($('#in-birth-year').value),
     flags: $$('#in-flags input:checked').map((c) => c.value),
+    /* 지금 받고 있는 장학금 (2026-08-27) — 이중수혜 금지 공고를 자격 판정에서 거른다.
+       '없음'을 눌렀으면 빈 배열, 아무것도 안 골랐으면 null(= 모른다). 둘은 다르다:
+       빈 배열이면 "안 받는다"라 전부 지원 가능이고, null 이면 판정하지 않는다. */
+    scholarships: $('#in-schol-none') && $('#in-schol-none').checked
+      ? []
+      : (() => { const v = $$('#in-scholarships input:checked').map((c) => c.value); return v.length ? v : null; })(),
     cert: $('#in-cert').checked,
     exchange: $('#in-exchange').checked,
     /* 🔴 온보딩 화면에 칸이 없는 값(현주소·긴급연락처·보호자·성별·주민등록번호)은
@@ -619,54 +1218,237 @@ function fitTone(pct) {
   return 'red';
 }
 
-function fitBadgeHtml(fit, fd) {
+/* 🔴 '미달인가'를 정하는 **단 한 곳** (2026-08-29 신설).
+   배지는 여기를 보고, 목록 정렬도 여기를 본다. 예전에는 배지가 `fd.fails` 로,
+   정렬이 `result.status` 로 각각 판단해서 **화면이 스스로 모순**됐다:
+   `적합도 33%` 라고 적힌 카드가 '지원 자격 미달' 카드들 **사이에** 앉아 있었다
+   (verify-explore-sort 가 그걸 잡고 있었는데 아무도 그 검사를 안 돌렸다).
+   ⚠️ 여기 규칙을 복사해 쓰지 말 것 — 복사하는 순간 다시 갈라진다. */
+function fitVerdict(fit, fd) {
+  if (fit === 0) return 'no';                                   // evaluate 가 미달로 확정
+  if (fd && fd.unread) return 'unread';                         // 자격을 아직 못 읽었다
+  if (fd && fd.fails && fd.fails.length) return 'no';           // 원문 요건을 못 맞춘다
+  return 'ok';
+}
+/* 정렬용 순위 — 낮을수록 위. 미달은 맨 아래(2026-08-26 개발자 결정) */
+function fitRank(m) {
+  const v = fitVerdict(m.fit, m.fd);
+  return v === 'no' ? 2 : (v === 'unread' ? 1 : 0);
+}
+
+function fitBadgeHtml(fit, fd, { full = false } = {}) {
   if (!fd) return fit > 0 ? `<span class="badge badge-fit">적합도 ${fit}%</span>` : '';
   /* 🔴 `fit === 0`은 **evaluate()가 미달로 확정한 것**이다 (fitDetail은 FIT_MIN=5가 바닥이라
      0을 내지 않는다 — fitScore만 ineligible에 0을 준다). 여기를 안 보면 판정이 갈라진다:
      다자녀 국가장학금은 학생이 다자녀가 아니라고 **확실히** 판정됐는데, fitDetail이
      `eligibilityLines`만 읽어 구조화된 자격(flagsAny·tracks)을 못 봐서 '자격 미확인'이 떴다
      (2026-08-26 정렬 검증에서 발견). 미달을 모른다고 말하면 학생이 헛걸음한다. */
-  if (fit === 0) return '<span class="badge badge-fit-no">지원 자격 미달</span>';
-  if (fd.unread) return '<span class="badge badge-fit-unknown">자격 미확인</span>';
+  const verdict = fitVerdict(fit, fd);
+  if (verdict === 'unread') return '<span class="badge badge-fit-unknown">자격 미확인</span>';
+  if (verdict === 'no') return '<span class="badge badge-fit-no">지원 자격 미달</span>';
   /* 🔴 미달은 **숫자가 아니라 fails로** 판정한다 (2026-08-24). 0%를 안 쓰기로 하면서
      `pct === 0`이 영영 참이 되지 않아 '지원 자격 미달' 배지가 통째로 사라졌었다.
      숫자는 순서를 정할 뿐이고 뜻은 배지가 전한다 — 그 뜻의 근거는 fails다. */
-  if (fd.fails && fd.fails.length) return '<span class="badge badge-fit-no">지원 자격 미달</span>';
+  /* 🔴 카드와 상세가 **같은 내용을 다른 분량으로** 말한다 (2026-08-30 개발자 지시).
+     카드는 훑는 자리라 `요건 3/6` 하나로 줄이고, 퍼센트와 '확인 필요'는 상세에 남긴다.
+     ⚠️ 상세까지 줄이면 안 된다 — '확인 필요 n'은 **앱이 모르는 요건이 몇 개인지** 밝히는
+        자리라(원칙 8-1) 화면 어디에도 없으면 "다 확인했다"는 거짓말이 된다.
+     ⚠️ 판정은 새로 만들지 않는다 — 위 `fitVerdict` 갈래를 그대로 지나온 뒤라
+        미달·미확인은 이미 각자 배지로 빠졌다. 여기 남는 것은 비율이 있는 경우뿐이다.
+     ⚠️ 색(fit-*)은 카드에도 그대로 둔다. 다만 `요건 3/6`이 늘 함께 가므로 색만으로 뜻을
+        전하지는 않는다(색각 이상이 있는 학생에게 색은 아무 말도 하지 않는다). */
+  /* 🔴 카드는 **퍼센트만** (2026-08-31 개발자 지시: "요건 없애고 퍼센테이지로").
+     ⚠️ 이건 2026-08-24 결정("숫자만 두지 않는다 — 퍼센트 옆에 근거를 함께")을 카드에서는
+        뒤집는 것이다. 그때 이유는 "적합도 높은 줄 알고 들어갔는데 신청을 못 하면 피로감이
+        쌓인다"였다. 근거는 사라지지 않고 **상세로 내려간다** — 아래 full 갈래가
+        `요건 6개 중 3개 충족 · 확인 필요 3`을 그대로 낸다.
+     ⚠️ 색(fit-*)만으로 뜻을 전하지 않는다 — 퍼센트 숫자가 늘 함께 간다
+        (색각 이상이 있는 학생에게 색은 아무 말도 하지 않는다). */
+  if (!full) return `<span class="badge badge-fit fit-${fitTone(fd.pct)}">적합도 ${fd.pct}%</span>`;
   const note = fd.unknown > 0 ? ` · 확인 필요 ${fd.unknown}` : '';
   return `<span class="badge badge-fit fit-${fitTone(fd.pct)}">적합도 ${fd.pct}% <em>요건 ${fd.total}개 중 ${fd.met}개 충족${note}</em></span>`;
+}
+
+/* 카드에 붙는 판정은 **하나뿐**이다 (2026-09-10 페이스리프트).
+   왜 — 한 카드에 최대 5개가 동시에 붙고 있었다: 적합도 · 교내외 · 마감 · 검수 전 · 신청 완료.
+   배지는 넣기 쉽고 아무도 빼자고 하지 않아 계속 늘었고, 전부 같은 무게라 우선순위가 안 보였다.
+   실측으로 '검수 전'은 등록 48건 중 20건(42%)에 붙어 **내부 검수 공정 상태**가 학생 화면에 나갔다.
+   🔴 판정을 새로 만들지 않는다 — fitVerdict / fitTone 을 그대로 쓴다.
+   🔴 뺀 것들이 사라지는 게 아니다: 교내외는 기관명 줄로, 마감은 글로, '검수 전'은 상세 시트로
+      옮겼다(상세의 badge-kind 가 '교외 · 검수 전'을 이미 낸다). 정직 표기는 그대로 지켜진다. */
+function cardBadgeHtml(fit, fd, myApp) {
+  /* 🔴 신청내역에 **있기만 한 것**을 '신청 완료'라고 부르지 않는다 (2026-09-10 코드 리뷰).
+     '한 번에 신청 준비'로 담은 건은 `pending` 인 채 들어가므로, 신청내역은 '서류 작성 필요'
+     라고 하는데 목록 카드만 '신청 완료'라고 말하고 있었다 — 학생은 다 끝난 줄 알고 넘어간다.
+     ⚠️ 낱말은 신청내역(`stepNow`)이 쓰는 것과 같은 것을 쓴다. */
+  if (myApp) return myApp.pending
+    ? '<span class="badge badge-pending">서류 작성 필요</span>'
+    : '<span class="badge badge-applied">신청 완료</span>';
+  const v = fitVerdict(fit, fd);
+  if (v === 'no') return '<span class="badge badge-fit-no">지원 자격 미달</span>';
+  if (v === 'unread') return '<span class="badge badge-fit-unknown">자격 미확인</span>';
+  /* 퍼센트 — 2026-08-31 개발자 지시('요건 없애고 퍼센테이지로')대로 숫자만.
+     2026-09-10 페이스리프트가 이것을 알약이 아닌 **글자**로 낮췄는데(다섯 장 연속 같은 알약이
+     제목보다 먼저 읽혔다), **2026-09-11 개발자 지시로 다시 알약**이 됐다 — "옅은 회색으로 잘
+     보이지 않음". 모양은 style.css 파일 끝 '적합도 알약' 절이 정한다(여기 클래스 이름은 그대로). */
+  return fd ? '<span class="sch-fit fit-' + fitTone(fd.pct) + '">적합도 ' + fd.pct + '%</span>' : '';
 }
 
 /* ---------------- 카드 렌더링 ---------------- */
 function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
   const meta = STATUS_META[result.status];
   const d = dday(sch.deadline);
-  const applied = state.applications.some((a) => a.id === sch.id);
+  /* 🔴 **'담았다'와 '다 했다'를 가른다** (2026-09-10 코드 리뷰에서 잡았다).
+     예전에는 신청내역에 있기만 하면 '신청 완료' 배지를 달았다. 그런데 '한 번에 신청 준비'로
+     담은 건은 `pending: bulkNeedsWork(sch)` 로 **서류 작성이 남은 채** 들어간다(applyAll).
+     그래서 같은 공고를 **신청내역은 '서류 작성 필요', 목록 카드는 '신청 완료'** 라고
+     서로 다르게 말했다 — 학생은 다 끝난 줄 알고 넘어가고 실제로는 아무것도 제출하지 못한다.
+     ⚠️ 낱말은 신청내역(`stepNow`)이 쓰는 것과 **같은 것을 쓴다** — 여기서 새로 지어내면
+        두 화면이 또 다른 말을 하게 된다. */
+  const myApp = state.applications.find((a) => a.id === sch.id);
+  const badge = cardBadgeHtml(fit, fd, myApp);
+  const due = sch.program ? '상시 제도' : ddayWords(d);
+  /* 금액을 못 읽은 공고가 등록 48건 중 34건(71%)이다. 예전엔 그 자리에 '금액 원문 확인'이
+     카드에서 **가장 굵은 줄**로 떴다 — 템플릿이 자기 빈칸을 읽어 주는 모습이었다.
+     🔴 감추지 않는다(원칙 8-1). 대신 **무게를 낮춘다** — 아는 금액은 굵게, 모르는 것은 옅게. */
+  /* 🔴 숫자가 있다고 다 '아는 금액'이 아니다 — 원문이 통째로 들어온 칸이 있다.
+     실측: '예산 총 5억원 1천만원 범위 내 최소 50만원 최대 400만원'(1인당 금액이 아니다),
+     '등록금 실납부액에 따라 차등지급 자세한 사항은 첨부파일 또는 홈페이지 참…'(잘린 본문).
+     이런 줄을 굵게 쓰면 카드가 확정되지 않은 금액을 확정된 것처럼 말한다.
+     그래서 **짧고 숫자가 있는 것만** 굵게 쓴다. 나머지는 지우지 않고 옅게 남긴다(원칙 8-1). */
+  const amountText = String(sch.amount || '');
+  const known = /\d/.test(amountText) && amountText.length <= 20;
   return `
+    <div class="sch-card-wrap">
+    ${saveBtnHtml(sch.id)}
     <button class="sch-card" data-detail="${sch.id}">
+      ${/* 🔴 맨 윗줄은 **기관명 + 판정 하나**다 (2026-09-10 페이스리프트).
+           교내·교외는 배지를 빼고 기관명 앞에 글로 붙인다 — 배지 줄이 카드를 지배하던 것을
+           끝내면서도 학생이 알아야 할 구분은 남긴다. */ ''}
       <div class="sch-top">
-        <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${sch.type}</span>
-        ${sch.program ? '<span class="badge badge-program">상시 제도</span>' : `<span class="badge badge-dday ${d.cls}">${d.label}</span>`}
-        ${sch.auto ? '<span class="badge badge-auto">자동 등록 · 검수 전</span>' : ''}
-        ${applied ? '<span class="badge badge-applied">신청함</span>' : ''}
-        ${fitBadgeHtml(fit, fd)}
+        <span class="sch-org">${esc(sch.type)} · ${esc(sch.provider)}</span>
+        ${badge}
       </div>
-      <p class="sch-name">${esc(sch.name)}</p>
-      <p class="sch-amount">${esc(sch.amount)}</p>
-      ${compact ? '' : `<p class="sch-provider">${esc(sch.provider)}</p>`}
-      ${/* 🔴 옛 판정 배지('지원 가능 · 선발 심사')를 **카드에서** 뺐다 (2026-08-24).
-           적합도 배지가 생긴 뒤로 한 카드에 판정이 둘이었고 서로 다른 축을 말해서,
-           `자격 미확인`인데 `지원 가능`이 함께 떴다. 학생은 '지원 가능'만 보고 들어갔다가
-           자격이 안 맞으면 헛걸음한다 — 이 앱이 없애려는 바로 그 피로감이다.
-           상세 시트에는 그대로 둔다(거기서는 마감·접수 상태를 함께 읽는다). */ ''}
+      <p class="sch-name">${esc(cardTitle(sch))}</p>
+      ${/* 🔴 마감(D-DAY 카운트)의 자리는 **맨 아랫줄 오른쪽**이다 (2026-09-11 개발자 지시).
+           맨 윗줄은 적합도가 쓰는 자리라 거기 두면 안 된다("적합도와 같은 곳에 있으면 안됨").
+           금액(왼쪽)과 마감(오른쪽)이 한 줄에 나란히 — 학생이 카드에서 마지막으로 읽는 두 숫자다.
+           2026-09-09 에 카드 밑에 두었던 빨간 막대는 같은 지시로 **뺐다**(interactions.js 에서도
+           지웠다 — 남겨 두면 다음 사람이 다시 붙인다). 7일 안쪽은 글자를 빨갛게(urgent) 한다. */ ''}
+      <div class="sch-foot">
+        <span class="sch-amount${known ? '' : ' unknown'}">${esc(sch.amount)}</span>
+        ${due ? `<span class="sch-due${(!sch.program && d.days >= 0 && d.days <= 7) ? ' urgent' : ''}">${esc(due)}</span>` : ''}
+      </div>
+    </button>
+    </div>`;
+}
+
+/* 북마크 단추 — 카드·상세 시트가 **같은 함수**를 쓴다 (2026-09-07).
+   🔴 카드 **바깥**에 둔다. `.sch-card` 가 `<button>` 이라 그 안에 단추를 넣으면
+      단추 안의 단추가 되어(허용되지 않는 구조) 브라우저마다 다르게 깨진다.
+      감싸는 `.sch-card-wrap` 이 자리를 잡아 주고, 누름은 서로 안 겹친다. */
+function saveBtnHtml(id) {
+  const on = isSaved(id);
+  return `<button class="save-btn${on ? ' on' : ''}" data-save="${esc(id)}"
+      aria-pressed="${on}" aria-label="${on ? '저장 해제' : '공고 저장'}">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M6 3h12a1 1 0 0 1 1 1v16.2a.8.8 0 0 1-1.25.66L12 17.3l-5.75 3.56A.8.8 0 0 1 5 20.2V4a1 1 0 0 1 1-1z" />
+      </svg>
     </button>`;
 }
 
+/* ── 홈 '신청서 마저 쓰기' 줄 (2026-09-09 · 개발자 지시 ②) ────────────────────
+   *"장시간 나갔다가 들어온 경우 해당 프로그레스가 저장되어 있었으면 해."*
+   창(4시간)을 넘겨 들어오면 화면은 홈으로 가지만 **쓰던 것은 안 버린다.** 자동으로
+   신청서를 열지 않는 이유는 하나다 — 며칠 만에 앱을 켰는데 반쯤 쓴 폼이 갑자기 뜨면
+   학생이 자기가 어디 있는지 모른다. 그래서 눌러서 들어오는 한 줄로 둔다.
+
+   🔴 여기서 마감·자격을 보고 숨기지 않는다. 이미 쓴 글은 학생 것이고, 마감됐다는 사실은
+      들어간 화면이 제 손으로 말한다. 숨기면 쓴 글이 사라진 것처럼 보인다. */
+function renderResumeCard() {
+  const el = $('#home-resume');
+  if (!el) return;
+  const saved = typeof resumeLoad === 'function' ? resumeLoad() : null;
+  const prog = saved && saved.form;
+  const alive = typeof resumeProgressAlive === 'function' && resumeProgressAlive(prog, Date.now());
+  const sch = alive && findSch(prog.schId);
+  if (!sch) { el.hidden = true; return; }
+
+  el.hidden = false;
+  el.innerHTML = `
+    <span class="rc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 15h6"/></svg></span>
+    <span class="rc-body">
+      <span class="rc-title">쓰던 신청서가 있어요</span>
+      <span class="rc-sub">${esc(sch.name || sch.title || '')} · ${esc(agoLabel(prog.at))}에 쓰던 것</span>
+    </span>
+    <span class="rc-go">신청서 마저 쓰기</span>`;
+  el.onclick = () => { openSheetShell(); startFormFill(sch, prog); };
+}
+
+/* '5분 전'·'어제' 처럼 사람이 읽는 말로. 🔴 지어내지 않는다 — 못 재면 빈 말을 하지 않고
+   '전에'라고만 한다(원칙 8-1). */
+function agoLabel(ts) {
+  const ms = Date.now() - Number(ts || 0);
+  if (!isFinite(ms) || ms < 0) return '조금 전';
+  const min = Math.floor(ms / 60000);
+  if (min < 1) return '방금';
+  if (min < 60) return `${min}분 전`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `${hr}시간 전`;
+  const day = Math.floor(hr / 24);
+  return day === 1 ? '어제' : `${day}일 전`;
+}
+
 /* ---------------- 홈 ---------------- */
+/* 홈 목록에 펴 두는 장수 (노션 UI-14). 접으면 셋, 펴면 열까지 —
+   그 위는 '전체 보기'(장학금 찾기)가 맡는다.
+   ⚠️ 이름의 DEADLINE 과 `#home-deadline-list` 표식은 **일부러 그대로 둔다** — 구획 이름이
+      '마감 임박'이던 시절의 이름이지만, 여기에 붙은 style.css 규칙과 검사 드라이버가 이미
+      있어 이름을 바꾸면 통째로 떨어져 나간다(설정 화면의 `#my-account` 와 같은 이유). */
+const HOME_DEADLINE_TOP = 3;
+const HOME_DEADLINE_MORE = 10;
+let homeDeadlineOpen = false;
+
+/* 🔴 홈의 차례는 **적합도와 마감일을 한 점수로 묶어** 내림차순이다 (2026-09-17 개발자 지시:
+   "마감임박이라는 수치를 지우고 … 적합도와 마감일을 모두 고려하여 내림차순으로 정렬").
+   그전에는 '마감 7일 안쪽인가'(dday 의 cls 'urgent')가 **1차 키**라, 7일 안쪽이기만 하면
+   적합도가 아무리 낮아도 바깥의 어떤 공고보다 위였다 — 실측(한국외대 프로필)에서
+   `50% D-11` 이 `15% D-1`·`20% D-1` **아래**였다. 게다가 그 칸 안은 적합도순이라
+   구획 제목('마감 임박')과 실제 차례가 서로 다른 말을 하고 있었다(개발자 지적).
+   지금은 둘을 한 자로 잰다 — **적합도 1%p 를 마감 하루로 친다.**
+       점수 = 적합도 − 남은 날   (한 달 너머로 남은 것은 다 같이 '아직 멀다')
+   같은 적합도면 마감이 가까운 것이 위로 오고(옛 동점 규칙 그대로), 적합도가 크게 앞서면
+   마감이 조금 멀어도 위에 남는다. 2026-09-12 지적("적합도가 낮아도 마감이 임박하면 홈에
+   뜬다 — 학생 입장에서는 '굳이…' 다")과 이번 지시를 **식 하나**가 함께 지킨다.
+   🔴 **판정을 새로 만들지 않는다** — 적합도는 카드 배지·탐색 정렬과 같은 `m.fit`·`fitRank`,
+      남은 날은 `dday()` 다. 여기서 문턱을 새로 정하면 홈과 장학금 찾기가 다른 말을 한다.
+   🔴 **마감을 모르는 공고에 `dday().days` 를 쓰지 말 것** — 그 값은 목록에서 안 사라지게
+      하려고 주는 **가짜 14**다(dday() 주석·CLAUDE.md). 순서에 쓰면 '한 달 뒤 마감'보다
+      위로 올라가 우리가 모르는 날짜를 아는 척하게 된다(원칙 8-1). 그래서 마감이 **적힌**
+      공고만 남은 날을 세고, 안 적힌 공고(상시 제도·기한 원문 확인)는 지평선으로 둔다. */
+const HOME_FIT_DAY_HORIZON = 30;
+function homeScore(m) {
+  const left = m.sch.deadline
+    ? Math.min(HOME_FIT_DAY_HORIZON, Math.max(0, dday(m.sch.deadline).days))
+    : HOME_FIT_DAY_HORIZON;
+  return m.fit - left;
+}
+/* 🔴 미달·자격 미확인은 점수와 무관하게 **아래**다 (2026-08-26 개발자 결정 — 탐색
+   '적합도순'과 같은 `fitRank`). 이게 없으면 마감이 가까운 '지원 자격 미달' 카드가
+   홈 맨 위에 앉는다 — 적합도를 고려한다면서 미달을 맨 위에 두는 셈이 된다.
+   ⚠️ 이 함수를 베끼지 말 것 — 검사 드라이버도 이것을 그대로 불러 차례를 대조한다. */
+const byHomeOrder = (a, b) =>
+  fitRank(a) - fitRank(b) || homeScore(b) - homeScore(a) || byDeadline(a, b);
+
 function renderHome() {
   const p = state.profile;
-  $('#home-greet').textContent = p.name ? `${p.name}님, 안녕하세요!` : '안녕하세요!';
+  /* 🔴 이름이 없으면 인사말로 때우지 않는다 — 이름은 신청서에도 들어가는 값이라
+     비어 있다는 사실 자체를 알려야 한다. 이 줄은 이미 눌러서 프로필로 가는 자리다. */
+  $('#home-greet').textContent = p.name ? `${p.name}님` : '이름 설정';
   $('#home-school').textContent = (p.school || '대학 미설정') + (p.campus ? ' · ' + p.campus : '');
-  $('#home-avatar').textContent = (p.name || '학').charAt(0);
+  /* 프로필 사진이 있으면 홈 왼쪽 위 동그라미에도 그 사진 (2026-09-11) — 없으면 첫 글자 그대로 */
+  if (profilePhoto && profilePhoto.url) $('#home-avatar').innerHTML = `<img src="${esc(profilePhoto.url)}" alt="" />`;
+  else $('#home-avatar').textContent = (p.name || '학').charAt(0);
 
   const matches = getMatches();
   /* '지금 받을 수 있는' 이라고 말하려면 **정말 지금 신청할 수 있어야** 한다 (2026-08-02 개발자 지적).
@@ -675,32 +1457,80 @@ function renderHome() {
   const applyable = matches.filter((m) =>
     ['eligible', 'selective'].includes(m.result.status) && dday(m.sch.deadline).days >= 0 && notStale(m.sch));
   const notApplied = applyable.filter((m) => !state.applications.some((a) => a.id === m.sch.id));
-  const total = applyable.reduce((sum, m) => sum + (m.sch.amountValue || 0), 0);
-  const unknownAmt = applyable.filter((m) => !m.sch.amountValue).length;
 
-  countUp($('#hero-amount'), total, (v) => `최대 ${won(v)}`);
-  $('#hero-count').textContent = `바로 신청 ${applyable.filter((m) => m.result.status === 'eligible').length}건 · 선발 심사형 ${applyable.filter((m) => m.result.status === 'selective').length}건${unknownAmt ? ` · 금액 미확인 ${unknownAmt}건 제외` : ''}`;
+  /* 🔴 합계는 **더하기가 아니라 고르기**다 (2026-08-27 · parse-amount.js).
+     그냥 다 더하면 ① 같은 장학금이 여러 학교 접수분으로 등록된 것(가송재단 5건)을
+     5번 세고 ② 원문이 '함께 받을 수 없다'고 적은 공고까지 다 더한다.
+     학생이 실제로 받을 수 없는 숫자를 '지금 받을 수 있는 장학금'이라 부르는 것은
+     기망이고 법적 책임이 따른다(개발자 지적). sumAmounts 가 그 둘을 걸러 준다. */
+  /* 🔴 `estimate: true` — 못 읽은 금액을 **우리가 읽은 금액들의 중앙값**으로 어림잡아
+     합계에 넣는다 (2026-09-17 개발자 지시). 켜는 곳은 여기 하나다: 금액 상세·관리자
+     화면·감사는 켜지 않으므로 거기서는 확인된 금액만 더한 숫자가 그대로 보인다.
+     짐작이 데이터에 남지 않는 이유와 근거는 parse-amount.js sumAmounts ④ 참조. */
+  const bill = sumAmounts(applyable.map((m) => m.sch),
+    { tuition: tuitionFor(p, tuitionTable), estimate: true });
+  const total = bill.total;
+  lastBill = { bill, count: applyable.length };
+
+  /* 🔴 어림잡은 몫이 섞였으면 **'약'** 을 붙인다 (2026-09-17). 설명 문장은 개발자 지시로
+     걷어냈지만, 짐작한 숫자를 확인한 숫자처럼 적는 것은 다른 문제다(원칙 8-1) — 글자
+     하나로 그 선을 지킨다. 어떻게 어림잡았는지는 금액 상세를 열면 나온다. */
+  const heroPre = bill.assumedWon > 0 ? '약 ' : '최대 ';
+  countUp($('#hero-amount'), total, (v) => `${heroPre}${won(v)}`);
+  /* 🔴 아랫줄에서 **금액 회계 이야기를 뺐다** (2026-09-17 개발자 지시: "'금액을 아직 못
+     읽은 4건은 뺀 금액~' 와 같은 설명을 전체 삭제"). '금액을 아직 못 읽은 4건은 뺀
+     금액이에요'·'확인된 금액만 더한 금액이에요' 둘 다 **우리 수집 공정 이야기**였다 —
+     학생이 홈에서 가장 먼저 읽는 문장이 앱의 내부 사정일 이유가 없다.
+     🔴 정직함은 자리를 옮긴 것이지 사라진 게 아니다: 어림잡은 몫은 위의 '약'이,
+        무엇을 못 읽었는지는 **금액 상세**가, 몇 건인지는 **관리자 화면**이 말한다.
+     ⚠️ 남는 한 줄('그중 n건은 바로 신청할 수 있어요')은 내부 사정이 아니라 **학생이 할 수
+        있는 일**이라 그대로 둔다. 되돌려 금액 문장을 다시 넣지 말 것 — 관문이 막는다. */
+  const nEligible = applyable.filter((m) => m.result.status === 'eligible').length;
+  $('#hero-label').textContent = `지금 신청할 수 있는 장학금 ${applyable.length}건`;
+  $('#hero-count').textContent = nEligible ? `그중 ${nEligible}건은 바로 신청할 수 있어요` : '';
 
   const btn = $('#btn-apply-all');
   btn.disabled = notApplied.length === 0;
-  btn.textContent = notApplied.length ? `⚡ ${notApplied.length}건 한 번에 신청 준비하기` : '✓ 가능한 장학금을 모두 준비했어요';
+  /* 버튼은 **누르면 무슨 일이 나는지**만 말한다 (2026-08-30 개발자 지시).
+     '⚡ 한 번에 모두 신청 준비하기'에서 이모지·'한 번에'·'모두'는 전부 앱의 감탄이지
+     학생이 얻는 정보가 아니었다. 남는 것은 건수와 동사뿐이다. */
+  btn.textContent = notApplied.length ? `${notApplied.length}건 신청 준비` : '준비할 장학금이 남아 있지 않아요';
 
-  const upcoming = applyable
-    .filter((m) => dday(m.sch.deadline).days >= 0 && notStale(m.sch))
-    .sort((a, b) => deadlineTs(a.sch) - deadlineTs(b.sch))
-    .slice(0, 3);
-  $('#home-deadline-list').innerHTML = upcoming.length
+  renderResumeCard();
+
+  /* 담을 것은 그대로다 — 자격이 확실히 미달인 것과 이미 마감된 것, 오래된 것만 뺀다.
+     차례는 위 `byHomeOrder`(적합도 + 마감일 한 점수) 하나가 정한다. */
+  const upcomingAll = matches
+    .filter((m) => m.result.status !== 'ineligible' && dday(m.sch.deadline).days >= 0 && notStale(m.sch))
+    .sort(byHomeOrder);
+  /* 석 장만 펴 두고 나머지는 '더보기' 로 편다 — 그려는 두고 CSS 가 가린다(style.css).
+     ⚠️ `HOME_DEADLINE_MORE` 를 넘는 것은 '전체 보기'(장학금 찾기)가 맡는다. */
+  const upcoming = upcomingAll.slice(0, HOME_DEADLINE_MORE);
+  /* ⚠️ 여기에는 뼈대를 두지 않는다 (2026-09-09 실측). 처음엔 "공고가 오기 전에 홈이
+     '없음'이라고 말한다"고 보고 뼈대를 넣었는데, 실제로 재 보니 **그런 일이 없었다** —
+     `allScholarships()` 가 data.js 의 상시 제도 6종을 동기로 먼저 내주기 때문에
+     이 목록은 받아오기 중에도 비지 않는다. 뼈대는 실제로 기다림이 보이는
+     `liveNoticesHtml()` 한 곳에만 둔다. */
+  const deadlineList = $('#home-deadline-list');
+  deadlineList.innerHTML = upcoming.length
     ? upcoming.map((m) => schCard(m.sch, m.result, { compact: true, fit: m.fit, fd: m.fd })).join('')
-    : '<p class="empty">지금 신청 가능한 장학금이 없어요. 프로필을 업데이트해 보세요.</p>';
+    : '<p class="empty">지금 신청할 수 있는 장학금이 없어요<br /><span class=\"empty-sub\">프로필을 채우면 더 많이 찾을 수 있어요</span></p>';
+  /* 앞의 HOME_DEADLINE_TOP 장을 뺀 나머지에 표를 붙인다 — 가리는 것은 style.css 가 한다.
+     '몇 장'은 이 상수 하나에만 산다(CSS 에 숫자를 두면 둘이 갈라진다). */
+  [...deadlineList.children].forEach((el, i) => el.classList.toggle('home-extra', i >= HOME_DEADLINE_TOP));
+  deadlineList.classList.toggle('more-open', homeDeadlineOpen);
+  const moreBtn = $('#home-deadline-more');
+  moreBtn.hidden = upcoming.length <= HOME_DEADLINE_TOP;
+  moreBtn.textContent = homeDeadlineOpen ? '접기' : '더보기';
+  moreBtn.setAttribute('aria-expanded', homeDeadlineOpen ? 'true' : 'false');
 
-  const recent = state.applications.slice(-2).reverse().filter((a) => findSch(a.id));
-  $('#home-apps').innerHTML = recent.length
-    ? recent.map(appCard).join('')
-    : '<p class="empty">아직 준비한 장학금이 없어요.</p>';
+  renderHomeUpdated();
 }
 
 /* ---------------- 탐색 ---------------- */
 let exploreFilter = 'all';
+/* 검색어 — 필터·정렬과 같은 성격으로 **저장하지 않는다**(새로고침하면 빈 값) */
+let exploreQuery = '';
 /* 정렬 기준 — 필터와 같은 성격으로 **저장하지 않는다**(새로고침하면 기본값). */
 let exploreSort = 'fit';
 
@@ -717,7 +1547,7 @@ function byMissingLast(va, vb, dir) {
   return va < vb ? -dir : va > vb ? dir : 0;
 }
 /* 🔴 이미 마감된 공고는 '마감 임박순'에서 **뒤로** 보낸다 (2026-08-26 스크린샷으로 발견).
-   마감 7일까지는 목록에 남기는 규칙(CLOSED_KEEP_DAYS) 때문에, 그냥 날짜 오름차순으로 두면
+   마감 다음 날까지는 목록에 남기는 규칙(CLOSED_KEEP_DAYS) 때문에, 그냥 날짜 오름차순으로 두면
    **지나간 공고가 맨 위**에 온다. '임박'은 다가온다는 뜻이지 지나갔다는 뜻이 아니다.
    지난 것끼리는 최근에 마감된 것부터 (아직 접수를 받을 여지가 그나마 크다). */
 const isPastDue = (d) => !!d && dday(d).days < 0;
@@ -758,11 +1588,6 @@ function closeSortMenu() {
   $('#explore-sort-btn').setAttribute('aria-expanded', 'false');
 }
 
-/* 누를 때마다 다음 기준으로 — 셋을 돌고 처음으로 */
-function cycleSort() {
-  applySort(SORT_KEYS[(SORT_KEYS.indexOf(exploreSort) + 1) % SORT_KEYS.length]);
-}
-
 function applySort(key) {
   if (!EXPLORE_SORTS[key]) return;
   exploreSort = key;
@@ -771,20 +1596,41 @@ function applySort(key) {
   closeSortMenu();
 }
 
+/* 금액 상세에서 고른 공고를 장학금 찾기 화면에서 찾아 보여 준다 (2026-08-27).
+   못 찾으면 아무 일도 안 일어나게 두지 않고 그 공고 상세를 연다 —
+   '눌렀는데 아무 반응 없음'이 학생에게는 고장으로 보인다. */
 function renderExplore() {
   const matches = getMatches();
-  const order = { eligible: 0, selective: 0, unknown: 1, ineligible: 2 };
   const sorter = EXPLORE_SORTS[exploreSort] || EXPLORE_SORTS.fit;
+  /* 🔴 **'우리 학교' 는 별도 칸이다** (2026-09-12 개발자 지시 · 노션 UI-16:
+     "교내/교외가 있는 것처럼 칸을 하나 더 만들어 뺀다").
+     이 칸에 담기는 것은 우리가 등록한 공고가 아니라 **수집 로봇이 학교 게시판에서 매일 줍는
+     글 목록**이다 — 적합도도, 마감 판정도, 신청 준비도 없다(원문 링크만 준다).
+     예전에는 '전체' 목록 **아래에** 붙어 있어 카드 수십 장을 지나야 보였다.
+     🔴 이 칸에서는 **정렬 버튼을 감춘다** — 적합도·마감이 없는 목록에 '적합도순'을 띄우면
+        방금(같은 날) 고친 지적("정렬 이런 거 하나도 안 지켜짐")을 그대로 되풀이하는 것이다.
+     🔴 검색은 그대로 걸린다(liveNoticesHtml 이 제목·학교로 거른다) — 화면에 검색창이
+        떠 있는데 안 걸리면 그것도 앱이 제 말을 안 지키는 것이다. */
+  const noticeTab = exploreFilter === 'notice';
+  { const b = $('#explore-sort-btn'); if (b) b.hidden = noticeTab; }
+  if (noticeTab) {
+    $('#explore-list').innerHTML = '';
+    $('#live-notices').innerHTML = liveNoticesHtml(exploreQuery);
+    closeSortMenu();
+    return;
+  }
   /* 🔴 판정 3단(가능/정보부족/미달)은 **적합도순일 때만** 1차 키다 (2026-08-26 개발자 결정:
      "적합도를 기준으로 했을 때는 맨 아래에 두는 게 맞지"). 마감순·최신순에서는 고른 기준이
      곧이곧대로 적용된다 — 마감 임박순인데 미달이라고 뒤로 밀면 그 정렬은 거짓말이 된다.
      미달 카드는 빨간 '지원 자격 미달' 배지로 구분되므로 위로 와도 오해하지 않는다. */
+  /* 🔴 정렬도 **배지와 같은 근거**(fitVerdict)를 쓴다 — `order[status]` 만 보면
+     배지가 '미달'인 카드와 '적합도 N%'인 카드가 뒤섞인다(2026-08-29에 실제로 그랬다). */
   let list = matches.slice().sort((a, b) =>
-    (exploreSort === 'fit' ? order[a.result.status] - order[b.result.status] : 0)
+    (exploreSort === 'fit' ? fitRank(a) - fitRank(b) : 0)
     || sorter.cmp(a, b)
   );
 
-  list = list.filter((m) => dday(m.sch.deadline).days >= -CLOSED_KEEP_DAYS); // 마감 1주일 경과 시 자동 숨김
+  list = list.filter((m) => dday(m.sch.deadline).days >= -CLOSED_KEEP_DAYS); // 마감 다음 날까지만 (그 뒤로는 신청 내역에서)
   list = list.filter((m) => notStale(m.sch)); // 마감을 확정 못 한 공고는 등록 후 60일까지만 노출
   if (exploreFilter === '교내' || exploreFilter === '교외') list = list.filter((m) => m.sch.type === exploreFilter);
   /* '신청 가능만'은 **정말 지금 신청할 수 있는 것**만 보여야 한다 (2026-08-02 개발자 지적).
@@ -794,10 +1640,43 @@ function renderExplore() {
     list = list.filter((m) => ['eligible', 'selective'].includes(m.result.status) && dday(m.sch.deadline).days >= 0);
   }
 
-  $('#live-notices').innerHTML = exploreFilter === 'all' ? liveNoticesHtml() : '';
+  /* 검색 (2026-08-30) — 정렬·필터가 다 끝난 **마지막에** 거른다.
+     ⚠️ 순서를 앞으로 옮기지 말 것: 마감·오래된 공고 숨김은 검색 결과에도 적용돼야 한다.
+        검색으로 마감된 공고가 나오면 '있는 줄 알고 눌렀다 마감'이 된다.
+     ⚠️ 색인을 따로 만들지 않는다 — 카드에 실제로 **보이는 글자**(제목·기관·금액)만 본다.
+        학생이 화면에서 읽은 낱말로 찾는 것이 검색이고, 안 보이는 값으로 걸리면 왜 나왔는지 모른다. */
+  const q = exploreQuery.trim().toLowerCase();
+  if (q) {
+    list = list.filter((m) => [m.sch.name, m.sch.provider, m.sch.amount]
+      .filter(Boolean).join(' ').toLowerCase().includes(q));
+  }
+
+  /* 실시간 공고는 이제 **제 칸('우리 학교')에서만** 나온다 — 위에서 먼저 돌려보낸다.
+     예전에는 '전체' 목록 아래에 붙였는데, 개발자 지시로 칸을 나눴다(노션 UI-16). */
+  $('#live-notices').innerHTML = '';
+  /* ⚠️ 홈과 같은 이유로 여기에도 뼈대를 두지 않는다 — 이 목록은 받아오기 중에도 비지 않는다
+     (renderHome 의 같은 자리 주석 참조). 뼈대는 `liveNoticesHtml()` 한 곳이다. */
+  /* 🔴 **구획 없이 한 목록이다** (2026-09-12 개발자 지시: "오늘 내일 마감 이번 주 마감
+     이번 달 마감 삭제 후 하나로 통합, 적합도 순 마감 임박순 이런 거 하나도 안 지켜짐").
+     2026-09-10 페이스리프트가 마감으로 7구획을 나눴는데, 구획이 **마감 순서로 고정**이라
+     학생이 고른 정렬은 구획 **안에서만** 살아 있었다 — 적합도순을 골라도 화면 맨 위는
+     늘 '오늘·내일 마감' 구획이라 정렬이 통째로 안 먹는 것처럼 보였다(그게 지적 그대로다).
+     정렬은 이제 위 sort 하나가 목록 전체에 그대로 적용된다.
+     ⚠️ 구획을 되살리려면 정렬을 어떻게 살릴지부터 정할 것 — 둘은 같은 자리를 두고 다툰다. */
   $('#explore-list').innerHTML = list.length
     ? list.map((m) => schCard(m.sch, m.result, { fit: m.fit, fd: m.fd })).join('')
-    : '<p class="empty">조건에 맞는 장학금이 없어요.</p>';
+    : `<p class="empty">${q ? `'${esc(exploreQuery.trim())}'와 맞는 장학금이 없어요` : '조건에 맞는 장학금이 없어요'}</p>`;
+}
+
+/* 🔴 '전체 목록을 보여 주겠다'고 **말한 곳**에서 부른다 (도우미의 '장학금 탭에서 전체 보기' ·
+   알림이 공고를 못 찾았을 때). 고른 칸은 화면을 옮겨도 그대로 남는 것이 맞지만(교내·교외도
+   그렇다), 그 칸이 '우리 학교'면 전체 목록을 약속해 놓고 **학교 게시판 글 목록**을 띄우게 된다
+   — 2026-09-12 코드 리뷰가 실측으로 잡은 길이다(카드 0장짜리 화면이 떴다). */
+function exploreShowAll() {
+  exploreFilter = 'all';
+  $$('#explore-filters .filter-chip').forEach((c) => c.classList.toggle('active', c.dataset.filter === 'all'));
+  showScreen('explore');
+  renderExplore();
 }
 
 /* ---------------- 서류 도우미 (AI 초안 작성) ---------------- */
@@ -873,10 +1752,10 @@ function certStatusListHtml(sch) {
     if (st && st.ok) return `<li class="doc-ok">✓ ${name} — ${st.text}</li>`;
     if (st) return `<li class="doc-miss">□ ${name} — ${st.text}</li>`;
     if (/자동/.test(doc)) return `<li>△ ${name} — 학교·재단 연동 후 자동 첨부 (또는 보관함에 올려두세요)</li>`;
-    return `<li>□ ${doc} — 공식 제출 시 함께 준비하세요</li>`;
+    return `<li>□ ${esc(doc)} — 공식 제출 시 함께 준비하세요</li>`;
   }).join('');
   return `<h4>증명서류 체크리스트</h4><ul class="doc-list">${rows}</ul>
-    <p class="dp-note">보관함(MY 탭)에 올려둔 서류는 다음 신청부터 자동으로 함께 준비돼요.</p>`;
+    <p class="dp-note">보관함(MY 탭) 서류는 다음 신청부터 자동 첨부.</p>`;
 }
 
 function personLine(p) {
@@ -935,11 +1814,11 @@ function renderDocPrep() {
     sheet.innerHTML = `
       <div class="sheet-handle"></div>
       <div class="sheet-body">
-        <h3 class="sheet-title">서류 작성 도우미</h3>
-        <p class="sheet-provider">${sch.name} · 답을 고르면 그 답으로 초안 문장을 엮어 드려요</p>
+        <h3 class="sheet-title">서류 작성</h3>
+        <p class="sheet-provider">${esc(sch.name)} · 고른 답으로 초안 문장을 엮습니다</p>
         ${docPrep.defs.map((def, di) => `
           <div class="dp-block">
-            <h4>${def.doc}</h4>
+            <h4>${esc(def.doc)}</h4>
             ${def.questions.map((q) => `
               <div class="field">
                 <span class="field-label">${q.label}</span>
@@ -949,7 +1828,7 @@ function renderDocPrep() {
               </div>`).join('')}
             <label class="field">
               <span class="field-label">직접 추가할 내용 (선택)</span>
-              <textarea class="dp-extra" data-def="${di}" rows="2" placeholder="넣고 싶은 문장을 자유롭게 적어주세요"></textarea>
+              <textarea class="dp-extra" data-def="${di}" rows="2" placeholder="추가할 문장을 직접 적을 수 있습니다"></textarea>
             </label>
           </div>`).join('')}
         <button class="btn btn-primary btn-lg" id="btn-dp-generate">초안 문장 만들기</button>
@@ -973,16 +1852,16 @@ function renderDocPrep() {
     sheet.innerHTML = `
       <div class="sheet-handle"></div>
       <div class="sheet-body">
-        <h3 class="sheet-title">이대로 제출 준비할까요?</h3>
-        <p class="sheet-provider">${sch.name} · 내용을 자유롭게 수정할 수 있어요</p>
+        <h3 class="sheet-title">작성 내용 확인</h3>
+        <p class="sheet-provider">${esc(sch.name)} · 내용을 직접 수정할 수 있습니다</p>
         ${docPrep.texts.map((t, i) => `
           <div class="dp-block">
-            <h4>${t.doc}</h4>
+            <h4>${esc(t.doc)}</h4>
             <textarea class="dp-text" data-i="${i}" rows="10">${esc(t.text)}</textarea>
           </div>`).join('')}
         ${certStatusListHtml(sch)}
-        <button class="btn btn-primary btn-lg" id="btn-dp-confirm">✓ 이대로 신청 준비 완료</button>
-        <p class="dp-note">완료하면 작성한 서류가 저장되고, 최종 제출처를 안내해 드려요.</p>
+        <button class="btn btn-primary btn-lg" id="btn-dp-confirm">이대로 신청 준비 완료</button>
+        <p class="dp-note">완료하면 작성한 서류가 저장되고 최종 제출처가 표시됩니다.</p>
       </div>`;
 
     $$('.dp-text').forEach((ta) =>
@@ -1000,14 +1879,52 @@ function renderDocPrep() {
 /* ---------------- 실제 양식 채움 플로우 ---------------- */
 let formFill = null; // { schId, stage:'q'|'preview', ans }
 
-function startFormFill(sch) {
+function startFormFill(sch, restore) {
   formFill = { schId: sch.id, stage: 'q', ans: null };
   /* 프로필이 바뀌었을 수 있으니 질문 설계를 다시 짠다 */
   if (typeof formInvalidatePlan === 'function') formInvalidatePlan();
-  renderFormFill();
+  renderFormFill(restore);
 }
 
-function renderFormFill() {
+/* ── 쓰던 신청서를 적어 둔다 (2026-09-09 · 이어보기 3겹) ─────────────────
+   개발자 지시: *"신청서 혹은 앱 내에서 어떠한 작업을 진행 중, 장시간 나갔다가 들어온
+   경우 해당 프로그레스가 저장되어 있었으면 해."*
+
+   🔴 **'만들기'를 누를 때 저장하는 것으로는 늦다.** 학생은 아무것도 누르지 않고 나간다
+      (증명서를 떼러 가는 것이 이 앱에서 가장 흔한 이탈이다). 그래서 **치는 동안**
+      적는다 — 그러지 않으면 크레딧을 낸 AI 초안까지 통째로 사라진다.
+   ⚠️ 글자마다 저장하면 긴 자소서에서 버벅인다. 잠깐 멈췄을 때만 적는다(디바운스). */
+let formSaveTimer = null;
+function formProgressSave(now) {
+  if (!formFill || typeof resumeSave !== 'function') return;
+  clearTimeout(formSaveTimer);
+  const run = () => {
+    if (!formFill) return;
+    /* 🔴 **질문 화면이 진짜 떠 있을 때만** 모은다. 시트는 하나를 돌려 쓰므로, 다른 내용이
+       올라온 뒤에 모으면 칸이 하나도 없어 **빈 답이 좋은 답을 덮는다**(코드 리뷰). */
+    if (formFill.stage === 'q' && !$('#btn-ff-generate')) return;
+    const sch = findSch(formFill.schId);
+    const tplId = sch && formTplIdFor(sch);
+    const tpl = tplId && FORM_TEMPLATES[tplId];
+    if (!tpl) return;
+    /* 미리보기 단계에서는 화면에 질문 칸이 없다 — 그때는 이미 모아 둔 답을 그대로 적는다 */
+    const ans = formFill.stage === 'q' ? collectFormAnswers(tpl) : formFill.ans;
+    if (!ans) return;
+    resumeSave({
+      sheet: { kind: 'form', id: formFill.schId },
+      form: { schId: formFill.schId, tplId: tplId, stage: formFill.stage, ans: ans, at: Date.now() },
+    });
+  };
+  if (now) run(); else formSaveTimer = setTimeout(run, 700);
+}
+
+/* 다 썼다 — 쓰던 것 표시를 지운다 (이제 신청내역에 정식으로 들어갔다) */
+function formProgressClear() {
+  clearTimeout(formSaveTimer);
+  if (typeof resumeSave === 'function') resumeSave({ form: null, sheet: null });
+}
+
+function renderFormFill(restore) {
   const sch = findSch(formFill.schId);
   const tpl = FORM_TEMPLATES[formTplIdFor(sch)];
   const sheet = $('#detail-sheet');
@@ -1016,16 +1933,48 @@ function renderFormFill() {
     sheet.innerHTML = `
       <div class="sheet-handle"></div>
       <div class="sheet-body">
-        <h3 class="sheet-title">${tpl.unofficial ? '지원문서 작성 도우미' : '양식 작성 도우미'}</h3>
-        <p class="sheet-provider">${esc(tpl.title)} · ${tpl.unofficial ? '자유 형식 제출 공고라 이 문서를 그대로 제출할 수 있어요' : '실제 공고 양식과 동일한 문서가 만들어져요'}</p>
+        <h3 class="sheet-title">${tpl.unofficial ? '지원문서 작성' : '양식 작성'}</h3>
+        <p class="sheet-provider">${esc(tpl.title)} · ${tpl.unofficial ? '자유 형식 제출 공고 — 이 문서를 그대로 제출할 수 있습니다' : '실제 공고 양식과 같은 구조로 만들어집니다'}</p>
         ${formQuestionsHtml(tpl)}
         ${typeof essayButtonHtml === 'function' ? essayButtonHtml(tpl) : ''}
         <button class="btn btn-primary btn-lg" id="btn-ff-generate">양식 문서 만들기</button>
-        <p class="dp-note">앱이 이미 아는 정보는 묻지 않고 채워요 — 위 '프로필에서 채웠어요'를 열어 확인·수정할 수 있어요.</p>
+        <p class="dp-note">이미 아는 정보는 묻지 않고 자동으로 채웁니다 — 위 '프로필에서 자동으로 채운 항목'에서 확인·수정할 수 있습니다.</p>
       </div>`;
+    /* 잠깐 나갔다 온 학생의 답을 그대로 되돌려 넣는다 (AI 초안도 같은 칸에 있어 함께 온다).
+       🔴 `essayBind` **앞에** 둔다 — 뒤에 두면 초안 도우미가 이미 읽어 간 값과 어긋난다. */
+    if (restore && restore.ans && typeof fillFormAnswers === 'function') {
+      const n = fillFormAnswers(tpl, restore.ans);
+      /* 되살렸다고 말하는 것은 **앱을 다시 열었을 때뿐**이다. '질문 다시 보기'로 돌아온
+         학생에게는 당연한 일이라 알릴 것이 없다(quiet). */
+      if (n && !restore.quiet) toast('쓰던 신청서를 그대로 불러왔어요');
+    }
     /* AI 초안 버튼 — essay-config.js 의 endpoint 가 비어 있으면 버튼 자체가 없다 */
     if (typeof essayBind === 'function') essayBind(tpl, sch);
-    $('#btn-ff-generate').addEventListener('click', () => {
+    /* 들어온 순간에도 한 번 적는다 — 자동으로 채운 값부터 남는다.
+       치는 동안의 저장은 bindEvents 의 **위임 리스너 하나**가 맡는다:
+       여기서 걸면 단계를 오갈 때마다 리스너가 쌓인다(시트는 innerHTML 만 갈린다). */
+    formProgressSave(true);
+    $('#btn-ff-generate').addEventListener('click', (e) => {
+      /* 제출 전 점검(1순위) — 그대로 내면 사고가 나는 것(빈칸 [ ]·블라인드에 학교명)이
+         있으면 한 번 세운다. 막지 않는다 — 다시 누르면 진행된다(이 앱의 방식). */
+      if (typeof essaySubmitReadiness === 'function') {
+        const chk = essaySubmitReadiness(tpl, sch);
+        const gen = e.currentTarget;
+        /* 🔴 '한 번 봤다'를 무엇에 대해 봤는지까지 기억한다 (2026-08-29 코드 리뷰 지적).
+           예전에는 `forced` 를 한 번 켜면 영영 안 껐다 — 그래서 학생이 그 뒤에 AI 초안을
+           새로 받아 `[봉사 기관명]` 이 **새로 생겨도** 관문이 두 번째부터는 아무 말 없이
+           통과시켰다. 막을 것이 달라지면 다시 한 번 세운다(같은 것이면 그대로 진행). */
+        const sig = (chk && chk.items || []).filter((i) => i.status === 'block')
+          .map((i) => `${i.id}:${i.detail}`).join('|');
+        if (chk && !chk.submittable && gen.dataset.forced !== sig) {
+          gen.dataset.forced = sig;
+          if (typeof essayRenderSubmitCheck === 'function') essayRenderSubmitCheck(tpl, sch);
+          const panel = $('#essay-submit-check');
+          if (panel) panel.scrollIntoView({ block: 'center', behavior: 'smooth' });
+          toast('먼저 고칠 곳이 있습니다 — 위 점검표를 확인해 주세요 (다시 누르면 그대로 진행됩니다)');
+          return;
+        }
+      }
       formFill.ans = collectFormAnswers(tpl);
       /* '다음 신청서에도 쓸게요'를 켜 둔 항목은 프로필에 남긴다 —
          두 번째 신청서부터는 그 질문이 아예 안 나온다 (기기 안에만 저장) */
@@ -1033,21 +1982,28 @@ function renderFormFill() {
       if (kept) { saveState(); if (typeof formInvalidatePlan === 'function') formInvalidatePlan(); }
       formFill.stage = 'preview';
       renderFormFill();
+      formProgressSave(true);   /* 미리보기로 넘어간 것도 진행분이다 */
     });
   } else {
     sheet.innerHTML = `
       <div class="sheet-handle"></div>
       <div class="sheet-body">
-        <h3 class="sheet-title">이대로 제출 준비할까요?</h3>
-        <p class="sheet-provider">칸을 눌러 직접 수정할 수 있어요 · ${tpl.unofficial ? '자유 형식 제출용 지원문서' : '실제 공고 양식과 동일한 구조'}</p>
+        <h3 class="sheet-title">작성 내용 확인</h3>
+        <p class="sheet-provider">칸을 눌러 직접 수정할 수 있습니다 · ${tpl.unofficial ? '자유 형식 제출용 지원문서' : '실제 공고 양식과 동일한 구조'}</p>
         <div class="fd-wrap" id="ff-doc">${renderFormDoc(tpl, state.profile, formFill.ans, { editable: true })}</div>
-        <button class="btn btn-primary btn-lg" id="btn-ff-confirm">✓ 이대로 신청 준비 완료</button>
+        <button class="btn btn-primary btn-lg" id="btn-ff-confirm">이대로 신청 준비 완료</button>
         <div class="submit-actions" style="margin-top:8px">
-          <button class="btn btn-outline" id="btn-ff-back">← 질문 다시</button>
-          <button class="btn btn-outline" id="btn-ff-doc">📄 .doc 저장</button>
+          <button class="btn btn-outline" id="btn-ff-back">질문 다시 보기</button>
+          <button class="btn btn-outline" id="btn-ff-doc">.doc 저장</button>
         </div>
       </div>`;
-    $('#btn-ff-back').addEventListener('click', () => { formFill.stage = 'q'; renderFormFill(); });
+    /* 🔴 '질문 다시 보기'는 **쓴 답을 들고 돌아가야 한다** (2026-09-09 코드 리뷰).
+       질문 화면을 새로 그리므로 칸이 전부 비는데, 예전에는 그대로 두어 학생이 다시 쳐야 했고,
+       이제는 그 빈 화면이 곧바로 장부에 적혀 **좋은 답을 빈 값으로 덮기까지** 한다. */
+    $('#btn-ff-back').addEventListener('click', () => {
+      formFill.stage = 'q';
+      renderFormFill({ ans: formFill.ans, quiet: true });
+    });
     $('#btn-ff-doc').addEventListener('click', () => downloadFormDoc(tpl, state.profile, formFill.ans));
     $('#btn-ff-confirm').addEventListener('click', () => {
       const existing = state.applications.find((a) => a.id === sch.id);
@@ -1055,8 +2011,9 @@ function renderFormFill() {
       else state.applications.push({ id: sch.id, appliedAt: nowStamp(), step: 0, formAns: formFill.ans, pending: false });
       saveState();
       const ch = officialChannel(sch);
-      toast(`양식 작성 완료! 문서를 저장해 ${ch.label}에 제출하세요`);
+      toast(`양식 작성 완료 · 문서를 저장해 ${ch.label}에 제출하세요`);
       formFill = null;
+      formProgressClear();   /* 신청내역에 정식으로 들어갔으니 '쓰던 것' 표시를 지운다 */
       closeSheet();
       const current = $$('.screen').find((s) => !s.hidden);
       if (current) showScreen(current.id.replace('screen-', ''));
@@ -1076,6 +2033,18 @@ let liveNotices = null;
 
    ⚠️ 옛 파일(data/notices.json)로 물러나는 길을 남겨 둔다 — 학교별 파일이 아직 없거나
    (그 학교 첫 수집 전) 배포가 엇갈린 순간에도 화면이 비지 않게. */
+/* 🔴 늦게 온 데이터로 **보이는 화면을 다시 그린다** (2026-09-01).
+   예전에는 loadRegistered 만 홈을 다시 그리고 loadKosaf·loadNotices 는 탐색만 그렸다.
+   그래서 한국장학재단 공고가 뒤늦게 들어오면 홈의 '마감 임박'이 그 전에 계산한
+   순서로 굳어, D-DAY 공고가 있는데도 D-2 부터 보였다.
+   ⚠️ 새로 데이터를 불러오는 곳을 만들면 여기를 부를 것 — 갈라 두면 또 한 곳만 고치게 된다. */
+function rerenderVisible() {
+  if (!state.profile) return;
+  if (!$('#screen-home').hidden) renderHome();
+  if (!$('#screen-explore').hidden) renderExplore();
+  if (!$('#screen-applications').hidden) renderApplications();
+}
+
 function loadNotices() {
   const p = state.profile;
   const files = (typeof noticeFilesForProfile === 'function' && p) ? noticeFilesForProfile(p) : [];
@@ -1090,11 +2059,19 @@ function loadNotices() {
       };
     })
     : get('data/notices.json');
-  job.then((d) => {
-    if (!d) return;
-    liveNotices = d;
-    if (!$('#screen-explore').hidden) renderExplore();
-  }).catch(() => { /* 오프라인 등 — 조용히 무시 */ });
+  /* 🔴 **부르는 쪽이 끝을 기다릴 수 있게 약속을 돌려준다** (2026-09-09).
+     당겨서 새로고침은 '다 받아 왔다'를 알아야 뱅뱅이를 멈춘다 — 예전처럼 아무것도
+     안 돌려주면 손을 떼자마자 멈춰서 학생 눈에는 아무 일도 안 한 것으로 보인다. */
+  /* 🔴 받아오기 실패만 여기서 삼킨다 — 그리기(rerenderVisible)까지 같은 catch 로 감싸면
+     그리다 난 진짜 버그가 조용히 묻히고, 그 안에서 다시 그리려다 두 번 던진다. */
+  return job.catch(() => null).then((d) => {
+    /* 🔴 **못 받아 왔어도 빈 문서를 넣는다** (2026-09-09). `null` 로 두면 화면이
+       '아직 오는 중'(뼈대)으로 읽어 영영 그 상태로 굳는다 — 오프라인 학생에게
+       끝나지 않는 기다림을 보여 주는 것은 '없음'보다 나쁘다.
+       ⚠️ 앞서 받아 둔 것이 있으면 그것을 남긴다(실패했다고 있던 공고를 지우지 않는다). */
+    liveNotices = d || liveNotices || { items: [], updatedAt: null };
+    rerenderVisible();
+  });
 }
 
 /* 자유 형식 지원문서 연결 (2026-07-15): 공고가 별도 양식 없이 자유 형식 제출을
@@ -1136,24 +2113,232 @@ function loadMajors() {
     .catch(() => { /* 오프라인 등 — 전국 공통 목록으로 동작 */ });
 }
 
-/* 정식 등록 공고 (수집 → 큐레이션 → 매칭·신청 지원) */
-function loadRegistered() {
-  fetch('data/registered.json', { cache: 'no-store' })
+/* 학교별 등록금 (2026-08-27) — `수업료 100%` 같은 비율형 공고를 원으로 바꾸는 데 쓴다.
+   비어 있으면 그 공고들은 '금액 미확인'으로 남는다. **전국 평균 같은 걸 지어내지 않는다.**
+   채우는 로봇: collector/fetch-tuition.mjs */
+let tuitionTable = {};
+/* 홈 합계를 마지막으로 계산한 내역 — '금액 상세' 시트가 이걸 그대로 보여 준다.
+   시트가 따로 다시 계산하면 화면과 시트가 다른 말을 하게 된다. */
+let lastBill = null;
+function loadTuition() {
+  fetch('data/tuition.json', { cache: 'no-store' })
     .then((r) => (r.ok ? r.json() : null))
     .then((d) => {
-      registeredList = (d && d.items) || [];
-      attachPrepTemplates(registeredList);
-      if (state.profile) {
-        if (!$('#screen-home').hidden) renderHome();
-        if (!$('#screen-explore').hidden) renderExplore();
-      }
+      tuitionTable = (d && d.schools) || {};
+      if (state.profile && !$('#screen-home').hidden) renderHome();
     })
-    .catch(() => { /* 오프라인 등 — 조용히 무시 */ });
+    .catch(() => { /* 오프라인 — 비율형은 미확인으로 둔다 */ });
 }
 
-function liveNoticesHtml() {
+/* 정식 등록 공고 (수집 → 큐레이션 → 매칭·신청 지원) */
+/* 언제 받은 목록인가 — 홈 맨 아래에 적는다 (2026-09-01 개발자 요청).
+   dataFetchedAt 은 **이 폰이 받아 온 시각**, regUpdatedAt 은 **로봇이 발행한 날**이다. */
+let dataFetchedAt = null;
+let regUpdatedAt = '';
+
+function renderHomeUpdated() {
+  const el = $('#home-updated');
+  if (!el) return;
+  if (!dataFetchedAt) {
+    /* 받아 온 적이 없다 — 저장된 목록을 최신인 것처럼 보이면 안 된다 */
+    el.textContent = '장학금 목록을 아직 받지 못했어요 · 인터넷 연결을 확인해 주세요';
+    return;
+  }
+  const t = dataFetchedAt;
+  const two = (n) => String(n).padStart(2, '0');
+  const when = `${t.getMonth() + 1}월 ${t.getDate()}일 ${two(t.getHours())}:${two(t.getMinutes())}`;
+  /* 두 줄로 나눈다 — 한 줄로 두면 오른쪽 끝이 도우미 동그라미에 가린다(실측).
+     두 가지가 서로 다른 사실이기도 하다. */
+  el.innerHTML = `<span>장학금 목록 마지막 확인 ${esc(when)}</span>`
+    + (regUpdatedAt ? `<span>공고 갱신 ${esc(regUpdatedAt)}</span>` : '');
+}
+
+function loadRegistered() {
+  return fetch('data/registered.json', { cache: 'no-store' })
+    .then((r) => (r.ok ? r.json() : null))
+    .then((d) => {
+      if (!d) return;
+      registeredList = d.items || [];
+      regUpdatedAt = d.updatedAt || '';
+      dataFetchedAt = new Date();
+      attachPrepTemplates(registeredList);
+    })
+    .catch(() => { /* 오프라인 등 — 조용히 무시 */ })
+    /* 🔴 **성공이든 실패든 여기를 지난다** — 못 받아 왔을 때도 화면을 한 번 다시 그려야
+       늦게 온 다른 데이터(층2·실시간 공고)와 함께 제자리를 잡는다. */
+    .then(() => { rerenderVisible(); });
+}
+
+function loadKosaf() {
+  return fetch('data/kosaf-open.json', { cache: 'no-store' })
+    .then((r) => (r.ok ? r.json() : null))
+    .then((d) => {
+      kosafList = (d && d.items) || [];
+      kosafUpdatedAt = (d && d.updatedAt) || '';
+      rerenderVisible();
+    })
+    .catch(() => { /* 오프라인 등 — 조용히 무시. 층2가 없어도 앱은 그대로 돈다 */ });
+}
+
+/* 데이터를 한꺼번에 다시 받는다 — 당겨서 새로고침과 화면 복귀가 **같은 함수**를 쓴다
+   (2026-09-09). 갈라 두면 한쪽에만 새 로더를 붙이는 일이 반드시 생긴다
+   (rerenderVisible 주석이 말하는 것과 같은 유형의 사고다). */
+function refreshAllData() {
+  const jobs = [loadNotices(), loadRegistered(), loadKosaf()];
+  if (typeof loadFormTemplates === 'function') jobs.push(loadFormTemplates());
+  /* 🔴 `swReg` 는 이 파일 한참 아래(서비스워커 등록 자리)에서 `let` 으로 선언된다.
+     그 줄이 아직 실행되기 전에 여기를 부르면 `typeof` 로 물어봐도 예외가 난다(TDZ).
+     감싸 두지 않으면 새로고침이 통째로 넘어지므로 감싼다 — 새 버전 확인은 덤이고
+     데이터를 다시 받는 것이 본업이다. */
+  try { if (swReg) swReg.update().catch(() => {}); } catch (e) { /* 아직 등록 전 */ }
+  return Promise.all(jobs.map((j) => Promise.resolve(j).catch(() => {})));
+}
+
+/* 층2 — 한국장학재단이 아는 재단 장학금을 **교외 공고와 같은 모양**으로 만든다 (2026-08-30).
+   🔴 처음에는 목록 맨 아래에 전용 구역으로 붙였다가 개발자에게 두 번 지적받았다:
+      ① 5,745px 아래라 "앱에 하나도 안 뜬다"  ② "복붙 수준으로 못생기게 해놨네."
+      맞는 지적이다. 새 화면을 만들 게 아니라 **이미 있는 카드에 얹었어야** 했다.
+      지금은 registeredList 와 같은 모양의 객체로 바꿔 schCard·openDetail·dday·정렬이
+      **한 글자도 새로 안 짜고** 그대로 돌아간다.
+   🔴 정직함은 그대로다 — KOSAF 는 재단이 적어 둔 칸이지 우리가 읽은 공고 원문이 아니다:
+      · 금액은 **합계에 넣지 않는다**(amountValue 0) — 확인 안 한 숫자를 더하면 기망이다
+      · 양식(formId)·준비문서(prepDoc)를 붙이지 않는다 → '앱에서 작성'이 안 뜬다
+      · 자격 줄은 **재단이 쓴 글자 그대로** 옮긴다(지어내지 않는다 — 원칙 8-1)
+      · 상세 시트가 출처를 밝힌다(openDetail 의 sourceKind 분기) */
+/* 🔴 **문장인 칸만 자격 요건으로 보여 준다** (2026-08-30 개발자 지적).
+   `학년구분: 대학신입생 대학2학기 대학3학기 …` 은 요건 문장이 아니라 **코드 나열**이라,
+   그대로 띄우면 요건 칸이 데이터 덤프가 된다. 나열형 칸은 화면에서 뺀다.
+   ⚠️ 뺀다고 판정이 나빠지지 않는다 — 어차피 적합도는 이 공고들에 대해 단정하지 않는다. */
+const KOSAF_ELIG = ['특정자격', '성적기준', '소득기준', '지역거주구분'];
+
+/* 🔴 재단이 쓴 글에는 `○`·`ㅇ`·`※` 같은 **머리 기호**가 그대로 들어 있다. 뜻이 아니라
+   서식이므로 화면에서는 떼어낸다(문장 자체는 한 글자도 바꾸지 않는다).
+   개발자 지적: "동그라미 기호니 … 너무 원문 그대로 가져오는 거 아니야?" */
+/* 🔴 머리 기호는 **머리 자리에 있을 때만** 뗀다 (2026-09-12 코드 리뷰).
+   `ㅇ` 은 한글 자모라 그냥 지우면 낱말 속 글자를 지운다 — 한국장학재단 원본에는 실제로
+   떨어져 나온 자모가 섞여 있어(실측 7곳), 그걸 지우면 `LG스플레이` 처럼 **다르게 틀린**
+   글자가 된다. 지우는 것도 지어내는 것과 같다(원칙 8-1). */
+const kosafClean = (t) => String(t || '').replace(/(^|\s)[○ㅇ●◦※]+/g, '$1').replace(/\s+/g, ' ').trim();
+
+/* 카드·시트에 보이는 **혜택 한 줄**. 원문 문단을 통째로 띄우지 않는다 —
+   금액은 이미 parse-amount 가 읽어 뒀으니 그 숫자로 짧게 말하고, 조건은 상세 칸에서 본다.
+   개발자 지적: "받을 수 있는 혜택만 간편하게 적어놔야지 원문 그대로 배껴놨네." */
+const KOSAF_AMOUNT_UNKNOWN = '금액은 재단 홈페이지에서 확인';
+function kosafAmountLabel(spec) {
+  if (spec && spec.kind === 'fixed' && spec.value) return `최대 ${won(spec.value)}`;
+  if (spec && spec.kind === 'range' && spec.max) {
+    return spec.min && spec.min !== spec.max ? `${won(spec.min)} ~ ${won(spec.max)}` : `최대 ${won(spec.max)}`;
+  }
+  if (spec && spec.kind === 'ratio' && spec.ratio) return `등록금의 ${Math.round(spec.ratio * 100)}%`;
+  /* 🔴 **못 읽은 금액 자리에 원문 문단을 흘리지 않는다** (2026-09-12 개발자 지적:
+     "lg ㄷ 스플레이 이런 식으로 글자 깨짐"). 예전에는 숫자를 못 읽으면 원문 40자를 잘라
+     그대로 띄웠다. 실측(열려 있는 116곳): 109곳은 숫자가 읽히고 **7곳만** 이 길로 갔는데,
+     그 7곳이 전부 금액이 아니었다 — `예산범위 내에서 이사회에서 결정한 금액`,
+     `기관확인필요`, `예산 총 5억원…`(총 사업규모다), 그리고 한국장학재단 원본의 오타가
+     그대로 드러난 `LGㄷ스플레이 입사 자격 부여…`.
+     🔴 오타는 **우리가 만든 것이 아니다** — `data/kosaf.json` 원본이 이미 그렇고
+        (겹친 글자 822곳·홀자모 7곳 실측: `프로그램램`·`유효효기간`·`기관확인필요요`),
+        같은 재단의 `운영기관명` 은 `LG디스플레이` 로 멀쩡하다. 우리 코드에는 글자를
+        복제하거나 지우는 자리가 없다(strip 은 태그·엔티티·공백만 만진다).
+        고칠 수 없는 남의 오타를 **카드 머리**에 띄우지 않는 것이 우리가 할 수 있는 일이고,
+        원문은 버리지 않고 상세 시트에 '재단이 적어 둔 것'으로 그대로 남긴다(원칙 8-1).
+     ⚠️ 여기서 원문을 다듬어 보여 주려 하지 말 것 — 지우면 `LG스플레이` 처럼 **다르게 틀린**
+        글자가 되고, 그건 지어낸 것과 같다. */
+  return KOSAF_AMOUNT_UNKNOWN;
+}
+function kosafAsScholarships() {
+  return kosafList
+    /* 마감 판정을 파일에 굳히지 않는다 — 수확 로봇은 가끔 돌고 앱은 매일 열린다 */
+    /* 🔴 **저장한 공고는 마감이 지나도 남긴다** (2026-09-07). 여기서 떨어뜨리면
+       findSch 가 그 공고를 못 찾아 **보관함에서 통째로 사라지고** 상세도 안 열린다.
+       층1(registeredList)은 이 걸러내기가 없어 원래 남으므로, 층2만 맞춰 주는 것이다.
+       ⚠️ 목록에 되살아나지는 않는다 — 탐색·홈은 각자 dday 로 한 번 더 거른다. */
+    .filter((i) => !i.due || dday(i.due).days >= -CLOSED_KEEP_DAYS || isSaved(`kosaf-${i.code}`))
+    .map((i) => {
+      const f = i.fields || {};
+      /* 한 칸에 여러 항목이 `○` 로 붙어 있다 — 재단이 쓴 대로 줄만 나눈다 */
+      /* 🔴 `제한없음` 이 든 칸은 **제한이 없다는 뜻**이라 자격 요건이 아니다 (2026-08-30).
+         재단이 체크박스를 통째로 적어 놓은 것(`제한없음 인문계열 사회계열 …`)이 자격 요건
+         자리를 차지하고 있었다 — 116곳 중 107줄. 아무것도 말하지 않는 줄이다. */
+      const split = (t) => String(t || '').split(/\s*[○ㅇ※]\s*/).map((x) => kosafClean(x))
+        .filter((x) => x.length >= 4 && !x.includes('제한없음'));
+      /* 🔴 `특정자격: ` 같은 **칸 이름을 붙이지 않는다** — 자격 요건 자리에는 요건만 적는다
+         (개발자 지적). 어느 칸에서 왔는지는 학생에게 아무 뜻이 없다. */
+      const lines = KOSAF_ELIG.flatMap((k) => split(f[k]));
+      const docs = split(f['제출처 및 제출서류']).filter((d) => !/자세한 사항/.test(d));
+      /* 이름표를 붙여 넘긴다 — parse-amount 는 `isAmountHead` 로 금액 절을 찾는다(section-head.js) */
+      const aSpec = amountFrom([`지원금액: ${f['지원금액'] || ''}`]);
+      const aExcl = exclusivityFrom([f['지원금액'] || '', f['자격제한'] || '']);
+      return {
+        id: `kosaf-${i.code}`,
+        name: `${i.org} ${i.name}`,
+        provider: i.org,
+        type: '교외',
+        amount: kosafAmountLabel(aSpec),
+        /* 금액을 못 읽었을 때만 원문을 함께 넘긴다 — 상세 시트에서 '재단이 적어 둔 것'으로 보여 준다.
+           읽은 경우에는 카드 문구가 이미 그 숫자라 두 번 말할 뿐이다. */
+        /* 🔴 조건을 **라벨과 같은 식으로** 쓴다 — 따로 적었다가 `{kind:'fixed', value:0}`
+           에서 라벨은 폴백인데 원문은 버려지는 어긋남이 있었다(2026-09-12 코드 리뷰). */
+        ...(kosafAmountLabel(aSpec) !== KOSAF_AMOUNT_UNKNOWN && kosafClean(f['지원금액'])
+          ? {} : (kosafClean(f['지원금액']) ? { amountNote: kosafClean(f['지원금액']) } : {})),
+        /* 🔴 금액은 **손으로 박지 않는다** — `parse-amount.js` 한 곳을 그대로 통과시킨다
+           (2026-08-30 개발자 지적). 처음엔 amountValue 를 0 으로 박아 뒀는데, 그러면
+           ① 재단이 적어 둔 금액이 홈 합계에서 통째로 빠지고 ② 앞으로 들어올 재단도
+           영영 0 이다. 이름표를 붙여 넘기면 절대액·비율형·시급·미확인을 그쪽이 가른다.
+           `amountSpec` 이 있으면 화면의 amountWon 이 그것을 읽는다(amountValue 는 폴백). */
+        amountSpec: aSpec,
+        amountValue: (aSpec.kind === 'fixed' || aSpec.kind === 'range') ? aSpec.value : 0,
+        /* 이중수혜 조항도 같은 파일이 읽는다 — 합계는 더하기가 아니라 **고르기**라
+           '타 장학금과 중복 불가'를 놓치면 학생이 못 받는 숫자를 받을 수 있다고 말하게 된다 */
+        ...(aExcl && aExcl.kind ? { exclusivity: aExcl } : {}),
+        deadline: i.due || null,
+        listedAt: (kosafUpdatedAt || '').slice(0, 10) || null,   // 마감 미상일 때 60일 규칙이 걸리게
+        period: i.due ? `접수 ~${i.due}` : (kosafClean(f['신청기간']) || '접수 기간 원문 확인'),
+        summary: `${i.org} — 한국장학재단 등록 장학금.`,
+        eligibility: { selective: true },     // 구조화된 조건이 없으니 판정하지 않는다(=unknown)
+        ...(lines.length ? { eligibilityLines: lines } : {}),
+        ...(split(f['자격제한']).length ? { eligibilityExcludes: split(f['자격제한']) } : {}),
+        documents: docs.length ? docs : ['재단 공고문에서 확인'],
+        sourceUrl: i.home || '',
+        sourceKind: 'kosaf',
+        /* 🔴 **층2의 유일한 '공고 원문'** (2026-09-12 개발자 지시로 신설).
+           그전까지 층2 재단이 학생에게 주는 것은 **재단 홈페이지 주소 하나**뿐이었다 —
+           들어가도 그 공고가 어디 있는지는 학생이 다시 찾아야 했다. KOSAF 상세 화면은
+           POST 전용이라 줄 주소가 아예 없고, KOSAF 첨부 원주소는 Referer 검사라
+           앱에서 누르면 "비정상적인 접근"이 뜬다.
+           → `collector/kosaf-attach.mjs` 가 리퍼러를 붙여 받아 둔 **우리 쪽 사본**을 준다.
+           ⚠️ 여기 들어오는 것은 `data/kosaf-files/…` 뿐이다(kosaf-open.mjs 가 거른다).
+              kosaf.go.kr 주소가 섞이면 학생이 못 받는다 — 관문 kosaf-check.mjs. */
+        ...((i.files || []).length
+          ? { attachments: i.files.map((f) => ({ name: f.name, url: f.path, bytes: f.bytes || 0 })) }
+          : {}),
+        ...(kosafClean(f['문의처']) ? { contact: kosafClean(f['문의처']) } : {}),
+        /* 층2 줄에 함께 보여 줄 **재단이 적어 둔 칸** (2026-09-07 캘린더).
+           자격 판정을 못 붙이는 대신 재단이 쓴 것을 그대로 옮긴다 — 해석하지 않는다. */
+        ...(kosafClean(f['선발인원']) ? { headcount: kosafClean(f['선발인원']) } : {}),
+      };
+    });
+}
+
+/* 실시간 공고 구역의 머리말 — '아직 안 옴'과 '없음' 이 같은 머리말을 쓰도록 한 곳에 둔다 */
+function liveNoticesHead(updatedAt) {
+  return `<div class="section-head" style="margin-top:4px"><h3>우리 학교 실시간 공고</h3>
+    <span class="link-btn">매일 아침 자동 갱신${updatedAt ? ' · ' + updatedAt : ''}</span></div>`;
+}
+
+function liveNoticesHtml(query) {
   const p = state.profile;
-  if (!liveNotices || !p) return '';
+  if (!p) return '';
+  /* 🔴 **'아직 안 왔다'와 '없다'는 다른 말이다** (2026-09-09).
+     예전에는 둘 다 빈 문자열이라 이 구역이 통째로 없다가 갑자기 나타났다 — 이 앱에서
+     실제로 기다림이 보이는 거의 유일한 자리다(정식 등록 공고는 data.js 의 상시 제도가
+     동기로 먼저 채워 목록이 빌 틈이 없다 — 실측으로 확인했다).
+     ⚠️ 뼈대가 굳지 않는 것은 `liveNotices` 가 성공·실패와 무관하게 채워지기 때문이 아니라,
+        실패하면 `null` 로 남기 때문이다. 그래서 아래 loadNotices 가 실패해도 **빈 문서**를
+        넣어 이 구역이 '없음'으로 정직하게 내려앉게 한다. */
+  if (!liveNotices) {
+    return liveNoticesHead('') + (typeof skeletonRows === 'function' ? skeletonRows(3) : '');
+  }
   // 정식 등록된 공고(registered.json + data.js 실공고)는 카드로 노출되므로 피드에서 제외
   // URL 뒤에 목록 파라미터가 붙는 경우가 있어 전방일치로 비교한다
   const regUrls = registeredList.map((s) => s.sourceUrl)
@@ -1168,22 +2353,43 @@ function liveNoticesHtml() {
   const isLoan = (n) => /대출|융자/.test(n.title);
   const scholarships = forMe.filter((n) => !isLoan(n));
   const loans = forMe.filter(isLoan);
-  const mine = scholarships.slice(0, loans.length ? 8 : 10).concat(loans.slice(0, 2));
-  const head = `<div class="section-head" style="margin-top:4px"><h3>우리 학교 실시간 공고</h3>
-    <span class="link-btn">매일 아침 자동 갱신${liveNotices.updatedAt ? ' · ' + liveNotices.updatedAt : ''}</span></div>`;
+  /* 🔴 **상한을 걷었다** (2026-09-12 · UI-16). 8+2 는 이 목록이 '전체' 카드 **아래에**
+     얹혀 있던 시절의 자리 다툼 때문이었다 — 제 칸이 생겼으니 학생이 보러 온 것을 잘라서
+     보여 줄 이유가 없다(실측: 한국외국어대학교 22건 · 경희대학교 17건).
+     ⚠️ 차례는 그대로 둔다 — 학자금 대출·융자는 장학금이 아니라서 **뒤에** 둔다
+        (정직 원칙 · 2026-07-30 조정). 없애지는 않는다: 앱에 대출 안내가 여기뿐이다. */
+  let mine = scholarships.concat(loans);
+  /* 🔴 검색은 **여기에도 걸어야 한다** (2026-09-12 · UI-16). 이 목록이 제 칸을 갖게 되면서
+     검색창이 그 화면에도 떠 있는데, 안 걸면 "검색했는데 그대로"가 된다 — 방금 구획에서
+     고친 것과 같은 유형(화면이 스스로 한 말을 안 지키는 것)이다. */
+  const q = String(query || '').trim().toLowerCase();
+  if (q) mine = mine.filter((n) => [n.title, n.school, n.campus].filter(Boolean)
+    .join(' ').toLowerCase().includes(q));
+  const head = liveNoticesHead(liveNotices.updatedAt);
   if (!mine.length) {
-    return head + `<p class="empty" style="margin-bottom:16px">아직 ${esc(p.school)} 게시판이 연결 전이거나 새 공고가 없어요.<br />연결되면 실제 공고가 여기에 자동으로 떠요.</p>`;
+    return head + (q
+      ? `<p class="empty" style="margin-bottom:16px">'${esc(String(query).trim())}'와 맞는 우리 학교 공고가 없어요</p>`
+      : `<p class="empty" style="margin-bottom:16px">아직 ${esc(p.school)} 게시판 연결 전이거나 새 공고가 없어요<br />연결되면 실제 공고가 여기에 자동으로 떠요.</p>`);
   }
   return head + `<div class="card-list" style="margin-bottom:18px">` + mine.map((n) => `
     <a class="sch-card notice-card" href="${esc(safeUrl(n.url))}" target="_blank" rel="noopener">
+      ${/* 🔴 맨 윗줄은 매칭 카드와 **같은 말투**다 — 기관 글 + 판정 하나 (2026-09-11).
+           예전엔 배지 셋(`교내 공고`·`마감 임박`·`양식 2`)이 한 줄을 채워, 페이스리프트로
+           걷어낸 배지 무더기가 이 경로에만 그대로 남아 있었다(실측 147장 중 9장).
+           🔴 첨부 개수를 `badge-applied` 로 쓰지 말 것 — 그 색은 '신청 완료'의 초록이라
+              첨부가 있다는 말이 신청이 끝났다는 말로 읽혔다. 아래 메타 줄로 내린다. */ ''}
       <div class="sch-top">
-        <span class="badge badge-in">교내 공고</span>
-        ${n.deadlineHint ? `<span class="badge badge-dday urgent">⏰</span>` : ''}
-        ${(n.attachments || []).length ? `<span class="badge badge-applied">양식 ${n.attachments.length}</span>` : ''}
+        <span class="sch-org">교내 공고 · ${esc(n.school)}${n.campus ? ' ' + esc(n.campus) : ''}</span>
+        ${/* 🔴 **'마감 임박' 배지를 여기 달지 않는다** (2026-09-12 · UI-16 으로 이 카드가 제 칸을
+             갖게 되면서 드러났다). 그 배지는 `deadlineHint` 가 **있기만 하면** 붙었다 — 본문에
+             '까지'·'마감' 이라는 낱말이 한 번이라도 나오면 붙는다는 뜻이라, `마감 안내 작성일
+             2026.08.31 … 조회수 5` 같은 게시판 껍데기에도 빨간 '마감 임박' 이 달려 있었다.
+             우리는 이 글의 마감일을 **모른다**(수집한 것은 제목·링크·기간 문장 한 줄뿐이다).
+             모르는 것을 단정하지 않는다(원칙 8-1) — 기간은 아래 줄이 원문 그대로 말한다. */ ''}
       </div>
-      <p class="sch-name">${esc(n.title)}</p>
-      ${n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? `<p class="sch-provider">⏰ ${esc(n.deadlineHint)}</p>` : ''}
-      <p class="sch-provider">${esc(n.school)}${n.campus ? ' ' + esc(n.campus) : ''} · ${esc(n.foundAt || '')} 수집 · ${isBoardListLink(n.url) ? '게시판 목록에서 보기 ↗' : '원문 보기 ↗'}</p>
+      <p class="sch-name">${esc(unent(n.title))}</p>
+      ${n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? `<p class="sch-provider">${esc(unent(n.deadlineHint))}</p>` : ''}
+      <p class="sch-provider">${(n.attachments || []).length ? `첨부 ${(n.attachments || []).length}개 · ` : ''}${esc(n.foundAt || '')} 수집 · ${isBoardListLink(n.url) ? '게시판 목록에서 보기 ↗' : '원문 보기 ↗'}</p>
     </a>`).join('') + `</div>`;
 }
 
@@ -1196,7 +2402,7 @@ function buildSubmissionText(sch, app) {
 }
 
 function copyText(text, okMsg) {
-  const done = () => toast(okMsg || '복사했어요. 공식 신청 페이지에 붙여넣으세요');
+  const done = () => toast(okMsg || '복사 완료 · 공식 신청 페이지에 붙여넣기');
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
   } else fallbackCopy(text, done);
@@ -1206,7 +2412,7 @@ function fallbackCopy(text, done) {
   ta.value = text;
   document.body.appendChild(ta);
   ta.select();
-  try { document.execCommand('copy'); done(); } catch (e) { toast('복사에 실패했어요'); }
+  try { document.execCommand('copy'); done(); } catch (e) { toast('복사 실패'); }
   ta.remove();
 }
 
@@ -1222,12 +2428,12 @@ async function shareApplication(sch, app) {
   try {
     if (files.length && navigator.canShare && navigator.canShare({ files })) {
       await navigator.share({ title: `${sch.name} 신청 서류`, text, files });
-      toast('서류와 함께 공유했어요 (메일 앱에서 바로 접수 가능)');
+      toast('서류와 함께 공유 완료 · 메일 앱에서 바로 접수 가능');
       return;
     }
     if (navigator.share) {
       await navigator.share({ title: `${sch.name} 신청 서류`, text });
-      toast('내용을 공유했어요. 파일은 보관함에서 따로 첨부하세요');
+      toast('내용 공유 완료 · 파일은 보관함에서 따로 첨부');
       return;
     }
   } catch (e) { /* 사용자가 공유를 취소한 경우 */ return; }
@@ -1251,7 +2457,7 @@ function finalizeApply(sch, docs) {
   }
   saveState();
   const ch = officialChannel(sch);
-  toast(`'${sch.name}' 신청 준비 완료! 최종 제출은 ${ch.label}에서 확인하세요`);
+  toast(`'${sch.name}' 신청 준비 완료 · 최종 제출은 ${ch.label}`);
   const current = $$('.screen').find((s) => !s.hidden);
   if (current) showScreen(current.id.replace('screen-', ''));
 }
@@ -1408,18 +2614,152 @@ function bulkRowHtml(sch) {
           <div class="bulk-badges">
             <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${esc(sch.type)}</span>
             ${sch.program ? '<span class="badge badge-program">상시 제도</span>' : `<span class="badge badge-dday ${d.cls}">${d.label}</span>`}
-            ${sch.auto ? '<span class="badge badge-auto">자동 등록 · 검수 전</span>' : ''}
+            ${/* 🔴 '자동 등록 · 검수 전' 배지를 뺐다 (2026-09-17 개발자 지시 — 내부 공정은
+                 관리자에게만). 운영 원칙 2 의 '정직한 표시'는 **학생이 판단에 쓸 수 있는 것**을
+                 감추지 말라는 뜻이고, 우리 검수 공정의 단계는 거기 해당하지 않는다.
+                 세는 곳은 관리자 '오늘 할 일'의 검수 전 카드 둘이다(_admin/admin.js). */ ''}
           </div>
           <p class="bulk-meta">${sch.deadline
             ? `마감 ${esc(sch.deadline.replace(/-/g, '.'))}`
-            : '마감 기한을 아직 읽지 못했어요 — 공고 원문에서 꼭 확인하세요'}</p>
+            : '마감 기한 미확인 — 공고 원문에서 꼭 확인하세요'}</p>
           <p class="bulk-meta">${esc(submitChannelLabel(sch))}</p>
           ${reqs.length
             ? `<p class="bulk-meta-head">지원자격 (공고 원문)</p><ul class="bulk-reqs">${reqs.map((r) => `<li>${esc(r)}</li>`).join('')}</ul>`
-            : '<p class="bulk-meta">지원 자격을 아직 읽지 못했어요 — 공고 원문에서 확인하세요</p>'}
+            : '<p class="bulk-meta">지원 자격은 공고 원문에서 확인하세요</p>'}
         </details>
       </div>
     </div>`;
+}
+
+/* ── 금액 상세 (2026-08-27) ────────────────────────────────────
+   홈의 '최대 N원'을 누르면 열린다. 그 숫자가 **어떻게 나왔는지 줄 단위로** 보여 준다.
+   갈래를 넷으로 나눈 이유: 합계 하나만 보여 주면 방어가 안 되고, 갈래를 나누면
+   각 줄이 원문을 근거로 갖는다. 특히 **안 더한 것도 보여 준다** — 감춘 게 아니라
+   이유가 있다는 걸 학생이 봐야 한다(개발자와 확정한 배치).
+
+   🔴 여기서 다시 계산하지 않는다. renderHome 이 만든 lastBill 을 그대로 그린다 —
+      따로 계산하면 히어로 숫자와 상세가 다른 말을 하게 된다. */
+/* 🔴 **추정값을 확정값처럼 적지 않는다** (2026-09-11 코드 리뷰에서 잡았다).
+   2026-09-10 수리로 비율형(`등록금 100%`)도 이중수혜 갈래를 거치게 되면서, 같은 공고가
+   `added`(또는 `onlyOne`)와 `estimated` **양쪽에** 들어간다 — 합계는 맞지만(한 번만 더한다)
+   화면은 네 갈래를 서로 안 겹치는 것처럼 그리고 있었다. 그래서 ① 건수를 더하면 공고 수보다
+   많아지고 ② 무엇보다 합산 줄이 `400만원` 이라고 **딱 떨어지게** 적었다 — 그 값은 학교 평균
+   등록금에서 뽑은 추정인데 확정된 금액처럼 읽힌다(원칙 8-1 · 이 파일 첫머리의 '기망').
+   ⚠️ 계산은 건드리지 않는다 — `parse-amount.js` 의 total 은 옳다. 적는 법만 고친다. */
+function estOpt(m, opt) {
+  const bill = lastBill && lastBill.bill;
+  if (!bill || bill.estimated.indexOf(m) < 0) return opt;
+  return Object.assign({}, opt, { tone: 'est', text: '약 ' + won(m.won) });
+}
+
+function amountDetailRow(m, opt) {
+  const o = opt || {};
+  const sch = m.ref, a = sch.amountSpec || null;
+  const val = o.text || (m.won ? won(m.won) : '금액 원문 확인');
+  /* 줄을 누르면 **그 공고의 상세 시트**가 뜬다 (2026-08-27 개발자 지시로 변경).
+     처음엔 장학금 탭으로 옮겨 그 카드를 찾아 스크롤했는데, 카드를 못 찾으면(필터·정렬·
+     마감 숨김) 아무 일도 안 일어난 것처럼 보였다. 지금은 찾아가지 않고 **바로 연다** —
+     장학금 탭에서 카드를 누른 것과 같은 화면이다.
+     시트 그릇(`#detail-sheet`)이 금액 상세와 같아서 내용만 갈린다(새 시트를 만들지 않는다).
+     안쪽 `원문 보기` 를 여닫는 클릭은 이동이 아니다 — 아래 핸들러가 details·a 를 걸러낸다. */
+  const cls = (o.dim ? 'ad-row dim' : 'ad-row') + ' tappable';
+  const merged = (m.mergedFrom || []).length;
+  /* 🔴 **수집한 글이므로 `esc()` 앞에서 기호를 되돌린다** (2026-09-13).
+     이 두 줄은 게시판 원문에서 그대로 온다 — `취 &middot; 창업지원금` 처럼 HTML 기호가
+     섞여 있고, `esc()` 만 하면 `&` 가 한 번 더 감싸져 학생 화면에 **글자로** 뜬다.
+     ⚠️ 순서를 뒤집지 말 것 — `esc()` 뒤에 되돌리면 `&amp;middot;` 가 돼 영영 안 풀린다.
+     (2026-09-11 에 `n.title`·`n.deadlineHint` 에서 같은 사고가 있었다. 그때 관문은
+      **칸 이름 두 개만** 보는 손 목록이라 이 자리를 못 잡았다 — 관문도 함께 넓혔다.) */
+  const raw = a && a.raw ? unent(a.raw) : '';
+  const exRaw = sch.exclusivity && sch.exclusivity.raw ? unent(sch.exclusivity.raw) : '';
+  return `<div class="${cls}" data-goto="${esc(sch.id)}" role="button" tabindex="0">
+    <div class="ad-top"><p class="ad-name">${esc(sch.name || '')}</p>
+      <p class="ad-val ${o.tone || ''}">${o.check ? '<span class="ad-chk">✓</span>' : ''}${esc(val)}</p></div>
+    ${o.note ? `<p class="ad-note">${esc(o.note)}</p>` : ''}
+    ${merged ? `<details><summary>${esc(schoolOfNotice(m.mergedFrom[0]) || '다른 학교')} 외 ${merged}건</summary>
+      <div class="ad-list"><span>같은 재단이 여러 학교에서 접수하는 공고. 1건으로 합산.</span>
+      ${[sch, ...m.mergedFrom].map((x) => `<span>${esc(x.provider || x.name || '')}</span>`).join('')}</div></details>` : ''}
+    ${raw || exRaw ? `<details><summary>원문 보기</summary>
+      <p class="ad-src">"${esc(raw || exRaw)}"<em>${esc(noticeSourceLabel(sch))}</em></p></details>`
+    /* 🔴 발췌가 없으면 지어내지 않고 **원문으로 가는 길**을 준다 (원칙 8-1).
+       금액이 첨부파일이나 제목에만 있어 사람이 손으로 넣은 공고가 있다 — 화면에 금액이
+       뜨는데 근거를 하나도 못 보여 주는 상태로 두면 안 된다(개발자 지적 2026-08-27).
+       게시판 목록 주소인 공고는 '원문 공고'라고 쓰면 거짓말이라 라벨을 바꾼다. */
+    : (o.text || m.won ? (sch.sourceUrl
+      ? `<p class="ad-link"><a href="${esc(safeUrl(sch.sourceUrl))}" target="_blank" rel="noopener">${
+          sch.program ? '한국장학재단 ↗' : (isBoardListLink(sch.sourceUrl) ? '게시판 목록 ↗' : '원문 공고 ↗')}</a></p>`
+      : '') : '')}
+  </div>`;
+}
+
+/* 원문 발췌 밑에 붙는 출처 한 줄 — `광운대학교 게시 원문`.
+   🔴 학교 이름을 줄이지 않는다(기관명 축약 금지) — provider 의 `(광운대 접수)` 대신
+      eligibility.schoolOnly 의 정식 명칭을 쓴다. 둘 다 없으면 출처를 지어내지 않고 비운다. */
+const noticeSourceLabel = (sch) => {
+  const school = (sch && sch.eligibility && sch.eligibility.schoolOnly) || '';
+  return school ? `${school} 게시 원문` : '공고 원문';
+};
+
+const schoolOfNotice = (sch) => {
+  const m = String(sch && sch.provider || '').match(/\(([^)]*대학교[^)]*)\s*접수\)/);
+  return m ? m[1] : (sch && sch.school) || '';
+};
+
+function renderAmountDetail(keepScroll) {
+  /* 못 그렸다는 것을 부르는 쪽이 알아야 한다 — dismissSheet 가 이 값을 보고 닫는다 */
+  if (!lastBill) return false;
+  const { bill, count } = lastBill;
+  const p = state.profile;
+  const sum = (arr) => arr.reduce((s, m) => s + (m.won || 0), 0);
+  /* 🔴 갈래는 **비어 있어도 그린다.** 승인받은 화면이 네 갈래이기 때문이다.
+     처음에 '내용 없으면 통째로 숨김'을 넣었다가 개발자가 승인한 화면과 다른 것이 나갔다
+     (2026-08-27). 보여 주고 승인받은 구조를 코드에서 조용히 바꾸지 말 것. */
+  const grp = (title, right, note, rows, empty) => `
+    <div class="ad-grp"><div class="ad-grp-h"><b>${title}</b><span>${rows ? right : '해당 없음'}</span></div>
+    ${rows && note ? `<p class="ad-grp-note">${note}</p>` : ''}${rows || `<p class="ad-empty">${empty}</p>`}</div>`;
+
+  $('#detail-sheet').innerHTML = `
+    <div class="sheet-handle"></div>
+    <div class="sheet-body">
+      <h3 class="sheet-title">금액 상세</h3>
+      <p class="sheet-provider">${esc(p.school || '')}${p.campus ? ' · ' + esc(p.campus) : ''} · 신청 가능 ${count}건</p>
+      <div class="ad-total">
+        <p class="ad-total-lb">지금 받을 수 있는 장학금</p>
+        <p class="ad-total-amt">${bill.assumedWon > 0 ? '약' : '최대'} ${won(bill.total)}</p>
+        <p class="ad-total-sub">${bill.assumedWon > 0
+          ? `금액을 못 읽은 ${bill.assumed.length}건은 어림잡아 더함`
+          : `확인된 금액만 합산${bill.unknown.length ? ` · 미확인 ${bill.unknown.length}건 제외` : ''}`}</p>
+      </div>
+      ${grp('합산', `${bill.added.length}건 · ${won(sum(bill.added))}`, '',
+        bill.added.map((m) => amountDetailRow(m, estOpt(m, { tone: 'on' }))).join(''),
+        '합산할 공고가 아직 없어요')}
+      ${grp('중복 수혜 불가', `${bill.onlyOne.length + bill.dropped.length}건 중 ${bill.onlyOne.length}건`,
+        '함께 받을 수 없는 공고입니다. 가장 큰 1건만 합산했습니다.',
+        bill.onlyOne.map((m) => amountDetailRow(m, estOpt(m, { tone: 'on', check: true }))).join('')
+        + (bill.dropped.length ? `<details><summary>함께 못 받는 공고 ${bill.dropped.length}건</summary>
+          ${bill.dropped.map((m) => amountDetailRow(m, { dim: true, tone: 'off', note: '위 공고와 동시 수혜 불가' })).join('')}</details>` : ''),
+        '모두 함께 받을 수 있는 공고입니다.')}
+      ${grp('등록금 비율 환산', `${bill.estimated.length}건 · 추정`,
+        '금액이 등록금 비율로만 적힌 공고입니다. 학교별 한 학기 등록금 기준 추정값이며 실제 금액과 다를 수 있습니다. 위 갈래에 이미 들어 있는 공고를 다시 적은 것이라 건수를 더하지 마세요.',
+        bill.estimated.map((m) => amountDetailRow(m, { tone: 'est', text: '약 ' + won(m.won) })).join(''),
+        '등록금 비율로 적힌 공고는 없어요')}
+      ${/* 🔴 홈 히어로가 이 몫을 어림잡아 더하므로(2026-09-17 개발자 지시) 이 칸도 그렇게
+           적어야 한다 — 합계에 넣어 놓고 '0원'이라고 적으면 두 숫자가 서로 다른 말을 한다.
+           🔴 줄마다의 금액은 여전히 '금액 원문 확인'이다: 어림잡은 것은 **합계 한 곳**이지
+              그 공고의 금액이 아니다(원칙 8-1 · parse-amount.js sumAmounts ④). */ ''}
+      ${grp('금액 미확인', bill.assumedWon > 0
+          ? `${bill.unknown.length}건 · 어림 ${won(bill.assumedWon)}`
+          : `${bill.unknown.length}건 · 0원`,
+        bill.assumedWon > 0
+          ? `원문에 금액이 없거나 첨부파일에만 있는 공고입니다. 이 중 ${bill.assumed.length}건은 위 합계에 한 건당 ${won(bill.assumedEach)}(확인된 공고들의 중앙값)으로 어림잡아 더했습니다 — 실제 금액과 다를 수 있습니다.`
+          : '원문에 금액이 없거나 첨부파일에만 있는 공고입니다.',
+        bill.unknown.length ? `<details><summary>공고 ${bill.unknown.length}건 보기</summary>
+          ${bill.unknown.map((m) => amountDetailRow(m, { dim: true, tone: 'off', text: '금액 원문 확인' })).join('')}</details>` : '',
+        '모든 공고의 금액을 확인했습니다.')}
+      <p class="ad-foot">모든 금액은 공고 원문 기준입니다.<br>선발 결과에 따라 실제 수혜액은 달라질 수 있습니다.</p>
+    </div>`;
+  openSheetShell(keepScroll);   // 되돌아온 것이면 보던 자리로 (아니면 undefined → 맨 위)
+  return true;
 }
 
 function renderBulkPrep() {
@@ -1432,9 +2772,9 @@ function renderBulkPrep() {
       <h3 class="sheet-title">한 번에 신청 준비</h3>
       <p class="sheet-provider" id="bulk-sum"></p>
       <label class="bulk-all"><input type="checkbox" id="bulk-all" checked /> 전체 선택</label>
-      ${ready.length ? `<p class="bulk-group-head">바로 준비돼요 · ${ready.length}건</p>${ready.map(bulkRowHtml).join('')}` : ''}
-      ${need.length ? `<p class="bulk-group-head">서류를 써야 해요 · ${need.length}건</p>${need.map(bulkRowHtml).join('')}
-        <p class="dp-note">이 ${need.length}건은 담아 둔 뒤 신청내역에서 자소서·신청서를 이어서 쓰면 돼요.</p>` : ''}
+      ${ready.length ? `<p class="bulk-group-head">바로 준비 가능 · ${ready.length}건</p>${ready.map(bulkRowHtml).join('')}` : ''}
+      ${need.length ? `<p class="bulk-group-head">서류 작성 필요 · ${need.length}건</p>${need.map(bulkRowHtml).join('')}
+        <p class="dp-note">이 ${need.length}건은 담아 둔 뒤 신청내역에서 자소서·신청서 작성.</p>` : ''}
       <button class="btn btn-primary btn-lg" id="btn-bulk-go"></button>
       <p class="dp-note">※ 최종 제출은 한국장학재단·학교 등 공식 채널에서 이루어져요.</p>
     </div>`;
@@ -1471,7 +2811,7 @@ function bulkStart() {
   const go = picked.filter((sch) => live.has(sch.id));
   if (!go.length) {
     closeSheet();
-    toast(gone.length ? '고른 장학금이 그 사이 모두 마감됐어요' : '준비할 수 있는 장학금이 없어요');
+    toast(gone.length ? '고른 장학금 전부 그 사이 마감' : '준비할 수 있는 장학금이 없어요');
     return;
   }
   const need = go.filter(bulkNeedsWork);
@@ -1480,10 +2820,10 @@ function bulkStart() {
   }));
   saveState();
   closeSheet();
-  const goneMsg = gone.length ? ` · ${gone.length}건은 그 사이 마감돼 빼놓았어요` : '';
+  const goneMsg = gone.length ? ` · ${gone.length}건은 그 사이 마감돼 제외` : '';
   toast(need.length
     ? `${go.length - need.length}건 준비 완료 · ${need.length}건은 신청내역에서 서류를 이어서 쓰세요${goneMsg}`
-    : `장학금 ${go.length}건 신청 준비가 완료됐어요 🎉${goneMsg}`);
+    : `장학금 ${go.length}건 신청 준비 완료${goneMsg}`);
   showScreen('applications');
 }
 
@@ -1495,17 +2835,64 @@ function applyAll() {
   renderBulkPrep();
 }
 
+/* 🔴 **'신청 버튼을 누를 수 있는가'의 단 하나의 기준** (2026-09-13 · 노션 백로그 핵심-2).
+   화면(openDetail)과 검사 도구(verify/what-shows.mjs)가 **같은 함수**를 쓴다.
+   ⚠️ 베껴 두면 갈라진다 — 실제로 갈라져 있었다: 이 규칙이 openDetail 안의 지역 변수라
+      what-shows 가 제 사본을 들고 있었고, 잠금을 푼 뒤에도 계속 '잠김'이라 보고했다.
+      (그 파일 머리말은 "앱 규칙을 한 줄도 베끼지 않는다"고 적어 둔 채였다.)
+
+   🔴 **자격 판정으로는 막지 않는다.** 예전에는 `['eligible','selective']` 가 이 식에
+   함께 있어서 미달·미확인이면 버튼이 통째로 잠겼다. 그런데 우리 판정은 100% 가 아니다 —
+   원문을 못 받았거나(`unknown`) 축이 없어서 미달이 된 공고가 실제로는 신청 가능하고,
+   막아 버리면 그 학생은 받을 수 있는 장학금을 **영영 못 본다**. 판정은 참고로 보여 주고
+   **결정은 학생이 한다**(caution 이 무엇을 확인해야 하는지 말한다).
+
+   ⚠️ 마감(`d.days >= 0`)과 이미 신청함(`app.pending`)은 **그대로 막는다** — 그 둘은
+      우리 판정이 아니라 **사실**이다. 마감된 공고를 신청하게 하는 것은 정직하지 않다(원칙 1).
+   ⚠️ 일괄 신청 준비(`bulkTargets`)는 일부러 안 열었다 — 거기는 여러 건을 한꺼번에 고르는
+      자리라 미달까지 섞으면 학생이 무엇을 고른 것인지 알 수 없게 된다.
+
+   caution — 자격이 확인되지 않은 채 신청하는 경우에만 값이 있다(없으면 빈 문자열).
+   🔴 **모르는 것을 '미충족'이라고 부르지 않는다** (2026-09-09 에 배운 것을 여기로 옮겼다).
+      `unknown` 은 '요건에 못 미친다'가 아니라 **'우리가 못 읽었다'**는 뜻이다 — 동산장학회
+      (이공계 새터민)에서 실제로 그랬다: 새터민이고 이공계이고 성적도 넘는 학생인데 자격 줄
+      셋 중 둘을 못 읽어 unknown 이 됐고, 화면은 그 학생에게 '요건 미충족'이라 단정했다.
+      그때는 **버튼 문구만** 갈랐고 잠금은 안 갈라서, 그 학생은 여전히 못 눌렀다. */
+function applyLock(result, app, d) {
+  const canApply = (!app || app.pending) && d.days >= 0;
+  const unsure = !['eligible', 'selective'].includes((result && result.status) || '');
+  return { canApply, caution: canApply && unsure ? result.status : '' };
+}
+
 /* ---------------- 상세 바텀시트 ---------------- */
+/* 「학교 포털」이 어디인지 알려 주는 한 줄 (백로그 UI-20 · 2026-09-14)
+
+   바로 위 안내 1단계가 예전부터 "학교 포털 장학 메뉴에서 접수 방법 확인"이라고 말해 왔는데
+   그 포털이 어디인지는 앱 어디에도 없었다 — 학교마다 다르다(data.js `SCHOOL_PORTALS`).
+
+   🔴 **이 공고의 제출처라고 말하지 않는다.** `eligibility.schoolOnly` 는 '이 학교 학생에게만
+      보인다'는 뜻이라, 학교 게시판에 올라온 교외·국가 공고가 전부 여기 들어 있다(실측 35건 중
+      12건). 그래서 문장은 '교내 장학금은 여기서 신청한다' + '이 공고의 접수 방법은 원문을
+      따르라' 둘로 나뉜다. 하나로 합쳐 "여기에 제출하세요"가 되면 앱이 같은 화면에 인용한
+      원문(`www.kosaf.go.kr 을 통하여 신청`)과 반대되는 말을 단정하게 된다(원칙 8-1).
+   🔴 표에 없는 학교는 지어내지 않고 **아무것도 안 띄운다.**
+   관문: verify/test-collector.mjs '학교 장학 신청 포털' 절. */
+function schoolPortalNote(sch) {
+  const p = schoolPortal(sch);
+  if (!p) return '';
+  return `<p class="dp-note">교내 장학금은 <a href="${esc(safeUrl(p.url))}" target="_blank" rel="noopener">${esc(p.label)} ↗</a>에서 신청합니다. 이 공고의 접수 방법은 위 안내와 공고 원문을 따라 주세요.</p>`;
+}
+
 function openDetail(id) {
   const sch = findSch(id);
   if (!sch) return;
-  const result = evaluate(sch, state.profile);
+  const result = evaluateFor(sch, state.profile);   // 카드와 같은 판정을 쓴다(위 주석)
   const fit = fitScore(sch, result, state.profile);
-  const fd = fitDetail(sch, state.profile);
+  const fd = fitDetailFor(sch, state.profile);   // 카드와 같은 근거를 쓴다(위 주석)
   const meta = STATUS_META[result.status];
   const d = dday(sch.deadline);
   const app = state.applications.find((a) => a.id === id);
-  const canApply = ['eligible', 'selective'].includes(result.status) && (!app || app.pending) && d.days >= 0;
+  const { canApply, caution: applyCaution } = applyLock(result, app, d);
   const ch = officialChannel(sch);
 
   /* 공고 원문에 적힌 자격 문장을 **그대로** 덧붙인다 (2026-08-02 개발자 지시).
@@ -1525,10 +2912,15 @@ function openDetail(id) {
   const judged = result.reasons.filter((r) => !isScopeOk(r));
 
   const checkRows = judged.map((r) => {
-    const bad = /필요|아니에요|가능$/.test(r) && !/충족|확인/.test(r);
+    /* 🔴 `미달`을 빠뜨려 **미달 근거 줄에 초록 ✓ 가 붙어 있었다** (2026-09-12 코드 리뷰).
+       `공고에 적힌 요건에 미달해요: …` 가 '필요·아니에요·가능' 중 어디에도 안 걸려
+       충족으로 그려졌다 — 화면이 스스로 모순된 말을 한 것이다.
+       ⚠️ `!/충족|확인/` 이 뒤에 있어 '확인'이 든 미달 줄은 여전히 ✓ 가 된다 — 그건
+          '확인 필요'(모름)를 ✓ 로 두지 않으려던 장치라, 미달을 먼저 본다. */
+    const bad = /미달/.test(r) || (/필요|아니에요|가능$/.test(r) && !/충족|확인/.test(r));
     return `<li class="${bad ? 'r-bad' : 'r-ok'}">${bad ? '✕' : '✓'} ${esc(r)}</li>`;
   }).join('')
-    + result.missing.map((m) => `<li class="r-unk">? ${esc(m)} 정보를 입력하면 정확히 판단할 수 있어요</li>`).join('');
+    + result.missing.map((m) => `<li class="r-unk">? ${esc(m)} 정보를 입력하면 정확히 판단할 수 있습니다</li>`).join('');
 
   /* 지원 자격 한 덩어리 — 원문 요건을 먼저 보여 주고, 그 아래에 '내 정보로 확인한 것'을 붙인다.
      앱이 판정할 수 있는 건 성적·소득구간·학년 같은 숫자 조건뿐이고, 원문의 '유자녀' 같은 항목은
@@ -1537,7 +2929,6 @@ function openDetail(id) {
   /* 'AI가 읽음 · 검수 전' — '자동 등록 · 검수 전' 배지와 같은 규칙(2026-08-23).
      사람이 검수하지 않았다는 사실을 숨기지 않는다. 관리자 화면에서 컨펌하면
      eligibilityReviewed 가 true 가 되어 사라진다. */
-  const aiRead = /^AI/.test(sch.eligibilityFrom || '') && sch.eligibilityReviewed !== true;
   /* 요건은 원문을 통째로 붙이지 않고 **짧게 다듬어 번호를 매겨** 보여 준다.
      프로필과 확실히 맞으면 ✓, 확실히 안 맞으면 ✕, 판정할 수 없으면 색 없이 둔다
      (2026-08-02 개발자 지시). 판정 규칙은 match-engine에 있어 알림과 갈라지지 않는다. */
@@ -1564,8 +2955,8 @@ function openDetail(id) {
   const reqStruct = requirementStruct(sch);
   if (reqStruct) {
     const must = [...reqStruct.common, ...reqStruct.grade];
-    if (must.length) reasonRows += `<li class="r-head">모두 해당해야 해요</li>` + must.map((e) => reqRow(e)).join('');
-    reasonRows += `<li class="r-head">아래 ${reqStruct.either.length === 2 ? '둘' : reqStruct.either.length + '가지'} 중 하나에 해당하면 돼요</li>`;
+    if (must.length) reasonRows += `<li class="r-head">공통 요건 <em>모두 해당해야 합니다</em></li>` + must.map((e) => reqRow(e)).join('');
+    reasonRows += `<li class="r-head">다음 ${reqStruct.either.length === 2 ? '둘' : reqStruct.either.length + '가지'} 중 하나 <em>하나만 해당하면 됩니다</em></li>`;
     reqStruct.either.forEach((b, i) => {
       /* 이름을 못 읽었으면 지어내지 않고 순서로만 가른다 (원칙 8-1) */
       reasonRows += `<li class="r-branch">${esc(b.label || `${i + 1}번째 경우`)}</li>`
@@ -1594,7 +2985,7 @@ function openDetail(id) {
     /* 자격 칸이 비지 않게 되돌린 줄은 여기 또 쓰지 않는다 — 같은 문장이 두 블록에 뜬다 */
   ])].filter((t) => !reqLines.includes(t));
   if (priLines.length) {
-    reasonRows += `<li class="r-head">자격을 갖춘 사람 중 먼저 뽑는 기준이에요</li>`
+    reasonRows += `<li class="r-head">우선 선발 기준 <em>자격을 갖춘 사람 중 먼저 뽑는 기준</em></li>`
       + priLines.map((e) => `<li class="r-req">${esc(e)}</li>`).join('');
   }
 
@@ -1607,74 +2998,120 @@ function openDetail(id) {
   const exLines = requirementLines(
     sch, [...(sch.eligibilityExcludes || []), ...(sch.eligibilityLines || [])], { onlyExclude: true });
   if (exLines.length) {
-    reasonRows += `<li class="r-head">이런 경우는 제외돼요</li>`
+    reasonRows += `<li class="r-head">지원 제외 대상</li>`
       + exLines.map((e) => `<li class="r-req">${esc(e)}</li>`).join('');
   }
-  if (aiRead && reasonRows) {
-    reasonRows = `<li class="r-ai">🤖 이 자격은 AI가 공고 원문에서 읽었어요 · 사람 검수 전</li>` + reasonRows;
-  }
+  /* 🔴 '이 자격은 AI가 공고 원문에서 읽은 것입니다 · 사람 검수 전' 줄을 **뺐다**
+     (2026-09-17 개발자 지시 — 앱 내부 사정은 관리자에게만). 누가 읽었고 사람이 검수했는지는
+     우리 공정 이야기이고, 학생이 그 줄을 보고 할 수 있는 일이 하나도 없다.
+     🔴 사라진 게 아니라 **자리를 옮겼다** — 관리자 화면 '데이터 품질'의
+        'AI가 읽은 자격 · 사람 검수 전' 카드가 같은 것을 센다(`_admin/admin.js` aiReadCount).
+     ⚠️ 그 줄을 만들던 `aiRead` 상수도 함께 지웠다 — 여기서 쓰는 곳이 더는 없다.
+        판정식(`/^AI/.test(eligibilityFrom) && eligibilityReviewed !== true`)의 원본은
+        이제 관리자 쪽 한 곳이다. 되살린다면 베끼지 말고 그 함수를 부를 것. */
   if (checkRows) {
-    reasonRows += `<li class="r-head">내 정보로 확인한 것</li>` + checkRows;
+    reasonRows += `<li class="r-head">내 정보로 확인한 항목</li>` + checkRows;
   }
   if (!reasonRows) {
     /* 원문 요건도 못 읽었고 판정할 조건도 없는 경우 — '제한이 없다'가 아니라 **모른다**는 뜻이다.
        원문에서 '제한 없음'을 확인한 공고만 eligibilityVerified로 확신 문구를 낸다. */
     reasonRows = sch.eligibilityVerified
-      ? `<li class="r-ok">✓ 별도 자격 제한이 없는 공고예요${result.status === 'selective' ? ' — 지원자 중 선발 심사로 결정돼요' : ''}</li>`
-      : `<li class="r-unk">? 지원 자격을 아직 읽지 못했어요 — 아래 원문에서 확인해 주세요${result.status === 'selective' ? ' (지원자 중 선발 심사로 결정돼요)' : ''}</li>`;
+      ? `<li class="r-ok">✓ 별도 자격 제한이 없는 공고입니다${result.status === 'selective' ? ' — 지원자 중 선발 심사로 결정됩니다' : ''}</li>`
+      : `<li class="r-unk">? 지원 자격은 아래 공고 원문에서 확인해 주세요${result.status === 'selective' ? ' (지원자 중 선발 심사로 결정됩니다)' : ''}</li>`;
   }
   const missingRows = '';
 
-  let btnLabel = '⚡ 원클릭 신청 준비하기';
-  if (app && !app.pending) btnLabel = '✓ 신청 준비 완료됨';
-  else if (app && app.pending) btnLabel = '📝 서류 작성하고 준비 완료하기';
-  else if (d.days < 0) btnLabel = '마감된 장학금이에요';
-  else if (!canApply) btnLabel = '요건 미충족으로 신청할 수 없어요';
+  /* 안내는 한 문장으로 (2026-09-01 개발자 지시). 한 화면에 설명이 셋이나 떠 있었는데
+     (발췌 출처 설명 · 전국 공고 회색 상자 · 제출 서류 부연) 셋 다 결국 '원문을 보라'였다.
+     🔴 링크 이름은 그 주소가 **실제로 여는 화면**을 말한다 — 목록 주소밖에 못 찾은
+        공고를 '원문 공고'라고 적으면 눌러 본 학생에게 거짓말이 된다(원칙 8-1). */
+  /* 🔴 **층2 링크를 '한국장학재단'이라고 부르면 안 된다** (2026-09-12).
+     층2의 sourceUrl 은 KOSAF 가 아니라 **그 재단 자기 홈페이지**다(예: `namgu.gwangju.kr`).
+     '한국장학재단 ↗'이라 적어 두면 눌러 본 학생에게 거짓말이 된다 — 이 규칙(링크 이름은
+     그 주소가 **실제로 여는 화면**을 말한다)은 바로 윗 문단이 이미 적어 둔 것이다.
+     KOSAF 를 가리키는 것은 `program`(data.js 의 상시 제도)뿐이다. */
+  const srcLabel = sch.program ? '한국장학재단 ↗'
+    : sch.sourceKind === 'kosaf' ? '재단 홈페이지 ↗'
+    : isBoardListLink(sch.sourceUrl) ? '게시판 목록 ↗' : '원문 공고 ↗';
+  const srcNote = sch.sourceUrl
+    ? `<p class="doc-legend">자세한 내용은 <a href="${esc(safeUrl(sch.sourceUrl))}" target="_blank" rel="noopener">${srcLabel}</a>에서 확인</p>`
+    : '<p class="doc-legend">자세한 내용은 원문 공고에서 확인</p>';
+
+  let btnLabel = '신청 준비 시작';
+  if (app && !app.pending) btnLabel = '신청 준비 완료됨';
+  else if (app && app.pending) btnLabel = '서류 작성 이어서 하기';
+  else if (d.days < 0) btnLabel = '마감된 장학금';
+  /* 🔴 여기에 '요건 미충족 — 신청할 수 없음' 문구를 **되살리지 말 것** (2026-09-13).
+     자격 판정은 이제 버튼을 잠그지 않는다(위 canApply). 못 미더운 판정은 버튼 위
+     `applyCaution` 줄이 말하고, 누를지는 학생이 정한다. 문구를 여기로 되돌리면
+     '신청할 수 없음'이라는 **사실이 아닌 말**이 화면에 다시 뜬다. */
 
   $('#detail-sheet').innerHTML = `
     <div class="sheet-handle"></div>
     <div class="sheet-body">
-      <div class="sch-top">
-        <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${sch.type}</span>
+      ${/* 🔴 시트 머리에는 **'이 공고가 무엇인가'만** 둔다 (2026-08-31 재설계).
+           정리 전에는 여기에 교외·D-day·검수전·적합도·판정 다섯이 붙어 두 줄로 흘렀고,
+           그중 둘(적합도 배지와 '지원 가능·선발 심사' 알약)은 **서로 다른 축의 판정**이라
+           학생이 어느 쪽을 믿어야 할지 알 수 없었다.
+           판정은 근거 옆이 제자리다 — 아래 '지원 자격' 머리로 내렸다.
+           ⚠️ `{ full: true }` 는 공동작업자가 넣은 것 — 상세에서는 퍼센트·'확인 필요'까지
+              다 보여 준다는 뜻이라 그대로 살린다(원칙 8-1). */ ''}
+      <div class="sch-top sheet-top">
         ${sch.program ? '<span class="badge badge-program">상시 제도</span>' : `<span class="badge badge-dday ${d.cls}">${d.label}</span>`}
-        ${sch.auto ? '<span class="badge badge-auto">자동 등록 · 검수 전</span>' : ''}
-        ${fitBadgeHtml(fit, fd)}
-        <span class="status-pill pill-${meta.cls}">${meta.label}</span>
+        ${/* 🔴 '· 검수 전' 을 뗐다 (2026-09-17 개발자 지시). 남는 것은 교내/교외처럼
+             **학생이 쓰는 갈래**뿐이다. 검수 상태는 관리자 화면이 센다. */ ''}
+        <span class="badge badge-kind">${esc(sch.type || '장학금')}</span>
+        ${saveBtnHtml(sch.id)}
       </div>
+      ${/* 🔴 순서: 이름 → **금액** → 주관·접수 (2026-09-02 개발자 지시).
+           학생이 카드를 열고 가장 먼저 찾는 것은 얼마를 받느냐다. 주관 기관은 제목에
+           이미 들어 있는 경우가 많아(예: '해외자원개발진흥재단 KOLNG …') 금액을 한 줄
+           아래로 밀고 있었다.
+           그리고 summary 를 지운다 — '해외자원개발진흥재단 — 한국장학재단 등록 장학금.'
+           처럼 바로 윗줄과 같은 말을 두 번 하는 데이터가 많다(개발자 지적). 없앤 정보는
+           없다: 주관은 아랫줄에, '한국장학재단 등록' 이라는 사실은 원문 링크 이름
+           ('한국장학재단 ↗')이 말한다. */ ''}
       <h3 class="sheet-title">${esc(sch.name)}</h3>
-      <p class="sheet-provider">${esc(sch.provider)} · ${esc(sch.period)}</p>
       <p class="sheet-amount">${esc(sch.amount)}</p>
-      <p class="sheet-summary">${esc(sch.summary)}</p>
+      ${/* 금액을 숫자로 못 읽은 층2 공고 — 재단이 그 칸에 적어 둔 말을 그대로 옮긴다.
+           카드 머리에는 안 띄운다(위 kosafAmountLabel 주석). */ ''}
+      ${sch.amountNote ? `<p class="doc-legend">재단이 적어 둔 지원금액 — ${esc(sch.amountNote)}</p>` : ''}
+      <p class="sheet-provider">${esc(sch.provider)} · ${esc(sch.period)}</p>
+      ${scheduleRowHtml(sch)}
 
-      <h4>지원 자격</h4>
+      <div class="sheet-verdict">
+        <h4>지원 자격</h4>
+        <span class="verdict-marks">${fitBadgeHtml(fit, fd, { full: true })}<span class="status-pill pill-${meta.cls}">${meta.label}</span></span>
+      </div>
       <ul class="reason-list">${reasonRows}${missingRows}</ul>
-      <p class="doc-legend">앱이 확인할 수 있는 건 성적·소득구간·학년처럼 프로필에 있는 항목뿐이에요. 나머지 요건과 최신 내용은 ${sch.sourceUrl
-        ? `<a href="${esc(safeUrl(sch.sourceUrl))}" target="_blank" rel="noopener" style="color:var(--primary);font-weight:700">${sch.program ? '한국장학재단 ↗' : (isBoardListLink(sch.sourceUrl) ? '게시판 목록 ↗' : '원문 공고 ↗')}</a>에서`
-        : '공고 원문에서'} 다시 확인하세요.</p>
+
+      ${(sch.sourceKind === 'kosaf' && sch.contact)
+        ? `<p class="doc-legend">문의 ${esc(sch.contact)}</p>` : ''}
 
       <h4>제출 서류</h4>
       <ul class="doc-list">
         ${sch.documents.map((doc) => {
           const auto = /자동/.test(doc);
-          return `<li>${auto ? '<span class="doc-auto">자동</span>' : '<span class="doc-manual">직접</span>'} ${doc}</li>`;
+          return `<li>${auto ? '<span class="doc-auto">자동</span>' : '<span class="doc-manual">직접</span>'} ${esc(doc)}</li>`;
         }).join('')}
       </ul>
-      <p class="doc-legend">${sch.documents.some((doc) => /자동/.test(doc))
-        ? `'자동' 표시 서류는 한국장학재단 등 제출처가 신청 과정에서 전산으로 확인하는 항목이에요 — 따로 준비해야 하는지는 공고 원문에서 확인하세요. `
-        : ''}'직접' 서류 중 자기소개서·계획서·사유서·신청 양식은 앱에서 바로 작성할 수 있어요.</p>
+      ${srcNote}
 
       ${(sch.excerpts && sch.excerpts.length) ? `
       <h4>공고 원문 안내 <span class="channel-tag">원문 그대로</span></h4>
       <ul class="doc-list">${sch.excerpts.map((e) => `<li>${esc(e)}</li>`).join('')}</ul>
-      <p class="doc-legend">공고 본문에서 자동으로 그대로 가져온 문장이에요 — 전체 내용은 원문 공고 ↗에서 확인하세요.</p>` : ''}
-      <p class="sheet-note">💡 ${esc(sch.note)}</p>
+      ${srcNote}` : ''}
       ${(sch.attachments && sch.attachments.length) ? `
-      <h4>공고 원본 첨부 양식</h4>
+      ${/* 🔴 머리말이 **그 파일이 실제로 무엇인지**를 말해야 한다 (2026-09-12).
+           층1은 학교 게시판에 붙어 있던 신청서 양식이고, 층2는 재단이 KOSAF 에 올린
+           선발 공고문이다. 둘을 '첨부 양식' 한 이름으로 부르면, 공고문을 받은 학생이
+           신청서인 줄 알고 그 안에서 빈칸을 찾는다(원칙 8-1 — 확인 안 한 것을 말하지 않는다). */ ''}
+      <h4>${sch.sourceKind === 'kosaf' ? '선발 공고문 <span class="channel-tag">재단 원문</span>' : '공고 원본 첨부 양식'}</h4>
       <ul class="doc-list">
-        ${sch.attachments.map((a) => `<li>📎 <a href="${esc(safeUrl(a.url))}" target="_blank" rel="noopener" style="color:var(--primary)">${esc(a.name)}</a></li>`).join('')}
+        ${sch.attachments.map((a) => `<li class="att"><a href="${esc(safeUrl(a.url))}" target="_blank" rel="noopener" style="color:var(--primary)">${esc(a.name)}</a>${a.bytes ? ` <span class="doc-legend">${Math.max(1, Math.round(a.bytes / 1024))}KB</span>` : ''}</li>`).join('')}
       </ul>` : ''}
-      <p class="sheet-deadline">${sch.program ? '신청 기간: 한국장학재단 공지 확인' : `마감일 ${sch.deadline || '원문 공고 확인'}`} · ${sch.duplicable ? '타 장학금과 중복 수혜 가능' : '중복 수혜 제한 있음'}${sch.sourceUrl ? ` · <a href="${esc(safeUrl(sch.sourceUrl))}" target="_blank" rel="noopener" style="color:var(--primary);font-weight:700">${sch.program ? '한국장학재단 ↗' : (isBoardListLink(sch.sourceUrl) ? '게시판 목록 ↗' : '원문 공고 ↗')}</a>` : ''}</p>
-      ${(!sch.program && isBoardListLink(sch.sourceUrl)) ? `<p class="doc-legend">이 학교 게시판은 목록에서 글을 눌러야 열리는 방식이라 공고 하나로 바로 가는 주소를 확인하지 못했어요. 열리는 목록에서 <strong>${esc(boardListTitle(sch.sourceUrl))}</strong>을(를) 찾아 눌러 주세요.</p>` : ''}
+      <p class="sheet-deadline">${sch.program ? '신청 기간: 한국장학재단 공지 확인' : `마감일 ${sch.deadline || '원문 공고 확인'}`} · ${sch.duplicable ? '타 장학금과 중복 수혜 가능' : '중복 수혜 제한 있음'}</p>
+      ${(!sch.program && isBoardListLink(sch.sourceUrl)) ? `<p class="doc-legend">이 학교 게시판은 목록에서 글을 눌러야 열리는 방식이라 공고 하나로 바로 가는 주소를 확인하지 못했습니다. 열리는 목록에서 <strong>${esc(boardListTitle(sch.sourceUrl))}</strong>을(를) 찾아 눌러 주세요.</p>` : ''}
 
       ${app && !app.pending ? (() => {
         const step = effectiveStep(app, sch);
@@ -1688,21 +3125,21 @@ function openDetail(id) {
         </div>
         <p class="applied-at">${app.appliedAt} 준비 완료 · 최종 제출처: ${ch.url ? `<a href="${esc(safeUrl(ch.url))}" target="_blank" rel="noopener">${esc(ch.label)}</a>` : esc(ch.label)}</p>
         ${step === 0 ? `
-          <button class="btn btn-outline" id="btn-mark-submitted" style="width:100%;margin-bottom:6px">✅ 공식 제출을 마쳤어요 — 제출 완료로 기록</button>
-          <p class="dp-note">최종 제출은 ${ch.label}에서 이루어져요. 제출을 마친 뒤 눌러 주시면 진행 단계가 넘어가요.</p>` : ''}
+          <button class="btn btn-outline" id="btn-mark-submitted" style="width:100%;margin-bottom:6px">공식 제출 완료로 기록</button>
+          <p class="dp-note">최종 제출은 ${ch.label}에서 이루어집니다. 제출을 마친 뒤 누르면 다음 단계로 넘어갑니다.</p>` : ''}
         ${step === 1 ? `
-          <p class="progress-note">📮 ${app.submittedAt} 공식 제출 기록됨${sch.deadline ? ` · 접수 마감(${sch.deadline}) 후 자동으로 심사 단계로 표시돼요` : ''}</p>
+          <p class="progress-note">${app.submittedAt} 공식 제출 기록됨${sch.deadline ? ` · 접수 마감(${sch.deadline}) 후 자동으로 심사 단계로 표시됩니다` : ''}</p>
           <button class="link-btn" id="btn-undo-progress" style="margin-bottom:10px">제출 기록 취소</button>` : ''}
         ${step === 2 ? `
-          <p class="progress-note">🔍 접수가 마감되어 심사가 진행 중이에요. 발표 결과가 나오면 아래에 기록해 주세요 — 발표 확인은 ${ch.label}${sch.sourceUrl ? ' 또는 원문 공고' : ''}에서 할 수 있어요.</p>
+          <p class="progress-note">접수가 마감되어 심사가 진행 중입니다. 발표 결과가 나오면 아래에 기록해 주세요 — 발표 확인은 ${ch.label}${sch.sourceUrl ? ' 또는 원문 공고' : ''}에서 할 수 있습니다.</p>
           <div class="submit-actions" style="margin-bottom:12px">
-            <button class="btn btn-outline" id="btn-result-won">🎉 선정됐어요</button>
+            <button class="btn btn-outline" id="btn-result-won">선정됨</button>
             <button class="btn btn-outline" id="btn-result-lost">아쉽게 미선정</button>
           </div>` : ''}
         ${step === 3 ? `
           <p class="progress-note ${app.result === 'won' ? 'progress-won' : ''}">${app.result === 'won'
-            ? `🎉 ${app.resultAt} 선정! 축하드려요 — ${sch.amount}`
-            : `${app.resultAt} 미선정으로 기록했어요. 아래 탐색 탭에서 다음 장학금을 함께 찾아봐요.`}</p>
+            ? `${esc(app.resultAt)} 선정 · ${esc(sch.amount)}`
+            : `${esc(app.resultAt)} 미선정으로 기록됨`}</p>
           <button class="link-btn" id="btn-undo-progress" style="margin-bottom:10px">결과 기록 취소</button>` : ''}
         ${app.docs && app.docs.length ? `
           <details class="dp-saved"><summary>작성한 서류 보기 (${app.docs.length})</summary>
@@ -1711,28 +3148,46 @@ function openDetail(id) {
         ${app.formAns && formTplIdFor(sch) ? `
           <h4>작성한 양식 문서</h4>
           <div class="submit-actions">
-            <button class="btn btn-outline" id="btn-form-save">📄 .doc 저장</button>
-            <button class="btn btn-outline" id="btn-form-print">🖨 인쇄/PDF</button>
-            <button class="btn btn-outline" id="btn-form-share">📤 공유</button>
+            <button class="btn btn-outline" id="btn-form-save">.doc 저장</button>
+            <button class="btn btn-outline" id="btn-form-print">인쇄 · PDF</button>
+            <button class="btn btn-outline" id="btn-form-share">공유</button>
           </div>
-          <button class="btn btn-outline" id="btn-form-edit" style="width:100%;margin-bottom:14px">✏️ 양식 다시 작성</button>` : ''}
+          <button class="btn btn-outline" id="btn-form-edit" style="width:100%;margin-bottom:14px">양식 다시 작성</button>` : ''}
         ${certStatusListHtml(sch)}
         <h4>최종 제출 방법 <span class="channel-tag">${submitChannelLabel(sch)}</span></h4>
         <ol class="guide-list">${ch.guide.map((g) => `<li>${g}</li>`).join('')}</ol>
+        ${schoolPortalNote(sch)}
         ${(ch.url || sch.sourceUrl) && step < 1 ? `
-        <button class="btn btn-primary" id="btn-go-submit" style="width:100%;margin-bottom:8px">⚡ 내용 복사하고 제출처 열기 ↗</button>` : ''}
+        <button class="btn btn-primary" id="btn-go-submit" style="width:100%;margin-bottom:8px">내용 복사하고 제출처 열기 ↗</button>` : ''}
         <div class="submit-actions">
-          <button class="btn btn-outline" id="btn-copy-docs">📋 서류 내용 복사</button>
-          <button class="btn btn-outline" id="btn-share-docs">📤 파일과 함께 공유</button>
+          <button class="btn btn-outline" id="btn-copy-docs">서류 내용 복사</button>
+          <button class="btn btn-outline" id="btn-share-docs">파일과 함께 공유</button>
         </div>
-        ${sch.applyEmail ? `<button class="btn btn-primary btn-lg" id="btn-mail-apply" style="margin-bottom:14px">📧 접수 메일 열기 (내용 자동 완성)</button>` : ''}`;
+        ${sch.applyEmail ? `<button class="btn btn-primary btn-lg" id="btn-mail-apply" style="margin-bottom:14px">접수 메일 열기 (내용 자동 완성)</button>` : ''}`;
       })() : ''}
 
+      ${/* 🔴 판정이 못 미더울 때 **막는 대신 말한다** (2026-09-13 · 핵심-2).
+           문구는 두 갈래다 — 못 읽은 것(unknown)과 안 맞아 보이는 것(ineligible)은
+           학생이 해야 할 일이 다르다: 앞은 '원문을 읽어 보라', 뒤는 '그래도 내가 맞는지
+           따져 보라'. 뭉뚱그리면 둘 다 '안 된다'로 읽힌다. */ ''}
+      ${/* 🔴 앞 갈래에서 **우리 사정을 뺐다** (2026-09-17 개발자 지시: "'이 공고는 지원자격을
+           아직 읽지 못했습니다' 와 같은 설명이 나타나지 않게 전부 삭제 … 앱 내부 사정에 대한
+           설명은 학생이 아니라 관리자에게만"). 학생이 할 일은 그대로 남는다 — 남은 한 문장은
+           '우리가 뭘 못 했다'가 아니라 '원문에서 자격을 보고 신청하라'는 안내다.
+           🔴 문장을 통째로 지우지는 않았다: 지우면 자격을 한 줄도 못 읽은 공고가 아무 말 없이
+              신청 버튼만 내밀어, 앱이 자격을 확인해 준 것처럼 읽힌다(원칙 8-1).
+           🔴 몇 건이 그런 상태인지는 관리자 화면 '지원 자격 미확보'가 센다. */ ''}
+      ${applyCaution ? `<p class="dp-note dp-caution">${applyCaution === 'unknown'
+        ? '신청 전에 공고 원문에서 지원 자격을 확인하세요.'
+        : '입력한 정보로는 요건이 맞지 않아 보입니다. 판정이 틀릴 수 있으니 원문을 확인한 뒤 신청하세요.'}</p>` : ''}
       <button class="btn btn-primary btn-lg" id="btn-apply-one" ${canApply ? '' : 'disabled'}>${btnLabel}</button>
-      ${canApply ? `<p class="dp-note">준비 완료 후 최종 제출처(${ch.label})를 안내해 드려요.${(!sch.formId && sch.prepFormId) ? ' 이 공고는 별도 양식 없이 자유 형식 제출을 받는 공고라, 앱이 제출용 지원문서 작성을 도와드려요.' : ''}</p>` : ''}
+      ${canApply ? `<p class="dp-note">준비를 마치면 최종 제출처(${ch.label})가 표시됩니다.${(!sch.formId && sch.prepFormId) ? ' 이 공고는 별도 양식 없이 자유 형식 제출을 받으므로, 앱에서 제출용 지원문서를 작성할 수 있습니다.' : ''}</p>` : ''}
     </div>`;
 
   openSheetShell();
+  /* 이어보기 — 보던 공고를 적어 둔다. 🔴 **판정은 적지 않는다**: 다시 열 때 이 함수가
+     처음부터 다시 돌아 `dday`·`evaluate` 로 새로 판정한다(자리를 비운 사이 마감될 수 있다). */
+  if (typeof resumeSave === 'function') resumeSave({ sheet: { kind: 'detail', id: sch.id } });
 
   if (canApply) {
     $('#btn-apply-one').addEventListener('click', () => applyTo(sch));
@@ -1788,10 +3243,15 @@ function scrollableAtTop(target, sheet) {
    (학교 목록에서 손가락이 닿는 순간 선택돼 버리던 것과 같은 계열의 실수를 막는 조건).
    ⚠️ 새로 만드는 시트에도 반드시 붙일 것 — 2026-08-21 개발자 지시. */
 function enableSheetSwipe(sheet, close) {
-  let startY = 0, dy = 0, dragging = false;
+  let startY = 0, dy = 0, dragging = false, startT = 0;
+  /* 🔴 **거리만 보면 안 된다** (2026-09-06). 90px 을 넘겨야만 닫히니 짧고 빠르게 튕기는
+     — 시트를 닫는 가장 자연스러운 손짓 — 이 무시됐다. 빠르기(px/ms)도 함께 본다.
+     0.11 은 '툭 치는 것'과 '천천히 끄는 것'이 갈리는 선이다. */
+  const FLICK = 0.11;
   sheet.addEventListener('touchstart', (e) => {
     if (e.touches.length !== 1) return;
     startY = e.touches[0].clientY;
+    startT = Date.now();
     dy = 0;
     dragging = scrollableAtTop(e.target, sheet);
   }, { passive: true });
@@ -1811,25 +3271,242 @@ function enableSheetSwipe(sheet, close) {
     sheet.style.transition = '';
     void sheet.offsetHeight;          // transition을 되살린 뒤에 transform을 바꿔야 튀지 않는다
     sheet.style.transform = '';
-    if (dy > 90) close();
+    const speed = dy / Math.max(1, Date.now() - startT);
+    if (dy > 90 || (dy > 12 && speed > FLICK)) close();
   }, { passive: true });
+}
+
+/* ── 안쪽 화면을 **오른쪽으로 쓸어** 되돌아가기 (2026-09-11 개발자 요청) ──────────
+   설정·휴지통·이용약관은 MY 안쪽 화면이라 나가는 길이 왼쪽 위 화살표 하나뿐이었다.
+   손가락으로 오른쪽으로 쓸면 그 화면을 나간다 — 시트를 아래로 쓸어 닫는 것과 같은 계열이다.
+
+   🔴 **규칙은 시트 것(enableSheetSwipe)과 같은 뼈대를 쓴다**: 거리만 보지 않고 **튕김
+      빠르기**도 함께 본다(짧고 빠르게 튕기는 것이 가장 자연스러운 손짓인데 거리만 보면
+      무시된다 — 2026-09-06 에 시트에서 겪은 그것). 문턱 값도 같은 뜻으로 맞춰 뒀다.
+
+   🔴 **세로 스크롤을 뺏지 않는다.** 첫 움직임에서 축을 정하고, 세로가 더 크면 그 손짓은
+      통째로 포기한다(다시 붙잡지 않는다). 이 저장소는 '보이지 않는 것이 손가락을 가로채는'
+      사고를 여러 번 냈다 — 밀어서 삭제가 그래서 걷어내졌다(2026-09-01).
+
+   🔴 **가로로 스크롤되는 것 위에서는 안 된다.** 약관의 표처럼 옆으로 밀리는 영역이
+      왼쪽 끝이 아니면 그건 그 영역의 스크롤이다(시트의 `scrollableAtTop` 과 같은 판정).
+
+   ⚠️ iOS 는 **화면 왼쪽 끝**에서 오른쪽으로 끄는 것을 제 '뒤로 가기'로 가로챈다. 그래서
+      왼쪽 끝 24px 에서 시작한 손짓은 건드리지 않고 넘긴다 — 우리가 잡아 봐야 OS 와 둘이
+      같이 반응해 두 번 나가거나 화면이 튄다. 그 자리를 뺀다고 손해가 없다(가운데에서
+      쓸어도 되니까).
+   ⚠️ 회귀는 **반드시 TouchEvent 로** 재현할 것 — 마우스로는 이 유형이 한 번도 재현되지
+      않았다(13차 세션 학교 검색 사고). verify/verify-settings.js 의 '쓸어서 나가기' 절. */
+function scrollableAtLeft(target, screen) {
+  for (let el = target; el && el !== screen.parentNode; el = el.parentElement) {
+    if (el.scrollLeft > 0) return false;
+  }
+  return true;
+}
+
+const SWIPE_EDGE_IOS = 24;   /* iOS 제 뒤로가기에 양보하는 왼쪽 끝 폭 */
+
+/* 🔴 손짓은 **앱 전체**(`#app`)에서 받는다 — 화면 조각에 붙이면 안 된다.
+   빈 휴지통처럼 내용이 짧은 화면은 아래쪽이 통째로 비어 있어서, 그 조각에만 붙이면
+   학생이 화면 가운데를 쓸어도 아무 일도 안 일어난다(검사에서 실제로 그렇게 걸렸다).
+   지금 어느 화면인지는 `currentScreen` 이 말해 주고, 안쪽 화면일 때만 맡는다. */
+const SWIPE_BACK_TO = {
+  settings: 'my',
+  trash: 'settings',
+  terms: 'settings',
+  logins: 'settings',
+  faq: 'settings',
+  support: 'settings',
+  perms: 'settings',
+};
+
+function enableScreenSwipeBack(root) {
+  if (!root || root.dataset.swipeBack) return;
+  root.dataset.swipeBack = '1';
+  const screen = () => $(`#screen-${currentScreen}`);
+  let x0 = 0, y0 = 0, dx = 0, t0 = 0, W = 1;
+  let live = false;      // 이 손짓을 우리가 맡았나
+  let axis = '';         // '' 아직 모름 · 'x' 우리 것 · 'y' 스크롤이라 포기
+  /* 🔴 속도는 **마지막 짧은 구간**으로 잰다. 손짓 전체로 나누면 '조금 끌고 → 멈췄다가 →
+     뗀다' 가 툭 치기로 읽혀, 되돌리려던 화면이 나가 버린다. 손을 멈췄으면 속도는 0이다. */
+  let vs = [];           // 최근 몇 점 {t, x}
+  const VWIN = 100;      // 속도를 재는 구간 (ms)
+  const VREST = 90;      // 이만큼 멈춰 있었으면 '놓은 것'이지 '친 것'이 아니다
+  const FLICK = 0.08;    // 튕김으로 볼 빠르기 (px/ms)
+  const TAKE = 0.22;     // 이만큼 끌면 놓아도 나간다 (화면 너비의 몫 · 430px 폰에서 95px)
+
+  /* 🔴 **우리가 그린 적 없으면 지우지 않는다** (2026-09-12 코드 리뷰가 잡았다).
+     손짓이 끝날 때마다 화면의 transform 을 비우고 있었는데, 그 자리엔 **당겨서 새로고침**
+     (`interactions.js`)이 붙잡아 둔 `translateY` 가 들어 있을 수 있다. 우리 손짓 판정은
+     `#app` 에 붙어 있어 document 보다 먼저 돌기 때문에, 안쪽 화면에서 아래로 당기면
+     놓는 순간 우리가 먼저 자국을 지워 **되돌아가는 움직임이 통째로 사라졌다**
+     (실측: 당기는 중 translateY(50px) → 뗀 직후 빈 값). */
+  let painted = false;
+  const reset = () => {
+    live = false; axis = '';
+    if (!painted) return;
+    painted = false;
+    const el = screen();
+    if (!el) return;
+    el.style.transition = '';
+    void el.offsetHeight;
+    el.style.transform = '';
+    el.style.opacity = '';
+  };
+
+  root.addEventListener('touchstart', (e) => {
+    live = false;
+    if (e.touches.length !== 1) return;
+    if (!SWIPE_BACK_TO[currentScreen] || !screen()) return;   // 안쪽 화면일 때만
+    /* 🔴 시트 안에서는 손대지 않는다. 시트(#detail-sheet 등)는 `#app` **안에** 있어서,
+       설정 화면 위에 로그인 시트가 떠 있을 때 그 안의 손짓까지 이 규칙이 가로챈다 —
+       시트는 제 손짓(아래로 쓸어 닫기)이 따로 있다(enableSheetSwipe). */
+    if (e.target.closest && e.target.closest('.sheet, .sheet-backdrop')) return;
+    const t = e.touches[0];
+    if (t.clientX <= SWIPE_EDGE_IOS) return;                   // OS 몫
+    if (!scrollableAtLeft(e.target, root)) return;
+    x0 = t.clientX; y0 = t.clientY; dx = 0; t0 = Date.now();
+    /* 문턱에 쓸 너비는 **여기서** 잰다 — 안 재면 1로 남아 문턱이 0.22px 이 된다 */
+    W = Math.max(1, screen().getBoundingClientRect().width);
+    vs = [{ t: t0, x: 0 }];
+    live = true; axis = '';
+  }, { passive: true });
+
+  root.addEventListener('touchmove', (e) => {
+    if (!live) return;
+    const el = screen();
+    if (!el) { live = false; return; }
+    const t = e.touches[0];
+    const mx = t.clientX - x0;
+    const my = t.clientY - y0;
+    if (!axis) {
+      /* 🔴 **엄지는 곧게 못 움직인다.** 8px 움직인 순간 `|가로| > |세로|` 하나로 정하면
+         엄지를 굴려 세로가 먼저 나가는 흔한 손짓을 통째로 버린다("쓸었는데 안 된다").
+         뚜렷해질 때까지 기다리되, **맡는 순간에는 가로가 이겨 있어야** 한다 —
+         비스듬한 손짓은 브라우저가 이미 세로로 굴리는 중이라 늦게 끼어들면 화면이 튄다. */
+      if (Math.abs(my) > 12 && Math.abs(my) > Math.abs(mx) * 1.4) { live = false; return; }
+      if (mx <= -10) { live = false; return; }
+      if (mx < 10 || Math.abs(my) >= mx) return;   // 아직 방향을 말하지 않았다
+      axis = 'x';
+    }
+    dx = mx;
+    const now = Date.now();
+    vs.push({ t: now, x: mx });
+    while (vs.length > 2 && now - vs[0].t > VWIN) vs.shift();
+    if (dx <= 0) { if (painted) { el.style.transform = ''; el.style.opacity = ''; } return; }
+    e.preventDefault();
+    /* 🔴 **인라인으로 끈다.** 당겨서 새로고침(`interactions.js release`)이 이 화면에
+       `transition: transform 0.28s` 를 인라인으로 남기는데, 인라인은 클래스를 이기므로
+       CSS 로는 못 끈다 — 안 끄면 화면이 손보다 0.28초 늦게 따라온다. */
+    painted = true;
+    el.style.transition = 'none';
+    el.style.transform = `translateX(${dx}px)`;
+    /* 멀리 끌수록 옅어진다 — '나가는 중'이 손끝에 보이게 (0.4 아래로는 안 내린다) */
+    el.style.opacity = String(Math.max(0.4, 1 - dx / 520));
+  }, { passive: false });
+
+  const finish = () => {
+    if (!live) { reset(); return; }
+    const moved = dx;
+    const nowMs = Date.now();
+    const a = vs[0], z = vs[vs.length - 1];
+    /* 🔴 '멈췄다'와 '너무 빨라서 시간이 0'을 **가르는 것**이 여기다 (2026-09-12).
+       멈춤의 증거는 오직 **마지막 점 이후의 빈 시간**(VREST)이다. 구간 길이가 0인 것은
+       그 반대 — 그 짧은 사이에 손이 그만큼 갔다는 뜻이라 오히려 빠른 것이다.
+       ⚠️ 둘을 한 줄에 뭉쳐 `z.t <= a.t → 0` 으로 두었더니, 점들이 **같은 밀리초**에
+          몰린 빠른 튕김이 '멈춤'으로 읽혀 검사가 세 번에 한 번 빨간불이었다(실측).
+          브라우저는 touchmove 를 묶어 보내고 Date.now() 는 1ms 눈금이라 실제로 생긴다. */
+    let span = z && a ? z.t - a.t : 0;
+    let dist = z && a ? z.x - a.x : 0;
+    if (span <= 0) { span = nowMs - t0; dist = moved; }   // 한 틱에 몰렸다 — 손짓 전체로 다시 본다
+    const speed = (!z || nowMs - z.t > VREST)
+      ? 0                                           // 손이 멈춰 있었다 — 친 게 아니다
+      : (span > 0 ? dist / span : Infinity);        // 0ms 에 그만큼 갔다 = 아주 빠른 튕김
+    const to = SWIPE_BACK_TO[currentScreen];
+    reset();
+    if (to && (moved > W * TAKE || (moved > 12 && speed > FLICK))) showScreen(to, { back: true });
+  };
+  root.addEventListener('touchend', finish, { passive: true });
+  root.addEventListener('touchcancel', () => { live = false; reset(); }, { passive: true });
 }
 
 /* 바텀시트를 여는 동작 한 곳 — 상세 시트와 일괄 준비 목록이 **같은 함수**를 쓴다.
    베끼면 열리는 모양이 갈라진다(내용은 부르는 쪽이 innerHTML 로 채운다). */
-function openSheetShell() {
+function openSheetShell(keepScroll) {
   $('#sheet-backdrop').hidden = false;
   const sheet = $('#detail-sheet');
   sheet.hidden = false;
-  requestAnimationFrame(() => {
+  void sheet.offsetHeight;   /* 배치를 확정시켜 transition 이 걸리게 한다 (rAF 대신) */
+  {
     $('#sheet-backdrop').classList.add('show');
     sheet.classList.add('show');
-  });
+    /* 🔴 **맨 위부터 보여 준다** (2026-08-29 개발자 지적: "공고를 누르면 그 공고의
+       아랫부분이 나온다"). 스크롤되는 것은 `.sheet` 자신인데(style.css `overflow-y:auto`)
+       내용만 innerHTML 로 갈아끼우므로 **앞 내용에서 내려 둔 위치가 그대로 남는다** —
+       금액 상세를 한참 내려보다 공고를 누르면 그 공고의 중간부터 보였다.
+       여기서 하는 이유: 부르는 쪽은 이 함수 **뒤에** innerHTML 을 채우므로 그 자리에서
+       되돌리면 내용이 없어 안 먹는다. 이 rAF 는 채운 뒤에 돈다.
+       되돌아가기(`dismissSheet`)만 보던 자리를 넘겨 그 위치를 되살린다. */
+    sheet.scrollTop = keepScroll || 0;
+  }
+}
+
+/* 시트를 내렸을 때 **돌아갈 곳** (2026-08-29 개발자 요청).
+   금액 상세에서 공고를 눌러 들어갔는데, 내리면 그냥 닫혀서 금액 상세를 처음부터
+   다시 열어야 했다("귀찮음이 있어서"). 한 단계 뒤로 가게 한다.
+   🔴 `closeSheet()` 자체를 고치면 안 된다 — 신청 준비·양식 작성 흐름도 그걸 부르는데,
+      그때 금액 상세로 튕겨 돌아가면 엉뚱하다. **사용자가 내리는 경로만** 뒤로 간다. */
+let sheetBack = null;
+
+/* 사용자가 시트를 내렸다 — 돌아갈 곳이 있으면 거기로, 없으면 닫는다 */
+function dismissSheet() {
+  const back = sheetBack;
+  sheetBack = null;
+  if (typeof back !== 'function') { closeSheet(); return; }
+  /* 🔴 **내려가는 동작을 끝까지 보여 준 뒤에** 이전 화면을 올린다
+     (2026-08-29 개발자 지적: "그 탭을 내리면 금액 상세 탭이 너무 빠르게 나와서 헷갈린다").
+     예전에는 손을 떼자마자 innerHTML 만 갈아끼웠다 — 쓸어내린 시트가 도로 **올라오면서**
+     내용만 바뀌니, 학생 눈에는 '닫으려 했는데 다른 게 튀어나온' 것으로 보였다.
+     지금은 ① 내려보내고 ② 다 내려간 뒤 이전 화면으로 채우고 ③ 다시 올린다.
+     배경(backdrop)은 끄지 않는다 — 끄면 그 사이에 화면이 한 번 번쩍인다.
+     ⏱ 기다리는 시간은 **CSS 에서 읽는다**(style.css `.sheet` transition). 숫자를 여기 적으면
+        CSS 를 고칠 때 조용히 어긋난다 — 이 저장소가 반복해 겪은 '베끼면 갈라진다'. */
+  const sheet = $('#detail-sheet');
+  /* 🔴 **`.show` 를 뗀 뒤에 읽는다** (2026-09-06) — 들어올 때(0.3s)와 나갈 때(0.22s)의
+     시간이 달라졌다. 떼기 전에 읽으면 들어올 때의 값이 나와 80ms 를 헛되이 기다린다. */
+  sheet.classList.remove('show');
+  const ms = (parseFloat(getComputedStyle(sheet).transitionDuration) || 0.22) * 1000;
+  setTimeout(() => {
+    /* 🔴 되돌아가기가 **실패하면 그냥 닫는다.** `renderAmountDetail()` 은 `lastBill` 이
+       없으면 아무것도 안 그리고 돌아오는데, 그때 여기서 return 해 버리면 시트가
+       **내려간 채 멈춘다** — 배경만 깔린 화면이 남는다. */
+    if (back() === false) closeSheet();
+  }, ms);
+}
+
+/* 금액 상세에서 공고로 들어갈 때 — 돌아갈 곳과 **보던 위치**를 함께 기억한다.
+   두 곳(누르기·키보드)에서 부르므로 함수로 둔다. 베껴 두면 한쪽만 고쳐져 갈라진다. */
+function rememberAmountBack() {
+  const y = $('#detail-sheet').scrollTop;
+  sheetBack = () => renderAmountDetail(y);
 }
 
 function closeSheet() {
+  sheetBack = null;          // 흐름이 닫을 때는 돌아갈 곳도 지운다
   docPrep = null;
   bulkPrep = null;
+  /* 🔴 **쓰던 신청서 표시도 함께 내린다** (2026-09-09 코드 리뷰). 안 내리면 시트가 닫힌 뒤에도
+     `formFill` 이 남아, ① 같은 시트를 쓰는 일괄 준비에서 체크만 해도 위임 리스너가
+     `formProgressSave` 를 불러 **칸이 없는 화면에서 답을 모아 빈 값으로 덮어쓰고**
+     ② 앱이 숨을 때 방금 지운 `sheet:{kind:'form'}` 을 다시 적어 다음에 켤 때 학생이
+     닫은 신청서가 도로 열린다. 🔴 장부의 `form`(쓴 글)은 여기서 안 지운다 — 시트를 내린 것과
+     쓴 글을 버리는 것은 다른 일이다. 지우는 곳은 `formProgressClear()` 하나뿐이다. */
+  formFill = null;
+  clearTimeout(formSaveTimer);
+  /* 이어보기 — 시트를 닫았으니 '열려 있던 시트'도 지운다.
+     🔴 쓰던 신청서(`form`)는 **여기서 지우지 않는다.** 학생이 시트를 내렸다고 해서
+        쓴 글을 버리는 것은 아니다 — 그건 '이대로 신청 준비 완료'를 눌렀을 때만 지운다. */
+  if (typeof resumeSave === 'function') resumeSave({ sheet: null });
   $('#sheet-backdrop').classList.remove('show');
   $('#detail-sheet').classList.remove('show');
   setTimeout(() => {
@@ -1850,32 +3527,173 @@ function closeSheet() {
    ────────────────────────────────────────────────────────────────────── */
 let appsSelectMode = false;
 const appsSelected = new Set();
-let lastSwipeAt = 0;            // 스와이프 직후의 클릭을 삼키는 자리 (아래 주석)
+const appsLogOpen = new Set();   // 펼쳐 둔 진행 기록 — 다시 그려도 닫히지 않게
 let undoBuffer = null;          // 되돌리기용 — 지운 항목과 원래 자리
 
 function appCard(app) {
   const sch = findSch(app.id);
   if (!sch) return '';
   const step = effectiveStep(app, sch);
-  const stepLabel = step === 3 ? (app.result === 'won' ? '🎉 선정' : '결과 확인') : APP_STEPS[step];
-  const statusBadge = app.pending
-    ? '<span class="badge badge-pending">서류 작성 필요</span>'
-    : `<span class="badge badge-applied">${stepLabel}</span>`;
+  const stepLabel = step === 3 ? (app.result === 'won' ? '선정' : '결과 확인') : APP_STEPS[step];
   const checked = appsSelected.has(app.id) ? 'checked' : '';
+  /* 🔴 진행 단계는 **막대에 붙인다** (2026-08-31 개발자 지시).
+     위쪽 배지로 두면 분류 배지(교내/교외)와 같은 무게로 보여서 '단계'라는 것이 안 읽혔고,
+     정작 그 아래 막대가 무엇을 재는 막대인지는 화면 어디에도 안 적혀 있었다.
+     이제 이름과 'n/4'가 막대 바로 위에 붙어, 막대와 글자가 같은 것을 말한다. */
+  const stepNow = app.pending ? '서류 작성 필요' : stepLabel;
+  /* 🔴 마감된 공고는 여기가 **유일한 자리**다 (2026-09-05 — 목록은 마감 다음 날 내린다).
+     진행 단계만 적으면 제출 안 한 채 마감된 건이 '신청 준비 완료'로만 보여 아직 낼 수 있다고
+     오해한다. 판정을 새로 만들지 않고 dday() 가 이미 내린 cls 를 읽는다 — 목록·상세·알림과
+     같은 함수다. 마감일이 없는 공고(상시 제도·기한 미확인)는 cls 가 비어 배지가 안 뜬다. */
+  const closedBadge = dday(sch.deadline).cls === 'closed'
+    ? '<span class="badge badge-dday closed">마감</span>' : '';
+  const stepCount = app.pending ? '' : `${step + 1}/${APP_STEPS.length}`;
+  const pct = app.pending ? 6 : ((step + 1) / APP_STEPS.length) * 100;
   return `
-    <div class="swipe-row" data-row="${esc(app.id)}">
-      <button class="swipe-del" data-del="${esc(app.id)}" aria-label="이 신청 기록 삭제">삭제</button>
+    <div class="swipe-row${appsLogOpen.has(app.id) ? ' log-open' : ''}" data-row="${esc(app.id)}">
       ${appsSelectMode ? `<input type="checkbox" class="row-check" data-pick="${esc(app.id)}" ${checked}
          aria-label="${esc(sch.name)} 선택" />` : ''}
-      <button class="sch-card" data-detail="${sch.id}">
+      <button class="sch-card" data-detail="${sch.id}" tabindex="-1">
         <div class="sch-top">
-          <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${sch.type}</span>
-          ${statusBadge}
+          <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${sch.type}</span>${closedBadge}
         </div>
         <p class="sch-name">${esc(sch.name)}</p>
-        <p class="sch-provider">${app.appliedAt} ${app.pending ? '담아둠' : '준비 완료'} · 제출처 ${esc(officialChannel(sch).label)}</p>
-        <div class="mini-progress"><div style="width:${app.pending ? 6 : ((step + 1) / APP_STEPS.length) * 100}%"></div></div>
+        <div class="app-step app-step-s${step}${app.result === 'lost' ? ' app-step-lost' : ''}${app.pending ? ' app-step-wait' : ''}">
+          <div class="app-step-head"><span>${esc(stepNow)}</span>${stepCount ? `<em>${stepCount}</em>` : ''}</div>
+          <div class="mini-progress"><div style="width:${pct}%"></div></div>
+        </div>
       </button>
+      <button class="app-toggle" data-log-toggle="${esc(app.id)}" aria-expanded="${appsLogOpen.has(app.id)}">
+        세부사항 입력하기<span class="app-caret" aria-hidden="true"></span>
+      </button>
+      ${appLogHtml(app, sch, step)}
+    </div>`;
+}
+
+/* 공고를 누르면 그 아래에 펼쳐지는 진행 기록.
+   🔴 앱이 **아는 것만** 적는다. 발표일은 공고 원문에 있을 수도 없을 수도 있는데 앱은
+      그것을 읽지 않았으므로 '공고 원문 확인'이라고 말한다(원칙 8-1) — 지어낸 날짜는
+      학생을 그날까지 기다리게 만든다.
+   🔴 제출·선정 기록은 여기서 바로 남긴다. 앱은 학교 전산을 볼 수 없으므로 이 둘은
+      언제나 학생이 적는 값이다(운영 원칙 8). */
+/* 담아 둔 공고를 다시 누르는 학생이 궁금한 것은 공고 내용이 아니다(담을 때 이미 봤다).
+   궁금한 것은 **"내가 지금 뭘 해야 하나"** 하나뿐이라, 그 한 줄을 패널 맨 위에 둔다.
+   🔴 앱이 아는 사실(담김·제출 기록·마감 경과·결과 기록)로만 정한다 — 발표일·경쟁률처럼
+      앱이 모르는 것은 여기 올리지 않는다(원칙 8-1).
+   🔴 무거운 동작(양식 작성·제출처 열기)은 **상세 시트로 보낸다.** 여기에 같은 버튼을
+      한 벌 더 만들면 제출 흐름이 두 곳으로 갈라진다. */
+function nextAction(app, sch, step, d, closed) {
+  const go = (label) => `<button class="app-next-btn" data-detail="${esc(sch.id)}">${label}</button>`;
+  if (app.pending) return { text: '신청서 작성이 남았어요', btn: go('이어서 작성') };
+  if (step === 0) {
+    return closed
+      ? { text: '접수가 마감됐어요. 제출하셨나요?',
+          btn: `<button class="app-next-btn" data-mark-submit="${esc(app.id)}">제출했다고 기록</button>` }
+      : { text: `아직 제출 기록이 없어요 · ${sch.deadline ? '마감 ' + esc(d.label) : '마감 기한 미확인'}`,
+          btn: go('제출하러 가기') };
+  }
+  if (step === 1) return { text: '제출 기록됨 · 접수가 마감되면 심사로 넘어가요', btn: '' };
+  if (step === 2) return { text: '결과가 나오면 아래에 기록해 주세요', btn: '' };
+  return { text: app.result === 'won' ? '선정으로 기록됨' : '미선정으로 기록됨', btn: '' };
+}
+
+/* 제출 서류 체크리스트 — 학생이 제출 직전 가장 자주 막히는 자리.
+   🔴 앱이 **이미 아는 것만** 쓴다: 공고가 적어 둔 요구 서류(sch.documents)와
+      기기 안 보관함(walletCache). 지어낼 자리가 없다.
+   🔴 판정은 상세 시트가 쓰는 docWalletStatus 를 그대로 쓴다 — 여기에 규칙을 한 벌
+      더 두면 같은 서류를 두 화면이 다르게 말한다(이 저장소가 자격 판정에서 겪은 일).
+   자소서·계획서 같은 작성물은 뺀다(certStatusListHtml 과 같은 기준) — 발급받는 것이 아니다.
+   다 준비된 경우엔 접어 둔다: 할 일이 없는 목록이 자리를 먹으면 진짜 할 일이 밀린다. */
+/* '서류 이름'인가, '아직 못 읽었다는 표시'인가.
+   원문 공고를 가리키면서 구체적인 서류 이름이 하나도 없으면 후자다.
+   `학자금대출 관련 증빙 (공고 확인)`·`논문 계획서 1부` 처럼 이름이 있는 것은 서류로 남는다. */
+function isUnknownDoc(doc) {
+  return /원문\s*공고|재공고\s*원문/.test(doc)
+    && !/증명서|신청서|동의서|계획서|사본|확인서|의향서|성적|증빙/.test(doc);
+}
+
+function docChecklistHtml(sch) {
+  const all = (sch.documents || []).filter((doc) => !ESSAY_DEFS.some((e) => e.match.test(doc)));
+  if (!all.length) return '';
+  /* 🔴 등록 데이터의 서류 칸 상당수는 서류 이름이 아니라 **'아직 못 읽었다'는 표시**다
+     (`지원 자격·제출 서류는 원문 공고에서 확인` 이 실측 25건으로 최다). 이것을
+     체크리스트 한 줄로 세면 "제출 서류 1개"라고 말하게 되는데, 앱은 그 공고에
+     서류가 몇 개인지 모른다 — 모르는 것을 아는 것처럼 말하는 꼴이다(원칙 8-1).
+     그래서 갈라서, 이런 항목은 세지 않고 '원문 확인' 한 줄로만 내놓는다. */
+  const known = all.filter((doc) => !isUnknownDoc(doc));
+  const unknown = all.length - known.length;
+  const note = unknown
+    ? '<p class="dc-unknown">이 밖의 제출 서류는 공고 원문에서 확인</p>'
+    : '';
+  if (!known.length) {
+    return '<p class="dc-unknown dc-only">제출 서류는 공고 원문에서 확인</p>';
+  }
+  const certDocs = known;
+  const marks = certDocs.map((doc) => ({ doc, st: docWalletStatus(doc) }));
+  const tracked = marks.filter((m) => m.st);
+  const missing = tracked.filter((m) => !m.st.ok);
+  const rows = marks.map(({ doc, st }) => {
+    const name = esc(doc.replace(/\s*\(.*\)$/, ''));
+    if (st && st.ok) return `<li class="dc-ok">${name}</li>`;
+    if (st) return `<li class="dc-miss">${name}<em>${esc(st.slot.issue)}</em></li>`;
+    /* 보관함에 칸이 없는 서류 — 있는지 없는지 앱이 알 수 없으므로 그렇게 말한다 */
+    return `<li class="dc-etc">${esc(doc)}<em>보관함에서 확인할 수 없는 서류</em></li>`;
+  }).join('');
+  /* 머리글은 **학생이 할 일의 개수**를 말한다 — 분수(0/2)는 읽는 데 한 박자 걸린다.
+     🔴 세는 것은 `known` 이다 (2026-09-10 코드 리뷰). `all` 로 세면 위에서 일부러 갈라낸
+        '아직 못 읽었다' 표시까지 서류로 세어, **머리글은 3개인데 목록은 2줄**이 된다
+        (실측 4건 — reg-hi-jeju 3→2 · reg-hufs-myeonhak 2→1 · reg-hufs-alumni 3→2 ·
+        reg-khu-intern 2→1). 줄은 갈랐는데 숫자만 안 갈랐던 것이다.
+        못 읽은 몫은 바로 아래 `note` 줄이 이미 말한다. */
+  const head = `제출 서류 ${known.length}개`
+    + (missing.length ? '' : tracked.length ? ' · 보관함에서 자동 첨부' : '');
+  return `
+    <details class="doc-check"${missing.length ? ' open' : ''}>
+      <summary>${esc(head)}${missing.length ? ` <b>${missing.length}개 준비 안 됨</b>` : ''}</summary>
+      <ul>${rows}</ul>
+      ${note}
+    </details>`;
+}
+
+function appLogHtml(app, sch, step) {
+  if (app.result) {
+    return `
+      <div class="app-log"${appsLogOpen.has(app.id) ? '' : ' hidden'}>
+        <div class="app-done${app.result === 'won' ? ' app-done-won' : ''}">
+          <p>${app.result === 'won' ? '선정으로 기록되었어요' : '미선정으로 기록되었어요'}${
+            app.resultAt ? ' · ' + esc(app.resultAt) : ''}</p>
+          ${/* 🔴 잘못 눌렀을 때 되돌아갈 길 — 없으면 오누름이 영영 남는다 */ ''}
+          <button class="app-log-btn" data-undo-result="${esc(app.id)}">기록 취소</button>
+        </div>
+      </div>`;
+  }
+  const d = dday(sch.deadline);
+  const row = (done, label, value) =>
+    `<li class="${done ? 'done' : ''}"><b>${esc(label)}</b><span>${value}</span></li>`;
+  const closed = sch.deadline && d.days < 0;
+  const next = nextAction(app, sch, step, d, closed);
+  return `
+    <div class="app-log"${appsLogOpen.has(app.id) ? '' : ' hidden'}>
+      <div class="app-next">
+        <p>${esc(next.text)}</p>
+        ${next.btn}
+      </div>
+      ${docChecklistHtml(sch)}
+      <ul class="app-log-list">
+        ${row(!!closed, '접수 마감', sch.deadline ? esc(sch.deadline) + (closed ? ' 지남' : ' · ' + esc(d.label)) : '기한 미확인')}
+        ${row(step >= 2, '심사', app.submittedAt && closed ? '진행 중' : '제출 기록과 마감 경과 후 표시')}
+        ${row(!!app.result, '선정 발표',
+          app.result ? (app.result === 'won' ? '선정 · ' : '미선정 · ') + esc(app.resultAt || '')
+            : `<button class="app-log-btn" data-mark-won="${esc(app.id)}">선정</button>
+               <button class="app-log-btn" data-mark-lost="${esc(app.id)}">미선정</button>`)}
+      </ul>
+      ${sch.sourceUrl
+        /* 🔴 목록 주소밖에 못 찾은 공고는 '원문'이라고 말하지 않는다 — 눌러 보면
+           게시판 목록이 열리는데 원문이라고 적어 두면 거짓말이 된다(원칙 8-1). */
+        ? `<a class="app-log-more" href="${esc(safeUrl(sch.sourceUrl))}" target="_blank" rel="noopener">${
+            sch.program ? '한국장학재단에서 보기 ↗'
+            : isBoardListLink(sch.sourceUrl) ? '게시판 목록 열기 ↗' : '공고 원문 보기 ↗'}</a>`
+        : `<button class="app-log-more" data-detail="${esc(sch.id)}">공고 상세 보기</button>`}
     </div>`;
 }
 
@@ -1889,66 +3707,320 @@ function deleteApps(ids) {
   if (!removed.length) return;
   state.applications = state.applications.filter((a) => !ids.includes(a.id));
   appsSelected.clear();
+  /* 🔴 토스트의 '실행 취소'는 **한 번 지나가면 끝**이다 — 다른 화면으로 넘어가거나
+     잠깐 한눈판 사이에 사라진다. 그래서 지운 기록을 휴지통에도 함께 담는다
+     (2026-09-11 개발자 지시). 두 길은 서로를 대신하지 않는다:
+       · 토스트  = 방금 잘못 눌렀을 때 그 자리에서 되돌리기
+       · 휴지통  = 며칠 뒤에야 알아차렸을 때 찾아가 되살리기 */
+  const when = Date.now();
+  removed.forEach((r) => state.trash.push({ at: r.at, app: r.app, deletedAt: when }));
   saveState();
   /* 되돌릴 때 **원래 자리로** 넣는다 — 뒤에 붙이면 목록 순서가 바뀌어
      학생이 "지웠다 살렸더니 딴 데 가 있네" 하고 또 헷갈린다. */
   undoBuffer = removed.slice().sort((x, y) => x.at - y.at);
   renderApplications();
   renderHome();
-  toast(`${removed.length}건을 지웠어요`, {
-    label: '되돌리기',
+  toast(`${removed.length}건 삭제`, {
+    label: '실행 취소',
     run: () => {
       for (const r of undoBuffer) state.applications.splice(r.at, 0, r.app);
+      /* 되살린 기록은 휴지통에서 뺀다 — 안 그러면 목록에도 있고 휴지통에도 있는
+         같은 기록이 둘이 되어, 나중에 휴지통에서 또 되살리면 중복으로 들어간다. */
+      const back = new Set(undoBuffer.map((r) => r.app && r.app.id));
+      state.trash = state.trash.filter((t) => !(t.deletedAt === when && back.has(t.app && t.app.id)));
       undoBuffer = null;
       saveState();
       renderApplications();
       renderHome();
-      toast('되돌렸어요');
+      toast('되살림');
     },
   });
 }
 
-/* 카드를 왼쪽으로 미는 손짓. **세로 스크롤을 막지 않는 것**이 이 함수의 어려운 부분이다 —
-   첫 움직임에서 가로/세로를 정하고, 세로면 즉시 손을 뗀다(목록이 정상으로 스크롤된다).
-   ⚠️ 이 유형은 **마우스로는 한 번도 재현되지 않는다** — 검사는 TouchEvent로 해야 한다
-   (13차 세션 학교 검색 사고와 같은 계열, CLAUDE.md 참조). */
-function enableRowSwipe(list) {
-  const REVEAL = 96;            // 삭제 버튼 너비와 같아야 한다 (style.css .swipe-del)
-  let row = null, x0 = 0, y0 = 0, dir = null, dx = 0;
-  const end = () => { if (row) row.classList.remove('dragging'); row = null; dir = null; };
+/* 🔴 밀어서 삭제는 걷어냈다 (2026-09-01 개발자 지시: "오류가 자꾸 먹어서").
+   세 번을 고쳤는데도 계속 사고를 냈다 — 스칠 때 삭제가 뜨고, 빨간 판이 패널 위를
+   덮어 신청 기록이 지워지고, 누름이 삼켜졌다. 원인이 손짓 판정 하나가 아니라
+   "보이지 않는 것이 화면 위에 겹쳐 있다"는 구조라 고칠 때마다 다른 자리가 터졌다.
+   지우는 길은 이미 하나 더 있다: 오른쪽 위 '선택' → 체크 → '삭제 n건'.
+   그쪽은 눈에 보이고, 여러 건을 한 번에 지우고, 실행 취소도 같이 준다.
+   되살리려면 이 자리에 enableRowSwipe 를 다시 두는 것이 아니라, 먼저
+   '안 보이는 것이 위를 덮지 않는 구조'부터 만들 것. */
 
-  list.addEventListener('touchstart', (e) => {
-    if (e.touches.length !== 1 || appsSelectMode) return;
-    const r = e.target.closest('.swipe-row');
-    if (!r) return;
-    list.querySelectorAll('.swipe-row.open').forEach((o) => { if (o !== r) o.classList.remove('open'); });
-    row = r; x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; dir = null; dx = 0;
-    row.classList.add('dragging');
-  }, { passive: true });
+/* ============================================================
+   달력 보기 · 보관함 (2026-09-07 · 노션 UI-21)
 
-  list.addEventListener('touchmove', (e) => {
-    if (!row) return;
-    const ax = e.touches[0].clientX - x0;
-    const ay = e.touches[0].clientY - y0;
-    if (!dir) {
-      if (Math.abs(ax) < 6 && Math.abs(ay) < 6) return;   // 아직 방향을 모른다
-      dir = Math.abs(ax) > Math.abs(ay) ? 'x' : 'y';
-      if (dir === 'y') { end(); return; }                 // 세로다 — 목록에 넘긴다
+   설계 근거는 `docs/designs/calendar-and-save.md`. 요약하면 세 가지다:
+   ① **맞춤이 없으면 달력은 그릴 수가 없다.** 전체 공고를 다 찍으면 9월 11일 한 칸에
+      28건이 몰려 무너진다. 그래서 상시로 찍는 것은 **신청·저장한 공고뿐**이고,
+      나머지는 날짜를 눌렀을 때만 펼친다(개발자 지시 4번).
+   ② **층1과 층2를 섞지 않는다.** 그날 마감되는 28건 중 26건은 한국장학재단 목록이라
+      자격 판정이 없다. 한 목록에 쏟으면 학생이 그것도 앱이 추천한 것으로 읽는다.
+   ③ **없는 날짜를 지어내지 않는다.** 발표일은 원문에 있을 때만 찍고, 없으면
+      '발표 대기'라고 상태로만 말한다.
+   🔴 판정은 새로 만들지 않는다 — 마감은 `dday`, 자격은 `evaluateFor`·`fitDetailFor`
+      그대로다. 여기에 규칙을 한 벌 더 두면 달력과 알림이 다른 날을 말한다.
+   ============================================================ */
+
+let calMode = false;      // 신청 내역이 목록/달력 중 무엇을 보이는가
+let calCursor = null;     // 보고 있는 달 (그 달 1일 · null이면 이번 달)
+let calPicked = null;     // 눌러서 펼친 날짜 'YYYY-MM-DD'
+
+/* 🔴 `toISOString()` 을 쓰지 말 것 — 그것은 UTC라 한국 시간 아침에 **하루 전 날짜**가 된다.
+   달력은 날짜가 전부인 화면이라 하루가 밀리면 통째로 틀린다. */
+function isoOf(dt) {
+  return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+}
+function calMonthStart() {
+  if (calCursor) return calCursor;
+  const t = todayStart();
+  return new Date(t.getFullYear(), t.getMonth(), 1);
+}
+
+/* 🔴 **한 번 그릴 때 목록은 한 번만 만든다** (2026-09-07 코드 리뷰).
+   `findSch` 는 부를 때마다 `allScholarships()` 를 새로 만들고, 그 안에서 재단 112곳의
+   원문 칸을 매번 다시 읽는다. 달력 한 번에 그것이 160번 돌고 있었다.
+   그리는 함수들이 이 꾸러미를 만들어 **서로 넘겨 쓴다.** */
+function calContext() {
+  const all = allScholarships();
+  const byId = new Map(all.map((s) => [s.id, s]));
+  const ids = new Set();
+  state.applications.forEach((a) => ids.add(a.id));
+  state.saved.forEach((s) => ids.add(s.id));
+  const mine = [...ids].map((id) => byId.get(id)).filter(Boolean);
+  return { all, byId, mine };
+}
+/** 내 공고 = 신청한 것 + 저장한 것. 달력에 상시로 찍히는 것은 이것뿐이다. */
+function myCalendarScholarships() {
+  return calContext().mine;
+}
+
+/** 결과를 기다리는 중인가 — **신청한 공고만** 발표를 기다린다.
+    🔴 저장만 해 둔 공고를 '발표 대기'로 두면 안 된다 (2026-09-07 코드 리뷰).
+       신청한 적이 없으니 발표될 결과도 없는데, 마감이 지나는 순간 영영
+       '발표 대기'로 남아 보관함의 '이미 마감된 저장 공고'와 서로 다른 말을 한다.
+    결과를 기록하면(선정/미선정) 기다림이 끝난다 — 개발자 지시 4-4 재검토 그대로. */
+function calAwaiting(id) {
+  const app = state.applications.find((a) => a.id === id);
+  return !!app && !app.result;
+}
+
+/* 점의 종류는 **둘뿐**이다 — 마감(파랑) · 발표(빨강).
+   ⚠️ 2026-09-07 개발자 지시로 발표를 반달에서 **마감과 같은 모양의 빨간 점**으로 바꿨다.
+      그래서 이 둘은 **색으로만 갈린다** — 색각 이상이 있는 학생에게는 같아 보인다.
+      메우는 자리는 둘이다: 범례, 그리고 날짜를 열었을 때 줄이 말하는 상태
+      ('발표 예정' · '접수 마감 · 결과 대기'). 점만으로 다 말하려 하지 말 것. */
+/* 보관함이 '마감 임박 n건'을 셀 때 쓰는 기준. 달력은 이제 이것으로 색을 가르지 않는다. */
+const CAL_SOON_DAYS = 3;
+
+/** 한 달치 점을 모은다 → { 'YYYY-MM-DD': [{ kind, id }] }
+    `mine` 을 받으면 목록을 다시 만들지 않는다(위 calContext 주석). */
+function calMarks(monthStart, mine) {
+  const ym = isoOf(monthStart).slice(0, 7);
+  const marks = {};
+  const put = (date, kind, id) => {
+    if (!date || String(date).slice(0, 7) !== ym) return;
+    (marks[date] = marks[date] || []).push({ kind, id });
+  };
+  for (const sch of (mine || myCalendarScholarships())) {
+    const waiting = calAwaiting(sch.id);
+    if (sch.deadline) {
+      const d = dday(sch.deadline);
+      /* 🔴 마감일 자리에는 **늘 '마감' 점**이다 (2026-09-07 개발자 지적:
+         "발표대기는 뭐야? 그냥 발표일로 고정하면 안돼?"). 맞는 지적이다 —
+         그날은 마감일이지 발표일이 아닌데 거기에 발표 뜻의 점을 찍으면 헷갈린다.
+         🔴 그래도 **지우지는 않는다**(개발자 지시 4-4): 신청한 공고는 마감 뒤가
+            진짜 시작이라, 마감이 지나도 점은 그대로 남아 학생이 찾아올 자리가 된다.
+         🔴 마감 임박(D-3)도 색으로 가르지 않는다 — 홈에서 이미 확인할 수 있다. */
+      put(sch.deadline, 'mine', sch.id);
     }
-    e.preventDefault();
-    const base = row.classList.contains('open') ? -REVEAL : 0;
-    dx = Math.max(-REVEAL, Math.min(0, base + ax));
-    row.style.setProperty('--dx', `${dx}px`);
-  }, { passive: false });
+    /* 발표는 **원문에서 읽은 진짜 발표일에만** 찍는다 (실측 45건 중 4건).
+       🔴 모르는 발표일을 마감일 자리로 옮겨 적지 않는다 — 그것이 '발표 대기' 였고,
+          학생에게는 마감일에 발표 점이 찍힌 것으로 보였다.
+       결과를 이미 기록했으면 기다릴 것이 없으므로 찍지 않는다. */
+    if (sch.announceDate && waiting) put(sch.announceDate, 'wait', sch.id);
+    /* 🔴 접수 시작일은 **달력에 찍지 않는다** (2026-09-07 개발자 지시 — 표시를 둘로 줄임).
+       달력에 남는 것은 '내가 무엇을 해야 하는 날'뿐이다: 마감과 발표.
+       접수 시작은 그날 학생이 할 일이 없고(마감 전에 내면 된다), 아직 안 열린 공고라는
+       사실은 상세 시트의 일정 줄(`scheduleRowHtml`)이 그대로 말한다. */
+  }
+  return marks;
+}
 
-  list.addEventListener('touchend', () => {
-    if (!row) return;
-    row.style.removeProperty('--dx');
-    row.classList.toggle('open', dx < -REVEAL / 2);
-    /* 민 뒤에 곧바로 오는 click은 카드 열기가 아니다 — 삼킨다 */
-    if (Math.abs(dx) > 6) lastSwipeAt = Date.now();
-    end();
-  }, { passive: true });
+/** 그날 마감되는 공고 전부 (내 공고는 뺀다 — 위에 이미 따로 나온다) */
+function calOthersOn(iso, ctx) {
+  const c = ctx || calContext();
+  const mine = new Set(c.mine.map((s) => s.id));
+  return c.all.filter((s) => s.deadline === iso && !mine.has(s.id));
+}
+
+const CAL_DOW = ['일', '월', '화', '수', '목', '금', '토'];
+const CAL_KIND_ORDER = { wait: 0, mine: 1 };
+const CAL_DOTS_MAX = 3;
+
+function renderCalendar() {
+  const box = $('#apps-calendar');
+  if (!box) return;
+  const ms = calMonthStart();
+  const ctx = calContext();
+  const marks = calMarks(ms, ctx.mine);
+  const today = isoOf(todayStart());
+  const days = new Date(ms.getFullYear(), ms.getMonth() + 1, 0).getDate();
+  const lead = new Date(ms.getFullYear(), ms.getMonth(), 1).getDay();
+
+  /* 🔴 **점이 아니라 공고를 센다** (2026-09-07 코드 리뷰). 한 공고가 마감일과 발표일에
+     각각 점을 가지면 '내 공고 2건'이 된다 — 학생은 하나만 담았는데 둘이라고 말하는 셈이다. */
+  const idsOf = (pick) => new Set(Object.values(marks)
+    .flatMap((list) => list.filter(pick).map((m) => m.id)));
+  const mineCount = idsOf(() => true).size;
+  const waitCount = idsOf((m) => m.kind === 'wait').size;
+
+  let cells = '';
+  for (let i = 0; i < lead; i++) cells += '<div class="cal-cell cal-pad" aria-hidden="true"></div>';
+  for (let d = 1; d <= days; d++) {
+    const iso = isoOf(new Date(ms.getFullYear(), ms.getMonth(), d));
+    const list = (marks[iso] || []).slice()
+      .sort((a, b) => CAL_KIND_ORDER[a.kind] - CAL_KIND_ORDER[b.kind]);
+    const shown = list.slice(0, CAL_DOTS_MAX);
+    const more = list.length - shown.length;
+    const dayIds = new Set(list.map((m) => m.id)).size;   // 안내 문구도 공고 수로 센다
+    /* 셀은 늘 누를 수 있다 — 점이 없어도 '그날 마감되는 공고'를 볼 수 있어야 한다 */
+    cells += `<button class="cal-cell${iso === today ? ' cal-today' : ''}${iso === calPicked ? ' cal-picked' : ''}"
+        data-cal-day="${iso}" aria-pressed="${iso === calPicked}"
+        aria-label="${ms.getMonth() + 1}월 ${d}일${dayIds ? ` · 내 공고 ${dayIds}건` : ''}">
+        <span class="cal-num">${d}</span>
+        <span class="cal-dots">${shown.map((m) => `<i class="cal-dot cal-dot-${m.kind}"></i>`).join('')}${more > 0 ? `<em class="cal-more">+${more}</em>` : ''}</span>
+      </button>`;
+  }
+
+  box.innerHTML = `
+    <div class="cal-head">
+      <button class="cal-nav" data-cal-move="-1" aria-label="이전 달">‹</button>
+      <span class="cal-month">${ms.getFullYear()}년 ${ms.getMonth() + 1}월</span>
+      <button class="cal-nav" data-cal-move="1" aria-label="다음 달">›</button>
+    </div>
+    <p class="cal-sum">${mineCount ? `내 공고 ${mineCount}건${waitCount ? ` · 발표 ${waitCount}건` : ''}` : '이 달에는 내 공고가 없어요'}</p>
+    <div class="cal-dow">${CAL_DOW.map((w) => `<span>${w}</span>`).join('')}</div>
+    <div class="cal-grid">${cells}</div>
+    ${/* 🔴 범례는 **두 종류**다 (2026-09-07 개발자 지시: "간단하고 명확히").
+         접수 시작과 마감 임박을 차례로 뺐다 — 전자는 그날 할 일이 없고, 후자는
+         홈에서 이미 확인할 수 있다. 여기에 종류를 다시 늘리지 말 것. */ ''}
+    <div class="cal-legend">
+      <span><i class="cal-dot cal-dot-mine"></i>마감</span>
+      <span><i class="cal-dot cal-dot-wait"></i>발표</span>
+    </div>
+    <div id="cal-day" class="cal-day">${calPicked ? calDayHtml(calPicked) : ''}</div>`;
+}
+
+/** 공고 한 줄 — 달력 아래 목록에 쓴다. 누르면 상세 시트로 간다(개발자 지시 5번). */
+function calRowHtml(sch, { badge = true, save = false } = {}) {
+  const d = sch.deadline ? dday(sch.deadline) : null;
+  let mark = '';
+  if (badge) {
+    /* 🔴 판정을 새로 만들지 않는다 — 카드·상세와 **같은 함수**를 쓴다.
+       층2(KOSAF)는 evaluateFor 가 이미 '아직 못 읽음'으로 돌려주므로 여기서
+       따로 막을 필요가 없다(그 정직함이 한 곳에 있다는 뜻이다). */
+    const result = evaluateFor(sch, state.profile);
+    mark = fitBadgeHtml(fitScore(sch, result, state.profile), fitDetailFor(sch, state.profile));
+  }
+  const row = `<button class="cal-row" data-detail="${esc(sch.id)}">
+      <span class="cal-row-top">${mark}${d ? `<span class="badge badge-dday ${d.cls}">${d.label}</span>` : ''}${sch.formId ? '<span class="badge badge-form">앱에서 작성</span>' : ''}</span>
+      <span class="cal-row-name">${esc(sch.name)}</span>
+      <span class="cal-row-sub">${esc(sch.amount)}${sch.headcount ? ` · ${esc(sch.headcount)}` : ''}</span>
+    </button>`;
+  /* 보관함에서는 **여기서 바로 해제**할 수 있어야 한다 — 담는 곳과 빼는 곳이 다르면
+     학생이 뺄 방법을 못 찾는다. 카드와 같은 이유로 단추는 줄 **바깥**에 둔다. */
+  return save ? `<div class="cal-row-wrap">${saveBtnHtml(sch.id)}${row}</div>` : row;
+}
+
+/** 하루를 눌렀을 때 아래에 펼치는 목록. 🔴 시트를 띄우지 않는다 — 닫을 때 스크롤이 튄다. */
+function calDayHtml(iso) {
+  const [y, m, d] = iso.split('-').map(Number);
+  const ctx = calContext();
+  const mineAll = ctx.mine;
+  const marks = (calMarks(new Date(y, m - 1, 1), ctx.mine)[iso] || []);
+  const seen = new Set();
+  const mineRows = marks.map((k) => {
+    if (seen.has(k.id)) return '';
+    seen.add(k.id);
+    const sch = mineAll.find((s) => s.id === k.id);
+    if (!sch) return '';
+    /* 🔴 달력에서 뺀 '결과 기다리는 중'을 **여기서** 말한다 (2026-09-07).
+       점의 종류를 줄이는 것과 정보를 없애는 것은 다르다 — 점은 둘로 두되,
+       날짜를 열었을 때는 그 공고가 지금 어떤 상태인지 한 줄로 밝힌다. */
+    const why = k.kind === 'wait' ? '발표 예정'
+      : (calAwaiting(sch.id) && sch.deadline && dday(sch.deadline).days < 0)
+        ? (sch.announceDate ? '접수 마감 · 결과 대기' : '접수 마감 · 결과 대기 (발표일은 원문 확인)')
+        : '접수 마감';
+    return `<p class="cal-why">${why}</p>` + calRowHtml(sch, { badge: false });
+  }).join('');
+
+  const others = calOthersOn(iso, ctx);
+  const layer1 = others.filter((s) => s.sourceKind !== 'kosaf');
+  const layer2 = others.filter((s) => s.sourceKind === 'kosaf');
+
+  return `
+    <div class="cal-day-head">
+      <h4>${m}월 ${d}일</h4>
+      <button class="cal-day-close" data-cal-day="">닫기</button>
+    </div>
+    ${mineRows ? `<h5 class="cal-sec">내 공고</h5>${mineRows}` : ''}
+    ${layer1.length ? `<h5 class="cal-sec">이날 마감되는 공고 ${layer1.length}건</h5>${layer1.map((s) => calRowHtml(s)).join('')}` : ''}
+    ${/* 🔴 층2는 **접어 둔다.** 하루에 26건까지 들어오는 데다 자격 판정이 없어,
+         층1과 한 목록에 쏟으면 학생이 그것도 앱이 추천한 것으로 읽는다. */ ''}
+    ${layer2.length ? `<details class="cal-kosaf">
+        <summary>한국장학재단 목록 ${layer2.length}건</summary>
+        <p class="cal-note">재단이 적어 둔 칸을 그대로 보여 줍니다 — 자격은 재단 홈페이지에서 확인하세요.</p>
+        ${layer2.map((s) => calRowHtml(s, { badge: false })).join('')}
+      </details>` : ''}
+    ${!mineRows && !layer1.length && !layer2.length ? '<p class="empty">이날 마감되는 공고가 없어요</p>' : ''}`;
+}
+
+/* 상세 시트에 접수 시작일·발표일을 한 줄로 (개발자 지시 4-1).
+   🔴 **원문에서 읽은 것만** 적는다. 없으면 그 자리를 비운다 — 발표일을 짐작해 적으면
+      학생이 그날 결과를 보러 갔다가 아무것도 없다(원칙 8-1). */
+function scheduleRowHtml(sch) {
+  const bits = [];
+  if (sch.openDate) bits.push(`접수 시작 ${esc(sch.openDate)}`);
+  if (sch.announceDate) bits.push(`발표 ${esc(sch.announceDate)}`);
+  return bits.length ? `<p class="sheet-schedule">${bits.join(' · ')}</p>` : '';
+}
+
+/* ---------------- 보관함 (MY) ----------------
+   저장한 공고를 모아 보는 자리. 🔴 **금액 합계를 내지 않는다** — 합산은 더하기가 아니라
+   고르기라(같은 장학금 한 번만 + 배타 그룹에서 최대 하나) 여기서 따로 더하면
+   홈과 다른 숫자를 말하게 된다. 건수만 센다. */
+function renderSaved() {
+  const el = $('#my-saved');
+  if (!el) return;
+  const list = savedScholarships();
+  if (!list.length) {
+    el.innerHTML = `<h3 class="my-card-title">보관함</h3>
+      <p class="empty">아직 담아 둔 장학금이 없어요<br /><span class="empty-sub">공고 카드의 북마크를 누르면 여기에 모여요</span></p><button class="btn btn-ghost btn-empty" data-go="explore">장학금 둘러보기</button>`;
+    return;
+  }
+  const open = list.filter((s) => s.deadline && dday(s.deadline).days >= 0)
+    .sort((a, b) => deadlineTs(a) - deadlineTs(b));
+  const undated = list.filter((s) => !s.deadline);
+  const closed = list.filter((s) => s.deadline && dday(s.deadline).days < 0)
+    .sort((a, b) => deadlineTs(b) - deadlineTs(a));
+  const soon = open.filter((s) => dday(s.deadline).days <= CAL_SOON_DAYS).length;
+
+  el.innerHTML = `
+    <h3 class="my-card-title">보관함</h3>
+    <p class="my-flags">저장 ${list.length}건${soon ? ` · 마감 임박 ${soon}건` : ''}</p>
+    ${open.length ? `<h5 class="cal-sec">마감이 다가오는 순</h5>${open.map((s) => calRowHtml(s, { save: true })).join('')}` : ''}
+    ${/* 🔴 날짜를 못 읽은 공고를 **숨기지 않는다** — 달력에는 찍을 수 없어 사라지는데,
+         사라지면 학생은 그 공고가 없는 줄 안다. 여기가 그 자리다. */ ''}
+    ${/* 🔴 '날짜를 아직 읽지 못한' → '기한은 원문에서 확인' (2026-09-17 개발자 지시).
+         앞은 우리가 못 한 일이고 뒤는 학생이 할 일이다. 건수는 관리자 '마감일 없음'이 센다. */ ''}
+    ${undated.length ? `<h5 class="cal-sec">기한을 원문에서 확인할 공고 ${undated.length}건</h5>
+      <p class="cal-note">접수 기간이 공고 원문에만 있어요. 원문을 열어 확인해 주세요.</p>
+      ${undated.map((s) => calRowHtml(s, { save: true })).join('')}` : ''}
+    ${closed.length ? `<details class="cal-kosaf">
+        <summary>이미 마감된 저장 공고 ${closed.length}건</summary>
+        <p class="cal-note">지우지 않고 둡니다 — 내년에 다시 열리는 공고가 많아요.</p>
+        ${closed.map((s) => calRowHtml(s, { badge: false, save: true })).join('')}
+      </details>` : ''}`;
 }
 
 function renderApplications() {
@@ -1962,9 +4034,9 @@ function renderApplications() {
 
   $('#apps-summary').innerHTML = apps.length
     ? `<div class="summary-card">
-         <p>준비 완료 ${prepared.length}건${submitted.length ? ` · 제출·심사 중 ${submitted.length}건` : ''}${wonApps.length ? ` · 🎉 선정 ${wonApps.length}건` : ''}${pending.length ? ` · 서류 작성 필요 ${pending.length}건` : ''} · ${wonApps.length ? '선정된 장학금' : '예상 최대 수혜액'}</p>
+         <p>준비 완료 ${prepared.length}건${submitted.length ? ` · 제출·심사 중 ${submitted.length}건` : ''}${wonApps.length ? ` · 선정 ${wonApps.length}건` : ''}${pending.length ? ` · 서류 작성 필요 ${pending.length}건` : ''} · ${wonApps.length ? '선정된 장학금' : '예상 최대 수혜액'}</p>
          <p class="summary-amount">${won(wonApps.length ? wonAmount : totalExpected)}</p>
-         <p class="summary-note">제출·발표 단계는 각 장학금 상세에서 직접 기록할 수 있어요 · 최종 제출은 각 공식 채널에서 이루어져요</p>
+         <p class="summary-note">제출·발표는 각 공식 채널에서 · 결과는 여기에 기록</p>
        </div>`
     : '';
 
@@ -1975,11 +4047,16 @@ function renderApplications() {
   list.classList.toggle('selecting', appsSelectMode);
   list.innerHTML = apps.length
     ? apps.map(appCard).join('')
-    : '<p class="empty">아직 준비한 장학금이 없어요.<br />홈에서 한 번에 준비해 보세요 ⚡</p>';
+    : '<p class="empty">아직 준비한 장학금이 없어요<br /><span class="empty-sub">공고를 고르면 서류 준비가 여기에 쌓여요</span></p><button class="btn btn-ghost btn-empty" data-go="explore">장학금 둘러보기</button>';
 
   /* 항목이 없으면 관리 장치를 통째로 숨긴다 — 빈 화면에 쓸 수 없는 버튼을 두지 않는다 */
   $('#apps-select-toggle').hidden = !apps.length;
-  $('#apps-swipe-hint').hidden = !apps.length;
+  /* 🔴 손짓 안내는 **처음 3번만** 띄운다 (2026-08-30 개발자 지시).
+     늘 떠 있으면 안내가 아니라 배경이 된다 — 읽어야 할 때는 이미 안 읽힌다.
+     세는 단위는 '앱을 켠 횟수'다. renderApplications() 는 삭제·되돌리기 때마다 다시 도는데
+     그때마다 세면 한 번 방문에 3회를 다 써 버린다(`_counted`가 그걸 막는다).
+     장부에 넣지 않고 localStorage 를 따로 쓰는 이유: 이건 이 기기의 화면 상태일 뿐이라
+     서버로 동기화될 프로필·신청내역에 섞이면 안 된다. */
   $('#apps-select-toggle').textContent = appsSelectMode ? '완료' : '선택';
   $('#apps-bulkbar').hidden = !(appsSelectMode && apps.length);
   const all = $('#apps-check-all');
@@ -1989,17 +4066,47 @@ function renderApplications() {
     del.disabled = appsSelected.size === 0;
     del.textContent = appsSelected.size ? `삭제 ${appsSelected.size}건` : '삭제';
   }
+
+  /* 목록 ↔ 달력 (2026-09-07 · 노션 UI-21).
+     🔴 새 탭을 만들지 않는다 — 하단바 4칸이 이미 꽉 찼고, 달력은 결국 '내 것'의 다른
+        보기다. 달력일 때는 목록 관리 장치(선택·삭제)를 감춘다: 달력에는 지울 줄이 없다. */
+  const cal = $('#apps-calendar');
+  const tog = $('#apps-view-toggle');
+  if (cal) cal.hidden = !calMode;
+  list.hidden = calMode;
+  /* 🔴 달력에서는 **수혜액 카드를 숨긴다** (2026-09-07 개발자 지시).
+     달력은 '언제'를 보는 화면이라 금액이 화면 위쪽을 차지하면 정작 달을 못 본다.
+     ⚠️ 지우는 게 아니라 숨기는 것이다 — 목록 보기에서는 그대로 나온다. */
+  $('#apps-summary').hidden = calMode;
+  if (tog) {
+    tog.textContent = calMode ? '목록 보기' : '달력 보기';
+    tog.setAttribute('aria-pressed', String(calMode));
+  }
+  $('#apps-select-toggle').hidden = !apps.length || calMode;
+  if (calMode) {
+    $('#apps-bulkbar').hidden = true;
+    renderCalendar();
+  }
 }
 
 /* 신청 내역 관리 배선 — 화면이 처음 만들어질 때 한 번만 건다 */
 function wireAppsManage() {
   const list = $('#apps-list');
-  enableRowSwipe(list);
+
+  /* 목록 ↔ 달력 (2026-09-07 · 노션 UI-21) */
+  const tog = $('#apps-view-toggle');
+  if (tog) tog.addEventListener('click', () => {
+    calMode = !calMode;
+    if (!calMode) calPicked = null;
+    /* 달력을 열 때는 늘 이번 달부터 — 지난달을 보다 나갔다 돌아왔는데 그대로면
+       "내 공고가 하나도 없다"로 보인다 */
+    if (calMode) calCursor = null;
+    renderApplications();
+  });
 
   $('#apps-select-toggle').addEventListener('click', () => {
     appsSelectMode = !appsSelectMode;
     appsSelected.clear();
-    list.querySelectorAll('.swipe-row.open').forEach((o) => o.classList.remove('open'));
     renderApplications();
   });
 
@@ -2019,8 +4126,6 @@ function wireAppsManage() {
   });
 
   list.addEventListener('click', (e) => {
-    const del = e.target.closest('[data-del]');
-    if (del) { deleteApps([del.dataset.del]); return; }
     const pick = e.target.closest('[data-pick]');
     if (pick) {
       if (pick.checked) appsSelected.add(pick.dataset.pick);
@@ -2039,7 +4144,7 @@ function learnedHtml(c) {
   const rows = LEARNED_COMMON.filter(([k]) => c[k]);
   if (!rows.length) return '';
   return `<div class="my-learned">
-    <p class="my-learned-head">신청서에서 배운 정보 <span>${rows.length}개 · 이 기기에만 저장돼요</span></p>
+    <p class="my-learned-head">신청서에서 배운 정보 <span>${rows.length}개 · 이 기기에만 저장</span></p>
     <ul>${rows.map(([k, label]) => `<li><span>${esc(label)}</span><strong>${esc(k === 'rrn' ? maskRrn(c[k]) : c[k])}</strong>
       <button type="button" class="btn-link" data-forget="${k}">지우기</button></li>`).join('')}</ul>
   </div>`;
@@ -2057,31 +4162,730 @@ function forgetLearned(key) {
   saveState();
   if (typeof formInvalidatePlan === 'function') formInvalidatePlan();
   renderMy();
-  toast('지웠어요 — 다음 신청서에서 다시 물어볼게요');
+  toast('삭제 완료 · 다음 신청서에서 다시 질문');
 }
 
 function renderMy() {
+  /* 판 번호는 APP_VERSION 한 곳에서 온다 — 프로필이 없어 일찍 돌아가더라도 적어 둔다 */
+  const ver = $('#my-version');
+  /* 🔴 "· 전국 대학 지원" 이라고 적혀 있었다 (2026-09-13 수정). 학교는 전국에서 고를 수
+     있지만 **교내 공고가 있는 학교는 두 곳뿐**이라, 그 말은 학생이 확인할 수 없는 약속이다.
+     지금은 **데이터가 세어 말한다** — 숫자를 손으로 적지 않으므로 학교가 늘면 저절로 맞는다.
+     ⚠️ 층2(한국장학재단)는 전국 재단이라 학교와 무관하다 — 그래서 따로 센다. */
+  if (ver) {
+    const inSchools = new Set(registeredList
+      .map((s) => s.eligibility && s.eligibility.schoolOnly).filter(Boolean));
+    const kosafN = kosafList.length;
+    const parts = [`한대장 ${APP_VERSION}`];
+    if (inSchools.size) parts.push(`교내 공고 ${inSchools.size}개교`);
+    if (kosafN) parts.push(`한국장학재단 ${kosafN}곳`);
+    ver.textContent = parts.join(' · ');
+  }
+
   const p = state.profile;
   if (!p) return;   // 온보딩을 아직 안 마친 상태 — 그릴 프로필이 없다
   const c = p.common || {};
-  const flagText = p.flags.length ? p.flags.map((f) => FLAG_LABELS[f]).join(', ') : '해당 없음';
+  /* ⚠️ 이름표가 없으면 **열쇠라도 보여 준다** — 다른 두 자리(bulkTags·match-engine)와 같은 방식이다.
+     빈칸을 내놓으면 학생이 고른 것이 화면에서 사라져 '해당 없음'처럼 읽힌다(2026-09-03~09 실제로 그랬다). */
   const trackLabel = (TRACKS.find((t) => t.id === p.track) || {}).label || '-';
   const commonFilled = ['studentId', 'birth', 'phone', 'email', 'account'].filter((k) => c[k]).length;
+  /* 🔴 **누를 수 있는 것은 이 버튼 하나다** (2026-09-12 개발자 지시). 전에는 카드 전체가
+     '프로필 수정' 버튼이라 표 아무 데나 눌러도 수정 화면으로 넘어갔다 — 학생이 제 성적을
+     확인하려고 표를 짚기만 해도 화면이 바뀌었다. span 이 아니라 button 이라야 키보드
+     Tab 으로 닿고 보조기기가 읽는다. 배선은 `#my-profile` 에 위임해 뒀다(다시 그려도 산다). */
+  const nameLine = `<p class="my-name">${esc(p.name || '대학생')} 님`
+    + `<button type="button" class="my-edit-hint">학적정보 수정 ›</button></p>`;
   $('#my-profile').innerHTML = `
-    <p class="my-name">${p.name || '대학생'} 님<span class="my-edit-hint">수정하기 ›</span></p>
-    <p class="my-line">${p.school || '대학 미설정'} · ${trackLabel}${p.major ? ' · ' + p.major : ''}</p>
+    ${photoHeadHtml(p, nameLine)}
+    ${/* 🔴 학과 칸은 **학생이 직접 치는 자유 입력**이다 — esc 를 빠뜨리면 `B<b>학과` 같은 글자에
+         MY 화면 아래쪽이 통째로 그 태그 안으로 빨려 들어간다(브라우저 실측). 2026-09-10. */ ''}
+    <p class="my-line">${esc(p.school || '대학 미설정')} · ${esc(trackLabel)}${p.major ? ' · ' + esc(p.major) : ''}</p>
     <div class="my-grid">
       <div><span>학년</span><strong>${p.year}학년 (${esc(p.status || '미설정')})</strong></div>
       <div><span>직전학기 평점</span><strong>${p.gpa != null ? p.gpa.toFixed(2) : '미입력'}</strong></div>
       <div><span>지원구간</span><strong>${p.bracket != null ? p.bracket + '구간' : '모름'}</strong></div>
       <div><span>공통 서류정보</span><strong>${commonFilled}/5 입력됨</strong></div>
     </div>
-    <p class="my-flags">특별자격: ${flagText}</p>
-    ${learnedHtml(c)}
-    <p class="my-flags">공통 서류정보(학번·연락처·계좌 등)는 이 기기에만 저장되고 서류 초안에 자동 기입돼요.</p>`;
+    ${/* 🔴 줄 셋을 뺐다 (2026-09-12 개발자 지시) — '특별자격: 해당 없음' · 공통 서류정보
+         안내 · 프로필 사진 안내. 대부분의 학생에게 '해당 없음' 한 줄이고, 나머지 둘은
+         온보딩에서 이미 같은 말을 했다(index.html '모두 선택 사항이며 이 기기에만
+         저장됩니다'). ⚠️ 저장 위치 고지 자체가 사라진 것은 아니다 — 온보딩 그 줄과
+         약관 「③ 서버로 보내지 않는 정보」가 원본이다. */ ''}
+    ${learnedHtml(c)}`;
+  bindPhotoButtons();
+  /* 🔴 계정·알림은 여기서 그리지 않는다 — 설정 화면으로 옮겼다 (2026-09-11).
+     renderSettings() 가 **같은 함수**를 불러 그린다. */
+  renderWallet();
+  renderSaved();
+}
+
+/* ---------------- 설정 화면 (2026-09-11 · 개발자 목업 승인) ---------------- */
+function renderSettings() {
   renderAccountCard();
   renderNotifyCard();
-  renderWallet();
+  const t = $('#btn-open-trash');
+  if (t && !t.dataset.wired) { t.dataset.wired = '1'; t.addEventListener('click', () => showScreen('trash')); }
+  const w = $('#btn-withdraw');
+  if (w && !w.dataset.wired) { w.dataset.wired = '1'; w.addEventListener('click', withdrawAccount); }
+  const tm = $('#btn-open-terms');
+  if (tm && !tm.dataset.wired) { tm.dataset.wired = '1'; tm.addEventListener('click', () => showScreen('terms')); }
+  for (const [id, screen] of [['#btn-open-logins', 'logins'], ['#btn-open-support', 'support'], ['#btn-open-faq', 'faq'], ['#btn-open-perms', 'perms']]) {
+    const b = $(id);
+    if (b && !b.dataset.wired) { b.dataset.wired = '1'; b.addEventListener('click', () => showScreen(screen)); }
+  }
+}
+
+/* ---------------- 로그인 활동 (2026-09-11 개발자 지시 1번) ----------------
+   "내 계정에 언제 어디서 로그인됐나". 낯선 기기가 보이면 비밀번호를 바꾸라고 알려 준다.
+   🔴 '없다'와 '못 읽었다'를 가른다 — 못 읽은 것을 '없다'로 보여 주면 낯선 기기를 놓친다.
+   🔴 **IP 는 적지 않는다.** 브라우저는 제 IP 를 모르고(서버만 안다) Supabase 에 바로 쓰는
+      지금 구조에는 받아 적을 자리가 없다. 지어내느니 줄을 비운다(원칙 8-1).
+   🔴 '현재 기기' 배지는 **기기 이름이 아니라 설치본 식별자**로 붙인다 — 이름으로 견주면
+      같은 기종을 쓰는 남의 로그인에 배지가 붙어, 찾으라고 만든 화면이 안심시킨다. */
+function loginWhen(iso) {
+  const d = new Date(iso);
+  if (isNaN(d)) return '시각 확인 불가';
+  const ap = d.getHours() < 12 ? '오전' : '오후';
+  const h12 = d.getHours() % 12 || 12;
+  const two = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}. ${ap} ${h12}:${two(d.getMinutes())}`;
+}
+
+async function renderLogins() {
+  const el = $('#logins-body');
+  if (!el) return;
+  if (typeof authUser !== 'function' || !authUser()) {
+    el.innerHTML = `<div class="my-card trash-empty">
+        <p class="trash-empty-title">로그인한 계정이 없어요</p>
+        <p class="legal-loading">로그인하면 이 계정에 언제 어느 기기로 접속했는지 여기에 쌓여요.</p>
+      </div>`;
+    return;
+  }
+  el.innerHTML = '<p class="legal-loading">불러오는 중이에요…</p>';
+  const r = await authLoginEvents(20);
+  if (!r.ok) {
+    /* 🔴 못 읽은 것을 '없다'로 말하지 않는다 */
+    el.innerHTML = `<div class="my-card trash-empty">
+        <p class="trash-empty-title">기록을 불러오지 못했어요</p>
+        <p class="legal-loading">인터넷이 끊겼거나 서버 준비가 아직 안 됐어요. 잠시 뒤 다시 열어 주세요.</p>
+      </div>`;
+    return;
+  }
+  if (!r.items.length) {
+    el.innerHTML = `<div class="my-card trash-empty">
+        <p class="trash-empty-title">아직 기록이 없어요</p>
+        <p class="legal-loading">다음 로그인부터 여기에 쌓여요.</p>
+      </div>`;
+    return;
+  }
+  const me = typeof clientId === 'function' ? clientId() : '';
+  el.innerHTML = r.items.map((it) => `
+    <div class="login-card">
+      ${it.client && me && it.client === me ? '<span class="login-now">현재 기기</span>' : ''}
+      <p class="login-device">${esc(it.device || '알 수 없는 기기')}</p>
+      <p class="login-meta">로그인 | ${esc(loginWhen(it.at))}</p>
+    </div>`).join('');
+}
+
+/* ---------------- 자주 묻는 질문 (2026-09-11 개발자 지시 2번 · 2026-09-13 고도화) ----------------
+   🔴 **앱이 실제로 하는 일만** 적는다. '곧 됩니다'나 확인 안 한 것을 적으면 그게 가장
+      눈에 잘 띄는 거짓말이 된다(운영 원칙 1·8-1). 답은 전부 지금 동작 기준이고,
+      기능이 바뀌면 이 목록도 같이 고쳐야 한다.
+   🔴 여기 적은 사실은 **코드에서 하나씩 확인한 것**이다 — 알림 5종은 `notify-rules.js`,
+      진척도 4단계는 `APP_STEPS`, 저장 목록이 기기 안에만 남는 것은 `supabase-client.js`
+      가 그 값을 안 보낸다는 것으로 확인했다. 새 항목을 더할 때도 같은 방식으로 확인한다.
+
+   칸은 셋이다 — [갈래, 질문, 답].
+   🔴 **갈래를 지어내지 않는다** — 칩 줄은 이 목록에 실제로 있는 갈래만 나온다(`faqCats`).
+      목록에 없는 갈래를 칩에 박아 두면 눌러도 0건인 칩이 생긴다.
+   🔴 `FAQ_TOP` 은 고객센터의 '자주 찾는 질문 TOP 5'가 쓰는 **같은 원본**이다. 두 화면이
+      제각기 목록을 들고 있으면 한쪽만 고쳐져 갈라진다(이 저장소가 반복해 겪은 사고다). */
+const FAQ_ITEMS = [
+  ['신청', '이 앱에서 신청까지 끝나나요?',
+    '아니요. 한대장은 <strong>신청 준비까지</strong> 도와줍니다. 최종 신청·접수는 한국장학재단, 각 대학, 각 재단 같은 공식 접수처에서 직접 하셔야 해요. 그래서 앱은 "신청 완료"라고 쓰지 않고 "신청 준비 완료"라고 적습니다.'],
+  ['신청', '신청 준비를 끝내면 그다음은 어떻게 되나요?',
+    '신청내역에 <strong>신청 준비 완료 → 공식 제출 → 심사 → 선정 발표</strong> 네 단계로 남습니다. 앱은 학교·재단 전산을 볼 수 없어서 <strong>제출과 결과는 학생이 직접 기록</strong>합니다("제출했어요", "선정·미선정" 버튼). 심사 단계만 제출 기록과 마감 경과로 앱이 표시해요.'],
+  ['신청', '대장님(도우미)은 무엇을 답해 주나요?',
+    '앱이 <strong>이미 알고 있는 것</strong>만 답합니다 — 등록된 공고, 필요한 서류, 내 신청 현황, 공고 원문에서 뽑아 둔 문장이에요. 모르는 것은 지어내지 않고 "못 찾았다"고 말합니다. 그게 이 도우미를 만든 이유예요.'],
+
+  ['공고·매칭', '우리 학교 공고가 안 보여요.',
+    '지금 공고 원문을 모으고 있는 학교가 정해져 있어요. 그 밖의 학교라도 <strong>전국 대상 공고</strong>와 <strong>한국장학재단이 아는 재단 장학금</strong>은 그대로 보입니다.'],
+  ['공고·매칭', '자격 요건이 안 적힌 공고가 있어요.',
+    '그 공고에서는 자격 요건을 <strong>공고 원문에서 직접 확인</strong>해 주세요. 앱이 짐작해서 채우지 않습니다 — 틀린 자격 판정은 모른다고 말하는 것보다 나쁘기 때문이에요.'],
+  ['공고·매칭', '금액이 "원문 확인"인 공고가 있어요.',
+    '공고 원문에 금액이 적혀 있지 않거나 첨부파일에만 있는 경우입니다. 그 공고의 카드에는 지어낸 숫자를 적지 않고 <strong>"금액 원문 확인"</strong> 그대로 둡니다. 다만 홈의 합계는 이런 공고를 빼 버리면 실제보다 작아지므로, <strong>금액을 확인한 공고들의 중앙값</strong>으로 어림잡아 더하고 숫자 앞에 "약"을 붙입니다. 자세한 내역은 홈의 금액을 눌러 <strong>금액 상세</strong>에서 볼 수 있어요.'],
+  ['공고·매칭', '저장(북마크)한 공고는 어디에 남나요?',
+    '<strong>이 기기에만</strong> 남습니다. 로그인해도 저장 목록은 서버로 올라가지 않아서, 기기를 바꾸면 다시 저장하셔야 해요.'],
+  ['공고·매칭', '달력에 왜 몇 개만 표시되나요?',
+    '상시로 찍는 것은 <strong>신청하거나 저장한 공고</strong>의 마감일(파랑)과 발표일(빨강)뿐입니다. 전부 찍으면 하루에 스무 건이 넘는 날이 있어 달력이 읽히지 않아요. 나머지는 <strong>날짜를 누르면</strong> 그날 것만 펼쳐집니다.'],
+
+  ['알림', '알림이 안 와요.',
+    '설정 → 알림에서 켜 주세요. <strong>아이폰은 홈 화면에 앱을 추가해야만</strong> 알림이 옵니다(사파리 탭에서는 안 옵니다). 폰에서 알림을 차단해 두었다면 설정 → 앱 권한에 바꾸는 방법이 적혀 있어요.'],
+  ['알림', '어떤 알림이 오나요?',
+    '다섯 가지입니다 — <strong>내 조건에 맞는 새 공고</strong>, <strong>마감 하루 전·당일</strong>, <strong>제출 기록을 안 한 공고</strong>, <strong>우리 학교 게시판 새 공고</strong>, <strong>마감 지난 공고의 결과 기록</strong>. 설정 → 알림에서 항목마다 따로 끄고 켤 수 있어요.'],
+
+  ['계정·기기', '내 정보는 어디에 저장되나요?',
+    '기본은 <strong>이 기기 안</strong>입니다. 로그인하면 기기를 바꿔도 이어 쓸 수 있도록 프로필과 신청내역이 서버에 저장되고, 낯선 기기를 알아차릴 수 있게 <strong>로그인한 시각과 기기 종류</strong>도 함께 남습니다(설정 → 로그인 활동에서 볼 수 있어요).'],
+  ['계정·기기', '기기를 바꾸면 이어서 쓸 수 있나요?',
+    '로그인하면 새 기기에서 프로필과 신청내역을 받아옵니다. 로그인하지 않으면 정보가 그 기기에만 남습니다.'],
+  ['계정·기기', '로그인하지 않아도 쓸 수 있나요?',
+    '네. 공고 검색·추천·알림·서류 보관함까지 <strong>로그인 없이 그대로</strong> 됩니다. 로그인은 기기를 바꿀 때 이어 쓰기 위한 것이에요.'],
+
+  ['개인정보', '주민등록번호·계좌번호·증명서류도 서버에 올라가나요?',
+    '아니요. 이 셋은 <strong>서버로 보내지 않습니다</strong>. 기기 안에만 저장되고, 서버로 나가는 사본에서 떼어냅니다.'],
+  ['개인정보', '기초생활수급·장애 같은 정보는요?',
+    '민감정보라 <strong>따로 동의하셨을 때만</strong> 서버에 올라갑니다. 동의하지 않으셔도 기기 안에는 그대로 남아 <strong>매칭은 똑같이</strong> 됩니다.'],
+
+  ['요금·기타', '유료인가요?',
+    '공고 검색·추천·알림은 무료입니다. 앞으로 유료 기능이 생기면 쓰기 전에 분명히 안내하고 동의를 받습니다.'],
+  ['요금·기타', '잘못 지웠어요. 되살릴 수 있나요?',
+    '설정 → 휴지통에서 되살릴 수 있어요. 지운 신청내역과 서류는 <strong>30일 동안</strong> 남습니다.'],
+  ['요금·기타', '인터넷이 없어도 열리나요?',
+    '한 번 열어 본 뒤로는 <strong>비행기 모드에서도</strong> 앱이 열리고 저장해 둔 공고·서류를 볼 수 있어요. 다만 새 공고를 받아오는 것은 연결됐을 때만 됩니다.'],
+];
+
+/* 고객센터의 '자주 찾는 질문 TOP 5' — 질문 글자로 가리킨다(번호로 가리키면 목록 순서가
+   바뀌는 순간 엉뚱한 질문이 TOP 에 오른다). 🔴 없는 질문을 적으면 관문이 잡는다. */
+const FAQ_TOP = [
+  '이 앱에서 신청까지 끝나나요?',
+  '우리 학교 공고가 안 보여요.',
+  '알림이 안 와요.',
+  '자격 요건이 안 적힌 공고가 있어요.',
+  '유료인가요?',
+];
+
+/* 목록에 실제로 있는 갈래만, 나온 순서대로 */
+function faqCats() {
+  const seen = [];
+  for (const [cat] of FAQ_ITEMS) if (!seen.includes(cat)) seen.push(cat);
+  return seen;
+}
+
+let faqCat = '전체';
+let faqQuery = '';
+
+/* 검색은 **질문과 답 둘 다** 본다 — '주민번호'는 질문에 없고 답에만 있다.
+   답에 섞인 <strong> 같은 표시는 빼고 글자만 견준다(안 빼면 'strong'이 검색된다). */
+function faqPlain(html) {
+  return String(html).replace(/<[^>]*>/g, '');
+}
+function faqHit(item, q) {
+  if (!q) return true;
+  const hay = `${item[1]} ${faqPlain(item[2])}`.toLowerCase();
+  /* 띄어쓰기로 끊어 **전부 들어 있는 것**만 — '알림 아이폰'처럼 두 낱말로 좁힐 수 있다 */
+  return q.toLowerCase().split(/\s+/).filter(Boolean).every((w) => hay.includes(w));
+}
+
+/* 찾은 낱말에 표시를 남긴다. 🔴 반드시 `esc()` **뒤에** 넣는다 — 먼저 넣으면 우리가 넣은
+   태그까지 글자로 바뀌어 화면에 `<mark>` 가 그대로 뜬다. */
+function faqWords(q) {
+  return String(q).toLowerCase().split(/\s+/).filter(Boolean);
+}
+function faqMarkPlain(text, q) {
+  let out = esc(text);
+  for (const w of faqWords(q)) {
+    const re = new RegExp(esc(w).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+    out = out.replace(re, (m) => `<mark>${m}</mark>`);
+  }
+  return out;
+}
+function faqMark(text, q) { return faqMarkPlain(text, q); }
+
+/* 답은 이미 HTML(`<strong>` 등)이라 통째로 바꾸면 **태그 속 글자까지** 건드려 문서가 깨진다.
+   그래서 태그와 글자를 갈라 **글자 조각에만** 표시를 남긴다.
+   🔴 이 표시가 필요한 이유: 검색은 질문뿐 아니라 **답도** 본다(‘주민번호’는 답에만 있다).
+      그래서 질문에는 안 걸린 결과가 목록에 뜨는데, 표시가 없으면 학생이 "왜 이게 나왔지?"
+      하고 만다 — 펼치면 걸린 자리가 보이게 해 준다. */
+function faqMarkHtml(html, q) {
+  if (!q) return html;
+  return String(html).split(/(<[^>]*>)/).map((piece) => {
+    if (piece.startsWith('<')) return piece;      // 태그는 손대지 않는다
+    for (const w of faqWords(q)) {
+      const re = new RegExp(w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+      piece = piece.replace(re, (m) => `<mark>${m}</mark>`);
+    }
+    return piece;
+  }).join('');
+}
+
+function faqListHtml() {
+  const items = FAQ_ITEMS.filter((it) => (faqCat === '전체' || it[0] === faqCat) && faqHit(it, faqQuery));
+
+  /* 🔴 결과가 없을 때 — 아파트너 참고안 그대로 '검색결과가 없습니다' + 고객센터로 보내는 길.
+     여기서 막다른 길로 두면 학생이 앱을 닫는다. */
+  if (!items.length) {
+    return `<div class="faq-empty">
+      <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="28" cy="28" r="17"/><path d="M40.5 40.5L54 54"/>
+        <path d="M22.5 25.5h.02M33.5 25.5h.02"/><path d="M22 34c3.6-2.6 8.4-2.6 12 0"/>
+      </svg>
+      <p class="faq-empty-title">검색결과가 없습니다</p>
+      <p class="faq-empty-sub">찾으시는 답이 없다면 고객센터에서<br />도우미에게 물어보거나 문의를 남기실 수 있어요.</p>
+      <button type="button" class="btn btn-outline" id="btn-faq-to-support">고객센터 가기</button>
+    </div>`;
+  }
+
+  const q = faqQuery;
+  return items.map(([cat, question, answer]) => `
+    <details class="faq-item">
+      <summary><span class="faq-cat">${esc(cat)}</span>${faqMark(question, q)}</summary>
+      <div class="faq-a">${faqMarkHtml(answer, q)}</div>
+    </details>`).join('');
+}
+
+/* 목록만 다시 그린다 — 검색창까지 다시 그리면 글자를 칠 때마다 **커서가 튄다**.
+   그래서 renderFaq(틀)과 faqRefresh(목록)를 갈라 두었다. */
+function faqRefresh() {
+  const list = $('#faq-list');
+  const banner = $('#faq-result');
+  if (!list) return;
+  list.innerHTML = faqListHtml();
+
+  /* 검색 중일 때만 몇 건인지 말한다(아파트너 참고안의 파란 ⓘ 줄) */
+  if (banner) {
+    const n = list.querySelectorAll('.faq-item').length;
+    banner.hidden = !faqQuery;
+    if (faqQuery) banner.innerHTML = `<strong>"${esc(faqQuery)}"</strong>에 대한 결과가 ${n}개입니다.`;
+  }
+
+  const go = $('#btn-faq-to-support');
+  if (go) go.addEventListener('click', () => showScreen('support'));
+}
+
+/* 화면을 **열 때마다** 검색어와 갈래를 처음으로 되돌린다.
+   🔴 이게 없으면 옛 검색어가 남는다 — 실제로 없는 낱말을 찾아 빈 화면을 본 학생이 설정으로
+      나갔다 '자주 묻는 질문'을 다시 눌렀을 때 **또 빈 화면**이 떴다(실측으로 잡았다).
+      목록에서 다시 들어오는 것은 "처음부터 보겠다"는 뜻이다. */
+function faqReset() {
+  faqCat = '전체';
+  faqQuery = '';
+  const input = $('#faq-search');
+  if (input) input.value = '';
+  const clear = $('#faq-search-clear');
+  if (clear) clear.hidden = true;
+  $$('#faq-cats .filter-chip').forEach((c) => c.classList.toggle('active', c.dataset.faqCat === '전체'));
+  faqRefresh();
+}
+
+function renderFaq() {
+  const el = $('#faq-body');
+  if (!el) return;
+  /* 틀(검색창·칩)은 한 번만 그린다 — 글자를 칠 때마다 다시 그리면 커서가 튄다.
+     되돌리기는 틀이 이미 있어도 매번 한다(위 faqReset 주석). */
+  if (el.dataset.filled) { faqReset(); return; }
+  el.dataset.filled = '1';
+
+  /* 갈래 칩 — '전체'가 맨 앞이고 처음에 켜져 있다 */
+  const chips = ['전체', ...faqCats()]
+    .map((c) => `<button type="button" class="filter-chip${c === faqCat ? ' active' : ''}" data-faq-cat="${esc(c)}">${esc(c)}</button>`)
+    .join('');
+
+  /* 검색창은 탐색 화면과 **같은 부품**(.search-box)을 쓴다 — 베끼면 두 검색창이 따로 논다 */
+  el.innerHTML = `
+    <div class="search-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input type="search" id="faq-search" placeholder="질문을 입력해주세요" maxlength="40" autocomplete="off" aria-label="자주 묻는 질문 검색" />
+      <button type="button" id="faq-search-clear" class="search-clear" aria-label="검색어 지우기" hidden>✕</button>
+    </div>
+    <div class="faq-cats" id="faq-cats">${chips}</div>
+    <p class="faq-result" id="faq-result" hidden></p>
+    <div id="faq-list"></div>`;
+
+  const input = $('#faq-search');
+  const clear = $('#faq-search-clear');
+  input.addEventListener('input', () => {
+    faqQuery = input.value.trim();
+    clear.hidden = !input.value;
+    faqRefresh();
+  });
+  clear.addEventListener('click', () => {
+    input.value = ''; faqQuery = ''; clear.hidden = true;
+    faqRefresh(); input.focus();
+  });
+  /* 폰 자판의 '검색'을 누르면 자판을 내린다 — 결과는 이미 글자를 칠 때마다 좁혀졌다 */
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); input.blur(); } });
+
+  $('#faq-cats').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-faq-cat]');
+    if (!b) return;
+    faqCat = b.dataset.faqCat;
+    $$('#faq-cats .filter-chip').forEach((c) => c.classList.toggle('active', c === b));
+    faqRefresh();
+  });
+
+  faqRefresh();
+}
+
+/* 고객센터에서 특정 질문으로 들어올 때 — 그 질문을 펼쳐 준다.
+   🔴 갈래·검색어 되돌리기는 renderFaq(→ faqReset)이 이미 한다. 여기에 한 벌 더 두면
+      한쪽만 고쳐져 갈라진다 — 이 저장소가 반복해 겪은 사고다. */
+function faqOpenQuestion(question) {
+  showScreen('faq');
+  for (const d of $$('#faq-list .faq-item')) {
+    if (d.querySelector('summary').textContent.includes(question)) {
+      d.open = true;
+      d.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      break;
+    }
+  }
+}
+
+/* ---------------- 고객센터 (2026-09-13 개발자 지시 · 아파트너·라이프캐치 참고안) ----------------
+   "설정 안에 고객센터를 두고, FAQ 는 강화해 달라"는 지시로 만들었다.
+
+   🔴 **여기 있는 길은 전부 실제로 가는 길이다.** 라이프캐치 참고안에는 '나의 문의 내역'
+      탭이 있지만 우리는 문의를 받아 두는 서버가 없다 — 없는 것을 탭으로 만들어 두면
+      눌렀을 때 빈 화면이 나오고, 그게 이 앱이 가장 하지 말아야 할 일이다(운영 원칙 1).
+      그래서 넣은 것은 넷뿐이고 넷 다 지금 동작한다:
+        ① 자주 찾는 질문 TOP 5 → 누르면 그 질문이 펼쳐진 FAQ 로 간다
+        ② 대장님(도우미)에게 묻기 → chat.js 의 chatOpen() 을 그대로 부른다
+        ③ 문의 메일 쓰기 → **문의처가 정해졌을 때만** 나온다(support-config.js)
+        ④ 진단 정보 복사 → 문의에 붙일 값. 개인정보는 한 줄도 담지 않는다.
+
+   🔴 문의처가 비어 있을 때 '문의하기' 자리를 **빈칸으로 두지 않는다** — 대신 지금 할 수
+      있는 것을 적는다. terms.html 9번과 **같은 사실**을 말해야 한다(약관과 앱이 다른 말을
+      하면 안 된다). 그 문장을 여기에 베끼지는 않는다 — 원본은 terms.html 하나다. */
+
+/* 문의·진단에 붙일 값. 🔴 이름·학교·성적·이메일 같은 개인정보는 **한 줄도 담지 않는다**.
+   담는 것은 '어느 앱을 어떤 환경에서 쓰는가'뿐이라 그대로 남에게 보여 줘도 된다. */
+function supportDiagnostics() {
+  const cap = typeof notifySupport === 'function' ? notifySupport() : {};
+  const perm = cap.hasApi ? cap.permission : '지원 안 함';
+  return [
+    ['앱 버전', APP_VERSION],
+    ['설치 형태', cap.standalone ? '홈 화면에 설치함' : '브라우저에서 열었음'],
+    ['알림 권한', perm === 'granted' ? '허용됨' : perm === 'denied' ? '차단됨' : perm === 'default' ? '아직 묻지 않음' : perm],
+    ['로그인', (typeof authLoad === 'function' && authLoad()) ? '로그인함' : '로그인 안 함'],
+    ['브라우저', navigator.userAgent],
+  ];
+}
+
+function supportDiagText() {
+  return supportDiagnostics().map(([k, v]) => `${k}: ${v}`).join('\n');
+}
+
+function renderSupport() {
+  const el = $('#support-body');
+  if (!el) return;
+
+  /* TOP 5 — FAQ_TOP 이 가리키는 질문을 FAQ_ITEMS 에서 찾는다.
+     🔴 못 찾으면 **번호를 비우지 않고 그 줄을 뺀다** — 없는 질문으로 가는 줄을 그려 두면
+        눌러도 아무 일이 없다. (관문이 '다섯 줄인가'를 세므로 빠지면 바로 드러난다) */
+  const top = FAQ_TOP
+    .map((q) => FAQ_ITEMS.find((it) => it[1] === q))
+    .filter(Boolean);
+
+  const topHtml = top.map((it, i) => `
+    <button type="button" class="sup-top-item" data-q="${esc(it[1])}">
+      <span class="sup-top-no">${i + 1}</span>
+      <span class="sup-top-q">${esc(it[1])}</span>
+      <span class="sup-top-go" aria-hidden="true">›</span>
+    </button>`).join('');
+
+  /* 문의처가 정해졌을 때만 메일 버튼을 낸다 — 없으면 정직하게 무엇이 되는지 적는다 */
+  const 문의 = supportConfigured()
+    ? `<p class="sup-desc">답변은 적어 주신 메일 주소로 받으실 수 있어요.${SUPPORT_CONFIG.hours ? ` 응대 시간은 ${esc(SUPPORT_CONFIG.hours)}입니다.` : ''}</p>
+       <button type="button" class="btn btn-outline" id="btn-support-mail">문의 메일 쓰기</button>`
+    : `<p class="sup-desc">한대장은 아직 시범 개발 중이라 <strong>따로 받아 볼 문의처를 두지 않았어요.</strong>
+         정해지면 이 자리에 적고 그때부터 받습니다(이용약관 9번과 같은 내용이에요).</p>
+       <p class="sup-desc">그때까지는 위의 <strong>대장님</strong>에게 물어봐 주세요.
+         내 정보를 지우는 것은 문의 없이 바로 하실 수 있어요 — 설정의 <strong>탈퇴</strong>(서버 정보),
+         MY 의 <strong>데이터 초기화</strong>(이 기기 정보)입니다.</p>`;
+
+  el.innerHTML = `
+    <div class="my-card">
+      <p class="wallet-title">자주 찾는 질문</p>
+      <div class="sup-top">${topHtml}</div>
+      <button type="button" class="sup-more" id="btn-support-faq">질문 전체 보기 · 검색</button>
+    </div>
+
+    <div class="my-card">
+      <p class="wallet-title">바로 물어보기</p>
+      <p class="sup-desc">대장님은 앱이 <strong>이미 아는 것</strong>(등록된 공고·서류·내 신청 현황·공고 원문)을 찾아 줍니다. 모르면 지어내지 않고 못 찾았다고 말해요.</p>
+      <button type="button" class="btn btn-outline" id="btn-support-chat">대장님에게 물어보기</button>
+    </div>
+
+    <div class="my-card">
+      <p class="wallet-title">문의하기</p>
+      ${문의}
+    </div>
+
+    <div class="my-card">
+      <p class="wallet-title">진단 정보</p>
+      <p class="sup-desc">문제를 알려 주실 때 아래를 함께 보내 주시면 원인을 훨씬 빨리 찾을 수 있어요.
+        <strong>이름·학교·성적 같은 개인정보는 들어 있지 않습니다.</strong></p>
+      <div class="sup-diag">${supportDiagnostics()
+        .map(([k, v]) => `<div class="sup-diag-row"><span>${esc(k)}</span><b>${esc(v)}</b></div>`).join('')}</div>
+      <button type="button" class="btn btn-outline" id="btn-support-copy">진단 정보 복사</button>
+    </div>`;
+
+  el.querySelectorAll('[data-q]').forEach((b) => {
+    b.addEventListener('click', () => faqOpenQuestion(b.dataset.q));
+  });
+  $('#btn-support-faq').addEventListener('click', () => showScreen('faq'));
+  $('#btn-support-chat').addEventListener('click', () => {
+    if (typeof chatOpen === 'function') chatOpen();
+    else toast('도우미를 열지 못했어요');
+  });
+  $('#btn-support-copy').addEventListener('click', () => copyText(supportDiagText(), '진단 정보를 복사했어요'));
+
+  const mail = $('#btn-support-mail');
+  if (mail) {
+    mail.addEventListener('click', () => {
+      /* 🔴 메일 앱을 여는 것뿐이다 — 앱이 대신 보내지 않는다. 학생이 내용을 보고 직접 보낸다.
+         진단 정보를 본문에 미리 넣어 두되, 보내기 전에 눈으로 볼 수 있는 자리에 둔다. */
+      const body = `\n\n\n--- 아래는 문제를 찾는 데 쓰는 정보입니다 (개인정보 없음) ---\n${supportDiagText()}\n`;
+      location.href = `mailto:${encodeURIComponent(SUPPORT_CONFIG.email)}`
+        + `?subject=${encodeURIComponent('[한대장] 문의')}&body=${encodeURIComponent(body)}`;
+    });
+  }
+}
+
+/* ---------------- 앱 권한 · 오픈소스 라이선스 (2026-09-11 개발자 지시 4번) ----------------
+   🔴 **웹앱은 폰 설정 앱을 열 수 없다.** 그런 길이 브라우저에 없다(앱스토어에 올린 진짜
+      앱만 된다). 그래서 '눌러서 폰 설정으로 이동'은 만들 수 없고, 대신 **지금 권한 상태를
+      보여 주고 어디로 가야 하는지 글로 안내**한다. 있지도 않은 버튼을 만들어 두면
+      눌러도 아무 일이 없어 더 나쁘다.
+   🔴 라이선스 목록은 **실제로 싣는 것만** 적는다. 이 앱은 CSP 가 바깥 스크립트를 막아
+      자바스크립트 라이브러리를 하나도 싣지 않고, 바깥에서 받는 것은 글꼴 하나뿐이다. */
+const OSS_LICENSES = [
+  ['Pretendard', 'SIL Open Font License 1.1', 'https://github.com/orioncactus/pretendard'],
+];
+
+function permLabel() {
+  if (typeof Notification === 'undefined') return { text: '이 브라우저는 알림을 지원하지 않아요', cls: 'off' };
+  if (Notification.permission === 'granted') return { text: '허용됨', cls: 'on' };
+  if (Notification.permission === 'denied') return { text: '차단됨', cls: 'off' };
+  return { text: '아직 묻지 않음', cls: 'off' };
+}
+
+function renderPerms() {
+  const el = $('#perms-body');
+  if (!el) return;
+  const p = permLabel();
+  const blocked = typeof Notification !== 'undefined' && Notification.permission === 'denied';
+  /* 🔴 **줄을 긋지 않는다** (2026-09-11 개발자 지시 — "단락 나누는 용으로 줄 그어져 있는 거 없애고").
+     전에는 서류 보관함의 `.wallet-row`·`.my-card` 를 빌려 써서 그 목록의 구분선이 딸려 왔다.
+     목록이 아니라 **읽는 글**이라 선이 문단을 토막 냈다. 이제 절은 **빈칸으로만** 나누고
+     (`.perm-sec` 사이 --space-32), 문단은 제 리듬을 갖는다 — 이끄는 글 → 항목 → 덧붙이는 글.
+     🔴 이 화면 전용 이름을 쓴다: 보관함 클래스를 여기서 고치면 서류 목록의 선까지 사라진다. */
+  el.innerHTML = `
+    <section class="perm-sec">
+      <p class="perm-title">앱 권한</p>
+      <div class="perm-state">
+        <p class="perm-name">알림</p>
+        <p class="perm-value nf-status-${p.cls}">${esc(p.text)}</p>
+      </div>
+      ${blocked ? `<p class="perm-how"><strong>폰에서 차단해 두셨어요.</strong> 앱에서는 다시 물을 수 없고,
+        폰 설정에서 직접 바꿔야 합니다.</p>
+      <p class="perm-how perm-steps">아이폰: 설정 → 알림 → 한대장 → 알림 허용<br />
+        안드로이드: 설정 → 앱 → 한대장 → 알림</p>`
+      : `<p class="perm-how">알림을 켜고 끄는 것은 <strong>설정 → 알림</strong>에서 합니다.
+        폰 설정에서 아예 차단해 두면 앱에서는 되돌릴 수 없어요.</p>`}
+      <p class="perm-how">한대장은 <strong>웹앱</strong>이라 사진·카메라·연락처 권한을 쓰지 않습니다.
+        서류 보관함에 파일을 올릴 때만 그때그때 파일을 고르게 되어 있고, 앱이 폰 안을 뒤지지 않습니다.</p>
+    </section>
+    <section class="perm-sec">
+      <p class="perm-title">오픈소스 라이선스</p>
+      <p class="perm-lead">이 앱은 바깥 자바스크립트 라이브러리를 하나도 싣지 않습니다(보안 설정이 막습니다).
+        바깥에서 받아 쓰는 것은 아래 글꼴 하나뿐이에요.</p>
+      ${OSS_LICENSES.map(([name, lic, url]) => `
+        <div class="perm-state">
+          <div>
+            <p class="perm-name">${esc(name)}</p>
+            <p class="perm-value">${esc(lic)}</p>
+          </div>
+          <a class="perm-link" href="${esc(url)}" target="_blank" rel="noopener">원문 ↗</a>
+        </div>`).join('')}
+    </section>`;
+}
+
+/* ---------------- 이용약관 · 개인정보처리방침 (2026-09-11) ----------------
+   🔴 글을 여기 베끼지 않는다 — 원본은 `terms.html` 하나다(법적 문서라 제 주소가 있어야 하고,
+      온보딩 동의 줄은 지금도 새 탭으로 그 파일을 연다). 두 벌이 되면 한쪽만 고쳐져
+      화면과 약관이 다른 말을 하게 된다. 그래서 그 파일을 읽어 와 본문만 옮겨 넣는다.
+   🔴 넣는 것은 **우리 저장소의 정적 파일**이지 수집한 글이 아니다 — 그래서 innerHTML 로
+      넣어도 된다(CSP 가 script-src 'self' 라 혹시 섞여 들어와도 실행되지 않는다).
+   ⚠️ 못 읽어 왔을 때 빈 화면으로 두지 않는다 — 무슨 일인지 말하고 원문 링크를 준다. */
+let termsHtml = null;
+
+async function renderTerms() {
+  const el = $('#terms-body');
+  if (!el) return;
+  if (termsHtml) { el.innerHTML = termsHtml; return; }
+  el.innerHTML = '<p class="legal-loading">약관을 불러오는 중이에요…</p>';
+  try {
+    const res = await fetch('terms.html', { cache: 'no-cache' });
+    if (!res.ok) throw new Error(String(res.status));
+    const doc = new DOMParser().parseFromString(await res.text(), 'text/html');
+    const src = doc.querySelector('.legal');
+    if (!src) throw new Error('본문 없음');
+    /* 그 파일의 제 머리줄(뒤로+제목)은 뺀다 — 이 화면이 이미 갖고 있다 */
+    const head = src.querySelector('.legal-header');
+    if (head) head.remove();
+    termsHtml = src.innerHTML;
+    el.innerHTML = termsHtml;
+  } catch (e) {
+    el.innerHTML = `<p class="legal-loading">약관을 불러오지 못했어요.
+      <a href="terms.html" target="_blank" rel="noopener">따로 열어 보기 ↗</a></p>`;
+  }
+}
+
+/* 탈퇴 — 계정 카드 안의 '탈퇴' 와 **같은 일**을 한다(서버에 저장된 내 정보 삭제).
+   🔴 지우는 것은 서버 사본뿐이고 이 기기의 프로필·신청내역은 그대로 남는다.
+      말과 다르게 굴면 안 되므로 묻는 문장에도 그렇게 적는다. */
+async function withdrawAccount() {
+  if (typeof authUser !== 'function' || !authUser()) {
+    toast('로그인한 계정이 없어요 — 지울 서버 정보가 없습니다');
+    return;
+  }
+  if (!confirm('서버에 저장된 프로필·신청내역을 지울까요?\n이 기기의 정보는 그대로 남습니다.')) return;
+  const r = await authDeleteData();
+  /* 🔴 알림 구독도 함께 끊는다 (2026-09-11 코드 리뷰). 약관이 '탈퇴 시 즉시 파기'라고
+     적고 있는데 탈퇴가 발송 서버의 구독을 건드리지 않아, 지웠다는 폰으로 알림이 계속 갔다.
+     ⚠️ 실패해도 탈퇴는 성공으로 둔다 — 프로필은 이미 지워졌고, 죽은 구독은 발송 때
+        404 정리가 받친다. */
+  if (typeof pushUnsubscribe === 'function') { try { await pushUnsubscribe(); } catch (e) { /* 무시 */ } }
+  toast(r.ok ? '서버 정보 삭제 완료' : r.error);
+  renderSettings();
+}
+
+/* ---------------- 휴지통 (2026-09-11 · 개발자 지시 "둘 다") ----------------
+   지운 **신청내역**(state.trash)과 지운 **서류 파일**(IndexedDB 'trash')이 함께 모인다.
+   🔴 두 곳에 나눠 담는 이유: 파일은 수 MB 라 localStorage 에 들어가지 않는다.
+      화면에서만 한 목록으로 합친다 — 학생에게는 '지운 것'이 한 군데여야 한다.
+   🔴 보관 기간 30일은 이 앱의 다른 규칙(마감+30일 숨김)과 같은 값으로 맞췄다. */
+const TRASH_KEEP_DAYS = 30;
+
+/* 지운 지 30일이 지난 것을 실제로 지운다. 앱을 열 때 한 번 돈다.
+   '보관 기간이 지나면 사라진다'고 화면에 적어 둔 이상, 정말로 사라져야 한다. */
+async function trashPurgeOld() {
+  const cut = Date.now() - TRASH_KEEP_DAYS * 86400000;
+  const before = state.trash.length;
+  state.trash = state.trash.filter((t) => (t.deletedAt || 0) > cut);
+  if (state.trash.length !== before) saveState();
+  try {
+    const all = await trashTx('readonly', (st) => st.getAll());
+    for (const r of all || []) {
+      if ((r.deletedAt || 0) <= cut) await trashTx('readwrite', (st) => st.delete(r.key));
+    }
+  } catch (e) { /* 금고를 못 열면 다음 실행에서 다시 시도한다 */ }
+}
+
+/* '3일 전' 처럼 읽기 쉬운 말로. 오늘 지운 것은 '오늘'이라고 한다. */
+function trashWhen(ms) {
+  const d = Math.floor((Date.now() - (ms || 0)) / 86400000);
+  if (d <= 0) return '오늘 지움';
+  if (d === 1) return '어제 지움';
+  return `${d}일 전에 지움`;
+}
+
+async function renderTrash() {
+  const el = $('#trash-body');
+  if (!el) return;
+  await trashPurgeOld();
+
+  let docs = [];
+  try { docs = (await trashTx('readonly', (st) => st.getAll())) || []; } catch (e) { docs = []; }
+
+  const rows = [
+    ...state.trash.map((t, i) => {
+      const sch = findSch(t.app && t.app.id);
+      return {
+        at: t.deletedAt || 0,
+        kind: '신청내역',
+        /* 🔴 공고가 목록에서 내려갔으면 이름을 **지어내지 않는다** — 원칙 8-1.
+           그래도 되살릴 수는 있어야 하므로 줄은 남기고 그렇게 적는다. */
+        title: sch ? sch.name : '(목록에서 내려간 공고)',
+        restore: `app:${i}`,
+        drop: `app:${i}`,
+      };
+    }),
+    ...docs.map((d) => {
+      const slot = (typeof DOC_SLOTS !== 'undefined' ? DOC_SLOTS : []).find((x) => x.slot === d.slot);
+      return {
+        at: d.deletedAt || 0,
+        kind: '서류',
+        title: slot ? slot.label : (d.name || '서류'),
+        restore: `doc:${d.key}`,
+        drop: `doc:${d.key}`,
+      };
+    }),
+  ].sort((a, b) => b.at - a.at);
+
+  if (!rows.length) {
+    /* 🔴 목업에 없던 화면이라 이 문구는 이 세션이 지은 것이다 — 개발자 확인 대상. */
+    /* 🔴 설명 한 줄은 뺐다 (2026-09-11 개발자 지시). 화면 맨 위 `.set-note` 가 이미
+       '30일 뒤 사라진다'를 말하고 있어 같은 말이 두 번이었다. */
+    el.innerHTML = `<div class="my-card trash-empty">
+        <p class="trash-empty-title">휴지통이 비어 있어요</p>
+      </div>`;
+    return;
+  }
+
+  el.innerHTML = `<div class="my-card">${rows.map((r) => `
+      <div class="wallet-row">
+        <div class="wallet-info">
+          <p class="trash-title">${esc(r.title)}</p>
+          <p class="wallet-status">${esc(r.kind)} · ${esc(trashWhen(r.at))}</p>
+        </div>
+        <div class="wallet-btns">
+          <button class="wallet-btn primary" data-trash-back="${esc(r.restore)}">되살리기</button>
+          <button class="wallet-btn danger" data-trash-drop="${esc(r.drop)}">완전 삭제</button>
+        </div>
+      </div>`).join('')}</div>`;
+
+  $$('#trash-body [data-trash-back]').forEach((b) =>
+    b.addEventListener('click', () => trashRestore(b.dataset.trashBack)));
+  $$('#trash-body [data-trash-drop]').forEach((b) =>
+    b.addEventListener('click', () => trashDrop(b.dataset.trashDrop)));
+}
+
+async function trashRestore(key) {
+  const [kind, rest] = key.split(/:(.+)/);
+  if (kind === 'app') {
+    const t = state.trash[Number(rest)];
+    if (!t) return;
+    /* 지운 뒤 목록이 짧아졌을 수 있으므로 자리를 범위 안으로 눌러 넣는다.
+       (splice 는 범위를 넘으면 맨 뒤에 붙이지만, 그 동작에 기대지 않고 분명히 적는다.) */
+    const at = Math.min(Math.max(0, t.at | 0), state.applications.length);
+    state.applications.splice(at, 0, t.app);
+    state.trash.splice(Number(rest), 1);
+    saveState();
+    renderApplications();
+    renderHome();
+    toast('신청내역으로 되살렸어요');
+  } else {
+    let rec;
+    try { rec = await trashTx('readonly', (st) => st.get(rest)); } catch (e) { rec = null; }
+    if (!rec) { toast('그 파일을 찾지 못했어요'); return; }
+    /* 🔴 그 자리에 다른 파일이 있으면 **덮어쓰지 않는다** — 되살리려다 멀쩡한 서류를
+       잃는 것은 휴지통이 막으려던 바로 그 일이다. */
+    if (walletCache[rec.slot]) { toast('그 칸에 이미 다른 서류가 있어요 · 먼저 지우거나 교체해 주세요'); return; }
+    await walletTx('readwrite', (st) => st.put({
+      slot: rec.slot, name: rec.name, type: rec.type, blob: rec.blob, savedAt: rec.savedAt,
+      ...(rec.dataUrl ? { dataUrl: rec.dataUrl } : {}),
+    }));
+    await trashTx('readwrite', (st) => st.delete(rest));
+    await walletRefresh();
+    /* 프로필 사진을 되살렸으면 MY·홈·양식 문서가 바로 알아야 한다 — 안 그러면 다시 켤 때까지 첫 글자만 보인다 */
+    if (rec.slot === PHOTO_SLOT) { await photoRefresh(); if (!$('#screen-home').hidden) renderHome(); }
+    toast(rec.slot === PHOTO_SLOT ? '프로필 사진을 되살렸어요' : '서류 보관함으로 되살렸어요');
+  }
+  renderTrash();
+}
+
+async function trashDrop(key) {
+  if (!confirm('완전히 지울까요?\n이 동작은 되돌릴 수 없습니다.')) return;
+  const [kind, rest] = key.split(/:(.+)/);
+  if (kind === 'app') {
+    state.trash.splice(Number(rest), 1);
+    saveState();
+  } else {
+    try { await trashTx('readwrite', (st) => st.delete(rest)); } catch (e) { /* 없으면 그만 */ }
+  }
+  toast('완전히 지웠어요');
+  renderTrash();
 }
 
 /* 알림 설정 카드 (notify.js가 내용을 만든다) */
@@ -2098,14 +4902,17 @@ function renderWallet() {
   const el = $('#my-wallet');
   el.innerHTML = `
     <p class="wallet-title">서류 보관함</p>
-    <p class="wallet-sub">한 번 올려두면 모든 신청에 자동으로 함께 준비돼요. 파일은 휴대폰 안에만 저장돼요.</p>
     ${DOC_SLOTS.map((s) => {
       const rec = walletCache[s.slot];
       return `
         <div class="wallet-row">
           <div class="wallet-info">
-            <p class="wallet-label">${s.label}</p>
-            <p class="wallet-status">${rec ? `✓ ${esc(rec.name)} · ${rec.savedAt}` : `없음 · ${s.issue}`}</p>
+            ${/* 🔴 서류 이름은 **누를 수 있다** — 어디서 떼는지를 작은 창으로 알려 준다.
+                 발급처를 줄마다 깔아 두면 여덟 줄이 설명으로 가득 차 정작 '있다/없다'가 안 보인다. */ ''}
+            <button class="wallet-label" data-issue="${s.slot}" aria-haspopup="dialog">
+              ${esc(s.label)}<span class="wallet-q" aria-hidden="true">?</span>
+            </button>
+            ${rec ? '' : '<p class="wallet-status">없음</p>'}
           </div>
           <div class="wallet-btns">
             ${rec ? `<button class="wallet-btn" data-view="${s.slot}">보기</button>
@@ -2117,13 +4924,41 @@ function renderWallet() {
         </div>`;
     }).join('')}`;
 
+  /* 발급처 안내 창 — 시트를 열 만한 내용이 아니라서 **작은 창** 하나로 띄운다.
+     🔴 발급처 글자는 data.js 의 DOC_SLOTS.issue 그대로다 — 여기서 지어내지 않는다. */
+  {
+    const pop = $('#wallet-pop');
+    const bg = $('#wallet-pop-backdrop');
+    const close = () => { if (!pop) return; pop.classList.remove('show'); if (bg) bg.classList.remove('show'); pop.hidden = true; };
+    $$('#my-wallet [data-issue]').forEach((btn) =>
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const slot = DOC_SLOTS.find((d) => d.slot === btn.dataset.issue);
+        if (!slot || !pop) return;
+        pop.innerHTML = `
+          <p class="wp-title">${esc(slot.label)}</p>
+          <p class="wp-label">발급 방법</p>
+          <p class="wp-issue">${esc(slot.issue)}</p>
+          <button class="wp-close" type="button">닫기</button>`;
+        pop.hidden = false;
+        if (bg) bg.classList.add('show');
+        requestAnimationFrame(() => pop.classList.add('show'));
+        pop.querySelector('.wp-close').addEventListener('click', close);
+      })
+    );
+    if (pop) {
+      $('#wallet-pop-backdrop').addEventListener('click', close);
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+    }
+  }
+
   $$('#my-wallet input[type=file]').forEach((inp) =>
     inp.addEventListener('change', async () => {
       const file = inp.files[0];
       if (!file) return;
-      if (file.size > 10 * 1024 * 1024) { toast('10MB 이하 파일만 올릴 수 있어요'); return; }
+      if (file.size > 10 * 1024 * 1024) { toast('10MB 이하 파일만 가능'); return; }
       await walletPut(inp.dataset.slot, file);
-      toast('보관함에 저장했어요');
+      toast('보관함 저장 완료');
       renderWallet();
     })
   );
@@ -2144,25 +4979,58 @@ function renderWallet() {
 
 /* ---------------- 이벤트 바인딩 ---------------- */
 function bindEvents() {
-  $$('.onboard-step [data-next]').forEach((btn) =>
+  /* 취소 — 고치던 것을 버리고 있던 화면으로 돌아간다.
+     🔴 저장하지 않는다: collectProfile() 을 부르지 않으므로 입력칸에 친 값은 버려지고
+        state.profile 은 손대지 않은 그대로다. 되돌리기가 아니라 '아무 일도 없던 것'이다. */
+  $$('[data-onboard-cancel]').forEach((btn) =>
     btn.addEventListener('click', () => {
-      if (onboardStep === 1) {
-        if (!$('#in-school').value.trim()) { toast('학교명을 입력해 주세요'); return; }
-        if (!getChip('#in-year')) { toast('학년을 선택해 주세요'); return; }
-      }
-      onboardStep += 1;
-      renderOnboardStep();
+      onboardEditing = false;
+      onboardStep = 0;
+      initOnboarding();          /* 칸을 저장된 프로필 값으로 되돌린다 */
+      showScreen('my');
     })
   );
 
+  /* 뒤로 — 친 값은 그대로 두고 단계만 되돌린다 (노션 UI-2).
+     앞으로 갈 때의 확인(학교·학년)은 여기서 하지 않는다: 돌아가는 길을 막으면
+     못 채운 칸에 갇힌다. 어디까지 왔는지는 이어보기 장부에도 적는다. */
+  $('#btn-onboard-back').addEventListener('click', () => {
+    if (onboardStep <= 0) return;
+    onboardStep -= 1;
+    renderOnboardStep();
+    onboardProgressSave();
+  });
+
+  $$('.onboard-step [data-next]').forEach((btn) =>
+    btn.addEventListener('click', () => {
+      if (onboardStep === 1) {
+        if (!$('#in-school').value.trim()) { toast('학교명 입력 필요'); return; }
+        if (!getChip('#in-year')) { toast('학년 선택 필요'); return; }
+      }
+      onboardStep += 1;
+      renderOnboardStep();
+      onboardProgressSave();   /* 어느 단계까지 왔는지도 진행분이다 */
+    })
+  );
+
+  /* 온보딩에서 친 것·고른 것을 적어 둔다 — 위임 하나로(칸이 많고 단계마다 다시 그린다) */
+  ['input', 'change', 'click'].forEach((ev) => {
+    $('#screen-onboarding').addEventListener(ev, () => onboardProgressSave());
+  });
+
   $('#btn-finish-onboard').addEventListener('click', () => {
+    onboardEditing = false;
     const isFirstTime = !state.profile;
     state.profile = collectProfile();
     /* 민감정보 동의는 프로필이 아니라 따로 둔다 — 프로필은 서버로 나가는 값이고
        동의 여부는 '나가도 되는가'를 정하는 값이라 섞으면 헷갈린다. */
     state.consent = { sensitive: !!$('#in-sensitive-ok').checked };
     saveState();
-    toast('프로필이 저장됐어요. 맞춤 장학금을 찾았어요!');
+    /* 온보딩을 마쳤으니 '쓰다 만 온보딩' 표시를 지운다 — 안 지우면 다음에 켤 때
+       이미 만든 프로필을 두고 또 온보딩 진행분을 들고 있게 된다 */
+    clearTimeout(onboardSaveTimer);
+    if (typeof resumeSave === 'function') resumeSave({ onboard: null });
+    toast('프로필을 저장했습니다');
     showScreen('home');
     // 프로필을 처음 만든 직후에 알림 동의를 딱 한 번 묻는다 (이후에는 MY 화면에서만)
     // 저장 완료 토스트가 사라진 뒤에 물어본다 (문구가 겹치지 않게)
@@ -2170,6 +5038,29 @@ function bindEvents() {
   });
 
   $('#in-flags').addEventListener('change', syncConsentRow);
+  /* 시·도를 바꾸면 그 아래 시·군·구 목록을 다시 채운다 (2026-08-30) */
+  $('#in-region').addEventListener('change', () => fillRegionCities('#in-region', '#in-region-city'));
+  $('#in-parent-region').addEventListener('change', () => fillRegionCities('#in-parent-region', '#in-parent-region-city'));
+
+  /* 히어로 금액을 누르면 '금액 상세' — 그 숫자가 어떻게 나왔는지 줄 단위로 보여 준다 */
+  const heroAmt = $('#hero-amount');
+  if (heroAmt) {
+    heroAmt.addEventListener('click', renderAmountDetail);
+    heroAmt.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); renderAmountDetail(); }
+    });
+  }
+
+  /* '받고 있는 장학금 없음'과 나머지는 같이 켤 수 없다 — 둘 다 켜지면 뜻이 모순된다 */
+  const scholBox = $('#in-scholarships'), scholNone = $('#in-schol-none');
+  if (scholBox && scholNone) {
+    scholBox.addEventListener('change', () => {
+      if ($$('#in-scholarships input:checked').length) scholNone.checked = false;
+    });
+    scholNone.addEventListener('change', () => {
+      if (scholNone.checked) $$('#in-scholarships input').forEach((c) => (c.checked = false));
+    });
+  }
 
   $('#btn-notify').addEventListener('click', () => {
     if (typeof openNotifyInbox === 'function') openNotifyInbox();
@@ -2217,6 +5108,22 @@ function bindEvents() {
     btn.addEventListener('click', () => showScreen(btn.dataset.goto))
   );
 
+  /* 검색 (2026-08-30) — 치는 대로 거른다.
+     ⚠️ 디바운스를 두지 않았다. 등록이 190건대라 한 번 거르는 데 밀리초 단위고,
+        기다렸다 그리면 '반응이 굼뜨다'는 느낌만 준다. 몇 천 건이 되면 그때 넣는다. */
+  {
+    const box = $('#explore-search');
+    const clear = $('#explore-search-clear');
+    const sync = () => {
+      exploreQuery = box.value;
+      clear.hidden = !box.value;
+      renderExplore();
+    };
+    box.addEventListener('input', sync);
+    /* type="search" 의 브라우저 기본 ✕ 는 iOS 에서 안 보인다 — 우리 버튼을 쓴다 */
+    clear.addEventListener('click', () => { box.value = ''; sync(); box.focus(); });
+  }
+
   $('#explore-filters').addEventListener('click', (e) => {
     const chip = e.target.closest('.filter-chip');
     if (!chip) return;
@@ -2225,36 +5132,19 @@ function bindEvents() {
     renderExplore();
   });
 
-  /* 정렬 버튼 — 짧게 누르면 다음 기준, 길게 누르면 목록 (2026-08-26 개발자 지시).
-     🔴 길게 눌러 목록을 연 뒤에 오는 click은 **삼켜야 한다** — 안 그러면 목록이 뜨는
-        동시에 기준까지 한 칸 넘어간다(신청 내역 스와이프와 같은 계열의 함정).
-     🔴 touch와 mouse를 **둘 다** 받되 겹쳐서 두 번 세지 않는다 — 터치 기기는
-        touchend 뒤에 click도 보내므로 길게 누른 사실을 플래그로 남겨 거른다. */
+  /* 정렬 버튼 — **누르면 목록이 열린다** (2026-08-31 개발자 지시).
+     🔴 예전에는 짧게 누르면 기준이 한 칸씩 넘어가고 길게 눌러야 목록이 떴다.
+        그 방식은 지금 무슨 기준인지 눌러 보기 전에는 알 수 없고, 길게 누르기는
+        아무도 발견하지 못하는 동작이다. 한 번 눌러 목록에서 고르는 쪽이 짧다.
+     ⚠️ 키보드도 같은 길이다 — Enter/Space 는 click 으로 와서 목록을 연다. */
   {
     const btn = $('#explore-sort-btn');
     const menu = $('#explore-sort-menu');
-    let timer = null, longFired = false;
-
-    const startPress = () => {
-      longFired = false;
-      clearTimeout(timer);
-      timer = setTimeout(() => { longFired = true; openSortMenu(); }, 450);
-    };
-    const endPress = () => clearTimeout(timer);
-
-    btn.addEventListener('touchstart', startPress, { passive: true });
-    btn.addEventListener('touchend', endPress, { passive: true });
-    btn.addEventListener('touchcancel', endPress, { passive: true });
-    btn.addEventListener('mousedown', startPress);
-    btn.addEventListener('mouseup', endPress);
-    btn.addEventListener('mouseleave', endPress);
 
     btn.addEventListener('click', () => {
-      if (longFired) { longFired = false; return; }   // 길게 눌러 목록을 연 것이다
-      if (!menu.hidden) { closeSortMenu(); return; }   // 열려 있으면 닫기만
-      cycleSort();
+      if (!menu.hidden) { closeSortMenu(); return; }
+      openSortMenu();
     });
-    /* 키보드 — Enter/Space는 click으로 오므로 순환된다. 목록은 ↓로 연다. */
     btn.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowDown') { e.preventDefault(); openSortMenu(); }
     });
@@ -2269,25 +5159,153 @@ function bindEvents() {
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSortMenu(); });
   }
 
+  /* 펼친 패널 안의 기록 버튼 — 상세 시트를 열지 않고 그 자리에서 남긴다 */
+  document.addEventListener('click', (e) => {
+    const sb = e.target.closest('[data-mark-submit]');
+    const wb = e.target.closest('[data-mark-won]');
+    const lb = e.target.closest('[data-mark-lost]');
+    const ub = e.target.closest('[data-undo-result]');
+    if (ub) {
+      /* 잘못 누른 결과 되돌리기 — 기록만 지운다. 상세 시트의 '결과 기록 취소'와 같은 함수다 */
+      e.stopPropagation();
+      const s = findSch(ub.dataset.undoResult);
+      if (s) undoProgress(s);
+      return;
+    }
+    if (!sb && !wb && !lb) return;
+    e.stopPropagation();
+    const id = (sb || wb || lb).dataset.markSubmit || (wb || lb).dataset.markWon || lb.dataset.markLost;
+    const sch = findSch(id);
+    if (!sch) return;
+    if (sb) recordSubmitted(sch); else recordResult(sch, !!wb);
+  });
+
+  /* 공고 저장(북마크) — 2026-09-07.
+     🔴 단추가 카드 **바깥**에 있어(saveBtnHtml 주석) 상세 열기와 겹치지 않는다.
+        그래도 stopPropagation 을 둔다: 나중에 누가 카드 안으로 옮겨도 조용히
+        상세가 함께 열리는 일이 없게. */
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-save]');
+    if (!b) return;
+    e.preventDefault();
+    e.stopPropagation();
+    toggleSave(b.dataset.save);
+  });
+
+  /* 달력 — 달 이동과 날짜 펼치기 */
+  document.addEventListener('click', (e) => {
+    const mv = e.target.closest('[data-cal-move]');
+    if (mv) {
+      const ms = calMonthStart();
+      calCursor = new Date(ms.getFullYear(), ms.getMonth() + Number(mv.dataset.calMove), 1);
+      calPicked = null;                      // 달을 옮기면 펼쳐 둔 날은 그 달에 없다
+      renderCalendar();
+      return;
+    }
+    const day = e.target.closest('[data-cal-day]');
+    if (!day) return;
+    const iso = day.dataset.calDay;
+    calPicked = (!iso || iso === calPicked) ? null : iso;
+    /* 🔴 격자를 통째로 다시 그리지 않는다 — 날짜를 누를 때마다 달력이 깜빡이고
+       스크롤이 튄다(일괄 준비 목록에서 겪은 것과 같은 유형). 바뀐 것만 고친다. */
+    $$('.cal-cell[data-cal-day]').forEach((c) => {
+      const on = !!calPicked && c.dataset.calDay === calPicked;
+      c.classList.toggle('cal-picked', on);
+      c.setAttribute('aria-pressed', String(on));
+    });
+    const panel = $('#cal-day');
+    if (panel) panel.innerHTML = calPicked ? calDayHtml(calPicked) : '';
+  });
+
+  /* 빈 상태의 '다음 동작' 단추 (2026-09-10 페이스리프트).
+     빈 화면이 "홈 화면에서 준비할 수 있습니다"처럼 **다른 데로 보내기만** 하고
+     정작 갈 단추는 없었다. 여기서 그 한 걸음을 받는다. */
+  document.addEventListener('click', (e) => {
+    const go = e.target.closest('[data-go]');
+    if (!go) return;
+    showScreen(go.dataset.go);
+  });
+
   document.addEventListener('click', (e) => {
     /* 🔴 카드를 민 직후에 오는 click은 '열기'가 아니다 — 밀었는데 상세가 열리면
        삭제 버튼을 보려던 학생이 매번 시트를 닫아야 한다. 선택 모드에서도 열지 않는다. */
-    if (Date.now() - lastSwipeAt < 350) return;
-    if (e.target.closest('[data-del]') || e.target.closest('[data-pick]')) return;
-    const card = e.target.closest('[data-detail]');
+    if (e.target.closest('[data-pick]')) return;
+    /* 이름 있는 손잡이('세부사항 입력하기')도 카드와 같은 길로 여닫는다 */
+    const handle = e.target.closest('[data-log-toggle]');
+    const card = handle || e.target.closest('[data-detail]');
     if (!card) return;
+    /* 신청 내역에서는 시트가 아니라 **그 자리에서 펼친다** (2026-09-01 개발자 지시).
+       담아 둔 공고에서 궁금한 것은 공고 내용이 아니라 '내가 어디까지 왔나'다.
+       공고 원문은 펼친 패널 안의 '공고 상세 보기'로 간다. */
+    const row = card.closest('.swipe-row');
+    if (row && !appsSelectMode && handle) {
+      const log = row.querySelector('.app-log');
+      if (log) {
+        log.hidden = !log.hidden;
+        if (log.hidden) appsLogOpen.delete(row.dataset.row); else appsLogOpen.add(row.dataset.row);
+        row.classList.toggle('log-open', !log.hidden);
+        row.querySelectorAll('[aria-expanded]').forEach((el) => el.setAttribute('aria-expanded', String(!log.hidden)));
+        /* 🔴 펼치기만 하면 화면 밖에서 열린다 — 카드(250px) 아래로 300px 가 더 붙는데
+           카드가 화면 중간 아래에 있으면 펼쳐진 부분이 통째로 안 보인다.
+           카드를 위로 올려 패널 전체가 화면에 들어오게 한다. */
+        if (!log.hidden) row.scrollIntoView({ block: 'start', behavior: 'smooth' });
+        return;
+      }
+    }
     if (appsSelectMode && card.closest('#apps-list')) {
       const id = card.dataset.detail;                 // 선택 모드에서는 카드를 눌러도 선택이 된다
       if (appsSelected.has(id)) appsSelected.delete(id); else appsSelected.add(id);
       renderApplications();
       return;
     }
+    /* 신청 내역의 이름 박스도 홈·장학금 탭과 **같이** 상세 시트를 연다
+       (2026-09-02 개발자 지시). 그 자리에서 펼치는 진행 기록은 아래
+       '세부사항 입력하기' 손잡이 몫이라 서로 겹치지 않는다.
+       ⚠️ 한때 이 카드를 눌러도 아무 일이 없게 뒀던 것은 **밀어서 삭제** 때문이었다 —
+          목록을 내리다 손이 스치면 삭제가 뜨던 시절의 방어다. 그 손짓은 제거됐으므로
+          (v129) 눌림을 막을 이유가 없어졌다. */
     openDetail(card.dataset.detail);
   });
 
-  $('#sheet-backdrop').addEventListener('click', closeSheet);
+  /* 금액 상세의 줄 → 장학금 찾기의 그 카드로 이동 (2026-08-27 개발자 요청).
+     🔴 필터가 '교내'·'교외'·'신청 가능만'으로 걸려 있으면 그 카드가 목록에 없어
+        스크롤할 곳이 사라진다. 그래서 **필터만 전체로 되돌린다** —
+        정렬은 건드리지 않는다(학생이 고른 기준을 말없이 바꾸면 그것도 임의 변경이다). */
+  /* 🔴 `details` 안쪽 클릭을 통째로 막으면 안 된다 (2026-08-27에 그렇게 했다가 걸렸다).
+     뺀 공고(`함께 못 받는 공고 2건`)와 미확인 공고(`공고 N건 보기`)는 **그 접기 안에 들어 있어서**,
+     통째로 막으면 그 줄들은 눌러도 안 간다. 막아야 하는 것은 셋뿐이다:
+       ① summary — 여닫는 손잡이  ② a — 원문 공고 링크
+       ③ **그 줄 자신의** 접기 안쪽 (원문 발췌·합친 학교 목록)
+     ③이 핵심이다. 바깥 접기 안에 든 줄은 `row.contains(det)` 가 false 라 그대로 이동한다. */
+  const notNav = (t, row) => {
+    if (t.closest('summary') || t.closest('a')) return true;
+    const det = t.closest('details');
+    return !!(det && row.contains(det));
+  };
+  document.addEventListener('click', (e) => {
+    const row = e.target.closest('[data-goto]');
+    if (!row || notNav(e.target, row)) return;
+    /* 시트 **안**에서 눌렀을 때만 돌아갈 곳을 기억한다 — index.html 의
+       `data-goto="explore"` 같은 화면 이동 버튼까지 걸리면 엉뚱한 곳으로 되돌아간다 */
+    /* 🔴 **진짜 공고일 때만** 기억한다 — openDetail 은 못 찾으면 조용히 돌아오는데,
+       그때 되돌아갈 곳만 남으면 학생이 한 번 더 내려야 닫힌다. */
+    if (row.closest('#detail-sheet') && findSch(row.dataset.goto)) rememberAmountBack();
+    openDetail(row.dataset.goto);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const row = e.target.closest && e.target.closest('[data-goto]');
+    if (!row || notNav(e.target, row)) return;
+    e.preventDefault();
+    /* 🔴 **진짜 공고일 때만** 기억한다 — openDetail 은 못 찾으면 조용히 돌아오는데,
+       그때 되돌아갈 곳만 남으면 학생이 한 번 더 내려야 닫힌다. */
+    if (row.closest('#detail-sheet') && findSch(row.dataset.goto)) rememberAmountBack();
+    openDetail(row.dataset.goto);
+  });
+
+  $('#sheet-backdrop').addEventListener('click', dismissSheet);
   $('#detail-sheet').addEventListener('click', (e) => {
-    if (e.target.classList.contains('sheet-handle')) closeSheet();
+    if (e.target.classList.contains('sheet-handle')) dismissSheet();
     if (e.target.id === 'btn-bulk-go' && bulkPrep) bulkStart();
   });
   /* 일괄 준비 목록의 체크 — 시트는 innerHTML 이 계속 갈리므로 줄마다 리스너를 걸지 않고
@@ -2306,19 +5324,43 @@ function bindEvents() {
     if (e.target.checked) bulkPrep.ids.add(id); else bulkPrep.ids.delete(id);
     bulkRefresh();
   });
-  enableSheetSwipe($('#detail-sheet'), closeSheet);
+  /* 쓰던 신청서를 치는 동안 적어 둔다 (2026-09-09 · 이어보기 3겹).
+     🔴 시트 **하나에 위임**한다 — 시트는 innerHTML 이 계속 갈리므로 그릴 때마다 걸면
+        리스너가 쌓인다(바로 위 일괄 준비 체크가 같은 이유로 위임이다). */
+  ['input', 'change'].forEach((ev) => {
+    $('#detail-sheet').addEventListener(ev, () => { if (formFill) formProgressSave(); });
+  });
+  enableSheetSwipe($('#detail-sheet'), dismissSheet);   // 쓸어 내리기 — 개발자가 말한 그 동작
   wireAppsManage();   // 신청 내역 — 왼쪽으로 밀어 삭제 · 선택 모드 (2026-08-24)
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     if (!$('#notify-sheet').hidden) closeNotifyPanel();
-    else if (!$('#detail-sheet').hidden) closeSheet();
+    else if (!$('#detail-sheet').hidden) dismissSheet();
   });
 
   $('#btn-apply-all').addEventListener('click', applyAll);
 
-  const editProfile = () => { initOnboarding(); showScreen('onboarding'); };
-  $('#btn-edit-profile').addEventListener('click', editProfile);
-  $('#btn-my-edit').addEventListener('click', editProfile);
+  /* '마감 임박' 더보기 (노션 UI-14) — 다시 그리지 않고 **가려 둔 카드를 편다**.
+     renderHome() 을 부르면 히어로 금액이 또 세어 올라가고(countUp 900ms) 스크롤이 튄다. */
+  {
+    const btn = $('#home-deadline-more');
+    if (btn) btn.addEventListener('click', () => {
+      homeDeadlineOpen = !homeDeadlineOpen;
+      $('#home-deadline-list').classList.toggle('more-open', homeDeadlineOpen);
+      btn.textContent = homeDeadlineOpen ? '접기' : '더보기';
+      btn.setAttribute('aria-expanded', homeDeadlineOpen ? 'true' : 'false');
+    });
+  }
+
+  const editProfile = () => {
+    onboardEditing = !!state.profile;   /* 이미 프로필이 있으면 '고치는 중'이다 */
+    initOnboarding();
+    showScreen('onboarding');
+  };
+  /* 🔴 홈 톱니는 없앴다 (2026-09-11 개발자 지시) — 입구는 MY 프로필 카드 하나다.
+     배선은 남겨 두되 **있을 때만** 건다(없는 요소에 걸면 그 자리에서 죽는다). */
+  { const e = $('#btn-edit-profile'); if (e) e.addEventListener('click', editProfile); }
+  { const e = $('#btn-my-edit'); if (e) e.addEventListener('click', editProfile); }
 
   /* 눌러서 넘어가는 영역 — 마우스·손가락뿐 아니라 키보드로도 되어야 한다
      (div라 버튼과 달리 Enter·스페이스가 저절로 먹지 않는다) */
@@ -2333,24 +5375,76 @@ function bindEvents() {
     });
   };
   onTap('#btn-home-profile', () => showScreen('my'));   // 홈 왼쪽 위 프로필 → MY
-  /* 🔴 캡처 단계로 먼저 잡는다 — 카드 전체가 '프로필 수정' 버튼이라
-     그냥 두면 '지우기'를 눌러도 수정 화면이 열려 버린다 */
+  /* 🔴 **카드 전체를 버튼으로 두지 않는다** (2026-09-12 개발자 지시 — "학적정보수정 부분만
+     눌렀을 때 수정가능하게"). 전에는 `onTap('#my-profile', …)` 로 카드 아무 데나 누르면
+     수정 화면이 열려, 학생이 성적·구간 표를 짚기만 해도 화면이 바뀌었다.
+     ⚠️ 그때 필요했던 **캡처 단계 가로채기 둘도 함께 걷었다** — 사진 단추·'지우기'가 카드로
+        번지는 것을 막던 장치라, 카드가 버튼이 아니게 된 지금은 할 일이 없다. 남은 것은
+        '지우기'가 실제로 하는 일 하나뿐이고, 위임이라 카드를 다시 그려도 산다. */
   $('#my-profile').addEventListener('click', (e) => {
+    if (e.target.closest('.my-edit-hint')) { editProfile(); return; }
     const del = e.target.closest('[data-forget]');
     if (!del) return;
-    e.stopPropagation();
     e.preventDefault();
     forgetLearned(del.dataset.forget);
-  }, true);
-  onTap('#my-profile', editProfile);                     // MY 맨 위 카드 → 프로필 수정
+  });
+
+  /* 🔴 브라우저 confirm 을 쓰지 않는다 — 그 창은 앱이 아니라 브라우저가 만드는 것이라
+     무엇이 지워지는지 목록으로 보여 줄 수 없고, 확인·취소 두 버튼밖에 못 넣는다.
+     되돌릴 수 없는 동작이므로 **무엇이 사라지는지 적어 두고** 묻는다. */
+  /* 설정 화면 — MY 오른쪽 위 톱니로 들어가고, 왼쪽 위 화살표로 되돌아온다 (2026-09-11). */
+  $('#btn-open-settings').addEventListener('click', () => showScreen('settings'));
+  $('#btn-settings-back').addEventListener('click', () => showScreen('my', { back: true }));
+  $('#btn-trash-back').addEventListener('click', () => showScreen('settings', { back: true }));
+  $('#btn-terms-back').addEventListener('click', () => showScreen('settings', { back: true }));
+  for (const id of ['#btn-logins-back', '#btn-faq-back', '#btn-support-back', '#btn-perms-back']) {
+    const b = $(id);
+    if (b) b.addEventListener('click', () => showScreen('settings', { back: true }));
+  }
+
+  /* 🔴 안쪽 화면 셋 다 같은 손짓으로 나간다 (2026-09-11 개발자 요청은 휴지통·약관이었는데,
+     설정만 안 되면 거기서 쓸어 보고 '안 된다'가 된다 — 안쪽 화면이라는 점이 같다).
+     어디로 나가는지는 위 `SWIPE_BACK_TO` 한 곳에 적혀 있다. */
+  enableScreenSwipeBack($('#app'));
 
   $('#btn-reset').addEventListener('click', () => {
-    if (!confirm('프로필과 신청 내역을 모두 삭제할까요?')) return;
-    [STORAGE_KEY, ...LEGACY_KEYS].forEach((k) => localStorage.removeItem(k));
-    state = { profile: null, applications: [] };
-    if (typeof notifyReset === 'function') notifyReset(); // 알림 설정·알림함도 함께 초기화
-    initOnboarding();
-    showScreen('onboarding');
+    const pop = $('#wallet-pop');
+    const bg = $('#wallet-pop-backdrop');
+    if (!pop) return;
+    const close = () => { pop.classList.remove('show'); if (bg) bg.classList.remove('show'); pop.hidden = true; };
+    pop.innerHTML = `
+      <p class="wp-title wp-danger">데이터 초기화</p>
+      <p class="wp-issue">아래가 이 기기에서 모두 사라집니다. 되돌릴 수 없습니다.</p>
+      <ul class="wp-list">
+        <li>프로필 (학교·성적·자격)</li>
+        <li>신청 내역과 진행 기록</li>
+        <li>알림 설정과 알림함</li>
+      </ul>
+      <p class="wp-note">서류 보관함의 파일은 그대로 남습니다.</p>
+      <div class="wp-actions">
+        <button class="wp-cancel" type="button">취소</button>
+        <button class="wp-go" type="button">초기화</button>
+      </div>`;
+    pop.hidden = false;
+    if (bg) bg.classList.add('show');
+    requestAnimationFrame(() => pop.classList.add('show'));
+    pop.querySelector('.wp-cancel').addEventListener('click', close);
+    pop.querySelector('.wp-go').addEventListener('click', () => {
+      close();
+      [STORAGE_KEY, ...LEGACY_KEYS].forEach((k) => localStorage.removeItem(k));
+      /* 🔴 **이어보기 장부도 함께 지운다** (2026-09-09 코드 리뷰 — 안 지우면 초기화가 거짓말이 된다).
+         그 장부에는 쓰다 만 온보딩(이름·학번·전화·계좌번호)과 신청서에 쓴 글이 들어 있어서,
+         지우지 않으면 다음에 앱을 켤 때 **지웠다고 말한 값이 그대로 되살아난다.** */
+      if (typeof resumeClear === 'function') resumeClear();
+      formFill = null;
+      /* 🔴 손으로 다시 적지 말 것 — 늘어난 칸이 빠진다(위 emptyState 주석).
+         ⚠️ 이 설명을 줄 끝 `//` 주석으로 두지 말 것 — verify/ui-tone.mjs 의 주석 제거기는
+            줄 **첫머리** `//` 만 걷어내서, 줄 끝에 둔 🔴 가 '화면에 이모지가 있다'로 잡힌다. */
+      state = emptyState();
+      if (typeof notifyReset === 'function') notifyReset(); // 알림 설정·알림함도 함께 초기화
+      initOnboarding();
+      showScreen('onboarding');
+    });
   });
 
   // 자동추천
@@ -2388,11 +5482,30 @@ document.addEventListener('visibilitychange', () => {
   if (document.visibilityState !== 'visible') return;
   if (Date.now() - lastFgRefresh < 5 * 60 * 1000) return;
   lastFgRefresh = Date.now();
-  loadNotices();
-  loadRegistered();
-  if (typeof loadFormTemplates === 'function') loadFormTemplates();
-  if (swReg) swReg.update().catch(() => {});
+  refreshAllData();
 });
+
+/* 당겨서 새로고침 (2026-09-09) — 짝은 interactions.js.
+   🔴 **시트가 떠 있으면 시작하지 않는다.** 알림 동의 시트는 온보딩 2.9초 뒤에 떠서 화면을
+      덮는데, 그 위에서 당기면 시트 뒤 목록이 움직여 보인다. 이 시트는 브라우저 검사를
+      세 번 넘어뜨린 자리이기도 하다(2026-09-07 · onboard-helper 의 dismissNotify).
+   🔴 **온보딩 중에는 끈다** — 아직 받아올 것이 정해지지 않았고(학교 미선택), 단계 사이에서
+      화면이 밀리면 입력하던 칸이 손가락을 따라 움직인다. */
+if (typeof installPullToRefresh === 'function') {
+  installPullToRefresh({
+    onRefresh: () => {
+      lastFgRefresh = Date.now();   // 방금 받았으니 화면 복귀 갱신은 5분 쉰다
+      return refreshAllData();
+    },
+    isBlocked: () => {
+      if (!state.profile) return true;                        // 온보딩 중
+      if (!$('#screen-onboarding').hidden) return true;
+      return !!document.querySelector(
+        '#notify-sheet:not([hidden]), #detail-sheet:not([hidden]), '
+        + '.sheet-backdrop:not([hidden]), .wallet-pop:not([hidden]), #chat-sheet:not([hidden])');
+    },
+  });
+}
 
 /* ══════════════════════════════════════════════════════════════════════════
    회원가입·로그인 — 기기를 바꿔도 이어쓰기 (2026-08-25)
@@ -2435,7 +5548,32 @@ function syncApplyRemote(remote) {
     migrateFitFields(p);
     state.profile = p;
   }
-  if (Array.isArray(remote.applications)) state.applications = remote.applications;
+  /* 🔴 **학생이 쓴 글은 서버에 없다** — syncSafeApplications 가 `formAns`·`docs` 를 떼고 보낸다
+     (주민등록번호·계좌·자기소개서가 들어 있어서다). 그래서 받은 것으로 통째로 갈아치우면
+     **이 기기에 있던 신청서 답이 지워진다.** 프로필의 rrn·account 를 되살리는 것과 같은 이유로
+     여기서도 기기 것을 되살린다. ⚠️ 서버가 가진 칸(단계·제출기록)은 서버 것이 이긴다. */
+  if (Array.isArray(remote.applications)) {
+    const mineByIdx = new Map((state.applications || []).map((a) => [a.id, a]));
+    state.applications = remote.applications.map((a) => {
+      const local = mineByIdx.get(a.id);
+      if (!local) return a;
+      const merged = Object.assign({}, a);
+      for (const k of ['formAns', 'docs']) if (merged[k] == null && local[k] != null) merged[k] = local[k];
+      return merged;
+    });
+    /* 🔴 **서버가 아직 모르는 신청서도 살린다** (2026-09-11 코드 리뷰에서 잡았다).
+       위 `map` 은 서버 목록을 기준으로 삼으므로, 아직 못 올린 신청서는 **통째로 사라진다.**
+       올리기는 2초 미룬 뒤 조용히 실패할 수 있어서(`syncSchedulePush`) 드문 일이 아니다 —
+       폰 A 에서 신청서를 쓰다 지하철에 들어가고, 폰 B 에서 프로필만 고쳐 `updated_at` 이
+       올라가면, 폰 A 가 다음에 열릴 때 그 글이 지워진다. 위에서 애써 되살린 바로 그 값이다.
+       ⚠️ **학생이 쓴 것이 든 건만** 되살린다 — 빈 건까지 되살리면 다른 기기에서 지운 신청이
+          되살아난다. 글은 다시 쓸 수 없고 빈 건은 다시 지우면 되므로, 잃는 쪽을 막는다. */
+    const remoteIds = new Set(remote.applications.map((a) => a.id));
+    for (const a of mineByIdx.values()) {
+      if (remoteIds.has(a.id)) continue;
+      if (a.formAns || a.docs) state.applications.push(a);
+    }
+  }
   state.consent = Object.assign({}, state.consent, { sensitive: !!remote.sensitiveOk });
   state.updatedAt = remote.updatedAt || state.updatedAt;
   saveState({ fromServer: true });
@@ -2483,7 +5621,7 @@ function renderAccountCard() {
     ? `<p class="acc-head">계정 <span class="acc-on">이어쓰기 켜짐</span></p>
        <p class="acc-mail">${esc(u.email || '로그인됨')}</p>
        <p class="acc-note">이 계정으로 다른 기기에서 로그인하면 프로필과 신청내역이 그대로 이어져요.
-         주민등록번호·계좌번호·증명서류는 서버로 보내지 않아요.</p>
+         주민등록번호·계좌번호·증명서류는 서버로 보내지 않습니다.</p>
        <div class="acc-actions">
          <button class="btn btn-outline" id="btn-acc-out">로그아웃</button>
          <button class="btn btn-outline danger" id="btn-acc-del">탈퇴 (서버 정보 삭제)</button>
@@ -2499,14 +5637,14 @@ function renderAccountCard() {
   const btnOut = $('#btn-acc-out');
   if (btnOut) btnOut.addEventListener('click', async () => {
     await authSignOut();
-    toast('로그아웃했어요 — 이 기기의 정보는 그대로 남아 있어요');
+    toast('로그아웃 · 이 기기의 정보는 그대로 유지');
     renderMy();
   });
   const btnDel = $('#btn-acc-del');
   if (btnDel) btnDel.addEventListener('click', async () => {
     if (!confirm('서버에 저장된 프로필·신청내역을 지울까요?\n이 기기의 정보는 그대로 남습니다.')) return;
     const r = await authDeleteData();
-    toast(r.ok ? '서버 정보를 지웠어요' : r.error);
+    toast(r.ok ? '서버 정보 삭제 완료' : r.error);
     renderMy();
   });
 }
@@ -2542,7 +5680,7 @@ function authProvidersHtml() {
       return `<button type="button" class="auth-social-btn auth-${esc(p)}" data-oauth="${esc(p)}"
         aria-label="${esc(m.label)}로 계속하기" title="${esc(m.label)}로 계속하기">${m.svg}</button>`;
     }).join('')}</div>
-    <p class="auth-social-note">한 번 연결하면 다음부터는 비밀번호 없이 바로 로그인돼요</p>`;
+    <p class="auth-social-note">한 번 연결하면 다음부터 비밀번호 없이 로그인</p>`;
 }
 
 function renderAuthSheet(errText, okText) {
@@ -2568,7 +5706,7 @@ function renderAuthSheet(errText, okText) {
     mid = emailField + pwField('비밀번호', 'current-password') + `
       <div class="auth-row">
         <label class="auth-remember"><input type="checkbox" id="in-auth-remember" ${remembered ? 'checked' : ''} /> 아이디 저장</label>
-        <button type="button" class="btn-link" id="btn-auth-forgot">비밀번호를 잊으셨나요?</button>
+        <button type="button" class="btn-link" id="btn-auth-forgot">비밀번호 찾기</button>
       </div>`;
   } else if (mode === 'up') {
     mid = emailField + pwField('비밀번호 (6자 이상)', 'new-password') + `
@@ -2577,7 +5715,7 @@ function renderAuthSheet(errText, okText) {
         <span>(필수) <a href="terms.html" target="_blank" rel="noopener">이용약관 · 개인정보처리방침</a>에 동의합니다</span>
       </label>`;
   } else if (mode === 'reset') {
-    mid = `<p class="auth-lead">가입할 때 쓴 이메일로 비밀번호를 다시 정하는 링크를 보내 드려요.</p>`
+    mid = `<p class="auth-lead">가입할 때 쓴 이메일로 비밀번호 재설정 링크를 보냅니다.</p>`
       + emailField;
   } else {
     mid = `<p class="auth-lead">새로 쓸 비밀번호를 정해 주세요.</p>`
@@ -2586,9 +5724,9 @@ function renderAuthSheet(errText, okText) {
 
   const goLabel = { in: '로그인', up: '가입하기', reset: '재설정 메일 보내기', newpw: '비밀번호 바꾸기' }[mode];
   const swap = mode === 'in'
-    ? '<button class="btn btn-outline" id="btn-auth-swap" style="width:100%">계정이 없어요 — 회원가입</button>'
+    ? '<button class="btn btn-outline" id="btn-auth-swap" style="width:100%">계정 없음 — 회원가입</button>'
     : mode === 'up'
-      ? '<button class="btn btn-outline" id="btn-auth-swap" style="width:100%">이미 계정이 있어요 — 로그인</button>'
+      ? '<button class="btn btn-outline" id="btn-auth-swap" style="width:100%">계정 있음 — 로그인</button>'
       : '<button class="btn btn-outline" id="btn-auth-swap" style="width:100%">← 로그인으로 돌아가기</button>';
 
   $('#detail-sheet').innerHTML = `
@@ -2601,7 +5739,7 @@ function renderAuthSheet(errText, okText) {
       <button class="btn btn-primary btn-lg" id="btn-auth-go">${goLabel}</button>
       ${swap}
       ${mode === 'in' || mode === 'up' ? authProvidersHtml() : ''}
-      <p class="dp-note">주민등록번호·계좌번호·증명서류는 서버로 보내지 않고 이 기기에만 남아요.</p>
+      <p class="dp-note">주민등록번호·계좌번호·증명서류는 이 기기에만 저장됩니다.</p>
     </div>`;
 
   $('#btn-auth-go').addEventListener('click', authSubmit);
@@ -2637,12 +5775,12 @@ async function authSubmit() {
   const pw = pwEl ? pwEl.value : '';
 
   if ((mode === 'in' || mode === 'up') && (!email || !pw)) {
-    authShowError('이메일과 비밀번호를 모두 입력해 주세요'); return;
+    authShowError('이메일과 비밀번호 입력 필요'); return;
   }
-  if (mode === 'reset' && !email) { authShowError('이메일을 입력해 주세요'); return; }
-  if (mode === 'newpw' && !pw) { authShowError('새 비밀번호를 입력해 주세요'); return; }
+  if (mode === 'reset' && !email) { authShowError('이메일 입력 필요'); return; }
+  if (mode === 'newpw' && !pw) { authShowError('새 비밀번호 입력 필요'); return; }
   if (mode === 'up' && !$('#in-auth-agree').checked) {
-    authShowError('약관과 개인정보처리방침에 동의해 주세요'); return;
+    authShowError('약관·개인정보처리방침 동의 필요'); return;
   }
 
   const btn = $('#btn-auth-go');
@@ -2663,18 +5801,18 @@ async function authSubmit() {
      팀원이 아닌 주소로는 거부하는데, 그 거부가 앱에는 성공으로 보인다. 그래서
      "보냈습니다"라고 단정하지 않고 안 왔을 때 무엇을 하면 되는지까지 적는다. */
   if (mode === 'reset') {
-    renderAuthSheet(null, '재설정 링크를 보내 달라고 요청했어요. 메일함(스팸함도)을 확인해 주세요.\n'
+    renderAuthSheet(null, '재설정 링크 요청 완료. 메일함(스팸함도)을 확인해 주세요.\n'
       + '몇 분 안에 안 오면 아직 메일 발송이 준비되지 않은 것이니 관리자에게 알려 주세요.');
     return;
   }
   if (mode === 'newpw') {
     closeSheet();
-    toast('비밀번호를 바꿨어요');
+    toast('비밀번호 변경 완료');
     renderMy();
     return;
   }
   if (r.needsEmailConfirm) {
-    renderAuthSheet(null, '가입 확인 메일을 보냈어요 — 메일의 링크를 누른 뒤 로그인해 주세요.');
+    renderAuthSheet(null, '가입 확인 메일 발송 — 메일의 링크를 누른 뒤 로그인해 주세요.');
     return;
   }
 
@@ -2684,7 +5822,7 @@ async function authSubmit() {
   else setRememberedEmail(email);          // 가입한 사람은 그 주소를 기억해 둔다
 
   closeSheet();
-  toast('로그인했어요 — 이제 기기를 바꿔도 이어져요');
+  toast('로그인 완료 · 기기를 바꿔도 이어짐');
   /* 🔴 순서가 중요하다 — **먼저** 서버와 맞춘다. 새 기기에서는 이 줄에서 프로필이
      처음 생기므로, 화면 그리기를 앞에 두면 아직 프로필이 없는 상태로 그리게 된다. */
   await syncAfterLoad();
@@ -2697,20 +5835,94 @@ bindEvents();
 initOnboarding();
 loadNotices();
 loadRegistered();
+loadKosaf();
 loadMajors();   // 학교별 학과 목록 — 온보딩 학과 자동추천이 그 학교 것만 보게
+loadTuition();  // 학교별 등록금 — `수업료 100%` 비율형 공고를 원으로 바꾸는 데 쓴다
 if (typeof loadFormTemplates === 'function') loadFormTemplates(); // 정식 등록 양식 최신화
-walletRefresh().then(() => {
+/* 🔴 두 손가락으로 화면이 커졌다 작아졌다 하던 것 (2026-09-01 개발자 지적).
+   막는 곳이 셋이라 셋 다 있어야 한다 — 하나만 두면 어떤 폰에서는 그대로 커진다:
+     ① index.html 뷰포트 user-scalable=no  (안드로이드 크롬 · 설치형 iOS)
+     ② style.css  html { touch-action } (크롬 계열의 손가락 두 개 벌리기)
+     ③ 여기 gesture* 차단          (iOS 사파리 — 위 둘을 **무시한다**)
+   ⚠️ 이 앱은 폰 화면에 맞춰 짜인 목록이라 확대할 일이 없다. 글자를 키우려면
+      폰 설정의 글자 크기를 쓰면 되고 그건 이 차단과 무관하게 그대로 동작한다. */
+['gesturestart', 'gesturechange', 'gestureend'].forEach((t) => {
+  document.addEventListener(t, (e) => e.preventDefault(), { passive: false });
+});
+
+/* 🔴 보관함·알림은 **늦게** 준비된다(IndexedDB·권한 확인). 준비되면 지금 보고 있는
+   화면을 다시 그려야 빈 칸이 채워진다. 알림 설정은 이제 **설정 화면**에 있으므로
+   MY 만 다시 그리면 '알림' 절이 영영 안 나온다 — 두 화면을 함께 본다. */
+function refreshOpenScreen() {
   if (!$('#screen-my').hidden) renderMy();
+  if (!$('#screen-settings').hidden) renderSettings();
+}
+walletRefresh().then(photoRefresh).then(() => {
+  refreshOpenScreen();
+  if (!$('#screen-home').hidden) renderHome();   // 홈 왼쪽 위 동그라미의 사진
 });
 if (typeof notifyInit === 'function') {
-  notifyInit().then(() => { if (!$('#screen-my').hidden) renderMy(); }).catch(() => {});
+  notifyInit().then(refreshOpenScreen).catch(() => {});
 }
-if (state.profile) {
-  saveState(); // 레거시 키 → 새 키 이관
-  showScreen('home');
-} else {
+/* ── 다시 열었을 때 어디로 갈 것인가 (2026-09-09 · 노션 원문 목록 4번) ────────
+   예전에는 프로필이 있으면 **늘 홈**이었다 — 탐색 탭을 보다 잠깐 나갔다 와도 홈이었고,
+   브라우저가 이전 화면의 스크롤만 그 홈에 붙여 놓았다(실측 282px).
+   지금은 판정을 `resume.js` 한 곳에 두고 그대로 따른다. 설계·경위는
+   docs/designs/first-run-and-resume.md, 관문은 verify/verify-resume.js. */
+let resumePlan = { screen: 'home', scroll: 0, sheet: null, form: null, onboard: null, resumeCard: null };
+if (state.profile) saveState();   // 레거시 키 → 새 키 이관
+if (typeof resumeDecide === 'function') {
+  resumePlan = resumeDecide({
+    saved: typeof resumeLoad === 'function' ? resumeLoad() : null,
+    now: Date.now(),
+    search: location.search,
+    hash: location.hash,
+    hasProfile: !!state.profile,
+  });
+}
+/* 알림·로그인 복귀로 열렸으면 이어보기가 손을 뗀다 — 그 흐름이 제 화면을 정한다 */
+/* 🔴 약관 화면에서 나가기를 누르면 **떠났던 자리(설정)** 로 되돌아온다 (2026-09-11 개발자 지시:
+   "나가면 홈화면으로 이어지는게 아니라 마이페이지로"). terms.html 은 앱 밖의 진짜 페이지라
+   돌아올 때 앱이 처음부터 뜨는데, 그때 이어보기는 `?screen=` 이 붙어 있으면 손을 떼고
+   (resumeHijacked) 홈으로 보내고 있었다 — 그래서 늘 홈이었다.
+   ⚠️ 'settings'·'trash' 는 탭이 아니라서 이어보기 장부가 기억하지 못한다(RESUME_TABS).
+      그래서 기억에 기대지 않고 **주소에 적어 보내고** 여기서 그대로 읽는다. */
+const backToScreen = (() => {
+  try { return new URLSearchParams(location.search).get('screen'); } catch (e) { return null; }
+})();
+if (resumePlan.skip && state.profile && (backToScreen === 'settings' || backToScreen === 'trash')) {
+  showScreen(backToScreen, { back: true });
+}
+else if (resumePlan.skip) showScreen(state.profile ? 'home' : 'onboarding');
+else if (resumePlan.screen === 'onboarding') {
+  /* 쓰다 만 온보딩을 되살린다(창과 무관 — 학교·학년을 다시 치게 하지 않는다) */
+  if (resumePlan.onboard && onboardRestore(resumePlan.onboard)) toast('쓰다 만 곳부터 이어서 할게요');
   showScreen('onboarding');
+} else {
+  showScreen(resumePlan.screen, { scroll: resumePlan.scroll });
+  /* 보던 시트·쓰던 신청서는 화면이 그려진 **뒤에** 올린다. 공고·양식 데이터가 아직 오는
+     중일 수 있어 조금 기다린다 — 못 찾으면 조용히 넘어간다(홈은 이미 떠 있다). */
+  if (resumePlan.form || resumePlan.sheet) {
+    setTimeout(() => {
+      if (resumePlan.form) {
+        const sch = findSch(resumePlan.form.schId);
+        /* 🔴 마감·자격은 여기서 다시 보지 않는다 — 이미 쓴 글을 뺏지 않는다.
+           마감된 공고는 시트 안의 판정이 제 손으로 말한다. */
+        if (sch) { openSheetShell(); startFormFill(sch, resumePlan.form); return; }
+      }
+      /* 🔴 공고 상세는 저장해 둔 판정을 쓰지 않고 `openDetail` 이 처음부터 다시 판정한다 */
+      if (resumePlan.sheet && findSch(resumePlan.sheet)) openDetail(resumePlan.sheet);
+    }, 900);
+  }
 }
+/* 부팅 화면을 걷는다 — 화면이 정해진 바로 이 자리다 */
+if (typeof window.bootDone === 'function') window.bootDone();
+
+/* 앱이 숨는 순간에 본 시각·스크롤을 확실히 적어 둔다 (formProgressSave 머리말 참조) */
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') { resumeMark(); formProgressSave(true); }
+});
+window.addEventListener('pagehide', () => { resumeMark(); formProgressSave(true); });
 /* 🔴 소셜 로그인·비밀번호 재설정 메일은 **주소 뒤에 토큰을 붙여** 이 앱으로 돌아온다.
    그걸 먼저 주워 담아야(그리고 주소창에서 지워야) 로그인 상태로 이어진다.
    그 뒤에 서버와 맞춘다 — 기기 우선이라 여기서 기다리지 않는다. 인터넷이 없으면
@@ -2718,7 +5930,7 @@ if (state.profile) {
 if (typeof authCaptureFromUrl === 'function') {
   authCaptureFromUrl().then((kind) => {
     if (kind === 'recovery') { openAuthSheet('newpw'); return; }   // 새 비밀번호를 정할 차례
-    if (kind === 'signin') { toast('로그인했어요'); renderMy(); }
+    if (kind === 'signin') { toast('로그인 완료'); renderMy(); }
     if (typeof syncAfterLoad === 'function') syncAfterLoad();
   }).catch(() => {
     if (typeof syncAfterLoad === 'function') syncAfterLoad();

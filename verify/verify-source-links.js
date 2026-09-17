@@ -11,6 +11,8 @@
 
    실행: (python3 -m http.server 8123 &) 후 node verify/verify-source-links.js */
 const { chromium } = require('playwright-core');
+const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
+const { nextUntil, assertOwnServer, dismissNotify } = require('./onboard-helper.js');
 const fs = require('fs');
 const path = require('path');
 
@@ -21,6 +23,10 @@ const isMarker = (u) => /#n-/.test(String(u || ''));
 const SCHOOL = process.env.LINKCHECK_SCHOOL || '경희';
 
 (async () => {
+  /* 🔴 재기 전에 **이 서버가 내 앱인지** 확인한다 — 아니면 여기서 멈춘다.
+     이 저장소는 작업 폴더를 여러 개 두고 쓰는데, 8123 에 다른 폴더의 서버가 떠 있으면
+     그 옛 앱을 재고도 아무도 모른다(빨간불이든 **가짜 초록불이든**). 규칙은 onboard-helper 한 곳. */
+  await assertOwnServer(PORT);
   let fail = 0;
   const bad = (m) => { fail += 1; console.log('  ✕ ' + m); };
   const ok = (m) => console.log('  ✓ ' + m);
@@ -41,7 +47,7 @@ const SCHOOL = process.env.LINKCHECK_SCHOOL || '경희';
 
   /* ── ② 브라우저 검사 ─────────────────────────────── */
   console.log(`■ 브라우저 — ${SCHOOL} 학생으로 실제 카드를 열어 링크 확인`);
-  const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+  const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page.setDefaultTimeout(8000);   // 없는 요소를 30초씩 기다리다 검사가 멈추지 않게
   const errors = [];
@@ -49,7 +55,7 @@ const SCHOOL = process.env.LINKCHECK_SCHOOL || '경희';
   page.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push('CONSOLE: ' + m.text()); });
   page.on('dialog', async (d) => { await d.accept(); });
 
-  await page.goto('http://localhost:8123/', { waitUntil: 'domcontentloaded' });
+  await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
   await page.click('.onboard-step[data-step="0"] [data-next]');
   await page.fill('#in-school', SCHOOL);
   await page.waitForTimeout(300);
@@ -67,13 +73,19 @@ const SCHOOL = process.env.LINKCHECK_SCHOOL || '경희';
   await page.selectOption('#in-bracket', '4');
   await page.selectOption('#in-region', '서울');
   await page.click('.onboard-step[data-step="2"] [data-next]');
-  await page.click('.onboard-step[data-step="3"] [data-next]');
+  /* 단계 번호를 박지 말 것 — 온보딩이 4단계에서 6단계가 되며 이 검사들이 죽어 있었다 */
+  await nextUntil(page, '#in-sid');
   await page.fill('#in-sid', '2023100123');
   await page.fill('#in-phone', '010-1234-5678');
   await page.fill('#in-email', 'test@univ.ac.kr');
   await page.click('#btn-finish-onboard');
   await page.waitForSelector('#screen-home:not([hidden])');
-  await page.waitForTimeout(1500);
+  /* 🔴 알림 동의 시트를 **뜰 때까지 기다렸다가** 치운다 (2026-09-07).
+     전에는 1.5초만 기다리고 곧장 카드를 눌렀는데, 시트는 2.9초 뒤에 떠서 그 뒤의
+     클릭을 전부 막았다 — 세 번에 한 번 빨간불이었다(깨끗한 트리에서 실측).
+     기다림·치우기 규칙은 onboard-helper 한 곳이다. */
+  await dismissNotify(page);
+  await page.waitForTimeout(300);
   await page.click('.nav-item[data-nav="explore"]');
   await page.waitForTimeout(800);
 
@@ -84,15 +96,21 @@ const SCHOOL = process.env.LINKCHECK_SCHOOL || '경희';
     .filter((r) => new RegExp(SCHOOL).test((r.eligibility && r.eligibility.schoolOnly) || ''))
     .map((r) => r.id);
   const checked = [];
+  let opened = 0;   // 실제로 연 카드 수 — '링크를 읽은 수'와 구분한다
   for (const id of khuIds) {
     const cardSel = `#explore-list [data-detail="${id}"]`;
     if (!(await page.$(cardSel))) continue;   // 마감돼 목록에서 빠진 공고는 건너뛴다
     await page.click(cardSel);
     await page.waitForSelector('#detail-sheet.show');
     await page.waitForTimeout(300);
-    const link = await page.$$eval('#detail-sheet .sheet-deadline a', (els) =>
+    /* 🔴 **원문 링크는 `.doc-legend` 안에 있다** — `.sheet-deadline` 이 아니다 (2026-09-03).
+       `.sheet-deadline` 은 `마감일 … · 중복 수혜 제한 있음` 한 줄일 뿐 링크가 없다(app.js:2118).
+       옛 자리를 읽고 있어 **늘 0건**이었고, 그래서 "카드를 한 건도 열지 못했다"고 보고했다 —
+       카드는 멀쩡히 열렸다. 자리가 바뀐 것을 검사가 못 따라간 것이다. */
+    const link = await page.$$eval('#detail-sheet .doc-legend a', (els) =>
       els.map((e) => ({ href: e.href, text: e.textContent.trim() }))).catch(() => []);
     const legend = await page.$$eval('#detail-sheet .doc-legend', (els) => els.map((e) => e.textContent)).catch(() => []);
+    opened += 1;
     if (link.length) {
       const l = link[link.length - 1];
       checked.push({ id, href: l.href, label: l.text, hasGuide: legend.some((t) => /목록에서/.test(t)) });
@@ -101,7 +119,11 @@ const SCHOOL = process.env.LINKCHECK_SCHOOL || '경희';
     await page.keyboard.press('Escape');
     await page.waitForTimeout(350);
   }
-  console.log(`  ${SCHOOL} 카드 ${checked.length}건의 링크를 실제로 읽음`);
+  console.log(`  ${SCHOOL} 카드 ${opened}건을 열어 링크 ${checked.length}건을 실제로 읽음`);
+  /* ⚠️ 한국장학재단(층2) 공고의 라벨('한국장학재단 ↗')은 **여기서 보지 않는다.**
+     층2 항목은 실행 중에 만들어져 `registered.json` 에 없고, 이 드라이버는 그 파일을
+     읽으므로 애초에 집히지 않는다(실측 0건). 그 규칙은 `verify-kosaf` 가 갖고 있다 —
+     두 곳에 같은 규칙을 두면 한쪽만 고쳐져 갈라진다. */
   for (const c of checked) {
     const marker = isMarker(c.href);
     const labelOk = marker ? /게시판 목록/.test(c.label) : /원문 공고/.test(c.label);
@@ -110,7 +132,9 @@ const SCHOOL = process.env.LINKCHECK_SCHOOL || '경희';
     else if (marker && !c.hasGuide) bad(`목록 링크인데 '목록에서 찾으세요' 안내가 없습니다 — ${line}`);
     else ok(line);
   }
-  if (!checked.length) bad(`${SCHOOL} 카드를 한 건도 열지 못했습니다 (온보딩·매칭 확인 필요)`);
+  /* ⚠️ '연 카드'와 '링크를 읽은 카드'를 구분해 말한다 — 뭉뚱그리면 원인을 엉뚱한 데서 찾는다 */
+  if (!opened) bad(`${SCHOOL} 카드를 한 건도 열지 못했습니다 (온보딩·매칭 확인 필요)`);
+  else if (!checked.length) bad(`${SCHOOL} 카드 ${opened}건을 열었지만 원문 링크를 한 건도 못 읽었습니다 (.doc-legend a 위치 확인)`);
 
   /* 실시간 공고 피드의 라벨도 같은 규칙인지 */
   const feed = await page.$$eval('#explore-list .notice-card', (els) => els.map((e) => ({

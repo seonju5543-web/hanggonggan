@@ -67,14 +67,53 @@ function unzipEntries(buf) {
 const unent = (t) => t.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"')
   .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n)).replace(/&amp;/g, '&');
 
+/* 문단 태그와 '글자 조각' 태그의 짝 — **여기 한 곳**에만 둔다.
+   docx·hwpx 두 갈래가 각자 정규식을 들고 있으면 한쪽만 고쳐져 갈라진다.
+   검사도 이 표를 통해 부른다(`xmlDocText`) — 베낀 사본을 검사하면 원본이 바뀌어도 통과한다. */
+/* 🔴 여는 태그는 **`>` 로 끝나거나 빈칸 뒤에 속성이 오는 것만** 글자 조각이다.
+   `<w:t[^>]*>` 라고 쓰면 이름이 `w:t` 로 시작하는 형제 태그가 전부 걸린다 —
+   `<w:tbl>`·`<w:tblPr>`·`<w:tc>`·`<w:tr>`·`<w:trPr>`·`<w:tcW …/>`, hwpx 는
+   `<hp:tc>`·`<hp:tbl>`·`<hp:table>`. 그러면 표가 열리는 자리마다 다음 `</w:t>` 까지를
+   통째로 삼켜 **XML 속성과 글꼴 이름이 본문이 된다**(저장분 23개에서 찌꺼기 2,583줄).
+   장학 공고는 신청기간을 표 안에 적는 일이 많아, 그 줄이 태그에 묻혀 마감일 파서가 못 읽었다.
+   관문: verify/test-collector.mjs '첨부 글자 뽑기' ④. */
+const RUNS = {
+  docx: { para: 'w:p', run: /<w:t(?:\s[^>]*)?>([\s\S]*?)<\/w:t>/ },
+  hwpx: { para: 'hp:p', run: /<hp:t(?:\s[^>]*)?>([\s\S]*?)<\/hp:t>/ },
+};
+
+/* XML 한 덩어리에서 글자를 뽑는다 (kind = 'docx' | 'hwpx') */
+export function xmlDocText(xml, kind) {
+  const r = RUNS[kind];
+  if (!r) throw new Error(`모르는 종류: ${kind}`);
+  return paraText(String(xml || ''), r.para, r.run);
+}
+
+/* 글자 조각 **안에** 들어 있는 서식 기호를 뜻대로 바꾼다 (2026-09-15).
+   hwpx 는 고정폭 공백·탭·줄바꿈을 `<hp:t>` 안에 태그로 넣는다 — 그냥 두면
+   `2. 접 수 처<hp:fwSpace/>` 처럼 태그가 학생이 읽는 글에 그대로 남는다.
+   🔴 **`unent` 보다 먼저** 돌아야 한다. 뒤에 돌리면 글자에 든 `&lt;3년 이상&gt;` 이
+      그때는 진짜 부등호라 태그로 보여 통째로 사라진다(원문보다 나쁜 글이 된다). */
+const inlineMarks = (raw) => raw
+  .replace(/<[a-z]+[0-9]*:lineBreak\b[^>]*\/?>/gi, '\n')
+  .replace(/<[a-z]+[0-9]*:(fwSpace|nbSpace|tab)\b[^>]*\/?>/gi, ' ')
+  .replace(/<[a-z]+[0-9]*:hyphen\b[^>]*\/?>/gi, '-')
+  /* 남은 표시(밑줄 시작·끝 같은 것)는 뜻이 없으니 버린다.
+     ⚠️ 딱 하나 예외가 있다 — `<![CDATA[…]]>` 안의 글자는 뜻이 있는데 여기서 사라진다.
+        저장분 32개에 0건이고 한글·Word 가 만들지도 않아 실무 위험은 없다고 보고 안 막았다.
+        막아야 할 날이 오면 여기다(확인한 사실이라 적어 둔다 — 짐작이 아니다). */
+  .replace(/<[^>]*>/g, '');
+
 function paraText(xml, paraTag, runRe) {
   return xml.split(new RegExp(`</${paraTag}>`))
     .map((chunk) => {
       const parts = [];
       let m;
       const re = new RegExp(runRe.source, 'g');
-      while ((m = re.exec(chunk))) parts.push(m[1]);
-      return unent(parts.join('')).replace(/[ \t\u00a0]+/g, ' ').trim();
+      while ((m = re.exec(chunk))) parts.push(inlineMarks(m[1]));
+      return unent(parts.join(''))
+        .split('\n').map((l) => l.replace(/[ \t\u00a0]+/g, ' ').trim())
+        .filter(Boolean).join('\n');
     })
     .filter(Boolean).join('\n');
 }
@@ -96,12 +135,12 @@ export function attachmentText(filePath) {
   }
   if (lower.endsWith('.docx')) {
     const d = unzipEntries(buf)['word/document.xml'];
-    return d ? paraText(d.toString('utf8'), 'w:p', /<w:t[^>]*>([\s\S]*?)<\/w:t>/) : '';
+    return d ? xmlDocText(d.toString('utf8'), 'docx') : '';
   }
   if (lower.endsWith('.hwpx')) {
     const e = unzipEntries(buf);
     return Object.keys(e).filter((k) => /^Contents\/section\d+\.xml$/.test(k)).sort()
-      .map((k) => paraText(e[k].toString('utf8'), 'hp:p', /<hp:t[^>]*>([\s\S]*?)<\/hp:t>/)).join('\n');
+      .map((k) => xmlDocText(e[k].toString('utf8'), 'hwpx')).join('\n');
   }
   /* 🔴 **PDF는 자격 경로에서 쓰지 않는다** (2026-08-20 실측으로 결정).
      저장된 공고문 PDF 5개 중 글자가 나온 것은 1개뿐이었고, 그 하나마저

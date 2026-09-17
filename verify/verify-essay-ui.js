@@ -17,6 +17,8 @@
      ⑤ 서버가 실패하면 학생이 쓴 글이 그대로 남는다
    ============================================================ */
 const { chromium } = require('playwright-core');
+const { assertOwnServer } = require('./onboard-helper.js');
+const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
 const SHOT = (n) => `${__dirname}/shot-essay-${n}.png`;
 
 let pass = 0, fail = 0;
@@ -35,6 +37,10 @@ async function dismissNotify(page) {
 }
 
 (async () => {
+  /* 🔴 재기 전에 **이 서버가 내 앱인지** 확인한다 — 아니면 여기서 멈춘다.
+     이 저장소는 작업 폴더를 여러 개 두고 쓰는데, 8123 에 다른 폴더의 서버가 떠 있으면
+     그 옛 앱을 재고도 아무도 모른다(빨간불이든 **가짜 초록불이든**). 규칙은 onboard-helper 한 곳. */
+  await assertOwnServer(PORT);
   const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   const errors = [];
@@ -42,7 +48,7 @@ async function dismissNotify(page) {
   page.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push('CONSOLE: ' + m.text()); });
   page.on('dialog', async (d) => { await d.accept(); });
 
-  await page.goto('http://localhost:8123/', { waitUntil: 'domcontentloaded' });
+  await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
   await page.click('.onboard-step[data-step="0"] [data-next]');
   await page.fill('#in-school', '한국외국어대학교');
   await page.waitForTimeout(200);
@@ -57,7 +63,17 @@ async function dismissNotify(page) {
   await page.selectOption('#in-bracket', '4');
   await page.selectOption('#in-region', '서울');
   await page.click('.onboard-step[data-step="2"] [data-next]');
-  await page.click('.onboard-step[data-step="3"] [data-next]');
+  /* 🔴 단계 번호를 박지 않는다 (2026-08-24) — 공동개발자가 4단계(이중수혜)를 새로 끼우자
+     서류 정보가 4→5단계로 밀려 이 드라이버가 '#in-sid 가 안 보인다'로 죽었다.
+     앞으로 단계가 더 늘어도 깨지지 않게 **서류 칸이 보일 때까지 '다음'을 누른다**
+     (검증 드라이버에 공고 id 를 박지 말라는 이 저장소의 규칙과 같은 계열). */
+  for (let i = 0; i < 4; i++) {
+    if (await page.isVisible('#in-sid').catch(() => false)) break;
+    const next = await page.$('.onboard-step:not([hidden]) [data-next]');
+    if (!next) break;
+    await next.click().catch(() => {});
+    await page.waitForTimeout(250);
+  }
   await page.fill('#in-sid', '202312345');
   await page.fill('#in-phone', '010-1234-5678');
   await page.fill('#in-email', 'test@hufs.ac.kr');
@@ -70,22 +86,41 @@ async function dismissNotify(page) {
   await page.click('.nav-item[data-nav="explore"]');
   await page.waitForTimeout(600);
   const target = await page.evaluate(() => {
+    const storyOf = (s) => (!s || !s.formId || !FORM_TEMPLATES[s.formId] ? []
+      : (FORM_TEMPLATES[s.formId].sections || []).flatMap((x) => x.fields || [])
+        .filter((f) => f.type === 'textarea' && f.kind === 'story'));
+    /* 🔴 신청 버튼이 **실제로 열리는** 공고만 집는다 (2026-08-30).
+       위 주석은 늘 '마감 안 된'이라고 말했지만 코드는 아무것도 안 보고 있었다.
+       앱이 신청을 여는 조건은 둘이다 — 마감 전이고, 자격 판정이 unknown·미달이 아닐 것.
+       🔴 조건을 베끼지 말고 **앱의 함수를 그대로 쓴다**(evaluate·dday) — 베끼면
+       앱이 조건을 바꿔도 이 검사만 옛 조건으로 남는다. */
+    const usable = (s) => dday(s.deadline).days >= 0
+      && ['eligible', 'selective'].includes(evaluate(s, state.profile).status);
     /* 🔴 화면에 실제로 뜬 카드 중에서 고른다. registeredList 전체에서 고르면
        '이 학생에게 안 보이는 학교한정 공고'를 집어 검사가 열리지도 않는다
        (첫 시도에 중앙대 공고를 집어 그렇게 됐다). */
-    for (const el of document.querySelectorAll('#explore-list [data-detail]')) {
-      const id = el.dataset.detail;
-      const s = (typeof registeredList !== 'undefined' ? registeredList : []).find((x) => x.id === id);
-      if (!s || !s.formId || !FORM_TEMPLATES[s.formId]) continue;
-      const tpl = FORM_TEMPLATES[s.formId];
-      const story = (tpl.sections || []).flatMap((x) => x.fields || [])
-        .filter((f) => f.type === 'textarea' && f.kind === 'story');
-      if (story.length) return { id: s.id, name: s.name, formId: s.formId, story: story.length };
+    const visible = [...document.querySelectorAll('#explore-list [data-detail]')]
+      .map((el) => registeredList.find((x) => x.id === el.dataset.detail)).filter(Boolean);
+    for (const s of visible) if (usable(s) && storyOf(s).length) {
+      return { id: s.id, name: s.name, formId: s.formId, story: storyOf(s).length, injected: false };
     }
-    return null;
+    /* 🔴 하나도 없으면 **조용히 건너뛰지 않는다** — 그러면 44항목이 통째로 안 돌고
+       초록불만 남는다(2026-08-30 실제로 그랬다: 마감일 파서를 고쳐 진짜 마감이 채워지자
+       마감 전 + 자격 통과 + 서술형 양식인 공고가 이 학생에게 0건이 됐다).
+       이 검사가 보는 것은 **서류 도우미 화면**이지 마감·자격 판정이 아니므로,
+       자격은 통과하는 공고의 마감만 앞당겨 픽스처로 쓴다(README ③ — 드라이버가 스스로 주입). */
+    /* '이 학생에게 보이는가'는 앱의 scopedToProfile 이 정한다 — 여기 베끼면 갈라진다 */
+    const relaxable = scopedToProfile(registeredList, state.profile).find((s) => storyOf(s).length
+      && ['eligible', 'selective'].includes(evaluate(s, state.profile).status));
+    if (!relaxable) return null;
+    const d = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
+    relaxable.deadline = d;
+    renderExplore();
+    return { id: relaxable.id, name: relaxable.name, formId: relaxable.formId,
+      story: storyOf(relaxable).length, injected: true };
   });
-  console.log(`\n대상 공고: ${target ? `${target.name} (${target.formId} · story ${target.story}칸)` : '없음'}`);
-  if (!target) { console.log('마감 전 + story 칸이 있는 양식 공고가 없습니다 — 건너뜁니다.'); await browser.close(); process.exit(0); }
+  console.log(`\n대상 공고: ${target ? `${target.name} (${target.formId} · story ${target.story}칸)${target.injected ? ' ⚠️ 마감 전인 공고가 없어 이 공고의 마감만 앞당겨 씁니다(픽스처)' : ''}` : '없음'}`);
+  if (!target) { console.log('서술형 양식 + 자격 통과 공고가 하나도 없습니다 — 건너뜁니다.'); await browser.close(); process.exit(0); }
 
   const openForm = async () => {
     await page.click('.nav-item[data-nav="explore"]');
@@ -258,6 +293,97 @@ async function dismissNotify(page) {
   await page.waitForTimeout(200);
   ok(await page.$eval(`#fq-${key}`, (el) => el.value) === '', '④-2 되돌리면 AI 초안 전으로 돌아간다');
   ok(await page.$('.essay-flag') === null, '④-2 되돌리면 초안 표시도 사라진다');
+
+  /* ── 7) 제출 전 점검표 + 빈칸 관문 · 재료 충분도 게이지 (2026-08-29, 고도화 1·2순위) ──
+     🔴 이 두 장치는 순수 모듈 검사(verify-essay-submit.mjs)가 판정을 지키지만,
+        **화면에 실제로 뜨는지**는 그 검사가 알 수 없다. 붙이는 것을 빠뜨려도 순수 검사는
+        조용히 통과한다 — 이 저장소가 여러 번 겪은 '검사가 조용해서 못 봤다' 유형이라
+        여기서 진짜 앱을 눌러 확인한다. */
+  console.log('\n[7) 제출 전 점검표 + 재료 게이지 — 화면에 실제로 뜨는가]');
+  /* 🔴 openForm 은 아래 내비게이션을 누르는데, 지금은 양식 시트가 그 위를 덮고 있다.
+     먼저 시트를 닫아야 한다(안 닫으면 클릭이 가로채여 시간초과로 죽는다). */
+  await page.keyboard.press('Escape');
+  await page.waitForSelector('#detail-sheet:not(.show)', { timeout: 4000 }).catch(() => {});
+  await page.waitForTimeout(300);
+  ok(await openForm(), '양식 화면을 다시 연다');
+  const askBox7 = await page.$('.essay-ask');
+  const fid = askBox7 ? await askBox7.evaluate((e) => e.dataset.for) : null;
+  ok(!!fid, '서술형 칸을 찾았다');
+
+  /* 게이지 — 아무것도 안 골랐을 때는 '부족'이어야 한다 */
+  const gaugeText = async () => page.$eval('.essay-gauge, [class*="gauge"]', (e) => e.innerText).catch(() => '');
+  ok((await gaugeText()).includes('부족'), '② 재료를 안 줬을 때 게이지가 "부족"이라고 말한다');
+
+  /* 키워드를 고르면 게이지가 실제로 움직인다 */
+  /* 🔴 눈금은 일부러 세 단계(부족/조금더/충분)라 키워드 하나로는 글자가 안 바뀐다.
+     그래서 **막대 길이**를 본다 — 그게 재료가 실제로 늘었다는 표시다.
+     🔴 page.click 을 쓰지 않는다 — 시트 안의 안내문이 위에 겹쳐 클릭이 가로채인다.
+        이 드라이버가 위(③)에서 이미 쓰는 방식대로 요소에게 직접 누르라고 한다. */
+  const barPct = async () => page.$eval('.essay-gauge-bar span',
+    (e) => parseFloat(e.style.width) || 0).catch(() => -1);
+  const before = await barPct();
+  await page.evaluate(() => {
+    document.querySelectorAll('.essay-ask .essay-chips').forEach((g) => {
+      const c = g.querySelector('.chip');
+      if (c) c.click();
+    });
+  });
+  await page.waitForTimeout(500);
+  const after = await barPct();
+  ok(after > before, `② 키워드를 고르면 게이지가 움직인다 (${before}% → ${after}%)`);
+
+  /* 직접 쓴 한 줄은 고른 보기보다 무겁게 센다 — 게이지가 그만큼 더 올라간다 */
+  const fu7 = await page.$('.essay-fu:not([hidden]) .essay-fu-in');
+  if (fu7) {
+    await fu7.fill('등록금을 벌면서도 전공 수업은 한 번도 빠지지 않았고 새벽에 공부하는 습관을 들였어요');
+    await page.waitForTimeout(500);
+    ok(await barPct() > after, '② 직접 쓴 한 줄이 게이지를 더 올린다');
+  } else {
+    ok(false, '② 되묻기 칸이 열려 있어야 한다');
+  }
+
+  /* 점검표 — 이름 붙은 자리 표시를 막는가 (관문의 핵심) */
+  await page.fill(`#fq-${fid}`, '[봉사 기관명]에서 꾸준히 활동하며 배운 것이 많습니다. '.repeat(3));
+  await page.waitForTimeout(900);
+  const checkText = await page.$eval('[class*="submit-check"], [class*="checklist"]', (e) => e.innerText).catch(() => '');
+  ok(checkText.includes('빈칸'), '① 제출 전 점검표가 화면에 뜬다');
+  /* 🔴 이 한 줄이 이 관문의 존재 이유다 — 초안 서버가 실제로 만드는 것은 `[ ]` 가 아니라
+     `[봉사 기관명]` 처럼 **이름 붙은 자리**다(worker.js 프롬프트의 예시 자체가 그것). */
+  ok(checkText.includes('[봉사 기관명]'),
+    '① 이름 붙은 자리 표시를 잡아 무엇을 채울지 짚어 준다');
+
+  /* 다 지우면 그 줄이 통과로 바뀐다 — 관문이 굳어 있지 않다 */
+  await page.fill(`#fq-${fid}`, '가정 형편이 어려운 가운데에도 학업을 이어 왔습니다. '.repeat(4));
+  await page.waitForTimeout(900);
+  const cleared = await page.$eval('[class*="submit-check"], [class*="checklist"]', (e) => e.innerText).catch(() => '');
+  ok(!cleared.includes('[봉사 기관명]'), '① 자리 표시를 지우면 그 줄이 풀린다');
+
+  /* 🔴 관문이 '한 번 세우고 영영 잠들지' 않는가 (코드 리뷰가 잡은 버그의 회귀).
+     예전에는 forced 를 한 번 켜면 안 꺼서, 그 뒤에 **새로 생긴** 빈칸을 그냥 통과시켰다.
+     ⚠️ '← 질문 다시'로 돌아가면 화면을 다시 그려 버튼이 새로 만들어지므로 래치가 저절로
+        풀린다 — 그 길로 시험하면 버그가 있어도 검사가 통과한다(실제로 처음에 그렇게 짰다가
+        고친 코드를 되돌려도 초록불이 나와서 알았다). 그래서 **화면을 다시 그리지 않고
+        그 자리에서 글만 바꿔** 시험한다. */
+  await page.fill(`#fq-${fid}`, '[봉사 기관명]에서 활동했습니다. '.repeat(4));
+  await page.waitForTimeout(700);
+  await page.click('#btn-ff-generate');                 // 1) 한 번 세운다
+  await page.waitForTimeout(500);
+  ok(await page.$('.form-doc') === null, '① 빈칸이 있으면 문서로 넘어가지 않고 세운다');
+
+  /* 2) 옛 빈칸을 고치고 **다른** 빈칸을 새로 만든다 — 화면은 그대로다(같은 버튼 그대로) */
+  await page.fill(`#fq-${fid}`, '[활동 시간]을 이렇게 썼습니다. '.repeat(4));
+  await page.waitForTimeout(700);
+  await page.click('#btn-ff-generate');
+  await page.waitForTimeout(600);
+  ok(await page.$('.form-doc') === null,
+    '① 새로 생긴 빈칸에는 다시 세운다 (관문이 한 번 쓰고 잠들지 않는다)');
+
+  /* 3) 같은 빈칸이면 다시 눌러 진행된다 — 가두지 않는다 */
+  await page.click('#btn-ff-generate');
+  await page.waitForTimeout(700);
+  ok(await page.$('.form-doc') !== null, '① 같은 것이면 다시 눌러 진행된다 (학생을 가두지 않는다)');
+  await page.click('#btn-ff-back');
+  await page.waitForTimeout(500);
 
   console.log('\n[5) 실패해도 학생 글을 덮지 않는가]');
   await page.fill(`#fq-${key}`, '제가 직접 쓴 문장입니다');

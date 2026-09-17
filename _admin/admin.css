@@ -2,60 +2,89 @@
    운영 도구라 '읽는 문서'가 아니라 '훑고 조작하는 화면'으로 만든다.
    상태는 숫자만이 아니라 색·형태로도 드러나게 해서, 손봐야 할 것이 한눈에 보이게 한다. */
 
+/* ══ 디자인 체계 — 앱1(style.css)과 한 벌이다 (2026-09-13 개발자 지시) ═══════════
+   *"디자인 측면에서도 앱1과 같은 체계를 맞춰줘"*
+
+   🔴 **여기 값을 손으로 고치지 말 것.** 원본은 `style.css` 의 `:root` 이고, 이 파일은
+   그 실효값을 옮겨 온 것이다(앱1 은 `:root` 를 여러 벌 겹쳐 쓰므로 **마지막에 이긴 값**이다).
+   앱1 이 색을 바꾸면 여기도 따라 바꾼다 — 관문이 둘을 대조한다(verify/ui-tone.mjs).
+
+   개발자가 정한 셋 (2026-09-13):
+   ① **어두운 화면은 없앴다.** 앱1 이 밝은 한 벌뿐이라서다(style.css 2067 — "다크모드 규칙을
+      넣지 말 것"). 예전엔 여기 세 벌(prefers-dark · [data-theme=dark] · [data-theme=light])이
+      있었는데, `--shadow` 가 그중 한 벌에만 있어 **밝은 OS 에서 어둡게 바꾸면 어두운 바탕에
+      밝은 화면용 그림자가 남는** 어긋남이 실제로 있었다. 한 벌이 되면서 그 종류가 사라진다.
+   ② **경고는 놋쇠다.** 앱1 은 뜻 색이 빨강·초록 둘뿐이지만(2026-09-11 결정 12번), 관리자는
+      '오류 0건'과 '경고 11건'을 한눈에 갈라야 하는 도구라 한 칸을 더 쓴다("색 체계는 유동성
+      허용"). 새 색이 아니라 **앱1 팔레트 안의 놋쇠**다.
+   ③ **글자는 앱1 척도에서 한 단 위.** 앱1 본문은 14.5px 인데 이 화면은 목록을 훑는 도구라
+      본문을 `--t-lg`(17px) 로 쓴다. **값을 새로 만들지 않고 단계만 다르게 고른다.**
+
+   ⚠️ 색 대비(흰 면 위, 직접 계산): --text 17.6 · --text-sub 6.96 · --accent 7.98 ·
+      --red 7.47 · --green 6.19 · --warn 5.05 — 전부 본문에 쓸 수 있다.
+      🔴 **--text-weak 는 3.30:1 뿐이다.** 예전 `--ink-3`(3.72)보다도 흐리다.
+         **14px 이상 글자에만** 쓴다. 그보다 작으면 --text-sub 를 쓴다. (되돌리지 말 것) */
+
 :root {
-  --paper:      #fbfaf8;
-  --paper-2:    #f3f1ec;
-  --paper-3:    #eceae4;
-  --rule:       #dcd8cf;
-  --rule-soft:  #e8e5de;
-  --ink:        #191d28;
-  --ink-2:      #4c5262;
-  --ink-3:      #7b8194;
-  --navy:       #1d3461;
-  --navy-soft:  #e7ebf3;
+  /* 중성 — 앱1 그대로. 바탕과 면이 다른 색이다(예전엔 둘 다 --paper 하나였다) */
+  --bg:         #fefdfc;
+  --surface:    #ffffff;
+  --surface-2:  #f7f6f4;
+  --line:       rgba(23, 25, 28, 0.09);
+  --rule:       rgba(23, 25, 28, 0.14);
 
-  --ok:         #2b6a56;  --ok-bg:    #e4efe9;
-  --warn:       #97650f;  --warn-bg:  #f8efdb;
-  --bad:        #a8402a;  --bad-bg:   #f7e6e1;
-  --mute:       #5b5f6d;  --mute-bg:  #ececef;
+  /* 글자 */
+  --text:       #17191c;
+  --text-sub:   #545a62;
+  --text-weak:  #888e97;   /* 3.30:1 — 14px 이상에만 */
 
-  --shadow-sm: 0 1px 2px rgba(25,29,40,.06);
-  --shadow:    0 1px 2px rgba(25,29,40,.05), 0 10px 30px -18px rgba(25,29,40,.35);
+  /* 동작 = 잉크 · 강조 = 잉크블루 하나 */
+  --primary:      #1e2b42;
+  --primary-dark: #131c2c;
+  --primary-weak: rgba(23, 25, 28, 0.055);   /* 눌린 면 */
+  --accent:       #27508f;
+  --accent-soft:  rgba(39, 80, 143, 0.09);
+  --accent-line:  rgba(39, 80, 143, 0.24);
 
-  --sans: "Pretendard", "Pretendard Variable", -apple-system, BlinkMacSystemFont,
-          "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
-  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, "D2Coding", Consolas, monospace;
-}
+  /* 뜻 색 — 앱1 의 빨강·초록 + 관리자 확장인 놋쇠 */
+  --red:    #8f3a2e;  --red-weak:   #f5e9e6;
+  --green:  #3d6b47;  --green-weak: #e9efe8;
+  --warn:   #8a6a1f;  --warn-weak:  rgba(184, 145, 47, 0.13);   /* 놋쇠 — 앱1 --gold 계열 */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --paper:#13151c; --paper-2:#1a1d25; --paper-3:#22262f;
-    --rule:#2f333e; --rule-soft:#262a33;
-    --ink:#e9eaee; --ink-2:#b2b7c3; --ink-3:#7f8598;
-    --navy:#96b2e8; --navy-soft:#1d2637;
-    --ok:#6fc4a4;  --ok-bg:#16302a;
-    --warn:#dcac54; --warn-bg:#332814;
-    --bad:#e8907a; --bad-bg:#38211c;
-    --mute:#9aa0b0; --mute-bg:#232631;
-    --shadow-sm: 0 1px 2px rgba(0,0,0,.4);
-    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 30px -20px #000;
-  }
-}
-:root[data-theme="dark"] {
-  --paper:#13151c; --paper-2:#1a1d25; --paper-3:#22262f;
-  --rule:#2f333e; --rule-soft:#262a33;
-  --ink:#e9eaee; --ink-2:#b2b7c3; --ink-3:#7f8598;
-  --navy:#96b2e8; --navy-soft:#1d2637;
-  --ok:#6fc4a4; --ok-bg:#16302a; --warn:#dcac54; --warn-bg:#332814;
-  --bad:#e8907a; --bad-bg:#38211c; --mute:#9aa0b0; --mute-bg:#232631;
-}
-:root[data-theme="light"] {
-  --paper:#fbfaf8; --paper-2:#f3f1ec; --paper-3:#eceae4;
-  --rule:#dcd8cf; --rule-soft:#e8e5de;
-  --ink:#191d28; --ink-2:#4c5262; --ink-3:#7b8194;
-  --navy:#1d3461; --navy-soft:#e7ebf3;
-  --ok:#2b6a56; --ok-bg:#e4efe9; --warn:#97650f; --warn-bg:#f8efdb;
-  --bad:#a8402a; --bad-bg:#f7e6e1; --mute:#5b5f6d; --mute-bg:#ececef;
+  /* 글자 크기 — 앱1 9단 그대로. 이 화면은 한 단 위를 고른다 */
+  --t-2xs: 11.5px; --t-xs: 12.5px; --t-sm: 13.5px; --t-md: 14.5px;
+  --t-lg:  17px;   --t-xl: 18.5px; --t-2xl: 21px;  --t-3xl: 27px;
+
+  /* 자간 — 앱1 그대로 */
+  --track-display: -0.03em;
+  --track-text:    -0.01em;
+
+  /* 여백 — 앱1 그대로. 🔴 생 px 를 새로 쓰지 말 것(예전엔 22가지 189곳이었다) */
+  --space-2: 2px;  --space-4: 4px;  --space-6: 6px;  --space-8: 8px;
+  --space-12: 12px; --space-16: 16px; --space-20: 20px; --space-24: 24px;
+  --space-32: 32px; --space-40: 40px;
+
+  /* 모서리 — 앱1 6단 그대로 (예전엔 3·4·5·6·8·12·20·999 여덟 가지였다) */
+  --radius-hair: 3px; --radius-xs: 9px; --radius-sm: 13px;
+  --radius: 19px; --radius-lg: 27px; --radius-pill: 999px;
+
+  /* 그림자 — 🔴 **떠 있는 것에만** (앱1 규칙). 면 위에 놓인 카드·표에는 붙이지 않는다 */
+  --shadow:       0 1px 2px rgba(24, 35, 56, 0.05), 0 8px 22px rgba(24, 35, 56, 0.07);
+  --shadow-sheet: 0 -14px 48px rgba(18, 26, 42, 0.20);
+  --ring:         0 0 0 2px #27508f;
+  /* 앱1 의 '떠 있는 버튼' 그림자 — 값은 style.css 실효값 그대로 */
+  --shadow-btn:       0 6px 18px rgba(35, 32, 26, 0.22);
+  --shadow-btn-hover: 0 8px 24px rgba(35, 32, 26, 0.28);
+
+  /* 움직임 — 앱1 그대로. 누르는 것 전부가 같은 속도로 답한다 */
+  --dur:  0.22s;
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* 서체 — 앱1 과 같은 Pretendard 한 벌 */
+  --font-text: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
+    'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', system-ui, sans-serif;
+  /* 관리자 확장 — 앱1 엔 없다. 공고 id·날짜처럼 자리를 세어야 읽히는 글자에 쓴다 */
+  --mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, 'D2Coding', Consolas, monospace;
 }
 
 * { box-sizing: border-box; }
@@ -70,231 +99,326 @@ html, body { margin: 0; padding: 0; }
    이 화면은 목록을 훑고 누르는 도구다. 예전 치수는 **가장 중요한 글자(공고 제목 13.8px)가
    본문보다 작고**, 학교·기관 줄은 11.9px였다 — 한글은 그 크기에서 뭉갠다.
 
-   ⚠️ 색 규칙(되돌리지 말 것): `--ink-3`는 밝은 화면에서 대비 3.72:1이라 **작은 글자 기준
-   4.5:1에 못 미친다**(다크 모드는 5.05:1로 통과 — 그래서 낮에만 유독 안 보였다).
-   그래서 `--ink-3`는 **14px 이상**에만 쓰고, 그보다 작은 글자는 `--ink-2`(7.58:1)를 쓴다. */
+   ⚠️ 색 규칙(되돌리지 말 것): `--text-weak` 는 대비 **3.30:1** 이라 작은 글자 기준(4.5:1)에
+   못 미친다. **14px 이상**에만 쓰고, 그보다 작으면 `--text-sub`(6.96:1)를 쓴다.
+   🔴 앱1 토큰으로 옮기면서 이 규칙이 **더 중요해졌다** — 옛 `--ink-3` 는 3.72:1 이었는데
+   앱1 `--text-weak` 는 3.30:1 로 더 흐리다. 없애지 말 것. */
 body {
-  background: var(--paper); color: var(--ink);
-  font-family: var(--sans); font-size: 16px; line-height: 1.6;
+  background: var(--bg); color: var(--text);
+  font-family: var(--font-text); font-size: var(--t-lg); line-height: 1.6;
   -webkit-font-smoothing: antialiased; word-break: keep-all; overflow-wrap: break-word;
 }
 h1,h2,h3,h4 { margin: 0; line-height: 1.3; letter-spacing: -.015em; text-wrap: balance; }
 p { margin: 0; }
 button { font: inherit; color: inherit; }
-a { color: var(--navy); }
+a { color: var(--accent); }
 .num, .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
-:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; border-radius: 3px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: var(--radius-xs); }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 
 /* ── 입장 화면 ───────────────────────────────── */
-.gate { min-height: 100dvh; display: grid; place-items: center; padding: 24px; background: var(--paper-2); }
+.gate { min-height: 100dvh; display: grid; place-items: center; padding: var(--space-24); background: var(--surface-2); }
 .gate-box {
-  width: 100%; max-width: 460px; background: var(--paper); border: 1px solid var(--rule-soft);
-  border-radius: 6px; padding: 30px 26px; box-shadow: var(--shadow);
-  display: flex; flex-direction: column; gap: 14px;
+  width: 100%; max-width: 460px; background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius-sm); padding: var(--space-32) var(--space-24);
+  display: flex; flex-direction: column; gap: var(--space-16);
 }
-.gate-box h1 { font-size: 1.4rem; font-weight: 800; }
-.gate-lede { color: var(--ink-2); font-size: .9rem; }
-.gate-label { font-size: .8rem; font-weight: 700; color: var(--ink-2); margin-top: 4px; }
-.gate-box input[type="password"] {
-  width: 100%; padding: 11px 12px; border: 1px solid var(--rule); border-radius: 4px;
-  background: var(--paper-2); color: var(--ink); font-family: var(--mono); font-size: .88rem;
+.gate-box h1 { font-size: var(--t-2xl); font-weight: 800; }
+.gate-lede { color: var(--text-sub); font-size: var(--t-md); }
+.gate-label { font-size: var(--t-xs); font-weight: 700; color: var(--text-sub); margin-top: var(--space-4); }
+.gate-label em { font-style: normal; font-weight: 500; color: var(--text-weak); }
+.gate-box input[type="password"], .gate-box input[type="date"] {
+  width: 100%; padding: var(--space-12) var(--space-12); border: 1px solid var(--rule); border-radius: var(--radius-sm);
+  background: var(--surface-2); color: var(--text); font-family: var(--mono); font-size: var(--t-sm);
 }
-.gate-check { display: flex; gap: 9px; align-items: flex-start; font-size: .86rem; color: var(--ink-2); }
-.gate-check em { font-style: normal; color: var(--ink-3); }
-.gate-msg { font-size: .86rem; padding: 10px 12px; border-radius: 4px; background: var(--bad-bg); color: var(--bad); }
-.gate-msg.ok { background: var(--ok-bg); color: var(--ok); }
-.gate-help { font-size: .83rem; color: var(--ink-2); border-top: 1px solid var(--rule-soft); padding-top: 12px; }
-.gate-help summary { cursor: pointer; font-weight: 650; color: var(--ink); }
-.gate-help ol { margin: 10px 0 0; padding-left: 20px; display: flex; flex-direction: column; gap: 5px; }
-.gate-help code { font-family: var(--mono); background: var(--paper-3); padding: 1px 5px; border-radius: 3px; }
-.gate-note { margin-top: 10px; color: var(--ink-3); }
+.gate-check { display: flex; gap: var(--space-8); align-items: flex-start; font-size: var(--t-sm); color: var(--text-sub); }
+.gate-check em { font-style: normal; color: var(--text-weak); }
+.gate-msg { font-size: var(--t-sm); padding: var(--space-12) var(--space-12); border-radius: var(--radius-sm); background: var(--red-weak); color: var(--red); }
+.gate-msg.ok { background: var(--green-weak); color: var(--green); }
+.gate-help { font-size: var(--t-sm); color: var(--text-sub); border-top: 1px solid var(--line); padding-top: var(--space-12); }
+.gate-help summary { cursor: pointer; font-weight: 650; color: var(--text); }
+.gate-help ol { margin: var(--space-12) 0 0; padding-left: var(--space-20); display: flex; flex-direction: column; gap: var(--space-4); }
+.gate-help code { font-family: var(--mono); background: var(--surface-2); padding: var(--space-2) var(--space-4); border-radius: var(--radius-hair); }
+.gate-note { margin-top: var(--space-12); color: var(--text-weak); }
 
 /* ── 상단 ────────────────────────────────────── */
-.topbar { position: sticky; top: 0; z-index: 20; background: var(--paper); border-bottom: 1px solid var(--rule); }
+/* 앱1 의 하단 내비와 같은 **유리** 재질이다 — 흐림만으로는 안 되고 안쪽 1px 선이 있어야
+   가장자리가 굴절돼 보인다(style.css '⑤ 표면'). 예전엔 평평한 흰 판 + 1px 선이었다. */
+.topbar {
+  position: sticky; top: 0; z-index: 20;
+  background: rgba(255, 254, 252, 0.82);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  backdrop-filter: blur(20px) saturate(1.6);
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.7), 0 1px 0 var(--line);
+  border-bottom: 0;
+}
 .topbar-in {
-  max-width: 1180px; margin: 0 auto; padding: 12px 16px 10px;
-  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  max-width: 1180px; margin: 0 auto; padding: var(--space-12) var(--space-16) var(--space-12);
+  display: flex; align-items: center; gap: var(--space-16); flex-wrap: wrap;
 }
-.brand { display: flex; align-items: baseline; gap: 8px; margin-right: auto; }
-.brand-mark { font-weight: 800; font-size: 1.05rem; letter-spacing: -.02em; }
+.brand { display: flex; align-items: baseline; gap: var(--space-8); margin-right: auto; }
+.brand-mark { font-weight: 800; font-size: var(--t-lg); letter-spacing: -.02em; }
 .brand-sub {
-  font-size: .68rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
-  color: var(--navy); border: 1px solid var(--navy); border-radius: 3px; padding: 1px 6px;
+  font-size: var(--t-2xs); font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--accent); background: var(--accent-soft); border: 0; border-radius: var(--radius-xs); padding: var(--space-2) var(--space-6);
 }
-.topbar-actions { display: flex; align-items: center; gap: 8px; }
-.deploy-state { font-size: .76rem; font-weight: 700; padding: 3px 9px; border-radius: 3px; white-space: nowrap; }
-.deploy-state.synced  { background: var(--ok-bg);   color: var(--ok); }
-.deploy-state.pending { background: var(--warn-bg); color: var(--warn); }
+.topbar-actions { display: flex; align-items: center; gap: var(--space-8); }
+.deploy-state { font-size: var(--t-xs); font-weight: 700; padding: var(--space-4) var(--space-8); border-radius: var(--radius-xs); white-space: nowrap; }
+.deploy-state.synced  { background: var(--green-weak);   color: var(--green); }
+.deploy-state.pending { background: var(--warn-weak); color: var(--warn); }
 
 .tabs {
-  max-width: 1180px; margin: 0 auto; padding: 0 8px;
-  display: flex; gap: 2px; overflow-x: auto; scrollbar-width: thin;
+  max-width: 1180px; margin: 0 auto; padding: 0 var(--space-8);
+  display: flex; gap: var(--space-2); overflow-x: auto; scrollbar-width: thin;
 }
 .tab {
   border: 0; background: none; cursor: pointer; white-space: nowrap;
-  padding: 11px 14px 12px; font-size: .95rem; font-weight: 600; color: var(--ink-2);
+  padding: var(--space-12) var(--space-16) var(--space-12); font-size: var(--t-md); font-weight: 600; color: var(--text-sub);
   border-bottom: 2px solid transparent; min-height: 44px;
 }
-.tab:hover { color: var(--ink); }
-.tab.active { color: var(--ink); border-bottom-color: var(--navy); }
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--text); border-bottom-color: var(--accent); }
 .tab-n {
-  font-family: var(--mono); font-size: .8rem; font-weight: 700;
-  background: var(--paper-3); color: var(--ink-2); border-radius: 8px; padding: 2px 7px; margin-left: 4px;
+  font-family: var(--mono); font-size: var(--t-xs); font-weight: 700;
+  background: var(--surface-2); color: var(--text-sub); border-radius: var(--radius-xs); padding: var(--space-2) var(--space-6); margin-left: var(--space-4);
 }
-.tab-n.hot { background: var(--bad-bg); color: var(--bad); }
+.tab-n.hot { background: var(--red-weak); color: var(--red); }
 
 /* ── 작업 진행 ───────────────────────────────── */
 /* 헤더(.topbar) 안에 들어 있으므로 스스로 sticky를 걸지 않는다.
    예전엔 .job(z-index 30)과 .topbar(20)가 **둘 다 top:0**이라 스크롤하면 탭 줄을 덮었다. */
+/* 앱1 '④ 색 정리' — 파랑을 꽉 칠하던 자리를 잉크 남색으로. 성공·실패만 초록·빨강이다 */
 .job {
-  background: var(--navy); color: #fff; padding: 9px 16px;
-  display: flex; align-items: center; gap: 10px; font-size: .87rem;
+  background: var(--primary); color: #fdfbf6; padding: var(--space-8) var(--space-16);
+  display: flex; align-items: center; gap: var(--space-12); font-size: var(--t-sm);
 }
+
+/* ── 모아 둔 수정 (2026-09-13) ────────────────
+   아직 저장되지 않았다는 것이 한눈에 보여야 한다 — 놋쇠(경고)로 칠하고 문구로도 말한다.
+   🔴 색만으로 말하지 않는다: '아직 저장되지 않았습니다' 를 글자로 적는다. */
+.pending-bar {
+  display: flex; gap: var(--space-8); align-items: center; flex-wrap: wrap;
+  padding: var(--space-8) var(--space-16);
+  background: var(--warn-weak); color: var(--warn);
+  border-top: 1px solid var(--rule); font-size: var(--t-md); font-weight: 650;
+}
+.pending-bar .btn { margin-left: auto; }
+.pending-bar .btn + .btn { margin-left: 0; }
 
 /* ── 데이터 읽기 실패 경고 ───────────────────── */
 .datafail {
-  max-width: 1148px; margin: 16px auto -4px; padding: 12px 14px;   /* .wrap(1180 - 좌우 16)과 폭을 맞춘다 */
-  background: var(--bad-bg); border: 1px solid var(--bad); border-radius: 6px;
-  color: var(--bad); font-size: .92rem; line-height: 1.5;
+  max-width: 1148px; margin: var(--space-16) auto calc(-1 * var(--space-4)); padding: var(--space-12) var(--space-16);   /* .wrap(1180 - 좌우 16)과 폭을 맞춘다 */
+  background: var(--red-weak); border: 1px solid var(--red); border-radius: var(--radius-sm);
+  color: var(--red); font-size: var(--t-md); line-height: 1.5;
 }
-.datafail ul { margin: 8px 0 10px; padding-left: 20px; display: flex; flex-direction: column; gap: 3px; }
+.datafail ul { margin: var(--space-8) 0 var(--space-12); padding-left: var(--space-20); display: flex; flex-direction: column; gap: var(--space-4); }
 .datafail code { color: inherit; }
-.job.ok  { background: var(--ok); }
-.job.bad { background: var(--bad); }
+.job.ok  { background: var(--green); }
+.job.bad { background: var(--red); }
 .job a { color: #fff; text-decoration: underline; }
 .job-dot { width: 8px; height: 8px; border-radius: 50%; background: #fff; animation: pulse 1.1s ease-in-out infinite; }
 .job.ok .job-dot, .job.bad .job-dot { animation: none; }
 @keyframes pulse { 0%,100% { opacity: .35; } 50% { opacity: 1; } }
-.job-close { margin-left: auto; background: none; border: 0; color: #fff; font-size: 1.2rem; cursor: pointer; line-height: 1; }
+.job-close { margin-left: auto; background: none; border: 0; color: #fff; font-size: var(--t-xl); cursor: pointer; line-height: 1; }
 
 /* ── 레이아웃 ────────────────────────────────── */
-.wrap { max-width: 1180px; margin: 0 auto; padding: 20px 16px 80px; }
-.screen { display: flex; flex-direction: column; gap: 18px; }
-.sec-head { display: flex; flex-direction: column; gap: 5px; }
-.sec-head h2 { font-size: 1.12rem; font-weight: 750; }
-.sec-head p { font-size: .86rem; color: var(--ink-2); }
-.muted { color: var(--ink-2); font-size: .9rem; }
-.empty { color: var(--ink-2); font-size: .92rem; padding: 22px; text-align: center;
-         border: 1px dashed var(--rule); border-radius: 5px; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: var(--space-20) var(--space-16) var(--space-40); }
+.screen { display: flex; flex-direction: column; gap: var(--space-20); }
+/* 앱1 의 머리글은 두 갈래다 — **화면 제목**(밑줄)과 **구역 머리**(윗줄).
+   🔴 밑줄은 **화면마다 하나뿐**이다. 처음엔 모든 `.sec-head` 에 달았더니 로봇 화면에만
+      밑줄이 열 개가 떠 강조가 아무 뜻도 없어졌다(그려 놓고 세어 보고 고쳤다).
+   🔴 `width: fit-content` 를 빼지 말 것 — 앱1 이 실측으로 겪었다(빼면 밑줄이 화면 끝까지 간다). */
+.sec-head { display: flex; flex-direction: column; gap: var(--space-4); }
+.sec-head h2 { font-size: var(--t-xl); font-weight: 800; letter-spacing: -.02em; }
+/* 🔴 **형제 순서(:first-child)로 찾지 말 것** (2026-09-14 코드 리뷰가 실측으로 잡았다).
+   작업대는 제목 **앞에** 선택 바를 그리는데(admin.js `${'$'}{selBarHtml()}`) 그 바는 **고른
+   것이 있을 때만** 나온다 — 그래서 체크를 하나 누르는 순간 「컨펌 작업대」 밑줄이 사라지고
+   대신 윗줄이 그어졌다(잰 값: 밑줄 96.73px → 0 · border-top 0 → 1px).
+   이 저장소 규칙 그대로 **표식**으로 찾는다(admin.js 가 다는 data-screen-title). */
+.sec-head[data-screen-title] h2 {
+  position: relative; width: fit-content; padding-bottom: var(--space-8);
+}
+.sec-head[data-screen-title] h2::after {
+  content: ''; position: absolute; left: 0; bottom: 0;
+  width: 100%; height: 3px; border-radius: var(--radius-pill); background: var(--accent);
+}
+/* 구역 머리 — 앱1 .section-head (상자가 없으니 윗줄과 제목이 구조를 맡는다) */
+.screen > .sec-head:not([data-screen-title]) {
+  border-top: 1px solid var(--rule); padding-top: var(--space-16); margin-top: var(--space-16);
+}
+.sec-head p { font-size: var(--t-sm); color: var(--text-sub); }
+.muted { color: var(--text-sub); font-size: var(--t-md); }
+/* 앱1 '⑦ 빈 화면' 과 **똑같다** — 상자(점선이든 면이든)를 쓰지 않고 윗줄 하나로 가른다 */
+.empty { color: var(--text-sub); font-size: var(--t-md); padding: var(--space-32) var(--space-20); text-align: center;
+         border: 0; border-top: 1px solid var(--line); border-radius: 0; background: transparent; line-height: 1.7; }
+/* 🔴 구역 머리 바로 밑에 오면 **선 두 개 사이에 제목이 끼었다** — 앱1 이 똑같이 겪고
+   똑같이 고쳤다(style.css `.empty:first-child`). 맨 앞이면 자기 윗줄을 긋지 않는다.
+   ⚠️ **`:first-child` 만으로는 이 화면에서 안 잡힌다** — 구역 머리(.sec-head)가 앞에 있어
+   빈 안내는 둘째 자식이다. 실제로 세 곳이 `선-제목-선` 샌드위치였다(2026-09-14 코드 리뷰). */
+.empty:first-child,
+.sec-head + .empty { border-top: 0; }
 
 /* ── 버튼 ────────────────────────────────────── */
+/* 🔴 앱1 과 **같은 모양 언어**다 (2026-09-14 개발자 지시 — *"디자인 측면에서 전혀 바뀌지
+   않은 것 같아. 앱1의 디자인 체계를 따라줘"*). 그전에는 **토큰 이름만 같고 모양이 달랐다**:
+   모서리 9px(앱1 13px) · 굵기 600(700) · 으뜸 버튼이 밝은 파랑 --accent(앱1 은 잉크 남색
+   --primary) · 그림자 없음(앱1 은 --shadow-btn 으로 떠 있다). 값만 옮기고 컴포넌트를 그대로
+   두면 **눈에는 하나도 안 바뀐다** — 그래서 실제로 그려 놓고 재어 맞췄다.
+   ⚠️ 되돌리지 말 것: 으뜸 버튼의 남색은 앱1 의 '④ 색 정리'(파랑을 쓰던 자리를 잉크로)다. */
 .btn {
-  border: 1px solid var(--rule); background: var(--paper); border-radius: 4px;
-  padding: 7px 12px; font-size: .85rem; font-weight: 600; cursor: pointer; white-space: nowrap;
+  border: 1px solid var(--rule); background: var(--surface); border-radius: var(--radius-sm);
+  padding: var(--space-6) var(--space-12); font-size: var(--t-sm); font-weight: 700; cursor: pointer; white-space: nowrap;
 }
-.btn:hover { background: var(--paper-2); }
+/* 앱1 .btn-outline:hover 와 같다 — 면을 바꾸지 않고 테두리를 짙게 한다 */
+.btn:hover { border-color: var(--text); background: var(--primary-weak); }
 .btn:disabled { opacity: .45; cursor: not-allowed; }
-/* btn-sm도 손가락으로 눌러야 한다 — 예전엔 높이가 약 26px이었다 */
-.btn-sm { padding: 7px 12px; font-size: .85rem; min-height: 40px; display: inline-flex; align-items: center; }
-.btn-lg { padding: 11px 16px; font-size: .95rem; }
-.btn:active { background: var(--paper-3); }
-.btn-primary { background: var(--navy); border-color: var(--navy); color: #fff; }
-.btn-primary:hover { filter: brightness(1.1); background: var(--navy); }
-.btn-ghost { background: none; }
-.btn.danger { color: var(--bad); border-color: color-mix(in srgb, var(--bad) 40%, transparent); }
-.btn.good { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 45%, transparent); }
-.btn-row { display: flex; flex-wrap: wrap; gap: 8px; }
+/* btn-sm도 손가락으로 눌러야 한다 — 예전엔 높이가 약 26px이었다.
+   모서리만 한 단 작게(앱1 .btn-sm 과 같은 --radius-xs) */
+.btn-sm { padding: var(--space-6) var(--space-12); font-size: var(--t-sm); min-height: 40px; display: inline-flex; align-items: center;
+          border-radius: var(--radius-xs); }
+.btn-lg { padding: var(--space-12) var(--space-16); font-size: var(--t-md); }
+.btn:active { background: var(--primary-weak); }
+.btn-primary { background: var(--primary); border-color: var(--primary); color: #fdfbf6; box-shadow: var(--shadow-btn); }
+.btn-primary:hover { background: var(--primary-dark); border-color: var(--primary-dark); box-shadow: var(--shadow-btn-hover); }
+.btn-primary:disabled { box-shadow: none; }
+/* 앱1 .btn-ghost — 투명한 면에 흐린 테두리 하나 */
+.btn-ghost { background: transparent; border-color: var(--line); color: var(--text-sub); }
+.btn-ghost:hover { background: var(--surface); border-color: var(--rule); }
+.btn.danger { color: var(--red); border-color: color-mix(in srgb, var(--red) 40%, transparent); }
+.btn.good { color: var(--green); border-color: color-mix(in srgb, var(--green) 45%, transparent); }
+.btn-row { display: flex; flex-wrap: wrap; gap: var(--space-8); }
 
 /* ── 할 일 카드 ──────────────────────────────── */
-.cards { display: grid; gap: 12px; grid-template-columns: 1fr; }
+.cards { display: grid; gap: var(--space-12); grid-template-columns: 1fr; }
 @media (min-width: 640px) { .cards { grid-template-columns: 1fr 1fr; } }
 @media (min-width: 980px) { .cards { grid-template-columns: repeat(3, 1fr); } }
+/* 🔴 앱1 은 **테두리 친 흰 판을 카드로 쓰지 않는다** — 판이 필요한 자리(홈 히어로)는
+   27px 모서리에 **면으로 칠한** 덩어리 하나뿐이다(style.css '⑤ 표면').
+   그래서 이 요약 카드도 테두리를 걷고 **중립인 흐린 면**으로 세운다.
+   🔴 예전의 왼쪽 3px 색 띠는 뺐다 — 숫자가 이미 그 색이라 **겹치는 신호**였고,
+      색 띠는 관리도구의 표식이지 앱1 의 어휘가 아니다.
+   🔴 **판을 통째로 칠하지 않는다** — 약한 면(--red-weak 등)은 앱1 에서 **배지 크기**에만
+      쓰는 문법이다. 카드 다섯 장에 칠해 보니 화면이 통째로 베이지가 됐다(실측).
+      급한 정도는 앱1 이 D-day 를 다루는 방식 그대로 **숫자 색**이 말한다.
+   ⚠️ 색만으로 말하지 않는 규칙은 그대로다 — 카드 제목이 무엇인지 글자로 적는다. */
 .card {
-  border: 1px solid var(--rule-soft); border-left: 3px solid var(--rule);
-  border-radius: 5px; background: var(--paper); padding: 15px 16px;
-  display: flex; flex-direction: column; gap: 7px; box-shadow: var(--shadow-sm);
+  border: 0; border-radius: var(--radius-lg);
+  background: var(--surface-2); padding: var(--space-20) var(--space-20);
+  display: flex; flex-direction: column; gap: var(--space-6);
 }
-.card.is-bad  { border-left-color: var(--bad); }
-.card.is-warn { border-left-color: var(--warn); }
-.card.is-ok   { border-left-color: var(--ok); }
-.card .k { font-size: .95rem; color: var(--ink); font-weight: 650; }
+.card .k { font-size: var(--t-md); color: var(--text); font-weight: 650; }
 /* 숫자를 1.75rem(28px)에서 줄였다 — 제목의 2배라 눈이 숫자에만 가고
    '무엇에 대한 숫자인가'가 안 읽혔다 */
-.card .v { font-family: var(--mono); font-size: 1.5rem; font-weight: 700; line-height: 1.05; letter-spacing: -.03em; }
-.card.is-bad .v  { color: var(--bad); }
+.card .v { font-family: var(--mono); font-size: var(--t-2xl); font-weight: 700; line-height: 1.05; letter-spacing: -.03em; }
+.card.is-bad .v  { color: var(--red); }
 .card.is-warn .v { color: var(--warn); }
-.card.is-ok .v   { color: var(--ok); }
-.card .d { font-size: .875rem; color: var(--ink-2); }
-.card .btn-row { margin-top: 4px; }
+.card.is-ok .v   { color: var(--green); }
+.card .d { font-size: var(--t-sm); color: var(--text-sub); }
+.card .btn-row { margin-top: var(--space-4); }
+/* 날짜를 적는 칸 (F-4 열쇠 만료일 · 마감 적어 두기) — 날짜 칸과 단추가 한 줄 */
+.key-exp { display: flex; flex-wrap: wrap; gap: var(--space-8); align-items: center; }
+.key-exp input[type="date"] { min-height: 36px; }
 
 /* 이상 없는 항목은 카드로 자리를 먹지 않고 한 줄 띠로 접는다 */
 .allclear {
-  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-  padding: 10px 14px; border: 1px solid var(--rule-soft); border-left: 3px solid var(--ok);
-  border-radius: 5px; background: var(--paper); font-size: .9rem; color: var(--ink-2);
+  display: flex; align-items: center; gap: var(--space-12); flex-wrap: wrap;
+  padding: var(--space-12) var(--space-16); border: 0;
+  border-radius: var(--radius-lg); background: var(--green-weak); font-size: var(--t-md); color: var(--text-sub);
 }
-.allclear-mark { color: var(--ok); font-weight: 800; }
-.allclear-list { color: var(--ink-3); font-size: .875rem; }
+.allclear-mark { color: var(--green); font-weight: 800; }
+/* ⚠️ 면을 --green-weak 로 칠하면서 --text-weak 는 2.83:1 이 됐다(흰 면에서도 3.30 이라
+   원래 14px 미만 금지였다). --text-sub 는 이 면 위에서 5.96:1 이다. */
+.allclear-list { color: var(--text-sub); font-size: var(--t-sm); }
 
 /* ── 필터 ────────────────────────────────────── */
 .filters {
-  display: flex; flex-direction: column; gap: 10px;
-  border: 1px solid var(--rule-soft); border-radius: 5px; padding: 13px 14px; background: var(--paper-2);
+  display: flex; flex-direction: column; gap: var(--space-12);
+  border: 0; border-radius: 0; padding: 0; background: transparent;
 }
-.filter-row { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
+.filter-row { display: flex; flex-wrap: wrap; gap: var(--space-6); align-items: center; }
 .filter-row > .lb {
-  font-size: .74rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
-  color: var(--ink-3); min-width: 4.4rem;
+  font-size: var(--t-2xs); font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+  color: var(--text-weak); min-width: 4.4rem;
 }
 /* 터치 목표 40px — 예전엔 약 26px이라 손가락으로 필터를 고를 수 없었다 */
+/* 앱1 의 칩은 **알약**이다(999px · 2px 테두리 · 글자 --text-sub).
+   🔴 켜진 칩은 **칠하지도 올리지도 않고 테두리만 강조색 2px, 글자는 먹**이다
+   — `style.css:4295` (2026-09-11 개발자가 번호로 정한 Apple 7번). **줄 번호를 적어 두는
+   이유**: `.chip.active` 는 style.css 에 다섯 벌 있고(344 · 2358 · 2635 · 4227 · 4295)
+   앞엣것들은 전부 죽어 있다. 실제로 이 파일 첫 판이 344줄(2026-08-31 판 — 흐린 면 + 고리)을
+   베껴 와서, 개발자가 정한 값을 관리자 화면에서만 되돌린 꼴이 됐다(2026-09-14 코드 리뷰). */
 .chip {
-  border: 1px solid var(--rule); background: var(--paper); border-radius: 20px;
-  padding: 8px 14px; font-size: .875rem; cursor: pointer; white-space: nowrap;
+  border: 2px solid rgba(18, 22, 31, 0.10); background: var(--surface); border-radius: var(--radius-pill);
+  padding: var(--space-8) var(--space-16); font-size: var(--t-sm); font-weight: 550; color: var(--text-sub);
+  cursor: pointer; white-space: nowrap;
   min-height: 40px; display: inline-flex; align-items: center;
 }
-.chip:hover { background: var(--paper-3); }
-.chip:active { background: var(--paper-3); }
-.chip.on { background: var(--navy); border-color: var(--navy); color: #fff; font-weight: 600; }
-.chip .c { font-family: var(--mono); opacity: .85; margin-left: 5px; font-size: .8rem; }
-.chip.st-unreviewed.on { background: var(--warn); border-color: var(--warn); color: #17140b; }
-.chip.st-closed.on { background: var(--mute); border-color: var(--mute); }
+.chip:hover { background: var(--primary-weak); color: var(--text); }
+.chip:active { background: var(--primary-weak); }
+.chip.on { background: var(--surface); border-color: var(--accent); color: var(--text); box-shadow: none; }
+.chip .c { font-family: var(--mono); opacity: .85; margin-left: var(--space-4); font-size: var(--t-xs); }
+/* 뜻이 다른 칩도 **같은 짜임**으로 — 면은 그대로 두고 테두리 색만 갈아 끼운다.
+   ⚠️ 면을 칠하면 글자 대비가 같이 떨어진다(놋쇠 칩이 실제로 4.47:1 까지 내려갔었다). */
+.chip.st-unreviewed.on { background: var(--surface); border-color: var(--warn); color: var(--text); }
+.chip.st-closed.on { background: var(--surface); border-color: var(--text-sub); color: var(--text); }
 
 /* 접어 둔 필터 */
-.filters-more { border: 1px solid var(--rule-soft); border-radius: 5px; padding: 0 12px; }
+/* 앱1 은 접는 묶음에도 상자를 두르지 않는다 — 윗줄 하나와 제목이 구조를 맡는다 */
+.filters-more { border: 0; border-top: 1px solid var(--line); border-radius: 0; padding: 0; }
 .filters-more > summary {
-  cursor: pointer; padding: 11px 2px; font-size: .9rem; font-weight: 600; color: var(--ink-2);
+  cursor: pointer; padding: var(--space-12) 0; font-size: var(--t-md); font-weight: 650; color: var(--text-sub);
   min-height: 44px; display: flex; align-items: center;
 }
-.filters-more[open] > summary { border-bottom: 1px solid var(--rule-soft); margin-bottom: 8px; }
-.filters-more .filter-row:last-child { padding-bottom: 12px; }
+.filters-more[open] > summary { border-bottom: 1px solid var(--line); margin-bottom: var(--space-8); }
+.filters-more .filter-row:last-child { padding-bottom: var(--space-12); }
 
 /* 지금 걸려 있는 필터 — 접혀 있어도 보이게 */
-.ftags { display: flex; flex-wrap: wrap; gap: 6px; }
+.ftags { display: flex; flex-wrap: wrap; gap: var(--space-6); }
 .ftag {
-  border: 1px solid var(--navy); background: var(--navy-soft); color: var(--navy);
-  border-radius: 20px; padding: 6px 12px; font-size: .85rem; font-weight: 600; cursor: pointer;
-  min-height: 36px; display: inline-flex; align-items: center; gap: 5px;
+  border: 1px solid var(--accent); background: var(--accent-soft); color: var(--accent);
+  border-radius: var(--radius-pill); padding: var(--space-6) var(--space-12); font-size: var(--t-sm); font-weight: 600; cursor: pointer;
+  min-height: 36px; display: inline-flex; align-items: center; gap: var(--space-4);
 }
-.ftag-all { border-color: var(--rule); background: var(--paper); color: var(--ink-2); font-weight: 500; }
+.ftag-all { border-color: var(--rule); background: var(--surface); color: var(--text-sub); font-weight: 500; }
+/* 앱1 입력 칸과 같다 — 모서리 13px · 흰 면 · 초점이 오면 강조색 테두리 + 2px 고리 */
 select, input[type="text"], input[type="search"], input[type="date"], input[type="url"], textarea {
-  border: 1px solid var(--rule); background: var(--paper); color: var(--ink);
-  border-radius: 4px; padding: 9px 10px; font-size: .95rem; font-family: inherit; max-width: 100%;
+  border: 1px solid var(--rule); background: var(--surface); color: var(--text);
+  border-radius: var(--radius-sm); padding: var(--space-8) var(--space-12); font-size: var(--t-md); font-family: inherit; max-width: 100%;
 }
+input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: var(--ring); outline: none; }
 select, input[type="text"], input[type="search"], input[type="date"], input[type="url"] { min-height: 40px; }
-textarea { width: 100%; font-size: .92rem; line-height: 1.55; }
+textarea { width: 100%; font-size: var(--t-md); line-height: 1.55; }
 input[type="search"] { min-width: 190px; flex: 1 1 190px; }
 
 /* ── 목록 ────────────────────────────────────── */
 /* 구분선을 --rule-soft에서 --rule로 — 예전 선은 거의 안 보여서
    166줄이 똑같은 높이·색으로 이어져 눈이 멈출 자리가 없었다 */
-.rows { display: flex; flex-direction: column; gap: 1px; background: var(--rule);
-        border: 1px solid var(--rule); border-radius: 5px; overflow: hidden; }
+/* 🔴 앱1 의 목록에는 **상자가 없다** (2026-09-14 실측). 학생 화면의 공고 줄(.sch-card)은
+   테두리도 모서리도 그림자도 없이 **아래 1px 선 하나**로만 갈린다 — 바탕 위에 글이 놓인
+   모양이다(style.css '⑤ 표면' 이 흰 판 + 테두리 + 그림자 판박이를 걷어낸 결과).
+   예전 관리자 목록은 회색 판 위에 흰 줄을 얹은 **테두리 친 상자**였다 — 같은 토큰을 써도
+   이것 하나 때문에 '관리도구' 로 읽혔다.
+   ⚠️ 줄 간격(--space-2 gap + 회색 바탕)으로 선을 만들던 방식을 되살리지 말 것 —
+      선은 이제 각 줄의 border-bottom 이다(마지막 줄은 긋지 않는다). */
+.rows { display: flex; flex-direction: column; background: transparent;
+        border: 0; border-radius: 0; }
 .row {
-  background: var(--paper); padding: 13px 14px; cursor: pointer;
-  display: grid; grid-template-columns: 1fr; gap: 6px;
+  background: transparent; padding: var(--space-16); cursor: pointer;
+  border-bottom: 1px solid var(--line);
+  display: grid; grid-template-columns: 1fr; gap: var(--space-6);
 }
-.row:hover { background: var(--paper-2); }
+.rows > .row:last-child { border-bottom: 0; }
+.row:hover { background: var(--surface-2); }
 /* 모바일엔 :hover가 없다 — 눌리는 느낌은 :active로 준다 */
-.row:active { background: var(--paper-3); }
+.row:active { background: var(--primary-weak); }
 @media (min-width: 780px) {
-  .row { grid-template-columns: 1fr 8.5rem 6rem 1rem; gap: 14px; align-items: center; }
+  .row { grid-template-columns: 1fr 8.5rem 6rem 1rem; gap: var(--space-16); align-items: center; }
   .row.has-pick { grid-template-columns: 1.75rem 1fr 8.5rem 6rem 5rem 1rem; }
 }
 /* 선택 네모 — 손가락으로 눌러야 하므로 눌리는 면적을 크게 잡는다 */
 .pick { display: inline-flex; align-items: center; justify-content: center;
-        min-width: 40px; min-height: 40px; margin: -8px 0 -8px -8px; cursor: pointer; }
-.pick input { width: 19px; height: 19px; accent-color: var(--navy); cursor: pointer; }
+        min-width: 40px; min-height: 40px; margin: calc(-1 * var(--space-8)) 0 calc(-1 * var(--space-8)) calc(-1 * var(--space-8)); cursor: pointer; }
+.pick input { width: 19px; height: 19px; accent-color: var(--accent); cursor: pointer; }
 .row-act { display: flex; justify-content: flex-end; }
 
 /* 선택 바 — **화면 아래에 고정**한다.
@@ -304,77 +428,102 @@ input[type="search"] { min-width: 190px; flex: 1 1 190px; }
 .selbar {
   position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 30;
   max-width: 1148px; margin: 0 auto;
-  display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
-  padding: 12px 14px;
-  background: var(--navy-soft); border: 1px solid var(--navy); border-radius: 8px;
+  display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-8);
+  padding: var(--space-12) var(--space-16);
+  background: var(--accent-soft); border: 1px solid var(--accent); border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
 }
-.selbar-n { font-weight: 750; color: var(--navy); margin-right: 4px; }
+.selbar-n { font-weight: 750; color: var(--accent); margin-right: var(--space-4); }
 .selbar-sp { flex: 1 1 auto; }
 
 /* 잘린 목록 '더 보기' */
-.more { display: flex; align-items: center; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+.more { display: flex; align-items: center; gap: var(--space-12); margin-top: var(--space-8); flex-wrap: wrap; }
 
 /* ── 스캔 지점 (B0-6) ─────────────────────────
    166줄이 똑같은 높이·색으로 이어지면 눈이 멈출 자리가 없어 '어디까지 봤는지'를 잃는다.
    구획 제목을 목록 위에 붙여 두면 스크롤 중에도 지금 보는 구간이 계속 보인다.
    .topbar(헤더)가 z-index 20이므로 그 아래(9)에 두어 **헤더를 덮지 않게** 한다. */
-.group + .group { margin-top: 16px; }
+.group + .group { margin-top: var(--space-16); }
+/* 앱1 '④ 구역 머리' 와 같다 — 상자가 사라졌으니 **제목이 구조를 맡는다**.
+   윗줄 하나 + 굵은 제목. 다만 이 화면은 수백 줄을 훑는 도구라 **붙어 다니는 것은 남긴다**
+   (B0-6). 붙어 있는 동안 글이 비쳐 보이지 않게 머리줄과 같은 유리 재질을 쓴다. */
 .group-head {
   position: sticky; top: var(--head-h, 0px); z-index: 9;
-  display: flex; align-items: center; gap: 8px;
-  font-size: .82rem; font-weight: 750; color: var(--ink-2);
-  background: var(--paper-2); border: 1px solid var(--rule);
-  border-radius: 5px 5px 0 0; border-bottom: 0;
-  padding: 8px 12px; margin-bottom: -1px;
+  display: flex; align-items: center; gap: var(--space-8);
+  font-size: var(--t-lg); font-weight: 800; color: var(--text); letter-spacing: -.02em;
+  background: rgba(255, 254, 252, 0.86);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  backdrop-filter: blur(20px) saturate(1.6);
+  border: 0; border-top: 1px solid var(--rule); border-radius: 0;
+  /* 🔴 좌우는 **줄(.row)과 같은 값**이어야 글자가 한 줄에 선다 — 0 으로 두었더니 구획 제목이
+     줄 제목보다 16px 왼쪽에 섰다(잰 값 66 vs 82). 앱1 은 둘이 정확히 같은 x 에 선다(20/20). */
+  padding: var(--space-12) var(--space-16) var(--space-8);
 }
 .group-n {
-  font-family: var(--mono); font-size: .78rem; font-weight: 700;
-  color: var(--ink-2); background: var(--paper); border: 1px solid var(--rule-soft);
-  border-radius: 999px; padding: 1px 8px;
+  font-family: var(--mono); font-size: var(--t-xs); font-weight: 700;
+  color: var(--text-sub); background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius-pill); padding: var(--space-2) var(--space-8);
 }
-.group .rows { border-radius: 0 0 5px 5px; }
+
 /* 누를 수 있다는 표시 — cursor:pointer만으로는 손가락 화면에서 전혀 안 보인다 */
-.row::after { content: '›'; color: var(--ink-3); font-size: 1.2rem; line-height: 1; justify-self: end; }
+.row::after { content: '›'; color: var(--text-weak); font-size: var(--t-xl); line-height: 1; justify-self: end; }
 .row[data-noclick]::after { content: ''; }
 @media (max-width: 779px) { .row::after { display: none; } }
-.row .t { font-weight: 650; font-size: 1rem; }
-/* 메타 줄: .79rem(11.9px) + --ink-3 → .875rem(14px) + --ink-2. 위 색 규칙 참조 */
-.row .m { font-size: .875rem; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 4px 10px; }
-.row .m > span + span::before { content: '·'; color: var(--ink-3); margin-right: 10px; }
-.row .badges { display: flex; flex-wrap: wrap; gap: 4px; }
-.row .dd { font-family: var(--mono); font-size: .875rem; font-weight: 700; text-align: left; }
+.row .t { font-weight: 650; font-size: var(--t-lg); }
+/* 🔴 목록은 이 화면에서 가장 오래 보는 면이라 **한 단 위**를 쓴다 —
+   제목 --t-lg(17px) · 메타 --t-md(14.5px). 예전엔 제목 13.8px · 메타 11.9px 였고
+   한글은 그 크기에서 뭉갠다. 메타 색은 --text-weak(3.30:1) 가 아니라 --text-sub 다. */
+.row .m { font-size: var(--t-md); color: var(--text-sub); display: flex; flex-wrap: wrap; gap: var(--space-4) var(--space-12); }
+.row .m > span + span::before { content: '·'; color: var(--text-weak); margin-right: var(--space-12); }
+.row .badges { display: flex; flex-wrap: wrap; gap: var(--space-4); }
+.row .dd { font-family: var(--mono); font-size: var(--t-md); font-weight: 700; text-align: left; }
 @media (min-width: 780px) { .row .dd { text-align: right; } }
 /* 색만으로 뜻을 전하지 않는다 — 색을 못 가리는 사람에게도 기호로 구별된다 */
-.dd.near { color: var(--bad); }
+.dd.near { color: var(--red); }
 .dd.near::before { content: '⏰ '; }
 .dd.soon { color: var(--warn); }
 .dd.soon::before { content: '• '; }
-.dd.none { color: var(--ink-2); font-weight: 500; }
+.dd.none { color: var(--text-sub); font-weight: 500; }
 
 .pill {
-  font-size: .78rem; font-weight: 700; padding: 2px 8px; border-radius: 3px; white-space: nowrap;
-  background: var(--mute-bg); color: var(--mute);
+  font-size: var(--t-xs); font-weight: 700; padding: var(--space-2) var(--space-8); border-radius: var(--radius-xs); white-space: nowrap;
+  background: var(--surface-2); color: var(--text-sub);
 }
-.pill.unreviewed { background: var(--warn-bg); color: var(--warn); }
-.pill.official   { background: var(--ok-bg);   color: var(--ok); }
-.pill.closed     { background: var(--mute-bg); color: var(--mute); }
-.pill.bad        { background: var(--bad-bg);  color: var(--bad); }
-.pill.warn       { background: var(--warn-bg); color: var(--warn); }
-.pill.info       { background: var(--navy-soft); color: var(--navy); }
+.pill.unreviewed { background: var(--warn-weak); color: var(--warn); }
+.pill.official   { background: var(--green-weak);   color: var(--green); }
+.pill.closed     { background: var(--surface-2); color: var(--text-sub); }
+.pill.bad        { background: var(--red-weak);  color: var(--red); }
+.pill.warn       { background: var(--warn-weak); color: var(--warn); }
+.pill.info       { background: var(--accent-soft); color: var(--accent); }
+/* 🔴 `.pill.good` 이 없어서 **성공이 '못 읽음' 과 똑같아 보였다**(코드 리뷰가 잡았다).
+   실패만 빨갛고 성공은 회색이면, 로봇이 잘 돌았는지가 색으로 안 드러난다.
+   ⚠️ 색만으로 말하지 않는 규칙은 그대로다 — 글자로도 '성공'·'실패' 를 적는다. */
+.pill.good       { background: var(--green-weak); color: var(--green); }
 
 /* ── 밀도 (B0-7) ──────────────────────────────
    훑을 때와 검수할 때 필요한 밀도가 다르다. '촘촘하게'는 한 화면에 들어오는 줄 수를 늘리는
    것이 목적이므로 **줄 간격만** 줄인다 — 글자 크기·색은 그대로 둔다(작게 만들면 B0의
    대비·치수 규칙이 깨진다). 터치 목표 40px가 걸린 것(.pick·버튼)도 건드리지 않는다. */
-:root[data-density="compact"] .row { padding: 8px 12px; gap: 3px; }
-:root[data-density="compact"] .rows { gap: 0; }
-:root[data-density="compact"] .row .m { gap: 2px 10px; }
-:root[data-density="compact"] .group + .group { margin-top: 10px; }
-:root[data-density="compact"] .group-head { padding: 6px 12px; }
+:root[data-density="compact"] .row { padding: var(--space-8) var(--space-12); gap: var(--space-4); }
+:root[data-density="compact"] .row .m { gap: var(--space-2) var(--space-12); }
+:root[data-density="compact"] .group + .group { margin-top: var(--space-12); }
+:root[data-density="compact"] .group-head { padding: var(--space-6) var(--space-12); }   /* 촘촘히 볼 때의 .row 좌우와 같은 값 */
 :root[data-density="compact"] th,
-:root[data-density="compact"] td { padding: 6px 10px; }
-:root[data-density="compact"] .card { padding: 12px 14px; }
+:root[data-density="compact"] td { padding: var(--space-6) var(--space-12); }
+:root[data-density="compact"] .card { padding: var(--space-12) var(--space-16); }
+
+/* ── 원인 묶음 (2026-09-13) ────────────────────
+   같은 원인 10건을 10줄로 늘어놓지 않는다. 한 줄 + 그 자리 버튼. */
+.pgroup {
+  border: 0; border-radius: var(--radius-lg);
+  background: var(--surface-2); padding: var(--space-16) var(--space-20);
+  display: flex; flex-direction: column; gap: var(--space-8);
+}
+.pgroup + .pgroup { margin-top: var(--space-8); }
+.pgroup-head { display: flex; gap: var(--space-8); align-items: center; flex-wrap: wrap; }
+.pgroup-msg { flex: 1 1 320px; font-size: var(--t-md); font-weight: 600; }
+.pgroup-head .btn { flex: 0 0 auto; }
+.pgroup details > summary { cursor: pointer; }
 
 /* ── 표 ──────────────────────────────────────── */
 /* 좁은 화면에서 표는 옆으로 밀어야 나머지 칸이 보이는데, 그 사실이 화면에 드러나지 않아
@@ -382,10 +531,10 @@ input[type="search"] { min-width: 190px; flex: 1 1 190px; }
    ① 밀 수 있는 방향에만 나타나는 그림자(순수 CSS — 끝까지 밀면 저절로 사라진다)
    ② 실제로 넘칠 때만 붙는 안내 한 줄(JS가 재어 보고 붙인다 — 안 넘치면 안 붙는다) */
 .scroller {
-  overflow-x: auto; border: 1px solid var(--rule-soft); border-radius: 5px;
+  overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius-sm);
   background:
-    linear-gradient(to right, var(--paper) 30%, rgba(255,255,255,0)) left center,
-    linear-gradient(to left,  var(--paper) 30%, rgba(255,255,255,0)) right center,
+    linear-gradient(to right, var(--surface) 30%, rgba(255,255,255,0)) left center,
+    linear-gradient(to left,  var(--surface) 30%, rgba(255,255,255,0)) right center,
     radial-gradient(farthest-side at 0 50%, rgba(25,29,40,.20), rgba(25,29,40,0)) left center,
     radial-gradient(farthest-side at 100% 50%, rgba(25,29,40,.20), rgba(25,29,40,0)) right center;
   background-repeat: no-repeat;
@@ -394,26 +543,26 @@ input[type="search"] { min-width: 190px; flex: 1 1 190px; }
   background-attachment: local, local, scroll, scroll;
 }
 .scroll-hint {
-  font-size: .8rem; color: var(--ink-2); margin-top: 6px;
-  display: flex; align-items: center; gap: 6px;
+  font-size: var(--t-xs); color: var(--text-sub); margin-top: var(--space-6);
+  display: flex; align-items: center; gap: var(--space-6);
 }
-table { border-collapse: collapse; width: 100%; font-size: .9rem; background: var(--paper); }
-th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--rule-soft); vertical-align: top; }
+table { border-collapse: collapse; width: 100%; font-size: var(--t-md); background: var(--surface); }
+th, td { text-align: left; padding: var(--space-12) var(--space-12); border-bottom: 1px solid var(--line); vertical-align: top; }
 /* `text-transform:uppercase`와 넓은 자간을 뺐다 — **한글에 대문자 변환은 효과가 없고**
    자간만 벌어져 읽기만 나빠진다. 이 화면은 한글 전용이다. */
-th { font-size: .8rem; color: var(--ink-2);
-     font-weight: 700; background: var(--paper-2); position: sticky; top: 0; }
+th { font-size: var(--t-xs); color: var(--text-sub);
+     font-weight: 700; background: var(--surface-2); position: sticky; top: 0; }
 tbody tr:last-child td { border-bottom: 0; }
 td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 /* ── 시트(상세·편집) ─────────────────────────── */
 .sheet-back { position: fixed; inset: 0; background: rgba(10,12,18,.5); z-index: 40; }
 .sheet {
-  position: fixed; z-index: 41; background: var(--paper);
-  inset: auto 0 0 0; max-height: 92dvh; border-radius: 12px 12px 0 0;
-  border-top: 1px solid var(--rule); box-shadow: var(--shadow);
-  overflow-y: auto; padding: 18px 16px 40px;
-  display: flex; flex-direction: column; gap: 14px;
+  position: fixed; z-index: 41; background: var(--surface);
+  inset: auto 0 0 0; max-height: 92dvh; border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  border-top: 1px solid var(--rule); box-shadow: var(--shadow-sheet);
+  overflow-y: auto; padding: var(--space-20) var(--space-16) var(--space-40);
+  display: flex; flex-direction: column; gap: var(--space-16);
 }
 /* 🔴 flex 세로 배치는 내용이 넘치면 **자식을 눌러 줄인다.**
    그래서 안쪽에 스크롤이 있는 상자(.doc-preview·.scroller)만 스크롤되고
@@ -423,7 +572,14 @@ td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space
 .sheet > * { flex: 0 0 auto; }
 @media (min-width: 900px) {
   .sheet { inset: 0 0 0 auto; width: min(760px, 92vw); max-height: none; border-radius: 0;
-           border-top: 0; border-left: 1px solid var(--rule); padding: 22px 24px 60px; }
+           border-top: 0; border-left: 1px solid var(--rule); padding: var(--space-24) var(--space-24) var(--space-40); }
+}
+/* 🔴 **넓은 화면에서는 대조가 이 도구의 본업이다** (2026-09-13).
+   760px 서랍 안의 2단은 한 칸이 약 355px 이라 공고 원문을 읽기에 좁았고,
+   그동안 뒤에 깔린 목록 680px 은 아무 쓸모가 없었다(실측). 1280px 이상에서 서랍을 넓혀
+   **원문 읽는 폭을 약 600px 로** 만든다. 목록은 어차피 시트를 닫아야 쓴다. */
+@media (min-width: 1280px) {
+  .sheet { width: min(1240px, 94vw); }
 }
 /* 시트 하단 고정 바 (B0-11) — 저장·컨펌 버튼이 스크롤에 묻히면
    긴 시트에서는 **끝까지 내려야만** 저장할 수 있다는 뜻이 된다.
@@ -431,64 +587,249 @@ td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space
    좌우 여백을 음수 마진으로 밀어내야 아래로 지나가는 내용이 배경에 가려진다. */
 .sheet-foot {
   position: sticky; bottom: 0; z-index: 2;
-  margin: 0 -16px; padding: 12px 16px;
-  background: var(--paper); border-top: 1px solid var(--rule-soft);
+  margin: 0 calc(-1 * var(--space-16)); padding: var(--space-12) var(--space-16);
+  background: var(--surface); border-top: 1px solid var(--line);
 }
-@media (min-width: 900px) { .sheet-foot { margin: 0 -24px; padding: 14px 24px; } }
+@media (min-width: 900px) { .sheet-foot { margin: 0 calc(-1 * var(--space-24)); padding: var(--space-16) var(--space-24); } }
 
-.sheet-head { display: flex; gap: 12px; align-items: flex-start; }
-.sheet-head h3 { font-size: 1.05rem; flex: 1; }
-.sheet-close { border: 0; background: none; font-size: 1.5rem; line-height: 1; cursor: pointer; color: var(--ink-3); }
+.sheet-head { display: flex; gap: var(--space-12); align-items: flex-start; }
+.sheet-head h3 { font-size: var(--t-lg); flex: 1; }
+.sheet-close { border: 0; background: none; font-size: var(--t-2xl); line-height: 1; cursor: pointer; color: var(--text-weak); }
 
 /* 원문 대조 — 왼쪽 앱1에 나갈 내용 / 오른쪽 공고 원문 */
-.compare { display: grid; grid-template-columns: 1fr; gap: 14px; }
+.compare { display: grid; grid-template-columns: 1fr; gap: var(--space-16); }
 @media (min-width: 900px) { .compare { grid-template-columns: 1fr 1fr; } }
-.pane { border: 1px solid var(--rule-soft); border-radius: 5px; overflow: hidden; }
+.pane { border: 1px solid var(--line); border-radius: var(--radius-sm); overflow: hidden; }
 .pane > h4 {
-  font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 700;
-  padding: 8px 12px; background: var(--paper-2); color: var(--ink-2); border-bottom: 1px solid var(--rule-soft);
+  font-size: var(--t-2xs); letter-spacing: .08em; text-transform: uppercase; font-weight: 700;
+  padding: var(--space-8) var(--space-12); background: var(--surface-2); color: var(--text-sub); border-bottom: 1px solid var(--line);
 }
-.pane-body { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
-.field { display: flex; flex-direction: column; gap: 4px; }
+.pane-body { padding: var(--space-12); display: flex; flex-direction: column; gap: var(--space-12); }
+.field { display: flex; flex-direction: column; gap: var(--space-4); }
 /* 라벨은 .75rem(11.3px)이라 --ink-3(밝은 화면 3.72:1)를 쓰면 안 된다 — B0의 색 규칙 */
-.field > label { font-size: .8rem; font-weight: 700; color: var(--ink-2); }
-.field .hint { font-size: .8rem; color: var(--ink-2); }
+.field > label { font-size: var(--t-xs); font-weight: 700; color: var(--text-sub); }
+.field .hint { font-size: var(--t-xs); color: var(--text-sub); }
 .field input, .field select, .field textarea { width: 100%; }
 .excerpt {
-  font-size: .85rem; line-height: 1.65; background: var(--paper-2);
-  border-left: 3px solid var(--navy); padding: 9px 11px; border-radius: 0 4px 4px 0;
+  font-size: var(--t-sm); line-height: 1.65; background: var(--surface-2);
+  border-left: 3px solid var(--accent); padding: var(--space-8) var(--space-12); border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   white-space: pre-wrap;
 }
-.kv { display: grid; grid-template-columns: 6.2rem 1fr; gap: 4px 10px; font-size: .85rem; }
-.kv dt { color: var(--ink-3); font-weight: 600; }
+.kv { display: grid; grid-template-columns: 6.2rem 1fr; gap: var(--space-4) var(--space-12); font-size: var(--t-sm); }
+.kv dt { color: var(--text-weak); font-weight: 600; }
 .kv dd { margin: 0; }
+
+/* 저장해 둔 공고 원문 (2026-09-13) — 시트 안에서 이것만 스크롤된다.
+   🔴 높이를 주지 않으면 본문 3,000자가 시트를 통째로 밀어내 아래 버튼이 안 보인다.
+   ⚠️ 시트가 flex 세로 배치라 자식을 눌러 줄이므로 min-height 0 이 필요하다. */
+.src-body {
+  white-space: pre-wrap; word-break: keep-all; overflow-wrap: break-word;
+  font-size: var(--t-sm); line-height: 1.7; color: var(--text);
+  background: var(--surface-2); border: 1px solid var(--line);
+  border-radius: var(--radius-sm); padding: var(--space-12);
+  max-height: 46vh; min-height: 0; overflow-y: auto;
+}
+.src-body:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* 먼저 채울 것 (2026-09-13) — 비어 있는 칸을 맨 위로 올린 묶음.
+   놋쇠(경고)로 테두리만 준다. 🔴 색만으로 말하지 않는다 — '지금 비어 있습니다' 를 글자로 적는다. */
+.field-first {
+  border: 1px solid var(--warn); border-radius: var(--radius-sm);
+  background: var(--warn-weak); padding: var(--space-12);
+  display: flex; flex-direction: column; gap: var(--space-8);
+  margin-bottom: var(--space-8);
+}
+.field-first-h { font-size: var(--t-md); font-weight: 700; color: var(--warn); }
 
 /* 양식 미리보기 */
 .doc-preview {
-  border: 1px solid var(--rule); border-radius: 4px; background: #fff; color: #111;
-  padding: 16px; overflow-x: auto; max-height: 62vh; overflow-y: auto;
+  border: 1px solid var(--rule); border-radius: var(--radius-sm); background: #fff; color: #111;
+  padding: var(--space-16); overflow-x: auto; max-height: 62vh; overflow-y: auto;
 }
 .report {
-  font-family: var(--mono); font-size: .78rem; line-height: 1.6; white-space: pre-wrap;
-  background: var(--paper-2); border: 1px solid var(--rule-soft); border-radius: 5px;
-  padding: 12px; max-height: 60vh; overflow: auto;
+  font-family: var(--mono); font-size: var(--t-xs); line-height: 1.6; white-space: pre-wrap;
+  background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius-sm);
+  padding: var(--space-12); max-height: 60vh; overflow: auto;
 }
 
 /* ── 토스트 / 푸터 ───────────────────────────── */
 .toast {
   position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 60;
-  background: var(--ink); color: var(--paper); padding: 10px 16px; border-radius: 20px;
-  font-size: .86rem; box-shadow: var(--shadow); max-width: 90vw;
+  background: var(--text); color: var(--surface); padding: var(--space-12) var(--space-16); border-radius: var(--radius);
+  font-size: var(--t-sm); box-shadow: var(--shadow); max-width: 90vw;
 }
-.foot { border-top: 1px solid var(--rule-soft); padding: 14px 16px 30px; text-align: center;
-        font-size: .78rem; color: var(--ink-3); }
+.foot { border-top: 1px solid var(--line); padding: var(--space-16) var(--space-16) var(--space-32); text-align: center;
+        font-size: var(--t-xs); color: var(--text-weak); }
 
 /* ── 자격 편집 (D단계) ───────────────────────── */
-.grid2 { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.grid2 { display: grid; grid-template-columns: 1fr; gap: var(--space-12); }
 @media (min-width: 560px) { .grid2 { grid-template-columns: 1fr 1fr; } }
-.pick-lines { display: flex; flex-direction: column; gap: 2px; max-height: 34vh; overflow-y: auto;
-  border: 1px solid var(--rule-soft); border-radius: 5px; padding: 8px; background: var(--paper-2); }
-.pick-line { display: flex; gap: 9px; align-items: flex-start; padding: 7px 6px; border-radius: 4px;
-  cursor: pointer; font-size: .9rem; line-height: 1.45; min-height: 40px; }
-.pick-line:hover { background: var(--paper-3); }
-.pick-line input { margin-top: 3px; width: 18px; height: 18px; accent-color: var(--navy); flex: 0 0 auto; }
+.pick-lines { display: flex; flex-direction: column; gap: var(--space-2); max-height: 34vh; overflow-y: auto;
+  border: 1px solid var(--line); border-radius: var(--radius-sm); padding: var(--space-8); background: var(--surface-2); }
+.pick-line { display: flex; gap: var(--space-8); align-items: flex-start; padding: var(--space-6) var(--space-6); border-radius: var(--radius-xs);
+  cursor: pointer; font-size: var(--t-md); line-height: 1.45; min-height: 40px; }
+.pick-line:hover { background: var(--primary-weak); }
+.pick-line input { margin-top: var(--space-4); width: 18px; height: 18px; accent-color: var(--accent); flex: 0 0 auto; }
+
+/* ---------------- 인스타 (2026-09-12) ----------------
+   게시물 행은 표지 한 장(54×68)을 왼쪽에 둔다 — 글자만으로는 어느 카드인지 못 알아본다. */
+.ig-main { display: flex; gap: var(--space-12); align-items: flex-start; min-width: 0; }
+.ig-thumb { width: 54px; height: 68px; object-fit: cover; border-radius: var(--radius-xs); border: 1px solid var(--line); background: var(--surface-2); flex: 0 0 54px; }
+.ig-acts { display: flex; flex-wrap: wrap; gap: var(--space-6); align-items: center; margin-top: var(--space-8); }
+.ig-tpl { font: inherit; font-size: var(--t-sm); padding: var(--space-4) var(--space-6); border: 1px solid var(--rule); border-radius: var(--radius-sm); background: var(--bg); color: var(--text); }
+.dd.past { color: var(--text-weak); }
+.ig-strip { display: flex; gap: var(--space-8); overflow-x: auto; padding-bottom: var(--space-6); }
+.ig-strip img { width: 200px; height: 250px; object-fit: cover; border-radius: var(--radius-xs); border: 1px solid var(--line); flex: 0 0 auto; }
+.ig-caption { white-space: pre-wrap; font: inherit; font-size: var(--t-sm); line-height: 1.6; background: var(--surface-2); padding: var(--space-12); border-radius: var(--radius-sm); max-height: 40vh; overflow: auto; }
+.ig-tpls { display: grid; gap: var(--space-12); grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.ig-tpl-card { margin: 0; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); overflow: hidden; }
+.ig-tpl-card img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; display: block; }
+.ig-tpl-none { aspect-ratio: 4 / 5; display: flex; align-items: center; justify-content: center; text-align: center; color: var(--text-weak); font-size: var(--t-sm); background: var(--surface-2); }
+.ig-tpl-card figcaption { padding: var(--space-8) var(--space-12); font-size: var(--t-sm); display: flex; flex-direction: column; gap: var(--space-2); }
+.ig-tpl-card figcaption span { color: var(--text-sub); font-size: var(--t-xs); }
+.ig-h3 { font-size: var(--t-md); margin: 0 0 var(--space-6); color: var(--text-sub); font-weight: 650; }
+/* 그래프 — 축·눈금은 뒤로 물러나고(--ink-3), 선 하나는 남색 2px. 글자는 글자 색(계열 색을 입히지 않는다) */
+.ig-chart { width: 100%; height: auto; display: block; }
+.ig-chart .axis { stroke: var(--rule); stroke-width: 1; }
+.ig-chart .tick { font-size: var(--t-2xs); fill: var(--text-sub); font-family: var(--mono); }
+.ig-chart .line { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.ig-chart .dot { fill: var(--accent); stroke: var(--surface); stroke-width: 2; }
+.ig-bars { display: flex; flex-direction: column; gap: var(--space-6); }
+.ig-bar { display: grid; grid-template-columns: 9rem 1fr 3rem; gap: var(--space-8); align-items: center; font-size: var(--t-sm); }
+.ig-bar-l { color: var(--text-sub); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ig-bar-t { height: 10px; background: var(--surface-2); border-radius: var(--radius-xs); overflow: hidden; }
+.ig-bar-t i { display: block; height: 100%; background: var(--accent); border-radius: var(--radius-xs); }
+.ig-bar-v { font-family: var(--mono); text-align: right; }
+.ig-cmt-text { margin: var(--space-4) 0; white-space: pre-wrap; }
+.ig-replies { margin: var(--space-6) 0 0 var(--space-8); font-size: var(--t-sm); color: var(--text-sub); display: flex; flex-direction: column; gap: var(--space-2); }
+.ig-reply-box { display: flex; flex-wrap: wrap; gap: var(--space-6); margin-top: var(--space-8); }
+.ig-reply-box input { flex: 1 1 220px; min-width: 0; font: inherit; font-size: var(--t-sm); padding: var(--space-6) var(--space-8); border: 1px solid var(--rule); border-radius: var(--radius-sm); background: var(--bg); color: var(--text); }
+
+/* ══ 반영 전 전후 대조 (2026-09-14) ══════════════════════════════
+   '한꺼번에 반영' 전에 **무엇이 무엇으로 바뀌는지** 한 줄씩 보여 준다.
+   🔴 옛 값은 흐리게 + 취소선, 새 값은 굵게 — 색만으로 가르지 않는다(색을 못 보는 사람).
+   ⚠️ `--text-weak` 는 3.30:1 이라 14px 미만에 쓰면 안 된다 → 이 줄은 --t-md(14.5px)다. */
+.diffs { margin-top: var(--space-6); display: flex; flex-direction: column; gap: var(--space-2); }
+.diffrow {
+  display: grid;
+  grid-template-columns: minmax(6em, auto) 1fr auto 1fr auto;
+  gap: var(--space-4) var(--space-8);
+  align-items: baseline;
+  font-size: var(--t-md);
+  padding: var(--space-4) 0;
+  border-top: 1px solid var(--line);
+}
+.diff-k { color: var(--text-sub); font-weight: 650; }
+.diff-a { color: var(--text-weak); text-decoration: line-through; word-break: break-all; }
+.diff-arrow { color: var(--text-weak); }
+.diff-b { font-weight: 700; word-break: break-all; }
+.diffrow.is-bad .diff-b { color: var(--red); }
+.diffrow.is-bad { background: var(--red-weak); }
+/* 좁은 화면에서는 한 칸으로 접는다 — 다섯 칸이 들어갈 자리가 없다 */
+@media (max-width: 720px) {
+  .diffrow { grid-template-columns: 1fr; }
+  .diff-arrow { display: none; }
+}
+/* 실행 버튼이 잠겼을 때 — '왜 안 눌리지' 가 되지 않게 눈에 보이게 */
+.btn[aria-disabled='true'], .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ══ 로봇 입력 칸 (2026-09-14) ══════════════════════════════════
+   입력을 받는 로봇이 여럿이라 한 줄에 칸이 여러 개 붙는다. */
+.runin {
+  display: flex; flex-direction: column; gap: var(--space-4);
+  margin-top: var(--space-6); font-size: var(--t-md); color: var(--text-sub);
+}
+.runin select, .runin input { width: 100%; }
+
+/* ══ 교외인데 한 학교에만 보이는 공고 (C2) ══════════════════════ */
+[data-src-scan] > summary {
+  cursor: pointer; font-size: var(--t-lg); font-weight: 650;
+  padding: var(--space-12) 0; border-top: 1px solid var(--rule);
+}
+.scope-count { margin-top: var(--space-4); font-size: var(--t-md); color: var(--text-sub); }
+.pickbox {
+  display: inline-flex; align-items: center; gap: var(--space-6);
+  font-size: var(--t-md); color: var(--text-sub); cursor: pointer;
+}
+/* 앱 공용 네모 — 전역 appearance 를 끄지 않아도 보이게 크기·색을 준다(.pick 과 같은 값) */
+.pickbox input { width: 19px; height: 19px; accent-color: var(--accent); cursor: pointer; }
+/* 원인 줄 아래 한 줄 설명 · 로봇 목록 아래 '여기서 부르지 않는 것'
+   (`.hint` 는 지금 `.field .hint` 에만 값이 있어 그대로 두면 본문 크기로 뜬다) */
+.pgroup > .hint, [data-robot-skip] {
+  display: block; margin: var(--space-4) 0 0;
+  font-size: var(--t-md); color: var(--text-sub);
+}
+
+/* ══ 손짓에 답하는 방식 — 앱1 '③ 상호작용' 을 그대로 옮겼다 (2026-09-14) ══════════
+   개발자 지시 *"디자인 측면에서 전혀 바뀌지 않은 것 같아. 앱1의 디자인 체계를 따라줘"*.
+
+   🔴 **토큰 값이 같은 것과 화면이 같아 보이는 것은 다른 일이다.** 2026-09-13 에 색·모서리·
+   글자 토큰을 앱1 실효값으로 옮겼는데, 정작 컴포넌트가 그 토큰을 **다른 단계로** 쓰고 있어
+   눈에는 하나도 안 바뀌었다(모서리 9px vs 앱1 13~19px · 으뜸 버튼 밝은 파랑 vs 잉크 남색 ·
+   그림자 없음 vs --shadow-btn · 굵기 600 vs 700 · 누름 반응 없음 vs scale(0.975)).
+   그래서 이번엔 **그려 놓고 계산된 값을 재어** 맞췄다. 관문 verify/ui-tone.mjs ⑨.
+
+   ⚠️ 앱1 은 '떠 있는 것에만 그림자' 규칙이라 목록 카드는 평소 그림자가 없다 — 손이 닿을
+   때만 --shadow-lift 로 들린다. 카드에 상시 그림자를 붙이지 말 것. */
+.btn, .chip, .ftag, .tab, .row, .card, .pgroup, .pick-line, .sheet-close, .job-close, .group-head {
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease),
+              border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease),
+              transform 0.14s var(--ease);
+}
+/* 누르면 살짝 들어간다 — 앱1 과 같은 비율 **0.95**(`style.css:4306` · 2026-09-11 개발자가
+   정한 Apple 20번 "누를 수 있는 것 전부 같은 값"). ⚠️ 0.975 는 그 위에서 **덮인 옛 값**이다
+   — 이 파일 첫 판이 그것을 베껴 왔다(2026-09-14 코드 리뷰). */
+.btn:active, .chip:active, .ftag:active, .sheet-close:active, .job-close:active { transform: scale(0.95); }
+.card:active, .pgroup:active { transform: scale(0.99); }
+/* 🔴 목록 줄(.row)은 줄이지 않는다 — 테두리 안에 꽉 찬 줄이라 줄어들면 가장자리가 잘린다.
+   눌리는 느낌은 면 색(--primary-weak)이 이미 맡고 있다.
+   🔴 **요약 카드를 손이 닿을 때 들어 올리지 않는다** — 앱1 은 그 들림을 `style.css:2504`
+   에서 **일부러 껐다**(`.sch-card:hover { transform: none; box-shadow: none }`). 앞쪽 2337줄의
+   `translateY(-1px) + --shadow-lift` 는 죽은 규칙이고, 이 파일 첫 판이 그것을 근거로 삼았다
+   (2026-09-14 코드 리뷰). 게다가 카드는 통째로 누르는 것이 아니라 안의 버튼을 누른다. */
+
+/* ── 등장 — 앱1 '⑥ 등장'과 같다. 화면이 툭 튀어나오지 않고 살짝 올라오며 도착한다.
+   🔴 **화면(.screen)에만 건다.** 앱1 은 목록 카드에도 차례로 걸지만, 이 화면은 버튼 하나를
+   누를 때마다 카드를 다시 그리므로 거기 걸면 **누를 때마다 전부 다시 깜빡인다.**
+   탭을 바꿀 때만 도착하는 것이 맞다(display:none → flex 에서만 다시 돈다).
+   ⚠️ 움직임을 줄이는 설정에서는 위쪽 `*{animation:none!important}` 이 이미 끈다. */
+/* 🔴 **이 움직임에는 transform 을 쓰지 않는다** — 앱1 의 taste-in 은 10px 떠오르지만,
+   이 화면에는 `position: fixed` 인 선택 바가 화면(.screen) **안에** 있어서 transform 이
+   그 기준(containing block)을 가로챈다.
+   겪은 순서(전부 실측):
+     ① `both` 로 두었더니 끝난 뒤에도 크롬이 `transform: none` 을 **단위행렬**로 남겨
+        선택 바가 영구히 4,054px 아래로 밀렸다(관문 verify-admin 이 잡았다).
+     ② `backwards` 로 고치니 영구 문제는 사라졌는데, **도는 0.22초 동안은 그대로**여서
+        작업대 탭을 열 때마다 선택 바가 사라졌다 나타났다(잰 값: 70ms 에 top 3,993 →
+        470ms 에 top 822 · 2026-09-14 코드 리뷰).
+   그래서 **떠오름을 버리고 밝아짐만 남겼다.** 앱1 과 다른 유일한 자리이고, 이렇게 두면
+   나중에 이 화면 안에 fixed 를 하나 더 넣어도 같은 일이 안 난다. 되돌리지 말 것. */
+@keyframes taste-in { from { opacity: 0; } to { opacity: 1; } }
+.screen { animation: taste-in var(--dur) var(--ease) backwards; }
+
+/* ── 손가락 기기 보정 — hover 가 눌린 채 굳지 않게 (앱1 '⑧ 손가락 기기 보정' 과 같은 방식)
+   🔴 **새 hover 규칙은 반드시 이 묶음에도 적는다.** 앱1 이 그 안내를 style.css 에 적어 두었고,
+   이 파일은 그것을 안 지켜서 실측에서 잡혔다 — 390×844 · hasTouch 로 카드를 탭하니 손을
+   떼었는데도 들린 채(matrix(1,0,0,1,0,-1) + 그림자) 남아 있었다(2026-09-14 코드 리뷰).
+   ⚠️ 그림자·여백은 다시 적지 않는다 — 여기서 원래 값을 되풀이하면 토큰 밖 값이 한 벌 는다. */
+@media (hover: none) {
+  /* 🔴 **적는 차례가 곧 규칙이다** — 아래 다섯은 특이도가 같아 뒤엣것이 이긴다.
+     차례를 섞으면 빨간 '지우기' 버튼의 테두리나 으뜸 버튼의 남색이 손가락 기기에서만
+     회색으로 풀린다(모양이 같은 특이도끼리 부딪히는 자리다). */
+  .btn:hover { border-color: var(--rule); background: var(--surface); }
+  .btn.danger:hover { border-color: color-mix(in srgb, var(--red) 40%, transparent); }
+  .btn.good:hover { border-color: color-mix(in srgb, var(--green) 45%, transparent); }
+  .btn-ghost:hover { background: transparent; border-color: var(--line); }
+  .btn-primary:hover { background: var(--primary); border-color: var(--primary); box-shadow: var(--shadow-btn); }
+
+  .chip:hover { background: var(--surface); color: var(--text-sub); }
+  .chip.on:hover { color: var(--text); }
+
+  .tab:hover { color: var(--text-sub); }
+  .tab.active:hover { color: var(--text); }
+
+  .pick-line:hover { background: transparent; }
+  /* 🔴 목록 줄은 앱1 과 다르게 **면까지 되돌린다** — 이 화면에서는 체크로 줄을 고르므로,
+     눌린 채 남은 회색이 '고른 줄'로 읽힌다(앱1 의 공고 카드에는 그런 뜻이 없다). */
+  .row:hover { background: transparent; }
+}

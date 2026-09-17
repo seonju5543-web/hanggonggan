@@ -19,8 +19,10 @@ const PR = (typeof module !== 'undefined' && module.exports)
   /* 🔴 브라우저에서는 **전역 함수**로 쓴다 — 여기에 이름을 빠뜨리면 Node 검사는 전부
      통과하는데 앱은 첫 카드에서 죽는다. `headRest`(section-head)에 이어 `caseBranch`도
      같은 실수를 했다(2026-08-24). 아래 회귀가 브라우저 순서로 실어 실제로 불러 본다. */
-  : { parseLine, gradOnly, caseBranch, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM };
+  : { parseLine, parseDegree, gradOnly, gradTarget, mentionsUndergrad, caseBranch, unaskedAttr, REGIONS, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM };
 const PR2 = PR;   // requirementLines가 쓰는 별칭 (선언 순서 때문에 이름만 따로 둔다)
+/* 시·도 이름은 parse-requirements 가 갖고 있다 — 여기 베끼면 두 벌이 된다 */
+const PR_REGIONS = PR.REGIONS || [];
 
 /* 자격 진단 — 프로필과 공고의 요건을 대조해 상태·사유·부족정보를 돌려준다 */
 function evaluate(sch, p) {
@@ -30,7 +32,15 @@ function evaluate(sch, p) {
   let ok = true;
 
   const flags = (p && p.flags) || [];
-  const gpaExempt = p.status === 'freshman';
+  /* 🔴 **옛 학적상태 값을 보고 있었다** (2026-09-09 코드 리뷰에서 잡았다).
+     온보딩이 저장하는 값은 `신입학` 인데 여기는 `freshman` 을 봤다. app.js 의
+     `LEGACY_STATUS` 가 옛 프로필까지 새 값으로 바꿔 주므로 이 비교는 **영영 참이 안 된다.**
+     결과: 온보딩이 *"직전학기 평점 (4.5 만점 · 신입학은 공란 가능)"* 이라고 직접 안내해
+     평점을 비운 신입생이, 국가장학금 Ⅰ·Ⅱ유형과 국가근로장학금에서 전부 '정보 입력 필요' 로
+     떨어지고 신청 버튼이 잠겼다(브라우저로 온보딩을 끝까지 눌러 실측).
+     이 저장소가 이미 아는 **'상수의 뜻이 바뀌면 그 값을 읽는 곳이 조용히 죽는다'** 유형이다.
+     관문: test-collector '옛 프로필 값' 절이 저장하는 값과 읽는 값을 대조한다. */
+  const gpaExempt = p.status === '신입학';
 
   if (e.minGpa != null && !gpaExempt) {
     if (p.gpa == null) missing.push('직전학기 평점');
@@ -48,7 +58,7 @@ function evaluate(sch, p) {
     ok = false; reasons.push(`${e.years.join('·')}학년만 지원 가능`);
   }
 
-  if (e.freshmanOnly && p.status !== 'freshman') {
+  if (e.freshmanOnly && p.status !== '신입학') {
     ok = false; reasons.push('신입학 첫 학기 학생만 지원 가능');
   }
 
@@ -71,7 +81,7 @@ function evaluate(sch, p) {
   }
 
   if (e.seoulOnly) {
-    if (p.region !== 'seoul') { ok = false; reasons.push('서울 거주자만 지원 가능'); }
+    if (p.region !== '서울') { ok = false; reasons.push('서울 거주자만 지원 가능'); }
     else reasons.push('거주지 요건 충족 (서울)');
   }
 
@@ -88,6 +98,56 @@ function evaluate(sch, p) {
   if (e.schoolOnly) {
     if (p.school !== e.schoolOnly) { ok = false; reasons.push(`${e.schoolOnly} 재학생만 지원 가능`); }
     else reasons.push(`재학 대학 공고 (${e.schoolOnly})`);
+  }
+
+  /* 🔴 이중수혜 (2026-08-27 개발자 지적으로 신설).
+     공고 원문 66건에 `타 재단 장학금 중복수혜 불가` 같은 조항이 있는데, 그동안 학생이
+     보는 자리에는 **0건** 노출이었다. 이 조항은 자격 절에도 제외 절에도 안 살고
+     신청기간·장학금액·제출서류 절에 흩어져 있어서, 절 단위로 자격을 읽는 구조가
+     통째로 버리고 있었다. 결과는 이 저장소가 가장 싫어하는 실패다 — 이미 다른
+     장학금을 받는 학생이 서류를 다 준비하고 지원했다가 탈락한다.
+
+     ⚠️ 모르면 판정하지 않는다. `scholarships` 가 null(=아직 안 물어봄)이면 missing 으로
+        두고, 없다고 단정하지 않는다. 이 앱의 '모른다고 말할 자유' 규칙 그대로다. */
+  const ex = sch.exclusivity;
+  /* 🔴 scope 가 'external'(**교외(민간) 장학금 전부**와 못 겹침) 인 것만 판정에 쓴다.
+     `복지장학 2는 복지장학 1과 중복 불가`
+     같은 **교내끼리의 배타**를 외부 재단 장학금 보유자에게 적용하면 멀쩡한 학생이 떨어진다.
+     원문이 대외·교외·타 재단이라고 못박은 것만 자격으로 본다. */
+  if (ex && ex.kind === 'forbidden' && ex.scope === 'external') {
+    const held = p && p.scholarships;
+    if (!Array.isArray(held)) missing.push('지금 받고 있는 장학금');
+    /* 🔴 막는 것은 **교외(외부 재단)** 하나뿐이다. 국가장학금·교내·근로는 안 막는다 —
+       원문이 `타 민간재단` 이라고 적어도 그건 **공기관을 뺀 말**이고(개발자 확인 2026-08-28),
+       공고들도 대개 `국가장학금 및 교내장학금만 중복 가능` 이라고 적는다.
+       여기에 kosaf 를 넣으면 국가장학금 받는 학생이 통째로 떨어진다 — 거의 모든 학생이다. */
+    else if (held.includes('external')) {
+      ok = false;
+      reasons.push('이미 받고 있는 외부 재단 장학금이 있어 지원할 수 없어요');
+    } else reasons.push('중복 수혜 조건 충족 (외부 재단 장학금 없음)');
+  }
+
+  /* 🔴 **공고 원문에 적힌 요건도 판정에 쓴다** (2026-08-29 개발자 지시).
+     예전에는 구조화된 `eligibility` 규칙만 봤다. 그런데 등록 공고 대부분은 그 칸이
+     비어 있고 요건이 **원문 자격 줄에만** 있어서, 원문에 `직전학기 18학점 이상,
+     평점 4.0/4.5 이상` 이라고 적힌 공고가 평점 3.2·14학점 학생에게 '지원 가능'으로
+     떴다(실측 6건). 배지는 '지원 자격 미달'이라 맞게 말하는데 **신청 버튼은 열려 있어**
+     학생이 서류를 준비하다 헛수고한다 — 이 저장소가 가장 싫어하는 실패다.
+
+     ⚠️ **틀린 미달은 못 받는 것보다 나쁘다.** 그래서 아무 줄이나 쓰지 않는다.
+        `fitDetail().fails` 는 이미 네 겹의 관문을 통과한 것만 담는다:
+          ① 확신이 높은 조건만 (`conf === HIGH`) — 예외 문구(`단,`·`다만`)가 붙었거나
+             한 줄에 조건이 여러 개면 LOW 라 미달을 안 낸다
+          ② 프로필에 그 값이 **있을 때만** (없으면 'unknown')
+          ③ 환산이 불확실하면 안 낸다 (백분위 성적은 미달 판정 자체를 안 한다)
+          ④ 여러 장학금이 묶인 공고·선택지 묶음·지급액 구간표는 제외
+        그래서 여기서 미달이 나오면 **원문 숫자와 프로필 숫자를 곧바로 비교한 결과**다. */
+  if (ok && p) {
+    const fails = (fitDetail(sch, p).fails || []);
+    if (fails.length) {
+      ok = false;
+      reasons.push('공고에 적힌 요건에 미달해요: ' + fails[0]);
+    }
   }
 
   if (!ok) return { status: 'ineligible', reasons, missing };
@@ -122,9 +182,30 @@ const FIT_MIN = 5;       // 미달이어도 5 — 파싱이 틀렸을 수 있다
 
 /* 파싱된 조건 하나를 학생과 맞춰 본다 → 'pass' | 'fail' | 'unknown'
    🔴 **모르면 unknown**이다. 틀린 fail은 학생에게서 장학금을 뺏는다. */
-function judgeCond(c, p) {
+/* 등급 → 4.5 만점 평점 (2026-08-30). `B0` 는 `B` 와 같은 뜻이다(학교가 둘 다 쓴다). */
+const LETTER_GPA = { 'A+': 4.5, A: 4.0, A0: 4.0, 'B+': 3.5, B: 3.0, B0: 3.0, 'C+': 2.5, C: 2.0, C0: 2.0 };
+
+/* 🔴 **이 앱의 프로필은 학부다** (2026-09-12 · 노션 핵심-4). 온보딩이 받는 학적은
+   1~4학년 + 재학·신입학·복학예정·휴학·초과학기·졸업유예뿐이라(index.html `#in-year`·
+   `#in-status`) 학위 과정을 따로 묻지 않는다. 그 사실을 **여기 한 곳에서만** 말한다 —
+   온보딩에 학위 칸이 생기면 이 함수만 그 값을 읽으면 된다(그때 `p.degree` 를 쓴다).
+   ⚠️ 여기서 'unknown' 을 내지 말 것 — 모른다고 하면 학위 축이 통째로 죽어, 대학원 전용
+      공고가 다시 '자격 미확인'으로 목록 위에 뜬다(2026-09-12 개발자 지적으로 고친 자리). */
+function degreeOf(p) {
+  const d = p && p.degree;
+  return (d === 'grad' || d === 'undergrad') ? d : 'undergrad';
+}
+
+function judgeCond(c, p, ctx) {
   const S = PR.GRADE_SCALE;
   switch (c.kind) {
+    case 'degree': {
+      const mine = degreeOf(p);
+      if (c.want === 'both') return 'pass';
+      /* 공고의 다른 줄이 학부를 대상으로 말했으면, 이 줄만 보고 떨어뜨리지 않는다(noticeCtx) */
+      if (c.want === 'grad' && ctx && ctx.anyUndergrad) return 'unknown';
+      return c.want === mine ? 'pass' : 'fail';
+    }
     case 'grade': {
       if (p.gpa == null) return 'unknown';
       /* 🔴 단위가 다르면 **떨어뜨리지 않는다**(설계 조건 ⑥). 백분위 70을 평점 70으로 읽으면
@@ -135,7 +216,18 @@ function judgeCond(c, p) {
         const pct = p.gpa / 4.5 * 100;
         return pct >= c.min + 10 ? 'pass' : 'unknown';   // 환산표가 학교마다 달라 미달은 안 낸다
       }
-      return 'unknown';                                   // B학점 등 — 환산 불가
+      /* 🔴 **등급도 환산한다** (2026-08-30 개발자 지적: "성적 단위 27줄 정도는 환산할 수 있을텐데").
+         4.5 만점의 표준 대응은 A+ 4.5 · A 4.0 · B+ 3.5 · B 3.0 · C+ 2.5 · C 2.0 이다.
+         ⚠️ 그런데 **학교마다 기준이 다르다** — 이 데이터 안에 그 경고가 직접 적혀 있다:
+            `특정대학 B학점이 2.7 기준인 대학은 신청서 접수 시 유의바람`.
+         그래서 백분위와 **같은 규칙**을 쓴다: 넉넉히 넘으면 통과, 모자라면 **미달을 안 낸다**.
+         표준값(높은 쪽)으로 재므로 통과 판정만으로도 안전하다. */
+      if (c.scale === S.letter) {
+        const need = LETTER_GPA[String(c.min || '').toUpperCase().replace(/학점/g, '')];
+        if (need == null) return 'unknown';
+        return p.gpa >= need ? 'pass' : 'unknown';
+      }
+      return 'unknown';
     }
     case 'bracket':
       if (p.bracket == null) return 'unknown';
@@ -173,9 +265,16 @@ function judgeCond(c, p) {
       return 'unknown';   // 그 밖에는 단정하지 않는다
     }
     case 'flags': {
-      const f = p.flags || [];
+      /* 교환학생은 flags 배열이 아니라 따로 받는다(온보딩 체크박스) — 같은 자리에서 본다 */
+      const f = (p.flags || []).concat(p.exchange ? ['exchange'] : []);
       if (!f.length) return 'unknown';                    // 안 고른 것과 해당 없는 것은 다르다
-      return c.anyOf.some((k) => f.includes(k)) ? 'pass' : 'unknown';
+      const has = c.anyOf.some((k) => f.includes(k));
+      /* 🔴 **제외 줄에서는 뜻이 뒤집힌다** (2026-08-30 전수 대조에서 발견 — 원래부터 있던 버그).
+         `장애학생은 지원 제외` 에 장애 학생이 'pass' 로 나와 **제외 조항이 한 번도 안 걸렸다.**
+         이 파일의 규약은 '제외 줄에서 judgeCond 가 fail 이면 그 학생이 걸린 것'이다
+         (국적이 이미 그렇게 돼 있다). 같은 규약을 따른다. */
+      if (c.exclude) return has ? 'fail' : 'pass';
+      return has ? 'pass' : 'unknown';
     }
     case 'nationality':
       if (!p.nationality) return 'unknown';
@@ -189,9 +288,101 @@ function judgeCond(c, p) {
       const age = new Date().getFullYear() - Number(p.birthYear);
       return age <= c.max ? 'pass' : 'fail';
     }
+    /* 🔴 학교 이름이 걸린 요건 — 우리가 아는 것으로 판정한다 (2026-08-30).
+       `충남대학교 재학 중인 학부생` 에 한국외대 학생이 ✓ 로 떠 있었다.
+       ⚠️ `한양대` vs `한양대학교`, `경북대` vs `경북대학교` 처럼 표기가 갈리므로
+          끝의 `학교`를 떼고 견준다. `서울대` 와 `서울시립대` 는 서로 안 걸린다(확인함). */
+    case 'school': {
+      if (!p.school) return 'unknown';
+      const norm = (x) => String(x).replace(/\s/g, '').replace(/학교$/, '');
+      const mine = norm(p.school);
+      const hit = c.anyOf.some((n) => {
+        const a = norm(n);
+        return a === mine || mine.startsWith(a) || a.startsWith(mine);
+      });
+      /* 🔴 제외 줄에서는 뜻이 뒤집힌다 — `서울대학교 학생은 제외` 는 **서울대 학생이** 걸린다.
+         안 뒤집었더니 정반대가 됐다: 서울대 학생은 멀쩡히 통과하고 **남이 미달**이 됐다
+         (2026-08-30 개발자 지적 "그 학교 학생이 쓰면 x 도 뜨는 거지?" — 안 떴다). */
+      if (c.exclude) return hit ? 'fail' : 'pass';
+      return hit ? 'pass' : 'fail';
+    }
+    /* 🔴 학과·전공·계열 (2026-08-30 개발자 지적: "왜 내 과에 천문 이런 게 없는데도
+       체크표시가 되어 있는지 모르겠네"). 프로필에 학과명·계열이 **둘 다 있는데**
+       조건 종류가 없어 이 축이 통째로 안 읽혔고, 안 읽힌 절은 보이지 않으므로
+       같은 줄의 소득구간 하나가 맞으면 줄 전체에 ✓ 가 붙었다(실측 9줄).
+       ⚠️ **어긋남을 함부로 미달이라 부르지 않는다** — 계열 분류가 재단과 우리가 다르고
+          `관련학과` 는 테두리가 흐리다. 그런 줄은 어긋나면 'unknown' 이다. */
+    case 'major': {
+      const norm = (x) => String(x).replace(/\s/g, '').replace(/(학과|학부|전공|과)$/, '');
+      const mine = p.major ? norm(p.major) : '';
+      /* 🔴 **부분 일치로 잇지 않는다** — `국제학부` 요건에 국제통상학과 학생이 ✓ 를 받았다.
+         꼬리말을 떼고 나면 `경영`=`경영학과`·`에너지융합공`=`에너지융합공학과` 처럼
+         제 짝은 그대로 같아진다(전수 대조: 부분 일치로 더 잡히는 것은 그 오탐 하나뿐이었다). */
+      const like = (a, b) => !!a && a === b;
+      /* ① 재단이 적어 준 포함 단어 — `학과명 포함 단어: 물리, 천문` */
+      if (c.words) {
+        if (!p.major) return 'unknown';
+        const hit = c.words.some((w) => String(p.major).includes(w));
+        return c.exclude ? (hit ? 'fail' : 'pass') : (hit ? 'pass' : 'fail');
+      }
+      /* ② 계열이 맞으면 그것으로 통과다 — **이름 대조보다 먼저 본다.**
+         `공학계열 컴퓨터학과` 같은 줄에서 기계공학과 학생이 이름만 어긋났다고 미달이 된다. */
+      const trackHit = c.tracks && p.track && c.tracks.includes(p.track);
+      if (trackHit) return c.exclude ? 'fail' : 'pass';
+      /* ③ 학과·학부 이름 */
+      if (c.names && mine) {
+        const hit = c.names.some((n) => like(mine, norm(n)));
+        if (hit) return c.exclude ? 'fail' : 'pass';
+        if (c.fuzzy) return 'unknown';
+        return c.exclude ? 'pass' : 'fail';
+      }
+      /* ④ 계열이 어긋난 것은 **모른다** — 재단 7분류와 우리 8분류가 안 맞는다 */
+      return 'unknown';
+    }
     case 'residence': {
+      /* 🔴 지역 요건은 **대부분 시·군 단위**다 (2026-08-30 개발자 지시).
+         시·도만 보던 시절에는 `안양시에 주소를 두고` 를 아예 판정하지 못해
+         한국장학재단 등록 116곳 중 83곳(72%)이 통째로 '자격 미확인'이었다.
+         🔴 `관내`는 **그 재단의 관할**을 뜻한다 — 줄만 봐서는 어느 시·군인지 알 수 없어
+            공고를 낸 곳(주관 기관 이름)에서 뽑아 ctx.homeCity 로 받는다.
+         ⚠️ 시·군을 못 맞춰도 **'fail' 이 아니라 'unknown'** 이다 — 거주 요건은 예외가 많고
+            (`관외 거주 인정`), 틀린 미달은 못 받는 것보다 나쁘다. 시·도도 같은 규칙이다. */
+      /* 🔴 **지역 이름이 늘 거주지인 것은 아니다 — 판정하지 않는 갈래가 둘 있다**
+         (2026-09-13 · 노션 백로그 G-6. 가르는 곳은 parse-requirements 의 parseResidence).
+           about:'school' = `울산시 소재 대학에 재학 중인 학생` → 앱은 **학교 소재지를 모른다**
+           about:'origin' = `울산시 소재 고등학교 졸업자`       → 앱은 **출신 고교를 안 묻는다**
+         거주지로 읽으면 **서울 학생이 포항공대에 다니는 경우**가 틀린 미달이 된다 —
+         틀린 미달은 못 받는 것보다 나쁘다.
+         ⚠️ 이 줄을 지우면 아래 시·군 규칙이 이어받아 **'fail' 을 낸다.** 지금은 conf 가 LOW 라
+            줄 단위에서는 '모른다'로 누그러지지만, 그건 이 갈래를 위해 만든 장치가 아니다 —
+            누가 conf 를 올리는 순간 조용히 틀린 미달이 된다. 뜻을 여기에 적어 둔다.
+         ⚠️ 그리고 **울산 사는 학생에게 ✓ 를 주지도 않는다** — 그 학생의 학교가 울산에 있는지
+            우리는 여전히 모른다. 사는 곳이 맞는 것과 학교가 거기 있는 것은 다른 이야기다. */
+      if (c.about && c.about !== 'home') return 'unknown';
+      /* 🔴 **제외 줄의 지역 이름은 판정하지 않는다** (2026-09-13 코드 리뷰가 잡은 것을 실측해 고침).
+         `(재)영동군민장학회 장학생으로 선발되어 재학 중 2회 이상 장학금을 받은 자` 는
+         **이미 두 번 받은 사람을 빼는 줄**인데, 아래 시·군 규칙이 이걸 '영동군에 살아야 한다'로
+         읽어 서울 학생이 **미달**이 됐다(실측 — 한 번도 받은 적 없는 학생이다).
+         제외 줄에 나오는 지역 이름은 대개 **주관 기관 이름**이지 학생의 거주 요건이 아니다.
+         ⚠️ 뒤집어서 '안 살면 통과'로 만들지도 않는다 — 그러면 이번엔 영동군 학생이 미달이 된다.
+            줄은 '지원 제외 대상' 칸에 **원문 그대로** 보이므로(원칙 8-1) 학생이 직접 읽는다.
+            판정하지 않는 쪽이 안전한 실패다. */
+      if (c.exclude) return 'unknown';
+      const cities = (c.cities || []).concat(c.inArea && ctx && ctx.homeCity ? [ctx.homeCity] : []);
+      const myCities = [p.regionCity, p.parentRegionCity].filter(Boolean);
+      if (cities.length) {
+        if (!myCities.length) return 'unknown';                 // 아직 안 고른 학생
+        if (cities.some((r) => myCities.includes(r))) return 'pass';
+        /* 🔴 학생이 **직접 고른** 시·군과 다르면 미달이다 — 안양시 학생에게 광양시 장학금은
+           받을 수 없는 것이다. 예전에는 여기서도 'unknown' 을 내서, 시·군을 받아 놓고도
+           지역 요건이 판정되지 않았다(실측 102줄 중 2줄만 판정됐다).
+           ⚠️ 예외 문구(`단,`·`관외 거주 인정`)가 있는 줄은 conf 가 LOW 라 위 lineVerdict 가
+              ✕ 로 만들지 않는다 — 그 안전장치가 이 판정을 감당한다. */
+        return 'fail';
+      }
+      if (c.inArea) return 'unknown';                           // 관할을 못 알아냈다
       const mine = [p.region, p.parentRegion].filter(Boolean);
-      if (!mine.length) return 'unknown';
+      if (!mine.length || !c.anyOf.length) return 'unknown';
       return c.anyOf.some((r) => mine.some((x) => x.includes(r) || r.includes(x))) ? 'pass' : 'unknown';
     }
     default: return 'unknown';
@@ -209,7 +400,11 @@ function judgeCond(c, p) {
    ⚠️ **'no'는 확신이 높을 때만** 낸다. ✕는 0%와 같은 무게의 판정이다. */
 function lineVerdict(text, p, isExclude, ctx) {
   if (!p) return null;
-  if (PR.gradOnly(text)) return null;          // 대학원 전용 줄 — 학부생과 무관
+  /* 🔴 **표의 한 칸만** 건너뛴다 (2026-09-12 · 노션 핵심-4). 예전에는 `gradOnly` 로
+     대학원을 말하는 줄을 **전부** 지나쳤다 — 그래서 `국내 … 대학원 석/박사 과정 재학생`
+     처럼 대상을 말하는 문장이 화면에서 아무 표시 없이 사라졌다. 지금은 학위 축(parseDegree)이
+     판정하고, 학부/대학원 기준을 나란히 적은 표(`일반대학원생 : 평점 4.0`)만 무관하다. */
+  if (PR.gradTarget(text) === 'label') return null;
   /* 🔴 경우별 분기(`신입생:` `재학생:` `복학생 및 편입생:`)는 **내 경우만** 판정한다
      (2026-08-24 개발자 지적). 안 그러면 재학생인데 `신입생:` 줄에도 ✓가 붙는다.
      프로필에 없는 경우(편입생·학년제)는 해당 여부를 모르므로 아무 표시도 안 한다. */
@@ -220,25 +415,59 @@ function lineVerdict(text, p, isExclude, ctx) {
   if (ctx && ctx.multi) return null;                        // 장학금이 여럿 묶인 공고
   if (ctx && ctx.inAnyOf && ctx.inAnyOf.has(text)) {        // 선택지 묶음의 한 갈래
     const { conds: cs } = PR.parseLine(text, !!isExclude);
-    for (const c of cs) if (judgeCond(c, p) === 'pass') return 'ok';
+    for (const c of cs) if (judgeCond(c, p, ctx) === 'pass') return 'ok';
     return null;                                            // 떨어져도 ✕는 안 친다
   }
   const { conds } = PR.parseLine(text, !!isExclude);
   let seen = null;
+  /* 🔴 **읽어 낸 조건이 하나라도 판정 안 되면 ✓ 를 치지 않는다** (2026-08-30 개발자 지적).
+     예전에는 `if (v === 'pass') seen = 'ok'` 라, **한 조건만 맞으면 줄 전체에 ✓** 가 붙었다.
+     그래서 이런 줄들이 '충족'으로 떠 있었다(전수 대조로 8건 확인):
+       `취약계층 국민연금수급자 또는 그 자녀(손자녀)로서 … 재학 중인 자`  ← '재학'만 맞았다
+       `보호자가 6개월 이상 원주시에 거주하는 만 24세 이하의 둘째아 이상 자녀`  ← '나이'만 맞았다
+       `세대주가 만 65세 이하`
+     우리가 **묻지도 않은 처지**를 확인했다고 말한 셈이다. 틀린 안심은 틀린 미달만큼 나쁘다.
+     ⚠️ 표시를 없앨 뿐 ✕ 를 만들지 않는다 — 모르는 것은 모른다고 두는 쪽이다. */
+  let unknown = false;
   for (const c of conds) {
     /* 지급액 구간표는 요건이 아니다 — 공고를 통째로 봐야 알 수 있어 맥락으로 받는다
        (한 공고에 `4분위 이하`·`5~6분위`가 함께 있으면 표다). 이걸 모르면
        퍼센트는 멀쩡한데 화면에만 ✕가 뜬다(2026-08-24 개발자 지적). */
     if (ctx && ctx.bracketTable && c.kind === 'bracket') continue;
-    const v = judgeCond(c, p);
+    const v = judgeCond(c, p, ctx);
     if (v === 'fail' && c.conf === PR.HIGH) return 'no';
-    if (v === 'pass') seen = 'ok';
+    /* 🔴 확신이 낮은 미달은 **사라지는 게 아니라 '모른다'** 다 (2026-08-30 개발자 지적:
+       "무지성 체크"). 예전에는 그냥 흘려버려서, 어긋난 절이 있는데도 같은 줄의 다른 절이
+       맞으면 ✓ 가 붙었다 — `(외국인 포함)` 때문에 확신이 낮아진 `국제학부 재학생` 줄이
+       영어학과 학생에게 충족으로 떴다. ✕ 를 만들지는 않는다(확신이 없으니까). */
+    if (v === 'fail') unknown = true;
+    else if (v === 'pass') seen = 'ok';
+    else if (v === 'unknown') unknown = true;
   }
-  return seen;
+  /* 프로필에 칸이 없는 처지를 물은 줄이면 충족이라고 말하지 않는다 (parse-requirements 참조) */
+  if (seen === 'ok' && PR.unaskedAttr(text, conds)) return null;
+  return unknown ? null : seen;
 }
 
 /* 공고 단위로만 알 수 있는 것 — 줄 하나만 봐서는 판단할 수 없다. 퍼센트와 ✓/✗가
    **같은 맥락**을 봐야 갈라지지 않는다. */
+/* 🔴 `관내`가 어디인가 — **공고를 낸 곳의 이름**에서 뽑는다 (2026-08-30 개발자 지시:
+   "뭐 관내 ~ 이런 거 해결하기 위해"). `무안군승달장학회`·`원주시청`·`강서구장학회` 처럼
+   주관 기관 이름에 관할이 들어 있다. 줄만 봐서는 `관내에 1년 이상 거주` 가 어디인지 알 수 없다.
+   ⚠️ 못 찾으면 null 이고, 그때 판정은 'unknown' 이다 — 지어내지 않는다. */
+function homeCityOf(sch) {
+  const name = `${(sch && sch.provider) || ''} ${(sch && sch.name) || ''}`;
+  /* ⚠️ 기관 이름은 시·군 뒤에 말이 **바로 붙는다**(`무안군승달장학회`). 경계를 요구하면
+     못 집는다 — 첫 후보를 쓰되 시·도에서 온 것만 걸러낸다(`서울시립대학교` → `서울시`). */
+  for (const m of name.matchAll(/([가-힣]{1,6}(?:시|군|구))/g)) {
+    const c = m[1];
+    if (/(특별시|광역시|특별자치시)$/.test(c)) continue;
+    if (PR_REGIONS.includes(c.replace(/(시|군|구)$/, ''))) continue;   // 서울시·부산시…
+    return c;
+  }
+  return null;
+}
+
 function noticeCtx(sch) {
   const lines = (sch && sch.eligibilityLines) || [];
   const items = requirementLines(sch, lines, { withMeta: true });
@@ -252,7 +481,14 @@ function noticeCtx(sch) {
   }
   /* 여러 장학금이 묶인 공고 — 하나에 미달해도 다른 것에 지원한다(설계 조건 ⑧) */
   const multi = items.some((it) => PR.MULTI_PROGRAM.test(it.text));
-  return { bracketTable: brackets.size > 1, inAnyOf, multi };
+  /* 🔴 **공고 어딘가에 학부가 대상이라고 적혀 있으면** 다른 줄의 대학원 표현으로 미달을 내지
+     않는다 (2026-09-12 · 핵심-4). 대상을 여러 줄에 나눠 적는 공고가 있다:
+       `4년제 대학 재학생` / `대학원 석·박사 과정 재학생`  ← 둘 중 하나면 된다는 뜻이다.
+     줄마다 따로 보면 뒤 줄이 학부생을 떨어뜨린다 — 축을 만들면서 실제로 그렇게 됐고
+     회귀 검사('띄어 쓴 「대학 재학생」도 학부를 말한 것으로 본다')가 잡았다.
+     ⚠️ 이건 '모른다'이지 '충족'이 아니다 — 학부가 대상인지 확실치 않아 ✓ 를 주지는 않는다. */
+  const anyUndergrad = lines.some((t) => PR.mentionsUndergrad && PR.mentionsUndergrad(t));
+  return { bracketTable: brackets.size > 1, inAnyOf, multi, anyUndergrad, homeCity: homeCityOf(sch) };
 }
 
 /* 공고 하나에 대한 적합도 **내역**. 카드가 "요건 6개 중 4개 충족"을 띄우려면 숫자가 필요하다. */
@@ -266,10 +502,31 @@ function fitDetail(sch, p) {
      요건이 **9개**인데 5개만 맞으면 '요건 5개 중 5개 충족 · 100%'가 떴다 —
      확인조차 안 한 요건 4개가 점수에서 통째로 빠진 것이다(실측 15건 · 23줄).
      점수는 `all: true`로 **전부** 세고, 화면에 몇 줄을 띄우는지는 따로 정한다. */
-  const items = requirementLines(sch, lines, { withMeta: true, all: true }).filter((it) => !PR.gradOnly(it.text));
+  const allItems = requirementLines(sch, lines, { withMeta: true, all: true });
+  /* 표의 한 칸만 분모에서 뺀다 — 대상을 말하는 문장은 학위 축이 판정한다(핵심-4) */
+  const items = allItems.filter((it) => PR.gradTarget(it.text) !== 'label');
   if (!items.length) return { pct: FIT_UNREAD, unread: true, met: 0, total: 0, unknown: 0, fails: [] };
 
-  const exLines = requirementLines(sch, [...((sch && sch.eligibilityExcludes) || []), ...lines], { onlyExclude: true });
+  /* 🔴 대학원 전용 판정은 **학위 축**(parse-requirements 의 parseDegree)이 한다 — 2026-09-12.
+     여기 있던 '대학원 전용이면 통째로 미달' 갈래는 지웠다. 그 갈래는 축이 없던 시절의 우회였고,
+     축이 생기면서 같은 일을 두 곳이 하게 됐다(이 저장소가 반복해 겪은 '규칙 두 벌' 사고).
+     축으로 옮기면서 그 갈래가 들고 있던 방어도 제자리를 찾았다:
+       · 뜻이 반대인 줄(`대학원생 지원 불가`) → parseDegree 가 말끝을 보고 뒤집는다.
+       · 여러 장학금이 묶인 공고 → 아래 `multi` 가 이미 fails 를 안 쌓는다(설계 조건 ⑧).
+       · 학부를 함께 말한 줄 → 축이 'both' 로 읽어 충족이다.
+     실측(2026-09-12): 학위를 말하는 자격 줄 157 중 이 축이 잡던 것은 7줄뿐이었다. */
+
+  /* 🔴 **이미 뽑아 둔 제외 줄을 그대로 판정한다** (2026-08-30 전수 대조에서 발견).
+     예전에는 제외 목록까지 `requirementLines(onlyExclude)` 에 밀어 넣었는데, 그 함수는
+     **자격 줄에 섞여 있는 제외를 찾아내는 용도**(절 경계로 가른다)라 이미 갈라 놓은
+     목록은 오히려 흘린다 — 실측: 정읍시민장학재단 제외 5줄 → 판정 대상 **0줄**,
+     건국대 6줄 → **0줄**. 제외 조항이 사실상 한 번도 안 걸리고 있었다.
+     (게다가 한 줄짜리 제외가 **절 머리글로 읽혀** 그 다음 자격 줄이 제외로 넘어가기도 했다.)
+     둘을 합치되 출처를 나눈다: 발췌기가 제외 절에서 뽑아 둔 것 + 자격 줄에 섞여 있던 것. */
+  const exLines = [...new Set([
+    ...((sch && sch.eligibilityExcludes) || []).map((x) => String(x || '').trim()).filter(Boolean),
+    ...requirementLines(sch, lines, { onlyExclude: true }),
+  ])];
   /* 여러 장학금이 묶인 공고는 0%를 내지 않는다(설계 조건 ⑧) — 하나에 미달해도 다른 것에 지원한다 */
   const multi = items.some((it) => PR.MULTI_PROGRAM.test(it.text));
 
@@ -300,7 +557,7 @@ function fitDetail(sch, p) {
     for (const c of conds) {
       if (c.conf !== PR.HIGH) continue;
       if (ctx.bracketTable && c.kind === 'bracket') continue;
-      if (judgeCond(c, p) === 'fail' && !multi) fails.push(line);
+      if (judgeCond(c, p, ctx) === 'fail' && !multi) fails.push(line);
     }
   }
 
@@ -372,10 +629,34 @@ function taggedSchool(n) {
   return null;
 }
 
+/* 🔴 지금 수집 중인 학교 — 이 목록 밖 학교의 실시간 공고는 **화면에서 내린다**
+   (2026-09-02 개발자 지시: "경희대 외대 두 곳을 제외한 공고는 내려달라").
+
+   🔴 **2026-09-05 갱신 — 이제 데이터에서도 뺀다** (개발자 지시: "수집 로봇들도 경희대
+      외대 말고는 다 수집하지 않아도 돼"). 아래 옛 문단은 '화면에서만 내린다'고 적혀 있었는데
+      더는 사실이 아니라 고쳐 둔다. 수집기 둘이 `dropUnserved()`(collector/publish-notices.mjs)로
+      떨구고, 학교별 파일도 서비스 학교 것만 남는다.
+      · 여기 이름을 도로 넣고 `schools.json`·`browser-targets.json` 의 `parked` 에서 학교를
+        되살리면 **그날 수집부터 다시 담긴다**(설정은 지우지 않고 보관 중이다).
+      · ⚠️ 다만 **옛 공고가 되돌아오지는 않는다** — `seen.json` 은 정리되지 않아 이미 본
+        공고를 다시 담지 않는다. 어차피 실시간 공고는 60일 수명이라 곧 같은 상태가 된다.
+      · 떨어진 공고가 사라진 것은 아니다: `collector/candidates.mjs` 의 검수 후보 장부에
+        그대로 있다(2026-09-05 실측 173건 전량 확인).
+
+   왜 내리나 — 2026-08-30에 수집을 이 두 곳으로 좁혔는데, 그 전에 받아 둔 다른 학교 공고가
+   60일 수명이 다할 때까지 남아 있었다(마지막 수집일 2026-08-29). **갱신이 멈춘 목록**을
+   계속 보여 주면 앱이 그 학교를 서비스하는 것처럼 보인다. 빈 화면은 이미 정직하게 말한다
+   ("게시판 연결 전이거나 새 공고 없음") — 온보딩의 학교 목록은 그대로 둔다.
+
+   🔴 이 판정은 화면(app.js)과 알림(sw.js·notify-rules.js)이 **같은 함수**로 본다.
+      한쪽에만 두면 화면에서 내린 공고를 알림이 알리는 모순이 생긴다. */
+const SERVED_SCHOOLS = ['경희대학교', '한국외국어대학교'];
+
 function noticeForProfile(n, p) {
   if (!p || !p.school || !n) return false;
   const tagged = taggedSchool(n);
   const school = tagged || n.school;
+  if (SERVED_SCHOOLS.indexOf(school) < 0) return false;
   if (school === p.school) return !(n.campus && p.campus && n.campus !== p.campus);
   // 공용 게시판의 공고 — 제목이 캠퍼스를 밝히지 않은 것만 분교 학생에게도 보여 준다
   if (!tagged && !n.campus && SHARED_BOARD_BRANCH[p.school] === school) return true;
@@ -409,6 +690,10 @@ function noticeForProfile(n, p) {
    🔴 이 잣대는 **여기 한 곳에만** 둔다. 예전엔 collector/eligibility-ai.mjs 와
    verify/eligibility-report.mjs 에 같은 정규식이 복사돼 있었고, 정작 화면으로 나가는
    문인 이 파일에는 없었다 — 그래서 앱이 무엇을 내보내는지 아무도 검사하지 않았다. */
+/* '누구는 신청할 수 있다' 꼴 — REQ_SIGNAL 과 ※ 곁말 관문이 **같은 것**을 본다.
+   두 곳에 따로 적으면 한쪽만 고쳐져 갈라진다(이 저장소가 반복해 겪은 실패). */
+const AFFIRM_ELIG = /(자|학생|생)[는은도만이가]?\s?[^.]{0,25}(신청|지원|참여|응모|수혜|선발)\s?(이|가)?\s?(가능|할\s?수\s?있)/;
+
 const REQ_SIGNAL = new RegExp([
   /* ① 자격을 이루는 낱말 — 학적·성적·소득·특별자격·지역 */
   '재학|휴학|복학|신입|편입|졸업|\\d\\s?학년|학부생|대학생|대학원생',
@@ -424,6 +709,18 @@ const REQ_SIGNAL = new RegExp([
   '(마친|가진|이수한|합격한|해당하는|갖춘)\\s?자',
   '이상인?\\s?자|이하의?\\s?(해당\\s?)?학생',
   '결격\\s?사유|결격사유|합격자|재직|파견|추천\\s?(가능|대상)자?|이수(한|자)',
+  /* ③ '누구는 신청할 수 있다' 꼴 — 한국어 공고가 **예외 자격**을 쓰는 대표 형식이다.
+        ②까지로는 증명이 안 돼 실제로 21줄이 화면에서 사라져 있었다(2026-08-27 전수):
+          `10학기 이하 후기 이중전공자는 등록금 전액 납부 시 신청 가능`   ← 면학장학금
+          `정규학기 내 재학생만 지원 가능 (건축학과 등 예외 인정)`        ← 사랑나눔
+          `학제 5~6년인 전공에 한하여 … 재학 중인 학생 지원 가능`        ← 인재림
+        이 줄들은 **본문 규칙을 뒤집는 예외**라, 빠지면 자격이 되는 학생이 안 된다고 본다.
+        (잡음보다 나쁜 실패 — 사랑나눔에서 기초생활수급자 요건이 잘렸던 것과 같은 계열)
+     🔴 넓히지 말 것. `포털을 통해 신청가능`(신청 방법)·`8월 20일부터 신청 가능`(일정)이
+        같이 들어오면 개발자가 네 번 지적한 그 잡음이 되살아난다. 그래서 두 겹으로 좁혔다:
+          ⓐ **사람을 가리키는 낱말**이 앞에 있어야 하고 (자·학생·생)
+          ⓑ 그 사이에 **마침표가 없어야** 한다(다른 문장으로 건너뛰지 않는다). */
+  AFFIRM_ELIG.source,
 ].join('|'));
 
 /* 자격이 **아닌 것**이 스스로 드러내는 표지 — 이름을 대는 게 아니라 '무엇을 말하는 줄인가'를 본다.
@@ -452,6 +749,11 @@ const EXCLUDE_LINE = /(제외(한다|합니다|됨|대상)?\s*$|받은\s*(학생
    (2026-08-24 전수 조사). `신/편입생은 입학 학기에만 학점 및 성적 기준 적용 제외`가
    '이런 경우는 제외돼요'에 떠서, 혜택을 불이익으로 보여 주고 있었다.
    `계절, 교류, 인정학점 제외`도 사람을 빼는 말이 아니라 학점 세는 규칙이다. */
+/* 🔴 줄의 **주장**은 끝에 있다 (2026-08-27). `국가장학금을 신청할 수 없는 대한민국 국적
+   미소지자도 선발 가능` 은 '신청할 수 없는'만 보면 제외로 읽히지만, 이 줄이 실제로
+   말하는 것은 **선발 가능**이다. 앞의 '없는'은 대상을 꾸미는 말일 뿐이다.
+   제외 칸에 넣으면 외국 국적 학생이 자기가 안 된다고 읽는다 — 자격이 뒤집혀 보인다. */
+const ENDS_AFFIRM = /(가능|있음|인\s?자|한다)\s*[.]?\s*$/;
 const NOT_AN_EXCLUSION = /(기준\s*)?적용\s*제외|미적용|산정.{0,6}제외|학점\s*제외|계절.{0,10}제외|제외한\s|제외하고|을\s*제외한|를\s*제외한/;
 /* 제외 절에 있어도 **긍정으로 적힌 줄은 자격**이다 (2026-08-24 개발자 지적).
    `결격사유에 해당하지 않는 자`는 지원 자격이고, `결격사유에 해당하면` 제외다. */
@@ -724,7 +1026,43 @@ function requirementLines(sch, lines, opts) {
     if (ELIG_SECTION.test(t)) inNonElig = false;
     if (inNonElig && !loose) continue;
     // 다듬은 뒤에 검사한다 — "3 ) 금 액 : …"은 번호를 떼야 '금액' 줄인 것이 드러난다
-    if (REQ_NOISE.test(l.trim()) || REQ_NOISE.test(t)) continue;
+    /* 🔴 `※` 곁말을 **내용도 안 보고** 버리면 안 된다 (2026-08-27 전수 조사).
+       ※ 로 시작하는 자격 줄이 95개인데 한 줄도 화면에 못 나가고 있었다. 그중에는
+       버려선 안 되는 것이 섞여 있다:
+         · `※ 졸업유예자, 휴학생, 대학원생, 세종캠퍼스 학생은 지원 불가`  (25건)
+           → 제외 칸에도 못 가서, 그 학생이 **자기가 된다고 읽는다.** 자격이 뒤집혀
+             보이는 실패라 잡음보다 나쁘다.
+         · `※ 10학기 이하 후기 이중전공자는 등록금 전액 납부 시 신청 가능`
+           → 본문 규칙(`8학기 이하`)을 뒤집는 **예외 자격**이다. 빠지면 되는 학생이 안 된다고 나온다.
+       ⚠️ 그렇다고 ※ 를 통째로 열면 2026-08-02에 개발자가 지적한 그 잡음이 되살아난다
+          (`※ 예산 범위 내 학교 지급기준에 의거하여 …`, `※ 동점자 처리기준 : …`).
+       그래서 이 저장소 방식대로 **증명한 줄만** 통과시킨다 — 제외를 말하거나(EXCLUDE_LINE),
+       '누구는 신청 가능' 꼴이거나(AFFIRM_ELIG). 나머지 ※ 는 예전처럼 버린다. */
+    /* ※ 곁말은 증명한 줄만 통과 (아래 주석). 예전엔 이 자리에서 **원문 줄 전체**에
+       REQ_NOISE 를 댔는데, 그러면 괄호 안 낱말까지 걸려 진짜 요건이 죽었다(바로 아래 참조).
+       ※ 판정만 원문으로 하고, 잡음 판정은 다듬은 줄로 한다. */
+    /* ⚠️ `isAside` 는 `※` 와 `*` 둘 다다(절 판정용). 버리는 것은 **※ 뿐**이다 —
+       `*` 까지 버리면 멀쩡한 요건 줄이 같이 죽는다(2026-08-28에 실제로 그렇게 만들었다가 되돌림). */
+    const asideProven = EXCLUDE_LINE.test(t) || AFFIRM_ELIG.test(t);
+    /* 🔴 **괄호가 곧 구조**인 부류는 괄호를 떼기 전에 먼저 거른다 (2026-08-28).
+       `학업성적(50) + 취창업준비계획(20) + 면접(30)` 은 괄호를 떼면 `학업성적 + …` 가 되어
+       배점표 규칙이 무력해진다 — 배점표가 지원 자격으로 새는 것이 개발자가 네 번 지적한 그 잡음이다.
+       아래의 '괄호는 부연' 규칙과 반대 방향이라, 순서로 갈라 둔다. */
+    const STRUCT_NOISE = /\(\d{1,3}\)\s*\+.*\(\d{1,3}\)|\(\d+\s?%\)\s*$|\(\d{1,3}\s?점\)/;
+    if (!loose && STRUCT_NOISE.test(t)) continue;
+    /* 잡음 판정은 **원문 줄에서 괄호 부연만 뗀 것**으로 본다.
+       · 원문으로 봐야 하는 이유 — `^배점`·`^총점` 처럼 **줄 앞**을 보는 규칙이 있는데,
+         다듬은 줄은 이름표(`배점 :`)를 이미 떼어 내서 그 규칙이 통째로 뚫린다.
+       · 괄호를 떼야 하는 이유 — `… 확정된 자 (국가장학 필수 신청, 미신청시 수혜 불가)` 가
+         괄호 안 `미신청시` 하나 때문에 죽었다. 괄호 밖이 그 줄의 주장이다.
+       · 증명된 ※ 곁말은 기호를 떼고 본다(그 기호 자체가 REQ_NOISE 의 첫 항목이라). */
+    let noiseProbe = String(l || '').replace(/\s*[(（][^)）]*[)）]\s*/g, ' ').replace(/\s+/g, ' ').trim();
+    if (asideProven) noiseProbe = noiseProbe.replace(/^[※*]\s*/, '');
+    if (REQ_NOISE.test(noiseProbe.length >= 4 ? noiseProbe : String(l || ''))) continue;
+    /* 다듬은 뒤에야 드러나는 잡음도 본다 — `3 ) 금 액 : …` 은 번호를 떼야 '금액' 줄인 것이 보인다.
+       여기서도 괄호는 부연이라 떼고 본다(위와 같은 이유). */
+    const bareNoise = t.replace(/\s*[(（][^)）]*[)）]\s*/g, ' ').replace(/\s+/g, ' ').trim();
+    if (REQ_NOISE.test(bareNoise.length >= 4 ? bareNoise : t)) continue;
     if (!loose && DOC_COUNT_TAIL.test(t)) continue;
     if (NOT_REQ_RE.test(t) || isTableCell(t)) continue;
     const ranks = PRIORITY_LINE.test(t) && !HARD_THRESHOLD.test(t);
@@ -742,6 +1080,8 @@ function requirementLines(sch, lines, opts) {
          괄호는 부연일 뿐이다. 넣으면 같은 줄이 자격·제외 두 곳에 뜬다(실측 9줄).
          자격 블록이 쓰는 잣대와 **같은 규칙**이다 — 갈라지면 또 어긋난다. */
       if (NOT_AN_EXCLUSION.test(t)) continue;   // 면제·산정 규칙은 제외가 아니다 (위 주석)
+      /* 끝이 '…선발 가능'이면 그 줄의 주장은 자격이다 (위 ENDS_AFFIRM 주석) */
+      if (AFFIRM_ELIG.test(t) && ENDS_AFFIRM.test(t)) continue;
       const bareEx = t.replace(/\s*[(（][^)）]*[)）]\s*$/, '').trim();
       const pureEx = EXCLUDE_LINE.test(bareEx.length >= 4 ? bareEx : t);
       if (!(sect === 'exclude' || pureEx)) continue;
@@ -762,9 +1102,11 @@ function requirementLines(sch, lines, opts) {
        `(자|생|중|상|하|명|원)$`처럼 느슨해서 `지원 제외 대상`의 '상'까지 자격으로 봤다.
        제목에서 지켜야 할 것은 **진짜 자격 범주 이름뿐**이므로 좁게 적는다. */
     if (SUB_HEAD.test(t) && !/수급|차상위|보훈|유공|장애|다자녀|한부모|새터민|북한이탈|다문화|국적/.test(t)) continue;
-    /* 대학원 전용 줄(`일반대학원생 : …`)은 학부생에게 해당이 없다. 화면에 남겨 두면
-       100%인데 아무 표시도 없는 줄이 되어 학생이 혼란스럽다(2026-08-24 개발자 지적). */
-    if (!loose && PR2.gradOnly(t)) continue;
+    /* 학부/대학원 기준을 나란히 적은 표의 칸(`일반대학원생 : …`)은 학부생에게 해당이 없다.
+       화면에 남겨 두면 100%인데 아무 표시도 없는 줄이 되어 혼란스럽다(2026-08-24 개발자 지적).
+       ⚠️ **대상을 말하는 문장은 지우지 않는다** — 그 줄이 사라지면 '내 것이 아니다'라는
+          사실 자체가 화면에서 없어진다(2026-09-12 · 핵심-4). 학위 축이 ✓/✕ 를 붙인다. */
+    if (!loose && PR2.gradTarget(t) === 'label') continue;
     if (POINTER_LINE.test(t)) {
       /* 안내 줄 자신은 화면에 안 내보내되, '여기부터 n줄은 선택지'라는 사실은 남긴다 */
       const n = anyOfCount(t);
@@ -789,14 +1131,23 @@ function requirementLines(sch, lines, opts) {
          ② 제외 대상은 버리지 않고 '이런 경우는 제외돼요' 블록으로 자리를 옮긴다
          ③ 요건 신호가 하나도 없으면 안 보여 준다 — 모른다고 말하는 편이 낫다 */
     if (!loose) {
-      if (NOT_A_REQUIREMENT.test(t)) continue;
+      /* 🔴 괄호 **안**은 부연이다 — 잡음 판정도 괄호를 떼고 본다 (2026-08-28).
+         `직전학기 C⁰ 수준(70/100점 만점) 이상인 재학생`
+         `직전 이수학점 3.5 이상 (4.5 만점) 인 자에 한함`
+         이 줄들의 `만점`은 배점표 표지가 아니라 **성적 척도**인데, 배점표 규칙에 걸려
+         진짜 성적 요건이 통째로 사라지고 있었다. 줄의 주장은 괄호 밖에 있다.
+         ⚠️ 괄호를 떼고도 잡음이면 그대로 버린다 —
+            `Dream PATH 마일리지 점수 적용 : 매학기 70점 만점 적용` 은 여전히 잡음이다. */
+      const bareAll = t.replace(/\s*[(（][^)）]*[)）]\s*/g, ' ').replace(/\s+/g, ' ').trim();
+      if (NOT_A_REQUIREMENT.test(bareAll.length >= 6 ? bareAll : t)) continue;
       /* 🔴 괄호 **안**의 '지원불가'로 줄을 통째로 버리면 안 된다 (2026-08-24) —
          `2026년 2학기 재학생 (휴학예정자 지원불가)`는 요건이고 괄호는 부연일 뿐인데,
          제외 규칙에 걸려 **진짜 자격이 조용히 사라지고 있었다**(잡음보다 나쁜 실패).
          괄호를 떼고도 여전히 제외를 말하는 줄만 옮긴다. 괄호가 곧 전부인 줄
          (`(타 장학금 수혜자 지원 불가)`)은 떼면 빈 껍데기라 그대로 본다. */
       const bare = t.replace(/\s*[(（][^)）]*[)）]\s*$/, '').trim();
-      if (EXCLUDE_LINE.test(bare.length >= 4 ? bare : t) && !NOT_AN_EXCLUSION.test(t)) continue;
+      if (EXCLUDE_LINE.test(bare.length >= 4 ? bare : t) && !NOT_AN_EXCLUSION.test(t)
+          && !(AFFIRM_ELIG.test(t) && ENDS_AFFIRM.test(t))) continue;
       if (!REQ_SIGNAL.test(t)) continue;
     }
     if (!out.includes(t)) {
@@ -924,6 +1275,6 @@ if (typeof module !== 'undefined' && module.exports) {
                      scopedToProfile, notStale, STALE_DAYS,
                      requirementLines, requirementStruct, requirementMatch, tidyRequirement,
                      REQ_SIGNAL, NOT_A_REQUIREMENT, EXCLUDE_LINE, HARD_THRESHOLD,
-                     noticeForProfile, taggedSchool, SHARED_BOARD_BRANCH,
+                     noticeForProfile, taggedSchool, SHARED_BOARD_BRANCH, SERVED_SCHOOLS,
                      noticeFileKey, noticeFileFor, noticeFilesForProfile };
 }

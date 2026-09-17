@@ -97,3 +97,13 @@ jobs:
           echo
           echo "결과: $([ "$DRY" = "true" ] && echo '닫을 것' || echo '닫음') ${closed}건 · 사람 코멘트가 있어 남김 ${kept}건"
           echo "남은 열린 이슈: $(gh issue list --repo "$REPO" --state open --limit 300 --json number --jq length)건"
+
+      # 🔴 실행 알림 (2026-09-06 신설) — 결과 알림과 다른 것이다.
+      #    결과 알림: "보러 갔더니 상태가 이상하더라"  · 실행 알림: "보러 가다가 내가 넘어졌다"
+      #    이게 없으면 감시 로봇이 죽었을 때 그 로봇이 지키던 것까지 함께 무음이 된다.
+      - name: 🚨 로봇이 넘어졌다
+        if: failure() || cancelled()
+        uses: ./.github/actions/robot-down
+        with:
+          robot: 오래된 수집 리포트 닫기
+          token: ${{ github.token }}

@@ -12,9 +12,19 @@
    v17 = 알림·진짜 푸시(선주) + 원문 링크 정직 표기(Josehyeon)를 합친 판. */
 /* v59 = 자격 요건 발췌 수리(Josehyeon) + 신청서 질문 방식 최적화(선주)를 합친 판.
    양쪽이 각자 v58로 올려 또 부딪혔다 — 위 주석의 규칙대로 **둘 다보다 큰 번호**로 올린다. */
-const CACHE = 'handaejang-v85';   /* v80(로그인) + v84(공동작업자) 병합 — 둘 다보다 큰 번호 */
-const ASSETS = ['.', 'index.html', 'style.css', 'app.js', 'data.js', 'forms.js', 'form-plan.js', 'essay.js', 'essay-config.js', 'essay-ask.js', 'essay-quality.js',
-  'section-head.js', 'parse-requirements.js', 'match-engine.js', 'notify-rules.js', 'notify.js', 'push-config.js',
+/* 🔴 v105 — style.css 를 고쳤으면 **여기도 올려야 한다** (2026-08-30에 두 번 빠뜨렸다).
+   349f731·bd3f660 에서 CSS 를 고치고 이 번호를 안 올렸더니, 배포는 성공했는데
+   설치된 앱은 옛 CSS 를 계속 내주고 있었다("아직도 각져 있어").
+   네트워크 우선이라 결국은 반영되지만, 응답이 3.5초를 넘으면 캐시로 떨어지고
+   그 캐시가 옛 판이면 그대로 옛 화면이 보인다. 번호를 올려야 확실히 청소된다. */
+/* ⚠️ 두 작업이 같은 날 v151 을 각자 올려 부딪혔다 — 번호는 v152 로 올리고 **둘 다** 남긴다.
+   번호만 맞추고 한쪽 파일 목록을 버리면, 버린 쪽 파일이 오프라인에서만 없어 앱이 죽는다. */
+/* ⚠️ 두 작업이 같은 날 v172 를 각자 올려 부딪혔다 — 번호는 v173 으로 올리고 **둘 다** 남긴다
+   (파일 머리말의 규칙 그대로). */
+/* ⚠️ 오늘 여러 작업이 같은 번호를 각자 올렸다 — 번호는 올리고 **한 일은 다 남긴다**(파일 머리말 규칙). */
+const CACHE = 'handaejang-v187';  /* v187 — 「학교 포털」이 어디인지 알려 주는 한 줄(UI-20 · 경희대 인포21 · 한국외대 HUFSAbility) */
+const ASSETS = ['.', 'index.html', 'style.css', 'boot.js', 'resume.js', 'interactions.js', 'app.js', 'data.js', 'forms.js', 'form-plan.js', 'essay.js', 'essay-config.js', 'essay-ask.js', 'essay-quality.js', 'essay-submit-check.js',
+  'section-head.js', 'parse-requirements.js', 'parse-amount.js', 'match-engine.js', 'notify-rules.js', 'notify.js', 'push-config.js', 'support-config.js',
   'chat-config.js', 'chat.js',
   /* 로그인 — 목록에서 빠지면 **오프라인에서** 이 파일만 없어 앱이 죽는다.
      ⚠️ importScripts 에는 넣지 않는다: 서비스워커는 로그인을 모른다(푸시는 지금처럼
@@ -24,7 +34,7 @@ const ASSETS = ['.', 'index.html', 'style.css', 'app.js', 'data.js', 'forms.js',
 const NET_TIMEOUT = 3500; /* 이 시간 안에 응답이 없으면 캐시부터 보여주고, 받아온 최신본은 다음 실행에 쓴다 */
 
 /* 알림 규칙은 앱 화면과 똑같은 파일을 쓴다 — 판단 기준이 두 벌로 갈라지지 않게 */
-try { importScripts('section-head.js', 'parse-requirements.js', 'match-engine.js', 'notify-rules.js'); } catch (e) { /* 못 읽으면 알림만 비활성 */ }
+try { importScripts('section-head.js', 'parse-requirements.js', 'parse-amount.js', 'match-engine.js', 'notify-rules.js'); } catch (e) { /* 못 읽으면 알림만 비활성 */ }
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
@@ -91,6 +101,16 @@ self.addEventListener('fetch', (e) => {
   let url;
   try { url = new URL(e.request.url); } catch { return; }
   if (url.origin !== self.location.origin) return; /* 외부(폰트 CDN 등)는 브라우저에 맡긴다 */
+
+  /* 🔴 **받아 둔 공고문 원본은 우리가 가로채지 않는다** (2026-09-12 — data/kosaf-files/).
+     이유 둘, 둘 다 실제로 깨지는 길이다:
+       ① 학생이 `target="_blank"` 로 여는 PDF·HWP 는 `mode === 'navigate'` 라 아래
+          '화면 자체' 가지로 들어간다. 그러면 느린 회선에서 **3.5초 시한에 걸려
+          index.html 이 대신 나간다** — 공고문을 눌렀는데 앱이 또 열린다.
+       ② 네트워크 우선은 받은 것을 캐시에 넣는다. 공고문은 건당 0.2~2MB 라
+          몇 개만 눌러도 폰 캐시가 앱 전체보다 커진다(오프라인에 쓸 것도 아니다).
+     브라우저에 맡기면 둘 다 없다 — 내려받기는 브라우저가 원래 잘하는 일이다. */
+  if (/\/data\/kosaf-files\//.test(url.pathname)) return;
 
   /* 화면 자체 */
   if (e.request.mode === 'navigate') {

@@ -1,7 +1,13 @@
 const { chromium } = require('playwright-core');
+const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
+const { nextUntil, assertOwnServer } = require('./onboard-helper.js');
 const SHOT = (n) => `${__dirname}/shot-${n}.png`;
 
 (async () => {
+  /* 🔴 재기 전에 **이 서버가 내 앱인지** 확인한다 — 아니면 여기서 멈춘다.
+     이 저장소는 작업 폴더를 여러 개 두고 쓰는데, 8123 에 다른 폴더의 서버가 떠 있으면
+     그 옛 앱을 재고도 아무도 모른다(빨간불이든 **가짜 초록불이든**). 규칙은 onboard-helper 한 곳. */
+  await assertOwnServer(PORT);
   const browser = await chromium.launch({ executablePath: (process.env.CHROME_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome') });
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   const errors = [];
@@ -9,7 +15,7 @@ const SHOT = (n) => `${__dirname}/shot-${n}.png`;
   page.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push('CONSOLE: ' + m.text()); });
   page.on('dialog', async (d) => { console.log('DIALOG:', d.message().slice(0, 160).replace(/\n/g, ' | ')); await d.accept(); });
 
-  await page.goto('http://localhost:8123/', { waitUntil: 'domcontentloaded' });
+  await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
   console.log('STEP title:', await page.title(), '| h1:', await page.textContent('.onboard-hero h1'));
   await page.click('.onboard-step[data-step="0"] [data-next]');
 
@@ -63,14 +69,19 @@ const SHOT = (n) => `${__dirname}/shot-${n}.png`;
   const bg = await page.$eval('#in-flags input[value="multiChild"]', (el) => getComputedStyle(el).backgroundImage.slice(0, 30));
   console.log('STEP checkbox check visible (bg-image):', bg !== 'none' ? 'yes' : 'NO!');
   await page.screenshot({ path: SHOT('13-checkbox') });
-  await page.click('.onboard-step[data-step="3"] [data-next]');
+  /* 단계 번호를 박지 말 것 — 온보딩이 4단계에서 6단계가 되며 이 검사들이 죽어 있었다 */
+  await nextUntil(page, '#in-sid');
 
   // ── Step 4: 공통 서류 정보
   await page.fill('#in-sid', '202312345');
   await page.fill('#in-phone', '010-1234-5678');
   await page.fill('#in-email', 'test@hufs.ac.kr');
-  await page.fill('#in-bank', '국민은행');
-  await page.fill('#in-account', '12345678901234');
+  /* 🔴 **계좌 칸은 온보딩에서 일부러 숨겼다** (2026-08-31 UI 정리 · index.html 주석).
+     "아직 아무 가치도 받지 못한 학생에게 계좌번호를 요구하는 것은 가장 흔한 이탈·불신
+     지점"이라 가입 때는 안 묻고, **프로필 수정으로 들어올 때만** 보인다.
+     그런데 이 검사만 남아 안 보이는 칸을 30초 채우려다 죽고 있었다.
+     ⚠️ 되살리지 말 것 — 값이 필요해지는 때는 신청서에 그 칸이 있을 때뿐이고,
+        그때는 form-plan.js 가 질문으로 띄운다(설계 그대로). */
   await page.screenshot({ path: SHOT('14-step4') });
   await page.click('#btn-finish-onboard');
   await page.waitForSelector('#screen-home:not([hidden])');
@@ -174,7 +185,12 @@ const SHOT = (n) => `${__dirname}/shot-${n}.png`;
 
   await page.click('.nav-item[data-nav="applications"]');
   await page.waitForTimeout(300);
-  const pendingCnt = await page.locator('.badge-pending').count();
+  /* 🔴 **신청내역의 '작성 중' 표시는 `.badge-pending` 이 아니다** (2026-09-03).
+     그 배지는 *일괄 준비 목록*(app.js `bulk-name`)에만 있다. 신청내역은 카드 안 진행 막대에
+     `.app-step-wait` 를 붙인다(app.js:2368). 게다가 이 줄은 화면 **전체**에서 세고 있어
+     일괄 준비 목록의 배지까지 함께 세었고, 그래서 `pendingCnt > 0` 인데 정작
+     `#apps-list` 안에는 없어 30초를 기다리다 죽었다. 세는 곳과 누르는 곳을 맞춘다. */
+  const pendingCnt = await page.locator('#apps-list .swipe-row:has(.app-step-wait)').count();
   const totalCnt = await page.locator('#apps-list .sch-card').count();
   console.log('STEP apps total:', totalCnt, '| pending(서류 작성 필요):', pendingCnt);
   console.log('STEP apps summary:', (await page.textContent('#apps-summary')).replace(/\s+/g, ' ').trim().slice(0, 120));
@@ -182,7 +198,7 @@ const SHOT = (n) => `${__dirname}/shot-${n}.png`;
 
   // pending 건 이어서 완성
   if (pendingCnt > 0) {
-    await page.click('#apps-list .sch-card:has(.badge-pending)');
+    await page.click('#apps-list .swipe-row:has(.app-step-wait) .sch-card');
     await page.waitForSelector('#detail-sheet.show');
     await page.waitForTimeout(350);
     console.log('STEP pending detail btn:', (await page.textContent('#btn-apply-one')).trim());

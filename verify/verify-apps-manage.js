@@ -3,6 +3,8 @@
       않는다(CLAUDE.md — 13차 세션 학교 검색 사고). 세로 스크롤이 살아 있는지도 함께 본다.
    실행: node verify/verify-apps-manage.js   (CHROME_PATH 필요) */
 const { chromium } = require('playwright-core');
+const { assertOwnServer } = require('./onboard-helper.js');
+const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
 
 /* 진짜 손가락 끌기 — Playwright의 마우스로는 touchstart/move/end가 안 난다 */
 async function drag(page, sel, dx, dy, steps = 8) {
@@ -31,6 +33,10 @@ const eq = (label, got, want) => {
 };
 
 (async () => {
+  /* 🔴 재기 전에 **이 서버가 내 앱인지** 확인한다 — 아니면 여기서 멈춘다.
+     이 저장소는 작업 폴더를 여러 개 두고 쓰는데, 8123 에 다른 폴더의 서버가 떠 있으면
+     그 옛 앱을 재고도 아무도 모른다(빨간불이든 **가짜 초록불이든**). 규칙은 onboard-helper 한 곳. */
+  await assertOwnServer(PORT);
   const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH });
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true });
   const page = await ctx.newPage();
@@ -40,6 +46,8 @@ const eq = (label, got, want) => {
 
   /* 프로필 + 신청 3건을 미리 넣어 둔다 — 온보딩을 매번 태우지 않으려고 */
   await page.addInitScript(() => {
+    /* 이어보기 장부도 지운다 — 남겨 두면 앱이 앞 검사에서 보던 화면으로 돌아간다 (2026-09-09) */
+    localStorage.removeItem('handaejang.resume');
     localStorage.setItem('handaejang.v1', JSON.stringify({
       profile: { name: '김한장', school: '한국외국어대학교', campus: '', track: 'humanities', major: '영어학과',
         year: 3, status: '재학', gpa: 3.5, bracket: 5, credits: 15, region: '서울', parentRegion: '서울',
@@ -51,7 +59,7 @@ const eq = (label, got, want) => {
       ],
     }));
   });
-  await page.goto('http://localhost:8123/', { waitUntil: 'domcontentloaded' });
+  await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('#screen-home:not([hidden])', { timeout: 8000 });
   /* 알림 동의 시트가 뒤에서 클릭을 가로챈다 — 다른 드라이버와 같은 방식으로 닫는다 */
   await page.waitForSelector('#notify-sheet:not([hidden])', { timeout: 6000 }).catch(() => {});
@@ -68,36 +76,41 @@ const eq = (label, got, want) => {
      화면에서 실제로 안 보이는지(offsetParent)까지 확인한다 (CLAUDE.md CSS 함정). */
   eq('선택 모드가 아니면 선택 막대가 안 보인다',
     await page.$eval('#apps-bulkbar', (e) => e.offsetParent !== null), false);
-  eq('밀기 전에는 삭제 버튼이 안 보인다',
-    await page.$eval('#apps-list .swipe-del', (e) => getComputedStyle(e).opacity), '0');
-
-  console.log('\n■ 왼쪽으로 밀기 (TouchEvent)');
-  await drag(page, '#apps-list .swipe-row:first-child .sch-card', -110, 0);
-  eq('민 카드가 열린다', await page.$eval('#apps-list .swipe-row:first-child', (e) => e.classList.contains('open')), true);
-  eq('민 직후에 상세가 열리지 않는다', await page.$eval('#detail-sheet', (e) => e.hidden), true);
-
-  console.log('\n■ 세로로 끌면 삭제가 열리지 않는다 (목록 스크롤을 뺏지 않는다)');
-  await page.$eval('#apps-list .swipe-row.open', (e) => e.classList.remove('open'));
-  await drag(page, '#apps-list .swipe-row:nth-child(2) .sch-card', 0, -120);
-  eq('세로로 끌면 안 열린다', await page.$eval('#apps-list .swipe-row:nth-child(2)', (e) => e.classList.contains('open')), false);
-
-  console.log('\n■ 삭제와 되돌리기');
-  await drag(page, '#apps-list .swipe-row:first-child .sch-card', -110, 0);
-  await page.click('#apps-list .swipe-row:first-child .swipe-del');
-  await page.waitForTimeout(400);
-  eq('한 건이 지워진다', await page.$$eval('#apps-list .swipe-row', (e) => e.length), 2);
-  eq('되돌리기 단추가 뜬다', await page.$eval('#toast .toast-undo', (e) => e.textContent.trim()), '되돌리기');
-  await page.click('#toast .toast-undo');
-  await page.waitForTimeout(400);
-  eq('되돌리면 3건으로 돌아온다', await page.$$eval('#apps-list .swipe-row', (e) => e.length), 3);
-  eq('되돌린 항목이 원래 자리에 있다',
-    await page.$eval('#apps-list .swipe-row:first-child', (e) => e.dataset.row), 'reg-hufs-yuheungsu');
+  /* 🔴 **'밀어서 삭제'는 2026-09-01 에 걷어냈다** (개발자 지시: "오류가 자꾸 먹어서").
+     스칠 때 삭제가 뜨고, 빨간 판이 패널을 덮어 기록이 지워지고, 누름이 삼켜졌다 —
+     세 번 고쳐도 재발해서 기능을 없앴다(커밋 33cdf22). 그런데 이 검사만 남아
+     `.swipe-del` 을 찾다 죽고 있었다(그 클래스는 앱에 한 번도 안 나온다).
+     🔴 **검사를 지우기만 하면 보장을 잃는다.** 삭제와 되돌리기는 여전히 있는 기능이라
+        살아 있는 경로(선택 → 체크 → 삭제 n건)로 **옮겨서** 계속 지킨다. */
 
   console.log('\n■ 선택 모드 · 전체 선택 · 일괄 삭제');
   await page.click('#apps-select-toggle');
   await page.waitForTimeout(300);
   eq('선택 막대가 나온다', await page.$eval('#apps-bulkbar', (e) => e.hidden), false);
   eq('선택 전에는 삭제가 잠겨 있다', await page.$eval('#apps-delete-selected', (e) => e.disabled), true);
+
+  /* 한 건만 골라 지우고 되돌린다 — 예전에 '밀어서 삭제'가 지키던 자리다 */
+  await page.click('#apps-list .swipe-row:first-child .row-check');
+  await page.waitForTimeout(200);
+  await page.click('#apps-delete-selected');
+  await page.waitForTimeout(400);
+  eq('한 건이 지워진다', await page.$$eval('#apps-list .swipe-row', (e) => e.length), 2);
+  /* 🔴 문구를 바꿀 때는 이 줄도 같이 바꾼다 — 2026-08-30 에 '되돌리기' → '실행 취소' 로
+     바뀌었는데 여기가 안 따라와 main 이 빨간불이었다.
+     ⚠️ 진짜 증명은 바로 아래 '되돌리면 3건' 이다 — 글자만 맞고 동작이 안 되면 소용없다. */
+  eq('되돌리기 단추가 뜬다', await page.$eval('#toast .toast-undo', (e) => e.textContent.trim()), '실행 취소');
+  await page.click('#toast .toast-undo');
+  await page.waitForTimeout(400);
+  eq('되돌리면 3건으로 돌아온다', await page.$$eval('#apps-list .swipe-row', (e) => e.length), 3);
+  eq('되돌린 항목이 원래 자리에 있다',
+    await page.$eval('#apps-list .swipe-row:first-child', (e) => e.dataset.row), 'reg-hufs-yuheungsu');
+
+  /* ⚠️ 앱은 **삭제하면 선택 모드를 끈다**(app.js `appsSelectMode = false`) — 일부러 그렇게
+     돼 있다(한 번 지우고 나면 보통 볼일이 끝난다). 그래서 일괄 삭제를 재려면 다시 켜야 한다.
+     이걸 모르고 이어서 '전체 선택'을 누르면 안 보이는 체크박스를 30초 기다리다 죽는다. */
+  await page.click('#apps-select-toggle');
+  await page.waitForTimeout(300);
+  eq('삭제 뒤 다시 선택 모드로 들어갈 수 있다', await page.$eval('#apps-bulkbar', (e) => e.hidden), false);
   await page.click('#apps-check-all');
   await page.waitForTimeout(300);
   eq('전체 선택하면 3건', await page.$eval('#apps-delete-selected', (e) => e.textContent.trim()), '삭제 3건');
@@ -115,8 +128,35 @@ const eq = (label, got, want) => {
   await page.waitForTimeout(400);
   eq('일괄 삭제도 되돌아온다', await page.$$eval('#apps-list .swipe-row', (e) => e.length), 3);
 
+  /* ══ 신청 현황은 홈이 아니라 여기다 (2026-09-12 · 노션 UI-15) ═══════════════
+     개발자 지시: "홈의 신청 현황을 지우고 신청 내역 칸에 반영한다."
+     같은 카드(appCard)를 두 화면이 그리고 있었고 홈은 최근 2건만 보여 주는 사본이었다.
+     🔴 **잃은 정보가 없어야** 옮긴 것이다 — 홈에서 뺐다면 이 화면이 그 건들을 다 보여 줘야 한다. */
+  console.log('\n■ 신청 현황은 신청내역 화면에만 (UI-15)');
+  const moved = await page.evaluate(() => {
+    const home = document.querySelector('#screen-home');
+    return {
+      홈에구획: [...home.querySelectorAll('.section-head h3')].map((h) => h.textContent.trim()),
+      홈에목록: !!document.querySelector('#home-apps'),
+      /* 🔴 **보이는지까지 본다** — `hidden` 만 걸어도 innerHTML 은 남는다(달력 보기가 실제로
+         그렇게 감춘다: renderApplications 의 `list.hidden = calMode`). 개수만 세면 화면이
+         텅 빈 채로 초록불이다(2026-09-12 코드 리뷰 실측). 이 파일이 12줄 위에서 이미
+         `offsetParent !== null` 로 재고 있었다 — 같은 잣대를 쓴다. */
+      신청내역카드: [...document.querySelectorAll('#apps-list .sch-card')]
+        .filter((e) => e.offsetParent !== null).length,
+      요약있음: (() => { const el = document.querySelector('#apps-summary');
+        return !!(el && el.offsetParent !== null && el.textContent.trim()); })(),
+      담은건수: (typeof state !== 'undefined' && state.applications || []).length,
+    };
+  });
+  eq('담은 신청이 있다 (검사가 헛돌지 않는다)', moved.담은건수 > 0, true);
+  eq('홈에는 「신청 현황」 구획이 없다', moved.홈에구획.includes('신청 현황'), false);
+  eq('  홈에 그 목록 자리도 없다 (#home-apps)', moved.홈에목록, false);
+  eq('신청내역 화면이 담은 건을 다 보여 준다', moved.신청내역카드, moved.담은건수);
+  eq('  요약 카드도 함께 있다 (홈이 하던 말을 여기가 한다)', moved.요약있음, true);
+
   console.log('\n■ 터치 타깃 (44px 이상)');
-  const small = await page.$$eval('.swipe-del, #apps-delete-selected, .toast-undo, .bulk-all',
+  const small = await page.$$eval('#apps-delete-selected, .toast-undo, .bulk-all',
     (els) => els.filter((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && (r.width < 44 || r.height < 44); })
       .map((e) => e.className));
   eq('작은 터치 타깃이 없다', small, []);

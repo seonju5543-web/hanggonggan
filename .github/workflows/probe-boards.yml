@@ -10,6 +10,8 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
+    # 시한이 없으면 GitHub 기본값 **6시간**이다 (2026-09-06 신설). 게시판 후보 주소를 훑어본다.
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

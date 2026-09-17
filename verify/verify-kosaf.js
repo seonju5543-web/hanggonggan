@@ -1,0 +1,463 @@
+/* 층2(한국장학재단 목록) 검증 (2026-08-30 — docs/designs/kosaf-and-narrowing.md ②)
+   🔴 개발자 지적 둘로 설계가 바뀌었다 (2026-08-30):
+      ① "앱에 하나도 안 뜬다" — 전용 구역이 목록 맨 아래 5,745px 에 있었다
+      ② "복붙 수준으로 못생기게 해놨네 · 그냥 교외에 포함시켜줘"
+      → 지금은 **교외 공고와 같은 카드**로 나온다(schCard·openDetail 를 그대로 쓴다).
+   🔴 그래도 정직함은 지켜야 한다 — KOSAF 는 재단이 적어 둔 칸이지 우리가 읽은 원문이 아니다:
+        · 금액을 합계에 넣지 않는다(amountValue 0)
+        · 양식 작성이 붙지 않는다
+        · 상세 시트가 출처를 밝힌다
+        · 첨부(선발공고문) 주소가 화면에 없다 — Referer 검사라 학생이 못 받는다
+   실행: node verify/verify-kosaf.js   (CHROME_PATH + PORT) */
+const fs = require('node:fs');
+const path = require('node:path');
+const { chromium } = require('playwright-core');
+const { assertOwnServer } = require('./onboard-helper.js');
+const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
+
+let fail = 0;
+const eq = (label, got, want) => {
+  const ok = JSON.stringify(got) === JSON.stringify(want);
+  if (!ok) { fail++; console.log(`  ✕ ${label}\n      받은 값: ${JSON.stringify(got)}\n      기대 값: ${JSON.stringify(want)}`); }
+  else console.log(`  ✓ ${label}`);
+};
+
+const PROFILE = {
+  name: '김한장', school: '한국외국어대학교', campus: '', track: 'humanities', major: '영어학과',
+  year: 3, status: '재학', gpa: 3.2, bracket: 6, credits: 14, region: '서울', parentRegion: '서울',
+  regionCity: '강서구', parentRegionCity: '강서구',
+  nationality: 'korean', birthYear: 2004, flags: [], cert: false, exchange: false, common: {},
+};
+
+(async () => {
+  /* 🔴 재기 전에 **이 서버가 내 앱인지** 확인한다 — 아니면 여기서 멈춘다.
+     이 저장소는 작업 폴더를 여러 개 두고 쓰는데, 8123 에 다른 폴더의 서버가 떠 있으면
+     그 옛 앱을 재고도 아무도 모른다(빨간불이든 **가짜 초록불이든**). 규칙은 onboard-helper 한 곳. */
+  await assertOwnServer(PORT);
+  const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH });
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 900 }, hasTouch: true });
+  const page = await ctx.newPage();
+  const errors = [];
+  page.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
+  page.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push('CONSOLE: ' + m.text()); });
+
+  await page.addInitScript((p) => {
+    localStorage.setItem('handaejang.v1', JSON.stringify({ profile: p, applications: [] }));
+    /* 이어보기 장부도 지운다 — 남겨 두면 앱이 앞 검사에서 보던 화면으로 돌아간다 (2026-09-09) */
+    localStorage.removeItem('handaejang.resume');
+  }, PROFILE);
+  await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('#screen-home:not([hidden])', { timeout: 8000 });
+  await page.waitForSelector('#notify-sheet:not([hidden])', { timeout: 6000 }).catch(() => {});
+  const later = await page.$('#btn-nf-later');
+  if (later) await later.click().catch(() => {}); else await page.keyboard.press('Escape');
+  await page.waitForSelector('#notify-sheet[hidden]', { timeout: 4000 }).catch(() => {});
+  await page.click('.nav-item[data-nav="explore"]');
+  await page.waitForTimeout(2000);
+
+  console.log('■ 교외 공고와 같은 모양으로 나온다');
+  const info = await page.evaluate(() => {
+    const all = allScholarships().filter((s) => s.sourceKind === 'kosaf');
+    const ids = [...document.querySelectorAll('#explore-list .sch-card')].map((e) => e.dataset.detail);
+    const shown = ids.filter((id) => id.startsWith('kosaf-'));
+    return {
+      made: all.length,
+      shown: shown.length,
+      first: shown[0] || null,
+      allExternal: all.every((s) => s.type === '교외'),
+      hasSpec: all.filter((s) => s.amountSpec).length,
+      /* 원문에 숫자가 없는데 값이 잡혔으면 지어낸 것이다 */
+      inventedAmount: all.filter((s) => s.amountValue > 0 && !/\d/.test(s.amount)).length,
+      withExcl: all.filter((s) => s.exclusivity && s.exclusivity.kind).length,
+      amtRead: all.filter((s) => s.amountValue > 0).length,
+      amtRatio: all.filter((s) => s.amountSpec && s.amountSpec.kind === 'ratio').length,
+      noForm: all.every((s) => !s.formId && !s.prepFormId),
+      withElig: all.filter((s) => (s.eligibilityLines || []).length).length,
+      closedShown: shown.filter((id) => dday(allScholarships().find((s) => s.id === id).deadline).days < -7).length,
+    };
+  });
+  eq(`한국장학재단 등록분이 카드로 만들어진다 (${info.made}곳)`, info.made > 0, true);
+  eq('  전부 교외로 들어간다', info.allExternal, true);
+  eq('  교외 목록에 실제로 섞여 나온다', info.shown > 0, true);
+  eq('  같은 카드(.sch-card)를 쓴다 — 전용 마크업이 없다',
+    await page.$$eval('#explore-list [data-kosaf], .filter-chip[data-filter="kosaf"]', (e) => e.length), 0);
+  eq(`  자격 줄을 재단 글자 그대로 갖고 있다 (${info.withElig}곳)`, info.withElig > 0, true);
+  eq('  마감 지난 것이 섞이지 않는다', info.closedShown, 0);
+
+  console.log('\n■ 🔴 적합도는 판정한 만큼만 말한다');
+  /* ⚠️ 한때 한국장학재단 등록분을 **무조건 '자격 미확인'** 으로 눌러 뒀다. 지역 요건(83곳)을
+     판정할 수 없어 서울 학생에게 안양시 장학금이 95%로 뜨던 때의 임시 조치였다.
+     시·군을 받은 뒤로는 그 눌림이 오히려 거짓말이라 걷어냈다 — 이제 셋으로 갈린다.
+     🔴 지키는 것은 하나: **지역이 안 맞는데 '적합'이라고 말하지 않는다.** */
+  const verdicts = await page.evaluate(() => {
+    const ms = getMatches().filter((m) => m.sch.sourceKind === 'kosaf');
+    const by = {}; ms.forEach((m) => { const v = fitVerdict(m.fit, m.fd); by[v] = (by[v] || 0) + 1; });
+    const okWrongCity = ms.filter((m) => fitVerdict(m.fit, m.fd) === 'ok')
+      .filter((m) => (m.sch.eligibilityLines || []).some((l) => {
+        const c = (l.match(/([가-힣]{1,6}(?:시|군|구))[에의]\s?(주소|주민등록|거주)/) || [])[1];
+        return c && c !== state.profile.regionCity && c !== state.profile.parentRegionCity;
+      })).map((m) => m.sch.name.slice(0, 30));
+    return { by, okWrongCity };
+  });
+  eq(`판정이 셋으로 갈린다 (${JSON.stringify(verdicts.by)})`,
+    Object.keys(verdicts.by).length >= 2, true);
+  eq('사는 시·군이 아닌 곳의 장학금을 「적합」이라고 하지 않는다', verdicts.okWrongCity, []);
+
+  console.log('\n■ 🔴 「받을 수 있다」고 세지 않는다');
+  /* 자격을 확인 안 한 것을 합계에 더하면 기망이다. evaluate 는 KOSAF 를 `selective`
+     (선발형 = 신청 가능)로 읽어서, 실측 홈 합계가 **2억 2,420만원**으로 부풀고
+     일괄 신청 준비 118건 중 **104건이 KOSAF** 였다(앱이 준비해 줄 수도 없는 것들). */
+  const reach = await page.evaluate(() => ({
+    bulk: bulkTargets().filter((s) => s.sourceKind === 'kosaf').length,
+    applyable: getMatches().filter((m) => m.sch.sourceKind === 'kosaf'
+      && ['eligible', 'selective'].includes(m.result.status)).length,
+    stillListed: getMatches().filter((m) => m.sch.sourceKind === 'kosaf').length,
+  }));
+  eq('일괄 신청 준비에 안 들어간다', reach.bulk, 0);
+  eq('  홈 합계가 세는 「신청 가능」에도 안 들어간다', reach.applyable, 0);
+  eq('  그래도 탐색 목록에는 그대로 남는다 (숨기는 게 아니다)', reach.stillListed > 0, true);
+
+  console.log('\n■ 상세 시트');
+  await page.click(`#explore-list [data-detail="${info.first}"]`);
+  await page.waitForSelector('#detail-sheet.show', { timeout: 4000 });
+  await page.waitForTimeout(300);
+  const sheet = await page.$eval('#detail-sheet', (e) => e.textContent);
+  /* 🔴 **문구를 박지 말 것** — 이 두 줄이 2026-09-01 부터 죽어 있었다(아무도 몰랐다).
+     ① 출처를 밝히던 안내 문단은 개발자 지시("중복 안내 줄이기")로 지워졌고, 그 일은 이제
+        **링크 이름**이 한다 — kosaf 공고의 링크는 '원문 공고 ↗' 가 아니라 '한국장학재단 ↗'.
+     ② 옛 문장 '자격 판정과 신청서 작성은 지원하지 않아요' 는 **이제 사실이 아니다.**
+        2026-08-30 에 지역 요건을 읽게 되면서 층2 에도 적합도를 낸다(실측 미달 79·적합 33).
+        사실이 아닌 문장을 요구하던 검사라, 되살리는 것이 아니라 **아직 참인 것**으로 바꾼다.
+     지키는 것: 이 앱은 kosaf 공고의 **원문을 읽지 않았다.** 그러니 링크를 '원문 공고'라고
+     부르면 눌러 본 학생에게 거짓말이 된다(원칙 8-1 · 2f9ef9b 커밋 설명 그대로). */
+  /* ⚠️ 2026-09-12: 이 줄이 요구하던 '한국장학재단 ↗' 은 **그 자체가 틀린 이름**이었다.
+     층2의 sourceUrl 은 KOSAF 가 아니라 그 재단 자기 홈페이지다(예: `namgu.gwangju.kr`) —
+     눌러 보면 한국장학재단이 안 열린다. 위 문단의 **뜻**(링크 이름은 그 주소가 실제로
+     여는 화면을 말한다)은 그대로 두고, 이름만 사실에 맞춘다. 이름을 지키려고 화면을
+     되돌리면 그게 거짓말이 된다. */
+  eq('출처를 밝힌다 (링크가 재단 홈페이지를 가리킨다)', /재단 홈페이지\s*↗/.test(sheet), true);
+  eq('  원문을 읽은 것처럼 「원문 공고」라고 부르지 않는다', /원문 공고\s*↗/.test(sheet), false);
+  eq('  「앱에서 작성」 버튼이 없다',
+    await page.$$eval('#detail-sheet button', (b) => b.filter((x) => /양식|작성하기/.test(x.textContent)).length), 0);
+  /* 🔴 KOSAF 첨부는 Referer 검사가 있어 앱에서 누르면 "비정상적인 접근"이 뜬다 */
+  eq('KOSAF 첨부 내려받기 주소가 화면에 없다',
+    await page.$$eval('#detail-sheet a', (a) => a.filter((x) => /kosaf\.go\.kr.*(download|fileDown|atchFile)/i.test(x.href)).length), 0);
+
+  console.log('\n■ 🔴 원문을 그대로 쏟아 붓지 않는다 (2026-08-30 개발자 지적)');
+  /* 지적 넷: `💡 undefined` · `○` 머리 기호 · `특정자격:` 칸 이름 접두어 ·
+     혜택 자리에 원문 문단 통째. 전부 "원문 그대로"를 게으름의 핑계로 쓴 것이었다. */
+  const clean = await page.evaluate(() => {
+    const t = document.querySelector('#detail-sheet').innerText;
+    const ks = allScholarships().filter((s) => s.sourceKind === 'kosaf');
+    return {
+      undef: /undefined/.test(t),
+      sym: /[○ㅇ※]/.test(t),
+      labelPrefix: ks.filter((s) => (s.eligibilityLines || [])
+        .some((l) => /^(특정자격|학년구분|학과구분|대학구분|성적기준|소득기준|지역거주구분)\s*:/.test(l))).length,
+      longAmount: ks.filter((s) => s.amount.length > 42).length,
+      dumpLine: ks.filter((s) => (s.eligibilityLines || []).some((l) => /대학\d학기 대학\d학기/.test(l))).length,
+      contradiction: /앱에서 바로 작성할 수 있어요/.test(t),
+    };
+  });
+  eq('💡 undefined 가 안 뜬다', clean.undef, false);
+  eq('  ○ ㅇ ※ 머리 기호를 떼고 보여 준다', clean.sym, false);
+  eq('  자격 요건에 칸 이름(`특정자격:`)을 붙이지 않는다', clean.labelPrefix, 0);
+  eq('  요건 자리에 코드 나열(`대학2학기 대학3학기…`)을 넣지 않는다', clean.dumpLine, 0);
+  eq('  혜택은 한 줄로 짧게 말한다 (원문 문단을 통째로 안 쓴다)', clean.longAmount, 0);
+  /* 🔴 **금액 줄에 원문 문단을 흘리지 않는다** (2026-09-12 개발자 지적: "lg ㄷ 스플레이
+     이런 식으로 글자 깨짐"). 예전에는 숫자를 못 읽으면 원문 40자를 잘라 그대로 띄웠고,
+     한국장학재단 원본의 오타(`LGㄷ스플레이`)가 카드 머리에 그대로 떴다.
+     🔴 그 오타는 우리가 만든 것이 아니다 — `data/kosaf.json` 원본이 이미 그렇고, 같은 재단의
+        `운영기관명` 은 `LG디스플레이` 로 멀쩡하다. 고칠 수 없는 남의 오타를 **헤드라인에
+        띄우지 않는 것**이 우리가 할 수 있는 일이고, 원문은 버리지 않고 상세에 남긴다.
+     ⚠️ 재단 이름·사업명은 여기서 검사하지 않는다 — 그건 원문 그대로 써야 하는 자리라
+        오타가 와도 우리가 손댈 수 없다(관문으로 만들면 고칠 수 없는 빨간불이 된다). */
+  /* 🔴 **오늘 데이터에 기대지 않는다** — 지금은 못 읽는 금액이 8곳이지만, 월·목 수확에서
+     전부 읽히는 날이 오면 아래 '원문을 상세로 내린다' 가 앱은 멀쩡한데 빨간불이 된다.
+     그래서 읽을 수 없는 금액을 가진 재단을 하나 심어 둔다(verify-explore-sort 와 같은 방식). */
+  await page.evaluate(() => {
+    kosafList = kosafList.concat([{ code: 'fixture-amt', org: '검사용재단', name: '검사용 장학금',
+      kind: '기타', due: null, home: 'https://example.org',
+      fields: { 지원금액: '○ 예산범위 내에서 이사회에서 결정한 금액', 신청기간: '○ 상시' } }]);
+    renderExplore();
+  });
+  await page.waitForTimeout(300);
+  const amt = await page.evaluate(() => {
+    const ks = allScholarships().filter((s) => s.sourceKind === 'kosaf');
+    /* 🔴 라벨 모양을 **앱이 실제로 쓰는 꼴 그대로** 적는다 — 처음엔 `[\d,]+원 ~` 로 적었다가
+       `won()` 이 만 단위를 `200만원` 으로 쓰는 것을 놓쳐, 범위형이 하나라도 들어오는 날
+       멀쩡한 화면이 빨간불이 될 뻔했다(2026-09-12 코드 리뷰). 끝도 묶는다 —
+       안 묶으면 `최대 400만원 범위 내에서 이사회 결정` 같은 원문 문단이 그대로 통과한다. */
+    const OK = /^최대 [\d,]+(만|억)?원$|^[\d,]+(만|억)?원 ~ [\d,]+(만|억)?원$|^등록금의 \d+%$|^금액은 재단 홈페이지에서 확인$/;
+    const bad = ks.filter((s) => !OK.test(s.amount));
+    const fallback = ks.filter((s) => s.amount === '금액은 재단 홈페이지에서 확인');
+    return { n: ks.length, bad: bad.map((s) => s.amount).slice(0, 5),
+      폴백: fallback.length, 폴백에원문있음: fallback.filter((s) => s.amountNote).length,
+      읽은건에원문안붙임: ks.filter((s) => s.amount !== '금액은 재단 홈페이지에서 확인' && s.amountNote).length };
+  });
+  eq('층2 카드가 있다 (검사가 헛돌지 않는다)', amt.n > 20, true);
+  eq('  금액 줄은 읽어 낸 금액이거나 정해진 한 문구다 (원문 문단 금지)', amt.bad, []);
+  eq('  못 읽은 금액의 원문은 버리지 않고 상세로 내린다', amt.폴백 > 0 && amt.폴백에원문있음 > 0, true);
+  eq('  읽어 낸 금액에는 원문을 덧붙이지 않는다 (같은 말 두 번 금지)', amt.읽은건에원문안붙임, 0);
+  /* 상세 시트에 실제로 그려지는지 — 데이터만 보면 렌더가 빠져도 통과한다 */
+  eq('  상세 시트가 그 원문을 보여 준다', await page.evaluate(async () => {
+    const s = allScholarships().find((x) => x.sourceKind === 'kosaf' && x.amountNote);
+    if (!s) return 'no-item';
+    openDetail(s.id);
+    await new Promise((r) => setTimeout(r, 250));
+    const t = document.querySelector('#detail-sheet').innerText;
+    return t.includes('재단이 적어 둔 지원금액') ? 'shown' : 'missing';
+  }), 'shown');
+  /* 🔴 **미달 근거 줄에 초록 ✓ 가 붙어 있었다** (2026-09-12 코드 리뷰가 화면에서 잡았다).
+     `공고에 적힌 요건에 미달해요: …` 가 ✕ 판정 낱말 어디에도 안 걸려 충족으로 그려졌다 —
+     배지는 '지원 자격 미달'인데 그 아래 근거에는 ✓ 라, 화면이 스스로 모순된 말을 했다.
+     ⚠️ 데이터(`fails`)만 보는 검사로는 못 잡는다 — **그려진 줄의 클래스**를 본다. */
+  eq('미달 근거 줄은 ✕ 로 그린다 (배지와 같은 말을 한다)', await page.evaluate(async () => {
+    const s = allScholarships().find((x) => (fitDetail(x, state.profile).fails || []).length);
+    if (!s) return 'no-item';
+    openDetail(s.id);
+    await new Promise((r) => setTimeout(r, 250));
+    const li = [...document.querySelectorAll('#detail-sheet .reason-list li')]
+      .find((e) => /미달해요/.test(e.textContent));
+    if (!li) return 'no-line';
+    return li.className.includes('r-bad') && li.textContent.trim().startsWith('✕') ? 'bad' : `wrong:${li.className}`;
+  }), 'bad');
+
+  /* 🔴 바로 위에서 "신청서 작성은 지원하지 않아요"라고 해 놓고 아래에서
+     "앱에서 바로 작성할 수 있어요"가 같이 떠 있었다 — 한 시트 안에서 말이 엇갈렸다. */
+  eq('  같은 시트 안에서 말이 엇갈리지 않는다', clean.contradiction, false);
+  /* 🔴 카드와 시트가 **같은 글자**를 말해야 한다 — 한쪽만 고쳐 카드는 「자격 미확인」인데
+     시트는 「적합도 25% · 요건 4개 중 1개 충족」이었다(개발자가 눌러 보고 잡았다).
+     화면에 실제로 그려진 두 배지를 견준다 — 함수를 견주면 렌더가 갈라져도 못 잡는다. */
+  /* 🔴 **글자가 같기를 요구하지 않는다** (2026-08-31 수리).
+     2026-08-30 부터 카드는 짧게(`적합도 67%`), 상세는 전부(`… 요건 3개 중 2개 충족 ·
+     확인 필요 1`) 보여 주도록 **일부러** 갈라 놓았다(fitBadgeHtml 의 `{full:true}`).
+     그런데 이 검사는 두 글자가 똑같기를 요구해서 그날부터 **main 이 빨간불**이었다.
+     지켜야 할 뜻은 그대로다 — 원래 잡으려던 사고는 "카드는 「자격 미확인」인데 상세는
+     「적합도 25%」" 처럼 **판정이 갈라지는 것**이지 글자 수가 다른 것이 아니다.
+     그래서 ①판정 갈래 ②퍼센트 숫자 둘만 견준다. */
+  eq('카드와 상세가 같은 적합도를 말한다', await page.evaluate(async () => {
+    const card = document.querySelector('#explore-list [data-detail^="kosaf-"]');
+    if (!card) return 'no-card';
+    /* 🔴 2026-09-10 페이스리프트: 카드의 적합도는 알약(.badge-fit)이 아니라 **글자**(.sch-fit)다.
+       상세 시트는 알약 그대로다(거기서는 '요건 n개 중 m개 충족'까지 함께 말한다).
+       재는 뜻은 그대로 — **판정 갈래와 퍼센트가 카드·상세에서 갈리지 않는다.**
+       ⚠️ .sch-fit 을 안 넣으면 카드가 'none' 으로 읽혀 멀쩡한 화면이 빨간불이 된다(실제로 그랬다). */
+    const read = (root) => {
+      const el = root.querySelector('.sch-fit, .badge-fit, .badge-fit-unknown, .badge-fit-no');
+      if (!el) return { kind: 'none', pct: null };
+      const t = el.textContent.replace(/\s+/g, ' ').trim();
+      const kind = el.className.includes('badge-fit-no') ? 'no'
+        : el.className.includes('badge-fit-unknown') ? 'unknown' : 'ok';
+      return { kind, pct: (t.match(/적합도 (\d+)%/) || [])[1] || null };
+    };
+    const onCard = read(card);
+    openDetail(card.dataset.detail);
+    await new Promise((r) => setTimeout(r, 250));
+    const onSheet = read(document.querySelector('#detail-sheet'));
+    if (onCard.kind !== onSheet.kind) return `판정 갈림: ${onCard.kind} / ${onSheet.kind}`;
+    if (onCard.pct !== onSheet.pct) return `퍼센트 갈림: ${onCard.pct} / ${onSheet.pct}`;
+    return 'same';
+  }), 'same');
+
+  console.log('\n■ 데이터');
+  const data = await page.evaluate(() => ({
+    n: kosafList.length,
+    loan: kosafList.filter((i) => /연\s?이율|상환기간|대여한도|대부/.test(i.fields['지원금액'] || '')).length,
+    badHome: kosafList.filter((i) => i.home && !/^https?:\/\//.test(i.home)).length,
+    noDue: kosafList.filter((i) => !i.due).length,
+  }));
+  eq(`대여(대출) 상품이 섞이지 않았다 (${data.n}곳)`, data.loan, 0);
+  eq('주소가 http(s) 가 아닌 것이 없다 (콜론 빠진 원본을 그대로 넘기면 우리 사이트로 간다)', data.badHome, 0);
+  /* 🔴 **실제 데이터가 그런 항목을 갖고 있기를 기대하지 않는다** (2026-09-03).
+     이 줄은 원래 `data.noDue > 0` 이었다 — 살아 있는 데이터에 마감일 빈 재단이 하나라도
+     있어야 통과하는 검사다. 그런데 KOSAF 가 그 칸을 **전부 채우자 그날로 빨간불**이 됐다.
+     코드는 멀쩡했다(실측: 창고 1,868건 중 빈 칸 4 → 0). 사람이 준비해 둔 픽스처에 기대는
+     검사는 언젠가 반드시 안 돌아간다는 그 유형이라, **규칙에 직접 먹여 본다.**
+
+     지키는 규칙(2026-08-30 개발자 지적): 마감일 칸이 비었어도 상세에 신청기간이 있으면
+     모집 중이다(푸른등대가 `ㅇ2학기: 8. 26. ~ 9. 10.` 처럼 **해 없는 학기 일정**을 쓴다).
+     ⚠️ `detail` 은 **평평하다**(`detail['신청기간']`) — `detail.fields` 가 아니다.
+        감싸서 넣으면 멀쩡한 코드가 버리는 것처럼 보인다(이 검사를 쓰다 실제로 헷갈렸다). */
+  {
+    const { slimKosaf } = await import('../collector/kosaf-open.mjs');
+    const mk = (code, due, period) => ({ code, org: '테스트재단', name: '장학생', goods: '장학금',
+      due, home: 'https://example.org', detail: { '신청기간': period, '지원금액': 'ㅇ100만원' } });
+    const ruled = slimKosaf({ items: [
+      mk('T1', '', 'ㅇ2학기: 8. 26. ~ 9. 10.'),   // 푸른등대 꼴 — 남아야 한다
+      mk('T2', '', ''),                            // 기간조차 없다 — 버려야 한다
+      mk('T3', '2026-12-31', 'ㅇ상시'),            // 마감 전 — 남아야 한다
+      mk('T4', '2020-01-01', 'ㅇ상시'),            // 마감 지남 — 버려야 한다
+    ] }, '2026-09-03');
+    const codes = ruled.items.map((i) => i.code).sort();
+    eq('마감일 칸이 비어도 기간이 있으면 버리지 않는다', codes, ['T1', 'T3']);
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════
+     선발공고문 사본 (2026-09-12 개발자 지시) — 층2가 재단 홈페이지 하나만 주던 구조의 수리.
+     🔴 **픽스처를 스스로 주입한다.** 지금 저장소에 받아 둔 사본이 0개라, 그냥 재면
+        이 검사가 빈 화면을 상대로 통과한다(이 작업에서 실제로 그 함정에 한 번 빠졌다 —
+        상세 파서가 엉뚱한 칸을 집어 96%가 0건이 됐는데 관문 셋이 전부 초록불이었다).
+     ══════════════════════════════════════════════════════════════════════ */
+  console.log('\n■ 선발공고문 사본이 학생 화면에 닿는가');
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(400);
+  const inj = await page.evaluate((id) => {
+    /* 앱이 받은 층2 목록에 사본 한 벌을 얹고 다시 그린다 — 화면 코드를 그대로 통과시킨다.
+       ⚠️ **이미 목록에 떠 있는 공고**에 얹는다. 아무 항목에나 얹으면 그 카드가 화면에
+          없어서(마감·필터) 클릭할 수 없다. */
+    const code = String(id).replace(/^kosaf-/, '');
+    const it = kosafList.find((x) => x.code === code);
+    if (!it) return null;
+    it.files = [{ name: '선발공고문.pdf', path: 'data/kosaf-files/TEST/선발공고문.pdf', bytes: 204800 }];
+    renderExplore();
+    return id;
+  }, info.first);
+  if (!inj) { fail++; console.log('  ✕ 층2 목록이 비어 픽스처를 못 넣었다'); }
+  else {
+    await page.click(`#explore-list [data-detail="${inj}"]`);
+    await page.waitForSelector('#detail-sheet.show', { timeout: 4000 });
+    await page.waitForTimeout(200);
+    const att = await page.$$eval('#detail-sheet a', (as) => as
+      .filter((a) => /kosaf-files/.test(a.getAttribute('href') || ''))
+      .map((a) => ({ href: a.href, text: a.textContent.trim() })));
+    eq('공고문 링크가 상세 시트에 뜬다', att.length, 1);
+    /* 🔴 주소가 **우리 도메인 + 앱이 놓인 자리** 로 풀려야 한다. `location.origin` 기준으로
+       풀면 `/data/…` 가 사이트 뿌리로 가서 404 다(앱은 /hanggonggan/ 아래에 있다). */
+    eq('  우리 도메인에서 받는다 (KOSAF 원주소가 아니다)',
+      att.length === 1 && att[0].href.startsWith(`http://localhost:${PORT}/data/kosaf-files/`), true);
+    /* 🔴 **앱이 하위 경로에 놓인 상태로 재야 한다** — 이 검사는 처음에 무력했다(2026-09-12).
+       검사 서버는 앱을 뿌리(`localhost:8123/`)에 두는데 진짜 앱은
+       `…github.io/hanggonggan/` 아래에 있다. 뿌리에서는 `location.origin` 기준으로
+       풀어도 결과가 같아서, safeUrl 을 되돌려도 위 줄이 초록불이었다(실측).
+       그래서 배포 자리를 흉내 내 **그때만** 다시 푼다. */
+    const based = await page.evaluate(() => {
+      Object.defineProperty(document, 'baseURI', { configurable: true, get: () => `${location.origin}/hanggonggan/` });
+      const got = safeUrl('data/kosaf-files/TEST/선발공고문.pdf');
+      delete document.baseURI;
+      return got;
+    });
+    eq('  하위 경로에 배포돼도 주소가 맞는다 (사이트 뿌리로 새지 않는다)',
+      /\/hanggonggan\/data\/kosaf-files\//.test(based), true);
+    const sheet2 = await page.$eval('#detail-sheet', (e) => e.textContent);
+    /* 🔴 공고문을 '첨부 양식'이라 부르면, 받은 학생이 신청서인 줄 알고 빈칸을 찾는다 */
+    eq('  그 파일이 무엇인지 이름을 붙인다 (선발 공고문)', /선발 공고문/.test(sheet2), true);
+    eq('  신청서 양식이라고 부르지 않는다', /공고 원본 첨부 양식/.test(sheet2), false);
+  }
+
+  /* ══ 층2도 신청 버튼이 열린다 (2026-09-13 · 노션 백로그 핵심-2) ═══════════════════
+     🔴 왜 여기에 두나 — 층2는 `evaluateFor`(app.js) 가 판정을 통째로 `unknown` 으로 눌러서,
+        자격 잠금이 있던 동안 **마감 전 90건이 100% 잠겨 있었다**(실측). 학생이 한국장학재단
+        목록에서 할 수 있는 일이 '재단 홈페이지 열기' 하나뿐이었다는 뜻이다.
+        층1과 달리 이 층은 **전부** 영향을 받으므로 화면에서 따로 못 박는다.
+     ⚠️ 여는 것으로 끝내면 안 된다 — 무엇을 확인해야 하는지 함께 말해야 한다(원칙 8-1). */
+  {
+    /* 🔴 **맨 앞 공고를 그냥 집으면 안 된다** (2026-09-13 코드 리뷰). 층2 중에도 `ineligible`
+       이 있고(마감 전 90건 중 절반 이상 — 프로필에 따라 다르다) 그건 안내 문구가 다르다.
+       마감이 굴러가면 맨 앞이 바뀌므로, 그렇게 두면 **어느 날 갑자기** 빨간불이 된다.
+       앱의 `evaluateFor` 로 상태를 보고 `unknown` 인 것을 그때그때 고른다. */
+    const target = await page.evaluate(() => {
+      const k = kosafAsScholarships().filter((s) => dday(s.deadline).days >= 0)
+        .filter((s) => evaluateFor(s, state.profile).status === 'unknown');
+      if (!k.length) return null;
+      openDetail(k[0].id);
+      return k[0].id;
+    });
+    eq('마감 전 · 자격 미확인인 층2 공고가 실제로 있다 (없으면 이 검사는 무의미하다)', !!target, true);
+    if (target) {
+      await page.waitForSelector('#detail-sheet.show', { timeout: 4000 });
+      const st = await page.evaluate(() => {
+        const b = document.querySelector('#btn-apply-one');
+        const c = document.querySelector('#detail-sheet .dp-caution');
+        return { locked: b ? b.disabled : null, label: b ? b.textContent.trim() : null,
+          note: c ? c.textContent.trim() : '' };
+      });
+      eq('  층2 공고도 신청 버튼이 열린다', st.locked, false);
+      eq('  버튼 문구가 「신청할 수 없음」이 아니다', /신청할 수 없음/.test(st.label || ''), false);
+      /* 🔴 층2는 자격을 **읽은 적이 없다** — 그러니 '미충족'이라 단정하면 안 되고,
+         학생을 원문으로 보내야 한다.
+         ⚠️ 2026-09-17 개발자 지시로 **문구에서 우리 사정을 뺐다**("앱 내부 사정에 대한
+            설명은 학생이 아니라 관리자에게만"). 예전 이 줄은 `/읽지 못했/` 를 요구했는데
+            그건 우리 공정을 학생 화면에 적으라는 요구였다 — 지키려던 규칙('확인해 준 척하지
+            않는다')은 그대로 두고 잣대만 옮긴다. 같은 판단이 test-collector
+            '판정 문구의 정직함' 절에도 적혀 있다(둘이 갈라지면 안 된다). */
+      eq('  자격은 원문에서 보라고 알린다', /원문/.test(st.note) && /자격/.test(st.note), true);
+      eq('  「요건 미충족」이라 단정하지 않는다', /미충족/.test(st.note), false);
+      eq('  우리 공정 이야기를 학생에게 하지 않는다', /읽지 못|검수|AI가/.test(st.note), false);
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(250);
+    }
+  }
+
+  /* ══ 속이 빈 공고문은 학생 화면에 닿지 않는다 (2026-09-13) ═══════════════════
+     🔴 재단이 '선발공고문' 자리에 **속이 빈 파일**을 올려 둔 것이 실측 5건 있었다
+        (`공고문 없음.hwp` — 열어 보니 0·0·5·8·29자). 층2의 유일한 공고 원문을 눌렀는데
+        빈 문서가 열리는 것은 안내가 아니라 헛걸음이다.
+     🔴 내리는 것은 **첨부 하나**이지 재단이 아니다 — 재단째 내리면 멀쩡히 모집 중인
+        장학금 5건이 학생에게서 사라진다. 그래서 둘을 같이 잰다.
+     ⚠️ **조용히 건너뛰지 않는다** — 장부가 비는 날(그 재단들이 마감되면 온다)에는
+        같은 일을 픽스처로 흉내 내 같은 두 가지를 잰다. */
+  console.log('\n■ 속이 빈 공고문이 학생 화면에 닿지 않는가');
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(300);
+  {
+    const ledger = JSON.parse(fs.readFileSync(
+      path.join(__dirname, '..', 'collector', 'kosaf-block.json'), 'utf8'));
+    const rows = (ledger.hidden || []).filter((b) => b.file);
+    /* 앱 목록에 실제로 떠 있는 것만 고른다(마감·필터로 빠진 재단은 클릭할 수 없다) */
+    const pick = await page.evaluate((rs) => {
+      for (const r of rs) {
+        const it = kosafList.find((x) => x.code === r.code);
+        if (it) return { code: r.code, file: r.file, org: it.org,
+          hasFile: ((it.files || []).some((f) => f.name === r.file)) };
+      }
+      return null;
+    }, rows);
+    let target = pick;
+    if (pick) {
+      eq(`내려 둔 첨부가 앱 파일에 없다 (${pick.org} / ${pick.file})`, pick.hasFile, false);
+      eq('  그 재단은 층2 목록에 그대로 있다', true, true);
+    } else {
+      /* 장부가 비었거나 그 재단들이 마감됐다 — 같은 일을 흉내 내 **같은 것을** 잰다 */
+      console.log('  · 장부에 내려 둔 첨부가 지금 목록에 없어 픽스처로 잰다');
+      target = await page.evaluate(() => {
+        const it = kosafList.find((x) => (x.files || []).length);
+        if (!it) return null;
+        delete it.files;                     // slimKosaf 가 내렸을 때와 같은 모양
+        renderExplore();
+        return { code: it.code, org: it.org, file: '(픽스처)' };
+      });
+      eq('픽스처를 넣을 층2 재단이 있다', !!target, true);
+    }
+    if (target) {
+      const card = await page.$(`#explore-list [data-detail="kosaf-${target.code}"]`);
+      if (!card) { fail++; console.log(`  ✕ 그 재단 카드가 목록에 없다 (kosaf-${target.code})`); }
+      else {
+        await card.click();
+        await page.waitForSelector('#detail-sheet.show', { timeout: 4000 });
+        await page.waitForTimeout(200);
+        const got = await page.evaluate(() => {
+          const sheet = document.querySelector('#detail-sheet');
+          return {
+            links: [...sheet.querySelectorAll('a')]
+              .filter((a) => /kosaf-files/.test(a.getAttribute('href') || '')).length,
+            head: /선발 공고문/.test(sheet.textContent),
+            /* 재단 자체는 그대로 — 홈페이지 링크와 이름이 살아 있어야 한다 */
+            title: (sheet.querySelector('h2, h3, .ds-title') || {}).textContent || sheet.textContent.slice(0, 40),
+          };
+        });
+        eq('  상세 시트에 공고문 링크가 없다', got.links, 0);
+        /* 🔴 빈 목록만 남은 **껍데기 머리말**도 안 된다 — 학생이 '있다는데 없네' 를 겪는다 */
+        eq('  「선발 공고문」 머리말이 아예 없다', got.head, false);
+        eq('  그래도 재단 카드는 열린다 (장학금까지 내리지 않았다)', got.title.length > 0, true);
+        await page.keyboard.press('Escape');
+        await page.waitForTimeout(250);
+      }
+    }
+  }
+
+  eq('콘솔 오류 없음', errors, []);
+  await browser.close();
+  console.log(fail ? `\n✕ 실패 ${fail}건` : '\n✓ 한국장학재단 등록분 검증 통과');
+  process.exit(fail ? 1 : 0);
+})();

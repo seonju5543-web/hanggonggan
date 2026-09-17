@@ -55,10 +55,10 @@ const FORM_TEMPLATES = {
             sugg: ['과제·아이디어 정리에 대화형 AI를 주 3회 이상 활용하고 있습니다.',
               '교내 프로젝트에서 이미지 생성 AI로 포스터를 제작해 봤습니다.'] },
           { id: 'exp', label: 'AI 관련 활동 경험', type: 'checks+text',
-            q: 'AI 관련 경험이 있다면 모두 고르세요 (없으면 선택하지 않아도 돼요)',
+            q: 'AI 관련 경험이 있다면 (해당 항목 모두 선택 · 없으면 선택 안 함)',
             options: ['AI·SW 관련 수업 수강 경험', 'AI·SW 관련 자격증 또는 교육 수료 경험',
               '공모전, 프로젝트, 동아리, 대외활동 경험', '기타 AI·디지털 도구 활용 경험'],
-            textLabel: '작성', tq: '경험 내용 (없으면 비워두세요 — "없음"으로 기재돼요)',
+            textLabel: '작성', tq: '경험 내용 (없으면 비워두세요 — "없음"으로 기재)',
             sugg: ['교양 수업에서 AI 리터러시 과목을 이수했습니다.'] , emptyText: '없음' },
         ],
       },
@@ -231,7 +231,7 @@ function formFieldHtml(f) {
   if (f.type === 'text') {
     html += `<input type="text" id="${fid}" placeholder="${esc(f.placeholder || '')}" value="${esc(f.preset || '')}" autocomplete="off" />`;
     const key = typeof formAutoKey === 'function' ? formAutoKey(f) : '';
-    if (key) html += `<label class="fq-keep"><input type="checkbox" class="fq-keep-box" data-key="${esc(key)}" data-for="${fid}" checked /><span>다음 신청서에도 쓸게요</span></label>`;
+    if (key) html += `<label class="fq-keep"><input type="checkbox" class="fq-keep-box" data-key="${esc(key)}" data-for="${fid}" checked /><span>다음 신청서에도 사용</span></label>`;
   }
   if (f.type === 'textarea') {
     /* 🔴 서술형(story) 칸은 빈 칸을 던지지 않는다 (개발자 지적 2026-08-23).
@@ -243,9 +243,9 @@ function formFieldHtml(f) {
     html += `<div class="fq-sugg">${(f.sugg || []).map((s) => `<button type="button" class="chip chip-sm" data-fill="${fid}" data-text="${esc(s)}">${esc(s.slice(0, 26))}…</button>`).join('')}</div>`;
     const ph = isStory
       ? (typeof essayOn === 'function' && essayOn()
-        ? '위 키워드를 고르고 아래 ✨ 버튼을 누르면 여기가 채워져요 — 직접 쓰셔도 돼요'
-        : '위 키워드를 고르고 아래 버튼을 누르면 여기로 옮겨져요 — 직접 쓰셔도 돼요')
-      : '직접 입력하거나 위 추천 문구를 눌러 채워보세요';
+        ? '위 키워드를 고른 뒤 아래 버튼을 누르면 이 칸이 채워집니다 — 직접 써도 됩니다'
+        : '위 키워드를 고른 뒤 아래 버튼을 누르면 이 칸으로 옮겨집니다 — 직접 써도 됩니다')
+      : '직접 입력하거나 위 추천 문구를 눌러 채우세요';
     html += `<textarea id="${fid}" rows="${isStory ? 5 : 3}" placeholder="${esc(ph)}"></textarea>`;
   }
   if (f.type === 'group') {
@@ -270,13 +270,13 @@ function formQuestionsHtml(tpl) {
 
   /* 안 물어본 것을 감추지 않는다 — 무엇을 채웠는지 보이고 그 자리에서 고칠 수 있어야 한다 */
   if (plan.autoRows.length) {
-    html += `<details class="fq-auto"><summary>프로필에서 ${plan.autoRows.length}개를 채웠어요 · 확인하고 고치기</summary>` +
+    html += `<details class="fq-auto"><summary>프로필에서 자동으로 채운 항목 ${plan.autoRows.length}개 · 확인하고 고치기</summary>` +
       plan.autoRows.map((r) => `<label class="fq-sub"><span>${esc(String(r.label).replace(/\n/g, ' '))}</span>` +
         `<input type="text" class="fq-auto-in" data-f="${esc(r.id)}" value="${esc(r.value)}" autocomplete="off" /></label>`).join('') +
-      `<p class="dp-note">여기서 고친 값은 이 신청서에만 적용돼요. 계속 바꾸려면 MY → 내 정보에서 고치세요.</p></details>`;
+      `<p class="dp-note">여기서 고친 값은 이 신청서에만 적용됩니다. 계속 바꾸려면 MY → 내 정보에서 고치세요.</p></details>`;
   }
   if (plan.over.length) {
-    html += `<p class="dp-note fq-over">이 신청서는 원본 항목이 많아요 — 질문 ${plan.counts.total}개예요. 하나도 빠뜨리지 않으려고 전부 보여 드려요.</p>`;
+    html += `<p class="dp-note fq-over">이 신청서는 원본 항목이 많습니다 — 질문 ${plan.counts.total}개입니다. 하나도 빠뜨리지 않도록 전부 보여 줍니다.</p>`;
   }
 
   plan.secs.forEach((sec) => {
@@ -334,6 +334,57 @@ function collectFormAnswers(tpl) {
   return ans;
 }
 
+/* ---------- 답변 되돌려 넣기 (2026-09-09 · 이어보기 3겹) ----------
+   `collectFormAnswers` 의 **거울**이다. 잠깐 나갔다 온 학생의 신청서를 쓰던 그대로
+   되살릴 때 쓴다(AI 초안도 같은 `#fq-<id>` 칸에 들어 있어 함께 돌아온다).
+   설계: docs/designs/first-run-and-resume.md
+
+   🔴 위 `collectFormAnswers` 와 **칸 종류가 어긋나면 조용히 빈 칸이 된다.** 한쪽에 종류를
+      더하면 여기도 더할 것. 관문: verify/test-collector.mjs '이어보기' 절이 두 함수가 다루는
+      종류가 같은지 센다. */
+function fillFormAnswers(tpl, ans) {
+  if (!ans) return 0;
+  const plan = formPlanFor(tpl);
+  let filled = 0;
+  const setVal = (sel, v) => {
+    const el = $(sel);
+    if (!el || v === undefined || v === null || v === '') return;
+    el.value = v;
+    filled += 1;
+  };
+  const setChips = (sel, picked) => {
+    const list = Array.isArray(picked) ? picked : [];
+    if (!list.length) return;
+    $$(`${sel} .chip`).forEach((c) => c.classList.toggle('active', list.indexOf(c.dataset.value) >= 0));
+    filled += 1;
+  };
+
+  /* ① 프로필에서 채운 값을 학생이 고쳤으면 그 고친 값 */
+  $$('.fq-auto-in').forEach((el) => { if (ans[el.dataset.f] !== undefined) { el.value = ans[el.dataset.f]; filled += 1; } });
+
+  /* ② 화면에 낸 질문 — collectFormAnswers 와 같은 순서·같은 종류로 되돌린다 */
+  plan.secs.forEach((sec) => sec.items.forEach((f) => {
+    const fid = `fq-${f.id}`;
+    const v = ans[f.id];
+    if (f.type === 'checks' || f.type === 'checks+text') {
+      if (!v) return;
+      setChips(`.fq-checks[data-f="${f.id}"]`, v.checks);
+      if (f.type === 'checks+text') setVal(`#${fid}-t`, v.text);
+    } else if (f.type === 'choice') {
+      if (v) setChips(`.fq-choice[data-f="${f.id}"]`, v.checks);
+    } else if (f.type === 'schedule') {
+      if (!v) return;
+      setChips(`.fq-checks[data-f="${f.id}-days"]`, v.days);
+      setVal(`#${fid}-time`, v.time);
+    } else if (f.type === 'group') {
+      (f.sub || []).forEach((sf) => setVal(`#fq-${sf.id}`, ans[sf.id]));
+    } else {
+      setVal(`#${fid}`, v);
+    }
+  }));
+  return filled;
+}
+
 /* 학생이 새로 적어 준 값을 프로필에 남긴다 ('다음 신청서에도 쓸게요').
    🔴 저장은 기기 안(localStorage)뿐이다 — 밖으로 나가는 코드는 없다. */
 function formKeepToProfile() {
@@ -362,9 +413,26 @@ function renderFormDoc(tpl, p, ans, { editable = false } = {}) {
   const ed = editable ? ' contenteditable="true"' : '';
   const box = (checked) => (checked ? '☑' : '□');
 
+  /* 사진란 (2026-09-11 개발자 지시 — MY 의 프로필 사진을 사진을 요구하는 공고에 쓴다).
+     🔴 들어가는 양식은 **photoNote 가 있는 양식뿐**이다 — 원본 서식에 사진란이 있다고 스키마화 때
+        적어 둔 표식이고, 사진란이 없는 서식에 사진을 붙이는 것은 지어내는 것이다.
+     🔴 사진이 없으면 예전 문구 그대로(인쇄 후 부착). 있으면 원본 서식처럼 **우측 상단**에 넣고
+        문구를 바꾼다 — 단, 규격(크기·배경·촬영 시기)은 우리가 모르므로 공고에서 확인하라고 적는다.
+     🔴 `photoNote` 는 이름과 달리 **사진 이야기가 아닌 안내**도 담고 있다(코드 리뷰 실측: 13건 중 3건이
+        '회색 안내 문구 삭제'·'추천란 서명·시험합격확인서 첨부'). 그래서 문구에 '사진' 이 있을 때만 사진란으로 본다.
+     🔴 원문 안내는 **지우지 않고 그대로 두고** 한 줄을 덧붙인다 — 규격(3cm×4cm·3개월 이내·컬러)은 원문이 말하고
+        우리는 모른다. 원본이 '좌측 상단' 이면 왼쪽에 붙인다(한 서식이 실제로 그렇다).
+     ⚠️ app.js 가 없는 곳(Node 검사·관리자 화면)에서는 함수가 없어 예전 문서와 한 글자도 안 다르다.
+     ⚠️ 사진이 없을 때 글자 하나(공백 포함)도 더하지 않는다 — form-snapshot 이 문서 동일성을 잰다. */
+  const hasPhotoBox = !!(tpl.photoNote && /사진/.test(tpl.photoNote));
+  const photo = (hasPhotoBox && typeof profilePhotoDataUrl === 'function') ? profilePhotoDataUrl() : '';
+  const photoSide = /좌측|왼쪽/.test(tpl.photoNote || '') ? ' left' : '';
   let html = `<div class="form-doc"><p class="fd-tag">${esc(tpl.tag || '<별첨>')}</p>
-    <h2 class="fd-title">${esc(tpl.title)}</h2>`;
-  if (tpl.photoNote) html += `<p class="fd-note">${esc(tpl.photoNote)}</p>`;
+    ${photo ? `<img class="fd-photo${photoSide}" src="${photo}" alt="증명사진" />\n    ` : ''}<h2 class="fd-title">${esc(tpl.title)}</h2>`;
+  if (tpl.photoNote) {
+    html += `<p class="fd-note">${esc(tpl.photoNote)}</p>`;
+    if (photo) html += `<p class="fd-note fd-photo-note">※ 앱이 MY 의 프로필 사진을 사진란에 넣었어요. 위 안내의 규격(크기·배경·촬영 시기)과 다르면 인쇄한 뒤 원본 사진을 붙여 주세요.</p>`;
+  }
 
   tpl.sections.forEach((sec) => {
     if (sec.heading || sec.note) html += `<p class="fd-sec">${esc(sec.heading)}${sec.note ? ` <span class="fd-note">${esc(sec.note)}</span>` : ''}</p>`;
@@ -441,6 +509,9 @@ const FORM_DOC_CSS = `
   .fd-title { text-align:center; font-size:19px; margin:10px 0 16px; }
   .fd-sec { font-weight:700; margin:16px 0 6px; font-size:14.5px; }
   .fd-note { font-weight:400; font-size:11.5px; color:#555; }
+  .fd-photo { float:right; width:3cm; height:4cm; object-fit:cover; border:1px solid #444; margin:0 0 8px 12px; }
+  .fd-photo.left { float:left; margin:0 12px 8px 0; }
+  .fd-photo-note { clear:both; }
   .fd-table { width:100%; border-collapse:collapse; table-layout:fixed; }
   .fd-table th, .fd-table td { border:1px solid #333; padding:7px 8px; font-size:12.5px; vertical-align:top; text-align:left; }
   .fd-table th { background:#f0f0f0; width:26%; font-weight:600; }
@@ -465,12 +536,12 @@ function downloadFormDoc(tpl, p, ans) {
   document.body.appendChild(a);
   a.click();
   a.remove();
-  toast('문서 파일(.doc)로 저장했어요 — 한글·워드에서 열 수 있어요');
+  toast('문서 파일(.doc)로 저장했습니다 — 한글·워드에서 열기 가능');
 }
 
 function printFormDoc(tpl, p, ans) {
   const w = window.open('', '_blank');
-  if (!w) { toast('팝업이 차단됐어요. 브라우저 설정을 확인해 주세요'); return; }
+  if (!w) { toast('팝업이 차단됐습니다. 브라우저 설정을 확인해 주세요'); return; }
   w.document.write(formDocFullHtml(tpl, p, ans));
   w.document.close();
   setTimeout(() => w.print(), 400);
@@ -497,7 +568,7 @@ function buildPrepTemplate(sch) {
     title: `${sch.name} — 지원문서`,
     docName: `지원문서_${(sch.name || '').replace(/[^가-힣a-zA-Z0-9]/g, '').slice(0, 24) || '장학금'}`,
     org: sch.provider || '',
-    tag: '※ 이 공고는 별도 신청서 양식 없이 자유 형식 제출을 받습니다 — 아래 문서를 그대로 제출할 수 있어요.',
+    tag: '※ 이 공고는 별도 신청서 양식 없이 자유 형식 제출을 받습니다 — 아래 문서를 그대로 제출할 수 있습니다.',
     unofficial: true,
     pledge: '위 내용은 사실과 다름이 없습니다.',
     signLabel: '지원자',

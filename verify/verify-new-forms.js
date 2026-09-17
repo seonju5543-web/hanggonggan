@@ -2,6 +2,8 @@
    ① data/forms.json 병합 확인 ② 각 스키마가 질문 화면·문서 렌더링에서 오류 없이 동작
    ③ 대표 1종(삼일)은 UI로 질문→문서 생성까지 ④ 명지 프로필로 고시장학금 양식 확인 */
 const { chromium } = require('playwright-core');
+const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
+const { nextUntil, assertOwnServer } = require('./onboard-helper.js');
 
 const NEW_KEYS = ['samil-apply', 'bogun-study-apply', 'bogun-multi-apply', 'sanhak-foreign-apply', 'mju-gosi-apply'];
 
@@ -9,7 +11,9 @@ const NEW_KEYS = ['samil-apply', 'bogun-study-apply', 'bogun-multi-apply', 'sanh
    특정 공고 id를 박아두면 시간이 지나 검증이 저절로 깨진다(2026-07-30 실제 발생).
    같은 양식을 쓰면서 아직 마감되지 않은 접수분을 찾아 구동한다. */
 const REG = require('../data/registered.json');
-const TODAY = new Date().toISOString().slice(0, 10);
+/* 🔴 KST 로 읽는다 — 그냥 toISOString 은 **UTC** 라 새벽에 하루 어긋나고,
+   그날 마감인 공고가 '아직 안 지났다'로 분류된다(verify-explore-sort 가 그래서 빨간불이었다). */
+const TODAY = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
 function pickTarget(formId) {
   const live = REG.items.filter((i) => i.formId === formId && (!i.deadline || i.deadline >= TODAY));
   if (!live.length) return null;
@@ -53,7 +57,8 @@ async function onboard(page, school, major) {
   await page.selectOption('#in-bracket', '4');
   await page.selectOption('#in-region', '서울');
   await page.click('.onboard-step[data-step="2"] [data-next]');
-  await page.click('.onboard-step[data-step="3"] [data-next]');
+  /* 단계 번호를 박지 말 것 — 온보딩이 4단계에서 6단계가 되며 이 검사들이 죽어 있었다 */
+  await nextUntil(page, '#in-sid');
   await page.fill('#in-sid', '2023310123');
   await page.fill('#in-phone', '010-1234-5678');
   await page.fill('#in-email', 'test@test.ac.kr');
@@ -63,13 +68,17 @@ async function onboard(page, school, major) {
 }
 
 (async () => {
+  /* 🔴 재기 전에 **이 서버가 내 앱인지** 확인한다 — 아니면 여기서 멈춘다.
+     이 저장소는 작업 폴더를 여러 개 두고 쓰는데, 8123 에 다른 폴더의 서버가 떠 있으면
+     그 옛 앱을 재고도 아무도 모른다(빨간불이든 **가짜 초록불이든**). 규칙은 onboard-helper 한 곳. */
+  await assertOwnServer(PORT);
   const browser = await chromium.launch({ executablePath: (process.env.CHROME_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome') });
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   const errors = [];
   page.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
   page.on('dialog', async (d) => { await d.accept(); });
 
-  await page.goto('http://localhost:8123/', { waitUntil: 'domcontentloaded' });
+  await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
   await onboard(page, '성균관', '소프트웨어학과');
 
   // ① 병합 확인
@@ -106,7 +115,7 @@ async function onboard(page, school, major) {
   const samilPage = await browser.newPage({ viewport: { width: 390, height: 844 } });
   samilPage.on('pageerror', (e) => errors.push('PAGEERROR-SAMIL: ' + e.message));
   samilPage.on('dialog', async (d) => { await d.accept(); });
-  await samilPage.goto('http://localhost:8123/', { waitUntil: 'domcontentloaded' });
+  await samilPage.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
   await onboard(samilPage, SCHOOL_ALIAS[samilTarget.eligibility.schoolOnly] || samilTarget.eligibility.schoolOnly, '컴퓨터공학부');
   {
     const page = samilPage; // 아래 단언들은 기존 그대로 재사용
@@ -145,7 +154,7 @@ async function onboard(page, school, major) {
   const page2 = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page2.on('pageerror', (e) => errors.push('PAGEERROR2: ' + e.message));
   page2.on('dialog', async (d) => { await d.accept(); });
-  await page2.goto('http://localhost:8123/', { waitUntil: 'domcontentloaded' });
+  await page2.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
   await onboard(page2, SCHOOL_ALIAS[gosiTarget.eligibility.schoolOnly] || gosiTarget.eligibility.schoolOnly, '융합소프트웨어학부');
   await page2.click('.nav-item[data-nav="explore"]');
   await page2.waitForTimeout(600);

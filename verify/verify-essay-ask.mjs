@@ -144,14 +144,22 @@ head('6) 학생마다 다른 보기가 나오는가 (2026-08-23)');
 
   const g = { label: '지원 동기', type: 'textarea', kind: 'story' };
   const now = (p) => (essayAskFor(g, { profile: p }).asks.find((a) => a.id === 'now') || {}).c || [];
-  ok(now({ status: 'freshman', year: 1 }).includes('첫 학기 적응'), '신입생에게는 첫 학기 적응을 보여 준다');
-  ok(now({ status: 'returning', year: 2 }).includes('학업 리듬 되찾기'), '복학생에게는 학업 리듬 되찾기를 보여 준다');
-  ok(now({ status: 'enrolled', year: 4 }).includes('졸업 요건 채우기'), '4학년에게는 졸업 요건을 보여 준다');
-  ok(essayStage({ status: 'returning', year: 3 }) === 'back', '복학은 학년보다 앞선다');
+  /* 🔴 **앱이 실제로 저장하는 값으로 잰다** (2026-09-09).
+     예전에는 여기가 옛 값(freshman·returning·enrolled·seoul·etc)이었다. 그런데 온보딩이
+     저장하는 값은 한글이고(`신입학`·`복학예정`·`재학`·`서울`) app.js 의 `LEGACY_STATUS` 가
+     옛 프로필까지 새 값으로 바꾼다 — 즉 **옛 값은 앱에 존재하지 않는다.**
+     그래서 이 검사는 앱이 한 번도 안 지나가는 길을 재고 있었고, 정작 essay-ask.js 가
+     옛 값을 보고 있던 **죽은 갈래**(복학·수도권 밖)를 그대로 통과시켰다.
+     ⚠️ 값을 되돌리지 말 것 — 되돌리면 이 검사가 다시 죽은 코드를 지킨다. */
+  ok(now({ status: '신입학', year: 1 }).includes('첫 학기 적응'), '신입생에게는 첫 학기 적응을 보여 준다');
+  ok(now({ status: '복학예정', year: 2 }).includes('학업 리듬 되찾기'), '복학생에게는 학업 리듬 되찾기를 보여 준다');
+  ok(now({ status: '재학', year: 4 }).includes('졸업 요건 채우기'), '4학년에게는 졸업 요건을 보여 준다');
+  ok(essayStage({ status: '복학예정', year: 3 }) === 'back', '복학은 학년보다 앞선다');
 
   const need = (p) => (essayAskFor(g, { profile: p }).asks.find((a) => a.id === 'need') || {}).c || [];
-  ok(need({ region: 'etc' }).includes('통학·자취 부담'), '수도권 밖 학생에게는 통학·자취 부담을 보여 준다');
-  ok(!need({ region: 'seoul' }).includes('통학·자취 부담'), '서울 학생에게는 안 보여 준다');
+  ok(need({ region: '강원' }).includes('통학·자취 부담'), '수도권 밖 학생에게는 통학·자취 부담을 보여 준다');
+  ok(!need({ region: '서울' }).includes('통학·자취 부담'), '서울 학생에게는 안 보여 준다');
+  ok(!need({ region: '경기' }).includes('통학·자취 부담'), '경기 학생에게도 안 보여 준다');
   ok(need({ flags: ['multiChild'] }).includes('형제자매와 함께 부담'), '다자녀 가구 신호를 쓴다');
 
   ok(essayAskFor(g).asks === essayAskFor(g).asks || true, '(참고) ctx 없이 부르면 예전과 같다');
@@ -440,6 +448,20 @@ head('9) 🔴 맞춤 보기에도 민감 낱말이 없는가 (전수)');
     '서식 설명박스 안내는 규정이 아니다');
   ok(!isFormRule('지원서류: 성적증명서 1부'),
     '제출 서류 목록은 작성 규정이 아니다');
+
+  /* 🔴 문체 지시도 작성 규정이다 (2026-09-05 전수조사에서 놓치고 있던 것)
+     한국외대 이백장학금의 이 줄이 RULEISH 에 걸릴 낱말이 없어 떨어지고 있었다 —
+     초안을 쓰는 데 직접 쓰이는 규정인데도 그랬다. 되돌리면 캔 공고가 2건 → 1건이 된다. */
+  ok(isFormRule('※ 내용이 길어질 경우 별지첨부 가능 , 자기소개서는 개조식이 아닌 서술식으로 작성'),
+    '🔴 문체 지시(개조식이 아닌 서술식)를 규정으로 잡는다');
+  ok(!isFormRule('서술형 문항은 총 3개입니다'), '문항 수 안내는 규정이 아니다');
+  ok(!isFormRule('자기소개서 1부, 성적증명서 1부를 방문 제출해 주십시오.'), '접수 안내는 여전히 규정이 아니다');
+  /* 🔴 문체 낱말을 RULEISH 에 그냥 넣으면 `서술식` 안의 `서술` 이 ABOUT 까지 만족시켜
+     두 겹 조건이 한 낱말로 무너진다 (2026-09-05 코드리뷰가 실행으로 증명한 실제 오탐). */
+  ok(!isFormRule('면접은 서술식 답변으로 진행되며 시간은 10분입니다'),
+    '🔴 자기소개서 이야기가 아닌 서술식은 규정이 아니다 (면접 안내)');
+  ok(!isFormRule('연구계획서는 서술식으로 3매 이내 작성'),
+    '🔴 우리가 다루지 않는 문서의 서술식도 규정이 아니다');
 
   const { perNotice } = mine();
   const blindCount = Object.values(perNotice).filter((v) => v.blind).length;

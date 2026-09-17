@@ -82,8 +82,8 @@ async function notifyRequestPermission() {
   const sup = notifySupport();
   if (!sup.hasApi) {
     toast(sup.iosNeedsInstall
-      ? 'iPhone은 홈 화면에 앱을 추가해야 알림을 받을 수 있어요'
-      : '이 브라우저는 알림을 지원하지 않아요');
+      ? 'iPhone은 홈 화면에 앱 추가 후 수신 가능'
+      : '이 브라우저는 알림 미지원');
     return 'unsupported';
   }
   let perm = Notification.permission;
@@ -129,7 +129,7 @@ async function notifyCheck({ quiet = false } = {}) {
   if (out.events.length) {
     NOTIFY_RULES.pushToInbox(notifyLedger, out.events, Date.now());
     await notifyDeliver(out.events);
-    if (!quiet) toast(`🔔 새 알림 ${out.events.length}건이 도착했어요`);
+    if (!quiet) toast(`새 알림 ${out.events.length}건`);
   }
   await notifySaveLedger();
   notifyRenderBadge();
@@ -147,7 +147,7 @@ async function notifyDeliver(events) {
     toShow = [{
       key: 'sum:' + Date.now(),
       type: 'newMatch',
-      title: `🔔 한대장 새 알림 ${events.length}건`,
+      title: `한대장 · 새 알림 ${events.length}건`,
       body: events.slice(0, 2).map((e) => e.title.replace(/^[^ ]+ /, '')).join(' / ') + ' 외',
       url: './?screen=notifications',
     }];
@@ -197,7 +197,7 @@ function notifyTimeText(ts) {
 }
 
 function notifyTypeMeta(type) {
-  return NOTIFY_RULES.TYPES.find((t) => t.id === type) || { icon: '🔔', label: '알림' };
+  return NOTIFY_RULES.TYPES.find((t) => t.id === type) || { icon: NOTIFY_RULES.ICON.bell, label: '알림' };
 }
 
 /* 알림함에서는 종류 아이콘을 따로 보여주므로 제목 앞 그림문자를 뺀다 (같은 그림이 두 번 뜨지 않게).
@@ -248,7 +248,7 @@ function openNotifyInbox() {
         <span class="nf-time">${notifyTimeText(it.ts)}</span>
       </span>
     </button>`).join('')
-    : `<p class="empty">아직 받은 알림이 없어요.<br />새 공고가 등록되거나 마감이 다가오면 여기에 쌓여요.</p>`;
+    : `<p class="empty">받은 알림이 없어요<br /><span class="empty-sub">새 공고가 등록되거나 마감이 다가오면 여기에 쌓여요</span></p>`;
 
   openNotifyPanel(`
     <div class="nf-head">
@@ -267,7 +267,7 @@ function openNotifyInbox() {
     notifyRenderBadge();
     openNotifyInbox();
   });
-  $('#btn-nf-settings').addEventListener('click', () => { closeNotifyPanel(); showScreen('my'); setTimeout(() => { const el = $('#my-notify'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 120); });
+  $('#btn-nf-settings').addEventListener('click', () => { closeNotifyPanel(); showScreen('settings'); setTimeout(() => { const el = $('#my-notify'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 120); });
 
   $$('[data-nf-open]').forEach((btn) => btn.addEventListener('click', async () => {
     const item = items.find((i) => i.key === btn.dataset.nfOpen);
@@ -278,6 +278,8 @@ function openNotifyInbox() {
     closeNotifyPanel();
     setTimeout(() => {
       if (item.schId && typeof findSch === 'function' && findSch(item.schId)) openDetail(item.schId);
+      /* 공고를 못 찾았으면 **전체 목록**으로 — 학생이 '우리 학교' 칸에 있었으면 거기엔 없다 */
+      else if (typeof exploreShowAll === 'function') exploreShowAll();
       else showScreen('explore');
     }, 260);
   }));
@@ -287,19 +289,20 @@ function openNotifyInbox() {
 function notifyConsentSheet() {
   const sup = notifySupport();
   const typeRows = NOTIFY_RULES.TYPES.map((t) => `
-    <li><span class="nf-ico">${t.icon}</span><span><strong>${esc(t.label)}</strong><br /><span class="nf-desc">${esc(t.desc)}</span></span></li>`).join('');
+    <li><span class="nf-ico">${t.icon}</span><span><strong>${esc(t.label)}</strong></span></li>`).join('');
 
   openNotifyPanel(`
+    ${/* 🔴 원 안의 종 아이콘을 뺐다 (노션 UI-5 · style.css .nf-consent-hero 주석 참조).
+         장식이라 정보가 없었고, 이 앱의 다른 시트와 달리 가운데 정렬이라 더 눈에 띄었다. */ ''}
     <div class="nf-consent-hero">
-      <div class="nf-bell">🔔</div>
-      <h3 class="sheet-title" style="margin-top:10px">장학금 알림을 받으시겠어요?</h3>
-      <p class="sheet-summary" style="margin-top:6px">마감을 놓쳐서 못 받는 장학금이 가장 아까워요.<br />꼭 필요한 것만 골라서 알려드릴게요.</p>
+      <h3 class="sheet-title">장학금 알림 받기</h3>
+      <p class="sheet-summary" style="margin-top:6px">마감을 놓쳐서 못 받는 장학금이 가장 아깝습니다. 꼭 필요한 것만 골라서 알립니다.</p>
     </div>
     <ul class="nf-type-list">${typeRows}</ul>
-    <p class="sheet-note">💡 ${pushConfigured()
-      ? '알림은 <strong>앱을 켜지 않아도</strong> 폰으로 도착해요. 알림 내용은 이 기기 안에서 만들어지고, 서버에는 폰 주소와 학교만 저장돼요.'
-      : '한대장은 아직 발송 서버가 없어요. 알림은 <strong>앱을 열 때</strong>와 <strong>앱을 열어 둔 동안</strong>, 그리고 휴대폰이 지원하면 백그라운드 자동 확인 시점에 전달돼요.'} 언제든 MY에서 끄고 켤 수 있어요.</p>
-    ${sup.iosNeedsInstall ? '<p class="sheet-note">📱 iPhone은 사파리 공유 → <strong>홈 화면에 추가</strong>로 앱을 설치하면 알림을 받을 수 있어요.</p>' : ''}
+    <p class="sheet-note">${pushConfigured()
+      ? '알림은 <strong>앱을 켜지 않아도</strong> 도착. 내용은 기기 안에서 생성 · 서버 저장은 폰 주소·학교만.'
+      : '발송 서버 미연결. 알림은 <strong>앱을 열 때</strong>·<strong>열어 둔 동안</strong>, 지원 기기는 백그라운드 확인 시점에 전달.'} MY에서 언제든 켜기·끄기.</p>
+    ${sup.iosNeedsInstall ? '<p class="sheet-note">iPhone은 사파리 공유 → <strong>홈 화면에 추가</strong>로 앱을 설치하면 수신 가능.</p>' : ''}
     <button class="btn btn-primary btn-lg" id="btn-nf-allow" style="margin-top:16px">알림 받기</button>
     <button class="btn btn-outline" id="btn-nf-later" style="margin-top:8px">나중에 할게요</button>
   `);
@@ -315,12 +318,12 @@ function notifyConsentSheet() {
       notifyRegisterBackground();
       const p = await pushEnsure(); // 발송 서버가 있으면 '앱을 안 켜도 오는 알림'까지 한 번에 켠다
       toast(p.ok
-        ? '알림을 켰어요. 앱을 켜지 않아도 폰으로 알려드릴게요'
-        : '알림을 켰어요. 새 공고와 마감을 챙겨드릴게요');
+        ? '알림을 켰습니다. 앱을 켜지 않아도 폰으로 알립니다'
+        : '알림을 켰습니다. 새 공고와 마감을 알립니다');
     } else if (perm === 'denied') {
-      toast('브라우저에서 알림이 차단돼 있어요. 앱 안 알림함으로 계속 알려드릴게요');
+      toast('브라우저에서 알림이 차단돼 있습니다. 앱 안 알림함으로 계속 알립니다');
     } else {
-      toast('앱 안 알림함으로 알려드릴게요. MY에서 언제든 켤 수 있어요');
+      toast('앱 안 알림함으로 알립니다. MY에서 언제든 켤 수 있습니다');
     }
     if (!$('#screen-my').hidden) renderMy();
     notifyRenderBadge();
@@ -330,7 +333,7 @@ function notifyConsentSheet() {
     notifyLedger.enabled = false;
     await finish();
     closeNotifyPanel();
-    toast('알림은 MY 화면에서 언제든 켤 수 있어요');
+    toast('알림은 MY 화면에서 언제든 켜기 가능');
     if (!$('#screen-my').hidden) renderMy();
   });
 }
@@ -355,39 +358,25 @@ function notifySettingsHtml() {
 
   let statusText;
   let statusCls;
-  if (!sup.hasApi) { statusText = sup.iosNeedsInstall ? '홈 화면에 앱을 추가하면 사용할 수 있어요' : '이 브라우저는 휴대폰 알림을 지원하지 않아요'; statusCls = 'off'; }
-  else if (sup.permission === 'denied') { statusText = '브라우저에서 차단됨 · 사이트 설정에서 알림을 허용해 주세요'; statusCls = 'off'; }
+  if (!sup.hasApi) { statusText = sup.iosNeedsInstall ? '홈 화면에 앱 추가 후 사용 가능' : '이 브라우저는 휴대폰 알림 미지원'; statusCls = 'off'; }
+  else if (sup.permission === 'denied') { statusText = '브라우저에서 차단됨 · 사이트 설정에서 알림 허용 필요'; statusCls = 'off'; }
   else if (on) { statusText = '휴대폰 알림 켜짐'; statusCls = 'on'; }
-  else if (sup.permission === 'granted') { statusText = '허용됨 · 앱에서 꺼 둔 상태예요'; statusCls = 'off'; }
-  else { statusText = '아직 켜지 않았어요'; statusCls = 'off'; }
+  else if (sup.permission === 'granted') { statusText = '허용됨 · 앱에서 꺼 둔 상태'; statusCls = 'off'; }
+  else { statusText = '아직 켜지 않음'; statusCls = 'off'; }
 
   const rows = NOTIFY_RULES.TYPES.map((t) => `
     <label class="nf-pref">
-      <span class="nf-pref-text"><strong>${t.icon} ${esc(t.label)}</strong><span class="nf-desc">${esc(t.desc)}</span></span>
+      <span class="nf-pref-text"><strong>${t.icon} ${esc(t.label)}</strong></span>
       <input type="checkbox" class="nf-switch" data-nf-pref="${t.id}" ${notifyLedger.prefs[t.id] ? 'checked' : ''} />
     </label>`).join('');
 
-  /* 진짜 푸시(앱을 안 켜도 오는 알림) — 2026-08-06 개발자 지시로 **기본값**이 됐다.
-     예전에는 별도 스위치로 사용자가 한 번 더 켜야 했는데, 그 스위치를 눌러 본 사람이 아무도 없어
-     실제로 등록된 폰이 0대였다. 이제 알림을 켜면 자동으로 연결되고(pushEnsure),
-     여기서는 **상태만 보여준다**(끄려면 위의 알림 끄기 하나로 충분하다). */
-  const canPush = pushConfigured();
-  const pushOn = pushActive();
-  const iosNotInstalled = /iPad|iPhone|iPod/.test(navigator.userAgent) && !sup.standalone;
-  const pushBlock = !canPush ? `
-    <div class="nf-push nf-push-off">
-      <p class="nf-push-title">📴 앱을 켜지 않아도 받기 — 준비 중</p>
-      <p class="nf-desc">지금은 <strong>앱을 열 때</strong> 알림을 확인해요. 발송 서버가 연결되면 앱을 켜지 않아도 폰으로 바로 도착해요.</p>
-    </div>`
-    : !on ? '' : `
-    <div class="nf-push${pushOn ? ' nf-push-on' : ''}">
-      <p class="nf-push-title">${pushOn ? '📲 앱을 켜지 않아도 받는 중' : '⏳ 연결하는 중'}</p>
-      <p class="nf-desc">${pushOn
-        ? '앱을 닫아 두거나 화면이 꺼져 있어도 마감·새 공고 알림이 폰으로 도착해요.'
-        : esc(pushReasonText(pushLastReason, iosNotInstalled))}</p>
-      ${iosNotInstalled ? '<p class="nf-desc">📱 iPhone은 사파리 <strong>공유 → 홈 화면에 추가</strong>로 설치해야 앱을 켜지 않아도 알림을 받을 수 있어요.</p>' : ''}
-      <p class="nf-desc">서버에는 <strong>폰 주소와 학교</strong>만 저장돼요 — 이름·성적·소득·서류는 이 기기 밖으로 나가지 않아요.</p>
-    </div>`;
+  /* 🔴 '앱을 켜지 않아도 받는 중' 상자를 없앴다 (2026-09-01 개발자 지시).
+     푸시 연결은 알림을 켜면 자동으로 되고(pushEnsure), 켜졌는지는 맨 위 상태 줄이 말한다.
+     ⚠️ 앞서 `const pushBlock = false ? A : B` 로 바꿔 A(준비 중) 가지만 지웠더니
+        남은 가지 B(받는 중)가 그대로 나와 상자가 계속 떠 있었다 — 조건을 죽이는 것으로는
+        안 된다. 삼항을 통째로 걷어내야 사라진다.
+     ⚠️ 서버에 무엇이 저장되는지(폰 주소·학교만)는 알림을 처음 켤 때 뜨는 동의 시트에
+        그대로 있다. 여기서 지운 것은 같은 말을 되풀이하던 자리다. */
 
   return `
     <div class="nf-set-head">
@@ -397,16 +386,7 @@ function notifySettingsHtml() {
       </div>
       <button class="wallet-btn ${on ? '' : 'primary'}" id="btn-nf-toggle">${on ? '끄기' : '켜기'}</button>
     </div>
-    <div class="nf-prefs">${rows}</div>
-    ${pushBlock}
-    <p class="wallet-sub" style="margin-top:12px">${canPush && pushOn
-      ? '알림 내용은 이 기기 안에서 만들어져요 — 서버는 "확인해 보라"고 폰을 깨우기만 해요.'
-      : '지금은 <strong>앱을 열 때 · 열어 둔 동안</strong> 확인해 알려드려요(안드로이드 설치형은 백그라운드 확인도 지원). 알림 내용은 이 기기 안에서만 만들어지고 밖으로 나가지 않아요.'}</p>
-    <div class="nf-set-actions">
-      <button class="wallet-btn" id="btn-nf-inbox">알림함 열기</button>
-      <button class="wallet-btn" id="btn-nf-test">테스트 알림</button>
-      <button class="wallet-btn" id="btn-nf-recheck">지금 확인</button>
-    </div>`;
+    <div class="nf-prefs">${rows}</div>`;
 }
 
 function bindNotifySettings() {
@@ -419,7 +399,7 @@ function bindNotifySettings() {
       notifyLedger.enabled = false;
       await notifySaveLedger();
       await pushUnsubscribe(); // 알림을 끄면 서버가 폰을 깨우는 것도 함께 멈춘다
-      toast('휴대폰 알림을 껐어요. 앱 안 알림함에는 계속 쌓여요');
+      toast('휴대폰 알림 꺼짐 · 앱 안 알림함에는 계속 쌓여요');
     } else {
       const perm = await notifyRequestPermission();
       notifyLedger.askedAt = notifyLedger.askedAt || Date.now();
@@ -430,10 +410,10 @@ function bindNotifySettings() {
         // 알림을 켜면 '앱을 안 켜도 오는 알림'까지 함께 켠다 (별도 스위치 없음 — 2026-08-06)
         const p = await pushEnsure();
         toast(p && p.ok
-          ? '알림을 켰어요. 앱을 켜지 않아도 폰으로 알려드릴게요'
-          : '알림을 켰어요');
+          ? '알림을 켰습니다. 앱을 켜지 않아도 폰으로 알립니다'
+          : '알림 켜짐');
       }
-      else if (perm === 'denied') toast('브라우저 사이트 설정에서 알림을 허용해 주세요');
+      else if (perm === 'denied') toast('브라우저 사이트 설정에서 알림 허용 필요');
     }
     renderMy();
   });
@@ -443,17 +423,17 @@ function bindNotifySettings() {
     await notifySaveLedger();
   }));
 
-  $('#btn-nf-inbox').addEventListener('click', openNotifyInbox);
-  $('#btn-nf-recheck').addEventListener('click', async () => {
+  { const e = $('#btn-nf-inbox'); if (e) e.addEventListener('click', openNotifyInbox); }
+  if ($('#btn-nf-recheck')) $('#btn-nf-recheck').addEventListener('click', async () => {
     const n = await notifyCheck({ quiet: true });
-    toast(n ? `새 알림 ${n}건을 받았어요` : '새로 알려드릴 내용이 없어요');
+    toast(n ? `새 알림 ${n}건` : '새로 온 알림이 없어요');
   });
-  $('#btn-nf-test').addEventListener('click', async () => {
+  if ($('#btn-nf-test')) $('#btn-nf-test').addEventListener('click', async () => {
     const ev = {
       key: 'test:' + Date.now(),
       type: 'newMatch',
-      title: '🔔 한대장 테스트 알림',
-      body: '알림이 이렇게 도착해요. 실제 알림에는 공고 이름과 마감일이 담겨요.',
+      title: '한대장 테스트 알림',
+      body: '알림 도착 예시 · 실제 알림에는 공고 이름과 마감일 포함.',
       url: './?screen=notifications',
     };
     NOTIFY_RULES.pushToInbox(notifyLedger, [ev], Date.now());
@@ -462,8 +442,8 @@ function bindNotifySettings() {
     notifyRenderBadge();
     const sup = notifySupport();
     toast(notifyLedger.enabled && sup.permission === 'granted'
-      ? '테스트 알림을 보냈어요'
-      : '알림함에 테스트 알림을 넣었어요 (휴대폰 알림은 꺼져 있어요)');
+      ? '테스트 알림 발송'
+      : '알림함에 테스트 알림 기록 (휴대폰 알림 꺼짐)');
   });
 }
 
@@ -653,19 +633,19 @@ function pushRemember(res) {
 
 /* 원인을 사용자가 할 수 있는 행동으로 바꿔 준다 (전문 용어 금지 — 이 화면은 학생이 본다) */
 function pushReasonText(reason, iosNotInstalled) {
-  if (iosNotInstalled) return '아직 이 기기에 연결되지 않았어요.';
+  if (iosNotInstalled) return '이 기기에 아직 연결되지 않음.';
   switch (reason) {
     case 'permission':
-      return '휴대폰이 이 앱의 알림을 막고 있어요. 폰 설정 → 알림에서 한대장을 허용해 주세요.';
+      return '휴대폰이 이 앱의 알림 차단 중. 폰 설정 → 알림에서 한대장을 허용해 주세요.';
     case 'unsupported':
-      return '이 브라우저에서는 앱을 켜지 않아도 오는 알림을 쓸 수 없어요. 크롬·사파리로 열어 주세요(카카오톡 안에서 열면 안 돼요).';
+      return '이 브라우저에서는 앱을 켜지 않아도 오는 알림 사용 불가. 크롬·사파리로 열기 필요(카카오톡 인앱 브라우저 불가).';
     case 'network':
     case 'server':
-      return '연결이 잠시 안 됐어요. 앱을 껐다 켜면 다시 시도해요.';
+      return '연결 일시 실패. 앱을 껐다 켜면 재시도.';
     case 'subscribe-failed':
-      return '휴대폰이 알림 연결을 거절했어요. 폰 설정 → 알림에서 허용한 뒤 앱을 껐다 켜 주세요.';
+      return '휴대폰이 알림 연결 거절. 폰 설정 → 알림에서 허용한 뒤 앱을 껐다 켜 주세요.';
     default:
-      return '곧 자동으로 연결돼요. 앱을 껐다 켜면 바로 반영돼요.';
+      return '곧 자동 연결. 앱을 껐다 켜면 즉시 반영.';
   }
 }
 
@@ -692,8 +672,31 @@ function notifyHandleLaunch() {
     if (typeof state === 'undefined' || !state.profile) return;
     if (screen === 'notifications') { openNotifyInbox(); return; }
     if (screen && ['home', 'explore', 'applications', 'my'].includes(screen)) { showScreen(screen); return; }
-    if (sch && typeof findSch === 'function' && findSch(sch)) openDetail(sch);
-    else if (sch) showScreen('explore');
+    if (!sch) return;
+
+    /* 🔴 **공고 목록이 아직 안 왔다고 포기하지 않는다** (2026-09-09 개발자 지적:
+       "알림을 눌러 앱에 접근했는데도 장학금-전체 페이지로 이동이 되고 해당 공고로 바로
+       이동되지는 않아"). 예전에는 이 자리에서 `findSch` 를 **한 번만** 보고 없으면 곧장
+       탐색 탭으로 보냈다. 그런데 공고 목록(`data/registered.json`)은 따로 받아 오는 것이라,
+       회선이 느린 폰에서는 그 순간에 아직 도착해 있지 않다 — 재현: 목록을 2.5초 늦추자
+       **매번** 탐색 탭으로 갔다. 알림을 누른 학생이 보려던 것은 그 공고 하나다.
+       그래서 **올 때까지 기다렸다가** 연다. 끝내 없으면(지워진 공고 등) 그때 탐색 탭으로. */
+    /* 🔴 기다리는 동안 **학생이 딴 데로 갔으면 손을 뗀다.** 몇 초 뒤에 갑자기 시트를 띄우거나
+       탐색 탭으로 끌고 가면, 그때는 학생이 이미 다른 일을 하는 중이라 화면을 뺏는 것이 된다.
+       기준은 딥링크가 내려앉은 화면(`landed`) — 그대로 있을 때만 연다. */
+    const landed = typeof currentScreen !== 'undefined' ? currentScreen : null;
+    const moved = () => landed !== null && typeof currentScreen !== 'undefined' && currentScreen !== landed;
+    const DEADLINE = Date.now() + 8000;   // 무한정 기다리지는 않는다
+    const tryOpen = () => {
+      if (moved()) return;                                     // 학생이 딴 데로 갔다
+      if (typeof findSch === 'function' && findSch(sch)) { openDetail(sch); return; }
+      if (Date.now() > DEADLINE) {
+        if (typeof exploreShowAll === 'function') exploreShowAll(); else showScreen('explore');
+        return;
+      }
+      setTimeout(tryOpen, 250);
+    };
+    tryOpen();
   }, 400);
 }
 

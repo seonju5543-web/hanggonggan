@@ -46,6 +46,12 @@ jobs:
           pip install olefile --quiet
           python3 collector/hwp-prvtext.py
           python3 collector/hwp-bodytext.py || true   # 본문 전체 (미리보기는 1023자에서 잘린다)
+          # PDF 글자 뽑기 (2026-09-05) — 전수조사에서 첨부 293개 중 HWP 138개만 읽히고 있었다.
+          # PDF 94개(262만 자)가 통째로 잠들어 있었고 그 안에 자격·금액·작성 규정이 들어 있다.
+          # poppler 가 안 깔려도 실행을 죽이지 않는다 — 스크립트가 없으면 알리고 그냥 넘어간다.
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils
+          python3 collector/pdf-text.py
       - run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

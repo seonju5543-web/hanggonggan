@@ -1,0 +1,54 @@
+# 인스타 트랙션 수확 — 팔로워·게시물 반응을 하루 한 번 insta/stats.json 에 적는다 (2026-09-12)
+#
+# 관리자 화면 「인스타 › 트랙션」 이 이 파일 하나를 읽는다. 🔴 토큰은 여기(서버)에만 있고
+# 화면은 인스타에 직접 묻지 않는다 — 화면에 토큰을 주면 여는 사람 전부가 계정에 글을 쓸 수 있다.
+# 🔴 시크릿이 없으면 `state=none` 으로 조용히 끝난다(계정 연결 전엔 정상).
+name: 인스타 트랙션 수확
+
+on:
+  schedule:
+    - cron: '53 21 * * *'      # 06:53 KST — 🔴 UTC 정각 부근을 피한다 · 06:37 은 링크 사냥꾼과 같은 분이라 비켰다(관문)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: insta-stats
+  cancel-in-progress: false
+
+env:
+  BASE: claude/nice-heisenberg-WESq5
+
+jobs:
+  harvest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/nice-heisenberg-WESq5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: 수확
+        id: h
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: node insta/stats.mjs | tee /tmp/out.txt; grep -q '^state=none' /tmp/out.txt && echo 'state=none' >> "$GITHUB_OUTPUT" || echo 'state=ok' >> "$GITHUB_OUTPUT"
+      # 🔴 로봇이 고친 파일은 저장 목록에 넣는 것까지가 한 세트다(CLAUDE.md · 이슈 #79 유형).
+      - name: 저장
+        if: ${{ steps.h.outputs.state == 'ok' }}
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add insta/stats.json
+          git diff --cached --quiet && { echo '변화 없음'; exit 0; }
+          git commit -m '인스타: 트랙션 수확'
+          for i in 1 2 3; do
+            git push origin "HEAD:$BASE" && break || { git pull --rebase origin "$BASE"; sleep 5; }
+            [ "$i" = 3 ] && { echo '🚨 기록을 못 올렸습니다'; exit 1; }
+          done
+      - name: 실패하면 시끄럽게
+        if: ${{ failure() || cancelled() }}
+        run: echo '🚨 트랙션 수확이 실패했습니다 — 못 받은 것을 「반응 0」 으로 읽지 마세요.' >> "$GITHUB_STEP_SUMMARY"

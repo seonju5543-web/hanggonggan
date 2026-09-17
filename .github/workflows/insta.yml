@@ -1,0 +1,431 @@
+# 인스타 카드뉴스 — 새 공고가 생기면 바로 카드를 그려 개발자 셋에게 보내고, 게시는 사람이 누른다
+#
+# 2026-09-12 개발자 지시로 다시 짰다 —
+#   ① **공고 하나에 게시물 하나**(`insta/pub/<공고 코드>/`) — 날짜 폴더 하나만 갈아엎던 시절엔 하루 한 건이었다.
+#   ② **생기면 바로** — 수집 로봇 셋이 끝날 때마다(`workflow_run`) 준비 안 한 공고를 그린다.
+#      월·목 예약은 뺐다. 하루 한 번 예약은 남긴다(로봇 push 는 다른 워크플로를 못 깨우는 날의 보정).
+#   ③ **개발자 셋 전부**에게 — 이슈 담당자 셋(GitHub 이 메일을 보낸다) + 시크릿이 있으면 SMTP 메일 한 통.
+#      명단은 `insta/team.json` 한 곳.
+#   ④ 판형은 번호(`insta/templates.json`) — `tpl` 칸에 번호를 준다.
+#
+# 🔴 **게시는 여전히 사람만 누른다.** 자동으로 올리면 개발자가 카드를 보는 자리가 사라지고,
+#    사실 관문이 못 잡는 종류(사진이 공고와 안 어울린다·말투가 이상하다)를 아무도 못 막는다.
+#    예약·workflow_run 실행에는 inputs 가 통째로 비어서 `prepare` 만 켜지고 `publish` 는 꺼진다.
+#    관문 C9 가 게시 조건이 긍정형인지, 준비에 `--publish` 가 없는지 본다.
+# 🔴 게시는 **다시 그리지 않는다** — ①이 커밋해 둔 그 폴더를 그대로 올린다. 다시 그리면 그 사이
+#    데이터가 바뀌었을 때 개발자가 본 것과 다른 카드가 올라간다.
+# 🔴 시크릿 둘이 있어야 게시가 된다: IG_USER_ID · IG_ACCESS_TOKEN (README 「처음 한 번」)
+name: 인스타 카드뉴스 게시
+
+on:
+  # ② 생기면 바로 — 수집 로봇이 끝나면 그 결과로 그린다. 🔴 로봇 push 는 다른 워크플로를 못
+  #    깨우므로 `push:` 로는 안 된다(deploy-sync 와 같은 이유로 workflow_run 을 쓴다).
+  workflow_run:
+    workflows: ['장학공고 수집 로봇', '브라우저형 수집 로봇', '한국장학재단 수확 로봇']
+    types: [completed]
+  schedule:
+    # 하루 한 번 보정 — 09:13 KST. 🔴 UTC 정각 부근은 GitHub 이 지연·생략한다(CLAUDE.md) — 홀수 분.
+    - cron: '13 0 * * *'
+  # 채팅에서 고친 카드를 다시 알린다(push-to-run) — insta/run-notify.txt 의 code: 줄
+  push:
+    branches: ['claude/nice-heisenberg-WESq5']
+    paths: ['insta/run-notify.txt']
+  workflow_dispatch:
+    inputs:
+      step:
+        description: '무엇을 할까'
+        type: choice
+        options: [준비 (새 공고를 그리고 알린다), 게시 (준비된 것을 올린다), 알림 (준비된 카드를 다시 보낸다), 건너뛰기 (이 공고는 안 올린다)]
+        default: '준비 (새 공고를 그리고 알린다)'
+      code:
+        description: '공고 코드 (게시·알림·건너뛰기에 필수 · 준비에서 주면 그 공고만 다시 그린다)'
+        type: string
+        default: ''
+      tpl:
+        description: '[준비] 판형 번호 (비우면 씨앗이 정한다 · insta/templates.json)'
+        type: string
+        default: ''
+      max:
+        description: '[준비] 한 번에 그릴 최대 건수'
+        type: string
+        default: '6'
+
+permissions:
+  contents: write
+  issues: write   # 🔴 실패를 요약에만 적으면 아무도 안 본다 — 이슈로 부른다
+
+# 🔴 수집 로봇들과 **다른 대기줄**을 쓴다 — 같은 줄에 넣으면 GitHub 이 대기 중인
+#    실행을 새 실행으로 취소해서 예약 수집이 조용히 사라진다(CLAUDE.md).
+concurrency:
+  group: insta-publish
+  cancel-in-progress: false
+
+env:
+  BASE: claude/nice-heisenberg-WESq5
+
+jobs:
+  # ── ① 준비 — 새 공고를 전부 그리고 · 커밋하고 · 개발자 셋에게 알린다 ──────────
+  prepare:
+    # 준비 버튼 · 예약 · 수집 뒤 · 알림 push 셋 다 여기로. 게시·건너뛰기만 아래 작업으로.
+    if: ${{ !startsWith(inputs.step, '게시') && !startsWith(inputs.step, '건너뛰기') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 40          # 🔴 없으면 GitHub 기본값 6시간까지 매달린다 (6건 × ~40초 + 설치 + Pages 대기)
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/nice-heisenberg-WESq5
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm init -y >/dev/null && npm i playwright@1 --no-audit --no-fund
+      - run: npx playwright@1 install --with-deps chromium
+
+      # 🔴 사실 관문을 먼저 통과해야 그린다 — 틀린 카드가 브랜드 계정으로 나가면 못 지운다.
+      - name: 사실 관문
+        run: node verify/verify-insta.js
+
+      # 무엇을 그릴지 — 알림(push-to-run·버튼)이면 그 코드 하나를 **안 그리고** 그대로 보낸다.
+      - name: 무엇을 할지 정한다
+        id: plan
+        env:
+          EVENT: ${{ github.event_name }}
+          STEP: ${{ inputs.step }}
+          CODE: ${{ inputs.code }}
+          MAX: ${{ inputs.max }}
+        run: |
+          if [ "$EVENT" = push ] || [ "${STEP#알림}" != "$STEP" ]; then
+            [ "$EVENT" = push ] && CODE=$(sed -n 's/^code:[[:space:]]*//p' insta/run-notify.txt | head -1)
+            # 🔴 표식 파일이 빈 채로 push 되는 일은 정상이다(처음 만들 때 · 보낸 뒤 지울 때) — 빨간불이 아니라 조용한 종료.
+            if [ -z "$CODE" ] && [ "$EVENT" = push ]; then echo "mode=none" >> "$GITHUB_OUTPUT"; echo "codes=" >> "$GITHUB_OUTPUT"; echo 'run-notify.txt 의 code: 가 비어 있어 아무것도 안 합니다.'; exit 0; fi
+            [ -n "$CODE" ] || { echo '알릴 공고 코드가 비어 있습니다 — code 칸을 채우세요.'; exit 1; }
+            [ -d "insta/pub/$CODE" ] || { echo "🚨 insta/pub/$CODE 가 없습니다 — 먼저 그려서 커밋했는지 보세요."; exit 1; }
+            echo "mode=notify" >> "$GITHUB_OUTPUT"; echo "codes=$CODE" >> "$GITHUB_OUTPUT"
+            echo "다시 알림: $CODE"
+          elif [ -n "$CODE" ]; then
+            echo "mode=draw" >> "$GITHUB_OUTPUT"; echo "codes=$CODE" >> "$GITHUB_OUTPUT"
+            echo "지정 공고 하나: $CODE"
+          else
+            # 준비 안 한 새 공고 전부(점수순) — 상한은 한 실행에서 그릴 수
+            node insta/pick.mjs --new --max="${MAX:-6}" > /tmp/new.json
+            CODES=$(node -e "console.log(require('/tmp/new.json').map((x)=>x.code).join(' '))")
+            echo "mode=draw" >> "$GITHUB_OUTPUT"; echo "codes=$CODES" >> "$GITHUB_OUTPUT"
+            echo "새 공고: ${CODES:-없음}"
+          fi
+
+      # 🔴 한 건이 넘어져도 나머지는 그린다 — 실패한 코드는 모아서 시끄럽게 알린다.
+      - name: 카드·캡션 그리기 (공고마다 폴더 하나)
+        if: ${{ steps.plan.outputs.mode == 'draw' && steps.plan.outputs.codes != '' }}
+        id: draw
+        env:
+          CODES: ${{ steps.plan.outputs.codes }}
+          TPL: ${{ inputs.tpl }}
+        run: |
+          OK=""; BAD=""
+          for c in $CODES; do
+            echo "── $c"
+            if [ -n "$TPL" ]; then node insta/render.mjs "$c" --tpl="$TPL" --pub; else node insta/render.mjs "$c" --pub; fi \
+              && OK="$OK $c" || BAD="$BAD $c"
+          done
+          echo "ok=${OK# }" >> "$GITHUB_OUTPUT"; echo "bad=${BAD# }" >> "$GITHUB_OUTPUT"
+          # 장부 — 그린 것은 '준비됨', 못 그린 것은 '실패'(7일 뒤 다시). 규칙은 pick.mjs 한 곳.
+          # 🔴 실패를 안 적으면 같은 공고가 매 실행 점수 1등으로 다시 뽑혀 나머지를 굶기고 실패 이슈만 쌓인다(코드 리뷰).
+          [ -n "$BAD" ] && node insta/ledger.mjs failed $BAD
+          [ -n "$OK" ] && node insta/ledger.mjs prepared $OK
+          [ -n "$OK" ] || { echo '🚨 한 건도 못 그렸습니다'; exit 1; }
+
+      - name: 아무것도 없으면 조용히 끝
+        if: ${{ steps.plan.outputs.codes == '' }}
+        run: echo '새 공고가 없습니다 — 정상 종료.' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: 관리자가 눈으로 볼 것
+        if: ${{ steps.plan.outputs.codes != '' }}
+        env:
+          CODES: ${{ steps.draw.outputs.ok || steps.plan.outputs.codes }}
+        run: |
+          {
+            echo '## 준비됐습니다 — 관리자 화면 › 인스타 에서 확인하고 게시를 누르세요'
+            for c in $CODES; do
+              echo; echo "### $c"; echo '```json'; cat "insta/pub/$c/meta.json"; echo '```'
+              echo '```'; cat "insta/pub/$c/caption.txt"; echo '```'
+            done
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: ${{ steps.plan.outputs.codes != '' }}
+        with:
+          name: 카드
+          path: insta/pub/
+          retention-days: 7
+
+      # 🔴 커밋해야 GitHub Pages 가 공개 주소로 서빙한다 — 인스타는 그 주소로 가져간다.
+      #    다른 공고의 폴더는 건드리지 않는다(공고당 폴더 하나).
+      - name: 게시용 그림·장부 커밋
+        if: ${{ always() && steps.plan.outputs.mode == 'draw' && steps.plan.outputs.codes != '' }}
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add -A insta/pub insta/seen.json
+          git diff --cached --quiet && { echo '바뀐 게 없습니다'; exit 0; }
+          git commit -m "인스타: 카드 준비 — $(echo "${{ steps.draw.outputs.ok }}" | wc -w | tr -d ' ')건"
+          for i in 1 2 3; do
+            git push origin "HEAD:$BASE" && break || { git pull --rebase origin "$BASE"; sleep 5; }
+            [ "$i" = 3 ] && { echo '🚨 기본 브랜치에 못 올렸습니다'; exit 1; }   # 🔴 sleep 이 0 을 남겨 그냥 넘어가던 자리
+          done
+          git push origin HEAD:main        # 🔴 Pages 는 main 을 배포한다
+
+      # 🔴 Pages 가 서빙을 시작해야 이슈·메일에 박은 그림이 뜬다. 아직 404 인 채로 만들면
+      #    GitHub 의 그림 중계(camo)가 **그 404 를 캐시해** 나중에도 안 보인다.
+      - name: 그림이 공개될 때까지 기다린다
+        if: ${{ steps.plan.outputs.codes != '' }}
+        env:
+          CODES: ${{ steps.draw.outputs.ok || steps.plan.outputs.codes }}
+        run: for c in $CODES; do node insta/publish.mjs --code="$c" --wait-only; done
+
+      # 🔴 여기가 사람이 들어오는 자리다 — 담당자로 지정하면 GitHub 이 **메일을 보낸다**
+      #    (새 열쇠도 메일 서버도 필요 없다). 담당자는 insta/team.json 의 셋 전부.
+      - name: 개발자 셋에게 알린다 (이슈 담당자 지정)
+        if: ${{ steps.plan.outputs.codes != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN: ${{ github.run_id }}
+          CODES: ${{ steps.draw.outputs.ok || steps.plan.outputs.codes }}
+          MODE: ${{ steps.plan.outputs.mode }}
+        run: |
+          ASSIGN=$(node -e "console.log(require('./insta/team.json').people.map((p)=>'--assignee '+p.github).join(' '))")
+          N=$(echo "$CODES" | wc -w | tr -d ' ')
+          FIRST=$(echo "$CODES" | awk '{print $1}')
+          ORG=$(jq -r .org  "insta/pub/$FIRST/meta.json"); NAME=$(jq -r .name "insta/pub/$FIRST/meta.json")
+          if [ "$MODE" = notify ]; then TITLE="📸 인스타 카드 수정본 — $ORG $NAME";
+          elif [ "$N" = 1 ]; then TITLE="📸 인스타 카드 준비됐습니다 — $ORG $NAME";
+          else TITLE="📸 인스타 카드 ${N}건 준비됐습니다 — $ORG $NAME 외 $((N-1))건"; fi
+          {
+            [ "$MODE" = notify ] && echo '채팅에서 고친 **수정본**입니다.' || echo "새 공고 **${N}건**의 카드가 준비됐습니다."
+            echo '보고 괜찮으면 **관리자 화면 → 인스타** 에서 게시를 누르세요. 마음에 안 들면 **그냥 두면** 아무것도 안 올라갑니다.'
+            # 🔴 판형 번호 바꾸기는 **화면에 이미 버튼이 있다**(카드 줄의 판형 고르기 + '이 판형으로 다시 그리기').
+            #    화면이 하는 일을 채팅으로 부르면 사람이 왕복만 는다 — 그래서 두 줄로 갈랐다 (2026-09-13).
+            #    주소는 아래 '관리자 화면:' 줄에 이미 한 번 적혀 있어 여기 또 박지 않는다.
+            echo '판형 번호만 바꾸는 것은 관리자 화면에서 됩니다 — 카드 줄에서 번호를 고르고 「이 판형으로 다시 그리기」를 누르세요.'
+            echo '글꼴·문구·장수처럼 판형 안을 고치려면 Claude Code 채팅에 그대로 말하면 됩니다(예: "글꼴 바꿔", "2장 줄여") — 수정본 그림을 보여 주고, 다시 보낼지 물어본 뒤 보냅니다.'
+            for c in $CODES; do
+              echo; echo "## $(jq -r .org "insta/pub/$c/meta.json") · $(jq -r .name "insta/pub/$c/meta.json")"
+              echo "마감 $(jq -r '.due // "원문 확인"' "insta/pub/$c/meta.json") · 판형 $(jq -r .tplNo "insta/pub/$c/meta.json")번 · 코드 \`$c\`"
+              echo
+              # 🔴 주소는 publish.mjs 에 **묻는다** — 여기 베끼면 기다린 주소와 갈라진다.
+              node insta/publish.mjs --code="$c" --urls | while read -r u; do printf '<img src="%s" width="180"> ' "$u"; done; echo
+              echo; echo '<details><summary>캡션</summary>'; echo; echo '```'; cat "insta/pub/$c/caption.txt"; echo '```'; echo '</details>'
+              echo "<!-- insta-code: $c -->"
+            done
+            echo; echo "관리자 화면: https://hanggonggan-admin.pages.dev/#insta · 원본 PNG: https://github.com/$REPO/actions/runs/$RUN"
+            echo '올리거나 건너뛰면 이 이슈는 **저절로 닫힙니다.**'
+          } > /tmp/ready.md
+          gh label create insta-ready --repo "$REPO" --color 0E8A16 --description '인스타 카드 준비됨' 2>/dev/null || true
+          # 🔴 담당자 지정이 **이 기능의 전부**다 — 막히면 알림 없는 이슈를 남기고 **빨간불로 끝낸다.**
+          #    조용히 초록불이 되면 아무도 안 읽는 이슈만 쌓인다(알림의 실패는 그 자체로 보여야 한다).
+          if gh issue create --repo "$REPO" --label insta-ready $ASSIGN --title "$TITLE" --body-file /tmp/ready.md; then
+            echo '✅ 이슈로 알렸습니다 (담당자 셋).'
+          else
+            gh issue create --repo "$REPO" --title "🚨 인스타 카드는 준비됐는데 담당자 지정에 실패했습니다 — $ORG $NAME" --body-file /tmp/ready.md || true
+            echo '🚨 담당자 지정에 실패했습니다 — insta/team.json 의 github 계정이 이 저장소 공동작업자인지 확인하세요.'
+            exit 1
+          fi
+
+      # **선택** — 우리 주소에서 우리 디자인으로 한 통 더(세 사람에게). 시크릿이 없으면 건너뛴다.
+      #    🔴 SMTP 는 보내는 계정으로 로그인해야 한다 — 주소 없이 보내는 길은 없다.
+      #    🔴 제3자 액션을 안 쓰고 curl 로 보낸다 — 메일 열쇠가 남의 코드를 안 거친다.
+      - name: 개발자 셋에게 메일 (선택 · SMTP 시크릿이 있을 때)
+        if: ${{ steps.plan.outputs.codes != '' }}
+        env:
+          CODES: ${{ steps.draw.outputs.ok || steps.plan.outputs.codes }}
+          MODE: ${{ steps.plan.outputs.mode }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          MAIL_USER: ${{ secrets.MAIL_USER }}
+          MAIL_PASS: ${{ secrets.MAIL_PASS }}
+          MAIL_TO:   ${{ secrets.MAIL_TO }}
+          MAIL_SMTP: ${{ secrets.MAIL_SMTP }}
+        run: |
+          if [ -z "$MAIL_USER" ] || [ -z "$MAIL_PASS" ]; then
+            # 🔴 이건 고장이 아니다 — **알림은 이미 GitHub 이 보냈다**(위 이슈의 담당자 지정 셋).
+            echo '메일은 GitHub 알림으로 갔습니다(이슈 담당자 셋). 우리 주소에서 직접 보내려면 시크릿 MAIL_USER·MAIL_PASS 를 넣으세요.' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          DIRS=$(echo "$CODES" | tr ' ' '\n' | sed 's|^|insta/pub/|' | paste -sd, -)
+          KIND=$([ "$MODE" = notify ] && echo revised || echo ready)
+          # 받는 사람은 team.json 셋이 기본 — MAIL_TO 를 주면 그걸로 덮는다(시험용)
+          node insta/mail.mjs --dirs="$DIRS" ${MAIL_TO:+--to="$MAIL_TO"} --from="$MAIL_USER" --run="$RUN_URL" --kind="$KIND" > /tmp/mail.txt
+          RCPT=$(sed -n 's/^To: //p' /tmp/mail.txt | tr -d '\r' | tr ',' '\n' | sed 's/^ *//;s/ *$//' | sed 's/^/--mail-rcpt /' | paste -sd' ' -)
+          curl -sS --ssl-reqd --url "smtps://${MAIL_SMTP:-smtp.gmail.com:465}" \
+            --user "$MAIL_USER:$MAIL_PASS" --mail-from "$MAIL_USER" $RCPT --upload-file /tmp/mail.txt
+          echo "✅ 메일을 보냈습니다 — $(sed -n 's/^To: //p' /tmp/mail.txt)"
+
+      - name: 못 그린 공고가 있으면 시끄럽게
+        if: ${{ steps.draw.outputs.bad != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN: ${{ github.run_id }}
+          BAD: ${{ steps.draw.outputs.bad }}
+        run: |
+          gh label create insta-fail --repo "$REPO" --color B60205 --description '인스타 게시 실패' 2>/dev/null || true
+          # 🔴 같은 공고로 이슈를 매 실행 새로 만들지 않는다 — 열린 이슈 제목에 그 코드가 있으면 코멘트만
+          for c in $BAD; do
+            N=$(gh issue list --repo "$REPO" --label insta-fail --state open --search "$c in:title" --json number --jq '.[0].number')
+            if [ -n "$N" ]; then gh issue comment "$N" --repo "$REPO" --body "다시 실패 — https://github.com/$REPO/actions/runs/$RUN"; BAD=$(echo "$BAD" | sed "s/\b$c\b//"); fi
+          done
+          BAD=$(echo $BAD); [ -n "$BAD" ] || exit 1
+          gh issue create --repo "$REPO" --label insta-fail --title "🚨 인스타 카드를 못 그린 공고가 있습니다 — $BAD" \
+            --body "실행 로그: https://github.com/$REPO/actions/runs/$RUN
+
+          못 그린 공고 코드: $BAD
+          넘침(종료 2)이면 그 공고의 원문이 길어 판형에 안 들어간 것이고, 폰트·사진이면 바깥 통신 문제입니다. 다음 실행에서 다시 시도합니다(장부에 안 적혔으므로)."
+          echo "🚨 못 그린 공고: $BAD" >> "$GITHUB_STEP_SUMMARY"
+          exit 1
+
+      - name: 실패하면 시끄럽게
+        # 못 그린 공고는 위 단계가 이미 알렸다 — 같은 실행에서 이슈를 두 번 만들지 않는다
+        if: ${{ (failure() || cancelled()) && steps.draw.outputs.bad == '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN: ${{ github.run_id }}
+        run: |
+          echo '🚨 준비가 실패했습니다 — 이슈를 만들었습니다.' >> "$GITHUB_STEP_SUMMARY"
+          gh label create insta-fail --repo "$REPO" --color B60205 --description '인스타 게시 실패' 2>/dev/null || true
+          gh issue list --repo "$REPO" --label insta-fail --state open --json title --jq '.[].title' | grep -q "준비가 실패" && exit 0
+          gh issue create --repo "$REPO" --label insta-fail \
+            --title '🚨 인스타 카드 준비가 실패했습니다' \
+            --body "실행 로그: https://github.com/$REPO/actions/runs/$RUN
+
+          사실 관문이 빨간불이면 카드가 원문을 상하게 하고 있다는 뜻이라, 고치기 전에는 올리면 안 됩니다."
+
+  # ── ② 게시 — ①이 커밋한 것을 그대로 올린다. **다시 안 그린다** ──
+  publish:
+    if: ${{ startsWith(inputs.step, '게시') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/nice-heisenberg-WESq5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 준비된 것이 있는지
+        id: dir
+        env:
+          CODE: ${{ inputs.code }}
+        run: |
+          [ -n "$CODE" ] || { echo '🚨 공고 코드를 주세요 — 관리자 화면의 게시 버튼이 넣어 줍니다.'; exit 1; }
+          [ -d "insta/pub/$CODE" ] || { echo "🚨 insta/pub/$CODE 가 없습니다 — 「준비」 로 먼저 그리세요."; exit 1; }
+          echo "준비된 폴더: insta/pub/$CODE"; cat "insta/pub/$CODE/meta.json"
+          # 🔴 이미 올린 공고를 두 번 올리지 않는다(이슈 #75 유형) — 장부를 본다.
+          if node -e "const s=require('./insta/seen.json');process.exit(s.posted.some((p)=>p.code===process.env.CODE)?1:0)"; then :; else
+            echo "🚨 $CODE 는 이미 올린 공고입니다(seen.json posted)."; exit 1; fi
+
+      # 🔴 준비(로봇)와 게시(사람)가 따로 도니까, 개발자가 본 카드와 지금 폴더가 같은 공고인지 본다.
+      #    이슈에 박아 둔 표식 `<!-- insta-code: … -->` 이 근거다. 표식이 없으면(손으로 그린 것) 누른 사람이 곧 확인이다.
+      - name: 개발자가 본 것과 같은 카드인가
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          CODE: ${{ inputs.code }}
+        run: |
+          if gh issue list --repo "$REPO" --label insta-ready --state open --json body --jq '.[].body' | grep -q "<!-- insta-code: $CODE -->"; then
+            echo "✅ 준비 이슈에 있는 카드입니다 — $CODE"
+          else
+            echo "⚠️ 열린 준비 이슈에 $CODE 표식이 없습니다 — 손으로 그렸거나 이미 닫힌 건입니다. 지금 버튼을 누른 사람이 확인한 것으로 봅니다."
+          fi
+
+      - name: 인스타에 올리기
+        env:
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: node insta/publish.mjs --code="${{ inputs.code }}" --publish
+
+      # 이 공고만 담긴 준비 이슈는 닫고, 여러 건이 담긴 이슈에는 코멘트만 남긴다.
+      - name: 준비 이슈 정리
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          CODE: ${{ inputs.code }}
+        run: |
+          for n in $(gh issue list --repo "$REPO" --label insta-ready --state open --json number,body --jq ".[] | select(.body | contains(\"<!-- insta-code: $CODE -->\")) | .number"); do
+            CNT=$(gh issue view "$n" --repo "$REPO" --json body --jq .body | grep -c '<!-- insta-code: ')
+            if [ "$CNT" -le 1 ]; then gh issue close "$n" --repo "$REPO" --comment "올렸습니다 ($CODE) — 자동으로 닫습니다.";
+            else gh issue comment "$n" --repo "$REPO" --body "올렸습니다 — $CODE"; fi
+          done
+
+      # 🔴 올린 것을 기억 못 하면 내일 같은 공고를 다시 올린다(이슈 #75 유형).
+      #    `git add` 목록에 넣는 것까지가 한 세트다.
+      - name: 올린 기록 저장
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add insta/seen.json
+          git diff --cached --quiet && { echo 'seen.json 변화 없음'; exit 0; }
+          git commit -m '인스타: 올린 공고 기록'
+          for i in 1 2 3; do
+            git push origin "HEAD:$BASE" && break || { git pull --rebase origin "$BASE"; sleep 5; }
+            [ "$i" = 3 ] && { echo '🚨 기본 브랜치에 못 올렸습니다'; exit 1; }   # 🔴 sleep 이 0 을 남겨 그냥 넘어가던 자리
+          done
+          git push origin HEAD:main
+
+      # 🔴 `if: failure()` 는 **시간 초과에 반응하지 않는다** — 상한을 넘긴 작업은
+      #    '실패' 가 아니라 '취소' 다(CLAUDE.md). 둘 다 잡는다.
+      - name: 실패하면 시끄럽게
+        if: ${{ failure() || cancelled() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN: ${{ github.run_id }}
+        run: |
+          echo '🚨 게시가 실패했습니다 — 이슈를 만들었습니다.' >> "$GITHUB_STEP_SUMMARY"
+          gh label create insta-fail --repo "$REPO" --color B60205 --description '인스타 게시 실패' 2>/dev/null || true
+          gh issue create --repo "$REPO" --label insta-fail \
+            --title '🚨 인스타 게시가 실패했습니다' \
+            --body "실행 로그: https://github.com/$REPO/actions/runs/$RUN
+
+          자주 나는 원인 셋
+          - 토큰 만료 → IG_ACCESS_TOKEN 갱신 (「인스타 토큰 수명 확인」 참고)
+          - 그림이 아직 공개 안 됨 → Pages 배포를 기다렸다 「게시」 를 다시
+          - 24시간 50건 상한 초과 → 내일 다시"
+
+  # ── ③ 건너뛰기 — 이 공고는 안 올린다고 장부에 적는다(폴더는 남긴다 · 다시 준비하면 되살아난다) ──
+  skip:
+    if: ${{ startsWith(inputs.step, '건너뛰기') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/nice-heisenberg-WESq5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: 장부에 적고 이슈 정리
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          CODE: ${{ inputs.code }}
+          ACTOR: ${{ github.actor }}
+        run: |
+          [ -n "$CODE" ] || { echo '🚨 공고 코드를 주세요.'; exit 1; }
+          node insta/ledger.mjs skip "$CODE" --by="$ACTOR"
+          git config user.name  'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add insta/seen.json
+          git diff --cached --quiet || git commit -m "인스타: 건너뛰기 — $CODE"
+          for i in 1 2 3; do
+            git push origin "HEAD:$BASE" && break || { git pull --rebase origin "$BASE"; sleep 5; }
+            [ "$i" = 3 ] && { echo '🚨 기본 브랜치에 못 올렸습니다'; exit 1; }
+          done
+          for n in $(gh issue list --repo "$REPO" --label insta-ready --state open --json number,body --jq ".[] | select(.body | contains(\"<!-- insta-code: $CODE -->\")) | .number"); do
+            CNT=$(gh issue view "$n" --repo "$REPO" --json body --jq .body | grep -c '<!-- insta-code: ')
+            if [ "$CNT" -le 1 ]; then gh issue close "$n" --repo "$REPO" --comment "건너뛰기로 정했습니다 ($CODE · $ACTOR).";
+            else gh issue comment "$n" --repo "$REPO" --body "건너뛰기 — $CODE ($ACTOR)"; fi
+          done
+      - name: 실패하면 시끄럽게
+        if: ${{ failure() || cancelled() }}
+        run: echo '🚨 건너뛰기 기록에 실패했습니다.' >> "$GITHUB_STEP_SUMMARY"

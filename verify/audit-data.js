@@ -166,6 +166,27 @@ try {
   });
 } catch (e) { warns.push(`자격 품질 채점을 돌리지 못했습니다: ${e.message.slice(0, 80)}`); }
 
+/* 🔴 화면에 금액이 뜨는데 근거를 못 보여 주는 공고 (2026-08-27 신설)
+   개발자 지적: *"실패분이라는 게 있는 게 말이 된다고 생각해, 사용자 앱에 들어가는 화면인데?"*
+   `amountValue`(화면에 뜨는 숫자)는 있는데 `amountSpec`(원문에서 읽은 근거)이 없으면,
+   학생은 금액만 보고 어디서 나온 값인지 확인할 길이 없다. 그런 공고는 화면이
+   **원문 공고 링크라도** 줘야 한다(원칙 8-1). 링크조차 없으면 오류로 막는다.
+   ⚠️ 이 검사는 파서가 나빠지는 것도 같이 잡는다 — 규칙을 잘못 고쳐 읽던 금액을
+      못 읽게 되면 여기 건수가 늘어난다(2026-08-27에 실제로 48→35건으로 떨어뜨렸다). */
+{
+  const noBasis = reg.items.filter((it) => (it.amountValue || 0) > 0 && !it.amountSpec);
+  for (const it of noBasis) {
+    const where = `registered:${it.id}`;
+    if (!it.sourceUrl) {
+      errors.push(`${where} — 화면에 ${it.amountValue.toLocaleString()}원이 뜨는데 원문 근거도 링크도 없습니다`);
+    } else {
+      warns.push(`${where} — 금액 ${it.amountValue.toLocaleString()}원의 원문 발췌가 없습니다 (원문이 첨부·제목에만 있는 공고 — 화면은 원문 링크를 줍니다)`);
+    }
+  }
+  const withSpec = reg.items.filter((it) => it.amountSpec).length;
+  console.log(`금액 근거: 원문 발췌 ${withSpec}건 · 발췌 없이 숫자만 ${noBasis.length}건`);
+}
+
 /* 결과 */
 console.log(`감사 대상: 정식 등록 ${reg.items.length}건 · 양식 ${Object.keys(forms.templates).length}종`);
 /* ── 🔴 자격 자리에 자격이 아닌 줄이 있으면 **저장을 막는다** (2026-08-23) ──
@@ -203,7 +224,16 @@ console.log(`감사 대상: 정식 등록 ${reg.items.length}건 · 양식 ${Obj
         errors.push(`registered:${it.id} — 지원 자격에 [${k}] 줄이 있습니다: "${l.slice(0, 60)}"`);
         break;
       }
-      if (FRAG.test(l)) warns.push(`registered:${it.id} — 자격 줄의 글자가 상했습니다(수집 단계): "${l.slice(0, 60)}"`);
+      /* 🔴 **원인을 단정하지 않는다** (2026-08-29 고침). 예전 문구는 `(수집 단계)`라고
+         못 박았는데, 걸린 두 건을 원문과 대조해 보니 **둘 다 수집 탓이 아니었다**:
+           · 동국인재육성장학 — 원문(5,019자·안 잘림)이 그대로 `경우만 성적 인` 이다
+           · 광운대 희망사다리 — 원문이 `( 단 , 현재 중소 ? 중견기업 …` 에서 줄을 바꾼다.
+             같은 문서 다른 줄은 `신 · 편입` 으로 가운뎃점이 멀쩡하다 → 우리 인코딩 문제가 아니다
+         둘 다 **학교가 문장 중간에 줄을 바꾼 것**이고, 우리는 줄 단위로 담는다.
+         원문을 안 열어 보고 원인을 적으면 다음 세션이 없는 버그를 쫓는다 —
+         이 저장소가 반복해 배운 '짐작하지 말고 열어 볼 것'을 경고 문구 자체가 어기고 있었다.
+         버리지 않고 경고로 두는 이유는 test-collector 에 적혀 있다(버리면 진짜 요건을 잃는다). */
+      if (FRAG.test(l)) warns.push(`registered:${it.id} — 자격 줄이 조각나 보입니다 (원문 줄바꿈일 수 있음 — 원문을 열어 확인하세요): "${l.slice(0, 60)}"`);
     }
   }
 }

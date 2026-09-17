@@ -34,6 +34,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { dedupeNotices } from '../collector/url-key.mjs';
+/* 학교당 상한은 발행기 것을 그대로 쓴다 — 베끼면 병합이 발행과 다른 크기를 만든다 */
+import { PER_SCHOOL } from '../collector/publish-notices.mjs';
 
 const [, , oursBase, oursPath, theirsPath, filePath = ''] = process.argv;
 
@@ -57,6 +59,24 @@ function mergeNotices(ours, theirs) {
   let items = dedupeNotices(all);
   // 수집기와 같은 상한(전체 200건) — 합치느라 목록이 무한정 늘지 않게
   if (items.length > 200) items = items.slice(0, 200);
+  const updatedAt = [ours?.updatedAt, theirs?.updatedAt].filter(Boolean).sort().pop();
+  return { ...(ours || {}), ...(theirs || {}), updatedAt, items };
+}
+
+/* 🔴 **학교별 공고 파일** `data/notices/<학교>.json` (2026-09-05 신설).
+   왜 지금 생겼나: 이 파일을 쓰는 것은 오랫동안 수집 로봇 둘뿐이었고 **같은 대기줄
+   (concurrency: collector)이라 줄을 서서** 부딪힐 일이 없었다. 2026-09-05에 링크 사냥꾼과
+   원문 링크 복구가 여기에 주소를 옮겨 쓰게 되면서 **서로 다른 대기줄 넷**이 같은 파일을
+   건드리게 됐다. 규칙이 없으면 평범한 줄 단위 충돌이 나고, 워크플로는 pull --rebase 3회
+   뒤 exit 1 — 사냥 결과가 통째로 날아가는 그 경로다(이슈 #85·#86과 같은 계열).
+   ⚠️ 상한은 **전체 200이 아니라 학교당 PER_SCHOOL** 이다. 200을 쓰면 학교별로 나눈 뜻이
+   사라진다 — 그래서 publish-notices.mjs 의 값을 가져다 쓴다(베끼면 갈라진다). */
+function mergeSchoolNotices(ours, theirs) {
+  const a = Array.isArray(ours?.items) ? ours.items : [];
+  const b = Array.isArray(theirs?.items) ? theirs.items : [];
+  const all = a.concat(b).sort((x, y) => String(y.foundAt || '').localeCompare(String(x.foundAt || '')));
+  let items = dedupeNotices(all);
+  if (items.length > PER_SCHOOL) items = items.slice(0, PER_SCHOOL);
   const updatedAt = [ours?.updatedAt, theirs?.updatedAt].filter(Boolean).sort().pop();
   return { ...(ours || {}), ...(theirs || {}), updatedAt, items };
 }
@@ -115,6 +135,10 @@ function mergeLinkHunt(o, t) {
 }
 
 const RULES = [
+  /* ⚠️ 학교별 파일이 먼저다 — `data/notices/x.json` 은 아래 notices.json 규칙에 안 걸리지만,
+     순서를 눈에 보이게 두어 다음 사람이 헷갈리지 않게 한다. index.json 은 매 발행마다
+     새로 쓰이므로 .gitattributes 에서 merge=ours 로 뺐다(합칠 내용이 없다). */
+  { match: /(^|\/)data\/notices\/[^/]+\.json$/, merge: mergeSchoolNotices },
   { match: /(^|\/)notices\.json$/, merge: mergeNotices },
   { match: /(^|\/)link-hunt\.json$/, merge: mergeLinkHunt },
   { match: /(^|\/)seen\.json$/, merge: mergeSeen },

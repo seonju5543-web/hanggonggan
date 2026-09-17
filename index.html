@@ -2,25 +2,69 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
   <title>한대장 — 한국 대학교 장학금, 한 번에</title>
   <meta name="description" content="전국 대학생을 위한 맞춤 장학금 매칭 · 원클릭 신청 서비스" />
   <!-- 보안: 외부 스크립트·임의 접속 차단(수집 데이터가 오염돼도 코드 실행 불가) + 학교 사이트로 리퍼러 미전송 -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://cdn.jsdelivr.net; img-src 'self' data: blob:; connect-src 'self' https://*.workers.dev https://*.supabase.co; object-src 'none'; base-uri 'self'" />
   <meta name="referrer" content="no-referrer" />
-  <meta name="theme-color" content="#101d3d" />
+  <!-- 🔴 화면 맨 위 띠 색이다. 배경(--bg)과 **같은 값**이어야 이어져 보인다 —
+       달라지면 상단에 회색 줄이 그어진 것처럼 보인다(2026-09-01 개발자 지적).
+       배경을 흰쪽으로 옮기고도 여기를 안 따라가서 #f6f4f0 이 그대로 남아 있었다.
+       ⚠️ manifest.json 의 theme_color 도 같이 고칠 것 — 설치한 앱은 그쪽을 본다. -->
+  <meta name="theme-color" content="#fefdfc" />
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link rel="manifest" href="manifest.json" />
+  <!-- 서체 — **Pretendard 하나다** (2026-09-11 개발자 지시로 되돌림)
+       🔴 2026-09-10 페이스리프트가 SUIT(본문)·SUITE(제목) 두 벌로 바꿨는데, 개발자가
+          배포된 앱을 보고 "폰트 바뀌었어 예전으로 돌리고"라고 지시해 되돌렸다.
+          SUIT·SUITE 를 다시 싣지 말 것 — 되돌리라는 지시가 이 두 줄을 두고 한 말이다.
+       🔴 글자 크기도 함께 예전 척도로 되돌렸다(style.css --t-*). 서체만 되돌리면
+          본문 17px 이 그대로 남아 "여전히 크다"가 된다 — 둘은 한 세트다. -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <!-- ============ 부팅 화면 ============
+       앱 코드가 다 실릴 때까지 덮어 두는 한 장. 글자를 넣지 않는다 — 매 실행 뜨는 자리에
+       "한 번에 찾고 한 번에 신청하세요"를 두면 학생이 자기 앱에서 매번 광고를 보게 된다.
+       배경색은 manifest.json 의 background_color·<meta theme-color> 와 **같은 값**이어야
+       한다(안드로이드 설치형이 그 색으로 제 스플래시를 그린다 — 다르면 켤 때 색이 튄다).
+       걷는 것은 boot.js 의 window.bootDone(). 설계: docs/designs/first-run-and-resume.md -->
+  <div id="boot">
+    <div class="boot-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/><path d="M22 10v6"/></svg>
+    </div>
+    <p class="boot-word">한대장</p>
+    <div id="boot-spin" class="boot-spin" aria-hidden="true"></div>
+    <!-- 시한(6초)이 지나도 앱이 안 오면 — '시작하기'를 남기지 않는다.
+         남기면 이미 쓰던 학생이 프로필을 처음부터 다시 만들게 된다.
+         🔴 이 버튼에 `onclick="…"` 을 쓰지 말 것 — CSP(`script-src 'self'`)가 인라인 처리기를
+            막아 **눌러도 아무 일도 안 일어난다**(2026-09-09 브라우저로 확인: "Refused to
+            execute inline event handler"). 배선은 boot.js 가 한다. -->
+    <div id="boot-fail" class="boot-fail" hidden>
+      <p>앱을 불러오지 못했어요.<br />인터넷 연결을 확인하고 다시 시도해 주세요.</p>
+      <button type="button" id="boot-retry" class="btn btn-primary">다시 시도</button>
+    </div>
+  </div>
+
   <div id="app" class="app">
 
-    <!-- ============ 온보딩 ============ -->
-    <section id="screen-onboarding" class="screen">
-      <div class="onboard-progress"><div id="onboard-bar" class="onboard-bar"></div></div>
+    <!-- ============ 온보딩 ============
+         🔴 `hidden` 을 빼지 말 것 — 이 화면만 안 감춰져 있어서, 앱 코드가 도착할 때까지
+            **이미 쓰던 학생에게도** 환영 화면이 떠 있었다(2026-09-09 실측).
+            관문: verify/test-collector.mjs '첫 실행 화면' 절 -->
+    <section id="screen-onboarding" class="screen" hidden>
+      <!-- 🔴 뒤로가기는 **단계마다 하나씩 두지 않는다** (노션 UI-2). 진행 막대와 한 줄에
+           놓인 이 버튼 하나가 전부이고, 어느 단계인지는 app.js renderOnboardStep 이 정한다.
+           단계 안에 넣으면 단계가 늘 때마다 또 베껴야 하고 그중 하나가 빠진다. -->
+      <div class="onboard-top">
+        <button class="sub-back" id="btn-onboard-back" type="button" aria-label="이전 단계" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <div class="onboard-progress"><div id="onboard-bar" class="onboard-bar"></div></div>
+      </div>
 
       <!-- Step 0: 인트로 -->
       <div class="onboard-step" data-step="0">
@@ -31,14 +75,24 @@
           <h1>한대장</h1>
           <p class="onboard-tagline">한국 대학교 장학금,<br /><strong>한 번에 찾고 한 번에 신청</strong>하세요</p>
           <ul class="onboard-points">
-            <li><span class="pt-icon">🔍</span> 교내·교외 장학금을 내 조건으로 자동 매칭</li>
-            <li><span class="pt-icon">⚡</span> 증명서 자동 첨부로 원클릭 신청</li>
-            <li><span class="pt-icon">🔔</span> 마감일 관리와 신청 현황 추적</li>
+            <li><span class="pt-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></span> 교내·교외 장학금을 내 조건으로 자동 매칭</li>
+            <li><span class="pt-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 14l2 2 4-4"/></svg></span> 증명서 자동 첨부로 신청 준비까지</li>
+            <li><span class="pt-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"/><path d="M10.3 20a2 2 0 0 0 3.4 0"/></svg></span> 마감일 관리와 신청 현황 추적</li>
           </ul>
         </div>
         <div class="onboard-actions">
           <button class="btn btn-primary btn-lg" data-next>시작하기</button>
-          <p class="onboard-note">1분이면 내가 받을 수 있는 장학금을 알 수 있어요</p>
+          <!-- 🔴 **시간을 약속하지 않는다** (노션 UI-22 · 2026-09-12 재 봄).
+               옛 문구는 "1분이면 내 장학금 확인" 이었는데, 재 보니 그 말이 참인 길은
+               **전부 건너뛰는 길 하나뿐**이었다: 앱이 막는 것은 학교·학년 둘뿐이라 8번 누르고
+               5글자 치면 홈까지 간다. 반대로 처음 가입하는 학생에게 보이는 칸은 입력 10 ·
+               고르기 6 · 칩 3묶음 · 체크 15개라 1분이 아니다. 시간을 적으면 단계가 늘 때마다
+               조용히 거짓말이 된다(넷 → 여섯으로 늘면서 실제로 그렇게 됐다).
+               그래서 **앱이 실제로 요구하는 것**을 적는다 — app.js 의 1단계 검증과 같은 둘이다.
+               ⚠️ '홈에 카드 3장'을 근거로 쓰지 말 것 — 그 석 장은 학교를 안 본다(외대·경희대·
+                  포항공대가 전부 같은 전국 재단 셋). 학교로 갈리는 것은 히어로 건수(11·13·5).
+               관문: test-collector '환영 화면 문구'. -->
+          <p class="onboard-note">학교와 학년만 정하면 바로 볼 수 있어요</p>
         </div>
       </div>
 
@@ -46,7 +100,12 @@
       <div class="onboard-step" data-step="1" hidden>
         <div class="onboard-body">
           <h2>학적 정보를 알려주세요</h2>
-          <p class="onboard-sub">전국 모든 대학을 지원해요</p>
+          <!-- 🔴 "전국 모든 대학 지원" 이었다 (2026-09-13 수정). 학교는 전국에서 고를 수 있는
+               것이 맞지만, **교내 공고가 있는 학교는 두 곳뿐**이다(등록 48건 = 한국외대 22 ·
+               경희대 12 · 학교 무관 14 · 층2 전국 재단 90곳 — 실측). '모든 대학 지원'은
+               그 학생이 교내 공고도 받는다는 말로 읽힌다. 확인 안 한 것을 단정하지 않는다(원칙 5).
+               ⚠️ 학교 목록을 줄일지 말지는 노션 A-6(개발자 판단 대기)다 — 여기서는 **말만** 고친다. -->
+          <p class="onboard-sub">학교는 전국에서 고를 수 있어요</p>
           <label class="field ac-wrap">
             <span class="field-label">학교</span>
             <input type="text" id="in-school" placeholder="학교명을 검색하세요 (예: 외대, 서울)" maxlength="30" autocomplete="off" />
@@ -88,10 +147,10 @@
               <button class="chip" data-value="초과학기">초과학기</button>
               <button class="chip" data-value="졸업유예">졸업유예</button>
             </div>
-            <span class="field-hint">'휴학생 지원 불가' 같은 조건이 많아, 이 항목이 적합도에 가장 크게 반영돼요</span>
           </div>
         </div>
         <div class="onboard-actions">
+        <button class="btn btn-onboard-cancel" data-onboard-cancel hidden>취소</button>
           <button class="btn btn-primary btn-lg" data-next>다음</button>
         </div>
       </div>
@@ -100,19 +159,17 @@
       <div class="onboard-step" data-step="2" hidden>
         <div class="onboard-body">
           <h2>성적과 소득 정보를 알려주세요</h2>
-          <p class="onboard-sub">장학금 자격 판단의 핵심 기준이에요</p>
+          <p class="onboard-sub">장학금 자격 판단의 핵심 기준</p>
           <label class="field">
-            <span class="field-label">직전학기 평점 (4.5 만점)</span>
+            <span class="field-label">직전학기 평점 (4.5 만점 · 신입학은 공란 가능)</span>
             <input type="number" id="in-gpa" placeholder="예: 3.85" min="0" max="4.5" step="0.01" inputmode="decimal" />
-            <span class="field-hint">신입학 첫 학기는 성적 요건이 면제 처리돼요 (비워두어도 괜찮아요)</span>
           </label>
           <label class="field">
             <span class="field-label">직전학기 이수학점</span>
             <input type="number" id="in-credits" placeholder="예: 15" min="0" max="30" step="1" inputmode="numeric" />
-            <span class="field-hint">'직전학기 12학점 이상' 같은 조건을 판단하는 데 써요</span>
           </label>
           <label class="field">
-            <span class="field-label">학자금 지원구간 (소득구간)</span>
+            <span class="field-label">학자금 지원구간 (모르면 '모름')</span>
             <select id="in-bracket">
               <option value="">모름 / 미산정</option>
               <option value="1">1구간</option><option value="2">2구간</option>
@@ -121,7 +178,6 @@
               <option value="7">7구간</option><option value="8">8구간</option>
               <option value="9">9구간</option><option value="10">10구간</option>
             </select>
-            <span class="field-hint">한국장학재단에서 산정한 구간이에요. 모르면 '모름'을 선택해도 매칭돼요.</span>
           </label>
           <label class="field">
             <span class="field-label">본인 거주 지역</span>
@@ -133,6 +189,13 @@
               <option>전북</option><option>전남</option><option>경북</option><option>경남</option><option>제주</option>
             </select>
           </label>
+          <!-- 🔴 시·군까지 받는다 (2026-08-30) — 지역 장학금은 대부분 시·군 단위라
+               시·도만으로는 `안양시에 주소를 두고` 같은 요건을 판정할 수 없다.
+               목록은 위 시·도를 고르면 app.js 가 REGION_CITIES 로 채운다. -->
+          <label class="field">
+            <span class="field-label">본인 거주 시·군·구</span>
+            <select id="in-region-city"><option value="">선택 안 함</option></select>
+          </label>
           <label class="field">
             <span class="field-label">부모님 거주 지역</span>
             <select id="in-parent-region">
@@ -142,7 +205,10 @@
               <option>경기</option><option>강원</option><option>충북</option><option>충남</option>
               <option>전북</option><option>전남</option><option>경북</option><option>경남</option><option>제주</option>
             </select>
-            <span class="field-hint">지역 장학금은 '부 또는 모가 1년 이상 거주'를 요구하는 곳이 많아요</span>
+          </label>
+          <label class="field">
+            <span class="field-label">부모님 거주 시·군·구</span>
+            <select id="in-parent-region-city"><option value="">본인과 같음 / 선택 안 함</option></select>
           </label>
           <label class="field">
             <span class="field-label">국적</span>
@@ -155,10 +221,10 @@
           <label class="field">
             <span class="field-label">태어난 해 (선택)</span>
             <input type="number" id="in-birth-year" placeholder="예: 2004" min="1940" max="2020" step="1" inputmode="numeric" />
-            <span class="field-hint">'만 39세 이하' 같은 나이 조건에만 써요</span>
           </label>
         </div>
         <div class="onboard-actions">
+        <button class="btn btn-onboard-cancel" data-onboard-cancel hidden>취소</button>
           <button class="btn btn-primary btn-lg" data-next>다음</button>
         </div>
       </div>
@@ -167,7 +233,7 @@
       <div class="onboard-step" data-step="3" hidden>
         <div class="onboard-body">
           <h2>해당하는 항목을 모두 선택하세요</h2>
-          <p class="onboard-sub">해당 사항이 없으면 바로 완료를 눌러도 돼요</p>
+          <p class="onboard-sub">해당 없으면 바로 완료</p>
           <div class="check-list" id="in-flags">
             <label class="check-item"><input type="checkbox" value="basicLiving" /><span>기초생활수급자</span></label>
             <label class="check-item"><input type="checkbox" value="nearPoverty" /><span>차상위계층</span></label>
@@ -187,21 +253,47 @@
                   기기에만 남아 서버로 안 나간다(supabase-client.js syncSafeProfile). -->
           <label class="check-item consent-item" id="in-sensitive-row" hidden>
             <input type="checkbox" id="in-sensitive-ok" />
-            <span>(선택) 위 항목은 <strong>민감정보</strong>예요. 기기를 바꿔도 이어지게 하려면
-              서버 저장에 동의해 주세요. <a href="terms.html" target="_blank" rel="noopener">자세히 보기</a>
-              <em>동의하지 않아도 앱은 그대로 쓸 수 있어요 — 이 항목이 이 기기에만 남을 뿐이에요.</em></span>
+            <span>(선택) 위 항목은 <strong>민감정보</strong>. 기기를 바꿔도 이어지게 하려면
+              서버 저장 동의 필요. <a href="terms.html" target="_blank" rel="noopener">자세히 보기</a>
+              <em>미동의 시에도 앱 사용 가능 — 이 항목만 기기에 보관.</em></span>
           </label>
         </div>
         <div class="onboard-actions">
+        <button class="btn btn-onboard-cancel" data-onboard-cancel hidden>취소</button>
           <button class="btn btn-primary btn-lg" data-next>다음</button>
         </div>
       </div>
 
-      <!-- Step 4: 공통 서류 정보 -->
+      <!-- Step 4: 지금 받고 있는 장학금 (2026-08-27)
+           🔴 이건 '있으면 좋은 정보'가 아니라 **지원 자격 그 자체**다. 공고 원문 66건에
+              `타 재단 장학금 중복수혜 불가` 같은 조항이 있는데, 그동안 학생이 보는 자리에는
+              0건 노출이었다. 이미 다른 장학금을 받는 학생이 서류를 다 준비하고 지원했다가
+              탈락한다 — 이 저장소가 가장 싫어하는 실패다(개발자 지적 2026-08-27). -->
       <div class="onboard-step" data-step="4" hidden>
         <div class="onboard-body">
+          <h2>지금 받고 있는<br />장학금이 있나요?</h2>
+          <p class="onboard-sub">다른 장학금과 함께 받을 수 없는 공고가 있습니다.<br />선택하면 지원할 수 없는 공고를 걸러냅니다.</p>
+          <div class="check-list" id="in-scholarships">
+            <label class="check-item"><input type="checkbox" value="kosaf" /><span>국가장학금<em>한국장학재단 I·II유형, 다자녀 등</em></span></label>
+            <label class="check-item"><input type="checkbox" value="internal" /><span>교내 장학금<em>우리 학교에서 주는 성적·복지 장학금</em></span></label>
+            <label class="check-item"><input type="checkbox" value="external" /><span>교외 장학금 (외부 재단)<em>재단·기업·지자체에서 주는 장학금</em></span></label>
+            <label class="check-item"><input type="checkbox" value="work" /><span>근로장학금<em>국가근로·교내근로</em></span></label>
+          </div>
+          <div class="check-list" id="in-scholarships-none">
+            <label class="check-item"><input type="checkbox" id="in-schol-none" /><span>받고 있는 장학금 없음</span></label>
+          </div>
+        </div>
+        <div class="onboard-actions">
+        <button class="btn btn-onboard-cancel" data-onboard-cancel hidden>취소</button>
+          <button class="btn btn-primary btn-lg" data-next>다음</button>
+        </div>
+      </div>
+
+      <!-- Step 5: 공통 서류 정보 -->
+      <div class="onboard-step" data-step="5" hidden>
+        <div class="onboard-body">
           <h2>서류에 자동으로 채울<br />기본 정보를 알려주세요</h2>
-          <p class="onboard-sub">거의 모든 장학금 신청서가 공통으로 요구하는 정보예요.<br />모두 선택 사항이고, 이 기기에만 저장돼요.</p>
+          <p class="onboard-sub">대부분의 장학금 신청서가 공통으로 요구하는 정보입니다.<br />모두 선택 사항이며 이 기기에만 저장됩니다.</p>
           <label class="field">
             <span class="field-label">학번 (선택)</span>
             <input type="text" id="in-sid" placeholder="예: 202512345" maxlength="12" inputmode="numeric" autocomplete="off" />
@@ -218,13 +310,19 @@
             <span class="field-label">이메일 (선택)</span>
             <input type="email" id="in-email" placeholder="예: hello@example.com" maxlength="40" autocomplete="off" />
           </label>
-          <label class="field">
+          <!-- 🔴 장학금 수령 계좌는 **가입 단계에서 묻지 않는다** (2026-08-31 UI 정리).
+               아직 아무 가치도 받지 못한 학생에게 계좌번호를 요구하는 것은 실제 서비스에서
+               가장 흔한 이탈·불신 지점이다. 필요한 때는 **신청서에 그 칸이 있을 때**뿐이고,
+               그때 form-plan.js 가 자동 채움에 실패해 질문으로 띄운다(설계 그대로 동작).
+               프로필 수정으로 들어온 경우에만 보인다 — initOnboarding() 이 hidden 을 푼다. -->
+          <label class="field" id="in-account-field" hidden>
             <span class="field-label">장학금 수령 계좌 (선택)</span>
             <input type="text" id="in-bank" placeholder="은행명 (예: 국민은행)" maxlength="12" autocomplete="off" style="margin-bottom:8px" />
             <input type="text" id="in-account" placeholder="계좌번호" maxlength="20" inputmode="numeric" autocomplete="off" />
           </label>
         </div>
         <div class="onboard-actions">
+        <button class="btn btn-onboard-cancel" data-onboard-cancel hidden>취소</button>
           <button class="btn btn-primary btn-lg" id="btn-finish-onboard">내 장학금 찾기</button>
         </div>
       </div>
@@ -236,7 +334,7 @@
         <div class="home-id tappable" id="btn-home-profile" role="button" tabindex="0" aria-label="내 정보 보기">
           <div class="avatar" id="home-avatar">학</div>
           <div>
-            <p class="home-greet" id="home-greet">안녕하세요!</p>
+            <p class="home-greet" id="home-greet">안녕하세요</p>
             <p class="home-school" id="home-school">대학 미설정</p>
           </div>
         </div>
@@ -245,30 +343,49 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>
           <span class="bell-badge" id="notify-badge" hidden></span>
         </button>
-        <button class="icon-btn" id="btn-edit-profile" title="프로필 수정" aria-label="프로필 수정">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33h.01a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51h.01a1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82v.01a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-        </button>
+        <!-- 🔴 홈 오른쪽 위 톱니를 뺐다 (2026-09-11 개발자 지시 5번).
+             학적정보 수정 입구는 MY 맨 위 프로필 카드('학적정보 수정 ›') 하나다 —
+             같은 일을 하는 입구가 둘이면 학생이 둘을 다른 것으로 읽는다.
+             app.js 의 editProfile 은 그대로 쓰이고, 배선은 요소가 있을 때만 건다. -->
         </div>
       </header>
 
       <div class="hero-card">
-        <p class="hero-label">지금 받을 수 있는 장학금</p>
-        <p class="hero-amount" id="hero-amount">0원</p>
+        <p class="hero-label" id="hero-label">지금 신청할 수 있는 장학금</p>
+        <p class="hero-amount tappable" id="hero-amount" role="button" tabindex="0" aria-label="금액 상세 보기">0원</p>
         <p class="hero-count" id="hero-count"></p>
-        <button class="btn btn-white btn-lg" id="btn-apply-all">⚡ 한 번에 모두 신청하기</button>
+        <button class="btn btn-white btn-lg" id="btn-apply-all">신청 준비</button>
       </div>
 
+      <!-- 쓰던 신청서 — 창(4시간)을 넘겨 들어와도 진행분은 안 버린다는 자리.
+           내용은 app.js renderHome() 이 채운다. 설계: docs/designs/first-run-and-resume.md -->
+      <button type="button" class="resume-card" id="home-resume" hidden></button>
+
+      <!-- 🔴 제목이 '마감 임박' 이던 자리 (2026-09-17 개발자 지시: "마감임박이라는 수치를
+           지우고 … 적합도와 마감일을 모두 고려하여 내림차순"). 그 이름은 **차례와 달랐다** —
+           칸 이름은 마감인데 안쪽 정렬은 적합도였다(개발자가 화면을 보고 짚은 그대로).
+           지금은 적합도와 마감일을 한 점수로 묶어 정렬하므로(app.js `byHomeOrder`) 이름도
+           그 점수를 말한다. 마감은 카드마다 붙는 `D-n` 글자가 그대로 전한다.
+           ⚠️ `#home-deadline-list`·`#home-deadline-more` 표식은 옛 이름 그대로 둔다 —
+              style.css 규칙과 검사 드라이버가 이 이름에 붙어 있다(app.js 같은 자리 주석). -->
       <div class="section-head">
-        <h3>마감 임박</h3>
+        <h3>나에게 맞는 장학금</h3>
         <button class="link-btn" data-goto="explore">전체 보기</button>
       </div>
       <div id="home-deadline-list" class="card-list"></div>
+      <!-- 더보기 — 목록을 다시 그리지 않고 **가려 둔 카드를 펴기만** 한다(노션 UI-14).
+           다시 그리면 히어로 금액이 또 세어 올라가고 스크롤이 튄다. -->
+      <button type="button" class="link-btn home-more" id="home-deadline-more"
+              aria-controls="home-deadline-list" aria-expanded="false" hidden>더보기</button>
 
-      <div class="section-head">
-        <h3>신청 현황</h3>
-        <button class="link-btn" data-goto="applications">전체 보기</button>
-      </div>
-      <div id="home-apps" class="card-list"></div>
+      <!-- 🔴 '신청 현황' 구획은 **신청내역 화면으로 옮겼다** (노션 UI-15 · 2026-09-12 개발자 지시:
+           "홈의 신청 현황을 지우고 신청 내역 칸에 반영한다"). 같은 카드(appCard)를 두 화면이
+           그리고 있었고, 홈은 그중 최근 2건만 보여 주는 **작은 사본**이었다.
+           잃은 정보는 없다 — 신청내역 화면이 요약 카드(준비 완료·제출·선정·서류 작성 필요 건수와
+           예상 수혜액)와 함께 전부 보여 주고, 아래 탭에서 한 번에 간다.
+           ⚠️ 홈에 다시 만들지 말 것 — 사본이 둘이면 둘이 다른 말을 한다(이 저장소가 반복해 겪었다). -->
+
+      <p class="home-updated" id="home-updated"></p>
     </section>
 
     <!-- ============ 장학금 탐색 ============ -->
@@ -291,10 +408,21 @@
           <div id="explore-sort-menu" class="sort-menu" role="menu" hidden></div>
         </div>
       </header>
+      <!-- 검색 (2026-08-30) — 앱에 검색이 아예 없었다. 기존 필터 칩·정렬 로직은 그대로 두고 위에 얹는다 -->
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input type="search" id="explore-search" placeholder="장학금·재단 이름으로 찾기" maxlength="40" autocomplete="off" aria-label="장학금 검색" />
+        <button type="button" id="explore-search-clear" class="search-clear" aria-label="검색어 지우기" hidden>✕</button>
+      </div>
       <div class="filter-row" id="explore-filters">
         <button class="filter-chip active" data-filter="all">전체</button>
         <button class="filter-chip" data-filter="교내">교내</button>
         <button class="filter-chip" data-filter="교외">교외</button>
+        <!-- 🔴 '우리 학교' 는 **다른 종류의 목록**이다 (노션 UI-16 · 2026-09-12).
+             교내·교외는 우리가 원문을 읽고 등록한 공고이고, 이 칸은 수집 로봇이 학교
+             게시판에서 매일 줍는 **글 목록**이다(적합도도 마감 판정도 없다).
+             예전에는 '전체' 목록 **아래에** 붙어 있어 스크롤 끝까지 가야 보였다. -->
+        <button class="filter-chip" data-filter="notice">우리 학교</button>
         <button class="filter-chip" data-filter="eligible">신청 가능만</button>
       </div>
       <div id="explore-list" class="card-list"></div>
@@ -306,7 +434,12 @@
     <section id="screen-applications" class="screen" hidden>
       <header class="page-header apps-header">
         <h2>신청 내역</h2>
-        <button id="apps-select-toggle" class="btn-ghost btn-sm" hidden>선택</button>
+        <!-- 달력은 새 탭이 아니라 여기 토글이다 — 하단바 4칸이 이미 꽉 찼고,
+             달력은 결국 '내가 담은 것'의 다른 보기다 (2026-09-07 · 노션 UI-21). -->
+        <div class="apps-header-actions">
+          <button id="apps-view-toggle" class="btn-ghost btn-sm" aria-pressed="false">달력 보기</button>
+          <button id="apps-select-toggle" class="btn-ghost btn-sm" hidden>선택</button>
+        </div>
       </header>
       <div id="apps-summary" class="apps-summary"></div>
       <!-- 선택 모드 막대 — 여러 건을 한 번에 정리할 때만 나온다 -->
@@ -315,21 +448,163 @@
         <button id="apps-delete-selected" class="btn-danger btn-sm" disabled>삭제</button>
       </div>
       <div id="apps-list" class="card-list"></div>
-      <p class="data-note" id="apps-swipe-hint" hidden>※ 카드를 <strong>왼쪽으로 밀면</strong> 삭제할 수 있어요. 지워도 잠시 되돌릴 수 있고, 장학금 자체는 사라지지 않아요.</p>
+      <!-- 달력 — app.js renderCalendar()가 채운다 -->
+      <div id="apps-calendar" class="cal" hidden></div>
     </section>
 
     <!-- ============ MY ============ -->
     <section id="screen-my" class="screen" hidden>
-      <header class="page-header"><h2>MY</h2></header>
-      <div id="my-profile" class="my-card tappable" role="button" tabindex="0" aria-label="프로필 수정"></div>
+      <!-- 🔴 오른쪽 위 톱니 = 설정 화면 (2026-09-11 개발자 지시 · 목업 승인).
+           계정·알림 카드는 여기서 **빼서** 설정 화면으로 옮겼다 — 같은 스위치가 두 곳에
+           보이면 어느 쪽이 진짜인지 알 수 없다(개발자가 '뺀다'로 결정). -->
+      <header class="page-header page-header-row">
+        <h2>MY</h2>
+        <button class="icon-btn" id="btn-open-settings" aria-label="설정" title="설정">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.9 19.3a1.7 1.7 0 0 0-1.88.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.7 15a1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.7 8.9a1.7 1.7 0 0 0-.34-1.88l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.7a1.7 1.7 0 0 0 1.03-1.56V3a2 2 0 1 1 4 0v.09A1.7 1.7 0 0 0 15 4.7a1.7 1.7 0 0 0 1.88-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.3 9v.01a1.7 1.7 0 0 0 1.56 1.02H21a2 2 0 1 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15z"/></svg>
+        </button>
+      </header>
+      <!-- 🔴 카드 전체가 버튼이 아니다 (2026-09-12 개발자 지시) — 누를 수 있는 것은 안쪽의
+           '학적정보 수정' 버튼 하나다. 그래서 tappable·role=button·tabindex 를 뺐다:
+           남겨 두면 보조기기가 여전히 "프로필 수정 버튼"이라고 읽고 Tab 이 카드에 멈춘다. -->
+      <div id="my-profile" class="my-card"></div>
+      <div id="my-wallet" class="my-card"></div>
+      <!-- 보관함 — 저장(북마크)한 공고. app.js renderSaved()가 채운다 (2026-09-07) -->
+      <div id="my-saved" class="my-card"></div>
+      <!-- 서류 보관함 줄과 같은 꼴 — 왼쪽에 할 일, 오른쪽에 누를 것 (2026-08-31).
+           🔴 id 는 그대로 둔다. app.js 가 이 이름으로 동작을 붙인다. -->
+      <!-- 프로필 수정은 맨 위(수정하기 ›)에 이미 있어 여기서는 뺐다 (2026-08-31).
+           🔴 초기화는 **붉은 글자 자체가 버튼**이다 — 오른쪽에 실행 버튼을 따로 두면
+              목록을 훑다 손가락이 스치기 쉬운데, 이건 되돌릴 수 없는 동작이다. -->
+      <div class="my-menu">
+        <button class="my-danger-line" id="btn-reset">데이터 초기화</button>
+      </div>
+      <!-- 🔴 판 번호를 여기 적지 않는다 — app.js 의 APP_VERSION 한 곳에서 온다.
+           고객센터 진단 정보가 같은 값을 쓰므로, 두 곳에 적으면 갈라진다. -->
+      <p class="data-note" id="my-version"></p>
+    </section>
+
+    <!-- ============ 설정 (2026-09-11 · 개발자 목업 승인) ============
+         승인받은 화면 = ① 뒤로 + '설정' ② 계정(로그인/회원가입) ③ 알림(상태줄 + 켜기 + 스위치 5개).
+         ④ 휴지통·이용약관·탈퇴는 같은 지시에서 개발자가 말로 덧붙인 것이라 목록으로 뒀다.
+         🔴 계정·알림의 내용은 **MY 가 쓰던 함수 그대로**다(renderAccountCard·notifySettingsHtml).
+            베끼면 두 화면이 다른 말을 하게 된다 — 이 저장소가 반복해 겪은 사고다. -->
+    <section id="screen-settings" class="screen" hidden>
+      <header class="sub-header">
+        <button class="sub-back" id="btn-settings-back" aria-label="뒤로">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <h2>설정</h2>
+      </header>
+      <!-- 🔴 id 를 그대로 둔다 (my-account · my-notify). 자리만 MY 에서 여기로 옮겼다 —
+           이 이름에 붙은 style.css 규칙(절 제목 21px·위 짧은 막대·줄 간격)과 app.js 동작이
+           이미 있어서, 이름을 바꾸면 그 규칙이 전부 떨어져 나가고 화면이 달라진다. -->
       <div id="my-account" class="my-card" hidden></div>
       <div id="my-notify" class="my-card" hidden></div>
-      <div id="my-wallet" class="my-card"></div>
-      <div class="my-menu">
-        <button class="my-menu-item" id="btn-my-edit">프로필 수정</button>
-        <button class="my-menu-item danger" id="btn-reset">데이터 초기화</button>
+      <!-- 🔴 '기타' 절 (2026-09-11 개발자 지시 — 제목 없이 목록만 있어서 위 '알림' 절과의
+           빈칸이 크게 벌어져 보였다). 계정·알림과 **같은 .my-card 리듬**을 쓰고 제목도
+           같은 규칙(style.css 의 절 제목 묶음)에 이름을 더해 붙였다 — 베끼지 않는다. -->
+      <div id="set-etc" class="my-card">
+        <p class="wallet-title">기타</p>
+        <div class="my-menu set-menu">
+          <button class="my-menu-item" id="btn-open-logins">로그인 활동</button>
+          <!-- 🔴 고객센터는 자주 묻는 질문 **바로 위**에 둔다 (2026-09-13 개발자 지시).
+               둘은 한 쌍이다 — 고객센터가 TOP 5 로 FAQ 를 가리키고, FAQ 는 답이 없을 때
+               고객센터로 보낸다. 떨어뜨려 놓으면 학생이 둘을 다른 기능으로 읽는다. -->
+          <button class="my-menu-item" id="btn-open-support">고객센터</button>
+          <button class="my-menu-item" id="btn-open-faq">자주 묻는 질문</button>
+          <button class="my-menu-item" id="btn-open-trash">휴지통</button>
+          <!-- 🔴 링크가 아니라 **버튼**이다 (2026-09-11 개발자 지시 "휴지통처럼 그냥 화면 전환").
+               예전엔 terms.html 로 진짜 페이지 이동이라, 되돌아올 때 앱이 처음부터 떠서
+               부팅 화면이 보였다. 지금은 앱 안 화면(#screen-terms)으로 바뀐다. -->
+          <button class="my-menu-item" id="btn-open-terms">이용약관 · 개인정보처리방침</button>
+          <!-- 🔴 '폰 설정으로 이동'은 만들 수 없다 — 웹앱에는 그런 길이 없다(진짜 앱만 된다).
+               대신 지금 권한 상태를 보여 주고 어디로 가야 하는지 글로 안내한다. -->
+          <button class="my-menu-item" id="btn-open-perms">앱 권한 · 오픈소스 라이선스</button>
+          <button class="my-menu-item danger" id="btn-withdraw">탈퇴</button>
+        </div>
       </div>
-      <p class="data-note">한대장 v0.3 (MVP) · 전국 대학 지원</p>
+    </section>
+
+    <!-- ============ 로그인 활동 (2026-09-11 개발자 지시 1번) ============
+         "내 계정에 언제 어디서 로그인됐나" — 낯선 기기가 보이면 비밀번호를 바꾸라고 알려 주는 화면.
+         🔴 담는 것은 **시각과 거친 기기 이름 둘뿐**이다(IP·위치 없음 · UA 원문 없음).
+            규칙은 supabase-client.js 의 `deviceLabel`·`authLogLogin` 한 곳. -->
+    <section id="screen-logins" class="screen" hidden>
+      <header class="sub-header sub-header-stick">
+        <button class="sub-back" id="btn-logins-back" aria-label="뒤로">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <h2>로그인 활동</h2>
+      </header>
+      <div id="logins-body"></div>
+    </section>
+
+    <!-- ============ 자주 묻는 질문 (2026-09-11 개발자 지시 2번) ============
+         🔴 **앱이 실제로 하는 일만** 적는다. 여기에 '곧 됩니다'나 확인 안 한 것을 적으면
+            그게 가장 눈에 잘 띄는 거짓말이 된다(운영 원칙 1·8-1). 답은 전부 지금 동작 기준. -->
+    <section id="screen-faq" class="screen" hidden>
+      <header class="sub-header sub-header-stick">
+        <button class="sub-back" id="btn-faq-back" aria-label="뒤로">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <h2>자주 묻는 질문</h2>
+      </header>
+      <div id="faq-body" class="faq"></div>
+    </section>
+
+    <!-- ============ 고객센터 (2026-09-13 개발자 지시 · 아파트너·라이프캐치 참고안) ============
+         🔴 여기 있는 길은 **전부 실제로 가는 길**이다. 참고안의 '나의 문의 내역' 탭은
+            받아 두는 서버가 없어 넣지 않았다 — 눌러서 빈 화면이 나오는 탭이 가장 나쁘다.
+         🔴 내용은 app.js renderSupport() 가 채운다. 문의 메일 버튼은 support-config.js 의
+            email 이 채워졌을 때만 나온다(push-config·chat-config 와 같은 방식). -->
+    <section id="screen-support" class="screen" hidden>
+      <header class="sub-header sub-header-stick">
+        <button class="sub-back" id="btn-support-back" aria-label="뒤로">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <h2>고객센터</h2>
+      </header>
+      <div id="support-body"></div>
+    </section>
+
+    <!-- ============ 앱 권한 · 오픈소스 라이선스 (2026-09-11 개발자 지시 4번) ============ -->
+    <section id="screen-perms" class="screen" hidden>
+      <header class="sub-header sub-header-stick">
+        <button class="sub-back" id="btn-perms-back" aria-label="뒤로">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <h2>앱 권한 · 오픈소스 라이선스</h2>
+      </header>
+      <div id="perms-body"></div>
+    </section>
+
+    <!-- ============ 이용약관 · 개인정보처리방침 (2026-09-11 · 앱 안 화면으로 전환) ============
+         🔴 **글을 여기 베끼지 않는다.** 원본은 terms.html 하나다(법적 문서라 제 주소도 있어야 하고,
+            온보딩 동의 줄은 여전히 새 탭으로 그 파일을 연다). 앱은 그 파일을 읽어 와 넣는다 —
+            두 벌이 되면 한쪽만 고쳐져 화면과 약관이 다른 말을 하게 된다.
+         🔴 머리줄은 **따라다닌다**(.sub-header-stick) — 긴 글이라 읽다가 중간에 나갈 수 있어야 한다. -->
+    <section id="screen-terms" class="screen" hidden>
+      <header class="sub-header sub-header-stick">
+        <button class="sub-back" id="btn-terms-back" aria-label="뒤로">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <h2>이용약관 · 개인정보처리방침</h2>
+      </header>
+      <div id="terms-body" class="legal"></div>
+    </section>
+
+    <!-- ============ 휴지통 (2026-09-11) ============
+         지운 신청내역과 지운 서류 파일이 30일 동안 여기 남는다(개발자가 '둘 다'로 결정).
+         🔴 목업에 없던 화면이라 문구는 이 세션이 지은 것 — 개발자 확인 대상. -->
+    <section id="screen-trash" class="screen" hidden>
+      <header class="sub-header">
+        <button class="sub-back" id="btn-trash-back" aria-label="뒤로">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <h2>휴지통</h2>
+      </header>
+      <p class="set-note">지운 지 30일이 지나면 자동으로 완전히 사라져요.</p>
+      <div id="trash-body"></div>
     </section>
 
     <!-- ============ 하단 내비게이션 ============ -->
@@ -382,11 +657,11 @@
       </symbol>
     </svg>
 
-    <!-- 꾹 눌러 옮길 수 있어서 위치를 코드가 아니라 chat.js가 정한다 (숨은 동작이라 첫 1회 안내도 붙는다) -->
-    <button class="chat-fab" id="btn-chat-fab" hidden aria-label="대장님 열기 — 장학금 도우미 (길게 눌러 위치를 옮길 수 있어요)">
+    <!-- 끌어서 옮길 수 있어서 위치를 코드가 아니라 chat.js가 정한다 (숨은 동작이라 첫 1회 안내도 붙는다) -->
+    <button class="chat-fab" id="btn-chat-fab" hidden aria-label="대장님 열기 — 장학금 도우미 (끌어서 위치 이동)">
       <svg class="mascot" viewBox="0 0 48 48" aria-hidden="true"><use href="#mascot"/></svg>
     </button>
-    <div class="chat-hint" id="chat-hint" hidden role="status">꾹 눌러서 옮길 수 있어요</div>
+    <div class="chat-hint" id="chat-hint" hidden role="status">끌어서 이동 가능</div>
     <div id="chat-backdrop" class="sheet-backdrop" hidden></div>
     <div id="chat-sheet" class="sheet chat-sheet" hidden role="dialog" aria-label="대장님 — 장학금 도우미" aria-modal="true">
       <div class="sheet-handle"></div>
@@ -396,7 +671,7 @@
         </span>
         <div class="chat-head-text">
           <p class="chat-title">대장님</p>
-          <p class="chat-sub">앱에 있는 공고·서류 정보로만 답해요</p>
+          <p class="chat-sub">앱에 있는 공고·서류 정보로만 답변</p>
         </div>
         <button class="icon-btn" id="btn-chat-close" aria-label="닫기">✕</button>
       </div>
@@ -412,19 +687,33 @@
     <div id="notify-backdrop" class="sheet-backdrop" hidden></div>
     <div id="notify-sheet" class="sheet" hidden></div>
 
+    <!-- 서류 발급처 안내 — 서류 이름을 누르면 뜨는 작은 창 (2026-08-31) -->
+    <div id="wallet-pop-backdrop" class="wallet-pop-backdrop"></div>
+    <div id="wallet-pop" class="wallet-pop" hidden role="dialog" aria-label="발급처 안내"></div>
+
     <!-- ============ 토스트 ============ -->
     <div id="toast" class="toast" hidden></div>
   </div>
 
+  <!-- 🔴 부팅 화면 — **다른 모든 스크립트보다 먼저** 실어야 한다. 뒤에 두면 그 사이가
+       그대로 비고, 그게 이 파일이 없애려는 바로 그 틈이다(파일 머리말 참조).
+       관문: verify/test-collector.mjs '첫 실행 화면' 절 -->
+  <script src="boot.js"></script>
   <script src="data.js"></script>
   <!-- 절 경계 판정 — match-engine이 전역으로 참조하므로 반드시 먼저 실어야 한다 -->
   <script src="section-head.js"></script>
+  <!-- 이어보기 판정 — app.js 가 전역으로 참조하므로 먼저 실어야 한다 -->
+  <script src="resume.js"></script>
   <script src="parse-requirements.js"></script>
+  <script src="parse-amount.js"></script>
   <script src="match-engine.js"></script>
   <script src="notify-rules.js"></script>
   <script src="push-config.js"></script>
+  <script src="support-config.js"></script>
   <script src="supabase-config.js"></script>
   <script src="supabase-client.js"></script>
+  <!-- 손짓과 움직임 (2026-09-09) — app.js 가 카드를 그릴 때 부르므로 **app.js 보다 먼저** -->
+  <script src="interactions.js"></script>
   <script src="form-plan.js"></script>
   <script src="essay-ask.js"></script>
   <script src="forms.js"></script>
@@ -432,6 +721,8 @@
   <script src="app.js"></script>
   <script src="essay-config.js"></script>
   <script src="essay-quality.js"></script>
+  <!-- 제출 전 점검표 판정 — essay.js 가 전역으로 참조하므로 먼저 실어야 한다 -->
+  <script src="essay-submit-check.js"></script>
   <script src="essay.js"></script>
   <script src="chat-config.js"></script>
   <script src="chat.js"></script>

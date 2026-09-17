@@ -58,6 +58,7 @@ jobs:
         run: |
           node verify/verify-essay-ask.mjs
           node verify/verify-essay-guard.mjs
+          node verify/verify-essay-submit.mjs
 
       # ① 집 안부터 — 이미 가진 공고 원문·첨부에서 **재단이 직접 적은 작성 규정**을 캔다.
       #    비용 0 · 네트워크 0. 바깥을 뒤지기 전에 여기부터 보는 것이 순서다.

@@ -33,7 +33,9 @@ if (fs.existsSync(poolPath)) {
 }
 const registered = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/registered.json'), 'utf8'));
 const showAll = process.argv.includes('--all');
-const TODAY = new Date().toISOString().slice(0, 10);
+/* 🔴 KST 로 읽는다 — 그냥 toISOString 은 **UTC** 라 새벽에 하루 어긋나고,
+   그날 마감인 공고가 '아직 안 지났다'로 분류된다(verify-explore-sort 가 그래서 빨간불이었다). */
+const TODAY = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
 
 /* URL 정규화 — collector/auto-register.mjs의 canonUrl과 같은 규칙.
    목록 파라미터(sort·페이지)는 떼고 글 식별자만 남기되, 클릭형 게시판의

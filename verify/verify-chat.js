@@ -11,9 +11,11 @@
    ⑨ 질문에 스크립트를 넣어도 그대로 실행되지 않는다(XSS)
    실행: python3 -m http.server 8123 & 후 node verify/verify-chat.js */
 const { chromium } = require('playwright-core');
+const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
+const { nextUntil, assertOwnServer } = require('./onboard-helper.js');
 const EXE = (process.env.CHROME_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome');
 const IGNORE_CONSOLE = /Failed to load resource|does not support the Push API in incognito/;
-const BASE = 'http://localhost:8123';
+const BASE = `http://localhost:${PORT}`;
 
 let fail = 0;
 const ok = (cond, label, extra) => {
@@ -37,7 +39,8 @@ async function onboard(page) {
   await page.selectOption('#in-bracket', '4');
   await page.selectOption('#in-region', '서울');
   await page.click('.onboard-step[data-step="2"] [data-next]');
-  await page.click('.onboard-step[data-step="3"] [data-next]');
+  /* 단계 번호를 박지 말 것 — 온보딩이 4단계에서 6단계가 되며 이 검사가 죽어 있었다 */
+  await nextUntil(page, '#btn-finish-onboard');
   await page.click('#btn-finish-onboard');
   await page.waitForSelector('#screen-home:not([hidden])');
 }
@@ -62,6 +65,10 @@ async function ask(page, q) {
 }
 
 (async () => {
+  /* 🔴 재기 전에 **이 서버가 내 앱인지** 확인한다 — 아니면 여기서 멈춘다.
+     이 저장소는 작업 폴더를 여러 개 두고 쓰는데, 8123 에 다른 폴더의 서버가 떠 있으면
+     그 옛 앱을 재고도 아무도 모른다(빨간불이든 **가짜 초록불이든**). 규칙은 onboard-helper 한 곳. */
+  await assertOwnServer(PORT);
   const browser = await chromium.launch({ executablePath: EXE });
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true });
   const page = await ctx.newPage();
@@ -141,11 +148,31 @@ async function ask(page, q) {
   ok(lang.typo1 && !lang.typo2, '오타 하나는 봐주고 두 개는 안 봐준다', lang);
   ok(!lang.typoShort, '짧은 낱말에는 오타 봐주기를 쓰지 않는다');
 
-  /* ② 되묻기 — 못 찾으면 비슷한 후보를 눌러 볼 수 있게 준다 */
-  const clarified = await ask(page, '조병두 장학');
+  /* ② 되묻기 — 못 찾으면 비슷한 후보를 눌러 볼 수 있게 준다
+     🔴 **이름을 박지 않는다** (2026-08-30). 예전에는 `조병두 장학`을 박아 뒀는데 그 공고가
+     데이터에서 사라지자(실시간 공고는 60일마다 갈린다) 이 항목이 조용히 빨간불이 됐다 —
+     '공고 id를 박지 말 것'과 같은 계열이다. 지금은 **살아 있는 공고 이름에 오타를 하나
+     내서** 물어본다. 데이터가 어떻게 바뀌어도 재현된다. */
+  const typoQ = await page.evaluate(() => {
+    const names = chatMatches().map((m) => m.sch.name)
+      .concat((chatNotices() || []).map((n) => n.title));
+    for (const n of names) {
+      const w = String(n).replace(/\[[^\]]*\]/g, ' ').split(/\s+/)
+        .find((x) => /^[가-힣]{3,6}(재단|장학회|문화재단)?$/.test(x) && x.length >= 3);
+      if (!w) continue;
+      /* 한 글자만 바꾼다 — 오타 봐주기가 살아 있으면 되묻어야 한다 */
+      const ch = w[1] === '아' ? '어' : '아';
+      return w.slice(0, 1) + ch + w.slice(2);
+    }
+    return null;
+  });
+  if (!typoQ) console.log('  · 오타를 낼 만한 공고 이름이 없어 되묻기 항목을 건너뜁니다');
+  const clarified = typoQ ? await ask(page, `${typoQ} 장학`) : '';
   const askChips = await page.locator('#chat-log .chat-asks .chat-chip').count();
-  ok(/이 중 하나인가요|찾았어요/.test(clarified) || askChips > 0,
-    '딱 안 맞아도 비슷한 후보를 되묻는다', clarified.slice(0, 60));
+  if (typoQ) {
+    ok(/이 중 하나인가요|찾았어요/.test(clarified) || askChips > 0,
+      `딱 안 맞아도 비슷한 후보를 되묻는다 (물어본 말: ${typoQ})`, clarified.slice(0, 60));
+  }
 
   /* ④ 앞 대화 기억 — 공고 하나를 물은 뒤 "그거 서류 뭐야?"가 통하는가 */
   const one = await page.evaluate(() => {
@@ -246,7 +273,7 @@ async function ask(page, q) {
   await page.click('#btn-chat-fab');
   await page.waitForSelector('#chat-sheet:not([hidden])');
 
-  console.log('\n[5-1] 🔴 마스코트 — 짧게 누르면 열리고, 꾹 눌러야 옮겨진다');
+  console.log('\n[5-1] 🔴 마스코트 — 짧게 누르면 열리고, 끌면 바로 옮겨진다');
   await page.evaluate(() => { const s = document.querySelector('#chat-sheet'); if (s && !s.hidden) chatClose(); });
   await page.waitForTimeout(350);
   ok(await page.locator('#btn-chat-fab .mascot').count() > 0, '떠 있는 버튼이 마스코트로 바뀌었다');
@@ -281,22 +308,64 @@ async function ask(page, q) {
   ok(tap.sheetOpen, '짧게 누르면 도우미가 열린다');
   ok(Math.abs(tap.left - before.x) < 2 && Math.abs(tap.top - before.y) < 2, '짧게 눌렀을 때는 자리가 안 움직인다');
 
+  /* 🔴 2026-09-06 개발자 지시 — "그냥 손가락으로 바로바로 이동시킬 수 있었으면 해."
+     기다리는 시간 없이(hold: 0) 끄는 그 순간부터 따라와야 한다. 이 항목이 초록불이면서
+     `hold` 를 늘려야만 옮겨지면 지시가 되돌아간 것이다. */
   await page.evaluate(() => chatClose());
   await page.waitForTimeout(350);
-  const drag = await press({ hold: 500, dx: -260, dy: -220 });   // 꾹 누른 뒤 왼쪽 위로 끌기
-  ok(!drag.sheetOpen, '꾹 눌러 옮긴 뒤에는 도우미가 열리지 않는다(옮기려던 것이지 열려던 게 아니다)');
-  ok(Math.abs(drag.top - before.y) > 40, '꾹 누르면 마스코트가 실제로 옮겨진다', { 전: before.y, 후: drag.top });
-  ok(drag.left < before.x - 40, '떼면 가까운 쪽 가장자리에 붙는다', { 전: before.x, 후: drag.left });
+  const quick = await press({ hold: 0, dx: -260, dy: -220 });     // 누르자마자 왼쪽 위로 끌기
+  ok(!quick.sheetOpen, '끌어서 옮긴 뒤에는 도우미가 열리지 않는다(옮기려던 것이지 열려던 게 아니다)');
+  ok(Math.abs(quick.top - before.y) > 40, '꾹 누르지 않아도 끄는 즉시 옮겨진다', { 전: before.y, 후: quick.top });
+  ok(quick.left < before.x - 40, '떼면 가까운 쪽 가장자리에 붙는다', { 전: before.x, 후: quick.left });
+
+  /* ⚠️ 그렇다고 손 떨림이 끌기가 되면 안 된다 — 그러면 버튼이 안 눌리는 것처럼 느껴진다 */
+  const placedAfterQuick = await page.locator('#btn-chat-fab').boundingBox();
+  const wobble = await press({ hold: 90, dx: 4, dy: 3 });
+  ok(wobble.sheetOpen, '살짝 흔들려도(4px) 여전히 열린다');
+  ok(Math.abs(wobble.left - placedAfterQuick.x) < 2 && Math.abs(wobble.top - placedAfterQuick.y) < 2,
+    '살짝 흔들린 것으로는 자리가 안 움직인다', { 전: placedAfterQuick, 후: { left: wobble.left, top: wobble.top } });
+  await page.evaluate(() => chatClose());
+  await page.waitForTimeout(350);
+
+  /* 꾹 누른 뒤 끄는 것도 그대로 옮겨져야 한다 — 누르는 버릇이 남은 학생이 막히면 안 된다 */
+  const held = await press({ hold: 500, dx: 240, dy: 120 });
+  ok(!held.sheetOpen && held.left > placedAfterQuick.x + 40,
+    '꾹 눌렀다가 끄는 옛 손버릇도 그대로 옮겨진다', { 전: placedAfterQuick.x, 후: held.left });
+
+  /* 🔴 기다림을 없애면 '누르지 않은 움직임'까지 끌기가 될 수 있다 — 마우스로 그냥 지나가는 것.
+     누른 적이 없으면 아무리 멀리 움직여도 마스코트는 제자리에 있어야 한다. */
+  const heldBox = await page.locator('#btn-chat-fab').boundingBox();
+  const hover = await page.evaluate(async () => {
+    const fab = document.querySelector('#btn-chat-fab');
+    const r = fab.getBoundingClientRect();
+    for (let i = 1; i <= 6; i++) {
+      fab.dispatchEvent(new PointerEvent('pointermove', {
+        pointerId: 9, clientX: r.left - i * 40, clientY: r.top - i * 30, bubbles: true, cancelable: true,
+      }));
+      await new Promise((res) => setTimeout(res, 20));
+    }
+    await new Promise((res) => setTimeout(res, 200));
+    const after = fab.getBoundingClientRect();
+    return { left: after.left, top: after.top, lifted: fab.classList.contains('lifted') };
+  });
+  ok(!hover.lifted && Math.abs(hover.left - heldBox.x) < 2 && Math.abs(hover.top - heldBox.y) < 2,
+    '누르지 않고 지나가기만 하면 마스코트가 따라오지 않는다', { 전: heldBox, 후: hover });
 
   /* 하단 탭을 덮어 버리면 학생이 앱을 못 옮겨 다닌다 */
-  const low = await press({ hold: 500, dx: 0, dy: 900 });
+  const low = await press({ hold: 0, dx: 0, dy: 900 });
   const navBox2 = await page.locator('#bottom-nav').boundingBox();
   const fabBox2 = await page.locator('#btn-chat-fab').boundingBox();
   ok(fabBox2.y + fabBox2.height <= navBox2.y + 1, '아무리 아래로 끌어도 하단 탭을 덮지 않는다',
     { fab: fabBox2.y + fabBox2.height, nav: navBox2.y });
   ok(fabBox2.x >= 0 && fabBox2.x + fabBox2.width <= 390, '화면 밖으로 나가지 않는다', fabBox2);
 
-  /* 옮긴 자리가 기억되는가 — 앱을 다시 열어도 그대로여야 한다 */
+  /* 옮긴 자리가 기억되는가 — 앱을 다시 열어도 그대로여야 한다.
+     🔴 **다시 열기 전에 홈으로 옮겨 둔다** (2026-09-09). 이 검사는 앞에서 도우미의
+        '행동 버튼'을 눌러 MY 화면으로 갔고(202줄) 돌아온 적이 없다. 예전에는 앱이 다시 열 때
+        무조건 홈으로 가서 그게 가려져 있었는데, 이어보기가 생기면서 **하던 화면(MY)으로**
+        돌아온다 — 앱이 맞고 이 검사의 가정이 낡은 것이다. 어디에 있는지를 검사가 정한다. */
+  await page.click('.nav-item[data-nav="home"]');
+  await page.waitForSelector('#screen-home:not([hidden])');
   const placed = await page.locator('#btn-chat-fab').boundingBox();
   await page.reload({ waitUntil: 'domcontentloaded' });
   await page.waitForSelector('#screen-home:not([hidden])');

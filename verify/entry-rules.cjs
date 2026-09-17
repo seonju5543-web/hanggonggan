@@ -27,8 +27,13 @@ const REQUIRED = ['id', 'name', 'type', 'provider', 'amount', 'summary', 'eligib
    opts.formIds: data/forms.json에 있는 양식 id 집합 (없으면 formId 존재 검사 생략) */
 function checkEntry(it, opts = {}) {
   const out = [];
-  const err = (msg) => out.push({ level: 'error', msg });
-  const warn = (msg) => out.push({ level: 'warn', msg });
+  /* `fix` 는 **누가 고칠 수 있는가**를 기계가 읽을 수 있게 적어 둔 이름이다 (2026-09-13).
+     🔴 사람에게 시키는 말("…파일을 고쳐서 push 하세요")을 문구에 넣지 않는다 —
+     이 저장소의 개발자는 코드 지식이 없고, 그 문구를 읽어도 할 수 있는 일이 없다.
+     대신 화면이 이 이름을 보고 **그 자리에 버튼**을 띄운다(관리자 화면 '할 일').
+     값은 워크플로 파일 이름이다. 없으면 사람이 하나씩 봐야 하는 일이다. */
+  const err = (msg, fix) => out.push(fix ? { level: 'error', msg, fix } : { level: 'error', msg });
+  const warn = (msg, fix) => out.push(fix ? { level: 'warn', msg, fix } : { level: 'warn', msg });
   const name = it.name || '';
   const url = it.sourceUrl || '';
 
@@ -49,9 +54,10 @@ function checkEntry(it, opts = {}) {
        공고가 아니라 **학교 장학 공지 목록 전체**가 열린다(사용자가 목록에서 다시 찾아야 하고,
        글이 뒤로 밀리면 아예 못 찾는다). 표식은 '아직 원문 주소를 못 찾았다'는 임시 표시일 뿐이므로
        감사에 남긴다 — 복구 로봇(collector/resolve-detail-urls.mjs)이 원문 주소로 바꿔 준다. */
-    warn('sourceUrl이 게시판 목록 주소(#n- 표식) — 원문 공고로 바로 못 갑니다. 복구 로봇 실행: collector/run-resolve-urls.txt 수정 후 push');
+    warn('학생이 원문 보기를 눌러도 그 공고로 못 가고 게시판 목록이 열립니다 (원문 주소를 아직 못 찾았습니다)',
+      'resolve-detail-urls.yml');
   } else if (RULES.BOARD_LIST.test(url)) {
-    warn('sourceUrl이 게시판 목록 주소 — 개별 공고 주소가 필요합니다');
+    warn('sourceUrl이 게시판 목록 주소 — 개별 공고 주소가 필요합니다', 'resolve-detail-urls.yml');
   }
   // 장학금이 아닌 것
   if (RULES.FILENAME_TITLE.test(name)) err(`제목이 첨부 파일 이름입니다: '${name.slice(0, 36)}'`);
@@ -59,8 +65,19 @@ function checkEntry(it, opts = {}) {
     err(`학자금대출·융자는 장학금이 아니라 정식 등록 대상이 아닙니다: '${name.slice(0, 30)}'`);
   }
   if (RULES.GRAD_ONLY.test(name)) err(`대학원 전용 공고는 학부생 매칭 대상이 아닙니다: '${name.slice(0, 30)}'`);
+  /* 지원 자격을 아직 못 읽은 공고 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로 나간다
+     (2026-09-17 개발자 지시로 우리 사정을 말하던 옛 문구를 걷었다 — 그 뒤로도 이 경고 문구가
+      옛 학생 문장을 인용하고 있어 관리자 화면이 **없는 문장**을 두 군데서 다르게 말했다).
+     🔴 문구를 '잘못됐다'로 쓰지 않는다 — 갓 자동 등록된 공고는 발췌기가 **나중에** 채우므로
+        여기 걸린 것 대부분은 틀린 게 아니라 아직 안 읽은 것이다(확인 안 한 원인을 단정하지 않는다). */
+  if (!(it.eligibilityLines || []).length && !it.eligibilityVerified) {
+    warn('지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다',
+      'eligibility-fill.yml');
+  }
   // 양식 정보 (원칙 5 — 감사 통과 조건)
-  if (!it.formId && !it.noForm) warn('formId도 noForm도 없음 — 양식을 연결하거나 양식 없음 사유를 기재하세요');
+  if (!it.formId && !it.noForm) {
+    warn('formId도 noForm도 없음 — 양식을 연결하거나 양식 없음 사유를 기재하세요', 'deep-fetch.yml');
+  }
   if (it.formId && opts.formIds && !opts.formIds.has(it.formId)) err(`formId '${it.formId}'가 data/forms.json에 없음`);
 
   return out;
@@ -99,4 +116,30 @@ function isDuplicatePair(A, B) {
   return sim >= 0.8 && distinct >= 0.5;
 }
 
-module.exports = { checkEntry, isDuplicatePair, RULES };
+/* ── `fix` 로 부를 로봇을 **어떤 모양으로** 부르는가 (2026-09-14) ──────────────
+   🔴 **입력 없이 부르지 말 것.** `eligibility-fill.yml` 의 `mode` 기본값은 '전부' 라,
+      화면이 값을 안 보내면 버튼 한 번에 **전수(약 2,229원)** 가 돈다.
+      `deep-fetch.yml` 의 `form_targets` 기본값은 '조병두' 라, 값을 안 보내면 지금 보는
+      공고가 아니라 **엉뚱한 공고의 첨부**를 받아 온다(실측).
+   🔴 여기 적는 글자는 워크플로 yml 의 `options:`·기본값과 **한 글자도** 달라선 안 된다 —
+      다르면 GitHub 이 422 로 거부한다. 관문(test-collector)이 yml 과 대조한다.
+   🔴 `_admin/admin.js` 에만 두지 말 것 — 로봇 규칙과 갈라진다. 규칙과 같은 파일에 둔다.
+
+   칸 뜻
+     main   눈에 띄는 버튼(싼 쪽·안전한 쪽)   ·   all  흐린 버튼(비싼 쪽·되돌릴 수 없는 쪽)
+     inputs 워크플로에 그대로 보낼 값
+     argFrom  'names' 이면 화면이 **그 원인에 걸린 공고 제목들**을 `arg` 칸에 채운다
+     cost   돈이 나가는 로봇이면 사람이 읽을 금액. 있으면 확인 시트가 한 줄 더 묻는다 */
+const FIX_PLAN = {
+  'eligibility-fill.yml': {
+    main: { label: '시범 3건만 읽기', inputs: { mode: '시범 3건만' }, cost: '약 50원' },
+    all: { label: '전부 읽기', inputs: { mode: '전부' }, cost: '건당 약 13원 (2026-08-23 실측 2,229원/169건)', danger: true },
+    note: '원문이 저장된 공고만 읽습니다 — 원문이 없는 공고는 로봇이 조용히 건너뜁니다.',
+  },
+  'deep-fetch.yml': {
+    main: { label: '첨부 원본 받아 오기', argFrom: 'names', arg: 'form_targets' },
+    note: '공고 제목으로 찾아 첨부 원본을 받아 옵니다. 받아 온 뒤 양식으로 만드는 것은 다음 수집 때입니다.',
+  },
+};
+
+module.exports = { checkEntry, isDuplicatePair, RULES, FIX_PLAN };

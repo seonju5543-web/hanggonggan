@@ -7,10 +7,11 @@
    4) 컨펌용 리포트 이슈 생성 (양식 스키마화·정식 등록은 개발자 컨펌 후)
    ============================================================ */
 import fs from 'node:fs';
+import { deadlineHintFrom } from './deadline-hint.mjs';
 import { FETCH_HEADERS } from './http-headers.mjs';
 import { urlKey, dedupeNotices, capNotices } from './url-key.mjs';
 import { loadCandidates, mergeCandidates, saveCandidates } from './candidates.mjs';
-import { publishBySchool } from './publish-notices.mjs';
+import { publishBySchool, dropUnserved } from './publish-notices.mjs';
 import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { cleanTitle, isMenuEntry } from './clean-title.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
@@ -30,7 +31,8 @@ const KEYWORDS = /장학|학자금|등록금 감면|학업장려|근로장학/;
 /* 메뉴/공고 판정은 clean-title.mjs의 isMenuEntry 한 곳에만 둔다 — 브라우저 수집기와 갈라지면
    같은 게시판을 두 로봇이 다르게 읽는다(2026-08-02 '…안내' 공고 대량 유실 사고) */
 const ATTACH_RE = /\.(hwp|hwpx|doc|docx|pdf|xls|xlsx)(\?|$)/i;
-const DEADLINE_RE = /(마감|까지|기한|접수기간|신청기간)[^\n<]{0,60}/;
+/* 접수 기간 한 줄을 뽑는 규칙은 collector/deadline-hint.mjs 한 곳 — 브라우저 수집기와 공용이다.
+   여기 정규식을 되살리지 말 것(두 벌이 갈라져 학생 화면에 게시판 껍데기가 떴다 · 2026-09-12). */
 
 const UA = FETCH_HEADERS;   // 규칙은 http-headers.mjs 한 곳 (2026-08-20)
 
@@ -73,10 +75,10 @@ async function fetchDetail(item) {
       if (attachments.length >= 8) break;
     }
     const text = html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
-    const dm = text.match(DEADLINE_RE);
+
     const uniq = new Map();
     attachments.forEach((a) => { if (!uniq.has(a.url)) uniq.set(a.url, a); });
-    return { attachments: [...uniq.values()], deadlineHint: dm ? dm[0].trim().slice(0, 80) : null };
+    return { attachments: [...uniq.values()], deadlineHint: deadlineHintFrom(text) };
   } catch {
     return { attachments: [], deadlineHint: null };
   }
@@ -312,11 +314,34 @@ notices.items = dedupeNotices(notices.items);
    (2026-08-17 실측 747건 유실). 경위는 collector/candidates.mjs 첫머리. */
 saveCandidates(mergeCandidates(loadCandidates().items, freshAll));
 
+/* 🔴 서비스하지 않는 학교의 공고는 여기서 떨군다 (2026-09-05 개발자 지시).
+   수집 대상은 이미 경희대·한국외대 둘뿐인데 **예전에 담긴 다른 학교 공고가 그대로 남아**
+   (200건 중 173건) 로봇들이 그걸 붙들고 일하고 있었다. ⚠️ '상한을 차지해 새 공고를
+   밀어낸다'는 설명은 **틀렸다** — 재 보니 한 건도 안 잘리고 있었다(2026-09-05 리뷰).
+   이유·되돌리는 법은 publish-notices.mjs 의 dropUnserved 첫머리. */
+{
+  const before = notices.items.length;
+  notices.items = dropUnserved(notices.items);
+  if (notices.items.length !== before) {
+    console.log(`서비스하지 않는 학교의 공고 ${before - notices.items.length}건을 피드에서 뺐습니다 (남은 ${notices.items.length}건)`);
+  }
+}
+
 const beforeCap = notices.items;
 /* 학교별 파일도 함께 발행한다 (2026-08-17) — 앱은 이쪽을 읽는다.
    위 capNotices는 **폰이 통째로 받는 옛 파일**을 작게 유지하려는 것이고, 학교별 파일에는
    그 상한이 필요 없다(학생은 자기 학교 것만 받는다). 그래서 자르기 **전** 목록으로 발행한다 —
-   순서가 바뀌면 학교별 파일도 16건으로 잘려 나눈 뜻이 사라진다. 경위는 collector/publish-notices.mjs */
+   순서가 바뀌면 학교별 파일도 16건으로 잘려 나눈 뜻이 사라진다. 경위는 collector/publish-notices.mjs
+
+   🔴 넘기는 것은 **전체 목록이어야 한다** — `freshAll`(이번에 새로 주운 것)로 바꾸지 말 것 (2026-09-06).
+      링크 사냥꾼(매일 06:37)과 원문 링크 복구(월 05:13)는 data/notices.json 의 **주소만 고치고**
+      학교별 파일은 만들지 않는다(publishBySchool 호출 0회, 워크플로 git add 목록에도 없다).
+      그 수리를 학생 화면으로 옮기는 것이 **여기 한 곳뿐**이다 — 07:41 수집이 전체를 다시 발행하면서
+      어젯밤 고쳐 둔 주소도 함께 실린다(실측: 두 파일의 주소 508건 전부 일치).
+      새로 주운 것만 넘기면 그 수리가 영영 앱에 안 닿는데, **오류는 하나도 안 난다** —
+      사냥꾼도 성공, 수집도 성공, 감사도 통과, 학생만 옛 주소를 누른다.
+      2026-08-17 '학교별 파일이 19일 동안 저장되지 않았다' 사고와 같은 모양이다.
+      관문: verify/test-collector.mjs '학교별 파일은 전체 목록으로 발행한다'. */
 publishBySchool(beforeCap);
 
 notices.items = capNotices(notices.items);
@@ -332,7 +357,13 @@ const lines = [
   '',
   `새로 발견한 공고: **${newCount}건** — 앱의 '실시간 공고'에는 즉시 표시되며(링크 연결만), 맞춤 매칭·양식 작성 지원 등록은 아래에서 컨펌해 주세요.`,
   '',
-  '> 컨펌 방법: 채팅에 "이슈 #N에서 ○○ 정식 등록해줘"라고 말씀해 주시면 자격요건·금액·마감일·첨부 양식을 스키마로 정리해 등록합니다.',
+  /* 🔴 등록은 이제 화면에서 된다 — 채팅은 '화면이 못 하는 것'만 맡는다 (2026-09-13).
+     주소는 마크다운 링크로 쓰지 않는다: 이 리포트는 GitHub 이슈와 관리자 화면 두 곳에 나가는데
+     화면 쪽은 글자 그대로 그려서(esc) `[이름](주소)` 라고 쓰면 대괄호가 그대로 보인다.
+     맨 주소로 두면 GitHub 이 알아서 링크로 만들고 화면에서도 읽힌다. */
+  '> 등록하는 곳 — 관리자 화면 → 컨펌 작업대: https://hanggonggan-admin.pages.dev/#review',
+  '> 「수집됐지만 아직 등록 안 한 공고」에서 원문 ↗ 으로 확인한 뒤 **등록하기**를 누르면 그 자리에서 등록됩니다(제목·구분·마감일·금액·주관·요약). 대출·대학원 전용처럼 규칙에 걸리는 것은 눌러도 막히니 안심하고 눌러도 됩니다.',
+  '> 다만 **첨부된 신청서 양식**과 **자격 요건 줄들**은 원문과 같은 구조로 옮겨야 해서 화면에서 못 합니다 — 그것까지 필요하면 채팅에 "이슈 #N 의 ○○ 양식·자격까지 등록해줘"라고 말씀해 주세요.',
   '',
 ];
 for (const r of results) {

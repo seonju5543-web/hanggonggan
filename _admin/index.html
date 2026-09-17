@@ -10,10 +10,22 @@
        바깥으로 나가는 통신은 GitHub 두 곳으로만 제한한다. -->
   <!-- frame-ancestors(다른 사이트가 이 화면을 액자처럼 품는 것 막기)는 메타 태그로는 무시된다.
        그건 _headers 파일로 Cloudflare가 진짜 응답 헤더에 실어 보낸다. -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://handaejang-push.seonju5543.workers.dev; object-src 'none'; base-uri 'self'; form-action 'none'" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://cdn.jsdelivr.net; img-src 'self' data: https://raw.githubusercontent.com; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://handaejang-push.seonju5543.workers.dev; object-src 'none'; base-uri 'self'; form-action 'none'" />
   <meta name="referrer" content="no-referrer" />
   <meta name="robots" content="noindex, nofollow" />
-  <meta name="theme-color" content="#141a2b" />
+  <meta name="theme-color" content="#fefdfc" />
+  <!-- 서체 — **앱1 과 같은 한 벌**이다 (2026-09-14 개발자 지시 *"서체만 앱1에 맞추고"*).
+       🔴 이 줄이 없으면 `admin.css` 의 `--font-text: 'Pretendard Variable', …` 은 **이름만**
+          이고 브라우저는 그 다음 대체 글꼴(system-ui · Apple SD Gothic Neo · 맑은 고딕)로
+          그린다. 토큰 값이 같아도 **글자 모양이 다르다** — 관리자 화면을 앱1 옆에 놓고
+          보면 그것 하나가 남아 있었다.
+       🔴 CSP 도 같이 열어야 한다(`style-src`·`font-src` 에 cdn.jsdelivr.net) — 둘 중
+          하나만 하면 **조용히 막힌다**(CSP 는 화면에 오류를 안 띄운다).
+       🔴 주소는 앱1 `index.html` 과 **글자까지 같아야 한다** — 다르면 두 화면이 다른 판의
+          같은 글꼴을 쓰게 된다. 관문 `verify/ui-tone.mjs` 이 두 파일을 대조한다.
+       ⚠️ `script-src` 는 건드리지 않았다 — 이 화면의 열쇠가 있는 곳이라 실행 코드는
+          여전히 'self' 뿐이다. -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
   <link rel="stylesheet" href="admin.css" />
 </head>
 <body>
@@ -29,6 +41,12 @@
     <label class="gate-label" for="gate-key">GitHub 개인 열쇠 (fine-grained token)</label>
     <input id="gate-key" type="password" autocomplete="off" spellcheck="false"
            placeholder="github_pat_..." />
+
+    <!-- 열쇠 만료일 (2026-09-16 · 백로그 F-4) — GitHub 은 브라우저에 만료일을 안 알려 준다
+         (Access-Control-Expose-Headers 에 없음 · 실측). 그래서 사람이 만들 때 정한 날을 여기 적어 두고
+         「할 일」이 남은 날을 센다. 비워 두면 화면은 '모른다'고 말한다(원칙 8-1). -->
+    <label class="gate-label" for="gate-expires">열쇠 만료일 <em>(선택 — GitHub 에서 만들 때 정한 날)</em></label>
+    <input id="gate-expires" type="date" />
 
     <label class="gate-check">
       <input id="gate-remember" type="checkbox" />
@@ -71,20 +89,25 @@
       <div class="topbar-actions">
         <span id="deploy-state" class="deploy-state" title="앱1(학생 앱) 반영 상태"></span>
         <button id="btn-density" class="btn btn-ghost btn-sm" title="목록 밀도" aria-label="목록 밀도 전환">≡</button>
-        <button id="btn-theme" class="btn btn-ghost btn-sm" title="밝게/어둡게" aria-label="화면 밝기 전환">◐</button>
         <button id="btn-reload" class="btn btn-ghost btn-sm">새로고침</button>
         <button id="btn-logout" class="btn btn-ghost btn-sm danger">열쇠 지우기</button>
       </div>
     </div>
     <nav class="tabs" id="tabs" role="tablist" aria-label="화면 전환">
-      <button class="tab active" data-tab="todo" role="tab" aria-selected="true" aria-controls="screen-todo">오늘 할 일 <span class="tab-n" id="n-todo"></span></button>
-      <button class="tab" data-tab="list" role="tab" aria-selected="false" aria-controls="screen-list">공고 전체 <span class="tab-n" id="n-list"></span></button>
-      <button class="tab" data-tab="review" role="tab" aria-selected="false" aria-controls="screen-review">컨펌 작업대 <span class="tab-n" id="n-review"></span></button>
-      <button class="tab" data-tab="forms" role="tab" aria-selected="false" aria-controls="screen-forms">양식 <span class="tab-n" id="n-forms"></span></button>
-      <button class="tab" data-tab="network" role="tab" aria-selected="false" aria-controls="screen-network">수집망 <span class="tab-n" id="n-network"></span></button>
+      <button class="tab active" data-tab="todo" role="tab" aria-selected="true" aria-controls="screen-todo">할 일 <span class="tab-n" id="n-todo"></span></button>
+      <button class="tab" data-tab="list" role="tab" aria-selected="false" aria-controls="screen-list">목록 <span class="tab-n" id="n-list"></span></button>
+      <button class="tab" data-tab="review" role="tab" aria-selected="false" aria-controls="screen-review">작업대 <span class="tab-n" id="n-review"></span></button>
       <button class="tab" data-tab="robots" role="tab" aria-selected="false" aria-controls="screen-robots">로봇 <span class="tab-n" id="n-robots"></span></button>
-      <button class="tab" data-tab="quality" role="tab" aria-selected="false" aria-controls="screen-quality">데이터 품질 <span class="tab-n" id="n-quality"></span></button>
+      <button class="tab" data-tab="insta" role="tab" aria-selected="false" aria-controls="screen-insta">인스타 <span class="tab-n" id="n-insta"></span></button>
     </nav>
+
+    <!-- 모아 둔 수정 (2026-09-13) — 저장은 GitHub 작업 한 번이고 그동안 화면이 잠기므로,
+         여러 건을 모았다가 한 번에 보낸다. 헤더 안에 두는 이유는 아래 #job 과 같다. -->
+    <div id="pending-bar" class="pending-bar" role="status" aria-live="polite" hidden>
+      <span id="pending-text"></span>
+      <button class="btn btn-sm btn-primary" data-act="flush">한꺼번에 반영</button>
+      <button class="btn btn-sm" data-act="flush-drop">버리기</button>
+    </div>
 
     <!-- 작업 진행 표시 (변경 요청 → 검사 → 반영).
          **헤더 안에 둔다** — 밖에 두고 각자 sticky를 걸면 스크롤할 때 이 띠가 탭 줄을 덮는다. -->
@@ -103,10 +126,8 @@
     <section id="screen-todo" role="tabpanel" tabindex="-1"    class="screen"></section>
     <section id="screen-list" role="tabpanel" tabindex="-1"    class="screen" hidden></section>
     <section id="screen-review" role="tabpanel" tabindex="-1"  class="screen" hidden></section>
-    <section id="screen-forms" role="tabpanel" tabindex="-1"   class="screen" hidden></section>
-    <section id="screen-network" role="tabpanel" tabindex="-1" class="screen" hidden></section>
     <section id="screen-robots" role="tabpanel" tabindex="-1"  class="screen" hidden></section>
-    <section id="screen-quality" role="tabpanel" tabindex="-1" class="screen" hidden></section>
+    <section id="screen-insta" role="tabpanel" tabindex="-1"   class="screen" hidden></section>
   </main>
 
   <footer class="foot">

@@ -14,6 +14,7 @@
    참고: auto-register.mjs에도 canonUrl이 따로 있다. 그쪽은 '아는 식별자만 남기는' 방식이라
    정식 등록 중복 판정처럼 더 세게 뭉쳐야 하는 곳에 쓰고, 여기 urlKey는 '군더더기만 떼는'
    방식이라 수집 단계에서 서로 다른 글이 잘못 합쳐지지 않아야 하는 곳에 쓴다. 역할이 달라 둘 다 둔다. */
+import { looksLikeHint } from './deadline-hint.mjs';
 
 // 글을 가리키지 않는(휘발성) 값들 — 정렬·페이지·검색어·권한·표시 개수 등
 const VOLATILE = new Set([
@@ -85,7 +86,10 @@ export function clickRowKey(listUrl, title) {
 export function preferNotice(a, b) {
   const marker = (n) => (n.url || '').includes('#n-');
   if (marker(a) !== marker(b)) return marker(a) ? b : a;
-  const score = (n) => (n.deadlineHint ? 1 : 0) + ((n.attachments || []).length ? 1 : 0);
+  /* 🔴 힌트는 **있기만 하면** 점수를 주고 있었다 (2026-09-12 코드 리뷰). 그래서 청소한 판과
+     옛 판이 합쳐지면 **버린 쓰레기 힌트가 이긴다** — 병합기가 `까지 나 . 선발 : 10 월…` 을
+     되살리는 것을 실측으로 확인했다. 지금은 **읽을 수 있는 힌트**에만 점수를 준다. */
+  const score = (n) => (looksLikeHint(n.deadlineHint) ? 1 : 0) + ((n.attachments || []).length ? 1 : 0);
   return score(b) > score(a) ? b : a;
 }
 

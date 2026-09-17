@@ -39,7 +39,7 @@ const TODAY = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
    같은 함수를 써야 '이미 등록된 공고를 로봇이 다시 등록하는' 일이 안 생긴다.
    이 파일은 불러오는 즉시 실행되므로 남이 여기서 가져갈 수 없어 따로 뺐다. */
 export { canonUrl } from './canon-url.mjs';
-import { canonUrl } from './canon-url.mjs';
+import { canonUrl, idFromUrl } from './canon-url.mjs';
 
 /* 제목 유사도 — 4글자 조각(4-gram) 겹침 비율. 재게시·접수분 중복 감지용 */
 function titleSim(a, b) {
@@ -177,8 +177,16 @@ if (!cfg.enabled) {
     && (blockedIds.has(i.id) || blockedUrls.has(canonUrl(i.sourceUrl || '')))));
   const removed = before - registered.items.length;
 
+  /* 등록 대상 학교 좁히기 (2026-08-30 개발자 지시 — 설정의 `schools`).
+     🔴 **수집은 그대로 두고 등록만 좁힌다.** 수집 비용은 사실상 0이고(Actions 월 700/2,000분),
+     실시간 공고 피드는 계속 나가야 다른 학교 학생이 빈 화면을 보지 않는다.
+     막히는 것은 '정식 등록'뿐이다 — 자격 진단·양식 작성을 붙이는, 사람 손이 드는 그 층.
+     빈 배열이면 제한 없음(예전 동작). */
+  const onlySchools = new Set(cfg.schools || []);
+  let outOfScope = 0;
   for (const n of notices.items || []) {
     if (added.length >= (cfg.maxPerRun || 8)) break;
+    if (onlySchools.size && n.school && !onlySchools.has(n.school)) { outOfScope += 1; continue; }
     const r = classify(n, regUrlSet, regEntries, batchSeen);
     if (r.verdict === 'hold') { held.push({ n, why: r.why }); continue; }
     if (r.verdict !== 'register') continue;
@@ -191,7 +199,8 @@ if (!cfg.enabled) {
     const atts = (n.attachments || [])
       .filter((a) => /신청서|지원서|신청양식|원서|서식|양식|동의서|서약서|추천서|공고/.test(a.name) && /\.(hwp|hwpx|doc|docx|pdf|zip|xlsx?)(\?|$)?/i.test(a.name + a.url))
       .slice(0, 6);
-    const id = 'auto-' + cu.replace(/[^a-z0-9]/gi, '').slice(-24).toLowerCase();
+    // 🔴 공식은 canon-url.mjs 하나 — 베끼면 관리자 화면의 register 와 갈라진다(2026-08-14 부경대 유형)
+    const id = idFromUrl('auto-', n.url);
     if (registered.items.some((i) => i.id === id)) continue;
     /* 사람이 한 번 '이건 아니다'라고 뺀 공고는 다시 등록하지 않는다.
        위 되돌리기와 같은 이유로 주소도 함께 본다 — 지우기만 하면 다음 실행에 또 들어온다. */
@@ -200,6 +209,17 @@ if (!cfg.enabled) {
     const entry = {
       id,
       name: title,
+      /* 🔴 **게시판에 뜨는 제목 그대로** 남긴다 (2026-08-29 신설).
+         `name` 은 청소하고 70자로 자른 값이라 게시판 행과 글자가 다르다. 링크 사냥꾼이
+         나중에 원문 주소를 찾을 때 대조하는 것은 게시판 행이므로, 그 원본이 없으면
+         표식(#n-) 주소 조각에 기대게 된다 — 그 조각은 주소 길이 때문에 잘려 있다.
+         중앙대 11건이 3주 동안 '사라진 공고'로 오해받은 원인이 바로 이 값의 부재였다
+         (CLAUDE.md '링크 사냥꾼이 못 찾는 진짜 이유'). 여기서 `n.title` 이 그 원본이다.
+         🔴 **담을 때 청소해서 담는다** — 사냥꾼도 `boardTitle = cleanTitle(mate.title)`
+         로 담고, test-collector 가 '저장된 boardTitle 에 부스러기가 없다'를 지킨다.
+         날것으로 담으면 앞머리 `공지 공지`·꼬리 `2026.08.25. 조회 287` 이 남아 대조가
+         앞 24자에서 통째로 빗나간다. (실제로 이 값을 날것으로 담았다가 그 검사에 걸렸다) */
+      boardTitle: cleanTitle(n.title),
       type: /교외|재단|장학회|재청|시민|청암|문화재단/.test(title) ? '교외' : '교내',
       provider: `${n.school}${n.campus ? ' ' + n.campus : ''} 게시 공고`,
       amount: '금액 원문 확인',
@@ -270,6 +290,12 @@ if (!cfg.enabled) {
   if (waiting) report.push('', `**⏳ 스키마화 대기 중 ${waiting}건** (원본 확보됨 — collector/pending-forms.json)`);
 
   report.push('', `### 🤖 자동 등록 (선조치후보고) — ${added.length}건 등록${removed ? ` · ${removed}건 제거(blockIds)` : ''}`);
+  /* 🔴 좁힌 것을 **말없이** 하지 않는다 — 리포트에 안 적으면 다음 세션이
+     "로봇이 갑자기 아무것도 안 등록한다"고 없는 버그를 쫓는다. */
+  if (onlySchools.size) {
+    report.push('', `등록 대상 학교: ${[...onlySchools].join(' · ')} (설정 \`schools\`)`
+      + `${outOfScope ? ` — 다른 학교 공고 ${outOfScope}건은 등록하지 않고 실시간 피드로만 나갔어요.` : ''}`);
+  }
   if (added.length) {
     report.push('', '자동 등록분은 앱에 **자동 등록 · 검수 전** 배지로 표시돼요. 잘못 등록된 건이 있으면 채팅으로 알려주시거나 `collector/auto-register-config.json`의 `blockIds`에 id를 넣어주세요.', '');
     for (const e of added) report.push(`- \`${e.id}\` [${e.name}](${e.sourceUrl})${e.deadline ? ` · 마감 ${e.deadline}` : ''} · ${(e.eligibility.schoolOnly || '')}`);

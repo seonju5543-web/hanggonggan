@@ -61,4 +61,16 @@ export function canonUrl(raw) {
   } catch { return (raw || '').split('#')[0]; }
 }
 
+/* 🔴 **주소에서 공고 id 를 만드는 공식 — 여기 하나** (2026-09-14 분리).
+   원래 이 식은 `auto-register.mjs` 안에만 있었다. 그런데 관리자 화면의 쓰기 경로
+   (`tools/admin-apply.mjs` 의 register·unblock)도 **같은 id** 를 만들어야 한다 —
+   다르면 사람이 막아 둔 공고를 로봇이 다른 id 로 다시 담는다.
+   🔴 **베끼지 말 것.** 2026-08-14 에 주소 정규화 규칙이 바뀌자 막아 둔 23건의 id 가
+   전부 어긋나 부경대 옛 공고가 새 id 를 달고 학생 앱에 되살아났다. 두 벌이면 또 갈라진다.
+   ⚠️ 이 식을 고치면 **이미 저장된 id 가 전부 무효가 된다**(설정의 blockIds 포함).
+   고쳐야 한다면 blockUrls 처럼 주소로 막는 쪽을 먼저 세우고 옮길 것. */
+export function idFromUrl(prefix, raw) {
+  return prefix + canonUrl(raw).replace(/[^a-z0-9]/gi, '').slice(-24).toLowerCase();
+}
+
 export default canonUrl;

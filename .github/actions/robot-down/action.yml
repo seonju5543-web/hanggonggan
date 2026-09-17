@@ -1,0 +1,58 @@
+# ============================================================
+#  로봇이 넘어졌다 — 공용 알림 (2026-09-06 신설)
+# ------------------------------------------------------------
+#  왜 만들었나
+#    예약(cron)으로 도는 로봇 7대에 **실행 알림이 없었다.** 결과 알림
+#    ("보러 갔더니 상태가 이상하더라")은 있는데, 실행 알림("보러 가다가
+#    내가 넘어졌다")이 없었다. 그래서 감시 로봇이 죽으면 그 로봇이 지키던
+#    것까지 통째로 무음이 됐다 — 경보기 전원이 나갔는데 그걸 알려 주는 게
+#    그 경보기 자신인 구조.
+#
+#  🔴 왜 7벌 베끼지 않고 한 벌로 두나
+#    이 저장소가 여러 번 데인 자리다("베끼면 갈라진다" — canon-url·section-head).
+#    알림 문구·중복 방지 규칙이 7벌로 흩어지면 한 곳만 고쳐진다.
+#
+#  🔴 라벨로 중복을 막는다 (제목 검색은 이모지·한글에서 놓친다 — 2026-07-31)
+#    같은 로봇의 열린 이슈가 있으면 코멘트만 단다. 매일 도는 로봇이 매일
+#    새 이슈를 만들면 일주일이면 알림을 무시하게 된다.
+# ============================================================
+name: 로봇 넘어짐 알림
+description: 예약 로봇이 실패·시간초과로 끝났을 때 이슈 하나에 모아 알린다
+inputs:
+  robot:
+    description: 로봇 이름 (이슈 제목에 쓴다)
+    required: true
+  token:
+    description: GITHUB_TOKEN
+    required: true
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+        ROBOT: ${{ inputs.robot }}
+        REPO: ${{ github.repository }}
+        RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      run: |
+        set -u
+        title="🚨 로봇이 넘어졌어요 — ${ROBOT}"
+        body="**${ROBOT}** 이 끝까지 못 갔어요 (실패 또는 시간 초과로 취소).
+
+        · 시각: $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST
+        · 실행 로그: ${RUN_URL}
+
+        시간 초과는 '실패'가 아니라 '취소'로 끝나기 때문에, 예전에는 이 알림 자체가
+        건너뛰어졌습니다(2026-08-04 수집 로봇 사고). 지금은 둘 다 잡습니다.
+
+        반복되면 Claude 세션에 \"${ROBOT} 실패 확인해줘\"라고 지시하세요."
+        # 라벨이 없으면 만든다 (없는 라벨로 검색하면 gh 가 오류를 낸다)
+        gh label create robot-down --repo "$REPO" --color B60205 \
+          --description "예약 로봇이 실패·시간초과로 끝남" 2>/dev/null || true
+        n=$(gh issue list --repo "$REPO" --label robot-down --state open \
+              --search "$ROBOT in:title" --limit 1 --json number --jq '.[0].number' 2>/dev/null || true)
+        if [ -n "$n" ] && [ "$n" != "null" ]; then
+          gh issue comment "$n" --repo "$REPO" --body "$body"
+        else
+          gh issue create --repo "$REPO" --label robot-down --title "$title" --body "$body"
+        fi

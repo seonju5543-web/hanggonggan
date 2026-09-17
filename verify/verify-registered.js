@@ -1,4 +1,6 @@
 const { chromium } = require('playwright-core');
+const { assertOwnServer } = require('./onboard-helper.js');
+const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
 const SHOT = (n) => `${__dirname}/shot-${n}.png`;
 
 /* 앱에서 '아직 마감되지 않은 + 양식이 연결된' 공고를 스스로 찾아 질문 → 문서 생성까지 구동한다.
@@ -18,21 +20,47 @@ async function dismissNotify(page) {
 }
 
 async function driveAnyLiveForm(page) {
-  const id = await page.evaluate(() => {
-    const today = new Date().toISOString().slice(0, 10);
-    const live = (typeof registeredList !== 'undefined' ? registeredList : [])
-      .filter((s) => s.formId && FORM_TEMPLATES[s.formId] && (!s.deadline || s.deadline >= today));
-    return live.length ? live[0].id : null;
-  });
-  if (!id) return { id: null, ok: false };
   await page.click('.nav-item[data-nav="explore"]');
   await page.waitForTimeout(500);
+  /* 🔴 **후보를 하나만 보고 포기하지 말 것** (2026-09-15 수리).
+     예전엔 `formId + 마감 전` 으로 거른 첫 항목(`live[0]`) 하나만 집었다. 그런데 그 조건은
+     **학생 화면에 그 카드가 실제로 뜨는가**를 안 본다 — 마감일이 없는 공고는 60일 규칙
+     (`notStale`)으로 탐색 목록에서 내려가므로, 목록에 없는 공고를 집어 들고 `!card` 로
+     즉시 실패했다. 2026-09-15에 실제로 그렇게 깨졌다: `reg-hi-jeju`(목록에 없음)를 집고
+     포기했는데, 같은 조건을 만족하면서 **목록에 있는 `reg-dongsan`** 은 시도도 안 했다.
+     지금은 **화면에 실제로 그려진 카드**에서 고르고(그게 앱의 진짜 판정이다),
+     하나가 안 되면 다음 후보로 넘어간다. 데이터가 바뀌어도 안 깨진다.
+     CLAUDE.md: 드라이버는 앱의 evaluate·dday 를 그대로 쓰고, 검증 대상을 박아 두지 않는다. */
+  const ids = await page.evaluate(() => [...document.querySelectorAll('#explore-list [data-detail]')]
+    .map((el) => el.dataset.detail)
+    .filter((id) => {
+      const s = (typeof registeredList !== 'undefined' ? registeredList : []).find((x) => x.id === id);
+      return s && s.formId && FORM_TEMPLATES[s.formId];
+    }));
+  if (!ids.length) return { id: null, ok: false };
+  const tried = [];
+  for (const id of ids) {
+    /* 🔴 **예외도 '다음 후보'다** (2026-09-15 코드 리뷰). `return` 으로 넘어가는 길은
+       셋뿐이고(카드 없음·버튼 잠김·문서 비었다) 나머지 세 자리는 waitForSelector 의
+       throw 다. 감싸지 않으면 첫 후보가 **느리게** 실패하는 순간 뒤 후보는 시도조차
+       못 한다 — 이번에 고치려던 증상이 모양만 바꿔 남는다. */
+    const r = await driveOneForm(page, id).catch((e) => ({ id, ok: false, why: String(e.message || e).split('\n')[0].slice(0, 80) }));
+    if (r.ok) return r;
+    tried.push(`${id}(${r.why})`);
+    await page.keyboard.press('Escape').catch(() => {});
+    await page.waitForTimeout(400);   /* 시트 퇴장 0.22s — 같은 파일의 다른 자리와 맞춘다 */
+  }
+  return { id: tried.join(', '), ok: false };
+}
+
+/* 후보 하나를 실제로 끝까지 몰아 본다 — 왜 실패했는지까지 돌려준다(조용한 실패 금지) */
+async function driveOneForm(page, id) {
   const card = await page.$(`#explore-list [data-detail="${id}"]`);
-  if (!card) return { id, ok: false };
+  if (!card) return { id, ok: false, why: '카드 없음' };
   await card.click();
-  await page.waitForSelector('#detail-sheet.show');
+  await page.waitForSelector('#detail-sheet.show', { timeout: 8000 });   /* 기본 30초는 순회를 통째로 잡아먹는다 */
   await page.waitForTimeout(300);
-  if (await page.$eval('#btn-apply-one', (el) => el.disabled)) return { id, ok: false };
+  if (await page.$eval('#btn-apply-one', (el) => el.disabled)) return { id, ok: false, why: '신청 버튼 잠김' };
   await page.click('#btn-apply-one');
   await page.waitForSelector('#btn-ff-generate', { timeout: 8000 });
   /* 빈 칸 채우기 — 자동 채움된 칸은 건드리지 않는다 */
@@ -46,10 +74,15 @@ async function driveAnyLiveForm(page) {
   await page.click('#btn-ff-generate');
   await page.waitForSelector('.form-doc', { timeout: 8000 });
   const doc = await page.$eval('.form-doc', (el) => el.textContent);
-  return { id, ok: doc.includes('검증 입력') || doc.length > 200 };
+  const ok = doc.includes('검증 입력') || doc.length > 200;
+  return { id, ok, why: ok ? '' : '문서가 비었다' };
 }
 
 (async () => {
+  /* 🔴 재기 전에 **이 서버가 내 앱인지** 확인한다 — 아니면 여기서 멈춘다.
+     이 저장소는 작업 폴더를 여러 개 두고 쓰는데, 8123 에 다른 폴더의 서버가 떠 있으면
+     그 옛 앱을 재고도 아무도 모른다(빨간불이든 **가짜 초록불이든**). 규칙은 onboard-helper 한 곳. */
+  await assertOwnServer(PORT);
   const browser = await chromium.launch({ executablePath: (process.env.CHROME_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome') });
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   const errors = [];
@@ -57,7 +90,7 @@ async function driveAnyLiveForm(page) {
   page.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push('CONSOLE: ' + m.text()); });
   page.on('dialog', async (d) => { await d.accept(); });
 
-  await page.goto('http://localhost:8123/', { waitUntil: 'domcontentloaded' });
+  await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
   await page.click('.onboard-step[data-step="0"] [data-next]');
 
   // 성균관대 프로필 (3학년 — 조병두 자격)
@@ -75,7 +108,15 @@ async function driveAnyLiveForm(page) {
   await page.selectOption('#in-bracket', '4');
   await page.selectOption('#in-region', '서울');
   await page.click('.onboard-step[data-step="2"] [data-next]');
-  await page.click('.onboard-step[data-step="3"] [data-next]');
+  /* 🔴 단계 번호를 박지 말 것 (2026-08-29 — 실제로 이것 때문에 이 검사가 죽어 있었다).
+     공동개발자가 4단계(지금 받고 있는 장학금)를 끼우자 서류 칸이 뒤로 밀렸고,
+     `data-step="3"` 만 누르던 이 드라이버는 `#in-sid` 를 못 찾아 30초 만에 시간초과로
+     통째로 실패했다. verify-essay-ui.js 가 2026-08-24에 똑같이 죽었고 그때 쓴 처방이
+     이것이다 — **서류 칸이 보일 때까지 '다음'을 누른다.** 단계가 더 늘어도 안 깨진다. */
+  for (let i = 0; i < 5 && !(await page.isVisible('#in-sid')); i++) {
+    await page.click('.onboard-step:not([hidden]) [data-next]');
+    await page.waitForTimeout(150);
+  }
   await page.fill('#in-sid', '2023310123');
   await page.fill('#in-phone', '010-1234-5678');
   await page.fill('#in-email', 'test@skku.edu');

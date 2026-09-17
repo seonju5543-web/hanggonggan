@@ -32,7 +32,12 @@ function chatSafe(fn, fallback) {
 
 function chatMatches() {
   /* 내 프로필로 판정된 전체 공고 — 화면(탐색 탭)이 쓰는 것과 같은 함수 */
-  return chatSafe(() => getMatches(), []);
+  /* 🔴 한국장학재단 등록분은 도우미가 다루지 않는다 (2026-08-30).
+     이 파일의 전제는 **우리가 읽은 공고 원문을 그대로 인용한다**는 것인데, KOSAF 는
+     재단이 적어 둔 칸이지 원문이 아니라 인용할 문장이 없다. 그대로 넣었더니
+     인용 없이 "등록 공고 4건을 찾았어요"라고 답해 버렸다(verify-chat 이 잡았다).
+     못 찾으면 지어내지 않고 '못 찾았다'고 말하는 것이 이 파일의 존재 이유다. */
+  return chatSafe(() => getMatches().filter((m) => m.sch.sourceKind !== 'kosaf'), []);
 }
 
 /* '지금 지원할 수 있는 것' — 홈 히어로와 **같은 기준**을 쓴다.
@@ -63,6 +68,12 @@ const CHAT_STOP = new Set([
   '장학금', '장학', '공고', '신청', '알려줘', '알려', '있어', '있나', '있나요', '뭐가', '뭐',
   '어떤', '어떻게', '언제', '얼마', '해줘', '주세요', '싶어', '하고', '그리고', '지금', '내가',
   '나는', '저는', '제가', '우리', '학교', '것', '거', '좀', '요', '까지', '부터', '관련', '대해',
+  /* 🔴 **거의 모든 공고에 들어 있는 낱말**은 찾은 것이 아니다 (2026-08-30).
+     `쿼카 사육 지원금 있어?` 에 `지원금` 하나로 3건이 걸려 도우미가
+     "등록 공고 3건을 찾았어요"라고 답했다 — 모르면서 아는 척한 것이다(이 파일의 존재 이유가
+     정확히 그 반대다). `장학금`·`장학`이 이미 빠져 있었는데 같은 갈래를 빠뜨렸다.
+     ⚠️ 넣어도 진짜 검색은 안 죽는다 — `기숙사비 지원금` 은 `기숙사비` 로 찾는다. */
+  '지원금', '지원', '장학생', '모집', '선발', '대상', '안내', '혜택', '사업', '제도', '정보',
 ]);
 const CHAT_TAIL = /(으로|에서|에게|에는|이나|이란|라는|보다|처럼|까지|부터|한테|들이|들을|들은|은|는|이|가|을|를|의|에|도|만|와|과|랑|로|나)$/;
 
@@ -151,7 +162,9 @@ function chatSearch(q, limit = 4) {
     const s = m.sch;
     const name = String(s.name || '').toLowerCase();
     const provider = String(s.provider || '').toLowerCase();
-    const body = [s.summary, s.amount, s.note, ...(s.excerpts || []), ...(s.eligibilityLines || [])]
+    /* `amountNote` — 금액을 숫자로 못 읽은 층2 공고에서 재단이 적어 둔 원문(app.js).
+       카드에는 안 뜨지만 상세에는 뜨므로, 도우미도 같은 재료를 봐야 화면과 말이 갈라지지 않는다. */
+    const body = [s.summary, s.amount, s.amountNote, s.note, ...(s.excerpts || []), ...(s.eligibilityLines || [])]
       .join(' ').toLowerCase();
     /* 원문 전문은 앱이 통째로 갖고 있기엔 너무 크다 — 로봇이 만들어 둔 검색용 요약만 본다 */
     const deep = chatDeepText(s.id);
@@ -531,6 +544,7 @@ function chatAiCandidates(q) {
       .map((t) => String(t).trim()).filter((t) => t.length >= 6).slice(0, 6);
     return { m, payload: {
       id: s.id, name: s.name, provider: s.provider, amount: s.amount,
+      ...(s.amountNote ? { amountNote: s.amountNote } : {}),
       period: s.period, summary: s.summary, deadline: s.deadline || null,
       sourceUrl: s.sourceUrl || null, quotes,
     } };
@@ -578,7 +592,7 @@ function chatVerifyAI(data, cand) {
   let lead = typeof data.lead === 'string' ? data.lead.trim().slice(0, 200) : '';
   if (lead) {
     const known = picks.map(({ m }) => [
-      m.sch.name, m.sch.provider, m.sch.amount, m.sch.period, m.sch.summary,
+      m.sch.name, m.sch.provider, m.sch.amount, m.sch.amountNote, m.sch.period, m.sch.summary,
       m.sch.deadline, m.sch.amountValue, ...(m.sch.excerpts || []), ...(m.sch.eligibilityLines || []),
     ].join(' ')).join(' ').replace(/[,\s]/g, '');
     const nums = lead.replace(/[,\s]/g, '').match(/\d+/g) || [];
@@ -717,7 +731,12 @@ function chatPushBot(a) {
 /* ⑥ 답에서 바로 다음 행동 — 도우미를 닫고 그 화면으로 보낸다 */
 function chatDoAction(act) {
   const go = (screen) => { chatClose(); setTimeout(() => chatSafe(() => showScreen(screen)), 180); };
-  if (act === 'explore') return go('explore');
+  /* 🔴 '전체 보기'라고 적어 놓고 '우리 학교' 칸을 띄우지 않는다 — app.js 가 칸을 되돌린다 */
+  if (act === 'explore') {
+    chatClose();
+    setTimeout(() => chatSafe(() => (typeof exploreShowAll === 'function' ? exploreShowAll() : showScreen('explore'))), 180);
+    return;
+  }
   if (act === 'applications') return go('applications');
   if (act === 'wallet') return go('my');
   if (act === 'notify') {
@@ -814,18 +833,22 @@ function chatClose() {
 }
 
 /* ============================================================
-   마스코트 버튼 — 눌러서 열고, **꾹 눌러서 옮긴다**
+   마스코트 버튼 — 눌러서 열고, **손가락으로 바로 끌어서 옮긴다**
    ------------------------------------------------------------
    🔴 '누르기'와 '옮기기'를 반드시 갈라야 한다. 13차 세션의 학교 검색 사고가 이 구분을
    빠뜨려서 났다(손가락이 닿는 순간 선택돼 목록을 못 내렸다). 여기서는 반대 방향의 같은 실수가
    가능하다 — 손이 조금 흔들렸다고 열리지 않으면 버튼이 안 눌리는 것처럼 느껴진다.
    그래서 규칙을 둘로 못 박는다:
-     · 짧게 누르고 뗀다(움직임 8px 미만)      → **연다**
-     · 꾹 누른다(360ms) → 그때부터 손가락을 따라온다 → 떼면 가까운 쪽 가장자리에 붙는다
+     · 짧게 누르고 뗀다(움직임 8px 미만)  → **연다**
+     · 8px 넘게 끈다 → **그 순간부터** 손가락을 따라온다 → 떼면 가까운 쪽 가장자리에 붙는다
+   🔴 기다리는 시간(옛 `CHAT_HOLD_MS` 360ms)은 2026-09-06 개발자 지시로 없앴다 —
+      *"그냥 손가락으로 바로바로 이동시킬 수 있었으면 해."* 기다림이 있으면 끌기 시작이
+      늘 한 박자 늦고, 그 사이 움직인 손가락은 '옮기려는 게 아니다'로 버려져 안 따라왔다.
+      가르는 것은 이제 **시간이 아니라 거리(CHAT_MOVE_TOL)** 하나뿐이다.
+      ⚠️ 이 거리를 0 으로 만들지 말 것 — 손 떨림이 곧 끌기가 되어 버튼이 안 눌린다.
    옮긴 자리는 기기에 기억되고, 화면을 돌리거나 창 크기가 바뀌면 다시 화면 안으로 넣는다.
    ============================================================ */
 const CHAT_FAB_KEY = 'handaejang.chatFab';   // { side:'left'|'right', ratio: 0~1 }
-const CHAT_HOLD_MS = 360;
 const CHAT_MOVE_TOL = 8;                     // 이만큼 움직이기 전까지는 '누른 것'으로 본다
 const CHAT_EDGE = 14;
 
@@ -855,6 +878,7 @@ function chatFabPlace(pos) {
   fab.style.top = top + 'px';
   fab.style.right = 'auto';
   fab.style.bottom = 'auto';
+  return { left, top };   /* 놓을 때 FLIP 으로 미끄러뜨리려면 '최종 자리'의 숫자가 필요하다 */
 }
 
 function chatBindFab() {
@@ -868,15 +892,32 @@ function chatBindFab() {
     if (s) chatFabPlace(s);          // 화면을 돌려도 마스코트가 화면 밖으로 나가지 않게
   });
 
-  let holdTimer = null, lifted = false, moved = false;
+  let lifted = false, moved = false;
+  /* 🔴 '지금 누르고 있는가'를 반드시 따로 들고 있어야 한다 (2026-09-06) — 옛 코드에서는
+     기다림(360ms 타이머)이 그 구실을 겸했다. 기다림을 없애면서 이걸 안 두면, 마우스로
+     그냥 지나가기만 해도(누르지 않은 pointermove) 8px 을 넘겨 마스코트가 커서를 따라온다. */
+  let pressId = null;
   let startX = 0, startY = 0, offX = 0, offY = 0;
-
-  const cancelHold = () => { clearTimeout(holdTimer); holdTimer = null; };
+  /* 🔴 옮기는 동안 `left`/`top` 을 쓰지 않는다 (2026-09-06) — 그것은 배치 속성이라
+     손가락이 움직일 때마다 브라우저가 화면을 다시 재고 다시 그린다. 지금은 **놓인 자리는
+     그대로 두고 `transform` 으로만** 끌고, 놓을 때 최종 자리로 옮긴 뒤 그 차이만큼
+     되돌려 놓고 0 으로 전환한다(FLIP). 눈에 보이는 미끄러짐은 같고, 배치 계산은 0이다. */
+  let baseX = 0, baseY = 0;      // 들어올린 순간의 '놓인 자리'
+  let lastX = 0, lastY = 0;      // 마지막으로 손가락이 가리킨 자리
+  const LIFT_SCALE = 1.14;       // .chat-fab.lifted 의 확대율 — CSS 대신 여기서 준다
+  const drag = (x, y, scaled) => {
+    fab.style.transform = `translate3d(${Math.round(x - baseX)}px, ${Math.round(y - baseY)}px, 0)`
+      + (scaled ? ` scale(${LIFT_SCALE})` : '');
+  };
 
   const lift = () => {
     lifted = true;
+    const r = fab.getBoundingClientRect();
+    baseX = r.left; baseY = r.top;
+    lastX = r.left; lastY = r.top;
     fab.classList.add('lifted');
     fab.classList.remove('dropping');
+    drag(baseX, baseY, true);
     chatHintHide();
     if (navigator.vibrate) { try { navigator.vibrate(12); } catch (e) { /* 진동은 있으면 좋은 것 */ } }
   };
@@ -885,46 +926,57 @@ function chatBindFab() {
     if (e.button != null && e.button !== 0) return;
     moved = false;
     lifted = false;
+    pressId = e.pointerId;
     startX = e.clientX; startY = e.clientY;
     const r = fab.getBoundingClientRect();
     offX = e.clientX - r.left;
     offY = e.clientY - r.top;
     fab.setPointerCapture(e.pointerId);
-    holdTimer = setTimeout(lift, CHAT_HOLD_MS);
   });
 
   fab.addEventListener('pointermove', (e) => {
+    if (pressId === null || e.pointerId !== pressId) return;   // 누르지 않고 지나가는 것은 끌기가 아니다
     const dx = e.clientX - startX, dy = e.clientY - startY;
     if (!lifted) {
-      /* 아직 안 들었는데 많이 움직였다 = 옮기려는 것도, 누르려는 것도 아니다(스크롤 등) */
-      if (Math.hypot(dx, dy) > CHAT_MOVE_TOL) { moved = true; cancelHold(); }
-      return;
+      /* 손 떨림만큼은 아직 '누른 것'이다 — 그 선을 넘는 순간 바로 들어올린다(기다리지 않는다).
+         🔴 여기서 `return` 하고 다음 이벤트를 기다리면 안 된다 — 끌기가 한 번 늦게 시작돼
+            손가락과 마스코트가 벌어진 채로 따라온다. 들어올린 뒤 **같은 이벤트에서** 옮긴다. */
+      if (Math.hypot(dx, dy) <= CHAT_MOVE_TOL) return;
+      lift();
     }
     moved = true;
     const size = fab.offsetWidth || 56;
     const band = chatFabBand(size);
     const x = Math.min(window.innerWidth - size - CHAT_EDGE, Math.max(CHAT_EDGE, e.clientX - offX));
     const y = Math.min(band.max, Math.max(band.min, e.clientY - offY));
-    fab.style.left = x + 'px';
-    fab.style.top = y + 'px';
-    fab.style.right = 'auto';
-    fab.style.bottom = 'auto';
+    lastX = x; lastY = y;
+    drag(x, y, true);
   });
 
   const finish = (e) => {
-    cancelHold();
+    /* 내가 받던 그 손가락이 떨어진 것만 본다 — 누른 적 없는 떼기(오른쪽 버튼 등)로 열리면 안 된다 */
+    if (pressId === null || (e && e.pointerId !== pressId)) return;
+    pressId = null;
     if (lifted) {
       lifted = false;
       fab.classList.remove('lifted');
       fab.classList.add('dropping');
-      /* 가까운 쪽 가장자리에 붙인다 — 가운데 떠 있으면 공고 카드를 가린다 */
+      /* 가까운 쪽 가장자리에 붙인다 — 가운데 떠 있으면 공고 카드를 가린다.
+         ⚠️ 자리는 `getBoundingClientRect` 가 아니라 **손가락이 마지막으로 가리킨 값**으로 잰다 —
+            들어올린 동안에는 1.14배로 커져 있어서 그 상자의 모서리는 실제 자리보다 밖에 있다. */
       const size = fab.offsetWidth || 56;
-      const r = fab.getBoundingClientRect();
       const band = chatFabBand(size);
-      const side = (r.left + size / 2) < window.innerWidth / 2 ? 'left' : 'right';
-      const ratio = band.max > band.min ? (r.top - band.min) / (band.max - band.min) : 0;
+      const side = (lastX + size / 2) < window.innerWidth / 2 ? 'left' : 'right';
+      const ratio = band.max > band.min ? (lastY - band.min) / (band.max - band.min) : 0;
       const pos = { side, ratio: Math.min(1, Math.max(0, ratio)) };
-      chatFabPlace(pos);
+      const home = chatFabPlace(pos) || { left: lastX, top: lastY };
+      /* FLIP — 최종 자리로 옮겨 놓고, 눈에는 아직 손끝에 있는 것처럼 되돌린 뒤 0 으로 민다 */
+      fab.style.transition = 'none';
+      drag(lastX + (baseX - home.left), lastY + (baseY - home.top), false);
+      void fab.offsetHeight;
+      fab.style.transition = '';
+      fab.classList.add('dropping');
+      fab.style.transform = '';
       try { localStorage.setItem(CHAT_FAB_KEY, JSON.stringify(pos)); } catch (err) { /* 저장 실패해도 이번 자리는 유지 */ }
       setTimeout(() => fab.classList.remove('dropping'), 260);
       return;
@@ -933,7 +985,12 @@ function chatBindFab() {
   };
 
   fab.addEventListener('pointerup', finish);
-  fab.addEventListener('pointercancel', () => { cancelHold(); lifted = false; fab.classList.remove('lifted'); });
+  fab.addEventListener('pointercancel', () => {
+    pressId = null;
+    lifted = false;
+    fab.classList.remove('lifted');
+    fab.style.transform = '';   /* 끌던 것을 지우지 않으면 마스코트가 옮겨진 채로 굳는다 */
+  });
 
   /* 키보드로도 열 수 있어야 한다 — pointer 경로로만 열면 버튼이 아닌 것이 된다.
      (옮기기는 키보드로 못 하지만, 자리는 편의 기능이라 못 해도 쓸 수 있다) */
@@ -944,7 +1001,7 @@ function chatBindFab() {
   });
 }
 
-/* 꾹 눌러 옮길 수 있다는 것을 처음 한 번만 알려 준다 — 숨은 동작은 알려 주지 않으면 없는 것과 같다 */
+/* 끌어서 옮길 수 있다는 것을 처음 한 번만 알려 준다 — 숨은 동작은 알려 주지 않으면 없는 것과 같다 */
 const CHAT_HINT_KEY = 'handaejang.chatHint';
 function chatHintHide() {
   const hint = document.querySelector('#chat-hint');

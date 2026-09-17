@@ -21,6 +21,8 @@ import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { scanOutgoing, checkDraft, mayDraft, materialText, qualityCheck, rulesFor } from '../server/essay/draft-guard.mjs';
 import PLAYBOOK from '../data/essay-playbook.json' with { type: 'json' };
+import { VOCAB, matchRule, decodeEntities, linkCandidates, NOT_SOURCE } from '../collector/essay-rule-line.mjs';
+import ASK from '../essay-ask.js';
 import worker from '../server/essay/worker.js';
 
 let pass = 0, fail = 0;
@@ -428,6 +430,78 @@ globalThis.fetch = realFetch;
   const w = fs.readFileSync(new URL('../server/essay/worker.js', import.meta.url), 'utf8');
   ok(/scrubSchool\(text, payload\.profile\.school/.test(w), '서버가 받은 초안에 실제로 이 검사를 건다');
   ok(/s\.blind[\s\S]{0,200}payload\.profile\.major/.test(w), '블라인드 공고에는 프롬프트에서도 학교를 빼고 보낸다');
+}
+
+/* ============================================================
+   학습 로봇이 '못 배우는 종류'를 만들지 않는가 (2026-09-05 신설)
+
+   실제로 만들어진 뒤 줄곧 그랬다(2026-08-23~09-05, 실행 7회): 리포트는 매번 "intro·value·effect·idea 는 전용 규칙이
+   없습니다. 그 종류 글 주소를 seeds 에 넣어 주세요"라고 안내했는데, **주소를 넣어도
+   생기지 않았다.** 붙일 규칙 어휘(VOCAB)가 아예 없어서 그 종류 문장은 전부
+   '컨펌 대기'로만 쌓였기 때문이다. 안내가 사실이 아니었던 것 — 관문이 없으니 아무도 몰랐다.
+   ============================================================ */
+head('20) 종류마다 배울 길이 열려 있는가');
+{
+  const kinds = ASK.ESSAY_KINDS.map(([k]) => k);
+  const withRules = new Set(PLAYBOOK.rules.filter((r) => r.kind !== '*').map((r) => r.kind));
+  const missing = kinds.filter((k) => !withRules.has(k));
+  ok(missing.length === 0,
+    '🔴 화면이 가르는 종류마다 전용 규칙이 있다 — 없으면 그 칸은 공통 규칙만 받는다',
+    missing.length ? `규칙 없는 종류: ${missing.join(', ')}` : '');
+
+  const codes = new Set(Object.keys(VOCAB));
+  const orphan = PLAYBOOK.rules.map((r) => r.code).filter((c) => !codes.has(c));
+  ok(orphan.length === 0,
+    '🔴 규칙마다 어휘가 있다 — 어휘가 없으면 그 규칙은 출처를 영영 못 받는다',
+    orphan.length ? `어휘 없는 규칙: ${orphan.join(', ')}` : '');
+
+  /* 어휘가 진짜 붙는지 — 실제로 컨펌 대기에 쌓여 있던 문장들로 재 본다 */
+  ok(matchRule('특히 장학금이 필요한 이유는 다른 장학금이 아닌 이 장학금이 필요한 이유를 녹여주면 좋습니다.').includes('effect-why-this'),
+    "'다른 장학금이 아닌 이 장학금' 문장이 effect 규칙에 붙는다");
+  ok(matchRule('여러 번 퇴고를 거쳐 맞춤법과 띄어쓰기를 점검해 주세요.').includes('proofread'),
+    '맞춤법·퇴고 문장이 규칙에 붙는다');
+  ok(matchRule('실패한 경험을 언급하는 것도 좋습니다.').includes('failure-lesson'),
+    '실패 경험 문장이 규칙에 붙는다');
+  ok(matchRule('가치관을 형성한 계기를 구체적으로 적어야 합니다.').includes('value-evidence'),
+    '가치관 문장이 value 규칙에 붙는다');
+  ok(matchRule('문제 정의를 먼저 하고 기대 효과를 적으세요.').includes('idea-problem-first'),
+    '아이디어 문장이 idea 규칙에 붙는다');
+}
+
+/* ============================================================
+   로봇이 주운 주소가 성한가 (2026-09-05 신설)
+   실제 사고: `?idx=17893&amp;code=1219` 가 그대로 seeds 에 올라가 매주 헛걸음했다.
+   저쪽 서버는 `amp;code` 라는 없는 칸을 받는다.
+   ============================================================ */
+head('21) 주운 주소·광고 거르기');
+{
+  ok(decodeEntities('a&amp;b') === 'a&b', 'HTML 실체참조를 되돌린다');
+  const html = '<a href="https://ex.com/view.php?idx=1&amp;code=2">장학금 자기소개서 작성법</a>';
+  const got = linkCandidates(html, 'https://ex.com/');
+  ok(got.length === 1 && got[0].url === 'https://ex.com/view.php?idx=1&code=2',
+    "🔴 주운 주소에 &amp; 가 남지 않는다", got.map((g) => g.url).join(' '));
+
+  ok(NOT_SOURCE.test('https://www.skillagit.com/product/view.php?idx=3862'),
+    '첨삭 상품 판매 페이지는 출처가 아니다');
+  ok(NOT_SOURCE.test('Ai로 만든 자소서, 깔끔하게 수정해드립니다.'),
+    '파는 문구가 제목이면 줍지 않는다');
+  ok(!NOT_SOURCE.test('https://community.linkareer.com/employment_data/3576403'),
+    '멀쩡한 팁 글은 막지 않는다');
+
+  const urls = JSON.parse(fs.readFileSync(new URL('../collector/essay-sources.json', import.meta.url), 'utf8'))
+    .seeds.map((x) => x.url);
+  ok(!urls.some((u) => u.includes('&amp;')), '지금 seeds 에 깨진 주소가 없다');
+  ok(!urls.some((u) => NOT_SOURCE.test(u)), '지금 seeds 에 광고·예시문 DB 가 없다');
+
+  /* 출처 번호가 겹치면 규칙이 엉뚱한 글을 근거로 달게 된다 (2026-09-05 코드리뷰에서 발견) */
+  const ids = PLAYBOOK.sources.map((x) => x.id);
+  ok(new Set(ids).size === ids.length, '🔴 출처 번호가 겹치지 않는다',
+    ids.filter((v, i) => ids.indexOf(v) !== i).join(' '));
+  const learn = fs.readFileSync(new URL('../collector/essay-playbook-learn.mjs', import.meta.url), 'utf8');
+  ok(/nextId\s*=\s*Math\.max/.test(learn) && !/nextId\s*=\s*\(PLAYBOOK\.sources[^)]*\)\s*\.length/.test(learn),
+    '🔴 출처 번호를 개수가 아니라 가장 큰 번호 다음으로 매긴다 — 하나라도 빼면 개수는 겹친다');
+  ok(/decodeEntities\(body\)/.test(fs.readFileSync(new URL('../collector/essay-rule-line.mjs', import.meta.url), 'utf8')),
+    '실체참조를 되돌리는 곳이 한 군데다 (toLines 도 같은 함수를 쓴다)');
 }
 
 console.log(`\n${fail ? '✗' : '✓'} AI 초안 안전장치 — 통과 ${pass} · 실패 ${fail}`);

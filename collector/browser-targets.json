@@ -2,6 +2,23 @@
  "_comment": "브라우저형 수집기 대상 — 일반 로봇이 차단되거나(403/404) 화면을 나중에 그리는(동적) 학교. 후보를 순서대로 시도해 첫 성공 주소에서 수집한다.",
  "targets": [
   {
+   "school": "한국외국어대학교",
+   "campus": "",
+   "candidates": [
+    "https://dep.hufs.ac.kr/student/12767/subview.do"
+   ]
+  },
+  {
+   "school": "경희대학교",
+   "campus": "공통",
+   "candidates": [
+    "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318"
+   ]
+  }
+ ],
+ "_parked": "2026-08-30 개발자 지시로 경희대·한국외대만 남기고 뺐다(docs/designs/kosaf-and-narrowing.md ③). 🔴 지우지 말고 여기 둔다 — 이 boardUrl 들은 알아내는 데 실행이 여러 번 걸렸다(경희대만 8회). 되돌리려면 이 배열의 항목을 위 목록으로 옮기면 된다. ⚠️ 뺀 학교의 실시간 공고는 60일에 걸쳐 서서히 사라진다(collect.mjs 의 cutoff) — 즉시 비지 않는다.",
+ "parked": [
+  {
    "school": "서울대학교",
    "campus": "",
    "candidates": [
@@ -66,20 +83,6 @@
    "campus": "",
    "candidates": [
     "https://www.dongguk.edu/article/JANGHAKNOTICE/list"
-   ]
-  },
-  {
-   "school": "한국외국어대학교",
-   "campus": "",
-   "candidates": [
-    "https://dep.hufs.ac.kr/student/12767/subview.do"
-   ]
-  },
-  {
-   "school": "경희대학교",
-   "campus": "공통",
-   "candidates": [
-    "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318"
    ]
   },
   {

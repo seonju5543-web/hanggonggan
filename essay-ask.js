@@ -215,8 +215,10 @@ const TRACK_PREP = {
    4학년에게 '앞으로의 다짐'만 물으면 그동안 해 온 것이 통째로 빠진다. */
 function essayStage(p) {
   if (!p) return 'mid';
-  if (p.status === 'freshman' || Number(p.year) <= 1) return 'new';
-  if (p.status === 'returning') return 'back';
+  /* ⚠️ 저장되는 값은 한글이다(`신입학`·`복학예정`). 옛 값(freshman·returning)을 보고 있어
+     이 갈래가 한 번도 안 잡혔다 — 2026-09-09 에 match-engine 과 함께 고쳤다. */
+  if (p.status === '신입학' || Number(p.year) <= 1) return 'new';
+  if (p.status === '복학예정') return 'back';
   return Number(p.year) >= 4 ? 'late' : 'mid';
 }
 const STAGE_NOW = {
@@ -396,7 +398,7 @@ function tailorAsks(asks, ctx) {
   const extra = [];
   if (p.cert) extra.push(SIGNAL_CHIPS.cert);
   if (p.exchange) extra.push(SIGNAL_CHIPS.exchange);
-  if (p.region && p.region !== 'seoul' && p.region !== 'gyeonggi') extra.push(SIGNAL_CHIPS.region_etc);
+  if (p.region && p.region !== '서울' && p.region !== '경기') extra.push(SIGNAL_CHIPS.region_etc);
   if (flags.includes('multiChild')) extra.push(SIGNAL_CHIPS.multiChild);
 
   const out = asks.map((a) => {

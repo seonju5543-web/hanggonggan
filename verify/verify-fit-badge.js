@@ -3,8 +3,17 @@
    '지원 자격 미달' 배지가 **통째로 사라진 적이 있다**. 배지 로직은 app.js에 있어
    test-collector(순수 모듈 검사)가 닿지 못하므로 진짜 앱을 띄워서 본다.
    개발자 지시(2026-08-24): "숫자는 0을 안 띄우되 지원 자격 미달 배지는 넣어야 돼."
-   실행: node verify/verify-fit-badge.js   (CHROME_PATH + localhost:8123 필요) */
+   실행: 이 워크트리에서 `python3 -m http.server <포트>` 를 띄운 뒤
+         CHROME_PATH=... PORT=<포트> node verify/verify-fit-badge.js
+   🔴 **PORT= 를 반드시 준다** — 8123 에는 다른 워크트리 서버가 떠 있을 수 있다. */
+/* 🔴 2026-09-10 페이스리프트: 카드의 적합도는 **알약이 아니라 글자**(.sch-fit)다.
+   목록에서 이 값이 대부분 33~50% 에 몰려 있어 카드마다 같은 색 덩어리가 반복되면서
+   눈이 제목보다 그것을 먼저 봤다. 숫자는 그대로 보인다(2026-08-31 개발자 지시 유지) —
+   바뀐 것은 무게뿐이라, 이 검사도 **선택자만** 옮기고 재는 뜻은 그대로 둔다.
+   알약은 학생이 멈춰 서야 하는 셋(미달·미확인·신청 완료)에만 남았다. */
 const { chromium } = require('playwright-core');
+const { assertOwnServer } = require('./onboard-helper.js');
+const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
 
 let fail = 0;
 const eq = (label, got, want) => {
@@ -20,6 +29,10 @@ const PROFILE = (over) => ({
 });
 
 (async () => {
+  /* 🔴 재기 전에 **이 서버가 내 앱인지** 확인한다 — 아니면 여기서 멈춘다.
+     이 저장소는 작업 폴더를 여러 개 두고 쓰는데, 8123 에 다른 폴더의 서버가 떠 있으면
+     그 옛 앱을 재고도 아무도 모른다(빨간불이든 **가짜 초록불이든**). 규칙은 onboard-helper 한 곳. */
+  await assertOwnServer(PORT);
   const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH });
   const errors = [];
 
@@ -27,9 +40,12 @@ const PROFILE = (over) => ({
     const ctx = await browser.newContext({ viewport: { width: 390, height: 900 }, hasTouch: true });
     const page = await ctx.newPage();
     page.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
-    await page.addInitScript((p) => localStorage.setItem('handaejang.v1',
-      JSON.stringify({ profile: p, applications: [] })), PROFILE(profileOver));
-    await page.goto('http://localhost:8123/', { waitUntil: 'domcontentloaded' });
+    await page.addInitScript((p) => {
+      localStorage.setItem('handaejang.v1', JSON.stringify({ profile: p, applications: [] }));
+      /* 이어보기 장부도 지운다 — 남겨 두면 앱이 앞 검사에서 보던 화면으로 돌아간다 (2026-09-09) */
+      localStorage.removeItem('handaejang.resume');
+    }, PROFILE(profileOver));
+    await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('#screen-home:not([hidden])', { timeout: 8000 });
     await page.waitForSelector('#notify-sheet:not([hidden])', { timeout: 6000 }).catch(() => {});
     const later = await page.$('#btn-nf-later');
@@ -41,7 +57,7 @@ const PROFILE = (over) => ({
   }
 
   const badges = (page) => page.$$eval('#explore-list .sch-card', (els) => els.map((e) => {
-    const b = e.querySelector('.badge-fit, .badge-fit-unknown, .badge-fit-no');
+    const b = e.querySelector('.sch-fit, .badge-fit, .badge-fit-unknown, .badge-fit-no');
     return { cls: b ? b.className : '', text: b ? b.innerText.replace(/\s+/g, ' ') : '' };
   }));
 
@@ -75,9 +91,16 @@ const PROFILE = (over) => ({
   await page.context().close();
   page = await open({});
   bs = await badges(page);
-  const okBadges = bs.filter((b) => b.cls.includes('badge-fit') && !b.cls.includes('unknown') && !b.cls.includes('-no'));
-  eq('적합도 배지에 근거가 함께 붙는다', okBadges.every((b) => /요건 \d+개 중 \d+개 충족/.test(b.text)), true);
-  eq('여기서도 100%는 안 뜬다', bs.some((b) => /적합도 100%/.test(b.text)), false);
+  const okBadges = bs.filter((b) => (b.cls.includes('sch-fit') || b.cls.includes('badge-fit')) && !b.cls.includes('unknown') && !b.cls.includes('-no'));
+  /* 🔴 카드 배지는 `적합도 50%` **퍼센트뿐**이다 (2026-08-31 개발자 지시).
+     요건 개수는 상세로 내려갔다 — 아래 '상세 시트' 절이 거기 남아 있는지 본다.
+     ⚠️ 이 두 검사를 짝으로 두는 것이 핵심이다. 카드만 검사하면 "카드는 퍼센트뿐"은 통과하고
+        "근거는 상세에 남겼다"는 아무도 안 봐서, 근거가 화면 어디에도 없는 상태가 지나간다.
+        2026-08-24 결정("숫자만 두지 않는다")을 카드에서 뒤집은 것이라 이 짝이 더 중요하다.
+     ⚠️ `.every()` 는 **빈 배열에서 true** 다 — 선택자가 어긋나도 통과하므로 개수부터 센다. */
+  eq('적합도 배지가 붙은 카드가 있다 (0이면 선택자가 어긋난 것)', okBadges.length > 0, true);
+  eq('카드 배지는 퍼센트뿐이다', okBadges.every((b) => /^적합도 \d+%$/.test(b.text)), true);
+  eq('카드에 요건 개수를 쓰지 않는다', okBadges.some((b) => /요건/.test(b.text)), false);
 
   /* 🔴 상세 시트는 자격 줄을 **하나도 빠뜨리지 않고** 보여야 한다 — 화면 5줄 상한이
      점수 분모까지 자르던 사고(2026-08-24)의 회귀다.
@@ -86,11 +109,10 @@ const PROFILE = (over) => ({
         내보내는 줄 수(`requirementLines(sch, null, {all:true})`)와 대조한다. */
   console.log('\n■ 상세 시트가 자격 줄을 빠뜨리지 않는다');
   const idx = await page.$$eval('#explore-list .sch-card',
-    (els) => els.findIndex((e) => /요건 \d+개/.test((e.querySelector('.badge-fit') || {}).innerText || '')));
+    (els) => els.findIndex((e) => /적합도 \d+%/.test((e.querySelector('.sch-fit, .badge-fit') || {}).innerText || '')));
   if (idx >= 0) {
     const cards = await page.$$('#explore-list .sch-card');
-    const txt = await cards[idx].$eval('.badge-fit', (e) => e.innerText.replace(/\s+/g, ' '));
-    const total = Number((txt.match(/요건 (\d+)개/) || [])[1]);
+    const txt = await cards[idx].$eval('.sch-fit, .badge-fit', (e) => e.innerText.replace(/\s+/g, ' '));
     const id = await cards[idx].evaluate((e) => e.dataset.detail);
     const expected = await page.evaluate((sid) => {
       const s = allScholarships().find((x) => x.id === sid);
@@ -100,8 +122,15 @@ const PROFILE = (over) => ({
     await page.waitForTimeout(700);
     const lines = await page.$$eval('#detail-sheet li.r-elig', (e) => e.length);
     eq(`'${txt}' — 자격 줄 ${expected}개가 모두 보인다`, lines, expected);
+    /* 🔴 카드에서 뺀 근거가 **상세에는 남아 있어야** 한다. 이 절이 없으면
+       '카드는 퍼센트뿐'만 검사되고 근거가 화면 어디에도 없는 상태가 통과한다. */
+    const detailTxt = await page.$eval('#detail-sheet .badge-fit', (e) => e.innerText.replace(/\s+/g, ' '))
+      .catch(() => '');
+    eq('상세 시트에는 퍼센트와 근거가 남아 있다', /적합도 \d+% .*요건 \d+개 중 \d+개 충족/.test(detailTxt), true);
+    /* 요건 수는 이제 **상세 배지에서만** 읽을 수 있다 — 카드에는 없다 */
+    const total = Number((detailTxt.match(/요건 (\d+)개 중/) || [])[1]);
     eq('배지의 요건 수가 줄 수를 넘지 않는다 (묶음은 1개로 센다)', total <= expected, true);
-  } else console.log('  (요건 개수를 띄운 카드가 없어 건너뜀)');
+  } else console.log('  🚨 요건 개수를 띄운 카드가 하나도 없다 — 배지 형식이 바뀌었는지 확인할 것');
 
   console.log('\nERRORS:', errors.length ? errors : 'none');
   if (errors.length) fail++;

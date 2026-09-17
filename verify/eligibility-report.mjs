@@ -158,6 +158,7 @@ if (BAD) for (const s of suspects) console.log(`   ✕ ${s.id} [${s.why}] ${s.li
    대신 **칸끼리 대조한다**: 세 칸에 같은 줄이 있나, 자격 칸의 줄이 못 받는 조건을
    말하나, 제외 칸의 줄이 받을 조건을 말하나. 필터가 어떻게 판정했든 결과만 본다. */
 const M = require("../match-engine.js");
+const { fitInconsistency } = require("./fit-consistency.cjs");
 const misplaced = [];
 {
   const EX_TAIL = /(지원|신청|참여|참가|지급|수혜)\s*불가\s*$|제외\s*$|제외됩니다\s*$/;
@@ -205,16 +206,13 @@ const inconsistent = [];
   for (const pp of profs) {
     const p = { ...base, ...pp };
     for (const it of reg.items) {
-      const fd = M.fitDetail(it, p);
-      if (fd.unread) continue;
-      const marks = (M.requirementLines(it, it.eligibilityLines) || [])
-        .map((l) => M.requirementMatch(l, p, it));
-      if (fd.pct === 100 && marks.some((v) => v !== 'ok'))
-        inconsistent.push({ id: it.id, why: '적합도 100%인데 ✓가 아닌 자격 줄이 있다', line: `${fd.met}/${fd.total}` });
-      else if (fd.pct > 0 && marks.some((v) => v === 'no'))
-        inconsistent.push({ id: it.id, why: `적합도 ${fd.pct}%인데 ✕인 줄이 있다`, line: `${fd.met}/${fd.total}` });
-      else if (fd.pct === 0 && !fd.fails.length)
-        inconsistent.push({ id: it.id, why: '0%인데 사유가 없다', line: '' });
+      /* 🔴 규칙은 **`verify/fit-consistency.cjs` 한 곳**에 있다 (2026-08-29).
+         예전엔 이 판정이 관문(test-collector)과 채점기(여기) 두 곳에 베껴져 있었고,
+         2026-08-26 상수 변경(미달 0 → FIT_MIN)을 관문만 따라가서 여기가 경고 227건을 냈다.
+         가지 셋 중 둘은 지우고 하나만 남겼다 — 나머지는 이 조건에 포함되거나
+         (met===total) 구조상 참이 될 수 없었다(fails 가 있으면 점수는 언제나 FIT_MIN). */
+      const bad = fitInconsistency(M, it, p);
+      if (bad) inconsistent.push({ id: it.id, ...bad });
     }
   }
 }

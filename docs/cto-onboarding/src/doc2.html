@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<title>한대장 — 코드·아키텍처 상세</title>
+<link rel="stylesheet" href="report.css">
+</head><body>
+
+<div class="cover">
+  <div class="kicker">CTO ONBOARDING · DOCUMENT 2 / 2</div>
+  <h1>한대장<br>코드 · 아키텍처 상세</h1>
+  <div class="sub">빌드 없는 정적 PWA + GitHub Actions 데이터 파이프라인 + 엣지 워커 2기</div>
+  <div class="meta">
+    <b>스택</b> Vanilla JS(모듈 번들러 없음) · GitHub Actions(Node 20, Playwright) · Cloudflare Workers/KV/Pages<br>
+    <b>코드</b> 약 26,000줄 (앱 7.5k · 수집기 6.7k · 검증 5.2k · 관리자·도구 3.8k · 워크플로 2.1k · 서버 0.7k) &nbsp;·&nbsp;
+    <b>기준</b> 2026-08-20 main HEAD · 커밋 646
+  </div>
+</div>
+
+<h2 class="sh"><span class="n">01</span>시스템 지형도</h2>
+<p class="lede">서버가 사실상 없다. 앱은 GitHub Pages에 올라간 <b>정적 파일</b>이고, 데이터를 만드는 일은 전부
+<b>GitHub Actions 위의 로봇</b>이 한다. 로봇의 산출물은 저장소의 JSON 파일이며, 앱은 그 JSON을 fetch할 뿐이다.
+"백엔드 = 저장소"라는 구조가 이 프로젝트의 모든 설계 결정을 지배한다.</p>
+
+<table class="tight">
+  <tr><th style="width:17%">계층</th><th style="width:24%">실행 위치</th><th>구성 요소와 역할</th></tr>
+  <tr><td><b>클라이언트</b></td><td>브라우저 (PWA · 설치형)</td>
+      <td><code>index.html/app.js/style.css</code> 화면 · <code>match-engine.js</code> 자격 판정 ·
+          <code>forms.js</code>+<code>form-plan.js</code> 신청서 · <code>notify.js</code>+<code>notify-rules.js</code> 알림 ·
+          <code>chat.js</code> 도우미 · <code>sw.js</code> 캐시·백그라운드</td></tr>
+  <tr><td><b>데이터</b></td><td>저장소의 정적 JSON (동일 오리진)</td>
+      <td><code>data/registered.json</code>(등록 188) · <code>notices.json</code>(피드 615) ·
+          <code>forms.json</code>(양식 48) · <code>majors.json</code>(학과 14,312) · <code>search-index.json</code>(159)</td></tr>
+  <tr><td><b>파이프라인</b></td><td>GitHub Actions (예약·push 트리거)</td>
+      <td>워크플로 19개 — 수집 2종 · 원문 심층수집 · 링크 사냥/복구/정찰 · 자동 등록 · 양식 스키마화 ·
+          누락 감사 · 배포 동기화 · 잠금 감시 · 진척도 갱신</td></tr>
+  <tr><td><b>엣지 서버</b></td><td>Cloudflare Workers (무료 등급)</td>
+      <td><code>server/push/</code> 푸시 발송(가동 중, KV) · <code>server/chat/</code> 도우미 AI 선택기(미배포) ·
+          <code>server/mail-worker.js</code> 접수 메일(키 대기)</td></tr>
+  <tr><td><b>운영 콘솔</b></td><td>Cloudflare Pages + Access</td>
+      <td><code>_admin/</code> 6개 화면 — 저장소를 직접 쓰지 않고 <code>admin-apply.yml</code>을 깨워 감사 통과 시에만 반영</td></tr>
+</table>
+
+<div class="callout">
+  <h4>이 코드베이스의 제1 설계 원칙 — "판정 규칙은 한 파일에만 둔다"</h4>
+  같은 판단을 두 곳에 적으면 <b>화면과 알림이 서로 다른 말을 한다</b>. 실제로 겪은 사고라서,
+  판정 로직은 브라우저·서비스워커·Node에서 <b>같은 파일</b>을 공유하도록 분리돼 있다.
+  <table class="tight" style="margin-top:5px">
+    <tr><th style="width:23%">공유 모듈</th><th style="width:38%">쓰는 곳</th><th>베끼면 생기는 일</th></tr>
+    <tr><td><code>match-engine.js</code></td><td>화면 · 서비스워커(백그라운드 알림) · 감사 스크립트</td><td>화면에서 숨긴 공고를 알림이 알린다</td></tr>
+    <tr><td><code>notify-rules.js</code></td><td>화면 알림 · 서비스워커 푸시 수신</td><td>같은 알림이 두 번 가거나 규칙이 갈라진다</td></tr>
+    <tr><td><code>form-plan.js</code></td><td>신청서 화면 · 감사 · 관리자 화면</td><td>"화면은 12문항인데 감사는 20문항"이 된다</td></tr>
+    <tr><td><code>collector/canon-url.mjs</code><br><code>url-key.mjs</code> · <code>clean-title.mjs</code></td><td>수집기 · 자동 등록 · 관리자 쓰기 · 협업 병합기</td><td>같은 공고가 두 번 등록된다(중복 판정이 어긋남)</td></tr>
+  </table>
+  브라우저 전역 스크립트와 Node <code>module.exports</code>를 겸용하는 형태로 작성돼 있다(번들러가 없으므로).
+</div>
+
+<h2 class="sh"><span class="n">02</span>저장소 지도와 코드 규모</h2>
+<figure class="avoid">
+  <div class="figtitle">영역별 코드 규모 (줄 수)</div>
+  <div class="bars">
+    <div class="bar"><div class="lb">앱 프론트엔드</div><div class="tr"><div class="fl" style="width:100%;background:var(--c1)"></div></div><div class="vl">7,503</div></div>
+    <div class="bar"><div class="lb">수집 로봇</div><div class="tr"><div class="fl" style="width:89%;background:var(--c2)"></div></div><div class="vl">6,676</div></div>
+    <div class="bar"><div class="lb">검증·QA</div><div class="tr"><div class="fl" style="width:69%;background:var(--c3)"></div></div><div class="vl">5,174</div></div>
+    <div class="bar"><div class="lb">문서(md)</div><div class="tr"><div class="fl" style="width:56%;background:var(--gray)"></div></div><div class="vl">4,236</div></div>
+    <div class="bar"><div class="lb">관리자·도구</div><div class="tr"><div class="fl" style="width:50%;background:var(--c4)"></div></div><div class="vl">3,776</div></div>
+    <div class="bar"><div class="lb">워크플로(yml)</div><div class="tr"><div class="fl" style="width:28%;background:var(--gray)"></div></div><div class="vl">2,123</div></div>
+    <div class="bar"><div class="lb">엣지 서버</div><div class="tr"><div class="fl" style="width:10%;background:var(--gray)"></div></div><div class="vl">741</div></div>
+  </div>
+  <figcaption><b>검증 코드가 앱 코드의 69%</b>다. 사람이 코드를 못 읽는 창업자 1인 + AI 세션이라는 개발 형태에서,
+  회귀를 잡아 주는 유일한 장치가 이 드라이버들이라 의도적으로 두껍다(→ 09장).</figcaption>
+</figure>
+
+<table class="tight">
+  <tr><th style="width:20%">경로</th><th>내용</th></tr>
+  <tr><td class="mono">/ (루트)</td><td>앱 본체 13개 파일 — 빌드 산출물이 아니라 <b>브라우저가 그대로 읽는 원본</b></td></tr>
+  <tr><td class="mono">data/</td><td>앱이 fetch하는 JSON. 로봇과 사람의 공동 산출물이자 사실상의 DB</td></tr>
+  <tr><td class="mono">collector/</td><td>수집·정규화·자동등록·스키마화 모듈 30여 개 + 로봇의 기록장(<code>seen.json</code>, <code>health.json</code>, 리포트)</td></tr>
+  <tr><td class="mono">collector/extracted/</td><td>공고 원문·첨부 원본·HWP 추출 텍스트 415개 — 발췌·스키마화의 근거 자료(약 91MB)</td></tr>
+  <tr><td class="mono">verify/</td><td>Playwright 회귀 드라이버 + 감사/리포트 도구 24개</td></tr>
+  <tr><td class="mono">_admin/ · tools/</td><td>운영 콘솔 화면과 그 쓰기 경로</td></tr>
+  <tr><td class="mono">server/</td><td>Cloudflare Worker 3종(푸시·챗 선택기·메일)</td></tr>
+  <tr><td class="mono">CLAUDE.md (2,221줄)</td><td>세션 인수인계 문서 — <b>이 저장소의 실질적 설계 문서</b>. 원칙·기술 사실·"되돌리면 안 되는 지점"이 누적돼 있다</td></tr>
+</table>
+
+<div class="break"></div>
+<h2 class="sh"><span class="n">03</span>프론트엔드 런타임</h2>
+<table class="tight">
+  <tr><th style="width:16%">파일</th><th class="num" style="width:7%">줄</th><th>책임과 주의점</th></tr>
+  <tr><td class="mono">app.js</td><td class="num">1,737</td><td>화면 렌더·온보딩·서류 보관함·신청 플로우·진척도 트래커·데이터 로더.
+      전역 <code>state = { profile, applications }</code> 하나를 <code>localStorage['handaejang.v1']</code>에 저장.
+      학교 개편·분교 분리에 대비한 <b>프로필 마이그레이션</b>(<code>migrateBranchCampus</code>)이 로드 시 돈다 —
+      없으면 분교 학생이 본교 공고를 받는다</td></tr>
+  <tr><td class="mono">match-engine.js</td><td class="num">314</td><td>자격 판정·적합도·오래된 공고 숨김·실시간 공고 소유 판정(→ 04장)</td></tr>
+  <tr><td class="mono">forms.js</td><td class="num">540</td><td>스키마 → 문서(<code>renderFormDoc</code>) 생성. .doc 저장·인쇄·공유</td></tr>
+  <tr><td class="mono">form-plan.js</td><td class="num">299</td><td>스키마를 건드리지 않고 <b>화면에 낼 질문만</b> 재설계(→ 05장)</td></tr>
+  <tr><td class="mono">notify.js / notify-rules.js</td><td class="num">744 / 336</td><td>알림 UI·권한 요청·알림함 / 규칙 엔진(순수 로직)</td></tr>
+  <tr><td class="mono">chat.js / chat-config.js</td><td class="num">1,054 / 60</td><td>장학금 도우미. 판정을 새로 만들지 않고 <code>evaluate</code>·<code>dday</code>를 그대로 호출(→ 08장)</td></tr>
+  <tr><td class="mono">data.js</td><td class="num">425</td><td>대학 212·별칭 110·계열 8·캠퍼스·서류슬롯 8·제출채널 7·상시 제도 7 등 정적 카탈로그</td></tr>
+  <tr><td class="mono">sw.js</td><td class="num">278</td><td>캐시 전략 + 백그라운드 확인 + 푸시 수신</td></tr>
+</table>
+
+<h3 class="ss">저장 위치 — 개인정보는 기기 밖으로 나가지 않는다</h3>
+<table class="tight">
+  <tr><th style="width:22%">데이터</th><th style="width:20%">저장소</th><th>비고</th></tr>
+  <tr><td>프로필(학교·성적·소득구간·특별자격·연락처·계좌·주민번호)</td><td>localStorage</td><td>외부 전송 코드 없음. 주민번호는 화면에서 뒷자리 마스킹</td></tr>
+  <tr><td>증명서류 파일 8슬롯</td><td>IndexedDB (Blob)</td><td>사용자가 직접 공유/메일을 열 때만 기기 밖으로 나간다</td></tr>
+  <tr><td>신청서 답변 · 진척도 · 알림 발송 장부</td><td>localStorage</td><td>알림 중복 방지 장부는 120일 TTL</td></tr>
+  <tr><td>푸시 구독</td><td>Cloudflare KV</td><td><b>폰 주소 + 학교 + 캠퍼스만</b> 저장 (→ 07장)</td></tr>
+</table>
+
+<h3 class="ss">서비스워커 캐시 전략 (<code>sw.js</code>, CACHE = handaejang-v58)</h3>
+<table class="tight">
+  <tr><th style="width:22%">자원</th><th style="width:20%">전략</th><th>이유</th></tr>
+  <tr><td>앱 코드(html/js/css)</td><td>네트워크 우선 + 3.5초 타임아웃 폴백</td><td>예전엔 캐시 우선이라 <b>버전 올리는 걸 잊으면 설치된 앱에 영영 반영되지 않았다</b>. 사람 기억에 의존하던 구멍을 막은 것</td></tr>
+  <tr><td>데이터(<code>data/*.json</code>)</td><td>네트워크 우선 (<code>cache:'no-cache'</code> 강제 재검증)</td><td>Pages의 10분 캐시 때문에 배포가 늦게 보이던 문제 해결. 공고·양식 추가는 <b>앱 코드 변경 없이 자동 반영</b></td></tr>
+  <tr><td>아이콘·이미지</td><td>캐시 우선</td><td>거의 안 바뀐다</td></tr>
+</table>
+<p><small><b>버전 규칙(사고 이력)</b>: 두 개발자가 각각 같은 번호로 캐시 버전을 올려 "내용이 다른 같은 버전"이 두 번 생겼다.
+합칠 때는 <b>양쪽보다 큰 번호</b>로 올려야 옛 캐시가 청소된다.</small></p>
+
+<h2 class="sh"><span class="n">04</span>매칭 엔진</h2>
+<p class="lede"><code>evaluate(sch, profile)</code>는 공고의 <code>eligibility</code> 객체와 프로필을 대조해
+<b>상태 · 사유 목록 · 부족 정보</b> 세 가지를 돌려준다. 사유를 함께 돌려주는 것이 핵심이다 —
+"왜 안 되는지"를 화면에 그대로 보여 주기 때문에 사용자가 앱을 의심하지 않는다.</p>
+<div class="cols">
+  <div class="card">
+    <h4>판정 신호 (12)</h4>
+    <table class="tight" style="margin:2px 0">
+      <tr><th>키</th><th>의미</th></tr>
+      <tr><td class="mono">minGpa</td><td>최소 평점 (신입생은 면제)</td></tr>
+      <tr><td class="mono">maxBracket</td><td>학자금 지원구간 상한</td></tr>
+      <tr><td class="mono">years</td><td>학년 제한</td></tr>
+      <tr><td class="mono">freshmanOnly</td><td>신입학 첫 학기</td></tr>
+      <tr><td class="mono">tracks</td><td>전공 계열</td></tr>
+      <tr><td class="mono">flagsAny</td><td>특별자격 5종 중 하나 이상</td></tr>
+      <tr><td class="mono">seoulOnly</td><td>거주지</td></tr>
+      <tr><td class="mono">needCert</td><td>공인 어학성적</td></tr>
+      <tr><td class="mono">exchange</td><td>교환학생 파견 예정</td></tr>
+      <tr><td class="mono">schoolOnly</td><td>재학 대학 한정</td></tr>
+      <tr><td class="mono">campusOnly</td><td>캠퍼스 한정</td></tr>
+      <tr><td class="mono">selective</td><td>선발 심사형(자격≠선정)</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>4단계 상태</h4>
+    <ul>
+      <li><b>eligible</b> — 요건 전부 충족, 바로 신청</li>
+      <li><b>selective</b> — 자격은 되나 선발 심사</li>
+      <li><b>unknown</b> — 프로필에 빠진 값이 있어 판단 불가 (<code>missing</code>에 무엇이 필요한지 담긴다)</li>
+      <li><b>ineligible</b> — 요건 미충족 (<code>reasons</code>에 사유)</li>
+    </ul>
+    <h4 style="margin-top:6px">적합도 점수 <code>fitScore</code></h4>
+    <p style="font-size:8.4pt">기본 62점 → 충족 조건 수 ×3(최대 +15) → selective −8 / unknown −22 →
+    평점 여유 (gpa−minGpa)×10 (최대 +12) → 소득구간 여유 (최대 +6) → 특별자격 매칭 +6 → 5~99로 클램프.
+    <b>정렬용 휴리스틱</b>이지 확률이 아니다.</p>
+  </div>
+</div>
+<table class="tight">
+  <tr><th style="width:22%">함수</th><th>하는 일 / 왜 있는가</th></tr>
+  <tr><td class="mono">scopedToProfile()</td><td><code>schoolOnly</code>·<code>campusOnly</code>로 남의 학교 공고를 목록·알림에서 제거</td></tr>
+  <tr><td class="mono">notStale()</td><td>마감일을 확정하지 못한 공고는 D-day가 없어 <b>영영 안 사라진다</b>. 등록 60일 경과 시 숨김.
+      화면과 알림이 같은 함수를 쓴다 — 숨긴 공고를 알림으로 알리면 눌러도 찾을 수 없다</td></tr>
+  <tr><td class="mono">requirementLines() /<br>requirementMatch()</td><td>구조화된 <code>eligibility</code>가 없는 공고를 위해 <b>원문 자격 문장</b>을 그대로 파싱해 대조
+      (소득분위·평점·특별자격 낱말·학년·재학 상태). 113건이 이 경로를 쓴다.
+      "가./나."로 시작하는 줄을 버리면 진짜 요건이 날아가는 등, 실데이터에서 얻은 예외가 주석으로 남아 있다</td></tr>
+  <tr><td class="mono">noticeForProfile()</td><td>실시간 공고가 이 학생 것인지 판정. 본교/분교 게시판 공유 문제(한양 [서울]·[ERICA] 등)를 제목 표식으로 가른다</td></tr>
+</table>
+
+<div class="break"></div>
+<h2 class="sh"><span class="n">05</span>양식 엔진 — 이 제품의 기술적 해자</h2>
+<p class="lede">공고 첨부 HWP/PDF/DOCX 신청서를 <b>같은 구조의 문서</b>로 앱 안에서 만들어 준다.
+층이 셋으로 갈라져 있고, 이 분리가 원칙 4("원본과 동일 구조")를 지키는 장치다.</p>
+<div class="flow">
+  <div class="st"><b>① 스키마 (원본)</b><span><code>data/forms.json</code> · 48종 · 필드 602개.
+    로봇 또는 사람이 원본 문서를 읽어 항목·문구·체크 보기를 그대로 옮긴 것. <b>단일 진실</b></span></div>
+  <div class="ar">›</div>
+  <div class="st"><b>② 질문 설계 (런타임)</b><span><code>form-plan.js</code> — 스키마를 <u>수정하지 않고</u>
+    화면에 낼 질문 목록만 다시 짠다. 자동 채움·클릭형 승격·표 병합</span></div>
+  <div class="ar">›</div>
+  <div class="st"><b>③ 문서 생성</b><span><code>forms.js renderFormDoc</code> — <b>①의 원본 스키마를 그대로</b> 읽어 문서를 만든다.
+    ②가 아무리 바뀌어도 문서는 안 바뀐다</span></div>
+</div>
+
+<figure class="avoid">
+  <div class="figtitle">질문 최적화 효과 — 원본 필드 602개가 학생에게는 질문 320개로</div>
+  <div class="stack">
+    <div style="width:36.5%;background:var(--gray)">자동 채움 220</div>
+    <div style="width:39.5%;background:var(--c1)">직접 입력 238</div>
+    <div style="width:13.6%;background:var(--c2)">클릭 82</div>
+    <div style="width:10.4%;background:#e6e9ef;color:#5b6474">병합·머리칸 62</div>
+  </div>
+  <div class="legend">
+    <span><i style="background:var(--gray)"></i>프로필에서 자동으로 채움(22키)</span>
+    <span><i style="background:var(--c1)"></i>서술이 필요해 직접 입력</span>
+    <span><i style="background:var(--c2)"></i>보기를 눌러 선택</span>
+    <span><i style="background:#e6e9ef"></i>표 병합·고정 머리칸</span>
+  </div>
+  <figcaption>2026-08-18 작업 전후: 총 질문 675 → <b>320</b>, 직접입력 10개 초과 양식 25종 → <b>2종</b>, 전체 20개 초과 7종 → <b>0종</b>.
+  같은 기간 <b>48종 중 44종의 생성 문서가 한 글자도 바뀌지 않았다</b>(나머지 4종은 원본 대조로 데이터를 고친 것).
+  질문을 줄인 게 아니라 <b>묻는 방식을 바꾼 것</b>이라는 증거다.</figcaption>
+</figure>
+
+<table class="tight">
+  <tr><th style="width:22%">레버</th><th>동작</th><th class="num" style="width:12%">효과</th></tr>
+  <tr><td><b>자동 채움</b></td><td>앱이 아는 값은 묻지 않는다. 로봇 생성 스키마에는 <code>auto</code> 표시가 0건이라
+      <b>라벨을 정규화해</b> 사전과 매칭한다(<code>성명</code>/<code>성 명</code>/<code>1. 성　명</code>을 한 값으로 — 라벨 442종 → 408종)</td><td class="num">220칸</td></tr>
+  <tr><td><b>클릭형 승격</b></td><td>보기가 데이터에 이미 적힌 필드만 <code>checks</code> → <code>choice</code>(단일 선택)로.
+      개수뿐 아니라 <b>정확도</b>가 목적 — 그전엔 성별에 남·여를 둘 다 체크할 수 있었다</td><td class="num">checks 69 중 62</td></tr>
+  <tr><td><b>표 병합</b></td><td>원본 표의 칸들을 카드 1개(<code>group</code>)로 묻고 <b>문서에는 칸 수만큼 그대로</b> 낸다.
+      직접입력이 10개를 넘을 때만 발동</td><td class="num">조건부</td></tr>
+  <tr><td><b>고정 머리칸</b></td><td>표 머리 칸은 <code>static</code>으로 묻지 않는다 — <b>원본 대조로 확인된 것만</b></td><td class="num">6칸</td></tr>
+</table>
+
+<div class="callout">
+  <h4>불변식과 그 증명 장치</h4>
+  <b>불변식</b>: 질문 방식을 어떻게 바꾸든 <code>renderFormDoc</code>의 출력 HTML은 동일해야 한다.
+  <b>증명</b>: <code>node verify/form-snapshot.mjs</code> — 48종의 생성 문서를 <b>문자 단위</b>로 기준본과 대조한다.
+  답을 채울 때 <b>필드 id가 아니라 라벨</b>로 채우는 것이 핵심이다(병합하면 id가 바뀌므로 id로 채우면 아무것도 증명하지 못한다).
+  <br><b>상한</b>: 직접입력 10 · 클릭 15 · 전체 20. <b>넘어도 질문을 감추지 않는다</b> — 감추면 학생이 빈 칸이 있는 문서를 제출하게 되므로,
+  전부 보여 주고 감사가 이름을 보고한다(현재 2종 초과).
+</div>
+
+<h2 class="sh"><span class="n">06</span>데이터 스키마</h2>
+<div class="cols">
+  <div class="card">
+    <h4><code>data/registered.json</code> — 정식 등록 공고 (188)</h4>
+    <table class="tight" style="margin:2px 0">
+      <tr><th>필드</th><th class="num">보유</th><th>의미</th></tr>
+      <tr><td class="mono">id / name / provider</td><td class="num">188</td><td>식별·주관</td></tr>
+      <tr><td class="mono">amount / amountValue</td><td class="num">188 / 8</td><td>표시 문구 / 확정 금액(없으면 0)</td></tr>
+      <tr><td class="mono">deadline / period / listedAt</td><td class="num">182 / 188 / 144</td><td>마감·기간·등록일(staleness 기준)</td></tr>
+      <tr><td class="mono">eligibility{}</td><td class="num">188</td><td>12신호 구조체</td></tr>
+      <tr><td class="mono">eligibilityLines[]</td><td class="num">113</td><td>원문 자격 문장 그대로</td></tr>
+      <tr><td class="mono">excerpts / excerptNote</td><td class="num">119</td><td>신청방법·서류 <b>원문 발췌</b></td></tr>
+      <tr><td class="mono">formId</td><td class="num">38</td><td>양식 연결(고유 36종)</td></tr>
+      <tr><td class="mono">noForm</td><td class="num">144</td><td>양식 없음 <b>사유</b>(감사 조건)</td></tr>
+      <tr><td class="mono">applyEmail</td><td class="num">4</td><td>이메일 접수처</td></tr>
+      <tr><td class="mono">prepDoc</td><td class="num">1</td><td>자유형식 확인 시에만 지원문서</td></tr>
+      <tr><td class="mono">auto</td><td class="num">22</td><td>로봇 등록 = '검수 전' 배지</td></tr>
+      <tr><td class="mono">sourceUrl / attachments[]</td><td class="num">188</td><td>원문·첨부 원본 링크</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4><code>data/forms.json</code> — 양식 스키마 (48)</h4>
+    <p style="font-size:8.4pt;margin-bottom:3px"><code>{ title, docName, org, pledge, sections:[{ heading, info[][], fields[] }] }</code><br>
+    <code>info</code>는 인적사항 표(라벨↔프로필 키 쌍), <code>fields</code>는 질문 항목이다.
+    한 섹션에 둘 다 있을 수 있다 — 예전에 <code>info</code>가 있으면 <code>fields</code>를 통째로 빠뜨리는 조기 return 버그가 있었다.</p>
+    <table class="tight" style="margin:2px 0">
+      <tr><th>필드 타입</th><th class="num">개수</th></tr>
+      <tr><td class="mono">text</td><td class="num">412</td></tr>
+      <tr><td class="mono">textarea</td><td class="num">102</td></tr>
+      <tr><td class="mono">checks</td><td class="num">69</td></tr>
+      <tr><td class="mono">checks+text</td><td class="num">8</td></tr>
+      <tr><td class="mono">static</td><td class="num">6</td></tr>
+      <tr><td class="mono">schedule</td><td class="num">4</td></tr>
+      <tr><td class="mono">choice</td><td class="num">1</td></tr>
+    </table>
+    <p style="font-size:8.1pt;color:#6b7686">새 타입을 만들면 <code>verify/audit-data.js</code>의 <code>FIELD_TYPES</code>에 <b>반드시</b> 등록해야 한다 —
+    빠뜨리면 감사가 exit 1로 죽고 <b>그날 수집 결과가 통째로 저장되지 않는다</b>(워크플로가 되돌린다).</p>
+    <h4 style="margin-top:6px"><code>data/notices.json</code> — 실시간 피드 (615)</h4>
+    <p style="font-size:8.4pt">제목·링크·학교·수집일·마감 단서·첨부만 담는다. <b>수집일 +60일에 자동 삭제</b>,
+    학교별 분할 파일(<code>data/notices/</code> 42개)로도 발행해 앱이 자기 학교 것만 받는다.</p>
+  </div>
+</div>
+
+<div class="break"></div>
+<h2 class="sh"><span class="n">07</span>데이터 파이프라인 — 로봇 19기</h2>
+<div class="flow" style="margin-bottom:6px">
+  <div class="st"><b>수집</b><span>게시판 목록 → 상세 방문 → 첨부·마감 단서</span></div><div class="ar">›</div>
+  <div class="st"><b>정규화</b><span>제목 청소 · URL 정규화 · 중복 판정</span></div><div class="ar">›</div>
+  <div class="st"><b>발행</b><span>notices.json + 학교별 분할</span></div><div class="ar">›</div>
+  <div class="st"><b>자동 등록</b><span>보수 규칙 통과분만 registered.json</span></div><div class="ar">›</div>
+  <div class="st"><b>원문·양식</b><span>심층수집 → 발췌 → 스키마화</span></div><div class="ar">›</div>
+  <div class="st"><b>감사·배포</b><span>audit 통과 시 저장 → main 병합</span></div>
+</div>
+
+<table class="tight">
+  <tr><th style="width:20%">모듈</th><th>하는 일 / 설계 이유</th></tr>
+  <tr><td class="mono">collect.mjs</td><td>일반 수집(HTTP). 게시판당 25건·학교당 30건 상한 — 상단 고정 공지가 10건 넘는 게시판에서 실공고가 잘리던 문제로 상향</td></tr>
+  <tr><td class="mono">browser-collect.mjs</td><td>진짜 Chromium. 봇 차단·동적 렌더링 게시판, <b>클릭형</b>(행이 링크가 아니라 스크립트인 경희대 유형)은 행을 실제로 눌러 상세를 채집.
+      인식 1건 이하면 진단(프레임 수·클릭 시도·본 글자·본 링크)이 리포트에 자동 첨부된다</td></tr>
+  <tr><td class="mono">auto-register.mjs</td><td>보수적 규칙(개별 실공고·미등록·마감 전·대출/행사/고용/대학원 제외)을 전부 통과한 것만 자동 등록.
+      애매한 건은 '컨펌 대기'로 리포트에만. 킬스위치 <code>enabled:false</code>, 오등록 제거 <code>blockIds</code></td></tr>
+  <tr><td class="mono">deepfetch.mjs</td><td>공고 전문·첨부 원본을 <code>extracted/</code>에 커밋 — <b>차단된 개발 샌드박스가 원문을 읽는 유일한 통로</b>.
+      HWP는 <code>olefile</code>로 <code>PrvText</code>를, HWPX/DOCX는 zip 내부 XML을 풀어 텍스트까지 추출</td></tr>
+  <tr><td class="mono">extract-excerpts.mjs</td><td>확보한 전문에서 신청기간·방법·제출서류·문의 <b>문장을 그대로</b> 발췌 → <code>excerpts</code>. 수집 때마다 자동 갱신</td></tr>
+  <tr><td class="mono">schema-from-text.mjs<br>schematize-forms.mjs</td><td><b>무료 우선 분류기</b>: 글자가 깨끗한 원본은 규칙만으로(비용 0) 즉시 앱 양식으로 승격.
+      PDF·표·시간표처럼 무료로 동일 문서를 장담 못 하는 것만 Claude API 호출(실행당 상한 기본 2, <code>0</code>이면 완전 정지)</td></tr>
+  <tr><td class="mono">link-hunter.mjs</td><td>목록 주소로만 남은 공고 전담. 주소를 <b>짐작하지 않고</b> 행을 눌러 브라우저가 간 주소를 받아 적는다.
+      재시도 간격 1→3→7→14→30일, <b>영구 포기 없음</b>. 3회째 <code>stuck</code>이면 이슈 자동 생성</td></tr>
+  <tr><td class="mono">audit-coverage.mjs</td><td>주간 누락 감사 — 게시판에 있었는데 우리가 못 잡은 공고를 역으로 센다</td></tr>
+  <tr><td class="mono">build-search-index.mjs</td><td>도우미용 요약 색인. 원문 전문은 수 MB라 앱이 못 받으므로 <b>그 공고에만 나오는 낱말</b>만 남긴다(2건 이상 등장하면 버림 — 게시판 껍데기 제거)</td></tr>
+</table>
+
+<h3 class="ss">예약 스케줄 (KST) — GitHub 예약 혼잡을 피해 전부 홀수 분</h3>
+<table class="tight">
+  <tr><th style="width:13%">시각</th><th style="width:26%">워크플로</th><th>비고</th></tr>
+  <tr><td class="mono">05:13 (월)</td><td>원문 링크 복구</td><td>목록 주소로 남은 공고를 게시판에서 찾아 교정</td></tr>
+  <tr><td class="mono">06:23 (월)</td><td>공고 누락 감사</td><td>수집망 커버리지 역검증</td></tr>
+  <tr><td class="mono">06:37</td><td>링크 사냥꾼</td><td>본업은 사냥, 남는 시간에만 기존 링크 순찰</td></tr>
+  <tr><td class="mono">07:37</td><td>검색용 요약 만들기</td><td>도우미 색인 갱신</td></tr>
+  <tr><td class="mono">07:41 / 11:41</td><td><b>장학공고 수집</b></td><td>낮 실행은 아침이 생략됐을 때의 백업(중복은 <code>seen.json</code>이 거른다)</td></tr>
+  <tr><td class="mono">08:07 / 12:07</td><td><b>브라우저형 수집</b></td><td>예산제 실행(<code>harvest-budget.mjs</code>) — 39분 상한</td></tr>
+  <tr><td class="mono">08:07 / 22:07</td><td>진척도 문서 갱신</td><td>PROGRESS.md 활동 로그 자동 기록</td></tr>
+  <tr><td class="mono">08:10 / 20:10</td><td>푸시 발송(Worker cron)</td><td>알릴 거리가 있는 학교의 구독자만 깨운다</td></tr>
+  <tr><td class="mono">12:23 / 16:23</td><td><b>배포 동기화</b></td><td>기본 브랜치 → main 병합. 수집 로봇 3종이 끝날 때마다도 실행</td></tr>
+  <tr><td class="mono">13:11</td><td>라이브 점검</td><td>실제 배포된 앱에 반영됐는지 확인</td></tr>
+  <tr><td class="mono">14:23</td><td>관리자 화면 잠금 확인</td><td>로그인 없이 열어 보고 잠김/안 잠김/판정 불가</td></tr>
+  <tr><td class="mono">14:37 / 22:37</td><td>main 직접 수정 되가져오기</td><td>배포 동기화의 <b>반대 방향</b> 짝</td></tr>
+  <tr><td class="mono">15:40 (월)</td><td>오래된 리포트 닫기</td><td>이슈 누적 방지</td></tr>
+</table>
+<p><small><b>push-to-run 관행</b>: MCP·수동 실행이 없는 세션에서도 <code>collector/run-*.txt</code> 파일을 고쳐 기본 브랜치에 push하면
+해당 로봇이 즉시 돈다. <b>워크플로 저장 단계 규칙</b>: <code>git add</code>에 아직 없을 수 있는 파일을 넣으면 <code>fatal: pathspec</code>으로
+실행 전체가 실패한다 — 실제로 수집 8회가 연속 침몰한 사고가 있어, 선택 파일은 <code>[ -f … ] &amp;&amp; git add …</code> 형태로만 넣고
+실패 시 🚨 코멘트를 남기는 스텝(<code>if: failure()</code>)이 붙어 있다.</small></p>
+
+<div class="break"></div>
+<h2 class="sh"><span class="n">08</span>알림·푸시와 도우미 — 프라이버시 우선 설계</h2>
+<div class="cols">
+  <div class="card">
+    <h4>푸시 (<code>server/push/worker.js</code> · 가동 중)</h4>
+    <p>서버가 하는 일은 <b>"확인해 봐"라고 폰을 깨우는 것 하나</b>다. 알림 문구는 서버가 만들지 않는다 —
+    깨어난 서비스워커가 <b>기기 안의 프로필</b>로 <code>match-engine</code>·<code>notify-rules</code>를 돌려 스스로 문구를 만든다.</p>
+    <ul>
+      <li>서버 저장 항목: <b>폰 주소 · 학교 · 캠퍼스</b>뿐 (이름·성적·소득·서류는 애초에 전송하지 않음)</li>
+      <li>내용 없는 푸시라 암호화할 페이로드가 없다 → 서버 코드가 작고 고장날 곳이 적다</li>
+      <li>무료 등급 제약 2개를 구조로 회피: 실행당 <b>외부 요청 50건</b>·<b>CPU 10ms</b> →
+          <code>reg → notices → plan → send(25대씩)</code> 상태 머신으로 2분마다 한 걸음. 걸음이 죽어도 이어서 진행, 5회 실패 시 <code>lastError</code> 기록</li>
+      <li>404/410 응답 구독은 자동 삭제. <code>/health</code>·<code>/test</code>로 <b>실제 도달</b>을 확인(KV의 등록 수는 '살아 있는 폰 수'가 아니다)</li>
+    </ul>
+    <p><b>알림 5종</b>: 새 매칭 공고 · 마감 D-1/당일 · 제출 리마인드 · 우리 학교 새 공고 · 결과 기록 리마인드.
+    한 번에 최대 12건(폭탄 방지), 첫 실행은 기존 공고를 '새 공고'로 쏟아내지 않도록 baseline 처리.</p>
+  </div>
+  <div class="card">
+    <h4>장학금 도우미 (<code>chat.js</code> + <code>server/chat/</code>)</h4>
+    <p>답은 <b>앱이 이미 아는 네 곳</b>에서만 나온다: 등록 공고(엔진 판정 결과) · 실시간 피드(제목·링크만) ·
+    내 신청 내역·보관함 · 공고 원문 발췌. 못 찾으면 <b>지어내지 않고 "못 찾았다"</b>고 말한다.</p>
+    <ul>
+      <li>판정을 새로 만들지 않는다 — <code>evaluate</code>·<code>dday</code>를 그대로 호출.
+          여기에 규칙을 한 벌 더 두면 화면과 챗봇이 다른 말을 한다</li>
+      <li>AI는 기본 <b>꺼져 있다</b>(<code>chat-config.js</code>의 endpoint가 비어 있음). 켜도 역할은 <b>'사서'</b>로 한정 —
+          어느 공고의 몇 번째 인용문이 맞는지 <b>고르기만</b> 하고 답 문장을 쓰지 않는다(모델 <code>claude-haiku-4-5</code>, 항목 8·인용 6 상한)</li>
+      <li>전송 대상은 질문 + 앱이 고른 공고의 <b>공개 정보</b>뿐. 프로필은 보내지 않고 서버는 질문도 답도 저장하지 않는다(KV 없음)</li>
+    </ul>
+  </div>
+</div>
+
+<h2 class="sh"><span class="n">09</span>검증 체계 — 이 프로젝트의 안전망</h2>
+<p class="lede">브라우저 자동화(Playwright) 드라이버 + 데이터 감사 도구로 24개. 커밋 전 실행이 관행이고,
+일부는 <b>워크플로 안에서 관문</b>으로 돈다.</p>
+<table class="tight">
+  <tr><th style="width:24%">도구</th><th>검사 대상</th></tr>
+  <tr><td class="mono">audit-data.js</td><td><b>관문</b>. 등록·양식 전수가 현재 엔진 기준을 충족하는지. 실패하면 그날 수집분을 저장하지 않고 되돌린다</td></tr>
+  <tr><td class="mono">form-snapshot.mjs</td><td>양식 48종의 생성 문서를 문자 단위로 대조 (원칙 4의 증명)</td></tr>
+  <tr><td class="mono">drive.js</td><td>전체 회귀 — 온보딩 → 매칭 → 보관함 → 신청 플로우</td></tr>
+  <tr><td class="mono">personas.js</td><td>120종 사용자 조합 스윕 — 크래시·빈 화면·콘솔 오류 탐지</td></tr>
+  <tr><td class="mono">verify-registered / new-forms / forms-data</td><td>등록 공고 노출, 신규 양식 렌더링, <b>데이터만 바꿔도 앱에 반영되는지</b></td></tr>
+  <tr><td class="mono">verify-source-links.js</td><td>'원문 공고 ↗'가 목록이 아니라 그 공고로 가는지 + 못 찾은 건 정직하게 표기되는지</td></tr>
+  <tr><td class="mono">verify-notify(-rules) / push-client / push-server</td><td>알림 규칙 단위 검증, <b>요청 본문 전수 검사로 개인정보 유출 여부</b>, VAPID 서명 실검증</td></tr>
+  <tr><td class="mono">verify-chat.js</td><td>정직 답변·말귀(동의어·초성·오타)·<b>가짜 AI 서버로 지어낸 답 차단</b>·XSS</td></tr>
+  <tr><td class="mono">verify-admin.js</td><td>관리자 화면 — 열쇠 없이는 아무것도 안 보이는지, 등록 양식 전부가 오류 없이 문서를 만드는지</td></tr>
+  <tr><td class="mono">eligibility-report.mjs</td><td>자격 확보율 전수 재채점 — <b>규칙을 고치기 전후로 돌려 숫자를 비교</b>하는 것이 이 영역의 작업 방식</td></tr>
+  <tr><td class="mono">check-deploy-sync / check-collab</td><td>작업분이 실제 앱에 나갔는지 / 상대 개발자와 같은 파일을 건드리는지</td></tr>
+</table>
+<p><small>알려진 상태: <code>verify-admin.js</code> 4개 항목이 <b>데이터 흐름 때문에</b> 실패한다 — 마감 임박 공고가 1건뿐이라
+'여러 건 선택' 검사가 성립하지 않는 것으로, 코드 결함이 아니며 공고가 늘면 저절로 통과한다.</small></p>
+
+<div class="break"></div>
+<h2 class="sh"><span class="n">10</span>브랜치·배포 토폴로지 (여기서 사고가 가장 많이 났다)</h2>
+<table class="tight">
+  <tr><th style="width:26%">브랜치</th><th>역할</th></tr>
+  <tr><td class="mono">claude/nice-heisenberg-WESq5</td><td><b>기본 브랜치</b>. GitHub의 <b>예약 실행은 기본 브랜치 한 곳에서만</b> 돌기 때문에 모든 로봇이 여기에 커밋한다</td></tr>
+  <tr><td class="mono">main</td><td><b>Pages 배포 소스</b>. 여기 push해야 앱이 나간다</td></tr>
+  <tr><td class="mono">claude/work-seonju<br>claude/work-josehyeon</td><td>개발자별 작업 브랜치. 두 사람 다 AI 세션으로 커밋해 <b>작성자가 동일하게 찍히므로</b>, 누구 작업인지는 브랜치로만 구분된다</td></tr>
+</table>
+<div class="cols">
+  <div class="card"><h4>두 방향 동기화 로봇</h4>
+    <ul><li><code>deploy-sync.yml</code>: 기본 브랜치 → main. <b>이게 없어서 수집 결과가 앱에 하루 이상 안 나간 사고</b>가 실제로 있었다</li>
+    <li><code>main-guard.yml</code>: main 직접 수정 → 기본 브랜치 되가져오기</li>
+    <li>충돌 시 조용히 멈추지 않고 🚨 이슈를 만든다. 두 로봇은 <b>서로 다른 concurrency 그룹</b>이어야 한다(같은 그룹이면 GitHub이 대기분을 취소해 되가져오기가 사라진다)</li></ul>
+  </div>
+  <div class="card"><h4>🔴 main에 브랜치 보호를 켜면 배포가 멈춘다</h4>
+    <p>로봇이 main에 <b>직접 push</b>해서 앱을 내보내므로, "Require a pull request before merging"을 켜면
+    로봇이 함께 막혀 앱 업데이트가 통째로 멈춘다. 켠다면 <code>Block force pushes</code>·<code>Restrict deletions</code>까지만.
+    main 직접 수정 문제는 <b>막는 대신 고치는</b> 되가져오기 로봇으로 푼다.</p>
+  </div>
+</div>
+<h3 class="ss">협업 충돌 해소 (<code>COLLAB.md</code>)</h3>
+<p>충돌의 대부분이 사람 코드가 아니라 <b>로봇이 매일 새로 쓰는 기록장</b>이었다(최근 100커밋 기준 notices 45·seen 36·리포트 28 ↔ app.js 5).
+그래서 <code>.gitattributes</code>로 전용 병합기(<code>tools/merge-json-union.mjs</code>)를 지정해 <b>합집합 병합</b>한다.
+단 <code>registered.json</code>·<code>forms.json</code>은 <b>일부러 제외</b> — 여기서는 '삭제'가 의미를 가지므로(오등록 제거) 합집합이 지운 항목을 되살린다.
+<code>merge=ours</code>는 git 내장이 아니라 <b>클론마다 등록</b>해야 동작한다(<code>bash tools/setup-collab.sh</code>).</p>
+
+<h2 class="sh"><span class="n">11</span>보안·프라이버시</h2>
+<table class="tight">
+  <tr><th style="width:20%">영역</th><th>조치</th></tr>
+  <tr><td>XSS · 데이터 오염</td><td>수집 데이터는 전부 신뢰할 수 없는 입력으로 취급. 모든 렌더링에 <code>esc()</code>,
+      링크는 <code>safeUrl()</code>이 <code>javascript:</code>·<code>data:</code> 스킴을 href·<code>window.open</code>에서 차단(CSP 위의 2차 방어)</td></tr>
+  <tr><td>CSP</td><td><code>default-src 'self'; script-src 'self'; object-src 'none'; base-uri 'self'; connect-src 'self' https://*.workers.dev</code>,
+      <code>referrer: no-referrer</code>. 즉 <b>수집 데이터가 오염돼도 코드 실행이 불가능</b>하고 외부 전송 경로가 없다</td></tr>
+  <tr><td>개인정보</td><td>프로필·서류·답변은 기기 안(localStorage/IndexedDB)에만. 외부 fetch는 동일 오리진 <code>data/*.json</code>과
+      푸시/챗 워커뿐이며, 그 요청 본문에 프로필이 없다는 것을 <code>verify-push-client.js</code>가 <b>전수 검사</b>한다</td></tr>
+  <tr><td>메일 서버</td><td>Origin 검사 + 수신 도메인 허용목록(ac.kr/or.kr/go.kr/re.kr) + 크기 제한 + 수신자 정규식 앵커링으로 스팸 릴레이 차단</td></tr>
+  <tr><td>관리자 콘솔</td><td>Cloudflare Access(허용 메일 2개·일회용 코드) + GitHub 토큰. <b>버튼이 저장소를 직접 고치지 않는다</b> —
+      워크플로를 깨우고 감사를 통과해야만 저장(실패 시 되돌림). 잠금은 매일 로봇이 로그인 없이 열어 보고 확인한다.
+      🔑 <b>토큰은 2026-11-07 만료</b> — 화면이 알려 주면 재발급 필요</td></tr>
+  <tr><td>비밀값</td><td>API 키는 Cloudflare Secret / GitHub Secret에만. 워크플로 입력은 환경변수로만 셸에 전달</td></tr>
+</table>
+
+<h2 class="sh"><span class="n">12</span>기술 부채와 90일 제안</h2>
+<table class="tight">
+  <tr><th style="width:5%">순</th><th style="width:26%">항목</th><th>현황과 제안</th></tr>
+  <tr><td class="num">1</td><td><b>테스트가 CI에 없다</b></td><td>드라이버는 훌륭한데 <b>사람(세션)이 손으로 돌린다</b>.
+      <code>audit-data</code>만 워크플로 관문이다. → 앱 파일 변경 PR에 <code>drive·personas·form-snapshot</code>을 붙이는 CI 1개 추가 (반나절)</td></tr>
+  <tr><td class="num">2</td><td><b>수집 대상이 통제 밖</b></td><td>학교가 게시판을 바꾸면 그 학교만 조용히 0건.
+      health·누락 감사·실패 이슈가 이미 있으나, <b>학교별 0건 연속 N일 경보</b>를 하나 더 세우는 것을 권함</td></tr>
+  <tr><td class="num">3</td><td><b>자동 등록의 재고 압력</b></td><td>로봇이 매일 등록하므로 검수를 멈추면 '검수 전'이 쌓인다(현재 22건).
+      관리자 화면 일괄 검수가 있으니 <b>주 1회 검수 리듬</b>을 운영 규칙으로 고정할 것</td></tr>
+  <tr><td class="num">4</td><td><b>유료 경로 단절</b></td><td>Claude API 잔액 부족으로 8/11부터 PDF·표 서식 자동 스키마화가 정지.
+      무료 규칙 경로는 정상이라 앱은 멈추지 않지만 대기 23건이 밀린다</td></tr>
+  <tr><td class="num">5</td><td><b>번들·타입 없음</b></td><td>의도적 선택이다(설치·빌드 0). 대신 전역 스크립트 순서와 <code>index.html</code>·<code>sw.js</code> ASSETS 배선이
+      <b>수동</b>이라 새 파일 추가 시 빠뜨리기 쉽다. → 배선 누락을 잡는 검사 1개면 충분, 번들러 도입은 권하지 않음</td></tr>
+  <tr><td class="num">6</td><td><b>단일 저장소 결합도</b></td><td>앱·데이터·로봇·검증이 한 저장소에 있어 로봇 커밋이 사람 작업과 섞인다.
+      합집합 병합으로 완화돼 있고, 분리는 예약 실행 제약(기본 브랜치 한 곳) 때문에 <b>득보다 실</b>이 크다</td></tr>
+  <tr><td class="num">7</td><td><b>회원가입·계정 없음</b></td><td>설계는 확정, 착수 보류. 기기 간 동기화가 없어 폰을 바꾸면 프로필이 사라진다.
+      착수 시 <b>주민등록번호는 민감정보 별도 동의 대상</b>이라는 점이 설계 제약</td></tr>
+</table>
+<div class="callout">
+  <h4>CTO 첫 2주 추천 경로</h4>
+  ① <code>CLAUDE.md</code>의 <b>운영 원칙 8개</b>와 <b>"되돌리면 안 되는 지점"</b> 절부터 읽는다(이 저장소의 실질적 설계 문서).
+  ② 로컬에서 <code>python3 -m http.server 8123</code> → <code>verify/</code> 드라이버 전량 1회 실행으로 현재 기준선을 눈으로 확인.
+  ③ <code>node verify/audit-data.js</code>·<code>eligibility-report.mjs</code>로 데이터 품질 숫자를 잡는다.
+  ④ 위 부채 1번(CI 관문)을 첫 커밋으로 — 이후 모든 작업의 안전망이 된다.
+</div>
+
+</body></html>

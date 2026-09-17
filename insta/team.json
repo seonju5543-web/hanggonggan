@@ -1,0 +1,8 @@
+{
+ "_readme": "인스타 카드가 준비되면 알림을 받는 사람들 (2026-09-12 개발자 지시 — '은서뿐만 아니라 개발자 세 명 모두'). github 은 준비 이슈의 담당자 지정에, email 은 SMTP 메일에 쓴다. 담당자 지정은 GitHub 이 메일을 보내므로 시크릿 없이도 알림이 간다.",
+ "people": [
+  { "name": "이선주", "github": "seonju5543-web", "email": "seonju5543@gmail.com" },
+  { "name": "조세현", "github": "Se-Hyeon-Jo", "email": "josehyeon0926@gmail.com" },
+  { "name": "유은서", "github": "didinin-wq", "email": "dhdp0105@gmail.com" }
+ ]
+}
