@@ -6,8 +6,8 @@
 
    이 검사가 정말로 막는 것 넷:
      · 적어도 안 풀리는 줄에 **단추가 붙는 것** — 학생이 적었는데 화면이 그대로다
-     · 저장한 줄이 **사라지는 것** — 자리를 지키며 색만 바뀌어야 한다(실제로 그렇게 만들었다가 고쳤다)
-     · 줄에 **마커(✓·✕)가 붙는 것** — 개발자 지시는 '글자 색만'이다
+     · 미확인 줄을 **여기 다시 나열하는 것** — 위 자격 블록이 이미 보여 준다(두 번 그려 화면이 배로 길어졌다)
+     · 저장해도 **위 자격 블록이 안 바뀌는 것** — 눈금은 거기 있다
      · 적은 값이 **그 공고에만 남는 것** — 프로필에 저장돼 다른 공고에도 쓰여야 한다
      · 공고 팝업을 **갈아치우는 것** — 적는 동안에도 보던 공고가 그대로 있어야 한다
 
@@ -102,7 +102,8 @@ async function seed(page) {
     save: !!document.querySelector('[data-elig-save]'),
   }));
   ok('  펼친 머리줄도 같은 것을 말한다', /미확인 자격/.test(opened.head), opened.head.trim());
-  ok('  미확인 줄이 보인다', opened.lines > 0, `${opened.lines}줄`);
+  ok('  미확인 줄을 여기 다시 나열하지 않는다 (위 자격 블록이 이미 보여 준다)',
+    opened.lines === 0, `${opened.lines}줄`);
   ok('  물을 칸이 그려져 있다', opened.inputs > 0, `${opened.inputs}칸`);
   ok('  저장 단추가 있다', opened.save);
   /* 🔴 닫는 길이 둘이다 (2026-09-18 개발자 지시) — 머리줄 화살표와 「나중에 하기」 */
@@ -131,12 +132,14 @@ async function seed(page) {
   ok('  다른 공고에 적용된다는 안내를 넣지 않았다 (2026-09-17 개발자 결정)',
     !/다른 공고/.test(sheetText));
 
-  const before = await page.evaluate(() => ({
-    lines: [...document.querySelectorAll('.elig-ask-lines li')].map((li) => li.textContent),
-    n: (document.querySelector('.elig-ask-head b') || {}).textContent,
-  }));
-  ok('  숫자와 줄 수가 같다', String(before.lines.length) === String(before.n),
-    `숫자 ${before.n} · 줄 ${before.lines.length}`);
+  /* 눈금은 **위 자격 블록**이다 — 저장하면 거기 줄이 ✓·✕ 로 바뀌어야 한다 */
+  const eligRows = () => page.evaluate(() => [...document.querySelectorAll('#detail-sheet .r-elig')]
+    .map((li) => ({ t: li.textContent.trim(), cls: li.className })));
+  const before = { rows: await eligRows(),
+    n: await page.evaluate(() => (document.querySelector('.elig-ask-head b') || {}).textContent) };
+  ok('  숫자와 판정 없는 줄 수가 같다',
+    String(before.rows.filter((r) => /r-req/.test(r.cls)).length) === String(before.n),
+    `숫자 ${before.n} · 판정 없는 줄 ${before.rows.filter((r) => /r-req/.test(r.cls)).length}`);
 
   /* ④ 적고 저장하면 그 줄이 **자리를 지키며 색만** 바뀐다 */
   const filled = await page.evaluate(() => {
@@ -149,27 +152,22 @@ async function seed(page) {
   await page.click('[data-elig-save]');
   await page.waitForTimeout(400);
 
-  const after = await page.evaluate(() => ({
-    lines: [...document.querySelectorAll('.elig-ask-lines li')]
-      .map((li) => ({ t: li.textContent, cls: li.className })),
-    n: (document.querySelector('.elig-ask-head b') || {}).textContent,
-    saveBtn: !!document.querySelector('[data-elig-save]'),
-    inputs: document.querySelectorAll('[data-elig-field]').length,
-  }));
-  ok('저장해도 줄이 사라지지 않는다 (자리를 지킨다)',
-    after.lines.length === before.lines.length,
-    `전 ${before.lines.length} → 후 ${after.lines.length}`);
+  const after = { rows: await eligRows(),
+    n: await page.evaluate(() => (document.querySelector('.elig-ask-head b') || {}).textContent),
+    saveBtn: await page.evaluate(() => !!document.querySelector('[data-elig-save]')),
+    later: await page.evaluate(() => !!document.querySelector('.elig-ask-later')),
+    inputs: await page.evaluate(() => document.querySelectorAll('[data-elig-field]').length) };
+  ok('저장하면 위 자격 블록의 그 줄이 판정된다 (눈금은 거기 있다)',
+    after.rows.filter((r) => /r-ok|r-bad/.test(r.cls)).length
+      > before.rows.filter((r) => /r-ok|r-bad/.test(r.cls)).length,
+    `판정된 줄 ${before.rows.filter((r) => /r-ok|r-bad/.test(r.cls)).length} → ${after.rows.filter((r) => /r-ok|r-bad/.test(r.cls)).length}`);
   ok('  줄의 차례가 그대로다',
-    after.lines.map((x) => x.t).join('|') === before.lines.join('|'));
-  ok('  풀린 줄에 색이 붙었다 (초록 또는 빨강)',
-    after.lines.some((x) => /\b(ok|bad)\b/.test(x.cls)),
-    after.lines.map((x) => x.cls || '-').join(' · '));
-  ok('  마커(✓·✕)를 붙이지 않았다 — 색만 (개발자 지시)',
-    !after.lines.some((x) => /[✓✕]/.test(x.t)));
+    after.rows.map((r) => r.t.replace(/^[✓✕]\s*/, '')).join('|')
+      === before.rows.map((r) => r.t.replace(/^[✓✕]\s*/, '')).join('|'));
   ok('  미확인 숫자가 줄었다', Number(after.n) < Number(before.n), `${before.n} → ${after.n}`);
-  ok('  물을 칸이 없으면 저장 단추를 그리지 않는다',
-    after.inputs > 0 ? after.saveBtn : !after.saveBtn,
-    `남은 칸 ${after.inputs} · 단추 ${after.saveBtn}`);
+  ok('  물을 칸이 없으면 아래 줄을 통째로 없앤다 (「나중에 하기」만 남으면 안 된다)',
+    after.inputs > 0 ? (after.saveBtn && after.later) : (!after.saveBtn && !after.later),
+    `남은 칸 ${after.inputs} · 저장 ${after.saveBtn} · 나중에 ${after.later}`);
 
   /* ⑤ 적은 값은 **프로필에** 남는다 — 그래서 다른 공고에도 쓰인다 */
   const saved = await page.evaluate((keys) => {

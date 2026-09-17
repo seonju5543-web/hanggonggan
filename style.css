@@ -4680,15 +4680,15 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 
 /* ── 자격 확인 도우미 (2026-09-17 · 노션 AI-1 · 2026-09-18 개발자 지시로 재단장) ──
    🔴 앱이 하는 말은 「미확인 자격 n」뿐이다. 설명 문장을 넣지 말 것(설계 3-2).
-   🔴 저장 뒤 줄은 **글자 색만** 바뀐다 — 마커(✓·✕)도 배경도 안 넣는다(개발자 지시).
-   🔴 **공고 팝업 안의 구획**이다. 시트를 갈아치우지 않는다 — 갈아치우면 보던 공고가
-      사라지고 뒤에 홈이 비친다.
-   🔴 **접혔을 때는 파란 글씨 한 줄과 화살표뿐이다** (2026-09-18 개발자 지시).
-      면도 선도 두르지 않는다 — 판을 깔면 공고 안에 또 다른 상자가 생겨 어수선하다.
+   🔴 **미확인 줄을 여기 다시 나열하지 않는다** — 위 자격 블록이 이미 보여 준다.
+      두 번 그렸더니 똑같은 줄이 회색으로 또 나와 화면이 두 배로 길어졌다(실측).
+      저장하면 **위 자격 블록의 그 줄**이 ✓·✕ 로 바뀐다.
+   🔴 칸은 **이름 왼쪽 · 값 굵게 오른쪽** 한 줄짜리다 — 앱1 의 `wallet-row`·학적정보
+      표와 같은 목록 언어다. 큰 네모를 쌓으면 빈 회색 덩어리가 된다.
+   🔴 접혔을 때는 파란 글씨 한 줄과 화살표뿐. 면도 선도 두르지 않는다.
    🔴 토큰 밖의 값을 쓰지 않는다 — ui-tone.mjs '토큰 이탈' 톱니가 지금 값을 천장으로 잡는다. */
 .elig-ask { margin: var(--space-12) 0 0; }
 
-/* 접혔을 때 — 「미확인 자격 4 ⌄」 그것뿐 */
 .elig-ask-open,
 .elig-ask-head {
   display: inline-flex; align-items: center; gap: var(--space-4);
@@ -4700,66 +4700,59 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 .elig-ask-head .elig-chev { transform: rotate(180deg); }
 .elig-ask-open:active, .elig-ask-head:active { transform: scale(0.95); }
 
-/* 펼쳤을 때 — 머리줄 아래로 내용이 열린다 */
 .elig-ask-on { margin-top: var(--space-16); }
-.elig-ask-head { margin-bottom: var(--space-16); }
+.elig-ask-head { margin-bottom: var(--space-8); }
 
-/* 미확인 줄 — 눈금이자 원문. 자르지 않고 그대로 보여 준다 */
-.elig-ask-lines { list-style: none; margin: 0 0 var(--space-20); padding: 0; }
-.elig-ask-lines li {
-  font-size: var(--t-sm); line-height: 1.5; padding: var(--space-6) 0;
-  color: var(--text-weak);
-  word-break: keep-all; overflow-wrap: break-word;
-}
-.elig-ask-lines li + li { border-top: 1px solid var(--line); }
-.elig-ask-lines li.ok  { color: var(--green); }
-.elig-ask-lines li.bad { color: var(--red); }
-
-/* 입력칸 — 라벨을 **박스 안에** 넣어 한 덩어리로 (2026-09-18 개발자 지시: "조금 더 이쁘게").
-   라벨을 밖에 두면 글자 줄과 네모가 따로 놀아 목록이 성글어 보인다. */
+/* 칸 묶음 — 위아래 가는 선 사이의 목록 */
+.elig-ask-fields { border-top: 1px solid var(--line); margin-bottom: var(--space-16); }
 .elig-ask-row {
-  display: block; margin-bottom: var(--space-8);
-  background: var(--surface-2);
-  border: 1px solid transparent;
-  border-radius: var(--radius);
-  padding: var(--space-12) var(--space-16);
-  transition: background .15s ease, border-color .15s ease, box-shadow .15s ease;
-}
-.elig-ask-row:focus-within {
-  background: var(--surface); border-color: var(--accent); box-shadow: var(--ring);
+  display: flex; align-items: center; gap: var(--space-12);
+  min-height: 52px; padding: var(--space-8) 0;
+  border-bottom: 1px solid var(--line);
 }
 .elig-ask-row > span:first-child {
-  display: block; font-size: var(--t-2xs); color: var(--text-weak);
-  font-weight: 500; margin-bottom: var(--space-2);
+  flex: 1; min-width: 0;
+  font-size: var(--t-sm); color: var(--text-sub); font-weight: 500;
 }
-.elig-ask-wrap { position: relative; display: flex; align-items: baseline; gap: var(--space-6); }
+.elig-ask-wrap {
+  flex: none; display: flex; align-items: baseline; gap: var(--space-4);
+  border-radius: var(--radius-xs);
+  padding: var(--space-4) var(--space-8);
+  transition: background .15s ease, box-shadow .15s ease;
+}
+.elig-ask-row:focus-within .elig-ask-wrap {
+  background: var(--surface-2); box-shadow: var(--ring);
+}
 .elig-ask-wrap em {
   flex: none; font-style: normal; font-size: var(--t-xs); color: var(--text-weak);
 }
-/* 칸 자체는 테두리도 면도 없다 — 박스가 그 일을 한다 */
+/* 값은 오른쪽 정렬 · 굵게 — 학적정보 표와 같다 */
 .elig-ask-in {
-  flex: 1 1 auto; min-width: 0; width: 100%;
-  background: none; border: 0; padding: 0;
-  font: inherit; font-size: var(--t-xl); font-weight: 700; color: var(--text);
-  letter-spacing: var(--track-display); font-variant-numeric: tabular-nums;
+  width: 78px; background: none; border: 0; padding: 0;
+  font: inherit; font-size: var(--t-md); font-weight: 700; color: var(--text);
+  text-align: right; font-variant-numeric: tabular-nums;
 }
+.elig-ask-in::placeholder { color: var(--text-weak); font-weight: 400; }
 .elig-ask-in:focus { outline: none; }
-/* 숫자 칸의 증감 화살표는 숨긴다 — 눌러서 올릴 값이 아니다 */
 .elig-ask-in::-webkit-outer-spin-button,
 .elig-ask-in::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .elig-ask-in[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+/* 글자 칸(학과·시·군)은 값이 길어 조금 넓게 */
+.elig-ask-in[type="text"] { width: 120px; }
 
-.elig-ask-save {
-  width: 100%; background: var(--accent); color: #fff; border: 0;
-  border-radius: var(--radius); padding: var(--space-16);
-  font: inherit; font-size: var(--t-md); font-weight: 700;
-  margin-top: var(--space-8);
+/* 아래 줄 — 왼쪽 '나중에 하기'(글자), 오른쪽 '저장'(작은 알약).
+   🔴 저장을 꽉 찬 판으로 두면 아래의 진짜 주 버튼과 무게가 같아진다. */
+.elig-ask-foot {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--space-12); margin-top: var(--space-4);
 }
-.elig-ask-save:active { transform: scale(0.95); }
-/* 접는 또 하나의 길 — 눌러서 나갈 자리를 아래에도 둔다 */
 .elig-ask-later {
-  display: block; width: 100%; background: none; border: 0;
-  padding: var(--space-12) 0 0;
+  background: none; border: 0; padding: var(--space-8) 0;
   color: var(--text-weak); font: inherit; font-size: var(--t-xs);
 }
-.elig-ask-later:active { transform: scale(0.95); }
+.elig-ask-save {
+  background: var(--accent); color: #fff; border: 0;
+  border-radius: var(--radius-pill); padding: var(--space-8) var(--space-20);
+  font: inherit; font-size: var(--t-xs); font-weight: 600;
+}
+.elig-ask-later:active, .elig-ask-save:active { transform: scale(0.95); }

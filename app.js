@@ -3547,7 +3547,7 @@ function eligAskHtml(sch) {
       ? `<select class="elig-ask-in" data-elig-field="${k}"><option value=""></option>`
         + f.options.map((o) => `<option${o === val ? ' selected' : ''}>${esc(o)}</option>`).join('')
         + `</select>`
-      : `<input class="elig-ask-in" data-elig-field="${k}" value="${esc(val)}"`
+      : `<input class="elig-ask-in" data-elig-field="${k}" value="${esc(val)}" placeholder="—"`
         + (f.kind === 'number'
           ? ` type="number" inputmode="decimal" step="${f.step}" min="${f.min}" max="${f.max}"`
           : ' type="text"') + `>`;
@@ -3555,19 +3555,24 @@ function eligAskHtml(sch) {
       + `<span class="elig-ask-wrap">${input}`
       + (f.suffix ? `<em>${esc(f.suffix)}</em>` : '') + `</span></label>`;
   }).join('');
-  /* 저장 뒤에는 **글자 색만** 바뀐다 (개발자 지시 — 마커 ✓·✕ 도 배경도 붙이지 않는다) */
-  const list = `<ul class="elig-ask-lines">` + shown.map((l) => {
-    const m = requirementMatch(l, state.profile, sch);
-    return `<li${m === 'ok' ? ' class="ok"' : m === 'no' ? ' class="bad"' : ''}>${esc(l)}</li>`;
-  }).join('') + `</ul>`;
-  const save = keys.length
-    ? `<button type="button" class="elig-ask-save" data-elig-save="${esc(sch.id)}">저장</button>` : '';
+  /* 🔴 **미확인 줄을 여기 다시 나열하지 않는다** (2026-09-18 실측으로 드러났다).
+     위 자격 블록이 이미 그 줄들을 보여 주고 있어서, 펼치면 똑같은 줄이 회색으로
+     한 번 더 나왔다 — 화면이 두 배로 길어지고 표처럼 어수선했다.
+     저장하면 **위 자격 블록의 그 줄**이 ✓ 또는 ✕ 로 바뀐다. 눈금은 거기 있다. */
+  /* 🔴 물을 칸이 없으면 **아래 줄을 통째로** 안 그린다 — 예전에는 저장 단추만 빼서
+     「나중에 하기」가 빈 줄에 덩그러니 남았다(실측). 누를 것이 없으면 자리도 없앤다.
+     🔴 저장은 **작은 알약**이다 — 꽉 찬 남색 판으로 두면 아래의 진짜 주 버튼
+     (신청 준비 / 마감된 장학금)과 무게가 같아져 무엇이 주인지 흐려진다. */
+  const foot = keys.length
+    ? `<div class="elig-ask-foot">`
+      + `<button type="button" class="elig-ask-later" data-elig-close="${esc(sch.id)}">나중에 하기</button>`
+      + `<button type="button" class="elig-ask-save" data-elig-save="${esc(sch.id)}">저장</button>`
+      + `</div>`
+    : '';
   return `<div class="elig-ask elig-ask-on">`
     + `<button type="button" class="elig-ask-head" data-elig-close="${esc(sch.id)}"`
     + ` aria-expanded="true">미확인 자격 <b>${left}</b>${ELIG_CHEV}</button>`
-    + list + rows + save
-    /* 닫는 길을 아래에도 둔다 — 다 적지 않고 나갈 자리가 있어야 한다 (2026-09-18 개발자 지시) */
-    + `<button type="button" class="elig-ask-later" data-elig-close="${esc(sch.id)}">나중에 하기</button>`
+    + `<div class="elig-ask-fields">${rows}</div>` + foot
     + `</div>`;
 }
 
