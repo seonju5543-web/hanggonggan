@@ -415,8 +415,17 @@ function lineVerdict(text, p, isExclude, ctx) {
   if (ctx && ctx.multi) return null;                        // 장학금이 여럿 묶인 공고
   if (ctx && ctx.inAnyOf && ctx.inAnyOf.has(text)) {        // 선택지 묶음의 한 갈래
     const { conds: cs } = PR.parseLine(text, !!isExclude);
-    for (const c of cs) if (judgeCond(c, p, ctx) === 'pass') return 'ok';
-    return null;                                            // 떨어져도 ✕는 안 친다
+    /* 🔴 갈래 안에서도 **조건 전부가 맞아야** ✓ 다 (2026-09-17 전수 대조). 하나만 맞으면 ✓ 로
+       두었더니 정읍시민장학재단의 `재학생: 2025년 2학기와 2026년 1학기 각각 85점 이상` 이
+       평점 2.8(백분위 62) 학생에게 ✓ 로 떴다 — `재학생` 하나가 맞아서. 아래 본 경로가
+       2026-08-30 에 이미 고친 것과 같은 규칙이다. 떨어져도 ✕ 는 여전히 안 친다. */
+    let pass = 0;
+    for (const c of cs) {
+      const v = judgeCond(c, p, ctx);
+      if (v !== 'pass') return null;
+      pass += 1;
+    }
+    return pass ? 'ok' : null;
   }
   const { conds } = PR.parseLine(text, !!isExclude);
   let seen = null;

@@ -48,6 +48,15 @@ function parseGrade(t) {
        `누적 평점평균이 3.0(B학점) 이상인 자`      ← 괄호 안 등급
        `4.5점 만점에 2.5점 이상`                  ← `점`
        `직전학기 성적 2.5점 이상인 자(4.5점 만점)`  ← `점` */
+  /* 🔴 두 척도를 나란히 적은 줄은 **4.5 만점 쪽 숫자**를 쓴다 (2026-09-17 전수 대조).
+     `평점 3.5 이상(4.5 만점 기준) 또는 3.3 이상(4.3 만점 기준)` 을 `3.5 · 4.3 척도` 로 읽어
+     평점 3.5(4.5 만점) 학생이 ✗ 를 받았다 — 첫 숫자에 뒤쪽 척도를 붙인 것이다.
+     프로필 평점은 4.5 만점이므로 그 척도의 숫자가 곧 답이고 환산이 필요 없다. */
+  const mBoth = has45 && has43 && t.match(/(\d\.\d{1,2})\s*점?\s*(?:이상|이상인)[^()]{0,12}\(\s*4\.5/);
+  if (mBoth) {
+    const v = parseFloat(mBoth[1]);
+    if (v <= 4.5) return { kind: 'grade', scale: GRADE_SCALE.gpa45, min: v, conf: HAS_EXCEPTION.test(t) ? LOW : HIGH };
+  }
   const mDec = t.match(/(\d\.\d{1,2})\s*점?\s*(?:\([^)]{0,8}\))?\s*(?:\/\s*4\.[35])?\s*점?\s*(?:이상|이상인|넘)/);
   const mPct = t.match(/(?:백분위|평균)?\s*(\d{2,3})\s*점?\s*(?:\/\s*100)?\s*(?:만점)?\s*(?:이상|이상인)/);
 
@@ -117,15 +126,24 @@ function parseStatus(t, isExclude) {
      `외국 대학에 재학 중인`. 이게 제외 목록에 들어가면 **재학생이 통째로 0%**가 된다
      (2026-08-24 0% 전수 확인에서 오탐 9건 중 5건이 이것이었다).
      장학금이 재학생을 제외하는 일은 없으므로, 제외 줄에서는 아예 담지 않는다. */
+  /* 🔴 **부정어가 뒤따르는 학적은 허용이 아니라 금지다** (2026-09-17 전수 대조 · 노션 UI-10).
+     `전국 대학(원)생 (휴학생 제외)`·`초·중·고·대학교 재학생(휴학생제외)`·
+     `2026년 2학기 재학생 (휴학예정자 지원불가)` 에서 `휴학` 을 **허용 목록**에 담아,
+     휴학 중인 학생에게 ✓ 가 떴다(실측 4줄 — 틀린 안심). 낱말 뒤 여덟 글자 안에
+     `제외·불가·불인정·안 됨` 이 오면 그 학적은 금지 쪽이다. */
+  const denied = (word) => new RegExp(`${word}[가-힣]{0,4}\\s?[^가-힣]{0,3}(제외|불가|불인정|안\\s?됨|지원\\s?불가)`).test(t);
+  const not = [];
   if (/재학/.test(t) && !isExclude && !/비재학|초과\s?재학|외국\s?대학에\s?재학/.test(t)) hit.push('재학');
-  if (/휴학/.test(t)) hit.push('휴학');
+  if (/휴학/.test(t)) (denied('휴학') ? not : hit).push('휴학');
   if (/복학\s?예정/.test(t)) hit.push('복학예정');
   if (/초과\s?학기|수업연한\s?초과/.test(t)) hit.push('초과학기');
   if (/졸업\s?유예|학사학위취득유예/.test(t)) hit.push('졸업유예');
-  if (/수료(생|자)/.test(t)) hit.push('수료');
-  if (/졸업(생|자|\s?예정)/.test(t) && !/졸업\s?유예/.test(t)) hit.push('졸업');
-  if (/자퇴/.test(t)) hit.push('자퇴');
+  if (/수료(생|자)/.test(t)) (denied('수료') ? not : hit).push('수료');
+  if (/졸업(생|자|\s?예정)/.test(t) && !/졸업\s?유예/.test(t)) (denied('졸업') ? not : hit).push('졸업');
+  if (/자퇴/.test(t)) (denied('자퇴') ? not : hit).push('자퇴');
   if (/대학원(생|\s?재학)/.test(t)) hit.push('대학원');
+  /* 허용 학적이 하나도 없고 금지만 있으면(`전국 대학(원)생 (휴학생 제외)`) 금지 조건으로 낸다 */
+  if (!hit.length && not.length) return { kind: 'status', not, regularOnly: false, conf: HIGH };
   if (!hit.length) return null;
   /* 🔴 `복학예정`이 함께 적혀 있으면 `휴학`을 금지로 읽지 않는다 —
      `2026-2학기 재학 및 복학예정자`는 휴학 중인 학생을 받아 주는 공고다(실측 14건). */
@@ -346,6 +364,22 @@ function homePersonAfterRegion(t) {
 const ORIGIN_SCHOOL = /(고등학교|고교|고등\s?및\s?중등|중등)[^,.]{0,14}(졸업|마친|이수|출신)|(소재|출신)[^,.]{0,8}(고등학교|고교)/;
 const SCHOOL_PLACE = /(소재|있는|위치한|연접)[^,.]{0,12}(대학교|대학|전문대)/;
 
+/* 🔴 **이름을 모르는 곳도 지역 요건이다** (2026-09-17 전수 대조 · 노션 UI-10).
+   `포항·광양 지역 가정 자녀 중 2026년 대학 신입생` 은 시·도 이름도, `포항시` 같은 꼬리말도
+   없어 지역 축이 통째로 빠졌고, 남은 `신입생` 하나가 맞아 **부산 사는 신입생에게 ✓** 가 떴다.
+   지역 낱말(`지역·소재·시민·도민·군민`) 앞에 우리가 모르는 고유명사가 붙어 있으면,
+   판정은 못 해도 **'모른다'로 남겨 ✓ 를 막는다.** 값은 담아 두어 감사가 볼 수 있게 한다.
+   ⚠️ `해당 지역`·`전국`·`국내`·`타 지역` 처럼 고유명사가 아닌 것은 요건이 아니다. */
+const PLACE_GENERIC = /^(해당|전국|국내|국외|타|동일|각|위|아래|상기|본|이|그|해외|지방|수도권|비수도권|인근|지정|일정|특정|모든|기타)$/;
+function unnamedPlace(t, about) {
+  /* ⚠️ `융합일본지역학부` 의 `지역` 은 지역이 아니다 — 낱말 뒤에 곧바로 한글이 이어지면 안 본다 */
+  const m = String(t).match(/(?:^|[\s(,])([가-힣]{2,4}(?:\s?[·,/]\s?[가-힣]{2,4})*)\s?(?:지역|소재|시민|도민|군민)(?=[\s(,.·]|$|(?:에서|에|의|을|를|이|가|은|는|내|과|와)(?![가-힣]))/);
+  if (!m) return null;
+  const words = m[1].split(/\s?[·,/]\s?/).map((w) => w.trim()).filter((w) => w && !PLACE_GENERIC.test(w));
+  if (!words.length) return null;
+  return { kind: 'residence', about: about || 'home', anyOf: [], cities: words, inArea: false, unnamed: true, conf: LOW };
+}
+
 function parseResidence(t) {
   /* ⚠️ `주소를 둔` 의 `둔` 은 `두`+`ㄴ` 이 아니라 **한 글자**다 — `주소를?\s?두` 로 잡으려다
      `주소를 둔 광양보건대학교 재학생` 을 통째로 놓쳤다(한글은 음절이 미리 합쳐져 있다). */
@@ -362,14 +396,14 @@ function parseResidence(t) {
   if (about !== 'home') {
     const names = regionNamesIn(t);
     /* 지역 이름이 하나도 없으면 이 줄은 지역 축과 무관하다 — `4년제 대학교 재학생` 등 */
-    if (!names.length) return null;
+    if (!names.length) return unnamedPlace(t, about);
     /* 값은 담아 두되 판정은 하지 않는다 — 무엇을 못 읽었는지 감사가 볼 수 있어야 한다 */
     return { kind: 'residence', about, anyOf: [], cities: names, inArea: false, conf: LOW };
   }
   /* ① 거주지 — 예전 문턱. `거주`·`주소` 같은 낱말이 있어야 한다.
      ⚠️ 여기까지만이던 시절, `세종특별자치시 초·중·고·대학생(재학생)` 처럼 **낱말이 없는 꼴**을
         통째로 놓쳤다(실측 6줄). 아래 HOME_PERSON 이 그 꼴을 받는다. */
-  if (!homeWord && !homePersonAfterRegion(t)) return null;
+  if (!homeWord && !homePersonAfterRegion(t)) return unnamedPlace(t, 'home');
   const prov = REGIONS.filter((r) => t.includes(r));
   const cities = [];
   CITY_RE.lastIndex = 0;
@@ -384,7 +418,7 @@ function parseResidence(t) {
   /* `관내`는 **그 재단의 관할**을 뜻한다 — 어느 시·군인지는 줄만 봐서는 모르고
      공고를 낸 곳(주관 기관 이름)이 정한다. 판정기가 맥락으로 받는다. */
   const inArea = /관내|관할/.test(t);
-  if (!prov.length && !cities.length && !inArea) return null;
+  if (!prov.length && !cities.length && !inArea) return unnamedPlace(t, 'home');
   /* 🔴 거주 요건은 **예외를 달고 다닌다.** 실제 원문:
        `부·모 또는 보호자가 광양시에 1년 이상 주소를 둔 자
         ○ 대학생의 경우 본인에 한하여 관외 거주 인정`
@@ -582,6 +616,16 @@ function parseMajor(t) {
   if (tracks.length >= 5) tracks.length = 0;
   /* ③ 학과·학부·전공 이름 */
   const names = [];
+  /* 🔴 `시각디자인 전공자 및 판화학과 재학생` — 띄어 쓴 `전공자` 는 이름이 아니라 꼬리말이다
+     (2026-09-17 전수 대조: 시각디자인학과 학생이 이 줄에 ✗ 를 받았다 — 이름이 `전공자` 로 잡혀서).
+     `X 전공자` 꼴은 X 를 이름으로 담고, 아래 일반 규칙이 `전공자` 를 이름으로 집는 것은 막는다. */
+  const MAJOR_HOLDER = /([가-힣A-Za-z]{2,12})\s+전공자/g;
+  MAJOR_HOLDER.lastIndex = 0;
+  let h;
+  while ((h = MAJOR_HOLDER.exec(t)) !== null) {
+    const n = h[1].trim();
+    if (n.length >= 2 && !MAJOR_GENERIC.test(n) && !MAJOR_TRACK.some(([re]) => re.test(n)) && !names.includes(n)) names.push(n);
+  }
   MAJOR_NAME.lastIndex = 0;
   let m;
   while ((m = MAJOR_NAME.exec(t)) !== null) {
@@ -589,6 +633,7 @@ function parseMajor(t) {
       const n = raw.trim();
       /* 🔴 계열 낱말은 이름이 아니다 — `이공계 전공` 을 학과명으로 집으면 공대생이 미달이 된다 */
       if (n.length < 2 || MAJOR_GENERIC.test(n) || names.includes(n)) continue;
+      if (/^전공자?$/.test(n)) continue;   // 위 MAJOR_HOLDER 가 맡는 꼬리말
       if (MAJOR_TRACK.some(([re]) => re.test(n))) continue;
       /* 학교 이름은 학과가 아니다 — `우수대학교 및 우수학과` 에서 앞말이 딸려 왔다 */
       if (/(대학교|대학|대)$/.test(n)) continue;
@@ -649,7 +694,16 @@ function parseMajor(t) {
    ⚠️ `독립유공자 후손` 처럼 **우리가 묻는 처지**가 함께 적힌 줄은 아래 `has('flags')` 가
       풀어 준다 — 여기서 막으면 진짜 판정까지 사라진다. */
 const LINEAGE_ATTR = /(문중|종친|종중|후손|자손|[가-힣]{1,3}\s?씨\s?(성|가문|일가)|성씨)/;
-const UNASKED_ATTR = /(입상|수상|둘째|셋째|넷째|막내|손자녀|조손|유자녀|유족|세대주|부양\s?가족|고아|위탁\s?가정|소년소녀|보호\s?종료|자립\s?준비|의사자|의상자|농어촌|농업인|어업인|귀농|귀어|소상공인|중소기업|재직자?|근로자|(도민|시민|군민|구민|주민)의\s?자녀)/;
+const UNASKED_ATTR = /(둘째|셋째|넷째|막내|손자녀|조손|유자녀|유족|세대주|부양\s?가족|고아|위탁\s?가정|소년소녀|보호\s?종료|자립\s?준비|의사자|의상자|농어촌|농업인|어업인|귀농|귀어|소상공인|중소기업|재직자?|근로자|(도민|시민|군민|구민|주민)의\s?자녀)/;
+/* 🔴 **한 일·가진 것을 묻는 줄은 처지 낱말이 있어도 확인한 것이 아니다** (2026-09-17 전수 대조).
+   아래는 프로필 어느 칸으로도 알 수 없는데, 딸린 조건 하나가 맞아 ✓ 가 떠 있던 실제 줄이다:
+     `한국장학재단에서 학자금대출을 받은 국내 대학교 재학생`               ← '재학'만 맞았다
+     `본교 학부에 형제·자매가 2인 이상 동시에 재학하고 있는 자`             ← '재학'만 맞았다
+     `학교(총)장 또는 단과대학장의 추천을 받은 대학교 2학년 이상 학생`       ← '학년'만 맞았다
+     `장애학생 중 … 대회 3위 이상 수상 실적이 있는 자`                     ← '장애'가 맞았다
+   ⚠️ 마지막 줄이 요점이다 — 우리가 묻는 처지(장애)가 있어도 **수상 실적**은 여전히 모른다.
+      그래서 이 무리는 `has('flags')` 로 풀어 주지 않는다(UNASKED_ATTR 과 다른 점). */
+const ACHIEVE_ATTR = /(입상|수상|학자금\s?대출|추천(을|서를?)?\s?받|자격증|경력|봉사\s?(실적|시간)|(형제|자매|남매)[^.]{0,10}(동시에?|함께|모두)\s?재학)/;
 /* 🔴 **형편을 말하는 낱말은 소득구간으로 확인된다** — 프로필에 칸이 있다.
    `학자금 지원구간 8구간 이하의 저소득층 학생` 을 `저소득` 이라는 낱말만 보고 막으면,
    우리가 아는 것(구간)으로 판정할 수 있는 줄까지 '모른다'가 된다.
@@ -659,6 +713,7 @@ function unaskedAttr(text, conds) {
   const t = String(text || '');
   const cs = conds || [];
   const has = (k) => cs.some((c) => c.kind === k);
+  if (ACHIEVE_ATTR.test(t)) return true;   // 처지 낱말이 있어도 풀리지 않는다 (위 주석)
   if (INCOME_ATTR.test(t) && (has('bracket') || has('flags'))) return false;
   if (!UNASKED_ATTR.test(t) && !INCOME_ATTR.test(t) && !LINEAGE_ATTR.test(t)) return false;
   return !has('flags');
@@ -709,7 +764,10 @@ function caseBranch(text) {
   const t = String(text || '').trim();
   /* 이름표가 줄 맨 앞에 있고 **콜론이 곧 따라와야** 분기다.
      `직전학기 성적기준: 80점…`처럼 앞말이 다르면 분기가 아니다. */
-  const head = t.split(/[:：]/)[0];
+  /* `복학생인 경우, 휴학 직전학기 성적 기준` — 콜론 대신 `인 경우,` 로 갈라 쓴 분기도 있다
+     (2026-09-17 전수 대조: 이 줄이 휴학 중인 학생에게 ✓ 로 떴다 — `휴학` 낱말만 보고). */
+  const asCase = t.match(/^([가-힣]{2,6})(?:인|일)\s?경우\s*[,:：]/);
+  const head = asCase ? asCase[1] : t.split(/[:：]/)[0];
   if (head === t || head.length > 26) return null;
   for (const [re, statuses] of CASE_STATUS) if (re.test(head)) return statuses;
   return null;

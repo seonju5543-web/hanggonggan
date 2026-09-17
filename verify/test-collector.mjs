@@ -3099,7 +3099,10 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
      *"재학 = 신입생 첫 학기 똑같잖아. 신입생도 재학생인데."*
      `국내 대학교 재학생`이 신입생 화면에 아무 표시도 안 뜨고 있었다. */
   {
-    const 재학요건 = '한국장학재단에서 학자금대출을 받은 국내 대학교 재학생';
+    /* ⚠️ 2026-09-17: 예전 픽스처 `한국장학재단에서 학자금대출을 받은 국내 대학교 재학생` 은
+       이제 **'모른다'** 다 — 학자금대출을 받았는지는 프로필이 모르는 처지라 ✓ 를 치지 않는다
+       (아래 '자격 판정 전수 대조' 절). 학적 포함 관계를 재는 데는 대출 말이 없는 줄이 맞다. */
+    const 재학요건 = '국내 대학교 재학생 (2026-2학기 기준)';
     const mk = (status) => ({ school: 'x', status, flags: [] });
     eq('신입생도 재학생이다', M.requirementMatch(재학요건, mk('신입학'), null), 'ok');
     eq('초과학기생도 재학생이다', M.requirementMatch(재학요건, mk('초과학기'), null), 'ok');
@@ -6951,6 +6954,119 @@ console.log('\n■ 도우미가 자주 묻는 질문을 답한다 (2026-09-15 ·
     chatSrc.indexOf('const faq = chatAnswerFaq(s);') > chatSrc.indexOf('const cards = chatSearch(s);'), true);
   eq('  버튼이 자주 묻는 질문 화면으로 간다', /act === 'faq'\) return go\('faq'\)/.test(chatSrc) && /name === 'faq'\) renderFaq\(\)/.test(appSrc), true);
   delete globalThis.FAQ_ITEMS;
+}
+
+/* ── 2026-09-17 · 노션 UI-10 — 틀린 ✓ · 틀린 ✗ (자격 판정 전수 대조) ──
+   개발자 지적: "학생에게 해당하지 않는 지원자격이 충족 표시되거나, 해당함에도 미충족 표시되는
+   문제". verify/verdict-table.mjs 로 학생 여섯 × 자격 줄 전부의 ✓·✗ 를 뽑아 사람이 읽었고,
+   아홉 갈래가 틀려 있었다. 아래는 그 실제 줄이다 — 되돌리면 여기서 빨간불. */
+console.log('\n■ 자격 판정 전수 대조 — 틀린 ✓·틀린 ✗ (2026-09-17 · 노션 UI-10)');
+{
+  const MEq = createRequire(import.meta.url)('../match-engine.js');
+  const PRq = createRequire(import.meta.url)('../parse-requirements.js');
+  const base = { school: '한국외국어대학교', campus: '서울', track: 'humanities', major: '영어학과', year: 3,
+    status: '재학', gpa: 3.5, bracket: 5, credits: 15, region: '서울', parentRegion: '서울',
+    nationality: 'korean', birthYear: 2004, flags: [], common: {} };
+  const mark = (line, over, sch) => MEq.requirementMatch(line, { ...base, ...(over || {}) }, sch || {});
+  const onLeave = { status: '휴학' };
+
+  /* ① 부정어 뒤의 학적은 금지다 — 휴학생에게 ✓ 가 떴던 세 줄 */
+  eq('「(휴학생 제외)」는 휴학생을 막는다 (틀린 ✓ 였다)', mark('전국 대학(원)생 (휴학생 제외)', onLeave), 'no');
+  eq('  재학생은 그 줄에 통과한다', mark('전국 대학(원)생 (휴학생 제외)'), 'ok');
+  eq('  붙여 쓴 「(휴학생제외)」도', mark('초·중·고·대학교 재학생(휴학생제외)', onLeave), 'no');
+  eq('  「휴학예정자 지원불가」도', mark('2026년 2학기 재학생 (2026-2학기 휴학예정자 지원불가)', onLeave), 'no');
+  eq('  「재학 및 복학예정자」는 여전히 휴학생을 받는다 (되돌아가면 안 되는 것)',
+    PRq.parseLine('2026-2학기 재학 및 복학예정자', false).conds.find((c) => c.kind === 'status').anyOf.includes('휴학'), false);
+  /* ② `복학생인 경우,` 도 경우별 분기다 — 휴학생에게 ✓ 가 떴다 */
+  eq('「복학생인 경우, 휴학 직전학기 …」는 휴학생의 줄이 아니다', mark('복학생인 경우, 휴학 직전학기 성적 기준', onLeave), null);
+  eq('  복학예정자에게는 판정한다', PRq.caseBranch('복학생인 경우, 휴학 직전학기 성적 기준'), ['복학예정']);
+  /* ③ `시각디자인 전공자` — 이름이 `전공자` 로 잡혀 시각디자인학과 학생이 ✗ 였다 */
+  eq('「시각디자인 전공자」는 시각디자인학과 학생에게 ✓ (틀린 ✗ 였다)',
+    mark('시각디자인 전공자 및 판화학과 재학생', { major: '시각디자인학과', track: 'arts', school: '경희대학교' }), 'ok');
+  eq('  영어학과 학생에게는 ✗ 그대로', mark('시각디자인 전공자 및 판화학과 재학생'), 'no');
+  eq('  이름 목록에 「전공자」가 없다',
+    (PRq.parseLine('시각디자인 전공자 및 판화학과 재학생', false).conds.find((c) => c.kind === 'major') || {}).names, ['시각디자인', '판화']);
+  /* ④ 두 척도가 나란한 줄 — 4.5 만점 3.5 학생이 ✗ 였다 */
+  const two = '직전 학기까지의 전체 평균 평점 3.5 이상(4.5 만점 기준) 또는 3.3 이상(4.3 만점 기준) 성적을 가진 학생';
+  eq('4.5 만점 쪽 숫자를 쓴다 (평점 3.5 → ✓ · 틀린 ✗ 였다)', mark(two), 'ok');
+  eq('  평점 2.8 은 ✗', mark(two, { gpa: 2.8 }), 'no');
+  /* ⑤ 선택지 묶음 안에서도 조건 전부가 맞아야 ✓ — 정읍시민장학재단 실제 공고로 잰다 */
+  {
+    const sch = JSON.parse(readText(new URL('../data/registered.json', import.meta.url))).items.find((x) => x.id === 'reg-hi-jeongeup');
+    if (sch) {
+      const line = (sch.eligibilityLines || []).find((l) => /재학생:.*85점/.test(l));
+      eq('  (실데이터) 정읍 「재학생: … 85점 이상」이 평점 2.8 학생에게 ✓ 가 아니다',
+        line ? mark(line, { gpa: 2.8, school: '경희대학교' }, sch) : null, null);
+    } else console.log('   (정읍 공고가 등록 목록에 없어 실데이터 항목을 건너뜀)');
+  }
+  /* ⑥ 이름 모르는 곳도 지역 요건이다 — 부산 신입생에게 포항·광양 줄이 ✓ 였다 */
+  const fresh = { status: '신입학', year: 1, gpa: null, credits: null, region: '부산', parentRegion: '부산' };
+  eq('「포항·광양 지역 가정 자녀 … 신입생」은 부산 신입생에게 ✓ 가 아니다', mark('포항·광양 지역 가정 자녀 중 2026년 대학 신입생', fresh), null);
+  eq('  「포항·광양 소재 대학교 … 신입생」도', mark('포항·광양 소재 대학교 2026년 우수성적 신입생', fresh), null);
+  eq('  「해당 지역」·「전국」은 지역 요건이 아니다',
+    PRq.parseLine('전국 4년제 대학교 2026년 신입생', false).conds.some((c) => c.kind === 'residence'), false);
+  /* ⑦ 한 일·가진 것을 묻는 줄은 처지 낱말이 있어도 ✓ 가 아니다 */
+  eq('「학자금대출을 받은 … 재학생」은 ✓ 가 아니다', mark('한국장학재단에서 학자금대출을 받은 국내 대학교 재학생'), null);
+  eq('  「형제·자매가 2인 이상 동시에 재학」도', mark('2026-2학기 본교 학부에 형제 · 자매가 2 인 이상 동시에 재학하고 있는 자'), null);
+  eq('  「추천을 받은 2학년 이상」도', mark('타지역에 소재한 국내 대학교에 재학 중인 학교(총)장 또는 단과대학장의 추천을 받은 대학교 2학년 이상 학생'), null);
+  eq('  「장애학생 중 … 수상 실적」은 장애 학생에게도 ✓ 가 아니다',
+    mark('장애학생 중 학업 성적 우수, 예술‧체육‧기능‧기타 분야에서 도단위 이상 대회 3위 이상 수상 실적이 있는 자', { flags: ['disabled'] }), null);
+  eq('  다자녀 줄은 여전히 다자녀 학생에게 ✓ (되돌아가면 안 되는 것)', mark('다자녀 가구의 자녀', { flags: ['multiChild'] }), 'ok');
+
+  /* ⑧ 🔴 정답표 — 사람이 읽은 판정과 엔진이 같은가 (예방 장치).
+     규칙을 고쳐 판정이 바뀌면 여기서 빨간불이 난다. 의도한 변화면 표를 다시 읽고
+     `node verify/verdict-table.mjs --write-gold` 로 굳힌다. 안 읽고 굳히지 말 것. */
+  process.env.VERDICT_AS_LIB = '1';
+  const VT = await import(new URL('./verdict-table.mjs', import.meta.url));
+  const gold = JSON.parse(readText(new URL('./fixtures/eligibility-gold.json', import.meta.url)));
+  const now = VT.verdictRows();
+  const key = (r) => `${r.id} ${r.text} ${r.exclude ? 1 : 0}`;
+  const nowMap = new Map(now.map((r) => [key(r), r.verdict]));
+  const drift = [];
+  let seen = 0;
+  for (const g of gold.rows) {
+    const v = nowMap.get(key(g));
+    if (!v) continue;   // 그 공고가 목록에서 빠졌으면 잴 것이 없다(목록은 매일 바뀐다)
+    seen += 1;
+    for (const p of Object.keys(g.verdict)) {
+      if ((g.verdict[p] || null) !== (v[p] || null)) drift.push(`${g.id} · ${p} · ${g.text.slice(0, 40)} : ${g.verdict[p] || '·'} → ${v[p] || '·'}`);
+    }
+  }
+  eq(`정답표 ${gold.rows.length}줄 중 아직 목록에 있는 줄을 실제로 쟀다`, seen > 0, true);
+  eq('  엔진 판정이 정답표와 같다 (다르면 표를 읽고 --write-gold)', drift, []);
+  eq('  정답표는 사람이 읽은 뒤 굳힌다고 적혀 있다', /사람이 표를 읽은 뒤에만/.test(gold.note || ''), true);
+}
+
+/* ── 2026-09-17 · 노션 G-3 — 마감일 감사 (틀린 마감은 못 읽은 것보다 나쁘다) ──
+   개발자 지적: "마감일이 아직 지나지 않았음에도 마감된 공고라고 뜨면서 신청 불가로 뜨는 문제".
+   verify/deadline-audit.mjs 가 마감마다 **근거 줄**을 찾고 말이 되는지 본다. 전수 조사 결과:
+   마감 47건 중 43건은 근거가 있고, 4건은 2026-09-12 자동 등록이 **게시판 요약 한 줄**에서 읽었는데
+   그 요약이 어디에도 저장되지 않아 근거를 잃었다(아래 톱니의 천장 4가 그것이다). */
+console.log('\n■ 마감일 감사 — 근거 없는 마감이 늘지 않는다 (2026-09-17 · 노션 G-3)');
+{
+  process.env.DEADLINE_AUDIT_AS_LIB = '1';
+  const DA = await import(new URL('./deadline-audit.mjs', import.meta.url));
+  /* ① 문구에서 끝 날짜 — 발표·지급 날짜는 마감이 아니다 */
+  eq('문구의 마지막 날짜를 끝으로 읽는다 (신청 2026.7.6 ~ 8.31)', DA.lastDateIn('신청 2026.7.6(월) ~ 8.31(월) 18:00', '2026'), '2026-08-31');
+  eq('  발표 날짜는 마감이 아니다 (모집 ~2026.8.5 · 선발 발표 8.26)', DA.lastDateIn('모집 ~2026.8.5 · 선발 발표 8.26(수)', '2026'), '2026-08-05');
+  eq('  해가 없으면 빌린다 (~9/18)', DA.lastDateIn('접수 ~9/18', '2026'), '2026-09-18');
+  eq('  날짜가 없으면 null', DA.lastDateIn('접수 기간 원문 확인', '2026'), null);
+  /* ② 전수 — 톱니. 근거 없는 마감이 지금(4건)보다 늘면 빨간불.
+        줄이면 천장을 내릴 것 · 올리려면 그 마감이 어디서 왔는지 먼저 적을 것. */
+  const rows = DA.auditDeadlines(new Date('2026-09-17T00:00:00'));
+  const noEvidence = rows.filter((r) => r.flags.some((f) => /근거를 못 찾음/.test(f)));
+  eq(`근거 없는 마감이 4건을 넘지 않는다 (지금 ${noEvidence.length}건: ${noEvidence.map((r) => r.id).join(', ') || '없음'})`,
+    noEvidence.length <= 4, true);
+  const wrongLabel = rows.filter((r) => r.flags.some((f) => /화면 문구의 끝 날짜/.test(f)));
+  eq('화면 문구의 끝 날짜와 마감이 어긋난 공고가 없다', wrongLabel.map((r) => `${r.id} ${r.deadline} vs 문구 「${r.period}」`), []);
+  const farAway = rows.filter((r) => r.flags.some((f) => /1년 넘게/.test(f)));
+  eq('등록일에서 1년 넘게 먼 마감이 없다', farAway.map((r) => r.id), []);
+  /* ③ 마감이 있는 공고는 전부 ISO 날짜이고 실제로 있는 날이다 — 틀린 꼴은 dday 가 NaN 을 낸다 */
+  const badIso = rows.filter((r) => r.deadline && !(/^\d{4}-\d{2}-\d{2}$/.test(r.deadline) && !Number.isNaN(new Date(r.deadline + 'T00:00:00').getTime())));
+  eq('마감은 전부 YYYY-MM-DD 이고 달력에 있는 날이다', badIso.map((r) => `${r.id} ${r.deadline}`), []);
+  /* ④ 자동 등록이 제목·요약에서 읽은 마감은 그 문구를 표식에 남긴다 — 근거 없는 마감이 더 생기지 않게 */
+  const ar = readText(new URL('../collector/auto-register.mjs', import.meta.url));
+  eq('자동 등록이 마감을 읽으면 그 문구를 deadlineFrom 에 남긴다', /deadlineFrom: `게시판 요약 · \$\{/.test(ar), true);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
