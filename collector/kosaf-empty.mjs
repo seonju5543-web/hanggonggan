@@ -57,7 +57,9 @@ export function emptyVerdict({ name, chars }) {
    잘리므로 짧다고 빈 문서가 아니다. 경로는 path.join 으로만 만든다(이름 속 `%`·`#`). */
 export function readChars(repoRoot, filePath) {
   let best = null;
-  for (const suffix of ['.body.txt', '.txt']) {
+  /* `.ocr.txt` — 스캔 공고문을 OCR 이 읽어 둔 것(품질 관문 통과분만 · 2026-09-17). 이게 없으면
+     kosaf-fetch 의 OCR 단계가 만든 파일을 아무도 안 열어 스캔본이 계속 '열지 못함'으로 남는다. */
+  for (const suffix of ['.body.txt', '.txt', '.ocr.txt']) {
     const p = path.join(repoRoot, filePath + suffix);
     if (!fs.existsSync(p)) continue;
     const n = charsOfText(fs.readFileSync(p, 'utf8'));
