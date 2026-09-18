@@ -179,12 +179,53 @@ const eq = (label, got, want) => {
     await page.waitForTimeout(300);
   }
 
+  /* 🔴 **아이콘 버튼의 손가락 표적** (2026-09-18 개발자 결정 「충돌」 9 (b)).
+     실측으로 `.icon-btn`(알림 종 · 설정 톱니)이 38×38 이었다 — Apple 최소 44 에 6px 모자란다.
+     넓힌 것은 **누를 수 있는 넓이**뿐이고 보이는 38×38 은 그대로다(hover 면이 커지면
+     승인받은 모양이 바뀐다 — 그래서 `.my-edit-hint` 처럼 padding 으로 넓히지 않고
+     안 보이는 덧판 `.icon-btn::after` 로 넓혔다. style.css `.icon-btn` 절).
+     🔴 **크기를 재는 것으로는 증명이 안 된다** — 덧판은 눈에 안 보이고 상자 크기를 안 바꾼다.
+        그래서 네 귀퉁이를 **실제로 짚어 보고**(elementFromPoint) 버튼에 닿는지 센다.
+        되돌리면(덧판을 지우면) 귀퉁이가 빗나가 빨간불이 된다 — 확인함. */
+  {
+    const tap = await page.$eval('#btn-open-settings', (e) => {
+      const r = e.getBoundingClientRect();
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      const hit = (dx, dy) => {
+        const el = document.elementFromPoint(cx + dx, cy + dy);
+        return !!(el && (el === e || e.contains(el)));
+      };
+      /* 44 짜리 표적이면 중심에서 ±21 까지는 버튼에 닿아야 한다(가장자리 1px 여유) */
+      const d = 21;
+      return {
+        보이는크기: `${Math.round(r.width)}×${Math.round(r.height)}`,
+        귀퉁이넷: [hit(-d, -d), hit(d, -d), hit(-d, d), hit(d, d)].filter(Boolean).length,
+      };
+    });
+    eq('보이는 아이콘 버튼은 38×38 그대로다 (모양을 키우지 않았다)', tap.보이는크기, '38×38');
+    eq('🔴 손가락이 닿는 넓이는 44×44 다 (네 귀퉁이를 실제로 짚어 확인)', tap.귀퉁이넷, 4);
+  }
+
   console.log('\n■ 설정 화면 — 승인받은 목업 그대로인가');
   await page.click('#btn-open-settings');
   await page.waitForSelector('#screen-settings:not([hidden])');
   await page.waitForTimeout(500);
   eq('제목이 "설정"', (await page.textContent('#screen-settings .sub-header h2')).trim(), '설정');
   eq('왼쪽 위에 뒤로 버튼이 있다', await page.$eval('#btn-settings-back', (e) => e.offsetParent !== null), true);
+  /* 🔴 뒤로 버튼도 아이콘 버튼과 같은 처지였다 — padding 8 + svg 24 = 40×40 (2026-09-18).
+     안쪽 화면(설정·휴지통·약관·로그인활동…)에서 빠져나가는 문이 이것 하나뿐이라 같이 넓혔다.
+     여기서도 재는 것은 **손가락이 닿는 넓이**이지 보이는 크기가 아니다(같은 덧판). */
+  {
+    const tap = await page.$eval('#btn-settings-back', (e) => {
+      const r = e.getBoundingClientRect();
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2, d = 21;
+      const hit = (dx, dy) => { const el = document.elementFromPoint(cx + dx, cy + dy); return !!(el && (el === e || e.contains(el))); };
+      return { 보이는크기: `${Math.round(r.width)}×${Math.round(r.height)}`,
+        귀퉁이넷: [hit(-d, -d), hit(d, -d), hit(-d, d), hit(d, d)].filter(Boolean).length };
+    });
+    eq('보이는 뒤로 버튼은 40×40 그대로다 (모양을 키우지 않았다)', tap.보이는크기, '40×40');
+    eq('🔴 뒤로 버튼이 닿는 넓이도 44×44 다 (귀퉁이 넷을 실제로 짚어 확인)', tap.귀퉁이넷, 4);
+  }
   eq('MY 탭이 켜진 채로 남는다 (여기가 MY 안쪽이라는 표시)',
     await page.$eval('.nav-item[data-nav="my"]', (e) => e.classList.contains('active')), true);
 

@@ -234,6 +234,27 @@ input::placeholder { color: var(--text-weak); }
 .icon-btn { padding: 8px; color: var(--text-weak); border-radius: var(--radius-sm); transition: background 0.15s, color 0.15s; }
 .icon-btn:hover { background: rgba(18, 22, 31, 0.05); color: var(--text-sub); }
 .icon-btn svg { width: 22px; height: 22px; display: block; }
+/* 🔴 손가락이 닿는 넓이만 44 로 넓힌다 — **보이는 모양은 38 그대로** (2026-09-18 개발자 결정 「충돌」 9 (b)).
+   Apple 최소 표적은 44 인데 padding 8 + svg 22 = 38 이라 6px 모자랐다(실측 38×38).
+   🔴 padding 을 키워 넓히지 말 것 — 이 버튼들은 화면 가장자리에 **음수 여백으로 딱 맞춰**
+      둔 것이라(.page-header-row .icon-btn · .sub-back) padding 이 3~4px 만 늘어도 아이콘이
+      제목·가장자리와 어긋나고, 보이는 hover 면도 같이 커진다. 넓히는 것은 '누를 수 있는 넓이'
+      하나이지 '그려지는 넓이'가 아니다.
+   ⚠️ 이 덧판은 **배경이 없어 눈에 안 보인다** — 크기를 재는 검사로는 지워져도 초록불이다.
+      그래서 관문은 `verify/verify-settings.js` 「아이콘 버튼의 손가락 표적」 절이고,
+      거기서 **네 귀퉁이를 실제로 짚어**(elementFromPoint) 버튼에 닿는지 센다.
+      🔴 ui-tone.mjs 에는 이 검사가 없다 — 거기서 찾지 말 것.
+   이미 같은 이유로 min-height:44 를 직접 준 형제가 있다 — `.sort-btn`(2026-08-26).
+   🔴 뒤로 버튼(`.sub-back`)도 같은 처지였다 — padding 8 + svg 24 = **40×40**(실측 · 8곳).
+      안쪽 화면에서 빠져나가는 문이 이것 하나뿐이라 같이 넓힌다. */
+.icon-btn, .sub-back { position: relative; }
+.icon-btn::after, .sub-back::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 44px; height: 44px;
+  transform: translate(-50%, -50%);
+}
 .link-btn { color: var(--text-weak); font-size: var(--t-sm); font-weight: 600; }
 
 /* ---------------- 온보딩 ---------------- */
