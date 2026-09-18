@@ -1112,6 +1112,61 @@ console.log('\n■ 수집망 좁히기 (2026-08-30)');
   eq('로봇은 parked 를 읽지 않는다', /\.parked/.test(cm) || /\.parked/.test(bc), false);
 }
 
+console.log('\n■ 학적정보 수정이 다른 칸을 지우지 않는다 (2026-09-18 코드 리뷰)');
+{
+  /* 🔴 `collectProfile()` 은 프로필 객체를 **통째로 새로 만든다** — 그 화면에 칸이 없는 값은
+     여기에 적지 않으면 저장을 누르는 순간 사라진다. `common`(서류 정보)이 이미 그래서
+     `Object.assign` 으로 물려받고 있었는데, 2026-09-18 에 들어온 `traits`(처지)가 빠져
+     **MY → 학적정보 수정 저장 한 번에 학생이 답해 둔 처지가 전부 날아가고** 있었다.
+     ⚠️ 프로필에 화면 밖 칸을 새로 만들면 여기 한 줄을 더하는 것까지가 한 세트다. */
+  const app = readText(new URL('../app.js', import.meta.url));
+  const at = app.indexOf('function collectProfile');
+  let fn = '';
+  if (at >= 0) {
+    let depth = 0;
+    for (let j = app.indexOf('{', at); j < app.length; j++) {
+      if (app[j] === '{') depth++;
+      else if (app[j] === '}' && --depth === 0) { fn = app.slice(at, j + 1); break; }
+    }
+  }
+  fn = fn.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  /* 함수를 못 자르면 아래가 빈 문자열을 상대로 조용히 통과한다 — 심장을 먼저 못 박는다 */
+  eq('학적정보를 모으는 함수를 통째로 찾았다 (못 찾으면 아래가 헛돈다)',
+    /school:/.test(fn) && /flags:/.test(fn), true);
+  for (const key of ['common', 'traits']) {
+    eq(`  화면에 칸이 없는 '${key}' 를 물려받는다 (저장해도 안 지워진다)`,
+      new RegExp(key + ':\\s*Object\\.assign\\(\\{\\},\\s*\\(state\\.profile').test(fn), true);
+  }
+}
+
+console.log('\n■ 병합 충돌 표식이 파일에 남지 않는다 (2026-09-18 실사고)');
+{
+  /* 🔴 **실제로 main 까지 나갔다** — `style.css` 에 `<<<<<<< HEAD`·`=======`·`>>>>>>> …` 세 줄이
+     커밋된 채 배포돼 있었다. 조용한 사고라 아무도 못 봤다: JS 였다면 즉시 죽지만 **CSS 는
+     안 죽고 그냥 버린다**. 브라우저 파서는 표식을 선택자로 읽고 다음 `{` 까지 삼켜서,
+     **표식 하나당 바로 뒤 규칙 한 개**가 사라진다.
+     실측(표식 제거 전/후): 규칙 1,210 → 1,213 · `.hero-amount` 1 → 2벌 ·
+     `.elig-ask-yn` 0 → 1 · `.elig-ask` 0 → 1 · 홈 히어로 아래 여백 **2px → 20px**
+     (그 블록 주석이 경고하던 바로 그 증상이 실제로 일어나 있었다).
+     🔴 이 관문은 **앱이 싣는 파일 전부**를 본다 — 한 파일만 보면 다음엔 옆 파일에서 난다. */
+  const files = ['style.css', 'app.js', 'index.html', 'sw.js', 'data.js', 'match-engine.js',
+    'boot.js', 'resume.js', 'notify.js', 'notify-rules.js', 'chat.js', 'forms.js',
+    'parse-amount.js', 'section-head.js', 'interactions.js', 'elig-ask.js',
+    'form-plan.js', 'essay.js', 'essay-quality.js', 'essay-submit-check.js',
+    '_admin/admin.css', '_admin/admin.js'];
+  /* ⚠️ 줄 **처음**에 온 것만 본다 — 본문·주석에 `=======` 같은 구분선을 긋는 파일이 있다
+     (이 저장소 주석이 실제로 `═` 를 쓴다). 표식은 늘 0열에서 시작한다. */
+  const MARK = /^(<{7} |={7}$|>{7} )/m;
+  const dirty = files.filter((f) => {
+    let t; try { t = readText(new URL('../' + f, import.meta.url)); } catch (e) { return false; }
+    return MARK.test(t);
+  });
+  eq('앱이 싣는 파일에 병합 충돌 표식이 없다', dirty, []);
+  /* 🔴 파일 목록이 비면 위 줄이 **아무것도 안 세고 통과**한다 — 실제로 읽혔는지 못 박는다 */
+  eq('  검사가 실제로 파일을 읽었다 (빈 목록을 상대로 통과하지 않는다)',
+    readText(new URL('../style.css', import.meta.url)).length > 1000, true);
+}
+
 console.log('\n■ 교내·교외 분류와 주관 기관 (2026-09-18 개발자 지시)');
 {
   /* 🔴 개발자 지적으로 드러난 것: 학생 카드가 `교내 · 경희대학교 게시 공고 /
@@ -1226,10 +1281,14 @@ console.log('\n■ 교내·교외 분류와 주관 기관 (2026-09-18 개발자 
     }
     return '';
   };
-  const liveFn = cutFn(app, 'liveNoticesHtml')
+  /* 🔴 **카드 그림은 `noticeCardHtml` 한 곳이다** (2026-09-18 오후에 갈라 뒀다 — 홈과
+     '교내' 칸이 같은 그림을 쓴다). 여기서 함수 이름을 안 따라가면 아래 세 줄이 **빈 문자열을
+     상대로 조용히 통과**한다(이 저장소가 겪은 '자리를 옮기면 관문이 무력해진다' 유형).
+     그래서 바로 아래 '통째로 찾았다' 가 심장 노릇을 한다. */
+  const liveFn = cutFn(app, 'noticeCardHtml')
     .replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
   /* 이 함수의 심장(카드 마크업)이 실제로 잘려 왔는지 본다 — 길이만 보면 토막도 통과한다 */
-  eq('실시간 공고를 그리는 함수를 통째로 찾았다 (못 찾으면 아래가 헛돈다)',
+  eq('게시판 글 카드를 그리는 함수를 통째로 찾았다 (못 찾으면 아래가 헛돈다)',
     /sch-org/.test(liveFn) && /sch-name/.test(liveFn), true);
   /* 🔴 **게시판 글 카드는 교내/교외를 말하지 않는다** (2026-09-18 오후 개발자 지시:
      "교내 교외가 어디에 게시되느냐가 아니라 어떤 재단이 주최하는가가 기준이 되어야 돼").
@@ -1251,8 +1310,24 @@ console.log('\n■ 교내·교외 분류와 주관 기관 (2026-09-18 개발자 
   const homeFn = cutFnApp('renderHome');
   eq('탐색·홈 두 함수를 통째로 찾았다 (못 찾으면 아래가 헛돈다)',
     /explore-list/.test(exploreFn) && /home-deadline-list/.test(homeFn), true);
-  eq('"교내" 칸이 게시판 글을 그리지 않는다', /liveNoticesHtml/.test(exploreFn), false);
+  eq('"교내" 칸이 게시판 글을 통째로 그리지 않는다', /liveNoticesHtml/.test(exploreFn), false);
   eq('  대신 홈이 그린다', /#live-notices.*liveNoticesHtml\(\)/.test(homeFn), true);
+  /* 🔴 **학교가 `[교내]` 라고 적어 둔 글은 '교내' 칸에도 온다** (2026-09-18 개발자 지적:
+     *"실시간 공고 보니까 교내에서 진행되는 거 있는데 교내탭에는 안 들어가져 있어"*).
+     실측으로 확인한 것: 그때 홈에 떠 있던 한국외대 `[공통][교내] 2026-2학기 가족장학금` 이
+     '교내' 칸에는 한 장도 없었다. 우리가 주최를 알아맞히는 것이 아니라 **주최자가 적어 둔
+     글자**를 읽는 것이라 원칙 8-1(추론 금지)에 걸리지 않는다. */
+  eq('  학교가 [교내] 라고 적어 둔 게시판 글은 "교내" 칸에도 온다',
+    /boardNoticesInSchool\(\)/.test(exploreFn), true);
+  eq('    그 카드도 같은 그림을 쓴다 (베끼지 않는다)', /noticeCardHtml/.test(exploreFn), true);
+  /* 판정을 새로 만들지 않는다 — `noticeKind` 한 곳(로봇·앱이 같이 쓴다) */
+  const inSchoolFn = cutFnApp('boardNoticesInSchool');
+  eq('    판정은 공용 noticeKind 하나다', /noticeKind\(n\.title\) === '교내'/.test(inSchoolFn), true);
+  /* 목록 고르기도 한 곳 — 베끼면 홈에만 뜨거나 '교내' 칸에만 뜨는 공고가 생긴다 */
+  const forMeFn = cutFnApp('boardNoticesForMe');
+  eq('    홈과 같은 목록을 본다', /noticeForProfile\(n, p\)/.test(forMeFn)
+    && /boardNoticesForMe\(\)/.test(inSchoolFn)
+    && /boardNoticesForMe\(\)/.test(cutFnApp('liveNoticesHtml')), true);
   /* 홈에 그릴 자리가 실제로 있어야 한다 — 표식이 index.html 에서 빠지면 조용히 아무것도 안 뜬다 */
   const html = readText(new URL('../index.html', import.meta.url));
   const homeBlock = html.slice(html.indexOf('id="screen-home"'), html.indexOf('id="screen-explore"'));

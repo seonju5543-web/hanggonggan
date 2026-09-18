@@ -1170,6 +1170,11 @@ function collectProfile() {
     credits: $('#in-credits').value.trim() === '' ? null : Number($('#in-credits').value),
     birthYear: $('#in-birth-year').value.trim() === '' ? null : Number($('#in-birth-year').value),
     flags: $$('#in-flags input:checked').map((c) => c.value),
+    /* 🔴 **처지(traits) 는 이 화면에 칸이 없다 — 그래서 그대로 물려받는다** (2026-09-18 코드
+       리뷰). 학적정보 수정은 이 객체를 **통째로 새로 만들어** 프로필에 넣으므로, 여기 안
+       적으면 저장을 누르는 순간 학생이 답해 둔 처지가 전부 사라진다(아래 `common` 을
+       Object.assign 으로 물려받는 이유와 같다). */
+    traits: Object.assign({}, (state.profile && state.profile.traits) || {}),
     /* 지금 받고 있는 장학금 (2026-08-27) — 이중수혜 금지 공고를 자격 판정에서 거른다.
        '없음'을 눌렀으면 빈 배열, 아무것도 안 골랐으면 null(= 모른다). 둘은 다르다:
        빈 배열이면 "안 받는다"라 전부 지원 가능이고, null 이면 판정하지 않는다. */
@@ -1525,8 +1530,10 @@ function renderHome() {
   moreBtn.setAttribute('aria-expanded', homeDeadlineOpen ? 'true' : 'false');
 
   /* 🔴 **우리 학교 게시판 새 공고는 여기서 그린다** (2026-09-18 개발자 지시로 '교내' 칸에서 옮겼다).
-     이 카드들은 제목·링크뿐이라 **누가 주최하는지 모른다** — 그래서 '교내' 칸에 둘 수 없다
-     (거기 두면 외부 장학금이 교내로 섞여 보인다 · 개발자가 짚은 혼동이 그것이다).
+     이 카드들은 대개 제목·링크뿐이라 **누가 주최하는지 모른다** — 그래서 통째로는 '교내' 칸에
+     둘 수 없다(거기 두면 외부 장학금이 교내로 섞여 보인다 · 개발자가 짚은 혼동이 그것이다).
+     ✅ 그중 학교가 제목에 `[교내]` 라고 **직접 적어 둔 글**만 '교내' 칸 꼬리에도 함께 뜬다
+        (`boardNoticesInSchool` · 같은 날 개발자 지적). 여기서는 전부 그대로 나온다.
      ⚠️ 검색은 안 건다 — 홈에는 검색창이 없다(탐색에 있던 시절의 이유가 사라졌다). */
   $('#live-notices').innerHTML = liveNoticesHtml();
 
@@ -1614,8 +1621,9 @@ function renderExplore() {
      *"교내 장학금만 볼 수 있는 창을 누르면 교내에서 주최하는 성적장학금이나 가족장학금 등과
       같은 것만 올라왔으면 좋겠어 … 어떤 재단이 주최하는가가 기준이 되어야 돼."*
      → 게시판 글은 **홈**으로 옮겼다(renderHome · 사라지면 학생이 볼 곳이 없다는 같은 지시).
-     ⚠️ 이 칸은 학교 게시판에 교내 공고가 있어도 **우리가 안 읽었으면 0건**이다.
-        그래서 빈 문구가 '없어요' 로 끝나지 않고 홈을 가리킨다(아래 emptyMsg). */
+     ⚠️ 이 칸은 학교 게시판에 교내 공고가 있어도 **우리가 안 읽었고 학교도 `[교내]` 라고
+        안 적어 뒀으면 0건**이다. 그래서 빈 문구가 '없어요' 로 끝나지 않고 홈을 가리킨다
+        (아래 emptyMsg). 학교가 적어 둔 것은 `boardIn` 이 주워 온다. */
   const inSchoolTab = exploreFilter === '교내';
   /* 🔴 판정 3단(가능/정보부족/미달)은 **적합도순일 때만** 1차 키다 (2026-08-26 개발자 결정:
      "적합도를 기준으로 했을 때는 맨 아래에 두는 게 맞지"). 마감순·최신순에서는 고른 기준이
@@ -1649,16 +1657,18 @@ function renderExplore() {
       .filter(Boolean).join(' ').toLowerCase().includes(q));
   }
 
-  /* 🔴 **학교 게시판 글은 이제 홈에서 나온다** (2026-09-18 개발자 지시 · 되돌리지 말 것).
+  /* 🔴 **게시판 글을 통째로 이 칸에 붓지 말 것** (2026-09-18 개발자 지시).
      2026-09-17 에 '우리 학교' 칸을 '교내' 에 합쳤는데, 그 결과 **교내 칸에 외부 장학금이
      섞여** 보였다 — 개발자 지적: *"교내 장학금만 볼 수 있는 창을 누르면 교내에서 주최하는
      성적장학금이나 가족장학금 등과 같은 것만 올라왔으면 좋겠어 … 교내 교외가 어디에
      게시되느냐가 아니라 어떤 재단이 주최하는가가 기준이 되어야 돼."*
-     게시판 글은 제목·링크뿐이라 **주최를 알 수 없다**(실측으로 확인: 제목의 바깥 기관
+     게시판 글은 대개 제목·링크뿐이라 **주최를 알 수 없다**(실측으로 확인: 제목의 바깥 기관
      낱말로 갈라 보니 `정영오 장학금`·`구종서 장학금`·`금신사랑`·`선원가족` 같은 외부
-     장학금이 전부 '교내 후보'로 떨어졌다). 모르는 것을 교내라고 부르지 않는다 — 그래서
-     이 칸에는 **우리가 확인한 등록 공고만** 두고, 게시판 글은 홈으로 옮겼다(renderHome).
-     ⚠️ 여기로 되돌리지 말 것. 되돌리면 개발자가 짚은 그 혼동이 그대로 돌아온다. */
+     장학금이 전부 '교내 후보'로 떨어졌다). 모르는 것을 교내라고 부르지 않는다.
+     ✅ **예외는 학교가 스스로 `[교내]` 라고 적어 둔 글 하나뿐이다** — 그건 우리가 맞히는
+        것이 아니라 주최자가 적어 둔 것이라 아래 `boardIn` 으로 이 칸 꼬리에 붙인다
+        (같은 날 개발자 지적: *"교내에서 진행되는 거 있는데 교내탭에는 안 들어가져 있어"*).
+     ⚠️ 낱말 목록을 늘려 나머지를 맞히려 하지 말 것 — 그 길은 위 실측대로 틀린다. */
   /* 🔴 **구획 없이 한 목록이다** (2026-09-12 개발자 지시: "오늘 내일 마감 이번 주 마감
      이번 달 마감 삭제 후 하나로 통합, 적합도 순 마감 임박순 이런 거 하나도 안 지켜짐").
      2026-09-10 페이스리프트가 마감으로 7구획을 나눴는데, 구획이 **마감 순서로 고정**이라
@@ -1674,8 +1684,19 @@ function renderExplore() {
     : (inSchoolTab
       ? '확인된 교내 장학금이 아직 없어요<br /><span class="empty-sub">학교 게시판 새 공고는 홈에서 볼 수 있어요</span>'
       : '조건에 맞는 장학금이 없어요');
-  $('#explore-list').innerHTML = list.length
+  /* 🔴 **학교가 `[교내]` 라고 적어 둔 게시판 글은 이 칸에도 온다** (2026-09-18 개발자 지적:
+     *"실시간 공고 보니까 교내에서 진행되는 거 있는데 교내탭에는 안 들어가져 있어"*).
+     우리가 원문을 읽어 등록한 카드가 먼저 오고, 그 **뒤에** 게시판 글이 붙는다 — 읽은 것과
+     읽지 않은 것을 섞지 않는다(게시판 글 카드는 `.notice-card` 라 겉모습부터 다르고,
+     아랫줄이 '원문 보기 ↗' 라고 말한다. 누르면 예전처럼 학교 게시판으로 나간다).
+     ⚠️ 검색어는 여기에도 건다 — 안 걸면 '검색했는데 그대로'가 된다(2026-09-12 · UI-16).
+        카드에 보이는 글자(제목)로만 거른다, 위 등록 공고와 같은 규칙이다. */
+  const boardIn = inSchoolTab
+    ? boardNoticesInSchool().filter((n) => !q || String(unent(n.title)).toLowerCase().includes(q))
+    : [];
+  $('#explore-list').innerHTML = (list.length || boardIn.length)
     ? list.map((m) => schCard(m.sch, m.result, { fit: m.fit, fd: m.fd })).join('')
+      + boardIn.map(noticeCardHtml).join('')
     : `<p class="empty">${emptyMsg}</p>`;
 }
 
@@ -2355,6 +2376,41 @@ function liveNoticesHead(updatedAt) {
 /* ⚠️ 검색 인자를 걷었다 (2026-09-18) — 이 목록이 탐색 화면에 있던 시절에는 그 화면의
    검색창이 안 걸리면 "검색했는데 그대로"가 됐다(2026-09-12 · UI-16). 홈에는 검색창이
    없으므로 그 이유가 사라졌다. 다시 검색이 필요해지면 그 화면에 창이 생길 때 같이 둔다. */
+/* 게시판 글 중 **내 학교 것 · 아직 등록 안 한 것**만 고른다 (2026-09-18 분리).
+   🔴 이 목록을 두 곳이 본다 — 홈의 '우리 학교 게시판 공고' 와 '교내' 칸의 꼬리
+   (`renderExplore`). 베끼면 한쪽에만 뜨는 공고가 생긴다. */
+function boardNoticesForMe() {
+  const p = state.profile;
+  if (!p || !liveNotices) return [];
+  // 정식 등록된 공고(registered.json + data.js 실공고)는 카드로 노출되므로 피드에서 제외
+  // URL 뒤에 목록 파라미터가 붙는 경우가 있어 전방일치로 비교한다
+  const regUrls = registeredList.map((s) => s.sourceUrl)
+    .concat(NATIONAL_SCHOLARSHIPS.filter((s) => s.sourceKind === 'official' && s.sourceUrl).map((s) => s.sourceUrl))
+    .filter(Boolean);
+  const isRegistered = (url) => regUrls.some((u) => url.startsWith(u) || u.startsWith(url));
+  /* 내 학교 공고인지는 match-engine이 정한다 — 알림(notify-rules)도 같은 함수를 쓴다 */
+  const forMe = (liveNotices.items || []).filter((n) => noticeForProfile(n, p) && !isRegistered(n.url));
+  /* 학자금 대출·융자는 장학금이 아니라서 매칭 카드로는 만들지 않는다(정직 원칙).
+     그렇다고 피드에서까지 밀려 잘리면 학생이 대출 정보를 아예 볼 곳이 없어지므로,
+     장학 공고를 앞에 두되 대출 공고는 뒤에 둔다 (2026-07-30 조정). */
+  const isLoan = (n) => /대출|융자/.test(n.title);
+  return forMe.filter((n) => !isLoan(n)).concat(forMe.filter(isLoan));
+}
+
+/* 🔴 **'교내' 칸에 함께 놓을 게시판 글** (2026-09-18 개발자 지적:
+   *"실시간 공고 보니까 교내에서 진행되는 거 있는데 교내탭에는 안 들어가져 있어"*).
+   실측으로 확인한 것 하나 — 한국외대 `[공통][교내] 2026-2학기 가족장학금` 이 홈에만 있고
+   '교내' 칸에는 없었다(수집 기록 650건 중 학교가 제목에 `교내` 를 적어 둔 것이 29건).
+   🔴 **우리가 주최를 알아맞히는 것이 아니다** — 학교가 제 게시판에 `[교내]` 라고 **직접
+      적어 둔 글**만 온다. 그게 `noticeKind` 가 하는 일이고, 판정은 `match-engine.js`
+      한 곳뿐이다(등록 로봇 auto-register 도 같은 함수를 쓴다).
+   ⚠️ 제목에 표식이 없는 교내 장학금(경희대 반영장학·우정장학 등)은 여기 안 온다 —
+      그건 원문을 읽어 정식 등록해야 알 수 있고, 그러면 이 꼬리가 아니라 카드가 된다.
+      낱말 목록을 늘려 맞히려 하지 말 것(이 저장소가 같은 방식으로 여러 번 틀렸다). */
+function boardNoticesInSchool() {
+  return boardNoticesForMe().filter((n) => noticeKind(n.title) === '교내');
+}
+
 function liveNoticesHtml() {
   const p = state.profile;
   if (!p) return '';
@@ -2368,31 +2424,22 @@ function liveNoticesHtml() {
   if (!liveNotices) {
     return liveNoticesHead('') + (typeof skeletonRows === 'function' ? skeletonRows(3) : '');
   }
-  // 정식 등록된 공고(registered.json + data.js 실공고)는 카드로 노출되므로 피드에서 제외
-  // URL 뒤에 목록 파라미터가 붙는 경우가 있어 전방일치로 비교한다
-  const regUrls = registeredList.map((s) => s.sourceUrl)
-    .concat(NATIONAL_SCHOLARSHIPS.filter((s) => s.sourceKind === 'official' && s.sourceUrl).map((s) => s.sourceUrl))
-    .filter(Boolean);
-  const isRegistered = (url) => regUrls.some((u) => url.startsWith(u) || u.startsWith(url));
-  /* 내 학교 공고인지는 match-engine이 정한다 — 알림(notify-rules)도 같은 함수를 쓴다 */
-  const forMe = (liveNotices.items || []).filter((n) => noticeForProfile(n, p) && !isRegistered(n.url));
-  /* 학자금 대출·융자는 장학금이 아니라서 매칭 카드로는 만들지 않는다(정직 원칙).
-     그렇다고 피드에서까지 밀려 잘리면 학생이 대출 정보를 아예 볼 곳이 없어지므로,
-     장학 공고를 앞에 두되 대출 공고 자리 2칸을 따로 남겨 둔다 (2026-07-30 조정). */
-  const isLoan = (n) => /대출|융자/.test(n.title);
-  const scholarships = forMe.filter((n) => !isLoan(n));
-  const loans = forMe.filter(isLoan);
   /* 🔴 **상한을 걷었다** (2026-09-12 · UI-16). 8+2 는 이 목록이 '전체' 카드 **아래에**
      얹혀 있던 시절의 자리 다툼 때문이었다 — 제 칸이 생겼으니 학생이 보러 온 것을 잘라서
-     보여 줄 이유가 없다(실측: 한국외국어대학교 22건 · 경희대학교 17건).
-     ⚠️ 차례는 그대로 둔다 — 학자금 대출·융자는 장학금이 아니라서 **뒤에** 둔다
-        (정직 원칙 · 2026-07-30 조정). 없애지는 않는다: 앱에 대출 안내가 여기뿐이다. */
-  let mine = scholarships.concat(loans);
+     보여 줄 이유가 없다(실측: 한국외국어대학교 22건 · 경희대학교 17건). */
+  const mine = boardNoticesForMe();
   const head = liveNoticesHead(liveNotices.updatedAt);
   if (!mine.length) {
     return head + `<p class="empty" style="margin-bottom:16px">아직 ${esc(p.school)} 게시판 연결 전이거나 새 공고가 없어요<br />연결되면 실제 공고가 여기에 자동으로 떠요.</p>`;
   }
-  return head + `<div class="card-list" style="margin-bottom:18px">` + mine.map((n) => `
+  return head + `<div class="card-list" style="margin-bottom:18px">` + mine.map(noticeCardHtml).join('') + `</div>`;
+}
+
+/* 게시판 글 카드 한 장 — 홈과 '교내' 칸이 **같은 그림**을 쓴다 (2026-09-18 분리).
+   ⚠️ 베끼지 말 것: 2026-09-11 에 카드 그림이 두 벌이라 한쪽에만 배지 무더기가 남아 있었다
+      (실측 147장 중 9장). */
+function noticeCardHtml(n) {
+  return `
     <a class="sch-card notice-card" href="${esc(safeUrl(n.url))}" target="_blank" rel="noopener">
       ${/* 🔴 맨 윗줄은 매칭 카드와 **같은 말투**다 — 기관 글 + 판정 하나 (2026-09-11).
            예전엔 배지 셋(`교내 공고`·`마감 임박`·`양식 2`)이 한 줄을 채워, 페이스리프트로
@@ -2427,7 +2474,7 @@ function liveNoticesHtml() {
       <p class="sch-name">${esc(unent(n.title))}</p>
       ${n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? `<p class="sch-provider">${esc(unent(n.deadlineHint))}</p>` : ''}
       <p class="sch-provider">${(n.attachments || []).length ? `첨부 ${(n.attachments || []).length}개 · ` : ''}${esc(n.foundAt || '')} 수집 · ${isBoardListLink(n.url) ? '게시판 목록에서 보기 ↗' : '원문 보기 ↗'}</p>
-    </a>`).join('') + `</div>`;
+    </a>`;
 }
 
 /* ---------------- 제출: 복사 · 파일 공유 ---------------- */

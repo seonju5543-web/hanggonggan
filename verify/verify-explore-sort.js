@@ -235,12 +235,21 @@ const PROFILE = {
   /* 🔴 **오늘 수집분에 기대지 않는다** — 실시간 공고는 60일이 지나면 지워지고(collect.mjs),
      한 학교의 수집이 며칠 멈추면 0건이 된다. 그러면 앱은 멀쩡한데 이 절이 빨간불이 되고,
      이 저장소는 그런 관문이 통째로 꺼진 적이 있다. 그래서 한 건을 심어 둔다. */
+  /* 🔴 **표식 있는 것과 없는 것을 둘 다 심는다** (2026-09-18 개발자 지적:
+     *"실시간 공고 보니까 교내에서 진행되는 거 있는데 교내탭에는 안 들어가져 있어"*).
+     하나만 심으면 '교내 칸에 게시판 글이 오는가'와 '아무거나 오지는 않는가' 중 한쪽만 재고,
+     되돌려도 초록불이 된다. `[교내]` 는 실제 게시판 제목의 꼴이다
+     (한국외대 `[공통][교내] 2026-2학기 가족장학금 신청 안내`). */
   await page.evaluate(() => {
     const p = state.profile;
-    liveNotices = { updatedAt: '2026-09-12', items: (liveNotices && liveNotices.items || []).concat([{
-      title: '검사용 우리 학교 공고', school: p.school, campus: p.campus || '',
-      url: 'https://example.ac.kr/notice/1', attachments: [], foundAt: '2026-09-12',
-    }]) };
+    const at = (title, n) => ({
+      title, school: p.school, campus: p.campus || '',
+      url: 'https://example.ac.kr/notice/' + n, attachments: [], foundAt: '2026-09-12',
+    });
+    liveNotices = { updatedAt: '2026-09-12', items: (liveNotices && liveNotices.items || []).concat([
+      at('검사용 우리 학교 공고', 1),
+      at('[공통][교내] 검사용 교내 가족장학금 신청 안내', 2),
+    ]) };
     renderHome();
   });
   /* 🔴 **게시판 글은 이제 홈에 있다** (2026-09-18 개발자 지시 · 아래 단언들이 그것을 못 박는다).
@@ -256,7 +265,12 @@ const PROFILE = {
     /* 🔴 **화면을 한정해 센다** — `#live-notices` 는 이제 홈에 있고, 화면이 숨어 있어도
        querySelectorAll 은 찾아낸다. 한정하지 않으면 '교내 칸에 없다'가 영영 거짓이 된다. */
     탐색안_공고: document.querySelectorAll('#screen-explore .notice-card').length,
+    /* 🔴 '교내' 칸에 온 게시판 글은 **학교가 `[교내]` 라고 적어 둔 것뿐**이어야 한다 */
+    탐색안_제목: [...document.querySelectorAll('#screen-explore .notice-card .sch-name')]
+      .map((e) => e.textContent),
     홈안_공고: document.querySelectorAll('#screen-home #live-notices .notice-card').length,
+    홈제목: [...document.querySelectorAll('#screen-home #live-notices .notice-card .sch-name')]
+      .map((e) => e.textContent),
     정렬버튼: !document.querySelector('#explore-sort-btn').hidden,
     /* 🔴 '마감 임박' 배지는 여기 없어야 한다 — 우리는 이 글의 마감일을 모른다(원칙 8-1) */
     임박배지: document.querySelectorAll('#live-notices .badge-dday').length,
@@ -264,8 +278,15 @@ const PROFILE = {
     종류말함: [...document.querySelectorAll('#live-notices .notice-card .sch-org')]
       .filter((e) => /교내|교외/.test(e.textContent)).length,
   }));
-  eq('🔴 게시판 글이 교내 칸에 나오지 않는다 (주최를 모르므로)', nt.탐색안_공고, 0);
+  /* 🔴 **주최를 모르는 게시판 글은 이 칸에 오지 않는다** (2026-09-18 오전 지시) —
+     그런데 학교가 스스로 `[교내]` 라고 적어 둔 글은 온다(같은 날 오후 지적).
+     두 줄이 함께 서야 뜻이 산다: 아무거나 오지도 않고, 적어 둔 것을 놓치지도 않는다. */
+  eq('🔴 주최 모르는 게시판 글은 교내 칸에 나오지 않는다',
+    nt.탐색안_제목.filter((t) => !/\[교내\]/.test(t)).length, 0);
+  eq('🔴 학교가 [교내] 라고 적어 둔 글은 교내 칸에 나온다',
+    nt.탐색안_제목.filter((t) => /검사용 교내 가족장학금/.test(t)).length, 1);
   eq('  대신 홈에 나온다 (사라지지 않는다)', nt.홈안_공고 > 0, true);
+  eq('  홈에는 표식 없는 것도 그대로 나온다', nt.홈제목.some((t) => /검사용 우리 학교 공고/.test(t)), true);
   eq('  등록 공고 자리에 교외가 섞이지 않는다', nt.교외섞임, 0);
   eq('  정렬 버튼은 보인다 (등록 공고가 함께 있으므로)', nt.정렬버튼, true);
   eq('  마감일을 모르므로 「마감 임박」이라고 하지 않는다', nt.임박배지, 0);
@@ -274,18 +295,39 @@ const PROFILE = {
      뜻으로 읽힌다. 우리가 아직 안 읽었을 뿐이므로 어디를 보면 되는지(홈) 말한다.
      🔴 **등록분을 실제로 0건으로 만들어 재야 한다** — 이 프로필에는 교내 등록 공고가
         있어서, 그냥 재면 빈 상태가 아예 안 일어나 되돌려도 초록불이 된다(실측으로 걸렸다). */
-  eq('  교내 등록분이 0건이면 홈을 가리킨다', await page.evaluate(() => {
-    const keep = registeredList;
+  /* 🔴 **게시판 글도 함께 비워야 '빈 상태'가 일어난다** (2026-09-18) — `[교내]` 표식 글이
+     이 칸 꼬리에 붙게 된 뒤로, 등록분만 비우면 카드가 1장 남아 빈 문구가 아예 안 나온다.
+     그대로 두면 이 줄이 **되돌려도 초록불인 죽은 관문**이 된다. */
+  eq('  교내 등록분도 게시판 글도 0건이면 홈을 가리킨다', await page.evaluate(() => {
+    const keep = registeredList, keepN = liveNotices;
     registeredList = registeredList.filter((s) => s.type !== '교내');
+    liveNotices = { updatedAt: keepN.updatedAt, items: [] };
     renderExplore();
     const el = document.querySelector('#explore-list .empty');
     const got = {
       등록카드: document.querySelectorAll('#explore-list .sch-card').length,
       홈안내: !!(el && /홈/.test(el.textContent)),
     };
-    registeredList = keep; renderExplore();
+    registeredList = keep; liveNotices = keepN; renderExplore();
     return got;
   }), { 등록카드: 0, 홈안내: true });
+  /* 🔴 등록분이 0건이어도 **게시판 글이 있으면 그것을 보여 준다** — '없어요' 라고 말하면
+     학생이 학교에 교내 장학금이 없다고 읽는다. 있는 것을 숨기는 쪽이 더 나쁘다. */
+  eq('  등록분이 0건이어도 [교내] 게시판 글은 보여 준다', await page.evaluate(() => {
+    const keep = registeredList;
+    registeredList = registeredList.filter((s) => s.type !== '교내');
+    renderExplore();
+    /* ⚠️ 개수를 못 박지 말 것 — 오늘 수집분에 진짜 `[교내]` 공고가 섞이면(2026-09-18 실측:
+       한국외대 `[공통][교내] 2026-2학기 가족장학금`) 숫자가 달라져 멀쩡한 화면이 빨간불이 된다.
+       심어 둔 것이 **들어 있는가**로 본다. */
+    const got = {
+      심은것: [...document.querySelectorAll('#explore-list .notice-card .sch-name')]
+        .filter((e) => /검사용 교내 가족장학금/.test(e.textContent)).length,
+      빈문구: document.querySelectorAll('#explore-list .empty').length,
+    };
+    registeredList = keep; renderExplore();
+    return got;
+  }), { 심은것: 1, 빈문구: 0 });
   /* 🔴 탐색 검색이 **홈의 게시판 글을 건드리지 않는다** — 다른 화면의 목록이다.
      예전엔 이 목록이 탐색에 있어 검색을 걸어야 했다(2026-09-12 UI-16). 자리가 바뀌면
      그 이유도 같이 사라진다 — 남겨 두면 홈 목록이 탐색 검색어로 조용히 비어 버린다. */
