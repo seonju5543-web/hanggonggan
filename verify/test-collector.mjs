@@ -1231,10 +1231,34 @@ console.log('\n■ 교내·교외 분류와 주관 기관 (2026-09-18 개발자 
   /* 이 함수의 심장(카드 마크업)이 실제로 잘려 왔는지 본다 — 길이만 보면 토막도 통과한다 */
   eq('실시간 공고를 그리는 함수를 통째로 찾았다 (못 찾으면 아래가 헛돈다)',
     /sch-org/.test(liveFn) && /sch-name/.test(liveFn), true);
-  eq('실시간 공고 카드가 "교내 공고" 로 못 박혀 있지 않다', /교내 공고/.test(liveFn), false);
-  eq('  같은 판정 함수(noticeKind)를 쓴다', /noticeKind\(n\.title\)/.test(liveFn), true);
+  /* 🔴 **게시판 글 카드는 교내/교외를 말하지 않는다** (2026-09-18 오후 개발자 지시:
+     "교내 교외가 어디에 게시되느냐가 아니라 어떤 재단이 주최하는가가 기준이 되어야 돼").
+     제목·링크뿐이라 주최를 모른다 — 아는 것(어느 게시판에서 왔나)만 적는다.
+     ⚠️ 같은 날 아침에 `교내 공고` → `noticeKind` 로 고쳤다가, 그것도 주최가 아니라
+        제목 표식일 뿐이라는 것이 실측으로 드러나 **아예 안 적는 쪽**으로 다시 바꿨다. */
+  eq('게시판 글 카드가 "교내 공고" 로 못 박혀 있지 않다', /교내 공고/.test(liveFn), false);
+  eq('  교내/교외를 아예 말하지 않는다 (주최를 모르므로)',
+    /교내|교외|noticeKind/.test(liveFn), false);
+  eq('  어느 게시판에서 왔는지는 적는다', /게시판</.test(liveFn), true);
   /* 브라우저에서는 전역으로 잡힌다 — 내보내기 목록에서 빠지면 Node 검사만 통과하고 앱이 죽는다 */
   eq('  noticeKind 가 Node 쪽으로도 내보내진다', /noticeKind, NOTICE_CAMPUS_MARK/.test(eng), true);
+
+  /* 🔴 **'교내' 칸에는 우리가 확인한 등록 공고만 온다** (2026-09-18 개발자 지시).
+     게시판 글을 그 칸에 되돌리면 개발자가 짚은 혼동(교내 칸에 외부 장학금)이 그대로 돌아온다.
+     옮긴 자리는 홈이다 — 사라지면 학생이 학교 게시판 새 공고를 볼 곳이 없어진다. */
+  const cutFnApp = (name) => cutFn(app, name).replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  const exploreFn = cutFnApp('renderExplore');
+  const homeFn = cutFnApp('renderHome');
+  eq('탐색·홈 두 함수를 통째로 찾았다 (못 찾으면 아래가 헛돈다)',
+    /explore-list/.test(exploreFn) && /home-deadline-list/.test(homeFn), true);
+  eq('"교내" 칸이 게시판 글을 그리지 않는다', /liveNoticesHtml/.test(exploreFn), false);
+  eq('  대신 홈이 그린다', /#live-notices.*liveNoticesHtml\(\)/.test(homeFn), true);
+  /* 홈에 그릴 자리가 실제로 있어야 한다 — 표식이 index.html 에서 빠지면 조용히 아무것도 안 뜬다 */
+  const html = readText(new URL('../index.html', import.meta.url));
+  const homeBlock = html.slice(html.indexOf('id="screen-home"'), html.indexOf('id="screen-explore"'));
+  eq('  그 자리(#live-notices)가 홈 안에 있다', /id="live-notices"/.test(homeBlock), true);
+  eq('  탐색 화면에는 없다',
+    /id="live-notices"/.test(html.slice(html.indexOf('id="screen-explore"'))), false);
 }
 
 console.log('\n■ 정식 등록 대상 학교 좁히기 (2026-08-30)');
