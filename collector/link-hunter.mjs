@@ -56,7 +56,7 @@
 import fs from 'node:fs';
 import { chromium } from 'playwright';
 import { cleanTitle } from './clean-title.mjs';
-import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, titleFingerprint, detailCandidates, idsFromSource, looksLikeLoginWall, rowDetailCandidates, looksLikeList } from './detail-url.mjs';
+import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, rowByCore, titleFingerprint, detailCandidates, idsFromSource, looksLikeLoginWall, rowDetailCandidates, looksLikeList } from './detail-url.mjs';
 /* 🔴 발행 직전 중복 정리는 **수집기와 같은 규칙**을 쓴다 (2026-09-04 신설).
    사냥꾼은 표식(#n-)을 진짜 주소로 바꾸는 로봇이라, 같은 공고가 서로 다른 표식으로
    두 번 담겨 있으면 **둘 다 같은 주소로 풀려 중복이 된다.** 그 중복 하나 때문에
@@ -571,7 +571,19 @@ for (const [listUrl, group] of boards) {
       if (outOfTime()) break;
       const want = huntTitle(t);
       const others = rows.map((r) => r.t).filter((x) => !sameTitle(want, x)).slice(0, 40);
-      const idx = rows.findIndex((r) => sameTitle(want, r.t));
+      let idx = rows.findIndex((r) => sameTitle(want, r.t));
+      /* 🔴 지문 대조가 빗나가면 **알맹이 낱말로 한 번 더** 본다 (2026-09-18).
+         앱 이름은 사람이 다듬은 것이라 게시판 행과 글자가 달라 지문이 애초에 안 맞는다 —
+         한국외대 6건이 이 이유로 4회 연속 '목록에서 못 찾음' 이 되어 likelyGone 처리됐다.
+         규칙은 detail-url.mjs 의 rowByCore 한 곳이고, **딱 하나일 때만** 고른다
+         (여럿이거나 캠퍼스가 어긋나면 지어내지 않고 넘긴다). */
+      if (idx < 0) {
+        const byCore = rowByCore(want, rows);
+        if (byCore) {
+          idx = rows.indexOf(byCore);
+          report.push(`  · 알맹이 낱말로 찾음: ${String(byCore.t || '').slice(0, 48)}`);
+        }
+      }
       if (idx < 0) continue;                       // 이 페이지엔 없다 — 다음 페이지에서 찾는다
       remaining.delete(t.key);
 

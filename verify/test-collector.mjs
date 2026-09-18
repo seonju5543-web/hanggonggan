@@ -38,7 +38,7 @@ import { pageCandidates, pageUrl, existingPageParam, samePage, shouldRetry } fro
 import { looseCandidate, sameNotice, findMissing, classifyMiss, coverageOf, looksLikeBoardChrome, looksLikeAttachmentName, dedupeNear } from '../collector/coverage-rules.mjs';
 import { createRequire } from 'node:module';
 import { isAttachmentEntry, isHtmlPayload } from '../collector/attachment-link.mjs';
-import { isDetailUrl, isMarkerUrl, markerTitle, sameTitle, detailCandidates, looksLikeLoginWall, rowDetailCandidates } from '../collector/detail-url.mjs';
+import { isDetailUrl, isMarkerUrl, markerTitle, sameTitle, titleCore, rowByCore, detailCandidates, looksLikeLoginWall, rowDetailCandidates } from '../collector/detail-url.mjs';
 import { cleanTitle, isMenuEntry } from '../collector/clean-title.mjs';
 import { makeBudget, rotateOrder, nextCursor, withDeadline, TIMED_OUT } from '../collector/harvest-budget.mjs';
 import { canonUrl } from '../collector/canon-url.mjs';
@@ -154,10 +154,20 @@ console.log('■ HWP 원본은 미리보기가 아니라 본문을 읽는다 (20
   /* ⚠️ 2026-09-12: 한국장학재단 로봇을 여기 넣는 것을 처음에 빠뜨렸다 — 그래서 받아 둔
      공고문 HWP 를 **미리보기 1023자만** 읽고 있었다. 첨부를 받는 로봇이 새로 생기면
      이 목록에도 넣어야 한다(안 넣으면 그 로봇만 조용히 앞 1000자만 본다). */
-  const wf = ['collect-scholarships', 'browser-collect', 'deep-fetch', 'kosaf-fetch']
-    .map((n) => readText(new URL(`../.github/workflows/${n}.yml`, import.meta.url)));
+  /* ⚠️ 2026-09-15: eligibility-fill 도 빠져 있었다 — `deepfetch --elig-attach` 가 파생 .txt 를
+     지우고 원본만 다시 놓는데 글자를 뽑는 단계가 없어, 울산연구원 HWP 본문 20KB 를 지운 채
+     커밋했다(실측). **`--elig-attach` 를 부르는 워크플로는 이 목록에서 자동으로 찾는다** —
+     이름을 손으로 적으면 다음 로봇도 또 빠진다. */
+  const wfDir = new URL('../.github/workflows/', import.meta.url);
+  const fetchers = fs.readdirSync(wfDir).filter((f) => f.endsWith('.yml'))
+    .filter((f) => /deepfetch\.mjs --elig-attach/.test(readText(new URL(f, wfDir))));
+  eq('  --elig-attach 를 부르는 워크플로를 찾는다 (eligibility-fill 포함)',
+    fetchers.includes('eligibility-fill.yml'), true);
+  const wf = [...new Set(['collect-scholarships', 'browser-collect', 'deep-fetch', 'kosaf-fetch']
+    .map((n) => `${n}.yml`).concat(fetchers))]
+    .map((n) => [n, readText(new URL(n, wfDir))]);
   eq('첨부를 받는 로봇이 전부 본문 추출기를 실제로 돌린다',
-    wf.every((y) => y.includes('hwp-bodytext.py')), true);
+    wf.filter(([, y]) => !y.includes('hwp-bodytext.py')).map(([n]) => n), []);
 }
 
 console.log('■ 원본 항목이 양식에서 빠지지 않았나 (2026-08-14 — 조용한 누락이 진짜 위험이다)');
@@ -1789,6 +1799,10 @@ console.log('\n■ 게시판 메뉴 걷어내기 (2026-08-20)');
   const allBoiler = new Set(['가', '나', '다']);
   eq('본문이 통째로 사라질 상황이면 원문을 그대로 둔다',
     stripBoilerplate('가\n나\n다', allBoiler), '가\n나\n다');
+  /* 🔴 그 안전판은 읽을 때의 것이다 — 잴 때는 끌 수 있어야 한다 (2026-09-15).
+     끄는 길이 없으면 빈 본문이 메뉴 분량으로 '있음'이 된다(notice-source 주석). */
+  eq('  잴 때는 안전판을 끄고 남은 것만 돌려준다',
+    stripBoilerplate('가\n나\n다', allBoiler, { fallback: false }), '');
 }
 
 /* ── 신청서 질문 방식 최적화 (2026-08-18 개발자 지시) ──────────────
@@ -1919,6 +1933,61 @@ console.log('\n■ 껍데기 페이지와 브라우저 본문 (2026-08-20)');
      동국대 교내장학(전체)(본문 정상, 한글 237자)을 버리는 것을 보고 내렸다. */
   eq('  문턱은 100자다 (올리면 멀쩡한 짧은 공고를 버린다)', NS.MIN_BODY, 100);
 
+  /* 🔴 2026-09-15 — **안전판이 빈 본문을 '있음'으로 뒤집었다** (노션 UI-10 · F-9).
+     메뉴 걷어내기의 안전판('다 지워지면 원문을 그대로 돌려준다')은 읽을 때의 것인데
+     잴 때도 걸려서, 본문이 그림뿐인 경희대 공고의 메뉴 1,400자가 본문 분량으로 세어졌다.
+     재수집 로봇은 그걸 '본문 확보 ✅'라고 적었고 발췌기·금액 로봇은 메뉴를 읽었다.
+     아래 셋은 그 경위의 세 조각이다 — 하나라도 되돌리면 껍데기가 다시 통과한다. */
+  {
+    /* ⚠️ 픽스처 크기가 곧 검사다 (코드 리뷰 2026-09-15 — 처음 판은 셋이 옛 코드에서도 통과했다).
+       메뉴는 **한글 100자를 넘겨야** 안전판이 되돌린 메뉴가 '본문 있음'이 되고, 제목은 정규화
+       뒤 **10자를 넘겨야** 제목 규칙이 켜진다. 줄이면 검사가 문턱만 재고 규칙은 안 잰다. */
+    const menuK = ['로그인', '사이트맵', '학사일정', '전체메뉴', '개인정보처리방침', '찾아오시는길',
+      '대학 입학 연구 교류 대학생활 교육 발전기금 웹메일 인포 채용시스템',
+      '공지사항 커뮤니티 학생지원 장학 도서관 박물관 정보서비스 미디어',
+      '대학소개 총장인사말 연혁 상징 비전 캠퍼스안내 부속기관 규정집',
+      '학사안내 수강신청 성적 졸업 학적변동 교직 복수전공 부전공 안내'];
+    const menuKo = menuK.join('').replace(/[^가-힣]/g, '').length;
+    eq('  (픽스처) 메뉴가 문턱을 넘긴다', menuKo >= 100, true);
+    const titleK = (n) => `${n}번째 공고 — 2026학년도 2학기 장학생 선발 안내문`;
+    eq('  (픽스처) 제목이 제목 규칙의 최소 길이를 넘긴다', NS.normTitle(titleK(1)).length >= 10, true);
+    const shellK = (n, extra) => ({ url: `https://k.ac.kr/view?id=${n}`, title: titleK(n),
+      text: [...menuK, titleK(n), `2026-09-0${n}조회수 15${n}`, ...(extra || [])].join('\n') });
+    /* ① 메뉴 밑에 제목·조회수뿐인 페이지 넷 — 걷어내면 120자가 안 돼 안전판이 켜지는 크기다.
+          안전판이 잴 때도 켜지면 메뉴 100자+가 본문이 돼 true 로 돌아간다. */
+    const i5 = NS.indexTexts([1, 2, 3, 4].map((n) => shellK(n)), {});
+    eq('메뉴를 걷어낸 뒤 남는 것이 제목뿐이면 원문으로 세지 않는다',
+      NS.hasText(i5.byUrl.get(NS.canonUrl('https://k.ac.kr/view?id=1'))), false);
+    /* ② 저장된 bodyChars 를 믿지 않는다 — 옛 규칙으로 잰 값이 파일에 남아 있다 */
+    const stale = [1, 2, 3, 4].map((n) => ({ ...shellK(n), bodyChars: 1400 }));
+    const i6 = NS.indexTexts(stale, {});
+    eq('  파일에 남은 옛 본문 분량을 믿지 않고 다시 잰다',
+      NS.hasText(i6.byUrl.get(NS.canonUrl('https://k.ac.kr/view?id=1'))), false);
+    /* ③ 이전글·다음글 줄은 다른 공고의 제목이다 — 본문으로 세지 않는다.
+          다른 공고 제목 넷(한글 90자+)과 자기 제목만으로 100자를 넘기게 해서, 제목 규칙이
+          꺼지면 true 로 돌아가게 한다(메뉴는 이미 걷어내진 상태라 안전판과 무관하다). */
+    const nav = [1, 2, 3, 4].map((n) => shellK(n, [1, 2, 3, 4].filter((m) => m !== n).map(titleK).concat([`[공통] ${titleK(((n + 1) % 4) + 1)}`])));
+    const i7 = NS.indexTexts(nav, {});
+    eq('  이전글·다음글(다른 공고 제목) 줄은 본문으로 세지 않는다',
+      NS.hasText(i7.byUrl.get(NS.canonUrl('https://k.ac.kr/view?id=1'))), false);
+    /* ④ 브라우저가 그린 판에만 있는 메뉴도 따로 배운다 — 한 통에 섞으면 비율 문턱에 못 미친다.
+          브라우저 메뉴만으로 한글 100자를 넘겨야, 따로 배우지 않으면 true 로 돌아간다. */
+    /* 본문은 공고마다 달라야 한다 — 같은 문장을 일곱 쪽에 넣으면 그게 메뉴로 배워진다(실제로 그랬다) */
+    const plain = [1, 2, 3, 4, 5, 6, 7].map((n) => shellK(n, real.split('\n').map((l) => `${l} — ${n}번 공고만의 문장`)));
+    const browserMenu = ['일반 학사 장학 근로 시간표 변경 교내학점교류 행사 채용 국제교류 취업',
+      '서울캠퍼스 서울특별시 동대문구 경희대로 국제캠퍼스 경기도 용인시 기흥구 덕영대로 광릉캠퍼스 남양주시',
+      '개인정보처리방침 이메일무단수집거부 교내전화번호 대학정보공시 예결산공고 입찰공고 관련기관',
+      '확대 축소 프린트 주소복사 목록 이전글 다음글 파일첨부 작성자 조회수 등록일 담당부서'];
+    eq('  (픽스처) 브라우저 메뉴가 문턱을 넘긴다', browserMenu.join('').replace(/[^가-힣]/g, '').length >= 100, true);
+    const bBodies = {};
+    for (const n of [8, 9, 10]) bBodies[`https://k.ac.kr/view?id=${n}`] = { title: titleK(n), text: [...browserMenu, titleK(n)].join('\n'), via: 'rescue' };
+    const i8 = NS.indexTexts(plain, bBodies);
+    eq('  브라우저 판에만 있는 메뉴 줄도 걷어낸다(말뭉치별로 따로 배운다)',
+      NS.hasText(i8.byUrl.get(NS.canonUrl('https://k.ac.kr/view?id=8'))), false);
+    eq('    본문이 딸린 일반 수집분은 그대로 통과',
+      NS.hasText(i8.byUrl.get(NS.canonUrl('https://k.ac.kr/view?id=1'))), true);
+  }
+
   /* 🔴 2026-08-23 — **줄바꿈을 없애면 본문이 있으나 마나다.** 재수집 로봇을 처음
      만들 때 태그를 벗기고 `\s+ → ' '`로 눌렀더니 본문이 통짜 한 줄이 됐고,
      ① AI가 줄 번호를 못 매겨 대상에서 빠지고 ② 표의 칸 구분(공통/재학생/신규자)이
@@ -1943,7 +2012,9 @@ console.log('\n■ 껍데기 페이지와 브라우저 본문 (2026-08-20)');
      실제로 정읍시민장학재단(한글 387자가 전부 메뉴)이 '확보 ✅'로 통과했고,
      되찾았다던 37건 중 24건이 그런 가짜였다. 발췌기·AI와 같은 말뭉치를 써야
      "재수집기는 됐다는데 발췌기는 못 읽는" 어긋남이 안 생긴다. */
-  eq('  본문 판정은 발췌기와 같은 말뭉치로 한다', /indexTexts\(texts, \{ \[t\.url\]/.test(rb), true);
+  /* 🔴 브라우저 본문도 같이 넣는다 (2026-09-15 코드 리뷰) — 메뉴는 브라우저 판에서도 따로 배우므로
+     이 한 건만 넣으면 표본이 없어 '여기선 확보, 발췌기에선 껍데기'로 갈린다(의암 손병희 163자 vs 85자). */
+  eq('  본문 판정은 발췌기와 같은 말뭉치로 한다 (브라우저 본문 포함)', /indexTexts\(texts, \{ \.\.\.bodies, \[t\.url\]/.test(rb), true);
   /* 🔴 동국대는 '오늘 하루 보지 않기' 팝업이 본문을 덮어, 받아 온 글자가
      `불교동아리 소식 · 공양기도문 · POPUP`뿐이었다. 그리고 일부 학교는 본문을
      iframe에 그린다 — 주 프레임만 보면 메뉴와 팝업만 손에 남는다.
@@ -2557,6 +2628,38 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
   /* ② PDF는 자격 경로에서 쓰지 않는다 — 글자가 정확히 안 나온다.
         실측: 원문 `3년 이상`이 `년이상`으로 뽑혔다. 숫자 하나가 결론을 바꾸는 글이다. */
   eq('  PDF는 자격 경로에서 쓰지 않는다', AT.attachmentText('없는파일.pdf'), '');
+  /* ②-2 🔴 HWPX 조각 안의 자식 태그를 벗긴다 (2026-09-15 — 익산사랑 장학생 공고문).
+        `<hp:t>` 안에 `<hp:sz …/>` 가 와서 `3. 지급액 및 접수 방법 <hp:sz width=…` 처럼
+        태그가 글자에 섞여 나왔고 금액·자격 규칙이 한 줄도 못 읽었다. 저장된 실제 파일로 잰다. */
+  {
+    /* 저장된 파일에 기대지 않는다 — `deepfetch --elig-attach` 가 elig-* 를 갈아엎으면 검사가
+       조용히 건너뛴다(코드 리뷰). 압축(저장 방식 0)만 쓴 HWPX 를 검사 안에서 만든다. */
+    const storedZip = (entries) => {
+      const locals = [], centrals = []; let off = 0;
+      for (const { name, data } of entries) {
+        const n = Buffer.from(name), d = Buffer.from(data);
+        const lh = Buffer.alloc(30); lh.writeUInt32LE(0x04034b50, 0); lh.writeUInt16LE(20, 4);
+        lh.writeUInt32LE(d.length, 18); lh.writeUInt32LE(d.length, 22); lh.writeUInt16LE(n.length, 26);
+        const ch = Buffer.alloc(46); ch.writeUInt32LE(0x02014b50, 0); ch.writeUInt16LE(20, 4); ch.writeUInt16LE(20, 6);
+        ch.writeUInt32LE(d.length, 20); ch.writeUInt32LE(d.length, 24); ch.writeUInt16LE(n.length, 28); ch.writeUInt32LE(off, 42);
+        locals.push(lh, n, d); centrals.push(ch, n); off += 30 + n.length + d.length;
+      }
+      const cd = Buffer.concat(centrals);
+      const eocd = Buffer.alloc(22); eocd.writeUInt32LE(0x06054b50, 0); eocd.writeUInt16LE(entries.length, 8);
+      eocd.writeUInt16LE(entries.length, 10); eocd.writeUInt32LE(cd.length, 12); eocd.writeUInt32LE(off, 16);
+      return Buffer.concat([...locals, cd, eocd]);
+    };
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hwpx-'));
+    const file = path.join(dir, 'notice.hwpx');
+    fs.writeFileSync(file, storedZip([{ name: 'Contents/section0.xml',
+      data: '<hp:p><hp:t>3. 지급액 및 접수 방법 <hp:sz width="49169" widthRelTo="ABSOLUTE"/>대학생 2백만원</hp:t></hp:p>'
+        + '<hp:p><hp:t>&lt;참고&gt; 4</hp:t><hp:t>년제 재학생</hp:t></hp:p>' }]));
+    const t = AT.attachmentText(file);
+    eq('  HWPX 조각 안의 자식 태그를 벗긴다', /<hp:/.test(t), false);
+    eq('    태그 자리의 글자는 붙어서 읽힌다', /3\. 지급액 및 접수 방법 대학생 2백만원/.test(t), true);
+    eq('    원문의 &lt; 는 글자라 남긴다 · 조각은 붙여 읽는다', /<참고> 4년제 재학생/.test(t), true);
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
   /* ③ 문단 단위로 이어 붙인다 — 조각마다 줄을 나누면 `4년제`의 `4`가 버려져
         `년제 대학교 재학생`만 남는다(실제로 그렇게 나와서 고쳤다) */
   const docx = fs.readdirSync(new URL('../collector/extracted/', import.meta.url))
@@ -2996,7 +3099,10 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
      *"재학 = 신입생 첫 학기 똑같잖아. 신입생도 재학생인데."*
      `국내 대학교 재학생`이 신입생 화면에 아무 표시도 안 뜨고 있었다. */
   {
-    const 재학요건 = '한국장학재단에서 학자금대출을 받은 국내 대학교 재학생';
+    /* ⚠️ 2026-09-17: 예전 픽스처 `한국장학재단에서 학자금대출을 받은 국내 대학교 재학생` 은
+       이제 **'모른다'** 다 — 학자금대출을 받았는지는 프로필이 모르는 처지라 ✓ 를 치지 않는다
+       (아래 '자격 판정 전수 대조' 절). 학적 포함 관계를 재는 데는 대출 말이 없는 줄이 맞다. */
+    const 재학요건 = '국내 대학교 재학생 (2026-2학기 기준)';
     const mk = (status) => ({ school: 'x', status, flags: [] });
     eq('신입생도 재학생이다', M.requirementMatch(재학요건, mk('신입학'), null), 'ok');
     eq('초과학기생도 재학생이다', M.requirementMatch(재학요건, mk('초과학기'), null), 'ok');
@@ -3226,6 +3332,67 @@ console.log('\n■ 금액 산정 — 부풀리지 않는가 (2026-08-27)');
     kindOf(['- 총 장학금액: 총 5천만원', '- 지급기준']), 'unknown');
   eq('총액과 1인당이 같이 있으면 1인당을 쓴다',
     wonOf(['장학금액 : 총상금 3천만원, 1인당 200만원 기준']), 2000000);
+  /* ①-2 🔴 인원 × 예산 표 (2026-09-15 — 울산연구원 하반기 공고문 HWP · 노션 F-9).
+        `총·예산` 낱말이 없는 지급 계획표가 글자로 뽑히면 칸마다 줄이 갈라져 나온다.
+        그대로 읽으면 1억 8천만원이 1인당 장학금이 됐다(실측). 아래는 실제 원문 줄이다. */
+  eq('인원과 금액이 칸으로 갈라진 예산표는 읽지 않는다',
+    kindOf(['지급금액', '계', '311명', '421백만원', '우수장학금', '대 학 생', '115명', '180백만원']), 'unknown');
+  eq('  한 줄에 붙어 있어도 마찬가지다',
+    kindOf(['지급금액 계 311명 421백만원 우수장학금 대학생 115명 180백만원']), 'unknown');
+  /* 넓힐 때 잃으면 안 되는 것 — 1인당·각 표시가 있으면 인원이 같이 있어도 읽는다 */
+  eq('  1인당 표시가 있으면 인원이 있어도 읽는다',
+    wonOf(['장학금액', '선발인원 20명', '1인당 100만원']), 1000000);
+  eq('  `각` 이 있으면 읽는다', wonOf(['장학금액 : 선발인원 12명, 각 100만원']), 1000000);
+  eq('  한 자리 인원은 예산표로 보지 않는다', wonOf(['장학금액 : 3명, 100만원']), 1000000);
+  /* ①-3 AI 가 포스터·PDF 에서 옮겨 온 실제 줄 (2026-09-15) — 표기가 넓다 */
+  eq('소수점 백만원을 읽는다 (2.5백만원 — 5백만원이 아니다)',
+    wonOf(['장학금액', '1. 가수 윤하 장학금액(학기당) 2.5백만원']), 2500000);
+  eq('천원 단위를 읽는다 (12,420천원)',
+    wonOf(['장학금액', '한 학기 장학금 12,420천원 (약 $0.9만), 4개월 이상 체류']), 12420000);
+  eq('  천만원이 천원보다 먼저다', wonOf(['장학금액 : 5천만원(1인당)']), 50000000);
+  eq('  수수료 5천원은 금액이 아니다', kindOf(['장학금액', '발급 수수료 5천원']), 'unknown');
+  /* 넓히면서 드러난 옛 구멍 둘 — 둘 다 실제 원문 줄이다 */
+  eq('숫자 속 쉼표에서 조각을 가르지 않는다 (1인당 최대 1,000,000원)',
+    wonOf(['장학금액', '1인당 최대 1,000,000원', '(인당 지원액) 개인별 상이(최대 500천원) ※대출이자 금액에 따라 상이']), 1000000);
+  eq('311명 은 1명 이 아니다 — 인원·예산 한 줄은 읽지 않는다',
+    kindOf(['○ 선발 예정인원 및 지급금액 : 311명, 421,000천원 예정']), 'unknown');
+  /* 🔴 예산표 관문이 진짜 1인당 금액까지 지우면 안 된다 (코드 리뷰 2026-09-15 — 처음 판이 그랬다).
+     범위(`~`)·학기당·매월은 한 사람 몫의 표기라 인원이 옆에 있어도 읽는다. */
+  {
+    const r = PA.amountFrom(['장학금액 : 1백만원 ~ 2백만원 (선발인원 20명)']);
+    eq('범위가 적혀 있으면 인원이 옆에 있어도 읽는다 (1백만원 ~ 2백만원 · 20명)', `${r.kind} ${r.value}`, 'range 2000000');
+  }
+  eq('  학기당은 한 사람 몫이다 (선발인원 20명 · 학기당 100만원)', wonOf(['장학금액', '선발인원 20명', '학기당 100만원']), 1000000);
+  eq('  매월도 한 사람 몫이다 (20명 내외 · 매월 50만원)', wonOf(['장학금액', '선발인원 20명 내외', '매월 50만원']), 500000);
+  /* 천원은 무늬 순서에서 맨 뒤 — 앞에 두면 괄호 안 교재비가 장학금이 된다 */
+  eq('천원이 뒤에 있는 교재비를 장학금으로 읽지 않는다', wonOf(['장학금액 : 3,000,000원 (교재비 100천원 별도)']), 3000000);
+  {
+    const r = PA.amountFrom(['장학금액 : 1인당 2.5백만원 ~ 3백만원']);
+    eq('소수점 범위도 범위다 (2.5백만원 ~ 3백만원)', `${r.kind} ${r.min} ${r.max}`, 'range 2500000 3000000');
+  }
+
+  /* 🔴 **표의 합계 행도 총액이다** (2026-09-17 · 노션 UI-12).
+     `TOTAL_RE` 는 `총상금`·`총예산`·`사업비` 같은 **낱말**을 찾는데, 요강의 예산표는
+     그런 낱말 없이 `지급금액 계 | 311명 | 421백만원` 처럼 **표의 합계 행**으로 적는다.
+     울산연구원 공고문 HWP 가 실제로 그 꼴이라, 첨부를 금액 경로에 붙이자마자
+     `180백만원`(115명 몫)이 **1인당 1억 8천만원**으로 나왔다 — 개발자가 '기망'이라고
+     한 바로 그 실패다. 표는 한 줄에 한 칸씩 펼쳐져 오므로 금액 절이 통째로 삼킨다.
+     ⚠️ 저장분으로 재 보니 이 규칙이 **지금 금액이 있는 27건 중 0건**을 잃는다.
+     ⚠️ 글자가 깨져도(`계 311浵ࡦ명`) 잡혀야 한다 — HWP 추출이 흔히 그렇게 낸다. */
+  /* ⚠️ **금액 머리글을 꼭 붙여 잰다** — 안 붙이면 절이 아예 안 열려 `unknown` 이 나오고
+     검사가 **다른 이유로** 통과한다(처음에 그렇게 짰다가 잡았다). 로봇도 머리글을 붙여 먹인다
+     (`extract-amounts.mjs` 의 `PA.amountFrom(['장학금액', ...aiLines])`). 붙이면 4.21억이 나왔다. */
+  eq('표의 합계 행(계 + 인원)을 1인당으로 읽지 않는다',
+    kindOf(['장학금액', '지급금액 계 311명 421백만원', '우수장학금', '대 학 생', '115명', '180백만원']), 'unknown');
+  eq('  글자가 깨진 합계 행도 막는다',
+    kindOf(['장학금액', '지급금액 계 311浵ࡦ명 421浵ࡦ백만원', '우수장학금', '대 학 생', '115명', '180백만원']), 'unknown');
+  eq('  「합계」·「소계」·「총계」도 총액이다', kindOf(['장학금액', '합계 3,000만원']), 'unknown');
+  /* 🔴 그러면서 진짜 1인당은 살아야 한다 — 위 검사만 두면 "늘 unknown" 으로도 통과한다 */
+  eq('  진짜 1인당은 그대로 읽는다', wonOf(['장학금액 : 1인당 100만원']), 1000000);
+  eq('  인원만 적힌 줄은 총액 신호가 아니다', wonOf(['장학금액 : 200만원', '모집인원 : 10명']), 2000000);
+  eq('  「선발 계획 30명」의 계획을 합계로 오인하지 않는다',
+    wonOf(['장학금액 : 200만원', '선발 계획 30명']), 2000000);
+
 
   /* ② 🔴 금액 절이 다음 절을 삼키면 자격 줄의 숫자를 금액으로 줍는다 — 중앙대 성림장학금.
         `5. 신청자격: … 건강보험료 지역 17만원 이하`의 17만원이 장학금액이 될 뻔했다. */
@@ -3839,6 +4006,14 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
      그래야 총액/1인당 가르기·유의사항 절 차단·자릿수 관문이 그대로 걸린다. */
   eq('금액 판정은 parse-amount 가 한다', /PA\.amountFrom\(\['장학금액', \.\.\.aiLines\]\)/.test(ex), true);
   eq('본문이 있으면 본문이 먼저다', /bodyLines\.length \? PA\.amountFrom\(bodyLines\)/.test(ex), true);
+  /* 🔴 공고문 첨부(HWP·DOCX)를 **글자로** 읽는 길 (2026-09-15 · 노션 F-9).
+     이 로봇은 2026-09-15 까지 첨부를 한 번도 안 열었다 — 게시판 본문이 '붙임 참조'뿐인 공고는
+     영영 '금액 원문 확인'이었다. 자격 발췌기와 **같은 색인(elig-docs)·같은 함수(attachmentText)**
+     를 써야 "발췌기는 읽는데 금액 로봇은 못 읽는" 어긋남이 안 생긴다. */
+  eq('금액 로봇이 공고문 첨부 색인을 연다', /elig-docs\.json/.test(ex), true);
+  eq('  첨부 글자는 발췌기와 같은 함수로 읽는다', /import \{ attachmentText, readable, docOrder \} from '\.\/attachment-text\.mjs'/.test(ex), true);
+  eq('  본문·AI 줄로 못 읽었을 때만 첨부를 본다', /a\.kind === 'unknown' && hasDocs/.test(ex), true);
+  eq('  첨부 금액도 parse-amount 가 정한다', /PA\.amountFrom\(t\.split/.test(ex), true);
 
   /* 검산기가 금액 줄을 실제로 돌려주는지 — 가짜 응답으로 돌려 본다(돈 0원) */
   if (AI && AI.verifyPdfLines) {
@@ -4112,13 +4287,17 @@ console.log('\n■ 이중수혜 — 가족 안의 이야기를 「다른 장학�
 
   /* 로봇이 사람 값을 덮지 않는다 — 매일 돌게 되면서 생긴 위험이다 */
   const ea = readText(new URL('../collector/extract-amounts.mjs', import.meta.url));
-  /* 🔴 **주인은 '누구 표식인가' 로 가른다** (2026-09-17 · F-9 컨펌 2). 옛 판(`!it.amountFrom`)은
-     표식이 **없는** 값을 사람 값으로 봤다 — 관리자 화면이 금액을 적으며 `관리자 <날짜>` 를
-     붙이기 시작하면 그 표식 때문에 '로봇 것' 으로 읽혀 다음 날 아침에 조용히 덮인다.
-     이중수혜에서 2026-09-14 에 똑같이 겪었다. */
-  eq('금액 로봇이 사람이 넣은 값을 덮지 않는다 (누구 표식인지 본다)',
-     /it\.amountFrom !== OWN_AMOUNT && \(it\.amountSpec \|\| Number\(it\.amountValue\) > 0\)/.test(ea), true);
-  eq('  🔴 사람이 비운 금액도 되채우지 않는다 (틀린 금액을 지운 조치가 무효가 되지 않게)',
+  /* 🔴 **뜻으로 잰다 — 글자를 박지 않는다** (2026-09-17 고침). 예전엔 `!it.amountFrom`
+     이라는 **옛 규칙의 생김새**를 박아 뒀는데, 그 규칙 자체가 거꾸로였다: 사람이 출처를
+     적는 순간 로봇이 제 것으로 알고 지웠다. 관문이 그 결함을 지키고 있었던 셈이다.
+     지금은 「로봇 표식이 아니면 사람」 — 옆 칸(exclusivityFrom·sameAsFrom)과 같은 뜻이다. */
+  eq('금액 로봇이 사람이 넣은 값을 덮지 않는다 (주인 표식을 본다)',
+     /amountFrom !== OWN_AMOUNT/.test(ea), true);
+  eq('  표식이 없어야 사람이라던 옛 판정이 남아 있지 않다',
+     /humanAmount = !it\.amountFrom &&/.test(ea), false);
+  /* 🔴 `· 비움` 은 사람이 **틀린 금액을 지운** 조치다 (2026-09-17 · F-9 컨펌 2) — 값이 비었다고
+     로봇에게 돌려주면 다음 실행이 같은 줄을 다시 읽어 같은 틀린 금액을 되채운다. */
+  eq('  사람이 비운 금액도 되채우지 않는다 (틀린 금액을 지운 조치가 무효가 되지 않게)',
      /const amountCleared = \/\^관리자 \.\*· 비움\$\//.test(ea) && /humanAmount = amountCleared/.test(ea), true);
   eq('  sameAs 도 제가 붙인 것만 지운다', /it\.sameAsFrom === OWN_SAME/.test(ea), true);
   /* 🔴 다른 로봇은 전부 날짜만 적는다 — 여기만 시각까지 적으면 매 실행 파일이 더러워진다 */
@@ -5586,9 +5765,40 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
   eq('등록 데이터에는 어림잡은 금액이 한 건도 안 들어갔다',
     madeUp.map((it) => it.id), []);
 
-  /* 🔴 짐작이 섞이면 학생 화면은 '최대'가 아니라 '약'이라고 적는다 — 어림잡은 숫자를
-     확인한 숫자처럼 적지 않는다(원칙 8-1). 문장은 지웠어도 이 선은 남는다. */
-  eq("어림잡은 몫이 있으면 '약'을 붙인다", /assumedWon > 0 \? '약 ' : '최대 '/.test(appSrc2), true);
+  /* 🔴 **홈 히어로는 '약' 을 붙이지 않는다** (2026-09-17 개발자 지시 2차).
+     한때 어림잡은 몫이 섞이면 '약' 을 붙였는데 개발자가 걷으라고 했다 — *"어차피 사용자가
+     직접 공고 내 들어가면 금액 있는 원문은 최대 ~ 라고 표시되고 추정치는 금액 원문 확인으로
+     표시되므로"*. 어느 공고가 확인된 것인지는 카드와 상세가 이미 말한다.
+     🔴 그 대신 **금액 상세는 내역을 그대로 말해야 한다** — 둘 다 걷으면 어림잡은 숫자를
+        확인한 숫자처럼 내놓게 된다(원칙 8-1). 아래 두 줄이 그 자리를 지킨다. */
+  /* ⚠️ **파일 전체를 훑지 말 것** — 금액 상세(renderAmountDetail)는 '약' 을 **일부러**
+     쓴다(바로 아래 줄에서 어림잡았다고 밝히므로 짝이 맞다). 홈 히어로 안만 본다. */
+  const homeBody = appSrc2.slice(appSrc2.indexOf('function renderHome('),
+    appSrc2.indexOf('function renderExplore('));
+  eq('renderHome 구간을 찾았다', homeBody.length > 500, true);
+  eq("홈 히어로가 '약' 을 붙이지 않는다", /'약 '/.test(homeBody), false);
+  eq('  홈 히어로는 countUp 에 최대만 넘긴다',
+    /countUp\(\$\('#hero-amount'\), total, \(v\) => `최대 \$\{won\(v\)\}`\)/.test(appSrc2), true);
+  eq('금액 상세는 어림잡은 몫을 그대로 밝힌다 (여기까지 걷으면 안 된다)',
+    /금액을 못 읽은 \$\{bill\.assumed\.length\}건은 어림잡아 더함/.test(appSrc2)
+    && /확인된 공고들의 중앙값/.test(appSrc2), true);
+
+  /* 🔴 히어로 아랫줄은 **요소째로 없앴다** (2026-09-17 개발자 지시 2차: "금액 밑에 있는
+     '그중 N건은 바로 신청할 수 있어요' 안내도 삭제해줘"). 금액 회계 두 줄에 이어 마지막
+     한 줄까지 걷어, 히어로는 건수·금액·버튼 셋뿐이다. */
+  {
+    const h2 = readText(new URL('../index.html', import.meta.url));
+    eq("히어로에 '그중 n건은 바로 신청할 수 있어요' 가 없다",
+      /바로 신청할 수 있어요/.test(appSrc2), false);
+    eq('  #hero-count 요소 자체가 없다 (채우는 곳 없는 빈 칸을 남기지 않는다)',
+      /id="hero-count"/.test(h2), false);
+    /* 🔴 그 칸이 주던 아래 여백을 물려받지 않으면 금액과 버튼이 2px 로 붙는다(실측 57 → 2).
+       style.css 는 뒤 블록이 앞을 덮으므로 파일 끝 '히어로' 절에 있어야 먹는다. */
+    const css = readText(new URL('../style.css', import.meta.url));
+    const tail = css.slice(css.lastIndexOf('홈 히어로 (2026-09-17'));
+    eq('  금액 아래 여백을 .hero-amount 가 물려받는다 (파일 끝 블록에서)',
+      /\.hero-amount \{ margin-bottom: 20px; \}/.test(tail), true);
+  }
 }
 
 /* ── 🔴 앱 내부 사정은 학생 화면에 적지 않는다 (2026-09-17 개발자 지시) ──
@@ -6624,6 +6834,13 @@ console.log('■ 첨부에서 마감일 — 본문이 껍데기인 게시판 (20
   }
   eq('첨부에서 마감을 읽는 함수가 있다', typeof AWAIT_EE.deadlineFromDocs, 'function');
 
+  /* ⚠️ 붙임 자르기·발표 이름표·관리자 표식은 **선주 세션 판**이 더 촘촘해 그쪽을 남겼다
+     (아래 ④ 절 — 붙임 변형 일곱·통째 붙임·서류 목록 속 [서식 n]·첨부에서 접수시작/발표까지).
+     내 판은 `[붙임 1] 선발 공고` 처럼 **파일 자체가 붙임인 것**을 통째로 잘라 버렸다(실측: 결과 빈 문자열).
+     여기 남긴 것은 그쪽에 없는 부정 하나뿐이다 — 지급일은 발표일이 아니다. */
+  eq('「지급 예정일」은 발표일이 아니다',
+    AWAIT_EE.extractAnnounce('지급 예정일 : 2026. 11. 13.') || '(없음)', '(없음)');
+
   /* 🔴 **포스터 이미지는 로봇이 못 읽는다 — 사람이 읽은 값은 근거를 적어 둔다** (2026-09-16)
      마감 없는 13건 중 7건은 첨부가 **공고 포스터 이미지**라 글자층이 없다(무료 경로로는
      방법이 없고 AI 경로 몫이다). 그 7건은 세션에서 사람이 이미지를 열어 읽었다.
@@ -6674,7 +6891,8 @@ console.log('■ 첨부에서 마감일 — 본문이 껍데기인 게시판 (20
   eq('  본문이 아예 없는 길에서도 첨부를 본다', /deadlineFromDocs\(it\)/.test(noBody), true);
   eq('  채우는 자리는 한 곳이다 (period 처리가 갈라지지 않게)',
     (ee.match(/function putDeadline\(/g) || []).length, 1);
-  eq('  출처를 정직하게 적는다', /putDeadline\(it, dl, '공고문 첨부'\)/.test(ee), true);
+  /* 2026-09-17: 표식은 docLabel 이 정한다 — 원문 글자면 '공고문 첨부', OCR 이면 '공고문 첨부(OCR)' */
+  eq('  출처를 정직하게 적는다', /putDeadline\(it, dl, docLabel\(fromDocs\.lastFile\)\)/.test(ee) && /'공고문 첨부\(OCR\)' : '공고문 첨부'/.test(ee), true);
 
   /* ③ 🔴 **동사가 든 이름표는 날짜 '범위'도 근거로 받는다** (2026-09-15 · G-3 이어서).
      `서류 접수 : 2026.7.27 (월) ~ 7.30 (목)` 를 놓치고 있었다 — 이름표는 통과하는데
@@ -6832,6 +7050,378 @@ console.log('■ 첨부에서 마감일 — 본문이 껍데기인 게시판 (20
       /it\.announceDateFrom = it\.announceDate \? OWNER/.test(aa) && /!it\.announceDate && !humanOwned\(it\.announceDateFrom\)/.test(ee), true);
     eq('  합칠 때 사람이 비운 마감을 되살리지 않는다', /!keep\.deadline && drop\.deadline && !\/\^\(AI\|관리자\)\//.test(aa), true);
   }
+}
+
+/* ── 2026-09-15 · 노션 UI-11 — 도우미가 자주 묻는 질문을 답한다 ──
+   고객센터 화면과 **같은 원본**(app.js FAQ_ITEMS)을 읽고 답 문장을 그대로 낸다. 공고 검색보다
+   뒤에 오고(그대로 물은 것만 앞), 낱말 하나로는 답하지 않는다 — '지원금 있어?' 사고의 FAQ 판. */
+console.log('\n■ 도우미가 자주 묻는 질문을 답한다 (2026-09-15 · 노션 UI-11)');
+{
+  const appSrc = readText(new URL('../app.js', import.meta.url));
+  const a = appSrc.indexOf('const FAQ_ITEMS = [');
+  const b = appSrc.indexOf('\n];', a);
+  eq('FAQ 원본은 app.js 하나다', a > 0 && b > a, true);
+  const faq = new Function(`return ${appSrc.slice(a + 'const FAQ_ITEMS = '.length, b + 2)}`)();
+  const chatSrc = readText(new URL('../chat.js', import.meta.url));
+  eq('  chat.js 에 FAQ 사본이 없다', /const FAQ_ITEMS\s*=/.test(chatSrc), false);
+  globalThis.FAQ_ITEMS = faq;
+  const C = createRequire(import.meta.url)('../chat.js');
+  const isFaq = (r) => !!(r && r.actions && r.actions.some((x) => x.act === 'faq'));
+  eq('그대로 물으면 답한다 (알림이 안 와요)', isFaq(C.chatRoute('알림이 안 와요')), true);
+  eq('  답 문장은 원본 그대로, 태그만 벗긴다', C.chatRoute('알림이 안 와요').text,
+    faq.find(([, q]) => q === '알림이 안 와요.')[2].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim());
+  eq('  짧은 질문도 (유료인가요?)', isFaq(C.chatRoute('유료인가요?')), true);
+  eq('  말이 달라도 (앱에서 신청까지 끝나?)', isFaq(C.chatRoute('앱에서 신청까지 끝나?')), true);
+  eq('  동점이면 물은 글자와 길게 이어지는 질문이 이긴다 (내 정보는 어디에 저장돼?)',
+    String((C.chatRoute('내 정보는 어디에 저장돼?') || {}).note || '').includes('내 정보는 어디에 저장되나요'), true);
+  eq('  공고 낱말이 든 질문은 FAQ 로 새지 않는다 (기숙사 알림)', isFaq(C.chatRoute('기숙사 알림')), false);
+  eq('  모르는 것은 모른다 (쿼카 사육 지원금)', C.chatRoute('쿼카 사육 지원금 있어?'), null);
+  /* 🔴 코드 리뷰(2026-09-15)가 잡은 새는 자리 둘 — 되돌리면 여기서 빨간불 */
+  eq('  낱말 하나로는 답하지 않는다 (공고 없어 → 인터넷 FAQ 가 아니다)', C.chatRoute('공고 없어'), null);
+  eq('    이름 바꾸기 → 기기 바꾸기 FAQ 가 아니다', C.chatRoute('이름 바꾸기'), null);
+  eq('    유료? 한 낱말은 모른다 (그대로 물어야 답한다)', C.chatRoute('유료?'), null);
+  eq('  4글자 부분일치로 삼키지 않는다 (학교 공고 → 우리 학교 공고 FAQ 가 아니다)', isFaq(C.chatRoute('학교 공고')), false);
+  eq('    공고 안 보여 도 마찬가지', isFaq(C.chatRoute('공고 안 보여')), false);
+  eq('  FAQ 는 공고 검색보다 뒤에 온다 (그대로 물은 것만 앞)',
+    chatSrc.indexOf('const faq = chatAnswerFaq(s);') > chatSrc.indexOf('const cards = chatSearch(s);'), true);
+  eq('  버튼이 자주 묻는 질문 화면으로 간다', /act === 'faq'\) return go\('faq'\)/.test(chatSrc) && /name === 'faq'\) renderFaq\(\)/.test(appSrc), true);
+  delete globalThis.FAQ_ITEMS;
+}
+
+/* ── 2026-09-17 · 노션 UI-10 — 틀린 ✓ · 틀린 ✗ (자격 판정 전수 대조) ──
+   개발자 지적: "학생에게 해당하지 않는 지원자격이 충족 표시되거나, 해당함에도 미충족 표시되는
+   문제". verify/verdict-table.mjs 로 학생 여섯 × 자격 줄 전부의 ✓·✗ 를 뽑아 사람이 읽었고,
+   아홉 갈래가 틀려 있었다. 아래는 그 실제 줄이다 — 되돌리면 여기서 빨간불. */
+console.log('\n■ 자격 판정 전수 대조 — 틀린 ✓·틀린 ✗ (2026-09-17 · 노션 UI-10)');
+{
+  const MEq = createRequire(import.meta.url)('../match-engine.js');
+  const PRq = createRequire(import.meta.url)('../parse-requirements.js');
+  const base = { school: '한국외국어대학교', campus: '서울', track: 'humanities', major: '영어학과', year: 3,
+    status: '재학', gpa: 3.5, bracket: 5, credits: 15, region: '서울', parentRegion: '서울',
+    nationality: 'korean', birthYear: 2004, flags: [], common: {} };
+  const mark = (line, over, sch) => MEq.requirementMatch(line, { ...base, ...(over || {}) }, sch || {});
+  const onLeave = { status: '휴학' };
+
+  /* ① 부정어 뒤의 학적은 금지다 — 휴학생에게 ✓ 가 떴던 세 줄 */
+  eq('「(휴학생 제외)」는 휴학생을 막는다 (틀린 ✓ 였다)', mark('전국 대학(원)생 (휴학생 제외)', onLeave), 'no');
+  eq('  재학생은 그 줄에 통과한다', mark('전국 대학(원)생 (휴학생 제외)'), 'ok');
+  eq('  붙여 쓴 「(휴학생제외)」도', mark('초·중·고·대학교 재학생(휴학생제외)', onLeave), 'no');
+  eq('  「휴학예정자 지원불가」도', mark('2026년 2학기 재학생 (2026-2학기 휴학예정자 지원불가)', onLeave), 'no');
+  eq('  「재학 및 복학예정자」는 여전히 휴학생을 받는다 (되돌아가면 안 되는 것)',
+    PRq.parseLine('2026-2학기 재학 및 복학예정자', false).conds.find((c) => c.kind === 'status').anyOf.includes('휴학'), false);
+  /* ② `복학생인 경우,` 도 경우별 분기다 — 휴학생에게 ✓ 가 떴다 */
+  eq('「복학생인 경우, 휴학 직전학기 …」는 휴학생의 줄이 아니다', mark('복학생인 경우, 휴학 직전학기 성적 기준', onLeave), null);
+  eq('  복학예정자에게는 판정한다', PRq.caseBranch('복학생인 경우, 휴학 직전학기 성적 기준'), ['복학예정']);
+  /* ③ `시각디자인 전공자` — 이름이 `전공자` 로 잡혀 시각디자인학과 학생이 ✗ 였다 */
+  eq('「시각디자인 전공자」는 시각디자인학과 학생에게 ✓ (틀린 ✗ 였다)',
+    mark('시각디자인 전공자 및 판화학과 재학생', { major: '시각디자인학과', track: 'arts', school: '경희대학교' }), 'ok');
+  eq('  영어학과 학생에게는 ✗ 그대로', mark('시각디자인 전공자 및 판화학과 재학생'), 'no');
+  eq('  이름 목록에 「전공자」가 없다',
+    (PRq.parseLine('시각디자인 전공자 및 판화학과 재학생', false).conds.find((c) => c.kind === 'major') || {}).names, ['시각디자인', '판화']);
+  /* ④ 두 척도가 나란한 줄 — 4.5 만점 3.5 학생이 ✗ 였다 */
+  const two = '직전 학기까지의 전체 평균 평점 3.5 이상(4.5 만점 기준) 또는 3.3 이상(4.3 만점 기준) 성적을 가진 학생';
+  eq('4.5 만점 쪽 숫자를 쓴다 (평점 3.5 → ✓ · 틀린 ✗ 였다)', mark(two), 'ok');
+  eq('  평점 2.8 은 ✗', mark(two, { gpa: 2.8 }), 'no');
+  /* ⑤ 선택지 묶음 안에서도 조건 전부가 맞아야 ✓ — 정읍시민장학재단 실제 공고로 잰다 */
+  {
+    const sch = JSON.parse(readText(new URL('../data/registered.json', import.meta.url))).items.find((x) => x.id === 'reg-hi-jeongeup');
+    if (sch) {
+      const line = (sch.eligibilityLines || []).find((l) => /재학생:.*85점/.test(l));
+      if (line) eq('  (실데이터) 정읍 「재학생: … 85점 이상」이 평점 2.8 학생에게 ✓ 가 아니다', mark(line, { gpa: 2.8, school: '경희대학교' }, sch), null);
+      else console.log('   (정읍 공고의 그 줄이 바뀌어 실데이터 항목을 건너뜀)');   // 줄이 없으면 null===null 로 조용히 통과하지 않게
+    } else console.log('   (정읍 공고가 등록 목록에 없어 실데이터 항목을 건너뜀)');
+  }
+  /* ⑤-2 선택지 묶음 안에서도 '묻지 않은 처지'·구간표 예외는 본 경로와 같다 (2026-09-17 코드 리뷰) */
+  {
+    const sch = { eligibilityLines: ['다음 두 가지 중 하나에 해당하는 국내 대학 재학생',
+      '한국장학재단에서 학자금대출을 받은 국내 대학교 재학생', '학과장 추천을 받은 재학생 (4분위 이하)', '5~6분위 재학생'] };
+    eq('  택1 묶음 안의 「학자금대출을 받은 … 재학생」도 ✓ 가 아니다', mark(sch.eligibilityLines[1], {}, sch), null);
+    eq('  택1 묶음 안의 「추천을 받은 재학생」도', mark(sch.eligibilityLines[2], { bracket: 3 }, sch), null);
+  }
+  /* ⑤-3 부정어의 사정거리는 절 전체다 — 목록·`및` 앞쪽 낱말이 허용으로 새고 있었다 */
+  eq('「재학생(휴학생, 졸업유예자 제외)」는 휴학생을 막는다', mark('재학생(휴학생, 졸업유예자 제외)', onLeave), 'no');
+  eq('  졸업유예자도', mark('재학생(휴학생, 졸업유예자 제외)', { status: '졸업유예' }), 'no');
+  eq('  「재학생 (휴학생·수료생·졸업생 제외)」의 수료생', mark('재학생 (휴학생·수료생·졸업생 제외)', { status: '수료' }), 'no');
+  eq('  「휴학생 및 휴학 예정자 지원 불가」의 휴학생 (실데이터 꼴)',
+    mark('1학년 또는 2학년 학생 (2026년 2학기 휴학생 및 휴학 예정자 지원 불가)', { ...onLeave, year: 2 }), 'no');
+  eq('  「수료생 및 졸업생 제외」— 앞쪽 수료생도 금지',
+    (PRq.parseLine('수료생 및 졸업생 제외', false).conds.find((c) => c.kind === 'status') || {}).not, ['수료', '졸업']);
+  eq('  「휴학생은 신청할 수 없음」', mark('휴학생은 신청할 수 없음', onLeave), 'no');
+  eq('  「휴학생은 신청 가능, 수료생은 신청 불가」에서 휴학생은 금지가 아니다',
+    (PRq.parseLine('휴학생은 신청 가능, 수료생은 신청 불가', false).conds.find((c) => c.kind === 'status') || {}).anyOf, ['휴학']);
+  eq('  「학적 제한 없음」은 부정이 아니다', (PRq.parseLine('휴학생 포함 학적 제한 없음', false).conds.find((c) => c.kind === 'status') || {}).not, undefined);
+  eq('  재학생은 「재학생(휴학생 제외)」에 여전히 ✓', mark('재학생(휴학생, 졸업유예자 제외)'), 'ok');
+  /* ⑤-4 `X 전공자` 의 X 가 일반 낱말이면 이름이 아니다 — 모든 학생이 ✗ 였다 */
+  eq('「해당 학과 전공자」는 ✗ 가 아니다', mark('해당 학과 전공자'), null);
+  eq('  「타 학과 전공자 지원 불가」도 ✗ 가 아니다', mark('타 학과 전공자 지원 불가'), null);
+  eq('  이름 목록이 빈다', (PRq.parseLine('동일 계열 전공자 우대', false).conds.find((c) => c.kind === 'major') || { names: [] }).names, []);
+  /* ⑤-5 괄호 안에 제 문턱이 있으면 4.5 쪽 숫자를 쓴다 */
+  eq('「4.3 만점 3.0 이상 (4.5 만점 3.2 이상)」은 평점 3.1 에게 ✗',
+    mark('평점 4.3 만점 3.0 이상 (4.5 만점 3.2 이상)', { gpa: 3.1 }), 'no');
+  /* ⑤-6 서술어는 지역 이름이 아니다 */
+  eq('「계속 거주하는 도민」의 지역 이름이 「거주하는」이 아니다',
+    (PRq.parseLine('충북에 3년 이상 계속 거주하는 도민의 자녀', false).conds.filter((c) => c.kind === 'residence' && c.unnamed)).length, 0);
+  eq('  「용인 지역」은 여전히 지역이다', (PRq.parseLine('용인 지역 거주자', false).conds.find((c) => c.kind === 'residence') || {}).unnamed, true);
+  eq('  「경력 무관」은 묻는 것이 아니다', PRq.unaskedAttr('경력 무관 · 재학생', [{ kind: 'status' }]), false);
+  /* ⑥ 이름 모르는 곳도 지역 요건이다 — 부산 신입생에게 포항·광양 줄이 ✓ 였다 */
+  const fresh = { status: '신입학', year: 1, gpa: null, credits: null, region: '부산', parentRegion: '부산' };
+  eq('「포항·광양 지역 가정 자녀 … 신입생」은 부산 신입생에게 ✓ 가 아니다', mark('포항·광양 지역 가정 자녀 중 2026년 대학 신입생', fresh), null);
+  eq('  「포항·광양 소재 대학교 … 신입생」도', mark('포항·광양 소재 대학교 2026년 우수성적 신입생', fresh), null);
+  eq('  「해당 지역」·「전국」은 지역 요건이 아니다',
+    PRq.parseLine('전국 4년제 대학교 2026년 신입생', false).conds.some((c) => c.kind === 'residence'), false);
+  /* ⑦ 한 일·가진 것을 묻는 줄은 처지 낱말이 있어도 ✓ 가 아니다 */
+  eq('「학자금대출을 받은 … 재학생」은 ✓ 가 아니다', mark('한국장학재단에서 학자금대출을 받은 국내 대학교 재학생'), null);
+  eq('  「형제·자매가 2인 이상 동시에 재학」도', mark('2026-2학기 본교 학부에 형제 · 자매가 2 인 이상 동시에 재학하고 있는 자'), null);
+  eq('  「추천을 받은 2학년 이상」도', mark('타지역에 소재한 국내 대학교에 재학 중인 학교(총)장 또는 단과대학장의 추천을 받은 대학교 2학년 이상 학생'), null);
+  eq('  「장애학생 중 … 수상 실적」은 장애 학생에게도 ✓ 가 아니다',
+    mark('장애학생 중 학업 성적 우수, 예술‧체육‧기능‧기타 분야에서 도단위 이상 대회 3위 이상 수상 실적이 있는 자', { flags: ['disabled'] }), null);
+  eq('  다자녀 줄은 여전히 다자녀 학생에게 ✓ (되돌아가면 안 되는 것)', mark('다자녀 가구의 자녀', { flags: ['multiChild'] }), 'ok');
+
+  /* ⑧ 🔴 정답표 — 사람이 읽은 판정과 엔진이 같은가 (예방 장치).
+     규칙을 고쳐 판정이 바뀌면 여기서 빨간불이 난다. 의도한 변화면 표를 다시 읽고
+     `node verify/verdict-table.mjs --write-gold` 로 굳힌다. 안 읽고 굳히지 말 것. */
+  process.env.VERDICT_AS_LIB = '1';
+  const VT = await import(new URL('./verdict-table.mjs', import.meta.url));
+  const gold = JSON.parse(readText(new URL('./fixtures/eligibility-gold.json', import.meta.url)));
+  const now = VT.verdictRows();
+  const key = (r) => `${r.id} ${r.text} ${r.exclude ? 1 : 0}`;
+  const nowMap = new Map(now.map((r) => [key(r), r.verdict]));
+  const drift = [];
+  let seen = 0;
+  for (const g of gold.rows) {
+    const v = nowMap.get(key(g));
+    if (!v) continue;   // 그 공고가 목록에서 빠졌으면 잴 것이 없다(목록은 매일 바뀐다)
+    seen += 1;
+    for (const p of Object.keys(g.verdict)) {
+      if ((g.verdict[p] || null) !== (v[p] || null)) drift.push(`${g.id} · ${p} · ${g.text.slice(0, 40)} : ${g.verdict[p] || '·'} → ${v[p] || '·'}`);
+    }
+  }
+  /* ⚠️ 열쇠(줄 글자)가 하나도 안 맞으면 전부 건너뛰어 조용히 통과한다 — 그래서 절반 넘게는 맞아야 한다
+     (목록에서 빠진 공고는 있어도 되지만, requirementLines 의 글자 다듬기가 바뀌면 여기서 드러난다) */
+  eq(`정답표 ${gold.rows.length}줄 중 아직 목록에 있는 줄을 실제로 쟀다 (${seen}줄)`, seen >= Math.ceil(gold.rows.length / 2), true);
+  eq('  엔진 판정이 정답표와 같다 (다르면 표를 읽고 --write-gold)', drift, []);
+  eq('  정답표는 사람이 읽은 뒤 굳힌다고 적혀 있다', /사람이 표를 읽은 뒤에만/.test(gold.note || ''), true);
+}
+
+/* ── 2026-09-17 · 노션 G-3 — 마감일 감사 (틀린 마감은 못 읽은 것보다 나쁘다) ──
+   개발자 지적: "마감일이 아직 지나지 않았음에도 마감된 공고라고 뜨면서 신청 불가로 뜨는 문제".
+   verify/deadline-audit.mjs 가 마감마다 **근거 줄**을 찾고 말이 되는지 본다. 전수 조사 결과:
+   근거 없는 마감은 전부 2026-09-12 자동 등록이 **게시판 요약 한 줄**에서 읽었는데 그 요약이
+   어디에도 저장되지 않아 근거를 잃은 것이다(아래 톱니의 천장이 그것이다 — 건국 1건은 2026-09-17
+   링크 정찰 run 35207443601 로 게시판 제목에서 확인해 deadlineFrom 에 적었다 · 4 → 3). */
+console.log('\n■ 마감일 감사 — 근거 없는 마감이 늘지 않는다 (2026-09-17 · 노션 G-3)');
+{
+  process.env.DEADLINE_AUDIT_AS_LIB = '1';
+  const DA = await import(new URL('./deadline-audit.mjs', import.meta.url));
+  /* ① 문구에서 끝 날짜 — 발표·지급 날짜는 마감이 아니다 */
+  eq('문구의 마지막 날짜를 끝으로 읽는다 (신청 2026.7.6 ~ 8.31)', DA.lastDateIn('신청 2026.7.6(월) ~ 8.31(월) 18:00', '2026'), '2026-08-31');
+  eq('  발표 날짜는 마감이 아니다 (모집 ~2026.8.5 · 선발 발표 8.26)', DA.lastDateIn('모집 ~2026.8.5 · 선발 발표 8.26(수)', '2026'), '2026-08-05');
+  eq('  해가 없으면 빌린다 (~9/18)', DA.lastDateIn('접수 ~9/18', '2026'), '2026-09-18');
+  eq('  달이 거꾸로 가면 해가 넘어간 것이다 (12.20 ~ 1.10)', DA.lastDateIn('접수 2026.12.20 ~ 1.10', '2026'), '2027-01-10');
+  eq('  소수는 날짜가 아니다 (평점 3.5 ~ 4.5)', DA.lastDateIn('접수 ~ 2026. 9. 18.(금) 18:00 · 평점 3.5 ~ 4.5', '2026'), '2026-09-18');
+  eq('  날짜가 없으면 null', DA.lastDateIn('접수 기간 원문 확인', '2026'), null);
+  /* ② 전수 — 톱니. 근거 없는 마감이 지금(4건)보다 늘면 빨간불.
+        줄이면 천장을 내릴 것 · 올리려면 그 마감이 어디서 왔는지 먼저 적을 것. */
+  const rows = DA.auditDeadlines(new Date('2026-09-17T00:00:00'));
+  const noEvidence = rows.filter((r) => r.flags.some((f) => /근거를 못 찾음/.test(f)));
+  eq(`근거 없는 마감이 3건을 넘지 않는다 (지금 ${noEvidence.length}건: ${noEvidence.map((r) => r.id).join(', ') || '없음'})`,
+    noEvidence.length <= 3, true);
+  const wrongLabel = rows.filter((r) => r.flags.some((f) => /화면 문구의 끝 날짜/.test(f)));
+  eq('화면 문구의 끝 날짜와 마감이 어긋난 공고가 없다', wrongLabel.map((r) => `${r.id} ${r.deadline} vs 문구 「${r.period}」`), []);
+  const farAway = rows.filter((r) => r.flags.some((f) => /1년 넘게/.test(f)));
+  eq('등록일에서 1년 넘게 먼 마감이 없다', farAway.map((r) => r.id), []);
+  /* ③ 마감이 있는 공고는 전부 ISO 날짜이고 실제로 있는 날이다 — 틀린 꼴은 dday 가 NaN 을 낸다 */
+  const badIso = rows.filter((r) => r.deadline && !(/^\d{4}-\d{2}-\d{2}$/.test(r.deadline) && !Number.isNaN(new Date(r.deadline + 'T00:00:00').getTime())));
+  eq('마감은 전부 YYYY-MM-DD 이고 달력에 있는 날이다', badIso.map((r) => `${r.id} ${r.deadline}`), []);
+  /* ④ 자동 등록이 제목·요약에서 읽은 마감은 그 문구를 표식에 남긴다 — 근거 없는 마감이 더 생기지 않게 */
+  const ar = readText(new URL('../collector/auto-register.mjs', import.meta.url));
+  eq('자동 등록이 마감을 읽으면 그 문구를 deadlineFrom 에 남긴다', /deadlineFrom: `게시판 요약 · \$\{/.test(ar), true);
+}
+
+/* ── 2026-09-17 · OCR — 그림·스캔 첨부 글자 읽기 (개발자 지시 "직접 할 수 있으면 사용") ──
+   무료 tesseract 로 글자층 없는 PDF·그림을 읽되 **품질 관문을 넘은 것만** `.ocr.txt` 로 남긴다.
+   실측: 스캔 공고문 0.92~0.98 통과 · 포스터 0.41~0.86 탈락(39개 중 8개). 틀린 자격 줄은 못 읽는 것보다
+   나쁘므로(원칙 8-1) 관문·글머리 기호 되돌림·AI 값 보호 셋이 이 절의 심장이다. */
+console.log('\n■ OCR — 그림·스캔 첨부 글자 읽기 (2026-09-17)');
+{
+  const ocrSrc = readText(new URL('../collector/ocr-text.py', import.meta.url));
+  eq('OCR 스크립트가 품질 관문을 가진다 (문서 한글 비율 0.9 · 살아남은 한글 200자)',
+    /ACCEPT_RATIO = 0\.90/.test(ocrSrc) && /ACCEPT_HANGUL = 200/.test(ocrSrc), true);
+  eq('  결과는 .ocr.txt 로만 남긴다 (.txt 면 pdf-text 의 "이미 뽑았다" 판정과 섞인다)',
+    /\+ '\.ocr\.txt'/.test(ocrSrc) && !/path \+ '\.txt', 'w'/.test(ocrSrc), true);
+  eq('  장부는 훑는 폴더 안에 둔다 (git add <폴더> 가 담는다 — 이슈 #79 유형)', /os\.path\.join\(root, LEDGER\)/.test(ocrSrc), true);
+  eq('  tesseract 가 없으면 경고를 남긴다 (조용히 0개 금지)', /::warning::tesseract/.test(ocrSrc), true);
+  /* 자가 검사 — 실제 OCR 출력 두 조각으로 관문이 살아 있는지(좋은 스캔은 남기고 포스터는 버리고
+     글머리 기호 오독(`ㅁ`·`(2`)을 되돌린다). python3 은 워크플로 러너와 개발 컴퓨터에 다 있다. */
+  const st = spawnSync('python3', ['collector/ocr-text.py', '--self-test'],
+    { cwd: fileURLToPath(new URL('..', import.meta.url)), encoding: 'utf8' });
+  eq('  자가 검사 통과', st.status === 0 && /"ok": true/.test(st.stdout || ''), true);
+  /* 코드 리뷰(2026-09-17)가 잡은 자리 셋 — 반쪽 굳힘 · 장부 유실 · 관문 상수 변경 뒤 영영 건너뜀 */
+  eq('  예산이 문서 중간에 바닥나면 반쪽을 굳히지 않는다 (Budget 예외)', /raise Budget\(/.test(ocrSrc) && /except Budget/.test(ocrSrc), true);
+  eq('  파일마다 장부를 저장한다 (단계가 죽어도 남게)', (ocrSrc.match(/save_ledger\(root, ledger\)/g) || []).length >= 2, true);
+  eq('  장부에 관문 판(gate)을 적어 상수가 바뀌면 다시 읽는다', /entry\.get\('gate'\) != GATE/.test(ocrSrc), true);
+  eq('  바깥 명령의 대기 시간을 남은 예산으로 깎는다', /timeout=remaining\(deadline/.test(ocrSrc), true);
+  /* 워크플로 — PDF 글자를 뽑는 로봇 전부가 OCR 도 돌리고, 설치 실패를 삼키지 않는다 */
+  const wfs = fs.readdirSync(new URL('../.github/workflows', import.meta.url))
+    .filter((f) => f.endsWith('.yml'))
+    .map((f) => [f, readText(new URL('../.github/workflows/' + f, import.meta.url))]);
+  eq('PDF 글자를 뽑는 워크플로 전부가 OCR 도 돌린다',
+    wfs.filter(([, t]) => /ocr-text\.py/.test(t)).map(([f]) => f).sort(),
+    wfs.filter(([, t]) => /pdf-text\.py/.test(t)).map(([f]) => f).sort());
+  for (const [f, t] of wfs.filter(([, t]) => /ocr-text\.py/.test(t))) {
+    eq(`  ${f} 가 tesseract-ocr-kor 를 설치한다 (안 하면 조용히 0개)`, /tesseract-ocr-kor/.test(t), true);
+    eq(`  ${f} 가 설치 실패를 삼키지 않는다`, /tesseract-ocr-kor[^\n]*\|\|\s*true/.test(t), false);
+    eq(`  ${f} 의 OCR 단계는 자기 예산 + continue-on-error 다 (보강 단계 규칙)`,
+      /name: 그림·스캔 첨부 글자 읽기 \(OCR\)\n(?:\s+if:[^\n]*\n)?\s+timeout-minutes: \d+\n\s+continue-on-error: true/.test(t), true);
+  }
+  /* 읽는 쪽 — PDF·그림에서 .ocr.txt 만 읽는다(.pdf.txt 는 2026-08-20 결정대로 안 읽는다) */
+  const at = readText(new URL('../collector/attachment-text.mjs', import.meta.url));
+  eq('attachmentText 가 PDF·그림에서 .ocr.txt 를 읽고 .pdf.txt 는 안 읽는다',
+    /\.ocr\.txt/.test(at) && !/'\.pdf\.txt'/.test(at), true);
+  {
+    const AT = await import(new URL('../collector/attachment-text.mjs', import.meta.url));
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ocr-'));
+    const img = path.join(tmp, 'elig-x-1.png');
+    fs.writeFileSync(img, 'not an image');
+    eq('  .ocr.txt 가 없으면 빈 문자열(모른다)', AT.attachmentText(img), '');
+    fs.writeFileSync(img + '.ocr.txt', '○ 전국 대학(원)생 (휴학생 제외)\n');
+    eq('  있으면 그 글자', AT.attachmentText(img).trim(), '○ 전국 대학(원)생 (휴학생 제외)');
+    const pdf = path.join(tmp, 'form-x-1.pdf');
+    fs.writeFileSync(pdf, '%PDF-1.4');
+    fs.writeFileSync(pdf + '.txt', '글자층 평점 3.0 이상');
+    eq('  PDF 의 .pdf.txt 는 여전히 안 읽는다', AT.attachmentText(pdf), '');
+    /* 코드 리뷰(2026-09-17): OCR 이 글자를 내기 시작하면 색인 순서(PDF 가 앞)만으로 HWP 를 이긴다 */
+    eq('첨부 읽는 차례 — HWP·DOCX 가 OCR(PDF·그림)보다 먼저', AT.docOrder(['a.pdf', 'b.jpg', 'c.hwp', 'd.docx']), ['c.hwp', 'd.docx', 'a.pdf', 'b.jpg']);
+    eq('  OCR 에서 온 글자인지 알 수 있다 (출처 표식용)', [AT.isOcrSource(img), AT.isOcrSource(pdf), AT.isOcrSource(path.join(tmp, 'x.hwp'))], [true, false, false]);
+  }
+  const exSrc2 = readText(new URL('../collector/extract-excerpts.mjs', import.meta.url));
+  eq('발췌기가 그 차례로 읽고 OCR 출처를 「공고문 첨부(OCR)」로 적는다',
+    (exSrc2.match(/docOrder\(/g) || []).length >= 2 && (exSrc2.match(/docLabel\(/g) || []).length >= 4 && /'공고문 첨부\(OCR\)'/.test(exSrc2), true);
+  eq('  옛 표식을 지울 때 (OCR) 판도 같이 본다', /\/\^공고문 첨부\/\.test\(it\.eligibilityFrom/.test(exSrc2), true);
+  eq('  금액 로봇도 같은 차례', /docOrder\(/.test(readText(new URL('../collector/extract-amounts.mjs', import.meta.url))), true);
+  /* KOSAF 쪽 — 사본 정리가 장부를 지우지 않고, 빈 껍데기 판정이 .ocr.txt 도 연다 */
+  eq('KOSAF 사본 정리가 재단 폴더만 지운다 (장부는 남긴다)', /isDirectory\(\)\) continue;/.test(readText(new URL('../collector/kosaf-attach.mjs', import.meta.url))), true);
+  eq('  KOSAF 빈 껍데기 판정이 .ocr.txt 도 연다', /'\.ocr\.txt'/.test(readText(new URL('../collector/kosaf-empty.mjs', import.meta.url))), true);
+  /* 🔴 무료 경로가 AI·관리자 값을 덮지 않는다 — OCR 을 붙인 첫 실행에서 의암 손병희의
+     `AI(공고 포스터 그림)` 자격 줄이 거친 OCR 줄로 갈렸다(본문 없는 갈림길에 관문이 없었다). */
+  const exSrc = readText(new URL('../collector/extract-excerpts.mjs', import.meta.url));
+  eq('본문 없는 갈림길도 AI·관리자가 채운 자격을 덮지 않는다',
+    /got\.length && WRITE && !humanOwned\(it\.eligibilityFrom\)/.test(exSrc), true);
+}
+
+/* ── 자격 묻기 — 채워도 판정이 안 바뀌는 줄에는 묻지 않는다 (2026-09-17 · 노션 AI-1) ──
+   🔴 이 절이 이 기능의 심장이다. 적어도 안 풀리는 줄에 단추를 달면
+      **학생이 적었는데 화면이 그대로다** — 묻지 않는 것보다 나쁘다.
+   🔴 판정은 화면이 쓰는 `requirementMatch` 를 그대로 탐침해서 낸다. judgeCond 로
+      바로 가면 경우별 분기·표 라벨·선택지 묶음 관문을 건너뛴다(사전 점검에서 실제로
+      `신입생:` 줄이 재학생에게 '평점을 물어라'를 냈다).
+   ⚠️ 아래 줄과 기대값은 **실제로 재서 얻은 것**이다(2026-09-17). 지어내지 말 것.
+      기대값이 안 맞으면 코드를 의심하기 전에 이 값을 다시 재 볼 것. */
+console.log('\n■ 자격 묻기 — 무엇을 물을 수 있나');
+{
+  const EA = createRequire(import.meta.url)('../elig-ask.js');
+  /* 온보딩 선택 칸을 하나도 안 채운 학생 — 필수(학교·캠퍼스·학년·학적)만 있다 */
+  const bare = { school: '경희대학교', campus: '서울', year: 3, status: '재학' };
+  const sch = { id: 't', name: '두을장학재단', provider: '두을장학재단' };
+  const L45 = '26년 정규 1학기를 총 15학점 이상 이수하고, 성적을 3.5/4.5 이상 취득한 자';
+
+  eq('평점과 이수학점을 묻는다 (4.5 만점으로 적힌 줄)',
+    EA.askableFields(L45, bare, sch), ['gpa', 'credits']);
+
+  /* 🔴 되돌림 방지 — 백분위 성적은 평점을 적어도 그 줄이 안 풀린다(줄이 풀리려면
+     조건이 **전부** 풀려야 하는데 환산 조건이 막혀 있다). 학점만 묻는 것이 맞다. */
+  eq('백분율환산 줄에서는 평점을 묻지 않는다 (학점만)',
+    EA.askableFields('학기별 최소 9학점 이상 이수하고 평점평균(백분율환산)이 85점 이상인 자', bare, sch),
+    ['credits']);
+
+  /* 🔴 되돌림 방지 — 재학생에게 `신입생:` 줄은 영영 판정되지 않는다 */
+  eq('내 경우가 아닌 분기 줄은 묻지 않는다',
+    EA.askableFields('신입생: 2026년 1학기 85점 이상', bare, sch), []);
+
+  eq('자격이 아닌 줄은 묻지 않는다 (접수 주소)',
+    EA.askableFields('[13620] 경기도 성남시 분당구 구미로 173번길 82 분당서울대학교병원 2동 7층', bare, sch), []);
+  eq('절 제목은 묻지 않는다', EA.askableFields('2. 신청자격', bare, sch), []);
+
+  eq('소득구간을 묻는다',
+    EA.askableFields('한국장학재단 학자금 지원구간 8구간 이내인 자', bare, sch), ['bracket']);
+  eq('국적을 묻는다',
+    EA.askableFields('대한민국 국적을 가진 자에 한함', bare, sch), ['nationality']);
+
+  /* 🔴 이미 채운 칸은 다시 묻지 않는다 — 남은 칸만 묻는다 */
+  eq('이미 적은 칸은 묻지 않는다 (남은 칸만)',
+    EA.askableFields(L45, { ...bare, gpa: 4.0 }, sch), ['credits']);
+  eq('  둘 다 적었으면 물을 것이 없다 (판정이 났으므로)',
+    EA.askableFields(L45, { ...bare, gpa: 4.0, credits: 15 }, sch), []);
+
+  /* 🔴 이미 **미달**로 판정된 줄에도 묻지 않는다 — 단추를 달면 이미 답이 난 줄에
+     또 적으라고 하는 것이다. (판정 유무로 보지 'ok' 인지로 보지 않는다)
+     ⚠️ 여기서 평점만 적어도 판정이 끝난다 — 확신 높은 미달은 나머지 조건을 안 보고
+        그 자리에서 'no' 다. 그래서 학점을 안 적었는데도 물을 것이 없다(실측). */
+  eq('미달로 판정된 줄에도 묻지 않는다', EA.askableFields(L45, { ...bare, gpa: 2.0 }, sch), []);
+  eq('  학점을 안 적었어도 마찬가지다', EA.askableFields(L45, { ...bare, gpa: 3.42 }, sch), []);
+
+  /* ── 칸의 이름·단위 ─────────────────────────────────────────────
+     🔴 칸 이름이 온보딩(app.js collectProfile)과 갈라지면 시트가 엉뚱한 칸에
+        저장하고 판정은 영영 안 바뀐다. 사람이 기억하는 대신 소스를 대조한다. */
+  eq('물을 수 있는 칸에는 전부 이름표가 있다',
+    Object.keys(EA.FIELD_PROBE).filter((f) => !EA.FIELD_META[f]), []);
+  eq('  이름표만 있고 탐침이 없는 칸은 없다 (물을 수 없는 칸을 화면에 그리지 않는다)',
+    Object.keys(EA.FIELD_META).filter((f) => !EA.FIELD_PROBE[f]), []);
+
+  {
+    const appJs = readText(new URL('../app.js', import.meta.url));
+    const at = appJs.indexOf('function collectProfile()');
+    const body = appJs.slice(at, at + 2600);
+    const made = new Set([...body.matchAll(/^\s{4}([A-Za-z_$][\w$]*):/gm)].map((m) => m[1]));
+    eq('FIELD_META 의 칸 이름이 전부 온보딩이 만드는 칸이다',
+      Object.keys(EA.FIELD_META).filter((k) => !made.has(k)), []);
+  }
+
+  /* 입력 문자열 → 프로필 값. 🔴 못 읽으면 0 이 아니라 null 이다(모르면 판정하지 않는다) */
+  eq('평점은 숫자로 바뀐다', EA.coerceField('gpa', '3.42'), 3.42);
+  eq('  빈 칸은 null', EA.coerceField('gpa', '  '), null);
+  eq('  글자는 null (0 이 아니다)', EA.coerceField('gpa', '몰라요'), null);
+  eq('  4.5 를 넘으면 4.5 로 깎는다 (온보딩과 같은 규칙)', EA.coerceField('gpa', '5.0'), 4.5);
+  eq('  음수는 0 으로', EA.coerceField('gpa', '-1'), 0);
+  eq('소득구간은 정수', EA.coerceField('bracket', '8'), 8);
+  eq('  0 은 null 이 아니다 (0 구간·0 학점은 유효한 값이다)', EA.coerceField('credits', '0'), 0);
+
+  /* 공고 단위로 모은다 — 같은 칸을 두 번 담지 않는다 */
+  {
+    const many = { id: 't', name: '두을장학재단', provider: '두을장학재단', eligibilityLines: [
+      L45,
+      '직전 학기 평점 3.0 이상인 자',
+      '대한민국 국적을 가진 자에 한함',
+    ] };
+    eq('공고의 자격 줄 전부에서 모으고 중복은 뺀다',
+      EA.askableForSch(many, bare), ['gpa', 'credits', 'nationality']);
+    eq('  자격 줄이 없는 공고에서도 죽지 않는다 (층2·상시 제도)',
+      EA.askableForSch({ id: 'k', name: '상시' }, bare), []);
+  }
+}
+
+/* ── 링크 사냥꾼 — 앱 이름과 게시판 제목이 달라도 찾는다 (2026-09-18) ──
+   🔴 실측: 한국외대 6건이 `목록에서 못 찾음` 4회로 likelyGone 처리됐는데, 게시판에
+      그 글이 **멀쩡히 있었다**. 앱 이름(사람이 다듬음)과 행 글자가 달라 지문이 안 맞은 것이다.
+   🔴 **느슨하게 풀면 안 된다** — 예전에 `복지장학금 (서울캠퍼스)` 가 `(다빈치캠퍼스)`
+      공고에 붙었다. 딱 하나일 때만, 캠퍼스가 어긋나면 버린다. */
+console.log('\n■ 링크 사냥꾼 — 알맹이 낱말로 한 번 더 찾기');
+{
+  const HUFS = '[공통][교내] 2026학년도 2학기 면학장학금 신청 안내';
+  eq('앱 이름에서 장학금 이름만 집는다', titleCore('면학장학금 (한국외대 교내)'), '면학장학금');
+  eq('  학기·연도·「신청 안내」는 알맹이가 아니다', titleCore(HUFS), '면학장학금');
+  eq('지문이 안 맞아도 알맹이로 찾는다 (실제로 못 찾던 줄)',
+    !sameTitle('면학장학금 (한국외대 교내)', HUFS)
+      && !!rowByCore('면학장학금 (한국외대 교내)', [{ t: HUFS }, { t: '[공통][교내] 2026-2학기 가족장학금 신청 안내' }]),
+    true);
+  eq('  여럿이면 지어내지 않는다',
+    rowByCore('면학장학금 (한국외대 교내)', [{ t: HUFS }, { t: '2025 면학장학금 안내' }]), null);
+  eq('  캠퍼스가 어긋나면 버린다 (복지장학금 사고)',
+    rowByCore('복지장학금 (서울캠퍼스)', [{ t: '[다빈치캠퍼스] 복지장학금 안내' }]), null);
+  eq('  같은 캠퍼스면 고른다',
+    !!rowByCore('복지장학금 (서울캠퍼스)', [{ t: '[서울캠퍼스] 복지장학금 안내' }]), true);
+  eq('  알맹이가 짧으면 안 고른다 (우연히 겹친다)',
+    rowByCore('장학 (안내)', [{ t: '아무 장학 공고' }]), null);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');

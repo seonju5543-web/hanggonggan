@@ -8,6 +8,8 @@
      · 실시간 공고 피드(data/notices.json) — 제목과 링크만 아는 것이라 그렇게만 말한다
      · 내 신청 내역(state.applications)과 서류 보관함
      · 공고 원문 발췌(excerpts) — 원문 문장 그대로
+     · 자주 묻는 질문(app.js FAQ_ITEMS) — 고객센터와 **같은 원본**, 답 문장 그대로
+       (2026-09-15 · 노션 UI-11 "도움말·자주 묻는 질문을 챗봇으로")
 
    못 찾으면 **지어내지 않고 "못 찾았다"고 말한다.** 이것이 운영 원칙 6·8-1
    (가짜 공지 금지 · 추론 금지)을 챗봇에서 지키는 방법이다. 금액을 모르는 공고에
@@ -471,6 +473,10 @@ function chatRoute(q) {
   if (/(어떻게 ?신청|신청 ?방법|접수 ?방법|어디에 ?내|제출 ?방법|어디서 ?신청)/.test(s)) return chatAnswerHowTo(s);
   if (/(신청할 수 있|지원할 수 있|가능한|받을 수 있|추천|맞는|자격|될까|되나)/.test(s)) return chatAnswerApplyable();
 
+  /* 자주 묻는 질문을 **그대로** 물었으면 그 답이다 (앱 사용법 질문은 공고가 아니다) */
+  const faqExact = chatAnswerFaq(s, { exactOnly: true });
+  if (faqExact) return faqExact;
+
   /* 위에 안 걸리면 낱말로 찾아본다 */
   const cards = chatSearch(s);
   const notices = chatSearchNotices(s);
@@ -487,7 +493,87 @@ function chatRoute(q) {
         : '',
     };
   }
+  /* 공고에서 못 찾았으면 자주 묻는 질문에서 찾아본다 — 공고가 먼저다(이 앱의 본업) */
+  const faq = chatAnswerFaq(s);
+  if (faq) return faq;
   return null;  // 못 알아들음 — AI 자리로 넘어간다
+}
+
+/* ---------------- 자주 묻는 질문 (2026-09-15 · 노션 UI-11) ----------------
+   고객센터 화면과 **같은 원본**(app.js FAQ_ITEMS)을 읽는다 — 여기 사본을 두면 한쪽만
+   고쳐져 갈라진다. 답 문장은 그 원본 그대로이고(태그만 벗긴다) 지어내는 자리가 없다.
+   🔴 공고 검색보다 **뒤**에 온다 — '기숙사 알림' 처럼 공고 낱말이 든 질문이 FAQ 로
+      새면 안 된다. 질문을 그대로 물었을 때(`exactOnly`)만 앞에서 먼저 답한다.
+   🔴 문턱: 질문 낱말 둘 이상이 FAQ 질문·답에 있어야 한다. 낱말 하나로 답하면
+      '지원금 있어?' 에 3건을 찾았다던 사고(CHAT_STOP 주석)를 FAQ 에서 되풀이한다. */
+function chatFaqItems() {
+  return chatSafe(() => (typeof FAQ_ITEMS !== 'undefined' && Array.isArray(FAQ_ITEMS) ? FAQ_ITEMS : []), []);
+}
+const chatStripTags = (s) => String(s || '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+const chatFaqNorm = (s) => String(s || '').toLowerCase().replace(/[^0-9a-zㄱ-ㅎ가-힣]/g, '');
+function chatAnswerFaq(q, opts) {
+  const items = chatFaqItems();
+  if (!items.length) return null;
+  const s = String(q || '');
+  const nq = chatFaqNorm(s);
+  /* 그대로 물었는가 — `유료인가요?` 처럼 짧은 질문도 있어 5글자부터 보되, 물은 글자가
+     FAQ 질문의 **60% 이상**을 덮어야 한다. 🔴 4글자 부분일치로 두었더니 `학교 공고` 가
+     '우리 학교 공고가 안 보여요' 에 삼켜져 우리 학교 공고를 찾는 학생이 FAQ 를 받았다(코드 리뷰). */
+  const exact = nq.length >= 5 && items.find(([, question]) => {
+    const nf = chatFaqNorm(question);
+    if (nf.length < 5) return false;
+    if (nf.includes(nq)) return nq.length >= nf.length * 0.6;
+    return nq.includes(nf);
+  });
+  if (opts && opts.exactOnly) return exact ? chatFaqReply(exact) : null;
+  if (exact) return chatFaqReply(exact);
+
+  const toks = chatTokens(s);
+  /* 🔴 낱말 하나로는 답하지 않는다 — 그대로 물은 것(`유료인가요?`)은 위에서 이미 잡혔다.
+     낱말 하나·뚜렷한 낱말 하나에도 답하게 두었더니 `공고 없어` 가 '인터넷이 없어도 열리나요' 로,
+     `이름 바꾸기` 가 '기기를 바꾸면' 으로 갔다(코드 리뷰 실측). 모르면 모른다고 한다. */
+  if (toks.length < 2) return null;
+  /* 어미 하나까지는 봐준다 — `저장돼`·`저장한` 은 `저장` 이다(chatTail 은 조사만 뗀다).
+     세 글자 이상에서만 마지막 글자를 뗀 줄기도 같이 본다. */
+  const stems = (t) => (t.length >= 3 ? [t, t.slice(0, -1)] : [t]);
+  /* 동점이면 **물은 글자와 가장 길게 이어지는** 질문이 이긴다 — `내 정보는 어디에 저장돼?` 가
+     `저장`·`어디` 두 낱말로는 '저장한 공고는 어디에' 와 동점이라 엉뚱한 답을 했다(실측). */
+  const longestRun = (a, b) => {
+    let best = 0;
+    for (let i = 0; i < a.length; i++) {
+      for (let j = 0; j < b.length; j++) {
+        let k = 0;
+        while (i + k < a.length && j + k < b.length && a[i + k] === b[j + k]) k += 1;
+        if (k > best) best = k;
+      }
+    }
+    return best;
+  };
+  let best = null, bestScore = 0, bestRun = 0;
+  for (const item of items) {
+    const [, question, answer] = item;
+    const qText = chatFaqNorm(question), aText = chatFaqNorm(chatStripTags(answer));
+    let score = 0;
+    for (const t of toks) {
+      if (stems(t).some((x) => qText.includes(x))) score += 2;
+      else if (stems(t).some((x) => aText.includes(x))) score += 1;
+    }
+    const run = longestRun(nq, qText);
+    if (score > bestScore || (score === bestScore && score > 0 && run > bestRun)) {
+      best = item; bestScore = score; bestRun = run;
+    }
+  }
+  /* 문턱 — FAQ **질문** 쪽 낱말 둘(4점) 이상. 그보다 약하면 모른다고 한다.
+     `기숙사 알림` 은 `알림` 하나뿐이라 FAQ 로 새지 않고, `로그인 안 해도 돼` 도 `로그인`
+     하나뿐이라 모른다고 한다(그대로 물으면 위 exact 가 답한다). 축소가 안전하다. */
+  return best && bestScore >= 4 ? chatFaqReply(best) : null;
+}
+function chatFaqReply([cat, question, answer]) {
+  return {
+    text: chatStripTags(answer),
+    note: `자주 묻는 질문 「${chatStripTags(question)}」의 답이에요 (${cat}). 다른 질문은 설정 → 고객센터에 있어요.`,
+    actions: [{ act: 'faq', label: '자주 묻는 질문 열기' }],
+  };
 }
 
 /* ---------------- 못 알아들었을 때 ----------------
@@ -731,7 +817,7 @@ function chatPushBot(a) {
 /* ⑥ 답에서 바로 다음 행동 — 도우미를 닫고 그 화면으로 보낸다 */
 function chatDoAction(act) {
   const go = (screen) => { chatClose(); setTimeout(() => chatSafe(() => showScreen(screen)), 180); };
-  /* 🔴 '전체 보기'라고 적어 놓고 '우리 학교' 칸을 띄우지 않는다 — app.js 가 칸을 되돌린다 */
+  /* 🔴 '전체 보기'라고 적어 놓고 '교내'·'교외'로 걸린 목록을 띄우지 않는다 — app.js 가 칸을 되돌린다 */
   if (act === 'explore') {
     chatClose();
     setTimeout(() => chatSafe(() => (typeof exploreShowAll === 'function' ? exploreShowAll() : showScreen('explore'))), 180);
@@ -739,6 +825,7 @@ function chatDoAction(act) {
   }
   if (act === 'applications') return go('applications');
   if (act === 'wallet') return go('my');
+  if (act === 'faq') return go('faq');   // 설정 → 고객센터 → 자주 묻는 질문 화면 (app.js showScreen)
   if (act === 'notify') {
     chatClose();
     setTimeout(() => {
@@ -1116,5 +1203,5 @@ if (typeof document !== 'undefined' && document.querySelector('#chat-sheet')) {
 
 /* Node(검사 도구)에서도 규칙만 따로 불러 볼 수 있게 */
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { chatTokens, chatRoute, chatSearch, chatAnswerUnknown, CHAT_SUGGESTIONS };
+  module.exports = { chatTokens, chatRoute, chatSearch, chatAnswerUnknown, chatAnswerFaq, CHAT_SUGGESTIONS };
 }

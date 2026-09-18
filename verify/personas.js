@@ -84,7 +84,6 @@ async function dismissNotify(page) {
 
     // 홈 히어로
     const hero = await page.textContent('#hero-amount').catch(() => 'ERR');
-    const heroCount = await page.textContent('#hero-count').catch(() => 'ERR');
     if (/NaN|undefined|Infinity|-/.test(hero)) anomalies.push(`#${i} ${p.school}: bad hero "${hero}"`);
     if (/최대 0원/.test(hero)) zeroHero++;
     heroVals.push(hero);

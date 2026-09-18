@@ -89,7 +89,11 @@ const FUTURE_PLAN = /202[7-9](?![\d])[^\d]*(학년도|년).*(유학|연수|입�
 const POSITIVE = /(장학생|장학금)/;
 const ACTION = /(선발|모집|신청|추천|접수)/;
 
-/* 마감 후보 추출 — 명확한 것만 (YYYY.M.D / ~M/D는 연도 불명이라 제외) */
+/* 마감 후보 추출 — 명확한 것만 (YYYY.M.D / ~M/D는 연도 불명이라 제외)
+   돌려주는 것은 `{ date, text }` — text 는 **실제로 맞춘 문구**다(2026-09-17 · 노션 G-3).
+   🔴 왜 문구까지 남기나: 게시판 요약(deadlineHint)은 저장되지 않아, 여기서 읽은 마감은 나중에
+      **근거를 대조할 길이 없었다**(verify/deadline-audit.mjs 가 4건을 '근거 없음'으로 잡았다).
+      등록할 때 `deadlineFrom: '게시판 요약 · <문구>'` 로 남기면 감사가 그 문구를 근거로 센다. */
 function parseDeadline(n) {
   const hay = `${n.title} ${n.deadlineHint || ''}`;
   const m = hay.match(/~\s*(\d{4})[.\-\/\s]+(\d{1,2})[.\-\/\s]+(\d{1,2})/) ||
@@ -97,10 +101,10 @@ function parseDeadline(n) {
             hay.match(/~\s*(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일/) ||
             hay.match(/(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일\s*[^\d]{0,8}(까지|마감)/) ||
             hay.match(/(\d{4})[.\-\/\s]+(\d{1,2})[.\-\/\s]+(\d{1,2})\s*[^\d]{0,6}(까지|마감)/);
-  if (m) return `${m[1]}-${String(m[2]).padStart(2, '0')}-${String(m[3]).padStart(2, '0')}`;
+  if (m) return { date: `${m[1]}-${String(m[2]).padStart(2, '0')}-${String(m[3]).padStart(2, '0')}`, text: m[0].trim() };
   // 연도 없는 "~7.03"·"~7/19" — 올해로 해석 (마감 경과 거르기용)
   const m2 = hay.match(/~\s*(\d{1,2})[.\/](\d{1,2})/);
-  if (m2) return `${TODAY.slice(0, 4)}-${String(m2[1]).padStart(2, '0')}-${String(m2[2]).padStart(2, '0')}`;
+  if (m2) return { date: `${TODAY.slice(0, 4)}-${String(m2[1]).padStart(2, '0')}-${String(m2[2]).padStart(2, '0')}`, text: m2[0].trim() };
   return null;
 }
 
@@ -142,9 +146,9 @@ function classify(n, regUrlSet, regEntries, batchSeen) {
     return { verdict: 'hold', why: `타교 등록분과 동일 사업(${similars[0].name.slice(0, 24)}) — 접수분 여부 컨펌 대기` };
   }
   if (!ACTION.test(t)) return { verdict: 'hold', why: '선발·모집·신청 신호 없음 — 개발자 컨펌 대기' };
-  const deadline = parseDeadline(n);
-  if (deadline && deadline < TODAY) return { verdict: 'skip', why: `마감 경과(${deadline})` };
-  return { verdict: 'register', deadline };
+  const dl = parseDeadline(n);
+  if (dl && dl.date < TODAY) return { verdict: 'skip', why: `마감 경과(${dl.date})` };
+  return { verdict: 'register', deadline: dl ? dl.date : null, deadlineText: dl ? dl.text : null };
 }
 
 /* ---------- 실행 ---------- */
@@ -227,6 +231,9 @@ if (!cfg.enabled) {
       // 예전에는 50만원을 넣어 홈 화면 합계가 부풀려져 있었다 (2026-07-30 교정)
       amountValue: 0,
       deadline: r.deadline || null,
+      // 마감을 읽었으면 **어느 문구에서 읽었는지** 남긴다 — 게시판 요약은 저장되지 않아 이 줄이
+      // 유일한 근거다(verify/deadline-audit.mjs 가 이 문구를 근거로 센다 · 2026-09-17 노션 G-3)
+      ...(r.deadline && r.deadlineText ? { deadlineFrom: `게시판 요약 · ${r.deadlineText}` } : {}),
       // 마감을 못 읽은 공고는 등록일을 남긴다 — 앱이 등록 후 60일이 지나면 자동으로 감춘다
       // (마감이 없으면 목록에서 영영 안 사라지던 문제, 2026-07-30 교정)
       ...(r.deadline ? {} : { listedAt: TODAY }),

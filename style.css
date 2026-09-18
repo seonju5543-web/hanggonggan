@@ -97,6 +97,11 @@
   --t-2xl: 21px;
   --t-3xl: 27px;
   --t-hero: 38px;   /* 금액 하나뿐 */
+  /* 🔴 입력칸 글자는 **척도가 아니라 기능값**이다 — iOS 는 16px 미만인 칸을 누르면 화면을
+     통째로 확대한다(학생이 손가락으로 다시 줄여야 한다). 그래서 '한 단계 아래(--t-md 14.5px)'
+     로 내리지 않고 **그 바닥인 16px** 에 둔다. 아홉 단계 척도(--t-2xs~hero)에 넣지 않는
+     이유가 이것이다 — 여기 끼우면 17px 과 1.06배라 '단계마다 1.07배' 관문이 빨간불이 된다. */
+  --t-input: 16px;
 
   /* 자간 — 전에는 화면 곳곳에 9가지가 흩어져 있었다. 큰 글자는 좁히고 작은 글자·숫자는 안 좁힌다. */
   --track-display: -0.03em;   /* 24px 이상 */
@@ -498,7 +503,6 @@ input::placeholder { color: var(--text-weak); }
   margin: 6px 0 2px;
   font-variant-numeric: tabular-nums;
 }
-.hero-count { font-size: var(--t-sm); color: rgba(232, 239, 254, 0.72); margin-bottom: 20px; }
 
 .section-head {
   display: flex;
@@ -615,6 +619,9 @@ input::placeholder { color: var(--text-weak); }
      좌우로 화면 끝까지 펼치기(아래 margin/padding 짝). 글자 크기는 **안 건드렸다** —
      2026-09-11 에 개발자가 크기 조정을 전부 되돌리라고 했다.
      실측(칩 5개): 360px 한 줄(칩 오른쪽 끝 355 < 360) · 390px · 430px 한 줄 · 세로 스크롤 그대로.
+     🔴 **2026-09-17 에 칩이 셋이 됐다**('우리 학교'는 '교내'에 합치고 '신청 가능만'은 없앴다).
+        자리가 남지만 **이 조임값을 되돌리지 않는다** — 되돌리면 칩이 다시 늘 때 잘린 자리로
+        돌아가고, 여백은 ui-tone 관문이 지키는 값이라 이 지시와 무관하게 바꿀 것이 아니다.
      ⚠️ 칩을 더 늘리면 다시 잘린다 — 그때는 이름을 줄이거나 칩을 줄일 것(줄바꿈으로 돌아가지 말 것). */
   flex-wrap: nowrap;
   gap: 6px;
@@ -635,6 +642,17 @@ input::placeholder { color: var(--text-weak); }
    ⚠️ 문턱을 360 보다 올리지 말 것 — 360 은 갤럭시 S·픽셀의 폭이라 거기서 접으면 지시("일렬로")를
       어기는 것이 된다. 관문이 320·360·390 셋을 다 잰다(verify-explore-sort '필터 칩 한 줄'). */
 @media (max-width: 359px) { .filter-row { flex-wrap: wrap; } }
+/* 🔴 **칩이 다섯이던 때 360px 에서 마지막 칩이 28px 잘려 있었다** (2026-09-17 실측).
+   필요한 폭이 408px 이었다: 전체 53 · 교내 53 · 교외 53 · 우리 학교 86 · 신청 가능만 100
+   + 칩 사이 24 + 왼쪽 여백 20 → 오른쪽 끝 388 > 360.
+   **같은 날 칩을 셋으로 줄여(우리 학교를 교내에 합치고 신청 가능만 폐지) 저절로 풀렸다** —
+   지금은 320px 에서도 오른쪽 끝이 162라 한참 남는다. 그래서 그때 넣었던 '좁은 화면에서만
+   칩을 조이는' 규칙은 **걷어냈다**(이유가 사라진 규칙은 남기지 않는다 — 남기면 다음 사람이
+   왜 좁은지 모른 채 그 값을 기준으로 삼는다).
+   ⚠️ 칩을 다시 넷 이상으로 늘리면 같은 일이 난다. 그때는 줄바꿈으로 되돌리지 말고
+      (개발자 지시 "일렬로") **좁은 화면에서만** 칩 안쪽 여백과 칩 사이를 조일 것 —
+      390px 이상과 선 굵기 2px 은 2026-09-11 개발자 승인 항목이라 건드리지 않는다. */
+
 .filter-row::-webkit-scrollbar { display: none; }
 .filter-chip {
   flex: 0 0 auto;        /* 줄이지 않는다 — 줄이면 글자가 칸 밖으로 새거나 두 줄로 접힌다 */
@@ -869,6 +887,30 @@ input::placeholder { color: var(--text-weak); }
   width: 4px; height: 4px; border-radius: var(--radius-pill);
   background: var(--text-weak);
 }
+/* 🔴 제출 서류 목록은 점을 두지 않는다 (2026-09-17 개발자 지시) — 줄마다 '자동'·'직접'
+   배지가 이미 앞에 붙어 있어서 점까지 있으면 표식이 두 겹이었다. 개발자 말 그대로
+   "'직접'이라는 단어 부분으로 충분히 나누어진다는 것이 인식이 된다".
+   🔴 `.doc-list` 전체에 대면 안 된다 — 같은 클래스를 네 군데가 나눠 쓰는데, 그중
+      **공고 원문 발췌**(app.js `sch.excerpts`)는 줄 앞에 아무 표식이 없어서 점이
+      유일한 구분 표식이다. 거기서 점을 빼면 발췌 여러 줄이 한 문단처럼 붙는다.
+      그래서 배지가 붙는 목록에만 `doc-badged` 를 달아 그 목록만 짚는다.
+   ⚠️ 이 규칙의 전제는 **줄마다 배지가 반드시 하나 붙는다**는 것이다(app.js 가 자동
+      아니면 직접을 항상 붙인다). 배지 없는 줄이 생기면 그 줄은 표식을 잃으므로
+      app.js 와 여기를 같이 봐야 한다. */
+.doc-list.doc-badged li::before { display: none; }
+/* 🔴 flex 로 두는 이유 — 점을 빼고 왼쪽 여백을 0 으로 하면, **줄이 넘어갈 때** 둘째 줄이
+   배지 아래 맨 왼쪽까지 나가서 한 항목이 두 항목처럼 보인다(서류 이름이 긴 공고가 많다:
+   `개인(신용)정보 수집·이용·제공 및 조회 동의서 1부`). 배지와 글을 가로 두 칸으로 두면
+   넘어간 줄이 글 아래로 들어가 항목 하나가 한 덩어리로 읽힌다.
+   배지의 margin-right 는 gap 과 겹치므로 여기서만 0 으로 되돌린다. */
+.doc-list.doc-badged li {
+  padding-left: 0;
+  display: flex;
+  gap: var(--space-6);
+  align-items: baseline;
+}
+.doc-list.doc-badged .doc-auto,
+.doc-list.doc-badged .doc-manual { flex: none; margin-right: 0; }
 /* 판정 표시(✓ ✕ ?)가 이미 앞에 붙는 줄은 점을 빼서 두 겹이 되지 않게 한다 */
 .reason-list .r-ok::before, .reason-list .r-bad::before, .reason-list .r-unk::before { display: none; }
 .reason-list .r-ok, .reason-list .r-bad, .reason-list .r-unk { padding-left: 2px; }
@@ -1188,14 +1230,31 @@ textarea:focus {
   text-align: left;
   padding: 13px 14px;
   border-radius: var(--radius-sm);
-  background: var(--surface);
+  /* 🔴 읽은 알림의 색이다 — 회색으로 가라앉힌다 (아래 nf-unread 주석 참조) */
+  background: var(--surface-2);
   border: 1px solid var(--line);
-  transition: background 0.15s;
 }
-.nf-item:hover { background: rgba(18, 22, 31, 0.02); }
-.nf-item.nf-unread { background: var(--primary-weak); border-color: rgba(138, 106, 31, 0.18); }
+.nf-item .nf-title { color: var(--text-sub); }
+/* 🔴 읽음/안 읽음의 색을 뒤집었다 (2026-09-17 개발자 지시) — 예전엔 **안 읽은 알림이
+   색 배경(회색으로 보임)** 이고 읽은 알림이 흰색이라, 처리할 것이 가라앉고 끝난 것이
+   떠 보였다. 지금은 **안 읽은 것이 흰 카드로 떠 오르고** 읽은 것은 회색으로 가라앉는다.
+   시트 바탕이 흰색(--surface)이라 안 읽은 카드는 배경만으로는 안 보인다 — 테두리와
+   옅은 그림자가 그 자리를 대신한다. 배경만 바꾸고 이 둘을 빼면 카드가 사라져 보인다. */
+.nf-item.nf-unread {
+  background: var(--surface);
+  border-color: rgba(138, 106, 31, 0.28);
+  /* 🔴 토큰을 쓴다 — 손으로 적었던 값은 rgba(58,48,28) 갈색이라 페이스리프트 전
+     옛 팔레트가 남아 있던 것이다(지금 체계는 남색). --shadow 가 바로 이 자리다. */
+  box-shadow: var(--shadow);
+}
+.nf-item.nf-unread .nf-title { color: var(--text); }
+/* 🔴 누를 때는 **글자가 강조색**이 된다 — 면을 칠하지 않는다(2026-09-12 개발자 지시와 같은 규칙:
+   `.nf-pref`·`.faq-item summary`·기타 줄이 이미 그렇다). 예전 `:hover` 는 면을 옅게 칠했는데
+   `.nf-item.nf-unread` 와 **특정도가 같아 뒤엣것이 이겨서**, 학생이 실제로 누르는 안 읽은 알림은
+   아무 반응이 없었다. 이 줄은 읽음/안 읽음 규칙보다 **뒤에 둬야** 둘 다에서 이긴다. */
+.nf-item:active .nf-title { color: var(--accent); }
 .nf-text { display: grid; gap: 3px; min-width: 0; }
-.nf-title { font-size: var(--t-md); font-weight: 700; letter-spacing: -0.015em; }
+.nf-title { font-size: var(--t-md); font-weight: 700; letter-spacing: -0.015em; transition: color 0.15s; }
 .nf-body { font-size: var(--t-sm); color: var(--text-sub); line-height: 1.5; }
 .nf-time { font-size: var(--t-2xs); color: var(--text-weak); font-weight: 600; }
 
@@ -1506,7 +1565,7 @@ textarea:focus {
   border: 1px solid var(--line);
   border-radius: var(--radius-pill);
   background: var(--bg);
-  font-size: 16px;                  /* 🔴 16px 미만으로 낮추지 말 것 — iOS가 입력을 시작할 때 화면을 확대해 버린다 */
+  font-size: var(--t-input);        /* 🔴 iOS 자동 확대 바닥값 — 뜻과 값은 --t-input 한 곳에 적혀 있다 */
   font-family: inherit;
   color: var(--text);
 }
@@ -2224,7 +2283,9 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
 .search-box > svg { width: 18px; height: 18px; color: var(--text-weak); flex: none; }
 .search-box input {
   border: 0; background: none; padding: 12px 0; min-height: 44px;   /* 터치 44px */
-  font-size: var(--t-lg);              /* 🔴 16px 미만이면 iOS 가 칸을 누를 때 화면을 확대한다 */
+  /* 🔴 17px → 16px (2026-09-17 개발자 지시 "글씨체가 좀 큰 것 같아서 아주 살짝만 줄여줘").
+     **더는 못 줄인다** — 16px 미만이면 iOS 가 칸을 누를 때 화면을 확대한다. */
+  font-size: var(--t-input);
 }
 .search-box input:focus { border: 0; box-shadow: none; }
 /* 🔴 ✕ 가 **둘** 뜨던 것을 끈다 (2026-09-13 · 자주 묻는 질문을 만들다 눈으로 발견).
@@ -2985,7 +3046,6 @@ body::after { opacity: 0.26; }
 /* 홈 — 절 사이를 하나로 */
 .alog-sum, .ledger-hero { margin-bottom: var(--sp-4); }
 .section-head { margin: var(--sp-4) 0 0; padding-top: 16px; }
-.hero-count { margin-top: var(--sp-1); padding-top: var(--sp-1); }
 .home-header { margin-bottom: var(--sp-3); padding-bottom: var(--sp-2); }
 
 /* 목록 줄 — 안쪽 간격을 하나로 */
@@ -3114,6 +3174,18 @@ body::after { opacity: 0.26; }
 .my-card { margin-top: 6px; padding-top: 18px; }
 .my-card:first-of-type { margin-top: 0; padding-top: 0; }
 
+/* 🔴 「공통 서류정보」 아래 ~ 「서류 보관함」 사이의 빈 띠를 줄인다 (2026-09-17 개발자 지시
+   "쓸데없는 빈칸이 있는데 이거 없애줘"). 한 곳이 아니라 **여백 넷이 연달아 쌓여서** 생긴
+   자리였다(실측 56px): 학적정보 표의 아래 여백 8 + 내 정보 카드의 아래 안쪽 여백 24 +
+   카드 사이 6 + 서류 보관함 카드의 위 안쪽 여백 18.
+   그중 **카드의 안쪽 여백 둘만** 줄인다 — 표의 아래 여백과 카드 사이 6px 은 구분선이
+   글자에 닿지 않게 하는 몫이라 없애면 줄과 글자가 붙는다. 결과 56 → 32px.
+   🔴 `.my-card` 를 통째로 고치면 안 된다 — 설정 화면(#my-account·#my-notify·#set-etc)과
+      MY 아래쪽 카드들이 **같은 클래스**를 써서 화면 전체 리듬이 같이 바뀐다. 그래서
+      첫 카드와 그 **바로 다음 카드** 한 쌍만 짚는다. */
+#my-profile { padding-bottom: var(--space-6); }
+#my-profile + .my-card { padding-top: var(--space-12); }
+
 :root {
   --bg:        #fefdfc;   /* #fdfcfa 에서 한 단계 더 흰쪽 (R254 G253 B252) */
   --surface-2: #f7f6f4;
@@ -3147,6 +3219,15 @@ body::after { opacity: 0.26; }
       나중에 더한 border-bottom 이 이웃한 줄에서 맞닿아 1px+1px 이 된 것이다.
       가르는 선은 하나면 된다(아래쪽만 남긴다) — 알림의 .nf-pref 와 같은 방식. */
 #screen-my .my-menu { border-top: 0; }
+/* 🔴 「데이터 초기화」가 보관함에서 너무 떨어져 있었다 (2026-09-17 개발자 지시 "너무
+   동떨어져있어 … 사이 줄여줘"). 빈 띠의 정체는 셋이 이어진 것이다(실측 64px):
+   보관함 카드의 아래 안쪽 여백 24 + `.my-menu` 의 위 여백 34(--sp-4 '절과 절 사이')
+   + 그 안쪽 여백 6. 그중 **위 여백만** 가장 좁은 단계(--sp-1 8px · '같은 덩어리 안')로 줄인다 → 38px.
+   🔴 `.my-menu` 를 통째로 고치면 안 된다 — 설정 화면(#screen-settings)의 메뉴가 같은
+      클래스라 거기 리듬까지 같이 바뀐다. 그래서 MY 화면으로 한정한다.
+   ⚠️ 이 줄 위에는 구분선이 없다(바로 위 규칙이 뗐다) — 그래서 여백이 유일한 경계다.
+      0 으로 만들면 초기화 버튼이 보관함 목록의 마지막 줄처럼 붙어 보인다. */
+#screen-my .my-menu { margin-top: var(--sp-1); }
 #my-wallet .wallet-row { border-top: 0; }
 
 /* ══ 신청 내역 — 공고를 누르면 그 자리에서 펼쳐지는 진행 기록 (2026-09-01) ══
@@ -3165,13 +3246,6 @@ body::after { opacity: 0.26; }
 }
 .home-updated span { display: block; }
 .home-updated:empty { display: none; }
-/* 🔴 홈 히어로 아랫줄 (2026-09-17) — 금액 회계 문장을 걷어내면서 이 칸이 **빌 수 있게**
-   됐다(바로 신청 가능한 공고가 0건인 학생). 규칙이 없으면 빈 채로 글 높이 29px + 위 여백을
-   먹어 금액과 버튼 사이가 벌어진다(실측: 금액→버튼 57px).
-   ⚠️ `.home-updated` 처럼 `display: none` 으로 통째로 지우면 이번엔 **아래 여백까지 사라져**
-      금액과 버튼이 2px 로 붙는다(실측). 그래서 글과 위 여백만 죽이고 `margin-bottom` 은
-      남긴다 — 버튼은 어느 쪽이든 같은 자리에서 숨 쉰다(빈 경우 22px). */
-.hero-count:empty { margin-top: 0; padding-top: 0; font-size: 0; line-height: 0; }
 
 /* 🔴 위아래 여백은 **같은 값**이어야 한다 — 11/12 로 1px 어긋나 있었고,
    높이를 실제로 정하던 것은 여백이 아니라 버튼의 min-height 였다(30px).
@@ -4129,8 +4203,7 @@ body,
 .sch-org,
 .empty,
 .empty-sub,
-.hero-label,
-.hero-count {
+.hero-label {
   word-break: keep-all;
   overflow-wrap: break-word;
 }
@@ -4639,3 +4712,93 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 
 /* 손가락으로 눌렀을 때 회색 판이 뜨지 않게 — 설정 목록과 같은 규칙 */
 .sup-top-item, .sup-more { -webkit-tap-highlight-color: transparent; }
+
+<<<<<<< HEAD
+/* ── 자격 확인 도우미 (2026-09-17 · 노션 AI-1 · 2026-09-18 개발자 지시로 재단장) ──
+   🔴 앱이 하는 말은 「미확인 자격 n」뿐이다. 설명 문장을 넣지 말 것(설계 3-2).
+   🔴 **미확인 줄을 여기 다시 나열하지 않는다** — 위 자격 블록이 이미 보여 준다.
+      두 번 그렸더니 똑같은 줄이 회색으로 또 나와 화면이 두 배로 길어졌다(실측).
+      저장하면 **위 자격 블록의 그 줄**이 ✓·✕ 로 바뀐다.
+   🔴 칸은 **이름 왼쪽 · 값 굵게 오른쪽** 한 줄짜리다 — 앱1 의 `wallet-row`·학적정보
+      표와 같은 목록 언어다. 큰 네모를 쌓으면 빈 회색 덩어리가 된다.
+   🔴 접혔을 때는 파란 글씨 한 줄과 화살표뿐. 면도 선도 두르지 않는다.
+   🔴 토큰 밖의 값을 쓰지 않는다 — ui-tone.mjs '토큰 이탈' 톱니가 지금 값을 천장으로 잡는다. */
+.elig-ask { margin: var(--space-12) 0 0; }
+
+.elig-ask-open,
+.elig-ask-head {
+  display: inline-flex; align-items: center; gap: var(--space-4);
+  background: none; border: 0; padding: 0;
+  color: var(--accent); font: inherit; font-size: var(--t-xs); font-weight: 600;
+}
+.elig-ask-open b, .elig-ask-head b { font-variant-numeric: tabular-nums; }
+.elig-chev { flex: none; transition: transform .18s ease; }
+.elig-ask-head .elig-chev { transform: rotate(180deg); }
+.elig-ask-open:active, .elig-ask-head:active { transform: scale(0.95); }
+
+.elig-ask-on { margin-top: var(--space-16); }
+.elig-ask-head { margin-bottom: var(--space-8); }
+
+/* 칸 묶음 — 위아래 가는 선 사이의 목록 */
+.elig-ask-fields { border-top: 1px solid var(--line); margin-bottom: var(--space-16); }
+.elig-ask-row {
+  display: flex; align-items: center; gap: var(--space-12);
+  min-height: 52px; padding: var(--space-8) 0;
+  border-bottom: 1px solid var(--line);
+}
+.elig-ask-row > span:first-child {
+  flex: 1; min-width: 0;
+  font-size: var(--t-sm); color: var(--text-sub); font-weight: 500;
+}
+.elig-ask-wrap {
+  flex: none; display: flex; align-items: baseline; gap: var(--space-4);
+  border-radius: var(--radius-xs);
+  padding: var(--space-4) var(--space-8);
+  transition: background .15s ease, box-shadow .15s ease;
+}
+.elig-ask-row:focus-within .elig-ask-wrap {
+  background: var(--surface-2); box-shadow: var(--ring);
+}
+.elig-ask-wrap em {
+  flex: none; font-style: normal; font-size: var(--t-xs); color: var(--text-weak);
+}
+/* 값은 오른쪽 정렬 · 굵게 — 학적정보 표와 같다 */
+.elig-ask-in {
+  width: 78px; background: none; border: 0; padding: 0;
+  font: inherit; font-size: var(--t-md); font-weight: 700; color: var(--text);
+  text-align: right; font-variant-numeric: tabular-nums;
+}
+.elig-ask-in::placeholder { color: var(--text-weak); font-weight: 400; }
+.elig-ask-in:focus { outline: none; }
+.elig-ask-in::-webkit-outer-spin-button,
+.elig-ask-in::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.elig-ask-in[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+/* 글자 칸(학과·시·군)은 값이 길어 조금 넓게 */
+.elig-ask-in[type="text"] { width: 120px; }
+
+/* 아래 줄 — 왼쪽 '나중에 하기'(글자), 오른쪽 '저장'(작은 알약).
+   🔴 저장을 꽉 찬 판으로 두면 아래의 진짜 주 버튼과 무게가 같아진다. */
+.elig-ask-foot {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--space-12); margin-top: var(--space-4);
+}
+.elig-ask-later {
+  background: none; border: 0; padding: var(--space-8) 0;
+  color: var(--text-weak); font: inherit; font-size: var(--t-xs);
+}
+.elig-ask-save {
+  background: var(--accent); color: #fff; border: 0;
+  border-radius: var(--radius-pill); padding: var(--space-8) var(--space-20);
+  font: inherit; font-size: var(--t-xs); font-weight: 600;
+}
+.elig-ask-later:active, .elig-ask-save:active { transform: scale(0.95); }
+=======
+/* ══ 홈 히어로 (2026-09-17 개발자 지시 2차) ═══════════════════════════════════
+   아랫줄(`.hero-count`)을 통째로 없앴다 — '그중 n건은 바로 신청할 수 있어요' 가
+   마지막 한 줄이었고 개발자가 그것도 지우라고 했다(그 앞에 금액 회계 두 줄을 걷었다).
+   🔴 그 칸이 주던 **아래 여백을 여기서 물려받는다.** 안 물려받으면 금액과 버튼 사이가
+      실측 57px → 2px 로 붙는다(`.hero-amount` 자신의 margin-bottom 은 2px 뿐이다).
+   🔴 이 파일은 **뒤 블록이 앞을 덮으므로** 값은 여기 적어야 실제로 먹는다
+      (CLAUDE.md '파일 끝 카드 블록이 앞의 규칙을 전부 덮는다' 와 같은 이유). */
+.hero-amount { margin-bottom: 20px; }
+>>>>>>> origin/claude/nice-heisenberg-WESq5
