@@ -800,7 +800,7 @@ function parseLine(line, isExclude) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { parseLine, parseDegree, TRAIT_PAT, gradOnly, gradTarget, mentionsUndergrad, GRADE_SCALE, STATUSES, HIGH, LOW, MULTI_PROGRAM, HAS_EXCEPTION, caseBranch, unaskedAttr, REGIONS};
+  module.exports = { parseLine, parseDegree, TRAIT_PAT, gradOnly, gradTarget, mentionsUndergrad, GRADE_SCALE, STATUSES, HIGH, LOW, MULTI_PROGRAM, HAS_EXCEPTION, caseBranch, unaskedAttr, hasTopLevelOr, orBranches, REGIONS};
 }
 
 /* ── 경우별 분기 (2026-08-24 개발자 지적) ─────────────────────────────────
@@ -826,6 +826,41 @@ const CASE_STATUS = [
 ];
 
 /** 이 줄이 '경우별 분기'인가 — 맞으면 그 경우에 해당하는 학적상태 목록, 아니면 null */
+/* 🔴 **괄호 밖의 `또는` 이 있는가** (2026-09-18 개발자 결정).
+   *"'또는'이면 첫번째 예시로는 농어촌이거나 기초생활이어야하니까 기초생활이 농어촌이
+     아니더라도 적합으로 해줘."*
+   ⚠️ 괄호 **안**의 `또는` 은 한 조건의 속살이라 세지 않는다
+      (`평점 3.5 이상(4.5 만점 기준 또는 …)`). 여는 괄호를 세어 0 단계에서만 본다.
+   ⚠️ 이 함수는 '또는이 있다'까지만 말한다 — **뜻까지 정하지 않는다.** 실측으로 확인:
+      등록 자격 줄 198개 중 괄호 밖 `또는` 은 17줄인데, 그중 여럿은 요건 둘을 잇는 것이
+      아니라 한 요건의 속살이다(`달서구 구민 또는 그 자녀로서 재학 중인 학생` — 쪼개면
+      아무 재학생이나 통과한다). 무엇을 OR 로 볼지는 부르는 쪽이 좁게 정한다. */
+function hasTopLevelOr(text) {
+  const t = String(text || '');
+  let depth = 0;
+  for (let i = 0; i < t.length; i++) {
+    const c = t[i];
+    if ('([{（'.indexOf(c) >= 0) depth++;
+    else if (')]}）'.indexOf(c) >= 0) depth = Math.max(0, depth - 1);
+    else if (depth === 0 && t.startsWith('또는', i)) return true;
+  }
+  return false;
+}
+
+/* 괄호 밖 `또는` 로 줄을 가른 **갈래들**. `hasTopLevelOr` 와 같은 자리를 센다. */
+function orBranches(text) {
+  const t = String(text || '');
+  const out = []; let depth = 0, last = 0;
+  for (let i = 0; i < t.length; i++) {
+    const c = t[i];
+    if ('([{（'.indexOf(c) >= 0) depth++;
+    else if (')]}）'.indexOf(c) >= 0) depth = Math.max(0, depth - 1);
+    else if (depth === 0 && t.startsWith('또는', i)) { out.push(t.slice(last, i)); last = i + 2; i += 1; }
+  }
+  out.push(t.slice(last));
+  return out.map((x) => x.trim()).filter(Boolean);
+}
+
 function caseBranch(text) {
   const t = String(text || '').trim();
   /* 이름표가 줄 맨 앞에 있고 **콜론이 곧 따라와야** 분기다.
