@@ -327,9 +327,18 @@ function pendingForms() {
 function pendingFetchWait() { return D.pending.filter((q) => !q.fetched && !q.retired); }
 function pendingRetired() { return D.pending.filter((q) => q.retired && !q.schematized); }
 
+/** 금액을 모르는가 — **판정은 여기 하나**다 (2026-09-18 코드 리뷰).
+ *  목록의 '금액 미확인' 배지·필터 칩과 「할 일」의 채우는 목록·품질 카드가 갈라져 있었다:
+ *  배지는 `!it.amountValue` 만 봐서, 로봇이 **등록금 비율**로 읽어 둔 공고(amountSpec 은
+ *  있고 amountValue 는 0)를 '금액 미확인' 이라 불렀다. 마감 축은 여기 넣지 않는다 —
+ *  목록은 마감 지난 공고도 보여 주는 화면이고 그건 `ddayHtml` 이 이미 말한다. */
+function amountUnknown(it) {
+  return !(Number(it.amountValue) > 0) && !it.amountSpec;
+}
+
 function badgesOf(it, formIds) {
   const b = [];
-  if (!it.amountValue) b.push('금액 미확인');
+  if (amountUnknown(it)) b.push('금액 미확인');
   if (!it.deadline) b.push('마감일 없음');
   if (typeof hasFormAttachment === 'function' && hasFormAttachment(it) && !it.formId) b.push('양식 미등록');
   const u = it.sourceUrl || '';
@@ -855,8 +864,7 @@ function bindDeadlineFill(root = byId('screen-todo')) {
 /** 금액을 모르는 공고 — **학생이 지금 보는 것만**. 마감이 지난 공고는 학생 화면에 없으므로
  *  여기 올리면 할 일이 아니라 잡음이 된다(마감 목록과 달리 마감일로 가를 수 있다). */
 function noAmountItems() {
-  return D.reg.filter((it) => !(Number(it.amountValue) > 0) && !it.amountSpec
-    && (dday(it.deadline) == null || dday(it.deadline) >= 0));
+  return D.reg.filter((it) => amountUnknown(it) && (dday(it.deadline) == null || dday(it.deadline) >= 0));
 }
 
 /** 만원 → 원. 사람은 공고를 '300만원' 으로 읽지 '3,000,000원' 으로 읽지 않는다. */

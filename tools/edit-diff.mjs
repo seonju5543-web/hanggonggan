@@ -148,6 +148,7 @@ export function validateValue(k, v, item = {}) {
       : '비울 수 없는 칸입니다 (비우면 학생 화면이 깨집니다)';
   }
   if (v === null || v === '' || v === undefined) return null;
+  if (k === 'amountValue' && Number(v) < 0) return `금액은 0 이상이어야 합니다 (비우려면 0): ${v}`;
   if (k === 'deadline' && !isDay(v)) return `마감일은 달력에 있는 날이어야 합니다 (YYYY-MM-DD): ${v}`;
   if (k === 'announceDate') {
     if (!isDay(v)) return `발표일은 달력에 있는 날이어야 합니다 (YYYY-MM-DD): ${v}`;
@@ -303,15 +304,20 @@ export function diffPatch(item, patch) {
     rows.push({ key: k, label: EDIT_LABEL[k] || k, before: old, after: v, block });
   });
   /* 마감일이 바뀌면 문구(period)도 따라 바뀐다 — 사람이 문구를 직접 적었으면 그쪽이 이긴다 */
+  /* 🔴 **'키가 patch 에 있나' 로 가르지 않는다** (2026-09-18 코드 리뷰). 검수 시트는
+     `[data-ed]` 칸을 **전부** 보내므로 period·amount 가 늘 patch 에 실려 있고, 그 조건으로는
+     이 파생이 시트 경로에서 한 번도 안 돈다 — 미리보기는 '안 바뀐다' 고 말하는데 저장소는
+     고치거나(금액) 안 고쳐서 감사가 묶음을 통째로 되돌린다. 기준은 **실제로 바뀌는 칸**이다.
+     저장소(admin-apply)는 같은 뜻을 `changed` 로 본다. */
   const dl = rows.find((r) => r.key === 'deadline' && !r.block);
-  if (dl && !('period' in (patch || {}))) {
+  if (dl && !rows.some((r) => r.key === 'period')) {
     const after = periodAfterDeadline(it.period, dl.after, it.deadline);
     if (after !== (it.period || '')) rows.push({ key: 'period', label: EDIT_LABEL.period, before: it.period, after, block: null });
   }
   /* 금액 숫자가 들어오면 카드 문구(amount)도 따라 바뀐다 — 사람이 문구를 직접 적었으면 그쪽이 이긴다.
      🔴 이 줄이 없으면 미리보기가 '금액 숫자' 한 칸만 예고하는데 저장소는 문구까지 고친다. */
   const av = rows.find((r) => r.key === 'amountValue' && !r.block);
-  if (av && !('amount' in (patch || {}))) {
+  if (av && !rows.some((r) => r.key === 'amount')) {
     const after = amountAfterValue(it.amount, av.after);
     if (after !== (it.amount || '')) rows.push({ key: 'amount', label: EDIT_LABEL.amount, before: it.amount, after, block: null });
   }

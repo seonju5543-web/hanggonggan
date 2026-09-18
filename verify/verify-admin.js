@@ -166,6 +166,31 @@ function serve() {
         });
         body = JSON.stringify(db);
       }
+      /* 🔴 **이 기능이 성공하면 그 기능을 재는 검사가 조용해진다** (2026-09-18 코드 리뷰).
+         「금액을 로봇이 못 읽은 공고」·「마감을 로봇이 못 읽은 공고」 두 절은 그런 공고가
+         0건이면 항목 대부분을 건너뛴다 — 그런데 0건은 **우리가 바라는 상태**다. 그러면
+         만원→원 변환·자릿수 천장·파생 예고를 누가 깨뜨려도 초록불이 된다(위 검수 대기와 같은 유형).
+         그래서 **조건 없이** 픽스처를 끼워 넣는다. 저장소 데이터는 건드리지 않는다. */
+      {
+        const db2 = JSON.parse(body);
+        const future = new Date(Date.now() + 9 * 3600e3 + 30 * 86400e3).toISOString().slice(0, 10);
+        const base = {
+          type: '교외', provider: '검사용', summary: '검사 드라이버가 끼워 넣은 항목입니다(저장소에는 없습니다).',
+          documents: ['원문 공고에서 확인'], eligibility: { selective: true },
+          noForm: '검사용', attachments: [], sourceKind: 'auto', listedAt: '2026-09-01',
+        };
+        for (const n of [1, 2]) db2.items.push({
+          ...base, id: `verify-noamount-${n}`, name: `검사용 금액 미확인 공고 ${n}`,
+          amount: '금액 원문 확인', amountValue: 0, deadline: future, period: '접수 기간 원문 확인',
+          sourceUrl: `https://example.ac.kr/view.do?seq=${950 + n}`,
+        });
+        db2.items.push({
+          ...base, id: 'verify-nodeadline-1', name: '검사용 마감 미확인 공고',
+          amount: '100만원', amountValue: 1000000, period: '접수 기간 원문 확인',
+          sourceUrl: 'https://example.ac.kr/view.do?seq=953',
+        });
+        body = JSON.stringify(db2);
+      }
       PAGE_ITEMS = JSON.parse(body).items;   // 화면이 실제로 받은 목록 — 아래 건수 비교는 전부 이걸 기준으로 한다
     }
     /* 인스타 — 게시 대기가 0건이면 '게시·카드 보기' 검사가 조용히 사라진다(위 검수 대기와 같은 유형).
@@ -1701,6 +1726,7 @@ function serve() {
     await page.waitForSelector('#screen-todo:not([hidden])');
     const dlRows = await page.locator('[data-deadline-fill] [data-dl-row]').count();
     ok(dlRows === noDl.length, '마감을 모르는 공고를 전부 줄로 보여 준다', `화면 ${dlRows} / 데이터 ${noDl.length}`);
+    ok(dlRows >= 1, '  이 절이 조용해지지 않는다 (드라이버가 픽스처를 스스로 주입한다)', `${dlRows}줄`);
     if (dlRows) {
       const t = await page.textContent('[data-dl-note]');
       ok(/짐작하지 않습니다/.test(t) && /사람이/.test(t), '화면이 날짜를 짐작하지 않는다고 말한다 (누가 적는지도)');
@@ -1783,6 +1809,8 @@ function serve() {
     const amRows = await page.locator('[data-amount-fill] [data-am-row]').count();
     ok(amRows === noAmt.length, '금액을 모르는 공고를 전부 줄로 보여 준다 (마감 지난 것은 뺀다)',
       `화면 ${amRows} / 데이터 ${noAmt.length}`);
+    /* 🔴 픽스처를 주입하므로 0건일 수 없다 — 0이면 절이 조용해진 것이지 통과가 아니다 */
+    ok(amRows >= 2, '  이 절이 조용해지지 않는다 (드라이버가 픽스처를 스스로 주입한다)', `${amRows}줄`);
     if (amRows) {
       const t = await page.textContent('[data-am-note]');
       ok(/짐작하지 않습니다/.test(t) && /만원/.test(t), '화면이 금액을 짐작하지 않는다고 말한다 (단위도 적는다)');
