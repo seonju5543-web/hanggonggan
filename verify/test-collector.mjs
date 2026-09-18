@@ -7360,5 +7360,50 @@ console.log('\n■ 링크 사냥꾼 — 알맹이 낱말로 한 번 더 찾기')
     rowByCore('장학 (안내)', [{ t: '아무 장학 공고' }]), null);
 }
 
+/* ── 처지(trait) — 프로필에 칸이 없던 개인 사정 (2026-09-18 · 노션 AI-1) ──
+   개발자 지시: *"평점 말고 개인적인 부분들 있잖아 뭐 예를들면 스님인지 그런거"*.
+   실측으로 개인 처지를 말하는 자격 줄 75개 중 68개를 못 풀고 있었다 — 층2를 안 봐서가
+   아니라(층2도 eligibilityLines 를 갖는다) 그런 **칸 자체가 프로필에 없어서**였다.
+   🔴 `flags` 와 같은 모양이다 — 파서가 종류를 내고 judgeCond 가 프로필을 본다. */
+console.log('\n■ 처지 요건 — 프로필에 칸이 없던 개인 사정');
+{
+  const EA = createRequire(import.meta.url)('../elig-ask.js');
+  const MEt = createRequire(import.meta.url)('../match-engine.js');
+  const sch = { id: 't', name: '테스트재단', provider: '테스트재단' };
+  const base = { school: '한국외국어대학교', campus: '서울', year: 3, status: '재학', flags: [] };
+  const v = (line, traits) => MEt.requirementMatch(line, { ...base, traits }, sch);
+
+  /* 실제 원문 줄이다 — 지어내지 말 것 */
+  const GED = '2026년 시행된 중졸 또는 고졸 검정고시를 합격한 자';
+  eq('안 물어봤으면 판정하지 않는다', v(GED, undefined), null);
+  eq('  「예」 면 충족', v(GED, { ged: true }), 'ok');
+  eq('  「아니요」 면 미달', v(GED, { ged: false }), 'no');
+
+  /* 🔴 **일부만 답한 상태에서 미달을 내지 않는다** — 한 줄이 여러 처지를 말할 때
+     안 물어본 갈래 때문에 틀린 ✕ 가 된다. 틀린 미달은 못 받는 것보다 나쁘다. */
+  const MANY = '군 복무를 마쳤거나 봉사활동 실적이 있는 자';
+  eq('여러 처지를 말하는 줄 — 하나만 「아니요」 면 판정하지 않는다',
+    v(MANY, { military: false }), null);
+  eq('  전부 「아니요」 여야 미달이다', v(MANY, { military: false, volunteer: false }), 'no');
+  eq('  하나라도 「예」 면 충족', v(MANY, { military: true }), 'ok');
+
+  /* 종류와 이름표가 갈라지면 화면에 못 그린다 */
+  const PRq = createRequire(import.meta.url)('../parse-requirements.js');
+  eq('파서의 처지 종류에 전부 이름표가 있다',
+    PRq.TRAIT_PAT.map(([k]) => k).filter((k) => !EA.TRAIT_LABEL[k]), []);
+  eq('  이름표만 있고 파서가 모르는 종류는 없다',
+    Object.keys(EA.TRAIT_LABEL).filter((k) => !PRq.TRAIT_PAT.some(([x]) => x === k)), []);
+
+  /* 🔴 말은 **명사형**이다 (2026-09-18 개발자 지시) — 다른 칸(`평점`)과 같은 결이어야 한다 */
+  eq('이름표가 묻는 문장이 아니다 (명사형)',
+    Object.values(EA.TRAIT_LABEL).filter((t) => /[?？]|나요|습니까|하셨|인가요/.test(t)), []);
+
+  /* 물을 수 있는 칸으로 잡히는가 — 화면이 이걸 보고 그린다 */
+  eq('처지를 물을 칸으로 내놓는다',
+    EA.askableFields(GED, base, sch), ['trait:ged']);
+  eq('  이미 답했으면 다시 묻지 않는다',
+    EA.askableFields(GED, { ...base, traits: { ged: true } }, sch), []);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);

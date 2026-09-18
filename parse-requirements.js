@@ -199,6 +199,41 @@ function parseFlags(t) {
   return { kind: 'flags', anyOf: hit, conf: HAS_EXCEPTION.test(t) ? LOW : HIGH };
 }
 
+/* ── 처지(trait) — **프로필에 칸이 없는 개인 사정** (2026-09-18 개발자 지시) ─────────
+   🔴 왜 필요한가 (실측): 개인 처지를 말하는 자격 줄 75개 중 **68개를 못 푼다.**
+      층2를 안 봐서가 아니라(층2도 eligibilityLines 를 갖는다) 그런 칸이 프로필에
+      아예 없어서다 — `기숙사 입사 중`·`대회 3위 이상 입상`·`검정고시 합격`·
+      `공직/언론 진출 희망자` 같은 것들이다.
+
+   🔴 **`flags` 와 같은 모양으로 붙인다** — 새 판정 규칙을 한 벌 더 만들지 않는다.
+      파서가 종류를 내고 judgeCond 가 프로필을 본다. 다른 점은 저장 자리 하나뿐이다
+      (`p.traits` — 예/아니요/모름 셋).
+
+   🔴 **좁게 잡는다.** 낱말 하나로 넓히면 엉뚱한 줄이 걸려 학생에게 헛것을 묻는다.
+      실측으로 몇 곳에 걸치는지 세고 넣었다(수상 11 · 혼인 4 · 재직 3 · 나머지 1~2).
+   ⚠️ 종류를 늘릴 때는 **elig-ask.js 의 TRAIT_ASK 도 같이** 늘린다(질문이 없으면 못 묻는다).
+   관문: test-collector '처지 요건' 절 */
+const TRAIT_PAT = [
+  ['award', /입상|수상\s?(실적|경력|자)|공모전|경시\s?대회|대회[^.]{0,10}(3위|입상|수상)/],
+  ['married', /기혼|미혼|배우자(가|를)?\s?(있|없|둔)|결혼\s?(한|여부)/],
+  ['job', /재직\s?(중|자|기간)|직장인|근로자|임직원/],
+  ['career', /진출\s?희망|희망자|지망생/],
+  ['farm', /농어촌|농업인|어업인|귀농|귀어/],
+  ['dorm', /기숙사|생활관/],
+  ['military', /군\s?복무|제대\s?군인|병역\s?(필|이행)|전역/],
+  ['ged', /검정고시/],
+  ['religion', /스님|승려|불교|사찰|조계|기독교|천주교|교회|성당|목사|신학생/],
+  ['member', /회원[^.]{0,4}자녀|조합원|향우회|동문회[^.]{0,4}(자녀|회원)|협회[^.]{0,3}회원|총연합회/],
+  ['volunteer', /봉사\s?(활동|시간|실적)/],
+  ['cert', /자격증|토익|토플|텝스|어학\s?(성적|점수)/],
+];
+
+function parseTrait(t) {
+  const hit = TRAIT_PAT.filter(([, re]) => re.test(t)).map(([k]) => k);
+  if (!hit.length) return null;
+  return { kind: 'trait', anyOf: hit, conf: HAS_EXCEPTION.test(t) ? LOW : HIGH };
+}
+
 /* ── 국적 ── */
 function parseNationality(t) {
   if (/외국인\s?유학생|유학생으로서|외국인\s?학생/.test(t)) return { kind: 'nationality', eq: 'foreign', conf: HIGH };
@@ -757,7 +792,7 @@ function parseLine(line, isExclude) {
   const conds = [];
   const push = (c) => { if (c) conds.push(c); };
   push(parseGrade(t)); push(parseBracket(t)); push(parseCredits(t)); push(parseYear(t));
-  push(parseStatus(t, isExclude)); push(parseFlags(t)); push(parseNationality(t));
+  push(parseStatus(t, isExclude)); push(parseFlags(t)); push(parseTrait(t)); push(parseNationality(t));
   push(parseAge(t)); push(parseResidence(t)); push(parseSchool(t)); push(parseMajor(t));
   push(parseDegree(t, isExclude));
   if (isExclude) conds.forEach((c) => { c.exclude = true; });
@@ -765,7 +800,7 @@ function parseLine(line, isExclude) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { parseLine, parseDegree, gradOnly, gradTarget, mentionsUndergrad, GRADE_SCALE, STATUSES, HIGH, LOW, MULTI_PROGRAM, HAS_EXCEPTION, caseBranch, unaskedAttr, REGIONS};
+  module.exports = { parseLine, parseDegree, TRAIT_PAT, gradOnly, gradTarget, mentionsUndergrad, GRADE_SCALE, STATUSES, HIGH, LOW, MULTI_PROGRAM, HAS_EXCEPTION, caseBranch, unaskedAttr, REGIONS};
 }
 
 /* ── 경우별 분기 (2026-08-24 개발자 지적) ─────────────────────────────────

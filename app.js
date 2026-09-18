@@ -3545,8 +3545,19 @@ function eligAskHtml(sch) {
       + `미확인 자격 <b>${left}</b>${ELIG_CHEV}</button></div>`;
   }
   const rows = keys.map((k) => {
-    const f = FIELD_META[k];
     const pv = state.profile || {};
+    /* 🔴 처지(trait) — 프로필에 칸이 없던 개인 사정은 **예/아니요**로 묻는다
+       (2026-09-18 개발자 지시: "평점 말고 개인적인 부분들"). 종류는 parse-requirements
+       의 TRAIT_PAT 이 정하고 칸 이름은 elig-ask 의 TRAIT_LABEL 이 갖는다 — 여기서 짓지 않는다. */
+    if (k.indexOf('trait:') === 0) {
+      const tk = k.slice(6);
+      const now = ((pv.traits || {})[tk]);
+      const yn = (v, lbl) => `<button type="button" class="elig-yn${now === v ? ' on' : ''}"`
+        + ` data-elig-trait="${esc(tk)}" data-elig-val="${v ? '1' : '0'}">${lbl}</button>`;
+      return `<div class="elig-ask-row elig-ask-yn"><span>${esc(TRAIT_LABEL[tk] || tk)}</span>`
+        + `<span class="elig-yn-pair">${yn(true, '예')}${yn(false, '아니요')}</span></div>`;
+    }
+    const f = FIELD_META[k];
     const val = pv[k] != null ? String(pv[k]) : '';
     const input = f.kind === 'select'
       ? `<select class="elig-ask-in" data-elig-field="${k}"><option value=""></option>`
@@ -3598,6 +3609,11 @@ function eligAskWire(sch) {
   /* 닫는 자리는 둘이다 — 머리줄(화살표)과 「나중에 하기」 */
   $$('[data-elig-close]', sheet).forEach((c) => c.addEventListener('click', () => redraw(false)));
   const s = $('[data-elig-save]', sheet); if (s) s.addEventListener('click', () => eligAskSave(sch));
+  /* 예/아니요는 누르는 즉시 그 칸만 켠다 — 저장은 아래 단추가 한 번에 한다 */
+  $$('[data-elig-trait]', sheet).forEach((b) => b.addEventListener('click', () => {
+    $$(`[data-elig-trait="${b.dataset.eligTrait}"]`, sheet).forEach((o) => o.classList.remove('on'));
+    b.classList.add('on');
+  }));
 }
 
 function eligAskSave(sch) {
@@ -3605,6 +3621,12 @@ function eligAskSave(sch) {
   $$('[data-elig-field]', sheet).forEach((el) => {
     state.profile[el.dataset.eligField] = coerceField(el.dataset.eligField, el.value);
   });
+  /* 처지는 **고른 것만** 적는다 — 안 고른 칸을 false 로 적으면 '아니요'라고 답한 것이 된다 */
+  const picked = $$('[data-elig-trait].on', sheet);
+  if (picked.length) {
+    state.profile.traits = Object.assign({}, state.profile.traits || {});
+    picked.forEach((b) => { state.profile.traits[b.dataset.eligTrait] = b.dataset.eligVal === '1'; });
+  }
   saveState();
   /* 적은 것이 **다른 공고에도 쓰이므로** 목록·홈도 다시 그린다 */
   renderHome();

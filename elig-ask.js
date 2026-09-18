@@ -65,6 +65,28 @@ const FIELD_PROBE = {
      · cert·exchange — 체크박스 한 칸이라 `false` 가 '아니오'인지 '안 답함'인지
        값만으로 갈리지 않는다. 실측으로 여는 줄도 0이라 넣지 않았다. */
 
+/* 🔴 처지(trait) — **프로필에 칸이 없던 개인 사정** (2026-09-18 개발자 지시).
+   "평점 말고 개인적인 부분들 있잖아 뭐 예를들면 스님인지 그런거".
+   실측: 개인 처지를 말하는 자격 줄 75개 중 **68개**를 못 풀고 있었다.
+   종류는 `parse-requirements.js` 의 `TRAIT_PAT` 한 곳이 정한다 — 여기는 **칸 이름만** 갖는다.
+   ⚠️ 거기에 종류를 더하면 여기도 같이 더한다(이름이 없으면 화면에 못 그린다). 관문이 대조한다.
+   🔴 **말은 명사형이다** (2026-09-18 개발자 지시: "결혼하셨나요? 보다는 혼인 여부 이런식으로") —
+      다른 칸(`평점`·`직전 학기 이수학점`)과 같은 결이어야 한 목록으로 읽힌다. */
+const TRAIT_LABEL = {
+  award:     '대회·공모전 수상',
+  married:   '혼인 여부',
+  job:       '재직 여부',
+  career:    '특정 분야 진출 희망',
+  farm:      '농어촌·농어업 가정',
+  dorm:      '기숙사 입사',
+  military:  '군 복무',
+  ged:       '검정고시 졸업',
+  religion:  '해당 종교',
+  member:    '단체 회원 (본인·부모)',
+  volunteer: '봉사활동 실적',
+  cert:      '자격증·어학 성적',
+};
+
 /* 칸 하나를 화면에 그리는 데 필요한 것.
    🔴 `label` 은 칸 이름이지 문장이 아니다. 여기에 설명을 넣지 말 것
       (화면에 새로 넣는 한국어를 늘리지 않는다 — 설계 3-3). */
@@ -112,6 +134,16 @@ function askableFields(line, profile, sch) {
       if (EA_ME.requirementMatch(line, trial, sch)) { out.push(key); break; }
     }
   }
+  /* 처지도 같은 방식으로 탐침한다 — 예/아니요를 넣어 보고 판정이 생기면 물을 수 있다.
+     🔴 이름은 `trait:<종류>` 로 돌려준다(프로필 칸 이름과 섞이지 않게). */
+  const tr = (p.traits && typeof p.traits === 'object') ? p.traits : {};
+  for (const key of Object.keys(TRAIT_LABEL)) {
+    if (typeof tr[key] === 'boolean') continue;            // 이미 답했다
+    for (const v of [true, false]) {
+      const trial = Object.assign({}, p, { traits: Object.assign({}, tr, { [key]: v }) });
+      if (EA_ME.requirementMatch(line, trial, sch)) { out.push('trait:' + key); break; }
+    }
+  }
   return out;
 }
 
@@ -152,5 +184,5 @@ function coerceField(key, raw) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { askableFields, askableForSch, coerceField, answered, FIELD_META, FIELD_PROBE };
+  module.exports = { askableFields, askableForSch, coerceField, answered, FIELD_META, FIELD_PROBE, TRAIT_LABEL };
 }

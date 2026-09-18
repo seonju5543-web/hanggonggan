@@ -4775,3 +4775,18 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
       (CLAUDE.md '파일 끝 카드 블록이 앞의 규칙을 전부 덮는다' 와 같은 이유). */
 .hero-amount { margin-bottom: 20px; }
 >>>>>>> origin/claude/nice-heisenberg-WESq5
+
+/* 처지 예/아니요 — 프로필에 칸이 없던 개인 사정 (2026-09-18 · 노션 AI-1) */
+.elig-ask-yn { align-items: flex-start; flex-wrap: wrap; gap: var(--space-8); }
+.elig-ask-yn > span:first-child { flex: 1 1 100%; line-height: 1.5; }
+.elig-yn-pair { display: flex; gap: var(--space-6); }
+.elig-yn {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius-pill); padding: var(--space-6) var(--space-16);
+  font: inherit; font-size: var(--t-xs); font-weight: 500; color: var(--text-sub);
+}
+.elig-yn.on {
+  border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent);
+  color: var(--accent); font-weight: 600;
+}
+.elig-yn:active { transform: scale(0.95); }
