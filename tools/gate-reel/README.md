@@ -20,3 +20,10 @@ $FF -y -sseof -0.2 -i docs/designs/assets/gates/cuts/start-screen-A.mp4 -frames:
 - 🔴 라이선스: 사진의 SA(동일조건) 여부는 `docs/designs/assets/gates/PICKS.md`. SA 사진이 든 영상은 CC BY-SA 로 공개한다.
 
 만든 컷: `docs/designs/assets/gates/cuts/` — A(경희대·한국외대·서울대 · SA 포함) · B(서울대·숙명여대·동국대 · CC BY 만).
+
+## 앱이 쓰는 사본 (2026-09-18 · 시작 화면에 실제로 들어간 것)
+
+앱은 mp4 가 아니라 **사진 3장 + CSS 움직임**으로 컷 A 를 그린다(보이는 것은 같다 — `style.css` 끝 '시작 화면' 절 · `app.js startMontage`).
+- 사진: `assets/gates/<파일>` — 원본을 가로 최대 1000px 로 다시 누른 사본(14장 1.8MB · 학생은 그중 3장만 받는다).
+- 목록: `assets/gates/gates.json` — `node tools/gate-reel/build-app-gates.mjs` 가 manifest 와 reel.html 의 FOCUS 에서 만든다. 손으로 고치지 말 것.
+- 사진을 바꾸면 셋을 같이: manifest/PICKS.md(출처) → 사본 다시 누르기 → gates.json 다시 만들기.

@@ -989,6 +989,76 @@ function renderOnboardStep() {
   if (back) back.hidden = onboardStep <= (onboardEditing ? 1 : 0);
   $('#onboard-bar').style.width = `${((onboardStep + 1) / ONBOARD_STEPS) * 100}%`;
   window.scrollTo(0, 0);
+  /* 시작 화면(0단계)이 보이면 정문 투어링을 준비한다 — 한 번만 돈다(startMontage 안의 표식) */
+  if (onboardStep === 0 && !onboardEditing) startMontage();
+}
+
+/* ---------------- 시작 화면 — 정문 투어링 (2026-09-18 개발자 결정 · 노션 UI-3) ----------------
+   승인받은 컷 A 그대로: 14개교 사진(assets/gates/gates.json) 중 **무작위 3장**이 학교당
+   `--start-dur`(2.5초)씩 걸어 들어가고, 마지막 장면에서 멈춘다(한 번 재생 후 정지).
+   🔴 시간은 style.css 의 --start-dur 를 읽는다 — 여기 숫자로 두면 CSS 와 어긋난다(boot.js 와 같은 규칙).
+   🔴 부팅 덮개가 열리는 순간(`boot:open` · boot.js)에 첫 사진이 스며든다 — 덮개 밑에서 먼저 돌기
+      시작하면 학생은 첫 장면을 못 본다. 덮개가 없거나 이미 걷혔으면 바로 시작한다.
+   🔴 사진을 못 받으면 지어내지 않는다 — 바탕색(--start-base) 위에 글과 버튼만 남는다.
+   🔴 움직임 줄이기 기기에서는 한 장만 .last 로 둔다(전역 * 규칙이 .run 을 끝값(투명)으로 보낸다).
+   ⚠️ 뒤로 돌아와도 다시 돌지 않는다 — 장면은 마지막 사진에서 멈춘 채 남아 있다. */
+const START_SCENES = 3;
+let startMontageState = null;   /* null → 아직 · 'pending' → 사진 준비 중 · 'done' → 한 번 돌았다 */
+
+function pickRandom(list, n) {
+  const a = list.slice();
+  for (let i = a.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a.slice(0, n);
+}
+
+/* CSS 변수의 시간을 ms 로 — boot.js 의 msOf 와 같은 규칙(초 단위만 1000배 · 못 읽으면 0) */
+function cssMs(el, name) {
+  const v = String(getComputedStyle(el).getPropertyValue(name) || '').trim();
+  const n = parseFloat(v) || 0;
+  return /[^m]s$/.test(v) ? n * 1000 : n;
+}
+
+function startMontage() {
+  if (startMontageState) return;
+  const stage = $('#start-stage');
+  if (!stage) return;
+  startMontageState = 'pending';
+  fetch('assets/gates/gates.json', { cache: 'no-cache' })
+    .then((r) => (r.ok ? r.json() : []))
+    .catch(() => [])
+    .then((list) => {
+      const all = Array.isArray(list) ? list.filter((g) => g && g.file && g.name) : [];
+      const reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+      const picks = pickRandom(all, reduce ? 1 : START_SCENES);
+      const scenes = picks.map((g) => {
+        const d = document.createElement('div');
+        d.className = 'start-scene';
+        if (g.focus) d.style.setProperty('--focus', g.focus);
+        d.innerHTML = `<img src="assets/gates/${esc(g.file)}" alt="" /><span class="start-school">${esc(g.name)}</span><span class="start-credit">${esc(g.credit || '')}</span>`;
+        stage.appendChild(d);
+        return d;
+      });
+      const dur = cssMs(stage, '--start-dur');
+      whenBootOpen(() => {
+        startMontageState = 'done';
+        scenes.forEach((d, i) => setTimeout(() => d.classList.add(i === scenes.length - 1 ? 'last' : 'run'), i * dur));
+        /* 🔴 다 돌고 나면 '멈춘 상태'를 클래스로 굳힌다 — 1단계에 갔다 돌아오면 0단계가 display:none 에서
+           다시 보이는 것이라 CSS 애니메이션이 **셋 다 처음부터 다시** 돈다(실측: 되돌아온 0.3초 뒤 세 장면이
+           전부 0.81). .start-done 은 마지막 장면만 남기고 나머지를 투명으로 고정한다(style.css). */
+        setTimeout(() => stage.classList.add('start-done'), scenes.length * dur);
+      });
+    });
+}
+
+/* 부팅 덮개에 구멍이 뚫리기 시작하는 순간(boot.js 가 'boot:open' 을 보낸다)에 부른다.
+   덮개가 없거나(검사 픽스처) 이미 걷혔으면 곧바로 부른다. */
+function whenBootOpen(fn) {
+  const boot = document.getElementById('boot');
+  if (!boot || boot.hidden || boot.classList.contains('boot-open')) { fn(); return; }
+  window.addEventListener('boot:open', fn, { once: true });
 }
 
 function initOnboarding() {

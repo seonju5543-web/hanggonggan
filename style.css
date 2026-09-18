@@ -297,50 +297,8 @@ input::placeholder { color: var(--text-weak); }
   gap: 24px;
 }
 .onboard-step[hidden] { display: none; }
-.onboard-hero { text-align: center; padding-top: 7vh; }
-.onboard-logo {
-  width: 88px;
-  height: 88px;
-  margin: 0 auto 18px;
-  border-radius: var(--radius-lg);
-  background: var(--grad-navy);
-  color: #f6f0e2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.onboard-logo svg { width: 44px; height: 44px; }
-.onboard-hero h1 {
-  font-size: var(--t-hero);
-  font-weight: 800;
-  letter-spacing: -0.035em;
-  background: var(--navy-1);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.onboard-tagline { font-size: var(--t-xl); color: var(--text-sub); margin-top: 12px; }
-.onboard-tagline strong { color: var(--text); }
-.onboard-points {
-  list-style: none;
-  text-align: left;
-  margin: 38px auto 0;
-  max-width: 330px;
-  display: grid;
-  gap: 12px;
-}
-.onboard-points li {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  padding: 15px 17px;
-  font-size: var(--t-md);
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.pt-icon { font-size: var(--t-xl); }
+/* 환영 화면(로고 타일·기능 카드·태그라인)의 규칙은 2026-09-18 에 걷어냈다 — 시작 화면이
+   정문 투어링으로 바뀌었다(파일 끝 '시작 화면' 절 · 노션 UI-3). 되살리지 말 것. */
 .onboard-note { text-align: center; font-size: var(--t-sm); color: var(--text-weak); margin-top: 14px; }
 .onboard-body h2 { font-size: var(--t-3xl); font-weight: 800; letter-spacing: -0.025em; }
 .onboard-sub { color: var(--text-weak); font-size: var(--t-md); margin: 6px 0 26px; }
@@ -4155,7 +4113,6 @@ button, input, select, textarea { letter-spacing: inherit; }
 .home-greet,
 .page-header h2,
 .onboard-body h2,
-.onboard-hero h1,
 .section-head h3,
 .sheet-title {
   font-family: var(--font-display);
@@ -4214,7 +4171,6 @@ button, input, select, textarea { letter-spacing: inherit; }
       한 줄보다 길면 그때만 자른다.
    ⚠️ 인쇄 문서(.fd-)와 원문 발췌는 원본 줄바꿈이 뜻을 가지므로 건드리지 않는다. */
 body,
-.onboard-hero h1,
 .onboard-body h2,
 .onboard-sub,
 .page-header h2,
@@ -4835,3 +4791,94 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
   color: var(--accent); font-weight: 600;
 }
 .elig-yn:active { transform: scale(0.95); }
+
+/* ══ 시작 화면 — 정문 투어링 (2026-09-18 개발자 결정 · 노션 UI-3) ═══════════════════
+   승인받은 화면은 컷 A(tools/gate-reel/reel.html 이 그린 390×844)다: 사진이 화면을 다 덮고,
+   학교당 2.5초씩 1.00→1.10 으로 걸어 들어가며(0.35초 페이드), 마지막 장면에서 멈춘다.
+   카피는 왼쪽 아래(ui bowl 실측 62% 높이), 버튼은 맨 아래, 위에는 워드마크와 학교 이름표뿐.
+   🔴 mp4 가 아니라 **사진 3장 + CSS 움직임**이다 — 보이는 것은 컷 A 와 같고, 서비스워커
+      3.5초 시한·iOS 저전력 자동재생 차단·움직임 줄이기 설정 문제가 전부 사라진다.
+   🔴 시간·비율은 reel.html 과 **같은 값**이어야 한다 — 관문 test-collector '시작 화면' 절이
+      둘을 대조한다(값을 못 박지 않고 '같은가'만 잰다 — 부팅 절과 같은 이유).
+   🔴 CSS 그라데이션 함수를 쓰지 않는다(ui-tone: 그라데이션은 --grad-navy 한 곳 — 주석의 글자까지
+      센다) — 스크림은 index.html 의 인라인 SVG 다. 여기서 CSS 그라데이션으로 바꾸면 관문이 잡는다.
+   🔴 여백은 토큰만, 색은 :root 의 --start-* 만 — 톱니(ui-tone)가 생 px·생 색을 센다.
+   🔴 이 화면만 .screen 의 20px 여백과 .app 의 아래 148px 을 거둔다(:has) — 사진이 화면 끝까지
+      닿아야 하고, 아래 빈자리가 남으면 148px 헛스크롤이 생긴다(옛 환영 화면의 실측 결함).
+   🔴 `flex: none` 을 빼지 말 것 — .onboard-step 의 `flex: 1`(= flex-basis 0%)은 세로 flex 그릇 안에서
+      height 를 무시한다. 빼면 0단계 높이가 **0** 이 되어 아래에 붙인 카피·버튼이 화면 위로 나간다
+      (2026-09-18 첫 실측: 버튼 top −159px · 스크림 0×0). */
+:root {
+  --start-base: #0f1522;        /* 사진 밑 바탕 · 사진이 못 오면 이 색만 보인다 */
+  --start-ink: #fdfbf6;         /* 사진 위 글자 · 흰 버튼 면 (.btn-primary 글자색과 같은 값) */
+  --start-band: 18, 26, 43;     /* 이름표 면 rgba 의 세 값 — 스크림 SVG 의 #121a2b 와 같은 색 */
+  --start-dur: 2500ms;          /* 학교 한 곳이 보이는 시간 — app.js 도 이 값을 읽는다 */
+  --t-start: 32px;              /* 시작 화면 제목 한 곳 — 27(3xl) 과 38(hero) 사이 */
+}
+.onboard-step[data-step="0"] {
+  display: block;
+  flex: none;
+  position: relative;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--start-base);
+  color: var(--start-ink);
+}
+#screen-onboarding:has(> .onboard-step[data-step="0"]:not([hidden])) { padding: 0; }
+.app:has(> #screen-onboarding:not([hidden]) > .onboard-step[data-step="0"]:not([hidden])) { padding-bottom: 0; }
+.start-screen { position: absolute; inset: 0; }
+.start-stage { position: absolute; inset: 0; }
+/* 장면 = 사진 + 학교 이름표 + 출처 한 줄 — 셋이 같이 스며들고 같이 사라진다 (컷 A 와 같다).
+   --focus 는 가로 사진을 세로로 자를 때 정문이 남는 자리(가로% 세로%) — gates.json 이 사진마다 준다. */
+.start-scene { position: absolute; inset: 0; opacity: 0; --focus: 50% 45%; }
+.start-scene img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: var(--focus);
+  transform-origin: var(--focus);
+}
+.start-scene.run { animation: start-fade var(--start-dur) linear 1 forwards; }
+.start-scene.run img { animation: start-walk var(--start-dur) cubic-bezier(0.25, 0.1, 0.25, 1) 1 forwards; }
+.start-scene.last { animation: start-fadein var(--start-dur) linear 1 forwards; }   /* 마지막 장면은 멈춘 채 남는다 — 한 번 재생 후 정지 */
+@keyframes start-fade { 0% { opacity: 0; } 14% { opacity: 1; } 86% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes start-fadein { 0% { opacity: 0; } 14% { opacity: 1; } 100% { opacity: 1; } }
+@keyframes start-walk { from { transform: scale(1); } to { transform: scale(1.10); } }
+.start-school {
+  position: absolute; left: var(--space-20); top: 64px;
+  padding: var(--space-6) var(--space-12);
+  border-radius: var(--radius-pill);
+  background: rgba(var(--start-band), 0.55);
+  font-size: var(--t-sm); font-weight: 700; color: var(--start-ink);
+}
+.start-credit {
+  position: absolute; left: var(--space-20); right: var(--space-20);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+  font-size: var(--t-2xs); color: var(--start-ink); opacity: 0.55;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.start-scrim { position: absolute; left: 0; right: 0; bottom: 0; height: 45%; pointer-events: none; }
+.start-mark { position: absolute; right: var(--space-20); top: 62px; font-size: var(--t-lg); font-weight: 900; color: var(--start-ink); }
+/* 카피와 버튼은 아래에 붙인다 — 844px 에서 카피 윗선 522 · 버튼 윗선 690 (컷 A). 더 긴 화면에서는 위 사진이 늘어난다. */
+.start-bottom {
+  position: absolute; left: var(--space-20); right: var(--space-20);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 66px);
+}
+.start-copy { display: flex; flex-direction: column; gap: var(--space-6); margin-bottom: calc(var(--sp-4) + var(--sp-3)); }
+.start-tag { font-size: var(--t-lg); font-weight: 500; opacity: 0.8; }
+.start-copy h1 { font-size: var(--t-start); line-height: 1.3125; font-weight: 900; letter-spacing: -0.02em; word-break: keep-all; overflow-wrap: break-word; }
+.onboard-step[data-step="0"] .onboard-actions { gap: var(--space-12); }
+.onboard-step[data-step="0"] .btn-primary { background: var(--start-ink); color: var(--primary); box-shadow: none; }
+.onboard-step[data-step="0"] .btn-primary:hover { background: var(--start-ink); }
+.onboard-step[data-step="0"] .onboard-note { color: var(--start-ink); opacity: 0.7; margin-top: 0; }
+/* 다 돌고 난 뒤의 멈춘 상태 — 1단계에 갔다 돌아오면 0단계가 display:none 에서 다시 보이는 것이라
+   애니메이션이 셋 다 처음부터 다시 돈다(실측). app.js 가 마지막 장면이 끝나는 시각에 이 클래스를 단다. */
+.start-stage.start-done .start-scene { animation: none; opacity: 0; }
+.start-stage.start-done .start-scene.last { opacity: 1; }
+.start-stage.start-done .start-scene img { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  /* 움직임을 줄인 기기: 사진 한 장만 그대로 보인다(app.js 가 한 장면만 .last 로 넣는다).
+     🔴 위쪽 전역 `*` 규칙이 애니메이션을 0.01ms 로 끝내므로 .run 은 끝값(투명)이 되어 안 보인다 — 그래서 .last 만 쓴다. */
+  .start-scene.last { animation: none; opacity: 1; }
+  .start-scene.last img { animation: none; }
+}

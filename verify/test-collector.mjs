@@ -5170,6 +5170,85 @@ console.log('\n■ 화면이 「전국 모든 대학」을 약속하지 않는�
     /schoolOnly\)\.filter\(Boolean\)/.test(app) && /kosafList\.length/.test(app), true);
 }
 
+/* ══ 시작 화면 — 승인받은 컷 A 그대로인가 (2026-09-18 · 노션 UI-3) ═══════════
+   개발자 결정: "A로 진행하고 사진은 무작위 3곳, 우선 배포 시작해". 승인받은 것은
+   tools/gate-reel/reel.html 이 그린 컷 A(사진 3장 · 학교당 2.5초 · 마지막 장면 정지)다.
+   시간·비율은 값을 못 박지 않고 **reel.html 과 같은가**를 잰다(부팅 절과 같은 이유 —
+   둘을 함께 고치면 못 박은 검사가 없는 불일치를 있다고 말한다). 구조·문구는 그대로 못 박는다.
+   🔴 스킬 approved-design 6번: 승인받은 화면은 검사로 못 박는다 — 검사만 고치고 화면을 바꾸지 말 것. */
+console.log('\n■ 시작 화면 — 승인받은 컷 A 그대로인가 (2026-09-18 · UI-3)');
+{
+  const root = new URL('../', import.meta.url);
+  const html = readText(new URL('index.html', root));
+  const css = readText(new URL('style.css', root));
+  const app = readText(new URL('app.js', root));
+  const reel = readText(new URL('tools/gate-reel/reel.html', root));
+  const step0 = (html.match(/<div class="onboard-step" data-step="0">([\s\S]*?)\n      <\/div>/) || [])[1] || '';
+  const s0 = step0.replace(/<!--[\s\S]*?-->/g, '');
+  eq('0단계 블록을 찾았다', s0.length > 200, true);
+  /* ① 승인받은 요소 전부 — 무대 · 스크림 · 워드마크 · 카피 두 줄 · 버튼 · 안내 한 줄 */
+  eq('사진 무대(#start-stage)가 있고 img 를 박아 두지 않는다 (무작위는 app.js 가 고른다)',
+    /id="start-stage"/.test(s0) && !/<img/.test(s0), true);
+  eq('스크림은 인라인 SVG 다 (style.css 에 linear-gradient 를 두지 않는다)',
+    /<svg class="start-scrim"[\s\S]*?<linearGradient/.test(s0), true);
+  eq('워드마크 「한대장」', /class="start-mark">한대장</.test(s0), true);
+  eq('카피 첫 줄 「한국 대학교 장학금,」', /class="start-tag">한국 대학교 장학금,</.test(s0), true);
+  eq('제목 「한 곳에서 찾고 / 한 번에 신청」', /<h1>한 곳에서 찾고<br \/>한 번에 신청<\/h1>/.test(s0), true);
+  eq('버튼 「내 장학금 찾기」 (data-next — 드라이버가 이걸 누른다)',
+    /<button[^>]*data-next[^>]*>내 장학금 찾기<\/button>/.test(s0), true);
+  eq('  0단계의 data-next 는 하나뿐이다', (s0.match(/data-next/g) || []).length, 1);
+  /* ② 해피 토크는 돌아오지 않는다 (2026-09-17 개발자 지시 "예비 고객은 앱에 대한 정보를 알고 있어") */
+  eq('로고 타일·기능 카드·숫자 자랑이 없다', /onboard-logo|onboard-points|onboard-tagline|\d+\s*(건|곳|종)/.test(s0), false);
+  /* ③ 사진 재료 — 14개교 · 파일이 실제로 있다 · 출처 줄 · NC/ND 없음 · 초점 */
+  const gates = JSON.parse(readText(new URL('assets/gates/gates.json', root)));
+  eq('사진 목록이 14개교다', gates.length, 14);
+  eq('사진 파일이 전부 실제로 있다',
+    gates.filter((g) => !fs.existsSync(new URL('assets/gates/' + g.file, root))).map((g) => g.file), []);
+  eq('전부 출처 줄(작가 · 라이선스 · Wikimedia Commons)이 있다',
+    gates.filter((g) => !g.name || !/Wikimedia Commons/.test(g.credit || '') || !/CC|Public domain|PD/i.test(g.license || '')).length, 0);
+  eq('NC·ND 라이선스가 없다 (상업 이용이 가능한 것만)', gates.filter((g) => /NC|ND/.test(g.license || '')).map((g) => g.file), []);
+  eq("출처 줄이 '정문' 이라고 단정하지 않는다 (정문이 아닌 사진이 있다)", gates.filter((g) => /정문/.test(g.credit || '')).length, 0);
+  /* ④ app.js — 무작위 3장 · 시간은 CSS 에서 · 덮개가 열릴 때 시작 · 마지막 장면 정지 · 움직임 줄이기 */
+  eq('한 번에 보여 주는 학교는 3곳', Number((app.match(/const START_SCENES = (\d+)/) || [])[1]), 3);
+  const pickBody = app.slice(app.indexOf('function pickRandom'), app.indexOf('function cssMs'));
+  const mont = app.slice(app.indexOf('function startMontage'), app.indexOf('function whenBootOpen'));
+  eq('무작위로 고른다 (Math.random)', /Math\.random\(\)/.test(pickBody) && /pickRandom\(/.test(mont), true);
+  eq('장면 시간을 CSS(--start-dur)에서 읽는다 · setTimeout 에 숫자를 적지 않는다',
+    /'--start-dur'/.test(mont) && !/setTimeout\([^)]*,\s*\d/.test(mont), true);
+  eq('덮개가 열리는 순간에 시작한다 (whenBootOpen · boot:open)', /whenBootOpen\(/.test(mont) && /'boot:open'/.test(app), true);
+  const bootJs = readText(new URL('boot.js', root));
+  eq("  boot.js 가 열림 단계에서 그 신호를 보낸다 ('boot-open' 바로 뒤)",
+    /classList\.add\('boot-open'\);[\s\S]{0,400}dispatchEvent\(new Event\('boot:open'\)\)/.test(bootJs), true);
+  eq('마지막 장면은 .last (멈춘 채 남는다 · 한 번 재생)', /'last' : 'run'/.test(mont), true);
+  /* 🔴 되돌아와도 다시 돌지 않는다 — display:none 에서 다시 보이면 CSS 애니메이션이 처음부터 다시 돈다(실측) */
+  eq('  다 돌면 멈춘 상태를 굳힌다 (start-done — 1단계에서 돌아와도 셋이 다시 돌지 않는다)',
+    /classList\.add\('start-done'\)/.test(mont) && /\.start-stage\.start-done \.start-scene\s*\{[^}]*animation:\s*none;\s*opacity:\s*0/.test(css), true);
+  eq('움직임 줄이기 기기에서는 한 장만 둔다', /prefers-reduced-motion: reduce/.test(mont) && /reduce \? 1 : START_SCENES/.test(mont), true);
+  eq('사진을 못 받아도 지어내지 않는다 (빈 목록으로 조용히)', /\.catch\(\(\) => \[\]\)/.test(mont), true);
+  eq('0단계를 그릴 때 부른다 (고치러 온 사람에게는 안 돈다)', /onboardStep === 0 && !onboardEditing\) startMontage\(\)/.test(app), true);
+  /* ⑤ style.css — reel.html(승인받은 컷을 그린 파일)과 같은 값인가 */
+  const num = (t, re) => Number((t.match(re) || [])[1]);
+  eq('장면 시간이 컷 A 와 같다', num(css, /--start-dur:\s*(\d+)ms/), num(reel, /q\.get\('dur'\) \|\| (\d+)/));
+  const stops = (t, name) => [...((t.match(new RegExp('@keyframes ' + name + '\\s*\\{[^\\n]*')) || [''])[0]
+    .matchAll(/(\d+(?:\.\d+)?)%\s*\{\s*opacity:\s*([\d.]+)/g))].map((m) => [Number(m[1]), Number(m[2])]);
+  const scales = (t, name) => [...((t.match(new RegExp('@keyframes ' + name + '\\s*\\{[^\\n]*')) || [''])[0]
+    .matchAll(/scale\(([\d.]+)\)/g))].map((m) => Number(m[1]));
+  eq('페이드 곡선이 컷 A 와 같다 (0→14% 들어오고 86→100% 나간다)', stops(css, 'start-fade'), stops(reel, 'fade'));
+  eq('  마지막 장면의 곡선도 같다', stops(css, 'start-fadein'), stops(reel, 'fadein'));
+  eq('  값을 실제로 읽었다 (빈 배열끼리 같다고 통과하면 안 된다)', stops(css, 'start-fade').length, 4);
+  eq('걷는 정도가 컷 A 와 같다 (1.00→1.10)', scales(css, 'start-walk'), scales(reel, 'walk'));
+  eq('  그 값도 실제로 읽었다', scales(css, 'start-walk').length, 2);
+  eq('시작 화면 움직임에 infinite 가 없다', /start-(?:fade|fadein|walk)[^;\n]*infinite/.test(css), false);
+  eq('스크림이 아래 45% (컷 A 의 380/844)',
+    num(css, /\.start-scrim\s*\{[^}]*height:\s*(\d+)%/), Math.round(num(reel, /\.scrim\{[^}]*height:(\d+)px/) / 844 * 100));
+  eq('style.css 에 linear-gradient 를 더하지 않았다 (스크림은 SVG)', /start[^\n]*linear-gradient/.test(css), false);
+  eq('이 화면만 .screen 여백과 .app 아래 빈자리를 거둔다 (:has — 148px 헛스크롤이 남지 않는다)',
+    /#screen-onboarding:has\([^{]*data-step="0"[^{]*\)\s*\{\s*padding:\s*0/.test(css) && /\.app:has\([^{]*data-step="0"[^{]*\)\s*\{\s*padding-bottom:\s*0/.test(css), true);
+  /* 🔴 첫 실측에서 잡은 것: .onboard-step 의 flex:1 이 height 를 무시해 0단계 높이가 0 이 됐다 */
+  eq('  0단계는 flex 에서 빠진다 (flex: none — 안 빼면 높이가 0 이 되어 아래 붙인 버튼이 화면 밖으로 나간다)',
+    /\.onboard-step\[data-step="0"\]\s*\{[^}]*flex:\s*none/.test(css), true);
+}
+
 console.log('\n■ 환영 화면 문구 (2026-09-12 · UI-22)');
 {
   const root = new URL('../', import.meta.url);

@@ -68,31 +68,42 @@
 
       <!-- Step 0: 인트로 -->
       <div class="onboard-step" data-step="0">
-        <div class="onboard-hero">
-          <div class="onboard-logo">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/><path d="M22 10v6"/></svg>
+        <!-- 시작 화면 = 정문 투어링 (2026-09-18 개발자 결정 · 노션 UI-3 — "A로 진행하고 사진은 무작위 3곳").
+             승인받은 것은 컷 A(tools/gate-reel/reel.html 이 그린 390×844)다: 사진이 화면을 다 덮고, 학교당
+             2.5초씩 걸어 들어가며, 마지막 장면에서 멈춘다. 왼쪽 아래 카피 두 줄 · 맨 아래 흰 버튼 · 위에는
+             워드마크와 학교 이름표뿐. 로고 타일·기능 카드 3장은 2026-09-17 개발자 지시로 뺐다
+             ("예비 고객은 앱에 대한 정보를 알고 있어") — 되살리지 말 것.
+             🔴 이 바로 윗줄의 class·data-step 표기를 바꾸지 말 것 — test-collector '환영 화면 문구' 가
+                이 글자 그대로 블록을 찾는다(다른 클래스를 앞에 붙이면 블록이 빈 문자열이 된다).
+             🔴 사진(<img>)을 여기 박지 않는다 — app.js startMontage 가 assets/gates/gates.json 에서
+                **무작위 3장**을 골라 #start-stage 에 넣는다. 못 받으면 바탕색 위에 글과 버튼만 남는다.
+             🔴 스크림은 CSS 그라데이션이 아니라 이 SVG 다 — ui-tone 관문이 style.css 의 linear-gradient 를
+                --grad-navy 한 곳으로 제한한다. 색은 style.css 의 --start-band(18,26,43)와 같은 #121a2b.
+             관문: test-collector '시작 화면 — 승인받은 컷 A 그대로인가' · verify-onboard-gaps(워드마크 62px). -->
+        <div class="start-screen">
+          <div class="start-stage" id="start-stage" aria-hidden="true"></div>
+          <svg class="start-scrim" viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true" focusable="false"><defs><linearGradient id="start-scrim-fade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#121a2b" stop-opacity="0" /><stop offset="1" stop-color="#121a2b" stop-opacity="0.88" /></linearGradient></defs><rect width="1" height="1" fill="url(#start-scrim-fade)" /></svg>
+          <div class="start-mark">한대장</div>
+          <div class="start-bottom">
+            <div class="start-copy">
+              <p class="start-tag">한국 대학교 장학금,</p>
+              <h1>한 곳에서 찾고<br />한 번에 신청</h1>
+            </div>
+            <div class="onboard-actions">
+              <button class="btn btn-primary btn-lg" data-next>내 장학금 찾기</button>
+              <!-- 🔴 **시간을 약속하지 않는다** (노션 UI-22 · 2026-09-12 재 봄).
+                   옛 문구는 "1분이면 내 장학금 확인" 이었는데, 재 보니 그 말이 참인 길은
+                   **전부 건너뛰는 길 하나뿐**이었다: 앱이 막는 것은 학교·학년 둘뿐이라 8번 누르고
+                   5글자 치면 홈까지 간다. 반대로 처음 가입하는 학생에게 보이는 칸은 입력 10 ·
+                   고르기 6 · 칩 3묶음 · 체크 15개라 1분이 아니다. 시간을 적으면 단계가 늘 때마다
+                   조용히 거짓말이 된다(넷 → 여섯으로 늘면서 실제로 그렇게 됐다).
+                   그래서 **앱이 실제로 요구하는 것**을 적는다 — app.js 의 1단계 검증과 같은 둘이다.
+                   ⚠️ '홈에 카드 3장'을 근거로 쓰지 말 것 — 그 석 장은 학교를 안 본다(외대·경희대·
+                      포항공대가 전부 같은 전국 재단 셋). 학교로 갈리는 것은 히어로 건수(11·13·5).
+                   관문: test-collector '환영 화면 문구'. -->
+              <p class="onboard-note">학교와 학년만 정하면 바로 볼 수 있어요</p>
+            </div>
           </div>
-          <h1>한대장</h1>
-          <p class="onboard-tagline">한국 대학교 장학금,<br /><strong>한 번에 찾고 한 번에 신청</strong>하세요</p>
-          <ul class="onboard-points">
-            <li><span class="pt-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></span> 교내·교외 장학금을 내 조건으로 자동 매칭</li>
-            <li><span class="pt-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 14l2 2 4-4"/></svg></span> 증명서 자동 첨부로 신청 준비까지</li>
-            <li><span class="pt-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"/><path d="M10.3 20a2 2 0 0 0 3.4 0"/></svg></span> 마감일 관리와 신청 현황 추적</li>
-          </ul>
-        </div>
-        <div class="onboard-actions">
-          <button class="btn btn-primary btn-lg" data-next>시작하기</button>
-          <!-- 🔴 **시간을 약속하지 않는다** (노션 UI-22 · 2026-09-12 재 봄).
-               옛 문구는 "1분이면 내 장학금 확인" 이었는데, 재 보니 그 말이 참인 길은
-               **전부 건너뛰는 길 하나뿐**이었다: 앱이 막는 것은 학교·학년 둘뿐이라 8번 누르고
-               5글자 치면 홈까지 간다. 반대로 처음 가입하는 학생에게 보이는 칸은 입력 10 ·
-               고르기 6 · 칩 3묶음 · 체크 15개라 1분이 아니다. 시간을 적으면 단계가 늘 때마다
-               조용히 거짓말이 된다(넷 → 여섯으로 늘면서 실제로 그렇게 됐다).
-               그래서 **앱이 실제로 요구하는 것**을 적는다 — app.js 의 1단계 검증과 같은 둘이다.
-               ⚠️ '홈에 카드 3장'을 근거로 쓰지 말 것 — 그 석 장은 학교를 안 본다(외대·경희대·
-                  포항공대가 전부 같은 전국 재단 셋). 학교로 갈리는 것은 히어로 건수(11·13·5).
-               관문: test-collector '환영 화면 문구'. -->
-          <p class="onboard-note">학교와 학년만 정하면 바로 볼 수 있어요</p>
         </div>
       </div>
 

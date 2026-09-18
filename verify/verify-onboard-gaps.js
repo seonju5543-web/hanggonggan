@@ -86,8 +86,9 @@ const eq = (label, got, want) => {
      로고 위치를 직접 본다. 2026-09-12 코드 리뷰가 잡은 자리다. */
   eq('환영 화면에서는 줄째로 display:none 이다',
     await page.$eval('.onboard-top', (e) => getComputedStyle(e).display), 'none');
-  eq('그래서 로고가 아래로 안 밀린다 (빈 줄의 여백 30px 이 안 남는다)',
-    await page.$eval('.onboard-logo', (e) => Math.round(e.getBoundingClientRect().top)), 90);
+  /* 2026-09-18 부터 0단계는 정문 투어링 시작 화면이다(노션 UI-3) — 로고 타일 대신 오른쪽 위 워드마크(62px)를 잰다 */
+  eq('그래서 워드마크가 아래로 안 밀린다 (빈 줄의 여백 30px 이 안 남는다 · 시작 화면은 위 62px)',
+    await page.$eval('.start-mark', (e) => Math.round(e.getBoundingClientRect().top)), 62);
   /* 다시 앞으로 가도 값이 남아 있다 — 되돌아온 길이 파괴적이지 않았다는 증거 */
   await page.click('.onboard-step[data-step="0"] [data-next]');
   eq('되돌아와도 학년 선택이 남아 있다',

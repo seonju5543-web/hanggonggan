@@ -1,0 +1,156 @@
+[
+ {
+  "id": "snu",
+  "name": "서울대학교",
+  "file": "snu-1.jpg",
+  "focus": "58% 62%",
+  "author": "Deuterium 001",
+  "license": "CC BY 3.0",
+  "shareAlike": false,
+  "page": "https://commons.wikimedia.org/wiki/File%3ASeoulNatlUnivMainGateAtNight.jpg",
+  "credit": "서울대학교 · 사진 Deuterium 001 · CC BY 3.0 · Wikimedia Commons"
+ },
+ {
+  "id": "korea",
+  "name": "고려대학교",
+  "file": "korea-2.jpg",
+  "focus": null,
+  "author": "Mannaa mohamed",
+  "license": "CC BY-SA 4.0",
+  "shareAlike": true,
+  "page": "https://commons.wikimedia.org/wiki/File%3AKorea_University_Anam_camps%2C_main_gate.jpg",
+  "credit": "고려대학교 · 사진 Mannaa mohamed · CC BY-SA 4.0 · Wikimedia Commons"
+ },
+ {
+  "id": "yonsei",
+  "name": "연세대학교",
+  "file": "yonsei-1.jpg",
+  "focus": null,
+  "author": "Christian Bolz",
+  "license": "CC BY-SA 4.0",
+  "shareAlike": true,
+  "page": "https://commons.wikimedia.org/wiki/File%3AYonsei_University_campus.jpg",
+  "credit": "연세대학교 · 사진 Christian Bolz · CC BY-SA 4.0 · Wikimedia Commons"
+ },
+ {
+  "id": "sogang",
+  "name": "서강대학교",
+  "file": "sogang-5.jpg",
+  "focus": "32% 48%",
+  "author": "알로스",
+  "license": "CC0",
+  "shareAlike": false,
+  "page": "https://commons.wikimedia.org/wiki/File%3ASogang-1641741169692_04.jpg",
+  "credit": "서강대학교 · 사진 알로스 · CC0 · Wikimedia Commons"
+ },
+ {
+  "id": "skku",
+  "name": "성균관대학교",
+  "file": "skku-1.jpg",
+  "focus": null,
+  "author": "hyolee2",
+  "license": "CC BY-SA 3.0",
+  "shareAlike": true,
+  "page": "https://commons.wikimedia.org/wiki/File%3ASungkyunkwan_University_2.JPG",
+  "credit": "성균관대학교 · 사진 hyolee2 · CC BY-SA 3.0 · Wikimedia Commons"
+ },
+ {
+  "id": "hanyang",
+  "name": "한양대학교",
+  "file": "hanyang-1.jpg",
+  "focus": null,
+  "author": "myself (User:Piotrus)",
+  "license": "CC BY-SA 3.0",
+  "shareAlike": true,
+  "page": "https://commons.wikimedia.org/wiki/File%3AHanyang_University_008.JPG",
+  "credit": "한양대학교 · 사진 myself (User:Piotrus) · CC BY-SA 3.0 · Wikimedia Commons"
+ },
+ {
+  "id": "cau",
+  "name": "중앙대학교",
+  "file": "cau-1.jpg",
+  "focus": null,
+  "author": "Hutanis",
+  "license": "CC BY-SA 3.0",
+  "shareAlike": true,
+  "page": "https://commons.wikimedia.org/wiki/File%3AChung-ang_Univ.Maingate.jpg",
+  "credit": "중앙대학교 · 사진 Hutanis · CC BY-SA 3.0 · Wikimedia Commons"
+ },
+ {
+  "id": "khu",
+  "name": "경희대학교",
+  "file": "khu-1.jpg",
+  "focus": "62% 78%",
+  "author": "Pectus Solentis",
+  "license": "CC BY-SA 3.0",
+  "shareAlike": true,
+  "page": "https://commons.wikimedia.org/wiki/File%3A%EA%B2%BD%ED%9D%AC%EB%8C%80_%EC%84%A4%EC%BA%A0_%EC%A0%95%EB%AC%B8.jpg",
+  "credit": "경희대학교 · 사진 Pectus Solentis · CC BY-SA 3.0 · Wikimedia Commons"
+ },
+ {
+  "id": "hufs",
+  "name": "한국외국어대학교",
+  "file": "hufs-3.jpg",
+  "focus": "50% 42%",
+  "author": "LERK",
+  "license": "CC BY-SA 4.0",
+  "shareAlike": true,
+  "page": "https://commons.wikimedia.org/wiki/File%3AHankuk_University_of_Foreign_Studies_Seoul_campus_20180914_090938.jpg",
+  "credit": "한국외국어대학교 · 사진 LERK · CC BY-SA 4.0 · Wikimedia Commons"
+ },
+ {
+  "id": "uos",
+  "name": "서울시립대학교",
+  "file": "uos-1.jpg",
+  "focus": null,
+  "author": "Younghopark7",
+  "license": "CC BY-SA 3.0",
+  "shareAlike": true,
+  "page": "https://commons.wikimedia.org/wiki/File%3A%EC%84%9C%EC%9A%B8%EC%8B%9C%EB%A6%BD%EB%8C%80%ED%95%99%EA%B5%90_%EB%8F%99%EB%AC%B8%ED%83%91.jpg",
+  "credit": "서울시립대학교 · 사진 Younghopark7 · CC BY-SA 3.0 · Wikimedia Commons"
+ },
+ {
+  "id": "konkuk",
+  "name": "건국대학교",
+  "file": "konkuk-1.jpg",
+  "focus": null,
+  "author": "Crossmr",
+  "license": "CC BY-SA 3.0",
+  "shareAlike": true,
+  "page": "https://commons.wikimedia.org/wiki/File%3AKonkukuniversitylake.JPG",
+  "credit": "건국대학교 · 사진 Crossmr · CC BY-SA 3.0 · Wikimedia Commons"
+ },
+ {
+  "id": "dongguk",
+  "name": "동국대학교",
+  "file": "dongguk-5.jpg",
+  "focus": "30% 48%",
+  "author": "Yerbol Nisanbayev",
+  "license": "CC BY 3.0",
+  "shareAlike": false,
+  "page": "https://commons.wikimedia.org/wiki/File%3ADongguk_University_at_Night.jpg",
+  "credit": "동국대학교 · 사진 Yerbol Nisanbayev · CC BY 3.0 · Wikimedia Commons"
+ },
+ {
+  "id": "hongik",
+  "name": "홍익대학교",
+  "file": "hongik-5.jpg",
+  "focus": null,
+  "author": "Michaela den",
+  "license": "CC BY-SA 3.0",
+  "shareAlike": true,
+  "page": "https://commons.wikimedia.org/wiki/File%3AHongik_University_entrance_2012.JPG",
+  "credit": "홍익대학교 · 사진 Michaela den · CC BY-SA 3.0 · Wikimedia Commons"
+ },
+ {
+  "id": "sookmyung",
+  "name": "숙명여자대학교",
+  "file": "sookmyung-4.jpg",
+  "focus": "36% 52%",
+  "author": "revi",
+  "license": "CC BY 2.0 kr",
+  "shareAlike": false,
+  "page": "https://commons.wikimedia.org/wiki/File%3A%EC%88%99%EB%AA%85%EC%97%AC%EC%9E%90%EB%8C%80%ED%95%99%EA%B5%90_001.jpg",
+  "credit": "숙명여자대학교 · 사진 revi · CC BY 2.0 kr · Wikimedia Commons"
+ }
+]

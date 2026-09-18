@@ -16,7 +16,7 @@ const SHOT = (n) => `${__dirname}/shot-${n}.png`;
   page.on('dialog', async (d) => { console.log('DIALOG:', d.message().slice(0, 160).replace(/\n/g, ' | ')); await d.accept(); });
 
   await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
-  console.log('STEP title:', await page.title(), '| h1:', await page.textContent('.onboard-hero h1'));
+  console.log('STEP title:', await page.title(), '| h1:', await page.textContent('.start-copy h1'));
   await page.click('.onboard-step[data-step="0"] [data-next]');
 
   // ── 자동추천: '외대' → 한국외국어대학교

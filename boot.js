@@ -108,6 +108,9 @@
          🔴 쉼의 길이도 CSS 에서 읽는다 — 여기 숫자로 두면 관문이 세 단계 합을 못 잰다. */
       setTimeout(function () {
         el.classList.add('boot-open');
+        /* 구멍이 뚫리기 시작했다고 앱에 알린다 — 시작 화면의 정문 투어링(app.js startMontage)이 이 순간에
+           첫 사진을 스며들게 한다(덮개 밑에서 먼저 돌면 학생이 첫 장면을 못 본다). */
+        try { window.dispatchEvent(new Event('boot:open')); } catch (e) { /* 아주 옛 브라우저 — 투어링은 안 돌고 화면은 뜬다 */ }
         setTimeout(function () { el.hidden = true; }, openMs + 20);
       }, foldMs + holdMs);
     }, wait);

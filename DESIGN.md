@@ -382,6 +382,7 @@ Apple 에서만 받은 것도 있다. **"알약은 고르는 것의 모양"** �
 |---|---|---|---|---|---|
 | `{typography.display-hero}` | 38px (`--t-hero`) | 800 | 1.2 | −0.03em | 홈 히어로 금액 · 신청내역 합계 · 온보딩 금액 |
 | `{typography.display-lg}` | 27px (`--t-3xl`) | 800 | 1.2 | −0.03em | 온보딩 제목 · 일괄 준비 합계 |
+| `{typography.display-start}` | 32px (`--t-start`) | 900 | 1.3125 | −0.02em | **시작 화면 제목 한 곳**(2026-09-18 · 컷 A 승인값 — 아래 「새 크기를 끼워 넣지 말 것」의 예외. 27 과 38 사이라 1.07배 관문은 지킨다) |
 | `{typography.headline}` | 21px (`--t-2xl`) | 800 | 1.2 | −0.03em | 화면 제목 · 상세 시트 제목 · MY 이름 |
 | `{typography.title}` | 18.5px (`--t-xl`) | 800 | 1.35 | −0.03em | 홈 인사말 · 시트 금액 · 온보딩 태그라인 |
 | `{typography.card-title}` | 17px (`--t-lg`) | 700 | 1.35 | −0.01em | 구획 머리 · 큰 버튼 · 보관함 제목 |
@@ -480,6 +481,7 @@ Apple 에서만 받은 것도 있다. **"알약은 고르는 것의 모양"** �
 - 시트는 들어올 때 0.3s · 나갈 때 0.22s(응답은 빠르게). 전부 아래로 쓸어내려 닫는다(`enableSheetSwipe` 한 곳).
 - `prefers-reduced-motion` 이면 움직임을 끈다(일곱 곳). 부팅 화면의 등장은 **한 번 나타나고 멈춘다**, 걷힘은 로고가 세로 막대로 접혔다가 그 자리에서 앱이 열린다(`docs/designs/first-run-and-resume.md`).
 - 손짓(당겨서 새로고침 · 저장 튕김 · 뼈대)은 `interactions.js` 한 곳 — 판정은 새로 만들지 않는다(마감 막대는 2026-09-11 에 뺐다).
+- **시작 화면 투어링**(2026-09-18 · 노션 UI-3): 정문 사진 3장(무작위)이 학교당 `--start-dur` 2.5초씩 0.35초 페이드 · 1.00→1.10 으로 걸어 들어가고 **마지막 장면에서 멈춘다**(한 번 재생). 움직임 줄이기 기기에서는 한 장만 그대로. 시간·곡선은 `tools/gate-reel/reel.html`(승인받은 컷 A)과 같아야 한다 — 관문 test-collector '시작 화면' 절.
 
 ## 컴포넌트
 
@@ -527,6 +529,14 @@ Apple 에서만 받은 것도 있다. **"알약은 고르는 것의 모양"** �
 ### 입력
 
 **`text-input`** — `{colors.surface-1}` · 1px 잉크 10% 테두리 · `{rounded.sm}` 13px · 16px · `{typography.body}`. 포커스: 테두리 `{colors.accent}` + `--ring`(2px 불투명 — 합쳐서 3px 강조색 선 **하나**로 보인다. 🔴 ③ 상호작용의 `:focus-visible` 바깥선은 입력칸에서 끈다 — 링이 불투명해지자 두 줄이 됐고 검색 알약 안에 네모 선이 하나 더 그려졌다 · 실측). 틀린 칸(`:user-invalid`)만 바깥선을 빨강으로 쓴다(16번). 오류(`:user-invalid` · 16번 적용): 테두리 `{colors.semantic-danger}` + 포커스 링도 같은 색, 문구는 그대로. 최소 높이 56px(통과). 검색 입력만 알약(Apple 의 `search-input` 과 같다). 체크박스는 앱 공용 그림을 써야 보인다(전역 `appearance:none`).
+
+### 시작 화면 (2026-09-18 · 노션 UI-3 · 컷 A 승인)
+
+**`start-montage`** — 온보딩 0단계 전체. 화면을 다 덮는 정문 사진 무대(`#start-stage` · `assets/gates/` 14장 중 **무작위 3장**) 위에 왼쪽 아래 카피, 맨 아래 흰 버튼. ui bowl 실측(Waymo · Tasteit · 센디)대로 카피 윗선 62% · 스크림 아래 45% · 버튼 맨 아래 · 위에는 워드마크와 학교 이름표뿐.
+- 바탕 `--start-base` #0f1522(사진이 못 오면 이 색만) · 글자 `--start-ink` #fdfbf6 · 이름표 면 `rgba(--start-band, .55)` · 스크림은 **index.html 의 인라인 SVG**(#121a2b 0→88%) — style.css 에는 그라데이션 함수를 두지 않는다(ui-tone 관문).
+- 카피: `start-tag` 17px 500 80% + `h1` `{typography.display-start}` 32px 900. 버튼: `button-inverse` 꼴(`--start-ink` 면 · `--primary` 글자 · 그림자 없음 · 60px). 안내 한 줄 `.onboard-note` 13.5px 70%. 출처 한 줄 `.start-credit` 11.5px 55%(장면마다 · 작가 · 라이선스 · Wikimedia Commons — 컷 A 의 9px 를 척도 최소값으로 올렸다).
+- 이 화면만 `.screen` 20px 여백과 `.app` 아래 148px 을 거둔다(`:has`) — 헛스크롤 0. 🔴 `.onboard-step[data-step="0"]` 의 `flex: none` 을 빼면 높이가 0 이 된다(실측).
+- 재료·라이선스: `docs/designs/assets/gates/PICKS.md`(SA 사진 10장 — 개발자가 2026-09-18 감수하기로 결정) · 앱 목록 `assets/gates/gates.json`(`tools/gate-reel/build-app-gates.mjs`).
 
 ### 탐색
 

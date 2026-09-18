@@ -124,7 +124,9 @@ console.log('\n■ style.css 가 토큰 밖의 값을 쓰지 않는다');
      ⚠️ 브라우저 검사(verify-interactions)는 **프로필이 있는 화면만** 훑어서 온보딩의 둘
         (로고·기능 카드)을 못 본다 — 코드 리뷰가 그 구멍을 실증했다. 그래서 CSS 에서 본다. */
   const FLAT = [['.avatar', '홈·MY 프로필 원'], ['.hero-card', '홈 히어로 패널'],
-    ['.onboard-logo', '온보딩 로고'], ['.onboard-points li', '온보딩 기능 카드']];
+    /* 2026-09-18 부터 온보딩 0단계는 정문 투어링 시작 화면이다 — 로고 타일·기능 카드는 없고,
+       사진 위의 학교 이름표와 흰 버튼이 '면 위에 놓인 것'이다. */
+    ['.start-school', '시작 화면 학교 이름표'], ['.onboard-step[data-step="0"] .btn-primary', '시작 화면 흰 버튼']];
   const withShadow = [];
   for (const [sel, name] of FLAT) {
     /* 그 선택자로 시작하는 블록 안에 box-shadow 가 있으면 잡는다(hover·active 는 다른 블록이다) */
@@ -157,7 +159,7 @@ console.log('\n■ style.css 가 토큰 밖의 값을 쓰지 않는다');
       · `.chat-*`  대장님. 2026-08-29 개발자 지시로 손대지 않기로 한 영역이다.
       · `.fd-*` `.form-doc`  인쇄되는 신청서 문서다. 흰 종이에 검은 글씨·회색 괘선이 맞다.
       · `@keyframes`  움직임의 중간값이라 여백 리듬과 무관하다. */
-const CEILING = { space: 516, color: 76, ghost: 0 };   // 2026-09-12 홈 신청 현황(UI-15) 제거로 517 → 516
+const CEILING = { space: 509, color: 75, ghost: 0 };   // 2026-09-18 시작 화면(UI-3): 옛 환영 화면 규칙을 걷어 516 → 509 · 76 → 75
 
 /** 천장 검사 — 늘면 실패, 줄면 천장을 내리라고 알린다(실패는 아니다). */
 const le = (name, got, ceiling, hint) => {
