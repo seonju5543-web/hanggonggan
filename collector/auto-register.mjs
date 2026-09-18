@@ -32,10 +32,10 @@ const registered = JSON.parse(fs.readFileSync(registeredPath, 'utf8'));
 let forms = { templates: {} };
 try { forms = JSON.parse(fs.readFileSync(new URL('../data/forms.json', HERE), 'utf8')); } catch { /* 없어도 진행 */ }
 
-/* 게시판이 제목에 직접 적어 둔 '교내' 표식. 이것 말고는 교내로 보지 않는다 (2026-09-18).
-   `[교내]` 대괄호 표식과 `교내장학` 두 가지가 게시판에서 실제로 쓰는 꼴이다.
-   🔴 맨 `교내` 두 글자로 넓히지 말 것 — `교내외 장학금 안내` 같은 제목이 교내가 된다. */
-const CAMPUS_MARK = /\[\s*교내\s*\]|교내장학/;
+/* 🔴 '교내인가 교외인가'는 **`match-engine.js` 한 곳**에서 정한다 (2026-09-18에 옮겼다).
+   앱 화면(실시간 공고 카드)도 같은 말을 해야 해서다 — 베껴 두면 같은 공고가 목록에서는
+   '교외', 실시간 구역에서는 '교내'로 뜬다(옮기기 전 실제 모습이 그랬다). */
+const { noticeKind } = createRequire(import.meta.url)('../match-engine.js');
 /* 주관 기관을 못 읽었을 때 쓰는 말. 같은 항목의 `금액 원문 확인` 과 같은 말투다. */
 const PROVIDER_UNKNOWN = '주관 기관 원문 확인';
 const TODAY = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10); // KST
@@ -238,7 +238,7 @@ if (!cfg.enabled) {
          학교 게시판에 올라오는 공고는 대부분 **학교가 옮겨 적은 교외 공고**라 기본값이 반대였다.
          ⚠️ 낱말 목록을 다시 늘려 교외를 찾으려 하지 말 것 — 그 방식이 틀린 이유가 위의 실측이다.
             찾을 수 있는 것은 '교내라고 적어 둔 것' 쪽이고, 그건 게시판이 제목에 직접 적는다. */
-      type: CAMPUS_MARK.test(title) ? '교내' : '교외',
+      type: noticeKind(title),
       /* 🔴 **게시한 학교를 주관 기관이라고 적지 않는다** (2026-09-18 개발자 지시).
          이 칸은 '누가 주는가'인데 '어느 게시판에서 주웠나'가 들어가 있었다(33건). 그래서
          카드가 `교내 · 경희대학교 게시 공고 / 푸른등대 한국수력원자력 k-원전 장학금` 처럼

@@ -1122,9 +1122,14 @@ console.log('\n■ 교내·교외 분류와 주관 기관 (2026-09-18 개발자 
        ② `provider` 에 **게시한 학교**가 들어갔다(33건). 그 칸은 '누가 주는가'다.
      🔴 규칙을 여기에 베끼지 않는다 — 로봇 소스에서 읽어 그대로 돌린다(베끼면 갈라진다). */
   const src = readText(new URL('../collector/auto-register.mjs', import.meta.url));
-  const mMark = src.match(/const CAMPUS_MARK = (\/.*\/);/);
+  /* 🔴 판정 규칙은 **`match-engine.js` 한 곳**이다 (2026-09-18에 옮겼다 — 앱 화면도 같은 말을
+     해야 해서다). 로봇도 앱도 이 함수를 불러 쓴다. 여기서 규칙을 베끼지 않고 그 파일에서 읽는다. */
+  const eng = readText(new URL('../match-engine.js', import.meta.url));
+  const mMark = eng.match(/const NOTICE_CAMPUS_MARK = (\/.*\/);/);
   const mProv = src.match(/const PROVIDER_UNKNOWN = '([^']+)';/);
-  eq('로봇에 교내 표식 규칙(CAMPUS_MARK)이 있다', !!mMark, true);
+  eq('교내 표식 규칙(NOTICE_CAMPUS_MARK)이 공용 엔진에 있다', !!mMark, true);
+  eq('  로봇이 그 함수를 가져다 쓴다 (규칙을 베끼지 않는다)',
+    /\{ noticeKind \} = createRequire/.test(src) && /type: noticeKind\(title\)/.test(src), true);
   eq('로봇에 "모름" 주관 기관(PROVIDER_UNKNOWN)이 있다', !!mProv, true);
   if (mMark && mProv) {
     const MARK = eval(mMark[1]);
@@ -1144,8 +1149,20 @@ console.log('\n■ 교내·교외 분류와 주관 기관 (2026-09-18 개발자 
       ['공통 2026년 상반기 사랑나눔장학생 모집 공고',
        '공통 제36기 미레에셋 해외교환 장학생 선발',
        '[화성시] 2026년 코나아이 소상공인 장학생 모집'].map(typeOf), ['교외', '교외', '교외']);
-    /* 🔴 맨 '교내' 두 글자로 넓히면 이것이 교내가 된다 — 넓히지 말라는 경계값 */
-    eq('  "교내외" 는 교내 표식이 아니다', typeOf('2026-2학기 교내외 장학금 통합 안내'), '교외');
+    /* 🔴 **`교내` 뒤에 `외` 가 오면 교내가 아니다** — `교내외`·`교내·외`·`교내•외` 는 둘 다를
+       뜻한다. 이 셋이 규칙을 넓힐 때의 경계값이다(전부 실제 게시판 제목). */
+    eq('  "교내외" 류는 교내가 아니다',
+      ['2026-2학기 교내외 장학금 통합 안내',
+       '(서울)2026학년도 2학기 서울캠퍼스 학기중 일반 교내·외 국가근로장학생 선발 안내',
+       '(다빈치) 2026학년도 다빈치캠퍼스 2학기 학기 중 교내•외근로 국가근로장학생 선발 안내'].map(typeOf),
+      ['교외', '교외', '교외']);
+    /* 🔴 반대쪽 함정 — 대괄호 표식만 보면 게시판이 대괄호 없이 쓰는 **진짜 교내 공고**를 놓친다.
+       실측(notices.json 120판): 제목에 `교내` 가 든 31건 중 12건만 잡히고 19건이 교외로 떨어졌다. */
+    eq('  대괄호가 없어도 제목이 "교내" 라고 하면 교내다',
+      ['[교내근로-인문캠퍼스] 2026학년도 2학기 국가근로장학생(교내근로) 선발결과 안내',
+       '2026학년도 2학기 대학원 교내 특별 장학금(외국인, 공로, 개신가족) 추가 신청 안내',
+       '[입학처] 2026학년도 2학기 교내 및 국가 근로장학생 모집 안내'].map(typeOf),
+      ['교내', '교내', '교내']);
     eq('로봇이 주관 기관에 게시 학교를 넣지 않는다',
       /provider: `\$\{n\.school\}/.test(src), false);
     eq('  대신 "모른다"고 적는다', /provider: PROVIDER_UNKNOWN/.test(src), true);
@@ -1189,6 +1206,35 @@ console.log('\n■ 교내·교외 분류와 주관 기관 (2026-09-18 개발자 
      우연히 맞던 것이다. 정직하게 고치자 학교를 찾는 공고가 39 → 10건으로 떨어졌다(실측). */
   const instaSchool = readText(new URL('../insta/school.mjs', import.meta.url));
   eq('인스타가 학교를 schoolOnly 로 찾는다', /eligibility \|\| \{\}\)\.schoolOnly/.test(instaSchool), true);
+
+  /* 🔴 **실시간 공고 카드도 같은 말을 해야 한다** (2026-09-18 개발자 지적 "교내공고에서 교내로").
+     그 카드 맨 윗줄은 목록 카드와 **같은 자리**(`.sch-org`)인데 `교내 공고` 로 못 박혀 있었다 —
+     제목이 `[공통][교외]` 인 공고가 '교내 공고' 로 떴다(실측 한국외대 27건 중 26건이 교외).
+     ⚠️ 주석까지 세지 말 것 — 아래 경위 주석이 옛 문구를 인용한다. */
+  /* ⚠️ 앱 전체에서 `교내 공고` 를 세면 안 된다 — MY 화면의 판 번호 줄이 `교내 공고 2개교`
+     로 쓴다(전혀 다른 뜻). **그 카드를 그리는 함수 안에서만** 본다. */
+  /* 🔴 **비탐욕 정규식으로 함수를 자르지 말 것** (2026-09-18 코드 리뷰). 안쪽에 0열 `}` 가
+     하나 생기는 순간 토막만 잘려 나오고, 아래 '못 박혀 있지 않다' 가 **빈 껍데기를 상대로
+     조용히 통과**한다. 여는 괄호부터 세어 짝이 맞는 자리에서 끊는다. */
+  const cutFn = (src, name) => {
+    const at = src.indexOf(`function ${name}(`);
+    if (at < 0) return '';
+    let i = src.indexOf('{', at), depth = 0;
+    for (let j = i; j < src.length; j++) {
+      if (src[j] === '{') depth++;
+      else if (src[j] === '}' && --depth === 0) return src.slice(at, j + 1);
+    }
+    return '';
+  };
+  const liveFn = cutFn(app, 'liveNoticesHtml')
+    .replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  /* 이 함수의 심장(카드 마크업)이 실제로 잘려 왔는지 본다 — 길이만 보면 토막도 통과한다 */
+  eq('실시간 공고를 그리는 함수를 통째로 찾았다 (못 찾으면 아래가 헛돈다)',
+    /sch-org/.test(liveFn) && /sch-name/.test(liveFn), true);
+  eq('실시간 공고 카드가 "교내 공고" 로 못 박혀 있지 않다', /교내 공고/.test(liveFn), false);
+  eq('  같은 판정 함수(noticeKind)를 쓴다', /noticeKind\(n\.title\)/.test(liveFn), true);
+  /* 브라우저에서는 전역으로 잡힌다 — 내보내기 목록에서 빠지면 Node 검사만 통과하고 앱이 죽는다 */
+  eq('  noticeKind 가 Node 쪽으로도 내보내진다', /noticeKind, NOTICE_CAMPUS_MARK/.test(eng), true);
 }
 
 console.log('\n■ 정식 등록 대상 학교 좁히기 (2026-08-30)');
