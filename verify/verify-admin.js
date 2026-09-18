@@ -166,6 +166,31 @@ function serve() {
         });
         body = JSON.stringify(db);
       }
+      /* 🔴 **이 기능이 성공하면 그 기능을 재는 검사가 조용해진다** (2026-09-18 코드 리뷰).
+         「금액을 로봇이 못 읽은 공고」·「마감을 로봇이 못 읽은 공고」 두 절은 그런 공고가
+         0건이면 항목 대부분을 건너뛴다 — 그런데 0건은 **우리가 바라는 상태**다. 그러면
+         만원→원 변환·자릿수 천장·파생 예고를 누가 깨뜨려도 초록불이 된다(위 검수 대기와 같은 유형).
+         그래서 **조건 없이** 픽스처를 끼워 넣는다. 저장소 데이터는 건드리지 않는다. */
+      {
+        const db2 = JSON.parse(body);
+        const future = new Date(Date.now() + 9 * 3600e3 + 30 * 86400e3).toISOString().slice(0, 10);
+        const base = {
+          type: '교외', provider: '검사용', summary: '검사 드라이버가 끼워 넣은 항목입니다(저장소에는 없습니다).',
+          documents: ['원문 공고에서 확인'], eligibility: { selective: true },
+          noForm: '검사용', attachments: [], sourceKind: 'auto', listedAt: '2026-09-01',
+        };
+        for (const n of [1, 2]) db2.items.push({
+          ...base, id: `verify-noamount-${n}`, name: `검사용 금액 미확인 공고 ${n}`,
+          amount: '금액 원문 확인', amountValue: 0, deadline: future, period: '접수 기간 원문 확인',
+          sourceUrl: `https://example.ac.kr/view.do?seq=${950 + n}`,
+        });
+        db2.items.push({
+          ...base, id: 'verify-nodeadline-1', name: '검사용 마감 미확인 공고',
+          amount: '100만원', amountValue: 1000000, period: '접수 기간 원문 확인',
+          sourceUrl: 'https://example.ac.kr/view.do?seq=953',
+        });
+        body = JSON.stringify(db2);
+      }
       PAGE_ITEMS = JSON.parse(body).items;   // 화면이 실제로 받은 목록 — 아래 건수 비교는 전부 이걸 기준으로 한다
     }
     /* 인스타 — 게시 대기가 0건이면 '게시·카드 보기' 검사가 조용히 사라진다(위 검수 대기와 같은 유형).
@@ -1701,6 +1726,7 @@ function serve() {
     await page.waitForSelector('#screen-todo:not([hidden])');
     const dlRows = await page.locator('[data-deadline-fill] [data-dl-row]').count();
     ok(dlRows === noDl.length, '마감을 모르는 공고를 전부 줄로 보여 준다', `화면 ${dlRows} / 데이터 ${noDl.length}`);
+    ok(dlRows >= 1, '  이 절이 조용해지지 않는다 (드라이버가 픽스처를 스스로 주입한다)', `${dlRows}줄`);
     if (dlRows) {
       const t = await page.textContent('[data-dl-note]');
       ok(/짐작하지 않습니다/.test(t) && /사람이/.test(t), '화면이 날짜를 짐작하지 않는다고 말한다 (누가 적는지도)');
@@ -1758,6 +1784,86 @@ function serve() {
       await page.evaluate(() => { window.__admin.pendingMap().clear(); });
     } else {
       ok(true, '마감을 모르는 공고가 0건이라 적어 두기를 못 눌렀다');
+    }
+    await page.unroute('**/actions/workflows/**/runs**');
+  }
+
+  /* ══ 금액을 로봇이 못 읽은 공고 — 사람이 적는다 (2026-09-17 · F-9 컨펌 2) ══════════
+     개발자가 "관리자 화면에서 손으로 채운다"로 정했다. 🔴 화면은 금액을 짐작하지 않는다.
+     🔴 그리고 **숫자만 적으면 감사가 묶음 전체를 되돌린다**(카드 문구에 숫자가 없는데
+        amountValue > 0 이면 오류) — 그래서 전후 대조에 '금액 문구' 칸이 같이 떠야 한다. */
+  {
+    const items = (PAGE_ITEMS || regFile.items);
+    const dd = (deadline) => (deadline
+      ? Math.round((new Date(`${deadline}T00:00:00Z`) - new Date(`${TODAY}T00:00:00Z`)) / 86400000) : null);
+    const noAmt = items.filter((it) => !(Number(it.amountValue) > 0) && !it.amountSpec
+      && (dd(it.deadline) == null || dd(it.deadline) >= 0));
+    await page.route('**/actions/workflows/**/runs**', (route) => route.fulfill({
+      status: 200, contentType: 'application/json',
+      body: JSON.stringify({ workflow_runs: [{ id: 12, status: 'completed', conclusion: 'success',
+        created_at: new Date(Date.now() + 5000).toISOString(), html_url: 'https://example.invalid/run' }] }),
+    }));
+    await page.evaluate(() => { window.__admin.pendingMap().clear(); });
+    await page.click('.tab[data-tab="todo"]');
+    await page.waitForSelector('#screen-todo:not([hidden])');
+    const amRows = await page.locator('[data-amount-fill] [data-am-row]').count();
+    ok(amRows === noAmt.length, '금액을 모르는 공고를 전부 줄로 보여 준다 (마감 지난 것은 뺀다)',
+      `화면 ${amRows} / 데이터 ${noAmt.length}`);
+    /* 🔴 픽스처를 주입하므로 0건일 수 없다 — 0이면 절이 조용해진 것이지 통과가 아니다 */
+    ok(amRows >= 2, '  이 절이 조용해지지 않는다 (드라이버가 픽스처를 스스로 주입한다)', `${amRows}줄`);
+    if (amRows) {
+      const t = await page.textContent('[data-am-note]');
+      ok(/짐작하지 않습니다/.test(t) && /만원/.test(t), '화면이 금액을 짐작하지 않는다고 말한다 (단위도 적는다)');
+      ok(/전액|%/.test(t), '  숫자 한 칸으로 못 적는 공고는 비워 두라고 말한다 (0원이 지어낸 숫자보다 낫다)');
+      ok(await page.locator('[data-amount-fill] input[data-am-input]').first().inputValue() === '',
+        '  금액 칸이 비어서 시작한다 (미리 채워 넣지 않는다)');
+      const linked = await page.locator('[data-amount-fill] [data-am-row]:has(a[href^="http"])').count();
+      ok(linked === amRows, '  줄마다 원문·첨부 링크가 있다', `${linked}/${amRows}`);
+      const id = await page.locator('[data-amount-fill] [data-am-row]').first().getAttribute('data-am-row');
+      /* 🔴 자릿수 실수 — 만원 칸에 300만원을 원으로 치면 300억이 된다. 그 자리에서 막는다 */
+      await page.fill(`[data-am-input="${id}"]`, '3000000');
+      await page.click(`[data-am-save="${id}"]`);
+      await page.waitForTimeout(200);
+      ok(!await page.evaluate((x) => window.__admin.pendingMap().get(x), id),
+        '  만원 칸에 원 단위를 치면 적히지 않는다 (300억이 될 뻔한 자리)');
+      await page.fill(`[data-am-input="${id}"]`, '300');
+      await page.click(`[data-am-save="${id}"]`);
+      await page.waitForTimeout(250);
+      const staged = await page.evaluate((x) => window.__admin.pendingMap().get(x), id);
+      ok(staged && staged.amountValue === 3000000, '적어 두기가 만원을 원으로 바꿔 모아 둔다',
+        JSON.stringify(staged));
+      ok(/모아 둠 · 300만원/.test(await page.textContent(`[data-am-row="${id}"]`)), '  줄에 적어 둔 금액이 보인다');
+      ok(await page.locator('[data-amount-fill] [data-am-row]').count() === amRows,
+        '  적어 둔 뒤에도 줄 수가 그대로다 (저장 전엔 사라지지 않는다)');
+      if (amRows >= 2) {
+        const other = await page.locator('[data-amount-fill] [data-am-row]').nth(1).getAttribute('data-am-row');
+        await page.fill(`[data-am-input="${other}"]`, '500');
+        await page.click(`[data-am-save="${id}"]`);
+        await page.waitForTimeout(200);
+        ok(await page.inputValue(`[data-am-input="${other}"]`) === '500',
+          '  한 줄을 적어 둬도 다른 줄에 쳐 둔 숫자는 그대로 있다');
+      }
+      let amSent = null;
+      await page.route('**/actions/workflows/**/dispatches', (route) => {
+        try { amSent = JSON.parse(route.request().postData() || '{}'); } catch { amSent = 'parse-fail'; }
+        route.fulfill({ status: 204, body: '' });
+      });
+      await page.click('[data-act="flush"]');
+      await page.waitForSelector('#sheet:not([hidden]) [data-ask-go]', { timeout: 8000 }).catch(() => {});
+      const diffText = await page.textContent('#sheet');
+      ok(/금액 문구/.test(diffText) && /300만원/.test(diffText),
+        '  전후 대조가 카드 문구까지 예고한다 (숫자만 고치면 감사가 묶음을 되돌린다)');
+      await page.click('#sheet [data-ask-go]');
+      await page.waitForTimeout(700);
+      const sp = (() => { try { return JSON.parse(amSent?.inputs?.payload || '{}'); } catch { return {}; } })();
+      const ed = (sp.edits || []).find((x) => x.id === id) || {};
+      ok(ed.patch && ed.patch.amountValue === 3000000, '  나가는 payload 에 금액이 원 단위로 실린다',
+        JSON.stringify(ed.patch));
+      await page.waitForFunction(() => !window.__admin.jobBusy(), null, { timeout: 30000 }).catch(() => {});
+      await page.unroute('**/actions/workflows/**/dispatches');
+      await page.evaluate(() => { window.__admin.pendingMap().clear(); });
+    } else {
+      ok(true, '금액을 모르는 마감 전 공고가 0건이라 적어 두기를 못 눌렀다');
     }
     await page.unroute('**/actions/workflows/**/runs**');
   }

@@ -681,6 +681,28 @@ function taggedSchool(n) {
       한쪽에만 두면 화면에서 내린 공고를 알림이 알리는 모순이 생긴다. */
 const SERVED_SCHOOLS = ['경희대학교', '한국외국어대학교'];
 
+/* 🔴 **공고가 교내인가 교외인가 — 규칙은 여기 하나다** (2026-09-18).
+   원래 `collector/auto-register.mjs` 안에만 있었는데, 앱 화면(실시간 공고 카드)도 같은 말을
+   해야 해서 공용 파일로 옮겼다. 🔴 **베끼지 말 것** — 갈라지면 같은 공고가 목록에서는 '교외',
+   실시간 구역에서는 '교내'로 뜬다(그게 이 수리 전의 모습이었다: 한국외대 실시간 27건 중
+   26건이 제목에 `[교외]` 라고 적혀 있는데 카드는 전부 `교내 공고` 였다).
+
+   **교내는 증거가 있을 때만**이다 — 제목에 `교내` 라고 적혀 있을 때.
+   🔴 낱말 목록을 늘려 **교외**를 찾으려 하지 말 것: 제목에 재단 이름이 안 드러나는 전국 사업
+   (`푸른등대 …`, `[공통][국가근로] …`)이 통째로 교내가 된다(2026-09-18 실측 19건 중 17건).
+
+   🔴 **`교내` 뒤에 `외` 가 오면 교내가 아니다** — `교내외`·`교내·외`·`교내•외` 는 **둘 다**를
+   뜻하는 말이라 교내로 읽으면 안 된다. 처음엔 이 함정 때문에 `[교내]` 대괄호 표식만 봤는데,
+   그러면 게시판이 대괄호 없이 쓰는 진짜 교내 공고를 통째로 놓친다 — 실측(notices.json 120판):
+   제목에 `교내` 가 든 31건 중 **12건만** 잡히고, `[교내근로-인문캠퍼스] … 국가근로장학생`,
+   `대학원 교내 특별 장학금`, `[입학처] … 교내 근로장학생 모집` 19건이 '교외'로 떨어졌다.
+   그래서 **넓히되 `외` 가 붙는 꼴만 뺀다.** ⚠️ `교내 및 교외 …` 처럼 사이에 낱말이 있으면
+   교내로 본다 — 둘 다인 공고이고, 게시판이 앞세운 말이 교내다. */
+const NOTICE_CAMPUS_MARK = /교내(?![·•‧・\s]*외)/;
+function noticeKind(title) {
+  return NOTICE_CAMPUS_MARK.test(String(title || '')) ? '교내' : '교외';
+}
+
 function noticeForProfile(n, p) {
   if (!p || !p.school || !n) return false;
   const tagged = taggedSchool(n);
@@ -1305,5 +1327,6 @@ if (typeof module !== 'undefined' && module.exports) {
                      requirementLines, requirementStruct, requirementMatch, tidyRequirement,
                      REQ_SIGNAL, NOT_A_REQUIREMENT, EXCLUDE_LINE, HARD_THRESHOLD,
                      noticeForProfile, taggedSchool, SHARED_BOARD_BRANCH, SERVED_SCHOOLS,
+                     noticeKind, NOTICE_CAMPUS_MARK,
                      noticeFileKey, noticeFileFor, noticeFilesForProfile };
 }

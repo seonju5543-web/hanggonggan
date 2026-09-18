@@ -241,61 +241,73 @@ const PROFILE = {
       title: '검사용 우리 학교 공고', school: p.school, campus: p.campus || '',
       url: 'https://example.ac.kr/notice/1', attachments: [], foundAt: '2026-09-12',
     }]) };
-    renderExplore();
+    renderHome();
   });
+  /* 🔴 **게시판 글은 이제 홈에 있다** (2026-09-18 개발자 지시 · 아래 단언들이 그것을 못 박는다).
+     2026-09-17 에 '교내' 칸에 합쳤더니 **교내 칸에 외부 장학금이 섞여** 보였다 —
+     *"교내 장학금만 볼 수 있는 창을 누르면 교내에서 주최하는 … 것만 올라왔으면 좋겠어 …
+       어디에 게시되느냐가 아니라 어떤 재단이 주최하는가가 기준이 되어야 돼."*
+     게시판 글은 제목·링크뿐이라 주최를 모르므로 '교내' 라고 부를 수 없다. */
   await page.click('.filter-chip[data-filter="교내"]'); await page.waitForTimeout(500);
   const nt = await page.evaluate(() => ({
     교외섞임: [...document.querySelectorAll('#explore-list .sch-card:not(.notice-card)')]
       .map((e) => e.dataset.detail)
       .filter((id) => ((allScholarships() || []).find((s) => s.id === id) || {}).type === '교외').length,
-    공고: document.querySelectorAll('#live-notices .notice-card').length,
+    /* 🔴 **화면을 한정해 센다** — `#live-notices` 는 이제 홈에 있고, 화면이 숨어 있어도
+       querySelectorAll 은 찾아낸다. 한정하지 않으면 '교내 칸에 없다'가 영영 거짓이 된다. */
+    탐색안_공고: document.querySelectorAll('#screen-explore .notice-card').length,
+    홈안_공고: document.querySelectorAll('#screen-home #live-notices .notice-card').length,
     정렬버튼: !document.querySelector('#explore-sort-btn').hidden,
     /* 🔴 '마감 임박' 배지는 여기 없어야 한다 — 우리는 이 글의 마감일을 모른다(원칙 8-1) */
     임박배지: document.querySelectorAll('#live-notices .badge-dday').length,
+    /* 🔴 교내/교외를 말하지 않는다 — 주최를 모르므로(같은 지시) */
+    종류말함: [...document.querySelectorAll('#live-notices .notice-card .sch-org')]
+      .filter((e) => /교내|교외/.test(e.textContent)).length,
   }));
-  eq('우리 학교 게시판 글이 교내 칸에 나온다 (칸을 합쳤다)', nt.공고 > 0, true);
+  eq('🔴 게시판 글이 교내 칸에 나오지 않는다 (주최를 모르므로)', nt.탐색안_공고, 0);
+  eq('  대신 홈에 나온다 (사라지지 않는다)', nt.홈안_공고 > 0, true);
   eq('  등록 공고 자리에 교외가 섞이지 않는다', nt.교외섞임, 0);
-  /* 🔴 감췄던 이유는 그 칸에 게시판 글'만' 있어서였다 — 등록 공고가 함께 있으니 보여야 한다 */
   eq('  정렬 버튼은 보인다 (등록 공고가 함께 있으므로)', nt.정렬버튼, true);
   eq('  마감일을 모르므로 「마감 임박」이라고 하지 않는다', nt.임박배지, 0);
-  /* 🔴 **'없어요' 라고 적어 놓고 그 아래에 공고를 늘어놓지 않는다** (2026-09-17).
-     교내 등록분이 0건이어도 게시판 글 구역이 제 빈 상태를 말하므로 여기는 비워 둔다.
+  eq('  카드가 교내/교외를 말하지 않는다', nt.종류말함, 0);
+  /* 🔴 교내 등록분이 0건일 때 **'없어요' 로만 끝내지 않는다** — 학교에 교내 장학금이 없다는
+     뜻으로 읽힌다. 우리가 아직 안 읽었을 뿐이므로 어디를 보면 되는지(홈) 말한다.
      🔴 **등록분을 실제로 0건으로 만들어 재야 한다** — 이 프로필에는 교내 등록 공고가
-        있어서, 그냥 재면 빈 상태가 아예 안 일어나 되돌려도 초록불이 된다(실측으로 걸렸다).
-        그래서 registeredList 에서 교내를 잠시 빼고 그 화면을 잰 뒤 되돌린다. */
-  eq('  등록분이 0건이어도 「없어요」와 공고가 같이 뜨지 않는다', await page.evaluate(() => {
+        있어서, 그냥 재면 빈 상태가 아예 안 일어나 되돌려도 초록불이 된다(실측으로 걸렸다). */
+  eq('  교내 등록분이 0건이면 홈을 가리킨다', await page.evaluate(() => {
     const keep = registeredList;
     registeredList = registeredList.filter((s) => s.type !== '교내');
     renderExplore();
+    const el = document.querySelector('#explore-list .empty');
     const got = {
       등록카드: document.querySelectorAll('#explore-list .sch-card').length,
-      /* 🔴 건수를 박지 않는다 — 실시간 공고는 60일이 지나면 지워진다(위 주석 참조).
-         '있다'만 요구하면 심어 둔 한 건이 늘 받쳐 준다. */
-      공고있음: document.querySelectorAll('#live-notices .notice-card').length > 0,
-      없어요: !!document.querySelector('#explore-list .empty'),
+      홈안내: !!(el && /홈/.test(el.textContent)),
     };
     registeredList = keep; renderExplore();
     return got;
-  }), { 등록카드: 0, 공고있음: true, 없어요: false });
-  /* 검색창이 떠 있으니 검색은 여기에도 걸려야 한다 */
+  }), { 등록카드: 0, 홈안내: true });
+  /* 🔴 탐색 검색이 **홈의 게시판 글을 건드리지 않는다** — 다른 화면의 목록이다.
+     예전엔 이 목록이 탐색에 있어 검색을 걸어야 했다(2026-09-12 UI-16). 자리가 바뀌면
+     그 이유도 같이 사라진다 — 남겨 두면 홈 목록이 탐색 검색어로 조용히 비어 버린다. */
   await page.fill('#explore-search', 'ㅁㄴㅇㄹ'); await page.waitForTimeout(400);
-  eq('  검색이 이 칸에도 걸린다', await page.evaluate(() => ({
-    공고: document.querySelectorAll('#live-notices .notice-card').length,
-    빈말: !!document.querySelector('#live-notices .empty'),
-  })), { 공고: 0, 빈말: true });
+  /* 🔴 **홈을 다시 그려 놓고 재야 한다** (2026-09-18 코드 리뷰). 검색은 탐색 화면만 다시
+     그리므로, 그냥 세면 앞서 그려 둔 카드가 그대로 있어 **되돌려도 초록불**이다
+     (검색이 이 목록에 다시 걸려도 못 잡는다). 홈을 그 검색어가 살아 있는 채로 다시 그린다. */
+  eq('  탐색 검색이 홈의 게시판 글을 비우지 않는다', await page.evaluate(() => {
+    renderHome();
+    return document.querySelectorAll('#screen-home #live-notices .notice-card').length > 0;
+  }), true);
   await page.fill('#explore-search', ''); await page.waitForTimeout(300);
   /* 🔴 도우미·알림이 '전체 보기'라고 적어 놓고 걸린 칸을 그대로 두면 약속을 안 지킨다
-     (2026-09-12 코드 리뷰가 '우리 학교' 칸에서 실측으로 잡았다: 카드 0장짜리 화면).
-     그 길은 exploreShowAll 한 곳을 지난다 — 칸을 합친 뒤에도 그대로 필요하다. */
+     (2026-09-12 코드 리뷰가 '우리 학교' 칸에서 실측으로 잡았다: 카드 0장짜리 화면). */
   eq('「전체 보기」로 오면 칸이 전체로 돌아온다', await page.evaluate(() => {
     exploreShowAll();
     return { 칩: (document.querySelector('.filter-chip.active') || {}).dataset.filter,
       카드: document.querySelectorAll('#explore-list .sch-card').length > 0 };
   }), { 칩: 'all', 카드: true });
-  /* 🔴 '전체'에서는 **빠져 있어야** 한다 — 그게 '별도 칸으로 뺀다'의 뜻이다 */
   await page.click('.filter-chip[data-filter="all"]'); await page.waitForTimeout(500);
-  eq('전체 목록 아래에는 더 이상 붙지 않는다',
-    await page.$$eval('#live-notices .notice-card', (e) => e.length), 0);
+  eq('전체 칸에도 붙지 않는다 (탐색 화면 어디에도 없다)',
+    await page.$$eval('#screen-explore .notice-card', (e) => e.length), 0);
 
   console.log('\n■ 홈 차례 — 적합도와 마감일을 한 점수로 (2026-09-17 개발자 지시)');
   await page.click('.nav-item[data-nav="home"]');

@@ -163,7 +163,13 @@ function chatSearch(q, limit = 4) {
   const rank = (fuzzy) => chatMatches().map((m) => {
     const s = m.sch;
     const name = String(s.name || '').toLowerCase();
-    const provider = String(s.provider || '').toLowerCase();
+    /* 🔴 **"모른다"고 적어 둔 주관 기관으로는 점수를 주지 않는다** (2026-09-18 코드 리뷰).
+       수집 로봇이 못 읽은 공고는 전부 `주관 기관 원문 확인` 이라 글자가 똑같다. 그대로 두면
+       '원문'·'확인' 같은 흔한 두 글자만으로 **서로 무관한 수십 건이 한꺼번에 +2** 를 받아,
+       "원문 확인은 어디서 해?" 같은 질문에 엉뚱한 공고를 "찾았어요"로 내민다.
+       못 찾으면 지어내지 않고 못 찾았다고 말하는 것이 이 파일의 존재 이유다(운영 원칙 6·8-1). */
+    const rawProv = String(s.provider || '');
+    const provider = /원문 확인|미확인/.test(rawProv) ? '' : rawProv.toLowerCase();
     /* `amountNote` — 금액을 숫자로 못 읽은 층2 공고에서 재단이 적어 둔 원문(app.js).
        카드에는 안 뜨지만 상세에는 뜨므로, 도우미도 같은 재료를 봐야 화면과 말이 갈라지지 않는다. */
     const body = [s.summary, s.amount, s.amountNote, s.note, ...(s.excerpts || []), ...(s.eligibilityLines || [])]

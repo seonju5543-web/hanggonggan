@@ -1112,6 +1112,155 @@ console.log('\n■ 수집망 좁히기 (2026-08-30)');
   eq('로봇은 parked 를 읽지 않는다', /\.parked/.test(cm) || /\.parked/.test(bc), false);
 }
 
+console.log('\n■ 교내·교외 분류와 주관 기관 (2026-09-18 개발자 지시)');
+{
+  /* 🔴 개발자 지적으로 드러난 것: 학생 카드가 `교내 · 경희대학교 게시 공고 /
+     푸른등대 한국수력원자력 k-원전 장학금` 이었다 — **한국장학재단 장학금을 경희대가 주는 것처럼**
+     보여 주고 있었다. 원인 둘:
+       ① `type` 이 제목 낱말(재단·장학회·시민…)로 교외를 찾고 **나머지를 전부 교내**로 떨어뜨렸다.
+          실측: '교내' 19건 중 진짜 교내는 2건, 국가장학금 7건 + 외부 재단·지자체 10건.
+       ② `provider` 에 **게시한 학교**가 들어갔다(33건). 그 칸은 '누가 주는가'다.
+     🔴 규칙을 여기에 베끼지 않는다 — 로봇 소스에서 읽어 그대로 돌린다(베끼면 갈라진다). */
+  const src = readText(new URL('../collector/auto-register.mjs', import.meta.url));
+  /* 🔴 판정 규칙은 **`match-engine.js` 한 곳**이다 (2026-09-18에 옮겼다 — 앱 화면도 같은 말을
+     해야 해서다). 로봇도 앱도 이 함수를 불러 쓴다. 여기서 규칙을 베끼지 않고 그 파일에서 읽는다. */
+  const eng = readText(new URL('../match-engine.js', import.meta.url));
+  const mMark = eng.match(/const NOTICE_CAMPUS_MARK = (\/.*\/);/);
+  const mProv = src.match(/const PROVIDER_UNKNOWN = '([^']+)';/);
+  eq('교내 표식 규칙(NOTICE_CAMPUS_MARK)이 공용 엔진에 있다', !!mMark, true);
+  eq('  로봇이 그 함수를 가져다 쓴다 (규칙을 베끼지 않는다)',
+    /\{ noticeKind \} = createRequire/.test(src) && /type: noticeKind\(title\)/.test(src), true);
+  eq('로봇에 "모름" 주관 기관(PROVIDER_UNKNOWN)이 있다', !!mProv, true);
+  if (mMark && mProv) {
+    const MARK = eval(mMark[1]);
+    const typeOf = (t) => (MARK.test(t) ? '교내' : '교외');
+    /* 전부 **실제로 등록돼 있던 제목**이다 */
+    eq('[교내] 표식이 붙은 것만 교내다',
+      ['[교내][서울]2026-2 국제학부 김봉철 장학금 장학생 모집(~9/4)',
+       '[공통][교내] 2026-2학기 가족장학금 신청 안내 (9/10 ~ 9/28)'].map(typeOf), ['교내', '교내']);
+    eq('  한국장학재단 국가장학금은 교내가 아니다',
+      ['[공통][국가]2026년 2학기 푸른등대 기부장학금 장학생 선발(~9/10)',
+       '[공통][국가근로] 2026-2학기 국가근로장학생 희망근로지 신청 안내',
+       '[공통][국가]2026-2 중소기업취업연계장학금 신규장학생 신청안내(~9/18)',
+       '[공통][국가]2026년 2학기 고졸 후학습자 장학금 신청안내',
+       '공통 푸른등대 한국수력원자력 k-원전 장학금 신청안내 (9.11~9.28)'].map(typeOf),
+      ['교외', '교외', '교외', '교외', '교외']);
+    eq('  제목에 재단 낱말이 없는 외부 공고도 교내가 아니다',
+      ['공통 2026년 상반기 사랑나눔장학생 모집 공고',
+       '공통 제36기 미레에셋 해외교환 장학생 선발',
+       '[화성시] 2026년 코나아이 소상공인 장학생 모집'].map(typeOf), ['교외', '교외', '교외']);
+    /* 🔴 **`교내` 뒤에 `외` 가 오면 교내가 아니다** — `교내외`·`교내·외`·`교내•외` 는 둘 다를
+       뜻한다. 이 셋이 규칙을 넓힐 때의 경계값이다(전부 실제 게시판 제목). */
+    eq('  "교내외" 류는 교내가 아니다',
+      ['2026-2학기 교내외 장학금 통합 안내',
+       '(서울)2026학년도 2학기 서울캠퍼스 학기중 일반 교내·외 국가근로장학생 선발 안내',
+       '(다빈치) 2026학년도 다빈치캠퍼스 2학기 학기 중 교내•외근로 국가근로장학생 선발 안내'].map(typeOf),
+      ['교외', '교외', '교외']);
+    /* 🔴 반대쪽 함정 — 대괄호 표식만 보면 게시판이 대괄호 없이 쓰는 **진짜 교내 공고**를 놓친다.
+       실측(notices.json 120판): 제목에 `교내` 가 든 31건 중 12건만 잡히고 19건이 교외로 떨어졌다. */
+    eq('  대괄호가 없어도 제목이 "교내" 라고 하면 교내다',
+      ['[교내근로-인문캠퍼스] 2026학년도 2학기 국가근로장학생(교내근로) 선발결과 안내',
+       '2026학년도 2학기 대학원 교내 특별 장학금(외국인, 공로, 개신가족) 추가 신청 안내',
+       '[입학처] 2026학년도 2학기 교내 및 국가 근로장학생 모집 안내'].map(typeOf),
+      ['교내', '교내', '교내']);
+    eq('로봇이 주관 기관에 게시 학교를 넣지 않는다',
+      /provider: `\$\{n\.school\}/.test(src), false);
+    eq('  대신 "모른다"고 적는다', /provider: PROVIDER_UNKNOWN/.test(src), true);
+  }
+  /* 소급 적용 (운영 원칙 7) — 이미 등록된 것에도 같은 기준이 서 있어야 한다 */
+  const reg = JSON.parse(readText(new URL('../data/registered.json', import.meta.url)));
+  const board = reg.items.filter((i) => /게시 공고$/.test(String(i.provider || '')));
+  eq('등록분에 "○○ 게시 공고" 주관 기관이 남아 있지 않다', board.length, 0);
+  /* 🔴 **'교내'는 "우리 학교가 준다"는 뜻이다** — 주관 기관이 바깥 기관이면 둘 중 하나가 틀렸다.
+     실제로 `한미 첨단분야 청년교류 지원사업`(주관 한국산업기술진흥원 KIAT)이 '교내'로 등록돼
+     **학교를 가리지 않고 모두에게** 교내 장학금처럼 떠 있었다(2026-09-18 발견).
+     낱말 목록이 아니라 **두 칸이 서로 모순되는가**로 본다 — 새 유형이 와도 걸린다. */
+  const SCHOOLISH = /대학교|대학|[가-힣]대\s|[가-힣]대$/;
+  const contradict = reg.items.filter((i) => i.type === '교내'
+    && !/원문 확인/.test(String(i.provider || ''))
+    && !SCHOOLISH.test(String(i.provider || '')));
+  eq('교내로 분류한 공고의 주관 기관은 학교이거나 "모름"이다',
+    contradict.map((i) => `${i.id}:${i.provider}`), []);
+  /* 🔴 **"모른다"고 적은 값이 학생 화면·학생 글로 새지 않는다** (2026-09-18 코드 리뷰가 셋을 더 잡았다).
+     `주관 기관 원문 확인` 은 앱 내부 사정이다 — 학생에게 그대로 보이면 2026-09-17 지시
+     (앱 내부 사정은 학생 화면에 안 적는다)를 정면으로 어긴다. 새던 자리 셋을 각각 못 박는다. */
+  const app = readText(new URL('../app.js', import.meta.url));
+  eq('초안이 "모름" 주관 기관을 문장에 넣지 않는다', /provLead\(sch\)/.test(app), true);
+  eq('  그 함수가 "원문 확인" 을 걸러 낸다', /원문 확인\|미확인/.test(app), true);
+  const dataJs = readText(new URL('../data.js', import.meta.url));
+  eq('제출처 안내도 "모름" 주관 기관을 이름으로 쓰지 않는다', /knownProvider/.test(dataJs), true);
+  /* 🔴 33건이 **같은 글자**를 갖게 되므로, 그 글자로 점수를 주면 '원문'·'확인' 두 글자에
+     무관한 공고가 한꺼번에 걸린다(chat.js CHAT_STOP 주석이 경고한 유형). */
+  const chatJs = readText(new URL('../chat.js', import.meta.url));
+  eq('도우미가 "모름" 주관 기관으로 공고를 고르지 않는다', /원문 확인\|미확인\/\.test\(rawProv\)/.test(chatJs), true);
+  /* 🔴 **관리자 등록 갈래의 기본값이 로봇과 같아야 한다** — 다르면 관리자가 공고 하나만 등록해도
+     위 '게시 공고가 남아 있지 않다' 관문이 빨간불이 되고, 수집 워크플로의 데이터 관문이 실패해
+     **그 실행의 자동 등록분이 통째로 되돌려진다**(revert-auto.mjs). */
+  const adminApply = readText(new URL('../tools/admin-apply.mjs', import.meta.url));
+  eq('관리자 등록도 기본이 교외다', /patch\.type === '교내' \? '교내' : '교외'/.test(adminApply), true);
+  /* ⚠️ **주석까지 세지 말 것** — 걷어낸 옛 배선을 인용한 주석에 걸려 빨간불이 된다
+     (CLAUDE.md 2026-09-12 · 실제로 이 줄을 쓰면서 그렇게 걸렸다). 주석을 지우고 본다. */
+  const adminCode = adminApply.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  eq('  관리자 등록도 게시 학교를 주관 기관으로 넣지 않는다', /게시 공고/.test(adminCode), false);
+  /* 🔴 인스타 로봇은 `provider` 글자로 학교를 찾고 있었다 — 그 칸이 `○○대학교 게시 공고` 라서
+     우연히 맞던 것이다. 정직하게 고치자 학교를 찾는 공고가 39 → 10건으로 떨어졌다(실측). */
+  const instaSchool = readText(new URL('../insta/school.mjs', import.meta.url));
+  eq('인스타가 학교를 schoolOnly 로 찾는다', /eligibility \|\| \{\}\)\.schoolOnly/.test(instaSchool), true);
+
+  /* 🔴 **실시간 공고 카드도 같은 말을 해야 한다** (2026-09-18 개발자 지적 "교내공고에서 교내로").
+     그 카드 맨 윗줄은 목록 카드와 **같은 자리**(`.sch-org`)인데 `교내 공고` 로 못 박혀 있었다 —
+     제목이 `[공통][교외]` 인 공고가 '교내 공고' 로 떴다(실측 한국외대 27건 중 26건이 교외).
+     ⚠️ 주석까지 세지 말 것 — 아래 경위 주석이 옛 문구를 인용한다. */
+  /* ⚠️ 앱 전체에서 `교내 공고` 를 세면 안 된다 — MY 화면의 판 번호 줄이 `교내 공고 2개교`
+     로 쓴다(전혀 다른 뜻). **그 카드를 그리는 함수 안에서만** 본다. */
+  /* 🔴 **비탐욕 정규식으로 함수를 자르지 말 것** (2026-09-18 코드 리뷰). 안쪽에 0열 `}` 가
+     하나 생기는 순간 토막만 잘려 나오고, 아래 '못 박혀 있지 않다' 가 **빈 껍데기를 상대로
+     조용히 통과**한다. 여는 괄호부터 세어 짝이 맞는 자리에서 끊는다. */
+  const cutFn = (src, name) => {
+    const at = src.indexOf(`function ${name}(`);
+    if (at < 0) return '';
+    let i = src.indexOf('{', at), depth = 0;
+    for (let j = i; j < src.length; j++) {
+      if (src[j] === '{') depth++;
+      else if (src[j] === '}' && --depth === 0) return src.slice(at, j + 1);
+    }
+    return '';
+  };
+  const liveFn = cutFn(app, 'liveNoticesHtml')
+    .replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  /* 이 함수의 심장(카드 마크업)이 실제로 잘려 왔는지 본다 — 길이만 보면 토막도 통과한다 */
+  eq('실시간 공고를 그리는 함수를 통째로 찾았다 (못 찾으면 아래가 헛돈다)',
+    /sch-org/.test(liveFn) && /sch-name/.test(liveFn), true);
+  /* 🔴 **게시판 글 카드는 교내/교외를 말하지 않는다** (2026-09-18 오후 개발자 지시:
+     "교내 교외가 어디에 게시되느냐가 아니라 어떤 재단이 주최하는가가 기준이 되어야 돼").
+     제목·링크뿐이라 주최를 모른다 — 아는 것(어느 게시판에서 왔나)만 적는다.
+     ⚠️ 같은 날 아침에 `교내 공고` → `noticeKind` 로 고쳤다가, 그것도 주최가 아니라
+        제목 표식일 뿐이라는 것이 실측으로 드러나 **아예 안 적는 쪽**으로 다시 바꿨다. */
+  eq('게시판 글 카드가 "교내 공고" 로 못 박혀 있지 않다', /교내 공고/.test(liveFn), false);
+  eq('  교내/교외를 아예 말하지 않는다 (주최를 모르므로)',
+    /교내|교외|noticeKind/.test(liveFn), false);
+  eq('  어느 게시판에서 왔는지는 적는다', /게시판</.test(liveFn), true);
+  /* 브라우저에서는 전역으로 잡힌다 — 내보내기 목록에서 빠지면 Node 검사만 통과하고 앱이 죽는다 */
+  eq('  noticeKind 가 Node 쪽으로도 내보내진다', /noticeKind, NOTICE_CAMPUS_MARK/.test(eng), true);
+
+  /* 🔴 **'교내' 칸에는 우리가 확인한 등록 공고만 온다** (2026-09-18 개발자 지시).
+     게시판 글을 그 칸에 되돌리면 개발자가 짚은 혼동(교내 칸에 외부 장학금)이 그대로 돌아온다.
+     옮긴 자리는 홈이다 — 사라지면 학생이 학교 게시판 새 공고를 볼 곳이 없어진다. */
+  const cutFnApp = (name) => cutFn(app, name).replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  const exploreFn = cutFnApp('renderExplore');
+  const homeFn = cutFnApp('renderHome');
+  eq('탐색·홈 두 함수를 통째로 찾았다 (못 찾으면 아래가 헛돈다)',
+    /explore-list/.test(exploreFn) && /home-deadline-list/.test(homeFn), true);
+  eq('"교내" 칸이 게시판 글을 그리지 않는다', /liveNoticesHtml/.test(exploreFn), false);
+  eq('  대신 홈이 그린다', /#live-notices.*liveNoticesHtml\(\)/.test(homeFn), true);
+  /* 홈에 그릴 자리가 실제로 있어야 한다 — 표식이 index.html 에서 빠지면 조용히 아무것도 안 뜬다 */
+  const html = readText(new URL('../index.html', import.meta.url));
+  const homeBlock = html.slice(html.indexOf('id="screen-home"'), html.indexOf('id="screen-explore"'));
+  eq('  그 자리(#live-notices)가 홈 안에 있다', /id="live-notices"/.test(homeBlock), true);
+  eq('  탐색 화면에는 없다',
+    /id="live-notices"/.test(html.slice(html.indexOf('id="screen-explore"'))), false);
+}
+
 console.log('\n■ 정식 등록 대상 학교 좁히기 (2026-08-30)');
 {
   const cfg = JSON.parse(readText(new URL('../collector/auto-register-config.json', import.meta.url)));
@@ -4295,10 +4444,79 @@ console.log('\n■ 이중수혜 — 가족 안의 이야기를 「다른 장학�
      /amountFrom !== OWN_AMOUNT/.test(ea), true);
   eq('  표식이 없어야 사람이라던 옛 판정이 남아 있지 않다',
      /humanAmount = !it\.amountFrom &&/.test(ea), false);
+  /* 🔴 `· 비움` 은 사람이 **틀린 금액을 지운** 조치다 (2026-09-17 · F-9 컨펌 2) — 값이 비었다고
+     로봇에게 돌려주면 다음 실행이 같은 줄을 다시 읽어 같은 틀린 금액을 되채운다. */
+  eq('  사람이 비운 금액도 되채우지 않는다 (틀린 금액을 지운 조치가 무효가 되지 않게)',
+     /const amountCleared = \/\^관리자 \.\*· 비움\$\//.test(ea) && /humanAmount = amountCleared/.test(ea), true);
   eq('  sameAs 도 제가 붙인 것만 지운다', /it\.sameAsFrom === OWN_SAME/.test(ea), true);
   /* 🔴 다른 로봇은 전부 날짜만 적는다 — 여기만 시각까지 적으면 매 실행 파일이 더러워진다 */
   eq('  updatedAt 은 날짜만 적는다 (매 실행 더러워지지 않게)',
      /toISOString\(\)\.slice\(0, 10\)/.test(ea), true);
+}
+
+console.log('\n■ 금액을 로봇이 못 읽은 공고 — 사람이 적는다 (2026-09-17 · 노션 F-9 컨펌 2)');
+{
+  /* 🔴 왜 있나 — 개발자가 '관리자 화면에서 손으로 채운다' 로 정했다(다른 안이던 본문 재수집
+     로봇은 고르지 않았다). 그런데 **숫자만 넣으면 감사가 묶음 전체를 되돌린다**:
+     entry-rules 는 `amountValue > 0` 인데 카드 문구에 숫자가 없으면 오류로 잡는다
+     (카드는 '금액 원문 확인', 합계는 500만원이라고 서로 다른 말을 하기 때문이다).
+     그래서 문구를 만드는 규칙이 **한 곳**이어야 하고, 화면의 전후 대조도 같은 것을 써야 한다. */
+  const ed = readText(new URL('../tools/edit-diff.mjs', import.meta.url));
+  const aa = readText(new URL('../tools/admin-apply.mjs', import.meta.url));
+  const ea = readText(new URL('../collector/extract-amounts.mjs', import.meta.url));
+  const adminJs = readText(new URL('../_admin/admin.js', import.meta.url));
+  const { wonText, amountText, amountAfterValue, diffPatch: dp } = await import('../tools/edit-diff.mjs');
+
+  eq('금액 문구를 만드는 규칙이 한 곳이다 (로봇이 가져다 쓴다)',
+     /import \{ amountText \} from '\.\.\/tools\/edit-diff\.mjs'/.test(ea), true);
+  /* 🔴 베끼면 로봇이 적는 문구와 사람이 적을 때 붙는 문구가 갈라진다 */
+  /* ⚠️ **꼴을 하나만 찾으면 사본을 놓친다** (2026-09-18 코드 리뷰) — 예전엔 로봇에서는
+     `const wonText =`, 화면에서는 `function wonText` 만 찾아서, 서로 반대 꼴로 베끼면
+     그냥 통과했다. 두 파일에 같은 잣대를 댄다. */
+  const copiesWonText = (t) => /(?:const|let|var|function)\s+wonText\b/.test(t);
+  eq('  로봇·화면이 제 사본을 다시 만들지 않는다',
+     copiesWonText(ea) || copiesWonText(adminJs), false);
+  eq('  화면도 같은 파일에서 가져온다',
+     /import \{[^}]*wonText[^}]*\} from '\.\/vendor\/edit-diff\.mjs'/.test(adminJs), true);
+
+  eq('만원으로 딱 떨어지면 만원, 아니면 원',
+     [wonText(5000000), wonText(1234000), amountText({ kind: 'range', min: 1000000, max: 3000000 })],
+     ['500만원', '1,234,000원', '100만원 ~ 300만원']);
+  /* 🔴 이미 숫자가 든 문구는 건드리지 않는다 — 사람이 다듬은 뜻을 맨 숫자로 덮으면 사라진다 */
+  eq('이미 숫자가 든 문구는 덮지 않는다',
+     amountAfterValue('등록금 + 영농정착 지원 300만원', 5000000), '등록금 + 영농정착 지원 300만원');
+  eq('  숫자가 없는 문구에만 넣는다', amountAfterValue('금액 원문 확인', 5000000), '500만원');
+  eq('  비우는 조치는 문구를 건드리지 않는다 (무엇으로 되돌릴지 모른다)',
+     amountAfterValue('금액 원문 확인', 0), '금액 원문 확인');
+
+  /* 화면이 예고한 칸과 저장소가 고치는 칸이 같아야 한다 */
+  const rows = dp({ id: 'x', amount: '금액 원문 확인', amountValue: 0 }, { amountValue: 3000000 });
+  eq('화면의 전후 대조가 카드 문구까지 예고한다',
+     rows.map((r) => `${r.key}=${r.after}`), ['amountValue=3000000', 'amount=300만원']);
+  eq('  저장소가 같은 함수를 쓴다', /amountAfterValue\(it\.amount, it\.amountValue\)/.test(aa), true);
+  /* 🔴 표식이 없으면 로봇이 다음 날 아침에 덮는다 — 비울 때도 남긴다(마감일과 같은 이유) */
+  eq('  관리자가 금액을 고치면 표식을 남긴다',
+     /changed\.includes\('amountValue'\)/.test(aa)
+     && /it\.amountFrom = Number\(it\.amountValue\) > 0 \? OWNER : `\$\{OWNER\} · 비움`/.test(aa), true);
+  /* 🔴 **비울 때는 로봇이 읽어 둔 구조도 함께 지워야 한다** — 합계는 amountSpec 을 먼저 보고
+     amountValue 는 그것이 없을 때만 본다. 안 지우면 사람이 '틀렸다' 고 지운 금액이 학생
+     화면에 그대로 떠 있는다(받을 수 없는 숫자를 보여 주는 일). 아래 한 줄이 그 근거다. */
+  const PAa = createRequire(import.meta.url)('../parse-amount.js');
+  eq('  (근거) 합계는 amountSpec 을 먼저 본다 — 그래서 숫자만 비우면 티가 안 난다',
+     PAa.amountWon({ amountSpec: { kind: 'fixed', value: 2500000 }, amountValue: 0 }, 0), 2500000);
+  /* 🔴 **여기서 글자로 재지 않는다** — 이 규칙이 진짜 도는지는 아래 「관리자 쓰기」 절이
+     `admin-apply.mjs` 를 자식 프로세스로 돌려 본다(ⓓ~ⓕ). 코드 리뷰가 실증했듯, 정규식으로
+     재면 조건을 죽이고 그 문장을 주석에 남기는 것만으로 초록불이 된다. */
+
+  /* 🔴 화면은 금액을 짐작하지 않는다(원칙 8-1) · 숫자 한 칸으로 못 적는 것은 비워 둔다 */
+  eq('화면이 금액을 짐작하지 않는다고 말한다', /화면은 금액을 짐작하지 않습니다/.test(adminJs), true);
+  eq('  자릿수 실수를 막는 천장이 있다 (만원 칸에 원을 치면 300억이 된다)',
+     /n > MAN_MAX/.test(adminJs) && /const MAN_MAX = 10000/.test(adminJs), true);
+  /* 🔴 학생 화면에 없는 공고를 할 일로 올리면 잡음이 된다 — 잡음이 된 관문·목록은 꺼진다 */
+  eq('  마감이 지난 공고는 적는 목록에 올리지 않는다',
+     /dday\(it\.deadline\) == null \|\| dday\(it\.deadline\) >= 0/.test(adminJs), true);
+  eq('  품질 카드도 같은 셈을 쓴다 (카드 숫자와 줄 수가 갈라지지 않게)',
+     /const noAmount = noAmountItems\(\)\.length/.test(adminJs), true);
 }
 
 console.log('\n■ 만들어 놓고 안 돌리는 로봇이 없는가 (2026-09-13 · 노션 F-9)');
@@ -6498,7 +6716,7 @@ console.log('\n■ 관리자 쓰기 — 되돌릴 수 없는 일 앞의 안전�
 {
   const script = fileURLToPath(new URL('../tools/admin-apply.mjs', import.meta.url));
   /* 공고 N건짜리 사본 저장소를 만들고 한 가지 일을 시킨다 */
-  const run = (action, payload, n = 20) => {
+  const run = (action, payload, n = 20, tweak = null) => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'admwrite-'));
     fs.mkdirSync(path.join(dir, 'data'), { recursive: true });
     fs.mkdirSync(path.join(dir, 'collector'), { recursive: true });
@@ -6509,6 +6727,7 @@ console.log('\n■ 관리자 쓰기 — 되돌릴 수 없는 일 앞의 안전�
       eligibility: { selective: true }, documents: ['재학증명서'],
       deadline: '2026-12-01', noForm: '양식 없음', auto: true, listedAt: '2026-09-01',
     }));
+    if (tweak) items.forEach(tweak);
     fs.writeFileSync(path.join(dir, 'data/registered.json'), `${JSON.stringify({ items }, null, 1)}\n`);
     fs.writeFileSync(path.join(dir, 'data/forms.json'), JSON.stringify({ forms: {}, templates: {} }));
     fs.writeFileSync(path.join(dir, 'collector/auto-register-config.json'),
@@ -6524,6 +6743,60 @@ console.log('\n■ 관리자 쓰기 — 되돌릴 수 없는 일 앞의 안전�
     return { status: r.status, out, after, cfg, left: after.length };
   };
   const ids = (a, b) => Array.from({ length: b - a }, (_, i) => `reg-t${a + i}`);
+  /* ⑨ 금액을 손으로 채우는 길 — **글자를 훑지 않고 저장소를 실제로 돌려 본다** (2026-09-18).
+     🔴 앞서 이 기능의 관문 둘은 `admin-apply.mjs` 의 **소스 글자**를 정규식으로 보고 있었다.
+        코드 리뷰가 그 무력함을 실증했다: 실제 조건을 `if (false && …)` 로 죽이고 정규식이
+        찾는 문장을 주석에 남겨 두자 관문이 그대로 초록불이었다. 이 절이 그 자리를 메운다.
+     🔴 그리고 여기서만 잡히는 진짜 사고가 있었다 — **검수 시트는 `[data-ed]` 칸을 전부
+        보내므로 `amount`·`period` 가 늘 patch 에 실린다.** 파생을 '키가 왔나' 로 가르면
+        시트 경로에서 한 번도 안 돌고, 금액 쪽은 감사가 오류를 내 `admin-apply.yml` 이
+        **그 묶음의 다른 수정까지 통째로 되돌린다.** */
+  {
+    const sheet = (id, patch) => ({ edits: [{ id, patch }] });
+    /* ⓐ 시트처럼 '안 바뀐 문구' 를 함께 보내도 카드 문구가 따라간다 */
+    const withLabel = run('edit', sheet('reg-t0', { amount: '금액 원문 확인', amountValue: 3000000 }), 3);
+    const w0 = withLabel.after.find((x) => x.id === 'reg-t0');
+    eq('시트가 안 바뀐 금액 문구를 같이 보내도 문구가 숫자를 따라간다 (감사가 묶음을 되돌리던 자리)',
+      [withLabel.status, w0.amount, w0.amountValue], [0, '300만원', 3000000]);
+    eq('  사람 표식이 붙는다 (로봇이 다음 날 안 덮게)', /^관리자 /.test(w0.amountFrom || ''), true);
+    /* ⓑ 마감 → 기간 문구도 같은 꼴 (감사가 안 잡아 조용히 나가던 자리) */
+    /* ⚠️ 픽스처에 기간 문구를 **미리** 넣는다 — 안 넣으면 시트가 보낸 값이 '안 바뀐 값'이
+       아니라 새 값이 되어, 파생을 건너뛰는 것이 맞는 동작이 된다(이 검사를 만들며 겪었다). */
+    const dl = run('edit', sheet('reg-t0', { deadline: '2026-12-31', period: '접수 기간 원문 확인' }), 3,
+      (it) => { it.period = '접수 기간 원문 확인'; });
+    eq('시트가 안 바뀐 기간 문구를 같이 보내도 문구가 마감을 따라간다',
+      dl.after.find((x) => x.id === 'reg-t0').period, '접수 기간 ~2026-12-31');
+    /* ⓒ 사람이 문구를 **진짜로** 고치면 그쪽이 이긴다 (덮어쓰지 않는다) */
+    const own = run('edit', sheet('reg-t0', { amount: '등록금 전액 + 생활비', amountValue: 3000000 }), 3);
+    eq('  사람이 문구를 직접 고치면 그대로 둔다', own.after.find((x) => x.id === 'reg-t0').amount, '등록금 전액 + 생활비');
+    /* ⓓ 로봇이 읽어 둔 구조가 사람 값과 어긋나면 물러난다 — 합계는 amountSpec 을 먼저 본다 */
+    const ratio = run('edit', sheet('reg-t1', { amountValue: 3000000 }), 3,
+      (it) => { if (it.id === 'reg-t1') { it.amountSpec = { kind: 'ratio', ratio: 1, value: 0, raw: '등록금 전액' }; it.amountFrom = '공고 원문'; } });
+    const r1 = ratio.after.find((x) => x.id === 'reg-t1');
+    eq('🔴 사람이 적은 금액과 어긋나는 로봇 구조는 물러난다 (카드와 합계가 다른 말을 하지 않게)',
+      [r1.amount, r1.amountValue, r1.amountSpec], ['300만원', 3000000, undefined]);
+    /* ⓔ 값이 같으면 구조를 남긴다 — 그 안에 원문 근거(raw)가 있고 감사가 그걸 센다 */
+    const same = run('edit', sheet('reg-t1', { amountValue: 2500000 }), 3,
+      (it) => { if (it.id === 'reg-t1') { it.amountSpec = { kind: 'fixed', value: 2500000, raw: '금 액 : 250 만 원' }; it.amountFrom = '공고 원문'; it.amount = '250만원'; it.amountValue = 2500000; } });
+    eq('  값이 같은 구조는 남긴다 (원문 근거를 버리지 않는다)',
+      !!same.after.find((x) => x.id === 'reg-t1').amountSpec, true);
+    /* ⓕ 비우기 — 표식이 남고 구조도 함께 지워진다(안 지우면 지운 티가 안 난다) */
+    const clear = run('edit', sheet('reg-t2', { amountValue: 0 }), 3,
+      (it) => { if (it.id === 'reg-t2') { it.amountValue = 2500000; it.amount = '250만원'; it.amountSpec = { kind: 'fixed', value: 2500000, raw: '250만원' }; it.amountFrom = '공고 원문'; } });
+    const c2 = clear.after.find((x) => x.id === 'reg-t2');
+    eq('금액을 비우면 · 비움 표식이 남고 로봇 구조도 함께 지워진다',
+      [/· 비움$/.test(c2.amountFrom || ''), c2.amountSpec, c2.amount], [true, undefined, '250만원']);
+    /* ⓖ 음수는 그 자리에서 막는다 — 합계를 깎는다 */
+    const neg = run('edit', sheet('reg-t0', { amountValue: -5000 }), 3);
+    eq('음수 금액은 저장소가 멈춘다 (합계를 깎는다)', [neg.status !== 0, neg.after.find((x) => x.id === 'reg-t0').amountValue], [true, 0]);
+    /* ⓗ 정식 등록 갈래도 같은 함수를 쓴다 — 여기만 옛 모양으로 남아 있었다 */
+    const reg1 = run('register', { notice: { url: 'https://example.ac.kr/view.do?seq=777', title: '새로 등록하는 검사용 장학금' },
+      patch: { name: '새로 등록하는 검사용 장학금', amountValue: 3000000, type: '교외', provider: '검사용' } }, 3);
+    const added = reg1.after.find((x) => x.name === '새로 등록하는 검사용 장학금');
+    eq('정식 등록 갈래도 문구가 숫자를 따라간다 (감사가 그 등록을 되돌리던 자리)',
+      [reg1.status, added && added.amount, added && added.amountValue], [0, '300만원', 3000000]);
+  }
+
 
   /* ① 많이 지우기 — 건수를 숫자로 한 번 더 받지 않으면 **한 건도** 안 지운다 */
   const big = run('remove', { ids: ids(0, 6) });

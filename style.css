@@ -97,6 +97,11 @@
   --t-2xl: 21px;
   --t-3xl: 27px;
   --t-hero: 38px;   /* 금액 하나뿐 */
+  /* 🔴 입력칸 글자는 **척도가 아니라 기능값**이다 — iOS 는 16px 미만인 칸을 누르면 화면을
+     통째로 확대한다(학생이 손가락으로 다시 줄여야 한다). 그래서 '한 단계 아래(--t-md 14.5px)'
+     로 내리지 않고 **그 바닥인 16px** 에 둔다. 아홉 단계 척도(--t-2xs~hero)에 넣지 않는
+     이유가 이것이다 — 여기 끼우면 17px 과 1.06배라 '단계마다 1.07배' 관문이 빨간불이 된다. */
+  --t-input: 16px;
 
   /* 자간 — 전에는 화면 곳곳에 9가지가 흩어져 있었다. 큰 글자는 좁히고 작은 글자·숫자는 안 좁힌다. */
   --track-display: -0.03em;   /* 24px 이상 */
@@ -229,6 +234,27 @@ input::placeholder { color: var(--text-weak); }
 .icon-btn { padding: 8px; color: var(--text-weak); border-radius: var(--radius-sm); transition: background 0.15s, color 0.15s; }
 .icon-btn:hover { background: rgba(18, 22, 31, 0.05); color: var(--text-sub); }
 .icon-btn svg { width: 22px; height: 22px; display: block; }
+/* 🔴 손가락이 닿는 넓이만 44 로 넓힌다 — **보이는 모양은 38 그대로** (2026-09-18 개발자 결정 「충돌」 9 (b)).
+   Apple 최소 표적은 44 인데 padding 8 + svg 22 = 38 이라 6px 모자랐다(실측 38×38).
+   🔴 padding 을 키워 넓히지 말 것 — 이 버튼들은 화면 가장자리에 **음수 여백으로 딱 맞춰**
+      둔 것이라(.page-header-row .icon-btn · .sub-back) padding 이 3~4px 만 늘어도 아이콘이
+      제목·가장자리와 어긋나고, 보이는 hover 면도 같이 커진다. 넓히는 것은 '누를 수 있는 넓이'
+      하나이지 '그려지는 넓이'가 아니다.
+   ⚠️ 이 덧판은 **배경이 없어 눈에 안 보인다** — 크기를 재는 검사로는 지워져도 초록불이다.
+      그래서 관문은 `verify/verify-settings.js` 「아이콘 버튼의 손가락 표적」 절이고,
+      거기서 **네 귀퉁이를 실제로 짚어**(elementFromPoint) 버튼에 닿는지 센다.
+      🔴 ui-tone.mjs 에는 이 검사가 없다 — 거기서 찾지 말 것.
+   이미 같은 이유로 min-height:44 를 직접 준 형제가 있다 — `.sort-btn`(2026-08-26).
+   🔴 뒤로 버튼(`.sub-back`)도 같은 처지였다 — padding 8 + svg 24 = **40×40**(실측 · 8곳).
+      안쪽 화면에서 빠져나가는 문이 이것 하나뿐이라 같이 넓힌다. */
+.icon-btn, .sub-back { position: relative; }
+.icon-btn::after, .sub-back::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 44px; height: 44px;
+  transform: translate(-50%, -50%);
+}
 .link-btn { color: var(--text-weak); font-size: var(--t-sm); font-weight: 600; }
 
 /* ---------------- 온보딩 ---------------- */
@@ -637,6 +663,17 @@ input::placeholder { color: var(--text-weak); }
    ⚠️ 문턱을 360 보다 올리지 말 것 — 360 은 갤럭시 S·픽셀의 폭이라 거기서 접으면 지시("일렬로")를
       어기는 것이 된다. 관문이 320·360·390 셋을 다 잰다(verify-explore-sort '필터 칩 한 줄'). */
 @media (max-width: 359px) { .filter-row { flex-wrap: wrap; } }
+/* 🔴 **칩이 다섯이던 때 360px 에서 마지막 칩이 28px 잘려 있었다** (2026-09-17 실측).
+   필요한 폭이 408px 이었다: 전체 53 · 교내 53 · 교외 53 · 우리 학교 86 · 신청 가능만 100
+   + 칩 사이 24 + 왼쪽 여백 20 → 오른쪽 끝 388 > 360.
+   **같은 날 칩을 셋으로 줄여(우리 학교를 교내에 합치고 신청 가능만 폐지) 저절로 풀렸다** —
+   지금은 320px 에서도 오른쪽 끝이 162라 한참 남는다. 그래서 그때 넣었던 '좁은 화면에서만
+   칩을 조이는' 규칙은 **걷어냈다**(이유가 사라진 규칙은 남기지 않는다 — 남기면 다음 사람이
+   왜 좁은지 모른 채 그 값을 기준으로 삼는다).
+   ⚠️ 칩을 다시 넷 이상으로 늘리면 같은 일이 난다. 그때는 줄바꿈으로 되돌리지 말고
+      (개발자 지시 "일렬로") **좁은 화면에서만** 칩 안쪽 여백과 칩 사이를 조일 것 —
+      390px 이상과 선 굵기 2px 은 2026-09-11 개발자 승인 항목이라 건드리지 않는다. */
+
 .filter-row::-webkit-scrollbar { display: none; }
 .filter-chip {
   flex: 0 0 auto;        /* 줄이지 않는다 — 줄이면 글자가 칸 밖으로 새거나 두 줄로 접힌다 */
@@ -1549,7 +1586,7 @@ textarea:focus {
   border: 1px solid var(--line);
   border-radius: var(--radius-pill);
   background: var(--bg);
-  font-size: 16px;                  /* 🔴 16px 미만으로 낮추지 말 것 — iOS가 입력을 시작할 때 화면을 확대해 버린다 */
+  font-size: var(--t-input);        /* 🔴 iOS 자동 확대 바닥값 — 뜻과 값은 --t-input 한 곳에 적혀 있다 */
   font-family: inherit;
   color: var(--text);
 }
@@ -2267,7 +2304,9 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
 .search-box > svg { width: 18px; height: 18px; color: var(--text-weak); flex: none; }
 .search-box input {
   border: 0; background: none; padding: 12px 0; min-height: 44px;   /* 터치 44px */
-  font-size: var(--t-lg);              /* 🔴 16px 미만이면 iOS 가 칸을 누를 때 화면을 확대한다 */
+  /* 🔴 17px → 16px (2026-09-17 개발자 지시 "글씨체가 좀 큰 것 같아서 아주 살짝만 줄여줘").
+     **더는 못 줄인다** — 16px 미만이면 iOS 가 칸을 누를 때 화면을 확대한다. */
+  font-size: var(--t-input);
 }
 .search-box input:focus { border: 0; box-shadow: none; }
 /* 🔴 ✕ 가 **둘** 뜨던 것을 끈다 (2026-09-13 · 자주 묻는 질문을 만들다 눈으로 발견).
@@ -3201,6 +3240,15 @@ body::after { opacity: 0.26; }
       나중에 더한 border-bottom 이 이웃한 줄에서 맞닿아 1px+1px 이 된 것이다.
       가르는 선은 하나면 된다(아래쪽만 남긴다) — 알림의 .nf-pref 와 같은 방식. */
 #screen-my .my-menu { border-top: 0; }
+/* 🔴 「데이터 초기화」가 보관함에서 너무 떨어져 있었다 (2026-09-17 개발자 지시 "너무
+   동떨어져있어 … 사이 줄여줘"). 빈 띠의 정체는 셋이 이어진 것이다(실측 64px):
+   보관함 카드의 아래 안쪽 여백 24 + `.my-menu` 의 위 여백 34(--sp-4 '절과 절 사이')
+   + 그 안쪽 여백 6. 그중 **위 여백만** 가장 좁은 단계(--sp-1 8px · '같은 덩어리 안')로 줄인다 → 38px.
+   🔴 `.my-menu` 를 통째로 고치면 안 된다 — 설정 화면(#screen-settings)의 메뉴가 같은
+      클래스라 거기 리듬까지 같이 바뀐다. 그래서 MY 화면으로 한정한다.
+   ⚠️ 이 줄 위에는 구분선이 없다(바로 위 규칙이 뗐다) — 그래서 여백이 유일한 경계다.
+      0 으로 만들면 초기화 버튼이 보관함 목록의 마지막 줄처럼 붙어 보인다. */
+#screen-my .my-menu { margin-top: var(--sp-1); }
 #my-wallet .wallet-row { border-top: 0; }
 
 /* ══ 신청 내역 — 공고를 누르면 그 자리에서 펼쳐지는 진행 기록 (2026-09-01) ══

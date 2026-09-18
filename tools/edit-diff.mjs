@@ -148,6 +148,7 @@ export function validateValue(k, v, item = {}) {
       : '비울 수 없는 칸입니다 (비우면 학생 화면이 깨집니다)';
   }
   if (v === null || v === '' || v === undefined) return null;
+  if (k === 'amountValue' && Number(v) < 0) return `금액은 0 이상이어야 합니다 (비우려면 0): ${v}`;
   if (k === 'deadline' && !isDay(v)) return `마감일은 달력에 있는 날이어야 합니다 (YYYY-MM-DD): ${v}`;
   if (k === 'announceDate') {
     if (!isDay(v)) return `발표일은 달력에 있는 날이어야 합니다 (YYYY-MM-DD): ${v}`;
@@ -243,6 +244,33 @@ export function periodAfterDeadline(period, deadline, oldDeadline) {
   return p;
 }
 
+/** 금액 숫자 → 카드에 뜰 문구. 만원으로 딱 떨어지면 `500만원`, 아니면 `1,234,000원`.
+ *  🔴 원본은 여기 하나다 — 로봇(collector/extract-amounts.mjs)·저장소(admin-apply)·화면이
+ *     전부 이걸 부른다. 베끼면 로봇이 적는 문구와 사람이 적을 때 붙는 문구가 갈라진다. */
+export function wonText(n) {
+  const v = Number(n) || 0;
+  return v % 10000 === 0
+    ? `${(v / 10000).toLocaleString('ko-KR')}만원`
+    : `${v.toLocaleString('ko-KR')}원`;
+}
+export function amountText(a) {
+  return a && a.kind === 'range' ? `${wonText(a.min)} ~ ${wonText(a.max)}` : wonText(a && a.value);
+}
+
+/** 금액 숫자가 바뀌면 카드 문구(amount)가 따라 바뀐다 (2026-09-17 · F-9 컨펌 2 · 개발자 결정 '나').
+ *  🔴 **숫자만 넣으면 감사가 막는다** — `verify/entry-rules.cjs` 는 `amountValue > 0` 인데
+ *     문구에 숫자가 없으면 **오류**로 잡는다(카드는 '금액 원문 확인', 합계는 500만원이라고
+ *     서로 다른 말을 하기 때문이다). 그래서 문구를 같이 고치는 것이 이 함수다.
+ *  규칙은 로봇(extract-amounts)과 같다: **이미 숫자가 든 문구는 건드리지 않는다**
+ *  (`등록금 + 영농정착 지원` 처럼 사람이 다듬은 뜻을 맨 숫자로 덮지 않는다).
+ *  숫자를 비우는 조치는 문구를 건드리지 않는다 — 무엇으로 되돌릴지 우리가 모른다. */
+export function amountAfterValue(amount, won) {
+  const cur = String(amount || '');
+  if (!(Number(won) > 0)) return cur;
+  if (/\d/.test(cur)) return cur;
+  return wonText(won);
+}
+
 /**
  * 한 건의 patch 가 실제로 바꾸는 칸만 고른다.
  * @returns {{key:string,label:string,before:*,after:*,block:(string|null)}[]}
@@ -276,10 +304,22 @@ export function diffPatch(item, patch) {
     rows.push({ key: k, label: EDIT_LABEL[k] || k, before: old, after: v, block });
   });
   /* 마감일이 바뀌면 문구(period)도 따라 바뀐다 — 사람이 문구를 직접 적었으면 그쪽이 이긴다 */
+  /* 🔴 **'키가 patch 에 있나' 로 가르지 않는다** (2026-09-18 코드 리뷰). 검수 시트는
+     `[data-ed]` 칸을 **전부** 보내므로 period·amount 가 늘 patch 에 실려 있고, 그 조건으로는
+     이 파생이 시트 경로에서 한 번도 안 돈다 — 미리보기는 '안 바뀐다' 고 말하는데 저장소는
+     고치거나(금액) 안 고쳐서 감사가 묶음을 통째로 되돌린다. 기준은 **실제로 바뀌는 칸**이다.
+     저장소(admin-apply)는 같은 뜻을 `changed` 로 본다. */
   const dl = rows.find((r) => r.key === 'deadline' && !r.block);
-  if (dl && !('period' in (patch || {}))) {
+  if (dl && !rows.some((r) => r.key === 'period')) {
     const after = periodAfterDeadline(it.period, dl.after, it.deadline);
     if (after !== (it.period || '')) rows.push({ key: 'period', label: EDIT_LABEL.period, before: it.period, after, block: null });
+  }
+  /* 금액 숫자가 들어오면 카드 문구(amount)도 따라 바뀐다 — 사람이 문구를 직접 적었으면 그쪽이 이긴다.
+     🔴 이 줄이 없으면 미리보기가 '금액 숫자' 한 칸만 예고하는데 저장소는 문구까지 고친다. */
+  const av = rows.find((r) => r.key === 'amountValue' && !r.block);
+  if (av && !rows.some((r) => r.key === 'amount')) {
+    const after = amountAfterValue(it.amount, av.after);
+    if (after !== (it.amount || '')) rows.push({ key: 'amount', label: EDIT_LABEL.amount, before: it.amount, after, block: null });
   }
   return rows;
 }

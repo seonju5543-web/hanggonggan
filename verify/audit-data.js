@@ -174,7 +174,15 @@ try {
    ⚠️ 이 검사는 파서가 나빠지는 것도 같이 잡는다 — 규칙을 잘못 고쳐 읽던 금액을
       못 읽게 되면 여기 건수가 늘어난다(2026-08-27에 실제로 48→35건으로 떨어뜨렸다). */
 {
-  const noBasis = reg.items.filter((it) => (it.amountValue || 0) > 0 && !it.amountSpec);
+  /* 🔴 **사람이 적은 금액은 이 셈에서 가른다** (2026-09-18 코드 리뷰). 관리자 화면에서
+     금액을 손으로 채우면 `amountValue > 0` 이고 `amountSpec` 은 끝내 안 생기므로, 손으로
+     채울수록 이 숫자가 늘어 **'파서가 나빠졌나' 를 보던 신호가 못 쓰게 된다.**
+     사람이 적은 것은 따로 세어 한 줄로만 알린다(근거는 사람이 원문을 읽은 것이다). */
+  const byHand = reg.items.filter((it) => (it.amountValue || 0) > 0 && !it.amountSpec
+    && /^관리자 /.test(it.amountFrom || ''));
+  const noBasis = reg.items.filter((it) => (it.amountValue || 0) > 0 && !it.amountSpec
+    && !/^관리자 /.test(it.amountFrom || ''));
+  if (byHand.length) console.log(` · 사람이 적은 금액 ${byHand.length}건 (관리자 화면에서 원문을 읽고 넣은 값 — 로봇 근거가 없는 것이 당연하다)`);
   for (const it of noBasis) {
     const where = `registered:${it.id}`;
     if (!it.sourceUrl) {
