@@ -144,21 +144,55 @@ async function driveOneForm(page, id) {
      🔴 **아래 조병두 분기보다 위에 둔다** (2026-09-17 코드 리뷰). 예전에는 파일 맨 끝에
         있었는데, 조병두가 마감돼 목록에서 내려간 뒤로 그 분기가 `process.exit` 로 먼저
         끝나서 이 검사가 **한 번도 실행되지 않았다**(오늘 실측: 한 줄도 안 찍혔다).
-     🔴 **'교내' 칸으로 옮겨야 피드가 보인다.** 실시간 공고는 '우리 학교' 칸(2026-09-12)을
-        거쳐 이제 '교내' 칸에서만 그려진다 — 칸을 안 옮기면 `#live-notices` 가 늘 빈칸이라
-        이 줄이 **무엇을 재든 '제거됨 OK'** 라고 답한다(중복이 돌아와도 초록불). */
+     🔴 **피드는 이제 홈에 있다** (2026-09-18 개발자 지시로 '교내' 칸에서 옮겼다 · 코드 리뷰가
+        잡았다). 그때까지 이 블록은 '교내' 칸을 눌러 피드를 띄웠는데, 그 누름이 **아무 일도
+        안 하게** 되면서 `#live-notices` 를 앞 화면이 남긴 상태로 재고 있었다.
+     🔴 **비어 있으면 로그만 찍지 않고 실패시킨다** — 0건이면 이 줄은 무엇을 재든
+        '제거됨 OK' 라고 답한다(중복이 돌아와도 초록불). 조용한 통과가 이 검사의 사고 유형이다. */
   {
-    const backFilter = await page.evaluate(() => {
-      const on = document.querySelector('#explore-filters .filter-chip.active');
-      return on ? on.dataset.filter : 'all';
+    /* 🔴 **픽스처를 스스로 주입한다** (2026-09-18). 예전에는 '조병두' 라는 공고 이름을 박아
+       두고 피드에 그 이름이 없으면 '제거됨 OK' 라고 답했는데 —
+         ① 조병두는 이제 등록 목록에 아예 없고(마감돼 내려갔다),
+         ② 이 드라이버의 학교(성균관대)는 **수집 대상이 아니라** 피드가 늘 0건이다.
+       그래서 이 줄은 오랫동안 **무엇을 재든 통과**였다. 지금은 지금 등록된 공고 하나의
+       주소를 그대로 쓴 가짜 피드 항목과, 등록된 적 없는 항목을 **함께 심어** 앞의 것만
+       사라지는지 본다 — 학교·데이터가 바뀌어도 안 깨진다. */
+    await page.click('.nav-item[data-nav="home"]').catch(() => {});
+    await page.waitForSelector('#screen-home:not([hidden])', { timeout: 5000 }).catch(() => {});
+    const dedup = await page.evaluate(() => {
+      const p = state.profile;
+      const reg = (registeredList || []).find((s) => s.sourceUrl && /^https?:/.test(s.sourceUrl));
+      if (!reg) return { skip: '등록 공고에 원문 주소가 하나도 없다' };
+      /* 🔴 **수집 대상 학교로 잠깐 바꿔서 잰다** — 피드는 `noticeForProfile` 이 거르는데,
+         그 함수는 `SERVED_SCHOOLS` 밖 학교(이 드라이버의 성균관대)의 글을 **전부 버린다**.
+         안 바꾸면 심어 둔 둘이 같이 사라져 '너무 많이 지운다'로 잘못 걸린다(실측). */
+      const served = (typeof SERVED_SCHOOLS !== 'undefined' && SERVED_SCHOOLS[0]) || p.school;
+      const keepSchool = p.school, keepCampus = p.campus;
+      p.school = served; p.campus = '';
+      const keep = liveNotices;
+      liveNotices = { updatedAt: '2026-09-18', items: [
+        { title: '검사용 · 이미 등록된 공고', school: served, campus: '',
+          url: reg.sourceUrl, attachments: [], foundAt: '2026-09-18' },
+        { title: '검사용 · 등록된 적 없는 공고', school: served, campus: '',
+          url: 'https://example.ac.kr/notice/never-registered', attachments: [], foundAt: '2026-09-18' },
+      ] };
+      renderHome();
+      const names = [...document.querySelectorAll('#screen-home #live-notices .notice-card .sch-name')]
+        .map((e) => e.textContent);
+      liveNotices = keep; p.school = keepSchool; p.campus = keepCampus; renderHome();
+      return { 등록된것: names.some((t) => /이미 등록된/.test(t)),
+        안등록된것: names.some((t) => /등록된 적 없는/.test(t)), 쓴공고: reg.name, 학교: served };
     });
-    await page.click('.filter-chip[data-filter="교내"]').catch(() => {});
-    await page.waitForTimeout(600);
-    const feed = await page.$$eval('#live-notices .notice-card .sch-name', (els) => els.map((e) => e.textContent)).catch(() => []);
-    if (!feed.length) console.log('🚨 피드가 비어 있어 중복 판정을 못 했습니다 (칸을 못 열었거나 수집분이 0건)');
-    console.log('피드 항목:', feed.length, '| 조병두 중복:', feed.some((f) => f.includes('조병두')) ? 'DUP!' : '제거됨 OK');
-    /* 🔴 고른 칸을 되돌린다 — 아래 검사들이 '전체' 목록에서 카드를 찾는다 */
-    await page.click(`.filter-chip[data-filter="${backFilter}"]`).catch(() => {});
+    if (dedup.skip) errors.push('중복 판정을 못 했습니다 — ' + dedup.skip);
+    else {
+      console.log('중복 제거 — 대조에 쓴 등록 공고:', dedup.쓴공고);
+      if (dedup.등록된것) errors.push('등록 공고가 피드에서 제거되지 않았습니다(중복 노출)');
+      if (!dedup.안등록된것) errors.push('등록된 적 없는 공고까지 피드에서 사라졌습니다(너무 많이 지운다)');
+      console.log('  이미 등록된 것 사라짐:', !dedup.등록된것, '| 안 등록된 것 남음:', dedup.안등록된것);
+    }
+    /* 🔴 아래 검사들은 탐색 목록에서 카드를 찾는다 — 화면을 되돌린다 */
+    await page.click('.nav-item[data-nav="explore"]').catch(() => {});
+    await page.waitForSelector('#screen-explore:not([hidden])', { timeout: 5000 }).catch(() => {});
     await page.waitForTimeout(400);
   }
 
