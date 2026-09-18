@@ -15,4 +15,4 @@
 # 데이터 관문(node verify/audit-data.js)을 통과하지 못하면 배포하지 않고 🚨 이슈를 남긴다.
 
 branch: claude/handaejang-revenue-model-akd2gl
-메모: 2026-09-18 — 교내 칸에 [교내] 게시판 글 + style.css 병합 충돌 표식 제거 + 처지(traits) 민감정보 동의 관문
+메모: 2026-09-18 — 「또는」 줄에서 처지 아니요가 미달을 만들지 않는다 (개발자 결정)
