@@ -19,7 +19,7 @@ const PR = (typeof module !== 'undefined' && module.exports)
   /* 🔴 브라우저에서는 **전역 함수**로 쓴다 — 여기에 이름을 빠뜨리면 Node 검사는 전부
      통과하는데 앱은 첫 카드에서 죽는다. `headRest`(section-head)에 이어 `caseBranch`도
      같은 실수를 했다(2026-08-24). 아래 회귀가 브라우저 순서로 실어 실제로 불러 본다. */
-  : { parseLine, parseDegree, gradOnly, gradTarget, mentionsUndergrad, caseBranch, unaskedAttr, REGIONS, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM, TRAIT_PAT };
+  : { parseLine, parseDegree, gradOnly, gradTarget, mentionsUndergrad, caseBranch, unaskedAttr, hasTopLevelOr, orBranches, REGIONS, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM, TRAIT_PAT };
 const PR2 = PR;   // requirementLines가 쓰는 별칭 (선언 순서 때문에 이름만 따로 둔다)
 /* 시·도 이름은 parse-requirements 가 갖고 있다 — 여기 베끼면 두 벌이 된다 */
 const PR_REGIONS = PR.REGIONS || [];
@@ -414,6 +414,47 @@ function judgeCond(c, p, ctx) {
 
    반환: 'ok'(충족) | 'no'(미달) | null(판정 불가 — 화면에 아무 표시도 안 한다)
    ⚠️ **'no'는 확신이 높을 때만** 낸다. ✕는 0%와 같은 무게의 판정이다. */
+/* 🔴 **「또는」 줄에서 '안 고른 갈래' 인 처지를 걷어낸다 — 규칙은 여기 한 곳** (2026-09-18).
+   개발자 결정: *"'또는'이면 첫번째 예시로는 농어촌이거나 기초생활이어야하니까 기초생활이
+   농어촌이 아니더라도 적합으로 해줘."* 증상 — `농어촌 지역 출신 학생 또는 기초생활수급자`
+   가 **기초생활수급자에게 미달**로 떴다(한 줄의 조건은 AND 인데 그 `또는` 은 OR).
+   🔴 **두 경로가 같은 함수를 쓴다** — 본 경로(lineVerdict)와 택1 묶음 경로(inAnyOf).
+      베끼면 같은 줄이 혼자 있을 때와 묶음 안에 있을 때 다른 말을 한다(이 저장소의 단골 사고).
+   받는 것: [조건, 판정] 쌍의 배열. 돌려주는 것: 걷어낸 뒤의 같은 모양. */
+function dropUnchosenOrTraits(text, judged, isExclude) {
+  if (!PR.hasTopLevelOr(text)) return judged;
+  if (!judged.some(function (x) { return x[0].kind === 'trait' && x[1] === 'fail'; })) return judged;
+  if (!judged.some(function (x) { return x[1] === 'pass'; })) return judged;
+  /* 🔴 **`A 또는 B` 뒤에 양쪽에 다 걸리는 꼬리가 붙는 줄이 있다** (2026-09-18 코드 리뷰가
+     실측으로 잡았다). 갈래를 가르면 그 꼬리가 **마지막 갈래에만** 들어가서, 꼬리에 있는
+     처지가 '한쪽 갈래에만 있는 것' 처럼 보인다. 실제로 이 둘이 뒤집혔다 —
+       `… 차상위계층의 자녀 또는 **본인으로** 부동산 임대차 계약자 및 기숙사 입사자`
+          → 기숙사생이 아닌 차상위 학생에게 **충족**
+       `… 재학 중인 회원 또는 회원 자녀 **※** 회원자격을 유지해야 함`
+          → 회원이 아닌 재학생에게 **충족**
+     표시는 **뒷갈래 머리에 붙은 이음 조사**(`본인으로`·`그 자녀로서`)이거나 덧붙임(`※`)이다.
+     ⚠️ 조사는 앞말에 **붙어** 온다 — `^으로` 로 찾으면 못 잡는다(`본인으로` 로 온다).
+        그래서 갈래 머리 열 글자 안에서 찾고, `※` 는 갈래 어디에 있든 본다(`회원 자녀 ※ …`).
+     그런 줄은 갈래가 독립이 아니므로 풀지 않는다 — 우리가 가를 수 없으면 안 가른다. */
+  const BOUND_TAIL = /※|^.{0,10}?(?:으로|로서)\s/;
+  const raw = PR.orBranches(text);
+  if (raw.slice(1).some(function (b) { return BOUND_TAIL.test(b); })) return judged;
+  const sig = (c) => c.kind + ':' + (c.anyOf || []).join('/');
+  const branches = raw.map(function (b) {
+    const set = new Set();
+    for (const c of PR.parseLine(b, !!isExclude).conds) set.add(sig(c));
+    return set;
+  });
+  const whereIn = (c) => branches.reduce((acc, b, i) => (b.has(sig(c)) ? acc.concat(i) : acc), []);
+  const passSpots = judged.filter(function (x) { return x[1] === 'pass'; }).map(function (x) { return whereIn(x[0]); });
+  return judged.filter(function (x) {
+    if (!(x[0].kind === 'trait' && x[1] === 'fail')) return true;
+    const mine = whereIn(x[0]);
+    if (!mine.length) return true;                       // 갈래를 못 짚으면 풀지 않는다
+    return !passSpots.some((sp) => sp.length && sp.every((i) => !mine.includes(i)));
+  });
+}
+
 function lineVerdict(text, p, isExclude, ctx) {
   if (!p) return null;
   /* 🔴 **표의 한 칸만** 건너뛴다 (2026-09-12 · 노션 핵심-4). 예전에는 `gradOnly` 로
@@ -435,11 +476,17 @@ function lineVerdict(text, p, isExclude, ctx) {
        두었더니 정읍시민장학재단의 `재학생: 2025년 2학기와 2026년 1학기 각각 85점 이상` 이
        평점 2.8(백분위 62) 학생에게 ✓ 로 떴다 — `재학생` 하나가 맞아서. 아래 본 경로가
        2026-08-30 에 이미 고친 것과 같은 규칙이다. 떨어져도 ✕ 는 여전히 안 친다. */
-    let pass = 0;
+    /* 🔴 **본 경로와 같은 「또는」 규칙을 여기에도 건다** (2026-09-18 코드 리뷰).
+       안 걸면 같은 줄이 혼자 있을 때는 충족인데 택1 묶음 안에서는 '모름' 이 된다 —
+       판정이 두 벌이 되는 자리다(이 저장소가 되풀이해 겪은 사고). */
+    const judgedAny = [];
     for (const c of cs) {
       if (ctx.bracketTable && c.kind === 'bracket') continue;     // 본 경로와 같은 예외(지급액 구간표)
-      const v = judgeCond(c, p, ctx);
-      if (v !== 'pass') return null;
+      judgedAny.push([c, judgeCond(c, p, ctx)]);
+    }
+    let pass = 0;
+    for (const x of dropUnchosenOrTraits(text, judgedAny, isExclude)) {
+      if (x[1] !== 'pass') return null;
       pass += 1;
     }
     /* 🔴 본 경로의 '묻지 않은 처지' 관문도 **여기서 똑같이** 건다 (2026-09-17 코드 리뷰).
@@ -458,12 +505,36 @@ function lineVerdict(text, p, isExclude, ctx) {
      우리가 **묻지도 않은 처지**를 확인했다고 말한 셈이다. 틀린 안심은 틀린 미달만큼 나쁘다.
      ⚠️ 표시를 없앨 뿐 ✕ 를 만들지 않는다 — 모르는 것은 모른다고 두는 쪽이다. */
   let unknown = false;
+  /* 🔴 **「또는」 줄에서 처지 '아니요' 는 미달이 아니라 '안 고른 갈래'다** (2026-09-18 개발자 결정:
+     *"'또는'이면 첫번째 예시로는 농어촌이거나 기초생활이어야하니까 기초생활이 농어촌이
+       아니더라도 적합으로 해줘."*).
+     증상: `농어촌 지역 출신 학생 또는 기초생활수급자` 가 **기초생활수급자 학생에게 미달**로
+     떴다 — 한 줄의 조건들은 AND 로 묶이는데 이 줄의 `또는` 은 OR 라서다(실측 재현).
+     `틀린 미달은 못 받는 것보다 나쁘다`(2026-08-30)에 정면으로 걸린다.
+
+     🔴 **처지(trait) 에만 건다 — 줄 전체를 OR 로 쪼개지 말 것.** 실측으로 확인했다:
+        괄호 밖 `또는` 이 있는 자격 줄 17개 중 여럿은 요건 둘을 잇는 것이 **아니라**
+        한 요건의 속살이다. 통째로 OR 로 보면 이렇게 망가진다 —
+          `달서구 관내 … 거주하는 구민 또는 그 자녀로서 대학교에 재학 중인 학생`
+             → '달서구 구민' OR '재학생' → **아무 재학생이나 적합**(틀린 안심)
+        같은 꼴이 5줄 중 3줄이었다(달서구·도민·원자력). 틀린 안심은 틀린 미달만큼 나쁘다.
+     ✅ 처지만 푸는 것이 왜 안전한가: 다른 축(거주지·학적·학과)은 **원문이 줄 전체에 건**
+        사실이라 한쪽만 떼어 낼 수 없다. 처지는 우리가 만들어 **학생에게 물은 예/아니요**
+        (`TRAIT_LABEL`)라, 갈래가 둘인 줄에서 한쪽 '아니요' 는 그 줄에 대해 아무 말도 안 한다.
+     ⚠️ **다른 조건이 실제로 맞을 때만** 푼다 — 아무것도 안 맞는데 풀면 그냥 '모른다' 로
+        뭉개져 판정이 사라진다. 그리고 갈래가 **전부** 처지이고 전부 '아니요' 면 그대로 미달이다
+        (`농어촌 또는 검정고시` 에 둘 다 아니요 — 이건 진짜 미달이다).
+     관문: verify/test-collector.mjs 「또는 줄의 처지 판정」 절. */
+  const judged = [];
   for (const c of conds) {
     /* 지급액 구간표는 요건이 아니다 — 공고를 통째로 봐야 알 수 있어 맥락으로 받는다
        (한 공고에 `4분위 이하`·`5~6분위`가 함께 있으면 표다). 이걸 모르면
        퍼센트는 멀쩡한데 화면에만 ✕가 뜬다(2026-08-24 개발자 지적). */
     if (ctx && ctx.bracketTable && c.kind === 'bracket') continue;
-    const v = judgeCond(c, p, ctx);
+    judged.push([c, judgeCond(c, p, ctx)]);
+  }
+  const use = dropUnchosenOrTraits(text, judged, isExclude);
+  for (const [c, v] of use) {
     if (v === 'fail' && c.conf === PR.HIGH) return 'no';
     /* 🔴 확신이 낮은 미달은 **사라지는 게 아니라 '모른다'** 다 (2026-08-30 개발자 지적:
        "무지성 체크"). 예전에는 그냥 흘려버려서, 어긋난 절이 있는데도 같은 줄의 다른 절이
