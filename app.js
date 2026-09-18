@@ -1775,6 +1775,15 @@ function personLine(p) {
    원칙 1(정직한 신청 상태)의 계열 문제라 이름을 '초안 문장 만들기'로 고쳤다.
    진짜 AI 초안은 등록 양식 쪽(essay.js + server/essay/)에 붙어 있다 —
    나중에 이 자유서식 도우미까지 그쪽으로 잇게 되면 그때 이름을 되돌릴 것. */
+/* 초안 첫 문장에 붙일 주관 기관. 🔴 **모른다고 적어 둔 값은 문장에 넣지 않는다** (2026-09-18).
+   수집 로봇이 주관 기관을 못 읽으면 `주관 기관 원문 확인` 을 넣는데(auto-register PROVIDER_UNKNOWN),
+   그걸 그대로 이으면 학생 지원서에 "주관 기관 원문 확인의 '○○장학금'에 지원합니다" 가 찍힌다.
+   앱이 모르는 것은 **빼고 쓴다** — 지어내지도, 앱 내부 사정을 학생 글에 흘리지도 않는다. */
+const provLead = (sch) => {
+  const v = String((sch && sch.provider) || '').trim();
+  return !v || /원문 확인|미확인/.test(v) ? '' : v + '의 ';
+};
+
 function generateEssay(def, sch, p, ans, extra) {
   const gpaTxt = p.gpa != null ? `직전 학기 평점 ${p.gpa}/4.5` : '';
   const trackLabel = (TRACKS.find((t) => t.id === p.track) || {}).label || '';
@@ -1782,7 +1791,7 @@ function generateEssay(def, sch, p, ans, extra) {
 
   if (def.kind === 'intro') {
     paras.push(
-      `[지원 동기]\n안녕하세요. ${p.school} ${p.major || trackLabel} ${p.year}학년 ${p.name || '지원자'}입니다. ${sch.provider}의 '${sch.name}'에 지원합니다. ${ans.motive}. ${gpaTxt ? gpaTxt + '을 유지하며 학업에 성실히 임해 왔고, 이 장학금은 제가 흔들림 없이 공부를 이어가는 데 큰 힘이 될 것입니다.' : ''}`,
+      `[지원 동기]\n안녕하세요. ${p.school} ${p.major || trackLabel} ${p.year}학년 ${p.name || '지원자'}입니다. ${provLead(sch)}'${sch.name}'에 지원합니다. ${ans.motive}. ${gpaTxt ? gpaTxt + '을 유지하며 학업에 성실히 임해 왔고, 이 장학금은 제가 흔들림 없이 공부를 이어가는 데 큰 힘이 될 것입니다.' : ''}`,
       `[나의 강점]\n저의 강점은 ${ans.strength}입니다. 전공 공부와 병행하며 쌓아 온 이 경험은 장학생으로서의 책임을 다하는 밑거름이 될 것이라 확신합니다.`,
       `[마무리]\n선발해 주신다면 학업 성취로 보답하고, 받은 도움을 후배들에게 돌려주는 선순환의 일원이 되겠습니다. 감사합니다.`
     );

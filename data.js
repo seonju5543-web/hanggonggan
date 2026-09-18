@@ -445,10 +445,18 @@ function officialChannel(sch) {
     const kind = sch.id.startsWith('kosaf') ? 'kosaf' : 'foundation';
     return { ...ch, guide: SUBMIT_GUIDES[kind] };
   }
+  /* 🔴 **앱이 모른다고 적어 둔 값을 제출처 이름으로 쓰지 않는다** (2026-09-18).
+     수집 로봇이 주관 기관을 못 읽으면 `주관 기관 원문 확인` 이 들어가는데, 그대로 이으면
+     학생 화면에 "최종 제출은 **주관 기관 원문 확인 (원문 공고의 접수 방법)**에서 이루어집니다"
+     가 뜬다 — 앱 내부 사정을 학생에게 흘리는 것이다(2026-09-17 지시와 같은 계열).
+     그럴 땐 기관 이름을 빼고 '원문 공고'라고만 말한다. */
+  const knownProvider = sch.provider && !/원문 확인|미확인/.test(String(sch.provider));
   if (sch.sourceUrl) {
-    return { label: `${sch.provider} (원문 공고의 접수 방법)`, url: sch.sourceUrl, guide: SUBMIT_GUIDES.campus };
+    return { label: knownProvider ? `${sch.provider} (원문 공고의 접수 방법)` : '원문 공고의 접수 방법',
+      url: sch.sourceUrl, guide: SUBMIT_GUIDES.campus };
   }
-  return { label: `${sch.provider} 장학공지 (학교 포털)`, guide: SUBMIT_GUIDES.campus };
+  return { label: knownProvider ? `${sch.provider} 장학공지 (학교 포털)` : '원문 공고의 접수 방법',
+    guide: SUBMIT_GUIDES.campus };
 }
 
 /* 🔴 **이 표의 열쇠는 `index.html` 의 `#in-flags` 체크박스와 한 글자도 어긋나면 안 된다.**

@@ -1112,6 +1112,85 @@ console.log('\n■ 수집망 좁히기 (2026-08-30)');
   eq('로봇은 parked 를 읽지 않는다', /\.parked/.test(cm) || /\.parked/.test(bc), false);
 }
 
+console.log('\n■ 교내·교외 분류와 주관 기관 (2026-09-18 개발자 지시)');
+{
+  /* 🔴 개발자 지적으로 드러난 것: 학생 카드가 `교내 · 경희대학교 게시 공고 /
+     푸른등대 한국수력원자력 k-원전 장학금` 이었다 — **한국장학재단 장학금을 경희대가 주는 것처럼**
+     보여 주고 있었다. 원인 둘:
+       ① `type` 이 제목 낱말(재단·장학회·시민…)로 교외를 찾고 **나머지를 전부 교내**로 떨어뜨렸다.
+          실측: '교내' 19건 중 진짜 교내는 2건, 국가장학금 7건 + 외부 재단·지자체 10건.
+       ② `provider` 에 **게시한 학교**가 들어갔다(33건). 그 칸은 '누가 주는가'다.
+     🔴 규칙을 여기에 베끼지 않는다 — 로봇 소스에서 읽어 그대로 돌린다(베끼면 갈라진다). */
+  const src = readText(new URL('../collector/auto-register.mjs', import.meta.url));
+  const mMark = src.match(/const CAMPUS_MARK = (\/.*\/);/);
+  const mProv = src.match(/const PROVIDER_UNKNOWN = '([^']+)';/);
+  eq('로봇에 교내 표식 규칙(CAMPUS_MARK)이 있다', !!mMark, true);
+  eq('로봇에 "모름" 주관 기관(PROVIDER_UNKNOWN)이 있다', !!mProv, true);
+  if (mMark && mProv) {
+    const MARK = eval(mMark[1]);
+    const typeOf = (t) => (MARK.test(t) ? '교내' : '교외');
+    /* 전부 **실제로 등록돼 있던 제목**이다 */
+    eq('[교내] 표식이 붙은 것만 교내다',
+      ['[교내][서울]2026-2 국제학부 김봉철 장학금 장학생 모집(~9/4)',
+       '[공통][교내] 2026-2학기 가족장학금 신청 안내 (9/10 ~ 9/28)'].map(typeOf), ['교내', '교내']);
+    eq('  한국장학재단 국가장학금은 교내가 아니다',
+      ['[공통][국가]2026년 2학기 푸른등대 기부장학금 장학생 선발(~9/10)',
+       '[공통][국가근로] 2026-2학기 국가근로장학생 희망근로지 신청 안내',
+       '[공통][국가]2026-2 중소기업취업연계장학금 신규장학생 신청안내(~9/18)',
+       '[공통][국가]2026년 2학기 고졸 후학습자 장학금 신청안내',
+       '공통 푸른등대 한국수력원자력 k-원전 장학금 신청안내 (9.11~9.28)'].map(typeOf),
+      ['교외', '교외', '교외', '교외', '교외']);
+    eq('  제목에 재단 낱말이 없는 외부 공고도 교내가 아니다',
+      ['공통 2026년 상반기 사랑나눔장학생 모집 공고',
+       '공통 제36기 미레에셋 해외교환 장학생 선발',
+       '[화성시] 2026년 코나아이 소상공인 장학생 모집'].map(typeOf), ['교외', '교외', '교외']);
+    /* 🔴 맨 '교내' 두 글자로 넓히면 이것이 교내가 된다 — 넓히지 말라는 경계값 */
+    eq('  "교내외" 는 교내 표식이 아니다', typeOf('2026-2학기 교내외 장학금 통합 안내'), '교외');
+    eq('로봇이 주관 기관에 게시 학교를 넣지 않는다',
+      /provider: `\$\{n\.school\}/.test(src), false);
+    eq('  대신 "모른다"고 적는다', /provider: PROVIDER_UNKNOWN/.test(src), true);
+  }
+  /* 소급 적용 (운영 원칙 7) — 이미 등록된 것에도 같은 기준이 서 있어야 한다 */
+  const reg = JSON.parse(readText(new URL('../data/registered.json', import.meta.url)));
+  const board = reg.items.filter((i) => /게시 공고$/.test(String(i.provider || '')));
+  eq('등록분에 "○○ 게시 공고" 주관 기관이 남아 있지 않다', board.length, 0);
+  /* 🔴 **'교내'는 "우리 학교가 준다"는 뜻이다** — 주관 기관이 바깥 기관이면 둘 중 하나가 틀렸다.
+     실제로 `한미 첨단분야 청년교류 지원사업`(주관 한국산업기술진흥원 KIAT)이 '교내'로 등록돼
+     **학교를 가리지 않고 모두에게** 교내 장학금처럼 떠 있었다(2026-09-18 발견).
+     낱말 목록이 아니라 **두 칸이 서로 모순되는가**로 본다 — 새 유형이 와도 걸린다. */
+  const SCHOOLISH = /대학교|대학|[가-힣]대\s|[가-힣]대$/;
+  const contradict = reg.items.filter((i) => i.type === '교내'
+    && !/원문 확인/.test(String(i.provider || ''))
+    && !SCHOOLISH.test(String(i.provider || '')));
+  eq('교내로 분류한 공고의 주관 기관은 학교이거나 "모름"이다',
+    contradict.map((i) => `${i.id}:${i.provider}`), []);
+  /* 🔴 **"모른다"고 적은 값이 학생 화면·학생 글로 새지 않는다** (2026-09-18 코드 리뷰가 셋을 더 잡았다).
+     `주관 기관 원문 확인` 은 앱 내부 사정이다 — 학생에게 그대로 보이면 2026-09-17 지시
+     (앱 내부 사정은 학생 화면에 안 적는다)를 정면으로 어긴다. 새던 자리 셋을 각각 못 박는다. */
+  const app = readText(new URL('../app.js', import.meta.url));
+  eq('초안이 "모름" 주관 기관을 문장에 넣지 않는다', /provLead\(sch\)/.test(app), true);
+  eq('  그 함수가 "원문 확인" 을 걸러 낸다', /원문 확인\|미확인/.test(app), true);
+  const dataJs = readText(new URL('../data.js', import.meta.url));
+  eq('제출처 안내도 "모름" 주관 기관을 이름으로 쓰지 않는다', /knownProvider/.test(dataJs), true);
+  /* 🔴 33건이 **같은 글자**를 갖게 되므로, 그 글자로 점수를 주면 '원문'·'확인' 두 글자에
+     무관한 공고가 한꺼번에 걸린다(chat.js CHAT_STOP 주석이 경고한 유형). */
+  const chatJs = readText(new URL('../chat.js', import.meta.url));
+  eq('도우미가 "모름" 주관 기관으로 공고를 고르지 않는다', /원문 확인\|미확인\/\.test\(rawProv\)/.test(chatJs), true);
+  /* 🔴 **관리자 등록 갈래의 기본값이 로봇과 같아야 한다** — 다르면 관리자가 공고 하나만 등록해도
+     위 '게시 공고가 남아 있지 않다' 관문이 빨간불이 되고, 수집 워크플로의 데이터 관문이 실패해
+     **그 실행의 자동 등록분이 통째로 되돌려진다**(revert-auto.mjs). */
+  const adminApply = readText(new URL('../tools/admin-apply.mjs', import.meta.url));
+  eq('관리자 등록도 기본이 교외다', /patch\.type === '교내' \? '교내' : '교외'/.test(adminApply), true);
+  /* ⚠️ **주석까지 세지 말 것** — 걷어낸 옛 배선을 인용한 주석에 걸려 빨간불이 된다
+     (CLAUDE.md 2026-09-12 · 실제로 이 줄을 쓰면서 그렇게 걸렸다). 주석을 지우고 본다. */
+  const adminCode = adminApply.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  eq('  관리자 등록도 게시 학교를 주관 기관으로 넣지 않는다', /게시 공고/.test(adminCode), false);
+  /* 🔴 인스타 로봇은 `provider` 글자로 학교를 찾고 있었다 — 그 칸이 `○○대학교 게시 공고` 라서
+     우연히 맞던 것이다. 정직하게 고치자 학교를 찾는 공고가 39 → 10건으로 떨어졌다(실측). */
+  const instaSchool = readText(new URL('../insta/school.mjs', import.meta.url));
+  eq('인스타가 학교를 schoolOnly 로 찾는다', /eligibility \|\| \{\}\)\.schoolOnly/.test(instaSchool), true);
+}
+
 console.log('\n■ 정식 등록 대상 학교 좁히기 (2026-08-30)');
 {
   const cfg = JSON.parse(readText(new URL('../collector/auto-register-config.json', import.meta.url)));

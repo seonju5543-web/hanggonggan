@@ -76,7 +76,14 @@ const bullets = (a) => (a.length ? a.map((t) => `○ ${t}`).join(' ') : '');
 /** 교내 공고 하나 → 카드 재료. 🔴 없는 값은 **지어내지 않고 빈 칸으로 둔다** —
  *  렌더러가 '앱에서 확인' 으로 정직하게 그린다. */
 export function toNotice(x) {
-  const school = SCHOOLS.find((s) => s.match.test(x.provider || '') || s.match.test(x.name || ''));
+  /* 🔴 **학교는 `eligibility.schoolOnly` 로 찾는다** (2026-09-18 코드 리뷰).
+     예전엔 `provider` 글자로 찾았는데, 그 칸이 `○○대학교 게시 공고` 였기 때문에 우연히 맞던 것이다.
+     주관 기관을 정직하게 `주관 기관 원문 확인` 으로 고치자 학교를 찾는 공고가 **39건 → 10건**으로
+     떨어졌다(실측). schoolOnly 는 어느 학교 접수분인지를 담는 **진짜 칸**이라 글자 모양에 안 흔들린다.
+     ⚠️ 옛 길도 남긴다 — schoolOnly 가 없는 옛 항목이 아직 있다. */
+  const only = String((x.eligibility || {}).schoolOnly || '');
+  const school = SCHOOLS.find((s) => s.match.test(only))
+    || SCHOOLS.find((s) => s.match.test(x.provider || '') || s.match.test(x.name || ''));
   if (!school) return null;
   const { qualify, exclude } = splitLines(x.eligibilityLines);
   return {

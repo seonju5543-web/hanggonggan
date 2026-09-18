@@ -3029,14 +3029,17 @@ function registerSheet(n) {
           <div class="field">
             <label for="rg-type">구분</label>
             <select id="rg-type" data-rg="type">
-              <option value="교내">교내</option>
-              <option value="교외">교외 (재단·지자체 등)</option>
+              <!-- 🔴 교외가 먼저다 — 학교 게시판 공고는 대부분 학교가 옮겨 적은 교외 공고다
+                   (2026-09-18 실측: '교내' 19건 중 진짜 교내는 2건). 기본값이 반대였다. -->
+              <option value="교외">교외 (재단·지자체·국가장학금)</option>
+              <option value="교내">교내 (우리 학교가 주는 것만)</option>
             </select>
           </div>
           ${f('deadline', '마감일', 'YYYY-MM-DD', '모르면 비워 두세요 — 등록 60일 뒤 자동으로 숨겨집니다')}
           ${f('amount', '금액 문구', '예: 등록금 전액')}
           ${f('amountValue', '금액(숫자)', '예: 3000000', '확인한 금액만 넣으세요. 비우면 합계에서 제외됩니다')}
-          ${f('provider', '주관', `${esc(n.school || '')}${n.campus ? ` ${esc(n.campus)}` : ''} 게시 공고`)}
+          <!-- 🔴 게시한 학교를 주관 기관으로 권하지 않는다 — 이 칸은 '누가 주는가'다 -->
+          ${f('provider', '주관', '주관 기관 원문 확인', '공고를 낸 재단·기관 이름. 모르면 비워 두세요 (게시한 학교를 적지 마세요)')}
           <div class="field">
             <label for="rg-summary">요약</label>
             <textarea id="rg-summary" data-rg="summary" rows="3"
