@@ -1,0 +1,51 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8">
+<title>학교 투어링 릴 — 학교당 2.5초</title>
+<style>
+:root{--on:#fdfbf6;--navy:#1e2b42;--band:#121a2b;font-family:'Pretendard Variable',Pretendard,-apple-system,'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0} html,body{width:390px;height:844px;overflow:hidden;background:#0f1522;color:var(--on)}
+.stage{position:relative;width:390px;height:844px;overflow:hidden;background:#0f1522}
+.scene{position:absolute;inset:0;opacity:0}
+.scene img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:var(--focus,50% 45%);transform-origin:var(--focus,50% 45%)}
+/* 장면: 0~2.5초 — 0.35초 페이드인 · 천천히 걸어 들어감(1.00→1.10) · 마지막 0.35초 페이드아웃 */
+.scene.run{animation:fade var(--dur) linear 1 forwards}
+.scene.run img{animation:walk var(--dur) cubic-bezier(.25,.1,.25,1) 1 forwards}
+.scene.last{animation:fadein var(--dur) linear 1 forwards}
+@keyframes fade{0%{opacity:0}14%{opacity:1}86%{opacity:1}100%{opacity:0}}
+@keyframes fadein{0%{opacity:0}14%{opacity:1}100%{opacity:1}}
+@keyframes walk{from{transform:scale(1)}to{transform:scale(1.10)}}
+.scrim{position:absolute;left:0;right:0;bottom:0;height:380px;background:linear-gradient(to bottom,rgba(18,26,43,0),rgba(18,26,43,.88));pointer-events:none}
+.school{position:absolute;left:20px;top:64px;padding:6px 12px;border-radius:999px;background:rgba(18,26,43,.55);font-size:13px;font-weight:700;color:var(--on)}
+.mark{position:absolute;right:20px;top:62px;font-size:16px;font-weight:900;color:var(--on)}
+.copy{position:absolute;left:20px;right:20px;top:522px;display:flex;flex-direction:column;gap:6px}
+.copy .tag{font-size:17px;font-weight:500;opacity:.8}
+.copy h1{font-size:32px;line-height:42px;font-weight:900;letter-spacing:-.02em}
+.actions{position:absolute;left:20px;right:20px;top:690px;display:flex;flex-direction:column;gap:12px;align-items:center}
+.btn{width:350px;height:60px;border:0;border-radius:13px;background:var(--on);color:var(--navy);font:700 17px inherit;line-height:60px;text-align:center}
+.note{font-size:13px;opacity:.7}
+.credit{position:absolute;left:20px;right:20px;bottom:8px;font-size:9px;opacity:.55;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+</style></head><body>
+<div class="stage" id="stage"></div>
+<div class="scrim"></div>
+<div class="mark">한대장</div>
+<div class="copy"><div class="tag">한국 대학교 장학금,</div><h1>한 곳에서 찾고<br>한 번에 신청</h1></div>
+<div class="actions"><div class="btn">내 장학금 찾기</div><div class="note">학교와 학년만 정하면 바로 볼 수 있어요</div></div>
+<script>
+/* ?list=snu-1.jpg,korea-2.jpg,... (docs/designs/assets/gates/ 기준) · ?dur=2500 · manifest 로 학교 이름·출처를 단다 */
+const q = new URLSearchParams(location.search);
+const DUR = Number(q.get('dur') || 2500);
+const list = (q.get('list') || '').split(',').filter(Boolean);
+/* 사진별 초점 — 가로 사진을 세로로 자를 때 정문이 화면에 남는 자리(가로% 세로%). 없으면 50% 45% */
+const FOCUS = { 'khu-1.jpg': '62% 78%', 'hufs-3.jpg': '50% 42%', 'snu-1.jpg': '58% 62%', 'sookmyung-4.jpg': '36% 52%', 'dongguk-5.jpg': '30% 48%', 'sogang-5.jpg': '32% 48%' };
+fetch('../../docs/designs/assets/gates/manifest.json').then(r => r.json()).then(m => {
+  const byFile = {}; m.schools.forEach(s => s.files.forEach(f => { byFile[f.file] = { ...f, school: s.name }; }));
+  const stage = document.getElementById('stage');
+  list.forEach((file, i) => {
+    const meta = byFile[file] || { school: file, author: '', license: '' };
+    const d = document.createElement('div'); d.className = 'scene'; d.style.setProperty('--dur', DUR + 'ms'); if (FOCUS[file]) d.style.setProperty('--focus', FOCUS[file]);
+    d.innerHTML = `<img src="../../docs/designs/assets/gates/${file}" alt=""><div class="school">${meta.school}</div><div class="credit">${meta.school} 정문 · 사진 ${meta.author || '작가 미상'} · ${meta.license} · Wikimedia Commons</div>`;
+    stage.appendChild(d);
+    setTimeout(() => { d.classList.add(i === list.length - 1 ? 'last' : 'run'); }, i * DUR);
+  });
+  document.body.dataset.total = list.length * DUR;
+});
+</script></body></html>

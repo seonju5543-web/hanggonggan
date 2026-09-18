@@ -1,0 +1,4 @@
+이 파일을 고쳐 push 하면 .github/workflows/gate-photos.yml 이 돈다 (push-to-run).
+결과: docs/designs/assets/gates/ 에 사진 + manifest.json
+only: cau
+run: 2026-09-18 #4 — 중앙대만 (3차까지 0장 · 검색어 넓힘)

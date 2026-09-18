@@ -1,0 +1,360 @@
+{
+ "fetchedAt": "2026-09-18T09:24:02.603Z",
+ "source": "Wikimedia Commons (API search, namespace 6)",
+ "rule": "CC0 · CC BY · CC BY-SA · PD 만 · NC/ND 제외 · 폭 900px 이상",
+ "schools": [
+  {
+   "id": "snu",
+   "name": "서울대학교",
+   "candidates": 1,
+   "files": [
+    {
+     "file": "snu-1.jpg",
+     "title": "File:SeoulNatlUnivMainGateAtNight.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3ASeoulNatlUnivMainGateAtNight.jpg",
+     "thumb": "https://upload.wikimedia.org/wikipedia/commons/3/3d/SeoulNatlUnivMainGateAtNight.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+     "width": 945,
+     "height": 573,
+     "license": "CC BY 3.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+     "shareAlike": false,
+     "author": "Deuterium 001",
+     "credit": "Own work",
+     "description": "The Main Gate of Seoul National University at Night",
+     "date": "2012-04-27 22:15:50",
+     "query": "Seoul National University main gate"
+    }
+   ],
+   "candidatesSeen": 1
+  },
+  {
+   "id": "korea",
+   "name": "고려대학교",
+   "candidates": 3,
+   "files": [
+    {
+     "file": "korea-2.jpg",
+     "title": "File:Korea University Anam camps, main gate.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3AKorea_University_Anam_camps%2C_main_gate.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9c/Korea_University_Anam_camps%2C_main_gate.jpg/1280px-Korea_University_Anam_camps%2C_main_gate.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 5184,
+     "height": 3456,
+     "license": "CC BY-SA 4.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+     "shareAlike": true,
+     "author": "Mannaa mohamed",
+     "credit": "Own work",
+     "description": "Korea University is one of the most famous Universities not only in Korea but also in Asia, it was ranked among the first 100 University in the world in 2016. he campus is located in Anam area (close ",
+     "date": "2016-11-13 13:57:19",
+     "query": "Korea University main gate"
+    }
+   ],
+   "candidatesSeen": 3
+  },
+  {
+   "id": "yonsei",
+   "name": "연세대학교",
+   "candidates": 8,
+   "files": [
+    {
+     "file": "yonsei-1.jpg",
+     "title": "File:Yonsei University campus.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3AYonsei_University_campus.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4e/Yonsei_University_campus.jpg/1280px-Yonsei_University_campus.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 4160,
+     "height": 2340,
+     "license": "CC BY-SA 4.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+     "shareAlike": true,
+     "author": "Christian Bolz",
+     "credit": "Own work",
+     "description": "Der Campus der Yonsei University in Sinchon.",
+     "date": "2015-12-13 11:53:11",
+     "query": "Yonsei University Sinchon"
+    }
+   ],
+   "candidatesSeen": 8
+  },
+  {
+   "id": "sogang",
+   "name": "서강대학교",
+   "candidates": 11,
+   "files": [
+    {
+     "file": "sogang-5.jpg",
+     "title": "File:Sogang-1641741169692 04.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3ASogang-1641741169692_04.jpg",
+     "thumb": "https://upload.wikimedia.org/wikipedia/commons/3/32/Sogang-1641741169692_04.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+     "width": 1280,
+     "height": 960,
+     "license": "CC0",
+     "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+     "shareAlike": false,
+     "author": "알로스",
+     "credit": "Own work",
+     "description": "Sogang University.",
+     "date": "2021",
+     "query": "Sogang University"
+    }
+   ],
+   "candidatesSeen": 11
+  },
+  {
+   "id": "skku",
+   "name": "성균관대학교",
+   "candidates": 4,
+   "files": [
+    {
+     "file": "skku-1.jpg",
+     "title": "File:Sungkyunkwan University 2.JPG",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3ASungkyunkwan_University_2.JPG",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/20/Sungkyunkwan_University_2.JPG/1280px-Sungkyunkwan_University_2.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 3264,
+     "height": 2448,
+     "license": "CC BY-SA 3.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+     "shareAlike": true,
+     "author": "hyolee2",
+     "credit": "Own work",
+     "description": "서울특별시 종로구에 있는 성균관대학교 정문",
+     "date": "",
+     "query": "성균관대학교 정문"
+    }
+   ],
+   "candidatesSeen": 4
+  },
+  {
+   "id": "hanyang",
+   "name": "한양대학교",
+   "candidates": 6,
+   "files": [
+    {
+     "file": "hanyang-1.jpg",
+     "title": "File:Hanyang University 008.JPG",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3AHanyang_University_008.JPG",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/69/Hanyang_University_008.JPG/1280px-Hanyang_University_008.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 3264,
+     "height": 2448,
+     "license": "CC BY-SA 3.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+     "shareAlike": true,
+     "author": "myself (User:Piotrus)",
+     "credit": "Self-photographed",
+     "description": "Hanyang University, private research university in South Korea, main campus is in Seoul, founded 1939.",
+     "date": "2013-04-11 11:09:05",
+     "query": "Hanyang University Seoul campus"
+    }
+   ],
+   "candidatesSeen": 6
+  },
+  {
+   "id": "cau",
+   "name": "중앙대학교",
+   "candidates": 8,
+   "files": [
+    {
+     "file": "cau-1.jpg",
+     "title": "File:Chung-ang Univ.Maingate.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3AChung-ang_Univ.Maingate.jpg",
+     "thumb": "https://upload.wikimedia.org/wikipedia/commons/4/49/Chung-ang_Univ.Maingate.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+     "width": 938,
+     "height": 630,
+     "license": "CC BY-SA 3.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+     "shareAlike": true,
+     "author": "Hutanis",
+     "credit": "Own work",
+     "description": "Chung-ang Univ.Deungyongmoon Maingate",
+     "date": "2013-06-07",
+     "query": "Chung-ang Univ Maingate"
+    }
+   ],
+   "candidatesSeen": 8
+  },
+  {
+   "id": "khu",
+   "name": "경희대학교",
+   "candidates": 13,
+   "files": [
+    {
+     "file": "khu-1.jpg",
+     "title": "File:경희대 설캠 정문.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A%EA%B2%BD%ED%9D%AC%EB%8C%80_%EC%84%A4%EC%BA%A0_%EC%A0%95%EB%AC%B8.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7e/%EA%B2%BD%ED%9D%AC%EB%8C%80_%EC%84%A4%EC%BA%A0_%EC%A0%95%EB%AC%B8.jpg/1280px-%EA%B2%BD%ED%9D%AC%EB%8C%80_%EC%84%A4%EC%BA%A0_%EC%A0%95%EB%AC%B8.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 5184,
+     "height": 3456,
+     "license": "CC BY-SA 3.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+     "shareAlike": true,
+     "author": "Pectus Solentis",
+     "credit": "Own work",
+     "description": "경희대학교 서울캠퍼스 정문",
+     "date": "2017-05-26 18:55:08",
+     "query": "경희대학교 정문"
+    }
+   ],
+   "candidatesSeen": 13
+  },
+  {
+   "id": "hufs",
+   "name": "한국외국어대학교",
+   "candidates": 16,
+   "files": [
+    {
+     "file": "hufs-3.jpg",
+     "title": "File:Hankuk University of Foreign Studies Seoul campus 20180914 090938.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3AHankuk_University_of_Foreign_Studies_Seoul_campus_20180914_090938.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/Hankuk_University_of_Foreign_Studies_Seoul_campus_20180914_090938.jpg/1280px-Hankuk_University_of_Foreign_Studies_Seoul_campus_20180914_090938.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 4000,
+     "height": 2250,
+     "license": "CC BY-SA 4.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+     "shareAlike": true,
+     "author": "LERK",
+     "credit": "Own work",
+     "description": "Hankuk University of Foreign Studies Seoul campus",
+     "date": "Taken on 14 September 2018 09:09:38 KST (UTC+9)",
+     "query": "Hankuk University of Foreign Studies Seoul Campus"
+    }
+   ],
+   "candidatesSeen": 16
+  },
+  {
+   "id": "uos",
+   "name": "서울시립대학교",
+   "candidates": 1,
+   "files": [
+    {
+     "file": "uos-1.jpg",
+     "title": "File:서울시립대학교 동문탑.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A%EC%84%9C%EC%9A%B8%EC%8B%9C%EB%A6%BD%EB%8C%80%ED%95%99%EA%B5%90_%EB%8F%99%EB%AC%B8%ED%83%91.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/%EC%84%9C%EC%9A%B8%EC%8B%9C%EB%A6%BD%EB%8C%80%ED%95%99%EA%B5%90_%EB%8F%99%EB%AC%B8%ED%83%91.jpg/1280px-%EC%84%9C%EC%9A%B8%EC%8B%9C%EB%A6%BD%EB%8C%80%ED%95%99%EA%B5%90_%EB%8F%99%EB%AC%B8%ED%83%91.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 1536,
+     "height": 2048,
+     "license": "CC BY-SA 3.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+     "shareAlike": true,
+     "author": "Younghopark7",
+     "credit": "Own work",
+     "description": "Alumni Tower. The bird image on the top of the tower is the Hawk of Jangsan Cape.",
+     "date": "2011-04-23",
+     "query": "University of Seoul"
+    }
+   ],
+   "candidatesSeen": 1
+  },
+  {
+   "id": "konkuk",
+   "name": "건국대학교",
+   "candidates": 17,
+   "files": [
+    {
+     "file": "konkuk-1.jpg",
+     "title": "File:Konkukuniversitylake.JPG",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3AKonkukuniversitylake.JPG",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b2/Konkukuniversitylake.JPG/1280px-Konkukuniversitylake.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 3872,
+     "height": 2592,
+     "license": "CC BY-SA 3.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+     "shareAlike": true,
+     "author": "Crossmr",
+     "credit": "Own work",
+     "description": "Photo taken of the Konkuk University Lake facing south showing Star City residential towers in the background",
+     "date": "2009-08-04",
+     "query": "Konkuk University lake"
+    }
+   ],
+   "candidatesSeen": 17
+  },
+  {
+   "id": "dongguk",
+   "name": "동국대학교",
+   "candidates": 21,
+   "files": [
+    {
+     "file": "dongguk-5.jpg",
+     "title": "File:Dongguk University at Night.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3ADongguk_University_at_Night.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6a/Dongguk_University_at_Night.jpg/1280px-Dongguk_University_at_Night.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 2288,
+     "height": 978,
+     "license": "CC BY 3.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+     "shareAlike": false,
+     "author": "Yerbol Nisanbayev",
+     "credit": "Own work",
+     "description": "Campus of the Dongguk University in Gyeongju at Night",
+     "date": "2008",
+     "query": "Dongguk University"
+    }
+   ],
+   "candidatesSeen": 21
+  },
+  {
+   "id": "hongik",
+   "name": "홍익대학교",
+   "candidates": 21,
+   "files": [
+    {
+     "file": "hongik-5.jpg",
+     "title": "File:Hongik University entrance 2012.JPG",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3AHongik_University_entrance_2012.JPG",
+     "thumb": "https://upload.wikimedia.org/wikipedia/commons/1/1f/Hongik_University_entrance_2012.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+     "width": 1166,
+     "height": 778,
+     "license": "CC BY-SA 3.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+     "shareAlike": true,
+     "author": "Michaela den",
+     "credit": "Own work",
+     "description": "Hongik University entrance in Hongdae, Mapo-gu, Seoul in 2012",
+     "date": "2012-09-20 14:46:01",
+     "query": "Hongik University Seoul"
+    }
+   ],
+   "candidatesSeen": 21
+  },
+  {
+   "id": "sookmyung",
+   "name": "숙명여자대학교",
+   "candidates": 15,
+   "files": [
+    {
+     "file": "sookmyung-4.jpg",
+     "title": "File:숙명여자대학교 001.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A%EC%88%99%EB%AA%85%EC%97%AC%EC%9E%90%EB%8C%80%ED%95%99%EA%B5%90_001.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a4/%EC%88%99%EB%AA%85%EC%97%AC%EC%9E%90%EB%8C%80%ED%95%99%EA%B5%90_001.jpg/1280px-%EC%88%99%EB%AA%85%EC%97%AC%EC%9E%90%EB%8C%80%ED%95%99%EA%B5%90_001.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 4032,
+     "height": 3024,
+     "license": "CC BY 2.0 kr",
+     "licenseUrl": "https://creativecommons.org/licenses/by/2.0/kr/deed.en",
+     "shareAlike": false,
+     "author": "revi",
+     "credit": "Own work",
+     "description": "Sookmyung Women's University, campus 1",
+     "date": "2018-08-30 17:03:10",
+     "query": "Sookmyung Women's University campus"
+    }
+   ],
+   "candidatesSeen": 15
+  }
+ ],
+ "pruned": "2026-09-18 — 14개교 한 장씩만 남김(고르지 않은 후보는 지움). 후보 수는 candidatesSeen 에.",
+ "picks": [
+  "snu-1.jpg",
+  "korea-2.jpg",
+  "yonsei-1.jpg",
+  "sogang-5.jpg",
+  "skku-1.jpg",
+  "hanyang-1.jpg",
+  "cau-1.jpg",
+  "khu-1.jpg",
+  "hufs-3.jpg",
+  "uos-1.jpg",
+  "konkuk-1.jpg",
+  "dongguk-5.jpg",
+  "hongik-5.jpg",
+  "sookmyung-4.jpg"
+ ]
+}

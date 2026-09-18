@@ -1,0 +1,42 @@
+name: 정문 사진 수집 (디자인 참고)
+
+# 2026-09-18 — 시작 화면 투어링 영상의 재료. 작업 샌드박스는 위키미디어·대학 홈페이지가 막혀 있어
+# (403) 이 로봇이 대신 받아 커밋한다. 실행: tools/run-gate-photos.txt 를 고쳐 push (push-to-run).
+# 받는 것은 위키미디어 공용의 **열린 라이선스 사진뿐**(규칙은 tools/fetch-gate-photos.mjs 머리말).
+
+on:
+  push:
+    paths:
+      - 'tools/run-gate-photos.txt'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gate-photos-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: 위키미디어 공용에서 정문 사진 받기
+        env:
+          FRESH: '1'   # 지난 실행의 사진을 비우고 다시 받는다 (걸러 낸 사진이 남지 않게)
+        run: |
+          # 표식 파일에 `only: snu,cau` 줄이 있으면 그 학교만 다시 받는다 (나머지는 그대로)
+          ONLY=$(grep -oE '^only:[[:space:]]*[a-z,]+' tools/run-gate-photos.txt | sed -E 's/^only:[[:space:]]*//' || true)
+          ONLY="$ONLY" node tools/fetch-gate-photos.mjs docs/designs/assets/gates
+      - name: 결과 커밋
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/designs/assets/gates
+          if git diff --cached --quiet; then echo "받은 사진 없음 — 커밋 생략"; exit 0; fi
+          git commit -m "정문 사진 수집 (위키미디어 공용 · 열린 라이선스만) [bot]"
+          git push
