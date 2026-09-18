@@ -18,7 +18,7 @@ import { createRequire } from 'node:module';
 import * as canon from '../collector/canon-url.mjs';
 import { indexTexts, sourceFor, hasText } from '../collector/notice-source.mjs';
 import { attachmentText, readable } from '../collector/attachment-text.mjs';
-import { periodAfterDeadline } from './edit-diff.mjs';
+import { periodAfterDeadline, amountAfterValue } from './edit-diff.mjs';
 
 /* 저장소 뿌리. 데이터 파일은 지금까지처럼 **작업 폴더 기준**으로 읽고 쓰지만(워크플로가
    저장소 안에서 돈다), 아래 '저장된 공고 원문'은 이 파일 기준으로 읽는다 — 검사도 같은 원문을
@@ -397,7 +397,12 @@ switch (action) {
       name: title.slice(0, 70),
       type: patch.type === '교외' ? '교외' : '교내',
       provider: patch.provider || `${school}${campus ? ` ${campus}` : ''} 게시 공고`.trim() || '원문 확인',
-      amount: patch.amount || '금액 원문 확인',
+      /* 🔴 등록 갈래도 **문구와 숫자가 같은 말을 해야 한다** (2026-09-18 코드 리뷰).
+         등록 시트는 '금액 문구' 와 '금액 숫자' 를 따로 두고 문구를 같이 적으라는 말이 없어,
+         숫자만 넣으면 `금액 원문 확인` + 3,000,000 으로 들어가 감사가 그 자리에서 막는다
+         (그러면 그 등록이 통째로 되돌려진다). 수정 갈래와 같은 함수를 쓴다. */
+      amount: amountAfterValue(patch.amount || '금액 원문 확인',
+        Number(patch.amountValue) > 0 ? Number(patch.amountValue) : 0),
       // 금액을 확인하지 못했으면 0 — 지어낸 숫자를 홈 합계에 섞지 않는다 (운영 원칙 8-1)
       amountValue: Number(patch.amountValue) > 0 ? Number(patch.amountValue) : 0,
       deadline: patch.deadline || null,
@@ -560,6 +565,9 @@ switch (action) {
           if (it.deadline && v < it.deadline) fail(`${it.id} — 발표일(${v})이 마감일(${it.deadline})보다 앞섭니다`);
         } else if (k === 'amountValue') {
           v = Number(v) || 0;
+          /* 🔴 음수는 합계를 **깎는다** — 자유 입력 칸이라 오타 하나로 들어온다.
+             비우려면 0 이다(그때는 '· 비움' 표식이 붙는다). */
+          if (v < 0) fail(`${it.id} — 금액은 0 이상이어야 합니다 (받은 값: ${v})`);
         } else if (k === 'deadline' && v) {
           if (!isDay(v)) fail(`마감일 형식이 올바르지 않습니다: ${v} (YYYY-MM-DD · 달력에 있는 날)`);
         } else if (k === 'type' && v && !['교내', '교외'].includes(v)) {
@@ -613,13 +621,47 @@ switch (action) {
         /* 학생 화면 문구(period)가 마감을 따라간다 — 규칙은 화면과 같은 함수(edit-diff periodAfterDeadline).
            적으면 D-14 옆에 '원문 확인'이 남지 않게, 비우면 방금 지운 날짜가 남지 않게.
            사람이 문구를 직접 보냈으면(patch.period) 그쪽이 이긴다. */
-        if (!('period' in (patch || {}))) {
+        /* 🔴 **'키가 patch 에 있나' 로 가르면 안 된다** (2026-09-18 코드 리뷰 · 세 관점이 따로 잡았다).
+           검수 시트는 `[data-ed]` 칸을 **전부** 보내므로 `period` 가 늘 patch 에 실려 있고,
+           그래서 이 파생이 시트 경로에서는 **한 번도 안 돌았다**(2026-09-16 주석이 막겠다고
+           적어 둔 상태가 그대로 남아 있었다 — 실증: 마감만 적으면 `D-105` 옆에 '접수 기간
+           원문 확인' 이 그대로 붙는다). 가르는 기준은 **그 칸이 실제로 바뀌었나** 하나다. */
+        if (!changed.includes('period')) {
           const after = periodAfterDeadline(it.period, it.deadline, oldDeadline);
           if (after !== (it.period || '')) { it.period = after; if (!changed.includes('period')) changed.push('period'); }
         }
       }
       /* 발표일도 같은 규칙 — 로봇(fillCalendarDates)이 이 표식을 본다 */
       if (changed.includes('announceDate')) it.announceDateFrom = it.announceDate ? OWNER : `${OWNER} · 비움`;
+      /* 금액도 같은 규칙 (2026-09-17 · F-9 컨펌 2 · 개발자 결정 '나' — 관리자가 손으로 채운다).
+         🔴 **문구를 같이 고치지 않으면 감사가 이 묶음을 통째로 되돌린다** — entry-rules 는
+            `amountValue > 0` 인데 문구에 숫자가 없으면 오류로 잡는다(카드는 '금액 원문 확인',
+            합계는 500만원이라고 서로 다른 말을 하기 때문이다). 규칙은 화면의 전후 대조와
+            **같은 함수**(edit-diff amountAfterValue)를 쓴다 — 갈라지면 미리보기가 거짓말을 한다.
+         🔴 표식이 없으면 로봇(extract-amounts)이 **다음 날 아침에 덮는다**. 비울 때도 남긴다 —
+            사람이 지운 틀린 금액을 로봇이 같은 줄에서 다시 읽어 되채우기 때문이다(마감일과 같다). */
+      if (changed.includes('amountValue')) {
+        it.amountFrom = Number(it.amountValue) > 0 ? OWNER : `${OWNER} · 비움`;
+        /* 🔴 **로봇이 읽어 둔 금액 구조(amountSpec)는 사람 값과 어긋나면 물러난다.**
+           합계를 내는 `amountWon` 은 amountSpec 을 **먼저** 보고 amountValue 는 그것이
+           없을 때만 본다. 그래서 구조를 두면 사람이 적은 숫자가 학생 화면에 한 글자도 안 닿는다 —
+           카드는 '300만원', 합계는 등록금 비율로 계산한 딴 숫자가 된다(2026-09-18 코드 리뷰가
+           실제 공고 둘로 재현했다: 비율형 `auto-ent2431260146…` · 절대액형 `reg-hi-jeongeup`).
+           게다가 이때 붙는 `관리자` 표식 때문에 로봇이 그 공고를 다시 읽지 않으므로
+           **틀린 로봇 값이 '사람이 보증한 값' 표식을 달고 굳는다.**
+           ⚠️ 값이 같으면 그대로 둔다 — 그 구조에는 원문 근거(raw)가 들어 있고, 감사가
+              '금액 근거 없음' 을 세는 자리다. 어긋날 때만 버린다.
+           ⚠️ 카드 문구(amount)는 비울 때 건드리지 않는다 — 무엇으로 되돌릴지 우리가 모른다.
+              같은 수정 시트의 '금액 문구' 칸에서 사람이 고친다. */
+        const won = Number(it.amountValue) > 0 ? Number(it.amountValue) : 0;
+        const spec = it.amountSpec;
+        const specAgrees = !!spec && (spec.kind === 'fixed' || spec.kind === 'range') && Number(spec.value) === won;
+        if (spec && !specAgrees) { delete it.amountSpec; changed.push('amountSpec'); }
+        if (!changed.includes('amount')) {
+          const after = amountAfterValue(it.amount, it.amountValue);
+          if (after !== (it.amount || '')) { it.amount = after; if (!changed.includes('amount')) changed.push('amount'); }
+        }
+      }
       return changed;
     };
 

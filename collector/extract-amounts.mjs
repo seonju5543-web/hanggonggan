@@ -21,6 +21,10 @@ import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { indexTexts, sourceFor, hasText } from './notice-source.mjs';
 import { attachmentText, readable, docOrder } from './attachment-text.mjs';
+/* 🔴 금액 문구(`500만원`)를 만드는 규칙은 **한 곳**이다 — 관리자 화면이 손으로 금액을 적을
+   때도 같은 문구가 붙어야 한다(2026-09-17 · F-9 컨펌 2). 여기에 다시 적으면 로봇이 쓴 카드와
+   사람이 쓴 카드가 다른 꼴로 뜬다. */
+import { amountText } from '../tools/edit-diff.mjs';
 
 const require = createRequire(import.meta.url);
 const PA = require('../parse-amount.js');
@@ -166,13 +170,6 @@ for (const [key, group] of byFoundation) {
 /* ── 보고 ─────────────────────────────────────────────────── */
 const man = (n) => (n ? (n / 10000).toLocaleString('ko-KR') + '만원' : '-');
 
-/* 카드에 뜰 금액 문구. 만원으로 딱 떨어지면 `500만원`, 아니면 `1,234,000원`. */
-const wonText = (n) => (n % 10000 === 0
-  ? (n / 10000).toLocaleString('ko-KR') + '만원'
-  : n.toLocaleString('ko-KR') + '원');
-const amountText = (a) => (a.kind === 'range'
-  ? `${wonText(a.min)} ~ ${wonText(a.max)}`
-  : wonText(a.value));
 console.log(`\n■ 금액 읽기 — 등록 ${items.length}건 (원문 있음 ${read} · 없음 ${noText}${fromAi ? ` · 그중 AI 가 읽어 둔 첨부에서 건진 것 ${fromAi}건` : ''}${fromDoc ? ` · 공고문 첨부 글자에서 건진 것 ${fromDoc}건` : ''})`);
 console.log(`   절대액 ${stat.fixed + stat.range}건 · 등록금 비율 ${stat.ratio}건 · 시급 ${stat.hourly}건 · 미확인 ${stat.unknown}건`);
 console.log(`\n■ 이중수혜`);
@@ -219,8 +216,14 @@ for (const it of items) {
        다음 실행에 지웠다 — **근거를 남길수록 사라지는** 구조였다.
        바로 아래 `exclusivityFrom` 은 이미 `!== OWN_*` 로 판정한다(그 주석이 "표식이 없는
        옛 데이터도 여전히 사람 값이다" 라고 적어 뒀다) — 금액만 어긋나 있었다.
-       ⚠️ 표식이 없는 옛 데이터는 그대로 사람 값이다(undefined !== OWN_AMOUNT). */
-    const humanAmount = (it.amountSpec || Number(it.amountValue) > 0) && it.amountFrom !== OWN_AMOUNT;
+       ⚠️ 표식이 없는 옛 데이터는 그대로 사람 값이다(undefined !== OWN_AMOUNT).
+       🔴 `· 비움` 은 사람이 **틀린 금액을 지운** 조치다 (2026-09-17 · F-9 컨펌 2) — 값이
+          비었다고 로봇에게 돌려주면 다음 실행이 같은 줄을 다시 읽어 **같은 틀린 금액을
+          되채운다**(마감일에서 겪었다). 그래서 비움 표식도 사람 값으로 본다. */
+    const amountCleared = /^관리자 .*· 비움$/.test(it.amountFrom || '');
+    const humanAmount = amountCleared
+      || ((it.amountSpec || Number(it.amountValue) > 0) && it.amountFrom !== OWN_AMOUNT);
+
     if (humanAmount) keptHuman += 1;
     else if (a.kind === 'unknown') { delete it.amountSpec; delete it.amountFrom; }
     else { it.amountSpec = a; it.amountFrom = OWN_AMOUNT; wrote++; }

@@ -4295,10 +4295,79 @@ console.log('\n■ 이중수혜 — 가족 안의 이야기를 「다른 장학�
      /amountFrom !== OWN_AMOUNT/.test(ea), true);
   eq('  표식이 없어야 사람이라던 옛 판정이 남아 있지 않다',
      /humanAmount = !it\.amountFrom &&/.test(ea), false);
+  /* 🔴 `· 비움` 은 사람이 **틀린 금액을 지운** 조치다 (2026-09-17 · F-9 컨펌 2) — 값이 비었다고
+     로봇에게 돌려주면 다음 실행이 같은 줄을 다시 읽어 같은 틀린 금액을 되채운다. */
+  eq('  사람이 비운 금액도 되채우지 않는다 (틀린 금액을 지운 조치가 무효가 되지 않게)',
+     /const amountCleared = \/\^관리자 \.\*· 비움\$\//.test(ea) && /humanAmount = amountCleared/.test(ea), true);
   eq('  sameAs 도 제가 붙인 것만 지운다', /it\.sameAsFrom === OWN_SAME/.test(ea), true);
   /* 🔴 다른 로봇은 전부 날짜만 적는다 — 여기만 시각까지 적으면 매 실행 파일이 더러워진다 */
   eq('  updatedAt 은 날짜만 적는다 (매 실행 더러워지지 않게)',
      /toISOString\(\)\.slice\(0, 10\)/.test(ea), true);
+}
+
+console.log('\n■ 금액을 로봇이 못 읽은 공고 — 사람이 적는다 (2026-09-17 · 노션 F-9 컨펌 2)');
+{
+  /* 🔴 왜 있나 — 개발자가 '관리자 화면에서 손으로 채운다' 로 정했다(다른 안이던 본문 재수집
+     로봇은 고르지 않았다). 그런데 **숫자만 넣으면 감사가 묶음 전체를 되돌린다**:
+     entry-rules 는 `amountValue > 0` 인데 카드 문구에 숫자가 없으면 오류로 잡는다
+     (카드는 '금액 원문 확인', 합계는 500만원이라고 서로 다른 말을 하기 때문이다).
+     그래서 문구를 만드는 규칙이 **한 곳**이어야 하고, 화면의 전후 대조도 같은 것을 써야 한다. */
+  const ed = readText(new URL('../tools/edit-diff.mjs', import.meta.url));
+  const aa = readText(new URL('../tools/admin-apply.mjs', import.meta.url));
+  const ea = readText(new URL('../collector/extract-amounts.mjs', import.meta.url));
+  const adminJs = readText(new URL('../_admin/admin.js', import.meta.url));
+  const { wonText, amountText, amountAfterValue, diffPatch: dp } = await import('../tools/edit-diff.mjs');
+
+  eq('금액 문구를 만드는 규칙이 한 곳이다 (로봇이 가져다 쓴다)',
+     /import \{ amountText \} from '\.\.\/tools\/edit-diff\.mjs'/.test(ea), true);
+  /* 🔴 베끼면 로봇이 적는 문구와 사람이 적을 때 붙는 문구가 갈라진다 */
+  /* ⚠️ **꼴을 하나만 찾으면 사본을 놓친다** (2026-09-18 코드 리뷰) — 예전엔 로봇에서는
+     `const wonText =`, 화면에서는 `function wonText` 만 찾아서, 서로 반대 꼴로 베끼면
+     그냥 통과했다. 두 파일에 같은 잣대를 댄다. */
+  const copiesWonText = (t) => /(?:const|let|var|function)\s+wonText\b/.test(t);
+  eq('  로봇·화면이 제 사본을 다시 만들지 않는다',
+     copiesWonText(ea) || copiesWonText(adminJs), false);
+  eq('  화면도 같은 파일에서 가져온다',
+     /import \{[^}]*wonText[^}]*\} from '\.\/vendor\/edit-diff\.mjs'/.test(adminJs), true);
+
+  eq('만원으로 딱 떨어지면 만원, 아니면 원',
+     [wonText(5000000), wonText(1234000), amountText({ kind: 'range', min: 1000000, max: 3000000 })],
+     ['500만원', '1,234,000원', '100만원 ~ 300만원']);
+  /* 🔴 이미 숫자가 든 문구는 건드리지 않는다 — 사람이 다듬은 뜻을 맨 숫자로 덮으면 사라진다 */
+  eq('이미 숫자가 든 문구는 덮지 않는다',
+     amountAfterValue('등록금 + 영농정착 지원 300만원', 5000000), '등록금 + 영농정착 지원 300만원');
+  eq('  숫자가 없는 문구에만 넣는다', amountAfterValue('금액 원문 확인', 5000000), '500만원');
+  eq('  비우는 조치는 문구를 건드리지 않는다 (무엇으로 되돌릴지 모른다)',
+     amountAfterValue('금액 원문 확인', 0), '금액 원문 확인');
+
+  /* 화면이 예고한 칸과 저장소가 고치는 칸이 같아야 한다 */
+  const rows = dp({ id: 'x', amount: '금액 원문 확인', amountValue: 0 }, { amountValue: 3000000 });
+  eq('화면의 전후 대조가 카드 문구까지 예고한다',
+     rows.map((r) => `${r.key}=${r.after}`), ['amountValue=3000000', 'amount=300만원']);
+  eq('  저장소가 같은 함수를 쓴다', /amountAfterValue\(it\.amount, it\.amountValue\)/.test(aa), true);
+  /* 🔴 표식이 없으면 로봇이 다음 날 아침에 덮는다 — 비울 때도 남긴다(마감일과 같은 이유) */
+  eq('  관리자가 금액을 고치면 표식을 남긴다',
+     /changed\.includes\('amountValue'\)/.test(aa)
+     && /it\.amountFrom = Number\(it\.amountValue\) > 0 \? OWNER : `\$\{OWNER\} · 비움`/.test(aa), true);
+  /* 🔴 **비울 때는 로봇이 읽어 둔 구조도 함께 지워야 한다** — 합계는 amountSpec 을 먼저 보고
+     amountValue 는 그것이 없을 때만 본다. 안 지우면 사람이 '틀렸다' 고 지운 금액이 학생
+     화면에 그대로 떠 있는다(받을 수 없는 숫자를 보여 주는 일). 아래 한 줄이 그 근거다. */
+  const PAa = createRequire(import.meta.url)('../parse-amount.js');
+  eq('  (근거) 합계는 amountSpec 을 먼저 본다 — 그래서 숫자만 비우면 티가 안 난다',
+     PAa.amountWon({ amountSpec: { kind: 'fixed', value: 2500000 }, amountValue: 0 }, 0), 2500000);
+  /* 🔴 **여기서 글자로 재지 않는다** — 이 규칙이 진짜 도는지는 아래 「관리자 쓰기」 절이
+     `admin-apply.mjs` 를 자식 프로세스로 돌려 본다(ⓓ~ⓕ). 코드 리뷰가 실증했듯, 정규식으로
+     재면 조건을 죽이고 그 문장을 주석에 남기는 것만으로 초록불이 된다. */
+
+  /* 🔴 화면은 금액을 짐작하지 않는다(원칙 8-1) · 숫자 한 칸으로 못 적는 것은 비워 둔다 */
+  eq('화면이 금액을 짐작하지 않는다고 말한다', /화면은 금액을 짐작하지 않습니다/.test(adminJs), true);
+  eq('  자릿수 실수를 막는 천장이 있다 (만원 칸에 원을 치면 300억이 된다)',
+     /n > MAN_MAX/.test(adminJs) && /const MAN_MAX = 10000/.test(adminJs), true);
+  /* 🔴 학생 화면에 없는 공고를 할 일로 올리면 잡음이 된다 — 잡음이 된 관문·목록은 꺼진다 */
+  eq('  마감이 지난 공고는 적는 목록에 올리지 않는다',
+     /dday\(it\.deadline\) == null \|\| dday\(it\.deadline\) >= 0/.test(adminJs), true);
+  eq('  품질 카드도 같은 셈을 쓴다 (카드 숫자와 줄 수가 갈라지지 않게)',
+     /const noAmount = noAmountItems\(\)\.length/.test(adminJs), true);
 }
 
 console.log('\n■ 만들어 놓고 안 돌리는 로봇이 없는가 (2026-09-13 · 노션 F-9)');
@@ -6498,7 +6567,7 @@ console.log('\n■ 관리자 쓰기 — 되돌릴 수 없는 일 앞의 안전�
 {
   const script = fileURLToPath(new URL('../tools/admin-apply.mjs', import.meta.url));
   /* 공고 N건짜리 사본 저장소를 만들고 한 가지 일을 시킨다 */
-  const run = (action, payload, n = 20) => {
+  const run = (action, payload, n = 20, tweak = null) => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'admwrite-'));
     fs.mkdirSync(path.join(dir, 'data'), { recursive: true });
     fs.mkdirSync(path.join(dir, 'collector'), { recursive: true });
@@ -6509,6 +6578,7 @@ console.log('\n■ 관리자 쓰기 — 되돌릴 수 없는 일 앞의 안전�
       eligibility: { selective: true }, documents: ['재학증명서'],
       deadline: '2026-12-01', noForm: '양식 없음', auto: true, listedAt: '2026-09-01',
     }));
+    if (tweak) items.forEach(tweak);
     fs.writeFileSync(path.join(dir, 'data/registered.json'), `${JSON.stringify({ items }, null, 1)}\n`);
     fs.writeFileSync(path.join(dir, 'data/forms.json'), JSON.stringify({ forms: {}, templates: {} }));
     fs.writeFileSync(path.join(dir, 'collector/auto-register-config.json'),
@@ -6524,6 +6594,60 @@ console.log('\n■ 관리자 쓰기 — 되돌릴 수 없는 일 앞의 안전�
     return { status: r.status, out, after, cfg, left: after.length };
   };
   const ids = (a, b) => Array.from({ length: b - a }, (_, i) => `reg-t${a + i}`);
+  /* ⑨ 금액을 손으로 채우는 길 — **글자를 훑지 않고 저장소를 실제로 돌려 본다** (2026-09-18).
+     🔴 앞서 이 기능의 관문 둘은 `admin-apply.mjs` 의 **소스 글자**를 정규식으로 보고 있었다.
+        코드 리뷰가 그 무력함을 실증했다: 실제 조건을 `if (false && …)` 로 죽이고 정규식이
+        찾는 문장을 주석에 남겨 두자 관문이 그대로 초록불이었다. 이 절이 그 자리를 메운다.
+     🔴 그리고 여기서만 잡히는 진짜 사고가 있었다 — **검수 시트는 `[data-ed]` 칸을 전부
+        보내므로 `amount`·`period` 가 늘 patch 에 실린다.** 파생을 '키가 왔나' 로 가르면
+        시트 경로에서 한 번도 안 돌고, 금액 쪽은 감사가 오류를 내 `admin-apply.yml` 이
+        **그 묶음의 다른 수정까지 통째로 되돌린다.** */
+  {
+    const sheet = (id, patch) => ({ edits: [{ id, patch }] });
+    /* ⓐ 시트처럼 '안 바뀐 문구' 를 함께 보내도 카드 문구가 따라간다 */
+    const withLabel = run('edit', sheet('reg-t0', { amount: '금액 원문 확인', amountValue: 3000000 }), 3);
+    const w0 = withLabel.after.find((x) => x.id === 'reg-t0');
+    eq('시트가 안 바뀐 금액 문구를 같이 보내도 문구가 숫자를 따라간다 (감사가 묶음을 되돌리던 자리)',
+      [withLabel.status, w0.amount, w0.amountValue], [0, '300만원', 3000000]);
+    eq('  사람 표식이 붙는다 (로봇이 다음 날 안 덮게)', /^관리자 /.test(w0.amountFrom || ''), true);
+    /* ⓑ 마감 → 기간 문구도 같은 꼴 (감사가 안 잡아 조용히 나가던 자리) */
+    /* ⚠️ 픽스처에 기간 문구를 **미리** 넣는다 — 안 넣으면 시트가 보낸 값이 '안 바뀐 값'이
+       아니라 새 값이 되어, 파생을 건너뛰는 것이 맞는 동작이 된다(이 검사를 만들며 겪었다). */
+    const dl = run('edit', sheet('reg-t0', { deadline: '2026-12-31', period: '접수 기간 원문 확인' }), 3,
+      (it) => { it.period = '접수 기간 원문 확인'; });
+    eq('시트가 안 바뀐 기간 문구를 같이 보내도 문구가 마감을 따라간다',
+      dl.after.find((x) => x.id === 'reg-t0').period, '접수 기간 ~2026-12-31');
+    /* ⓒ 사람이 문구를 **진짜로** 고치면 그쪽이 이긴다 (덮어쓰지 않는다) */
+    const own = run('edit', sheet('reg-t0', { amount: '등록금 전액 + 생활비', amountValue: 3000000 }), 3);
+    eq('  사람이 문구를 직접 고치면 그대로 둔다', own.after.find((x) => x.id === 'reg-t0').amount, '등록금 전액 + 생활비');
+    /* ⓓ 로봇이 읽어 둔 구조가 사람 값과 어긋나면 물러난다 — 합계는 amountSpec 을 먼저 본다 */
+    const ratio = run('edit', sheet('reg-t1', { amountValue: 3000000 }), 3,
+      (it) => { if (it.id === 'reg-t1') { it.amountSpec = { kind: 'ratio', ratio: 1, value: 0, raw: '등록금 전액' }; it.amountFrom = '공고 원문'; } });
+    const r1 = ratio.after.find((x) => x.id === 'reg-t1');
+    eq('🔴 사람이 적은 금액과 어긋나는 로봇 구조는 물러난다 (카드와 합계가 다른 말을 하지 않게)',
+      [r1.amount, r1.amountValue, r1.amountSpec], ['300만원', 3000000, undefined]);
+    /* ⓔ 값이 같으면 구조를 남긴다 — 그 안에 원문 근거(raw)가 있고 감사가 그걸 센다 */
+    const same = run('edit', sheet('reg-t1', { amountValue: 2500000 }), 3,
+      (it) => { if (it.id === 'reg-t1') { it.amountSpec = { kind: 'fixed', value: 2500000, raw: '금 액 : 250 만 원' }; it.amountFrom = '공고 원문'; it.amount = '250만원'; it.amountValue = 2500000; } });
+    eq('  값이 같은 구조는 남긴다 (원문 근거를 버리지 않는다)',
+      !!same.after.find((x) => x.id === 'reg-t1').amountSpec, true);
+    /* ⓕ 비우기 — 표식이 남고 구조도 함께 지워진다(안 지우면 지운 티가 안 난다) */
+    const clear = run('edit', sheet('reg-t2', { amountValue: 0 }), 3,
+      (it) => { if (it.id === 'reg-t2') { it.amountValue = 2500000; it.amount = '250만원'; it.amountSpec = { kind: 'fixed', value: 2500000, raw: '250만원' }; it.amountFrom = '공고 원문'; } });
+    const c2 = clear.after.find((x) => x.id === 'reg-t2');
+    eq('금액을 비우면 · 비움 표식이 남고 로봇 구조도 함께 지워진다',
+      [/· 비움$/.test(c2.amountFrom || ''), c2.amountSpec, c2.amount], [true, undefined, '250만원']);
+    /* ⓖ 음수는 그 자리에서 막는다 — 합계를 깎는다 */
+    const neg = run('edit', sheet('reg-t0', { amountValue: -5000 }), 3);
+    eq('음수 금액은 저장소가 멈춘다 (합계를 깎는다)', [neg.status !== 0, neg.after.find((x) => x.id === 'reg-t0').amountValue], [true, 0]);
+    /* ⓗ 정식 등록 갈래도 같은 함수를 쓴다 — 여기만 옛 모양으로 남아 있었다 */
+    const reg1 = run('register', { notice: { url: 'https://example.ac.kr/view.do?seq=777', title: '새로 등록하는 검사용 장학금' },
+      patch: { name: '새로 등록하는 검사용 장학금', amountValue: 3000000, type: '교외', provider: '검사용' } }, 3);
+    const added = reg1.after.find((x) => x.name === '새로 등록하는 검사용 장학금');
+    eq('정식 등록 갈래도 문구가 숫자를 따라간다 (감사가 그 등록을 되돌리던 자리)',
+      [reg1.status, added && added.amount, added && added.amountValue], [0, '300만원', 3000000]);
+  }
+
 
   /* ① 많이 지우기 — 건수를 숫자로 한 번 더 받지 않으면 **한 건도** 안 지운다 */
   const big = run('remove', { ids: ids(0, 6) });
