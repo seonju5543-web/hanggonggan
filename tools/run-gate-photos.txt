@@ -1,4 +1,6 @@
 이 파일을 고쳐 push 하면 .github/workflows/gate-photos.yml 이 돈다 (push-to-run).
 결과: docs/designs/assets/gates/ 에 사진 + manifest.json
+🔴 branch 줄이 지금 push 하는 브랜치와 같을 때만 돈다 (deploy/run-deploy.txt 와 같은 안전장치 · 강제 push 에는 안 돈다).
+branch: claude/quirky-clarke-x4i9a4
 only: cau
 run: 2026-09-18 #4 — 중앙대만 (3차까지 0장 · 검색어 넓힘)

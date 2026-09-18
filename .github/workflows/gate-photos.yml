@@ -20,12 +20,31 @@ jobs:
   fetch:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # 🔴 강제 push(브랜치를 다시 세우는 것)에는 돌지 않는다 — 2026-09-18 실제로 겪었다: 브랜치를 기본 브랜치 위에
+    #    다시 세워 force-push 하자 표식 파일이 한 글자도 안 바뀌었는데 이 로봇이 돌아 중앙대 후보 4장(1.7MB)을
+    #    다시 받아 커밋했다(GitHub 은 강제 push 에서 바뀐 파일을 못 가려 paths 를 무시한다).
+    if: ${{ !github.event.forced }}
     steps:
       - uses: actions/checkout@v4
+      # 🔴 표식 파일의 branch 줄과 push 된 브랜치가 같을 때만 돈다 (deploy/run-deploy.txt 와 같은 안전장치).
+      #    이 파일은 기본 브랜치를 타고 모든 작업 브랜치로 퍼지므로, 남이 기본 브랜치를 병합해 받는 것만으로
+      #    그 사람 브랜치에서 사진 수집이 돌아 커밋이 남는다(로봇 기록장이 옆 브랜치에서 갈라진다).
+      - name: 표식 확인
+        id: mark
+        run: |
+          WANT=$(grep -oE '^branch:[[:space:]]*\S+' tools/run-gate-photos.txt | sed -E 's/^branch:[[:space:]]*//' || true)
+          if [ "$WANT" != "${GITHUB_REF_NAME}" ]; then
+            echo "표식의 branch 줄('$WANT')이 이 브랜치('${GITHUB_REF_NAME}')가 아니라 건너뜁니다."
+            echo "run=no" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=yes" >> "$GITHUB_OUTPUT"
+          fi
       - uses: actions/setup-node@v4
+        if: steps.mark.outputs.run == 'yes'
         with:
           node-version: '22'
       - name: 위키미디어 공용에서 정문 사진 받기
+        if: steps.mark.outputs.run == 'yes'
         env:
           FRESH: '1'   # 지난 실행의 사진을 비우고 다시 받는다 (걸러 낸 사진이 남지 않게)
         run: |
@@ -33,6 +52,7 @@ jobs:
           ONLY=$(grep -oE '^only:[[:space:]]*[a-z,]+' tools/run-gate-photos.txt | sed -E 's/^only:[[:space:]]*//' || true)
           ONLY="$ONLY" node tools/fetch-gate-photos.mjs docs/designs/assets/gates
       - name: 결과 커밋
+        if: steps.mark.outputs.run == 'yes'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
