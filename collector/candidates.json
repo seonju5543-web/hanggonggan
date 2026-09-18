@@ -1,8 +1,17 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-09-18",
- "count": 2061,
+ "count": 2062,
  "items": [
+  {
+   "title": "[공통][국가] 2026-2학기 고졸후학습자(희망사다리2유형) 장학금 신청(~9/17)",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/267154/artclView.do",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-09-18"
+  },
   {
    "title": "[공통][교외]2026-2학기 정영오(Luke) 장학금 장학생 모집안내",
    "url": "https://dep.hufs.ac.kr/bbs/student/2431/267001/artclView.do",
