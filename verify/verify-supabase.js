@@ -304,6 +304,23 @@ const seedScript = (seed) => `localStorage.setItem('handaejang.v1', ${JSON.strin
     ok(before && before[0].profile && before[0].profile.flags === undefined,
       '동의 전에는 특별자격이 안 나간다', before && before[0].profile && before[0].profile.flags);
     ok(before && before[0].sensitive_ok === false, '동의 여부가 false로 기록된다');
+    /* 🔴 **처지(traits) 도 민감정보다** (2026-09-18 코드 리뷰). `religion`(해당 종교)·
+       `married`(혼인)·`military`(군 복무)·`farm`(농어촌)이 들어가는데 `SYNC_SENSITIVE_KEYS`
+       에 없어 **동의와 무관하게 나가고 있었다**. 종교는 개인정보 보호법 제23조가 이름을
+       적어 둔 값이라 '나중에'가 없다.
+       ⚠️ 이 줄이 심어 둔 값을 상대로 재는지 먼저 못 박는다 — 프로필에 traits 가 아예 없으면
+          `undefined` 라 **아무것도 안 막고도 통과**한다(이 저장소의 단골 실패 유형). */
+    await page.evaluate(() => {
+      state.profile.traits = { religion: true, married: false };
+      saveState();
+    });
+    await page.waitForTimeout(800);
+    ok(await page.evaluate(() => !!(state.profile.traits || {}).religion),
+      '  (준비) 처지가 기기에 실제로 심어졌다');
+    const beforeT = (received.filter((r) => r.method === 'POST' && r.path.startsWith('/rest/v1/profiles')).pop() || {}).body;
+    ok(beforeT && beforeT[0].profile && beforeT[0].profile.traits === undefined,
+      '  동의 전에는 처지(종교·혼인 등)도 안 나간다',
+      beforeT && beforeT[0].profile && beforeT[0].profile.traits);
     /* 기기에는 그대로 남아 있어야 한다 — 매칭이 달라지면 안 된다 */
     ok(await page.evaluate(() => state.profile.flags.length) === 2, '동의와 무관하게 기기에는 남아 있다');
 
@@ -313,6 +330,8 @@ const seedScript = (seed) => `localStorage.setItem('handaejang.v1', ${JSON.strin
     ok(after && after[0].profile && Array.isArray(after[0].profile.flags)
       && after[0].profile.flags.includes('basicLiving'), '동의하면 특별자격이 올라간다');
     ok(after && after[0].sensitive_ok === true, '동의 여부가 true로 기록된다');
+    ok(after && after[0].profile && after[0].profile.traits
+      && after[0].profile.traits.religion === true, '  동의하면 처지도 올라간다');
     await firstPage.ctx.close();
   }
 

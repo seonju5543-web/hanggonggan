@@ -33,8 +33,14 @@ const REMEMBER_KEY = 'handaejang.remember';
 const SYNC_OMIT_COMMON = ['rrn', 'account'];
 
 /* 특별자격(기초생활수급·장애·국가유공자 등)은 **민감정보**라 별도 동의가 필요하다.
-   동의하지 않으면 서버로 올리지 않는다 — 기기에는 그대로 남으므로 매칭은 지금과 똑같다. */
-const SYNC_SENSITIVE_KEYS = ['flags'];
+   동의하지 않으면 서버로 올리지 않는다 — 기기에는 그대로 남으므로 매칭은 지금과 똑같다.
+   🔴 **`traits`(처지) 도 같은 칸이다** (2026-09-18 코드 리뷰에서 잡았다). 그 묶음에는
+      `religion`(해당 종교)·`married`(혼인 여부)·`military`(군 복무)·`farm`(농어촌 가정)이
+      들어간다 — 종교는 개인정보 보호법 제23조가 이름을 적어 둔 민감정보다. 새로 생긴 칸이
+      이 목록에 안 들어와서 **동의와 무관하게 서버로 나가고 있었다**(Supabase 는 켜져 있다).
+   ⚠️ 프로필에 민감한 칸을 새로 만들면 **여기에 이름을 더하는 것까지가 한 세트**다.
+      관문 `verify/verify-supabase.js` 가 나가는 요청 본문을 모아 실제로 안 나가는지 센다. */
+const SYNC_SENSITIVE_KEYS = ['flags', 'traits'];
 
 /* ---------------- 로그인 상태 ---------------- */
 function authLoad() {

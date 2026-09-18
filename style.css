@@ -4734,7 +4734,6 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 /* 손가락으로 눌렀을 때 회색 판이 뜨지 않게 — 설정 목록과 같은 규칙 */
 .sup-top-item, .sup-more { -webkit-tap-highlight-color: transparent; }
 
-<<<<<<< HEAD
 /* ── 자격 확인 도우미 (2026-09-17 · 노션 AI-1 · 2026-09-18 개발자 지시로 재단장) ──
    🔴 앱이 하는 말은 「미확인 자격 n」뿐이다. 설명 문장을 넣지 말 것(설계 3-2).
    🔴 **미확인 줄을 여기 다시 나열하지 않는다** — 위 자격 블록이 이미 보여 준다.
@@ -4813,7 +4812,6 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
   font: inherit; font-size: var(--t-xs); font-weight: 600;
 }
 .elig-ask-later:active, .elig-ask-save:active { transform: scale(0.95); }
-=======
 /* ══ 홈 히어로 (2026-09-17 개발자 지시 2차) ═══════════════════════════════════
    아랫줄(`.hero-count`)을 통째로 없앴다 — '그중 n건은 바로 신청할 수 있어요' 가
    마지막 한 줄이었고 개발자가 그것도 지우라고 했다(그 앞에 금액 회계 두 줄을 걷었다).
@@ -4822,7 +4820,6 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
    🔴 이 파일은 **뒤 블록이 앞을 덮으므로** 값은 여기 적어야 실제로 먹는다
       (CLAUDE.md '파일 끝 카드 블록이 앞의 규칙을 전부 덮는다' 와 같은 이유). */
 .hero-amount { margin-bottom: 20px; }
->>>>>>> origin/claude/nice-heisenberg-WESq5
 
 /* 처지 예/아니요 — 프로필에 칸이 없던 개인 사정 (2026-09-18 · 노션 AI-1) */
 .elig-ask-yn { align-items: flex-start; flex-wrap: wrap; gap: var(--space-8); }
