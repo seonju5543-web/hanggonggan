@@ -491,7 +491,7 @@ function lineVerdict(text, p, isExclude, ctx) {
     }
     /* 🔴 본 경로의 '묻지 않은 처지' 관문도 **여기서 똑같이** 건다 (2026-09-17 코드 리뷰).
        빠뜨리면 `학자금대출을 받은 … 재학생` 같은 줄이 택1 묶음 안에서만 ✓ 로 되살아난다. */
-    if (pass && PR.unaskedAttr(text, cs)) return null;
+    if (pass && PR.unaskedAttr(text, cs, p)) return null;
     return pass ? 'ok' : null;
   }
   const { conds } = PR.parseLine(text, !!isExclude);
@@ -545,7 +545,7 @@ function lineVerdict(text, p, isExclude, ctx) {
     else if (v === 'unknown') unknown = true;
   }
   /* 프로필에 칸이 없는 처지를 물은 줄이면 충족이라고 말하지 않는다 (parse-requirements 참조) */
-  if (seen === 'ok' && PR.unaskedAttr(text, conds)) return null;
+  if (seen === 'ok' && PR.unaskedAttr(text, conds, p)) return null;
   return unknown ? null : seen;
 }
 

@@ -7878,6 +7878,7 @@ console.log('\n■ 처지 요건 — 프로필에 칸이 없던 개인 사정');
 {
   const EA = createRequire(import.meta.url)('../elig-ask.js');
   const MEt = createRequire(import.meta.url)('../match-engine.js');
+  const PRq0 = createRequire(import.meta.url)('../parse-requirements.js');
   const sch = { id: 't', name: '테스트재단', provider: '테스트재단' };
   const base = { school: '한국외국어대학교', campus: '서울', year: 3, status: '재학', flags: [] };
   const v = (line, traits) => MEt.requirementMatch(line, { ...base, traits }, sch);
@@ -7896,8 +7897,70 @@ console.log('\n■ 처지 요건 — 프로필에 칸이 없던 개인 사정');
   eq('  전부 「아니요」 여야 미달이다', v(MANY, { military: false, volunteer: false }), 'no');
   eq('  하나라도 「예」 면 충족', v(MANY, { military: true }), 'ok');
 
+  /* 🔴 **징계는 어느 칸에 있든 「있으면 미달」이다** (2026-09-19 실측으로 잡은 틀린 미달).
+     자격 칸에 **부정문**으로 적히는 일이 흔하다 — `교내 징계처분을 받지 않은 학생`.
+     이것을 보통 처지처럼 읽으면 「징계 없음」이라고 답한 학생이 **미달**이 된다.
+     ⚠️ 부정어 사정거리를 새로 만들어 풀지 말 것 — 층2의 `○` 묶음 줄에서 절 경계가 새
+     `… 3위 이내 입상자 (미술 분야 공모전 … 제외)` 가 「수상하면 미달」이 된다(실측 2줄).
+     장학금이 **징계 받았을 것을 요구하는 일은 없으므로** 종류 자체를 결격으로 둔다. */
+  const DISC = '다 . 교내 징계처분을 받지 않은 학생';
+  eq('징계 — 자격 칸의 부정문에서 「없음」이 충족이다', v(DISC, { discipline: false }), 'ok');
+  eq('  「있음」이면 미달', v(DISC, { discipline: true }), 'no');
+  eq('  안 물어봤으면 판정하지 않는다', v(DISC, undefined), null);
+  const DISC_X = '3) 공고일 현재 정학, 퇴학 등 징계 처분을 받은 학생은 제외';
+  eq('  같은 줄이 제외 문구로 적혀 있어도 뜻이 같다', v(DISC_X, { discipline: false }), 'ok');
+
+  /* 🔴 **제외 칸에서는 결격 처지만 미달을 낸다** (2026-09-19 코드 리뷰 · 전수 24줄 중 9줄이
+     틀린 미달이었다). 제외 칸 줄에 처지 낱말이 있다고 '그 처지면 탈락'이 아니다 — 층2는
+     한 줄에 `○` 로 여러 조항이 뭉쳐 있어 낱말이 어느 조항에 속하는지 알 수 없다. */
+  const exFail = (line, traits) => {
+    const { conds } = PRq0.parseLine(line, true);
+    return conds.filter((c) => c.conf === PRq0.HIGH && c.kind === 'trait')
+      .some((c) => MEt.judgeCond(c, { ...base, traits }, {}) === 'fail');
+  };
+  eq('제외 칸 — 수상자를 「중복 수혜 불가」 로 떨어뜨리지 않는다',
+    exFail('○ 동일한 수상실적으로 중복 수혜 불가', { award: true }), false);
+  eq('  대출자를 「초과시 제외」 로 떨어뜨리지 않는다',
+    exFail('○ 학자금대출과 타 장학금이 해당 학기 등록금을 초과시 제외', { loan: true }), false);
+  eq('  긍정문이 제외 칸에 있어도 뒤집지 않는다 (군필 미달 사고)',
+    exFail('○ 남성의 경우 병역을 마쳤거나 면제인 자만 지원가능', { military: true }), false);
+  eq('  징계는 제외 칸에서 그대로 미달이다', exFail('① 징계받은 자 또는 징계 의결 중인 자', { discipline: true }), true);
+
+  /* 🔴 **물어서 답을 받은 성취는 빗장이 풀린다** — 안 풀면 「예」가 무의미하고 「아니요」만
+     미달을 만든다(실측: 수상 15줄 중 12줄). ⚠️ 물을 칸이 없는 낱말이 남으면 그대로 막힌다. */
+  const AWARD = '예술‧체육‧과학‧기능 분야의 전국규모 이상 대회에서 3위 이상 수상실적이 있는 자';
+  eq('성취를 물어서 답했으면 충족이 된다', v(AWARD, { award: true }), 'ok');
+  eq('  안 물어봤으면 그대로 모른다', v(AWARD, undefined), null);
+  eq('  「아니요」 면 미달', v(AWARD, { award: false }), 'no');
+  eq('  물을 칸이 없는 낱말이 섞이면 풀지 않는다 (추천서)',
+    v('학교장의 추천을 받고 대회에서 3위 이상 수상실적이 있는 자', { award: true }), null);
+
+  /* 🔴 **어느 답으로도 충족이 될 수 없으면 묻지 않는다** — 자기를 떨어뜨리는 것밖에
+     못 하는 단추를 학생에게 주지 않는다. */
+  const ONEWAY = '학교장의 추천을 받고 대회에서 3위 이상 수상실적이 있는 자';
+  eq('답해서 나아질 수 없는 처지는 묻지 않는다',
+    EA.askableFields(ONEWAY, base, sch).filter((k) => k === 'trait:award'), []);
+
+  /* 🔴 넓히려다 되돌린 넷 — 다시 넓히면 여기서 걸린다 (경위는 설계 문서 12절) */
+  const kindsOf = (t) => (PRq0.parseLine(t, false).conds
+    .filter((c) => c.kind === 'trait' || c.kind === 'flags').flatMap((c) => c.anyOf));
+  eq('지역 학사(재사생·학숙)는 학교 기숙사가 아니다',
+    kindsOf('○ 공고일 기준 학숙생활 3개월 이상인 전남학숙 재사생').includes('dorm'), false);
+  eq('  맨 `병역` 으로 넓히지 않는다',
+    kindsOf('○ 남성의 경우 병역을 마쳤거나 면제인 자만 지원가능').includes('military'), false);
+  eq('  `시정유공자`·`새마을 유공자` 는 국가유공자가 아니다',
+    kindsOf('○ 시정유공자로 시장의 포상을 받은 본인 또는 자녀').includes('merit'), false);
+  eq('  `국가보훈등록증`·`참전유공자` 는 맞다',
+    kindsOf('○ 6.25 참전유공자 후손(고손/증손/손자/자녀)').includes('merit'), true);
+  eq('  `셋째 이상` 은 「둘째 이상 자녀」 칸으로 답할 수 없다',
+    kindsOf('○ 반값등록금 대상자 중 셋째 이상 자녀').includes('birthOrder'), false);
+  eq('  `산업재해` 는 재난·재해 피해가 아니다',
+    kindsOf('○ 산업재해 및 기타사유로 가정생활이 어려운 근로자').includes('disaster'), false);
+
   /* 종류와 이름표가 갈라지면 화면에 못 그린다 */
   const PRq = createRequire(import.meta.url)('../parse-requirements.js');
+  eq('결격 처지는 파서가 아는 종류여야 한다',
+    [...PRq.TRAIT_DISQUALIFY].filter((k) => !PRq.TRAIT_PAT.some(([x]) => x === k)), []);
   eq('파서의 처지 종류에 전부 이름표가 있다',
     PRq.TRAIT_PAT.map(([k]) => k).filter((k) => !EA.TRAIT_LABEL[k]), []);
   eq('  이름표만 있고 파서가 모르는 종류는 없다',
