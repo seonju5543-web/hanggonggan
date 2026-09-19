@@ -169,15 +169,21 @@
   "name": "[공통][교외] 2026년 고속도로 장학생 선발(~10/11)"
  },
  "https://dep.hufs.ac.kr/bbs/student/2431/265695/artclView.do": {
-  "tries": 2,
-  "at": "2026-09-19",
+  "tries": 3,
+  "at": "2026-09-20",
   "minBody": 100,
   "name": "공통 제36기 미레에셋 해외교환 장학생 선발"
  },
  "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=323111&menuno=200318": {
-  "tries": 2,
-  "at": "2026-09-19",
+  "tries": 3,
+  "at": "2026-09-20",
   "minBody": 100,
   "name": "공통 2026년 하반기 문주장학재단 AI·ICT 분야 인재 장학생 선발 안내"
+ },
+ "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=323127&menuno=200318": {
+  "tries": 1,
+  "at": "2026-09-20",
+  "minBody": 100,
+  "name": "공통 2026년 하반기 (재)춘천인재육성장학재단 봄내장학생 선발 안내"
  }
 }
