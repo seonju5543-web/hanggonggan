@@ -147,6 +147,12 @@ async function seed(page) {
       nationality: '대한민국', major: '경영학과', regionCity: '동대문구' };
     const els = [...document.querySelectorAll('[data-elig-field]')];
     els.forEach((el) => { el.value = VAL[el.dataset.eligField] || '1'; });
+    /* 🔴 처지 칸도 **같이** 답해야 「물을 것이 없다」가 된다 — 여기를 빠뜨리면
+       스칼라만 채우고 "남은 칸 0" 이라 부르게 된다(처지 종류가 늘자 실제로 그랬다). */
+    for (const k of new Set([...document.querySelectorAll('[data-elig-trait]')]
+      .map((b) => b.dataset.eligTrait))) {
+      document.querySelector(`[data-elig-trait="${k}"][data-elig-val="0"]`).click();
+    }
     return els.map((el) => el.dataset.eligField);
   });
   await page.click('[data-elig-save]');
@@ -156,7 +162,9 @@ async function seed(page) {
     n: await page.evaluate(() => (document.querySelector('.elig-ask-head b') || {}).textContent),
     saveBtn: await page.evaluate(() => !!document.querySelector('[data-elig-save]')),
     later: await page.evaluate(() => !!document.querySelector('.elig-ask-later')),
-    inputs: await page.evaluate(() => document.querySelectorAll('[data-elig-field]').length) };
+    /* 「물을 칸」은 스칼라 입력칸 + 처지 칸이다 — 한쪽만 세면 남아 있는데 없다고 부른다 */
+    inputs: await page.evaluate(() => document.querySelectorAll('[data-elig-field]').length
+      + new Set([...document.querySelectorAll('[data-elig-trait]')].map((b) => b.dataset.eligTrait)).size) };
   ok('저장하면 위 자격 블록의 그 줄이 판정된다 (눈금은 거기 있다)',
     after.rows.filter((r) => /r-ok|r-bad/.test(r.cls)).length
       > before.rows.filter((r) => /r-ok|r-bad/.test(r.cls)).length,

@@ -180,11 +180,17 @@ function parseStatus(t, isExclude) {
 /* ── 특별자격 ── 프로필 flags와 같은 이름을 쓴다 */
 const FLAG_PAT = [
   ['basicLiving', /기초\s?생활\s?수급|기초수급/], ['nearPoverty', /차상위/],
-  ['multiChild', /다자녀/], ['merit', /국가유공|보훈\s?대상|독립유공/],
+  /* ⚠️ `multiChild` 를 `\d자녀 이상` 으로 넓히지 말 것 — 위 TRAIT_PAT 머리말 참조.
+     `merit` 은 `5.18민주유공자`·`국가보훈등록증` 을 놓치고 있었다(실측 1줄). */
+  /* ⚠️ 맨 `유공자` 로 넓히지 말 것 (2026-09-19 코드 리뷰) — `시정유공자`·`새마을사업
+     유공자` 가 걸려 국가유공자 학생이 새마을 장학금에 ✓ 를 받는다(archive 3줄).
+     `flags` 는 '모름' 이 없어 넓히는 순간 곧 ✓ 다 — trait 보다 더 조심해야 한다. */
+  ['multiChild', /다자녀/], ['merit', /(국가|독립|참전|민주)\s?유공|보훈\s?(대상|등록)/],
   /* 🔴 `특수교육대상자` 는 **장애 학생을 가리키는 행정 용어**다 (2026-08-30 개발자 지적:
      "특수교육대상자=장애학생인데 이것도 너가 판정할 수 있는 건데"). 못 알아봐서
      판정에서 빠지고 있었다. `장애인 등에 대한 특수교육법` 의 용어다. */
-  ['disabled', /장애\s?(학생|인|우|의\s?정도)|특수\s?교육\s?대상자?/], ['singleParent', /한부모/],
+  /* ⚠️ `장애등급`·`장애 정도가 심한` 은 **행정 용어 그대로**라 안 넓히면 안 걸린다(실측 2줄). */
+  ['disabled', /장애\s?(학생|인|우|등급|정도|의\s?정도)|특수\s?교육\s?대상자?/], ['singleParent', /한부모/],
   ['defector', /북한이탈|새터민|탈북/], ['multicultural', /다문화/],
   /* 🔴 교환학생도 **온보딩에서 묻는다**(`#in-exchange`) — 안 읽으면 `이공계 학부생` 절만
      맞고 `교환학생 선발 통과` 는 안 보여서, 파견 예정이 아닌 학생에게 ✓ 가 붙는다. */
@@ -214,24 +220,76 @@ function parseFlags(t) {
    ⚠️ 종류를 늘릴 때는 **elig-ask.js 의 TRAIT_ASK 도 같이** 늘린다(질문이 없으면 못 묻는다).
    관문: test-collector '처지 요건' 절 */
 const TRAIT_PAT = [
-  ['award', /입상|수상\s?(실적|경력|자)|공모전|경시\s?대회|대회[^.]{0,10}(3위|입상|수상)/],
+  ['award', /입상|수상\s?(실적|경력|자)|공모전|경시\s?대회|대회[^.]{0,20}(\d\s?위|입상|수상|우승)/],
   ['married', /기혼|미혼|배우자(가|를)?\s?(있|없|둔)|결혼\s?(한|여부)/],
   ['job', /재직\s?(중|자|기간)|직장인|근로자|임직원/],
-  ['career', /진출\s?희망|희망자|지망생/],
+  ['career', /진출\s?희망|희망\s?자|지망생|되기를\s?희망|(취업|창업)\s?\(?\s?희망/],
   ['farm', /농어촌|농업인|어업인|귀농|귀어/],
+  /* ⚠️ `재사생`·`학숙` 을 여기 넣지 말 것 (2026-09-19 코드 리뷰) — 그건 **지역 학사**
+     (충북학사·전남학숙·전북장학숙)이지 우리 학교 기숙사가 아니다. 넣었더니 학교
+     기숙사생이 `전남학숙 재사생` 줄에 ✓ 를 받았다(실측 · 지금 열려 있는 공고). */
   ['dorm', /기숙사|생활관/],
+  /* ⚠️ 맨 `병역` 으로 넓히지 말 것 — 늘어나는 줄이 `남성의 경우 병역을 마쳤거나 면제인
+     자만 지원가능` 하나인데 이게 **자격제한 칸에 적힌 긍정문**이라 군필자가 미달이 됐다. */
   ['military', /군\s?복무|제대\s?군인|병역\s?(필|이행)|전역/],
   ['ged', /검정고시/],
-  ['religion', /스님|승려|불교|사찰|조계|기독교|천주교|교회|성당|목사|신학생/],
+  ['religion', /스님|승려|불교|사찰|조계|기독교|천주교|교회|성당|목사|신학생|재적승|승적/],
   ['member', /회원[^.]{0,4}자녀|조합원|향우회|동문회[^.]{0,4}(자녀|회원)|협회[^.]{0,3}회원|총연합회/],
   ['volunteer', /봉사\s?(활동|시간|실적)/],
-  ['cert', /자격증|토익|토플|텝스|어학\s?(성적|점수)/],
+  ['cert', /자격증|토익|토플|텝스|어학\s?(성적|점수)|아이엘츠|IELTS|오픽|OPIc|HSK|JLPT|한국사\s?능력/i],
+  /* 2026-09-19 개발자 지시 *"오탐없는 범위 내에서 최대한 넓혀"* 로 늘린 여덟.
+     자격 글 540줄(층1 등록 + 층2 KOSAF)을 전수로 훑어 **걸리는 줄을 전부 눈으로 보고** 넣었다.
+     🔴 그때 걸러낸 오탐 둘 — 되돌리지 말 것:
+       · 성별(`남학생`)은 **`전주시 풍남학생 입사생`에 걸린다.** 그래서 성별은 종류를 안 만들었다.
+       · 다자녀를 `\d자녀 이상`으로 넓히면 `(3자녀 이상 가정은 2명 선발)`(선발 인원 안내)이
+         걸려 **다자녀 가정에 틀린 미달**이 붙는다. `둘째 이상`만 쓰고 자리도 flags 가 아니라
+         여기다 — flags 의 `multiChild` 에 합치면 두 자녀 가정이 `셋째 이상` 줄에 ✓ 를 받는다. */
+  ['discipline', /징계/],
+  ['loan', /학자금\s?대출/],
+  ['club', /동아리|학생\s?단체/],
+  /* ⚠️ `산업재해` 는 뺀다 — `산업재해 및 기타사유로 가정생활이 어려운 근로자` 는
+     부모의 근로 사정이지 재난 피해가 아니다(전체 재단 archive 에 있다). */
+  ['disaster', /재난|(?<!산업)재해/],
+  /* ⚠️ `셋째|넷째` 는 넣지 말 것 — 이름표가 `둘째 이상 자녀` 하나라 두 자녀 가정이
+     `셋째 이상 자녀` 줄에 ✓ 를 받는다. 물을 칸을 쪼갤 때까지는 둘째만 읽는다. */
+  ['birthOrder', /둘째\s?아?\s?이상/],
+  ['bereaved', /유가족|유족|양육자의?\s?사망|사망한[^.]{0,14}자녀/],
+  ['sailor', /선원|승무\s?경력/],
+  ['diabetes', /당뇨/],
 ];
 
-function parseTrait(t) {
+/* 🔴 **어느 칸에 있든 「있으면 미달」인 처지** (2026-09-19 실측으로 잡은 틀린 미달).
+   징계는 자격 칸에 **부정문**으로 적히는 일이 흔하다 — `교내 징계처분을 받지 않은 학생`.
+   보통 처지처럼 읽으면 「징계 없음」이라고 답한 학생이 미달이 된다.
+   ⚠️ 부정어 사정거리를 새로 만들어 풀지 말 것 — 층2의 `○` 묶음 줄에서 절 경계가 새
+      `… 3위 이내 입상자 (미술 분야 공모전 … 제외)` 가 「수상하면 미달」이 된다(실측 2줄).
+   장학금이 **징계 받았을 것을 요구하는 일은 없으므로** 종류 자체를 결격으로 둔다. */
+const TRAIT_DISQUALIFY = new Set(['discipline']);
+
+/* 한 줄에 결격 처지와 보통 처지가 같이 나오면 **조건을 갈라서** 낸다 —
+   `anyOf` 하나에 담으면 뜻이 반대인 둘이 한 깃발을 나눠 갖는다.
+
+   🔴 **제외 칸에서는 결격 처지만 미달을 낸다** (2026-09-19 코드 리뷰로 잡은 틀린 미달).
+      제외 칸 줄에 처지 낱말이 있다고 해서 '그 처지면 탈락'인 것이 아니다 — 층2는 한 줄에
+      `○` 로 여러 조항이 뭉쳐 있어 낱말이 **어느 조항에 속하는지 알 수 없다.**
+      전수(제외 칸 24줄): 맞는 미달 15(징계 12·재직 3) · **틀린 미달 9**
+        · `동일한 수상실적으로 중복 수혜 불가`            → 수상자 탈락 (중복수혜 조항이다)
+        · `학자금대출과 타 장학금이 … 초과시 제외`        → 대출자 탈락 (초과가 조건이다)
+        · `남성의 경우 병역을 마쳤거나 면제인 자만 지원가능` → 군필 탈락 (**긍정문이다**)
+        · `정읍시 장학금 수령자(농업인, 이·통장 …)`       → 농어촌 가정 탈락
+      그래서 결격(`TRAIT_DISQUALIFY`) 말고는 **LOW** 로 낸다 — `fitDetail` 의 제외 칸
+      반복문이 HIGH 만 보므로 미달이 안 된다. ⚠️ 맞는 미달 3(`직장인 제외`)도 같이
+      잃지만, **틀린 미달은 못 받는 것보다 나쁘다**(운영 원칙). */
+function parseTrait(t, isExclude) {
   const hit = TRAIT_PAT.filter(([, re]) => re.test(t)).map(([k]) => k);
-  if (!hit.length) return null;
-  return { kind: 'trait', anyOf: hit, conf: HAS_EXCEPTION.test(t) ? LOW : HIGH };
+  if (!hit.length) return [];
+  const conf = HAS_EXCEPTION.test(t) ? LOW : HIGH;
+  const out = [];
+  const bad = hit.filter((k) => TRAIT_DISQUALIFY.has(k));
+  const rest = hit.filter((k) => !TRAIT_DISQUALIFY.has(k));
+  if (rest.length) out.push({ kind: 'trait', anyOf: rest, conf: isExclude ? LOW : conf });
+  if (bad.length) out.push({ kind: 'trait', anyOf: bad, conf, exclude: true });
+  return out;
 }
 
 /* ── 국적 ── */
@@ -768,18 +826,39 @@ const UNASKED_ATTR = /(둘째|셋째|넷째|막내|손자녀|조손|유자녀|�
      `장애학생 중 … 대회 3위 이상 수상 실적이 있는 자`                     ← '장애'가 맞았다
    ⚠️ 마지막 줄이 요점이다 — 우리가 묻는 처지(장애)가 있어도 **수상 실적**은 여전히 모른다.
       그래서 이 무리는 `has('flags')` 로 풀어 주지 않는다(UNASKED_ATTR 과 다른 점). */
-const ACHIEVE_ATTR = /(입상|수상|학자금\s?대출|추천(을|서를?)?\s?받|자격증|경력|봉사\s?(실적|시간)|(형제|자매|남매)[^.]{0,10}(동시에?|함께|모두)\s?재학)/;
+/* 🔴 **그중 학생에게 직접 물을 수 있게 된 것은 빗장을 푼다** (2026-09-19 · 처지 넓히기).
+   위 주석은 **물어볼 방법이 없던 시절**의 글이다. 지금은 앱이 그 자리에서 묻는다
+   (`elig-ask.js`). 안 풀면 「예」라고 답해도 ✓ 가 안 뜨고 「아니요」만 미달을 만들어
+   **답해서 나아질 수 없는데 나빠지기만 하는 질문**이 된다 — 실측으로 수상 15줄 중 12줄,
+   학자금대출·봉사는 전부가 그 꼴이었다.
+   ⚠️ 푸는 조건은 **그 줄의 미확인 낱말이 전부 답한 처지로 덮일 때만**이다. `추천을 받`·
+      `형제·자매 동시 재학` 처럼 물을 칸이 없는 낱말이 하나라도 남으면 빗장은 그대로다
+      (`장애학생 중 … 수상 실적` 의 교훈 — 딸린 조건 하나가 맞았다고 ✓ 가 되면 안 된다). */
+const ACHIEVE_PARTS = [
+  [/입상|수상/, 'award'], [/학자금\s?대출/, 'loan'], [/자격증/, 'cert'],
+  [/봉사\s?(실적|시간)/, 'volunteer'],
+  /* 물을 칸이 없는 것들 — 하나라도 있으면 안 풀린다 */
+  [/(?<!수상\s?)(?<!봉사\s?)경력/, null], [/추천(을|서를?)?\s?받/, null],
+  [/(형제|자매|남매)[^.]{0,10}(동시에?|함께|모두)\s?재학/, null],
+];
+const ACHIEVE_ATTR = new RegExp(ACHIEVE_PARTS.map(([re]) => re.source).join('|'));
+/* 그 줄의 성취 낱말이 전부 **답을 받은** 처지로 덮이는가 */
+function achieveAnswered(t, p) {
+  const tr = (p && p.traits) || {};
+  const hit = ACHIEVE_PARTS.filter(([re]) => re.test(t));
+  return hit.length > 0 && hit.every(([, k]) => k && typeof tr[k] === 'boolean');
+}
 /* 🔴 **형편을 말하는 낱말은 소득구간으로 확인된다** — 프로필에 칸이 있다.
    `학자금 지원구간 8구간 이하의 저소득층 학생` 을 `저소득` 이라는 낱말만 보고 막으면,
    우리가 아는 것(구간)으로 판정할 수 있는 줄까지 '모른다'가 된다.
    (2026-08-30 코드 리뷰에서 잡았다 — 지금 데이터에는 아직 없지만 들어오면 바로 물린다.) */
 const INCOME_ATTR = /(취약\s?계층|저소득|사회적\s?배려|가정\s?형편|생계|수급자)/;
-function unaskedAttr(text, conds) {
+function unaskedAttr(text, conds, p) {
   const t = String(text || '');
   const cs = conds || [];
   const has = (k) => cs.some((c) => c.kind === k);
   /* `경력 무관`·`수상 여부 무관` 은 묻는 것이 아니다(2026-09-17 코드 리뷰) */
-  if (ACHIEVE_ATTR.test(t) && !/(무관|불문|관계\s?없)/.test(t)) return true;   // 처지 낱말이 있어도 풀리지 않는다 (위 주석)
+  if (ACHIEVE_ATTR.test(t) && !/(무관|불문|관계\s?없)/.test(t)) return !achieveAnswered(t, p);
   if (INCOME_ATTR.test(t) && (has('bracket') || has('flags'))) return false;
   if (!UNASKED_ATTR.test(t) && !INCOME_ATTR.test(t) && !LINEAGE_ATTR.test(t)) return false;
   return !has('flags');
@@ -790,9 +869,9 @@ function parseLine(line, isExclude) {
   const t = String(line || '');
   if (!t.trim()) return { conds: [], multiProgram: false };
   const conds = [];
-  const push = (c) => { if (c) conds.push(c); };
+  const push = (c) => { if (Array.isArray(c)) conds.push(...c); else if (c) conds.push(c); };
   push(parseGrade(t)); push(parseBracket(t)); push(parseCredits(t)); push(parseYear(t));
-  push(parseStatus(t, isExclude)); push(parseFlags(t)); push(parseTrait(t)); push(parseNationality(t));
+  push(parseStatus(t, isExclude)); push(parseFlags(t)); push(parseTrait(t, isExclude)); push(parseNationality(t));
   push(parseAge(t)); push(parseResidence(t)); push(parseSchool(t)); push(parseMajor(t));
   push(parseDegree(t, isExclude));
   if (isExclude) conds.forEach((c) => { c.exclude = true; });
@@ -800,7 +879,7 @@ function parseLine(line, isExclude) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { parseLine, parseDegree, TRAIT_PAT, gradOnly, gradTarget, mentionsUndergrad, GRADE_SCALE, STATUSES, HIGH, LOW, MULTI_PROGRAM, HAS_EXCEPTION, caseBranch, unaskedAttr, hasTopLevelOr, orBranches, REGIONS};
+  module.exports = { parseLine, parseDegree, TRAIT_PAT, TRAIT_DISQUALIFY, gradOnly, gradTarget, mentionsUndergrad, GRADE_SCALE, STATUSES, HIGH, LOW, MULTI_PROGRAM, HAS_EXCEPTION, caseBranch, unaskedAttr, hasTopLevelOr, orBranches, REGIONS};
 }
 
 /* ── 경우별 분기 (2026-08-24 개발자 지적) ─────────────────────────────────

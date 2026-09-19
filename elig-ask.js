@@ -85,6 +85,15 @@ const TRAIT_LABEL = {
   member:    '단체 회원 (본인·부모)',
   volunteer: '봉사활동 실적',
   cert:      '자격증·어학 성적',
+  /* 2026-09-19 — 자격 글 540줄 전수 대조로 늘린 여덟. 걸린 줄 수는 설계 문서 6절. */
+  discipline: '징계 이력',
+  loan:       '학자금대출 이용',
+  club:       '동아리·학생단체 활동',
+  disaster:   '재난·재해 피해',
+  birthOrder: '둘째 이상 자녀',
+  bereaved:   '가족 사망 · 유가족',
+  sailor:     '선원 · 선원 가족',
+  diabetes:   '당뇨 진단',
 };
 
 /* 칸 하나를 화면에 그리는 데 필요한 것.
@@ -134,15 +143,20 @@ function askableFields(line, profile, sch) {
       if (EA_ME.requirementMatch(line, trial, sch)) { out.push(key); break; }
     }
   }
-  /* 처지도 같은 방식으로 탐침한다 — 예/아니요를 넣어 보고 판정이 생기면 물을 수 있다.
-     🔴 이름은 `trait:<종류>` 로 돌려준다(프로필 칸 이름과 섞이지 않게). */
+  /* 처지도 같은 방식으로 탐침한다 — 예/아니요를 넣어 본다.
+     🔴 이름은 `trait:<종류>` 로 돌려준다(프로필 칸 이름과 섞이지 않게).
+
+     🔴 **어느 답으로도 충족이 될 수 없으면 묻지 않는다** (2026-09-19 코드 리뷰).
+        위 스칼라 칸과 여기가 다른 점이다. 처지는 **답해서 나아질 수 없는데 나빠지기만
+        하는 질문**이 생긴다 — 줄의 다른 낱말을 앱이 영영 못 읽으면(`추천을 받은`)
+        「예」는 여전히 '모름'이고 「아니요」만 미달이 된다. 실측으로 수상 15줄 중 12줄이
+        그 꼴이었다. 학생에게 자기를 떨어뜨리는 것밖에 못 하는 단추를 주지 않는다. */
   const tr = (p.traits && typeof p.traits === 'object') ? p.traits : {};
   for (const key of Object.keys(TRAIT_LABEL)) {
     if (typeof tr[key] === 'boolean') continue;            // 이미 답했다
-    for (const v of [true, false]) {
-      const trial = Object.assign({}, p, { traits: Object.assign({}, tr, { [key]: v }) });
-      if (EA_ME.requirementMatch(line, trial, sch)) { out.push('trait:' + key); break; }
-    }
+    const verdicts = [true, false].map((v) => EA_ME.requirementMatch(
+      line, Object.assign({}, p, { traits: Object.assign({}, tr, { [key]: v }) }), sch));
+    if (verdicts.includes('ok')) out.push('trait:' + key);
   }
   return out;
 }
