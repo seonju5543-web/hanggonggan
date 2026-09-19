@@ -22,13 +22,11 @@
 ⚙️ 설정: `collector/schools.json` · 발행: `data/notices.json` · 로봇: `collector/collect.mjs`
 **⏳ 스키마화 대기 중 55건** (원본 확보됨 — collector/pending-forms.json)
 
-### 🤖 자동 등록 (선조치후보고) — 1건 등록
+### 🤖 자동 등록 (선조치후보고) — 0건 등록
 
 등록 대상 학교: 경희대학교 · 한국외국어대학교 (설정 `schools`)
 
-자동 등록분은 앱에 **자동 등록 · 검수 전** 배지로 표시돼요. 잘못 등록된 건이 있으면 채팅으로 알려주시거나 `collector/auto-register-config.json`의 `blockIds`에 id를 넣어주세요.
-
-- `auto-oardid323127menuno200318` [공통 2026년 하반기 (재)춘천인재육성장학재단 봄내장학생 선발 안내](https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323127) · 경희대학교
+이번 실행에서 자동 등록 기준(개별 실공고·미등록·마감 전)을 전부 통과한 공고가 없어요.
 
 **컨펌 대기 (자동 기준 미달 5건)** — 장학 신호는 있지만 선발·모집 신호가 약해요:
 - 서울 2027학년도 미래인재육성재단 장학생 모집 (2027년 이후 사업으로 보임 — 개발자 컨펌 대기)
