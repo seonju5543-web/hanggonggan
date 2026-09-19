@@ -1,0 +1,590 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>홈 화면 전면 교체 — 후보 3안</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  /* ══ 이 문서의 색은 style.css 의 **실효값 실측**이다 (2026-09-19 · 브라우저로 재서 옮겼다).
+        🔴 style.css 는 :root 를 열 벌 겹쳐 쓰므로 파일 앞쪽만 읽으면 정반대로 읽는다 —
+           앞 블록은 '따뜻한 잉크·놋쇠'라고 적혀 있지만 **실제로 화면에 뜨는 값은 남색·파랑**이다. */
+  :root {
+    --bg:#fefdfc; --surface:#ffffff; --surface-2:#f7f6f4;
+    --text:#17191c; --text-sub:#545a62; --text-weak:#888e97;
+    --line:rgba(23,25,28,.09); --rule:rgba(23,25,28,.14);
+    --primary:#1e2b42; --accent:#27508f; --accent-soft:rgba(39,80,143,.09);
+    --green:#3d6b47; --green-weak:#e9efe8; --red:#8f3a2e; --red-weak:#f5e9e6;
+    --r-xs:9px; --r-sm:13px; --r:19px; --r-lg:27px;
+    --shadow:0 1px 2px rgba(24,35,56,.05), 0 8px 22px rgba(24,35,56,.07);
+    --navy:radial-gradient(120% 130% at 78% -18%, rgba(104,148,216,.30) 0%, rgba(104,148,216,0) 58%), #182338;
+    /* 문서 껍데기 (앱 색이 아니다 — 시안 배경과 글) */
+    --pg-bg:#f1f0ec; --pg-fg:#1c1d21; --pg-mute:#62666f; --pg-line:#d9d7d0; --pg-card:#fff;
+    --pg-rec:#3d6b47; --pg-rec-bg:#e6efe8; --pg-warn:#8f3a2e; --pg-warn-bg:#f7eae7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --pg-bg:#17181b; --pg-fg:#ecedef; --pg-mute:#9a9ea6; --pg-line:#33353b; --pg-card:#1f2024;
+      --pg-rec:#9fd1ab; --pg-rec-bg:#23372a; --pg-warn:#f0a99c; --pg-warn-bg:#3a2320; }
+  }
+  :root[data-theme="dark"] { --pg-bg:#17181b; --pg-fg:#ecedef; --pg-mute:#9a9ea6; --pg-line:#33353b; --pg-card:#1f2024;
+    --pg-rec:#9fd1ab; --pg-rec-bg:#23372a; --pg-warn:#f0a99c; --pg-warn-bg:#3a2320; }
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--pg-bg);color:var(--pg-fg);
+    font-family:'Pretendard Variable',Pretendard,-apple-system,'Apple SD Gothic Neo','Noto Sans KR',system-ui,sans-serif;
+    font-size:15px;line-height:1.62;word-break:keep-all;overflow-wrap:break-word;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1120px;margin:0 auto;padding:40px 20px 80px}
+  h1{font-size:27px;font-weight:700;letter-spacing:-.025em;margin:0 0 8px}
+  h2{font-size:20px;font-weight:700;letter-spacing:-.02em;margin:0}
+  h3{font-size:16px;font-weight:650;letter-spacing:-.015em;margin:0 0 8px}
+  p{margin:0 0 10px}
+  .lead{color:var(--pg-mute);max-width:74ch}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88em;background:rgba(127,127,127,.12);padding:1px 5px;border-radius:4px}
+  header.top{border-bottom:1px solid var(--pg-line);padding-bottom:22px;margin-bottom:34px}
+  .meta{font-size:13px;color:var(--pg-mute);margin-top:10px}
+
+  section.block{margin-bottom:56px}
+  .sec-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--pg-line);padding-bottom:10px;margin-bottom:22px}
+  .sec-head .tag{font-size:12.5px;font-weight:600;color:var(--pg-mute)}
+
+  /* 진단 막대 */
+  .bars{display:grid;gap:10px;max-width:760px}
+  .bar-row{display:grid;grid-template-columns:118px 1fr 116px;gap:12px;align-items:center;font-size:13.5px}
+  .bar-track{height:22px;background:var(--pg-card);border:1px solid var(--pg-line);border-radius:5px;overflow:hidden;display:flex}
+  .bar-fill{height:100%}
+  .b-board{background:#c0563f} .b-hero{background:#1e2b42} .b-match{background:#27508f} .b-etc{background:#b9b6ae}
+  .bar-row b{font-variant-numeric:tabular-nums;font-weight:600}
+  .bar-row .who{color:var(--pg-mute)}
+
+  /* 폰 프레임 */
+  .phones{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:30px;align-items:start}
+  .phone-col{min-width:0}
+  .phone-cap{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+  .phone-cap .num{font-size:12px;font-weight:700;letter-spacing:.04em;color:#fff;background:var(--primary);border-radius:4px;padding:2px 7px}
+  .phone-cap h3{margin:0}
+  .phone{width:330px;max-width:100%;margin:0 auto;border-radius:30px;background:var(--bg);border:1px solid var(--pg-line);
+    box-shadow:0 2px 6px rgba(0,0,0,.06),0 18px 44px rgba(0,0,0,.12);overflow:hidden;
+    color:var(--text);font-size:13.5px;line-height:1.5;position:relative}
+  .scr{padding:16px 15px 0;height:600px;overflow:hidden;position:relative}
+  .scr::after{content:'';position:absolute;left:0;right:0;bottom:56px;height:46px;
+    background:linear-gradient(to bottom,rgba(254,253,252,0),var(--bg));pointer-events:none}
+  .fade-off .scr::after{display:none}
+
+  /* ── 앱 컴포넌트 재현 (style.css 실효값) ── */
+  .a-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  .a-id{display:flex;align-items:center;gap:10px}
+  .a-av{width:38px;height:38px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px}
+  .a-greet{font-weight:800;font-size:16px;letter-spacing:-.02em}
+  .a-school{font-size:11.5px;color:var(--text-weak);font-weight:500}
+  .a-bell{width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:var(--accent);position:relative;font-size:16px}
+  .a-bell i{position:absolute;top:-1px;right:-2px;background:var(--accent);color:#fff;font-size:9px;font-style:normal;
+    min-width:14px;height:14px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-weight:700}
+
+  .a-hero{background:var(--navy);border-radius:var(--r-lg);padding:18px 17px 16px;color:#fff;margin-bottom:18px}
+  .a-hero .lbl{font-size:11.5px;color:rgba(232,239,254,.75);font-weight:600}
+  .a-hero .amt{font-size:30px;font-weight:800;letter-spacing:-.03em;margin:3px 0 12px}
+  .a-btn-white{display:block;width:100%;background:#fff;color:var(--primary);border:0;border-radius:var(--r-sm);
+    padding:12px;font-weight:700;font-size:14px;font-family:inherit}
+
+  .a-sec{display:flex;justify-content:space-between;align-items:baseline;margin:20px 0 10px}
+  .a-sec h4{margin:0;font-size:15px;font-weight:800;letter-spacing:-.02em}
+  .a-sec .more{font-size:12px;color:var(--accent);font-weight:600}
+
+  .a-card{padding:13px 0;border-bottom:1px solid var(--line)}
+  .a-card .top{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+  .a-card .org{font-size:11.5px;color:var(--text-weak);font-weight:500;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+  .a-pill{font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:var(--surface-2);
+    border:1px solid var(--line);color:var(--text-sub);white-space:nowrap}
+  .a-pill.hi{background:var(--accent-soft);border-color:rgba(39,80,143,.26);color:var(--accent)}
+  .a-card .name{font-size:14.5px;font-weight:700;letter-spacing:-.015em;margin-bottom:3px}
+  .a-card .bot{display:flex;justify-content:space-between;align-items:baseline}
+  .a-card .money{font-size:12.5px;color:var(--text-sub)}
+  .a-dday{font-size:12px;font-weight:700;color:var(--text-sub);font-variant-numeric:tabular-nums}
+  .a-dday.urgent{color:var(--red)}
+  .a-bookmark{color:var(--text-weak);width:14px;height:14px;flex:0 0 14px}
+
+  /* 게시판 카드 (지금 홈의 74%) */
+  .a-board{border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 11px;margin-bottom:8px;background:var(--surface)}
+  .a-board .src{font-size:10.5px;font-weight:700;color:var(--accent);margin-bottom:3px}
+  .a-board .src.calm{color:var(--text-weak)}
+  .a-board .ttl{font-size:12.5px;font-weight:600;line-height:1.45}
+  .a-board .sub{font-size:10.5px;color:var(--text-weak);margin-top:3px}
+
+  /* 하단 탭 */
+  .a-nav{position:absolute;left:0;right:0;bottom:0;height:56px;display:flex;background:rgba(255,255,255,.94);
+    border-top:1px solid var(--line);backdrop-filter:blur(14px)}
+  .a-nav div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+    font-size:9.5px;font-weight:600;color:var(--text-weak)}
+  .a-nav div.on{color:var(--accent)}
+  .a-nav .ic{font-size:16px;line-height:1}
+  .a-nav div.on .ic{font-weight:700}
+  .a-nav.five div{font-size:9px}
+  .a-nav .fab{flex:0 0 58px;position:relative}
+  .a-nav .fab .ball{position:absolute;top:-16px;width:46px;height:46px;border-radius:50%;background:var(--primary);
+    color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 6px 16px rgba(24,35,56,.3)}
+  .a-nav .fab span.lb{margin-top:30px;font-size:8.5px}
+
+  /* 새 제안 컴포넌트 */
+  .n-task{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:15px 14px;
+    box-shadow:var(--shadow);margin-bottom:12px}
+  .n-task .kicker{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--red);margin-bottom:7px}
+  .n-task .kicker .dot{width:5px;height:5px;border-radius:50%;background:var(--red)}
+  .n-task .q{font-size:16px;font-weight:800;letter-spacing:-.02em;line-height:1.35;margin-bottom:4px}
+  .n-task .why{font-size:12px;color:var(--text-sub);margin-bottom:12px}
+  .n-btn{display:block;width:100%;background:var(--primary);color:#fff;border:0;border-radius:var(--r-sm);
+    padding:12px;font-weight:700;font-size:14px;font-family:inherit}
+  .n-btn.ghost{background:var(--surface);color:var(--text);border:1px solid var(--rule)}
+
+  .n-strip{display:flex;align-items:center;justify-content:space-between;background:var(--surface);
+    border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 13px;margin-bottom:16px}
+  .n-strip .k{font-size:11.5px;color:var(--text-weak);font-weight:600}
+  .n-strip .v{font-size:15px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .n-strip .arw{color:var(--text-weak);font-size:13px}
+
+  .n-quick{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:6px}
+  .n-quick a{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 2px;border-radius:var(--r-sm);
+    background:var(--surface);border:1px solid var(--line);text-decoration:none;color:var(--text)}
+  .n-quick .qi{width:30px;height:30px;border-radius:10px;background:var(--accent-soft);color:var(--accent);
+    display:flex;align-items:center;justify-content:center;font-size:14px}
+  .n-quick .ql{font-size:10.5px;font-weight:600;letter-spacing:-.01em}
+  .n-quick .qn{font-size:9px;color:var(--red);font-weight:700}
+
+  .n-dash{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;
+    box-shadow:var(--shadow);margin-bottom:11px}
+  .n-dash .dh{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
+  .n-dash .dh b{font-size:13px;font-weight:700}
+  .n-dash .dh span{font-size:12px;color:var(--text-weak)}
+  .n-dash .big{font-size:24px;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+  .n-dash .sub{font-size:11.5px;color:var(--text-sub);margin-top:2px}
+  .n-prog{display:flex;height:6px;border-radius:999px;overflow:hidden;margin-top:11px;background:var(--surface-2)}
+  .n-prog i{display:block;height:100%}
+  .n-legend{display:flex;gap:12px;margin-top:7px;font-size:10.5px;color:var(--text-sub)}
+  .n-legend span::before{content:'';display:inline-block;width:7px;height:7px;border-radius:2px;margin-right:4px;background:var(--surface-2)}
+  .n-legend span:nth-child(1)::before{background:var(--green)}
+  .n-legend span:nth-child(2)::before{background:var(--accent)}
+
+  .n-week{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:4px}
+  .n-week div{text-align:center;padding:7px 0 8px;border-radius:9px;font-size:10.5px;color:var(--text-weak)}
+  .n-week div b{display:block;font-size:13px;font-weight:700;color:var(--text);margin-top:2px;font-variant-numeric:tabular-nums}
+  .n-week div.today{background:var(--primary);color:rgba(255,255,255,.7)}
+  .n-week div.today b{color:#fff}
+  .n-week .mk{display:block;width:5px;height:5px;border-radius:50%;margin:3px auto 0;background:var(--accent)}
+  .n-week .mk.red{background:var(--red)}
+  .n-week .mk.none{background:transparent}
+
+  .n-rail{display:flex;gap:8px;overflow:hidden;margin:0 -15px 16px;padding:0 15px}
+  .n-chip{flex:0 0 auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);
+    padding:9px 11px;min-width:96px}
+  .n-chip .d{font-size:12px;font-weight:800;color:var(--red);font-variant-numeric:tabular-nums}
+  .n-chip .t{font-size:10.5px;color:var(--text-sub);margin-top:2px;line-height:1.35}
+  .n-chip.calm .d{color:var(--text-sub)}
+
+  .n-feature{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;
+    box-shadow:var(--shadow);margin-bottom:16px}
+  .n-feature .band{background:var(--navy);color:#fff;padding:13px 14px}
+  .n-feature .band .fit{display:inline-block;font-size:10.5px;font-weight:700;background:rgba(255,255,255,.16);
+    border-radius:999px;padding:3px 9px;margin-bottom:7px}
+  .n-feature .band .nm{font-size:17px;font-weight:800;letter-spacing:-.025em;line-height:1.3}
+  .n-feature .band .og{font-size:11px;color:rgba(232,239,254,.72);margin-top:3px}
+  .n-feature .body{padding:12px 14px 14px}
+  .n-feature .row{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid var(--line)}
+  .n-feature .row:last-of-type{border-bottom:0}
+  .n-feature .row span{color:var(--text-weak)}
+  .n-feature .row b{font-weight:700}
+  .n-feature .acts{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:11px}
+  .n-feature .acts button{border-radius:var(--r-sm);padding:10px;font-size:12.5px;font-weight:700;font-family:inherit;border:0}
+  .n-feature .acts .p{background:var(--primary);color:#fff}
+  .n-feature .acts .g{background:var(--surface);border:1px solid var(--rule);color:var(--text)}
+
+  .n-seg{display:flex;gap:4px;background:var(--surface-2);border-radius:999px;padding:3px;margin-bottom:14px}
+  .n-seg div{flex:1;text-align:center;font-size:12px;font-weight:600;padding:7px 0;border-radius:999px;color:var(--text-sub)}
+  .n-seg div.on{background:var(--surface);color:var(--text);font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+
+  .n-fold{display:flex;align-items:center;justify-content:center;gap:5px;border:1px solid var(--line);
+    border-radius:var(--r-sm);padding:10px;font-size:12px;font-weight:600;color:var(--text-sub);background:var(--surface)}
+
+  /* 비교표 · 목록 */
+  table{width:100%;border-collapse:collapse;font-size:14px;margin-top:6px}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--pg-line);vertical-align:top}
+  th{font-weight:650;font-size:13px;color:var(--pg-mute);background:rgba(127,127,127,.06)}
+  td b{font-weight:650}
+  .verdict{display:inline-block;font-size:12px;font-weight:650;padding:3px 9px;border-radius:5px;white-space:nowrap}
+  .verdict.rec{color:var(--pg-rec);background:var(--pg-rec-bg)}
+  .verdict.ask{color:var(--pg-warn);background:var(--pg-warn-bg)}
+  ul.tight{margin:6px 0 0;padding-left:18px}
+  ul.tight li{margin-bottom:5px}
+  .note{background:var(--pg-card);border:1px solid var(--pg-line);border-left:3px solid var(--pg-warn);
+    border-radius:0 8px 8px 0;padding:12px 14px;font-size:13.5px;margin-top:14px}
+  .note b{color:var(--pg-warn)}
+  .src{font-size:12.5px;color:var(--pg-mute);margin-top:10px}
+  .src a{color:inherit}
+  .pros{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;font-size:13.5px}
+  .pros h4{margin:0 0 5px;font-size:12.5px;font-weight:700;letter-spacing:.02em}
+  .pros .p h4{color:var(--pg-rec)} .pros .c h4{color:var(--pg-warn)}
+  .pros ul{margin:0;padding-left:16px} .pros li{margin-bottom:4px}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <h1>홈 화면 전면 교체 — 후보 3안</h1>
+  <p class="lead">개발자 지시(2026-09-19): <i>"홈화면 디자인을 전면 교체하고 싶은데 … 버튼, UX, 기능 탭 추가, 기능 탭 디자인 등의 부분에서"</i>.
+     타 앱 사례는 <b>UI bowl</b>에서 찾아 붙였고, 지금 홈의 숫자는 전부 <b>브라우저로 직접 재서</b> 옮겼다(짐작이 아니다).</p>
+  <p class="meta">2026-09-19 · 기준 화면 390×844 · 프로필: 한국외대 서울캠퍼스 3학년 · 실측 도구 Chromium 1194</p>
+</header>
+
+<!-- ════════════ 진단 ════════════ -->
+<section class="block">
+  <div class="sec-head"><h2>지금 홈에서 실제로 일어나는 일</h2><span class="tag">실측 · 짐작 아님</span></div>
+  <p class="lead">홈을 끝까지 펼치면 <b>3,474px</b>다. 그 길이를 무엇이 쓰고 있는지 재 봤다.</p>
+
+  <div class="bars">
+    <div class="bar-row"><span class="who">학교 게시판 글</span>
+      <span class="bar-track"><i class="bar-fill b-board" style="width:74.3%"></i></span><b>2,583px · 74%</b></div>
+    <div class="bar-row"><span class="who">맞춤 장학금</span>
+      <span class="bar-track"><i class="bar-fill b-match" style="width:10.3%"></i></span><b>359px · 10%</b></div>
+    <div class="bar-row"><span class="who">금액 히어로</span>
+      <span class="bar-track"><i class="bar-fill b-hero" style="width:5.9%"></i></span><b>206px · 6%</b></div>
+    <div class="bar-row"><span class="who">헤더 · 여백 · 기타</span>
+      <span class="bar-track"><i class="bar-fill b-etc" style="width:9.5%"></i></span><b>326px · 10%</b></div>
+  </div>
+
+  <div class="note">
+    <b>이것이 이번 교체의 핵심 문제다.</b> 홈의 4분의 3은 <b>학교 게시판 글 18건</b>인데,
+    이 카드들은 우리가 원문을 읽은 적이 없어 <b>누가 주는 장학금인지도 모른다</b>(제목과 링크뿐이라
+    적합도·마감·금액이 전부 없다). 즉 학생이 홈에서 스크롤하는 것의 대부분은
+    <b>앱이 아무것도 판단해 주지 못한 외부 링크</b>이고, 정작 앱이 판단한 '나에게 맞는 장학금'은
+    화면의 10%다. 세 후보안은 전부 이 비율을 뒤집는 데서 출발한다.
+  </div>
+
+  <h3 style="margin-top:26px">두 번째 문제 — 적합도 숫자가 앱을 깎아내리고 있다</h3>
+  <p class="lead">홈에 올라올 수 있는 공고 <b>89건</b>을 전부 채점해 봤다.</p>
+  <table style="max-width:760px">
+    <tr><th style="width:230px">재 본 것</th><th style="width:96px">결과</th><th>뜻</th></tr>
+    <tr><td>자격이 <b>미달</b>인 공고</td><td><b>0건</b></td><td>한 건도 "당신은 안 됩니다"가 아니다</td></tr>
+    <tr><td>적합도 <b>40% 미만</b>으로 뜨는 공고</td><td><b>84건</b></td><td>그런데 화면에는 거의 전부 낮은 숫자가 뜬다</td></tr>
+    <tr><td>적합도 <b>60% 이상</b>인 공고</td><td><b>0건</b></td><td>높은 숫자는 아예 나올 일이 없다</td></tr>
+    <tr><td>판정이 <code>모름</code>인 공고</td><td><b>85건</b></td><td>나머지 4건도 '선택 조건 있음'이고, <b>확정은 0건</b></td></tr>
+  </table>
+  <div class="note">
+    <b>낮은 숫자의 원인은 학생이 아니라 우리다.</b> 첫 카드의 <code>적합도 50%</code>를 열어 보면
+    속은 <code>met 1 · total 2 · unknown 1 · fails []</code>다 — <b>아는 조건 2개 중 1개는 맞았고 1개는 우리가 모르며, 안 맞는 건 하나도 없다</b>.
+    그걸 "50%"라고 적으면 학생은 <b>반만 자격이 된다</b>고 읽는다. 지금 홈의 첫 화면 석 장이 전부 이 상태다(50% · 50% · 33%).
+  </div>
+
+  <h3 style="margin-top:26px">세 번째 — 홈 공고의 93%는 '재단이 적어 둔 칸'이다</h3>
+  <p class="lead">89건 중 <b>83건이 층2(한국장학재단 목록)</b>이고, 우리가 원문을 읽은 층1은 <b>6건</b>뿐이다.
+     상위 10장 중 9장이 층2다. 층2에는 <b>양식도 서류 안내도 붙지 않는다</b> — 실제로 신청서 양식이 연결된 공고는 89건 중 <b>1건</b>이다.
+     그래서 홈이 학생에게 시킬 수 있는 일은 <b>'원문을 열어 확인하기'</b>이지 '서류 담기'가 아니다.
+     <b>아래 후보 셋은 이 제약 안에서만 그렸다</b> — 없는 기능을 그린 그림은 시안이 아니라 거짓말이 된다.</p>
+
+  <h3 style="margin-top:26px">그 밖에 눈으로 확인한 것</h3>
+  <ul class="tight">
+    <li><b>첫 화면에 '할 일'이 없다.</b> 제일 큰 덩어리가 <code>최대 400만원</code>인데, 이건 4건을 <i>전부</i> 받았을 때의 숫자라
+        학생이 지금 무엇을 해야 하는지는 말해 주지 않는다.</li>
+    <li><b>지름길이 하나도 없다.</b> 달력은 신청내역 화면 안에, 서류 보관함은 MY 안에, 도우미는 떠다니는 동그라미에 있다 — 홈에서 가는 길이 없다.</li>
+    <li><b>오늘 마감이 셋째 줄에 있다.</b> 실측 당시 <code>수산장학생</code>이 <b>D-DAY</b>였는데 카드 석 장 중 맨 아래였고, 화면 접힘선에 걸려 잘려 있었다.</li>
+    <li><b>도우미 마스코트가 카드를 가린다.</b> 실측 스크린샷에서 '끌어서 이동 가능' 말풍선이 셋째 카드의 금액 줄을 덮고 있었다.</li>
+    <li><b>게시판 카드의 파란 머리글</b>(<code>한국외국어대학교 게시판</code>)이 화면에서 가장 채도 높은 덩어리라, 확인 안 된 정보가 확인된 정보보다 눈에 먼저 띈다.</li>
+  </ul>
+</section>
+
+<!-- ════════════ 후보 3안 ════════════ -->
+<section class="block">
+  <div class="sec-head"><h2>후보 3안</h2><span class="tag">셋 다 같은 데이터만 쓴다 — 새로 지어내는 값 없음</span></div>
+
+  <div class="phones">
+
+    <!-- ─── A안 ─── -->
+    <div class="phone-col">
+      <div class="phone-cap"><span class="num">A</span><h3>오늘 할 일</h3></div>
+      <div class="phone">
+        <div class="scr">
+          <div class="a-head">
+            <div class="a-id"><div class="a-av">이</div>
+              <div><div class="a-greet">이선주님</div><div class="a-school">한국외국어대학교 · 서울캠퍼스</div></div></div>
+            <div class="a-bell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg><i>1</i></div>
+          </div>
+
+          <div class="n-task">
+            <div class="kicker"><span class="dot"></span>오늘 마감</div>
+            <div class="q">수산장학생, 오늘이 마감이에요</div>
+            <div class="why">광산김씨대종중장학문화재단 · 안 맞는 조건은 없어요</div>
+            <button class="n-btn">공고 원문 열기</button>
+          </div>
+
+          <div class="n-strip">
+            <div><div class="k">지금 신청할 수 있는 장학금</div><div class="v">4건 · 최대 400만원</div></div>
+            <div class="arw">›</div>
+          </div>
+
+          <div class="n-quick">
+            <a><span class="qi">▤</span><span class="ql">서류함</span><span class="qn">&nbsp;</span></a>
+            <a><span class="qi">▦</span><span class="ql">달력</span><span class="qn">이번 주 3</span></a>
+            <a><span class="qi">◔</span><span class="ql">알림함</span><span class="qn">1</span></a>
+            <a><span class="qi">◍</span><span class="ql">도우미</span><span class="qn">&nbsp;</span></a>
+          </div>
+
+          <div class="a-sec"><h4>나에게 맞는 장학금</h4><span class="more">전체 보기</span></div>
+          <div class="a-card">
+            <div class="top"><span class="org">교외 · 재단법인 경주시장학회</span><span class="a-pill hi">미달 조건 없음</span><svg class="a-bookmark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></div>
+            <div class="name">일반장학생</div>
+            <div class="bot"><span class="money">최대 200만원</span><span class="a-dday urgent">D-4</span></div>
+          </div>
+          <div class="a-card">
+            <div class="top"><span class="org">교외 · 충청북도 충주시청</span><span class="a-pill">조건 확인 필요</span><svg class="a-bookmark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></div>
+            <div class="name">장애인및자녀장학금</div>
+            <div class="bot"><span class="money">금액은 재단 홈페이지에서 확인</span><span class="a-dday urgent">D-4</span></div>
+          </div>
+          <div class="a-card">
+            <div class="top"><span class="org">교외 · 광산김씨대종중장학회</span><span class="a-pill">조건 확인 필요</span><svg class="a-bookmark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></div>
+            <div class="name">수산장학생</div>
+            <div class="bot"><span class="money">최대 500만원</span><span class="a-dday urgent">D-DAY</span></div>
+          </div>
+        </div>
+        <div class="a-nav">
+          <div class="on"><span class="ic">⌂</span>홈</div><div><span class="ic">◇</span>장학금</div>
+          <div><span class="ic">▤</span>신청내역</div><div><span class="ic">◯</span>MY</div>
+        </div>
+      </div>
+
+      <div class="pros">
+        <div class="p"><h4>좋은 점</h4><ul>
+          <li>첫 화면이 <b>문장 하나</b>로 할 일을 말한다</li>
+          <li>지름길 4개가 홈으로 올라온다</li>
+          <li>지금 구조를 가장 적게 건드린다</li></ul></div>
+        <div class="c"><h4>걸리는 점</h4><ul>
+          <li>할 일이 없는 날의 화면을 따로 설계해야 한다</li>
+          <li>금액이 작아져 '최대 400만원'의 인상이 약해진다</li></ul></div>
+      </div>
+      <p class="src">근거 사례 — <a href="https://uibowl.io/name/%ED%86%A0%EC%8A%A4?patterns=%EC%84%A4%EC%A0%95">토스</a> · 홈 맨 위가 '할 일' 카드,
+        <a href="https://uibowl.io/name/%EC%9B%90%ED%8B%B0%EB%93%9C?patterns=iPhone%20%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7">원티드</a> · 제목 아래 아이콘 4칸,
+        <a href="https://uibowl.io/name/%EB%A7%90%ED%95%B4%EB%B3%B4%EC%B9%B4?patterns=%EB%A9%94%EC%9D%B8">말해보카</a> · 큰 카드 하나 + 시작 버튼</p>
+    </div>
+
+    <!-- ─── B안 ─── -->
+    <div class="phone-col">
+      <div class="phone-cap"><span class="num">B</span><h3>한눈에 보는 판</h3></div>
+      <div class="phone">
+        <div class="scr">
+          <div class="a-head">
+            <div class="a-id"><div class="a-av">이</div>
+              <div><div class="a-greet">이선주님</div><div class="a-school">한국외국어대학교 · 서울캠퍼스</div></div></div>
+            <div class="a-bell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg><i>1</i></div>
+          </div>
+
+          <div class="n-dash">
+            <div class="dh"><b>내 장학금</b><span>›</span></div>
+            <div class="big">최대 400만원</div>
+            <div class="sub">지금 신청할 수 있는 4건을 합한 금액</div>
+            <div class="n-prog">
+              <i style="width:25%;background:var(--green)"></i><i style="width:25%;background:var(--accent)"></i><i style="width:50%;background:var(--surface-2)"></i>
+            </div>
+            <div class="n-legend">
+              <span>준비 완료 1</span>
+              <span>준비 중 1</span><span>아직 안 함 2</span>
+            </div>
+          </div>
+
+          <div class="n-dash">
+            <div class="dh"><b>이번 주 마감</b><span>달력 ›</span></div>
+            <div class="n-week">
+              <div>월<b>15</b><i class="mk none"></i></div>
+              <div>화<b>16</b><i class="mk none"></i></div>
+              <div>수<b>17</b><i class="mk"></i></div>
+              <div class="today">목<b>18</b><i class="mk red"></i></div>
+              <div>금<b>19</b><i class="mk none"></i></div>
+              <div>토<b>20</b><i class="mk"></i></div>
+              <div>일<b>21</b><i class="mk none"></i></div>
+            </div>
+          </div>
+
+          <div class="n-dash" style="padding:12px 14px">
+            <div class="dh" style="margin:0"><b>쓰던 신청서 · 경주시장학회</b><span>이어서 ›</span></div>
+          </div>
+
+          <div class="a-sec"><h4>나에게 맞는 장학금</h4><span class="more">전체 보기</span></div>
+          <div class="a-card">
+            <div class="top"><span class="org">교외 · 재단법인 경주시장학회</span><span class="a-pill hi">미달 조건 없음</span><svg class="a-bookmark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></div>
+            <div class="name">일반장학생</div>
+            <div class="bot"><span class="money">최대 200만원</span><span class="a-dday urgent">D-4</span></div>
+          </div>
+          <div class="a-card">
+            <div class="top"><span class="org">교외 · 충청북도 충주시청</span><span class="a-pill">조건 확인 필요</span><svg class="a-bookmark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></div>
+            <div class="name">장애인및자녀장학금</div>
+            <div class="bot"><span class="money">금액은 재단 홈페이지에서 확인</span><span class="a-dday urgent">D-4</span></div>
+          </div>
+        </div>
+        <div class="a-nav five">
+          <div class="on"><span class="ic">⌂</span>홈</div><div><span class="ic">◇</span>장학금</div>
+          <div><span class="ic">🗓</span>달력</div><div><span class="ic">▤</span>신청내역</div><div><span class="ic">◯</span>MY</div>
+        </div>
+      </div>
+
+      <div class="pros">
+        <div class="p"><h4>좋은 점</h4><ul>
+          <li>금액·마감·진행이 <b>각자 자기 카드</b>를 가진다</li>
+          <li>달력이 처음으로 눈에 보인다(지금은 묻혀 있다)</li>
+          <li>카드를 늘리거나 줄이기 쉽다</li></ul></div>
+        <div class="c"><h4>걸리는 점</h4><ul>
+          <li>카드가 셋이라 <b>첫 화면에 공고가 거의 안 들어온다</b></li>
+          <li>진행 막대는 신청내역 화면과 뜻이 겹칠 수 있다</li></ul></div>
+      </div>
+      <p class="src">근거 사례 — <a href="https://uibowl.io/name/%EC%8B%A0%ED%95%9C%20%EC%8A%88%ED%8D%BCSOL?patterns=%EB%A9%94%EC%9D%B8&patternName=%EC%89%AC%EC%9A%B4%20%ED%99%88">신한 슈퍼SOL</a> · 자산/주식/포인트를 카드로 쌓은 '쉬운 홈',
+        <a href="https://uibowl.io/name/%EB%AC%B4%EB%94%94%20Moodee?patterns=%EB%82%B4%EC%97%AD&patternName=%ED%99%9C%EB%8F%99%20%EC%BA%98%EB%A6%B0%EB%8D%94">무디</a> · 달력을 요약 카드로 접어 보여 주는 방식</p>
+    </div>
+
+    <!-- ─── C안 ─── -->
+    <div class="phone-col">
+      <div class="phone-cap"><span class="num">C</span><h3>오늘의 한 건</h3></div>
+      <div class="phone">
+        <div class="scr">
+          <div class="a-head">
+            <div class="a-id"><div class="a-av">이</div>
+              <div><div class="a-greet">이선주님</div><div class="a-school">한국외국어대학교 · 서울캠퍼스</div></div></div>
+            <div class="a-bell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg><i>1</i></div>
+          </div>
+
+          <div class="n-rail">
+            <div class="n-chip"><div class="d">D-4</div><div class="t">경주시장학회<br>일반장학생</div></div>
+            <div class="n-chip"><div class="d">D-4</div><div class="t">충주시청<br>장애인및자녀</div></div>
+            <div class="n-chip"><div class="d">D-DAY</div><div class="t">광산김씨<br>수산장학생</div></div>
+          </div>
+
+          <div class="n-feature">
+            <div class="band">
+              <span class="fit">오늘의 한 건 · 미달 조건 없음</span>
+              <div class="nm">일반장학생</div>
+              <div class="og">재단법인 경주시장학회 · 교외</div>
+            </div>
+            <div class="body">
+              <div class="row"><span>지원 금액</span><b>최대 200만원</b></div>
+              <div class="row"><span>마감</span><b>9월 23일 · D-4</b></div>
+              <div class="row"><span>접수 방법</span><b>재단 홈페이지 ↗</b></div>
+              <div class="acts">
+                <button class="g">저장</button><button class="p">공고 원문 열기</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="n-seg"><div class="on">맞춤 공고</div><div>우리 학교 게시판</div></div>
+
+          <div class="a-card">
+            <div class="top"><span class="org">교외 · 충청북도 충주시청</span><span class="a-pill">조건 확인 필요</span><svg class="a-bookmark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></div>
+            <div class="name">장애인및자녀장학금</div>
+            <div class="bot"><span class="money">금액은 재단 홈페이지에서 확인</span><span class="a-dday urgent">D-4</span></div>
+          </div>
+          <div class="a-card">
+            <div class="top"><span class="org">교외 · 광산김씨대종중장학회</span><span class="a-pill">조건 확인 필요</span><svg class="a-bookmark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4.5L6 21z"/></svg></div>
+            <div class="name">수산장학생</div>
+            <div class="bot"><span class="money">최대 500만원</span><span class="a-dday urgent">D-DAY</span></div>
+          </div>
+        </div>
+        <div class="a-nav">
+          <div class="on"><span class="ic">⌂</span>홈</div><div><span class="ic">◇</span>장학금</div>
+          <div class="fab"><span class="ball">✎</span><span class="lb">신청 준비</span></div>
+          <div><span class="ic">▤</span>신청내역</div><div><span class="ic">◯</span>MY</div>
+        </div>
+      </div>
+
+      <div class="pros">
+        <div class="p"><h4>좋은 점</h4><ul>
+          <li>앱이 <b>하나를 골라 준다</b> — 고르는 부담이 사라진다</li>
+          <li>게시판이 <b>같은 자리 다른 갈래</b>로 접힌다(74% 문제 해결)</li>
+          <li>가장 '앱답고' 생동감 있다</li></ul></div>
+        <div class="c"><h4>걸리는 점</h4><ul>
+          <li>추천 1건을 <b>무엇으로 고르는지</b> 규칙이 필요하다</li>
+          <li>가운데 동그란 버튼은 뜻이 분명하지 않으면 안 눌린다</li></ul></div>
+      </div>
+      <p class="src">근거 사례 — <a href="https://uibowl.io/name/%ED%94%8C%EB%9E%AD?patterns=%EB%A9%94%EC%9D%B8">플랭</a> · 오늘 할 것 한 장 + 큰 버튼,
+        <a href="https://uibowl.io/name/%EC%B1%84%EB%B9%84?patterns=%EB%A9%94%EC%9D%B8">채비</a> · 하단 가운데 동그란 주 동작,
+        <a href="https://uibowl.io/name/%EC%A0%A0%EB%94%94?patterns=%EB%A9%94%EC%9D%B8">젠디</a> · 한 화면 안에서 갈래를 가르는 알약 탭</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════ 비교 ════════════ -->
+<section class="block">
+  <div class="sec-head"><h2>셋을 나란히 놓으면</h2></div>
+  <table>
+    <tr><th style="width:132px">보는 눈</th><th>A · 오늘 할 일</th><th>B · 한눈에 보는 판</th><th>C · 오늘의 한 건</th></tr>
+    <tr><td><b>첫 화면이 하는 말</b></td><td>"이걸 하세요"</td><td>"당신 상태는 이렇습니다"</td><td>"이거 하나 보세요"</td></tr>
+    <tr><td><b>게시판 74% 문제</b></td><td>3건만 남기고 접는다</td><td>3건만 남기고 접는다</td><td>갈래로 접어 <b>0건</b>이 기본</td></tr>
+    <tr><td><b>새 기능 탭</b></td><td>없음 (4탭 그대로)</td><td>달력 탭 신설 (5탭)</td><td>가운데 동작 버튼 (4탭+1)</td></tr>
+    <tr><td><b>고칠 파일</b></td><td>index.html · app.js · style.css</td><td>왼쪽 + 달력을 화면으로 분리</td><td>왼쪽 + 추천 규칙 1개</td></tr>
+    <tr><td><b>드는 일</b></td><td>작다</td><td>중간</td><td>중간</td></tr>
+    <tr><td><b>되돌리기</b></td><td>쉽다</td><td>탭이 늘어 조금 어렵다</td><td>쉽다</td></tr>
+    <tr><td><b>추천</b></td>
+      <td><span class="verdict rec">먼저 이것</span><br>지금 문제를 가장 적은 비용으로 푼다</td>
+      <td><span class="verdict ask">달력만 떼서</span><br>달력 탭은 A와 같이 해도 된다</td>
+      <td><span class="verdict ask">그다음</span><br>A가 자리 잡은 뒤 얹으면 안전하다</td></tr>
+  </table>
+  <div class="note">
+    <b>섞어도 된다.</b> 셋은 서로 배타적이지 않다 — 실제로 제일 나은 조합은
+    <b>A의 할 일 카드 + A의 지름길 4칸 + B의 달력 탭 + C의 게시판 갈래</b>다.
+    번호로 골라 주시면 그 조합대로 만든다.
+  </div>
+</section>
+
+<!-- ════════════ 기능 탭 ════════════ -->
+<section class="block">
+  <div class="sec-head"><h2>기능 탭 — 무엇을 더할 수 있나</h2><span class="tag">지금은 홈 · 장학금 · 신청내역 · MY 넷</span></div>
+  <table>
+    <tr><th style="width:120px">후보</th><th style="width:150px">모양</th><th>왜</th><th style="width:96px">판단</th></tr>
+    <tr><td><b>달력</b></td><td>5번째 탭</td>
+      <td>이미 만들어 둔 달력이 <b>신청내역 화면 안쪽</b>에 있어 학생이 있는 줄 모른다. 마감으로 먹고사는 앱에서 달력은 한 번에 닿아야 한다.</td>
+      <td><span class="verdict rec">추천</span></td></tr>
+    <tr><td><b>서류함</b></td><td>5번째 탭</td>
+      <td>서류는 '한 번 담아 두고 계속 꺼내 쓰는' 물건이라 MY 안쪽보다 탭이 맞다. 다만 달력과 둘 다 넣으면 6탭이 된다.</td>
+      <td><span class="verdict ask">달력 다음</span></td></tr>
+    <tr><td><b>신청 준비</b></td><td>가운데 동그란 버튼</td>
+      <td>주 동작을 늘 같은 자리에 둔다. <b>단, 지금 데이터로는 이 버튼이 할 일이 거의 없다</b> —
+          홈에 올라오는 89건 중 신청서 양식이 연결된 것은 <b>1건</b>이고 앱이 지원문서를 만들어 주는 공고(<code>prepDoc</code>)는 <b>0건</b>이다.
+          양식이 늘기 전에 이 버튼을 가운데 두면 <b>눌러도 별일이 없는 자리</b>가 된다.</td>
+      <td><span class="verdict ask">양식이 는 뒤</span></td></tr>
+    <tr><td><b>도우미</b></td><td>탭으로 흡수</td>
+      <td>지금은 떠다니는 동그라미라 <b>실측에서 카드를 가리고 있었다</b>. 탭으로 옮기면 가림이 사라진다. 대신 어느 화면에서든 부르던 편함은 잃는다.</td>
+      <td><span class="verdict ask">고민 필요</span></td></tr>
+    <tr><td><b>게시판</b></td><td>홈 안 갈래(알약 탭)</td>
+      <td>탭을 늘리지 않고 74% 문제를 푸는 가장 싼 방법. C안에 들어 있다.</td>
+      <td><span class="verdict rec">추천</span></td></tr>
+  </table>
+  <div class="note">
+    <b>탭은 다섯을 넘기지 않는 것이 좋다.</b> 실측한 사례에서도 다섯이 한계였다(신한·토스·빼기·채비·보맵 전부 5). 여섯이 되면
+    글자가 줄어들다 못해 아이콘만 남고, 그때부터는 학생이 <b>아이콘을 해독</b>해야 한다.
+  </div>
+</section>
+
+<!-- ════════════ 공통 손질 ════════════ -->
+<section class="block">
+  <div class="sec-head"><h2>어느 안을 고르든 같이 할 손질</h2><span class="tag">버튼 · 카드 · 색</span></div>
+  <table>
+    <tr><th style="width:36px">#</th><th style="width:170px">무엇을</th><th>왜 · 어떻게</th></tr>
+    <tr><td>1</td><td><b>적합도 숫자를 없앤다</b><br><span style="font-size:12px;color:var(--pg-mute)">셋 중 가장 급한 손질</span></td>
+      <td>첫 화면 카드 셋이 <code>50% · 50% · 33%</code>였는데, 89건 전수에서 <b>미달인 공고는 0건</b>이고 <b>60% 이상도 0건</b>이다.
+          즉 이 숫자는 자격이 아니라 <b>우리가 읽어 둔 조건이 몇 개냐</b>를 보여 주는 값인데, 학생은 점수로 읽는다.
+          → <b>미달 조건 없음 / 조건 확인 필요</b> 두 말로 바꾼다.
+          <b>판정은 <code>app.js</code>의 <code>fitVerdict</code>를 그대로 쓴다</b> — 규칙을 새로 만들면 화면과 알림이 갈라진다(이 저장소가 반복해 겪은 사고).</td></tr>
+    <tr><td>2</td><td><b>확인한 것과 아닌 것의 위계</b></td>
+      <td>지금은 게시판 카드만 <b>테두리 + 파란 머리글</b>이라 오히려 더 눈에 띈다. 뒤집는다 —
+          우리가 원문을 읽은 공고가 면(흰 카드)이고, 게시판 링크는 <b>회색 글씨 줄</b>이다.</td></tr>
+    <tr><td>3</td><td><b>버튼 높이를 하나로</b></td>
+      <td>지금 주 버튼은 히어로 안의 흰 버튼 하나뿐이고 나머지 화면과 높이가 다르다. 주 버튼 <b>48px · 모서리 13px · 누르면 0.95</b>로 통일한다
+          (0.95는 2026-09-11에 개발자가 이미 정한 값이다).</td></tr>
+    <tr><td>4</td><td><b>비활성 버튼의 말</b></td>
+      <td><code>준비할 장학금이 남아 있지 않아요</code>가 버튼 안에 들어 있어 <b>눌러도 되는 것처럼</b> 보인다.
+          버튼은 동사만 남기고, 사정은 버튼 밖 한 줄로 내린다.</td></tr>
+    <tr><td>5</td><td><b>마스코트를 비킨다</b></td>
+      <td>실측에서 카드를 덮고 있었다. 내려갈 때 접히고 멈추면 다시 펴지게 한다(이미 있는 <code>interactions.js</code>에 얹는다).</td></tr>
+    <tr><td>6</td><td><b>빈 화면의 말</b></td>
+      <td>맞는 공고가 없을 때 지금은 <code>지금 신청할 수 있는 장학금이 없어요</code>로 끝난다.
+          <b>무엇을 하면 늘어나는지</b>를 버튼으로 준다(프로필 채우기 · 조건 다시 보기).</td></tr>
+  </table>
+</section>
+
+<footer style="border-top:1px solid var(--pg-line);padding-top:18px;font-size:13px;color:var(--pg-mute)">
+  세 폰 그림에 적힌 공고 이름 · 금액 · D-day는 <b>2026-09-19에 실제 앱 홈에 떠 있던 값</b>이다(충주시청 D-4 · 경주시장학회 D-4 · 광산김씨 D-DAY).
+  다만 <b>지름길 칸의 배지 숫자와 B안 달력의 점 위치는 배치를 보이려고 넣은 예시</b>다 — 그 둘은 만들 때 실제 값으로 채운다.
+  색 토큰은 <code>style.css</code>의 계산된 값에서 읽었고, 화면 숫자는 전부 브라우저로 직접 쟀다.
+  <b>재 본 방법과 만들 때의 함정은 <code>docs/designs/home-redesign.md</code></b>에 있다.<br>
+  <b>이 문서는 시안이고 아직 앱 코드는 한 줄도 고치지 않았다</b> — 번호를 고르면 그때 만든다.
+</footer>
+</div>
