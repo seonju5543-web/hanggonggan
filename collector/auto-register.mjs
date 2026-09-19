@@ -16,7 +16,7 @@ import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { cleanTitle } from './clean-title.mjs';
 // 등록 규칙은 감사 도구와 같은 파일을 쓴다 (verify/entry-rules.cjs) — 규칙이 갈라지지 않게
-const { checkEntry } = createRequire(import.meta.url)('../verify/entry-rules.cjs');
+const { checkEntry, isDuplicatePair } = createRequire(import.meta.url)('../verify/entry-rules.cjs');
 
 const HERE = new URL('.', import.meta.url);
 const cfgPath = new URL('auto-register-config.json', HERE);
@@ -47,28 +47,12 @@ const TODAY = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
 export { canonUrl } from './canon-url.mjs';
 import { canonUrl, idFromUrl } from './canon-url.mjs';
 
-/* 제목 유사도 — 4글자 조각(4-gram) 겹침 비율. 재게시·접수분 중복 감지용 */
-function titleSim(a, b) {
-  if (!a || !b) return 0;
-  const grams = (s) => { const g = new Set(); for (let i = 0; i <= s.length - 4; i++) g.add(s.slice(i, i + 4)); return g; };
-  const [ga, gb] = [grams(a), grams(b)];
-  const [small, big] = ga.size <= gb.size ? [ga, gb] : [gb, ga];
-  if (!small.size) return 0;
-  let hit = 0;
-  for (const g of small) if (big.has(g)) hit++;
-  return hit / small.size;
-}
-
 /* 제목 청소는 공용 모듈에 있다 (수집기와 같은 규칙을 써야 중복 판정이 어긋나지 않는다) */
 export { cleanTitle } from './clean-title.mjs';
 
 /* ---------- 제목 정규화: 학교별 재게시·꼬리표 차이를 흡수 ---------- */
 const stripPunct = (t) => t.replace(/[\s·ㆍ()~〜.,'"“”‘’!⭐★]/g, '').replace(/공지/g, '').toLowerCase();
 const normTitle = (t) => stripPunct(cleanTitle(t).replace(/\[[^\]]*\]/g, ''));
-/* 대괄호를 살린 판 — 대괄호 안에 사업단·재단 이름이 든 공고가 있어서
-   (예: "[빅데이터혁신융합대학사업단] … 성과형 장학금") 대괄호를 떼면 정작 이름이 사라져
-   같은 공고를 못 알아본다. 2026-07-30 시립대 이중 등록의 원인이었다. */
-const normTitleFull = (t) => stripPunct(cleanTitle(t));
 
 /* ---------- 재단명 추출: 같은 재단 사업의 학교별 재게시를 식별 ---------- */
 const GENERIC_FOUNDATION = /^(한국|국가|대학|교내|교외|학교|서울|재단)$/;
@@ -81,7 +65,7 @@ export function foundationKey(t) {
 /* ---------- 판정 규칙 (verify/list-unregistered.js와 동일 계열 + 자동화용 강화) ---------- */
 const NON_NOTICE = /^(장학금 종류|장학금 신청|장학\/?학자금|장학 및 학자금|학자금 대출|장학금·학자금|국가장학금 및 학자금대출|국제화장학금|교외장학재단|근로장학공고게시판|네오르네상스장학|장학금안내|장학\(공지\)|학생지원팀|학생지원센터|장학 및 학자금 대출|학자금 중복지원)/;
 const LOAN = /학자금\s?대출|학자금융자|무이자|이자지원|대출 신청|대출 안내|대출 관련/;
-const EVENT = /교육\s*\*|참가팀 모집|참가자 선발|운영계획서|포스터$|Q&amp;A|Q&A|설명회|박람회|공모전|연수|탐방/;
+const EVENT = /교육\s*\*|참가팀 모집|참가자 선발|운영계획서|포스터$|Q&amp;A|Q&A|설명회|박람회|공모전|연수|탐방|캠프|\bCamp\b|서포터즈/i;
 /* 파일 이름이 그대로 제목으로 잡힌 것 — 확장자 전부 차단.
    예전에는 pdf·hwp·zip만 걸러 '코나아이_소상공인_장학생_모집_포스터.png'가 장학금으로
    등록됐다(원문 보기를 누르면 이미지가 내려받아짐). 2026-07-30 교정 */
@@ -90,9 +74,25 @@ const MENU_TAIL = /\[등록\/장학\]\s*$|^\d+\.\s|^\(붙임|^\(신청서식|^\(
 const DOWNLOAD_URL = /mode=download|attachNo=|fileDown|\/download\b|\.(png|jpe?g|gif|hwpx?|pdf|docx?|zip|xlsx?)(\?|$)/i;
 const EMPLOYMENT = /채용|조교(?!.*장학금)|근무자 모집|직원 모집/;
 const NOT_UNDERGRAD = /대학원생?\s|석사|박사|수련의|졸업(생|자)\s*대상|T\/AS|강의보조/;
-const ADMIN_NOTICE = /출근부|지급\s*안내|지급일|계좌\s*등록|서류\s*보완|유의사항\s*안내|중복지원|반환|환수|추천서\s*(총장|직인)|안내\s*및\s*FAQ/;
+/* 🔴 **뽑고 난 뒤의 공지**는 신청 공고가 아니다 (2026-09-19 · 장학 신호를 넓히면서 드러났다).
+   `선발 결과 확인`·`선발 및 결과발표`·`이중선발자 최종 수혜 장학 선택`·`교내장학 선발 포기 신청`·
+   `희망근로지 신청`(이미 뽑힌 학생이 근무지를 고르는 것) 같은 글은 **`신청`·`선발` 이 들어 있어서
+   ACTION 관문을 그냥 통과한다** — 실측(collector/candidates.json 2,058건)으로 이 줄이 없으면
+   그런 행정 공지 열둘이 학생 화면에 장학금 카드로 나갔다.
+   ⚠️ `선발 알림` 은 넣지 않았다 — `선발 안내`(진짜 모집 공고)와 글자가 너무 가깝다. */
+const ADMIN_NOTICE = /출근부|지급\s*안내|지급일|계좌\s*등록|서류\s*보완|유의사항\s*안내|중복지원|반환|환수|추천서\s*(총장|직인)|안내\s*및\s*FAQ|결과\s*(발표|안내|확인)|결과발표|선발\s*결과|확인\s*방법|포기\s*(신청|서)|희망\s*근로지|이중\s*선발|선발자\s*(공고|안내|명단)|필수사항|(^|\s|└)RE:/;
 const FUTURE_PLAN = /202[7-9](?![\d])[^\d]*(학년도|년).*(유학|연수|입학|신입학)|신입학|입학전형/;
-const POSITIVE = /(장학생|장학금)/;
+/* 🔴 `장학생|장학금` 두 낱말만 보면 **학교 교내 장학금 이름을 통째로 놓친다** (2026-09-19 개발자 지적
+   — "우리 학교 게시판 교내 공고가 장학금 탭에 안 올라온다"). 교내 장학은 이름이 `장학` 으로 끝난다:
+   실측으로 `반영장학`·`우정장학(학업장려금)`·`우정장학(가계곤란)`·`경희꿈도전장학` 넷과 교외
+   `선원가족장학사업` 이 "'장학' 신호 없음"으로 **조용히** 버려지고 있었다(경희대 교내 공고 전부).
+   🔴 **넓히는 것만으로는 안전하지 않다 — 그렇게 적었다가 코드 리뷰에 잡혔다.** `ACTION 이 거른다`
+   고 썼는데 재 보니 거짓이었다: 행정 공지야말로 `신청`·`선발` 을 달고 온다. 실측
+   (`collector/candidates.json` 2,058건)으로 이 한 글자를 넓히면 등록 후보가 65건 늘고 그중 열둘이
+   **뽑고 난 뒤의 공지**였다(선발 결과 확인 · 희망근로지 신청 · 선발 포기 신청 …).
+   그래서 넓히기와 **한 세트로 ADMIN_NOTICE·EVENT 를 같이 조였다** — 둘을 떼어 놓지 말 것.
+   ⚠️ 이자지원 공고(`통영시 대학생 학자금 이자 지원`)에는 `장학` 이 아예 없어 여전히 걸러진다. */
+const POSITIVE = /장학/;
 const ACTION = /(선발|모집|신청|추천|접수)/;
 
 /* 마감 후보 추출 — 명확한 것만 (YYYY.M.D / ~M/D는 연도 불명이라 제외)
@@ -100,6 +100,18 @@ const ACTION = /(선발|모집|신청|추천|접수)/;
    🔴 왜 문구까지 남기나: 게시판 요약(deadlineHint)은 저장되지 않아, 여기서 읽은 마감은 나중에
       **근거를 대조할 길이 없었다**(verify/deadline-audit.mjs 가 4건을 '근거 없음'으로 잡았다).
       등록할 때 `deadlineFrom: '게시판 요약 · <문구>'` 로 남기면 감사가 그 문구를 근거로 센다. */
+/* 🔴 **달력에 없는 날은 마감이 아니다 — 못 믿으면 비운다** (2026-09-19 코드 리뷰가 잡았다).
+   위 규칙이 빈칸을 받게 되면서 2자리 연도 `~ 26. 9. 10.` 이 **달 26일**로 읽혔고(실측 16건),
+   그 `2026-26-09` 는 ① 글자 비교라 `< 오늘` 이 거짓이라 **마감 경과 거르기를 통과**하고
+   ② `entry-rules` 의 `^\d{4}-\d{2}-\d{2}$` 도 통과하며 ③ 앱의 `dday()` 에서 `Invalid Date` 가 돼
+   카드에 **`D-NaN`** 이 뜨고 지난 날로도 안 넘어가 **영영 안 사라진다**.
+   ⚠️ 2자리 연도를 알아맞혀 고쳐 주지 말 것 — 여기서 비우면 `listedAt` 이 붙어 60일 뒤 감춰진다. */
+const okDate = (y, mo, d) => {
+  const iso = `${y}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+  const t = new Date(`${iso}T00:00:00Z`);
+  return !Number.isNaN(t.getTime()) && t.toISOString().slice(0, 10) === iso ? iso : null;
+};
+
 function parseDeadline(n) {
   const hay = `${n.title} ${n.deadlineHint || ''}`;
   const m = hay.match(/~\s*(\d{4})[.\-\/\s]+(\d{1,2})[.\-\/\s]+(\d{1,2})/) ||
@@ -107,14 +119,22 @@ function parseDeadline(n) {
             hay.match(/~\s*(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일/) ||
             hay.match(/(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일\s*[^\d]{0,8}(까지|마감)/) ||
             hay.match(/(\d{4})[.\-\/\s]+(\d{1,2})[.\-\/\s]+(\d{1,2})\s*[^\d]{0,6}(까지|마감)/);
-  if (m) return { date: `${m[1]}-${String(m[2]).padStart(2, '0')}-${String(m[3]).padStart(2, '0')}`, text: m[0].trim() };
-  // 연도 없는 "~7.03"·"~7/19" — 올해로 해석 (마감 경과 거르기용)
-  const m2 = hay.match(/~\s*(\d{1,2})[.\/](\d{1,2})/);
-  if (m2) return { date: `${TODAY.slice(0, 4)}-${String(m2[1]).padStart(2, '0')}-${String(m2[2]).padStart(2, '0')}`, text: m2[0].trim() };
+  if (m) {
+    const iso = okDate(m[1], m[2], m[3]);
+    if (iso) return { date: iso, text: m[0].trim() };
+  }
+  /* 연도 없는 "~7.03"·"~7/19" — 올해로 해석 (마감 경과 거르기용)
+     🔴 점 뒤 빈칸을 받는다 — 게시판은 `(~ 9. 18)` 처럼 띄어 쓴다. 안 받으면 마감을 못 읽어
+        **끝난 공고가 '접수 기간 원문 확인' 을 달고 60일 동안 탭에 남는다**(2026-09-19 실측 3건). */
+  const m2 = hay.match(/~\s*(\d{1,2})\s*[.\/]\s*(\d{1,2})/);
+  if (m2) {
+    const iso = okDate(TODAY.slice(0, 4), m2[1], m2[2]);
+    if (iso) return { date: iso, text: m2[0].trim() };
+  }
   return null;
 }
 
-function classify(n, regUrlSet, regEntries, batchSeen) {
+function classify(n, regUrlSet, regItems, batchSeen) {
   const t = n.title || '';
   const cu = canonUrl(n.url);
   const nt = normTitle(t);
@@ -135,21 +155,45 @@ function classify(n, regUrlSet, regEntries, batchSeen) {
   // 2027년 이후 연도가 제목에 있으면 미래 사업일 가능성 — 자동 등록하지 않고 컨펌 대기
   const years = (t.match(/20\d{2}/g) || []).map(Number);
   if (years.some((y) => y >= 2027)) return { verdict: 'hold', why: '2027년 이후 사업으로 보임 — 개발자 컨펌 대기' };
-  // 같은 재단·같은 사업 감지: ① 제목 유사도(4-gram) ② 재단명 일치
-  // 같은 학교(또는 전국 등록분)와 겹치면 = 재게시 중복(스킵), 다른 학교와 겹치면 = 타교 접수분일 수 있음(컨펌 대기)
+  /* 같은 재단·같은 사업 감지: ① 이름 대조 ② 재단명 일치
+     같은 학교(또는 전국 등록분)와 겹치면 = 재게시 중복(스킵), 다른 학교면 = 타교 접수분일 수 있음(컨펌 대기)
+
+     🔴 **이름 대조는 감사와 같은 파일을 쓴다** (`verify/entry-rules.cjs` 의 `isDuplicatePair`).
+     2026-09-19 이전에는 여기에 제 사본(4-gram 겹침 ≥ 0.55)이 있었는데, 공고 제목은 대부분이
+     붙박이 말(`2026년도 2학기 … 장학생 선발 안내`)이고 등록명은 짧아서 **그 몇 조각이 전부
+     붙박이**였다 — 짧은 등록명 하나가 아무 공고나 다 잡았다.
+     실측(2026-09-19 · notices.json 52건): 옛 규칙의 '동일 사업' 판정 18건 중 16건을 새 규칙이
+     뒤집는다. 그중 **여덟은 등록된 적도 없는 남의 사업**이었고(경주시장학회↔동산장학회 ·
+     포항시장학회↔동산장학회 · 한원↔양천 · 여성동문회↔총동문회 · 금신사랑↔익산사랑 ·
+     울산연구원↔익산사랑 · 정영오↔이백 · 정연주↔이백), 나머지는 **타교 접수분**이라 원래
+     컨펌 대기로 갔어야 할 것들이다. 공용 판정은 겹침 ≥ 0.8 **에 더해** 공통 꼬리를 뗀
+     나머지(distinctiveSim)까지 본다.
+     ⚠️ 느슨하게 되돌리지 말 것 — 여기서 나는 오판은 **조용한 삭제**라 아무도 못 본다.
+     ⚠️ 아직 못 가르는 것: `인천인재평생교육진흥원` ↔ `충북인재평생교육진흥원` 처럼 **앞 낱말만
+        다른 지역 재단**은 여전히 같은 사업으로 읽힐 수 있다(공통 꼬리 떼기가 이 꼴을 못 잡는다). */
   const fk = foundationKey(t);
-  // 대괄호를 뗀 판·살린 판을 모두 대조해 가장 높은 유사도를 쓴다 (한쪽만 보면 놓친다)
-  const ntFull = normTitleFull(t);
-  const bestSim = (r) => Math.max(
-    titleSim(nt, r.nt), titleSim(ntFull, r.ntFull || r.nt),
-    titleSim(nt, r.ntFull || r.nt), titleSim(ntFull, r.nt),
-  );
-  const similars = regEntries.filter((r) => bestSim(r) >= 0.55 || (fk && r.name.includes(fk)));
+  const title = cleanTitle(t);
+  const schoolOf = (i) => (i.eligibility || {}).schoolOnly || '';
+  /* 🔴 등록명의 괄호는 **꼬리표만** 뗀다 — 이름의 일부는 남긴다.
+     떼야 하는 이유: 등록 54건 중 38건이 `(한국외대 접수, 2026 후기)`·`(~10/11)`·`(2026 하반기)`
+     같은 꼬리를 달고 있어, 안 떼면 꼬리가 이름으로 세어져 **진짜 재게시를 못 잡는다**
+     (실측 적중 164 → 떼면 343). 같은 학교에 같은 카드가 두 장 생기는 2026-07-30 이중 등록이 이 자리다.
+     🔴 그런데 **통째로 떼면 반대쪽으로 틀린다** — `우정장학(학업장려금)` 과 `우정장학(가계곤란)` 은
+     경희대의 **서로 다른 장학금**인데 괄호를 떼면 한 장학금이 된다(실측으로 하나가 사라졌다).
+     그래서 괄호 안에 **숫자나 `접수`가 있을 때만** 꼬리표로 본다 — 학기·연도·마감·접수처는 전부
+     숫자나 그 낱말을 달고 오고, 이름의 일부(`학업장려금`·`가계곤란`·`Luke`)는 안 달고 온다.
+     🔴 **양쪽에 똑같이 적용한다.** 옛 규칙은 등록명에만 썼는데, 그러면 공고 쪽 꼬리표가 그대로
+        남아 `고졸후학습자(희망사다리2유형) 장학금 신청(~9/17)` 이 같은 학교 등록분과 안 맞는다. */
+  const bare = (s) => (s || '').replace(/\([^)]*(\d|접수)[^)]*\)/g, '');
+  const similars = regItems.filter((i) =>
+    // 학교 축은 아래에서 따로 본다 — 여기서는 '같은 사업인가'만 묻는다(같은 학교로 맞춰 넣는다)
+    isDuplicatePair({ name: bare(title), eligibility: {} }, { name: bare(i.name), eligibility: {} })
+    || (fk && (i.name || '').includes(fk)));
   if (similars.length) {
     // 같은 학교(또는 전국) 등록분이 하나라도 있으면 재게시 중복 — 타교뿐이면 접수분일 수 있어 컨펌 대기
-    const same = similars.find((r) => !r.school || r.school === n.school);
-    if (same) return { verdict: 'skip', why: `이미 등록(동일 사업: ${same.name.slice(0, 24)})` };
-    return { verdict: 'hold', why: `타교 등록분과 동일 사업(${similars[0].name.slice(0, 24)}) — 접수분 여부 컨펌 대기` };
+    const same = similars.find((i) => !schoolOf(i) || schoolOf(i) === n.school);
+    if (same) return { verdict: 'skip', why: `이미 등록(동일 사업: ${(same.name || '').slice(0, 24)})` };
+    return { verdict: 'hold', why: `타교 등록분과 동일 사업(${(similars[0].name || '').slice(0, 24)}) — 접수분 여부 컨펌 대기` };
   }
   if (!ACTION.test(t)) return { verdict: 'hold', why: '선발·모집·신청 신호 없음 — 개발자 컨펌 대기' };
   const dl = parseDeadline(n);
@@ -163,16 +207,13 @@ if (!cfg.enabled) {
   report.push('', '### 🤝 자동 등록: 꺼짐 (auto-register-config.json enabled=false)');
 } else {
   const regUrlSet = new Set(registered.items.map((i) => canonUrl(i.sourceUrl || '')).filter(Boolean));
-  const regEntries = registered.items.map((i) => ({
-    name: i.name || '',
-    // "(동국대 접수)" 같은 꼬리표는 떼고 사업명만 비교
-    nt: normTitle((i.name || '').replace(/\([^)]*\)/g, '')),
-    ntFull: normTitleFull((i.name || '').replace(/\([^)]*\)/g, '')),
-    school: (i.eligibility && i.eligibility.schoolOnly) || '',
-  }));
   const batchSeen = new Set();
   const added = [];
   const held = [];
+  /* 거른 이유를 센다 — **조용한 탈락이 이 사고의 정체였다** (2026-09-19). 리포트가 hold 만 적고
+     skip 은 한 줄도 안 적어서, 경희대 교내 장학 넷과 '가짜 동일 사업' 여덟이 몇 주 동안
+     아무 흔적 없이 사라졌다. 이유별 숫자만 적는다(33줄을 다 적으면 아무도 안 읽는다). */
+  const skipped = new Map();
 
   /* 잘못 등록된 건 되돌리기 (막음 장치) — id와 주소 **둘 다** 본다.
      🔴 왜 주소까지 보나 (2026-08-14에 실제로 당했다):
@@ -194,12 +235,19 @@ if (!cfg.enabled) {
      빈 배열이면 제한 없음(예전 동작). */
   const onlySchools = new Set(cfg.schools || []);
   let outOfScope = 0;
+  let unseen = 0; // 한 실행 상한에 걸려 **아예 안 본** 공고 — 거른 것과 섞으면 숫자가 거짓말을 한다
   for (const n of notices.items || []) {
-    if (added.length >= (cfg.maxPerRun || 8)) break;
+    if (added.length >= (cfg.maxPerRun || 8)) { unseen += 1; continue; }
     if (onlySchools.size && n.school && !onlySchools.has(n.school)) { outOfScope += 1; continue; }
-    const r = classify(n, regUrlSet, regEntries, batchSeen);
+    const r = classify(n, regUrlSet, registered.items, batchSeen);
     if (r.verdict === 'hold') { held.push({ n, why: r.why }); continue; }
-    if (r.verdict !== 'register') continue;
+    if (r.verdict !== 'register') {
+      /* 괄호 안 알맹이(공고 이름·날짜)는 떼고 이유만 남긴다 — 안 떼면 집계가 아니라 목록이 된다:
+         `이미 등록(동일 사업: 충북…)` → `이미 등록(동일 사업)` · `마감 경과(2026-09-17)` → `마감 경과` */
+      const key = (r.why || '').replace(/:\s*[^)]*(?=\))/, '').replace(/\(\d{4}-\d{2}-\d{2}\)/, '');
+      skipped.set(key, (skipped.get(key) || 0) + 1);
+      continue;
+    }
     const cu = canonUrl(n.url);
     batchSeen.add(cu);
     batchSeen.add(n.school + '|' + normTitle(n.title));
@@ -211,10 +259,11 @@ if (!cfg.enabled) {
       .slice(0, 6);
     // 🔴 공식은 canon-url.mjs 하나 — 베끼면 관리자 화면의 register 와 갈라진다(2026-08-14 부경대 유형)
     const id = idFromUrl('auto-', n.url);
-    if (registered.items.some((i) => i.id === id)) continue;
+    // 아래 두 갈래도 집계에 넣는다 — 여기서 빠져나가면 다시 '조용한 탈락'이 된다
+    if (registered.items.some((i) => i.id === id)) { skipped.set('이미 등록(같은 id)', (skipped.get('이미 등록(같은 id)') || 0) + 1); continue; }
     /* 사람이 한 번 '이건 아니다'라고 뺀 공고는 다시 등록하지 않는다.
        위 되돌리기와 같은 이유로 주소도 함께 본다 — 지우기만 하면 다음 실행에 또 들어온다. */
-    if (blockedIds.has(id) || blockedUrls.has(cu)) continue;
+    if (blockedIds.has(id) || blockedUrls.has(cu)) { skipped.set('사람이 막아 둔 공고(blockIds/blockUrls)', (skipped.get('사람이 막아 둔 공고(blockIds/blockUrls)') || 0) + 1); continue; }
     const title = cleanTitle(n.title).slice(0, 70);
     const entry = {
       id,
@@ -282,7 +331,6 @@ if (!cfg.enabled) {
     }
     registered.items.push(entry);
     regUrlSet.add(cu);
-    regEntries.push({ name: title, nt: normTitle(title), ntFull: normTitleFull(title), school: n.school });
     added.push(entry);
   }
 
@@ -335,6 +383,14 @@ if (!cfg.enabled) {
     report.push('', `**컨펌 대기 (자동 기준 미달 ${held.length}건)** — 장학 신호는 있지만 선발·모집 신호가 약해요:`);
     for (const h of held.slice(0, 10)) report.push(`- ${h.n.title.slice(0, 60)} (${h.why})`);
   }
+  if (skipped.size) {
+    const total = [...skipped.values()].reduce((a, b) => a + b, 0);
+    report.push('', `**거른 공고 ${total}건 — 이유별**`, '');
+    for (const [why, c] of [...skipped].sort((a, b) => b[1] - a[1])) report.push(`- ${why} · ${c}건`);
+  }
+  /* 🔴 '거른 것'과 '아예 안 본 것'을 섞지 않는다 — 상한에 걸려 멈춘 뒤의 공고는 판정조차 안 했다.
+     안 적으면 위 숫자가 "이만큼 걸러졌다"로 읽혀 다음 세션이 없는 버그를 쫓는다. */
+  if (unseen) report.push('', `⏭ 한 실행 상한(${cfg.maxPerRun || 8}건)에 걸려 **${unseen}건은 보지 않았어요** — 다음 수집에서 이어서 봅니다.`);
 }
 
 if (fs.existsSync(reportPath)) fs.appendFileSync(reportPath, report.join('\n') + '\n');
