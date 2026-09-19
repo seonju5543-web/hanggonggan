@@ -770,8 +770,40 @@ const SERVED_SCHOOLS = ['경희대학교', '한국외국어대학교'];
    그래서 **넓히되 `외` 가 붙는 꼴만 뺀다.** ⚠️ `교내 및 교외 …` 처럼 사이에 낱말이 있으면
    교내로 본다 — 둘 다인 공고이고, 게시판이 앞세운 말이 교내다. */
 const NOTICE_CAMPUS_MARK = /교내(?![·•‧・\s]*외)/;
-function noticeKind(title) {
-  return NOTICE_CAMPUS_MARK.test(String(title || '')) ? '교내' : '교외';
+
+/* 🔴 **학교가 스스로 운영하는 장학 제도 이름** (2026-09-20 개발자 지시 —
+   *"그 셋이 대체 왜 교외에 있었는지 모르겠으며 교내로 바꾸고 재발하지 않도록 해줘"*).
+
+   왜 필요한가: 위 표식 규칙은 **제목에 `교내` 라고 적혀 있을 때만** 교내라고 부른다. 그런데
+   학교가 제 장학금을 올릴 때는 그 글자를 안 쓴다 — 제 게시판이니 굳이 적을 이유가 없다.
+   그래서 경희대 교내 장학 넷이 전부 '교외'로 떨어져 있었다.
+   실제로 확인해 봤더니 게시판에도 근거가 없다(2026-09-20 직접 열람):
+     · 게시판은 `BMSR00040` 하나뿐 — 교내·교외를 가르는 게시판이 따로 없다.
+     · 목록의 분류 칸은 `공통/서울/국제` = **캠퍼스**이고, 작성자는 전부 `(○○)학생지원센터`다.
+     · `[공통]` 표식은 교외인 `[공통] 두을장학재단 제29기 …` 도 달고 있어 신호가 못 된다.
+   → 제목·게시판으로는 **가를 수 없다.** 가를 수 있는 것은 원문뿐이고, 원문은 한 번 읽으면
+     그 제도가 사라질 때까지 유효하다(매 학기 같은 이름으로 다시 올라온다). 그래서 여기에 적는다.
+
+   🔴 **원문을 읽어 확인한 것만 적는다 — 그럴듯해서 적지 않는다**(운영 원칙 8-1).
+      확인한 내용은 `docs/designs/on-campus-programs.md` 에 공고 주소·날짜와 함께 남긴다.
+   🔴 **학교별이다.** 같은 낱말이라도 다른 학교 공고에는 안 쓴다 — `우정장학` 은 경희대의 제도지만
+      다른 학교 게시판의 `우정…` 은 외부 재단일 수 있다.
+   ⚠️ 이 표를 '교외를 찾는' 쪽으로 뒤집지 말 것 — 2026-09-18에 실패한 방식이 그거다. */
+const OWN_PROGRAMS = {
+  // 경희대학교 — 2026-09-20 공고 원문·첨부 공지문으로 확인 (news.khu.ac.kr BMSR00040)
+  '경희대학교': [
+    '반영장학',        // 첨부 공지문: 대외협력처 대외협력팀이 접수·심사·지급(ysy922@khu.ac.kr), 외부 재단 없음
+    '우정장학',        // 위 공지문이 "본 장학에 선발된 학생은 우정장학(학업장려금) 수혜 불가"로 제 제도끼리 배타를 건다
+    '경희꿈도전장학',  // 첨부 계획(안): 지도교수 추천서·교내 심사 2단계·"경희정신 구현" 도전분야
+  ],
+};
+
+/* 공고가 교내인가 교외인가. `school` 은 그 공고를 올린 학교(모르면 생략) — 위 표가 학교별이라 필요하다. */
+function noticeKind(title, school) {
+  const t = String(title || '');
+  if (NOTICE_CAMPUS_MARK.test(t)) return '교내';
+  if ((OWN_PROGRAMS[school] || []).some((p) => t.includes(p))) return '교내';
+  return '교외';
 }
 
 function noticeForProfile(n, p) {
@@ -1398,6 +1430,6 @@ if (typeof module !== 'undefined' && module.exports) {
                      requirementLines, requirementStruct, requirementMatch, tidyRequirement,
                      REQ_SIGNAL, NOT_A_REQUIREMENT, EXCLUDE_LINE, HARD_THRESHOLD,
                      noticeForProfile, taggedSchool, SHARED_BOARD_BRANCH, SERVED_SCHOOLS,
-                     noticeKind, NOTICE_CAMPUS_MARK,
+                     noticeKind, NOTICE_CAMPUS_MARK, OWN_PROGRAMS,
                      noticeFileKey, noticeFileFor, noticeFilesForProfile };
 }

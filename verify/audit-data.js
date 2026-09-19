@@ -17,6 +17,7 @@ const ROOT = path.join(__dirname, '..');
 const reg = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/registered.json'), 'utf8'));
 const forms = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/forms.json'), 'utf8'));
 const { checkEntry, isDuplicatePair } = require('./entry-rules.cjs');
+const { noticeKind: reqNoticeKind } = require('../match-engine.js');
 const { formBudgetReport, FORM_LIMITS } = require('../form-plan.js');
 /* 🔴 새 필드 타입을 여기 안 넣으면 감사가 exit 1로 죽고, 그날 수집 로봇 결과가
    하나도 저장되지 않는다(워크플로가 감사 실패 시 되돌리기를 한다) */
@@ -33,7 +34,10 @@ for (const it of reg.items) {
   seenIds.add(it.id);
   /* 항목별 규칙은 verify/entry-rules.cjs 한 곳에만 있다 — 수집 로봇도 같은 규칙으로
      등록 '전'에 거르므로, 새 규칙을 거기 추가하면 양쪽에 동시에 적용된다 */
-  for (const p of checkEntry(it, { formIds: new Set(Object.keys(forms.templates)) })) {
+  /* 🔴 `noticeKind` 를 같이 넘긴다 (2026-09-20) — 규칙은 entry-rules 한 곳에 있지만, 그 파일은
+     관리자 화면이 브라우저로도 읽어서 스스로 match-engine 을 부를 수 없다. 안 넘기면
+     '학교가 스스로 운영하는 장학 제도가 교외로 남아 있다' 검사가 조용히 꺼진다. */
+  for (const p of checkEntry(it, { formIds: new Set(Object.keys(forms.templates)), noticeKind: reqNoticeKind })) {
     (p.level === 'error' ? errors : warns).push(`${where} — ${p.msg}`);
   }
   // 신청서 첨부가 있는데 양식도 사유도 없는 경우는 따로 더 구체적으로 알린다
@@ -245,6 +249,7 @@ console.log(`감사 대상: 정식 등록 ${reg.items.length}건 · 양식 ${Obj
     }
   }
 }
+
 
 /* ── 🔴 초안이 학생을 탈락시키지 못하게 하는 관문 (2026-08-24) ──
    개발자 지적: "공고 원문·첨부에서 드러난 위험과 같은 위험이 또 있나? 자격 매칭 개발과

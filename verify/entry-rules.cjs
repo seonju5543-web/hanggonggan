@@ -80,6 +80,30 @@ function checkEntry(it, opts = {}) {
   }
   if (it.formId && opts.formIds && !opts.formIds.has(it.formId)) err(`formId '${it.formId}'가 data/forms.json에 없음`);
 
+  /* 🔴 학교가 스스로 운영하는 장학 제도가 '교외'로 남아 있는가 (2026-09-20 개발자 지시 · 소급 · 원칙 7)
+     *"그 셋이 대체 왜 교외에 있었는지 모르겠으며 교내로 바꾸고 재발하지 않도록 해줘."*
+     경희대 반영장학·우정장학·경희꿈도전장학이 교외로 등록돼 있었다 — 판정이 **제목에 `교내` 라고
+     적혀 있을 때만** 교내라고 부르는데 학교는 제 게시판에 그 글자를 안 쓰기 때문이다.
+     🔴 **이 검사가 '재발 방지'의 실체다** — 규칙(match-engine 의 `OWN_PROGRAMS`)만 고치면
+        이미 등록된 것은 교외로 남는다(`type` 은 등록할 때 한 번 정해지고 다시 안 본다).
+
+     🔴 **`opts.noticeKind` 로 판정을 받아 온다 — 여기서 match-engine 을 require 하지 말 것.**
+        이 파일은 `_admin/build.sh` 가 감싸서 **브라우저로도** 읽는다(관리자 화면). 최상위
+        require 를 넣으면 admin.js 가 통째로 안 돌아 버튼이 죽는다(2026-09-13 실사고와 같은 유형).
+
+     ⚠️ **오류가 아니라 경고다.** 오류로 두면 사람이 관리자 화면에서 '교외'로 고치는 순간
+        감사가 영영 실패하고, 그러면 수집 워크플로가 매일 되돌리기를 돌려 **자동 등록이 통째로
+        멈춘다**(revert-auto 는 기존 항목을 못 고친다). 사람 판단을 기계가 잠그면 안 된다.
+     ⚠️ 학교를 모르는 전국 등록분은 건너뛴다 — 표가 학교별이라 적용할 수 없다. */
+  const ownSchool = (it.eligibility || {}).schoolOnly || '';
+  if (opts.noticeKind && ownSchool && it.type !== '교내'
+    // `name` 은 70자로 잘린 값이라 게시판 원제목도 같이 본다 (이름이 뒤에 있으면 놓친다)
+    && opts.noticeKind(`${name} ${it.boardTitle || ''}`, ownSchool) === '교내') {
+    warn(`${ownSchool}가 스스로 운영하는 장학 제도인데 '${it.type}'로 등록돼 있습니다 `
+      + `— 교내로 고치거나, 아니라면 match-engine.js 의 OWN_PROGRAMS 에서 그 이름을 빼세요 `
+      + `(근거: docs/designs/on-campus-programs.md)`);
+  }
+
   return out;
 }
 

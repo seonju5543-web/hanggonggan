@@ -1268,7 +1268,7 @@ console.log('\n■ 교내·교외 분류와 주관 기관 (2026-09-18 개발자 
   const mProv = src.match(/const PROVIDER_UNKNOWN = '([^']+)';/);
   eq('교내 표식 규칙(NOTICE_CAMPUS_MARK)이 공용 엔진에 있다', !!mMark, true);
   eq('  로봇이 그 함수를 가져다 쓴다 (규칙을 베끼지 않는다)',
-    /\{ noticeKind \} = createRequire/.test(src) && /type: noticeKind\(title\)/.test(src), true);
+    /\{ noticeKind \} = createRequire/.test(src) && /type: noticeKind\(title, n\.school\)/.test(src), true);
   eq('로봇에 "모름" 주관 기관(PROVIDER_UNKNOWN)이 있다', !!mProv, true);
   if (mMark && mProv) {
     const MARK = eval(mMark[1]);
@@ -8114,6 +8114,98 @@ console.log('\n■ 실시간 공고 → 장학금 탭 (자동 등록 판정 · 2
     eq('  마감을 내놓는 두 갈래가 모두 그 검사를 거친다',
       (src.match(/const iso = okDate\(/g) || []).length, 2);
   }
+}
+
+/* ── 2026-09-20 · 학교가 스스로 운영하는 장학 제도는 '교내'다 (개발자 지시) ──
+   *"그 셋이 대체 왜 교외에 있었는지 모르겠으며 교내로 바꾸고 재발하지 않도록 해줘."*
+   원인: 판정이 **제목에 `교내` 라고 적혀 있을 때만** 교내라고 부르는데, 학교는 제 게시판에
+   그 글자를 안 쓴다. 직접 열어 보니 게시판에도 근거가 없었다 — 게시판 하나 · 분류 칸은 캠퍼스 ·
+   작성자는 전부 학생지원센터 · `[공통]` 은 교외인 두을장학재단도 달고 있다.
+   그래서 **원문을 한 번 읽고 이름표를 적어 두는** 방식이다(근거는 docs/designs/on-campus-programs.md).
+   🔴 규칙을 여기에 베끼지 않는다 — match-engine 에서 불러 쓴다. */
+console.log('\n■ 학교가 스스로 운영하는 장학 제도 (2026-09-20)');
+{
+  const { noticeKind, OWN_PROGRAMS } = createRequire(import.meta.url)('../match-engine.js');
+  eq('공용 엔진이 학교별 제도 이름표를 내보낸다', !!OWN_PROGRAMS && !!OWN_PROGRAMS['경희대학교'], true);
+
+  /* 전부 **실제로 게시판에 올라온 제목**이고, 넷은 원문으로 교내임을 확인했다 */
+  const 교내 = [
+    '공통 [공통] 2026학년도 2학기 반영장학 신청 안내',
+    '공통 [공통] 2026학년도 2학기 우정장학(학업장려금) 신청 안내',
+    '공통 [공통] 2026학년도 2학기 우정장학(가계곤란) 복학생/재입학생 신청 안내',
+    '공통 [공통] 2026학년도 2학기 경희꿈도전장학 신청 안내',
+  ];
+  eq('경희대가 직접 주는 장학금은 교내다', 교내.filter((t) => noticeKind(t, '경희대학교') !== '교내'), []);
+
+  /* 🔴 같은 게시판·같은 작성자·같은 `[공통]` 표식을 단 교외 공고가 섞여 들면 표가 너무 넓은 것이다 */
+  const 교외 = [
+    '공통 [공통] 두을장학재단 제29기 장학생 모집',
+    '공통 푸른등대 한국수력원자력 k-원전 장학금 신청안내 (9.11~9.28)',
+    '공통 2026년 (재)경주시장학회 장학생 선발 안내',
+    '서울 [서울C] 2026학년도 2학기 하나금융나눔재단 하나장학생 선발 안내',
+    '공통 2026학년도 2학기 선원가족 장학생 모집 안내',
+  ];
+  eq('  같은 게시판의 외부 재단 공고는 그대로 교외다', 교외.filter((t) => noticeKind(t, '경희대학교') !== '교외'), []);
+
+  /* 🔴 표는 **학교별**이다 — 다른 학교 게시판의 같은 낱말은 외부 재단일 수 있다 */
+  eq('  다른 학교 제목에는 그 표를 쓰지 않는다',
+    noticeKind('2026학년도 2학기 반영장학 신청 안내', '한국외국어대학교'), '교외');
+  eq('  학교를 모르면 예전처럼 표식만 본다',
+    [noticeKind('2026학년도 2학기 반영장학 신청 안내'), noticeKind('[교내] 가족장학금 신청')], ['교외', '교내']);
+
+  /* 🔴 `교내외` 는 둘 다라 교내가 아니다 — 2026-09-18 규칙이 살아 있는지 */
+  eq('  `교내외` 는 여전히 교내가 아니다', noticeKind('교내외 장학금 통합 안내', '경희대학교'), '교외');
+
+  /* 🔴 **앱 화면(`boardNoticesInSchool`)에는 이 표를 쓰지 않는다** — 2026-09-18 결정
+     *"표식 없는 것까지 낱말로 맞히려 하지 말 것"* 이 거기서는 그대로 살아 있다. 실제로 써 봤더니
+     경희대 게시판의 `⭐중요⭐ 2026-2학기 국가장학금(2차) 및 복학생 우정장학(가계곤란) 신청 안내`
+     가 '교내' 칸에 떴다 — **국가장학금 공지를 교내라고 부르는** 09-18 사고 그대로다.
+     등록 로봇은 그 제목을 `국가장학금` 규칙으로 이미 거르므로, 표는 **등록 단계에서만** 쓴다. */
+  const arSrc = readText(new URL('../collector/auto-register.mjs', import.meta.url));
+  const appSrc = readText(new URL('../app.js', import.meta.url));
+  eq('로봇이 학교를 같이 넘긴다', /type: noticeKind\(title, n\.school\)/.test(arSrc), true);
+  eq('  앱의 게시판 글 판정은 표식만 본다 (표를 쓰지 않는다)',
+    /noticeKind\(n\.title\) === '교내'/.test(appSrc), true);
+  eq('  그 합성 제목은 등록 단계에서 걸러진다 (국가장학금 규칙)',
+    /if \(\/국가장학금\/\.test\(t\)\) return \{ verdict: 'skip'/.test(arSrc), true);
+
+  /* 소급 — 이미 등록된 것을 현재 규칙으로 다시 잰다. 🔴 이게 '재발 방지'의 실체다:
+     규칙만 고치면 `type` 은 등록할 때 정해진 채 안 바뀐다.
+     🔴 **글자가 아니라 동작으로 잰다** — 앞선 판은 감사 소스를 정규식으로 봐서, `errors.push` 를
+        `warns.push` 로 바꿔 관문의 이빨을 통째로 뽑아도 초록이었다(코드 리뷰가 잡았다). */
+  {
+    const { checkEntry } = createRequire(import.meta.url)('./entry-rules.cjs');
+    const base = {
+      id: 'x', name: '공통 [공통] 2026학년도 2학기 반영장학 신청 안내', provider: 'p', amount: 'a',
+      summary: 's', documents: [], sourceUrl: 'https://x/a', eligibility: { schoolOnly: '경희대학교' },
+      noForm: '-', eligibilityVerified: true,
+    };
+    const hits = (it, opts) => checkEntry(it, opts).filter((p) => /스스로 운영/.test(p.msg));
+    eq('교외로 남아 있으면 감사가 짚는다', hits({ ...base, type: '교외' }, { noticeKind }).length, 1);
+    /* ⚠️ **오류가 아니라 경고여야 한다** — 오류면 사람이 관리자 화면에서 교외로 고치는 순간
+       감사가 영영 실패하고 수집 워크플로가 매일 되돌리기를 돌려 자동 등록이 통째로 멈춘다
+       (revert-auto 는 기존 항목을 못 고친다). 사람 판단을 기계가 잠그면 안 된다. */
+    eq('  경고다 (오류로 두면 사람이 고친 값이 파이프라인을 잠근다)',
+      hits({ ...base, type: '교외' }, { noticeKind })[0].level, 'warn');
+    eq('  교내면 조용하다', hits({ ...base, type: '교내' }, { noticeKind }).length, 0);
+    eq('  이름이 70자에서 잘려도 게시판 원제목으로 잡는다',
+      hits({ ...base, type: '교외', name: '공통 [공통] 2026학년도 2학기', boardTitle: base.name }, { noticeKind }).length, 1);
+    eq('  이어붙인 자리를 넘어 오탐하지 않는다',
+      hits({ ...base, type: '교외', name: '재단 우', boardTitle: '정장학 안내' }, { noticeKind }).length, 0);
+    eq('  학교를 모르는 전국 등록분은 건너뛴다',
+      hits({ ...base, type: '교외', eligibility: {} }, { noticeKind }).length, 0);
+    /* 🔴 감사가 판정 함수를 **실제로 넘기는가** — 안 넘기면 이 검사는 조용히 꺼진다 */
+    const auditSrc = readText(new URL('./audit-data.js', import.meta.url));
+    /* 🔴 **`checkEntry` 를 부르는 그 자리**를 본다 — 그냥 `noticeKind: reqNoticeKind` 를 찾으면
+       위쪽 `require` 줄의 같은 글자에 걸려, 인자를 빼도 초록이다(만들면서 실제로 그랬다). */
+    eq('  감사가 판정 함수를 넘긴다 (안 넘기면 조용히 꺼진다)',
+      /checkEntry\(it, \{[^}]*noticeKind: reqNoticeKind/.test(auditSrc), true);
+  }
+
+  /* 근거 문서가 표와 같은 이름을 담고 있는가 — 근거 없이 이름만 늘어나는 것을 막는다 */
+  const doc = readText(new URL('../docs/designs/on-campus-programs.md', import.meta.url));
+  eq('표의 이름마다 근거 기록이 있다',
+    (OWN_PROGRAMS['경희대학교'] || []).filter((p) => !doc.includes(p)), []);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
