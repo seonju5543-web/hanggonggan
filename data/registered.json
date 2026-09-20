@@ -3736,6 +3736,182 @@
    ],
    "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/264949/artclView.do",
    "sourceKind": "auto"
+  },
+  {
+   "id": "auto-ent2431264946artclviewdo",
+   "name": "[공통][교외] 2026년 2학기 선원가족장학사업 선발 안내",
+   "boardTitle": "[공통][교외] 2026년 2학기 선원가족장학사업 선발 안내",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-20",
+   "period": "접수 기간 원문 확인",
+   "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-20 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/264946/artclView.do",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-oardid322922menuno200318",
+   "name": "공통 [공통] 2026학년도 2학기 경희꿈도전장학 신청 안내",
+   "boardTitle": "공통 [공통] 2026학년도 2학기 경희꿈도전장학 신청 안내",
+   "type": "교내",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-20",
+   "period": "접수 기간 원문 확인",
+   "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경희대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-20 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "붙임2-1 2026-2학기 경희꿈도전장학 지도교수 추천서(장학신청시 제출).hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=ecde5e43bac64aebb41c05ff0c70a795&fileSn=2&bbsId=BMSR00040"
+    }
+   ],
+   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322922",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-oardid322916menuno200318",
+   "name": "공통 2026년도 하반기 울산연구원 장학생 선발 안내",
+   "boardTitle": "공통 2026년도 하반기 울산연구원 장학생 선발 안내",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-20",
+   "period": "접수 기간 원문 확인",
+   "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경희대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-20 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026년 하반기 장학생 선발계획 공고.pdf",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=557dd1eec33a49bbb8d8b6f7f9b58198&fileSn=1&bbsId=BMSR00040"
+    },
+    {
+     "name": "2026년 하반기 장학생 선발계획 공고.hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=557dd1eec33a49bbb8d8b6f7f9b58198&fileSn=2&bbsId=BMSR00040"
+    }
+   ],
+   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322916",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-oardid322915menuno200318",
+   "name": "공통 2026학년도 2학기 선원가족 장학생 모집 안내",
+   "boardTitle": "공통 2026학년도 2학기 선원가족 장학생 모집 안내",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-20",
+   "period": "접수 기간 원문 확인",
+   "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경희대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-20 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322915",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-oardid322875menuno200318",
+   "name": "공통 [공통] 2026학년도 2학기 우정장학(학업장려금) 신청 안내",
+   "boardTitle": "공통 [공통] 2026학년도 2학기 우정장학(학업장려금) 신청 안내",
+   "type": "교내",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-20",
+   "period": "접수 기간 원문 확인",
+   "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경희대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-20 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322875",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-oardid322874menuno200318",
+   "name": "공통 [공통] 2026학년도 2학기 우정장학(가계곤란) 복학생/재입학생 신청 안내",
+   "boardTitle": "공통 [공통] 2026학년도 2학기 우정장학(가계곤란) 복학생/재입학생 신청 안내",
+   "type": "교내",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-20",
+   "period": "접수 기간 원문 확인",
+   "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경희대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-20 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322874",
+   "sourceKind": "auto"
   }
  ]
 }
