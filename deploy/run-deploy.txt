@@ -14,5 +14,5 @@
 # 배포되는 경로: 작업 브랜치 → 기본 브랜치(claude/nice-heisenberg-WESq5) → main → 앱
 # 데이터 관문(node verify/audit-data.js)을 통과하지 못하면 배포하지 않고 🚨 이슈를 남긴다.
 
-branch: claude/quirky-clarke-x4i9a4
-메모: 2026-09-19 — 인수인계(시작 화면 기록 문서 + 다음 세션 시작점) · 기본 브랜치에 있어야 다음 세션이 읽는다
+branch: claude/handaejang-notice-error-check-fg521c
+메모: 2026-09-20 — 신청내역 수리 5건(기록 사라짐·차례·손잡이 문구·금액 이름표·마감 막대) + drive.js 간헐 실패
