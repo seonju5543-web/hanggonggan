@@ -669,6 +669,22 @@
    "added": "2026-09-08",
    "fetched": true,
    "schematized": false
+  },
+  {
+   "id": "auto-ent2431267001artclviewdo",
+   "name": "[공통][교외]2026-2학기 정영오(Luke) 장학금 장학생 모집안내",
+   "target": "2026-2학기 정영오(Luke) 장학금 장학생 모집안",
+   "added": "2026-09-20",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-ent2431266737artclviewdo",
+   "name": "[서울]2026년 대학생 청소년 AI교육지원장학금 대학생 멘토 모집 안내(~10/30)",
+   "target": "2026년 대학생 청소년 AI교육지원장학금 대학생 멘토",
+   "added": "2026-09-20",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }

@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-09-19",
+ "updatedAt": "2026-09-20",
  "items": [
   {
    "id": "reg-hi-jeju",
@@ -3371,9 +3371,9 @@
    "provider": "주관 기관 원문 확인",
    "amount": "금액 원문 확인",
    "amountValue": 0,
-   "deadline": null,
+   "deadline": "2026-10-07",
    "listedAt": "2026-09-19",
-   "period": "접수 기간 원문 확인",
+   "period": "접수 기간 ~2026-10-07",
    "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true,
@@ -3422,6 +3422,319 @@
     }
    ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323127",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "선발기준",
+    "❍ 공통기준: 공고일 현재 주민등록 주소지가 1년 이상 춘천시에 등록된 시민 또는 그 자녀로서 중‧고등학교 및 대학(교)에 재학 중인 학생 * 주소이전 장학생, 세인트존스대학교 장학생 예외",
+    "❍ 분야별 선발기준",
+    "(예산액)",
+    "거주기준",
+    "자격기준",
+    "(직전정규학기)",
+    "평가비율",
+    "저 소 득",
+    "자녀(손)",
+    "관내 1년 이상",
+    "󰋻국민기초생활보장법 제2조에 따른 기초생활수급자·차상위계층 및 한부모 가족지원법 제5조·제5조의2에 따른 한부모 가족의 본인 또는 자녀(손)",
+    "성적 40% + 생활수준 50% + 봉사 10%",
+    "통리반장"
+   ],
+   "eligibilityFrom": "공고문 첨부",
+   "deadlineFrom": "공고문 첨부",
+   "openDate": "2026-09-28"
+  },
+  {
+   "id": "auto-ent2431267001artclviewdo",
+   "name": "[공통][교외]2026-2학기 정영오(Luke) 장학금 장학생 모집안내",
+   "boardTitle": "[공통][교외]2026-2학기 정영오(Luke) 장학금 장학생 모집안내",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "100만원",
+   "amountValue": 1000000,
+   "deadline": "2026-09-30",
+   "deadlineFrom": "게시판 요약 · ~ 9. 30",
+   "period": "접수 ~2026-09-30",
+   "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-20 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026-2학기 정영오 장학금+신청서(양식).hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150782/download.do"
+    },
+    {
+     "name": "개인정보수집이용동의서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150783/download.do"
+    }
+   ],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/267001/artclView.do",
+   "sourceKind": "auto",
+   "openDate": "2026-09-21",
+   "eligibilityLines": [
+    "3. 지원자격",
+    "가 . 가정형편이 어려운 학생 ( 학자금 지원구간 기준 )",
+    "나 . 직전학기 12 학점이상 , 평점평균 3.5 이상",
+    "* 학자금 지원구간 , 가정형편 최우선 고려"
+   ],
+   "excerpts": [
+    "선발인원 및 지원금액 : 2 명 ( 서울 1 명 , 글로벌 헝가리학 1 명 ), 생활비 장학금 1 인 1,000,000 원",
+    "문의처 : 서울캠퍼스 장학팀 (02-2173-2137), 글로벌캠퍼스 학생지원 ."
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 1000000,
+    "ratio": 0,
+    "min": 1000000,
+    "max": 1000000,
+    "raw": "2. 선발인원 및 지원금액 : 2 명 ( 서울 1 명 , 글로벌 헝가리학 1 명 ), 생활비 장학금 1 인 1,000,000 원"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-ent2431266737artclviewdo",
+   "name": "[서울]2026년 대학생 청소년 AI교육지원장학금 대학생 멘토 모집 안내(~10/30)",
+   "boardTitle": "[서울]2026년 대학생 청소년 AI교육지원장학금 대학생 멘토 모집 안내(~10/30)",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-10-30",
+   "deadlineFrom": "게시판 요약 · ~ 2026. 10. 30",
+   "period": "접수 ~2026-10-30",
+   "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-20 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "붙임1.멘토 활동계획서 양식.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150626/download.do"
+    }
+   ],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/266737/artclView.do",
+   "sourceKind": "auto",
+   "openDate": "2026-09-15",
+   "eligibilityLines": [
+    "4. 선발기준",
+    "가 . 직전학기 성적 백분위 70 점 이상인 재학생 ( 학자금 지원구간 무관 [10 구간 지원 가능 ])",
+    "나 . 봉사역량 우수자 ( 봉사기간 , 지속성 )",
+    "다 . 자기소개 , 지원동기 , 성적 및 전공 관련 등을 종합적으로 평가하여 선발",
+    "라 . 대학생 청소년교육지원장학 ( 교 . 사대생 튜터링 ) 사업 기참여자 가산점",
+    "마 . 초과학기생 (9 학기 이상 ), 졸업 유예자 , 휴학생 참여 불가 ( 초과학기생의 경우 등록금 전액 납부자는 참여가능 )",
+    "※ 국가근로장학금사업 및 대청교 , 다문화 ⦁ 탈북학생 멘토링사업과 중복참여 불가"
+   ],
+   "excerpts": [
+    "멘토활동계획서 제출 방법 : 이메일 : scholarship@hufs.ac.kr 또는 장학팀 ( 학생회관 121 호 ) 직접 제출",
+    "장학금액 : 시간당 18,000 원 * 인정 멘토링 활동시간",
+    "문의처 : 자세한 내용은 한국장학재단 홈페이지 ( https://www.kosaf.go.kr/ko/main.do) 또는 장학팀 02-2173-2136 으로 문의하시기 바랍니다"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "hourly",
+    "value": 0,
+    "ratio": 0,
+    "min": 0,
+    "max": 0,
+    "raw": "7. 장학금액 : 시간당 18,000 원 * 인정 멘토링 활동시간 8. 선발결과 : 선발자 대상으로 개별연락 예정"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-oardid323082menuno200318",
+   "name": "공통 2026년 (재)경주시장학회 장학생 선발 안내",
+   "boardTitle": "공통 2026년 (재)경주시장학회 장학생 선발 안내",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-20",
+   "period": "접수 기간 원문 확인",
+   "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경희대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-20 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323082",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-oardid323054menuno200318",
+   "name": "공통 [공통] 2026학년도 2학기 반영장학 신청 안내",
+   "boardTitle": "공통 [공통] 2026학년도 2학기 반영장학 신청 안내",
+   "type": "교내",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-20",
+   "period": "접수 기간 원문 확인",
+   "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경희대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-20 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323054",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-oardid323019menuno200318",
+   "name": "공통 2026년도 (재)인천인재평생교육진흥원 하반기 장학생 선발 안내",
+   "boardTitle": "공통 2026년도 (재)인천인재평생교육진흥원 하반기 장학생 선발 안내",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-20",
+   "period": "접수 기간 원문 확인",
+   "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경희대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-20 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "[붙임2-1]26년 하반기_인천인희망드림 장학생(공고문).hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=654f683f435d49afba0e1cb2dfd510f2&fileSn=1&bbsId=BMSR00040"
+    },
+    {
+     "name": "[붙임2-2]26년 하반기_관외대학 거주비 지원(공고문).hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=654f683f435d49afba0e1cb2dfd510f2&fileSn=2&bbsId=BMSR00040"
+    },
+    {
+     "name": "[붙임2-3]26년 하반기_공익인재(공고문).hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=654f683f435d49afba0e1cb2dfd510f2&fileSn=3&bbsId=BMSR00040"
+    }
+   ],
+   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323019",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-oardid323011menuno200318",
+   "name": "공통 2026년 금신사랑장학생 선발 안내",
+   "boardTitle": "공통 2026년 금신사랑장학생 선발 안내",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-20",
+   "period": "접수 기간 원문 확인",
+   "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경희대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-20 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323011",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-ent2431265667artclviewdo",
+   "name": "[공통][교외]2026년도 (재)포항시장학회 장학생 선발공고",
+   "boardTitle": "[공통][교외]2026년도 (재)포항시장학회 장학생 선발공고",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-20",
+   "period": "접수 기간 원문 확인",
+   "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-20 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/265667/artclView.do",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-ent2431264949artclviewdo",
+   "name": "[공통][교외] 2026년 익산사랑 장학생 선발 안내",
+   "boardTitle": "[공통][교외] 2026년 익산사랑 장학생 선발 안내",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-20",
+   "period": "접수 기간 원문 확인",
+   "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-20 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026년도 익산사랑 장학생 선발 공고문.pdf",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/149724/download.do"
+    }
+   ],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/264949/artclView.do",
    "sourceKind": "auto"
   }
  ]
