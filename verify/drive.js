@@ -1,6 +1,6 @@
 const { chromium } = require('playwright-core');
 const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
-const { nextUntil, assertOwnServer } = require('./onboard-helper.js');
+const { nextUntil, assertOwnServer, dismissNotify } = require('./onboard-helper.js');
 const SHOT = (n) => `${__dirname}/shot-${n}.png`;
 
 (async () => {
@@ -224,6 +224,13 @@ const SHOT = (n) => `${__dirname}/shot-${n}.png`;
 
   // ── 영속성/비정상 입력 프로브
   await page.reload({ waitUntil: 'domcontentloaded' });
+  /* 🔴 **새로고침하면 동의 시트가 다시 예약된다** (2026-09-20 · 이 드라이버가 간헐적으로
+     죽던 진짜 이유). 위에서 한 번 닫았지만 그건 그 판 이야기고, 여기서 다시 뜨면 그
+     배경이 클릭을 삼켜 바로 다음 `.nav-item[data-nav="my"]` 이 30초 만에 시간초과로
+     죽는다 — 깨끗한 트리에서도 3번에 1번꼴로 빨간불이었다(실측).
+     ⚠️ 위처럼 **고정 시간(3300ms)으로 기다리지 않는다** — 느린 기기에서는 그 뒤에 뜬다.
+        공용 도우미가 '뜨면 닫고, 안 뜨면 그냥 지나간다'로 처리한다. */
+  await dismissNotify(page);
   // MY 화면에 값이 안 채워진 자리가 없는가 (2026-08-25 '(undefined)' 사고로 추가)
   await page.click('.nav-item[data-nav="my"]');
   await page.waitForTimeout(400);

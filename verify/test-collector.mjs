@@ -3538,6 +3538,48 @@ console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08
   eq("합이 0 이면 '금액 미확인'이라고 적는다",
     appsSrc.includes("shownAmount ? won(shownAmount) : '금액 미확인'"), true);
 
+  /* ── 🔴 차례 — 할 일이 있는 것부터 (2026-09-20 개발자 지적) ──
+     예전엔 담은 순서를 뒤집기만 해서, 실측으로 위 세 장이 전부 끝난 일이고 '서류 작성
+     필요'와 마감 전 공고가 맨 아래로 밀렸다. 🔴 **차례만 바꾸고 거르지 않는다.** */
+  console.log('■ 신청내역 차례 — 할 일이 있는 것부터 (2026-09-20)');
+  const appOrder = new Function(`${grab('appOrder')}\nreturn appOrder;`)();
+  const T = '2026-09-20';
+  const R = (id, app, deadline) => ({ app: { id, ...app }, sch: deadline === null ? null : { deadline } });
+  const mixed = [
+    R('끝남',      { result: 'won' },            '2026-09-30'),
+    R('기다림',    { submittedAt: '2026-09-01' }, '2026-09-25'),
+    R('마감지남',  {},                            '2026-09-01'),
+    R('마감모름',  {},                            null),
+    R('급함',      {},                            '2026-09-22'),
+    R('덜급함',    {},                            '2026-09-28'),
+  ];
+  eq('할 일 → 기다림 → 끝남 차례, 할 일 안에서는 임박순',
+    appOrder(mixed, T).map((r) => r.app.id),
+    ['급함', '덜급함', '마감지남', '마감모름', '기다림', '끝남']);
+  /* 🔴 이 항목이 이 절의 존재 이유다 — 차례를 바꾸다 줄을 흘리면 1번 사고가 되살아난다 */
+  eq('차례를 바꿔도 줄 수는 그대로', appOrder(mixed, T).length, mixed.length);
+  eq('한 줄도 잃지 않는다',
+    appOrder(mixed, T).map((r) => r.app.id).slice().sort().join(),
+    mixed.map((r) => r.app.id).slice().sort().join());
+  eq('빈 목록도 괜찮다', appOrder([], T).length, 0);
+  /* 마감을 모르는 공고에 '남은 날 14일'이라는 가짜 값을 쓰지 않는다(CLAUDE.md) */
+  eq('차례를 정할 때 dday 를 쓰지 않는다', grab('appOrder').includes('dday('), false);
+
+  /* ── 손잡이가 없는 것을 약속하지 않는다 · 마감된 건의 막대 · 금액 이름표 (2026-09-20) ── */
+  console.log('■ 신청내역 — 없는 것을 약속하지 않는다 (2026-09-20)');
+  /* 아래 절이 쓰는 `cardSrc` 는 여기보다 뒤에서 선언된다 — 같은 이름을 앞당겨 쓰면
+     초기화 전 접근으로 죽는다(실제로 한 번 죽였다). 따로 떼어 쓴다. */
+  const appCardSrc = grab('appCard');
+  eq("결과를 기록한 건은 '기록 보기'라고 말한다",
+    appCardSrc.includes("app.result ? '기록 보기' : '세부사항 입력하기'"), true);
+  eq('마감됐는데 제출 기록이 없으면 막대를 진행색으로 칠하지 않는다',
+    appCardSrc.includes("deadPrep ? ' app-step-closed' : ''"), true);
+  eq('제출을 기록한 건은 마감 뒤에도 진행색을 지킨다 (심사 중이므로)',
+    /const deadPrep = isClosed && !app\.submittedAt && !app\.result;/.test(appCardSrc), true);
+  eq('금액 이름표가 건수 줄에서 떨어져 있다', appsSrc.includes('class="summary-label"'), true);
+  eq('건수 줄에 금액 이름표를 다시 붙이지 않는다',
+    /건\$\{[^}]*\}\s*·\s*\$\{wonApps\.length \? '선정된 장학금'/.test(appsSrc), false);
+
   /* 마감 배지는 자기만의 잣대를 만들지 않는다 — dday() 가 내린 cls 를 읽는다.
      새로 `days < 0` 을 쓰면 상시 제도(days:14)·기한 미확인까지 규칙이 갈라진다. */
   const cardSrc = grab('appCard');

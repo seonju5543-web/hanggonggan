@@ -3876,8 +3876,14 @@ function appCard(app, sch) {
      진행 단계만 적으면 제출 안 한 채 마감된 건이 '신청 준비 완료'로만 보여 아직 낼 수 있다고
      오해한다. 판정을 새로 만들지 않고 dday() 가 이미 내린 cls 를 읽는다 — 목록·상세·알림과
      같은 함수다. 마감일이 없는 공고(상시 제도·기한 미확인)는 cls 가 비어 배지가 안 뜬다. */
-  const closedBadge = dday(sch.deadline).cls === 'closed'
-    ? '<span class="badge badge-dday closed">마감</span>' : '';
+  const isClosed = dday(sch.deadline).cls === 'closed';
+  const closedBadge = isClosed ? '<span class="badge badge-dday closed">마감</span>' : '';
+  /* 🔴 **마감된 건의 막대를 '진행 중'처럼 칠하지 않는다** (2026-09-20 개발자 지적).
+     면학장학금이 마감인데 파란 막대가 1/4 만큼 차 있어, 훑으면 아직 진행 중으로 읽혔다
+     (마감 표시는 오른쪽 위 작은 회색 배지뿐이었다).
+     ⚠️ 제출을 기록한 건은 **빼지 않는다** — 그건 마감 뒤에도 진짜로 진행 중(심사)이다.
+        결과를 기록한 건도 제 색(선정 빨강·미선정 회색)을 그대로 쓴다. */
+  const deadPrep = isClosed && !app.submittedAt && !app.result;
   const stepCount = app.pending ? '' : `${step + 1}/${APP_STEPS.length}`;
   const pct = app.pending ? 6 : ((step + 1) / APP_STEPS.length) * 100;
   return `
@@ -3889,13 +3895,17 @@ function appCard(app, sch) {
           <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${sch.type}</span>${closedBadge}
         </div>
         <p class="sch-name">${esc(sch.name)}</p>
-        <div class="app-step app-step-s${step}${app.result === 'lost' ? ' app-step-lost' : ''}${app.pending ? ' app-step-wait' : ''}">
+        <div class="app-step app-step-s${step}${app.result === 'lost' ? ' app-step-lost' : ''}${app.pending ? ' app-step-wait' : ''}${deadPrep ? ' app-step-closed' : ''}">
           <div class="app-step-head"><span>${esc(stepNow)}</span>${stepCount ? `<em>${stepCount}</em>` : ''}</div>
           <div class="mini-progress"><div style="width:${pct}%"></div></div>
         </div>
       </button>
       <button class="app-toggle" data-log-toggle="${esc(app.id)}" aria-expanded="${appsLogOpen.has(app.id)}">
-        세부사항 입력하기<span class="app-caret" aria-hidden="true"></span>
+        ${/* 🔴 **없는 것을 약속하지 않는다** (2026-09-20 개발자 지적). 이 손잡이는 모든
+             카드에 똑같이 '세부사항 입력하기'라고 붙어 있었는데, 결과를 기록한 건은
+             펼쳐도 「기록 취소」 하나뿐이라 입력할 것이 없다(실측 5장 중 2장이 그랬다).
+             할 일이 남았을 때만 '입력하기'라고 말한다. */ ''
+        }${app.result ? '기록 보기' : '세부사항 입력하기'}<span class="app-caret" aria-hidden="true"></span>
       </button>
       ${appLogHtml(app, sch, step)}
     </div>`;
@@ -4377,8 +4387,46 @@ function appRows(applications, resolve) {
     .map((a) => ({ app: a, sch: resolve(a.id) || null }));
 }
 
+/* 차례 — **지금 할 일이 있는 것부터** (2026-09-20 개발자 지적).
+
+   🔴 예전엔 담은 순서를 뒤집기만 했다(`.slice().reverse()`). 그래서 실측으로 위 세 장이
+      전부 마감·선정·미선정(끝난 일)이고, '서류 작성 필요'와 마감 전 공고가 맨 아래로
+      밀려 있었다 — 학생이 스크롤을 끝까지 내려야 할 일을 만난다.
+
+   세 묶음으로만 가른다(더 잘게 나누면 왜 이 차례인지 학생이 못 읽는다):
+     0 할 일 남음   — 서류를 쓰던 중이거나 아직 제출을 기록하지 않았다
+     1 기다리는 중  — 제출을 기록했고 결과를 기다린다
+     2 끝남         — 선정·미선정을 기록했다
+   묶음 안에서는 **마감 전이 먼저**(임박한 것부터), 마감이 지난 것은 뒤로 돌리되
+   최근에 마감된 것부터 둔다. 마감을 모르는 것은 맨 뒤다.
+
+   🔴 **거르지 않는다 — 차례만 바꾼다.** 줄 수는 그대로여야 한다(바로 위 `appRows` 머리말과
+      '신청 내역은 마감으로 거르지 않는다' 관문이 지키는 것이 그것이다).
+   🔴 `dday()` 를 쓰지 않는다 — 그 함수는 마감을 모르는 공고에 '남은 날 14일'이라는 가짜
+      값을 준다(CLAUDE.md). 여기서는 날짜 글자를 그대로 견준다.
+   순수 함수라 가짜 날짜로 검사가 그대로 돌려 본다. */
+function appOrder(rows, today) {
+  const t = today || todayStart().toISOString().slice(0, 10);
+  const stage = (a) => (a.result ? 2 : a.submittedAt ? 1 : 0);
+  const key = (r) => {
+    const dl = (r.sch && r.sch.deadline) || '';
+    const closed = dl ? dl < t : false;
+    return { stage: stage(r.app), unknown: dl ? 0 : 1, closed: closed ? 1 : 0, dl };
+  };
+  return rows.slice().sort((x, y) => {
+    const a = key(x), b = key(y);
+    if (a.stage !== b.stage) return a.stage - b.stage;
+    if (a.unknown !== b.unknown) return a.unknown - b.unknown;   // 마감을 모르면 뒤로
+    if (a.closed !== b.closed) return a.closed - b.closed;       // 마감 지난 것은 뒤로
+    if (a.dl === b.dl) return 0;                                 // 같으면 담은 차례 유지
+    /* 마감 전은 임박한 것부터, 마감 뒤는 최근 마감부터 */
+    return a.closed ? (a.dl < b.dl ? 1 : -1) : (a.dl < b.dl ? -1 : 1);
+  });
+}
+
 function renderApplications() {
-  const rows = appRows(state.applications, findSch);
+  /* 잇고(버리지 않는다) → 차례를 정한다(거르지 않는다). 둘 다 순수 함수라 검사가 직접 돌린다. */
+  const rows = appOrder(appRows(state.applications, findSch));
   /* 공고를 아직 찾을 수 있는 동안 이름을 적어 둔다 — 나중에 목록에서 내려가도 학생이
      무엇이었는지 알아볼 수 있다. 옛 기록을 살리는 길이 이것 하나뿐이라 여기서 한다
      (loadState 는 registered.json 이 오기 전에 돌아 아직 아무것도 못 찾는다). */
@@ -4409,7 +4457,11 @@ function renderApplications() {
 
   $('#apps-summary').innerHTML = apps.length
     ? `<div class="summary-card">
-         <p>준비 완료 ${prepared.length}건${submitted.length ? ` · 제출·심사 중 ${submitted.length}건` : ''}${wonApps.length ? ` · 선정 ${wonApps.length}건` : ''}${pending.length ? ` · 서류 작성 필요 ${pending.length}건` : ''} · ${wonApps.length ? '선정된 장학금' : '예상 최대 수혜액'}</p>
+         ${/* 🔴 금액의 이름표를 **건수 줄에서 떼어냈다** (2026-09-20 개발자 지적).
+              예전엔 `… · 서류 작성 필요 1건 · 선정된 장학금` 처럼 한 줄에 가운뎃점으로
+              붙어 있어, 아래 금액의 이름표가 **네 번째 건수처럼** 읽혔다. */ ''}
+         <p>준비 완료 ${prepared.length}건${submitted.length ? ` · 제출·심사 중 ${submitted.length}건` : ''}${wonApps.length ? ` · 선정 ${wonApps.length}건` : ''}${pending.length ? ` · 서류 작성 필요 ${pending.length}건` : ''}</p>
+         <p class="summary-label">${wonApps.length ? '선정된 장학금' : '예상 최대 수혜액'}</p>
          <p class="summary-amount">${shownAmount ? won(shownAmount) : '금액 미확인'}</p>
          <p class="summary-note">제출·발표는 각 공식 채널에서 · 결과는 여기에 기록${
            shownAmount && unknownAmount ? ` · 금액 미확인 ${unknownAmount}건 제외` : ''}</p>
