@@ -3492,6 +3492,52 @@ console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08
   eq('신청 내역은 마감으로 거르지 않는다 (dday 판정 없음)',
     appsSrc.includes('dday('), false);
 
+  /* ── 🔴 신청 기록을 버리지 않는다 (2026-09-20 개발자 지시로 수리) ──
+     예전엔 `.filter((a) => findSch(a.id))` 라, 공고를 못 찾으면 그 신청 기록을 화면에서
+     통째로 빼고 **아무 말도 하지 않았다.** 실측으로 저장 3건 중 1장만 그려졌고 선정으로
+     기록해 둔 건까지 사라졌다. 못 찾는 일은 드물지 않다 — 학생이 학교를 바꾸거나(schoolOnly),
+     층2(KOSAF) 공고가 마감 다음 날 데이터에서 내려갈 때 일어난다.
+     바로 위 '마감으로 거르지 않는다'와 같은 계열이다: **신청 내역에서 줄이 사라지면 안 된다.** */
+  console.log('■ 신청 기록을 버리지 않는다 (2026-09-20)');
+  eq('공고를 못 찾는다고 기록을 거르지 않는다',
+    /filter\(\s*\(a\)\s*=>\s*findSch\(/.test(appsSrc), false);
+  eq('기록↔공고 잇기를 appRows 로 한다', appsSrc.includes('appRows(state.applications, findSch)'), true);
+  /* 금액은 못 찾으면 0 이어야 한다 — 옛 코드는 공고를 못 찾는 그 자리에서 죽었다
+     (그래서 위 filter 가 있었던 것이기도 하다). 되돌아오면 여기서 잡는다.
+     🔴 **주석을 빼고 잰다** — 걷어낸 옛 코드를 인용한 주석에 걸려 빨간불이 된다
+        (2026-09-12 에 같은 함정을 한 번 밟았다: CLAUDE.md '주석까지 세지 말 것'). */
+  const codeOnly = (s) => s.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/.*$/gm, '$1');
+  eq('못 찾는 공고의 금액에서 죽지 않는다',
+    /findSch\([^)]*\)\.amountValue/.test(codeOnly(appsSrc)), false);
+
+  /* 규칙을 글자로만 재지 않고 **함수를 그대로 돌려 본다** — 못 찾는 기록이 살아남는가 */
+  const appRows = new Function(`${grab('appRows')}\nreturn appRows;`)();
+  const stored = [{ id: 'a' }, { id: 'gone' }, { id: 'c' }];
+  const rows = appRows(stored, (id) => (id === 'gone' ? null : { id, name: id }));
+  eq('못 찾는 기록도 줄로 남는다', rows.length, 3);
+  eq('못 찾는 줄은 공고 자리가 비어 있다', rows.map((r) => !!r.sch), [true, false, true]);
+  eq('차례는 최근 담은 것부터', rows.map((r) => r.app.id), ['c', 'gone', 'a']);
+  eq('기록이 없으면 빈 목록', appRows(null, () => null).length, 0);
+
+  /* 사라진 공고 카드가 **모르는 것을 말하지 않는가** (원칙 8-1) */
+  const goneSrc = grab('appCardGone');
+  eq('이름을 지어내지 않는다 (적어 둔 name 만 쓴다)',
+    goneSrc.includes("app.name || '(목록에서 내려간 공고)'"), true);
+  eq('마감을 말하지 않는다', goneSrc.includes('dday('), false);
+  eq('금액을 말하지 않는다', goneSrc.includes('amountValue'), false);
+  eq('진행 단계(n/4)를 말하지 않는다', goneSrc.includes('APP_STEPS'), false);
+  /* 학생이 적어 둔 것은 학생의 기록이라 그대로 남는다 */
+  eq('학생이 기록한 결과는 남긴다', /app\.result/.test(goneSrc), true);
+  eq('잘못 누른 기록을 되돌릴 길이 있다', goneSrc.includes('data-undo-result'), true);
+  /* 되돌리기는 공고를 요구하면 안 된다 — 요구하면 사라진 공고의 기록이 영영 안 지워진다
+     (저장 해제 `toggleSave` 가 2026-09-07 코드 리뷰에서 같은 이유로 고쳐졌다) */
+  eq('되돌리기가 공고를 요구하지 않는다', grab('undoProgress').includes('typeof schOrId'), true);
+
+  /* 합이 0 일 때 '0원'이라고 말하지 않는다 — 금액 미확인 공고가 많아(실측 68건 중 41건)
+     그중 하나를 선정으로 기록하면 '선정된 장학금 0원'이 떴다. */
+  eq("합이 0 이면 '금액 미확인'이라고 적는다",
+    appsSrc.includes("shownAmount ? won(shownAmount) : '금액 미확인'"), true);
+
   /* 마감 배지는 자기만의 잣대를 만들지 않는다 — dday() 가 내린 cls 를 읽는다.
      새로 `days < 0` 을 쓰면 상시 제도(days:14)·기한 미확인까지 규칙이 갈라진다. */
   const cardSrc = grab('appCard');

@@ -2923,6 +2923,14 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 .app-step-lost .mini-progress div { background: var(--text-weak); }
 .app-step-lost .app-step-head span { color: var(--text-weak); }
 
+/* 목록에서 내려간 공고의 신청 기록 (2026-09-20) — 기록을 버리지 않고 줄을 남긴다.
+   🔴 흐리게 죽이지 않는다. 학생이 적어 둔 제출·선정 기록이 들어 있는 줄이라
+      '읽지 않아도 되는 글'이 아니다 — 그래서 --text-weak(3.7:1) 이 아니라
+      --text-sub(7.4:1) 를 쓴다. 배지만 회색으로 사정을 알린다. */
+.badge-gone { background: rgba(18, 22, 31, 0.07); color: var(--text-sub); }
+.app-gone-note { font-size: var(--t-xs); color: var(--text-sub); margin-top: 6px; }
+.app-gone-rec  { font-size: var(--t-sm); color: var(--text); font-weight: 650; margin-top: 4px; }
+
 /* 홈의 '신청 현황'도 이미 담은 것들이다 — 신청 내역과 같이 체크 동그라미를 뺀다.
    (빈 동그라미가 '아직 안 했다'로 읽히던 것과 같은 이유) */
 
