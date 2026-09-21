@@ -295,8 +295,19 @@ function chatMissReport() {
    cards = 보여 줄 공고 (누르면 기존 상세 화면이 열린다)
    note  = 한계·주의 (모르는 것은 모른다고 적는 자리) */
 
+/* 🔴 차례는 **화면과 같은 함수로** 정한다 (2026-09-21 코드 리뷰).
+   예전엔 `b.fit - a.fit` 로 raw 점수만 봤다. 점수는 순서를 정할 뿐 뜻은 배지가 전하는데,
+   도우미에는 배지가 없어서 **'자격 미확인'(FIT_UNREAD 35)이 우리가 실제로 확인한
+   부분 충족(예: 33%)보다 위로** 올라갔다 — 확인 안 한 것을 먼저 권하는 꼴이다.
+   화면은 `fitRank` 로 그 갈래를 먼저 가른다(적합 0 · 미확인 1 · 미달 2). 같은 것을 쓴다.
+   ⚠️ app.js 의 전역이라 없을 수도 있다고 보고 못 찾으면 예전 방식으로 떨어진다. */
+function chatByFit(list) {
+  const rank = (m) => chatSafe(() => (typeof fitRank === 'function' ? fitRank(m) : 0), 0);
+  return list.slice().sort((a, b) => rank(a) - rank(b) || b.fit - a.fit);
+}
+
 function chatAnswerApplyable() {
-  const list = chatApplyable().sort((a, b) => b.fit - a.fit);
+  const list = chatByFit(chatApplyable());
   if (!list.length) {
     return {
       text: '지금 조건에 맞는 공고를 찾지 못했어요.',
@@ -632,7 +643,7 @@ function chatAiCandidates(q) {
   });
   add(chatSearch(q, cap));
   add(chatClarify(q, cap));
-  add(chatApplyable().sort((a, b) => b.fit - a.fit));
+  add(chatByFit(chatApplyable()));
 
   return pool.map((m) => {
     const s = m.sch;

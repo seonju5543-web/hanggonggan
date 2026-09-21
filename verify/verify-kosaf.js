@@ -404,11 +404,21 @@ const PROFILE = {
     const ledger = JSON.parse(fs.readFileSync(
       path.join(__dirname, '..', 'collector', 'kosaf-block.json'), 'utf8'));
     const rows = (ledger.hidden || []).filter((b) => b.file);
-    /* 앱 목록에 실제로 떠 있는 것만 고른다(마감·필터로 빠진 재단은 클릭할 수 없다) */
+    /* 앱 목록에 실제로 떠 있는 것만 고른다(마감·필터로 빠진 재단은 클릭할 수 없다).
+       🔴 **화면을 봐야 한다 — 데이터에 있는 것만으로는 안 된다** (2026-09-21 수리).
+          예전 코드는 `kosafList` 에 있기만 하면 골랐는데, 그 목록은 마감된 재단도 들고 있다
+          (화면이 `dday` 로 내린다). 그래서 장부 첫 줄이 마감되는 날 이 검사가 빨간불이 됐다 —
+          실측: kosaf-2701052001 (가천문화재단 · due 2026-09-17 · 오늘 기준 '마감').
+          **앱은 제대로 동작하고 있었다**(바로 위 '마감 지난 것이 섞이지 않는다'가 통과한다).
+          주석은 처음부터 '떠 있는 것'이라고 적어 두었는데 코드가 그걸 안 보고 있었을 뿐이다.
+       ⚠️ 검사를 무르게 한 것이 아니다 — 고를 것이 없으면 아래 픽스처 갈래가 **같은 두 가지**를
+          그대로 잰다(첨부는 내려가고 재단 카드는 남는가). */
     const pick = await page.evaluate((rs) => {
       for (const r of rs) {
         const it = kosafList.find((x) => x.code === r.code);
-        if (it) return { code: r.code, file: r.file, org: it.org,
+        if (!it) continue;
+        if (!document.querySelector(`#explore-list [data-detail="kosaf-${r.code}"]`)) continue;
+        return { code: r.code, file: r.file, org: it.org,
           hasFile: ((it.files || []).some((f) => f.name === r.file)) };
       }
       return null;
@@ -420,8 +430,13 @@ const PROFILE = {
     } else {
       /* 장부가 비었거나 그 재단들이 마감됐다 — 같은 일을 흉내 내 **같은 것을** 잰다 */
       console.log('  · 장부에 내려 둔 첨부가 지금 목록에 없어 픽스처로 잰다');
+      /* 🔴 여기서도 **화면에 떠 있는 것**을 골라야 한다 (2026-09-21 코드 리뷰).
+         `kosafList` 첫 줄을 그냥 집으면 마감된 재단이 걸려(실측 0603003 · due 2026-09-17)
+         아래 `page.$` 가 null 이 되고, 위 갈래에서 막 고친 **같은 날짜 흘러감 빨간불**이
+         픽스처 쪽에서 그대로 되살아난다. */
       target = await page.evaluate(() => {
-        const it = kosafList.find((x) => (x.files || []).length);
+        const it = kosafList.find((x) => (x.files || []).length
+          && document.querySelector(`#explore-list [data-detail="kosaf-${x.code}"]`));
         if (!it) return null;
         delete it.files;                     // slimKosaf 가 내렸을 때와 같은 모양
         renderExplore();
