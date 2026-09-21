@@ -3602,7 +3602,15 @@
     }
    ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323082",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "3. 선발기준",
+    "□ 성적 35% + 생활정도 50% + 경주시 거주기간 15%",
+    "□ 가산점 대상 (중복적용 불가) (해당자에 한함)",
+    "ㆍ 3자녀 이상 가정의 자녀(자녀수별로 세분화 점수)",
+    "- 3자녀 : 5점, 4자녀 : 7점, 5자녀 이상 : 10점"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)"
   },
   {
    "id": "auto-oardid323054menuno200318",
