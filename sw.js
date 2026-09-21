@@ -67,7 +67,7 @@ const CACHE = 'handaejang-v202';  /* v202 — 학교가 스스로 운영하는 �
                                      없던 개인 사정(수상·혼인·재직·기숙사·검정고시·종교 등 열둘)을
                                      예/아니요로 묻는다 (노션 AI-1 · 개발자 지시) */
 
-const ASSETS = ['.', 'index.html', 'style.css', 'boot.js', 'resume.js', 'interactions.js', 'app.js', 'data.js', 'forms.js', 'form-plan.js', 'essay.js', 'essay-config.js', 'essay-ask.js', 'essay-quality.js', 'essay-submit-check.js',
+const ASSETS = ['.', 'index.html', 'style.css', 'boot.js', 'resume.js', 'interactions.js', 'app.js', 'apply-channel.js', 'data.js', 'forms.js', 'form-plan.js', 'essay.js', 'essay-config.js', 'essay-ask.js', 'essay-quality.js', 'essay-submit-check.js',
   'elig-ask.js',
   'section-head.js', 'parse-requirements.js', 'parse-amount.js', 'match-engine.js', 'notify-rules.js', 'notify.js', 'push-config.js', 'support-config.js',
   'chat-config.js', 'chat.js',

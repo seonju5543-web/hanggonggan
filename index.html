@@ -722,6 +722,9 @@
        그대로 비고, 그게 이 파일이 없애려는 바로 그 틈이다(파일 머리말 참조).
        관문: verify/test-collector.mjs '첫 실행 화면' 절 -->
   <script src="boot.js"></script>
+  <!-- 신청 채널 근거 판정 — data.js 가 전역으로 참조하므로 반드시 먼저 실어야 한다.
+       (못 실리면 data.js 는 포털형이라고 단정하지 않고 '원문 확인'으로 떨어진다) -->
+  <script src="apply-channel.js"></script>
   <script src="data.js"></script>
   <!-- 절 경계 판정 — match-engine이 전역으로 참조하므로 반드시 먼저 실어야 한다 -->
   <script src="section-head.js"></script>

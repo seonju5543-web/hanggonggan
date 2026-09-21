@@ -295,17 +295,19 @@ function naturesOf(it) {
   return out.length ? out : ['기타'];
 }
 
-/* 접수 방법 — 앱1(data.js submitChannelLabel)과 같은 순서로 판정한다 */
+/* 접수 방법 — 🔴 **판정은 앱1의 `data.js submitChannelKind()` 하나다** (2026-09-21).
+   예전엔 같은 순서를 여기에 한 벌 더 적어 두고 주석으로 "같은 순서로 판정한다"고
+   버티고 있었다. 그래서 앱1이 마지막 줄을 고쳐도 관리자 화면은 계속 '포털 입력'이라고
+   말했다 — 이 저장소가 자격 판정에서 이미 겪은 갈라짐과 같은 꼴이다.
+   data.js 는 build.sh 가 vendor 로 옮기므로 여기서 그대로 부를 수 있다. */
 function channelOf(it) {
-  if (it.applyEmail) return 'email';
-  if (it.program || /한국장학재단/.test(it.provider || '')) return 'kosaf';
-  if (it.formId) return 'form';
-  if (typeof hasFormAttachment === 'function' && hasFormAttachment(it)) return 'download';
-  return 'portal';
+  return typeof submitChannelKind === 'function' ? submitChannelKind(it) : 'unknown';
 }
 const CHANNEL_LABEL = {
   email: '이메일 접수', kosaf: '한국장학재단', form: '앱에서 양식 작성',
   download: '원본 양식 다운로드형', portal: '포털 입력',
+  /* 원문에서 접수 방법을 못 읽은 공고 — 개발자가 채워야 할 자리라 이름을 따로 준다 */
+  unknown: '접수 방법 미확인',
 };
 
 const RULES = (window.ENTRY_RULES && window.ENTRY_RULES.RULES) || {};

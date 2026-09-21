@@ -163,15 +163,33 @@ async function authSignIn(email, password) {
   return { ok: true };
 }
 
+/* 🔴 **갱신은 한 번에 하나만 나간다** (2026-09-21 — 기술 고문 요청서 Q8 이 의심한 결함이 사실이었다).
+
+   Supabase 는 갱신 토큰을 **한 번 쓰면 새것으로 바꾼다(회전)**. 그런데 이 함수를 부를 수 있는
+   자리가 11곳이라, 프로필 읽기와 쓰기가 같은 순간에 만료를 맞으면 둘이 각자 갱신을 시도한다.
+   먼저 도착한 쪽이 토큰을 써 버리므로 **뒤쪽은 이미 죽은 토큰을 내밀어 실패하고**,
+   `sbAuthed` 가 그걸 "갱신도 안 된다"로 읽어 `authClear()` — 즉 **멀쩡한 로그인이 풀린다.**
+
+   처방 이름은 single-flight 다: 진행 중인 갱신이 있으면 **새로 부르지 않고 그 하나를 같이 기다린다.**
+   ⚠️ `finally` 로 반드시 비운다 — 안 비우면 첫 실패가 영원히 캐시돼 다시는 갱신하지 못한다.
+   ⚠️ 이건 **한 탭 안**을 막는다. 탭을 여러 개 띄우면 각 탭이 제 장부를 갖고 있어 여전히 부딪힐
+      수 있다(표준 해법은 Web Locks API). 지금은 로그인 자체가 꺼져 있어 급하지 않고,
+      켜기 전에 결정할 일로 남겨 둔다. */
+let authRefreshing = null;
+
 async function authRefresh() {
-  const t = authLoad();
-  if (!t || !t.refreshToken) return false;
-  const res = await sbFetch('/auth/v1/token?grant_type=refresh_token', {
-    method: 'POST', body: { refresh_token: t.refreshToken },
-  });
-  if (!res.ok || !res.json || !res.json.access_token) return false;
-  authStore(res.json);
-  return true;
+  if (authRefreshing) return authRefreshing;          // 이미 돌고 있으면 그것을 같이 기다린다
+  authRefreshing = (async () => {
+    const t = authLoad();
+    if (!t || !t.refreshToken) return false;
+    const res = await sbFetch('/auth/v1/token?grant_type=refresh_token', {
+      method: 'POST', body: { refresh_token: t.refreshToken },
+    });
+    if (!res.ok || !res.json || !res.json.access_token) return false;
+    authStore(res.json);
+    return true;
+  })();
+  try { return await authRefreshing; } finally { authRefreshing = null; }
 }
 
 /* 이 앱이 열려 있는 주소 — 메일 링크와 소셜 로그인이 **여기로 되돌아온다**.

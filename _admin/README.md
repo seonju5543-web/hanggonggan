@@ -40,15 +40,19 @@
 
 ### ⚠️ 바로 이어서 해야 하는 설정 — 빌드 감시 경로
 
-**Settings → Build → Build watch paths** 의 *Include paths* 에 아래 다섯 줄을 넣으세요.
+**Settings → Build → Build watch paths** 의 *Include paths* 에 아래 여섯 줄을 넣으세요.
 
 ```
 _admin/*
 data.js
+apply-channel.js
 forms.js
 verify/entry-rules.cjs
 collector/url-key.mjs
 ```
+
+⚠️ `apply-channel.js` 는 2026-09-21에 더해졌습니다 — `data.js` 의 접수 채널 판정이 이 파일을
+부르므로, 빠뜨리면 이 파일만 고친 날 관리자 화면이 **옛 판정을 그대로** 씁니다.
 
 **왜 필요한가**: 수집 로봇이 하루에 열 번쯤 이 저장소에 공고를 커밋합니다. 그대로 두면
 그때마다 관리자 화면을 처음부터 다시 만들어서, 무료 한도(월 500회)를 며칠 만에 다 씁니다.

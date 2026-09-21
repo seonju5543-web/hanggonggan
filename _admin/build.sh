@@ -23,6 +23,9 @@ printf 'User-agent: *\nDisallow: /\n' > "$OUT/robots.txt"
 
 # ── 공용 원본 ────────────────────────────────────────────────
 # 접수 채널 판정(submitChannelLabel·hasFormAttachment) 등
+# 🔴 data.js 가 전역으로 부르는 이웃이다 — 같이 안 옮기면 채널 판정이 조용히
+#    "모름"으로만 떨어진다(2026-09-13 사고 계열: 부르는 이웃까지 옮긴다).
+cp apply-channel.js "$OUT/vendor/apply-channel.js"
 cp data.js "$OUT/vendor/data.js"
 # 양식 문서 생성(renderFormDoc·FORM_DOC_CSS)
 cp forms.js "$OUT/vendor/forms.js"

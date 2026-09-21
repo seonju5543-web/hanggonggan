@@ -8296,5 +8296,81 @@ console.log('\n■ 학교가 스스로 운영하는 장학 제도 (2026-09-20)')
     (OWN_PROGRAMS['경희대학교'] || []).filter((p) => !doc.includes(p)), []);
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   🔴 모르는 접수 방법을 '포털형'이라고 부르지 않는다 (2026-09-21 개발자 지시)
+
+   예전 `submitChannelLabel` 의 마지막 줄은 조건 없이 '온라인·포털 입력형'이었다. 그래서
+   접수 방법을 **읽지 못한 공고까지** "포털에서 복사해 붙여넣으세요"라고 단정했다 —
+   실측으로 등록 68건 중 44건에 그 문구가 붙었고 **42건은 원문에 근거가 없었다**.
+   기술 고문 요청서 10쪽이 "연동 설계와 별개로 고쳐야 할 자리"로 지목한 바로 그 자리다.
+   ══════════════════════════════════════════════════════════════════ */
+console.log('\n■ 모르는 접수 방법을 단정하지 않는다 (2026-09-21)');
+{
+  const dataSrc = readText(new URL('../data.js', import.meta.url));
+  const acSrc = readText(new URL('../apply-channel.js', import.meta.url));
+
+  /* 규칙을 베끼지 않았는가 — 근거 판정은 apply-channel.js 하나여야 한다 */
+  eq('앱이 근거 판정을 베끼지 않는다 (classifyChannels 를 부른다)',
+    /classifyChannels\(\{\s*lines/.test(dataSrc), true);
+  eq('판정 순서가 한 곳이다 (submitChannelKind)', dataSrc.includes('function submitChannelKind'), true);
+  eq('관리자 화면이 그 함수를 쓴다',
+    readText(new URL('../_admin/admin.js', import.meta.url)).includes('submitChannelKind(it)'), true);
+  /* 부르는 이웃까지 옮겼는가 — 안 옮기면 관리자 화면에서 조용히 '모름'만 나온다 */
+  eq('관리자 빌드가 apply-channel.js 를 함께 옮긴다',
+    readText(new URL('../_admin/build.sh', import.meta.url)).includes('apply-channel.js'), true);
+  /* 🔴 **주석까지 세지 말 것** — 바로 위 줄의 설명 주석에 'data.js' 가 들어 있어서
+     생 indexOf 로 재면 순서가 거꾸로 읽힌다(실제로 한 번 빨간불이 났다). 태그로 잰다. */
+  eq('앱이 data.js 보다 먼저 싣는다', (() => {
+    const h = readText(new URL('../index.html', import.meta.url));
+    const at = (f) => h.indexOf(`<script src="${f}"></script>`);
+    return at('apply-channel.js') >= 0 && at('apply-channel.js') < at('data.js');
+  })(), true);
+
+  /* 글자가 아니라 **동작**으로 잰다 — data.js 의 진짜 함수를 떼어 내 돌린다 */
+  const grabFn = (name) => {
+    const s = dataSrc.indexOf(`function ${name}(`);
+    if (s < 0) throw new Error(`data.js 에서 ${name} 을 못 찾음`);
+    let d = 0, seen = false;
+    for (let i = dataSrc.indexOf('{', s); i < dataSrc.length; i++) {
+      if (dataSrc[i] === '{') { d++; seen = true; }
+      else if (dataSrc[i] === '}') { d--; if (seen && !d) return dataSrc.slice(s, i + 1); }
+    }
+    throw new Error(`${name} 의 끝을 못 찾음`);
+  };
+  /* apply-channel.js 를 **파일 그대로** 앞에 싣고, 그 위에서 data.js 의 진짜 함수를 돌린다
+     — 베낀 사본이 아니라 원본을 재야 의미가 있다(이 파일의 다른 절과 같은 방식). */
+  const built = new Function(`${acSrc}
+${dataSrc.match(/const SUBMIT_CHANNEL_LABEL = \{[\s\S]*?\};/)[0]}
+${[ 'hasFormAttachment', 'hasPortalEvidence', 'submitChannelKind', 'submitChannelLabel' ].map(grabFn).join('\n')}
+return { submitChannelKind, submitChannelLabel };`)();
+  const kind = built.submitChannelKind;
+  const label = built.submitChannelLabel;
+
+  /* 🔴 이 항목이 이 절의 존재 이유다 */
+  eq('접수 방법을 모르면 포털이라고 하지 않는다',
+    kind({ documents: ['신청 서류·접수 방법은 원문 공고 확인'] }), 'unknown');
+  eq('아무 정보도 없으면 포털이라고 하지 않는다', kind({}), 'unknown');
+  eq('모를 때의 문구가 단정하지 않는다', label({}), '🖥 접수 방법은 원문 공고에서 확인');
+  /* 근거가 있으면 예전처럼 포털이라고 말한다 — 모두 '모름'으로 만들어 버리면 그것도 퇴보다 */
+  eq('원문이 포털이라고 하면 포털이다',
+    kind({ documents: ['종합정보시스템(포털)에서 온라인 신청'] }), 'portal');
+  /* 상단 메뉴의 '포털' 글자로 되살아나지 않는가 (apply-channel.js 첫머리의 오탐 ②) */
+  eq('메뉴 글자만으로는 포털이 아니다',
+    kind({ excerpts: ['학사행정 포털 장학 로그인 사이트맵'] }), 'unknown');
+  /* 앞선 갈래는 그대로여야 한다 */
+  eq('이메일 접수는 그대로', kind({ applyEmail: 'a@hufs.ac.kr' }), 'email');
+  eq('양식 연결분은 그대로', kind({ formId: 'x' }), 'form');
+  eq('첨부 양식형은 그대로', kind({ attachments: [{ name: '신청서.hwp' }] }), 'download');
+
+  /* 실제 데이터로도 — 근거 없는 단정이 0건인가 */
+  const reg = JSON.parse(readText(new URL('../data/registered.json', import.meta.url)));
+  const claimed = reg.items.filter((it) => kind(it) === 'portal');
+  const baseless = claimed.filter((it) => {
+    const t = [].concat(it.documents || [], it.excerpts || []).join(' ');
+    return !/종합정보시스템|HUFS\s?Ability|학사정보시스템|학생지원시스템|포털|인포\s?21|INFO\s?21/i.test(t);
+  });
+  eq('등록 데이터에 근거 없는 포털 단정이 없다', baseless.length, 0);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);

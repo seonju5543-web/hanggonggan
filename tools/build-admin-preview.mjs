@@ -204,6 +204,8 @@ const nReg = (reg && reg.items ? reg.items.length : 0);
 /** vendor/<이름> → 저장소 원본. build.sh 의 복사 목록과 같아야 한다.
  *  🔴 여기 없는 vendor 파일이 index.html 에 새로 실리면 **조용히 빠지지 않고 실패한다**(아래 검사). */
 const VENDOR = {
+  /* 🔴 data.js 가 전역으로 부르는 이웃 — 빠뜨리면 미리보기에서만 채널 판정이 '모름'으로 떨어진다 */
+  'vendor/apply-channel.js': () => read('apply-channel.js'),
   'vendor/data.js': () => read('data.js'),
   'vendor/forms.js': () => read('forms.js'),
   'vendor/form-plan.js': () => read('form-plan.js'),

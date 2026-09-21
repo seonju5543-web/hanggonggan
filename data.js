@@ -431,12 +431,53 @@ function hasFormAttachment(sch) {
 
 /* 접수 채널 분류 — 실제 공고의 접수 방식 (정직 표기: 앱이 대신 못 누르는 채널은 명시).
    앱 내 작성(formId) > 원본 양식 다운로드(첨부 양식 有) > 포털 입력 순으로 정확히 안내한다. */
+/* 🔴 **모르는 것을 '포털형'이라고 부르지 않는다** (2026-09-21 개발자 지시).
+
+   예전 마지막 줄은 조건 없이 `'🖥 온라인·포털 입력형 — 복사해서 붙여넣기'` 였다. 그래서
+   접수 방법을 **읽지 못한 공고까지** 학생에게 "포털에서 복사해 붙여넣으세요"라고 단정했다.
+   실측(2026-09-21 · 등록 68건): 그 문구가 44건에 붙었고 그중 **42건은 원문에 근거가 없었다**
+   (예: 유흥수 장학금이 가진 정보는 `신청 서류·접수 방법은 원문 공고 확인` 한 줄뿐이다).
+   확인하지 않은 것을 확인한 것처럼 말하는 것이라 운영 원칙 8-1 위반이고, 기술 고문 요청서
+   10쪽에도 "연동 설계와 별개로 고쳐야 할 자리"로 적혀 있었다.
+
+   🔴 근거 판정을 **여기에 베끼지 않는다** — `apply-channel.js` 를 불러 쓴다. 그 파일
+      머리말이 경고하듯, 본문을 아무 데나 훑으면 상단 메뉴의 '포털' 글자 때문에 거의 모든
+      공고가 도로 포털형이 된다. 규칙이 두 벌이 되면 그 함정이 앱에서만 되살아난다.
+   🔴 순서 판정은 `submitChannelKind()` 한 곳이다 — 관리자 화면(`_admin/admin.js channelOf`)이
+      같은 함수를 쓴다. 예전엔 같은 순서를 두 벌로 적어 두고 "같은 순서로 판정한다"는 주석으로
+      버티고 있었다. */
+const SUBMIT_CHANNEL_LABEL = {
+  email: '📧 이메일 접수 — 앱에서 메일 자동 완성',
+  kosaf: '🏛 한국장학재단 — 본인 인증 후 직접 신청',
+  form: '📄 양식 제출형 — 앱에서 원본 양식 작성',
+  download: '📎 원본 양식 다운로드형 — 첨부 양식을 내려받아 작성',
+  portal: '🖥 온라인·포털 입력형 — 복사해서 붙여넣기',
+  unknown: '🖥 접수 방법은 원문 공고에서 확인',
+};
+
+/* 이 공고가 '학교 시스템에 입력하는 것'이라고 **원문이 말했는가**.
+   앱이 가진 원문 조각은 둘뿐이다 — 공고에서 뽑은 제출 서류·방법 줄(documents)과
+   원문 발췌(excerpts). 앱이 스스로 쓴 요약(summary·note)은 근거가 아니다.
+   ⚠️ `attachments` 는 넘기지 않는다 — 첨부에 신청서가 있는 경우는 위에서 이미
+      `download` 로 갈라졌고, 여기서 또 세면 같은 공고가 두 번 분류된다. */
+function hasPortalEvidence(sch) {
+  if (typeof classifyChannels !== 'function') return false;   // 못 읽으면 단정하지 않는다
+  const lines = [].concat(sch.documents || [], sch.excerpts || []);
+  if (!lines.length) return false;
+  return classifyChannels({ lines, attachments: [] })
+    .some((h) => h.kind === '학교 시스템 입력형');
+}
+
+function submitChannelKind(sch) {
+  if (sch.applyEmail) return 'email';
+  if (sch.program || /한국장학재단/.test(sch.provider || '')) return 'kosaf';
+  if (sch.formId) return 'form';
+  if (hasFormAttachment(sch)) return 'download';
+  return hasPortalEvidence(sch) ? 'portal' : 'unknown';
+}
+
 function submitChannelLabel(sch) {
-  if (sch.applyEmail) return '📧 이메일 접수 — 앱에서 메일 자동 완성';
-  if (sch.program || /한국장학재단/.test(sch.provider || '')) return '🏛 한국장학재단 — 본인 인증 후 직접 신청';
-  if (sch.formId) return '📄 양식 제출형 — 앱에서 원본 양식 작성';
-  if (hasFormAttachment(sch)) return '📎 원본 양식 다운로드형 — 첨부 양식을 내려받아 작성';
-  return '🖥 온라인·포털 입력형 — 복사해서 붙여넣기';
+  return SUBMIT_CHANNEL_LABEL[submitChannelKind(sch)] || SUBMIT_CHANNEL_LABEL.unknown;
 }
 
 function officialChannel(sch) {
