@@ -38,7 +38,8 @@ const stripComments = (t) => t
 
 /* 화면 코드 — 🔴 chat.js 는 넣지 않는다 (위 지시) */
 const UI_FILES = ['index.html', 'app.js', 'essay.js', 'notify.js', 'notify-rules.js',
-  'forms.js', 'form-plan.js', 'essay-ask.js', 'essay-submit-check.js', 'essay-quality.js'];
+  'forms.js', 'form-plan.js', 'essay-ask.js', 'essay-submit-check.js', 'essay-quality.js',
+  'gating.js'];   // 과팅 탭 (2026-09-21) — 학생끼리 보는 화면이라 말투 규칙을 그대로 받는다
 
 /* ── ① 이모지 ───────────────────────────────────────────────────────────────
    ⚠️ `✓ ✕ □ △ ← ↑ ● ■ ※` 같은 것은 이모지가 아니라 **활자**다. 이 앱은 그것들을

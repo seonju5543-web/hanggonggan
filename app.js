@@ -925,7 +925,7 @@ function showScreen(name, opts) {
   if (typeof resumeSaveScroll === 'function' && currentScreen && currentScreen !== name) {
     resumeSaveScroll(currentScreen, window.scrollY);
   }
-  ['onboarding', 'home', 'explore', 'applications', 'my', 'settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms'].forEach((n) => {
+  ['onboarding', 'home', 'explore', 'applications', 'gating', 'my', 'settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms'].forEach((n) => {
     $(`#screen-${n}`).hidden = n !== name;
   });
   $('#bottom-nav').hidden = name === 'onboarding';
@@ -958,6 +958,8 @@ function showScreen(name, opts) {
   if (name === 'home') renderHome();
   if (name === 'explore') renderExplore();
   if (name === 'applications') renderApplications();
+  /* 과팅 탭 (2026-09-21) — gating.js 가 app.js 뒤에 실리므로 있을 때만 부른다 */
+  if (name === 'gating' && typeof renderGating === 'function') renderGating();
   if (name === 'my') renderMy();
   if (name === 'settings') renderSettings();
   if (name === 'trash') renderTrash();

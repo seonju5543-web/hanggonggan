@@ -277,6 +277,12 @@ async function authSignOut() {
 async function authDeleteData() {
   const u = authUser();
   if (!u) return { ok: false, error: '로그인 상태가 아니에요' };
+  /* 🔴 과팅 프로필을 **먼저** 지운다 (2026-09-21). 글·요청·대화·차단은 auth.users 를 따라
+     cascade 로 지워지지만 계정 껍데기가 남는 구조라 그 행은 직접 지워야 한다. 표가 아직
+     없을 수 있어(마이그레이션 전) 실패해도 탈퇴는 계속한다. */
+  try {
+    await sbAuthed(`/rest/v1/gating_profiles?user_id=eq.${encodeURIComponent(u.userId)}`, { method: 'DELETE' });
+  } catch (e) { /* 표가 아직 없을 수 있다 */ }
   const res = await sbAuthed(`/rest/v1/profiles?user_id=eq.${encodeURIComponent(u.userId)}`, { method: 'DELETE' });
   if (!res.ok) return { ok: false, error: authErrorText(res) };
   /* 🔴 로그인 기록도 같이 지운다 — 약관이 '탈퇴 시 지체 없이 파기'라고 적고 있다.

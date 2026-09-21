@@ -4488,7 +4488,8 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
 
      ⚠️ 예외 셋은 **자기가 앱 서버를 직접 띄운다**(`http.createServer`). 남의 앱을 잴 수가
         없어 이미 안전하고, 관문을 붙이면 오히려 없는 포트를 확인하다 죽는다. */
-  const SELF_SERVED = ['verify-admin.js', 'verify-supabase.js', 'verify-push-client.js'];
+  const SELF_SERVED = ['verify-admin.js', 'verify-supabase.js', 'verify-push-client.js',
+    'verify-gating.js'];   // 과팅 (2026-09-21) — 가짜 Supabase·가짜 과팅 서버와 함께 앱 사본을 직접 띄운다
   /* ⚠️ 두 번째 예외 갈래 — **서버를 아예 안 쓰는 드라이버** (2026-09-14 신설).
      `verify-admin-shape.js` 는 CSS 두 벌을 디스크에서 읽어 `page.setContent` 로 직접 넣는다.
      남의 서버를 잴 길이 처음부터 없어 `assertOwnServer` 를 붙일 자리도 없다(없는 포트를
@@ -8434,6 +8435,86 @@ return { submitChannelKind, submitChannelLabel };`)();
     return !/종합정보시스템|HUFS\s?Ability|학사정보시스템|학생지원시스템|포털|인포\s?21|INFO\s?21/i.test(t);
   });
   eq('등록 데이터에 근거 없는 포털 단정이 없다', baseless.length, 0);
+}
+
+/* ══ 과팅 탭 (2026-09-21 개발자 지시 · 설계 docs/designs/gating.md) ═════════════════
+   이 앱에서 처음으로 **학생끼리 서로를 보는** 화면이다. 남의 글·채팅을 못 보게 막는 것은
+   앱 코드가 아니라 Supabase 의 행 단위 규칙(RLS)이고, 인증 행을 만드는 것은 서버(워커)뿐이다.
+   여기서는 그 뼈대가 **되돌아가지 않았는지**를 파일에서 본다(동작은 verify-gating.js 와
+   verify-gating-server.mjs). 항목마다 되돌려 빨간불을 확인했다(2026-09-21). */
+console.log('\n■ 과팅 탭 (2026-09-21)');
+{
+  const root = new URL('../', import.meta.url);
+  const html = readText(new URL('index.html', root));
+  const app = readText(new URL('app.js', root));
+  const sw = readText(new URL('sw.js', root));
+  const sql = readText(new URL('supabase/migrations/0003_gating.sql', root));
+  const sbc = readText(new URL('supabase-client.js', root));
+  const cfg = readText(new URL('gating-config.js', root));
+  const yml = readText(new URL('.github/workflows/verify-ui.yml', root));
+
+  /* ① 화면 — 감춘 채 시작 · 탭 버튼 · 화면 목록 · 그리기 · 안쪽 화면 목록에는 없다 */
+  eq('과팅 화면이 감춘 채 시작한다', /<section id="screen-gating" class="screen" hidden>/.test(html), true);
+  eq('아래 탭에 과팅 버튼이 있다', /data-nav="gating"/.test(html), true);
+  eq('showScreen 의 화면 목록에 gating 이 있다', /\['onboarding', 'home', 'explore', 'applications', 'gating', 'my'/.test(app), true);
+  eq('showScreen 이 renderGating 을 부른다', /name === 'gating' && typeof renderGating === 'function'\) renderGating\(\)/.test(app), true);
+  eq('안쪽 화면 목록(SUB)에는 gating 이 없다 (최상위 탭이다)', /const SUB = \[[^\]]*'gating'/.test(app), false);
+  eq('이어보기 탭 목록에 gating 이 있다', /RESUME_TABS = \[[^\]]*'gating'/.test(readText(new URL('resume.js', root))), true);
+
+  /* ② 파일 — 서비스워커 목록 · 스크립트 순서 · CSP */
+  eq('sw.js ASSETS 에 gating.js 가 있다', /'gating\.js'/.test(sw), true);
+  eq('sw.js ASSETS 에 gating-config.js 가 있다', /'gating-config\.js'/.test(sw), true);
+  const order = [...html.matchAll(/<script src="([^"]+)"/g)].map((m) => m[1]);
+  eq('gating-config.js 가 gating.js 보다 먼저다', order.indexOf('gating-config.js') < order.indexOf('gating.js'), true);
+  eq('gating.js 가 app.js 뒤다 ($·esc·시트를 쓴다)', order.indexOf('gating.js') > order.indexOf('app.js'), true);
+  eq('CSP 에 wss: 를 열지 않았다 (채팅은 폴링이다)', /wss:/.test(html), false);
+  eq('설정이 비어 있다 (배포 주소는 개발자가 채운다) 또는 workers.dev 주소다',
+    /endpoint: ''/.test(cfg) || /endpoint: 'https:\/\/[a-z0-9.-]+\.workers\.dev'/.test(cfg), true);
+  eq('gating-config.js 가 gatingConfigured 를 준다', /function gatingConfigured\(\)/.test(cfg), true);
+
+  /* ③ 표 — 모든 표에 RLS · 인증 표에는 정책 0 · security definer 에 search_path · 컬럼 grant */
+  const tables = [...sql.matchAll(/create table if not exists public\.(gating_\w+|school_verifications)/g)].map((m) => m[1]);
+  eq('과팅 표를 읽어 냈다 (열 개)', tables.length, 10);
+  const noRls = tables.filter((t) => !new RegExp(`alter table public\\.${t} enable row level security`).test(sql));
+  eq('모든 과팅 표에 행 단위 규칙(RLS)이 켜져 있다', noRls, []);
+  eq('인증 코드 표에는 정책이 하나도 없다 (서버만 본다)', /create policy [^\n]* on public\.school_verifications/.test(sql), false);
+  const defs = [...sql.matchAll(/create or replace function public\.(\w+)[\s\S]*?(?=create or replace function|-- ---|$)/g)]
+    .filter((m) => /security definer/.test(m[0]) && !/set search_path = public/.test(m[0])).map((m) => m[1]);
+  eq('security definer 함수는 전부 search_path 를 고정한다 (권한 상승 구멍)', defs, []);
+  eq('학생은 과팅 프로필의 세 칸만 고칠 수 있다 (verified_at 을 스스로 못 켠다)',
+    /revoke insert, update on table public\.gating_profiles from authenticated;\s*grant update \(nickname, dept, gender\) on table public\.gating_profiles to authenticated;/.test(sql), true);
+  eq('anon 은 과팅 표를 아예 못 본다', /from anon;/.test(sql.slice(sql.indexOf('revoke all on table public.gating_profiles'))), true);
+  eq('글·요청의 학교·학과·성별은 트리거가 프로필에서 덮어쓴다', /new\.school := p\.school;[\s\S]*new\.gender := p\.gender;/.test(sql), true);
+  eq('매칭 확정 RPC 는 서버만 부른다', /revoke execute on function public\.gating_commit_match\(bigint, bigint\) from public, anon, authenticated/.test(sql), true);
+  eq('사용자 칸은 전부 탈퇴를 따라 지워진다 (cascade)',
+    [...sql.matchAll(/references auth\.users( on delete cascade)?/g)].filter((m) => !m[1]).length, 0);
+
+  /* ④ 앱 — 탈퇴 순서 · 글 본문에 학교를 안 보낸다 · 폴링 상수 */
+  const del = sbc.slice(sbc.indexOf('async function authDeleteData'));
+  eq('탈퇴가 과팅 프로필을 프로필보다 먼저 지운다', del.indexOf('gating_profiles') > 0 && del.indexOf('gating_profiles') < del.indexOf('/rest/v1/profiles'), true);
+  const gating = readText(new URL('gating.js', root));
+  eq('글 올리기 본문은 인원·범위·글뿐이다', /body: \{ headcount, want_school: want, body \}/.test(gating), true);
+  eq('요청 본문은 인원·범위뿐이다', /body: \{ headcount, want_school: want \}/.test(gating), true);
+  eq('프로필 저장 본문은 닉네임·학과·성별뿐이다', /body: \{ nickname: nick, dept, gender \}/.test(gating), true);
+  eq('서버 설정이 비면 그리기만 하고 요청을 안 보낸다', /if \(typeof gatingConfigured !== 'function' \|\| !gatingConfigured\(\)\) \{[\s\S]{0,400}return;/.test(gating), true);
+
+  /* ⑤ 관문이 워크플로에 걸려 있는가 · 도메인 표 */
+  eq('verify-ui.yml 이 과팅 서버 관문을 돌린다', /node verify\/verify-gating-server\.mjs/.test(yml), true);
+  eq('verify-ui.yml 의 화면 검사 목록에 verify-gating.js 가 있다', /verify-gating\.js/.test(yml.slice(yml.indexOf('for f in'))), true);
+  eq('verify-ui.yml 이 server/gating 을 감시한다', /'server\/gating\/\*\*'/.test(yml), true);
+  const dom = readText(new URL('data/school-domains.json', root));
+  eq('학교 도메인 표가 로봇 형식(들여쓰기 1칸)이다', /^\{\n "updatedAt"/.test(dom), true);
+  const domains = JSON.parse(dom).domains;
+  eq('학교 도메인 표에 수집망 두 학교가 있다', [domains['khu.ac.kr'], domains['hufs.ac.kr']], ['경희대학교', '한국외국어대학교']);
+  eq('도메인 표의 값이 전부 학교 이름이다 (빈 값 없음)', Object.values(domains).filter((v) => !v || !/대학교|KAIST/.test(v)), []);
+
+  /* ⑥ 약관 — 있는 기능만 적는다는 규칙의 반대편: 이제 있는 기능이 적혀 있어야 한다 */
+  const terms = readText(new URL('terms.html', root));
+  eq("약관 주석이 더는 '게시물·커뮤니티가 없다'고 말하지 않는다", /커뮤니티 같은 것은 이 서비스에 없다/.test(terms), false);
+  eq('제1부에 과팅 이용 규칙 조가 있다', /<h4>제\d+조(의\d+)? \(과팅/.test(terms), true);
+  eq('제2부 수집 항목 표에 과팅 줄이 있다', /data-label="수집 시점">과팅/.test(terms), true);
+  eq('국외 이전에 메일 발송처(Resend)가 있다', /Resend/.test(terms), true);
+  eq('성별을 민감정보 표(②)에 넣지 않았다', /특별자격 입력 시[\s\S]*?<\/table>/.exec(terms)[0].includes('성별'), false);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');

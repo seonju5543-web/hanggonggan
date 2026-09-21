@@ -4904,3 +4904,63 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
   .start-scene.last { animation: none; opacity: 1; }
   .start-scene.last img { animation: none; }
 }
+
+/* ---------------- 과팅 (2026-09-21 개발자 지시 · 설계 docs/designs/gating.md) ----------------
+   학생끼리 서로를 보는 첫 화면. 모양은 새로 만들지 않고 앱1 것을 그대로 쓴다 — 칩(.chip)·
+   빈 안내(.empty)·입력(.field)·시트(.sheet-body)·버튼(.btn). 여기 있는 것은 목록 줄과
+   말풍선처럼 앱에 없던 꼴뿐이다. 값은 전부 토큰(ui-tone 관문). */
+.gt-gate { padding: var(--space-24) var(--space-20); text-align: left; }
+.gt-gate.empty { text-align: center; }
+.gt-gate-title { font-size: var(--t-xl); font-weight: 800; color: var(--text); margin-bottom: var(--sp-1); letter-spacing: -0.02em; }
+.gt-gate-text { font-size: var(--t-sm); color: var(--text-sub); line-height: 1.7; margin-bottom: var(--sp-3); }
+.gt-gate .btn { width: 100%; margin-top: var(--sp-1); }
+.gt-gate.empty .btn { max-width: 240px; margin-left: auto; margin-right: auto; }
+.gt-me { font-size: var(--t-sm); color: var(--text-sub); margin-bottom: var(--sp-2); display: flex; gap: var(--space-8); align-items: center; }
+.gt-me-edit { font-size: var(--t-xs); }
+.gt-tabs { margin-bottom: var(--sp-3); }
+.gt-lead { font-size: var(--t-sm); color: var(--text-sub); line-height: 1.7; margin-bottom: var(--sp-3); }
+.gt-filter { display: grid; gap: var(--sp-1); margin-bottom: var(--sp-2); }
+.gt-schools { flex-wrap: nowrap; overflow-x: auto; padding-bottom: var(--space-2); scrollbar-width: none; }
+.gt-schools::-webkit-scrollbar { display: none; }
+.gt-schools .chip { white-space: nowrap; flex: none; }
+.gt-write { width: 100%; margin-bottom: var(--sp-3); }
+.gt-post { padding: var(--space-16) 0; border-bottom: 1px solid var(--line); }
+.gt-post-head { display: flex; justify-content: space-between; align-items: center; gap: var(--space-8); margin-bottom: var(--sp-1); }
+.gt-post-who { font-size: var(--t-sm); font-weight: 700; color: var(--text); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gt-post-badge { background: var(--accent-soft); color: var(--accent); flex: none; }
+.gt-post-body { font-size: var(--t-md); color: var(--text); line-height: 1.65; white-space: pre-wrap; word-break: keep-all; overflow-wrap: break-word; margin-bottom: var(--sp-1); }
+.gt-post-foot { display: flex; justify-content: space-between; align-items: center; gap: var(--space-8); flex-wrap: wrap; }
+.gt-post-meta { font-size: var(--t-xs); color: var(--text-weak); }
+.gt-post-actions { display: flex; align-items: center; gap: var(--space-12); }
+.gt-post-actions .btn-link { font-size: var(--t-xs); color: var(--text-weak); background: none; border: 0; padding: 0; cursor: pointer; }
+.gt-post-chat { padding: var(--space-8) var(--space-16); font-size: var(--t-sm); }
+.gt-matched, .gt-waiting, .gt-form { padding: var(--space-16); border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); margin-bottom: var(--sp-2); }
+.gt-matched { border-color: var(--accent-line); background: var(--accent-soft); }
+.gt-matched-title { font-size: var(--t-lg); font-weight: 800; margin-bottom: var(--sp-1); }
+.gt-matched .btn, .gt-waiting .btn { margin-top: var(--sp-2); }
+.gt-rooms { display: grid; }
+.gt-room-row { display: grid; grid-template-columns: 1fr auto; gap: 0 var(--space-12); text-align: left; padding: var(--space-16) 0; border-bottom: 1px solid var(--line); background: none; border-left: 0; border-right: 0; border-top: 0; cursor: pointer; width: 100%; }
+.gt-room-name { font-size: var(--t-md); font-weight: 700; color: var(--text); }
+.gt-room-last { grid-column: 1; font-size: var(--t-sm); color: var(--text-weak); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: var(--space-2); }
+.gt-room-when { grid-column: 2; grid-row: 1; font-size: var(--t-xs); color: var(--text-weak); }
+.gt-room-row.unread .gt-room-name::after { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: var(--radius-pill); background: var(--accent); margin-left: var(--space-8); vertical-align: middle; }
+.gt-room-row.unread .gt-room-last { color: var(--text); font-weight: 600; }
+/* 대화방 — 시트 안에서 말풍선 목록이 스크롤되고 입력줄은 아래에 붙는다 */
+.gt-room { display: flex; flex-direction: column; min-height: 60vh; }
+.gt-room-head { display: flex; justify-content: space-between; align-items: center; gap: var(--space-8); }
+.gt-room-head .sheet-title { margin-top: 0; }
+.gt-room-actions { display: flex; gap: var(--space-12); }
+.gt-room-actions .btn-link { font-size: var(--t-xs); color: var(--text-weak); background: none; border: 0; padding: 0; cursor: pointer; }
+.gt-room-note { font-size: var(--t-xs); color: var(--text-weak); margin: var(--sp-1) 0 var(--sp-2); }
+.gt-msgs { flex: 1; display: flex; flex-direction: column; gap: var(--space-8); overflow-y: auto; max-height: 50vh; padding: var(--space-8) 0; }
+.gt-msg { max-width: 82%; align-self: flex-start; background: var(--surface-2); border-radius: var(--radius); padding: var(--space-8) var(--space-12); }
+.gt-msg.me { align-self: flex-end; background: var(--primary); color: var(--start-ink); }
+.gt-msg.pending { opacity: 0.6; }
+.gt-msg-body { display: block; font-size: var(--t-md); line-height: 1.55; white-space: pre-wrap; word-break: keep-all; overflow-wrap: break-word; }
+.gt-msg-when { display: block; font-size: var(--t-2xs); opacity: 0.65; margin-top: var(--space-2); text-align: right; }
+.gt-room-input { display: flex; gap: var(--space-8); margin-top: var(--sp-2); position: sticky; bottom: 0; background: var(--surface); padding-top: var(--space-8); }
+.gt-room-input input { flex: 1; min-width: 0; }
+.gt-room-input .btn { flex: none; padding: var(--space-12) var(--space-16); }
+/* 아래 탭의 새 소식 점 */
+.nav-item { position: relative; }
+.nav-dot { position: absolute; top: 4px; left: calc(50% + 8px); width: 8px; height: 8px; border-radius: var(--radius-pill); background: var(--red); }

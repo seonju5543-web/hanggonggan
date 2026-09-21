@@ -55,6 +55,9 @@ on:
       #    여기 없으면 그 안전장치를 떼는 커밋에서 이 검사가 한 번도 안 돈다.
       - 'tools/admin-apply.mjs'
       - 'server/push/**'     # 푸시 발송 서버 (verify-push-server.mjs)
+      - 'server/gating/**'   # 과팅 서버 (verify-gating-server.mjs · 2026-09-21)
+      - 'supabase/migrations/**'   # 과팅 표의 RLS 뼈대는 test-collector 가 파일로 본다
+      - 'data/school-domains.json' # 과팅 학교 도메인 표 (사람이 고친다 · 로봇 파일이 아니다)
       - 'insta/**'           # 인스타 카드 (verify-insta.js)
       - '.github/workflows/verify-ui.yml'
   workflow_dispatch:
@@ -102,6 +105,11 @@ jobs:
       - name: 푸시 발송 서버 관문
         run: node verify/verify-push-server.mjs
 
+      # 과팅 서버 (2026-09-21) — 짝 고르기 규칙·학교 이메일 판정·만능 열쇠가 밖으로 안 나가는가.
+      # 브라우저가 필요 없다(가짜 Supabase·가짜 메일 서비스를 함수로 세운다).
+      - name: 과팅 서버 관문
+        run: node verify/verify-gating-server.mjs
+
       - name: 양식 문서 동일성 관문 (원칙 4)
         run: node verify/form-snapshot.mjs
 
@@ -141,7 +149,7 @@ jobs:
                    verify-notify.js verify-sheet-back.js verify-kosaf.js \
                    verify-calendar.js verify-resume.js verify-interactions.js \
                    verify-admin.js verify-settings.js verify-admin-shape.js \
-                   verify-elig-ask.js; do
+                   verify-elig-ask.js verify-gating.js; do
             echo "── $f"
             node "verify/$f"
           done

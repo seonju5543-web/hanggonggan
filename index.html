@@ -506,6 +506,18 @@
       <p class="data-note" id="my-version"></p>
     </section>
 
+    <!-- ============ 과팅 (2026-09-21 개발자 지시) ============
+         이 앱에서 처음으로 학생끼리 서로를 보는 화면. 내용은 전부 gating.js 가 그린다 —
+         학교 이메일 인증 → 과팅 프로필 → 게시판·매칭·대화. 서버 설정(gating-config.js)이
+         비어 있으면 '준비 중' 카드만 뜬다. 🔴 id 는 [a-z]+ 여야 한다(test-collector 의
+         '열린 채 시작하는 .screen' 검사가 그 꼴만 읽는다). -->
+    <section id="screen-gating" class="screen" hidden>
+      <header class="page-header">
+        <h2>과팅</h2>
+      </header>
+      <div id="gating-body"></div>
+    </section>
+
     <!-- ============ 설정 (2026-09-11 · 개발자 목업 승인) ============
          승인받은 화면 = ① 뒤로 + '설정' ② 계정(로그인/회원가입) ③ 알림(상태줄 + 켜기 + 스위치 5개).
          ④ 휴지통·이용약관·탈퇴는 같은 지시에서 개발자가 말로 덧붙인 것이라 목록으로 뒀다.
@@ -644,6 +656,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>
         신청내역
       </button>
+      <button class="nav-item" data-nav="gating">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 2.9-5.5 6.5-5.5s6.5 2 6.5 5.5"/><circle cx="17" cy="9" r="2.8"/><path d="M15.2 14.2c2.9.3 5.3 2.1 5.3 5.3"/></svg>
+        과팅
+      </button>
       <button class="nav-item" data-nav="my">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
         MY
@@ -754,5 +770,9 @@
   <script src="essay.js"></script>
   <script src="chat-config.js"></script>
   <script src="chat.js"></script>
+  <!-- 과팅 (2026-09-21) — app.js 의 $·esc·toast·시트·로그인 시트를 쓰므로 **app.js 뒤**.
+       gating-config.js 가 먼저(endpoint 가 비면 탭은 '준비 중'만 그리고 요청 0건). -->
+  <script src="gating-config.js"></script>
+  <script src="gating.js"></script>
 </body>
 </html>

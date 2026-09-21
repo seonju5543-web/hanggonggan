@@ -1,0 +1,22 @@
+name = "handaejang-gating"
+main = "worker.js"
+compatibility_date = "2026-01-01"
+
+# 앱 주소 — 학교 도메인 표(data/school-domains.json)를 여기서 읽고, 이 주소에서 오는 요청만 받는다
+[vars]
+APP_ORIGIN = "https://seonju5543-web.github.io/hanggonggan"
+ALLOW_ORIGIN = "https://seonju5543-web.github.io"
+# Supabase 프로젝트 주소와 **공개** 열쇠(anon) — supabase-config.js 와 같은 값이다. 비밀이 아니다.
+SUPABASE_URL = "https://ffnzmiorcojbhpqwqgcy.supabase.co"
+SUPABASE_ANON = "sb_publishable_kWvjVknBPO8V6ktPEHOlvA_-CTXhCAA"
+# 인증 메일의 보내는 사람 — Resend 에 등록한 도메인의 주소여야 한다 (README 3단계)
+MAIL_FROM = "한대장 <noreply@example.com>"
+
+# 🔴 비밀값은 여기 두지 않는다. 배포 뒤 명령 한 줄씩:
+#     npx wrangler secret put SUPABASE_SERVICE_ROLE   (Supabase → Settings → API → service_role)
+#     npx wrangler secret put RESEND_KEY              (resend.com → API Keys)
+#     npx wrangler secret put VERIFY_PEPPER           (아무 긴 무작위 문자열 — 인증 번호 해시에 섞는다)
+
+# 예약 실행 — 5분마다 만료 정리 + 매칭. 할 일이 없으면 요청 넷으로 끝난다.
+[triggers]
+crons = ["*/5 * * * *"]

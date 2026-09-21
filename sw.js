@@ -23,7 +23,11 @@
    (파일 머리말의 규칙 그대로). */
 /* ⚠️ 오늘 여러 작업이 같은 번호를 각자 올렸다 — 번호는 올리고 **한 일은 다 남긴다**(파일 머리말 규칙). */
 /* ⚠️ 또 부딪혔다 — 같은 날 네 갈래가 각자 번호를 달았다. 규칙대로 **번호는 올리고 한 일은 다 남긴다**. */
-const CACHE = 'handaejang-v203';  /* v203 — 카드 제목이 기관명을 담는다 (2026-09-21 개발자 지시
+const CACHE = 'handaejang-v204';  /* v204 — 과팅 탭 (2026-09-21 개발자 지시). 새 파일 둘
+                                     (gating-config.js · gating.js)이 아래 ASSETS 에 들어갔다 —
+                                     빠지면 설치된 앱이 오프라인에서 이 파일만 없어 죽는다.
+
+                                     v203 — 카드 제목이 기관명을 담는다 (2026-09-21 개발자 지시
                                      "공고 이름이 너무 축약되어 있음"). `장학생 (2026 하반기)` 처럼
                                      누구 것인지 모르던 제목을 되살리고, 대신 윗줄에서 기관명을
                                      뺀다 — 카드에 한 번만 나오되 그 한 번이 굵은 줄이다.
@@ -76,6 +80,7 @@ const ASSETS = ['.', 'index.html', 'style.css', 'boot.js', 'resume.js', 'interac
   'elig-ask.js',
   'section-head.js', 'parse-requirements.js', 'parse-amount.js', 'match-engine.js', 'notify-rules.js', 'notify.js', 'push-config.js', 'support-config.js',
   'chat-config.js', 'chat.js',
+  'gating-config.js', 'gating.js',   /* 과팅 (2026-09-21) */
   /* 로그인 — 목록에서 빠지면 **오프라인에서** 이 파일만 없어 앱이 죽는다.
      ⚠️ importScripts 에는 넣지 않는다: 서비스워커는 로그인을 모른다(푸시는 지금처럼
         기기 안에서 판단한다). 넣으면 서버에 붙는 경로가 하나 더 생겨 경계가 흐려진다. */
