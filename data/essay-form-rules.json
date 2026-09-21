@@ -2,7 +2,7 @@
   "_설명": "공고별 작성 규정 — 재단이 공고·첨부에 직접 적어 둔 문장 그대로. collector/essay-house-mine.mjs 가 만든다.",
   "_왜 원문 그대로인가": "우리가 요약하면 뜻이 바뀐다. 재단의 말이 우리 말보다 정확하다(운영 원칙 8-1 · 발췌 원칙과 같은 계열).",
   "_blind": "학교명을 쓰면 심사에서 제외되는 공고. 앱이 초안에서 학교 이름을 지운다(server/essay/draft-guard.mjs scrubSchool).",
-  "updatedAt": "2026-09-14",
+  "updatedAt": "2026-09-21",
   "notices": {
     "auto-c839d20ec84a0ebb09c20202": {
       "blind": true,
@@ -20,6 +20,12 @@
       "blind": false,
       "lines": [
         "※ 내용이 길어질 경우 별지첨부 가능 , 자기소개서는 개조식이 아닌 서술식으로 작성"
+      ]
+    },
+    "auto-ent2431267001artclviewdo": {
+      "blind": false,
+      "lines": [
+        "< 장학금 신청사유(자기소개서) □ 작성분량 및 방법 11 point / 줄 간격 160 / A4 2장 내외>"
       ]
     }
   }
