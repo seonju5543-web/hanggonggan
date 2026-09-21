@@ -3320,7 +3320,9 @@
     "※ 휴학생 및 2년 미만 교육과정, 방송통신대학·사이버대학(원격대학) 등 제외"
    ],
    "eligibilityFrom": "AI(원문 줄 그대로)",
-   "eligibilityReviewed": false
+   "eligibilityReviewed": false,
+   "sameAs": "하나금융나눔재단",
+   "sameAsFrom": "자동"
   },
   {
    "id": "auto-99ec839d20ec84a0ebb09c20",
@@ -4049,6 +4051,74 @@
    ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322874",
    "sourceKind": "auto"
+  },
+  {
+   "id": "auto-ent2431267416artclviewdo",
+   "name": "[서울][교외] 2026년 하나금융나눔재단 하나장학생 모집(~9/29)",
+   "boardTitle": "[서울][교외] 2026년 하나금융나눔재단 하나장학생 모집(~9/29)",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "80만원",
+   "amountValue": 800000,
+   "deadline": "2026-09-29",
+   "deadlineFrom": "게시판 요약 · ~9/29",
+   "period": "접수 ~2026-09-29",
+   "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-21 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2. 하나장학생 신청서(대학생용).docx",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/151027/download.do"
+    },
+    {
+     "name": "3. 개인정보 수집이용 및 제공 동의서.pdf",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/151028/download.do"
+    }
+   ],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/267416/artclView.do",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "Ⅱ. 지원 자격",
+    "■ 대한민국 국적자로 아래의 학업성적, 소득 요건을 모두 충족하는 학생",
+    "학업성적",
+    "① 직전학기 12학점 이상 이수한 자",
+    "② 직전학기 학업성적",
+    "(3.0/4.5) 이상",
+    "※ 2026년 2학기 현재 휴학생 제외",
+    "※ 복학생: 휴학 직전학기 성적 적용",
+    "본인이 장애인인 경우, 성적 요건 미적용",
+    "한국장학재단 학자금 지원구간 5 구간 이내",
+    "Ⅲ. 제출 서류",
+    "학생 작성·준비",
+    "- 하나장학생 신청서(재단 양식)",
+    "- 개인정보 수집∙이용 및 제공동의서(재단 양식)"
+   ],
+   "excerpts": [
+    "ㆍ모든 서류는 필수제출 서류 이며, 2026 년 7월 1일 이후 발급된 서류만 인정",
+    "■ 접수 방법: scholarship@hufs.ac.kr 이메일 접수"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 800000,
+    "ratio": 0,
+    "min": 800000,
+    "max": 800000,
+    "raw": "■ 장학금액 대학생 80 만원"
+   },
+   "amountFrom": "공고 원문",
+   "sameAs": "하나금융나눔재단",
+   "sameAsFrom": "자동"
   }
  ]
 }

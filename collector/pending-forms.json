@@ -685,6 +685,14 @@
    "added": "2026-09-20",
    "fetched": true,
    "schematized": false
+  },
+  {
+   "id": "auto-ent2431267416artclviewdo",
+   "name": "[서울][교외] 2026년 하나금융나눔재단 하나장학생 모집(~9/29)",
+   "target": "2026년 하나금융나눔재단 하나장학생 모집(~9/29)",
+   "added": "2026-09-21",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }

@@ -452,5 +452,15 @@
   "ratio": 0.968,
   "hangul": 356,
   "lines": 23
+ },
+ "elig-kkdaoq-1.png": {
+  "sig": "146680:f46aa47ac253",
+  "gate": "0.9/200/0.6/v2",
+  "ok": true,
+  "at": "2026-09-21",
+  "pages": 1,
+  "ratio": 0.91,
+  "hangul": 471,
+  "lines": 30
  }
 }
