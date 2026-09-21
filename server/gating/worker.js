@@ -6,8 +6,11 @@
         Supabase 의 gating_profiles 에 "인증됐다"는 행을 만든다.
         행을 만드는 것은 **이 서버뿐**이다(학생 계정은 그 표에 insert 권한이 없다 —
         supabase/migrations/0003_gating.sql ②). 그래서 만능 열쇠(service_role)가 여기 있다.
-     ② **매칭** — 5분마다 '대기 중' 요청을 읽어 짝을 고르고(pairRequests), 확정은 SQL
-        함수 gating_commit_match 하나에 맡긴다(원자적 · 서버만 부를 수 있다).
+     ② **매칭** — **매주 화·금 밤 9시(KST)** 에 '대기 중' 요청을 모아 짝을 고르고(pairRequests),
+        확정은 SQL 함수 gating_commit_match 하나에 맡긴다(원자적 · 서버만 부를 수 있다).
+        5분마다 도는 예약은 **만료 정리만** 한다. 정해진 시각에 한 번 공개하는 것은
+        2026-09-21 개발자 결정이다(스탠퍼드 Date Drop·위밋 방식 — 대기열이 쌓여 짝의 질이 좋아지고
+        기대감이 생긴다). 시각은 wrangler.toml 의 cron 과 아래 DROP_CRON 이 한 쌍이다.
 
    왜 이렇게 만들었나
    - 만능 열쇠는 **저장소에 절대 넣지 않는다.** `wrangler secret put` 으로만 넣는다.
@@ -23,7 +26,7 @@
      POST /verify/send  { email }           Authorization: Bearer <학생 토큰>
      POST /verify/check { code }            Authorization: Bearer <학생 토큰>
      GET  /health
-   예약(5분마다): 만료 정리 → 매칭.
+   예약: 5분마다 만료 정리 · 화·금 12:00 UTC(=21:00 KST) 에 매칭.
 
    필요한 설정(절차는 같은 폴더 README.md)
      변수  : APP_ORIGIN · ALLOW_ORIGIN · SUPABASE_URL · SUPABASE_ANON · MAIL_FROM
@@ -36,6 +39,8 @@ export const SEND_PER_HOUR = 3;                // 한 시간에 세 번까지
 export const SEND_GAP_MS = 60 * 1000;          // 연달아 보내기는 1분 간격
 export const MATCH_PER_TICK = 20;              // 한 번 예약 실행에 확정하는 짝 수(무료 등급 외부 요청 50건/실행)
 export const REMATCH_DAYS = 30;                // 같은 둘은 30일 안에 다시 짝짓지 않는다
+/* 매칭을 맺는 예약 — wrangler.toml 의 둘째 cron 과 **글자까지 같아야** 한다(scheduled 가 이 문자열로 가른다) */
+export const DROP_CRON = '0 12 * * 2,5';       // 화·금 12:00 UTC = 21:00 KST
 
 /* ---------------- 유틸 ---------------- */
 const json = (obj, status = 200, extra = {}) =>
@@ -263,12 +268,14 @@ export function pairRequests(requests, blocks, recent) {
   return out;
 }
 
-/* ---------------- 예약 실행: 만료 정리 → 매칭 ---------------- */
-export async function runScheduled(env) {
-  const result = { expired: false, proposed: 0, committed: 0, errors: [] };
+/* ---------------- 예약 실행: 만료 정리 → (공개 시각이면) 매칭 ---------------- */
+export async function runScheduled(env, opts) {
+  const doMatch = !!(opts && opts.match);
+  const result = { expired: false, matched: doMatch, proposed: 0, committed: 0, errors: [] };
   const ex = await sbService(env, '/rest/v1/rpc/gating_run_expiry', { method: 'POST', body: {} });
   result.expired = ex.ok;
   if (!ex.ok) result.errors.push('expiry:' + ex.status);
+  if (!doMatch) { lastRun = { at: new Date().toISOString(), ...result }; return result; }
 
   const [reqs, blocks, recent] = await Promise.all([
     sbService(env, '/rest/v1/gating_requests?status=eq.waiting&select=id,user_id,school,dept,gender,headcount,want_school,when_pref,created_at,status&order=created_at.asc&limit=500'),
@@ -320,6 +327,7 @@ export default {
   },
 
   async scheduled(event, env, ctx) {
-    ctx.waitUntil(runScheduled(env));
+    /* 화·금 21시(KST) 예약만 짝을 맺는다. 5분짜리는 정리만. */
+    ctx.waitUntil(runScheduled(env, { match: (event && event.cron) === DROP_CRON }));
   },
 };

@@ -111,6 +111,21 @@ create table if not exists public.gating_requests (
 );
 create index if not exists gating_requests_waiting on public.gating_requests (status, created_at);
 
+-- 관심 — 글에 "우리 팀 어때요" 하고 손을 드는 것 (2026-09-21 개발자 결정 "관심 → 수락 → 방").
+-- 글쓴이가 수락해야 방이 열린다. 위밋·춘천 과팅 플랫폼 방식 — 원치 않는 대화가 줄고 글쓴이가 고른다.
+create table if not exists public.gating_interests (
+  id          bigint generated always as identity primary key,
+  post_id     bigint not null references public.gating_posts on delete cascade,
+  from_user   uuid not null default auth.uid() references auth.users on delete cascade,
+  nickname    text not null default '',   -- ④ 스냅숏 — 트리거가 채운다 (글쓴이가 수락 전에 보는 것)
+  school      text,
+  dept        text,
+  gender      text,
+  status      text not null default 'waiting' check (status in ('waiting', 'accepted', 'declined')),
+  created_at  timestamptz not null default now(),
+  unique (post_id, from_user)
+);
+
 -- 채팅방 — 글에서 열린 방(kind='post') 또는 매칭으로 열린 방(kind='match')
 create table if not exists public.gating_rooms (
   id          bigint generated always as identity primary key,
@@ -252,6 +267,33 @@ drop trigger if exists gating_requests_fill on public.gating_requests;
 create trigger gating_requests_fill before insert on public.gating_requests
   for each row execute function public.gating_fill_author();
 
+-- 관심 — 스냅숏 + 규칙(내 글 금지 · 마감 글 금지 · 차단 관계 금지 · 하루 10건)
+create or replace function public.gating_fill_interest() returns trigger
+  language plpgsql security definer set search_path = public as $$
+declare p public.gating_profiles; post public.gating_posts;
+begin
+  select * into p from public.gating_profiles where user_id = auth.uid();
+  if not found or p.verified_at is null or p.nickname is null then raise exception 'not_verified'; end if;
+  select * into post from public.gating_posts where id = new.post_id;
+  if not found or post.status <> 'open' or post.expires_at < now() then raise exception 'post_closed'; end if;
+  if post.author = auth.uid() then raise exception 'own_post'; end if;
+  if public.is_blocked_pair(auth.uid(), post.author) then raise exception 'blocked'; end if;
+  if (select count(*) from public.gating_interests where from_user = auth.uid() and created_at > now() - interval '24 hours') >= 10 then
+    raise exception 'rate:interests';
+  end if;
+  new.from_user := auth.uid();
+  new.nickname := p.nickname;
+  new.school := coalesce(p.school, p.verified_domain);
+  new.dept := p.dept;
+  new.gender := p.gender;
+  new.status := 'waiting';
+  return new;
+end;
+$$;
+drop trigger if exists gating_interests_fill on public.gating_interests;
+create trigger gating_interests_fill before insert on public.gating_interests
+  for each row execute function public.gating_fill_interest();
+
 -- 속도 제한 — 글 하루 3건 · 요청 동시에 1건 · 메시지 분당 30건 · 신고 하루 10건
 create or replace function public.gating_rate_posts() returns trigger
   language plpgsql security definer set search_path = public as $$
@@ -367,39 +409,67 @@ create trigger gating_profiles_touch before update on public.gating_profiles
 -- 4. RPC
 -- ------------------------------------------------------------
 
--- 글에 말 걸기 — 방 하나를 열고 둘을 넣는다. 이미 열었으면 그 방을 돌려준다.
-create or replace function public.gating_open_room(p_post bigint) returns bigint
+-- 글의 방을 연다 — **학생이 직접 못 부른다**(2026-09-21 결정 "관심 → 수락 → 방"). 아래 수락 RPC 가 부른다.
+-- 이미 열린 방이면 그 방을 돌려주고, 나갔던 사람은 다시 들어간다.
+create or replace function public.gating_open_room(p_post bigint, p_visitor uuid) returns bigint
   language plpgsql volatile security definer set search_path = public as $$
 declare
-  uid uuid := auth.uid();
   post public.gating_posts;
-  me public.gating_profiles;
+  visitor public.gating_profiles;
   rid bigint;
 begin
-  if uid is null or not public.is_verified(uid) then raise exception 'not_verified'; end if;
   select * into post from public.gating_posts where id = p_post;
-  if not found or post.status <> 'open' or post.expires_at < now() then raise exception 'post_closed'; end if;
-  if post.author = uid then raise exception 'own_post'; end if;
-  if public.is_blocked_pair(uid, post.author) then raise exception 'blocked'; end if;
-  select id into rid from public.gating_rooms where post_id = p_post and opened_by = uid;
+  if not found then raise exception 'post_closed'; end if;
+  select id into rid from public.gating_rooms where post_id = p_post and opened_by = p_visitor;
   if found then
-    -- 나갔던 방이면 다시 들어간다 (안 그러면 빈 방에 갇혀 보내는 말마다 not_member — 코드 리뷰)
-    update public.gating_room_members set left_at = null where room_id = rid and user_id = uid;
+    update public.gating_room_members set left_at = null where room_id = rid and user_id in (p_visitor, post.author);
     return rid;
   end if;
-  if (select count(*) from public.gating_rooms where opened_by = uid and created_at > now() - interval '24 hours') >= 10 then
-    raise exception 'rate:rooms';
-  end if;
-  select * into me from public.gating_profiles where user_id = uid;
-  insert into public.gating_rooms (kind, post_id, opened_by) values ('post', p_post, uid) returning id into rid;
+  select * into visitor from public.gating_profiles where user_id = p_visitor;
+  insert into public.gating_rooms (kind, post_id, opened_by) values ('post', p_post, p_visitor) returning id into rid;
   insert into public.gating_room_members (room_id, user_id, nickname) values
-    (rid, uid, coalesce(me.nickname, '')),
+    (rid, p_visitor, coalesce(visitor.nickname, '')),
     (rid, post.author, post.nickname);
   return rid;
 end;
 $$;
-revoke execute on function public.gating_open_room(bigint) from public, anon;
-grant execute on function public.gating_open_room(bigint) to authenticated, service_role;
+revoke execute on function public.gating_open_room(bigint, uuid) from public, anon, authenticated;
+grant execute on function public.gating_open_room(bigint, uuid) to service_role;
+
+-- 관심 수락 — 글쓴이만. 방을 열고 둘을 넣는다.
+create or replace function public.gating_accept_interest(p_id bigint) returns bigint
+  language plpgsql volatile security definer set search_path = public as $$
+declare it public.gating_interests; post public.gating_posts; rid bigint;
+begin
+  select * into it from public.gating_interests where id = p_id for update;
+  if not found then raise exception 'not_found'; end if;
+  select * into post from public.gating_posts where id = it.post_id;
+  if post.author is distinct from auth.uid() then raise exception 'not_author'; end if;
+  if it.status <> 'waiting' then raise exception 'already_answered'; end if;
+  if public.is_blocked_pair(auth.uid(), it.from_user) then raise exception 'blocked'; end if;
+  rid := public.gating_open_room(it.post_id, it.from_user);
+  update public.gating_interests set status = 'accepted' where id = p_id;
+  return rid;
+end;
+$$;
+revoke execute on function public.gating_accept_interest(bigint) from public, anon;
+grant execute on function public.gating_accept_interest(bigint) to authenticated, service_role;
+
+-- 관심 거절 — 글쓴이만. 상대에게는 '거절' 이 아니라 그냥 답이 없는 것으로 보인다(앱이 status 를 안 보여 준다).
+create or replace function public.gating_decline_interest(p_id bigint) returns void
+  language plpgsql volatile security definer set search_path = public as $$
+declare it public.gating_interests; post public.gating_posts;
+begin
+  select * into it from public.gating_interests where id = p_id for update;
+  if not found then raise exception 'not_found'; end if;
+  select * into post from public.gating_posts where id = it.post_id;
+  if post.author is distinct from auth.uid() then raise exception 'not_author'; end if;
+  if it.status <> 'waiting' then raise exception 'already_answered'; end if;
+  update public.gating_interests set status = 'declined' where id = p_id;
+end;
+$$;
+revoke execute on function public.gating_decline_interest(bigint) from public, anon;
+grant execute on function public.gating_decline_interest(bigint) to authenticated, service_role;
 
 -- 매칭 확정 — 서버(service_role)만. 워커가 고른 짝을 **원자적으로** 굳힌다.
 create or replace function public.gating_commit_match(a bigint, b bigint) returns bigint
@@ -437,6 +507,7 @@ begin
   delete from public.gating_room_members where user_id = uid;
   delete from public.gating_matches where user_a = uid or user_b = uid;
   delete from public.gating_requests where user_id = uid;
+  delete from public.gating_interests where from_user = uid;
   delete from public.gating_posts where author = uid;
   delete from public.gating_blocks where blocker = uid or blocked = uid;
   delete from public.school_verifications where user_id = uid;
@@ -467,9 +538,12 @@ grant execute on function public.gating_run_expiry() to service_role;
 -- 5. 권한 — ② ⑥ 기본 grant 를 걷어내고 필요한 것만 준다
 -- ------------------------------------------------------------
 revoke all on table public.gating_profiles, public.school_verifications, public.gating_posts,
-  public.gating_requests, public.gating_rooms, public.gating_matches, public.gating_room_members,
+  public.gating_requests, public.gating_interests, public.gating_rooms, public.gating_matches, public.gating_room_members,
   public.gating_messages, public.gating_reports, public.gating_blocks, public.gating_room_last
   from anon;
+
+-- 관심: 넣기만 · 답(수락·거절)은 RPC 가 바꾼다
+revoke update, delete on table public.gating_interests from authenticated;
 
 -- 인증 코드 표는 로그인한 사람도 못 본다
 revoke all on table public.school_verifications from authenticated;
@@ -509,6 +583,7 @@ alter table public.gating_profiles enable row level security;
 alter table public.school_verifications enable row level security;   -- 정책 0개 = service_role 말고는 아무도
 alter table public.gating_posts enable row level security;
 alter table public.gating_requests enable row level security;
+alter table public.gating_interests enable row level security;
 alter table public.gating_rooms enable row level security;
 alter table public.gating_matches enable row level security;
 alter table public.gating_room_members enable row level security;
@@ -552,6 +627,17 @@ create policy "과팅 요청 넣기" on public.gating_requests
 drop policy if exists "과팅 요청 고치기" on public.gating_requests;
 create policy "과팅 요청 고치기" on public.gating_requests
   for update using (user_id = auth.uid()) with check (user_id = auth.uid());
+
+-- gating_interests: 보낸 사람과 글쓴이만 본다 · 넣는 것은 인증한 본인
+drop policy if exists "과팅 관심 읽기" on public.gating_interests;
+create policy "과팅 관심 읽기" on public.gating_interests
+  for select using (
+    from_user = auth.uid()
+    or exists (select 1 from public.gating_posts p where p.id = post_id and p.author = auth.uid())
+  );
+drop policy if exists "과팅 관심 넣기" on public.gating_interests;
+create policy "과팅 관심 넣기" on public.gating_interests
+  for insert with check (from_user = auth.uid() and public.is_verified(auth.uid()));
 
 -- gating_matches: 내 요청이 낀 짝만
 drop policy if exists "과팅 짝 읽기" on public.gating_matches;

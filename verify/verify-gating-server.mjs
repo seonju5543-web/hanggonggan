@@ -197,7 +197,19 @@ console.log('\n■ 인증 요청 처리 (가짜 서버)');
     { id: 2, user_id: 'u2', school: '경희대학교', dept: '영문', gender: '여', headcount: 3, want_school: 'any', created_at: '2026-09-21T00:00:02Z', status: 'waiting' },
     { id: 3, user_id: 'u3', school: '경희대학교', dept: '사학', gender: '남', headcount: 3, want_school: 'any', created_at: '2026-09-21T00:00:03Z', status: 'waiting' },
   ];
-  const r = await W.runScheduled(env);
+  /* 5분짜리 예약은 정리만 — 짝은 안 맺는다 (2026-09-21 개발자 결정 "정해진 시각에 한 번") */
+  const quiet = await W.runScheduled(env, { match: false });
+  ok(quiet.expired === true && quiet.proposed === 0 && db.commits.length === 0, '5분 예약은 만료 정리만 하고 짝을 안 맺는다', quiet);
+  let tick = null;
+  await worker.scheduled({ cron: '*/5 * * * *' }, env, { waitUntil: (p) => { tick = p; } });
+  await tick;
+  ok(db.commits.length === 0, "  scheduled('*/5') 도 짝을 안 맺는다");
+  await worker.scheduled({ cron: W.DROP_CRON }, env, { waitUntil: (p) => { tick = p; } });
+  await tick;
+  ok(db.commits.length === 1, '  scheduled(DROP_CRON) 은 맺는다', db.commits.length);
+  ok(W.DROP_CRON === '0 12 * * 2,5', 'DROP_CRON 은 화·금 12:00 UTC (= 21:00 KST)');
+  db.commits.length = 0;
+  const r = await W.runScheduled(env, { match: true });
   ok(r.expired === true, '만료 정리 RPC 를 먼저 부른다');
   ok(r.proposed === 1 && r.committed === 1, '셋 중 남·여 한 쌍만 확정한다', r);
   ok(JSON.stringify(db.commits[0]) === '{"a":1,"b":2}', '확정은 SQL 함수(gating_commit_match)에 맡긴다', db.commits[0]);

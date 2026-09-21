@@ -11,7 +11,7 @@
      [2] 로그인 안 했으면 문 — 로그인 버튼이 로그인 시트를 연다
      [3] 인증 흐름 — 번호 보내기(본문은 이메일뿐) → 확인 → 학교 이름을 지어내지 않는다 → 프로필(칸 셋)
      [4] 게시판 — 남의 글이 글자로만 그려진다(esc) · 전화번호 글은 막힌다 · 보내는 칸은 셋
-     [5] 대화방 — 방 열기 RPC · 폴링은 그 방만 · 보내기 본문 · 새 말이 5초 안에 뜬다 · 닫으면 폴링 정지
+     [5] 관심 → 수락 → 방 (앱은 방을 직접 못 연다) · 폴링은 그 방만 · 보내기 본문 · 새 말이 5초 안에 뜬다 · 닫으면 폴링 정지
      [6] 매칭 — 신청 본문은 둘 · 짝이 되면 카드
      [7] 차단 — 그 사람 글이 사라진다
      [8] 🔴 이름·학번·전화·주민등록번호·계좌가 과팅 경로로 **한 번도** 안 나간다
@@ -50,7 +50,7 @@ const db = {
     { id: 12, author: U3, nickname: '경희사학', school: '경희대학교', dept: '사학과', gender: '여', headcount: 4, want_school: 'same',
       body: '4:4 이번 주말 어때요', status: 'open', created_at: '2026-09-19T10:00:00Z', expires_at: '2026-10-03T10:00:00Z' },
   ],
-  rooms: [], members: [], messages: [], requests: [], matches: [], blocks: [], reports: [],
+  rooms: [], members: [], messages: [], requests: [], matches: [], blocks: [], reports: [], interests: [],
   nextId: 100,
 };
 const cors = {
@@ -109,13 +109,33 @@ function supabase(r) {
     return r.send(200, db.posts.filter((x) => x.status === 'open' && !blocked.has(x.author)));
   }
   if (u.startsWith('/rest/v1/rpc/gating_forget_me')) { db.me = null; db.posts = db.posts.filter((x) => x.author !== ME); return r.send(204); }
-  if (u.startsWith('/rest/v1/rpc/gating_open_room')) {
-    const post = db.posts.find((x) => x.id === Number(r.body && r.body.p_post));
-    if (!post) return r.send(400, { message: 'post_closed' });
+  /* 방을 직접 여는 RPC 는 학생 권한에 없다 — 진짜 서버라면 permission denied */
+  if (u.startsWith('/rest/v1/rpc/gating_open_room')) return r.send(403, { message: 'permission denied for function gating_open_room' });
+  if (u.startsWith('/rest/v1/gating_interests')) {
+    if (r.method === 'POST') {
+      const post = db.posts.find((x) => x.id === Number(r.body && r.body.post_id));
+      if (!post) return r.send(400, { message: 'post_closed' });
+      if (db.interests.some((i) => i.post_id === post.id && i.from_user === ME)) return r.send(409, { message: 'duplicate key value violates unique constraint "gating_interests_post_id_from_user_key"' });
+      const row = Object.assign({ id: db.nextId++, from_user: ME, nickname: db.me.nickname, school: db.me.school || db.me.verified_domain, dept: db.me.dept, gender: db.me.gender, status: 'waiting', created_at: now() }, r.body);
+      db.interests.push(row);
+      return r.send(201, [row]);
+    }
+    /* RLS 흉내 — 내가 보낸 것 + 내 글에 온 것 */
+    const mine = new Set(db.posts.filter((x) => x.author === ME).map((x) => x.id));
+    return r.send(200, db.interests.filter((i) => i.from_user === ME || mine.has(i.post_id)));
+  }
+  if (u.startsWith('/rest/v1/rpc/gating_accept_interest') || u.startsWith('/rest/v1/rpc/gating_decline_interest')) {
+    const it = db.interests.find((i) => i.id === Number(r.body && r.body.p_id));
+    if (!it) return r.send(400, { message: 'not_found' });
+    const post = db.posts.find((x) => x.id === it.post_id);
+    if (!post || post.author !== ME) return r.send(400, { message: 'not_author' });
+    if (it.status !== 'waiting') return r.send(400, { message: 'already_answered' });
+    if (u.includes('decline')) { it.status = 'declined'; return r.send(204); }
+    it.status = 'accepted';
     const id = db.nextId++;
-    db.rooms.push({ id, kind: 'post', post_id: post.id, opened_by: ME, created_at: now(), closed_at: null });
-    db.members.push({ room_id: id, user_id: ME, nickname: db.me.nickname, last_read_at: now(), left_at: null });
-    db.members.push({ room_id: id, user_id: post.author, nickname: post.nickname, last_read_at: now(), left_at: null });
+    db.rooms.push({ id, kind: 'post', post_id: post.id, opened_by: it.from_user, created_at: now(), closed_at: null });
+    db.members.push({ room_id: id, user_id: it.from_user, nickname: it.nickname, last_read_at: now(), left_at: null });
+    db.members.push({ room_id: id, user_id: ME, nickname: post.nickname, last_read_at: now(), left_at: null });
     return r.send(200, id);
   }
   if (u.startsWith('/rest/v1/gating_room_members')) {
@@ -406,19 +426,47 @@ const gatingReqs = () => received.filter((r) => r.to === 'gw' || /\/rest\/v1\/(g
     ok(await page.locator('.gt-post .gt-verified').count() === 3, "글마다 '인증' 배지가 붙는다");
     ok(await page.locator('#detail-sheet.show').count() === 0, '올리면 시트가 닫힌다');
     ok(await page.locator('.gt-post').count() === 3, '목록이 새로 그려진다');
-    ok(await page.locator('.gt-post[data-post="100"] [data-gt="close-post"]').count() === 1, '내 글에는 마감 버튼만 있다');
-    ok(await page.locator('.gt-post[data-post="100"] [data-gt="open-room"]').count() === 0, '  내 글에는 대화하기가 없다');
+    ok(await page.locator('.gt-post[data-post="100"] [data-gt="close-post"]').count() === 1, '내 글에는 마감 버튼이 있다');
+    ok(/관심 0명/.test(await page.textContent('.gt-post[data-post="100"] [data-gt="interests-of"]')), "  내 글에는 '관심 n명' 이 있다");
+    ok(await page.locator('[data-gt="open-room"]').count() === 0, "🔴 '대화하기' 버튼은 어디에도 없다 (관심 → 수락 → 방)");
   }
 
-  /* ───────────── [5] 대화방 ───────────── */
-  console.log('\n[5] 대화방 — 방 열기 · 폴링은 그 방만 · 보내기 · 새 말 · 닫으면 정지');
+  /* ───────────── [5] 관심 → 수락 → 방 ───────────── */
+  console.log('\n[5] 관심 → 수락 → 방 · 폴링은 그 방만 · 보내기 · 새 말 · 닫으면 정지');
   {
-    await page.click('.gt-post[data-post="11"] [data-gt="open-room"]');
+    /* 남의 글에 관심 보내기 */
+    await page.click('.gt-post[data-post="11"] [data-gt="interest"]');
+    await page.waitForTimeout(600);
+    const sentReq = received.filter((r) => r.method === 'POST' && r.path.startsWith('/rest/v1/gating_interests')).pop();
+    ok(!!sentReq && JSON.stringify(Object.keys(sentReq.body)) === '["post_id"]' && sentReq.body.post_id === 11, '🔴 관심 본문은 글 번호 하나뿐 (닉네임·학교·성별은 서버가 채운다)', sentReq && sentReq.body);
+    ok(await page.locator('.gt-post[data-post="11"] [data-gt="interest"]').count() === 0
+      && /관심 보냄/.test(await page.textContent('.gt-post[data-post="11"]')), "보낸 뒤에는 '관심 보냄' 으로 잠긴다");
+    ok(await page.locator('#gt-room').count() === 0, '  관심만으로는 방이 안 열린다');
+
+    /* 내 글에 관심 둘이 온다 (연영이 · 경희사학) → 하나 거절 · 하나 수락 */
+    db.interests.push({ id: db.nextId++, post_id: 100, from_user: U3, nickname: '경희사학', school: '경희대학교', dept: '사학과', gender: '여', status: 'waiting', created_at: new Date().toISOString() });
+    db.interests.push({ id: db.nextId++, post_id: 100, from_user: U2, nickname: '연영이', school: '한국외국어대학교', dept: '영어학과', gender: '여', status: 'waiting', created_at: new Date().toISOString() });
+    await page.click('.gt-tabs .chip[data-v="match"]');
+    await page.click('.gt-tabs .chip[data-v="board"]');
+    await page.waitForSelector('.gt-post[data-post="100"] [data-gt="interests-of"]');
+    ok(/관심 2명/.test(await page.textContent('.gt-post[data-post="100"] [data-gt="interests-of"]')), '내 글에 온 관심 수가 보인다');
+    await page.click('.gt-post[data-post="100"] [data-gt="interests-of"]');
+    await page.waitForSelector('#gt-interests');
+    ok(await page.locator('#gt-interests .gt-interest').count() === 2 && /경희사학[\s\S]*사학과[\s\S]*여/.test(await page.textContent('#gt-interests')), '관심 목록에 닉네임·학교·학과·성별이 보인다');
+    const firstDecline = page.locator('#gt-interests [data-gt="decline"]').first();
+    const declineId = await firstDecline.getAttribute('data-id');
+    await firstDecline.click();
+    await page.waitForTimeout(500);
+    const dec = received.filter((r) => r.path.startsWith('/rest/v1/rpc/gating_decline_interest')).pop();
+    ok(!!dec && dec.body.p_id === Number(declineId), '거절은 RPC 로', dec && dec.body);
+    ok(await page.locator('#gt-interests .gt-interest').count() === 1 && db.rooms.length === 0, '  거절하면 목록에서 빠지고 방은 안 생긴다');
+    await page.click('#gt-interests .gt-interest [data-gt="accept"]');
     await page.waitForSelector('#gt-room');
-    const rpc = received.find((r) => r.path.startsWith('/rest/v1/rpc/gating_open_room'));
-    ok(!!rpc && rpc.body.p_post === 11, '방 열기는 RPC 하나로 (앱이 방·구성원을 직접 안 만든다)', rpc && rpc.body);
+    const acc = received.filter((r) => r.path.startsWith('/rest/v1/rpc/gating_accept_interest')).pop();
+    ok(!!acc && typeof acc.body.p_id === 'number', '수락은 RPC 로 (앱이 방·구성원을 직접 안 만든다)', acc && acc.body);
+    ok(!received.some((r) => r.path.startsWith('/rest/v1/rpc/gating_open_room')), '🔴 앱은 방을 직접 여는 RPC 를 한 번도 안 부른다');
     const roomId = Number(await page.getAttribute('#gt-room', 'data-room'));
-    ok(roomId > 0, '방 번호를 받았다', roomId);
+    ok(roomId > 0, '수락하면 방이 열린다', roomId);
     ok(/연영이/.test(await page.textContent('#gt-room .sheet-title')), '상대 닉네임이 제목이다');
     ok(await page.locator('#gt-msgs [data-gt="ice"]').count() === 3, '빈 방에는 첫 인사 질문 셋이 뜬다');
     const iceQ = await page.getAttribute('#gt-msgs [data-gt="ice"]', 'data-q');
@@ -526,15 +574,18 @@ const gatingReqs = () => received.filter((r) => r.to === 'gw' || /\/rest\/v1\/(g
     const rep = received.filter((r) => r.method === 'POST' && r.path.startsWith('/rest/v1/gating_reports')).pop();
     ok(!!rep && rep.body.reason === '광고' && rep.body.post_id === 11 && rep.body.target_user === U2, '신고 본문은 사유·대상·글 번호', rep && rep.body);
     /* 대화방에서 신고하면 방 번호가 실린다 (운영자가 그 방을 찾는다 — 코드 리뷰) */
-    await page.click('.gt-post[data-post="11"] [data-gt="open-room"]');
+    await page.click('.gt-tabs .chip[data-v="chat"]');
+    await page.waitForSelector('.gt-room-row');
+    await page.click('.gt-room-row');
     await page.waitForSelector('#gt-room');
     const roomIdR = Number(await page.getAttribute('#gt-room', 'data-room'));
+    const partnerR = await page.getAttribute('#gt-room [data-gt="report"]', 'data-user');   /* 어느 방이 먼저 뜨든 그 방의 상대 */
     await page.click('#gt-room [data-gt="report"]');
     await page.waitForSelector('#gt-report');
     await page.click('[data-gt="report-send"]');
     await page.waitForTimeout(500);
     const rep2 = received.filter((r) => r.method === 'POST' && r.path.startsWith('/rest/v1/gating_reports')).pop();
-    ok(!!rep2 && rep2.body.room_id === roomIdR && rep2.body.target_user === U2, '대화방 신고에는 방 번호가 실린다', rep2 && rep2.body);
+    ok(!!rep2 && rep2.body.room_id === roomIdR && rep2.body.target_user === partnerR && [U2, U3].includes(partnerR), '대화방 신고에는 방 번호와 그 방의 상대가 실린다', rep2 && rep2.body);
   }
 
   /* ───────────── [8] 🔴 개인정보 ───────────── */

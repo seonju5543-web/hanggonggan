@@ -53,6 +53,30 @@ const GT_ICEBREAKERS = [
   '몇 학년끼리 모였어요',
 ];
 const GT_REPORT_REASONS = ['욕설', '광고', '연락처강요', '사칭', '기타'];
+/* 매칭 공개 시각 — 매주 화·금 밤 9시 (2026-09-21 개발자 결정 · 서버 wrangler.toml 의 둘째 cron 과 한 쌍).
+   [요일(0=일), 시] 이고 폰의 시계(KST)로 센다. */
+const GT_DROPS = [[2, 21], [5, 21]];
+const GT_DAY_KO = ['일', '월', '화', '수', '목', '금', '토'];
+/* 다음 공개 시각 — 순수 함수(검사가 Node 에서 돌린다). now 는 Date. */
+function gtNextDrop(now) {
+  const base = new Date(now || Date.now());
+  for (let i = 0; i <= 7; i++) {
+    const d = new Date(base.getFullYear(), base.getMonth(), base.getDate() + i);
+    for (const [dow, hour] of GT_DROPS) {
+      if (d.getDay() !== dow) continue;
+      const at = new Date(d.getFullYear(), d.getMonth(), d.getDate(), hour, 0, 0, 0);
+      if (at.getTime() > base.getTime()) return at;
+    }
+  }
+  return null;
+}
+function gtNextDropLabel(now) {
+  const at = gtNextDrop(now);
+  if (!at) return '';
+  const base = new Date(now || Date.now());
+  const sameDay = at.getFullYear() === base.getFullYear() && at.getMonth() === base.getMonth() && at.getDate() === base.getDate();
+  return `${sameDay ? '오늘' : GT_DAY_KO[at.getDay()] + '요일'} 밤 ${at.getHours() - 12}시`;
+}
 
 const gt = {
   armed: false,          // 탭을 한 번이라도 열었는가 — 그전에는 서버에 아무것도 묻지 않는다
@@ -125,7 +149,10 @@ function gtErrText(res) {
   if (/rate:posts/.test(m)) return '글은 하루에 3건까지 올릴 수 있어요';
   if (/rate:requests/.test(m)) return '이미 짝을 찾는 중인 요청이 있어요';
   if (/rate:messages/.test(m)) return '너무 빨리 보내고 있어요. 잠시 후 다시';
-  if (/rate:rooms/.test(m)) return '오늘은 새 대화를 더 열 수 없어요';
+  if (/rate:interests|rate:rooms/.test(m)) return '관심은 하루에 10건까지 보낼 수 있어요';
+  if (/gating_interests_post_id_from_user_key/.test(m)) return '이미 관심을 보낸 글이에요';
+  if (/not_author/.test(m)) return '내 글에만 할 수 있어요';
+  if (/already_answered/.test(m)) return '이미 답한 관심이에요';
   if (/rate/.test(m)) return '잠시 후 다시 시도해 주세요';
   if (/not_verified/.test(m)) return '학교 인증을 먼저 마쳐 주세요';
   if (/post_closed/.test(m)) return '마감된 글이에요';
@@ -299,7 +326,7 @@ function gtRenderBoard() {
   if (!pane) return;
   if (gt.posts === null) {
     pane.innerHTML = '<div class="empty">글을 불러오는 중</div>';
-    gtLoadPosts().then(() => { if (gt.tab === 'board') gtRenderBoard(); });
+    Promise.all([gtLoadPosts(), gtLoadInterests()]).then(() => { if (gt.tab === 'board') gtRenderBoard(); });
     return;
   }
   const me = gtMyId();
@@ -309,6 +336,8 @@ function gtRenderBoard() {
     && (!f.dept || String(p.dept || '').includes(f.dept)));
   const card = (p) => {
     const mine = p.author === me;
+    const sent = (gt.interests || []).some((i) => i.post_id === p.id && i.from_user === me);
+    const waiting = (gt.interests || []).filter((i) => i.post_id === p.id && i.from_user !== me && i.status === 'waiting').length;
     return `
       <article class="gt-post" data-post="${p.id}">
         <div class="gt-post-head">
@@ -320,10 +349,13 @@ function gtRenderBoard() {
           <span class="gt-post-meta">${p.want_school === 'same' ? '같은 학교만' : '학교 무관'} · ${esc(gtWhenLabel(p.when_pref))}${p.area ? ' · ' + esc(p.area) : ''} · ${esc(gtWhen(p.created_at))}</span>
           <span class="gt-post-actions">
             ${mine
-              ? '<button type="button" class="btn-link" data-gt="close-post" data-id="' + p.id + '">마감</button>'
+              ? `<button type="button" class="btn-link" data-gt="close-post" data-id="${p.id}">마감</button>
+                 <button type="button" class="btn btn-primary gt-post-chat" data-gt="interests-of" data-id="${p.id}">관심 ${waiting}명</button>`
               : `<button type="button" class="btn-link" data-gt="report" data-kind="post" data-id="${p.id}" data-user="${esc(p.author)}">신고</button>
                  <button type="button" class="btn-link" data-gt="block" data-user="${esc(p.author)}">차단</button>
-                 <button type="button" class="btn btn-primary gt-post-chat" data-gt="open-room" data-id="${p.id}">대화하기</button>`}
+                 ${sent
+                   ? '<button type="button" class="btn btn-outline gt-post-chat" disabled>관심 보냄</button>'
+                   : `<button type="button" class="btn btn-primary gt-post-chat" data-gt="interest" data-id="${p.id}">관심 보내기</button>`}`}
           </span>
         </div>
       </article>`;
@@ -456,8 +488,9 @@ function gtRenderMatch() {
   const waiting = gt.requests.find((r) => r.status === 'waiting');
   const matched = gt.requests.filter((r) => r.status === 'matched' && r.room_id);
   const me = gt.me;
-  let html = `<p class="gt-lead">인원·학교 범위를 적어 두면 5분마다 조건이 맞는 다른 과 팀과 짝을 맺고, 대화방이 열립니다.
-    성별이 다른 팀끼리만 맺습니다. 짝이 되면 여기와 아래 탭에 점이 뜹니다.</p>`;
+  let html = `<p class="gt-lead">인원·학교 범위·시간대를 적어 두면 <strong>매주 화·금 밤 9시</strong>에 조건이 맞는 다른 과 팀과 짝을 맺고, 대화방이 열립니다.
+    성별이 다른 팀끼리만 맺습니다. 짝이 되면 여기와 아래 탭에 점이 뜹니다.
+    <span class="gt-next-drop">다음 공개: ${esc(gtNextDropLabel())}</span></p>`;
   if (matched.length) {
     html += matched.map((r) => `
       <div class="gt-matched">
@@ -573,17 +606,74 @@ function gtRenderInbox() {
     : '<div class="empty">아직 대화가 없어요. 게시판에서 글에 말을 걸거나 매칭을 신청해 보세요.</div>';
 }
 
-/* ---------------- 대화방 ---------------- */
-async function gtOpenRoomFromPost(postId) {
+/* ---------------- 관심 → 수락 → 방 (2026-09-21 개발자 결정) ----------------
+   글에는 '관심 보내기' 만 있다. 방은 글쓴이가 수락할 때 서버(RPC gating_accept_interest)가 연다.
+   🔴 앱은 방을 직접 여는 RPC 를 부르지 않는다 — 부를 권한도 없다(0003 에서 authenticated 회수). */
+async function gtLoadInterests() {
+  /* RLS 가 '내가 보낸 것 + 내 글에 온 것' 만 돌려준다 */
+  const res = await sbAuthed('/rest/v1/gating_interests?select=id,post_id,from_user,nickname,school,dept,gender,status,created_at&order=created_at.desc&limit=200');
+  gt.interests = res.ok && Array.isArray(res.json) ? res.json : (gt.interests || []);
+  return gt.interests;
+}
+
+async function gtInterestSend(postId) {
   if (gt.busy) return;
   gt.busy = true;
-  const res = await sbAuthed('/rest/v1/rpc/gating_open_room', { method: 'POST', body: { p_post: Number(postId) } });
+  /* 🔴 보내는 칸은 글 번호 하나 — 닉네임·학교·학과·성별은 서버 트리거가 프로필에서 채운다 */
+  const res = await sbAuthed('/rest/v1/gating_interests', { method: 'POST', headers: { Prefer: 'return=representation' }, body: { post_id: Number(postId) } });
   gt.busy = false;
   if (!res.ok) { toast(gtErrText(res)); return; }
-  const roomId = Number(res.json);
-  gt.rooms = null;
-  gtOpenRoom(roomId);
+  const row = Array.isArray(res.json) ? res.json[0] : null;
+  if (row) gt.interests = [row].concat(gt.interests || []);
+  toast('관심을 보냈어요. 글쓴이가 수락하면 대화방이 열립니다');
+  gtRenderBoard();
 }
+
+function gtInterestsSheet(postId) {
+  const id = Number(postId);
+  const list = (gt.interests || []).filter((i) => i.post_id === id && i.from_user !== gtMyId() && i.status === 'waiting');
+  gt.seenInterests = (gt.seenInterests || []).concat(list.map((i) => i.id));
+  gtSetDot(gtHasUnread());
+  openSheetShell();
+  $('#detail-sheet').innerHTML = `
+    <div class="sheet-handle"></div>
+    <div class="sheet-body" id="gt-interests" data-post="${id}">
+      <h3 class="sheet-title">관심을 보낸 팀</h3>
+      <p class="auth-lead">수락하면 그 팀과 대화방이 열립니다. 거절은 상대에게 따로 알리지 않습니다.</p>
+      ${list.length ? list.map((i) => `
+        <div class="gt-interest" data-interest="${i.id}">
+          <div class="gt-interest-who"><span class="gt-verified" title="학교 이메일 인증">인증</span>${esc(i.nickname || '')} · ${esc(i.school || '학교 미표시')}${i.dept ? ' · ' + esc(i.dept) : ''} · ${esc(i.gender || '')}</div>
+          <div class="gt-interest-actions">
+            <button type="button" class="btn btn-outline" data-gt="decline" data-id="${i.id}">거절</button>
+            <button type="button" class="btn btn-primary" data-gt="accept" data-id="${i.id}">수락</button>
+          </div>
+        </div>`).join('') : '<div class="empty">아직 관심을 보낸 팀이 없어요.</div>'}
+    </div>`;
+}
+
+async function gtInterestAnswer(interestId, accept) {
+  if (gt.busy) return;
+  gt.busy = true;
+  const res = await sbAuthed(accept ? '/rest/v1/rpc/gating_accept_interest' : '/rest/v1/rpc/gating_decline_interest',
+    { method: 'POST', body: { p_id: Number(interestId) } });
+  gt.busy = false;
+  if (!res.ok) { toast(gtErrText(res)); return; }
+  const it = (gt.interests || []).find((i) => i.id === Number(interestId));
+  if (it) it.status = accept ? 'accepted' : 'declined';
+  if (accept) {
+    gt.rooms = null;
+    /* 🔴 closeSheet() 를 부르지 않는다 — 그 함수가 걸어 두는 '다 내려간 뒤 숨김' 타이머가 바로 이어
+       연 대화방 시트를 숨겨 버린다(검사가 잡았다). 같은 시트 그릇을 그 자리에서 대화방으로 바꾼다. */
+    toast('대화방이 열렸어요');
+    gtOpenRoom(Number(res.json));
+  } else {
+    const box = $('#gt-interests');
+    if (box) gtInterestsSheet(box.dataset.post);
+  }
+  if (gt.tab === 'board') gtRenderBoard();
+}
+
+/* ---------------- 대화방 ---------------- */
 
 async function gtOpenRoom(roomId) {
   const id = Number(roomId);
@@ -887,7 +977,10 @@ async function gtProfileSave() {
 
 /* ---------------- 알림 점 (30초 폴링 · 탭을 한 번 연 뒤에만) ---------------- */
 function gtHasUnread() {
-  return (gt.rooms || []).some((r) => r.unread) || (gt.requests || []).some((r) => r.status === 'matched' && !(gt.seenMatches || []).includes(r.id));
+  const me = gtMyId();
+  return (gt.rooms || []).some((r) => r.unread)
+    || (gt.requests || []).some((r) => r.status === 'matched' && !(gt.seenMatches || []).includes(r.id))
+    || (gt.interests || []).some((i) => i.from_user !== me && i.status === 'waiting' && !(gt.seenInterests || []).includes(i.id));
 }
 function gtSetDot(on) {
   const btn = document.querySelector('.nav-item[data-nav="gating"]');
@@ -905,6 +998,7 @@ function gtInboxStart() {
       const keepErr = gt.err;   /* 배경 확인의 실패는 화면에 안 올린다 — 다음 그리기에 새어 나온다(코드 리뷰) */
       await gtLoadRooms();
       if (gt.tab !== 'match') await gtLoadRequests();
+      await gtLoadInterests();
       gt.err = keepErr;
       gtSetDot(gtHasUnread());
       if (gt.tab === 'chat' && !gt.room) gtRenderInbox();
@@ -940,7 +1034,10 @@ if (typeof document !== 'undefined' && typeof window !== 'undefined' && !window.
     else if (k === 'compose') gtComposeOpen();
     else if (k === 'post') gtPostCreate();
     else if (k === 'close-post') gtPostClose(b.dataset.id);
-    else if (k === 'open-room') gtOpenRoomFromPost(b.dataset.id);
+    else if (k === 'interest') gtInterestSend(b.dataset.id);
+    else if (k === 'interests-of') gtInterestsSheet(b.dataset.id);
+    else if (k === 'accept') gtInterestAnswer(b.dataset.id, true);
+    else if (k === 'decline') gtInterestAnswer(b.dataset.id, false);
     else if (k === 'open-room-id') {
       const rid = Number(b.dataset.room);
       gt.seenMatches = (gt.seenMatches || []).concat((gt.requests || []).filter((r) => r.room_id === rid).map((r) => r.id));
@@ -965,5 +1062,5 @@ if (typeof document !== 'undefined' && typeof window !== 'undefined' && !window.
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { GT_CONTACT_RE, GT_NICK_RE, GT_ROOM_POLL_MS, GT_INBOX_POLL_MS };
+  module.exports = { GT_CONTACT_RE, GT_NICK_RE, GT_ROOM_POLL_MS, GT_INBOX_POLL_MS, GT_DROPS, gtNextDrop, gtNextDropLabel };
 }

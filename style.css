@@ -4971,6 +4971,11 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 .gt-ice { padding: var(--space-8) 0; }
 .gt-ice-title { font-size: var(--t-sm); color: var(--text-weak); margin-bottom: var(--sp-1); }
 .gt-ice .chip { font-size: var(--t-sm); text-align: left; }
+.gt-interest { display: flex; justify-content: space-between; align-items: center; gap: var(--space-12); padding: var(--space-12) 0; border-bottom: 1px solid var(--line); }
+.gt-interest-who { font-size: var(--t-sm); font-weight: 700; color: var(--text); min-width: 0; }
+.gt-interest-actions { display: flex; gap: var(--space-8); flex: none; }
+.gt-interest-actions .btn { padding: var(--space-8) var(--space-12); font-size: var(--t-sm); }
+.gt-next-drop { display: block; margin-top: var(--space-6); font-weight: 700; color: var(--accent); }
 /* 아래 탭의 새 소식 점 */
 .nav-item { position: relative; }
 .nav-dot { position: absolute; top: 4px; left: calc(50% + 8px); width: 8px; height: 8px; border-radius: var(--radius-pill); background: var(--red); }

@@ -8474,7 +8474,7 @@ console.log('\n■ 과팅 탭 (2026-09-21)');
 
   /* ③ 표 — 모든 표에 RLS · 인증 표에는 정책 0 · security definer 에 search_path · 컬럼 grant */
   const tables = [...sql.matchAll(/create table if not exists public\.(gating_\w+|school_verifications)/g)].map((m) => m[1]);
-  eq('과팅 표를 읽어 냈다 (열 개)', tables.length, 10);
+  eq('과팅 표를 읽어 냈다 (열한 개)', tables.length, 11);
   const noRls = tables.filter((t) => !new RegExp(`alter table public\\.${t} enable row level security`).test(sql));
   eq('모든 과팅 표에 행 단위 규칙(RLS)이 켜져 있다', noRls, []);
   eq('인증 코드 표에는 정책이 하나도 없다 (서버만 본다)', /create policy [^\n]* on public\.school_verifications/.test(sql), false);
@@ -8505,6 +8505,27 @@ console.log('\n■ 과팅 탭 (2026-09-21)');
   eq('첫 인사 질문은 미리 적어 둔 목록에서만 나온다', /const GT_ICEBREAKERS = \[/.test(gating) && !/essay|chat-config|GATING_CONFIG\.endpoint[^\n]*ice/i.test(gating.slice(gating.indexOf('function gtIcebreakers'), gating.indexOf('function gtIcebreakers') + 400)), true);
   eq('공개 글의 링크를 앱과 DB 가 둘 다 막는다', /GT_LINK_RE/.test(gating) && /open\\\.kakao/.test(sql), true);
   eq("'약속을 친구에게' 는 약속을 서버에 저장하지 않는다", /function gtSharePlan/.test(gating) && !/sbAuthed[^\n]*plan/.test(gating), true);
+  /* 2026-09-21 개발자 결정 둘 — 관심 → 수락 → 방 · 매칭은 화·금 21시에 한 번 */
+  eq('앱은 방을 직접 여는 RPC 를 부르지 않는다 (관심 → 수락 → 방)', /rpc\/gating_open_room/.test(gating), false);
+  eq('방을 여는 RPC 는 학생 권한에서 회수됐다', /revoke execute on function public\.gating_open_room\(bigint, uuid\) from public, anon, authenticated/.test(sql), true);
+  eq('관심 본문은 글 번호 하나뿐이다', /body: \{ post_id: Number\(postId\) \}/.test(gating), true);
+  eq('수락은 글쓴이만 (RPC 가 author 를 본다)', /post\.author is distinct from auth\.uid\(\) then raise exception 'not_author'/.test(sql), true);
+  eq('탈퇴가 관심도 지운다', /delete from public\.gating_interests where from_user = uid/.test(sql), true);
+  const toml = readText(new URL('server/gating/wrangler.toml', root));
+  const workerSrc = readText(new URL('server/gating/worker.js', root));
+  const drop = (workerSrc.match(/DROP_CRON = '([^']+)'/) || [])[1];
+  eq('워커의 DROP_CRON 이 wrangler.toml 의 예약과 글자까지 같다', !!drop && toml.includes(`"${drop}"`), true);
+  eq('5분 예약은 정리만 한다 (scheduled 가 cron 으로 가른다)', /match: \(event && event\.cron\) === DROP_CRON/.test(workerSrc), true);
+  {
+    const G = createRequire(import.meta.url)('../gating.js');
+    const at = (y, m, d, h, mi) => new Date(y, m - 1, d, h, mi || 0);
+    const fmt = (x) => x ? `${x.getDay()}-${x.getHours()}` : null;
+    eq('월요일 낮 → 화요일 21시', fmt(G.gtNextDrop(at(2026, 9, 21, 12))), '2-21');    // 2026-09-21 은 월요일
+    eq('화요일 21시 30분 → 금요일 21시', fmt(G.gtNextDrop(at(2026, 9, 22, 21, 30))), '5-21');
+    eq('토요일 → 화요일 21시', fmt(G.gtNextDrop(at(2026, 9, 26, 10))), '2-21');
+    eq('화요일 아침이면 문구가 오늘', G.gtNextDropLabel(at(2026, 9, 22, 9)), '오늘 밤 9시');
+    eq('월요일이면 문구가 화요일', G.gtNextDropLabel(at(2026, 9, 21, 9)), '화요일 밤 9시');
+  }
   eq('프로필 저장 본문은 닉네임·학과·성별뿐이다', /body: \{ nickname: nick, dept, gender \}/.test(gating), true);
   eq('서버 설정이 비면 그리기만 하고 요청을 안 보낸다', /if \(typeof gatingConfigured !== 'function' \|\| !gatingConfigured\(\)\) \{[\s\S]{0,400}return;/.test(gating), true);
 

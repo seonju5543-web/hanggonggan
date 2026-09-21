@@ -17,6 +17,9 @@ MAIL_FROM = "한대장 <noreply@example.com>"
 #     npx wrangler secret put RESEND_KEY              (resend.com → API Keys)
 #     npx wrangler secret put VERIFY_PEPPER           (아무 긴 무작위 문자열 — 인증 번호 해시에 섞는다)
 
-# 예약 실행 — 5분마다 만료 정리 + 매칭. 할 일이 없으면 요청 넷으로 끝난다.
+# 예약 실행 둘 (2026-09-21 개발자 결정 "정해진 시각에 한 번")
+#   "*/5 * * * *"   — 만료 정리만 (요청 하나로 끝난다)
+#   "0 12 * * 2,5"  — 화·금 12:00 UTC = **밤 9시 KST** 에 대기 중인 요청을 모아 짝을 맺는다
+# 🔴 둘째 줄은 worker.js 의 DROP_CRON 과 글자까지 같아야 한다 — 워커가 그 문자열로 가른다.
 [triggers]
-crons = ["*/5 * * * *"]
+crons = ["*/5 * * * *", "0 12 * * 2,5"]
