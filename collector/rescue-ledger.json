@@ -199,57 +199,63 @@
   "name": "공통 [공통] 2026학년도 2학기 반영장학 신청 안내"
  },
  "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=323019&menuno=200318": {
-  "tries": 1,
-  "at": "2026-09-21",
+  "tries": 2,
+  "at": "2026-09-22",
   "minBody": 100,
   "name": "공통 2026년도 (재)인천인재평생교육진흥원 하반기 장학생 선발 안내"
  },
  "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=323011&menuno=200318": {
-  "tries": 1,
-  "at": "2026-09-21",
+  "tries": 2,
+  "at": "2026-09-22",
   "minBody": 100,
   "name": "공통 2026년 금신사랑장학생 선발 안내"
  },
  "https://dep.hufs.ac.kr/bbs/student/2431/265667/artclView.do": {
-  "tries": 1,
-  "at": "2026-09-21",
+  "tries": 2,
+  "at": "2026-09-22",
   "minBody": 100,
   "name": "[공통][교외]2026년도 (재)포항시장학회 장학생 선발공고"
  },
  "https://dep.hufs.ac.kr/bbs/student/2431/264949/artclView.do": {
-  "tries": 1,
-  "at": "2026-09-21",
+  "tries": 2,
+  "at": "2026-09-22",
   "minBody": 100,
   "name": "[공통][교외] 2026년 익산사랑 장학생 선발 안내"
  },
  "https://dep.hufs.ac.kr/bbs/student/2431/264946/artclView.do": {
-  "tries": 1,
-  "at": "2026-09-21",
+  "tries": 2,
+  "at": "2026-09-22",
   "minBody": 100,
   "name": "[공통][교외] 2026년 2학기 선원가족장학사업 선발 안내"
  },
  "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=322916&menuno=200318": {
-  "tries": 1,
-  "at": "2026-09-21",
+  "tries": 2,
+  "at": "2026-09-22",
   "minBody": 100,
   "name": "공통 2026년도 하반기 울산연구원 장학생 선발 안내"
  },
  "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=322915&menuno=200318": {
-  "tries": 1,
-  "at": "2026-09-21",
+  "tries": 2,
+  "at": "2026-09-22",
   "minBody": 100,
   "name": "공통 2026학년도 2학기 선원가족 장학생 모집 안내"
  },
  "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=322875&menuno=200318": {
-  "tries": 1,
-  "at": "2026-09-21",
+  "tries": 2,
+  "at": "2026-09-22",
   "minBody": 100,
   "name": "공통 [공통] 2026학년도 2학기 우정장학(학업장려금) 신청 안내"
  },
  "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=322874&menuno=200318": {
-  "tries": 1,
-  "at": "2026-09-21",
+  "tries": 2,
+  "at": "2026-09-22",
   "minBody": 100,
   "name": "공통 [공통] 2026학년도 2학기 우정장학(가계곤란) 복학생/재입학생 신청 안내"
+ },
+ "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=323148&menuno=200318": {
+  "tries": 1,
+  "at": "2026-09-22",
+  "minBody": 100,
+  "name": "공통 [공통] 2026학년도 2학기 점프장학 신청 안내_09.22(화)~10.9(금)"
  }
 }
