@@ -108,6 +108,7 @@ function supabase(r) {
     const blocked = new Set(db.blocks.map((b) => b.blocked));
     return r.send(200, db.posts.filter((x) => x.status === 'open' && !blocked.has(x.author)));
   }
+  if (u.startsWith('/rest/v1/rpc/gating_forget_me')) { db.me = null; db.posts = db.posts.filter((x) => x.author !== ME); return r.send(204); }
   if (u.startsWith('/rest/v1/rpc/gating_open_room')) {
     const post = db.posts.find((x) => x.id === Number(r.body && r.body.p_post));
     if (!post) return r.send(400, { message: 'post_closed' });
@@ -135,7 +136,7 @@ function supabase(r) {
     return r.send(200, db.rooms.filter((x) => ids.includes(String(x.id))).map((x) => {
       const last = db.messages.filter((m) => m.room_id === x.id).slice(-1)[0];
       return { room_id: x.id, kind: x.kind, post_id: x.post_id, closed_at: x.closed_at, created_at: x.created_at,
-        last_body: last ? last.body : null, last_at: last ? last.created_at : null, last_id: last ? last.id : null };
+        last_body: last ? last.body : null, last_at: last ? last.created_at : null, last_sender: last ? last.sender : null, last_id: last ? last.id : null };
     }));
   }
   if (u.startsWith('/rest/v1/gating_messages')) {
@@ -388,13 +389,21 @@ const gatingReqs = () => received.filter((r) => r.to === 'gw' || /\/rest\/v1\/(g
     await page.waitForTimeout(300);
     ok(/전화번호/.test(await page.textContent('#gt-compose #gt-err')), '전화번호가 든 글은 막는다');
     ok(!received.some((r) => r.method === 'POST' && r.path.startsWith('/rest/v1/gating_posts')), '  그 글은 서버로 안 갔다');
+    await page.fill('#gt-body', '오픈채팅으로 오세요 https://open.kakao.com/o/abc');
+    await page.click('[data-gt="post"]');
+    await page.waitForTimeout(300);
+    ok(/링크/.test(await page.textContent('#gt-compose #gt-err')), '링크가 든 글은 막는다 (에브리타임 오픈채팅 유도 유형)');
     await page.fill('#gt-body', '3:3 과팅 구해요. 주말 저녁 좋아요.');
     await page.click('#gt-hc .chip[data-v="4"]');
+    await page.click('#gt-when .chip[data-v="weekend_eve"]');
+    await page.fill('#gt-area', '회기역 근처');
     await page.click('[data-gt="post"]');
     await page.waitForTimeout(800);
     const post = received.filter((r) => r.method === 'POST' && r.path.startsWith('/rest/v1/gating_posts')).pop();
-    ok(!!post && JSON.stringify(Object.keys(post.body).sort()) === '["body","headcount","want_school"]', '🔴 글로 보내는 칸은 본문·인원·범위 셋뿐 (학교·학과·성별·닉네임은 서버가 채운다)', post && post.body);
-    ok(post && post.body.headcount === 4, '  고른 인원이 간다');
+    ok(!!post && JSON.stringify(Object.keys(post.body).sort()) === '["area","body","headcount","want_school","when_pref"]', '🔴 글로 보내는 칸은 본문·인원·범위·시간대·지역 (학교·학과·성별·닉네임은 서버가 채운다)', post && post.body);
+    ok(post && post.body.headcount === 4 && post.body.when_pref === 'weekend_eve' && post.body.area === '회기역 근처', '  고른 인원·시간대·지역이 간다');
+    ok(/주말 저녁 · 회기역 근처/.test(await page.textContent('.gt-post[data-post="100"]')), '  카드에 시간대·지역이 글자로 뜬다');
+    ok(await page.locator('.gt-post .gt-verified').count() === 3, "글마다 '인증' 배지가 붙는다");
     ok(await page.locator('#detail-sheet.show').count() === 0, '올리면 시트가 닫힌다');
     ok(await page.locator('.gt-post').count() === 3, '목록이 새로 그려진다');
     ok(await page.locator('.gt-post[data-post="100"] [data-gt="close-post"]').count() === 1, '내 글에는 마감 버튼만 있다');
@@ -411,6 +420,12 @@ const gatingReqs = () => received.filter((r) => r.to === 'gw' || /\/rest\/v1\/(g
     const roomId = Number(await page.getAttribute('#gt-room', 'data-room'));
     ok(roomId > 0, '방 번호를 받았다', roomId);
     ok(/연영이/.test(await page.textContent('#gt-room .sheet-title')), '상대 닉네임이 제목이다');
+    ok(await page.locator('#gt-msgs [data-gt="ice"]').count() === 3, '빈 방에는 첫 인사 질문 셋이 뜬다');
+    const iceQ = await page.getAttribute('#gt-msgs [data-gt="ice"]', 'data-q');
+    await page.click('#gt-msgs [data-gt="ice"]');
+    ok(await page.inputValue('#gt-msg-in') === iceQ, '  누르면 입력칸에 들어간다 (보내지는 않는다)');
+    ok(!received.some((r) => r.method === 'POST' && r.path.startsWith('/rest/v1/gating_messages')), '  그 자체로 서버에 가지 않는다');
+    ok(await page.locator('#gt-room .gt-safety [data-gt="share-plan"]').count() === 1, "'만나기 전에 확인할 것' 과 친구에게 보내기 버튼이 있다");
 
     await page.fill('#gt-msg-in', '안녕하세요 3:3 가능해요');
     await page.press('#gt-msg-in', 'Enter');
@@ -425,14 +440,26 @@ const gatingReqs = () => received.filter((r) => r.to === 'gw' || /\/rest\/v1\/(g
     ok(await page.locator('.gt-msg:not(.me)').count() === 1, '상대의 새 말이 5초 안에 뜬다');
     const polls = received.filter((r) => r.method === 'GET' && r.path.startsWith('/rest/v1/gating_messages'));
     ok(polls.length > 0 && polls.every((r) => r.path.includes(`room_id=eq.${roomId}`)), '🔴 폴링은 이 방만 묻는다', polls.map((r) => r.path).slice(-2));
-    ok(polls.slice(-1)[0].path.includes('id=gt.') && !polls.slice(-1)[0].path.includes('id=gt.0'), '  두 번째부터는 마지막 번호 뒤만 묻는다', polls.slice(-1)[0].path);
+    await page.waitForTimeout(4500);   /* 다음 폴링까지 — 그때는 받은 마지막 번호 뒤만 물어야 한다 */
+    const later = received.filter((r) => r.method === 'GET' && r.path.startsWith('/rest/v1/gating_messages')).slice(-1)[0];
+    ok(/id=gt\.[1-9]\d*/.test(later.path), '  말을 받은 뒤에는 마지막 번호 뒤만 묻는다', later.path);
     ok(received.some((r) => r.method === 'PATCH' && r.path.startsWith('/rest/v1/gating_room_members') && r.body.last_read_at), '읽음 시각을 적는다');
+
+    /* 🔴 동시에 말해도 상대 말이 안 사라진다 (코드 리뷰 2) — 상대가 먼저 넣고(작은 번호) 내가 보낸 뒤 폴링 */
+    db.messages.push({ id: db.nextId++, room_id: roomId, sender: U2, body: '토요일 7시 어때요', created_at: new Date().toISOString() });
+    await page.fill('#gt-msg-in', '좋아요 토요일');
+    await page.press('#gt-msg-in', 'Enter');
+    await page.waitForTimeout(5500);
+    ok((await page.textContent('#gt-msgs')).includes('토요일 7시 어때요'), '🔴 내가 보내는 사이에 온 상대 말도 뜬다');
+    ok(await page.locator('.gt-msg').count() === 4, '  말풍선이 겹치지 않는다 (넷)', await page.locator('.gt-msg').count());
+    /* 상대가 마지막으로 말한 상태로 둔다 — 아래 '내 차례' 검사의 전제 */
+    db.messages.push({ id: db.nextId++, room_id: roomId, sender: U2, body: '그럼 그때 봐요', created_at: new Date().toISOString() });
 
     /* 연락처는 경고 한 번 */
     await page.fill('#gt-msg-in', '카톡 아이디 알려줄게요');
     await page.press('#gt-msg-in', 'Enter');
     await page.waitForTimeout(300);
-    ok(await page.locator('.gt-msg.me').count() === 1, '연락처가 든 말은 한 번 멈춰 세운다 (막지는 않는다)');
+    ok(await page.locator('.gt-msg.me').count() === 2, '연락처가 든 말은 한 번 멈춰 세운다 (막지는 않는다)', await page.locator('.gt-msg.me').count());
 
     /* 닫으면 폴링이 멈춘다 */
     const before = received.filter((r) => r.method === 'GET' && r.path.startsWith('/rest/v1/gating_messages')).length;
@@ -444,6 +471,7 @@ const gatingReqs = () => received.filter((r) => r.to === 'gw' || /\/rest\/v1\/(g
     await page.click('.gt-tabs .chip[data-v="chat"]');
     await page.waitForSelector('.gt-room-row');
     ok(await page.locator('.gt-room-row').count() === 1 && /연영이/.test(await page.textContent('.gt-room-row')), '대화 목록에 그 방이 있다');
+    ok(await page.locator('.gt-room-row .gt-turn').count() === 1, "상대가 마지막으로 말했으면 '내 차례' 가 붙는다");
   }
 
   /* ───────────── [6] 매칭 ───────────── */
@@ -455,7 +483,7 @@ const gatingReqs = () => received.filter((r) => r.to === 'gw' || /\/rest\/v1\/(g
     await page.click('[data-gt="request"]');
     await page.waitForTimeout(700);
     const req = received.filter((r) => r.method === 'POST' && r.path.startsWith('/rest/v1/gating_requests')).pop();
-    ok(!!req && JSON.stringify(Object.keys(req.body).sort()) === '["headcount","want_school"]' && req.body.want_school === 'same', '🔴 신청으로 보내는 칸은 인원·범위 둘뿐', req && req.body);
+    ok(!!req && JSON.stringify(Object.keys(req.body).sort()) === '["headcount","want_school","when_pref"]' && req.body.want_school === 'same', '🔴 신청으로 보내는 칸은 인원·범위·시간대 셋뿐', req && req.body);
     ok(await page.locator('[data-gt="cancel-request"]').count() === 1, "'짝을 찾는 중' 카드와 취소 버튼");
     /* 서버가 짝을 맺었다 */
     const reqId = db.requests[0].id;
@@ -497,6 +525,16 @@ const gatingReqs = () => received.filter((r) => r.to === 'gw' || /\/rest\/v1\/(g
     await page.waitForTimeout(500);
     const rep = received.filter((r) => r.method === 'POST' && r.path.startsWith('/rest/v1/gating_reports')).pop();
     ok(!!rep && rep.body.reason === '광고' && rep.body.post_id === 11 && rep.body.target_user === U2, '신고 본문은 사유·대상·글 번호', rep && rep.body);
+    /* 대화방에서 신고하면 방 번호가 실린다 (운영자가 그 방을 찾는다 — 코드 리뷰) */
+    await page.click('.gt-post[data-post="11"] [data-gt="open-room"]');
+    await page.waitForSelector('#gt-room');
+    const roomIdR = Number(await page.getAttribute('#gt-room', 'data-room'));
+    await page.click('#gt-room [data-gt="report"]');
+    await page.waitForSelector('#gt-report');
+    await page.click('[data-gt="report-send"]');
+    await page.waitForTimeout(500);
+    const rep2 = received.filter((r) => r.method === 'POST' && r.path.startsWith('/rest/v1/gating_reports')).pop();
+    ok(!!rep2 && rep2.body.room_id === roomIdR && rep2.body.target_user === U2, '대화방 신고에는 방 번호가 실린다', rep2 && rep2.body);
   }
 
   /* ───────────── [8] 🔴 개인정보 ───────────── */
@@ -518,9 +556,9 @@ const gatingReqs = () => received.filter((r) => r.to === 'gw' || /\/rest\/v1\/(g
   {
     const r = await page.evaluate(() => authDeleteData());
     ok(r && r.ok === true, '탈퇴가 된다', r);
-    const gi = received.findIndex((x) => x.method === 'DELETE' && x.path.startsWith('/rest/v1/gating_profiles'));
+    const gi = received.findIndex((x) => x.method === 'POST' && x.path.startsWith('/rest/v1/rpc/gating_forget_me'));
     const pi = received.findIndex((x) => x.method === 'DELETE' && x.path.startsWith('/rest/v1/profiles'));
-    ok(gi >= 0 && pi >= 0 && gi < pi, '🔴 gating_profiles DELETE 가 profiles DELETE 보다 먼저다', [gi, pi]);
+    ok(gi >= 0 && pi >= 0 && gi < pi, '🔴 gating_forget_me(글·대화·차단·프로필 전부) 가 profiles DELETE 보다 먼저다', [gi, pi]);
     await ctx.close();
   }
 

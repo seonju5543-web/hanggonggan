@@ -47,6 +47,10 @@ console.log('■ 짝 고르기 (pairRequests)');
   ok(JSON.stringify(three) === '[[1,3]]', '인원이 같은 쪽을 고른다', three);
   const sch = pair([r(1), r(2, { gender: '여', dept: '영문', school: '한국외국어대학교' }), r(3, { gender: '여', dept: '영문' })]);
   ok(JSON.stringify(sch) === '[[1,3]]', '점수가 같으면 같은 학교를 고른다', sch);
+  const when = pair([r(1, { when_pref: 'weekend_eve' }), r(2, { gender: '여', dept: '영문', when_pref: 'weekday_eve' }), r(3, { gender: '여', dept: '사학', when_pref: 'weekend_eve' })]);
+  ok(JSON.stringify(when) === '[[1,3]]', '희망 시간대가 같은 쪽을 고른다 (2026-09-21)', when);
+  const anyWhen = pair([r(1, { when_pref: 'any' }), r(2, { gender: '여', dept: '영문', when_pref: 'any' }), r(3, { gender: '여', dept: '사학', school: '한국외국어대학교' })]);
+  ok(JSON.stringify(anyWhen) === '[[1,2]]', "'협의' 끼리는 시간대 점수가 없다 (같은 학교 +1 이 이긴다)", anyWhen);
 
   /* 결정적 — 순서를 섞어 넣어도 같은 답 */
   const a = pair([r(1), r(2, { gender: '여', dept: '영문' }), r(3, { gender: '여', dept: '사학' }), r(4, { dept: '철학' })]);
@@ -103,7 +107,7 @@ console.log('\n■ 인증 요청 처리 (가짜 서버)');
     if (u.includes('/rest/v1/school_verifications')) {
       if (method === 'POST') { db.verifications.push(Object.assign({ id: nextId++, attempts: 0, sent_at: new Date().toISOString(), consumed_at: null }, body)); return new Response(null, { status: 201 }); }
       if (method === 'PATCH') { const id = Number((u.match(/id=eq\.(\d+)/) || [])[1]); const row = db.verifications.find((r) => r.id === id); Object.assign(row, body); return new Response(null, { status: 204 }); }
-      if (method === 'DELETE') return new Response(null, { status: 204 });
+      if (method === 'DELETE') { const uid = (u.match(/user_id=eq\.([^&]+)/) || [])[1]; if (uid) db.verifications = db.verifications.filter((r) => r.user_id !== decodeURIComponent(uid)); return new Response(null, { status: 204 }); }
       const rows = db.verifications.filter((r) => u.includes('consumed_at=is.null') ? !r.consumed_at : true).sort((a, b) => b.id - a.id);
       return J(rows);
     }
@@ -168,7 +172,7 @@ console.log('\n■ 인증 요청 처리 (가짜 서버)');
   ok(prof && prof.user_id === 'user-1' && prof.verified_domain === 'khu.ac.kr' && prof.school === '경희대학교', '프로필 행이 만들어진다', prof);
   ok(prof && !('email' in prof) && prof.school_email_hash && !prof.school_email_hash.includes('khu'), '🔴 프로필에는 이메일 원문이 아니라 해시만', prof && Object.keys(prof));
   ok(!('nickname' in (prof || {})), '닉네임은 서버가 정하지 않는다 (학생이 고른다)');
-  ok(db.verifications[0].consumed_at, '쓴 번호는 닫힌다');
+  ok(db.verifications.length === 0, '🔴 통과하면 인증 행(이메일 원문)을 전부 지운다', db.verifications.length);
 
   /* 다섯 번 틀리면 잠긴다 */
   db.verifications.length = 0;

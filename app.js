@@ -6278,6 +6278,8 @@ async function authSubmit() {
      처음 생기므로, 화면 그리기를 앞에 두면 아직 프로필이 없는 상태로 그리게 된다. */
   await syncAfterLoad();
   renderMy();
+  /* 과팅 문에서 로그인했으면 그 화면을 다시 그린다 — 안 그러면 '로그인' 버튼이 그대로 남는다(코드 리뷰) */
+  if (currentScreen === 'gating' && typeof renderGating === 'function') renderGating();
 }
 
 /* ---------------- 시작 ---------------- */

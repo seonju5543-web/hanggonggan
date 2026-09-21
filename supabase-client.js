@@ -281,7 +281,10 @@ async function authDeleteData() {
      cascade 로 지워지지만 계정 껍데기가 남는 구조라 그 행은 직접 지워야 한다. 표가 아직
      없을 수 있어(마이그레이션 전) 실패해도 탈퇴는 계속한다. */
   try {
-    await sbAuthed(`/rest/v1/gating_profiles?user_id=eq.${encodeURIComponent(u.userId)}`, { method: 'DELETE' });
+    /* 글·요청·방 참여·메시지·차단·프로필을 한 번에 — SQL 함수 gating_forget_me (0003_gating.sql).
+       ⚠️ gating_profiles 만 지우면 글·대화가 남는다(auth.users cascade 는 계정을 지울 때만 돈다 — 코드 리뷰). */
+    const r = await sbAuthed('/rest/v1/rpc/gating_forget_me', { method: 'POST', body: {} });
+    if (!r.ok) await sbAuthed(`/rest/v1/gating_profiles?user_id=eq.${encodeURIComponent(u.userId)}`, { method: 'DELETE' });
   } catch (e) { /* 표가 아직 없을 수 있다 */ }
   const res = await sbAuthed(`/rest/v1/profiles?user_id=eq.${encodeURIComponent(u.userId)}`, { method: 'DELETE' });
   if (!res.ok) return { ok: false, error: authErrorText(res) };

@@ -4961,6 +4961,16 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 .gt-room-input { display: flex; gap: var(--space-8); margin-top: var(--sp-2); position: sticky; bottom: 0; background: var(--surface); padding-top: var(--space-8); }
 .gt-room-input input { flex: 1; min-width: 0; }
 .gt-room-input .btn { flex: none; padding: var(--space-12) var(--space-16); }
+.gt-verified { display: inline-block; font-size: var(--t-2xs); font-weight: 700; color: var(--green); background: var(--green-weak); border-radius: var(--radius-pill); padding: 0 var(--space-6); margin-right: var(--space-6); vertical-align: middle; }
+.gt-turn { display: inline-block; font-size: var(--t-2xs); font-weight: 700; color: var(--accent); background: var(--accent-soft); border-radius: var(--radius-pill); padding: 0 var(--space-6); margin-right: var(--space-6); vertical-align: middle; }
+.gt-safety { margin-bottom: var(--sp-2); font-size: var(--t-sm); color: var(--text-sub); }
+.gt-safety summary { cursor: pointer; font-weight: 700; color: var(--text); padding: var(--space-8) 0; }
+.gt-safety ul { padding-left: var(--space-16); line-height: 1.6; margin-bottom: var(--sp-1); }
+.gt-safety li { margin-bottom: var(--space-2); }
+.gt-share { width: 100%; }
+.gt-ice { padding: var(--space-8) 0; }
+.gt-ice-title { font-size: var(--t-sm); color: var(--text-weak); margin-bottom: var(--sp-1); }
+.gt-ice .chip { font-size: var(--t-sm); text-align: left; }
 /* 아래 탭의 새 소식 점 */
 .nav-item { position: relative; }
 .nav-dot { position: absolute; top: 4px; left: calc(50% + 8px); width: 8px; height: 8px; border-radius: var(--radius-pill); background: var(--red); }

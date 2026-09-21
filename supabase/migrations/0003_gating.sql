@@ -21,10 +21,10 @@
 --      insert 정책은 전부 `with check` 다.
 --   ④ 글·요청의 닉네임·학교·학과·성별은 **트리거가 gating_profiles 에서 덮어쓴다.**
 --      앱이 보내는 값은 무시한다 — 안 그러면 남의 학교·학과를 적을 수 있다(사칭).
---   ⑤ 사용자 칸은 전부 `references auth.users on delete cascade` 다 — 탈퇴하면 글·요청·
---      메시지·차단이 같이 사라진다(약관 "탈퇴 시 파기"의 근거). 앱의 authDeleteData 가
---      gating_profiles 를 지우면 나머지는 그 행이 아니라 auth.users 를 따라 지워진다.
---      ⚠️ 계정 껍데기는 남으므로(0001 주석) 표마다 자기 행 delete 정책도 둔다.
+--   ⑤ 탈퇴는 **gating_forget_me()** 가 지운다 — 글·요청·방 참여·메시지·차단·프로필 전부.
+--      `references auth.users on delete cascade` 는 계정 자체가 지워질 때의 안전망일 뿐이고,
+--      앱은 계정 껍데기를 못 지우므로(0001 주석 · Edge Function 없음) 그 cascade 는
+--      탈퇴 때 **안 돈다.** 코드 리뷰(2026-09-21)가 잡았다 — 약관 5번이 약속하는 것은 이 함수다.
 --   ⑥ anon(로그인 안 한 요청)은 표를 **아예** 못 본다 — 정책 평가도 안 하게 revoke.
 -- ============================================================
 
@@ -77,10 +77,17 @@ create table if not exists public.gating_posts (
   gender        text,
   headcount     smallint not null check (headcount between 2 and 8),
   want_school   text not null default 'any' check (want_school in ('same', 'any')),
+  -- 희망 시간대·만남 지역 (2026-09-21 타 앱 조사 — 미팅 관례는 주선자가 날짜·장소를 정한다.
+  -- 이게 없으면 대화가 늘 "언제 어디서" 로 시작한다). 지역은 학생이 적는 짧은 글자.
+  when_pref     text not null default 'any' check (when_pref in ('weekday_eve', 'weekend_day', 'weekend_eve', 'any')),
+  area          text check (area is null or char_length(area) <= 20),
   body          text not null
     check (char_length(body) between 1 and 300
-      -- 전화번호는 공개 글에 못 적는다(앱도 막지만 DB 가 마지막 선이다)
-      and body !~ '01[016789][-. ]?[0-9]{3,4}[-. ]?[0-9]{4}'),
+      -- 전화번호·링크는 공개 글에 못 적는다(앱도 막지만 DB 가 마지막 선이다).
+      -- 링크를 막는 이유: 에브리타임 과팅 글이 오픈채팅 링크로 즉석 만남을 유도하는 것이
+      -- 기사화된 위험 유형이다(콜뉴스24 2026). 대화방 안에서만 나누게 한다.
+      and body !~ '01[016789][-. ]?[0-9]{3,4}[-. ]?[0-9]{4}'
+      and body !~* 'https?://|open\.kakao|kakao\.com|instagram\.com|\.link/'),
   status        text not null default 'open' check (status in ('open', 'closed', 'hidden')),
   report_count  integer not null default 0,
   created_at    timestamptz not null default now(),
@@ -97,6 +104,7 @@ create table if not exists public.gating_requests (
   gender       text,
   headcount    smallint not null check (headcount between 2 and 8),
   want_school  text not null default 'any' check (want_school in ('same', 'any')),
+  when_pref    text not null default 'any' check (when_pref in ('weekday_eve', 'weekend_day', 'weekend_eve', 'any')),
   status       text not null default 'waiting' check (status in ('waiting', 'matched', 'cancelled', 'expired')),
   created_at   timestamptz not null default now(),
   expires_at   timestamptz not null default now() + interval '7 days'
@@ -150,6 +158,7 @@ create table if not exists public.gating_reports (
   reporter     uuid not null default auth.uid() references auth.users on delete cascade,
   target_user  uuid,
   post_id      bigint references public.gating_posts on delete set null,
+  room_id      bigint references public.gating_rooms on delete set null,   -- 대화방 신고 — 운영자가 그 방을 찾는다
   message_id   bigint references public.gating_messages on delete set null,
   reason       text not null check (reason in ('욕설', '광고', '연락처강요', '사칭', '기타')),
   detail       text check (detail is null or char_length(detail) <= 200),
@@ -170,6 +179,8 @@ create or replace view public.gating_room_last
 select r.id as room_id, r.kind, r.post_id, r.opened_by, r.created_at, r.closed_at,
   (select m.body from public.gating_messages m where m.room_id = r.id order by m.id desc limit 1) as last_body,
   (select m.created_at from public.gating_messages m where m.room_id = r.id order by m.id desc limit 1) as last_at,
+  -- 마지막 말을 누가 했나 — 앱이 '내 차례' 를 표시한다(Hinge 'Your Turn' 이 유령 행동을 25% 줄인 장치)
+  (select m.sender from public.gating_messages m where m.room_id = r.id order by m.id desc limit 1) as last_sender,
   (select max(m.id) from public.gating_messages m where m.room_id = r.id) as last_id
 from public.gating_rooms r;
 
@@ -220,7 +231,9 @@ begin
   if not found or p.verified_at is null or p.nickname is null then
     raise exception 'not_verified';
   end if;
-  new.school := p.school;
+  -- 학교 이름이 표에 없으면 인증한 도메인을 적는다 — 도메인은 사실이지 짐작이 아니다.
+  -- (없이 두면 같은 abc.ac.kr 두 팀이 '다른 학교' 로 읽혀 같은 과끼리 짝이 맺힌다 — 코드 리뷰)
+  new.school := coalesce(p.school, p.verified_domain);
   new.dept := p.dept;
   new.gender := p.gender;
   if tg_table_name = 'gating_posts' then
@@ -302,6 +315,24 @@ drop trigger if exists gating_messages_guard on public.gating_messages;
 create trigger gating_messages_guard before insert on public.gating_messages
   for each row execute function public.gating_message_guard();
 
+-- 글의 상태는 학생이 '열림 → 마감' 만 바꿀 수 있다. 신고로 감춘 글(hidden)은 작성자가 못 되돌린다
+-- (코드 리뷰 2026-09-21 — 없으면 3명이 신고해도 작성자가 status 를 open 으로 되돌렸다).
+-- 신고 트리거·서버는 session 표식(gating.internal)으로 지나간다.
+create or replace function public.gating_posts_guard() returns trigger
+  language plpgsql security definer set search_path = public as $$
+begin
+  if auth.role() = 'service_role' or current_setting('gating.internal', true) = '1' then return new; end if;
+  if old.status = 'hidden' then raise exception 'not_allowed'; end if;
+  if new.status is distinct from old.status and not (old.status = 'open' and new.status = 'closed') then
+    raise exception 'not_allowed';
+  end if;
+  return new;
+end;
+$$;
+drop trigger if exists gating_posts_guard on public.gating_posts;
+create trigger gating_posts_guard before update on public.gating_posts
+  for each row execute function public.gating_posts_guard();
+
 create or replace function public.gating_after_report() returns trigger
   language plpgsql security definer set search_path = public as $$
 declare n integer;
@@ -311,9 +342,11 @@ begin
   end if;
   if new.post_id is not null then
     select count(distinct reporter) into n from public.gating_reports where post_id = new.post_id;
+    perform set_config('gating.internal', '1', true);
     update public.gating_posts set report_count = n,
       status = case when n >= 3 and status = 'open' then 'hidden' else status end
       where id = new.post_id;
+    perform set_config('gating.internal', '', true);
   end if;
   return new;
 end;
@@ -349,7 +382,11 @@ begin
   if post.author = uid then raise exception 'own_post'; end if;
   if public.is_blocked_pair(uid, post.author) then raise exception 'blocked'; end if;
   select id into rid from public.gating_rooms where post_id = p_post and opened_by = uid;
-  if found then return rid; end if;
+  if found then
+    -- 나갔던 방이면 다시 들어간다 (안 그러면 빈 방에 갇혀 보내는 말마다 not_member — 코드 리뷰)
+    update public.gating_room_members set left_at = null where room_id = rid and user_id = uid;
+    return rid;
+  end if;
   if (select count(*) from public.gating_rooms where opened_by = uid and created_at > now() - interval '24 hours') >= 10 then
     raise exception 'rate:rooms';
   end if;
@@ -389,6 +426,26 @@ $$;
 revoke execute on function public.gating_commit_match(bigint, bigint) from public, anon, authenticated;
 grant execute on function public.gating_commit_match(bigint, bigint) to service_role;
 
+-- 탈퇴 — 학생 본인이 부른다. 과팅에서 남긴 것을 **전부** 지운다(약관 5번의 근거).
+-- 신고 기록은 남긴다(신고당한 사람이 탈퇴해도 운영자가 봐야 한다 · 보관 기간은 약관에 따로 정한다).
+create or replace function public.gating_forget_me() returns void
+  language plpgsql volatile security definer set search_path = public as $$
+declare uid uuid := auth.uid();
+begin
+  if uid is null then raise exception 'login'; end if;
+  delete from public.gating_messages where sender = uid;
+  delete from public.gating_room_members where user_id = uid;
+  delete from public.gating_matches where user_a = uid or user_b = uid;
+  delete from public.gating_requests where user_id = uid;
+  delete from public.gating_posts where author = uid;
+  delete from public.gating_blocks where blocker = uid or blocked = uid;
+  delete from public.school_verifications where user_id = uid;
+  delete from public.gating_profiles where user_id = uid;
+end;
+$$;
+revoke execute on function public.gating_forget_me() from public, anon;
+grant execute on function public.gating_forget_me() to authenticated, service_role;
+
 -- 만료 정리 — 서버만
 create or replace function public.gating_run_expiry() returns void
   language plpgsql volatile security definer set search_path = public as $$
@@ -396,6 +453,10 @@ begin
   if auth.role() is distinct from 'service_role' then raise exception 'service_only'; end if;
   update public.gating_requests set status = 'expired' where status = 'waiting' and expires_at < now();
   update public.gating_posts set status = 'closed' where status = 'open' and expires_at < now();
+  -- 30일 동안 말이 없는 방은 닫는다 — 열린 채 쌓이면 대화 목록이 죽은 방으로 찬다
+  update public.gating_rooms set closed_at = now()
+    where closed_at is null and created_at < now() - interval '30 days'
+      and not exists (select 1 from public.gating_messages m where m.room_id = gating_rooms.id and m.created_at > now() - interval '30 days');
   delete from public.school_verifications where sent_at < now() - interval '1 day';
 end;
 $$;
@@ -417,12 +478,12 @@ revoke all on table public.school_verifications from authenticated;
 revoke insert, update on table public.gating_profiles from authenticated;
 grant update (nickname, dept, gender) on table public.gating_profiles to authenticated;
 
--- 글: 고칠 수 있는 칸은 본문·상태(마감)뿐
-revoke update on table public.gating_posts from authenticated;
+-- 글: 고칠 수 있는 칸은 본문·상태(마감)뿐 · 지우기는 없다(신고당한 글의 흔적을 없애는 길이 된다 — 마감이 길)
+revoke update, delete on table public.gating_posts from authenticated;
 grant update (body, status) on table public.gating_posts to authenticated;
 
--- 요청: 상태만(트리거가 '대기 → 취소' 로 좁힌다)
-revoke update on table public.gating_requests from authenticated;
+-- 요청: 상태만(트리거가 '대기 → 취소' 로 좁힌다) · 지우기는 없다(짝 기록이 딸려 지워져 30일 재매칭 금지가 풀린다)
+revoke update, delete on table public.gating_requests from authenticated;
 grant update (status) on table public.gating_requests to authenticated;
 
 -- 방·짝: RPC 만 만든다
@@ -479,14 +540,18 @@ create policy "과팅 글 쓰기" on public.gating_posts
 drop policy if exists "과팅 글 고치기" on public.gating_posts;
 create policy "과팅 글 고치기" on public.gating_posts
   for update using (author = auth.uid()) with check (author = auth.uid());
-drop policy if exists "과팅 글 지우기" on public.gating_posts;
-create policy "과팅 글 지우기" on public.gating_posts
-  for delete using (author = auth.uid());
+-- (글 지우기 정책은 없다 — 위 grant 절 참조. 탈퇴는 gating_forget_me 가 지운다)
 
--- gating_requests: 자기 것만
+-- gating_requests: 자기 것만 (읽기·넣기·고치기 — 지우기 없음)
 drop policy if exists "과팅 요청 자기 것" on public.gating_requests;
-create policy "과팅 요청 자기 것" on public.gating_requests
-  for all using (user_id = auth.uid()) with check (user_id = auth.uid() and public.is_verified(auth.uid()));
+create policy "과팅 요청 읽기" on public.gating_requests
+  for select using (user_id = auth.uid());
+drop policy if exists "과팅 요청 넣기" on public.gating_requests;
+create policy "과팅 요청 넣기" on public.gating_requests
+  for insert with check (user_id = auth.uid() and public.is_verified(auth.uid()));
+drop policy if exists "과팅 요청 고치기" on public.gating_requests;
+create policy "과팅 요청 고치기" on public.gating_requests
+  for update using (user_id = auth.uid()) with check (user_id = auth.uid());
 
 -- gating_matches: 내 요청이 낀 짝만
 drop policy if exists "과팅 짝 읽기" on public.gating_matches;

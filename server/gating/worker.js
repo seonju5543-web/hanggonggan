@@ -210,11 +210,9 @@ async function verifyCheck(env, user, body) {
   if (up.status === 409) return json({ error: 'email_taken' }, 409);
   if (!up.ok) return json({ error: 'server', detail: up.status }, 502);
 
-  /* 쓴 번호는 닫고, 이 사람의 다른 번호는 지운다 */
-  await sbService(env, `/rest/v1/school_verifications?id=eq.${row.id}`, {
-    method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: { consumed_at: new Date().toISOString() },
-  });
-  await sbService(env, `/rest/v1/school_verifications?user_id=eq.${encodeURIComponent(user.id)}&id=neq.${row.id}`, {
+  /* 이 사람의 인증 행을 **전부 지운다** — 이메일 주소 원문이 남는 곳은 이 표뿐이라, 통과한 순간
+     지우는 것이 약관("인증 뒤 이메일 주소를 저장하지 않는다")을 참으로 만드는 길이다(코드 리뷰). */
+  await sbService(env, `/rest/v1/school_verifications?user_id=eq.${encodeURIComponent(user.id)}`, {
     method: 'DELETE', headers: { Prefer: 'return=minimal' },
   });
   return json({ ok: true, domain: parsed.domain, school: parsed.school });
@@ -232,7 +230,8 @@ async function verifyCheck(env, user, body) {
      · 인원 차가 1 이하
      · 희망 범위 양방향: 'same' 이면 상대 학교가 내 학교와 같아야 한다
      · 서로 차단한 사이 · 최근 짝이었던 사이는 제외
-     · 점수: 인원이 같으면 +2 · 학교가 같으면 +1. 먼저 온 요청부터 가장 점수 높은 짝을 고른다 */
+     · 점수: 인원이 같으면 +2 · 학교가 같으면 +1 · 희망 시간대가 같으면 +1(둘 다 '협의' 는 0).
+       먼저 온 요청부터 가장 점수 높은 짝을 고른다 */
 export function pairRequests(requests, blocks, recent) {
   const list = (requests || []).filter((r) => r && r.status !== 'cancelled' && r.status !== 'matched' && r.status !== 'expired')
     .slice().sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)) || (a.id - b.id));
@@ -255,7 +254,8 @@ export function pairRequests(requests, blocks, recent) {
       if (b.want_school === 'same' && !sameSchool) continue;
       const k = pairKey(a.user_id, b.user_id);
       if (blocked.has(k) || seen.has(k)) continue;
-      const score = ((a.headcount === b.headcount) ? 2 : 0) + (sameSchool ? 1 : 0);
+      const sameWhen = !!a.when_pref && a.when_pref !== 'any' && a.when_pref === b.when_pref;
+      const score = ((a.headcount === b.headcount) ? 2 : 0) + (sameSchool ? 1 : 0) + (sameWhen ? 1 : 0);
       if (score > bestScore) { best = b; bestScore = score; }
     }
     if (best) { used.add(a.id); used.add(best.id); out.push([a.id, best.id]); }
@@ -271,7 +271,7 @@ export async function runScheduled(env) {
   if (!ex.ok) result.errors.push('expiry:' + ex.status);
 
   const [reqs, blocks, recent] = await Promise.all([
-    sbService(env, '/rest/v1/gating_requests?status=eq.waiting&select=id,user_id,school,dept,gender,headcount,want_school,created_at,status&order=created_at.asc&limit=500'),
+    sbService(env, '/rest/v1/gating_requests?status=eq.waiting&select=id,user_id,school,dept,gender,headcount,want_school,when_pref,created_at,status&order=created_at.asc&limit=500'),
     sbService(env, '/rest/v1/gating_blocks?select=blocker,blocked&limit=2000'),
     sbService(env, `/rest/v1/gating_matches?select=user_a,user_b&created_at=gte.${encodeURIComponent(new Date(Date.now() - REMATCH_DAYS * 86400 * 1000).toISOString())}&limit=2000`),
   ]);

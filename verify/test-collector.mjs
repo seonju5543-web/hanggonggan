@@ -8484,17 +8484,27 @@ console.log('\n■ 과팅 탭 (2026-09-21)');
   eq('학생은 과팅 프로필의 세 칸만 고칠 수 있다 (verified_at 을 스스로 못 켠다)',
     /revoke insert, update on table public\.gating_profiles from authenticated;\s*grant update \(nickname, dept, gender\) on table public\.gating_profiles to authenticated;/.test(sql), true);
   eq('anon 은 과팅 표를 아예 못 본다', /from anon;/.test(sql.slice(sql.indexOf('revoke all on table public.gating_profiles'))), true);
-  eq('글·요청의 학교·학과·성별은 트리거가 프로필에서 덮어쓴다', /new\.school := p\.school;[\s\S]*new\.gender := p\.gender;/.test(sql), true);
+  eq('글·요청의 학교·학과·성별은 트리거가 프로필에서 덮어쓴다', /new\.school := coalesce\(p\.school, p\.verified_domain\);[\s\S]*new\.gender := p\.gender;/.test(sql), true);
   eq('매칭 확정 RPC 는 서버만 부른다', /revoke execute on function public\.gating_commit_match\(bigint, bigint\) from public, anon, authenticated/.test(sql), true);
   eq('사용자 칸은 전부 탈퇴를 따라 지워진다 (cascade)',
     [...sql.matchAll(/references auth\.users( on delete cascade)?/g)].filter((m) => !m[1]).length, 0);
 
   /* ④ 앱 — 탈퇴 순서 · 글 본문에 학교를 안 보낸다 · 폴링 상수 */
   const del = sbc.slice(sbc.indexOf('async function authDeleteData'));
-  eq('탈퇴가 과팅 프로필을 프로필보다 먼저 지운다', del.indexOf('gating_profiles') > 0 && del.indexOf('gating_profiles') < del.indexOf('/rest/v1/profiles'), true);
+  eq('탈퇴가 과팅의 흔적 전부(gating_forget_me)를 프로필보다 먼저 지운다',
+    del.indexOf('rpc/gating_forget_me') > 0 && del.indexOf('rpc/gating_forget_me') < del.indexOf('/rest/v1/profiles'), true);
+  eq('gating_forget_me 가 글·메시지·차단·프로필을 다 지운다',
+    ['gating_messages', 'gating_room_members', 'gating_posts', 'gating_blocks', 'gating_profiles'].filter((t) => !new RegExp(`delete from public\\.${t} where`).test(sql.slice(sql.indexOf('function public.gating_forget_me')))), []);
+  eq('신고로 감춘 글은 작성자가 못 되돌린다 (guard 트리거)', /old\.status = 'hidden' then raise exception/.test(sql), true);
+  eq('학생은 글·요청을 지우지 못한다 (마감·취소만)', /revoke update, delete on table public\.gating_posts from authenticated/.test(sql) && /revoke update, delete on table public\.gating_requests from authenticated/.test(sql), true);
   const gating = readText(new URL('gating.js', root));
-  eq('글 올리기 본문은 인원·범위·글뿐이다', /body: \{ headcount, want_school: want, body \}/.test(gating), true);
-  eq('요청 본문은 인원·범위뿐이다', /body: \{ headcount, want_school: want \}/.test(gating), true);
+  eq('글 올리기 본문은 인원·범위·시간대·지역·글뿐이다 (학교·학과·성별·닉네임은 서버가 채운다)',
+    /body: \{ headcount, want_school: want, when_pref: whenPref, area: area \|\| null, body \}/.test(gating), true);
+  eq('요청 본문은 인원·범위·시간대뿐이다', /body: \{ headcount, want_school: want, when_pref: whenPref \}/.test(gating), true);
+  /* 2026-09-21 타 앱 조사로 더한 것 — 첫 인사 질문은 AI 가 아니라 미리 적어 둔 목록이다(원칙 6·8-1) */
+  eq('첫 인사 질문은 미리 적어 둔 목록에서만 나온다', /const GT_ICEBREAKERS = \[/.test(gating) && !/essay|chat-config|GATING_CONFIG\.endpoint[^\n]*ice/i.test(gating.slice(gating.indexOf('function gtIcebreakers'), gating.indexOf('function gtIcebreakers') + 400)), true);
+  eq('공개 글의 링크를 앱과 DB 가 둘 다 막는다', /GT_LINK_RE/.test(gating) && /open\\\.kakao/.test(sql), true);
+  eq("'약속을 친구에게' 는 약속을 서버에 저장하지 않는다", /function gtSharePlan/.test(gating) && !/sbAuthed[^\n]*plan/.test(gating), true);
   eq('프로필 저장 본문은 닉네임·학과·성별뿐이다', /body: \{ nickname: nick, dept, gender \}/.test(gating), true);
   eq('서버 설정이 비면 그리기만 하고 요청을 안 보낸다', /if \(typeof gatingConfigured !== 'function' \|\| !gatingConfigured\(\)\) \{[\s\S]{0,400}return;/.test(gating), true);
 

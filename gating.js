@@ -32,7 +32,26 @@ const GT_INBOX_POLL_MS = 30000;
 const GT_HEADCOUNTS = [2, 3, 4, 5, 6, 7, 8];
 /* 공개 글에는 연락처를 못 적는다 (DB CHECK 도 전화번호를 막는다). 채팅에서는 **경고만** 한다. */
 const GT_CONTACT_RE = /01[016789][-.\s]?\d{3,4}[-.\s]?\d{4}|카톡|카카오|인스타|텔레그램|@[a-z0-9_.]{3,}/i;
+/* 링크도 공개 글에는 못 적는다 (2026-09-21 타 앱 조사) — 에브리타임 과팅 글이 오픈채팅 링크로
+   즉석 만남을 유도하는 것이 기사화된 위험 유형이다. 대화방 안에서만 나누게 한다. */
+const GT_LINK_RE = /https?:\/\/|open\.kakao|kakao\.com|instagram\.com|\.link\//i;
 const GT_NICK_RE = /^[가-힣a-zA-Z0-9]{2,10}$/;
+/* 희망 시간대 — 미팅 관례는 주선자가 날짜·장소를 정한다. 글에 적어 두면 첫 대화가
+   "언제 어디서" 로 시작하지 않는다(위밋·춘천 과팅 플랫폼이 같은 칸을 둔다). */
+const GT_WHEN = [['any', '협의'], ['weekday_eve', '평일 저녁'], ['weekend_day', '주말 낮'], ['weekend_eve', '주말 저녁']];
+const gtWhenLabel = (v) => (GT_WHEN.find((w) => w[0] === v) || GT_WHEN[0])[1];
+/* 첫 인사 도우미 — 위피가 채팅방이 열릴 때 대화 주제를 추천한다. 여기서는 **미리 적어 둔
+   질문**만 준다(AI 로 만들지 않는다 — 원칙 6·8-1). 누르면 입력칸에 들어가고 학생이 고쳐서 보낸다. */
+const GT_ICEBREAKERS = [
+  '언제가 제일 시간 괜찮으세요',
+  '과팅 장소는 어디가 편하세요',
+  '팀 분위기가 어떤 편이에요, 조용한 쪽이에요 활발한 쪽이에요',
+  '학교 근처 맛집 하나 추천해 주세요',
+  '주말엔 보통 뭐 하면서 보내세요',
+  '요즘 제일 재밌는 수업이 뭐예요',
+  '술은 어느 정도 하세요, 저희는 가볍게 하는 편이에요',
+  '몇 학년끼리 모였어요',
+];
 const GT_REPORT_REASONS = ['욕설', '광고', '연락처강요', '사칭', '기타'];
 
 const gt = {
@@ -113,6 +132,7 @@ function gtErrText(res) {
   if (/own_post/.test(m)) return '내 글에는 말을 걸 수 없어요';
   if (/blocked/.test(m)) return '차단한 사이라 대화를 열 수 없어요';
   if (/room_closed|not_member/.test(m)) return '닫힌 대화방이에요';
+  if (/one_per_post_visitor/.test(m)) return '이미 열린 대화방이에요. 대화 탭에서 이어가세요';
   if (/23505|duplicate/.test(m)) return '이미 쓰는 닉네임이에요';
   if (/23514|violates check/.test(m)) return '입력한 값이 규칙에 맞지 않아요';
   return '문제가 생겼어요. 잠시 후 다시 시도해 주세요';
@@ -185,6 +205,7 @@ function renderGating() {
   if (!gtVerified()) { box.innerHTML = gtVerifyHtml(); gtLoadMe().then((m) => { if (m && m.verified_at) renderGating(); }); return; }
   if (!gtReady()) { box.innerHTML = gtProfileHtml(); return; }
   box.innerHTML = gtMainHtml();
+  gt.posts = null;   /* 탭에 들어올 때마다 새 글을 받는다 */
   gtRenderTab();
   gtInboxStart();
 }
@@ -267,7 +288,7 @@ function gtRenderTab() {
 
 /* ---------------- 게시판 ---------------- */
 async function gtLoadPosts() {
-  const res = await sbAuthed('/rest/v1/gating_posts?status=eq.open&order=created_at.desc&limit=100&select=id,author,nickname,school,dept,gender,headcount,want_school,body,created_at,expires_at');
+  const res = await sbAuthed('/rest/v1/gating_posts?status=eq.open&order=created_at.desc&limit=100&select=id,author,nickname,school,dept,gender,headcount,want_school,when_pref,area,body,created_at,expires_at');
   gt.posts = res.ok && Array.isArray(res.json) ? res.json : (gt.posts || []);
   if (!res.ok) gt.err = gtErrText(res);
   return gt.posts;
@@ -291,12 +312,12 @@ function gtRenderBoard() {
     return `
       <article class="gt-post" data-post="${p.id}">
         <div class="gt-post-head">
-          <span class="gt-post-who">${esc(p.nickname || '')} · ${esc(p.school || '학교 미표시')}${p.dept ? ' · ' + esc(p.dept) : ''}</span>
+          <span class="gt-post-who"><span class="gt-verified" title="학교 이메일 인증">인증</span>${esc(p.nickname || '')} · ${esc(p.school || '학교 미표시')}${p.dept ? ' · ' + esc(p.dept) : ''}</span>
           <span class="badge gt-post-badge">${esc(p.gender || '')} ${p.headcount}명</span>
         </div>
         <p class="gt-post-body">${esc(p.body)}</p>
         <div class="gt-post-foot">
-          <span class="gt-post-meta">${p.want_school === 'same' ? '같은 학교만' : '학교 무관'} · ${esc(gtWhen(p.created_at))}</span>
+          <span class="gt-post-meta">${p.want_school === 'same' ? '같은 학교만' : '학교 무관'} · ${esc(gtWhenLabel(p.when_pref))}${p.area ? ' · ' + esc(p.area) : ''} · ${esc(gtWhen(p.created_at))}</span>
           <span class="gt-post-actions">
             ${mine
               ? '<button type="button" class="btn-link" data-gt="close-post" data-id="' + p.id + '">마감</button>'
@@ -350,10 +371,20 @@ function gtComposeOpen() {
           <button type="button" class="chip" data-gt="pick" data-group="gt-ws" data-v="same">같은 학교만</button>
         </div>
       </div>
+      <div class="field">
+        <span class="field-label">희망 시간대</span>
+        <div class="chip-group" id="gt-when">
+          ${GT_WHEN.map(([v, l]) => `<button type="button" class="chip ${v === 'any' ? 'active' : ''}" data-gt="pick" data-group="gt-when" data-v="${v}">${l}</button>`).join('')}
+        </div>
+      </div>
+      <label class="field">
+        <span class="field-label">만남 지역 (선택 · 20자)</span>
+        <input type="text" id="gt-area" maxlength="20" placeholder="예: 회기역 근처, 홍대" />
+      </label>
       <label class="field">
         <span class="field-label">내용 (300자까지)</span>
-        <textarea id="gt-body" rows="4" maxlength="300" placeholder="예: 3:3 과팅 구해요. 이번 주말 저녁 선호합니다."></textarea>
-        <span class="field-hint">전화번호·카톡 아이디는 공개 글에 적을 수 없어요. 대화방에서 나누세요.</span>
+        <textarea id="gt-body" rows="4" maxlength="300" placeholder="예: 3:3 과팅 구해요. 다들 2학년이고 가볍게 술 마시는 편이에요."></textarea>
+        <span class="field-hint">전화번호·메신저 아이디·링크는 공개 글에 적을 수 없어요. 대화방에서 나누세요.</span>
       </label>
       <p class="auth-err" id="gt-err" hidden></p>
       <button class="btn btn-primary btn-lg" data-gt="post">올리기</button>
@@ -364,16 +395,19 @@ async function gtPostCreate() {
   const body = String(($('#gt-body') || {}).value || '').trim();
   const headcount = Number((document.querySelector('#gt-hc .chip.active') || {}).dataset ? document.querySelector('#gt-hc .chip.active').dataset.v : 3);
   const want = (document.querySelector('#gt-ws .chip.active') || { dataset: { v: 'any' } }).dataset.v;
+  const whenPref = (document.querySelector('#gt-when .chip.active') || { dataset: { v: 'any' } }).dataset.v;
+  const area = String(($('#gt-area') || {}).value || '').trim().slice(0, 20);
   const err = $('#gt-err');
   const say = (m) => { if (err) { err.textContent = m; err.hidden = !m; } };
   if (!body) return say('내용을 적어 주세요');
-  if (GT_CONTACT_RE.test(body)) return say('전화번호·메신저 아이디는 공개 글에 적을 수 없어요');
+  if (GT_CONTACT_RE.test(body) || GT_CONTACT_RE.test(area)) return say('전화번호·메신저 아이디는 공개 글에 적을 수 없어요');
+  if (GT_LINK_RE.test(body) || GT_LINK_RE.test(area)) return say('링크는 공개 글에 적을 수 없어요. 대화방에서 나누세요');
   if (gt.busy) return;
   gt.busy = true;
   /* 🔴 보내는 칸은 셋뿐 — 학교·학과·성별·닉네임은 서버 트리거가 프로필에서 채운다 */
   const res = await sbAuthed('/rest/v1/gating_posts', {
     method: 'POST', headers: { Prefer: 'return=representation' },
-    body: { headcount, want_school: want, body },
+    body: { headcount, want_school: want, when_pref: whenPref, area: area || null, body },
   });
   gt.busy = false;
   if (!res.ok) return say(gtErrText(res));
@@ -393,7 +427,7 @@ async function gtPostClose(id) {
 
 /* ---------------- 매칭 ---------------- */
 async function gtLoadRequests() {
-  const res = await sbAuthed(`/rest/v1/gating_requests?user_id=eq.${encodeURIComponent(gtMyId())}&order=created_at.desc&limit=5&select=id,headcount,want_school,status,created_at,expires_at`);
+  const res = await sbAuthed(`/rest/v1/gating_requests?user_id=eq.${encodeURIComponent(gtMyId())}&order=created_at.desc&limit=5&select=id,headcount,want_school,when_pref,status,created_at,expires_at`);
   gt.requests = res.ok && Array.isArray(res.json) ? res.json : (gt.requests || []);
   if (!res.ok) gt.err = gtErrText(res);
   /* 매칭된 요청은 방 번호까지 */
@@ -436,7 +470,7 @@ function gtRenderMatch() {
     html += `
       <div class="gt-waiting">
         <p class="gt-matched-title">짝을 찾는 중</p>
-        <p class="gt-post-meta">${waiting.headcount}명 · ${waiting.want_school === 'same' ? '같은 학교만' : '학교 무관'} · ${esc(gtWhen(waiting.created_at))} 신청 · 7일 뒤 자동 만료</p>
+        <p class="gt-post-meta">${waiting.headcount}명 · ${waiting.want_school === 'same' ? '같은 학교만' : '학교 무관'} · ${esc(gtWhenLabel(waiting.when_pref))} · ${esc(gtWhen(waiting.created_at))} 신청 · 7일 뒤 자동 만료</p>
         <button class="btn btn-outline" data-gt="cancel-request" data-id="${waiting.id}">취소</button>
       </div>`;
   } else {
@@ -456,6 +490,13 @@ function gtRenderMatch() {
             <button type="button" class="chip" data-gt="pick" data-group="gt-rws" data-v="same">같은 학교만</button>
           </div>
         </div>
+        <div class="field">
+          <span class="field-label">희망 시간대</span>
+          <div class="chip-group" id="gt-rwhen">
+            ${GT_WHEN.map(([v, l]) => `<button type="button" class="chip ${v === 'any' ? 'active' : ''}" data-gt="pick" data-group="gt-rwhen" data-v="${v}">${l}</button>`).join('')}
+          </div>
+          <span class="field-hint">시간대가 같은 팀을 먼저 맺습니다. '협의' 는 어느 쪽과도 맺힙니다.</span>
+        </div>
         <p class="auth-err" id="gt-err" ${gt.err ? '' : 'hidden'}>${esc(gt.err)}</p>
         <button class="btn btn-primary btn-lg" data-gt="request">짝 찾기 신청</button>
       </div>`;
@@ -468,11 +509,12 @@ async function gtRequestCreate() {
   if (gt.busy) return;
   const headcount = Number((document.querySelector('#gt-rhc .chip.active') || { dataset: { v: 3 } }).dataset.v);
   const want = (document.querySelector('#gt-rws .chip.active') || { dataset: { v: 'any' } }).dataset.v;
+  const whenPref = (document.querySelector('#gt-rwhen .chip.active') || { dataset: { v: 'any' } }).dataset.v;
   gt.busy = true;
-  const res = await sbAuthed('/rest/v1/gating_requests', { method: 'POST', headers: { Prefer: 'return=representation' }, body: { headcount, want_school: want } });
+  const res = await sbAuthed('/rest/v1/gating_requests', { method: 'POST', headers: { Prefer: 'return=representation' }, body: { headcount, want_school: want, when_pref: whenPref } });
   gt.busy = false;
   if (!res.ok) { gt.err = gtErrText(res); gtRenderMatch(); return; }
-  toast('신청했어요. 짝이 맺어지면 알려 드립니다');
+  toast('신청했어요. 짝이 맺어지면 여기와 아래 탭에 점이 뜹니다');
   gt.requests = null;
   gtRenderMatch();
 }
@@ -494,7 +536,7 @@ async function gtLoadRooms() {
   if (!mine.length) { gt.rooms = []; return gt.rooms; }
   const ids = mine.map((m) => m.room_id).join(',');
   const [last, others] = await Promise.all([
-    sbAuthed(`/rest/v1/gating_room_last?room_id=in.(${ids})&select=room_id,kind,closed_at,created_at,last_body,last_at,last_id`),
+    sbAuthed(`/rest/v1/gating_room_last?room_id=in.(${ids})&select=room_id,kind,closed_at,created_at,last_body,last_at,last_sender,last_id`),
     sbAuthed(`/rest/v1/gating_room_members?room_id=in.(${ids})&user_id=neq.${encodeURIComponent(me)}&select=room_id,user_id,nickname,left_at`),
   ]);
   const lastBy = {}; (last.ok && Array.isArray(last.json) ? last.json : []).forEach((r) => { lastBy[r.room_id] = r; });
@@ -506,6 +548,8 @@ async function gtLoadRooms() {
       id: m.room_id, kind: l.kind || 'post', closedAt: l.closed_at || null, createdAt: l.created_at || '',
       partner: o.nickname || '상대', partnerId: o.user_id || '', partnerLeft: !!o.left_at,
       lastBody: l.last_body || '', lastAt: l.last_at || '', lastId: l.last_id || 0,
+      /* 마지막 말이 상대 것이면 '내 차례' — Hinge 의 Your Turn(답장 안 한 대화를 눈에 띄게 해 유령 행동 25% 감소) */
+      myTurn: !!(l.last_sender && l.last_sender !== me),
       unread: !!(l.last_at && new Date(l.last_at).getTime() > new Date(m.last_read_at).getTime()),
     };
   }).sort((a, b) => String(b.lastAt || b.createdAt).localeCompare(String(a.lastAt || a.createdAt)));
@@ -523,7 +567,7 @@ function gtRenderInbox() {
   pane.innerHTML = gt.rooms.length ? `<div class="gt-rooms">${gt.rooms.map((r) => `
     <button type="button" class="gt-room-row ${r.unread ? 'unread' : ''}" data-gt="open-room-id" data-room="${r.id}">
       <span class="gt-room-name">${esc(r.partner)}${r.kind === 'match' ? ' · 매칭' : ''}${r.partnerLeft ? ' · 나감' : ''}</span>
-      <span class="gt-room-last">${esc(r.lastBody || '대화를 시작해 보세요')}</span>
+      <span class="gt-room-last">${r.myTurn ? '<span class="gt-turn">내 차례</span>' : ''}${esc(r.lastBody || '대화를 시작해 보세요')}</span>
       <span class="gt-room-when">${esc(gtWhen(r.lastAt || r.createdAt))}</span>
     </button>`).join('')}</div>`
     : '<div class="empty">아직 대화가 없어요. 게시판에서 글에 말을 걸거나 매칭을 신청해 보세요.</div>';
@@ -560,6 +604,15 @@ async function gtOpenRoom(roomId) {
         </span>
       </div>
       <p class="gt-room-note">연락처는 충분히 이야기한 뒤에 나누세요. 불편하면 신고·차단할 수 있습니다.</p>
+      <details class="gt-safety">
+        <summary>만나기 전에 확인할 것</summary>
+        <ul>
+          <li>첫 만남은 사람이 많은 공개된 장소에서, 낮이나 이른 저녁에 잡습니다.</li>
+          <li>약속(누구와·언제·어디서)을 친구 한 명에게 미리 알립니다.</li>
+          <li>이 앱은 학교 이메일만 확인합니다. 상대의 학교·학과는 본인이 적은 것이고 신분을 보증하지 않습니다.</li>
+        </ul>
+        <button type="button" class="btn btn-outline gt-share" data-gt="share-plan" data-partner="${esc(info.partner)}">약속을 친구에게 보내기</button>
+      </details>
       <div class="gt-msgs" id="gt-msgs" aria-live="polite"><div class="empty">불러오는 중</div></div>
       <form class="gt-room-input" id="gt-room-form" autocomplete="off">
         <input type="text" id="gt-msg-in" maxlength="500" placeholder="메시지" aria-label="메시지 입력" />
@@ -606,7 +659,9 @@ async function gtRoomPollOnce(first) {
     if (!gt.room || gt.room !== r) return;
     if (res.ok && Array.isArray(res.json)) {
       if (res.json.length) {
-        r.msgs.push(...res.json);
+        const have = new Set(r.msgs.map((m) => m.id));
+        r.msgs.push(...res.json.filter((m) => !have.has(m.id)));
+        r.msgs.sort((a, b) => (typeof a.id === 'number' && typeof b.id === 'number') ? a.id - b.id : 0);
         r.lastId = res.json[res.json.length - 1].id;
         r.idleSince = Date.now();
         r.step = 0;
@@ -630,7 +685,10 @@ function gtRenderMsgs() {
     <div class="gt-msg ${m.sender === me ? 'me' : ''}${m.pending ? ' pending' : ''}">
       <span class="gt-msg-body">${esc(m.body)}</span>
       <span class="gt-msg-when">${esc(gtWhen(m.created_at))}</span>
-    </div>`).join('') : '<div class="empty">첫 인사를 건네 보세요.</div>';
+    </div>`).join('') : `<div class="gt-ice">
+      <p class="gt-ice-title">첫 인사를 건네 보세요. 누르면 입력칸에 들어갑니다.</p>
+      <div class="chip-group">${gtIcebreakers().map((q) => `<button type="button" class="chip" data-gt="ice" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>
+    </div>`;
   box.scrollTop = box.scrollHeight;
 }
 
@@ -667,7 +725,9 @@ async function gtSend() {
     toast(gtErrText(res));
   } else {
     const saved = Array.isArray(res.json) ? res.json[0] : null;
-    if (saved && i >= 0) { r.msgs[i] = saved; r.lastId = Math.max(r.lastId, saved.id); }
+    /* 🔴 lastId 를 여기서 올리지 않는다 — 같은 순간 상대가 보낸 말(내 것보다 작은 번호)을 다음
+       폴링이 건너뛴다(코드 리뷰). 폴링이 내 말을 다시 가져오면 번호로 걸러 낸다. */
+    if (saved && i >= 0) r.msgs[i] = saved;
     else if (i >= 0) r.msgs[i].pending = false;
     r.idleSince = Date.now();
     r.step = 0;
@@ -686,6 +746,25 @@ async function gtLeave(roomId) {
   toast('대화방을 나갔어요');
   gt.rooms = null;
   if (gt.tab === 'chat') gtRenderInbox();
+}
+
+/* 방마다 셋을 고른다 — 방 번호로 정해지므로 다시 그려도 같은 셋이 나온다(흔들리면 누르려던 게 사라진다) */
+function gtIcebreakers() {
+  const seed = gt.room ? gt.room.id : 0;
+  const out = [];
+  for (let i = 0; i < 3; i++) out.push(GT_ICEBREAKERS[(seed * 7 + i * 3) % GT_ICEBREAKERS.length]);
+  return out;
+}
+
+/* 약속을 친구에게 — 틴더 'Share My Date' 와 같은 뜻. 앱은 약속을 **저장하지 않고** 보낼 글만 만든다.
+   날짜·장소는 학생이 채운다(우리는 모른다). */
+async function gtSharePlan(partner) {
+  const text = `[한대장 과팅] ${partner || '상대'} 팀과 과팅 약속이 있어. 언제: (날짜·시간)  어디서: (장소)  끝나면 연락할게.`;
+  try {
+    if (navigator.share) { await navigator.share({ text }); return; }
+    await navigator.clipboard.writeText(text);
+    toast('약속 문구를 복사했어요. 친구에게 붙여 넣어 보내세요');
+  } catch { /* 취소했거나 공유를 못 하는 브라우저 */ }
 }
 
 /* ---------------- 신고 · 차단 ---------------- */
@@ -720,6 +799,7 @@ async function gtReportSend() {
   const detail = String(($('#gt-report-detail') || {}).value || '').trim();
   const body = { reason, detail: detail || null, target_user: box.dataset.user || null };
   if (box.dataset.kind === 'post') body.post_id = Number(box.dataset.id);
+  if (box.dataset.kind === 'room') body.room_id = Number(box.dataset.id);
   gt.busy = true;
   const res = await sbAuthed('/rest/v1/gating_reports', { method: 'POST', headers: { Prefer: 'return=minimal' }, body });
   gt.busy = false;
@@ -807,7 +887,7 @@ async function gtProfileSave() {
 
 /* ---------------- 알림 점 (30초 폴링 · 탭을 한 번 연 뒤에만) ---------------- */
 function gtHasUnread() {
-  return (gt.rooms || []).some((r) => r.unread) || (gt.requests || []).some((r) => r.status === 'matched' && !gt.seenMatch);
+  return (gt.rooms || []).some((r) => r.unread) || (gt.requests || []).some((r) => r.status === 'matched' && !(gt.seenMatches || []).includes(r.id));
 }
 function gtSetDot(on) {
   const btn = document.querySelector('.nav-item[data-nav="gating"]');
@@ -822,8 +902,10 @@ function gtInboxStart() {
     gt.inboxTimer = null;
     if (!gtOn() || !gtReady()) return;
     if (document.visibilityState !== 'hidden') {
+      const keepErr = gt.err;   /* 배경 확인의 실패는 화면에 안 올린다 — 다음 그리기에 새어 나온다(코드 리뷰) */
       await gtLoadRooms();
       if (gt.tab !== 'match') await gtLoadRequests();
+      gt.err = keepErr;
       gtSetDot(gtHasUnread());
       if (gt.tab === 'chat' && !gt.room) gtRenderInbox();
     }
@@ -846,16 +928,29 @@ if (typeof document !== 'undefined' && typeof window !== 'undefined' && !window.
     else if (k === 'pick') { const g = document.getElementById(b.dataset.group); if (g) g.querySelectorAll('.chip').forEach((c) => c.classList.toggle('active', c === b)); }
     else if (k === 'save-profile') gtProfileSave();
     else if (k === 'edit-profile') { gt.editing = true; const box = $('#gating-body'); if (box) box.innerHTML = gtProfileHtml(); }
-    else if (k === 'tab') { gt.tab = b.dataset.v; document.querySelectorAll('.gt-tabs .chip').forEach((c) => c.classList.toggle('active', c === b)); gtRenderTab(); }
+    else if (k === 'tab') {
+      gt.tab = b.dataset.v;
+      /* 대화 목록은 열 때마다 새로 받는다 — 방을 연 뒤에 온 말('내 차례')이 옛 사본에는 없다 */
+      if (gt.tab === 'chat') gt.rooms = null;
+      if (gt.tab === 'board') gt.posts = null;   /* 게시판도 열 때마다 새로 — 남의 새 글이 사본에 없다 */
+      document.querySelectorAll('.gt-tabs .chip').forEach((c) => c.classList.toggle('active', c === b));
+      gtRenderTab();
+    }
     else if (k === 'school') { gt.filter.school = b.dataset.v; gtRenderBoard(); }
     else if (k === 'compose') gtComposeOpen();
     else if (k === 'post') gtPostCreate();
     else if (k === 'close-post') gtPostClose(b.dataset.id);
     else if (k === 'open-room') gtOpenRoomFromPost(b.dataset.id);
-    else if (k === 'open-room-id') { gt.seenMatch = true; gtOpenRoom(b.dataset.room); }
+    else if (k === 'open-room-id') {
+      const rid = Number(b.dataset.room);
+      gt.seenMatches = (gt.seenMatches || []).concat((gt.requests || []).filter((r) => r.room_id === rid).map((r) => r.id));
+      gtOpenRoom(rid);
+    }
     else if (k === 'request') gtRequestCreate();
     else if (k === 'cancel-request') gtRequestCancel(b.dataset.id);
     else if (k === 'leave') gtLeave(b.dataset.room);
+    else if (k === 'ice') { const i = $('#gt-msg-in'); if (i) { i.value = b.dataset.q; i.focus(); } }
+    else if (k === 'share-plan') gtSharePlan(b.dataset.partner);
     else if (k === 'report') gtReportOpen(b.dataset.kind, b.dataset.id, b.dataset.user);
     else if (k === 'report-send') gtReportSend();
     else if (k === 'block') gtBlock(b.dataset.user);
