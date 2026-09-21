@@ -80,10 +80,19 @@ function takeFn(name) {
     + `이 도구는 앱 규칙을 베끼지 않고 가져다 쓰므로, 못 가져오면 멈춥니다(틀린 답을 내느니 멈춘다).`);
   return m[0];
 }
-/* 의존 순서대로 — dday 는 todayStart 를, fitBadgeHtml 은 fitTone·fitVerdict 를 쓴다 */
-const NEED = ['todayStart', 'dday', 'fitTone', 'fitVerdict', 'fitBadgeHtml', 'applyLock'];
+/* 카드 윗줄·제목 규칙은 한 줄짜리 const 를 쓴다 — 함수와 같은 이유로 **가져다 쓴다** */
+function takeConst(name) {
+  const m = appSrc.match(new RegExp(`^const ${name} = .*$`, 'm'));
+  if (!m) throw new Error(`app.js 에서 ${name} 을 못 찾았습니다 — 가져올 수 없으면 멈춥니다.`);
+  return m[0];
+}
+/* 의존 순서대로 — dday 는 todayStart 를, fitBadgeHtml 은 fitTone·fitVerdict 를,
+   cardOrgLine 은 cardTitle·bareOrg·orgBase 를 쓴다 */
+const NEED = ['todayStart', 'dday', 'fitTone', 'fitVerdict', 'fitBadgeHtml', 'applyLock',
+  'cleanCardTitle', 'cardTitle', 'cardOrgLine'];
 const ctx = vm.createContext({ Date, Math, Number, String, JSON, console });
-vm.runInContext(NEED.map(takeFn).join('\n\n'), ctx, { filename: 'app.js(발췌)' });
+vm.runInContext([...['bareOrg', 'orgBase'].map(takeConst), ...NEED.map(takeFn)].join('\n\n'),
+  ctx, { filename: 'app.js(발췌)' });
 const appFn = (n) => vm.runInContext(n, ctx);
 const stripTags = (h) => String(h).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 
@@ -105,6 +114,11 @@ for (const sch of hits) {
   const exLines = ME.requirementLines(sch, [...(sch.eligibilityExcludes || []), ...(sch.eligibilityLines || [])], { onlyExclude: true });
 
   console.log(`\n■ ${sch.name || sch.id}`);
+  /* 🔴 **카드에 실제로 찍히는 두 줄**을 앱 함수 그대로 보여 준다 (2026-09-21 코드 리뷰가 잡았다).
+     그전까지 이 도구는 `sch.name` 원본만 찍어서, 제목을 다듬는 규칙과 윗줄에서 기관명을 빼는
+     규칙을 **둘 다 못 봤다.** 「매 세션 이것만은」 1번이 화면 이야기를 이 도구로만 하라고
+     하는데 정작 카드 윗줄을 몰랐던 것이다. */
+  console.log(`   카드 윗줄 「${appFn('cardOrgLine')(sch)}」  ·  카드 제목 「${appFn('cardTitle')(sch)}」`);
   console.log(`   학생: ${p.school} ${p.track} ${p.year}학년 · 평점 ${p.gpa} · ${p.credits}학점 · ${p.bracket}구간`);
   console.log(`   판정 ${result.status}  ·  배지 「${badge}」`);
   console.log(`   신청 버튼 ${canApply ? '열림' : '잠김'}  (마감: ${d.label || '?'})`);
