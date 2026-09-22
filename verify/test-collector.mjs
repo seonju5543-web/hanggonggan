@@ -8436,5 +8436,70 @@ return { submitChannelKind, submitChannelLabel };`)();
   eq('등록 데이터에 근거 없는 포털 단정이 없다', baseless.length, 0);
 }
 
+/* ── 🔴 노션 「작업 현황」이 낡은 것을 오늘 일이라고 말하지 않는다 (2026-09-22 신설) ──
+   개발자 지적: *"지금 내가 한 일들이 노션에 업데이트 돼야하는데 안되고있어 뭐야 대체 뭐가문제야"*.
+   로봇은 **16일 동안 초록불로 성공**하고 있었다 — 9/6 커밋 8건을 찾아내 '갱신 2026-09-22' 와
+   나란히 적었다. 멈춘 것이 아니라 **최신인 것처럼 보이는 것**이라 아무도 못 알아봤다.
+   뿌리: `--author` 로 사람을 갈랐는데 **주소가 더 이상 사람을 가르지 않는다** — 실측으로
+   9/7 이후 사람 커밋 250개 중 182개가 Claude Code 공용 주소(`noreply@anthropic.com`)다.
+   🔴 이 로봇에는 **관문이 하나도 없었다.** 그래서 16일이 지나갔다 — 그게 이 절이 생긴 이유다.
+   🔴 **글자가 아니라 동작으로 잰다** — `--dry` 로 실제로 돌려 무엇을 적는지 본다. */
+{
+  console.log('\n■ 노션 「작업 현황」 (2026-09-22)');
+  const src = readText(new URL('../tools/notion-status.mjs', import.meta.url));
+  const yml = readText(new URL('../.github/workflows/update-progress.yml', import.meta.url));
+
+  /* ① 공용 주소를 사람 칸에 다시 넣지 않는다 — 넣으면 한 사람의 줄에 셋의 일이 실린다.
+        주석 속 인용은 빼고 **코드**만 본다. */
+  const peopleBlock = src.slice(src.indexOf('const PEOPLE = {'), src.indexOf('};', src.indexOf('const PEOPLE = {')));
+  eq('공용 주소를 emails 에 넣지 않는다', /noreply@anthropic\.com/.test(peopleBlock), false);
+
+  /* ② 워크플로가 push 범위를 넘긴다 — 안 넘기면 로봇이 영영 주소 근거로만 돈다(사고 그대로). */
+  eq('워크플로가 GITHUB_EVENT_BEFORE 를 넘긴다', /GITHUB_EVENT_BEFORE:\s*\$\{\{\s*github\.event\.before\s*\}\}/.test(yml), true);
+  eq('로봇이 그 값을 읽는다', /process\.env\.GITHUB_EVENT_BEFORE/.test(src), true);
+
+  /* ③ '지금 하는 일' 은 **목록에 보인 그 커밋**을 본다 — git 을 따로 한 번 더 읽으면
+        두 칸이 서로 다른 날의 일을 말한다(고치기 전이 그랬다). */
+  eq("'지금 하는 일' 이 목록과 같은 커밋을 본다", /git show --name-status[^`]*list\.slice\(0, 3\)/.test(src), true);
+
+  /* ④ ⟵ 여기가 심장이다. 로봇을 **실제로 돌려** 세 경우를 잰다. */
+  const run = (env) => {
+    const r = spawnSync(process.execPath, ['tools/notion-status.mjs', '--dry'], {
+      cwd: fileURLToPath(new URL('..', import.meta.url)),
+      encoding: 'utf8',
+      env: { ...process.env, NOTION_TOKEN: 'dry', GITHUB_EVENT_BEFORE: '', GITHUB_REF_NAME: 'main', ...env },
+    });
+    return (r.stdout || '') + (r.stderr || '');
+  };
+  /* 최근 커밋 둘이 실려 있어야 잴 수 있다 — 얕은 클론이면 건너뛴다(거짓 빨간불 금지). */
+  /* 🔴 **사람 커밋이 든 범위를 골라야 한다.** 그냥 `HEAD~2` 를 쓰면 그 둘이 마침 로봇
+     커밋인 날(수집 로봇이 하루 열 번 커밋한다) 이 검사가 **까닭 없이 빨간불**이 된다 —
+     관문이 흔들리면 다음 사람이 관문 전체를 꺼 버린다(2026-08-29 교훈). */
+  const root = fileURLToPath(new URL('..', import.meta.url));
+  const human = spawnSync('git', ['log', '-n', '60', '--no-merges', '--pretty=format:%H%x09%ae'],
+    { cwd: root, encoding: 'utf8' });
+  const rows = (human.stdout || '').split('\n').filter(Boolean).map((l) => l.split('\t'));
+  const firstHuman = rows.findIndex(([, ae]) => !/\[bot\]|handaejang-bot/.test(ae));
+  const anchor = firstHuman >= 0 && rows[firstHuman + 1] ? rows[firstHuman + 1][0] : '';
+  if (human.status !== 0 || !anchor) {
+    console.log('  (이력에서 사람 커밋을 못 찾아 동작 검사를 건너뜁니다 — fetch-depth: 0 이 필요합니다)');
+  } else {
+    const before = anchor;   // 사람 커밋 하나를 확실히 담는 범위
+    const pushed = run({ GITHUB_ACTOR: 'didinin-wq', GITHUB_EVENT_BEFORE: before });
+    eq('push 근거가 주소 근거를 이긴다 (낡음 경고가 안 뜬다)', /지금 한 일이 아닙니다/.test(pushed), false);
+    eq('push 로 올린 커밋을 적는다', /최근 커밋:[\s\S]*\d\d-\d\d \d\d:\d\d ·/.test(pushed), true);
+
+    /* 🔴 되돌림 검사 — push 근거를 빼앗으면 **반드시 낡음 경고가 떠야 한다.**
+       이 한 줄이 이번 사고 그 자체다(주소 근거밖에 없을 때 9/6 을 오늘로 적던 것). */
+    const noPush = run({ GITHUB_ACTOR: 'didinin-wq' });
+    eq('근거가 낡으면 낡았다고 적는다', /지금 한 일이 아닙니다/.test(noPush), true);
+    eq("낡으면 '지금 하는 일' 을 덮지 않는다", /지금 하는 일: \(못 읽어서 그대로 둠\)/.test(noPush), true);
+
+    /* 근거가 아예 없으면 — 남의 커밋으로 채우지 않는다 */
+    const none = run({ GITHUB_ACTOR: 'seonju5543-web' });
+    eq('근거가 없으면 못 찾았다고 적는다', /사람 커밋을 찾지 못했습니다/.test(none), true);
+  }
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);

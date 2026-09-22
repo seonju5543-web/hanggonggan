@@ -50,9 +50,14 @@ const LOG_LINES = 8;
    ⚠️ 이선주 의 `noreply@anthropic.com` 는 **확인된 값이 아니라 추론이다** — 은서·세현은
       자기 이름으로 찍히는데 그 계정만 git 설정이 없어 보인다. 본인이 git 설정을 하면
       여기에 그 주소를 더할 것. 못 찾으면 로봇은 **지어내지 않고 못 찾았다고 적는다.** */
+/* 🔴 **`noreply@anthropic.com` 을 여기 다시 넣지 말 것** (2026-09-22 실측으로 확정).
+   그 주소는 이선주의 것이 아니라 **Claude Code 세션이 쓰는 공용 주소**다 — 9/7 이후
+   사람 커밋 250개 중 182개가 그 주소이고, 셋 다 그 세션으로 일한다. 넣으면 이선주의 줄에
+   은서·세현의 일이 통째로 실린다(2026-09-06 에 없앤 '복붙'이 그대로 되살아난다).
+   비워 두는 것이 맞다 — 아래 `push` 근거가 이선주의 줄을 채운다. */
 const PEOPLE = {
   'seonju5543-web': { name: '이선주', page: '3d29505a-3ec3-81e0-a77e-df1a93912858',
-                      emails: ['noreply@anthropic.com'] },
+                      emails: [] },
   'Se-Hyeon-Jo':    { name: '세현',   page: '3d29505a-3ec3-81d5-8ad2-c11b875e594b',
                       emails: ['josehyeon@josehyeon-ui-MacBookAir.local', 'josehyeon0926@gmail.com'] },
   'didinin-wq':     { name: '은서',   page: '3d29505a-3ec3-81c1-b647-ef7cb39ca72d',
@@ -122,20 +127,77 @@ if (!who) {
    "최근 14일 작업 없음"이라는 **확인하지 않은 단정**이 노션에 적힌다. */
 const sh = (c) => { try { return { ok: true, out: execSync(c, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim() }; } catch { return { ok: false, out: '' }; } };
 
-/* 🔴 **그 사람이 쓴 커밋만** 본다. 필터 없이 읽으면 세 줄이 전부 main 의 같은 목록이 된다.
-   git 은 `--author` 를 여러 개 주면 '또는'으로 묶는다. */
+/* 🔴 **작성자 주소로는 더 이상 사람을 가를 수 없다** (2026-09-22 · 이 로봇이 16일 동안
+   9/6 커밋을 오늘 날짜로 적고 있던 것을 개발자가 지적해 드러났다: "내가 한 일들이 노션에
+   업데이트 돼야하는데 안되고있어").
+   실측: 9/7 이후 사람 커밋 250개 중 **182개가 `noreply@anthropic.com`** — Claude Code
+   세션의 공용 주소다. 은서의 마지막 제 주소 커밋은 **9/6** 이라, `--author` 필터가
+   그 8건을 매번 새로 찾아내 '갱신 2026-09-22' 와 나란히 적었다. **빈 줄보다 나쁘다**
+   — 멈춘 것이 아니라 최신인 것처럼 보였다.
+   → 먼저 보는 것은 **이 push 가 실제로 올린 커밋**이다. push 는 한 사람의 행위라
+     남의 일이 섞이지 않는다(주소와 달리 공유되지 않는다).
+   ⚠️ 따라잡기 push 는 예외다 — 뒤처진 브랜치를 밀면 남이 쓴 것까지 한꺼번에 올라간다
+     (2026-09-06 실측 935건). 그래서 `PUSH_MAX` 를 넘으면 이 근거를 쓰지 않는다. */
+const PUSH_MAX = 30;
+const BOT = /\[bot\]|handaejang-bot/;
+const before = (process.env.GITHUB_EVENT_BEFORE || '').trim();
+
+/* 한 줄에 주소·시각·제목을 함께 받아 **로봇 커밋을 우리가 직접 걸러낸다**
+   (`--author` 로 거르면 push 근거와 author 근거가 서로 다른 방식이 되어 갈라진다). */
+function commitsIn(range, n) {
+  const r = sh(`git log --no-merges ${range} --pretty=format:"%H%x09%ae%x09%at%x09%ad · %s" --date=format:"%m-%d %H:%M" -n ${n * 4}`);
+  if (!r.ok || !r.out) return [];
+  return r.out.split('\n').filter(Boolean).map((l) => {
+    const [sha, ae, at, ...rest] = l.split('\t');
+    return { sha, ae, at: Number(at), line: rest.join('\t') };
+  }).filter((c) => !BOT.test(c.ae)).slice(0, n);
+}
+
 const byAuthor = (who.emails || []).map((e) => `--author=${JSON.stringify(e)}`).join(' ');
-const log = byAuthor
-  ? sh(`git log --no-merges ${byAuthor} --pretty=format:"%ad · %s" --date=format:"%m-%d %H:%M" -n ${LOG_LINES}`)
-  : { ok: false, out: '' };
+
+/* 근거 고르기 — push 가 먼저, 안 되면 주소. 무엇을 근거로 삼았는지 **기억해 둔다**:
+   낡은 것을 골랐으면 그렇다고 적어야 하기 때문이다(원칙 8-1). */
+let basis = '';
+let picked = [];
+/* ⚠️ 셸에 넣기 전에 **40자리 16진수인지 본다** — `github.event.before` 는 우리가 만든
+   값이 아니고, 아래 git 호출은 셸을 거친다. 아닌 값은 근거로 쓰지 않는다(빈 문자열 포함). */
+if (/^[0-9a-f]{40}$/.test(before) && !/^0+$/.test(before) && sh(`git cat-file -e ${before}^{commit}`).ok) {
+  const n = Number(sh(`git rev-list --count --no-merges ${before}..HEAD`).out || '-1');
+  if (n >= 0 && n <= PUSH_MAX) {
+    picked = commitsIn(`${before}..HEAD`, LOG_LINES);
+    if (picked.length) basis = 'push';
+  }
+}
+if (!picked.length && byAuthor) {
+  picked = commitsIn(byAuthor, LOG_LINES);
+  if (picked.length) basis = 'author';
+}
+
+/* 🔴 **낡은 목록에 오늘 날짜를 붙이지 않는다.** 이것이 이 사고의 심장이다 —
+   '갱신'만 오늘로 바뀌고 내용은 16일 전에 얼어 있었는데, 화면에는 멀쩡해 보였다. */
+const STALE_DAYS = 3;
+/* ⚠️ `Number(NaN) > 3` 은 false 다 — 시각을 못 읽었을 때 조용히 '안 낡음'으로 넘어가면
+   이 관문이 그대로 무력해진다. 못 읽으면 **낡은 쪽으로** 센다. */
+const ageDays = picked.length && Number.isFinite(picked[0].at)
+  ? (Date.now() / 1000 - picked[0].at) / 86400 : Infinity;
+const stale = basis === 'author' && ageDays > STALE_DAYS;
+const staleNote = stale
+  ? `⚠️ 아래는 **지금 한 일이 아닙니다** — 이 계정 주소로 된 커밋이 ${Number.isFinite(ageDays) ? Math.floor(ageDays) + '일째' : '언제부터인지 모르게'} 없습니다.\n`
+    + '   (Claude Code 세션은 작성자를 Claude 로 적습니다 · 근거를 못 찾았습니다)\n'
+  : '';
+
+const log = { ok: picked.length > 0, out: staleNote + picked.map((c) => c.line).join('\n') };
 
 /* 만진 파일 → 한 낱말. 최근 3개만 본다 — 지금 무엇을 하는 중인지가 알고 싶은 것이지
    이 사람이 여태 무엇을 했는지가 아니다. */
-function nowDoing() {
-  if (!byAuthor) return '';
+function nowDoing(list) {
+  if (!list.length) return '';
+  /* 🔴 **목록에 보인 바로 그 커밋들**을 본다 (2026-09-22). 예전엔 여기서 `--author` 로
+     git 을 한 번 더 읽어, 위 목록과 다른 커밋을 근거로 낱말을 골랐다 — 근거가 둘이면
+     '최근 커밋' 과 '지금 하는 일' 이 서로 다른 날의 일을 말한다. */
   /* `--name-status` 로 받는다 — 무엇을 만졌는지뿐 아니라 **새로 만들었는지 고쳤는지**까지
      git 이 알려 준다. 그래야 뒤에 붙일 낱말을 지어내지 않아도 된다. */
-  const files = sh(`git log --no-merges ${byAuthor} -n 3 --name-status --pretty=format:`);
+  const files = sh(`git show --name-status --pretty=format: ${list.slice(0, 3).map((c) => c.sha).join(' ')}`);
   if (!files.ok || !files.out) return '';
   const count = new Map();      // 기능 이름 → 무게 합
   const marks = new Map();      // 기능 이름 → 본 상태 글자들
@@ -194,20 +256,23 @@ const props = {
 };
 if (log.ok && log.out) {
   props['최근 커밋'] = { rich_text: [{ text: { content: fitLines(log.out, MAX_TEXT) } }] };
-} else if (!byAuthor) {
-  /* 주소를 모르는 사람 — **남의 커밋으로 채우지 않는다.** 그게 복붙의 원인이었다. */
-  props['최근 커밋'] = { rich_text: [{ text: { content: `⚠️ ${who.name} 의 커밋 주소를 모릅니다 — tools/notion-status.mjs 의 PEOPLE 에 emails 를 채우세요.` } }] };
-  console.error(`✕ ${who.name}: emails 가 비어 있습니다.`);
 } else {
-  props['최근 커밋'] = { rich_text: [{ text: { content: '⚠️ 이 이름으로 된 커밋을 찾지 못했습니다 — git 설정(user.email)을 확인하세요.' } }] };
-  console.error(`✕ ${who.name}: ${who.emails.join(', ')} 로 된 커밋이 없습니다.`);
+  /* 근거가 둘 다 없다 — **남의 커밋으로 채우지 않는다.** 그게 복붙의 원인이었다.
+     ⚠️ 여기서 'emails 를 채우세요' 라고 시키지 않는다: 공용 주소(`noreply@anthropic.com`)를
+     채우는 것이 바로 복붙을 되살리는 길이다(PEOPLE 머리말). */
+  props['최근 커밋'] = { rich_text: [{ text: { content:
+      `⚠️ ${who.name} 의 이번 push 에서 사람 커밋을 찾지 못했습니다.\n`
+    + '   (로봇 커밋만 있었거나, 따라잡기 push 였거나, 수동 실행이었습니다)' } }] };
+  console.error(`✕ ${who.name}: 근거 없음 (push=${before || '없음'} · emails=${(who.emails || []).join(', ') || '비움'})`);
 }
 
 /* '지금 하는 일' — 예전에는 사람이 채우는 칸이었는데, 백로그를 베껴 붙이게 돼서
    실제로 만진 것과 어긋났다(2026-09-06 개발자 지시로 로봇이 채운다).
    ⚠️ **못 읽으면 비우지 않고 그냥 두지도 않는다** — 빈 값을 쓰면 사람이 적어 둔 것을 지운다.
       읽었을 때만 덮어쓴다. */
-const doing = nowDoing();
+/* 🔴 **낡은 근거로는 '지금 하는 일' 을 쓰지 않는다** — 16일 전에 만진 파일을 '지금'이라
+   부르는 것은 확인하지 않은 것을 확인했다고 말하는 것이다(원칙 8-1). 그대로 둔다. */
+const doing = stale ? '' : nowDoing(picked);
 if (doing) props['지금 하는 일'] = { rich_text: [{ text: { content: doing } }] };
 
 /* `--dry` — 노션에 쓰지 않고 무엇을 쓸지만 보여 준다. 이 로봇은 push 때만 도는데,

@@ -59,4 +59,9 @@ jobs:
       - name: 노션 「작업 현황」 갱신
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          # 🔴 **이 push 가 무엇을 올렸는가** — 2026-09-22 사고의 수리. 작성자 주소로는
+          #    더 이상 사람이 안 갈린다(사람 커밋 대부분이 Claude Code 공용 주소다).
+          #    push 는 한 사람의 행위라 남의 일이 안 섞인다. 없으면(수동 실행·force push)
+          #    로봇이 주소 근거로 물러나고, 그것이 낡았으면 낡았다고 적는다.
+          GITHUB_EVENT_BEFORE: ${{ github.event.before }}
         run: node tools/notion-status.mjs
