@@ -1,8 +1,22 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-09-22",
- "count": 2022,
+ "count": 2023,
  "items": [
+  {
+   "title": "[서울][교외] 2026-2 인송문화재단 장학생 모집 공고(~9/30)",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/267582/artclView.do",
+   "attachments": [
+    {
+     "name": "(서식) ‘仁松 일반장학생’ 선발 지원서_2026_2.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/151078/download.do"
+    }
+   ],
+   "deadlineHint": "지원기간 : 2026. 9. 30.(수 ) 오전 10:00 까지 &nbsp; 8. 제출방법 : 등기우편 또는 방문접수 서울캠퍼스 장학팀 ( 국제",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-09-22"
+  },
   {
    "title": "[서울][국가근로] 2026학년도 2학기 국가근로장학생 모집 안내(추가)(~9/28)",
    "url": "https://dep.hufs.ac.kr/bbs/student/2431/267406/artclView.do",

@@ -693,6 +693,14 @@
    "added": "2026-09-21",
    "fetched": true,
    "schematized": false
+  },
+  {
+   "id": "auto-ent2431267582artclviewdo",
+   "name": "[서울][교외] 2026-2 인송문화재단 장학생 모집 공고(~9/30)",
+   "target": "2026-2 인송문화재단 장학생 모집 공고(~9/30)",
+   "added": "2026-09-22",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }
