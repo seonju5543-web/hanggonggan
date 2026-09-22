@@ -15,4 +15,4 @@
 # 데이터 관문(node verify/audit-data.js)을 통과하지 못하면 배포하지 않고 🚨 이슈를 남긴다.
 
 branch: claude/handaejang-notice-error-check-fg521c
-메모: 2026-09-21 — 판정 못 한 공고를 '적합'이라 하지 않는다(틀린 안심 수리) · verify-kosaf 빨간불 2건 해소
+메모: 2026-09-22 — 노션 「작업 현황」 수리 · 가르는 근거를 작성자 주소에서 push 로 옮겼다(관문 신설)
