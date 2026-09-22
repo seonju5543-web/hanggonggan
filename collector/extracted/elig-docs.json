@@ -209,18 +209,17 @@
    "elig-n44shk-2.jpg"
   ]
  },
- "auto-oardid323019menuno200318": {
-  "slug": "axqbis",
-  "files": [
-   "elig-axqbis-1.hwp",
-   "elig-axqbis-2.hwp"
-  ]
- },
  "auto-oardid323082menuno200318": {
   "slug": "1rz9dj",
   "files": [
    "elig-1rz9dj-1.pdf",
    "elig-1rz9dj-2.jpg"
+  ]
+ },
+ "auto-oardid323054menuno200318": {
+  "slug": "kkdaoq",
+  "files": [
+   "elig-kkdaoq-1.png"
   ]
  },
  "auto-rnoticedoarticleno154473": {
@@ -256,10 +255,11 @@
    "elig-rs62se-2.png"
   ]
  },
- "auto-oardid323054menuno200318": {
-  "slug": "kkdaoq",
+ "auto-oardid323019menuno200318": {
+  "slug": "axqbis",
   "files": [
-   "elig-kkdaoq-1.png"
+   "elig-axqbis-1.hwp",
+   "elig-axqbis-2.hwp"
   ]
  }
 }
