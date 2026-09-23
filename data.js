@@ -403,6 +403,23 @@ function schoolPortal(sch) {
   return SCHOOL_PORTALS[((sch || {}).eligibility || {}).schoolOnly] || null;
 }
 
+/* 🔴 **시스템별 주소** (2026-09-23) — 한 학교가 시스템을 둘 쓴다.
+   한국외대는 신청이 `HUFS Ability`, 계좌 등록이 `종합정보시스템`이라 학교 이름만으로
+   주소를 고르면 학생을 **엉뚱한 시스템**으로 보낸다(실측: 등록 공고 15건 중 1건이 후자).
+   🔴 열쇠는 `apply-channel.js` 의 `PORTAL_SYSTEMS` 와 **같은 글자**여야 한다(관문이 대조).
+   🔴 **주소를 짐작해 채우지 말 것** — 종합정보시스템은 아직 열어서 확인한 주소가 없다.
+      없으면 `url` 을 비워 두고 화면이 **이름만** 말한다(링크 없이). 틀린 링크보다 낫다. */
+const PORTAL_SYSTEM_INFO = {
+  'HUFS Ability': { label: 'HUFS Ability', url: 'https://hufsability.hufs.ac.kr',
+                    verifiedTitle: '한국외대 HUFSAbility', verifiedAt: '2026-09-14' },
+  '인포21': { label: '경희대학교 인포21', url: 'https://info21.khu.ac.kr',
+              verifiedTitle: '경희대학교 인포21', verifiedAt: '2026-09-14' },
+  '종합정보시스템': { label: '종합정보시스템', url: '' },   // 주소 미확인 — 지어내지 않는다
+};
+function portalSystemInfo(sch) {
+  return PORTAL_SYSTEM_INFO[(sch || {}).applyPortal] || null;
+}
+
 /* 접수 채널별 최종 제출 단계 가이드 */
 const SUBMIT_GUIDES = {
   kosaf: [
@@ -451,7 +468,11 @@ const SUBMIT_CHANNEL_LABEL = {
   kosaf: '🏛 한국장학재단 — 본인 인증 후 직접 신청',
   form: '📄 양식 제출형 — 앱에서 원본 양식 작성',
   download: '📎 원본 양식 다운로드형 — 첨부 양식을 내려받아 작성',
-  portal: '🖥 온라인·포털 입력형 — 복사해서 붙여넣기',
+  /* 🔴 '복사해서 붙여넣기' 였다 (2026-09-23 에 고침) — 이제 공고가 말한 **시스템과 경로**를
+     그대로 보여 주므로(`schoolPortalNote`) 옛 문구는 앱이 하는 일보다 작게 말한다.
+     ⚠️ 시스템을 모르는 옛 등록분도 이 머리말을 쓰므로 **시스템 이름을 여기 적지 않는다** —
+        이름은 아래 안내 줄이 말한다(거기엔 근거가 있고 여기엔 없다). */
+  portal: '🖥 학교 시스템에서 신청 — 신청 화면 안내',
   unknown: '🖥 접수 방법은 원문 공고에서 확인',
 };
 
@@ -472,7 +493,17 @@ function submitChannelKind(sch) {
   if (sch.applyEmail) return 'email';
   if (sch.program || /한국장학재단/.test(sch.provider || '')) return 'kosaf';
   if (sch.formId) return 'form';
+  /* 🔴 **원문이 말한 신청방법이 첨부 파일명보다 강하다** (2026-09-23).
+     실측 2건(가족장학금·정영오)은 신청서 첨부가 있으면서 원문이 「신청방법 : 온라인 신청
+     (HUFS Ability …)」라고 못 박는다. 첨부는 **거기서 받아 내는 서식**이지 다른 제출처가
+     아니다. 첨부를 앞에 두면 머리말이 '첨부 양식 내려받기'가 되어 학생이 어디에 내는지를
+     끝까지 못 듣는다. 양식 작성·내려받기 버튼은 이 순서와 무관하게 그대로 뜬다. */
+  if (sch.applyPortal) return 'portal';
   if (hasFormAttachment(sch)) return 'download';
+  /* 🔴 아래는 **발췌 줄만** 보는 약한 근거라 첨부보다 뒤에 둔다. 그게 가장 믿을 만한 근거다 (2026-09-23) — 로봇이 **공고 원문
+     전체**를 읽어 채운 값이고, 아래 `hasPortalEvidence` 는 화면에 실린 **발췌 줄만** 본다.
+     발췌는 14칸 상한이라 신청방법 줄이 밀려나는 일이 잦다(실측: 원문으로는 15건인데
+     발췌로는 1건이었다). 둘 다 두는 이유는 옛 등록분에 `applyPortal` 이 없기 때문이다. */
   return hasPortalEvidence(sch) ? 'portal' : 'unknown';
 }
 

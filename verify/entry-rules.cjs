@@ -124,6 +124,19 @@ function checkEntry(it, opts = {}) {
     }
   }
 
+  /* 🔴 **포털 시스템도 근거 없이 못 들어온다** (2026-09-23 · 접수 메일과 같은 규칙).
+     여기가 틀리면 학생을 엉뚱한 화면으로 보낸다 — 한국외대는 시스템이 둘이라
+     '신청'이 아니라 '계좌 등록' 화면으로 보내면 신청 버튼을 영영 못 찾는다.
+     ⚠️ 관리자가 손으로 넣은 것은 경고까지만(위 접수 메일과 같은 이유). */
+  if (it.applyPortal) {
+    const src = it.applyPortalSource || '';
+    const byHuman = /^(AI|관리자)/.test(it.applyPortalFrom || '');
+    if (!src) {
+      (byHuman ? warn : err)(`포털 시스템(${it.applyPortal})에 근거 문장이 없습니다 `
+        + `— applyPortalSource 에 신청 방법이 적힌 공고 원문 한 줄을 남기세요`);
+    }
+  }
+
   return out;
 }
 

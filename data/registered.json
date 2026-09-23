@@ -224,7 +224,10 @@
    "openDate": "2026-08-03",
    "announceDate": "2026-08-28",
    "boardTitle": "[서울][교외]2026-2 유흥수 장학금(융합일본지역학부 재학생 대상) 장학생 선발",
-   "amountFrom": "공고 원문"
+   "amountFrom": "공고 원문",
+   "applyPortal": "HUFS Ability",
+   "applyPortalSource": "3) 지원방법 : 온라인 신청 (HUFS Ability - 학생핵심역량통합시스템 ) - 로그인 ( 학 번 / 비번 ) - 교과 / 비교과 - 장학신청 목록에서 해당 장학금 선택",
+   "applyPortalFrom": "공고 원문"
   },
   {
    "id": "reg-hufs-myeonhak",
@@ -268,7 +271,10 @@
    "deadlineFrom": "공고 원문",
    "openDate": "2026-07-09",
    "boardTitle": "[공통][교내] 2026학년도 2학기 면학장학금 신청 안내",
-   "exclusivityFrom": "공고 원문"
+   "exclusivityFrom": "공고 원문",
+   "applyPortal": "종합정보시스템",
+   "applyPortalSource": "3. 신청 방법 : 종합정보시스템 로그인 – 등록 / 장학정보 – 면학장학금 신청",
+   "applyPortalFrom": "공고 원문"
   },
   {
    "id": "reg-hi-jeongeup",
@@ -391,7 +397,10 @@
    },
    "openDate": "2026-07-27",
    "boardTitle": "[공통][교내]2026-1 외대재직직원장학금(씨앗) 장학생 모집(~8/5)",
-   "amountFrom": "공고 원문"
+   "amountFrom": "공고 원문",
+   "applyPortal": "HUFS Ability",
+   "applyPortalSource": "6. 신청방법 : 온라인 신청 (HUFS Ability- 학생핵심역량통합시스템 ) → 로그인 ( 학번 / 비번 ) → 교과 / 비교과 → 장학신청 목록 → 해당 장학금",
+   "applyPortalFrom": "공고 원문"
   },
   {
    "id": "reg-hufs-ambassador",
@@ -439,7 +448,10 @@
    "openDate": "2026-08-03",
    "announceDate": "2026-08-28",
    "boardTitle": "[공통][교외]2026-2 한국외대 동문홍보대사 장학금 장학생 모집(~8/12)",
-   "amountFrom": "공고 원문"
+   "amountFrom": "공고 원문",
+   "applyPortal": "HUFS Ability",
+   "applyPortalSource": "7. 신청방법 : 온라인신청(HUFS Ability-학생핵심역량통합시스템) - 로그인(학번/비번) - 교과/비교과 - 장학신청 목록 - 해당 장학금",
+   "applyPortalFrom": "공고 원문"
   },
   {
    "id": "reg-posco-vision",
@@ -663,7 +675,10 @@
     "4) 학년이 높은 학생"
    ],
    "eligibilityFrom": "AI(원문 줄 그대로)",
-   "eligibilityReviewed": false
+   "eligibilityReviewed": false,
+   "applyPortal": "HUFS Ability",
+   "applyPortalSource": "3. 신청방법 : 온라인신청 (HUFS Ability- 학생핵심역량통합시스템 ) - 로그인 ( 학번 / 비번 ) - 교과 / 비교과 – 장학신청목록 - 해당 장학금",
+   "applyPortalFrom": "공고 원문"
   },
   {
    "id": "reg-khu-intern",
@@ -1270,7 +1285,10 @@
    "boardTitle": "[공통][교외] 2026-2학기 남가주동문장학회 장학생 선발 공고",
    "amountFrom": "공고 원문",
    "openDate": "2026-08-03",
-   "announceDate": "2026-08-28"
+   "announceDate": "2026-08-28",
+   "applyPortal": "HUFS Ability",
+   "applyPortalSource": "4. 지원방법 : 온라인 신청 (HUFS Ability - 학생핵심역량통합시스템 ) - 로그인 ( 학 번 / 비번 ) - 교과 / 비교과 - 해당 장학금 선택",
+   "applyPortalFrom": "공고 원문"
   },
   {
    "type": "교외",
@@ -1354,7 +1372,10 @@
     "2. 장학금 지급액 : 500 만원 /1 인 ( 학업지원비 ( 생활비 ) 로 지급 ) ( 타 대외 장학금과 이중수혜 금지 )"
    ],
    "eligibilityFrom": "AI(원문 줄 그대로)",
-   "eligibilityReviewed": false
+   "eligibilityReviewed": false,
+   "applyPortal": "HUFS Ability",
+   "applyPortalSource": "6. 신청방법 : 온라인신청 (HUFS Ability- 학생핵심역량통합시스템 ) - 로그인 ( 학번 / 비번 ) - 교과 / 비교과 – 장학신청목록 - 해당 장학금",
+   "applyPortalFrom": "공고 원문"
   },
   {
    "type": "교외",
@@ -1782,7 +1803,10 @@
    },
    "amountFrom": "공고 원문",
    "exclusivityFrom": "공고 원문",
-   "aiTries": 1
+   "aiTries": 1,
+   "applyPortal": "인포21",
+   "applyPortalSource": "4. 신청 접수 : 2026년 8월 26일(수)까지 인포21 신청",
+   "applyPortalFrom": "공고 원문"
   },
   {
    "id": "auto-oardid322606menuno200318",
@@ -1974,7 +1998,10 @@
     ]
    },
    "eligibilityFrom": "AI(원문 줄 그대로)",
-   "eligibilityReviewed": false
+   "eligibilityReviewed": false,
+   "applyPortal": "HUFS Ability",
+   "applyPortalSource": "7. 신청방법 : 온라인 신청 (HUFS Ability – 학생핵심역량통합시스템 – 로그인 ( 학번 / 비번 ) - 교과 / 비교과 – 장학신청 목록 - 해당 장학금 선택",
+   "applyPortalFrom": "공고 원문"
   },
   {
    "id": "auto-ent2431263858artclviewdo",
@@ -2046,7 +2073,10 @@
     ]
    },
    "eligibilityFrom": "AI(원문 줄 그대로)",
-   "eligibilityReviewed": false
+   "eligibilityReviewed": false,
+   "applyPortal": "HUFS Ability",
+   "applyPortalSource": "가 . 온라인신청 (HUFS Ability( 학생핵심역량통합시스템 ) → 로그인 ( 학번 / 비번 ) → 교과 / 비교과 → 장학신청 목록 → 해당 장학금",
+   "applyPortalFrom": "공고 원문"
   },
   {
    "id": "auto-ent2431264156artclviewdo",
@@ -2189,7 +2219,10 @@
     ]
    },
    "eligibilityFrom": "AI(원문 줄 그대로)",
-   "eligibilityReviewed": false
+   "eligibilityReviewed": false,
+   "applyPortal": "HUFS Ability",
+   "applyPortalSource": "6. 신청방법 : 온라인 신청 (HUFS Ability- 학생핵심역량통합시스템 ) → 로그인 ( 학번 / 비번 ) → 교과 / 비교과 → 장학신청 목록 → 해당 장학금",
+   "applyPortalFrom": "공고 원문"
   },
   {
    "id": "auto-84a0ebb09c20ec9588eb82b4",
@@ -2944,7 +2977,10 @@
     ]
    },
    "eligibilityFrom": "AI(원문 줄 그대로)",
-   "eligibilityReviewed": false
+   "eligibilityReviewed": false,
+   "applyPortal": "HUFS Ability",
+   "applyPortalSource": "6 신청방법 : 온라인 신청 (HUFS Ability- 학생핵심역량통합시스템 ) → 로그인 ( 학번 / 비번 ) → 교과 / 비교과 → 장학신청 목록 → 해당 장학금 선택",
+   "applyPortalFrom": "공고 원문"
   },
   {
    "id": "auto-oardid323027menuno200318",
@@ -3201,7 +3237,10 @@
     "* 현재 모집중인 타 장학금과 중복신청 불가"
    ],
    "eligibilityFrom": "AI(원문 줄 그대로)",
-   "eligibilityReviewed": false
+   "eligibilityReviewed": false,
+   "applyPortal": "HUFS Ability",
+   "applyPortalSource": "6. 신청방법 : 온라인 신청 (HUFS Ability- 학생핵심역량통합시스템 ) → 로그인 ( 학번 / 비번 ) → 교과 / 비교과 → 장학신청 목록 → 해당 장학금",
+   "applyPortalFrom": "공고 원문"
   },
   {
    "id": "auto-ent2431266533artclviewdo",
@@ -3331,7 +3370,10 @@
    "eligibilityFrom": "AI(원문 줄 그대로)",
    "eligibilityReviewed": false,
    "sameAs": "하나금융나눔재단",
-   "sameAsFrom": "자동"
+   "sameAsFrom": "자동",
+   "applyPortal": "인포21",
+   "applyPortalSource": "신청방법: 인포21을 통한 신청",
+   "applyPortalFrom": "공고 원문"
   },
   {
    "id": "auto-99ec839d20ec84a0ebb09c20",
@@ -3509,7 +3551,10 @@
     "max": 1000000,
     "raw": "2. 선발인원 및 지원금액 : 2 명 ( 서울 1 명 , 글로벌 헝가리학 1 명 ), 생활비 장학금 1 인 1,000,000 원"
    },
-   "amountFrom": "공고 원문"
+   "amountFrom": "공고 원문",
+   "applyPortal": "HUFS Ability",
+   "applyPortalSource": "6. 신청방법 : 온라인 신청 (HUFS Ability- 학생핵심역량통합시스템 ) → 로그인 ( 학번 / 비번 ) → 교과 / 비교과 → 장학신청 목록 → 해당 장학금",
+   "applyPortalFrom": "공고 원문"
   },
   {
    "id": "auto-ent2431266737artclviewdo",
@@ -4156,7 +4201,10 @@
    },
    "amountFrom": "공고 원문",
    "sameAs": "하나금융나눔재단",
-   "sameAsFrom": "자동"
+   "sameAsFrom": "자동",
+   "applyEmail": "scholarship@hufs.ac.kr",
+   "applyEmailSource": "■ 접수 방법: scholarship@hufs.ac.kr 이메일 접수",
+   "applyEmailFrom": "공고 원문"
   },
   {
    "id": "auto-20ec9588eb82b40922ed9994",
