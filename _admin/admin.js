@@ -3242,6 +3242,9 @@ function detailSheet(itRaw) {
                   placeholder="비우면 전국" /></div>
               <div class="field"><label for="eg-campusOnly">캠퍼스</label>
                 <input type="text" id="eg-campusOnly" data-eg="campusOnly" value="${esc(e.campusOnly || '')}" /></div>
+              <div class="field"><label for="eg-schoolsAny">지원 대상 대학 (여러 곳)</label>
+                <input type="text" id="eg-schoolsAny" data-eg="schoolsAny" value="${esc((e.schoolsAny || []).join(', '))}"
+                  placeholder="쉼표로 구분 · 한 캠퍼스만이면 학교|캠퍼스" /></div>
               <div class="field"><label for="eg-years">학년</label>
                 <input type="text" id="eg-years" data-eg="years" value="${esc((e.years || []).join(','))}"
                   placeholder="예: 1,2" /></div>

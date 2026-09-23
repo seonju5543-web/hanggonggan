@@ -8286,6 +8286,7 @@ console.log('\n■ 학교가 스스로 운영하는 장학 제도 (2026-09-20)')
     '공통 [공통] 2026학년도 2학기 우정장학(학업장려금) 신청 안내',
     '공통 [공통] 2026학년도 2학기 우정장학(가계곤란) 복학생/재입학생 신청 안내',
     '공통 [공통] 2026학년도 2학기 경희꿈도전장학 신청 안내',
+    '공통 [공통] 2026학년도 2학기 점프장학 신청 안내_09.22(화)~10.9(금)',   // 2026-09-23 · 단과대학 장학예산
   ];
   eq('경희대가 직접 주는 장학금은 교내다', 교내.filter((t) => noticeKind(t, '경희대학교') !== '교내'), []);
 
@@ -8780,6 +8781,46 @@ return { submitChannelKind, submitChannelLabel };`)();
      적혀 있다면 화면이 그것을 쓰는지까지는 이 관문이 보지 않는다(verify-settings 의 몫). */
   const h = supportSrc.match(/\bhours:\s*'([^']*)'/);
   eq('응대 시간 칸이 있다 (비어 있어도 된다)', !!h, true);
+}
+
+/* ── 2026-09-23 · 여러 대학만 받는 공고 (`schoolsAny`) + 분야 이름 학과 판정 ──
+   개발자 지시 *"k 원전 장학은 당연히 지원 대상 대학에 재학중인 학생의 화면에서만 떠야할 것이고,
+   이에 따른 자격매칭도 수반되어야 할 것"*. 포스터가 「2026년 기준 지원대상 대학(13개교)」을
+   적어 두는데 우리 칸은 학교 하나(`schoolOnly`)뿐이라 경희대 학생에게만 떴다.
+   그리고 `원자력 관련 학과` 를 학과명과 **같은 글자**로만 대조해 원자력공학과 학생도 '모름'이었다.
+   🔴 규칙을 베끼지 않는다 — match-engine 을 불러 쓴다. */
+console.log('\n■ 여러 대학만 받는 공고 · 분야 이름 학과 판정 (2026-09-23)');
+{
+  const ME = createRequire(import.meta.url)('../match-engine.js');
+  const sch = { id: 't', eligibility: { selective: true,
+    schoolsAny: ['서울대학교', '경희대학교|국제캠퍼스(용인)', '단국대학교|천안캠퍼스'] },
+    eligibilityLines: ['대한민국 국적의 지원대상 대학(원) 재학생 중 원자력 관련 학과 또는 연계 전공으로 인정된 대학생 및 대학원생(일반대학원 석사과정 전일제)'] };
+  const seen = (p) => ME.scopedToProfile([sch], p).length === 1;
+  eq('목록의 대학 학생에게 보인다', seen({ school: '서울대학교' }), true);
+  eq('  목록 밖 학교 학생에게는 안 보인다', seen({ school: '한국외국어대학교' }), false);
+  eq('  한 캠퍼스만 대상이면 다른 캠퍼스 학생에게 안 보인다',
+    [seen({ school: '경희대학교', campus: '국제캠퍼스(용인)' }), seen({ school: '경희대학교', campus: '서울캠퍼스' })], [true, false]);
+  eq('  캠퍼스를 안 적은 학생에게는 보인다(schoolOnly/campusOnly 와 같게)', seen({ school: '단국대학교', campus: '' }), true);
+  eq('  자격 판정도 목록 밖 학교를 미달로 본다',
+    ME.evaluate(sch, { school: '한국외국어대학교', year: 3, flags: [] }).status, 'ineligible');
+
+  /* 관리자 저장 경로가 이 칸을 조용히 버리면 다음 수정 때 전국 공고로 되돌아간다 */
+  const apply = readText(new URL('../tools/admin-apply.mjs', import.meta.url));
+  eq('  관리자 저장 경로가 schoolsAny 칸을 받는다', /schoolsAny:\s*'strArr'/.test(apply), true);
+
+  /* 분야 이름: 학과명에 그 분야가 들어 있으면 ✓, 아니면 '모름'(연계 전공일 수 있어 미달 아님) */
+  const base = { school: '서울대학교', year: 3, status: '재학', nationality: 'korean', flags: [], track: 'engineering' };
+  const majorVerdict = (major) => {
+    const fd = ME.fitDetail(sch, { ...base, major });
+    return fd.fails.length ? 'fail' : (fd.met === fd.total && fd.total ? 'pass' : 'unknown');
+  };
+  eq('  `원자력 관련 학과` 에 원자력공학과·원자력·양자공학과가 맞는다',
+    [majorVerdict('원자력공학과'), majorVerdict('원자력·양자공학과')], ['pass', 'pass']);
+  eq('  다른 학과는 미달이 아니라 모른다', majorVerdict('국어국문학과'), 'unknown');
+  /* 🔴 학과 **이름** 대조는 여전히 같은 글자다 — `국제학부` 요건에 국제통상학과가 ✓ 받던 사고 */
+  const byName = { id: 'n', eligibility: {}, eligibilityLines: ['국제학부 재학생'] };
+  eq('  학과 이름 요건은 부분 일치로 잇지 않는다',
+    ME.fitDetail(byName, { ...base, major: '국제통상학과' }).met, 0);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');

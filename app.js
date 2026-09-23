@@ -2745,6 +2745,7 @@ function bulkTags(sch) {
   const L = (typeof FLAG_LABELS !== 'undefined' && FLAG_LABELS) || {};
 
   if (e.schoolOnly) add('우리 학교 공고');
+  if (e.schoolsAny) add('지원 대상 대학');
   if (e.flagsAny) e.flagsAny.forEach((f) => add(L[f] || f));
   if (e.minGpa != null) add(`평점 ${e.minGpa} 이상`);
   if (e.maxBracket != null) add(`소득 ${e.maxBracket}구간 이하`);

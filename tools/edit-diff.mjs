@@ -60,6 +60,7 @@ export const ELIG_KEYS = {
   selective: 'bool',
   schoolOnly: 'str',
   campusOnly: 'str',
+  schoolsAny: 'strArr', // "학교" 또는 "학교|캠퍼스" — match-engine.js inSchoolsAny
   years: 'numArr',      // [1,2,3,4]
   minGpa: 'num',
   maxBracket: 'num',
@@ -68,7 +69,7 @@ export const ELIG_KEYS = {
 
 /* 자격 칸을 사람 말로 — 화면이 `{"schoolOnly":"경희대학교"}` 를 그대로 뱉으면 못 읽는다 */
 export const ELIG_LABEL = {
-  selective: '선발제', schoolOnly: '학교 한정', campusOnly: '캠퍼스 한정',
+  selective: '선발제', schoolOnly: '학교 한정', campusOnly: '캠퍼스 한정', schoolsAny: '지원 대상 대학',
   years: '학년', minGpa: '최소 학점', maxBracket: '소득구간 상한', tracks: '계열',
 };
 

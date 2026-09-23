@@ -783,7 +783,9 @@ function parseMajor(t) {
       if (/(대학교|대학|대)$/.test(n)) continue;
       fields.push(n);
     }
-    if (fields.length) return { kind: 'major', names: fields, fuzzy: true, conf: LOW };
+    /* `field` — 이 이름은 학과명이 아니라 **분야**다. 판정은 '학과명에 그 분야가 들어 있는가'로 한다
+       (match-engine 'major' ③). 같은 글자 대조로는 `원자력 관련 학과` 에 원자력공학과가 안 맞았다. */
+    if (fields.length) return { kind: 'major', names: fields, field: true, fuzzy: true, conf: LOW };
   }
   if (!names.length && !tracks.length) return null;
   return {

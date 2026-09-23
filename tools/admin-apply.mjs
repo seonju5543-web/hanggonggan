@@ -100,6 +100,7 @@ const ELIG_KEYS = {
   selective: 'bool',
   schoolOnly: 'str',
   campusOnly: 'str',
+  schoolsAny: 'strArr', // "학교" 또는 "학교|캠퍼스" — match-engine.js inSchoolsAny
   years: 'numArr',      // [1,2,3,4]
   minGpa: 'num',
   maxBracket: 'num',

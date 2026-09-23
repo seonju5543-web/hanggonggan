@@ -100,6 +100,11 @@ function evaluate(sch, p) {
     else reasons.push(`재학 대학 공고 (${e.schoolOnly})`);
   }
 
+  if (e.schoolsAny) {
+    if (!inSchoolsAny(e, p)) { ok = false; reasons.push(`지원 대상 대학(${e.schoolsAny.length}곳) 재학생만 지원 가능`); }
+    else reasons.push(`지원 대상 대학 재학 (${p.school})`);
+  }
+
   /* 🔴 이중수혜 (2026-08-27 개발자 지적으로 신설).
      공고 원문 66건에 `타 재단 장학금 중복수혜 불가` 같은 조항이 있는데, 그동안 학생이
      보는 자리에는 **0건** 노출이었다. 이 조항은 자격 절에도 제외 절에도 안 살고
@@ -352,7 +357,9 @@ function judgeCond(c, p, ctx) {
       if (trackHit) return c.exclude ? 'fail' : 'pass';
       /* ③ 학과·학부 이름 */
       if (c.names && mine) {
-        const hit = c.names.some((n) => like(mine, norm(n)));
+        /* 분야 이름(`원자력 관련 학과` → `원자력`)은 학과명에 **들어 있으면** 맞다 — 원자력공학과·
+           원자력·양자공학과. 학과 이름끼리는 위 주석대로 부분 일치로 잇지 않는다. (2026-09-23) */
+        const hit = c.names.some((n) => (c.field ? mine.includes(norm(n)) : like(mine, norm(n))));
         if (hit) return c.exclude ? 'fail' : 'pass';
         if (c.fuzzy) return 'unknown';
         return c.exclude ? 'pass' : 'fail';
@@ -707,6 +714,20 @@ function notStale(sch, now) {
   return Math.round((startOfToday - listed) / 86400000) <= STALE_DAYS;
 }
 
+/* 여러 대학만 받는 공고 (2026-09-23 · 푸른등대 k-원전 — "2026년 기준 지원대상 대학(13개교)").
+   `schoolsAny` 는 `"학교"` 또는 `"학교|캠퍼스"` 글자들이다 — 한 캠퍼스만 대상인 학교가 있다
+   (경희대학교 국제캠퍼스 · 단국대학교 천안캠퍼스). 학교 이름은 data.js UNIVERSITIES 와 같은 글자.
+   캠퍼스를 모르는 학생은 schoolOnly/campusOnly 와 같게 **보여 준다**(숨기면 캠퍼스 칸을 안 채운
+   학생에게 영영 안 뜬다). */
+function inSchoolsAny(e, p) {
+  if (!e.schoolsAny) return true;
+  if (!p || !p.school) return false;
+  return e.schoolsAny.some((x) => {
+    const [school, campus] = String(x).split('|');
+    return school === p.school && (!campus || !p.campus || campus === p.campus);
+  });
+}
+
 /* 학교·캠퍼스 한정 공고 걸러내기 — 다른 학교 공고가 목록·알림에 섞이지 않게 */
 function scopedToProfile(list, p) {
   if (!p) return [];
@@ -714,6 +735,7 @@ function scopedToProfile(list, p) {
     const e = s.eligibility || {};
     if (e.schoolOnly && e.schoolOnly !== p.school) return false;
     if (e.campusOnly && p.campus && e.campusOnly !== p.campus) return false;
+    if (!inSchoolsAny(e, p)) return false;
     return true;
   });
 }
@@ -813,6 +835,7 @@ const OWN_PROGRAMS = {
     '반영장학',        // 첨부 공지문: 대외협력처 대외협력팀이 접수·심사·지급(ysy922@khu.ac.kr), 외부 재단 없음
     '우정장학',        // 위 공지문이 "본 장학에 선발된 학생은 우정장학(학업장려금) 수혜 불가"로 제 제도끼리 배타를 건다
     '경희꿈도전장학',  // 첨부 계획(안): 지도교수 추천서·교내 심사 2단계·"경희정신 구현" 도전분야
+    '점프장학',        // 2026-09-23 본문 이미지: "단과대학 장학예산에 따라" 지급 · "교내 장학 공통 자격 요건" · INFO21 신청
   ],
 };
 
@@ -1444,7 +1467,7 @@ function requirementStruct(sch) {
 /* Node(검증 스크립트)에서도 같은 엔진을 불러 쓸 수 있게 — 브라우저·서비스워커에는 영향 없음 */
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { evaluate, fitScore, fitDetail, judgeCond, FIT_UNREAD, FIT_FLOOR, FIT_MAX, FIT_MIN,
-                     scopedToProfile, notStale, STALE_DAYS,
+                     scopedToProfile, inSchoolsAny, notStale, STALE_DAYS,
                      requirementLines, requirementStruct, requirementMatch, tidyRequirement,
                      REQ_SIGNAL, NOT_A_REQUIREMENT, EXCLUDE_LINE, HARD_THRESHOLD,
                      noticeForProfile, taggedSchool, SHARED_BOARD_BRANCH, SERVED_SCHOOLS,
