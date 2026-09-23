@@ -8429,9 +8429,16 @@ return { submitChannelKind, submitChannelLabel };`)();
   /* 실제 데이터로도 — 근거 없는 단정이 0건인가 */
   const reg = JSON.parse(readText(new URL('../data/registered.json', import.meta.url)));
   const claimed = reg.items.filter((it) => kind(it) === 'portal');
+  /* 🔴 근거는 **두 갈래**다 (2026-09-23 에 둘째가 생겼다) — 화면에 실린 발췌 줄,
+     그리고 로봇이 공고 원문 전체를 읽어 남긴 `applyPortalSource`. 뒤엣것이 더 강하다
+     (발췌는 14칸 상한이라 신청방법 줄이 자주 밀려난다 — 실측 원문 15건 vs 발췌 1건).
+     ⚠️ 이 검사의 이빨은 그대로다: **어느 쪽이든 근거가 있어야** 포털이라고 부를 수 있고,
+        `applyPortalSource` 는 그 안에 **시스템 이름이 실제로 들어 있어야** 근거로 친다. */
+  const PORTAL_WORDS = /종합정보시스템|HUFS\s?Ability|학사정보시스템|학생지원시스템|포털|인포\s?21|INFO\s?21/i;
   const baseless = claimed.filter((it) => {
     const t = [].concat(it.documents || [], it.excerpts || []).join(' ');
-    return !/종합정보시스템|HUFS\s?Ability|학사정보시스템|학생지원시스템|포털|인포\s?21|INFO\s?21/i.test(t);
+    if (PORTAL_WORDS.test(t)) return false;
+    return !(it.applyPortalSource && PORTAL_WORDS.test(it.applyPortalSource));
   });
   eq('등록 데이터에 근거 없는 포털 단정이 없다', baseless.length, 0);
 }
@@ -8472,33 +8479,53 @@ return { submitChannelKind, submitChannelLabel };`)();
     return (r.stdout || '') + (r.stderr || '');
   };
   /* 최근 커밋 둘이 실려 있어야 잴 수 있다 — 얕은 클론이면 건너뛴다(거짓 빨간불 금지). */
-  /* 🔴 **사람 커밋이 든 범위를 골라야 한다.** 그냥 `HEAD~2` 를 쓰면 그 둘이 마침 로봇
-     커밋인 날(수집 로봇이 하루 열 번 커밋한다) 이 검사가 **까닭 없이 빨간불**이 된다 —
-     관문이 흔들리면 다음 사람이 관문 전체를 꺼 버린다(2026-08-29 교훈). */
-  const root = fileURLToPath(new URL('..', import.meta.url));
-  const human = spawnSync('git', ['log', '-n', '60', '--no-merges', '--pretty=format:%H%x09%ae'],
-    { cwd: root, encoding: 'utf8' });
-  const rows = (human.stdout || '').split('\n').filter(Boolean).map((l) => l.split('\t'));
-  const firstHuman = rows.findIndex(([, ae]) => !/\[bot\]|handaejang-bot/.test(ae));
-  const anchor = firstHuman >= 0 && rows[firstHuman + 1] ? rows[firstHuman + 1][0] : '';
-  if (human.status !== 0 || !anchor) {
-    console.log('  (이력에서 사람 커밋을 못 찾아 동작 검사를 건너뜁니다 — fetch-depth: 0 이 필요합니다)');
-  } else {
-    const before = anchor;   // 사람 커밋 하나를 확실히 담는 범위
-    const pushed = run({ GITHUB_ACTOR: 'didinin-wq', GITHUB_EVENT_BEFORE: before });
-    eq('push 근거가 주소 근거를 이긴다 (낡음 경고가 안 뜬다)', /지금 한 일이 아닙니다/.test(pushed), false);
-    eq('push 로 올린 커밋을 적는다', /최근 커밋:[\s\S]*\d\d-\d\d \d\d:\d\d ·/.test(pushed), true);
+  /* 🔴 **저장소 이력에 기대지 않는다** (2026-09-23 · 두 번째 판).
+     첫 판은 이 저장소의 최근 커밋에서 범위를 골랐는데, 기본 브랜치를 한 번 병합하자
+     닻부터 **34커밋**(PUSH_MAX 30 초과)이 되어 로봇이 '따라잡기 push' 로 올바르게
+     판정했고 **관문만 빨간불**이 됐다. 로봇은 멀쩡한데 검사가 흔들린 것이다 —
+     그런 관문은 다음 사람이 통째로 꺼 버린다(2026-09-11 '통과할 수 없는 관문' 교훈).
+     그래서 **검사가 제 저장소를 만들어** 잰다: 커밋 둘(사람 하나·로봇 하나)만 있는
+     깨끗한 이력이라 병합·수집 커밋이 아무리 쌓여도 결과가 안 변한다. */
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'notion-gate-'));
+  const git = (...a) => spawnSync('git', a, { cwd: tmp, encoding: 'utf8' });
+  git('init', '-q', '-b', 'main');
+  git('config', 'user.email', 'dhdp0105@gmail.com');
+  git('config', 'user.name', '유은서');
+  fs.writeFileSync(path.join(tmp, 'seed.txt'), 'x');
+  git('add', '-A'); git('commit', '-qm', '씨앗 커밋');
+  const before = git('rev-parse', 'HEAD').stdout.trim();
+  /* 사람이 만진 파일 — AREAS 가 '한국장학재단 목록'으로 읽는 경로를 일부러 고른다 */
+  fs.mkdirSync(path.join(tmp, 'collector'), { recursive: true });
+  fs.writeFileSync(path.join(tmp, 'collector/kosaf-open.mjs'), '// 고침');
+  git('add', '-A'); git('commit', '-qm', '층2 목록을 고쳤다');
 
-    /* 🔴 되돌림 검사 — push 근거를 빼앗으면 **반드시 낡음 경고가 떠야 한다.**
-       이 한 줄이 이번 사고 그 자체다(주소 근거밖에 없을 때 9/6 을 오늘로 적던 것). */
-    const noPush = run({ GITHUB_ACTOR: 'didinin-wq' });
-    eq('근거가 낡으면 낡았다고 적는다', /지금 한 일이 아닙니다/.test(noPush), true);
-    eq("낡으면 '지금 하는 일' 을 덮지 않는다", /지금 하는 일: \(못 읽어서 그대로 둠\)/.test(noPush), true);
+  const runIn = (env) => {
+    const r = spawnSync(process.execPath,
+      [fileURLToPath(new URL('../tools/notion-status.mjs', import.meta.url)), '--dry'],
+      { cwd: tmp, encoding: 'utf8',
+        env: { ...process.env, NOTION_TOKEN: 'dry', GITHUB_EVENT_BEFORE: '', GITHUB_REF_NAME: 'main', ...env } });
+    return (r.stdout || '') + (r.stderr || '');
+  };
 
-    /* 근거가 아예 없으면 — 남의 커밋으로 채우지 않는다 */
-    const none = run({ GITHUB_ACTOR: 'seonju5543-web' });
-    eq('근거가 없으면 못 찾았다고 적는다', /사람 커밋을 찾지 못했습니다/.test(none), true);
-  }
+  const pushed = runIn({ GITHUB_ACTOR: 'didinin-wq', GITHUB_EVENT_BEFORE: before });
+  eq('push 근거가 주소 근거를 이긴다 (낡음 경고가 안 뜬다)', /지금 한 일이 아닙니다/.test(pushed), false);
+  eq('push 로 올린 커밋을 적는다', /층2 목록을 고쳤다/.test(pushed), true);
+  eq("'지금 하는 일' 은 만진 파일에서 읽는다", /지금 하는 일: 한국장학재단 목록/.test(pushed), true);
+
+  /* 🔴 되돌림 검사 — push 근거를 빼앗으면 **반드시 낡음 경고가 떠야 한다.**
+     이 한 줄이 2026-09-22 사고 그 자체다(주소 근거밖에 없을 때 9/6 을 오늘로 적던 것).
+     이 임시 저장소에는 은서 주소로 된 커밋이 '씨앗'뿐이고 그건 방금 만든 것이라
+     낡지 않았다 — 그래서 **일부러 오래된 날짜로** 하나 더 얹어 낡음을 만든다. */
+  git('-c', 'user.email=dhdp0105@gmail.com', 'commit', '-q', '--allow-empty',
+      '--date=2020-01-02T00:00:00', '-m', '아주 오래된 커밋');
+  const noPush = runIn({ GITHUB_ACTOR: 'didinin-wq' });
+  eq('근거가 낡으면 낡았다고 적는다', /지금 한 일이 아닙니다/.test(noPush), true);
+  eq("낡으면 '지금 하는 일' 을 덮지 않는다", /지금 하는 일: \(못 읽어서 그대로 둠\)/.test(noPush), true);
+
+  /* 근거가 아예 없으면 — 남의 커밋으로 채우지 않는다(이선주는 emails 가 비어 있다) */
+  const none = runIn({ GITHUB_ACTOR: 'seonju5543-web' });
+  eq('근거가 없으면 못 찾았다고 적는다', /사람 커밋을 찾지 못했습니다/.test(none), true);
+  fs.rmSync(tmp, { recursive: true, force: true });
 }
 
 /* ── 🔴 메일 접수 주소 — 문의처를 접수처라고 부르지 않는다 (2026-09-23 신설) ──
@@ -8589,6 +8616,93 @@ return { submitChannelKind, submitChannelLabel };`)();
   const mailed = reg.items.filter((x) => x.applyEmail);
   eq('접수 메일 주소가 들어 있다 (0건이면 통로가 다시 막힌 것)', mailed.length > 0, true);
   eq('전부 근거 문장을 달고 있다', mailed.filter((x) => !(x.applyEmailSource || '').includes(x.applyEmail)), []);
+}
+
+/* ── 🔴 포털 신청 — '어느 시스템'까지 읽는다 (2026-09-23 신설) ──
+   그전까지 포털 공고에 앱이 하는 말은 **학교 포털 주소 하나**였다. 그런데 한국외대는
+   시스템이 둘이라(신청 `HUFS Ability` · 계좌 `종합정보시스템`) 학교로만 고르면 학생을
+   계좌 등록 화면으로 보낸다 — 거기엔 신청 버튼이 없어서 끝까지 못 찾는다.
+   🔴 **길은 우리가 쓰지 않는다** — 원문에 통째로 적혀 있으므로 그 문장을 그대로 보인다
+      (원칙 8-1). 우리가 다시 쓰면 추론이 되고, 학교가 메뉴를 바꾸면 거짓이 된다.
+   🔴 픽스처는 **전부 실제 공고 원문 줄**이다. 오탐 셋(다운로드·선발확인·지급계좌)이
+      '받아야' 줄보다 중요하다 — 그게 학생을 엉뚱한 화면으로 보내는 길이다. */
+{
+  console.log('\n■ 포털 신청 시스템 (2026-09-23)');
+  const req = createRequire(import.meta.url);
+  const { judgePortalLine, findApplyPortal, PORTAL_SYSTEMS } = req('../apply-channel.js');
+  const exc = readText(new URL('../collector/extract-excerpts.mjs', import.meta.url));
+  const dataJs = readText(new URL('../data.js', import.meta.url));
+  const appJs = readText(new URL('../app.js', import.meta.url));
+  const take = (l) => { const v = judgePortalLine(l); return !!(v && v.ok); };
+  const sysOf = (l) => { const v = judgePortalLine(l); return v && v.ok ? v.system : null; };
+
+  /* ① 내는 곳을 말하는 줄 — 받는다 (셋 다 실제 원문) */
+  eq('HUFS Ability 신청방법 줄을 받는다',
+    sysOf('6. 신청방법 : 온라인 신청 (HUFS Ability- 학생핵심역량통합시스템 ) → 로그인 ( 학번 / 비번 ) → 교과 / 비교과 → 장학신청 목록 → 해당 장학금'), 'HUFS Ability');
+  eq('종합정보시스템 신청방법 줄을 받는다',
+    sysOf('3. 신청 방법 : 종합정보시스템 로그인 - 등록 / 장학정보 - 면학장학금 신청'), '종합정보시스템');
+  eq('인포21 신청방법 줄을 받는다', sysOf('신청방법: 인포21을 통한 신청'), '인포21');
+  eq('인포21 접수 줄도 받는다', sysOf('4. 신청 접수 : 2026년 8월 26일(수)까지 인포21 신청'), '인포21');
+
+  /* ② 🔴 내는 곳이 **아닌** 줄 — 전부 실제 원문. 여기가 이 절의 심장이다. */
+  eq('양식 받는 곳은 접수처가 아니다',
+    take('가 . 장학금 신청서 ( HUFS Ability 다운로드 )'), false);
+  eq('결과 보는 곳은 접수처가 아니다',
+    take('다 . 선발확인 : HUFS Ability 로그인 후 장학금 신청내역에서 확인'), false);
+  eq('입금 계좌는 접수처가 아니다',
+    take('7. 지급방법 : 계좌 지급 ( 종합정보시스템 등록 계좌로 지급 예정 )'), false);
+  eq('계좌 등록 안내도 접수처가 아니다',
+    take('※ 종합정보시스템 로그인 → 등록 / 장학 → 본인명의 계좌입력'), false);
+  /* 🔴 경희대 사이트 상단 메뉴다(웹메일 / 인포21 / 채용시스템) — 실측으로 확인했다 */
+  eq('상단 메뉴의 맨 이름은 접수처가 아니다', take('인포21'), false);
+
+  /* ③ 🔴 `로` 가 `로그인` 첫 글자에 걸리던 것 — 한 글자 겹침이라 눈으로는 안 보인다 */
+  const ch = req('../apply-channel.js');
+  eq('조사 `로` 가 `로그인` 을 먹지 않는다',
+    ch.classifyChannels({ lines: ['다 . 선발확인 : HUFS Ability 로그인 후 장학금 신청내역에서 확인'], attachments: [] })
+      .some((h) => h.kind === '학교 시스템 입력형'), false);
+
+  /* ④ 한 공고에 시스템이 둘이면 **내는 쪽**을 고른다 (실측: 씨앗 장학금이 그 꼴) */
+  const two = findApplyPortal([
+    '6. 신청방법 : 온라인 신청 (HUFS Ability- 학생핵심역량통합시스템 ) → 로그인 → 교과 / 비교과 → 장학신청 목록',
+    '7. 지급방법 : 계좌 지급 ( 종합정보시스템 등록 계좌로 지급 예정 )',
+    '※ 종합정보시스템 로그인 → 등록 / 장학 → 계좌정보 입력',
+  ].join('\n'));
+  eq('시스템이 둘이면 내는 쪽을 고른다', two && two.system, 'HUFS Ability');
+
+  /* ⑤ 두 경로가 같은 함수를 쓴다 (접수 메일에서 낸 실수를 되풀이하지 않는다) */
+  eq("'첨부만' 경로도 포털을 채운다", /fillApplyPortal\(it, null\)/.test(exc), true);
+  eq('본문 경로도 같은 함수를 부른다', /fillApplyPortal\(it, body\)/.test(exc), true);
+
+  /* ⑥ 열쇠가 두 파일에서 같은 글자인가 — 갈라지면 안내가 통째로 사라진다 */
+  const keys = PORTAL_SYSTEMS.map(([k]) => k);
+  eq('시스템 열쇠를 읽어 냈다', keys.length >= 3, true);
+  eq('data.js 의 주소 표가 같은 열쇠를 쓴다',
+    keys.filter((k) => !new RegExp(`'${k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}'\\s*:`).test(dataJs)), []);
+
+  /* ⑦ 🔴 주소를 모르는 시스템은 **링크를 만들지 않는다** — 틀린 링크보다 이름만이 낫다 */
+  eq('주소 미확인 시스템은 url 이 비어 있다', /'종합정보시스템':\s*\{[^}]*url:\s*''/.test(dataJs), true);
+  eq('화면이 url 이 있을 때만 링크를 만든다', /sys\.url\s*\?/.test(appJs), true);
+
+  /* ⑧ 길을 우리가 다시 쓰지 않는다 — 원문 문장을 그대로 보인다 */
+  eq('화면이 근거 문장을 그대로 보인다', /applyPortalSource/.test(appJs), true);
+  /* 🔴 **없는 클래스를 지어내지 않는다** — 만들면서 `.dp-quote` 라는 이름을 새로 지었는데
+     style.css 에 그런 규칙이 없어 스타일 없는 글이 앞 문장에 붙어 나올 참이었다.
+     이 자리에서 쓰는 이름은 CSS 에 실제로 있어야 한다. */
+  const css = readText(new URL('../style.css', import.meta.url));
+  const note = appJs.slice(appJs.indexOf('function schoolPortalNote'), appJs.indexOf('function openDetail'));
+  const used = [...note.matchAll(/class="([a-z][a-z0-9-]*)"/g)].map((m) => m[1]);
+  eq('포털 안내가 쓰는 클래스를 읽어 냈다', used.length > 0, true);
+  eq('그 클래스가 전부 style.css 에 있다',
+    used.filter((c) => !new RegExp(`\\.${c}\\b`).test(css)), []);
+
+  /* ⑨ 실제 데이터 — HTML 기호가 학생 화면에 글자로 새지 않는가 (2026-09-11 사고와 같은 줄) */
+  const reg = JSON.parse(readText(new URL('../data/registered.json', import.meta.url)));
+  const withPortal = reg.items.filter((x) => x.applyPortal);
+  eq('포털 시스템이 들어 있다 (0건이면 통로가 막힌 것)', withPortal.length > 0, true);
+  eq('전부 근거 문장을 달고 있다', withPortal.filter((x) => !x.applyPortalSource), []);
+  const ents = reg.items.filter((x) => /&[a-zA-Z#0-9]+;/.test(`${x.applyPortalSource || ''}${x.applyEmailSource || ''}`));
+  eq('근거 문장에 HTML 기호가 남아 있지 않다', ents.map((x) => x.id), []);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');

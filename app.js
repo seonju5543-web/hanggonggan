@@ -3054,6 +3054,25 @@ function applyLock(result, app, d) {
    🔴 표에 없는 학교는 지어내지 않고 **아무것도 안 띄운다.**
    관문: verify/test-collector.mjs '학교 장학 신청 포털' 절. */
 function schoolPortalNote(sch) {
+  /* 🔴 **공고가 시스템을 말했으면 그 시스템으로 보낸다** (2026-09-23).
+     예전에는 학교 포털 주소 하나만 줬는데, 한국외대는 시스템이 둘이라(신청 HUFS Ability ·
+     계좌 종합정보시스템) 학교로만 고르면 엉뚱한 화면으로 보낸다.
+     🔴 **길은 우리가 쓰지 않는다** — 원문에 통째로 적혀 있으므로 그 문장을 그대로 보여 준다
+        (원칙 8-1). 우리가 다시 쓰면 그 순간 추론이 되고, 학교가 메뉴를 바꾸면 거짓이 된다.
+     🔴 주소를 모르는 시스템은 **이름만** 말한다(틀린 링크보다 낫다). */
+  const sys = portalSystemInfo(sch);
+  if (sys) {
+    const where = sys.url
+      ? `<a href="${esc(safeUrl(sys.url))}" target="_blank" rel="noopener">${esc(sys.label)} ↗</a>`
+      : `<b>${esc(sys.label)}</b>`;
+    /* 🔴 인용은 **이미 있는 `.r-quote`** 를 쓴다 (2026-08-02 에 '원문 그대로 옮긴 문장'
+       용도로 만들어졌는데 아무 데서도 안 쓰이고 있었다). 새 이름을 지어내면 CSS 가 없어
+       스타일 없는 글이 앞 문장에 붙어 나온다 — 만들면서 실제로 그렇게 했다가 잡았다.
+       ⚠️ 블록 스타일(padding-left·border-left)이라 `<span>` 이 아니라 `<p>` 여야 먹는다. */
+    const path = sch.applyPortalSource
+      ? `<p class="r-quote">공고 원문 그대로 — 「${esc(sch.applyPortalSource)}」</p>` : '';
+    return `<p class="dp-note">${where}에서 신청합니다.</p>${path}`;
+  }
   const p = schoolPortal(sch);
   if (!p) return '';
   return `<p class="dp-note">교내 장학금은 <a href="${esc(safeUrl(p.url))}" target="_blank" rel="noopener">${esc(p.label)} ↗</a>에서 신청합니다. 이 공고의 접수 방법은 위 안내와 공고 원문을 따라 주세요.</p>`;

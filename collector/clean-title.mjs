@@ -11,13 +11,20 @@
    게시판이 제목에 따옴표·괄호·부등호를 쓰면 HTML에는 &quot; &#40; &lt; 로 들어 있는데,
    태그만 걷어내면 이 글자들이 그대로 남아 앱 화면에 "&quot;근로지담당자&quot;" 처럼 보인다.
    (2026-08-02 가천·가톨릭·경기대를 붙이면서 발견 — 기존 게시판들은 안 쓰던 표기라 여태 안 드러났다) */
-function decodeEntities(t) {
-  return t
+/* 🔴 **내보낸다** (2026-09-23) — 공고 원문을 학생 화면에 그대로 보여 주는 칸이 늘었다
+   (`applyEmailSource`·`applyPortalSource`). 베껴 쓰면 한쪽만 고쳐져 갈라지므로 여기서 가져간다.
+   ⚠️ 화살표·줄표는 **게시판이 실제로 내보내는 기호**다 — 실측으로 저장된 근거 문장에
+      `&rarr;`·`&ndash;` 가 남아 학생 화면에 글자로 뜰 참이었다(2026-09-11 `&nbsp;` 사고와 같은 줄). */
+export function decodeEntities(t) {
+  return String(t || '')
     .replace(/&#(\d+);/g, (_, d) => String.fromCharCode(+d))
     .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCharCode(parseInt(h, 16)))
     .replace(/&quot;/g, '"').replace(/&apos;/g, "'")
     .replace(/&lt;/g, '<').replace(/&gt;/g, '>')
     .replace(/&nbsp;/g, ' ')
+    .replace(/&rarr;/g, '→').replace(/&larr;/g, '←')
+    .replace(/&ndash;/g, '–').replace(/&mdash;/g, '—')
+    .replace(/&middot;/g, '·').replace(/&hellip;/g, '…')
     .replace(/&amp;/g, '&');   // 반드시 마지막 — 먼저 풀면 &amp;quot; 가 이중 해제된다
 }
 

@@ -25,6 +25,10 @@ const { isExcludeHead: shExclude, headText: shHead } = _cr(import.meta.url)('../
    개인정보 수집 항목이 지원 자격 자리에 앉는다(실제로 겪고 되돌린 적이 있다). */
 import { attachmentText, readable, docOrder, isOcrSource } from './attachment-text.mjs';
 import { findApplyEmail, humanOwnedEmail } from './apply-email.mjs';
+import { decodeEntities } from './clean-title.mjs';
+/* 포털 판정은 `apply-channel.js` 한 곳 — 앱·관리자 화면도 같은 파일을 쓴다(베끼지 말 것).
+   ⚠️ `_cr` 는 위에서 이미 들여왔다 — 다시 import 하면 그 자리에서 죽는다(실제로 그랬다). */
+const { findApplyPortal } = _cr(import.meta.url)('../apply-channel.js');
 
 const HERE = new URL('.', import.meta.url);
 const texts = JSON.parse(fs.readFileSync(new URL('extracted/notices-text.json', HERE), 'utf8'));
@@ -657,7 +661,7 @@ const strip = makeStripper(texts);
 let eligDocs = {};
 try { eligDocs = JSON.parse(fs.readFileSync(new URL('extracted/elig-docs.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
 
-let hit = 0, none = 0, kept = 0, cleaned = 0, fromDoc = 0, gotDeadline = 0, dlFromDoc = 0, gotOpen = 0, gotAnnounce = 0, gotApplyEmail = 0;
+let hit = 0, none = 0, kept = 0, cleaned = 0, fromDoc = 0, gotDeadline = 0, dlFromDoc = 0, gotOpen = 0, gotAnnounce = 0, gotApplyEmail = 0, gotApplyPortal = 0;
 /* 공고문 첨부에서 자격 줄을 읽는다. 본문 경로와 원문 없는 경로가 **같은 함수**를 써야
    "본문 있을 땐 읽고 없을 땐 안 읽는" 어긋남이 안 생긴다. 스캔 PDF 등 글자가 안 나오는
    것은 조용히 건너뛴다(읽은 척하는 것보다 안 읽는 편이 낫다). */
@@ -752,6 +756,7 @@ export function announceFromDocs(it, texts) { return fromDocs(it, extractAnnounc
 /* 접수 메일 주소도 같은 골격을 탄다 — 경희대는 본문이 '첨부파일 확인'으로 끝나
    첨부를 안 보면 접수처를 영영 못 읽는다(실측: 접수 주소 4건 중 2건이 첨부 안에 있었다). */
 export function applyEmailFromDocs(it, texts) { return fromDocs(it, findApplyEmail, texts); }
+export function applyPortalFromDocs(it, texts) { return fromDocs(it, findApplyPortal, texts); }
 
 /* 🔴 **사람이 정한 마감은 로봇이 건드리지 않는다** (2026-09-16 · G-3 ②).
    자격은 `eligibilityFrom` 의 `AI`·`관리자` 표식을 존중하는데 마감은 그 짝이 없었다 —
@@ -783,8 +788,21 @@ function fillApplyEmail(it, body) {
   if (!mail) { mail = applyEmailFromDocs(it); if (mail) from = docLabel(fromDocs.lastFile); }
   if (!mail) return;
   gotApplyEmail += 1;
-  if (WRITE) { it.applyEmail = mail.email; it.applyEmailSource = mail.source; it.applyEmailFrom = from; }
+  if (WRITE) { it.applyEmail = mail.email; it.applyEmailSource = decodeEntities(mail.source); it.applyEmailFrom = from; }
   else console.log(`   [접수메일] ${it.id} → ${mail.email} (${from})`);
+}
+
+/* 포털 시스템을 채우는 자리 **한 곳** — 접수 메일과 똑같이 두 경로가 공용한다.
+   🔴 '첨부만' 경로를 빠뜨리지 말 것(2026-09-23 에 메일에서 실제로 그 실수를 했다). */
+function fillApplyPortal(it, body) {
+  if (it.applyPortal || humanOwnedEmail(it.applyPortalFrom)) return;
+  let got = body ? findApplyPortal(body) : null;
+  let from = '공고 원문';
+  if (!got) { got = applyPortalFromDocs(it); if (got) from = docLabel(fromDocs.lastFile); }
+  if (!got) return;
+  gotApplyPortal += 1;
+  if (WRITE) { it.applyPortal = got.system; it.applyPortalSource = decodeEntities(got.source); it.applyPortalFrom = from; }
+  else console.log(`   [포털] ${it.id} → ${got.system} (${from})`);
 }
 
 function qualFromDocs(it) {
@@ -891,6 +909,7 @@ for (const it of reg.items) {
     const docs = docsOnce(it);
     fillCalendarDates(it, () => openDateFromDocs(it, docs()), () => announceFromDocs(it, docs()));
     fillApplyEmail(it, null);          // 본문이 없으니 첨부에서만 — 본문 경로와 같은 함수
+    fillApplyPortal(it, null);
     kept += 1; continue;
   }
 
@@ -925,6 +944,7 @@ for (const it of reg.items) {
 
   /* 접수 메일 주소 — 규칙도 자리도 `fillApplyEmail` 한 곳(위) · '첨부만' 경로와 공용 */
   fillApplyEmail(it, body);
+  fillApplyPortal(it, body);
 
   /* 접수 시작일·발표일 — 캘린더가 쓴다 (2026-09-07). 마감일과 같은 규칙으로,
      **비어 있을 때만** 채우고 **말이 안 되면 버린다.**
@@ -990,6 +1010,7 @@ console.log(`\n게시판 메뉴를 걷어낸 공고 ${cleaned}건`);
 console.log(`발췌 성공 ${hit}건 · 원문은 읽었으나 발췌 불가 ${none}건 · 원문 미확보라 손대지 않음 ${kept}건`);
 console.log(`마감일을 새로 읽은 공고 ${gotDeadline}건 (그중 공고문 첨부에서 ${dlFromDoc}건)`);
 console.log(`접수 메일 주소를 새로 읽은 공고 ${gotApplyEmail}건`);
+console.log(`포털 신청 시스템을 새로 읽은 공고 ${gotApplyPortal}건`);
 console.log(`접수 시작일 ${gotOpen}건 · 발표일 ${gotAnnounce}건 (캘린더용 — 원문에 있을 때만)`);
 if (WRITE) {
   fs.writeFileSync(regPath, JSON.stringify(reg, null, 1) + '\n');
