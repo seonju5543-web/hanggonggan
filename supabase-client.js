@@ -173,23 +173,81 @@ async function authSignIn(email, password) {
    처방 이름은 single-flight 다: 진행 중인 갱신이 있으면 **새로 부르지 않고 그 하나를 같이 기다린다.**
    ⚠️ `finally` 로 반드시 비운다 — 안 비우면 첫 실패가 영원히 캐시돼 다시는 갱신하지 못한다.
    ⚠️ 이건 **한 탭 안**을 막는다. 탭을 여러 개 띄우면 각 탭이 제 장부를 갖고 있어 여전히 부딪힐
-      수 있다(표준 해법은 Web Locks API). 지금은 로그인 자체가 꺼져 있어 급하지 않고,
-      켜기 전에 결정할 일로 남겨 둔다. */
+      수 있다(표준 해법은 Web Locks API). → **2026-09-23 에 막았다. 아래를 볼 것.** */
+
+/* 🔴 **탭 사이도 막는다** (2026-09-23 — 위 ⚠️ 가 "켜기 전에 결정할 일"로 남겨 둔 그 숙제).
+   로그인이 실제로 켜져 앱에 배포된 뒤라 더 미룰 수 없었다. 실측한 피해는 이렇다:
+   탭 A 가 갱신에 성공하면 탭 B 가 든 갱신 토큰은 **그 순간 죽는다**. 탭 B 의 이 함수가
+   false 를 돌려주고, `sbAuthed` 가 그것을 "로그인이 끝났다"로 읽어 `authClear()` —
+   탭 A 가 방금 받아 온 **멀쩡한 토큰까지** 지운다. 두 탭이 같이 로그아웃된다.
+
+   ① 줄을 세운다(Web Locks) — 탭 B 는 탭 A 가 끝날 때까지 기다린다.
+   ② 🔴 **기다린 뒤에는 서버를 다시 부르지 않는다.** 줄만 세우면 탭 B 는 제 차례에
+      여전히 죽은 토큰을 내민다(순서만 바뀌고 결과는 같다). 그래서 잠금을 잡은 **직후에
+      저장소를 다시 읽어**, 토큰이 바뀌어 있으면 '이미 누가 해 놨다'로 보고 성공을 돌려준다.
+      ①만으로는 안 고쳐진다 — 실제로 고치는 것은 ②다.
+   ⚠️ 잠금을 못 쓰는 환경이면 **지금 동작 그대로** 둔다(한 탭 안 보호는 남는다).
+      기능이 없다고 로그인이 깨지면 안 된다.
+   관문: verify/verify-supabase.js [9] 절 — 탭 두 개를 **같은 context** 에 띄우고
+        가짜 서버가 실제로 토큰을 회전시킨다(안 그러면 이 사고가 재현되지 않는다). */
+const AUTH_LOCK = 'handaejang-auth-refresh';
+
+/* 잠금을 잡고 부른다. ⚠️ **fn 이 시작됐는지 기억한다** — 안 그러면 fn 이 던진 오류를
+   '잠금을 못 잡았다'로 잘못 읽고 fn 을 두 번 부른다(갱신을 두 번 하는 셈이라 사고가 되돌아온다). */
+function withAuthLock(fn) {
+  const locks = typeof navigator !== 'undefined' && navigator.locks;
+  if (!locks || typeof locks.request !== 'function') return fn();
+  let started = false;
+  const wrapped = () => { started = true; return fn(); };
+  return Promise.resolve()
+    .then(() => locks.request(AUTH_LOCK, wrapped))
+    .catch((e) => { if (started) throw e; return fn(); });
+}
+
 let authRefreshing = null;
 
 async function authRefresh() {
   if (authRefreshing) return authRefreshing;          // 이미 돌고 있으면 그것을 같이 기다린다
-  authRefreshing = (async () => {
-    const t = authLoad();
-    if (!t || !t.refreshToken) return false;
-    const res = await sbFetch('/auth/v1/token?grant_type=refresh_token', {
-      method: 'POST', body: { refresh_token: t.refreshToken },
-    });
-    if (!res.ok || !res.json || !res.json.access_token) return false;
-    authStore(res.json);
-    return true;
-  })();
+  /* 🔴 기다리기 **전에** 적어 둔다 — 기다린 뒤에 읽으면 무엇이 바뀌었는지 알 수 없다. */
+  const had = (authLoad() || {}).refreshToken || '';
+  authRefreshing = withAuthLock(() => authRefreshLocked(had));
   try { return await authRefreshing; } finally { authRefreshing = null; }
+}
+
+async function authRefreshLocked(had) {
+  const t = authLoad();
+  if (!t || !t.refreshToken) return false;
+  /* 기다리는 동안 다른 탭이 이미 갱신했다 — 여기서 서버를 부르면 **죽은 토큰**을 내밀게 된다. */
+  if (had && t.refreshToken !== had) return true;
+
+  const res = await sbFetch('/auth/v1/token?grant_type=refresh_token', {
+    method: 'POST', body: { refresh_token: t.refreshToken },
+  });
+  if (res.ok && res.json && res.json.access_token) { authStore(res.json); return true; }
+
+  /* 🔴 **실패했다고 곧바로 '로그인이 끝났다'가 아니다** (2026-09-23 · 실측으로 드러났다).
+     잠금이 순서를 지켜 줘도, 앞 탭이 저장소에 적은 새 토큰이 **이 탭에 아직 안 보일 수
+     있다** — localStorage 는 탭 사이에서 즉시 보이지 않는다(검사 5번 중 2번 실패로 재현).
+     그래서 위 한 줄짜리 비교만으로는 못 막는다. 짧게 지켜보다 토큰이 바뀌면 성공이다.
+     ⚠️ 이 기다림은 **실패했을 때만** 치른다 — 흔한 경우(탭 하나)는 조금도 안 느려진다. */
+  return waitForOtherTabRefresh(t.refreshToken);
+}
+
+/* 다른 탭이 갱신한 결과가 이 탭에 보일 때까지 짧게 지켜본다.
+   ⚠️ 못 보고 끝나면 **진짜로 실패한 것**이라 false 를 돌려준다 — 그때는 로그인을 정리하는 게 맞다.
+   ⚠️ 시한을 없애지 말 것: 없으면 정말 만료된 로그인이 영영 안 끝난다. */
+const AUTH_PROPAGATE_MS = 600;
+function waitForOtherTabRefresh(oldToken) {
+  const until = Date.now() + AUTH_PROPAGATE_MS;
+  return new Promise((resolve) => {
+    const look = () => {
+      const now = (authLoad() || {}).refreshToken || '';
+      if (now && now !== oldToken) return resolve(true);
+      if (Date.now() >= until) return resolve(false);
+      setTimeout(look, 25);
+    };
+    look();
+  });
 }
 
 /* 이 앱이 열려 있는 주소 — 메일 링크와 소셜 로그인이 **여기로 되돌아온다**.

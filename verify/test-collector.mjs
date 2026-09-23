@@ -8743,5 +8743,44 @@ return { submitChannelKind, submitChannelLabel };`)();
   eq('문서가 실측 날짜를 밝힌다', /2026-09-23 저장소 실측/.test(brief), true);
 }
 
+/* ── 🔴 문의처 — 앱과 약관이 같은 주소를 말한다 (2026-09-23 신설) ─────────────
+   왜 관문인가: `support-config.js` 는 비어 있으면 '문의 메일 쓰기' 버튼을 아예 안 낸다.
+   그래서 주소를 채우는 것과 약관 9번을 고치는 것이 **한 세트**인데, 한쪽만 하기 쉽다.
+   실제로 로그인이 켜져 배포된 뒤에도 약관은 "이용자를 받고 있지 않습니다 ·
+   별도 문의처를 두지 않습니다" 라고 말하고 있었다 — 개인정보를 받으면서 지우거나
+   물어볼 곳이 없다고 적혀 있던 것이다.
+   🔴 **주소를 여기 베껴 적지 않는다** — 베끼면 이 관문이 세 번째 사본이 된다.
+      support-config.js 에서 읽어 terms.html 안에 그 주소가 있는지만 본다. */
+{
+  console.log('\n■ 문의처 — 앱과 약관이 갈라지지 않는다 (2026-09-23)');
+  const supportSrc = readText(new URL('../support-config.js', import.meta.url));
+  const terms = readText(new URL('../terms.html', import.meta.url));
+  const m = supportSrc.match(/\bemail:\s*'([^']*)'/);
+  eq('support-config.js 에서 문의처 칸을 읽어 냈다', !!m, true);
+  const email = m ? m[1] : '';
+
+  if (email) {
+    eq('약관이 그 주소를 그대로 적는다', terms.includes(email), true);
+    /* 주소가 있는데 "문의처를 두지 않습니다"가 남아 있으면 앱과 약관이 반대말을 한다 */
+    eq('약관이 「문의처를 두지 않습니다」라고 말하지 않는다',
+      /별도\s*문의처를\s*두지\s*않습니다/.test(terms), false);
+    eq('약관이 「이용자를 받고 있지 않습니다」라고 말하지 않는다',
+      /이용자를\s*받고\s*있지\s*않습니다/.test(terms), false);
+    /* 로그인이 켜져 있으면 '공개되지 않았다'도 사실이 아니다 */
+    eq('약관이 「외부에 공개되지 않았」다고 말하지 않는다',
+      /외부에\s*공개되지\s*않았/.test(terms), false);
+    eq('채워 두고 남은 임시 표식이 없다', /legal-tmp/.test(terms), false);
+  } else {
+    /* 비워 둔 상태도 정당하다 — 다만 그때는 약관도 같은 말을 해야 한다 */
+    eq('문의처가 비었으면 약관도 없다고 말한다',
+      /별도\s*문의처를\s*두지\s*않습니다/.test(terms), true);
+  }
+
+  /* 🔴 응대 시간은 지킬 수 있을 때만 적는다(운영 원칙 1) — 빈 칸은 정상이다.
+     적혀 있다면 화면이 그것을 쓰는지까지는 이 관문이 보지 않는다(verify-settings 의 몫). */
+  const h = supportSrc.match(/\bhours:\s*'([^']*)'/);
+  eq('응대 시간 칸이 있다 (비어 있어도 된다)', !!h, true);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);

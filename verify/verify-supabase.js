@@ -37,6 +37,24 @@ const ok = (cond, label, extra) => {
 const received = [];     // { path, method, body, raw }
 let storedRow = null;    // 서버에 저장된 프로필 행 (한 사람뿐인 시험이라 하나로 충분)
 
+/* 🔴 **갱신 토큰 회전** (2026-09-23 신설) — 진짜 Supabase 는 갱신 토큰을 한 번 쓰면
+   죽이고 새것을 준다. 그런데 이 가짜 서버는 언제나 같은 'refresh-test' 를 200 으로
+   돌려주고 있었다. 그래서 **탭 두 개가 같은 토큰으로 동시에 갱신해도 둘 다 성공했고**,
+   실제로 로그인이 풀리는 그 자리를 검사가 통째로 못 보고 있었다.
+   여기서 진짜처럼 회전시킨다 — 지난 토큰을 내밀면 400 이다. */
+let liveRefresh = 'refresh-1';
+let liveAccess = 'access-1';
+let rotations = 0;
+const rotate = () => {
+  rotations += 1;
+  liveRefresh = 'refresh-' + (rotations + 1);
+  liveAccess = 'access-' + (rotations + 1);
+};
+
+/* 옛 access 토큰을 401 로 되돌려 줄 것인가. [9] 절에서만 켠다 —
+   늘 켜 두면 다른 절들이 쓰던 흐름까지 흔들려, 고치려는 것과 상관없는 빨간불이 난다. */
+let strictAuth = false;
+
 function startSupabase() {
   return new Promise((resolve) => {
     const srv = http.createServer((req, res) => {
@@ -57,12 +75,22 @@ function startSupabase() {
           res.end(obj === undefined ? '' : JSON.stringify(obj));
         };
         const token = (email) => ({
-          access_token: 'access-test', refresh_token: 'refresh-test', expires_in: 3600,
+          access_token: liveAccess, refresh_token: liveRefresh, expires_in: 3600,
           user: { id: '00000000-0000-4000-8000-000000000001', email },
         });
 
         if (req.url.startsWith('/auth/v1/signup')) return send(200, token((body && body.email) || ''));
-        if (req.url.startsWith('/auth/v1/token')) return send(200, token((body && body.email) || 'test@example.com'));
+        if (req.url.startsWith('/auth/v1/token')) {
+          /* 갱신인지 비밀번호 로그인인지 가른다 — 회전은 갱신에서만 일어난다. */
+          const isRefresh = /grant_type=refresh_token/.test(req.url) || !!(body && body.refresh_token);
+          if (isRefresh) {
+            if (!body || body.refresh_token !== liveRefresh) {
+              return send(400, { error: 'invalid_grant', error_description: 'Already Used' });
+            }
+            rotate();
+          }
+          return send(200, token((body && body.email) || 'test@example.com'));
+        }
         if (req.url.startsWith('/auth/v1/logout')) return send(204);
         if (req.url.startsWith('/auth/v1/recover')) return send(200, {});
         if (req.url.startsWith('/auth/v1/user')) {
@@ -70,6 +98,9 @@ function startSupabase() {
           return send(200, { id: '00000000-0000-4000-8000-000000000001', email: 'test@example.com' });
         }
         if (req.url.startsWith('/rest/v1/profiles')) {
+          if (strictAuth && String(req.headers.authorization || '') !== 'Bearer ' + liveAccess) {
+            return send(401, { message: 'JWT expired' });
+          }
           if (req.method === 'POST') { storedRow = (body && body[0]) || null; return send(201); }
           if (req.method === 'DELETE') { storedRow = null; return send(204); }
           return send(200, storedRow ? [storedRow] : []);
@@ -480,8 +511,77 @@ const seedScript = (seed) => `localStorage.setItem('handaejang.v1', ${JSON.strin
     await ctx.close();
   }
 
-  /* ───────────── [9] 서버가 죽어도 앱은 열린다 ───────────── */
-  console.log('\n[9] 서버가 죽어 있어도 앱은 그대로 열린다 (기기 우선)');
+  /* ───────── [9] 🔴 탭을 여러 개 띄워도 로그인이 풀리지 않는다 (2026-09-23) ─────────
+     Supabase 는 갱신 토큰을 **한 번 쓰면 죽이고 새것을 준다**(회전). 그래서 탭 A 가
+     갱신에 성공하는 순간 탭 B 가 든 토큰은 죽는다. 탭 B 의 `authRefresh` 가 false 를
+     돌려주면 `sbAuthed` 가 그것을 "로그인이 끝났다"로 읽어 `authClear()` — 탭 A 가
+     방금 받아 온 **멀쩡한 토큰까지** 지운다. 두 탭이 같이 로그아웃된다.
+
+     🔴 **탭 두 개를 같은 context 에 띄우는 것이 이 절의 심장이다** — 그래야 저장소와
+        잠금을 실제로 공유한다. 창을 따로 만들면(newPage 도우미) 저장소가 갈라져
+        이 사고가 **재현되지 않고 검사가 조용히 통과한다.** */
+  console.log('\n[9] 탭 두 개가 같은 순간에 토큰을 갱신해도 로그인이 살아남는다');
+  {
+    const ctx = await browser.newContext({ viewport: { width: 390, height: 900 } });
+    const a = await ctx.newPage();
+    const b = await ctx.newPage();
+    for (const p of [a, b]) {
+      p.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
+      await p.goto(`http://localhost:${APP_PORT}/`, { waitUntil: 'domcontentloaded' });
+    }
+    await a.waitForTimeout(600);
+
+    /* 열쇠 이름을 여기 베껴 적지 않는다 — 앱에서 읽어 온다(이름이 바뀌면 검사가 따라간다) */
+    const authKey = await a.evaluate(() => AUTH_KEY);
+    const seedAuth = (tok) => a.evaluate(
+      ([k, t]) => localStorage.setItem(k, JSON.stringify(t)), [authKey, tok]);
+
+    /* ── ⓐ 약속: 다른 탭이 먼저 갱신했다고 '실패'라고 말하지 않는다 ── */
+    await seedAuth({
+      accessToken: liveAccess, refreshToken: liveRefresh, expiresAt: Date.now() - 1000,
+      userId: '00000000-0000-4000-8000-000000000001', email: 'test@example.com',
+    });
+    /* ⚠️ **'서버를 한 번만 부른다'를 관문으로 세우지 말 것** (2026-09-23 실측으로 뺐다 —
+       6번 중 2번 실패했다). localStorage 는 탭 사이에서 즉시 보이지 않아, 잠금을
+       넘겨받은 탭이 앞 탭의 새 토큰을 **아직 못 본 채** 부를 수 있다. 그건 사고가
+       아니라 이 수정이 감안한 경우이고(부른 뒤 회복한다), 브라우저가 보장해 주지 않는
+       것을 관문으로 삼으면 **통과할 수 없는 관문**이 되어 다음 사람이 관문을 꺼 버린다.
+       재는 것은 **학생에게 무엇이 남는가**다: 아무도 실패로 끝나지 않고, 로그인이
+       안 지워지고, 요청이 성사되고, 살아 있는 토큰이 두 번 회전하지 않는다. */
+    const before = rotations;
+    const both = await Promise.all([
+      a.evaluate(() => authRefresh()),
+      b.evaluate(() => authRefresh()),
+    ]);
+    ok(both[0] === true && both[1] === true,
+      '🔴 두 탭이 동시에 갱신해도 둘 다 성공으로 끝난다 (진 탭이 실패를 말하지 않는다)', both);
+    ok(rotations === before + 1,
+      '살아 있는 토큰이 한 번만 회전한다 (두 번 돌면 남의 토큰이 죽는다)', rotations - before);
+    ok(await a.evaluate(() => !!authLoad()), '갱신 뒤에도 로그인 표가 남아 있다');
+
+    /* ── ⓑ 실제 피해: 401 을 받고 갱신에 진 탭이 남의 토큰을 지우지 않는다 ──
+       탭 둘 다 **이미 죽은 access 토큰**을 들고 시작한다(만료 시각은 아직 안 지났다고
+       적혀 있어 미리 갱신하지 않는다). 서버가 401 을 주면 그제서야 둘이 같이 갱신에
+       달려든다 — 로그인이 풀리던 바로 그 경로다. */
+    strictAuth = true;
+    await seedAuth({
+      accessToken: 'stale-access', refreshToken: liveRefresh, expiresAt: Date.now() + 600000,
+      userId: '00000000-0000-4000-8000-000000000001', email: 'test@example.com',
+    });
+    const got = await Promise.all([
+      a.evaluate(() => sbAuthed('/rest/v1/profiles?select=*').then((r) => r.status)),
+      b.evaluate(() => sbAuthed('/rest/v1/profiles?select=*').then((r) => r.status)),
+    ]);
+    ok(await a.evaluate(() => !!authLoad()),
+      '🔴 갱신에 진 탭이 로그인을 지우지 않는다 (지우면 두 탭이 같이 로그아웃)');
+    ok(got[0] === 200 && got[1] === 200, '두 탭 다 요청이 성사된다', got);
+    strictAuth = false;
+
+    await ctx.close();
+  }
+
+  /* ───────────── [10] 서버가 죽어도 앱은 열린다 ───────────── */
+  console.log('\n[10] 서버가 죽어 있어도 앱은 그대로 열린다 (기기 우선)');
   {
     await new Promise((r) => sb.close(r));
     const { ctx, page } = await newPage();
@@ -496,7 +596,7 @@ const seedScript = (seed) => `localStorage.setItem('handaejang.v1', ${JSON.strin
     await ctx.close();
   }
 
-  console.log('\n[10] 콘솔 오류');
+  console.log('\n[11] 콘솔 오류');
   ok(errors.length === 0, '콘솔·페이지 오류 없음', errors.slice(0, 4));
 
   await browser.close();
