@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-09-22",
+ "updatedAt": "2026-09-23",
  "items": [
   {
    "id": "reg-hi-jeju",
@@ -4318,6 +4318,64 @@
     "raw": "( 단 , 국가장학금 및 교내 장학금 , 근로 , 봉사장학금 , 전체대상장학금만 중복수혜 가능)"
    },
    "exclusivityFrom": "공고 원문"
+  },
+  {
+   "id": "auto-ent2431267611artclviewdo",
+   "name": "[글로벌][교외] 2026년 효림장학재단 장학생 선발 안내 (~10/1)",
+   "boardTitle": "[글로벌][교외] 2026년 효림장학재단 장학생 선발 안내 (~10/1)",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "100만원",
+   "amountValue": 1000000,
+   "deadline": "2026-10-01",
+   "deadlineFrom": "게시판 요약 · ~ 2026. 10. 1",
+   "period": "접수 ~2026-10-01",
+   "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-23 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "개인정보수집이용동의서 (7).hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/151093/download.do"
+    },
+    {
+     "name": "장학금+신청서(양식)(효림장학재단).hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/151094/download.do"
+    }
+   ],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/267611/artclView.do",
+   "sourceKind": "auto",
+   "openDate": "2026-09-28",
+   "eligibilityLines": [
+    "3. 지원자격",
+    "가 . 화학과 , 생명공학과 2, 3, 4 학년 재학생",
+    "나 . 가정형편이 어려운 학생",
+    "다 . 언행이 타의 모범이 되는 학생",
+    "라 . 면학열이 왕성한 학생",
+    "마 . 직전학기 12 학점 이상 이수 / 직전학기 및 전체 총 평점 3.0 이상인 학생"
+   ],
+   "excerpts": [
+    "선발인원 및 장학금액 : 5 명 / 1 인 100 만원 ( 생활비 장학금 / 등록금 범위 외 )"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 1000000,
+    "ratio": 0,
+    "min": 1000000,
+    "max": 1000000,
+    "raw": "2. 선발인원 및 장학금액 : 5 명 / 1 인 100 만원 ( 생활비 장학금 / 등록금 범위 외 )"
+   },
+   "amountFrom": "공고 원문"
   }
  ]
 }
