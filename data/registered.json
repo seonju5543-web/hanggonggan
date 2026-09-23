@@ -111,8 +111,7 @@
    "period": "참여의향서 제출 ~2026.9.11",
    "summary": "우수 논문을 제출한 학생을 선발하는 장학금입니다. 서식·작성요령 양식을 내려받아 제출해요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "경희대학교"
+    "selective": true
    },
    "documents": [
     "참여의향서 (앱에서 원본 양식 작성 — 서식1)",
@@ -1820,8 +1819,7 @@
    "period": "접수 기간 ~2026-07-30",
    "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "경희대학교"
+    "selective": true
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -2089,8 +2087,7 @@
    "period": "접수 ~2026-09-10",
    "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "한국외국어대학교"
+    "selective": true
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -2146,7 +2143,11 @@
     "max": 2500000,
     "raw": "장학금액 1. 가수 윤하 장학금액(학기당) 2.5백만원 2. 공수 김용호 장학금액(학기당) 2.5백만원 3. 국민건강보험공단 강원인재(유형1) 장학금액(학기당) 3백만원 4. 국민건강보험공단 강원인재(유형2) 장학금액(학기당) 3백만원 5. 국민연금 장학금액(학기당) 1.5백만원 6. 김재영 신규 장학금액(학기당) 2.5백만원"
    },
-   "amountFrom": "공고 원문"
+   "amountFrom": "공고 원문",
+   "excerpts": [
+    "2026-2학기 푸른등대 기부장학금 신규장학생 신청기간을 안내합니다."
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   },
   {
    "id": "auto-ent2431264197artclviewdo",
@@ -2237,8 +2238,7 @@
    "period": "접수 기간 ~2026-09-09",
    "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "경희대학교"
+    "selective": true
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -2340,8 +2340,7 @@
    "period": "접수 ~2026-09-18",
    "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "한국외국어대학교"
+    "selective": true
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -2434,57 +2433,6 @@
    ]
   },
   {
-   "id": "auto-cb2ad20ec9588eb82b482f26",
-   "name": "공통 2026-2학기 푸른등대 기부장학금 신규장학생 신청 안내(8/26~9/10)",
-   "boardTitle": "공통 2026-2학기 푸른등대 기부장학금 신규장학생 신청 안내(8/26~9/10)",
-   "type": "교외",
-   "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
-   "deadline": "2026-09-10",
-   "period": "접수 ~2026-09-10",
-   "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
-   "eligibility": {
-    "selective": true,
-    "schoolOnly": "경희대학교"
-   },
-   "documents": [
-    "지원 자격·제출 서류는 원문 공고에서 확인"
-   ],
-   "duplicable": true,
-   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
-   "noForm": "자동 등록(검수 전) 2026-08-30 — 양식 스키마화는 검수 후 진행",
-   "auto": true,
-   "attachments": [
-    {
-     "name": "2026년 2학기 푸른등대 기부장학금 홍보 포스터.jpg",
-     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=390b87f7fe82497ca4ca98d9e1e902f3&fileSn=1&bbsId=BMSR00040"
-    },
-    {
-     "name": "본문이미지-2480x3508.jpg",
-     "url": "https://www.khu.ac.kr/upload/cross/images/000064/2026%EB%85%84_2%ED%95%99%EA%B8%B0_%ED%91%B8%EB%A5%B8%EB%93%B1%EB%8C%80_%EA%B8%B0%EB%B6%80%EC%9E%A5%ED%95%99%EA%B8%88_%ED%99%8D%EB%B3%B4_%ED%8F%AC%EC%8A%A4%ED%84%B0_1.jpg",
-     "bodyImage": true
-    }
-   ],
-   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322894",
-   "sourceKind": "auto",
-   "excerpts": [
-    "2026-2학기 푸른등대 기부장학금 신규장학생 신청기간을 안내합니다."
-   ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
-   "eligibilityPrev": {
-    "lines": null,
-    "excludes": null,
-    "priority": null,
-    "from": null
-   },
-   "eligibilityLines": [
-    "대한민국 국적의 국내 대학교 재학생"
-   ],
-   "eligibilityFrom": "AI(공고 포스터 그림)",
-   "eligibilityReviewed": false
-  },
-  {
    "id": "auto-ent2431263952artclviewdo",
    "name": "[공통][국가]2026년 2학기 고졸 후학습자 장학금 신청안내",
    "boardTitle": "[공통][국가]2026년 2학기 고졸 후학습자 장학금 신청안내",
@@ -2497,8 +2445,7 @@
    "period": "접수 기간 ~2026-09-18",
    "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "한국외국어대학교"
+    "selective": true
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -2562,8 +2509,7 @@
    "period": "접수 기간 ~2026-09-23",
    "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "한국외국어대학교"
+    "selective": true
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -2599,8 +2545,7 @@
    "period": "접수 기간 ~2026-09-30",
    "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "경희대학교"
+    "selective": true
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -2672,8 +2617,7 @@
    "period": "접수 기간 원문 확인",
    "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "경희대학교"
+    "selective": true
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -2729,8 +2673,7 @@
    "period": "접수 ~2026-09-28",
    "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "한국외국어대학교"
+    "selective": true
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -2796,8 +2739,7 @@
    "period": "접수 기간 ~2026-10-06",
    "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "경희대학교"
+    "selective": true
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -2859,8 +2801,7 @@
    "period": "접수 기간 ~2026-09-30",
    "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "경희대학교"
+    "selective": true
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -2995,8 +2936,7 @@
    "period": "접수 기간 원문 확인",
    "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "경희대학교"
+    "selective": true
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -3055,8 +2995,7 @@
    "period": "접수 기간 원문 확인",
    "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "경희대학교"
+    "selective": true
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -3254,8 +3193,7 @@
    "period": "접수 ~2026-10-11",
    "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "한국외국어대학교"
+    "selective": true
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -3388,8 +3326,7 @@
    "period": "접수 기간 원문 확인",
    "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "경희대학교"
+    "selective": true
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -3429,8 +3366,7 @@
    "period": "접수 기간 ~2026-10-07",
    "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "경희대학교"
+    "selective": true
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -3629,8 +3565,7 @@
    "period": "접수 기간 원문 확인",
    "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "경희대학교"
+    "selective": true
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -3747,8 +3682,7 @@
    "period": "접수 기간 ~2026-10-08",
    "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "경희대학교"
+    "selective": true
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -3811,8 +3745,7 @@
    "period": "접수 기간 원문 확인",
    "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "경희대학교"
+    "selective": true
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -3853,8 +3786,7 @@
    "period": "접수 기간 원문 확인",
    "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "한국외국어대학교"
+    "selective": true
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -3873,43 +3805,6 @@
    "sourceKind": "auto"
   },
   {
-   "id": "auto-ent2431264949artclviewdo",
-   "name": "[공통][교외] 2026년 익산사랑 장학생 선발 안내",
-   "boardTitle": "[공통][교외] 2026년 익산사랑 장학생 선발 안내",
-   "type": "교외",
-   "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
-   "deadline": null,
-   "listedAt": "2026-09-20",
-   "period": "접수 기간 원문 확인",
-   "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
-   "eligibility": {
-    "selective": true,
-    "schoolOnly": "한국외국어대학교"
-   },
-   "documents": [
-    "지원 자격·제출 서류는 원문 공고에서 확인"
-   ],
-   "duplicable": true,
-   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
-   "noForm": "자동 등록(검수 전) 2026-09-20 — 양식 스키마화는 검수 후 진행",
-   "auto": true,
-   "attachments": [
-    {
-     "name": "2026년도 익산사랑 장학생 선발 공고문.pdf",
-     "url": "https://dep.hufs.ac.kr/bbs/student/2431/149724/download.do"
-    },
-    {
-     "name": "본문이미지-972x722.png",
-     "url": "https://dep.hufs.ac.kr/CrossEditor/binary/images/000535/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7_2026-09-01_144557.png",
-     "bodyImage": true
-    }
-   ],
-   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/264949/artclView.do",
-   "sourceKind": "auto"
-  },
-  {
    "id": "auto-ent2431264946artclviewdo",
    "name": "[공통][교외] 2026년 2학기 선원가족장학사업 선발 안내",
    "boardTitle": "[공통][교외] 2026년 2학기 선원가족장학사업 선발 안내",
@@ -3922,8 +3817,7 @@
    "period": "접수 기간 원문 확인",
    "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "한국외국어대학교"
+    "selective": true
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -3989,84 +3883,6 @@
     }
    ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322922",
-   "sourceKind": "auto"
-  },
-  {
-   "id": "auto-oardid322916menuno200318",
-   "name": "공통 2026년도 하반기 울산연구원 장학생 선발 안내",
-   "boardTitle": "공통 2026년도 하반기 울산연구원 장학생 선발 안내",
-   "type": "교외",
-   "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
-   "deadline": null,
-   "listedAt": "2026-09-20",
-   "period": "접수 기간 원문 확인",
-   "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
-   "eligibility": {
-    "selective": true,
-    "schoolOnly": "경희대학교"
-   },
-   "documents": [
-    "지원 자격·제출 서류는 원문 공고에서 확인"
-   ],
-   "duplicable": true,
-   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
-   "noForm": "자동 등록(검수 전) 2026-09-20 — 양식 스키마화는 검수 후 진행",
-   "auto": true,
-   "attachments": [
-    {
-     "name": "2026년 하반기 장학생 선발계획 공고.pdf",
-     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=557dd1eec33a49bbb8d8b6f7f9b58198&fileSn=1&bbsId=BMSR00040"
-    },
-    {
-     "name": "2026년 하반기 장학생 선발계획 공고.hwp",
-     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=557dd1eec33a49bbb8d8b6f7f9b58198&fileSn=2&bbsId=BMSR00040"
-    },
-    {
-     "name": "본문이미지-793x1121.jpg",
-     "url": "https://com.khu.ac.kr/upload/cross/images/001198/2026%EB%85%84_%ED%95%98%EB%B0%98%EA%B8%B0_%EC%9E%A5%ED%95%99%EC%83%9D_%EC%84%A0%EB%B0%9C%EA%B3%84%ED%9A%8D_%EA%B3%B5%EA%B3%A0_1.jpg",
-     "bodyImage": true
-    }
-   ],
-   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322916",
-   "sourceKind": "auto"
-  },
-  {
-   "id": "auto-oardid322915menuno200318",
-   "name": "공통 2026학년도 2학기 선원가족 장학생 모집 안내",
-   "boardTitle": "공통 2026학년도 2학기 선원가족 장학생 모집 안내",
-   "type": "교외",
-   "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
-   "deadline": null,
-   "listedAt": "2026-09-20",
-   "period": "접수 기간 원문 확인",
-   "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
-   "eligibility": {
-    "selective": true,
-    "schoolOnly": "경희대학교"
-   },
-   "documents": [
-    "지원 자격·제출 서류는 원문 공고에서 확인"
-   ],
-   "duplicable": true,
-   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
-   "noForm": "자동 등록(검수 전) 2026-09-20 — 양식 스키마화는 검수 후 진행",
-   "auto": true,
-   "attachments": [
-    {
-     "name": "2026년 2학기 선원가족장학사업 선발요강.pdf",
-     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=e71d2f6401454201a91b2cf2d9238a24&fileSn=1&bbsId=BMSR00040"
-    },
-    {
-     "name": "본문이미지-1121x793.jpg",
-     "url": "https://www.khu.ac.kr/upload/cross/images/000064/2026%EB%85%84_2%ED%95%99%EA%B8%B0_%EC%84%A0%EC%9B%90%EA%B0%80%EC%A1%B1_%EC%9E%A5%ED%95%99%EC%82%AC%EC%97%85_%EC%95%88%EB%82%B4_1.jpg",
-     "bodyImage": true
-    }
-   ],
-   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322915",
    "sourceKind": "auto"
   },
   {
