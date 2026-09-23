@@ -8452,5 +8452,95 @@ return { submitChannelKind, submitChannelLabel };`)();
   }
 }
 
+/* ── 🔴 메일 접수 주소 — 문의처를 접수처라고 부르지 않는다 (2026-09-23 신설) ──
+   2026-09-02 에 사람이 공고 121건을 직접 열어 접수 채널을 갈랐고 이메일 접수를 찾아냈는데,
+   그 결과가 기술 고문 요청서(PDF)에만 남고 **앱 데이터에는 한 칸도 안 들어갔다** —
+   `applyEmail` 이 등록 68건 중 0건이라 '접수 메일 열기' 버튼이 한 번도 뜬 적이 없었다.
+   이제 원문을 읽는 자리(extract-excerpts)가 수집 때마다 채운다.
+   🔴 여기 픽스처는 **하나만 빼고 전부 실제 공고 원문 줄**이다. 규칙을 넓히려는 다음 사람이
+      무엇을 깨뜨리는지 눈으로 보게 하려는 것이다. 합성인 하나는 아래 ⑦에 표시해 뒀다 —
+      그 규칙(문의)만이 잡는 줄이 지금 말뭉치에 **0건**이라 실제 줄을 쓸 수가 없었다.
+   🔴 가장 위험한 것은 오탐이다 — 주소가 틀리면 학생의 신청서와 증명서류가 **엉뚱한 사람**
+      에게 간다. 그래서 '버려야' 줄이 '받아야' 줄보다 많다. */
+{
+  console.log('\n■ 메일 접수 주소 (2026-09-23)');
+  const src = readText(new URL('../collector/apply-email.mjs', import.meta.url));
+  const exc = readText(new URL('../collector/extract-excerpts.mjs', import.meta.url));
+
+  /* ① 규칙이 한 곳인가 — 베끼면 본문 경로와 첨부 경로가 다른 말을 한다 */
+  eq('판정 규칙은 apply-email.mjs 한 곳', /export function judgeLine/.test(src), true);
+  eq('발췌기가 그것을 가져다 쓴다', /from '\.\/apply-email\.mjs'/.test(exc), true);
+  eq('발췌기 안에 규칙을 베껴 두지 않았다',
+    /(INQUIRY|OTHER_SENDER|SUBMIT_VERB)\s*=/.test(exc), false);
+
+  /* ② 🔴 **두 경로가 같은 함수를 쓴다.** 본문이 껍데기인 게시판(경희대 유형)은 위쪽
+        갈림길에서 continue 로 빠져나가므로, 본문 경로에만 붙이면 첨부에 접수처가 적힌
+        공고가 통째로 샌다 — 만들면서 실제로 그렇게 틀려 울산연구원 1건을 놓쳤다. */
+  eq("'첨부만' 경로도 접수 메일을 채운다", /fillApplyEmail\(it, null\)/.test(exc), true);
+  eq('본문 경로도 같은 함수를 부른다', /fillApplyEmail\(it, body\)/.test(exc), true);
+
+  /* ③ ⟵ 심장. 실제 원문 10줄을 그대로 넣어 받고 버리는 것을 잰다. */
+  const { judgeLine, findApplyEmail } = await import('../collector/apply-email.mjs');
+  const take = (line) => { const v = judgeLine(line); return !!(v && v.ok); };
+
+  eq('신청서를 이메일로 제출하라는 줄 — 받는다',
+    take('9. 지원방법 : [ 붙임 ] 의 신청서를 작성하여 관재팀 이메일 (khsa0063@khu.ac.kr) 로 제출'), true);
+  eq('접수주소 이름표가 붙은 줄 — 받는다',
+    take('◯ 접수주소 : nohsy12@518.org (※우편접수 불가)'), true);
+  eq('메일로 서류를 제출하라는 줄 — 받는다',
+    take('⑥ 서류 준비 및 메일(injae@uri.re.kr)로 신청서(3종), 증빙서류 제출'), true);
+  eq('제출 방법 : 이메일 — 받는다',
+    take('다 . 멘토활동계획서 제출 방법 : 이메일 : scholarship@hufs.ac.kr 또는 장학팀 ( 학생회관 121 호 ) 직접 제출'), true);
+
+  /* 🔴 버려야 하는 줄 — 전부 실제로 나온 것이다 */
+  eq('문의처 줄은 접수처가 아니다',
+    take('12. 문의처 : 서울캠퍼스 총무관리처 관재팀 (02-961-0043~4, khsa0063@khu.ac.kr)'), false);
+  eq('문의사항 줄도 아니다',
+    take('☎ 문의사항 : 서울 장학팀 (02-2173-2136 / scholarship@hufs.ac.kr)'), false);
+  eq('담당자 줄도 아니다',
+    take('① 서울 사랑의열매 담당자 : jiwon.kim716@chest.or.kr'), false);
+  eq("내는 행위가 없는 '- 이메일 :' 줄은 받지 않는다",
+    take('- 이메일 : scholarship@hufs.ac.kr'), false);
+  eq('부서 연락처 줄도 받지 않는다',
+    take('글로벌 학생지원 . 장학팀 (031-330-4034 / studenty@hufs.ac.kr )'), false);
+  /* 🔴 이 줄이 이 절의 존재 이유다 — '제출'도 있고 주소도 있지만 **보내는 사람이 교수**이고
+     주소는 **이화여대**다. 받으면 우리 학생의 신청서가 남의 학교 메일함으로 간다. */
+  eq('🔴 제3자(교수)가 내는 줄은 받지 않는다',
+    take('(또는 교수님이 장학복지팀으로 제출하는 것도 가능함/ scholarship@ewha.ac.kr [추천 학생의 이름/학 번/장학금명 기재])'), false);
+
+  /* ⑦ 🔴 **합성 픽스처 — 위 줄들과 달리 실제 공고에서 뽑은 것이 아니다.**
+     말뭉치를 뒤져 보니 '메일 + 내는 행위 + 문의'를 한 줄에 가진 공고가 지금은 0건이라,
+     문의 규칙이 **혼자 잡는 경우**를 실제 줄로는 시험할 수가 없었다(그래서 이 규칙을
+     빼도 관문이 한동안 초록이었다 — 만들면서 그렇게 틀렸다).
+     규칙을 남겨 둔 이유: `제출 관련 문의` 꼴은 한국 공고에 흔한 표현이고, 그 주소는
+     **물어보는 곳이지 내는 곳이 아니다.** 여기로 신청서를 보내면 접수가 안 된다.
+     ⚠️ 애매한 줄(`제출 및 문의`)도 함께 버린다 — 버리면 학생은 '원문 확인'을 보지만,
+        잘못 받으면 신청서가 엉뚱한 메일함으로 간다. 한쪽이 훨씬 싸다. */
+  eq('[합성] 제출 문의용 주소는 접수처가 아니다',
+    take('※ 제출 관련 문의 : 장학팀 scholarship@example.ac.kr'), false);
+
+  /* ④ 근거 문장을 반드시 함께 돌려준다 — 감사가 그것으로 주소를 대조한다 */
+  const got = findApplyEmail('가. 안내\n◯ 접수주소 : nohsy12@518.org (※우편접수 불가)\n나. 문의 : 02-0000');
+  eq('주소를 찾아낸다', got && got.email, 'nohsy12@518.org');
+  eq('근거 문장에 그 주소가 들어 있다', !!(got && got.source.includes(got.email)), true);
+
+  /* ⑤ 감사가 근거 없는 주소를 막는가 — 로봇이 넣은 것은 오류, 사람이 넣은 것은 경고.
+     🔴 사람 것을 오류로 만들면 관리자가 화면에서 고치는 순간 자동 등록이 통째로 멈춘다. */
+  const { checkEntry } = createRequire(import.meta.url)('./entry-rules.cjs');
+  const base = { id: 't', name: '테스트 장학금', sourceUrl: 'https://x.ac.kr/a', type: '교외', deadline: '2026-12-01' };
+  const lv = (o) => (checkEntry({ ...base, ...o }, { formIds: new Set() })
+    .find((p) => /메일 주소/.test(p.msg)) || {}).level || '(없음)';
+  eq('근거 있으면 통과', lv({ applyEmail: 'a@b.ac.kr', applyEmailSource: '접수주소 : a@b.ac.kr 로 제출', applyEmailFrom: '공고 원문' }), '(없음)');
+  eq('로봇이 근거 없이 넣으면 오류', lv({ applyEmail: 'a@b.ac.kr', applyEmailFrom: '공고 원문' }), 'error');
+  eq('사람이 넣은 것은 경고까지만', lv({ applyEmail: 'a@b.ac.kr', applyEmailFrom: '관리자 2026-09-23' }), 'warn');
+  eq('근거가 딴 주소면 오류', lv({ applyEmail: 'a@b.ac.kr', applyEmailSource: '접수주소 : zzz@c.ac.kr 로 제출', applyEmailFrom: '공고 원문' }), 'error');
+
+  /* ⑥ 실제 데이터 — 넣어 둔 주소가 전부 제 근거 문장 안에 있는가 */
+  const reg = JSON.parse(readText(new URL('../data/registered.json', import.meta.url)));
+  const mailed = reg.items.filter((x) => x.applyEmail);
+  eq('접수 메일 주소가 들어 있다 (0건이면 통로가 다시 막힌 것)', mailed.length > 0, true);
+  eq('전부 근거 문장을 달고 있다', mailed.filter((x) => !(x.applyEmailSource || '').includes(x.applyEmail)), []);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);
