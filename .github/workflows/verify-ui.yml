@@ -141,7 +141,8 @@ jobs:
                    verify-notify.js verify-sheet-back.js verify-kosaf.js \
                    verify-calendar.js verify-resume.js verify-interactions.js \
                    verify-admin.js verify-settings.js verify-admin-shape.js \
-                   verify-elig-ask.js; do
+                   verify-elig-ask.js \
+                   verify-apply-prep.js; do
             echo "── $f"
             node "verify/$f"
           done
