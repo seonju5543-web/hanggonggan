@@ -529,9 +529,16 @@ function officialChannel(sch) {
      가 뜬다 — 앱 내부 사정을 학생에게 흘리는 것이다(2026-09-17 지시와 같은 계열).
      그럴 땐 기관 이름을 빼고 '원문 공고'라고만 말한다. */
   const knownProvider = sch.provider && !/원문 확인|미확인/.test(String(sch.provider));
+  /* 🔴 층2(한국장학재단에 등록된 재단 장학금)는 **재단이 직접 받는** 공고다 (2026-09-23).
+     학교 게시판 공고와 같은 `campus` 안내를 주면 "학교 포털 장학 메뉴에서 접수 방법 확인"이 떠
+     재단 장학금을 학교에서 찾게 만든다 — 층2 공고 68건이 신청 준비 시트에서 그렇게 보였다. */
+  const guide = sch.sourceKind === 'kosaf' ? SUBMIT_GUIDES.foundation : SUBMIT_GUIDES.campus;
   if (sch.sourceUrl) {
     return { label: knownProvider ? `${sch.provider} (원문 공고의 접수 방법)` : '원문 공고의 접수 방법',
-      url: sch.sourceUrl, guide: SUBMIT_GUIDES.campus };
+      url: sch.sourceUrl, guide };
+  }
+  if (sch.sourceKind === 'kosaf') {
+    return { label: knownProvider ? `${sch.provider} (재단 공고의 접수 방법)` : '원문 공고의 접수 방법', guide };
   }
   return { label: knownProvider ? `${sch.provider} 장학공지 (학교 포털)` : '원문 공고의 접수 방법',
     guide: SUBMIT_GUIDES.campus };

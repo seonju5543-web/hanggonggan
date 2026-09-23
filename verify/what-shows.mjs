@@ -96,6 +96,51 @@ vm.runInContext([...['bareOrg', 'orgBase'].map(takeConst), ...NEED.map(takeFn)].
 const appFn = (n) => vm.runInContext(n, ctx);
 const stripTags = (h) => String(h).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 
+/* ── 신청 버튼을 **누르면** 무엇이 뜨는가 (2026-09-23) ─────────────────────────────
+   개발자 지적 *"신청 준비 시작 버튼을 눌렀을때 바로 신청내역으로 이동"* — 이 도구는 '버튼이
+   열려 있다'까지만 말해서, 누르는 순간 곧장 '준비 완료'로 새는 공고 100건을 못 봤다.
+   🔴 여기서도 **베끼지 않는다**: app.js 의 applyTo 와 그 이웃(formTplIdFor·essayDefsFor·
+      attachPrepTemplates)을 이름으로 떼어 오고, 양식은 forms.js + data/forms.json 그대로 싣는다.
+      applyTo 가 부르는 화면 함수만 '무엇을 불렀나'를 적는 가짜로 둔다. */
+const takeBlockConst = (name) => {
+  const m = appSrc.match(new RegExp(`^const ${name} = \\[[\\s\\S]*?^\\];`, 'm'));
+  if (!m) throw new Error(`app.js 에서 ${name} 을 못 찾았습니다 — 가져올 수 없으면 멈춥니다.`);
+  return m[0];
+};
+const pressCtx = vm.createContext({ Date, Math, Number, String, JSON, Object, Array, RegExp, console });
+vm.runInContext(fs.readFileSync(new URL('../forms.js', import.meta.url), 'utf8'), pressCtx, { filename: 'forms.js' });
+vm.runInContext(`Object.assign(FORM_TEMPLATES, ${JSON.stringify(JSON.parse(fs.readFileSync(new URL('../data/forms.json', import.meta.url), 'utf8')).templates || {})});`, pressCtx);
+{
+  const dataSrc = fs.readFileSync(new URL('../data.js', import.meta.url), 'utf8');
+  const isForm = dataSrc.match(/^function isFormAttachment\([\s\S]*?^\}/m);
+  if (!isForm) throw new Error('data.js 에서 isFormAttachment() 을 못 찾았습니다 — 가져올 수 없으면 멈춥니다.');
+  vm.runInContext([isForm[0], takeBlockConst('ESSAY_DEFS'),
+    ...['essayDefsFor', 'formTplIdFor', 'attachPrepTemplates', 'applyTo'].map(takeFn)].join('\n\n'),
+    pressCtx, { filename: 'app.js(신청 버튼)' });
+}
+function pressRoute(sch) {
+  const s = JSON.parse(JSON.stringify(sch));
+  const got = [];
+  Object.assign(pressCtx, {
+    startFormFill: () => got.push('form'), startDocPrep: () => got.push('doc'),
+    renderApplyPrep: () => got.push('prep'), finalizeApply: () => got.push('finalize'), closeSheet: () => {},
+  });
+  const run = (n) => vm.runInContext(n, pressCtx);
+  run('attachPrepTemplates')([s]);
+  run('applyTo')(s);
+  if (got.includes('finalize')) return "🚨 확인 화면 없이 곧장 '신청 준비 완료'로 담긴다";
+  if (got[0] === 'form') {
+    const id = run('formTplIdFor')(s);
+    return `양식 작성 화면 (${id}${run('FORM_TEMPLATES')[id].unofficial ? ' · 자유 형식 지원문서' : ''})`;
+  }
+  if (got[0] === 'doc') return `서류 도우미 (${run('essayDefsFor')(s).map((d) => d.doc).join(' · ')})`;
+  if (got[0] === 'prep') {
+    const n = (s.attachments || []).filter(run('isFormAttachment')).length;
+    return `신청 준비 시트 — 확인을 눌러야 담긴다 (내려받을 신청서 양식 첨부 ${n}개)`;
+  }
+  return `(알 수 없음: ${got.join(',') || '아무것도 안 부름'})`;
+}
+
 for (const sch of hits) {
   const result = ME.evaluate(sch, p);
   const fit = ME.fitScore(sch, result, p);
@@ -130,6 +175,7 @@ for (const sch of hits) {
        규칙(앱 규칙을 한 줄도 베끼지 않는다)이 글자에도 그대로 적용된다. */
     console.log(`   ⚠️ 버튼 위 안내: ${cautionText(caution)}`);
   }
+  if (canApply) console.log(`   누르면 → ${pressRoute(sch)}`);
   console.log(`   ─ 목록 카드에 보이는 자격 줄 (${listLines.length}줄 · 5줄 상한)`);
   for (const l of listLines) console.log(`       · ${String(l).slice(0, 84)}`);
   console.log(`   ─ 상세 시트에 보이는 자격 줄 (${allLines.length}줄 · 전부)`);

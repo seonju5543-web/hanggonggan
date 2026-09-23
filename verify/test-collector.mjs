@@ -1233,6 +1233,16 @@ console.log('\n■ 신청 준비 시작 버튼 — 양식이 없어도 곧장 \'
     cert({ documents: ['지원 자격·제출 서류는 원문 공고에서 확인'] }), '');
   const mixed = cert({ documents: ['재학증명서', '재단 공고문에서 확인', '신청 서류·접수 방법은 원문 공고 확인'] });
   eq('  진짜 서류는 남기고 안내 줄만 뺀다', [/재학증명서/.test(mixed), /확인 —/.test(mixed.replace(/재학증명서[^<]*/, ''))], [true, false]);
+
+  /* 준비 시트가 층2에서 '학교 포털 장학 메뉴에서 확인'이라고 말하지 않는다 — 재단이 직접 받는 공고다.
+     data.js 의 진짜 officialChannel 을 파일째 싣고 부른다. */
+  const oc = new Function(`${readText(new URL('../data.js', import.meta.url))}\nreturn officialChannel;`)();
+  const k2 = oc({ id: 'kosaf-0603003', sourceKind: 'kosaf', provider: '테스트장학재단', sourceUrl: 'http://example.or.kr/' });
+  eq('🔴 층2 재단 공고의 제출 안내는 재단 쪽이다 (학교 포털로 보내지 않는다)',
+    [/재단 공고/.test(k2.guide[0]), k2.guide.some((g) => /학교 포털/.test(g))], [true, false]);
+  eq('  홈페이지 주소가 없어도 \'학교 포털\'이라 부르지 않는다',
+    /학교 포털/.test(oc({ id: 'kosaf-1', sourceKind: 'kosaf', provider: '테스트장학재단' }).label), false);
+  eq('  학교 게시판 공고는 그대로 학교 안내다', /학교 포털/.test(oc({ id: 'auto-x', sourceUrl: 'https://e.ac.kr/v' }).guide[0]), true);
 }
 
 /* 2026-08-20 — 자격 절을 어디서 끊나. 개발자가 "본문에 다 써 있는데 못 읽는 것 같다"고
