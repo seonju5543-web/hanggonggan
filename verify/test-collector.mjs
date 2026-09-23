@@ -1077,6 +1077,164 @@ console.log('\n■ 유료 API 크레딧 누수 방지 (2026-08-20)');
   eq('  사고 깊이를 지정한다(기본값이 가장 비싸다)', /output_config:\s*\{\s*effort:/.test(code), true);
 }
 
+/* 2026-09-23 — 개발자 지적 *"공고 대부분이 공고양식을 읽지 못하고 신청 준비 시작 버튼을 눌렀을때
+   바로 신청내역으로 이동되는 문제"*. 원인이 세 겹이었고 이 절이 로봇 쪽 둘을 **실제로 돌려** 잰다
+   (글자만 훑는 관문은 조건을 `if (false && …)` 로 죽여도 초록이었다 — 이 저장소가 배운 것).
+   ① 크레딧을 막으려던 `enabled:false` 가 **무료 변환기까지** 세웠다(한 달 · 원본 59건이 받아진 채 방치)
+   ② 대기줄이 '이번 실행에 새로 등록한 것'만 봐서 나중에 신청서가 붙은 공고는 영영 못 들어갔다
+   ③ 앱이 양식 없는 공고를 누르는 순간 '준비 완료'로 찍었다 — 아래 「신청 준비 시작 버튼」 절 */
+console.log('\n■ 양식 변환 로봇의 두 스위치 — 유료를 끄려다 무료까지 끄지 않는다 (2026-09-23)');
+{
+  const root = new URL('../', import.meta.url);
+  const realCfg = JSON.parse(readText(new URL('collector/schematize-config.json', root)));
+  eq('🔴 실제 설정: 로봇 전체는 켜져 있다 (enabled 가 false 면 무료 변환까지 멈춘다)', realCfg.enabled !== false, true);
+  eq('  실제 설정: 유료 경로는 꺼 둔 채다 (크레딧 누수 방지는 apiEnabled 로)', realCfg.apiEnabled, false);
+
+  /* 사본 저장소를 만들어 로봇을 진짜로 돌린다. 변환기가 받아들이는 원본(400자 넘는 표형 신청서)과
+     유료 경로로 가는 원본(글자가 너무 적음)을 하나씩 둔다. */
+  const FORM_TXT = `테스트재단 장학금 신청서
+<성명><><학번><>
+<학과><><연락처><>
+<주소><>
+<지원 동기><>
+<학업 계획><>
+위와 같이 테스트재단 장학금을 신청합니다. 본인은 위에 적은 사항이 사실과 다름없음을 확인하며, 사실과 다른 내용을 적은 것이 드러나면 선발이 취소되어도 이의를 제기하지 않겠습니다. 장학금을 받게 되면 재단이 정한 학업 보고서를 학기마다 기한 안에 내고, 재단 행사에 성실히 참여하겠습니다. 장학금은 등록금과 학업에 필요한 비용에만 쓰겠습니다. 학적에 변동이 생기면 즉시 재단에 알리겠습니다. 이 신청서에 적은 개인정보는 장학생 선발과 장학금 지급에만 쓰인다는 설명을 들었습니다. 선발 결과는 재단 누리집 공지와 개별 연락으로 확인하겠습니다.
+2026년   월   일
+신청인        (서명)
+테스트재단 이사장 귀하`;
+  const run = (cfg) => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'schem-'));
+    fs.mkdirSync(path.join(dir, 'collector/extracted'), { recursive: true });
+    fs.mkdirSync(path.join(dir, 'data'), { recursive: true });
+    for (const f of ['schematize-forms.mjs', 'schema-from-text.mjs', 'pdf-text.mjs', 'attachment-text.mjs', 'form-quality.mjs', 'form-coverage.mjs']) {
+      fs.copyFileSync(fileURLToPath(new URL(`collector/${f}`, root)), path.join(dir, 'collector', f));
+    }
+    fs.writeFileSync(path.join(dir, 'collector/schematize-config.json'), JSON.stringify(cfg));
+    fs.writeFileSync(path.join(dir, 'collector/pending-forms.json'), JSON.stringify({ items: [
+      { id: 'reg-a', name: '가 장학금', target: '가 장학금 공고', fetched: true, schematized: false },
+      { id: 'reg-b', name: '나 장학금', target: '나 장학금 공고', fetched: true, schematized: false },
+    ] }, null, 1));
+    fs.writeFileSync(path.join(dir, 'collector/extracted/forms-index.txt'),
+      'form-a-1.txt\t가 장학금 공고\t장학금 신청서.hwp\t1000\nform-b-1.txt\t나 장학금 공고\t장학금 신청서.hwp\t1000\n');
+    fs.writeFileSync(path.join(dir, 'collector/extracted/form-a-1.txt'), FORM_TXT);
+    fs.writeFileSync(path.join(dir, 'collector/extracted/form-b-1.txt'), '장학금 신청서\n성명 :\n학번 :\n지원 동기 :');
+    const entry = (id) => ({ id, name: id, provider: '테스트재단', noForm: '자동 등록(검수 전) 2026-09-01 — 양식 스키마화는 검수 후 진행', auto: true });
+    fs.writeFileSync(path.join(dir, 'data/registered.json'), JSON.stringify({ items: [entry('reg-a'), entry('reg-b')] }, null, 1));
+    fs.writeFileSync(path.join(dir, 'data/forms.json'), JSON.stringify({ templates: {} }, null, 1));
+    const env = { ...process.env };
+    delete env.ANTHROPIC_API_KEY;   // 이 검사는 절대 돈을 쓰지 않는다
+    const r = spawnSync(process.execPath, [path.join(dir, 'collector/schematize-forms.mjs'), 'r.md'], { cwd: dir, encoding: 'utf8', env });
+    const reg = JSON.parse(readText(path.join(dir, 'data/registered.json'))).items;
+    const q = JSON.parse(readText(path.join(dir, 'collector/pending-forms.json'))).items;
+    const forms = JSON.parse(readText(path.join(dir, 'data/forms.json'))).templates;
+    fs.rmSync(dir, { recursive: true, force: true });
+    return { status: r.status, out: `${r.stdout}${r.stderr}`, a: reg.find((x) => x.id === 'reg-a'), b: reg.find((x) => x.id === 'reg-b'),
+      qa: q.find((x) => x.id === 'reg-a'), qb: q.find((x) => x.id === 'reg-b'), nForms: Object.keys(forms).length };
+  };
+  const on = run({ enabled: true, apiEnabled: false });
+  eq('🔴 유료를 꺼도 무료 변환기는 돈다 — 받아 둔 신청서가 앱 양식이 되어 공고에 이어진다',
+    [on.status, !!on.a.formId, on.a.noForm, on.nForms], [0, true, undefined, 1]);
+  eq('  변환된 공고는 대기줄에서 끝난 것으로 표시된다', on.qa.schematized, true);
+  eq('  유료 경로로 갈 원본은 대기줄에 남는다(원본 첨부 안내 유지)', [on.qb.schematized, !!on.b.formId], [false, false]);
+  eq('🔴 부르지도 않은 API 를 실패로 세지 않는다 — 켜는 날 이미 \'재시도 중단\'이면 한 번도 안 해 본 공고가 버려진다',
+    on.qb.apiTries, undefined);
+  const off = run({ enabled: false, apiEnabled: false });
+  eq('  enabled:false 는 여전히 킬스위치다 (아무것도 안 바꾼다)', [off.status, !!off.a.formId, off.nForms, off.qa.schematized], [0, false, 0, false]);
+}
+
+console.log('\n■ 나중에 신청서가 붙은 공고도 양식 대기줄에 넣는다 (2026-09-23 · 원칙 7 소급)');
+{
+  /* auto-register 를 사본 저장소에서 실제로 돌린다. 새 공고는 없고(notices 0건) 이미 등록된 자동 등록분만 있다.
+     예전 코드는 '이번 실행에 등록한 것(added)'만 대기줄에 넣어서, 아래 E1·E4 가 영영 못 들어갔다. */
+  const root = new URL('../', import.meta.url);
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'areg-'));
+  for (const d of ['collector', 'verify', 'data']) fs.mkdirSync(path.join(dir, d), { recursive: true });
+  for (const f of fs.readdirSync(fileURLToPath(root))) {
+    if (f.endsWith('.js')) fs.copyFileSync(fileURLToPath(new URL(f, root)), path.join(dir, f));
+  }
+  for (const f of fs.readdirSync(fileURLToPath(new URL('collector/', root)))) {
+    if (f.endsWith('.mjs') || f === 'auto-register-config.json') fs.copyFileSync(fileURLToPath(new URL(`collector/${f}`, root)), path.join(dir, 'collector', f));
+  }
+  for (const f of fs.readdirSync(fileURLToPath(new URL('verify/', root)))) {
+    if (f.endsWith('.cjs')) fs.copyFileSync(fileURLToPath(new URL(`verify/${f}`, root)), path.join(dir, 'verify', f));
+  }
+  const WAIT = '자동 등록(검수 전) 2026-09-01 — 양식 스키마화는 검수 후 진행';
+  const base = (id, extra) => ({ id, name: `${id} 장학생 선발 안내`, type: '교외', provider: '주관 기관 원문 확인',
+    amount: '금액 원문 확인', amountValue: 0, deadline: '2099-12-31', summary: '요약', documents: ['재학증명서'],
+    eligibility: { selective: true }, sourceUrl: `https://example.ac.kr/view.do?seq=${id}`, noForm: WAIT, auto: true, ...extra });
+  fs.writeFileSync(path.join(dir, 'data/registered.json'), JSON.stringify({ items: [
+    base('e1', { attachments: [{ name: '신청서식.hwpx', url: 'https://example.ac.kr/f1' }] }),
+    base('e2', { attachments: [{ name: '신청서식.hwpx', url: 'https://example.ac.kr/f2' }], noForm: '포털 입력형 — 채울 양식 없음(사람 확인)' }),
+    base('e3', { attachments: [{ name: '신청서식.hwpx', url: 'https://example.ac.kr/f3' }], deadline: '2000-01-01' }),
+    base('e4', { attachments: [{ name: '붙임2 활동 계획서(장학신청시 제출).hwp', url: 'https://example.ac.kr/f4' }] }),
+    base('e5', { attachments: [{ name: '신청서식.hwpx', url: 'https://example.ac.kr/f5' }] }),
+    base('e6', { attachments: [{ name: '선발 공고문.pdf', url: 'https://example.ac.kr/f6' }] }),
+  ] }, null, 1));
+  fs.writeFileSync(path.join(dir, 'collector/pending-forms.json'), JSON.stringify({ items: [
+    { id: 'e5', name: 'e5', target: 'e5', fetched: false, schematized: false, retired: true },
+  ] }, null, 1));
+  fs.writeFileSync(path.join(dir, 'data/notices.json'), JSON.stringify({ items: [] }));
+  fs.writeFileSync(path.join(dir, 'data/forms.json'), JSON.stringify({ templates: {} }));
+  const r = spawnSync(process.execPath, [path.join(dir, 'collector/auto-register.mjs')], { cwd: dir, encoding: 'utf8' });
+  const q = JSON.parse(readText(path.join(dir, 'collector/pending-forms.json'))).items;
+  fs.rmSync(dir, { recursive: true, force: true });
+  eq('  로봇이 정상 종료한다', r.status, 0);
+  const queued = q.filter((x) => !x.retired).map((x) => x.id).sort();
+  eq('🔴 이미 등록된 자동 등록분 중 신청서가 붙은 것을 대기줄에 넣는다 (서식·계획서)', queued, ['e1', 'e4']);
+  eq('  사람이 적은 \'양식 없음\' 사유는 존중한다 · 마감 지난 것 · 공고문뿐인 것은 안 넣는다',
+    ['e2', 'e3', 'e6'].some((id) => q.some((x) => x.id === id)), false);
+  eq('  한 번 들어갔던 것(retired)은 다시 넣지 않는다', q.filter((x) => x.id === 'e5').length, 1);
+}
+
+console.log('\n■ 신청 준비 시작 버튼 — 양식이 없어도 곧장 \'준비 완료\'로 새지 않는다 (2026-09-23)');
+{
+  /* app.js 의 **진짜 함수**를 이름으로 떼어 가짜 이웃과 함께 돌린다(사본을 재면 원본이 바뀌어도 초록이다). */
+  const appSrc = readText(new URL('../app.js', import.meta.url));
+  const take = (name) => {
+    const s = appSrc.indexOf(`function ${name}(`);
+    if (s < 0) throw new Error(`app.js 에서 ${name} 을 못 찾음`);
+    let d = 0, seen = false;
+    for (let i = appSrc.indexOf('{', s); i < appSrc.length; i++) {
+      if (appSrc[i] === '{') { d++; seen = true; }
+      else if (appSrc[i] === '}') { d--; if (seen && !d) return appSrc.slice(s, i + 1); }
+    }
+    throw new Error(`${name} 의 끝을 못 찾음`);
+  };
+  const route = (hasForm, essays) => {
+    const calls = [];
+    const applyTo = new Function('formTplIdFor', 'essayDefsFor', 'startFormFill', 'startDocPrep',
+      'renderApplyPrep', 'finalizeApply', 'closeSheet', `${take('applyTo')}\nreturn applyTo;`)(
+      () => (hasForm ? 'f1' : null), () => essays, () => calls.push('양식'), () => calls.push('서류도우미'),
+      () => calls.push('준비시트'), () => calls.push('완료'), () => calls.push('닫기'));
+    applyTo({ id: 'x', documents: [] });
+    return calls;
+  };
+  eq('🔴 양식도 서류 도우미도 없는 공고 → 준비 시트만 뜬다 (완료를 찍지 않는다 — 그날의 버그)', route(false, []), ['준비시트']);
+  eq('  앱 양식이 있으면 양식 작성으로 간다', route(true, []), ['양식']);
+  eq('  작성형 서류가 있으면 서류 도우미로 간다', route(false, [{ kind: 'intro' }]), ['서류도우미']);
+
+  /* 준비 시트 안에서 '완료'는 **학생이 확인 버튼을 눌렀을 때만** 일어난다 — 주석을 걷고 본다 */
+  const prep = take('renderApplyPrep').replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  const beforeClick = prep.split(/\$\('#btn-prep-confirm'\)\.addEventListener\('click'/)[0];
+  eq('  준비 시트는 확인 버튼 배선을 가진다', /\$\('#btn-prep-confirm'\)\.addEventListener\('click'/.test(prep), true);
+  eq('🔴 확인 버튼을 누르기 전에는 finalizeApply 를 부르지 않는다', /finalizeApply\(/.test(beforeClick), false);
+  eq('  확인 버튼이 finalizeApply 를 부른다', /addEventListener\('click',[\s\S]*finalizeApply\(sch/.test(prep), true);
+  /* 제출처·채널 이름·양식 첨부 판정·원문 링크 이름은 **한 곳씩** — 시트가 제 사본을 들면 상세 시트와 다른 말을 한다 */
+  eq('  판정을 새로 만들지 않고 한 곳씩 가져다 쓴다',
+    ['officialChannel(sch)', 'submitChannelLabel(sch)', 'isFormAttachment', 'sourceNoteHtml(sch)'].filter((s) => !prep.includes(s)), []);
+  eq('  층2 첨부를 \'신청서 양식\'이라 부르지 않는다 (재단이 올린 선발 공고문이다)',
+    /const formAtts = kosaf \? \[\] :/.test(prep), true);
+
+  /* 체크리스트에 '원문에서 확인하라'는 안내 줄이 **서류처럼** 올라가지 않는다 */
+  const ph = new RegExp(appSrc.match(/const DOC_PLACEHOLDER = \/(.*)\/;/)[1]);
+  const cert = new Function('ESSAY_DEFS', 'DOC_PLACEHOLDER', 'docWalletStatus', 'esc',
+    `${take('certStatusListHtml')}\nreturn certStatusListHtml;`)([], ph, () => null, (s) => s);
+  eq('  자동 등록분의 안내 줄 하나뿐이면 체크리스트를 만들지 않는다',
+    cert({ documents: ['지원 자격·제출 서류는 원문 공고에서 확인'] }), '');
+  const mixed = cert({ documents: ['재학증명서', '재단 공고문에서 확인', '신청 서류·접수 방법은 원문 공고 확인'] });
+  eq('  진짜 서류는 남기고 안내 줄만 뺀다', [/재학증명서/.test(mixed), /확인 —/.test(mixed.replace(/재학증명서[^<]*/, ''))], [true, false]);
+}
+
 /* 2026-08-20 — 자격 절을 어디서 끊나. 개발자가 "본문에 다 써 있는데 못 읽는 것 같다"고
    짚어 준 뒤 판 결과, 절 경계를 **길이로 재던 것**이 진짜 원인이었다.
    `EXCERPTS_AS_LIB=1`로 발췌기를 라이브러리처럼 불러 **규칙 함수를 직접 돌린다**
@@ -8471,7 +8629,7 @@ console.log('\n■ 모르는 접수 방법을 단정하지 않는다 (2026-09-21
      — 베낀 사본이 아니라 원본을 재야 의미가 있다(이 파일의 다른 절과 같은 방식). */
   const built = new Function(`${acSrc}
 ${dataSrc.match(/const SUBMIT_CHANNEL_LABEL = \{[\s\S]*?\};/)[0]}
-${[ 'hasFormAttachment', 'hasPortalEvidence', 'submitChannelKind', 'submitChannelLabel' ].map(grabFn).join('\n')}
+${[ 'isFormAttachment', 'hasFormAttachment', 'hasPortalEvidence', 'submitChannelKind', 'submitChannelLabel' ].map(grabFn).join('\n')}
 return { submitChannelKind, submitChannelLabel };`)();
   const kind = built.submitChannelKind;
   const label = built.submitChannelLabel;

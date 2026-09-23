@@ -441,9 +441,15 @@ const SUBMIT_GUIDES = {
 };
 
 /* 첨부에 실제 신청서·양식 파일(HWP/DOC/HWPX/ZIP)이 있는지 — '원본 양식 다운로드형' 판별 */
+/* 첨부 하나가 '학생이 내려받아 채우는 서식'으로 보이는가 — 판정은 여기 한 곳.
+   접수 채널 분류(아래 hasFormAttachment)와 신청 준비 시트(app.js renderApplyPrep)가 같이 쓴다.
+   갈라 두면 채널은 '원본 양식 다운로드형'이라 말하는데 시트는 양식이 없다고 그리게 된다. */
+function isFormAttachment(a) {
+  const name = (a && a.name) || '';
+  return /신청서|지원서|양식|서식|서류/.test(name) && /\.(hwp|hwpx|docx?|zip)/i.test(name);
+}
 function hasFormAttachment(sch) {
-  return (sch.attachments || []).some((a) =>
-    /신청서|지원서|양식|서식|서류/.test(a.name) && /\.(hwp|hwpx|docx?|zip)/i.test(a.name));
+  return (sch.attachments || []).some(isFormAttachment);
 }
 
 /* 접수 채널 분류 — 실제 공고의 접수 방식 (정직 표기: 앱이 대신 못 누르는 채널은 명시).

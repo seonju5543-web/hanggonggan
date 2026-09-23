@@ -2315,6 +2315,8 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
 .att { position: relative; padding-left: 13px; }
 .att::before { content: ''; position: absolute; left: 0; top: 0.62em; width: 5px; height: 5px;
                border-radius: var(--radius-pill); background: var(--text-weak); }
+/* 첨부 링크 색 — 상세 시트는 줄마다 인라인으로 칠해 왔고, 신청 준비 시트(2026-09-23)는 이 규칙을 쓴다 */
+.att a { color: var(--primary); }
 
 /* ── 상세 시트 — 판정은 근거 옆에 한 번만 (2026-08-31) ────────────────────────
    정리 전에는 시트 맨 위에 적합도 배지와 '지원 가능 · 선발 심사' 알약이 나란히 떠서

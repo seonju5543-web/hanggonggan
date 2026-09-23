@@ -265,7 +265,17 @@ function finish() {
 }
 
 const hasKey = !!process.env.ANTHROPIC_API_KEY;
-if (!cfg.enabled) { log('schematize-config.json enabled:false — 건너뜁니다.'); process.exit(0); }
+/* 🔴 **스위치가 둘이다 — 유료를 끄려고 전체를 끄지 말 것** (2026-09-23 개발자 지적:
+   "공고 대부분이 공고양식을 읽지 못하고 신청 준비 시작 버튼을 눌렀을때 바로 신청내역으로 이동").
+   2026-08-20 크레딧 누수 조사 때 `enabled:false` 로 **유료 API 를 끄려 했는데**, 그 값이
+   이 줄에서 로봇을 통째로 세워 **돈이 안 드는 무료 변환기까지 한 달 동안 멈췄다.**
+   원본은 매일 받아지는데(59건 · 전부 저장소에 있었다) 양식이 한 건도 안 만들어져,
+   그 뒤 자동 등록된 공고는 전부 '양식 없음' — 앱의 신청 버튼이 곧장 '준비 완료'로 새던 원인이다.
+   · `enabled`    — 로봇 전체(무료+유료). 끄면 아무것도 안 한다(킬스위치).
+   · `apiEnabled` — **유료 API 경로만.** 꺼도 무료 변환기는 돈다. 크레딧 걱정은 이것으로 끈다.
+   관문: verify/test-collector.mjs '양식 변환 로봇의 두 스위치' 절(로봇을 실제로 돌려 잰다). */
+if (cfg.enabled === false) { log('schematize-config.json enabled:false — 무료 변환까지 전부 건너뜁니다.'); process.exit(0); }
+const apiOn = cfg.apiEnabled !== false;
 
 let queue;
 try { queue = JSON.parse(fs.readFileSync(queuePath, 'utf8')); } catch { log('대기 큐 없음'); process.exit(0); }
@@ -322,6 +332,7 @@ for (const item of pending) {
 
   let linked = false;
   let leftForManual = false;
+  let calledApi = false;   // 이 공고로 유료 API 를 실제로 불렀나 — 재시도 한도는 이것만 센다
   const freeParts = [];
 
   for (const row of rows) {
@@ -346,6 +357,7 @@ for (const item of pending) {
       continue;
     }
 
+    if (!apiOn) { manual.push([item.name, row.attachment, `유료 경로 꺼짐(schematize-config apiEnabled:false) — ${why}`]); leftForManual = true; continue; }
     if (!hasKey) { manual.push([item.name, row.attachment, 'API 키 없음 — 다음 세션이 수동 처리']); leftForManual = true; continue; }
     /* ?? 를 쓴다 — 0(“절대 부르지 마”)을 || 가 기본값으로 되돌려 버리는 사고 방지 */
     const cap = cfg.maxApiCallsPerRun ?? 2;
@@ -368,6 +380,7 @@ for (const item of pending) {
     let parsed;
     try {
       apiCalls++;
+      calledApi = true;
       const c = await getClient();
       /* fallbacks: 안전 분류기가 요청을 거절하면 다른 모델로 자동 재시도 (같은 호출 안에서) */
       const stream = c.beta.messages.stream({
@@ -467,8 +480,11 @@ for (const item of pending) {
      변환이 구조적으로 불가능하면 그 재시도는 영원히 성공하지 못하고 돈만 쓴다.
      원본 재확보 쪽에 이미 있는 `retired` 장치(mark-fetched.mjs)와 같은 방침 —
      조용히 사라지지 않고 리포트에 '자동 재시도 중단'으로 계속 뜨며,
-     pending-forms.json에서 apiTries를 지우면 다시 시도한다. */
-  else {
+     pending-forms.json에서 apiTries를 지우면 다시 시도한다.
+     🔴 **실제로 API 를 부른 실행만 센다** (2026-09-23). 유료 경로가 꺼져 있거나 한도에 걸려
+        부르지도 못한 실행까지 세면, 켜는 날엔 이미 '6회 실패 — 재시도 중단'이 붙어
+        **한 번도 시도하지 않은 공고가 포기된다.** 무료 변환 실패는 돈이 안 들어 세지 않는다. */
+  else if (calledApi) {
     item.apiTries = (item.apiTries || 0) + 1;
     if (item.apiTries >= (cfg.giveUpAfter ?? 6)) {
       item.schematized = true;

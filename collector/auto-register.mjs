@@ -349,8 +349,27 @@ if (!cfg.enabled) {
   let queue = { items: [] };
   try { queue = JSON.parse(fs.readFileSync(queuePath, 'utf8')); } catch { /* 첫 실행 */ }
   let queued = 0;
-  for (const e of added) {
-    if (!(e.attachments || []).some((a) => /신청서|지원서|신청양식|원서|서식|양식|동의서|서약서/.test(a.name))) continue;
+  let backfilled = 0;
+  /* 🔴 **이번 실행에 등록한 것만 보지 않는다** (2026-09-23 · 원칙 7 소급).
+     예전엔 `added` 만 훑어서, 등록할 때 첨부가 공고문뿐이었다가 **나중에 신청서가 붙은**
+     공고(재수집·본문 재수집이 첨부를 채운다)는 영영 대기줄에 못 들어갔다 — 실측으로 마감 전
+     자동 등록분 32건 중 22건이 대기줄 밖이었고, 그중엔 `신청서식.hwpx` 를 단 공고도 있었다.
+     그래서 **아직 양식이 안 붙은 자동 등록분**을 매 실행 다시 본다. 좁히는 조건 셋:
+     · `noForm` 이 로봇이 단 '검수 전' 표시일 때만 — 사람이 '양식 없음'을 확인해 적은 사유는 존중한다
+     · 마감 지난 공고는 뺀다 —받아 봐야 학생이 못 쓴다(원본 확보 단계의 시간만 먹는다)
+     · 한 번이라도 대기줄에 들어간 적 있으면 다시 넣지 않는다(받기 실패 retired 도 그대로 둔다) */
+  const stillNeedsForm = (e) => e.auto && !e.formId && !e.prepDoc
+    && /^자동 등록\(검수 전\)/.test(e.noForm || '')
+    && !(e.deadline && e.deadline < TODAY);
+  const addedIds = new Set(added.map((e) => e.id));
+  const candidates = [...added, ...registered.items.filter((e) => !addedIds.has(e.id) && stillNeedsForm(e))];
+  /* 학생이 채우는 서식으로 보이는 첨부 이름. `계획서`·`자기소개서` 는 2026-09-23 에 더했다 —
+     `활동 계획서(장학신청시 제출).hwp` 처럼 이름에 '신청서·양식'이 없는 서식이 대기줄 밖에 있었다.
+     `선발 계획(안)` 같은 **읽는 문서**가 같이 들어와도 괜찮다: 변환기(schematize-forms.mjs 의
+     NOT_A_FORM)가 신청서가 아닌 것을 거른다 — 여기서는 원본을 받아 둘지만 정한다. */
+  const FORMISH = /신청서|지원서|신청양식|원서|서식|양식|동의서|서약서|계획서|자기소개서/;
+  for (const e of candidates) {
+    if (!(e.attachments || []).some((a) => FORMISH.test(a.name))) continue;
     if (queue.items.some((q) => q.id === e.id)) continue;
     /* deepfetch가 제목 부분일치로 대상을 찾으므로, 부스러기 없는 제목 앞부분을 표적으로 쓴다.
        길이 12자 → 30자 (2026-08-04). 12자는 "2026학년도 2학기 " 처럼 어느 공고에나 있는
@@ -361,10 +380,11 @@ if (!cfg.enabled) {
     const target = cleanTitle(e.name).replace(/^(\s*\[[^\]]*\])+/, '').trim().slice(0, 30);
     queue.items.push({ id: e.id, name: e.name, target, added: TODAY, fetched: false, schematized: false });
     queued++;
+    if (!addedIds.has(e.id)) backfilled++;
   }
   if (queued) {
     fs.writeFileSync(queuePath, JSON.stringify(queue, null, 1) + '\n');
-    report.push('', `**🧩 양식 원본 자동 확보 예약 ${queued}건** — 원본은 이 실행에서 바로 내려받고, 스키마화(앱 내 작성 전환)는 다음 Claude 세션이 처리해요.`);
+    report.push('', `**🧩 양식 원본 자동 확보 예약 ${queued}건**${backfilled ? ` (그중 ${backfilled}건은 전에 등록됐는데 신청서 첨부가 나중에 붙은 공고)` : ''} — 원본은 이 실행에서 바로 내려받고, 같은 실행의 무료 변환기가 앱 양식으로 옮겨요(못 옮긴 것은 리포트 '보류'에 남아요).`);
   }
   const waiting = queue.items.filter((q) => q.fetched && !q.schematized).length;
   if (waiting) report.push('', `**⏳ 스키마화 대기 중 ${waiting}건** (원본 확보됨 — collector/pending-forms.json)`);

@@ -1867,9 +1867,15 @@ function autoDocs(sch) {
   return sch.documents.filter((doc) => /자동/.test(doc));
 }
 
+/* '서류가 무엇인지는 원문에서 확인' 이라는 **안내 줄** — 서류 이름이 아니다.
+   자동 등록분은 documents 에 `지원 자격·제출 서류는 원문 공고에서 확인` 한 줄만 들고 온다
+   (층2는 `재단 공고문에서 확인`). 이걸 체크리스트에 올리면 "□ 지원 자격·제출 서류는 원문 공고에서
+   확인 — 공식 제출 시 함께 준비하세요" 처럼 **서류가 아닌 것을 챙기라고** 말한다(2026-09-23). */
+const DOC_PLACEHOLDER = /(원문\s*공고|공고문)(에서)?\s*확인/;
+
 /* 증명서류(작성형 제외)의 보관함 상태 목록 HTML */
 function certStatusListHtml(sch) {
-  const certDocs = sch.documents.filter((doc) => !ESSAY_DEFS.some((e) => e.match.test(doc)));
+  const certDocs = sch.documents.filter((doc) => !ESSAY_DEFS.some((e) => e.match.test(doc)) && !DOC_PLACEHOLDER.test(doc));
   if (!certDocs.length) return '';
   const rows = certDocs.map((doc) => {
     const st = docWalletStatus(doc);
@@ -2647,8 +2653,60 @@ function applyTo(sch) {
     startDocPrep(sch);
     return;
   }
-  finalizeApply(sch, null);
-  closeSheet();
+  /* 🔴 **여기서 곧장 finalizeApply 를 부르지 말 것** (2026-09-23 개발자 지적:
+     "공고 대부분이 공고양식을 읽지 못하고 신청 준비 시작 버튼을 눌렀을때 바로 신청내역으로 이동").
+     예전엔 앱 양식도 서류 도우미도 없는 공고는 **누르는 순간** '신청 준비 완료'가 됐다 —
+     학생은 아무것도 준비하지 않았는데 신청내역에 '준비 완료'가 찍혔다(원칙 1 정직한 신청 상태).
+     실측으로 마감 전 공고 112건 중 100건(층1 32 · 층2 68)이 이 길이었다.
+     이제는 '신청 준비' 시트가 먼저 뜬다 — 원본 양식 파일 · 제출 서류 · 최종 제출 방법을 보여 주고,
+     학생이 확인 버튼을 눌러야 담긴다. 관문: verify/test-collector.mjs 「신청 준비 시작 버튼」. */
+  renderApplyPrep(sch);
+}
+
+/* 앱 양식이 없는 공고의 '신청 준비' 시트.
+   🔴 여기서 새로 판정하지 않는다 — 제출처는 officialChannel · 채널 이름은 submitChannelLabel ·
+      양식 첨부인지는 isFormAttachment(data.js) · 원문 링크 이름은 sourceNoteHtml 한 곳씩이다.
+   🔴 앱 내부 사정(왜 앱 양식이 없는지)은 적지 않는다(2026-09-17 지시) — 학생이 할 일만 적는다.
+   🔴 원본에 없는 서류·방법을 지어내지 않는다 — 발췌(excerpts)와 공고가 준 서류 이름만 옮긴다. */
+function renderApplyPrep(sch) {
+  const ch = officialChannel(sch);
+  const atts = sch.attachments || [];
+  const kosaf = sch.sourceKind === 'kosaf';
+  /* 층2 첨부는 재단이 올린 **선발 공고문**이다 — 신청서라고 부르면 학생이 그 안에서 빈칸을 찾는다
+     (상세 시트의 '선발 공고문' 머리말과 같은 규칙) */
+  const formAtts = kosaf ? [] : atts.filter(isFormAttachment);
+  const otherAtts = atts.filter((a) => !formAtts.includes(a));
+  const attList = (list) => `<ul class="doc-list">${list.map((a) => `<li class="att"><a href="${esc(safeUrl(a.url))}" target="_blank" rel="noopener">${esc(a.name)}</a>${a.bytes ? ` <span class="doc-legend">${Math.max(1, Math.round(a.bytes / 1024))}KB</span>` : ''}</li>`).join('')}</ul>`;
+  const excerpts = sch.excerpts || [];
+  const certHtml = certStatusListHtml(sch);
+  $('#detail-sheet').innerHTML = `
+    <div class="sheet-handle"></div>
+    <div class="sheet-body" id="apply-prep">
+      <h3 class="sheet-title">신청 준비</h3>
+      <p class="sheet-provider">${esc(sch.name)} · 준비할 것을 확인하고 담아 두세요</p>
+      ${formAtts.length ? `
+      <h4>신청서 양식 <span class="channel-tag">공고 원본</span></h4>
+      ${attList(formAtts)}
+      <p class="dp-note">원본 파일을 내려받아 작성해 주세요.</p>` : ''}
+      ${otherAtts.length ? `
+      <h4>${kosaf ? '선발 공고문 <span class="channel-tag">재단 원문</span>' : '공고 첨부 파일'}</h4>
+      ${attList(otherAtts)}` : ''}
+      ${excerpts.length ? `
+      <h4>공고 원문 안내 <span class="channel-tag">원문 그대로</span></h4>
+      <ul class="doc-list">${excerpts.map((e) => `<li>${esc(e)}</li>`).join('')}</ul>` : ''}
+      ${certHtml || '<p class="dp-note">제출 서류는 공고 원문에서 확인해 주세요.</p>'}
+      <h4>최종 제출 방법 <span class="channel-tag">${submitChannelLabel(sch)}</span></h4>
+      <ol class="guide-list">${ch.guide.map((g) => `<li>${g}</li>`).join('')}</ol>
+      ${schoolPortalNote(sch)}
+      ${sourceNoteHtml(sch)}
+      <button class="btn btn-primary btn-lg" id="btn-prep-confirm">이대로 신청 준비 완료</button>
+      <p class="dp-note">누르면 신청내역에 담기고, 제출·결과는 그곳에서 기록합니다. 학교·재단에 접수되는 것은 아닙니다.</p>
+    </div>`;
+  $('#btn-prep-confirm').addEventListener('click', () => {
+    finalizeApply(sch, null);
+    closeSheet();
+  });
+  $('#detail-sheet').scrollTop = 0;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -3079,6 +3137,18 @@ function schoolPortalNote(sch) {
   return `<p class="dp-note">교내 장학금은 <a href="${esc(safeUrl(p.url))}" target="_blank" rel="noopener">${esc(p.label)} ↗</a>에서 신청합니다. 이 공고의 접수 방법은 위 안내와 공고 원문을 따라 주세요.</p>`;
 }
 
+/* '자세한 내용은 ○○ ↗에서 확인' 한 줄 — 공고 상세와 신청 준비 시트가 같이 쓴다.
+   🔴 링크 이름은 그 주소가 **실제로 여는 화면**을 말한다(아래 openDetail 의 두 문단 참조).
+      시트마다 따로 적으면 한쪽만 '원문 공고'라고 거짓말하게 된다. */
+function sourceNoteHtml(sch) {
+  const srcLabel = sch.program ? '한국장학재단 ↗'
+    : sch.sourceKind === 'kosaf' ? '재단 홈페이지 ↗'
+    : isBoardListLink(sch.sourceUrl) ? '게시판 목록 ↗' : '원문 공고 ↗';
+  return sch.sourceUrl
+    ? `<p class="doc-legend">자세한 내용은 <a href="${esc(safeUrl(sch.sourceUrl))}" target="_blank" rel="noopener">${srcLabel}</a>에서 확인</p>`
+    : '<p class="doc-legend">자세한 내용은 원문 공고에서 확인</p>';
+}
+
 function openDetail(id) {
   const sch = findSch(id);
   if (!sch) return;
@@ -3229,12 +3299,7 @@ function openDetail(id) {
      '한국장학재단 ↗'이라 적어 두면 눌러 본 학생에게 거짓말이 된다 — 이 규칙(링크 이름은
      그 주소가 **실제로 여는 화면**을 말한다)은 바로 윗 문단이 이미 적어 둔 것이다.
      KOSAF 를 가리키는 것은 `program`(data.js 의 상시 제도)뿐이다. */
-  const srcLabel = sch.program ? '한국장학재단 ↗'
-    : sch.sourceKind === 'kosaf' ? '재단 홈페이지 ↗'
-    : isBoardListLink(sch.sourceUrl) ? '게시판 목록 ↗' : '원문 공고 ↗';
-  const srcNote = sch.sourceUrl
-    ? `<p class="doc-legend">자세한 내용은 <a href="${esc(safeUrl(sch.sourceUrl))}" target="_blank" rel="noopener">${srcLabel}</a>에서 확인</p>`
-    : '<p class="doc-legend">자세한 내용은 원문 공고에서 확인</p>';
+  const srcNote = sourceNoteHtml(sch);
 
   let btnLabel = '신청 준비 시작';
   if (app && !app.pending) btnLabel = '신청 준비 완료됨';
