@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-09-23",
+ "updatedAt": "2026-09-24",
  "items": {
   "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2668%20%5B%ED%99%8D%EB%B3%B4%5D%20%ED%95%9C%EA%B5%AD%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EA%B3%B5%EA%B3%B5%EB%8D%B0%EC%9D%B4%ED%84%B0%20%EA%B0%9C%EB%B0%A9%20%EB%B0%8F%20%ED%99%9C%EC%9A%A9%20%EC%95%88%EB%82%B4%202026.0": {
    "attempts": 5,
@@ -3428,7 +3428,7 @@
    "lastWhy": "",
    "status": "resolved",
    "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322917",
-   "patrolledAt": "2026-09-22"
+   "patrolledAt": "2026-09-24"
   },
   "r:auto-cb2ad20ec9588eb82b482f26": {
    "attempts": 0,
@@ -3850,19 +3850,19 @@
    "lastWhy": "page.goto: Timeout 20000ms exceeded."
   },
   "r:reg-diabetes-hope": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-24",
    "lastWhy": "제목 불일치(다른 글이 열림)"
   },
   "r:reg-dongsan": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-24",
    "lastWhy": "제목 불일치(다른 글이 열림)"
   },
   "r:reg-partner-foundation": {
-   "patrolledAt": "2026-09-22",
-   "lastWhy": "제목 불일치(다른 글이 열림)"
+   "patrolledAt": "2026-09-24",
+   "lastWhy": "page.goto: Timeout 20000ms exceeded."
   },
   "r:auto-kuk2351202780artclviewdo": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-24",
    "lastWhy": "제목 불일치(다른 글이 열림)"
   },
   "r:auto-oardid322606menuno200318": {
@@ -3882,11 +3882,11 @@
    "lastWhy": ""
   },
   "r:auto-ent2431264197artclviewdo": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-24",
    "lastWhy": ""
   },
   "r:auto-ent2431264135artclviewdo": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-24",
    "lastWhy": ""
   },
   "r:auto-ent2431264146artclviewdo": {
@@ -4142,7 +4142,7 @@
    "lastWhy": "",
    "status": "resolved",
    "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323098",
-   "patrolledAt": "2026-09-22"
+   "patrolledAt": "2026-09-24"
   },
   "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323098": {
    "patrolledAt": "2026-09-23",
@@ -4167,7 +4167,7 @@
    "lastWhy": "",
    "status": "resolved",
    "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323111",
-   "patrolledAt": "2026-09-22"
+   "patrolledAt": "2026-09-24"
   },
   "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323111": {
    "patrolledAt": "2026-09-23",
@@ -4194,15 +4194,15 @@
    "lastWhy": ""
   },
   "r:auto-ent2431267001artclviewdo": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-24",
    "lastWhy": ""
   },
   "r:auto-ent2431266737artclviewdo": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-24",
    "lastWhy": ""
   },
   "r:auto-ent2431265667artclviewdo": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-24",
    "lastWhy": ""
   },
   "r:auto-ent2431264949artclviewdo": {
@@ -4210,27 +4210,27 @@
    "lastWhy": ""
   },
   "r:auto-oardid323082menuno200318": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-24",
    "lastWhy": ""
   },
   "r:auto-oardid323054menuno200318": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-24",
    "lastWhy": ""
   },
   "r:auto-oardid323019menuno200318": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-24",
    "lastWhy": ""
   },
   "r:auto-oardid323011menuno200318": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-24",
    "lastWhy": ""
   },
   "r:auto-ent2431264946artclviewdo": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-24",
    "lastWhy": ""
   },
   "r:auto-oardid322922menuno200318": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-24",
    "lastWhy": ""
   },
   "r:auto-oardid322916menuno200318": {
@@ -4242,11 +4242,11 @@
    "lastWhy": ""
   },
   "r:auto-oardid322875menuno200318": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-24",
    "lastWhy": ""
   },
   "r:auto-oardid322874menuno200318": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-24",
    "lastWhy": ""
   },
   "n:https://dep.hufs.ac.kr/bbs/student/2431/267416/artclView.do": {
