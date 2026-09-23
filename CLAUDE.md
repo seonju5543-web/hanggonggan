@@ -147,6 +147,8 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 ## 중요한 기술 사실 (재발견에 시간 쓰지 말 것)
 
 각 줄의 경위는 `SESSIONS.md`(특히 「2026-09-23 이관분」)에서 제목으로 찾는다.
+"관문 「X」" 는 `verify/test-collector.mjs` 의 절이다 — `grep -n "■.*X" verify/test-collector.mjs` 로 찾는다.
+파일 이름만 적힌 관문(`verify-*.js` 등)은 `verify/` 에 있다.
 
 ### 판정 · 자격
 
@@ -191,7 +193,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   버튼은 `mailto:` 라 서버가 필요 없다. 관문 「메일 접수 주소」.
 - **포털 신청**(`findApplyPortal`): 한 학교가 시스템을 둘 쓴다 · 양식 받는 곳·결과 보는 곳·계좌 등록은 접수처가 아니다 · 길은 원문 그대로 인용 ·
   주소를 짐작해 채우지 말 것 · 열쇠 글자는 `PORTAL_SYSTEMS`↔`PORTAL_SYSTEM_INFO` 같게. 관문 「포털 신청 시스템」.
-- **학자금대출**은 정식 등록 제외(대출 원금·이자를 지원하는 장학금은 제외 대상 아님 — `LOAN_EXCEPT`) · 피드는 장학 8칸 + 대출 2칸.
+- **학자금대출**은 정식 등록 제외(대출 원금·이자를 지원하는 장학금은 제외 대상 아님 — `LOAN_EXCEPT`) · 피드에선 빼지 않고 장학 공고 뒤로 보낸다(`boardNoticesForMe`).
 - **인스타**: 🔴 게시는 사람만 누른다 · 토큰은 워크플로에만 · 한 실행 최대 6건 · 수정은 다시 그려 **보여 주고 메일 보낼지 물은 뒤** push-to-run(스킬 `insta-revise`).
   관문 `verify-insta.js` · `docs/designs/instagram-pipeline.md`.
 
@@ -208,8 +210,9 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 - **첫 화면**: 감추지 않은 화면이 하나면 그게 첫 화면이 된다 · CSP 가 인라인·`onclick=` 을 막는다 · 저장은 `visibilitychange` 로(`beforeunload` 금지) ·
   부팅 화면 바닥값 1초(`performance.now()` 금지) · 알림 딥링크는 목록을 기다렸다 연다. 관문 `verify-resume.js`.
 - **시작 화면**(정문 투어링): `docs/designs/start-screen.md` · `.onboard-step[data-step="0"]` 의 `flex: none` 을 빼면 높이 0 · 사진은 위키미디어 열린 라이선스만.
-- 카드 마감은 `D-3` 글자 하나(막대 삭제) · 적합도는 알약 · 누름 표시는 글자색(탈퇴 제외 · `:active` 는 CDP 로 잰다) · 패럴랙스 되살리지 말 것 ·
-  MY 프로필 카드는 버튼이 아니다(`.my-edit-hint` 만) · 빈칸은 먹물 사이로 잰다 · 화면 제목 밑줄은 글자 폭.
+- **개발자가 정한 화면 결정 (되돌리지 말 것)**: 카드 마감은 `D-3` 글자 하나(빨간 막대 삭제) · 적합도는 알약 · 누르면 회색 판이 아니라
+  글자색이 바뀐다(탈퇴 제외 · `:active` 는 마우스가 아니라 CDP 로 잰다) · 패럴랙스 없음 · MY 프로필 카드는 통째 버튼이 아니다(`.my-edit-hint` 만) ·
+  여백은 상자 사이가 아니라 **글자와 글자 사이**로 잰다 · 화면 제목 밑줄은 글자 폭 · 구분선은 목록에만. 관문 `verify-settings.js`.
 - 일괄 신청 준비는 `confirm()` 이 아니라 앱 목록(`renderBulkPrep`) · 시트 그릇은 `#detail-sheet` · 체크해도 다시 그리지 않는다.
 - 기다림이 보이는 곳은 실시간 공고 구역 하나(`allScholarships` 가 상시 제도를 먼저 준다). 못 받아 왔을 때 `null` 로 두지 말 것(뼈대가 굳는다).
 
@@ -218,7 +221,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 - **🔴 로봇이 고친 파일은 전부 `git add` 에** · 없을 수 있는 파일은 `[ -f … ] && git add` · 데이터 관문(감사)은 저장 직전 · 감사 실패면 결과가 하나도 안 남는다.
 - **🔴 모든 워크플로에 `timeout-minutes`** · 보강 단계는 `timeout-minutes` + `continue-on-error: true` · 실패 알림은 `if: failure() || cancelled()` ·
   학교마다 `withDeadline()` 절대 시한 · 전역 예산(`harvest-budget.mjs`) 안에 스스로 끝낸다(상한을 올리는 건 해법 아님) · 넘어져도 `saveAll()`.
-- 대기줄(concurrency)을 하나로 합치지 말 것(대기 실행이 취소된다) · 예약은 홀수 분(정각은 지연·누락) · 새 공고 0건이면 이슈 대신 코멘트.
+- 대기줄(concurrency)을 하나로 합치지 말 것(대기 실행이 취소된다) · 예약은 정각·UTC 자정을 피한다(지연·누락이 실제로 났다 · 관례는 홀수 분) · 새 공고 0건이면 이슈 대신 코멘트.
 - 문법 검사는 `node --check` — `import('./x.mjs')` 는 **실행된다**. 불러오는 순간 실행되는 파일(auto-register·schematize)은 가져다 쓰지 말 것.
 - **원문 링크는 그 공고 하나로** — 주소를 유추하지 말고 게시판 폼을 그대로 · 세션 없는 새 탭에서 열어 확인 · '못 읽음'과 '다른 글'을 구분 ·
   같은 학교를 하루에 여러 번 두드리지 말 것 · 못 찾으면 `#n-` 표식(앱이 '게시판 목록 ↗'). 사냥꾼이 못 찾는 이유는 대개 `boardTitle` 이 없어서.
@@ -264,6 +267,9 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 - **현황 숫자를 적지 않는다**(사본은 반드시 낡는다) — 필요하면 그때 센다.
 - 🔴 관문: `test-collector.mjs` 「CLAUDE.md 부피」 — **60KB · 400줄 · 한 항목 20줄**을 넘으면 실패한다
   (줄 수만 세던 시절 한 줄에 3,600자를 몰아 써서 153KB 까지 불었다).
+- 🔴 관문: 같은 파일 「CLAUDE.md 가 가리키는 것이 실제로 있다」 — 백틱·명령 블록의 **파일 경로**, 백틱의 **함수·칸 이름**,
+  「관문 「X」」의 **절 이름**이 코드에 없으면 실패한다. 이름을 바꾸면 이 문서도 같이 고친다. 코드에 없는 이름(MCP 도구 등)은 그 절의 예외 목록에.
+  두 문서 관문은 로컬·`verify-ui.yml`(`DOC_GATES=1`)에서만 실패하고 **수집 로봇에선 건너뛴다**(문서 오타로 자동 등록분이 되돌려지면 안 된다).
 
 ## 커밋 규칙
 

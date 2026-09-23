@@ -2477,8 +2477,14 @@ console.log('\n■ 자격 자리의 잡음을 유형별로 세는가 (2026-08-23
    (68개 항목 중 38개는 이미 검사가 지키므로 설명 대신 '규칙 한 줄 + 관문 위치'만 남겼다).
    🔴 **줄이라고 적어 두는 것은 리포트다.** 실제로 줄이기 직전 최대 항목이 71줄이었고,
       "간결하게 쓰자"는 문장은 그 옆에 계속 있었다. 그래서 관문으로 만든다. */
+/* 🔴 CLAUDE.md 를 재는 두 절은 **로봇 워크플로에서는 건너뛴다** (2026-09-23).
+   수집 로봇이 이 파일을 데이터 관문으로 돌리고, 실패하면 그 실행의 자동 등록분을 되돌린다
+   (collect-scholarships.yml '감사 실패 시 자동 등록분 되돌리기'). 문서 오타로 수집이 멈추면 안 된다.
+   로컬과 코드 검사(verify-ui.yml — `DOC_GATES=1`)에서는 그대로 실패한다. 건너뛸 때도 조용하지 않게 알린다. */
+const DOC_GATES = !process.env.GITHUB_ACTIONS || process.env.DOC_GATES === '1';
 console.log('\n■ CLAUDE.md 부피 (2026-08-29)');
-{
+if (!DOC_GATES) console.log('  (로봇 워크플로 — 문서 관문 건너뜀 · verify-ui.yml 과 로컬에서만 잰다)');
+else {
   const md = readText(new URL('../CLAUDE.md', import.meta.url));
   const total = md.split('\n').length;
   eq(`문서 전체가 400줄을 넘지 않는다 (지금 ${total}줄)`, total <= 400, true);
@@ -2496,6 +2502,57 @@ console.log('\n■ CLAUDE.md 부피 (2026-08-29)');
   const longs = items.map((t) => [t.split('\n').length, t.split('\n')[0].slice(0, 40)])
                      .filter(([n]) => n > 20);
   eq('한 항목이 20줄을 넘지 않는다 (넘으면 경위를 SESSIONS.md 로)', longs, []);
+}
+
+/* ── 2026-09-23 · CLAUDE.md 가 가리키는 것이 실제로 있는가 ──
+   문서는 규칙 옆에 **관문 위치·파일·함수 이름**만 적는다(경위는 SESSIONS.md). 그러면 문서의 값은
+   그 이름들이 살아 있는가에 달렸다 — 이름이 바뀌면 문서가 조용히 거짓이 된다. 그래서 전부 대조한다.
+   정리 당시 손으로 대조해 '피드는 장학 8칸 + 대출 2칸'(이미 사라진 동작)을 잡았다. */
+console.log('\n■ CLAUDE.md 가 가리키는 것이 실제로 있다 (2026-09-23)');
+if (!DOC_GATES) console.log('  (로봇 워크플로 — 문서 관문 건너뜀)');
+else {
+  const md = readText(new URL('../CLAUDE.md', import.meta.url));
+  const R = new URL('../', import.meta.url);
+  const ex = (p) => fs.existsSync(new URL(p, R));
+  const ticks = [...md.matchAll(/`([^`\n]+)`/g)].map((m) => m[1].trim());
+  /* 명령 블록(```) 안의 경로도 — 복사해서 바로 쓰라고 둔 곳이라 틀리면 가장 먼저 사람을 속인다 */
+  for (const block of md.match(/```[a-z]*\n[\s\S]*?```/g) || []) {
+    for (const m of block.matchAll(/(?:^|\s)((?:verify|tools|collector|docs|insta|deploy)\/[\w./-]+\.(?:mjs|js|cjs|sh|py))/g)) ticks.push(m[1]);
+  }
+
+  /* ① 파일 경로 — 뿌리 또는 흔한 폴더에서 찾는다. 글로브(*)는 폴더만 본다. */
+  /* "만들면 안 된다"·확장자 이야기·빌드 산출물(`_admin/build.sh` 가 만든다)·분수 표기 */
+  const NOT_FILES = new Set(['_config.yml', '.nojekyll', '.ocr.txt', '.pdf.txt', 'dist/vendor/', 'met/total']);
+  const paths = [...new Set(ticks.filter((t) => !/\s/.test(t) && (/\//.test(t) || /\.(js|mjs|cjs|json|md|py|sh|yml|html|txt)$/.test(t))))]
+    .map((t) => t.replace(/:\d+$/, ''))
+    .filter((t) => !NOT_FILES.has(t) && !/^https?:/.test(t) && !/[<>…()']/.test(t) && !/^claude\//.test(t));   // 브랜치 이름·코드 조각 제외
+  const missingPaths = paths.filter((t) => {
+    if (t.includes('*')) return !ex(t.slice(0, t.lastIndexOf('/') + 1) || './');
+    return !['', 'verify/', 'collector/', 'tools/', '.github/workflows/', 'data/'].some((d) => ex(d + t));
+  });
+  eq('문서에 적힌 파일이 전부 있다', missingPaths, []);
+
+  /* ② 함수·변수·칸 이름 — 코드 어딘가에 그 글자가 있어야 한다 */
+  const code = spawnSync('git', ['ls-files', '*.js', '*.mjs', '*.cjs', '*.css', '*.html', '*.yml', '*.sh', '*.py'],
+    { cwd: fileURLToPath(R), encoding: 'utf8' }).stdout.split('\n').filter(Boolean)
+    .map((f) => { try { return readText(new URL(f, R)); } catch { return ''; } }).join('\n');
+  const NOT_CODE = new Set(['notion-query-data-sources']);   // MCP 도구 이름
+  const skills = fs.existsSync(new URL('.claude/skills/', R)) ? fs.readdirSync(new URL('.claude/skills/', R)) : [];
+  const ids = [...new Set(ticks.filter((t) => /^[#.\[]?[A-Za-z_][A-Za-z0-9_-]*(\(\)|[:=\]].*)?$/.test(t))
+    .map((t) => t.replace(/^[#.\[]/, '').replace(/\(\)$/, '').replace(/[:=\]].*$/, ''))
+    .filter((k) => k.length > 2 && /[A-Z_]|[a-z][A-Z]|-/.test(k)))];
+  const missingIds = ids.filter((k) => !NOT_CODE.has(k) && !skills.includes(k) && !code.includes(k));
+  eq('문서에 적힌 함수·칸 이름이 코드에 전부 있다', missingIds, []);
+
+  /* ③ "관문 「X」" — 이 파일의 절 이름이어야 한다(「」 는 떼고 대조) */
+  const strip = (s) => s.replace(/[「」]/g, '').trim();
+  const self = readText(new URL(import.meta.url));
+  const sections = [...self.matchAll(/console\.log\('\\?n?■ ([^']+)'\)/g)].map((m) => strip(m[1]));
+  const gates = [...md.matchAll(/관문[^「\n]{0,30}「((?:[^「」]|「[^」]*」)+)」/g)].map((m) => strip(m[1]))
+    .filter((g) => g !== 'X');   // 찾는 법을 설명하는 줄의 자리표시
+  eq('관문 이름이 가리키는 절이 전부 있다', gates.filter((g) => !sections.some((s) => s.includes(g))), []);
+  /* 🔴 뽑은 게 0이면 위 셋은 빈 목록을 상대로 통과한다 — 개수가 있어야 대조가 진짜다 */
+  eq('  (대조할 것을 실제로 뽑았다 — 파일·이름·관문)', [paths.length > 40, ids.length > 40, gates.length > 10], [true, true, true]);
 }
 
 console.log('\n■ 데이터 파일 형식 (2026-08-29)');
