@@ -104,6 +104,26 @@ function checkEntry(it, opts = {}) {
       + `(근거: docs/designs/on-campus-programs.md)`);
   }
 
+  /* 🔴 **접수 메일 주소는 근거 없이 못 들어온다** (2026-09-23 신설 · 원칙 8-1).
+     이 주소가 틀리면 학생의 신청서와 증명서류가 **엉뚱한 사람의 메일함**으로 간다.
+     그래서 주소를 넣었으면 그것이 적힌 원문 문장(`applyEmailSource`)을 함께 남기고,
+     여기서 **주소가 그 문장 안에 실제로 들어 있는지** 다시 본다.
+     ⚠️ 관리자가 손으로 넣은 것(`applyEmailFrom` 이 '관리자'·'AI')은 **경고까지만** 한다 —
+        오류로 만들면 사람이 화면에서 고치는 순간 감사가 영영 실패해 자동 등록이 통째로
+        멈춘다(바로 위 '교내' 규칙과 같은 이유). 로봇이 넣은 것은 근거가 반드시 있어야
+        하므로 오류다 — 근거 없이 들어왔다면 그건 버그다. */
+  if (it.applyEmail) {
+    const src = it.applyEmailSource || '';
+    const byHuman = /^(AI|관리자)/.test(it.applyEmailFrom || '');
+    if (!src) {
+      (byHuman ? warn : err)(`접수 메일 주소(${it.applyEmail})에 근거 문장이 없습니다 `
+        + `— applyEmailSource 에 그 주소가 적힌 공고 원문 한 줄을 남기세요`);
+    } else if (!src.includes(it.applyEmail)) {
+      err(`접수 메일 주소(${it.applyEmail})가 근거 문장 안에 없습니다 `
+        + `— 근거: 「${src.slice(0, 60)}…」`);
+    }
+  }
+
   return out;
 }
 

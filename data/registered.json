@@ -737,7 +737,10 @@
     "다 . 타 교내 근로 장학과 중복 근로 불가능"
    ],
    "eligibilityFrom": "AI(원문 줄 그대로)",
-   "eligibilityReviewed": false
+   "eligibilityReviewed": false,
+   "applyEmail": "khsa0063@khu.ac.kr",
+   "applyEmailSource": "9. 지원방법 : [ 붙임 ] 의 신청서를 작성하여 관재팀 이메일 (khsa0063@khu.ac.kr) 로 제출",
+   "applyEmailFrom": "공고 원문"
   },
   {
    "id": "auto-tentsno1menuid100siteno2",
@@ -1158,7 +1161,10 @@
    },
    "amountFrom": "공고 원문",
    "openDate": "2026-08-06",
-   "aiTries": 1
+   "aiTries": 1,
+   "applyEmail": "nohsy12@518.org",
+   "applyEmailSource": "◯ 접수주소 : nohsy12@518.org (※우편접수 불가)",
+   "applyEmailFrom": "공고문 첨부"
   },
   {
    "id": "auto-c839d20ec84a0ebb09c20202",
@@ -2542,7 +2548,10 @@
    "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/263956/artclView.do",
    "sourceKind": "auto",
    "deadlineFrom": "공고문 첨부",
-   "openDate": "2026-09-16"
+   "openDate": "2026-09-16",
+   "applyEmail": "injae@uri.re.kr",
+   "applyEmailSource": "⑥ 서류 준비 및 메일(injae@uri.re.kr)로 신청서(3종), 증빙서류 제출",
+   "applyEmailFrom": "공고문 첨부"
   },
   {
    "id": "auto-oardid322850menuno200318",
@@ -3557,7 +3566,10 @@
     "max": 0,
     "raw": "7. 장학금액 : 시간당 18,000 원 * 인정 멘토링 활동시간 8. 선발결과 : 선발자 대상으로 개별연락 예정"
    },
-   "amountFrom": "공고 원문"
+   "amountFrom": "공고 원문",
+   "applyEmail": "scholarship@hufs.ac.kr",
+   "applyEmailSource": "다 . 멘토활동계획서 제출 방법 : 이메일 : scholarship@hufs.ac.kr 또는 장학팀 ( 학생회관 121 호 ) 직접 제출",
+   "applyEmailFrom": "공고 원문"
   },
   {
    "id": "auto-oardid323082menuno200318",

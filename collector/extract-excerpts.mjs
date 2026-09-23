@@ -24,6 +24,7 @@ const { isExcludeHead: shExclude, headText: shHead } = _cr(import.meta.url)('../
    🔴 **공고문만** 본다(attachment-text.mjs 첫머리 참조) — 신청서·동의서를 읽으면
    개인정보 수집 항목이 지원 자격 자리에 앉는다(실제로 겪고 되돌린 적이 있다). */
 import { attachmentText, readable, docOrder, isOcrSource } from './attachment-text.mjs';
+import { findApplyEmail, humanOwnedEmail } from './apply-email.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const texts = JSON.parse(fs.readFileSync(new URL('extracted/notices-text.json', HERE), 'utf8'));
@@ -656,7 +657,7 @@ const strip = makeStripper(texts);
 let eligDocs = {};
 try { eligDocs = JSON.parse(fs.readFileSync(new URL('extracted/elig-docs.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
 
-let hit = 0, none = 0, kept = 0, cleaned = 0, fromDoc = 0, gotDeadline = 0, dlFromDoc = 0, gotOpen = 0, gotAnnounce = 0;
+let hit = 0, none = 0, kept = 0, cleaned = 0, fromDoc = 0, gotDeadline = 0, dlFromDoc = 0, gotOpen = 0, gotAnnounce = 0, gotApplyEmail = 0;
 /* 공고문 첨부에서 자격 줄을 읽는다. 본문 경로와 원문 없는 경로가 **같은 함수**를 써야
    "본문 있을 땐 읽고 없을 땐 안 읽는" 어긋남이 안 생긴다. 스캔 PDF 등 글자가 안 나오는
    것은 조용히 건너뛴다(읽은 척하는 것보다 안 읽는 편이 낫다). */
@@ -748,6 +749,9 @@ function docsOnce(it) { let memo; return () => (memo ??= docTexts(it)); }
 export function deadlineFromDocs(it, texts) { return fromDocs(it, extractDeadline, texts); }
 export function openDateFromDocs(it, texts) { return fromDocs(it, extractOpenDate, texts); }
 export function announceFromDocs(it, texts) { return fromDocs(it, extractAnnounce, texts); }
+/* 접수 메일 주소도 같은 골격을 탄다 — 경희대는 본문이 '첨부파일 확인'으로 끝나
+   첨부를 안 보면 접수처를 영영 못 읽는다(실측: 접수 주소 4건 중 2건이 첨부 안에 있었다). */
+export function applyEmailFromDocs(it, texts) { return fromDocs(it, findApplyEmail, texts); }
 
 /* 🔴 **사람이 정한 마감은 로봇이 건드리지 않는다** (2026-09-16 · G-3 ②).
    자격은 `eligibilityFrom` 의 `AI`·`관리자` 표식을 존중하는데 마감은 그 짝이 없었다 —
@@ -764,6 +768,23 @@ function putDeadline(it, dl, from) {
   it.deadlineFrom = from;
   if (!it.period) it.period = `접수 ~${dl}`;
   else if (/원문\s*확인/.test(it.period)) it.period = it.period.replace(/원문\s*확인/, `~${dl}`);
+}
+
+/* 접수 메일 주소를 채우는 자리 **한 곳** — 본문 경로와 '첨부만' 경로가 같은 규칙을 쓴다.
+   🔴 **두 경로가 있다는 것을 잊지 말 것** (2026-09-23 · 만들면서 실제로 틀렸다).
+      본문이 껍데기인 게시판(경희대 유형)은 위쪽 갈림길에서 `continue` 로 빠져나가므로,
+      본문 경로에만 붙이면 **첨부에 접수처가 적힌 공고가 통째로 새어 나간다**
+      (실측: 그래서 울산연구원 1건을 놓쳤다. 바로 그 갈림길의 마감일 주석이 같은 경고를 한다).
+   🔴 주소만 넣지 않는다 — 근거 문장을 함께 남겨야 감사가 '원문에 실제로 있었는가'를 본다. */
+function fillApplyEmail(it, body) {
+  if (it.applyEmail || humanOwnedEmail(it.applyEmailFrom)) return;
+  let mail = body ? findApplyEmail(body) : null;
+  let from = '공고 원문';
+  if (!mail) { mail = applyEmailFromDocs(it); if (mail) from = docLabel(fromDocs.lastFile); }
+  if (!mail) return;
+  gotApplyEmail += 1;
+  if (WRITE) { it.applyEmail = mail.email; it.applyEmailSource = mail.source; it.applyEmailFrom = from; }
+  else console.log(`   [접수메일] ${it.id} → ${mail.email} (${from})`);
 }
 
 function qualFromDocs(it) {
@@ -869,6 +890,7 @@ for (const it of reg.items) {
        첨부 글자는 한 번만 뽑아 셋이 나눠 쓴다(비어 있을 때만 읽으므로 게으르게). */
     const docs = docsOnce(it);
     fillCalendarDates(it, () => openDateFromDocs(it, docs()), () => announceFromDocs(it, docs()));
+    fillApplyEmail(it, null);          // 본문이 없으니 첨부에서만 — 본문 경로와 같은 함수
     kept += 1; continue;
   }
 
@@ -900,6 +922,9 @@ for (const it of reg.items) {
       else console.log(`   [마감] ${it.id} → ${dl} (${from})`);
     }
   }
+
+  /* 접수 메일 주소 — 규칙도 자리도 `fillApplyEmail` 한 곳(위) · '첨부만' 경로와 공용 */
+  fillApplyEmail(it, body);
 
   /* 접수 시작일·발표일 — 캘린더가 쓴다 (2026-09-07). 마감일과 같은 규칙으로,
      **비어 있을 때만** 채우고 **말이 안 되면 버린다.**
@@ -964,6 +989,7 @@ for (const it of reg.items) {
 console.log(`\n게시판 메뉴를 걷어낸 공고 ${cleaned}건`);
 console.log(`발췌 성공 ${hit}건 · 원문은 읽었으나 발췌 불가 ${none}건 · 원문 미확보라 손대지 않음 ${kept}건`);
 console.log(`마감일을 새로 읽은 공고 ${gotDeadline}건 (그중 공고문 첨부에서 ${dlFromDoc}건)`);
+console.log(`접수 메일 주소를 새로 읽은 공고 ${gotApplyEmail}건`);
 console.log(`접수 시작일 ${gotOpen}건 · 발표일 ${gotAnnounce}건 (캘린더용 — 원문에 있을 때만)`);
 if (WRITE) {
   fs.writeFileSync(regPath, JSON.stringify(reg, null, 1) + '\n');
