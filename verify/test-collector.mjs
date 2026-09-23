@@ -2481,10 +2481,18 @@ console.log('\n■ CLAUDE.md 부피 (2026-08-29)');
 {
   const md = readText(new URL('../CLAUDE.md', import.meta.url));
   const total = md.split('\n').length;
-  eq(`문서 전체가 900줄을 넘지 않는다 (지금 ${total}줄)`, total <= 900, true);
-  /* 항목 하나가 길어지는 것이 부풀기의 실제 경로다 — 전체 줄 수보다 먼저 걸린다 */
-  const facts = md.slice(md.indexOf('## 중요한 기술 사실'), md.indexOf('## 현황 숫자는'));
-  const items = facts.split(/\n(?=- \*\*)/).slice(1);
+  eq(`문서 전체가 400줄을 넘지 않는다 (지금 ${total}줄)`, total <= 400, true);
+  /* 🔴 **줄 수만 세면 한 줄에 몰아 쓴다** (2026-09-23) — 900줄 관문을 지키는 동안 한 줄이
+     3,600자까지 자라 문서가 153KB 가 됐다(매 세션 통째로 읽힌다). 그래서 무게를 같이 잰다. */
+  const bytes = Buffer.byteLength(md, 'utf8');
+  eq(`문서 전체가 60KB 를 넘지 않는다 (지금 ${Math.round(bytes / 1024)}KB)`, bytes <= 60 * 1024, true);
+  /* 항목 하나가 길어지는 것이 부풀기의 실제 경로다 — 전체 줄 수보다 먼저 걸린다.
+     ⚠️ 끝 표시가 문서에 없으면 indexOf 가 -1 이라 범위가 조용히 틀어진다 — 다음 `## ` 절까지로 자른다. */
+  const factsAt = md.indexOf('## 중요한 기술 사실');
+  eq('「중요한 기술 사실」 절이 있다', factsAt >= 0, true);
+  const factsEnd = md.indexOf('\n## ', factsAt + 5);
+  const facts = md.slice(factsAt, factsEnd < 0 ? md.length : factsEnd);
+  const items = facts.split(/\n(?=- |### )/).slice(1);   // 굵은 글씨 없는 항목·소제목에서도 끊는다
   const longs = items.map((t) => [t.split('\n').length, t.split('\n')[0].slice(0, 40)])
                      .filter(([n]) => n > 20);
   eq('한 항목이 20줄을 넘지 않는다 (넘으면 경위를 SESSIONS.md 로)', longs, []);
