@@ -2975,7 +2975,7 @@
    "lastWhy": ""
   },
   "r:auto-tentsno1menuid100siteno2": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-23",
    "lastWhy": ""
   },
   "r:auto-tentsno5menuid100siteno2": {
@@ -3707,39 +3707,39 @@
    "lastWhy": ""
   },
   "r:reg-hufs-yuheungsu": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-23",
    "lastWhy": "",
    "lastTried": "2026-09-13",
    "attempts": 0,
    "status": ""
   },
   "r:reg-hufs-myeonhak": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-23",
    "lastWhy": "",
    "lastTried": "2026-09-13",
    "attempts": 0,
    "status": ""
   },
   "r:reg-hufs-seed": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-23",
    "lastWhy": "",
    "lastTried": "2026-09-13",
    "attempts": 0,
    "status": ""
   },
   "r:reg-hufs-ambassador": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-23",
    "lastWhy": "",
    "lastTried": "2026-09-13",
    "attempts": 0,
    "status": ""
   },
   "r:reg-kosaf-daecheonggyo": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-23",
    "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)"
   },
   "r:reg-hufs-alumni": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-23",
    "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)"
   },
   "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322894": {
@@ -3788,50 +3788,50 @@
    "likelyGone": true
   },
   "r:reg-hi-jeju": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-23",
    "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)"
   },
   "r:auto-rnoticedoarticleno154473": {
-   "patrolledAt": "2026-09-22",
-   "lastWhy": ""
+   "patrolledAt": "2026-09-23",
+   "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)"
   },
   "r:reg-sejong-didim": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-23",
    "lastWhy": "제목 불일치(다른 글이 열림)"
   },
   "r:reg-posco-vision": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-23",
    "lastWhy": "제목 불일치(다른 글이 열림)"
   },
   "r:auto-kolifenoticejspduid52964": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-23",
    "lastWhy": ""
   },
   "r:auto-ent2431260146artclviewdo": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-23",
    "lastWhy": ""
   },
   "r:auto-ent2431260214artclviewdo": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-23",
    "lastWhy": ""
   },
   "r:auto-ent2431260269artclviewdo": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-23",
    "lastWhy": ""
   },
   "r:reg-hufs-namgaju": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-23",
    "lastWhy": "",
    "lastTried": "2026-09-11",
    "attempts": 0,
    "status": ""
   },
   "r:reg-hufs-gasong": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-23",
    "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)"
   },
   "r:reg-hufs-yangcheon": {
-   "patrolledAt": "2026-09-22",
+   "patrolledAt": "2026-09-23",
    "lastWhy": "",
    "lastTried": "2026-09-11",
    "attempts": 0,
@@ -3842,12 +3842,12 @@
    "lastWhy": ""
   },
   "r:auto-c839d20ec84a0ebb09c20202": {
-   "patrolledAt": "2026-09-22",
-   "lastWhy": ""
+   "patrolledAt": "2026-09-23",
+   "lastWhy": "page.goto: Timeout 20000ms exceeded."
   },
   "r:auto-09c6eab8b020ec9ea5ed9599": {
-   "patrolledAt": "2026-09-22",
-   "lastWhy": "제목 불일치(다른 글이 열림)"
+   "patrolledAt": "2026-09-23",
+   "lastWhy": "page.goto: Timeout 20000ms exceeded."
   },
   "r:reg-diabetes-hope": {
    "patrolledAt": "2026-09-22",
