@@ -8705,5 +8705,43 @@ return { submitChannelKind, submitChannelLabel };`)();
   eq('근거 문장에 HTML 기호가 남아 있지 않다', ents.map((x) => x.id), []);
 }
 
+/* ── 🔴 기술 고문 요청서가 우리 전제와 어긋나지 않는다 (2026-09-23 신설) ──
+   이 문서는 **바깥 사람에게 보내는 글**이라 틀리면 고칠 기회가 없다 — 고문이 없는 전제로
+   답을 쓰면 그 답이 통째로 버려진다. 실제로 그랬다: 문서가 「전국 외부 공고까지 넓히려
+   합니다」라고 적고 있었는데 개발자는 2026-09-21에 **정반대**를 정했다(2곳 확정).
+   CLAUDE.md 도 「보내기 전에 고칠 것」이라고 적어 뒀지만 글로만 적힌 규칙은 되돌아간다.
+   🔴 여기서 잠그는 것은 **잘 안 변하는 전제**뿐이다. 공고 건수 같은 값은 날마다 변하므로
+      잠그면 **통과할 수 없는 관문**이 되어 다음 사람이 관문 전체를 꺼 버린다
+      (2026-09-11 서체 문턱에서 이미 겪었다). 그 값은 `docs/advisor/check-brief.mjs` 가
+      보내기 전에 나란히 찍어 준다 — 막지 않고 보여 준다. */
+{
+  console.log('\n■ 기술 고문 요청서 (2026-09-23)');
+  const brief = readText(new URL('../docs/advisor/tech-advisor-brief.html', import.meta.url));
+  const claude = readText(new URL('../CLAUDE.md', import.meta.url));
+
+  /* ① 수집망 결정과 어긋나지 않는가 — 이 사고 그 자체 */
+  eq('CLAUDE.md 에 「수집망 두 곳」 결정이 살아 있다', /수집망은 두 곳 그대로/.test(claude), true);
+  eq('요청서가 「전국으로 넓히려 한다」고 말하지 않는다',
+    /전국\s*(외부\s*)?공고까지\s*넓히려/.test(brief), false);
+  eq('요청서가 좁힌 사실을 적는다', /2곳으로 확정|경희대·한국외대 2곳/.test(brief), true);
+
+  /* ② 이미 고친 결함을 미해결로 적어 두지 않는다 — 고문의 시간을 뺏는다 */
+  eq('포털 오단정을 아직 고칠 자리라고 적지 않는다',
+    /포털에서 복사해 붙여넣으세요[\s\S]{0,200}고쳐야 할 자리/.test(brief), false);
+
+  /* ③ Q5 ①의 사실관계 — '키만 없다'가 아니었다(대상 데이터가 없었고, mailto 는 서버가 필요 없다) */
+  eq("메일 접수를 '키만 없다'고 적지 않는다", /키만 없습니다/.test(brief), false);
+  eq('mailto 로 이미 열려 있다는 사실을 적는다', /mailto:/.test(brief), true);
+
+  /* ④ 낡은 숫자가 되돌아오지 않는가 — 한 번 고친 값들이다(현재값을 박는 게 아니라 옛값을 막는다) */
+  const OLD = ['14,677', '18개 파일', '정식 등록 공고 45건', '재단 116곳', '실시간 공고 507건'];
+  eq('고쳐 둔 옛 숫자가 되돌아오지 않았다', OLD.filter((n) => brief.includes(n)), []);
+
+  /* ⑤ 재는 도구가 있고, 문서가 잰 날짜를 밝히는가 */
+  eq('보내기 전 대조 도구가 있다',
+    fs.existsSync(fileURLToPath(new URL('../docs/advisor/check-brief.mjs', import.meta.url))), true);
+  eq('문서가 실측 날짜를 밝힌다', /2026-09-23 저장소 실측/.test(brief), true);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);

@@ -175,7 +175,7 @@ footer.end{border-top:1px solid var(--line);margin-top:20px;padding-top:8px;
   </div>
 
   <div style="margin-top:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 0;margin-bottom:14px">
-    <div><div class="mono" style="font-size:17pt;color:var(--blue);line-height:1.1">14,677</div><div style="font-size:8pt;color:var(--ink3);margin-top:2px">앱 코어 코드 줄 수<br>빌드 도구 없음</div></div>
+    <div><div class="mono" style="font-size:17pt;color:var(--blue);line-height:1.1">17,050</div><div style="font-size:8pt;color:var(--ink3);margin-top:2px">앱 코어 코드 줄 수<br>빌드 도구 없음</div></div>
     <div><div class="mono" style="font-size:17pt;color:var(--blue);line-height:1.1">48</div><div style="font-size:8pt;color:var(--ink3);margin-top:2px">스키마화된 신청서 양식<br>602개 입력 필드</div></div>
     <div><div class="mono" style="font-size:17pt;color:var(--blue);line-height:1.1">121</div><div style="font-size:8pt;color:var(--ink3);margin-top:2px">채널을 실측한 공고<br>경희 58 + 외대 63</div></div>
     <div><div class="mono" style="font-size:17pt;color:var(--rust);line-height:1.1">0</div><div style="font-size:8pt;color:var(--ink3);margin-top:2px">학교 시스템으로<br>실제 전송된 신청</div></div>
@@ -208,7 +208,7 @@ footer.end{border-top:1px solid var(--line);margin-top:20px;padding-top:8px;
   <h3 style="margin-top:26px">그림·표 목록</h3>
   <table>
     <tr><td style="width:16%" class="mono">그림 1</td><td>사용자 여정과 끊긴 지점</td><td style="width:16%" class="mono">표 1</td><td>실행 환경과 비용</td></tr>
-    <tr><td class="mono">그림 2</td><td>시스템 구성도</td><td class="mono">표 2</td><td>코드 지도 (18개 파일 · 14,677줄)</td></tr>
+    <tr><td class="mono">그림 2</td><td>시스템 구성도</td><td class="mono">표 2</td><td>코드 지도 (27개 파일 · 17,050줄)</td></tr>
     <tr><td class="mono">그림 3</td><td>데이터 파이프라인 (게시판 → 앱)</td><td class="mono">표 3</td><td>자동화 로봇 27종</td></tr>
     <tr><td class="mono">그림 4</td><td>개인정보 경계 — 기기와 서버</td><td class="mono">표 4</td><td>학생 프로필 33값</td></tr>
     <tr><td class="mono">그림 5</td><td>지금 신청 플로우 vs 목표</td><td class="mono">표 5</td><td>포털형 18건의 경로</td></tr>
@@ -224,7 +224,7 @@ footer.end{border-top:1px solid var(--line);margin-top:20px;padding-top:8px;
   <p class="sec-lead">앱은 학생이 신청서를 <em>작성 완료</em>하는 지점까지 완성돼 있습니다. 학교 시스템에 <em>제출</em>하는 마지막 단계만 사람이 손으로 합니다. 이 문서는 그 단계를 자동화하기 위한 기술 상담 요청입니다.</p>
 
   <div class="stat-row">
-    <div class="stat b"><div class="v">14,677</div><div class="k">앱 코어 코드 줄 수<br>(18개 파일 · 빌드 도구 없음)</div></div>
+    <div class="stat b"><div class="v">17,050</div><div class="k">앱 코어 코드 줄 수<br>(27개 파일 · 빌드 도구 없음)</div></div>
     <div class="stat b"><div class="v">48</div><div class="k">스키마화된 신청서 양식<br>(141섹션 · 602필드)</div></div>
     <div class="stat b"><div class="v">33</div><div class="k">앱이 이미 보유한<br>학생 프로필 값</div></div>
     <div class="stat r"><div class="v">0</div><div class="k">학교 시스템으로<br>실제 전송된 신청</div></div>
@@ -240,7 +240,7 @@ footer.end{border-top:1px solid var(--line);margin-top:20px;padding-top:8px;
 
   <h3>안 되는 것 — 그리고 그것이 전부입니다</h3>
   <ul class="b">
-    <li><strong>제출.</strong> 학교 포털은 학번·비밀번호 로그인 뒤에 있고, 앱은 그 문을 넘지 못합니다. 지금 앱이 하는 말은 “복사해서 붙여넣으세요”입니다.</li>
+    <li><strong>제출.</strong> 학교 포털은 학번·비밀번호 로그인 뒤에 있고, 앱은 그 문을 넘지 못합니다. 지금 앱이 하는 말은 <strong>“이 시스템의 이 경로로 가세요”</strong>까지입니다(공고 원문 문장을 그대로 보여 줍니다). <em>대신 눌러 주는 것</em>은 못 합니다.</li>
     <li>그래서 앱은 <strong>“신청 완료”라고 쓰지 않습니다.</strong> “신청 준비 완료”라고만 씁니다 — 실제 접수가 일어나지 않은 것을 완료라고 표기하지 않는 것이 이 서비스의 운영 원칙 1번입니다.</li>
   </ul>
 
@@ -363,7 +363,7 @@ footer.end{border-top:1px solid var(--line);margin-top:20px;padding-top:8px;
       <text x="300" y="182" font-size="9.4" fill="#465661">첨부 원본 확보 · HWP 텍스트 추출</text>
       <text x="300" y="196" font-size="9.4" fill="#465661">자동 등록 · 링크 사냥 · 감사 관문</text>
       <text x="300" y="212" font-size="8.4" fill="#7C8A94">결과를 저장소에 커밋 → 배포 동기화</text>
-      <text x="300" y="226" font-size="8.4" fill="#7C8A94" font-family="PM, monospace">data/*.json (5.6 MB)</text>
+      <text x="300" y="226" font-size="8.4" fill="#7C8A94" font-family="PM, monospace">data/*.json (5.9 MB)</text>
 
       <!-- 서버리스 -->
       <rect x="556" y="30" width="230" height="128" rx="4" fill="#fff" stroke="#D4DBE0"/>
@@ -428,7 +428,7 @@ footer.end{border-top:1px solid var(--line);margin-top:20px;padding-top:8px;
 
   <h3>2.4 코드 지도</h3>
   <table>
-    <caption>표 2 — 앱 코어 18개 파일 · 14,677줄 (2026-09-03 실측)</caption>
+    <caption>표 2 — 앱 코어 27개 파일 · 17,050줄 (2026-09-23 실측)</caption>
     <tr><th style="width:22%">파일</th><th class="num" style="width:9%">줄</th><th>역할 · 연동 관점에서의 의미</th></tr>
     <tr><td class="mono">app.js</td><td class="num">3,507</td><td>화면·신청 플로우·서류 보관함·진척도 트래커. <strong>제출 버튼이 있는 곳</strong></td></tr>
     <tr><td class="mono">style.css</td><td class="num">3,134</td><td>화면 스타일</td></tr>
@@ -448,7 +448,7 @@ footer.end{border-top:1px solid var(--line);margin-top:20px;padding-top:8px;
     <tr><td class="mono">sw.js</td><td class="num">289</td><td>서비스워커 — 네트워크 우선 캐시 · 푸시 수신</td></tr>
     <tr><td class="mono">section-head.js</td><td class="num">182</td><td>공고의 절 경계 판정(자격/제외/선발) — 3개 도구 공용</td></tr>
     <tr><td class="mono">essay-quality.js</td><td class="num">101</td><td>초안 품질 검사 — 브라우저·서버·검사 공용</td></tr>
-    <tr class="tot"><td>18개 파일</td><td class="num">14,677</td><td>이 밖에 수집 로봇 47개(.mjs)와 검증 드라이버 42개가 있습니다</td></tr>
+    <tr class="tot"><td>27개 파일</td><td class="num">17,050</td><td>이 밖에 수집 로봇 56개(.mjs)와 검증 드라이버 54개가 있습니다</td></tr>
   </table>
   <p class="tbl-note">설계 규칙 하나를 미리 말씀드립니다 — <strong>판정 규칙은 절대 복사하지 않습니다.</strong> 화면·서비스워커·감사 도구가 같은 파일을 불러 씁니다. 규칙이 두 벌이 되면 “화면에서 숨긴 공고를 알림이 알리는” 모순이 실제로 발생했기 때문입니다.</p>
 
@@ -496,7 +496,7 @@ footer.end{border-top:1px solid var(--line);margin-top:20px;padding-top:8px;
         <text x="0" y="160" font-size="9.4" fill="#465661"><tspan font-weight="700" fill="#14202A">사람이 개입하는 지점</tspan> — 애매한 공고는 자동 등록하지 않고 ‘컨펌 대기’로 리포트에만 올립니다. 개발자가 직접 판단합니다.</text>
         <text x="0" y="180" font-size="9.4" fill="#465661"><tspan font-weight="700" fill="#14202A">되돌리기</tspan> — 감사가 실패하면 그 실행이 새로 등록한 공고만 골라 되돌리고 이슈를 남깁니다. 잘못된 공고가 앱에 하루도 못 나갑니다.</text>
         <text x="0" y="200" font-size="9.4" fill="#465661"><tspan font-weight="700" fill="#14202A">배포 동기화</tspan> — 로봇은 기본 브랜치에만 커밋하고, 별도 로봇이 main으로 병합해 배포합니다(읽는 곳과 쓰는 곳을 가르면 중복 수집이 발생).</text>
-        <text x="0" y="226" font-size="8.6" fill="#7C8A94">데이터 총량 5.6 MB — 앱이 실제로 내려받는 것은 공고 목록 368 KB · 등록 공고 94 KB · 양식 178 KB입니다. 변경이 없으면 304로 거의 0바이트.</text>
+        <text x="0" y="226" font-size="8.6" fill="#7C8A94">데이터 총량 5.9 MB — 앱이 실제로 내려받는 것은 공고 목록 34 KB · 등록 공고 199 KB · 양식 178 KB입니다. 변경이 없으면 304로 거의 0바이트.</text>
       </g>
     </svg>
     <figcaption><b>그림 3</b>게시판에서 앱까지. 전 과정이 무인이며, 감사 관문이 데이터 품질의 마지막 방어선입니다.</figcaption>
@@ -520,7 +520,7 @@ footer.end{border-top:1px solid var(--line);margin-top:20px;padding-top:8px;
   <h3>2.6 데이터 모델</h3>
   <p>연동 시 학교로 넘어갈 후보가 되는 두 스키마입니다. 실제 파일에서 그대로 가져왔습니다(긴 문자열만 줄임).</p>
 
-  <p class="filename">data/registered.json — 정식 등록 공고 45건 · 94 KB</p>
+  <p class="filename">data/registered.json — 정식 등록 공고 72건 · 199 KB</p>
 <pre>{
  "id": "reg-hufs-alumni",
  "name": "총동문회 장학금 (한국외대, 2026-2학기)",
@@ -741,7 +741,7 @@ object-src 'none'; base-uri 'self'</pre>
 }</pre>
   <div class="box warn">
     <h4>이 다섯 줄이 실측 조사에서 드러난 결함입니다</h4>
-    <p style="margin:0">마지막 줄은 <strong>“모르는 것”과 “포털형인 것”을 같은 문구로 처리</strong>합니다. 121건 조사 결과 실제 포털형은 18건이었는데, 앱은 접수 방법을 확인하지 못한 27건에도 “포털에서 복사해 붙여넣으세요”라고 단정하고 있었습니다. 확인하지 않은 것을 확인한 것처럼 말하는 것은 이 서비스의 원칙 위반이라, 연동 설계와 별개로 고쳐야 할 자리입니다. <strong>Q4에서 이런 자리를 더 짚어 주시길 요청드립니다.</strong></p>
+    <p style="margin:0">마지막 줄은 <strong>“모르는 것”과 “포털형인 것”을 같은 문구로 처리</strong>하고 있었습니다. 121건 조사 결과 실제 포털형은 18건인데, 앱은 접수 방법을 확인하지 못한 공고에도 “포털에서 복사해 붙여넣으세요”라고 단정했습니다. 확인하지 않은 것을 확인한 것처럼 말하는 것은 이 서비스의 원칙 위반이라 <strong>2026-09-21에 고쳤습니다</strong> — 근거가 없으면 “접수 방법은 원문 공고에서 확인”이라고 적습니다. <strong>이 사례를 남겨 두는 이유는, 이런 자리가 여기 하나였을 리 없기 때문입니다. Q4에서 같은 유형을 더 짚어 주시길 요청드립니다.</strong></p>
   </div>
 
   <h3>2.10 이미 만들어 둔, 아직 켜지 않은 자산</h3>
@@ -1108,7 +1108,7 @@ await fetch('https://api.resend.com/emails', {
     <tr><td class="num">2</td><td><strong>메일 워커의 방어가 Origin 검사뿐</strong></td><td>브라우저가 아닌 곳에서 오는 요청은 Origin을 위조할 수 있습니다. 수신 도메인 화이트리스트가 있지만, 접수처로 스팸을 보내는 통로가 되지 않는지 확인이 필요합니다.</td></tr>
     <tr><td class="num">3</td><td><strong>전송 기록이 남지 않음</strong></td><td>워커에 저장소가 없어 “보냈다”는 기록이 어디에도 없습니다. 분쟁이 나면 증명할 수단이 없습니다.</td></tr>
     <tr><td class="num">4</td><td><strong>로봇이 데이터 원본을 매일 덮어씀</strong></td><td>사람이 등록한 데이터와 로봇이 쓰는 파일이 같습니다. 병합 규칙으로 막고 있지만, 학교와 주고받는 데이터가 여기 섞이면 사고의 성격이 달라집니다.</td></tr>
-    <tr><td class="num">5</td><td><strong>정적 파일 통째 다운로드</strong></td><td>공고 목록 368 KB를 앱이 통째로 받아 자기 학교 것만 고릅니다. 학교가 늘면 한계가 옵니다(실측 기준 50~100개교).</td></tr>
+    <tr><td class="num">5</td><td><strong>정적 파일 통째 다운로드</strong></td><td>공고 목록 34 KB를 앱이 통째로 받아 자기 학교 것만 고릅니다. 학교가 늘면 한계가 옵니다(실측 기준 50~100개교).</td></tr>
     <tr><td class="num">6</td><td><strong>서비스워커 캐시 버전 수동 관리</strong></td><td>현재 v145. 올리는 것을 잊으면 옛 화면이 남습니다(실제로 두 번 겪었습니다). 네트워크 우선이라 결국 반영되지만 3.5초를 넘기면 캐시로 떨어집니다.</td></tr>
   </table>
 
@@ -1135,15 +1135,15 @@ await fetch('https://api.resend.com/emails', {
   </div>
 
   <div class="q-ask">
-    <p>학교와의 협약은 시간이 걸립니다. 그동안 <strong>학교 개발 없이 지금 작동시킬 수 있는 것</strong>이 둘 있습니다 — ① 이메일 접수 13건을 앱이 실제로 발송(코드는 있고 키만 없습니다) ② 포털형 18건의 반클릭(정확한 화면으로 보내고 값을 미리 갖춰 두기). 어떤 순서로, 어떤 최소 구현으로 만들어야 합니까?</p>
+    <p>학교와의 협약은 시간이 걸립니다. 그동안 <strong>학교 개발 없이</strong> 할 수 있는 것이 둘 있고, 이 요청서를 쓴 뒤 <strong>둘 다 일부를 먼저 만들었습니다</strong>(2026-09-23).</p><p class="q-sub">① <strong>이메일 접수</strong> — 공고 원문에서 접수 주소를 읽어 앱에 담았고, 누르면 학생 폰의 메일 앱이 제목·본문이 채워진 채 열립니다(<span class="mono">mailto:</span> — 서버도 열쇠도 필요 없었습니다). 남은 것은 <strong>앱이 대신 보내는 것</strong>이고 거기서부터 발송 서버가 필요합니다. ② <strong>포털</strong> — 공고가 말한 시스템까지 읽어(한 학교가 시스템을 둘 쓰는 것을 여기서 알았습니다) 그 시스템으로 보내고 원문의 경로 문장을 그대로 보여 줍니다. 남은 것은 <strong>값을 미리 갖춰 두는 것</strong>입니다.</p><p><strong>그래서 여쭙고 싶은 것은 “다음 한 칸”입니다</strong> — 이 둘을 어디까지 밀어야 하고, 어느 지점부터는 학교 협약 없이는 의미가 없어집니까?</p>
     <p class="q-sub">①의 기술 요건을 특히 여쭙습니다 — <strong>발신 도메인 인증(SPF·DKIM·DMARC), 바운스 처리, 전송 증빙 보관</strong>. 저희 워커에는 저장소가 없어 증빙을 남길 자리가 없고, 학교 메일 서버가 외부 도메인 첨부 메일을 어떻게 취급하는지도 모릅니다. ②는 <strong>자동 채움을 어디까지 구현할 수 있는지</strong>가 관건입니다 — 클립보드 API, 딥링크 파라미터, PWA 공유 대상 중 실제로 쓸 만한 것이 있습니까?</p>
   </div>
 
   <h4>우리 상황 — 이미 있는 재료</h4>
   <ul class="b">
-    <li>발송 코드(<span class="mono">server/mail-worker.js</span>)는 완성돼 있습니다. Origin 검사 · 수신 도메인 화이트리스트 · 크기 제한까지 들어 있고, <strong>키가 없어 한 번도 돌려 본 적이 없습니다.</strong></li>
+    <li>발송 코드(<span class="mono">server/mail-worker.js</span>)는 완성돼 있습니다. Origin 검사 · 수신 도메인 화이트리스트 · 크기 제한까지 들어 있고, <strong>키가 없어 한 번도 돌려 본 적이 없습니다.</strong> ⚠️ 다만 이것은 <em>완전 자동 발송</em>용입니다 — 학생이 직접 보내는 길(<span class="mono">mailto:</span>)은 이미 열려 있고 서버를 타지 않습니다.</li>
     <li>앱이 만드는 첨부는 <span class="mono">.doc</span>(Word HTML) 형식입니다. 학교가 HWP를 기대할 때 무엇으로 보내야 하는지 판단이 필요합니다.</li>
-    <li>포털형 18건의 <strong>정확한 경로 문장은 이미 확보</strong>돼 있습니다(표 5). 딥링크로 만들 재료는 있습니다.</li>
+    <li>포털형의 <strong>정확한 경로 문장은 이미 확보</strong>돼 있고(표 5), 이제 <strong>앱 데이터에도 들어가 학생 화면에 원문 그대로 보입니다.</strong> 딥링크로 만들 재료는 있습니다.</li>
   </ul>
 
   <div class="hyp">
@@ -1216,7 +1216,7 @@ await fetch('https://api.resend.com/emails', {
 
   <h4>우리 상황 — 저희가 아는 한계값</h4>
   <ul class="b">
-    <li><strong>공고 목록을 통째로 내려받습니다.</strong> 앱은 <span class="mono">notices.json</span> 368 KB를 전부 받아 자기 학교 것만 고릅니다. 학교별로 파일이 나뉘어 있지 않아, 실측 기준 <strong>50~100개교</strong>가 한계입니다(현재 등록 2개교).</li>
+    <li><strong>공고 목록을 통째로 내려받습니다.</strong> 앱은 <span class="mono">notices.json</span> 34 KB를 전부 받아 자기 학교 것만 고릅니다. 학교별로 파일이 나뉘어 있지 않아, 실측 기준 <strong>50~100개교</strong>가 한계입니다(현재 등록 2개교).</li>
     <li><strong>GitHub Actions</strong> — 공개 저장소인 동안은 무제한이라 제약이 아닙니다. 비공개로 전환하면 그 순간 월 2,000분이 상한이 되고, 현재 사용량은 약 700분입니다.</li>
     <li><strong>Supabase·Cloudflare 모두 무료 등급</strong>입니다. 어느 지표가 먼저 한도에 닿는지 저희는 모릅니다.</li>
     <li><strong>푸시 발송</strong>은 2분마다 25대씩 보냅니다 — 수백 명까지는 무해하다고 계산했지만 실제로 겪어 본 적은 없습니다.</li>
@@ -1277,29 +1277,30 @@ await fetch('https://api.resend.com/emails', {
 <section class="q">
   <div class="q-head">
     <div class="q-no">질문 09 · 수집 범위</div>
-    <h3 class="q-title" style="border:0;padding:0">외부 공고를 전부 수집하는 것이 맞습니까</h3>
+    <h3 class="q-title" style="border:0;padding:0">수집망을 넓히는 판단은 무엇을 보고 내려야 합니까</h3>
   </div>
 
   <div class="q-ask">
-    <p>김성민 교수님께서 <strong>“외부 공고를 전부 수집하는 것이 좋다”</strong>고 조언해 주셨습니다. 지금은 로봇이 교내 장학 게시판과 한국장학재단만 훑고 있는데, 대상을 전국 외부 공고까지 넓히려 합니다. <strong>이것을 오류 없이 감당할 수 있습니까?</strong> 그리고 “전부”의 현실적인 크기를 어디로 잡아야 합니까?</p>
-    <p class="q-sub">비용부터 정리하면, <strong>공개 저장소인 동안 로봇 실행은 무제한 무료</strong>라 예산은 제약이 아닙니다(비공개로 돌릴 때만 월 2,000분이 상한이 되고, 현재 700분입니다). 그래서 저희가 실제로 걱정하는 것은 비용이 아니라 <strong>정확도</strong>입니다 — 게시판 형식이 제각각인 외부 공고를 대량으로 넣으면, <em>못 읽은 자격 요건과 잘못 만든 신청서 양식이 학생 화면에 그대로 나갑니다.</em></p>
+    <p>김성민 교수님께서 <strong>“외부 공고를 전부 수집하는 것이 좋다”</strong>고 조언해 주셨습니다. 저희는 <strong>반대로 좁혔습니다</strong> — 2026-09-21에 수집 대상을 <strong>경희대·한국외대 2곳으로 확정</strong>하고 나머지 42개교를 내렸습니다. 온보딩에서는 213개교를 고를 수 있으므로 <em>다른 학교 학생에게는 앱이 비어 보입니다.</em> 이것은 사고가 아니라 <strong>알고 내린 결정</strong>입니다: 공고가 늘수록 못 읽은 자격 요건과 잘못 만든 신청서 양식이 학생 화면에 그대로 나가는데, 그 오류를 사람이 다 볼 수 없기 때문입니다.</p><p><strong>여쭙고 싶은 것은 “넓혀도 되는가”가 아니라 “언제 · 무엇을 보고 넓히는가”입니다.</strong> 지금의 좁힘이 옳은 판단인지, 그리고 넓혀도 된다고 말해 주는 신호가 무엇인지 알고 싶습니다.</p>
+    <p class="q-sub">비용은 제약이 아닙니다 — <strong>공개 저장소인 동안 로봇 실행은 무제한 무료</strong>입니다(비공개로 돌릴 때만 월 2,000분이 상한이 되고, 현재 700분입니다). 걸리는 것은 <strong>정확도 하나</strong>이고, 그래서 넓히기를 <em>미룬</em> 것입니다.</p>
   </div>
 
   <h4>우리 상황</h4>
   <ul class="b">
     <li>지금도 자격 요건과 양식 스키마화는 <strong>공고 원문의 구조에 크게 좌우됩니다.</strong> 절 머리글이 없거나 첨부 안에만 내용이 있으면 판독률이 떨어집니다.</li>
-    <li>이미 <strong>2층 구조를 쓰고 있습니다</strong> — 한국장학재단 재단 116곳은 목록과 링크만 보여 주고, 자격 진단·양식 작성을 붙이지 않습니다. 재단이 적어 둔 칸을 그대로 옮길 뿐입니다.</li>
+    <li>이미 <strong>2층 구조를 쓰고 있습니다</strong> — 한국장학재단 재단 101곳은 목록과 링크만 보여 주고, 자격 진단·양식 작성을 붙이지 않습니다. 재단이 적어 둔 칸을 그대로 옮길 뿐입니다.</li>
     <li>잘못된 데이터는 <strong>감사 관문</strong>이 막습니다(그림 3). 다만 이 관문은 “규칙에 어긋나는가”를 볼 뿐, <em>“원문을 제대로 읽었는가”는 보지 못합니다.</em></li>
     <li>공고가 늘면 앱이 내려받는 파일도 함께 커집니다(질문 07의 첫 번째 한계값).</li>
   </ul>
 
   <div class="hyp">
-    <b>우리 가설</b> — 대량 수집분은 <b>정식 등록(매칭·자격 진단·양식 작성)에 넣지 않고 ‘목록·링크만 보여 주는 층’으로 따로 둔다</b>는 것이 저희 안입니다. 자격 진단과 양식 작성은 사람이 원문을 검수한 공고에만 붙입니다. 이렇게 하면 수집을 몇 배로 늘려도 <b>틀린 판정이 학생에게 나가지 않습니다</b> — 대신 대부분의 공고에서 앱이 해 주는 일이 “있다고 알려 주는 것”뿐이 됩니다. 이 맞바꿈이 옳은지 판단이 서지 않습니다.
+    <b>우리 가설</b> — 넓힐 때가 오면 새로 들어오는 공고는 <b>정식 등록(매칭·자격 진단·양식 작성)에 넣지 않고 ‘목록·링크만 보여 주는 층’으로 따로 둔다</b>는 것이 저희 안입니다. 자격 진단과 양식 작성은 사람이 원문을 검수한 공고에만 붙입니다. 이렇게 하면 수집을 몇 배로 늘려도 <b>틀린 판정이 학생에게 나가지 않습니다</b> — 대신 대부분의 공고에서 앱이 해 주는 일이 “있다고 알려 주는 것”뿐이 됩니다. 이 맞바꿈이 옳은지, 그리고 <b>그 구조가 준비되기 전에는 넓히지 않는 것이 맞는지</b> 판단이 서지 않습니다.
   </div>
 
   <div class="want">
     <h4>받고 싶은 답의 형태</h4>
     <ul class="b">
+      <li><strong>넓혀도 된다고 말해 주는 신호</strong> — 무엇이 갖춰지면(또는 어떤 숫자가 어디에 닿으면) 2곳을 늘려도 된다고 볼 수 있습니까. 지금의 좁힘을 언제까지 끌고 가야 합니까.</li>
       <li>이 <strong>2층 구조가 맞는지</strong>, 아니면 다른 방식이 있는지.</li>
       <li>대량 수집에서 <strong>품질을 자동으로 재는 방법</strong> — 사람이 다 볼 수 없는데 무엇이 틀렸는지 알아야 합니다(수집·판독의 구체적인 어려움은 질문 10·11에 나눠 적었습니다).</li>
       <li>크롤링을 그만두고 <strong>제휴·제공받기로 넘어가야 하는 지점</strong>이 있다면 그 신호.</li>
@@ -1457,10 +1458,10 @@ await fetch('https://api.resend.com/emails', {
 ├─ forms.js · form-plan.js · essay*.js            <span class="c">양식·서술형 문서</span>
 ├─ supabase-client.js · notify*.js · chat.js      <span class="c">로그인·알림·도우미</span>
 ├─ data/
-│   ├─ registered.json      <span class="c">정식 등록 공고 45건 · 94 KB</span>
+│   ├─ registered.json      <span class="c">정식 등록 공고 72건 · 199 KB</span>
 │   ├─ forms.json           <span class="c">양식 스키마 48종 · 178 KB</span>
-│   ├─ notices.json         <span class="c">실시간 공고 507건 · 368 KB</span>
-│   ├─ kosaf-open.json      <span class="c">한국장학재단 재단 116곳 · 210 KB</span>
+│   ├─ notices.json         <span class="c">실시간 공고 57건 · 34 KB</span>
+│   ├─ kosaf-open.json      <span class="c">한국장학재단 재단 101곳 · 202 KB</span>
 │   └─ tuition.json majors.json search-index.json
 ├─ collector/               <span class="c">수집 로봇 47개 (.mjs) + 원문 542개 파일</span>
 ├─ server/
@@ -1489,8 +1490,9 @@ await fetch('https://api.resend.com/emails', {
   </ul>
 
   <footer class="end">
-    한대장 · 기술 고문 요청서 · 2026-09-03 · 이선주 seonju5543@gmail.com<br>
-    이 문서의 수치는 전부 2026-09-03 저장소 실측이며, 채널 분류는 2026-09-02 게시판 직접 열람 결과입니다.
+    한대장 · 기술 고문 요청서 · 2026-09-23 고침 · 이선주 seonju5543@gmail.com<br>
+    이 문서의 수치는 전부 <b>2026-09-23 저장소 실측</b>이며, 채널 분류는 2026-09-02 게시판 직접 열람 결과입니다.
+    수집 대상은 <b>경희대·한국외대 2곳</b>입니다(2026-09-21 결정).
   </footer>
 </section>
 
