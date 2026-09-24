@@ -154,8 +154,15 @@ async function dismissNotify(page) {
     await page.click('#btn-essay-ai');
     await page.waitForTimeout(500);
     ok(await page.evaluate(() => window.__off) === 0, '① 꺼져 있을 때 바깥으로 나가는 요청이 0건이다');
+    /* 🔴 **키워드 질문이 붙은 그 칸**을 본다 (2026-09-24). 예전엔 화면의 첫 `fq-` 글상자를 봤는데,
+       서술형 칸 앞에 '기타(직접 작성)' 같은 글상자가 있는 양식(AI 멘토 활동계획서)을 고르자 엉뚱한
+       칸을 재서 빨간불이 났다 — 앱은 제 칸(fq-strength)에 정확히 옮기고 있었다(실측).
+       질문 묶음이 `data-for` 로 제 칸을 말한다(essay.js essayAskHtml). */
     const moved = await page.evaluate(() => {
-      const t2 = [...document.querySelectorAll('.sheet-body textarea')].find((x) => x.id.startsWith('fq-'));
+      /* 칩을 누른 **그 질문 묶음**의 칸 — 첫 묶음은 칩 없이 직접 쓰는 칸만 있을 수 있다(AI 멘토: 앞 4칸) */
+      const c = document.querySelector('.essay-ask .essay-chips .chip');
+      const ask = c && c.closest('.essay-ask');
+      const t2 = ask && document.getElementById(`fq-${ask.dataset.for}`);
       return t2 ? t2.value : '';
     });
     ok(moved.includes('·'), '① 고른 키워드가 칸에 옮겨진다', moved.slice(0, 50));
@@ -253,7 +260,12 @@ async function dismissNotify(page) {
   ok(!/fallbacks/.test(body), '③ fallbacks 를 붙이지 않는다');
   ok((sent[0].fields || []).every((f) => f.kind === 'story'),
     '③ story 칸만 보낸다 — 사실 나열형은 요청에 없다');
-  const f0 = (sent[0].fields || [])[0] || {};
+  /* 요청의 칸도 **키워드 질문이 붙은 칸**으로 고른다 — 첫 칸이 그 칸이라는 보장이 없다(위 ① 과 같은 이유) */
+  const askFor = await page.evaluate(() => {
+    const c = document.querySelector('.essay-ask .essay-chips .chip');
+    return c ? c.closest('.essay-ask').dataset.for : null;
+  });
+  const f0 = (sent[0].fields || []).find((f) => f.key === askFor) || (sent[0].fields || [])[0] || {};
   ok((f0.asks || []).length >= 1, '③ 학생이 고른 키워드가 요청에 실려 간다', JSON.stringify(f0.asks || []));
   ok((f0.asks || []).some((a) => a.own), '③ 직접 쓴 한 줄이 own 으로 구분돼 실려 간다');
   ok(Number(f0.target) >= 200, `③ 목표 분량이 실려 간다 (${f0.target}자)`);
@@ -306,12 +318,18 @@ async function dismissNotify(page) {
   await page.waitForSelector('#detail-sheet:not(.show)', { timeout: 4000 }).catch(() => {});
   await page.waitForTimeout(300);
   ok(await openForm(), '양식 화면을 다시 연다');
+  /* 칩이 있는 질문 묶음의 칸을 고른다 (위 ① 과 같은 이유) */
   const askBox7 = await page.$('.essay-ask');
-  const fid = askBox7 ? await askBox7.evaluate((e) => e.dataset.for) : null;
+  const fid = await page.evaluate(() => {
+    const c = document.querySelector('.essay-ask .essay-chips .chip');
+    return c ? c.closest('.essay-ask').dataset.for : (document.querySelector('.essay-ask') || { dataset: {} }).dataset.for || null;
+  });
   ok(!!fid, '서술형 칸을 찾았다');
 
   /* 게이지 — 아무것도 안 골랐을 때는 '부족'이어야 한다 */
-  const gaugeText = async () => page.$eval('.essay-gauge, [class*="gauge"]', (e) => e.innerText).catch(() => '');
+  /* 게이지도 **그 칸의** 것을 본다 — 칸마다 하나씩 있고(data-for), 첫 게이지는 질문 없는 칸일 수 있다 */
+  const gSel = fid ? `.essay-gauge[data-for="${fid}"]` : '.essay-gauge';
+  const gaugeText = async () => page.$eval(gSel, (e) => e.innerText).catch(() => '');
   ok((await gaugeText()).includes('부족'), '② 재료를 안 줬을 때 게이지가 "부족"이라고 말한다');
 
   /* 키워드를 고르면 게이지가 실제로 움직인다 */
@@ -319,7 +337,7 @@ async function dismissNotify(page) {
      그래서 **막대 길이**를 본다 — 그게 재료가 실제로 늘었다는 표시다.
      🔴 page.click 을 쓰지 않는다 — 시트 안의 안내문이 위에 겹쳐 클릭이 가로채인다.
         이 드라이버가 위(③)에서 이미 쓰는 방식대로 요소에게 직접 누르라고 한다. */
-  const barPct = async () => page.$eval('.essay-gauge-bar span',
+  const barPct = async () => page.$eval(`${gSel} .essay-gauge-bar span`,
     (e) => parseFloat(e.style.width) || 0).catch(() => -1);
   const before = await barPct();
   await page.evaluate(() => {
@@ -386,6 +404,9 @@ async function dismissNotify(page) {
   await page.waitForTimeout(500);
 
   console.log('\n[5) 실패해도 학생 글을 덮지 않는가]');
+  /* 7) 이 일부러 넣은 빈칸 표시(`[활동 시간]`)를 걷는다 — 칩이 있는 칸(fid)과 초안 칸(key)이 다른
+     양식이면 그 표시가 남아, 아래 6) 에서 앱이 '먼저 고칠 곳'으로 **맞게** 한 번 세운다(2026-09-24). */
+  if (fid && fid !== key) await page.fill(`#fq-${fid}`, '');
   await page.fill(`#fq-${key}`, '제가 직접 쓴 문장입니다');
   await page.evaluate(() => {
     window.fetch = async () => { throw new Error('서버 죽음'); };

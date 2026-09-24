@@ -2552,7 +2552,6 @@
    ],
    "duplicable": true,
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
-   "noForm": "자동 등록(검수 전) 2026-08-30 — 양식 스키마화는 검수 후 진행",
    "auto": true,
    "attachments": [
     {
@@ -2602,7 +2601,8 @@
     "raw": "장학금액 : 100만원"
    },
    "amountFrom": "공고 원문",
-   "deadlineFrom": "공고문 이미지 2026-09-15 · 접수 2026년 9월 1일(화) - 30일(수)"
+   "deadlineFrom": "공고문 이미지 2026-09-15 · 접수 2026년 9월 1일(화) - 30일(수)",
+   "formId": "samwon-apply"
   },
   {
    "id": "auto-oardid321881menuno200318",
@@ -2680,7 +2680,6 @@
    ],
    "duplicable": true,
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
-   "noForm": "자동 등록(검수 전) 2026-09-01 — 양식 스키마화는 검수 후 진행",
    "auto": true,
    "attachments": [
     {
@@ -2724,7 +2723,8 @@
     "4. 선발기준 : 소득구간 , 성적 등 고려"
    ],
    "eligibilityFrom": "AI(원문 줄 그대로)",
-   "eligibilityReviewed": false
+   "eligibilityReviewed": false,
+   "formId": "dalseo-apply"
   },
   {
    "id": "auto-9599ec839d20ec84a0ebb09c",
@@ -2864,7 +2864,6 @@
    ],
    "duplicable": true,
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
-   "noForm": "자동 등록(검수 전) 2026-09-08 — 양식 스키마화는 검수 후 진행",
    "auto": true,
    "attachments": [
     {
@@ -2921,7 +2920,8 @@
    "eligibilityReviewed": false,
    "applyPortal": "HUFS Ability",
    "applyPortalSource": "6 신청방법 : 온라인 신청 (HUFS Ability- 학생핵심역량통합시스템 ) → 로그인 ( 학번 / 비번 ) → 교과 / 비교과 → 장학신청 목록 → 해당 장학금 선택",
-   "applyPortalFrom": "공고 원문"
+   "applyPortalFrom": "공고 원문",
+   "formId": "hufs-family-apply"
   },
   {
    "id": "auto-oardid323027menuno200318",
@@ -3467,7 +3467,6 @@
    ],
    "duplicable": true,
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
-   "noForm": "자동 등록(검수 전) 2026-09-20 — 양식 스키마화는 검수 후 진행",
    "auto": true,
    "attachments": [
     {
@@ -3504,7 +3503,8 @@
    "amountFrom": "공고 원문",
    "applyPortal": "HUFS Ability",
    "applyPortalSource": "6. 신청방법 : 온라인 신청 (HUFS Ability- 학생핵심역량통합시스템 ) → 로그인 ( 학번 / 비번 ) → 교과 / 비교과 → 장학신청 목록 → 해당 장학금",
-   "applyPortalFrom": "공고 원문"
+   "applyPortalFrom": "공고 원문",
+   "formId": "hufs-jeongyeongo-apply"
   },
   {
    "id": "auto-ent2431266737artclviewdo",
@@ -3527,7 +3527,6 @@
    ],
    "duplicable": true,
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
-   "noForm": "자동 등록(검수 전) 2026-09-20 — 양식 스키마화는 검수 후 진행",
    "auto": true,
    "attachments": [
     {
@@ -3564,7 +3563,8 @@
    "amountFrom": "공고 원문",
    "applyEmail": "scholarship@hufs.ac.kr",
    "applyEmailSource": "다 . 멘토활동계획서 제출 방법 : 이메일 : scholarship@hufs.ac.kr 또는 장학팀 ( 학생회관 121 호 ) 직접 제출",
-   "applyEmailFrom": "공고 원문"
+   "applyEmailFrom": "공고 원문",
+   "formId": "hufs-ai-mentor-plan"
   },
   {
    "id": "auto-oardid323082menuno200318",
@@ -3986,7 +3986,6 @@
    ],
    "duplicable": true,
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
-   "noForm": "자동 등록(검수 전) 2026-09-21 — 양식 스키마화는 검수 후 진행",
    "auto": true,
    "attachments": [
     {
@@ -4034,7 +4033,8 @@
    "sameAsFrom": "자동",
    "applyEmail": "scholarship@hufs.ac.kr",
    "applyEmailSource": "■ 접수 방법: scholarship@hufs.ac.kr 이메일 접수",
-   "applyEmailFrom": "공고 원문"
+   "applyEmailFrom": "공고 원문",
+   "formId": "hana-scholar-apply"
   },
   {
    "id": "auto-20ec9588eb82b40922ed9994",
@@ -4106,7 +4106,6 @@
    ],
    "duplicable": true,
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
-   "noForm": "자동 등록(검수 전) 2026-09-22 — 양식 스키마화는 검수 후 진행",
    "auto": true,
    "attachments": [
     {
@@ -4147,7 +4146,8 @@
     "scope": "narrow",
     "raw": "( 단 , 국가장학금 및 교내 장학금 , 근로 , 봉사장학금 , 전체대상장학금만 중복수혜 가능)"
    },
-   "exclusivityFrom": "공고 원문"
+   "exclusivityFrom": "공고 원문",
+   "formId": "insong-apply"
   },
   {
    "id": "auto-ent2431267611artclviewdo",
