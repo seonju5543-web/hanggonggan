@@ -14,5 +14,5 @@
 # 배포되는 경로: 작업 브랜치 → 기본 브랜치(claude/nice-heisenberg-WESq5) → main → 앱
 # 데이터 관문(node verify/audit-data.js)을 통과하지 못하면 배포하지 않고 🚨 이슈를 남긴다.
 
-branch: claude/handaejang-notice-error-check-fg521c
-메모: 2026-09-23 — 로그인 탭 충돌 수리 + 문의처(약관 9번·support-config) 채움
+branch: claude/job-posting-form-read-error-98ck8a
+메모: 2026-09-24 — '신청 준비 시작'이 곧장 준비 완료로 새던 것(신청 준비 시트) + 마감 전 양식 7종 + 양식 변환 로봇 두 스위치
