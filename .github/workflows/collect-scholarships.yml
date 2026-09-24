@@ -63,6 +63,10 @@ jobs:
         continue-on-error: true
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # 원본 받기 예산을 단계 상한 안으로 (2026-09-23) — deepfetch 기본값은 6분이라 이 단계 상한 6분에서는
+          # 받는 도중 단계가 끊겨 같은 단계의 변환·mark-fetched 가 통째로 안 돌았다. 양식 대기줄을
+          # 소급해 채우면서(auto-register) 이 단계가 실제로 받을 것이 생겼다. 못 받은 것은 다음 실행이 받는다.
+          FORMS_BUDGET_MS: '240000'
         run: |
           targets=$(node collector/pending-targets.mjs)
           if [ -n "$targets" ]; then
