@@ -121,7 +121,8 @@ async function swipeDown(page, sel) {
     /* 앱 양식이 **아예 없는** 공고만 — formId 만 있고 템플릿이 안 온 공고는 섞지 않는다 */
     const plain = (s) => !s.formId && !s.prepFormId && !formTplIdFor(s) && !essayDefsFor(s).length;
     const l1 = live.filter((s) => regIds.has(s.id) && s.sourceKind !== 'kosaf' && plain(s));
-    const hasFormAtt = (s) => (s.attachments || []).some(isFormAttachment);
+    /* 시트가 '신청서 양식'으로 부르는 규칙은 data.js isApplicationForm 한 곳 (2026-09-23 리뷰로 좁혔다) */
+    const hasFormAtt = (s) => (s.attachments || []).some(isApplicationForm);
     /* A — 서류 목록에 안내 줄이 있고(③을 잴 수 있고) 원문 주소가 있는 것을 먼저 */
     const score = (s) => (s.documents.some((d) => PH.test(d)) ? 4 : 0) + (s.sourceUrl ? 2 : 0) + (hasFormAtt(s) ? 0 : 1);
     const A = l1.slice().sort((a, b) => score(b) - score(a))[0] || null;
@@ -131,7 +132,7 @@ async function swipeDown(page, sel) {
     const F = live.find((s) => formTplIdFor(s)) || null;
     const brief = (s) => s && ({ id: s.id, name: s.name.slice(0, 40), src: !!s.sourceUrl,
       atts: (s.attachments || []).length,
-      formAtts: (s.attachments || []).filter(isFormAttachment).map((a) => ({ name: a.name, href: safeUrl(a.url) })),
+      formAtts: (s.attachments || []).filter(isApplicationForm).map((a) => ({ name: a.name, href: safeUrl(a.url) })),
       ph: s.documents.some((d) => PH.test(d)) });
     return { A: brief(A), B: brief(B), C: brief(C), F: brief(F), counts: { l1: l1.length, l2: l2.length } };
   }, PLACEHOLDER_RE.source);
@@ -203,12 +204,18 @@ async function swipeDown(page, sel) {
       await page.click('#btn-prep-confirm', { timeout: 4000 });
       eq('  확인을 누르면 신청내역에 pending:false 로 담긴다', await appsOf(pick.A.id),
         { mem: [{ pending: false }], disk: [{ pending: false }] });
-      eq('  시트가 닫힌다', await closedAfter(600), true);
-      await open(pick.A.id);
-      eq('  다시 열면 버튼이 「신청 준비 완료됨」 이고 잠겨 있다', await page.evaluate(() => {
+      /* 확인하면 닫지 않고 **그 공고의 준비 완료 화면**을 연다 (2026-09-23 리뷰 — 메일 접수 버튼·
+         제출처·'공식 제출 완료로 기록'이 거기 있다. 닫으면 학생이 공고를 다시 찾아 열어야 했다) */
+      await page.waitForTimeout(500);
+      eq('  시트가 닫히지 않고 그 공고의 준비 완료 화면이 된다 (다음 할 일이 보인다)', await page.evaluate(() => {
         const b = document.querySelector('#btn-apply-one');
-        return b && { label: b.textContent.trim(), disabled: b.disabled };
-      }), { label: '신청 준비 완료됨', disabled: true });
+        return {
+          open: document.querySelector('#detail-sheet').classList.contains('show'),
+          prep: !!document.querySelector('#apply-prep'),
+          applied: !!document.querySelector('#detail-sheet .applied-at'),
+          btn: b && { label: b.textContent.trim(), disabled: b.disabled },
+        };
+      }), { open: true, prep: false, applied: true, btn: { label: '신청 준비 완료됨', disabled: true } });
       await page.keyboard.press('Escape');
       await closedAfter(500);
     } else { fail++; console.log('  ✕ 신청 준비 시트가 안 떠 확인 버튼을 누를 수 없다'); }

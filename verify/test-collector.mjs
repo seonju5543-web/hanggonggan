@@ -1086,9 +1086,9 @@ console.log('\n■ 유료 API 크레딧 누수 방지 (2026-08-20)');
 console.log('\n■ 양식 변환 로봇의 두 스위치 — 유료를 끄려다 무료까지 끄지 않는다 (2026-09-23)');
 {
   const root = new URL('../', import.meta.url);
-  const realCfg = JSON.parse(readText(new URL('collector/schematize-config.json', root)));
-  eq('🔴 실제 설정: 로봇 전체는 켜져 있다 (enabled 가 false 면 무료 변환까지 멈춘다)', realCfg.enabled !== false, true);
-  eq('  실제 설정: 유료 경로는 꺼 둔 채다 (크레딧 누수 방지는 apiEnabled 로)', realCfg.apiEnabled, false);
+  /* ⚠️ 실제 설정 파일의 값(enabled·apiEnabled)은 **못 박지 않는다** (2026-09-23 리뷰).
+     켜고 끄는 것은 개발자 결정이고, 이 검사는 수집 로봇의 데이터 관문이라 여기서 값을 못 박으면
+     유료를 켜는 날 그날 자동 등록분이 통째로 되돌려진다. 지키는 것은 **동작**이다(아래). */
 
   /* 사본 저장소를 만들어 로봇을 진짜로 돌린다. 변환기가 받아들이는 원본(400자 넘는 표형 신청서)과
      유료 경로로 가는 원본(글자가 너무 적음)을 하나씩 둔다. */
@@ -1121,14 +1121,18 @@ console.log('\n■ 양식 변환 로봇의 두 스위치 — 유료를 끄려다
     const entry = (id) => ({ id, name: id, provider: '테스트재단', noForm: '자동 등록(검수 전) 2026-09-01 — 양식 스키마화는 검수 후 진행', auto: true });
     fs.writeFileSync(path.join(dir, 'data/registered.json'), JSON.stringify({ items: [entry('reg-a'), entry('reg-b')] }, null, 1));
     fs.writeFileSync(path.join(dir, 'data/forms.json'), JSON.stringify({ templates: {} }, null, 1));
-    const env = { ...process.env };
-    delete env.ANTHROPIC_API_KEY;   // 이 검사는 절대 돈을 쓰지 않는다
+    /* 🔴 **가짜 열쇠를 준다** (2026-09-23 리뷰). 열쇠를 지운 채 돌리면 유료 경로가 어차피 '키 없음'
+       갈래로 빠져서, apiEnabled 검사를 통째로 죽여도 이 절이 초록이었다. 가짜 열쇠 + 닿지 않는 주소면
+       유료 경로를 **탔을 때만** 리포트에 'API 호출 실패'가 남는다(사본 폴더엔 SDK 도 없어 돈이 나갈 길이 없다). */
+    const env = { ...process.env, ANTHROPIC_API_KEY: 'sk-ant-test-not-a-real-key', ANTHROPIC_BASE_URL: 'http://127.0.0.1:9' };
     const r = spawnSync(process.execPath, [path.join(dir, 'collector/schematize-forms.mjs'), 'r.md'], { cwd: dir, encoding: 'utf8', env });
+    const report = fs.existsSync(path.join(dir, 'r.md')) ? readText(path.join(dir, 'r.md')) : '';
     const reg = JSON.parse(readText(path.join(dir, 'data/registered.json'))).items;
     const q = JSON.parse(readText(path.join(dir, 'collector/pending-forms.json'))).items;
     const forms = JSON.parse(readText(path.join(dir, 'data/forms.json'))).templates;
     fs.rmSync(dir, { recursive: true, force: true });
-    return { status: r.status, out: `${r.stdout}${r.stderr}`, a: reg.find((x) => x.id === 'reg-a'), b: reg.find((x) => x.id === 'reg-b'),
+    return { status: r.status, out: `${r.stdout}${r.stderr}`, report, calledApi: /API 호출 실패/.test(report),
+      a: reg.find((x) => x.id === 'reg-a'), b: reg.find((x) => x.id === 'reg-b'),
       qa: q.find((x) => x.id === 'reg-a'), qb: q.find((x) => x.id === 'reg-b'), nForms: Object.keys(forms).length };
   };
   const on = run({ enabled: true, apiEnabled: false });
@@ -1136,8 +1140,16 @@ console.log('\n■ 양식 변환 로봇의 두 스위치 — 유료를 끄려다
     [on.status, !!on.a.formId, on.a.noForm, on.nForms], [0, true, undefined, 1]);
   eq('  변환된 공고는 대기줄에서 끝난 것으로 표시된다', on.qa.schematized, true);
   eq('  유료 경로로 갈 원본은 대기줄에 남는다(원본 첨부 안내 유지)', [on.qb.schematized, !!on.b.formId], [false, false]);
+  eq('🔴 apiEnabled:false 면 열쇠가 있어도 유료 API 를 부르지 않는다 (리포트에 \'유료 경로 꺼짐\')',
+    [on.calledApi, /유료 경로 꺼짐/.test(on.report)], [false, true]);
   eq('🔴 부르지도 않은 API 를 실패로 세지 않는다 — 켜는 날 이미 \'재시도 중단\'이면 한 번도 안 해 본 공고가 버려진다',
     on.qb.apiTries, undefined);
+  const dflt = run({ enabled: true });
+  eq('🔴 설정에 apiEnabled 가 없으면(파일이 깨졌거나 빠졌을 때) 유료는 꺼진 쪽이다', dflt.calledApi, false);
+  /* 대조군 — 켜면 **정말 부르는지** 본다. 이게 없으면 위 두 줄은 '원래 못 부르는 사본'에서 초록일 수 있다 */
+  const paid = run({ enabled: true, apiEnabled: true });
+  eq('  대조군: apiEnabled:true 면 유료 경로를 정말 탄다 (가짜 열쇠라 \'API 호출 실패\'로 남는다 — 이 검출이 살아 있다는 증거)',
+    paid.calledApi, true);
   const off = run({ enabled: false, apiEnabled: false });
   eq('  enabled:false 는 여전히 킬스위치다 (아무것도 안 바꾼다)', [off.status, !!off.a.formId, off.nForms, off.qa.schematized], [0, false, 0, false]);
 }
@@ -1221,7 +1233,10 @@ console.log('\n■ 신청 준비 시작 버튼 — 양식이 없어도 곧장 \'
   eq('  확인 버튼이 finalizeApply 를 부른다', /addEventListener\('click',[\s\S]*finalizeApply\(sch/.test(prep), true);
   /* 제출처·채널 이름·양식 첨부 판정·원문 링크 이름은 **한 곳씩** — 시트가 제 사본을 들면 상세 시트와 다른 말을 한다 */
   eq('  판정을 새로 만들지 않고 한 곳씩 가져다 쓴다',
-    ['officialChannel(sch)', 'submitChannelLabel(sch)', 'isFormAttachment', 'sourceNoteHtml(sch)'].filter((s) => !prep.includes(s)), []);
+    ['officialChannel(sch)', 'submitChannelLabel(sch)', 'isApplicationForm', 'sourceNoteHtml(sch)'].filter((s) => !prep.includes(s)), []);
+  /* 확인하면 닫지 않고 그 공고의 '준비 완료' 화면을 연다 — 메일 접수 버튼·제출처가 거기 있다(리뷰 L1) */
+  eq('  확인하면 그 공고의 준비 완료 화면을 다시 연다 (다음 할 일이 거기 있다)',
+    /finalizeApply\(sch, null\);\s*openDetail\(sch\.id\)/.test(prep), true);
   eq('  층2 첨부를 \'신청서 양식\'이라 부르지 않는다 (재단이 올린 선발 공고문이다)',
     /const formAtts = kosaf \? \[\] :/.test(prep), true);
 
@@ -1233,6 +1248,28 @@ console.log('\n■ 신청 준비 시작 버튼 — 양식이 없어도 곧장 \'
     cert({ documents: ['지원 자격·제출 서류는 원문 공고에서 확인'] }), '');
   const mixed = cert({ documents: ['재학증명서', '재단 공고문에서 확인', '신청 서류·접수 방법은 원문 공고 확인'] });
   eq('  진짜 서류는 남기고 안내 줄만 뺀다', [/재학증명서/.test(mixed), /확인 —/.test(mixed.replace(/재학증명서[^<]*/, ''))], [true, false]);
+  /* 🔴 서류 이름은 수집한 외부 글이다 — 모든 갈래가 esc 를 거친다 (2026-09-23 리뷰: ✓·□·△ 세 갈래가 날것이었다) */
+  const escReal = (x) => String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const certE = (st) => new Function('ESSAY_DEFS', 'DOC_PLACEHOLDER', 'docWalletStatus', 'esc',
+    `${take('certStatusListHtml')}\nreturn certStatusListHtml;`)([], ph, () => st, escReal);
+  const evil = ['재학증명서 <a href="https://evil.example/">여기서 발급</a>', '<i>x</i> 자동 제출'];
+  eq('🔴 보관함 상태가 있는 갈래도 서류 이름의 태그를 그리지 않는다',
+    /<a |<i>/.test(certE({ ok: true, text: '<b>파일</b>' })({ documents: evil })), false);
+  eq('  보관함 상태가 없는 갈래(△ 자동)도 그리지 않는다', /<a |<i>/.test(certE(null)({ documents: evil })), false);
+  /* 상세 시트의 '제출 서류' 목록도 안내 줄에 '직접' 배지를 달지 않는다 */
+  const detailSrc = take('openDetail').replace(/\/\*[\s\S]*?\*\//g, '');
+  eq('  상세 시트의 제출 서류 목록도 안내 줄을 거른다', /documents\.filter\(\(doc\) => !DOC_PLACEHOLDER\.test\(doc\)\)/.test(detailSrc), true);
+
+  /* 첨부를 '신청서 양식 — 내려받아 작성하세요'라고 부르는 선 · 층2 채널 (data.js 진짜 함수) */
+  const dsrc = readText(new URL('../data.js', import.meta.url));
+  const D = new Function(`${dsrc}\nreturn { isApplicationForm, submitChannelKind };`)();
+  eq('🔴 결과보고서 양식은 신청서라 부르지 않는다 (점프장학 실측)',
+    D.isApplicationForm({ name: '붙임3 서울 및 국제 공통_상담 및 학업 결과보고서 양식.hwp' }), false);
+  eq('  신청서식·지원서·선발원서는 신청서다',
+    ['신청서식.hwpx', '(서식) ‘仁松 일반장학생’ 선발 지원서_2026_2.hwp', 'F_장학생 선발원서.docx'].map((n) => D.isApplicationForm({ name: n })), [true, true, true]);
+  eq('🔴 층2 첨부는 이름에 신청서가 있어도 \'양식 다운로드형\'이라 부르지 않는다 (화면이 \'선발 공고문\'이라 부른다)',
+    D.submitChannelKind({ sourceKind: 'kosaf', provider: '원주시청', attachments: [{ name: '지원신청서.hwp' }] }) === 'download', false);
+  eq('  층1 은 그대로 다운로드형이다', D.submitChannelKind({ attachments: [{ name: '장학금 신청서.hwp' }] }), 'download');
 
   /* 준비 시트가 층2에서 '학교 포털 장학 메뉴에서 확인'이라고 말하지 않는다 — 재단이 직접 받는 공고다.
      data.js 의 진짜 officialChannel 을 파일째 싣고 부른다. */
@@ -4449,8 +4486,16 @@ console.log('\n■ 금액 상세 — 승인받은 화면 그대로인가 (2026-0
     (app.match(/dismissSheet\(\)/g) || []).length >= 2, true);
   /* 🔴 closeSheet 자체를 고치면 안 된다 — 신청 준비·양식 작성 흐름도 그걸 부르는데
      그때 금액 상세로 튕겨 돌아가면 엉뚱하다. 흐름은 여전히 closeSheet 를 쓴다. */
-  eq('신청 흐름은 여전히 그냥 닫는다 (되돌아가지 않는다)',
-    /finalizeApply\(sch, null\);\n\s*closeSheet\(\);/.test(app), true);
+  /* ⚠️ 뜻은 두고 자리만 옮겼다 (2026-09-23). 예전 이 줄은 `finalizeApply(sch, null); closeSheet();` 를
+     찾았는데, 그 글자가 있던 곳이 **바로 그날 고친 버그** — 양식 없는 공고를 누르는 순간 곧장
+     '준비 완료'로 담던 applyTo 의 마지막 줄 — 였다. 지키려던 뜻은 '신청 흐름이 끝날 때
+     dismissSheet(금액 상세로 되돌아가기)를 쓰지 않는다'이므로, 지금 흐름 셋에서 그것을 본다. */
+  eq('신청 흐름은 여전히 그냥 닫는다 (되돌아가지 않는다)', [
+    /finalizeApply\(sch, docPrep\.texts\);[\s\S]{0,60}closeSheet\(\);/.test(app),                // 서류 도우미
+    /formProgressClear\(\);[^\n]*\n\s*closeSheet\(\);/.test(app),                                 // 앱 양식
+    /finalizeApply\(sch, null\);\s*openDetail\(sch\.id\);/.test(app),                              // 신청 준비 시트 → 준비 완료 화면
+    /function renderApplyPrep[\s\S]*?\n\}/.exec(app)[0].includes('dismissSheet'),
+  ], [true, true, true, false]);
   eq('흐름이 닫을 때 돌아갈 곳도 지운다', /sheetBack = null;\s*\/\/ 흐름이 닫을 때/.test(app), true);
   /* 화면 이동 버튼(index.html 의 data-goto="explore")까지 걸리면 엉뚱한 곳으로 되돌아간다 */
   eq('시트 안에서 누른 것만 되돌아갈 곳을 기억한다',

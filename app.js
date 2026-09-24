@@ -1879,9 +1879,12 @@ function certStatusListHtml(sch) {
   if (!certDocs.length) return '';
   const rows = certDocs.map((doc) => {
     const st = docWalletStatus(doc);
-    const name = doc.replace(/\s*\(.*\)$/, '');
-    if (st && st.ok) return `<li class="doc-ok">✓ ${name} — ${st.text}</li>`;
-    if (st) return `<li class="doc-miss">□ ${name} — ${st.text}</li>`;
+    /* 🔴 서류 이름은 **수집한 외부 글**이다(층1 documents · 층2 재단 칸) — 전부 esc 를 거친다 (2026-09-23 리뷰).
+       예전엔 마지막 갈래만 거쳐서, 이름에 든 태그가 그대로 그려졌다(가짜 '발급처' 링크를 심을 수 있었다).
+       이 목록이 이제 확인 전 신청 준비 시트에도 뜨므로 더는 미룰 수 없다. st.text 에도 파일 이름이 든다. */
+    const name = esc(doc.replace(/\s*\(.*\)$/, ''));
+    if (st && st.ok) return `<li class="doc-ok">✓ ${name} — ${esc(st.text)}</li>`;
+    if (st) return `<li class="doc-miss">□ ${name} — ${esc(st.text)}</li>`;
     if (/자동/.test(doc)) return `<li>△ ${name} — 학교·재단 연동 후 자동 첨부 (또는 보관함에 올려두세요)</li>`;
     return `<li>□ ${esc(doc)} — 공식 제출 시 함께 준비하세요</li>`;
   }).join('');
@@ -2674,8 +2677,9 @@ function renderApplyPrep(sch) {
   const kosaf = sch.sourceKind === 'kosaf';
   /* 층2 첨부는 재단이 올린 **선발 공고문**이다 — 신청서라고 부르면 학생이 그 안에서 빈칸을 찾는다
      (상세 시트의 '선발 공고문' 머리말과 같은 규칙) */
-  const formAtts = kosaf ? [] : atts.filter(isFormAttachment);
-  const otherAtts = atts.filter((a) => !formAtts.includes(a));
+  const formAtts = kosaf ? [] : atts.filter(isApplicationForm);
+  /* 본문 사진(bodyImage)은 공고 원문 그 자체다 — '첨부 파일'로 늘어놓지 않는다(원문 링크가 준다) */
+  const otherAtts = atts.filter((a) => !formAtts.includes(a) && !a.bodyImage);
   const attList = (list) => `<ul class="doc-list">${list.map((a) => `<li class="att"><a href="${esc(safeUrl(a.url))}" target="_blank" rel="noopener">${esc(a.name)}</a>${a.bytes ? ` <span class="doc-legend">${Math.max(1, Math.round(a.bytes / 1024))}KB</span>` : ''}</li>`).join('')}</ul>`;
   const excerpts = sch.excerpts || [];
   const certHtml = certStatusListHtml(sch);
@@ -2698,13 +2702,17 @@ function renderApplyPrep(sch) {
       <h4>최종 제출 방법 <span class="channel-tag">${submitChannelLabel(sch)}</span></h4>
       <ol class="guide-list">${ch.guide.map((g) => `<li>${g}</li>`).join('')}</ol>
       ${schoolPortalNote(sch)}
+      ${(kosaf && sch.contact) ? `<p class="doc-legend">문의 ${esc(sch.contact)}</p>` : ''}
       ${sourceNoteHtml(sch)}
       <button class="btn btn-primary btn-lg" id="btn-prep-confirm">이대로 신청 준비 완료</button>
       <p class="dp-note">누르면 신청내역에 담기고, 제출·결과는 그곳에서 기록합니다. 학교·재단에 접수되는 것은 아닙니다.</p>
     </div>`;
+  /* 확인하면 **닫지 않고 그 공고의 '준비 완료' 화면을 연다** (2026-09-23 리뷰) — 다음 할 일
+     (메일 접수 버튼·제출처 열기·'공식 제출 완료로 기록')이 거기 있다. 닫아 버리면 메일 접수
+     공고는 버튼을 찾으러 공고를 다시 열어야 했다. */
   $('#btn-prep-confirm').addEventListener('click', () => {
     finalizeApply(sch, null);
-    closeSheet();
+    openDetail(sch.id);
   });
   $('#detail-sheet').scrollTop = 0;
 }
@@ -3358,12 +3366,17 @@ function openDetail(id) {
            style.css 가 이 클래스를 보고 **왼쪽 점을 뺀다**(2026-09-17 개발자 지시:
            배지가 이미 항목을 가르므로 점은 표식이 두 겹). 아래 map 이 배지를 항상
            하나씩 붙이는 것이 그 전제다 — 배지를 빼면 이 클래스도 같이 빼야 한다. */ ''}
-      <ul class="doc-list doc-badged">
-        ${sch.documents.map((doc) => {
+      ${/* 🔴 '원문에서 확인하라'는 안내 줄(DOC_PLACEHOLDER)은 서류가 아니다 (2026-09-23 리뷰) —
+           '직접' 배지를 달면 그 문장을 챙겨야 할 서류처럼 읽는다. 목록에서 빼고, 남는 서류가
+           없으면 목록 대신 그 안내를 한 줄로 말한다(아래 srcNote 가 링크를 준다). */ ''}
+      ${(() => {
+        const docs = sch.documents.filter((doc) => !DOC_PLACEHOLDER.test(doc));
+        if (!docs.length) return '<p class="doc-legend">제출 서류는 공고 원문에서 확인해 주세요.</p>';
+        return `<ul class="doc-list doc-badged">${docs.map((doc) => {
           const auto = /자동/.test(doc);
           return `<li>${auto ? '<span class="doc-auto">자동</span>' : '<span class="doc-manual">직접</span>'} ${esc(doc)}</li>`;
-        }).join('')}
-      </ul>
+        }).join('')}</ul>`;
+      })()}
       ${srcNote}
 
       ${(sch.excerpts && sch.excerpts.length) ? `
@@ -3395,12 +3408,12 @@ function openDetail(id) {
         <p class="applied-at">${app.appliedAt} 준비 완료 · 최종 제출처: ${ch.url ? `<a href="${esc(safeUrl(ch.url))}" target="_blank" rel="noopener">${esc(ch.label)}</a>` : esc(ch.label)}</p>
         ${step === 0 ? `
           <button class="btn btn-outline" id="btn-mark-submitted" style="width:100%;margin-bottom:6px">공식 제출 완료로 기록</button>
-          <p class="dp-note">최종 제출은 ${ch.label}에서 이루어집니다. 제출을 마친 뒤 누르면 다음 단계로 넘어갑니다.</p>` : ''}
+          <p class="dp-note">최종 제출은 ${esc(ch.label)}에서 이루어집니다. 제출을 마친 뒤 누르면 다음 단계로 넘어갑니다.</p>` : ''}
         ${step === 1 ? `
           <p class="progress-note">${app.submittedAt} 공식 제출 기록됨${sch.deadline ? ` · 접수 마감(${sch.deadline}) 후 자동으로 심사 단계로 표시됩니다` : ''}</p>
           <button class="link-btn" id="btn-undo-progress" style="margin-bottom:10px">제출 기록 취소</button>` : ''}
         ${step === 2 ? `
-          <p class="progress-note">접수가 마감되어 심사가 진행 중입니다. 발표 결과가 나오면 아래에 기록해 주세요 — 발표 확인은 ${ch.label}${sch.sourceUrl ? ' 또는 원문 공고' : ''}에서 할 수 있습니다.</p>
+          <p class="progress-note">접수가 마감되어 심사가 진행 중입니다. 발표 결과가 나오면 아래에 기록해 주세요 — 발표 확인은 ${esc(ch.label)}${sch.sourceUrl ? ' 또는 원문 공고' : ''}에서 할 수 있습니다.</p>
           <div class="submit-actions" style="margin-bottom:12px">
             <button class="btn btn-outline" id="btn-result-won">선정됨</button>
             <button class="btn btn-outline" id="btn-result-lost">아쉽게 미선정</button>
@@ -3450,7 +3463,7 @@ function openDetail(id) {
         ? '신청 전에 공고 원문에서 지원 자격을 확인하세요.'
         : '입력한 정보로는 요건이 맞지 않아 보입니다. 판정이 틀릴 수 있으니 원문을 확인한 뒤 신청하세요.'}</p>` : ''}
       <button class="btn btn-primary btn-lg" id="btn-apply-one" ${canApply ? '' : 'disabled'}>${btnLabel}</button>
-      ${canApply ? `<p class="dp-note">준비를 마치면 최종 제출처(${ch.label})가 표시됩니다.${(!sch.formId && sch.prepFormId) ? ' 이 공고는 별도 양식 없이 자유 형식 제출을 받으므로, 앱에서 제출용 지원문서를 작성할 수 있습니다.' : ''}</p>` : ''}
+      ${canApply ? `<p class="dp-note">준비를 마치면 최종 제출처(${esc(ch.label)})가 표시됩니다.${(!sch.formId && sch.prepFormId) ? ' 이 공고는 별도 양식 없이 자유 형식 제출을 받으므로, 앱에서 제출용 지원문서를 작성할 수 있습니다.' : ''}</p>` : ''}
     </div>`;
 
   openSheetShell();

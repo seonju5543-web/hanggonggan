@@ -446,10 +446,17 @@ const SUBMIT_GUIDES = {
    갈라 두면 채널은 '원본 양식 다운로드형'이라 말하는데 시트는 양식이 없다고 그리게 된다. */
 function isFormAttachment(a) {
   const name = (a && a.name) || '';
-  return /신청서|지원서|양식|서식|서류/.test(name) && /\.(hwp|hwpx|docx?|zip)/i.test(name);
+  /* `원서` 는 2026-09-23 에 더했다 — `F_장학생 선발원서.docx`(삼원)가 신청서인데 안 걸렸다(실측 영향 1건) */
+  return /신청서|지원서|원서|양식|서식|서류/.test(name) && /\.(hwp|hwpx|docx?|zip)/i.test(name);
 }
 function hasFormAttachment(sch) {
   return (sch.attachments || []).some(isFormAttachment);
+}
+/* 그중 **학생이 내는 신청서**로 이름이 말하는 것 — 신청 준비 시트가 '신청서 양식 · 내려받아 작성해
+   주세요'라고 단정해도 되는 것만 (2026-09-23 리뷰). isFormAttachment 는 채널을 가르는 데는 넓어도
+   되지만, '작성하라'고 말하기엔 넓다 — `결과보고서 양식.hwp` 도 거기 걸린다(점프장학 실측). */
+function isApplicationForm(a) {
+  return isFormAttachment(a) && /신청서|지원서|원서/.test((a && a.name) || '');
 }
 
 /* 접수 채널 분류 — 실제 공고의 접수 방식 (정직 표기: 앱이 대신 못 누르는 채널은 명시).
@@ -505,7 +512,10 @@ function submitChannelKind(sch) {
      아니다. 첨부를 앞에 두면 머리말이 '첨부 양식 내려받기'가 되어 학생이 어디에 내는지를
      끝까지 못 듣는다. 양식 작성·내려받기 버튼은 이 순서와 무관하게 그대로 뜬다. */
   if (sch.applyPortal) return 'portal';
-  if (hasFormAttachment(sch)) return 'download';
+  /* 🔴 층2 첨부는 파일 이름으로 신청서라 부르지 않는다 (2026-09-23 리뷰 · CLAUDE.md 「층2」 —
+     첨부 칸을 낱말로 찾지 말 것). 여기서 '다운로드형'이라 하면 같은 화면이 그 파일을
+     '선발 공고문'이라 부르는 것과 어긋난다. */
+  if (sch.sourceKind !== 'kosaf' && hasFormAttachment(sch)) return 'download';
   /* 🔴 아래는 **발췌 줄만** 보는 약한 근거라 첨부보다 뒤에 둔다. 그게 가장 믿을 만한 근거다 (2026-09-23) — 로봇이 **공고 원문
      전체**를 읽어 채운 값이고, 아래 `hasPortalEvidence` 는 화면에 실린 **발췌 줄만** 본다.
      발췌는 14칸 상한이라 신청방법 줄이 밀려나는 일이 잦다(실측: 원문으로는 15건인데
@@ -533,12 +543,14 @@ function officialChannel(sch) {
      학교 게시판 공고와 같은 `campus` 안내를 주면 "학교 포털 장학 메뉴에서 접수 방법 확인"이 떠
      재단 장학금을 학교에서 찾게 만든다 — 층2 공고 68건이 신청 준비 시트에서 그렇게 보였다. */
   const guide = sch.sourceKind === 'kosaf' ? SUBMIT_GUIDES.foundation : SUBMIT_GUIDES.campus;
+  /* 층2 이름표도 재단 쪽으로 — 그 주소는 공고 원문이 아니라 **재단 홈페이지**다(리뷰 L3) */
+  if (sch.sourceKind === 'kosaf') {
+    return { label: knownProvider ? `${sch.provider} (재단 공고의 접수 방법)` : '재단 공고의 접수 방법',
+      ...(sch.sourceUrl ? { url: sch.sourceUrl } : {}), guide };
+  }
   if (sch.sourceUrl) {
     return { label: knownProvider ? `${sch.provider} (원문 공고의 접수 방법)` : '원문 공고의 접수 방법',
       url: sch.sourceUrl, guide };
-  }
-  if (sch.sourceKind === 'kosaf') {
-    return { label: knownProvider ? `${sch.provider} (재단 공고의 접수 방법)` : '원문 공고의 접수 방법', guide };
   }
   return { label: knownProvider ? `${sch.provider} 장학공지 (학교 포털)` : '원문 공고의 접수 방법',
     guide: SUBMIT_GUIDES.campus };
