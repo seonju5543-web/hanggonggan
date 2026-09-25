@@ -1,0 +1,10 @@
+name = "handaejang-apply"
+main = "worker.js"
+compatibility_date = "2026-01-01"
+
+# 저장할 것이 없다 — 학생이 쓴 신청서도, 보낸 기록도 여기 남기지 않는다(KV 없음).
+# ⚠️ 발송 로그(증빙)를 남기려면 그때 KV 를 붙인다. 붙이는 순간 '무엇이 남는가'를
+#    terms.html 수집 항목 표에도 같이 적어야 한다.
+
+# 🔴 열쇠는 여기 두지 않는다. 배포 후 명령 한 줄로 넣는다:
+#     npx wrangler secret put RESEND_KEY
