@@ -424,7 +424,7 @@ async function seed(page) {
   const homeBad = await shadowScan('홈');
   ok('홈 — 훑은 요소가 충분히 많다', (await page.evaluate(() => document.querySelectorAll('#screen-home *').length)) > 30);
   ok('홈 — 떠 있지 않은 것에 그림자가 없다', homeBad.length === 0, JSON.stringify(homeBad));
-  for (const [label, nav] of [['장학금 찾기', 'explore'], ['신청내역', 'applications'], ['MY', 'my']]) {
+  for (const [label, nav] of [['장학금 찾기', 'explore'], ['대외활동·공모전', 'activities'], ['신청내역', 'applications'], ['MY', 'my']]) {
     const bad = await shadowScan(label, nav);
     ok(`${label} — 떠 있지 않은 것에 그림자가 없다`, bad.length === 0, JSON.stringify(bad));
   }

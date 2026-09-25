@@ -925,7 +925,7 @@ function showScreen(name, opts) {
   if (typeof resumeSaveScroll === 'function' && currentScreen && currentScreen !== name) {
     resumeSaveScroll(currentScreen, window.scrollY);
   }
-  ['onboarding', 'home', 'explore', 'applications', 'my', 'settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms'].forEach((n) => {
+  ['onboarding', 'home', 'explore', 'activities', 'applications', 'my', 'settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms'].forEach((n) => {
     $(`#screen-${n}`).hidden = n !== name;
   });
   $('#bottom-nav').hidden = name === 'onboarding';
@@ -957,6 +957,7 @@ function showScreen(name, opts) {
 
   if (name === 'home') renderHome();
   if (name === 'explore') renderExplore();
+  if (name === 'activities') renderActivities();
   if (name === 'applications') renderApplications();
   if (name === 'my') renderMy();
   if (name === 'settings') renderSettings();
@@ -2185,6 +2186,7 @@ function rerenderVisible() {
   if (!state.profile) return;
   if (!$('#screen-home').hidden) renderHome();
   if (!$('#screen-explore').hidden) renderExplore();
+  if (!$('#screen-activities').hidden) renderActivities();
   if (!$('#screen-applications').hidden) renderApplications();
 }
 
@@ -2327,7 +2329,7 @@ function loadKosaf() {
    (2026-09-09). 갈라 두면 한쪽에만 새 로더를 붙이는 일이 반드시 생긴다
    (rerenderVisible 주석이 말하는 것과 같은 유형의 사고다). */
 function refreshAllData() {
-  const jobs = [loadNotices(), loadRegistered(), loadKosaf()];
+  const jobs = [loadNotices(), loadRegistered(), loadKosaf(), loadActivities()];
   if (typeof loadFormTemplates === 'function') jobs.push(loadFormTemplates());
   /* 🔴 `swReg` 는 이 파일 한참 아래(서비스워커 등록 자리)에서 `let` 으로 선언된다.
      그 줄이 아직 실행되기 전에 여기를 부르면 `typeof` 로 물어봐도 예외가 난다(TDZ).
@@ -2539,7 +2541,8 @@ function liveNoticesHtml() {
 /* 게시판 글 카드 한 장 — 홈과 '교내' 칸이 **같은 그림**을 쓴다 (2026-09-18 분리).
    ⚠️ 베끼지 말 것: 2026-09-11 에 카드 그림이 두 벌이라 한쪽에만 배지 무더기가 남아 있었다
       (실측 147장 중 9장). */
-function noticeCardHtml(n) {
+function noticeCardHtml(n, opts) {
+  const o = opts || {};
   return `
     <a class="sch-card notice-card" href="${esc(safeUrl(n.url))}" target="_blank" rel="noopener">
       ${/* 🔴 맨 윗줄은 매칭 카드와 **같은 말투**다 — 기관 글 + 판정 하나 (2026-09-11).
@@ -2564,7 +2567,8 @@ function noticeCardHtml(n) {
              장학금`·`금신사랑`·`선원가족` 같은 외부 장학금이 전부 '교내 후보' 로 떨어졌다.
              🔴 낱말 목록을 늘려 다시 맞히려 하지 말 것 — 이 저장소가 같은 방식으로 여러 번 틀렸다.
                 진짜로 알려면 원문을 읽어 정식 등록해야 하고, 그러면 이 목록이 아니라 카드가 된다. */ ''}
-        <span class="sch-org">${esc(n.school)}${n.campus ? ' ' + esc(n.campus) : ''} 게시판</span>
+        ${/* 대외활동·공모전 탭은 윗줄만 바꿔 쓴다(opts.org · 2026-09-25) — 카드 그림은 이 한 벌이다 */ ''}
+        ${o.org ? `<span class="sch-org">${esc(o.org)}</span>` : `<span class="sch-org">${esc(n.school)}${n.campus ? ' ' + esc(n.campus) : ''} 게시판</span>`}
         ${/* 🔴 **'마감 임박' 배지를 여기 달지 않는다** (2026-09-12 · UI-16 으로 이 카드가 제 칸을
              갖게 되면서 드러났다). 그 배지는 `deadlineHint` 가 **있기만 하면** 붙었다 — 본문에
              '까지'·'마감' 이라는 낱말이 한 번이라도 나오면 붙는다는 뜻이라, `마감 안내 작성일
@@ -2576,6 +2580,63 @@ function noticeCardHtml(n) {
       ${n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? `<p class="sch-provider">${esc(unent(n.deadlineHint))}</p>` : ''}
       <p class="sch-provider">${(n.attachments || []).length ? `첨부 ${(n.attachments || []).length}개 · ` : ''}${esc(n.foundAt || '')} 수집 · ${isBoardListLink(n.url) ? '게시판 목록에서 보기 ↗' : '원문 보기 ↗'}</p>
     </a>`;
+}
+
+/* ---------------- 대외활동·공모전 (2026-09-25 · 노션 UI-34) ----------------
+   로봇이 학교 게시판에서 주운 **제목+링크** 목록(data/activities.json)을 제 탭에 보인다.
+   장학 피드의 '우리 학교 게시판 공고'와 같은 종류라 **같은 카드 그림**(noticeCardHtml)을 쓴다 —
+   윗줄 글자만 '공모전 · 경희대학교 게시판' 처럼 종류를 앞세운다(두 번째 카드 함수를 만들지 않는다 ·
+   2026-09-11 카드 두 벌 사고). 자격·적합도·양식은 없다 — 원문을 읽지 않은 것을 판정하지 않는다(8-1).
+   🔴 받아오기 실패는 **빈 문서**로 내려앉힌다(`null` 로 두면 뼈대가 굳는다 — loadNotices 와 같은 규칙).
+   🔴 새 데이터가 오면 rerenderVisible 을 부른다 — 갈라 두면 한 화면만 굳는다(2026-09-01 규칙). */
+let liveActivities = null;
+let activitiesFilter = 'all';
+let activitiesQuery = '';
+
+function loadActivities() {
+  return fetch('data/activities.json', { cache: 'no-store' })
+    .then((r) => (r.ok ? r.json() : null))
+    .catch(() => null)
+    .then((d) => {
+      liveActivities = d || liveActivities || { items: [], updatedAt: null };
+      rerenderVisible();
+    });
+}
+
+/* 내 학생에게 보이는 글 — 학교 범위는 match-engine 의 activityForProfile 한 곳(학교 글은 장학 피드와
+   같은 잣대 · 학교가 빈 글은 전국). 여기서 학교 이름을 다시 비교하지 않는다. */
+function activitiesForMe() {
+  const p = state.profile;
+  if (!p || !liveActivities) return [];
+  return (liveActivities.items || []).filter((n) => n && n.url && activityForProfile(n, p));
+}
+
+function renderActivities() {
+  const p = state.profile;
+  if (!p) return;
+  const box = $('#activities-list');
+  $('#activities-updated').textContent = (liveActivities && liveActivities.updatedAt)
+    ? `${liveActivities.updatedAt} 갱신` : '매일 아침 갱신';
+  if (!liveActivities) {   // 아직 오는 중 — '없다'와 다른 말이다
+    box.innerHTML = typeof skeletonRows === 'function' ? skeletonRows(3) : '';
+    return;
+  }
+  let list = activitiesForMe();
+  if (activitiesFilter !== 'all') list = list.filter((n) => n.kind === activitiesFilter);
+  /* 검색은 카드에 **보이는 글자**(제목)로만 — 탐색 화면과 같은 규칙(2026-08-30) */
+  const q = activitiesQuery.trim().toLowerCase();
+  if (q) list = list.filter((n) => String(unent(n.title)).toLowerCase().includes(q));
+  /* 최근 수집 순 — 마감일을 모르는 목록이라(원문 한 줄만 있다) 마감순은 거짓이 된다 */
+  list = list.slice().sort((a, b) => String(b.foundAt || '').localeCompare(String(a.foundAt || '')));
+  if (!list.length) {
+    box.innerHTML = `<p class="empty">${q
+      ? `'${esc(activitiesQuery.trim())}'와 맞는 글이 없어요`
+      : `아직 ${esc(p.school)} 게시판에서 모은 ${activitiesFilter === 'all' ? '대외활동·공모전' : esc(activitiesFilter)} 글이 없어요<br /><span class="empty-sub">게시판이 연결되면 새 글이 여기에 자동으로 떠요</span>`}</p>`;
+    return;
+  }
+  box.innerHTML = list.map((n) => noticeCardHtml(n, {
+    org: `${n.kind || '대외활동'} · ${n.school ? `${n.school}${n.campus ? ' ' + n.campus : ''} 게시판` : (n.host || '전국')}`,
+  })).join('');
 }
 
 /* ---------------- 제출: 복사 · 파일 공유 ---------------- */
@@ -4611,7 +4672,7 @@ function renderApplications() {
   }
 
   /* 목록 ↔ 달력 (2026-09-07 · 노션 UI-21).
-     🔴 새 탭을 만들지 않는다 — 하단바 4칸이 이미 꽉 찼고, 달력은 결국 '내 것'의 다른
+     🔴 새 탭을 만들지 않는다 — 하단바가 이미 꽉 찼고(2026-09-25 대외활동 탭으로 5칸), 달력은 결국 '내 것'의 다른
         보기다. 달력일 때는 목록 관리 장치(선택·삭제)를 감춘다: 달력에는 지울 줄이 없다. */
   const cal = $('#apps-calendar');
   const tog = $('#apps-view-toggle');
@@ -5675,9 +5736,30 @@ function bindEvents() {
     const chip = e.target.closest('.filter-chip');
     if (!chip) return;
     exploreFilter = chip.dataset.filter;
-    $$('.filter-chip').forEach((c) => c.classList.toggle('active', c === chip));
+    $$('#explore-filters .filter-chip').forEach((c) => c.classList.toggle('active', c === chip));
     renderExplore();
   });
+
+  /* 대외활동·공모전 — 탐색 화면과 같은 손짓(칩 · 검색). ⚠️ 칩 상태는 **제 줄 안에서만** 바꾼다 —
+     `$$('.filter-chip')` 전체를 건드리면 다른 화면의 칩이 같이 꺼진다(그래서 위 탐색 쪽도 좁혔다). */
+  $('#activities-filters').addEventListener('click', (e) => {
+    const chip = e.target.closest('.filter-chip');
+    if (!chip) return;
+    activitiesFilter = chip.dataset.filter;
+    $$('#activities-filters .filter-chip').forEach((c) => c.classList.toggle('active', c === chip));
+    renderActivities();
+  });
+  {
+    const box = $('#activities-search');
+    const clear = $('#activities-search-clear');
+    const sync = () => {
+      activitiesQuery = box.value;
+      clear.hidden = !box.value;
+      renderActivities();
+    };
+    box.addEventListener('input', sync);
+    clear.addEventListener('click', () => { box.value = ''; sync(); box.focus(); });
+  }
 
   /* 정렬 버튼 — **누르면 목록이 열린다** (2026-08-31 개발자 지시).
      🔴 예전에는 짧게 누르면 기준이 한 칸씩 넘어가고 길게 눌러야 목록이 떴다.
@@ -6410,6 +6492,7 @@ loadState();
 bindEvents();
 initOnboarding();
 loadNotices();
+loadActivities();
 loadRegistered();
 loadKosaf();
 loadMajors();   // 학교별 학과 목록 — 온보딩 학과 자동추천이 그 학교 것만 보게

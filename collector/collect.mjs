@@ -4,6 +4,7 @@
    2) 각 공고 상세 페이지에 들어가 첨부파일(양식 hwp/pdf 등)과
       마감일 단서를 수집
    3) data/notices.json 으로 발행 → 앱의 '실시간 공고'에 표시
+      (같은 게시판의 공모전·서포터즈 글은 data/activities.json → 앱 '대외활동' 탭 · 2026-09-25)
    4) 컨펌용 리포트 이슈 생성 (양식 스키마화·정식 등록은 개발자 컨펌 후)
    ============================================================ */
 import fs from 'node:fs';
@@ -15,6 +16,7 @@ import { publishBySchool, dropUnserved } from './publish-notices.mjs';
 import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { cleanTitle, isMenuEntry } from './clean-title.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
+import { activityKind } from './activity-kind.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const cfg = JSON.parse(fs.readFileSync(new URL('schools.json', HERE), 'utf8'));
@@ -28,6 +30,26 @@ let notices = { updatedAt: null, items: [] };
 try { notices = JSON.parse(fs.readFileSync(noticesPath, 'utf8')); } catch { /* 첫 실행 */ }
 
 const KEYWORDS = /장학|학자금|등록금 감면|학업장려|근로장학/;
+
+/* ── 대외활동·공모전 (2026-09-25 · 노션 UI-34) ─────────────────────────────
+   같은 게시판을 한 번만 두드린다 — 장학 게시판에서 주운 행 가운데 공모전·서포터즈 글은
+   장학 피드가 버리던 것이라(KEYWORDS 에 안 걸린다) **같은 rawLinks 에서** 갈라 담는다.
+   전용 게시판(activity-sources.json)은 아래 루프에 role:'activity' 로 붙어 같은 길을 간다.
+   🔴 발행 파일은 data/activities.json 하나로 **notices.json 과 섞지 않는다** — 섞으면
+      알림(notify-rules)·푸시(server/push)가 '새 장학 공고 N건'으로 세고, dropUnserved 가
+      학교 없는 전국 글을 버린다. 판정은 activity-kind.mjs 한 곳. 장부도 따로 둔다
+      (seen-activities.json) — 장학 장부에 이미 '봤다'로 적힌 글도 활동으로는 처음이다. */
+const actCfgPath = new URL('activity-sources.json', HERE);
+let actCfg = { sources: [] };
+try { actCfg = JSON.parse(fs.readFileSync(actCfgPath, 'utf8')); } catch { /* 설정 없음 = 전용 게시판 없음 */ }
+const seenActPath = new URL('seen-activities.json', HERE);
+let seenAct = {};
+try { seenAct = JSON.parse(fs.readFileSync(seenActPath, 'utf8')); } catch { /* 첫 실행 */ }
+const actsPath = new URL('../data/activities.json', HERE);
+let acts = { updatedAt: null, items: [] };
+try { acts = JSON.parse(fs.readFileSync(actsPath, 'utf8')); } catch { /* 첫 실행 */ }
+const ACT_FRESH_MAX = 20;    // 게시판 하나에서 한 실행에 상세까지 읽는 새 글 상한 (장학은 40)
+const ACT_CAP = 200;         // 폰이 통째로 받는 파일 — 상한을 두어 작게 유지한다
 /* 메뉴/공고 판정은 clean-title.mjs의 isMenuEntry 한 곳에만 둔다 — 브라우저 수집기와 갈라지면
    같은 게시판을 두 로봇이 다르게 읽는다(2026-08-02 '…안내' 공고 대량 유실 사고) */
 const ATTACH_RE = /\.(hwp|hwpx|doc|docx|pdf|xls|xlsx)(\?|$)/i;
@@ -238,11 +260,23 @@ async function readMorePages(boardUrl, firstRows, readPage) {
 
 const results = [];
 const freshAll = [];
+/* 대외활동·공모전 — 전용 게시판의 상태와 이번에 새로 주운 글. 장학 results 와 분리해 두는 이유:
+   health.json(연속 실패 장부)은 prune-health.mjs 가 schools.json 이름으로 고아를 지우므로
+   전용 게시판을 거기 섞으면 매 실행 지워진다. 전용 게시판 상태는 리포트에만 적는다. */
+const actResults = [];
+const freshActs = [];
 
-for (const s of cfg.schools) {
-  const name = s.campus && s.campus !== '공통' ? `${s.school} ${s.campus}` : s.school;
+/* 게시판 하나를 두 역할이 나눠 읽는다 — role:'scholarship' 은 장학 피드 + 활동, role:'activity' 는 활동만 */
+const boards = (cfg.schools || []).map((s) => ({ ...s, role: 'scholarship' }))
+  .concat((actCfg.sources || []).map((s) => ({ ...s, role: 'activity' })));
+
+for (const s of boards) {
+  const isAct = s.role === 'activity';
+  const name = (s.campus && s.campus !== '공통' ? `${s.school} ${s.campus}` : s.school || (s.host || '전국'))
+    + (isAct ? ' 대외활동·공모전' : '');
+  const bucket = isAct ? actResults : results;
   if (!s.boardUrl) {
-    results.push({ name, status: '⚙️ 게시판 주소 미설정' + (s.note ? ` (${s.note})` : ''), items: [] });
+    bucket.push({ name, status: '⚙️ 게시판 주소 미설정' + (s.note ? ` (${s.note})` : ''), items: [] });
     continue;
   }
   try {
@@ -263,6 +297,36 @@ for (const s of cfg.schools) {
       const extra = await readMorePages(s.boardUrl, rawLinks, (u) => fetchBoard(u).then(async (r) => (r.ok ? extractLinks(await r.text(), u) : [])));
       rawLinks = rawLinks.concat(extra.rows);
       if (extra.note) pageNotes.push(`${name}: ${extra.note}`);
+    }
+    /* 대외활동·공모전 — 같은 rawLinks 에서 갈라 담는다 (판정은 activity-kind.mjs 한 곳).
+       장학 낱말 규칙(KEYWORDS)을 넘겨 '봉사장학·인턴장학' 같은 장학 제도는 장학 쪽에 남긴다. */
+    {
+      const actItems = rawLinks
+        .map((i) => ({ ...i, kind: activityKind(i.title, { scholarship: KEYWORDS }) }))
+        .filter((i) => i.kind)
+        .filter((i) => !isMenuEntry(i.title))
+        .filter((i) => !isAttachmentEntry(i));
+      const freshA = actItems.filter((i) => !seenAct[urlKey(i.url)]).slice(0, ACT_FRESH_MAX);
+      for (const it of freshA) {
+        const detail = await fetchDetail(it);
+        it.attachments = detail.attachments;
+        it.deadlineHint = detail.deadlineHint;
+        it.school = s.school || '';
+        it.campus = s.campus === '공통' ? '' : (s.campus || '');
+        if (!it.school && s.host) it.host = s.host;   // 전국 글은 주최를 설정에서 받는다(제목으로 짐작하지 않는다)
+        it.foundAt = new Date().toISOString().slice(0, 10);
+        seenAct[urlKey(it.url)] = it.foundAt;
+        freshActs.push(it);
+      }
+      if (isAct) {
+        actResults.push({
+          name,
+          status: actItems.length ? `✅ 정상 (활동·공모전 ${actItems.length}건 감지)` : '🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요',
+          items: freshA,
+        });
+        continue;   // 전용 게시판은 장학 피드에 담지 않는다
+      }
+      if (freshA.length) actResults.push({ name: `${name} (장학 게시판에서 발견)`, status: '✅', items: freshA });
     }
     const items = rawLinks
       .filter((i) => KEYWORDS.test(i.title))
@@ -291,11 +355,12 @@ for (const s of cfg.schools) {
   } catch (e) {
     // 이유를 그대로 적는다 — ENOTFOUND면 주소가 없는 것이고, TIMEOUT이면 학교가 느린 것이라
     // 해야 할 일이 정반대다. 'TypeError'만 적으면 둘을 구분할 수 없다.
-    results.push({ name, status: `⚠️ 오류 (${netReason(e)}) — 주소 확인 필요`, items: [] });
+    bucket.push({ name, status: `⚠️ 오류 (${netReason(e)}) — 주소 확인 필요`, items: [] });
   }
 }
 
 fs.writeFileSync(seenPath, JSON.stringify(seen, null, 1));
+fs.writeFileSync(seenActPath, JSON.stringify(seenAct, null, 1));
 fs.writeFileSync(pagePath, JSON.stringify(pageMemo, null, 1));
 
 /* 앱 발행: 최신 공고를 학교별로 병합, 학교당 최대 15건·전체 200건 유지 */
@@ -348,6 +413,19 @@ notices.items = capNotices(notices.items);
 notices.updatedAt = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
 fs.mkdirSync(new URL('../data/', HERE), { recursive: true });
 fs.writeFileSync(noticesPath, JSON.stringify(notices, null, 1));
+
+/* ── 대외활동·공모전 발행 — data/activities.json (notices.json 과 섞지 않는다) ──
+   장학 피드와 같은 규칙: 60일 지나면 지운다 · 첨부 링크 걷어낸다 · 같은 글은 하나 · 상한.
+   학교 글은 서비스 학교(dropUnserved)만, 학교가 빈 전국 글은 그대로 둔다(모든 학생에게 보인다). */
+acts.items = freshActs.concat(acts.items || []);
+acts.items = acts.items.filter((n) => (n.foundAt || '9999') >= cutoff);
+acts.items = acts.items.filter((n) => !isAttachmentEntry(n));
+acts.items = dedupeNotices(acts.items);
+acts.items = acts.items.filter((n) => !n.school).concat(dropUnserved(acts.items.filter((n) => n.school)));
+acts.items.sort((a, b) => String(b.foundAt || '').localeCompare(String(a.foundAt || '')));
+acts.items = acts.items.slice(0, ACT_CAP);
+acts.updatedAt = notices.updatedAt;
+fs.writeFileSync(actsPath, JSON.stringify(acts, null, 1));
 
 /* 컨펌 리포트 */
 const newCount = freshAll.length;
@@ -406,6 +484,17 @@ if (chronic.length) {
   lines.push('');
 }
 
+/* 대외활동·공모전 — 컨펌 대상이 아니다(제목+링크만 앱 '대외활동' 탭에 실린다). 상태와 새 글만 적는다. */
+lines.push(`### 🎯 대외활동·공모전 새 글 ${freshActs.length}건 → 앱 '대외활동' 탭 (data/activities.json · ${acts.items.length}건 게재 중)`);
+for (const r of actResults) {
+  lines.push(`- **${r.name}** — ${r.status}`);
+  for (const i of r.items) lines.push(`  - [${i.kind}] [${i.title}](${i.url})${i.deadlineHint ? ` — ⏰ ${i.deadlineHint}` : ''}`);
+}
+if (!actCfg.sources || !actCfg.sources.some((x) => x.boardUrl)) {
+  lines.push('> 전용 게시판 주소가 아직 없습니다 — `collector/activity-sources.json` 의 `boardUrl` 에 학교의 대외활동·공모전 게시판 주소를 적어 주세요(장학 게시판에서 발견되는 글만 담고 있습니다).');
+}
+lines.push('');
+
 if (pageNotes.length) {
   lines.push('### 📄 목록 2페이지 이후에서 더 읽은 게시판');
   lines.push('1페이지만 읽던 시절에는 상단 고정 공지에 밀린 실공고가 영영 안 잡혔습니다.');
@@ -416,10 +505,10 @@ const noPage = Object.values(pageMemo).filter((v) => v && v.ok === false).length
 if (noPage) lines.push(`📄 페이지 넘기기가 안 되는 게시판 ${noPage}곳 (14일 뒤 다시 시도합니다)`, '');
 
 lines.push('---');
-lines.push('⚙️ 설정: `collector/schools.json` · 발행: `data/notices.json` · 로봇: `collector/collect.mjs`');
+lines.push('⚙️ 설정: `collector/schools.json` · `collector/activity-sources.json` · 발행: `data/notices.json` · `data/activities.json` · 로봇: `collector/collect.mjs`');
 fs.writeFileSync(new URL('report.md', HERE), lines.join('\n'));
 
-console.log(`collected: ${newCount} new items; notices.json now has ${notices.items.length} items`);
+console.log(`collected: ${newCount} new items; notices.json now has ${notices.items.length} items; activities: ${freshActs.length} new, ${acts.items.length} total`);
 if (process.env.GITHUB_OUTPUT) {
   fs.appendFileSync(process.env.GITHUB_OUTPUT, `new_count=${newCount}\n`);
 }

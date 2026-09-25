@@ -129,13 +129,14 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 | `data/registered.json` | 정식 등록 공고(층1 · 원문을 읽은 것) |
 | `data/forms.json` | 양식 스키마 원본 — 여기에만 추가하면 앱 무변경 반영 |
 | `data/notices.json` | 실시간 공고 피드 |
+| `data/activities.json` | 대외활동·공모전 피드(제목+링크 · 장학 피드와 **섞지 않는다**) — `docs/designs/activities-tab.md` |
 | `data/kosaf-open.json` `data/kosaf-files/` | 층2 — 한국장학재단이 아는 재단 장학금(마감 전만) · 선발공고문 사본. 층1과 섞지 않는다 |
 | `data/tuition.json` | 등록금(학교·계열) |
 
 로봇 · 서버 · 관리자
 | 파일 | 역할 |
 |---|---|
-| `collector/collect.mjs` `browser-collect.mjs` | 게시판 수집(일반·진짜 Chromium) |
+| `collector/collect.mjs` `browser-collect.mjs` | 게시판 수집(일반·진짜 Chromium) — 일반 수집기가 같은 행에서 대외활동·공모전도 갈라 담는다(`activity-kind.mjs` · 출처 `activity-sources.json`) |
 | `collector/auto-register.mjs` | 자동 정식 등록(원칙 2) |
 | `collector/extract-excerpts.mjs` | 원문 발췌 · 마감일 · 메일 접수 주소(`apply-email.mjs`) |
 | `collector/deepfetch.mjs` `rescue-bodies.mjs` | 본문·첨부 원본 받기 · 옛 공고 본문 메우기 |
@@ -201,6 +202,9 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   버튼은 `mailto:` 라 서버가 필요 없다. 관문 「메일 접수 주소」.
 - **포털 신청**(`findApplyPortal`): 한 학교가 시스템을 둘 쓴다 · 양식 받는 곳·결과 보는 곳·계좌 등록은 접수처가 아니다 · 길은 원문 그대로 인용 ·
   주소를 짐작해 채우지 말 것 · 열쇠 글자는 `PORTAL_SYSTEMS`↔`PORTAL_SYSTEM_INFO` 같게. 관문 「포털 신청 시스템」.
+- **대외활동·공모전 탭** (2026-09-25 · 노션 UI-34): 판정은 `collector/activity-kind.mjs` `activityKind` 한 곳(장학 제도는 장학 쪽 · 공모전은 장학 낱말이 있어도 공모전) ·
+  파일·장부는 장학 피드와 **따로**(`data/activities.json` · 섞으면 알림이 활동 글로 운다) · 학교 범위는 `activityForProfile` · 카드는 `noticeCardHtml` 한 벌 ·
+  전용 게시판 주소는 **개발자가** `activity-sources.json` 에 적는다(null = 리포트에 '주소 미설정'). 관문 「대외활동·공모전」 · `verify-activities.js`(서비스워커를 막고 잰다).
 - **학자금대출**은 정식 등록 제외(대출 원금·이자를 지원하는 장학금은 제외 대상 아님 — `LOAN_EXCEPT`) · 피드에선 빼지 않고 장학 공고 뒤로 보낸다(`boardNoticesForMe`).
 - **인스타**: 🔴 게시는 사람만 누른다 · 토큰은 워크플로에만 · 한 실행 최대 6건 · 수정은 다시 그려 **보여 주고 메일 보낼지 물은 뒤** push-to-run(스킬 `insta-revise`).
   관문 `verify-insta.js` · `docs/designs/instagram-pipeline.md`.

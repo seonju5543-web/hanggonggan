@@ -671,7 +671,7 @@ function notifyHandleLaunch() {
   setTimeout(() => {
     if (typeof state === 'undefined' || !state.profile) return;
     if (screen === 'notifications') { openNotifyInbox(); return; }
-    if (screen && ['home', 'explore', 'applications', 'my'].includes(screen)) { showScreen(screen); return; }
+    if (screen && ['home', 'explore', 'activities', 'applications', 'my'].includes(screen)) { showScreen(screen); return; }
     if (!sch) return;
 
     /* 🔴 **공고 목록이 아직 안 왔다고 포기하지 않는다** (2026-09-09 개발자 지적:

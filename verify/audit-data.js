@@ -124,6 +124,29 @@ try {
   if (badUrl.length) warns.push(`notices — 첨부 내려받기 주소가 공고로 들어온 것 ${badUrl.length}건 (예: '${badUrl[0].title.slice(0, 30)}')`);
 } catch { /* 피드 파일이 없으면 건너뜀 */ }
 
+/* 대외활동·공모전 피드 감사 (2026-09-25) — 장학 피드와 같은 규칙(중복·첨부 주소)에
+   이 파일만의 약속 둘을 더 본다: kind 는 activity-kind.mjs 의 두 값뿐 · 학교가 적힌 글은
+   서비스 학교뿐(학교가 빈 글은 전국 — host 가 있어야 한다). 어기면 로봇이 저장 전에 되돌린다. */
+try {
+  const acts = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/activities.json'), 'utf8'));
+  const served = require('../match-engine.js').SERVED_SCHOOLS || [];
+  const byUrl = new Map(); let dup = 0; let badKind = 0; let badSchool = 0; let noHost = 0;
+  for (const n of acts.items || []) {
+    const uk = `u:${urlKey(n.url)}`;
+    if (byUrl.has(uk)) dup++;
+    byUrl.set(uk, 1);
+    if (n.kind !== '공모전' && n.kind !== '대외활동') badKind++;
+    if (n.school && served.indexOf(n.school) < 0) badSchool++;
+    if (!n.school && !n.host) noHost++;
+  }
+  if (dup) errors.push(`activities — 대외활동·공모전에 중복 ${dup}건 (수집기 중복 제거가 동작하지 않았습니다)`);
+  if (badKind) errors.push(`activities — kind 가 '공모전'·'대외활동' 이 아닌 글 ${badKind}건 (판정은 collector/activity-kind.mjs 한 곳)`);
+  if (badSchool) errors.push(`activities — 서비스하지 않는 학교의 글 ${badSchool}건 (수집망은 두 곳 그대로 — CLAUDE.md)`);
+  if (noHost) warns.push(`activities — 학교도 주최(host)도 없는 전국 글 ${noHost}건 (activity-sources.json 의 host 를 적어 주세요)`);
+  const badUrl = (acts.items || []).filter((n) => /mode=download|attachNo=|fileDown/i.test(n.url || ''));
+  if (badUrl.length) warns.push(`activities — 첨부 내려받기 주소가 글로 들어온 것 ${badUrl.length}건`);
+} catch { /* 파일이 없으면 건너뜀 */ }
+
 /* 양식 원본 큐: '원본 확보됨(fetched)'이라고 표시됐는데 실제 파일이 없으면,
    다음 세션이 양식을 만들 수 없다 (2026-07-30 도레이·염곡 원본이 이렇게 사라졌다) */
 try {

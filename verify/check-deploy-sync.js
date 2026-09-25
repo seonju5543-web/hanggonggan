@@ -103,7 +103,7 @@ const count = (ref, file) => {
     return arr.length;
   } catch { return null; }
 };
-for (const f of ['data/notices.json', 'data/registered.json', 'data/forms.json']) {
+for (const f of ['data/notices.json', 'data/activities.json', 'data/registered.json', 'data/forms.json']) {
   const now = count(null, f), live = count('origin/main', f);
   if (now !== null && live !== null && now !== live) {
     console.log(`  · ${f}: 앱(main) ${live}건 → 작업본 ${now}건 (${now - live > 0 ? '+' : ''}${now - live})`);

@@ -858,6 +858,16 @@ function noticeForProfile(n, p) {
   return false;
 }
 
+/* 대외활동·공모전 글이 이 학생에게 보이는가 (2026-09-25 · 노션 UI-34).
+   학교가 적힌 글은 **장학 피드와 같은 잣대**(noticeForProfile — 서비스 학교·캠퍼스)로 보고,
+   학교가 빈 글은 전국 공통이라 누구에게나 보인다. 판정을 app.js 에 새로 만들지 않는다 —
+   여기 두어야 학교 범위 규칙이 바뀔 때 두 피드가 같이 움직인다. */
+function activityForProfile(n, p) {
+  if (!p || !p.school || !n) return false;
+  if (!n.school) return true;
+  return noticeForProfile(n, p);
+}
+
 /* ---------------- 공고의 자격 요건을 짧게 정리하고 프로필과 대조 ----------------
    원문을 통째로 붙이면 ※ 부연설명까지 섞여 지저분하다(2026-08-02 개발자 지적).
    여기서는 **요건 줄만 골라 다듬어** '1) 4년제 대학생 2) 한부모 가정'처럼 짧게 만든다.
@@ -1470,7 +1480,7 @@ if (typeof module !== 'undefined' && module.exports) {
                      scopedToProfile, inSchoolsAny, notStale, STALE_DAYS,
                      requirementLines, requirementStruct, requirementMatch, tidyRequirement,
                      REQ_SIGNAL, NOT_A_REQUIREMENT, EXCLUDE_LINE, HARD_THRESHOLD,
-                     noticeForProfile, taggedSchool, SHARED_BOARD_BRANCH, SERVED_SCHOOLS,
+                     noticeForProfile, activityForProfile, taggedSchool, SHARED_BOARD_BRANCH, SERVED_SCHOOLS,
                      noticeKind, NOTICE_CAMPUS_MARK, OWN_PROGRAMS,
                      noticeFileKey, noticeFileFor, noticeFilesForProfile };
 }

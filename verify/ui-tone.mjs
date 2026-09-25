@@ -338,7 +338,7 @@ console.log('\n■ 수집한 글의 HTML 기호를 글자로 띄우지 않는다
   /* 🔴 **앱이 실제로 받아 가는 파일을 전부 본다** (2026-09-13 코드 리뷰).
      처음엔 뿌리의 json 셋만 훑었는데, 학교별로 나뉜 `data/notices/*.json` 도 앱이 받는다
      (loadNotices). 손으로 적은 목록은 새 파일이 생기면 그대로 썩는다 — 디렉터리를 읽는다. */
-  const dataFiles = ['data/registered.json', 'data/notices.json', 'data/kosaf-open.json'];
+  const dataFiles = ['data/registered.json', 'data/notices.json', 'data/activities.json', 'data/kosaf-open.json'];
   try {
     for (const n of fs.readdirSync(path.join(ROOT, 'data/notices')).filter((x) => x.endsWith('.json'))) {
       dataFiles.push('data/notices/' + n);

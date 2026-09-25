@@ -183,8 +183,10 @@ const PROFILE = {
   await page.click('.filter-chip[data-filter="교외"]'); await page.waitForTimeout(500);
   await page.click('#explore-sort-btn'); await page.waitForTimeout(300);
   await page.click('#explore-sort-menu [data-sort="deadline"]'); await page.waitForTimeout(600);
+  /* ⚠️ 탐색 화면의 칩만 센다 (2026-09-25) — 대외활동·공모전 탭이 제 칩 줄(#activities-filters)을 가지면서
+     문서 전체를 세면 숨은 화면의 '전체' 칩까지 잡힌다. 재는 뜻(정렬이 이 화면의 칩을 건드리지 않는다)은 그대로다. */
   eq('정렬을 바꿔도 필터 칩 active가 그대로다',
-    await page.$$eval('.filter-chip.active', (e) => e.map((x) => x.dataset.filter)), ['교외']);
+    await page.$$eval('#explore-filters .filter-chip.active', (e) => e.map((x) => x.dataset.filter)), ['교외']);
   /* 🔴 2026-09-10 페이스리프트로 교내·교외가 **배지에서 기관명 줄의 글자**로 옮겨졌다
      (한 카드에 배지가 최대 5개 붙던 것을 1개로 줄이면서). 뜻은 그대로라 재는 곳만 바꾼다. */
   eq('필터도 그대로 걸려 있다',

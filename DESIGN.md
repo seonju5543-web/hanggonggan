@@ -540,7 +540,7 @@ Apple 에서만 받은 것도 있다. **"알약은 고르는 것의 모양"** �
 
 ### 탐색
 
-**`bottom-nav`** — 4탭(홈 · 장학금 · 신청내역 · MY). 반투명 바탕(흰색 82~88% + `backdrop-filter: blur(18px) saturate(1.6)`) + 위 1px hairline · 높이 73px + 안전 영역. 아이콘 23px 선 1.8 + `{typography.meta}` 550. 선택 `bottom-nav-selected` = `{colors.accent}` 글자 + 위 짧은 선 18×2(19번 · 2026-09-11 점에서 선으로). Apple 의 frosted 고정 바와 같은 처리다.
+**`bottom-nav`** — 5탭(홈 · 장학금 · 대외활동 · 신청내역 · MY — 2026-09-25 대외활동·공모전 탭 추가). 반투명 바탕(흰색 82~88% + `backdrop-filter: blur(18px) saturate(1.6)`) + 위 1px hairline · 높이 73px + 안전 영역. 아이콘 23px 선 1.8 + `{typography.meta}` 550. 선택 `bottom-nav-selected` = `{colors.accent}` 글자 + 위 짧은 선 18×2(19번 · 2026-09-11 점에서 선으로). Apple 의 frosted 고정 바와 같은 처리다.
 
 **`icon-button`** — 알림 · 설정(톱니) · 뒤로. 22px 아이콘 + 8px 여백 = **38×38**(실측) · `{rounded.sm}` · 투명. Apple 의 원형 아이콘 버튼은 정확히 44 — 「충돌」 9번.
 

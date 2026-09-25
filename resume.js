@@ -25,7 +25,7 @@ var RESUME_WINDOW_MS = 4 * 60 * 60 * 1000;      // 4시간
 /* 쓰던 것을 버리는 시점. 창과 **다른 값**이다 — 창은 '어디로 가는가', 이건 '언제 버리는가'. */
 var RESUME_KEEP_MS = 7 * 24 * 60 * 60 * 1000;   // 7일
 var RESUME_KEY = 'handaejang.resume';
-var RESUME_TABS = ['home', 'explore', 'applications', 'my'];
+var RESUME_TABS = ['home', 'explore', 'activities', 'applications', 'my'];
 
 /* 알림·로그인 복귀로 열렸는가 — 그러면 이어보기가 **처음부터 손을 뗀다**.
    🔴 나중에 덮으면 안 된다: notify.js 의 `notifyHandleLaunch()` 는 시작 1.6초 뒤에 도는데,

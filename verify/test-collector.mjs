@@ -40,6 +40,7 @@ import { createRequire } from 'node:module';
 import { isAttachmentEntry, isHtmlPayload } from '../collector/attachment-link.mjs';
 import { isDetailUrl, isMarkerUrl, markerTitle, sameTitle, titleCore, rowByCore, detailCandidates, looksLikeLoginWall, rowDetailCandidates } from '../collector/detail-url.mjs';
 import { cleanTitle, isMenuEntry } from '../collector/clean-title.mjs';
+import { activityKind, ACTIVITY_KINDS } from '../collector/activity-kind.mjs';
 import { makeBudget, rotateOrder, nextCursor, withDeadline, TIMED_OUT } from '../collector/harvest-budget.mjs';
 import { canonUrl } from '../collector/canon-url.mjs';
 import { checkFormQuality } from '../collector/form-quality.mjs';
@@ -1317,6 +1318,92 @@ console.log('\n■ 수집망 좁히기 (2026-08-30)');
   const cm = readText(new URL('../collector/collect.mjs', import.meta.url));
   const bc = readText(new URL('../collector/browser-collect.mjs', import.meta.url));
   eq('로봇은 parked 를 읽지 않는다', /\.parked/.test(cm) || /\.parked/.test(bc), false);
+}
+
+console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
+{
+  /* 왜 있나 — 앱에 '대외활동' 탭이 생겼다. 데이터는 장학 피드와 **다른 파일**(data/activities.json)이고
+     판정은 collector/activity-kind.mjs 한 곳이다. 아래는 그 약속이 되돌아가면 빨간불이 되는 자리들:
+     ① 판정 규칙(장학 제도는 장학 쪽 · 공모전은 장학 낱말이 있어도 공모전 · 행정 안내는 아님)
+     ② 로봇이 장학 피드에 섞지 않고 제 파일·제 장부에 쓰며, 워크플로가 그 파일을 저장한다
+     ③ 출처는 두 학교뿐이고 주소는 사람이 준다(boardUrl null 허용)
+     ④ 화면 — 탭·화면·로더가 손으로 적은 목록 여섯 곳에 다 들어 있고, 카드는 한 벌이다 */
+  const cm = readText(new URL('../collector/collect.mjs', import.meta.url));
+  const K = new RegExp((cm.match(/const KEYWORDS = \/(.+?)\/;/) || [])[1]);
+  const kind = (t) => activityKind(t, { scholarship: K });
+  eq('종류는 둘', ACTIVITY_KINDS.slice().sort(), ['공모전', '대외활동']);
+  /* ① 판정 — 아래 제목은 실제 게시판에서 주운 것들이다(collector/candidates.json · two-school/scan.json) */
+  eq('공모전 — 장학수기 공모전은 장학 낱말이 있어도 공모전', kind('공통 2026년 (재)김해시미래인재장학재단 제3회 장학수기 공모전 공고'), '공모전');
+  eq('공모전 — 경진대회', kind('청년 창업 아이디어 경진대회 참가자 모집'), '공모전');
+  eq('공모전 — 해커톤', kind('2026 캠퍼스 해커톤 참가팀 모집'), '공모전');
+  eq('대외활동 — 해외봉사단', kind('2026 대학생 해외봉사단 모집'), '대외활동');
+  eq('대외활동 — 서포터즈', kind('2026 하반기 청년 서포터즈 2기 모집'), '대외활동');
+  eq('대외활동 — 멘토링 참여자 모집', kind('한국지역아동센터연합회 대학생 멘토링 참여학생 모집'), '대외활동');
+  eq('아니다 — 봉사장학은 장학 제도', kind('2026학년도 2학기 봉사장학생 부서별 선발 안내'), null);
+  eq('아니다 — 인턴장학은 장학 제도', kind('서울 인사처 경희인턴장학 지원자 모집'), null);
+  eq('아니다 — 서포터즈 장학생은 장학 제도', kind('2026-2학기 지성학Ⅱ 서포터즈 장학생 모집 안내'), null);
+  eq('아니다 — 이미 뽑힌 사람에게 주는 행정 안내', kind('[서울][다문화탈북학생 멘토링] 2026학년도 1학기 7월 다문화탈북학생 멘토링 출근부 마감 안내'), null);
+  eq('아니다 — 채용 공고', kind('2026 하반기 인턴 채용 공고'), null);
+  eq('아니다 — 국가장학금', kind('2026학년도 2학기 국가장학금 신청 안내'), null);
+  eq('아니다 — 빈 제목', kind(''), null);
+  eq('장학 규칙을 안 넘기면 장학 낱말을 보지 않는다 (호출자가 넘겨야 한다)', activityKind('봉사장학생 봉사활동 안내'), '대외활동');
+  /* ② 로봇 */
+  eq('로봇은 activity-kind 를 부른다 (규칙을 베끼지 않는다)', /from '\.\/activity-kind\.mjs'/.test(cm) && /activityKind\(i\.title, \{ scholarship: KEYWORDS \}\)/.test(cm), true);
+  eq('제 파일에 쓴다 (data/activities.json)', /'\.\.\/data\/activities\.json'/.test(cm) && /fs\.writeFileSync\(actsPath/.test(cm), true);
+  eq('제 장부에 적는다 (seen-activities.json)', /'seen-activities\.json'/.test(cm) && /fs\.writeFileSync\(seenActPath/.test(cm), true);
+  eq('활동 글을 장학 피드(freshAll)에 넣지 않는다', /freshActs\.push\(it\)/.test(cm) && !/freshAll\.push\(it\);\s*\n\s*\}\s*\n\s*if \(isAct\)/.test(cm), true);
+  eq('활동 파일도 60일·중복·서비스 학교·상한 규칙을 지킨다',
+    /acts\.items = acts\.items\.filter\(\(n\) => \(n\.foundAt \|\| '9999'\) >= cutoff\)/.test(cm)
+    && /acts\.items = dedupeNotices\(acts\.items\)/.test(cm)
+    && /dropUnserved\(acts\.items\.filter\(\(n\) => n\.school\)\)/.test(cm)
+    && /acts\.items = acts\.items\.slice\(0, ACT_CAP\)/.test(cm), true);
+  eq('전용 게시판은 장학 피드에 담지 않는다', /if \(isAct\) \{[\s\S]*?continue;/.test(cm), true);
+  const strip = (t) => t.split('\n').filter((l) => !/^\s*#/.test(l)).join('\n');
+  const wf = strip(readText(new URL('../.github/workflows/collect-scholarships.yml', import.meta.url)));
+  eq('워크플로가 활동 파일 한 쌍을 저장한다', /git add data\/activities\.json/.test(wf) && /git add collector\/seen-activities\.json/.test(wf), true);
+  const ga = readText(new URL('../.gitattributes', import.meta.url));
+  eq('두 파일은 합집합으로 자동 병합', /data\/activities\.json\s+merge=jsonunion/.test(ga) && /collector\/seen-activities\.json\s+merge=jsonunion/.test(ga), true);
+  /* ③ 출처 */
+  const src = JSON.parse(readText(new URL('../collector/activity-sources.json', import.meta.url)));
+  const served = ['경희대학교', '한국외국어대학교'];
+  eq('전용 게시판 출처는 서비스 학교 둘뿐 (전국 글은 학교를 비우고 host 를 적는다)',
+    (src.sources || []).every((x) => (x.school === '' ? !!x.host : served.includes(x.school))), true);
+  eq('  항목마다 boardUrl 칸이 있다 (null 이면 로봇이 "주소 미설정"으로 리포트한다)', (src.sources || []).length > 0 && src.sources.every((x) => 'boardUrl' in x), true);
+  eq('  보관 칸과 되돌리는 법', Array.isArray(src.parked) && /되돌리려면/.test(src._parked || ''), true);
+  eq('  주소를 추천하지 않는다 — 설명에 그 규칙이 적혀 있다', /주소를 추천하지 않는다/.test(src._comment || ''), true);
+  const acts = JSON.parse(readText(new URL('../data/activities.json', import.meta.url)));
+  eq('발행 파일 모양 {updatedAt, items[]}', 'updatedAt' in acts && Array.isArray(acts.items), true);
+  eq('  실린 글의 kind 는 둘 중 하나', acts.items.every((n) => ACTIVITY_KINDS.includes(n.kind) && n.url && n.title), true);
+  /* ④ 화면 */
+  const html = readText(new URL('../index.html', import.meta.url));
+  const app = readText(new URL('../app.js', import.meta.url));
+  eq('아래 탭에 대외활동이 있다', /data-nav="activities"/.test(html), true);
+  const at = (id) => html.indexOf(`id="${id}"`);
+  eq('화면은 탐색 **뒤**·신청내역 **앞** (관문 「교내·교외 분류와 주관 기관」이 홈~탐색 사이를 재므로)',
+    at('screen-explore') > 0 && at('screen-explore') < at('screen-activities') && at('screen-activities') < at('screen-applications'), true);
+  const chips = [...html.matchAll(/<div class="filter-row" id="activities-filters">([\s\S]*?)<\/div>/g)][0];
+  const chipVals = chips ? [...chips[1].matchAll(/data-filter="([^"]+)"/g)].map((m) => m[1]) : [];
+  eq('칩은 전체 + 종류 둘 (값은 activity-kind 의 것 그대로)', chipVals, ['all', ...ACTIVITY_KINDS.slice().reverse()]);
+  eq('검색창·목록 그릇이 있다', /id="activities-search"/.test(html) && /id="activities-list"/.test(html), true);
+  eq('showScreen 의 화면 목록에 있다', /\['onboarding', 'home', 'explore', 'activities', 'applications'/.test(app), true);
+  eq('showScreen 이 그린다', /if \(name === 'activities'\) renderActivities\(\);/.test(app), true);
+  eq('늦게 온 데이터로 다시 그린다 (rerenderVisible)', /if \(!\$\('#screen-activities'\)\.hidden\) renderActivities\(\);/.test(app), true);
+  eq('당겨서 새로고침이 같이 받는다 (refreshAllData)', /loadKosaf\(\), loadActivities\(\)\]/.test(app), true);
+  eq('첫 실행에 받는다', /^loadActivities\(\);$/m.test(app), true);
+  eq('못 받아 왔어도 빈 문서로 내려앉는다 (뼈대가 굳지 않게)', /liveActivities = d \|\| liveActivities \|\| \{ items: \[\], updatedAt: null \}/.test(app), true);
+  eq('학교 범위는 엔진의 activityForProfile 한 곳', /activityForProfile\(n, p\)/.test(app) && !/function activityForProfile/.test(app), true);
+  eq('카드는 한 벌 — noticeCardHtml 을 다시 쓴다 (두 번째 카드 함수 없음)', /noticeCardHtml\(n, \{/.test(app) && !/function activityCardHtml/.test(app), true);
+  eq('칩 켜고 끄기는 제 줄 안에서만 (다른 화면 칩을 건드리지 않는다)', /\$\$\('\.filter-chip'\)\.forEach/.test(app), false);
+  const eng = createRequire(import.meta.url)('../match-engine.js');
+  const P = { school: '한국외국어대학교', campus: '' };
+  eq('엔진: 학교가 빈 글은 누구에게나', eng.activityForProfile({ school: '', url: 'u' }, P), true);
+  eq('엔진: 내 학교 글', eng.activityForProfile({ school: '한국외국어대학교', campus: '', url: 'u' }, P), true);
+  eq('엔진: 다른 학교 글은 아님', eng.activityForProfile({ school: '경희대학교', campus: '', url: 'u' }, P), false);
+  eq('엔진: 프로필 없으면 아님', eng.activityForProfile({ school: '', url: 'u' }, null), false);
+  eq('다시 열면 이 탭으로 돌아온다 (resume)', /RESUME_TABS = \[[^\]]*'activities'/.test(readText(new URL('../resume.js', import.meta.url))), true);
+  eq('알림 딥링크가 이 탭을 안다 (notify)', /\['home', 'explore', 'activities', 'applications', 'my'\]\.includes\(screen\)/.test(readText(new URL('../notify.js', import.meta.url))), true);
+  const ui = strip(readText(new URL('../.github/workflows/verify-ui.yml', import.meta.url)));
+  eq('브라우저 드라이버가 관문에 걸려 있다', /verify-activities\.js/.test(ui), true);
 }
 
 console.log('\n■ 「또는」 줄의 처지 판정 (2026-09-18 개발자 결정)');
