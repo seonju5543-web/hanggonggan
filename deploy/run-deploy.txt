@@ -14,5 +14,5 @@
 # 배포되는 경로: 작업 브랜치 → 기본 브랜치(claude/nice-heisenberg-WESq5) → main → 앱
 # 데이터 관문(node verify/audit-data.js)을 통과하지 못하면 배포하지 않고 🚨 이슈를 남긴다.
 
-branch: claude/job-posting-form-read-error-98ck8a
+branch: claude/handaejang-notice-error-check-fg521c
 메모: 2026-09-25 — 기기 사이 덮어쓰기 방지 (조건부 PATCH · 충돌 시 합치기)
