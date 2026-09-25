@@ -47,7 +47,10 @@ function authLoad() {
   try { return JSON.parse(localStorage.getItem(AUTH_KEY)) || null; } catch { return null; }
 }
 function authSave(t) { localStorage.setItem(AUTH_KEY, JSON.stringify(t)); }
-function authClear() { localStorage.removeItem(AUTH_KEY); }
+/* ⚠️ 로그인이 끝나면 '서버에서 본 판' 기억도 같이 버린다 — 다음 사람이 남의 판을
+   물려받아 조건부 수정이 엉뚱하게 맞거나 빗나가면 안 된다(syncVerLoad 가 사람도 대조하지만
+   같은 사람이 다시 로그인할 때 옛 판이 남아 있으면 첫 push 가 헛돈다). */
+function authClear() { localStorage.removeItem(AUTH_KEY); syncVerClear(); }
 
 function rememberedEmail() {
   try { return localStorage.getItem(REMEMBER_KEY) || ''; } catch { return ''; }
@@ -464,24 +467,86 @@ function syncSafeApplications(apps) {
 }
 
 /* ---------------- 올리기 · 내려받기 ---------------- */
+
+/* 🔴 **서버 행이 내가 본 그대로일 때만 덮어쓴다** (2026-09-25 · 기술 고문 보고서 Q6)
+
+   그전까지 `syncPush` 는 저장할 때마다 **아무 확인 없이 행 전체를 upsert** 했다.
+   시각 비교(`theirs > mine`)는 **앱을 열 때 한 번**뿐이라(app.js syncAfterLoad), 그 뒤의
+   저장은 전부 무조건 덮어썼다. 실측으로 재현된 사고는 이렇다 —
+   폰 A 가 신청서를 올려 둔 뒤 폰 B 가 프로필 한 칸을 고치면, **A 가 올린 신청서가
+   서버에서 통째로 사라진다.** 학생이 쓴 글은 다시 쓸 수 없다.
+
+   🔴 **칸을 쪼개는 것으로는 안 고쳐진다.** 보고서는 JSONB 를 개별 컬럼으로 나누라고 했지만,
+      옛 기기는 쪼갠 칸들을 **제 옛 값으로 똑같이** 덮는다. 고쳐야 하는 것은 모양이 아니라
+      '내가 본 뒤로 서버가 움직였는가'를 **안 보는 것**이다. (0001_profiles.sql 이 칸을
+      안 쪼갠 데에는 따로 적어 둔 이유가 있다 — 앱 구조가 바뀔 때마다 DB 도 같이 고쳐야 한다.)
+
+   방법: 우리가 마지막으로 **본** `updated_at` 을 기억해 두고, 그 값이 아직 서버에 있을 때만
+   고친다(조건부 PATCH). 0행이 돌아오면 다른 기기가 먼저 쓴 것이므로 **덮지 않고**
+   `conflict` 로 알린다 — 합치는 일은 `app.js` 의 `syncApplyRemote` 한 곳이 맡는다
+   (합치는 규칙을 여기 한 벌 더 두면 두 곳이 갈라진다).
+   관문: verify/verify-supabase.js [9] 절. */
+const SYNC_VER_KEY = 'handaejang.syncver';
+
+/** 우리가 마지막으로 본 서버 행의 `updated_at`. 사람이 바뀌면 안 쓴다. */
+function syncVerLoad(userId) {
+  try {
+    const v = JSON.parse(localStorage.getItem(SYNC_VER_KEY) || 'null');
+    return v && v.userId === userId ? String(v.updatedAt || '') : '';
+  } catch { return ''; }
+}
+function syncVerSave(userId, updatedAt) {
+  try { localStorage.setItem(SYNC_VER_KEY, JSON.stringify({ userId, updatedAt })); } catch { /* 저장이 막혀도 동작은 해야 한다 */ }
+}
+function syncVerClear() {
+  try { localStorage.removeItem(SYNC_VER_KEY); } catch { /* 위와 같다 */ }
+}
+
 /* 서버에 올린다. 실패해도 앱은 아무 일 없이 계속 돈다 — 폰 안 저장이 원본이다. */
 async function syncPush(state) {
   if (!signedIn() || !state) return { ok: false, skipped: true };
   const u = authUser();
   const sensitiveOk = !!(state.consent && state.consent.sensitive);
+  const stamp = new Date().toISOString();
   const row = {
     user_id: u.userId,
     profile: syncSafeProfile(state.profile, sensitiveOk),
     applications: syncSafeApplications(state.applications),
     sensitive_ok: sensitiveOk,
-    updated_at: new Date().toISOString(),
+    updated_at: stamp,
   };
-  const res = await sbAuthed('/rest/v1/profiles', {
-    method: 'POST',
-    headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
-    body: [row],
-  });
-  return { ok: res.ok, error: res.ok ? null : authErrorText(res) };
+  const seen = syncVerLoad(u.userId);
+
+  /* ⚠️ 본 적이 없으면 **넣기 전에 먼저 본다** — 서버에 이미 행이 있는데 그냥 올리면
+     그게 바로 덮어쓰기다(다른 기기에서 갓 로그인한 경우가 정확히 이 꼴이다). */
+  if (!seen) {
+    const remote = await syncPull();
+    /* ⚠️ **빠져나갈 구멍을 남긴다** — 서버 행에 `updated_at` 이 비어 있으면(표의 기본값 때문에
+       거의 없지만) 걸 조건이 없다. 그때도 conflict 만 돌려주면 `syncPull` 이 또 빈 값을 적어
+       **다시는 못 올리는 상태**가 된다. 그런 행은 막지 않고 그냥 올린다 — 못 올리는 것보다 낫다. */
+    if (remote && remote.updatedAt) return { ok: false, conflict: true, remote };
+    const ins = await sbAuthed('/rest/v1/profiles', {
+      method: 'POST',
+      headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
+      body: [row],
+    });
+    if (ins.ok) syncVerSave(u.userId, stamp);
+    return { ok: ins.ok, error: ins.ok ? null : authErrorText(ins) };
+  }
+
+  const res = await sbAuthed(
+    `/rest/v1/profiles?user_id=eq.${encodeURIComponent(u.userId)}&updated_at=eq.${encodeURIComponent(seen)}`,
+    { method: 'PATCH', headers: { Prefer: 'return=representation' }, body: row });
+  if (res.ok && Array.isArray(res.json) && res.json.length) {
+    syncVerSave(u.userId, stamp);
+    return { ok: true, error: null };
+  }
+  if (res.ok) {
+    /* 0행 = 내가 본 뒤로 다른 기기가 먼저 썼다. **덮지 않는다.** */
+    const remote = await syncPull();
+    return { ok: false, conflict: true, remote };
+  }
+  return { ok: false, error: authErrorText(res) };
 }
 
 /* 서버에서 내려받는다. 없으면(첫 로그인 전) null. */
@@ -492,6 +557,8 @@ async function syncPull() {
     `/rest/v1/profiles?user_id=eq.${encodeURIComponent(u.userId)}&select=profile,applications,sensitive_ok,updated_at`);
   if (!res.ok || !Array.isArray(res.json) || !res.json.length) return null;
   const row = res.json[0];
+  /* 🔴 본 값을 적어 둔다 — 다음 push 가 '그 사이 서버가 움직였는가'를 이걸로 판단한다. */
+  syncVerSave(u.userId, row.updated_at || '');
   return {
     profile: row.profile || null,
     applications: row.applications || [],

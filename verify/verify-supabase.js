@@ -103,6 +103,18 @@ function startSupabase() {
           }
           if (req.method === 'POST') { storedRow = (body && body[0]) || null; return send(201); }
           if (req.method === 'DELETE') { storedRow = null; return send(204); }
+          /* 🔴 **조건부 수정** (2026-09-25 신설) — PostgREST 는 `?updated_at=eq.<값>` 필터가
+             걸린 PATCH 를 **맞는 행에만** 적용하고, 맞는 행이 없으면 **빈 배열**을 돌려준다.
+             그 '0행' 이 곧 '내가 본 뒤로 다른 기기가 먼저 썼다' 는 신호다.
+             예전 가짜 서버는 PATCH 를 몰라 404 를 줬다 — 그러면 덮어쓰기 사고를 흉내조차 못 한다. */
+          if (req.method === 'PATCH') {
+            const want = /[?&]updated_at=eq\.([^&]+)/.exec(req.url);
+            const cond = want ? decodeURIComponent(want[1]) : null;
+            if (!storedRow) return send(200, []);
+            if (cond !== null && String(storedRow.updated_at) !== cond) return send(200, []);
+            storedRow = Object.assign({}, storedRow, body || {});
+            return send(200, [storedRow]);
+          }
           return send(200, storedRow ? [storedRow] : []);
         }
         return send(404, { msg: 'not found' });
@@ -111,6 +123,19 @@ function startSupabase() {
     srv.listen(SB_PORT, () => resolve(srv));
   });
 }
+
+/* 🔴 **프로필이 나간 마지막 요청을 방식과 무관하게 찾는다** (2026-09-25).
+   예전에는 검사들이 `method === 'POST'` 만 봤다. 2026-09-25에 덮어쓰기를 막으면서
+   두 번째부터는 **조건부 PATCH** 로 나가는데, 그러면 검사가 **첫 POST 만 보고**
+   그 뒤에 무엇이 나갔는지 못 본다 — 주민번호·계좌 검사가 조용히 무력해지는 자리다.
+   ⚠️ 뜻은 그대로다(마지막으로 나간 프로필 행). 바뀐 것은 전송 방식뿐이라 **자리만 옮긴다.**
+   ⚠️ POST 는 본문이 배열 `[row]`, PATCH 는 객체 `row` 다 — 여기서 한 모양으로 맞춘다. */
+const profileWrites = () => received.filter(
+  (r) => (r.method === 'POST' || r.method === 'PATCH') && r.path.startsWith('/rest/v1/profiles'));
+const lastProfileRow = () => {
+  const b = (profileWrites().pop() || {}).body;
+  return Array.isArray(b) ? b[0] : b;
+};
 
 /* ───────── 앱 복사본 (원본 저장소는 절대 건드리지 않는다) ───────── */
 /* ⚠️ 값을 **항상 덮어쓴다** — 저장소에 무엇이 적혀 있든 상관없게. 나중에 진짜 주소가
@@ -298,7 +323,7 @@ const seedScript = (seed) => `localStorage.setItem('handaejang.v1', ${JSON.strin
     await page.waitForTimeout(1200);
     ok(await page.locator('#detail-sheet.show').count() === 0, '가입되면 시트가 닫힌다');
     ok(received.some((r) => r.path.startsWith('/auth/v1/signup')), '서버에 가입 요청이 갔다');
-    ok(received.some((r) => r.method === 'POST' && r.path.startsWith('/rest/v1/profiles')), '프로필이 서버로 올라갔다');
+    ok(profileWrites().length > 0, '프로필이 서버로 올라갔다');
   }
 
   console.log('\n[3] 🔴 주민등록번호·계좌번호는 한 번도 안 나간다 (terms.html 의 약속)');
@@ -308,13 +333,13 @@ const seedScript = (seed) => `localStorage.setItem('handaejang.v1', ${JSON.strin
     ok(!all.includes(ACCOUNT), '계좌번호가 요청 본문에 없다');
     ok(!/"rrn"/.test(all), "'rrn' 이라는 칸 자체가 안 나간다");
     ok(!/"account"/.test(all), "'account' 라는 칸 자체가 안 나간다");
-    const row = (received.filter((r) => r.method === 'POST' && r.path.startsWith('/rest/v1/profiles')).pop() || {}).body;
-    const keys = row && row[0] ? Object.keys(row[0]).sort() : [];
+    const row = lastProfileRow();
+    const keys = row ? Object.keys(row).sort() : [];
     ok(JSON.stringify(keys) === JSON.stringify(['applications', 'profile', 'sensitive_ok', 'updated_at', 'user_id']),
       '올라가는 칸은 정해진 다섯 개뿐이다', keys);
     /* 학교·학년 같은 것은 **올라가야** 한다 — 안 올라가면 기기 간 이어쓰기가 안 된다 */
-    ok(row && row[0].profile && row[0].profile.school === '한국외국어대학교', '학교는 올라간다(이어쓰기의 핵심)');
-    ok(row && row[0].profile && row[0].profile.common && row[0].profile.common.studentId === '202312345',
+    ok(row && row.profile && row.profile.school === '한국외국어대학교', '학교는 올라간다(이어쓰기의 핵심)');
+    ok(row && row.profile && row.profile.common && row.profile.common.studentId === '202312345',
       '학번처럼 민감하지 않은 서류 정보는 올라간다');
 
     /* 🔴 **신청내역 쪽도 본다** (2026-09-09). 프로필만 청소하고 신청내역을 그대로 보내던
@@ -322,7 +347,7 @@ const seedScript = (seed) => `localStorage.setItem('handaejang.v1', ${JSON.strin
     ok(!/"formAns"/.test(all), "신청서 답('formAns')이 통째로 안 나간다");
     ok(!/"docs"/.test(all), "서류·자기소개서('docs')가 안 나간다");
     ok(!all.includes('자기소개서 초안입니다'), '자기소개서 글자가 요청 본문에 없다');
-    const apps = row && row[0] ? row[0].applications : null;
+    const apps = row ? row.applications : null;
     ok(Array.isArray(apps) && apps.length === 1, '신청내역 자체는 올라간다 (기기 간 이어쓰기)', apps && apps.length);
     ok(apps && apps[0] && apps[0].id === 'reg-hufs-yangcheon' && apps[0].step === 0,
       '  올라가는 것은 어느 공고를 언제 어디까지 했는가 뿐이다');
@@ -331,10 +356,10 @@ const seedScript = (seed) => `localStorage.setItem('handaejang.v1', ${JSON.strin
   console.log('\n[4] 민감정보(특별자격)는 동의했을 때만 나간다');
   {
     const { page } = firstPage;
-    const before = (received.filter((r) => r.method === 'POST' && r.path.startsWith('/rest/v1/profiles')).pop() || {}).body;
-    ok(before && before[0].profile && before[0].profile.flags === undefined,
-      '동의 전에는 특별자격이 안 나간다', before && before[0].profile && before[0].profile.flags);
-    ok(before && before[0].sensitive_ok === false, '동의 여부가 false로 기록된다');
+    const before = lastProfileRow();
+    ok(before && before.profile && before.profile.flags === undefined,
+      '동의 전에는 특별자격이 안 나간다', before && before.profile && before.profile.flags);
+    ok(before && before.sensitive_ok === false, '동의 여부가 false로 기록된다');
     /* 🔴 **처지(traits) 도 민감정보다** (2026-09-18 코드 리뷰). `religion`(해당 종교)·
        `married`(혼인)·`military`(군 복무)·`farm`(농어촌)이 들어가는데 `SYNC_SENSITIVE_KEYS`
        에 없어 **동의와 무관하게 나가고 있었다**. 종교는 개인정보 보호법 제23조가 이름을
@@ -348,21 +373,21 @@ const seedScript = (seed) => `localStorage.setItem('handaejang.v1', ${JSON.strin
     await page.waitForTimeout(800);
     ok(await page.evaluate(() => !!(state.profile.traits || {}).religion),
       '  (준비) 처지가 기기에 실제로 심어졌다');
-    const beforeT = (received.filter((r) => r.method === 'POST' && r.path.startsWith('/rest/v1/profiles')).pop() || {}).body;
-    ok(beforeT && beforeT[0].profile && beforeT[0].profile.traits === undefined,
+    const beforeT = lastProfileRow();
+    ok(beforeT && beforeT.profile && beforeT.profile.traits === undefined,
       '  동의 전에는 처지(종교·혼인 등)도 안 나간다',
-      beforeT && beforeT[0].profile && beforeT[0].profile.traits);
+      beforeT && beforeT.profile && beforeT.profile.traits);
     /* 기기에는 그대로 남아 있어야 한다 — 매칭이 달라지면 안 된다 */
     ok(await page.evaluate(() => state.profile.flags.length) === 2, '동의와 무관하게 기기에는 남아 있다');
 
     await page.evaluate(() => { state.consent.sensitive = true; saveState(); });
     await page.waitForTimeout(800);
-    const after = (received.filter((r) => r.method === 'POST' && r.path.startsWith('/rest/v1/profiles')).pop() || {}).body;
-    ok(after && after[0].profile && Array.isArray(after[0].profile.flags)
-      && after[0].profile.flags.includes('basicLiving'), '동의하면 특별자격이 올라간다');
-    ok(after && after[0].sensitive_ok === true, '동의 여부가 true로 기록된다');
-    ok(after && after[0].profile && after[0].profile.traits
-      && after[0].profile.traits.religion === true, '  동의하면 처지도 올라간다');
+    const after = lastProfileRow();
+    ok(after && after.profile && Array.isArray(after.profile.flags)
+      && after.profile.flags.includes('basicLiving'), '동의하면 특별자격이 올라간다');
+    ok(after && after.sensitive_ok === true, '동의 여부가 true로 기록된다');
+    ok(after && after.profile && after.profile.traits
+      && after.profile.traits.religion === true, '  동의하면 처지도 올라간다');
     await firstPage.ctx.close();
   }
 
@@ -511,6 +536,50 @@ const seedScript = (seed) => `localStorage.setItem('handaejang.v1', ${JSON.strin
     await ctx.close();
   }
 
+  /* ───────── [9] 🔴 다른 기기가 먼저 쓴 것을 덮어쓰지 않는다 (2026-09-25) ─────────
+     기술 고문 보고서 Q6 이 지적한 '통째 저장 + 덮어쓰기' 사고다. 다만 원인은 JSONB 라는
+     **모양**이 아니라, 저장할 때마다 도는 push 가 **'내가 본 뒤로 서버가 움직였는가'를
+     한 번도 안 보는 것**이다(app.js syncSchedulePush → syncPush 가 무조건 upsert).
+     칸을 쪼개도 옛 기기가 제 옛 값으로 그 칸들을 똑같이 덮으므로 안 고쳐진다.
+
+     재현: 폰 A 가 신청서를 올려 둔 뒤, 폰 B(이 화면)가 프로필 한 칸을 고쳐 저장한다.
+     고치기 전에는 B 의 push 가 행을 통째로 갈아엎어 **A 가 올린 신청서가 서버에서 사라진다.** */
+  console.log('\n[9] 다른 기기가 먼저 올린 신청서를 덮어쓰지 않는다');
+  {
+    const { ctx, page } = await newPage();
+    await page.goto(`http://localhost:${APP_PORT}/`, { waitUntil: 'domcontentloaded' });
+    await page.evaluate(seedScript(SEED));
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await settle(page);
+    /* 로그인 상태로 만든다 — 토큰을 직접 심고 한 번 올려 서버 행을 세운다 */
+    await page.evaluate(([k, t]) => localStorage.setItem(k, JSON.stringify(t)),
+      [await page.evaluate(() => AUTH_KEY), {
+        accessToken: liveAccess, refreshToken: liveRefresh, expiresAt: Date.now() + 600000,
+        userId: '00000000-0000-4000-8000-000000000001', email: 'test@example.com',
+      }]);
+    await page.evaluate(() => syncPush(state));
+    ok(!!storedRow, '먼저 이 기기 것이 서버에 올라갔다');
+
+    /* 🔴 **다른 기기(폰 A)가 먼저 쓴다** — 서버 행을 직접 바꿔 신청서 하나를 더한다.
+       앱은 이 일을 모른다. 이게 실제로 벌어지는 일이다. */
+    const OTHER = 'reg-other-device-only';
+    storedRow = Object.assign({}, storedRow, {
+      applications: [...(storedRow.applications || []), { id: OTHER, step: 1, appliedAt: '2026-09-24T00:00:00.000Z' }],
+      updated_at: '2026-09-24T00:00:00.000Z',
+    });
+
+    /* 이제 이 기기가 프로필 한 칸을 고쳐 저장한다 → 2초 뒤 push 가 돈다 */
+    await page.evaluate(() => { state.profile.gpa = 4.1; saveState(); });
+    await page.waitForTimeout(2500);
+
+    const ids = (storedRow.applications || []).map((a) => a.id);
+    ok(ids.includes(OTHER),
+      '🔴 다른 기기가 올린 신청서가 서버에 그대로 있다 (덮어쓰면 학생 글이 사라진다)', ids);
+    ok((storedRow.profile || {}).gpa === 4.1, '이 기기가 고친 값도 함께 올라갔다',
+      (storedRow.profile || {}).gpa);
+    await ctx.close();
+  }
+
   /* ───────── [9] 🔴 탭을 여러 개 띄워도 로그인이 풀리지 않는다 (2026-09-23) ─────────
      Supabase 는 갱신 토큰을 **한 번 쓰면 죽이고 새것을 준다**(회전). 그래서 탭 A 가
      갱신에 성공하는 순간 탭 B 가 든 토큰은 죽는다. 탭 B 의 `authRefresh` 가 false 를
@@ -520,7 +589,7 @@ const seedScript = (seed) => `localStorage.setItem('handaejang.v1', ${JSON.strin
      🔴 **탭 두 개를 같은 context 에 띄우는 것이 이 절의 심장이다** — 그래야 저장소와
         잠금을 실제로 공유한다. 창을 따로 만들면(newPage 도우미) 저장소가 갈라져
         이 사고가 **재현되지 않고 검사가 조용히 통과한다.** */
-  console.log('\n[9] 탭 두 개가 같은 순간에 토큰을 갱신해도 로그인이 살아남는다');
+  console.log('\n[10] 탭 두 개가 같은 순간에 토큰을 갱신해도 로그인이 살아남는다');
   {
     const ctx = await browser.newContext({ viewport: { width: 390, height: 900 } });
     const a = await ctx.newPage();
@@ -581,7 +650,7 @@ const seedScript = (seed) => `localStorage.setItem('handaejang.v1', ${JSON.strin
   }
 
   /* ───────────── [10] 서버가 죽어도 앱은 열린다 ───────────── */
-  console.log('\n[10] 서버가 죽어 있어도 앱은 그대로 열린다 (기기 우선)');
+  console.log('\n[11] 서버가 죽어 있어도 앱은 그대로 열린다 (기기 우선)');
   {
     await new Promise((r) => sb.close(r));
     const { ctx, page } = await newPage();
@@ -596,7 +665,7 @@ const seedScript = (seed) => `localStorage.setItem('handaejang.v1', ${JSON.strin
     await ctx.close();
   }
 
-  console.log('\n[11] 콘솔 오류');
+  console.log('\n[12] 콘솔 오류');
   ok(errors.length === 0, '콘솔·페이지 오류 없음', errors.slice(0, 4));
 
   await browser.close();

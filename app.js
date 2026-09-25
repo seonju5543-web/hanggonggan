@@ -6075,16 +6075,42 @@ function syncSchedulePush() {
   if (typeof signedIn !== 'function' || !signedIn()) return;
   clearTimeout(syncTimer);
   syncTimer = setTimeout(() => {
-    syncPush(state).catch(() => { /* 실패해도 앱은 그대로 — 폰 안 저장이 원본이다 */ });
+    syncPushMerging(state).catch(() => { /* 실패해도 앱은 그대로 — 폰 안 저장이 원본이다 */ });
   }, (typeof SUPABASE_CONFIG !== 'undefined' && SUPABASE_CONFIG.pushDelayMs) || 2000);
+}
+
+/* 🔴 **다른 기기가 먼저 썼으면 덮지 않고 합친 뒤 올린다** (2026-09-25 · 고문 보고서 Q6)
+
+   `syncPush` 는 이제 '내가 본 판이 아직 서버에 있을 때만' 고친다(supabase-client.js).
+   다른 기기가 먼저 썼으면 `conflict` 를 돌려주는데, 그때 **그냥 포기하면 이 기기가 고친 것이
+   영영 안 올라간다.** 그래서 받아서 합치고(`syncApplyRemote` — 합치는 규칙은 거기 한 곳뿐이다)
+   **한 번만** 다시 올린다.
+   ⚠️ 다시 올리는 것은 한 번뿐이다 — 계속 밀면 두 기기가 서로를 밀어내며 돌 수 있다.
+      한 번 더 부딪히면 다음 저장이나 다음 실행이 가져간다(기기 안 저장이 원본이라 안 잃는다). */
+async function syncPushMerging(st) {
+  const r = await syncPush(st);
+  if (!r || !r.conflict || !r.remote) return r;
+  syncApplyRemote(r.remote, { quiet: true });   // 합치기만 한다 — 방금 고친 값을 되돌리지 않는다
+  /* ⚠️ 다시 올릴 때는 **전역 `state`** 다 — `syncApplyRemote` 가 고치는 것이 그것이라,
+     넘겨받은 `st` 를 그대로 쓰면 합친 결과가 아니라 합치기 전 것을 올리게 된다. */
+  return syncPush(state);
 }
 
 /* 서버에서 받은 것을 이 기기에 적는다.
    🔴 **서버에 일부러 안 올린 것**(주민번호·계좌·미동의 민감자격)은 서버에 없다.
       그대로 덮어쓰면 이 기기의 값이 사라지므로, 빈자리만 기기 것으로 채운다. */
-function syncApplyRemote(remote) {
+function syncApplyRemote(remote, opts) {
+  const o = opts || {};
   const wasOnboarding = !state.profile;
-  if (remote.profile) {
+  /* 🔴 `quiet` — **덮어쓰기 충돌을 풀 때** 쓴다(syncPushMerging). 방향이 반대이기 때문이다:
+     여기 기본값은 '앱을 열었는데 서버가 더 새것' 이라 서버 프로필이 이긴다. 그런데 충돌은
+     **학생이 방금 이 기기에서 고쳐서** 올리려던 참에 난 것이라, 서버 것으로 갈아치우면
+     방금 고친 값이 눈앞에서 되돌아간다(실측: 성적 4.1 → 3.6).
+     그래서 quiet 일 때는 ①프로필·동의는 **이 기기 것을 둔다** ②신청내역은 **합친다**
+     ③화면을 다시 그리지 않는다(글을 쓰는 중일 수 있다 — 포커스가 날아간다).
+     ⚠️ 잃는 쪽을 막는 기준은 아래 신청내역 주석과 같다 — **글은 다시 못 쓰고, 프로필 한 칸은
+        다시 고치면 된다.** 그래서 합치는 것은 글이 든 신청내역 쪽이다. */
+  if (remote.profile && !o.quiet) {
     const localP = state.profile || {};
     const localCommon = localP.common || {};
     const p = JSON.parse(JSON.stringify(remote.profile));
@@ -6121,10 +6147,13 @@ function syncApplyRemote(remote) {
       if (a.formAns || a.docs) state.applications.push(a);
     }
   }
-  state.consent = Object.assign({}, state.consent, { sensitive: !!remote.sensitiveOk });
-  state.updatedAt = remote.updatedAt || state.updatedAt;
+  if (!o.quiet) {
+    state.consent = Object.assign({}, state.consent, { sensitive: !!remote.sensitiveOk });
+    state.updatedAt = remote.updatedAt || state.updatedAt;
+  }
   saveState({ fromServer: true });
 
+  if (o.quiet) return;                 // 화면은 건드리지 않는다 (위 주석 ③)
   if (wasOnboarding && state.profile) { initOnboarding(); showScreen('home'); return; }
   const cur = $$('.screen').find((sc) => !sc.hidden);
   if (cur) showScreen(cur.id.replace('screen-', ''));
@@ -6136,12 +6165,12 @@ async function syncAfterLoad() {
   syncBusy = true;
   try {
     const remote = await syncPull();
-    if (!remote) { await syncPush(state); return; }          // 서버가 비었으면 내 것을 올린다
+    if (!remote) { await syncPushMerging(state); return; }   // 서버가 비었으면 내 것을 올린다
     const mine = state.updatedAt || '';
     const theirs = remote.updatedAt || '';
     /* 새 기기(프로필이 아예 없음)면 무조건 받는다 — 이게 개발자가 겪던 바로 그 상황이다 */
     if (!state.profile || theirs > mine) syncApplyRemote(remote);
-    else if (mine > theirs) await syncPush(state);
+    else if (mine > theirs) await syncPushMerging(state);
   } catch (e) {
     /* 인터넷이 없거나 서버가 자고 있으면 그냥 지나간다 — 앱은 폰 안 데이터로 계속 돈다 */
   } finally { syncBusy = false; }

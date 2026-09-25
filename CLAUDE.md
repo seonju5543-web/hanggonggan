@@ -237,6 +237,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 - 서비스워커는 코드·데이터 모두 네트워크 우선 + `cache:'no-cache'` + 3.5초 폴백. 버전 인상은 옛 캐시 청소용 관례.
 - CSP(`script-src 'self'`) · 모든 렌더링 `esc()`(HTML 기호 되돌림은 `esc()` 앞) · 개인정보는 기기 안에만(로그인 사본은 `syncSafeProfile`).
 - 로그인 토큰 갱신은 탭 간 Web Locks + 다시 읽기 + `waitForOtherTabRefresh` 세 개가 한 세트('서버 한 번만'을 관문으로 세우지 말 것). 관문 `verify-supabase.js`.
+- 🔴 **기기 사이 덮어쓰기**: push 는 **내가 본 판이 아직 서버에 있을 때만** 고친다(조건부 PATCH · 0행이면 `conflict`). 안 그러면 폰 A 가 올린 신청서가 폰 B 의 저장 한 번에 사라진다(실측). 🔴 **고문 보고서 Q6 의 '칸을 쪼개라'로는 안 고쳐진다** — 옛 기기가 쪼갠 칸을 제 옛 값으로 똑같이 덮는다. 합치는 규칙은 `syncApplyRemote` 한 곳이고 충돌 때는 방향이 반대라 `{quiet:true}`(프로필은 이 기기 것 · 신청내역은 합침 · 화면 안 그림). ⚠️ 진짜 Postgres 의 시각 비교는 아직 안 눌러 봤다. `docs/designs/sync-overwrite.md` · 관문 `verify-supabase.js` [9].
 
 ### 관리자 화면 · 외부 서비스
 
