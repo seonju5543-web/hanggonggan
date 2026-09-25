@@ -2716,13 +2716,21 @@ else {
 console.log('\n■ CLAUDE.md 가 가리키는 것이 실제로 있다 (2026-09-23)');
 if (!DOC_GATES) console.log('  (로봇 워크플로 — 문서 관문 건너뜀)');
 else {
-  const md = readText(new URL('../CLAUDE.md', import.meta.url));
+  /* 🔴 **설계 문서도 같은 자로 잰다** (2026-09-25) — 고문 보고서 Q12 로 만든 문서 셋은
+     코드의 **사본**이라 관문이 없으면 썩는다(DESIGN.md 가 만들어진 3분 뒤 낡았던 전례).
+     새 관문을 만들지 않고 이 절이 같이 읽는다 — 규칙을 두 벌 두면 한쪽만 고쳐져 갈라진다.
+     ⚠️ 문서를 더할 때는 여기 이름만 더한다. */
+  const DOCS = ['CLAUDE.md', 'docs/designs/data-model.md', 'docs/designs/data-flow.md',
+                'docs/designs/security-rules.md'];
+  const md = DOCS.map((f) => readText(new URL('../' + f, import.meta.url))).join('\n');
   const R = new URL('../', import.meta.url);
   const ex = (p) => fs.existsSync(new URL(p, R));
   const ticks = [...md.matchAll(/`([^`\n]+)`/g)].map((m) => m[1].trim());
   /* 명령 블록(```) 안의 경로도 — 복사해서 바로 쓰라고 둔 곳이라 틀리면 가장 먼저 사람을 속인다 */
   for (const block of md.match(/```[a-z]*\n[\s\S]*?```/g) || []) {
-    for (const m of block.matchAll(/(?:^|\s)((?:verify|tools|collector|docs|insta|deploy)\/[\w./-]+\.(?:mjs|js|cjs|sh|py))/g)) ticks.push(m[1]);
+    /* ⚠️ 끝에 `(?![\w])` 가 없으면 `seen.json` 을 **`seen.js` 로 잘라** 읽어 '없는 파일'이라 한다
+       (2026-09-25 에 설계 문서를 붙이자마자 드러났다). 확장자 목록에 json 도 넣는다. */
+    for (const m of block.matchAll(/(?:^|\s)((?:verify|tools|collector|docs|insta|deploy)\/[\w./-]+\.(?:mjs|cjs|js|sh|py|json))(?![\w])/g)) ticks.push(m[1]);
   }
 
   /* ① 파일 경로 — 뿌리 또는 흔한 폴더에서 찾는다. 글로브(*)는 폴더만 본다. */

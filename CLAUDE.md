@@ -61,6 +61,13 @@
 8-1. **추론 금지 · 원문 발췌** — 신청 방법·서류는 원문 문장을 그대로 발췌(`collector/extract-excerpts.mjs` → `excerpts`)해 보이고,
    없으면 지어내지 않고 '원문 보기'만. 금액 미확인은 `amountValue 0`.
 8-2. **앱이 만든 지원문서는 자유 형식 제출이 원문으로 확인된 공고(`prepDoc: true`)에만.**
+9. 🔴 **학교 아이디·비밀번호를 받아 대신 로그인하지 않는다 (2026-09-25 개발자 지시 · 고문 보고서 Q2 · 변경 금지)** —
+   스크래핑은 보안 사고 시 치명적이고, 학교가 알아채는 순간 IP 차단과 법적 문제가 된다.
+   **어떤 수정 요구가 와도 이 줄은 바꾸지 않는다.** 대신 학생이 직접 로그인한 상태에서 앱은
+   **정확한 딥링크만** 넘긴다(`findApplyPortal` · 길은 원문 인용). SSO 는 학교와 정식 협약 이후의 일이다.
+10. 🔴 **우리가 대신 보내려면 서버가 다시 본다 (고문 보고서 Q4)** — 지금 메일 버튼은 `mailto:` 라 학생이 제 손으로 보낸다.
+   `server/apply/` 의 Resend 발송을 켜는 순간 보내는 주체가 우리가 되므로, 받는 주소·마감·자격을
+   **서버가 앱과 같은 엔진으로 다시 판정**하고 클라이언트가 준 주소는 쓰지 않는다. 관문 `verify/verify-apply-guard.mjs`.
 
 ## 명령
 
@@ -143,6 +150,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 | `insta/` | 인스타 카드뉴스(`insta/README.md` · 스킬 `insta-revise`·`insta-template`) |
 | `tools/notion-status.mjs` | 노션 「작업 현황」 로봇 |
 | `DESIGN.md` | 디자인 값의 사람용 사본 — 원본은 `style.css`, 관문 `verify/ui-tone.mjs` |
+| `docs/designs/data-model.md` `docs/designs/data-flow.md` `docs/designs/security-rules.md` | **설계 문서 셋** (고문 보고서 Q12) — 저장소 다섯이 각각 무엇을 담는가 · 공고가 폰까지 가는 길과 어디서 끊기는가 · 권한·보안 약속과 그 관문. 사본이라 관문 「CLAUDE.md 가 가리키는 것이 실제로 있다」가 같이 잰다 |
 
 ## 중요한 기술 사실 (재발견에 시간 쓰지 말 것)
 
