@@ -15,4 +15,4 @@
 # 데이터 관문(node verify/audit-data.js)을 통과하지 못하면 배포하지 않고 🚨 이슈를 남긴다.
 
 branch: claude/handaejang-notice-error-check-fg521c
-메모: 2026-09-25 — 기기 사이 덮어쓰기 방지 (조건부 PATCH · 충돌 시 합치기)
+메모: 2026-09-25 — 효림장학재단 양식 추가(마감 10/1)
