@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
- "updatedAt": "2026-09-24",
- "count": 2014,
+ "updatedAt": "2026-09-25",
+ "count": 2013,
  "items": [
   {
    "title": "[글로벌][교외] 2026년 효림장학재단 장학생 선발 안내 (~10/1)",
@@ -33373,20 +33373,6 @@
    "school": "서울시립대학교",
    "campus": "",
    "foundAt": "2026-07-27"
-  },
-  {
-   "title": "2026년 대학생 청소년교육지원장학금 활동도우미(근로) 모집(8/6~)",
-   "url": "https://www.uos.ac.kr/korNotice/list.do?list_id=FA1#n-2026%EB%85%84%20%EB%8C%80%ED%95%99%EC%83%9D%20%EC%B2%AD%EC%86%8C%EB%85%84%EA%B5%90%EC%9C%A1%EC%A7%80%EC%9B%90%EC%9E%A5%ED%95%99%EA%B8%88%20%ED%99%9C%EB%8F%99%EB%8F%84%EC%9A%B0%EB%AF%B8(%EA%B7%BC%EB%A1%9C)%20%EB%AA%A8%EC%A7%91(8%2F6~)",
-   "attachments": [
-    {
-     "name": "대학생 청소년교육지원장학금 활동도우미 신청서_이름.hwp",
-     "url": "https://www.uos.ac.kr/common/board-download.do?listId=FA1&seq=31158&fSeq=1"
-    }
-   ],
-   "deadlineHint": "까지 ◎ 장학금 시급 단가: 12,790원 ◎ 주요업무 &nbsp; 1. 한국장학재단 멘토링 장학금 멘토 활동",
-   "school": "서울시립대학교",
-   "campus": "",
-   "foundAt": "2026-07-26"
   }
  ]
 }

@@ -716,6 +716,64 @@
    "added": "2026-09-23",
    "fetched": true,
    "schematized": false
+  },
+  {
+   "id": "auto-9599ec839d20ec84a0ebb09c",
+   "name": "공통 제36기 미레에셋 해외교환 장학생 선발",
+   "target": "공통 제36기 미레에셋 해외교환 장학생 선발",
+   "added": "2026-09-25",
+   "fetched": false,
+   "schematized": false,
+   "tries": 1,
+   "lastTryAt": "2026-09-25"
+  },
+  {
+   "id": "auto-84a0ebb09c20eab3b5eab3a0",
+   "name": "서울 (재) 김해시미래인재장학재단 2026 장학생 선발 공고",
+   "target": "서울 (재) 김해시미래인재장학재단 2026 장학생 선발",
+   "added": "2026-09-25",
+   "fetched": false,
+   "schematized": false,
+   "tries": 1,
+   "lastTryAt": "2026-09-25"
+  },
+  {
+   "id": "auto-99ec839d20ec84a0ebb09c20",
+   "name": "공통 2026년 하반기 문주장학재단 AI·ICT 분야 인재 장학생 선발 안내",
+   "target": "공통 2026년 하반기 문주장학재단 AI·ICT 분야 ",
+   "added": "2026-09-25",
+   "fetched": false,
+   "schematized": false,
+   "tries": 1,
+   "lastTryAt": "2026-09-25"
+  },
+  {
+   "id": "auto-oardid323054menuno200318",
+   "name": "공통 [공통] 2026학년도 2학기 반영장학 신청 안내",
+   "target": "공통 [공통] 2026학년도 2학기 반영장학 신청 안내",
+   "added": "2026-09-25",
+   "fetched": false,
+   "schematized": false,
+   "tries": 1,
+   "lastTryAt": "2026-09-25"
+  },
+  {
+   "id": "auto-oardid322922menuno200318",
+   "name": "공통 [공통] 2026학년도 2학기 경희꿈도전장학 신청 안내",
+   "target": "공통 [공통] 2026학년도 2학기 경희꿈도전장학 신청",
+   "added": "2026-09-25",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-20ec9588eb82b40922ed9994",
+   "name": "공통 [공통] 2026학년도 2학기 점프장학 신청 안내_09.22(화)~10.9(금)",
+   "target": "공통 [공통] 2026학년도 2학기 점프장학 신청 안내",
+   "added": "2026-09-25",
+   "fetched": false,
+   "schematized": false,
+   "tries": 1,
+   "lastTryAt": "2026-09-25"
   }
  ]
 }
