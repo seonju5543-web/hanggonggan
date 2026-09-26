@@ -19,7 +19,7 @@
    끄기: 그냥 배포하지 않으면 된다. 앱은 이 주소가 비면 버튼을 안 낸다.
    ========================================================================== */
 import { validateSubmission } from './apply-guard.mjs';
-import { recordSend, applyWebhook, verifySvix, logConfigured, resolveUser } from './send-log.mjs';
+import { recordSend, applyWebhook, verifySvix, logConfigured, resolveUser, loadProfile } from './send-log.mjs';
 
 const APP_ORIGIN = 'https://seonju5543-web.github.io';
 /* 발행물은 앱과 같은 곳에서 읽는다 — 사본을 서버에 두면 두 벌이 되어 갈라진다. */
@@ -90,9 +90,16 @@ export default {
     const registered = await loadRegistered();
     if (!registered) return say(503, { why: '공고 목록을 확인할 수 없어 보내지 않았습니다' });
 
+    /* 🔴 **프로필은 우리 사본을 읽는다** — 요청에 온 프로필은 쓰지 않는다(변조 가능).
+       없으면 409 로 돌려보내 앱이 한 번 올리고 다시 부르게 한다(422 와 구분되는 신호다). */
+    const held = await loadProfile(env, userId);
+    if (!held) return say(409, { code: 'no_profile',
+      why: '프로필이 서버에 올라와 있지 않습니다 (앱에서 저장한 뒤 다시 시도해 주세요)' });
+
     /* 🔴 여기가 관문이다. 통과 못 하면 **어떤 경로로도** 아래로 못 내려간다. */
-    const v = validateSubmission(payload, registered);
-    if (!v.ok) return say(422, { why: v.why, status: v.status || null });
+    const v = validateSubmission(payload, registered, null, held);
+    if (!v.ok) return say(v.code === 'no_profile' ? 409 : 422,
+      { code: v.code || null, why: v.why, status: v.status || null });
 
     /* 본문은 클라이언트가 쓴다(학생이 쓴 글이라 서버가 지어낼 수 없다). 다만 크기는 막는다. */
     const subject = String(payload.subject || '').slice(0, 300);

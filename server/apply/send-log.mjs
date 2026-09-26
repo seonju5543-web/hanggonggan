@@ -72,6 +72,31 @@ export async function recordSend(env, row) {
   } catch { return false; }
 }
 
+/* 🔴 **프로필도 클라이언트 말로 믿지 않는다** (2026-09-26 · 고문 보고서 Q4 의 마지막 구멍).
+   그전까지 `validateSubmission` 은 요청 본문의 `profile` 로 자격을 판정했다 — 그러면
+   기기에서 성적·소득구간을 고친 학생이 **서버 재검증을 그대로 통과한다.** 재검증이 아니었다.
+   지금은 우리가 가진 사본(`profiles` 표)을 읽어 그것으로만 판정한다.
+
+   ⚠️ 서버 사본은 **일부러 덜 담긴다**(`syncSafeProfile`) — 주민번호·계좌는 아예 없고,
+      특별자격(`flags`)·처지(`traits`)는 **동의했을 때만** 있다. 그래서 동의를 안 한 학생은
+      특별자격 공고에서 판정이 `ineligible` 로 떨어지는데, 그건 '없다'가 아니라 **'모른다'** 다.
+      그 둘을 뭉개면 멀쩡한 학생에게 "특별자격이 필요해요"라고 거짓말을 한다 → `apply-guard.mjs`
+      가 그 경우를 따로 가려 말한다.
+   🔴 service_role 로 읽는다 — 학생의 토큰으로 읽으면 학생이 고칠 수 있는 경로가 된다. */
+export async function loadProfile(env, userId) {
+  if (!logConfigured(env) || !userId) return null;
+  try {
+    const r = await fetch(String(env.SUPABASE_URL).replace(/\/+$/, '')
+      + `/rest/v1/profiles?user_id=eq.${encodeURIComponent(userId)}&select=profile,sensitive_ok,updated_at`, {
+      headers: { apikey: env.SUPABASE_SERVICE_KEY, Authorization: 'Bearer ' + env.SUPABASE_SERVICE_KEY },
+    });
+    if (!r.ok) return null;
+    const rows = await r.json();
+    if (!Array.isArray(rows) || !rows.length || !rows[0].profile) return null;
+    return { profile: rows[0].profile, sensitiveOk: !!rows[0].sensitive_ok, updatedAt: rows[0].updated_at || null };
+  } catch { return null; }
+}
+
 /* ── Svix 서명 확인 ───────────────────────────────────────────────────────
    서명 대상은 `{svix-id}.{svix-timestamp}.{본문}` 이고, 열쇠는 `whsec_` 뒤의 base64 다.
    헤더에는 서명이 **여럿** 올 수 있다(`v1,xxx v1,yyy`) — 열쇠를 돌릴 때 겹쳐 보내기 때문이다.

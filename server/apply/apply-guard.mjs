@@ -46,14 +46,38 @@ export function findNotice(registered, id) {
   return list.find((x) => x && x.id === id) || null;
 }
 
+/* 🔴 **서버 사본이 특별자격·처지를 모를 수 있다** — 학생이 민감정보 동의를 안 켰으면
+   `syncSafeProfile` 이 `flags`·`traits` 를 떼고 올린다. 그 상태로 특별자격 공고를 판정하면
+   엔진이 `ineligible` 을 내고 이유는 *"해당 특별자격이 필요해요"* 가 된다 —
+   **사실은 '없다'가 아니라 '우리가 모른다'** 다. 그 둘을 뭉개면 멀쩡한 학생에게 거짓말을 한다.
+   그래서 그 경우를 먼저 가려 **무엇을 하면 되는지**를 말한다. */
+function needsSensitive(notice) {
+  const e = (notice && notice.eligibility) || {};
+  /* 🔴 **`flagsAny` 하나뿐이다.** 실측으로 좁혔다(2026-09-26):
+     · 동의로 빠지는 것은 `flags`·`traits` 둘뿐이고(`SYNC_SENSITIVE_KEYS`),
+       구조화된 요건 중 그 둘과 대조하는 것은 `flagsAny` 뿐이다.
+     · ⚠️ `needCert` 를 여기 넣었다가 뺐다 — `cert` 는 **동의와 무관하게 서버에 올라간다.**
+       넣어 두면 진짜 미달(외국어성적 없음)을 "확인할 수 없다"고 말해 학생을 헷갈리게 한다.
+     · ⚠️ 원문 자격 줄 경로(`fitDetail().fails`)는 처지가 없어도 `fails` 를 만들지 않는다
+       (실측: 동의 O/X 어느 쪽도 `eligible`). 그래서 여기 넣을 것이 없다.
+     🔴 넓히려면 **먼저 재고** 넓힌다 — 넓히면 진짜 미달이 '모름'으로 새어 나간다. */
+  return Array.isArray(e.flagsAny) && e.flagsAny.length > 0;
+}
+
 /**
  * 보내도 되는가 — 보낼 주소까지 **여기서** 정해 돌려준다.
- * @param {{noticeId:string, profile:object}} payload  클라이언트가 보낸 것
- * @param {object} registered                          우리 발행물(data/registered.json)
- * @param {Date}   [now]
- * @returns {{ok:boolean, to?:string, notice?:object, why?:string}}
+ *
+ * 🔴 **프로필을 payload 에서 받지 않는다** (2026-09-26). 넷째 인자로 **서버가 읽어 온 것**을
+ *    받는다(`send-log.mjs loadProfile`). 요청 본문의 프로필로 판정하면 기기에서 성적을 고친
+ *    학생이 그대로 통과해, '서버 재검증'이라는 이름만 남는다.
+ *
+ * @param {{noticeId:string}} payload   클라이언트가 보낸 것 — **공고 id 만 쓴다**
+ * @param {object} registered           우리 발행물(data/registered.json)
+ * @param {Date|null} now
+ * @param {{profile:object, sensitiveOk:boolean}|null} held  서버가 가진 프로필
+ * @returns {{ok:boolean, to?:string, notice?:object, why?:string, code?:string}}
  */
-export function validateSubmission(payload, registered, now) {
+export function validateSubmission(payload, registered, now, held) {
   const id = payload && payload.noticeId;
   if (!id || typeof id !== 'string') return { ok: false, why: '공고를 지정하지 않았습니다' };
 
@@ -71,17 +95,27 @@ export function validateSubmission(payload, registered, now) {
 
   if (deadlinePassed(notice.deadline, now)) return { ok: false, why: '접수가 마감된 공고입니다' };
 
-  const p = payload && payload.profile;
-  if (!p || typeof p !== 'object') return { ok: false, why: '프로필이 없습니다' };
+  /* 🔴 **서버가 가진 프로필만** 본다. payload.profile 은 쳐다보지 않는다. */
+  const p = held && held.profile;
+  if (!p || typeof p !== 'object') {
+    return { ok: false, code: 'no_profile',
+      why: '프로필이 서버에 올라와 있지 않습니다 (앱에서 로그인해 한 번 저장해 주세요)' };
+  }
 
   /* 🔴 학교 한정 공고를 남의 학교 학생이 내지 못하게 — 앱과 같은 함수로 본다. */
   if (!ME.scopedToProfile([notice], p).length) {
-    return { ok: false, why: '이 공고를 낼 수 있는 학교·캠퍼스가 아닙니다' };
+    return { ok: false, code: 'scope', why: '이 공고를 낼 수 있는 학교·캠퍼스가 아닙니다' };
   }
 
   const r = ME.evaluate(notice, p) || {};
   if (!SENDABLE.has(r.status)) {
-    return { ok: false, why: '지원 자격을 충족하지 않습니다', status: r.status, reasons: r.reasons };
+    /* '없다'와 '모른다'를 가른다 — 위 needsSensitive 주석 참조. */
+    if (needsSensitive(notice) && !(held && held.sensitiveOk)) {
+      return { ok: false, code: 'sensitive_off',
+        why: '특별자격을 서버가 확인할 수 없습니다 (설정에서 민감정보 동의를 켜면 대신 낼 수 있어요)' };
+    }
+    return { ok: false, code: 'not_eligible',
+      why: '지원 자격을 충족하지 않습니다', status: r.status, reasons: r.reasons };
   }
   return { ok: true, to, notice };
 }
