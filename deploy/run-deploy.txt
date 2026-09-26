@@ -15,4 +15,4 @@
 # 데이터 관문(node verify/audit-data.js)을 통과하지 못하면 배포하지 않고 🚨 이슈를 남긴다.
 
 branch: claude/handaejang-notice-error-check-fg521c
-메모: 2026-09-26 — 조작한 프로필로 자격을 맞힐 수 없게
+메모: 2026-09-26 — 접수 대행 절차서 0단계(도메인)
