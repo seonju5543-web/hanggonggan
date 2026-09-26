@@ -1436,6 +1436,35 @@ function noticeFilesForProfile(p) {
   return list;
 }
 
+/* 🔴 **학교별 파일이 없을 때 옛 파일을 받아야 하는가** (2026-09-26 · 고문 보고서)
+
+   학교별 파일(2026-08-17)로 나눈 뒤에도 물러나는 길을 남겨 뒀다 — 학교별 파일이 아직
+   없거나 배포가 엇갈린 순간에 화면이 비지 않게 `data/notices.json` 을 받는 길이다.
+   그런데 **그 길이 대다수 학생에게 걸린다.** 수집망은 두 곳뿐이고 온보딩은 213개교를
+   고를 수 있으므로, 나머지 학교 학생은 매번 옛 파일을 통째로 받고 **자기 공고가 0건**이다
+   (그 파일에는 다른 학교 공고만 들어 있다). 실측 2026-09-26: 33.5KB 를 받아 0건.
+   수집 학교가 늘면 이 낭비도 같이 는다 — 40곳이면 670KB 를 받아 0건이다.
+
+   그래서 색인(`data/notices/index.json` · 400바이트)을 **학교별 파일과 나란히** 받아,
+   색인이 "네 파일은 없다"고 말하면 **옛 파일을 받지 않고 빈 목록으로 끝낸다.**
+   ⚠️ 색인 자체를 못 받았으면(오프라인·배포 엇갈림) 예전처럼 물러난다 — 판단이 안 서면
+      화면이 비지 않는 쪽이다. 즉 안전망은 그대로 두고 **알 수 있을 때만** 안 받는다.
+   ⚠️ 학교 이름이 아니라 **파일 이름**으로 맞춘다. 이름 규칙은 `noticeFileKey` 한 곳이고,
+      색인에는 그 결과가 적혀 있어 규칙을 두 번 쓰지 않는다.
+   🔴 화면(app.js loadNotices)과 알림(sw.js)이 **이 함수를 함께 쓴다** — 여기 두는 이유가
+      그것이다. 한쪽에만 두면 화면에 없는 공고를 알림이 알리거나 그 반대가 된다. */
+function noticeFallbackNeeded(indexDoc, files) {
+  const idx = indexDoc && indexDoc.files;
+  if (!idx || typeof idx !== 'object') return true;      // 색인을 못 읽었다 → 예전처럼 물러난다
+  const known = new Set();
+  for (const v of Object.values(idx)) {
+    if (v && v.file) known.add(`data/notices/${v.file}`);
+  }
+  /* 내 파일이 색인에 하나라도 있으면, 못 받은 것은 배포가 엇갈린 것이다 → 물러난다.
+     하나도 없으면 우리에게 그 학교 공고가 없다는 뜻이다 → 받을 것이 없다. */
+  return (files || []).some((f) => known.has(f));
+}
+
 /* 자격 요건을 **구조**로 — 공통 / 둘 중 하나 / 성적 (2026-08-23 신설).
 
    왜 필요한가: 원문이 표인 공고를 줄 목록으로 펴면 공통·분기가 사라져 뜻이 뒤집힌다.
@@ -1472,5 +1501,6 @@ if (typeof module !== 'undefined' && module.exports) {
                      REQ_SIGNAL, NOT_A_REQUIREMENT, EXCLUDE_LINE, HARD_THRESHOLD,
                      noticeForProfile, taggedSchool, SHARED_BOARD_BRANCH, SERVED_SCHOOLS,
                      noticeKind, NOTICE_CAMPUS_MARK, OWN_PROGRAMS,
-                     noticeFileKey, noticeFileFor, noticeFilesForProfile };
+                     noticeFileKey, noticeFileFor, noticeFilesForProfile,
+                     noticeFallbackNeeded };
 }

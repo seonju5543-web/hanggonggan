@@ -223,14 +223,24 @@ async function backgroundCheck() {
      여기만 옛 파일을 보면, 화면에는 있는 공고를 알림이 모르거나 그 반대가 된다
      (이 저장소가 match-engine.js를 화면·알림이 함께 쓰는 것과 같은 이유). */
   const noticeFiles = typeof noticeFilesForProfile === 'function' ? noticeFilesForProfile(profile) : [];
-  const [reg, ...noticeDocs] = await Promise.all([
+  /* 🔴 색인을 나란히 받아, 우리에게 그 학교 공고가 **없다는 것을 알 때는** 옛 파일을 받지
+     않는다 (2026-09-26 · 고문 보고서). 판정은 match-engine 의 `noticeFallbackNeeded` 한 곳 —
+     화면(app.js loadNotices)과 같은 함수다. 여기만 다르게 두면 화면에 없는 공고를 알림이
+     알리거나 그 반대가 된다. */
+  const [reg, idx, ...noticeDocs] = await Promise.all([
     readJson('data/registered.json'),
+    noticeFiles.length ? readJson('data/notices/index.json') : Promise.resolve(null),
     ...(noticeFiles.length ? noticeFiles : ['data/notices.json']).map(readJson),
   ]);
   const gotAny = noticeDocs.some(Boolean);
-  const notices = gotAny
-    ? { items: noticeDocs.filter(Boolean).flatMap((d) => d.items || []) }
-    : await readJson('data/notices.json');   // 학교별 파일이 아직 없는 학교
+  let notices;
+  if (gotAny) {
+    notices = { items: noticeDocs.filter(Boolean).flatMap((d) => d.items || []) };
+  } else if (!noticeFiles.length || noticeFallbackNeeded(idx, noticeFiles)) {
+    notices = await readJson('data/notices.json');   // 배포 엇갈림·색인 못 읽음 → 물러난다
+  } else {
+    notices = { items: [] };                         // 우리에게 그 학교 공고가 없다
+  }
 
   const out = NOTIFY_RULES.evaluate({
     now: Date.now(),

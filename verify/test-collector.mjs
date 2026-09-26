@@ -880,10 +880,61 @@ console.log('\n■ 학교별 공고 파일 (로봇이 쓴 파일을 앱이 찾�
     eq(`${f}가 학교별 파일 규칙을 쓴다`,
       /noticeFilesForProfile\(/.test(readText(new URL(f, root))), true);
   }
-  // 옛 파일로 물러나는 길 — 아직 자기 학교 파일이 없는 학생의 화면이 비면 안 된다
+  /* 옛 파일로 물러나는 길 — 아직 자기 학교 파일이 없는 학생의 화면이 비면 안 된다.
+     🔴 **다만 조건이 붙었다** (2026-09-26 · 고문 보고서). 수집망이 두 곳이고 온보딩은
+        213개교를 고를 수 있어, 그전까지는 **대다수 학생이 이 길로 들어가 옛 파일을 통째로
+        받고 자기 공고 0건**이었다(실측: 33.5KB 받아 0건 · 수집 40곳이면 670KB).
+        지금은 색인을 나란히 받아 '우리에게 그 학교 공고가 없다'를 알면 받지 않는다. */
   for (const f of ['app.js', 'sw.js']) {
-    eq(`${f}에 옛 파일 폴백이 남아 있다`,
-      /data\/notices\.json/.test(readText(new URL(f, root))), true);
+    const src = readText(new URL(f, root));
+    eq(`${f}에 옛 파일 폴백이 남아 있다`, /data\/notices\.json/.test(src), true);
+    eq(`  ${f} 이 noticeFallbackNeeded 로 판단한다`, /noticeFallbackNeeded\s*\(/.test(src), true);
+    eq(`  ${f} 이 색인을 나란히 받아 온다`, /data\/notices\/index\.json/.test(src), true);
+    /* 🔴 **조건 없이 물러나는 자리가 남아 있으면 고친 것이 아무 일도 안 한 것이 된다** */
+    const lines = src.split('\n');
+    const bare = [];
+    lines.forEach((ln, i) => {
+      if (/^\s*(\/\/|\/?\*)/.test(ln)) return;                       // 주석 줄은 뺀다
+      if (!/['"]data\/notices\.json['"]/.test(ln)) return;
+      const near = lines.slice(Math.max(0, i - 2), i + 1).join(' ');
+      if (!/noticeFallbackNeeded|noticeFiles\.length|files\.length/.test(near)) bare.push(i + 1);
+    });
+    eq(`  ${f} 에 조건 없이 옛 파일을 받는 줄이 없다`, bare, []);
+  }
+
+  /* 🔴 판정 자체 — '알 때는 안 받고, 모를 때는 예전처럼 물러난다'.
+     ⚠️ 판단이 안 서면 **화면이 비지 않는 쪽**이다(오프라인·배포 엇갈림). */
+  const IDX = { files: { '한국외국어대학교': { file: 'n19cz03g.json', count: 32 },
+                         '경희대학교': { file: 'n1w4hprp.json', count: 25 } } };
+  for (const [idx, fl, want, label] of [
+    [IDX, ['data/notices/n19cz03g.json'], true,  '색인에 있는데 파일을 못 받았다 → 물러난다(배포 엇갈림)'],
+    [IDX, ['data/notices/nsgh1oi.json'],  false, '🔴 색인에 없는 학교 → 옛 파일을 받지 않는다'],
+    [IDX, ['data/notices/nX.json', 'data/notices/n19cz03g.json'], true, '분교 둘 중 하나라도 있으면 물러난다'],
+    [null, ['data/notices/nsgh1oi.json'], true,  '색인을 못 받았다(오프라인) → 예전처럼 물러난다'],
+    [{},   ['data/notices/nsgh1oi.json'], true,  '색인이 망가졌다 → 물러난다'],
+    [IDX,  [],                            false, '받을 파일이 없으면 판단할 것도 없다'],
+  ]) {
+    eq('  ' + label, ME.noticeFallbackNeeded(idx, fl), want);
+  }
+
+  /* 🔴 **로봇이 만든 색인을 앱의 판정 함수에 실제로 먹여 본다.** 색인의 모양
+     (`files: { 학교: { file } }`)이 바뀌면 앱은 **조용히 옛 파일을 다시 받기 시작한다**
+     (판정이 '모른다'로 떨어져 늘 물러난다). 글자로 재지 않고 로봇 출력을 그대로 쓴다. */
+  {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'notices-idx-')) + path.sep;
+    publishBySchool([
+      { id: 'a', school: '한국외국어대학교', title: '가', url: 'https://x/1', listedAt: '2026-09-20' },
+      { id: 'b', school: '경희대학교', title: '나', url: 'https://x/2', listedAt: '2026-09-20' },
+    ], { dir: new URL('file://' + tmp) });
+    /* ⚠️ 파일은 `readText` 로 읽는다 — 이 파일의 메타 검사가 그걸 잰다(줄바꿈 통일). */
+    const idx = JSON.parse(readText(new URL('file://' + tmp + 'index.json')));
+    const hufs = ME.noticeFilesForProfile({ school: '한국외국어대학교' });
+    const snu = ME.noticeFilesForProfile({ school: '서울대학교' });
+    eq('  로봇이 낸 색인으로 수집 학교를 알아본다 (물러난다)', ME.noticeFallbackNeeded(idx, hufs), true);
+    eq('  🔴 로봇이 낸 색인으로 수집 안 하는 학교를 알아본다 (안 받는다)', ME.noticeFallbackNeeded(idx, snu), false);
+    eq('  색인의 파일 이름이 앱이 찾아갈 이름과 같다',
+      'data/notices/' + idx.files['한국외국어대학교'].file, hufs[0]);
+    fs.rmSync(tmp, { recursive: true, force: true });
   }
   for (const f of ['collector/collect.mjs', 'collector/browser-collect.mjs']) {
     const src = readText(new URL(f, root));

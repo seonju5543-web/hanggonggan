@@ -28,6 +28,13 @@ const eq = (label, got, want) => {
   const page = await ctx.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
+  /* 🔴 **무엇을 받아 왔는지 센다** (2026-09-26 · 고문 보고서). 공고는 학교별 파일에서
+     오는데, 프로필이 없을 때 옛 `data/notices.json` 을 통째로 받던 자리가 있었다 —
+     첫 실행 학생 전원이 그 낭비를 치렀고(실측 33.5KB → 0건), 그걸 없애면 이번에는
+     **온보딩을 마쳐도 공고를 다시 받지 않아 화면이 비는** 반대쪽 사고가 난다.
+     둘 다 재려면 '받은 주소 목록'이 필요하다. */
+  const asked = [];
+  page.on('request', (r) => { const u = r.url(); if (/\/data\//.test(u)) asked.push(u.replace(/^https?:\/\/[^/]+\//, '')); });
 
   await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
   await page.click('.onboard-step[data-step="0"] [data-next]');
@@ -100,6 +107,33 @@ const eq = (label, got, want) => {
   await nextUntil(page, '#btn-finish-onboard');
   await page.click('#btn-finish-onboard');
   await dismissNotify(page);
+
+  /* ───── 실시간 공고를 어디서 받아 오는가 (2026-09-26 · 고문 보고서) ─────
+     고문 지적: "학교별로 JSON 을 쪼개 배포하라." 쪼개는 일은 2026-08-17에 이미 했고,
+     남아 있던 낭비는 **옛 파일로 물러나는 길**이었다. 여기서 두 쪽을 다 잰다. */
+  console.log('\n[공고 파일] 첫 실행 학생이 무엇을 받는가');
+  {
+    /* 🔴 프로필이 생기기 전에는 옛 파일을 받지 않아야 한다 — 받아도 한 줄도 못 쓴다
+       (`noticesForMe` 가 프로필 없으면 빈 배열로 끝난다). */
+    eq('🔴 프로필이 없을 때 옛 파일을 통째로 받지 않았다',
+      asked.filter((u) => u === 'data/notices.json'), []);
+    /* 🔴 그 대신 **온보딩을 마친 뒤** 그 학교 파일을 받았어야 한다 — 이 짝이 없으면
+       첫 실행 학생의 실시간 공고가 앱을 다시 열 때까지 비어 보인다. */
+    const shards = asked.filter((u) => /^data\/notices\//.test(u) && !/index\.json$/.test(u));
+    eq('🔴 온보딩을 마친 뒤 그 학교 공고 파일을 받았다', shards.length > 0, true, shards);
+    eq('색인도 나란히 받았다 (옛 파일을 받을지 판단하는 데 쓴다)',
+      asked.some((u) => u === 'data/notices/index.json'), true);
+    /* 그리고 화면에 실제로 공고가 보여야 한다 — 받아 온 것을 쓰고 있는가 */
+    await page.waitForTimeout(600);
+    const cards = await page.evaluate(() => ({
+      뼈대: document.querySelectorAll('#screen-home #live-notices .skel-list').length,
+      공고: document.querySelectorAll('#screen-home #live-notices .notice-card').length,
+    }));
+    eq('🔴 홈의 실시간 공고가 뼈대에 굳지 않았다', cards.뼈대, 0);
+    eq('🔴 홈에 그 학교 공고가 보인다 (받아 온 것을 실제로 쓴다)', cards.공고 > 0, true, cards);
+  }
+
+
   await page.click('.nav-item[data-nav="my"]');
   /* ⚠️ 2026-09-12 부터 **카드가 아니라 그 안의 버튼**을 눌러야 수정으로 간다
      (개발자 지시 — 표를 짚기만 해도 넘어가던 것을 막았다). */

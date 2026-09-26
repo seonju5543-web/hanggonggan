@@ -2175,12 +2175,31 @@ let liveNotices = null;
    상한도 필요 없다. 파일 이름 규칙은 match-engine.js의 noticeFileFor 한 곳에 있다.
 
    ⚠️ 옛 파일(data/notices.json)로 물러나는 길을 남겨 둔다 — 학교별 파일이 아직 없거나
-   (그 학교 첫 수집 전) 배포가 엇갈린 순간에도 화면이 비지 않게. */
+   (그 학교 첫 수집 전) 배포가 엇갈린 순간에도 화면이 비지 않게.
+   🔴 **다만 '알 수 있을 때'는 받지 않는다** (2026-09-26 · 고문 보고서). 수집망은 두 곳뿐이고
+      온보딩은 213개교를 고를 수 있어, **대다수 학생이 그 물러나는 길로 들어가 옛 파일을
+      통째로 받고 자기 공고 0건**이었다(실측: 33.5KB 받아 0건 · 수집 40곳이면 670KB).
+      그래서 색인(400바이트)을 나란히 받아 "네 파일은 없다"면 옛 파일을 받지 않는다.
+      판정은 `noticeFallbackNeeded` 한 곳 — 알림(sw.js)도 같은 함수를 쓴다. */
 /* 🔴 늦게 온 데이터로 **보이는 화면을 다시 그린다** (2026-09-01).
    예전에는 loadRegistered 만 홈을 다시 그리고 loadKosaf·loadNotices 는 탐색만 그렸다.
    그래서 한국장학재단 공고가 뒤늦게 들어오면 홈의 '마감 임박'이 그 전에 계산한
    순서로 굳어, D-DAY 공고가 있는데도 D-2 부터 보였다.
    ⚠️ 새로 데이터를 불러오는 곳을 만들면 여기를 부를 것 — 갈라 두면 또 한 곳만 고치게 된다. */
+/* 🔴 **학교가 정해지거나 바뀌면 공고 파일을 다시 받는다** (2026-09-26).
+   공고는 학교별 파일에서 오므로 학교가 바뀌면 받아 둔 파일이 남의 학교 것이 된다.
+   그전까지 `loadNotices()` 는 **앱을 열 때 한 번**과 당겨서 새로고침에서만 돌았다 —
+   그래서 ①첫 실행 학생은 프로필이 생겨도 공고를 다시 받지 않았고(그때는 옛 파일을
+   통째로 받아 두어 우연히 가려졌다) ②MY 에서 **학교를 바꾸면** 실시간 공고가 조용히
+   비어 보였다(받아 둔 것이 전부 남의 학교 것이라 필터에서 다 떨어진다).
+   ⚠️ 같은 학교면 다시 받지 않는다 — 프로필을 고칠 때마다 네트워크를 두드릴 이유가 없다. */
+function loadNoticesIfSchoolChanged() {
+  const key = (typeof noticeFilesForProfile === 'function' && state.profile)
+    ? noticeFilesForProfile(state.profile).join(',') : '';
+  if (key === noticeFilesLoaded) return;
+  loadNotices();
+}
+
 function rerenderVisible() {
   if (!state.profile) return;
   if (!$('#screen-home').hidden) renderHome();
@@ -2188,20 +2207,36 @@ function rerenderVisible() {
   if (!$('#screen-applications').hidden) renderApplications();
 }
 
+/* 마지막으로 받아 온 학교별 파일 목록 — 학교가 바뀌면 다시 받아야 한다(아래 주석). */
+let noticeFilesLoaded = null;
+
 function loadNotices() {
   const p = state.profile;
   const files = (typeof noticeFilesForProfile === 'function' && p) ? noticeFilesForProfile(p) : [];
+  noticeFilesLoaded = files.join(',');
   const get = (u) => fetch(u, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  /* ⚠️ 색인은 학교별 파일과 **나란히** 부른다 — 먼저 받고 나서 부르면 공고가 있는 학생에게
+     왕복이 한 번 더 늘어(모바일에서 눈에 보인다) 아낀 것보다 손해다. */
   const job = files.length
-    ? Promise.all(files.map(get)).then((docs) => {
-      const ok = docs.filter(Boolean);
-      if (!ok.length) return get('data/notices.json');    // 아직 학교별 파일이 없는 학교
+    ? Promise.all([...files.map(get), get('data/notices/index.json')]).then((docs) => {
+      const idx = docs[docs.length - 1];
+      const ok = docs.slice(0, files.length).filter(Boolean);
+      if (!ok.length) {
+        return noticeFallbackNeeded(idx, files)
+          ? get('data/notices.json')                       // 배포 엇갈림·색인 못 읽음 → 물러난다
+          : { updatedAt: (idx && idx.updatedAt) || null, items: [] };   // 우리에게 그 학교 공고가 없다
+      }
       return {
         updatedAt: ok.map((d) => d.updatedAt).filter(Boolean).sort().pop() || null,
         items: ok.flatMap((d) => d.items || []),
       };
     })
-    : get('data/notices.json');
+    /* 🔴 **프로필이 없으면 아무것도 받지 않는다** (2026-09-26). 예전에는 여기서 옛 파일을
+       통째로 받았는데, 프로필이 없으면 `noticesForMe` 가 `if (!p) return []` 로 끝나
+       **받아도 한 줄도 못 쓴다.** 첫 실행 학생 전원이 그 낭비를 치르고 있었다.
+       ⚠️ 그래서 **프로필이 정해지는 순간 다시 받는다** — `loadNoticesIfSchoolChanged`.
+          그 짝이 없으면 첫 실행 학생의 실시간 공고가 새로 열 때까지 비어 보인다. */
+    : Promise.resolve({ items: [], updatedAt: null });
   /* 🔴 **부르는 쪽이 끝을 기다릴 수 있게 약속을 돌려준다** (2026-09-09).
      당겨서 새로고침은 '다 받아 왔다'를 알아야 뱅뱅이를 멈춘다 — 예전처럼 아무것도
      안 돌려주면 손을 떼자마자 멈춰서 학생 눈에는 아무 일도 안 한 것으로 보인다. */
@@ -5573,6 +5608,8 @@ function bindEvents() {
        동의 여부는 '나가도 되는가'를 정하는 값이라 섞으면 헷갈린다. */
     state.consent = { sensitive: !!$('#in-sensitive-ok').checked };
     saveState();
+    /* 학교가 정해졌거나 바뀌었으면 그 학교 공고 파일을 받는다 (위 주석) */
+    loadNoticesIfSchoolChanged();
     /* 온보딩을 마쳤으니 '쓰다 만 온보딩' 표시를 지운다 — 안 지우면 다음에 켤 때
        이미 만든 프로필을 두고 또 온보딩 진행분을 들고 있게 된다 */
     clearTimeout(onboardSaveTimer);
@@ -6144,6 +6181,9 @@ function syncApplyRemote(remote, opts) {
     migrateBranchCampus(p);
     migrateFitFields(p);
     state.profile = p;
+    /* 🔴 다른 기기에서 학교를 바꿨을 수도 있다 — 받아 둔 공고가 남의 학교 것이면 다시 받는다.
+       ⚠️ `quiet` 일 때는 프로필을 안 바꾸므로 이 안(바꾼 경우)에만 둔다. */
+    loadNoticesIfSchoolChanged();
   }
   /* 🔴 **학생이 쓴 글은 서버에 없다** — syncSafeApplications 가 `formAns`·`docs` 를 떼고 보낸다
      (주민등록번호·계좌·자기소개서가 들어 있어서다). 그래서 받은 것으로 통째로 갈아치우면
