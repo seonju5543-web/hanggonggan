@@ -725,8 +725,8 @@
    "added": "2026-09-25",
    "fetched": false,
    "schematized": false,
-   "tries": 4,
-   "lastTryAt": "2026-09-25"
+   "tries": 5,
+   "lastTryAt": "2026-09-26"
   },
   {
    "id": "auto-84a0ebb09c20eab3b5eab3a0",
@@ -735,8 +735,8 @@
    "added": "2026-09-25",
    "fetched": false,
    "schematized": false,
-   "tries": 4,
-   "lastTryAt": "2026-09-25"
+   "tries": 5,
+   "lastTryAt": "2026-09-26"
   },
   {
    "id": "auto-99ec839d20ec84a0ebb09c20",
@@ -745,8 +745,8 @@
    "added": "2026-09-25",
    "fetched": false,
    "schematized": false,
-   "tries": 4,
-   "lastTryAt": "2026-09-25"
+   "tries": 5,
+   "lastTryAt": "2026-09-26"
   },
   {
    "id": "auto-oardid323054menuno200318",
@@ -755,8 +755,8 @@
    "added": "2026-09-25",
    "fetched": false,
    "schematized": false,
-   "tries": 4,
-   "lastTryAt": "2026-09-25"
+   "tries": 5,
+   "lastTryAt": "2026-09-26"
   },
   {
    "id": "auto-oardid322922menuno200318",
@@ -773,8 +773,8 @@
    "added": "2026-09-25",
    "fetched": false,
    "schematized": false,
-   "tries": 4,
-   "lastTryAt": "2026-09-25"
+   "tries": 5,
+   "lastTryAt": "2026-09-26"
   }
  ]
 }
