@@ -14,5 +14,5 @@
 # 배포되는 경로: 작업 브랜치 → 기본 브랜치(claude/nice-heisenberg-WESq5) → main → 앱
 # 데이터 관문(node verify/audit-data.js)을 통과하지 못하면 배포하지 않고 🚨 이슈를 남긴다.
 
-branch: claude/job-posting-form-read-error-98ck8a
-메모: 2026-09-25 — 효림장학재단 양식 추가(마감 10/1) · 다시 시도(앞 실행은 다른 세션 배포 표식과 겹쳐 충돌)
+branch: claude/handaejang-notice-error-check-fg521c
+메모: 2026-09-26 — 접수 대행 발신 인증·바운스·발송 증빙
