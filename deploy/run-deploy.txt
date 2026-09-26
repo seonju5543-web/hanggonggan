@@ -15,4 +15,4 @@
 # 데이터 관문(node verify/audit-data.js)을 통과하지 못하면 배포하지 않고 🚨 이슈를 남긴다.
 
 branch: claude/handaejang-notice-error-check-fg521c
-메모: 2026-09-26 — 접수 대행 발신 인증·바운스·발송 증빙
+메모: 2026-09-26 — 조작한 프로필로 자격을 맞힐 수 없게
