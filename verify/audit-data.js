@@ -282,6 +282,19 @@ try {
   warns.push(`초안 위험 관문을 돌리지 못했습니다: ${e.message.slice(0, 80)}`);
 }
 
+/* ── 🔴 학교가 늘면 정식 등록도 학교별로 나눌 때다 (2026-09-26 개발자 지시) ──────────
+   개발자: *"그럼 학교 늘리면 그때 다시 학교별로 나누라고 얘기해줘."*
+   🔴 재는 규칙은 `verify/data-weight.cjs` **한 곳**이다 — 수집 리포트(→ GitHub 이슈)도 같은
+      함수를 쓴다. 여기 베껴 두면 한쪽 숫자만 고치고 다른 쪽이 옛말을 하게 된다.
+   ⚠️ 경고다(오류가 아니다) — 오류로 두면 자동 등록이 멈춘다. */
+try {
+  const { registeredSplitAdvice } = require('./data-weight.cjs');
+  const advice = registeredSplitAdvice(reg);
+  if (advice.line) warns.push(`registered — ${advice.line}`);
+} catch (e) {
+  warns.push(`폰이 받는 양을 재지 못했습니다: ${e.message.slice(0, 80)}`);
+}
+
 if (errors.length) { console.log('\n[오류 — 반드시 수정]'); errors.forEach((e) => console.log(' ✕', e)); }
 if (warns.length) { console.log('\n[경고 — 소급 적용 필요 항목]'); warns.forEach((w) => console.log(' ⚠', w)); }
 if (!errors.length && !warns.length) console.log('✓ 모든 데이터가 현재 엔진 기준을 충족합니다');

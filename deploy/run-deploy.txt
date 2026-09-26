@@ -15,4 +15,4 @@
 # 데이터 관문(node verify/audit-data.js)을 통과하지 못하면 배포하지 않고 🚨 이슈를 남긴다.
 
 branch: claude/handaejang-notice-error-check-fg521c
-메모: 2026-09-26 — 학과 목록 학교별 파일 (407KB→1.5KB) + 배포 감시 넷 추가
+메모: 2026-09-26 — 학교 늘면 정식 등록도 나누라고 데이터가 스스로 알린다

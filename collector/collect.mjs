@@ -366,6 +366,29 @@ const lines = [
   '> 다만 **첨부된 신청서 양식**과 **자격 요건 줄들**은 원문과 같은 구조로 옮겨야 해서 화면에서 못 합니다 — 그것까지 필요하면 채팅에 "이슈 #N 의 ○○ 양식·자격까지 등록해줘"라고 말씀해 주세요.',
   '',
 ];
+
+/* 🔴 **학교가 늘면 '정식 등록도 학교별로 나눌 때'라고 여기서 말한다** (2026-09-26 개발자 지시:
+   *"학교 늘리면 그때 다시 학교별로 나누라고 얘기해줘"*).
+   감사(`verify/audit-data.js`)도 같은 함수를 쓰지만 그쪽 출력은 **CI 로그에만 남는다** —
+   개발자가 실제로 읽는 것은 이 리포트(→ GitHub 이슈)다.
+
+   🔴 **머리쪽에 넣는다.** 꼬리에 두면 잘린다 — 워크플로가 이슈 본문을 60,000바이트에서
+      자르는데(`head -c`), **경고를 띄우게 만드는 그 성장이 바로 리포트를 넘치게 하는 것**이라
+      처음 뜨는 순간에 잘려 나간다(코드 리뷰에서 잡았다).
+   ⚠️ 재는 규칙은 `verify/data-weight.cjs` 한 곳 — 여기서 다시 계산하지 말 것.
+   ⚠️ 한 회차 시차가 있다: 이 리포트는 `auto-register` **전에** 쓰이므로 이번 회차에 새로
+      자동 등록된 공고는 다음 회차 숫자에 들어간다(감사는 뒤에 돌아 먼저 안다). 선을 천천히
+      넘는 값이라 한 회차(12시간) 늦는 것은 문제가 아니다 — 놓치지만 않으면 된다. */
+try {
+  const { registeredSplitAdvice } = await import('../verify/data-weight.cjs');
+  const regDoc = JSON.parse(fs.readFileSync(new URL('../data/registered.json', HERE), 'utf8'));
+  const advice = registeredSplitAdvice(regDoc);
+  if (advice.line) lines.push(`⚠️ ${advice.line}`, '');
+} catch (e) {
+  /* 🔴 **삼키지 않는다** — 삼키면 이 장치가 영영 죽어도 아무도 모른다(코드 리뷰에서 잡았다).
+     관문은 코드 글자만 보므로 '부르다가 터지는' 것은 이 줄만이 알려 준다. */
+  lines.push(`⚠️ 폰이 받는 양을 재지 못했습니다(장치가 죽었을 수 있습니다): ${String(e && e.message).slice(0, 80)}`, '');
+}
 for (const r of results) {
   lines.push(`### ${r.name}`);
   lines.push(`상태: ${r.status}`);

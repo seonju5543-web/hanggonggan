@@ -4014,6 +4014,90 @@ console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08
   }
 }
 
+console.log('■ 학교가 늘면 「정식 등록도 나눌 때」라고 말하는가 (2026-09-26 개발자 지시)');
+{
+  /* 개발자: "그럼 학교 늘리면 그때 다시 학교별로 나누라고 얘기해줘."
+     🔴 문서에만 적으면 안 돈다 — 데이터가 스스로 재서 말해야 한다. 여기서 재는 것은
+        ①선을 넘으면 말하는가 ②안 넘으면 조용한가 ③재는 규칙이 한 곳인가
+        ④개발자가 **실제로 읽는 곳**(수집 리포트 → GitHub 이슈)에 뜨는가. */
+  const DW = createRequire(import.meta.url)('./data-weight.cjs');
+  const reg = JSON.parse(readText(new URL('../data/registered.json', import.meta.url)));
+
+  /* ① 지금은 조용해야 한다 (실측 21KB · 선 150KB) */
+  const now = DW.registeredSplitAdvice(reg);
+  eq('  지금은 아직 말하지 않는다 (선을 안 넘었다)', { over: now.over, line: now.line }, { over: false, line: null });
+  eq('  그래도 재기는 했다 (전국분과 학교 수를 읽어냈다)', now.nation > 0 && now.schools > 0, true);
+
+  /* ② 학교가 늘어난 미래 — **실데이터 크기에 기대지 않는다.** 처음에 실제 공고를 스무 번
+     복제해 봤는데 그 공고가 작아서 선을 못 넘었고, 검사가 '말하지 않는다'로 초록불이었다.
+     지어낸 픽스처로 재면 숫자가 눈에 보이고 데이터가 바뀌어도 흔들리지 않는다. */
+  const pad = (n) => 'x'.repeat(n);
+  const four = { items: [
+    { id: 'n1', eligibility: {}, note: pad(90 * 1024) },                          // 전국 — 모두가 받는다
+    { id: 's1', eligibility: { schoolOnly: '가대학교' }, note: pad(200 * 1024) },
+    { id: 's2', eligibility: { schoolOnly: '나대학교' }, note: pad(200 * 1024) },
+    { id: 's3', eligibility: { campusOnly: '다대학교 본교' }, note: pad(200 * 1024) },
+  ] };
+  const later = DW.registeredSplitAdvice(four);
+  /* 남의 학교 것 = 학교 한정 600KB − 가장 큰 학교 200KB = 400KB → 선(150KB)을 넘는다 */
+  /* ⚠️ `eq` 는 인자가 셋이다 — 넷째를 주면 조용히 버려진다(전에도 같은 실수를 했다). */
+  eq('  🔴 학교가 늘면 말한다', later.over, true);
+  eq('  남의 학교 것만 센다 (전국분은 빼고, 가장 큰 학교 몫도 빼고)',
+    Math.round(later.wasted / 1024), 400);
+  eq('  전국분을 따로 센다', Math.round(later.nation / 1024), 90);
+  eq('  그 말에 **무엇을 하라**가 들어 있다', /학교별 파일로 나눌 때/.test(later.line || ''), true);
+  eq('  본뜰 곳도 알려 준다', /publish-notices|match-engine/.test(later.line || ''), true);
+  /* 🔴 `schoolsAny`(여러 학교)도 학교 한정으로 센다 — 나눌 때 그 학교들 파일에 각각 들어간다 */
+  const anyOnly = DW.registeredSplitAdvice({ items: [
+    { id: 'a1', eligibility: { schoolsAny: ['가대학교', '나대학교'] }, note: pad(300 * 1024) },
+    { id: 'a2', eligibility: { schoolsAny: ['다대학교'] }, note: pad(200 * 1024) },
+  ] });
+  eq('  여러 학교만 받는 공고도 학교 한정으로 센다', Math.round(anyOnly.wasted / 1024), 200);
+  /* 🔴 **여러 학교가 함께 받는 공고를 '남의 것'으로 세지 않는다** (2026-09-26 코드 리뷰).
+     나누면 파일은 학교 단위라 그 공고는 **그 학교들 파일에 각각** 들어간다. 묶음 하나로
+     세던 첫 판은 낭비를 네 배로 부풀렸고 `학교 N곳` 도 묶음 수라 틀렸다. */
+  const shared = DW.registeredSplitAdvice({ items: [
+    { id: 'a', eligibility: { schoolOnly: '가대학교' }, note: pad(60 * 1024) },
+    { id: 'b', eligibility: { schoolOnly: '나대학교' }, note: pad(19 * 1024) },
+    { id: 'c', eligibility: { schoolsAny: ['가대학교', '나대학교', '다대학교|본교'] }, note: pad(200 * 1024) },
+  ] });
+  eq('  함께 받는 공고는 그 학교들 것으로 센다 (낭비 19KB — 부풀리면 79KB 가 된다)',
+    Math.round(shared.wasted / 1024), 19);
+  eq('  학교 수는 묶음 수가 아니라 실제 학교 수다', shared.schools, 3);
+  eq("  `학교|캠퍼스` 꼴에서 학교 이름만 집는다",
+    [...DW.schoolsOfNotice({ schoolsAny: ['가대학교|본교'] })], ['가대학교']);
+  /* 전국 공고만 있으면 나눌 이유가 없다 */
+  const nationOnly = DW.registeredSplitAdvice({ items: [
+    { id: 'z', eligibility: {}, note: pad(900 * 1024) },
+  ] });
+  eq('  전국 공고만 있으면 말하지 않는다 (나눠도 줄지 않는다)',
+    { over: nationOnly.over, wasted: nationOnly.wasted }, { over: false, wasted: 0 });
+
+  /* ③ 🔴 재는 규칙이 한 곳인가 — 베껴 두면 한쪽 숫자만 고치고 다른 쪽이 옛말을 한다 */
+  for (const [name, src] of [
+    ['verify/audit-data.js', readText(new URL('../verify/audit-data.js', import.meta.url))],
+    ['collector/collect.mjs', readText(new URL('../collector/collect.mjs', import.meta.url))],
+  ]) {
+    eq('  ' + name + ' 이 그 함수를 부른다', /registeredSplitAdvice\s*\(/.test(src), true);
+    /* 선(150KB)을 자기 파일에 적어 두지 않았는가 */
+    eq('  ' + name + ' 이 선을 베껴 적지 않았다',
+      /SPLIT_WARN_BYTES\s*=/.test(src.replace(/\/\*[\s\S]*?\*\//g, '')), false);
+  }
+  /* ④ 개발자가 읽는 곳에 뜨는가 — 감사 출력은 CI 로그에만 남는다 */
+  const collectSrc = readText(new URL('../collector/collect.mjs', import.meta.url));
+  eq('  🔴 수집 리포트(→ GitHub 이슈)에 싣는다', /lines\.push\([^)]*advice\.line/.test(collectSrc), true);
+  /* 🔴 **머리쪽에 실어야 한다.** 워크플로가 이슈 본문을 60,000바이트에서 자르는데(`head -c`),
+     경고를 띄우게 만드는 그 성장이 바로 리포트를 넘치게 한다 — 꼬리에 두면 **처음 뜨는
+     순간에 잘린다**(코드 리뷰에서 잡았다). 학교별 상세보다 앞이어야 한다. */
+  eq('  🔴 리포트 꼬리가 아니라 머리쪽에 싣는다 (60,000바이트에서 잘린다)',
+    collectSrc.indexOf('advice.line') < collectSrc.indexOf("lines.push('---')"), true);
+  /* 🔴 부르다가 터지는 것을 삼키지 않는가 — 삼키면 장치가 영영 죽어도 아무도 모른다 */
+  const catchBlock = /catch\s*\(e\)\s*\{([\s\S]{0,600}?)\}/.exec(
+    collectSrc.slice(collectSrc.indexOf('registeredSplitAdvice')));
+  eq('  🔴 재지 못한 것도 리포트에 적는다 (조용히 죽지 않는다)',
+    /lines\.push/.test((catchBlock && catchBlock[1]) || ''), true);
+}
+
 console.log('■ 프로필 개별 칸 · DB 검증 (0004 · 2026-09-26 · 고문 보고서 Q6)');
 {
   const sql = readText(new URL('../supabase/migrations/0004_profile_columns.sql', import.meta.url));
