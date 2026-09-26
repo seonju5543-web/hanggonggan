@@ -78,13 +78,25 @@ connect-src 'self' https://*.workers.dev https://*.supabase.co
 🔴 **Resend 자동 발송(`server/mail-worker.js`)을 켜는 순간 보내는 주체가 우리가 된다.**
 그때 고문 Q4 의 지적이 그대로 현실이 된다 — 기기에서 값을 바꾼 신청서가 **검증 없이** 학교·재단으로 간다.
 
-켜기 전에 반드시:
-1. 최종 제출 내용을 서버로 보내 **자격 요건을 서버에서 한 번 재검증**한다.
-   (이때 `profile` 의 매칭 핵심 칸이 컬럼으로 필요해진다 — 고문 Q6 의 진짜 쓸모가 여기다.)
-2. 발신 도메인 인증(SPF·DKIM·DMARC)과 바운스 처리.
-3. 발송 로그(증빙)를 남긴다.
+✅ **2026-09-26 에 셋 다 만들었다**(`server/apply/`). 남은 것은 **DNS 와 시크릿**이라 사람 몫이다 —
+순서는 `server/apply/README.md`. 관문 `verify/verify-apply-guard.mjs`.
 
-이미 있는 방어: Origin 검사 · 수신 도메인 허용목록(`ac.kr`/`or.kr`/`go.kr`/`re.kr`) · 크기 제한.
+| 방어 | 어디 |
+|---|---|
+| 자격·마감·학교 범위를 서버가 **앱과 같은 엔진**으로 다시 판정 | `server/apply/apply-guard.mjs` |
+| 받는 주소를 **공고에서** 찾는다(클라이언트가 준 값을 안 쓴다) | `server/apply/apply-guard.mjs` |
+| 누가 냈는지를 **토큰으로 확인**(본문의 id 를 믿지 않는다) | `server/apply/send-log.mjs` 의 `resolveUser` |
+| **발송 뒤** 증빙을 적고, 실패면 실패로 적는다 | `server/apply/send-log.mjs` 의 `recordSend` |
+| 반송·도착을 웹훅으로 받되 **서명을 맞춘 것만** | `server/apply/send-log.mjs` 의 `verifySvix` |
+| 발신 도메인을 코드에 박지 않는다(SPF·DKIM·DMARC 세운 것만) | `APPLY_FROM` 시크릿 |
+| 증빙 표는 **읽기 정책만** — 학생이 못 고친다 | `supabase/migrations/0003_apply_sends.sql` |
+
+🔴 **fail-closed 넷**: 열쇠 없음 · 발신 도메인 없음 · 장부 못 씀 · 로그인 없음 → **안 보낸다.**
+🔴 증빙에 **학생이 쓴 글을 담지 않는다**(제목까지만). 담는 것이 늘면 `terms.html` 2번 표도 같이 고친다.
+⚠️ 남은 것: `profile` 의 매칭 핵심 칸을 컬럼으로 두면 서버 재검증이 더 단단해진다(고문 Q6 의 진짜 쓸모).
+   지금은 클라이언트가 보낸 프로필로 판정하므로, **조작한 프로필로 자격을 맞히는 것**은 아직 막지 못한다.
+
+이미 있는 방어: Origin 검사 · 크기 제한.
 
 ## 7. 열쇠와 비밀
 

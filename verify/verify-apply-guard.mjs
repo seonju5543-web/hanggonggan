@@ -94,5 +94,78 @@ console.log('\n■ 마감 판정 (날짜끼리 · 당일은 살아 있다)');
   ok(!deadlinePassed('', NOW), '마감을 못 읽은 공고를 이 줄로 막지 않는다');
 }
 
+console.log('\n■ 발송 기록 · 바운스 (2026-09-26 · Q5 D+30)');
+{
+  const L = await import('../server/apply/send-log.mjs');
+  const w = fs.readFileSync(fileURLToPath(new URL('../server/apply/worker.js', import.meta.url)), 'utf8');
+
+  /* ① 발신 도메인 — SPF·DKIM·DMARC 는 DNS 라 코드로 못 잰다.
+        잴 수 있는 것은 **인증한 도메인을 안 넣으면 코드가 닫히는가** 하나다. */
+  ok(!/apply@handaejang\.app/.test(w), '🔴 발신 주소를 코드에 박아 두지 않는다');
+  ok(/env\.APPLY_FROM/.test(w) && /APPLY_FROM\)\s*return say\(503/.test(w),
+    '발신 도메인이 없으면 보내지 않는다 (스팸으로 버려지거나 반송된다)');
+
+  /* ② 증빙 — 못 남기면 아예 안 보낸다 · 누가 냈는지는 토큰으로 확인한다 */
+  ok(/logConfigured\(env\)\)\s*return say\(503/.test(w), '기록을 남길 수 없으면 대신 보내지 않는다');
+  ok(/resolveUser\(env, req\.headers\.get\('Authorization'\)\)/.test(w),
+    '🔴 누가 냈는지를 클라이언트 말로 믿지 않는다 (토큰을 서버가 확인)');
+  ok(!/payload\.user_?[Ii]d/.test(w), '요청 본문의 user_id 를 쓰지 않는다');
+
+  /* ③ 순서 — 보낸 뒤에 적는다(안 보낸 것을 보냈다고 적는 게 더 나쁘다) */
+  ok(w.indexOf('api.resend.com') < w.indexOf('recordSend('), '기록은 발송 **뒤에** 한다');
+  ok(/status: r\.ok \? 'queued' : 'failed'/.test(w), '발송이 실패하면 실패로 적는다');
+
+  /* ④ 웹훅 — 서명을 못 맞추면 장부를 건드리지 않는다 */
+  const SEC = 'whsec_' + Buffer.from('test-secret-key-16').toString('base64');
+  const body = JSON.stringify({ type: 'email.bounced', data: { email_id: 'abc' } });
+  const id = 'msg_1', ts = String(Math.floor(Date.now() / 1000));
+  const crypto = await import('node:crypto');
+  const good = crypto.createHmac('sha256', Buffer.from(SEC.replace(/^whsec_/, ''), 'base64'))
+    .update(`${id}.${ts}.${body}`).digest('base64');
+  const hdr = (sig, t) => new Map([['svix-id', id], ['svix-timestamp', t || ts], ['svix-signature', sig]]);
+  const H = (m) => ({ get: (k) => m.get(k) ?? null });
+
+  ok(await L.verifySvix(SEC, H(hdr('v1,' + good)), body), '맞는 서명은 통과한다');
+  ok(!await L.verifySvix(SEC, H(hdr('v1,' + 'A'.repeat(good.length))), body), '🔴 틀린 서명은 막는다');
+  ok(!await L.verifySvix(SEC, H(hdr('v1,' + good)), body + 'x'), '🔴 본문이 바뀌면 막는다');
+  ok(!await L.verifySvix(SEC, H(hdr('v1,' + good, '1000000000')), body),
+    '🔴 오래된 요청은 막는다 (되받아치기)');
+  ok(!await L.verifySvix('', H(hdr('v1,' + good)), body), '열쇠가 없으면 막는다');
+  /* 열쇠를 돌릴 때 서명이 여럿 온다 — 하나라도 맞으면 통과여야 한다(첫 것만 보면 교체 중 다 막힌다) */
+  ok(await L.verifySvix(SEC, H(hdr('v1,' + 'B'.repeat(good.length) + ' v1,' + good)), body),
+    '서명이 여럿이면 하나만 맞아도 통과한다 (열쇠 교체 중)');
+  ok(/verifySvix\(env\.RESEND_WEBHOOK_SECRET/.test(w) && /status: 401/.test(w),
+    '워커가 서명을 확인하고, 아니면 401');
+
+  /* ⑤ 모르는 사건을 상태로 바꾸지 않는다 */
+  ok(L.EVENT_STATUS['email.bounced'] === 'bounced', '반송은 bounced 로');
+  ok(L.EVENT_STATUS['email.delivery_delayed'] === null, '지연은 아직 실패가 아니다');
+  ok((await L.applyWebhook({}, { type: 'email.nonsense' })).ok === false, '모르는 사건은 반영하지 않는다');
+  /* 🔴 보통 객체면 `'constructor' in 표` 가 **참**이라(프로토타입) 상태 칸에 함수가 들어간다.
+     자체 리뷰에서 잡았다 — 되돌아오면 여기서 막힌다. */
+  for (const proto of ['constructor', 'toString', '__proto__', 'hasOwnProperty']) {
+    ok((await L.applyWebhook({}, { type: proto })).why === '모르는 사건',
+      `  🔴 프로토타입 이름을 사건으로 받지 않는다 (${proto})`);
+  }
+  /* 망가진 열쇠에 던지면 워커가 500 이고 Resend 가 계속 되보낸다 */
+  ok(await L.verifySvix('whsec_!!!not-base64!!!',
+    H(hdr('v1,' + good)), body) === false, '🔴 망가진 열쇠에 터지지 않고 막는다');
+
+  /* CORS — `Authorization` 을 안 열면 브라우저가 그 헤더를 아예 안 보낸다(늘 401) */
+  ok(/'Access-Control-Allow-Headers': 'Content-Type, Authorization'/.test(w),
+    '🔴 CORS 가 Authorization 을 허용한다 (안 열면 학생을 영영 못 알아본다)');
+
+  /* ⑥ 표와 정책 — 증빙이라 학생이 못 고쳐야 한다 */
+  const sql = fs.readFileSync(fileURLToPath(new URL('../supabase/migrations/0003_apply_sends.sql', import.meta.url)), 'utf8');
+  ok(/enable row level security/.test(sql), 'RLS 를 켠다');
+  ok(/for select/.test(sql), '읽기 정책이 있다');
+  ok(!/for (insert|update|delete|all)/.test(sql),
+    '🔴 넣기·고치기·지우기 정책을 만들지 않는다 (학생이 증빙을 조작할 수 없다)');
+  ok(!/service_role/.test(sql) || /절대 넣지 않는다/.test(sql), 'service_role 열쇠를 파일에 적지 않는다');
+  for (const bad of ['formAns', 'docs', 'essay', 'rrn', 'account']) {
+    ok(!new RegExp('\\b' + bad + '\\b').test(sql), `🔴 학생이 쓴 글·민감정보를 담지 않는다 (${bad})`);
+  }
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건` : '\n✓ 접수 대행 재검증 관문 통과');
 process.exit(fail ? 1 : 0);

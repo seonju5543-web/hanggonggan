@@ -19,6 +19,7 @@
    끄기: 그냥 배포하지 않으면 된다. 앱은 이 주소가 비면 버튼을 안 낸다.
    ========================================================================== */
 import { validateSubmission } from './apply-guard.mjs';
+import { recordSend, applyWebhook, verifySvix, logConfigured, resolveUser } from './send-log.mjs';
 
 const APP_ORIGIN = 'https://seonju5543-web.github.io';
 /* 발행물은 앱과 같은 곳에서 읽는다 — 사본을 서버에 두면 두 벌이 되어 갈라진다. */
@@ -43,15 +44,45 @@ export default {
     const cors = {
       'Access-Control-Allow-Origin': APP_ORIGIN,
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
+      /* 🔴 `Authorization` 이 없으면 브라우저가 **그 헤더를 아예 안 보낸다**(preflight 에서 걸린다)
+         → 서버가 학생을 못 알아보고 늘 401 이 된다. 2026-09-26 에 로그인 확인을 붙이면서 같이 열었다. */
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     };
     const say = (code, obj) => new Response(JSON.stringify(obj),
       { status: code, headers: { ...cors, 'content-type': 'application/json' } });
 
     if (req.method === 'OPTIONS') return new Response(null, { headers: cors });
     if (req.method !== 'POST') return say(405, { why: 'POST only' });
+
+    /* ── 바운스·도착 알림 (Resend → 우리) ──────────────────────────────────
+       🔴 앱이 부르는 곳과 **다른 경로**다. Origin 검사를 걸면 안 된다 — 브라우저가 아니라
+          Resend 서버가 부르므로 Origin 이 없다. 대신 **서명**으로 확인한다.
+       🔴 서명을 못 맞추면 401 이고 장부를 건드리지 않는다 — 아무나 '도착했다'로 바꿀 수
+          있으면 증빙이 증빙이 아니다. */
+    if (new URL(req.url).pathname.replace(/\/+$/, '').endsWith('/resend-hook')) {
+      const raw = await req.text();
+      if (!await verifySvix(env.RESEND_WEBHOOK_SECRET, req.headers, raw)) {
+        return new Response('unauthorized', { status: 401 });
+      }
+      let ev; try { ev = JSON.parse(raw); } catch { return new Response('bad json', { status: 400 }); }
+      const r = await applyWebhook(env, ev);
+      /* ⚠️ 우리 장부 사정으로 200 이 아니면 Resend 가 계속 되보낸다 — 알 수 없는 사건은
+         '받았다'로 닫고(200), 우리가 못 적은 것만 500 으로 남겨 다시 받는다. */
+      return new Response(r.ok ? 'ok' : (r.why || 'skip'),
+        { status: r.ok || r.why === '모르는 사건' ? 200 : 500 });
+    }
     if ((req.headers.get('Origin') || '') !== APP_ORIGIN) return say(403, { why: 'forbidden' });
     if (!env.RESEND_KEY) return say(503, { why: '아직 접수 대행이 켜지지 않았습니다' });
+    /* 🔴 **발신 주소를 코드에 박지 않는다** (2026-09-26). 박아 두면 그 도메인의 SPF·DKIM·DMARC
+       를 세워 두지 않은 채 배포하게 되고, 그러면 받는 쪽이 스팸으로 버리거나 통째로 반송한다
+       — 그리고 그 실패는 **학생에게 조용하다.** 인증을 마친 도메인을 시크릿으로 넣는다.
+       세우는 법은 server/apply/README.md. */
+    if (!env.APPLY_FROM) return say(503, { why: '발신 도메인이 아직 준비되지 않았습니다' });
+
+    /* 🔴 증빙을 남길 수 없으면 대신 보내지 않는다 — '보냈는지 모르는 발송'을 만들지 않는다. */
+    if (!logConfigured(env)) return say(503, { why: '발송 기록을 남길 수 없어 보내지 않았습니다' });
+    const userId = await resolveUser(env, req.headers.get('Authorization'));
+    if (!userId) return say(401, { why: '로그인이 필요합니다 (누가 냈는지 기록해야 합니다)' });
 
     let payload;
     try { payload = await req.json(); } catch { return say(400, { why: '읽을 수 없는 요청' }); }
@@ -79,12 +110,26 @@ export default {
       method: 'POST',
       headers: { Authorization: `Bearer ${env.RESEND_KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        from: '한대장 접수대행 <apply@handaejang.app>',   // Resend 에서 발신 도메인 인증 필요
-        to: [v.to],                                      // 🔴 서버가 고른 주소
+        from: env.APPLY_FROM,        // 🔴 SPF·DKIM·DMARC 를 세워 둔 도메인만 (README)
+        to: [v.to],                  // 🔴 서버가 고른 주소 — 클라이언트가 준 값이 아니다
         reply_to: payload.replyTo,
         subject, text, attachments,
       }),
     });
-    return new Response(await r.text(), { status: r.status, headers: cors });
+    const body = await r.text();
+    let sent = null; try { sent = JSON.parse(body); } catch { /* Resend 가 JSON 을 안 줄 수도 있다 */ }
+
+    /* 🔴 **보낸 뒤에** 적는다 — 안 보낸 것을 보냈다고 적는 게 더 나쁘다.
+       실패했으면 실패로 적는다(학생이 '냈다'고 착각하는 것을 막는 자리다). */
+    const logged = await recordSend(env, {
+      userId, noticeId: v.notice.id, to: v.to, subject,
+      providerId: sent && sent.id, status: r.ok ? 'queued' : 'failed',
+      detail: r.ok ? null : body.slice(0, 500),
+    });
+
+    /* ⚠️ 기록이 안 됐다고 발송을 되돌리지 않는다(되돌릴 수도 없다) — 조용히 넘기지 않고 알린다. */
+    return say(r.status, r.ok
+      ? { ok: true, id: sent && sent.id, logged }
+      : { ok: false, why: '발송에 실패했습니다', logged });
   },
 };
