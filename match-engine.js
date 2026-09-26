@@ -1424,6 +1424,16 @@ function noticeFileFor(school) {
   return `data/notices/${noticeFileKey(school)}.json`;
 }
 
+/* 학교별 **학과 목록** 파일 (2026-09-26). 공고와 같은 이름 규칙(`noticeFileKey`)을 **불러 쓴다**
+   — 베끼면 로봇과 앱이 갈라져 학과 추천이 조용히 죽는다(2026-08-27에 분교 이름으로 그 일이
+   실제로 났다). 여기 두는 이유는 판정이 아니라 **로봇(Node)과 앱(브라우저)이 같은 이름을
+   써야 하기 때문**이다 — 이 파일이 둘 다 읽는 유일한 곳이다.
+   ⚠️ 열쇠는 `'학교'` 또는 `'학교 캠퍼스'` 다(캠퍼스마다 학과가 다른 학교가 있다 —
+      `majorSuggestions` 가 캠퍼스 열쇠를 먼저 본다). 로봇이 저장한 열쇠를 그대로 넘긴다. */
+function majorsFileFor(schoolKey) {
+  return `data/majors/${noticeFileKey(schoolKey)}.json`;
+}
+
 /* 이 학생이 받아야 할 공고 파일들.
    분교가 본교 게시판을 함께 쓰는 경우(한양 ERICA·건국 글로컬·홍익 세종)에는 본교 파일도
    받아야 한다 — 공고가 본교 이름으로 저장되기 때문. 어느 것이 내 공고인지는 그다음에
@@ -1502,5 +1512,5 @@ if (typeof module !== 'undefined' && module.exports) {
                      noticeForProfile, taggedSchool, SHARED_BOARD_BRANCH, SERVED_SCHOOLS,
                      noticeKind, NOTICE_CAMPUS_MARK, OWN_PROGRAMS,
                      noticeFileKey, noticeFileFor, noticeFilesForProfile,
-                     noticeFallbackNeeded };
+                     noticeFallbackNeeded, majorsFileFor };
 }

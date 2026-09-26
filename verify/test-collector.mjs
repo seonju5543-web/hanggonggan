@@ -37,6 +37,8 @@ process.env.EXCERPTS_AS_LIB = '1';
 const AWAIT_EE = await import('../collector/extract-excerpts.mjs');
 import { mergeCandidates } from '../collector/candidates.mjs';
 import { publishBySchool, splitBySchool } from '../collector/publish-notices.mjs';
+/* ⚠️ 발행만 든 모듈이다 — `collector/majors.mjs` 는 **불러오는 순간 커리어넷을 두드린다.** */
+import { publishMajorsBySchool } from '../collector/publish-majors.mjs';
 import { pageCandidates, pageUrl, existingPageParam, samePage, shouldRetry } from '../collector/paginate.mjs';
 import { looseCandidate, sameNotice, findMissing, classifyMiss, coverageOf, looksLikeBoardChrome, looksLikeAttachmentName, dedupeNear } from '../collector/coverage-rules.mjs';
 import { createRequire } from 'node:module';
@@ -4830,6 +4832,80 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
   /* 분교 7곳은 전부 매핑돼 있어야 한다 — 빠지면 그 학교 학과가 본교로 합쳐진다 */
   eq('data.js 분교 7곳이 전부 BRANCH_MAP 에 있다',
     [...unis].filter((u) => /캠퍼스$/.test(u) && !targets.includes(u)), []);
+
+  const ME = createRequire(import.meta.url)('../match-engine.js');
+
+  /* ── 학교별 학과 파일 (2026-09-26 · 고문 보고서) ────────────────────────────
+     앱이 첫 화면에서 `data/majors.json` **407KB(gzip 65KB)** 를 통째로 받고 있었다 —
+     209개교가 든 파일인데 쓰는 곳은 온보딩 자동추천 한 곳이고, 학생에게 필요한 것은
+     자기 학교 목록(gzip 1.5KB)뿐이다. 이제 학교별 파일 하나만 받는다.
+     🔴 이 배선이 끊기면 **조용하다** — 파일이 없으면 전국 공통 목록으로 물러나므로
+        화면상 아무 일도 안 일어난 것처럼 보이고, 2026-08-02의 그 사고로 되돌아간다. */
+  const appSrc = readText(new URL('../app.js', import.meta.url));
+  eq('  앱이 첫 화면에서 407KB 파일을 받지 않는다',
+    /fetch\(\s*'data\/majors\.json'/.test(appSrc), false);
+  eq('  앱이 학교별 파일 이름 규칙을 쓴다 (match-engine 한 곳)',
+    /majorsFileFor\(/.test(appSrc), true);
+  eq('  이름 규칙을 앱이 베끼지 않았다 (data/majors/ 를 직접 짜맞추지 않는다)',
+    /['\"`]data\/majors\//.test(appSrc.replace(/\/\*[\s\S]*?\*\//g, '')), false);
+  /* 🔴 로봇이 학교별 파일을 **실제로 쓰는가** — 안 쓰면 앱은 새 학과를 영영 못 본다 */
+  const robotSrc = readText(new URL('../collector/majors.mjs', import.meta.url));
+  eq('  로봇이 학교별 파일을 발행한다', /publishMajorsBySchool\(/.test(robotSrc), true);
+  /* 🔴 워크플로가 그 폴더를 커밋하는가 (CLAUDE.md: 로봇이 고친 파일은 전부 git add 에) */
+  const wf = readText(new URL('../.github/workflows/refresh-majors.yml', import.meta.url));
+  eq('  워크플로가 data/majors 폴더도 커밋한다', /git add[^\n]*\bdata\/majors\b(?!\.json)/.test(wf), true);
+
+  /* 🔴 **로봇이 쓴 파일을 앱의 규칙으로 찾을 수 있는가** — 글자로 재지 않고 실제로 써 본다
+     (2026-08-27에 로봇과 앱의 학교 이름이 갈라져 학과 추천이 조용히 죽은 적이 있다). */
+  {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'majors-')) + path.sep;
+    const pub = publishMajorsBySchool({
+      '한국외국어대학교': ['영어통번역학과', '경영학부'],
+      '한국과학기술원': ['전산학부'],            // 커리어넷 이름 → 앱 이름(KAIST)으로 맞춰야 한다
+      '빈학교': [],                             // 학과가 없으면 파일을 만들지 않는다
+      '없는대학교': ['아무학과'],                // 앱이 고를 수 없는 학교 → 만들지 않는다
+    }, { dir: new URL('file://' + tmp), updatedAt: '2026-09-26' });
+    eq('  🔴 커리어넷 이름을 앱 이름으로 맞춰 저장한다 (한국과학기술원 → KAIST)',
+      fs.existsSync(path.join(tmp, ME.majorsFileFor('KAIST').split('/').pop())), true);
+    eq('  앱이 고를 수 없는 학교는 만들지 않는다', pub.skipped, ['없는대학교']);
+    for (const key of ['한국외국어대학교', 'KAIST']) {
+      const name = ME.majorsFileFor(key).split('/').pop();
+      const doc = JSON.parse(readText(new URL('file://' + tmp + name)));
+      eq('  앱이 찾아갈 이름으로 저장됐다 — ' + key, doc.school, key);
+    }
+    eq('  학과가 없는 학교는 파일을 만들지 않는다',
+      fs.existsSync(path.join(tmp, ME.majorsFileFor('빈학교').split('/').pop())), false);
+    const idx = JSON.parse(readText(new URL('file://' + tmp + 'index.json')));
+    eq('  색인이 저장한 학교만 적는다', idx.schools, 2);
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+
+  /* 🔴 **앱은 `'학교 캠퍼스'` 열쇠를 받지 않는다** — 수확 로봇이 그 꼴을 하나도 발행하지
+     않기 때문이다(실측 2026-09-26: 캠퍼스별로 학과가 다른 곳은 `BRANCH_MAP` 이 분교를
+     **별개 학교 이름**으로 바꿔 저장한다). 로봇이 그 꼴을 발행하기 시작하면 앱이 그 파일을
+     영영 안 받으므로 **여기서 막는다.** 색인의 열쇠가 전부 `UNIVERSITIES` 안의 학교 이름이어야 한다. */
+  {
+    /* ⚠️ 위 `unis` 는 **쓰지 않는다** — 그 파싱은 배열이 끝나기 전에 잘려(212/213) 실제로
+       이 검사를 **틀리게 빨간불로** 만들었다(2026-09-26). 여기서는 배열 끝(`\n];`)까지 읽는다.
+       ⚠️ 이 목록은 앱의 `loadMajorsFor` 가 **부르기 전에 거르는 기준**이다 — 여기 없는 이름으로
+          발행하면 그 학교 학생은 파일을 영영 못 받고 전국 공통 목록으로 조용히 물러난다. */
+    const uniAll = new Set([...dataSrc.slice(dataSrc.indexOf('const UNIVERSITIES = ['),
+      dataSrc.indexOf('\n];', dataSrc.indexOf('const UNIVERSITIES = ['))).matchAll(/'([^']+)'/g)].map((m) => m[1]));
+    eq('  UNIVERSITIES 를 끝까지 읽었다', uniAll.size >= 210, true, uniAll.size);
+    const idx = JSON.parse(readText(new URL('../data/majors/index.json', import.meta.url)));
+    eq('  🔴 발행된 열쇠가 전부 앱의 학교 이름이다 (아니면 그 학교 학생은 파일을 영영 못 받는다)',
+      Object.keys(idx.files).filter((k) => !uniAll.has(k)), []);
+    /* 🔴 커리어넷 이름 ≠ 앱 이름인 곳이 **실제로 있다** — 맞추는 장치가 살아 있는지 잰다
+       (`UNIV_ALIASES` 를 통과시킨다 · 관문이 처음 이걸 잡았다). */
+    eq('  커리어넷 이름을 앱 이름으로 맞추는 장치가 산다 (KAIST 등 7곳)',
+      ['KAIST', 'POSTECH', 'GIST', 'UNIST', 'DGIST', '부경대학교', '한국에너지공과대학교(KENTECH)']
+        .filter((n) => !idx.files[n]), []);
+  }
+
+  /* 발행된 실제 파일도 본다 — 앱이 지금 당장 찾아갈 수 있어야 한다(다음 로봇 실행까지
+     기다리면 그 사이 학과 추천이 전국 공통 목록으로 돌아간다). */
+  eq('  지금 저장소에 한국외대 학과 파일이 있다',
+    fs.existsSync(fileURLToPath(new URL('../' + ME.majorsFileFor('한국외국어대학교'), import.meta.url))), true);
 }
 
 

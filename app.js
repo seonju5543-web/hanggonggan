@@ -906,6 +906,12 @@ function majorSuggestions(q) {
   if (!n) return [];
   const school = $('#in-school').value.trim();
   const campus = getChip('#in-campus');
+  /* 🔴 **쓰는 자리에서 확실히 한 번 받는다** (2026-09-26). 아래 학교 입력 listener 가 미리
+     받아 두지만, 고치러 들어온 학생은 `initOnboarding` 이 값을 **프로그램으로** 넣어
+     `input` 이 안 뜬다 — 그 경우 여기서만 받는다. 같은 학교는 두 번 받지 않는다.
+     ⚠️ 받아오기는 비동기라 **이 호출의 결과가 지금 당장 오지는 않는다.** 그래서 학교 입력
+        쪽에서 미리 받는 것이 짝이다(안 그러면 첫 글자에 전국 공통 목록이 잠깐 보인다). */
+  loadMajorsFor(school);
   /* 그 학교에 실제로 있는 학과 목록을 확보한 곳은 **그 목록만** 쓴다.
      예전엔 전국 공통 목록을 뒤에 붙여서, 외대에서 '일'을 치면 학교에 없는
      '일어일문학과'가 같이 떴다(2026-08-02 개발자 지적 — 경희대 사례).
@@ -1132,6 +1138,11 @@ function initOnboarding() {
   }
 
   renderCampusChips(p ? p.campus : null);
+  /* 🔴 **고치러 들어온 학생도 자기 학교 학과 파일을 받아야 한다** (2026-09-26 코드 리뷰).
+     위에서 `#in-school` 값을 **코드로** 넣었으므로 `input` 이 뜨지 않고, 그래서 학교 입력
+     쪽 프리페치가 **한 번도 돌지 않았다** — 그 학생이 학과를 고치려고 '일'을 치면 전국
+     공통 목록이 뜨고 `일어일문학과` 를 눌러 버릴 수 있다(2026-08-02 그 사고 그대로다). */
+  if (p && p.school) loadMajorsFor(p.school);
   syncConsentRow();
 
   onboardStep = p ? 1 : 0;
@@ -2295,17 +2306,55 @@ function formTplIdFor(sch) {
 /* 학교별 학과 목록 (2026-08-06 — 커리어넷 오픈API에서 수확, collector/majors.mjs가 발행).
    MAJORS_BY_SCHOOL에 합쳐서 학과 자동추천이 '그 학교에 실제로 있는 학과'만 보여 주게 한다
    (경희대에서 '일'을 치면 없는 일어일문학과가 뜨던 문제 — 2026-08-02 개발자 지적).
-   손으로 검수해 둔 목록(외대)이 이미 있으면 그쪽을 지키고 덮어쓰지 않는다. */
-function loadMajors() {
-  fetch('data/majors.json', { cache: 'no-store' })
-    .then((r) => (r.ok ? r.json() : null))
-    .then((d) => {
-      if (!d || !d.bySchool) return;
-      for (const [school, majors] of Object.entries(d.bySchool)) {
-        if (!MAJORS_BY_SCHOOL[school]) MAJORS_BY_SCHOOL[school] = majors;
-      }
-    })
-    .catch(() => { /* 오프라인 등 — 전국 공통 목록으로 동작 */ });
+   손으로 검수해 둔 목록(외대)이 이미 있으면 그쪽을 지키고 덮어쓰지 않는다.
+
+   🔴 **자기 학교 파일 하나만 받는다** (2026-09-26 · 고문 보고서). 그전에는 209개교가 든
+      `data/majors.json` 을 **첫 화면에서 통째로** 받았다 — 실측 407KB(gzip 65KB)로 앱이
+      받는 것 중 가장 큰 파일이었는데, 쓰는 곳은 온보딩 학과 자동추천 한 곳뿐이다.
+      학교별 파일은 gzip 1.5KB다(한국외대 실측).
+   ⚠️ 그래서 **앱을 열 때 받지 않는다** — 학교가 정해질 때(또는 학과를 칠 때) 받는다.
+      못 받으면 전국 공통 목록(`MAJORS_COMMON`)으로 물러난다 — 원래 있던 폴백이다.
+   ⚠️ 열쇠는 `'학교'` 또는 `'학교 캠퍼스'` 다(캠퍼스마다 학과가 다른 학교가 있다).
+      이름 규칙은 `match-engine.js majorsFileFor` 한 곳 — 로봇과 같은 함수다. */
+const majorsAsked = new Set();     // 같은 학교를 두 번 받지 않는다
+function loadMajorsFor(school) {
+  if (!school || typeof majorsFileFor !== 'function') return;
+  /* 🔴 **실제 학교 이름일 때만 부른다** (2026-09-26 코드 리뷰). 학교 칸은 `input` 마다
+     돌아서, '한국외국어대학교' 를 치는 동안 '한'·'한국'… 아홉 번 404 를 부르고 그 쓰레기
+     열쇠가 `majorsAsked` 에 쌓였다. `UNIVERSITIES` 에 있는 이름만 받는다(아래 캠퍼스 칩을
+     그리는 `renderCampusChips` 도 정확한 이름으로만 맞춰 보므로 폭이 같다). */
+  if (typeof UNIVERSITIES !== 'undefined' && !UNIVERSITIES.includes(school)) return;
+  /* 🔴 **`'학교 캠퍼스'` 열쇠는 받지 않는다** (2026-09-26 실측). `majorSuggestions` 가 그
+     열쇠를 먼저 보긴 하지만, 수확 로봇은 그 꼴을 **하나도 발행하지 않는다** — 캠퍼스별로
+     학과가 다른 곳은 `BRANCH_MAP` 이 **분교를 별개 학교 이름**으로 바꿔 저장한다
+     (`건국대학교 글로컬캠퍼스` 처럼 `UNIVERSITIES` 에 따로 있다). 그래서 캠퍼스 열쇠로
+     부르면 **언제나 404** 다. 그 열쇠는 `data.js` 에 손으로 넣은 목록만을 위한 자리이고,
+     그건 이미 기억에 있어 받아올 것이 없다.
+     ⚠️ 로봇이 그 꼴을 발행하기 시작하면 여기도 같이 고칠 것 — 관문이 색인을 보고 잰다. */
+  for (const key of [school]) {
+    if (majorsAsked.has(key)) continue;
+    majorsAsked.add(key);
+    fetch(majorsFileFor(key), { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (!d || !Array.isArray(d.majors) || !d.majors.length) return;
+        /* 손으로 검수해 둔 목록이 있으면 지킨다 — 옛 loadMajors 와 같은 규칙이다. */
+        if (!MAJORS_BY_SCHOOL[key]) MAJORS_BY_SCHOOL[key] = d.majors;
+        /* 🔴 **도착했으면 추천을 다시 그린다** (코드 리뷰에서 잡았다). 받아오기는 비동기라
+           학생이 이미 학과를 치고 있으면 화면에는 **전국 공통 목록이 그대로 떠 있다** —
+           경희대 학생이 '일'을 치고 `일어일문학과` 를 눌러 버릴 수 있다(2026-08-02 그 사고).
+           ⚠️ 목록을 여기서 직접 만들지 말 것 — `attachAutocomplete` 가 `input` 으로 그린다. */
+        const el = $('#in-major');
+        if (el && el.value.trim() && document.activeElement === el) {
+          el.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      })
+      .catch(() => {
+        /* 🔴 실패는 **다시 시도할 수 있게** 지운다 (코드 리뷰). 남겨 두면 지하철에서 한 번
+           끊긴 학생이 그 세션 내내 전국 공통 목록으로 남는다. */
+        majorsAsked.delete(key);
+      });
+  }
 }
 
 /* 학교별 등록금 (2026-08-27) — `수업료 100%` 같은 비율형 공고를 원으로 바꾸는 데 쓴다.
@@ -6052,7 +6101,11 @@ function bindEvents() {
   attachAutocomplete($('#in-school'), schoolSuggestions);
   attachAutocomplete($('#in-major'), majorSuggestions);
   ['change', 'input'].forEach((ev) =>
-    $('#in-school').addEventListener(ev, () => renderCampusChips(null))
+    $('#in-school').addEventListener(ev, () => {
+      renderCampusChips(null);
+      /* 학과 칸에 닿기 전에 미리 받아 둔다 — 첫 글자에 전국 공통 목록이 보이지 않게 */
+      loadMajorsFor($('#in-school').value.trim());
+    })
   );
 }
 
@@ -6493,7 +6546,9 @@ initOnboarding();
 loadNotices();
 loadRegistered();
 loadKosaf();
-loadMajors();   // 학교별 학과 목록 — 온보딩 학과 자동추천이 그 학교 것만 보게
+/* 🔴 학과 목록은 **여기서 받지 않는다** (2026-09-26) — 209개교가 든 407KB 파일이었고
+   쓰는 곳은 온보딩 자동추천 한 곳뿐이다. 학교가 정해질 때 그 학교 파일만 받는다
+   (`loadMajorsFor` · 위 주석). */
 loadTuition();  // 학교별 등록금 — `수업료 100%` 비율형 공고를 원으로 바꾸는 데 쓴다
 if (typeof loadFormTemplates === 'function') loadFormTemplates(); // 정식 등록 양식 최신화
 /* 🔴 두 손가락으로 화면이 커졌다 작아졌다 하던 것 (2026-09-01 개발자 지적).

@@ -17,10 +17,14 @@
 
    키: 환경변수 CAREERNET_API_KEY (GitHub Secret과 같은 이름 — 코드에 넣지 않는다).
    실행: CAREERNET_API_KEY=... node collector/majors.mjs
-   출력: data/majors.json — { updatedAt, source, bySchool: { '학교명': [학과…] } }
-   앱(app.js)은 이 파일을 읽어 MAJORS_BY_SCHOOL에 합친다.
+   출력: ① data/majors.json — { updatedAt, source, bySchool: { '학교명': [학과…] } } (사람·도구용)
+         ② data/majors/<열쇠>.json — **앱이 받는 것은 이쪽뿐이다** (학교 하나당 파일 하나)
+   🔴 앱은 ①을 받지 않는다 (2026-09-26 · 고문 보고서) — 209개교 407KB 를 첫 화면에서
+      통째로 받고 있었는데, 학생에게 필요한 것은 자기 학교 목록(gzip 1.5KB)뿐이다.
+      발행은 `collector/publish-majors.mjs` · 이름 규칙은 `match-engine.js majorsFileFor`.
    ============================================================ */
 import fs from 'node:fs';
+import { publishMajorsBySchool } from './publish-majors.mjs';
 
 const KEY = process.env.CAREERNET_API_KEY;
 if (!KEY) { console.error('CAREERNET_API_KEY가 없습니다 — 아무것도 하지 않고 종료합니다.'); process.exit(0); }
@@ -116,5 +120,9 @@ const out = {
   ),
 };
 fs.writeFileSync(OUT_PATH, JSON.stringify(out, null, 1) + '\n');
+/* 🔴 **앱이 받는 것은 이쪽이다** — 이 줄을 빼면 앱은 새 학과를 영영 못 본다(그리고 조용하다:
+   파일이 없으면 전국 공통 목록으로 물러나므로 화면상 아무 일도 안 일어난 것처럼 보인다). */
+const pub = publishMajorsBySchool(out.bySchool, { updatedAt: out.updatedAt });
 const majors = Object.values(out.bySchool).reduce((a, v) => a + v.length, 0);
-console.log(`저장 완료: 학교 ${bySchool.size}곳 · 학과 항목 ${majors}건 · 상세 실패 ${failed}건 → data/majors.json`);
+console.log(`저장 완료: 학교 ${bySchool.size}곳 · 학과 항목 ${majors}건 · 상세 실패 ${failed}건`);
+console.log(`  → data/majors.json (사람용) · data/majors/ 학교별 ${pub.schools}개 파일 (앱이 받는 것)`);

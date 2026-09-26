@@ -254,7 +254,15 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   이 줄이 반대로 적혀 있어 고문 보고서가 "10개교면 병목"이라 오해했다(2026-09-26 정정). 옛 파일은 로봇 장부 + 물러나는 길로만 남았고,
   그 길도 색인(`data/notices/index.json`)으로 **알 때는 안 받는다**(`noticeFallbackNeeded` 한 곳 — 화면·알림 공용).
   프로필이 없으면 아무것도 안 받고, 학교가 정해지거나 바뀌면 다시 받는다(`loadNoticesIfSchoolChanged`). 관문 「학교별 공고 파일」.
-- 폰이 받는 양은 이제 `notices` 가 아니라 **`majors.json`(407KB)·`kosaf-open.json`·`registered.json`** 이 지배한다 — 줄일 곳은 거기다(아직 안 했다).
+- **학과 목록도 학교별 파일뿐이다**(2026-09-26 · `majorsFileFor` — 공고와 **같은 이름 규칙을 불러 쓴다**).
+  `data/majors.json`(209개교 407KB)은 사람·도구용이고 앱은 안 받는다 · 발행 `collector/publish-majors.mjs`
+  (majors.mjs 는 **불러오는 순간 API 를 두드려서** 발행만 떼어 놨다) · 앱은 첫 화면에서 안 받고 학교가 정해질 때 받는다.
+  🔴 끊기면 **조용하다** — 전국 공통 목록으로 물러나 2026-08-02 사고("경희대에 '일'→일어일문학과")로 돌아간다.
+  🔴 발행 열쇠는 **`UNIVERSITIES` 의 이름**이어야 한다 — 커리어넷 이름은 다르다(`한국과학기술원`↔`KAIST` 등 7곳).
+  이어 주는 표를 새로 만들지 말고 `UNIV_ALIASES` 를 통과시킨다 · `'학교 캠퍼스'` 꼴은 로봇이 발행하지 않는다(부르면 404).
+  관문 「분교 이름이 로봇과 앱에서 같은가」 · `verify-onboard-gaps.js`(경희대로 내용을 잰다 — 외대는 손검수 목록이 있어 헛돈다).
+- 남은 큰 것은 `kosaf-open.json`·`registered.json` 이다 — **둘 다 못 줄였다**: 층2의 `fields`(78%)는 카드를 만드는 값이고,
+  정식 등록은 전국분(절반)을 모두가 받아야 한다. 학교별로 나누면 **자라는 것만** 막힌다(오늘 이득은 작다).
 - 브라우저 수집 게시판 연결이 안 되면 리포트의 진단(프레임·클릭·본 글자)부터 본다. 짐작 말고 스킬 `probe-run`.
 
 ### 알림 · 업데이트 · 보안
@@ -281,6 +289,9 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 
 ### 훅 · 검사 운영
 
+- 🔴 **배포 감시는 `git add data/…` 하는 워크플로 전부를 본다**(`check-deploy-sync.js`) — 파일 이름을 하나씩 적었더니
+  2026-09-26까지 넷(`kosaf-fetch`·`essay-playbook`·`refresh-tuition`·`refresh-majors`)을 **초록불인 채로** 놓쳤다.
+  새 로봇이 앱 데이터를 쓰면 `deploy-sync.yml` 의 `workflows:` 목록에도 이름을 넣는다(안 넣으면 최대 12시간 안 나간다).
 - 검사는 '돌리라고 적어 두면' 안 돈다 — 워크플로·훅에 걸어야 돈다. 새 사고는 **먼저 관문을 만들고** 여기엔 그 위치만 적는다.
 - 훅은 스킬 호출을 장부(`.claude/hooks/skill-ledger.sh`)에 적는다. Stop 훅이 **막는 것은 디버깅 빚뿐**(verify 빨간불 뒤 `systematic-debugging` 미호출), 리뷰는 알림.
   빚 관문·노션 표식은 조기 종료보다 **위**에 둔다. 리뷰 스킬이 서브에이전트를 못 쓰면 diff 를 직접 보되 항목을 하나씩 짚는다.

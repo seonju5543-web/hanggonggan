@@ -36,7 +36,10 @@ jobs:
         run: |
           git config user.name "handaejang-bot"
           git config user.email "bot@handaejang.local"
-          git add data/majors.json
+          # 🔴 학교별 파일까지 넣는다 — 앱이 받는 것은 그쪽뿐이다(2026-09-26).
+          #    빠뜨리면 앱은 새 학과를 영영 못 보고, 파일이 없으면 전국 공통 목록으로
+          #    조용히 물러나므로 화면상 아무 일도 안 일어난 것처럼 보인다.
+          git add data/majors.json data/majors
           git diff --cached --quiet && { echo "변경 없음"; exit 0; }
           git commit -m "majors: 학교별 학과 목록 갱신 (커리어넷 API)"
           for i in 1 2 3; do

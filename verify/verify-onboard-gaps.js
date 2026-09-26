@@ -34,12 +34,18 @@ const eq = (label, got, want) => {
      **온보딩을 마쳐도 공고를 다시 받지 않아 화면이 비는** 반대쪽 사고가 난다.
      둘 다 재려면 '받은 주소 목록'이 필요하다. */
   const asked = [];
-  page.on('request', (r) => { const u = r.url(); if (/\/data\//.test(u)) asked.push(u.replace(/^https?:\/\/[^/]+\//, '')); });
+  const got200 = [];
+  const strip = (u) => u.replace(/^https?:\/\/[^/]+\//, '');
+  page.on('request', (r) => { const u = r.url(); if (/\/data\//.test(u)) asked.push(strip(u)); });
+  /* 🔴 **부른 것과 받은 것을 따로 센다** (코드 리뷰에서 잡았다). 부른 것만 세면 **404 로
+     끝난 요청도 '받았다'로 통과한다** — 실제로 그랬다(학교 이름을 치는 동안 나가는 404). */
+  page.on('response', (r) => { const u = r.url(); if (/\/data\//.test(u) && r.status() === 200) got200.push(strip(u)); });
 
   await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
   await page.click('.onboard-step[data-step="0"] [data-next]');
   await page.fill('#in-school', '한국외국어'); await page.waitForTimeout(250);
   await page.click('.ac-list:not([hidden]) .ac-item');
+
   await page.click('#in-track .chip[data-value="humanities"]');
   await page.fill('#in-major', '영어학과'); await page.fill('#in-name', '김한장');
   await page.click('#in-year .chip[data-value="3"]');
@@ -119,12 +125,21 @@ const eq = (label, got, want) => {
       asked.filter((u) => u === 'data/notices.json'), []);
     /* 🔴 그 대신 **온보딩을 마친 뒤** 그 학교 파일을 받았어야 한다 — 이 짝이 없으면
        첫 실행 학생의 실시간 공고가 앱을 다시 열 때까지 비어 보인다. */
-    const shards = asked.filter((u) => /^data\/notices\//.test(u) && !/index\.json$/.test(u));
     /* ⚠️ `eq` 는 인자가 셋이다 — 넷째를 주면 **조용히 버려져** 빨간불일 때 아무것도 안 보인다
        (코드 리뷰에서 잡았다). 그래서 받은 값을 **got 쪽에** 담는다. */
-    eq('🔴 온보딩을 마친 뒤 그 학교 공고 파일을 받았다', shards.length > 0 ? true : asked, true);
+    eq('🔴 온보딩을 마친 뒤 그 학교 공고 파일을 받아냈다',
+      got200.some((u) => /^data\/notices\//.test(u) && !/index\.json$/.test(u)) ? true : { asked, got200 }, true);
     eq('색인도 나란히 받았다 (옛 파일을 받을지 판단하는 데 쓴다)',
       asked.some((u) => u === 'data/notices/index.json'), true);
+    /* 🔴 학과 목록도 같은 이야기다 — 209개교가 든 407KB 파일(gzip 65KB)을 첫 화면에서
+       받고 있었다. 이제 학교가 정해질 때 그 학교 파일 하나(gzip 1.5KB)만 받는다. */
+    eq('🔴 209개교가 든 학과 파일(407KB)을 받지 않았다',
+      asked.filter((u) => u === 'data/majors.json'), []);
+    eq('🔴 그 대신 그 학교 학과 파일을 **받아냈다** (404 로 끝난 요청은 안 센다)',
+      got200.some((u) => /^data\/majors\//.test(u)) ? true : { asked, got200 }, true);
+    /* 🔴 학교 이름을 치는 동안 404 를 남발하지 않는가 — 실제 학교 이름일 때만 부른다 */
+    const majors404 = asked.filter((u) => /^data\/majors\//.test(u) && !got200.includes(u));
+    eq('  없는 학교 이름으로 두드리지 않는다 (치는 중간 이름으로 404 를 내지 않는다)', majors404, []);
     /* 그리고 화면에 실제로 공고가 보여야 한다 — 받아 온 것을 쓰고 있는가 */
     await page.waitForTimeout(600);
     const cards = await page.evaluate(() => ({
@@ -144,6 +159,38 @@ const eq = (label, got, want) => {
   eq('고치러 들어오면 1단계부터', await stepNow(), 1);
   eq('그 자리에는 취소가 있다', await page.isVisible('.onboard-step[data-step="1"] .btn-onboard-cancel'), true);
   eq('그리고 뒤로가기는 없다 (인사말로 돌아갈 일이 아니다)', await page.isVisible('#btn-onboard-back'), false);
+
+  /* ── 🔴 학과 자동추천이 **그 학교 파일**을 쓰는가 (2026-09-26 · 고문 보고서) ──
+     배선이 끊기면 **조용하다** — 파일이 없으면 전국 공통 목록으로 물러나므로 화면상
+     아무 일도 안 일어난 것처럼 보이고, 2026-08-02 개발자 지적 그 사고로 되돌아간다:
+       "경희대 국제캠을 고르고 '일'을 치면 일어일문학과가 뜨는데 경희대엔 일본어학과만 있다."
+     🔴 그래서 **경희대**로 잰다 — 한국외대는 `data.js` 에 손으로 검수해 둔 목록이 있어
+        파일을 안 받아도 통과해 버린다(실측으로 확인했다). 경희대는 손검수 목록이 없다.
+     ⚠️ 학과 이름을 박지 않는다 — 발행된 파일과 전국 공통 목록에서 **뽑아** 대조한다. */
+  console.log('\n[학과 목록] 그 학교 파일을 받아 쓰는가 (경희대 — 2026-08-02 그 사례)');
+  {
+    await page.fill('#in-school', '경희대학교');
+    await page.waitForTimeout(200);
+    await page.click('.ac-list:not([hidden]) .ac-item');
+    await page.waitForTimeout(800);            // 학교별 파일이 도착할 시간
+    await page.fill('#in-major', '일');
+    await page.waitForTimeout(300);
+    const got = await page.evaluate(() =>
+      [...document.querySelectorAll('.ac-wrap .ac-list:not([hidden]) .ac-item')].map((e) => e.textContent.trim()));
+    const pools = await page.evaluate(async () => {
+      const r = await fetch(majorsFileFor('경희대학교'));
+      return { file: r.ok ? (await r.json()).majors : null, common: MAJORS_COMMON };
+    });
+    eq('발행된 경희대 파일을 앱이 실제로 열 수 있다',
+      Array.isArray(pools.file) && pools.file.length > 0, true);
+    eq('🔴 추천이 전부 그 학교 파일에 있는 학과다', got.filter((m) => !pools.file.includes(m)), []);
+    /* 전국 공통 목록에만 있는 것이 섞이면 = 파일을 못 받아 폴백으로 돈 것이다 */
+    const onlyCommon = pools.common.filter((m) => m.includes('일') && !pools.file.includes(m));
+    eq('  (검사가 헛돌지 않는다 — 폴백에만 있는 학과가 실제로 존재한다)', onlyCommon.length > 0, true);
+    eq('🔴 폴백(전국 공통)에만 있는 학과가 섞이지 않았다',
+      got.filter((m) => onlyCommon.includes(m)), []);
+    eq('추천이 비어 있지 않다', got.length > 0 ? true : got, true);
+  }
 
   console.log('\nERRORS:', errors.length ? errors : 'none');
   if (errors.length) fail++;
