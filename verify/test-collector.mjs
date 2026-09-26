@@ -1388,7 +1388,7 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
   eq('showScreen 의 화면 목록에 있다', /\['onboarding', 'home', 'explore', 'activities', 'applications'/.test(app), true);
   eq('showScreen 이 그린다', /if \(name === 'activities'\) renderActivities\(\);/.test(app), true);
   eq('늦게 온 데이터로 다시 그린다 (rerenderVisible)', /if \(!\$\('#screen-activities'\)\.hidden\) renderActivities\(\);/.test(app), true);
-  eq('당겨서 새로고침이 같이 받는다 (refreshAllData)', /loadKosaf\(\), loadActivities\(\)\]/.test(app), true);
+  eq('당겨서 새로고침이 같이 받는다 (refreshAllData)', /const jobs = \[loadNotices\(\), [^\n]*loadActivities\(\)/.test(app), true);
   eq('첫 실행에 받는다', /^loadActivities\(\);$/m.test(app), true);
   eq('못 받아 왔어도 빈 문서로 내려앉는다 (뼈대가 굳지 않게)', /liveActivities = d \|\| liveActivities \|\| \{ items: \[\], updatedAt: null \}/.test(app), true);
   eq('학교 범위는 엔진의 activityForProfile 한 곳', /activityForProfile\(n, p\)/.test(app) && !/function activityForProfile/.test(app), true);
@@ -1404,6 +1404,59 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
   eq('알림 딥링크가 이 탭을 안다 (notify)', /\['home', 'explore', 'activities', 'applications', 'my'\]\.includes\(screen\)/.test(readText(new URL('../notify.js', import.meta.url))), true);
   const ui = strip(readText(new URL('../.github/workflows/verify-ui.yml', import.meta.url)));
   eq('브라우저 드라이버가 관문에 걸려 있다', /verify-activities\.js/.test(ui), true);
+}
+
+console.log('\n■ 재단·지자체 게시판 (2026-09-26 · 노션 F-13 · 교외 확대)');
+{
+  /* 왜 있나 — 링커리어처럼 주최에서 직접 받는 길을 만들었다: 한국장학재단 공개 데이터의 재단 홈페이지 63곳에서
+     찾기 로봇이 장학 게시판을 찾고, 수집기가 그 글을 data/external.json 에 싣는다(docs/designs/external-sources.md).
+     되돌아가면 안 되는 것: ① 찾기 판정이 느슨해져 옆 메뉴·SNS·파일이 게시판으로 잡히는 것 ② 재단 글이 학교 피드에 섞이는 것
+     ③ 로봇 파일이 저장 목록에서 빠지는 것 ④ 화면 배선 한 곳이 빠져 구역이 영영 안 뜨는 것. */
+  const fb = await import('../collector/find-boards.mjs');
+  const L = (t, u) => ({ title: t, url: u });
+  const board = [L('2026년 2학기 장학생 모집 공고', 'https://f.or.kr/b/1'), L('2026 하반기 장학생 선발 안내', 'https://f.or.kr/b/2'), L('제12기 장학생 신청 접수', 'https://f.or.kr/b/3'), L('장학금 안내', 'https://f.or.kr/m')];
+  eq('찾기 — 공고 3건이면 게시판', fb.scoreBoardPage(board).signals >= 3, true);
+  eq('  옆 메뉴(장학금 안내)는 공고로 세지 않는다', fb.scoreBoardPage([L('장학금 안내', 'u'), L('장학 제도', 'u2')]).signals, 0);
+  eq('  연도·날짜·모집 표시가 없는 장학 낱말은 공고가 아니다', fb.isNoticeLike(L('우리 재단의 장학 철학', 'u')), false);
+  eq('  첨부 파일 링크는 공고가 아니다', fb.isNoticeLike(L('2026년 장학생 모집 공고.hwp', 'https://f.or.kr/a.hwp')), false);
+  eq('  봉사단 모집은 장학 공고가 아니다 (활동 쪽이 맡는다)', fb.isNoticeLike(L('2026년 봉사단 모집', 'u')), false);
+  const menu = [L('공지사항', 'https://www.f.or.kr/notice'), L('장학사업 안내', 'https://f.or.kr/scholar'), L('오시는 길', 'https://f.or.kr/map'), L('페이스북 소식', 'https://facebook.com/f'), L('뉴스', 'https://other.com/news'), L('소식', 'https://sub.f.or.kr/news'), L('공고문.pdf', 'https://f.or.kr/n.pdf'), L('회원 로그인 안내', 'https://f.or.kr/login')];
+  const picked = fb.pickMenuLinks(menu, 'http://www.f.or.kr/').map((x) => x.url);
+  eq('메뉴 고르기 — 같은 호스트(하위 포함)의 공지·장학·소식만', picked, ['https://f.or.kr/scholar', 'https://www.f.or.kr/notice', 'https://sub.f.or.kr/news']);
+  eq('  장학 메뉴가 맨 앞', picked[0], 'https://f.or.kr/scholar');
+  eq('  최대 개수를 지킨다', fb.pickMenuLinks(menu.concat([L('공지 2', 'https://f.or.kr/n2'), L('공지 3', 'https://f.or.kr/n3'), L('공지 4', 'https://f.or.kr/n4'), L('공지 5', 'https://f.or.kr/n5')]), 'http://f.or.kr/', 4).length, 4);
+  eq('  홈 주소가 깨져 있으면 빈 목록 (검사가 죽지 않는다)', fb.pickMenuLinks(menu, 'not a url'), []);
+  /* 출처 파일 */
+  const src = JSON.parse(readText(new URL('../collector/external-sources.json', import.meta.url)));
+  eq('출처는 kosaf-open 에서 온 것 — 주소를 지어내지 않았다', (src.sources || []).length > 50 && src.sources.every((x) => x.seed === 'kosaf-open' && x.host && /^https?:\/\//.test(x.home) && 'boardUrl' in x), true);
+  eq('  자동으로 찾은 게시판에는 증거가 붙어 있다', src.sources.filter((x) => x.boardUrl && x.autoFound).every((x) => x.autoFound.signals >= 3 && Array.isArray(x.autoFound.sample)), true);
+  eq('  보관 칸과 되돌리는 법', Array.isArray(src.parked) && /되돌리려면/.test(src._parked || ''), true);
+  const extData = JSON.parse(readText(new URL('../data/external.json', import.meta.url)));
+  eq('발행 파일 모양 — 학교 없는 글만, 주최(host)는 반드시', 'updatedAt' in extData && Array.isArray(extData.items) && extData.items.every((n) => !n.school && n.host && n.url), true);
+  /* 로봇 배선 */
+  const cm = readText(new URL('../collector/collect.mjs', import.meta.url));
+  eq('수집기가 찾은 게시판만 읽는다 (boardUrl 있는 것 · role external)', /filter\(\(s\) => s\.boardUrl\)\.map\(\(s\) => \(\{ \.\.\.s, role: 'external' \}\)\)/.test(cm), true);
+  eq('재단 글은 학교 피드에 담지 않는다 (continue)', /if \(isExt\) \{[\s\S]*?freshExt\.push\(it\);[\s\S]*?continue;/.test(cm), true);
+  eq('제 파일·제 장부에 쓴다', /fs\.writeFileSync\(extPath/.test(cm) && /fs\.writeFileSync\(seenExtPath/.test(cm), true);
+  eq('발행 규칙 — 60일·중복·주최 없는 글 제외·상한', /ext\.items = ext\.items\.filter\(\(n\) => \(n\.foundAt \|\| '9999'\) >= cutoff\)/.test(cm) && /ext\.items = dedupeNotices\(ext\.items\)/.test(cm) && /filter\(\(n\) => !n\.school && n\.host\)/.test(cm) && /ext\.items\.slice\(0, EXT_CAP\)/.test(cm), true);
+  eq('링크 읽는 눈은 board-links.mjs 한 곳 (수집기·찾기 로봇이 같은 것)', /from '\.\/board-links\.mjs'/.test(cm) && /from '\.\/board-links\.mjs'/.test(readText(new URL('../collector/find-boards.mjs', import.meta.url))) && !/^function extractLinks/m.test(cm), true);
+  const strip = (t) => t.split('\n').filter((l) => !/^\s*#/.test(l)).join('\n');
+  const wf = strip(readText(new URL('../.github/workflows/collect-scholarships.yml', import.meta.url)));
+  eq('워크플로 — 찾기가 수집 앞에, 보강 규칙(상한 + continue-on-error)으로', wf.indexOf('node collector/find-boards.mjs') > 0 && wf.indexOf('node collector/find-boards.mjs') < wf.indexOf('node collector/collect.mjs') && /timeout-minutes: 4\s*\n\s*continue-on-error: true\s*\n\s*env:\s*\n\s*FIND_BOARDS_MAX/.test(wf), true);
+  eq('워크플로 — 파일 넷을 저장한다', ['collector/external-sources.json', 'collector/find-boards-report.md', 'data/external.json', 'collector/seen-external.json'].every((f) => new RegExp(`git add ${f.replace(/[./]/g, '\\$&')}`).test(wf)), true);
+  const ga = readText(new URL('../.gitattributes', import.meta.url));
+  eq('병합 규칙 — 발행·장부는 합집합, 리포트는 내 것', /data\/external\.json\s+merge=jsonunion/.test(ga) && /collector\/seen-external\.json\s+merge=jsonunion/.test(ga) && /collector\/find-boards-report\.md\s+merge=ours/.test(ga), true);
+  /* 화면 */
+  const html = readText(new URL('../index.html', import.meta.url));
+  const app = readText(new URL('../app.js', import.meta.url));
+  const homeSlice = html.slice(html.indexOf('id="screen-home"'), html.indexOf('id="screen-explore"'));
+  eq('홈에 구역이 있다 — 학교 게시판 구역 바로 아래', homeSlice.indexOf('id="live-notices"') > 0 && homeSlice.indexOf('id="live-notices"') < homeSlice.indexOf('id="external-notices"'), true);
+  eq('renderHome 이 그린다', /\$\('#external-notices'\)\.innerHTML = externalNoticesHtml\(\);/.test(app), true);
+  eq('당겨서 새로고침·첫 실행이 받는다', /loadActivities\(\), loadExternal\(\)\]/.test(app) && /^loadExternal\(\);$/m.test(app), true);
+  eq('못 받아 왔어도 빈 문서', /liveExternal = d \|\| liveExternal \|\| \{ items: \[\], updatedAt: null \}/.test(app), true);
+  eq('카드는 한 벌 · 주최를 윗줄에', /noticeCardHtml\(n, \{ org: `\$\{n\.host\} 공고` \}\)/.test(app) && !/function externalCardHtml/.test(app), true);
+  eq('등록된 주소는 뺀다 — 학교 구역과 같은 잣대(registeredUrlMatcher)', (app.match(/registeredUrlMatcher\(\)/g) || []).length >= 2, true);
+  eq('글이 없으면 구역이 비어 있다 (빈 문구를 둘 만들지 않는다)', /if \(!mine\.length\) return '';/.test(app.slice(app.indexOf('function externalNoticesHtml'))), true);
 }
 
 console.log('\n■ 「또는」 줄의 처지 판정 (2026-09-18 개발자 결정)');
@@ -5167,6 +5220,7 @@ console.log('\n■ 만들어 놓고 안 돌리는 로봇이 없는가 (2026-09-1
   const MUST_RUN = [
     ['collector/extract-amounts.mjs', '금액·이중수혜를 원문에서 읽어 registered.json 에 넣는다'],
     ['collector/extract-excerpts.mjs', '원문 발췌·마감일을 registered.json 에 넣는다'],
+    ['collector/find-boards.mjs', '재단·지자체 장학 게시판을 찾아 external-sources.json 에 적는다 (교외 확대 · 2026-09-26)'],
   ];
   /* 🔴 **주석을 걷고 본다** — 안 걷으면 "이 로봇이 안 걸려 있었다" 고 적어 둔 **설명 주석**의
      글자를 읽고 통과한다. 만들면서 실제로 그랬다: 단계를 통째로 지웠는데도 초록불이었다.

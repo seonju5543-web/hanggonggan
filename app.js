@@ -1629,6 +1629,8 @@ function renderHome() {
         (`boardNoticesInSchool` · 같은 날 개발자 지적). 여기서는 전부 그대로 나온다.
      ⚠️ 검색은 안 건다 — 홈에는 검색창이 없다(탐색에 있던 시절의 이유가 사라졌다). */
   $('#live-notices').innerHTML = liveNoticesHtml();
+  /* 재단·지자체 새 공고 (2026-09-26 · 교외 확대) — 학교 게시판 구역 아래, 글이 있을 때만 */
+  $('#external-notices').innerHTML = externalNoticesHtml();
 
   renderHomeUpdated();
 }
@@ -2329,7 +2331,7 @@ function loadKosaf() {
    (2026-09-09). 갈라 두면 한쪽에만 새 로더를 붙이는 일이 반드시 생긴다
    (rerenderVisible 주석이 말하는 것과 같은 유형의 사고다). */
 function refreshAllData() {
-  const jobs = [loadNotices(), loadRegistered(), loadKosaf(), loadActivities()];
+  const jobs = [loadNotices(), loadRegistered(), loadKosaf(), loadActivities(), loadExternal()];
   if (typeof loadFormTemplates === 'function') jobs.push(loadFormTemplates());
   /* 🔴 `swReg` 는 이 파일 한참 아래(서비스워커 등록 자리)에서 `let` 으로 선언된다.
      그 줄이 아직 실행되기 전에 여기를 부르면 `typeof` 로 물어봐도 예외가 난다(TDZ).
@@ -2482,15 +2484,21 @@ function liveNoticesHead(updatedAt) {
 /* 게시판 글 중 **내 학교 것 · 아직 등록 안 한 것**만 고른다 (2026-09-18 분리).
    🔴 이 목록을 두 곳이 본다 — 홈의 '우리 학교 게시판 공고' 와 '교내' 칸의 꼬리
    (`renderExplore`). 베끼면 한쪽에만 뜨는 공고가 생긴다. */
+/* '이 주소는 이미 정식 등록됐나' — 학교 게시판 구역과 재단·지자체 구역이 **같은 잣대**를 쓴다 (2026-09-26 분리).
+   URL 뒤에 목록 파라미터가 붙는 경우가 있어 전방일치로 비교한다. */
+function registeredUrlMatcher() {
+  const regUrls = registeredList.map((s) => s.sourceUrl)
+    .concat(NATIONAL_SCHOLARSHIPS.filter((s) => s.sourceKind === 'official' && s.sourceUrl).map((s) => s.sourceUrl))
+    .filter(Boolean);
+  return (url) => regUrls.some((u) => url.startsWith(u) || u.startsWith(url));
+}
+
 function boardNoticesForMe() {
   const p = state.profile;
   if (!p || !liveNotices) return [];
   // 정식 등록된 공고(registered.json + data.js 실공고)는 카드로 노출되므로 피드에서 제외
   // URL 뒤에 목록 파라미터가 붙는 경우가 있어 전방일치로 비교한다
-  const regUrls = registeredList.map((s) => s.sourceUrl)
-    .concat(NATIONAL_SCHOLARSHIPS.filter((s) => s.sourceKind === 'official' && s.sourceUrl).map((s) => s.sourceUrl))
-    .filter(Boolean);
-  const isRegistered = (url) => regUrls.some((u) => url.startsWith(u) || u.startsWith(url));
+  const isRegistered = registeredUrlMatcher();
   /* 내 학교 공고인지는 match-engine이 정한다 — 알림(notify-rules)도 같은 함수를 쓴다 */
   const forMe = (liveNotices.items || []).filter((n) => noticeForProfile(n, p) && !isRegistered(n.url));
   /* 학자금 대출·융자는 장학금이 아니라서 매칭 카드로는 만들지 않는다(정직 원칙).
@@ -2637,6 +2645,44 @@ function renderActivities() {
   box.innerHTML = list.map((n) => noticeCardHtml(n, {
     org: `${n.kind || '대외활동'} · ${n.school ? `${n.school}${n.campus ? ' ' + n.campus : ''} 게시판` : (n.host || '전국')}`,
   })).join('');
+}
+
+/* ---------------- 재단·지자체 새 공고 (2026-09-26 · 노션 F-13 · 교외 확대) ----------------
+   재단·지자체 홈페이지의 장학 게시판에서 로봇이 주운 **제목+링크**(data/external.json). 학교 글이 아니라
+   '우리 학교 게시판 공고'에는 못 들어간다(그 판정은 학교를 요구한다). 주최(host)는 로봇 설정에서 온
+   것이라 카드 윗줄에 적는다 — 제목으로 짐작한 것이 아니다. 자격·적합도·양식은 없다(원칙 8-1).
+   같은 카드 그림(noticeCardHtml)을 쓴다. 정식 등록된 공고(같은 주소)는 카드가 따로 있으니 뺀다.
+   🔴 받아오기 실패는 빈 문서로 내려앉힌다 · 새 데이터가 오면 rerenderVisible (loadNotices 와 같은 규칙). */
+let liveExternal = null;
+
+function loadExternal() {
+  return fetch('data/external.json', { cache: 'no-store' })
+    .then((r) => (r.ok ? r.json() : null))
+    .catch(() => null)
+    .then((d) => {
+      liveExternal = d || liveExternal || { items: [], updatedAt: null };
+      rerenderVisible();
+    });
+}
+
+function externalNoticesForMe() {
+  const p = state.profile;
+  if (!p || !liveExternal) return [];
+  const isRegistered = registeredUrlMatcher();
+  return (liveExternal.items || [])
+    .filter((n) => n && n.url && n.host && !n.school && !isRegistered(n.url))
+    .sort((a, b) => String(b.foundAt || '').localeCompare(String(a.foundAt || '')));
+}
+
+/* 글이 없으면 빈 문자열 — 홈에 '없어요' 구역을 하나 더 만들지 않는다(학교 게시판 구역이 이미 그 말을 한다) */
+function externalNoticesHtml() {
+  const mine = externalNoticesForMe();
+  if (!mine.length) return '';
+  return `<div class="section-head" style="margin-top:4px"><h3>재단·지자체 새 공고</h3>
+    <span class="link-btn">${liveExternal.updatedAt ? esc(liveExternal.updatedAt) + ' 갱신' : ''}</span></div>`
+    + `<div class="card-list" style="margin-bottom:18px">`
+    + mine.map((n) => noticeCardHtml(n, { org: `${n.host} 공고` })).join('')
+    + `</div>`;
 }
 
 /* ---------------- 제출: 복사 · 파일 공유 ---------------- */
@@ -6493,6 +6539,7 @@ bindEvents();
 initOnboarding();
 loadNotices();
 loadActivities();
+loadExternal();
 loadRegistered();
 loadKosaf();
 loadMajors();   // 학교별 학과 목록 — 온보딩 학과 자동추천이 그 학교 것만 보게

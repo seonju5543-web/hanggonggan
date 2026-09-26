@@ -44,6 +44,16 @@ jobs:
         with:
           node-version: 20
 
+      # 재단·지자체 장학 게시판 찾기 (2026-09-26 · 노션 F-13) — 교외 공고 확대. 수집 **앞**에 두어
+      # 이번에 찾은 게시판을 같은 실행이 바로 읽는다. 보강 단계 규칙: 자기 상한 + continue-on-error.
+      - name: 재단·지자체 장학 게시판 찾기 (보강 — 실패해도 수집은 나간다)
+        timeout-minutes: 4
+        continue-on-error: true
+        env:
+          FIND_BOARDS_MAX: '8'
+          FIND_BOARDS_MS: '150000'
+        run: node collector/find-boards.mjs
+
       - id: run
         name: 게시판 수집
         run: node collector/collect.mjs
@@ -180,6 +190,11 @@ jobs:
           # 대외활동·공모전 (2026-09-25) — 로봇이 고친 파일은 전부 git add 에 (이슈 #79 규칙). 장부와 발행 파일 한 쌍.
           [ -f data/activities.json ] && git add data/activities.json
           [ -f collector/seen-activities.json ] && git add collector/seen-activities.json
+          # 재단·지자체 게시판 (2026-09-26) — 찾기 로봇이 고친 출처 목록·리포트와 발행 파일·장부
+          [ -f collector/external-sources.json ] && git add collector/external-sources.json
+          [ -f collector/find-boards-report.md ] && git add collector/find-boards-report.md
+          [ -f data/external.json ] && git add data/external.json
+          [ -f collector/seen-external.json ] && git add collector/seen-external.json
           # 🔴 학교별 공고 파일 — 앱이 **실제로 읽는 것은 이쪽**이다(data/notices.json 은
           #    학교별 파일이 아직 없는 학교를 위한 뒷길). 수집기는 매 실행 이 폴더를 새로
           #    쓰는데 여기에 없어서 **한 번도 저장되지 않았다** — 2026-08-17 에 폴더를

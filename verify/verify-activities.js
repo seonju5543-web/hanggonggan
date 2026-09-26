@@ -32,6 +32,14 @@ const FIXTURE = {
   ],
 };
 
+const EXT_FIXTURE = {
+  updatedAt: '2026-09-26',
+  items: [
+    { title: '2026년 하반기 장학생 선발 공고', url: 'https://www.uljinsf.kr/n/1', host: '울진군장학재단', school: '', foundAt: '2026-09-26', attachments: [], deadlineHint: '신청기간 : 2026. 10. 2. ~ 10. 20.' },
+    { title: '2026 보훈 장학생 모집 안내', url: 'https://www.mpva.go.kr/n/2', host: '국가보훈부', school: '', foundAt: '2026-09-25', attachments: [] },
+  ],
+};
+
 const PROFILE = {
   school: '한국외국어대학교', campus: '', track: 'humanities', major: '',
   year: 3, status: '재학', gpa: 3.5, bracket: 5, flags: [], nationality: 'korean',
@@ -53,6 +61,10 @@ async function fresh(browser, mode) {
   await page.route('**/data/activities.json*', (route) => (mode === 'fail'
     ? route.abort()
     : route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(FIXTURE) })));
+  /* 재단·지자체 새 공고 (2026-09-26 · 교외 확대) — 같은 검사에서 홈 구역도 잰다 */
+  await page.route('**/data/external.json*', (route) => (mode === 'fail'
+    ? route.abort()
+    : route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(EXT_FIXTURE) })));
   await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(1200);
   await dismissNotify(page);
@@ -71,6 +83,13 @@ const cards = (page) => page.$$eval('#activities-list .notice-card', (els) => el
   /* ── 정상 응답 ── */
   {
     const { page, errors } = await fresh(browser, 'ok');
+    /* ── 홈: 재단·지자체 새 공고 구역 ── */
+    eq('홈 — 재단·지자체 새 공고 구역이 학교 게시판 구역 아래에 뜬다',
+      await page.$eval('#external-notices', (e) => e.querySelector('h3') && e.querySelector('h3').textContent.trim()), '재단·지자체 새 공고');
+    eq('홈 — 카드 윗줄이 주최를 말한다 · 최근 수집 순',
+      await page.$$eval('#external-notices .notice-card .sch-org', (els) => els.map((e) => e.textContent.trim())), ['울진군장학재단 공고', '국가보훈부 공고']);
+    eq('홈 — 기간 한 줄은 원문 그대로',
+      await page.$eval('#external-notices .notice-card .sch-provider', (e) => e.textContent.trim()), '신청기간 : 2026. 10. 2. ~ 10. 20.');
     const navs = await page.$$eval('#bottom-nav .nav-item', (b) => b.map((x) => x.dataset.nav));
     eq('① 아래 탭 다섯 — 대외활동은 장학금 다음', navs, ['home', 'explore', 'activities', 'applications', 'my']);
     await page.click('.nav-item[data-nav="activities"]');
@@ -122,11 +141,14 @@ const cards = (page) => page.$$eval('#activities-list .notice-card', (els) => el
     await page.waitForTimeout(500);
     eq('⑤ 실패해도 뼈대가 아니라 "없어요"', await page.$eval('#activities-list', (e) => e.textContent.includes('없어요') && !e.querySelector('.skel, .skeleton')), true);
     eq('⑤ 갱신 날짜 자리는 기본 문구', await page.$eval('#activities-updated', (e) => e.textContent.trim()), '매일 아침 갱신');
+    await page.click('.nav-item[data-nav="home"]');
+    await page.waitForTimeout(400);
+    eq('⑤ 홈 — 재단 글을 못 받아 왔으면 구역이 비어 있다 (뼈대·빈 문구 없음)', await page.$eval('#external-notices', (e) => e.innerHTML.trim()), '');
     eq('⑤ 페이지 오류 없음', errors, []);
     await page.context().close();
   }
 
   await browser.close();
-  console.log(fail ? `\n✕ ${fail}건 실패` : '\n✓ 대외활동·공모전 탭 검사 통과');
+  console.log(fail ? `\n✕ ${fail}건 실패` : '\n✓ 대외활동·공모전 탭 · 재단·지자체 새 공고 검사 통과');
   process.exit(fail ? 1 : 0);
 })().catch((e) => { console.error(e); process.exit(1); });

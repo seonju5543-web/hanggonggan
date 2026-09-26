@@ -17,6 +17,7 @@ import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { cleanTitle, isMenuEntry } from './clean-title.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { activityKind } from './activity-kind.mjs';
+import { extractLinks, stripSessionId } from './board-links.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const cfg = JSON.parse(fs.readFileSync(new URL('schools.json', HERE), 'utf8'));
@@ -50,6 +51,23 @@ let acts = { updatedAt: null, items: [] };
 try { acts = JSON.parse(fs.readFileSync(actsPath, 'utf8')); } catch { /* 첫 실행 */ }
 const ACT_FRESH_MAX = 20;    // 게시판 하나에서 한 실행에 상세까지 읽는 새 글 상한 (장학은 40)
 const ACT_CAP = 200;         // 폰이 통째로 받는 파일 — 상한을 두어 작게 유지한다
+
+/* ── 재단·지자체 장학 게시판 → 교외 공고 확대 (2026-09-26 · 노션 F-13) ─────────────
+   external-sources.json 의 boardUrl 이 있는 곳(find-boards.mjs 가 찾았거나 사람이 적은 곳)을 같은 루프에서
+   role:'external' 로 읽는다. 학교가 없는 전국 글이라 notices.json 에 넣을 수 없다(dropUnserved 가 버리고,
+   알림이 '우리 학교 새 공고'로 센다) — data/external.json 에 따로 싣고 홈의 '재단·지자체 새 공고'에 보인다.
+   주최(host)는 설정에서 받는다 — 제목으로 짐작하지 않는다(원칙 8-1). 장부는 seen-external.json. */
+const extCfgPath = new URL('external-sources.json', HERE);
+let extCfg = { sources: [] };
+try { extCfg = JSON.parse(fs.readFileSync(extCfgPath, 'utf8')); } catch { /* 설정 없음 */ }
+const seenExtPath = new URL('seen-external.json', HERE);
+let seenExt = {};
+try { seenExt = JSON.parse(fs.readFileSync(seenExtPath, 'utf8')); } catch { /* 첫 실행 */ }
+const extPath = new URL('../data/external.json', HERE);
+let ext = { updatedAt: null, items: [] };
+try { ext = JSON.parse(fs.readFileSync(extPath, 'utf8')); } catch { /* 첫 실행 */ }
+const EXT_FRESH_MAX = 20;
+const EXT_CAP = 200;
 /* 메뉴/공고 판정은 clean-title.mjs의 isMenuEntry 한 곳에만 둔다 — 브라우저 수집기와 갈라지면
    같은 게시판을 두 로봇이 다르게 읽는다(2026-08-02 '…안내' 공고 대량 유실 사고) */
 const ATTACH_RE = /\.(hwp|hwpx|doc|docx|pdf|xls|xlsx)(\?|$)/i;
@@ -58,22 +76,7 @@ const ATTACH_RE = /\.(hwp|hwpx|doc|docx|pdf|xls|xlsx)(\?|$)/i;
 
 const UA = FETCH_HEADERS;   // 규칙은 http-headers.mjs 한 곳 (2026-08-20)
 
-function extractLinks(html, base) {
-  const out = [];
-  const re = /<a\b[^>]*href\s*=\s*["']([^"'#][^"']*)["'][^>]*>([\s\S]*?)<\/a>/gi;
-  let m;
-  while ((m = re.exec(html)) !== null) {
-    const title = cleanTitle(m[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim());
-    if (title.length < 6 || title.length > 140) continue;
-    let url;
-    try { url = new URL(m[1].replace(/&amp;/g, '&'), base).href; } catch { continue; }
-    if (!/^https?:/.test(url)) continue;
-    out.push({ title, url: stripSessionId(url) });
-  }
-  const uniq = new Map();
-  out.forEach((i) => { if (!uniq.has(i.url)) uniq.set(i.url, i); });
-  return [...uniq.values()];
-}
+/* extractLinks 는 board-links.mjs 로 옮겼다 (2026-09-26) — 재단 게시판 찾기 로봇과 같은 눈으로 읽는다 */
 
 /* 공고 상세 페이지에서 첨부파일과 마감 단서 추출 */
 async function fetchDetail(item) {
@@ -164,13 +167,7 @@ const BOARD_RULES = {
   },
 };
 
-/* 자바 게시판이 주소 경로에 끼워 넣는 세션 값(;JSESSIONID=…)을 뗀다.
-   접속할 때마다 값이 달라서 그대로 두면 **매일 같은 공고를 새 공고로 다시 담고**
-   (이슈 #75와 같은 병), 남의 세션이 박힌 주소를 학생에게 보여 주게 된다.
-   충북대에서 실제로 이 형태가 왔고, 떼고 열어도 정상인 것을 확인했다 (2026-08-02). */
-function stripSessionId(u) {
-  return String(u || '').replace(/;jsessionid=[^?#/]*/i, '');
-}
+/* stripSessionId 도 board-links.mjs 로 옮겼다 (2026-09-26) */
 
 async function rowsByRule(rule, boardUrl) {
   if (rule.kind === 'json') {
@@ -265,16 +262,21 @@ const freshAll = [];
    전용 게시판을 거기 섞으면 매 실행 지워진다. 전용 게시판 상태는 리포트에만 적는다. */
 const actResults = [];
 const freshActs = [];
+/* 재단·지자체 게시판 — 상태와 새 글. health.json 에는 넣지 않는다(prune-health 가 schools.json 이름으로 고아를 지운다). */
+const extResults = [];
+const freshExt = [];
 
 /* 게시판 하나를 두 역할이 나눠 읽는다 — role:'scholarship' 은 장학 피드 + 활동, role:'activity' 는 활동만 */
 const boards = (cfg.schools || []).map((s) => ({ ...s, role: 'scholarship' }))
-  .concat((actCfg.sources || []).map((s) => ({ ...s, role: 'activity' })));
+  .concat((actCfg.sources || []).map((s) => ({ ...s, role: 'activity' })))
+  .concat((extCfg.sources || []).filter((s) => s.boardUrl).map((s) => ({ ...s, role: 'external' })));
 
 for (const s of boards) {
   const isAct = s.role === 'activity';
+  const isExt = s.role === 'external';
   const name = (s.campus && s.campus !== '공통' ? `${s.school} ${s.campus}` : s.school || (s.host || '전국'))
     + (isAct ? ' 대외활동·공모전' : '');
-  const bucket = isAct ? actResults : results;
+  const bucket = isAct ? actResults : (isExt ? extResults : results);
   if (!s.boardUrl) {
     bucket.push({ name, status: '⚙️ 게시판 주소 미설정' + (s.note ? ` (${s.note})` : ''), items: [] });
     continue;
@@ -328,6 +330,31 @@ for (const s of boards) {
       }
       if (freshA.length) actResults.push({ name: `${name} (장학 게시판에서 발견)`, status: '✅', items: freshA });
     }
+    if (isExt) {
+      /* 재단·지자체 게시판 — 장학 낱말 규칙은 학교 게시판과 같다. 학교 대신 host(주최)를 단다. */
+      const extItems = rawLinks
+        .filter((i) => KEYWORDS.test(i.title))
+        .filter((i) => !isMenuEntry(i.title))
+        .filter((i) => !isAttachmentEntry(i));
+      const freshE = extItems.filter((i) => !seenExt[urlKey(i.url)]).slice(0, EXT_FRESH_MAX);
+      for (const it of freshE) {
+        const detail = await fetchDetail(it);
+        it.attachments = detail.attachments;
+        it.deadlineHint = detail.deadlineHint;
+        it.school = '';
+        it.campus = '';
+        it.host = s.host || '';
+        it.foundAt = new Date().toISOString().slice(0, 10);
+        seenExt[urlKey(it.url)] = it.foundAt;
+        freshExt.push(it);
+      }
+      extResults.push({
+        name,
+        status: extItems.length ? `✅ 정상 (장학 공고 ${extItems.length}건 감지)` : '🟡 접속은 되지만 장학 공고를 찾지 못함 — 게시판이 맞는지 확인 필요',
+        items: freshE,
+      });
+      continue;   // 재단 글은 학교 피드(notices.json)에 담지 않는다
+    }
     const items = rawLinks
       .filter((i) => KEYWORDS.test(i.title))
       .filter((i) => !isMenuEntry(i.title))     // 옆 메뉴 제외 (실공고 신호가 있으면 남긴다)
@@ -361,6 +388,7 @@ for (const s of boards) {
 
 fs.writeFileSync(seenPath, JSON.stringify(seen, null, 1));
 fs.writeFileSync(seenActPath, JSON.stringify(seenAct, null, 1));
+fs.writeFileSync(seenExtPath, JSON.stringify(seenExt, null, 1));
 fs.writeFileSync(pagePath, JSON.stringify(pageMemo, null, 1));
 
 /* 앱 발행: 최신 공고를 학교별로 병합, 학교당 최대 15건·전체 200건 유지 */
@@ -426,6 +454,17 @@ acts.items.sort((a, b) => String(b.foundAt || '').localeCompare(String(a.foundAt
 acts.items = acts.items.slice(0, ACT_CAP);
 acts.updatedAt = notices.updatedAt;
 fs.writeFileSync(actsPath, JSON.stringify(acts, null, 1));
+
+/* ── 재단·지자체 공고 발행 — data/external.json (학교 피드와 섞지 않는다 · 규칙은 위와 같다) ── */
+ext.items = freshExt.concat(ext.items || []);
+ext.items = ext.items.filter((n) => (n.foundAt || '9999') >= cutoff);
+ext.items = ext.items.filter((n) => !isAttachmentEntry(n));
+ext.items = dedupeNotices(ext.items);
+ext.items = ext.items.filter((n) => !n.school && n.host);   // 학교 글은 여기 오지 않는다 · 주최 없는 글도 싣지 않는다
+ext.items.sort((a, b) => String(b.foundAt || '').localeCompare(String(a.foundAt || '')));
+ext.items = ext.items.slice(0, EXT_CAP);
+ext.updatedAt = notices.updatedAt;
+fs.writeFileSync(extPath, JSON.stringify(ext, null, 1));
 
 /* 컨펌 리포트 */
 const newCount = freshAll.length;
@@ -495,6 +534,18 @@ if (!actCfg.sources || !actCfg.sources.some((x) => x.boardUrl)) {
 }
 lines.push('');
 
+/* 재단·지자체 게시판 — 교외 확대. 컨펌 대상이 아니다(제목+링크만 홈 '재단·지자체 새 공고'에 실린다). */
+{
+  const known = (extCfg.sources || []).filter((x) => x.boardUrl).length;
+  lines.push(`### 🏛 재단·지자체 새 공고 ${freshExt.length}건 → 홈 '재단·지자체 새 공고' (data/external.json · ${ext.items.length}건 게재 중 · 게시판 아는 곳 ${known}/${(extCfg.sources || []).length})`);
+  for (const r of extResults) {
+    lines.push(`- **${r.name}** — ${r.status}`);
+    for (const i of r.items) lines.push(`  - [${i.title}](${i.url})${i.deadlineHint ? ` — ⏰ ${i.deadlineHint}` : ''}`);
+  }
+  if (!known) lines.push('> 아직 게시판을 아는 재단이 없습니다 — `collector/find-boards.mjs` 가 매 실행 홈페이지에서 찾습니다(`collector/find-boards-report.md`). 사람이 `collector/external-sources.json` 의 `boardUrl` 에 적어도 됩니다.');
+  lines.push('');
+}
+
 if (pageNotes.length) {
   lines.push('### 📄 목록 2페이지 이후에서 더 읽은 게시판');
   lines.push('1페이지만 읽던 시절에는 상단 고정 공지에 밀린 실공고가 영영 안 잡혔습니다.');
@@ -505,10 +556,10 @@ const noPage = Object.values(pageMemo).filter((v) => v && v.ok === false).length
 if (noPage) lines.push(`📄 페이지 넘기기가 안 되는 게시판 ${noPage}곳 (14일 뒤 다시 시도합니다)`, '');
 
 lines.push('---');
-lines.push('⚙️ 설정: `collector/schools.json` · `collector/activity-sources.json` · 발행: `data/notices.json` · `data/activities.json` · 로봇: `collector/collect.mjs`');
+lines.push('⚙️ 설정: `collector/schools.json` · `collector/activity-sources.json` · `collector/external-sources.json` · 발행: `data/notices.json` · `data/activities.json` · `data/external.json` · 로봇: `collector/collect.mjs`');
 fs.writeFileSync(new URL('report.md', HERE), lines.join('\n'));
 
-console.log(`collected: ${newCount} new items; notices.json now has ${notices.items.length} items; activities: ${freshActs.length} new, ${acts.items.length} total`);
+console.log(`collected: ${newCount} new items; notices.json now has ${notices.items.length} items; activities: ${freshActs.length} new, ${acts.items.length} total; external: ${freshExt.length} new, ${ext.items.length} total`);
 if (process.env.GITHUB_OUTPUT) {
   fs.appendFileSync(process.env.GITHUB_OUTPUT, `new_count=${newCount}\n`);
 }

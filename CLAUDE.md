@@ -130,6 +130,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 | `data/forms.json` | 양식 스키마 원본 — 여기에만 추가하면 앱 무변경 반영 |
 | `data/notices.json` | 실시간 공고 피드 |
 | `data/activities.json` | 대외활동·공모전 피드(제목+링크 · 장학 피드와 **섞지 않는다**) — `docs/designs/activities-tab.md` |
+| `data/external.json` | 재단·지자체 게시판 공고(교외 확대 · 학교 없는 전국 글 · 주최는 `host`) — `docs/designs/external-sources.md` |
 | `data/kosaf-open.json` `data/kosaf-files/` | 층2 — 한국장학재단이 아는 재단 장학금(마감 전만) · 선발공고문 사본. 층1과 섞지 않는다 |
 | `data/tuition.json` | 등록금(학교·계열) |
 
@@ -205,6 +206,9 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 - **대외활동·공모전 탭** (2026-09-25 · 노션 UI-34): 판정은 `collector/activity-kind.mjs` `activityKind` 한 곳(장학 제도는 장학 쪽 · 공모전은 장학 낱말이 있어도 공모전) ·
   파일·장부는 장학 피드와 **따로**(`data/activities.json` · 섞으면 알림이 활동 글로 운다) · 학교 범위는 `activityForProfile` · 카드는 `noticeCardHtml` 한 벌 ·
   전용 게시판 주소는 **개발자가** `activity-sources.json` 에 적는다(null = 리포트에 '주소 미설정'). 관문 「대외활동·공모전」 · `verify-activities.js`(서비스워커를 막고 잰다).
+- **재단·지자체 게시판(교외 확대)** (2026-09-26 · 노션 F-13): 링커리어류는 크롤링이 아니라 **주최사 직접 등록**이라 긁지 않는다 — 우리는 주최의 제 게시판을 읽는다.
+  출처 `collector/external-sources.json` 은 `kosaf-open.json` 의 재단 홈페이지에서 왔고, `collector/find-boards.mjs` 가 게시판을 찾아 `autoFound` 로 적는다(잘못 찾으면 `parked`).
+  글은 `data/external.json`(학교 피드와 따로) → 홈 「재단·지자체 새 공고」(`externalNoticesHtml` · 등록된 주소는 `registeredUrlMatcher` 로 뺀다). 링크 읽는 눈은 `collector/board-links.mjs` 한 곳. 관문 「재단·지자체 게시판」.
 - **학자금대출**은 정식 등록 제외(대출 원금·이자를 지원하는 장학금은 제외 대상 아님 — `LOAN_EXCEPT`) · 피드에선 빼지 않고 장학 공고 뒤로 보낸다(`boardNoticesForMe`).
 - **인스타**: 🔴 게시는 사람만 누른다 · 토큰은 워크플로에만 · 한 실행 최대 6건 · 수정은 다시 그려 **보여 주고 메일 보낼지 물은 뒤** push-to-run(스킬 `insta-revise`).
   관문 `verify-insta.js` · `docs/designs/instagram-pipeline.md`.

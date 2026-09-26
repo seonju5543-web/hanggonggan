@@ -16,6 +16,9 @@ collector/health.json        merge=jsonunion
 # 대외활동·공모전 (2026-09-25) — 장학 피드와 같은 성격의 로봇 기록장이라 같은 규칙
 data/activities.json         merge=jsonunion
 collector/seen-activities.json merge=jsonunion
+# 재단·지자체 공고 (2026-09-26)
+data/external.json           merge=jsonunion
+collector/seen-external.json merge=jsonunion
 
 # ── 매 실행 새로 쓰이는 리포트: 내 쪽을 남긴다(다음 수집이 어차피 덮어쓴다) ──
 # ⚠️ 리포트를 쓰는 로봇을 새로 만들면 **여기에 반드시 한 줄 추가할 것**.
@@ -26,6 +29,7 @@ collector/browser-report.md  merge=ours
 collector/deepfetch-report.md merge=ours
 collector/link-hunt-report.md merge=ours
 collector/kosaf-attach-report.md merge=ours
+collector/find-boards-report.md merge=ours
 
 # ── 수집된 원본 첨부: 내용 비교가 의미 없는 이진 파일로 취급 ──────────
 collector/extracted/**       -diff

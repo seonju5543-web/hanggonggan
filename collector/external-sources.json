@@ -1,0 +1,385 @@
+{
+ "_comment": "재단·지자체 장학 게시판 목록 — 교외 공고 확대 (2026-09-26 · 노션 F-13 · 개발자 지시 '교외 공고 또한 늘릴 방안이 있다면 추진'). 학교 게시판(schools.json)과 별개 파일이고, 여기서 주운 글은 data/external.json 에 실려 홈의 '재단·지자체 새 공고'에 보인다(학교가 없는 전국 글 · 주최는 host). 출처는 **우리 데이터에서 나왔다** — 한국장학재단 공개 데이터(data/kosaf-open.json)가 적어 둔 재단 홈페이지(home)다. 주소를 기억으로 지어낸 것이 아니다. boardUrl 이 null 이면 collector/find-boards.mjs 가 홈페이지에서 장학 공고 게시판을 찾아 채운다(autoFound · 증거와 함께) — 못 찾으면 probe 에 날짜를 적고 14일 뒤 다시 본다. 사람이 boardUrl 을 직접 적어도 된다. 잘못 찾은 게시판은 parked 로 옮긴다.",
+ "sources": [
+  {
+   "host": "해석정해영선생장학문화재단",
+   "home": "http://www.haesuk.or.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "가천문화재단",
+   "home": "http://gachon.or.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "울진군장학재단",
+   "home": "http://www.uljinsf.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "서울특별시 양천구청",
+   "home": "https://www.yangcheon.go.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "국가보훈부",
+   "home": "https://www.mpva.go.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "영동군민장학회",
+   "home": "https://www.yd21.go.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "(재)음성군장학회",
+   "home": "https://scholarship.eumseong.go.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "(재)앨트웰민초장학재단",
+   "home": "http://www.mincho.or.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "한국광산장학회",
+   "home": "http://www.gwangsan.go.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "대관령꿈나무장학회",
+   "home": "https://www.pc.go.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "재단법인 김해시미래인재장학재단",
+   "home": "http://www.ghjanghak.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "재단법인 광산김씨대종중장학문화재단",
+   "home": "http://www.kwangsankim.co.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "전주인재육성재단",
+   "home": "https://www.jinjae.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "강원인재원",
+   "home": "http://injae.gwd.go.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "포항시장학회",
+   "home": "http://phsjhh.itsm.co.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "당진발전본부장학회",
+   "home": "http://www.ewp.co.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "충청북도 충주시청",
+   "home": "https://www.chungju.go.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "재단법인 상주시장학회",
+   "home": "http://www.sjjh.or.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "재단법인 경주시장학회",
+   "home": "http://janghak.gyeongju.go.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "재단법인 울산연구원",
+   "home": "https://uill.uri.re.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "영축총림장학회",
+   "home": "http://www.tongdosa.or.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "달서인재육성장학재단",
+   "home": "http://www.dalseoij.org/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "현대자동차그룹",
+   "home": "https://hmg-scholar.recruiter.co.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "재단법인 삼원장학재단",
+   "home": "http://www.jiheonsf.or.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "구례군청",
+   "home": "http://www.gurye.go.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "(재)전남광주통합특별시 서구 장학재단",
+   "home": "http://www.seogu.gwangju.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "양구군청",
+   "home": "https://www.yanggu.go.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "진안군청",
+   "home": "http://www.jinan.go.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "장보고장학회(완도군청)",
+   "home": "http://www.wando.go.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "재단법인 두을장학재단",
+   "home": "http://www.dooeul.or.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "재단법인 세종연구원",
+   "home": "https://www.sri.re.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "한국중부발전 보령발전본부",
+   "home": "https://www.komipo.co.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "재단법인 연수큰재장학재단",
+   "home": "http://yeonsukeunjae.imweb.me/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "한진해운장학재단",
+   "home": "http://www.hjsfoundation.or.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "한국야쿠르트 사회복지재단",
+   "home": "http://www.kyswf.or.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "광주남구장학회",
+   "home": "https://namgu.gwangju.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "경상남도청",
+   "home": "http://www.gyeongnam.go.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "(재)부안군근농인재육성재단",
+   "home": "http://www.buan.go.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "(재)송파구 인재육성 장학재단",
+   "home": "http://janghak.songpa.go.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "경상남도장학회",
+   "home": "https://www.gyeongam.go.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "재단법인 대하장학회",
+   "home": "https://cafe.daum.net/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "파안장학문화재단법인",
+   "home": "https://paan.or.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "메디힐장학재단",
+   "home": "https://medihealsf.or.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "울산광역시 남구장학재단",
+   "home": "http://www.unsf.or.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "(재)부산북구장학회",
+   "home": "http://www.bsbukgu.go.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "(재)고속도로장학재단",
+   "home": "http://www.hsf.or.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "(사)한국해기사협회",
+   "home": "http://www.mariners.or.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "영국문화원",
+   "home": "http://www.britishcouncil.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "파주돈재갑진장학회",
+   "home": "https://pjdjkjscholarship.or.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "(재)수림재단",
+   "home": "http://www.surim.or.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "재단법인 전남인재평생교육진흥원",
+   "home": "https://www.jntle.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "한국선원복지고용센터",
+   "home": "https://www.koswec.or.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "중외학술복지재단",
+   "home": "http://www.jw-foundation.or.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "이천시청",
+   "home": "https://www.icheon.go.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "아산시미래장학회",
+   "home": "http://asanmirae.or.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "경상남도 고성군청",
+   "home": "http://www.goseong.go.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "재단법인 석성장학회",
+   "home": "http://www.seoksung.co.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "(재)인제군장학회",
+   "home": "https://www.inje.go.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "강원도 원주시청",
+   "home": "https://www.wonju.go.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "경상북도 영주시청",
+   "home": "https://www.yeongju.go.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "춘향장학재단",
+   "home": "https://www.namwon.go.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "영천시장학회",
+   "home": "http://www.ycsf.or.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  },
+  {
+   "host": "화물복지재단",
+   "home": "https://www.fordrivers.or.kr/",
+   "boardUrl": null,
+   "seed": "kosaf-open"
+  }
+ ],
+ "_parked": "쓰지 않게 된 곳은 지우지 말고 여기로 옮긴다(schools.json 의 parked 와 같은 규칙). 되돌리려면 항목을 위 sources 로 옮기면 된다.",
+ "parked": []
+}
