@@ -114,13 +114,15 @@ const eq = (label, got, want) => {
   console.log('\n[공고 파일] 첫 실행 학생이 무엇을 받는가');
   {
     /* 🔴 프로필이 생기기 전에는 옛 파일을 받지 않아야 한다 — 받아도 한 줄도 못 쓴다
-       (`noticesForMe` 가 프로필 없으면 빈 배열로 끝난다). */
+       (`boardNoticesForMe` 가 프로필 없으면 빈 배열로 끝난다). */
     eq('🔴 프로필이 없을 때 옛 파일을 통째로 받지 않았다',
       asked.filter((u) => u === 'data/notices.json'), []);
     /* 🔴 그 대신 **온보딩을 마친 뒤** 그 학교 파일을 받았어야 한다 — 이 짝이 없으면
        첫 실행 학생의 실시간 공고가 앱을 다시 열 때까지 비어 보인다. */
     const shards = asked.filter((u) => /^data\/notices\//.test(u) && !/index\.json$/.test(u));
-    eq('🔴 온보딩을 마친 뒤 그 학교 공고 파일을 받았다', shards.length > 0, true, shards);
+    /* ⚠️ `eq` 는 인자가 셋이다 — 넷째를 주면 **조용히 버려져** 빨간불일 때 아무것도 안 보인다
+       (코드 리뷰에서 잡았다). 그래서 받은 값을 **got 쪽에** 담는다. */
+    eq('🔴 온보딩을 마친 뒤 그 학교 공고 파일을 받았다', shards.length > 0 ? true : asked, true);
     eq('색인도 나란히 받았다 (옛 파일을 받을지 판단하는 데 쓴다)',
       asked.some((u) => u === 'data/notices/index.json'), true);
     /* 그리고 화면에 실제로 공고가 보여야 한다 — 받아 온 것을 쓰고 있는가 */
@@ -130,7 +132,7 @@ const eq = (label, got, want) => {
       공고: document.querySelectorAll('#screen-home #live-notices .notice-card').length,
     }));
     eq('🔴 홈의 실시간 공고가 뼈대에 굳지 않았다', cards.뼈대, 0);
-    eq('🔴 홈에 그 학교 공고가 보인다 (받아 온 것을 실제로 쓴다)', cards.공고 > 0, true, cards);
+    eq('🔴 홈에 그 학교 공고가 보인다 (받아 온 것을 실제로 쓴다)', cards.공고 > 0 ? true : cards, true);
   }
 
 

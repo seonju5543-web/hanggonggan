@@ -233,10 +233,14 @@ async function backgroundCheck() {
     ...(noticeFiles.length ? noticeFiles : ['data/notices.json']).map(readJson),
   ]);
   const gotAny = noticeDocs.some(Boolean);
+  /* ⚠️ 아래 판정을 `typeof` 로 감싼다 — 서비스워커는 **옛 match-engine.js 를 캐시에서 내줄 수
+     있다**(코드 리뷰에서 잡았다). 감싸지 않으면 그 자리에서 던져 `backgroundCheck` 가 통째로
+     실패하고, 푸시를 받은 폰이 문구 없는 기본 알림을 띄운다. */
   let notices;
   if (gotAny) {
     notices = { items: noticeDocs.filter(Boolean).flatMap((d) => d.items || []) };
-  } else if (!noticeFiles.length || noticeFallbackNeeded(idx, noticeFiles)) {
+  } else if (!noticeFiles.length || typeof noticeFallbackNeeded !== 'function'
+             || noticeFallbackNeeded(idx, noticeFiles)) {
     notices = await readJson('data/notices.json');   // 배포 엇갈림·색인 못 읽음 → 물러난다
   } else {
     notices = { items: [] };                         // 우리에게 그 학교 공고가 없다

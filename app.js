@@ -2207,13 +2207,20 @@ function rerenderVisible() {
   if (!$('#screen-applications').hidden) renderApplications();
 }
 
-/* 마지막으로 받아 온 학교별 파일 목록 — 학교가 바뀌면 다시 받아야 한다(아래 주석). */
+/* 마지막으로 **성공적으로** 받아 온 학교별 파일 목록 — 학교가 바뀌면 다시 받아야 한다.
+   🔴 **받기 전에 적지 않는다** (2026-09-26 코드 리뷰에서 잡았다). 받기 전에 적으면
+      ① 실패한 받아오기도 '받았다'로 남아 같은 학교로 다시 시도하지 않고
+      ② 학교가 바뀌는 순간 두 받아오기가 겹쳤을 때 **늦게 온 옛 학교 것이 이긴다**
+      (앱을 열 때 A 로 시작했는데 로그인 사본이 B 였던 경우가 정확히 그 꼴이다). */
 let noticeFilesLoaded = null;
+/* 지금 받고 있는 목록 — 이것과 다른 것이 돌아오면 **버린다**(늦게 온 옛 학교 것이다). */
+let noticeFilesWanted = null;
 
 function loadNotices() {
   const p = state.profile;
   const files = (typeof noticeFilesForProfile === 'function' && p) ? noticeFilesForProfile(p) : [];
-  noticeFilesLoaded = files.join(',');
+  const wanted = files.join(',');
+  noticeFilesWanted = wanted;
   const get = (u) => fetch(u, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
   /* ⚠️ 색인은 학교별 파일과 **나란히** 부른다 — 먼저 받고 나서 부르면 공고가 있는 학생에게
      왕복이 한 번 더 늘어(모바일에서 눈에 보인다) 아낀 것보다 손해다. */
@@ -2222,7 +2229,10 @@ function loadNotices() {
       const idx = docs[docs.length - 1];
       const ok = docs.slice(0, files.length).filter(Boolean);
       if (!ok.length) {
-        return noticeFallbackNeeded(idx, files)
+        /* ⚠️ `typeof` 로 감싼다 — 위 `noticeFilesForProfile` 과 같은 이유다(코드 리뷰에서
+           잡았다). 서비스워커가 옛 `match-engine.js` 를 캐시에서 내주면 이 함수가 아직
+           없고, 그 오류는 아래 `job.catch` 가 삼켜 **물러나는 길이 조용히 사라진다.** */
+        return (typeof noticeFallbackNeeded !== 'function' || noticeFallbackNeeded(idx, files))
           ? get('data/notices.json')                       // 배포 엇갈림·색인 못 읽음 → 물러난다
           : { updatedAt: (idx && idx.updatedAt) || null, items: [] };   // 우리에게 그 학교 공고가 없다
       }
@@ -2232,8 +2242,8 @@ function loadNotices() {
       };
     })
     /* 🔴 **프로필이 없으면 아무것도 받지 않는다** (2026-09-26). 예전에는 여기서 옛 파일을
-       통째로 받았는데, 프로필이 없으면 `noticesForMe` 가 `if (!p) return []` 로 끝나
-       **받아도 한 줄도 못 쓴다.** 첫 실행 학생 전원이 그 낭비를 치르고 있었다.
+       통째로 받았는데, 프로필이 없으면 `boardNoticesForMe` 가 `if (!p || !liveNotices)` 로
+       끝나 **받아도 한 줄도 못 쓴다.** 첫 실행 학생 전원이 그 낭비를 치르고 있었다.
        ⚠️ 그래서 **프로필이 정해지는 순간 다시 받는다** — `loadNoticesIfSchoolChanged`.
           그 짝이 없으면 첫 실행 학생의 실시간 공고가 새로 열 때까지 비어 보인다. */
     : Promise.resolve({ items: [], updatedAt: null });
@@ -2243,6 +2253,13 @@ function loadNotices() {
   /* 🔴 받아오기 실패만 여기서 삼킨다 — 그리기(rerenderVisible)까지 같은 catch 로 감싸면
      그리다 난 진짜 버그가 조용히 묻히고, 그 안에서 다시 그리려다 두 번 던진다. */
   return job.catch(() => null).then((d) => {
+    /* 🔴 **늦게 온 옛 학교 것은 버린다** (2026-09-26 코드 리뷰). 그 사이 학교가 바뀌었으면
+       이 결과는 남의 학교 것이다 — 앱을 열 때 A 로 시작했는데 로그인 사본이 B 였던 경우가
+       정확히 그 꼴이고, A 가 늦게 오면 B 학생 화면에 A 의 공고가 앉는다.
+       ⚠️ 버릴 때는 `noticeFilesLoaded` 를 건드리지 않는다 — 지금 받고 있는 쪽이 적는다. */
+    if (noticeFilesWanted !== wanted) return liveNotices;
+    /* 성공한 것만 '받았다'로 남긴다 — 실패를 적으면 같은 학교로 다시 시도하지 않는다. */
+    noticeFilesLoaded = d ? wanted : null;
     /* 🔴 **못 받아 왔어도 빈 문서를 넣는다** (2026-09-09). `null` 로 두면 화면이
        '아직 오는 중'(뼈대)으로 읽어 영영 그 상태로 굳는다 — 오프라인 학생에게
        끝나지 않는 기다림을 보여 주는 것은 '없음'보다 나쁘다.
