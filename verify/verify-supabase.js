@@ -55,6 +55,15 @@ const rotate = () => {
    늘 켜 두면 다른 절들이 쓰던 흐름까지 흔들려, 고치려는 것과 상관없는 빨간불이 난다. */
 let strictAuth = false;
 
+/* 🔴 **DB 가 값을 거절하는 상황**을 흉내낸다. [13] 절에서만 켠다 (2026-09-26).
+   0004_profile_columns.sql 의 CHECK 가 실제로 하는 일이고, PostgREST 는 그것을
+   **400 + `code: '23514'`** 로 되돌려 준다. 몸통의 `details` 에 실패한 행이 통째로
+   들어가는 것까지 진짜와 같게 둔다 — 그 안에 주민등록번호가 있고, 앱이 그것을
+   화면에 옮기면 안 되는 것이 이 절이 재는 것의 절반이다. */
+let rejectWrites = '';     // '' 또는 제약 이름 (예: 'profiles_gpa_range')
+/* 거절이 **아닌** 실패(서버가 아픈 것). 이것으로는 학생을 귀찮게 하지 않아야 한다. */
+let failWrites = false;
+
 function startSupabase() {
   return new Promise((resolve) => {
     const srv = http.createServer((req, res) => {
@@ -100,6 +109,18 @@ function startSupabase() {
         if (req.url.startsWith('/rest/v1/profiles')) {
           if (strictAuth && String(req.headers.authorization || '') !== 'Bearer ' + liveAccess) {
             return send(401, { message: 'JWT expired' });
+          }
+          if (failWrites && (req.method === 'POST' || req.method === 'PATCH')) {
+            return send(500, { message: 'internal error' });
+          }
+          if (rejectWrites && (req.method === 'POST' || req.method === 'PATCH')) {
+            return send(400, {
+              code: '23514',
+              message: `new row for relation "profiles" violates check constraint "${rejectWrites}"`,
+              /* 진짜와 같게 — 여기에 학생의 모든 칸이 들어온다. 앱이 이걸 옮기면 안 된다. */
+              details: 'Failing row contains (uuid, {"common": {"rrn": "000000-0000000", "account": "1002-333-444444"}}, …).',
+              hint: null,
+            });
           }
           if (req.method === 'POST') { storedRow = (body && body[0]) || null; return send(201); }
           if (req.method === 'DELETE') { storedRow = null; return send(204); }
@@ -649,9 +670,101 @@ const seedScript = (seed) => `localStorage.setItem('handaejang.v1', ${JSON.strin
     await ctx.close();
   }
 
+  /* ───────── [13] 🔴 DB 가 값을 거절하면 학생이 알게 된다 (2026-09-26 · 고문 Q6) ─────────
+     0004_profile_columns.sql 부터 있을 수 없는 값(성적 999 · 1만 자 학교 이름)은 DB 가
+     **쓰기를 거절한다.** 그런데 올리기 실패는 `app.js syncSchedulePush` 의
+     `.catch(() => {})` 에 **통째로 삼켜지고 있었다** — 그러면 프로필이 영영 서버에
+     안 올라가고, 학생은 다른 기기에서 이어쓰기가 안 되는 이유를 모른다.
+     조건부 PATCH 라 다음 저장도, 그다음 저장도 같은 자리에서 막힌다.
+
+     🔴 여기서 두 가지를 잰다 — ① 한 번은 **알린다** ② 그 문구에 **개인정보를 옮기지 않는다**
+        (PostgREST 의 `details` 에는 실패한 행이 통째로 들어 있다). */
+  console.log('\n[13] DB 가 값을 거절하면 학생에게 알린다 (개인정보는 옮기지 않는다)');
+  {
+    const { ctx, page } = await newPage();
+    await page.goto(`http://localhost:${APP_PORT}/`, { waitUntil: 'domcontentloaded' });
+    await page.evaluate(seedScript(SEED));
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await settle(page);
+    await page.evaluate(([k, t]) => localStorage.setItem(k, JSON.stringify(t)),
+      [await page.evaluate(() => AUTH_KEY), {
+        accessToken: liveAccess, refreshToken: liveRefresh, expiresAt: Date.now() + 600000,
+        userId: '00000000-0000-4000-8000-000000000001', email: 'test@example.com',
+      }]);
+    /* 토스트를 가로채 모은다 — 화면에서 사라지는 것을 쫓지 않고 부른 것을 센다 */
+    await page.evaluate(() => {
+      window.__toasts = [];
+      const orig = window.toast;
+      window.toast = (m) => { window.__toasts.push(String(m)); return orig ? orig(m) : undefined; };
+    });
+
+    rejectWrites = 'profiles_gpa_range';
+    await page.evaluate(() => { state.profile.gpa = 4.1; saveState(); });
+    await page.waitForTimeout(2500);
+    let seen = await page.evaluate(() => window.__toasts.slice());
+    const said = seen.filter((m) => /서버에 저장하지 못했|서버에 올리지 못했/.test(m));
+    ok(said.length === 1, '🔴 거절을 한 번 알린다 (조용히 삼키지 않는다)', seen);
+    ok(said.some((m) => /성적/.test(m)), '어느 칸이 문제인지 말한다', said);
+    ok(!said.some((m) => /Failing row|rrn|account|1002-|000000-/.test(m)),
+      '🔴 서버가 준 `details`(실패한 행 전체)를 화면에 옮기지 않는다', said);
+
+    /* ⚠️ 값을 고치지 않으면 저장할 때마다 같은 자리에서 거절된다 — 매번 띄우면
+       토스트가 화면을 덮어 앱을 못 쓴다. 두 번째 저장에서는 늘지 않아야 한다. */
+    await page.evaluate(() => { state.profile.gpa = 4.2; saveState(); });
+    await page.waitForTimeout(2500);
+    seen = await page.evaluate(() => window.__toasts.slice());
+    ok(seen.filter((m) => /서버에 저장하지 못했|서버에 올리지 못했/.test(m)).length === 1,
+      '두 번째 거절은 다시 띄우지 않는다 (같은 말을 계속하면 앱을 못 쓴다)', seen);
+
+    /* 🔴 **아픈 서버와 구분한다** — 그건 지나가도 되는 실패다(폰 안 저장이 원본이라 안 잃는다).
+       ⚠️ 서버를 **죽여서** 재지 않는다 — [11] 이 서버를 죽이므로 그 뒤에 두면 이 절 전체가
+          '인터넷 없음'이 되어 조용히 무력해진다(2026-09-26에 실제로 그렇게 만들었다).
+          그래서 이 절은 [11] **앞**에 있고, 여기서는 500 을 돌려주게 해서 잰다. */
+    /* 🔴 먼저 **한 번 성공**시킨다 — 두 가지를 동시에 잰다:
+         ① 값을 고치면 그냥 올라간다  ② 성공이 '이미 알렸다' 기억을 푼다.
+       ⚠️ 이 성공이 없으면 아래 500 검사는 **절대 실패할 수 없는 단정**이 된다(래치가
+          이미 켜져 있어 무엇을 해도 토스트가 안 뜬다 — 코드 리뷰에서 잡았다). */
+    rejectWrites = '';
+    const fixed = await page.evaluate(async () => {
+      window.__toasts.length = 0;
+      const r = await syncPushMerging(state);
+      syncTellIfRejected(r);
+      return { ok: !!(r && r.ok), told: window.__toasts.slice() };
+    });
+    ok(fixed.ok === true, '값이 정상이면 그냥 올라간다', fixed);
+
+    failWrites = true;
+    const other = await page.evaluate(async () => {
+      window.__toasts.length = 0;
+      const r = await syncPushMerging(state);
+      syncTellIfRejected(r);
+      return { rejected: !!(r && r.rejected), toasts: window.__toasts.slice() };
+    });
+    failWrites = false;
+    ok(other.rejected === false, '서버가 아파서 실패한 것은 `rejected` 가 아니다', other);
+    ok(!other.toasts.some((m) => /저장하지 못했|올리지 못했/.test(m)),
+      '그런 실패로는 학생을 귀찮게 하지 않는다 (지나가도 되는 실패다)', other.toasts);
+
+    /* 🔴 성공 뒤에 **다른 칸**이 거절되면 다시 알려야 한다 (래치가 풀렸는가) */
+    rejectWrites = 'profiles_text_len';
+    const again = await page.evaluate(async () => {
+      window.__toasts.length = 0;
+      const r = await syncPushMerging(state);
+      syncTellIfRejected(r);
+      return window.__toasts.slice();
+    });
+    rejectWrites = '';
+    ok(again.some((m) => /학교·캠퍼스·학과 이름/.test(m)),
+      '🔴 한 번 성공한 뒤 다른 칸이 거절되면 다시 알린다 (기억이 풀린다)', again);
+    await ctx.close();
+  }
+
   /* ───────────── [10] 서버가 죽어도 앱은 열린다 ───────────── */
   console.log('\n[11] 서버가 죽어 있어도 앱은 그대로 열린다 (기기 우선)');
   {
+    /* 🔴 **이 줄이 가짜 서버를 죽인다 — 서버가 필요한 절은 반드시 이 위에 둔다.**
+       2026-09-26에 [13] 을 이 아래에 두었다가, 요청이 전부 '인터넷 없음'으로 실패해
+       거절 검사가 **아무것도 안 재면서** 빨간불만 냈다. 새 절은 위에 붙일 것. */
     await new Promise((r) => sb.close(r));
     const { ctx, page } = await newPage();
     await page.goto(`http://localhost:${APP_PORT}/`, { waitUntil: 'domcontentloaded' });

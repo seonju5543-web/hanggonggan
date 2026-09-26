@@ -502,6 +502,41 @@ function syncVerClear() {
   try { localStorage.removeItem(SYNC_VER_KEY); } catch { /* 위와 같다 */ }
 }
 
+/* 🔴 **DB 가 값을 거절했을 때는 조용히 넘기면 안 된다** (2026-09-26 · 고문 보고서 Q6)
+
+   0004_profile_columns.sql 부터, 있을 수 없는 값(성적 999 · 학년 0 밖 · 1만 자 학교 이름)은
+   **DB 가 쓰기를 거절**한다. 그런데 올리기 실패는 지금까지 **아무 데도 안 보였다**
+   (app.js syncSchedulePush 의 `.catch(() => {})`). 그대로 두면 이런 일이 벌어진다 —
+   프로필이 **영영 서버에 안 올라가고**, 학생은 다른 기기에서 이어쓰기가 안 되는 이유를 모른다.
+   조건부 PATCH 라 `syncVerSave` 도 안 되니 다음 저장도, 그다음 저장도 같은 자리에서 막힌다.
+   그래서 '거절'은 '인터넷이 없다'와 **구분해서** 돌려주고, 화면이 한 번 알린다.
+
+   🔴 서버가 준 `details` 는 **쓰지 않는다** — 거기에는 실패한 행이 통째로 들어 있어
+      주민등록번호·계좌번호까지 담길 수 있다(PostgREST 가 `Failing row contains (…)` 를 그대로 준다).
+      우리가 읽는 것은 **제약 이름 하나**뿐이다. 관문: verify/verify-supabase.js [13] 절. */
+const SYNC_REJECT_FIELD = {
+  profiles_gpa_range: '성적(학점)',
+  profiles_grade_range: '학년',
+  profiles_bracket_range: '학자금지원구간',
+  profiles_text_len: '학교·캠퍼스·학과 이름',
+};
+/** DB 가 값을 보고 거절한 것인가. 거절이면 학생에게 보일 한국어 문장, 아니면 빈 문자열. */
+function syncRejectText(res) {
+  if (!res || res.status !== 400) return '';
+  const j = res.json || {};
+  if (String(j.code || '') !== '23514') return '';     // 23514 = Postgres check_violation
+  const m = /constraint "([a-z0-9_]+)"/i.exec(String(j.message || ''));
+  const field = (m && SYNC_REJECT_FIELD[m[1]]) || '';
+  return field
+    ? `${field} 값이 올바르지 않아 서버에 저장하지 못했어요. 프로필에서 다시 확인해 주세요`
+    : '프로필에 저장할 수 없는 값이 있어 서버에 올리지 못했어요';
+}
+/** 실패 한 가지 모양으로 — 거절이면 `rejected: true` 와 한국어 문장을 함께 준다. */
+function syncFail(res) {
+  const rejected = syncRejectText(res);
+  return { ok: false, rejected: !!rejected, error: rejected || authErrorText(res) };
+}
+
 /* 서버에 올린다. 실패해도 앱은 아무 일 없이 계속 돈다 — 폰 안 저장이 원본이다. */
 async function syncPush(state) {
   if (!signedIn() || !state) return { ok: false, skipped: true };
@@ -531,7 +566,7 @@ async function syncPush(state) {
       body: [row],
     });
     if (ins.ok) syncVerSave(u.userId, stamp);
-    return { ok: ins.ok, error: ins.ok ? null : authErrorText(ins) };
+    return ins.ok ? { ok: true, error: null } : syncFail(ins);
   }
 
   const res = await sbAuthed(
@@ -546,7 +581,7 @@ async function syncPush(state) {
     const remote = await syncPull();
     return { ok: false, conflict: true, remote };
   }
-  return { ok: false, error: authErrorText(res) };
+  return syncFail(res);
 }
 
 /* 서버에서 내려받는다. 없으면(첫 로그인 전) null. */
@@ -571,5 +606,6 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     syncSafeProfile, syncSafeApplications, SYNC_OMIT_COMMON, SYNC_OMIT_APP,
     SYNC_SENSITIVE_KEYS, authErrorText, REMEMBER_KEY,
+    SYNC_REJECT_FIELD, syncRejectText, syncFail,
   };
 }

@@ -6075,8 +6075,32 @@ function syncSchedulePush() {
   if (typeof signedIn !== 'function' || !signedIn()) return;
   clearTimeout(syncTimer);
   syncTimer = setTimeout(() => {
-    syncPushMerging(state).catch(() => { /* 실패해도 앱은 그대로 — 폰 안 저장이 원본이다 */ });
+    syncPushMerging(state).then(syncTellIfRejected)
+      .catch(() => { /* 실패해도 앱은 그대로 — 폰 안 저장이 원본이다 */ });
   }, (typeof SUPABASE_CONFIG !== 'undefined' && SUPABASE_CONFIG.pushDelayMs) || 2000);
+}
+
+/* 🔴 **DB 가 값을 거절한 것은 학생에게 알린다** (2026-09-26 · 고문 보고서 Q6)
+
+   0004_profile_columns.sql 부터 있을 수 없는 값(성적 999 · 1만 자 학교 이름)은 DB 가 쓰기를
+   거절한다. 그런데 올리기 실패는 여기서 `.catch(() => {})` 로 **통째로 삼켜지고 있었다** —
+   그러면 프로필이 **영영 서버에 안 올라가고** 학생은 다른 기기에서 이어쓰기가 안 되는 이유를
+   모른다. '인터넷이 없다'는 지나가도 되지만 '값이 틀렸다'는 지나가면 안 된다.
+
+   ⚠️ **한 번만 알린다.** 값을 고치지 않으면 저장할 때마다 같은 자리에서 거절되므로,
+      매번 띄우면 토스트가 화면을 덮어 앱을 못 쓴다.
+   🔴 **성공하면 그 기억을 푼다** (2026-09-26 코드 리뷰에서 잡았다). 안 풀면, 값을 고쳐
+      한 번 올라간 뒤 **다른 칸**이 거절될 때 다시 조용해진다 — 이 장치가 없애려던 상태로
+      그대로 돌아간다. 푸는 자리는 '실제로 올라간 순간' 하나뿐이다.
+   ⚠️ 문구는 supabase-client.js 가 만든다(어느 칸이 문제인지 아는 곳이 거기다). 여기서
+      따로 만들지 말 것 — 두 곳이 갈라진다. */
+let syncRejectTold = false;
+function syncTellIfRejected(r) {
+  if (r && r.ok) { syncRejectTold = false; return r; }
+  if (!r || !r.rejected || syncRejectTold) return r;
+  syncRejectTold = true;
+  if (typeof toast === 'function') toast(r.error);
+  return r;
 }
 
 /* 🔴 **다른 기기가 먼저 썼으면 덮지 않고 합친 뒤 올린다** (2026-09-25 · 고문 보고서 Q6)
@@ -6165,12 +6189,12 @@ async function syncAfterLoad() {
   syncBusy = true;
   try {
     const remote = await syncPull();
-    if (!remote) { await syncPushMerging(state); return; }   // 서버가 비었으면 내 것을 올린다
+    if (!remote) { syncTellIfRejected(await syncPushMerging(state)); return; }   // 서버가 비었으면 내 것을 올린다
     const mine = state.updatedAt || '';
     const theirs = remote.updatedAt || '';
     /* 새 기기(프로필이 아예 없음)면 무조건 받는다 — 이게 개발자가 겪던 바로 그 상황이다 */
     if (!state.profile || theirs > mine) syncApplyRemote(remote);
-    else if (mine > theirs) await syncPushMerging(state);
+    else if (mine > theirs) syncTellIfRejected(await syncPushMerging(state));
   } catch (e) {
     /* 인터넷이 없거나 서버가 자고 있으면 그냥 지나간다 — 앱은 폰 안 데이터로 계속 돈다 */
   } finally { syncBusy = false; }

@@ -27,6 +27,9 @@ import { hoursFor, cronsOf, isStale, countField, runsPerWeek, everyWords } from 
    자식 프로세스도 못 띄운다. 리눅스(클라우드 검사)에서는 멀쩡해서 **이 검사 5개가
    개발자 컴퓨터에서만 조용히 실패하고 있었다** — 진짜 실패를 가리는 소음이었다(2026-09-05). */
 import { fileURLToPath } from 'node:url';
+/* 서버 재검증이 쓰는 범위 — 여기서 **베끼지 않고 불러** 온다(베끼면 두 곳이 갈라진다).
+   ⚠️ apply-guard.mjs 는 불러도 아무 일이 일어나지 않는다(정의만 한다 · match-engine 은 이미 싣는다). */
+import { PROFILE_BOUNDS as GUARD_BOUNDS } from '../server/apply/apply-guard.mjs';
 import { urlKey, titleKey, dedupeNotices, preferNotice, capNotices, clickRowKey } from '../collector/url-key.mjs';
 /* extract-excerpts 는 **불러오면 그 자리에서 실행된다** — EXCERPTS_AS_LIB 가 그걸 막는 스위치다
    (이 저장소의 알려진 함정: `node -e "import('./x.mjs')"` 로 문법 검사를 하면 안 되는 이유와 같다). */
@@ -3956,6 +3959,110 @@ console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08
       /<h3>[^<]*마감\s*임박[^<]*<\/h3>/.test(head), false);
     eq('  그래도 이름은 있다 (빈 제목으로 지우지 않았다)', /<h3>\s*\S[^<]*<\/h3>/.test(head), true);
   }
+}
+
+console.log('■ 프로필 개별 칸 · DB 검증 (0004 · 2026-09-26 · 고문 보고서 Q6)');
+{
+  const sql = readText(new URL('../supabase/migrations/0004_profile_columns.sql', import.meta.url));
+  /* 주석을 뺀 본문만 본다 — 주석에 적힌 낱말이 검사를 통과시키면 검사가 아니다
+     (2026-09-12에 같은 함정을 밟았다). */
+  const body = sql.replace(/^\s*--.*$/gm, '');
+
+  /* 🔴 ① 앱이 칸마다 따로 써 넣는 꼴로 되돌리지 말 것 — 그러면 두 곳이 갈라지고,
+     옛 앱이 깔린 폰이 쪼갠 칸을 제 옛 값으로 덮는다(docs/designs/sync-overwrite.md). */
+  const cols = ['school', 'campus', 'major', 'track', 'enroll_status', 'gender', 'grade', 'gpa', 'income_bracket'];
+  /* 🔴 **칸 하나씩 따로 본다.** 처음에는 `add column … [\s\S]{0,400}? generated always as` 로
+     재다가, 칸을 보통 칸으로 바꿔도 **초록불이었다**(2026-09-26 red-green 에서 잡았다) —
+     정규식이 쉼표를 넘어 **옆 칸의** generated 절을 물었기 때문이다. 그래서 괄호 깊이를
+     세어 **맨 바깥 쉼표로만** 가른다(칸 안의 `nullif(x, '')` 쉼표에 속지 않게). */
+  const stmt = /alter table public\.profiles([\s\S]*?);/.exec(body);
+  eq('  칸을 더하는 문장을 찾았다', !!stmt, true);
+  const pieces = [];
+  if (stmt) {
+    let depth = 0, cur = '';
+    for (const ch of stmt[1]) {
+      if (ch === '(') depth++;
+      else if (ch === ')') depth--;
+      if (ch === ',' && depth === 0) { pieces.push(cur); cur = ''; continue; }
+      cur += ch;
+    }
+    pieces.push(cur);
+  }
+  for (const c of cols) {
+    const piece = pieces.find((x) => new RegExp('add column if not exists\\s+' + c + '\\s').test(x));
+    eq('  ' + c + ' 는 jsonb 에서 DB 가 꺼내 채운다 (앱이 따로 안 쓴다)',
+      !!piece && /generated always as/.test(piece) && /profile\s*->/.test(piece), true);
+  }
+  eq('  앱의 쓰기 경로는 그대로다 (개별 칸을 보내는 코드를 만들지 않았다)',
+    /\b(school|major|income_bracket|enroll_status)\s*:/.test(
+      readText(new URL('../supabase-client.js', import.meta.url))
+        .slice(readText(new URL('../supabase-client.js', import.meta.url)).indexOf('const row = {'),
+               readText(new URL('../supabase-client.js', import.meta.url)).indexOf('const seen ='))), false);
+
+  /* 🔴 ② 꺼내는 식이 실패하면 저장 자체가 죽는다 — 맨 형변환을 두지 말 것.
+     `(profile->>'x')::int` 는 숫자가 아닌 값 하나에 오류가 되고, 학생은 이유를 모른다.
+     ⚠️ 처음에는 전체 개수만 비교했다(`guarded >= casts`) — 그건 **어느 칸이 안 막혔는지
+        모르고**, 한 칸에 정규식이 둘이면 빈 칸을 덮어 준다(코드 리뷰에서 잡았다).
+        지금은 **칸마다** 같은 조각 안에 정규식이 있는지 본다. */
+  for (const piece of pieces) {
+    if (!/::\s*(int|smallint|numeric|integer)/.test(piece)) continue;
+    const name = (/add column if not exists\s+(\w+)/.exec(piece) || [])[1] || '?';
+    eq('  ' + name + ' 은 숫자로 바꾸기 전에 정규식으로 걸러 본다', /~\s*'\^/.test(piece), true);
+  }
+
+  /* 🔴 ③ **읽을 수 없는 값을 NULL 로 두면 안 된다** — NULL 은 CHECK 를 통과하는데
+     jsonb 안에는 이상한 값이 그대로 남고, 서버는 그 jsonb 를 읽는다(실측으로 잡았다:
+     `gpa: 999` 가 조용히 통과했다). 그래서 `else -1` 로 두어 CHECK 가 거절하게 한다. */
+  eq('  읽을 수 없는 값은 NULL 이 아니라 거절된다 (else -1)',
+    (body.match(/else\s+-1/g) || []).length >= 3, true);
+
+  /* 🔴 ④ 0 은 '안 골랐다'다 — 미달로 읽으면 학년을 안 고른 정상 학생을 막는다 */
+  eq("  학년·소득구간의 0 은 '모른다'로 둔다", /= '0'\s*then null/.test(body), true);
+
+  /* 🔴 ⑤ 닫힌 목록을 걸지 말 것 — 성별은 자유 입력 양식에서도 배워지고(forms.json),
+     칩 목록은 앱에서 늘어난다. 늘어날 수 있는 것에 자물쇠를 걸면 정상 학생의 저장이 막힌다. */
+  for (const bad of ['gender in (', 'enroll_status in (', 'track in (']) {
+    eq('  ' + bad + '…) 같은 닫힌 목록을 걸지 않는다', body.includes(bad), false);
+  }
+
+  /* 🔴 ⑥ **입력칸이 허용하는 값을 DB·서버가 거절하면 안 된다.** 입력칸만 넓히면
+     정상 학생의 저장이 조용히 막힌다(조건부 PATCH 라 다음 저장도 같은 자리에서 막힌다).
+     그래서 `index.html` 의 min/max 와 두 겹의 숫자를 대조한다. */
+  {
+    const html = readText(new URL('../index.html', import.meta.url));
+    const attr = (id, a) => {
+      const tag = new RegExp('<input[^>]*id="' + id + '"[^>]*>').exec(html);
+      const m = tag && new RegExp(a + '="([-0-9.]+)"').exec(tag[0]);
+      return m ? Number(m[1]) : null;
+    };
+    const sqlRange = (col) => {
+      const m = new RegExp(col + '\\s+between\\s+([0-9.]+)\\s+and\\s+([0-9.]+)').exec(body);
+      return m ? [Number(m[1]), Number(m[2])] : null;
+    };
+    const GB = GUARD_BOUNDS;       // apply-guard.mjs 에서 불러온 것
+    for (const [id, col, key] of [['in-credits', 'credits', 'credits'], ['in-birth-year', 'birth_year', 'birthYear']]) {
+      const want = [attr(id, 'min'), attr(id, 'max')];
+      eq('  ' + id + ' 의 min/max 를 DB CHECK 가 그대로 받는다',
+        JSON.stringify(sqlRange(col)), JSON.stringify(want));
+      eq('  ' + id + ' 의 min/max 를 서버도 그대로 받는다',
+        JSON.stringify(GB[key]), JSON.stringify(want));
+    }
+    /* gpa 는 CHECK 모양이 `between` 이 아니라 `>= … and <= …` 다 */
+    const g = /gpa\s*>=\s*([0-9.]+)\s+and\s+gpa\s*<=\s*([0-9.]+)/.exec(body);
+    eq('  in-gpa 의 min/max 를 DB CHECK 가 그대로 받는다',
+      JSON.stringify(g && [Number(g[1]), Number(g[2])]),
+      JSON.stringify([attr('in-gpa', 'min'), attr('in-gpa', 'max')]));
+    eq('  in-gpa 의 min/max 를 서버도 그대로 받는다',
+      JSON.stringify(GB.gpa), JSON.stringify([attr('in-gpa', 'min'), attr('in-gpa', 'max')]));
+  }
+
+  /* 🔴 ⑦ 거절이 학생에게 보이는가 — 조용히 실패하면 프로필이 영영 안 올라간다 */
+  const cli = readText(new URL('../supabase-client.js', import.meta.url));
+  const app = readText(new URL('../app.js', import.meta.url));
+  eq('  앱이 check_violation(23514) 을 알아본다', /'23514'/.test(cli), true);
+  eq('  화면이 그것을 한 번 알린다', /syncTellIfRejected/.test(app), true);
+  /* 🔴 서버가 준 details 에는 실패한 행이 통째로(주민등록번호까지) 들어 있다 */
+  eq('  🔴 서버가 준 details 를 화면에 옮기지 않는다', /\bj\.details\b|res\.json\.details/.test(cli), false);
 }
 
 console.log('■ 회원가입·로그인 배선 (2026-08-25) — 빠뜨리면 조용히 안 되는 세 가지');

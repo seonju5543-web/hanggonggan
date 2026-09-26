@@ -64,6 +64,70 @@ function needsSensitive(notice) {
   return Array.isArray(e.flagsAny) && e.flagsAny.length > 0;
 }
 
+/* 🔴 **있을 수 없는 값은 판정 전에 막는다** (2026-09-26 · 고문 보고서 Q6)
+
+   고문의 지적: *"데이터 내용 검증은 클라이언트가 아닌 DB 제약 혹은 서버에서 수행한다."*
+   실제 구멍은 이렇다 — 변조한 앱이 학생 **본인 토큰**으로 우리 사본에 `gpa: 999` 를 써 넣으면
+   (RLS 는 '자기 행'만 보므로 이것은 막지 않는다), 엔진의 `minGpa` 를 뭐라고 적어 둬도
+   **전부 통과한다.** 서버가 사본을 읽는다는 것만으로는 이걸 못 막는다.
+
+   두 겹으로 막는다:
+     ① DB — `supabase/migrations/0004_profile_columns.sql` 의 CHECK 가 **쓰기 자체를 거절**한다.
+     ② 여기 — 그래도 한 번 더 본다. 0004 를 붙여넣기 **전에** 올라간 행은 검사를 안 받았고,
+        서버가 'DB 설정이 되어 있을 것'을 전제하면 안 된다(fail-closed 원칙).
+
+   🔴 아래 숫자는 0004 의 CHECK 와 **같아야 한다.** 관문 `verify/verify-apply-guard.mjs` 가
+      그 SQL 을 읽어 숫자가 어긋나면 실패한다 — 한쪽만 고치면 거기서 잡힌다.
+   ⚠️ 글자 길이는 여기서 보지 않는다. 1만 자 학교 이름은 어떤 요건과도 안 맞아 **저절로
+      떨어지므로**, 판정을 뒤집는 숫자 칸만 본다(막을 수 있는 것만 막는다고 적는다). */
+export const PROFILE_BOUNDS = {
+  gpa: [0, 4.5],          // index.html #in-gpa        min=0    max=4.5
+  year: [1, 8],           // 온보딩 칩은 1~4 · 초과학기·대학원까지 여유
+  bracket: [1, 10],       // 학자금지원구간
+  credits: [0, 30],       // index.html #in-credits    min=0    max=30
+  birthYear: [1940, 2020],// index.html #in-birth-year min=1940 max=2020
+};
+/* 🔴 위 넷(`gpa`·`credits`·`birthYear`)의 숫자는 **`index.html` 의 입력칸 min/max 와 같다.**
+   입력칸을 넓히면서 여기를 안 넓히면 **정상 학생의 저장이 거절된다** — 관문
+   `verify/test-collector.mjs` 「프로필 개별 칸 · DB 검증」 이 두 곳을 대조한다.
+   ⚠️ `credits`·`birthYear` 를 뒤늦게 더했다(2026-09-26 코드 리뷰). 둘 다 판정을 뒤집는다 —
+      실측: '15학점 이상' 줄에서 `credits: 999999` 가 통과하고, `birthYear: 3000` 은
+      나이가 **음수**가 되어 '만 30세 이하'를 통과했다. 새 칸을 만들면 여기도 같이 본다. */
+
+/* 0 은 '안 골랐다'다 — app.js `Number(getChip('#in-year'))` 가 빈 칩에서 0 을 만든다.
+   0 을 미달로 읽으면 학년을 안 고른 정상 학생을 막는다. 성적·이수학점의 0 은 진짜 0 이다. */
+const ZERO_IS_UNKNOWN = new Set(['year', 'bracket']);
+
+/** 숫자로 읽는다. 읽을 수 없으면 `NaN` — **`null`(모른다)과 구분해야 한다.** */
+function numOrNaN(v) {
+  if (v === null || v === undefined || v === '') return null;   // 모른다
+  const n = Number(v);
+  return Number.isFinite(n) ? n : NaN;                          // 읽을 수 없다
+}
+
+/** 있을 수 없는 값이 있으면 그 칸 이름, 없으면 빈 문자열. */
+export function profileOutOfRange(p) {
+  if (!p || typeof p !== 'object') return '';
+  for (const key of Object.keys(PROFILE_BOUNDS)) {
+    const n = numOrNaN(p[key]);
+    if (n === null) continue;                                   // 모른다 → 엔진이 'unknown' 으로 둔다
+    /* 🔴 **읽을 수 없는 값을 통과시키면 안 된다** (2026-09-26 코드 리뷰에서 잡았다).
+       처음에는 "엔진 비교가 전부 false 라 저절로 미달로 떨어진다"고 적고 통과시켰는데,
+       **실측하니 반대였다** — 엔진은 `else if (p.gpa < min) 미달; else 충족` 꼴이라
+       `gpa: '사점일'` 이 *"성적 요건 충족"* 으로 나온다(`{}` 도 같다). 즉 읽을 수 없는 값은
+       미달이 아니라 **통과**다. 0004 의 CHECK 는 그것을 이미 `-1` 로 거절하고 있었으므로
+       서버만 뚫려 있었던 셈이다. 두 겹이 같은 말을 하게 여기서도 막는다. */
+    if (Number.isNaN(n)) return key;
+    if (n === 0 && ZERO_IS_UNKNOWN.has(key)) continue;
+    const [lo, hi] = PROFILE_BOUNDS[key];
+    if (n < lo || n > hi) return key;
+  }
+  return '';
+}
+
+const BOUND_LABEL = { gpa: '성적(학점)', year: '학년', bracket: '학자금지원구간',
+                      credits: '이수학점', birthYear: '출생연도' };
+
 /**
  * 보내도 되는가 — 보낼 주소까지 **여기서** 정해 돌려준다.
  *
@@ -100,6 +164,14 @@ export function validateSubmission(payload, registered, now, held) {
   if (!p || typeof p !== 'object') {
     return { ok: false, code: 'no_profile',
       why: '프로필이 서버에 올라와 있지 않습니다 (앱에서 로그인해 한 번 저장해 주세요)' };
+  }
+
+  /* 🔴 있을 수 없는 값이면 판정하지 않는다 — 통과시키면 그게 바로 변조 통과다. */
+  const bad = profileOutOfRange(p);
+  if (bad) {
+    return { ok: false, code: 'profile_bad',
+      why: `프로필의 ${BOUND_LABEL[bad] || bad} 값이 올바르지 않습니다 (앱에서 다시 저장해 주세요)`,
+      field: bad };
   }
 
   /* 🔴 학교 한정 공고를 남의 학교 학생이 내지 못하게 — 앱과 같은 함수로 본다. */

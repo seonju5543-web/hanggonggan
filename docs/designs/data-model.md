@@ -47,6 +47,10 @@ auth.users (Supabase 가 관리)
             applications jsonb  ← 깎인 사본
             sensitive_ok boolean
             updated_at   timestamptz   ← 🔴 덮어쓰기 판정에 쓴다
+            ── 아래 열하나는 **DB 가 위 jsonb 에서 꺼내 채우는 칸**이다 (0004 · 앱은 안 보낸다)
+            school · campus · major · track · enroll_status · gender      text
+            grade · income_bracket · credits · birth_year   smallint      gpa  numeric
+                         ↑ 이 칸들에 CHECK 가 걸려 **있을 수 없는 값은 쓰기가 거절된다**
    └─1:N─ login_events
             id bigint PK · user_id uuid · at timestamptz
             device text  ← '아이폰 · Safari' 정도의 거친 이름 (원문 UA 아님)
@@ -54,12 +58,38 @@ auth.users (Supabase 가 관리)
           index (user_id, at desc)
 ```
 
-🔴 **`profile` 을 개별 컬럼으로 쪼개자는 제안이 두 번 있었다**(마이그레이션 주석 · 고문 Q6).
-쪼개지 않은 이유와, 쪼개도 덮어쓰기 사고가 안 고쳐지는 이유는 **`docs/designs/sync-overwrite.md`**.
-요약: 앱의 프로필 구조가 이미 두 번 바뀌었고(`migrateBranchCampus`·`migrateFitFields`),
-쪼개면 앱을 고칠 때마다 DB 도 같이 고쳐야 하며 **안 고치면 조용히 값이 사라진다.**
-쪼개는 이득은 따로 있다 — **서버에서 자격을 재검증**하려면 필요하다(고문 Q4). 그건
-자동 발송을 켤 때의 일이다.
+### 개별 컬럼 — 무엇을 위해 쪼갰고, 무엇을 위해 안 쪼갰는가 (2026-09-26)
+
+고문 보고서 Q6 은 두 가지를 한 문장에 담았다. **둘은 서로 다른 일이라 따로 답했다.**
+
+| 보고서가 말한 것 | 우리 답 |
+|---|---|
+| "통째 덮어쓰기(Last-write-wins)로 데이터가 증발한다" | 맞다. 그런데 **쪼개는 것으로는 안 고쳐진다** — 옛 기기가 쪼갠 칸을 제 옛 값으로 똑같이 덮는다. 고친 것은 모양이 아니라 **조건부 수정**이다 (`docs/designs/sync-overwrite.md`) |
+| "핵심 정보를 개별 컬럼으로 분리하고, 검증은 클라이언트가 아닌 DB CHECK 혹은 서버에서" | 그대로 했다 — `0004_profile_columns.sql` |
+
+🔴 쪼개는 방법을 **DB 가 꺼내 채우는 칸**(`generated always as … stored`)으로 골랐다.
+앱이 jsonb 와 개별 칸을 **둘 다** 쓰게 하면 두 곳이 갈라지고(프로필 구조가 이미 두 번
+바뀌었다 — `migrateBranchCampus`·`migrateFitFields`), **안 고치면 조용히 값이 사라진다.**
+꺼내 채우면 쓰는 길이 하나라 갈라질 수가 없고, CHECK 는 꺼낸 칸에 걸리므로
+**이상한 값이면 jsonb 쓰기 자체가 거절된다** = 보고서가 원한 'DB 검증'이 그대로 선다.
+
+🔴 **CHECK 가 잡는 것은 '있을 수 없는 값'이고, '거짓말'은 아니다.** 성적 999 는 막지만
+성적 2.0 인 학생이 4.1 이라 적는 것은 못 막는다(4.1 은 정상 범위다). 학교 학사정보와
+연동되기 전까지 그것을 확인할 방법은 없다 — 없는 방어를 있다고 적지 않는다.
+그래서 서버도 같은 범위를 한 번 더 본다(`apply-guard.mjs profileOutOfRange` ·
+0004 를 아직 붙여넣지 않았을 수 있고, 서버는 DB 설정을 전제하지 않는다).
+
+🔴 **'모른다'와 '읽을 수 없다'는 다르다.** 안 적은 값은 통과시켜 엔진이 `unknown` 으로 두게
+하고, 숫자로 읽을 수 없는 값(`gpa: "사점일"`)은 **거절한다** — 실측하니 엔진은 그것을
+미달이 아니라 *"성적 요건 충족"* 으로 읽는다(`else if (p.gpa < min) 미달; else 충족`).
+🔴 `gpa`·`credits`·`birthYear` 의 범위는 **`index.html` 입력칸의 min/max 와 같은 숫자다.**
+입력칸만 넓히면 정상 학생의 저장이 조용히 막히므로, 관문이 세 곳(HTML·SQL·서버)을 대조한다.
+
+⚠️ 거절은 **조용하면 안 된다.** 올리기 실패는 `app.js` 가 통째로 삼키고 있었으므로
+(`syncSchedulePush` 의 `.catch`), 거절만 따로 가려(`syncRejectText` — Postgres 23514)
+화면이 **한 번** 알린다. 관문 `verify/verify-supabase.js` [13] 절 · `verify/test-collector.mjs`
+「프로필 개별 칸 · DB 검증」 · `verify/verify-apply-guard.mjs`.
+🔴 서버가 준 `details` 에는 실패한 행이 통째로(주민등록번호까지) 들어 있어 **화면에 옮기지 않는다.**
 
 ## 3. 🔴 서버로 나가지 않는 것 — 이 목록이 약속의 전부다
 

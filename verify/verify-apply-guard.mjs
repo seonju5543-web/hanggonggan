@@ -7,7 +7,8 @@
    ========================================================================== */
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { validateSubmission, deadlinePassed, SENDABLE } from '../server/apply/apply-guard.mjs';
+import { validateSubmission, deadlinePassed, SENDABLE,
+         PROFILE_BOUNDS, profileOutOfRange } from '../server/apply/apply-guard.mjs';
 
 let fail = 0;
 const ok = (cond, label, extra) => {
@@ -129,6 +130,74 @@ console.log('\n■ 🔴 조작한 프로필로 자격을 맞힐 수 없다 (2026
     { profile: { ...P, flags: [] }, sensitiveOk: true });
   ok(!consented.ok && consented.code === 'not_eligible',
     '  동의를 켰는데 정말 없으면 자격 미달이다', consented.code);
+}
+
+console.log('\n■ 🔴 있을 수 없는 값 · DB 제약과 같은 숫자인가 (2026-09-26 · Q6)');
+{
+  /* 실제 구멍: 변조한 앱이 학생 본인 토큰으로 사본에 999 를 써 넣으면 `minGpa` 를
+     뭐라고 적어 둬도 전부 통과한다. 사본을 읽는 것만으로는 못 막는다. */
+  for (const [over, label] of [
+    [{ gpa: 999 }, '성적 999'],
+    [{ gpa: 4.6 }, '성적 4.6 (4.5 초과)'],
+    [{ gpa: -1 }, '성적 음수'],
+    [{ year: 99 }, '학년 99'],
+    [{ bracket: 99 }, '학자금지원구간 99'],
+    [{ credits: 999999 }, '이수학점 999999'],
+    [{ credits: 31 }, '이수학점 31 (30 초과)'],
+    [{ birthYear: 3000 }, '출생연도 3000 (나이가 음수가 된다)'],
+    /* 🔴 **숫자로 못 읽는 값도 막는다** — 처음에는 "엔진이 저절로 미달로 떨어뜨린다"고 믿고
+       통과시켰는데, 실측하니 `gpa: '사점일'` 이 *"성적 요건 충족"* 으로 나왔다(코드 리뷰). */
+    [{ gpa: '사점일' }, "성적 '사점일' (숫자로 못 읽는다)"],
+    [{ gpa: {} }, '성적이 객체'],
+  ]) {
+    const v = validateSubmission({ noticeId: NOTICE.id }, REG, NOW, HELD(over));
+    ok(v.ok === false && v.code === 'profile_bad', `🔴 ${label} 은 판정 전에 막는다`, v);
+  }
+  /* 🔴 정상 학생을 막으면 안 된다 — 여기가 red-green 의 반대쪽이다 */
+  for (const [over, label] of [
+    [{ year: 0 }, '학년을 안 골랐다(0)'],
+    [{ bracket: 0 }, '소득구간 0'],
+    [{ gpa: 0 }, '성적 0.0 (진짜 0 이다)'],
+    [{ gpa: 4.5 }, '성적 4.5 (경계)'],
+    [{ gpa: null, year: null, bracket: null }, '전부 모른다'],
+    [{ credits: 0 }, '이수학점 0 (진짜 0 이다)'],
+    [{ credits: 30 }, '이수학점 30 (경계)'],
+    [{ birthYear: 1940 }, '출생연도 1940 (경계)'],
+    [{ credits: '', birthYear: null }, '이수학점·출생연도를 안 적었다'],
+  ]) {
+    const v = validateSubmission({ noticeId: NOTICE.id }, REG, NOW, HELD(over));
+    ok(v.code !== 'profile_bad', `  ${label} 은 막지 않는다`, v.code);
+  }
+  /* 🔴 **'모른다'와 '읽을 수 없다'를 가른다** — 뭉개면 둘 중 하나가 틀린다 */
+  ok(profileOutOfRange({ gpa: null }) === '' && profileOutOfRange({ gpa: '' }) === '',
+    "안 적은 것은 '모른다'라 막지 않는다");
+  ok(profileOutOfRange({ gpa: '사점일' }) === 'gpa',
+    '🔴 숫자로 못 읽는 값은 막는다 (엔진은 그것을 *충족* 으로 읽는다 — 실측)');
+  ok(profileOutOfRange({ gpa: '4.1' }) === '',
+    '숫자로 적힌 문자열은 막지 않는다 (앱이 그렇게 보낼 수도 있다)');
+
+  /* 🔴 **DB CHECK 와 숫자가 같은가** — 한쪽만 고치면 겹이 하나 사라지므로 여기서 잡는다 */
+  const mig = fs.readFileSync(fileURLToPath(new URL('../supabase/migrations/0004_profile_columns.sql', import.meta.url)), 'utf8');
+  const num = (re) => { const m = re.exec(mig); return m ? m.slice(1).map(Number) : null; };
+  const sqlGrade   = num(/grade\s+between\s+([0-9.]+)\s+and\s+([0-9.]+)/);
+  const sqlBracket = num(/income_bracket\s+between\s+([0-9.]+)\s+and\s+([0-9.]+)/);
+  const sqlGpa     = num(/gpa\s*>=\s*([0-9.]+)\s+and\s+gpa\s*<=\s*([0-9.]+)/);
+  ok(sqlGrade && sqlGrade[0] === PROFILE_BOUNDS.year[0] && sqlGrade[1] === PROFILE_BOUNDS.year[1],
+    '🔴 학년 범위가 0004 의 CHECK 와 같다', { sql: sqlGrade, js: PROFILE_BOUNDS.year });
+  ok(sqlBracket && sqlBracket[0] === PROFILE_BOUNDS.bracket[0] && sqlBracket[1] === PROFILE_BOUNDS.bracket[1],
+    '🔴 소득구간 범위가 0004 의 CHECK 와 같다', { sql: sqlBracket, js: PROFILE_BOUNDS.bracket });
+  ok(sqlGpa && sqlGpa[0] === PROFILE_BOUNDS.gpa[0] && sqlGpa[1] === PROFILE_BOUNDS.gpa[1],
+    '🔴 성적 범위가 0004 의 CHECK 와 같다', { sql: sqlGpa, js: PROFILE_BOUNDS.gpa });
+  const sqlCredits = num(/credits\s+between\s+([0-9.]+)\s+and\s+([0-9.]+)/);
+  const sqlBirth   = num(/birth_year\s+between\s+([0-9.]+)\s+and\s+([0-9.]+)/);
+  ok(sqlCredits && sqlCredits[0] === PROFILE_BOUNDS.credits[0] && sqlCredits[1] === PROFILE_BOUNDS.credits[1],
+    '🔴 이수학점 범위가 0004 의 CHECK 와 같다', { sql: sqlCredits, js: PROFILE_BOUNDS.credits });
+  ok(sqlBirth && sqlBirth[0] === PROFILE_BOUNDS.birthYear[0] && sqlBirth[1] === PROFILE_BOUNDS.birthYear[1],
+    '🔴 출생연도 범위가 0004 의 CHECK 와 같다', { sql: sqlBirth, js: PROFILE_BOUNDS.birthYear });
+  /* 🔴 **칸을 더했으면 여기도 늘어야 한다** — 새 칸을 PROFILE_BOUNDS 에 넣고 SQL 을
+     잊으면(또는 그 반대면) 위 대조가 `null` 로 잡는다. 개수까지 못 박아 한쪽만 늘지 않게 한다. */
+  ok(Object.keys(PROFILE_BOUNDS).length === 5,
+    '범위를 재는 칸이 다섯이다 (늘렸으면 SQL·관문도 같이 늘린다)', Object.keys(PROFILE_BOUNDS));
 }
 
 console.log('\n■ 판정을 베끼지 않았는가 (갈라지면 화면과 서버가 다른 말을 한다)');
