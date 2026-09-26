@@ -4,9 +4,9 @@
 -- 쓰는 법: Supabase 대시보드 → SQL Editor 에 이 파일 내용을 통째로 붙여넣고 Run.
 --          여러 번 붙여넣어도 안전하다(같은 것을 다시 만들지 않는다).
 --
--- 무엇을 하는가: 지금까지 `profile` jsonb 한 칸에만 있던 **학교·캠퍼스·학과·학년·성별·
--- 학적상태·계열·성적·소득구간**을 각각의 칸으로 꺼내고, 그 칸에 **DB 가 직접 값을 검사하는
--- 제약(CHECK)** 을 건다. 앱이 무엇을 보내든 DB 가 한 번 더 본다.
+-- 무엇을 하는가: 지금까지 `profile` jsonb 한 칸에만 있던 **학교·캠퍼스·학과·계열·학적상태·
+-- 성별·학년·성적·소득구간·이수학점·출생연도** 열하나를 각각의 칸으로 꺼내고, 그 칸에
+-- **DB 가 직접 값을 검사하는 제약(CHECK)** 을 건다. 앱이 무엇을 보내든 DB 가 한 번 더 본다.
 --
 -- ============================================================
 -- 🔴 왜 '앱이 칸마다 따로 써 넣기'가 아니라 '꺼내 쓰기(generated)' 인가
@@ -182,13 +182,16 @@ alter table public.profiles add  constraint profiles_text_len
 -- ============================================================
 -- 붙여넣은 뒤 눈으로 확인 (한 줄씩 Run)
 -- ============================================================
--- 칸이 생겼는가:
---   select school, campus, major, grade, gender, enroll_status, track, gpa, income_bracket
+-- 칸 열하나가 생겼는가 (회원이 없으면 `(0 rows)` 로 나온다 — 칸 이름 줄만 보면 된다):
+--   select school, campus, major, track, enroll_status, gender,
+--          grade, gpa, income_bracket, credits, birth_year
 --     from public.profiles limit 20;
 --
--- 제약이 걸렸는가 (네 줄이 나와야 한다):
+-- 제약이 걸렸는가 (🔴 **여섯 줄**이 나와야 한다 — 실제로 돌려 확인한 숫자다):
 --   select conname from pg_constraint
---    where conrelid = 'public.profiles'::regclass and conname like 'profiles_%';
+--    where conrelid = 'public.profiles'::regclass and contype = 'c' order by conname;
+--   ⚠️ `contype = 'c'`(검사 제약만)로 좁힌다. `conname like 'profiles_%'` 로 보면
+--      0001 이 만든 profiles_pkey·profiles_user_id_fkey 까지 섞여 여덟 줄이 된다.
 --
 -- 🔴 붙여넣을 때 `violates check constraint` 오류가 나면, **이미 있는 행 중에 이상한 값이 있다**는
 --    뜻이다(0004 이전에 올라간 행은 검사를 받지 않았다). 어느 행인지 이렇게 찾는다:
