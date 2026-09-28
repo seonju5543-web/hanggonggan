@@ -3699,47 +3699,47 @@
    "lastWhy": ""
   },
   "n:https://dep.hufs.ac.kr/bbs/student/2431/263952/artclView.do": {
-   "patrolledAt": "2026-09-27",
+   "patrolledAt": "2026-09-28",
    "lastWhy": ""
   },
   "n:https://dep.hufs.ac.kr/bbs/student/2431/263956/artclView.do": {
-   "patrolledAt": "2026-09-27",
+   "patrolledAt": "2026-09-28",
    "lastWhy": ""
   },
   "r:reg-hufs-yuheungsu": {
-   "patrolledAt": "2026-09-27",
+   "patrolledAt": "2026-09-28",
    "lastWhy": "",
    "lastTried": "2026-09-13",
    "attempts": 0,
    "status": ""
   },
   "r:reg-hufs-myeonhak": {
-   "patrolledAt": "2026-09-27",
+   "patrolledAt": "2026-09-28",
    "lastWhy": "",
    "lastTried": "2026-09-13",
    "attempts": 0,
    "status": ""
   },
   "r:reg-hufs-seed": {
-   "patrolledAt": "2026-09-27",
+   "patrolledAt": "2026-09-28",
    "lastWhy": "",
    "lastTried": "2026-09-13",
    "attempts": 0,
    "status": ""
   },
   "r:reg-hufs-ambassador": {
-   "patrolledAt": "2026-09-27",
+   "patrolledAt": "2026-09-28",
    "lastWhy": "",
    "lastTried": "2026-09-13",
    "attempts": 0,
    "status": ""
   },
   "r:reg-kosaf-daecheonggyo": {
-   "patrolledAt": "2026-09-27",
+   "patrolledAt": "2026-09-28",
    "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)"
   },
   "r:reg-hufs-alumni": {
-   "patrolledAt": "2026-09-27",
+   "patrolledAt": "2026-09-28",
    "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)"
   },
   "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322894": {
@@ -3788,7 +3788,7 @@
    "likelyGone": true
   },
   "r:reg-hi-jeju": {
-   "patrolledAt": "2026-09-27",
+   "patrolledAt": "2026-09-28",
    "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)"
   },
   "r:auto-rnoticedoarticleno154473": {
@@ -3808,26 +3808,26 @@
    "lastWhy": ""
   },
   "r:auto-ent2431260146artclviewdo": {
-   "patrolledAt": "2026-09-27",
+   "patrolledAt": "2026-09-28",
    "lastWhy": ""
   },
   "r:auto-ent2431260214artclviewdo": {
-   "patrolledAt": "2026-09-27",
+   "patrolledAt": "2026-09-28",
    "lastWhy": ""
   },
   "r:auto-ent2431260269artclviewdo": {
-   "patrolledAt": "2026-09-27",
+   "patrolledAt": "2026-09-28",
    "lastWhy": ""
   },
   "r:reg-hufs-namgaju": {
-   "patrolledAt": "2026-09-27",
+   "patrolledAt": "2026-09-28",
    "lastWhy": "",
    "lastTried": "2026-09-11",
    "attempts": 0,
    "status": ""
   },
   "r:reg-hufs-gasong": {
-   "patrolledAt": "2026-09-27",
+   "patrolledAt": "2026-09-28",
    "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)"
   },
   "r:reg-hufs-yangcheon": {
@@ -4317,6 +4317,14 @@
   "r:auto-ent2431267817artclviewdo": {
    "patrolledAt": "2026-09-28",
    "lastWhy": ""
+  },
+  "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%202026%EB%85%84%EB%8F%84%20%ED%95%98%EB%B0%98%EA%B8%B0%20(%EC%9E%AC)%EB%85%BC%EC%82%B0%EC%8B%9C%EC%9E%A5%ED%95%99%ED%9A%8C%20%ED%95%99%EC%97%85%EC%9E%A5%EB%A0%A4%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4": {
+   "attempts": 0,
+   "title": "공통 2026년도 하반기 (재)논산시장학회 학업장려 장학생 선발 안내",
+   "lastTried": "2026-09-28",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323199"
   }
  }
 }
