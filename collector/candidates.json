@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-09-28",
- "count": 2002,
+ "count": 2003,
  "items": [
   {
    "title": "[공통][대청교] 2026학년도 2학기 9월 대학생 청소년교육지원장학 출근부 마감 안내",
@@ -17,6 +17,15 @@
    "url": "https://dep.hufs.ac.kr/bbs/student/2431/267751/artclView.do",
    "attachments": [],
    "deadlineHint": "지원 기간 : 2026. 10.&nbsp;13.( 화 ) ~ 2026. 10. 20.( 화 ) 15:00 &nbsp; 6. 제출 서류 가 . 장",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-09-28"
+  },
+  {
+   "title": "[공통][교내]2026학년도 2학기 면학장학금 신청 안내(미신청자)(~10/16)",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/267817/artclView.do",
+   "attachments": [],
+   "deadlineHint": "신청 기간 : 2026.09.29.( 화 ) 10:00 ~ 2026.10.16.( 금 ) 13:00 까지 &nbsp; 4. 신청 방법 : 온라인",
    "school": "한국외국어대학교",
    "campus": "",
    "foundAt": "2026-09-28"
