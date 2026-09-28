@@ -1400,6 +1400,18 @@
    "cards": 4,
    "dir": "insta/pub/auto-20ec9588eb82b40922ed9994",
    "at": "2026-09-23"
+  },
+  {
+   "status": "prepared",
+   "code": "auto-ent2431267751artclviewdo",
+   "org": "한국외국어대학교",
+   "name": "2026학년도 재직직원동문회 장학생 모집",
+   "due": "2026-10-20",
+   "school": "한국외대",
+   "tplNo": 1,
+   "cards": 5,
+   "dir": "insta/pub/auto-ent2431267751artclviewdo",
+   "at": "2026-09-28"
   }
  ]
 }
