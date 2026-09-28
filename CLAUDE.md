@@ -277,6 +277,13 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 - 서비스워커는 코드·데이터 모두 네트워크 우선 + `cache:'no-cache'` + 3.5초 폴백. 버전 인상은 옛 캐시 청소용 관례.
 - CSP(`script-src 'self'`) · 모든 렌더링 `esc()`(HTML 기호 되돌림은 `esc()` 앞) · 개인정보는 기기 안에만(로그인 사본은 `syncSafeProfile`).
 - 로그인 토큰 갱신은 탭 간 Web Locks + 다시 읽기 + `waitForOtherTabRefresh` 세 개가 한 세트('서버 한 번만'을 관문으로 세우지 말 것). 관문 `verify-supabase.js`.
+  🔴 **잠금 획득에 시한이 있어야 한다**(`authLockWaitMs` · 넘으면 `{steal:true}` 로 빼앗는다) — 잠금을 쥔 탭이 죽으면 `locks.request` 가
+  **영영 돌아오지 않아** 그 기기가 다시는 갱신하지 못한다(`.catch` 는 '거절'만 받는다). 관문 `verify-supabase.js` [14].
+  🔴 시한을 **SDK 기본값 5초로 베끼지 말 것** — 우리 요청 시한이 8초라 정상 갱신 중인 탭의 잠금을 빼앗는다. `timeoutMs` 에서 유도한다.
+- 🔴 **Supabase SDK 를 들여오지 않기로 했다 (2026-09-28 · 고문 보고서)** — 다중 탭 로그아웃은 이미 고쳐져 있고(관문 [10]),
+  SDK 의 Mutex Lock 은 **우리와 같은 `navigator.locks`** 이며, UMD 54KB(gzip)는 첫 화면 예산 75KB 의 3분의 2다.
+  SDK 가 나은 점 하나(고아 잠금 회수)만 가져왔다. ⚠️ 나중에 들여올 일이 생기면 **번들러는 필요 없다** —
+  npm 패키지 안에 이미 든 UMD 파일 한 장(dist/umd 폴더)을 저장소에 두면 `script-src 'self'` 가 유지된다. 경위는 `SESSIONS.md` 「SDK 를 번들로…」.
 - 🔴 **기기 사이 덮어쓰기**: push 는 **내가 본 판이 아직 서버에 있을 때만** 고친다(조건부 PATCH · 0행이면 `conflict`). 안 그러면 폰 A 가 올린 신청서가 폰 B 의 저장 한 번에 사라진다(실측). 🔴 **고문 보고서 Q6 의 '칸을 쪼개라'로는 안 고쳐진다** — 옛 기기가 쪼갠 칸을 제 옛 값으로 똑같이 덮는다. 합치는 규칙은 `syncApplyRemote` 한 곳이고 충돌 때는 방향이 반대라 `{quiet:true}`(프로필은 이 기기 것 · 신청내역은 합침 · 화면 안 그림). ⚠️ 진짜 Postgres 의 시각 비교는 아직 안 눌러 봤다. `docs/designs/sync-overwrite.md` · 관문 `verify-supabase.js` [9].
 
 ### 관리자 화면 · 외부 서비스

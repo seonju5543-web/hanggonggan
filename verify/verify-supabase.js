@@ -670,6 +670,88 @@ const seedScript = (seed) => `localStorage.setItem('handaejang.v1', ${JSON.strin
     await ctx.close();
   }
 
+  /* ───────── [14] 🔴 잠금이 고아가 되어도 갱신이 살아난다 (2026-09-28 · 고문 보고서) ─────────
+     고문 제안은 "SDK 를 번들러로 묶어 SDK 의 Mutex Lock 을 쓰라"였다. SDK 구현을 열어 보니
+     잠금 API 는 **우리와 똑같은 `navigator.locks`** 였고 다른 점은 하나 — **획득 시한과
+     `{steal:true}` 회수**다. 우리 것에는 그것이 없어, 잠금을 쥔 탭이 죽으면 다른 탭의
+     `locks.request` 가 **영영 돌아오지 않고** 그 기기는 토큰을 다시는 갱신하지 못했다.
+
+     🔴 재는 법: 탭 A 가 잠금을 잡고 **영원히 놓지 않는다**. 그 상태에서 탭 B 가 갱신을
+        부르면, 시한 뒤에 빼앗아 **성공해야** 한다. 시한·회수가 없으면 여기서 영영 멈춘다.
+     ⚠️ 두 탭은 **같은 context** 여야 한다(잠금을 공유한다) — 창을 따로 만들면 재현되지 않는다. */
+  console.log('\n[14] 잠금을 쥔 탭이 죽어도 다른 탭이 토큰을 갱신한다 (고아 잠금 회수)');
+  {
+    const ctx = await browser.newContext({ viewport: { width: 390, height: 900 } });
+    const a = await ctx.newPage();
+    const b = await ctx.newPage();
+    for (const p of [a, b]) {
+      p.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
+      await p.goto(`http://localhost:${APP_PORT}/`, { waitUntil: 'domcontentloaded' });
+      await p.evaluate(seedScript(SEED));
+    }
+    for (const p of [a, b]) {
+      await p.reload({ waitUntil: 'domcontentloaded' });
+      await settle(p);
+      await p.evaluate(([k, t]) => localStorage.setItem(k, JSON.stringify(t)),
+        [await p.evaluate(() => AUTH_KEY), {
+          accessToken: liveAccess, refreshToken: liveRefresh, expiresAt: Date.now() - 1000,
+          userId: '00000000-0000-4000-8000-000000000001', email: 'test@example.com',
+        }]);
+    }
+    /* 기다리는 시간을 짧게 줄인다 — 진짜 10초를 기다리면 검사가 느려진다.
+       ⚠️ 값을 **앱에서 읽어** 줄인다(앱이 그 값을 쓰는지까지 함께 재는 셈이다). */
+    /* ⑤ 🔴 **앱의 실제 값과 대조한다** — 숫자를 여기 박으면(9000 등) 앱이 바뀌어도 초록불이다.
+       잠금을 쥔 쪽이 쓸 수 있는 최대는 `timeoutMs`(요청) + `AUTH_PROPAGATE_MS`(다른 탭 기다림)다.
+       기다림 시한이 그보다 길어야, 정상 갱신 중인 탭의 잠금을 빼앗지 않는다. */
+    const budget = await b.evaluate(() => ({
+      wait: authLockWaitMs(),
+      timeout: (typeof SUPABASE_CONFIG !== 'undefined' && SUPABASE_CONFIG.timeoutMs) || 8000,
+      propagate: typeof AUTH_PROPAGATE_MS === 'number' ? AUTH_PROPAGATE_MS : 600,
+      lockName: AUTH_LOCK,
+    }));
+    ok(budget.wait > budget.timeout + budget.propagate,
+      '🔴 기다림 시한이 잠금을 쥔 쪽의 최대 시간보다 길다 (짧으면 정상 갱신을 빼앗는다)', budget);
+    /* ② 🔴 **잠금 이름을 앱에서 읽는다** — 글자로 박으면 `AUTH_LOCK` 이름만 바꿔도 이 절이
+       **아무것도 안 재면서** 초록불이 된다(코드 리뷰에서 실제로 확인했다). */
+    ok(!!budget.lockName, '앱에서 잠금 이름을 읽어냈다', budget.lockName);
+    const SHORT_WAIT = 700;
+    await b.evaluate((ms) => { window.authLockWaitMs = () => ms; }, SHORT_WAIT);
+
+    /* 🔴 탭 A 가 잠금을 잡고 **영원히** 놓지 않는다 (탭이 죽은 것과 같은 상태) */
+    await a.evaluate((lockName) => {
+      window.__held = new Promise(() => {});
+      /* ⚠️ **제 거절을 스스로 받는다** — 탭 B 가 빼앗으면 이 요청이
+         *"Lock broken by another request with the 'steal' option."* 로 거절된다.
+         안 받으면 검사가 그것을 앱의 페이지 오류로 세어 엉뚱한 빨간불이 난다
+         (실제로 그렇게 났다 — 앱 잘못이 아니라 이 검사가 만든 잠금이다). */
+      navigator.locks.request(lockName, () => window.__held).catch(() => {});
+    }, budget.lockName);
+    await a.waitForTimeout(200);
+
+    /* ⚠️ 시한·회수가 없으면 `authRefresh()` 가 **영영 돌아오지 않는다.** 그대로 두면 검사가
+       멈췄다가 드라이버 전체가 알 수 없는 오류로 죽는다 — 읽을 수 있는 빨간불이 되게
+       여기서 한 번 끊는다(끊긴 것 자체가 그 사고의 증거다). */
+    /* ③ 🔴 **비교 기준을 실제 이전 값으로 잡는다** — `'refresh-1'` 과 비교하던 것은 앞 절이
+       이미 토큰을 돌려놔서 **언제나 통과**했다(코드 리뷰에서 확인: 서버를 안 불러도 초록불). */
+    const before = await b.evaluate(() => (authLoad() || {}).refreshToken || '');
+    const t0 = Date.now();
+    const got = await b.evaluate(async () => {
+      const done = authRefresh().then((r) => ({ ok: r, token: (authLoad() || {}).refreshToken || '' }));
+      const late = new Promise((r) => setTimeout(() => r({ ok: 'HUNG', token: '' }), 5000));
+      return Promise.race([done, late]);
+    });
+    const took = Date.now() - t0;
+    ok(got.ok === true, '🔴 잠금이 고아가 되어도 갱신이 성공한다 (시한 뒤 빼앗는다)', got);
+    ok(!!got.token && got.token !== before,
+      '🔴 서버를 실제로 불러 새 토큰을 받아 왔다 (앞 절이 남긴 값이 아니다)', { before, after: got.token });
+    /* ④ 🔴 시한을 **줄여 둔 값 기준**으로 잰다 — 8초로 재던 것은 위 `Promise.race` 가 5초에
+       끊으므로 **빨간 실행에서도 통과**했다(코드 리뷰에서 확인). 700ms 로 줄여 놨으니
+       그 갑절 조금 넘는 선이면 '시한을 지켰다'를 실제로 잰다. */
+    ok(took < SHORT_WAIT * 3, '줄여 둔 시한 안에 끝난다 (영영 기다리지 않는다)',
+      { took: took + 'ms', wait: SHORT_WAIT + 'ms' });
+    await ctx.close();
+  }
+
   /* ───────── [13] 🔴 DB 가 값을 거절하면 학생이 알게 된다 (2026-09-26 · 고문 Q6) ─────────
      0004_profile_columns.sql 부터 있을 수 없는 값(성적 999 · 1만 자 학교 이름)은 DB 가
      **쓰기를 거절한다.** 그런데 올리기 실패는 `app.js syncSchedulePush` 의
