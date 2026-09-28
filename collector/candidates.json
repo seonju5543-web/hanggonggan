@@ -1,8 +1,26 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
- "updatedAt": "2026-09-27",
- "count": 2001,
+ "updatedAt": "2026-09-28",
+ "count": 2002,
  "items": [
+  {
+   "title": "[공통][대청교] 2026학년도 2학기 9월 대학생 청소년교육지원장학 출근부 마감 안내",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/267749/artclView.do",
+   "attachments": [],
+   "deadlineHint": "마감 : 2026. 10. 1.(금 ) 오후 2 시 &nbsp;&nbsp;&nbsp; 한국장학재단 기관포털 ( http://workstudy.k",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-09-28"
+  },
+  {
+   "title": "[공통][교내]2026학년도 재직직원동문회 장학생 모집(~10/20)",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/267751/artclView.do",
+   "attachments": [],
+   "deadlineHint": "지원 기간 : 2026. 10.&nbsp;13.( 화 ) ~ 2026. 10. 20.( 화 ) 15:00 &nbsp; 6. 제출 서류 가 . 장",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-09-28"
+  },
   {
    "title": "[글로벌][교외] 2026년 효림장학재단 장학생 선발 안내 (~10/1)",
    "url": "https://dep.hufs.ac.kr/bbs/student/2431/267611/artclView.do",
@@ -33118,40 +33136,6 @@
    "school": "연세대학교",
    "campus": "",
    "foundAt": "2026-07-30"
-  },
-  {
-   "title": "[등록/장학] 2026년 5·18희망장학생 모집 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52964&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "attachments": [
-    {
-     "name": "부설기관",
-     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
-    },
-    {
-     "name": "부설연구기관",
-     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
-    },
-    {
-     "name": "연구지원팀",
-     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
-    },
-    {
-     "name": "연구진흥팀",
-     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
-    },
-    {
-     "name": "경영관리팀",
-     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
-    },
-    {
-     "name": "기술지주회사",
-     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
-    }
-   ],
-   "deadlineHint": "까지 가능) 수료/졸업요건 안내 입학연도별 졸업학점 안내 학적변동 구분 특별프로그램 안내 --> 병무 안내 수강",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-07-29"
   }
  ]
 }
