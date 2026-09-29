@@ -4327,6 +4327,60 @@
    "attachments": [],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323199",
    "sourceKind": "auto"
+  },
+  {
+   "id": "auto-ent2431267935artclviewdo",
+   "name": "2026-2학기 재직동문교수회(HUFS 명문가 장학금) 신청안내(~10/16)",
+   "boardTitle": "2026-2학기 재직동문교수회(HUFS 명문가 장학금) 신청안내(~10/16)",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "100만원",
+   "amountValue": 1000000,
+   "deadline": "2026-10-16",
+   "deadlineFrom": "게시판 요약 · ~ 2026. 10. 16",
+   "period": "접수 ~2026-10-16",
+   "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-29 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/267935/artclView.do",
+   "sourceKind": "auto",
+   "applyPortal": "HUFS Ability",
+   "applyPortalSource": "6 신청방법 : 온라인 신청 (HUFS Ability- 학생핵심역량통합시스템 ) → 로그인 ( 학번 / 비번 ) → 교과 / 비교과 → 장학신청 목록 → 해당 장학금 선택",
+   "applyPortalFrom": "공고 원문",
+   "openDate": "2026-10-06",
+   "eligibilityLines": [
+    "2. 신청자격 ( 가 , 나 모두 해당 )",
+    "가 . 2026-2 학기 재학생 중 4 촌 이내 친인척이 3 인 ( 본인포함 ) 이상 한국외대 학부과정의 동문인 경우",
+    "단, 현재 우리 대학에 재직 중인 동문 교수 및 직원의 4 촌 이내 친인척은 제외",
+    "나 . 직전 정규학기 취득학점 12 학점 이상 , 평점평균 3.0 이상인 자",
+    "다 . 선발관련사항 ( 예산 초과 신청 시 )",
+    "① 기존 가족장학금 수혜자도 신청 가능하나 가족장학금 미수혜자를 우선 선발함",
+    "② 자격을 충족하더라도 평가 순위에 따라 탈락될 수 있음"
+   ],
+   "excerpts": [
+    "장학금액 및 선발 인원 : 1,000,000 원 ( 생활비성 ), 총 5 명",
+    "문의처 서울 장학팀 : 02-2173-2137, 글로벌 학생지원 · 장학팀 : 031-330-4034"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 1000000,
+    "ratio": 0,
+    "min": 1000000,
+    "max": 1000000,
+    "raw": "3. 장학금액 및 선발 인원 : 1,000,000 원 ( 생활비성 ), 총 5 명"
+   },
+   "amountFrom": "공고 원문"
   }
  ]
 }

@@ -1,8 +1,17 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-09-29",
- "count": 1983,
+ "count": 1984,
  "items": [
+  {
+   "title": "2026-2학기 재직동문교수회(HUFS 명문가 장학금) 신청안내(~10/16)",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/267935/artclView.do",
+   "attachments": [],
+   "deadlineHint": "신청기간 : 2026. 10. 6.( 화 ) 09:00 ~ 2026. 10. 16.( 금 ) 16:00 까지 &nbsp; 5. 제출서류 &nbs",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-09-29"
+  },
   {
    "title": "[공통][대청교] 2026학년도 2학기 9월 대학생 청소년교육지원장학 출근부 마감 안내",
    "url": "https://dep.hufs.ac.kr/bbs/student/2431/267749/artclView.do",
