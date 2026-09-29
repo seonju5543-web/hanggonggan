@@ -23,7 +23,9 @@ const eq = (label, got, want) => {
 };
 
 /* 마감은 오늘 기준으로 만든다 — 날짜를 박아 두면 달이 바뀌는 순간 '마감' 이 되어 검사가 조용히 뒤집힌다 */
-const iso = (days) => new Date(Date.now() + 9 * 3600e3 + days * 86400e3).toISOString().slice(0, 10);
+/* 마감 날짜는 **브라우저와 같은 시계**(이 컴퓨터의 현지 날짜)로 만든다 — 앱의 dday() 가 todayStart()(현지 자정)로 재기 때문.
+   한국 시간(+9h)으로 만들면 UTC 15시 이후엔 하루가 어긋나 D-5 가 D-6 으로 뜬다(2026-09-29 15:19 UTC 에 실제로 났다). */
+const iso = (days) => { const d = new Date(); d.setDate(d.getDate() + days); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
 const FIXTURE = {
   updatedAt: '2026-09-25',
   items: [
