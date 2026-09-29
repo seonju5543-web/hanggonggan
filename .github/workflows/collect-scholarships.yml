@@ -33,7 +33,11 @@ jobs:
     # 실제로 7/31 브라우저 수집이 360분을 돌다 취소됐고, 수집 로봇 2종이 같은
     # 대기줄(concurrency: collector)을 쓰기 때문에 그동안 다음 수집이 줄을 섰다.
     # 학교를 더 붙일수록 '한 곳이 안 열려 멈추는' 확률도 같이 오른다.
-    timeout-minutes: 30   # 실측 0.9~7.7분 (단계 예산 합: 6+4+5+1+3+3+4 + 준비·저장 — OCR 4분 추가 2026-09-17)
+    # 상한 = 단계 상한의 합 + 준비·저장 여유 (browser-collect.yml 과 같은 셈법 · 관문 test-collector 「일반 수집 예산」).
+    # 2026-09-29 수집망 2 → 44개교 복원: 「게시판 수집」 단계에 자체 상한 10분(예산 8분 + 마무리 2분)이 생겨
+    # 단계 합 4+10+6+5+1+4+3+3+4 = 40 → 상한 44. ⚠️ 상한을 키우는 것으로 때우지 말 것 — 단계가 오래 걸리면
+    # 그 단계의 예산(HARVEST_BUDGET_MS)을 줄이고, 상한은 그 합을 담는 그릇으로만 쓴다(8/2~3 사고의 교훈).
+    timeout-minutes: 44
     steps:
       - uses: actions/checkout@v4
 
@@ -56,6 +60,13 @@ jobs:
 
       - id: run
         name: 게시판 수집
+        # 자체 예산(8분 · collect.mjs HARVEST_BUDGET_MS) + 단계 상한 + continue-on-error 세 겹 (2026-09-29 · 44개교 복원).
+        # 상한 10 = 예산 8 + 마무리 2. 이 상한에 닿는다는 것 자체가 '어딘가 안 멈췄다'는 신호다.
+        # continue-on-error 라 흘러넘쳐도 아래 저장·감사·리포트 단계는 돈다(잘린 학교는 회전 커서가 다음 실행에 넘긴다).
+        timeout-minutes: 10
+        continue-on-error: true
+        env:
+          HARVEST_BUDGET_MS: '480000'
         run: node collector/collect.mjs
 
       - name: 정식 등록 자동화 (선조치후보고 — collector/auto-register-config.json으로 on/off)
@@ -212,6 +223,8 @@ jobs:
           [ -f collector/candidates.json ] && git add collector/candidates.json
           # 페이지 넘기기 방식 기록 — 빠뜨리면 매 실행 처음부터 헤맨다 (2026-08-17)
           [ -f collector/pagination.json ] && git add collector/pagination.json
+          # 회전 커서 (2026-09-29) — 없으면 매 실행 같은 학교에서 시작해 예산에 걸리는 학교가 늘 같다
+          [ -f collector/collect-cursor.json ] && git add collector/collect-cursor.json
           [ -f collector/health.json ] && git add collector/health.json
           [ -f collector/pending-forms.json ] && git add collector/pending-forms.json
           [ -d collector/extracted ] && git add collector/extracted

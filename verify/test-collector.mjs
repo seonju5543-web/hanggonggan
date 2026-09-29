@@ -1352,28 +1352,74 @@ console.log('\n■ 신청 준비 시작 버튼 — 양식이 없어도 곧장 \'
 /* 2026-08-30 — 정식 등록을 경희대·한국외대로 좁혔다(개발자 지시).
    🔴 좁힌 것은 **등록뿐**이고 수집은 그대로다 — 실시간 공고 피드는 계속 나가야
    다른 학교 학생이 빈 화면을 보지 않는다. 되돌리려면 설정의 `schools` 를 [] 로. */
-/* 2026-08-30 — 수집망도 두 곳으로 좁혔다. 🔴 뺀 학교의 주소는 **지우지 않고 parked 로 옮겼다** —
-   이 boardUrl 들은 알아내는 데 실행이 여러 번 걸렸고(경희대만 8회), 지우면 되돌릴 때 처음부터
-   다시 찾아야 한다. 로봇은 `schools`·`targets` 만 읽으므로 parked 는 아무 일도 하지 않는다. */
-console.log('\n■ 수집망 좁히기 (2026-08-30)');
+/* 2026-08-30 — 수집망을 두 곳으로 좁혔다. 뺀 학교의 주소는 지우지 않고 parked 로 옮겼다.
+   2026-09-29 — 개발자 지시(대외활동·공모전 탭 + 인포 중심 피벗 — "제외시킨 학교를 모두 살려")로 **44개교 전부 되살렸다**.
+   🔴 여기서 잠그는 것 셋: ① 되살린 학교가 도로 빠지지 않는다(수집 설정 둘) ② 앱이 보여 주는 학교(SERVED_SCHOOLS)와
+   로봇이 수집하는 학교가 같다 — 갈라지면 로봇은 모으는데 앱은 숨겨 **아무도 모르는 채로** 빈 화면이 된다
+   ③ 보관 자리(parked)의 규칙은 그대로 — 쓰지 않게 된 게시판은 지우지 않고 옮긴다.
+   ⚠️ 정식 등록 범위(auto-register-config.json `schools`)는 두 곳 그대로다 — 별개 결정이라 여기서 같이 잠근다. */
+console.log('\n■ 수집망 복원 (2026-09-29 · 2026-08-30 좁힘을 되돌림)');
 {
   const sc = JSON.parse(readText(new URL('../collector/schools.json', import.meta.url)));
   const bt = JSON.parse(readText(new URL('../collector/browser-targets.json', import.meta.url)));
-  const names = (a) => a.map((x) => x.school).sort();
-  eq('일반 수집은 두 곳', names(sc.schools), ['경희대학교', '한국외국어대학교']);
-  eq('브라우저 수집도 두 곳', names(bt.targets), ['경희대학교', '한국외국어대학교']);
-  /* 🔴 뺀 학교를 지워 버리면 되돌릴 때 주소를 처음부터 다시 찾아야 한다 */
-  /* ⚠️ `sc.parked.length` 로 바로 읽으면 키가 통째로 사라졌을 때 **검사가 죽는다** —
-     빨간불이 아니라 뒤 절이 아예 안 도는 것이라 더 나쁘다. 없으면 빈 배열로 본다. */
+  const uniq = (a) => [...new Set(a.map((x) => x.school))].sort();
+  /* 2026-08-30 에 뺐던 학교 — 되돌린 뒤 하나라도 도로 빠지면 여기서 빨간불 */
+  const REVIVED = ['서울대학교', '연세대학교', '고려대학교', '서강대학교', '성균관대학교', '한양대학교', '중앙대학교', '서울시립대학교',
+    '건국대학교', '동국대학교', '홍익대학교', '숙명여자대학교', '광운대학교', '명지대학교', '상명대학교', '가천대학교', '아주대학교',
+    '국민대학교', '숭실대학교', '세종대학교', '이화여자대학교', '인하대학교', '부산대학교', '가톨릭대학교', '한국항공대학교', '경기대학교',
+    '서울과학기술대학교', '계명대학교', '서울교육대학교', '한국방송통신대학교', '경북대학교', '영남대학교', '전북대학교', '충남대학교',
+    '전남대학교', '조선대학교', '충북대학교', '부경대학교', '강원대학교'];
+  eq('일반 수집에 경희대·한국외대가 있다', ['경희대학교', '한국외국어대학교'].filter((n) => !uniq(sc.schools).includes(n)), []);
+  eq('일반 수집에 2026-08-30 에 뺐던 학교가 전부 돌아왔다', REVIVED.filter((n) => !uniq(sc.schools).includes(n)), []);
+  eq('브라우저 수집도 두 곳 이상이다 (17곳을 되살렸다)', bt.targets.length >= 19, true);
+  eq('브라우저 수집 학교는 일반 수집 학교의 부분집합이다 (앱 상수가 schools.json 만 보므로)',
+    uniq(bt.targets).filter((n) => !uniq(sc.schools).includes(n)), []);
+  eq('  항목마다 게시판 주소 칸이 있다', sc.schools.every((x) => 'boardUrl' in x), true);
+  /* 앱·알림·발행이 같이 쓰는 상수 — schools.json 과 같아야 한다 (자세한 대조는 「화면이 보여 주는 학교 = 로봇이 수집하는 학교」) */
+  const served = createRequire(import.meta.url)('../match-engine.js').SERVED_SCHOOLS;
+  eq('앱 상수 SERVED_SCHOOLS 도 44곳 전부다', REVIVED.filter((n) => !served.includes(n)), []);
+  /* 보관 자리의 규칙은 그대로 — 키가 사라지면 다음에 뺄 때 주소를 잃는다 */
   const parked = (o) => (Array.isArray(o.parked) ? o.parked : []);
-  eq('뺀 학교의 게시판 주소가 남아 있다', parked(sc).length > 0 && parked(bt).length > 0, true);
-  eq('  보관분에도 주소가 실제로 들어 있다',
-    parked(sc).length > 0 && parked(sc).every((x) => 'boardUrl' in x), true);
-  eq('  왜 뺐는지·어떻게 되돌리는지 적혀 있다', /되돌리려면/.test(sc._parked || ''), true);
-  /* 로봇이 보관분을 실수로 훑으면 좁힌 뜻이 사라진다 */
+  eq('보관 배열이 남아 있다 (비어 있어도 된다)', Array.isArray(sc.parked) && Array.isArray(bt.parked), true);
+  eq('  보관분에 주소 칸이 있다', parked(sc).every((x) => 'boardUrl' in x), true);
+  eq('  왜 되살렸는지·어떻게 되돌리는지 적혀 있다', /2026-09-29/.test(sc._parked || '') && /되돌리려면/.test(sc._parked || ''), true);
   const cm = readText(new URL('../collector/collect.mjs', import.meta.url));
   const bc = readText(new URL('../collector/browser-collect.mjs', import.meta.url));
   eq('로봇은 parked 를 읽지 않는다', /\.parked/.test(cm) || /\.parked/.test(bc), false);
+  /* 정식 등록은 별개 — 넓히면 재단 공고가 학교마다 따로 등록된다(노션 F-5 · 49건 손작업) */
+  const ar = JSON.parse(readText(new URL('../collector/auto-register-config.json', import.meta.url)));
+  eq('정식 등록 범위는 두 곳 그대로 (넓히는 것은 개발자 지시 때만)', (ar.schools || []).slice().sort(), ['경희대학교', '한국외국어대학교']);
+}
+
+/* ── 일반 수집 예산 (2026-09-29 · 44개교 복원과 한 세트) ─────────────────────────
+   브라우저 수집기의 「절대 시한」·예산 검사와 같은 것을 일반 수집기에도 건다. 학교가 둘일 때는
+   0.9~7.7분에 끝나 필요 없었지만 44곳이면 상한에 걸릴 수 있고, 걸리면 그날 수집분이 통째로 버려진다. */
+console.log('\n■ 일반 수집 예산 (2026-09-29)');
+{
+  const root = new URL('../', import.meta.url);
+  const src = readText(new URL('collector/collect.mjs', root));
+  eq('예산·시한·회전을 harvest-budget 에서 불러 쓴다 (베끼지 않는다)',
+    /import \{ makeBudget, rotateOrder, nextCursor, withDeadline, TIMED_OUT \} from '\.\/harvest-budget\.mjs'/.test(src), true);
+  eq('게시판을 집기 전에 예산을 묻는다', /if \(budget\.expired\(\)\) \{/.test(src), true);
+  eq('게시판 하나에 절대 시한을 건다', /await withDeadline\(harvestBoard\(s\), BOARD_HARD_MS\)/.test(src), true);
+  eq('  시한을 넘기면 리포트에 적고 다음으로 간다', /if \(r === TIMED_OUT\) \{/.test(src), true);
+  eq('  예산에 걸려 건너뛴 학교는 ⏰ 로 적는다 (⚠️ 로 적으면 연속 실패로 세어진다)', /status: `⏰ 시간 예산/.test(src), true);
+  eq('회전 커서를 읽고 저장한다', /rotateOrder\(boards\.length, cursor\.next \|\| 0\)/.test(src) && /fs\.writeFileSync\(cursorPath/.test(src), true);
+  eq('  예산·시한이 환경변수로 바뀐다 (워크플로가 정한다)', /HARVEST_BUDGET_MS/.test(src) && /BOARD_HARD_MS/.test(src), true);
+  eq('  리포트 머리에 예산 결과를 적는다', /skippedByBudget\.length/.test(src), true);
+  const yml = readText(new URL('.github/workflows/collect-scholarships.yml', root));
+  eq('저장 목록에 회전 커서가 있다', /collect-cursor\.json/.test(yml), true);
+  /* 작업 상한 4칸 · 단계 상한 8칸 — browser-collect 검사와 같은 읽기 */
+  const limit = Number((yml.match(/^ {4}timeout-minutes:\s*(\d+)/m) || [])[1]);
+  const stepCaps = [...yml.matchAll(/^ {8}timeout-minutes:\s*(\d+)/gm)].map((m) => Number(m[1]));
+  const budgetMin = Number((yml.match(/HARVEST_BUDGET_MS:\s*'(\d+)'/) || [])[1]) / 60000;
+  const harvestStep = yml.slice(yml.indexOf('name: 게시판 수집'), yml.indexOf('run: node collector/collect.mjs'));
+  const harvestCap = Number((harvestStep.match(/timeout-minutes:\s*(\d+)/) || [])[1]);
+  eq('수집 단계에 자체 상한이 있다', Number.isFinite(harvestCap), true);
+  eq('  수집 단계는 실패해도 저장 단계로 간다 (continue-on-error)', /continue-on-error: true/.test(harvestStep), true);
+  eq('  수집 단계 상한이 수집 예산보다 크다', harvestCap > budgetMin, true);
+  const OVERHEAD = 3;
+  eq('작업 상한이 단계 상한의 합 + 여유보다 크다', limit > stepCaps.reduce((a, b) => a + b, 0) + OVERHEAD, true);
 }
 
 console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
@@ -1421,8 +1467,8 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
   eq('두 파일은 합집합으로 자동 병합', /data\/activities\.json\s+merge=jsonunion/.test(ga) && /collector\/seen-activities\.json\s+merge=jsonunion/.test(ga), true);
   /* ③ 출처 */
   const src = JSON.parse(readText(new URL('../collector/activity-sources.json', import.meta.url)));
-  const served = ['경희대학교', '한국외국어대학교'];
-  eq('전용 게시판 출처는 서비스 학교 둘뿐 (전국 글은 학교를 비우고 host 를 적는다)',
+  const served = createRequire(import.meta.url)('../match-engine.js').SERVED_SCHOOLS;   // 2026-09-29: 두 곳 → 44곳, 상수 한 곳에서 읽는다
+  eq('전용 게시판 출처는 서비스 학교 안 (전국 글은 학교를 비우고 host 를 적는다)',
     (src.sources || []).every((x) => (x.school === '' ? !!x.host : served.includes(x.school))), true);
   eq('  항목마다 boardUrl 칸이 있다 (null 이면 로봇이 "주소 미설정"으로 리포트한다)', (src.sources || []).length > 0 && src.sources.every((x) => 'boardUrl' in x), true);
   eq('  보관 칸과 되돌리는 법', Array.isArray(src.parked) && /되돌리려면/.test(src._parked || ''), true);
@@ -3047,7 +3093,7 @@ console.log('\n■ 서비스하지 않는 학교의 공고는 피드에 안 담�
   const ME = await import(new URL('../match-engine.js', import.meta.url));
   const served = ME.default ? ME.default.SERVED_SCHOOLS : ME.SERVED_SCHOOLS;
   const got = dropUnserved([
-    { school: served[0], title: 'ㄱ' }, { school: '동국대학교', title: 'ㄴ' },
+    { school: served[0], title: 'ㄱ' }, { school: '한대장가상대학교', title: 'ㄴ' },
     { school: served[1], title: 'ㄷ' }, { title: '학교 없음' }, null,
   ]);
   eq('서비스 학교만 남긴다', got.map((n) => n.school), [served[0], served[1]]);
@@ -9470,10 +9516,11 @@ return { submitChannelKind, submitChannelLabel };`)();
   const claude = readText(new URL('../CLAUDE.md', import.meta.url));
 
   /* ① 수집망 결정과 어긋나지 않는가 — 이 사고 그 자체 */
-  eq('CLAUDE.md 에 「수집망 두 곳」 결정이 살아 있다', /수집망은 두 곳 그대로/.test(claude), true);
-  eq('요청서가 「전국으로 넓히려 한다」고 말하지 않는다',
-    /전국\s*(외부\s*)?공고까지\s*넓히려/.test(brief), false);
-  eq('요청서가 좁힌 사실을 적는다', /2곳으로 확정|경희대·한국외대 2곳/.test(brief), true);
+  /* 2026-09-29: 두 곳 → 44개교 복원. 요청서는 좁혔던 경위와 되살린 사실을 **둘 다** 적어야 한다 —
+     정식 등록(자격 진단·양식)은 두 곳 그대로라 그 구분이 빠지면 고문이 다른 전제로 답한다. */
+  eq('CLAUDE.md 에 「수집망 44개교 복원」 결정이 살아 있다', /수집망 44개교 복원/.test(claude), true);
+  eq('요청서가 되살린 사실을 적는다', /44개교/.test(brief) && /2026-09-29/.test(brief), true);
+  eq('요청서가 정식 등록은 두 곳이라고 구분해 적는다', /정식 등록[^<]{0,40}경희대·한국외대/.test(brief), true);
 
   /* ② 이미 고친 결함을 미해결로 적어 두지 않는다 — 고문의 시간을 뺏는다 */
   eq('포털 오단정을 아직 고칠 자리라고 적지 않는다',
