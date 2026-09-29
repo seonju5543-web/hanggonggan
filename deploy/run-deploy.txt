@@ -15,4 +15,4 @@
 # 데이터 관문(node verify/audit-data.js)을 통과하지 못하면 배포하지 않고 🚨 이슈를 남긴다.
 
 branch: claude/handaejang-notice-error-check-fg521c
-메모: 2026-09-28 — 고아 잠금 회수 (SDK 번들 대신 그 한 가지만)
+메모: 2026-09-29 — 라이브 점검이 앱이 실제로 받는 파일을 보게

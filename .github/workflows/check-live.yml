@@ -31,22 +31,48 @@ jobs:
           SITE: https://seonju5543-web.github.io/hanggonggan
         run: |
           mkdir -p live
-          for f in sw.js app.js data/notices.json data/registered.json data/forms.json; do
+
+          # 🔴 **앱이 실제로 받는 파일을 본다** (2026-09-29 신설).
+          #    그전까지 이 점검은 data/notices.json·registered.json·forms.json 만 봤는데,
+          #    앱은 2026-08-17부터 공고를, 09-26부터 학과 목록을 **학교별 파일**에서 읽는다.
+          #    즉 **앱이 안 받는 파일을 검사하고, 정작 받는 파일은 아무도 안 보고 있었다.**
+          #    그 파일이 404면 앱은 옛 파일·전국 공통 목록으로 **조용히 물러난다** — 화면상
+          #    아무 일도 안 일어난 것처럼 보여서 이 점검이 없으면 영영 모른다.
+          #    ⚠️ 파일 이름을 여기 박지 않는다 — match-engine.js 의 규칙으로 뽑는다(앱과 같은 곳).
+          EXTRA=$(node -e "
+            const M = require('./match-engine.js');
+            const fs = require('fs');
+            const out = ['data/notices/index.json'];
+            // 공고: 색인에 있는 학교 전부 (지금 두 곳뿐이다)
+            try {
+              const ni = JSON.parse(fs.readFileSync('data/notices/index.json','utf8'));
+              for (const k of Object.keys(ni.files)) out.push(M.noticeFilesForProfile({school:k})[0]);
+            } catch {}
+            // 학과: 전부 받으면 209번이라, 두 곳만 — 하나는 **별칭을 거친 이름**(KAIST)으로 고른다.
+            //       커리어넷 이름과 앱 이름이 달라 2026-09-26까지 7곳이 조용히 안 받아지고 있었다.
+            for (const k of ['한국외국어대학교','KAIST']) out.push(M.majorsFileFor(k));
+            console.log([...new Set(out)].join(' '));
+          ")
+
+          for f in sw.js app.js data/notices.json data/registered.json data/forms.json $EXTRA; do
             mkdir -p "live/$(dirname "$f")"
             curl -sSL --max-time 30 -H 'Cache-Control: no-cache' "$SITE/$f" -o "live/$f" || echo "받기 실패: $f"
           done
+          echo "— 앱이 실제로 받는 파일도 확인: $EXTRA —"
 
           echo "— 캐시 응답 헤더(참고) —"
           curl -sSI --max-time 30 "$SITE/data/registered.json" | grep -i "cache-control\|etag\|last-modified" || true
 
-          node - <<'EOF'
+          EXTRA_FILES="$EXTRA" node - <<'EOF'
           const fs = require('fs');
           /* 파일마다 담는 모양이 달라서(공고=items 배열, 양식=templates 목록) 개수를 각각 센다.
              모양을 못 읽으면 '읽기실패'로 남겨 두 쪽 다 undefined라 통과해 버리는 일이 없게 한다. */
           const count = (p) => {
             try {
               const j = JSON.parse(fs.readFileSync(p, 'utf8'));
-              const box = j.items || j.templates || j;
+              /* ⚠️ `majors` 도 안다 — 모르면 학과 파일에서 **칸 수 3**(school·updatedAt·majors)을
+                 세어, 내용이 달라도 3 대 3 으로 통과한다(404 만 겨우 잡힌다). */
+              const box = j.items || j.templates || j.majors || j;
               if (Array.isArray(box)) return box.length;
               if (box && typeof box === 'object') return Object.keys(box).length;
               return '읽기실패';
@@ -55,10 +81,19 @@ jobs:
           const cache = (p) => { try { return (fs.readFileSync(p, 'utf8').match(/const CACHE = '([^']+)'/) || [,'?'])[1]; } catch { return '?'; } };
           const rows = [
             ['서비스워커 버전', cache('sw.js'), cache('live/sw.js')],
-            ['실시간 공고', count('data/notices.json'), count('live/data/notices.json')],
+            ['실시간 공고(옛)', count('data/notices.json'), count('live/data/notices.json')],
             ['정식 등록', count('data/registered.json'), count('live/data/registered.json')],
             ['양식', count('data/forms.json'), count('live/data/forms.json')],
           ];
+          /* 🔴 **앱이 실제로 받는 학교별 파일** — 위 목록은 앱이 더 이상 받지 않는 파일들이다.
+             이 줄들이 ❌ 면 학생은 옛 파일·전국 공통 목록으로 조용히 물러나고 있다는 뜻이다.
+             ⚠️ `count` 는 못 읽으면 '읽기실패'를 주므로, 404 를 통과로 세는 일이 없다. */
+          const extra = (process.env.EXTRA_FILES || '').split(/\s+/).filter(Boolean);
+          for (const f of extra) {
+            const label = f.startsWith('data/majors/') ? '학과(학교별)'
+              : f.endsWith('index.json') ? '공고 색인' : '공고(학교별)';
+            rows.push([`${label} ${f.split('/').pop()}`, count(f), count('live/' + f)]);
+          }
           let bad = 0;
           console.log('\n항목             저장소(main)   실제 앱   결과');
           for (const [name, repo, live] of rows) {
