@@ -120,6 +120,7 @@ function serve() {
   /* 바깥 요청 가로채기 — 저장소의 진짜 파일로 응답한다 */
   let apiCalls = 0;
   let PAGE_ITEMS = null;   // 화면이 실제로 받은 목록 (아래 raw 가로채기가 채운다)
+  let ACT_ITEMS = [];      // 「활동」 탭이 실제로 받은 목록 (2026-09-29)
   await page.route('https://api.github.com/**', async (route) => {
     apiCalls += 1;
     const u = route.request().url();
@@ -195,6 +196,21 @@ function serve() {
     }
     /* 인스타 — 게시 대기가 0건이면 '게시·카드 보기' 검사가 조용히 사라진다(위 검수 대기와 같은 유형).
        검사용 준비 카드를 끼워 넣는다. 저장소 장부는 건드리지 않는다. */
+    /* 대외활동·공모전 (2026-09-29) — 첫 수집 전에는 파일이 비어 있어 「활동」 탭 검사가 조용히 사라진다.
+       검사용 글 3건(숨긴 글 1건 포함)을 끼워 넣는다. 저장소 데이터는 건드리지 않는다. */
+    if (rel === 'data/activities.json') {
+      const db = JSON.parse(body);
+      db.items = db.items || [];
+      if (!db.items.length) {
+        db.items.push(
+          { title: '검사용 해외봉사단 모집', url: 'https://example.ac.kr/act/1', kind: '대외활동', school: '한국외국어대학교', campus: '', foundAt: '2026-09-28', attachments: [], deadlineHint: '신청기간 : 10.1 ~ 10.15' },
+          { title: '검사용 아이디어 공모전', url: 'https://example.ac.kr/act/2', kind: '공모전', school: '경희대학교', campus: '', foundAt: '2026-09-27', attachments: [] },
+          { title: '검사용 숨긴 글', url: 'https://example.ac.kr/act/3', kind: '대외활동', school: '', host: '검사용', foundAt: '2026-09-26', attachments: [], hidden: true, hiddenBy: '관리자 2026-09-29' },
+        );
+        body = JSON.stringify(db);
+      }
+      ACT_ITEMS = JSON.parse(body).items;
+    }
     if (rel === 'insta/seen.json') {
       const db = JSON.parse(body);
       db.prepared = db.prepared || [];
@@ -453,7 +469,7 @@ function serve() {
     await page.waitForSelector('#screen-todo:not([hidden])');
     const goTargets = await page.evaluate(() => [...document.querySelectorAll('#app [data-go]')]
       .map((b) => b.dataset.go));
-    const known = ['todo', 'review', 'list', 'robots', 'insta'];
+    const known = ['todo', 'review', 'list', 'robots', 'insta', 'activities'];
     ok(goTargets.every((g) => known.includes(g)),
       '화면으로 보내는 버튼이 전부 살아 있는 화면을 가리킨다', goTargets.join(',') || '없음');
     /* 그리고 모르는 이름이 와도 갇히지 않는다 */
@@ -1902,6 +1918,60 @@ function serve() {
     await page.waitForTimeout(150);
   } else {
     ok(false, '상세에 마감일 칸이 없어 막힘 검사를 못 했다');
+  }
+
+  /* ══ 대외활동·공모전 「활동」 탭 (2026-09-29) ═══════════════════════════════
+     앱 「대외활동」 탭의 글과 출처를 다루는 화면. 건수는 화면이 실제로 받은 목록(ACT_ITEMS)과 대조하고,
+     '숨기기'는 진짜로 admin-apply 를 깨우는지(보내는 동작 이름·주소)까지 본다. */
+  {
+    await page.click('.tab[data-tab="activities"]');
+    await page.waitForSelector('#screen-activities:not([hidden])');
+    const visible = ACT_ITEMS.filter((n) => !n.hidden);
+    const rowsN = await page.locator('#screen-activities [data-act-rows] [data-row]').count();
+    ok(rowsN === visible.length, '「활동」 탭 — 글 수가 화면이 받은 목록(숨긴 글 제외)과 같다', `${rowsN} / ${visible.length}`);
+    const badge = await page.$eval('#n-activities', (e) => e.textContent.trim());
+    ok(badge === String(visible.length), '  탭 배지도 같은 수', badge);
+    const hiddenN = await page.locator('#screen-activities [data-act-hidden] [data-row]').count();
+    ok(hiddenN === ACT_ITEMS.filter((n) => n.hidden).length, '  숨긴 글은 접힌 칸에 따로', String(hiddenN));
+    /* 칩으로 거른다 */
+    await page.click('#screen-activities [data-actf="공모전"]');
+    await page.waitForTimeout(200);
+    const contestN = await page.locator('#screen-activities [data-act-rows] [data-row]').count();
+    ok(contestN === visible.filter((n) => n.kind === '공모전').length, '  공모전 칩이 실제로 거른다', String(contestN));
+    await page.click('#screen-activities [data-actf="all"]');
+    await page.waitForTimeout(200);
+    /* 출처 수 = 파일의 sources 수 */
+    const srcFile = JSON.parse(fs.readFileSync(path.join(ROOT, 'collector/activity-sources.json'), 'utf8'));
+    const srcN = await page.locator('#screen-activities [data-act-src-rows] [data-row]').count();
+    ok(srcN === (srcFile.sources || []).length, '  출처 줄 수가 activity-sources.json 과 같다', `${srcN} / ${(srcFile.sources || []).length}`);
+    /* 숨기기 — 확인 시트 → 진짜 요청 */
+    let actSent = null;
+    await page.route('**/actions/workflows/**/dispatches', (route) => {
+      try { actSent = JSON.parse(route.request().postData() || '{}'); } catch { actSent = 'parse-fail'; }
+      route.fulfill({ status: 204, body: '' });
+    });
+    const first = visible[0];
+    await page.click(`#screen-activities [data-act-hide="${first.url}"]`);
+    await page.waitForSelector('#sheet:not([hidden])');
+    ok(await page.locator('#sheet [data-rows] [data-row]').count() === 1, '  숨기기 전에 그 글을 보여 준다');
+    await page.click('#sheet [data-ask-go]');
+    await page.waitForTimeout(600);
+    const ap = (() => { try { return JSON.parse(actSent?.inputs?.payload || '{}'); } catch { return {}; } })();
+    ok(actSent?.inputs?.action === 'activityHide' && Array.isArray(ap.urls) && ap.urls[0] === first.url,
+      '  숨기기가 activityHide 와 그 글의 주소를 보낸다', JSON.stringify(actSent?.inputs || null).slice(0, 120));
+    await page.waitForFunction(() => /반영 완료|실패|확인/.test(document.querySelector('#job-text')?.textContent || ''), null, { timeout: 20000 }).catch(() => {});
+    await page.unroute('**/actions/workflows/**/dispatches');
+    /* 출처 추가 — 집계 사이트는 화면에서 먼저 막는다 (저장소도 막는다) */
+    await page.fill('#screen-activities [data-act-in="boardUrl"]', 'https://linkareer.com/list/activity');
+    await page.fill('#screen-activities [data-act-in="host"]', '검사');
+    let addSent = null;
+    await page.route('**/actions/workflows/**/dispatches', (route) => { addSent = 'sent'; route.fulfill({ status: 204, body: '' }); });
+    await page.click('#screen-activities [data-act-src-add]');
+    await page.waitForTimeout(400);
+    ok(addSent === null, '  집계 사이트 주소는 출처 추가가 나가지 않는다');
+    await page.unroute('**/actions/workflows/**/dispatches');
+    await page.click('.tab[data-tab="todo"]');
+    await page.waitForSelector('#screen-todo:not([hidden])');
   }
 
   /* 콘솔 오류 */

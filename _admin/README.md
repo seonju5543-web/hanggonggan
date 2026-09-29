@@ -49,6 +49,7 @@ apply-channel.js
 forms.js
 verify/entry-rules.cjs
 collector/url-key.mjs
+collector/activity-kind.mjs
 ```
 
 ⚠️ `apply-channel.js` 는 2026-09-21에 더해졌습니다 — `data.js` 의 접수 채널 판정이 이 파일을

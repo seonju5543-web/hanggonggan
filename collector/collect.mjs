@@ -18,6 +18,7 @@ import { cleanTitle, isMenuEntry } from './clean-title.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { activityKind } from './activity-kind.mjs';
 import { extractLinks, stripSessionId } from './board-links.mjs';
+import { canonUrl } from './canon-url.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const cfg = JSON.parse(fs.readFileSync(new URL('schools.json', HERE), 'utf8'));
@@ -51,6 +52,9 @@ let acts = { updatedAt: null, items: [] };
 try { acts = JSON.parse(fs.readFileSync(actsPath, 'utf8')); } catch { /* 첫 실행 */ }
 const ACT_FRESH_MAX = 20;    // 게시판 하나에서 한 실행에 상세까지 읽는 새 글 상한 (장학은 40)
 const ACT_CAP = 200;         // 폰이 통째로 받는 파일 — 상한을 두어 작게 유지한다
+/* 관리자가 숨긴 글 (activity-config.json hideUrls · 2026-09-29) — 지우지 않고 hidden 표식을 붙인다(되살리기가 된다) */
+let actHide = new Set();
+try { actHide = new Set((JSON.parse(fs.readFileSync(new URL('activity-config.json', HERE), 'utf8')).hideUrls || []).map(canonUrl)); } catch { /* 설정 없음 */ }
 
 /* ── 재단·지자체 장학 게시판 → 교외 공고 확대 (2026-09-26 · 노션 F-13) ─────────────
    external-sources.json 의 boardUrl 이 있는 곳(find-boards.mjs 가 찾았거나 사람이 적은 곳)을 같은 루프에서
@@ -452,6 +456,7 @@ acts.items = dedupeNotices(acts.items);
 acts.items = acts.items.filter((n) => !n.school).concat(dropUnserved(acts.items.filter((n) => n.school)));
 acts.items.sort((a, b) => String(b.foundAt || '').localeCompare(String(a.foundAt || '')));
 acts.items = acts.items.slice(0, ACT_CAP);
+acts.items.forEach((n) => { if (actHide.has(canonUrl(n.url))) n.hidden = true; else if (n.hidden && !actHide.has(canonUrl(n.url))) delete n.hidden; });
 acts.updatedAt = notices.updatedAt;
 fs.writeFileSync(actsPath, JSON.stringify(acts, null, 1));
 

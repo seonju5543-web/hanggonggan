@@ -29,6 +29,8 @@ const FIXTURE = {
     { title: '제3회 장학수기 공모전 공고', url: 'https://dep.hufs.ac.kr/bbs/x/2', kind: '공모전', school: '한국외국어대학교', campus: '', foundAt: '2026-09-24', attachments: [] },
     { title: '경희 아이디어 경진대회', url: 'https://news.khu.ac.kr/x/3', kind: '공모전', school: '경희대학교', campus: '', foundAt: '2026-09-25', attachments: [] },
     { title: '전국 청년 서포터즈 모집', url: 'https://example.org/x/4', kind: '대외활동', school: '', host: '청년재단', foundAt: '2026-09-23', attachments: [] },
+    /* 관리자가 숨긴 글 — 파일에는 있지만 화면에는 없어야 한다 (2026-09-29) */
+    { title: '숨긴 글 — 보이면 안 된다', url: 'https://dep.hufs.ac.kr/bbs/x/5', kind: '대외활동', school: '한국외국어대학교', campus: '', foundAt: '2026-09-27', attachments: [], hidden: true },
   ],
 };
 

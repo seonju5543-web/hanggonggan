@@ -1464,6 +1464,61 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
   eq('알림 딥링크가 이 탭을 안다 (notify)', /\['home', 'explore', 'activities', 'applications', 'my'\]\.includes\(screen\)/.test(readText(new URL('../notify.js', import.meta.url))), true);
   const ui = strip(readText(new URL('../.github/workflows/verify-ui.yml', import.meta.url)));
   eq('브라우저 드라이버가 관문에 걸려 있다', /verify-activities\.js/.test(ui), true);
+
+  /* ⑤ 관리자 「활동」 탭 (2026-09-29 개발자 지시) — 저장소를 **실제로 돌려 본다** (글자를 훑지 않는다) */
+  {
+    const script = fileURLToPath(new URL('../tools/admin-apply.mjs', import.meta.url));
+    const runAct = (action, payload, seed = {}) => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'admact-'));
+      fs.mkdirSync(path.join(dir, 'data'), { recursive: true });
+      fs.mkdirSync(path.join(dir, 'collector'), { recursive: true });
+      const items = seed.items || [
+        { title: '해외봉사단 모집', url: 'https://ex.ac.kr/a/1?page=3', kind: '대외활동', school: '한국외국어대학교', campus: '', foundAt: '2026-09-28' },
+        { title: '아이디어 공모전', url: 'https://ex.ac.kr/a/2', kind: '공모전', school: '경희대학교', campus: '', foundAt: '2026-09-27' },
+      ];
+      fs.writeFileSync(path.join(dir, 'data/registered.json'), JSON.stringify({ items: [] }));
+      fs.writeFileSync(path.join(dir, 'data/forms.json'), JSON.stringify({ forms: {}, templates: {} }));
+      fs.writeFileSync(path.join(dir, 'data/activities.json'), JSON.stringify({ updatedAt: '2026-09-28', items }, null, 1));
+      fs.writeFileSync(path.join(dir, 'collector/activity-config.json'), JSON.stringify(seed.cfg || { hideUrls: [] }, null, 1));
+      fs.writeFileSync(path.join(dir, 'collector/activity-sources.json'), JSON.stringify(seed.src || { sources: [{ school: '경희대학교', campus: '공통', boardUrl: 'https://ex.ac.kr/board', evidence: 'x' }], parked: [] }, null, 1));
+      const r = spawnSync(process.execPath, [script], { cwd: dir, encoding: 'utf8', env: { ...process.env, ACTION: action, ACTOR: 'gate', PAYLOAD: JSON.stringify(payload) } });
+      const read = (f) => JSON.parse(readText(path.join(dir, f)));
+      const out = { status: r.status, out: `${r.stdout || ''}${r.stderr || ''}`, acts: read('data/activities.json').items, cfg: read('collector/activity-config.json'), src: read('collector/activity-sources.json') };
+      fs.rmSync(dir, { recursive: true, force: true });
+      return out;
+    };
+    const k = runAct('activityKind', { url: 'https://ex.ac.kr/a/1?page=3', kind: '공모전' });
+    eq('관리자 — 종류 바꾸기가 실제로 바뀌고 사람 표식이 붙는다', [k.status, k.acts[0].kind, /^관리자 /.test(k.acts[0].kindFrom || '')], [0, '공모전', true]);
+    eq('  모르는 종류는 거부', runAct('activityKind', { url: 'https://ex.ac.kr/a/1', kind: '행사' }).status !== 0, true);
+    eq('  같은 종류로 바꾸기는 거부 (아무것도 안 바뀐다)', runAct('activityKind', { url: 'https://ex.ac.kr/a/2', kind: '공모전' }).status !== 0, true);
+    const h = runAct('activityHide', { urls: ['https://ex.ac.kr/a/1'] });
+    eq('관리자 — 숨기기는 지우지 않고 표식 + 설정에 주소를 적는다 (주소는 canonUrl 로 맞춘다)',
+      [h.status, h.acts.length, h.acts[0].hidden === true, h.cfg.hideUrls], [0, 2, true, ['https://ex.ac.kr/a/1']]);
+    const u = runAct('activityUnhide', { urls: ['https://ex.ac.kr/a/1?page=3'] },
+      { items: [{ title: 't', url: 'https://ex.ac.kr/a/1', kind: '대외활동', school: '', host: 'h', foundAt: '2026-09-28', hidden: true }], cfg: { hideUrls: ['https://ex.ac.kr/a/1'] } });
+    eq('  되살리기는 표식과 설정 주소를 함께 걷는다', [u.status, u.acts[0].hidden, u.cfg.hideUrls], [0, undefined, []]);
+    eq('  없는 글을 숨기려 하면 거부', runAct('activityHide', { urls: ['https://ex.ac.kr/none'] }).status !== 0, true);
+    const add = runAct('activitySource', { op: 'add', source: { school: '', host: '정부24 공모전', boardUrl: 'https://www.gov.kr/portal/cnstexhb', evidence: '검색' } });
+    eq('관리자 — 출처 추가 (전국 글은 host 필수)', [add.status, add.src.sources.length, add.src.sources[1].host], [0, 2, '정부24 공모전']);
+    eq('  집계 사이트는 거부', runAct('activitySource', { op: 'add', source: { host: 'x', boardUrl: 'https://linkareer.com/list/activity' } }).status !== 0, true);
+    eq('  다른 학교는 거부 (수집망 두 곳)', runAct('activitySource', { op: 'add', source: { school: '서울대학교', boardUrl: 'https://snu.ac.kr/b' } }).status !== 0, true);
+    eq('  같은 주소는 거부', runAct('activitySource', { op: 'add', source: { school: '경희대학교', boardUrl: 'https://ex.ac.kr/board' } }).status !== 0, true);
+    const pk = runAct('activitySource', { op: 'park', boardUrl: 'https://ex.ac.kr/board' });
+    eq('  보관은 지우지 않고 parked 로 옮긴다', [pk.status, pk.src.sources.length, pk.src.parked.length, pk.src.parked[0].boardUrl], [0, 0, 1, 'https://ex.ac.kr/board']);
+    const up = runAct('activitySource', { op: 'unpark', boardUrl: 'https://ex.ac.kr/board' }, { src: { sources: [], parked: [{ school: '경희대학교', boardUrl: 'https://ex.ac.kr/board' }] } });
+    eq('  되살리기는 sources 로 되돌린다', [up.status, up.src.sources.length, up.src.parked.length], [0, 1, 0]);
+    /* 화면 배선 — 파일 셋을 읽고(readJson 규칙은 「못 읽은 파일」 절이 잰다), 워크플로가 셋을 저장하고, 로봇·앱이 hidden 을 지킨다 */
+    const adminJs = readText(new URL('../_admin/admin.js', import.meta.url));
+    const adminHtml = readText(new URL('../_admin/index.html', import.meta.url));
+    eq('관리자 화면에 「활동」 탭과 화면이 있다', /data-tab="activities"/.test(adminHtml) && /id="screen-activities"/.test(adminHtml) && /'activities'\]/.test(adminJs) && /activities: renderActivities/.test(adminJs), true);
+    eq('  종류 두 가지는 vendor/activity-kind.mjs 에서 (베끼지 않는다)', /from '\.\/vendor\/activity-kind\.mjs'/.test(adminJs) && /cp collector\/activity-kind\.mjs/.test(readText(new URL('../_admin/build.sh', import.meta.url))), true);
+    const ay = strip(readText(new URL('../.github/workflows/admin-apply.yml', import.meta.url)));
+    eq('  관리자 워크플로가 파일 셋을 저장한다', /git add data\/activities\.json collector\/activity-sources\.json collector\/activity-config\.json/.test(ay), true);
+    eq('  로봇은 숨긴 주소에 hidden 표식을 유지한다', /actHide\.has\(canonUrl\(n\.url\)\)/.test(cm), true);
+    eq('  앱은 hidden 글을 보이지 않는다', /!n\.hidden && activityForProfile\(n, p\)/.test(app), true);
+    const kinds = (readText(new URL('../tools/admin-apply.mjs', import.meta.url)).match(/const ACT_KINDS = \[([^\]]+)\]/) || [])[1] || '';
+    eq('  저장소의 종류 목록이 activity-kind 와 같다', kinds.match(/'([^']+)'/g).map((x) => x.slice(1, -1)).sort(), ACTIVITY_KINDS.slice().sort());
+  }
 }
 
 console.log('\n■ 재단·지자체 게시판 (2026-09-26 · 노션 F-13 · 교외 확대)');
@@ -8002,7 +8057,7 @@ console.log('\n■ 관리자 쓰기 — 되돌릴 수 없는 일 앞의 안전�
      목록이 바뀌면 사람이 '이 동작도 공고 목록을 고치는가'를 한 번 본다. */
   eq('공고 목록을 안 고치는 동작 목록이 그대로다',
     cases.filter((c) => !writes.includes(c)).sort(),
-    ['addBoard', 'autoRegister', 'formQueue', 'unblock']);
+    ['activityHide', 'activityKind', 'activitySource', 'activityUnhide', 'addBoard', 'autoRegister', 'formQueue', 'unblock']);
 }
 
 console.log('\n■ 못 읽은 파일의 숫자를 화면이 단정하지 않는다');

@@ -47,6 +47,12 @@ const SCHOOLS = 'collector/schools.json';
 const PENDING = 'collector/pending-forms.json';
 const FORMS = 'data/forms.json';
 const LOG = 'data/admin-log.json';
+/* 대외활동·공모전 (2026-09-29 · 관리자 「활동」 탭) — 피드 파일 · 출처 목록 · 사람 조정(숨김) */
+const ACTS = 'data/activities.json';
+const ACT_SRC = 'collector/activity-sources.json';
+const ACT_CFG = 'collector/activity-config.json';
+const ACT_KINDS = ['공모전', '대외활동'];   // collector/activity-kind.mjs 의 ACTIVITY_KINDS 와 같다 (관문이 대조한다 — ESM 이라 여기서 못 부른다)
+
 
 const action = process.env.ACTION || '';
 const actor = process.env.ACTOR || 'unknown';
@@ -745,6 +751,97 @@ switch (action) {
     row.note = `관리자 화면에서 등록 (${kstNow()} KST)`;
     writeJson(SCHOOLS, s);
     detail = `${payload.school} ${payload.campus || ''} → ${url}`;
+    touched = true;
+    break;
+  }
+
+  /* ── 대외활동·공모전 — 종류 바꾸기 (2026-09-29) ─────────────────────────── */
+  case 'activityKind': {
+    const url = String(payload.url || '').trim();
+    const kind = String(payload.kind || '').trim();
+    if (!url) fail('대상 글의 주소가 없습니다');
+    if (!ACT_KINDS.includes(kind)) fail(`종류는 ${ACT_KINDS.join('·')} 중 하나여야 합니다: ${kind}`);
+    const acts = readJson(ACTS, null);
+    if (!acts || !Array.isArray(acts.items)) fail(`${ACTS} 를 읽지 못했습니다`);
+    const it = acts.items.find((x) => canonUrl(x.url) === canonUrl(url));
+    if (!it) fail(`그 주소의 글이 목록에 없습니다: ${url}`);
+    if (it.kind === kind) fail('이미 그 종류입니다');
+    const before = it.kind;
+    it.kind = kind;
+    it.kindFrom = `관리자 ${kstNow().slice(0, 10)}`;
+    writeJson(ACTS, acts);
+    detail = `${it.title.slice(0, 40)} · ${before} → ${kind}`;
+    touched = true;
+    break;
+  }
+
+  /* ── 대외활동·공모전 — 숨기기 / 되살리기 ───────────────────────────────
+     지우지 않는다. 글에 hidden 표식을 붙이고 주소를 activity-config.json 에 적어 두어
+     로봇이 다시 발행해도 표식이 유지된다(collect.mjs). 되살리기는 그 반대. */
+  case 'activityHide':
+  case 'activityUnhide': {
+    const urls = (Array.isArray(payload.urls) ? payload.urls : [payload.url]).map((u) => String(u || '').trim()).filter(Boolean);
+    if (!urls.length) fail('대상 글의 주소가 없습니다');
+    const hide = action === 'activityHide';
+    const acts = readJson(ACTS, null);
+    if (!acts || !Array.isArray(acts.items)) fail(`${ACTS} 를 읽지 못했습니다`);
+    const cfg = readJson(ACT_CFG, { hideUrls: [] });
+    cfg.hideUrls = Array.isArray(cfg.hideUrls) ? cfg.hideUrls : [];
+    const keys = new Set(urls.map(canonUrl));
+    let n = 0;
+    for (const it of acts.items) {
+      if (!keys.has(canonUrl(it.url))) continue;
+      if (hide) { it.hidden = true; it.hiddenBy = `관리자 ${kstNow().slice(0, 10)}`; } else { delete it.hidden; delete it.hiddenBy; }
+      n += 1;
+    }
+    if (hide) {
+      for (const u of urls) if (!cfg.hideUrls.some((x) => canonUrl(x) === canonUrl(u))) cfg.hideUrls.push(u);
+    } else {
+      cfg.hideUrls = cfg.hideUrls.filter((x) => !keys.has(canonUrl(x)));
+    }
+    if (!n && hide) fail('그 주소의 글이 목록에 없습니다');
+    writeJson(ACTS, acts);
+    writeJson(ACT_CFG, cfg);
+    detail = `${hide ? '숨김' : '되살림'} ${n}건 (숨긴 주소 ${cfg.hideUrls.length}개)`;
+    touched = true;
+    break;
+  }
+
+  /* ── 대외활동·공모전 — 출처 추가 / 보관 / 되살리기 ─────────────────────── */
+  case 'activitySource': {
+    const op = String(payload.op || '');
+    const src = readJson(ACT_SRC, null);
+    if (!src || !Array.isArray(src.sources)) fail(`${ACT_SRC} 를 읽지 못했습니다`);
+    src.parked = Array.isArray(src.parked) ? src.parked : [];
+    if (op === 'add') {
+      const s = payload.source || {};
+      const url = String(s.boardUrl || '').trim();
+      if (!/^https?:\/\//i.test(url)) fail(`게시판 주소는 http(s)로 시작해야 합니다: ${url}`);
+      if (/linkareer|wevity|thinkcontest|campuspick|all-con|contestkorea|thinkyou|allforyoung/i.test(url)) fail('집계 사이트는 출처로 넣지 않습니다 — 주최의 제 게시판을 넣어 주세요');
+      if ([...src.sources, ...src.parked].some((x) => canonUrl(x.boardUrl || '') === canonUrl(url))) fail('이미 있는 게시판 주소입니다');
+      const school = String(s.school || '').trim();
+      const host = String(s.host || '').trim();
+      if (!school && !host) fail('학교 이름이나 주최(host) 가운데 하나는 있어야 합니다');
+      if (school && !['경희대학교', '한국외국어대학교'].includes(school)) fail(`수집망은 두 학교뿐입니다: ${school}`);
+      const row = { school, campus: school ? (s.campus || '공통') : '', boardUrl: url,
+        evidence: String(s.evidence || '').trim() || `관리자 화면에서 등록 (${kstNow()} KST)`, note: String(s.note || '').trim() || '관리자 화면에서 등록' };
+      if (!school) row.host = host;
+      src.sources.push(row);
+      detail = `출처 추가 · ${school || host} → ${url}`;
+    } else if (op === 'park' || op === 'unpark') {
+      const url = String(payload.boardUrl || '').trim();
+      const from = op === 'park' ? src.sources : src.parked;
+      const to = op === 'park' ? src.parked : src.sources;
+      const i = from.findIndex((x) => canonUrl(x.boardUrl || '') === canonUrl(url));
+      if (i < 0) fail(`그 주소의 출처가 없습니다: ${url}`);
+      const [row] = from.splice(i, 1);
+      row[op === 'park' ? 'parkedAt' : 'unparkedAt'] = `${kstNow()} KST`;
+      to.push(row);
+      detail = `출처 ${op === 'park' ? '보관' : '되살림'} · ${row.school || row.host} · ${url}`;
+    } else {
+      fail(`알 수 없는 출처 작업입니다: ${op}`);
+    }
+    writeJson(ACT_SRC, src);
     touched = true;
     break;
   }

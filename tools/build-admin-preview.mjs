@@ -36,6 +36,10 @@ const DATA = {
   'collector/pending-forms.json': readJson('collector/pending-forms.json'),
   'collector/auto-register-config.json': readJson('collector/auto-register-config.json'),
   'data/admin-log.json': readJson('data/admin-log.json'),
+  /* 대외활동·공모전 (2026-09-29) — 「활동」 탭 */
+  'data/activities.json': readJson('data/activities.json'),
+  'collector/activity-sources.json': readJson('collector/activity-sources.json'),
+  'collector/activity-config.json': readJson('collector/activity-config.json'),
   /* 저장해 둔 공고 원문 (2026-09-13) — 상세 시트의 오른쪽 칸이 이걸 읽는다.
      ⚠️ 둘이 합쳐 800KB 라 미리보기 파일이 그만큼 커진다. 그래도 담는 이유:
         안 담으면 미리보기가 '원문이 없습니다'라고 **거짓으로** 말한다. */

@@ -55,3 +55,20 @@
 2. **모음 사이트·공공 API를 붙일지** — 붙이면 같은 파일에 `{ "school": "", "host": "…", "boardUrl": "…" }`.
 3. **알림** — 활동 글은 지금 알림·푸시 대상이 아니다(일부러). 원하면 `notify-rules.js` TYPES 에 종류를 더하고 설정 스위치를 단다.
 4. **탭 이름·아이콘** — 「대외활동」(트로피). 화면 캡처는 세션 보고에 첨부했다.
+
+## 관리자 화면 「활동」 탭 (2026-09-29 · 개발자 지시 "관리자 페이지에 대외활동 및 공모전 관련 조작 기능도 추가해")
+
+`hanggonggan-admin.pages.dev/#activities`. 다른 탭과 같은 길 — 버튼은 저장소를 직접 고치지 않고 `admin-apply.yml` 을 깨우며, 감사를 통과해야 저장된다.
+
+| 할 수 있는 일 | 버튼 | 저장소 동작(`tools/admin-apply.mjs`) | 무엇이 바뀌나 |
+|---|---|---|---|
+| 종류 바로잡기 | `공모전(으)로` / `대외활동(으)로` | `activityKind {url, kind}` | 글의 `kind` + `kindFrom: 관리자 날짜` (로봇은 있는 글을 다시 판정하지 않는다) |
+| 숨기기 | `숨기기` → 확인 시트 | `activityHide {urls}` | 글에 `hidden:true` 표식 + `collector/activity-config.json hideUrls` 에 주소. 지우지 않는다 — 로봇이 다시 발행해도 표식을 유지하고(`collect.mjs`), 앱은 hidden 글을 안 보인다 |
+| 되살리기 | 「숨긴 글」 칸의 `되살리기` | `activityUnhide {urls}` | 표식과 설정 주소를 함께 걷는다 |
+| 출처 추가 | 양식(어디 글인가 · 주최 · 게시판 주소 · 근거) | `activitySource {op:'add', source}` | `activity-sources.json sources` 에 한 줄. 집계 사이트 주소·두 학교 밖 학교·같은 주소는 저장소가 거부한다 |
+| 출처 보관 / 되살리기 | `보관` → 확인 시트 / 「보관한 출처」의 `되살리기` | `activitySource {op:'park'|'unpark', boardUrl}` | `sources` ↔ `parked` 로 옮긴다(지우지 않는다) |
+
+화면이 보이는 것: 게재 중·숨긴 글·출처 게시판 수(주소 미설정 곳 포함) 카드, 칩(전체/대외활동/공모전), 글 목록(종류 알약·수집일·기간 한 줄·원문 링크), 출처 목록(주소·근거·**최근 수집 상태** — `collector/report.md` 의 「🎯」 절에서 읽는다).
+종류 두 가지는 `vendor/activity-kind.mjs`(build.sh 가 복사)에서 온다 — 베끼지 않는다.
+
+관문: `test-collector.mjs` 「대외활동·공모전」 ⑤ — 저장소를 실제로 돌려 본다(종류 바꾸기·모르는 종류 거부·숨기기/되살리기·출처 추가/거부/보관/되살리기) + 화면 배선. `verify-admin.js` 「활동」 탭 절 — 검사용 글 3건(숨긴 글 1건)을 끼워 넣고 건수·칩·숨기기 요청(`activityHide` + 주소)·집계 사이트 차단을 진짜 브라우저로 잰다.

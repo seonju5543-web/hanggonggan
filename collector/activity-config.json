@@ -1,0 +1,4 @@
+{
+ "_comment": "대외활동·공모전 피드의 사람 조정 (2026-09-29 · 관리자 화면 「활동」 탭). hideUrls: 관리자가 '숨기기'를 누른 글의 주소(canonUrl) — 수집 로봇이 발행할 때 그 글에 hidden:true 를 붙이고 앱은 hidden 글을 보이지 않는다. 지우지 않고 표식만 두는 이유: 되살리기가 되고, 60일이 지나면 저절로 사라진다. 이 파일은 관리자 화면 버튼(tools/admin-apply.mjs activityHide/activityUnhide)이 고친다.",
+ "hideUrls": []
+}

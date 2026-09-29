@@ -2717,7 +2717,8 @@ function loadActivities() {
 function activitiesForMe() {
   const p = state.profile;
   if (!p || !liveActivities) return [];
-  return (liveActivities.items || []).filter((n) => n && n.url && activityForProfile(n, p));
+  /* 관리자가 숨긴 글(hidden · activity-config.json)은 보이지 않는다 — 지운 것이 아니라 표식이다 */
+  return (liveActivities.items || []).filter((n) => n && n.url && !n.hidden && activityForProfile(n, p));
 }
 
 function renderActivities() {

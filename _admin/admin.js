@@ -21,6 +21,8 @@ import { makeStripper } from './vendor/page-boilerplate.mjs';
    저장소(tools/admin-apply.mjs)가 실제로 넣는 값과 **같은 파일**로 계산해야
    '반영 전 전후 대조' 가 거짓말을 하지 않는다(화면은 '1,2' 를 보내고 저장소는 [1,2] 로 넣는다). */
 import { diffPatch, showValue, wonText } from './vendor/edit-diff.mjs';
+/* 대외활동·공모전 종류 두 가지 — 🔴 베끼지 않는다. 로봇(collect.mjs)·관문이 같은 파일을 본다 (2026-09-29). */
+import { ACTIVITY_KINDS } from './vendor/activity-kind.mjs';
 
 /* ---------------- 설정 ---------------- */
 const OWNER = 'seonju5543-web';
@@ -159,6 +161,8 @@ const D = {
   updatedAt: '', deployAhead: null,
   /* 인스타(2026-09-12) — 장부·판형·통계·댓글·토큰 지문·견본. 전부 파일이다(인스타에 직접 안 묻는다) */
   insta: { seen: { posted: [], prepared: [] }, templates: [], stats: { history: [], posts: [] }, comments: { items: [] }, token: null, samples: { templates: [] } },
+  /* 대외활동·공모전 (2026-09-29) — 피드·출처·사람 조정(숨김) */
+  activities: [], actUpdatedAt: '', actSources: { sources: [], parked: [] }, actCfg: { hideUrls: [] },
   failed: [],   // 읽지 못한 파일 — 비어 있지 않으면 화면 숫자를 믿으면 안 된다
 };
 
@@ -211,7 +215,7 @@ async function readText(path) {
 async function loadAll() {
   D.failed = [];        // 매번 새로 센다 — 지난번 실패가 남아 있으면 안 된다
   reportCache = {};     // 로봇을 돌린 뒤 옛 리포트가 보이던 문제(A5)
-  const [reg, notices, forms, health, schools, targets, linkHunt, pending, autoCfg, log] =
+  const [reg, notices, forms, health, schools, targets, linkHunt, pending, autoCfg, log, acts, actSrc, actCfg] =
     await Promise.all([
       readJson('data/registered.json', { items: [] }),
       readJson('data/notices.json', { items: [] }),
@@ -223,6 +227,9 @@ async function loadAll() {
       readJson('collector/pending-forms.json', { items: [] }),
       readJson('collector/auto-register-config.json', { enabled: true, blockIds: [] }),
       readJson('data/admin-log.json', { items: [] }),
+      readJson('data/activities.json', { items: [] }),
+      readJson('collector/activity-sources.json', { sources: [], parked: [] }),
+      readJson('collector/activity-config.json', { hideUrls: [] }),
     ]);
 
   D.reg = reg.items || [];
@@ -236,6 +243,10 @@ async function loadAll() {
   D.pending = pending.items || [];
   D.autoCfg = autoCfg || { enabled: true, blockIds: [] };
   D.log = (log.items || []).slice().reverse();   // 최신이 위로
+  D.activities = acts.items || [];
+  D.actUpdatedAt = acts.updatedAt || '';
+  D.actSources = { sources: actSrc.sources || [], parked: actSrc.parked || [] };
+  D.actCfg = actCfg || { hideUrls: [] };
 
   /* 인스타 — stats·comments·token-seen·samples 는 **아직 없을 수 있는** 파일이라(계정 연결 전·견본 전)
      404 를 '못 읽음' 경고로 세지 않는다. seen·templates 는 저장소에 늘 있으니 실패하면 경고에 든다. */
@@ -489,7 +500,7 @@ async function applyAction(action, payload, label) {
    넷을 '같은 48건을 네 번 다르게 자른 화면' 으로 두던 것을 끝냈다.
    ⚠️ 화면을 지운 것이 아니라 **품은 것**이다 — 그 내용을 그리는 함수는 그대로 살아 있고
       renderQuality('todo-quality-slot') 처럼 그릴 자리만 받는다(베끼지 않는다). */
-const SCREENS = ['todo', 'review', 'list', 'robots', 'insta'];
+const SCREENS = ['todo', 'review', 'list', 'robots', 'insta', 'activities'];
 let current = 'todo';
 
 function show(name) {
@@ -523,7 +534,7 @@ const screenFromHash = () => {
 
 function renderScreen(name) {
   ({ todo: renderTodo, list: renderList, review: renderReview,
-    robots: renderRobots, insta: renderInsta }[name] || (() => {}))();
+    robots: renderRobots, insta: renderInsta, activities: renderActivities }[name] || (() => {}))();
   markScrollers(byId(`screen-${name}`));
 }
 
@@ -637,6 +648,7 @@ function renderCounts() {
   const rb = byId('n-robots');
   if (rb && !rb.dataset.filled) { rb.textContent = '—'; rb.className = 'tab-n'; }
   set('n-insta', instaGroups().prepared.length + instaNewComments().length, true);   // 눌러야 할 것 = 게시 대기 + 답 안 한 댓글
+  set('n-activities', D.activities.filter((n) => n && n.url && !n.hidden).length);   // 앱에 보이는 글 수
 }
 
 /* ---------------- ① 오늘 할 일 ---------------- */
@@ -2402,6 +2414,167 @@ async function instaDispatch(file, inputs, label, note, danger = false, lines = 
   });
 }
 
+
+/* ---------------- ⑥ 대외활동·공모전 (2026-09-29 · 노션 UI-34) ----------------
+   앱 「대외활동」 탭에 실리는 글(data/activities.json)과 그 출처(collector/activity-sources.json)를 다룬다.
+   버튼은 저장소를 직접 고치지 않는다 — admin-apply.yml 을 깨우고 감사를 통과해야 저장된다(다른 탭과 같다).
+   할 수 있는 일: 종류 바꾸기(공모전↔대외활동) · 숨기기/되살리기(지우지 않고 표식) · 출처 추가/보관/되살리기.
+   종류 두 가지는 vendor/activity-kind.mjs 의 것 그대로 — 여기 베끼지 않는다. */
+let ACT_FILTER = 'all';
+const ACT_SCHOOLS = ['경희대학교', '한국외국어대학교'];
+
+function activityRows() {
+  const all = D.activities.filter((n) => n && n.url);
+  const shownItems = all.filter((n) => !n.hidden);
+  const hidden = all.filter((n) => n.hidden);
+  const list = ACT_FILTER === 'all' ? shownItems : shownItems.filter((n) => n.kind === ACT_FILTER);
+  return { all, shownItems, hidden, list };
+}
+
+function actSourceName(s) {
+  return s.school ? `${s.school}${s.campus && s.campus !== '공통' ? ' ' + s.campus : ''} 대외활동·공모전` : `${s.host || '전국'} 대외활동·공모전`;
+}
+
+function actItemRowHtml(n, hiddenRow) {
+  const other = ACTIVITY_KINDS.find((k) => k !== n.kind) || ACTIVITY_KINDS[0];
+  return `
+    <div class="row" data-row data-noclick data-act-item="${esc(n.url)}" style="cursor:default${hiddenRow ? ';opacity:.55' : ''}">
+      <div><div class="t" data-row-title>${esc(n.title)}</div>
+        <div class="m"><span>${esc(n.school ? `${n.school} 게시판` : (n.host || '전국'))}</span>${n.deadlineHint ? `<span>${esc(n.deadlineHint)}</span>` : ''}<span>${esc(n.foundAt || '')} 수집</span></div>
+        <div class="badges"><span class="pill ${n.kind === '공모전' ? 'info' : 'good'}">${esc(n.kind || '?')}</span>${n.kindFrom ? `<span class="pill">${esc(n.kindFrom)}</span>` : ''}${n.hiddenBy ? `<span class="pill warn">${esc(n.hiddenBy)} 숨김</span>` : ''}</div></div>
+      <div class="btn-row">
+        <a class="btn btn-sm" href="${esc(n.url)}" target="_blank" rel="noreferrer noopener">원문 ↗</a>
+        ${hiddenRow
+          ? `<button class="btn btn-sm" data-act-unhide="${esc(n.url)}">되살리기</button>`
+          : `<button class="btn btn-sm" data-act-kind="${esc(n.url)}" data-kind="${esc(other)}">${esc(other)}(으)로</button>
+             <button class="btn btn-sm danger" data-act-hide="${esc(n.url)}">숨기기</button>`}
+      </div>
+      <div></div>
+    </div>`;
+}
+
+function actSourceRowHtml(s, parked) {
+  return `
+    <div class="row" data-row data-noclick data-act-src="${esc(s.boardUrl || '')}" style="cursor:default${parked ? ';opacity:.55' : ''}">
+      <div><div class="t" data-row-title>${esc(actSourceName(s))}</div>
+        <div class="m"><span>${s.boardUrl ? `<a href="${esc(s.boardUrl)}" target="_blank" rel="noreferrer noopener">${esc(s.boardUrl)}</a>` : '주소 미설정'}</span>
+          <span data-src-status="${esc(actSourceName(s))}">${parked ? '보관 중' : '상태 읽는 중…'}</span></div>
+        ${s.evidence ? `<div class="hint">${esc(s.evidence)}</div>` : ''}</div>
+      <div class="btn-row">${s.boardUrl ? (parked
+        ? `<button class="btn btn-sm" data-act-src-unpark="${esc(s.boardUrl)}">되살리기</button>`
+        : `<button class="btn btn-sm" data-act-src-park="${esc(s.boardUrl)}">보관</button>`) : ''}</div>
+      <div></div>
+    </div>`;
+}
+
+function renderActivities() {
+  const box = byId('screen-activities');
+  const { shownItems, hidden, list } = activityRows();
+  const src = D.actSources.sources || [];
+  const parked = D.actSources.parked || [];
+  const noUrl = src.filter((s) => !s.boardUrl).length;
+  const chip = (v, label) => `<button class="chip${ACT_FILTER === v ? ' on' : ''}" data-actf="${esc(v)}">${esc(label)} <span class="c">${v === 'all' ? shownItems.length : shownItems.filter((n) => n.kind === v).length}</span></button>`;
+  box.innerHTML = `
+    <div class="sec-head" data-screen-title>
+      <h2>대외활동·공모전</h2>
+      <p>앱 「대외활동」 탭에 실리는 글입니다(제목+링크 · 자격 판정 없음). 로봇이 학교·공공 게시판에서 주워 오고, 여기서 <b>종류를 바로잡거나 숨깁니다</b>.
+         숨기기는 지우는 것이 아니라 표식이라 되살릴 수 있습니다. 출처를 더하면 다음 수집(07:41·11:41)부터 읽습니다.</p>
+    </div>
+    <div class="cards">
+      <div class="card ${shownItems.length ? 'is-ok' : 'is-warn'}" data-stat><div class="v">${shownItems.length}</div><div class="k">게재 중</div><div class="d">앱에 보이는 글 · 데이터 기준일 ${esc(D.actUpdatedAt || '아직 수집 전')}</div></div>
+      <div class="card" data-stat><div class="v">${hidden.length}</div><div class="k">숨긴 글</div><div class="d">파일에는 남고 앱에는 안 보입니다</div></div>
+      <div class="card ${noUrl ? 'is-warn' : 'is-ok'}" data-stat><div class="v">${src.length}</div><div class="k">출처 게시판</div><div class="d">${noUrl ? `주소 미설정 ${noUrl}곳` : '전부 주소가 있습니다'} · 보관 ${parked.length}곳</div></div>
+    </div>
+
+    <div class="sec-head"><h2>글 ${list.length}건</h2><p>종류 판정은 로봇이 제목만 보고 한 것이라 틀릴 수 있습니다 — 틀리면 버튼 하나로 바꿉니다.</p></div>
+    <div class="filter-row" data-act-filters>${chip('all', '전체')}${ACTIVITY_KINDS.map((k) => chip(k, k)).join('')}</div>
+    ${list.length
+      ? `<div class="rows" data-rows data-act-rows>${list.map((n) => actItemRowHtml(n, false)).join('')}</div>`
+      : `<p class="empty">${shownItems.length ? '이 종류의 글이 없습니다' : '아직 수집된 글이 없습니다 — 첫 수집 뒤에 여기 뜹니다'}</p>`}
+    ${hidden.length ? `<details class="row" data-act-hidden><summary class="muted">숨긴 글 ${hidden.length}건</summary>
+      <div class="rows" data-rows>${hidden.map((n) => actItemRowHtml(n, true)).join('')}</div></details>` : ''}
+
+    <div class="sec-head"><h2>출처 게시판 ${src.length}곳</h2><p>주소마다 어디서 확인했는지(근거)를 적습니다. 잘못 잡힌 게시판은 <b>보관</b>으로 빼고, 다시 쓰려면 되살립니다. 상태는 최근 「일반 수집」 리포트에서 읽습니다.</p></div>
+    <div class="rows" data-rows data-act-src-rows>${src.map((s) => actSourceRowHtml(s, false)).join('')}</div>
+    ${parked.length ? `<details class="row" data-act-parked><summary class="muted">보관한 출처 ${parked.length}곳</summary>
+      <div class="rows" data-rows>${parked.map((s) => actSourceRowHtml(s, true)).join('')}</div></details>` : ''}
+
+    <div class="pgroup" data-act-add>
+      <div class="sec-head"><h2>출처 추가</h2><p>주최의 <b>제 게시판</b>만 넣습니다 — 링커리어·위비티 같은 집계 사이트는 저장소가 거부합니다.</p></div>
+      <div class="field"><label class="lb">어디 글인가</label>
+        <select data-act-in="school"><option value="">전국 (모든 학생에게)</option>${ACT_SCHOOLS.map((s) => `<option value="${esc(s)}">${esc(s)}</option>`).join('')}</select></div>
+      <div class="field"><label class="lb">주최·운영 기관 (전국 글일 때)</label><input type="text" data-act-in="host" placeholder="예: 정부24 공모전" maxlength="60" /></div>
+      <div class="field"><label class="lb">게시판 목록 주소</label><input type="url" data-act-in="boardUrl" placeholder="https://…" maxlength="400" /></div>
+      <div class="field"><label class="lb">어디서 확인했나 (근거)</label><input type="text" data-act-in="evidence" placeholder="예: 학교 홈페이지 학생지원팀 > 학생활동 메뉴" maxlength="200" /></div>
+      <div class="btn-row"><button class="btn btn-primary" data-act-src-add>출처 추가</button></div>
+    </div>`;
+  loadActivityStatus();
+}
+
+/* 출처마다 최근 수집 상태 — 리포트(collector/report.md)의 「🎯 대외활동·공모전」 절 한 줄씩 */
+async function loadActivityStatus() {
+  const text = reportCache['collector/report.md'] ?? (reportCache['collector/report.md'] = await readText('collector/report.md'));
+  const map = new Map();
+  for (const line of String(text || '').split('\n')) {
+    const m = line.match(/^- \*\*(.+?)\*\* — (.+)$/);
+    if (m) map.set(m[1].replace(/ \(장학 게시판에서 발견\)$/, ''), m[2]);
+  }
+  $$('[data-src-status]').forEach((el) => {
+    if (/보관 중/.test(el.textContent)) return;
+    const st = map.get(el.dataset.srcStatus);
+    el.textContent = st ? st.slice(0, 60) : '최근 리포트에 없음 (다음 수집 뒤 확인)';
+  });
+}
+
+/* 화면 안 위임 — bindGlobal 의 클릭 처리 앞에서 부른다. 처리했으면 true. */
+async function handleActivityClick(e) {
+  const t = e.target;
+  const q = (attr) => { const el = t.closest(`[${attr}]`); return el ? el : null; };
+  let el;
+  if ((el = q('data-actf'))) { ACT_FILTER = el.dataset.actf; renderActivities(); return true; }
+  const titleOf = (url) => { const n = D.activities.find((x) => x.url === url); return n ? n.title : url; };
+  if ((el = q('data-act-kind'))) {
+    const url = el.dataset.actKind; const kind = el.dataset.kind;
+    askSheet({ title: `종류를 「${kind}」(으)로 바꿉니다`, note: '앱의 칩(대외활동/공모전) 분류가 바뀝니다. 로봇은 사람이 바꾼 종류를 덮지 않습니다.',
+      lines: [{ t: titleOf(url), m: url }], goLabel: '바꾸기',
+      run: () => applyAction('activityKind', { url, kind }, '종류 바꾸기') });
+    return true;
+  }
+  if ((el = q('data-act-hide'))) {
+    const url = el.dataset.actHide;
+    askSheet({ title: '이 글을 앱에서 숨깁니다', note: '지우지 않습니다 — 표식만 붙어 「숨긴 글」에서 되살릴 수 있습니다. 로봇이 다시 발행해도 숨김이 유지됩니다.',
+      lines: [{ t: titleOf(url), m: url }], goLabel: '숨기기', danger: true,
+      run: () => applyAction('activityHide', { urls: [url] }, '숨기기') });
+    return true;
+  }
+  if ((el = q('data-act-unhide'))) {
+    await applyAction('activityUnhide', { urls: [el.dataset.actUnhide] }, '되살리기');
+    return true;
+  }
+  if ((el = q('data-act-src-park'))) {
+    const url = el.dataset.actSrcPark;
+    askSheet({ title: '이 출처를 보관합니다', note: '다음 수집부터 읽지 않습니다. 이미 실린 글은 60일 뒤 저절로 사라집니다. 되살리기는 「보관한 출처」에서.',
+      lines: [{ t: url }], goLabel: '보관', danger: true,
+      run: () => applyAction('activitySource', { op: 'park', boardUrl: url }, '출처 보관') });
+    return true;
+  }
+  if ((el = q('data-act-src-unpark'))) {
+    await applyAction('activitySource', { op: 'unpark', boardUrl: el.dataset.actSrcUnpark }, '출처 되살리기');
+    return true;
+  }
+  if (q('data-act-src-add')) {
+    const box = byId('screen-activities');
+    const val = (k) => (box.querySelector(`[data-act-in="${k}"]`)?.value || '').trim();
+    const source = { school: val('school'), host: val('host'), boardUrl: val('boardUrl'), evidence: val('evidence') };
+    if (!/^https?:\/\//i.test(source.boardUrl)) { toast('게시판 주소는 http(s)로 시작해야 해요'); return true; }
+    if (!source.school && !source.host) { toast('전국 글이면 주최·운영 기관을 적어 주세요'); return true; }
+    if (/linkareer|wevity|thinkcontest|campuspick|all-con|contestkorea|thinkyou|allforyoung/i.test(source.boardUrl)) { toast('집계 사이트는 출처로 넣지 않아요 — 주최의 제 게시판을 넣어 주세요'); return true; }
+    await applyAction('activitySource', { op: 'add', source }, '출처 추가');
+    return true;
+  }
+  return false;
+}
+
 /* 화면 안 위임 — bindGlobal 의 클릭 처리 맨 앞에서 부른다. 처리했으면 true. */
 async function handleInstaClick(e) {
   const t = e.target;
@@ -3525,6 +3698,7 @@ function bindGlobal() {
   /* 화면 안 위임 */
   byId('app').addEventListener('click', async (e) => {
     if (await handleInstaClick(e)) return;   // 인스타 화면의 버튼 (2026-09-12)
+    if (await handleActivityClick(e)) return;   // 대외활동·공모전 화면의 버튼 (2026-09-29)
 
     /* 모아 둔 수정 — 이 버튼은 **머리줄에 있어 시트 밖**이다.
        🔴 시트 핸들러(#sheet)에 두면 영영 안 눌린다(만들면서 실제로 그렇게 만들었다가 잡았다). */

@@ -47,6 +47,8 @@ cp collector/page-boilerplate.mjs "$OUT/vendor/page-boilerplate.mjs"
 #   🔴 화면의 '반영 전 전후 대조' 와 저장소(tools/admin-apply.mjs)가 **같은 파일**을 봐야 한다.
 #      베끼면 미리보기가 거짓말을 한다(화면은 '1,2' 를 보내고 저장소는 [1,2] 로 넣는다).
 cp tools/edit-diff.mjs "$OUT/vendor/edit-diff.mjs"
+# 대외활동·공모전 종류 두 가지 — 로봇(collect.mjs)·관문·관리자 화면이 같은 파일을 본다 (2026-09-29)
+cp collector/activity-kind.mjs "$OUT/vendor/activity-kind.mjs"
 
 # 등록 규칙 — Node용 파일이라 브라우저에서 읽히도록 앞뒤만 감싼다.
 # (내용은 손대지 않는다. 규칙이 바뀌면 다음 빌드에 그대로 따라온다)
