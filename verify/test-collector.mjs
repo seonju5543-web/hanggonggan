@@ -1368,7 +1368,8 @@ console.log('\n■ 수집망 복원 (2026-09-29 · 2026-08-30 좁힘을 되돌�
     '건국대학교', '동국대학교', '홍익대학교', '숙명여자대학교', '광운대학교', '명지대학교', '상명대학교', '가천대학교', '아주대학교',
     '국민대학교', '숭실대학교', '세종대학교', '이화여자대학교', '인하대학교', '부산대학교', '가톨릭대학교', '한국항공대학교', '경기대학교',
     '서울과학기술대학교', '계명대학교', '서울교육대학교', '한국방송통신대학교', '경북대학교', '영남대학교', '전북대학교', '충남대학교',
-    '전남대학교', '조선대학교', '충북대학교', '부경대학교', '강원대학교'];
+    '전남대학교', '조선대학교', '충북대학교', '부경대학교', '강원대학교',
+    '연세대학교 미래캠퍼스', '고려대학교 세종캠퍼스', '동국대학교 WISE캠퍼스'];   // 분교는 별개 학교 (data.js UNIVERSITIES)
   eq('일반 수집에 경희대·한국외대가 있다', ['경희대학교', '한국외국어대학교'].filter((n) => !uniq(sc.schools).includes(n)), []);
   eq('일반 수집에 2026-08-30 에 뺐던 학교가 전부 돌아왔다', REVIVED.filter((n) => !uniq(sc.schools).includes(n)), []);
   eq('브라우저 수집도 두 곳 이상이다 (17곳을 되살렸다)', bt.targets.length >= 19, true);
@@ -1400,8 +1401,12 @@ console.log('\n■ 일반 수집 예산 (2026-09-29)');
   const src = readText(new URL('collector/collect.mjs', root));
   eq('예산·시한·회전을 harvest-budget 에서 불러 쓴다 (베끼지 않는다)',
     /import \{ makeBudget, rotateOrder, nextCursor, withDeadline, TIMED_OUT \} from '\.\/harvest-budget\.mjs'/.test(src), true);
-  eq('게시판을 집기 전에 예산을 묻는다', /if \(budget\.expired\(\)\) \{/.test(src), true);
-  eq('게시판 하나에 절대 시한을 건다', /await withDeadline\(harvestBoard\(s\), BOARD_HARD_MS\)/.test(src), true);
+  eq('게시판을 집기 전에 「게시판 하나의 시한만큼 남았나」를 묻는다 (expired 로 바꾸면 예산 끝에서 시한만큼 넘친다)',
+    /if \(!budget\.hasRoom\(BOARD_HARD_MS\)\) \{/.test(src), true);
+  eq('  시한을 넘긴 게시판은 dead 표식으로 장부·리포트에 더 끼어들지 못한다', /ctx\.dead = true/.test(src) && (src.match(/if \(ctx\.dead\) return;/g) || []).length >= 6, true);
+  eq('  저장을 마치면 스스로 끝낸다 (버려진 소켓이 단계를 붙잡지 않게)', /\nprocess\.exit\(0\);\s*$/.test(src), true);
+  eq('  health 는 ⏰ 를 성공으로도 실패로도 안 세고 ⛔ 는 실패로 센다', /if \(\/\^⏰\/\.test\(r\.status\)\) continue;/.test(src) && /if \(\/⚠️\|⛔\/\.test\(r\.status\)\)/.test(src), true);
+  eq('게시판 하나에 절대 시한을 건다', /await withDeadline\(harvestBoard\(s, ctx\), BOARD_HARD_MS\)/.test(src), true);
   eq('  시한을 넘기면 리포트에 적고 다음으로 간다', /if \(r === TIMED_OUT\) \{/.test(src), true);
   eq('  예산에 걸려 건너뛴 학교는 ⏰ 로 적는다 (⚠️ 로 적으면 연속 실패로 세어진다)', /status: `⏰ 시간 예산/.test(src), true);
   eq('회전 커서를 읽고 저장한다', /rotateOrder\(boards\.length, cursor\.next \|\| 0\)/.test(src) && /fs\.writeFileSync\(cursorPath/.test(src), true);
@@ -1417,7 +1422,12 @@ console.log('\n■ 일반 수집 예산 (2026-09-29)');
   const harvestCap = Number((harvestStep.match(/timeout-minutes:\s*(\d+)/) || [])[1]);
   eq('수집 단계에 자체 상한이 있다', Number.isFinite(harvestCap), true);
   eq('  수집 단계는 실패해도 저장 단계로 간다 (continue-on-error)', /continue-on-error: true/.test(harvestStep), true);
-  eq('  수집 단계 상한이 수집 예산보다 크다', harvestCap > budgetMin, true);
+  /* 마지막 게시판은 예산 안에서 시한까지 돌 수 있다 — hasRoom(BOARD_HARD_MS) 가 그 시한을 예산 안에 넣으므로
+     단계 상한은 예산 + 마무리(저장·발행) 여유만 있으면 된다. 기본 시한은 소스에서 읽는다(박아 두지 않는다). */
+  const hardMs = Number((src.match(/BOARD_HARD_MS \|\| (\d+)\)/) || [])[1]);
+  eq('  게시판 시한이 예산보다 훨씬 짧다 (시한이 예산의 절반을 넘으면 한 게시판이 실행을 삼킨다)', hardMs > 0 && hardMs * 2 < budgetMin * 60000, true);
+  eq('  수집 단계 상한이 수집 예산 + 마무리 1분보다 크다', harvestCap * 60000 > budgetMin * 60000 + 60000, true);
+  eq('  수집 단계가 실패해도 알린다 (continue-on-error 가 크래시를 조용하게 만드므로)', /if: steps\.run\.outcome != 'success'/.test(yml), true);
   const OVERHEAD = 3;
   eq('작업 상한이 단계 상한의 합 + 여유보다 크다', limit > stepCaps.reduce((a, b) => a + b, 0) + OVERHEAD, true);
 }

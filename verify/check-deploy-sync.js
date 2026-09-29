@@ -70,8 +70,22 @@ try {
 } catch { /* 파일이 없으면 검사 생략 */ }
 if (!syncBad) console.log('✅ 배포 동기화가 데이터 로봇 전부를 감시 중\n');
 
-/* 앱이 실제로 읽어가는 파일들 — 이것만 main에 있으면 사용자 화면이 최신이다 */
-const APP_PATHS = ['index.html', 'app.js', 'style.css', 'forms.js', 'data.js', 'sw.js', 'manifest.json', 'data', 'icons'];
+/* 앱이 실제로 읽어가는 파일들 — 이것만 main에 있으면 사용자 화면이 최신이다.
+   🔴 스크립트 목록은 index.html 에서 **읽는다**(2026-09-29 리뷰) — 손으로 적은 목록에 match-engine.js·boot.js·
+   notify-rules.js 등이 빠져 있어, SERVED_SCHOOLS 를 44곳으로 바꾼 커밋이 main 에 없는데도 「앱 파일 기준으로
+   main과 같음」이라고 초록불을 냈다. check-brief.mjs 와 같은 셈법(index.html 의 src + sw.js). */
+const APP_PATHS = (() => {
+  const path = require('node:path');
+  const root = path.join(__dirname, '..');
+  const fixed = ['index.html', 'style.css', 'sw.js', 'manifest.json', 'terms.html', 'data', 'icons'];
+  try {
+    const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+    const scripts = [...html.matchAll(/src="([a-z0-9.-]+\.js)"/g)].map((m) => m[1]);
+    const sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
+    const swScripts = [...sw.matchAll(/['"]\.?\/?([a-z0-9-]+\.js)['"]/g)].map((m) => m[1]);
+    return [...new Set([...fixed, ...scripts, ...swScripts])];
+  } catch { return [...fixed, 'app.js', 'forms.js', 'data.js']; }
+})();
 
 sh('git fetch origin main', true);
 const hasMain = sh('git rev-parse --verify --quiet origin/main', true);

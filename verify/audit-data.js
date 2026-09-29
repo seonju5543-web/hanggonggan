@@ -141,7 +141,7 @@ try {
   }
   if (dup) errors.push(`activities — 대외활동·공모전에 중복 ${dup}건 (수집기 중복 제거가 동작하지 않았습니다)`);
   if (badKind) errors.push(`activities — kind 가 '공모전'·'대외활동' 이 아닌 글 ${badKind}건 (판정은 collector/activity-kind.mjs 한 곳)`);
-  if (badSchool) errors.push(`activities — 서비스하지 않는 학교의 글 ${badSchool}건 (수집망은 두 곳 그대로 — CLAUDE.md)`);
+  if (badSchool) errors.push(`activities — 서비스하지 않는 학교의 글 ${badSchool}건 (서비스 학교는 match-engine.js SERVED_SCHOOLS — CLAUDE.md 「수집망 44개교 복원」)`);
   if (noHost) warns.push(`activities — 학교도 주최(host)도 없는 전국 글 ${noHost}건 (activity-sources.json 의 host 를 적어 주세요)`);
   const badUrl = (acts.items || []).filter((n) => /mode=download|attachNo=|fileDown/i.test(n.url || ''));
   if (badUrl.length) warns.push(`activities — 첨부 내려받기 주소가 글로 들어온 것 ${badUrl.length}건`);

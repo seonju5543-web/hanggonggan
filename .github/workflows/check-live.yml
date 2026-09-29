@@ -43,7 +43,7 @@ jobs:
             const M = require('./match-engine.js');
             const fs = require('fs');
             const out = ['data/notices/index.json'];
-            // 공고: 색인에 있는 학교 전부 (지금 두 곳뿐이다)
+            // 공고: 색인에 있는 학교 전부 (2026-09-29 부터 44개교 — 색인이 정한다, 여기 박지 않는다)
             try {
               const ni = JSON.parse(fs.readFileSync('data/notices/index.json','utf8'));
               for (const k of Object.keys(ni.files)) out.push(M.noticeFilesForProfile({school:k})[0]);

@@ -61,13 +61,30 @@ jobs:
       - id: run
         name: 게시판 수집
         # 자체 예산(8분 · collect.mjs HARVEST_BUDGET_MS) + 단계 상한 + continue-on-error 세 겹 (2026-09-29 · 44개교 복원).
-        # 상한 10 = 예산 8 + 마무리 2. 이 상한에 닿는다는 것 자체가 '어딘가 안 멈췄다'는 신호다.
-        # continue-on-error 라 흘러넘쳐도 아래 저장·감사·리포트 단계는 돈다(잘린 학교는 회전 커서가 다음 실행에 넘긴다).
+        # 상한 10 = 예산 8 + 마무리 2. 로봇은 게시판 하나의 시한(2분 30초)만큼 남았을 때만 다음 게시판을 집으므로
+        # 수집은 예산 안에서 끝난다. 이 상한에 닿는다는 것 자체가 '어딘가 안 멈췄다'는 신호다.
+        # continue-on-error 라 흘러넘쳐도 아래 저장·감사·리포트 단계는 돈다. ⚠️ 다만 상한에 **잘리면** 로봇이 아무것도
+        # 못 쓴다(장부·커서는 수집이 끝난 뒤 쓴다) — 그래서 바로 아래 「수집 단계 실패 알림」이 조용히 넘어가지 않게 한다.
         timeout-minutes: 10
         continue-on-error: true
         env:
           HARVEST_BUDGET_MS: '480000'
         run: node collector/collect.mjs
+
+      # continue-on-error 는 크래시·시간초과를 **조용하게** 만든다 — 작업이 성공으로 끝나 아래 failure()/cancelled() 알림이
+      # 안 울리고, new_count 가 비어 리포트 이슈도 0건 코멘트도 안 나간다(리뷰 2026-09-29). 그래서 여기서 따로 알린다.
+      - name: 🚨 수집 단계 실패 알림 (최근 리포트 이슈에 코멘트)
+        if: steps.run.outcome != 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          last=$(gh issue list --repo "${{ github.repository }}" \
+            --search '"수집 리포트" in:title' --state open \
+            --limit 1 --json number --jq '.[0].number' || true)
+          if [ -n "$last" ] && [ "$last" != "null" ]; then
+            gh issue comment "$last" --repo "${{ github.repository }}" \
+              --body "🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **게시판 수집 단계가 ${{ steps.run.outcome }} 로 끝났습니다** (상한 10분에 잘렸거나 로봇이 죽었습니다 — 이번 실행의 수집분·회전 커서는 저장되지 않았을 수 있습니다). 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · Claude 세션에 '수집 단계 실패 확인해줘'라고 지시하세요."
+          fi
 
       - name: 정식 등록 자동화 (선조치후보고 — collector/auto-register-config.json으로 on/off)
         run: node collector/auto-register.mjs

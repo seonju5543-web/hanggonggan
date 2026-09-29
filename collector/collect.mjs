@@ -296,7 +296,7 @@ const boardLabel = (s) => (s.campus && s.campus !== '공통' ? `${s.school} ${s.
 const bucketOf = (s) => (s.role === 'activity' ? actResults : (s.role === 'external' ? extResults : results));
 
 /* 게시판 하나를 읽는다. `return` 은 옛 `continue` — 이 게시판을 마치고 다음으로 간다는 뜻. */
-async function harvestBoard(s) {
+async function harvestBoard(s, ctx = { dead: false }) {
   const isAct = s.role === 'activity';
   const isExt = s.role === 'external';
   const name = boardLabel(s);
@@ -312,8 +312,9 @@ async function harvestBoard(s) {
       rawLinks = await rowsByRule(rule, s.boardUrl);   // 링크가 아닌 행을 쓰는 게시판
     } else {
       const res = await fetchBoard(s.boardUrl);
+      if (ctx.dead) return;   // 시한을 넘겨 버려진 게시판 — 리포트·장부를 더 건드리지 않는다
       if (!res.ok) {
-        results.push({ name, status: `⚠️ 접속 실패 (HTTP ${res.status}) — 주소 수정 필요`, items: [] });
+        bucket.push({ name, status: `⚠️ 접속 실패 (HTTP ${res.status}) — 주소 수정 필요`, items: [] });   // 활동·재단 게시판도 제 표에 (리뷰 2026-09-29)
         return;
       }
       rawLinks = extractLinks(await res.text(), s.boardUrl);
@@ -334,6 +335,7 @@ async function harvestBoard(s) {
         .filter((i) => !isAttachmentEntry(i));
       const freshA = actItems.filter((i) => !seenAct[urlKey(i.url)]).slice(0, ACT_FRESH_MAX);
       for (const it of freshA) {
+        if (ctx.dead) return;
         const detail = await fetchDetail(it);
         it.attachments = detail.attachments;
         it.deadlineHint = detail.deadlineHint;
@@ -344,6 +346,7 @@ async function harvestBoard(s) {
         seenAct[urlKey(it.url)] = it.foundAt;
         freshActs.push(it);
       }
+      if (ctx.dead) return;
       if (isAct) {
         actResults.push({
           name,
@@ -362,6 +365,7 @@ async function harvestBoard(s) {
         .filter((i) => !isAttachmentEntry(i));
       const freshE = extItems.filter((i) => !seenExt[urlKey(i.url)]).slice(0, EXT_FRESH_MAX);
       for (const it of freshE) {
+        if (ctx.dead) return;
         const detail = await fetchDetail(it);
         it.attachments = detail.attachments;
         it.deadlineHint = detail.deadlineHint;
@@ -372,6 +376,7 @@ async function harvestBoard(s) {
         seenExt[urlKey(it.url)] = it.foundAt;
         freshExt.push(it);
       }
+      if (ctx.dead) return;
       extResults.push({
         name,
         status: extItems.length ? `✅ 정상 (장학 공고 ${extItems.length}건 감지)` : '🟡 접속은 되지만 장학 공고를 찾지 못함 — 게시판이 맞는지 확인 필요',
@@ -389,6 +394,7 @@ async function harvestBoard(s) {
 
     // 상세 페이지 방문: 첨부양식·마감 단서 수집
     for (const it of fresh) {
+      if (ctx.dead) return;
       const detail = await fetchDetail(it);
       it.attachments = detail.attachments;
       it.deadlineHint = detail.deadlineHint;
@@ -398,12 +404,14 @@ async function harvestBoard(s) {
       seen[urlKey(it.url)] = it.foundAt;
       freshAll.push(it);
     }
+    if (ctx.dead) return;
     results.push({
       name,
       status: items.length ? `✅ 정상 (실공고 ${items.length}건 감지)` : '🟡 접속은 되지만 실공고를 찾지 못함 — 공지 목록 페이지인지 확인 필요',
       items: fresh,
     });
   } catch (e) {
+    if (ctx.dead) return;
     // 이유를 그대로 적는다 — ENOTFOUND면 주소가 없는 것이고, TIMEOUT이면 학교가 느린 것이라
     // 해야 할 일이 정반대다. 'TypeError'만 적으면 둘을 구분할 수 없다.
     bucket.push({ name, status: `⚠️ 오류 (${netReason(e)}) — 주소 확인 필요`, items: [] });
@@ -418,15 +426,19 @@ const skippedByBudget = [];
 for (const idx of order) {
   const s = boards[idx];
   const name = boardLabel(s);
-  if (budget.expired()) {
+  /* 시작해도 되나 — '남은 시간 > 0' 이 아니라 '게시판 하나의 시한만큼 남았나'를 묻는다(browser-collect 와 같다).
+     안 그러면 예산 끝에 집은 게시판이 시한까지 더 돌아 단계 상한을 넘긴다(리뷰 2026-09-29). */
+  if (!budget.hasRoom(BOARD_HARD_MS)) {
     skippedByBudget.push(name);
     bucketOf(s).push({ name, status: `⏰ 시간 예산(${humanMs(BUDGET_MS)}) 소진 — 이번 실행은 건너뜀, 다음 실행이 여기부터 이어서 봅니다`, items: [] });
     continue;
   }
   const t0 = Date.now();
   console.log(`[${Math.round(budget.elapsed() / 1000)}s] ▶ ${name}`);
-  const r = await withDeadline(harvestBoard(s), BOARD_HARD_MS);
+  const ctx = { dead: false };
+  const r = await withDeadline(harvestBoard(s, ctx), BOARD_HARD_MS);
   if (r === TIMED_OUT) {
+    ctx.dead = true;   // 아직 도는 작업은 결과를 버린다 — 저장이 끝난 뒤 장부·리포트에 끼어들지 못하게
     bucketOf(s).push({ name, status: `⛔ 응답이 멈춰 ${humanMs(BOARD_HARD_MS)}에서 강제 중단 — 여기까지 주운 공고만 저장합니다`, items: [] });
   }
   console.log(`[${Math.round(budget.elapsed() / 1000)}s] ◀ ${name} (${Math.round((Date.now() - t0) / 1000)}초)`);
@@ -538,7 +550,7 @@ const lines = [
    브라우저 수집 리포트와 같은 자리·같은 말. 안 적으면 '학교 몇 곳이 조용히 빠졌다'를 아무도 모른다. */
 if (skippedByBudget.length) {
   lines.push(`⏰ **시간 예산(${humanMs(BUDGET_MS)})에 걸려 게시판 ${skippedByBudget.length}곳을 이번 실행에서 못 봤습니다** — ${skippedByBudget.slice(0, 8).join(' · ')}${skippedByBudget.length > 8 ? ' …' : ''}`);
-  lines.push(`  → 다음 실행은 **${boards[cursor.next] ? boardLabel(boards[cursor.next]) : '처음'}**부터 시작합니다(하루 2회 실행이라 모든 학교가 하루 안에 한 번은 돕니다).`, '');
+  lines.push(`  → 이번에 본 게시판 ${doneCount}/${boards.length}곳 · 다음 실행은 **${boards[cursor.next] ? boardLabel(boards[cursor.next]) : '처음'}**부터 시작합니다.`, '');
 } else {
   lines.push(`⏱ 게시판 ${doneCount}곳을 ${humanMs(budget.elapsed())}에 다 돌았습니다(예산 ${humanMs(BUDGET_MS)}).`, '');
 }
@@ -588,10 +600,11 @@ try { health = JSON.parse(fs.readFileSync(healthPath, 'utf8')); } catch { /* 첫
 const chronic = [];
 for (const r of results) {
   if (/게시판 주소 미설정/.test(r.status)) continue;   // 아직 주소가 없는 곳은 실패가 아니다
+  if (/^⏰/.test(r.status)) continue;                 // 예산에 걸려 안 본 곳 — 성공도 실패도 아니다 (lastOk 를 오늘로 찍지 않는다)
   const h = health[r.name] || { fails: 0, lastOk: null };
-  if (/⚠️/.test(r.status)) {
+  if (/⚠️|⛔/.test(r.status)) {                       // ⛔ 응답 멈춤도 연속되면 '멈춘 학교'다
     h.fails += 1;
-    if (h.fails >= 3) chronic.push(`${r.name} (${h.fails}회 연속) — ${r.status.replace(/^⚠️\s*/, '')}`);
+    if (h.fails >= 3) chronic.push(`${r.name} (${h.fails}회 연속) — ${r.status.replace(/^[⚠️⛔]\s*/, '')}`);
   } else {
     h.fails = 0; h.lastOk = today;
   }
@@ -645,3 +658,6 @@ console.log(`collected: ${newCount} new items; notices.json now has ${notices.it
 if (process.env.GITHUB_OUTPUT) {
   fs.appendFileSync(process.env.GITHUB_OUTPUT, `new_count=${newCount}\n`);
 }
+/* 저장을 마쳤으면 스스로 끝낸다 — 시한에 걸려 버려진 게시판의 소켓이 프로세스를 붙잡아
+   '저장은 다 했는데 단계 상한에 걸려 실패'로 끝나는 것을 막는다(browser-collect 와 같은 이유). */
+process.exit(0);
