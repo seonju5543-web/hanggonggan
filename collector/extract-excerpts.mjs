@@ -307,7 +307,7 @@ function dateFrom(value, ctxYear) {
        대개 **같은 줄**에서 온다. 훑는 규칙이 두 벌이 되면 시작과 끝이 서로 다른 줄에서
        와 짝이 안 맞는다(다른 공고의 날짜가 섞이는 그 사고 유형이다).
     `accept(label, value)` 가 이름표를 고르고, `read(value, ctxYear)` 가 날짜를 읽는다. */
-function eachLabeledValue(text, accept, read) {
+export function eachLabeledValue(text, accept, read) {
   if (!text) return null;
   const lines = String(text).split(/\n+/).map((l) => unent(l).replace(/[ \t　]+/g, ' ').trim()).filter(Boolean);
   const ctxYear = soleYear(text);

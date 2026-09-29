@@ -16,7 +16,9 @@ import { publishBySchool, dropUnserved } from './publish-notices.mjs';
 import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { cleanTitle, isMenuEntry } from './clean-title.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
-import { activityKind } from './activity-kind.mjs';
+import { activityKind, activityField } from './activity-kind.mjs';
+import { activityExcerpts } from './activity-excerpts.mjs';
+import { robotsAllows } from './robots.mjs';
 import { extractLinks, stripSessionId } from './board-links.mjs';
 import { canonUrl } from './canon-url.mjs';
 import { makeBudget, rotateOrder, nextCursor, withDeadline, TIMED_OUT } from './harvest-budget.mjs';
@@ -126,9 +128,10 @@ async function fetchDetail(item) {
 
     const uniq = new Map();
     attachments.forEach((a) => { if (!uniq.has(a.url)) uniq.set(a.url, a); });
-    return { attachments: [...uniq.values()], deadlineHint: deadlineHintFrom(text) };
+    /* 본문 글자(text)도 돌려준다 (2026-09-29) — 활동 글은 여기서 모집기간·자격·혜택을 원문 그대로 발췌한다(activity-excerpts.mjs) */
+    return { attachments: [...uniq.values()], deadlineHint: deadlineHintFrom(text), text };
   } catch {
-    return { attachments: [], deadlineHint: null };
+    return { attachments: [], deadlineHint: null, text: '' };
   }
 }
 
@@ -309,6 +312,12 @@ async function harvestBoard(s, ctx = { dead: false }) {
     bucket.push({ name, status: '⚙️ 게시판 주소 미설정' + (s.note ? ` (${s.note})` : ''), items: [] });
     return;
   }
+  /* 공공·재단 게시판은 robots.txt 가 막은 길이면 읽지 않는다 (2026-09-29 · 4차 리서치 — 접근 제한을 깨고 긁는 것은 불법행위가 될 수 있다).
+     학교 게시판(role scholarship)은 지금까지처럼 읽는다. 파일이 없거나 못 받으면 읽어도 된다고 본다(robots.mjs). */
+  if ((isAct || isExt) && !(await robotsAllows(s.boardUrl))) {
+    bucket.push({ name, status: '⛔ robots.txt 가 막아 둔 주소 — 읽지 않았습니다 (출처를 바꾸거나 보관하세요)', items: [] });
+    return;
+  }
   try {
     const rule = BOARD_RULES[s.school];
     let rawLinks;
@@ -343,6 +352,12 @@ async function harvestBoard(s, ctx = { dead: false }) {
         const detail = await fetchDetail(it);
         it.attachments = detail.attachments;
         it.deadlineHint = detail.deadlineHint;
+        /* 원문 발췌 (2026-09-29) — 모집기간→마감일(장학과 같은 규칙) · 활동기간·대상·혜택·주최·인원은 원문 문장 그대로. 없으면 비운다 */
+        const ex = activityExcerpts(detail.text);
+        if (ex.deadline) it.deadline = ex.deadline;
+        if (ex.excerpts.length) it.excerpts = ex.excerpts;
+        const field = activityField(it.title, it.kind);
+        if (field) it.field = field;
         it.school = s.school || '';
         it.campus = s.campus === '공통' ? '' : (s.campus || '');
         if (!it.school && s.host) it.host = s.host;   // 전국 글은 주최를 설정에서 받는다(제목으로 짐작하지 않는다)
@@ -373,6 +388,8 @@ async function harvestBoard(s, ctx = { dead: false }) {
         const detail = await fetchDetail(it);
         it.attachments = detail.attachments;
         it.deadlineHint = detail.deadlineHint;
+        const exd = activityExcerpts(detail.text);   // 재단 공고도 마감일은 같은 규칙으로 읽는다 (발췌 줄은 장학 카드가 아니라 안 싣는다)
+        if (exd.deadline) it.deadline = exd.deadline;
         it.school = '';
         it.campus = '';
         it.host = s.host || '';

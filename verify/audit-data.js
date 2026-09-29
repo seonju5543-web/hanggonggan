@@ -138,6 +138,8 @@ try {
     if (n.kind !== '공모전' && n.kind !== '대외활동') badKind++;
     if (n.school && served.indexOf(n.school) < 0) badSchool++;
     if (!n.school && !n.host) noHost++;
+    if (n.deadline && !/^\d{4}-\d{2}-\d{2}$/.test(n.deadline)) errors.push(`activities — 마감일 형식이 아닙니다(YYYY-MM-DD): '${n.deadline}' (${(n.title || '').slice(0, 30)})`);
+    if (n.excerpts && !(Array.isArray(n.excerpts) && n.excerpts.every((x) => x && x.label && x.text))) errors.push(`activities — 발췌 모양이 {label,text}[] 이 아닙니다 (${(n.title || '').slice(0, 30)})`);
   }
   if (dup) errors.push(`activities — 대외활동·공모전에 중복 ${dup}건 (수집기 중복 제거가 동작하지 않았습니다)`);
   if (badKind) errors.push(`activities — kind 가 '공모전'·'대외활동' 이 아닌 글 ${badKind}건 (판정은 collector/activity-kind.mjs 한 곳)`);

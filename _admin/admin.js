@@ -2441,7 +2441,7 @@ function actItemRowHtml(n, hiddenRow) {
   return `
     <div class="row" data-row data-noclick data-act-item="${esc(n.url)}" style="cursor:default${hiddenRow ? ';opacity:.55' : ''}">
       <div><div class="t" data-row-title>${esc(n.title)}</div>
-        <div class="m"><span>${esc(n.school ? `${n.school} 게시판` : (n.host || '전국'))}</span>${n.deadlineHint ? `<span>${esc(n.deadlineHint)}</span>` : ''}<span>${esc(n.foundAt || '')} 수집</span></div>
+        <div class="m"><span>${esc(n.school ? `${n.school} 게시판` : (n.host || '전국'))}</span>${n.field ? `<span>${esc(n.field)}</span>` : ''}${n.deadline ? `<span>마감 ${esc(n.deadline)}</span>` : (n.deadlineHint ? `<span>${esc(n.deadlineHint)}</span>` : '')}<span>${esc(n.foundAt || '')} 수집</span></div>
         <div class="badges"><span class="pill ${n.kind === '공모전' ? 'info' : 'good'}">${esc(n.kind || '?')}</span>${n.kindFrom ? `<span class="pill">${esc(n.kindFrom)}</span>` : ''}${n.hiddenBy ? `<span class="pill warn">${esc(n.hiddenBy)} 숨김</span>` : ''}</div></div>
       <div class="btn-row">
         <a class="btn btn-sm" href="${esc(n.url)}" target="_blank" rel="noreferrer noopener">원문 ↗</a>

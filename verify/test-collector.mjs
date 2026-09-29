@@ -45,7 +45,7 @@ import { createRequire } from 'node:module';
 import { isAttachmentEntry, isHtmlPayload } from '../collector/attachment-link.mjs';
 import { isDetailUrl, isMarkerUrl, markerTitle, sameTitle, titleCore, rowByCore, detailCandidates, looksLikeLoginWall, rowDetailCandidates } from '../collector/detail-url.mjs';
 import { cleanTitle, isMenuEntry } from '../collector/clean-title.mjs';
-import { activityKind, ACTIVITY_KINDS } from '../collector/activity-kind.mjs';
+import { activityKind, ACTIVITY_KINDS, activityField, ACTIVITY_FIELDS } from '../collector/activity-kind.mjs';
 import { makeBudget, rotateOrder, nextCursor, withDeadline, TIMED_OUT } from '../collector/harvest-budget.mjs';
 import { canonUrl } from '../collector/canon-url.mjs';
 import { checkFormQuality } from '../collector/form-quality.mjs';
@@ -1576,6 +1576,46 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
     const kinds = (readText(new URL('../tools/admin-apply.mjs', import.meta.url)).match(/const ACT_KINDS = \[([^\]]+)\]/) || [])[1] || '';
     eq('  저장소의 종류 목록이 activity-kind 와 같다', kinds.match(/'([^']+)'/g).map((x) => x.slice(1, -1)).sort(), ACTIVITY_KINDS.slice().sort());
   }
+
+  /* ⑥ 4차 리서치 적용 (2026-09-29) — 원문 발췌·분야·robots.txt·마감 D-day·정렬. 규칙은 순수 함수라 여기서 직접 돌린다. */
+  {
+    const ex = await import('../collector/activity-excerpts.mjs');
+    const post = '2026년 대학생 해외봉사단 모집\n○ 모집기간 : 2026. 10. 1.(수) ~ 2026. 10. 15.(수) 18:00\n○ 활동기간 : 2027. 1. 5. ~ 1. 20. (2주)\n○ 모집대상 : 국내 대학 재학생 (휴학생 포함)\n○ 혜택 : 항공료·체재비 전액 지원\n○ 주최 : 청년재단\n○ 모집인원 : 40명\n○ 문의 : 02-000-0000';
+    const r = ex.activityExcerpts(post);
+    eq('발췌 — 모집기간에서 마감일을 읽는다 (장학과 같은 규칙: 이름표 뒤 날짜)', r.deadline, '2026-10-15');
+    eq('  발췌 줄은 원문 문장 그대로, 카드 순서대로', r.excerpts.map((x) => x.label), ['모집기간', '활동기간', '대상', '혜택', '주최', '모집인원']);
+    eq('  값은 원문 그대로 (지어내지 않는다)', r.excerpts.find((x) => x.label === '대상').text, '국내 대학 재학생 (휴학생 포함)');
+    eq('  문의처는 발췌하지 않는다', r.excerpts.some((x) => /문의/.test(x.label)), false);
+    eq('  이름표 없는 글은 비운다 — 날짜가 있어도 마감으로 짐작하지 않는다', ex.activityExcerpts('10월 3일에 행사가 있습니다. 2026.10.03 참고.'), { deadline: null, excerpts: [] });
+    eq('  기간이 "상시" 면 마감을 비운다', ex.activityExcerpts('○ 모집기간 : 2026.9.1. ~ 상시').deadline, null);
+    /* 줄 전체가 200자를 넘으면 이름표 줄이 아니라 문장이라 아예 안 읽는다(eachLabeledValue 규칙) — 그 안쪽 값은 160자에서 끊는다 */
+    const longV = ex.activityExcerpts('○ 혜택 : ' + 'ㄱ'.repeat(185)).excerpts[0];
+    eq('  긴 값은 160자에서 끊고 … 를 단다', [longV ? longV.text.length : -1, longV ? longV.text.endsWith('…') : false], [160, true]);
+    eq('  200자를 넘는 줄은 문장이라 읽지 않는다', ex.activityExcerpts('○ 혜택 : ' + 'ㄱ'.repeat(300)).excerpts.length, 0);
+    eq('분야 — 서포터즈는 서포터즈·기자단', activityField('2026 청년 서포터즈 2기 모집', '대외활동'), '서포터즈·기자단');
+    eq('  해커톤은 IT·소프트웨어', activityField('AI 해커톤 참가팀 모집', '공모전'), 'IT·소프트웨어');
+    eq('  못 가르면 null — 억지로 기타라고 적지 않는다', activityField('2026 하반기 참가자 모집', '대외활동'), null);
+    eq('  종류마다 제 분야 목록', Object.keys(ACTIVITY_FIELDS).sort(), ['공모전', '대외활동']);
+    const rb = await import('../collector/robots.mjs');
+    const rules = rb.parseRobots('# c\nUser-agent: *\nDisallow: /bbs/\nAllow: /bbs/public\n\nUser-agent: Googlebot\nDisallow:');
+    eq('robots — * 묶음의 Disallow 만 읽는다', rules, { disallow: ['/bbs/'], allow: ['/bbs/public'] });
+    eq('  막힌 길', rb.allowedByRules(rules, '/bbs/list.do'), false);
+    eq('  Allow 가 더 길면 연다', rb.allowedByRules(rules, '/bbs/public/list'), true);
+    eq('  다른 길은 연다', rb.allowedByRules(rules, '/portal/x'), true);
+    eq('  빈 파일은 전부 연다', rb.allowedByRules(rb.parseRobots(''), '/anything'), true);
+    eq('  파일을 못 받으면 읽어도 된다고 본다 (없는 것과 막힌 것은 다르다)', await rb.robotsAllows('https://none.invalid/x', async () => { throw new Error('ENOTFOUND'); }), true);
+    eq('  Disallow: / 는 전부 막는다', await rb.robotsAllows('https://blocked.invalid/x', async () => ({ ok: true, headers: { get: () => 'text/plain' }, text: async () => 'User-agent: *\nDisallow: /' })), false);
+    /* 배선 */
+    eq('로봇 — 활동·재단 게시판만 robots.txt 를 묻는다 (학교 게시판은 그대로)', /if \(\(isAct \|\| isExt\) && !\(await robotsAllows\(s\.boardUrl\)\)\)/.test(cm), true);
+    eq('  활동 글에 발췌·마감·분야를 싣는다', /const ex = activityExcerpts\(detail\.text\);[\s\S]*?it\.deadline = ex\.deadline;[\s\S]*?it\.excerpts = ex\.excerpts;[\s\S]*?activityField\(it\.title, it\.kind\)/.test(cm), true);
+    eq('  재단 공고도 마감일을 같은 규칙으로', /const exd = activityExcerpts\(detail\.text\);/.test(cm), true);
+    eq('  상세 페이지 글자를 돌려준다', /deadlineHint: deadlineHintFrom\(text\), text \}/.test(cm), true);
+    eq('앱 — 마감을 읽은 글은 마감 다음 날까지만 (장학과 같은 CLOSED_KEEP_DAYS)', /!n\.deadline \|\| dday\(n\.deadline\)\.days >= -CLOSED_KEEP_DAYS/.test(app), true);
+    eq('  D-day 는 dday()·ddayWords() 한 곳 (판정을 새로 만들지 않는다)', /dday: n\.deadline \? \{ label: ddayWords\(dday\(n\.deadline\)\)/.test(app), true);
+    eq('  마감 임박순은 마감을 읽은 글끼리만', /const byDeadline = \(a, b\) => \(a\.deadline && b\.deadline \? a\.deadline\.localeCompare\(b\.deadline\)/.test(app), true);
+    eq('  정렬 단추가 있다', /id="activities-sort-btn"/.test(html) && /\$\('#activities-sort-btn'\)\.addEventListener/.test(app), true);
+    eq('  발췌 줄은 카드 한 벌 안에서 그린다', /\(o\.excerpts \|\| \[\]\)\.map\(\(x\) => `<p class="sch-provider">/.test(app), true);
+  }
 }
 
 console.log('\n■ 재단·지자체 게시판 (2026-09-26 · 노션 F-13 · 교외 확대)');
@@ -1629,7 +1669,7 @@ console.log('\n■ 재단·지자체 게시판 (2026-09-26 · 노션 F-13 · 교
   eq('renderHome 이 그린다', /\$\('#external-notices'\)\.innerHTML = externalNoticesHtml\(\);/.test(app), true);
   eq('당겨서 새로고침·첫 실행이 받는다', /loadActivities\(\), loadExternal\(\)\]/.test(app) && /^loadExternal\(\);$/m.test(app), true);
   eq('못 받아 왔어도 빈 문서', /liveExternal = d \|\| liveExternal \|\| \{ items: \[\], updatedAt: null \}/.test(app), true);
-  eq('카드는 한 벌 · 주최를 윗줄에', /noticeCardHtml\(n, \{ org: `\$\{n\.host\} 공고` \}\)/.test(app) && !/function externalCardHtml/.test(app), true);
+  eq('카드는 한 벌 · 주최를 윗줄에 (마감을 읽은 글은 D-day 도)', /noticeCardHtml\(n, \{ org: `\$\{n\.host\} 공고`, dday: n\.deadline \?/.test(app) && !/function externalCardHtml/.test(app), true);
   eq('등록된 주소는 뺀다 — 학교 구역과 같은 잣대(registeredUrlMatcher)', (app.match(/registeredUrlMatcher\(\)/g) || []).length >= 2, true);
   eq('글이 없으면 구역이 비어 있다 (빈 문구를 둘 만들지 않는다)', /if \(!mine\.length\) return '';/.test(app.slice(app.indexOf('function externalNoticesHtml'))), true);
 }

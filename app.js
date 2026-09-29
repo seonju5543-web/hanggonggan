@@ -2678,6 +2678,8 @@ function noticeCardHtml(n, opts) {
                 진짜로 알려면 원문을 읽어 정식 등록해야 하고, 그러면 이 목록이 아니라 카드가 된다. */ ''}
         ${/* 대외활동·공모전 탭은 윗줄만 바꿔 쓴다(opts.org · 2026-09-25) — 카드 그림은 이 한 벌이다 */ ''}
         ${o.org ? `<span class="sch-org">${esc(o.org)}</span>` : `<span class="sch-org">${esc(n.school)}${n.campus ? ' ' + esc(n.campus) : ''} 게시판</span>`}
+        ${/* 마감을 **읽은** 글만 D-day 를 단다 (2026-09-29 · 원문 이름표 뒤 날짜 — 장학 카드와 같은 dday()·같은 글자). 못 읽은 글은 아래 기간 한 줄이 원문 그대로 말한다. */ ''}
+        ${o.dday ? `<span class="sch-due${o.dday.urgent ? ' urgent' : ''}">${esc(o.dday.label)}</span>` : ''}
         ${/* 🔴 **'마감 임박' 배지를 여기 달지 않는다** (2026-09-12 · UI-16 으로 이 카드가 제 칸을
              갖게 되면서 드러났다). 그 배지는 `deadlineHint` 가 **있기만 하면** 붙었다 — 본문에
              '까지'·'마감' 이라는 낱말이 한 번이라도 나오면 붙는다는 뜻이라, `마감 안내 작성일
@@ -2686,7 +2688,9 @@ function noticeCardHtml(n, opts) {
              모르는 것을 단정하지 않는다(원칙 8-1) — 기간은 아래 줄이 원문 그대로 말한다. */ ''}
       </div>
       <p class="sch-name">${esc(unent(n.title))}</p>
-      ${n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? `<p class="sch-provider">${esc(unent(n.deadlineHint))}</p>` : ''}
+      ${/* 원문 발췌 줄 (2026-09-29 · 활동 글) — 이름표 : 원문 문장. 발췌가 있으면 기간 한 줄은 겹쳐 적지 않는다 */ ''}
+      ${(o.excerpts || []).map((x) => `<p class="sch-provider">${esc(x.label)} · ${esc(unent(x.text))}</p>`).join('')}
+      ${!(o.excerpts || []).length && n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? `<p class="sch-provider">${esc(unent(n.deadlineHint))}</p>` : ''}
       <p class="sch-provider">${(n.attachments || []).length ? `첨부 ${(n.attachments || []).length}개 · ` : ''}${esc(n.foundAt || '')} 수집 · ${isBoardListLink(n.url) ? '게시판 목록에서 보기 ↗' : '원문 보기 ↗'}</p>
     </a>`;
 }
@@ -2701,6 +2705,8 @@ function noticeCardHtml(n, opts) {
 let liveActivities = null;
 let activitiesFilter = 'all';
 let activitiesQuery = '';
+/* 정렬 둘 — 최근 수집순(기본) · 마감 임박순(마감을 읽은 글이 앞, 못 읽은 글은 뒤에 최근순) (2026-09-29 · 4차 리서치: 경쟁 앱의 기본 축) */
+let activitiesSort = 'recent';
 
 function loadActivities() {
   return fetch('data/activities.json', { cache: 'no-store' })
@@ -2717,8 +2723,10 @@ function loadActivities() {
 function activitiesForMe() {
   const p = state.profile;
   if (!p || !liveActivities) return [];
-  /* 관리자가 숨긴 글(hidden · activity-config.json)은 보이지 않는다 — 지운 것이 아니라 표식이다 */
-  return (liveActivities.items || []).filter((n) => n && n.url && !n.hidden && activityForProfile(n, p));
+  /* 관리자가 숨긴 글(hidden · activity-config.json)은 보이지 않는다 — 지운 것이 아니라 표식이다.
+     마감을 읽은 글은 장학 목록과 같은 규칙(CLOSED_KEEP_DAYS)으로 마감 다음 날까지만 — 마감을 못 읽은 글은 60일 규칙(로봇)에 맡긴다 */
+  return (liveActivities.items || []).filter((n) => n && n.url && !n.hidden && activityForProfile(n, p)
+    && (!n.deadline || dday(n.deadline).days >= -CLOSED_KEEP_DAYS));
 }
 
 function renderActivities() {
@@ -2735,9 +2743,14 @@ function renderActivities() {
   if (activitiesFilter !== 'all') list = list.filter((n) => n.kind === activitiesFilter);
   /* 검색은 카드에 **보이는 글자**(제목)로만 — 탐색 화면과 같은 규칙(2026-08-30) */
   const q = activitiesQuery.trim().toLowerCase();
-  if (q) list = list.filter((n) => String(unent(n.title)).toLowerCase().includes(q));
-  /* 최근 수집 순 — 마감일을 모르는 목록이라(원문 한 줄만 있다) 마감순은 거짓이 된다 */
-  list = list.slice().sort((a, b) => String(b.foundAt || '').localeCompare(String(a.foundAt || '')));
+  /* 검색은 카드에 보이는 글자로 — 제목 · 분야 · 발췌 줄 */
+  if (q) list = list.filter((n) => [n.title, n.field, ...(n.excerpts || []).map((x) => x.text)].filter(Boolean).map((x) => String(unent(x)).toLowerCase()).some((x) => x.includes(q)));
+  const byRecent = (a, b) => String(b.foundAt || '').localeCompare(String(a.foundAt || ''));
+  /* 마감 임박순은 **마감을 읽은 글끼리만** 잰다 — 못 읽은 글에 가짜 날짜를 주지 않는다(dday 의 가짜 14 를 순서에 쓰지 말 것 · CLAUDE.md) */
+  const byDeadline = (a, b) => (a.deadline && b.deadline ? a.deadline.localeCompare(b.deadline) : a.deadline ? -1 : b.deadline ? 1 : byRecent(a, b));
+  list = list.slice().sort(activitiesSort === 'deadline' ? byDeadline : byRecent);
+  const sortLabel = $('#activities-sort-label');
+  if (sortLabel) sortLabel.textContent = activitiesSort === 'deadline' ? '마감 임박순' : '최근 수집순';
   if (!list.length) {
     box.innerHTML = `<p class="empty">${q
       ? `'${esc(activitiesQuery.trim())}'와 맞는 글이 없어요`
@@ -2745,7 +2758,9 @@ function renderActivities() {
     return;
   }
   box.innerHTML = list.map((n) => noticeCardHtml(n, {
-    org: `${n.kind || '대외활동'} · ${n.school ? `${n.school}${n.campus ? ' ' + n.campus : ''} 게시판` : (n.host || '전국')}`,
+    org: `${n.kind || '대외활동'}${n.field ? ' · ' + n.field : ''} · ${n.school ? `${n.school}${n.campus ? ' ' + n.campus : ''} 게시판` : (n.host || '전국')}`,
+    dday: n.deadline ? { label: ddayWords(dday(n.deadline)), urgent: dday(n.deadline).days >= 0 && dday(n.deadline).days <= 7 } : null,
+    excerpts: n.excerpts,
   })).join('');
 }
 
@@ -2783,7 +2798,7 @@ function externalNoticesHtml() {
   return `<div class="section-head" style="margin-top:4px"><h3>재단·지자체 새 공고</h3>
     <span class="link-btn">${liveExternal.updatedAt ? esc(liveExternal.updatedAt) + ' 갱신' : ''}</span></div>`
     + `<div class="card-list" style="margin-bottom:18px">`
-    + mine.map((n) => noticeCardHtml(n, { org: `${n.host} 공고` })).join('')
+    + mine.map((n) => noticeCardHtml(n, { org: `${n.host} 공고`, dday: n.deadline ? { label: ddayWords(dday(n.deadline)), urgent: dday(n.deadline).days >= 0 && dday(n.deadline).days <= 7 } : null })).join('')
     + `</div>`;
 }
 
@@ -5897,6 +5912,11 @@ function bindEvents() {
     if (!chip) return;
     activitiesFilter = chip.dataset.filter;
     $$('#activities-filters .filter-chip').forEach((c) => c.classList.toggle('active', c === chip));
+    renderActivities();
+  });
+  /* 정렬 버튼 — 누를 때마다 최근순 ↔ 마감 임박순 (기준이 둘뿐이라 목록을 띄우지 않는다) */
+  $('#activities-sort-btn').addEventListener('click', () => {
+    activitiesSort = activitiesSort === 'deadline' ? 'recent' : 'deadline';
     renderActivities();
   });
   {

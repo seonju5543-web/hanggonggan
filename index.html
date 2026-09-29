@@ -464,6 +464,13 @@
     <section id="screen-activities" class="screen" hidden>
       <header class="page-header apps-header">
         <h2>대외활동·공모전</h2>
+        <!-- 정렬 — 탐색 화면과 같은 단추(↑↓ + 지금 기준). 기준이 둘(최근 수집순 · 마감 임박순)이라 누르면 바로 바뀐다. 갱신 날짜는 목록 위 칩 줄 옆이 아니라 여기 오른쪽에 그대로 둔다. -->
+        <div class="sort-wrap">
+          <button id="activities-sort-btn" class="sort-btn" aria-label="정렬 기준 — 눌러서 바꾸기">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16"/><path d="M4 8l3-4 3 4"/><path d="M17 20V4"/><path d="M14 16l3 4 3-4"/></svg>
+            <span id="activities-sort-label">최근 수집순</span>
+          </button>
+        </div>
         <span id="activities-updated" class="link-btn"></span>
       </header>
       <div class="search-box">

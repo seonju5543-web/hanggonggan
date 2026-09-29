@@ -22,10 +22,15 @@ const eq = (label, got, want) => {
   else console.log(`  ✓ ${label}`);
 };
 
+/* 마감은 오늘 기준으로 만든다 — 날짜를 박아 두면 달이 바뀌는 순간 '마감' 이 되어 검사가 조용히 뒤집힌다 */
+const iso = (days) => new Date(Date.now() + 9 * 3600e3 + days * 86400e3).toISOString().slice(0, 10);
 const FIXTURE = {
   updatedAt: '2026-09-25',
   items: [
-    { title: '2026 대학생 해외봉사단 모집', url: 'https://dep.hufs.ac.kr/bbs/x/1', kind: '대외활동', school: '한국외국어대학교', campus: '', foundAt: '2026-09-25', attachments: [], deadlineHint: '신청기간 : 2026. 10. 1. ~ 10. 15.' },
+    { title: '2026 대학생 해외봉사단 모집', url: 'https://dep.hufs.ac.kr/bbs/x/1', kind: '대외활동', field: '봉사', school: '한국외국어대학교', campus: '', foundAt: '2026-09-25', attachments: [], deadlineHint: '신청기간 : 2026. 10. 1. ~ 10. 15.',
+      deadline: iso(5), excerpts: [{ label: '모집기간', text: '2026. 10. 1. ~ 10. 15.' }, { label: '혜택', text: '항공료 전액 지원' }] },
+    /* 마감이 지난 글 — 파일에는 있지만 화면에는 없어야 한다 (2026-09-29) */
+    { title: '지난 공모전 — 보이면 안 된다', url: 'https://dep.hufs.ac.kr/bbs/x/6', kind: '공모전', school: '한국외국어대학교', campus: '', foundAt: '2026-09-26', attachments: [], deadline: iso(-3) },
     { title: '제3회 장학수기 공모전 공고', url: 'https://dep.hufs.ac.kr/bbs/x/2', kind: '공모전', school: '한국외국어대학교', campus: '', foundAt: '2026-09-24', attachments: [] },
     { title: '경희 아이디어 경진대회', url: 'https://news.khu.ac.kr/x/3', kind: '공모전', school: '경희대학교', campus: '', foundAt: '2026-09-25', attachments: [] },
     { title: '전국 청년 서포터즈 모집', url: 'https://example.org/x/4', kind: '대외활동', school: '', host: '청년재단', foundAt: '2026-09-23', attachments: [] },
@@ -103,9 +108,17 @@ const cards = (page) => page.$$eval('#activities-list .notice-card', (els) => el
     let seen = await cards(page);
     eq('② 내 학교 글 + 전국 글만 (경희대 글은 안 보인다) · 최근 수집 순', seen.map((c) => c.name),
       ['2026 대학생 해외봉사단 모집', '제3회 장학수기 공모전 공고', '전국 청년 서포터즈 모집']);
-    eq('④ 윗줄은 종류 · 학교 게시판', seen[0].org, '대외활동 · 한국외국어대학교 게시판');
+    eq('④ 윗줄은 종류 · 분야 · 학교 게시판', seen[0].org, '대외활동 · 봉사 · 한국외국어대학교 게시판');
+    eq('④ 마감을 읽은 글은 D-5 (dday 와 같은 글자)', await page.$eval('#activities-list .notice-card .sch-due', (e) => e.textContent.trim()), 'D-5');
+    eq('④ 발췌 줄 — 이름표 · 원문 그대로', await page.$$eval('#activities-list .notice-card:first-child .sch-provider', (els) => els.slice(0, 2).map((e) => e.textContent.trim())), ['모집기간 · 2026. 10. 1. ~ 10. 15.', '혜택 · 항공료 전액 지원']);
+    eq('④ 마감 지난 글은 보이지 않는다', seen.some((c) => /지난 공모전/.test(c.name)), false);
     eq('④ 전국 글은 주최를 말한다', seen[2].org, '대외활동 · 청년재단');
-    eq('④ 기간 한 줄은 원문 그대로', await page.$eval('#activities-list .notice-card .sch-provider', (e) => e.textContent.trim()), '신청기간 : 2026. 10. 1. ~ 10. 15.');
+    /* 정렬 — 마감 임박순은 마감을 읽은 글이 앞, 못 읽은 글은 뒤 */
+    await page.click('#activities-sort-btn'); await page.waitForTimeout(200);
+    eq('③ 마감 임박순 — 마감 읽은 글이 앞', (await cards(page)).map((c) => c.name)[0], '2026 대학생 해외봉사단 모집');
+    eq('③ 정렬 단추 글자', await page.$eval('#activities-sort-label', (e) => e.textContent.trim()), '마감 임박순');
+    await page.click('#activities-sort-btn'); await page.waitForTimeout(200);
+    eq('③ 다시 누르면 최근 수집순', await page.$eval('#activities-sort-label', (e) => e.textContent.trim()), '최근 수집순');
     eq('갱신 날짜', await page.$eval('#activities-updated', (e) => e.textContent.trim()), '2026-09-25 갱신');
 
     await page.click('#activities-filters .filter-chip[data-filter="공모전"]');
