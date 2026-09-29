@@ -1426,7 +1426,11 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
     (src.sources || []).every((x) => (x.school === '' ? !!x.host : served.includes(x.school))), true);
   eq('  항목마다 boardUrl 칸이 있다 (null 이면 로봇이 "주소 미설정"으로 리포트한다)', (src.sources || []).length > 0 && src.sources.every((x) => 'boardUrl' in x), true);
   eq('  보관 칸과 되돌리는 법', Array.isArray(src.parked) && /되돌리려면/.test(src._parked || ''), true);
-  eq('  주소를 추천하지 않는다 — 설명에 그 규칙이 적혀 있다', /주소를 추천하지 않는다/.test(src._comment || ''), true);
+  /* 2026-09-29 개발자 지시 "어떻게 해서든 크롤링 출처를 찾아" — 주소를 안 적는 규칙에서 **근거와 함께 적는 규칙**으로 바뀌었다.
+     주소마다 evidence(어디서 확인했나)가 있어야 한다 · 집계 사이트(링커리어·위비티·씽굿·캠퍼스픽·올콘·콘테스트코리아)는 출처가 아니다. */
+  eq('  주소가 있는 항목은 확인한 근거(evidence)를 적는다', src.sources.filter((x) => x.boardUrl).every((x) => typeof x.evidence === 'string' && x.evidence.length > 10), true);
+  eq('  집계 사이트는 출처에 넣지 않는다', src.sources.some((x) => /linkareer|wevity|thinkcontest|campuspick|all-con|contestkorea|thinkyou|allforyoung/i.test(x.boardUrl || '')), false);
+  eq('  설명에 집계 사이트를 넣지 않는 이유가 적혀 있다', /집계 사이트/.test(src._comment || ''), true);
   const acts = JSON.parse(readText(new URL('../data/activities.json', import.meta.url)));
   eq('발행 파일 모양 {updatedAt, items[]}', 'updatedAt' in acts && Array.isArray(acts.items), true);
   eq('  실린 글의 kind 는 둘 중 하나', acts.items.every((n) => ACTIVITY_KINDS.includes(n.kind) && n.url && n.title), true);

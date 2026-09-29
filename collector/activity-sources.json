@@ -1,17 +1,68 @@
 {
- "_comment": "대외활동·공모전 게시판 목록 (2026-09-25 · 노션 UI-34). 장학 게시판(schools.json)과는 별개 파일이다 — 장학 게시판은 로봇이 이미 읽고 있어 거기서 발견되는 공모전·서포터즈 글은 설정 없이 함께 담긴다. 여기에는 학교의 **대외활동·공모전 전용 게시판**(취업·비교과·학생활동 게시판 등)을 적는다. boardUrl 이 null 이면 로봇이 매 실행 '주소 미설정'으로 리포트한다. 🔴 주소는 개발자가 확인해 적는다 — 로봇은 검색을 못 하고, Claude 세션은 주소를 추천하지 않는다(CLAUDE.md 매 세션 6). school 이 빈 문자열이면 전국 공통(모든 학생에게 보인다)이고 그때는 host(주최·운영 기관)를 반드시 적는다. 수집망은 경희대·한국외대 두 곳 그대로다(2026-09-21 지시) — 다른 학교를 넣으면 관문 「대외활동·공모전」이 막는다.",
+ "_comment": "대외활동·공모전 게시판 목록 (2026-09-25 신설 · 2026-09-29 출처 채움 — 개발자 지시 '어떻게 해서든 크롤링 출처를 찾아'). 장학 게시판(schools.json)과는 별개 파일이다 — 장학 게시판에서 발견되는 공모전·서포터즈 글은 설정 없이 함께 담긴다. 여기 주소는 전부 **웹 검색 결과에서 확인된 것**(evidence 칸)이고 샌드박스는 바깥이 막혀 열어 보지는 못했다 — 첫 수집 리포트의 상태 줄(✅/🟡/⚠️)로 확인한다. boardUrl 이 null 이면 로봇이 매 실행 '주소 미설정'으로 리포트한다. school 이 빈 문자열이면 전국 공통(모든 학생에게 보인다)이고 그때는 host(주최·운영 기관)를 반드시 적는다. 🔴 링커리어·위비티·씽굿 같은 집계 사이트는 넣지 않는다 — 그들도 주최사가 올린 것을 싣는 곳이라 원문 출처가 아니고 약관·저작권 위험이 있다(docs/designs/external-sources.md). 수집망은 경희대·한국외대 두 곳 그대로다(2026-09-21 지시) — 다른 학교를 넣으면 관문 「대외활동·공모전」이 막는다.",
  "sources": [
   {
-   "school": "경희대학교",
+   "school": "한국외국어대학교",
    "campus": "공통",
-   "boardUrl": null,
-   "note": "대외활동·공모전 전용 게시판 주소가 필요합니다 — 개발자가 확인해 적어 주세요"
+   "boardUrl": "https://dep.hufs.ac.kr/student/12769/subview.do",
+   "evidence": "웹 검색 2026-09-29: \"학생활동 — 장학팀 · 학생지원팀 게시판(공모전·봉사 모집·학생활동 안내, 5,421건)\" — 이미 읽는 장학 게시판(12767)의 이웃 게시판",
+   "note": "학생지원팀 「학생활동」 게시판"
   },
   {
    "school": "한국외국어대학교",
    "campus": "공통",
-   "boardUrl": null,
-   "note": "대외활동·공모전 전용 게시판 주소가 필요합니다 — 개발자가 확인해 적어 주세요"
+   "boardUrl": "https://www.hufs.ac.kr/hufs/11302/subview.do",
+   "evidence": "웹 검색 2026-09-29: \"진로 취업 — 한국외국어대학교\"",
+   "note": "본교 「진로·취업」 게시판 — 서포터즈·인턴십 글이 여기 올라온다면 잡힌다 · 첫 리포트로 확인"
+  },
+  {
+   "school": "경희대학교",
+   "campus": "공통",
+   "boardUrl": "https://khu.ac.kr/kor/notice/list.do?page=1&condition=all&category=GENERAL",
+   "evidence": "웹 검색 2026-09-29: \"경희대학교 공지사항 — 카테고리 GENERAL(일반) · 인권센터 공모전 등 모집 공고 포함\"",
+   "note": "본교 일반 공지 — 상세는 detail.do?seq= 형태. 목록이 스크립트로 그려지면 🟡 가 뜬다 → browser-targets 로 옮긴다"
+  },
+  {
+   "school": "경희대학교",
+   "campus": "공통",
+   "boardUrl": "https://isss.khu.ac.kr/globalcenter/user/bbs/BMSR00040/list.do?menuNo=7900041",
+   "evidence": "웹 검색 2026-09-29: \"취업/경력 · Job/Career — 글로벌교육지원팀(국제처)\" · 카카오스타일 글로벌 뷰티 서포터즈 모집 글이 여기 있었다",
+   "note": "국제처 글로벌교육지원팀 「취업/경력」 게시판 — 장학 게시판(news.khu.ac.kr BMSR00040)과 같은 게시판 엔진"
+  },
+  {
+   "school": "경희대학교",
+   "campus": "공통",
+   "boardUrl": "https://goodjob.khu.ac.kr/bbs/board.php?bo_table=s2_5",
+   "evidence": "웹 검색 2026-09-29: \"사회진출 프로그램 공지 — 경희대학교 미래인재센터\"",
+   "note": "미래인재센터 「사회진출 프로그램 공지」 — 학교가 운영하는 프로그램·캠프 모집"
+  },
+  {
+   "school": "",
+   "host": "정부24 공모전",
+   "boardUrl": "https://www.gov.kr/portal/cnstexhb",
+   "evidence": "웹 검색 2026-09-29: \"공모전 — 정부24(gov.kr/portal/cnstexhb)\" · 부처·공공기관 공모전 통합 목록 · 글 주소는 /portal/cnstexhb/<번호> · pageIndex 로 넘긴다",
+   "note": "정부 부처·공공기관 공모전의 원문 게시처 — 집계 사이트들이 그대로 싣는 출처"
+  },
+  {
+   "school": "",
+   "host": "온통청년 청년참여 프로그램",
+   "boardUrl": "https://www.youthcenter.go.kr/bbs03List/48",
+   "evidence": "웹 검색 2026-09-29: \"청년참여 프로그램 < 청년소식 — 온통청년(youthcenter.go.kr/bbs03View/48/…)\" · 한국고용정보원 운영",
+   "note": "정부 청년정책 포털의 참여 프로그램(서포터즈·참여단·공모) 게시판 — 열쇠 없이 읽는 HTML"
+  },
+  {
+   "school": "",
+   "host": "서울시 청년몽땅정보통",
+   "boardUrl": "https://youth.seoul.go.kr/bbs/list.do?key=2303300002",
+   "evidence": "웹 검색 2026-09-29: \"청년정책 > 공지사항 — 청년몽땅정보통\" · [모집공고] 미래 청년 일자리 참여자 모집 등",
+   "note": "서울시 청년 사업 모집공고 — 두 학교가 서울권이라 넣었다"
+  },
+  {
+   "school": "",
+   "host": "창업진흥원 K-Startup",
+   "boardUrl": "https://www.k-startup.go.kr/web/main/mainSection0.do",
+   "evidence": "웹 검색 2026-09-29: \"신규 사업 공고 — K-Startup\" · 창업 경진대회·공모전이 여기 공고된다. 공공데이터포털 15125364 에 같은 내용의 API 가 있다(열쇠 필요 — 개발자 결정)",
+   "note": "창업 경진대회·공모전만 판정을 통과한다(지원사업 공고는 activity-kind 가 거른다)"
   }
  ],
  "_parked": "쓰지 않게 된 게시판은 지우지 말고 여기로 옮긴다(schools.json 의 parked 와 같은 규칙 — 주소를 알아내는 데 든 시간을 버리지 않는다). 되돌리려면 항목을 위 sources 로 옮기면 된다.",
