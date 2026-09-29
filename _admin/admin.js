@@ -2421,7 +2421,8 @@ async function instaDispatch(file, inputs, label, note, danger = false, lines = 
    할 수 있는 일: 종류 바꾸기(공모전↔대외활동) · 숨기기/되살리기(지우지 않고 표식) · 출처 추가/보관/되살리기.
    종류 두 가지는 vendor/activity-kind.mjs 의 것 그대로 — 여기 베끼지 않는다. */
 let ACT_FILTER = 'all';
-const ACT_SCHOOLS = ['경희대학교', '한국외국어대학교'];
+/* 학교 고르기 목록은 collector/schools.json(수집망)에서 — 베끼지 않는다(2026-09-29 44개교 복원) */
+const actSchools = () => [...new Set(D.schools.map((s) => s.school).filter(Boolean))];
 
 function activityRows() {
   const all = D.activities.filter((n) => n && n.url);
@@ -2502,7 +2503,7 @@ function renderActivities() {
     <div class="pgroup" data-act-add>
       <div class="sec-head"><h2>출처 추가</h2><p>주최의 <b>제 게시판</b>만 넣습니다 — 링커리어·위비티 같은 집계 사이트는 저장소가 거부합니다.</p></div>
       <div class="field"><label class="lb">어디 글인가</label>
-        <select data-act-in="school"><option value="">전국 (모든 학생에게)</option>${ACT_SCHOOLS.map((s) => `<option value="${esc(s)}">${esc(s)}</option>`).join('')}</select></div>
+        <select data-act-in="school"><option value="">전국 (모든 학생에게)</option>${actSchools().map((s) => `<option value="${esc(s)}">${esc(s)}</option>`).join('')}</select></div>
       <div class="field"><label class="lb">주최·운영 기관 (전국 글일 때)</label><input type="text" data-act-in="host" placeholder="예: 정부24 공모전" maxlength="60" /></div>
       <div class="field"><label class="lb">게시판 목록 주소</label><input type="url" data-act-in="boardUrl" placeholder="https://…" maxlength="400" /></div>
       <div class="field"><label class="lb">어디서 확인했나 (근거)</label><input type="text" data-act-in="evidence" placeholder="예: 학교 홈페이지 학생지원팀 > 학생활동 메뉴" maxlength="200" /></div>

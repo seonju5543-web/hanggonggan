@@ -65,7 +65,7 @@
 | 종류 바로잡기 | `공모전(으)로` / `대외활동(으)로` | `activityKind {url, kind}` | 글의 `kind` + `kindFrom: 관리자 날짜` (로봇은 있는 글을 다시 판정하지 않는다) |
 | 숨기기 | `숨기기` → 확인 시트 | `activityHide {urls}` | 글에 `hidden:true` 표식 + `collector/activity-config.json hideUrls` 에 주소. 지우지 않는다 — 로봇이 다시 발행해도 표식을 유지하고(`collect.mjs`), 앱은 hidden 글을 안 보인다 |
 | 되살리기 | 「숨긴 글」 칸의 `되살리기` | `activityUnhide {urls}` | 표식과 설정 주소를 함께 걷는다 |
-| 출처 추가 | 양식(어디 글인가 · 주최 · 게시판 주소 · 근거) | `activitySource {op:'add', source}` | `activity-sources.json sources` 에 한 줄. 집계 사이트 주소·두 학교 밖 학교·같은 주소는 저장소가 거부한다 |
+| 출처 추가 | 양식(어디 글인가 · 주최 · 게시판 주소 · 근거) | `activitySource {op:'add', source}` | `activity-sources.json sources` 에 한 줄. 집계 사이트 주소·서비스 학교 밖 학교(`SERVED_SCHOOLS`)·같은 주소는 저장소가 거부한다 |
 | 출처 보관 / 되살리기 | `보관` → 확인 시트 / 「보관한 출처」의 `되살리기` | `activitySource {op:'park'|'unpark', boardUrl}` | `sources` ↔ `parked` 로 옮긴다(지우지 않는다) |
 
 화면이 보이는 것: 게재 중·숨긴 글·출처 게시판 수(주소 미설정 곳 포함) 카드, 칩(전체/대외활동/공모전), 글 목록(종류 알약·수집일·기간 한 줄·원문 링크), 출처 목록(주소·근거·**최근 수집 상태** — `collector/report.md` 의 「🎯」 절에서 읽는다).

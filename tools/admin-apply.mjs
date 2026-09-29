@@ -52,6 +52,8 @@ const ACTS = 'data/activities.json';
 const ACT_SRC = 'collector/activity-sources.json';
 const ACT_CFG = 'collector/activity-config.json';
 const ACT_KINDS = ['공모전', '대외활동'];   // collector/activity-kind.mjs 의 ACTIVITY_KINDS 와 같다 (관문이 대조한다 — ESM 이라 여기서 못 부른다)
+/* 학교 게시판 출처는 서비스 학교만 — 목록은 match-engine.js 한 곳(2026-09-29 44개교 복원 · 여기 베끼지 않는다) */
+const SERVED_SCHOOLS = createRequire(import.meta.url)('../match-engine.js').SERVED_SCHOOLS || [];
 
 
 const action = process.env.ACTION || '';
@@ -822,7 +824,7 @@ switch (action) {
       const school = String(s.school || '').trim();
       const host = String(s.host || '').trim();
       if (!school && !host) fail('학교 이름이나 주최(host) 가운데 하나는 있어야 합니다');
-      if (school && !['경희대학교', '한국외국어대학교'].includes(school)) fail(`수집망은 두 학교뿐입니다: ${school}`);
+      if (school && !SERVED_SCHOOLS.includes(school)) fail(`서비스하지 않는 학교입니다(match-engine.js SERVED_SCHOOLS): ${school}`);
       const row = { school, campus: school ? (s.campus || '공통') : '', boardUrl: url,
         evidence: String(s.evidence || '').trim() || `관리자 화면에서 등록 (${kstNow()} KST)`, note: String(s.note || '').trim() || '관리자 화면에서 등록' };
       if (!school) row.host = host;
