@@ -906,6 +906,12 @@ function majorSuggestions(q) {
   if (!n) return [];
   const school = $('#in-school').value.trim();
   const campus = getChip('#in-campus');
+  /* 🔴 **쓰는 자리에서 확실히 한 번 받는다** (2026-09-26). 아래 학교 입력 listener 가 미리
+     받아 두지만, 고치러 들어온 학생은 `initOnboarding` 이 값을 **프로그램으로** 넣어
+     `input` 이 안 뜬다 — 그 경우 여기서만 받는다. 같은 학교는 두 번 받지 않는다.
+     ⚠️ 받아오기는 비동기라 **이 호출의 결과가 지금 당장 오지는 않는다.** 그래서 학교 입력
+        쪽에서 미리 받는 것이 짝이다(안 그러면 첫 글자에 전국 공통 목록이 잠깐 보인다). */
+  loadMajorsFor(school);
   /* 그 학교에 실제로 있는 학과 목록을 확보한 곳은 **그 목록만** 쓴다.
      예전엔 전국 공통 목록을 뒤에 붙여서, 외대에서 '일'을 치면 학교에 없는
      '일어일문학과'가 같이 떴다(2026-08-02 개발자 지적 — 경희대 사례).
@@ -1133,6 +1139,11 @@ function initOnboarding() {
   }
 
   renderCampusChips(p ? p.campus : null);
+  /* 🔴 **고치러 들어온 학생도 자기 학교 학과 파일을 받아야 한다** (2026-09-26 코드 리뷰).
+     위에서 `#in-school` 값을 **코드로** 넣었으므로 `input` 이 뜨지 않고, 그래서 학교 입력
+     쪽 프리페치가 **한 번도 돌지 않았다** — 그 학생이 학과를 고치려고 '일'을 치면 전국
+     공통 목록이 뜨고 `일어일문학과` 를 눌러 버릴 수 있다(2026-08-02 그 사고 그대로다). */
+  if (p && p.school) loadMajorsFor(p.school);
   syncConsentRow();
 
   onboardStep = p ? 1 : 0;
@@ -2178,12 +2189,31 @@ let liveNotices = null;
    상한도 필요 없다. 파일 이름 규칙은 match-engine.js의 noticeFileFor 한 곳에 있다.
 
    ⚠️ 옛 파일(data/notices.json)로 물러나는 길을 남겨 둔다 — 학교별 파일이 아직 없거나
-   (그 학교 첫 수집 전) 배포가 엇갈린 순간에도 화면이 비지 않게. */
+   (그 학교 첫 수집 전) 배포가 엇갈린 순간에도 화면이 비지 않게.
+   🔴 **다만 '알 수 있을 때'는 받지 않는다** (2026-09-26 · 고문 보고서). 수집망은 두 곳뿐이고
+      온보딩은 213개교를 고를 수 있어, **대다수 학생이 그 물러나는 길로 들어가 옛 파일을
+      통째로 받고 자기 공고 0건**이었다(실측: 33.5KB 받아 0건 · 수집 40곳이면 670KB).
+      그래서 색인(400바이트)을 나란히 받아 "네 파일은 없다"면 옛 파일을 받지 않는다.
+      판정은 `noticeFallbackNeeded` 한 곳 — 알림(sw.js)도 같은 함수를 쓴다. */
 /* 🔴 늦게 온 데이터로 **보이는 화면을 다시 그린다** (2026-09-01).
    예전에는 loadRegistered 만 홈을 다시 그리고 loadKosaf·loadNotices 는 탐색만 그렸다.
    그래서 한국장학재단 공고가 뒤늦게 들어오면 홈의 '마감 임박'이 그 전에 계산한
    순서로 굳어, D-DAY 공고가 있는데도 D-2 부터 보였다.
    ⚠️ 새로 데이터를 불러오는 곳을 만들면 여기를 부를 것 — 갈라 두면 또 한 곳만 고치게 된다. */
+/* 🔴 **학교가 정해지거나 바뀌면 공고 파일을 다시 받는다** (2026-09-26).
+   공고는 학교별 파일에서 오므로 학교가 바뀌면 받아 둔 파일이 남의 학교 것이 된다.
+   그전까지 `loadNotices()` 는 **앱을 열 때 한 번**과 당겨서 새로고침에서만 돌았다 —
+   그래서 ①첫 실행 학생은 프로필이 생겨도 공고를 다시 받지 않았고(그때는 옛 파일을
+   통째로 받아 두어 우연히 가려졌다) ②MY 에서 **학교를 바꾸면** 실시간 공고가 조용히
+   비어 보였다(받아 둔 것이 전부 남의 학교 것이라 필터에서 다 떨어진다).
+   ⚠️ 같은 학교면 다시 받지 않는다 — 프로필을 고칠 때마다 네트워크를 두드릴 이유가 없다. */
+function loadNoticesIfSchoolChanged() {
+  const key = (typeof noticeFilesForProfile === 'function' && state.profile)
+    ? noticeFilesForProfile(state.profile).join(',') : '';
+  if (key === noticeFilesLoaded) return;
+  loadNotices();
+}
+
 function rerenderVisible() {
   if (!state.profile) return;
   if (!$('#screen-home').hidden) renderHome();
@@ -2192,26 +2222,59 @@ function rerenderVisible() {
   if (!$('#screen-applications').hidden) renderApplications();
 }
 
+/* 마지막으로 **성공적으로** 받아 온 학교별 파일 목록 — 학교가 바뀌면 다시 받아야 한다.
+   🔴 **받기 전에 적지 않는다** (2026-09-26 코드 리뷰에서 잡았다). 받기 전에 적으면
+      ① 실패한 받아오기도 '받았다'로 남아 같은 학교로 다시 시도하지 않고
+      ② 학교가 바뀌는 순간 두 받아오기가 겹쳤을 때 **늦게 온 옛 학교 것이 이긴다**
+      (앱을 열 때 A 로 시작했는데 로그인 사본이 B 였던 경우가 정확히 그 꼴이다). */
+let noticeFilesLoaded = null;
+/* 지금 받고 있는 목록 — 이것과 다른 것이 돌아오면 **버린다**(늦게 온 옛 학교 것이다). */
+let noticeFilesWanted = null;
+
 function loadNotices() {
   const p = state.profile;
   const files = (typeof noticeFilesForProfile === 'function' && p) ? noticeFilesForProfile(p) : [];
+  const wanted = files.join(',');
+  noticeFilesWanted = wanted;
   const get = (u) => fetch(u, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  /* ⚠️ 색인은 학교별 파일과 **나란히** 부른다 — 먼저 받고 나서 부르면 공고가 있는 학생에게
+     왕복이 한 번 더 늘어(모바일에서 눈에 보인다) 아낀 것보다 손해다. */
   const job = files.length
-    ? Promise.all(files.map(get)).then((docs) => {
-      const ok = docs.filter(Boolean);
-      if (!ok.length) return get('data/notices.json');    // 아직 학교별 파일이 없는 학교
+    ? Promise.all([...files.map(get), get('data/notices/index.json')]).then((docs) => {
+      const idx = docs[docs.length - 1];
+      const ok = docs.slice(0, files.length).filter(Boolean);
+      if (!ok.length) {
+        /* ⚠️ `typeof` 로 감싼다 — 위 `noticeFilesForProfile` 과 같은 이유다(코드 리뷰에서
+           잡았다). 서비스워커가 옛 `match-engine.js` 를 캐시에서 내주면 이 함수가 아직
+           없고, 그 오류는 아래 `job.catch` 가 삼켜 **물러나는 길이 조용히 사라진다.** */
+        return (typeof noticeFallbackNeeded !== 'function' || noticeFallbackNeeded(idx, files))
+          ? get('data/notices.json')                       // 배포 엇갈림·색인 못 읽음 → 물러난다
+          : { updatedAt: (idx && idx.updatedAt) || null, items: [] };   // 우리에게 그 학교 공고가 없다
+      }
       return {
         updatedAt: ok.map((d) => d.updatedAt).filter(Boolean).sort().pop() || null,
         items: ok.flatMap((d) => d.items || []),
       };
     })
-    : get('data/notices.json');
+    /* 🔴 **프로필이 없으면 아무것도 받지 않는다** (2026-09-26). 예전에는 여기서 옛 파일을
+       통째로 받았는데, 프로필이 없으면 `boardNoticesForMe` 가 `if (!p || !liveNotices)` 로
+       끝나 **받아도 한 줄도 못 쓴다.** 첫 실행 학생 전원이 그 낭비를 치르고 있었다.
+       ⚠️ 그래서 **프로필이 정해지는 순간 다시 받는다** — `loadNoticesIfSchoolChanged`.
+          그 짝이 없으면 첫 실행 학생의 실시간 공고가 새로 열 때까지 비어 보인다. */
+    : Promise.resolve({ items: [], updatedAt: null });
   /* 🔴 **부르는 쪽이 끝을 기다릴 수 있게 약속을 돌려준다** (2026-09-09).
      당겨서 새로고침은 '다 받아 왔다'를 알아야 뱅뱅이를 멈춘다 — 예전처럼 아무것도
      안 돌려주면 손을 떼자마자 멈춰서 학생 눈에는 아무 일도 안 한 것으로 보인다. */
   /* 🔴 받아오기 실패만 여기서 삼킨다 — 그리기(rerenderVisible)까지 같은 catch 로 감싸면
      그리다 난 진짜 버그가 조용히 묻히고, 그 안에서 다시 그리려다 두 번 던진다. */
   return job.catch(() => null).then((d) => {
+    /* 🔴 **늦게 온 옛 학교 것은 버린다** (2026-09-26 코드 리뷰). 그 사이 학교가 바뀌었으면
+       이 결과는 남의 학교 것이다 — 앱을 열 때 A 로 시작했는데 로그인 사본이 B 였던 경우가
+       정확히 그 꼴이고, A 가 늦게 오면 B 학생 화면에 A 의 공고가 앉는다.
+       ⚠️ 버릴 때는 `noticeFilesLoaded` 를 건드리지 않는다 — 지금 받고 있는 쪽이 적는다. */
+    if (noticeFilesWanted !== wanted) return liveNotices;
+    /* 성공한 것만 '받았다'로 남긴다 — 실패를 적으면 같은 학교로 다시 시도하지 않는다. */
+    noticeFilesLoaded = d ? wanted : null;
     /* 🔴 **못 받아 왔어도 빈 문서를 넣는다** (2026-09-09). `null` 로 두면 화면이
        '아직 오는 중'(뼈대)으로 읽어 영영 그 상태로 굳는다 — 오프라인 학생에게
        끝나지 않는 기다림을 보여 주는 것은 '없음'보다 나쁘다.
@@ -2247,17 +2310,55 @@ function formTplIdFor(sch) {
 /* 학교별 학과 목록 (2026-08-06 — 커리어넷 오픈API에서 수확, collector/majors.mjs가 발행).
    MAJORS_BY_SCHOOL에 합쳐서 학과 자동추천이 '그 학교에 실제로 있는 학과'만 보여 주게 한다
    (경희대에서 '일'을 치면 없는 일어일문학과가 뜨던 문제 — 2026-08-02 개발자 지적).
-   손으로 검수해 둔 목록(외대)이 이미 있으면 그쪽을 지키고 덮어쓰지 않는다. */
-function loadMajors() {
-  fetch('data/majors.json', { cache: 'no-store' })
-    .then((r) => (r.ok ? r.json() : null))
-    .then((d) => {
-      if (!d || !d.bySchool) return;
-      for (const [school, majors] of Object.entries(d.bySchool)) {
-        if (!MAJORS_BY_SCHOOL[school]) MAJORS_BY_SCHOOL[school] = majors;
-      }
-    })
-    .catch(() => { /* 오프라인 등 — 전국 공통 목록으로 동작 */ });
+   손으로 검수해 둔 목록(외대)이 이미 있으면 그쪽을 지키고 덮어쓰지 않는다.
+
+   🔴 **자기 학교 파일 하나만 받는다** (2026-09-26 · 고문 보고서). 그전에는 209개교가 든
+      `data/majors.json` 을 **첫 화면에서 통째로** 받았다 — 실측 407KB(gzip 65KB)로 앱이
+      받는 것 중 가장 큰 파일이었는데, 쓰는 곳은 온보딩 학과 자동추천 한 곳뿐이다.
+      학교별 파일은 gzip 1.5KB다(한국외대 실측).
+   ⚠️ 그래서 **앱을 열 때 받지 않는다** — 학교가 정해질 때(또는 학과를 칠 때) 받는다.
+      못 받으면 전국 공통 목록(`MAJORS_COMMON`)으로 물러난다 — 원래 있던 폴백이다.
+   ⚠️ 열쇠는 `'학교'` 또는 `'학교 캠퍼스'` 다(캠퍼스마다 학과가 다른 학교가 있다).
+      이름 규칙은 `match-engine.js majorsFileFor` 한 곳 — 로봇과 같은 함수다. */
+const majorsAsked = new Set();     // 같은 학교를 두 번 받지 않는다
+function loadMajorsFor(school) {
+  if (!school || typeof majorsFileFor !== 'function') return;
+  /* 🔴 **실제 학교 이름일 때만 부른다** (2026-09-26 코드 리뷰). 학교 칸은 `input` 마다
+     돌아서, '한국외국어대학교' 를 치는 동안 '한'·'한국'… 아홉 번 404 를 부르고 그 쓰레기
+     열쇠가 `majorsAsked` 에 쌓였다. `UNIVERSITIES` 에 있는 이름만 받는다(아래 캠퍼스 칩을
+     그리는 `renderCampusChips` 도 정확한 이름으로만 맞춰 보므로 폭이 같다). */
+  if (typeof UNIVERSITIES !== 'undefined' && !UNIVERSITIES.includes(school)) return;
+  /* 🔴 **`'학교 캠퍼스'` 열쇠는 받지 않는다** (2026-09-26 실측). `majorSuggestions` 가 그
+     열쇠를 먼저 보긴 하지만, 수확 로봇은 그 꼴을 **하나도 발행하지 않는다** — 캠퍼스별로
+     학과가 다른 곳은 `BRANCH_MAP` 이 **분교를 별개 학교 이름**으로 바꿔 저장한다
+     (`건국대학교 글로컬캠퍼스` 처럼 `UNIVERSITIES` 에 따로 있다). 그래서 캠퍼스 열쇠로
+     부르면 **언제나 404** 다. 그 열쇠는 `data.js` 에 손으로 넣은 목록만을 위한 자리이고,
+     그건 이미 기억에 있어 받아올 것이 없다.
+     ⚠️ 로봇이 그 꼴을 발행하기 시작하면 여기도 같이 고칠 것 — 관문이 색인을 보고 잰다. */
+  for (const key of [school]) {
+    if (majorsAsked.has(key)) continue;
+    majorsAsked.add(key);
+    fetch(majorsFileFor(key), { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (!d || !Array.isArray(d.majors) || !d.majors.length) return;
+        /* 손으로 검수해 둔 목록이 있으면 지킨다 — 옛 loadMajors 와 같은 규칙이다. */
+        if (!MAJORS_BY_SCHOOL[key]) MAJORS_BY_SCHOOL[key] = d.majors;
+        /* 🔴 **도착했으면 추천을 다시 그린다** (코드 리뷰에서 잡았다). 받아오기는 비동기라
+           학생이 이미 학과를 치고 있으면 화면에는 **전국 공통 목록이 그대로 떠 있다** —
+           경희대 학생이 '일'을 치고 `일어일문학과` 를 눌러 버릴 수 있다(2026-08-02 그 사고).
+           ⚠️ 목록을 여기서 직접 만들지 말 것 — `attachAutocomplete` 가 `input` 으로 그린다. */
+        const el = $('#in-major');
+        if (el && el.value.trim() && document.activeElement === el) {
+          el.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      })
+      .catch(() => {
+        /* 🔴 실패는 **다시 시도할 수 있게** 지운다 (코드 리뷰). 남겨 두면 지하철에서 한 번
+           끊긴 학생이 그 세션 내내 전국 공통 목록으로 남는다. */
+        majorsAsked.delete(key);
+      });
+  }
 }
 
 /* 학교별 등록금 (2026-08-27) — `수업료 100%` 같은 비율형 공고를 원으로 바꾸는 데 쓴다.
@@ -5680,6 +5781,8 @@ function bindEvents() {
        동의 여부는 '나가도 되는가'를 정하는 값이라 섞으면 헷갈린다. */
     state.consent = { sensitive: !!$('#in-sensitive-ok').checked };
     saveState();
+    /* 학교가 정해졌거나 바뀌었으면 그 학교 공고 파일을 받는다 (위 주석) */
+    loadNoticesIfSchoolChanged();
     /* 온보딩을 마쳤으니 '쓰다 만 온보딩' 표시를 지운다 — 안 지우면 다음에 켤 때
        이미 만든 프로필을 두고 또 온보딩 진행분을 들고 있게 된다 */
     clearTimeout(onboardSaveTimer);
@@ -6126,7 +6229,11 @@ function bindEvents() {
   attachAutocomplete($('#in-school'), schoolSuggestions);
   attachAutocomplete($('#in-major'), majorSuggestions);
   ['change', 'input'].forEach((ev) =>
-    $('#in-school').addEventListener(ev, () => renderCampusChips(null))
+    $('#in-school').addEventListener(ev, () => {
+      renderCampusChips(null);
+      /* 학과 칸에 닿기 전에 미리 받아 둔다 — 첫 글자에 전국 공통 목록이 보이지 않게 */
+      loadMajorsFor($('#in-school').value.trim());
+    })
   );
 }
 
@@ -6203,8 +6310,32 @@ function syncSchedulePush() {
   if (typeof signedIn !== 'function' || !signedIn()) return;
   clearTimeout(syncTimer);
   syncTimer = setTimeout(() => {
-    syncPushMerging(state).catch(() => { /* 실패해도 앱은 그대로 — 폰 안 저장이 원본이다 */ });
+    syncPushMerging(state).then(syncTellIfRejected)
+      .catch(() => { /* 실패해도 앱은 그대로 — 폰 안 저장이 원본이다 */ });
   }, (typeof SUPABASE_CONFIG !== 'undefined' && SUPABASE_CONFIG.pushDelayMs) || 2000);
+}
+
+/* 🔴 **DB 가 값을 거절한 것은 학생에게 알린다** (2026-09-26 · 고문 보고서 Q6)
+
+   0004_profile_columns.sql 부터 있을 수 없는 값(성적 999 · 1만 자 학교 이름)은 DB 가 쓰기를
+   거절한다. 그런데 올리기 실패는 여기서 `.catch(() => {})` 로 **통째로 삼켜지고 있었다** —
+   그러면 프로필이 **영영 서버에 안 올라가고** 학생은 다른 기기에서 이어쓰기가 안 되는 이유를
+   모른다. '인터넷이 없다'는 지나가도 되지만 '값이 틀렸다'는 지나가면 안 된다.
+
+   ⚠️ **한 번만 알린다.** 값을 고치지 않으면 저장할 때마다 같은 자리에서 거절되므로,
+      매번 띄우면 토스트가 화면을 덮어 앱을 못 쓴다.
+   🔴 **성공하면 그 기억을 푼다** (2026-09-26 코드 리뷰에서 잡았다). 안 풀면, 값을 고쳐
+      한 번 올라간 뒤 **다른 칸**이 거절될 때 다시 조용해진다 — 이 장치가 없애려던 상태로
+      그대로 돌아간다. 푸는 자리는 '실제로 올라간 순간' 하나뿐이다.
+   ⚠️ 문구는 supabase-client.js 가 만든다(어느 칸이 문제인지 아는 곳이 거기다). 여기서
+      따로 만들지 말 것 — 두 곳이 갈라진다. */
+let syncRejectTold = false;
+function syncTellIfRejected(r) {
+  if (r && r.ok) { syncRejectTold = false; return r; }
+  if (!r || !r.rejected || syncRejectTold) return r;
+  syncRejectTold = true;
+  if (typeof toast === 'function') toast(r.error);
+  return r;
 }
 
 /* 🔴 **다른 기기가 먼저 썼으면 덮지 않고 합친 뒤 올린다** (2026-09-25 · 고문 보고서 Q6)
@@ -6248,6 +6379,9 @@ function syncApplyRemote(remote, opts) {
     migrateBranchCampus(p);
     migrateFitFields(p);
     state.profile = p;
+    /* 🔴 다른 기기에서 학교를 바꿨을 수도 있다 — 받아 둔 공고가 남의 학교 것이면 다시 받는다.
+       ⚠️ `quiet` 일 때는 프로필을 안 바꾸므로 이 안(바꾼 경우)에만 둔다. */
+    loadNoticesIfSchoolChanged();
   }
   /* 🔴 **학생이 쓴 글은 서버에 없다** — syncSafeApplications 가 `formAns`·`docs` 를 떼고 보낸다
      (주민등록번호·계좌·자기소개서가 들어 있어서다). 그래서 받은 것으로 통째로 갈아치우면
@@ -6293,12 +6427,12 @@ async function syncAfterLoad() {
   syncBusy = true;
   try {
     const remote = await syncPull();
-    if (!remote) { await syncPushMerging(state); return; }   // 서버가 비었으면 내 것을 올린다
+    if (!remote) { syncTellIfRejected(await syncPushMerging(state)); return; }   // 서버가 비었으면 내 것을 올린다
     const mine = state.updatedAt || '';
     const theirs = remote.updatedAt || '';
     /* 새 기기(프로필이 아예 없음)면 무조건 받는다 — 이게 개발자가 겪던 바로 그 상황이다 */
     if (!state.profile || theirs > mine) syncApplyRemote(remote);
-    else if (mine > theirs) await syncPushMerging(state);
+    else if (mine > theirs) syncTellIfRejected(await syncPushMerging(state));
   } catch (e) {
     /* 인터넷이 없거나 서버가 자고 있으면 그냥 지나간다 — 앱은 폰 안 데이터로 계속 돈다 */
   } finally { syncBusy = false; }
@@ -6542,7 +6676,9 @@ loadActivities();
 loadExternal();
 loadRegistered();
 loadKosaf();
-loadMajors();   // 학교별 학과 목록 — 온보딩 학과 자동추천이 그 학교 것만 보게
+/* 🔴 학과 목록은 **여기서 받지 않는다** (2026-09-26) — 209개교가 든 407KB 파일이었고
+   쓰는 곳은 온보딩 자동추천 한 곳뿐이다. 학교가 정해질 때 그 학교 파일만 받는다
+   (`loadMajorsFor` · 위 주석). */
 loadTuition();  // 학교별 등록금 — `수업료 100%` 비율형 공고를 원으로 바꾸는 데 쓴다
 if (typeof loadFormTemplates === 'function') loadFormTemplates(); // 정식 등록 양식 최신화
 /* 🔴 두 손가락으로 화면이 커졌다 작아졌다 하던 것 (2026-09-01 개발자 지적).

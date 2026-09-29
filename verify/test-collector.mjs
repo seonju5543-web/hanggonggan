@@ -27,6 +27,9 @@ import { hoursFor, cronsOf, isStale, countField, runsPerWeek, everyWords } from 
    자식 프로세스도 못 띄운다. 리눅스(클라우드 검사)에서는 멀쩡해서 **이 검사 5개가
    개발자 컴퓨터에서만 조용히 실패하고 있었다** — 진짜 실패를 가리는 소음이었다(2026-09-05). */
 import { fileURLToPath } from 'node:url';
+/* 서버 재검증이 쓰는 범위 — 여기서 **베끼지 않고 불러** 온다(베끼면 두 곳이 갈라진다).
+   ⚠️ apply-guard.mjs 는 불러도 아무 일이 일어나지 않는다(정의만 한다 · match-engine 은 이미 싣는다). */
+import { PROFILE_BOUNDS as GUARD_BOUNDS } from '../server/apply/apply-guard.mjs';
 import { urlKey, titleKey, dedupeNotices, preferNotice, capNotices, clickRowKey } from '../collector/url-key.mjs';
 /* extract-excerpts 는 **불러오면 그 자리에서 실행된다** — EXCERPTS_AS_LIB 가 그걸 막는 스위치다
    (이 저장소의 알려진 함정: `node -e "import('./x.mjs')"` 로 문법 검사를 하면 안 되는 이유와 같다). */
@@ -34,6 +37,8 @@ process.env.EXCERPTS_AS_LIB = '1';
 const AWAIT_EE = await import('../collector/extract-excerpts.mjs');
 import { mergeCandidates } from '../collector/candidates.mjs';
 import { publishBySchool, splitBySchool } from '../collector/publish-notices.mjs';
+/* ⚠️ 발행만 든 모듈이다 — `collector/majors.mjs` 는 **불러오는 순간 커리어넷을 두드린다.** */
+import { publishMajorsBySchool } from '../collector/publish-majors.mjs';
 import { pageCandidates, pageUrl, existingPageParam, samePage, shouldRetry } from '../collector/paginate.mjs';
 import { looseCandidate, sameNotice, findMissing, classifyMiss, coverageOf, looksLikeBoardChrome, looksLikeAttachmentName, dedupeNear } from '../collector/coverage-rules.mjs';
 import { createRequire } from 'node:module';
@@ -878,10 +883,61 @@ console.log('\n■ 학교별 공고 파일 (로봇이 쓴 파일을 앱이 찾�
     eq(`${f}가 학교별 파일 규칙을 쓴다`,
       /noticeFilesForProfile\(/.test(readText(new URL(f, root))), true);
   }
-  // 옛 파일로 물러나는 길 — 아직 자기 학교 파일이 없는 학생의 화면이 비면 안 된다
+  /* 옛 파일로 물러나는 길 — 아직 자기 학교 파일이 없는 학생의 화면이 비면 안 된다.
+     🔴 **다만 조건이 붙었다** (2026-09-26 · 고문 보고서). 수집망이 두 곳이고 온보딩은
+        213개교를 고를 수 있어, 그전까지는 **대다수 학생이 이 길로 들어가 옛 파일을 통째로
+        받고 자기 공고 0건**이었다(실측: 33.5KB 받아 0건 · 수집 40곳이면 670KB).
+        지금은 색인을 나란히 받아 '우리에게 그 학교 공고가 없다'를 알면 받지 않는다. */
   for (const f of ['app.js', 'sw.js']) {
-    eq(`${f}에 옛 파일 폴백이 남아 있다`,
-      /data\/notices\.json/.test(readText(new URL(f, root))), true);
+    const src = readText(new URL(f, root));
+    eq(`${f}에 옛 파일 폴백이 남아 있다`, /data\/notices\.json/.test(src), true);
+    eq(`  ${f} 이 noticeFallbackNeeded 로 판단한다`, /noticeFallbackNeeded\s*\(/.test(src), true);
+    eq(`  ${f} 이 색인을 나란히 받아 온다`, /data\/notices\/index\.json/.test(src), true);
+    /* 🔴 **조건 없이 물러나는 자리가 남아 있으면 고친 것이 아무 일도 안 한 것이 된다** */
+    const lines = src.split('\n');
+    const bare = [];
+    lines.forEach((ln, i) => {
+      if (/^\s*(\/\/|\/?\*)/.test(ln)) return;                       // 주석 줄은 뺀다
+      if (!/['"]data\/notices\.json['"]/.test(ln)) return;
+      const near = lines.slice(Math.max(0, i - 2), i + 1).join(' ');
+      if (!/noticeFallbackNeeded|noticeFiles\.length|files\.length/.test(near)) bare.push(i + 1);
+    });
+    eq(`  ${f} 에 조건 없이 옛 파일을 받는 줄이 없다`, bare, []);
+  }
+
+  /* 🔴 판정 자체 — '알 때는 안 받고, 모를 때는 예전처럼 물러난다'.
+     ⚠️ 판단이 안 서면 **화면이 비지 않는 쪽**이다(오프라인·배포 엇갈림). */
+  const IDX = { files: { '한국외국어대학교': { file: 'n19cz03g.json', count: 32 },
+                         '경희대학교': { file: 'n1w4hprp.json', count: 25 } } };
+  for (const [idx, fl, want, label] of [
+    [IDX, ['data/notices/n19cz03g.json'], true,  '색인에 있는데 파일을 못 받았다 → 물러난다(배포 엇갈림)'],
+    [IDX, ['data/notices/nsgh1oi.json'],  false, '🔴 색인에 없는 학교 → 옛 파일을 받지 않는다'],
+    [IDX, ['data/notices/nX.json', 'data/notices/n19cz03g.json'], true, '분교 둘 중 하나라도 있으면 물러난다'],
+    [null, ['data/notices/nsgh1oi.json'], true,  '색인을 못 받았다(오프라인) → 예전처럼 물러난다'],
+    [{},   ['data/notices/nsgh1oi.json'], true,  '색인이 망가졌다 → 물러난다'],
+    [IDX,  [],                            false, '받을 파일이 없으면 판단할 것도 없다'],
+  ]) {
+    eq('  ' + label, ME.noticeFallbackNeeded(idx, fl), want);
+  }
+
+  /* 🔴 **로봇이 만든 색인을 앱의 판정 함수에 실제로 먹여 본다.** 색인의 모양
+     (`files: { 학교: { file } }`)이 바뀌면 앱은 **조용히 옛 파일을 다시 받기 시작한다**
+     (판정이 '모른다'로 떨어져 늘 물러난다). 글자로 재지 않고 로봇 출력을 그대로 쓴다. */
+  {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'notices-idx-')) + path.sep;
+    publishBySchool([
+      { id: 'a', school: '한국외국어대학교', title: '가', url: 'https://x/1', listedAt: '2026-09-20' },
+      { id: 'b', school: '경희대학교', title: '나', url: 'https://x/2', listedAt: '2026-09-20' },
+    ], { dir: new URL('file://' + tmp) });
+    /* ⚠️ 파일은 `readText` 로 읽는다 — 이 파일의 메타 검사가 그걸 잰다(줄바꿈 통일). */
+    const idx = JSON.parse(readText(new URL('file://' + tmp + 'index.json')));
+    const hufs = ME.noticeFilesForProfile({ school: '한국외국어대학교' });
+    const snu = ME.noticeFilesForProfile({ school: '서울대학교' });
+    eq('  로봇이 낸 색인으로 수집 학교를 알아본다 (물러난다)', ME.noticeFallbackNeeded(idx, hufs), true);
+    eq('  🔴 로봇이 낸 색인으로 수집 안 하는 학교를 알아본다 (안 받는다)', ME.noticeFallbackNeeded(idx, snu), false);
+    eq('  색인의 파일 이름이 앱이 찾아갈 이름과 같다',
+      'data/notices/' + idx.files['한국외국어대학교'].file, hufs[0]);
+    fs.rmSync(tmp, { recursive: true, force: true });
   }
   for (const f of ['collector/collect.mjs', 'collector/browser-collect.mjs']) {
     const src = readText(new URL(f, root));
@@ -4098,6 +4154,194 @@ console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08
   }
 }
 
+console.log('■ 학교가 늘면 「정식 등록도 나눌 때」라고 말하는가 (2026-09-26 개발자 지시)');
+{
+  /* 개발자: "그럼 학교 늘리면 그때 다시 학교별로 나누라고 얘기해줘."
+     🔴 문서에만 적으면 안 돈다 — 데이터가 스스로 재서 말해야 한다. 여기서 재는 것은
+        ①선을 넘으면 말하는가 ②안 넘으면 조용한가 ③재는 규칙이 한 곳인가
+        ④개발자가 **실제로 읽는 곳**(수집 리포트 → GitHub 이슈)에 뜨는가. */
+  const DW = createRequire(import.meta.url)('./data-weight.cjs');
+  const reg = JSON.parse(readText(new URL('../data/registered.json', import.meta.url)));
+
+  /* ① 지금은 조용해야 한다 (실측 21KB · 선 150KB) */
+  const now = DW.registeredSplitAdvice(reg);
+  eq('  지금은 아직 말하지 않는다 (선을 안 넘었다)', { over: now.over, line: now.line }, { over: false, line: null });
+  eq('  그래도 재기는 했다 (전국분과 학교 수를 읽어냈다)', now.nation > 0 && now.schools > 0, true);
+
+  /* ② 학교가 늘어난 미래 — **실데이터 크기에 기대지 않는다.** 처음에 실제 공고를 스무 번
+     복제해 봤는데 그 공고가 작아서 선을 못 넘었고, 검사가 '말하지 않는다'로 초록불이었다.
+     지어낸 픽스처로 재면 숫자가 눈에 보이고 데이터가 바뀌어도 흔들리지 않는다. */
+  const pad = (n) => 'x'.repeat(n);
+  const four = { items: [
+    { id: 'n1', eligibility: {}, note: pad(90 * 1024) },                          // 전국 — 모두가 받는다
+    { id: 's1', eligibility: { schoolOnly: '가대학교' }, note: pad(200 * 1024) },
+    { id: 's2', eligibility: { schoolOnly: '나대학교' }, note: pad(200 * 1024) },
+    { id: 's3', eligibility: { campusOnly: '다대학교 본교' }, note: pad(200 * 1024) },
+  ] };
+  const later = DW.registeredSplitAdvice(four);
+  /* 남의 학교 것 = 학교 한정 600KB − 가장 큰 학교 200KB = 400KB → 선(150KB)을 넘는다 */
+  /* ⚠️ `eq` 는 인자가 셋이다 — 넷째를 주면 조용히 버려진다(전에도 같은 실수를 했다). */
+  eq('  🔴 학교가 늘면 말한다', later.over, true);
+  eq('  남의 학교 것만 센다 (전국분은 빼고, 가장 큰 학교 몫도 빼고)',
+    Math.round(later.wasted / 1024), 400);
+  eq('  전국분을 따로 센다', Math.round(later.nation / 1024), 90);
+  eq('  그 말에 **무엇을 하라**가 들어 있다', /학교별 파일로 나눌 때/.test(later.line || ''), true);
+  eq('  본뜰 곳도 알려 준다', /publish-notices|match-engine/.test(later.line || ''), true);
+  /* 🔴 `schoolsAny`(여러 학교)도 학교 한정으로 센다 — 나눌 때 그 학교들 파일에 각각 들어간다 */
+  const anyOnly = DW.registeredSplitAdvice({ items: [
+    { id: 'a1', eligibility: { schoolsAny: ['가대학교', '나대학교'] }, note: pad(300 * 1024) },
+    { id: 'a2', eligibility: { schoolsAny: ['다대학교'] }, note: pad(200 * 1024) },
+  ] });
+  eq('  여러 학교만 받는 공고도 학교 한정으로 센다', Math.round(anyOnly.wasted / 1024), 200);
+  /* 🔴 **여러 학교가 함께 받는 공고를 '남의 것'으로 세지 않는다** (2026-09-26 코드 리뷰).
+     나누면 파일은 학교 단위라 그 공고는 **그 학교들 파일에 각각** 들어간다. 묶음 하나로
+     세던 첫 판은 낭비를 네 배로 부풀렸고 `학교 N곳` 도 묶음 수라 틀렸다. */
+  const shared = DW.registeredSplitAdvice({ items: [
+    { id: 'a', eligibility: { schoolOnly: '가대학교' }, note: pad(60 * 1024) },
+    { id: 'b', eligibility: { schoolOnly: '나대학교' }, note: pad(19 * 1024) },
+    { id: 'c', eligibility: { schoolsAny: ['가대학교', '나대학교', '다대학교|본교'] }, note: pad(200 * 1024) },
+  ] });
+  eq('  함께 받는 공고는 그 학교들 것으로 센다 (낭비 19KB — 부풀리면 79KB 가 된다)',
+    Math.round(shared.wasted / 1024), 19);
+  eq('  학교 수는 묶음 수가 아니라 실제 학교 수다', shared.schools, 3);
+  eq("  `학교|캠퍼스` 꼴에서 학교 이름만 집는다",
+    [...DW.schoolsOfNotice({ schoolsAny: ['가대학교|본교'] })], ['가대학교']);
+  /* 전국 공고만 있으면 나눌 이유가 없다 */
+  const nationOnly = DW.registeredSplitAdvice({ items: [
+    { id: 'z', eligibility: {}, note: pad(900 * 1024) },
+  ] });
+  eq('  전국 공고만 있으면 말하지 않는다 (나눠도 줄지 않는다)',
+    { over: nationOnly.over, wasted: nationOnly.wasted }, { over: false, wasted: 0 });
+
+  /* ③ 🔴 재는 규칙이 한 곳인가 — 베껴 두면 한쪽 숫자만 고치고 다른 쪽이 옛말을 한다 */
+  for (const [name, src] of [
+    ['verify/audit-data.js', readText(new URL('../verify/audit-data.js', import.meta.url))],
+    ['collector/collect.mjs', readText(new URL('../collector/collect.mjs', import.meta.url))],
+  ]) {
+    eq('  ' + name + ' 이 그 함수를 부른다', /registeredSplitAdvice\s*\(/.test(src), true);
+    /* 선(150KB)을 자기 파일에 적어 두지 않았는가 */
+    eq('  ' + name + ' 이 선을 베껴 적지 않았다',
+      /SPLIT_WARN_BYTES\s*=/.test(src.replace(/\/\*[\s\S]*?\*\//g, '')), false);
+  }
+  /* ④ 개발자가 읽는 곳에 뜨는가 — 감사 출력은 CI 로그에만 남는다 */
+  const collectSrc = readText(new URL('../collector/collect.mjs', import.meta.url));
+  eq('  🔴 수집 리포트(→ GitHub 이슈)에 싣는다', /lines\.push\([^)]*advice\.line/.test(collectSrc), true);
+  /* 🔴 **머리쪽에 실어야 한다.** 워크플로가 이슈 본문을 60,000바이트에서 자르는데(`head -c`),
+     경고를 띄우게 만드는 그 성장이 바로 리포트를 넘치게 한다 — 꼬리에 두면 **처음 뜨는
+     순간에 잘린다**(코드 리뷰에서 잡았다). 학교별 상세보다 앞이어야 한다. */
+  eq('  🔴 리포트 꼬리가 아니라 머리쪽에 싣는다 (60,000바이트에서 잘린다)',
+    collectSrc.indexOf('advice.line') < collectSrc.indexOf("lines.push('---')"), true);
+  /* 🔴 부르다가 터지는 것을 삼키지 않는가 — 삼키면 장치가 영영 죽어도 아무도 모른다 */
+  const catchBlock = /catch\s*\(e\)\s*\{([\s\S]{0,600}?)\}/.exec(
+    collectSrc.slice(collectSrc.indexOf('registeredSplitAdvice')));
+  eq('  🔴 재지 못한 것도 리포트에 적는다 (조용히 죽지 않는다)',
+    /lines\.push/.test((catchBlock && catchBlock[1]) || ''), true);
+}
+
+console.log('■ 프로필 개별 칸 · DB 검증 (0004 · 2026-09-26 · 고문 보고서 Q6)');
+{
+  const sql = readText(new URL('../supabase/migrations/0004_profile_columns.sql', import.meta.url));
+  /* 주석을 뺀 본문만 본다 — 주석에 적힌 낱말이 검사를 통과시키면 검사가 아니다
+     (2026-09-12에 같은 함정을 밟았다). */
+  const body = sql.replace(/^\s*--.*$/gm, '');
+
+  /* 🔴 ① 앱이 칸마다 따로 써 넣는 꼴로 되돌리지 말 것 — 그러면 두 곳이 갈라지고,
+     옛 앱이 깔린 폰이 쪼갠 칸을 제 옛 값으로 덮는다(docs/designs/sync-overwrite.md). */
+  const cols = ['school', 'campus', 'major', 'track', 'enroll_status', 'gender', 'grade', 'gpa', 'income_bracket'];
+  /* 🔴 **칸 하나씩 따로 본다.** 처음에는 `add column … [\s\S]{0,400}? generated always as` 로
+     재다가, 칸을 보통 칸으로 바꿔도 **초록불이었다**(2026-09-26 red-green 에서 잡았다) —
+     정규식이 쉼표를 넘어 **옆 칸의** generated 절을 물었기 때문이다. 그래서 괄호 깊이를
+     세어 **맨 바깥 쉼표로만** 가른다(칸 안의 `nullif(x, '')` 쉼표에 속지 않게). */
+  const stmt = /alter table public\.profiles([\s\S]*?);/.exec(body);
+  eq('  칸을 더하는 문장을 찾았다', !!stmt, true);
+  const pieces = [];
+  if (stmt) {
+    let depth = 0, cur = '';
+    for (const ch of stmt[1]) {
+      if (ch === '(') depth++;
+      else if (ch === ')') depth--;
+      if (ch === ',' && depth === 0) { pieces.push(cur); cur = ''; continue; }
+      cur += ch;
+    }
+    pieces.push(cur);
+  }
+  for (const c of cols) {
+    const piece = pieces.find((x) => new RegExp('add column if not exists\\s+' + c + '\\s').test(x));
+    eq('  ' + c + ' 는 jsonb 에서 DB 가 꺼내 채운다 (앱이 따로 안 쓴다)',
+      !!piece && /generated always as/.test(piece) && /profile\s*->/.test(piece), true);
+  }
+  eq('  앱의 쓰기 경로는 그대로다 (개별 칸을 보내는 코드를 만들지 않았다)',
+    /\b(school|major|income_bracket|enroll_status)\s*:/.test(
+      readText(new URL('../supabase-client.js', import.meta.url))
+        .slice(readText(new URL('../supabase-client.js', import.meta.url)).indexOf('const row = {'),
+               readText(new URL('../supabase-client.js', import.meta.url)).indexOf('const seen ='))), false);
+
+  /* 🔴 ② 꺼내는 식이 실패하면 저장 자체가 죽는다 — 맨 형변환을 두지 말 것.
+     `(profile->>'x')::int` 는 숫자가 아닌 값 하나에 오류가 되고, 학생은 이유를 모른다.
+     ⚠️ 처음에는 전체 개수만 비교했다(`guarded >= casts`) — 그건 **어느 칸이 안 막혔는지
+        모르고**, 한 칸에 정규식이 둘이면 빈 칸을 덮어 준다(코드 리뷰에서 잡았다).
+        지금은 **칸마다** 같은 조각 안에 정규식이 있는지 본다. */
+  for (const piece of pieces) {
+    if (!/::\s*(int|smallint|numeric|integer)/.test(piece)) continue;
+    const name = (/add column if not exists\s+(\w+)/.exec(piece) || [])[1] || '?';
+    eq('  ' + name + ' 은 숫자로 바꾸기 전에 정규식으로 걸러 본다', /~\s*'\^/.test(piece), true);
+  }
+
+  /* 🔴 ③ **읽을 수 없는 값을 NULL 로 두면 안 된다** — NULL 은 CHECK 를 통과하는데
+     jsonb 안에는 이상한 값이 그대로 남고, 서버는 그 jsonb 를 읽는다(실측으로 잡았다:
+     `gpa: 999` 가 조용히 통과했다). 그래서 `else -1` 로 두어 CHECK 가 거절하게 한다. */
+  eq('  읽을 수 없는 값은 NULL 이 아니라 거절된다 (else -1)',
+    (body.match(/else\s+-1/g) || []).length >= 3, true);
+
+  /* 🔴 ④ 0 은 '안 골랐다'다 — 미달로 읽으면 학년을 안 고른 정상 학생을 막는다 */
+  eq("  학년·소득구간의 0 은 '모른다'로 둔다", /= '0'\s*then null/.test(body), true);
+
+  /* 🔴 ⑤ 닫힌 목록을 걸지 말 것 — 성별은 자유 입력 양식에서도 배워지고(forms.json),
+     칩 목록은 앱에서 늘어난다. 늘어날 수 있는 것에 자물쇠를 걸면 정상 학생의 저장이 막힌다. */
+  for (const bad of ['gender in (', 'enroll_status in (', 'track in (']) {
+    eq('  ' + bad + '…) 같은 닫힌 목록을 걸지 않는다', body.includes(bad), false);
+  }
+
+  /* 🔴 ⑥ **입력칸이 허용하는 값을 DB·서버가 거절하면 안 된다.** 입력칸만 넓히면
+     정상 학생의 저장이 조용히 막힌다(조건부 PATCH 라 다음 저장도 같은 자리에서 막힌다).
+     그래서 `index.html` 의 min/max 와 두 겹의 숫자를 대조한다. */
+  {
+    const html = readText(new URL('../index.html', import.meta.url));
+    const attr = (id, a) => {
+      const tag = new RegExp('<input[^>]*id="' + id + '"[^>]*>').exec(html);
+      const m = tag && new RegExp(a + '="([-0-9.]+)"').exec(tag[0]);
+      return m ? Number(m[1]) : null;
+    };
+    const sqlRange = (col) => {
+      const m = new RegExp(col + '\\s+between\\s+([0-9.]+)\\s+and\\s+([0-9.]+)').exec(body);
+      return m ? [Number(m[1]), Number(m[2])] : null;
+    };
+    const GB = GUARD_BOUNDS;       // apply-guard.mjs 에서 불러온 것
+    for (const [id, col, key] of [['in-credits', 'credits', 'credits'], ['in-birth-year', 'birth_year', 'birthYear']]) {
+      const want = [attr(id, 'min'), attr(id, 'max')];
+      eq('  ' + id + ' 의 min/max 를 DB CHECK 가 그대로 받는다',
+        JSON.stringify(sqlRange(col)), JSON.stringify(want));
+      eq('  ' + id + ' 의 min/max 를 서버도 그대로 받는다',
+        JSON.stringify(GB[key]), JSON.stringify(want));
+    }
+    /* gpa 는 CHECK 모양이 `between` 이 아니라 `>= … and <= …` 다 */
+    const g = /gpa\s*>=\s*([0-9.]+)\s+and\s+gpa\s*<=\s*([0-9.]+)/.exec(body);
+    eq('  in-gpa 의 min/max 를 DB CHECK 가 그대로 받는다',
+      JSON.stringify(g && [Number(g[1]), Number(g[2])]),
+      JSON.stringify([attr('in-gpa', 'min'), attr('in-gpa', 'max')]));
+    eq('  in-gpa 의 min/max 를 서버도 그대로 받는다',
+      JSON.stringify(GB.gpa), JSON.stringify([attr('in-gpa', 'min'), attr('in-gpa', 'max')]));
+  }
+
+  /* 🔴 ⑦ 거절이 학생에게 보이는가 — 조용히 실패하면 프로필이 영영 안 올라간다 */
+  const cli = readText(new URL('../supabase-client.js', import.meta.url));
+  const app = readText(new URL('../app.js', import.meta.url));
+  eq('  앱이 check_violation(23514) 을 알아본다', /'23514'/.test(cli), true);
+  eq('  화면이 그것을 한 번 알린다', /syncTellIfRejected/.test(app), true);
+  /* 🔴 서버가 준 details 에는 실패한 행이 통째로(주민등록번호까지) 들어 있다 */
+  eq('  🔴 서버가 준 details 를 화면에 옮기지 않는다', /\bj\.details\b|res\.json\.details/.test(cli), false);
+}
+
 console.log('■ 회원가입·로그인 배선 (2026-08-25) — 빠뜨리면 조용히 안 되는 세 가지');
 {
   const at = (f) => readText(new URL('../' + f, import.meta.url));
@@ -4812,6 +5056,80 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
   /* 분교 7곳은 전부 매핑돼 있어야 한다 — 빠지면 그 학교 학과가 본교로 합쳐진다 */
   eq('data.js 분교 7곳이 전부 BRANCH_MAP 에 있다',
     [...unis].filter((u) => /캠퍼스$/.test(u) && !targets.includes(u)), []);
+
+  const ME = createRequire(import.meta.url)('../match-engine.js');
+
+  /* ── 학교별 학과 파일 (2026-09-26 · 고문 보고서) ────────────────────────────
+     앱이 첫 화면에서 `data/majors.json` **407KB(gzip 65KB)** 를 통째로 받고 있었다 —
+     209개교가 든 파일인데 쓰는 곳은 온보딩 자동추천 한 곳이고, 학생에게 필요한 것은
+     자기 학교 목록(gzip 1.5KB)뿐이다. 이제 학교별 파일 하나만 받는다.
+     🔴 이 배선이 끊기면 **조용하다** — 파일이 없으면 전국 공통 목록으로 물러나므로
+        화면상 아무 일도 안 일어난 것처럼 보이고, 2026-08-02의 그 사고로 되돌아간다. */
+  const appSrc = readText(new URL('../app.js', import.meta.url));
+  eq('  앱이 첫 화면에서 407KB 파일을 받지 않는다',
+    /fetch\(\s*'data\/majors\.json'/.test(appSrc), false);
+  eq('  앱이 학교별 파일 이름 규칙을 쓴다 (match-engine 한 곳)',
+    /majorsFileFor\(/.test(appSrc), true);
+  eq('  이름 규칙을 앱이 베끼지 않았다 (data/majors/ 를 직접 짜맞추지 않는다)',
+    /['\"`]data\/majors\//.test(appSrc.replace(/\/\*[\s\S]*?\*\//g, '')), false);
+  /* 🔴 로봇이 학교별 파일을 **실제로 쓰는가** — 안 쓰면 앱은 새 학과를 영영 못 본다 */
+  const robotSrc = readText(new URL('../collector/majors.mjs', import.meta.url));
+  eq('  로봇이 학교별 파일을 발행한다', /publishMajorsBySchool\(/.test(robotSrc), true);
+  /* 🔴 워크플로가 그 폴더를 커밋하는가 (CLAUDE.md: 로봇이 고친 파일은 전부 git add 에) */
+  const wf = readText(new URL('../.github/workflows/refresh-majors.yml', import.meta.url));
+  eq('  워크플로가 data/majors 폴더도 커밋한다', /git add[^\n]*\bdata\/majors\b(?!\.json)/.test(wf), true);
+
+  /* 🔴 **로봇이 쓴 파일을 앱의 규칙으로 찾을 수 있는가** — 글자로 재지 않고 실제로 써 본다
+     (2026-08-27에 로봇과 앱의 학교 이름이 갈라져 학과 추천이 조용히 죽은 적이 있다). */
+  {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'majors-')) + path.sep;
+    const pub = publishMajorsBySchool({
+      '한국외국어대학교': ['영어통번역학과', '경영학부'],
+      '한국과학기술원': ['전산학부'],            // 커리어넷 이름 → 앱 이름(KAIST)으로 맞춰야 한다
+      '빈학교': [],                             // 학과가 없으면 파일을 만들지 않는다
+      '없는대학교': ['아무학과'],                // 앱이 고를 수 없는 학교 → 만들지 않는다
+    }, { dir: new URL('file://' + tmp), updatedAt: '2026-09-26' });
+    eq('  🔴 커리어넷 이름을 앱 이름으로 맞춰 저장한다 (한국과학기술원 → KAIST)',
+      fs.existsSync(path.join(tmp, ME.majorsFileFor('KAIST').split('/').pop())), true);
+    eq('  앱이 고를 수 없는 학교는 만들지 않는다', pub.skipped, ['없는대학교']);
+    for (const key of ['한국외국어대학교', 'KAIST']) {
+      const name = ME.majorsFileFor(key).split('/').pop();
+      const doc = JSON.parse(readText(new URL('file://' + tmp + name)));
+      eq('  앱이 찾아갈 이름으로 저장됐다 — ' + key, doc.school, key);
+    }
+    eq('  학과가 없는 학교는 파일을 만들지 않는다',
+      fs.existsSync(path.join(tmp, ME.majorsFileFor('빈학교').split('/').pop())), false);
+    const idx = JSON.parse(readText(new URL('file://' + tmp + 'index.json')));
+    eq('  색인이 저장한 학교만 적는다', idx.schools, 2);
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+
+  /* 🔴 **앱은 `'학교 캠퍼스'` 열쇠를 받지 않는다** — 수확 로봇이 그 꼴을 하나도 발행하지
+     않기 때문이다(실측 2026-09-26: 캠퍼스별로 학과가 다른 곳은 `BRANCH_MAP` 이 분교를
+     **별개 학교 이름**으로 바꿔 저장한다). 로봇이 그 꼴을 발행하기 시작하면 앱이 그 파일을
+     영영 안 받으므로 **여기서 막는다.** 색인의 열쇠가 전부 `UNIVERSITIES` 안의 학교 이름이어야 한다. */
+  {
+    /* ⚠️ 위 `unis` 는 **쓰지 않는다** — 그 파싱은 배열이 끝나기 전에 잘려(212/213) 실제로
+       이 검사를 **틀리게 빨간불로** 만들었다(2026-09-26). 여기서는 배열 끝(`\n];`)까지 읽는다.
+       ⚠️ 이 목록은 앱의 `loadMajorsFor` 가 **부르기 전에 거르는 기준**이다 — 여기 없는 이름으로
+          발행하면 그 학교 학생은 파일을 영영 못 받고 전국 공통 목록으로 조용히 물러난다. */
+    const uniAll = new Set([...dataSrc.slice(dataSrc.indexOf('const UNIVERSITIES = ['),
+      dataSrc.indexOf('\n];', dataSrc.indexOf('const UNIVERSITIES = ['))).matchAll(/'([^']+)'/g)].map((m) => m[1]));
+    eq('  UNIVERSITIES 를 끝까지 읽었다', uniAll.size >= 210, true, uniAll.size);
+    const idx = JSON.parse(readText(new URL('../data/majors/index.json', import.meta.url)));
+    eq('  🔴 발행된 열쇠가 전부 앱의 학교 이름이다 (아니면 그 학교 학생은 파일을 영영 못 받는다)',
+      Object.keys(idx.files).filter((k) => !uniAll.has(k)), []);
+    /* 🔴 커리어넷 이름 ≠ 앱 이름인 곳이 **실제로 있다** — 맞추는 장치가 살아 있는지 잰다
+       (`UNIV_ALIASES` 를 통과시킨다 · 관문이 처음 이걸 잡았다). */
+    eq('  커리어넷 이름을 앱 이름으로 맞추는 장치가 산다 (KAIST 등 7곳)',
+      ['KAIST', 'POSTECH', 'GIST', 'UNIST', 'DGIST', '부경대학교', '한국에너지공과대학교(KENTECH)']
+        .filter((n) => !idx.files[n]), []);
+  }
+
+  /* 발행된 실제 파일도 본다 — 앱이 지금 당장 찾아갈 수 있어야 한다(다음 로봇 실행까지
+     기다리면 그 사이 학과 추천이 전국 공통 목록으로 돌아간다). */
+  eq('  지금 저장소에 한국외대 학과 파일이 있다',
+    fs.existsSync(fileURLToPath(new URL('../' + ME.majorsFileFor('한국외국어대학교'), import.meta.url))), true);
 }
 
 

@@ -54,8 +54,12 @@ try {
   for (const f of fs.readdirSync('.github/workflows')) {
     if (!/\.ya?ml$/.test(f) || /deploy-sync|main-guard|update-progress|check-live|probe-boards|fetch-page/.test(f)) continue;
     const y = fs.readFileSync(`.github/workflows/${f}`, 'utf8');
-    // 데이터 파일을 커밋하는 워크플로만 대상
-    if (!/git add[^\n]*data\/(notices|registered)\.json/.test(y)) continue;
+    /* 앱이 받는 데이터를 커밋하는 워크플로만 대상.
+       🔴 **파일 이름을 하나씩 적지 않는다** (2026-09-26). 예전에는 `notices|registered` 둘만
+          봤는데, 학과 목록이 앱 데이터가 되자 이 검사가 **초록불인 채로 놓쳤다**(코드 리뷰에서
+          잡았다). `git add data/…` 이면 전부 본다 — 앱이 안 읽는 것(seen·후보 장부 등)은
+          `data/` 밖에 있으므로 이 폭이 맞다. */
+    if (!/git add[^\n]*\bdata\/[a-z-]+/.test(y)) continue;
     const name = (y.match(/^name:\s*(.+)$/m) || [])[1]?.trim();
     if (name && !watched.includes(name)) {
       console.log(`❌ deploy-sync가 '${name}'(${f})를 모릅니다 — 이 로봇이 고친 데이터는 최대 12시간 앱에 안 나갑니다.`);

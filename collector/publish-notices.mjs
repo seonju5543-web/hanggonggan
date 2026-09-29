@@ -155,10 +155,17 @@ export function publishBySchool(items, opts = {}) {
     index[school] = { file: `${key}.json`, count: list.length };
     fs.writeFileSync(new URL(`${key}.json`, dir), JSON.stringify({ school, updatedAt, items: list }, null, 1));
   }
-  /* 색인은 앱이 쓰지 않는다(앱은 이름 규칙으로 바로 찾아간다). 사람과 도구가
-     '어느 파일이 어느 학교인가'를 볼 수 있게 두는 것 — 이름이 n1abc처럼 읽을 수 없으므로. */
+  /* 🔴 **색인은 앱도 읽는다** (2026-09-26 · 고문 보고서 — 그전까지는 사람용이었다).
+     앱은 이름 규칙(noticeFileKey)으로 자기 파일을 바로 찾아가지만, 그 파일이 **없을 때**
+     옛 파일(data/notices.json)을 통째로 받을지 말지를 이 색인으로 판단한다
+     (match-engine.js `noticeFallbackNeeded` 한 곳 · 화면과 알림이 같이 쓴다).
+     수집 학교가 두 곳이고 온보딩은 213개교를 고를 수 있어, 그 판단이 없으면
+     **대다수 학생이 옛 파일을 통째로 받고 자기 공고 0건**이다(실측 33.5KB → 0건).
+     🔴 그래서 `files` 의 모양(`{ 학교: { file, count } }`)을 바꾸면 앱이 조용히 옛 파일을
+        다시 받기 시작한다 — 관문 「학교별 공고 파일 · 옛 파일로 물러나는 길」이 이 로봇의
+        출력을 실제로 만들어 앱의 판정 함수에 먹여 본다. 사람용 설명도 그대로 둔다. */
   fs.writeFileSync(new URL('index.json', dir), JSON.stringify({
-    note: '학교별 실시간 공고 파일 색인. 앱은 match-engine.js의 noticeFileKey로 파일을 직접 찾으므로 이 파일을 읽지 않는다 — 사람이 보기 위한 것.',
+    note: '학교별 실시간 공고 파일 색인. 앱은 noticeFileKey 로 자기 파일을 바로 찾아가고, 그 파일이 없을 때 옛 data/notices.json 을 받을지 말지를 이 색인으로 판단한다(match-engine.js noticeFallbackNeeded). 사람이 어느 파일이 어느 학교인지 보는 데도 쓴다.',
     updatedAt,
     schools: Object.keys(index).length,
     files: index,

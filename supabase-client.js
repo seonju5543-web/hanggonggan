@@ -195,16 +195,70 @@ async function authSignIn(email, password) {
         가짜 서버가 실제로 토큰을 회전시킨다(안 그러면 이 사고가 재현되지 않는다). */
 const AUTH_LOCK = 'handaejang-auth-refresh';
 
+/* 🔴 **고아 잠금에서 빠져나오는 길** (2026-09-28 · 고문 보고서 — SDK 를 읽어 배운 것)
+
+   고문 제안: "Supabase SDK 를 번들러로 묶어 쓰면 SDK 의 안전한 토큰 갱신(Mutex Lock)을
+   누릴 수 있다." SDK 의 그 구현(`navigatorLock`)을 실제로 열어 보니 **잠금 API 는 우리와
+   똑같은 `navigator.locks`** 였고, 다른 점은 딱 하나였다 — **획득에 시한이 있고, 시한을
+   넘기면 `{steal:true}` 로 빼앗는다.**
+
+   우리 것에는 그 시한이 없었다. 잠금을 잡은 탭이 죽거나 멈추면(탭 강제 종료·기기 절전에서
+   깨지 못한 탭) 잠금이 **고아**가 되고, 다른 탭의 `locks.request` 는 **영영 돌아오지 않는다**
+   — `.catch` 는 '거절'만 받으므로 아무 도움이 안 된다. 그러면 그 기기는 토큰을 다시는
+   갱신하지 못하고, 갱신 시한이 지나면 조용히 로그아웃된다.
+   그래서 SDK 를 통째로 들여오는 대신(실측 gzip 54KB · 첫 화면 예산의 3분의 2) **이 한 가지만**
+   가져왔다. 왜 통째로 안 들여왔는지는 SESSIONS.md 「SDK 를 번들로…」.
+
+   🔴 **시한을 SDK 의 기본값(5초)으로 두면 안 된다** — 우리 갱신 요청 시한이 8초라(`timeoutMs`),
+      5초에 빼앗으면 **정상적으로 갱신 중인 탭의 잠금을 뺏어** 두 탭이 동시에 갱신하게 된다.
+      그게 바로 이 잠금이 막으려던 사고다. 그래서 **우리 요청 시한에서 유도한다**(+2초 여유).
+      두 값이 갈라지지 않게 숫자를 따로 적지 않는다.
+   ⚠️ `steal` 과 `signal` 은 같이 줄 수 없다(명세) — 빼앗는 요청에는 signal 을 주지 않는다. */
+function authLockWaitMs() {
+  const t = (typeof SUPABASE_CONFIG !== 'undefined' && SUPABASE_CONFIG.timeoutMs) || 8000;
+  /* 🔴 **잠금을 쥔 쪽이 쓸 수 있는 시간을 전부 더한다** (2026-09-28 코드 리뷰에서 잡았다).
+     `authRefreshLocked` 는 요청(≤ timeoutMs) 뒤에 **다른 탭을 기다릴 수도 있다**
+     (`waitForOtherTabRefresh` ≤ AUTH_PROPAGATE_MS). 그 몫을 빼고 재면 여유가 1.4초로 줄고,
+     누가 AUTH_PROPAGATE_MS 를 올리는 순간 **정상적으로 갱신 중인 탭의 잠금을 빼앗는다** —
+     이 잠금이 막으려던 바로 그 사고다. 관문이 이 관계를 잰다(verify-supabase.js [14]). */
+  const prop = typeof AUTH_PROPAGATE_MS === 'number' ? AUTH_PROPAGATE_MS : 600;
+  return t + prop + 2000;
+}
+
 /* 잠금을 잡고 부른다. ⚠️ **fn 이 시작됐는지 기억한다** — 안 그러면 fn 이 던진 오류를
    '잠금을 못 잡았다'로 잘못 읽고 fn 을 두 번 부른다(갱신을 두 번 하는 셈이라 사고가 되돌아온다). */
 function withAuthLock(fn) {
   const locks = typeof navigator !== 'undefined' && navigator.locks;
   if (!locks || typeof locks.request !== 'function') return fn();
   let started = false;
-  const wrapped = () => { started = true; return fn(); };
+  let timer = null;
+  const clear = () => { if (timer) { clearTimeout(timer); timer = null; } };
+  /* ⚠️ 잠금을 **잡은 순간** 시계를 끈다 — 내 일이 오래 걸리는 것은 기다림이 아니다
+     (안 끄면 일하는 중에 abort 가 떠서 엉뚱한 곳을 건드린다). */
+  /* 🔴 **내 일의 결과를 붙잡아 둔다** (2026-09-28 관문이 잡았다). 다른 탭이 `steal` 하면
+     이 요청은 *"Lock broken by another request with the 'steal' option."* 로 **거절된다** —
+     내 일이 이미 끝났는데도 그렇다. 그걸 오류로 올리면 멀쩡히 받아 온 토큰을 버리고
+     화면에 오류가 뜬다. 그래서 거절 대신 붙잡아 둔 결과를 돌려준다.
+     ⚠️ `fn` 자체가 실패한 경우는 `work` 가 거절된 약속이라 **그대로 올라간다**(뜻 그대로다). */
+  let work = null;
+  const wrapped = () => { started = true; clear(); work = fn(); return work; };
+  const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  if (ctrl) timer = setTimeout(() => ctrl.abort(), authLockWaitMs());
+  const opts = ctrl ? { mode: 'exclusive', signal: ctrl.signal } : undefined;
   return Promise.resolve()
-    .then(() => locks.request(AUTH_LOCK, wrapped))
-    .catch((e) => { if (started) throw e; return fn(); });
+    .then(() => (opts ? locks.request(AUTH_LOCK, opts, wrapped) : locks.request(AUTH_LOCK, wrapped)))
+    .catch((e) => {
+      clear();
+      if (started) return work;                   // 내 일은 이미 돌았다 — 잠금이 깨져도 그 결과를 쓴다
+      /* 시한을 넘겼다 = 잠금을 쥔 쪽이 돌아오지 않는다 → **빼앗아** 진행한다.
+         그래도 안 되면 잠금 없이 한다 — 갱신을 아예 못 하는 것보다 낫다
+         (잡은 직후 저장소를 다시 읽으므로 헛돌아도 남의 토큰을 죽이지 않는다). */
+      if (ctrl && ctrl.signal.aborted) {
+        return locks.request(AUTH_LOCK, { mode: 'exclusive', steal: true }, wrapped)
+          .catch((e2) => (started ? work : fn()));
+      }
+      return fn();                                // 잠금을 못 쓰는 환경 → 그냥 한다
+    });
 }
 
 let authRefreshing = null;
@@ -502,6 +556,41 @@ function syncVerClear() {
   try { localStorage.removeItem(SYNC_VER_KEY); } catch { /* 위와 같다 */ }
 }
 
+/* 🔴 **DB 가 값을 거절했을 때는 조용히 넘기면 안 된다** (2026-09-26 · 고문 보고서 Q6)
+
+   0004_profile_columns.sql 부터, 있을 수 없는 값(성적 999 · 학년 0 밖 · 1만 자 학교 이름)은
+   **DB 가 쓰기를 거절**한다. 그런데 올리기 실패는 지금까지 **아무 데도 안 보였다**
+   (app.js syncSchedulePush 의 `.catch(() => {})`). 그대로 두면 이런 일이 벌어진다 —
+   프로필이 **영영 서버에 안 올라가고**, 학생은 다른 기기에서 이어쓰기가 안 되는 이유를 모른다.
+   조건부 PATCH 라 `syncVerSave` 도 안 되니 다음 저장도, 그다음 저장도 같은 자리에서 막힌다.
+   그래서 '거절'은 '인터넷이 없다'와 **구분해서** 돌려주고, 화면이 한 번 알린다.
+
+   🔴 서버가 준 `details` 는 **쓰지 않는다** — 거기에는 실패한 행이 통째로 들어 있어
+      주민등록번호·계좌번호까지 담길 수 있다(PostgREST 가 `Failing row contains (…)` 를 그대로 준다).
+      우리가 읽는 것은 **제약 이름 하나**뿐이다. 관문: verify/verify-supabase.js [13] 절. */
+const SYNC_REJECT_FIELD = {
+  profiles_gpa_range: '성적(학점)',
+  profiles_grade_range: '학년',
+  profiles_bracket_range: '학자금지원구간',
+  profiles_text_len: '학교·캠퍼스·학과 이름',
+};
+/** DB 가 값을 보고 거절한 것인가. 거절이면 학생에게 보일 한국어 문장, 아니면 빈 문자열. */
+function syncRejectText(res) {
+  if (!res || res.status !== 400) return '';
+  const j = res.json || {};
+  if (String(j.code || '') !== '23514') return '';     // 23514 = Postgres check_violation
+  const m = /constraint "([a-z0-9_]+)"/i.exec(String(j.message || ''));
+  const field = (m && SYNC_REJECT_FIELD[m[1]]) || '';
+  return field
+    ? `${field} 값이 올바르지 않아 서버에 저장하지 못했어요. 프로필에서 다시 확인해 주세요`
+    : '프로필에 저장할 수 없는 값이 있어 서버에 올리지 못했어요';
+}
+/** 실패 한 가지 모양으로 — 거절이면 `rejected: true` 와 한국어 문장을 함께 준다. */
+function syncFail(res) {
+  const rejected = syncRejectText(res);
+  return { ok: false, rejected: !!rejected, error: rejected || authErrorText(res) };
+}
+
 /* 서버에 올린다. 실패해도 앱은 아무 일 없이 계속 돈다 — 폰 안 저장이 원본이다. */
 async function syncPush(state) {
   if (!signedIn() || !state) return { ok: false, skipped: true };
@@ -531,7 +620,7 @@ async function syncPush(state) {
       body: [row],
     });
     if (ins.ok) syncVerSave(u.userId, stamp);
-    return { ok: ins.ok, error: ins.ok ? null : authErrorText(ins) };
+    return ins.ok ? { ok: true, error: null } : syncFail(ins);
   }
 
   const res = await sbAuthed(
@@ -546,7 +635,7 @@ async function syncPush(state) {
     const remote = await syncPull();
     return { ok: false, conflict: true, remote };
   }
-  return { ok: false, error: authErrorText(res) };
+  return syncFail(res);
 }
 
 /* 서버에서 내려받는다. 없으면(첫 로그인 전) null. */
@@ -571,5 +660,6 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     syncSafeProfile, syncSafeApplications, SYNC_OMIT_COMMON, SYNC_OMIT_APP,
     SYNC_SENSITIVE_KEYS, authErrorText, REMEMBER_KEY,
+    SYNC_REJECT_FIELD, syncRejectText, syncFail,
   };
 }

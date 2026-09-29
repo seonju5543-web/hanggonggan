@@ -55,6 +55,15 @@ const rotate = () => {
    늘 켜 두면 다른 절들이 쓰던 흐름까지 흔들려, 고치려는 것과 상관없는 빨간불이 난다. */
 let strictAuth = false;
 
+/* 🔴 **DB 가 값을 거절하는 상황**을 흉내낸다. [13] 절에서만 켠다 (2026-09-26).
+   0004_profile_columns.sql 의 CHECK 가 실제로 하는 일이고, PostgREST 는 그것을
+   **400 + `code: '23514'`** 로 되돌려 준다. 몸통의 `details` 에 실패한 행이 통째로
+   들어가는 것까지 진짜와 같게 둔다 — 그 안에 주민등록번호가 있고, 앱이 그것을
+   화면에 옮기면 안 되는 것이 이 절이 재는 것의 절반이다. */
+let rejectWrites = '';     // '' 또는 제약 이름 (예: 'profiles_gpa_range')
+/* 거절이 **아닌** 실패(서버가 아픈 것). 이것으로는 학생을 귀찮게 하지 않아야 한다. */
+let failWrites = false;
+
 function startSupabase() {
   return new Promise((resolve) => {
     const srv = http.createServer((req, res) => {
@@ -100,6 +109,18 @@ function startSupabase() {
         if (req.url.startsWith('/rest/v1/profiles')) {
           if (strictAuth && String(req.headers.authorization || '') !== 'Bearer ' + liveAccess) {
             return send(401, { message: 'JWT expired' });
+          }
+          if (failWrites && (req.method === 'POST' || req.method === 'PATCH')) {
+            return send(500, { message: 'internal error' });
+          }
+          if (rejectWrites && (req.method === 'POST' || req.method === 'PATCH')) {
+            return send(400, {
+              code: '23514',
+              message: `new row for relation "profiles" violates check constraint "${rejectWrites}"`,
+              /* 진짜와 같게 — 여기에 학생의 모든 칸이 들어온다. 앱이 이걸 옮기면 안 된다. */
+              details: 'Failing row contains (uuid, {"common": {"rrn": "000000-0000000", "account": "1002-333-444444"}}, …).',
+              hint: null,
+            });
           }
           if (req.method === 'POST') { storedRow = (body && body[0]) || null; return send(201); }
           if (req.method === 'DELETE') { storedRow = null; return send(204); }
@@ -649,9 +670,183 @@ const seedScript = (seed) => `localStorage.setItem('handaejang.v1', ${JSON.strin
     await ctx.close();
   }
 
+  /* ───────── [14] 🔴 잠금이 고아가 되어도 갱신이 살아난다 (2026-09-28 · 고문 보고서) ─────────
+     고문 제안은 "SDK 를 번들러로 묶어 SDK 의 Mutex Lock 을 쓰라"였다. SDK 구현을 열어 보니
+     잠금 API 는 **우리와 똑같은 `navigator.locks`** 였고 다른 점은 하나 — **획득 시한과
+     `{steal:true}` 회수**다. 우리 것에는 그것이 없어, 잠금을 쥔 탭이 죽으면 다른 탭의
+     `locks.request` 가 **영영 돌아오지 않고** 그 기기는 토큰을 다시는 갱신하지 못했다.
+
+     🔴 재는 법: 탭 A 가 잠금을 잡고 **영원히 놓지 않는다**. 그 상태에서 탭 B 가 갱신을
+        부르면, 시한 뒤에 빼앗아 **성공해야** 한다. 시한·회수가 없으면 여기서 영영 멈춘다.
+     ⚠️ 두 탭은 **같은 context** 여야 한다(잠금을 공유한다) — 창을 따로 만들면 재현되지 않는다. */
+  console.log('\n[14] 잠금을 쥔 탭이 죽어도 다른 탭이 토큰을 갱신한다 (고아 잠금 회수)');
+  {
+    const ctx = await browser.newContext({ viewport: { width: 390, height: 900 } });
+    const a = await ctx.newPage();
+    const b = await ctx.newPage();
+    for (const p of [a, b]) {
+      p.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
+      await p.goto(`http://localhost:${APP_PORT}/`, { waitUntil: 'domcontentloaded' });
+      await p.evaluate(seedScript(SEED));
+    }
+    for (const p of [a, b]) {
+      await p.reload({ waitUntil: 'domcontentloaded' });
+      await settle(p);
+      await p.evaluate(([k, t]) => localStorage.setItem(k, JSON.stringify(t)),
+        [await p.evaluate(() => AUTH_KEY), {
+          accessToken: liveAccess, refreshToken: liveRefresh, expiresAt: Date.now() - 1000,
+          userId: '00000000-0000-4000-8000-000000000001', email: 'test@example.com',
+        }]);
+    }
+    /* 기다리는 시간을 짧게 줄인다 — 진짜 10초를 기다리면 검사가 느려진다.
+       ⚠️ 값을 **앱에서 읽어** 줄인다(앱이 그 값을 쓰는지까지 함께 재는 셈이다). */
+    /* ⑤ 🔴 **앱의 실제 값과 대조한다** — 숫자를 여기 박으면(9000 등) 앱이 바뀌어도 초록불이다.
+       잠금을 쥔 쪽이 쓸 수 있는 최대는 `timeoutMs`(요청) + `AUTH_PROPAGATE_MS`(다른 탭 기다림)다.
+       기다림 시한이 그보다 길어야, 정상 갱신 중인 탭의 잠금을 빼앗지 않는다. */
+    const budget = await b.evaluate(() => ({
+      wait: authLockWaitMs(),
+      timeout: (typeof SUPABASE_CONFIG !== 'undefined' && SUPABASE_CONFIG.timeoutMs) || 8000,
+      propagate: typeof AUTH_PROPAGATE_MS === 'number' ? AUTH_PROPAGATE_MS : 600,
+      lockName: AUTH_LOCK,
+    }));
+    ok(budget.wait > budget.timeout + budget.propagate,
+      '🔴 기다림 시한이 잠금을 쥔 쪽의 최대 시간보다 길다 (짧으면 정상 갱신을 빼앗는다)', budget);
+    /* ② 🔴 **잠금 이름을 앱에서 읽는다** — 글자로 박으면 `AUTH_LOCK` 이름만 바꿔도 이 절이
+       **아무것도 안 재면서** 초록불이 된다(코드 리뷰에서 실제로 확인했다). */
+    ok(!!budget.lockName, '앱에서 잠금 이름을 읽어냈다', budget.lockName);
+    const SHORT_WAIT = 700;
+    await b.evaluate((ms) => { window.authLockWaitMs = () => ms; }, SHORT_WAIT);
+
+    /* 🔴 탭 A 가 잠금을 잡고 **영원히** 놓지 않는다 (탭이 죽은 것과 같은 상태) */
+    await a.evaluate((lockName) => {
+      window.__held = new Promise(() => {});
+      /* ⚠️ **제 거절을 스스로 받는다** — 탭 B 가 빼앗으면 이 요청이
+         *"Lock broken by another request with the 'steal' option."* 로 거절된다.
+         안 받으면 검사가 그것을 앱의 페이지 오류로 세어 엉뚱한 빨간불이 난다
+         (실제로 그렇게 났다 — 앱 잘못이 아니라 이 검사가 만든 잠금이다). */
+      navigator.locks.request(lockName, () => window.__held).catch(() => {});
+    }, budget.lockName);
+    await a.waitForTimeout(200);
+
+    /* ⚠️ 시한·회수가 없으면 `authRefresh()` 가 **영영 돌아오지 않는다.** 그대로 두면 검사가
+       멈췄다가 드라이버 전체가 알 수 없는 오류로 죽는다 — 읽을 수 있는 빨간불이 되게
+       여기서 한 번 끊는다(끊긴 것 자체가 그 사고의 증거다). */
+    /* ③ 🔴 **비교 기준을 실제 이전 값으로 잡는다** — `'refresh-1'` 과 비교하던 것은 앞 절이
+       이미 토큰을 돌려놔서 **언제나 통과**했다(코드 리뷰에서 확인: 서버를 안 불러도 초록불). */
+    const before = await b.evaluate(() => (authLoad() || {}).refreshToken || '');
+    const t0 = Date.now();
+    const got = await b.evaluate(async () => {
+      const done = authRefresh().then((r) => ({ ok: r, token: (authLoad() || {}).refreshToken || '' }));
+      const late = new Promise((r) => setTimeout(() => r({ ok: 'HUNG', token: '' }), 5000));
+      return Promise.race([done, late]);
+    });
+    const took = Date.now() - t0;
+    ok(got.ok === true, '🔴 잠금이 고아가 되어도 갱신이 성공한다 (시한 뒤 빼앗는다)', got);
+    ok(!!got.token && got.token !== before,
+      '🔴 서버를 실제로 불러 새 토큰을 받아 왔다 (앞 절이 남긴 값이 아니다)', { before, after: got.token });
+    /* ④ 🔴 시한을 **줄여 둔 값 기준**으로 잰다 — 8초로 재던 것은 위 `Promise.race` 가 5초에
+       끊으므로 **빨간 실행에서도 통과**했다(코드 리뷰에서 확인). 700ms 로 줄여 놨으니
+       그 갑절 조금 넘는 선이면 '시한을 지켰다'를 실제로 잰다. */
+    ok(took < SHORT_WAIT * 3, '줄여 둔 시한 안에 끝난다 (영영 기다리지 않는다)',
+      { took: took + 'ms', wait: SHORT_WAIT + 'ms' });
+    await ctx.close();
+  }
+
+  /* ───────── [13] 🔴 DB 가 값을 거절하면 학생이 알게 된다 (2026-09-26 · 고문 Q6) ─────────
+     0004_profile_columns.sql 부터 있을 수 없는 값(성적 999 · 1만 자 학교 이름)은 DB 가
+     **쓰기를 거절한다.** 그런데 올리기 실패는 `app.js syncSchedulePush` 의
+     `.catch(() => {})` 에 **통째로 삼켜지고 있었다** — 그러면 프로필이 영영 서버에
+     안 올라가고, 학생은 다른 기기에서 이어쓰기가 안 되는 이유를 모른다.
+     조건부 PATCH 라 다음 저장도, 그다음 저장도 같은 자리에서 막힌다.
+
+     🔴 여기서 두 가지를 잰다 — ① 한 번은 **알린다** ② 그 문구에 **개인정보를 옮기지 않는다**
+        (PostgREST 의 `details` 에는 실패한 행이 통째로 들어 있다). */
+  console.log('\n[13] DB 가 값을 거절하면 학생에게 알린다 (개인정보는 옮기지 않는다)');
+  {
+    const { ctx, page } = await newPage();
+    await page.goto(`http://localhost:${APP_PORT}/`, { waitUntil: 'domcontentloaded' });
+    await page.evaluate(seedScript(SEED));
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await settle(page);
+    await page.evaluate(([k, t]) => localStorage.setItem(k, JSON.stringify(t)),
+      [await page.evaluate(() => AUTH_KEY), {
+        accessToken: liveAccess, refreshToken: liveRefresh, expiresAt: Date.now() + 600000,
+        userId: '00000000-0000-4000-8000-000000000001', email: 'test@example.com',
+      }]);
+    /* 토스트를 가로채 모은다 — 화면에서 사라지는 것을 쫓지 않고 부른 것을 센다 */
+    await page.evaluate(() => {
+      window.__toasts = [];
+      const orig = window.toast;
+      window.toast = (m) => { window.__toasts.push(String(m)); return orig ? orig(m) : undefined; };
+    });
+
+    rejectWrites = 'profiles_gpa_range';
+    await page.evaluate(() => { state.profile.gpa = 4.1; saveState(); });
+    await page.waitForTimeout(2500);
+    let seen = await page.evaluate(() => window.__toasts.slice());
+    const said = seen.filter((m) => /서버에 저장하지 못했|서버에 올리지 못했/.test(m));
+    ok(said.length === 1, '🔴 거절을 한 번 알린다 (조용히 삼키지 않는다)', seen);
+    ok(said.some((m) => /성적/.test(m)), '어느 칸이 문제인지 말한다', said);
+    ok(!said.some((m) => /Failing row|rrn|account|1002-|000000-/.test(m)),
+      '🔴 서버가 준 `details`(실패한 행 전체)를 화면에 옮기지 않는다', said);
+
+    /* ⚠️ 값을 고치지 않으면 저장할 때마다 같은 자리에서 거절된다 — 매번 띄우면
+       토스트가 화면을 덮어 앱을 못 쓴다. 두 번째 저장에서는 늘지 않아야 한다. */
+    await page.evaluate(() => { state.profile.gpa = 4.2; saveState(); });
+    await page.waitForTimeout(2500);
+    seen = await page.evaluate(() => window.__toasts.slice());
+    ok(seen.filter((m) => /서버에 저장하지 못했|서버에 올리지 못했/.test(m)).length === 1,
+      '두 번째 거절은 다시 띄우지 않는다 (같은 말을 계속하면 앱을 못 쓴다)', seen);
+
+    /* 🔴 **아픈 서버와 구분한다** — 그건 지나가도 되는 실패다(폰 안 저장이 원본이라 안 잃는다).
+       ⚠️ 서버를 **죽여서** 재지 않는다 — [11] 이 서버를 죽이므로 그 뒤에 두면 이 절 전체가
+          '인터넷 없음'이 되어 조용히 무력해진다(2026-09-26에 실제로 그렇게 만들었다).
+          그래서 이 절은 [11] **앞**에 있고, 여기서는 500 을 돌려주게 해서 잰다. */
+    /* 🔴 먼저 **한 번 성공**시킨다 — 두 가지를 동시에 잰다:
+         ① 값을 고치면 그냥 올라간다  ② 성공이 '이미 알렸다' 기억을 푼다.
+       ⚠️ 이 성공이 없으면 아래 500 검사는 **절대 실패할 수 없는 단정**이 된다(래치가
+          이미 켜져 있어 무엇을 해도 토스트가 안 뜬다 — 코드 리뷰에서 잡았다). */
+    rejectWrites = '';
+    const fixed = await page.evaluate(async () => {
+      window.__toasts.length = 0;
+      const r = await syncPushMerging(state);
+      syncTellIfRejected(r);
+      return { ok: !!(r && r.ok), told: window.__toasts.slice() };
+    });
+    ok(fixed.ok === true, '값이 정상이면 그냥 올라간다', fixed);
+
+    failWrites = true;
+    const other = await page.evaluate(async () => {
+      window.__toasts.length = 0;
+      const r = await syncPushMerging(state);
+      syncTellIfRejected(r);
+      return { rejected: !!(r && r.rejected), toasts: window.__toasts.slice() };
+    });
+    failWrites = false;
+    ok(other.rejected === false, '서버가 아파서 실패한 것은 `rejected` 가 아니다', other);
+    ok(!other.toasts.some((m) => /저장하지 못했|올리지 못했/.test(m)),
+      '그런 실패로는 학생을 귀찮게 하지 않는다 (지나가도 되는 실패다)', other.toasts);
+
+    /* 🔴 성공 뒤에 **다른 칸**이 거절되면 다시 알려야 한다 (래치가 풀렸는가) */
+    rejectWrites = 'profiles_text_len';
+    const again = await page.evaluate(async () => {
+      window.__toasts.length = 0;
+      const r = await syncPushMerging(state);
+      syncTellIfRejected(r);
+      return window.__toasts.slice();
+    });
+    rejectWrites = '';
+    ok(again.some((m) => /학교·캠퍼스·학과 이름/.test(m)),
+      '🔴 한 번 성공한 뒤 다른 칸이 거절되면 다시 알린다 (기억이 풀린다)', again);
+    await ctx.close();
+  }
+
   /* ───────────── [10] 서버가 죽어도 앱은 열린다 ───────────── */
   console.log('\n[11] 서버가 죽어 있어도 앱은 그대로 열린다 (기기 우선)');
   {
+    /* 🔴 **이 줄이 가짜 서버를 죽인다 — 서버가 필요한 절은 반드시 이 위에 둔다.**
+       2026-09-26에 [13] 을 이 아래에 두었다가, 요청이 전부 '인터넷 없음'으로 실패해
+       거절 검사가 **아무것도 안 재면서** 빨간불만 냈다. 새 절은 위에 붙일 것. */
     await new Promise((r) => sb.close(r));
     const { ctx, page } = await newPage();
     await page.goto(`http://localhost:${APP_PORT}/`, { waitUntil: 'domcontentloaded' });
