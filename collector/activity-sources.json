@@ -119,6 +119,48 @@
    "boardUrl": "https://kyf.or.kr/user/boardList.do?bbsId=BBSMSTR_000000000367",
    "evidence": "웹 검색 2026-09-29: \"2024년 청년재단 서포터즈 청년Z 모집 공고 — kyf.or.kr/user/boardDetail.do?bbsId=BBSMSTR_000000000367\"",
    "note": "상세 주소에서 목록 이름(boardList.do)을 유추했다 — 첫 리포트에서 ⚠️ 면 주소를 확인한다"
+  },
+  {
+   "school": "",
+   "host": "부산청년플랫폼",
+   "boardUrl": "https://young.busan.go.kr/jprog/list.nm",
+   "evidence": "웹 검색 2026-09-29(3차): \"총 - : 부산청년플랫폼 — young.busan.go.kr/jprog/list.nm\" · 청년 프로그램 목록 · 청정넷 청년위원 모집",
+   "note": "부산권 학교(수집망 44개교)용"
+  },
+  {
+   "school": "",
+   "host": "인천유스톡톡 청년포털",
+   "boardUrl": "https://youth.incheon.go.kr/bbs/bbsMsgList.do?bcd=notice",
+   "evidence": "웹 검색 2026-09-29(3차): \"공지사항 — 인천유스톡톡(youth.incheon.go.kr/bbs/bbsMsgDetail.do?msg_seq=…&bcd=notice)\" · 부트캠프·역량강화 모집 공지",
+   "note": "상세 주소(bbsMsgDetail.do)에서 목록(bbsMsgList.do)을 유추했다 — 첫 리포트에서 ⚠️ 면 주소를 확인한다"
+  },
+  {
+   "school": "",
+   "host": "대전청년포털",
+   "boardUrl": "https://www.daejeonyouthportal.kr/",
+   "evidence": "웹 검색 2026-09-29(3차): \"대전광역시-대전청년포털 — daejeonyouthportal.kr\" · 대전청년의회 의원 모집·인재육성 장학생 선발 공고",
+   "note": "홈 화면의 링크만 읽는다 — 목록 주소는 첫 리포트 뒤 보정"
+  },
+  {
+   "school": "",
+   "host": "울산청년정책플랫폼 U-PAGE",
+   "boardUrl": "https://www.ulsan.go.kr/s/ulsanyouth/main.ulsan",
+   "evidence": "웹 검색 2026-09-29(3차): \"울산청년정책플랫폼 U-PAGE — ulsan.go.kr/s/ulsanyouth\" · 공모·지원사업 게시판(아카데미 교육생·일경험 참여자·제안 경연대회 참가자 모집)",
+   "note": "홈 화면의 링크만 읽는다 — 목록 주소는 첫 리포트 뒤 보정"
+  },
+  {
+   "school": "",
+   "host": "광주청년통합플랫폼",
+   "boardUrl": "https://youth.gwangju.go.kr/",
+   "evidence": "웹 검색 2026-09-29(3차): \"전남광주통합특별시 청년통합플랫폼 — youth.gwangju.go.kr\"",
+   "note": "홈 화면의 링크만 읽는다 — 목록 주소는 첫 리포트 뒤 보정"
+  },
+  {
+   "school": "",
+   "host": "경남청년정보플랫폼",
+   "boardUrl": "https://youth.gyeongnam.go.kr/",
+   "evidence": "웹 검색 2026-09-29(3차): \"경상남도 청년정보플랫폼 — youth.gyeongnam.go.kr\"",
+   "note": "홈 화면의 링크만 읽는다 — 목록 주소는 첫 리포트 뒤 보정"
   }
  ],
  "_parked": "쓰지 않게 된 게시판은 지우지 말고 여기로 옮긴다(schools.json 의 parked 와 같은 규칙 — 주소를 알아내는 데 든 시간을 버리지 않는다). 되돌리려면 항목을 위 sources 로 옮기면 된다.",
