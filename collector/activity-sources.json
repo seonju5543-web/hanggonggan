@@ -63,6 +63,62 @@
    "boardUrl": "https://www.k-startup.go.kr/web/main/mainSection0.do",
    "evidence": "웹 검색 2026-09-29: \"신규 사업 공고 — K-Startup\" · 창업 경진대회·공모전이 여기 공고된다. 공공데이터포털 15125364 에 같은 내용의 API 가 있다(열쇠 필요 — 개발자 결정)",
    "note": "창업 경진대회·공모전만 판정을 통과한다(지원사업 공고는 activity-kind 가 거른다)"
+  },
+  {
+   "school": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "boardUrl": "https://www.korea.kr/etc/byulBeforeList.do",
+   "evidence": "웹 검색 2026-09-29: \"진행중인 이벤트 — 정책브리핑(korea.kr/etc/byulBeforeList.do)\" · 부처 공모전·이벤트 목록(구독&참여)",
+   "note": "정부24 공모전과 겹치는 글은 제목 열쇠로 하나가 된다(dedupeNotices)"
+  },
+  {
+   "school": "",
+   "host": "경기청년포털",
+   "boardUrl": "https://youth.gg.go.kr/gg/intro/notice.do",
+   "evidence": "웹 검색 2026-09-29: \"공지사항 게시판목록 — 경기청년포털\" · 청년기획단·청년참여기구 모집 공고 · 한국외대 글로벌캠퍼스(용인)가 경기도",
+   "note": "경기도 청년 사업 모집"
+  },
+  {
+   "school": "",
+   "host": "KOICA 봉사단",
+   "boardUrl": "https://kov.koica.go.kr/ho/cobb/ovhHoCobbBbsNormalList.do?menuId=MENU0000000000000162&bbsSn=1004",
+   "evidence": "웹 검색 2026-09-29: \"모집선발 > 모집 공지사항 — KOICA 봉사단(kov.koica.go.kr … bbsSn=1004)\" · 프로젝트 봉사단·UNV 대학생 봉사단 모집",
+   "note": "상세 주소(…BbsNormalDetail.do)에서 목록 이름을 유추했다 — 첫 리포트에서 ⚠️ 면 주소를 확인한다"
+  },
+  {
+   "school": "",
+   "host": "국립국제교육원",
+   "boardUrl": "https://www.niied.go.kr/web/main/nid/niied_board/list",
+   "evidence": "웹 검색 2026-09-29: \"소식 > 공지사항 목록 — 국립국제교육원\" · 한중 대학생 교류 프로그램·외국정부초청장학생 모집",
+   "note": "교환·유학 장학과 교류 프로그램 — 장학 낱말 글은 활동 판정에서 빠지고(장학 쪽), 교류·참가자 모집만 담긴다"
+  },
+  {
+   "school": "",
+   "host": "한국콘텐츠진흥원",
+   "boardUrl": "https://www.kocca.kr/kocca/pims/list.do?menuNo=204104",
+   "evidence": "웹 검색 2026-09-29: \"지원공고 < 알림마당 < 한국콘텐츠진흥원\" · APEC AI 영상 콘텐츠 공모전 등",
+   "note": "콘텐츠 분야 공모전·참가자 모집"
+  },
+  {
+   "school": "",
+   "host": "문화포털 문화지원사업",
+   "boardUrl": "https://www.culture.go.kr/portal/cltBnf/cltSup/list.do?menuNo=200104",
+   "evidence": "웹 검색 2026-09-29: \"문화지원사업(목록) — 문화포털\" · 문체부 전 분야 공모정보 520건",
+   "note": "문화·예술 공모전"
+  },
+  {
+   "school": "",
+   "host": "서울문화포털 공모소식",
+   "boardUrl": "https://culture.seoul.go.kr/culture/bbs/B0000014/list.do?menuNo=200118",
+   "evidence": "웹 검색 2026-09-29: \"공모소식(목록) < 새소식 — 서울문화포털\"",
+   "note": "서울시 문화 공모"
+  },
+  {
+   "school": "",
+   "host": "청년재단",
+   "boardUrl": "https://kyf.or.kr/user/boardList.do?bbsId=BBSMSTR_000000000367",
+   "evidence": "웹 검색 2026-09-29: \"2024년 청년재단 서포터즈 청년Z 모집 공고 — kyf.or.kr/user/boardDetail.do?bbsId=BBSMSTR_000000000367\"",
+   "note": "상세 주소에서 목록 이름(boardList.do)을 유추했다 — 첫 리포트에서 ⚠️ 면 주소를 확인한다"
   }
  ],
  "_parked": "쓰지 않게 된 게시판은 지우지 말고 여기로 옮긴다(schools.json 의 parked 와 같은 규칙 — 주소를 알아내는 데 든 시간을 버리지 않는다). 되돌리려면 항목을 위 sources 로 옮기면 된다.",

@@ -1488,7 +1488,10 @@ console.log('\n■ 재단·지자체 게시판 (2026-09-26 · 노션 F-13 · 교
   eq('  홈 주소가 깨져 있으면 빈 목록 (검사가 죽지 않는다)', fb.pickMenuLinks(menu, 'not a url'), []);
   /* 출처 파일 */
   const src = JSON.parse(readText(new URL('../collector/external-sources.json', import.meta.url)));
-  eq('출처는 kosaf-open 에서 온 것 — 주소를 지어내지 않았다', (src.sources || []).length > 50 && src.sources.every((x) => x.seed === 'kosaf-open' && x.host && /^https?:\/\//.test(x.home) && 'boardUrl' in x), true);
+  /* 씨앗 둘 — kosaf-open(한국장학재단 공개 데이터의 재단 홈페이지) · web-search(2026-09-29 개발자 지시 "2차 크롤링 출처" — 웹 검색으로 확인한
+     대형 민간 재단·공공기관, 반드시 evidence 와 함께). 주소를 기억으로 지어낸 항목은 없다. */
+  eq('출처는 kosaf-open 또는 근거 있는 web-search — 주소를 지어내지 않았다', (src.sources || []).length > 50 && src.sources.every((x) => x.host && /^https?:\/\//.test(x.home) && 'boardUrl' in x && (x.seed === 'kosaf-open' || (x.seed === 'web-search' && typeof x.evidence === 'string' && x.evidence.length > 10))), true);
+  eq('  집계 사이트는 출처에 넣지 않는다', src.sources.some((x) => /linkareer|wevity|thinkcontest|campuspick|all-con|contestkorea|thinkyou|allforyoung/i.test((x.boardUrl || '') + (x.home || ''))), false);
   eq('  자동으로 찾은 게시판에는 증거가 붙어 있다', src.sources.filter((x) => x.boardUrl && x.autoFound).every((x) => x.autoFound.signals >= 3 && Array.isArray(x.autoFound.sample)), true);
   eq('  보관 칸과 되돌리는 법', Array.isArray(src.parked) && /되돌리려면/.test(src._parked || ''), true);
   const extData = JSON.parse(readText(new URL('../data/external.json', import.meta.url)));

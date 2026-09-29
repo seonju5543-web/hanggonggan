@@ -378,6 +378,107 @@
    "home": "https://www.fordrivers.or.kr/",
    "boardUrl": null,
    "seed": "kosaf-open"
+  },
+  {
+   "host": "서울장학재단",
+   "home": "https://www.hissf.or.kr/",
+   "boardUrl": null,
+   "seed": "web-search",
+   "evidence": "웹 검색 2026-09-29: \"서울장학재단 — hissf.or.kr\" · 서울희망 대학진로장학금(800명·연 400만원)·서울해외교환학생장학금 · 공지 글 주소 programs/user/news/ssfnews/read.asp"
+  },
+  {
+   "host": "삼성꿈장학재단",
+   "home": "https://www.sdream.or.kr/",
+   "boardUrl": null,
+   "seed": "web-search",
+   "evidence": "웹 검색 2026-09-29: \"삼성꿈장학재단 — sdream.or.kr\" · 글로벌 희망장학생(학기당 480만원) 공지"
+  },
+  {
+   "host": "현대차 정몽구 재단",
+   "home": "https://www.cmkfoundation-scholarship.org/",
+   "boardUrl": null,
+   "seed": "web-search",
+   "evidence": "웹 검색 2026-09-29: \"현대차 정몽구 스칼러십 — 온라인 장학생 선발 사이트\""
+  },
+  {
+   "host": "관정이종환교육재단",
+   "home": "https://www.ikef.or.kr/",
+   "boardUrl": "https://www.ikef.or.kr/page.php?id=%2Fkj%2Fscholar_schedule",
+   "seed": "web-search",
+   "evidence": "웹 검색 2026-09-29: \"장학생 선발 공고 — ikef.or.kr/page.php?id=/kj/scholar_schedule\" · 국내대학 장학생(학기당 최대 600만원)·국외유학 장학생"
+  },
+  {
+   "host": "두산연강재단",
+   "home": "https://www.yonkang.org/",
+   "boardUrl": null,
+   "seed": "web-search",
+   "evidence": "웹 검색 2026-09-29: 2026년 두산연강재단 장학생 선발 안내 — \"접수: 두산연강재단 홈페이지(www.yonkang.org/kr)\" · 학기당 400만원"
+  },
+  {
+   "host": "미래에셋박현주재단",
+   "home": "https://foundation.miraeasset.com/",
+   "boardUrl": "https://foundation.miraeasset.com/ko/news/notice/list.do",
+   "seed": "web-search",
+   "evidence": "웹 검색 2026-09-29: \"제34기 미래에셋 해외교환 장학생 선발 공고 — foundation.miraeasset.com/ko/news/notice/view.do?…detailsKey=487\"",
+   "note": "상세 주소(view.do)에서 목록(list.do)을 유추했다 — 첫 리포트에서 ⚠️ 면 확인"
+  },
+  {
+   "host": "아산사회복지재단",
+   "home": "https://www.asanfoundation.or.kr/",
+   "boardUrl": null,
+   "seed": "web-search",
+   "evidence": "웹 검색 2026-09-29: \"2026년 아산장학생 선발 안내 — asanfoundation.or.kr/af/foundation/notice/afFoundationNoticeDetail.do?idx=11282\""
+  },
+  {
+   "host": "포스코청암재단",
+   "home": "https://www.postf.org/",
+   "boardUrl": null,
+   "seed": "web-search",
+   "evidence": "웹 검색 2026-09-29: \"포스코청암재단 — postf.org\" · 장학생 선발 사이트 postf.recruiter.co.kr"
+  },
+  {
+   "host": "한국고등교육재단",
+   "home": "https://www.kfas.or.kr/",
+   "boardUrl": "https://www.kfas.or.kr/bbs/board.php?bo_table=kfas_whats_new",
+   "seed": "web-search",
+   "evidence": "웹 검색 2026-09-29: \"모집 요강 — kfas.or.kr/bbs/board.php?bo_table=kfas_whats_new&wr_id=87\" · 해외유학후보장학생"
+  },
+  {
+   "host": "한국장학재단 공지",
+   "home": "https://www.kosaf.go.kr/",
+   "boardUrl": "https://www.kosaf.go.kr/ko/notice.do",
+   "seed": "web-search",
+   "evidence": "웹 검색 2026-09-29: \"전체 — kosaf.go.kr/ko/notice.do?page=2\" · 공지 4,756건(사업공고·장학 안내)",
+   "note": "층2(학자금지원정보)와 다른 것 — 재단 공지 게시판 자체"
+  },
+  {
+   "host": "국립국제교육원 공지",
+   "home": "https://www.niied.go.kr/",
+   "boardUrl": "https://www.niied.go.kr/web/main/nid/niied_board/list",
+   "seed": "web-search",
+   "evidence": "웹 검색 2026-09-29: \"소식 > 공지사항 목록 — 국립국제교육원\" · 외국정부초청장학생·국비유학생 선발"
+  },
+  {
+   "host": "롯데장학재단",
+   "home": "https://www.lottefoundation.or.kr/",
+   "boardUrl": "https://www.lottefoundation.or.kr/notice",
+   "seed": "web-search",
+   "evidence": "웹 검색 2026-09-29: \"롯데재단 — lottefoundation.or.kr\" · 공지 글 주소 lottefoundation.or.kr/notice/2520 · 신격호 롯데 취업준비생 장학사업·희망장학생",
+   "note": "글 주소(/notice/<번호>)에서 목록(/notice)을 유추했다 — 첫 리포트에서 ⚠️ 면 확인"
+  },
+  {
+   "host": "동원육영재단",
+   "home": "https://www.dwef.or.kr/",
+   "boardUrl": null,
+   "seed": "web-search",
+   "evidence": "웹 검색 2026-09-29: \"동원육영재단 — dwef.or.kr\" · YTF·IDS 장학 프로그램"
+  },
+  {
+   "host": "일주학술문화재단",
+   "home": "https://www.iljufoundation.org/",
+   "boardUrl": null,
+   "seed": "web-search",
+   "evidence": "웹 검색 2026-09-29: \"일주학술문화재단 — iljufoundation.org\" · 해외박사 장학생 선발(33기)"
   }
  ],
  "_parked": "쓰지 않게 된 곳은 지우지 말고 여기로 옮긴다(schools.json 의 parked 와 같은 규칙). 되돌리려면 항목을 위 sources 로 옮기면 된다.",
