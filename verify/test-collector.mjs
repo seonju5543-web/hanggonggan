@@ -1357,7 +1357,8 @@ console.log('\n■ 신청 준비 시작 버튼 — 양식이 없어도 곧장 \'
    🔴 여기서 잠그는 것 셋: ① 되살린 학교가 도로 빠지지 않는다(수집 설정 둘) ② 앱이 보여 주는 학교(SERVED_SCHOOLS)와
    로봇이 수집하는 학교가 같다 — 갈라지면 로봇은 모으는데 앱은 숨겨 **아무도 모르는 채로** 빈 화면이 된다
    ③ 보관 자리(parked)의 규칙은 그대로 — 쓰지 않게 된 게시판은 지우지 않고 옮긴다.
-   ⚠️ 정식 등록 범위(auto-register-config.json `schools`)는 두 곳 그대로다 — 별개 결정이라 여기서 같이 잠근다. */
+   ⚠️ 정식 등록 범위(auto-register-config.json `schools`)도 같은 날 저녁 개발자 지시로 수집 학교 전부로 넓혔다(빈 배열 = 제한 없음) —
+      좁혀 두면 되살린 학교의 공고가 피드로만 나가고 자격 진단·양식이 안 붙으므로 여기서 같이 잠근다. */
 console.log('\n■ 수집망 복원 (2026-09-29 · 2026-08-30 좁힘을 되돌림)');
 {
   const sc = JSON.parse(readText(new URL('../collector/schools.json', import.meta.url)));
@@ -1387,9 +1388,11 @@ console.log('\n■ 수집망 복원 (2026-09-29 · 2026-08-30 좁힘을 되돌�
   const cm = readText(new URL('../collector/collect.mjs', import.meta.url));
   const bc = readText(new URL('../collector/browser-collect.mjs', import.meta.url));
   eq('로봇은 parked 를 읽지 않는다', /\.parked/.test(cm) || /\.parked/.test(bc), false);
-  /* 정식 등록은 별개 — 넓히면 재단 공고가 학교마다 따로 등록된다(노션 F-5 · 49건 손작업) */
+  /* 정식 등록 범위 — 2026-09-29 저녁 개발자 지시("정식 등록도 44곳으로 넓혀"). 빈 배열이 '수집 학교 전부'다.
+     ⚠️ 알려진 부작용(전국 사업이 게시 학교 한정으로 묶임 · 노션 F-5)은 관리자 「할 일」과 '타교 동일 사업 컨펌 대기'가 받는다. */
   const ar = JSON.parse(readText(new URL('../collector/auto-register-config.json', import.meta.url)));
-  eq('정식 등록 범위는 두 곳 그대로 (넓히는 것은 개발자 지시 때만)', (ar.schools || []).slice().sort(), ['경희대학교', '한국외국어대학교']);
+  eq('정식 등록 범위 = 수집 학교 전부 (빈 배열 · 좁히는 것은 개발자 지시 때만)', (ar.schools || []).length, 0);
+  eq('  왜 넓혔는지·부작용이 설정에 적혀 있다', /2026-09-29/.test(ar._schools || '') && /F-5/.test(ar._schools || ''), true);
 }
 
 /* ── 일반 수집 예산 (2026-09-29 · 44개교 복원과 한 세트) ─────────────────────────
@@ -1881,12 +1884,15 @@ console.log('\n■ 교내·교외 분류와 주관 기관 (2026-09-18 개발자 
     /id="live-notices"/.test(html.slice(html.indexOf('id="screen-explore"'))), false);
 }
 
-console.log('\n■ 정식 등록 대상 학교 좁히기 (2026-08-30)');
+console.log('\n■ 정식 등록 대상 학교 범위 (2026-08-30 좁힘 → 2026-09-29 되돌림)');
 {
+  /* 2026-08-30 두 곳으로 좁혔고, 2026-09-29 개발자 지시("정식 등록도 44곳으로 넓혀")로 다시 비웠다(빈 배열 = 수집 학교 전부).
+     범위 자체는 「수집망 복원」 절이 잠근다 — 여기는 **장치가 살아 있는가**(설정을 읽고, 거르고, 리포트에 적는가)만 본다.
+     장치가 죽으면 다음에 좁힐 때 설정을 고쳐도 아무 일이 안 일어난다. */
   const cfg = JSON.parse(readText(new URL('../collector/auto-register-config.json', import.meta.url)));
   const src = readText(new URL('../collector/auto-register.mjs', import.meta.url));
-  eq('설정에 대상 학교가 적혀 있다', cfg.schools, ['경희대학교', '한국외국어대학교']);
-  eq('  왜 좁혔는지도 적혀 있다', /품질|자격 요건 매칭/.test(cfg._schools || ''), true);
+  eq('설정에 schools 배열이 있다 (비어 있으면 수집 학교 전부)', Array.isArray(cfg.schools), true);
+  eq('  왜 좁혔었고 왜 넓혔는지 적혀 있다', /품질|자격 매칭/.test(cfg._schools || '') && /2026-09-29/.test(cfg._schools || ''), true);
   eq('로봇이 그 설정을 실제로 읽는다', /cfg\.schools/.test(src), true);
   eq('  대상 밖 공고를 등록 전에 거른다', /onlySchools\.size && n\.school && !onlySchools\.has\(n\.school\)/.test(src), true);
   /* 🔴 조용히 좁히면 다음 세션이 "로봇이 갑자기 등록을 안 한다"고 없는 버그를 쫓는다 */
@@ -9530,7 +9536,8 @@ return { submitChannelKind, submitChannelLabel };`)();
      정식 등록(자격 진단·양식)은 두 곳 그대로라 그 구분이 빠지면 고문이 다른 전제로 답한다. */
   eq('CLAUDE.md 에 「수집망 44개교 복원」 결정이 살아 있다', /수집망 44개교 복원/.test(claude), true);
   eq('요청서가 되살린 사실을 적는다', /44개교/.test(brief) && /2026-09-29/.test(brief), true);
-  eq('요청서가 정식 등록은 두 곳이라고 구분해 적는다', /정식 등록[^<]{0,40}경희대·한국외대/.test(brief), true);
+  eq('요청서가 정식 등록도 44개교라고 적는다 (두 곳으로 남았다고 적지 않는다)',
+    /정식 등록[^<]{0,60}44개교/.test(brief) && !/정식 등록[^<]{0,40}(경희대·한국외대 2곳 그대로|2곳입니다)/.test(brief), true);
 
   /* ② 이미 고친 결함을 미해결로 적어 두지 않는다 — 고문의 시간을 뺏는다 */
   eq('포털 오단정을 아직 고칠 자리라고 적지 않는다',
