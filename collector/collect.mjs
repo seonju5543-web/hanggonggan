@@ -38,7 +38,11 @@ const cfg = JSON.parse(fs.readFileSync(new URL('schools.json', HERE), 'utf8'));
    ⚠️ 워크플로의 단계 상한(collect-scholarships.yml 「게시판 수집」)은 이 예산보다 커야 한다 —
       관문 test-collector 「일반 수집 예산」이 대소관계를 잰다. */
 const BUDGET_MS = Number(process.env.HARVEST_BUDGET_MS || 8 * 60000);        // 기본 8분 (8/4 배분: 수집 ≤8)
-const BOARD_HARD_MS = Number(process.env.BOARD_HARD_MS || 150000);           // 게시판 하나 2분 30초
+const BOARD_HARD_MS = Number(process.env.BOARD_HARD_MS || 90000);            // 게시판 하나 1분 30초 (2026-09-30 실측: 서울대가 150초 시한을 꽉 채웠다 → 상세 상한 40→20 과 함께 줄임)
+/* 다음 게시판을 집으려면 최소 이만큼은 남아 있어야 한다 (2026-09-30). 처음엔 '시한(BOARD_HARD_MS)만큼'을 요구했는데
+   첫 실행에서 예산 8분 중 마지막 116초를 아무 게시판도 못 집고 흘려보냈다(21/75곳). 최악의 경우 마지막 게시판은
+   예산 끝 - MIN_ROOM_MS 에 시작해 시한까지 돌므로 단계 상한은 예산 + (시한 - 최소 여유) 보다 커야 한다 — 관문 「일반 수집 예산」이 잰다. */
+const MIN_ROOM_MS = Number(process.env.MIN_ROOM_MS || 30000);
 const budget = makeBudget(BUDGET_MS);
 const cursorPath = new URL('collect-cursor.json', HERE);
 let cursor = { next: 0 };
@@ -71,7 +75,8 @@ try { seenAct = JSON.parse(fs.readFileSync(seenActPath, 'utf8')); } catch { /* �
 const actsPath = new URL('../data/activities.json', HERE);
 let acts = { updatedAt: null, items: [] };
 try { acts = JSON.parse(fs.readFileSync(actsPath, 'utf8')); } catch { /* 첫 실행 */ }
-const ACT_FRESH_MAX = 20;    // 게시판 하나에서 한 실행에 상세까지 읽는 새 글 상한 (장학은 40)
+const FRESH_PER_BOARD = Number(process.env.FRESH_PER_BOARD || 20);   // 장학 게시판 하나에서 한 실행에 상세까지 읽는 새 글 상한 (2026-09-30 40 → 20)
+const ACT_FRESH_MAX = 20;    // 게시판 하나에서 한 실행에 상세까지 읽는 새 글 상한 (장학도 20 · FRESH_PER_BOARD)
 const ACT_CAP = 200;         // 폰이 통째로 받는 파일 — 상한을 두어 작게 유지한다
 /* 관리자가 숨긴 글 (activity-config.json hideUrls · 2026-09-29) — 지우지 않고 hidden 표식을 붙인다(되살리기가 된다) */
 let actHide = new Set();
@@ -411,7 +416,10 @@ async function harvestBoard(s, ctx = { dead: false }) {
       // 첨부파일 내려받기 링크 제외 — 안 막으면 '…포스터.png' 같은 파일 이름이 공고로 뜬다
       .filter((i) => !isAttachmentEntry(i));
     // 이미 본 글인지는 정규화한 주소로 판정 — 정렬 순번만 바뀐 같은 글을 '신규'로 담지 않기 위해
-    const fresh = items.filter((i) => !seen[i.url] && !seen[urlKey(i.url)]).slice(0, 40);
+    /* 한 실행에 상세까지 읽는 새 글 상한 (2026-09-30 · 44개교 첫 실행 실측: 75개 게시판 중 21곳만 보고 예산 8분이 끝났다 —
+       되살린 학교마다 한 달치 새 글이 쌓여 게시판 하나가 상세 40건을 읽느라 2~3분씩 걸렸다). 못 읽은 글은 seen 에 안 적히므로
+       다음 실행이 이어서 읽는다. 40 → 20: 한 게시판이 오래 붙들지 않게 해 회전이 빨라진다(활동·재단 게시판과 같은 값). */
+    const fresh = items.filter((i) => !seen[i.url] && !seen[urlKey(i.url)]).slice(0, FRESH_PER_BOARD);
 
     // 상세 페이지 방문: 첨부양식·마감 단서 수집
     for (const it of fresh) {
@@ -447,9 +455,9 @@ const skippedByBudget = [];
 for (const idx of order) {
   const s = boards[idx];
   const name = boardLabel(s);
-  /* 시작해도 되나 — '남은 시간 > 0' 이 아니라 '게시판 하나의 시한만큼 남았나'를 묻는다(browser-collect 와 같다).
-     안 그러면 예산 끝에 집은 게시판이 시한까지 더 돌아 단계 상한을 넘긴다(리뷰 2026-09-29). */
-  if (!budget.hasRoom(BOARD_HARD_MS)) {
+  /* 시작해도 되나 — '남은 시간 > 0' 이 아니라 '최소 여유(MIN_ROOM_MS)가 남았나'를 묻는다.
+     예산 끝에 집은 게시판은 시한(BOARD_HARD_MS)까지 더 돌 수 있으므로 그만큼은 단계 상한이 품는다(리뷰 2026-09-29 · 2026-09-30 조정). */
+  if (!budget.hasRoom(MIN_ROOM_MS)) {
     skippedByBudget.push(name);
     bucketOf(s).push({ name, status: `⏰ 시간 예산(${humanMs(BUDGET_MS)}) 소진 — 이번 실행은 건너뜀, 다음 실행이 여기부터 이어서 봅니다`, items: [] });
     continue;

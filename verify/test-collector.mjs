@@ -1404,8 +1404,8 @@ console.log('\n■ 일반 수집 예산 (2026-09-29)');
   const src = readText(new URL('collector/collect.mjs', root));
   eq('예산·시한·회전을 harvest-budget 에서 불러 쓴다 (베끼지 않는다)',
     /import \{ makeBudget, rotateOrder, nextCursor, withDeadline, TIMED_OUT \} from '\.\/harvest-budget\.mjs'/.test(src), true);
-  eq('게시판을 집기 전에 「게시판 하나의 시한만큼 남았나」를 묻는다 (expired 로 바꾸면 예산 끝에서 시한만큼 넘친다)',
-    /if \(!budget\.hasRoom\(BOARD_HARD_MS\)\) \{/.test(src), true);
+  eq('게시판을 집기 전에 「최소 여유가 남았나」를 묻는다 (expired 로 바꾸면 예산이 0 이어도 집는다)',
+    /if \(!budget\.hasRoom\(MIN_ROOM_MS\)\) \{/.test(src), true);
   eq('  시한을 넘긴 게시판은 dead 표식으로 장부·리포트에 더 끼어들지 못한다', /ctx\.dead = true/.test(src) && (src.match(/if \(ctx\.dead\) return;/g) || []).length >= 6, true);
   eq('  저장을 마치면 스스로 끝낸다 (버려진 소켓이 단계를 붙잡지 않게)', /\nprocess\.exit\(0\);\s*$/.test(src), true);
   eq('  health 는 ⏰ 를 성공으로도 실패로도 안 세고 ⛔ 는 실패로 센다', /if \(\/\^⏰\/\.test\(r\.status\)\) continue;/.test(src) && /if \(\/⚠️\|⛔\/\.test\(r\.status\)\)/.test(src), true);
@@ -1428,8 +1428,11 @@ console.log('\n■ 일반 수집 예산 (2026-09-29)');
   /* 마지막 게시판은 예산 안에서 시한까지 돌 수 있다 — hasRoom(BOARD_HARD_MS) 가 그 시한을 예산 안에 넣으므로
      단계 상한은 예산 + 마무리(저장·발행) 여유만 있으면 된다. 기본 시한은 소스에서 읽는다(박아 두지 않는다). */
   const hardMs = Number((src.match(/BOARD_HARD_MS \|\| (\d+)\)/) || [])[1]);
+  const minRoom = Number((src.match(/MIN_ROOM_MS \|\| (\d+)\)/) || [])[1]);
   eq('  게시판 시한이 예산보다 훨씬 짧다 (시한이 예산의 절반을 넘으면 한 게시판이 실행을 삼킨다)', hardMs > 0 && hardMs * 2 < budgetMin * 60000, true);
-  eq('  수집 단계 상한이 수집 예산 + 마무리 1분보다 크다', harvestCap * 60000 > budgetMin * 60000 + 60000, true);
+  eq('  최소 여유는 시한보다 짧다 (같거나 길면 예산 끝을 흘려보낸다 — 2026-09-30 첫 실행에서 116초를 버렸다)', minRoom > 0 && minRoom < hardMs, true);
+  /* 최악: 마지막 게시판이 (예산 − 최소 여유)에 시작해 시한까지 돈다 → 예산 + 시한 − 최소 여유. 여기에 저장·발행 여유 30초. */
+  eq('  수집 단계 상한이 「예산 + 시한 − 최소 여유 + 30초」보다 크다', harvestCap * 60000 > budgetMin * 60000 + hardMs - minRoom + 30000, true);
   eq('  수집 단계가 실패해도 알린다 (continue-on-error 가 크래시를 조용하게 만드므로)', /if: steps\.run\.outcome != 'success'/.test(yml), true);
   const OVERHEAD = 3;
   eq('작업 상한이 단계 상한의 합 + 여유보다 크다', limit > stepCaps.reduce((a, b) => a + b, 0) + OVERHEAD, true);
