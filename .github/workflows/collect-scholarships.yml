@@ -44,6 +44,11 @@ jobs:
     timeout-minutes: 44
     steps:
       - uses: actions/checkout@v4
+        with:
+          # 🔴 대기줄(collector)에서 기다린 뒤에는 **지금 브랜치 끝**에서 시작한다 (2026-09-30).
+          #    기본값(GITHUB_SHA)은 큐에 들어간 시점에 굳어서, 앞 로봇이 저장한 커밋 위로 rebase 하다
+          #    규칙 없는 장부에서 충돌 → 3회 실패 → 그 실행의 수집분이 통째로 버려졌다(브라우저 19곳 17분치).
+          ref: ${{ github.ref_name }}
 
       - name: 협업 병합기 등록 (충돌 자동 해소 — COLLAB.md)
         run: bash tools/setup-collab.sh

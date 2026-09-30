@@ -1438,6 +1438,40 @@ console.log('\n■ 일반 수집 예산 (2026-09-29)');
   eq('작업 상한이 단계 상한의 합 + 여유보다 크다', limit > stepCaps.reduce((a, b) => a + b, 0) + OVERHEAD, true);
 }
 
+/* ── 로봇 대기줄 — 옛 커밋에서 시작하지 않는다 (2026-09-30 사고) ───────────────────────
+   브라우저 수집이 19곳을 17분 동안 다 돌고 **저장 단계에서 통째로 버려졌다**. 수동 실행 둘이 같은 대기줄
+   (concurrency: collector)에 섰는데, 뒤 로봇의 체크아웃 기준(GITHUB_SHA)은 **큐에 들어간 시점**에 굳어서
+   앞 로봇이 저장한 커밋 위로 rebase 하다 규칙 없는 장부 넷(candidates·pagination·notices-text·registered)에서
+   충돌 → 3회 재시도 실패 → exit 1. 예약 실행도 앞 실행 중에 큐에 들어가면 똑같이 당한다.
+   수리 둘: ① 그 대기줄의 워크플로 전부가 `ref: github.ref_name` 으로 **지금 브랜치 끝**에서 시작한다
+   ② 그래도 부딪힐 때를 위해 장부 셋에 병합 규칙, 커서 둘은 내 것. registered.json 은 일부러 그대로(삭제가 뜻을 가진다). */
+console.log('\n■ 로봇 대기줄 — 옛 커밋에서 시작하지 않는다 (2026-09-30)');
+{
+  const root = new URL('../', import.meta.url);
+  const wfDir = new URL('.github/workflows/', root);
+  const files = fs.readdirSync(wfDir).filter((f) => f.endsWith('.yml'));
+  const queued = files.filter((f) => /group:\s*collector\b/.test(readText(new URL(f, wfDir))));
+  eq('collector 대기줄을 쓰는 워크플로가 있다', queued.length >= 2, true);
+  const stale = queued.filter((f) => {
+    const y = readText(new URL(f, wfDir));
+    /* 체크아웃 단계 바로 다음 with 블록에 ref 가 있어야 한다 — 다른 단계의 ref 를 세면 통과해 버린다 */
+    return !/- uses: actions\/checkout@v4\n\s+with:\n(?:\s+#[^\n]*\n)*\s+ref: \$\{\{ github\.ref_name \}\}/.test(y);
+  });
+  eq('  전부 지금 브랜치 끝(ref: github.ref_name)에서 시작한다', stale, []);
+  const ga = readText(new URL('../.gitattributes', import.meta.url));
+  for (const f of ['collector/candidates.json', 'collector/pagination.json', 'collector/extracted/notices-text.json']) {
+    eq(`  ${f} 에 합집합 규칙이 있다`, new RegExp(`^${f.replace(/[./]/g, '\\$&')}\\s+merge=jsonunion`, 'm').test(ga), true);
+  }
+  for (const f of ['collector/browser-cursor.json', 'collector/collect-cursor.json']) {
+    eq(`  ${f} 는 내 것(매 실행 새로 쓰인다)`, new RegExp(`^${f.replace(/[./]/g, '\\$&')}\\s+merge=ours`, 'm').test(ga), true);
+  }
+  eq('  registered.json 은 여전히 자동 병합하지 않는다 (삭제가 뜻을 가진다)', /^data\/registered\.json\s+merge=/m.test(ga), false);
+  /* 병합기가 그 파일들을 실제로 안다 — .gitattributes 만 적고 규칙이 없으면 종료코드 1 로 평범한 충돌이 된다 */
+  const mj = readText(new URL('tools/merge-json-union.mjs', root));
+  eq('  병합기에 규칙 셋이 있다', ['candidates', 'pagination', 'notices-text'].filter((k) => !new RegExp(`match: /[^\\n]*${k}[^\\n]*merge: merge`).test(mj)), []);
+  eq('  검수 후보는 수집기와 같은 합치기 규칙을 쓴다 (베끼지 않는다)', /import \{ mergeCandidates \} from '\.\.\/collector\/candidates\.mjs'/.test(mj), true);
+}
+
 console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
 {
   /* 왜 있나 — 앱에 '대외활동' 탭이 생겼다. 데이터는 장학 피드와 **다른 파일**(data/activities.json)이고
