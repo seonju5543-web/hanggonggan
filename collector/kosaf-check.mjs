@@ -15,6 +15,7 @@ import { execFileSync } from 'node:child_process';
    베끼면 "로봇은 내렸는데 관문은 못 보는" 갈라짐이 생긴다. */
 import { emptyVerdict, readChars } from './kosaf-empty.mjs';
 import { loadBlock, blockKey } from './kosaf-open.mjs';
+import { detailLoss, DROP_LIMIT } from './kosaf-detail-loss.mjs';
 
 let fail = 0;
 const ok = (label, cond, extra = '') => {
@@ -38,15 +39,27 @@ console.log('\n■ 상세(자격 20칸)를 잃지 않았나');
 /* 🔴 여기서 걸린 실제 사고: 목록은 매 실행 새로 받고 상세는 일부만 받으므로,
    이어받기를 빼면 205건이 2건이 된다(2026-08-30에 실측). 지난 회차 재단은 다시
    안 받으므로 한 번 잃으면 영영 못 되찾는다. */
+/* 🔴 개수가 아니라 **재단 코드로** 비교한다 — 목록에서 내려간 재단까지 '잃음'으로 세면
+   영영 저장이 막힌다(2026-09-22~29 세 번 연속 · 이슈 #227). 판정은 kosaf-detail-loss.mjs 한 곳. */
 const nowDetail = (full.items || []).filter((i) => i.detail).length;
-let prevDetail = null;
+let prevItems = null;
 try {
   const prev = JSON.parse(execFileSync('git', ['show', 'HEAD:data/kosaf.json'], { encoding: 'utf8', maxBuffer: 64 << 20 }));
-  prevDetail = (prev.items || []).filter((i) => i.detail).length;
+  prevItems = prev.items || [];
 } catch { /* 처음 커밋 등 — 비교할 것이 없으면 건너뛴다 */ }
-if (prevDetail === null) console.log('  · 비교할 이전 판이 없어 건너뜁니다');
-else ok(`상세가 줄지 않았다 (${prevDetail} → ${nowDetail})`, nowDetail >= prevDetail,
-  '이어받기(prevDetail)가 끊긴 것부터 의심하세요');
+if (prevItems === null) console.log('  · 비교할 이전 판이 없어 건너뜁니다');
+else {
+  const loss = detailLoss(prevItems, full.items);
+  const names = (xs) => xs.slice(0, 5).map((x) => x.name || x.code).join(', ')
+    + (xs.length > 5 ? ` 외 ${xs.length - 5}곳` : '');
+  ok(`목록에 남은 재단의 상세를 잃지 않았다 (지난 ${loss.prevCount}건 → 지금 ${nowDetail}건)`, !loss.lost.length,
+    `${loss.lost.length}곳 — ${names(loss.lost)} · 이어받기(prevDetail)가 끊긴 것부터 의심하세요`);
+  if (loss.dropped.length) {
+    console.log(`  · 한국장학재단 목록에서 내려간 재단 ${loss.dropped.length}곳 — 상세도 함께 빠짐: ${names(loss.dropped)}`);
+  }
+  ok(`목록에서 내려간 재단이 지나치게 많지 않다 (${loss.dropped.length}곳 · ${(loss.dropRate * 100).toFixed(1)}%)`,
+    !loss.tooManyDropped, `${DROP_LIMIT * 100}% 초과 — 재단이 내려간 게 아니라 목록 읽기가 깨졌을 수 있습니다`);
+}
 
 console.log('\n■ 앱이 받는 파일(층2)');
 ok(`비어 있지 않다 (${open.count}곳)`, open.count > 0);

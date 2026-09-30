@@ -56,6 +56,8 @@ import { parseFiles, filenameFrom, nameFromUrl, safeFileName, looksLikeHtml, sni
 import { slimKosaf, blockKey } from '../collector/kosaf-open.mjs';
 /* 층2 빈 껍데기 — '비었나'의 판정은 collector/kosaf-empty.mjs 한 곳이다 */
 import { emptyVerdict, emptyShells, charsOfText, MIN_BODY_CHARS } from '../collector/kosaf-empty.mjs';
+/* 층2 상세를 잃었나 — 판정은 collector/kosaf-detail-loss.mjs 한 곳이다(kosaf-check 가 같은 것을 쓴다) */
+import { detailLoss, DROP_LIMIT } from '../collector/kosaf-detail-loss.mjs';
 
 let fail = 0;
 const eq = (label, got, want) => {
@@ -7592,6 +7594,42 @@ console.log('\n■ 층2 빈 껍데기 판정 (collector/kosaf-empty.mjs)');
   ];
   const chars = (p) => ({ 'p/a': 4, 'p/b': 5000 }[p] ?? null);
   eq('빈 첨부만 골라낸다', emptyShells(items, chars).map((x) => [x.code, x.file]), [['A', '공고문 없음.hwp']]);
+}
+
+/* 🔴 층2 상세 이어받기 (2026-09-30 · 이슈 #227) — 관문이 **개수**로 비교하던 시절,
+   재단 2곳이 한국장학재단 목록에서 내려가자(1,849 → 1,847곳) 그 상세도 빠진 것을
+   '이어받기가 끊겼다'로 읽고 저장을 막았다. 내려간 재단은 돌아오지 않으므로
+   9/22·9/25·9/29 세 번 연속 막혔다. 지금은 재단 코드로 맞춘다. */
+console.log('\n■ 한국장학재단 상세 이어받기 (collector/kosaf-detail-loss.mjs)');
+{
+  const mk = (n, detailed = n) => Array.from({ length: n }, (_, i) => ({
+    code: `C${i}`, org: `재단${i}`, name: '장학생', ...(i < detailed ? { detail: { 자격: 'x' } } : {}),
+  }));
+  const prev = mk(100);
+  /* ① 오늘 사고 재현 — 2곳이 목록에서 내려갔다. 로봇은 정상이므로 막으면 안 된다 */
+  const r1 = detailLoss(prev, prev.slice(2));
+  eq('목록에서 내려간 재단은 "잃음"이 아니다', r1.lost.length, 0);
+  eq('  내려간 재단을 이름과 함께 알린다', r1.dropped.map((x) => x.name), ['재단0 / 장학생', '재단1 / 장학생']);
+  eq('  2%는 지나치게 많지 않다', r1.tooManyDropped, false);
+  /* 🔴 옛 판정(개수 비교)이었다면 ①은 실패였다 — 이 절이 무엇을 고쳤는지 남긴다 */
+  const oldGate = (p, n) => n.filter((i) => i.detail).length >= p.filter((i) => i.detail).length;
+  eq('  (옛 개수 비교는 이 경우를 막았다 — 되돌리면 저장이 영영 막힌다)', oldGate(prev, prev.slice(2)), false);
+  /* ② 진짜 사고 — 목록에 남았는데 상세가 사라졌다(이어받기 끊김) */
+  const cut = prev.map((i, k) => (k === 5 ? { code: i.code, org: i.org, name: i.name } : i));
+  const r2 = detailLoss(prev, cut);
+  eq('목록에 남은 재단의 상세가 사라지면 잡는다', r2.lost.map((x) => x.code), ['C5']);
+  /* ②-2 새 재단이 늘어도 사라진 것을 가리지 못한다(개수 비교의 두 번째 구멍) */
+  const r2b = detailLoss(prev, [...cut, { code: 'NEW', org: '새', name: '재단', detail: { a: 1 } }]);
+  eq('  새로 받은 상세가 사라진 것을 가리지 못한다', r2b.lost.length, 1);
+  /* ③ 목록 읽기가 반쯤 깨진 경우를 '내려감'으로 조용히 넘기지 않는다 */
+  eq('목록의 20%가 사라지면 실패로 본다', detailLoss(prev, prev.slice(20)).tooManyDropped, true);
+  eq('  문턱은 10%', DROP_LIMIT, 0.1);
+  /* ④ 지난번에 상세가 없던 재단이 내려간 것은 셀 대상이 아니다 */
+  eq('상세가 없던 재단이 내려간 것은 세지 않는다', detailLoss(mk(10, 5), mk(10, 5).slice(0, 5)).dropped.length, 0);
+  /* ⑤ 관문이 실제로 이 판정을 쓴다(베낀 규칙이 아니다) */
+  const chk = readText(new URL('../collector/kosaf-check.mjs', import.meta.url));
+  eq('kosaf-check.mjs 가 detailLoss 로 판정한다', /detailLoss\(prevItems, full\.items\)/.test(chk), true);
+  eq('  옛 개수 비교가 남아 있지 않다', /nowDetail >= prevDetail/.test(chk), false);
 }
 
 console.log('\n■ 층2 제외 장부 (collector/kosaf-block.json → slimKosaf)');
