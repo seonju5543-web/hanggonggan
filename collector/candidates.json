@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-09-30",
- "count": 2500,
+ "count": 2512,
  "items": [
   {
    "title": "2026년 재단법인 대전청년내일재단 성취 장학생(대학생) 선발 연..",
@@ -1197,6 +1197,24 @@
    "foundAt": "2026-09-30"
   },
   {
+   "title": "2026년도 국가유산진흥원 전통 기·예능 분야 및 매장유산 관련 분야 우수 장학생 선발 안내",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&#038;category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&#038;pageIndex=3&#038;uid=361",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-09-30"
+  },
+  {
+   "title": "2026년도 인천인재평생교육진흥원 하반기 장학생 선발 안내",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&#038;category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&#038;pageIndex=3&#038;uid=362",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-09-30"
+  },
+  {
    "title": "대전청년내일재단 2026년 하반기 인재육성(성취) 장학생 선발 안내",
    "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&#038;category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&#038;pageIndex=3&#038;uid=363",
    "attachments": [],
@@ -1526,6 +1544,38 @@
    "foundAt": "2026-09-30"
   },
   {
+   "title": "[교외장학] 2026년도 하반기 재단법인 논산시장학회 장학생 선발 공고",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=376788&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "2026년도 하반기 재단법인 논산시장학회 장학생 선발 공고문(발췌본).hwpx",
+     "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=file-download&articleNo=376788&attachNo=334418"
+    },
+    {
+     "name": "2026년도 하반기 재단법인 논산시장학회 장학생 신청 서식.hwpx",
+     "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=file-download&articleNo=376788&attachNo=334419"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-09-30"
+  },
+  {
+   "title": "[교외장학] 2026년 하반기 대전청년내일재단 성취 장학생(대학생) 모집 연장",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=376795&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "2026년 성취(대) 장학생 선발계획 연장 공고.hwpx",
+     "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=file-download&articleNo=376795&attachNo=334423"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-09-30"
+  },
+  {
    "title": "[학생지원팀] (재)대전청년내일재단 2026년 2학기 인재육성(성취) 장학생 선발 안내(기간 연장)",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=275600&article.offset=0&articleLimit=10&srCategoryId=22",
    "attachments": [
@@ -1652,6 +1702,28 @@
     }
    ],
    "deadlineHint": "신청기간 2026.09.28.(월) 09:00 ~ 10. 30.(금) 18:00 4. 신청방법 논산시청 인구청년교육과 교육지원팀 방문 접수 등기",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-09-30"
+  },
+  {
+   "title": "[학생지원팀] 2026학년도 2학기 하나금융나눔재단 하나장학생 선발 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276264&article.offset=0&articleLimit=10&srCategoryId=22",
+   "attachments": [
+    {
+     "name": "3. 하나장학생 신청서(대학생용).docx",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276264&attachNo=226022"
+    },
+    {
+     "name": "[재단양식] 개인정보 수집이용 및 제공 동의서.pdf",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276264&attachNo=226023"
+    },
+    {
+     "name": "[가톨릭대] 외부장학금 신청 및 추천을 위한 개인정보 수집 및 이용 동의서.hwpx",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276264&attachNo=226024"
+    }
+   ],
+   "deadlineHint": "제출기한 - 트리니티 신청: 2026. 10. 2.(금)까지 - 원본서류 제출: 2026. 10. 6.(화) 12:00까지 &nbsp; ※ 학생",
    "school": "가톨릭대학교",
    "campus": "",
    "foundAt": "2026-09-30"
@@ -3464,6 +3536,38 @@
    "foundAt": "2026-09-30"
   },
   {
+   "title": "[학부-교외장학] 2026학년도 하반기 (재)논산시장학회 장학생 선발 안내",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/45670/artclView.do",
+   "attachments": [
+    {
+     "name": "2026년도 하반기 재단법인 논산시장학회 장학생 신청 서식.hwpx",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41426/download.do"
+    },
+    {
+     "name": "2026년도 하반기 재단법인 논산시장학회 장학생 선발 공고문(발췌본).hwpx",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41427/download.do"
+    }
+   ],
+   "deadlineHint": "신청 기한 :&nbsp; ~ 2026. 10. 30. (금) 18:00 2. 지원내용 : 150만 원 (※생활비성 장학금) 3. 지원 자격 &n",
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-09-30"
+  },
+  {
+   "title": "[학부-교외장학] 2026학년도 대전청년내일재단 성취(대) 장학생 선발 안내(기간연장)",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/45671/artclView.do",
+   "attachments": [
+    {
+     "name": "2026년 성취(대) 장학생 선발계획 연장 공고.hwpx",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41428/download.do"
+    }
+   ],
+   "deadlineHint": "접수 기한 : ~ 26. 10. 8. (목) 17:00(기간연장) 6. 접수처 : 대전청년포털(www.daejeonyouthportal.kr)",
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-09-30"
+  },
+  {
    "title": "(재)대전청년내일재단 2026년 하반기 인재육성(성취) 장학생 선발 안내",
    "url": "https://www.jbnu.ac.kr/web/Board/217248/detailView.do?category=6",
    "attachments": [],
@@ -3549,6 +3653,24 @@
    "url": "https://www.jbnu.ac.kr/web/Board/217794/detailView.do?category=6",
    "attachments": [],
    "deadlineHint": "신청기한: 2026. 10. 15.(목) 17:00 4. 제출서류: 장학생지원서, 성적증명서, 재학증명서, 가족관계증명서, 개인정보수집이용동의서",
+   "school": "전북대학교",
+   "campus": "",
+   "foundAt": "2026-09-30"
+  },
+  {
+   "title": "2026년 전북특별자치도 토박이장학생 선발 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/217993/detailView.do?category=6",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "전북대학교",
+   "campus": "",
+   "foundAt": "2026-09-30"
+  },
+  {
+   "title": "2026년도 하반기 (재)논산시장학회 학업장려 장학생 선발 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/217994/detailView.do?category=6",
+   "attachments": [],
+   "deadlineHint": "접수기간 : 2026.&nbsp; 9.&nbsp; 28.(월) 09:00 ~ 10. 30(금) 18:00 4. 접 수 처 : 논산시청 인구청년교",
    "school": "전북대학교",
    "campus": "",
    "foundAt": "2026-09-30"
@@ -5842,6 +5964,40 @@
    "foundAt": "2026-09-30"
   },
   {
+   "title": "[등록/장학] [대전광역시] 2026년 하반기 인재육성(성취) 장학생 선발 안내(기간연장)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53299&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [
+    {
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "부설연구기관",
+     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-09-30"
+  },
+  {
    "title": "[등록/장학] 2026학년도 2학기 가족장학금 신청 안내",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53316&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "attachments": [
@@ -5973,6 +6129,40 @@
     }
    ],
    "deadlineHint": "접수 기간 : 2026 년 9 월 28 일 (월 ) ~ 2026 년 10 월 30 일 (금 ) ※ 시 홈페이지 , 읍 · 면 · 동 단체회의 등",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-09-30"
+  },
+  {
+   "title": "[일반] [한국장학재단] 2026 대전 일자리 박람회",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53407&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [
+    {
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "부설연구기관",
+     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    }
+   ],
+   "deadlineHint": null,
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-09-30"
@@ -6601,6 +6791,32 @@
   {
    "title": "[보건진료소] 2026학년도 2학기 국가근로장학생 모집 안내",
    "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=57138&bidx=894195&qidx=57138&cate=0&allboard=true&nowpage=2",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "서식1. 국가근로장학생 지원서(학생).hwp",
+     "url": "javascript:downloadfile("
+    }
+   ],
+   "deadlineHint": "모집기간: &nbsp;~ 2026. 8. 25.(화) 15:00까지 &nbsp;&rarr; 기간 내 지원한 서류만 검토 * 지원자가 많을 시 조",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-09-30"
+  },
+  {
+   "title": "[보건진료소] 2026학년도 2학기 국가근로장학생 모집 안내",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=57138&bidx=894195&qidx=57138&cate=0&allboard=true&nowpage=3",
    "attachments": [
     {
      "name": "장학금 신청 주요 일정",

@@ -6873,6 +6873,303 @@
     "raw": "3. 장학 금액 : 300만 원 / 인 (※ 생활비성 장학금)"
    },
    "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-larshipdoarticleno376795",
+   "name": "[교외장학] 2026년 하반기 대전청년내일재단 성취 장학생(대학생) 모집 연장",
+   "boardTitle": "[교외장학] 2026년 하반기 대전청년내일재단 성취 장학생(대학생) 모집 연장",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-30",
+   "period": "접수 기간 원문 확인",
+   "summary": "아주대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "아주대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026년 성취(대) 장학생 선발계획 연장 공고.hwpx",
+     "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=file-download&articleNo=376795&attachNo=334423"
+    }
+   ],
+   "sourceUrl": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=376795&article.offset=0&articleLimit=10",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-993detailviewdocategory6",
+   "name": "2026년 전북특별자치도 토박이장학생 선발 안내",
+   "boardTitle": "2026년 전북특별자치도 토박이장학생 선발 안내",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-30",
+   "period": "접수 기간 원문 확인",
+   "summary": "전북대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "전북대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.jbnu.ac.kr/web/Board/217993/detailView.do?category=6",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-0005009002000000seq31571",
+   "name": "[빅데이터혁신융합대학사업단] 2026학년도 2학기 성과형 장학금(자격증) 신청 안내",
+   "boardTitle": "[빅데이터혁신융합대학사업단] 2026학년도 2학기 성과형 장학금(자격증) 신청 안내",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-30",
+   "period": "접수 기간 원문 확인",
+   "summary": "서울시립대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서울시립대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31571&sort=7&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "3. 신청 자격 [가~다]",
+    "가. 빅데이터 마이크로디그리 이수(예정)자",
+    "- 재학 기간 동안 빅데이터 교과목을 1과목 이상 수강해야 함",
+    "-2026년 2학기 수강 중인 과목도 인정",
+    "-빅데이터표준 마이크로디그리 교과목과 연계융합표준 마이크로디그리 교과목 모두 인정",
+    "- 대체 교과목은 인정하지 않음",
+    "- 교과목 관련 자세한 내용은 [첨부파일 2] 참고",
+    "나. 2026학년도 2학기 등록한 학부 재학생",
+    "- 휴학생 및 대학원생 신청 불가",
+    "다. 대상 자격증을 인정 기간(2026. 1. 1.(목) ~ 2026. 12. 7.(월)) 내 취득한 자",
+    "- 신청 시점에 자격증 취득이 '최종합격' 완료되어야 인정"
+   ],
+   "excerpts": [
+    "전화 : 02-6490-6114 / 서울시통합문의 : 02-120"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-leno275600srcategoryid22",
+   "name": "[학생지원팀] (재)대전청년내일재단 2026년 2학기 인재육성(성취) 장학생 선발 안내(기간 연장)",
+   "boardTitle": "[학생지원팀] (재)대전청년내일재단 2026년 2학기 인재육성(성취) 장학생 선발 안내(기간 연장)",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-30",
+   "period": "접수 기간 원문 확인",
+   "summary": "가톨릭대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "가톨릭대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026년 성취(대) 장학생 선발계획 연장 공고.hwpx",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=275600&attachNo=225949"
+    }
+   ],
+   "sourceUrl": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=275600&article.offset=0&articleLimit=10&srCategoryId=22",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-leno275978srcategoryid22",
+   "name": "[학생지원팀](한국장학재단)2026년도 2학기 고졸 후학습자 장학사업(희망사다리Ⅱ유형) 신규장학생 신청기간 연장 안내",
+   "boardTitle": "[학생지원팀](한국장학재단)2026년도 2학기 고졸 후학습자 장학사업(희망사다리Ⅱ유형) 신규장학생 신청기간 연장 안내",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-30",
+   "period": "접수 기간 원문 확인",
+   "summary": "가톨릭대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "가톨릭대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=275978&article.offset=0&articleLimit=10&srCategoryId=22",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-leno275925srcategoryid22",
+   "name": "[장애학생지원센터] 2026학년도 2학기 장애학생 특별장학금 신청안내(-9/23/수, 17시까지)",
+   "boardTitle": "[장애학생지원센터] 2026학년도 2학기 장애학생 특별장학금 신청안내(-9/23/수, 17시까지)",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-09-23",
+   "listedAt": "2026-09-30",
+   "period": "접수 기간 ~2026-09-23",
+   "summary": "가톨릭대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "가톨릭대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "개인정보수집 이용동의서(장애학생특별장학금신청).hwp",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=275925&attachNo=225665"
+    }
+   ],
+   "sourceUrl": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=275925&article.offset=0&articleLimit=10&srCategoryId=22",
+   "sourceKind": "auto",
+   "deadlineFrom": "공고 원문",
+   "applyEmail": "cukedu1213@catholic.ac.kr",
+   "applyEmailSource": "▶ 서류제출 ( 이메일 ) : cukedu1213@catholic.ac.kr",
+   "applyEmailFrom": "공고 원문",
+   "openDate": "2026-09-16",
+   "eligibilityLines": [
+    "2. 신청자격 및 선발인원",
+    "가. 신청자격(학부생)",
+    ": 장애인복지법에 적용받는 장애학생(재학생) 중 아래 기준에 해당하는 장학금 신청자",
+    "직전 학기 성적기준 : 평점 평균 1.8 이상 /15 학점 이상 이수자",
+    "※ 2026-2학기 기준, 편입생·휴학생·9차(초과학기)이상자 등록자는 신청이 불가함",
+    "나. 선발인원 : 신청자격에 부합하는 모든 신청자 선발"
+   ],
+   "excerpts": [
+    "문의처 : 장애학생지원센터(니콜스관 1층, N109호) : 02-2164-4699"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-notiphpcodes1301seq11120",
+   "name": "2026학년도 2학기 교내장학금 신청 안내 학생지원팀 2026-09-02 1,076",
+   "boardTitle": "2026학년도 2학기 교내장학금 신청 안내 학생지원팀 2026-09-02 1,076",
+   "type": "교내",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-09-18",
+   "listedAt": "2026-09-30",
+   "period": "접수 기간 ~2026-09-18",
+   "summary": "한국항공대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국항공대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "1. 2026학년도 2학기 장학 신청서.hwp",
+     "url": "https://kau.ac.kr/upfile/2026/09/02/20260902103858-3922.hwp"
+    },
+    {
+     "name": "2. 2026학년도 2학기 은익C장학(학부(과)장) 추천서.hwp",
+     "url": "https://kau.ac.kr/upfile/2026/09/02/20260902103858-8690.hwp"
+    }
+   ],
+   "sourceUrl": "https://kau.ac.kr/kaulife/scholnoti.php?searchkey=&searchvalue=&code=s1301&page=&mode=read&seq=11120",
+   "sourceKind": "auto",
+   "deadlineFrom": "공고 원문",
+   "openDate": "2026-09-01",
+   "eligibilityLines": [
+    "국가유공자장학",
+    "국가유공자와 그자녀 , 독립유공자와 그 손 • 자녀",
+    "국가유공자 자녀 : 등록금 1/2",
+    "국가유공자 본인 : 등록금전액",
+    "북한이탈주민장학",
+    "우리 대학 재학생"
+   ]
+  },
+  {
+   "id": "auto-notiphpcodes1301seq11234",
+   "name": "2026년 하반기 인재육성 성취(대) 장학생 선발 안내 학생지원팀 2026-09-28 142",
+   "boardTitle": "2026년 하반기 인재육성 성취(대) 장학생 선발 안내 학생지원팀 2026-09-28 142",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-10-08",
+   "listedAt": "2026-09-30",
+   "period": "접수 기간 ~2026-10-08",
+   "summary": "한국항공대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국항공대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026년 성취(대) 장학생 선발계획 연장 공고.hwpx",
+     "url": "https://kau.ac.kr/upfile/2026/09/28/20260928062726-3313.hwpx"
+    }
+   ],
+   "sourceUrl": "https://kau.ac.kr/kaulife/scholnoti.php?searchkey=&searchvalue=&code=s1301&page=&mode=read&seq=11234",
+   "sourceKind": "auto",
+   "deadlineFrom": "공고 원문",
+   "openDate": "2026-09-01",
+   "excerpts": [
+    "선발인원 : 468 명 ( 대전 지역 소재 대학 374 명 , 타지역 소재 대학 94 명 ) / 1 인 150 만 원",
+    "신청방법 : 대전청년포털 ( www.daejeonyouthportal.kr) 온라인 신청",
+    "기타문의 : 대전청년내일재단 인재육성팀 ( ☎ 042-719-8451~2)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   }
  ]
 }

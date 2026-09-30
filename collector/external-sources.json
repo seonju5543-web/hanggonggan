@@ -516,49 +516,116 @@
    "host": "재단법인 대하장학회",
    "home": "https://cafe.daum.net/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "https://top.cafe.daum.net/",
+     "signals": 0
+    }
+   }
   },
   {
    "host": "파안장학문화재단법인",
    "home": "https://paan.or.kr/",
-   "boardUrl": null,
-   "seed": "kosaf-open"
+   "boardUrl": "https://paan.or.kr/",
+   "seed": "kosaf-open",
+   "autoFound": {
+    "date": "2026-09-30",
+    "signals": 20,
+    "menu": "(홈)",
+    "sample": [
+     "장학생 신청/자선기금 수혜자 모집 및 발표",
+     "1 파안장학문화재단법인, 2026 추석 자선금 지원자 선정 발표 파안장학문화재단법인이 2026 추석 자선금 지원자를 다음과 같이 선정하였습니다.명영O한경O명환O임재O오성O성아O이상 6명자선기금은 개인 당 ... 2026-09-22",
+     "1 파안장학문화재단법인이 어려운 이웃을 위해 2026 추석 자선기금 지원신청을 받습니... 파안장학문화재단법인2026년 추석 자선기금 지원 신청 안내 다가오는 추석을 앞두고 파안장학문화재단법인이어려운 우리 이웃을 위해 ... 2026-08-31"
+    ]
+   }
   },
   {
    "host": "메디힐장학재단",
    "home": "https://medihealsf.or.kr/",
-   "boardUrl": null,
-   "seed": "kosaf-open"
+   "boardUrl": "https://medihealsf.or.kr/",
+   "seed": "kosaf-open",
+   "autoFound": {
+    "date": "2026-09-30",
+    "signals": 6,
+    "menu": "(홈)",
+    "sample": [
+     "2018롯데면세점-메디힐 글로벌 앰버서더 장학금",
+     "[메디힐유임순장학금] 2021학년도 2학기 메디힐유임순장학생 장학금 수령방법 공지 --> --> --> [메디힐유임순장학금] 2021학년도 2학기 메디힐유임순장학생 장학금 수령방법",
+     "[메디힐유임순장학금] 2021학년도 1학기 메디힐유임순장학생 장학금 수령 방법 공지 --> --> --> [메디힐유임순장학금] 2021학년도 1학기 메디힐유임순장학생 장학금 수령 방법"
+    ]
+   }
   },
   {
    "host": "울산광역시 남구장학재단",
    "home": "http://www.unsf.or.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "홈페이지 못 엶 (HTTP 403)",
+    "best": null
+   }
   },
   {
    "host": "(재)부산북구장학회",
    "home": "http://www.bsbukgu.go.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "https://www.bsbukgu.go.kr/index.bsbukgu",
+     "signals": 0
+    }
+   }
   },
   {
    "host": "(재)고속도로장학재단",
    "home": "http://www.hsf.or.kr/",
-   "boardUrl": null,
-   "seed": "kosaf-open"
+   "boardUrl": "http://www.hsf.or.kr/",
+   "seed": "kosaf-open",
+   "autoFound": {
+    "date": "2026-09-30",
+    "signals": 3,
+    "menu": "(홈)",
+    "sample": [
+     "'원거리 진학 대학생 주거비 장학금 지원 사업' 대상자 선발결과 2026.09.10",
+     "2026년 고속도로장학생 선발 안내(9.14(월)부터 모집) 2026.09.08",
+     "[마감] '원거리 진학 대학생 주거 장학금 지원 사업(신설)' 대상자 모집(8.10~) 2026.07.28"
+    ]
+   }
   },
   {
    "host": "(사)한국해기사협회",
    "home": "http://www.mariners.or.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "최고 1건 ((홈))",
+    "best": {
+     "url": "https://www.mariners.or.kr/",
+     "signals": 1
+    }
+   }
   },
   {
    "host": "영국문화원",
    "home": "http://www.britishcouncil.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "최고 1건 ((홈))",
+    "best": {
+     "url": "https://www.britishcouncil.kr/",
+     "signals": 1
+    }
+   }
   },
   {
    "host": "파주돈재갑진장학회",

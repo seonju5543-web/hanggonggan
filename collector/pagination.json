@@ -364,5 +364,49 @@
  "https://www.lottefoundation.or.kr/notice": {
   "ok": false,
   "checkedAt": "2026-09-30"
+ },
+ "https://scholarship.eumseong.go.kr/www/index.do": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "https://janghak.songpa.go.kr/22": {
+  "ok": true,
+  "way": {
+   "kind": "page",
+   "param": "page"
+  },
+  "checkedAt": "2026-09-30"
+ },
+ "https://paan.or.kr/": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "https://medihealsf.or.kr/": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "http://www.hsf.or.kr/": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "https://www.korea.kr/etc/byulBeforeList.do": {
+  "ok": true,
+  "way": {
+   "kind": "page",
+   "param": "pageIndex"
+  },
+  "checkedAt": "2026-09-30"
+ },
+ "https://young.busan.go.kr/jprog/list.nm": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "https://www.ulsan.go.kr/s/ulsanyouth/main.ulsan": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "https://ydjh.yd21.go.kr/": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
  }
 }
