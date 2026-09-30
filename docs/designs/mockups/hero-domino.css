@@ -1,0 +1,32 @@
+/* 홈 히어로 — 도미노 온보딩 '총 자산' 꼴 (2026-09-30 시안). 앱 토큰만 쓴다. */
+.hero-band { margin: -20px -20px 0; padding: calc(20px + env(safe-area-inset-top)) 20px 24px; background: var(--navy-1); color: #fff; }
+.hero-band .home-header { margin-bottom: var(--sp-3); padding-bottom: 0; }
+.hero-band .home-greet { color: #fff; }
+.hero-band .home-school { color: rgba(232,239,254,0.72); }
+.hero-band .avatar { background: #fff; color: var(--navy-1); }
+.hero-band .bell-btn { color: #fff; }
+.hb-label { font-size: var(--t-sm); font-weight: 600; color: rgba(232,239,254,0.72); }
+.hb-amount { display: flex; align-items: baseline; gap: 6px; margin-top: 8px; font-variant-numeric: tabular-nums; letter-spacing: -0.04em; line-height: 1; }
+.hb-max { font-size: var(--t-xl); font-weight: 700; color: rgba(232,239,254,0.72); letter-spacing: -0.01em; }
+.hb-num { font-size: 52px; font-weight: 800; }
+.hb-unit { font-size: var(--t-3xl); font-weight: 800; }
+.hb-rows { list-style: none; margin: 22px 0 0; padding: 0;
+  -webkit-mask-image: linear-gradient(#000 60%, transparent 100%); mask-image: linear-gradient(#000 60%, transparent 100%); }
+.hb-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid rgba(232,239,254,0.12); }
+.hb-ini { flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--navy-2); color: #fff; font-size: var(--t-xs); font-weight: 800; display: flex; align-items: center; justify-content: center; }
+.hb-name { flex: 1; min-width: 0; font-size: var(--t-sm); font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hb-right { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-variant-numeric: tabular-nums; }
+.hb-right b { font-size: var(--t-sm); font-weight: 800; color: #fff; }
+.hb-right small { font-size: var(--t-2xs); font-weight: 600; color: rgba(232,239,254,0.6); }
+.hb-cta { margin-top: 14px; }
+/* 밝은 변형 — 같은 구조를 흰 바탕에 */
+.hero-band.light { background: var(--bg); color: var(--text); padding-bottom: 8px; }
+.hero-band.light .home-greet { color: var(--text); }
+.hero-band.light .home-school { color: var(--text-weak); }
+.hero-band.light .avatar { background: var(--primary); color: #fff; }
+.hero-band.light .bell-btn { color: var(--text); }
+.hero-band.light .hb-label, .hero-band.light .hb-max { color: var(--text-sub); }
+.hero-band.light .hb-row { border-top-color: var(--line); }
+.hero-band.light .hb-ini { background: var(--primary-weak); color: var(--primary); }
+.hero-band.light .hb-name, .hero-band.light .hb-right b { color: var(--text); }
+.hero-band.light .hb-right small { color: var(--text-weak); }
