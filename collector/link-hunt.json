@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-09-29",
+ "updatedAt": "2026-09-30",
  "items": {
   "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2668%20%5B%ED%99%8D%EB%B3%B4%5D%20%ED%95%9C%EA%B5%AD%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EA%B3%B5%EA%B3%B5%EB%8D%B0%EC%9D%B4%ED%84%B0%20%EA%B0%9C%EB%B0%A9%20%EB%B0%8F%20%ED%99%9C%EC%9A%A9%20%EC%95%88%EB%82%B4%202026.0": {
    "attempts": 5,
@@ -3355,13 +3355,13 @@
    "lastWhy": ""
   },
   "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%20%EC%A0%9C36%EA%B8%B0%20%EB%AF%B8%EB%A0%88%EC%97%90%EC%85%8B%20%ED%95%B4%EC%99%B8%EA%B5%90%ED%99%98%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C": {
-   "attempts": 4,
+   "attempts": 5,
    "title": "공통 제36기 미레에셋 해외교환 장학생 선발",
-   "lastTried": "2026-09-23",
+   "lastTried": "2026-09-30",
    "lastWhy": "목록에서 못 찾음",
    "status": "",
    "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322953",
-   "nextTryAt": "2026-09-30",
+   "nextTryAt": "2026-10-14",
    "escalated": true,
    "likelyGone": true
   },
@@ -3761,29 +3761,29 @@
   "r:reg-khu-uiam": {
    "patrolledAt": "2026-09-06",
    "lastWhy": "목록에서 못 찾음",
-   "lastTried": "2026-09-23",
-   "attempts": 4,
+   "lastTried": "2026-09-30",
+   "attempts": 5,
    "status": "",
-   "nextTryAt": "2026-09-30",
+   "nextTryAt": "2026-10-14",
    "escalated": true,
    "likelyGone": true
   },
   "r:reg-hi-jeongeup": {
    "patrolledAt": "2026-09-06",
    "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)",
-   "lastTried": "2026-09-23",
-   "attempts": 4,
+   "lastTried": "2026-09-30",
+   "attempts": 5,
    "status": "",
-   "nextTryAt": "2026-09-30",
+   "nextTryAt": "2026-10-14",
    "escalated": true
   },
   "r:reg-khu-intern": {
    "patrolledAt": "2026-09-06",
    "lastWhy": "목록에서 못 찾음",
-   "lastTried": "2026-09-23",
-   "attempts": 4,
+   "lastTried": "2026-09-30",
+   "attempts": 5,
    "status": "",
-   "nextTryAt": "2026-09-30",
+   "nextTryAt": "2026-10-14",
    "escalated": true,
    "likelyGone": true
   },
@@ -4340,6 +4340,166 @@
   },
   "r:auto-ent2431267935artclviewdo": {
    "patrolledAt": "2026-09-29",
+   "lastWhy": ""
+  },
+  "n:https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&#038;category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&#038;uid=392": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&#038;category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&#038;uid=391": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&#038;category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&#038;uid=390": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&#038;category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&#038;uid=389": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&#038;category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&#038;uid=365": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&#038;category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&#038;uid=364": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&#038;category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&#038;uid=363": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&#038;category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&#038;uid=362": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.yonsei.ac.kr/bbs/sc/58/944220/artclView.do": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.yonsei.ac.kr/bbs/sc/58/944184/artclView.do": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.yonsei.ac.kr/bbs/sc/58/944175/artclView.do": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.yonsei.ac.kr/bbs/sc/58/944136/artclView.do": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.yonsei.ac.kr/bbs/sc/58/944133/artclView.do": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.yonsei.ac.kr/bbs/sc/58/944122/artclView.do": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.yonsei.ac.kr/bbs/sc/58/944104/artclView.do": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.yonsei.ac.kr/bbs/sc/58/944101/artclView.do": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.yonsei.ac.kr/bbs/sc/58/944090/artclView.do": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.yonsei.ac.kr/bbs/sc/58/944066/artclView.do": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.yonsei.ac.kr/bbs/sc/58/944063/artclView.do": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.yonsei.ac.kr/bbs/sc/58/944062/artclView.do": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.yonsei.ac.kr/bbs/sc/58/944052/artclView.do": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.yonsei.ac.kr/bbs/sc/58/944031/artclView.do": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.yonsei.ac.kr/bbs/sc/58/944030/artclView.do": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.yonsei.ac.kr/bbs/sc/58/944016/artclView.do": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.yonsei.ac.kr/bbs/sc/58/943993/artclView.do": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&#038;category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&#038;uid=361": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140050&article.offset=0&articleLimit=10": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140196&article.offset=0&articleLimit=10": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140127&article.offset=0&articleLimit=10": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140108&article.offset=0&articleLimit=10": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140039&article.offset=0&articleLimit=10": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=139996&article.offset=0&articleLimit=10": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=139991&article.offset=0&articleLimit=10": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.konkuk.ac.kr/bbs/konkuk/235/1206961/artclView.do": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.konkuk.ac.kr/bbs/konkuk/235/1208556/artclView.do": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.konkuk.ac.kr/bbs/konkuk/235/1208222/artclView.do": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.konkuk.ac.kr/bbs/konkuk/235/1208146/artclView.do": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.konkuk.ac.kr/bbs/konkuk/235/1208043/artclView.do": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.konkuk.ac.kr/bbs/konkuk/235/1208040/artclView.do": {
+   "patrolledAt": "2026-09-30",
+   "lastWhy": ""
+  },
+  "n:https://www.konkuk.ac.kr/bbs/konkuk/235/1208039/artclView.do": {
+   "patrolledAt": "2026-09-30",
    "lastWhy": ""
   }
  }

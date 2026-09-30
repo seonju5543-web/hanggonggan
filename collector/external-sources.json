@@ -5,49 +5,114 @@
    "host": "해석정해영선생장학문화재단",
    "home": "http://www.haesuk.or.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "http://www.haesuk.or.kr/",
+     "signals": 0
+    }
+   }
   },
   {
    "host": "가천문화재단",
    "home": "http://gachon.or.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "http://gachon.or.kr/",
+     "signals": 0
+    }
+   }
   },
   {
    "host": "울진군장학재단",
    "home": "http://www.uljinsf.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "http://www.uljinsf.kr/",
+     "signals": 0
+    }
+   }
   },
   {
    "host": "서울특별시 양천구청",
    "home": "https://www.yangcheon.go.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "홈페이지 못 엶 (fetch failed)",
+    "best": null
+   }
   },
   {
    "host": "국가보훈부",
    "home": "https://www.mpva.go.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "https://www.mpva.go.kr/",
+     "signals": 0
+    }
+   }
   },
   {
    "host": "영동군민장학회",
    "home": "https://www.yd21.go.kr/",
-   "boardUrl": null,
-   "seed": "kosaf-open"
+   "boardUrl": "https://ydjh.yd21.go.kr/",
+   "seed": "kosaf-open",
+   "autoFound": {
+    "date": "2026-09-30",
+    "signals": 6,
+    "menu": "영동군민장학회 영동군민장학회",
+    "sample": [
+     "장학증서 출력 영동군 장학회에 선발된 장학생들의 장학증서 조회 및 출력을 할 수 있습니다. -->",
+     "사항 2026년 영동군민장학생 선발 알림 2026.08.26",
+     "사항 2026년도 향토장학금 지원 신청 마... 2026.07.30"
+    ]
+   }
   },
   {
    "host": "(재)음성군장학회",
    "home": "https://scholarship.eumseong.go.kr/",
-   "boardUrl": null,
-   "seed": "kosaf-open"
+   "boardUrl": "https://scholarship.eumseong.go.kr/www/index.do",
+   "seed": "kosaf-open",
+   "autoFound": {
+    "date": "2026-09-30",
+    "signals": 5,
+    "menu": "(홈)",
+    "sample": [
+     "2026년 군민평생 장학생 선발 공고",
+     "2026년 2학기 우수대학생 특별장학금(前명문대 특별장학금) 신청 접수 및 지급 계획 안내",
+     "2026년 전입장학금 지원 공고"
+    ]
+   }
   },
   {
    "host": "(재)앨트웰민초장학재단",
    "home": "http://www.mincho.or.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "http://www.mincho.or.kr/",
+     "signals": 0
+    }
+   }
   },
   {
    "host": "한국광산장학회",
