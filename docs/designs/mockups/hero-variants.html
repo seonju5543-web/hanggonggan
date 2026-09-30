@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>홈 히어로 후보 셋 (2026-09-30)</title>
+<!-- 앱의 실제 style.css 를 그대로 싣는다 — 색·글자·모서리가 앱과 같아야 고를 수 있다.
+     A 는 앱에 이미 넣은 것(style.css 히어로 절)이고, B·C 는 이 파일 안 <style> 로만 그린다. -->
+<link rel="stylesheet" href="../../../style.css">
+<style>
+  body { background: var(--bg); padding: 16px 20px 40px; max-width: 480px; margin: 0 auto; }
+  .variant { margin-bottom: 36px; }
+  .v-head { font-size: var(--t-xs); font-weight: 700; color: var(--text-weak); margin-bottom: 10px; letter-spacing: 0.02em; }
+  .v-note { font-size: var(--t-xs); color: var(--text-sub); line-height: 1.6; margin-top: 10px; }
+  /* B — 밝은 판: 흰 면 + 얇은 선, 글자는 잉크, 버튼은 주 버튼(남색) */
+  .v-b .hero-card { background: var(--surface); color: var(--text); border: 1px solid var(--line); }
+  .v-b .hero-label { color: var(--text-sub); }
+  .v-b .hero-amount { border-bottom-color: var(--line); }
+  /* C — 판 없음: 바탕 위에 글자만, 아래 얇은 선 하나로 목록과 가른다 */
+  .v-c .hero-card { background: none; color: var(--text); border-radius: 0; padding: 4px 0 24px; border-bottom: 1px solid var(--line); margin-bottom: 0; }
+  .v-c .hero-label { color: var(--text-sub); }
+  .v-c .hero-amount { border-bottom: 0; padding-bottom: 0; }
+</style>
+</head>
+<body>
+  <section class="variant v-a">
+    <p class="v-head">A · 정돈된 남색 판 (추천 · 앱에 넣어 둠)</p>
+    <div class="hero-card">
+      <p class="hero-label">지금 신청할 수 있는 장학금 19건</p>
+      <p class="hero-amount">최대 3,663만원</p>
+      <button class="btn btn-white btn-lg">18건 신청 준비</button>
+    </div>
+    <p class="v-note">장식(오른쪽 위 원 · 주황 빛 두 겹)을 걷고 남색 판에 은은한 빛 하나만 남겼다. 금액 밑에 얇은 선을 두어 '숫자'와 '동작'을 가른다. 미니스탁·네이버페이의 자산 요약처럼 요소 셋만 남는다.</p>
+  </section>
+  <section class="variant v-b">
+    <p class="v-head">B · 밝은 판 (토스·미니스탁 꼴)</p>
+    <div class="hero-card">
+      <p class="hero-label">지금 신청할 수 있는 장학금 19건</p>
+      <p class="hero-amount">최대 3,663만원</p>
+      <button class="btn btn-primary btn-lg">18건 신청 준비</button>
+    </div>
+    <p class="v-note">흰 면 위 얇은 선 한 장. 앱의 '어두운 판은 홈 히어로 하나' 결정(DESIGN.md)을 버리는 대신 화면 전체가 한 톤이 된다.</p>
+  </section>
+  <section class="variant v-c">
+    <p class="v-head">C · 판 없음 (미니스탁 홈 꼴)</p>
+    <div class="hero-card">
+      <p class="hero-label">지금 신청할 수 있는 장학금 19건</p>
+      <p class="hero-amount">최대 3,663만원</p>
+      <button class="btn btn-primary btn-lg">18건 신청 준비</button>
+    </div>
+    <p class="v-note">그릇 없이 글자만 둔다. 가장 조용하지만 첫 화면에서 '여기가 요약'이라는 신호가 약하다.</p>
+  </section>
+</body>
+</html>
