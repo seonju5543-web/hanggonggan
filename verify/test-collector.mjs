@@ -1404,8 +1404,8 @@ console.log('\n■ 일반 수집 예산 (2026-09-29)');
   const src = readText(new URL('collector/collect.mjs', root));
   eq('예산·시한·회전을 harvest-budget 에서 불러 쓴다 (베끼지 않는다)',
     /import \{ makeBudget, rotateOrder, nextCursor, withDeadline, TIMED_OUT \} from '\.\/harvest-budget\.mjs'/.test(src), true);
-  eq('게시판을 집기 전에 「게시판 하나의 시한만큼 남았나」를 묻는다 (expired 로 바꾸면 예산 끝에서 시한만큼 넘친다)',
-    /if \(!budget\.hasRoom\(BOARD_HARD_MS\)\) \{/.test(src), true);
+  eq('게시판을 집기 전에 「최소 여유가 남았나」를 묻는다 (expired 로 바꾸면 예산이 0 이어도 집는다)',
+    /if \(!budget\.hasRoom\(MIN_ROOM_MS\)\) \{/.test(src), true);
   eq('  시한을 넘긴 게시판은 dead 표식으로 장부·리포트에 더 끼어들지 못한다', /ctx\.dead = true/.test(src) && (src.match(/if \(ctx\.dead\) return;/g) || []).length >= 6, true);
   eq('  저장을 마치면 스스로 끝낸다 (버려진 소켓이 단계를 붙잡지 않게)', /\nprocess\.exit\(0\);\s*$/.test(src), true);
   eq('  health 는 ⏰ 를 성공으로도 실패로도 안 세고 ⛔ 는 실패로 센다', /if \(\/\^⏰\/\.test\(r\.status\)\) continue;/.test(src) && /if \(\/⚠️\|⛔\/\.test\(r\.status\)\)/.test(src), true);
@@ -1428,11 +1428,48 @@ console.log('\n■ 일반 수집 예산 (2026-09-29)');
   /* 마지막 게시판은 예산 안에서 시한까지 돌 수 있다 — hasRoom(BOARD_HARD_MS) 가 그 시한을 예산 안에 넣으므로
      단계 상한은 예산 + 마무리(저장·발행) 여유만 있으면 된다. 기본 시한은 소스에서 읽는다(박아 두지 않는다). */
   const hardMs = Number((src.match(/BOARD_HARD_MS \|\| (\d+)\)/) || [])[1]);
+  const minRoom = Number((src.match(/MIN_ROOM_MS \|\| (\d+)\)/) || [])[1]);
   eq('  게시판 시한이 예산보다 훨씬 짧다 (시한이 예산의 절반을 넘으면 한 게시판이 실행을 삼킨다)', hardMs > 0 && hardMs * 2 < budgetMin * 60000, true);
-  eq('  수집 단계 상한이 수집 예산 + 마무리 1분보다 크다', harvestCap * 60000 > budgetMin * 60000 + 60000, true);
+  eq('  최소 여유는 시한보다 짧다 (같거나 길면 예산 끝을 흘려보낸다 — 2026-09-30 첫 실행에서 116초를 버렸다)', minRoom > 0 && minRoom < hardMs, true);
+  /* 최악: 마지막 게시판이 (예산 − 최소 여유)에 시작해 시한까지 돈다 → 예산 + 시한 − 최소 여유. 여기에 저장·발행 여유 30초. */
+  eq('  수집 단계 상한이 「예산 + 시한 − 최소 여유 + 30초」보다 크다', harvestCap * 60000 > budgetMin * 60000 + hardMs - minRoom + 30000, true);
   eq('  수집 단계가 실패해도 알린다 (continue-on-error 가 크래시를 조용하게 만드므로)', /if: steps\.run\.outcome != 'success'/.test(yml), true);
   const OVERHEAD = 3;
   eq('작업 상한이 단계 상한의 합 + 여유보다 크다', limit > stepCaps.reduce((a, b) => a + b, 0) + OVERHEAD, true);
+}
+
+/* ── 로봇 대기줄 — 옛 커밋에서 시작하지 않는다 (2026-09-30 사고) ───────────────────────
+   브라우저 수집이 19곳을 17분 동안 다 돌고 **저장 단계에서 통째로 버려졌다**. 수동 실행 둘이 같은 대기줄
+   (concurrency: collector)에 섰는데, 뒤 로봇의 체크아웃 기준(GITHUB_SHA)은 **큐에 들어간 시점**에 굳어서
+   앞 로봇이 저장한 커밋 위로 rebase 하다 규칙 없는 장부 넷(candidates·pagination·notices-text·registered)에서
+   충돌 → 3회 재시도 실패 → exit 1. 예약 실행도 앞 실행 중에 큐에 들어가면 똑같이 당한다.
+   수리 둘: ① 그 대기줄의 워크플로 전부가 `ref: github.ref_name` 으로 **지금 브랜치 끝**에서 시작한다
+   ② 그래도 부딪힐 때를 위해 장부 셋에 병합 규칙, 커서 둘은 내 것. registered.json 은 일부러 그대로(삭제가 뜻을 가진다). */
+console.log('\n■ 로봇 대기줄 — 옛 커밋에서 시작하지 않는다 (2026-09-30)');
+{
+  const root = new URL('../', import.meta.url);
+  const wfDir = new URL('.github/workflows/', root);
+  const files = fs.readdirSync(wfDir).filter((f) => f.endsWith('.yml'));
+  const queued = files.filter((f) => /group:\s*collector\b/.test(readText(new URL(f, wfDir))));
+  eq('collector 대기줄을 쓰는 워크플로가 있다', queued.length >= 2, true);
+  const stale = queued.filter((f) => {
+    const y = readText(new URL(f, wfDir));
+    /* 체크아웃 단계 바로 다음 with 블록에 ref 가 있어야 한다 — 다른 단계의 ref 를 세면 통과해 버린다 */
+    return !/- uses: actions\/checkout@v4\n\s+with:\n(?:\s+#[^\n]*\n)*\s+ref: \$\{\{ github\.ref_name \}\}/.test(y);
+  });
+  eq('  전부 지금 브랜치 끝(ref: github.ref_name)에서 시작한다', stale, []);
+  const ga = readText(new URL('../.gitattributes', import.meta.url));
+  for (const f of ['collector/candidates.json', 'collector/pagination.json', 'collector/extracted/notices-text.json']) {
+    eq(`  ${f} 에 합집합 규칙이 있다`, new RegExp(`^${f.replace(/[./]/g, '\\$&')}\\s+merge=jsonunion`, 'm').test(ga), true);
+  }
+  for (const f of ['collector/browser-cursor.json', 'collector/collect-cursor.json']) {
+    eq(`  ${f} 는 내 것(매 실행 새로 쓰인다)`, new RegExp(`^${f.replace(/[./]/g, '\\$&')}\\s+merge=ours`, 'm').test(ga), true);
+  }
+  eq('  registered.json 은 여전히 자동 병합하지 않는다 (삭제가 뜻을 가진다)', /^data\/registered\.json\s+merge=/m.test(ga), false);
+  /* 병합기가 그 파일들을 실제로 안다 — .gitattributes 만 적고 규칙이 없으면 종료코드 1 로 평범한 충돌이 된다 */
+  const mj = readText(new URL('tools/merge-json-union.mjs', root));
+  eq('  병합기에 규칙 셋이 있다', ['candidates', 'pagination', 'notices-text'].filter((k) => !new RegExp(`match: /[^\\n]*${k}[^\\n]*merge: merge`).test(mj)), []);
+  eq('  검수 후보는 수집기와 같은 합치기 규칙을 쓴다 (베끼지 않는다)', /import \{ mergeCandidates \} from '\.\.\/collector\/candidates\.mjs'/.test(mj), true);
 }
 
 console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');

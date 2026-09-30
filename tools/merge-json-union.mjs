@@ -36,6 +36,9 @@ import path from 'node:path';
 import { dedupeNotices } from '../collector/url-key.mjs';
 /* 학교당 상한은 발행기 것을 그대로 쓴다 — 베끼면 병합이 발행과 다른 크기를 만든다 */
 import { PER_SCHOOL } from '../collector/publish-notices.mjs';
+/* 검수 후보 장부는 수집기와 같은 합치기 규칙을 쓴다(베끼면 갈라진다 — 60일·주소 열쇠·preferNotice) */
+import { mergeCandidates } from '../collector/candidates.mjs';
+import { urlKey } from '../collector/url-key.mjs';
 
 const [, , oursBase, oursPath, theirsPath, filePath = ''] = process.argv;
 
@@ -134,7 +137,43 @@ function mergeLinkHunt(o, t) {
   return out;
 }
 
+/* ── 2026-09-30 신설 셋 — 브라우저 수집 19곳 17분치가 통째로 버려진 사고에서 ──────────
+   수동 실행 둘이 같은 대기줄(collector)에 서 있다가, 뒤 로봇이 **대기줄에 들어간 시점의 옛 커밋**에서
+   시작해(GITHUB_SHA 가 큐에 넣을 때 굳는다) 앞 로봇의 저장 위로 rebase 하다 규칙 없는 파일 넷에서 충돌 →
+   3회 재시도 실패 → exit 1. 체크아웃 기준을 고친 것(워크플로 `ref: github.ref_name`)이 본 수리이고,
+   여기는 그래도 부딪힐 때를 위한 안전망이다. registered.json 은 여전히 일부러 뺀다(삭제가 뜻을 가진다). */
+/* 검수 후보 장부 — 수집기의 mergeCandidates 그대로(주소 열쇠 · 60일 · 더 나은 판 선택 · 순서 고정) */
+function mergeCandidateLedger(o, t) {
+  const items = mergeCandidates(t?.items || [], o?.items || []);
+  const updatedAt = [o?.updatedAt, t?.updatedAt].filter(Boolean).sort().pop();
+  return { ...(t || {}), ...(o || {}), updatedAt, count: items.length, items };
+}
+/* 페이지 넘기기 기록: 게시판 주소 → { ok, checkedAt, … }. 더 최근에 확인한 쪽을 남긴다 */
+function mergePagination(o, t) {
+  const out = { ...(t || {}) };
+  for (const [k, ov] of Object.entries(o || {})) {
+    const tv = out[k];
+    out[k] = !tv || String(ov?.checkedAt || '') >= String(tv?.checkedAt || '') ? ov : tv;
+  }
+  return out;
+}
+/* 공고 원문 말뭉치(배열): 주소로 합치고, 본문을 더 많이 가진 쪽을 남긴다(잘린 판이 온전한 판을 덮지 않게) */
+function mergeNoticesText(o, t) {
+  const byKey = new Map();
+  const weight = (x) => (Number(x?.bodyChars) || String(x?.text || '').length);
+  for (const it of [...(Array.isArray(t) ? t : []), ...(Array.isArray(o) ? o : [])]) {
+    if (!it || !it.url) continue;
+    const k = urlKey(it.url);
+    const prev = byKey.get(k);
+    byKey.set(k, !prev || weight(it) >= weight(prev) ? it : prev);
+  }
+  return [...byKey.values()];
+}
+
 const RULES = [
+  { match: /(^|\/)collector\/candidates\.json$/, merge: mergeCandidateLedger },
+  { match: /(^|\/)collector\/pagination\.json$/, merge: mergePagination },
+  { match: /(^|\/)collector\/extracted\/notices-text\.json$/, merge: mergeNoticesText },
   /* ⚠️ 학교별 파일이 먼저다 — `data/notices/x.json` 은 아래 notices.json 규칙에 안 걸리지만,
      순서를 눈에 보이게 두어 다음 사람이 헷갈리지 않게 한다. index.json 은 매 발행마다
      새로 쓰이므로 .gitattributes 에서 merge=ours 로 뺐다(합칠 내용이 없다). */
