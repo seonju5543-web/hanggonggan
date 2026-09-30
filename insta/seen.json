@@ -1640,6 +1640,78 @@
    "cards": 5,
    "dir": "insta/pub/2700296013",
    "at": "2026-09-30"
+  },
+  {
+   "status": "prepared",
+   "code": "0607007",
+   "org": "문경시장학회",
+   "name": "다자녀생활장학생",
+   "due": "2026-10-08",
+   "school": null,
+   "tplNo": 3,
+   "cards": 5,
+   "dir": "insta/pub/0607007",
+   "at": "2026-09-30"
+  },
+  {
+   "status": "prepared",
+   "code": "2000457002",
+   "org": "재단법인 진도군인재육성장학회",
+   "name": "특기장학생",
+   "due": "2026-10-08",
+   "school": null,
+   "tplNo": 1,
+   "cards": 5,
+   "dir": "insta/pub/2000457002",
+   "at": "2026-09-30"
+  },
+  {
+   "status": "prepared",
+   "code": "2000457001",
+   "org": "재단법인 진도군인재육성장학회",
+   "name": "학업성적장학생",
+   "due": "2026-10-08",
+   "school": null,
+   "tplNo": 2,
+   "cards": 5,
+   "dir": "insta/pub/2000457001",
+   "at": "2026-09-30"
+  },
+  {
+   "status": "prepared",
+   "code": "2000103003",
+   "org": "계양구 인재양성장학재단",
+   "name": "드림장학금",
+   "due": "2026-10-12",
+   "school": null,
+   "tplNo": 1,
+   "cards": 5,
+   "dir": "insta/pub/2000103003",
+   "at": "2026-09-30"
+  },
+  {
+   "status": "prepared",
+   "code": "2000103002",
+   "org": "계양구 인재양성장학재단",
+   "name": "특기장학금",
+   "due": "2026-10-12",
+   "school": null,
+   "tplNo": 2,
+   "cards": 5,
+   "dir": "insta/pub/2000103002",
+   "at": "2026-09-30"
+  },
+  {
+   "status": "prepared",
+   "code": "2000103001",
+   "org": "계양구 인재양성장학재단",
+   "name": "학업우수장학금",
+   "due": "2026-10-12",
+   "school": null,
+   "tplNo": 1,
+   "cards": 5,
+   "dir": "insta/pub/2000103001",
+   "at": "2026-09-30"
   }
  ]
 }
