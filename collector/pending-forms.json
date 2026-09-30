@@ -785,6 +785,56 @@
    "lastTryAt": "2026-09-26",
    "retired": true,
    "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
+  },
+  {
+   "id": "auto-bbssc58944066artclviewdo",
+   "name": "제36기 미래에셋 해외교환 장학생 선발 안내",
+   "target": "제36기 미래에셋 해외교환 장학생 선발 안내",
+   "added": "2026-09-30",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-bbssc58944063artclviewdo",
+   "name": "2026년도 국가유산진흥원 전통 기·예능 분야 및 매장유산 관련 분야 우수 장학생 선발 안내",
+   "target": "2026년도 국가유산진흥원 전통 기·예능 분야 및 매장",
+   "added": "2026-09-30",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-otice06doarticleno140127",
+   "name": "2026학년도 벽송회장학금 장학생 선발안내( ~ 2026년 10월 9일(금) 오후 5시까지)",
+   "target": "2026학년도 벽송회장학금 장학생 선발안내( ~ 202",
+   "added": "2026-09-30",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-kuk2351208222artclviewdo",
+   "name": "[교내][등록금] 2026학년도 2학기 건국가족장학생 선발 안내(10. 1.(목) 09:00 ~ 10. 20.(화) 23:59",
+   "target": "2026학년도 2학기 건국가족장학생 선발 안내(10. ",
+   "added": "2026-09-30",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-kuk2351208039artclviewdo",
+   "name": "[교외][장학금] 2026학년도 2학기 마포인재육성장학재단 장학생 선발 안내(9. 30. ~ 10. 7.)",
+   "target": "2026학년도 2학기 마포인재육성장학재단 장학생 선발 ",
+   "added": "2026-09-30",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-oardid323199menuno200318",
+   "name": "공통 2026년도 하반기 (재)논산시장학회 학업장려 장학생 선발 안내",
+   "target": "공통 2026년도 하반기 (재)논산시장학회 학업장려 장",
+   "added": "2026-09-30",
+   "fetched": false,
+   "schematized": false,
+   "tries": 1,
+   "lastTryAt": "2026-09-30"
   }
  ]
 }
