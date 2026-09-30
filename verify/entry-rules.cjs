@@ -173,6 +173,29 @@ function isDuplicatePair(A, B) {
   return sim >= 0.8 && distinct >= 0.5;
 }
 
+/* ── 사업 열쇠 — 학교가 달라도 같은 사업인가 (2026-09-30 · F-5 재발에서) ──────────────
+   `isDuplicatePair` 는 같은 학교 안의 재게시를 잡는 눈이고(학교가 다르면 false), 한 재단 사업이 여러 학교 게시판에
+   올라온 경우는 제목의 접두어·꼬리가 학교마다 달라 4-gram 유사도로도 못 잡았다:
+     `[교외장학] 2026 산재 노동자 자녀 성장지원사업 모집` ↔ `2026년도 산재 노동자 자녀 성장지원사업 참여자 모집 안내`
+   그래서 대괄호 표식·연도·학기·회차·기수·게시판 붙박이 말(모집·안내·공고·선발·신청·접수·참여자·장학생)을 떼고 남는
+   **알맹이**를 열쇠로 삼는다. 열쇠가 같으면 같은 사업이다. 🔴 열쇠가 8자 미만이면 판정하지 않는다 — `성적우수장학` 처럼
+   여러 학교가 각자 운영하는 흔한 이름이 한 사업으로 묶이면 학교별 제도가 조용히 지워진다(그건 재게시가 아니다). */
+const PROGRAM_NOISE = /\[[^\]]*\]|\([^)]*\)|20\d{2}\s*(학년도|년도|년)?|\d\s*학기|(상|하)반기|제?\s*\d+\s*(회|기|차)|하반기|상반기|공통|서울|글로벌|국제/g;
+const PROGRAM_TAIL = /(참여자|참가자|장학생|대상자|학생)?\s*(추가\s*)?(선발|모집|신청|접수|추천|지원)\s*(계획|안내|공고|공지)?(\s*(안내|공고|공지))?$/;
+function programKey(title) {
+  let t = String(title || '').replace(PROGRAM_NOISE, ' ');
+  t = t.replace(/\s+/g, ' ').trim();
+  for (let i = 0; i < 3; i++) t = t.replace(PROGRAM_TAIL, '').trim();
+  t = t.replace(/[\s·ㆍ~〜.,'"「」『』:：\-–—_/]/g, '').toLowerCase();
+  return t.length >= 8 ? t : null;
+}
+/* 같은 사업인가 — 열쇠가 같으면 같다. 학교 축은 보지 않는다(부르는 쪽이 '다른 학교'를 따로 확인한다). */
+function sameProgram(a, b) {
+  const ka = programKey(a && a.name != null ? a.name : a);
+  const kb = programKey(b && b.name != null ? b.name : b);
+  return !!ka && ka === kb;
+}
+
 /* ── `fix` 로 부를 로봇을 **어떤 모양으로** 부르는가 (2026-09-14) ──────────────
    🔴 **입력 없이 부르지 말 것.** `eligibility-fill.yml` 의 `mode` 기본값은 '전부' 라,
       화면이 값을 안 보내면 버튼 한 번에 **전수(약 2,229원)** 가 돈다.
@@ -199,4 +222,4 @@ const FIX_PLAN = {
   },
 };
 
-module.exports = { checkEntry, isDuplicatePair, RULES, FIX_PLAN };
+module.exports = { checkEntry, isDuplicatePair, programKey, sameProgram, RULES, FIX_PLAN };

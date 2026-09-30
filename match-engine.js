@@ -852,10 +852,13 @@ const OWN_PROGRAMS = {
 };
 
 /* 공고가 교내인가 교외인가. `school` 은 그 공고를 올린 학교(모르면 생략) — 위 표가 학교별이라 필요하다. */
-function noticeKind(title, school) {
+function noticeKind(title, school, learned) {
   const t = String(title || '');
   if (NOTICE_CAMPUS_MARK.test(t)) return '교내';
   if ((OWN_PROGRAMS[school] || []).some((p) => t.includes(p))) return '교내';
+  /* 로봇이 원문 증거로 배운 제도 이름(collector/own-programs.json · 2026-09-30) — 등록 단계에서만 넘어온다.
+     앱 화면은 이 인자를 넘기지 않으므로 고정 표만 본다(파일을 받지 않는다). */
+  if (learned && Array.isArray(learned[school]) && learned[school].some((p) => p && t.includes(p.name || p))) return '교내';
   return '교외';
 }
 

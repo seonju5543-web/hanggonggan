@@ -15,6 +15,7 @@
       조용한 이유는 폴백(전국 공통 목록)이 받아 주기 때문이다.
    ============================================================ */
 import fs from 'node:fs';
+import { loadSchoolNames } from './school-names.mjs';
 import { createRequire } from 'node:module';
 
 const ME = createRequire(import.meta.url)('../match-engine.js');
@@ -29,21 +30,7 @@ const ME = createRequire(import.meta.url)('../match-engine.js');
       (`collector/majors.mjs` 의 `inApp` 이 같은 이유로 같은 방식을 쓴다).
    ⚠️ `UNIVERSITIES` 에 아예 없는 학교는 **파일을 만들지 않는다** — 앱이 고를 수 없는
       학교라 받아 갈 사람이 없다(209곳 중 몇 곳이 그렇다). */
-function loadSchoolNames(dataJsUrl) {
-  const src = fs.readFileSync(dataJsUrl, 'utf8');
-  const block = (head) => {
-    const i = src.indexOf(head);
-    if (i < 0) return '';
-    return src.slice(i, src.indexOf(head.endsWith('[') ? '\n];' : '\n};', i));
-  };
-  const unis = new Set([...block('const UNIVERSITIES = [').matchAll(/'([^']+)'/g)].map((m) => m[1]));
-  const alias = new Map();
-  for (const m of block('const UNIV_ALIASES = {').matchAll(/'([^']+)'\s*:\s*'([^']+)'/g)) {
-    alias.set(m[1], m[2]);
-  }
-  if (!unis.size) throw new Error('data.js 에서 UNIVERSITIES 를 못 읽었습니다 — 파일 모양이 바뀐 것 같습니다');
-  return { unis, alias };
-}
+/* 학교 이름·별칭 읽기는 collector/school-names.mjs 한 곳 (2026-09-30 — 교내·교외 판정기도 같은 것을 쓴다) */
 
 /**
  * @param {Record<string, string[]>} bySchool  열쇠는 `'학교'` 또는 `'학교 캠퍼스'`

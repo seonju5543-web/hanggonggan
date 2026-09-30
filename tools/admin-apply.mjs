@@ -12,6 +12,7 @@
    실행: ACTION=<이름> PAYLOAD='<json>' node tools/admin-apply.mjs            */
 
 import fs from 'node:fs';
+import { mergeInto } from '../collector/registered-merge.mjs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
@@ -700,30 +701,8 @@ switch (action) {
     const drop = byId(payload.dropId);
     if (!keep || !drop) fail('합칠 두 공고를 모두 찾지는 못했습니다');
     if (keep.id === drop.id) fail('같은 공고끼리는 합칠 수 없습니다');
-
-    const ke = keep.eligibility || {};
-    const de = drop.eligibility || {};
-    let promoted = false;
-    /* 서로 다른 학교에 같은 공고가 올라온 경우 = 사실 여러 학교가 받는 장학금이다.
-       한쪽만 남기면 다른 학교 학생이 못 보게 되므로 전국으로 승격한다 (호반 선례). */
-    if (ke.schoolOnly && de.schoolOnly && ke.schoolOnly !== de.schoolOnly) {
-      delete ke.schoolOnly; delete ke.campusOnly;
-      keep.eligibility = ke;
-      promoted = true;
-    }
-    /* 남기는 쪽에 없는 정보는 지우는 쪽에서 살려 온다 (링크·첨부·발췌를 잃지 않게) */
-    /* 사람이 일부러 비운 마감(`관리자 … · 비움`)은 합칠 때도 되살리지 않는다 */
-    if (!keep.deadline && drop.deadline && !/^(AI|관리자)/.test(keep.deadlineFrom || '')) {
-      keep.deadline = drop.deadline;
-      if (drop.deadlineFrom) keep.deadlineFrom = drop.deadlineFrom;
-    }
-    if (!(keep.attachments || []).length && (drop.attachments || []).length) keep.attachments = drop.attachments;
-    if (!(keep.excerpts || []).length && (drop.excerpts || []).length) {
-      keep.excerpts = drop.excerpts;
-      if (drop.excerptNote) keep.excerptNote = drop.excerptNote;
-    }
-    if (!keep.formId && drop.formId) keep.formId = drop.formId;
-
+    /* 합치는 규칙은 collector/registered-merge.mjs 한 곳 — 로봇(auto-register · scope-promote)과 같다 (2026-09-30) */
+    const { promoted } = mergeInto(keep, drop, { reason: `관리자 합침(${actor})` });
     reg.items = reg.items.filter((x) => x.id !== drop.id);
     detail = `${drop.id} → ${keep.id} 로 합침${promoted ? ' (전국으로 승격)' : ''}`;
     touched = true;

@@ -16,7 +16,11 @@ import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { cleanTitle } from './clean-title.mjs';
 // 등록 규칙은 감사 도구와 같은 파일을 쓴다 (verify/entry-rules.cjs) — 규칙이 갈라지지 않게
-const { checkEntry, isDuplicatePair } = createRequire(import.meta.url)('../verify/entry-rules.cjs');
+const { checkEntry, isDuplicatePair, sameProgram } = createRequire(import.meta.url)('../verify/entry-rules.cjs');
+/* 교내·교외 증거 판정 + 학교 이름표 + 합치기 — 규칙은 각자 한 곳 (2026-09-30 · 베끼지 않는다) */
+import { classifyKind, schoolDomain } from './kind-evidence.mjs';
+import { loadSchoolNames, schoolTokens } from './school-names.mjs';
+import { mergeInto } from './registered-merge.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const cfgPath = new URL('auto-register-config.json', HERE);
@@ -36,6 +40,16 @@ try { forms = JSON.parse(fs.readFileSync(new URL('../data/forms.json', HERE), 'u
    앱 화면(실시간 공고 카드)도 같은 말을 해야 해서다 — 베껴 두면 같은 공고가 목록에서는
    '교외', 실시간 구역에서는 '교내'로 뜬다(옮기기 전 실제 모습이 그랬다). */
 const { noticeKind } = createRequire(import.meta.url)('../match-engine.js');
+const ME = createRequire(import.meta.url)('../match-engine.js');
+const NOTICE_CAMPUS_MARK = ME.NOTICE_CAMPUS_MARK;
+const OWN_PROGRAMS = ME.OWN_PROGRAMS || {};
+/* 로봇이 원문 증거로 배운 학교 제도 표 (collector/kind-classify.mjs 가 채운다) — 고정 표(OWN_PROGRAMS)와 합쳐 본다.
+   파일·이름표가 없어도 죽지 않는다(관문이 사본 저장소에서 이 로봇을 돌린다). 학교 도메인은 공고 주소에서 읽는다(수집 설정은 건드리지 않는다). */
+let learnedPrograms = {};
+try { learnedPrograms = JSON.parse(fs.readFileSync(new URL('own-programs.json', import.meta.url), 'utf8')).programs || {}; } catch { /* 아직 없음 */ }
+let SCHOOL_NAMES = { unis: new Set(), alias: new Map() };
+try { SCHOOL_NAMES = loadSchoolNames(new URL('../data.js', import.meta.url)); } catch { /* data.js 없는 사본 */ }
+const ownNames = (school) => [...(OWN_PROGRAMS[school] || []), ...((learnedPrograms[school] || []).map((p) => p.name || p))];
 /* 주관 기관을 못 읽었을 때 쓰는 말. 같은 항목의 `금액 원문 확인` 과 같은 말투다. */
 const PROVIDER_UNKNOWN = '주관 기관 원문 확인';
 const TODAY = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10); // KST
@@ -185,6 +199,10 @@ function classify(n, regUrlSet, regItems, batchSeen) {
      🔴 **양쪽에 똑같이 적용한다.** 옛 규칙은 등록명에만 썼는데, 그러면 공고 쪽 꼬리표가 그대로
         남아 `고졸후학습자(희망사다리2유형) 장학금 신청(~9/17)` 이 같은 학교 등록분과 안 맞는다. */
   const bare = (s) => (s || '').replace(/\([^)]*(\d|접수)[^)]*\)/g, '');
+  /* 🔴 학교가 달라도 **같은 사업**이면 새로 등록하지 않고 기존 등록분을 전국으로 승격한다 (2026-09-30 · F-5 재발에서).
+     열쇠는 verify/entry-rules.cjs programKey — 대괄호·연도·꼬리말을 뗀 알맹이. 재게시(같은 학교)는 아래 isDuplicatePair 가 잡는다. */
+  const twin = regItems.find((i) => schoolOf(i) && schoolOf(i) !== n.school && sameProgram({ name: title }, { name: i.name }));
+  if (twin) return { verdict: 'promote', why: `다른 학교(${schoolOf(twin)}) 등록분과 같은 사업 → 전국으로 승격`, twin };
   const similars = regItems.filter((i) =>
     // 학교 축은 아래에서 따로 본다 — 여기서는 '같은 사업인가'만 묻는다(같은 학교로 맞춰 넣는다)
     isDuplicatePair({ name: bare(title), eligibility: {} }, { name: bare(i.name), eligibility: {} })
@@ -210,6 +228,7 @@ if (!cfg.enabled) {
   const batchSeen = new Set();
   const added = [];
   const held = [];
+  const promoted = [];   // 다른 학교의 같은 사업으로 전국 승격된 기존 등록분 (2026-09-30)
   /* 거른 이유를 센다 — **조용한 탈락이 이 사고의 정체였다** (2026-09-19). 리포트가 hold 만 적고
      skip 은 한 줄도 안 적어서, 경희대 교내 장학 넷과 '가짜 동일 사업' 여덟이 몇 주 동안
      아무 흔적 없이 사라졌다. 이유별 숫자만 적는다(33줄을 다 적으면 아무도 안 읽는다). */
@@ -238,6 +257,15 @@ if (!cfg.enabled) {
     if (added.length >= (cfg.maxPerRun || 8)) { unseen += 1; continue; }
     if (onlySchools.size && n.school && !onlySchools.has(n.school)) { outOfScope += 1; continue; }
     const r = classify(n, regUrlSet, registered.items, batchSeen);
+    if (r.verdict === 'promote') {
+      /* 기존 등록분을 전국으로 — 합치는 규칙은 registered-merge.mjs 한 곳(관리자 merge 와 같다). 새 공고는 등록하지 않는다(같은 사업이다). */
+      const { promoted: did } = mergeInto(r.twin, { id: `notice:${canonUrl(n.url)}`, eligibility: { schoolOnly: n.school }, sourceUrl: n.url, attachments: n.attachments || [] },
+        { reason: `같은 사업이 ${n.school} 게시판에도 올라옴(자동)` });
+      if (did) promoted.push({ keep: r.twin, n });
+      else skipped.set('이미 전국(동일 사업)', (skipped.get('이미 전국(동일 사업)') || 0) + 1);
+      regUrlSet.add(canonUrl(n.url));
+      continue;
+    }
     if (r.verdict === 'hold') { held.push({ n, why: r.why }); continue; }
     if (r.verdict !== 'register') {
       /* 괄호 안 알맹이(공고 이름·날짜)는 떼고 이유만 남긴다 — 안 떼면 집계가 아니라 목록이 된다:
@@ -288,7 +316,10 @@ if (!cfg.enabled) {
       /* 🔴 **학교를 같이 넘긴다** (2026-09-20) — 학교가 제 장학금을 올릴 때는 제목에 `교내` 라고
          안 적는다(제 게시판이니까). 그 학교의 제도 이름표(`OWN_PROGRAMS`)를 봐야 알 수 있고,
          그 표는 학교별이라 이 값이 없으면 경희대 교내 장학 넷이 다시 전부 '교외'가 된다. */
-      type: noticeKind(title, n.school),
+      type: noticeKind(title, n.school, learnedPrograms),
+      /* 왜 그렇게 판정했나 — 제목만으로 읽은 증거(원문 본문은 뒤 단계 kind-classify.mjs 가 읽어 고친다 · 2026-09-30) */
+      ...(() => { const k = classifyKind({ title, school: n.school, tokens: schoolTokens(n.school, SCHOOL_NAMES), domain: schoolDomain(n.url), campusMark: NOTICE_CAMPUS_MARK, own: ownNames(n.school) });
+        return { kindEvidence: k.evidence.slice(0, 3), kindConfidence: k.confidence, kindFrom: '로봇(제목)' }; })(),
       /* 🔴 **게시한 학교를 주관 기관이라고 적지 않는다** (2026-09-18 개발자 지시).
          이 칸은 '누가 주는가'인데 '어느 게시판에서 주웠나'가 들어가 있었다(33건). 그래서
          카드가 `교내 · 경희대학교 게시 공고 / 푸른등대 한국수력원자력 k-원전 장학금` 처럼
@@ -335,7 +366,7 @@ if (!cfg.enabled) {
     added.push(entry);
   }
 
-  if (added.length || removed) {
+  if (added.length || removed || promoted.length) {
     registered.updatedAt = TODAY;
     fs.writeFileSync(registeredPath, JSON.stringify(registered, null, 1) + '\n');
   }
@@ -399,6 +430,10 @@ if (!cfg.enabled) {
     for (const e of added) report.push(`- \`${e.id}\` [${e.name}](${e.sourceUrl})${e.deadline ? ` · 마감 ${e.deadline}` : ''} · ${(e.eligibility.schoolOnly || '')}`);
   } else {
     report.push('', '이번 실행에서 자동 등록 기준(개별 실공고·미등록·마감 전)을 전부 통과한 공고가 없어요.');
+  }
+  if (promoted.length) {
+    report.push('', `**전국으로 승격 ${promoted.length}건** — 다른 학교 게시판에 같은 사업이 올라와 한 학교 한정을 풀었어요(합치는 규칙은 관리자 합침과 같아요 · 근거는 항목의 scopeFrom).`);
+    for (const { keep, n } of promoted) report.push(`- \`${keep.id}\` ${(keep.name || '').slice(0, 40)} ← ${n.school} 게시판 [${cleanTitle(n.title).slice(0, 40)}](${n.url})`);
   }
   if (held.length) {
     report.push('', `**컨펌 대기 (자동 기준 미달 ${held.length}건)** — 장학 신호는 있지만 선발·모집 신호가 약해요:`);

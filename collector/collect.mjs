@@ -26,6 +26,8 @@ import { makeBudget, rotateOrder, nextCursor, withDeadline, TIMED_OUT } from './
 
 const HERE = new URL('.', import.meta.url);
 const cfg = JSON.parse(fs.readFileSync(new URL('schools.json', HERE), 'utf8'));
+/* 브라우저 로봇도 읽는 학교 — 🟡 이 반복되면 담당을 옮기라고 리포트에 적기 위해서만 읽는다(수집 대상은 안 바꾼다) */
+const browserSchools = new Set((() => { try { return JSON.parse(fs.readFileSync(new URL('browser-targets.json', HERE), 'utf8')).targets.map((t) => t.school); } catch { return []; } })());
 
 /* ── 시간 예산 · 학교별 절대 시한 · 순서 회전 (2026-09-29 신설 — 수집망을 2 → 44개교로 되살리면서) ──
    브라우저 수집기(browser-collect.mjs)는 2026-08-03 사고 뒤 이 셋을 갖췄는데 이 로봇은 없었다 —
@@ -322,6 +324,12 @@ async function harvestBoard(s, ctx = { dead: false }) {
     bucket.push({ name, status: '⚙️ 게시판 주소 미설정' + (s.note ? ` (${s.note})` : ''), items: [] });
     return;
   }
+  /* 브라우저 담당 게시판(schools.json collector:'browser' · 2026-09-30) — 같은 게시판을 하루 두 번 두드리지 않는다.
+     실측: 일반 로봇은 이 다섯 곳에서 🟡 0건, 브라우저는 정상. health 는 이 상태를 세지 않는다(⚙️ 처럼). */
+  if (s.role === 'scholarship' && s.collector === 'browser') {
+    bucket.push({ name, status: '🖥 브라우저 담당 게시판 — 일반 로봇은 건너뜀', items: [] });
+    return;
+  }
   /* 공공·재단 게시판은 robots.txt 가 막은 길이면 읽지 않는다 (2026-09-29 · 4차 리서치 — 접근 제한을 깨고 긁는 것은 불법행위가 될 수 있다).
      학교 게시판(role scholarship)은 지금까지처럼 읽는다. 파일이 없거나 못 받으면 읽어도 된다고 본다(robots.mjs). */
   if ((isAct || isExt) && !(await robotsAllows(s.boardUrl))) {
@@ -443,7 +451,9 @@ async function harvestBoard(s, ctx = { dead: false }) {
     if (ctx.dead) return;
     results.push({
       name,
-      status: items.length ? `✅ 정상 (실공고 ${items.length}건 감지)` : '🟡 접속은 되지만 실공고를 찾지 못함 — 공지 목록 페이지인지 확인 필요',
+      status: items.length ? `✅ 정상 (실공고 ${items.length}건 감지)`
+        : ('🟡 접속은 되지만 실공고를 찾지 못함 — 공지 목록 페이지인지 확인 필요'
+          + (browserSchools.has(s.school) ? ' · 브라우저 로봇도 읽는 학교라 collector:"browser" 로 옮길 후보' : '')),
       items: fresh,
     });
   } catch (e) {
@@ -652,7 +662,7 @@ let health = {};
 try { health = JSON.parse(fs.readFileSync(healthPath, 'utf8')); } catch { /* 첫 실행 */ }
 const chronic = [];
 for (const r of results) {
-  if (/게시판 주소 미설정/.test(r.status)) continue;   // 아직 주소가 없는 곳은 실패가 아니다
+  if (/게시판 주소 미설정|브라우저 담당/.test(r.status)) continue;   // 아직 주소가 없는 곳·브라우저 담당은 실패가 아니다
   if (/^⏰/.test(r.status)) continue;                 // 예산에 걸려 안 본 곳 — 성공도 실패도 아니다 (lastOk 를 오늘로 찍지 않는다)
   const h = health[r.name] || { fails: 0, lastOk: null };
   if (/⚠️|⛔/.test(r.status)) {                       // ⛔ 응답 멈춤도 연속되면 '멈춘 학교'다

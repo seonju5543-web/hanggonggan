@@ -4,7 +4,8 @@
   {
    "school": "경희대학교",
    "campus": "공통",
-   "boardUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318"
+   "boardUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318",
+   "collector": "browser"
   },
   {
    "school": "한국외국어대학교",
@@ -68,7 +69,8 @@
    "school": "서울시립대학교",
    "campus": "",
    "boardUrl": "https://www.uos.ac.kr/korNotice/list.do?list_id=FA1",
-   "note": "FA1=장학공지 (FA2는 학사공지라 장학 0건이었음 — 2026-07-30 교정). 목록을 스크립트로 그려 브라우저형 수집기가 주력"
+   "note": "FA1=장학공지 (FA2는 학사공지라 장학 0건이었음 — 2026-07-30 교정). 목록을 스크립트로 그려 브라우저형 수집기가 주력",
+   "collector": "browser"
   },
   {
    "school": "건국대학교",
@@ -79,7 +81,8 @@
   {
    "school": "동국대학교",
    "campus": "",
-   "boardUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/list"
+   "boardUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/list",
+   "collector": "browser"
   },
   {
    "school": "동국대학교 WISE캠퍼스",
@@ -90,7 +93,8 @@
   {
    "school": "홍익대학교",
    "campus": "",
-   "boardUrl": "https://www.hongik.ac.kr/kr/newscenter/notice.do"
+   "boardUrl": "https://www.hongik.ac.kr/kr/newscenter/notice.do",
+   "collector": "browser"
   },
   {
    "school": "숙명여자대학교",
@@ -112,7 +116,8 @@
   {
    "school": "상명대학교",
    "campus": "",
-   "boardUrl": "https://www.smu.ac.kr/kor/life/notice.do"
+   "boardUrl": "https://www.smu.ac.kr/kor/life/notice.do",
+   "collector": "browser"
   },
   {
    "school": "가천대학교",
@@ -260,5 +265,6 @@
   }
  ],
  "_parked": "2026-08-30 개발자 지시로 경희대·한국외대만 남기고 뺐던 42곳을 2026-09-29 개발자 지시(대외활동·공모전 탭 + 인포 중심 피벗 — \"죽은 학교들을 모두 다시 살려\")로 전부 위 schools 로 되살렸다. 이 배열은 이제 \"쓰지 않게 된 게시판\"의 보관 자리다 — 🔴 지우지 말고 여기로 옮긴다(주소를 알아내는 데 든 실행 횟수를 버리지 않는다 · 경희대만 8회). 되돌리려면 항목을 위 schools 로 옮기면 된다. ⚠️ 정식 등록(자격 진단·양식) 범위는 별개다 — collector/auto-register-config.json 의 schools 가 정한다(2026-09-29 저녁부터 빈 배열 = 수집 학교 전부 · 좁히는 것은 개발자 지시 때만).",
- "parked": []
+ "parked": [],
+ "_collector": "collector 칸(2026-09-30): 'browser' 면 일반 로봇(collect.mjs)은 이 게시판을 건너뛰고 브라우저 로봇만 읽는다. 첫 실행 실측(2026-09-30)에서 일반 로봇이 🟡 0건이고 브라우저가 정상인 학교에 달았다(경희·시립·동국·홍익·상명). 반대(브라우저가 0건·일반이 정상)면 browser-targets.json 에서 빼는 것이 답이다. 칸이 없으면 둘 다 읽는다. 관문 「수집망 복원」이 browser 담당 학교가 browser-targets.json 에 있는지 대조한다."
 }

@@ -63,3 +63,10 @@ data/notices/index.json      merge=ours
 # 없고, KOSAF 첨부 원주소는 Referer 검사라 앱에서 누르면 "비정상적인 접근"이 뜬다).
 # 내용 비교가 의미 없는 이진 파일이라 diff 를 끈다 — collector/extracted 와 같은 취급.
 data/kosaf-files/**          -diff
+
+# ── 판정 로봇 장부 (2026-09-30) ──
+# 학습 표는 합집합(이름으로) · 후보·씨앗은 매 실행 새로 쓰이므로 내 것
+collector/own-programs.json          merge=jsonunion
+collector/kind-candidates.json       merge=ours
+collector/portal-candidates.json     merge=ours
+collector/school-board-seeds.json    merge=ours

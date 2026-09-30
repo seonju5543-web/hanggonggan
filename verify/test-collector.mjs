@@ -1488,6 +1488,82 @@ console.log('\n■ 로봇 대기줄 — 옛 커밋에서 시작하지 않는다 
   eq('  검수 후보는 수집기와 같은 합치기 규칙을 쓴다 (베끼지 않는다)', /import \{ mergeCandidates \} from '\.\.\/collector\/candidates\.mjs'/.test(mj), true);
 }
 
+/* ── 장학금 판정 자동화 · 범위 승격 (2026-09-30 · 개발자 지시 "2번의 이유를 분석하고 장학금 판정을 자동화") ──────
+   왜 사람 손이었나 — noticeKind 는 제목만 보고, 학교는 제 장학금에 '교내'라고 적지 않으므로 학교마다 사람이 원문을 읽어
+   OWN_PROGRAMS 를 채워야 했다(44개교에서 경희대 하나). 옛 낱말 목록 방식은 2026-09-18 실측에서 19건 중 17건이 틀렸다.
+   지금은 **원문 증거**(제목 표식·학교 이름표·본문의 교비/장학팀/포털·접수 이메일 도메인·재단 직접 제출 문장)를
+   kind-evidence.mjs 가 읽고, kind-classify.mjs 가 원문 도착 뒤 구분을 고치며 제도 이름을 own-programs.json 에 배운다.
+   같은 눈으로 scope-promote.mjs 가 학교 한정으로 묶인 전국 사업을 푼다(F-5). 🔴 첫 시험에서 밟은 것: 메뉴의 '발전기금'·'포털'
+   글자가 증거로 세어졌다 → 껍데기(page-boilerplate)를 걷어낸 본문만 읽고, 학교 이름표 없이는 교내로 보지 않는다. */
+console.log('\n■ 장학금 판정 자동화 · 범위 승격 (2026-09-30)');
+{
+  const root = new URL('../', import.meta.url);
+  const KE = await import(new URL('collector/kind-evidence.mjs', root));
+  const ME = createRequire(import.meta.url)('../match-engine.js');
+  const base = { school: '동국대학교', tokens: ['동국대학교', '동국대', '동대', '동국'], domain: 'dongguk.edu', campusMark: ME.NOTICE_CAMPUS_MARK, own: [] };
+  const k = (x) => KE.classifyKind({ ...base, ...x });
+  eq('[교내] 표식은 교내 high', k({ title: '[교내][등록금] 2026학년도 2학기 건국가족장학생 선발 안내' }).kind + k({ title: '[교내] x' }).confidence, '교내high');
+  eq('[교외] 표식은 교외 high', k({ title: '[교외장학] 2026 산재 노동자 자녀 성장지원사업 모집' }).kind, '교외');
+  eq('제목에 재단·공단 낱말이 있으면 교외 high', k({ title: '2026년 대전청년내일재단 성취 장학생 선발' }).confidence + k({ title: '2026년 대전청년내일재단 성취 장학생 선발' }).kind, 'high교외');
+  eq('  총동문회도 바깥이다', k({ title: '2026학년도 2학기 아주대학교 총동문회 동문장학생 선발 공고' }).kind, '교외');
+  eq('학교 이름표 + 본문의 학교 증거 → 교내 high', k({ title: '2026-2학기 동국리더장학 신청 안내', text: '교내장학금입니다. 신청서는 장학팀에 제출' }).confidence, 'high');
+  eq('  학교 이름표만 → 교내 mid (후보로만)', k({ title: '2026-2학기 동국리더장학 신청 안내' }).confidence, 'mid');
+  eq('  본문 낱말만(이름표 없음)으로는 교내로 보지 않는다 — 메뉴 글자 사고', k({ title: '2026년 상반기 사랑나눔장학생 모집 공고', text: '발전기금 포털 신청' }).kind, '교외');
+  eq('증거 없음 → 교외 low (2026-09-18 기본값)', (() => { const r = k({ title: '2026학년도 2학기 소망장학금 신청 안내' }); return r.kind + r.confidence; })(), '교외low');
+  eq('접수 이메일이 학교 밖 도메인이면 national', k({ title: '2026 장학생 선발', applyEmail: 'apply@foundation.or.kr' }).national, true);
+  eq('  학교 도메인이면 national 아님', k({ title: '2026 장학생 선발', applyEmail: 'scholar@dongguk.edu' }).national, false);
+  eq('본문 "재단 홈페이지에서 신청" 은 national', k({ title: '희망사다리 장학사업 학생 모집', text: '재단 홈페이지에서 신청' }).national, true);
+  eq('  "위원회에서 신청"은 national 아님 (학교 안 위원회가 흔하다 · 벽송회 사고)', k({ title: '벽송회장학금 장학생 선발', text: '장학위원회에서 신청 심사' }).national, false);
+  eq('학습 표 이름 — 학교 이름표가 들면 짧아도 배운다', KE.programNameForTable('2026-2학기 동국리더장학 신청 안내', base.tokens), '동국리더장학');
+  eq('  이름표 없고 짧으면 배우지 않는다', KE.programNameForTable('2026학년도 2학기 소망장학금 신청 안내', base.tokens), null);
+  eq('  바깥 기관 이름은 배우지 않는다', KE.programNameForTable('2026년 하반기 일운과학기술재단 장학생 선발 안내', base.tokens), null);
+  /* 엔진 — 학습 표를 셋째 인자로 받는다 (등록 단계만 · 앱 화면은 넘기지 않는다) */
+  eq('noticeKind 가 학습 표를 받아 교내로 본다', ME.noticeKind('2026-2학기 동국리더장학 신청 안내', '동국대학교', { '동국대학교': [{ name: '동국리더장학' }] }), '교내');
+  eq('  학습 표 없이는 교외 (앱 화면과 같다)', ME.noticeKind('2026-2학기 동국리더장학 신청 안내', '동국대학교'), '교외');
+  /* 사업 열쇠 — 학교가 달라도 같은 사업 */
+  const ER = createRequire(import.meta.url)('../verify/entry-rules.cjs');
+  eq('programKey 가 접두어·연도·꼬리말을 떼고 같은 사업을 잇는다', ER.sameProgram('[교외장학] 2026 산재 노동자 자녀 성장지원사업 모집', '2026년도 산재 노동자 자녀 성장지원사업 참여자 모집 안내'), true);
+  eq('  흔한 이름(성적우수장학생)은 열쇠를 만들지 않는다', ER.programKey('2026학년도 2학기 성적우수장학생 선발 안내'), null);
+  eq('  다른 사업은 다르다', ER.sameProgram('대전청년내일재단 성취 장학생 선발', '대전청년내일재단 인재육성장학생 선발계획 공고'), false);
+  /* 합치기 — 관리자와 로봇이 같은 함수 */
+  const RM = await import(new URL('collector/registered-merge.mjs', root));
+  const keep = { id: 'a', eligibility: { schoolOnly: '아주대학교' }, sourceUrl: 'https://a' };
+  const r = RM.mergeInto(keep, { id: 'b', eligibility: { schoolOnly: '연세대학교' }, sourceUrl: 'https://b', deadline: '2026-10-30' }, { reason: '시험' });
+  eq('다른 학교끼리 합치면 전국으로 승격하고 근거를 남긴다', r.promoted && !keep.eligibility.schoolOnly && /연세대학교/.test(keep.scopeFrom) && keep.deadline === '2026-10-30', true);
+  const adminSrc = readText(new URL('tools/admin-apply.mjs', root));
+  eq('관리자 merge 가 그 함수를 쓴다 (규칙을 베끼지 않는다)', /import \{ mergeInto \} from '\.\.\/collector\/registered-merge\.mjs'/.test(adminSrc) && /mergeInto\(keep, drop/.test(adminSrc), true);
+  const ar = readText(new URL('collector/auto-register.mjs', root));
+  eq('자동 등록이 다른 학교의 같은 사업을 전국으로 승격한다 (verdict promote)', /sameProgram\(/.test(ar) && /verdict: 'promote'/.test(ar) && /mergeInto\(r\.twin/.test(ar), true);
+  eq('  등록 항목에 판정 근거를 남긴다 (kindEvidence)', /kindEvidence/.test(ar) && /noticeKind\(title, n\.school, learnedPrograms\)/.test(ar), true);
+  /* 로봇 셋이 워크플로에 있고, 관문 앞에 있다 */
+  for (const f of ['.github/workflows/collect-scholarships.yml', '.github/workflows/browser-collect.yml']) {
+    const y = readText(new URL(f, root));
+    const at = y.indexOf('node collector/scope-promote.mjs');
+    eq(`${f} 가 판정 로봇 셋을 데이터 관문 앞에서 돌린다`, at > 0 && at < y.indexOf('name: 데이터 관문') && /node collector\/kind-classify\.mjs/.test(y) && /node collector\/portal-candidates\.mjs/.test(y), true);
+    eq(`  ${f} 저장 목록에 학습 표·후보 장부가 있다`, ['own-programs.json', 'kind-candidates.json', 'portal-candidates.json'].filter((n) => !y.includes(n)), []);
+  }
+  const ga = readText(new URL('.gitattributes', root));
+  eq('학습 표는 합집합 병합 · 후보 장부는 내 것', /own-programs\.json\s+merge=jsonunion/.test(ga) && /kind-candidates\.json\s+merge=ours/.test(ga), true);
+  const own = JSON.parse(readText(new URL('collector/own-programs.json', root)));
+  eq('학습 표 모양 {programs, blocked}', typeof own.programs === 'object' && typeof own.blocked === 'object', true);
+  /* 로봇이 껍데기를 걷어낸 본문을 읽는다 — 안 그러면 메뉴의 발전기금·포털이 증거가 된다 */
+  for (const f of ['collector/scope-promote.mjs', 'collector/kind-classify.mjs']) {
+    eq(`${f} 가 껍데기를 걷어낸 본문을 읽는다`, /makeStripperMulti\(\[texts\]\)/.test(readText(new URL(f, root))), true);
+  }
+  /* ⑥ 담당 로봇 · ③ 정찰 · ④ 씨앗 · ⑤ 사진 */
+  const sc = JSON.parse(readText(new URL('collector/schools.json', root)));
+  const bt = JSON.parse(readText(new URL('collector/browser-targets.json', root)));
+  const browserOnly = sc.schools.filter((x) => x.collector === 'browser').map((x) => x.school);
+  eq('브라우저 담당(collector:browser) 학교는 전부 browser-targets 에 있다', browserOnly.filter((n) => !bt.targets.some((t) => t.school === n)), []);
+  eq('  일반 로봇이 그 게시판을 건너뛴다', /s\.collector === 'browser'/.test(readText(new URL('collector/collect.mjs', root))), true);
+  const probe = readText(new URL('collector/run-probe.txt', root));
+  eq('정찰 지시에 못 읽은 네 학교 주소가 있다', ['sogang.ac.kr', 'student.snu.ac.kr', 'dongguk.edu', 'smu.ac.kr'].filter((h) => !probe.includes(h)), []);
+  const seeds = JSON.parse(readText(new URL('collector/school-board-seeds.json', root)));
+  eq('학교 씨앗은 근거(evidence)와 함께 적혀 있고 find-boards 가 읽는다', seeds.seeds.every((x) => x.home && x.evidence) && /school-board-seeds\.json/.test(readText(new URL('collector/find-boards.mjs', root))), true);
+  eq('  씨앗은 schools.json 에 자동으로 넣지 않는다', /schoolsCfg\.schools[^\n]*boardUrl\s*=/.test(readText(new URL('collector/find-boards.mjs', root))), false);
+  eq('정문 사진 도구가 서비스 학교 전부를 이름 규칙(noticeFileKey)으로 만든다', /ME\.SERVED_SCHOOLS/.test(readText(new URL('tools/fetch-gate-photos.mjs', root))) && /ME\.noticeFileKey\(name\)/.test(readText(new URL('tools/fetch-gate-photos.mjs', root))), true);
+}
+
 console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
 {
   /* 왜 있나 — 앱에 '대외활동' 탭이 생겼다. 데이터는 장학 피드와 **다른 파일**(data/activities.json)이고
@@ -1899,7 +1975,7 @@ console.log('\n■ 교내·교외 분류와 주관 기관 (2026-09-18 개발자 
   const mProv = src.match(/const PROVIDER_UNKNOWN = '([^']+)';/);
   eq('교내 표식 규칙(NOTICE_CAMPUS_MARK)이 공용 엔진에 있다', !!mMark, true);
   eq('  로봇이 그 함수를 가져다 쓴다 (규칙을 베끼지 않는다)',
-    /\{ noticeKind \} = createRequire/.test(src) && /type: noticeKind\(title, n\.school\)/.test(src), true);
+    /\{ noticeKind \} = createRequire/.test(src) && /type: noticeKind\(title, n\.school(, learnedPrograms)?\)/.test(src), true);   // 셋째 인자 = 학습 표 (2026-09-30)
   eq('로봇에 "모름" 주관 기관(PROVIDER_UNKNOWN)이 있다', !!mProv, true);
   if (mMark && mProv) {
     const MARK = eval(mMark[1]);
@@ -8685,7 +8761,9 @@ console.log('■ 첨부에서 마감일 — 본문이 껍데기인 게시판 (20
       ['접수 기간 원문 확인', '접수 ~2026-10-01']);
     eq('  발표일도 같은 표식을 남기고 로봇이 존중한다',
       /it\.announceDateFrom = it\.announceDate \? OWNER/.test(aa) && /!it\.announceDate && !humanOwned\(it\.announceDateFrom\)/.test(ee), true);
-    eq('  합칠 때 사람이 비운 마감을 되살리지 않는다', /!keep\.deadline && drop\.deadline && !\/\^\(AI\|관리자\)\//.test(aa), true);
+    /* 합치는 규칙은 2026-09-30 부터 collector/registered-merge.mjs 한 곳(관리자·로봇 공용) — 거기서 본다 */
+    const rm = readText(new URL('../collector/registered-merge.mjs', import.meta.url));
+    eq('  합칠 때 사람이 비운 마감을 되살리지 않는다', /!keep\.deadline && drop\.deadline && !\/\^\(AI\|관리자\)\//.test(rm), true);
   }
 }
 
@@ -9238,7 +9316,7 @@ console.log('\n■ 실시간 공고 → 장학금 탭 (자동 등록 판정 · 2
 
   /* ②-2 중복 판정은 감사와 같은 파일을 쓴다 (베끼면 또 갈라진다) */
   eq('로봇이 공용 중복 판정을 가져다 쓴다',
-    /isDuplicatePair \} = createRequire|checkEntry, isDuplicatePair \}/.test(src) && /isDuplicatePair\(\{ name: bare\(title\)/.test(src), true);
+    /isDuplicatePair[^}]*\} = createRequire/.test(src) && /isDuplicatePair\(\{ name: bare\(title\)/.test(src), true);
   eq('  제 사본(titleSim)을 다시 들이지 않는다', /function titleSim/.test(src), false);
   {
     const { isDuplicatePair } = createRequire(import.meta.url)('./entry-rules.cjs');
@@ -9358,7 +9436,7 @@ console.log('\n■ 학교가 스스로 운영하는 장학 제도 (2026-09-20)')
      등록 로봇은 그 제목을 `국가장학금` 규칙으로 이미 거르므로, 표는 **등록 단계에서만** 쓴다. */
   const arSrc = readText(new URL('../collector/auto-register.mjs', import.meta.url));
   const appSrc = readText(new URL('../app.js', import.meta.url));
-  eq('로봇이 학교를 같이 넘긴다', /type: noticeKind\(title, n\.school\)/.test(arSrc), true);
+  eq('로봇이 학교를 같이 넘긴다', /type: noticeKind\(title, n\.school(, learnedPrograms)?\)/.test(arSrc), true);   // 셋째 인자 = 학습 표 (2026-09-30)
   eq('  앱의 게시판 글 판정은 표식만 본다 (표를 쓰지 않는다)',
     /noticeKind\(n\.title\) === '교내'/.test(appSrc), true);
   eq('  그 합성 제목은 등록 단계에서 걸러진다 (국가장학금 규칙)',

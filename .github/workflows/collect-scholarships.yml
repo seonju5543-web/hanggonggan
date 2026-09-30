@@ -41,7 +41,7 @@ jobs:
     # 2026-09-29 수집망 2 → 44개교 복원: 「게시판 수집」 단계에 자체 상한 10분(예산 8분 + 마무리 2분)이 생겨
     # 단계 합 4+10+6+5+1+4+3+3+4 = 40 → 상한 44. ⚠️ 상한을 키우는 것으로 때우지 말 것 — 단계가 오래 걸리면
     # 그 단계의 예산(HARVEST_BUDGET_MS)을 줄이고, 상한은 그 합을 담는 그릇으로만 쓴다(8/2~3 사고의 교훈).
-    timeout-minutes: 44
+    timeout-minutes: 47   # 2026-09-30 판정 로봇 단계 2분 추가 → 단계 합 42 + 여유 3
     steps:
       - uses: actions/checkout@v4
         with:
@@ -179,6 +179,17 @@ jobs:
         continue-on-error: true
         run: node collector/extract-amounts.mjs --write
 
+      # 원문이 도착한 뒤에만 할 수 있는 판정 셋 (2026-09-30 · 개발자 지시 "장학금 판정 자동화") — 보강 규칙(상한 + continue-on-error).
+      #   범위 승격: 학교 한정으로 묶인 전국 사업을 원문 증거로 푼다(F-5) · 교내·교외 원문 판정: 제목만 보던 구분을 본문 증거로 고치고 학교 제도를 배운다 ·
+      #   포털 표 후보: 학교별 접수 시스템을 모아 사람이 SCHOOL_PORTALS 에 넣게 한다. 셋 다 데이터 관문 **앞**에 둔다(관문이 결과를 본다).
+      - name: 범위 승격 · 교내/교외 원문 판정 · 포털 표 후보 (원문 증거)
+        timeout-minutes: 2
+        continue-on-error: true
+        run: |
+          node collector/scope-promote.mjs
+          node collector/kind-classify.mjs
+          node collector/portal-candidates.mjs
+
       # 데이터 관문 (2026-07-30 도입): 로봇이 바꾼 데이터가 규칙을 어기면 저장하지 않고 되돌린다.
       # 잘못된 공고가 앱에 하루라도 노출되는 일을 막는 장치 — 사람이 감사를 기억해서 돌릴 필요가 없다.
       # 위치 규칙 (2026-08-01): 관문은 **저장 직전**에 둔다. 예전엔 양식 스키마화보다 앞에 있어서
@@ -224,6 +235,11 @@ jobs:
           # 빠뜨리면 registered.json의 formId만 저장되고 양식은 버려져 '없는 양식을 가리키는
           # 연결'이 생긴다 (2026-08-01 감사 실패의 원인 — 이슈 #79).
           git add collector/seen.json data/notices.json data/registered.json data/forms.json
+          # 판정 로봇 셋의 장부 (2026-09-30) — 로봇이 고친 파일은 전부 git add 에 (이슈 #79 규칙)
+          [ -f collector/own-programs.json ] && git add collector/own-programs.json
+          [ -f collector/kind-candidates.json ] && git add collector/kind-candidates.json
+          [ -f collector/portal-candidates.json ] && git add collector/portal-candidates.json
+          [ -f collector/school-board-seeds.json ] && git add collector/school-board-seeds.json
           # 대외활동·공모전 (2026-09-25) — 로봇이 고친 파일은 전부 git add 에 (이슈 #79 규칙). 장부와 발행 파일 한 쌍.
           [ -f data/activities.json ] && git add data/activities.json
           [ -f collector/seen-activities.json ] && git add collector/seen-activities.json
