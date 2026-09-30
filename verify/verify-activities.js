@@ -116,12 +116,37 @@ const cards = (page) => page.$$eval('#activities-list .notice-card', (els) => el
     eq('④ 마감 지난 글은 보이지 않는다', seen.some((c) => /지난 공모전/.test(c.name)), false);
     eq('④ 전국 글은 주최를 말한다', seen[2].org, '대외활동 · 청년재단');
     /* 정렬 — 마감 임박순은 마감을 읽은 글이 앞, 못 읽은 글은 뒤 */
+    /* 🔴 정렬은 **탐색 화면과 같은 단추·같은 자리·같은 동작**이다 (2026-09-30 개발자 지시) —
+       누르면 기준 목록이 뜨고, 골라야 바뀐다. 머리줄 오른쪽 끝에 선다(갱신 날짜 칸이 없어서). */
+    const menuShown = () => page.$eval('#activities-sort-menu', (e) => e.offsetParent !== null);
+    eq('③ 처음에는 정렬 목록이 안 보인다', await menuShown(), false);
     await page.click('#activities-sort-btn'); await page.waitForTimeout(200);
+    eq('③ 누르면 정렬 목록이 열린다 (탐색 화면과 같은 동작)', await menuShown(), true);
+    eq('③   선택지는 둘 — 최근 수집순 · 마감 임박순',
+      await page.$$eval('#activities-sort-menu [data-sort]', (e) => e.map((x) => x.textContent.trim())), ['최근 수집순', '마감 임박순']);
+    eq('③   지금 기준에 표시가 있다',
+      await page.$eval('#activities-sort-menu [aria-checked="true"]', (e) => e.dataset.sort), 'recent');
+    await page.click('#activities-sort-menu [data-sort="deadline"]'); await page.waitForTimeout(200);
     eq('③ 마감 임박순 — 마감 읽은 글이 앞', (await cards(page)).map((c) => c.name)[0], '2026 대학생 해외봉사단 모집');
     eq('③ 정렬 단추 글자', await page.$eval('#activities-sort-label', (e) => e.textContent.trim()), '마감 임박순');
+    eq('③   고르고 나면 목록이 닫힌다', await menuShown(), false);
     await page.click('#activities-sort-btn'); await page.waitForTimeout(200);
-    eq('③ 다시 누르면 최근 수집순', await page.$eval('#activities-sort-label', (e) => e.textContent.trim()), '최근 수집순');
-    eq('갱신 날짜', await page.$eval('#activities-updated', (e) => e.textContent.trim()), '2026-09-25 갱신');
+    await page.click('#activities-sort-menu [data-sort="recent"]'); await page.waitForTimeout(200);
+    eq('③ 다시 골라 최근 수집순', await page.$eval('#activities-sort-label', (e) => e.textContent.trim()), '최근 수집순');
+    await page.click('#activities-sort-btn'); await page.waitForTimeout(200);
+    await page.click('#activities-list'); await page.waitForTimeout(150);
+    eq('③   바깥을 누르면 목록이 닫힌다', await menuShown(), false);
+    eq('③ 갱신 날짜를 보이지 않는다 (머리줄 셋째 칸이 단추를 가운데로 밀었다)',
+      await page.$('#activities-updated'), null);
+    /* 자리 — 탐색 화면의 정렬 단추와 오른쪽 끝이 같다(화면 폭 기준) */
+    const rightOf = (sel) => page.$eval(sel, (e) => Math.round(e.getBoundingClientRect().right));
+    const actRight = await rightOf('#activities-sort-btn');
+    const headRight = await page.$eval('#screen-activities .page-header', (e) => Math.round(e.getBoundingClientRect().right
+      - parseFloat(getComputedStyle(e).paddingRight)));
+    eq('③ 정렬 단추가 머리줄 오른쪽 끝에 붙는다', Math.abs(actRight - headRight) <= 1, true);
+    await page.click('.nav-item[data-nav="explore"]'); await page.waitForTimeout(300);
+    eq('③   탐색 화면의 정렬 단추와 같은 자리다', Math.abs(await rightOf('#explore-sort-btn') - actRight) <= 1, true);
+    await page.click('.nav-item[data-nav="activities"]'); await page.waitForTimeout(300);
 
     await page.click('#activities-filters .filter-chip[data-filter="공모전"]');
     await page.waitForTimeout(200);
@@ -157,7 +182,6 @@ const cards = (page) => page.$$eval('#activities-list .notice-card', (els) => el
     await page.click('.nav-item[data-nav="activities"]');
     await page.waitForTimeout(500);
     eq('⑤ 실패해도 뼈대가 아니라 "없어요"', await page.$eval('#activities-list', (e) => e.textContent.includes('없어요') && !e.querySelector('.skel, .skeleton')), true);
-    eq('⑤ 갱신 날짜 자리는 기본 문구', await page.$eval('#activities-updated', (e) => e.textContent.trim()), '매일 아침 갱신');
     await page.click('.nav-item[data-nav="home"]');
     await page.waitForTimeout(400);
     eq('⑤ 홈 — 재단 글을 못 받아 왔으면 구역이 비어 있다 (뼈대·빈 문구 없음)', await page.$eval('#external-notices', (e) => e.innerHTML.trim()), '');

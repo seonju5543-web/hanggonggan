@@ -1679,7 +1679,12 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
     eq('앱 — 마감을 읽은 글은 마감 다음 날까지만 (장학과 같은 CLOSED_KEEP_DAYS)', /!n\.deadline \|\| dday\(n\.deadline\)\.days >= -CLOSED_KEEP_DAYS/.test(app), true);
     eq('  D-day 는 dday()·ddayWords() 한 곳 (판정을 새로 만들지 않는다)', /dday: n\.deadline \? \{ label: ddayWords\(dday\(n\.deadline\)\)/.test(app), true);
     eq('  마감 임박순은 마감을 읽은 글끼리만', /const byDeadline = \(a, b\) => \(a\.deadline && b\.deadline \? a\.deadline\.localeCompare\(b\.deadline\)/.test(app), true);
-    eq('  정렬 단추가 있다', /id="activities-sort-btn"/.test(html) && /\$\('#activities-sort-btn'\)\.addEventListener/.test(app), true);
+    /* 2026-09-30 — 탐색 화면과 **한 벌**(SORT_MENUS)로 배선한다: 누르면 기준 목록이 뜬다 */
+    eq('  정렬 단추·목록이 있고 탐색 화면과 같은 배선을 탄다', /id="activities-sort-btn"/.test(html)
+      && /id="activities-sort-menu"/.test(html)
+      && /activities: \{ btn: '#activities-sort-btn', menu: '#activities-sort-menu'/.test(app)
+      && /for \(const which of Object\.keys\(SORT_MENUS\)\)/.test(app), true);
+    eq('  대외활동 전용 토글 배선이 되살아나지 않았다 (두 벌 금지)', /\$\('#activities-sort-btn'\)\.addEventListener/.test(app), false);
     eq('  발췌 줄은 카드 한 벌 안에서 그린다', /\(o\.excerpts \|\| \[\]\)\.map\(\(x\) => `<p class="sch-provider">/.test(app), true);
   }
 }
