@@ -5201,33 +5201,6 @@
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   },
   {
-   "id": "auto-wardnewsdoarticleno95206",
-   "name": "AWARDS 숙명여대 화공생명공학과 서세정 졸업생, ‘일본 문부과학성 장학생’ 선발",
-   "boardTitle": "AWARDS 숙명여대 화공생명공학과 서세정 졸업생, ‘일본 문부과학성 장학생’ 선발",
-   "type": "교외",
-   "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
-   "deadline": null,
-   "listedAt": "2026-09-30",
-   "period": "접수 기간 원문 확인",
-   "summary": "숙명여자대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
-   "eligibility": {
-    "selective": true,
-    "schoolOnly": "숙명여자대학교"
-   },
-   "documents": [
-    "지원 자격·제출 서류는 원문 공고에서 확인"
-   ],
-   "duplicable": true,
-   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
-   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
-   "auto": true,
-   "attachments": [],
-   "sourceUrl": "https://www.sookmyung.ac.kr/kr/news/award-news.do?mode=view&articleNo=95206",
-   "sourceKind": "auto"
-  },
-  {
    "id": "auto-nuid100nttid30203ptabno5",
    "name": "2026년 푸른등대 한국수력원자력 K-원전 장학금 신청 안내",
    "boardTitle": "2026년 푸른등대 한국수력원자력 K-원전 장학금 신청 안내",
@@ -5902,6 +5875,301 @@
     "min": 3000000,
     "max": 3000000,
     "raw": "지원금액 학기 당 300 만원 ( 생활비 무상보조 )"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-ucd000000000000062seq699",
+   "name": "2026년도 2학기 고졸 후학습자 장학사업(희망사다리 II유형) 신규장학생 신청 기간 안내(기간 연장)",
+   "boardTitle": "2026년도 2학기 고졸 후학습자 장학사업(희망사다리 II유형) 신규장학생 신청 기간 안내(기간 연장)",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-09-30",
+   "deadlineFrom": "게시판 요약 · ~ 9. 30",
+   "period": "접수 ~2026-09-30",
+   "summary": "부산대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "부산대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://onestop.pusan.ac.kr/page?menuCD=000000000000062&mode=DETAIL&seq=699",
+   "sourceKind": "auto",
+   "openDate": "2026-09-01",
+   "eligibilityLines": [
+    "가. 지원대상",
+    "○ 대한민국 국적자로 최종 학력이 고졸인 자",
+    "※ 전문학사 취득자가 전공심화과정 및 4년제 대학에 신･편입하는 경우, ‘전문학사 취득 전’ 재직기간 2년을 충족하면 장학금 지원 가능 <증빙서류 제출 필요>",
+    "※ 가족기업, 공공기관, 국가 및 지자체 등 일부 기업은 지원대상에서 제외",
+    "○ (성적) 직전학기 성적이 백분위 70점(평점 1.51에 해당) 이상인 자",
+    "○ (재직요건)",
+    "- 2026년 7월 1일 기준 재직기간이 2년 이상인 자( 단 , 중소 · 중견기업은 1년 이상)",
+    "※ 고용보험 가입정보 기준으로 산정하며 이전 재직 기업 유형 및 규모는 무관. 군 복무기간을 포함하되, 재직 경력이 최소 6개월(180일) 이상이어야 함",
+    "- 2026년 7월 1일 기준 지원 대상 기업에 재직 중인 자",
+    "※ 「중소기업법」 및 「중견기업법」에 따른 중소·중견기업과 기업신용조회사에서 대기업으로 분류한 기업, 비영리법인, 비사업자까지 포함(기업유형 및 규모에 따라 차등지원)",
+    "※ 단, 공공기관 등 업무처리기준상 “재직 인정 제외 기업”은 지원대상에서 제외(【붙임1】참조)"
+   ],
+   "excerpts": [
+    "- 2026년 7월 1일 기준 지원 대상 기업에 재직 중인 자",
+    "신청방법: 한국장학재단 홈페이지(www.kosaf.go.kr)에서 학생 본인이 직접 신청"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "ratio",
+    "value": 0,
+    "ratio": 1,
+    "min": 0,
+    "max": 0,
+    "raw": "나. 지원내용: 수혜횟수 범위 내 정규학기 및 초과학기 등록금 지원 ○ 현 재직기업의 유형 및 규모에 따라 등록금 차등 지원 - 중소·중견기업: 등록금 전액 - 대기업·비영리기관: 등록금 50%"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-ucd000000000000062seq698",
+   "name": "2026학년도 2학기 중소기업 취업연계 장학사업(희망사다리Ⅰ유형) 학생 신청 기간 안내",
+   "boardTitle": "2026학년도 2학기 중소기업 취업연계 장학사업(희망사다리Ⅰ유형) 학생 신청 기간 안내",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "200만원",
+   "amountValue": 2000000,
+   "deadline": "2026-09-18",
+   "listedAt": "2026-09-30",
+   "period": "접수 기간 ~2026-09-18",
+   "summary": "부산대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "부산대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://onestop.pusan.ac.kr/page?menuCD=000000000000062&mode=DETAIL&seq=698",
+   "sourceKind": "auto",
+   "deadlineFrom": "공고 원문",
+   "openDate": "2026-09-01",
+   "eligibilityLines": [
+    "□ 지원대상",
+    "ㅇ (기본요건) 대한민국 국적자로 일반대 3학년 이상 또는 전문대 2학년 이상의 학생이며, 대학의 최소이수학점 이상을 이수하고(대학의 최소이수학점 기준이 없는 경우 12학점 이상 이수), 직전학기 성적이 100점 만점의 70점 이상인 자",
+    "- 취업지원형: 기본요건을 충족하는 학생 중 중소·중견기업 취업(희망)자",
+    "- 창업지원형: 기본요건을 충족하는 학생 중 창업(희망)자",
+    "※ 본 장학금 기존 수혜자 중 전문대 장학생이 졸업 후 전공심화 또는 4년제 편입하는 경우, 편입한 첫 학기에 한해 신규로 재신청 가능"
+   ],
+   "excerpts": [
+    "□ 기타 문의: 한국장학재단 콜센터(1800-0499)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 2000000,
+    "ratio": 0,
+    "min": 2000000,
+    "max": 2000000,
+    "raw": "□ 지원내용 ㅇ (등록금) 수혜학기 등록금 전액 - 수혜학기 중복지원 여부와 등록금액에 따라 장학금액 변동 가능 - 장학생 지원기준을 충족하지 못할 시 장학금 지원 중단 ㅇ (취·창업지원금) 수혜학기 당 200만원 - 매 학기 직무기초교육 이수자에 한해 지원"
+   },
+   "amountFrom": "공고 원문",
+   "exclusivity": {
+    "kind": "forbidden",
+    "scope": "external",
+    "raw": "- 일자리사업 중복 참여 금지: 장학금 지원 학기 및 의무종사 종료일까지 청년 내일채움공제, 취업성공패키지, 청년구직활동지원금 등 중복수혜 금지 (상세 내용은 업무처리기준 등 반드시 확인)"
+   },
+   "exclusivityFrom": "공고 원문"
+  },
+  {
+   "id": "auto-ec9588eb82b4202026091720",
+   "name": "2026-2학기 동국리더장학 신청 안내",
+   "boardTitle": "2026-2학기 동국리더장학 신청 안내",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-10-14",
+   "deadlineFrom": "게시판 요약 · ~ 10. 14",
+   "period": "접수 ~2026-10-14",
+   "summary": "동국대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "동국대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-%EA%B3%B5%EC%A7%80%20%EA%B3%B5%EC%A7%80%202026-2%ED%95%99%EA%B8%B0%20%EB%8F%99%EA%B5%AD%EB%A6%AC%EB%8D%94%EC%9E%A5%ED%95%99%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4%202026.09.17.%20",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-eba79dec82aceb8ba4eba6ac",
+   "name": "[기한 연장]2026-2학기 고졸 후학습자 장학사업(희망사다리 Ⅱ유형) 신규장학생 선발 안내(~9/30(수))",
+   "boardTitle": "[기한 연장]2026-2학기 고졸 후학습자 장학사업(희망사다리 Ⅱ유형) 신규장학생 선발 안내(~9/30(수))",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-09-30",
+   "deadlineFrom": "게시판 요약 · ~9/30",
+   "period": "접수 ~2026-09-30",
+   "summary": "동국대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "동국대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-%EA%B3%B5%EC%A7%80%20%EA%B3%B5%EC%A7%80%20%5B%EA%B8%B0%ED%95%9C%20%EC%97%B0%EC%9E%A5%5D2026-2%ED%95%99%EA%B8%B0%20%EA%B3%A0%EC%A1%B8%20%ED%9B%84%ED%95%99%EC%8A%B5%EC%9E%90%20%EC%9E%A5%ED%95%99%EC%82%AC%EC%97%85(%ED%9D%AC%EB%A7%9D%EC%82%AC%EB%8B%A4%EB%A6%AC",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-84b1ecb7a820ec9ea5ed9599",
+   "name": "[홍보] 2026년 대전청년내일재단 하반기 인재육성(성취) 장학생 선발 안내(기간 연장)",
+   "boardTitle": "[홍보] 2026년 대전청년내일재단 하반기 인재육성(성취) 장학생 선발 안내(기간 연장)",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-30",
+   "period": "접수 기간 원문 확인",
+   "summary": "동국대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "동국대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2724%20%5B%ED%99%8D%EB%B3%B4%5D%202026%EB%85%84%20%EB%8C%80%EC%A0%84%EC%B2%AD%EB%85%84%EB%82%B4%EC%9D%BC%EC%9E%AC%EB%8B%A8%20%ED%95%98%EB%B0%98%EA%B8%B0%20%EC%9D%B8%EC%9E%AC%EC%9C%A1%EC%84%B1(%EC%84%B1%EC%B7%A8)%20%EC%9E%A5%ED%95%99",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-202026091720eca1b0ed9a8c",
+   "name": "2026년 2학기 파안장학 선발 안내",
+   "boardTitle": "2026년 2학기 파안장학 선발 안내",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-30",
+   "period": "접수 기간 원문 확인",
+   "summary": "동국대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "동국대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2719%202026%EB%85%84%202%ED%95%99%EA%B8%B0%20%ED%8C%8C%EC%95%88%EC%9E%A5%ED%95%99%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4%202026.09.17.%20%EC%A1%B0%ED%9A%8C",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-8eca79120ec9588eb82b4202",
+   "name": "[홍보] 2026 하반기 AI·ICT 인재 장학생 모집 안내",
+   "boardTitle": "[홍보] 2026 하반기 AI·ICT 인재 장학생 모집 안내",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-30",
+   "period": "접수 기간 원문 확인",
+   "summary": "동국대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "동국대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2716%20%5B%ED%99%8D%EB%B3%B4%5D%202026%20%ED%95%98%EB%B0%98%EA%B8%B0%20AI%C2%B7ICT%20%EC%9D%B8%EC%9E%AC%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EC%95%88%EB%82%B4%202",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-notice7doarticleno892571",
+   "name": "2026-2 희망사다리Ⅰ유형(중소기업취업연계) 장학금 신청 안내",
+   "boardTitle": "2026-2 희망사다리Ⅰ유형(중소기업취업연계) 장학금 신청 안내",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "200만원",
+   "amountValue": 2000000,
+   "deadline": "2026-09-18",
+   "listedAt": "2026-09-30",
+   "period": "접수 기간 ~2026-09-18",
+   "summary": "세종대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "세종대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.sejong.ac.kr/kor/intro/notice7.do?mode=view&articleNo=892571&article.offset=0&articleLimit=10",
+   "sourceKind": "auto",
+   "deadlineFrom": "공고 원문",
+   "openDate": "2026-09-01",
+   "eligibilityLines": [
+    "■ 지원대상",
+    "- 기본요건 : 3 학년이상 인 자로 직전학기 12 학점 이상 취득 및 백분위 성적 70 점 이상인 자",
+    "(‘26-2 편입생 및 재입학생은 성적 심사 제외 )",
+    "① 취업지원형 : 기본요건을 충족하는 학생 중 중소 · 중견기업 취업 ( 희망 ) 자",
+    "② 창업지원형 : 기본요건을 충족하는 학생 중 창업 ( 희망 ) 자"
+   ],
+   "excerpts": [
+    "■ 신청기간 : 2026 년 9 월 1 일 ( 화 ) ~ 9 월 18 일 (금 ) 18:00 시까지 기한엄수",
+    "■ 기타문의 : 학생지원과 02-3408-4355"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 2000000,
+    "ratio": 0,
+    "min": 2000000,
+    "max": 2000000,
+    "raw": "■ 지원내용 - 등록금 : 등록금 전액 ※ 장학생 지원기준을 충족하지 못할 시 장학금 지원 중단 - 취 · 창업지원금 : 학기당 200 만원 ※ 매 학기 직무기초교육 미이수시 미지급"
    },
    "amountFrom": "공고 원문"
   }
