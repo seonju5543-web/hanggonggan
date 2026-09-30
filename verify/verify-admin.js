@@ -851,10 +851,14 @@ function serve() {
   await page.waitForSelector('#screen-review:not([hidden])');
   const moreBtns = await page.locator('#screen-review [data-more]').count();
   if (moreBtns) {
-    const before = await page.locator('#screen-review [data-rows] [data-row]').count();
+    /* 🔴 [data-row] 로 세지 말 것 — 그 표식은 '컨펌 대기 공고 한 줄'(③ 건수 검사가 기댄다)이라
+       미등록 후보 줄에는 없다. 그래서 후보가 80건을 넘어 버튼이 처음 생긴 날(2026-09-30 · 44개교 복원)
+       늘어난 줄을 못 보고 63 → 63 으로 빨간불이 됐다. 버튼이 늘리는 목록의 줄(.row)을 센다. */
+    const rowsN = () => page.locator('#screen-review [data-rows] > .row').count();
+    const before = await rowsN();
     await page.locator('#screen-review [data-more]').first().click();
     await page.waitForTimeout(250);
-    const after = await page.locator('#screen-review [data-rows] [data-row]').count();
+    const after = await rowsN();
     ok(after > before, '더 보기를 누르면 잘려 있던 줄이 실제로 늘어난다', `${before} → ${after}줄`);
   } else {
     ok(true, '더 보기 버튼 — 지금 데이터에선 잘린 목록이 없어 건너뜀');
