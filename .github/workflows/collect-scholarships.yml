@@ -88,7 +88,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           last=$(gh issue list --repo "${{ github.repository }}" \
-            --search '"수집 리포트" in:title' --state open \
+            --search '"장학공고 수집 리포트" in:title' --state open \
             --limit 1 --json number --jq '.[0].number' || true)
           if [ -n "$last" ] && [ "$last" != "null" ]; then
             gh issue comment "$last" --repo "${{ github.repository }}" \

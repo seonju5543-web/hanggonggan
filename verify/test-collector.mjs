@@ -1380,6 +1380,11 @@ console.log('\n■ 수집망 복원 (2026-09-29 · 2026-08-30 좁힘을 되돌�
   /* 앱·알림·발행이 같이 쓰는 상수 — schools.json 과 같아야 한다 (자세한 대조는 「화면이 보여 주는 학교 = 로봇이 수집하는 학교」) */
   const served = createRequire(import.meta.url)('../match-engine.js').SERVED_SCHOOLS;
   eq('앱 상수 SERVED_SCHOOLS 도 44곳 전부다', REVIVED.filter((n) => !served.includes(n)), []);
+  /* 서비스한다고 적었는데 아무 로봇도 안 읽는 학교 — 학생은 빈 피드를 본다. 지금은 게시판 주소가 없는 분교 셋뿐이고(개발자가 주소를 줘야 한다),
+     넷째가 조용히 생기면 여기서 잡는다(리뷰 2026-09-30). */
+  const browserSet = new Set(bt.targets.map((x) => x.school));
+  const unread = [...new Set(sc.schools.filter((x) => !x.boardUrl && !browserSet.has(x.school)).map((x) => x.school))].sort();
+  eq('아무 로봇도 안 읽는 서비스 학교는 주소 없는 분교 셋뿐이다', unread, ['고려대학교 세종캠퍼스', '동국대학교 WISE캠퍼스', '연세대학교 미래캠퍼스']);
   /* 보관 자리의 규칙은 그대로 — 키가 사라지면 다음에 뺄 때 주소를 잃는다 */
   const parked = (o) => (Array.isArray(o.parked) ? o.parked : []);
   eq('보관 배열이 남아 있다 (비어 있어도 된다)', Array.isArray(sc.parked) && Array.isArray(bt.parked), true);
@@ -1450,7 +1455,8 @@ console.log('\n■ 로봇 대기줄 — 옛 커밋에서 시작하지 않는다 
   const root = new URL('../', import.meta.url);
   const wfDir = new URL('.github/workflows/', root);
   const files = fs.readdirSync(wfDir).filter((f) => f.endsWith('.yml'));
-  const queued = files.filter((f) => /group:\s*collector\b/.test(readText(new URL(f, wfDir))));
+  /* 진짜 대기줄 선언만 센다 — 주석의 "group: collector" 를 세면 다른 대기줄 워크플로까지 잡는다(리뷰 2026-09-30) */
+  const queued = files.filter((f) => /^concurrency:\n(?:[^\n]*\n)*?\s+group:\s*collector\s*$/m.test(readText(new URL(f, wfDir))));
   eq('collector 대기줄을 쓰는 워크플로가 있다', queued.length >= 2, true);
   const stale = queued.filter((f) => {
     const y = readText(new URL(f, wfDir));
@@ -1458,6 +1464,14 @@ console.log('\n■ 로봇 대기줄 — 옛 커밋에서 시작하지 않는다 
     return !/- uses: actions\/checkout@v4\n\s+with:\n(?:\s+#[^\n]*\n)*\s+ref: \$\{\{ github\.ref_name \}\}/.test(y);
   });
   eq('  전부 지금 브랜치 끝(ref: github.ref_name)에서 시작한다', stale, []);
+  /* 🔴 체크아웃 단계에 with: 가 둘이면 GitHub 이 파일 전체를 「잘못된 워크플로」로 거절한다 — 2026-09-30 실제로 다섯 파일이
+     그렇게 죽어 관리자 버튼까지 멈췄다. 파이썬 yaml 은 중복 키를 조용히 넘기므로 여기서 직접 센다(모든 워크플로 · 모든 단계). */
+  const dupWith = files.filter((f) => {
+    const y = readText(new URL(f, wfDir));
+    return [...y.matchAll(/^( +)- (?:name|uses|id):[^\n]*\n((?:\1  [^\n]*\n|\s*#[^\n]*\n)*)/gm)]
+      .some((m) => (m[2].match(new RegExp(`^${m[1]}  with:`, 'gm')) || []).length > 1);
+  });
+  eq('  어느 단계에도 with: 가 둘 이상 없다 (중복 키 = GitHub 이 파일을 거절한다)', dupWith, []);
   const ga = readText(new URL('../.gitattributes', import.meta.url));
   for (const f of ['collector/candidates.json', 'collector/pagination.json', 'collector/extracted/notices-text.json']) {
     eq(`  ${f} 에 합집합 규칙이 있다`, new RegExp(`^${f.replace(/[./]/g, '\\$&')}\\s+merge=jsonunion`, 'm').test(ga), true);
@@ -9125,6 +9139,10 @@ console.log('\n■ 실시간 공고 → 장학금 탭 (자동 등록 판정 · 2
   {
     const grab = (n) => { const m = src.match(new RegExp(`const ${n} = (/[^\\n]*/[a-z]*);`)); return m ? eval(m[1]) : null; };
     const [ADMIN, EVENT] = [grab('ADMIN_NOTICE'), grab('EVENT')];
+    /* 2026-09-30 실측 — 숙명여대 '주요공지'에 섞인 수상 소식(award-news)이 '선발' 낱말로 자동 등록됐다. 뉴스는 신청 공고가 아니다. */
+    eq('수상 소식(AWARDS · 졸업생 … 선발)은 행정 안내처럼 거른다',
+      ADMIN.test("AWARDS 숙명여대 화공생명공학과 서세정 졸업생, ‘일본 문부과학성 장학생’ 선발"), true);
+    eq('  진짜 선발 공고는 거르지 않는다', ['2026학년도 2학기 건국가족장학생 선발 안내', '2026년 하반기 일운과학기술재단 장학생 선발 안내'].filter((t) => ADMIN.test(t)), []);
     eq('로봇에서 행정 공지·행사 규칙을 찾았다', !!ADMIN && !!EVENT, true);
     if (ADMIN && EVENT) {
       const 행정 = [

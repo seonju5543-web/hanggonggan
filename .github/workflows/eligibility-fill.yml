@@ -63,13 +63,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # 🔴 대기줄(collector)에서 기다린 뒤에는 **지금 브랜치 끝**에서 시작한다 (2026-09-30).
-          #    기본값(GITHUB_SHA)은 큐에 들어간 시점에 굳어서, 앞 로봇이 저장한 커밋 위로 rebase 하다
-          #    규칙 없는 장부에서 충돌 → 3회 실패 → 그 실행의 수집분이 통째로 버려졌다(브라우저 19곳 17분치).
+          # 🔴 작업이 시작되는 시점의 **브랜치 끝**에서 시작한다 (2026-09-30 · 수집 로봇과 같은 규칙).
+          #    기본값(GITHUB_SHA)은 큐에 들어간 시점에 굳어서, 기다리는 사이 다른 로봇이 저장한 커밋 위로 rebase 하다 충돌할 수 있다.
           ref: ${{ github.ref_name }}
-        with:
-          # 로봇은 자기가 읽은 브랜치(=기본 브랜치)에만 저장한다. 배포는 deploy-sync의 몫.
-          ref: 'claude/nice-heisenberg-WESq5'
       - uses: actions/setup-node@v4
         with: { node-version: '20' }
 
