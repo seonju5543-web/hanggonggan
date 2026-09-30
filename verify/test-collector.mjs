@@ -7278,8 +7278,13 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
     appSrc2.indexOf('function renderExplore('));
   eq('renderHome 구간을 찾았다', homeBody.length > 500, true);
   eq("홈 히어로가 '약' 을 붙이지 않는다", /'약 '/.test(homeBody), false);
-  eq('  홈 히어로는 countUp 에 최대만 넘긴다',
-    /countUp\(\$\('#hero-amount'\), total, \(v\) => `최대 \$\{won\(v\)\}`\)/.test(appSrc2), true);
+  /* 2026-09-30 재구성(도미노 '총 자산' 꼴): 금액은 '최대'·숫자·단위 세 조각이고 숫자만 countUp 한다.
+     세 조각은 wonParts 한 곳에서 나오므로 won() 과 갈라질 수 없다. */
+  eq('  홈 히어로 숫자는 wonParts 로 굴리고 단위는 목표 금액의 것으로 고정한다',
+    /countUp\(\$\('#hero-num'\), total, \(v\) => wonParts\(v, unit\)\.num\)/.test(appSrc2)
+    && /function won\(n\) \{\s*const p = wonParts\(n\);/.test(appSrc2), true);
+  eq('  히어로 3줄은 합계에 실제로 든 것(added·onlyOne)만, 금액 큰 순',
+    /\[\.\.\.bill\.added, \.\.\.bill\.onlyOne\][\s\S]{0,200}?sort\(\(a, b\) => b\.won - a\.won\)[\s\S]{0,60}?slice\(0, HERO_ROWS\)/.test(homeBody), true);
   eq('금액 상세는 어림잡은 몫을 그대로 밝힌다 (여기까지 걷으면 안 된다)',
     /금액을 못 읽은 \$\{bill\.assumed\.length\}건은 어림잡아 더함/.test(appSrc2)
     && /확인된 공고들의 중앙값/.test(appSrc2), true);
@@ -7293,6 +7298,11 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
       /바로 신청할 수 있어요/.test(appSrc2), false);
     eq('  #hero-count 요소 자체가 없다 (채우는 곳 없는 빈 칸을 남기지 않는다)',
       /id="hero-count"/.test(h2), false);
+    /* 2026-09-30 승인 구조: 머리줄과 히어로가 한 남색 띠 안 · 금액 세 조각 · 3줄 자리 · 버튼 id 그대로 */
+    eq('  머리줄과 히어로가 .hero-band 한 띠 안에 있다',
+      /<div class="hero-band">\s*<header class="home-header">[\s\S]*?<div class="hero-card">[\s\S]*?<\/div>\s*<\/div>/.test(h2), true);
+    eq('  금액이 최대·숫자·단위 세 조각이고 3줄 자리와 버튼이 있다',
+      /id="hero-num"/.test(h2) && /id="hero-unit"/.test(h2) && /id="hero-rows"/.test(h2) && /id="btn-apply-all"/.test(h2), true);
     /* 🔴 그 칸이 주던 아래 여백을 물려받지 않으면 금액과 버튼이 2px 로 붙는다(실측 57 → 2).
        style.css 는 뒤 블록이 앞을 덮으므로 파일 끝 '히어로' 절에 있어야 먹는다. */
     const css = readText(new URL('../style.css', import.meta.url));

@@ -97,6 +97,7 @@
   --t-2xl: 21px;
   --t-3xl: 27px;
   --t-hero: 38px;   /* 금액 하나뿐 */
+  --t-hero-lg: 52px; /* 홈 히어로 숫자 한 곳 (2026-09-30 · 도미노 '총 자산' 꼴) — 다른 데 쓰지 말 것 */
   /* 🔴 입력칸 글자는 **척도가 아니라 기능값**이다 — iOS 는 16px 미만인 칸을 누르면 화면을
      통째로 확대한다(학생이 손가락으로 다시 줄여야 한다). 그래서 '한 단계 아래(--t-md 14.5px)'
      로 내리지 않고 **그 바닥인 16px** 에 둔다. 아홉 단계 척도(--t-2xs~hero)에 넣지 않는
@@ -446,36 +447,67 @@ input::placeholder { color: var(--text-weak); }
 .home-greet { font-size: var(--t-xl); font-weight: 800; letter-spacing: -0.02em; }
 .home-school { font-size: var(--t-sm); color: var(--text-weak); font-weight: 500; }
 
-/* 🔴 히어로 장식을 걷었다 (2026-09-30 개발자 지시 "이 부분만 수정" · 후보 A).
-   전에는 남색 판 위에 **주황 빛 두 겹 + 오른쪽 위 큰 원(::after)** 이 얹혀 있었다 — 금융 앱의
-   자산 요약(미니스탁·네이버페이·코빗 · 유아이볼 실측)은 숫자 하나에 장식이 없다. 남는 것은
-   --grad-navy 의 은은한 빛 하나(이 앱의 유일한 그라데이션)와 요소 셋(건수·금액·버튼)이다.
-   금액 밑 얇은 선은 '숫자'와 '동작'을 가르는 유일한 구분이다(그림자 금지 · ui-tone FLAT).
-   후보 B·C 는 docs/designs/mockups/hero-variants.html 에만 있다. */
-.hero-card {
-  position: relative;
-  overflow: hidden;
-  background: var(--grad-navy);
-  border-radius: var(--radius-lg);
-  padding: var(--space-24) var(--space-24) var(--space-20);
+/* ══ 홈 히어로 — 남색 띠 + 큰 숫자 + 그 금액을 이루는 3줄 (2026-09-30 개발자 지시) ═══════
+   "카드가 아니어도 되니까 강조 수준은 매우 높되, 깔끔한 디자인" → 첫 안(자산 요약 셋)은 물리고
+   유아이볼 도미노 온보딩 '총 자산'을 가리켰다: 작은 이름표 · 큰 숫자 · 그 밑에 숫자를 이루는
+   항목 3줄 · 아래로 흐려짐 · 큰 버튼. 카드(모서리·장식·그림자)는 없다 — 화면 위쪽이 통째로 띠다.
+   🔴 새 색·그림자 없음(ui-tone FLAT) · 여백은 토큰만 · 숫자 크기는 --t-hero-lg 한 곳.
+   설계 문서: docs/designs/mockups/hero-domino.md */
+.hero-band {
+  margin: calc(var(--space-20) * -1) calc(var(--space-20) * -1) 0;
+  padding: calc(var(--space-20) + env(safe-area-inset-top)) var(--space-20) var(--space-24);
+  background: var(--navy-1);
   color: #fff;
-  margin-bottom: var(--space-32);
 }
+.hero-band .home-header { margin-bottom: var(--sp-3); padding-bottom: 0; }
+.hero-band .home-greet { color: #fff; }
+.hero-band .home-school { color: rgba(232, 239, 254, 0.72); }
+.hero-band .avatar { background: #fff; color: var(--navy-1); }
+.hero-band .icon-btn { color: #fff; }
+.hero-card { position: relative; color: #fff; margin-bottom: var(--space-32); }
 .hero-label {
   font-size: var(--t-sm);
   font-weight: 600;
   letter-spacing: 0.02em;
-  color: rgba(232, 239, 254, 0.75);
+  color: rgba(232, 239, 254, 0.72);
 }
+/* 금액 세 조각 — 숫자만 크다. baseline 으로 맞춰 '최대 2,665 만원' 이 한 줄로 읽힌다 */
 .hero-amount {
-  font-size: var(--t-hero);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  margin: var(--space-6) 0 var(--space-2);
-  padding-bottom: var(--space-16);
-  border-bottom: 1px solid rgba(232, 239, 254, 0.14);
+  display: flex; align-items: baseline; gap: var(--space-6);
+  margin: var(--space-8) 0 var(--space-2);
   font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+  line-height: 1;
 }
+.hero-max { font-size: var(--t-xl); font-weight: 700; color: rgba(232, 239, 254, 0.72); letter-spacing: -0.01em; }
+.hero-num { font-size: var(--t-hero-lg); font-weight: 800; }
+.hero-unit { font-size: var(--t-3xl); font-weight: 800; }
+/* 그 금액을 이루는 공고 — 아래 줄로 갈수록 흐려져 '더 있다'를 말한다.
+   ⚠️ 그라데이션 마스크를 쓰지 않는다 — 그라데이션은 --grad-navy 한 곳뿐(ui-tone 관문). 줄마다 투명도로 낸다. */
+.hero-rows { list-style: none; margin: var(--space-4) 0 0; padding: 0; }
+.hero-row:nth-child(2) { opacity: 0.8; }
+.hero-row:nth-child(3) { opacity: 0.45; }
+.hero-rows[hidden] { display: none; }
+.hero-row {
+  display: flex; align-items: center; gap: var(--space-12);
+  padding: var(--space-12) 0;
+  border-top: 1px solid rgba(232, 239, 254, 0.12);
+}
+.hero-ini {
+  flex: none; width: 30px; height: 30px; border-radius: 50%;
+  background: var(--navy-2); color: #fff;
+  font-size: var(--t-xs); font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+}
+.hero-row-name {
+  flex: 1; min-width: 0;
+  font-size: var(--t-sm); font-weight: 600; color: #fff;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.hero-row-right { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-2); font-variant-numeric: tabular-nums; }
+.hero-row-right b { font-size: var(--t-sm); font-weight: 800; color: #fff; }
+.hero-row-right small { font-size: var(--t-2xs); font-weight: 600; color: rgba(232, 239, 254, 0.6); }
+.hero-card .btn-white { margin-top: var(--space-16); }
 
 .section-head {
   display: flex;

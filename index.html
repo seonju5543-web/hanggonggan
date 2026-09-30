@@ -341,6 +341,10 @@
 
     <!-- ============ 홈 ============ -->
     <section id="screen-home" class="screen" hidden>
+      <!-- 🔴 홈 위쪽은 통째로 남색 띠다 (2026-09-30 개발자 지시 "카드가 아니어도 되니까 강조 수준은 매우 높되" ·
+           참고 유아이볼 도미노 온보딩 '총 자산'). 머리줄과 히어로가 한 띠 안에 있어 카드 장식 없이 강조된다.
+           id 는 전부 그대로다 — 검사 드라이버가 #hero-amount · #btn-apply-all 을 본다. 설계: docs/designs/mockups/hero-domino.md -->
+      <div class="hero-band">
       <header class="home-header">
         <div class="home-id tappable" id="btn-home-profile" role="button" tabindex="0" aria-label="내 정보 보기">
           <div class="avatar" id="home-avatar">학</div>
@@ -363,8 +367,12 @@
 
       <div class="hero-card">
         <p class="hero-label" id="hero-label">지금 신청할 수 있는 장학금</p>
-        <p class="hero-amount tappable" id="hero-amount" role="button" tabindex="0" aria-label="금액 상세 보기">0원</p>
+        <!-- 금액은 세 조각 — '최대'·숫자·단위. 숫자만 크게 두어 눈이 한 곳에 모인다(app.js heroAmount 가 채운다) -->
+        <p class="hero-amount tappable" id="hero-amount" role="button" tabindex="0" aria-label="금액 상세 보기"><span class="hero-max">최대</span><span class="hero-num" id="hero-num">0</span><span class="hero-unit" id="hero-unit">원</span></p>
+        <!-- 그 금액을 이루는 공고 — 금액 큰 순 셋 (app.js heroRowsHtml · 도미노의 '종목 3줄' 자리). 누르면 그 공고 상세 -->
+        <ul class="hero-rows" id="hero-rows"></ul>
         <button class="btn btn-white btn-lg" id="btn-apply-all">신청 준비</button>
+      </div>
       </div>
 
       <!-- 쓰던 신청서 — 창(4시간)을 넘겨 들어와도 진행분은 안 버린다는 자리.

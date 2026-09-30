@@ -513,7 +513,7 @@ Apple 에서만 받은 것도 있다. **"알약은 고르는 것의 모양"** �
 - 안의 순서는 **기관 글(caption · ink-subtle) + 판정 알약 하나 → 제목(body 700) → 금액(body-sm) + 마감 D-DAY(caption 600 · danger 7일 이내)**. 판정 알약은 **카드당 하나**(적합도 % · 미달 · 미확인 · 신청 완료 중 하나) — 마감은 맨 윗줄(적합도 자리)에 올리지 않는다(2026-09-11 개발자 지시). 금액을 못 읽은 공고는 감추지 않고 `.sch-amount.unknown` 으로 무게만 낮춘다(원칙 8-1).
 - 🔴 카드를 그리는 함수는 둘이다(`schCard` · `liveNoticesHtml`) — 하나만 고치면 한 화면에 카드 말투가 두 가지가 된다(2026-09-11 실사고).
 
-**`hero-panel`** — 홈 히어로. `{colors.inverse-canvas}` + `--grad-navy` · `{rounded.lg}` 27px · 32px 24px 24px · `--shadow-lift`. 안에 `display-hero` 금액 하나, 설명 한 줄, `button-inverse` 하나. 🔴 숫자에 해명 세 토막을 붙이지 않는다(백로그 UI-6). ⚠️ 38px 고정이라 **360px 폰에서 네 자리 금액(1,405만원)이 두 줄**로 꺾인다 — 「충돌」 21번.
+**`hero-panel`** — 홈 히어로 (2026-09-30 재구성 · 도미노 '총 자산' 꼴 · `docs/designs/mockups/hero-domino.md`). 카드가 아니라 화면 위쪽을 통째로 덮는 **남색 띠**(`.hero-band` · `{colors.inverse-canvas}` 단색 · 모서리·그림자 없음)에 머리줄까지 들어간다. 안에 이름표 한 줄, 금액 세 조각(「최대」 `title` · 숫자 `--t-hero-lg` 52px · 단위 `display-lg`), **그 금액을 이루는 공고 3줄**(머리글자 원 · 이름 · 금액·마감 · 아래 줄일수록 흐림), `button-inverse` 하나. 🔴 숫자에 해명 세 토막을 붙이지 않는다(백로그 UI-6). 360px 에서 다섯 자리 금액까지 한 줄(실측 64px 높이).
 
 **`bottom-sheet`** — 상세·도우미·일괄 준비 전부 이 그릇(`#detail-sheet`). `{colors.surface-1}` · 윗모서리 `{rounded.lg}` · 20px 24px 32px · `--shadow-sheet` · 위에 손잡이 44×5. **전부 아래로 쓸어내려 닫는다**(2026-08-21 개발자 지시). 데스크톱에서도 폭 480px 가운데(1440px 에서 실측 480).
 
