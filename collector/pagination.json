@@ -157,7 +157,7 @@
  },
  "https://kangwon.ac.kr/ko/bbs/750/list.do": {
   "ok": false,
-  "checkedAt": "2026-08-17"
+  "checkedAt": "2026-09-30"
  },
  "https://www.yonsei.ac.kr/sc/254/subview.do?enc=Zm5jdDF8QEB8JTJGYmJzJTJGc2MlMkY1OCUyRmFydGNsTGlzdC5kbyUzRmZpbmRDbFNlcSUzRDI1NyUyNg%3D%3D": {
   "ok": true,
@@ -270,6 +270,98 @@
   "checkedAt": "2026-09-30"
  },
  "https://www.gachon.ac.kr/": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "https://isss.khu.ac.kr/globalcenter/user/bbs/BMSR00040/list.do?menuNo=7900041": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "https://goodjob.khu.ac.kr/bbs/board.php?bo_table=s2_5": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "https://www.youthcenter.go.kr/bbs03List/48": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "https://www.k-startup.go.kr/web/main/mainSection0.do": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "https://youth.seoul.go.kr/bbs/list.do?key=2303300002": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "https://youth.gg.go.kr/gg/intro/notice.do": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "https://kov.koica.go.kr/ho/cobb/ovhHoCobbBbsNormalList.do?menuId=MENU0000000000000162&bbsSn=1004": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "https://www.culture.go.kr/portal/cltBnf/cltSup/list.do?menuNo=200104": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "https://culture.seoul.go.kr/culture/bbs/B0000014/list.do?menuNo=200118": {
+  "ok": true,
+  "way": {
+   "kind": "page",
+   "param": "pageIndex"
+  },
+  "checkedAt": "2026-09-30"
+ },
+ "https://www.daejeonyouthportal.kr/": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "https://youth.gwangju.go.kr/": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "https://youth.gyeongnam.go.kr/": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "http://www.ghjanghak.kr/": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "http://www.sjjh.or.kr/": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "http://www.jiheonsf.or.kr/bbs/board.php?bo_table=tl_notice": {
+  "ok": true,
+  "way": {
+   "kind": "page",
+   "param": "page"
+  },
+  "checkedAt": "2026-09-30"
+ },
+ "https://www.ikef.or.kr/page.php?id=%2Fkj%2Fscholar_schedule": {
+  "ok": true,
+  "way": {
+   "kind": "page",
+   "param": "page"
+  },
+  "checkedAt": "2026-09-30"
+ },
+ "https://foundation.miraeasset.com/ko/news/notice/list.do": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "https://www.kosaf.go.kr/ko/notice.do": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "https://www.niied.go.kr/web/main/nid/niied_board/list": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "https://www.lottefoundation.or.kr/notice": {
   "ok": false,
   "checkedAt": "2026-09-30"
  }
