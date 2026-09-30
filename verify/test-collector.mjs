@@ -1508,6 +1508,26 @@ console.log('\n■ 장학금 판정 자동화 · 범위 승격 (2026-09-30)');
   eq('  총동문회도 바깥이다', k({ title: '2026학년도 2학기 아주대학교 총동문회 동문장학생 선발 공고' }).kind, '교외');
   eq('학교 이름표 + 본문의 학교 증거 → 교내 high', k({ title: '2026-2학기 동국리더장학 신청 안내', text: '교내장학금입니다. 신청서는 장학팀에 제출' }).confidence, 'high');
   eq('  학교 이름표만 → 교내 mid (후보로만)', k({ title: '2026-2학기 동국리더장학 신청 안내' }).confidence, 'mid');
+  eq('  이름표 + 학교 창구 하나만 → mid (창구는 바깥 재단 사업도 쓴다 · 리뷰 3차)', k({ title: '2026-2학기 동국리더장학 신청 안내', text: '신청서는 장학팀에 제출' }).confidence, 'mid');
+  eq('  이름표 + 학교 이메일 + 학교 창구 → high', k({ title: '2026-2학기 동국리더장학 신청 안내', text: '신청서는 장학팀에 제출', applyEmail: 'scholar@dongguk.edu' }).confidence, 'high');
+  /* 리뷰 3차(2026-09-30) — 지자체 이름 안의 학교 짧은 이름: 「부산광역시 대학생 … 장학팀에 제출」@부산대 는 교내가 아니다 */
+  {
+    const SN = await import(new URL('collector/school-names.mjs', root));
+    const names = SN.loadSchoolNames(new URL('data.js', root));
+    const busan = SN.schoolTokens('부산대학교', names);
+    eq('지역 이름과 같은 밑동(부산)·두 글자 별칭(부대)은 이름표가 아니다 — 지자체·낱말 안에 든다', busan.filter((t) => t.length < 3 || t === '부산'), []);
+    eq('  `부산대` 꼴은 있다', busan.includes('부산대'), true);
+    eq('  지역이 아닌 밑동은 두 글자여도 남는다(동국 — 동국리더장학이 이 꼴로 붙는다) · 세 글자(성균관)도', SN.schoolTokens('동국대학교', names).includes('동국') && SN.schoolTokens('성균관대학교', names).includes('성균관'), true);
+    eq('  신문·중앙회는 바깥 기관 낱말 (조선일보 ≠ 조선대 · 농협중앙회 ≠ 중앙대)', KE.ORG_RE.test('조선일보 장학생') && KE.ORG_RE.test('농협중앙회 장학'), true);
+    eq('  지역 이름표(REGION_CITIES)를 data.js 에서 읽었다', !!names.regions && names.regions.has('부산') && names.regions.has('경기'), true);
+    const r = KE.classifyKind({ ...base, school: '부산대학교', tokens: busan, domain: 'pusan.ac.kr', title: '2026 부산광역시 대학생 학자금 지원 장학생 모집', text: '신청서를 장학팀에 제출' });
+    eq('「부산광역시 대학생 … 장학팀에 제출」@부산대 ≠ 교내 high', r.kind === '교내' && r.confidence === 'high', false);
+    eq('  지자체 이름이 붙은 꼴은 바깥 기관 낱말이다', KE.ORG_RE.test('서울시 청년 장학') && KE.ORG_RE.test('충청남도 인재육성 장학'), true);
+    eq('  맨 낱말 다섯은 잡지 않는다 — 기업가정신 · 학교법인', KE.ORG_RE.test('기업가정신 장학생') || KE.ORG_RE.test('학교법인 동국학원 장학'), false);
+    eq('  이름이 붙은 회사·공사·그룹은 잡는다', KE.ORG_RE.test('한국전력공사 장학') && KE.ORG_RE.test('현대차그룹 장학') && KE.ORG_RE.test('중소기업 장학'), true);
+    eq('이메일 도메인은 같거나 하위(.)일 때만 학교 — xkhu.ac.kr 은 khu.ac.kr 이 아니다', [KE.domainMatches('a.khu.ac.kr', 'khu.ac.kr'), KE.domainMatches('xkhu.ac.kr', 'khu.ac.kr')], [true, false]);
+    eq('  판정기가 그 함수를 쓴다(맨 endsWith 금지)', /domainMatches\(emailDomain, x\.domain\)/.test(readText(new URL('collector/kind-evidence.mjs', root))) && !/emailDomain\.endsWith\(x\.domain\)/.test(readText(new URL('collector/kind-evidence.mjs', root))), true);
+  }
   eq('  본문 낱말만(이름표 없음)으로는 교내로 보지 않는다 — 메뉴 글자 사고', k({ title: '2026년 상반기 사랑나눔장학생 모집 공고', text: '발전기금 포털 신청' }).kind, '교외');
   eq('증거 없음 → 교외 low (2026-09-18 기본값)', (() => { const r = k({ title: '2026학년도 2학기 소망장학금 신청 안내' }); return r.kind + r.confidence; })(), '교외low');
   eq('접수 이메일이 학교 밖 도메인이면 national', k({ title: '2026 장학생 선발', applyEmail: 'apply@foundation.or.kr' }).national, true);
@@ -1530,10 +1550,27 @@ console.log('\n■ 장학금 판정 자동화 · 범위 승격 (2026-09-30)');
   const keep = { id: 'a', eligibility: { schoolOnly: '아주대학교' }, sourceUrl: 'https://a' };
   const r = RM.mergeInto(keep, { id: 'b', eligibility: { schoolOnly: '연세대학교' }, sourceUrl: 'https://b', deadline: '2026-10-30' }, { reason: '시험' });
   eq('다른 학교끼리 합치면 전국으로 승격하고 근거를 남긴다', r.promoted && !keep.eligibility.schoolOnly && /연세대학교/.test(keep.scopeFrom) && keep.deadline === '2026-10-30', true);
+  /* 리뷰 3차 — 이미 전국인 등록분은 세 번째 학교 글을 흡수한다(범위 그대로 · 게시 학교만 근거에) · 같은 글은 두 번 더하지 않는다 */
+  const r2 = RM.mergeInto(keep, { id: 'c', eligibility: { schoolOnly: '건국대학교' }, sourceUrl: 'https://c' }, { reason: '시험' });
+  RM.mergeInto(keep, { id: 'c', eligibility: { schoolOnly: '건국대학교' }, sourceUrl: 'https://c' }, { reason: '시험' });
+  eq('전국 등록분이 학교 한정 글을 흡수한다 — 승격은 아니고 alsoPostedAt 만 늘며 중복은 한 번', !r2.promoted && r2.absorbed && keep.alsoPostedAt.filter((a) => a.id === 'c').length === 1 && !keep.eligibility.schoolOnly && /연세대학교/.test(keep.scopeFrom), true);
   const adminSrc = readText(new URL('tools/admin-apply.mjs', root));
   eq('관리자 merge 가 그 함수를 쓴다 (규칙을 베끼지 않는다)', /import \{ mergeInto \} from '\.\.\/collector\/registered-merge\.mjs'/.test(adminSrc) && /mergeInto\(keep, drop/.test(adminSrc), true);
+  /* 리뷰 3차 — 관리자가 구분·범위를 고치면 표식을 남긴다(없으면 로봇이 다음 실행에 되돌린다) · 교내→교외는 blocked 로 */
+  eq('관리자 edit 이 type 변경에 kindFrom, eligibility 범위 변경에 scopeFrom 을 찍는다', /changed\.includes\('type'\)[^\n]*\n\s*it\.kindFrom = OWNER/.test(adminSrc) && /scopeOf\(it\.eligibility\) !== oldScope\) it\.scopeFrom = OWNER/.test(adminSrc), true);
+  eq('  교내→교외 되돌림은 학습 표 blocked 로 (같은 이름 함수 programNameForTable)', /blockLearnedProgram\(it\)/.test(adminSrc) && /programNameForTable\(it\.name/.test(adminSrc) && /own\.blocked\[school\]/.test(adminSrc), true);
+  eq('  관리자 워크플로가 학습 표를 저장한다', /own-programs\.json/.test(readText(new URL('.github/workflows/admin-apply.yml', root))), true);
   const ar = readText(new URL('collector/auto-register.mjs', root));
   eq('자동 등록이 다른 학교의 같은 사업을 전국으로 승격한다 (verdict promote)', /sameProgram\(/.test(ar) && /verdict: 'promote'/.test(ar) && /mergeInto\(r\.twin/.test(ar), true);
+  eq('  이미 전국인 등록분과 같은 사업은 흡수(absorb) — 다시 학교 한정으로 등록하지 않는다 (세 번째 학교 구멍)', /schoolOf\(i\) !== n\.school && sameProgram/.test(ar) && !/schoolOf\(i\) && schoolOf\(i\) !== n\.school/.test(ar) && /verdict: 'absorb'/.test(ar) && /r\.verdict === 'absorb'/.test(ar), true);
+  eq('  승격은 로봇 등록·교외·사람 미지정·마감 전 등록분만 (아니면 hold)', /twin\.auto && twin\.type === '교외' && !\/\^관리자\/\.test\(twin\.scopeFrom/.test(ar) && /twin\.deadline < TODAY/.test(ar), true);
+  const sp = readText(new URL('collector/scope-promote.mjs', root));
+  eq('  범위 승격 로봇도 전국 등록분이 흡수한다(isNationalAbsorber) · 여러 학교만 받는 공고는 그 학교가 목록에 있을 때만', /export function isNationalAbsorber\(it, school\)/.test(sp) && /absorbed/.test(sp) && /domainMatches\(/.test(sp) && /schoolsAny\.some/.test(sp) && /schoolsAny/.test(ar) && /split\('\|'\)\[0\] === n\.school/.test(ar), true);
+  /* 리뷰 3차 — 리포트 파일은 부르는 쪽이 준다(브라우저 수집은 browser-report.md 만 커밋한다) */
+  for (const f of ['collector/scope-promote.mjs', 'collector/kind-classify.mjs', 'collector/portal-candidates.mjs']) {
+    eq(`  ${f} 가 리포트 파일 이름을 인자로 받는다`, /process\.argv\.slice\(2\)\.find/.test(readText(new URL(f, root))), true);
+  }
+  eq('  browser-collect.yml 이 셋에 browser-report.md 를 넘긴다', (readText(new URL('.github/workflows/browser-collect.yml', root)).match(/node collector\/(scope-promote|kind-classify|portal-candidates)\.mjs collector\/browser-report\.md/g) || []).length, 3);
   eq('  등록 항목에 판정 근거를 남긴다 (kindEvidence)', /kindEvidence/.test(ar) && /noticeKind\(title, n\.school, learnedPrograms\)/.test(ar), true);
   /* 로봇 셋이 워크플로에 있고, 관문 앞에 있다 */
   for (const f of ['.github/workflows/collect-scholarships.yml', '.github/workflows/browser-collect.yml']) {

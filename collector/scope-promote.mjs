@@ -16,7 +16,7 @@ import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { canonUrl } from './canon-url.mjs';
 import { makeStripperMulti } from './page-boilerplate.mjs';   // 메뉴·푸터 껍데기를 걷어낸 본문만 읽는다 — 메뉴의 '발전기금'·'포털'이 증거로 세어졌다(첫 시험)
-import { classifyKind, schoolDomain, SCHOOL_APPLY_RE } from './kind-evidence.mjs';
+import { classifyKind, schoolDomain, SCHOOL_APPLY_RE, domainMatches } from './kind-evidence.mjs';
 import { loadSchoolNames, schoolTokens } from './school-names.mjs';
 import { mergeInto } from './registered-merge.mjs';
 const { sameProgram } = createRequire(import.meta.url)('../verify/entry-rules.cjs');
@@ -24,7 +24,9 @@ const { sameProgram } = createRequire(import.meta.url)('../verify/entry-rules.cj
 const HERE = new URL('.', import.meta.url);
 const REG = new URL('../data/registered.json', HERE);
 const TEXT = new URL('extracted/notices-text.json', HERE);
-const REPORT = new URL('report.md', HERE);
+/* 리포트 파일은 부르는 쪽이 준다 — 브라우저 수집은 browser-report.md 만 커밋한다(리뷰 3차 2026-09-30). 기본은 report.md */
+const reportArg = process.argv.slice(2).find((a) => !a.startsWith('--'));
+const REPORT = new URL(reportArg || 'report.md', reportArg && reportArg.includes('/') ? new URL('../', HERE) : HERE);
 const TODAY = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
 const WRITE = !process.argv.includes('--dry');
 
@@ -42,13 +44,20 @@ export function isCandidate(it) {
   const e = it.eligibility || {};
   return !!(it.auto && it.type === '교외' && e.schoolOnly && !/^관리자/.test(it.scopeFrom || ''));
 }
+/* 이미 전국인 로봇 등록분 — 같은 사업의 학교 한정 글을 **흡수**한다(범위는 그대로 · 게시 학교만 근거에 더한다 · 리뷰 3차 2026-09-30) */
+export function isNationalAbsorber(it, school) {
+  const e = it.eligibility || {};
+  if (!(it.auto && it.type === '교외' && !e.schoolOnly && !/^관리자/.test(it.scopeFrom || ''))) return false;
+  /* 여러 학교만 받는 공고(schoolsAny · "학교" 또는 "학교|캠퍼스")는 그 학교가 목록에 있을 때만 — 푸른등대 K-원전(13개교) 이 이 꼴 */
+  return !e.schoolsAny || !school || e.schoolsAny.some((x) => String(x).split('|')[0] === school);
+}
 
 /* 원문 증거로 전국인가 — 순수 함수(관문이 픽스처로 돈다). 학교 창구 문장이 있으면 절대 아니다. */
 export function nationalEvidence(it, body) {
   const school = (it.eligibility || {}).schoolOnly;
   const k = classifyKind({ title: it.name, school, text: body, excerpts: it.excerpts, applyEmail: it.applyEmail, applyPortal: it.applyPortal,
     tokens: schoolTokens(school, names), domain: domainOf(school), own: [] });
-  const schoolWindow = SCHOOL_APPLY_RE.test(body || '') || !!it.applyPortal || (it.applyEmail || '').toLowerCase().endsWith(domainOf(school) || '\u0000');
+  const schoolWindow = SCHOOL_APPLY_RE.test(body || '') || !!it.applyPortal || domainMatches((it.applyEmail || '').split('@')[1], domainOf(school));
   if (!k.national || schoolWindow) return null;
   return k.evidence.filter((e) => /학교 밖|본문/.test(e)).join(' · ') || null;
 }
@@ -58,13 +67,16 @@ let changed = 0;
 const items = reg.items;
 /* ③ 다른 학교의 같은 사업 — 먼저 합친다(둘 다 후보일 때 한 건으로) */
 for (let i = 0; i < items.length; i++) {
-  const a = items[i]; if (!isCandidate(a)) continue;
+  const a = items[i];
+  if (!isCandidate(a) && !isNationalAbsorber(a)) continue;
   for (let j = items.length - 1; j > i; j--) {
     const b = items[j];
     if (!isCandidate(b) || (b.eligibility || {}).schoolOnly === (a.eligibility || {}).schoolOnly) continue;
+    if (!isCandidate(a) && !isNationalAbsorber(a, (b.eligibility || {}).schoolOnly)) continue;
     if (!sameProgram(a, b)) continue;
-    const { promoted } = mergeInto(a, b, { reason: '다른 학교 게시판에도 같은 사업(자동 승격)' });
+    const { promoted, absorbed } = mergeInto(a, b, { reason: '다른 학교 게시판에도 같은 사업(자동 승격)' });
     if (promoted) { lines.push(`- 🌐 \`${a.id}\` ${(a.name || '').slice(0, 40)} ← \`${b.id}\`(${(b.eligibility || {}).schoolOnly}) 와 같은 사업이라 합쳐 전국으로`); items.splice(j, 1); changed++; }
+    else if (absorbed) { lines.push(`- 🌐 \`${a.id}\` ${(a.name || '').slice(0, 40)} (이미 전국) ← \`${b.id}\`(${(b.eligibility || {}).schoolOnly}) 같은 사업이라 흡수`); items.splice(j, 1); changed++; }
   }
 }
 /* ①② 원문 증거 */

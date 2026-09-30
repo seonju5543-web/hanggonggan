@@ -70,7 +70,8 @@ for (const name of ME.SERVED_SCHOOLS) {
   const isBranch = /캠퍼스$/.test(name);
   SCHOOLS.push({
     id: ME.noticeFileKey(name), name, generated: true,
-    must: new RegExp(`${esc(name)}|${esc(short)}`),
+    /* 짧은 이름이 두 글자(부산·조선…)면 낱말 하나로는 딴 사진(부산 야경)이 걸린다 — `○○대` 꼴까지 있어야 받는다(리뷰 3차 2026-09-30) */
+    must: new RegExp(short.length <= 2 ? `${esc(name)}|${esc(short)}대` : `${esc(name)}|${esc(short)}`),
     not: isBranch ? /Station|역|병원|logo|로고|모형/i : GENERIC_NOT,
     q: [`${name} 정문`, `${name} 캠퍼스`, `${name}`, `${short} 정문`],
   });

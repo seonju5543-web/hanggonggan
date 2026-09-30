@@ -13,6 +13,8 @@
 
 import fs from 'node:fs';
 import { mergeInto } from '../collector/registered-merge.mjs';
+import { programNameForTable } from '../collector/kind-evidence.mjs';
+import { loadSchoolNames, schoolTokens } from '../collector/school-names.mjs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
@@ -52,6 +54,11 @@ const LOG = 'data/admin-log.json';
 const ACTS = 'data/activities.json';
 const ACT_SRC = 'collector/activity-sources.json';
 const ACT_CFG = 'collector/activity-config.json';
+const OWN_PROGRAMS_FILE = 'collector/own-programs.json';   // 학교 제도 학습 표(kind-classify 가 쓴다) — 관리자가 되돌린 이름은 blocked 로
+let _schoolNames = null;
+const schoolTokensFor = (school) => {
+  try { _schoolNames ||= loadSchoolNames(new URL('../data.js', import.meta.url)); return schoolTokens(school, _schoolNames); } catch { return [school]; }
+};
 const ACT_KINDS = ['공모전', '대외활동'];   // collector/activity-kind.mjs 의 ACTIVITY_KINDS 와 같다 (관문이 대조한다 — ESM 이라 여기서 못 부른다)
 /* 학교 게시판 출처는 서비스 학교만 — 목록은 match-engine.js 한 곳(2026-09-29 44개교 복원 · 여기 베끼지 않는다) */
 const SERVED_SCHOOLS = createRequire(import.meta.url)('../match-engine.js').SERVED_SCHOOLS || [];
@@ -507,6 +514,21 @@ switch (action) {
      🔴 한 건이라도 규칙을 어기면 **전부 멈춘다**(fail). 감사가 저장 직전에 다시 보고
         실패하면 통째로 되돌리므로, 반만 반영되는 상태가 생기지 않는다. */
   case 'edit': {
+    /* 교내→교외로 되돌린 제도 이름을 학습 표의 blocked 에 — 이름 규칙은 로봇과 같은 함수(kind-evidence programNameForTable) */
+    const blockLearnedProgram = (it) => {
+      const school = (it.eligibility || {}).schoolOnly || '';
+      if (!school) return;
+      const own = readJson(OWN_PROGRAMS_FILE, { programs: {}, blocked: {} });
+      own.programs ||= {}; own.blocked ||= {};
+      const pname = programNameForTable(it.name, schoolTokensFor(school));
+      if (!pname) return;
+      own.programs[school] = (own.programs[school] || []).filter((p) => (p.name || p) !== pname);
+      if (!own.programs[school].length) delete own.programs[school];
+      if (!(own.blocked[school] || []).some((p) => (p.name || p) === pname)) {
+        (own.blocked[school] ||= []).push({ name: pname, from: it.id, at: TODAY, by: actor });
+      }
+      writeJson(OWN_PROGRAMS_FILE, own);
+    };
     const edits = Array.isArray(payload.edits) && payload.edits.length
       ? payload.edits
       : [{ id: payload.id, patch: payload.patch }];
@@ -552,6 +574,9 @@ switch (action) {
     const applyPatch = (it, patch) => {
       const changed = [];
       const oldDeadline = it.deadline;   // 마감을 비울 때 period 에 남은 그 날짜를 같이 걷어내려고
+      const oldType = it.type;
+      const scopeOf = (e) => JSON.stringify([(e || {}).schoolOnly || '', (e || {}).campusOnly || '', (e || {}).schoolsAny || []]);
+      const oldScope = scopeOf(it.eligibility);
       applyPrepDoc(it, patch || {}, changed);
       Object.keys(patch || {}).forEach((k) => {
         if (PAIRED.has(k)) return;                         // 위에서 짝으로 처리했다
@@ -645,6 +670,16 @@ switch (action) {
           if (after !== (it.period || '')) { it.period = after; if (!changed.includes('period')) changed.push('period'); }
         }
       }
+      /* 🔴 구분(교내/교외)·학교 범위도 같은 규칙 (2026-09-30 리뷰 3차) — 원문 판정 로봇(kind-classify)과 범위 승격 로봇(scope-promote)은
+         `kindFrom`·`scopeFrom` 이 '관리자'로 시작하면 건드리지 않는다. 표식이 없으면 사람이 고친 구분이 다음 실행에 되돌아간다.
+         교내→교외로 되돌리면 그 제도 이름은 학습 표(own-programs.json)의 blocked 로 옮겨 다시 배우지 않는다. */
+      if (changed.includes('type') && it.type !== oldType) {
+        it.kindFrom = OWNER;
+        it.kindEvidence = [`관리자(${actor})가 ${oldType || '?'} → ${it.type} 로 정함`];
+        delete it.kindConfidence;
+        if (it.type === '교외') blockLearnedProgram(it);
+      }
+      if (changed.includes('eligibility') && scopeOf(it.eligibility) !== oldScope) it.scopeFrom = OWNER;
       /* 발표일도 같은 규칙 — 로봇(fillCalendarDates)이 이 표식을 본다 */
       if (changed.includes('announceDate')) it.announceDateFrom = it.announceDate ? OWNER : `${OWNER} · 비움`;
       /* 금액도 같은 규칙 (2026-09-17 · F-9 컨펌 2 · 개발자 결정 '나' — 관리자가 손으로 채운다).

@@ -34,7 +34,9 @@ export function portalCandidates(items, knownSchools = new Set()) {
 
 const out = portalCandidates(reg.items, known);
 fs.writeFileSync(new URL('portal-candidates.json', HERE), JSON.stringify({ updatedAt: TODAY, note: '학교별 접수 시스템 후보 — 정식 등록 항목의 applyPortal 을 모은 것. 사람이 확인해 data.js SCHOOL_PORTALS 에 넣는다(주소는 원문·정찰로 확인한 것만).', items: out }, null, 1) + '\n');
-const REPORT = new URL('report.md', HERE);
+/* 리포트 파일은 부르는 쪽이 준다(브라우저 수집은 browser-report.md · 리뷰 3차 2026-09-30) · 기본 report.md */
+const reportArg = process.argv.slice(2).find((a) => !a.startsWith('--'));
+const REPORT = new URL(reportArg || 'report.md', reportArg && reportArg.includes('/') ? new URL('../', HERE) : HERE);
 if (fs.existsSync(REPORT) && out.length) {
   fs.appendFileSync(REPORT, ['', `### 🏛 학교 포털 표 후보 — ${out.length}개교 (표에 없는 학교만)`,
     '정식 등록 공고의 접수 시스템을 학교별로 모았어요. 확인하고 data.js SCHOOL_PORTALS 에 넣어 주세요(주소는 원문·정찰로 확인한 것만).',

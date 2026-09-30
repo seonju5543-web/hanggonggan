@@ -186,9 +186,9 @@ jobs:
         timeout-minutes: 2
         continue-on-error: true
         run: |
-          node collector/scope-promote.mjs
-          node collector/kind-classify.mjs
-          node collector/portal-candidates.mjs
+          node collector/scope-promote.mjs || echo "scope-promote 실패 — 다음 줄은 계속"
+          node collector/kind-classify.mjs || echo "kind-classify 실패 — 다음 줄은 계속"
+          node collector/portal-candidates.mjs || echo "portal-candidates 실패"
 
       # 데이터 관문 (2026-07-30 도입): 로봇이 바꾼 데이터가 규칙을 어기면 저장하지 않고 되돌린다.
       # 잘못된 공고가 앱에 하루라도 노출되는 일을 막는 장치 — 사람이 감사를 기억해서 돌릴 필요가 없다.

@@ -201,8 +201,19 @@ function classify(n, regUrlSet, regItems, batchSeen) {
   const bare = (s) => (s || '').replace(/\([^)]*(\d|접수)[^)]*\)/g, '');
   /* 🔴 학교가 달라도 **같은 사업**이면 새로 등록하지 않고 기존 등록분을 전국으로 승격한다 (2026-09-30 · F-5 재발에서).
      열쇠는 verify/entry-rules.cjs programKey — 대괄호·연도·꼬리말을 뗀 알맹이. 재게시(같은 학교)는 아래 isDuplicatePair 가 잡는다. */
-  const twin = regItems.find((i) => schoolOf(i) && schoolOf(i) !== n.school && sameProgram({ name: title }, { name: i.name }));
-  if (twin) return { verdict: 'promote', why: `다른 학교(${schoolOf(twin)}) 등록분과 같은 사업 → 전국으로 승격`, twin };
+  const twin = regItems.find((i) => schoolOf(i) !== n.school && sameProgram({ name: title }, { name: i.name }));
+  if (twin) {
+    /* 이미 전국인 등록분(schoolOnly 없음)과 같은 사업 — 새로 등록하지 않고 게시 학교만 근거에 더한다(리뷰 3차 · 세 번째 학교 구멍) */
+    if (!schoolOf(twin)) {
+      const any = (twin.eligibility || {}).schoolsAny;
+      if (any && !any.some((x) => String(x).split('|')[0] === n.school)) return { verdict: 'hold', why: `타교 등록분과 동일 사업(${(twin.name || '').slice(0, 24)}) — 받는 학교 목록에 ${n.school} 없음 · 컨펌 대기` };
+      return { verdict: 'absorb', why: '이미 전국(동일 사업)', twin };
+    }
+    /* 승격은 **로봇이 등록한 교외 · 사람이 범위를 정하지 않은 · 마감 안 지난** 등록분만 — 나머지는 사람이 본다(리뷰 3차) */
+    const promotable = twin.auto && twin.type === '교외' && !/^관리자/.test(twin.scopeFrom || '') && !(twin.deadline && twin.deadline < TODAY);
+    if (!promotable) return { verdict: 'hold', why: `타교 등록분과 동일 사업(${(twin.name || '').slice(0, 24)}) — 승격 불가(사람 지정·교내·마감 경과) 컨펌 대기` };
+    return { verdict: 'promote', why: `다른 학교(${schoolOf(twin)}) 등록분과 같은 사업 → 전국으로 승격`, twin };
+  }
   const similars = regItems.filter((i) =>
     // 학교 축은 아래에서 따로 본다 — 여기서는 '같은 사업인가'만 묻는다(같은 학교로 맞춰 넣는다)
     isDuplicatePair({ name: bare(title), eligibility: {} }, { name: bare(i.name), eligibility: {} })
@@ -257,8 +268,9 @@ if (!cfg.enabled) {
     if (added.length >= (cfg.maxPerRun || 8)) { unseen += 1; continue; }
     if (onlySchools.size && n.school && !onlySchools.has(n.school)) { outOfScope += 1; continue; }
     const r = classify(n, regUrlSet, registered.items, batchSeen);
-    if (r.verdict === 'promote') {
-      /* 기존 등록분을 전국으로 — 합치는 규칙은 registered-merge.mjs 한 곳(관리자 merge 와 같다). 새 공고는 등록하지 않는다(같은 사업이다). */
+    if (r.verdict === 'promote' || r.verdict === 'absorb') {
+      /* 기존 등록분을 전국으로(promote) 또는 이미 전국인 등록분에 게시 학교만 더한다(absorb) — 합치는 규칙은 registered-merge.mjs 한 곳
+         (관리자 merge 와 같다). 새 공고는 등록하지 않는다(같은 사업이다). */
       const { promoted: did } = mergeInto(r.twin, { id: `notice:${canonUrl(n.url)}`, eligibility: { schoolOnly: n.school }, sourceUrl: n.url, attachments: n.attachments || [] },
         { reason: `같은 사업이 ${n.school} 게시판에도 올라옴(자동)` });
       if (did) promoted.push({ keep: r.twin, n });

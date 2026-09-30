@@ -24,7 +24,10 @@
 
 /* 바깥 기관 낱말 — 제목·주관에 이게 있으면 학교가 주는 것이 아니다.
    ⚠️ 동문회·총동문회도 바깥이다(법인이 다르다 · 2026-09-18 결정 "교내는 우리 학교가 준다는 뜻"). */
-export const ORG_RE = /(재단법인|사단법인|장학재단|장학회|장학관|재단|공단|진흥원|복지회|복지관|협회|학회|은행|그룹|\(주\)|주식회사|㈜|기업|회사|시청|군청|구청|도청|교육청|(?:^|[^가-힣])(?:시|군|구)\s*장학|한국장학재단|국가장학|국가근로|공사|위원회|연합회|(?:총)?동문회|동창회|교회|사랑의열매|법인|공제회|로터리|라이온스|유니세프|적십자)/;
+export const ORG_RE = /(재단법인|사단법인|장학재단|장학회|장학관|재단|공단|진흥원|복지회|복지관|협회|학회|은행|[가-힣A-Za-z]+그룹|\(주\)|주식회사|㈜|기업(?!가)|[가-힣]+회사|시청|군청|구청|도청|교육청|(?:^|[^가-힣])(?:시|군|구)\s*장학|[가-힣]{1,5}(?:특별시|광역시|특별자치[시도]|시|군|구|도)\s*(?:청|장학|인재|대학생|청년|거주)|한국장학재단|국가장학|국가근로|[가-힣]+공사(?![가-힣])|위원회|연합회|(?:총)?동문회|동창회|교회|사랑의열매|(?<!학교)법인|[가-힣]+일보|중앙회|공제회|로터리|라이온스|유니세프|적십자)/;
+/* ⚠️ 낱말 다섯은 **맨 것으로 쓰지 않는다**(2026-09-30 리뷰 3차): `기업` 은 '기업가정신 장학'에, `법인` 은 '학교법인 ○○학원'(학교 자신)에,
+   `그룹`·`회사`·`공사` 는 본문 낱말('공사 중')에 걸렸다. 지자체는 이름이 붙은 꼴(`부산광역시 대학생`·`서울시 청년`)까지 잡는다 —
+   학교 이름표 '부산'·'서울'이 지자체 이름 안에 들어 있어 교내로 읽힌 사고(같은 리뷰)를 여기서 먼저 끊는다. */
 /* 제목의 교외 표식 */
 export const OFF_MARK_RE = /\[\s*교외|교외\s*장학|외부\s*장학|외부\s*기관/;
 /* 본문 — 학교가 준다는 말 */
@@ -34,6 +37,12 @@ export const EXTERNAL_APPLY_RE = /(재단|공단|진흥원|장학회|복지회|�
 /* ⚠️ 위원회·사무국·본부는 넣지 않는다 — 학교 안 장학위원회·학생지원본부가 흔해 첫 시험에서 성균관대 벽송회장학금이 전국으로 풀렸다(2026-09-30). */
 /* 본문 — 학교 창구로 내라는 말 (교내 또는 학교 접수분) */
 export const SCHOOL_APPLY_RE = /(장학팀|학생지원팀|학생처|학생과|학과\s*사무실|행정실|교학팀|학사지원팀|장학복지팀)\s*(에|으로|방문|직접|을\s*통해)?\s*(제출|접수|방문|신청)|(포털|종합정보시스템|학사정보시스템|INFO21|HUFSAbility|SAINT|e-?Campus|유레카|KLAS|학생지원시스템)[^\n]{0,24}(신청|접수|등록|입력|제출)/i;
+
+/* 이메일 도메인이 학교 도메인인가 — 같거나 그 하위(`.`)여야 한다. 맨 endsWith 는 `xkhu.ac.kr` 같은 남의 도메인도 통과시킨다(리뷰 3차). */
+export function domainMatches(emailDomain, schoolDom) {
+  const e = String(emailDomain || '').toLowerCase(); const d = String(schoolDom || '').toLowerCase();
+  return !!(e && d && (e === d || e.endsWith('.' + d)));
+}
 
 /* 학교의 인터넷 도메인 — 게시판 주소에서 읽는다(표를 새로 만들지 않는다). news.khu.ac.kr → khu.ac.kr */
 export function schoolDomain(boardUrl) {
@@ -66,7 +75,7 @@ export function classifyKind(x = {}) {
   const orgInTitle = ORG_RE.exec(title);
   const orgInProvider = x.provider && !/원문 확인/.test(x.provider) ? ORG_RE.exec(String(x.provider)) : null;
   const emailDomain = x.applyEmail ? String(x.applyEmail).split('@')[1]?.toLowerCase() : '';
-  const emailIsSchool = !!(emailDomain && x.domain && emailDomain.endsWith(x.domain));
+  const emailIsSchool = domainMatches(emailDomain, x.domain);
   const emailIsOutside = !!(emailDomain && !emailIsSchool && !/\.ac\.kr$/.test(emailDomain));
   const externalApply = EXTERNAL_APPLY_RE.exec(body);
   const schoolApply = SCHOOL_APPLY_RE.exec(body) || (x.applyPortal ? { 0: `포털 ${x.applyPortal}` } : null);
@@ -93,8 +102,10 @@ export function classifyKind(x = {}) {
   if (schoolBody) ev.push(`본문 「${schoolBody[0].trim()}」`);
   if (emailIsSchool) ev.push(`접수 이메일 도메인 ${emailDomain} (학교)`);
   if (schoolApply) ev.push(`접수처 「${String(schoolApply[0]).trim()}」`);
-  const schoolSignals = [schoolBody, emailIsSchool, schoolApply].filter(Boolean).length;
-  if (token && schoolSignals >= 1) return { kind: '교내', confidence: 'high', evidence: ev, national: false };
+  /* 🔴 high 는 '학교가 준다'는 본문(SCHOOL_BODY_RE)이 있을 때, 또는 약한 신호(학교 이메일·학교 창구)가 **둘** 겹칠 때만.
+     창구 하나만으로는 mid — 학교 창구는 바깥 재단 사업도 쓴다(2026-09-30 리뷰 3차 · 학습 표에 들어가는 문턱이라 더 엄하다). */
+  const weak = [emailIsSchool, schoolApply].filter(Boolean).length;
+  if (token && (schoolBody || weak >= 2)) return { kind: '교내', confidence: 'high', evidence: ev, national: false };
   if (token) return { kind: '교내', confidence: 'mid', evidence: ev, national: false };
   /* 학교 이름표 없이 본문 낱말만으로는 교내로 보지 않는다 — 실측(2026-09-30 첫 시험): 사랑나눔·익산사랑·삼원·푸른등대처럼
      바깥 재단 사업도 학교 게시판 본문엔 '발전기금'·'포털' 메뉴 글자가 섞여 나온다. 껍데기를 걷어내도 학교가 옮겨 적은

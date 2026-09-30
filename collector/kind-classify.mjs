@@ -23,7 +23,9 @@ const REG = new URL('../data/registered.json', HERE);
 const TEXT = new URL('extracted/notices-text.json', HERE);
 const OWN = new URL('own-programs.json', HERE);
 const CAND = new URL('kind-candidates.json', HERE);
-const REPORT = new URL('report.md', HERE);
+/* 리포트 파일은 부르는 쪽이 준다(브라우저 수집은 browser-report.md · 리뷰 3차 2026-09-30) · 기본 report.md */
+const reportArg = process.argv.slice(2).find((a) => !a.startsWith('--'));
+const REPORT = new URL(reportArg || 'report.md', reportArg && reportArg.includes('/') ? new URL('../', HERE) : HERE);
 const TODAY = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
 const WRITE = !process.argv.includes('--dry');
 
@@ -36,7 +38,7 @@ const schools = JSON.parse(fs.readFileSync(new URL('schools.json', HERE), 'utf8'
 const names = loadSchoolNames(new URL('../data.js', HERE));
 const domainOf = (school) => { const row = schools.find((x) => x.school === school && x.boardUrl); return row ? schoolDomain(row.boardUrl) : ''; };
 let own = { programs: {}, blocked: {} };
-try { own = { programs: {}, blocked: {}, ...JSON.parse(fs.readFileSync(OWN, 'utf8')) }; } catch { /* 첫 실행 */ }
+try { own = JSON.parse(fs.readFileSync(OWN, 'utf8')); own.programs ||= {}; own.blocked ||= {}; } catch { /* 첫 실행 */ }   // 열쇠 순서(_comment 먼저)를 지킨다
 
 /* 어느 학교의 공고인가 — 학교 한정이면 그 학교, 아니면 게시판을 적은 요약에서 읽는다(없으면 판정 안 함) */
 export function schoolOf(it) {

@@ -6,6 +6,9 @@ export function mergeInto(keep, drop, { reason = '' } = {}) {
   const ke = keep.eligibility || {};
   const de = drop.eligibility || {};
   let promoted = false;
+  /* 남기는 쪽이 **이미 전국**이고 지우는 쪽이 학교 한정이면 '흡수' — 범위는 그대로, 게시 학교만 근거에 더한다
+     (리뷰 3차 2026-09-30: 전국으로 풀린 뒤 세 번째 학교 게시판 글이 다시 학교 한정으로 등록되던 구멍). */
+  const absorbed = !ke.schoolOnly && !!de.schoolOnly;
   if (ke.schoolOnly && de.schoolOnly && ke.schoolOnly !== de.schoolOnly) {
     delete ke.schoolOnly; delete ke.campusOnly;
     keep.eligibility = ke;
@@ -22,10 +25,10 @@ export function mergeInto(keep, drop, { reason = '' } = {}) {
   }
   if (!keep.formId && drop.formId) keep.formId = drop.formId;
   /* 어느 학교 게시판에도 올라왔는지 — 전국으로 승격한 근거를 남긴다(원문 링크와 함께) */
-  if (promoted) {
-    const src = [...(keep.alsoPostedAt || []), { school: de.schoolOnly, url: drop.sourceUrl || '', id: drop.id }];
-    keep.alsoPostedAt = src;
-    keep.scopeFrom = `${reason || '다른 학교 게시판에도 같은 사업'} — ${de.schoolOnly} 게시판 ${drop.sourceUrl || drop.id}`;
+  if (promoted || absorbed) {
+    const seen = (keep.alsoPostedAt || []).some((a) => a && (a.id === drop.id || (drop.sourceUrl && a.url === drop.sourceUrl)));
+    if (!seen) keep.alsoPostedAt = [...(keep.alsoPostedAt || []), { school: de.schoolOnly, url: drop.sourceUrl || '', id: drop.id }];
   }
-  return { promoted };
+  if (promoted) keep.scopeFrom = `${reason || '다른 학교 게시판에도 같은 사업'} — ${de.schoolOnly} 게시판 ${drop.sourceUrl || drop.id}`;
+  return { promoted, absorbed };
 }

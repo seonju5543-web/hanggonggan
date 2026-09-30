@@ -45,6 +45,10 @@
 - **범위 승격 `collector/scope-promote.mjs`**(F-5): 학교 한정·교외·로봇 등록분 중 ① 접수 이메일이 학교 밖 ② 본문 "재단에 직접 제출/재단 홈페이지 신청/우편 접수"
   ③ 다른 학교의 같은 사업(`programKey` · `entry-rules.cjs`)이면 전국으로 푼다(`scopeFrom` 에 근거). 학교 창구(장학팀·포털) 문장이 있으면 그 학교 접수분이라 안 푼다.
   자동 등록도 같은 열쇠로 다른 학교의 같은 사업이 오면 새로 등록하지 않고 기존 것을 승격한다(`verdict: 'promote'`). 합치기는 `collector/registered-merge.mjs` 한 곳(관리자 merge 와 같다).
+- **리뷰 3차에서 막은 구멍 넷**(같은 날): ① 학교 이름표에 **지역 이름 밑동·두 글자 별칭을 쓰지 않는다**(`schoolTokens` · '부산광역시 대학생'이 부산대 교내로 읽혔다 ·
+  지역 이름은 data.js `REGION_CITIES` 에서 읽는다) · 교내 high 는 '학교가 준다'는 본문 또는 약한 신호 둘 ② **이미 전국인 등록분은 세 번째 학교 글을 흡수**한다
+  (`absorbed` · `isNationalAbsorber` · 여러 학교만 받는 공고는 그 학교가 `schoolsAny` 에 있을 때만) · 승격은 로봇 등록·교외·사람 미지정·마감 전만
+  ③ 관리자가 구분·범위를 고치면 `kindFrom`·`scopeFrom` 에 '관리자' 표식(없으면 로봇이 다음 실행에 되돌린다) ④ 판정 로봇 셋은 리포트 파일을 인자로 받는다(브라우저 수집은 `browser-report.md`).
 - 그 밖(같은 지시): 브라우저 담당 게시판은 `schools.json` `collector:"browser"` 로 일반 로봇이 건너뛴다 · 못 읽는 학교는 `run-probe.txt` 정찰 · 주소 없는 분교는
   `school-board-seeds.json` 씨앗을 `find-boards.mjs` 가 훑어 후보만 리포트(자동으로 넣지 않는다) · 포털 표 후보 `collector/portal-candidates.mjs` · 정문 사진은 44개교(`fetch-gate-photos.mjs`).
   관문 「장학금 판정 자동화 · 범위 승격」.
