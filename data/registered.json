@@ -4324,7 +4324,31 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-09-29 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "2026년도 하반기 재단법인 논산시장학회 장학생 선발 공고문(발췌본).hwpx",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=5ad84df2ff5e4c2aacfde6317d12d598&fileSn=1&bbsId=BMSR00040"
+    },
+    {
+     "name": "2026년도 하반기 재단법인 논산시장학회 장학생 신청 서식.hwpx",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=5ad84df2ff5e4c2aacfde6317d12d598&fileSn=2&bbsId=BMSR00040"
+    },
+    {
+     "name": "본문이미지-992x1403.png",
+     "url": "https://www.khu.ac.kr/upload/cross/images/000067/2026%EB%85%84%EB%8F%84_%ED%95%98%EB%B0%98%EA%B8%B0_%EC%9E%AC%EB%8B%A8%EB%B2%95%EC%9D%B8_%EB%85%BC%EC%82%B0%EC%8B%9C%EC%9E%A5%ED%95%99%ED%9A%8C_%EC%9E%A5%ED%95%99%EC%83%9D_%EC%84%A0%EB%B0%9C_%EA%B3%B5%EA%B3%A0%EB%AC%B8001.png",
+     "bodyImage": true
+    },
+    {
+     "name": "본문이미지-992x1403.png",
+     "url": "https://www.khu.ac.kr/upload/cross/images/000067/2026%EB%85%84%EB%8F%84_%ED%95%98%EB%B0%98%EA%B8%B0_%EC%9E%AC%EB%8B%A8%EB%B2%95%EC%9D%B8_%EB%85%BC%EC%82%B0%EC%8B%9C%EC%9E%A5%ED%95%99%ED%9A%8C_%EC%9E%A5%ED%95%99%EC%83%9D_%EC%84%A0%EB%B0%9C_%EA%B3%B5%EA%B3%A0%EB%AC%B8002.png",
+     "bodyImage": true
+    },
+    {
+     "name": "본문이미지-992x1403.png",
+     "url": "https://www.khu.ac.kr/upload/cross/images/000067/2026%EB%85%84%EB%8F%84_%ED%95%98%EB%B0%98%EA%B8%B0_%EC%9E%AC%EB%8B%A8%EB%B2%95%EC%9D%B8_%EB%85%BC%EC%82%B0%EC%8B%9C%EC%9E%A5%ED%95%99%ED%9A%8C_%EC%9E%A5%ED%95%99%EC%83%9D_%EC%84%A0%EB%B0%9C_%EA%B3%B5%EA%B3%A0%EB%AC%B8003.png",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323199",
    "sourceKind": "auto"
   },
