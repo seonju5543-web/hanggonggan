@@ -3073,9 +3073,13 @@ function bulkRowHtml(sch) {
       <input type="checkbox" class="bulk-check" data-bulk="${esc(sch.id)}" ${on ? 'checked' : ''}
         aria-label="${esc(sch.name)} 준비 목록에 넣기" />
       <div class="bulk-main">
-        <p class="bulk-name">${esc(sch.name)}${bulkNeedsWork(sch) ? '<span class="badge badge-pending">서류 작성 필요</span>' : ''}</p>
+        <div class="bulk-head">
+          <p class="bulk-name">${esc(sch.name)}${bulkNeedsWork(sch) ? '<span class="badge badge-pending">서류 작성 필요</span>' : ''}</p>
+          ${/* 금액은 제목 오른쪽 같은 줄 — 숫자가 이 목록의 주인공이다(DESIGN.md). 못 읽은 금액은
+               지어내지 않고 '원문 확인'으로 흐리게(원칙 8-1) */ ''}
+          <p class="bulk-amount${sch.amountValue ? '' : ' unknown'}">${esc(sch.amount || '금액 원문 확인')}</p>
+        </div>
         <p class="bulk-tags">${bulkTags(sch).map((x) => `<span class="chip-sm">${esc(x)}</span>`).join('')}</p>
-        <p class="bulk-amount">${esc(sch.amount || '금액 원문 확인')}</p>
         <details class="bulk-more">
           <summary>더보기</summary>
           <div class="bulk-badges">
@@ -3233,17 +3237,24 @@ function renderBulkPrep() {
   const targets = bulkPrep.list;
   const ready = targets.filter((sch) => !bulkNeedsWork(sch));
   const need = targets.filter(bulkNeedsWork);
+  /* 2026-09-30 재설계 — 장바구니 꼴 (합계·버튼을 시트 바닥에 붙인다).
+     예전엔 합계가 맨 위, 버튼이 스무 줄 아래라 고르는 동안 총액이 안 보였다.
+     겉에 보이는 넷(체크·제목·자격 단어·금액)과 '더보기' 안의 것은 2026-08-25 지시 그대로다.
+     ⚠️ id 는 그대로다 — bulk-sum · bulk-all · btn-bulk-go 를 bulkRefresh 와 검사(verify/drive.js)가 본다. */
   $('#detail-sheet').innerHTML = `
     <div class="sheet-handle"></div>
-    <div class="sheet-body">
+    <div class="sheet-body bulk-sheet">
       <h3 class="sheet-title">한 번에 신청 준비</h3>
-      <p class="sheet-provider" id="bulk-sum"></p>
-      <label class="bulk-all"><input type="checkbox" id="bulk-all" checked /> 전체 선택</label>
-      ${ready.length ? `<p class="bulk-group-head">바로 준비 가능 · ${ready.length}건</p>${ready.map(bulkRowHtml).join('')}` : ''}
-      ${need.length ? `<p class="bulk-group-head">서류 작성 필요 · ${need.length}건</p>${need.map(bulkRowHtml).join('')}
-        <p class="dp-note">이 ${need.length}건은 담아 둔 뒤 신청내역에서 자소서·신청서 작성.</p>` : ''}
-      <button class="btn btn-primary btn-lg" id="btn-bulk-go"></button>
-      <p class="dp-note">※ 최종 제출은 한국장학재단·학교 등 공식 채널에서 이루어져요.</p>
+      <p class="sheet-provider">고른 장학금을 '신청 준비 완료'로 신청내역에 담아요</p>
+      <label class="bulk-all"><input type="checkbox" id="bulk-all" checked /> 전체 선택 <span class="bulk-all-n" id="bulk-all-n"></span></label>
+      ${ready.length ? `<div class="bulk-group"><p class="bulk-group-head">바로 준비 가능 <span>${ready.length}건</span></p>${ready.map(bulkRowHtml).join('')}</div>` : ''}
+      ${need.length ? `<div class="bulk-group"><p class="bulk-group-head">서류 작성 필요 <span>${need.length}건</span></p>
+        <p class="bulk-group-note">담은 뒤 신청내역에서 자소서·신청서를 이어서 써요</p>${need.map(bulkRowHtml).join('')}</div>` : ''}
+      <div class="bulk-foot">
+        <p class="bulk-sum" id="bulk-sum"></p>
+        <button class="btn btn-primary btn-lg" id="btn-bulk-go"></button>
+        <p class="bulk-foot-note">최종 제출은 한국장학재단·학교 등 공식 채널에서 이루어져요</p>
+      </div>
     </div>`;
   bulkRefresh();
   $('#detail-sheet').scrollTop = 0;
@@ -3257,9 +3268,15 @@ function bulkRefresh() {
   /* 금액을 확인 못 한 공고는 합계에 넣지 않는다 — 지어낸 숫자를 섞지 않는다(원칙 8-1).
      홈 히어로의 '금액 미확인 n건 제외'와 같은 규칙이다. */
   const unknown = picked.filter((sch) => !sch.amountValue).length;
-  $('#bulk-sum').textContent = `선택 ${picked.length}건 · 최대 ${won(total)}${unknown ? ` · 금액 미확인 ${unknown}건 제외` : ''}`;
+  /* 합계는 바닥 판에 — 건수 · 큰 금액 · (있으면) 안 더한 건수. 사이 공백은 textContent 로
+     읽을 때(검사 로그) 붙지 않게 하려는 것이고 화면은 flex 라 무시한다. */
+  $('#bulk-sum').innerHTML = `<span class="bulk-sum-n">선택 ${picked.length}건</span> `
+    + `<strong class="bulk-sum-amt">최대 ${won(total)}</strong>`
+    + (unknown ? ` <small class="bulk-sum-note">금액 미확인 ${unknown}건은 합계에 넣지 않았어요</small>` : '');
   const all = $('#bulk-all');
   if (all) all.checked = picked.length === bulkPrep.list.length;
+  const allN = $('#bulk-all-n');
+  if (allN) allN.textContent = `${picked.length}/${bulkPrep.list.length}`;
   $$('#detail-sheet [data-bulk]').forEach((box) => {
     const row = box.closest('.bulk-row');
     if (row) row.classList.toggle('off', !box.checked);

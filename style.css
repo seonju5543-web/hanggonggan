@@ -1880,57 +1880,96 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
 }
 
 /* ============================================================
-   일괄 신청 준비 목록 (2026-08-25)
-   겉에 보이는 것은 넷 — 체크 · 제목 · 자격 단어 · 금액.
-   마감·배지·제출처·자격 원문은 <details> 안에 접는다(개발자 지시).
-   ⚠️ 새 색을 만들지 않는다 — 배지·D-day 는 기존 규칙을 그대로 쓴다.
+   일괄 신청 준비 목록 (2026-08-25 · 2026-09-30 재설계)
+   겉에 보이는 것은 넷 — 체크 · 제목 · 자격 단어 · 금액 (2026-08-25 개발자 지시 그대로).
+   마감·배지·제출처·자격 원문은 <details> 안에 접는다.
+   2026-09-30: 장바구니 꼴로 — ① 합계와 버튼을 **시트 바닥에 붙여**(sticky) 스무 줄을
+   고르는 동안에도 총액이 보인다 ② 금액은 제목 오른쪽 같은 줄, 굵은 숫자 ③ 줄은 상자·점선
+   대신 얇은 선 하나로 가른다(DESIGN.md "카드는 흰 면 위의 얇은 선") ④ 전체 선택 옆에 n/N.
+   ⚠️ 새 색·새 그림자를 만들지 않는다 — 바닥 판은 하단 내비처럼 **선 하나**로 뜬다.
+   ⚠️ 여백은 토큰만(ui-tone 톱니). id·클래스 이름은 verify/drive.js 가 본다 — 바꾸지 말 것.
    ============================================================ */
 /* 🔴 .bulk-all 은 신청내역 전체선택이 이미 쓰는 이름이다(style.css 위쪽).
    같은 물건이라 그림은 그대로 쓰고, 시트에서만 필요한 구분선만 **시트 안으로 한정**해
    덧붙인다. 통째로 다시 선언하면 신청내역 쪽 모양이 함께 바뀐다. */
 #detail-sheet .bulk-all {
-  padding: 10px 0; margin-bottom: 6px;
+  padding: var(--space-6) 0; margin: 0;
   border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
 }
+.bulk-all-n { margin-left: auto; font-size: var(--t-sm); font-weight: 600; color: var(--text-weak); font-variant-numeric: tabular-nums; }
 .bulk-group-head {
+  display: flex; align-items: baseline; gap: var(--space-6);
   font-size: var(--t-xs); font-weight: 700; color: var(--text-weak);
-  margin: 16px 0 8px;
+  margin: var(--sp-3) 0 var(--space-2);
 }
+.bulk-group-head span { color: var(--text-sub); font-variant-numeric: tabular-nums; }
+.bulk-group-note { font-size: var(--t-xs); color: var(--text-weak); line-height: 1.6; margin: 0 0 var(--space-2); }
 .bulk-row {
-  display: flex; gap: 10px;
-  border: 1px solid var(--line); border-radius: var(--radius-sm);
-  padding: 12px; margin-bottom: 8px;
+  display: flex; gap: var(--space-12); align-items: flex-start;
+  padding: var(--space-16) 0;
+  border-bottom: 1px solid var(--line);
   transition: opacity 0.15s;
 }
 /* 뺀 줄은 **지우지 않고 흐리게** 둔다 — 실수로 뺐을 때 되돌릴 수 있어야 한다 */
+/* 묶음의 마지막 줄은 선을 뺀다 — 바로 밑 바닥 판의 윗선과 겹쳐 두 줄로 보인다(실측) */
+.bulk-group .bulk-row:last-child { border-bottom: 0; }
 .bulk-row.off { opacity: 0.42; }
 .bulk-row.off .bulk-name { text-decoration: line-through; }
-.bulk-check { margin: 1px 0 0; }   /* 크기·그림은 위 공용 규칙이 준다 */
+.bulk-check { margin: var(--space-2) 0 0; }   /* 크기·그림은 위 공용 규칙이 준다 */
 .bulk-main { flex: 1; min-width: 0; }
+.bulk-head { display: flex; align-items: flex-start; gap: var(--space-12); }
 .bulk-name {
-  font-size: var(--t-md); font-weight: 700; color: var(--text);
-  margin-bottom: 6px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  flex: 1; min-width: 0;
+  font-size: var(--t-md); font-weight: 700; color: var(--text); line-height: 1.4;
+  display: flex; align-items: center; gap: var(--space-6); flex-wrap: wrap;
+  word-break: keep-all; overflow-wrap: break-word;
 }
-.bulk-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; }
+/* 금액 — 제목 오른쪽, 표 숫자. 긴 문구('등록금 전액' 등)는 42% 안에서 줄을 바꾼다 */
+.bulk-amount {
+  flex: none; max-width: 42%; text-align: right;
+  font-size: var(--t-md); font-weight: 700; color: var(--text); line-height: 1.4;
+  font-variant-numeric: tabular-nums; word-break: keep-all;
+}
+.bulk-amount.unknown { font-size: var(--t-xs); font-weight: 600; color: var(--text-weak); padding-top: var(--space-2); }
+.bulk-tags { display: flex; flex-wrap: wrap; gap: var(--space-4); margin-top: var(--space-6); }
 .bulk-tags .chip-sm {
   background: var(--primary-weak); color: var(--primary);
-  border-radius: var(--radius-pill); font-weight: 600; padding: 4px 9px; font-size: var(--t-2xs);
+  border-radius: var(--radius-pill); font-weight: 600; padding: var(--space-4) var(--space-8); font-size: var(--t-2xs);
 }
-.bulk-amount { font-size: var(--t-sm); color: var(--text-sub); margin-bottom: 6px; }
-.bulk-more { border-top: 1px dashed var(--line); padding-top: 8px; }
+.bulk-more { margin-top: var(--space-8); }
 .bulk-more > summary {
-  font-size: var(--t-xs); color: var(--primary); font-weight: 600;
+  display: inline-flex; align-items: center; gap: var(--space-4);
+  font-size: var(--t-xs); color: var(--text-sub); font-weight: 600;
   cursor: pointer; list-style: none; min-height: 24px;
 }
 .bulk-more > summary::-webkit-details-marker { display: none; }
-.bulk-more > summary::before { content: '▸ '; }
-.bulk-more[open] > summary::before { content: '▾ '; }
-.bulk-badges { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0 6px; }
-.bulk-meta { font-size: var(--t-xs); color: var(--text-sub); line-height: 1.6; margin-bottom: 3px; }
-.bulk-meta-head { font-size: var(--t-2xs); color: var(--text-weak); font-weight: 700; margin: 8px 0 4px; }
-.bulk-reqs { font-size: var(--t-xs); color: var(--text-sub); line-height: 1.65; padding-left: 2px; list-style: none; }
-.bulk-reqs li { margin-bottom: 2px; }
+.bulk-more > summary::before { content: '▸'; }
+.bulk-more[open] > summary::before { content: '▾'; }
+.bulk-badges { display: flex; flex-wrap: wrap; gap: var(--space-4); margin: var(--space-8) 0 var(--space-6); }
+.bulk-meta { font-size: var(--t-xs); color: var(--text-sub); line-height: 1.6; margin-bottom: var(--space-2); }
+.bulk-meta-head { font-size: var(--t-2xs); color: var(--text-weak); font-weight: 700; margin: var(--space-8) 0 var(--space-4); }
+.bulk-reqs { font-size: var(--t-xs); color: var(--text-sub); line-height: 1.65; padding-left: var(--space-2); list-style: none; }
+.bulk-reqs li { margin-bottom: var(--space-2); }
 .bulk-reqs li::before { content: '· '; color: var(--text-weak); }
+
+/* 바닥 판 — 합계와 버튼. 스크롤 그릇은 .sheet 이므로 sticky 가 그 바닥에 붙는다.
+   .sheet-body 의 아래 여백을 이 시트에서만 0 으로 두고 판이 시트 끝까지 닿게 한다.
+   (안전 영역은 판 자신의 아래 패딩이 받는다) */
+.sheet-body.bulk-sheet { padding-bottom: 0; }
+.bulk-foot {
+  position: sticky; bottom: 0; z-index: 2;
+  margin: var(--sp-2) calc(var(--space-24) * -1) 0;
+  padding: var(--space-12) var(--space-24) calc(var(--space-16) + env(safe-area-inset-bottom));
+  background: var(--surface); border-top: 1px solid var(--line);
+}
+.bulk-sum {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2) var(--space-8);
+  font-size: var(--t-sm); color: var(--text-sub); margin-bottom: var(--space-12);
+}
+/* 금액은 상세 시트의 .sheet-amount 와 같은 색(2026-09-02 개발자 지시) · 표 숫자 */
+.bulk-sum-amt { margin-left: auto; font-size: var(--t-xl); font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.bulk-sum-note { flex-basis: 100%; font-size: var(--t-2xs); color: var(--text-weak); }
+.bulk-foot-note { font-size: var(--t-2xs); color: var(--text-weak); text-align: center; line-height: 1.5; margin-top: var(--space-8); }
 
 
 /* ============================================================
