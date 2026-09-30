@@ -18,6 +18,7 @@ import { cleanTitle, isMenuEntry } from './clean-title.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { activityKind, activityField } from './activity-kind.mjs';
 import { activityExcerpts } from './activity-excerpts.mjs';
+import { htmlToLines } from './html-text.mjs';
 import { robotsAllows } from './robots.mjs';
 import { extractLinks, stripSessionId } from './board-links.mjs';
 import { canonUrl } from './canon-url.mjs';
@@ -128,8 +129,10 @@ async function fetchDetail(item) {
 
     const uniq = new Map();
     attachments.forEach((a) => { if (!uniq.has(a.url)) uniq.set(a.url, a); });
-    /* 본문 글자(text)도 돌려준다 (2026-09-29) — 활동 글은 여기서 모집기간·자격·혜택을 원문 그대로 발췌한다(activity-excerpts.mjs) */
-    return { attachments: [...uniq.values()], deadlineHint: deadlineHintFrom(text), text };
+    /* 본문 글자도 돌려준다 (2026-09-29) — 활동 글은 여기서 모집기간·자격·혜택을 원문 그대로 발췌한다(activity-excerpts.mjs).
+       🔴 **줄을 살린 글자**(htmlToLines)여야 한다 — 위의 text 는 한 줄로 뭉갠 것이라 발췌기가 200자 넘는 줄로 보고 통째로 건너뛴다
+       (2026-09-30 첫 실행 · 26건 전부 마감 0건). 마감 단서 한 줄(deadlineHint)은 예전대로 뭉갠 글자에서 읽는다. */
+    return { attachments: [...uniq.values()], deadlineHint: deadlineHintFrom(text), text: htmlToLines(html) };
   } catch {
     return { attachments: [], deadlineHint: null, text: '' };
   }
@@ -299,7 +302,7 @@ const boards = (cfg.schools || []).map((s) => ({ ...s, role: 'scholarship' }))
 
 /* 리포트에 적는 이름과 그 이름이 들어갈 표 — 수집 본문과 시한 초과 처리가 같은 것을 써야 한다 */
 const boardLabel = (s) => (s.campus && s.campus !== '공통' ? `${s.school} ${s.campus}` : s.school || (s.host || '전국'))
-  + (s.role === 'activity' ? ' 대외활동·공모전' : '');
+  + (s.role === 'activity' ? ' 대외활동·공모전' + (s.school && /「[^」]+」/.test(s.note || '') ? ` ${(s.note.match(/「[^」]+」/) || [''])[0]}` : '') : '');   // 한 학교 게시판 여럿이 리포트에서 같은 이름이 되지 않게 (2026-09-30 실측 · 경희대 3줄)
 const bucketOf = (s) => (s.role === 'activity' ? actResults : (s.role === 'external' ? extResults : results));
 
 /* 게시판 하나를 읽는다. `return` 은 옛 `continue` — 이 게시판을 마치고 다음으로 간다는 뜻. */
@@ -358,6 +361,7 @@ async function harvestBoard(s, ctx = { dead: false }) {
         if (ex.excerpts.length) it.excerpts = ex.excerpts;
         const field = activityField(it.title, it.kind);
         if (field) it.field = field;
+        it.excerptsAt = new Date().toISOString().slice(0, 10);   // 원문을 읽은 날 — 아래 소급 보강이 다시 읽지 않게
         it.school = s.school || '';
         it.campus = s.campus === '공통' ? '' : (s.campus || '');
         if (!it.school && s.host) it.host = s.host;   // 전국 글은 주최를 설정에서 받는다(제목으로 짐작하지 않는다)
@@ -536,6 +540,22 @@ acts.items = acts.items.filter((n) => !n.school).concat(dropUnserved(acts.items.
 acts.items.sort((a, b) => String(b.foundAt || '').localeCompare(String(a.foundAt || '')));
 acts.items = acts.items.slice(0, ACT_CAP);
 acts.items.forEach((n) => { if (actHide.has(canonUrl(n.url))) n.hidden = true; else if (n.hidden && !actHide.has(canonUrl(n.url))) delete n.hidden; });
+/* 소급(운영 원칙 7) — 발췌 없이 실린 글은 원문을 다시 읽어 마감·발췌·분야를 채운다 (2026-09-30 첫 실행의 26건이 그렇다 —
+   글자를 한 줄로 뭉개 넘긴 사고 · html-text.mjs). 한 실행 최대 ACT_BACKFILL 건 · 예산 안에서만 · 읽은 글은 excerptsAt 을 적어 다시 안 읽는다
+   (못 읽었어도 적는다 — 없는 이름표를 매일 다시 찾지 않는다). */
+const ACT_BACKFILL = 20;
+let actBackfilled = 0;
+for (const it of acts.items) {
+  if (actBackfilled >= ACT_BACKFILL || it.excerptsAt) continue;
+  if (!budget.hasRoom(20000)) break;
+  const detail = await fetchDetail(it);
+  const ex = activityExcerpts(detail.text);
+  if (ex.deadline) it.deadline = ex.deadline;
+  if (ex.excerpts.length) it.excerpts = ex.excerpts;
+  if (!it.field) { const f = activityField(it.title, it.kind); if (f) it.field = f; }
+  if (detail.text) it.excerptsAt = new Date().toISOString().slice(0, 10);   // 못 받아 온 날은 적지 않는다 — 잠깐 끊긴 것을 영영 '읽었다'로 굳히지 않게
+  actBackfilled += 1;
+}
 acts.updatedAt = notices.updatedAt;
 fs.writeFileSync(actsPath, JSON.stringify(acts, null, 1));
 
@@ -642,6 +662,7 @@ if (chronic.length) {
 
 /* 대외활동·공모전 — 컨펌 대상이 아니다(제목+링크만 앱 '대외활동' 탭에 실린다). 상태와 새 글만 적는다. */
 lines.push(`### 🎯 대외활동·공모전 새 글 ${freshActs.length}건 → 앱 '대외활동' 탭 (data/activities.json · ${acts.items.length}건 게재 중)`);
+if (actBackfilled) lines.push(`- 🔁 전에 실린 글 ${actBackfilled}건의 원문을 다시 읽어 마감·발췌를 채웠습니다 (남은 ${acts.items.filter((n) => !n.excerptsAt).length}건은 다음 실행에)`);
 for (const r of actResults) {
   lines.push(`- **${r.name}** — ${r.status}`);
   for (const i of r.items) lines.push(`  - [${i.kind}] [${i.title}](${i.url})${i.deadlineHint ? ` — ⏰ ${i.deadlineHint}` : ''}`);

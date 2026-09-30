@@ -1612,7 +1612,17 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
     eq('로봇 — 활동·재단 게시판만 robots.txt 를 묻는다 (학교 게시판은 그대로)', /if \(\(isAct \|\| isExt\) && !\(await robotsAllows\(s\.boardUrl\)\)\)/.test(cm), true);
     eq('  활동 글에 발췌·마감·분야를 싣는다', /const ex = activityExcerpts\(detail\.text\);[\s\S]*?it\.deadline = ex\.deadline;[\s\S]*?it\.excerpts = ex\.excerpts;[\s\S]*?activityField\(it\.title, it\.kind\)/.test(cm), true);
     eq('  재단 공고도 마감일을 같은 규칙으로', /const exd = activityExcerpts\(detail\.text\);/.test(cm), true);
-    eq('  상세 페이지 글자를 돌려준다', /deadlineHint: deadlineHintFrom\(text\), text \}/.test(cm), true);
+    /* 2026-09-30 첫 실행 사고 — 상세 글자를 한 줄로 뭉개 넘겨 26건 전부 마감·발췌 0건. 줄을 살리는 변환은 html-text.mjs 한 곳. */
+    const { htmlToLines } = await import('../collector/html-text.mjs');
+    const page = '<div class="nav">' + '메뉴 '.repeat(120) + '</div><div><h3>참여자 모집 안내</h3><p>1. 신청기간&nbsp;: 2026. 9. 7. (월) ~ 2026. 10. 31. (토)</p><p>2. 모집대상 : 산재 노동자 자녀(대학생)</p><br>문의처 02-000</div><script>var x = "신청기간 : 2000. 1. 1.";</script>';
+    eq('  한 줄로 뭉갠 글자로는 아무것도 못 읽는다 (그래서 사고가 났다)', ex.activityExcerpts(page.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ')), { deadline: null, excerpts: [] });
+    eq('  줄을 살린 글자(htmlToLines)면 마감·발췌를 읽는다 · &nbsp; 도 되돌린다 · 스크립트는 버린다', ex.activityExcerpts(htmlToLines(page)), { deadline: '2026-10-31', excerpts: [{ label: '모집기간', text: '2026. 9. 7. (월) ~ 2026. 10. 31. (토)' }, { label: '대상', text: '산재 노동자 자녀(대학생)' }] });
+    eq('  상세 페이지 글자는 줄을 살려 돌려준다 (마감 단서 한 줄은 예전대로)', /deadlineHint: deadlineHintFrom\(text\), text: htmlToLines\(html\) \}/.test(cm), true);
+    eq('  발췌 없이 실린 글은 다음 실행이 원문을 다시 읽어 채운다 (소급 · 예산 안 · 읽은 글은 excerptsAt)', /const ACT_BACKFILL = \d+;[\s\S]*?if \(actBackfilled >= ACT_BACKFILL \|\| it\.excerptsAt\) continue;[\s\S]*?if \(!budget\.hasRoom\([\s\S]*?it\.excerptsAt = /.test(cm) && /it\.excerptsAt = new Date\(\)\.toISOString\(\)\.slice\(0, 10\);   \/\/ 원문을 읽은 날/.test(cm), true);
+    for (const f of ['deepfetch.mjs', 'rescue-bodies.mjs']) {
+      const src = readText(new URL(`../collector/${f}`, import.meta.url));
+      eq(`  ${f} 도 같은 변환을 불러 쓴다 (베끼지 않는다)`, /htmlToLines\(html\)/.test(src) && !/replace\(\/<br\\s\*\\\/\?>\/gi/.test(src), true);
+    }
     eq('앱 — 마감을 읽은 글은 마감 다음 날까지만 (장학과 같은 CLOSED_KEEP_DAYS)', /!n\.deadline \|\| dday\(n\.deadline\)\.days >= -CLOSED_KEEP_DAYS/.test(app), true);
     eq('  D-day 는 dday()·ddayWords() 한 곳 (판정을 새로 만들지 않는다)', /dday: n\.deadline \? \{ label: ddayWords\(dday\(n\.deadline\)\)/.test(app), true);
     eq('  마감 임박순은 마감을 읽은 글끼리만', /const byDeadline = \(a, b\) => \(a\.deadline && b\.deadline \? a\.deadline\.localeCompare\(b\.deadline\)/.test(app), true);

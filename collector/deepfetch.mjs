@@ -1,6 +1,7 @@
 /* 심층 수집: notices.json의 모든 공고 본문 전문 + 지정 공고의 첨부파일 원본을
    저장소(collector/extracted/)에 저장한다. 정식 등록 큐레이션의 원천 자료. */
 import fs from 'node:fs';
+import { htmlToLines } from './html-text.mjs';
 import { isHtmlPayload } from './attachment-link.mjs';
 /* 요청 머리말은 http-headers.mjs 한 곳에 있다 — 베껴 두면 한쪽만 고쳐져
    "수집기는 받는데 심층 수집은 못 받는" 어긋남이 생긴다 (2026-08-20 신설, 첫머리 주석 참조) */
@@ -43,18 +44,8 @@ const FORMS_ONLY = process.argv.includes('--forms-only');
    받아 둔 글자는 extract-excerpts가 **본문에서 못 뽑았을 때만** 본다. */
 const ELIG_ATTACH = process.argv.includes('--elig-attach');
 
-function clean(html) {
-  return html
-    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
-    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
-    .replace(/<br\s*\/?>/gi, '\n')
-    .replace(/<\/(p|div|tr|li|h\d)>/gi, '\n')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
-    .replace(/[ \t]+/g, ' ')
-    .replace(/\n\s*\n+/g, '\n')
-    .trim();
-}
+/* HTML → 줄 글자는 html-text.mjs 한 곳 (2026-09-30 — collect.mjs·rescue-bodies.mjs 와 같은 변환) */
+function clean(html) { return htmlToLines(html); }
 
 // 첨부 원본만 필요한 실행은 여기서 끝낸다 — 본문 재수집(19분짜리)을 아예 시작하지 않는다
 if (FORMS_ONLY) {
