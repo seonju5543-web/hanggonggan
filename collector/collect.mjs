@@ -254,7 +254,7 @@ try { pageMemo = JSON.parse(fs.readFileSync(pagePath, 'utf8')); } catch { /* 첫
 const pageNotes = [];
 const todayStr = new Date().toISOString().slice(0, 10);
 
-async function readMorePages(boardUrl, firstRows, readPage) {
+async function readMorePages(boardUrl, firstRows, readPage, ctx = { dead: false }) {
   if (PAGES <= 1) return { rows: [], note: '' };
   const learned = pageMemo[boardUrl];
   if (!shouldRetry(learned)) return { rows: [], note: '' };
@@ -276,12 +276,14 @@ async function readMorePages(boardUrl, firstRows, readPage) {
     }
     if (!got) {
       if (pageNo === 2) {   // 2페이지부터 못 넘겼다 = 이 게시판은 페이지 넘기기가 안 된다
-        pageMemo[boardUrl] = { ok: false, checkedAt: todayStr };
+        if (ctx.dead) return { rows: [], note: '' };
+    pageMemo[boardUrl] = { ok: false, checkedAt: todayStr };
         return { rows, note: '' };
       }
       break;                // 3페이지가 없는 것은 정상 (공고가 그만큼 없는 게시판)
     }
     way = got.way;
+    if (ctx.dead) return { rows: [], note: '' };
     pageMemo[boardUrl] = { ok: true, way, checkedAt: todayStr };
     rows.push(...got.rows);
     firstKeys.push(...got.rows.map((r) => urlKey(r.url)));   // 다음 페이지 비교 기준에 누적
@@ -342,7 +344,8 @@ async function harvestBoard(s, ctx = { dead: false }) {
       /* 목록 2페이지부터도 훑는다 (2026-08-17) — 상단 고정 공지가 많은 게시판은 실공고가
          1페이지 밖으로 밀리면 영영 안 잡혔다. 장부를 비워도 안 잡힌다(게시판에 그 순간
          떠 있는 것만 읽으므로). 규칙·경위는 collector/paginate.mjs 첫머리. */
-      const extra = await readMorePages(s.boardUrl, rawLinks, (u) => fetchBoard(u).then(async (r) => (r.ok ? extractLinks(await r.text(), u) : [])));
+      const extra = await readMorePages(s.boardUrl, rawLinks, (u) => fetchBoard(u).then(async (r) => (r.ok ? extractLinks(await r.text(), u) : [])), ctx);
+      if (ctx.dead) return;   // 페이지를 넘기는 사이 시한이 지났다 — 리포트 메모도 남기지 않는다
       rawLinks = rawLinks.concat(extra.rows);
       if (extra.note) pageNotes.push(`${name}: ${extra.note}`);
     }
@@ -654,7 +657,7 @@ for (const r of results) {
   const h = health[r.name] || { fails: 0, lastOk: null };
   if (/⚠️|⛔/.test(r.status)) {                       // ⛔ 응답 멈춤도 연속되면 '멈춘 학교'다
     h.fails += 1;
-    if (h.fails >= 3) chronic.push(`${r.name} (${h.fails}회 연속) — ${r.status.replace(/^[⚠️⛔]\s*/, '')}`);
+    if (h.fails >= 3) chronic.push(`${r.name} (${h.fails}회 연속) — ${r.status.replace(/^(?:⚠️|⛔)\s*/u, '')}`);
   } else {
     h.fails = 0; h.lastOk = today;
   }

@@ -540,8 +540,10 @@ function esc(s) {
 /* 🔴 여기 없는 기호는 학생 화면에 **글자 그대로** 뜬다 — 데이터에 실제로 있는 것만 담는다.
    `middot` 는 2026-09-13 에 더했다: 금액 근거 줄(`amountSpec.raw`)에 게시판이 담아 온
    `취 &middot; 창업지원금` 이 그대로 들어 있었다(실측 4건). 관문 ui-tone ⑦ 이
-   **데이터에 나오는 기호를 전부 아는지** 세므로, 새 기호가 들어오면 그때 빨간불이 된다. */
-const ENTITIES = { nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", '#39': "'", '#160': ' ', middot: '·' };
+   **데이터에 나오는 기호를 전부 아는지** 세므로, 새 기호가 들어오면 그때 빨간불이 된다.
+   2026-09-30 에 여덟 개를 더했다 — 44개교 복원으로 들어온 게시판들이 `&lsquo;`·`&#40;` 등을
+   담아 왔다(관문이 잡았다). 숫자 기호도 **보이는 글자인 것만** 이름을 대고 넣는다(위 🔴 그대로). */
+const ENTITIES = { nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", '#39': "'", '#160': ' ', middot: '·', '#038': '&', '#039': "'", '#40': '(', '#41': ')', lsquo: '‘', rsquo: '’', bull: '•', sim: '∼' };
 /* 🔴 **목록을 두 벌 두지 않는다** (2026-09-13). 예전에는 정규식에 이름이 한 벌 더 박혀 있어서,
    ENTITIES 에 `middot` 를 더해도 정규식이 그걸 몰라 **아무 일도 안 일어났다**(실측).
    이 저장소가 여러 번 데인 자리다 — 목록에서 정규식을 만든다. */
@@ -1743,28 +1745,47 @@ const SORT_KEYS = Object.keys(EXPLORE_SORTS);
    (2026-08-26 개발자 지시). 기준이 셋뿐이라 한 번 누르는 것이 가장 빠르고,
    바로 고르고 싶을 때만 목록을 연다. 목록은 화면 절반을 덮는 시트가 아니라
    **아이콘 바로 아래** 뜨는 작은 팝오버다. */
-function openSortMenu() {
-  const menu = $('#explore-sort-menu');
-  menu.innerHTML = SORT_KEYS.map((k) => `
+/* 🔴 정렬 목록은 **한 벌**이다 — 탐색과 대외활동·공모전이 같은 함수로 연다(2026-09-30 개발자 지시
+   "장학금 쪽과 똑같이"). 화면마다 다른 것은 단추·목록의 id 와 기준표뿐이다. 두 벌로 베끼면
+   한쪽만 고쳐져 또 달라진다(이 화면이 이미 한 번 그렇게 갈라져 있었다). */
+const ACTIVITY_SORTS = {
+  recent: { label: '최근 수집순' },
+  deadline: { label: '마감 임박순' },
+};
+const SORT_MENUS = {
+  explore: { btn: '#explore-sort-btn', menu: '#explore-sort-menu', label: '#explore-sort-label',
+    sorts: EXPLORE_SORTS, get: () => exploreSort,
+    set: (k) => { exploreSort = k; renderExplore(); } },
+  activities: { btn: '#activities-sort-btn', menu: '#activities-sort-menu', label: '#activities-sort-label',
+    sorts: ACTIVITY_SORTS, get: () => activitiesSort,
+    set: (k) => { activitiesSort = k; renderActivities(); } },
+};
+
+function openSortMenu(which = 'explore') {
+  const m = SORT_MENUS[which];
+  const menu = $(m.menu);
+  menu.innerHTML = Object.keys(m.sorts).map((k) => `
     <button class="sort-opt" role="menuitemradio" data-sort="${k}"
-            aria-checked="${k === exploreSort}">${EXPLORE_SORTS[k].label}</button>`).join('');
+            aria-checked="${k === m.get()}">${m.sorts[k].label}</button>`).join('');
   menu.hidden = false;
-  $('#explore-sort-btn').setAttribute('aria-expanded', 'true');
+  $(m.btn).setAttribute('aria-expanded', 'true');
 }
 
-function closeSortMenu() {
-  const menu = $('#explore-sort-menu');
-  if (!menu || menu.hidden) return;
-  menu.hidden = true;
-  $('#explore-sort-btn').setAttribute('aria-expanded', 'false');
+function closeSortMenu(which) {
+  for (const k of which ? [which] : Object.keys(SORT_MENUS)) {
+    const menu = $(SORT_MENUS[k].menu);
+    if (!menu || menu.hidden) continue;
+    menu.hidden = true;
+    $(SORT_MENUS[k].btn).setAttribute('aria-expanded', 'false');
+  }
 }
 
-function applySort(key) {
-  if (!EXPLORE_SORTS[key]) return;
-  exploreSort = key;
-  $('#explore-sort-label').textContent = EXPLORE_SORTS[key].label;
-  renderExplore();
-  closeSortMenu();
+function applySort(key, which = 'explore') {
+  const m = SORT_MENUS[which];
+  if (!m.sorts[key]) return;
+  $(m.label).textContent = m.sorts[key].label;
+  m.set(key);
+  closeSortMenu(which);
 }
 
 /* 금액 상세에서 고른 공고를 장학금 찾기 화면에서 찾아 보여 준다 (2026-08-27).
@@ -2785,8 +2806,7 @@ function renderActivities() {
   const p = state.profile;
   if (!p) return;
   const box = $('#activities-list');
-  $('#activities-updated').textContent = (liveActivities && liveActivities.updatedAt)
-    ? `${liveActivities.updatedAt} 갱신` : '매일 아침 갱신';
+  /* 🔴 갱신 날짜는 보이지 않는다(2026-09-30 개발자 지시) — 머리줄 셋째 칸이 정렬 단추를 가운데로 밀었다 */
   if (!liveActivities) {   // 아직 오는 중 — '없다'와 다른 말이다
     box.innerHTML = typeof skeletonRows === 'function' ? skeletonRows(3) : '';
     return;
@@ -2802,7 +2822,7 @@ function renderActivities() {
   const byDeadline = (a, b) => (a.deadline && b.deadline ? a.deadline.localeCompare(b.deadline) : a.deadline ? -1 : b.deadline ? 1 : byRecent(a, b));
   list = list.slice().sort(activitiesSort === 'deadline' ? byDeadline : byRecent);
   const sortLabel = $('#activities-sort-label');
-  if (sortLabel) sortLabel.textContent = activitiesSort === 'deadline' ? '마감 임박순' : '최근 수집순';
+  if (sortLabel) sortLabel.textContent = (ACTIVITY_SORTS[activitiesSort] || ACTIVITY_SORTS.recent).label;
   if (!list.length) {
     box.innerHTML = `<p class="empty">${q
       ? `'${esc(activitiesQuery.trim())}'와 맞는 글이 없어요`
@@ -5983,11 +6003,7 @@ function bindEvents() {
     $$('#activities-filters .filter-chip').forEach((c) => c.classList.toggle('active', c === chip));
     renderActivities();
   });
-  /* 정렬 버튼 — 누를 때마다 최근순 ↔ 마감 임박순 (기준이 둘뿐이라 목록을 띄우지 않는다) */
-  $('#activities-sort-btn').addEventListener('click', () => {
-    activitiesSort = activitiesSort === 'deadline' ? 'recent' : 'deadline';
-    renderActivities();
-  });
+  /* 정렬 버튼은 탐색 화면과 한 벌로 묶었다 — 아래 '정렬 버튼' 블록(SORT_MENUS) 이 둘 다 배선한다 */
   {
     const box = $('#activities-search');
     const clear = $('#activities-search-clear');
@@ -6004,28 +6020,30 @@ function bindEvents() {
      🔴 예전에는 짧게 누르면 기준이 한 칸씩 넘어가고 길게 눌러야 목록이 떴다.
         그 방식은 지금 무슨 기준인지 눌러 보기 전에는 알 수 없고, 길게 누르기는
         아무도 발견하지 못하는 동작이다. 한 번 눌러 목록에서 고르는 쪽이 짧다.
-     ⚠️ 키보드도 같은 길이다 — Enter/Space 는 click 으로 와서 목록을 연다. */
-  {
-    const btn = $('#explore-sort-btn');
-    const menu = $('#explore-sort-menu');
+     ⚠️ 키보드도 같은 길이다 — Enter/Space 는 click 으로 와서 목록을 연다.
+     대외활동·공모전 화면도 **같은 배선**을 탄다(2026-09-30 · SORT_MENUS). */
+  for (const which of Object.keys(SORT_MENUS)) {
+    const btn = $(SORT_MENUS[which].btn);
+    const menu = $(SORT_MENUS[which].menu);
+    if (!btn || !menu) continue;
 
     btn.addEventListener('click', () => {
-      if (!menu.hidden) { closeSortMenu(); return; }
-      openSortMenu();
+      if (!menu.hidden) { closeSortMenu(which); return; }
+      openSortMenu(which);
     });
     btn.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowDown') { e.preventDefault(); openSortMenu(); }
+      if (e.key === 'ArrowDown') { e.preventDefault(); openSortMenu(which); }
     });
 
     menu.addEventListener('click', (e) => {
       const pick = e.target.closest('[data-sort]');
-      if (pick) applySort(pick.dataset.sort);
+      if (pick) applySort(pick.dataset.sort, which);
     });
-    document.addEventListener('click', (e) => {
-      if (!menu.hidden && !e.target.closest('.sort-wrap')) closeSortMenu();
-    });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSortMenu(); });
   }
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.sort-wrap')) closeSortMenu();
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSortMenu(); });
 
   /* 펼친 패널 안의 기록 버튼 — 상세 시트를 열지 않고 그 자리에서 남긴다 */
   document.addEventListener('click', (e) => {

@@ -21,7 +21,7 @@ import { diffPatch } from '../tools/edit-diff.mjs';
       고칠 곳은 **읽는 쪽**이고, 그 자리는 여기 하나다. */
 const readText = (u) => fs.readFileSync(u, 'utf8').replace(/\r\n/g, '\n');
 // 하트비트 순수 함수 — 예약 간격 계산은 한 곳에만 둔다 (2026-09-06)
-import { hoursFor, cronsOf, isStale, countField, runsPerWeek, everyWords } from '../collector/robot-heartbeat.mjs';
+import { hoursFor, cronsOf, isStale, countField, runsPerWeek, everyWords, latestSuccessIso, newerIso } from '../collector/robot-heartbeat.mjs';
 /* 🔴 URL 을 파일 경로로 쓸 때는 .pathname 이 아니라 fileURLToPath 다.
    윈도우에서 .pathname 은 `/C:/…` 를 주는데 그건 유효한 경로가 아니라 파일을 못 열고
    자식 프로세스도 못 띄운다. 리눅스(클라우드 검사)에서는 멀쩡해서 **이 검사 5개가
@@ -56,6 +56,8 @@ import { parseFiles, filenameFrom, nameFromUrl, safeFileName, looksLikeHtml, sni
 import { slimKosaf, blockKey } from '../collector/kosaf-open.mjs';
 /* 층2 빈 껍데기 — '비었나'의 판정은 collector/kosaf-empty.mjs 한 곳이다 */
 import { emptyVerdict, emptyShells, charsOfText, MIN_BODY_CHARS } from '../collector/kosaf-empty.mjs';
+/* 층2 상세를 잃었나 — 판정은 collector/kosaf-detail-loss.mjs 한 곳이다(kosaf-check 가 같은 것을 쓴다) */
+import { detailLoss, DROP_LIMIT } from '../collector/kosaf-detail-loss.mjs';
 
 let fail = 0;
 const eq = (label, got, want) => {
@@ -1380,6 +1382,11 @@ console.log('\n■ 수집망 복원 (2026-09-29 · 2026-08-30 좁힘을 되돌�
   /* 앱·알림·발행이 같이 쓰는 상수 — schools.json 과 같아야 한다 (자세한 대조는 「화면이 보여 주는 학교 = 로봇이 수집하는 학교」) */
   const served = createRequire(import.meta.url)('../match-engine.js').SERVED_SCHOOLS;
   eq('앱 상수 SERVED_SCHOOLS 도 44곳 전부다', REVIVED.filter((n) => !served.includes(n)), []);
+  /* 서비스한다고 적었는데 아무 로봇도 안 읽는 학교 — 학생은 빈 피드를 본다. 지금은 게시판 주소가 없는 분교 셋뿐이고(개발자가 주소를 줘야 한다),
+     넷째가 조용히 생기면 여기서 잡는다(리뷰 2026-09-30). */
+  const browserSet = new Set(bt.targets.map((x) => x.school));
+  const unread = [...new Set(sc.schools.filter((x) => !x.boardUrl && !browserSet.has(x.school)).map((x) => x.school))].sort();
+  eq('아무 로봇도 안 읽는 서비스 학교는 주소 없는 분교 셋뿐이다', unread, ['고려대학교 세종캠퍼스', '동국대학교 WISE캠퍼스', '연세대학교 미래캠퍼스']);
   /* 보관 자리의 규칙은 그대로 — 키가 사라지면 다음에 뺄 때 주소를 잃는다 */
   const parked = (o) => (Array.isArray(o.parked) ? o.parked : []);
   eq('보관 배열이 남아 있다 (비어 있어도 된다)', Array.isArray(sc.parked) && Array.isArray(bt.parked), true);
@@ -1450,7 +1457,8 @@ console.log('\n■ 로봇 대기줄 — 옛 커밋에서 시작하지 않는다 
   const root = new URL('../', import.meta.url);
   const wfDir = new URL('.github/workflows/', root);
   const files = fs.readdirSync(wfDir).filter((f) => f.endsWith('.yml'));
-  const queued = files.filter((f) => /group:\s*collector\b/.test(readText(new URL(f, wfDir))));
+  /* 진짜 대기줄 선언만 센다 — 주석의 "group: collector" 를 세면 다른 대기줄 워크플로까지 잡는다(리뷰 2026-09-30) */
+  const queued = files.filter((f) => /^concurrency:\n(?:[^\n]*\n)*?\s+group:\s*collector\s*$/m.test(readText(new URL(f, wfDir))));
   eq('collector 대기줄을 쓰는 워크플로가 있다', queued.length >= 2, true);
   const stale = queued.filter((f) => {
     const y = readText(new URL(f, wfDir));
@@ -1458,6 +1466,14 @@ console.log('\n■ 로봇 대기줄 — 옛 커밋에서 시작하지 않는다 
     return !/- uses: actions\/checkout@v4\n\s+with:\n(?:\s+#[^\n]*\n)*\s+ref: \$\{\{ github\.ref_name \}\}/.test(y);
   });
   eq('  전부 지금 브랜치 끝(ref: github.ref_name)에서 시작한다', stale, []);
+  /* 🔴 체크아웃 단계에 with: 가 둘이면 GitHub 이 파일 전체를 「잘못된 워크플로」로 거절한다 — 2026-09-30 실제로 다섯 파일이
+     그렇게 죽어 관리자 버튼까지 멈췄다. 파이썬 yaml 은 중복 키를 조용히 넘기므로 여기서 직접 센다(모든 워크플로 · 모든 단계). */
+  const dupWith = files.filter((f) => {
+    const y = readText(new URL(f, wfDir));
+    return [...y.matchAll(/^( +)- (?:name|uses|id):[^\n]*\n((?:\1  [^\n]*\n|\s*#[^\n]*\n)*)/gm)]
+      .some((m) => (m[2].match(new RegExp(`^${m[1]}  with:`, 'gm')) || []).length > 1);
+  });
+  eq('  어느 단계에도 with: 가 둘 이상 없다 (중복 키 = GitHub 이 파일을 거절한다)', dupWith, []);
   const ga = readText(new URL('../.gitattributes', import.meta.url));
   for (const f of ['collector/candidates.json', 'collector/pagination.json', 'collector/extracted/notices-text.json']) {
     eq(`  ${f} 에 합집합 규칙이 있다`, new RegExp(`^${f.replace(/[./]/g, '\\$&')}\\s+merge=jsonunion`, 'm').test(ga), true);
@@ -1663,7 +1679,12 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
     eq('앱 — 마감을 읽은 글은 마감 다음 날까지만 (장학과 같은 CLOSED_KEEP_DAYS)', /!n\.deadline \|\| dday\(n\.deadline\)\.days >= -CLOSED_KEEP_DAYS/.test(app), true);
     eq('  D-day 는 dday()·ddayWords() 한 곳 (판정을 새로 만들지 않는다)', /dday: n\.deadline \? \{ label: ddayWords\(dday\(n\.deadline\)\)/.test(app), true);
     eq('  마감 임박순은 마감을 읽은 글끼리만', /const byDeadline = \(a, b\) => \(a\.deadline && b\.deadline \? a\.deadline\.localeCompare\(b\.deadline\)/.test(app), true);
-    eq('  정렬 단추가 있다', /id="activities-sort-btn"/.test(html) && /\$\('#activities-sort-btn'\)\.addEventListener/.test(app), true);
+    /* 2026-09-30 — 탐색 화면과 **한 벌**(SORT_MENUS)로 배선한다: 누르면 기준 목록이 뜬다 */
+    eq('  정렬 단추·목록이 있고 탐색 화면과 같은 배선을 탄다', /id="activities-sort-btn"/.test(html)
+      && /id="activities-sort-menu"/.test(html)
+      && /activities: \{ btn: '#activities-sort-btn', menu: '#activities-sort-menu'/.test(app)
+      && /for \(const which of Object\.keys\(SORT_MENUS\)\)/.test(app), true);
+    eq('  대외활동 전용 토글 배선이 되살아나지 않았다 (두 벌 금지)', /\$\('#activities-sort-btn'\)\.addEventListener/.test(app), false);
     eq('  발췌 줄은 카드 한 벌 안에서 그린다', /\(o\.excerpts \|\| \[\]\)\.map\(\(x\) => `<p class="sch-provider">/.test(app), true);
   }
 }
@@ -6076,6 +6097,30 @@ console.log('\n■ 하트비트 간격 계산 (브라우저·인터넷 불필요
     isStale(24, '2026-09-04T12:00:00Z', now), false);
   eq('  성공 기록이 아예 없으면 조용한 것', isStale(24, null, now), true);
 
+  /* 🔴 경보 전 두 번째 확인 (2026-09-30 · 이슈 #316) — 9/28 에 배포 동기화가 매일 성공하는데도
+     첫 질문이 옛 시각을 줘 「175.7시간 전」 틀린 경보가 섰다. 경보감이면 최근 실행 목록을
+     직접 받아 **늦은 쪽**을 쓴다. 판정이 거꾸로(이른 쪽) 가면 틀린 경보가, 첫 답만 쓰면
+     같은 사고가 되살아난다. */
+  const runs = [
+    { conclusion: 'failure', updated_at: '2026-09-05T23:00:00Z' },
+    { conclusion: 'success', updated_at: '2026-09-05T20:00:00Z' },
+    { conclusion: 'success', updated_at: '2026-09-05T08:00:00Z' },
+    { conclusion: null, created_at: '2026-09-05T23:30:00Z' },          // 도는 중 — 성공 아님
+  ];
+  eq('최근 목록에서 가장 늦은 성공을 고른다 (실패·도는 중은 빼고)', latestSuccessIso(runs), '2026-09-05T20:00:00Z');
+  eq('  성공이 없으면 없다고 한다', latestSuccessIso([{ conclusion: 'failure', updated_at: 'x' }]), null);
+  const stale1st = '2026-09-01T00:00:00Z';   // 9/28 의 첫 답처럼 옛 시각
+  eq('두 답 중 늦은 쪽을 쓴다 — 첫 답이 옛것이면 경보가 서지 않는다',
+    isStale(24, newerIso(stale1st, latestSuccessIso(runs)), now), false);
+  eq('  (첫 답만 썼다면 경보가 섰다 — 이 절이 고친 것)', isStale(24, stale1st, now), true);
+  eq('  정말 조용하면 두 길 모두 옛것이라 경보는 그대로 선다',
+    isStale(24, newerIso(stale1st, '2026-09-01T06:00:00Z'), now), true);
+  eq('  두 번째 길을 못 읽으면 첫 답을 그대로 쓴다', newerIso(stale1st, null), stale1st);
+  eq('  첫 답이 비어도 두 번째 답을 쓴다', newerIso(null, '2026-09-05T20:00:00Z'), '2026-09-05T20:00:00Z');
+  const hb = readText(new URL('../collector/robot-heartbeat.mjs', import.meta.url));
+  eq('하트비트가 경보감일 때 두 번째 길을 실제로 부른다',
+    /isStale\(w\.everyHours, last\.at, now\)\)[\s\S]{0,120}recentSuccessAt/.test(hb), true);
+
   /* 🔴 위 검사들은 **글자로 쓴 cron** 을 본다 — 셈이 되돌아가면 잡히지만, 저장소의 진짜
      예약이 어떻게 읽히는지는 못 본다. 층2 수확이 정확히 그 자리에서 조용히 틀렸다:
      월·목(주 2회)인데 '주 1회'로 읽혀 경보 문턱이 21일이었고, 21일이면 층2 90곳 중
@@ -7588,6 +7633,42 @@ console.log('\n■ 층2 빈 껍데기 판정 (collector/kosaf-empty.mjs)');
   ];
   const chars = (p) => ({ 'p/a': 4, 'p/b': 5000 }[p] ?? null);
   eq('빈 첨부만 골라낸다', emptyShells(items, chars).map((x) => [x.code, x.file]), [['A', '공고문 없음.hwp']]);
+}
+
+/* 🔴 층2 상세 이어받기 (2026-09-30 · 이슈 #227) — 관문이 **개수**로 비교하던 시절,
+   재단 2곳이 한국장학재단 목록에서 내려가자(1,849 → 1,847곳) 그 상세도 빠진 것을
+   '이어받기가 끊겼다'로 읽고 저장을 막았다. 내려간 재단은 돌아오지 않으므로
+   9/22·9/25·9/29 세 번 연속 막혔다. 지금은 재단 코드로 맞춘다. */
+console.log('\n■ 한국장학재단 상세 이어받기 (collector/kosaf-detail-loss.mjs)');
+{
+  const mk = (n, detailed = n) => Array.from({ length: n }, (_, i) => ({
+    code: `C${i}`, org: `재단${i}`, name: '장학생', ...(i < detailed ? { detail: { 자격: 'x' } } : {}),
+  }));
+  const prev = mk(100);
+  /* ① 오늘 사고 재현 — 2곳이 목록에서 내려갔다. 로봇은 정상이므로 막으면 안 된다 */
+  const r1 = detailLoss(prev, prev.slice(2));
+  eq('목록에서 내려간 재단은 "잃음"이 아니다', r1.lost.length, 0);
+  eq('  내려간 재단을 이름과 함께 알린다', r1.dropped.map((x) => x.name), ['재단0 / 장학생', '재단1 / 장학생']);
+  eq('  2%는 지나치게 많지 않다', r1.tooManyDropped, false);
+  /* 🔴 옛 판정(개수 비교)이었다면 ①은 실패였다 — 이 절이 무엇을 고쳤는지 남긴다 */
+  const oldGate = (p, n) => n.filter((i) => i.detail).length >= p.filter((i) => i.detail).length;
+  eq('  (옛 개수 비교는 이 경우를 막았다 — 되돌리면 저장이 영영 막힌다)', oldGate(prev, prev.slice(2)), false);
+  /* ② 진짜 사고 — 목록에 남았는데 상세가 사라졌다(이어받기 끊김) */
+  const cut = prev.map((i, k) => (k === 5 ? { code: i.code, org: i.org, name: i.name } : i));
+  const r2 = detailLoss(prev, cut);
+  eq('목록에 남은 재단의 상세가 사라지면 잡는다', r2.lost.map((x) => x.code), ['C5']);
+  /* ②-2 새 재단이 늘어도 사라진 것을 가리지 못한다(개수 비교의 두 번째 구멍) */
+  const r2b = detailLoss(prev, [...cut, { code: 'NEW', org: '새', name: '재단', detail: { a: 1 } }]);
+  eq('  새로 받은 상세가 사라진 것을 가리지 못한다', r2b.lost.length, 1);
+  /* ③ 목록 읽기가 반쯤 깨진 경우를 '내려감'으로 조용히 넘기지 않는다 */
+  eq('목록의 20%가 사라지면 실패로 본다', detailLoss(prev, prev.slice(20)).tooManyDropped, true);
+  eq('  문턱은 10%', DROP_LIMIT, 0.1);
+  /* ④ 지난번에 상세가 없던 재단이 내려간 것은 셀 대상이 아니다 */
+  eq('상세가 없던 재단이 내려간 것은 세지 않는다', detailLoss(mk(10, 5), mk(10, 5).slice(0, 5)).dropped.length, 0);
+  /* ⑤ 관문이 실제로 이 판정을 쓴다(베낀 규칙이 아니다) */
+  const chk = readText(new URL('../collector/kosaf-check.mjs', import.meta.url));
+  eq('kosaf-check.mjs 가 detailLoss 로 판정한다', /detailLoss\(prevItems, full\.items\)/.test(chk), true);
+  eq('  옛 개수 비교가 남아 있지 않다', /nowDetail >= prevDetail/.test(chk), false);
 }
 
 console.log('\n■ 층2 제외 장부 (collector/kosaf-block.json → slimKosaf)');
@@ -9135,6 +9216,10 @@ console.log('\n■ 실시간 공고 → 장학금 탭 (자동 등록 판정 · 2
   {
     const grab = (n) => { const m = src.match(new RegExp(`const ${n} = (/[^\\n]*/[a-z]*);`)); return m ? eval(m[1]) : null; };
     const [ADMIN, EVENT] = [grab('ADMIN_NOTICE'), grab('EVENT')];
+    /* 2026-09-30 실측 — 숙명여대 '주요공지'에 섞인 수상 소식(award-news)이 '선발' 낱말로 자동 등록됐다. 뉴스는 신청 공고가 아니다. */
+    eq('수상 소식(AWARDS · 졸업생 … 선발)은 행정 안내처럼 거른다',
+      ADMIN.test("AWARDS 숙명여대 화공생명공학과 서세정 졸업생, ‘일본 문부과학성 장학생’ 선발"), true);
+    eq('  진짜 선발 공고는 거르지 않는다', ['2026학년도 2학기 건국가족장학생 선발 안내', '2026년 하반기 일운과학기술재단 장학생 선발 안내'].filter((t) => ADMIN.test(t)), []);
     eq('로봇에서 행정 공지·행사 규칙을 찾았다', !!ADMIN && !!EVENT, true);
     if (ADMIN && EVENT) {
       const 행정 = [

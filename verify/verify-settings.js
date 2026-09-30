@@ -1052,9 +1052,20 @@ const eq = (label, got, want) => {
     await page.waitForSelector('#screen-my:not([hidden])');
     await page.waitForTimeout(600);
 
+    /* ②-c 🔴 서류 보관함 — 서류 이름 사이에 구분선이 없다 (2026-09-30 개발자 지시
+       "서류보관함에 서류이름들 사이에 구분표시줄이 있는데 그것도 다 없애"). 위·아래 두 규칙이
+       줄을 긋고 있었다 — 하나만 지우면 다른 하나가 남는다. */
+    const 보관함줄 = await page.$$eval('#my-wallet .wallet-row', (els) => els.map((e) => {
+      const cs = getComputedStyle(e);
+      return (parseFloat(cs.borderTopWidth) || 0) + (parseFloat(cs.borderBottomWidth) || 0);
+    }));
+    eq(`  (검사가 무력하지 않은지 — 서류 줄을 실제로 찾았다: ${보관함줄.length}줄)`, 보관함줄.length >= 3, true);
+    eq('🔴 서류 보관함의 서류 이름 사이에 구분선이 없다', 보관함줄.every((w) => !w), true);
+
     /* ③ 톱니 — MY 의 가로줄이 지금보다 늘지 않는다 */
-    const MY천장 = 10;   /* 톱니 — 줄이면 이 숫자도 같이 내린다. 이 세는 법(테두리 제외)으로
-                            재면 고치기 전이 15개였다. ⚠️ 21 은 테두리까지 세던 옛 숫자다. */
+    const MY천장 = 3;    /* 톱니 — 줄이면 이 숫자도 같이 내린다. 이 세는 법(테두리 제외)으로
+                            재면 고치기 전이 15개였다. ⚠️ 21 은 테두리까지 세던 옛 숫자다.
+                            2026-09-30 서류 보관함 구분선을 걷어 10 → 3(실측). */
     const my = await 가로줄(page);
     eq(`🔴 MY 의 가로줄이 ${MY천장}개를 넘지 않는다 (지금 ${my}개 · 줄이면 이 숫자도 같이 내린다)`,
       my <= MY천장, true);

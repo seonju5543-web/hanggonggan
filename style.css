@@ -3269,6 +3269,9 @@ body::after { opacity: 0.26; }
 /* 🔴 줄 높이를 정하던 것은 여백(12px)과 **min-height 56px** 둘이었다 — 여백만 줄이면
    56px 에 걸려 안 줄어든다. 둘을 함께 내린다. 글자 위아래 공간도 함께 좁아진다. */
 #my-wallet .wallet-row { padding: 6px 0; min-height: 0; }
+/* 🔴 서류 이름 사이 구분선을 모두 없앤다 (2026-09-30 개발자 지시) — 위(1066행)와 아래(2628행)
+   두 곳이 줄을 긋고 있어 둘 다 끈다. 휴지통·다른 목록의 `.wallet-row` 는 그대로 둔다. */
+#my-wallet .wallet-row { border-top: 0; border-bottom: 0; }
 /* 글자 위아래 공간의 정체는 줄간격이다 — 14.5px 글자에 22.5px 줄간격(1.55)이라
    글자마다 8px 이 붙어 있었다. 한 줄짜리 이름표에는 그만큼이 필요 없다. */
 #my-wallet .wallet-label { line-height: 1.3; }
