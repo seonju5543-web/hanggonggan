@@ -21,7 +21,7 @@ import { diffPatch } from '../tools/edit-diff.mjs';
       고칠 곳은 **읽는 쪽**이고, 그 자리는 여기 하나다. */
 const readText = (u) => fs.readFileSync(u, 'utf8').replace(/\r\n/g, '\n');
 // 하트비트 순수 함수 — 예약 간격 계산은 한 곳에만 둔다 (2026-09-06)
-import { hoursFor, cronsOf, isStale, countField, runsPerWeek, everyWords } from '../collector/robot-heartbeat.mjs';
+import { hoursFor, cronsOf, isStale, countField, runsPerWeek, everyWords, latestSuccessIso, newerIso } from '../collector/robot-heartbeat.mjs';
 /* 🔴 URL 을 파일 경로로 쓸 때는 .pathname 이 아니라 fileURLToPath 다.
    윈도우에서 .pathname 은 `/C:/…` 를 주는데 그건 유효한 경로가 아니라 파일을 못 열고
    자식 프로세스도 못 띄운다. 리눅스(클라우드 검사)에서는 멀쩡해서 **이 검사 5개가
@@ -6091,6 +6091,30 @@ console.log('\n■ 하트비트 간격 계산 (브라우저·인터넷 불필요
   eq('  3배 안이면 정상 (GitHub 이 몇 시간 미루는 건 정상이다)',
     isStale(24, '2026-09-04T12:00:00Z', now), false);
   eq('  성공 기록이 아예 없으면 조용한 것', isStale(24, null, now), true);
+
+  /* 🔴 경보 전 두 번째 확인 (2026-09-30 · 이슈 #316) — 9/28 에 배포 동기화가 매일 성공하는데도
+     첫 질문이 옛 시각을 줘 「175.7시간 전」 틀린 경보가 섰다. 경보감이면 최근 실행 목록을
+     직접 받아 **늦은 쪽**을 쓴다. 판정이 거꾸로(이른 쪽) 가면 틀린 경보가, 첫 답만 쓰면
+     같은 사고가 되살아난다. */
+  const runs = [
+    { conclusion: 'failure', updated_at: '2026-09-05T23:00:00Z' },
+    { conclusion: 'success', updated_at: '2026-09-05T20:00:00Z' },
+    { conclusion: 'success', updated_at: '2026-09-05T08:00:00Z' },
+    { conclusion: null, created_at: '2026-09-05T23:30:00Z' },          // 도는 중 — 성공 아님
+  ];
+  eq('최근 목록에서 가장 늦은 성공을 고른다 (실패·도는 중은 빼고)', latestSuccessIso(runs), '2026-09-05T20:00:00Z');
+  eq('  성공이 없으면 없다고 한다', latestSuccessIso([{ conclusion: 'failure', updated_at: 'x' }]), null);
+  const stale1st = '2026-09-01T00:00:00Z';   // 9/28 의 첫 답처럼 옛 시각
+  eq('두 답 중 늦은 쪽을 쓴다 — 첫 답이 옛것이면 경보가 서지 않는다',
+    isStale(24, newerIso(stale1st, latestSuccessIso(runs)), now), false);
+  eq('  (첫 답만 썼다면 경보가 섰다 — 이 절이 고친 것)', isStale(24, stale1st, now), true);
+  eq('  정말 조용하면 두 길 모두 옛것이라 경보는 그대로 선다',
+    isStale(24, newerIso(stale1st, '2026-09-01T06:00:00Z'), now), true);
+  eq('  두 번째 길을 못 읽으면 첫 답을 그대로 쓴다', newerIso(stale1st, null), stale1st);
+  eq('  첫 답이 비어도 두 번째 답을 쓴다', newerIso(null, '2026-09-05T20:00:00Z'), '2026-09-05T20:00:00Z');
+  const hb = readText(new URL('../collector/robot-heartbeat.mjs', import.meta.url));
+  eq('하트비트가 경보감일 때 두 번째 길을 실제로 부른다',
+    /isStale\(w\.everyHours, last\.at, now\)\)[\s\S]{0,120}recentSuccessAt/.test(hb), true);
 
   /* 🔴 위 검사들은 **글자로 쓴 cron** 을 본다 — 셈이 되돌아가면 잡히지만, 저장소의 진짜
      예약이 어떻게 읽히는지는 못 본다. 층2 수확이 정확히 그 자리에서 조용히 틀렸다:

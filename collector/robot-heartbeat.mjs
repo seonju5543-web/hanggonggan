@@ -125,6 +125,36 @@ async function lastSuccessAt(repo, file, token) {
   return run ? { at: run.updated_at || run.created_at } : { at: null };
 }
 
+/* 🔴 **경보 전에 한 번 더 다른 길로 묻는다** (2026-09-30).
+   2026-09-28 하트비트가 배포 동기화를 「마지막 성공 175.7시간 전」으로 올렸는데, 그 주에도
+   하루 15~18번씩 전부 성공해 있었다(틀린 경보 — 이슈 #316). 위 질문(`status=success` 거르기)이
+   그때 옛 실행을 돌려준 것으로 보이나, 다음 날부터는 재현되지 않아 원인은 **확인하지 못했다.**
+   그래서 원인을 짐작해 고치지 않고, 경보를 올리기 **직전에만** 거르기 없이 최근 실행 목록을
+   받아 가장 늦은 성공을 직접 찾는다. 둘 중 **늦은 쪽**을 쓴다 — 한쪽이 옛 답을 줘도 경보가 서지 않고,
+   정말 조용하면 두 길 모두 옛 시각이라 경보는 그대로 선다. */
+export function latestSuccessIso(runs) {
+  let best = null;
+  for (const r of runs || []) {
+    if (r.conclusion !== 'success') continue;
+    const at = r.updated_at || r.created_at;
+    if (at && (!best || Date.parse(at) > Date.parse(best))) best = at;
+  }
+  return best;
+}
+export function newerIso(a, b) {
+  if (!a) return b || null;
+  if (!b) return a;
+  return Date.parse(b) > Date.parse(a) ? b : a;
+}
+async function recentSuccessAt(repo, file, token) {
+  const url = `https://api.github.com/repos/${repo}/actions/workflows/${file}/runs?per_page=100`;
+  const r = await fetch(url, {
+    headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' },
+  });
+  if (!r.ok) return null;                          // 못 읽으면 첫 답을 그대로 쓴다
+  return latestSuccessIso((await r.json()).workflow_runs);
+}
+
 export function isStale(everyHours, lastIso, nowMs) {
   if (everyHours == null) return false;
   if (!lastIso) return true;                       // 성공 기록이 아예 없다
@@ -141,7 +171,13 @@ async function main() {
 
   for (const w of scheduledWorkflows()) {
     let last = { at: null, error: '조회 안 함' };
-    if (repo && token) last = await lastSuccessAt(repo, w.file, token);
+    if (repo && token) {
+      last = await lastSuccessAt(repo, w.file, token);
+      /* 경보감일 때만 두 번째 길로 확인한다 — 스무 대 전부 두 번 물을 필요는 없다 */
+      if (!last.error && isStale(w.everyHours, last.at, now)) {
+        last = { at: newerIso(last.at, await recentSuccessAt(repo, w.file, token)) };
+      }
+    }
     const ageH = last.at ? Math.round((now - Date.parse(last.at)) / 360000) / 10 : null;
     rows.push({
       file: w.file, name: w.name,
