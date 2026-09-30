@@ -316,8 +316,8 @@ async function harvestBoard(s, ctx = { dead: false }) {
     return;
   }
   /* 공공·재단 게시판은 robots.txt 가 막은 길이면 읽지 않는다 (2026-09-29 · 4차 리서치 — 접근 제한을 깨고 긁는 것은 불법행위가 될 수 있다).
-     학교 게시판(role scholarship)은 지금까지처럼 읽는다. 파일이 없거나 못 받으면 읽어도 된다고 본다(robots.mjs). */
-  if ((isAct || isExt) && !(await robotsAllows(s.boardUrl))) {
+     학교 게시판은(장학이든 활동이든 · school 이 있는 출처) 지금까지처럼 읽는다. 파일이 없거나 못 받으면 읽어도 된다고 본다(robots.mjs). */
+  if ((isExt || (isAct && !s.school)) && !(await robotsAllows(s.boardUrl))) {   // 학교의 활동 게시판은 학교 장학 게시판과 같은 취급 (2026-09-30 · 외대 두 곳이 ⛔ 로 막혔다)
     bucket.push({ name, status: '⛔ robots.txt 가 막아 둔 주소 — 읽지 않았습니다 (출처를 바꾸거나 보관하세요)', items: [] });
     return;
   }
@@ -535,6 +535,8 @@ fs.writeFileSync(noticesPath, JSON.stringify(notices, null, 1));
 acts.items = freshActs.concat(acts.items || []);
 acts.items = acts.items.filter((n) => (n.foundAt || '9999') >= cutoff);
 acts.items = acts.items.filter((n) => !isAttachmentEntry(n));
+/* 소급(운영 원칙 7) — 판정 규칙이 좁아지면 이미 실린 글도 다시 잰다. 관리자가 종류를 정한 글(kindFrom)은 사람 판단이라 건드리지 않는다. */
+acts.items = acts.items.filter((n) => n.kindFrom || activityKind(n.title, { scholarship: KEYWORDS }));
 acts.items = dedupeNotices(acts.items);
 acts.items = acts.items.filter((n) => !n.school).concat(dropUnserved(acts.items.filter((n) => n.school)));
 acts.items.sort((a, b) => String(b.foundAt || '').localeCompare(String(a.foundAt || '')));

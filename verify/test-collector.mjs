@@ -1461,6 +1461,11 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
   eq('아니다 — 채용 공고', kind('2026 하반기 인턴 채용 공고'), null);
   eq('아니다 — 국가장학금', kind('2026학년도 2학기 국가장학금 신청 안내'), null);
   eq('아니다 — 빈 제목', kind(''), null);
+  /* 2026-09-30 서울문화포털 첫 수집 실측 — 대학생이 낼 수 없는 글이 섞였다 */
+  eq('아니다 — 초·중생 공모전', kind('[종로문화재단] 제13회 전국 초·중생 윤동주시화공모전 참여자 모집'), null);
+  eq('아니다 — 공연장 정기 대관 공모', kind('[서울문화재단] 2026 서울문화예술교육센터 서초 정기대관② 3분기 공모 안내'), null);
+  eq('대외활동 — 청소년을 돕는 대학생 모집은 남긴다 (청소년 낱말로 거르지 않는다)', kind('2026학년도 대학생 청소년 AI 교육지원사업 멘토 선발 안내'), '대외활동');
+  eq('로봇 — 규칙이 좁아지면 이미 실린 글도 다시 잰다 (관리자가 정한 kindFrom 은 예외)', /acts\.items = acts\.items\.filter\(\(n\) => n\.kindFrom \|\| activityKind\(n\.title, \{ scholarship: KEYWORDS \}\)\);/.test(cm), true);
   eq('장학 규칙을 안 넘기면 장학 낱말을 보지 않는다 (호출자가 넘겨야 한다)', activityKind('봉사장학생 봉사활동 안내'), '대외활동');
   /* ② 로봇 */
   eq('로봇은 activity-kind 를 부른다 (규칙을 베끼지 않는다)', /from '\.\/activity-kind\.mjs'/.test(cm) && /activityKind\(i\.title, \{ scholarship: KEYWORDS \}\)/.test(cm), true);
@@ -1609,7 +1614,7 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
     eq('  파일을 못 받으면 읽어도 된다고 본다 (없는 것과 막힌 것은 다르다)', await rb.robotsAllows('https://none.invalid/x', async () => { throw new Error('ENOTFOUND'); }), true);
     eq('  Disallow: / 는 전부 막는다', await rb.robotsAllows('https://blocked.invalid/x', async () => ({ ok: true, headers: { get: () => 'text/plain' }, text: async () => 'User-agent: *\nDisallow: /' })), false);
     /* 배선 */
-    eq('로봇 — 활동·재단 게시판만 robots.txt 를 묻는다 (학교 게시판은 그대로)', /if \(\(isAct \|\| isExt\) && !\(await robotsAllows\(s\.boardUrl\)\)\)/.test(cm), true);
+    eq('로봇 — 공공·재단 게시판만 robots.txt 를 묻는다 (학교 게시판은 활동 게시판이라도 그대로 · 2026-09-30 외대 실측)', /if \(\(isExt \|\| \(isAct && !s\.school\)\) && !\(await robotsAllows\(s\.boardUrl\)\)\)/.test(cm), true);
     eq('  활동 글에 발췌·마감·분야를 싣는다', /const ex = activityExcerpts\(detail\.text\);[\s\S]*?it\.deadline = ex\.deadline;[\s\S]*?it\.excerpts = ex\.excerpts;[\s\S]*?activityField\(it\.title, it\.kind\)/.test(cm), true);
     eq('  재단 공고도 마감일을 같은 규칙으로', /const exd = activityExcerpts\(detail\.text\);/.test(cm), true);
     /* 2026-09-30 첫 실행 사고 — 상세 글자를 한 줄로 뭉개 넘겨 26건 전부 마감·발췌 0건. 줄을 살리는 변환은 html-text.mjs 한 곳. */
