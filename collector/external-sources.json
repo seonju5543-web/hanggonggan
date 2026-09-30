@@ -415,49 +415,102 @@
    "host": "재단법인 연수큰재장학재단",
    "home": "http://yeonsukeunjae.imweb.me/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "홈페이지 못 엶 (HTTP 404)",
+    "best": null
+   }
   },
   {
    "host": "한진해운장학재단",
    "home": "http://www.hjsfoundation.or.kr/",
-   "boardUrl": null,
-   "seed": "kosaf-open"
+   "boardUrl": "http://www.hjsfoundation.or.kr/",
+   "seed": "kosaf-open",
+   "autoFound": {
+    "date": "2026-09-30",
+    "signals": 5,
+    "menu": "(홈)",
+    "sample": [
+     "2026년 하반기 장학생 신청서 마감 안내(26.9.30 기준) 26.09.09 -->",
+     "2026년 하반기 장학생 선발계획 공고 26.08.28 -->",
+     "**필독** 제출 방법 상세 안내 : 지방세 세목별 과세증명서(2006년 하반기 장학생 지원 시) 26.08.28 -->"
+    ]
+   }
   },
   {
    "host": "한국야쿠르트 사회복지재단",
    "home": "http://www.kyswf.or.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "홈페이지 못 엶 (fetch failed)",
+    "best": null
+   }
   },
   {
    "host": "광주남구장학회",
    "home": "https://namgu.gwangju.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "홈페이지 못 엶 (fetch failed)",
+    "best": null
+   }
   },
   {
    "host": "경상남도청",
    "home": "http://www.gyeongnam.go.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "https://www.gyeongnam.go.kr/",
+     "signals": 0
+    }
+   }
   },
   {
    "host": "(재)부안군근농인재육성재단",
    "home": "http://www.buan.go.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "홈페이지 못 엶 (The operation was aborted due to timeout)",
+    "best": null
+   }
   },
   {
    "host": "(재)송파구 인재육성 장학재단",
    "home": "http://janghak.songpa.go.kr/",
-   "boardUrl": null,
-   "seed": "kosaf-open"
+   "boardUrl": "https://janghak.songpa.go.kr/22",
+   "seed": "kosaf-open",
+   "autoFound": {
+    "date": "2026-09-30",
+    "signals": 10,
+    "menu": "장학생 선발공고",
+    "sample": [
+     "2026년 하반기 송파구인재육성장학재단 장학생 선발 공고",
+     "2026년 상반기 송파구인재육성장학재단 장학생 선발 결과 공고",
+     "2026년 송파구인재육성장학재단 해외문화체험 장학생 선발 결과 공고"
+    ]
+   }
   },
   {
    "host": "경상남도장학회",
    "home": "https://www.gyeongam.go.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "홈페이지 못 엶 (fetch failed)",
+    "best": null
+   }
   },
   {
    "host": "재단법인 대하장학회",

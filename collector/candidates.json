@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-09-30",
- "count": 2485,
+ "count": 2487,
  "items": [
   {
    "title": "2026년 재단법인 대전청년내일재단 성취 장학생(대학생) 선발 연..",
@@ -533,6 +533,20 @@
    "attachments": [],
    "deadlineHint": "접수기간 : 2026.10.15.(목) 13:30까지 2026 동계 어학연수 (Advanced Language Program)모집 안내 자세히",
    "school": "한국항공대학교",
+   "campus": "",
+   "foundAt": "2026-09-30"
+  },
+  {
+   "title": "2026학년도 공과대학생 어학/전공 자격증 취득 장학금 지원(PKNU-꿈·미래) 신청 안내",
+   "url": "https://nano.pknu.ac.kr/nano/2432?action=view&no=9994682",
+   "attachments": [
+    {
+     "name": "2026학년도 공과대학생 어학_전공 자격증 취득 장학금 신청 안내.pdf",
+     "url": "https://nano.pknu.ac.kr/boardDownload.do?no=8005574"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "부경대학교",
    "campus": "",
    "foundAt": "2026-09-30"
   },
@@ -8592,6 +8606,20 @@
     {
      "name": "2-2. 카드뉴스(일정수정).png",
      "url": "https://www3.chosun.ac.kr/bbs/scho/332/378829/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "조선대학교",
+   "campus": "",
+   "foundAt": "2026-09-30"
+  },
+  {
+   "title": "[한국장학재단] 희망사다리 장학생 대상 일자리 박람회 홍보",
+   "url": "https://www3.chosun.ac.kr/bbs/scho/332/281665/artclView.do",
+   "attachments": [
+    {
+     "name": "(대전ver)- 2026 대전 일자리박람회.png",
+     "url": "https://www3.chosun.ac.kr/bbs/scho/332/379081/download.do"
     }
    ],
    "deadlineHint": null,
