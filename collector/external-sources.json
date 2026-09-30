@@ -118,49 +118,103 @@
    "host": "한국광산장학회",
    "home": "http://www.gwangsan.go.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "홈페이지 못 엶 (fetch failed)",
+    "best": null
+   }
   },
   {
    "host": "대관령꿈나무장학회",
    "home": "https://www.pc.go.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "홈페이지 못 엶 (fetch failed)",
+    "best": null
+   }
   },
   {
    "host": "재단법인 김해시미래인재장학재단",
    "home": "http://www.ghjanghak.kr/",
-   "boardUrl": null,
-   "seed": "kosaf-open"
+   "boardUrl": "http://www.ghjanghak.kr/",
+   "seed": "kosaf-open",
+   "autoFound": {
+    "date": "2026-09-30",
+    "signals": 8,
+    "menu": "(홈)",
+    "sample": [
+     "2026년 제3회 장학수기 공모전 심사 결과...",
+     "2026년 하반기 장학생 선발 공고",
+     "(재)김해시미래인재장학재단 제3회 장학..."
+    ]
+   }
   },
   {
    "host": "재단법인 광산김씨대종중장학문화재단",
    "home": "http://www.kwangsankim.co.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "http://www.kwangsankim.co.kr/",
+     "signals": 0
+    }
+   }
   },
   {
    "host": "전주인재육성재단",
    "home": "https://www.jinjae.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "홈페이지 못 엶 (The operation was aborted due to timeout)",
+    "best": null
+   }
   },
   {
    "host": "강원인재원",
    "home": "http://injae.gwd.go.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "https://injae.gwd.go.kr/",
+     "signals": 0
+    }
+   }
   },
   {
    "host": "포항시장학회",
    "home": "http://phsjhh.itsm.co.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "홈페이지 못 엶 (fetch failed)",
+    "best": null
+   }
   },
   {
    "host": "당진발전본부장학회",
    "home": "http://www.ewp.co.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "https://www.ewp.co.kr/kor/main/",
+     "signals": 0
+    }
+   }
   },
   {
    "host": "충청북도 충주시청",

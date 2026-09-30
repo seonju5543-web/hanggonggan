@@ -4813,6 +4813,285 @@
     "raw": "1. 장학금: 등록금 최대 300만원"
    },
    "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-larshipdoarticleno375940",
+   "name": "[공지] 2026학년도 2학기 퇴직교직원자녀장학 신청 안내(~2026.10.02.(금) 까지)",
+   "boardTitle": "[공지] 2026학년도 2학기 퇴직교직원자녀장학 신청 안내(~2026.10.02.(금) 까지)",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-10-02",
+   "deadlineFrom": "게시판 요약 · ~2026.10.02",
+   "period": "접수 ~2026-10-02",
+   "summary": "아주대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "아주대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026-2_퇴직교직원자녀장학_신청서.hwp",
+     "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=file-download&articleNo=375940&attachNo=333649"
+    },
+    {
+     "name": "개인(신용)정보_수집_이용_제공_및_조회_동의서.hwp",
+     "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=file-download&articleNo=375940&attachNo=333650"
+    }
+   ],
+   "sourceUrl": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=375940&article.offset=0&articleLimit=10",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-larshipdoarticleno375827",
+   "name": "[공지] 2026학년도 2학기 가족장학 신청 안내(~2026.10.02.(금) 까지)",
+   "boardTitle": "[공지] 2026학년도 2학기 가족장학 신청 안내(~2026.10.02.(금) 까지)",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-10-02",
+   "deadlineFrom": "게시판 요약 · ~2026.10.02",
+   "period": "접수 ~2026-10-02",
+   "summary": "아주대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "아주대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026-2_가족장학_신청서.hwp",
+     "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=file-download&articleNo=375827&attachNo=333540"
+    },
+    {
+     "name": "2026-2_가족장학_개인(신용)정보수집,이용,제공_및_조회_동의서.hwp",
+     "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=file-download&articleNo=375827&attachNo=333541"
+    }
+   ],
+   "sourceUrl": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=375827&article.offset=0&articleLimit=10",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-larshipdoarticleno376668",
+   "name": "2026학년도 2학기 바르게장학/1-1-1 캠페인장학 신청 안내_10.26.(월)까지",
+   "boardTitle": "2026학년도 2학기 바르게장학/1-1-1 캠페인장학 신청 안내_10.26.(월)까지",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "100만원",
+   "amountValue": 1000000,
+   "deadline": null,
+   "listedAt": "2026-09-30",
+   "period": "접수 기간 원문 확인",
+   "summary": "아주대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "아주대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "붙임2-1. 2026-2학기_바르게, 1-1-1 캠페인 장학_신청서.hwp",
+     "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=file-download&articleNo=376668&attachNo=334307"
+    },
+    {
+     "name": "붙임2-2. 2026-2학기_개인(신용)정보_수집_이용_제공_및_조회_동의서(바르게, 1-1-1 캠페인 장학).hwp",
+     "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=file-download&articleNo=376668&attachNo=334308"
+    }
+   ],
+   "sourceUrl": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=376668&article.offset=0&articleLimit=10",
+   "sourceKind": "auto",
+   "applyEmail": "sch_in@ajou.ac.kr",
+   "applyEmailSource": "* 서류작성 후 상기 순서대로 정렬 → PDF파일로 연속스캔하여 1개 파일로 만든 후 반드시 접수기간 내에 이메일(sch_in@ajou.ac.kr)로 제출",
+   "applyEmailFrom": "공고 원문",
+   "eligibilityLines": [
+    "* 공통조건: 2026-2학기 정규학기 재학생, 직전학기 12학점 이상, 2.0이상 취득, 초과학기(학적유지자)제외",
+    "① 소득분위 0~8구간인 재학생",
+    "② 소득분위가 없으나 가계가 곤란함을 증명할 수 있는 재학생",
+    "1) 자격 관련: 기초생활수급자 및 차상위계층 증명서, 한부모가족증명서, 장애인증명서 등",
+    "- 실직: 고용보험 수급자격 인정명세서"
+   ],
+   "excerpts": [
+    "* 서류작성 후 상기 순서대로 정렬 → PDF파일로 연속스캔하여 1개 파일로 만든 후 반드시 접수기간 내에 이메일(sch_in@ajou.ac.kr)로 제출"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 1000000,
+    "ratio": 0,
+    "min": 1000000,
+    "max": 1000000,
+    "raw": "장학금액 최대 100만원 / 생활비성 장학 선발조건 교내 장학금 지급규칙에 해당하는 자 중 가계곤란자 * 공통조건: 2026-2학기 정규학기 재학생, 직전학기 12학점 이상, 2.0이상 취득, 초과학기(학적유지자)제외 * 선택조건: ① 또는 ②에 해당하는 자 ① 소득분위 0~8구간인 재학생 (2026-2학기 학자금 지원구간이 없다면, 가장 최신 학자금 지원"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-larshipdoarticleno375968",
+   "name": "[교외장학] 2026 산재 노동자 자녀 성장지원사업 모집",
+   "boardTitle": "[교외장학] 2026 산재 노동자 자녀 성장지원사업 모집",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-30",
+   "period": "접수 기간 원문 확인",
+   "summary": "아주대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "아주대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=375968&article.offset=0&articleLimit=10",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-larshipdoarticleno375935",
+   "name": "[대청교] 2026학년도 2학기 대학생 청소년교육지원장학 멘토 추가 모집 안내",
+   "boardTitle": "[대청교] 2026학년도 2학기 대학생 청소년교육지원장학 멘토 추가 모집 안내",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-30",
+   "period": "접수 기간 원문 확인",
+   "summary": "아주대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "아주대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=375935&article.offset=0&articleLimit=10",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-larshipdoarticleno375792",
+   "name": "[교외장학] 2026학년도 2학기 아주대학교 총동문회 동문장학생 선발 공고",
+   "boardTitle": "[교외장학] 2026학년도 2학기 아주대학교 총동문회 동문장학생 선발 공고",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-30",
+   "period": "접수 기간 원문 확인",
+   "summary": "아주대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "아주대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "가. 장학생 지원서 및 자기소개서 (1).hwp",
+     "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=file-download&articleNo=375792&attachNo=333488"
+    },
+    {
+     "name": "마. 교외장학생 서약서(2026-2).hwp",
+     "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=file-download&articleNo=375792&attachNo=333489"
+    },
+    {
+     "name": "바. 개인정보 수집 이용 제공 및 조회 동의서 (2).hwp",
+     "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=file-download&articleNo=375792&attachNo=333490"
+    }
+   ],
+   "sourceUrl": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=375792&article.offset=0&articleLimit=10",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-2427viewdocurrentpageno1",
+   "name": "2026년 대전청년내일재단 성취(대) 장학생 선발계획 연장 공고",
+   "boardTitle": "2026년 대전청년내일재단 성취(대) 장학생 선발계획 연장 공고",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-30",
+   "period": "접수 기간 원문 확인",
+   "summary": "국민대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "국민대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12427/view.do?currentPageNo=1",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-2373viewdocurrentpageno1",
+   "name": "2026년 JW이종호재단 기초과학자 장학생 선발 안내",
+   "boardTitle": "2026년 JW이종호재단 기초과학자 장학생 선발 안내",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-30",
+   "period": "접수 기간 원문 확인",
+   "summary": "국민대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "국민대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12373/view.do?currentPageNo=1",
+   "sourceKind": "auto"
   }
  ]
 }
