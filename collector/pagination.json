@@ -1,7 +1,11 @@
 {
  "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=list&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80": {
-  "ok": false,
-  "checkedAt": "2026-08-17"
+  "ok": true,
+  "way": {
+   "kind": "page",
+   "param": "pageIndex"
+  },
+  "checkedAt": "2026-09-30"
  },
  "https://www.yonsei.ac.kr/bbs/sc/58/artclList.do?findClSeq=257": {
   "ok": true,
@@ -9,15 +13,15 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-08-29"
+  "checkedAt": "2026-09-30"
  },
  "https://www.skku.edu/skku/campus/skk_comm/notice06.do": {
   "ok": false,
-  "checkedAt": "2026-08-17"
+  "checkedAt": "2026-09-30"
  },
  "https://www.hanyang.ac.kr/notice_all?p_p_id=kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_action=view&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_sCategoryId=224311300": {
   "ok": false,
-  "checkedAt": "2026-08-17"
+  "checkedAt": "2026-09-30"
  },
  "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318": {
   "ok": false,
@@ -29,35 +33,35 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-09-29"
+  "checkedAt": "2026-09-30"
  },
  "https://www.uos.ac.kr/korNotice/list.do?list_id=FA1": {
   "ok": false,
-  "checkedAt": "2026-08-17"
+  "checkedAt": "2026-09-30"
  },
  "https://www.konkuk.ac.kr/konkuk/2239/subview.do": {
   "ok": false,
-  "checkedAt": "2026-08-17"
+  "checkedAt": "2026-09-30"
  },
  "https://www.dongguk.edu/article/JANGHAKNOTICE/list": {
   "ok": false,
-  "checkedAt": "2026-08-17"
+  "checkedAt": "2026-09-30"
  },
  "https://www.hongik.ac.kr/kr/newscenter/notice.do": {
   "ok": false,
-  "checkedAt": "2026-08-17"
+  "checkedAt": "2026-09-30"
  },
  "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=list&srCategoryId=46": {
   "ok": false,
-  "checkedAt": "2026-08-17"
+  "checkedAt": "2026-09-30"
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp": {
   "ok": false,
-  "checkedAt": "2026-08-17"
+  "checkedAt": "2026-09-30"
  },
  "https://www.mju.ac.kr/mjukr/259/subview.do": {
   "ok": false,
-  "checkedAt": "2026-08-17"
+  "checkedAt": "2026-09-30"
  },
  "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do": {
   "ok": false,
@@ -189,7 +193,7 @@
  },
  "https://www.smu.ac.kr/kor/life/notice.do": {
   "ok": false,
-  "checkedAt": "2026-08-17"
+  "checkedAt": "2026-09-30"
  },
  "https://www.smu.ac.kr/kor/life/notice.do?srCategoryId=8": {
   "ok": false,
@@ -242,7 +246,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-08-29"
+  "checkedAt": "2026-09-30"
  },
  "https://www.gachon.ac.kr/kor/7986/subview.do": {
   "ok": true,

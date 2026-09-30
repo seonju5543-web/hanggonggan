@@ -25,6 +25,7 @@
          node collector/rescue-bodies.mjs --write   (실제로 받아서 저장)
    ============================================================ */
 import fs from 'node:fs';
+import { htmlToLines } from './html-text.mjs';
 import { chromium } from 'playwright';
 import { createRequire } from 'node:module';
 import { indexTexts, sourceFor, hasText, canonUrl, MIN_BODY } from './notice-source.mjs';
@@ -240,10 +241,7 @@ for (const t of targets) {
       const res = await fetch(t.url, { redirect: 'follow', headers: UA, signal: AbortSignal.timeout(20000) });
       if (res.ok) {
         const html = await res.text();
-        text = html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ')
-          .replace(/<br\s*\/?>/gi, '\n').replace(/<\/(p|div|li|tr|h[1-6])>/gi, '\n')
-          .replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ')
-          .replace(/[ \t\u00a0]+/g, ' ').split('\n').map((l) => l.trim()).filter(Boolean).join('\n');
+        text = htmlToLines(html);   // HTML → 줄 글자는 html-text.mjs 한 곳 (2026-09-30)
       }
     } catch { /* 이쪽도 안 되면 그냥 실패로 둔다 */ }
   }
