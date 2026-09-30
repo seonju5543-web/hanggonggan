@@ -833,8 +833,56 @@
    "added": "2026-09-30",
    "fetched": false,
    "schematized": false,
-   "tries": 1,
+   "tries": 4,
    "lastTryAt": "2026-09-30"
+  },
+  {
+   "id": "auto-larshipdoarticleno375940",
+   "name": "[공지] 2026학년도 2학기 퇴직교직원자녀장학 신청 안내(~2026.10.02.(금) 까지)",
+   "target": "2026학년도 2학기 퇴직교직원자녀장학 신청 안내(~2",
+   "added": "2026-09-30",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-larshipdoarticleno375827",
+   "name": "[공지] 2026학년도 2학기 가족장학 신청 안내(~2026.10.02.(금) 까지)",
+   "target": "2026학년도 2학기 가족장학 신청 안내(~2026.1",
+   "added": "2026-09-30",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-larshipdoarticleno376668",
+   "name": "2026학년도 2학기 바르게장학/1-1-1 캠페인장학 신청 안내_10.26.(월)까지",
+   "target": "2026학년도 2학기 바르게장학/1-1-1 캠페인장학 ",
+   "added": "2026-09-30",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-larshipdoarticleno375792",
+   "name": "[교외장학] 2026학년도 2학기 아주대학교 총동문회 동문장학생 선발 공고",
+   "target": "2026학년도 2학기 아주대학교 총동문회 동문장학생 선",
+   "added": "2026-09-30",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-archgbn0searchordersort0",
+   "name": "[삼척] 2026학년도 2학기 KNU-SOS 장학생 신청 안내(2차)",
+   "target": "2026학년도 2학기 KNU-SOS 장학생 신청 안내(",
+   "added": "2026-09-30",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-7986subviewdonttid125413",
+   "name": "[장학공지] 2026-2학기 외국인 유학생 다자녀장학금 신청 안내",
+   "target": "2026-2학기 외국인 유학생 다자녀장학금 신청 안내",
+   "added": "2026-09-30",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }

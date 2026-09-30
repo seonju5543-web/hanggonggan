@@ -41,6 +41,15 @@ collector/extracted/**       -diff
 # 링크 사냥꾼 기록장 — 로봇이 매 실행 갱신하므로 합집합 병합
 collector/link-hunt.json merge=jsonunion
 
+# ── 2026-09-30 — 브라우저 수집 19곳 17분치가 저장 단계 충돌로 통째로 버려진 사고 ──
+# 규칙 없는 장부 넷이 충돌했다. 검수 후보·페이지 기록·원문 말뭉치는 합치고(규칙은 merge-json-union.mjs),
+# 회전 커서는 매 실행 새로 쓰이므로 리포트처럼 내 쪽을 남긴다. registered.json 은 여전히 일부러 뺀다.
+collector/candidates.json            merge=jsonunion
+collector/pagination.json            merge=jsonunion
+collector/extracted/notices-text.json merge=jsonunion
+collector/browser-cursor.json        merge=ours
+collector/collect-cursor.json        merge=ours
+
 # ── 학교별 공고 파일 (2026-09-05) ──────────────────────────────────
 # 앱이 실제로 읽는 파일이다. 오랫동안 수집 로봇 둘만 썼고 같은 대기줄이라 안 부딪혔는데,
 # 링크 사냥꾼·원문 링크 복구가 여기에 고친 주소를 옮겨 쓰면서 **다른 대기줄 넷**이 됐다.
