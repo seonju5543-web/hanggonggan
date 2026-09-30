@@ -346,7 +346,10 @@ async function onboard(page) {
   // ⑦ 알림 클릭으로 앱이 열리는 경로 (?sch=)
   console.log('\n  [딥링크] 알림 클릭 → 해당 공고 열기');
   await page.goto(BASE + '/?sch=test-deadline-1', { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(2200);
+  /* 🔴 고정 2.2초 뒤 한 번 재지 않는다 — 앱은 **공고 목록이 올 때까지 기다렸다가** 주소를 정리한다
+     (notifyHandleLaunch). 느린 실행 기계에서는 그 전에 재서 빨간불이 났다(2026-09-30 · 같은 커밋이
+     main 은 초록, 기본 브랜치는 빨강). 정리되기를 기다리되 8초 시한을 둔다 — 안 정리하면 여전히 실패. */
+  await page.waitForFunction(() => location.search === '', null, { timeout: 8000 }).catch(() => {});
   const deep = await page.evaluate(() => location.search);
   ok(deep === '', '주소창이 원래대로 정리됨 (새로고침 때 재실행 방지)', deep);
   // 주입한 테스트 공고는 새로고침하면 사라지므로 실제 등록 공고로 확인
