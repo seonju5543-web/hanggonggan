@@ -4695,7 +4695,9 @@
     "max": 1500000,
     "raw": "라. 지원금액: 150만원 마 . 지원방법 : 대전청년포털 회원가입 후 온라인 신청 , 자세한 사항은 반드시 공고문 확인"
    },
-   "amountFrom": "공고 원문"
+   "amountFrom": "공고 원문",
+   "sameAs": "대전청년내일재단",
+   "sameAsFrom": "자동"
   },
   {
    "id": "auto-kuk2351208222artclviewdo",
@@ -6528,6 +6530,349 @@
     "장학금액 : 10 0만 원 / 인 (※ 생활비성 장학금)"
    ],
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-094bnum5233cate0qidx5233",
+   "name": "[발전기금] 2026학년도 2학기 조형도동문 장학생 선발 공고(국가유공자 관련 장학, ~10/14(수)까지)",
+   "boardTitle": "[발전기금] 2026학년도 2학기 조형도동문 장학생 선발 공고(국가유공자 관련 장학, ~10/14(수)까지)",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "100만원",
+   "amountValue": 1000000,
+   "deadline": "2026-10-14",
+   "deadlineFrom": "게시판 요약 · ~10/14",
+   "period": "접수 ~2026-10-14",
+   "summary": "서울과학기술대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서울과학기술대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2.조형도동문 장학생 선발 공고문.hwp",
+     "url": "javascript:downloadfile('/storage/www/bbs/5233','ADAD689941A4435EBBA2A434D0BC1456_.hwp','2.%EC%A1%B0%ED%98%95%EB%8F%84%EB%8F%99%EB%AC%B8 %EC%9E%A5%ED%95%99%EC%83%9D %EC%84%A0%EB%B0%9C %EA%B3%B5%EA%B3%A0%EB%AC%B8.hwp' );"
+    }
+   ],
+   "sourceUrl": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=896094&qidx=5233&cate=0&allboard=true&nowpage=1",
+   "sourceKind": "auto",
+   "applyEmail": "sfund@seoultech.ac.kr",
+   "applyEmailSource": "6. 신청방법 : 이메일 접수(sfund@seoultech.ac.kr)",
+   "applyEmailFrom": "공고 원문",
+   "openDate": "2026-10-01",
+   "eligibilityLines": [
+    "3. 선발대상",
+    "가. 1순위: 국가유공자 본인이 본교에 재학중인 학생",
+    "나. 2순위: 국가유공자의 배우자가 본교에 재학중인 학생",
+    "다. 3순위: 국가유공자의 자녀가 본교에 재학중인 학생"
+   ],
+   "excerpts": [
+    "신청기간 : 2026.10.1.(목) ~ 10.",
+    "장학금액 : 1인당 100만원(최대1학기만 지원)",
+    "신청방법 : 이메일 접수(sfund@seoultech.ac.kr)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 1000000,
+    "ratio": 0,
+    "min": 1000000,
+    "max": 1000000,
+    "raw": "5. 장학금액 : 1인당 100만원(최대1학기만 지원)"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-onttid000100000000003862",
+   "name": "[교내-10/22] 2026학년도 2학기 대학봉사장학금 신청 안내",
+   "boardTitle": "[교내-10/22] 2026학년도 2학기 대학봉사장학금 신청 안내",
+   "type": "교내",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-30",
+   "period": "접수 기간 원문 확인",
+   "summary": "고려대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "고려대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.korea.ac.kr/ko/568/subview.do?nttId=000100000000003862",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-onttid000100000000003682",
+   "name": "[기금-10/13] 2026학년도 2학기 정인장학금(구 운몽 허천구) 신청 안내 (생활비)",
+   "boardTitle": "[기금-10/13] 2026학년도 2학기 정인장학금(구 운몽 허천구) 신청 안내 (생활비)",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-09-30",
+   "period": "접수 기간 원문 확인",
+   "summary": "고려대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "고려대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.korea.ac.kr/ko/568/subview.do?nttId=000100000000003682",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-onttid000100000000003861",
+   "name": "[기금-10/8] 2026학년도 2학기 푸른솔 사회정의 장학금 신청 안내",
+   "boardTitle": "[기금-10/8] 2026학년도 2학기 푸른솔 사회정의 장학금 신청 안내",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-10-13",
+   "deadlineFrom": "게시판 요약 · ~ 2026. 10. 13",
+   "period": "접수 ~2026-10-13",
+   "summary": "고려대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "고려대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.korea.ac.kr/ko/568/subview.do?nttId=000100000000003861",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-krbbskr845364artclviewdo",
+   "name": "[학부-교외장학] 2026학년도 대전청년내일재단 성취(대) 장학생 선발 안내",
+   "boardTitle": "[학부-교외장학] 2026학년도 대전청년내일재단 성취(대) 장학생 선발 안내",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "150만원",
+   "amountValue": 1500000,
+   "deadline": "2026-09-23",
+   "listedAt": "2026-09-30",
+   "period": "접수 기간 ~2026-09-23",
+   "summary": "인하대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "인하대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026년 성취(대) 장학생 선발계획 공고.hwpx",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41192/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.inha.ac.kr/bbs/kr/8/45364/artclView.do",
+   "sourceKind": "auto",
+   "deadlineFrom": "공고 원문",
+   "eligibilityLines": [
+    "3. '타지역 소재 대학' 자격 기준 (아래 기준 모두 충족해야 함)",
+    "가. 공고일(‘26.9.1.) 기준 본인 또는 부모가 1년 전부터 계속해서 대전광역시에 주소를 두고 있는 대한민국 국적의 학생",
+    "나. 타지역에 소재한 국내 대학교에 재학 중인 학교(총)장 또는 단과대학장의 추천을 받은 대학교 2학년 이상 학생",
+    "다. 직전 학기까지의 전체 평균 평점 3.5 이상(4.5 만점 기준) 성적을 가진 학생"
+   ],
+   "excerpts": [
+    "장학금액 : 인당 150만 원 (생활비성)",
+    "문의처 : 대전청년내일재단 인재육성팀 ☎ 042-719-8426, 8451~2"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 1500000,
+    "ratio": 0,
+    "min": 1500000,
+    "max": 1500000,
+    "raw": "2. 장학금액 : 인당 150만 원 (생활비성) 3. '타지역 소재 대학' 자격 기준 (아래 기준 모두 충족해야 함) 가. 공고일(&lsquo;26.9.1.) 기준 본인 또는 부모가 1년 전부터 계속해서 대전광역시에 주소를 두고 있는 대한민국 국적의 학생 나. 타지역에 소재한 국내 대학교에 재학 중인 학교(총)장 또는 단과대학장의 추천을 받은 대학교 2학년"
+   },
+   "amountFrom": "공고 원문",
+   "sameAs": "대전청년내일재단",
+   "sameAsFrom": "자동"
+  },
+  {
+   "id": "auto-krbbskr845362artclviewdo",
+   "name": "[학부-국가장학] 2026학년도 2학기 중소기업취업연계 (희망사다리Ⅰ) 장학금 신청 안내",
+   "boardTitle": "[학부-국가장학] 2026학년도 2학기 중소기업취업연계 (희망사다리Ⅰ) 장학금 신청 안내",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "200만원",
+   "amountValue": 2000000,
+   "deadline": "2026-09-18",
+   "listedAt": "2026-09-30",
+   "period": "접수 기간 ~2026-09-18",
+   "summary": "인하대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "인하대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "붙임2. 2026-2학기 한국장학재단 희망사다리1 장학금 신청서(취업지원형).hwp",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41184/download.do"
+    },
+    {
+     "name": "붙임3. 2026-2학기 한국장학재단 희망사다리1 장학금 신청서(창업지원형).hwp",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41185/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.inha.ac.kr/bbs/kr/8/45362/artclView.do",
+   "sourceKind": "auto",
+   "deadlineFrom": "공고 원문",
+   "eligibilityLines": [
+    "1. 지원 대상",
+    "ㅇ대한민국 국적자로 선발 학기 사업 참여 대학에 정규 학기 재학 (3학년 이상)중이며, 직전 정규 학기 100점 만점의 70점(1.50학점) 이상인 자",
+    "- 등록 차수별 최소이수학점 이상을 이수한 자에 한하며 졸업 학기 학생은 직전 학기 최소이수학점 적용 제외",
+    "ㅇ계약학과 학생은 지원 대상에서 제외",
+    "ㅇ수혜 종료자는 지원 대상에서 제외되나 전문대 장학생이 졸업 후 전공심화과정 또는 4년제 대학에 편입 하는 경우 지원 가능",
+    "- 단, 편입 첫 학기에 신규 신청을 완료한 자에 한해 지원 가능"
+   ],
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 2000000,
+    "ratio": 0,
+    "min": 2000000,
+    "max": 2000000,
+    "raw": "4. 지원 내용 ㅇ (등록금) 학기 당 등록금 전액 - 수혜 학기 중복 지원 여부와 등록금액에 따라 장학금액 변동 가능 ㅇ (취․창업지원금) 학기 당 200만 원 - 직무기초교육 미 이수자는 해당 학기 지원금 반환 조치 5. 장학생 의무사항 ㅇ (정보제공 동의) 장학생 자격 상실(포기), 의무종사불이행 등으로 인한 장학금 반환 담보를 위해 보증보험 가입을 "
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-krbbskr845284artclviewdo",
+   "name": "[학부-교외장학] 2026학년도 수림재단 13회 동교인재상 장학생 선발 안내",
+   "boardTitle": "[학부-교외장학] 2026학년도 수림재단 13회 동교인재상 장학생 선발 안내",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-10-16",
+   "listedAt": "2026-09-30",
+   "period": "접수 기간 ~2026-10-16",
+   "summary": "인하대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "인하대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026년도 동교인재상_선발공고.pdf",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41106/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.inha.ac.kr/bbs/kr/8/45284/artclView.do",
+   "sourceKind": "auto",
+   "deadlineFrom": "공고 원문",
+   "eligibilityLines": [
+    "1. 신청 자격 : 국내 4년제 이상 대학의 최종 학년 재학생 (휴학생 포함)으로서 재학 중에 성취한 공적으로 타의 모범이 되고, 대학의 명예 선양과 발전에 크게 기여한 개인"
+   ],
+   "excerpts": [
+    "신청 방법 : 수림재단 홈페이지 ( https://www.surim.or.kr/ )에서 양식 다운로드 후, 제출 기한 내에 등기 우편으로 제출",
+    "문의처 : 수림재단 (02-6928-7861~4/ surimfd@gmail.com surimfd@naver.com / http://www.surim.or.kr)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-krbbskr845263artclviewdo",
+   "name": "[학부-교외장학] 2026학년도 2학기 유한재단 장학생 선발 안내",
+   "boardTitle": "[학부-교외장학] 2026학년도 2학기 유한재단 장학생 선발 안내",
+   "type": "교외",
+   "provider": "주관 기관 원문 확인",
+   "amount": "300만원",
+   "amountValue": 3000000,
+   "deadline": "2026-09-08",
+   "listedAt": "2026-09-30",
+   "period": "접수 기간 ~2026-09-08",
+   "summary": "인하대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "인하대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "개인정보 수집 이용 및 제공 동의서.hwp",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41097/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.inha.ac.kr/bbs/kr/8/45263/artclView.do",
+   "sourceKind": "auto",
+   "deadlineFrom": "공고 원문",
+   "eligibilityLines": [
+    "1. 지원 자격 (가. ~ 다. 모두 충족)",
+    "가. 결손 및 다문화 가정의 학생",
+    "나. (2026-2학기 기준) 한국장학재단 소득구간 5분위 이하 학생",
+    "※ 2026-2학기 학자금 지원구간 산정 중인 자에 한하여, 2026-1학기 학자금 지원구간 인정",
+    "※ 휴학 등의 사유로 2025학년도 이전 통지서 제출 불가",
+    "다. 2026학년도 2학기 정규 학기 재학생 (휴학생, 초과학기, 부분등록 제외)",
+    "※ 금학기 타 교외장학재단으로 생활비성 장학금 수혜 이력이 있는 학생의 경우, 선발에서 제외될 수 있음"
+   ],
+   "excerpts": [
+    "문의처 : 장학복지팀 교외장학 담당 (032-860-7076)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 3000000,
+    "ratio": 0,
+    "min": 3000000,
+    "max": 3000000,
+    "raw": "3. 장학 금액 : 300만 원 / 인 (※ 생활비성 장학금)"
+   },
+   "amountFrom": "공고 원문"
   }
  ]
 }

@@ -893,6 +893,22 @@
    "added": "2026-09-30",
    "fetched": true,
    "schematized": false
+  },
+  {
+   "id": "auto-krbbskr845362artclviewdo",
+   "name": "[학부-국가장학] 2026학년도 2학기 중소기업취업연계 (희망사다리Ⅰ) 장학금 신청 안내",
+   "target": "2026학년도 2학기 중소기업취업연계 (희망사다리Ⅰ) ",
+   "added": "2026-09-30",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-krbbskr845263artclviewdo",
+   "name": "[학부-교외장학] 2026학년도 2학기 유한재단 장학생 선발 안내",
+   "target": "2026학년도 2학기 유한재단 장학생 선발 안내",
+   "added": "2026-09-30",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }
