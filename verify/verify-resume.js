@@ -109,8 +109,14 @@ async function openWith(ctx, resume) {
        '환영 화면이 안 뜬다'도 아무것도 안 잰 셈이라, 통과로 넘기면 거짓 초록불이 된다. */
     ok('그 사이 부팅 화면이 떠 있다 (안 보이면 늦추기가 안 먹은 것)', sawBoot);
     ok('앱 코드가 오기 전에 환영 화면이 안 뜬다', sawBoot && !sawOnboarding);
-    await slow.waitForTimeout(2500);
-    ok('앱 코드가 오면 부팅 화면이 걷힌다', await slow.isHidden('#boot').catch(() => false));
+    /* 🔴 고정 2.5초 뒤 한 번 재면 **느린 실행 기계에서 걷히는 중에 잰다** — 2026-09-30 같은 커밋이
+       main 에서는 초록, 기본 브랜치에서는 이 한 줄만 빨강이었다(a6900ed). 걷히기를 **기다리되
+       시한을 둔다**.
+       🔴 시한은 boot.js 의 안전장치(BOOT_TIMEOUT_MS 6초 — 앱이 안 와도 스스로 걷힌다)보다
+          **짧아야** 한다. 길게 잡으면 app.js 가 영영 안 와도 안전장치가 걷어 줘서 통과한다(거짓 초록불).
+          부팅 화면이 붙은 뒤 위 반복 1.2초 + 여기 4초 = 5.2초 < 6초. 정상은 늦춘 1.8초 + 바닥값 1초 + 걷힘 움직임. */
+    const bootGone = await slow.waitForSelector('#boot', { state: 'hidden', timeout: 4000 }).then(() => true, () => false);
+    ok('앱 코드가 오면 부팅 화면이 걷힌다', bootGone);
     ok('그리고 홈이다', (await shown(slow)) === 'home');
     await slow.close();
     await slowCtx.close();
