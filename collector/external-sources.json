@@ -318,49 +318,98 @@
    "host": "구례군청",
    "home": "http://www.gurye.go.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "홈페이지 못 엶 (fetch failed)",
+    "best": null
+   }
   },
   {
    "host": "(재)전남광주통합특별시 서구 장학재단",
    "home": "http://www.seogu.gwangju.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "https://www.seogu.gwangju.kr/",
+     "signals": 0
+    }
+   }
   },
   {
    "host": "양구군청",
    "home": "https://www.yanggu.go.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "홈페이지 못 엶 (fetch failed)",
+    "best": null
+   }
   },
   {
    "host": "진안군청",
    "home": "http://www.jinan.go.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "https://www.jinan.go.kr/index.jinan",
+     "signals": 0
+    }
+   }
   },
   {
    "host": "장보고장학회(완도군청)",
    "home": "http://www.wando.go.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "홈페이지 못 엶 (fetch failed)",
+    "best": null
+   }
   },
   {
    "host": "재단법인 두을장학재단",
    "home": "http://www.dooeul.or.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "홈페이지 못 엶 (fetch failed)",
+    "best": null
+   }
   },
   {
    "host": "재단법인 세종연구원",
    "home": "https://www.sri.re.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "https://www.sri.re.kr/",
+     "signals": 0
+    }
+   }
   },
   {
    "host": "한국중부발전 보령발전본부",
    "home": "https://www.komipo.co.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "홈페이지 못 엶 (fetch failed)",
+    "best": null
+   }
   },
   {
    "host": "재단법인 연수큰재장학재단",

@@ -312,5 +312,57 @@
    "param": "pageIndex"
   },
   "checkedAt": "2026-09-30"
+ },
+ "https://www.daejeonyouthportal.kr/": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "https://youth.gwangju.go.kr/": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "https://youth.gyeongnam.go.kr/": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "http://www.ghjanghak.kr/": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "http://www.sjjh.or.kr/": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "http://www.jiheonsf.or.kr/bbs/board.php?bo_table=tl_notice": {
+  "ok": true,
+  "way": {
+   "kind": "page",
+   "param": "page"
+  },
+  "checkedAt": "2026-09-30"
+ },
+ "https://www.ikef.or.kr/page.php?id=%2Fkj%2Fscholar_schedule": {
+  "ok": true,
+  "way": {
+   "kind": "page",
+   "param": "page"
+  },
+  "checkedAt": "2026-09-30"
+ },
+ "https://foundation.miraeasset.com/ko/news/notice/list.do": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "https://www.kosaf.go.kr/ko/notice.do": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "https://www.niied.go.kr/web/main/nid/niied_board/list": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
+ },
+ "https://www.lottefoundation.or.kr/notice": {
+  "ok": false,
+  "checkedAt": "2026-09-30"
  }
 }
