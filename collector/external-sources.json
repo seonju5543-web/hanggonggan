@@ -220,49 +220,99 @@
    "host": "충청북도 충주시청",
    "home": "https://www.chungju.go.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "홈페이지 못 엶 (fetch failed)",
+    "best": null
+   }
   },
   {
    "host": "재단법인 상주시장학회",
    "home": "http://www.sjjh.or.kr/",
-   "boardUrl": null,
-   "seed": "kosaf-open"
+   "boardUrl": "http://www.sjjh.or.kr/",
+   "seed": "kosaf-open",
+   "autoFound": {
+    "date": "2026-09-30",
+    "signals": 3,
+    "menu": "(홈)",
+    "sample": [
+     "2026-09-11 2026년도 2차 (재)상주시장학회 장학생 선발 공고 상주시장학회 공고 제2026-2호 상주시 지역인재육성과 학생들의 생활비 부담 경감 등을 위한 2026년도 2차 (재)상주시장학회 장학생 선발 계획을 다음과 같이 ..",
+     "2026-08-26 2026년도 1차(재)상주시장학회 선발 공고(대학생) 상주시장학회 공고 제2026-1호2026년도 1차(재)상주시장학회 장학생 선발 계획을 다음과 같이 공고합니다. 제출 서류 등 기타 자세한 사항은 반드시 첨부 문서를 확..",
+     "상주시장학회 카카오채널 우리 친구해요! 친구추가하고 카카오톡으로 장학생 선발 알림 등 재단소식을 받아보세요."
+    ]
+   }
   },
   {
    "host": "재단법인 경주시장학회",
    "home": "http://janghak.gyeongju.go.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "홈페이지 못 엶 (fetch failed)",
+    "best": null
+   }
   },
   {
    "host": "재단법인 울산연구원",
    "home": "https://uill.uri.re.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "홈페이지 못 엶 (fetch failed)",
+    "best": null
+   }
   },
   {
    "host": "영축총림장학회",
    "home": "http://www.tongdosa.or.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "홈페이지 못 엶 (fetch failed)",
+    "best": null
+   }
   },
   {
    "host": "달서인재육성장학재단",
    "home": "http://www.dalseoij.org/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "홈페이지 못 엶 (fetch failed)",
+    "best": null
+   }
   },
   {
    "host": "현대자동차그룹",
    "home": "https://hmg-scholar.recruiter.co.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-09-30",
+    "why": "홈페이지 못 엶 (fetch failed)",
+    "best": null
+   }
   },
   {
    "host": "재단법인 삼원장학재단",
    "home": "http://www.jiheonsf.or.kr/",
-   "boardUrl": null,
-   "seed": "kosaf-open"
+   "boardUrl": "http://www.jiheonsf.or.kr/bbs/board.php?bo_table=tl_notice",
+   "seed": "kosaf-open",
+   "autoFound": {
+    "date": "2026-09-30",
+    "signals": 13,
+    "menu": "사항 전체보기 →",
+    "sample": [
+     "제 24기 후기 (재)삼원장학재단 장학생 선발공고",
+     "제 24기 전기 (재)삼원장학재단 선발 장학생 발표",
+     "제 24기 전기 (재)삼원장학재단 장학생 선발공고"
+    ]
+   }
   },
   {
    "host": "구례군청",
