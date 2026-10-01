@@ -112,6 +112,36 @@ async function main() {
       lines.push(`- 🟡 ${s.host} — ${why} (${RETRY_DAYS}일 뒤 다시)`);
     }
   }
+  /* ── 학교 홈페이지 씨앗 (2026-09-30 · collector/school-board-seeds.json) — 게시판 주소가 없는 분교 셋.
+     재단과 같은 방식으로 메뉴를 따라가되, **schools.json 에 자동으로 넣지 않는다** — 후보와 표본 제목을 리포트에 적고 사람이 관리자
+     「게시판 주소 추가」로 넣는다(학교 게시판은 주소 하나가 학생 전체의 피드를 정하므로 짐작으로 채우지 않는다). */
+  try {
+    const seedCfg = JSON.parse(fs.readFileSync(new URL('school-board-seeds.json', import.meta.url), 'utf8'));
+    const schoolsCfg = JSON.parse(fs.readFileSync(new URL('schools.json', import.meta.url), 'utf8'));
+    const still = (seedCfg.seeds || []).filter((x) => { const row = (schoolsCfg.schools || []).find((r) => r.school === x.school); return row && !row.boardUrl; });
+    if (still.length) lines.push('', `### 🏫 게시판 주소 없는 학교 — 홈페이지에서 후보 찾기 (${still.length}곳)`);
+    for (const x of still) {
+      if (Date.now() - start > BUDGET_MS) { lines.push('⏱ 시간 예산이 다 되어 학교 씨앗은 다음 실행에'); break; }
+      let best = null; let why = '';
+      try {
+        const home = await get(x.home);
+        const homeLinks = extractLinks(home.html, home.url);
+        const cands = [{ title: '(홈)', url: home.url, links: homeLinks }];
+        for (const m of pickMenuLinks(homeLinks, x.home, 8)) {
+          if (Date.now() - start > BUDGET_MS) break;
+          try { const pg = await get(m.url); cands.push({ title: m.title, url: pg.url, links: extractLinks(pg.html, pg.url) }); } catch { /* 다음 후보 */ }
+        }
+        for (const c of cands) { const sc = scoreBoardPage(c.links); if (!best || sc.signals > best.signals) best = { url: c.url, menu: c.title, ...sc }; }
+        why = best ? `최고 ${best.signals}건 (${best.menu})` : '후보 없음';
+      } catch (e) { why = `홈페이지 못 엶 (${e.message || e.name})`; }
+      x.probe = { checkedAt: today, why, best: best ? { url: best.url, signals: best.signals, sample: best.sample } : null };
+      lines.push(best && best.signals >= MIN_SIGNALS
+        ? `- 🟢 **${x.school}** 후보: ${best.url} (${best.menu} · 공고 ${best.signals}건 · 예: ${best.sample.join(' / ')}) → 관리자 「게시판 주소 추가」로 넣어 주세요`
+        : `- 🟡 ${x.school} — ${why}`);
+    }
+    if (still.length) fs.writeFileSync(new URL('school-board-seeds.json', import.meta.url), JSON.stringify(seedCfg, null, 1) + '\n');
+  } catch (e) { lines.push(`- ⚠️ 학교 씨앗 처리 중 오류: ${e.message}`); }
+
   lines.push('', found ? `새로 찾은 게시판 ${found}곳 — 다음 수집(07:41)부터 읽습니다. 잘못 찾았으면 \`collector/external-sources.json\` 에서 그 항목을 \`parked\` 로 옮겨 주세요.` : '이번에는 새로 찾은 게시판이 없습니다.', '');
   fs.writeFileSync(SRC, JSON.stringify(cfg, null, 1));
   fs.writeFileSync(REPORT, lines.join('\n'));

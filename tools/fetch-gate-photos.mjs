@@ -12,6 +12,7 @@
       BY-SA 는 표기 + 동일조건(영상도 같은 라이선스)이라 manifest 에 `shareAlike: true` 로 적어 둔다.
    ⚠️ 검색은 낱말 대조라 엉뚱한 사진(역·동상·건물)이 섞인다 — 학교당 후보를 여러 장 받아 두고
       사람이 고른다. 이 파일은 고르지 않는다. */
+import { createRequire } from 'node:module';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -56,6 +57,25 @@ const SCHOOLS = [
   { id: 'sookmyung', name: '숙명여자대학교', must: /Sookmyung|숙명/i, not: /library|도서관/i,
     q: ['숙명여자대학교 정문', 'Sookmyung Women\'s University main gate', 'Sookmyung Women\'s University campus', 'Sookmyung Women\'s University'] },
 ];
+
+/* 2026-09-30 — 44개교 복원: 손으로 다듬은 14곳 밖의 서비스 학교는 **이름에서 만든다**(match-engine SERVED_SCHOOLS 를 읽는다 · 박아 두지 않는다).
+   must = 정식 이름 또는 '대학교'를 뗀 짧은 이름(한글) · not = 분교·역·병원·로고 공통 목록 · 검색어는 한글만(영문 이름표는 학교마다 달라 짐작하지 않는다).
+   id 는 학교별 공고 파일과 같은 규칙(noticeFileKey)이라 파일 이름이 학교마다 유일하다. 사진이 한 장도 없으면 그 학교는 리포트에 '없음'으로 남는다(조용히 넘어가지 않는다). */
+const ME = createRequire(import.meta.url)('../match-engine.js');
+const GENERIC_NOT = /Station|역|병원|Hospital|logo|로고|모형|miniature|세종캠|Sejong|ERICA|글로컬|미래캠|원주|WISE|경주|안성|수원|용인|천안|Global Campus/i;
+const esc = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+for (const name of ME.SERVED_SCHOOLS) {
+  if (SCHOOLS.some((x) => x.name === name)) continue;
+  const short = name.replace(/대학교$/, '');
+  const isBranch = /캠퍼스$/.test(name);
+  SCHOOLS.push({
+    id: ME.noticeFileKey(name), name, generated: true,
+    /* 짧은 이름이 두 글자(부산·조선…)면 낱말 하나로는 딴 사진(부산 야경)이 걸린다 — `○○대` 꼴까지 있어야 받는다(리뷰 3차 2026-09-30) */
+    must: new RegExp(short.length <= 2 ? `${esc(name)}|${esc(short)}대` : `${esc(name)}|${esc(short)}`),
+    not: isBranch ? /Station|역|병원|logo|로고|모형/i : GENERIC_NOT,
+    q: [`${name} 정문`, `${name} 캠퍼스`, `${name}`, `${short} 정문`],
+  });
+}
 
 const OK_LICENSE = /^(CC0|CC BY(?:-SA)? [0-9.]+|Public domain|CC-PD-Mark|PD)/i;
 const BAD_LICENSE = /NC|ND/;
@@ -135,5 +155,7 @@ for (const s of SCHOOLS) {
   manifest.schools.push({ id: s.id, name: s.name, candidates: cands.length, files });
   console.log(`${s.name}: 후보 ${cands.length} · 받음 ${files.length}` + files.map((f) => `\n   · ${f.file}  ${f.license}${f.shareAlike ? ' (SA)' : ''}  ${f.title}`).join(''));
 }
+const empty = manifest.schools.filter((m) => !(m.files || []).length).map((m) => m.name);
+if (empty.length) console.log(`\n⚠️ 사진이 한 장도 없는 학교 ${empty.length}곳 — ${empty.join(' · ')} (위키미디어에 열린 라이선스 사진이 없거나 이름표가 파일 제목에 없다)`);
 fs.writeFileSync(path.join(OUT, 'manifest.json'), JSON.stringify(manifest, null, 1) + '\n');
 console.log(`\n합계 ${total}장 → ${OUT}/manifest.json`);

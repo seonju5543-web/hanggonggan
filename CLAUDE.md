@@ -32,6 +32,29 @@
 - 8월 30일에 지운 정식 등록 211건은 되살리지 않는다(마감 지난 것 128 · 오늘 이후 마감 7) — 새로 수집한다. 기술 고문 요청서(`docs/advisor/`)는
   좁힌 경위와 되살린 사실을 둘 다 적는다 — 관문 「기술 고문 요청서」 · 건수 `node docs/advisor/check-brief.mjs` · PDF `node docs/advisor/render.js`.
 
+## 🔴 장학금 판정 자동화 (2026-09-30 지시 — *"2번의 이유를 분석하고 장학금 판정을 자동화"*)
+
+- **왜 사람 손이었나**: `noticeKind` 는 제목만 보고, 학교는 제 장학금에 '교내'라고 적지 않아 학교마다 사람이 원문을 읽고 `OWN_PROGRAMS` 를 채워야 했다
+  (44개교에서 경희대 하나). 낱말 목록으로 교외를 찾는 옛길은 2026-09-18 실측(19건 중 17건 오판)으로 막혔다. 남은 길은 **원문 증거**다.
+- **판정기 `collector/kind-evidence.mjs`**(`classifyKind` · 순수 함수): 제목 표식 → 학교 제도 표(고정 `OWN_PROGRAMS` + 학습 `own-programs.json`) →
+  제목의 바깥 기관 낱말(`ORG_RE`) → 학교 이름표(`schoolTokens`) + 본문 증거(교비·장학팀 접수·학교 도메인 이메일) 순. 이름표 없이 본문 낱말만으로는 교내로 보지 않는다
+  (첫 시험: 메뉴의 '발전기금'·'포털'이 증거로 세어졌다 → 껍데기를 걷어낸 본문만 읽는다 `makeStripperMulti`). 증거 없음 = 교외.
+- **소급 로봇 `collector/kind-classify.mjs`**(원문 도착 뒤 · 두 수집 워크플로의 데이터 관문 앞): 확신 high 면 구분을 고치고 `kindEvidence` 를 남기며 제도 이름을
+  학습 표에 적는다(다음 등록부터 `noticeKind(title, school, learned)` 셋째 인자로 잡힌다 · 앱 화면은 안 넘긴다). mid 는 `kind-candidates.json` 후보로만.
+  관리자가 교내→교외로 되돌린 이름은 `blocked` 로(다시 배우지 않는다).
+- **범위 승격 `collector/scope-promote.mjs`**(F-5): 학교 한정·교외·로봇 등록분 중 ① 접수 이메일이 학교 밖 ② 본문 "재단에 직접 제출/재단 홈페이지 신청/우편 접수"
+  ③ 다른 학교의 같은 사업(`programKey` · `entry-rules.cjs`)이면 전국으로 푼다(`scopeFrom` 에 근거). 학교 창구(장학팀·포털) 문장이 있으면 그 학교 접수분이라 안 푼다.
+  자동 등록도 같은 열쇠로 다른 학교의 같은 사업이 오면 새로 등록하지 않고 기존 것을 승격한다(`verdict: 'promote'`). 합치기는 `collector/registered-merge.mjs` 한 곳(관리자 merge 와 같다).
+- **리뷰 3차에서 막은 구멍 넷**(같은 날): ① 학교 이름표에 **지역 이름 밑동·두 글자 별칭을 쓰지 않는다**(`schoolTokens` · '부산광역시 대학생'이 부산대 교내로 읽혔다 ·
+  지역 이름은 data.js `REGION_CITIES` 에서 읽는다) · 교내 high 는 '학교가 준다'는 본문 또는 약한 신호 둘 ② **이미 전국인 등록분은 세 번째 학교 글을 흡수**한다
+  (`absorbed` · `isNationalAbsorber` · 여러 학교만 받는 공고는 그 학교가 `schoolsAny` 에 있을 때만) · 승격은 로봇 등록·교외·사람 미지정·마감 전만
+  ③ 관리자가 구분·범위를 고치면 `kindFrom`·`scopeFrom` 에 '관리자' 표식(없으면 로봇이 다음 실행에 되돌린다) ④ 판정 로봇 셋은 리포트 파일을 인자로 받는다(브라우저 수집은 `browser-report.md`).
+- 🔴 **합칠 때 마감은 날짜를 내는 문구와 함께만 옮긴다**(`deadlineQuote` · 2026-10-01 첫 클라우드 실행에서 근거 없는 마감이 4건이 되어 데이터 관문이 빨간불 → 그날 자동 등록 8건이 되돌려졌다).
+  **실데이터에 기댄 고정 검사를 관문에 두지 말 것** — 「정식 등록도 나눌 때」의 '지금은 선 아래' 줄이 44개교 복원 뒤 선을 넘나들며 같은 날 같은 사고를 냈다(지금은 숫자만 보인다).
+- 그 밖(같은 지시): 브라우저 담당 게시판은 `schools.json` `collector:"browser"` 로 일반 로봇이 건너뛴다 · 못 읽는 학교는 `run-probe.txt` 정찰 · 주소 없는 분교는
+  `school-board-seeds.json` 씨앗을 `find-boards.mjs` 가 훑어 후보만 리포트(자동으로 넣지 않는다) · 포털 표 후보 `collector/portal-candidates.mjs` · 정문 사진은 44개교(`fetch-gate-photos.mjs`).
+  관문 「장학금 판정 자동화 · 범위 승격」.
+
 ## 관리자 업무 = 노션 백로그 (정본은 노션 하나)
 
 - 노션 Hangonggan › 프로젝트 › 한대장 › 「개발 업무」. 백로그 `data_source 60ac025f-edbd-4284-bb57-5e077bab1c3d` · 작업 현황 `2b015aa3-b2ed-444e-ae5b-bb30a8e14a23`.
@@ -164,7 +187,8 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 | 파일 | 역할 |
 |---|---|
 | `collector/collect.mjs` `browser-collect.mjs` | 게시판 수집(일반·진짜 Chromium) — 일반 수집기가 같은 행에서 대외활동·공모전도 갈라 담는다(`activity-kind.mjs` · 출처 `activity-sources.json`) |
-| `collector/auto-register.mjs` | 자동 정식 등록(원칙 2) |
+| `collector/auto-register.mjs` | 자동 정식 등록(원칙 2) — 다른 학교의 같은 사업은 새로 등록하지 않고 기존 등록을 전국으로 승격 |
+| `collector/kind-evidence.mjs` `kind-classify.mjs` `scope-promote.mjs` `registered-merge.mjs` | 교내·교외 증거 판정 · 원문 도착 뒤 소급 판정(학습 표 `own-programs.json`) · 학교 한정 → 전국 승격 · 합치기 한 곳 |
 | `collector/collect-news.mjs` `find-news-boards.mjs` `news-kind.mjs` | 교내 소식 로봇(따로 돈다) · 공지 게시판 찾기(출처 `news-sources.json` · 후보는 웹 검색 + `evidence`) · 실을지·갈래 판정 한 곳 |
 | `collector/fetch-board.mjs` | 게시판 받기·실패 이유 펴기 — 일반 수집기와 소식 로봇이 같이 쓴다(베끼지 말 것) |
 | `collector/extract-excerpts.mjs` | 원문 발췌 · 마감일 · 메일 접수 주소(`apply-email.mjs`) |

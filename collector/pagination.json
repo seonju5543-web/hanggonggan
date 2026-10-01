@@ -403,5 +403,21 @@
  "https://asanmirae.or.kr:449/main/": {
   "ok": false,
   "checkedAt": "2026-10-01"
+ },
+ "https://www.yonkang.org/kr": {
+  "ok": false,
+  "checkedAt": "2026-10-01"
+ },
+ "https://www.asanfoundation.or.kr/af/library/bbs/afLibraryPhotoBbsList.do": {
+  "ok": true,
+  "way": {
+   "kind": "page",
+   "param": "pageIndex"
+  },
+  "checkedAt": "2026-10-01"
+ },
+ "https://www.iljufoundation.org/homepage/index.do": {
+  "ok": false,
+  "checkedAt": "2026-10-01"
  }
 }

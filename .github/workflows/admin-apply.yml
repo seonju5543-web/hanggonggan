@@ -100,6 +100,8 @@ jobs:
           git add data/registered.json data/admin-log.json \
                   collector/auto-register-config.json collector/schools.json \
                   collector/pending-forms.json data/forms.json
+          # 관리자가 교내→교외로 되돌린 제도 이름은 학습 표의 blocked 로 간다(2026-09-30 리뷰 3차) — 없으면 로봇이 다시 배운다
+          [ -f collector/own-programs.json ] && git add collector/own-programs.json
           if git diff --cached --quiet; then
             echo "바뀐 내용이 없습니다."
             exit 0

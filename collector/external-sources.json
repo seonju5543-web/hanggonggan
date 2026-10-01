@@ -844,14 +844,30 @@
    "home": "https://www.sdream.or.kr/",
    "boardUrl": null,
    "seed": "web-search",
-   "evidence": "웹 검색 2026-09-29: \"삼성꿈장학재단 — sdream.or.kr\" · 글로벌 희망장학생(학기당 480만원) 공지"
+   "evidence": "웹 검색 2026-09-29: \"삼성꿈장학재단 — sdream.or.kr\" · 글로벌 희망장학생(학기당 480만원) 공지",
+   "probe": {
+    "checkedAt": "2026-10-01",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "https://www.sdream.or.kr/",
+     "signals": 0
+    }
+   }
   },
   {
    "host": "현대차 정몽구 재단",
    "home": "https://www.cmkfoundation-scholarship.org/",
    "boardUrl": null,
    "seed": "web-search",
-   "evidence": "웹 검색 2026-09-29: \"현대차 정몽구 스칼러십 — 온라인 장학생 선발 사이트\""
+   "evidence": "웹 검색 2026-09-29: \"현대차 정몽구 스칼러십 — 온라인 장학생 선발 사이트\"",
+   "probe": {
+    "checkedAt": "2026-10-01",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "https://www.cmkfoundation-scholarship.org/",
+     "signals": 0
+    }
+   }
   },
   {
    "host": "관정이종환교육재단",
@@ -863,9 +879,19 @@
   {
    "host": "두산연강재단",
    "home": "https://www.yonkang.org/",
-   "boardUrl": null,
+   "boardUrl": "https://www.yonkang.org/kr",
    "seed": "web-search",
-   "evidence": "웹 검색 2026-09-29: 2026년 두산연강재단 장학생 선발 안내 — \"접수: 두산연강재단 홈페이지(www.yonkang.org/kr)\" · 학기당 400만원"
+   "evidence": "웹 검색 2026-09-29: 2026년 두산연강재단 장학생 선발 안내 — \"접수: 두산연강재단 홈페이지(www.yonkang.org/kr)\" · 학기당 400만원",
+   "autoFound": {
+    "date": "2026-10-01",
+    "signals": 4,
+    "menu": "(홈)",
+    "sample": [
+     "2026.08.20 두산연강재단, 대학 장학생 대상 미래역량강화 워크숍 진행 두산연강재단, 대학 장학생 대상 미래역량강화 워크숍 진행",
+     "2026.08.12 두산연강재단, 대학 장학생 대상 금융교육 워크숍 진행 두산연강재단, 대학 장학생 대상 금융교육 워크숍 진행",
+     "2026.05.29 두산연강재단, '두산연강 고교 장학생'에 5억여 원 장학금 지원 두산연강재단, '두산연강 고교 장학생'에 5억여 원 장학금 지원"
+    ]
+   }
   },
   {
    "host": "미래에셋박현주재단",
@@ -878,16 +904,34 @@
   {
    "host": "아산사회복지재단",
    "home": "https://www.asanfoundation.or.kr/",
-   "boardUrl": null,
+   "boardUrl": "https://www.asanfoundation.or.kr/af/library/bbs/afLibraryPhotoBbsList.do",
    "seed": "web-search",
-   "evidence": "웹 검색 2026-09-29: \"2026년 아산장학생 선발 안내 — asanfoundation.or.kr/af/foundation/notice/afFoundationNoticeDetail.do?idx=11282\""
+   "evidence": "웹 검색 2026-09-29: \"2026년 아산장학생 선발 안내 — asanfoundation.or.kr/af/foundation/notice/afFoundationNoticeDetail.do?idx=11282\"",
+   "autoFound": {
+    "date": "2026-10-01",
+    "signals": 4,
+    "menu": "사진다운로드",
+    "sample": [
+     "2026년 장학증서 수여식",
+     "2025년 장학증서 수여식",
+     "2024년 장학증서 수여식"
+    ]
+   }
   },
   {
    "host": "포스코청암재단",
    "home": "https://www.postf.org/",
    "boardUrl": null,
    "seed": "web-search",
-   "evidence": "웹 검색 2026-09-29: \"포스코청암재단 — postf.org\" · 장학생 선발 사이트 postf.recruiter.co.kr"
+   "evidence": "웹 검색 2026-09-29: \"포스코청암재단 — postf.org\" · 장학생 선발 사이트 postf.recruiter.co.kr",
+   "probe": {
+    "checkedAt": "2026-10-01",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "https://www.postf.org/",
+     "signals": 0
+    }
+   }
   },
   {
    "host": "한국고등교육재단",
@@ -924,14 +968,29 @@
    "home": "https://www.dwef.or.kr/",
    "boardUrl": null,
    "seed": "web-search",
-   "evidence": "웹 검색 2026-09-29: \"동원육영재단 — dwef.or.kr\" · YTF·IDS 장학 프로그램"
+   "evidence": "웹 검색 2026-09-29: \"동원육영재단 — dwef.or.kr\" · YTF·IDS 장학 프로그램",
+   "probe": {
+    "checkedAt": "2026-10-01",
+    "why": "홈페이지 못 엶 (fetch failed)",
+    "best": null
+   }
   },
   {
    "host": "일주학술문화재단",
    "home": "https://www.iljufoundation.org/",
-   "boardUrl": null,
+   "boardUrl": "https://www.iljufoundation.org/homepage/index.do",
    "seed": "web-search",
-   "evidence": "웹 검색 2026-09-29: \"일주학술문화재단 — iljufoundation.org\" · 해외박사 장학생 선발(33기)"
+   "evidence": "웹 검색 2026-09-29: \"일주학술문화재단 — iljufoundation.org\" · 해외박사 장학생 선발(33기)",
+   "autoFound": {
+    "date": "2026-10-01",
+    "signals": 5,
+    "menu": "(홈)",
+    "sample": [
+     "페이스북 더보기 2026년 34기 해외박사 장학생 선발 2026.03.31.",
+     "페이스북 더보기 2026년 34기 국내학사 장학생 선발 2026.03.20.",
+     "페이스북 더보기 2025년 33기 해외박사 장학생 선발 2025.03.28."
+    ]
+   }
   }
  ],
  "_parked": "쓰지 않게 된 곳은 지우지 말고 여기로 옮긴다(schools.json 의 parked 와 같은 규칙). 되돌리려면 항목을 위 sources 로 옮기면 된다.",

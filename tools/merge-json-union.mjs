@@ -172,7 +172,27 @@ function mergeNoticesText(o, t) {
   return [...byKey.values()];
 }
 
+/* 학습 표(own-programs.json · 2026-09-30): 학교별 제도 이름을 이름으로 합친다 · blocked 도 합친다 · blocked 에 있는 이름은 programs 에서 뺀다 */
+function mergeOwnPrograms(o, t) {
+  const out = { ...(t || {}), ...(o || {}), programs: {}, blocked: {} };
+  for (const side of [t, o]) {
+    for (const [school, list] of Object.entries((side && side.blocked) || {})) {
+      const cur = out.blocked[school] || []; for (const p of list || []) if (!cur.some((x) => (x.name || x) === (p.name || p))) cur.push(p); out.blocked[school] = cur;
+    }
+  }
+  for (const side of [t, o]) {
+    for (const [school, list] of Object.entries((side && side.programs) || {})) {
+      const blocked = new Set((out.blocked[school] || []).map((x) => x.name || x));
+      const cur = out.programs[school] || [];
+      for (const p of list || []) { const n = p.name || p; if (!blocked.has(n) && !cur.some((x) => (x.name || x) === n)) cur.push(p); }
+      out.programs[school] = cur;
+    }
+  }
+  return out;
+}
+
 const RULES = [
+  { match: /(^|\/)collector\/own-programs\.json$/, merge: mergeOwnPrograms },
   { match: /(^|\/)collector\/candidates\.json$/, merge: mergeCandidateLedger },
   { match: /(^|\/)collector\/pagination\.json$/, merge: mergePagination },
   { match: /(^|\/)collector\/extracted\/notices-text\.json$/, merge: mergeNoticesText },

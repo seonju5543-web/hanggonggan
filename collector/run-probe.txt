@@ -19,3 +19,14 @@ checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765595
 checkUrl: https://www.konkuk.ac.kr/bbs/konkuk/235/1202780/artclView.do
 checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765586
 checkUrl: https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=154473&article.offset=0&articleLimit=10&noCat=501
+
+# 2026-09-30 — 44개교 복원 첫 실행에서 못 읽은 네 학교 (개발자 지시 "해결책 전체 시행").
+#   서강대: 일반 로봇이 UNABLE_TO_VERIFY_LEAF_SIGNATURE(서버 인증서 사슬 불완전) · 브라우저는 SPA 껍데기 0건.
+#           → 진짜 브라우저로 목록 API 와 화면을 열어 무엇이 보이는지 받아 적는다.
+#   서울대·동국대·상명대: 두 로봇 모두 시한(일반 150초 · 브라우저 7분 30초)에 걸려 강제 중단 — 어느 화면이 느린지 본다.
+checkUrl: https://www.sogang.ac.kr/api/api/v1/mainKo/BbsData/boardList?pageNum=1&pageSize=30&bbsConfigFk=141
+checkUrl: https://www.sogang.ac.kr/ko/scholarship-notice
+checkUrl: https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=list&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80
+checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/list
+checkUrl: https://www.smu.ac.kr/kor/life/notice.do?srCategoryId=8
+checkUrl: https://www.smu.ac.kr/kor/life/scholarship.do

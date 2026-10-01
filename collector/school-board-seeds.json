@@ -1,0 +1,47 @@
+{
+ "_comment": "게시판 주소가 없는 서비스 학교의 **홈페이지 씨앗** (2026-09-30 · 해결책 ④). find-boards.mjs 가 재단 홈페이지에서 장학 게시판을 찾는 것과 같은 방식으로 학교 홈페이지 메뉴를 따라가 후보를 찍는다. 🔴 여기 홈 주소는 일반에 알려진 공식 도메인으로 적었고 evidence 에 근거를 남긴다 — 로봇이 열어 확인한 뒤에만 후보가 된다. 찾은 후보는 schools.json 에 자동으로 넣지 않는다(collector/find-boards-report.md 에 적고, 관리자 「게시판 주소 추가」로 사람이 넣는다 — 주소를 짐작해 채우지 않는다는 규칙).",
+ "seeds": [
+  {
+   "school": "연세대학교 미래캠퍼스",
+   "home": "https://www.yonsei.ac.kr/wj/",
+   "evidence": "연세대 미래캠퍼스(원주) 공식 사이트 경로(wj = 원주) — 로봇이 열어 확인",
+   "probe": {
+    "checkedAt": "2026-10-01",
+    "why": "홈페이지 못 엶 (HTTP 404)",
+    "best": null
+   }
+  },
+  {
+   "school": "고려대학교 세종캠퍼스",
+   "home": "https://sejong.korea.ac.kr/",
+   "evidence": "고려대 세종캠퍼스 공식 도메인 — 로봇이 열어 확인",
+   "probe": {
+    "checkedAt": "2026-10-01",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "https://sejong.korea.ac.kr/",
+     "signals": 0,
+     "sample": []
+    }
+   }
+  },
+  {
+   "school": "동국대학교 WISE캠퍼스",
+   "home": "https://wise.dongguk.ac.kr/",
+   "evidence": "동국대 WISE캠퍼스 공식 도메인 — 로봇이 열어 확인",
+   "probe": {
+    "checkedAt": "2026-10-01",
+    "why": "최고 12건 ((홈))",
+    "best": {
+     "url": "https://wise.dongguk.ac.kr/main",
+     "signals": 12,
+     "sample": [
+      "대전청년내일재단 2026년 장학생 선발 안내(대상: 대전광역시에 주소를 둔 2학년 이상 재학생 /~10.8.) 2026.09.28.",
+      "2026년도 하반기 재단법인 논산시장학회 장학생 선발 안내(대상: 논산시 주민 및 자녀, ~10.30.(금)) 2026.09.28.",
+      "[한국장학재단] 국가장학금 학자금 지원구간 산정 체계 개편 안내 2026.09.23."
+     ]
+    }
+   }
+  }
+ ]
+}
