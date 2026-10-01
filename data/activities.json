@@ -2,6 +2,964 @@
  "updatedAt": "2026-10-01",
  "items": [
   {
+   "title": "2026년 초기창업패키지 로켓십 IR 경진대회 참가기업 모집 (2회차: 콘텐츠·플랫폼)",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179246",
+   "kind": "공모전",
+   "field": "창업",
+   "deadline": "2026-10-02",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-14 ~ 2026-10-02"
+    },
+    {
+     "label": "대상",
+     "text": "씨엔티테크 초기창업패키지 운영사무국은 스타트업의 투자유치와 네트워크 확장을 지원하기 위해, 산업별 특화 투자사를 초청한 IR 경진대회를 개최합니다."
+    },
+    {
+     "label": "주최",
+     "text": "민간"
+    },
+    {
+     "label": "활동지역",
+     "text": "전국"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "씨엔티테크(주)",
+   "api": "kstartup",
+   "foundAt": "2026-10-01",
+   "seenAt": "2026-10-01",
+   "excerptsAt": "2026-10-01"
+  },
+  {
+   "title": "2026년 영등포 청년 창업 도약 아카데미",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179116",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-10-02",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-03 ~ 2026-10-02"
+    },
+    {
+     "label": "대상",
+     "text": "19~39세 청년 예비창업자 또는 3년 이내 초기창업자 (총 30명 내외) 영등포구 거주 또는 영등포구에 사업장을 둔 청년 (예비)창업자 우선 선발"
+    },
+    {
+     "label": "주최",
+     "text": "공공기관"
+    },
+    {
+     "label": "활동지역",
+     "text": "서울"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "서울창조경제혁신센터",
+   "api": "kstartup",
+   "foundAt": "2026-10-01",
+   "seenAt": "2026-10-01",
+   "excerptsAt": "2026-10-01"
+  },
+  {
+   "title": "2026 「Go to Market」동남권 창업기업 온라인 판로개척 교육 참가자 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179339",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-10-04",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-22 ~ 2026-10-04"
+    },
+    {
+     "label": "대상",
+     "text": "동남권(부산·울산·경남) 소재, 업력 7년 미만 (예비)창업기업"
+    },
+    {
+     "label": "주최",
+     "text": "교육기관"
+    },
+    {
+     "label": "활동지역",
+     "text": "전국"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "경상국립대학교 창업중심대학사업단",
+   "api": "kstartup",
+   "foundAt": "2026-10-01",
+   "seenAt": "2026-10-01",
+   "excerptsAt": "2026-10-01"
+  },
+  {
+   "title": "2026 옥천군 로컬 크리에이터 아카데미",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179354",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-10-05",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-21 ~ 2026-10-05"
+    },
+    {
+     "label": "대상",
+     "text": "- 지역 창업에 관심있는 옥천군 청년 20명 ※ 만 39세 미만"
+    },
+    {
+     "label": "주최",
+     "text": "민간"
+    },
+    {
+     "label": "활동지역",
+     "text": "충북"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "(주)렛츠",
+   "api": "kstartup",
+   "foundAt": "2026-10-01",
+   "seenAt": "2026-10-01",
+   "excerptsAt": "2026-10-01"
+  },
+  {
+   "title": "[강동구 청년해냄센터] 전문분야 창업멘토링 10월 참가자 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179330",
+   "kind": "대외활동",
+   "field": "멘토링",
+   "deadline": "2026-10-06",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-22 ~ 2026-10-06"
+    },
+    {
+     "label": "대상",
+     "text": "예비창업자, 기창업자"
+    },
+    {
+     "label": "주최",
+     "text": "공공기관"
+    },
+    {
+     "label": "활동지역",
+     "text": "전국"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "강동구 청년해냄센터",
+   "api": "kstartup",
+   "foundAt": "2026-10-01",
+   "seenAt": "2026-10-01",
+   "excerptsAt": "2026-10-01"
+  },
+  {
+   "title": "청년의 아이디어가 브랜드가 되는 과정 | RE:CREATE 성수 인사이트포럼 「성수, 브랜드의 전성시대」 참가자 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179317",
+   "kind": "대외활동",
+   "deadline": "2026-10-06",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-22 ~ 2026-10-06"
+    },
+    {
+     "label": "대상",
+     "text": "청년, (예비)창업자, 스타트업, 브랜드 운영자, 소상공인, 메이커·크리에이터 등 브랜드 및 창업에 관심 있는 누구나"
+    },
+    {
+     "label": "주최",
+     "text": "민간"
+    },
+    {
+     "label": "활동지역",
+     "text": "서울"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "성동청년 창업이룸센터",
+   "api": "kstartup",
+   "foundAt": "2026-10-01",
+   "seenAt": "2026-10-01",
+   "excerptsAt": "2026-10-01"
+  },
+  {
+   "title": "2026 마포 청년 창업 아이디어 경진대회(MAPO NEXT STAGE)",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179252",
+   "kind": "공모전",
+   "field": "기획·아이디어",
+   "deadline": "2026-10-06",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-14 ~ 2026-10-06"
+    },
+    {
+     "label": "대상",
+     "text": "전국 19세~39세 이하 청년으로 창업에 관심 있는 개인(팀) 예비 및 초기(3년 이내) 창업자"
+    },
+    {
+     "label": "주최",
+     "text": "공공기관"
+    },
+    {
+     "label": "활동지역",
+     "text": "전국"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "마포청년창업취업지원센터 나루",
+   "api": "kstartup",
+   "foundAt": "2026-10-01",
+   "seenAt": "2026-10-01",
+   "excerptsAt": "2026-10-01"
+  },
+  {
+   "title": "로컬창업캠프 2기",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179314",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-10-07",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-21 ~ 2026-10-07"
+    },
+    {
+     "label": "대상",
+     "text": "청년 예비 및 초기창업자(1987년 이후 출생자)"
+    },
+    {
+     "label": "주최",
+     "text": "지자체"
+    },
+    {
+     "label": "활동지역",
+     "text": "서울"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "관악구청",
+   "api": "kstartup",
+   "foundAt": "2026-10-01",
+   "seenAt": "2026-10-01",
+   "excerptsAt": "2026-10-01"
+  },
+  {
+   "title": "2026년 민간 산림복지 창업 아카데미[2차] 참가자 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179276",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-10-07",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-14 ~ 2026-10-07"
+    },
+    {
+     "label": "대상",
+     "text": "산림복지전문업 창업에 관심이 있는 예비창업자"
+    },
+    {
+     "label": "주최",
+     "text": "공공기관"
+    },
+    {
+     "label": "활동지역",
+     "text": "전국"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "한국산림복지진흥원",
+   "api": "kstartup",
+   "foundAt": "2026-10-01",
+   "seenAt": "2026-10-01",
+   "excerptsAt": "2026-10-01"
+  },
+  {
+   "title": "2026년 투자 유치 역량 강화 특강",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179183",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-10-07",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-07 ~ 2026-10-07"
+    },
+    {
+     "label": "대상",
+     "text": "관내 예비·초기창업자"
+    },
+    {
+     "label": "주최",
+     "text": "교육기관"
+    },
+    {
+     "label": "활동지역",
+     "text": "서울"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "동대문구 창업지원센터",
+   "api": "kstartup",
+   "foundAt": "2026-10-01",
+   "seenAt": "2026-10-01",
+   "excerptsAt": "2026-10-01"
+  },
+  {
+   "title": "[숭실대학교 캠퍼스타운] 2026 석·박사급 실험실 창업스쿨(유형2) 참여자 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179054",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-10-07",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-08-27 ~ 2026-10-07"
+    },
+    {
+     "label": "대상",
+     "text": "이공계(예비)석·박사급 연구인력, (예비)창업자·초기창업자"
+    },
+    {
+     "label": "주최",
+     "text": "교육기관"
+    },
+    {
+     "label": "활동지역",
+     "text": "서울"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "숭실대학교 캠퍼스타운사업단",
+   "api": "kstartup",
+   "foundAt": "2026-10-01",
+   "seenAt": "2026-10-01",
+   "excerptsAt": "2026-10-01"
+  },
+  {
+   "title": "2026 제10회 G밸리창업경진대회 참가기업 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179309",
+   "kind": "공모전",
+   "field": "창업",
+   "deadline": "2026-10-08",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-18 ~ 2026-10-08"
+    },
+    {
+     "label": "대상",
+     "text": "예비창업자 또는 창업 7년 이내 스타트업 (공고일 기준) ※ 신산업 창업 분야에 관한 규정(2024.1.30) 별표1에 따른 신산업 창업 분야는 10년 이내 기업"
+    },
+    {
+     "label": "주최",
+     "text": "민간"
+    },
+    {
+     "label": "활동지역",
+     "text": "전국"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "한국산업단지공단",
+   "api": "kstartup",
+   "foundAt": "2026-10-01",
+   "seenAt": "2026-10-01",
+   "excerptsAt": "2026-10-01"
+  },
+  {
+   "title": "2026년 서울창업센터 관악 X SK에코플랜트 오픈이노베이션 프로그램 참여기업 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179347",
+   "kind": "대외활동",
+   "deadline": "2026-10-11",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-18 ~ 2026-10-11"
+    },
+    {
+     "label": "대상",
+     "text": "모집주제 해결을 위한 우수 아이디어와 구현기술을 보유한 서울시 소재의 7년 이내 스타트업(신산업 분야의 경우 10년 이내)"
+    },
+    {
+     "label": "주최",
+     "text": "공공기관"
+    },
+    {
+     "label": "활동지역",
+     "text": "서울"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "서울창업센터 관악",
+   "api": "kstartup",
+   "foundAt": "2026-10-01",
+   "seenAt": "2026-10-01",
+   "excerptsAt": "2026-10-01"
+  },
+  {
+   "title": "2026 제2회 반려동물 창업 아이디어 경진대회 참가자 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179323",
+   "kind": "공모전",
+   "field": "기획·아이디어",
+   "deadline": "2026-10-11",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-21 ~ 2026-10-11"
+    },
+    {
+     "label": "대상",
+     "text": "➀ 전국의 예비창업자(개인·팀) 또는 창업 10년 미만 기업(개인·법인) ➁ 반려동물 산업에 관심 있는 전국 청소년 ※ 본 대회에서 창업자란 공고일 기준 사업자등록 후 1년 이상 10년 미만인 개인사업자 또는 법인사업자를 말함. ※ 본 대회에서 예비창업자란 공고일 기준 사업자등록을 하…"
+    },
+    {
+     "label": "주최",
+     "text": "민간"
+    },
+    {
+     "label": "활동지역",
+     "text": "전국"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "(사)한국반려동물산업협회",
+   "api": "kstartup",
+   "foundAt": "2026-10-01",
+   "seenAt": "2026-10-01",
+   "excerptsAt": "2026-10-01"
+  },
+  {
+   "title": "창업특강 : AI시대에 창업한다는 것",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179315",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-10-12",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-21 ~ 2026-10-12"
+    },
+    {
+     "label": "대상",
+     "text": "청년 예비 및 초기창업자(1987년 이후 출생자)"
+    },
+    {
+     "label": "주최",
+     "text": "지자체"
+    },
+    {
+     "label": "활동지역",
+     "text": "전국"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "관악구청",
+   "api": "kstartup",
+   "foundAt": "2026-10-01",
+   "seenAt": "2026-10-01",
+   "excerptsAt": "2026-10-01"
+  },
+  {
+   "title": "2026년도 세종시 개천절 랩소디 나라사랑마을축제 행사 지원 (고등학생, 대학생 지원가능)",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3520815",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-10-01",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-16 ~ 2026-10-01"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-10-03 ~ 2026-10-03"
+    },
+    {
+     "label": "활동지역",
+     "text": "세종시 보람동 이응다리 \"뿌리깊은 나무\" 앞"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "세종특별자치시 세종시",
+   "api": "vol1365",
+   "foundAt": "2026-10-01",
+   "seenAt": "2026-10-01",
+   "excerptsAt": "2026-10-01"
+  },
+  {
+   "title": "대학생 자원봉사자 모집(데이터 입력 및 수정)",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3528225",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-10-01",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-30 ~ 2026-10-01"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-10-02 ~ 2026-10-02"
+    },
+    {
+     "label": "활동지역",
+     "text": "수원시장학재단 사무국"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "(재)수원시장학재단",
+   "api": "vol1365",
+   "foundAt": "2026-10-01",
+   "seenAt": "2026-10-01",
+   "excerptsAt": "2026-10-01"
+  },
+  {
+   "title": "고양시자원봉사센터 청년 업무보조 (자료정리 외 단순 사무업무 등) 관련 봉사자 모집",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3528293",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-10-01",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-30 ~ 2026-10-01"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-10-01 ~ 2026-10-02"
+    },
+    {
+     "label": "활동지역",
+     "text": "경기 고양시 일산서구 중앙로 1601 고양종합운동장 북문 지하1층 고양시자원봉사센터"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "고양시자원봉사센터",
+   "api": "vol1365",
+   "foundAt": "2026-10-01",
+   "seenAt": "2026-10-01",
+   "excerptsAt": "2026-10-01"
+  },
+  {
+   "title": "강동선사문화축제 자원봉사자 모집_성인(대학생)_주말 종일_토,일선택가능",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3517342",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-10-02",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-08 ~ 2026-10-02"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-10-17 ~ 2026-10-18"
+    },
+    {
+     "label": "활동지역",
+     "text": "서울암사동유적 강동선사문화축제 행사장"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "강동구청",
+   "api": "vol1365",
+   "foundAt": "2026-10-01",
+   "seenAt": "2026-10-01",
+   "excerptsAt": "2026-10-01"
+  },
+  {
+   "title": "2026년 이음터 마을동아리 연합 축제 자원봉사자 모집(장안대학교, 협성대학교)",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3520393",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-10-02",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-14 ~ 2026-10-02"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-10-17 ~ 2026-10-17"
+    },
+    {
+     "label": "활동지역",
+     "text": "동탄중앙초등학교 운동장, 청계중앙공원 일부 사용"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "다원이음터",
+   "api": "vol1365",
+   "foundAt": "2026-10-01",
+   "seenAt": "2026-10-01",
+   "excerptsAt": "2026-10-01"
+  },
+  {
+   "title": "10월(오전) 대전수학문화관 대학생 봉사활동 모집",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3521994",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-10-02",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-14 ~ 2026-10-02"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-10-01 ~ 2026-10-31"
+    },
+    {
+     "label": "활동지역",
+     "text": "대전수학문화관"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "대전교육정보원 대전수학문화관",
+   "api": "vol1365",
+   "foundAt": "2026-10-01",
+   "seenAt": "2026-10-01",
+   "excerptsAt": "2026-10-01"
+  },
+  {
+   "title": "10월(오후) 대전수학문화관 대학생 봉사활동 모집",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3521995",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-10-02",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-14 ~ 2026-10-02"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-10-01 ~ 2026-10-31"
+    },
+    {
+     "label": "활동지역",
+     "text": "대전수학문화관"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "대전교육정보원 대전수학문화관",
+   "api": "vol1365",
+   "foundAt": "2026-10-01",
+   "seenAt": "2026-10-01",
+   "excerptsAt": "2026-10-01"
+  },
+  {
+   "title": "\"Safe 대전 안전체험한마당 \"활동지원 / 점심식사제공 / 청소년, 대학생 지원 요망.",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3526544",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-10-02",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-28 ~ 2026-10-02"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-10-16 ~ 2026-10-16"
+    },
+    {
+     "label": "활동지역",
+     "text": "대전엑스포 시민 광장 일원"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "대전해바라기센터",
+   "api": "vol1365",
+   "foundAt": "2026-10-01",
+   "seenAt": "2026-10-01",
+   "excerptsAt": "2026-10-01"
+  },
+  {
+   "title": "[새아름작은도서관] 11~12월 오후(14시~18시) 대학생 자원봉사활동",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3527870",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-10-03",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-01 ~ 2026-10-03"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-11-01 ~ 2026-12-31"
+    },
+    {
+     "label": "활동지역",
+     "text": "새아름작은도서관 1층"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "양천구립도서관",
+   "api": "vol1365",
+   "foundAt": "2026-10-01",
+   "seenAt": "2026-10-01",
+   "excerptsAt": "2026-10-01"
+  },
+  {
+   "title": "[대학생, 청년] AI 교육 활동 보조 봉사자 모집",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3522428",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-10-05",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-17 ~ 2026-10-05"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-10-12 ~ 2026-10-12"
+    },
+    {
+     "label": "활동지역",
+     "text": "군포시자원봉사센터 4층 교육장"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "경기도 군포시",
+   "api": "vol1365",
+   "foundAt": "2026-10-01",
+   "seenAt": "2026-10-01",
+   "excerptsAt": "2026-10-01"
+  },
+  {
+   "title": "서울아산병원 대학생 자원봉사자 모집 (월~목요일 오전)",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3524946",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-10-05",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-28 ~ 2026-10-05"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-11-02 ~ 2026-11-05"
+    },
+    {
+     "label": "활동지역",
+     "text": "서울아산병원"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "서울아산병원사회복지팀",
+   "api": "vol1365",
+   "foundAt": "2026-10-01",
+   "seenAt": "2026-10-01",
+   "excerptsAt": "2026-10-01"
+  },
+  {
+   "title": "서울아산병원 대학생 자원봉사자 모집 (월~목요일 오후)",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3524951",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-10-05",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-28 ~ 2026-10-05"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-11-02 ~ 2026-11-05"
+    },
+    {
+     "label": "활동지역",
+     "text": "서울아산병원"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "서울아산병원사회복지팀",
+   "api": "vol1365",
+   "foundAt": "2026-10-01",
+   "seenAt": "2026-10-01",
+   "excerptsAt": "2026-10-01"
+  },
+  {
+   "title": "푸른나눔 자원봉사 기본교육(대학생 및 성인)",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3521608",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-10-06",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-16 ~ 2026-10-06"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-10-08 ~ 2026-10-08"
+    },
+    {
+     "label": "활동지역",
+     "text": "천안시자원봉사센터 교육실"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "천안시자원봉사센터",
+   "api": "vol1365",
+   "foundAt": "2026-10-01",
+   "seenAt": "2026-10-01",
+   "excerptsAt": "2026-10-01"
+  },
+  {
+   "title": "제1회 농땡장(청년농부 플리마켓) 자원봉사자 모집",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3524840",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-10-06",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-23 ~ 2026-10-06"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-10-10 ~ 2026-10-10"
+    },
+    {
+     "label": "활동지역",
+     "text": "농경철기문화 테마공원"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "포항시 농촌활성화지원센터",
+   "api": "vol1365",
+   "foundAt": "2026-10-01",
+   "seenAt": "2026-10-01",
+   "excerptsAt": "2026-10-01"
+  },
+  {
+   "title": "10월 인피니티 청소년봉사단 환경정화 봉사활동",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3523464",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-10-07",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-21 ~ 2026-10-07"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-10-10 ~ 2026-10-10"
+    },
+    {
+     "label": "활동지역",
+     "text": "탄금공원(구.세계무술공원 앞 집결)"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "충주시자원봉사센터",
+   "api": "vol1365",
+   "foundAt": "2026-10-01",
+   "seenAt": "2026-10-01",
+   "excerptsAt": "2026-10-01"
+  },
+  {
    "title": "2026.06.15 두산연강재단, '제20회 과학교사 학술시찰' 진행 두산연강재단은 초·중·고 과학교사들을 대상으로 국내외 과학 관련 산업 현장과 교육 현장을 탐방하는 &lsquo;과학교사 학술시찰&rsquo;을 6월 15일부터 22일까지 진행한다.",
    "url": "https://www.yonkang.org/kr/news/645",
    "kind": "대외활동",
