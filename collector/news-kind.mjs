@@ -54,8 +54,9 @@ export function newsKind(title) {
    @param opts.isAttachmentEntry  attachment-link.mjs (파일 링크 제외) */
 export function isNewsRow(row, opts = {}) {
   const t = String((row && row.title) || '').trim();
-  if (t.length < 6) return false;
-  if (NAV_ONLY.test(t) || NAV_PHRASE.test(t)) return false;
+  if (t.length < 4) return false;
+  /* 길잡이 글귀는 **짧은 제목**에만 — 「개인정보보호 교육 이수 안내」 같은 진짜 글을 먹지 않게 (리뷰 2026-10-01) */
+  if (NAV_ONLY.test(t) || (t.length <= 12 && NAV_PHRASE.test(t))) return false;
   if (opts.isAttachmentEntry && opts.isAttachmentEntry(row)) return false;
   if (NOT_NEWS.test(t)) return false;
   if (opts.scholarship && opts.scholarship.test(t)) return false;

@@ -1819,6 +1819,7 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
   eq('  옆 메뉴·파일 링크·너무 짧은 제목·신호 없는 짧은 글자는 안 싣는다', [NK.isNewsRow({ title: '공지사항', url: 'u' }, opts), NK.isNewsRow({ title: '안내문 2026학년도', url: 'https://u.ac.kr/a.pdf' }, opts), NK.isNewsRow({ title: '안내', url: 'u' }, opts), NK.isNewsRow({ title: '오시는 길 안내도', url: 'u' }, opts)], [false, false, false, false]);
   /* 🔴 clean-title 의 isMenuEntry 를 쓰면 안 된다 — 날짜 없는 공지 제목(「열람실 운영시간 변경 안내」)을 옆 메뉴로 보아 소식이 통째로 빠진다(2026-09-30 관문에서 잡았다) */
   eq('  날짜 없는 공지 제목도 싣는다 (clean-title 의 메뉴 판정을 쓰지 않는다)', ['기말고사 일정 변경 공지', '도서관 열람실 운영시간 변경 안내'].map((t) => NK.isNewsRow({ title: t, url: 'https://u.ac.kr/1' }, opts)), [true, true]);
+  eq('  길잡이 낱말이 든 **긴** 제목은 글이다 (「개인정보보호 교육 이수 안내」·「개강 안내」)', ['개인정보보호 교육 이수 안내', '통합정보시스템 로그인 방식 변경 안내', '개강 안내'].map((t) => NK.isNewsRow({ title: t, url: 'https://u.ac.kr/1' }, opts)), [true, true, true]);
   /* ② 찾기 로봇 — 순수 함수 */
   const L = (t, u) => ({ title: t, url: u });
   const board = 'https://www.khu.ac.kr/kor/notice/list.do';
@@ -1832,7 +1833,9 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
   /* ③ 출처 파일 — 44개교 · 근거 */
   const src = JSON.parse(readText(new URL('collector/news-sources.json', root)));
   const schoolsCfg = JSON.parse(readText(new URL('collector/schools.json', root)));
-  eq('출처는 수집망 학교 전부와 같다 (schools.json)', src.sources.map((s) => s.school).sort(), schoolsCfg.schools.map((s) => s.school).sort());
+  const srcSchools = new Set([...src.sources, ...(src.parked || [])].map((s) => s.school));
+  eq('출처(보관 포함)가 수집망 학교 전부를 덮는다 (schools.json)', schoolsCfg.schools.map((s) => s.school).filter((n) => !srcSchools.has(n)), []);
+  eq('  출처 학교는 전부 서비스 학교 · 게시판이 있는 줄은 학교 하나에 하나', src.sources.every((s) => schoolsCfg.schools.some((x) => x.school === s.school)) && new Set(src.sources.filter((s) => s.boardUrl).map((s) => s.school)).size === src.sources.filter((s) => s.boardUrl).length, true);
   eq('  후보마다 근거(웹 검색 결과 URL)가 있다 — 주소를 지어내지 않았다', src.sources.every((s) => (s.candidates || []).every((c) => /^https?:\/\//.test(c.url) && typeof c.evidence === 'string' && c.evidence.length >= 10)), true);
   eq('  boardUrl 이 있으면 로봇 확인(autoFound) 또는 사람의 근거(evidence)가 붙어 있다', src.sources.filter((s) => s.boardUrl).every((s) => (s.autoFound && s.autoFound.rows >= FN.MIN_ROWS && Array.isArray(s.autoFound.sample)) || (typeof s.evidence === 'string' && s.evidence.length > 10)), true);
   eq('  보관 칸과 되돌리는 법', Array.isArray(src.parked) && /되돌리려면/.test(src._parked || ''), true);
@@ -1865,6 +1868,9 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
   const saved = ['data/news', 'collector/seen-news.json', 'collector/news-cursor.json', 'collector/news-health.json', 'collector/news-sources.json', 'collector/news-report.md', 'collector/find-news-boards-report.md'];
   eq('  로봇이 쓰는 파일 전부를 저장한다', saved.filter((f) => !wf.includes('git add ' + f)), []);
   eq('  관문(test-collector + audit-data)이 저장 앞에 있고 실패하면 되돌린다', wf.indexOf('node verify/audit-data.js') < wf.indexOf('git commit') && /if: steps\.audit\.outcome == 'failure'/.test(wf), true);
+  eq('  감사 실패를 조용히 넘기지 않는다 (이슈 생성 단계)', /교내 소식 데이터 감사 실패/.test(wf) && (wf.match(/if: steps\.audit\.outcome == 'failure'/g) || []).length >= 2, true);
+  eq('  글이 0건이 된 학교의 파일은 빈 파일로 되쓴다 (옛 글이 영영 남지 않게)', /items: \[\] \}, null, 1\)\)/.test(rn) && /publishedFiles/.test(rn), true);
+  eq('  수집일은 KST', /const todayStr = \(\) => new Date\(Date\.now\(\) \+ 9 \* 3600000\)/.test(rn), true);
   const sync = readText(new URL('.github/workflows/deploy-sync.yml', root));
   eq('  배포 동기화가 이 로봇을 안다', /'교내 소식 수집 로봇'/.test(sync), true);
   const ga = readText(new URL('.gitattributes', root));
@@ -1921,6 +1927,8 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
     eq('  되살리기', run('newsUnhide', { urls: ['https://k.ac.kr/n/1'] }).status === 0 && !readT(newsFile).items[0].hidden && readT('collector/news-config.json').hideUrls.length, 0);
     eq('  출처 추가 — 빈 줄이 있는 학교는 그 줄에 채운다', run('newsSource', { op: 'add', source: { school: '서울대학교', boardUrl: 'https://s.ac.kr/notice', evidence: '검사용 근거' } }).status === 0 && readT('collector/news-sources.json').sources.find((s) => s.school === '서울대학교').boardUrl, 'https://s.ac.kr/notice');
     eq('  서비스 밖 학교·학교 없는 출처는 거절', run('newsSource', { op: 'add', source: { school: '없는대학교', boardUrl: 'https://x.ac.kr/n' } }).status !== 0 && run('newsSource', { op: 'add', source: { school: '', boardUrl: 'https://x.ac.kr/n' } }).status !== 0, true);
+    eq('  이미 게시판이 있는 학교는 거절 (학교 하나에 줄 하나)', run('newsSource', { op: 'add', source: { school: '서울대학교', boardUrl: 'https://s.ac.kr/notice2', evidence: '검사용 근거 둘' } }).status !== 0, true);
+    eq('  짧은 근거에도 날짜 도장이 붙어 10자를 넘는다', (readT('collector/news-sources.json').sources.find((s) => s.school === '서울대학교').evidence || '').length >= 10, true);
     eq('  보관 → 되살리기', run('newsSource', { op: 'park', boardUrl: 'https://k.ac.kr/notice' }).status === 0 && readT('collector/news-sources.json').parked.length === 1 && run('newsSource', { op: 'unpark', boardUrl: 'https://k.ac.kr/notice' }).status === 0 && readT('collector/news-sources.json').parked.length, 0);
     fs.rmSync(dir, { recursive: true, force: true });
     const adminJs = readText(new URL('_admin/admin.js', root));
@@ -1930,6 +1938,8 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
     const apply = readText(new URL('tools/admin-apply.mjs', root));
     const kinds = (apply.match(/const NEWS_KINDS = \[([^\]]+)\]/) || [])[1] || '';
     eq('  저장소의 갈래 목록이 news-kind 와 같다', kinds.match(/'([^']+)'/g).map((x) => x.slice(1, -1)), NK.NEWS_KINDS);
+    const auditKinds = (readText(new URL('verify/audit-data.js', root)).match(/const NEWS_KINDS = \[([^\]]+)\]/) || [])[1] || '';
+    eq('  감사의 갈래 사본도 news-kind 와 같다', auditKinds.match(/'([^']+)'/g).map((x) => x.slice(1, -1)), NK.NEWS_KINDS);
     const ay = readText(new URL('.github/workflows/admin-apply.yml', root));
     eq('  관리자 워크플로가 소식 파일을 저장한다', /git add data\/news/.test(ay) && /git add collector\/news-sources\.json/.test(ay), true);
   }

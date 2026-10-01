@@ -117,7 +117,7 @@ async function main() {
     if (!budget.hasRoom(PER_SCHOOL_MS / 3)) { skipped.push(s.school); continue; }
     const r = await withDeadline(findOne(s), PER_SCHOOL_MS);
     if (r === TIMED_OUT) {
-      s.probe = { checkedAt: today, tried: [{ url: (s.candidates[0] || {}).url || s.home, status: `⛔ ${Math.round(PER_SCHOOL_MS / 1000)}초 시한 초과` }] };
+      s.probe = { checkedAt: today, tried: [{ url: ((s.candidates || [])[0] || {}).url || s.home, status: `⛔ ${Math.round(PER_SCHOOL_MS / 1000)}초 시한 초과` }] };
       missed.push(s); continue;
     }
     if (r.found) {

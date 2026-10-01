@@ -30,8 +30,8 @@ jobs:
     env:
       NODE_EXTRA_CA_CERTS: collector/certs/sectigo-server-auth-dv-r36.pem   # 계명대처럼 중간 인증서를 안 보내는 학교 (collector/certs/README.md)
     # 상한 = 단계 상한의 합 + 여유 3 (관문 test-collector 「교내 소식」이 대소관계를 잰다 · 상한을 키워 때우지 말 것).
-    # 찾기 7 + 수집 6 + 알림 1 + 관문 5 + 되돌리기 1 + 저장 3 + 리포트 1 + 알림 1 = 25 → 29
-    timeout-minutes: 29
+    # 찾기 7 + 수집 6 + 알림 1 + 관문 5 + 되돌리기 1 + 감사 알림 1 + 저장 3 + 리포트 1 + 알림 1 = 26 → 30
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
@@ -93,6 +93,18 @@ jobs:
         run: |
           git checkout -- data/news collector/seen-news.json 2>/dev/null || true
           git clean -fdq data/news || true
+
+      # 감사 실패는 조용히 넘어가지 않는다 — 되돌리기만 하고 끝나면 홈 구역이 **소리 없이 멈춘다**(리뷰 2026-10-01). 이슈를 새로 연다(첫 실행엔 댓글 달 이슈가 없다).
+      - name: 🚨 데이터 감사 실패 알림 (이슈 생성)
+        if: steps.audit.outcome == 'failure'
+        timeout-minutes: 1
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create --repo "${{ github.repository }}" \
+            --title "🚨 교내 소식 데이터 감사 실패 $(TZ=Asia/Seoul date +%Y-%m-%d) — 이번 발행분을 되돌렸습니다" \
+            --body "소식 수집은 됐지만 관문(test-collector·audit-data)을 통과하지 못해 data/news 를 되돌렸습니다. 고칠 때까지 홈 「우리 학교 소식」이 갱신되지 않습니다. 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · Claude 세션에 '소식 감사 실패 확인해줘'라고 지시하세요." \
+            --assignee "${{ github.repository_owner }}"
 
       - name: 수집 상태 저장 (중복 방지 기록)
         timeout-minutes: 3

@@ -154,7 +154,7 @@ try {
 try {
   const dir = path.join(ROOT, 'data/news');
   const served = require('../match-engine.js').SERVED_SCHOOLS || [];
-  const NEWS_KINDS = ['학사', '행사', '채용', '생활'];   // collector/news-kind.mjs NEWS_KINDS 와 같다 (관문 「교내 소식」이 관리자 사본과 대조한다)
+  const NEWS_KINDS = ['학사', '행사', '채용', '생활'];   // collector/news-kind.mjs NEWS_KINDS 와 같다 (이 파일은 CJS 라 못 불러온다 · 관문 「교내 소식」이 이 사본도 대조한다)
   const files = fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => /\.json$/.test(f) && f !== 'index.json') : [];
   let dup = 0; let badKind = 0; let badSchool = 0; let badDate = 0; let badUrl = 0;
   for (const f of files) {

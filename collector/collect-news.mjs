@@ -59,12 +59,17 @@ try { hideSet = new Set((JSON.parse(fs.readFileSync(new URL('news-config.json', 
 
 /* 지금 실려 있는 글 — 통짜 파일이 없다. 학교별 파일 전부를 읽어 합친다(발행도 그 폴더에 다시 쓴다). */
 const NEWS_DIR = new URL('../data/news/', HERE);
+const publishedFiles = [];   // { path, school } — 발행 뒤 글이 0건이 된 학교의 파일을 빈 파일로 되쓰는 데 쓴다
 function loadPublished() {
   let files = [];
   try { files = fs.readdirSync(NEWS_DIR).filter((f) => /\.json$/.test(f) && f !== 'index.json'); } catch { return []; }
   const out = [];
   for (const f of files) {
-    try { out.push(...(JSON.parse(fs.readFileSync(new URL(f, NEWS_DIR), 'utf8')).items || [])); } catch { /* 깨진 파일은 이번 발행이 새로 쓴다 */ }
+    try {
+      const doc = JSON.parse(fs.readFileSync(new URL(f, NEWS_DIR), 'utf8'));
+      if (doc.school) publishedFiles.push({ path: new URL(f, NEWS_DIR), school: doc.school });
+      out.push(...(doc.items || []));
+    } catch { /* 깨진 파일은 이번 발행이 새로 쓴다 */ }
   }
   return out;
 }
@@ -77,7 +82,7 @@ const results = [];
 const freshAll = [];
 const boards = (cfg.sources || []).map((s) => ({ ...s }));
 const boardLabel = (s) => (s.campus && s.campus !== '공통' ? `${s.school} ${s.campus}` : s.school);
-const todayStr = () => new Date().toISOString().slice(0, 10);
+const todayStr = () => new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);   // KST — 발행 색인·찾기 로봇·관리자와 같은 시계 (07:19 KST 실행이 어제 날짜를 찍지 않게)
 
 /* 게시판 하나를 읽는다. `return` 은 이 게시판을 마치고 다음으로 간다는 뜻. */
 async function harvestBoard(s, ctx = { dead: false }) {
@@ -181,6 +186,16 @@ const pub = publishBySchool(all, {
   dir: NEWS_DIR, perSchool: NEWS_PER_SCHOOL,
   note: '학교별 교내 소식 파일 색인 (data/news/). 앱은 match-engine.js newsFileFor(noticeFileKey) 로 자기 학교 파일을 바로 받는다 — 옛 통짜 파일로 물러나는 길은 없다. check-live.yml 이 이 색인의 학교 전부를 확인한다.',
 });
+/* 글이 하나도 안 남은 학교의 파일은 **빈 파일로 다시 쓴다** (리뷰 2026-10-01). publishBySchool 은 글이 있는 학교만 쓰고 옛 파일을 지우지 않는데,
+   앱은 색인이 아니라 파일 이름으로 바로 받으므로 그대로 두면 30일 지난 글이 영영 보인다. */
+{
+  const alive = new Set(all.map((n) => n.school));
+  const stamp = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
+  for (const f of publishedFiles) {
+    if (alive.has(f.school)) continue;
+    fs.writeFileSync(f.path, JSON.stringify({ school: f.school, updatedAt: stamp, items: [] }, null, 1));
+  }
+}
 
 /* 연속 실패 감시 — 장학 수집기와 같은 규칙(3회 연속이면 주소가 바뀐 것). 장부는 제 것(news-health.json — health.json 은 prune-health 가 schools.json 이름으로 고아를 지운다) */
 const chronic = [];

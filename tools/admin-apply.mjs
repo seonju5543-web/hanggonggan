@@ -929,8 +929,11 @@ switch (action) {
       if (!school) fail('학교 이름이 있어야 합니다 (교내 소식은 학교 게시판만 읽습니다)');
       if (!SERVED_SCHOOLS.includes(school)) fail(`서비스하지 않는 학교입니다(match-engine.js SERVED_SCHOOLS): ${school}`);
       if ([...src.sources, ...src.parked].some((x) => canonUrl(x.boardUrl || '') === canonUrl(url))) fail('이미 있는 게시판 주소입니다');
-      const evidence = String(s.evidence || '').trim() || `관리자 화면에서 등록 (${kstNow()} KST)`;
-      /* 그 학교 줄이 이미 있으면(찾기 로봇이 못 찾은 학교) 주소만 채운다 — 학교 하나에 줄 하나 */
+      /* 근거는 짧아도 **언제 누가**는 남는다 — 관문이 10자 이상을 요구한다(짧은 메모만 적으면 저장 뒤 관문이 깨진다 · 리뷰 2026-10-01) */
+      const typed = String(s.evidence || '').trim();
+      const evidence = `${typed ? typed + ' · ' : ''}관리자 화면에서 등록 (${kstNow()} KST)`;
+      /* 학교 하나에 줄 하나 — 이미 게시판이 있는 학교는 거절한다(둘이면 리포트·건강 장부에서 이름이 겹쳐 한쪽 실패가 묻힌다). 바꾸려면 먼저 보관. */
+      if (src.sources.some((x) => x.school === school && x.boardUrl)) fail(`${school} 은 이미 게시판이 있습니다 — 바꾸려면 그 줄을 먼저 보관하세요`);
       const row = src.sources.find((x) => x.school === school && !x.boardUrl);
       if (row) { row.boardUrl = url; row.evidence = evidence; delete row.probe; row.note = `${row.note ? row.note + ' · ' : ''}관리자가 주소를 적음 (${kstNow().slice(0, 10)})`; }
       else src.sources.push({ school, campus: s.campus || '', home: '', boardUrl: url, candidates: [], evidence, note: '관리자 화면에서 등록' });
