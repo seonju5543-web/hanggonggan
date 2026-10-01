@@ -19,7 +19,9 @@
          node collector/open-api.mjs --dry-run  (받아서 리포트만 · 파일 안 바꿈)
    ============================================================ */
 import fs from 'node:fs';
-import { API_SOURCES, findRows, xmlItems, xmlTag, mapRows, mergeApi, sourceVerdict } from './open-api-map.mjs';
+import { API_SOURCES, findRows, xmlItems, xmlTag, mapRows, mergeApi, sourceVerdict, splitLines } from './open-api-map.mjs';
+import { activityDetails, putActivityDetails } from './activity-excerpts.mjs';
+import { htmlToLines } from './html-text.mjs';
 import { canonUrl } from './canon-url.mjs';
 
 /* 장학 낱말 — collect.mjs 의 KEYWORDS 사본(관문이 같은지 잰다 · test-collector 「감사의 수집기 그물 사본」).
@@ -139,6 +141,26 @@ const FETCHERS = {
     return rows;
   },
 };
+/* 1365 상세 — 목록에는 봉사 내용(progrmCn)이 없어 실은 글(최대 15)만 번호로 하나씩 받는다.
+   한 건이 실패해도 글은 그대로 싣는다(내용 칸만 빈다) — 상세 때문에 출처 전체를 실패로 치지 않는다. */
+async function vol1365Details(items, refs) {
+  let got = 0;
+  for (const it of items) {
+    const no = refs.get(it.url);
+    if (!no || Date.now() - started > BUDGET_MS) continue;
+    try {
+      const r = await getText('https://apis.data.go.kr/1741000/volunteerPartcptnService/getVltrPartcptnItem', { serviceKey: portalKey, progrmRegistNo: no });
+      const row = xmlItems(r.text)[0];
+      if (!row || !row.progrmCn) continue;
+      const d = activityDetails(htmlToLines(row.progrmCn));
+      if (!d.noticeLines.length) d.noticeLines = splitLines(row.progrmCn, 6);
+      putActivityDetails(it, d);
+      got += 1;
+    } catch { /* 이 글만 내용 없이 */ }
+  }
+  return got;
+}
+
 const HAS_KEY = { kstartup: !!portalKey, vol1365: !!portalKey, youthPolicy: !!youthKey, youthContent: !!youthContentKey };
 const KEY_NAME = { kstartup: 'DATA_GO_KR_KEY', vol1365: 'DATA_GO_KR_KEY', youthPolicy: 'YOUTHCENTER_KEY', youthContent: 'YOUTHCENTER_CONTENT_KEY' };
 
@@ -150,7 +172,8 @@ for (const src of Object.keys(API_SOURCES)) {
   if (!HAS_KEY[src]) { results[src] = { ok: false }; lines.push(`- ⏸ **${name}** — 열쇠(${KEY_NAME[src]})가 없어 건너뜀 · 지난 글 그대로`); continue; }
   try {
     const rows = await FETCHERS[src]();
-    const { items, dropped } = mapRows(src, rows, { scholarship: KEYWORDS, today });
+    const { items, dropped, refs } = mapRows(src, rows, { scholarship: KEYWORDS, today });
+    const detailNote = src === 'vol1365' && items.length ? ` · 상세 내용 ${await vol1365Details(items, refs)}/${items.length}건` : '';
     const why = Object.entries(dropped).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${v}`).join(' · ');
     const bad = sourceVerdict(rows, dropped);
     if (bad) {   // 🔴 성공으로 치지 않는다 — 치면 지난 글이 조용히 지워진다 (리뷰 C1)
@@ -158,7 +181,9 @@ for (const src of Object.keys(API_SOURCES)) {
       lines.push(`- ❌ **${name}** — ${bad} · 지난 글 그대로 둠${why ? ` · 버림: ${why}` : ''}`);
     } else {
       results[src] = { ok: true, items };
-      lines.push(`- ✅ **${name}** — 받은 행 ${rows.length} · 실은 글 **${items.length}**${why ? ` · 버림: ${why}` : ''}`);
+      lines.push(`- ✅ **${name}** — 받은 행 ${rows.length} · 실은 글 **${items.length}**${detailNote}${why ? ` · 버림: ${why}` : ''}`);
+      /* 자격 줄을 읽은 글 수 — 적합도 배지가 붙는 글이다. 0 이면 응답 칸이 바뀌었는지 본다 */
+      lines.push(`  - 자격 줄 있는 글 ${items.filter((n) => (n.eligibilityLines || []).length).length}/${items.length} · 원문 안내 있는 글 ${items.filter((n) => (n.noticeLines || []).length).length}/${items.length}`);
     }
     /* 첫 행의 칸 이름 — 명세와 실제가 다르면 여기서 바로 보인다(값은 안 적는다 · 담당자 연락처 등이 섞여 있다) */
     if (rows[0]) lines.push(`  - 첫 행 칸: \`${Object.keys(rows[0]).slice(0, 40).join(', ')}\``);

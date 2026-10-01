@@ -17,7 +17,7 @@ import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { cleanTitle, isMenuEntry } from './clean-title.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { activityKind, activityField } from './activity-kind.mjs';
-import { activityExcerpts } from './activity-excerpts.mjs';
+import { activityExcerpts, activityDetails, putActivityDetails, ACT_DETAILS_V } from './activity-excerpts.mjs';
 import { htmlToLines } from './html-text.mjs';
 import { robotsAllows } from './robots.mjs';
 import { extractLinks, stripSessionId } from './board-links.mjs';
@@ -347,6 +347,8 @@ async function harvestBoard(s, ctx = { dead: false }) {
         const ex = activityExcerpts(detail.text);
         if (ex.deadline) it.deadline = ex.deadline;
         if (ex.excerpts.length) it.excerpts = ex.excerpts;
+        /* 자격·제외·우선 선발·원문 안내 (2026-10-01) — 장학 발췌기 규칙 그대로(activityDetails). 앱이 장학과 같은 엔진으로 적합도를 낸다 */
+        if (detail.text) putActivityDetails(it, activityDetails(detail.text));
         const field = activityField(it.title, it.kind);
         if (field) it.field = field;
         it.excerptsAt = new Date().toISOString().slice(0, 10);   // 원문을 읽은 날 — 아래 소급 보강이 다시 읽지 않게
@@ -538,16 +540,18 @@ acts.items.forEach((n) => { if (actHide.has(canonUrl(n.url))) n.hidden = true; e
 /* 소급(운영 원칙 7) — 발췌 없이 실린 글은 원문을 다시 읽어 마감·발췌·분야를 채운다 (2026-09-30 첫 실행의 26건이 그렇다 —
    글자를 한 줄로 뭉개 넘긴 사고 · html-text.mjs). 한 실행 최대 ACT_BACKFILL 건 · 예산 안에서만 · 읽은 글은 excerptsAt 을 적어 다시 안 읽는다
    (못 읽었어도 적는다 — 없는 이름표를 매일 다시 찾지 않는다). */
-const ACT_BACKFILL = 20;
+const ACT_BACKFILL = 40;   // 2026-10-01 20→40 — 자격 판(detailsV) 소급으로 다시 읽을 글이 130건이다. 예산(budget.hasRoom) 안에서만 돈다
 let actBackfilled = 0;
 for (const it of acts.items) {
-  if (actBackfilled >= ACT_BACKFILL || it.excerptsAt) continue;
+  /* 🔴 자격 판(detailsV)이 옛것인 글도 다시 읽는다 (2026-10-01 · 소급 — 원칙 7). API 글은 API 로봇이 채우므로 건너뛴다 */
+  if (actBackfilled >= ACT_BACKFILL || it.api || (it.excerptsAt && it.detailsV === ACT_DETAILS_V)) continue;
   if (!budget.hasRoom(20000)) break;
   const detail = await fetchDetail(it);
   const ex = activityExcerpts(detail.text);
   if (ex.deadline) it.deadline = ex.deadline;
   if (ex.excerpts.length) it.excerpts = ex.excerpts;
   if (!it.field) { const f = activityField(it.title, it.kind); if (f) it.field = f; }
+  if (detail.text) putActivityDetails(it, activityDetails(detail.text));
   if (detail.text) it.excerptsAt = new Date().toISOString().slice(0, 10);   // 못 받아 온 날은 적지 않는다 — 잠깐 끊긴 것을 영영 '읽었다'로 굳히지 않게
   actBackfilled += 1;
 }

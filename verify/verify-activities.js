@@ -30,10 +30,15 @@ const FIXTURE = {
   updatedAt: '2026-09-25',
   items: [
     { title: '2026 대학생 해외봉사단 모집', url: 'https://dep.hufs.ac.kr/bbs/x/1', kind: '대외활동', field: '봉사', school: '한국외국어대학교', campus: '', foundAt: '2026-09-25', attachments: [], deadlineHint: '신청기간 : 2026. 10. 1. ~ 10. 15.',
-      deadline: iso(5), excerpts: [{ label: '모집기간', text: '2026. 10. 1. ~ 10. 15.' }, { label: '혜택', text: '항공료 전액 지원' }] },
+      deadline: iso(5), excerpts: [{ label: '모집기간', text: '2026. 10. 1. ~ 10. 15.' }, { label: '혜택', text: '항공료 전액 지원' }],
+      /* 자격 줄 (2026-10-01) — 장학과 같은 엔진이 판정한다: 나이 범위 ✓ */
+      eligibilityLines: ['만 19~34세 대한민국 국민'], noticeLines: ['봉사단은 5개국에 파견합니다.'] },
     /* 마감이 지난 글 — 파일에는 있지만 화면에는 없어야 한다 (2026-09-29) */
     { title: '지난 공모전 — 보이면 안 된다', url: 'https://dep.hufs.ac.kr/bbs/x/6', kind: '공모전', school: '한국외국어대학교', campus: '', foundAt: '2026-09-26', attachments: [], deadline: iso(-3) },
-    { title: '제3회 장학수기 공모전 공고', url: 'https://dep.hufs.ac.kr/bbs/x/2', kind: '공모전', school: '한국외국어대학교', campus: '', foundAt: '2026-09-24', attachments: [] },
+    /* 나이가 확실히 안 맞는 글 — 23살 학생에게 '지원 자격 미달' (적합도순에서 맨 아래).
+       ⚠️ 지역 줄(`부산 거주`)로 만들지 말 것 — 엔진은 부모 거주지도 보므로 본인 지역만 달라서는 '모름'이다(틀린 미달 금지) */
+    { title: '제3회 장학수기 공모전 공고', url: 'https://dep.hufs.ac.kr/bbs/x/2', kind: '공모전', school: '한국외국어대학교', campus: '', foundAt: '2026-09-24', attachments: [],
+      eligibilityLines: ['만 15~19세 청소년'] },
     { title: '경희 아이디어 경진대회', url: 'https://news.khu.ac.kr/x/3', kind: '공모전', school: '경희대학교', campus: '', foundAt: '2026-09-25', attachments: [] },
     { title: '전국 청년 서포터즈 모집', url: 'https://example.org/x/4', kind: '대외활동', school: '', host: '청년재단', foundAt: '2026-09-23', attachments: [] },
     /* 관리자가 숨긴 글 — 파일에는 있지만 화면에는 없어야 한다 (2026-09-29) */
@@ -52,6 +57,7 @@ const EXT_FIXTURE = {
 const PROFILE = {
   school: '한국외국어대학교', campus: '', track: 'humanities', major: '',
   year: 3, status: '재학', gpa: 3.5, bracket: 5, flags: [], nationality: 'korean',
+  birthYear: new Date().getFullYear() - 23, region: '서울', regionCity: '동대문구',   // 나이·지역 — 활동 글 자격 판정(2026-10-01)
   onboarded: true, common: { studentId: '', birth: '', phone: '', email: '', bank: '', account: '' },
 };
 
@@ -115,6 +121,10 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
     eq('④ 윗줄은 종류 · 학교 게시판 (장학 카드의 기관 자리)', seen[0].org, '대외활동 · 한국외국어대학교 게시판');
     eq('④ 마감을 읽은 글은 아랫줄 오른쪽 D-5 (장학 카드와 같은 자리·같은 글자)', await page.$eval('#activities-list [data-activity] .sch-foot .sch-due', (e) => e.textContent.trim()), 'D-5');
     eq('④ 아랫줄 왼쪽(장학 카드의 금액 자리)은 짧은 혜택', await page.$eval('#activities-list [data-activity] .sch-foot .sch-amount', (e) => e.textContent.trim()), '항공료 전액 지원');
+    /* 판정 하나 — 장학 카드와 같은 cardBadgeHtml (2026-10-01) */
+    eq('④ 카드 맨 윗줄 판정 — 나이 맞음 → 적합도 % · 나이 넘음 → 미달 · 자격 줄 없음 → 자격 미확인',
+      await page.$$eval('#activities-list .sch-card .sch-top', (e) => e.map((x) => (x.querySelector('.sch-fit, .badge') || {}).textContent || '').map((t) => t.trim().replace(/\d+%/, 'N%'))),
+      ['적합도 N%', '지원 자격 미달', '자격 미확인']);
     eq('④ 혜택이 없으면 분야를 옅게 — 없으면 빈칸(지어내지 않는다)', await page.$$eval('#activities-list [data-activity] .sch-amount', (e) => e.map((x) => [x.textContent.trim(), x.classList.contains('unknown')])), [['항공료 전액 지원', false], ['', true], ['', true]]);
     eq('④ 카드에 발췌 줄을 쌓지 않는다 (장학 카드처럼 석 줄)', await page.$$eval('#activities-list .sch-provider', (e) => e.length), 0);
     eq('④ 장학 카드와 같은 그릇 (.sch-card-wrap > button.sch-card)', await page.$$eval('#activities-list .sch-card-wrap > button.sch-card[data-activity]', (e) => e.length), 3);
@@ -125,7 +135,13 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
       e.querySelector('.sheet-title').textContent.trim(), e.querySelector('.sheet-amount').textContent.trim(),
       e.querySelector('.sheet-provider').textContent.trim(), e.querySelector('.badge-dday').textContent.trim(), e.querySelector('.badge-kind').textContent.trim()]),
       ['2026 대학생 해외봉사단 모집', '항공료 전액 지원', '한국외국어대학교 게시판 · 봉사', 'D-5', '대외활동']);
-    eq('⑤ 모집 안내는 원문 발췌 그대로 (혜택은 위에 한 번만)', await page.$$eval('#detail-sheet .doc-list li', (e) => e.map((x) => x.textContent.trim())), ['모집기간 · 2026. 10. 1. ~ 10. 15.']);
+    eq('⑤ 모집 안내는 원문 발췌 그대로 (혜택은 위에 한 번만)', await page.$$eval('#detail-sheet .doc-list', (u) => u[0].querySelectorAll('li').length && [...u[0].querySelectorAll('li')].map((x) => x.textContent.trim())), ['모집기간 · 2026. 10. 1. ~ 10. 15.']);
+    eq('⑤ 지원 자격 — 장학 시트와 같은 머리(적합도 · 요건 n개 중 n개 충족)와 ✓ 줄',
+      await page.$eval('#detail-sheet', (e) => [e.querySelector('.sheet-verdict h4').textContent.trim(), /요건 1개 중 1개 충족/.test(e.querySelector('.sheet-verdict').textContent),
+        [...e.querySelectorAll('.reason-list li')].map((li) => li.textContent.trim())]),
+      ['지원 자격', true, ['✓ 만 19~34세 대한민국 국민']]);
+    eq('⑤ 지원 가능 알약은 없다(활동 글엔 구조화 조건이 없어 늘 가능 — 거짓 안심)', await page.$$eval('#detail-sheet .status-pill', (e) => e.length), 0);
+    eq('⑤ 공고 원문 안내 — 원문 문장 그대로', await page.$$eval('#detail-sheet .doc-list', (u) => u.map((x) => x.textContent.trim()).some((t) => t.includes('봉사단은 5개국에 파견합니다.'))), true);
     eq('⑤ 원문 단추는 그 글 주소를 새 탭으로', await page.$eval('#detail-sheet a.btn-primary', (a) => [a.getAttribute('href'), a.target, a.textContent.trim()]), ['https://dep.hufs.ac.kr/bbs/x/1', '_blank', '원문에서 신청하기 ↗']);
     eq('⑤ 단추 글자에 밑줄이 없다', await page.$eval('#detail-sheet a.btn-primary', (a) => getComputedStyle(a).textDecorationLine), 'none');
     await page.keyboard.press('Escape'); await page.waitForTimeout(500);
@@ -139,14 +155,18 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
     eq('③ 처음에는 정렬 목록이 안 보인다', await menuShown(), false);
     await page.click('#activities-sort-btn'); await page.waitForTimeout(200);
     eq('③ 누르면 정렬 목록이 열린다 (탐색 화면과 같은 동작)', await menuShown(), true);
-    eq('③   선택지는 둘 — 최근 수집순 · 마감 임박순',
-      await page.$$eval('#activities-sort-menu [data-sort]', (e) => e.map((x) => x.textContent.trim())), ['최근 수집순', '마감 임박순']);
+    eq('③   선택지는 셋 — 최근 수집순 · 마감 임박순 · 적합도순(장학 탐색과 같은 잣대 · 2026-10-01)',
+      await page.$$eval('#activities-sort-menu [data-sort]', (e) => e.map((x) => x.textContent.trim())), ['최근 수집순', '마감 임박순', '적합도순']);
     eq('③   지금 기준에 표시가 있다',
       await page.$eval('#activities-sort-menu [aria-checked="true"]', (e) => e.dataset.sort), 'recent');
     await page.click('#activities-sort-menu [data-sort="deadline"]'); await page.waitForTimeout(200);
     eq('③ 마감 임박순 — 마감 읽은 글이 앞', (await cards(page)).map((c) => c.name)[0], '2026 대학생 해외봉사단 모집');
     eq('③ 정렬 단추 글자', await page.$eval('#activities-sort-label', (e) => e.textContent.trim()), '마감 임박순');
     eq('③   고르고 나면 목록이 닫힌다', await menuShown(), false);
+    await page.click('#activities-sort-btn'); await page.waitForTimeout(200);
+    await page.click('#activities-sort-menu [data-sort="fit"]'); await page.waitForTimeout(200);
+    eq('③ 적합도순 — 맞음 → 미확인 → 미달(장학 탐색의 fitRank 와 같은 순서)', (await cards(page)).map((c) => c.name),
+      ['2026 대학생 해외봉사단 모집', '전국 청년 서포터즈 모집', '제3회 장학수기 공모전 공고']);
     await page.click('#activities-sort-btn'); await page.waitForTimeout(200);
     await page.click('#activities-sort-menu [data-sort="recent"]'); await page.waitForTimeout(200);
     eq('③ 다시 골라 최근 수집순', await page.$eval('#activities-sort-label', (e) => e.textContent.trim()), '최근 수집순');

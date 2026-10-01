@@ -16,7 +16,7 @@
      · 한 출처를 **못 받아 온 날은 그 출처의 지난 글을 그대로 둔다** — 네트워크가 잠깐 끊겼다고 글이 사라지지 않게.
    ============================================================ */
 import { activityKind, activityField } from './activity-kind.mjs';
-import { activityExcerpts } from './activity-excerpts.mjs';
+import { activityExcerpts, activityDetails, putActivityDetails, CONTACT } from './activity-excerpts.mjs';
 import { htmlToLines } from './html-text.mjs';
 import { decodeEntities } from './clean-title.mjs';
 import { canonUrl } from './canon-url.mjs';
@@ -68,8 +68,20 @@ const periods = (raw) => String(raw ?? '').split(/\\N|\n|,/).map((p) => {
 
 const excerpt = (label, text) => (text ? { label, text: clip(text) } : null);
 
+/* API 의 긴 글 칸(신청 대상·공고 내용 등)을 줄로 — 원문 줄바꿈·글머리(○ • - ※ 1.)에서 끊는다. 한 줄 240자 · 최대 8줄.
+   🔴 문의처(전화·메일)가 든 줄은 싣지 않는다(activity-excerpts 의 규칙과 같다 — 그 함수를 거친다). */
+export function splitLines(raw, max = 8) {
+  const t = htmlToLines(String(raw ?? ''));
+  const parts = t.split('\n').flatMap((l) => l.split(/\s(?=[○•◦▪■□◎※]\s?)|(?<=\S)\s(?=\d{1,2}[.)]\s)/))
+    .map((l) => l.replace(/^[\s\-–·•○◦▪■□◎]+/, '').trim())
+    .filter((l) => l.length >= 3 && /[가-힣A-Za-z]/.test(l))   // 3자 — `공무원`·`재직자` 같은 제외 대상이 한 낱말로 온다
+    .map((l) => (l.length > 240 ? `${l.slice(0, 239)}…` : l));
+  return parts.filter((l) => !CONTACT.test(l)).slice(0, max);
+}
+const labeled = (label, raw) => { const l = splitLines(raw, 3); return l.length ? [`${label} : ${l.join(' ')}`.slice(0, 240)] : []; };
+
 /* 같은 모양의 글 하나 — 학교가 빈 전국 글(앱이 모든 학생에게 보인다) */
-function item({ title, url, kind, field, deadline, host, excerpts, api }) {
+function item({ title, url, kind, field, deadline, host, excerpts, api, details }) {
   /* 카드 윗줄에 주최가 이미 나온다 — 같은 이름을 발췌 '주최'로 또 적지 않는다 (리뷰 M4) */
   const h = clip(host);
   excerpts = (excerpts || []).filter((x) => x && !(x.label === '주최' && x.text === h));
@@ -86,6 +98,8 @@ function item({ title, url, kind, field, deadline, host, excerpts, api }) {
     campus: '',
     host: h,
     api,
+    /* 자격·제외·우선 선발·원문 안내 — 앱이 장학과 같은 엔진으로 적합도를 낸다(2026-10-01). 없으면 칸을 안 만든다 */
+    ...putActivityDetails({}, details || {}),
   };
 }
 
@@ -109,6 +123,16 @@ export function mapKstartup(r, { scholarship } = {}) {
          '주최 · 민간'은 기관 이름이 아니라 주최로 적지 않는다. 기관 이름은 pbanc_ntrp_nm(카드 윗줄 host) */
       excerpt('활동지역', r.supt_regin),
     ],
+    details: {
+      /* 대상 연령은 **한 갈래일 때만** 자격 줄로 — 여러 갈래('만 20세 미만,만 20세 이상 ~ 만 39세 이하,…')를 한 줄로 두면 범위 하나로 잘못 읽힌다 */
+      eligibilityLines: [...splitLines(r.aply_trgt_ctnt), ...(r.biz_trgt_age && !/,/.test(r.biz_trgt_age) ? [`대상 연령 : ${r.biz_trgt_age}`] : [])],
+      eligibilityExcludes: splitLines(r.aply_excl_trgt_ctnt),
+      eligibilityPriority: splitLines(r.prfn_matr, 5),
+      noticeLines: [...splitLines(r.pbanc_ctnt, 5),
+        ...labeled('온라인 접수', r.aply_mthd_onli_rcpt_istc), ...labeled('이메일 접수', r.aply_mthd_eml_rcpt_istc),
+        ...labeled('방문 접수', r.aply_mthd_vst_rcpt_istc), ...labeled('우편 접수', r.aply_mthd_pssr_rcpt_istc),
+        ...labeled('기타 접수', r.aply_mthd_etc_istc)].slice(0, 8),
+    },
     api: 'kstartup',
   }) };
 }
@@ -132,7 +156,7 @@ export function map1365(r) {
       excerpt('활동지역', r.actPlace),
     ],
     api: 'vol1365',
-  }) };
+  }), ref: r.progrmRegistNo || null };   // 상세 내용(progrmCn)은 목록에 없어 로봇이 이 번호로 따로 받는다(vol1365Details)
 }
 
 export function mapYouthPolicy(r, { scholarship } = {}) {
@@ -145,6 +169,8 @@ export function mapYouthPolicy(r, { scholarship } = {}) {
   const always = String(r.aplyPrdSeCd || '') === '0057002';   // 신청기간 구분: 상시
   const min = Number(r.sprtTrgtMinAge) || 0, max = Number(r.sprtTrgtMaxAge) || 0;
   const age = String(r.sprtTrgtAgeLmtYn || '').toUpperCase() !== 'N' && (min || max) ? `만 ${min || ''}~${max || ''}세` : null;
+  /* 판정 엔진이 읽는 나이 줄 — 범위면 '만 19세 ~ 만 34세', 위만 있으면 '만 34세 이하'(parse-requirements parseAge) */
+  const ageLine = age ? (min && max ? `만 ${min}세 ~ 만 ${max}세` : (max ? `만 ${max}세 이하` : null)) : null;
   return { item: item({
     title, url, kind,
     deadline: always ? null : lastDate(r.aplyYmd),
@@ -155,6 +181,12 @@ export function mapYouthPolicy(r, { scholarship } = {}) {
       excerpt('혜택', r.plcySprtCn),
       excerpt('주최', r.operInstCdNm && r.operInstCdNm !== r.sprvsnInstCdNm ? r.operInstCdNm : null),
     ],
+    details: {
+      eligibilityLines: [...(ageLine ? [ageLine] : []), ...splitLines(r.addAplyQlfcCndCn, 6), ...splitLines(r.earnEtcCn, 2)],
+      eligibilityExcludes: splitLines(r.ptcpPrpTrgtCn),
+      noticeLines: [...splitLines(r.plcyExplnCn, 3), ...labeled('신청 방법', r.plcyAplyMthdCn), ...labeled('심사 방법', r.srngMthdCn),
+        ...labeled('제출 서류', r.sbmsnDcmntCn), ...labeled('기타', r.etcMttrCn)].slice(0, 8),
+    },
     api: 'youthPolicy',
   }) };
 }
@@ -175,6 +207,7 @@ export function mapYouthContent(r, { scholarship, today } = {}) {
     deadline: ex.deadline,
     host: r.pstSeNm ? `온통청년 ${r.pstSeNm}` : '온통청년',
     excerpts: ex.excerpts,
+    details: activityDetails(htmlToLines(r.pstWholCn)),
     api: 'youthContent',
   }) };
 }
@@ -217,8 +250,9 @@ export function mapRows(source, rows, { scholarship, today }) {
   const dropped = {};
   const items = [];
   const seen = new Set();
+  const refs = new Map();   // 글 주소 → 상세를 따로 받을 번호(1365) — 글에는 싣지 않는다
   for (const r of rows) {
-    const { item: it, drop } = MAPPERS[source](r, { scholarship, today });
+    const { item: it, drop, ref } = MAPPERS[source](r, { scholarship, today });
     if (drop) { dropped[drop] = (dropped[drop] || 0) + 1; continue; }
     if (it.deadline && it.deadline < today) { dropped['마감 지남'] = (dropped['마감 지남'] || 0) + 1; continue; }
     /* 같은 글 — 주소로도, 제목으로도(수집 로봇의 dedupeNotices 가 학교·캠퍼스·제목으로 합친다 ·
@@ -226,12 +260,13 @@ export function mapRows(source, rows, { scholarship, today }) {
     const k = canonUrl(it.url), tk = titleKey(it);
     if (seen.has(k) || (tk && seen.has(tk))) { dropped['같은 글'] = (dropped['같은 글'] || 0) + 1; continue; }
     seen.add(k); if (tk) seen.add(tk);
+    if (ref) refs.set(it.url, ref);
     items.push(it);
   }
   items.sort((a, b) => String(a.deadline || '9999').localeCompare(String(b.deadline || '9999')));
   const cap = API_SOURCES[source].cap;
   if (items.length > cap) dropped[`상한 ${cap}건 초과`] = items.length - cap;
-  return { items: items.slice(0, cap), dropped };
+  return { items: items.slice(0, cap), dropped, refs };
 }
 
 /* 받아 온 결과를 '성공'으로 쳐도 되는가 — 아니면 이유(문자열). 🔴 성공으로 치면 그 출처의 지난 글이 이번 글로 **바뀐다**.

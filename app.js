@@ -1736,6 +1736,8 @@ const SORT_KEYS = Object.keys(EXPLORE_SORTS);
 const ACTIVITY_SORTS = {
   recent: { label: '최근 수집순' },
   deadline: { label: '마감 임박순' },
+  /* 적합도순 (2026-10-01) — 장학 탐색과 같은 잣대: 판정(fitRank — 맞음 < 미확인 < 미달)이 먼저, 그 안에서 적합도 */
+  fit: { label: '적합도순' },
 };
 const SORT_MENUS = {
   explore: { btn: '#explore-sort-btn', menu: '#explore-sort-menu', label: '#explore-sort-label',
@@ -2821,7 +2823,10 @@ function renderActivities() {
   const byRecent = (a, b) => String(b.foundAt || '').localeCompare(String(a.foundAt || ''));
   /* 마감 임박순은 **마감을 읽은 글끼리만** 잰다 — 못 읽은 글에 가짜 날짜를 주지 않는다(dday 의 가짜 14 를 순서에 쓰지 말 것 · CLAUDE.md) */
   const byDeadline = (a, b) => (a.deadline && b.deadline ? a.deadline.localeCompare(b.deadline) : a.deadline ? -1 : b.deadline ? 1 : byRecent(a, b));
-  list = list.slice().sort(activitiesSort === 'deadline' ? byDeadline : byRecent);
+  /* 적합도순 — 장학 탐색(EXPLORE_SORTS.fit)과 같은 순서: fitRank 먼저(미달은 맨 아래), 그 안에서 적합도, 같으면 마감 */
+  const fits = activitiesSort === 'fit' ? new Map(list.map((n) => [n, activityFit(n)])) : null;   // 한 번만 잰다(비교마다 엔진을 돌리지 않게)
+  const byFit = (a, b) => { const fa = fits.get(a), fb = fits.get(b); return fitRank(fa) - fitRank(fb) || fb.fit - fa.fit || byDeadline(a, b); };
+  list = list.slice().sort(activitiesSort === 'deadline' ? byDeadline : activitiesSort === 'fit' ? byFit : byRecent);
   const sortLabel = $('#activities-sort-label');
   if (sortLabel) sortLabel.textContent = (ACTIVITY_SORTS[activitiesSort] || ACTIVITY_SORTS.recent).label;
   if (!list.length) {
@@ -2843,13 +2848,32 @@ const activityWhere = (n) => (n.school ? `${n.school}${n.campus ? ' ' + n.campus
 /* 혜택 줄이 짧으면 카드 아랫줄 왼쪽(장학 카드의 금액 자리)에 굵게 — 길거나 없으면 분야를 옅게 */
 const activityBenefit = (n) => ((n.excerpts || []).find((x) => x.label === '혜택') || {}).text || '';
 
+/* 활동 글 → 판정 엔진이 읽는 모양 (2026-10-01). 칸 이름이 장학과 같아(eligibilityLines·Excludes·Priority) **엔진을 그대로** 부른다.
+   🔴 eligibility(구조화 조건)는 비워 둔다 — 활동 글에는 사람이 확인한 성적·소득 조건이 없다. 판정 근거는 원문에서 뽑은 줄뿐이다(원칙 8-1).
+   id 는 'act:' + 주소 — 장학 id 와 섞이지 않는다(묻기 상자 eligAsk 가 이 id 로 '어느 시트의 상자인가'를 가린다). */
+function activityAsSch(n) {
+  return {
+    id: `act:${n.url}`, name: unent(n.title), type: n.kind || '대외활동', eligibility: {},
+    eligibilityLines: n.eligibilityLines || [], eligibilityExcludes: n.eligibilityExcludes || [], eligibilityPriority: n.eligibilityPriority || [],
+    excerpts: n.noticeLines || [], documents: [], deadline: n.deadline || null,
+  };
+}
+/* 카드·정렬·시트가 **같은 값**을 쓴다 — getMatches 와 같은 세 함수(evaluateFor · fitScore · fitDetailFor) */
+function activityFit(n) {
+  const sch = activityAsSch(n);
+  const result = evaluateFor(sch, state.profile);
+  return { sch, result, fit: fitScore(sch, result, state.profile), fd: fitDetailFor(sch, state.profile) };
+}
+
 function activityCardHtml(n) {
+  const m = activityFit(n);
   const d = n.deadline ? dday(n.deadline) : null;
   const benefit = unent(activityBenefit(n));
   const shortBenefit = benefit && benefit.length <= 20;
   return cardShellHtml({
     attrs: `data-activity="${esc(n.url)}"`,
     org: `${n.kind || '대외활동'} · ${activityWhere(n)}`,
+    badge: cardBadgeHtml(m.fit, m.fd, null),   // 장학 카드와 같은 판정 하나(적합도 % · 자격 미확인 · 지원 자격 미달)
     name: unent(n.title),
     foot: shortBenefit ? benefit : (n.field || ''),
     footKnown: !!shortBenefit,
@@ -2861,9 +2885,14 @@ function activityCardHtml(n) {
 function openActivityDetail(url) {
   const n = (liveActivities && liveActivities.items || []).find((x) => x && x.url === url);
   if (!n) return;
+  const { sch, result, fit, fd } = activityFit(n);
   const d = n.deadline ? dday(n.deadline) : null;
   const benefit = unent(activityBenefit(n));
   const rows = (n.excerpts || []).filter((x) => x.label !== '혜택');
+  /* 원문 안내 — 위 '모집 안내'에 이미 나온 문장은 다시 적지 않는다(같은 접수기간이 두 칸에 떴다 · 2026-10-01) */
+  const flat = (x) => String(unent(x || '')).replace(/[\s:：·\-–]/g, '');
+  const seenText = [...(n.excerpts || []).map((x) => flat(x.text)), ...(n.eligibilityLines || []).map(flat)].filter((x) => x.length >= 6);
+  const notice = (n.noticeLines || []).filter((l) => !seenText.some((e) => flat(l).includes(e)));
   const listLink = isBoardListLink(n.url);
   /* 주소의 HTML 기호(&amp;)는 되돌려 연다 — 찾기(data-activity)는 저장된 n.url 그대로 · 안전하지 않은 주소면 단추를 안 그린다(href="" 는 앱 자신을 연다) */
   const href = safeUrl(unent(n.url));
@@ -2879,12 +2908,24 @@ function openActivityDetail(url) {
       ${benefit ? `<p class="sheet-amount">${esc(benefit)}</p>` : ''}
       <p class="sheet-provider">${esc(activityWhere(n))}${n.field ? ` · ${esc(n.field)}` : ''}</p>
 
+      ${/* 지원 자격 — 장학 시트와 **같은 함수·같은 모양**(eligibilityRowsHtml · fitBadgeHtml full · 묻기 상자).
+           '지원 가능·선발 심사' 알약(STATUS_META)은 달지 않는다 — 활동 글에는 구조화 조건이 없어 그 알약은 늘 '가능'이라 거짓 안심이 된다. */ ''}
+      <div class="sheet-verdict">
+        <h4>지원 자격</h4>
+        <span class="verdict-marks">${fitBadgeHtml(fit, fd, { full: true })}</span>
+      </div>
+      <ul class="reason-list">${eligibilityRowsHtml(sch, result)}</ul>
+      ${eligAskHtml(sch)}
+
       <h4>모집 안내 <span class="channel-tag">원문 그대로</span></h4>
       ${rows.length
         ? `<ul class="doc-list">${rows.map((x) => `<li>${esc(x.label)} · ${esc(unent(x.text))}</li>`).join('')}</ul>`
         : (n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint)
           ? `<ul class="doc-list"><li>${esc(unent(n.deadlineHint))}</li></ul>`
           : '<p class="doc-legend">모집 기간·대상은 공고 원문에서 확인해 주세요.</p>')}
+      ${notice.length ? `
+      <h4>공고 원문 안내 <span class="channel-tag">원문 그대로</span></h4>
+      <ul class="doc-list">${notice.map((l) => `<li>${esc(unent(l))}</li>`).join('')}</ul>` : ''}
       ${(n.attachments || []).length ? `
       <h4>공고 원본 첨부</h4>
       <ul class="doc-list">${n.attachments.map((a) => `<li class="att"><a href="${esc(safeUrl(a.url))}" target="_blank" rel="noopener" style="color:var(--primary)">${esc(a.name || '첨부 파일')}</a></li>`).join('')}</ul>` : ''}
@@ -2894,6 +2935,7 @@ function openActivityDetail(url) {
       <p class="dp-note">신청은 주최 측 원문 페이지에서 진행돼요.</p>` : ''}
     </div>`;
   openSheetShell();
+  eligAskWire(sch, () => openActivityDetail(url));   // 묻기 상자 배선 — 다시 그릴 때 이 시트로 돌아온다
 }
 
 /* ---------------- 재단·지자체 새 공고 (2026-09-26 · 노션 F-13 · 교외 확대) ----------------
@@ -3592,18 +3634,9 @@ function sourceNoteHtml(sch) {
     : '<p class="doc-legend">자세한 내용은 원문 공고에서 확인</p>';
 }
 
-function openDetail(id) {
-  const sch = findSch(id);
-  if (!sch) return;
-  const result = evaluateFor(sch, state.profile);   // 카드와 같은 판정을 쓴다(위 주석)
-  const fit = fitScore(sch, result, state.profile);
-  const fd = fitDetailFor(sch, state.profile);   // 카드와 같은 근거를 쓴다(위 주석)
-  const meta = STATUS_META[result.status];
-  const d = dday(sch.deadline);
-  const app = state.applications.find((a) => a.id === id);
-  const { canApply, caution: applyCaution } = applyLock(result, app, d);
-  const ch = officialChannel(sch);
-
+/* 상세 시트의 '지원 자격' 줄들 — 장학(openDetail)과 대외활동·공모전(openActivityDetail)이 **한 함수**를 쓴다 (2026-10-01 개발자 지시:
+   *"원문 공고나 첨부파일, 자격요건 적합도 등이 장학금 탭 수준"*). 판정은 match-engine 그대로 — 여기서 새 판정을 만들지 않는다. */
+function eligibilityRowsHtml(sch, result) {
   /* 공고 원문에 적힌 자격 문장을 **그대로** 덧붙인다 (2026-08-02 개발자 지시).
      소득·학년 같은 구조화된 조건이 일부 있어도 그게 요건의 전부가 아니다 — 5·18희망장학생의
      '민주화운동·국가폭력 피해자 유자녀' 같은 항목은 기계 조건으로 잡히지 않는다.
@@ -3731,6 +3764,23 @@ function openDetail(id) {
       ? `<li class="r-ok">✓ 별도 자격 제한이 없는 공고입니다${result.status === 'selective' ? ' — 지원자 중 선발 심사로 결정됩니다' : ''}</li>`
       : `<li class="r-unk">? 지원 자격은 아래 공고 원문에서 확인해 주세요${result.status === 'selective' ? ' (지원자 중 선발 심사로 결정됩니다)' : ''}</li>`;
   }
+  return reasonRows;
+}
+
+function openDetail(id) {
+  const sch = findSch(id);
+  if (!sch) return;
+  const result = evaluateFor(sch, state.profile);   // 카드와 같은 판정을 쓴다(위 주석)
+  const fit = fitScore(sch, result, state.profile);
+  const fd = fitDetailFor(sch, state.profile);   // 카드와 같은 근거를 쓴다(위 주석)
+  const meta = STATUS_META[result.status];
+  const d = dday(sch.deadline);
+  const app = state.applications.find((a) => a.id === id);
+  const { canApply, caution: applyCaution } = applyLock(result, app, d);
+  const ch = officialChannel(sch);
+
+  /* 지원 자격 줄 — 대외활동 시트도 **같은 함수**를 부른다(2026-10-01 · 베끼지 않는다) */
+  const reasonRows = eligibilityRowsHtml(sch, result);
   const missingRows = '';
 
   /* 안내는 한 문장으로 (2026-09-01 개발자 지시). 한 화면에 설명이 셋이나 떠 있었는데
@@ -4298,13 +4348,14 @@ function eligAskHtml(sch) {
 
 /* innerHTML 을 채운 **뒤에** 배선한다 — openDetail 이 쓰는 방식 그대로.
    🔴 인라인 `onclick` 은 CSP(`script-src 'self'`)가 조용히 막는다(2026-09-09 boot.js). */
-function eligAskWire(sch) {
+/* reopen — 다시 그리는 길. 장학은 openDetail, 대외활동은 openActivityDetail(2026-10-01) — 묻기 상자는 한 벌이다 */
+function eligAskWire(sch, reopen = () => openDetail(sch.id)) {
   const sheet = $('#detail-sheet');
   const redraw = (open) => {
     /* 🔴 펼칠 때만 본 줄을 새로 고른다 — 저장 뒤 다시 그릴 때는 그대로 둔다 */
     eligAsk = open ? { id: sch.id, open: true, shown: null } : null;
     const y = sheet.scrollTop;
-    openDetail(sch.id);
+    reopen();
     sheet.scrollTop = y;
     const box = $('#detail-sheet .elig-ask');
     if (open && box) box.scrollIntoView({ block: 'nearest' });
@@ -4312,7 +4363,7 @@ function eligAskWire(sch) {
   const o = $('[data-elig-open]', sheet); if (o) o.addEventListener('click', () => redraw(true));
   /* 닫는 자리는 둘이다 — 머리줄(화살표)과 「나중에 하기」 */
   $$('[data-elig-close]', sheet).forEach((c) => c.addEventListener('click', () => redraw(false)));
-  const s = $('[data-elig-save]', sheet); if (s) s.addEventListener('click', () => eligAskSave(sch));
+  const s = $('[data-elig-save]', sheet); if (s) s.addEventListener('click', () => eligAskSave(sch, reopen));
   /* 예/아니요는 누르는 즉시 그 칸만 켠다 — 저장은 아래 단추가 한 번에 한다 */
   $$('[data-elig-trait]', sheet).forEach((b) => b.addEventListener('click', () => {
     $$(`[data-elig-trait="${b.dataset.eligTrait}"]`, sheet).forEach((o) => o.classList.remove('on'));
@@ -4320,7 +4371,7 @@ function eligAskWire(sch) {
   }));
 }
 
-function eligAskSave(sch) {
+function eligAskSave(sch, reopen = () => openDetail(sch.id)) {
   const sheet = $('#detail-sheet');
   $$('[data-elig-field]', sheet).forEach((el) => {
     state.profile[el.dataset.eligField] = coerceField(el.dataset.eligField, el.value);
@@ -4335,8 +4386,9 @@ function eligAskSave(sch) {
   /* 적은 것이 **다른 공고에도 쓰이므로** 목록·홈도 다시 그린다 */
   renderHome();
   renderExplore();
+  if (!$('#screen-activities').hidden) renderActivities();   // 대외활동 카드의 적합도도 같은 프로필로 다시 잰다
   const y = sheet.scrollTop;
-  openDetail(sch.id);              /* 본 줄은 eligAsk.shown 에 그대로 있다 */
+  reopen();                        /* 본 줄은 eligAsk.shown 에 그대로 있다 */
   sheet.scrollTop = y;
 }
 
