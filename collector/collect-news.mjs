@@ -176,6 +176,8 @@ const cutoff = new Date(Date.now() - NEWS_KEEP_DAYS * 86400000).toISOString().sl
 let all = freshAll.concat(loadPublished());
 all = all.filter((n) => n && n.url && n.school && (n.foundAt || '9999') >= cutoff);
 all = all.filter((n) => !isAttachmentEntry(n));
+/* 소급(원칙 7) — 실을지 규칙(news-kind)이 바뀌면 이미 실린 글도 같은 잣대로 다시 거른다. 2차 실행 뒤 메뉴·바닥글 잡음을 이것으로 걷었다. */
+all = all.filter((n) => isNewsRow(n, { scholarship: KEYWORDS, activityKind, isAttachmentEntry }));
 all = dedupeNotices(all);
 all = dropUnserved(all);
 for (const n of all) { if (hideSet.has(canonUrl(n.url))) { n.hidden = true; } else if (n.hidden && !n.hiddenBy) { delete n.hidden; } }

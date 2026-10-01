@@ -64,6 +64,18 @@ export function pickNewsMenuLinks(links, home, max = 6) {
 }
 
 /* 받기 — 못 받으면 **이유 글자**를 돌려준다(HTTP 403 · ENOTFOUND …). 'Error' 한 낱말로 뭉개면 주소가 틀린 건지 학교가 막은 건지 모른다. */
+/* 열리는데 글 줄이 없는 페이지의 생김새 — 링크·줄 블록·날짜 토큰 수와, 날짜가 든 블록 표본. 리포트에 적어 사람이 규칙을 정한다. */
+export function pageDiag(html) {
+  const text = (s) => String(s).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  const dates = (String(html).match(/20\d{2}\s*[.\-/년]\s*\d{1,2}\s*[.\-/월]\s*\d{1,2}/g) || []).length;
+  const blocks = [...String(html).matchAll(/<(tr|li|dd|article)\b[^>]*>((?:(?!<\1\b)[\s\S])*?)<\/\1>/gi)];
+  const dated = blocks.filter((b) => /20\d{2}\s*[.\-/년]\s*\d{1,2}\s*[.\-/월]\s*\d{1,2}/.test(b[2]));
+  const links = (String(html).match(/<a\b[^>]*href=/gi) || []).length;
+  const scripts = (String(html).match(/<script\b/gi) || []).length;
+  return { bytes: String(html).length, links, scripts, dates, blocks: blocks.length, datedBlocks: dated.length,
+    sample: dated.slice(0, 2).map((b) => `<${b[1]}> ${text(b[2]).slice(0, 120)}`) };
+}
+
 async function get(url, ms = 15000) {
   const res = await fetchBoard(url, { firstMs: ms, retryMs: ms, tries: 2 });
   if (!res.ok) return { error: `HTTP ${res.status}` };
@@ -81,7 +93,9 @@ async function findOne(s) {
       const page = await get(url);
       if (page.error) { tried.push({ url, label, rows: 0, status: page.error }); return null; }
       const score = scoreNewsPage(extractDatedRows(page.html, page.url), page.url);
-      tried.push({ url, label, rows: score.rows, status: 'ok' });
+      const t = { url, label, rows: score.rows, status: 'ok' };
+      if (score.rows < MIN_ROWS) t.diag = pageDiag(page.html);   // 왜 0행인가 — 다음 수리의 재료 (짐작하지 않는다)
+      tried.push(t);
       if (score.rows >= MIN_ROWS) return { url: page.url, label, via, evidence, rows: score.rows, sample: score.sample };
     } catch (e) {
       tried.push({ url, label, rows: 0, status: netReason(e) });
@@ -144,7 +158,10 @@ async function main() {
     lines.push(`### 🙋 개발자에게 출처를 요청할 학교 ${missed.length}곳 — 후보와 홈 메뉴를 다 열어 봤지만 날짜가 붙은 공지 글 줄(${MIN_ROWS}행 이상)을 못 찾았습니다`);
     for (const s of missed) {
       lines.push(`- **${s.school}**`);
-      for (const t of (s.probe.tried || []).slice(0, 8)) lines.push(`  - ${t.url} — ${t.status === 'ok' ? `열림 · 글처럼 보이는 행 ${t.rows}` : t.status}`);
+      for (const t of (s.probe.tried || []).slice(0, 8)) {
+        lines.push(`  - ${t.url} — ${t.status === 'ok' ? `열림 · 글처럼 보이는 행 ${t.rows}` : t.status}`);
+        if (t.diag) lines.push(`    - 생김새: ${Math.round(t.diag.bytes / 1024)}KB · 링크 ${t.diag.links} · 스크립트 ${t.diag.scripts} · 날짜 토큰 ${t.diag.dates} · 줄 블록 ${t.diag.blocks}(날짜 든 것 ${t.diag.datedBlocks})${t.diag.sample.length ? ' · 표본: ' + t.diag.sample.map((x) => `「${x}」`).join(' ') : ''}`);
+      }
     }
     lines.push('', `> 목록이 스크립트로만 그려지는 게시판(SPA·클릭형)은 이 로봇이 못 읽습니다 — 그런 학교는 \`collector/collect-news.mjs\` 의 \`NEWS_BOARD_RULES\` 에 규칙(json·dataId·onclick)이 필요합니다. 학생이 보는 공지 목록 주소를 알려 주시면 그 자리에 적습니다.`, '');
   }

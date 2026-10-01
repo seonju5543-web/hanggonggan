@@ -70,7 +70,10 @@ export function extractDatedRows(html, base) {
     const block = m[2];
     const postedAt = rowDate(block);
     if (!postedAt) continue;
-    for (const l of extractLinks(block, base)) {
+    /* 글 줄은 링크 한둘(제목·첨부)에 짧다 — 날짜가 든 **메뉴 덩어리**(부산대 상단 바 · 충북대 바닥글 · 2차 실행 실측)는 링크가 많고 길다 */
+    const links = extractLinks(block, base);
+    if (links.length > 4 || block.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').length > 600) continue;
+    for (const l of links) {
       if (!out.has(l.url)) out.set(l.url, { ...l, postedAt });
     }
   }
