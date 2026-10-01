@@ -1,6 +1,6 @@
 {
  "school": "아주대학교",
- "updatedAt": "2026-10-01",
+ "updatedAt": "2026-10-02",
  "items": [
   {
    "title": "[공지] [학부] 어학졸업인증(2027년 2월 졸업)을 위한 공인어학 성적 등록 및 제출 안내 (~2027.1.22)",
@@ -23,23 +23,6 @@
    "title": "[공지] [학부/학사과정] ★필독★ 출석(전자출결, 공결, 취업계 등) 관련 안내",
    "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=373746&article.offset=0&articleLimit=10",
    "postedAt": "2026-08-14",
-   "school": "아주대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[공지] [학부] 2026-2학기 등록/환불 안내(8.24.~8.28.) (26.07.28. 수정)",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=372607&article.offset=0&articleLimit=10",
-   "postedAt": "2026-07-28",
-   "school": "아주대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[공지] [학사] 2026-2학기 휴학/복학 신청 안내 (07.28. 수정)",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=370302&article.offset=0&articleLimit=10",
-   "postedAt": "2026-06-15",
-   "kind": "학사",
    "school": "아주대학교",
    "campus": "",
    "foundAt": "2026-10-01"

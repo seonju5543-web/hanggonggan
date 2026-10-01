@@ -5,7 +5,7 @@
    "school": "경희대학교",
    "campus": "공통",
    "home": "https://www.khu.ac.kr/kor/main/index.do",
-   "boardUrl": null,
+   "boardUrl": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200316",
    "candidates": [
     {
      "url": "https://www.khu.ac.kr/kor/notice/list.do?page=1&condition=all&category=GENERAL",
@@ -18,7 +18,19 @@
      "evidence": "같은 검색 → 결과 URL https://www.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200316 (제목: 공지사항(일반)) — 옛 게시판 경로, 장학은 menuNo=200318"
     }
    ],
-   "note": "학사 카테고리의 category 값은 검색으로 확인 못 함. 일반 공지는 activity-sources.json 에서도 읽는다(같은 주소). 2026-10-01 정찰: 행이 javascript:view(번호) · 누르면 POST view.do 라 글 주소가 없다 → news-board-rules.mjs listOnly(목록 표식 #n-) 로 싣는다."
+   "note": "학사 카테고리의 category 값은 검색으로 확인 못 함. 일반 공지는 activity-sources.json 에서도 읽는다(같은 주소). 2026-10-01 정찰: 행이 javascript:view(번호) · 누르면 POST view.do 라 글 주소가 없다 → news-board-rules.mjs listOnly(목록 표식 #n-) 로 싣는다.",
+   "autoFound": {
+    "date": "2026-10-02",
+    "via": "candidate",
+    "label": "공지사항",
+    "rows": 10,
+    "sample": [
+     "공통 [추천채용] [INVENI] 대표이사 비서 정규직 추천채용",
+     "공통 [KOICA] 몽골 관광인력 역량강화 프로젝트 봉사단 모집",
+     "공통 [휘경이문누리종합사회복지관] 나눔바자회 '누리페스타' 자원봉사자 모집"
+    ],
+    "evidence": "같은 검색 → 결과 URL https://www.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200316 (제목: 공지사항(일반)) — 옛 게시판 경로, 장학은 menuNo=200318"
+   }
   },
   {
    "school": "한국외국어대학교",
@@ -156,7 +168,64 @@
      "evidence": "같은 검색 → 결과 URL https://www.korea.ac.kr/ko/567/subview.do (제목: 학사공지)"
     }
    ],
-   "note": "subview.do 는 감싸는 페이지 · 실제 목록 /bbs/ko/<번호>/artclList.do 번호는 미확인."
+   "note": "subview.do 는 감싸는 페이지 · 실제 목록 /bbs/ko/<번호>/artclList.do 번호는 미확인.",
+   "probe": {
+    "checkedAt": "2026-10-02",
+    "tried": [
+     {
+      "url": "https://www.korea.ac.kr/ko/566/subview.do",
+      "label": "일반공지",
+      "rows": 0,
+      "status": "ok",
+      "diag": {
+       "bytes": 95768,
+       "links": 367,
+       "scripts": 31,
+       "dates": 14,
+       "blocks": 261,
+       "datedBlocks": 1,
+       "sample": [
+        "<article> fnctId=portalBoard,fnctNo=1 게시판 검색 시작일 ~ 종료일 게시물 검색 제목 작성자 번호, 제목, 작성자, 등록일자, 조회수 정보를 제공 번호 제목 작성자 Department --> 등록일자 조"
+       ],
+       "anchors": []
+      }
+     },
+     {
+      "url": "https://www.korea.ac.kr/ko/567/subview.do",
+      "label": "학사공지",
+      "rows": 0,
+      "status": "ok",
+      "diag": {
+       "bytes": 87834,
+       "links": 350,
+       "scripts": 31,
+       "dates": 8,
+       "blocks": 261,
+       "datedBlocks": 1,
+       "sample": [
+        "<article> fnctId=portalBoard,fnctNo=2 게시판 검색 시작일 ~ 종료일 게시물 검색 제목 작성자 번호, 제목, 작성자, 등록일자, 조회수 정보를 제공 번호 제목 작성자 Department --> 등록일자 조"
+       ],
+       "anchors": []
+      }
+     },
+     {
+      "url": "https://www.korea.ac.kr/ko/461/subview.do",
+      "label": "학부 학사일정",
+      "rows": 0,
+      "status": "ok",
+      "diag": {
+       "bytes": 115068,
+       "links": 355,
+       "scripts": 31,
+       "dates": 4,
+       "blocks": 258,
+       "datedBlocks": 0,
+       "sample": [],
+       "anchors": []
+      }
+     }
+    ]
+   }
   },
   {
    "school": "고려대학교 세종캠퍼스",
@@ -211,7 +280,44 @@
      "evidence": "웹 검색 2026-09-30 'site:www.sogang.ac.kr announcement 공지사항 학사공지 sogang' → 결과 URL https://www.sogang.ac.kr/ko/campus/student-support/notice (제목: 학생 일반공지 · 학생지원팀)"
     }
    ],
-   "note": "서강은 SPA 라 목록이 내부 API(api/api/v1/mainKo/BbsData/boardList?bbsConfigFk=…)로 온다 — 장학은 141. 일반 공지의 bbsConfigFk 는 미확인이라 규칙(json)이 필요할 수 있음."
+   "note": "서강은 SPA 라 목록이 내부 API(api/api/v1/mainKo/BbsData/boardList?bbsConfigFk=…)로 온다 — 장학은 141. 일반 공지의 bbsConfigFk 는 미확인이라 규칙(json)이 필요할 수 있음.",
+   "probe": {
+    "checkedAt": "2026-10-02",
+    "tried": [
+     {
+      "url": "https://www.sogang.ac.kr/ko/announcement",
+      "label": "공지사항",
+      "rows": 0,
+      "status": "ok",
+      "diag": {
+       "bytes": 920928,
+       "links": 199,
+       "scripts": 8,
+       "dates": 0,
+       "blocks": 17,
+       "datedBlocks": 0,
+       "sample": [],
+       "anchors": []
+      }
+     },
+     {
+      "url": "https://www.sogang.ac.kr/ko/campus/student-support/notice",
+      "label": "일반공지",
+      "rows": 0,
+      "status": "ok",
+      "diag": {
+       "bytes": 921231,
+       "links": 199,
+       "scripts": 8,
+       "dates": 0,
+       "blocks": 17,
+       "datedBlocks": 0,
+       "sample": [],
+       "anchors": []
+      }
+     }
+    ]
+   }
   },
   {
    "school": "성균관대학교",
@@ -282,7 +388,76 @@
      "evidence": "웹 검색 2026-09-30 'site:www.cau.ac.kr 공지사항 학사 cms FR_CON MENU_ID' → 결과 URL https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100 (제목: CAU Notice · 요약: 전체/학사/학점교류/모집/장학/행사/일반 탭)"
     }
    ],
-   "note": "상세는 BoardView.do?BBS_SEQ=…&MENU_ID=100. 탭 파라미터(P_TAB_NO)는 짐작."
+   "note": "상세는 BoardView.do?BBS_SEQ=…&MENU_ID=100. 탭 파라미터(P_TAB_NO)는 짐작.",
+   "probe": {
+    "checkedAt": "2026-10-02",
+    "tried": [
+     {
+      "url": "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100",
+      "label": "공지사항",
+      "rows": 0,
+      "status": "ok",
+      "diag": {
+       "bytes": 1032969,
+       "links": 578,
+       "scripts": 26,
+       "dates": 4,
+       "blocks": 432,
+       "datedBlocks": 1,
+       "sample": [
+        "<li> "
+       ],
+       "anchors": [
+        "<a href=\"http://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110\" target=\"_blank\" title=\"새창\">",
+        "<a href=\"http://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110\" target=\"_blank\" title=\"새창\">"
+       ]
+      }
+     },
+     {
+      "url": "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100",
+      "label": "CAU Notice",
+      "rows": 0,
+      "status": "ok",
+      "diag": {
+       "bytes": 1032969,
+       "links": 578,
+       "scripts": 26,
+       "dates": 4,
+       "blocks": 432,
+       "datedBlocks": 1,
+       "sample": [
+        "<li> "
+       ],
+       "anchors": [
+        "<a href=\"http://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110\" target=\"_blank\" title=\"새창\">",
+        "<a href=\"http://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110\" target=\"_blank\" title=\"새창\">"
+       ]
+      }
+     },
+     {
+      "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=29848&pageNo=1&P_TAB_NO=1",
+      "label": "참여 안내\" class=\"\">미래AX공학관 건립기금 참여 안내",
+      "rows": 2,
+      "status": "ok",
+      "diag": {
+       "bytes": 1045076,
+       "links": 582,
+       "scripts": 24,
+       "dates": 5,
+       "blocks": 432,
+       "datedBlocks": 2,
+       "sample": [
+        "<article> 통합 미래 AX 공학관 건립기금 모금 참여 안내 관리자 2026-05-15 조회 12861 (위 이미지를 클릭하시면 미래 AX 공학관 소개페이지로 이동합니다.) AI 시대를 이끌 중앙의 신형 엔진, 205관 미래 A",
+        "<li> "
+       ],
+       "anchors": [
+        "<a href=\"http://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110\" target=\"_blank\" title=\"새창\">",
+        "<a href=\"http://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110\" target=\"_blank\" title=\"새창\">"
+       ]
+      }
+     }
+    ]
+   }
   },
   {
    "school": "서울시립대학교",
@@ -301,7 +476,44 @@
      "evidence": "같은 검색 → 결과 URL https://www.uos.ac.kr/korNotice/view.do?list_id=FA2&seq=8930&menuid=2000005009003000000 (제목: 학사공지 < UOS공지 < 캠퍼스생활) — view 에서 list 로 유도"
     }
    ],
-   "note": "🔴 schools.json 메모는 FA1=장학공지라 했으나 검색 결과 제목은 FA1=일반공지·FA2=학사공지. 같은 주소를 장학 로봇이 이미 읽고 있으면 하루 두 번 두드리는 셈 — 첫 리포트로 확인."
+   "note": "🔴 schools.json 메모는 FA1=장학공지라 했으나 검색 결과 제목은 FA1=일반공지·FA2=학사공지. 같은 주소를 장학 로봇이 이미 읽고 있으면 하루 두 번 두드리는 셈 — 첫 리포트로 확인.",
+   "probe": {
+    "checkedAt": "2026-10-02",
+    "tried": [
+     {
+      "url": "https://www.uos.ac.kr/korNotice/list.do?list_id=FA1",
+      "label": "일반공지",
+      "rows": 0,
+      "status": "ok",
+      "diag": {
+       "bytes": 499,
+       "links": 0,
+       "scripts": 0,
+       "dates": 0,
+       "blocks": 0,
+       "datedBlocks": 0,
+       "sample": [],
+       "anchors": []
+      }
+     },
+     {
+      "url": "https://www.uos.ac.kr/korNotice/list.do?list_id=FA2",
+      "label": "학사공지",
+      "rows": 0,
+      "status": "ok",
+      "diag": {
+       "bytes": 499,
+       "links": 0,
+       "scripts": 0,
+       "dates": 0,
+       "blocks": 0,
+       "datedBlocks": 0,
+       "sample": [],
+       "anchors": []
+      }
+     }
+    ]
+   }
   },
   {
    "school": "건국대학교",
@@ -900,7 +1112,78 @@
      "evidence": "같은 검색 → 결과 URL https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=144&cmd=2&parm_bod_uid=232037 (제목: 계명대학교 - 열린마당 > 공지사항 > 학사)"
     }
    ],
-   "note": "공지사항이 일반(143)·학사(144)·장학(145)·입시(146) 탭. 상세는 &cmd=2&parm_bod_uid=<번호>."
+   "note": "공지사항이 일반(143)·학사(144)·장학(145)·입시(146) 탭. 상세는 &cmd=2&parm_bod_uid=<번호>.",
+   "probe": {
+    "checkedAt": "2026-10-02",
+    "tried": [
+     {
+      "url": "https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=143",
+      "label": "일반공지",
+      "rows": 0,
+      "status": "ok",
+      "diag": {
+       "bytes": 76953,
+       "links": 523,
+       "scripts": 16,
+       "dates": 35,
+       "blocks": 351,
+       "datedBlocks": 17,
+       "sample": [
+        "<li> 개인정보처리방침_2018. 04. 30. ~ 2018. 12. 20.",
+        "<li> 개인정보처리방침_2018. 12. 21. ~ 2019. 2. 28."
+       ],
+       "anchors": [
+        "<a href=\"https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3855&amp;\" target=\"_self\">",
+        "<a href=\"https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3855&amp;\" target=\"_self\">"
+       ]
+      }
+     },
+     {
+      "url": "https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=144",
+      "label": "학사공지",
+      "rows": 0,
+      "status": "ok",
+      "diag": {
+       "bytes": 80244,
+       "links": 530,
+       "scripts": 16,
+       "dates": 37,
+       "blocks": 354,
+       "datedBlocks": 18,
+       "sample": [
+        "<li> 개인정보처리방침_2018. 04. 30. ~ 2018. 12. 20.",
+        "<li> 개인정보처리방침_2018. 12. 21. ~ 2019. 2. 28."
+       ],
+       "anchors": [
+        "<a href=\"https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3855&amp;\" target=\"_self\">",
+        "<a href=\"https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3855&amp;\" target=\"_self\">"
+       ]
+      }
+     },
+     {
+      "url": "https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=143&cmd=2&parm_bod_uid=271134",
+      "label": "여성학연구소 뉴스레터 계명여성학 제11호 여성학연구소",
+      "rows": 0,
+      "status": "ok",
+      "diag": {
+       "bytes": 56856,
+       "links": 489,
+       "scripts": 18,
+       "dates": 33,
+       "blocks": 320,
+       "datedBlocks": 16,
+       "sample": [
+        "<li> 개인정보처리방침_2018. 04. 30. ~ 2018. 12. 20.",
+        "<li> 개인정보처리방침_2018. 12. 21. ~ 2019. 2. 28."
+       ],
+       "anchors": [
+        "<a href=\"https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3855&amp;\" target=\"_self\">",
+        "<a href=\"https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3855&amp;\" target=\"_self\">"
+       ]
+      }
+     }
+    ]
+   }
   },
   {
    "school": "서울교육대학교",
@@ -971,7 +1254,28 @@
      "evidence": "웹 검색 2026-09-30 'knu.ac.kr wbbs listBtin.action bbs_cde=1 공지사항' → 결과 URL https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/viewBtin.action?btin.bbs_cde=1&btin.doc_no=1325007&btin.appl_no=000000&menu_idx=67 (제목: 경북대학교 > 공지 > 공지사항); 목록 listBtin.action 은 유추"
     }
    ],
-   "note": "🙋 개발자 요청: 공지 게시판 주소를 못 찾았다. 홈 메뉴를 따라가면 포토뉴스(홍보 기사)만 공지로 잘못 잡혀(7차까지 두 번) 홈 추적을 껐다(home null). 후보 listBtin.action 은 정찰(2026-10-01 probe-links)에서 로봇·브라우저 모두 「메인페이지로 이동 · 로그인페이지로 이동」 글자만 보이고 글이 없다. 학생이 로그인 없이 보는 경북대 공지 목록 주소가 필요하다."
+   "note": "🙋 개발자 요청: 공지 게시판 주소를 못 찾았다. 홈 메뉴를 따라가면 포토뉴스(홍보 기사)만 공지로 잘못 잡혀(7차까지 두 번) 홈 추적을 껐다(home null). 후보 listBtin.action 은 정찰(2026-10-01 probe-links)에서 로봇·브라우저 모두 「메인페이지로 이동 · 로그인페이지로 이동」 글자만 보이고 글이 없다. 학생이 로그인 없이 보는 경북대 공지 목록 주소가 필요하다.",
+   "probe": {
+    "checkedAt": "2026-10-02",
+    "tried": [
+     {
+      "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/listBtin.action?bbs_cde=1&menu_idx=67",
+      "label": "공지사항",
+      "rows": 0,
+      "status": "ok",
+      "diag": {
+       "bytes": 3390,
+       "links": 0,
+       "scripts": 9,
+       "dates": 0,
+       "blocks": 0,
+       "datedBlocks": 0,
+       "sample": [],
+       "anchors": []
+      }
+     }
+    ]
+   }
   },
   {
    "school": "영남대학교",

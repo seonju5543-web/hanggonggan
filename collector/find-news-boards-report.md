@@ -1,9 +1,42 @@
-## 🗞 교내 소식 게시판 찾기 (2026-10-01) — 게시판 아는 학교 38/44
+## 🗞 교내 소식 게시판 찾기 (2026-10-02) — 게시판 아는 학교 38/44
 
-### ✅ 이번에 찾은 게시판 6곳
-- **동국대학교** → https://www.dongguk.edu/article/GENERALNOTICES/list (일반공지 · 검색 후보 · 글 10행 · 예: 「[서울앵커사업단 캠퍼스타운센터] AI리터러시_뤼튼과 함께하는 예비 IPO 협업 프로젝트 모집 공고(~10/14)」 「10월 6일(화)과 10월 8일(목) 헌혈 버스 시행 안내」 「[중앙도서관] 2026년 대학도서관 이용자 만족도 조사 참여 안내 (~10/6)」)
-- **동국대학교 WISE캠퍼스** → https://wise.dongguk.ac.kr/article/generalnotice/list (일반공지 · 검색 후보 · 글 11행 · 예: 「양산지역 학생통학버스 운행 시간표 변경 안내 2026.09.17. 임준택」 「2026-2학기 비교과 교육과정 안내 2026.09.02. 한정」 「[혁신] 교수학습개발센터 2026-2학기 학습법 LXP 시행 안내 2026.10.01. 오제인」)
-- **인하대학교** → https://www.inha.ac.kr/bbs/kr/8/artclList.do (공지사항 · 검색 후보 · 글 19행 · 예: 「[IPP] 2027년도 상반기 일학습병행 학생 모집 기업 초청 설명회 사전 신청 안내」 「[대학일자리플러스센터] 'SK하이닉스+삼성전자 면접대비 특강' 모집중!」 「[대학혁신지원사업] "나도 학생 강사" : 학생 주도 학습 프로그램(SDC) 강사 모집」)
-- **서울교육대학교** → https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=1309&bbsId=1082 (공지사항 · 검색 후보 · 글 15행 · 예: 「[통일부] 제25기 평화통일민주교육위원 추가 위촉 신청 안내(10월 05일까지 날···」 「2026학년도 창의융복합 교육연구 프로젝트 팀 모집」 「학생증 발급 및 사진 등록 안내」)
-- **경북대학교** → https://www.knu.ac.kr/wbbs/wbbs/main/main.action (정부재정지원사업 · 홈 메뉴 · 글 5행 · 예: 「포토뉴스 대현119안전센터와 교내 어린이집에서 합동소방훈련 실시 경북대는 9월 30일 교내 어린이집에서 교직원과 원아, 대현119안전센터 소방관 등 300여명이 참여한 가운데 2026년도 합동소방훈련을 실시했다. 2026-10-01」 「포토뉴스 수의과대학 김규태 교수, 제자 위해 발전기금 1천만원 전달 수의과대학 김규태 교수가 제자들을 위해 써달라며 발전기금 1천만원을 경북대에 전달했다. 2026-10-01」 「포토뉴스 교육부 글로컬랩 2개 연구소 선정… 9년간 총 사업비 377억원 확보 교육부와 한국연구재단이 추진하는 ‘글로컬랩(거점형) 사업’에 지능형건설자동화연구센터와 세포·기질연구소가 각각 최종 선정됐다. 2026-09-29」)
-- **전북대학교** → https://www.jbnu.ac.kr/web/news/notice/sub01.do (공지사항 · 검색 후보 · 글 11행 · 예: 「2026학년도 전공배정 제도 설명회 개최 안내」 「제2차「청년세대 성별균형 공개형 공론장」청년 참여자 모집 홍보 협조 요청」 「[전북국제개발협력센터] 국제개발협력 전문가 특강 참여자 모집 - 국제개발협력과 글쓰기 이해 (큰사람 포인트 10점 지급!)」)
+### ✅ 이번에 찾은 게시판 1곳
+- **경희대학교** → https://www.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200316 (공지사항 · 검색 후보 · 글 10행 · 예: 「공통 [추천채용] [INVENI] 대표이사 비서 정규직 추천채용」 「공통 [KOICA] 몽골 관광인력 역량강화 프로젝트 봉사단 모집」 「공통 [휘경이문누리종합사회복지관] 나눔바자회 '누리페스타' 자원봉사자 모집」)
+
+### 🙋 개발자에게 출처를 요청할 학교 6곳 — 후보와 홈 메뉴를 다 열어 봤지만 날짜가 붙은 공지 글 줄(5행 이상)을 못 찾았습니다
+- **고려대학교**
+  - https://www.korea.ac.kr/ko/566/subview.do — 열림 · 글처럼 보이는 행 0
+    - 생김새: 94KB · 링크 367 · 스크립트 31 · 날짜 토큰 14 · 줄 블록 261(날짜 든 것 1) · 표본: 「<article> fnctId=portalBoard,fnctNo=1 게시판 검색 시작일 ~ 종료일 게시물 검색 제목 작성자 번호, 제목, 작성자, 등록일자, 조회수 정보를 제공 번호 제목 작성자 Department --> 등록일자 조」
+  - https://www.korea.ac.kr/ko/567/subview.do — 열림 · 글처럼 보이는 행 0
+    - 생김새: 86KB · 링크 350 · 스크립트 31 · 날짜 토큰 8 · 줄 블록 261(날짜 든 것 1) · 표본: 「<article> fnctId=portalBoard,fnctNo=2 게시판 검색 시작일 ~ 종료일 게시물 검색 제목 작성자 번호, 제목, 작성자, 등록일자, 조회수 정보를 제공 번호 제목 작성자 Department --> 등록일자 조」
+  - https://www.korea.ac.kr/ko/461/subview.do — 열림 · 글처럼 보이는 행 0
+    - 생김새: 112KB · 링크 355 · 스크립트 31 · 날짜 토큰 4 · 줄 블록 258(날짜 든 것 0)
+- **서강대학교**
+  - https://www.sogang.ac.kr/ko/announcement — 열림 · 글처럼 보이는 행 0
+    - 생김새: 899KB · 링크 199 · 스크립트 8 · 날짜 토큰 0 · 줄 블록 17(날짜 든 것 0)
+  - https://www.sogang.ac.kr/ko/campus/student-support/notice — 열림 · 글처럼 보이는 행 0
+    - 생김새: 900KB · 링크 199 · 스크립트 8 · 날짜 토큰 0 · 줄 블록 17(날짜 든 것 0)
+- **중앙대학교**
+  - https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100 — 열림 · 글처럼 보이는 행 0
+    - 생김새: 1009KB · 링크 578 · 스크립트 26 · 날짜 토큰 4 · 줄 블록 432(날짜 든 것 1) · 표본: 「<li> 」 · 날짜 앞 링크: `<a href="http://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110" target="_blank" title="새창">` `<a href="http://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110" target="_blank" title="새창">`
+  - https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100 — 열림 · 글처럼 보이는 행 0
+    - 생김새: 1009KB · 링크 578 · 스크립트 26 · 날짜 토큰 4 · 줄 블록 432(날짜 든 것 1) · 표본: 「<li> 」 · 날짜 앞 링크: `<a href="http://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110" target="_blank" title="새창">` `<a href="http://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110" target="_blank" title="새창">`
+  - https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=29848&pageNo=1&P_TAB_NO=1 — 열림 · 글처럼 보이는 행 2
+    - 생김새: 1021KB · 링크 582 · 스크립트 24 · 날짜 토큰 5 · 줄 블록 432(날짜 든 것 2) · 표본: 「<article> 통합 미래 AX 공학관 건립기금 모금 참여 안내 관리자 2026-05-15 조회 12861 (위 이미지를 클릭하시면 미래 AX 공학관 소개페이지로 이동합니다.) AI 시대를 이끌 중앙의 신형 엔진, 205관 미래 A」 「<li> 」 · 날짜 앞 링크: `<a href="http://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110" target="_blank" title="새창">` `<a href="http://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110" target="_blank" title="새창">`
+- **서울시립대학교**
+  - https://www.uos.ac.kr/korNotice/list.do?list_id=FA1 — 열림 · 글처럼 보이는 행 0
+    - 생김새: 0KB · 링크 0 · 스크립트 0 · 날짜 토큰 0 · 줄 블록 0(날짜 든 것 0)
+  - https://www.uos.ac.kr/korNotice/list.do?list_id=FA2 — 열림 · 글처럼 보이는 행 0
+    - 생김새: 0KB · 링크 0 · 스크립트 0 · 날짜 토큰 0 · 줄 블록 0(날짜 든 것 0)
+- **계명대학교**
+  - https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=143 — 열림 · 글처럼 보이는 행 0
+    - 생김새: 75KB · 링크 523 · 스크립트 16 · 날짜 토큰 35 · 줄 블록 351(날짜 든 것 17) · 표본: 「<li> 개인정보처리방침_2018. 04. 30. ~ 2018. 12. 20.」 「<li> 개인정보처리방침_2018. 12. 21. ~ 2019. 2. 28.」 · 날짜 앞 링크: `<a href="https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3855&amp;" target="_self">` `<a href="https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3855&amp;" target="_self">`
+  - https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=144 — 열림 · 글처럼 보이는 행 0
+    - 생김새: 78KB · 링크 530 · 스크립트 16 · 날짜 토큰 37 · 줄 블록 354(날짜 든 것 18) · 표본: 「<li> 개인정보처리방침_2018. 04. 30. ~ 2018. 12. 20.」 「<li> 개인정보처리방침_2018. 12. 21. ~ 2019. 2. 28.」 · 날짜 앞 링크: `<a href="https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3855&amp;" target="_self">` `<a href="https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3855&amp;" target="_self">`
+  - https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=143&cmd=2&parm_bod_uid=271134 — 열림 · 글처럼 보이는 행 0
+    - 생김새: 56KB · 링크 489 · 스크립트 18 · 날짜 토큰 33 · 줄 블록 320(날짜 든 것 16) · 표본: 「<li> 개인정보처리방침_2018. 04. 30. ~ 2018. 12. 20.」 「<li> 개인정보처리방침_2018. 12. 21. ~ 2019. 2. 28.」 · 날짜 앞 링크: `<a href="https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3855&amp;" target="_self">` `<a href="https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3855&amp;" target="_self">`
+- **경북대학교**
+  - https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/listBtin.action?bbs_cde=1&menu_idx=67 — 열림 · 글처럼 보이는 행 0
+    - 생김새: 3KB · 링크 0 · 스크립트 9 · 날짜 토큰 0 · 줄 블록 0(날짜 든 것 0)
+
+> 목록이 스크립트로만 그려지는 게시판(SPA·클릭형)은 이 로봇이 못 읽습니다 — 그런 학교는 `collector/collect-news.mjs` 의 `NEWS_BOARD_RULES` 에 규칙(json·dataId·onclick)이 필요합니다. 학생이 보는 공지 목록 주소를 알려 주시면 그 자리에 적습니다.
