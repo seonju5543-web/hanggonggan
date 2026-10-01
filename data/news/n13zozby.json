@@ -3,14 +3,6 @@
  "updatedAt": "2026-10-01",
  "items": [
   {
-   "title": "메인으로 이동",
-   "url": "https://www.pusan.ac.kr/kor/Main.do",
-   "postedAt": "2026-09-30",
-   "school": "부산대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
    "title": "대학/대학원",
    "url": "http://www.pusan.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN003",
    "postedAt": "2026-09-30",
