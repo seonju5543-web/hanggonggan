@@ -14,6 +14,9 @@
    꼴
      kind 'onclick' — <a onclick="goDetail(123)"> 에서 fn 으로 번호를 꺼내 detail(번호, 게시판 주소)로 상세 주소를 만든다.
      kind 'dataId'  — <a data-id="123"> 의 번호로 같은 일을 한다.
+     kind 'listOnly' — 글 하나의 GET 주소가 **없는** 게시판(경희: 누르면 POST 로 view.do · 정찰 2026-10-01). 제목+게시일은 싣되 링크는
+                       목록 주소 + `#n-제목` 표식으로 둔다 — 앱이 「게시판 목록 ↗」 로 정직하게 적는다(app.js isBoardListLink · 장학 공고와 같은 관례).
+                       상세가 없으니 verifyRuleDetail 은 건너뛴다(목록 자체를 방금 읽었다).
    글 줄 뽑기는 board-links.mjs extractDatedRows 그대로(날짜 붙은 줄 · 되풀이되는 주소 꼴)이고, 링크를 푸는 눈만 바꾼다(resolve).
    그래서 게시일(postedAt)·메뉴 거르기·첨부 제외가 href 게시판과 똑같이 적용된다.
    ============================================================ */
@@ -31,6 +34,14 @@ const dongguk = {
 };
 
 export const NEWS_BOARD_RULES = {
+  /* 경희대: 행이 <a href="javascript:view('323229','')">. 정찰(2026-10-01 probe-links)에서 눌러 보니 POST 로 …/BMSR00040/view.do 가 열리고
+     주소에 번호가 없다 — 글 하나로 가는 GET 주소를 만들 수 없다(짐작하지 않는다). 목록 주소 + #n-제목 표식만 둔다. */
+  '경희대학교': {
+    kind: 'listOnly',
+    fn: /\bview\(\s*['"](\d+)['"]/,
+    detail: (id, boardUrl, title) => `${String(boardUrl).split('#')[0]}#n-${encodeURIComponent(String(title || '').slice(0, 80))}`,
+    evidence: '정찰 2026-10-01: 행은 href="javascript:view(번호)" · 첫 줄을 누르면 POST 로 /kor/user/bbs/BMSR00040/view.do (주소에 번호 없음) → 글 하나의 주소가 없어 목록 표식(#n-)으로만',
+  },
   '동국대학교': dongguk,
   '동국대학교 WISE캠퍼스': dongguk,
   /* 서울교대: 행이 <a href="javascript:" data-id="55101" class="nttInfoBtn">. 상세는 selectNttInfo.do?mi=…&bbsId=…&nttSn=<data-id>
@@ -60,18 +71,24 @@ export const NEWS_BOARD_RULES = {
 /* 규칙 하나 → <a …> 의 속성 글자를 받아 상세 주소를 돌려주는 함수(못 풀면 null). extractDatedRows 의 resolve 옵션에 넘긴다. */
 export function ruleResolver(rule, boardUrl) {
   if (!rule) return null;
-  return (attrs) => {
+  return (attrs, title) => {
     let id = null;
-    if (rule.kind === 'onclick') {
-      const oc = attrs.match(/onclick\s*=\s*(["'])((?:(?!\1)[\s\S])*)\1/i);
-      id = oc ? (oc[2].match(rule.fn) || [])[1] : null;
+    if (rule.kind === 'onclick' || rule.kind === 'listOnly') {
+      /* onclick="goDetail(1)" 도, href="javascript:view('1','')" 도 — 두 속성의 값을 모두 본다 */
+      for (const m of attrs.matchAll(/\b(?:onclick|href)\s*=\s*(["'])((?:(?!\1)[\s\S])*)\1/gi)) {
+        id = (m[2].match(rule.fn) || [])[1];
+        if (id) break;
+      }
     } else if (rule.kind === 'dataId') {
       id = (attrs.match(/data-id\s*=\s*["'](\d+)["']/i) || [])[1];
     }
     if (!id) return null;
-    try { return rule.detail(id, boardUrl) || null; } catch { return null; }
+    try { return rule.detail(id, boardUrl, title) || null; } catch { return null; }
   };
 }
+
+/* 이 규칙의 글에 상세 확인이 필요한가 — 목록 표식(listOnly)은 상세가 없다 */
+export const needsDetailCheck = (rule) => !!rule && rule.kind !== 'listOnly';
 
 /* 학교 이름으로 규칙을 골라 글 줄을 뽑는다 — 규칙 없는 학교는 보통 눈(href) 그대로. 두 로봇이 이 함수 하나를 부른다. */
 export function datedRowsFor(school, html, boardUrl) {
@@ -90,7 +107,8 @@ export async function verifyRuleDetail(row, opts = {}) {
   const fetchFn = opts.fetch || fetchBoard;
   if (!row || !row.url) return { ok: false, reason: '확인할 글이 없음' };
   let res;
-  try { res = await fetchFn(row.url, { tries: 1, firstMs: 15000 }); } catch (e) { return { ok: false, reason: `상세 열기 실패 (${(e && e.message) || e})` }; }
+  /* 같은 학교를 방금 두드린 뒤라 한 번은 끊길 수 있다(전북 7차 실측 fetch failed) → 두 번 시도 */
+  try { res = await fetchFn(row.url, { tries: 2, firstMs: 15000, retryMs: 20000 }); } catch (e) { return { ok: false, reason: `상세 열기 실패 (${(e && e.message) || e})` }; }
   if (!res || !res.ok) return { ok: false, reason: `상세 HTTP ${res ? res.status : '?'}` };
   const sameUrl = (a, b) => { try { const x = new URL(a); const y = new URL(b); return x.origin + x.pathname === y.origin + y.pathname; } catch { return false; } };
   if (opts.boardUrl && res.url && sameUrl(res.url, opts.boardUrl)) return { ok: false, reason: '상세 주소가 목록으로 되돌아옴 (규칙이 이 게시판에 안 맞음)' };

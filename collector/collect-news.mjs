@@ -14,7 +14,7 @@
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { sameSite } from './board-links.mjs';
-import { NEWS_BOARD_RULES, datedRowsFor, verifyRuleDetail } from './news-board-rules.mjs';   // 클릭형 게시판 규칙 한 곳 (찾기 로봇과 같은 것)
+import { NEWS_BOARD_RULES, datedRowsFor, verifyRuleDetail, needsDetailCheck } from './news-board-rules.mjs';   // 클릭형 게시판 규칙 한 곳 (찾기 로봇과 같은 것)
 import { urlKey, dedupeNotices } from './url-key.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { activityKind } from './activity-kind.mjs';
@@ -42,6 +42,8 @@ const MIN_ROOM_MS = Number(process.env.NEWS_MIN_ROOM_MS || 15000);
 const NEWS_FRESH_MAX = Number(process.env.NEWS_FRESH_MAX || 30);     // 게시판 하나에서 한 실행에 담는 새 글 상한
 const NEWS_KEEP_DAYS = Number(process.env.NEWS_KEEP_DAYS || 30);      // 수집일로부터 이만큼 지나면 뺀다 (공지는 장학 공고보다 빨리 낡는다)
 const NEWS_PER_SCHOOL = Number(process.env.NEWS_PER_SCHOOL || 40);    // 학교별 파일 한 장의 상한 (폰이 받는 크기)
+const NEWS_POSTED_MAX_DAYS = Number(process.env.NEWS_POSTED_MAX_DAYS || 60);   // 게시일이 이보다 오래된 글은 싣지 않는다 — 상단 고정 공지가 2025년 글을 '소식'으로 올렸다(서울교대 7차 실측)
+const postedCutoff = () => new Date(Date.now() - NEWS_POSTED_MAX_DAYS * 86400000).toISOString().slice(0, 10);
 const budget = makeBudget(BUDGET_MS);
 
 const cursorPath = new URL('news-cursor.json', HERE);
@@ -104,10 +106,11 @@ async function harvestBoard(s, ctx = { dead: false }) {
     /* 무엇을 싣나 — 학교 사이트 안의 글 가운데 장학·활동·잡음을 뺀 것 (판정은 news-kind.mjs 한 곳) */
     const items = rawLinks
       .filter((i) => sameSite(i.url, s.boardUrl))
+      .filter((i) => !i.postedAt || i.postedAt >= postedCutoff())   // 오래된 고정 공지 제외 (게시일을 아는 글만 잰다)
       .filter((i) => isNewsRow(i, { scholarship: KEYWORDS, activityKind, isAttachmentEntry }));
     const fresh = items.filter((i) => !seen[urlKey(i.url)]).slice(0, NEWS_FRESH_MAX);
     /* 🔴 규칙으로 만든 상세 주소는 매번 첫 글 하나를 실제로 열어 제목을 확인한다 — 안 맞으면 이 게시판은 싣지 않는다(틀린 링크보다 0건). */
-    if (rule && fresh.length) {
+    if (needsDetailCheck(rule) && fresh.length) {
       const v = await verifyRuleDetail(fresh[0], { boardUrl: s.boardUrl, others: items.map((i) => i.title) });
       if (ctx.dead) return;
       if (!v.ok) { results.push({ name, status: `⚠️ 클릭형 규칙(news-board-rules.mjs)의 상세 주소 확인 실패 — ${v.reason} · 이 게시판은 싣지 않음`, items: [] }); return; }
@@ -167,6 +170,7 @@ const cutoff = new Date(Date.now() - NEWS_KEEP_DAYS * 86400000).toISOString().sl
 let all = freshAll.concat(loadPublished());
 all = all.filter((n) => n && n.url && n.school && (n.foundAt || '9999') >= cutoff);
 all = all.filter((n) => !isAttachmentEntry(n));
+all = all.filter((n) => !n.postedAt || n.postedAt >= postedCutoff());   // 소급 — 게시일 상한 (규칙이 바뀌면 실린 글도 같은 잣대)
 /* 소급(원칙 7) — 실을지 규칙(news-kind)이 바뀌면 이미 실린 글도 같은 잣대로 다시 거른다. 2차 실행 뒤 메뉴·바닥글 잡음을 이것으로 걷었다. */
 all = all.filter((n) => isNewsRow(n, { scholarship: KEYWORDS, activityKind, isAttachmentEntry }));
 all = dedupeNotices(all);

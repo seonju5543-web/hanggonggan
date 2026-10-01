@@ -40,7 +40,7 @@ jobs:
     # 서버가 깜빡한 사슬 한 칸을 우리가 들고 있는 것이다. 자세히: collector/certs/README.md
     # 2026-08-23에 이게 없어서 조선대 공고문 PDF 내려받기가 TypeError 로 죽었다.
     env:
-      NODE_EXTRA_CA_CERTS: collector/certs/sectigo-server-auth-dv-r36.pem
+      NODE_EXTRA_CA_CERTS: collector/certs/bundle.pem
     # 재수집 예산 12분 + 브라우저 설치·검증·저장. 상한은 예산의 그릇이지 '넉넉히'가 아니다.
     timeout-minutes: 25
     steps:

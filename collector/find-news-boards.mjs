@@ -17,7 +17,7 @@
    ============================================================ */
 import fs from 'node:fs';
 import { extractLinks, sameSite } from './board-links.mjs';
-import { NEWS_BOARD_RULES, datedRowsFor, verifyRuleDetail } from './news-board-rules.mjs';   // 클릭형 게시판 규칙 한 곳 (수집 로봇과 같은 것)
+import { NEWS_BOARD_RULES, datedRowsFor, verifyRuleDetail, needsDetailCheck } from './news-board-rules.mjs';   // 클릭형 게시판 규칙 한 곳 (수집 로봇과 같은 것)
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { isNewsRow } from './news-kind.mjs';
 import { fetchBoard, netReason } from './fetch-board.mjs';
@@ -107,7 +107,7 @@ async function findOne(s) {
       const t = { url, label, rows: score.rows, status: 'ok' };
       if (score.rows < MIN_ROWS) t.diag = pageDiag(page.html);   // 왜 0행인가 — 다음 수리의 재료 (짐작하지 않는다)
       /* 🔴 규칙 학교는 첫 글의 상세를 실제로 열어 제목이 있는지 본 뒤에만 '찾음' — 규칙이 이 게시판에 안 맞으면 못 찾은 것이다 */
-      if (score.rows >= MIN_ROWS && NEWS_BOARD_RULES[s.school]) {
+      if (score.rows >= MIN_ROWS && needsDetailCheck(NEWS_BOARD_RULES[s.school])) {
         const first = rows.find((r) => sameSite(r.url, page.url)) || rows[0];
         const v = await verifyRuleDetail(first, { boardUrl: page.url, others: rows.map((r) => r.title) });
         if (!v.ok) { t.status = `규칙 상세 확인 실패 — ${v.reason}`; tried.push(t); return null; }

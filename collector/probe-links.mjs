@@ -46,8 +46,22 @@ async function freshPage() {
 /* ── ① 주소 하나를 학생 눈으로 열어 본다 ── */
 async function checkUrl(url) {
   const { page, ctx } = await freshPage();
+  /* 화면이 부르는 요청을 적는다 (2026-10-01) — SPA(서강)·스크립트 목록(고려·중앙·시립)은 목록을 **별도 요청**으로 받아 그린다.
+     그 주소(bbsConfigFk 같은 열쇠)와 폼 전송의 본문(경희 view.do)이 규칙의 재료다. 그림·글꼴·스크립트 파일은 뺀다. */
+  const reqs = [];
+  page.on('request', (r) => {
+    try {
+      const u = r.url(); const t = r.resourceType();
+      if (!/^(xhr|fetch|document)$/.test(t)) return;
+      if (/\.(css|js|png|jpe?g|gif|svg|webp|ico|woff2?|ttf|map)(\?|$)/i.test(u)) return;
+      const pd = r.postData();
+      const line = `${r.method()} ${u.slice(0, 220)}${pd ? ` · 본문: ${String(pd).slice(0, 220)}` : ''}`;
+      if (!reqs.includes(line) && reqs.length < 14) reqs.push(line);
+    } catch { /* 요청 객체가 이미 닫힘 */ }
+  });
   try {
     const res = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 25000 });
+    await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {});   // 스크립트가 목록을 다 그릴 때까지 (시립 7차: 2.5초로는 빈 화면)
     await page.waitForTimeout(2500);
     const info = await page.evaluate(() => ({
       title: document.title || '',
@@ -110,7 +124,14 @@ async function checkUrl(url) {
       }
     } else {
       report.push('- 날짜 줄의 제목 링크: 없음 (날짜가 든 줄에 링크가 없거나 목록이 안 그려짐)');
+      /* 왜 없는가 — 목록처럼 보이는 첫 요소의 HTML 앞부분을 그대로 적는다(짐작 대신 재료 · 계명·상명·서강 7차) */
+      const frag = await page.evaluate(() => {
+        const el = document.querySelector('table, [class*="board"], [class*="bbs"], [class*="list"], [id*="board"], [id*="list"]');
+        return el ? el.outerHTML.replace(/\s+/g, ' ').slice(0, 1500) : '';
+      }).catch(() => '');
+      if (frag) report.push(`- 목록처럼 보이는 첫 요소의 HTML (앞 1500자): \`${frag.replace(/`/g, "'")}\``);
     }
+    if (reqs.length) { report.push(`- 화면이 부른 요청 ${reqs.length}개 (목록 API·폼 전송 후보):`); reqs.forEach((l) => report.push(`    · ${l}`)); }
     report.push('');
   } catch (e) {
     report.push(`### 🔗 ${url}`);

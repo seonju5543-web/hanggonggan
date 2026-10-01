@@ -81,15 +81,26 @@ const DATE_G = /(20\d{2})\s*[.\-/년]\s*(\d{1,2})\s*[.\-/월]\s*(\d{1,2})(?!\d)|
 const inScript = (seg) => /<script\b(?:(?!<\/script>)[\s\S])*$/i.test(seg) || /<style\b(?:(?!<\/style>)[\s\S])*$/i.test(seg);
 /* 클릭형 게시판(news-board-rules.mjs) — <a onclick=…>·<a data-id=…> 는 href 가 없어 extractLinks 가 못 본다.
    resolve(속성 글자) 가 상세 주소를 돌려주면 그 링크도 글 줄의 링크로 센다(제목 정리·길이 규칙은 href 링크와 같다). */
+/* 클릭형 <a> 는 줄 전체(제목·게시일·작성자·조회수)를 감싸는 일이 흔하다(동국 WISE 7차 실측 「… 안내 2026.09.17. 임준택」).
+   제목 뒤에 오는 첫 날짜부터 끝까지 잘라낸다 — 날짜가 제목 앞머리에 있는 글(「2026.10.2 셔틀 변경」)은 건드리지 않는다. */
+export function cutRowTail(title) {
+  const t = String(title || '');
+  const m = t.match(/\s+(?:20\d{2}\s*[.\-/년]\s*\d{1,2}\s*[.\-/월]\s*\d{1,2}\.?|(?<!\d)\d{2}\.\d{2}\.\d{2})(?!\d)[\s\S]*$/);
+  if (!m || m.index < 6) return t.trim();
+  /* 제목 **안**의 날짜(「신청 기간 2026.10.1 ~ 10.5」·「~10.14 까지」)는 꼬리가 아니다 — 꼬리는 짧고(작성자·조회수) 기간 낱말이 없다 */
+  const tail = m[0];
+  if (tail.length > 40 || /~|까지|마감|부터|신청|접수|\(|\)/.test(tail)) return t.trim();
+  return t.slice(0, m.index).trim();
+}
 function resolvedLinks(seg, resolve) {
   const out = [];
   const re = /<a\b([^>]*)>([\s\S]*?)<\/a>/gi;
   let m;
   while ((m = re.exec(seg)) !== null) {
-    const url = resolve(m[1]);
-    if (!url) continue;
-    const title = cleanTitle(m[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim());
+    const title = cutRowTail(cleanTitle(m[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()));
     if (title.length < 6 || title.length > 140) continue;
+    const url = resolve(m[1], title);
+    if (!url) continue;
     out.push({ title, url });
   }
   return out;

@@ -17,12 +17,14 @@
 워크플로에서 `NODE_EXTRA_CA_CERTS`로 지정한다(수집 로봇 2종에 배선돼 있다).
 손으로 돌릴 때도 같다:
 
-    NODE_EXTRA_CA_CERTS=collector/certs/sectigo-server-auth-dv-r36.pem node collector/deepfetch.mjs --fill
+    NODE_EXTRA_CA_CERTS=collector/certs/bundle.pem node collector/deepfetch.mjs --fill
 
 ## 지금 들어 있는 것
 | 파일 | 무엇 | 만료 |
 |---|---|---|
 | `sectigo-server-auth-dv-r36.pem` | Sectigo Public Server Authentication CA DV R36 (계명대) | 2036-03-21 |
+| `sectigo-server-auth-ov-r36.pem` | Sectigo Public Server Authentication CA OV R36 (서강대 · 2026-10-01 정찰 `probe-chain.sh` 로 받아 `openssl verify` OK) | 2036-03-21 |
+| `bundle.pem` | 위 둘을 이어 붙인 묶음 — **워크플로가 가리키는 파일**(`NODE_EXTRA_CA_CERTS` 는 파일 하나만 받는다). 새 인증서를 넣으면 `cat` 으로 다시 만든다(관문이 대조) |
 
 ## 다른 학교가 같은 증상을 보이면
 1. `echo \| openssl s_client -connect <호스트>:443 -servername <호스트>` 로 사슬을 본다.

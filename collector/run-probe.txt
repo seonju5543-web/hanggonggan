@@ -31,17 +31,13 @@ checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/list
 checkUrl: https://www.smu.ac.kr/kor/life/notice.do?srCategoryId=8
 checkUrl: https://www.smu.ac.kr/kor/life/scholarship.do
 
-# 2026-10-01 — 교내 소식 로봇(collect-news.mjs)이 6차 실행까지 못 읽은 학교 (개발자 지시 "실패한 작업 전부 해결책 설계 후 착수").
-#   날짜 줄의 제목 링크가 **무엇으로 상세를 여는지**(href·onclick·data-*)와 첫 줄을 눌렀을 때 **어디로 가는지**를 받아 적는다 —
-#   그 결과만으로 news-board-rules.mjs 에 규칙을 적는다(주소를 유추하지 않는다). 서강은 인증서 사슬(certHost)도 본다.
-checkUrl: https://www.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200316
+# 2026-10-01 (2차) — 교내 소식 7차 실행 뒤 남은 학교. 1차 정찰(같은 날)로 동국·WISE·서울교대·전북·경희는 규칙을 적었고 서강 인증서는 certs/ 에 넣었다.
+#   이번엔 정찰이 **화면이 부른 요청**(목록 API·폼 전송 본문)과 **목록 요소의 HTML 조각**까지 적는다 — 그 결과만으로 규칙을 적는다(주소를 유추하지 않는다).
+#   계명: 목록 행에 날짜 링크가 안 잡힌다(바닥글 방침만) → HTML 조각 · 서강: SPA 공지사항의 API 열쇠(bbsConfigFk) · 시립: 스크립트가 그린 뒤의 행 ·
+#   상명: 통합공지 행의 제목 링크 · 고려·중앙: 목록을 받아 오는 요청이 GET 인가.
+checkUrl: https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=143
+checkUrl: https://www.sogang.ac.kr/ko/announcement
+checkUrl: https://www.uos.ac.kr/korNotice/list.do?list_id=FA1
+checkUrl: https://www.smu.ac.kr/kor/life/notice.do
 checkUrl: https://www.korea.ac.kr/ko/566/subview.do
 checkUrl: https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100
-checkUrl: https://www.uos.ac.kr/korNotice/list.do?list_id=FA1
-checkUrl: https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=143
-checkUrl: https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/listBtin.action?bbs_cde=1&menu_idx=67
-checkUrl: https://www.yu.ac.kr/main/intro/yu-notice.do?mode=list&article.offset=0
-checkUrl: https://www.smu.ac.kr/kor/life/notice.do
-checkUrl: https://www.sogang.ac.kr/ko/announcement
-checkUrl: https://www.inha.ac.kr/bbs/kr/8/artclList.do
-certHost: www.sogang.ac.kr

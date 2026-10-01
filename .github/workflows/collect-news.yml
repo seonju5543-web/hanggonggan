@@ -28,7 +28,7 @@ jobs:
   news:
     runs-on: ubuntu-latest
     env:
-      NODE_EXTRA_CA_CERTS: collector/certs/sectigo-server-auth-dv-r36.pem   # 계명대처럼 중간 인증서를 안 보내는 학교 (collector/certs/README.md)
+      NODE_EXTRA_CA_CERTS: collector/certs/bundle.pem   # 계명대처럼 중간 인증서를 안 보내는 학교 (collector/certs/README.md)
     # 상한 = 단계 상한의 합 + 여유 3 (관문 test-collector 「교내 소식」이 대소관계를 잰다 · 상한을 키워 때우지 말 것).
     # 찾기 7 + 수집 6 + 알림 1 + 관문 5 + 되돌리기 1 + 감사 알림 1 + 저장 3 + 리포트 1 + 알림 1 = 26 → 30
     timeout-minutes: 30
