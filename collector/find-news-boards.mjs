@@ -53,7 +53,9 @@ export function pickNewsMenuLinks(links, home, max = 6) {
   const seen = new Set();
   const out = [];
   for (const l of links || []) {
-    if (!sameSite(l.url, home) || !MENU.test(l.title + ' ' + l.url) || NOT_MENU.test(l.title + ' ' + l.url)) continue;
+    /* 같은 **호스트**만 — 하위 도메인(job.·fund.·coss.)으로 건너가면 취업·발전기금·사업단 게시판을 학교 공지로 올린다(4차 실행 실측 · 부산·전북·충북) */
+    let sameHost = false; try { sameHost = new URL(l.url).hostname === new URL(home).hostname; } catch { /* 깨진 주소 */ }
+    if (!sameHost || !MENU.test(l.title + ' ' + l.url) || NOT_MENU.test(l.title + ' ' + l.url)) continue;
     const key = l.url.replace(/[?#].*$/, '');
     if (seen.has(key)) continue;
     seen.add(key);
@@ -71,9 +73,16 @@ export function pageDiag(html) {
   const blocks = [...String(html).matchAll(/<(tr|li|dd|article)\b[^>]*>((?:(?!<\1\b)[\s\S])*?)<\/\1>/gi)];
   const dated = blocks.filter((b) => /20\d{2}\s*[.\-/년]\s*\d{1,2}\s*[.\-/월]\s*\d{1,2}/.test(b[2]));
   const links = (String(html).match(/<a\b[^>]*href=/gi) || []).length;
+  /* 날짜 바로 앞 토막의 <a> 태그 둘 — href 가 javascript: 인지, onclick 으로 여는지 보려고 (규칙 json·onclick·dataId 를 정하는 재료) */
+  const dm = /20\d{2}\s*[.\-/년]\s*\d{1,2}\s*[.\-/월]\s*\d{1,2}/g; let dmm; const anchors = [];
+  while ((dmm = dm.exec(String(html))) !== null && anchors.length < 2) {
+    const seg = String(html).slice(Math.max(0, dmm.index - 600), dmm.index);
+    const a = [...seg.matchAll(/<a\b[^>]*>/gi)].pop();
+    if (a) anchors.push(a[0].replace(/\s+/g, ' ').slice(0, 160));
+  }
   const scripts = (String(html).match(/<script\b/gi) || []).length;
   return { bytes: String(html).length, links, scripts, dates, blocks: blocks.length, datedBlocks: dated.length,
-    sample: dated.slice(0, 2).map((b) => `<${b[1]}> ${text(b[2]).slice(0, 120)}`) };
+    sample: dated.slice(0, 2).map((b) => `<${b[1]}> ${text(b[2]).slice(0, 120)}`), anchors };
 }
 
 async function get(url, ms = 15000) {
@@ -160,7 +169,7 @@ async function main() {
       lines.push(`- **${s.school}**`);
       for (const t of (s.probe.tried || []).slice(0, 8)) {
         lines.push(`  - ${t.url} — ${t.status === 'ok' ? `열림 · 글처럼 보이는 행 ${t.rows}` : t.status}`);
-        if (t.diag) lines.push(`    - 생김새: ${Math.round(t.diag.bytes / 1024)}KB · 링크 ${t.diag.links} · 스크립트 ${t.diag.scripts} · 날짜 토큰 ${t.diag.dates} · 줄 블록 ${t.diag.blocks}(날짜 든 것 ${t.diag.datedBlocks})${t.diag.sample.length ? ' · 표본: ' + t.diag.sample.map((x) => `「${x}」`).join(' ') : ''}`);
+        if (t.diag) lines.push(`    - 생김새: ${Math.round(t.diag.bytes / 1024)}KB · 링크 ${t.diag.links} · 스크립트 ${t.diag.scripts} · 날짜 토큰 ${t.diag.dates} · 줄 블록 ${t.diag.blocks}(날짜 든 것 ${t.diag.datedBlocks})${t.diag.sample.length ? ' · 표본: ' + t.diag.sample.map((x) => `「${x}」`).join(' ') : ''}${(t.diag.anchors || []).length ? ' · 날짜 앞 링크: ' + t.diag.anchors.map((x) => '`' + x + '`').join(' ') : ''}`);
       }
     }
     lines.push('', `> 목록이 스크립트로만 그려지는 게시판(SPA·클릭형)은 이 로봇이 못 읽습니다 — 그런 학교는 \`collector/collect-news.mjs\` 의 \`NEWS_BOARD_RULES\` 에 규칙(json·dataId·onclick)이 필요합니다. 학생이 보는 공지 목록 주소를 알려 주시면 그 자리에 적습니다.`, '');
