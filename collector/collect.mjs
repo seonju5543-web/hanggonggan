@@ -21,6 +21,7 @@ import { activityExcerpts } from './activity-excerpts.mjs';
 import { htmlToLines } from './html-text.mjs';
 import { robotsAllows } from './robots.mjs';
 import { extractLinks, stripSessionId } from './board-links.mjs';
+import { tidyExternal, dropReason as externalDropReason } from './external-clean.mjs';
 import { canonUrl } from './canon-url.mjs';
 import { fetchBoard, netReason } from './fetch-board.mjs';
 import { makeBudget, rotateOrder, nextCursor, withDeadline, TIMED_OUT } from './harvest-budget.mjs';
@@ -547,6 +548,14 @@ ext.items = ext.items.filter((n) => (n.foundAt || '9999') >= cutoff);
 ext.items = ext.items.filter((n) => !isAttachmentEntry(n));
 ext.items = dedupeNotices(ext.items);
 ext.items = ext.items.filter((n) => !n.school && n.host);   // 학교 글은 여기 오지 않는다 · 주최 없는 글도 싣지 않는다
+/* 제목 부스러기(번호·게시일·미리보기·주석)를 떼고, 옛 글·결과 발표·재단 메뉴를 거른다 (2026-10-01 개발자 지시).
+   🔴 **매 실행 전체에** 건다 — 이 파일은 합집합 병합이라 병합이 되살린 글도 여기서 다시 걸러진다. 규칙은 external-clean.mjs 한 곳. */
+const extDropped = {};
+ext.items = ext.items.map(tidyExternal).filter((n) => {
+  const why = externalDropReason(n, notices.updatedAt);
+  if (why) { const k = /\d{4}/.test(why) ? '옛 글' : why; extDropped[k] = (extDropped[k] || 0) + 1; }
+  return !why;
+});
 ext.items.sort((a, b) => String(b.foundAt || '').localeCompare(String(a.foundAt || '')));
 ext.items = ext.items.slice(0, EXT_CAP);
 ext.updatedAt = notices.updatedAt;
@@ -658,6 +667,7 @@ lines.push('');
 {
   const known = (extCfg.sources || []).filter((x) => x.boardUrl).length;
   lines.push(`### 🏛 재단·지자체 새 공고 ${freshExt.length}건 → 홈 '재단·지자체 새 공고' (data/external.json · ${ext.items.length}건 게재 중 · 게시판 아는 곳 ${known}/${(extCfg.sources || []).length})`);
+  if (Object.keys(extDropped).length) lines.push(`> 걸러 낸 글: ${Object.entries(extDropped).map(([k, v]) => `${k} ${v}건`).join(' · ')} (collector/external-clean.mjs)`);
   for (const r of extResults) {
     lines.push(`- **${r.name}** — ${r.status}`);
     for (const i of r.items) lines.push(`  - [${i.title}](${i.url})${i.deadlineHint ? ` — ⏰ ${i.deadlineHint}` : ''}`);

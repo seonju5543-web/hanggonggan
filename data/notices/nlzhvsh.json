@@ -1,161 +1,60 @@
 {
  "school": "강원대학교",
- "updatedAt": "2026-09-30",
+ "updatedAt": "2026-10-01",
  "items": [
   {
-   "title": "[삼척] 2026학년도 2학기 KNU-SOS 장학생 신청 안내(2차)",
-   "url": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2503&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "title": "2026년 우양재단 동행 장학생 모집 안내",
+   "url": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2509&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
    "attachments": [
     {
-     "name": "(붙임1)2026-2학기 KNU-SOS 장학생 선발 계획 안내(2차).hwp chevron_forward",
-     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20260922111438444.hwp&path=/bbs/34&fn=(%EB%B6%99%EC%9E%841)2026-2%ED%95%99%EA%B8%B0%20KNU-SOS%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EA%B3%84%ED%9A%8D%20%EC%95%88%EB%82%B4(2%EC%B0%A8).hwp"
+     "name": "[붙임1] 2026년 동행장학 홍보 포스터.jpg chevron_forward",
+     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261001034659260.jpg&path=/bbs/34&fn=[%EB%B6%99%EC%9E%841]%202026%EB%85%84%20%EB%8F%99%ED%96%89%EC%9E%A5%ED%95%99%20%ED%99%8D%EB%B3%B4%20%ED%8F%AC%EC%8A%A4%ED%84%B0.jpg"
     },
     {
-     "name": "관련서식 및 메뉴얼.zip chevron_forward",
-     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20260922111448185.zip&path=/bbs/34&fn=%EA%B4%80%EB%A0%A8%EC%84%9C%EC%8B%9D%20%EB%B0%8F%20%EB%A9%94%EB%89%B4%EC%96%BC.zip"
+     "name": "[붙임2] 2026년 우양재단 동행장학 신청서 서식.hwp chevron_forward",
+     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261001034659335.hwp&path=/bbs/34&fn=[%EB%B6%99%EC%9E%842]%202026%EB%85%84%20%EC%9A%B0%EC%96%91%EC%9E%AC%EB%8B%A8%20%EB%8F%99%ED%96%89%EC%9E%A5%ED%95%99%20%EC%8B%A0%EC%B2%AD%EC%84%9C%20%EC%84%9C%EC%8B%9D.hwp"
+    }
+   ],
+   "deadlineHint": "신청기간 ~ 10월 18일 (일) 까지 ▣ 지원인원 및 금액 가족 돌봄 청년 11명 / 인당 100만원 ▣ 지원기간 2026년 1회성 지원 ▣",
+   "school": "강원대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "2027년도 대산농촌재단 장학생 선발 안내",
+   "url": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2508&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "attachments": [
+    {
+     "name": "[붙임1] 2027 대산장학생 선발 공지.jpg chevron_forward",
+     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261001034457063.jpg&path=/bbs/34&fn=[%EB%B6%99%EC%9E%841]%202027%20%EB%8C%80%EC%82%B0%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EA%B3%B5%EC%A7%80.jpg"
+    },
+    {
+     "name": "[붙임2] 2027 대산장학생 선발요강.pdf chevron_forward",
+     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261001034459136.pdf&path=/bbs/34&fn=[%EB%B6%99%EC%9E%842]%202027%20%EB%8C%80%EC%82%B0%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%EC%9A%94%EA%B0%95.pdf"
     }
    ],
    "deadlineHint": null,
    "school": "강원대학교",
    "campus": "",
-   "foundAt": "2026-09-30"
+   "foundAt": "2026-10-01"
   },
   {
-   "title": "제36기 미래에셋 해외교환 장학생 선발요강 안내",
-   "url": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2486&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "title": "2026년 우양재단 동행 장학생 모집",
+   "url": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2507&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
    "attachments": [
     {
-     "name": "가. (공고) 제36기 미래에셋 해외교환 장학생 선발 요강.pdf chevron_forward",
-     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20260901105058879.pdf&path=/bbs/34&fn=%EA%B0%80.%20(%EA%B3%B5%EA%B3%A0)%20%EC%A0%9C36%EA%B8%B0%20%EB%AF%B8%EB%9E%98%EC%97%90%EC%85%8B%20%ED%95%B4%EC%99%B8%EA%B5%90%ED%99%98%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%9A%94%EA%B0%95.pdf"
+     "name": "[붙임1] 2026년 동행장학 홍보 포스터.jpg chevron_forward",
+     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261001023912783.jpg&path=/bbs/34&fn=[%EB%B6%99%EC%9E%841]%202026%EB%85%84%20%EB%8F%99%ED%96%89%EC%9E%A5%ED%95%99%20%ED%99%8D%EB%B3%B4%20%ED%8F%AC%EC%8A%A4%ED%84%B0.jpg"
     },
     {
-     "name": "나. (별첨) 부모 명의 개인정보 제공 및 활용 동의서.pdf chevron_forward",
-     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20260901105100707.pdf&path=/bbs/34&fn=%EB%82%98.%20(%EB%B3%84%EC%B2%A8)%20%EB%B6%80%EB%AA%A8%20%EB%AA%85%EC%9D%98%20%EA%B0%9C%EC%9D%B8%EC%A0%95%EB%B3%B4%20%EC%A0%9C%EA%B3%B5%20%EB%B0%8F%20%ED%99%9C%EC%9A%A9%20%EB%8F%99%EC%9D%98%EC%84%9C.pdf"
+     "name": "[붙임2] 2026년 우양재단 동행장학 신청서 서식.hwp chevron_forward",
+     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261001023912884.hwp&path=/bbs/34&fn=[%EB%B6%99%EC%9E%842]%202026%EB%85%84%20%EC%9A%B0%EC%96%91%EC%9E%AC%EB%8B%A8%20%EB%8F%99%ED%96%89%EC%9E%A5%ED%95%99%20%EC%8B%A0%EC%B2%AD%EC%84%9C%20%EC%84%9C%EC%8B%9D.hwp"
     }
    ],
    "deadlineHint": null,
    "school": "강원대학교",
    "campus": "",
-   "foundAt": "2026-09-30"
-  },
-  {
-   "title": "[대전청년내일재단] 2026년 하반기 인재육성 성취(대) 장학생 선발 안내",
-   "url": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2506&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
-   "attachments": [
-    {
-     "name": "2026년 성취(대) 장학생 선발계획 연장 공고.hwpx chevron_forward",
-     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20260928052800301.hwpx&path=/bbs/34&fn=2026%EB%85%84%20%EC%84%B1%EC%B7%A8(%EB%8C%80)%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%EA%B3%84%ED%9A%8D%20%EC%97%B0%EC%9E%A5%20%EA%B3%B5%EA%B3%A0.hwpx"
-    },
-    {
-     "name": "(웹배너) 성취(대) 장학생 선발 연장(홍보용).zip chevron_forward",
-     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20260928052806519.zip&path=/bbs/34&fn=(%EC%9B%B9%EB%B0%B0%EB%84%88)%20%EC%84%B1%EC%B7%A8(%EB%8C%80)%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%97%B0%EC%9E%A5(%ED%99%8D%EB%B3%B4%EC%9A%A9).zip"
-    }
-   ],
-   "deadlineHint": "신청기간: 2026. 9. 1.(화) ~ 10. 8.(목) 17:00까지(기간 연장) 라. 신청방법: 대전청년포털(www.daejeonyouth",
-   "school": "강원대학교",
-   "campus": "",
-   "foundAt": "2026-09-30"
-  },
-  {
-   "title": "2026년도 하반기 (재)논산시장학회 학업장려 장학생 선발 안내",
-   "url": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2505&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
-   "attachments": [
-    {
-     "name": "2026년도 하반기 재단법인 논산시장학회 장학생 선발 공고문(발췌본).hwpx chevron_forward",
-     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20260928100417613.hwpx&path=/bbs/34&fn=2026%EB%85%84%EB%8F%84%20%ED%95%98%EB%B0%98%EA%B8%B0%20%EC%9E%AC%EB%8B%A8%EB%B2%95%EC%9D%B8%20%EB%85%BC%EC%82%B0%EC%8B%9C%EC%9E%A5%ED%95%99%ED%9A%8C%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EA%B3%B5%EA%B3%A0%EB%AC%B8(%EB%B0%9C%EC%B7%8C%EB%B3%B8).hwpx"
-    },
-    {
-     "name": "2026년도 하반기 재단법인 논산시장학회 장학생 신청 서식.hwpx chevron_forward",
-     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20260928100417666.hwpx&path=/bbs/34&fn=2026%EB%85%84%EB%8F%84%20%ED%95%98%EB%B0%98%EA%B8%B0%20%EC%9E%AC%EB%8B%A8%EB%B2%95%EC%9D%B8%20%EB%85%BC%EC%82%B0%EC%8B%9C%EC%9E%A5%ED%95%99%ED%9A%8C%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%8B%A0%EC%B2%AD%20%EC%84%9C%EC%8B%9D.hwpx"
-    }
-   ],
-   "deadlineHint": "신청기간 : 2026. 9. 28.( 월 ) 09:00 ~ 10. 30.( 금 ) 18:00 - 접 수 처 : 논산시청 인구청년교육과 교육지원팀",
-   "school": "강원대학교",
-   "campus": "",
-   "foundAt": "2026-09-30"
-  },
-  {
-   "title": "2026학년도 2학기 국가장학금 1유형(다자녀포함) 1차 지급 알림",
-   "url": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2504&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
-   "attachments": [],
-   "deadlineHint": null,
-   "school": "강원대학교",
-   "campus": "",
-   "foundAt": "2026-09-30"
-  },
-  {
-   "title": "2026학년도 2학기 인송문화재단 신규장학생 선발 안내",
-   "url": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2502&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
-   "attachments": [
-    {
-     "name": "(서식) ‘仁松 일반장학생’ 선발 지원서_2026_2.hwp chevron_forward",
-     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20260918052923715.hwp&path=/bbs/34&fn=(%EC%84%9C%EC%8B%9D)%20%E2%80%98%E4%BB%81%E6%9D%BE%20%EC%9D%BC%EB%B0%98%EC%9E%A5%ED%95%99%EC%83%9D%E2%80%99%20%EC%84%A0%EB%B0%9C%20%EC%A7%80%EC%9B%90%EC%84%9C_2026_2.hwp"
-    }
-   ],
-   "deadlineHint": "신청기간: 2026. 10. 1.( 목 )~ 2.( 금 ) 17:00 까지 4. 지원자격: 학자금지원구간 3분위 이하(2026년 2학기 기준)로",
-   "school": "강원대학교",
-   "campus": "",
-   "foundAt": "2026-09-30"
-  },
-  {
-   "title": "(재)춘천인재육성장학재단 2026년 하반기 봄내장학생 선발 안내",
-   "url": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2501&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
-   "attachments": [
-    {
-     "name": "2026년 하반기 봄내장학생 선발 공고(게시용-QR).hwp chevron_forward",
-     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20260917061648314.hwp&path=/bbs/34&fn=2026%EB%85%84%20%ED%95%98%EB%B0%98%EA%B8%B0%20%EB%B4%84%EB%82%B4%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EA%B3%B5%EA%B3%A0(%EA%B2%8C%EC%8B%9C%EC%9A%A9-QR).hwp"
-    },
-    {
-     "name": "자주 묻는 질문(26년 하반기)_봄내장학금.hwp chevron_forward",
-     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20260917061648375.hwp&path=/bbs/34&fn=%EC%9E%90%EC%A3%BC%20%EB%AC%BB%EB%8A%94%20%EC%A7%88%EB%AC%B8(26%EB%85%84%20%ED%95%98%EB%B0%98%EA%B8%B0)_%EB%B4%84%EB%82%B4%EC%9E%A5%ED%95%99%EA%B8%88.hwp"
-    }
-   ],
-   "deadlineHint": "접수기간: 2026. 9. 28.( 월 ) ~ 10. 7.( 수 ) ※ 이번학기(26년 2학기) 등록금 자부담금 없는 경우(전액 면제자) 신청불",
-   "school": "강원대학교",
-   "campus": "",
-   "foundAt": "2026-09-30"
-  },
-  {
-   "title": "2026학년도 1학기 주거안정장학금 지급요청서(8월분) 신청 안내",
-   "url": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2499&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
-   "attachments": [
-    {
-     "name": "장학생 지급요청서 작성 매뉴얼.pdf chevron_forward",
-     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20260911054129076.pdf&path=/bbs/34&fn=%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%A7%80%EA%B8%89%EC%9A%94%EC%B2%AD%EC%84%9C%20%EC%9E%91%EC%84%B1%20%EB%A7%A4%EB%89%B4%EC%96%BC.pdf"
-    }
-   ],
-   "deadlineHint": null,
-   "school": "강원대학교",
-   "campus": "",
-   "foundAt": "2026-09-30"
-  },
-  {
-   "title": "[삼척] 2026학년도 2학기 동시재학 장학금 신청 안내",
-   "url": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2498&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
-   "attachments": [
-    {
-     "name": "0.2026-2학기 동시재학 장학금 신청 안내문.pdf chevron_forward",
-     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20260911011504545.pdf&path=/bbs/34&fn=0.2026-2%ED%95%99%EA%B8%B0%20%EB%8F%99%EC%8B%9C%EC%9E%AC%ED%95%99%20%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4%EB%AC%B8.pdf"
-    }
-   ],
-   "deadlineHint": "신청기한 : 2026. 9. 23.(수)까지 4. 장학금 성격 : 등록금 보조성(등록금성 장학 간 중복지원 불가 ), 이미 타 장학금으로 해당",
-   "school": "강원대학교",
-   "campus": "",
-   "foundAt": "2026-09-30"
-  },
-  {
-   "title": "2026년 고속도로 장학생 선발 안내",
-   "url": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2497&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
-   "attachments": [
-    {
-     "name": "2026년 고속도로 장학생 선발 안내문.pdf chevron_forward",
-     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20260911011439199.pdf&path=/bbs/34&fn=2026%EB%85%84%20%EA%B3%A0%EC%86%8D%EB%8F%84%EB%A1%9C%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4%EB%AC%B8.pdf"
-    }
-   ],
-   "deadlineHint": null,
-   "school": "강원대학교",
-   "campus": "",
-   "foundAt": "2026-09-30"
+   "foundAt": "2026-10-01"
   }
  ]
 }

@@ -1,7 +1,21 @@
 {
  "school": "이화여자대학교",
- "updatedAt": "2026-09-30",
+ "updatedAt": "2026-10-01",
  "items": [
+  {
+   "title": "[학부] [대전청년내일재단] 2026년 하반기 인재육성 성취(대) 장학생 선발 안내(기간 연장)",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367194&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "2026년 성취(대) 장학생 선발계획 연장 공고.hwpx",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367194&attachNo=353349"
+    }
+   ],
+   "deadlineHint": "신청기간 2026.10.01 ~ 2026.10.08 조회 6 2026년 성취(대) 장학생 선발계획 연장 공고.hwpx [대전청년내일재단] 202",
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
   {
    "title": "[학부] (재)춘천인재육성장학재단 2026년 하반기 봄내장학생 선발 안내",
    "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367133&article.offset=0&articleLimit=10",
