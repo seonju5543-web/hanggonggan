@@ -1,8 +1,40 @@
 {
  "note": "학교별 실시간 공고 파일 색인. 앱은 noticeFileKey 로 자기 파일을 바로 찾아가고, 그 파일이 없을 때 옛 data/notices.json 을 받을지 말지를 이 색인으로 판단한다(match-engine.js noticeFallbackNeeded). 사람이 어느 파일이 어느 학교인지 보는 데도 쓴다.",
  "updatedAt": "2026-10-01",
- "schools": 32,
+ "schools": 33,
  "files": {
+  "건국대학교": {
+   "file": "nmpm6i7.json",
+   "count": 1
+  },
+  "서울교육대학교": {
+   "file": "n18ebv4b.json",
+   "count": 11
+  },
+  "경희대학교": {
+   "file": "n1w4hprp.json",
+   "count": 2
+  },
+  "중앙대학교": {
+   "file": "n1iz3lr8.json",
+   "count": 16
+  },
+  "가천대학교": {
+   "file": "nzzc8bm.json",
+   "count": 15
+  },
+  "동국대학교": {
+   "file": "n1or8oiw.json",
+   "count": 15
+  },
+  "상명대학교": {
+   "file": "n1ozjjw8.json",
+   "count": 4
+  },
+  "고려대학교": {
+   "file": "n1lw6ycq.json",
+   "count": 9
+  },
   "한국외국어대학교": {
    "file": "n19cz03g.json",
    "count": 3
@@ -14,10 +46,6 @@
   "성균관대학교": {
    "file": "n1x6ubj9.json",
    "count": 3
-  },
-  "가천대학교": {
-   "file": "nzzc8bm.json",
-   "count": 14
   },
   "국민대학교": {
    "file": "n1tasrsl.json",
@@ -43,17 +71,9 @@
    "file": "nlzhvsh.json",
    "count": 3
   },
-  "경희대학교": {
-   "file": "n1w4hprp.json",
-   "count": 1
-  },
   "서울시립대학교": {
    "file": "n1au199v.json",
    "count": 2
-  },
-  "중앙대학교": {
-   "file": "n1iz3lr8.json",
-   "count": 16
   },
   "이화여자대학교": {
    "file": "n1tk2q9m.json",
@@ -79,18 +99,6 @@
    "file": "ncuyr4z.json",
    "count": 2
   },
-  "상명대학교": {
-   "file": "n1ozjjw8.json",
-   "count": 3
-  },
-  "서울교육대학교": {
-   "file": "n18ebv4b.json",
-   "count": 10
-  },
-  "고려대학교": {
-   "file": "n1lw6ycq.json",
-   "count": 6
-  },
   "조선대학교": {
    "file": "n1qr99q6.json",
    "count": 1
@@ -102,10 +110,6 @@
   "부산대학교": {
    "file": "n13zozby.json",
    "count": 3
-  },
-  "동국대학교": {
-   "file": "n1or8oiw.json",
-   "count": 13
   },
   "계명대학교": {
    "file": "n1nel147.json",

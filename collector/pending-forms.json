@@ -997,6 +997,22 @@
    "added": "2026-10-01",
    "fetched": true,
    "schematized": false
+  },
+  {
+   "id": "auto-7986subviewdonttid125837",
+   "name": "[장학공지] (생활비)2026년 hy사회복지재단 든든 학업지원금 선발 공고",
+   "target": "(생활비)2026년 hy사회복지재단 든든 학업지원금 선",
+   "added": "2026-10-01",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-enoticedoarticleno769228",
+   "name": "2026년 우양재단 동행장학생 모집 안내",
+   "target": "2026년 우양재단 동행장학생 모집 안내",
+   "added": "2026-10-01",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }
