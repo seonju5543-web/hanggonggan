@@ -7760,9 +7760,11 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
     /* 🔴 2026-10-01 CTO 결정(시안 I4)으로 금액 아래에 한 줄(#hero-sub)이 다시 생겼다 — 그래서
        금액 자신의 아래 여백은 다시 좁아지고, 간격은 그 줄과 그림 칸이 만든다. 지키는 것은 같다:
        금액과 버튼이 붙지 않는다. */
-    eq('  금액 바로 아래에 한 줄(#hero-sub)과 그림 칸(#hero-tiles)이 있다 — 금액과 버튼이 붙지 않는다',
+    /* 차례: 금액 → 한 줄 → 버튼 → 그림 칸 (버튼을 그림 위로 — 2026-10-01 CTO 지시) */
+    eq('  금액 아래 한 줄(#hero-sub) → 버튼 → 그림 칸(#hero-tiles) 차례다 — 금액과 버튼이 붙지 않는다',
       /id="hero-sub"/.test(h2) && /id="hero-tiles"/.test(h2)
-      && h2.indexOf('id="hero-tiles"') < h2.indexOf('id="btn-apply-all"'), true);
+      && h2.indexOf('id="hero-sub"') < h2.indexOf('id="btn-apply-all"')
+      && h2.indexOf('id="btn-apply-all"') < h2.indexOf('id="hero-tiles"'), true);
     eq('  .hero-tiles 가 세로 여백을 갖는다 (파일 끝 블록에서)',
       /\.hero-tiles \{[^}]*margin: var\(--sp-3\)/.test(tail), true);
     eq('  그림 칸 위아래에 구분선이 없다 (2026-10-01 CTO 지시)',

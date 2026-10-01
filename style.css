@@ -4827,7 +4827,7 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 .hero-tiles {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  margin: var(--sp-3) 0 var(--sp-3);
+  margin: var(--sp-3) 0 var(--sp-2);
   /* 위아래 구분선 없음 (2026-10-01 CTO 지시) — 칸 사이는 여백만으로 가른다 */
 }
 .hero-tile {
@@ -4848,38 +4848,38 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 .hero-tile:active .hero-ico { transform: scale(0.94); }
 .hero-ico {
   position: relative;
-  width: 52px;
-  height: 52px;
+  width: 42px;
+  height: 42px;
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
   transition: transform 0.12s ease;
 }
-.hero-ico svg { width: 30px; height: 30px; }
+.hero-ico svg { width: 24px; height: 24px; }
 .hero-ico.red   { background: var(--red-weak); }
 .hero-ico.green { background: var(--green-weak); }
 .hero-ico.navy  { background: var(--surface-2); }
 .hero-ico.gold  { background: var(--accent-soft); }
 .hero-badge {
   position: absolute;
-  top: -6px;
-  right: -8px;
-  min-width: 22px;
-  height: 22px;
+  top: -5px;
+  right: -7px;
+  min-width: 20px;
+  height: 20px;
   padding: 0 var(--sp-1);
   border-radius: var(--radius-pill);
   background: var(--red);
   color: #fff;
   font-size: var(--t-2xs);
   font-weight: 800;
-  line-height: 18px;
+  line-height: 16px;
   text-align: center;
   border: 2px solid var(--bg);
   font-variant-numeric: tabular-nums;
 }
 .hero-badge.zero { background: var(--text-weak); }
-.hero-card #btn-apply-all { width: 100%; }
+.hero-card #btn-apply-all { width: 100%; margin-top: var(--sp-3); }   /* 버튼이 그림 칸 위로 (2026-10-01 CTO) */
 
 /* 처지 예/아니요 — 프로필에 칸이 없던 개인 사정 (2026-09-18 · 노션 AI-1) */
 .elig-ask-yn { align-items: flex-start; flex-wrap: wrap; gap: var(--space-8); }
