@@ -446,20 +446,28 @@ input::placeholder { color: var(--text-weak); }
 .home-greet { font-size: var(--t-xl); font-weight: 800; letter-spacing: -0.02em; }
 .home-school { font-size: var(--t-sm); color: var(--text-weak); font-weight: 500; }
 
-/* 🔴 히어로 장식을 걷었다 (2026-09-30 개발자 지시 "이 부분만 수정" · 후보 A).
-   전에는 남색 판 위에 **주황 빛 두 겹 + 오른쪽 위 큰 원(::after)** 이 얹혀 있었다 — 금융 앱의
-   자산 요약(미니스탁·네이버페이·코빗 · 유아이볼 실측)은 숫자 하나에 장식이 없다. 남는 것은
-   --grad-navy 의 은은한 빛 하나(이 앱의 유일한 그라데이션)와 요소 셋(건수·금액·버튼)이다.
-   금액 밑 얇은 선은 '숫자'와 '동작'을 가르는 유일한 구분이다(그림자 금지 · ui-tone FLAT).
-   후보 B·C 는 docs/designs/mockups/hero-variants.html 에만 있다. */
 .hero-card {
   position: relative;
   overflow: hidden;
-  background: var(--grad-navy);
+  background:
+    radial-gradient(120% 140% at 85% -20%, rgba(184, 145, 47, 0.55) 0%, rgba(184, 145, 47, 0) 55%),
+    radial-gradient(90% 90% at -10% 110%, rgba(138, 106, 31, 0.35) 0%, rgba(138, 106, 31, 0) 60%),
+    var(--grad-navy);
   border-radius: var(--radius-lg);
-  padding: var(--space-24) var(--space-24) var(--space-20);
+  padding: 28px 24px 24px;
   color: #fff;
-  margin-bottom: var(--space-32);
+  margin-bottom: 30px;
+}
+.hero-card::after {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -18%;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  pointer-events: none;
 }
 .hero-label {
   font-size: var(--t-sm);
@@ -471,9 +479,7 @@ input::placeholder { color: var(--text-weak); }
   font-size: var(--t-hero);
   font-weight: 800;
   letter-spacing: -0.03em;
-  margin: var(--space-6) 0 var(--space-2);
-  padding-bottom: var(--space-16);
-  border-bottom: 1px solid rgba(232, 239, 254, 0.14);
+  margin: 6px 0 2px;
   font-variant-numeric: tabular-nums;
 }
 
