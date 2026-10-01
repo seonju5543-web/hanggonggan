@@ -2000,6 +2000,30 @@
    "cards": 5,
    "dir": "insta/pub/2700582004",
    "at": "2026-10-01"
+  },
+  {
+   "status": "prepared",
+   "code": "2000206004",
+   "org": "강원도 영월군청",
+   "name": "석탄산업전환지역저소득층장학금",
+   "due": "2026-11-06",
+   "school": null,
+   "tplNo": 2,
+   "cards": 5,
+   "dir": "insta/pub/2000206004",
+   "at": "2026-10-01"
+  },
+  {
+   "status": "prepared",
+   "code": "0568003",
+   "org": "광주남구장학회",
+   "name": "특별장학생",
+   "due": "2026-10-02",
+   "school": null,
+   "tplNo": 1,
+   "cards": 5,
+   "dir": "insta/pub/0568003",
+   "at": "2026-10-01"
   }
  ]
 }
