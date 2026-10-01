@@ -1,58 +1,46 @@
-## 🗞 교내 소식 게시판 찾기 (2026-10-01) — 게시판 아는 학교 24/44
+## 🗞 교내 소식 게시판 찾기 (2026-10-01) — 게시판 아는 학교 33/44
 
-### ✅ 이번에 찾은 게시판 24곳
-- **한국외국어대학교** → https://www.hufs.ac.kr/hufs/11281/subview.do (공지사항 · 검색 후보 · 글 10행 · 예: 「2026학년도 서울캠퍼스 재학생 대상 법정의무교육 이수 안내」 「2027학년도 전기 글로벌미디어커뮤니케이션대학원 신입생 모집(특별/일반)」 「(서울) 2026년도 후반기 학생예비군 기본 2차훈련(안내)」)
+### ✅ 이번에 찾은 게시판 33곳
+- **한국외국어대학교** → https://www.hufs.ac.kr/hufs/11281/subview.do (공지사항 · 검색 후보 · 글 11행 · 예: 「[글로벌] 보건실 - 10월 심폐소생술 교육일정 안내(2026.10.8(목)10시 - 백년관 207호 강의실)」 「2026학년도 서울캠퍼스 재학생 대상 법정의무교육 이수 안내」 「2027학년도 전기 글로벌미디어커뮤니케이션대학원 신입생 모집(특별/일반)」)
+- **서울대학교** → https://www.snu.ac.kr/snunow/notice/genernal (일반공지 · 검색 후보 · 글 5행 · 예: 「2027년 서울대 대학원생 전기 SSBT 장학생 모집(~ 2026.09.27.) 첨부파일 있음」 「서울대학교 「최고경영자과정 AMP USA」 2027년 1월 개강 잠정 보류」 「2026학년도 2학기 등록금 납부 안내 첨부파일 있음」)
+- **연세대학교** → https://www.yonsei.ac.kr/bbs/sc/58/artclList.do (공지사항 · 검색 후보 · 글 14행 · 예: 「일반공지 10/2(금) 교외장학재단 제출용 총장 직인 날인 불가 안내 신촌/국제」 「일반공지 2026학년도 2학기 학부 수강과목 철회 안내 신촌/국제」 「일반공지 2026-2학기 졸업앨범 촬영 일정 안내 신촌/국제」)
+- **연세대학교 미래캠퍼스** → https://www.yonsei.ac.kr/bbs/wj/104/artclList.do (공지사항 · 검색 후보 · 글 24행 · 예: 「일반공지 2026년도 후반기 육군 학군사관 후보생 67,68기 모집안내 신촌/국제」 「일반공지 2027학년도 1학기 재입학(일반, 특별) 전형 요강(미래캠퍼스) 신촌/국제」 「일반공지 2026학년도 2학기 학부 수강과목 철회 안내 신촌/국제」)
 - **고려대학교 세종캠퍼스** → https://sejong.korea.ac.kr/koreaSejong/7913/subview.do (일반공지 · 검색 후보 · 글 5행 · 예: 「[공지] 고려대학교 세종캠퍼스 구매 담당자 사칭 피싱(사기) 피해 주의 안내」 「[세종] 휘트니스센터 10월 종일 회원권 2차 온라인 접수 안내」 「2026학년도 2학기 학생 셔틀버스 운행 시간 변경 안내」)
-- **성균관대학교** → https://www.skku.edu/skku/campus/skk_comm/notice01.do (공지사항 · 검색 후보 · 글 34행 · 예: 「법학전문대학원 행정조교 모집 안내(~10.14.(수)/접수 연장)」 「[관리팀(인사캠)] 혜화셔틀버스, 종로07/08 마을버스 이용자 설문조사」 「[성균관대학교 청정에너지ICT연구소] 이공계열 박사 후 연구원 모집(2명 이상)」)
+- **성균관대학교** → https://www.skku.edu/skku/campus/skk_comm/notice01.do (공지사항 · 검색 후보 · 글 35행 · 예: 「법학전문대학원 행정조교 모집 안내(~10.14.(수)/접수 연장)」 「[관리팀(인사캠)] 혜화셔틀버스, 종로07/08 마을버스 이용자 설문조사」 「[성균관대학교 청정에너지ICT연구소] 이공계열 박사 후 연구원 모집(2명 이상)」)
 - **한양대학교** → https://www.hanyang.ac.kr/web/www/notice_all (공지사항 · 검색 후보 · 글 20행 · 예: 「[기술경영전문대학원] 2027학년도 일반전형 입학설명회 안내」 「2026년 교원창업포럼 개최 안내(10. 20.(화) 14:30 ~ 18:30)」 「[현장실습지원센터]2026학년도 현장실습 참여후기 공모전 안내」)
-- **건국대학교** → https://www.konkuk.ac.kr/konkuk/2238/subview.do (학사공지 · 검색 후보 · 글 20행 · 예: 「2026-2 기초교양 이수의무 면제 신청 안내(9.14.~10.11.)」 「전공 이수구분 신설에 따른 이수원칙(학점 취득 인정) 안내」 「졸업요건 관리를 위한 필수확인 사항 안내(2024학년도 재공지)」)
+- **건국대학교** → https://www.konkuk.ac.kr/konkuk/2238/subview.do (학사공지 · 검색 후보 · 글 20행 · 예: 「2026년도 제140회 학위수여식 관련 졸업가능여부 조회 및 행사, 학위복 대여 안내」 「2026-2 기초교양 이수의무 면제 신청 안내(9.14.~10.11.)」 「전공 이수구분 신설에 따른 이수원칙(학점 취득 인정) 안내」)
 - **홍익대학교** → https://www.hongik.ac.kr/kr/education/notice-undergrad.do?mode=list (학사공지 · 검색 후보 · 글 8행 · 예: 「2026학년도 2학기 강의중간평가 시행 안내」 「[세종캠퍼스] 2026-2학기 세종캠퍼스 졸업사진 촬영 안내」 「[세종앵커사업단] 세종한두리캠퍼스 브랜드 디자인 공모전 참가자 모집」)
 - **숙명여자대학교** → https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=list (공지사항 · 검색 후보 · 글 11행 · 예: 「[졸업] 2026-2 (2027년 2월) 주요 졸업 일정 안내(8학기 이상 재학생 필독)」 「2027학년도 전기 일반대학원 신·편입생 모집 안내」 「[학부] 2026-2 중간시험 시행 안내」)
-- **광운대학교** → https://www.kw.ac.kr/ko/life/notice.jsp (공지사항 · 검색 후보 · 글 53행 · 예: 「[일반] [HUSS-글로벌공생] 글로벌지속가능융합학과 2026 전공설명회 신청 안내」 「[일반] [HUSS-글로벌공생] 2026 인문사회 학생을 위한 AI 인사이트 특강 안내」 「[일반] [HUSS-글로벌공생] 2026학년도 「HUSS 인문사회 취업 페스티벌」 안내」)
-- **명지대학교** → https://www.mju.ac.kr/mjukr/255/subview.do (일반공지 · 검색 후보 · 글 22행 · 예: 「[ 일반공지 ] 2026학년도 2학기 자연캠퍼스 학기 중 통학·셔틀버스 운행 안내」 「[ 일반공지 ] [보건의료센터] 교내 자동심장충격기(AED) 위치 안내」 「[아너칼리지인문교학팀] 2026-2학기 교육조교 1종 모집 공고」)
-- **상명대학교** → https://www.smu.ac.kr/webzine/today.do (상명 새소식 더보기 · 홈 메뉴 · 글 5행 · 예: 「카자흐스탄 카즈가사대학교 총장단과 간담회 진행... 글로벌 문화콘텐츠 교류협력 논의」 「상명대 지능형로봇사업단 학부생팀 강남로봇플러스 페스티벌 조종 부문 최우수상」 「상명대, 천안시에 ‘AI 기반 친환경 식품 포장재 푸드테크 연구지원센터’ 제안」)
-- **아주대학교** → https://www.ajou.ac.kr/kr/ajou/notice.do (공지사항 · 검색 후보 · 글 12행 · 예: 「[공지] [학군단]26년도 후반기 학군사관 ROTC 후보생 67,68기 모집안내(8.31~10.13)」 「[공지] [학부/학사과정] ★필독★ 출석(전자출결, 공결, 취업계 등) 관련 안내」 「[공지] [학사] 2026-2학기 휴학/복학 신청 안내 (07.28. 수정)」)
-- **숭실대학교** → https://scatch.ssu.ac.kr/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/ (공지사항 · 검색 후보 · 글 14행 · 예: 「장학 hy사회복지재단 「2026년 든든 학업지원금」선발 안내(~10.8.목 17시)」 「장학 2026년 우양재단 동행 장학생 모집 안내(~10.18.일)」 「국제교류 [겨울 단기] 미국 Temple University American Culture at Temple (ACT) Winter 2027 참가자 모집 안내」)
+- **광운대학교** → https://www.kw.ac.kr/ko/life/notice.jsp (공지사항 · 검색 후보 · 글 53행 · 예: 「[국제학생] 2027학년도 전기 대학원 외국인 학생 모집 안내 / 2027 Spring Graduate Admission Guide for International Students」 「[일반] [HUSS-글로벌공생] 글로벌지속가능융합학과 2026 전공설명회 신청 안내」 「[일반] [HUSS-글로벌공생] 2026 인문사회 학생을 위한 AI 인사이트 특강 안내」)
+- **명지대학교** → https://www.mju.ac.kr/mjukr/255/subview.do (일반공지 · 검색 후보 · 글 22행 · 예: 「[대학교육혁신원] 2026학년도 2학기 제1기 학생 서포터즈 「MJ IN:US(이너스)」 최종 합격자 안내」 「[ 일반공지 ] 2026학년도 2학기 자연캠퍼스 학기 중 통학·셔틀버스 운행 안내」 「[ 일반공지 ] [보건의료센터] 교내 자동심장충격기(AED) 위치 안내」)
+- **상명대학교** → https://www.smu.ac.kr/webzine/today.do (상명 새소식 더보기 · 홈 메뉴 · 글 10행 · 예: 「우리 대학서 ‘파키스탄 영양 정책 관리자 초청 연수’ 개최... 서울시 식생활종합지원센터 운영 사례 소개」 「경영대학원 피트니스 MBA, 중국 차이나핏 대표단과 간담회 시행」 「「2026 천안 유니브시티 페스티벌」 참여… 대학생 주도 문화예술 콘텐츠 선보여」)
+- **가천대학교** → https://www.gachon.ac.kr/kor/3104/subview.do (학사공지 · 검색 후보 · 글 11행 · 예: 「2026-2학기 재학중 취업자 출석인정(취업계) 관련서류 제출 안내」 「2026학년도 동계 계절학기 예비수강신청 및 일정 안내」 「2026-2학기 휴학 및 휴학연장 안내」)
+- **아주대학교** → https://www.ajou.ac.kr/kr/ajou/notice.do (공지사항 · 검색 후보 · 글 15행 · 예: 「[공지] [학부] 어학졸업인증(2027년 2월 졸업)을 위한 공인어학 성적 등록 및 제출 안내 (~2027.1.22)」 「[공지] [학군단]26년도 후반기 학군사관 ROTC 후보생 67,68기 모집안내(8.31~10.13)」 「[공지] [학부/학사과정] ★필독★ 출석(전자출결, 공결, 취업계 등) 관련 안내」)
+- **국민대학교** → https://www.kookmin.ac.kr/user/kmuNews/notice/4/index.do (학사공지 · 검색 후보 · 글 16행 · 예: 「[현장실습지원센터] 2026학년도 동계 한국항공우주산업(KAI) 현장실습 기계공학부 학생 모집(~10/15) 2026.10.01 현장실습지원센터 장지수」 「2026학년도 2학기 학부 중간시험 보조감독 모집 2026.09.23 교무팀 김선아」 「[교수학습개발센터] 기초학습(수학,물리,화학,생명) 역량 강화 동영상 특강 안내 2026.09.10 교수학습개발센터 강현주」)
+- **숭실대학교** → https://scatch.ssu.ac.kr/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/ (공지사항 · 검색 후보 · 글 15행 · 예: 「장학 hy사회복지재단 「2026년 든든 학업지원금」선발 안내(~10.8.목 17시)」 「장학 2026년 우양재단 동행 장학생 모집 안내(~10.18.일)」 「국제교류 [겨울 단기] 미국 Temple University American Culture at Temple (ACT) Winter 2027 참가자 모집 안내」)
 - **세종대학교** → https://www.sejong.ac.kr/kor/intro/notice1.do?mode=list (일반공지 · 검색 후보 · 글 16행 · 예: 「학술정보원 이용자 만족도 조사」 「세종대학교 애지헌복합관 신축공사 안내」 「2027-1학기 교수초빙(9월공고_정년제 전임교원) 안내」)
 - **이화여자대학교** → https://www.ewha.ac.kr/ewha/news/notice.do (공지사항 · 검색 후보 · 글 17행 · 예: 「[학부] 2026학년도 제2학기 영어 및 정보인증제 신청 안내」 「[학부] 2027학년도 제1학기 학부 재입학, 학부 졸업논문등제출자격재부여 신청안내」 「2027학년도 전기 일반대학원 입학전형 원서접수 안내」)
-- **부산대학교** → https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095 (공지사항 · 검색 후보 · 글 20행 · 예: 「[종합교원양성센터] 제3회 AI·디지털 융합 교육 콘텐츠 개발 경진대회 개최 안내」 「2027학년도 전기 데이터사이언스전문대학원 신입생 모집」 「(+신청기간연장)[기술사업부] 2026년 도전! 지식재산권(IP) 골든벨 참가자...」)
+- **부산대학교** → https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095 (공지사항 · 검색 후보 · 글 20행 · 예: 「(+신청기간연장)[기술사업부] 2026년 도전! 지식재산권(IP) 골든벨 참가자...」 「[종합교원양성센터] 제3회 AI·디지털 융합 교육 콘텐츠 개발 경진대회 개최 안내」 「2027학년도 전기 데이터사이언스전문대학원 신입생 모집」)
 - **가톨릭대학교** → https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=list (공지사항 · 검색 후보 · 글 13행 · 예: 「[학부대학운영팀] 제18차 사랑의 연탄나눔 봉사자 모집 안내」 「[교수학습개발원] 2026학년도 AI활용 세미나 4차 ‘에이전틱 AI시대, 대학 교수 업무 방식 패러다임 변화’ 신청 안내」 「[대외협력팀] 발전기금 홍보대사 <가대사랑> 16기 모집(~10/5(월)까지 연장)」)
-- **서울과학기술대학교** → https://www.seoultech.ac.kr/service/info/notice/ (공지사항 · 검색 후보 · 글 17행 · 예: 「AICOSS-UNLV 글로벌 단기 파견 프로그램 참가자 모집 연장 공고(자격요건 변경)」 「2026년 산학연협력 EXPO 개최 안내」 「[홍보실]2026학년도 2학기 학생 홍보대사(영상·디자인) 최종 합격자 알림」)
-- **경북대학교** → https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/list.action?bbs_cde=29&menu_idx=191 (교육수요자만족도 · 홈 메뉴 · 글 10행 · 예: 「2025학년도 산업체 만족도조사 결과」 「2025학년도 생활관 만족도조사 결과」 「2025학년도 도서관 이용자 만족도조사 결과」)
+- **한국항공대학교** → https://kau.ac.kr/kaulife/notice.php (일반공지 · 검색 후보 · 글 20행 · 예: 「[학생지원팀] 2026학년도 2학기 KAU 사회봉사단 선발 결과 안내 학생지원팀 2026-10-01 40」 「2027학년도 1학기 미국 UNLV 해외연구실습 (SURE) 파견 학생 선발 안내 국제교류처 2026-10-01 60」 「​대학 캠퍼스 방송 촬영 안내 총무팀 2026-09-30 128」)
+- **경기대학교** → https://www.kyonggi.ac.kr/www/selectBbsNttList.do?key=7520&bbsNo=1073 (공지사항 · 검색 후보 · 글 10행 · 예: 「[일반] [경기대 인재개발처 재맞고] 서울캠퍼스 공기업 NCS·대기업 직무적성검사 과정 홍보」 「[입학에서 취업까지] [정치외교학전공] 몽골 관광인력 역량강화 프로젝트 봉사단 9기 모집」 「[입학에서 취업까지] (수학과) 2026학년도 사회봉사 장학금 신청 안내」)
+- **서울과학기술대학교** → https://www.seoultech.ac.kr/service/info/notice/ (공지사항 · 검색 후보 · 글 20행 · 예: 「[국제교류처] 2026학년도 제4회 모의 TOEIC Speaking, OPIc 시험접수 안내(2026. 10. 24. 시행)」 「[국제교류처] 2026학년도 제7회 모의 TOEIC 시험접수 안내(2026. 10. 24. 시행)」 「[국제교류처] 2026학년도 제10회 SeoulTech 한국어말하기대회 개최 안내(참가 신청자 모집, ~2026.10.14.)」)
+- **한국방송통신대학교** → https://www.knou.ac.kr/bbs/knou/51/artclList.do (공지사항 · 검색 후보 · 글 13행 · 예: 「[일반] [국립대학 육성사업] 3주만에 끝내는 AI 취업 치트키 특강」 「[전공] 2027학년도 1학기 생활과학부 전공분리 승인 안내」 「[시험성적] 2026학년도 2학기 출석수업대체과제물 시행공고」)
+- **경북대학교** → https://www.knu.ac.kr/wbbs/wbbs/main/main.action (정부재정지원사업 · 홈 메뉴 · 글 5행 · 예: 「포토뉴스 대현119안전센터와 교내 어린이집에서 합동소방훈련 실시 경북대는 9월 30일 교내 어린이집에서 교직원과 원아, 대현119안전센터 소방관 등 300여명이 참여한 가운데 2026년도 합동소방훈련을 실시했다. 2026-10-01」 「포토뉴스 수의과대학 김규태 교수, 제자 위해 발전기금 1천만원 전달 수의과대학 김규태 교수가 제자들을 위해 써달라며 발전기금 1천만원을 경북대에 전달했다. 2026-10-01」 「포토뉴스 교육부 글로컬랩 2개 연구소 선정… 9년간 총 사업비 377억원 확보 교육부와 한국연구재단이 추진하는 ‘글로컬랩(거점형) 사업’에 지능형건설자동화연구센터와 세포·기질연구소가 각각 최종 선정됐다. 2026-09-29」)
 - **영남대학교** → https://www.yu.ac.kr/main/bachelor/bachelor-guide.do (학사공지 · 검색 후보 · 글 9행 · 예: 「9 2026학년도 2학기 중간시험 실시 및 부정행위자 처리 기준 안내」 「8 2026학년도 2학기 교양, 교직, 일반선택 중간시험 시간표 안내(주간, 야간)」 「7 2026학년도 전기(27년2월) 조기졸업 신청 안내」)
 - **충남대학교** → https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0701&site_dvs_cd=kr&menu_dvs_cd=0701 (공지사항 · 검색 후보 · 글 9행 · 예: 「대표홈페이지 일부 게시판 폐쇄 안내(대학문화마당, CNU장터, 구인구직, 분실물 광장, 스터디 및 공모전)」 「[RISE] 2026 All-set 기업지원 사업 시행 공고」 「2026학년도 2학기 학생생활관 보결 3차 모집 안내」)
 - **전남대학교** → https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5 (공지사항 · 검색 후보 · 글 20행 · 예: 「[학사안내] 2026학년도 제2학기 최종 등록 공고」 「[학사안내] 2026학년도 2학기 교과구분 정정 실시 안내」 「[공모전] 『2026 English Essay Contest』개최 안내」)
 - **조선대학교** → https://www3.chosun.ac.kr/chosun/217/subview.do (일반공지 · 검색 후보 · 글 14행 · 예: 「[G-LAMP사업단] 2026 하반기 블루밍 라운지(Blooming Rounge) 참여교원 모집공고」 「[G-LAMP사업단] 2026 LAMP 전임교원 선발공고」 「YBM 한국토익위원회 주관 본교 특별 TOEIC 시험 실시 안내(10. 24.(토))」)
+- **충북대학교** → https://www.cbnu.ac.kr/www/selectBbsNttList.do?bbsNo=8&key=813 (공지사항 · 검색 후보 · 글 9행 · 예: 「2027학년도 전기 대학원(일반대학원) 신입생 모집요강 공지(안내)」 「충북대학교 학칙 일부개정학칙(안) 행정예고 및 의견수렴」 「2026년도 하반기 하나트래블로그 국제학생증 ISIC 체크카드 무료 발급 행사 안내」)
 - **부경대학교** → https://www.pknu.ac.kr/main/163 (공지사항 · 검색 후보 · 글 20행 · 예: 「2026학년도 동계 계절수업 개설 희망과목 수요조사 안내」 「노션 × AI를 활용한 실전 특강 안내(11/4~11/6 13시~17시)」 「10월 심리검사 일정(2026, 학생상담센터)」)
-- **강원대학교** → https://www.kangwon.ac.kr/ko/bbs/504/list.do (공지사항 · 검색 후보 · 글 53행 · 예: 「2026학년도 2학기 「현장체험 프로젝트 패키지(PREX)」 참여 팀 모집 공고」 「학생 무료 건강검진 안내」 「2026년 학생예비군 11.3. 기본훈련(3차) 안내」)
+- **강원대학교** → https://www.kangwon.ac.kr/ko/bbs/504/list.do (공지사항 · 검색 후보 · 글 54행 · 예: 「2026학년도 2학기 「현장체험 프로젝트 패키지(PREX)」 참여 팀 모집 공고」 「학생 무료 건강검진 안내」 「2026년 학생예비군 11.3. 기본훈련(3차) 안내」)
 
-### 🙋 개발자에게 출처를 요청할 학교 20곳 — 후보와 홈 메뉴를 다 열어 봤지만 날짜가 붙은 공지 글 줄(5행 이상)을 못 찾았습니다
+### 🙋 개발자에게 출처를 요청할 학교 11곳 — 후보와 홈 메뉴를 다 열어 봤지만 날짜가 붙은 공지 글 줄(5행 이상)을 못 찾았습니다
 - **경희대학교**
   - https://www.khu.ac.kr/kor/notice/list.do?page=1&condition=all&category=GENERAL — HTTP 404
   - https://www.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200316 — 열림 · 글처럼 보이는 행 0
     - 생김새: 122KB · 링크 295 · 스크립트 21 · 날짜 토큰 11 · 줄 블록 249(날짜 든 것 11) · 표본: 「<li> 통합민원」 「<tr> 공지 공통 [추천채용] [INVENI] 대표이사 비서 정규직 추천채용 미래인재센터(서울) 2026-10-01 14」 · 날짜 앞 링크: `<a href="http://nominate.khu.ac.kr/" target="_blank" >`
   - https://www.khu.ac.kr/kor/main/index.do — HTTP 404
-- **서울대학교**
-  - https://www.snu.ac.kr/snunow/notice/genernal — 열림 · 글처럼 보이는 행 4
-    - 생김새: 96KB · 링크 378 · 스크립트 16 · 날짜 토큰 14 · 줄 블록 272(날짜 든 것 6) · 표본: 「<tr> 2027년 서울대 대학원생 전기 SSBT 장학생 모집(~ 2026.09.27.) 첨부파일 있음 2026. 8. 28.」 「<tr> 서울대학교 「최고경영자과정 AMP USA」 2027년 1월 개강 잠정 보류 2026. 8. 20.」 · 날짜 앞 링크: `<a href="/snunow/notice/genernal?md=v&bbsidx=174722">` `<a href="/snunow/notice/genernal?md=v&bbsidx=174722">`
-  - https://www.snu.ac.kr/snunow/snu_story — 열림 · 글처럼 보이는 행 0
-    - 생김새: 103KB · 링크 401 · 스크립트 16 · 날짜 토큰 6 · 줄 블록 265(날짜 든 것 0)
-  - https://www.snu.ac.kr/snunow/snu_media/online-newsletter — 열림 · 글처럼 보이는 행 0
-    - 생김새: 108KB · 링크 417 · 스크립트 14 · 날짜 토큰 17 · 줄 블록 291(날짜 든 것 3) · 표본: 「<li> [2026 전공탐색주간] 135개 전공과 교육과정을 만나는 5일 2026.09.14. ~ 2026.09.18.」 「<li> 2026년 제1회 SNU 청렴주간 「우리가 만드는 청렴」 2026.09.14. ~ 2026.09.18.」 · 날짜 앞 링크: `<a href="https://now.snu.ac.kr/" target="_blank" title="새창으로 열림" rel="noopener noreferrer">` `<a href="https://www.snu.ac.kr/snunow/events?md=v&bbsidx=175490" title="새창으로 열림" target="_blank" rel="noopener noreferrer">`
-  - https://www.snu.ac.kr/snunow/events?md=v&bbsidx=174122 — 열림 · 글처럼 보이는 행 0
-    - 생김새: 101KB · 링크 370 · 스크립트 17 · 날짜 토큰 8 · 줄 블록 265(날짜 든 것 0) · 날짜 앞 링크: `<a href="/snunow/events?sc=y" class="tab-btn is-active" title="현재페이지">` `<a href="/snunow/events?sc=y" class="tab-btn is-active" title="현재페이지">`
-- **연세대학교**
-  - https://www.yonsei.ac.kr/sc/254/subview.do — 열림 · 글처럼 보이는 행 0
-    - 생김새: 97KB · 링크 268 · 스크립트 47 · 날짜 토큰 32 · 줄 블록 210(날짜 든 것 1) · 표본: 「<article> 공지사항 fnctId=bbs,fnctNo=58 분류 전체보기 학사 장학 모집 일반 RSS 2.0 총 8257 개의 게시물 게시물 검색 제목 작성자 담당부서 게시글 리스트 일반공지 10/2(금) 교외장학재단 제출용 총」
-  - https://www.yonsei.ac.kr/bbs/sc/58/artclList.do — 열림 · 글처럼 보이는 행 0
-    - 생김새: 38KB · 링크 35 · 스크립트 18 · 날짜 토큰 30 · 줄 블록 31(날짜 든 것 16) · 표본: 「<li> 일반공지 10/2(금) 교외장학재단 제출용 총장 직인 날인 불가 안내 신촌/국제 조회수 177 작성일 2026.09.30 학생지원팀」 「<li> 일반공지 2026학년도 2학기 학부 수강과목 철회 안내 신촌/국제 조회수 361 작성일 2026.09.28 교무처 학사지원팀」
-  - https://www.yonsei.ac.kr/sc/ — HTTP 404
-- **연세대학교 미래캠퍼스**
-  - https://www.yonsei.ac.kr/wj/1415/subview.do — 열림 · 글처럼 보이는 행 0
-    - 생김새: 109KB · 링크 236 · 스크립트 43 · 날짜 토큰 43 · 줄 블록 165(날짜 든 것 1) · 표본: 「<article> 공지사항 fnctId=bbs,fnctNo=104 분류 전체보기 학사 장학 모집 일반 RSS 2.0 총 6424 개의 게시물 게시물 검색 제목 작성자 담당부서 게시글 리스트 일반공지 2026년도 후반기 육군 학군사관 」
-  - https://www.yonsei.ac.kr/bbs/wj/104/artclList.do — 열림 · 글처럼 보이는 행 0
-    - 생김새: 57KB · 링크 48 · 스크립트 16 · 날짜 토큰 41 · 줄 블록 44(날짜 든 것 29) · 표본: 「<li> 일반공지 2026년도 후반기 육군 학군사관 후보생 67,68기 모집안내 신촌/국제 조회수 4 작성일 2026.10.01 미래학생군사교육단」 「<li> 일반공지 2027학년도 1학기 재입학(일반, 특별) 전형 요강(미래캠퍼스) 신촌/국제 조회수 45 작성일 2026.10.01 미래교무처 학사지원팀」
-  - https://www.yonsei.ac.kr/wj/ — HTTP 404
 - **고려대학교**
   - https://www.korea.ac.kr/ko/566/subview.do — 열림 · 글처럼 보이는 행 0
     - 생김새: 94KB · 링크 367 · 스크립트 31 · 날짜 토큰 14 · 줄 블록 261(날짜 든 것 1) · 표본: 「<article> fnctId=portalBoard,fnctNo=1 게시판 검색 시작일 ~ 종료일 게시물 검색 제목 작성자 번호, 제목, 작성자, 등록일자, 조회수 정보를 제공 번호 제목 작성자 Department --> 등록일자 조」
@@ -69,8 +57,8 @@
     - 생김새: 1009KB · 링크 578 · 스크립트 26 · 날짜 토큰 4 · 줄 블록 432(날짜 든 것 1) · 표본: 「<li> 」 · 날짜 앞 링크: `<a href="http://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110" target="_blank" title="새창">` `<a href="http://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110" target="_blank" title="새창">`
   - https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100 — 열림 · 글처럼 보이는 행 0
     - 생김새: 1009KB · 링크 578 · 스크립트 26 · 날짜 토큰 4 · 줄 블록 432(날짜 든 것 1) · 표본: 「<li> 」 · 날짜 앞 링크: `<a href="http://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110" target="_blank" title="새창">` `<a href="http://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110" target="_blank" title="새창">`
-  - https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=29848&pageNo=1&P_TAB_NO=1 — 열림 · 글처럼 보이는 행 0
-    - 생김새: 1021KB · 링크 582 · 스크립트 24 · 날짜 토큰 5 · 줄 블록 432(날짜 든 것 2) · 표본: 「<article> 통합 미래 AX 공학관 건립기금 모금 참여 안내 관리자 2026-05-15 조회 12849 (위 이미지를 클릭하시면 미래 AX 공학관 소개페이지로 이동합니다.) AI 시대를 이끌 중앙의 신형 엔진, 205관 미래 A」 「<li> 」 · 날짜 앞 링크: `<a href="http://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110" target="_blank" title="새창">` `<a href="http://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110" target="_blank" title="새창">`
+  - https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=29848&pageNo=1&P_TAB_NO=1 — 열림 · 글처럼 보이는 행 2
+    - 생김새: 1021KB · 링크 582 · 스크립트 24 · 날짜 토큰 5 · 줄 블록 432(날짜 든 것 2) · 표본: 「<article> 통합 미래 AX 공학관 건립기금 모금 참여 안내 관리자 2026-05-15 조회 12850 (위 이미지를 클릭하시면 미래 AX 공학관 소개페이지로 이동합니다.) AI 시대를 이끌 중앙의 신형 엔진, 205관 미래 A」 「<li> 」 · 날짜 앞 링크: `<a href="http://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110" target="_blank" title="새창">` `<a href="http://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110" target="_blank" title="새창">`
 - **서울시립대학교**
   - https://www.uos.ac.kr/korNotice/list.do?list_id=FA1 — 열림 · 글처럼 보이는 행 0
     - 생김새: 0KB · 링크 0 · 스크립트 0 · 날짜 토큰 0 · 줄 블록 0(날짜 든 것 0)
@@ -78,13 +66,13 @@
     - 생김새: 0KB · 링크 0 · 스크립트 0 · 날짜 토큰 0 · 줄 블록 0(날짜 든 것 0)
 - **동국대학교**
   - https://www.dongguk.edu/article/GENERALNOTICES/list — 열림 · 글처럼 보이는 행 0
-    - 생김새: 85KB · 링크 283 · 스크립트 19 · 날짜 토큰 18 · 줄 블록 227(날짜 든 것 16) · 표본: 「<li> 공지 공지 [서울앵커사업단 캠퍼스타운센터] AI리터러시_뤼튼과 함께하는 예비 IPO 협업 프로젝트 모집 공고(~10/14) 2026.10.01. 조회 79」 「<li> 공지 공지 10월 6일(화)과 10월 8일(목) 헌혈 버스 시행 안내 2026.10.01. 조회 38」 · 날짜 앞 링크: `<a href="#none" onclick="goDetail(26766449);">` `<a href="#none" onclick="goDetail(26766446);">`
+    - 생김새: 85KB · 링크 283 · 스크립트 19 · 날짜 토큰 18 · 줄 블록 227(날짜 든 것 16) · 표본: 「<li> 공지 공지 [서울앵커사업단 캠퍼스타운센터] AI리터러시_뤼튼과 함께하는 예비 IPO 협업 프로젝트 모집 공고(~10/14) 2026.10.01. 조회 81」 「<li> 공지 공지 10월 6일(화)과 10월 8일(목) 헌혈 버스 시행 안내 2026.10.01. 조회 38」 · 날짜 앞 링크: `<a href="#none" onclick="goDetail(26766449);">` `<a href="#none" onclick="goDetail(26766446);">`
   - https://www.dongguk.edu/article/HAKSANOTICE/list — 열림 · 글처럼 보이는 행 0
-    - 생김새: 86KB · 링크 292 · 스크립트 19 · 날짜 토큰 18 · 줄 블록 237(날짜 든 것 16) · 표본: 「<li> 공지 프로그램 및 특강 공지 2027학년도 상반기 현장실습(학기/계절) 설명회 참석 학생 모집 안내 2026.09.30. 조회 459」 「<li> 공지 프로그램 및 특강 공지 [취업] 실전 모의면접 컨설팅 - 나의 유형별 면접 완벽 마스터(마이성공스피치) [신청 ~ 10/2(금) 17시] 2026.09.28. 조회 302」 · 날짜 앞 링크: `<a href="#none" onclick="goDetail(26766431);">` `<a href="#none" onclick="goDetail(26766399);">`
+    - 생김새: 86KB · 링크 292 · 스크립트 19 · 날짜 토큰 18 · 줄 블록 237(날짜 든 것 16) · 표본: 「<li> 공지 프로그램 및 특강 공지 2027학년도 상반기 현장실습(학기/계절) 설명회 참석 학생 모집 안내 2026.09.30. 조회 464」 「<li> 공지 프로그램 및 특강 공지 [취업] 실전 모의면접 컨설팅 - 나의 유형별 면접 완벽 마스터(마이성공스피치) [신청 ~ 10/2(금) 17시] 2026.09.28. 조회 302」 · 날짜 앞 링크: `<a href="#none" onclick="goDetail(26766431);">` `<a href="#none" onclick="goDetail(26766399);">`
   - https://www.dongguk.edu/article/GENERALNOTICES/list — 열림 · 글처럼 보이는 행 0
-    - 생김새: 85KB · 링크 283 · 스크립트 19 · 날짜 토큰 18 · 줄 블록 227(날짜 든 것 16) · 표본: 「<li> 공지 공지 [서울앵커사업단 캠퍼스타운센터] AI리터러시_뤼튼과 함께하는 예비 IPO 협업 프로젝트 모집 공고(~10/14) 2026.10.01. 조회 79」 「<li> 공지 공지 10월 6일(화)과 10월 8일(목) 헌혈 버스 시행 안내 2026.10.01. 조회 38」 · 날짜 앞 링크: `<a href="#none" onclick="goDetail(26766449);">` `<a href="#none" onclick="goDetail(26766446);">`
+    - 생김새: 85KB · 링크 283 · 스크립트 19 · 날짜 토큰 18 · 줄 블록 227(날짜 든 것 16) · 표본: 「<li> 공지 공지 [서울앵커사업단 캠퍼스타운센터] AI리터러시_뤼튼과 함께하는 예비 IPO 협업 프로젝트 모집 공고(~10/14) 2026.10.01. 조회 81」 「<li> 공지 공지 10월 6일(화)과 10월 8일(목) 헌혈 버스 시행 안내 2026.10.01. 조회 38」 · 날짜 앞 링크: `<a href="#none" onclick="goDetail(26766449);">` `<a href="#none" onclick="goDetail(26766446);">`
   - https://www.dongguk.edu/article/HAKSANOTICE/list — 열림 · 글처럼 보이는 행 0
-    - 생김새: 86KB · 링크 292 · 스크립트 19 · 날짜 토큰 18 · 줄 블록 237(날짜 든 것 16) · 표본: 「<li> 공지 프로그램 및 특강 공지 2027학년도 상반기 현장실습(학기/계절) 설명회 참석 학생 모집 안내 2026.09.30. 조회 459」 「<li> 공지 프로그램 및 특강 공지 [취업] 실전 모의면접 컨설팅 - 나의 유형별 면접 완벽 마스터(마이성공스피치) [신청 ~ 10/2(금) 17시] 2026.09.28. 조회 302」 · 날짜 앞 링크: `<a href="#none" onclick="goDetail(26766431);">` `<a href="#none" onclick="goDetail(26766399);">`
+    - 생김새: 86KB · 링크 292 · 스크립트 19 · 날짜 토큰 18 · 줄 블록 237(날짜 든 것 16) · 표본: 「<li> 공지 프로그램 및 특강 공지 2027학년도 상반기 현장실습(학기/계절) 설명회 참석 학생 모집 안내 2026.09.30. 조회 464」 「<li> 공지 프로그램 및 특강 공지 [취업] 실전 모의면접 컨설팅 - 나의 유형별 면접 완벽 마스터(마이성공스피치) [신청 ~ 10/2(금) 17시] 2026.09.28. 조회 302」 · 날짜 앞 링크: `<a href="#none" onclick="goDetail(26766431);">` `<a href="#none" onclick="goDetail(26766399);">`
   - https://www.dongguk.edu/article/HAKSANOTICE/detail/26766252 — 열림 · 글처럼 보이는 행 0
     - 생김새: 94KB · 링크 260 · 스크립트 20 · 날짜 토큰 4 · 줄 블록 213(날짜 든 것 0) · 날짜 앞 링크: `<a href="/resources/files/2025-1575 정보통신접근성 품질인증서-동국대학교.pdf" target="_blank" title="새 창 열림" >` `<a href="/resources/files/2025-1575 정보통신접근성 품질인증서-동국대학교.pdf" target="_blank" title="새 창 열림" >`
   - https://www.dongguk.edu/article/GENERALNOTICES/detail/26763074 — 열림 · 글처럼 보이는 행 0
@@ -95,7 +83,7 @@
     - 생김새: 100KB · 링크 262 · 스크립트 21 · 날짜 토큰 5 · 줄 블록 218(날짜 든 것 0) · 날짜 앞 링크: `<a href="/resources/files/2025-1575 정보통신접근성 품질인증서-동국대학교.pdf" target="_blank" title="새 창 열림" >` `<a href="/resources/files/2025-1575 정보통신접근성 품질인증서-동국대학교.pdf" target="_blank" title="새 창 열림" >`
 - **동국대학교 WISE캠퍼스**
   - https://wise.dongguk.ac.kr/article/generalnotice/list — 열림 · 글처럼 보이는 행 0
-    - 생김새: 79KB · 링크 242 · 스크립트 18 · 날짜 토큰 12 · 줄 블록 199(날짜 든 것 12) · 표본: 「<li> 공지 공지 양산지역 학생통학버스 운행 시간표 변경 안내 2026.09.17. 임준택 조회 277」 「<li> 공지 공지 2026-2학기 비교과 교육과정 안내 2026.09.02. 한정 조회 1128」 · 날짜 앞 링크: `<a href="#none" onclick="goDetail(520586);">` `<a href="#none" onclick="goDetail(520420);">`
+    - 생김새: 79KB · 링크 242 · 스크립트 18 · 날짜 토큰 12 · 줄 블록 199(날짜 든 것 12) · 표본: 「<li> 공지 공지 양산지역 학생통학버스 운행 시간표 변경 안내 2026.09.17. 임준택 조회 278」 「<li> 공지 공지 2026-2학기 비교과 교육과정 안내 2026.09.02. 한정 조회 1128」 · 날짜 앞 링크: `<a href="#none" onclick="goDetail(520586);">` `<a href="#none" onclick="goDetail(520420);">`
   - https://wise.dongguk.ac.kr/article/acdnotice/list — 열림 · 글처럼 보이는 행 0
     - 생김새: 80KB · 링크 253 · 스크립트 18 · 날짜 토큰 12 · 줄 블록 210(날짜 든 것 12) · 표본: 「<li> 공지 수업/성적 공지 2026-2학기 학부 수강신청 안내 2026.07.23. 김형욱 조회 24260」 「<li> 공지 학적 공지 2026학년도 2학기 복학 신청 안내(~8.28까지 신청기간 연장) 2026.06.02. 이영찬 조회 3355」 · 날짜 앞 링크: `<a href="#none" onclick="goDetail(520116);">` `<a href="#none" onclick="goDetail(519659);">`
   - https://wise.dongguk.ac.kr/article/generalnotice/detail/520707 — 열림 · 글처럼 보이는 행 0
@@ -110,43 +98,9 @@
     - 생김새: 81KB · 링크 225 · 스크립트 19 · 날짜 토큰 2 · 줄 블록 189(날짜 든 것 0)
   - https://wise.dongguk.ac.kr/article/generalnotice/detail/520677 — 열림 · 글처럼 보이는 행 0
     - 생김새: 90KB · 링크 226 · 스크립트 20 · 날짜 토큰 6 · 줄 블록 191(날짜 든 것 0)
-- **가천대학교**
-  - https://www.gachon.ac.kr/kor/7986/subview.do — 열림 · 글처럼 보이는 행 0
-    - 생김새: 241KB · 링크 394 · 스크립트 38 · 날짜 토큰 51 · 줄 블록 299(날짜 든 것 1) · 표본: 「<article> fnctId=commonNotice,fnctNo=0 게시물 검색 검색하기 제목 작성자 16913 건, 현재페이지: 1 /339 게시글 리스트 공통공지사항 테이블입니다. --> NO 게시판 이름 --> 제목 작성자 작」 · 날짜 앞 링크: `<a href="javascript:jf_viewArtcl('kor', '125837');">` `<a href="javascript:jf_viewArtcl('kor', '125819');">`
-  - https://www.gachon.ac.kr/kor/3104/subview.do — 열림 · 글처럼 보이는 행 0
-    - 생김새: 249KB · 링크 361 · 스크립트 38 · 날짜 토큰 13 · 줄 블록 304(날짜 든 것 1) · 표본: 「<article> fnctId=bbs,fnctNo=475 게시물 검색 검색하기 제목 작성자 RSS 2.0 1151 건, 현재페이지: 1 /116 게시글 리스트 학사공지_학사 NO 제목 작성자 작성일 조회수 첨부파일 일반공지 2026학」
-- **국민대학교**
-  - https://www.kookmin.ac.kr/user/kmuNews/notice/1/index.do — 열림 · 글처럼 보이는 행 0
-    - 생김새: 83KB · 링크 441 · 스크립트 52 · 날짜 토큰 3 · 줄 블록 384(날짜 든 것 0) · 날짜 앞 링크: `<a href="#">` `<a href="#">`
-  - https://www.kookmin.ac.kr/user/kmuNews/notice/4/index.do — 열림 · 글처럼 보이는 행 0
-    - 생김새: 94KB · 링크 475 · 스크립트 52 · 날짜 토큰 18 · 줄 블록 419(날짜 든 것 15) · 표본: 「<li> [현장실습지원센터] 2026학년도 동계 한국항공우주산업(KAI) 현장실습 기계공학부 학생 모집(~10/15) 2026.10.01 현장실습지원센터 장지수 조회수 211」 「<li> 2026학년도 2학기 학부 중간시험 보조감독 모집 2026.09.23 교무팀 김선아 조회수 14668」 · 날짜 앞 링크: `<a href="#">` `<a href="#">`
-  - https://www.kookmin.ac.kr/comm/menu/user/89bdc36e40697dd8ad9e6cb0d423bc9c/content/index.do — 열림 · 글처럼 보이는 행 0
-    - 생김새: 106KB · 링크 430 · 스크립트 51 · 날짜 토큰 7 · 줄 블록 474(날짜 든 것 5) · 표본: 「<li> 텍스트 생성의 경우 생성형 AI도구명. (날짜). "[프롬프트 내용]". URL 예시: ChatGPT 5.1. (2025.08.20). "[프롬프트 내용]". https://chat.openai.com」 「<li> 코딩 지원의 경우 생성형 AI도구명. (날짜). "[작업 내용]" 예시: GitHub Copilot. (2024.09.17). "[작업 내용: Python 함수 작성]"」 · 날짜 앞 링크: `<a href="#">` `<a href="#">`
-  - https://www.kookmin.ac.kr/comm/board/user/5aebb357061791311cdd4953e2bfb35a/index.do — 열림 · 글처럼 보이는 행 0
-    - 생김새: 187KB · 링크 573 · 스크립트 52 · 날짜 토큰 25 · 줄 블록 361(날짜 든 것 0) · 날짜 앞 링크: `<a href="#">` `<a href="#">`
-  - https://www.kookmin.ac.kr/user/research/research/index.do — 열림 · 글처럼 보이는 행 0
-    - 생김새: 92KB · 링크 433 · 스크립트 46 · 날짜 토큰 2 · 줄 블록 354(날짜 든 것 0) · 날짜 앞 링크: `<a href="#">` `<a href="#">`
-  - https://www.kookmin.ac.kr/user/kmuNews/headline/index.do — 열림 · 글처럼 보이는 행 3
-    - 생김새: 114KB · 링크 485 · 스크립트 46 · 날짜 토큰 5 · 줄 블록 401(날짜 든 것 0) · 날짜 앞 링크: `<a href="#">` `<a href="#">`
-  - https://www.kookmin.ac.kr/comm/board/user/505778f2d4a04163de6ee5fee35d9bb9/index.do — 열림 · 글처럼 보이는 행 0
-    - 생김새: 104KB · 링크 456 · 스크립트 52 · 날짜 토큰 14 · 줄 블록 399(날짜 든 것 10) · 표본: 「<li> 경력 있는 신입사원 여기 있습니다! 100% 실무 프로젝트 국민대 취업지원 프로그램 CoREP 화제 기업 채용 시 신입사원에게 실무 경험을 묻는 경우가 많지만, 대학생이 실제 업무를 경험할 기회는 많지 않다. 수업을」 「<li> 국민대 대학일자리플러스센터, 서울북부고용센터와 ‘서울북부 유스온(Youth ON)’ 취업특강 운영 &lsquo;경험 기반 입사지원서 작성법&rsquo; 주제로 지역청년 구직역량 강화 국민대학교(총장 정승렬) 대학일자」 · 날짜 앞 링크: `<a href="#">` `<a href="#">`
-  - https://www.kookmin.ac.kr/comm/board/user/be8e117863cfd580d7ed5931a799207c/index.do — 열림 · 글처럼 보이는 행 0
-    - 생김새: 104KB · 링크 456 · 스크립트 52 · 날짜 토큰 16 · 줄 블록 399(날짜 든 것 10) · 표본: 「<li> 국제학술대회 ACCV 2026 논문 채택 / 이성원(전자공학부) 교수 연구팀 국민대학교 전자공학부 이성원 교수 연구팀이 컴퓨터 비전 분야의 주요 국제학술대회인 제18회 아시아 컴퓨터 비전 학술대회(Asian Conf」 「<li> ECCV 2026 SDAD 워크숍 ‘Best Paper Honorable Mention’ 수상 / 육화취(자동차모빌리티대학원 자동차IT융합전공 석박사통합과정 22) 학생 국민대학교 자동차모빌리티대학원 육화취 석박사통」 · 날짜 앞 링크: `<a href="#">` `<a href="#">`
 - **인하대학교**
-  - https://www.inha.ac.kr/bbs/kr/8/artclList.do — TypeError: EAI_AGAIN
-  - https://www.inha.ac.kr/ — TypeError: ENOTFOUND
-- **한국항공대학교**
-  - https://kau.ac.kr/kaulife/notice.php — 열림 · 글처럼 보이는 행 0
-    - 생김새: 108KB · 링크 538 · 스크립트 9 · 날짜 토큰 44 · 줄 블록 431(날짜 든 것 22) · 표본: 「<li> 2027학년도 1학기 전임교원 채용 모집대상 : 정년 및 비정년트랙 / 접수기간 : 2026.10.15.(목) 13:30까지」 「<li> 제 36기 미래에셋 해외교환 장학생 선발 안내 2026.09.01.(화)~2026.10.06.(화)」 · 날짜 앞 링크: `<a href="https://kau.ac.kr/kaulife/recruitment.php?mode=read&amp;seq=11225" target="_blank">` `<a href="https://kau.ac.kr/kaulife/notice.php?searchkey=&amp;searchvalue=&amp;code=s1101&amp;page=&amp;mode=read&amp;seq=11116" target="_blank">`
-  - https://kau.ac.kr/kaulife/acdnoti.php — 열림 · 글처럼 보이는 행 0
-    - 생김새: 111KB · 링크 538 · 스크립트 9 · 날짜 토큰 43 · 줄 블록 431(날짜 든 것 22) · 표본: 「<li> 2027학년도 1학기 전임교원 채용 모집대상 : 정년 및 비정년트랙 / 접수기간 : 2026.10.15.(목) 13:30까지」 「<li> 제 36기 미래에셋 해외교환 장학생 선발 안내 2026.09.01.(화)~2026.10.06.(화)」 · 날짜 앞 링크: `<a href="https://kau.ac.kr/kaulife/recruitment.php?mode=read&amp;seq=11225" target="_blank">` `<a href="https://kau.ac.kr/kaulife/notice.php?searchkey=&amp;searchvalue=&amp;code=s1101&amp;page=&amp;mode=read&amp;seq=11116" target="_blank">`
-- **경기대학교**
-  - https://www.kyonggi.ac.kr/www/selectBbsNttList.do?key=7520&bbsNo=1073 — 열림 · 글처럼 보이는 행 0
-    - 생김새: 136KB · 링크 238 · 스크립트 25 · 날짜 토큰 15 · 줄 블록 205(날짜 든 것 1) · 표본: 「<article> 홈 대학소개 KGU소식 통합 공지사항 통합 공지사항 공유하기 SNS공유 페이스북 트위터 네이버블로그 카카오톡 닫기 인쇄 // share sns try { Kakao.init('4aab0c51c848e3b3fb19bd」 · 날짜 앞 링크: `<a href="/www/sitemapNoKey.do" class="shortcut_anchor">` `<a href="./selectBbsNttView.do?key=6815&bbsNo=1073&nttNo=603664&pageUnit=10&searchCnd=all" target="_top">`
-  - https://www.kyonggi.ac.kr/www/selectBbsNttList.do?key=10055&bbsNo=1430 — 열림 · 글처럼 보이는 행 0
-    - 생김새: 88KB · 링크 217 · 스크립트 19 · 날짜 토큰 4 · 줄 블록 205(날짜 든 것 1) · 표본: 「<article> 홈 대학소개 학교법인 이사장 이사장 동정 이사장 동정 공유하기 SNS공유 페이스북 트위터 네이버블로그 카카오톡 닫기 인쇄 // share sns try { Kakao.init('4aab0c51c848e3b3fb19b」 · 날짜 앞 링크: `<a href="/www/sitemapNoKey.do" class="shortcut_anchor">` `<a href="#none" target="_blank" title="새창" rel="noopener noreferrer" class="wa">`
-  - https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=5203&bbsNo=684&nttNo=624109&pageUnit=10&searchCnd=all&sf.bf1=K0505&sf.dc=11A42 — 열림 · 글처럼 보이는 행 0
-    - 생김새: 101KB · 링크 221 · 스크립트 22 · 날짜 토큰 6 · 줄 블록 194(날짜 든 것 1) · 표본: 「<article> 홈 대학본부 기획처 대학기관연구센터 주요 연구 성과 주요 연구 성과 공유하기 SNS공유 페이스북 트위터 네이버블로그 카카오톡 닫기 인쇄 // share sns try { Kakao.init('4aab0c51c848e」 · 날짜 앞 링크: `<a href="/www/sitemapNoKey.do" class="shortcut_anchor">` `<a href="./selectBbsNttView.do?key=5203&amp;bbsNo=684&amp;pageIndex=1&amp;pageUnit=10&amp;searchCnd=all&amp;sf.bf1=K0505&amp;sf.dc=11A42&amp;nttNo=611159" class`
+  - https://www.inha.ac.kr/bbs/kr/8/artclList.do — TypeError: ENOTFOUND
+  - https://www.inha.ac.kr/ — TypeError: UND_ERR_CONNECT_TIMEOUT
 - **계명대학교**
   - https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=143 — 열림 · 글처럼 보이는 행 0
     - 생김새: 75KB · 링크 523 · 스크립트 16 · 날짜 토큰 35 · 줄 블록 351(날짜 든 것 17) · 표본: 「<li> 개인정보처리방침_2018. 04. 30. ~ 2018. 12. 20.」 「<li> 개인정보처리방침_2018. 12. 21. ~ 2019. 2. 28.」 · 날짜 앞 링크: `<a href="https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3855&amp;" target="_self">` `<a href="https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3855&amp;" target="_self">`
@@ -159,18 +113,13 @@
     - 생김새: 79KB · 링크 276 · 스크립트 25 · 날짜 토큰 19 · 줄 블록 208(날짜 든 것 15) · 표본: 「<tr> 공지 [통일부] 제25기 평화통일민주교육위원 추가 위촉 신청 안내(10월 05일까지 날··· 학생처 2026.09.16 571」 「<tr> 공지 2026학년도 창의융복합 교육연구 프로젝트 팀 모집 교수학습지원센터 2026.09.15 704」 · 날짜 앞 링크: `<a href="javascript:" data-id="55101" class="nttInfoBtn">` `<a href="javascript:" data-id="55080" class="nttInfoBtn">`
   - https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=1280&bbsId=1081 — 열림 · 글처럼 보이는 행 0
     - 생김새: 107KB · 링크 289 · 스크립트 25 · 날짜 토큰 23 · 줄 블록 221(날짜 든 것 19) · 표본: 「<tr> 공지 중요공지 [경기도교육청] 2027학년도 경기도 유치원·초등학교·특수학교(유치원·초등)교사 ··· 임용진로센터 2026.09.30 261」 「<tr> 공지 중요공지 [서울시교육청] 2027학년도 서울특별시교육청 공립(국·사립) 유치원·초등·특수학··· 임용진로센터 2026.09.30 310」 · 날짜 앞 링크: `<a href="javascript:" data-id="55226" class="nttInfoBtn">` `<a href="javascript:" data-id="55207" class="nttInfoBtn">`
-- **한국방송통신대학교**
-  - https://www.knou.ac.kr/bbs/knou/51/artclList.do — 열림 · 글처럼 보이는 행 4
-    - 생김새: 66KB · 링크 45 · 스크립트 15 · 날짜 토큰 16 · 줄 블록 43(날짜 든 것 15) · 표본: 「<tr> 일반공지 [일반] [국립대학 육성사업] 3주만에 끝내는 AI 취업 치트키 특강 진로심리상담실 2026-10-01 762 첨부파일 1 개 있음」 「<tr> 일반공지 [전공] 2027학년도 1학기 생활과학부 전공분리 승인 안내 학사운영과 2026-09-30 996 첨부파일 0 개 있음」
-  - https://www.knou.ac.kr/knou/80/subview.do — 열림 · 글처럼 보이는 행 0
-    - 생김새: 150KB · 링크 314 · 스크립트 35 · 날짜 토큰 10 · 줄 블록 162(날짜 든 것 1) · 표본: 「<article> fnctId=bbs,fnctNo=47 게시물 검색 검색하기 제목 작성자 내용 124 개 게시글 리스트 KNOU 뉴스레터 번호 제목 작성자 작성일 조회 파일 124 [WEKNOU] 2026년 9월 뉴스레터 남가현 20」
 - **전북대학교**
   - https://www.jbnu.ac.kr/web/news/notice/sub01.do — 열림 · 글처럼 보이는 행 0
-    - 생김새: 217KB · 링크 742 · 스크립트 34 · 날짜 토큰 12 · 줄 블록 687(날짜 든 것 12) · 표본: 「<tr> 교육 2026학년도 전공배정 제도 설명회 개최 안내 2026-09-22 조회수 1802 교무처 교무과」 「<tr> 6185 기타 제2차「청년세대 성별균형 공개형 공론장」청년 참여자 모집 홍보 협조 요청 2026-10-01 조회수 44 사무국 총무과」 · 날짜 앞 링크: `<a href="javascript:;" class="title" onclick="pf_DetailMove('217819')">` `<a href="javascript:;" class="title" onclick="pf_DetailMove('218031')">`
+    - 생김새: 217KB · 링크 742 · 스크립트 34 · 날짜 토큰 12 · 줄 블록 687(날짜 든 것 12) · 표본: 「<tr> 교육 2026학년도 전공배정 제도 설명회 개최 안내 2026-09-22 조회수 1802 교무처 교무과」 「<tr> 6185 기타 제2차「청년세대 성별균형 공개형 공론장」청년 참여자 모집 홍보 협조 요청 2026-10-01 조회수 45 사무국 총무과」 · 날짜 앞 링크: `<a href="javascript:;" class="title" onclick="pf_DetailMove('217819')">` `<a href="javascript:;" class="title" onclick="pf_DetailMove('218031')">`
   - https://www.jbnu.ac.kr/web/news/notice/sub02.do — 열림 · 글처럼 보이는 행 0
-    - 생김새: 219KB · 링크 730 · 스크립트 34 · 날짜 토큰 11 · 줄 블록 675(날짜 든 것 11) · 표본: 「<tr> 846 [전북인문사회연구원] 2026년 전북인문사회연구원 신진연구자 지원 과제 지원사업 공고 2026-10-01 조회수 73 전북인문사회연구원」 「<tr> 845 [전북인문사회연구원] 2026년 전북인문사회연구원 지역연계 과제 지원사업 공고 2026-10-01 조회수 55 전북인문사회연구원」 · 날짜 앞 링크: `<a href="javascript:;" class="title" onclick="pf_DetailMove('218035')">` `<a href="javascript:;" class="title" onclick="pf_DetailMove('218034')">`
+    - 생김새: 219KB · 링크 730 · 스크립트 34 · 날짜 토큰 11 · 줄 블록 675(날짜 든 것 11) · 표본: 「<tr> 846 [전북인문사회연구원] 2026년 전북인문사회연구원 신진연구자 지원 과제 지원사업 공고 2026-10-01 조회수 76 전북인문사회연구원」 「<tr> 845 [전북인문사회연구원] 2026년 전북인문사회연구원 지역연계 과제 지원사업 공고 2026-10-01 조회수 59 전북인문사회연구원」 · 날짜 앞 링크: `<a href="javascript:;" class="title" onclick="pf_DetailMove('218035')">` `<a href="javascript:;" class="title" onclick="pf_DetailMove('218034')">`
   - https://www.jbnu.ac.kr/web/news/notice/sub05.do — 열림 · 글처럼 보이는 행 0
-    - 생김새: 217KB · 링크 730 · 스크립트 34 · 날짜 토큰 31 · 줄 블록 675(날짜 든 것 11) · 표본: 「<tr> 129 예정 [프랑스·아프리카연구소] 2026년도 국내학술대회 ｜ 아프리카 대중문화와 권력: 재구성되는 목소리와 공간 2026-09-30 조회수 29 특강기간 2026-10-02 ~ 2026-10-02 프랑스·아프리」 「<tr> 128 마감 2026학년도 과학교육학부 (주관 지구과학교육전공) 외부강사초청 2026-09-14 조회수 178 특강기간 2026-09-14 ~ 2026-09-21 과학교육학부」 · 날짜 앞 링크: `<a href="javascript:;" class="title" onclick="pf_DetailMove('217970')">` `<a href="javascript:;" class="title" onclick="pf_DetailMove('217970')">`
+    - 생김새: 217KB · 링크 730 · 스크립트 34 · 날짜 토큰 31 · 줄 블록 675(날짜 든 것 11) · 표본: 「<tr> 129 예정 [프랑스·아프리카연구소] 2026년도 국내학술대회 ｜ 아프리카 대중문화와 권력: 재구성되는 목소리와 공간 2026-09-30 조회수 30 특강기간 2026-10-02 ~ 2026-10-02 프랑스·아프리」 「<tr> 128 마감 2026학년도 과학교육학부 (주관 지구과학교육전공) 외부강사초청 2026-09-14 조회수 178 특강기간 2026-09-14 ~ 2026-09-21 과학교육학부」 · 날짜 앞 링크: `<a href="javascript:;" class="title" onclick="pf_DetailMove('217970')">` `<a href="javascript:;" class="title" onclick="pf_DetailMove('217970')">`
   - https://www.jbnu.ac.kr/web/academic/schedule.do — 열림 · 글처럼 보이는 행 0
     - 생김새: 192KB · 링크 749 · 스크립트 33 · 날짜 토큰 1 · 줄 블록 684(날짜 든 것 1) · 표본: 「<dd> 2024-03-28」
   - https://www.jbnu.ac.kr/web/unvrslife/newstudent/sub01.do — 열림 · 글처럼 보이는 행 0
@@ -181,16 +130,5 @@
     - 생김새: 219KB · 링크 732 · 스크립트 34 · 날짜 토큰 13 · 줄 블록 676(날짜 든 것 13) · 표본: 「<li> NEWS Plus 제957호 2026-07-07」 「<li> NEWS Plus 제956호 2026-07-07」
   - https://www.jbnu.ac.kr/web/news/plaza/sub03.do — 열림 · 글처럼 보이는 행 0
     - 생김새: 211KB · 링크 730 · 스크립트 35 · 날짜 토큰 11 · 줄 블록 675(날짜 든 것 11) · 표본: 「<tr> 4203 선심성 현금지원 8개 교육청에 페널티…최대 100억 교부금 삭감 2026-09-23 조회수 14 전북대학교」 「<tr> 4202 수험생 83% &#034;2028학년도 대입 개편, 수시 지원에 영향&#034; 2026-09-23 조회수 27 전북대학교」 · 날짜 앞 링크: `<a href="javascript:;" class="title" onclick="pf_moveLink('https://www.yna.co.kr/view/AKR20260922186800530')">` `<a href="javascript:;" class="title" onclick="pf_moveLink('https://www.yna.co.kr/view/AKR20260923052500530')">`
-- **충북대학교**
-  - https://www.cbnu.ac.kr/www/selectBbsNttList.do?bbsNo=8&key=813 — 열림 · 글처럼 보이는 행 0
-    - 생김새: 159KB · 링크 499 · 스크립트 18 · 날짜 토큰 20 · 줄 블록 353(날짜 든 것 1) · 표본: 「<article> CBNU 대학생활 홈 대학생활 대학/대학원 입학/취업 연구/산학 학사안내 대학생활 홍보센터 대학안내 홈페이지 가이드 공지사항 학생지원 학생활동 생활/편의 IT서비스 공지사항 함께하는 CBNU 전체 전체 일반 학사/장」
-  - https://www.cbnu.ac.kr/www/selectBbsNttList.do?bbsNo=3&key=432 — 열림 · 글처럼 보이는 행 0
-    - 생김새: 138KB · 링크 476 · 스크립트 18 · 날짜 토큰 16 · 줄 블록 353(날짜 든 것 1) · 표본: 「<article> CBNU 연구/산학 홈 연구/산학 대학/대학원 입학/취업 연구/산학 학사안내 대학생활 홍보센터 대학안내 홈페이지 가이드 연구지원 연구지원 연구윤리 저널검색 교내연구기관 산학협력 사업단 연구 서식 자료실 연구처 안전관」
-  - https://www.cbnu.ac.kr/www/addWebNewsletterView.do?key=563 — 열림 · 글처럼 보이는 행 0
-    - 생김새: 111KB · 링크 473 · 스크립트 16 · 날짜 토큰 0 · 줄 블록 353(날짜 든 것 0)
-  - https://www.cbnu.ac.kr/www/cancelWebNewsletterView.do?key=997 — 열림 · 글처럼 보이는 행 0
-    - 생김새: 109KB · 링크 473 · 스크립트 16 · 날짜 토큰 0 · 줄 블록 353(날짜 든 것 0)
-  - https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=548&bbsNo=14&nttNo=170287 — 열림 · 글처럼 보이는 행 0
-    - 생김새: 116KB · 링크 472 · 스크립트 18 · 날짜 토큰 1 · 줄 블록 353(날짜 든 것 1) · 표본: 「<article> CBNU 홍보센터 홈 홍보센터 대학/대학원 입학/취업 연구/산학 학사안내 대학생활 홍보센터 대학안내 홈페이지 가이드 CBNU뉴스 CBNU뉴스 CBNU Interview 언론자료 CBNU 홍보 대외협력 학생홍보대사 해」 · 날짜 앞 링크: `<a href="./selectBbsNttView.do?key=548&amp;bbsNo=14&amp;pageIndex=1&amp;pageUnit=10&amp;searchCnd=all&amp;nttNo=170233" class="move_link">`
 
 > 목록이 스크립트로만 그려지는 게시판(SPA·클릭형)은 이 로봇이 못 읽습니다 — 그런 학교는 `collector/collect-news.mjs` 의 `NEWS_BOARD_RULES` 에 규칙(json·dataId·onclick)이 필요합니다. 학생이 보는 공지 목록 주소를 알려 주시면 그 자리에 적습니다.
