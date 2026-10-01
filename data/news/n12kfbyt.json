@@ -1,0 +1,220 @@
+{
+ "school": "영남대학교",
+ "updatedAt": "2026-10-01",
+ "items": [
+  {
+   "title": "ENG website",
+   "url": "https://www.yu.ac.kr/english/",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "총장 프로필",
+   "url": "https://www.yu.ac.kr/main/intro/profile.do",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "연설 및 기고문",
+   "url": "https://www.yu.ac.kr/main/intro/speeches-and-contributions.do",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "대담 및 인터뷰",
+   "url": "https://www.yu.ac.kr/main/intro/talks-and-interviews.do",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "총장과의 대화",
+   "url": "https://www.yu.ac.kr/main/intro/conversation-with-the-president.do",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "업무추진비 사용내역",
+   "url": "https://www.yu.ac.kr/main/academics/details-of-use-of-business-promotion-expenses.do",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "비전과 전략",
+   "url": "https://www.yu.ac.kr/main/intro/yu-vision.do",
+   "kind": "학사",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "안전보건 경영방침",
+   "url": "https://www.yu.ac.kr/main/intro/safety-and-health-management-policy.do",
+   "kind": "생활",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "대학브로슈어",
+   "url": "https://pr.yu.ac.kr/pr/archive/promotional-booklet.do",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "사이버홍보실",
+   "url": "https://pr.yu.ac.kr/",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "학술·공연·행사",
+   "url": "https://www.yu.ac.kr/main/intro/academic-performance-and-event.do",
+   "kind": "행사",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "Y형인재교육",
+   "url": "http://portal.yu.ac.kr/sso/login.jsp?type=linc&cReturn_Url=https%3A%2F%2Fjoin.yu.ac.kr%2Fyuedu%2Ffront%2Findex.php%3Fg_page%3Dprogram%26m_page%3Dprogram01",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "청탁금지법 바로알기",
+   "url": "https://www.yu.ac.kr/main/intro/know-the-anti-graft-law-right-away.do",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "부설연구기관",
+   "url": "https://www.yu.ac.kr/main/intro/associated.do",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "부설교육기관",
+   "url": "https://www.yu.ac.kr/main/intro/yulife.do",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "대학평의원회",
+   "url": "https://www.yu.ac.kr/main/intro/institution.do",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "법인사무조직",
+   "url": "https://www.yu.ac.kr/main/intro/corporate-office-organization.do",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "정관및제규정",
+   "url": "https://www.yu.ac.kr/main/intro/articles-of-incorporation-and-regulations.do",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "학교법인공지사항",
+   "url": "https://www.yu.ac.kr/main/intro/notice-related-to-coronavirus-20.do",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "캠퍼스 안내",
+   "url": "https://www.yu.ac.kr/main/intro/direction.do",
+   "kind": "생활",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "캠퍼스 VR",
+   "url": "https://www.yu.ac.kr/_vr_new/ko/index.html",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "자동심장충격기(AED) 위치",
+   "url": "https://www.yu.ac.kr/main/intro/aed-position.do",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "학칙 사전공고/주요 규정 변경 안내",
+   "url": "https://www.yu.ac.kr/main/intro/rules.do",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "목적외 이용·제공대장",
+   "url": "https://www.yu.ac.kr/main/intro/purpose.do",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "정보공개제도",
+   "url": "https://www.yu.ac.kr/main/intro/information-disclosure-system.do",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "정보공개제도 안내",
+   "url": "https://www.yu.ac.kr/main/intro/information-disclosure-system-guide.do",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "정보공개청구 및 비공개대상 정보",
+   "url": "https://www.yu.ac.kr/main/intro/non-disclosure.do",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "정보공개청구 수수료",
+   "url": "https://www.yu.ac.kr/main/intro/fee.do",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "대학자체평가보고서",
+   "url": "https://www.yu.ac.kr/main/intro/report.do",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "영남대학교 75년사",
+   "url": "http://ecat.yu.ac.kr/Viewer/YEQM4WM52XEO",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  }
+ ]
+}

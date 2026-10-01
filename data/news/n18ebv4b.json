@@ -1,0 +1,219 @@
+{
+ "school": "서울교육대학교",
+ "updatedAt": "2026-10-01",
+ "items": [
+  {
+   "title": "MY-PORTAL",
+   "url": "https://portal.snue.ac.kr/portal/lo/login/loginPage.do",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "수강신청 및 재이수",
+   "url": "https://www.snue.ac.kr/snue/cm/cntnts/cntntsView.do?mi=1289&cntntsId=1191",
+   "kind": "학사",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "교원자격무시험검정",
+   "url": "https://www.snue.ac.kr/snue/cm/cntnts/cntntsView.do?mi=3037&cntntsId=3020",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "미래교육센터",
+   "url": "https://www.snue.ac.kr/snue/cm/cntnts/cntntsView.do?mi=3049&cntntsId=3036",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "주간식단안내",
+   "url": "https://www.snue.ac.kr/snue/mm/menu/userMenuList.do?mi=1275",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "학교생활지원",
+   "url": "https://www.snue.ac.kr/snue/cm/cntnts/cntntsView.do?mi=1421&cntntsId=3014",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "장애학생지원센터",
+   "url": "https://with.snue.ac.kr/",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "학생성장지원팀",
+   "url": "http://life.snue.ac.kr/",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "학생서비스센터",
+   "url": "https://www.snue.ac.kr/snue/cm/cntnts/cntntsView.do?mi=1304&cntntsId=1207",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "분실물습득신고",
+   "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=1308&bbsId=3010",
+   "kind": "생활",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "PPT 템플릿",
+   "url": "https://www.snue.ac.kr/snue/cm/cntnts/cntntsView.do?mi=3621&cntntsId=3412",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "SNUE 뉴스",
+   "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=1310&bbsId=3006",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "교육·연구 및 학생지도비",
+   "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=1130&bbsId=4107",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "재무정보공시",
+   "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3555&bbsId=3005",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "학칙 및 규정",
+   "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=1278&bbsId=3049",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "국내기관 교류현황",
+   "url": "https://www.snue.ac.kr/snue/cm/cntnts/cntntsView.do?mi=3039&cntntsId=3023",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "국외기관 교류현황",
+   "url": "https://www.snue.ac.kr/snue/cm/cntnts/cntntsView.do?mi=1403&cntntsId=1174",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "캠퍼스 투어 신청",
+   "url": "https://www.snue.ac.kr/snue/am/apl/goDeerDream.do?mi=3497",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "개교 80주년",
+   "url": "https://www.snue.ac.kr/snue/cm/cntnts/cntntsView.do?mi=3652&cntntsId=3428",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "엠블럼 및 슬로건",
+   "url": "https://www.snue.ac.kr/snue/cm/cntnts/cntntsView.do?mi=3653&cntntsId=3427",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "서울교대 80년의 역사",
+   "url": "https://www.snue.ac.kr/snue/cm/cntnts/cntntsView.do?mi=3654&cntntsId=3429",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "발전기금 기부 안내",
+   "url": "https://fund.snue.ac.kr/fund/un/univFund/univFundWrite.do?mi=3478",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "e-CLASS",
+   "url": "https://lms.snue.ac.kr/",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "교육전문대학원",
+   "url": "https://grad.snue.ac.kr/grad/main.do",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "SNUE평생교육",
+   "url": "https://www.snue.ac.kr/snue/main.do#section5",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "웹메일시스템",
+   "url": "https://mail.snue.ac.kr/",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "SMS서비스",
+   "url": "https://sms.snue.ac.kr/",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "인터넷디스크",
+   "url": "https://idisk.snue.ac.kr/",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "스마트학생증(교직원증)",
+   "url": "https://smartcard.snue.ac.kr/",
+   "kind": "학사",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "원격지원서비스",
+   "url": "http://help.snue.ac.kr/",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  }
+ ]
+}

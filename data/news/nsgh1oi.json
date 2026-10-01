@@ -1,0 +1,218 @@
+{
+ "school": "서울대학교",
+ "updatedAt": "2026-10-01",
+ "items": [
+  {
+   "title": "비교과프로그램",
+   "url": "https://extra.snu.ac.kr/",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "국제교육프로그램",
+   "url": "https://www.snu.ac.kr/academics/programs/international",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "외국어교육프로그램",
+   "url": "https://www.snu.ac.kr/academics/programs/language",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "교수학습지원",
+   "url": "https://www.snu.ac.kr/academics/programs/learning_support",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "국가지원연구센터",
+   "url": "https://www.snu.ac.kr/research/units/government_funded",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "4단계 두뇌한국(BK)21사업",
+   "url": "https://www.snu.ac.kr/research/units/bk21-groups",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "중점연구지원",
+   "url": "https://www.snu.ac.kr/research/support/intensive",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "학술연구지원",
+   "url": "https://www.snu.ac.kr/research/support/academic",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "한국학 통일학지원",
+   "url": "https://www.snu.ac.kr/research/support/special",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "연구기자재지원",
+   "url": "https://www.snu.ac.kr/research/support/support",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "연구실 안전관리",
+   "url": "https://www.snu.ac.kr/research/support/safety",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "COVID-19",
+   "url": "https://www.snu.ac.kr/coronavirus",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "예비 대학원생",
+   "url": "https://admission.snu.ac.kr/graduate/prospective",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "입학 웹진 아로리",
+   "url": "http://snuarori.snu.ac.kr/",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "관악학생생활관",
+   "url": "https://www.snu.ac.kr/campuslife/facilities/dorm",
+   "kind": "생활",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "경력개발센터",
+   "url": "https://www.snu.ac.kr/campuslife/aid/career",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "대학생활문화원",
+   "url": "https://www.snu.ac.kr/campuslife/aid/programs",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "장애학생지원센터",
+   "url": "https://www.snu.ac.kr/campuslife/aid/disabled",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "학생지원서비스",
+   "url": "https://www.snu.ac.kr/campuslife/aid/administration",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "정보화서비스",
+   "url": "https://www.snu.ac.kr/campuslife/aid/it",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "의료보건서비스",
+   "url": "https://www.snu.ac.kr/campuslife/aid/health/hospital1",
+   "kind": "생활",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "행정서비스헌장",
+   "url": "https://adminservice.snu.ac.kr/",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "언론 속 서울대",
+   "url": "https://www.snu.ac.kr/snunow/focus?sc=y",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "SNU 미디어",
+   "url": "https://www.snu.ac.kr/snunow/snu_media/online-newsletter",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "SNU 캘린더",
+   "url": "https://www.snu.ac.kr/snunow/events/today",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "SNU Awards",
+   "url": "https://www.snu.ac.kr/about/winners/pride",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "학술연구교육상(교육부문)",
+   "url": "https://www.snu.ac.kr/about/winners/education",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "학술연구교육상(연구부문)",
+   "url": "https://www.snu.ac.kr/about/winners/research",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "재무정보공시",
+   "url": "https://www.snu.ac.kr/about/overview/financial_statements",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "학칙 및 규정",
+   "url": "http://rule.snu.ac.kr/",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  }
+ ]
+}

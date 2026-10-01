@@ -1,0 +1,177 @@
+{
+ "school": "동국대학교 WISE캠퍼스",
+ "updatedAt": "2026-10-01",
+ "items": [
+  {
+   "title": "PORTAL",
+   "url": "https://nportal.dongguk.ac.kr/",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "nDRIMS",
+   "url": "https://ndrims.dongguk.ac.kr/",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "E-CLASS",
+   "url": "https://eclass.dongguk.ac.kr/index.jsp",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "Wisian-road",
+   "url": "https://wisian-road.dongguk.ac.kr/login",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "학생경력관리시스템",
+   "url": "https://job1.dongguk.ac.kr/",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "학적정보정정",
+   "url": "https://wise.dongguk.ac.kr/page/352",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "전자출결시스템",
+   "url": "https://smart.dongguk.ac.kr/service/login?targetUrl=%2Fservice%2Fpage%2Findex",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "SITEMAP",
+   "url": "https://wise.dongguk.ac.kr/sitemap/detail",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "캠퍼스투어신청",
+   "url": "https://wise.dongguk.ac.kr/page/62",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "대학/대학원",
+   "url": "https://wise.dongguk.ac.kr/page/961",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "아이디어 제안",
+   "url": "https://wise.dongguk.ac.kr/article/ideanotice/list",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "취업프로그램",
+   "url": "https://wise.dongguk.ac.kr/article/empprg/list",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "개인정보목적외이용제공대장",
+   "url": "https://wise.dongguk.ac.kr/article/privacyNotice/list",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "취업지원센터",
+   "url": "https://career.dongguk.ac.kr/",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "교수학습개발센터",
+   "url": "https://dkctl.dongguk.ac.kr/",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "교양융합교육원",
+   "url": "https://lad.dongguk.ac.kr/",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "대학혁신사업단",
+   "url": "https://oei.dongguk.ac.kr/",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "금장생활관(기숙사)",
+   "url": "https://dorm.dongguk.ac.kr/",
+   "kind": "생활",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "발전기금/후원의집",
+   "url": "http://ilove.dongguk.ac.kr/ilove/",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "보건진료센터",
+   "url": "https://health.dongguk.ac.kr/",
+   "kind": "생활",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "참사람사회공헌센터",
+   "url": "https://volunteers.dongguk.ac.kr/",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "학생군사교육단",
+   "url": "https://rotc.dongguk.ac.kr/",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "학생상담센터",
+   "url": "https://scc.dongguk.ac.kr/",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "학술정보원(도서관)",
+   "url": "https://libk.dongguk.ac.kr/",
+   "kind": "생활",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  }
+ ]
+}
