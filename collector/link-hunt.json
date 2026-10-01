@@ -5797,6 +5797,134 @@
   "n:https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2508&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0": {
    "patrolledAt": "2026-10-01",
    "lastWhy": ""
+  },
+  "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%20%5B%EA%B3%B5%ED%86%B5%5D%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EA%B2%BD%ED%9D%AC%EB%AA%A9%EB%A0%A8%EC%9E%A5%ED%95%99%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4_10.02(%EA%B8%88": {
+   "attempts": 0,
+   "title": "공통 [공통] 2026학년도 2학기 경희목련장학 신청 안내_10.02(금)~10.25(일)",
+   "lastTried": "2026-10-01",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323225"
+  },
+  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2726%20%5B%ED%99%8D%EB%B3%B4%5D%202027%EB%85%84%EB%8F%84%20%EB%8C%80%EC%82%B0%EB%86%8D%EC%B4%8C%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4%202026.1": {
+   "attempts": 1,
+   "title": "2726 [홍보] 2027년도 대산농촌재단 장학생 선발 안내 2026.10.01. 조회 44",
+   "lastTried": "2026-10-01",
+   "lastWhy": "HTTP 404",
+   "nextTryAt": "2026-10-02",
+   "status": ""
+  },
+  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2725%20%5B%ED%99%8D%EB%B3%B4%5D%20%EC%9A%B0%EC%96%91%EC%9E%AC%EB%8B%A8%202026%EB%85%84%20%EB%8F%99%ED%96%89%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EC%95%88%EB%82%B4%202026.1": {
+   "attempts": 1,
+   "title": "2725 [홍보] 우양재단 2026년 동행 장학생 모집 안내 2026.10.01. 조회 131",
+   "lastTried": "2026-10-01",
+   "lastWhy": "HTTP 404",
+   "nextTryAt": "2026-10-02",
+   "status": ""
+  },
+  "n:https://www.skku.edu/skku/campus/skk_comm/notice06.do#n-2026%EB%85%84%202%ED%95%99%EA%B8%B0%20%EC%86%A1%ED%99%94%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4(~2026.10.07%20%EC%98%A4%ED%9B%84%20": {
+   "attempts": 1,
+   "title": "2026년 2학기 송화재단 장학생 선발 안내(~2026.10.07 오후 1시까지)",
+   "lastTried": "2026-10-01",
+   "lastWhy": "제목 불일치(다른 글이 열림)",
+   "nextTryAt": "2026-10-02",
+   "status": ""
+  },
+  "n:https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-%5B%EA%B3%B5%ED%86%B5%5D%20%E2%94%94%20RE%3A(%EC%83%9D%ED%99%9C%EB%B9%84)2027%ED%95%99%EB%85%84%EB%8F%84%20(%EC%9E%AC)%EB%AF%B8%EB%9E%98%EC%9D%B8%EC%9E%AC%EC%9C%A1%EC%84%B1%EC%9E%AC%EB%8B%A8%20%EC%8B%A0%EA%B7%9C%EC%9E%A5%ED%95%99%EC%83%9D": {
+   "attempts": 1,
+   "title": "[공통] └ RE:(생활비)2027학년도 (재)미래인재육성재단 신규장학생 선발결과 안내 N",
+   "lastTried": "2026-10-01",
+   "lastWhy": "목록에서 못 찾음",
+   "nextTryAt": "2026-10-02",
+   "status": ""
+  },
+  "n:https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-%5B%EA%B3%B5%ED%86%B5%5D%20%E2%94%94%20RE%3A(%EC%83%9D%ED%99%9C%EB%B9%84)2026-2%ED%95%99%EA%B8%B0%20(%EC%A3%BC)%EC%95%84%EC%9D%B4%EC%98%A4%EC%95%8C%EC%BD%94%EB%A6%AC%EC%95%84%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0": {
+   "attempts": 1,
+   "title": "[공통] └ RE:(생활비)2026-2학기 (주)아이오알코리아 장학생 선발결과 안내 N",
+   "lastTried": "2026-10-01",
+   "lastWhy": "목록에서 못 찾음",
+   "nextTryAt": "2026-10-02",
+   "status": ""
+  },
+  "n:https://www.konkuk.ac.kr/bbs/konkuk/235/1208982/artclView.do": {
+   "patrolledAt": "2026-10-01",
+   "lastWhy": ""
+  },
+  "n:https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083&nttId=55323": {
+   "patrolledAt": "2026-10-01",
+   "lastWhy": ""
+  },
+  "n:https://www.gachon.ac.kr/kor/7986/subview.do?nttId=125837": {
+   "patrolledAt": "2026-10-01",
+   "lastWhy": ""
+  },
+  "n:https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=769228&article.offset=0&articleLimit=10": {
+   "patrolledAt": "2026-10-01",
+   "lastWhy": ""
+  },
+  "n:https://www.korea.ac.kr/ko/568/subview.do?nttId=000100000000003865": {
+   "patrolledAt": "2026-10-01",
+   "lastWhy": ""
+  },
+  "n:https://www.korea.ac.kr/ko/568/subview.do?nttId=000100000000003864": {
+   "patrolledAt": "2026-10-01",
+   "lastWhy": ""
+  },
+  "n:https://www.korea.ac.kr/ko/568/subview.do?nttId=000100000000003863": {
+   "patrolledAt": "2026-10-01",
+   "lastWhy": ""
+  },
+  "n:https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2507&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0": {
+   "patrolledAt": "2026-10-01",
+   "lastWhy": ""
+  },
+  "n:https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31569&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&": {
+   "patrolledAt": "2026-10-01",
+   "lastWhy": ""
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30129&pageNo=1": {
+   "patrolledAt": "2026-10-01",
+   "lastWhy": ""
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30125&pageNo=1": {
+   "patrolledAt": "2026-10-01",
+   "lastWhy": ""
+  },
+  "n:https://kau.ac.kr/kaulife/scholnoti.php?searchkey=&searchvalue=&code=s1301&page=&mode=read&seq=11141": {
+   "patrolledAt": "2026-10-01",
+   "lastWhy": ""
+  },
+  "n:https://kau.ac.kr/kaulife/scholnoti.php?searchkey=&searchvalue=&code=s1301&page=&mode=read&seq=11140": {
+   "patrolledAt": "2026-10-01",
+   "lastWhy": ""
+  },
+  "n:https://kau.ac.kr/kaulife/scholnoti.php?searchkey=&searchvalue=&code=s1301&page=&mode=read&seq=11137": {
+   "patrolledAt": "2026-10-01",
+   "lastWhy": ""
+  },
+  "n:https://kau.ac.kr/kaulife/scholnoti.php?searchkey=&searchvalue=&code=s1301&page=&mode=read&seq=11115": {
+   "patrolledAt": "2026-10-01",
+   "lastWhy": ""
+  },
+  "n:https://kau.ac.kr/kaulife/scholnoti.php?searchkey=&searchvalue=&code=s1301&page=3&mode=read&seq=10681": {
+   "patrolledAt": "2026-10-01",
+   "lastWhy": "제목 불일치(다른 글이 열림)"
+  },
+  "n:https://kau.ac.kr/kaulife/scholnoti.php?searchkey=&searchvalue=&code=s1301&page=3&mode=read&seq=10660": {
+   "patrolledAt": "2026-10-01",
+   "lastWhy": "제목 불일치(다른 글이 열림)"
+  },
+  "n:https://kau.ac.kr/kaulife/scholnoti.php?searchkey=&searchvalue=&code=s1301&page=3&mode=read&seq=10610": {
+   "patrolledAt": "2026-10-01",
+   "lastWhy": ""
+  },
+  "n:https://kau.ac.kr/kaulife/scholnoti.php?searchkey=&searchvalue=&code=s1301&page=3&mode=read&seq=10586": {
+   "patrolledAt": "2026-10-01",
+   "lastWhy": ""
+  },
+  "n:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626271&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888": {
+   "patrolledAt": "2026-10-01",
+   "lastWhy": "제목 불일치(다른 글이 열림)"
   }
  }
 }
