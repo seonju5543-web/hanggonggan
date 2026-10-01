@@ -1,7 +1,57 @@
 {
  "school": "가톨릭대학교",
- "updatedAt": "2026-09-30",
+ "updatedAt": "2026-10-01",
  "items": [
+  {
+   "title": "[학생지원팀] 2027년도 대산농촌재단 장학생 선발 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276341&article.offset=0&articleLimit=10&srCategoryId=22",
+   "attachments": [
+    {
+     "name": "[붙임2] 2027 대산장학생 선발요강.pdf",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276341&attachNo=226093"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "[학생지원팀] 2026년 우양재단 동행 장학생 모집",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276332&article.offset=0&articleLimit=10&srCategoryId=22",
+   "attachments": [
+    {
+     "name": "[붙임2] 2026년 우양재단 동행장학 신청서 서식.hwp",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276332&attachNo=226074"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "[학생지원팀] 2026학년도 2학기 하나금융나눔재단 하나장학생 선발 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276264&article.offset=0&articleLimit=10&srCategoryId=22",
+   "attachments": [
+    {
+     "name": "3. 하나장학생 신청서(대학생용).docx",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276264&attachNo=226022"
+    },
+    {
+     "name": "[재단양식] 개인정보 수집이용 및 제공 동의서.pdf",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276264&attachNo=226023"
+    },
+    {
+     "name": "[가톨릭대] 외부장학금 신청 및 추천을 위한 개인정보 수집 및 이용 동의서.hwpx",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276264&attachNo=226024"
+    }
+   ],
+   "deadlineHint": "제출기한 - 트리니티 신청: 2026. 10. 2.(금)까지 - 원본서류 제출: 2026. 10. 6.(화) 12:00까지 &nbsp; ※ 학생",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-09-30"
+  },
   {
    "title": "[학생지원팀] (재)대전청년내일재단 2026년 2학기 인재육성(성취) 장학생 선발 안내(기간 연장)",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=275600&article.offset=0&articleLimit=10&srCategoryId=22",

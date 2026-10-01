@@ -543,7 +543,7 @@ function esc(s) {
    **데이터에 나오는 기호를 전부 아는지** 세므로, 새 기호가 들어오면 그때 빨간불이 된다.
    2026-09-30 에 여덟 개를 더했다 — 44개교 복원으로 들어온 게시판들이 `&lsquo;`·`&#40;` 등을
    담아 왔다(관문이 잡았다). 숫자 기호도 **보이는 글자인 것만** 이름을 대고 넣는다(위 🔴 그대로). */
-const ENTITIES = { nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", '#39': "'", '#160': ' ', middot: '·', '#038': '&', '#039': "'", '#40': '(', '#41': ')', lsquo: '‘', rsquo: '’', bull: '•', sim: '∼' };
+const ENTITIES = { nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", '#39': "'", '#160': ' ', middot: '·', '#038': '&', '#039': "'", '#40': '(', '#41': ')', lsquo: '‘', rsquo: '’', bull: '•', sim: '∼', rarr: '→' };
 /* 🔴 **목록을 두 벌 두지 않는다** (2026-09-13). 예전에는 정규식에 이름이 한 벌 더 박혀 있어서,
    ENTITIES 에 `middot` 를 더해도 정규식이 그걸 몰라 **아무 일도 안 일어났다**(실측).
    이 저장소가 여러 번 데인 자리다 — 목록에서 정규식을 만든다. */
@@ -2864,14 +2864,26 @@ function externalNoticesForMe() {
 }
 
 /* 글이 없으면 빈 문자열 — 홈에 '없어요' 구역을 하나 더 만들지 않는다(학교 게시판 구역이 이미 그 말을 한다) */
+/* 🔴 **몇 장만 펴 두고 '더보기'로 편다** (2026-10-01 개발자 지시 — "나에게 맞는 장학금처럼").
+   재단·지자체 글이 156건이라 홈이 끝없이 길어졌다. 처음엔 '나에게 맞는 장학금'과 같은 석 장
+   (`HOME_DEADLINE_TOP`)만 보이고, 더보기를 누를 때마다 `HOME_DEADLINE_MORE`(10)장씩 더 편다.
+   ⚠️ '나에게 맞는 장학금'은 10장 너머를 '전체 보기'(장학금 찾기)가 맡지만, 이 글들은 **따로 볼
+      화면이 없다** — 그래서 10장에서 멈추지 않고 끝까지 편다(멈추면 나머지 글이 앱에서 사라진다).
+   다 펴면 '접기'. 누를 때 이 구역만 다시 그린다(renderHome 을 부르면 히어로 금액이 또 세어 올라간다). */
+let externalShown = HOME_DEADLINE_TOP;
 function externalNoticesHtml() {
   const mine = externalNoticesForMe();
   if (!mine.length) return '';
+  const shown = Math.min(externalShown, mine.length);
+  const more = mine.length > HOME_DEADLINE_TOP
+    ? `<button type="button" class="link-btn home-more" id="external-more" data-external-more
+         aria-expanded="${shown >= mine.length ? 'true' : 'false'}">${shown >= mine.length ? '접기' : '더보기'}</button>`
+    : '';
   return `<div class="section-head" style="margin-top:4px"><h3>재단·지자체 새 공고</h3>
     <span class="link-btn">${liveExternal.updatedAt ? esc(liveExternal.updatedAt) + ' 갱신' : ''}</span></div>`
-    + `<div class="card-list" style="margin-bottom:18px">`
-    + mine.map((n) => noticeCardHtml(n, { org: `${n.host} 공고`, dday: n.deadline ? { label: ddayWords(dday(n.deadline)), urgent: dday(n.deadline).days >= 0 && dday(n.deadline).days <= 7 } : null })).join('')
-    + `</div>`;
+    + `<div class="card-list" id="external-list">`
+    + mine.slice(0, shown).map((n) => noticeCardHtml(n, { org: `${n.host} 공고`, dday: n.deadline ? { label: ddayWords(dday(n.deadline)), urgent: dday(n.deadline).days >= 0 && dday(n.deadline).days <= 7 } : null })).join('')
+    + `</div>${more}<div style="margin-bottom:18px"></div>`;
 }
 
 /* ---------------- 제출: 복사 · 파일 공유 ---------------- */
@@ -6225,6 +6237,16 @@ function bindEvents() {
   });
 
   $('#btn-apply-all').addEventListener('click', applyAll);
+
+  /* 재단·지자체 새 공고 더보기 (2026-10-01) — 이 구역만 다시 그린다. 다 폈으면 '접기'로 석 장에 돌아간다. */
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('[data-external-more]')) return;
+    const total = externalNoticesForMe().length;
+    externalShown = externalShown >= total
+      ? HOME_DEADLINE_TOP
+      : (externalShown < HOME_DEADLINE_MORE ? HOME_DEADLINE_MORE : externalShown + HOME_DEADLINE_MORE);
+    $('#external-notices').innerHTML = externalNoticesHtml();
+  });
 
   /* '마감 임박' 더보기 (노션 UI-14) — 다시 그리지 않고 **가려 둔 카드를 편다**.
      renderHome() 을 부르면 히어로 금액이 또 세어 올라가고(countUp 900ms) 스크롤이 튄다. */

@@ -1,7 +1,25 @@
 {
  "school": "서울교육대학교",
- "updatedAt": "2026-09-30",
+ "updatedAt": "2026-10-01",
  "items": [
+  {
+   "title": "[우양재단] 2026년 동행 장학생 모집 (가족 돌봄 청년 대상, ~10/18)",
+   "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083&nttId=55323",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "[(재)대전청년내일재단] 2026년 하반기 인재육성(성취) 장학생 선발 안내",
+   "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083&pageNo=2&nttId=54977",
+   "attachments": [],
+   "deadlineHint": "신청기간 안내 학생처 2026.09.01 726 614 「2026년 하반기 익산시 대학생 학자금 이자 지원 사업」안내 학생처 2026.08.31",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-09-30"
+  },
   {
    "title": "(재)논산시장학회 학업장려 장학생 선발",
    "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083&nttId=55272",
@@ -43,15 +61,6 @@
     }
    ],
    "deadlineHint": "신청기간 :&nbsp;2026. 9. 28. (월) 09:00 ~ 10.&nbsp;30. (금)&nbsp;18:00 &nbsp; 2. 장학금액:",
-   "school": "서울교육대학교",
-   "campus": "",
-   "foundAt": "2026-09-30"
-  },
-  {
-   "title": "[(재)대전청년내일재단] 2026년 하반기 인재육성(성취) 장학생 선발 안내",
-   "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083&nttId=54977",
-   "attachments": [],
-   "deadlineHint": null,
    "school": "서울교육대학교",
    "campus": "",
    "foundAt": "2026-09-30"
