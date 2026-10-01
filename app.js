@@ -2880,7 +2880,8 @@ function schoolNewsForMe() {
   if (!p || !liveNews) return [];
   return (liveNews.items || [])
     .filter((n) => n && n.url && n.title && !n.hidden && noticeForProfile(n, p))
-    .sort((a, b) => String(b.foundAt || '').localeCompare(String(a.foundAt || '')));
+    /* 게시판 줄에 적힌 게시일(postedAt)이 있으면 그것으로, 없으면 수집일로 — 최근 것이 앞 */
+    .sort((a, b) => String(b.postedAt || b.foundAt || '').localeCompare(String(a.postedAt || a.foundAt || '')));
 }
 
 /* 홈 「우리 학교 소식」 — 학교 게시판 공고 구역 바로 아래. 앞 NEWS_HOME_TOP 장만 펴고 나머지는 더보기(장 수는 이 상수 하나). */
@@ -2897,7 +2898,7 @@ function schoolNewsHtml() {
   const shown = newsOpen ? mine : mine.slice(0, NEWS_HOME_TOP);
   const more = mine.length > NEWS_HOME_TOP;
   return head + `<div class="card-list" style="margin-bottom:${more ? 6 : 18}px">`
-    + shown.map((n) => noticeCardHtml(n, { org: `${n.school} 공지${n.kind ? ' · ' + n.kind : ''}` })).join('')
+    + shown.map((n) => noticeCardHtml(n, { org: `${n.school} 공지${n.kind ? ' · ' + n.kind : ''}`, excerpts: n.postedAt ? [{ label: '게시', text: n.postedAt }] : [] })).join('')
     + `</div>`
     + (more ? `<button type="button" class="link-btn home-more" data-news-more aria-expanded="${newsOpen ? 'true' : 'false'}" style="margin-bottom:18px">${newsOpen ? '접기' : `더보기 (${mine.length - NEWS_HOME_TOP})`}</button>` : '');
 }

@@ -268,6 +268,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   `data/news/<학교키>.json`(`newsFileFor` · 공고와 같은 열쇠 · 옛 통짜 파일 없음) → 홈 「우리 학교 소식」(`schoolNewsHtml` · 다섯 장 + 더보기 `NEWS_HOME_TOP`).
   로봇은 **따로**(`collect-news.mjs` · 장학 수집기 예산이 이미 꽉 차서) · 판정은 `news-kind.mjs` 한 곳(장학·활동 글은 그쪽 피드 몫) · 학교 범위는 `noticeForProfile` ·
   출처는 웹 검색 후보를 찾기 로봇이 열어 확인해 `boardUrl` 로 올린다(못 찾으면 리포트 「개발자에게 요청」) · 알림 없음. 관문 「교내 소식」 · `verify-news.js`.
+  🔴 글 줄은 **날짜가 붙은 줄만**(`extractDatedRows` · 게시일 `postedAt`) — 페이지 링크 전부를 쓰면 사이트 메뉴가 글이 된다(2026-10-01 첫 실행 906건 사고). 학교 게시판은 robots.txt 를 묻지 않는다(장학 수집기와 같은 정책).
 - **학자금대출**은 정식 등록 제외(대출 원금·이자를 지원하는 장학금은 제외 대상 아님 — `LOAN_EXCEPT`) · 피드에선 빼지 않고 장학 공고 뒤로 보낸다(`boardNoticesForMe`).
 - **인스타**: 🔴 게시는 사람만 누른다 · 토큰은 워크플로에만 · 한 실행 최대 6건 · 수정은 다시 그려 **보여 주고 메일 보낼지 물은 뒤** push-to-run(스킬 `insta-revise`).
   관문 `verify-insta.js` · `docs/designs/instagram-pipeline.md`.

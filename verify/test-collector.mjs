@@ -1942,9 +1942,17 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
   /* ② 찾기 로봇 — 순수 함수 */
   const L = (t, u) => ({ title: t, url: u });
   const board = 'https://www.khu.ac.kr/kor/notice/list.do';
-  const rows = [L('2026학년도 2학기 수강신청 안내', 'https://www.khu.ac.kr/n/1'), L('기말고사 일정 변경 공지', 'https://www.khu.ac.kr/n/2'), L('도서관 열람실 운영시간 변경 안내', 'https://www.khu.ac.kr/n/3'), L('2026 가을축제 개최 안내', 'https://www.khu.ac.kr/n/4'), L('셔틀버스 노선 변경 안내 (9/30~)', 'https://www.khu.ac.kr/n/5')];
-  eq('찾기 — 학교 안 글 5행이면 게시판', FN.scoreNewsPage(rows, board).rows >= FN.MIN_ROWS, true);
-  eq('  다른 사이트 링크·메뉴·파일은 글로 세지 않는다', FN.scoreNewsPage([L('2026학년도 수강신청 안내', 'https://blog.naver.com/x'), L('공지사항', board), L('공지문.pdf', 'https://www.khu.ac.kr/a.pdf')], board).rows, 0);
+  const BL = await import('../collector/board-links.mjs');
+  /* 🔴 첫 실행 사고(2026-10-01): 페이지의 링크 전부를 글로 세어 사이트 메뉴 906건이 발행됐다. 글 줄은 **날짜가 붙은 줄**만이다. */
+  const navHtml = '<ul id="nav"><li><a href="/kor/about">학교법인 경희학원</a></li><li><a href="/kor/open">대학정보공시 안내</a></li><li><a href="/kor/eval">대학자체평가 결과 안내</a></li><li><a href="/kor/map1">신규 서울 캠퍼스 안내</a></li><li><a href="/kor/map2">신규 국제 캠퍼스 안내</a></li><li><a href="/kor/fund">기부금 모금액 및 활용실적</a></li></ul>';
+  const rowsHtml = '<table><tbody>' + ['2026학년도 2학기 수강신청 안내', '기말고사 일정 변경 공지', '도서관 열람실 운영시간 변경 안내', '2026 가을축제 개최 안내', '셔틀버스 노선 변경 안내 (9/30~)'].map((t, i) => `<tr><td>${i + 1}</td><td><a href="/kor/notice/view.do?seq=${i + 1}">${t}</a></td><td>2026.09.${20 + i}</td></tr>`).join('') + '</tbody></table>';
+  const dated = BL.extractDatedRows(navHtml + rowsHtml, board);
+  eq('글 줄 뽑기 — 날짜가 붙은 줄의 링크만 (메뉴 6개는 0)', dated.map((r) => r.url.split('seq=')[1]), ['1', '2', '3', '4', '5']);
+  eq('  게시일을 줄에서 읽는다 (지어내지 않는다)', dated[0].postedAt, '2026-09-20');
+  eq('  날짜 꼴 셋 — 2026.9.30 · 2026-09-30 · 26.09.30 · 2026년 9월 30일', ['2026.9.30', '2026-09-30', '26.09.30', '2026년 9월 30일', '09.30', '2026.13.01'].map(BL.rowDate), ['2026-09-30', '2026-09-30', '2026-09-30', '2026-09-30', null, null]);
+  eq('찾기 — 날짜 줄 5행이면 게시판', FN.scoreNewsPage(dated, board).rows >= FN.MIN_ROWS, true);
+  eq('  메뉴 링크 전부를 넘겨도 게시판이 아니다 (날짜 없는 링크는 세지 않는다)', FN.scoreNewsPage(BL.extractLinks(navHtml, board), board).rows, 0);
+  eq('  다른 사이트 링크·메뉴·파일은 글로 세지 않는다', FN.scoreNewsPage([{ ...L('2026학년도 수강신청 안내', 'https://blog.naver.com/x'), postedAt: '2026-09-30' }, { ...L('공지사항', board), postedAt: '2026-09-30' }, { ...L('공지문.pdf', 'https://www.khu.ac.kr/a.pdf'), postedAt: '2026-09-30' }], board).rows, 0);
   eq('  장학 글도 게시판 판정에는 센다 (무엇을 실을지는 수집기가 가른다)', FN.isNewsLike(L('2026-2학기 장학금 신청 안내', 'https://www.khu.ac.kr/n/9'), board), true);
   const menu = [L('공지사항', 'https://www.khu.ac.kr/kor/notice/list.do'), L('장학공지', 'https://www.khu.ac.kr/kor/schol'), L('학사공지', 'https://www.khu.ac.kr/kor/acad'), L('오시는 길', 'https://www.khu.ac.kr/map'), L('뉴스', 'https://other.com/news'), L('입찰공고', 'https://www.khu.ac.kr/bid'), L('대학원 공지', 'https://www.khu.ac.kr/grad-notice')];
   eq('메뉴 고르기 — 같은 사이트의 공지·학사만 (장학·입찰·대학원·외부 제외) · 공지사항이 앞', FN.pickNewsMenuLinks(menu, 'https://www.khu.ac.kr/').map((x) => x.url), ['https://www.khu.ac.kr/kor/notice/list.do', 'https://www.khu.ac.kr/kor/acad']);
@@ -1964,6 +1972,8 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
   eq('  장학 수집기도 fetch-board 를 불러 쓴다 (한 벌)', /from '\.\/fetch-board\.mjs'/.test(cm) && !/^async function fetchBoard/m.test(cm), true);
   eq('  isNewsRow 에 장학 그물·활동 판정을 넘긴다', /isNewsRow\(i, \{ scholarship: KEYWORDS, activityKind, isAttachmentEntry \}\)/.test(rn) && !/isMenuEntry/.test(rn), true);
   eq('  상세를 읽지 않는다 (fetchDetail 없음 · 제목+링크+수집일만)', /fetchDetail/.test(rn), false);
+  eq('  글 줄만 읽는다 — extractDatedRows (페이지 링크 전부 extractLinks 가 아니다)', /rawLinks = extractDatedRows\(html, s\.boardUrl\)/.test(rn) && !/\bextractLinks\(/.test(rn) && /extractDatedRows\(page\.html, page\.url\)/.test(readText(new URL('collector/find-news-boards.mjs', root))), true);
+  eq('  학교 게시판은 robots.txt 를 묻지 않는다 (장학 수집기와 같은 정책 · 첫 실행에서 10개교가 ⛔ 로 빠졌다)', /robotsAllows/.test(rn), false);
   eq('  예산·시한·회전 — hasRoom · withDeadline · 커서 저장 · 스스로 끝낸다', /if \(!budget\.hasRoom\(MIN_ROOM_MS\)\) \{/.test(rn) && /await withDeadline\(harvestBoard\(s, ctx\), BOARD_HARD_MS\)/.test(rn) && /fs\.writeFileSync\(cursorPath/.test(rn) && /\nprocess\.exit\(0\);\s*$/.test(rn), true);
   eq('  학교별 파일로만 발행한다 (notices.json·activities.json 에 쓰지 않는다)', /publishBySchool\(all, \{\s*\n?\s*dir: NEWS_DIR/.test(rn) && !/notices\.json|activities\.json/.test(rn.replace(/\/\*[\s\S]*?\*\//g, '')), true);
   eq('  발행 규칙 — 보관 기한·중복·서비스 학교·숨김 표식', /NEWS_KEEP_DAYS/.test(rn) && /all = dedupeNotices\(all\)/.test(rn) && /all = dropUnserved\(all\)/.test(rn) && /hideSet\.has\(canonUrl\(n\.url\)\)/.test(rn), true);
@@ -2021,7 +2031,7 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
   eq('못 받아 왔어도 빈 문서 (뼈대가 굳지 않게)', /liveNews = d \|\| liveNews \|\| \{ items: \[\], updatedAt: null \}/.test(app), true);
   eq('옛 통짜 파일로 물러나는 길이 없다', /data\/news\.json/.test(app), false);
   eq('학교 범위는 엔진의 noticeForProfile 한 곳 · 숨긴 글 제외', /\.filter\(\(n\) => n && n\.url && n\.title && !n\.hidden && noticeForProfile\(n, p\)\)/.test(app), true);
-  eq('카드는 한 벌 — 윗줄만 「학교 공지 · 갈래」', /noticeCardHtml\(n, \{ org: `\$\{n\.school\} 공지\$\{n\.kind \? ' · ' \+ n\.kind : ''\}` \}\)/.test(app) && !/function newsCardHtml/.test(app), true);
+  eq('카드는 한 벌 — 윗줄만 「학교 공지 · 갈래」 · 게시일은 줄에서 읽은 것만 한 줄', /noticeCardHtml\(n, \{ org: `\$\{n\.school\} 공지\$\{n\.kind \? ' · ' \+ n\.kind : ''\}`, excerpts: n\.postedAt \? \[\{ label: '게시', text: n\.postedAt \}\] : \[\] \}\)/.test(app) && !/function newsCardHtml/.test(app), true);
   eq('더보기 — 장 수는 상수 하나 · 그릇에 위임', /const NEWS_HOME_TOP = \d+;/.test(app) && /newsBox\.addEventListener\('click'/.test(app) && /data-news-more/.test(app), true);
   const ui = strip(readText(new URL('.github/workflows/verify-ui.yml', root)));
   eq('브라우저 드라이버가 관문에 걸려 있다', /verify-news\.js/.test(ui), true);

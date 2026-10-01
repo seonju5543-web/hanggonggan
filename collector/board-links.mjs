@@ -46,3 +46,33 @@ export function sameSite(url, base) {
   const a = siteKey(url); const b = siteKey(base);
   return !!a && !!b && a === b;
 }
+
+/* ── 게시판 **글 줄**만 뽑기 (2026-10-01 · 교내 소식 첫 실행 사고) ──────────────────────────────
+   extractLinks 는 페이지의 <a> 전부를 준다 — 장학 수집기는 그 뒤에 장학 낱말로 거르니 괜찮았지만, 낱말 그물이 없는 교내 소식은
+   첫 실행에서 **사이트 메뉴 906건**(「학교법인 경희학원」「대학정보공시」…)을 글로 담아 발행했다. 게시판 글 줄은 메뉴와 다르게
+   **같은 줄(<tr>·<li>…)에 날짜가 붙어 있다** — 그것으로 가른다. 날짜는 게시일로 같이 담는다(postedAt · 지어낸 것이 아니라 줄에 적힌 것).
+   ⚠️ 날짜가 줄에 없는 게시판(SPA·날짜 없는 목록)은 0건이 된다 — 그런 곳은 리포트 🟡 로 뜨고 사람이 규칙을 적는다. 메뉴를 섞는 것보다 낫다. */
+const ROW_DATE = /(20\d{2})\s*[.\-/년]\s*(\d{1,2})\s*[.\-/월]\s*(\d{1,2})(?!\d)|(?<!\d)(\d{2})\.(\d{2})\.(\d{2})(?!\d)/;
+export function rowDate(text) {
+  const m = ROW_DATE.exec(String(text || '').replace(/<[^>]+>/g, ' '));
+  if (!m) return null;
+  const [y, mo, d] = m[1] ? [m[1], m[2], m[3]] : [`20${m[4]}`, m[5], m[6]];
+  const mm = Number(mo); const dd = Number(d);
+  if (mm < 1 || mm > 12 || dd < 1 || dd > 31) return null;
+  return `${y}-${String(mm).padStart(2, '0')}-${String(dd).padStart(2, '0')}`;
+}
+export function extractDatedRows(html, base) {
+  const out = new Map();
+  /* 같은 꼬리표가 안에 또 나오지 않는 가장 안쪽 블록만 — 중첩 메뉴(li 안의 li)는 날짜가 없어 어차피 걸러진다 */
+  const re = /<(tr|li|article|dd)\b[^>]*>((?:(?!<\1\b)[\s\S])*?)<\/\1>/gi;
+  let m;
+  while ((m = re.exec(html)) !== null) {
+    const block = m[2];
+    const postedAt = rowDate(block);
+    if (!postedAt) continue;
+    for (const l of extractLinks(block, base)) {
+      if (!out.has(l.url)) out.set(l.url, { ...l, postedAt });
+    }
+  }
+  return [...out.values()];
+}

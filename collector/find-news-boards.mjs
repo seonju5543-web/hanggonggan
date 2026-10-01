@@ -16,7 +16,7 @@
    실행: node collector/find-news-boards.mjs   (FIND_NEWS_MAX=50 FIND_NEWS_MS=360000)
    ============================================================ */
 import fs from 'node:fs';
-import { extractLinks, sameSite } from './board-links.mjs';
+import { extractLinks, extractDatedRows, sameSite } from './board-links.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { isNewsRow } from './news-kind.mjs';
 import { fetchBoard, netReason } from './fetch-board.mjs';
@@ -38,9 +38,10 @@ export function isNewsLike(link, boardUrl) {
   return isNewsRow(link, { isAttachmentEntry });
 }
 
-/* 페이지 하나가 '공지 게시판'인가 — 글처럼 보이는 행 수와 표본 */
-export function scoreNewsPage(links, boardUrl) {
-  const hits = (links || []).filter((l) => isNewsLike(l, boardUrl));
+/* 페이지 하나가 '공지 게시판'인가 — **날짜가 붙은 글 줄**(extractDatedRows) 가운데 글처럼 보이는 것의 수와 표본.
+   🔴 페이지의 링크 전부로 세면 사이트 메뉴 수십 개가 '글'로 세어져 아무 페이지나 게시판이 된다(첫 실행 42/44 '찾음' 사고 · 2026-10-01). */
+export function scoreNewsPage(rows, boardUrl) {
+  const hits = (rows || []).filter((l) => l.postedAt && isNewsLike(l, boardUrl));
   return { rows: hits.length, sample: hits.slice(0, 3).map((l) => l.title) };
 }
 
@@ -79,7 +80,7 @@ async function findOne(s) {
     try {
       const page = await get(url);
       if (page.error) { tried.push({ url, label, rows: 0, status: page.error }); return null; }
-      const score = scoreNewsPage(extractLinks(page.html, page.url), page.url);
+      const score = scoreNewsPage(extractDatedRows(page.html, page.url), page.url);
       tried.push({ url, label, rows: score.rows, status: 'ok' });
       if (score.rows >= MIN_ROWS) return { url: page.url, label, via, evidence, rows: score.rows, sample: score.sample };
     } catch (e) {
@@ -140,7 +141,7 @@ async function main() {
     lines.push('');
   }
   if (missed.length) {
-    lines.push(`### 🙋 개발자에게 출처를 요청할 학교 ${missed.length}곳 — 후보와 홈 메뉴를 다 열어 봤지만 공지 글 목록(${MIN_ROWS}행 이상)을 못 찾았습니다`);
+    lines.push(`### 🙋 개발자에게 출처를 요청할 학교 ${missed.length}곳 — 후보와 홈 메뉴를 다 열어 봤지만 날짜가 붙은 공지 글 줄(${MIN_ROWS}행 이상)을 못 찾았습니다`);
     for (const s of missed) {
       lines.push(`- **${s.school}**`);
       for (const t of (s.probe.tried || []).slice(0, 8)) lines.push(`  - ${t.url} — ${t.status === 'ok' ? `열림 · 글처럼 보이는 행 ${t.rows}` : t.status}`);

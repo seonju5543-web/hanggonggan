@@ -13,13 +13,12 @@
    ============================================================ */
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
-import { extractLinks, sameSite } from './board-links.mjs';
+import { extractDatedRows, sameSite } from './board-links.mjs';
 import { urlKey, dedupeNotices } from './url-key.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { activityKind } from './activity-kind.mjs';
 import { newsKind, isNewsRow } from './news-kind.mjs';
 import { canonUrl } from './canon-url.mjs';
-import { robotsAllows } from './robots.mjs';
 import { fetchBoard, netReason } from './fetch-board.mjs';
 import { publishBySchool, dropUnserved } from './publish-notices.mjs';
 import { makeBudget, rotateOrder, nextCursor, withDeadline, TIMED_OUT } from './harvest-budget.mjs';
@@ -91,11 +90,8 @@ async function harvestBoard(s, ctx = { dead: false }) {
     results.push({ name, status: '⚙️ 게시판 주소 미설정' + (s.probe ? ' (찾기 로봇이 못 찾음 — 리포트 참조)' : ' (찾기 로봇이 다음 실행에 봅니다)'), items: [] });
     return;
   }
-  /* robots.txt 가 막은 길이면 읽지 않는다 (공공·재단 게시판과 같은 규칙 · 파일이 없거나 못 받으면 읽어도 된다고 본다) */
-  if (!(await robotsAllows(s.boardUrl))) {
-    results.push({ name, status: '⛔ robots.txt 가 막아 둔 주소 — 읽지 않았습니다 (출처를 바꾸거나 보관하세요)', items: [] });
-    return;
-  }
+  /* robots.txt 는 묻지 않는다 — 학교 게시판은 장학 수집기와 같은 정책(collector/robots.mjs 머리말 · 공공·재단 게시판만 묻는다).
+     첫 실행에서 물었더니 10개교가 ⛔ 로 빠졌다(2026-10-01). */
   try {
     const rule = NEWS_BOARD_RULES[s.school];
     let rawLinks;
@@ -115,7 +111,9 @@ async function harvestBoard(s, ctx = { dead: false }) {
       } else if (rule && rule.kind === 'dataId') {
         rawLinks = [...html.matchAll(/data-id=["'](\d+)["'][^>]*>([\s\S]{0,300}?)<\/a>/g)].map((m) => ({ title: m[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(), url: rule.detail(m[1]) })).filter((x) => x.title);
       } else {
-        rawLinks = extractLinks(html, s.boardUrl);
+        /* 🔴 글 줄만 — 페이지의 <a> 전부(extractLinks)를 쓰면 사이트 메뉴가 글로 담긴다(첫 실행 906건 사고 · 2026-10-01).
+           날짜가 붙은 줄(<tr>·<li>…)의 링크만 글이고, 그 날짜가 게시일(postedAt)이다. */
+        rawLinks = extractDatedRows(html, s.boardUrl);
       }
     }
     /* 무엇을 싣나 — 학교 사이트 안의 글 가운데 장학·활동·잡음을 뺀 것 (판정은 news-kind.mjs 한 곳) */
@@ -136,7 +134,7 @@ async function harvestBoard(s, ctx = { dead: false }) {
     if (ctx.dead) return;
     results.push({
       name,
-      status: items.length ? `✅ 정상 (공지 글 ${items.length}건 감지 · 새 글 ${fresh.length})` : '🟡 접속은 되지만 공지 글을 찾지 못함 — 목록이 스크립트로만 그려지는 게시판이면 NEWS_BOARD_RULES 가 필요합니다',
+      status: items.length ? `✅ 정상 (공지 글 ${items.length}건 감지 · 새 글 ${fresh.length})` : '🟡 접속은 되지만 날짜가 붙은 글 줄을 찾지 못함 — 목록이 스크립트로만 그려지거나 줄에 날짜가 없는 게시판이면 NEWS_BOARD_RULES 가 필요합니다',
       items: fresh,
     });
   } catch (e) {
@@ -234,7 +232,7 @@ const unset = results.filter((r) => /주소 미설정/.test(r.status));
 if (unset.length) lines.push(`⚙️ 게시판 주소가 아직 없는 학교 ${unset.length}곳: ${unset.map((r) => r.name).join(' · ')} (찾기 로봇 리포트 collector/find-news-boards-report.md)`, '');
 for (const r of results) {
   lines.push(`### ${r.name}`, `상태: ${r.status}`);
-  for (const i of r.items) lines.push(`- ${i.kind ? `[${i.kind}] ` : ''}[${i.title}](${i.url})`);
+  for (const i of r.items) lines.push(`- ${i.kind ? `[${i.kind}] ` : ''}[${i.title}](${i.url})${i.postedAt ? ` — ${i.postedAt}` : ''}`);
   lines.push('');
 }
 lines.push('---', '⚙️ 설정: `collector/news-sources.json` · 발행: `data/news/<학교키>.json` · 로봇: `collector/collect-news.mjs` · 판정: `collector/news-kind.mjs`');
