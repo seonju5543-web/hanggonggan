@@ -49,6 +49,8 @@ cp collector/page-boilerplate.mjs "$OUT/vendor/page-boilerplate.mjs"
 cp tools/edit-diff.mjs "$OUT/vendor/edit-diff.mjs"
 # 대외활동·공모전 종류 두 가지 — 로봇(collect.mjs)·관문·관리자 화면이 같은 파일을 본다 (2026-09-29)
 cp collector/activity-kind.mjs "$OUT/vendor/activity-kind.mjs"
+# 교내 소식 갈래 목록 (2026-09-30) — 관리자 「소식」 탭이 갈래 버튼을 그릴 때 쓴다 (베끼지 않는다)
+cp collector/news-kind.mjs "$OUT/vendor/news-kind.mjs"
 
 # 등록 규칙 — Node용 파일이라 브라우저에서 읽히도록 앞뒤만 감싼다.
 # (내용은 손대지 않는다. 규칙이 바뀌면 다음 빌드에 그대로 따라온다)

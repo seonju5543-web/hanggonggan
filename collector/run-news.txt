@@ -1,0 +1,2 @@
+# 교내 소식 수집 실행 트리거 (push-to-run) — 이 파일을 고쳐 기본 브랜치에 push 하면 .github/workflows/collect-news.yml 이 돈다.
+2026-09-30 첫 실행 준비 (로봇 신설)

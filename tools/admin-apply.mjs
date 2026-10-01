@@ -52,6 +52,17 @@ const ACTS = 'data/activities.json';
 const ACT_SRC = 'collector/activity-sources.json';
 const ACT_CFG = 'collector/activity-config.json';
 const ACT_KINDS = ['공모전', '대외활동'];   // collector/activity-kind.mjs 의 ACTIVITY_KINDS 와 같다 (관문이 대조한다 — ESM 이라 여기서 못 부른다)
+/* 교내 소식 (2026-09-30 · 관리자 「소식」 탭) — 학교별 파일 폴더 · 출처 목록 · 사람 조정(숨김). 갈래는 collector/news-kind.mjs 의 NEWS_KINDS 와 같다(관문이 대조한다) */
+const NEWS_DIR = 'data/news';
+const NEWS_SRC = 'collector/news-sources.json';
+const NEWS_CFG = 'collector/news-config.json';
+const NEWS_KINDS = ['학사', '행사', '채용', '생활'];
+/* 학교별 소식 파일 전부 — 통짜 파일이 없어 글 하나를 찾으려면 폴더를 훑는다(색인 제외) */
+function newsFiles() {
+  let names = [];
+  try { names = fs.readdirSync(NEWS_DIR).filter((f) => /\.json$/.test(f) && f !== 'index.json'); } catch { return []; }
+  return names.map((f) => ({ path: `${NEWS_DIR}/${f}`, doc: readJson(`${NEWS_DIR}/${f}`, null) })).filter((x) => x.doc && Array.isArray(x.doc.items));
+}
 /* 학교 게시판 출처는 서비스 학교만 — 목록은 match-engine.js 한 곳(2026-09-29 44개교 복원 · 여기 베끼지 않는다) */
 const SERVED_SCHOOLS = createRequire(import.meta.url)('../match-engine.js').SERVED_SCHOOLS || [];
 
@@ -844,6 +855,100 @@ switch (action) {
       fail(`알 수 없는 출처 작업입니다: ${op}`);
     }
     writeJson(ACT_SRC, src);
+    touched = true;
+    break;
+  }
+
+  /* ── 교내 소식 — 갈래 바꾸기 (2026-09-30) ─────────────────────────────── */
+  case 'newsKind': {
+    const url = String(payload.url || '').trim();
+    const kind = String(payload.kind || '').trim();   // '' 이면 갈래 없음
+    if (!url) fail('대상 글의 주소가 없습니다');
+    if (kind && !NEWS_KINDS.includes(kind)) fail(`갈래는 ${NEWS_KINDS.join('·')} 중 하나이거나 비워야 합니다: ${kind}`);
+    let hit = null;
+    for (const f of newsFiles()) {
+      const it = f.doc.items.find((x) => canonUrl(x.url) === canonUrl(url));
+      if (!it) continue;
+      if ((it.kind || '') === kind) fail('이미 그 갈래입니다');
+      const before = it.kind || '없음';
+      if (kind) it.kind = kind; else delete it.kind;
+      it.kindFrom = `관리자 ${kstNow().slice(0, 10)}`;
+      writeJson(f.path, f.doc);
+      hit = `${it.title.slice(0, 40)} · ${before} → ${kind || '없음'}`;
+      break;
+    }
+    if (!hit) fail(`그 주소의 글이 소식 파일에 없습니다: ${url}`);
+    detail = hit;
+    touched = true;
+    break;
+  }
+
+  /* ── 교내 소식 — 숨기기 / 되살리기 (지우지 않는다 · 로봇이 다시 발행해도 news-config.json 이 표식을 유지한다) ── */
+  case 'newsHide':
+  case 'newsUnhide': {
+    const urls = (Array.isArray(payload.urls) ? payload.urls : [payload.url]).map((u) => String(u || '').trim()).filter(Boolean);
+    if (!urls.length) fail('대상 글의 주소가 없습니다');
+    const hide = action === 'newsHide';
+    const cfg = readJson(NEWS_CFG, { hideUrls: [] });
+    cfg.hideUrls = Array.isArray(cfg.hideUrls) ? cfg.hideUrls : [];
+    const keys = new Set(urls.map(canonUrl));
+    let n = 0;
+    for (const f of newsFiles()) {
+      let changed = 0;
+      for (const it of f.doc.items) {
+        if (!keys.has(canonUrl(it.url))) continue;
+        if (hide) { it.hidden = true; it.hiddenBy = `관리자 ${kstNow().slice(0, 10)}`; } else { delete it.hidden; delete it.hiddenBy; }
+        changed += 1;
+      }
+      if (changed) { writeJson(f.path, f.doc); n += changed; }
+    }
+    if (hide) {
+      for (const u of urls) if (!cfg.hideUrls.some((x) => canonUrl(x) === canonUrl(u))) cfg.hideUrls.push(u);
+    } else {
+      cfg.hideUrls = cfg.hideUrls.filter((x) => !keys.has(canonUrl(x)));
+    }
+    if (!n && hide) fail('그 주소의 글이 소식 파일에 없습니다');
+    writeJson(NEWS_CFG, cfg);
+    detail = `${hide ? '숨김' : '되살림'} ${n}건 (숨긴 주소 ${cfg.hideUrls.length}개)`;
+    touched = true;
+    break;
+  }
+
+  /* ── 교내 소식 — 출처 추가 / 보관 / 되살리기 ─────────────────────────────
+     학교 게시판만이다(전국 글 없음). 학교는 서비스 학교여야 하고, 주소마다 근거(evidence)를 적는다. */
+  case 'newsSource': {
+    const op = String(payload.op || '');
+    const src = readJson(NEWS_SRC, null);
+    if (!src || !Array.isArray(src.sources)) fail(`${NEWS_SRC} 를 읽지 못했습니다`);
+    src.parked = Array.isArray(src.parked) ? src.parked : [];
+    if (op === 'add') {
+      const s = payload.source || {};
+      const url = String(s.boardUrl || '').trim();
+      const school = String(s.school || '').trim();
+      if (!/^https?:\/\//i.test(url)) fail(`게시판 주소는 http(s)로 시작해야 합니다: ${url}`);
+      if (!school) fail('학교 이름이 있어야 합니다 (교내 소식은 학교 게시판만 읽습니다)');
+      if (!SERVED_SCHOOLS.includes(school)) fail(`서비스하지 않는 학교입니다(match-engine.js SERVED_SCHOOLS): ${school}`);
+      if ([...src.sources, ...src.parked].some((x) => canonUrl(x.boardUrl || '') === canonUrl(url))) fail('이미 있는 게시판 주소입니다');
+      const evidence = String(s.evidence || '').trim() || `관리자 화면에서 등록 (${kstNow()} KST)`;
+      /* 그 학교 줄이 이미 있으면(찾기 로봇이 못 찾은 학교) 주소만 채운다 — 학교 하나에 줄 하나 */
+      const row = src.sources.find((x) => x.school === school && !x.boardUrl);
+      if (row) { row.boardUrl = url; row.evidence = evidence; delete row.probe; row.note = `${row.note ? row.note + ' · ' : ''}관리자가 주소를 적음 (${kstNow().slice(0, 10)})`; }
+      else src.sources.push({ school, campus: s.campus || '', home: '', boardUrl: url, candidates: [], evidence, note: '관리자 화면에서 등록' });
+      detail = `출처 추가 · ${school} → ${url}`;
+    } else if (op === 'park' || op === 'unpark') {
+      const url = String(payload.boardUrl || '').trim();
+      const from = op === 'park' ? src.sources : src.parked;
+      const to = op === 'park' ? src.parked : src.sources;
+      const i = from.findIndex((x) => canonUrl(x.boardUrl || '') === canonUrl(url));
+      if (i < 0) fail(`그 주소의 출처가 없습니다: ${url}`);
+      const [row] = from.splice(i, 1);
+      row[op === 'park' ? 'parkedAt' : 'unparkedAt'] = `${kstNow()} KST`;
+      to.push(row);
+      detail = `출처 ${op === 'park' ? '보관' : '되살림'} · ${row.school} · ${url}`;
+    } else {
+      fail(`알 수 없는 출처 작업입니다: ${op}`);
+    }
+    writeJson(NEWS_SRC, src);
     touched = true;
     break;
   }

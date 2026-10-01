@@ -1642,6 +1642,8 @@ function renderHome() {
         (`boardNoticesInSchool` · 같은 날 개발자 지적). 여기서는 전부 그대로 나온다.
      ⚠️ 검색은 안 건다 — 홈에는 검색창이 없다(탐색에 있던 시절의 이유가 사라졌다). */
   $('#live-notices').innerHTML = liveNoticesHtml();
+  /* 교내 소식 (2026-09-30) — 학교 게시판 공고 구역 바로 아래. 재단·지자체보다 위(우리 학교 것끼리) */
+  $('#school-news').innerHTML = schoolNewsHtml();
   /* 재단·지자체 새 공고 (2026-09-26 · 교외 확대) — 학교 게시판 구역 아래, 글이 있을 때만 */
   $('#external-notices').innerHTML = externalNoticesHtml();
 
@@ -2453,7 +2455,7 @@ function loadKosaf() {
    (2026-09-09). 갈라 두면 한쪽에만 새 로더를 붙이는 일이 반드시 생긴다
    (rerenderVisible 주석이 말하는 것과 같은 유형의 사고다). */
 function refreshAllData() {
-  const jobs = [loadNotices(), loadRegistered(), loadKosaf(), loadActivities(), loadExternal()];
+  const jobs = [loadNotices(), loadNews(), loadRegistered(), loadKosaf(), loadActivities(), loadExternal()];
   if (typeof loadFormTemplates === 'function') jobs.push(loadFormTemplates());
   /* 🔴 `swReg` 는 이 파일 한참 아래(서비스워커 등록 자리)에서 `let` 으로 선언된다.
      그 줄이 아직 실행되기 전에 여기를 부르면 `typeof` 로 물어봐도 예외가 난다(TDZ).
@@ -2820,6 +2822,72 @@ function externalNoticesHtml() {
     + `<div class="card-list" style="margin-bottom:18px">`
     + mine.map((n) => noticeCardHtml(n, { org: `${n.host} 공고`, dday: n.deadline ? { label: ddayWords(dday(n.deadline)), urgent: dday(n.deadline).days >= 0 && dday(n.deadline).days <= 7 } : null })).join('')
     + `</div>`;
+}
+
+/* ---------------- 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 학교에 맞춘 교내 뉴스를 앱 내에 추가") ----------------
+   로봇(collector/collect-news.mjs)이 학교 공지 게시판에서 주운 **제목+링크+수집일**을 학교별 파일(data/news/<학교키>.json)로 싣는다.
+   장학 피드(notices)·대외활동(activities)과 파일을 섞지 않는다 — 알림이 공지로 울지 않고, 학생은 제 학교 파일 하나만 받는다.
+   🔴 옛 통짜 파일로 물러나는 길이 **없다** — 파일이 없으면(404) 빈 목록이고 구역은 '없어요' 한 줄을 보인다(뼈대로 굳지 않는다).
+   판정·파일 이름은 match-engine.js 한 곳(newsFilesForProfile · 내 글인가는 noticeForProfile — 공고와 같은 잣대).
+   카드는 noticeCardHtml **한 벌**(윗줄만 '학교 공지 · 갈래'). 자격·적합도·마감은 없다 — 원문을 읽지 않은 것을 판정하지 않는다(원칙 8-1). */
+let liveNews = null;
+let newsFilesLoaded = null;   // 마지막으로 **성공적으로** 받은 파일 목록 (loadNotices 와 같은 규칙 — 받기 전에 적지 않는다)
+let newsFilesWanted = '';
+let newsOpen = false;         // '더보기'를 눌러 편 상태 — 다시 그려도 유지
+const NEWS_HOME_TOP = 5;      // 홈에 펴 두는 장 수 · 나머지는 더보기
+
+function loadNews() {
+  const p = state.profile;
+  const files = (typeof newsFilesForProfile === 'function' && p) ? newsFilesForProfile(p) : [];
+  const wanted = files.join(',');
+  newsFilesWanted = wanted;
+  const get = (u) => fetch(u, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  const job = files.length
+    ? Promise.all(files.map(get)).then((docs) => {
+      const ok = docs.filter(Boolean);
+      return { updatedAt: ok.map((d) => d.updatedAt).filter(Boolean).sort().pop() || null, items: ok.flatMap((d) => d.items || []) };
+    })
+    : Promise.resolve({ items: [], updatedAt: null });   // 프로필이 없으면 아무것도 받지 않는다 — 학교가 정해지면 loadNewsIfSchoolChanged 가 받는다
+  return job.catch(() => null).then((d) => {
+    if (newsFilesWanted !== wanted) return liveNews;   // 늦게 온 옛 학교 것은 버린다 (loadNotices 와 같은 규칙)
+    newsFilesLoaded = d ? wanted : null;
+    liveNews = d || liveNews || { items: [], updatedAt: null };   // 못 받아 왔어도 빈 문서 — 뼈대가 굳지 않게
+    rerenderVisible();
+  });
+}
+
+/* 학교가 정해지거나 바뀌면 그 학교 소식 파일을 받는다 — loadNoticesIfSchoolChanged 와 **같은 자리에서 같이** 부른다(관문이 짝을 센다) */
+function loadNewsIfSchoolChanged() {
+  const key = (typeof newsFilesForProfile === 'function' && state.profile) ? newsFilesForProfile(state.profile).join(',') : '';
+  if (key === newsFilesLoaded) return;
+  loadNews();
+}
+
+function schoolNewsForMe() {
+  const p = state.profile;
+  if (!p || !liveNews) return [];
+  return (liveNews.items || [])
+    .filter((n) => n && n.url && n.title && !n.hidden && noticeForProfile(n, p))
+    .sort((a, b) => String(b.foundAt || '').localeCompare(String(a.foundAt || '')));
+}
+
+/* 홈 「우리 학교 소식」 — 학교 게시판 공고 구역 바로 아래. 앞 NEWS_HOME_TOP 장만 펴고 나머지는 더보기(장 수는 이 상수 하나). */
+function schoolNewsHtml() {
+  const p = state.profile;
+  if (!p) return '';
+  const head = `<div class="section-head" style="margin-top:4px"><h3>우리 학교 소식</h3>
+    <span class="link-btn">${liveNews && liveNews.updatedAt ? esc(liveNews.updatedAt) + ' 갱신' : '매일 갱신'}</span></div>`;
+  if (!liveNews) return head + (typeof skeletonRows === 'function' ? skeletonRows(2) : '');
+  const mine = schoolNewsForMe();
+  if (!mine.length) {
+    return head + `<p class="empty" style="margin-bottom:16px">아직 ${esc(p.school)} 공지 게시판 연결 전이거나 새 소식이 없어요</p>`;
+  }
+  const shown = newsOpen ? mine : mine.slice(0, NEWS_HOME_TOP);
+  const more = mine.length > NEWS_HOME_TOP;
+  return head + `<div class="card-list" style="margin-bottom:${more ? 6 : 18}px">`
+    + shown.map((n) => noticeCardHtml(n, { org: `${n.school} 공지${n.kind ? ' · ' + n.kind : ''}` })).join('')
+    + `</div>`
+    + (more ? `<button type="button" class="link-btn home-more" data-news-more aria-expanded="${newsOpen ? 'true' : 'false'}" style="margin-bottom:18px">${newsOpen ? '접기' : `더보기 (${mine.length - NEWS_HOME_TOP})`}</button>` : '');
 }
 
 /* ---------------- 제출: 복사 · 파일 공유 ---------------- */
@@ -5770,6 +5838,14 @@ function renderWallet() {
 
 /* ---------------- 이벤트 바인딩 ---------------- */
 function bindEvents() {
+  /* 교내 소식 더보기 (2026-09-30) — 구역은 통째로 다시 그려지므로 그릇(#school-news)에 위임한다. 히어로는 안 건드린다. */
+  const newsBox = $('#school-news');
+  if (newsBox) newsBox.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-news-more]');
+    if (!btn) return;
+    newsOpen = !newsOpen;
+    newsBox.innerHTML = schoolNewsHtml();
+  });
   /* 취소 — 고치던 것을 버리고 있던 화면으로 돌아간다.
      🔴 저장하지 않는다: collectProfile() 을 부르지 않으므로 입력칸에 친 값은 버려지고
         state.profile 은 손대지 않은 그대로다. 되돌리기가 아니라 '아무 일도 없던 것'이다. */
@@ -5819,6 +5895,7 @@ function bindEvents() {
     saveState();
     /* 학교가 정해졌거나 바뀌었으면 그 학교 공고 파일을 받는다 (위 주석) */
     loadNoticesIfSchoolChanged();
+    loadNewsIfSchoolChanged();   // 교내 소식도 같은 조건으로 (2026-09-30)
     /* 온보딩을 마쳤으니 '쓰다 만 온보딩' 표시를 지운다 — 안 지우면 다음에 켤 때
        이미 만든 프로필을 두고 또 온보딩 진행분을 들고 있게 된다 */
     clearTimeout(onboardSaveTimer);
@@ -6421,6 +6498,7 @@ function syncApplyRemote(remote, opts) {
     /* 🔴 다른 기기에서 학교를 바꿨을 수도 있다 — 받아 둔 공고가 남의 학교 것이면 다시 받는다.
        ⚠️ `quiet` 일 때는 프로필을 안 바꾸므로 이 안(바꾼 경우)에만 둔다. */
     loadNoticesIfSchoolChanged();
+    loadNewsIfSchoolChanged();   // 교내 소식도 같은 조건으로 (2026-09-30)
   }
   /* 🔴 **학생이 쓴 글은 서버에 없다** — syncSafeApplications 가 `formAns`·`docs` 를 떼고 보낸다
      (주민등록번호·계좌·자기소개서가 들어 있어서다). 그래서 받은 것으로 통째로 갈아치우면
@@ -6711,6 +6789,7 @@ loadState();
 bindEvents();
 initOnboarding();
 loadNotices();
+loadNews();
 loadActivities();
 loadExternal();
 loadRegistered();

@@ -92,6 +92,11 @@ jobs:
           # ⚠️ 2026-09-13 점검: 이번에 새로 쓰는 파일은 없다(원문 대조는 **읽기만** 한다).
           # 대외활동·공모전 (2026-09-29) — 관리자 「활동」 탭이 고치는 파일 셋 (이슈 #79 규칙: 고친 파일은 전부 git add)
           git add data/activities.json collector/activity-sources.json collector/activity-config.json
+          # 교내 소식 (2026-09-30) — 관리자 「소식」 탭이 고치는 것: 학교별 파일 폴더 · 출처 · 숨김 설정 (없을 수 있는 파일은 있을 때만)
+          [ -d data/news ] && git add data/news
+          [ -f collector/news-sources.json ] && git add collector/news-sources.json
+          [ -f collector/news-config.json ] && git add collector/news-config.json
+          true
           git add data/registered.json data/admin-log.json \
                   collector/auto-register-config.json collector/schools.json \
                   collector/pending-forms.json data/forms.json

@@ -23,6 +23,8 @@ import { makeStripper } from './vendor/page-boilerplate.mjs';
 import { diffPatch, showValue, wonText } from './vendor/edit-diff.mjs';
 /* 대외활동·공모전 종류 두 가지 — 🔴 베끼지 않는다. 로봇(collect.mjs)·관문이 같은 파일을 본다 (2026-09-29). */
 import { ACTIVITY_KINDS } from './vendor/activity-kind.mjs';
+/* 교내 소식 갈래 (2026-09-30) — collector/news-kind.mjs 의 것 그대로 (베끼지 않는다) */
+import { NEWS_KINDS } from './vendor/news-kind.mjs';
 
 /* ---------------- 설정 ---------------- */
 const OWNER = 'seonju5543-web';
@@ -163,6 +165,8 @@ const D = {
   insta: { seen: { posted: [], prepared: [] }, templates: [], stats: { history: [], posts: [] }, comments: { items: [] }, token: null, samples: { templates: [] } },
   /* 대외활동·공모전 (2026-09-29) — 피드·출처·사람 조정(숨김) */
   activities: [], actUpdatedAt: '', actSources: { sources: [], parked: [] }, actCfg: { hideUrls: [] },
+  /* 교내 소식 (2026-09-30) — 출처·숨김 설정·학교별 파일 색인 (글은 학교를 골라 그때 받는다 — 44개 파일을 다 받지 않는다) */
+  newsSources: { sources: [], parked: [] }, newsCfg: { hideUrls: [] }, newsIndex: { files: {} },
   failed: [],   // 읽지 못한 파일 — 비어 있지 않으면 화면 숫자를 믿으면 안 된다
 };
 
@@ -215,7 +219,7 @@ async function readText(path) {
 async function loadAll() {
   D.failed = [];        // 매번 새로 센다 — 지난번 실패가 남아 있으면 안 된다
   reportCache = {};     // 로봇을 돌린 뒤 옛 리포트가 보이던 문제(A5)
-  const [reg, notices, forms, health, schools, targets, linkHunt, pending, autoCfg, log, acts, actSrc, actCfg] =
+  const [reg, notices, forms, health, schools, targets, linkHunt, pending, autoCfg, log, acts, actSrc, actCfg, newsSrc, newsCfg, newsIdx] =
     await Promise.all([
       readJson('data/registered.json', { items: [] }),
       readJson('data/notices.json', { items: [] }),
@@ -230,6 +234,9 @@ async function loadAll() {
       readJson('data/activities.json', { items: [] }),
       readJson('collector/activity-sources.json', { sources: [], parked: [] }),
       readJson('collector/activity-config.json', { hideUrls: [] }),
+      readJson('collector/news-sources.json', { sources: [], parked: [] }),
+      readJson('collector/news-config.json', { hideUrls: [] }),
+      readJson('data/news/index.json', { files: {} }),
     ]);
 
   D.reg = reg.items || [];
@@ -247,6 +254,9 @@ async function loadAll() {
   D.actUpdatedAt = acts.updatedAt || '';
   D.actSources = { sources: actSrc.sources || [], parked: actSrc.parked || [] };
   D.actCfg = actCfg || { hideUrls: [] };
+  D.newsSources = { sources: newsSrc.sources || [], parked: newsSrc.parked || [] };
+  D.newsCfg = newsCfg || { hideUrls: [] };
+  D.newsIndex = newsIdx && newsIdx.files ? newsIdx : { files: {} };
 
   /* 인스타 — stats·comments·token-seen·samples 는 **아직 없을 수 있는** 파일이라(계정 연결 전·견본 전)
      404 를 '못 읽음' 경고로 세지 않는다. seen·templates 는 저장소에 늘 있으니 실패하면 경고에 든다. */
@@ -500,7 +510,7 @@ async function applyAction(action, payload, label) {
    넷을 '같은 48건을 네 번 다르게 자른 화면' 으로 두던 것을 끝냈다.
    ⚠️ 화면을 지운 것이 아니라 **품은 것**이다 — 그 내용을 그리는 함수는 그대로 살아 있고
       renderQuality('todo-quality-slot') 처럼 그릴 자리만 받는다(베끼지 않는다). */
-const SCREENS = ['todo', 'review', 'list', 'robots', 'insta', 'activities'];
+const SCREENS = ['todo', 'review', 'list', 'robots', 'insta', 'activities', 'news'];
 let current = 'todo';
 
 function show(name) {
@@ -534,7 +544,7 @@ const screenFromHash = () => {
 
 function renderScreen(name) {
   ({ todo: renderTodo, list: renderList, review: renderReview,
-    robots: renderRobots, insta: renderInsta, activities: renderActivities }[name] || (() => {}))();
+    robots: renderRobots, insta: renderInsta, activities: renderActivities, news: renderNews }[name] || (() => {}))();
   markScrollers(byId(`screen-${name}`));
 }
 
@@ -649,6 +659,7 @@ function renderCounts() {
   if (rb && !rb.dataset.filled) { rb.textContent = '—'; rb.className = 'tab-n'; }
   set('n-insta', instaGroups().prepared.length + instaNewComments().length, true);   // 눌러야 할 것 = 게시 대기 + 답 안 한 댓글
   set('n-activities', D.activities.filter((n) => n && n.url && !n.hidden).length);   // 앱에 보이는 글 수
+  set('n-news', D.newsSources.sources.filter((s) => !s.boardUrl).length, true);   // 사람 손이 필요한 것 = 게시판 주소가 없는 학교 수
 }
 
 /* ---------------- ① 오늘 할 일 ---------------- */
@@ -2036,6 +2047,7 @@ function networkSectionHtml() {
 const ROBOTS = [
   { f: 'collect-scholarships.yml', n: '일반 수집 로봇', d: () => `게시판 ${D.schools.length}곳을 훑어 새 공고를 담습니다`, when: '매일 07:41·11:41' },
   { f: 'browser-collect.yml', n: '브라우저형 수집 로봇', d: () => `봇차단·동적 게시판 ${D.targets.length}곳을 진짜 브라우저로 봅니다`, when: '매일 08:07·12:07' },
+  { f: 'collect-news.yml', n: '교내 소식 로봇', d: () => `학교 공지 게시판 ${D.newsSources.sources.filter((s) => s.boardUrl).length}곳에서 제목+링크를 담습니다 (게시판 찾기 포함)`, when: '매일 07:19·13:19' },
   { f: 'link-hunter.yml', n: '링크 사냥꾼', d: '원문 주소를 못 찾은 공고를 계속 다시 찾습니다', when: '매일 06:37' },
   { f: 'resolve-detail-urls.yml', n: '원문 링크 복구', d: '목록 주소로 남은 공고를 게시판에서 찾아 고칩니다', when: '주 1회' },
   /* 🔴 **지금 보는 공고가 아니라 `form_targets` 에 적힌 공고**의 첨부를 받아 온다.
@@ -2149,6 +2161,8 @@ const REPORTS = [
   ['collector/browser-report.md', '브라우저 수집'],
   ['collector/link-hunt-report.md', '링크 사냥꾼'],
   ['collector/resolve-report.md', '원문 링크 복구'],
+  ['collector/news-report.md', '교내 소식 수집'],
+  ['collector/find-news-boards-report.md', '소식 게시판 찾기'],
 ];
 
 /* 로봇이 남긴 열린 이슈 — 🚨 경보를 맨 위로, 리포트는 접어 둔다 */
@@ -2571,6 +2585,177 @@ async function handleActivityClick(e) {
     if (!source.school && !source.host) { toast('전국 글이면 주최·운영 기관을 적어 주세요'); return true; }
     if (/linkareer|wevity|thinkcontest|campuspick|all-con|contestkorea|thinkyou|allforyoung/i.test(source.boardUrl)) { toast('집계 사이트는 출처로 넣지 않아요 — 주최의 제 게시판을 넣어 주세요'); return true; }
     await applyAction('activitySource', { op: 'add', source }, '출처 추가');
+    return true;
+  }
+  return false;
+}
+
+
+/* ---------------- ⑦ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 학교에 맞춘 교내 뉴스") ----------------
+   앱 홈 「우리 학교 소식」에 실리는 글(data/news/<학교키>.json · 학교별 파일)과 출처(collector/news-sources.json)를 다룬다.
+   버튼은 저장소를 직접 고치지 않는다 — admin-apply.yml 을 깨우고 감사를 통과해야 저장된다(다른 탭과 같다).
+   할 수 있는 일: 갈래 바꾸기(학사·행사·채용·생활·없음) · 숨기기/되살리기(표식) · 출처 추가/보관/되살리기.
+   글은 **학교를 골라 그때 받는다** — 44개 파일을 한꺼번에 받지 않는다(색인 data/news/index.json 이 파일 이름을 안다).
+   갈래 네 가지는 vendor/news-kind.mjs 의 것 그대로 — 여기 베끼지 않는다. */
+let NEWS_LOADED = { school: '', items: null };
+
+function newsSourceRowHtml(s, parked) {
+  const found = s.autoFound;
+  const probe = s.probe;
+  const status = parked ? '보관 중'
+    : s.boardUrl ? (found ? `${found.date} 확인 · ${found.via === 'candidate' ? '검색 후보' : '홈 메뉴'} · 글 ${found.rows}행` : '사람이 적은 주소')
+    : (probe ? `${probe.checkedAt} 못 찾음 (${(probe.tried || []).length}곳 시도) — 개발자에게 요청` : '찾기 로봇이 다음 실행에 봅니다');
+  const ev = (found && found.evidence) || s.evidence || (s.candidates && s.candidates[0] && s.candidates[0].evidence) || '';
+  return `
+    <div class="row" data-row data-noclick data-news-src="${esc(s.boardUrl || '')}" style="cursor:default${parked ? ';opacity:.55' : ''}">
+      <div><div class="t" data-row-title>${esc(s.school)}${s.campus && s.campus !== '공통' ? ' ' + esc(s.campus) : ''} 공지</div>
+        <div class="m"><span>${s.boardUrl ? `<a href="${esc(s.boardUrl)}" target="_blank" rel="noreferrer noopener">${esc(s.boardUrl)}</a>` : '주소 미설정'}</span>
+          <span data-news-status="${esc(s.school)}">${esc(status)}</span></div>
+        ${ev ? `<div class="hint">${esc(ev.slice(0, 160))}</div>` : ''}
+        <div class="badges">${!s.boardUrl && probe ? '<span class="pill warn">출처 요청 필요</span>' : ''}${found && found.sample ? found.sample.slice(0, 2).map((t) => `<span class="pill">${esc(t.slice(0, 28))}</span>`).join('') : ''}</div></div>
+      <div class="btn-row">${s.boardUrl ? (parked
+        ? `<button class="btn btn-sm" data-news-src-unpark="${esc(s.boardUrl)}">되살리기</button>`
+        : `<button class="btn btn-sm" data-news-src-park="${esc(s.boardUrl)}">보관</button>`) : ''}</div>
+      <div></div>
+    </div>`;
+}
+
+function newsItemRowHtml(n) {
+  const hiddenRow = !!n.hidden;
+  return `
+    <div class="row" data-row data-noclick data-news-item="${esc(n.url)}" style="cursor:default${hiddenRow ? ';opacity:.55' : ''}">
+      <div><div class="t" data-row-title>${esc(n.title)}</div>
+        <div class="m"><span>${esc(n.school)} 공지</span><span>${esc(n.foundAt || '')} 수집</span></div>
+        <div class="badges">${n.kind ? `<span class="pill info">${esc(n.kind)}</span>` : '<span class="pill">갈래 없음</span>'}${n.kindFrom ? `<span class="pill">${esc(n.kindFrom)}</span>` : ''}${n.hiddenBy ? `<span class="pill warn">${esc(n.hiddenBy)} 숨김</span>` : ''}</div></div>
+      <div class="btn-row">
+        <a class="btn btn-sm" href="${esc(n.url)}" target="_blank" rel="noreferrer noopener">원문 ↗</a>
+        ${hiddenRow
+          ? `<button class="btn btn-sm" data-news-unhide="${esc(n.url)}">되살리기</button>`
+          : `<select data-news-kind-sel="${esc(n.url)}"><option value="">갈래 없음</option>${NEWS_KINDS.map((k) => `<option value="${esc(k)}"${n.kind === k ? ' selected' : ''}>${esc(k)}</option>`).join('')}</select>
+             <button class="btn btn-sm" data-news-kind="${esc(n.url)}">바꾸기</button>
+             <button class="btn btn-sm danger" data-news-hide="${esc(n.url)}">숨기기</button>`}
+      </div>
+      <div></div>
+    </div>`;
+}
+
+function renderNews() {
+  const box = byId('screen-news');
+  const src = D.newsSources.sources || [];
+  const parked = D.newsSources.parked || [];
+  const known = src.filter((s) => s.boardUrl);
+  const missing = src.filter((s) => !s.boardUrl && s.probe);
+  const pending = src.filter((s) => !s.boardUrl && !s.probe);
+  const files = D.newsIndex.files || {};
+  const schoolsWithFile = Object.keys(files);
+  const items = NEWS_LOADED.items;
+  box.innerHTML = `
+    <div class="sec-head" data-screen-title>
+      <h2>교내 소식</h2>
+      <p>앱 홈 「우리 학교 소식」에 실리는 글입니다(제목+링크 · 학교 공지 게시판 · 자격 판정 없음). 로봇이 게시판을 <b>찾고</b>(검색 후보 → 홈 메뉴) 매일 두 번 읽습니다.
+         못 찾은 학교는 아래 「출처 요청 필요」로 뜹니다 — 학생이 보는 공지 목록 주소를 <b>출처 추가</b>에 적으면 다음 수집부터 읽습니다.</p>
+    </div>
+    <div class="cards">
+      <div class="card ${known.length ? 'is-ok' : 'is-warn'}" data-stat><div class="v">${known.length}<span class="muted">/${src.length}</span></div><div class="k">게시판 아는 학교</div><div class="d">색인 기준일 ${esc(D.newsIndex.updatedAt || '아직 수집 전')} · 파일 있는 학교 ${schoolsWithFile.length}</div></div>
+      <div class="card ${missing.length ? 'is-warn' : 'is-ok'}" data-stat><div class="v">${missing.length}</div><div class="k">출처 요청 필요</div><div class="d">로봇이 후보·홈 메뉴를 다 열어 봤지만 못 찾은 학교${pending.length ? ` · 아직 안 본 학교 ${pending.length}` : ''}</div></div>
+      <div class="card" data-stat><div class="v">${(D.newsCfg.hideUrls || []).length}</div><div class="k">숨긴 글</div><div class="d">파일에는 남고 앱에는 안 보입니다 · 보관한 출처 ${parked.length}곳</div></div>
+    </div>
+
+    <div class="sec-head"><h2>글 보기·바로잡기</h2><p>학교를 골라 그 학교 파일만 받습니다. 갈래(학사·행사·채용·생활)는 로봇이 제목만 보고 붙인 꼬리표라 틀리면 바꿉니다.</p></div>
+    <div class="pgroup" data-news-pick>
+      <div class="field"><label class="lb">학교</label>
+        <select data-news-in="school">${schoolsWithFile.length ? schoolsWithFile.map((s) => `<option value="${esc(s)}"${NEWS_LOADED.school === s ? ' selected' : ''}>${esc(s)} (${files[s].count}건)</option>`).join('') : '<option value="">아직 소식 파일이 없습니다 — 첫 수집 뒤에</option>'}</select></div>
+      <div class="btn-row"><button class="btn" data-news-load${schoolsWithFile.length ? '' : ' disabled'}>글 불러오기</button></div>
+    </div>
+    ${items ? (items.length
+      ? `<div class="rows" data-rows data-news-rows>${items.filter((n) => !n.hidden).map(newsItemRowHtml).join('')}</div>
+         ${items.some((n) => n.hidden) ? `<details class="row" data-news-hidden><summary class="muted">숨긴 글 ${items.filter((n) => n.hidden).length}건</summary><div class="rows" data-rows>${items.filter((n) => n.hidden).map(newsItemRowHtml).join('')}</div></details>` : ''}`
+      : '<p class="empty">이 학교 파일에 글이 없습니다</p>') : ''}
+
+    <div class="sec-head"><h2>출처 게시판 ${src.length}곳</h2><p>학교마다 한 줄. 로봇이 찾은 주소에는 확인한 날짜·글 수·표본 제목이, 못 찾은 학교에는 시도한 흔적이 붙습니다. 잘못 잡힌 게시판은 <b>보관</b>으로 빼고 바른 주소를 추가합니다.</p></div>
+    <div class="rows" data-rows data-news-src-rows>${src.map((s) => newsSourceRowHtml(s, false)).join('')}</div>
+    ${parked.length ? `<details class="row" data-news-parked><summary class="muted">보관한 출처 ${parked.length}곳</summary>
+      <div class="rows" data-rows>${parked.map((s) => newsSourceRowHtml(s, true)).join('')}</div></details>` : ''}
+
+    <div class="pgroup" data-news-add>
+      <div class="sec-head"><h2>출처 추가</h2><p>학생이 보는 <b>공지 목록 페이지</b> 주소를 넣습니다(장학 게시판은 장학 로봇 몫이라 넣지 않습니다). 그 학교 줄이 비어 있으면 그 줄에 주소가 채워집니다.</p></div>
+      <div class="field"><label class="lb">학교</label>
+        <select data-news-in="addSchool">${[...new Set(D.schools.map((s) => s.school).filter(Boolean))].map((s) => `<option value="${esc(s)}">${esc(s)}</option>`).join('')}</select></div>
+      <div class="field"><label class="lb">공지 목록 주소</label><input type="url" data-news-in="boardUrl" placeholder="https://…" maxlength="400" /></div>
+      <div class="field"><label class="lb">어디서 확인했나 (근거)</label><input type="text" data-news-in="evidence" placeholder="예: 학교 홈페이지 > 대학소식 > 공지사항 메뉴" maxlength="200" /></div>
+      <div class="btn-row"><button class="btn btn-primary" data-news-src-add>출처 추가</button></div>
+    </div>`;
+  loadNewsStatus();
+}
+
+/* 출처마다 최근 수집 상태 — 리포트(collector/news-report.md)의 「### 학교 / 상태: …」 두 줄 */
+async function loadNewsStatus() {
+  const text = reportCache['collector/news-report.md'] ?? (reportCache['collector/news-report.md'] = await readText('collector/news-report.md'));
+  const map = new Map();
+  const lines = String(text || '').split('\n');
+  for (let i = 0; i < lines.length - 1; i += 1) {
+    const h = lines[i].match(/^### (.+)$/); const st = lines[i + 1].match(/^상태: (.+)$/);
+    if (h && st) map.set(h[1].trim(), st[1]);
+  }
+  $('[data-news-status]').forEach((el) => {
+    const st = map.get(el.dataset.newsStatus);
+    if (st) el.textContent = `${el.textContent} · 최근 수집: ${st.slice(0, 60)}`;
+  });
+}
+
+/* 화면 안 위임 — bindGlobal 의 클릭 처리에서 부른다. 처리했으면 true. */
+async function handleNewsClick(e) {
+  const t = e.target;
+  const q = (attr) => { const el = t.closest(`[${attr}]`); return el ? el : null; };
+  const box = byId('screen-news');
+  let el;
+  if (q('data-news-load')) {
+    const school = box.querySelector('[data-news-in="school"]')?.value || '';
+    const f = (D.newsIndex.files || {})[school];
+    if (!f) { toast('그 학교의 소식 파일이 아직 없어요'); return true; }
+    const doc = await readJson(`data/news/${f.file}`, { items: [] });
+    NEWS_LOADED = { school, items: doc.items || [] };
+    renderNews();
+    return true;
+  }
+  const titleOf = (url) => { const n = (NEWS_LOADED.items || []).find((x) => x.url === url); return n ? n.title : url; };
+  if ((el = q('data-news-kind'))) {
+    const url = el.dataset.newsKind;
+    const sel = box.querySelector(`[data-news-kind-sel="${CSS.escape(url)}"]`);
+    const kind = sel ? sel.value : '';
+    askSheet({ title: `갈래를 「${kind || '없음'}」(으)로 바꿉니다`, note: '앱 카드 윗줄의 꼬리표가 바뀝니다. 로봇은 사람이 바꾼 갈래를 덮지 않습니다.',
+      lines: [{ t: titleOf(url), m: url }], goLabel: '바꾸기',
+      run: () => applyAction('newsKind', { url, kind }, '갈래 바꾸기') });
+    return true;
+  }
+  if ((el = q('data-news-hide'))) {
+    const url = el.dataset.newsHide;
+    askSheet({ title: '이 글을 앱에서 숨깁니다', note: '지우지 않습니다 — 표식만 붙어 「숨긴 글」에서 되살릴 수 있습니다. 로봇이 다시 발행해도 숨김이 유지됩니다.',
+      lines: [{ t: titleOf(url), m: url }], goLabel: '숨기기', danger: true,
+      run: () => applyAction('newsHide', { urls: [url] }, '숨기기') });
+    return true;
+  }
+  if ((el = q('data-news-unhide'))) {
+    await applyAction('newsUnhide', { urls: [el.dataset.newsUnhide] }, '되살리기');
+    return true;
+  }
+  if ((el = q('data-news-src-park'))) {
+    const url = el.dataset.newsSrcPark;
+    askSheet({ title: '이 출처를 보관합니다', note: '다음 수집부터 읽지 않습니다. 이미 실린 글은 30일 뒤 저절로 사라집니다. 되살리기는 「보관한 출처」에서.',
+      lines: [{ t: url }], goLabel: '보관', danger: true,
+      run: () => applyAction('newsSource', { op: 'park', boardUrl: url }, '출처 보관') });
+    return true;
+  }
+  if ((el = q('data-news-src-unpark'))) {
+    await applyAction('newsSource', { op: 'unpark', boardUrl: el.dataset.newsSrcUnpark }, '출처 되살리기');
+    return true;
+  }
+  if (q('data-news-src-add')) {
+    const val = (k) => (box.querySelector(`[data-news-in="${k}"]`)?.value || '').trim();
+    const source = { school: val('addSchool'), boardUrl: val('boardUrl'), evidence: val('evidence') };
+    if (!/^https?:\/\//i.test(source.boardUrl)) { toast('게시판 주소는 http(s)로 시작해야 해요'); return true; }
+    if (!source.school) { toast('학교를 골라 주세요'); return true; }
+    await applyAction('newsSource', { op: 'add', source }, '출처 추가');
     return true;
   }
   return false;
@@ -3700,6 +3885,7 @@ function bindGlobal() {
   byId('app').addEventListener('click', async (e) => {
     if (await handleInstaClick(e)) return;   // 인스타 화면의 버튼 (2026-09-12)
     if (await handleActivityClick(e)) return;   // 대외활동·공모전 화면의 버튼 (2026-09-29)
+    if (await handleNewsClick(e)) return;   // 교내 소식 화면의 버튼 (2026-09-30)
 
     /* 모아 둔 수정 — 이 버튼은 **머리줄에 있어 시트 밖**이다.
        🔴 시트 핸들러(#sheet)에 두면 영영 안 눌린다(만들면서 실제로 그렇게 만들었다가 잡았다). */

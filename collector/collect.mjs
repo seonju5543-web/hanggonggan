@@ -22,6 +22,7 @@ import { htmlToLines } from './html-text.mjs';
 import { robotsAllows } from './robots.mjs';
 import { extractLinks, stripSessionId } from './board-links.mjs';
 import { canonUrl } from './canon-url.mjs';
+import { fetchBoard, netReason } from './fetch-board.mjs';
 import { makeBudget, rotateOrder, nextCursor, withDeadline, TIMED_OUT } from './harvest-budget.mjs';
 
 const HERE = new URL('.', import.meta.url);
@@ -143,37 +144,7 @@ async function fetchDetail(item) {
   }
 }
 
-/* fetch의 네트워크 실패는 전부 'TypeError: fetch failed'로 뭉뚱그려져 온다.
-   **진짜 이유는 e.cause에 들어 있다**(ENOTFOUND=주소가 없음 / UND_ERR_CONNECT_TIMEOUT=연결 지연 /
-   CERT=인증서). 이걸 안 펴 줘서 홍익대·서울과기대가 며칠째 '⚠️ 오류 (TypeError)'로만 남아
-   **주소가 틀린 건지 학교가 잠깐 느린 건지 구분할 수 없었다** (2026-08-02).
-   동국대에서 얻은 '못 읽음과 틀림을 뭉뚱그리지 말 것'과 같은 계열의 문제다. */
-function netReason(e) {
-  const seen = [];
-  for (let c = e; c && seen.length < 4; c = c.cause) {
-    if (c.code) seen.push(c.code);
-    else if (c.message && c !== e) seen.push(String(c.message).slice(0, 60));
-  }
-  return seen.length ? `${e.name}: ${seen.join(' ← ')}` : (e.name || e.message);
-}
-
-/* 연결이 잠깐 안 되는 것과 주소가 틀린 것은 다르다 — 일시 장애는 한 번 더 두드려 본다.
-   (브라우저 수집기는 이미 3단계 재시도가 있는데 일반 수집기에는 없어서, 학교가 잠시
-   느린 날 통째로 빠지고 그게 리포트에는 '오류'로만 남았다.) */
-const TRANSIENT = /TIMEOUT|ECONNRESET|ECONNREFUSED|EAI_AGAIN|ETIMEDOUT|UND_ERR/i;
-async function fetchBoard(url) {
-  let lastErr;
-  for (let i = 0; i < 3; i += 1) {
-    try {
-      return await fetch(url, { redirect: 'follow', headers: UA, signal: AbortSignal.timeout(i === 0 ? 20000 : 45000) });
-    } catch (e) {
-      lastErr = e;
-      if (!TRANSIENT.test(netReason(e)) || i === 2) break;   // 주소가 없는 것(ENOTFOUND)은 다시 해도 같다
-      await new Promise((r) => setTimeout(r, 3000 * (i + 1)));
-    }
-  }
-  throw lastErr;
-}
+/* netReason·fetchBoard 는 fetch-board.mjs 로 옮겼다 (2026-09-30) — 교내 소식 로봇(collect-news.mjs)과 같은 것을 쓴다 */
 
 /* 목록 행이 진짜 링크가 아닌 게시판 — 주소를 유추하지 말고 **게시판이 실제로 쓰는 것**만 쓴다
    (경희대에서 세 번 틀린 뒤 세운 규칙). 두 형태 다 실제로 열어서 확인해 둔 것이다.

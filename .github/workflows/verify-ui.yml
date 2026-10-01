@@ -150,7 +150,7 @@ jobs:
                    verify-calendar.js verify-resume.js verify-interactions.js \
                    verify-admin.js verify-settings.js verify-admin-shape.js \
                    verify-elig-ask.js \
-                   verify-apply-prep.js verify-activities.js; do
+                   verify-apply-prep.js verify-activities.js verify-news.js; do
             echo "── $f"
             node "verify/$f"
           done

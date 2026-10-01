@@ -51,6 +51,12 @@ jobs:
             // 학과: 전부 받으면 209번이라, 두 곳만 — 하나는 **별칭을 거친 이름**(KAIST)으로 고른다.
             //       커리어넷 이름과 앱 이름이 달라 2026-09-26까지 7곳이 조용히 안 받아지고 있었다.
             for (const k of ['한국외국어대학교','KAIST']) out.push(M.majorsFileFor(k));
+            // 교내 소식 (2026-09-30): 색인이 있는 학교 전부 — 앱이 받는 파일이므로 여기서도 본다(CLAUDE.md 「명령」 규칙)
+            try {
+              const nx = JSON.parse(fs.readFileSync('data/news/index.json','utf8'));
+              out.push('data/news/index.json');
+              for (const k of Object.keys(nx.files)) out.push(M.newsFilesForProfile({school:k})[0]);
+            } catch {}
             console.log([...new Set(out)].join(' '));
           ")
 
@@ -91,6 +97,7 @@ jobs:
           const extra = (process.env.EXTRA_FILES || '').split(/\s+/).filter(Boolean);
           for (const f of extra) {
             const label = f.startsWith('data/majors/') ? '학과(학교별)'
+              : f.startsWith('data/news/') ? (f.endsWith('index.json') ? '소식 색인' : '소식(학교별)')
               : f.endsWith('index.json') ? '공고 색인' : '공고(학교별)';
             rows.push([`${label} ${f.split('/').pop()}`, count(f), count('live/' + f)]);
           }

@@ -24,6 +24,7 @@ const COLLECTORS = [
   '.github/workflows/collect-scholarships.yml',
   '.github/workflows/browser-collect.yml',
   '.github/workflows/deep-fetch.yml',
+  '.github/workflows/collect-news.yml',   // 교내 소식 (2026-09-30)
 ];
 let wfBad = 0;
 for (const f of COLLECTORS) {
@@ -40,7 +41,7 @@ for (const f of COLLECTORS) {
     wfBad++;
   }
 }
-if (wfBad === 0) console.log('✅ 수집 로봇 3종: 저장 위치·실패 알림 정상');
+if (wfBad === 0) console.log(`✅ 수집 로봇 ${COLLECTORS.length}종: 저장 위치·실패 알림 정상`);
 
 /* ── 배포 동기화가 '데이터를 고치는 로봇'을 전부 알고 있나 (2026-08-01 추가) ─────────
    로봇이 기본 브랜치에 커밋해도, deploy-sync의 workflow_run 목록에 그 로봇 이름이 없으면

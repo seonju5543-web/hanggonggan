@@ -180,6 +180,10 @@ const RULES = [
      순서를 눈에 보이게 두어 다음 사람이 헷갈리지 않게 한다. index.json 은 매 발행마다
      새로 쓰이므로 .gitattributes 에서 merge=ours 로 뺐다(합칠 내용이 없다). */
   { match: /(^|\/)data\/notices\/[^/]+\.json$/, merge: mergeSchoolNotices },
+  /* 교내 소식 (2026-09-30) — 학교별 파일·장부·건강 장부는 공고와 같은 모양이라 같은 병합기를 쓴다 */
+  { match: /(^|\/)data\/news\/[^/]+\.json$/, merge: mergeSchoolNotices },
+  { match: /(^|\/)seen-news\.json$/, merge: mergeSeen },
+  { match: /(^|\/)news-health\.json$/, merge: mergeHealth },
   { match: /(^|\/)notices\.json$/, merge: mergeNotices },
   { match: /(^|\/)link-hunt\.json$/, merge: mergeLinkHunt },
   { match: /(^|\/)seen\.json$/, merge: mergeSeen },

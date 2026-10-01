@@ -1,0 +1,152 @@
+name: 교내 소식 수집 로봇
+
+# 교내 소식(학교 공지 게시판 → 앱 홈 「우리 학교 소식」) — 2026-09-30 개발자 지시로 **로봇을 따로** 뒀다.
+# 장학 수집 로봇(collect-scholarships.yml)의 8분 예산은 이미 꽉 차(30/80 게시판) 거기 얹으면 장학·활동 수집이 느려진다.
+# 제목+링크만 담고 상세를 읽지 않으므로 게시판 44곳이 몇 분이면 끝난다. 설계: docs/designs/news-feed.md
+
+on:
+  schedule:
+    # 정각·UTC 자정을 피하고(지연·누락 실측) 다른 로봇과 겹치지 않는 홀수 분. 하루 2회 — 공지는 장학보다 자주 바뀐다.
+    - cron: '19 22 * * *'   # 매일 07:19 KST
+    - cron: '19 4 * * *'    # 매일 13:19 KST
+  workflow_dispatch:
+  push:
+    branches: ['claude/nice-heisenberg-WESq5']
+    paths:
+      - 'collector/run-news.txt'   # 이 파일을 수정해 push하면 즉시 수집 (push-to-run)
+
+permissions:
+  contents: write
+  issues: write
+
+# 제 대기줄 — 장학·브라우저 수집(collector)과 합치지 않는다(대기 실행이 취소된다 · CLAUDE.md). 저장 충돌은 pull --rebase 재시도가 푼다.
+concurrency:
+  group: collector-news
+  cancel-in-progress: false
+
+jobs:
+  news:
+    runs-on: ubuntu-latest
+    env:
+      NODE_EXTRA_CA_CERTS: collector/certs/sectigo-server-auth-dv-r36.pem   # 계명대처럼 중간 인증서를 안 보내는 학교 (collector/certs/README.md)
+    # 상한 = 단계 상한의 합 + 여유 3 (관문 test-collector 「교내 소식」이 대소관계를 잰다 · 상한을 키워 때우지 말 것).
+    # 찾기 7 + 수집 6 + 알림 1 + 관문 5 + 되돌리기 1 + 저장 3 + 리포트 1 + 알림 1 = 25 → 29
+    timeout-minutes: 29
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}   # 대기줄에서 기다린 뒤에는 지금 브랜치 끝에서 시작한다 (collect-scholarships 와 같은 이유)
+
+      - name: 협업 병합기 등록 (충돌 자동 해소 — COLLAB.md)
+        run: bash tools/setup-collab.sh
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # 게시판 찾기 (보강 — 실패해도 수집은 나간다). 수집 **앞**에 두어 이번에 찾은 게시판을 같은 실행이 바로 읽는다.
+      # 첫 실행은 44곳을 다 보므로 넉넉히(50곳 · 5분). 다음부터는 boardUrl 이 비고 14일 지난 학교만 본다.
+      - name: 교내 소식 게시판 찾기 (보강 — 실패해도 수집은 나간다)
+        timeout-minutes: 7
+        continue-on-error: true
+        env:
+          FIND_NEWS_MAX: '50'
+          FIND_NEWS_MS: '300000'
+        run: node collector/find-news-boards.mjs
+
+      - id: run
+        name: 소식 수집
+        # 자체 예산(4분 · collect-news.mjs NEWS_BUDGET_MS) + 단계 상한 + continue-on-error 세 겹.
+        # 상한 6 = 예산 4 + 마지막 게시판이 시한까지 도는 최악(45초 − 최소 여유 15초) + 저장·발행 여유.
+        timeout-minutes: 6
+        continue-on-error: true
+        env:
+          NEWS_BUDGET_MS: '240000'
+        run: node collector/collect-news.mjs
+
+      - name: 🚨 수집 단계 실패 알림 (최근 리포트 이슈에 코멘트)
+        if: steps.run.outcome != 'success'
+        timeout-minutes: 1
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          last=$(gh issue list --repo "${{ github.repository }}" \
+            --search '"교내 소식 수집 리포트" in:title' --state open \
+            --limit 1 --json number --jq '.[0].number' || true)
+          if [ -n "$last" ] && [ "$last" != "null" ]; then
+            gh issue comment "$last" --repo "${{ github.repository }}" \
+              --body "🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **소식 수집 단계가 ${{ steps.run.outcome }} 로 끝났습니다** (상한 6분에 잘렸거나 로봇이 죽었습니다). 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · Claude 세션에 '소식 수집 실패 확인해줘'라고 지시하세요."
+          fi
+
+      # 데이터 관문 — 저장 직전. 규칙을 어기면 이번 실행의 소식 파일을 되돌리고 알린다(장학 수집과 같은 규칙).
+      - name: 데이터 관문 (수집기 규칙 테스트 + 데이터 감사)
+        id: audit
+        timeout-minutes: 5
+        continue-on-error: true
+        run: |
+          node verify/test-collector.mjs
+          node verify/audit-data.js
+
+      - name: 감사 실패 시 이번 소식 발행분 되돌리기
+        if: steps.audit.outcome == 'failure'
+        timeout-minutes: 1
+        run: |
+          git checkout -- data/news collector/seen-news.json 2>/dev/null || true
+          git clean -fdq data/news || true
+
+      - name: 수집 상태 저장 (중복 방지 기록)
+        timeout-minutes: 3
+        run: |
+          git config user.name "handaejang-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # 로봇이 고친 파일은 전부 git add 에 (이슈 #79 규칙) — 발행 파일·장부·커서·건강·출처·리포트
+          [ -d data/news ] && git add data/news
+          [ -f collector/seen-news.json ] && git add collector/seen-news.json
+          [ -f collector/news-cursor.json ] && git add collector/news-cursor.json
+          [ -f collector/news-health.json ] && git add collector/news-health.json
+          [ -f collector/news-sources.json ] && git add collector/news-sources.json
+          [ -f collector/news-report.md ] && git add collector/news-report.md
+          [ -f collector/find-news-boards-report.md ] && git add collector/find-news-boards-report.md
+          true
+          if ! git diff --cached --quiet; then
+            git commit -m "news: 교내 소식 수집"
+            pushed=0
+            for i in 1 2 3; do
+              if git push; then pushed=1; break; fi
+              git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
+            done
+            if [ "$pushed" != "1" ]; then
+              echo "::error::소식 데이터 push 실패 — 3회 재시도 모두 실패. 이번 수집분이 저장되지 않았습니다."
+              exit 1
+            fi
+          fi
+
+      # 리포트 이슈는 **사람 손이 필요할 때만** 만든다(연속 실패·글을 못 읽는 게시판·찾기 로봇이 못 찾은 학교) — 매일 새 이슈는 소음이다.
+      # 수동 실행 때는 늘 만든다(첫 실행 확인용).
+      - name: 리포트 이슈 (사람 손이 필요할 때만)
+        if: github.event_name == 'workflow_dispatch' || steps.run.outputs.needs_human == '1'
+        timeout-minutes: 1
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          { cat collector/news-report.md; echo; echo '---'; echo; [ -f collector/find-news-boards-report.md ] && cat collector/find-news-boards-report.md; } > /tmp/news-issue.md || true
+          if [ "$(wc -c < /tmp/news-issue.md)" -gt 60000 ]; then head -c 60000 /tmp/news-issue.md > /tmp/news-cut.md; printf '\n\n> ⚠️ 리포트가 길어 잘렸습니다 — 전문은 collector/news-report.md\n' >> /tmp/news-cut.md; mv /tmp/news-cut.md /tmp/news-issue.md; fi
+          gh issue create \
+            --title "🗞 교내 소식 수집 리포트 $(TZ=Asia/Seoul date +%Y-%m-%d) (새 글 ${{ steps.run.outputs.new_count }}건)" \
+            --body-file /tmp/news-issue.md \
+            --repo "${{ github.repository }}" \
+            --assignee "${{ github.repository_owner }}"
+
+      - name: 🚨 실패·시간초과 알림 (최근 리포트 이슈에 코멘트)
+        if: failure() || cancelled()
+        timeout-minutes: 1
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          last=$(gh issue list --repo "${{ github.repository }}" \
+            --search '"교내 소식 수집 리포트" in:title' --state open \
+            --limit 1 --json number --jq '.[0].number' || true)
+          if [ -n "$last" ] && [ "$last" != "null" ]; then
+            gh issue comment "$last" --repo "${{ github.repository }}" \
+              --body "🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **교내 소식 로봇이 끝까지 못 갔어요** (실패 또는 시간 초과) — 이번 수집분은 저장되지 않았습니다. 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          fi

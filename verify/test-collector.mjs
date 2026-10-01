@@ -773,7 +773,7 @@ console.log('\n■ 누락 감사 (감사가 수집기의 맹점을 물려받지 
   /* 원인을 가를 때 쓰는 수집기 그물은 수집기의 것과 **같아야** 한다.
      갈라지면 '키워드 밖'이라는 진단 자체가 거짓이 된다. */
   const audited = (src.match(/HARVEST_KEYWORDS = (\/[^\n]+\/);/) || [])[1];
-  for (const f of ['collector/collect.mjs', 'collector/browser-collect.mjs']) {
+  for (const f of ['collector/collect.mjs', 'collector/browser-collect.mjs', 'collector/collect-news.mjs']) {
     const k = (readText(new URL(f, root)).match(/KEYWORDS = (\/[^\n]+\/);/) || [])[1];
     eq(`감사의 수집기 그물 사본이 ${f}와 같다`, audited === k, true);
   }
@@ -1623,7 +1623,7 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
     /* 화면 배선 — 파일 셋을 읽고(readJson 규칙은 「못 읽은 파일」 절이 잰다), 워크플로가 셋을 저장하고, 로봇·앱이 hidden 을 지킨다 */
     const adminJs = readText(new URL('../_admin/admin.js', import.meta.url));
     const adminHtml = readText(new URL('../_admin/index.html', import.meta.url));
-    eq('관리자 화면에 「활동」 탭과 화면이 있다', /data-tab="activities"/.test(adminHtml) && /id="screen-activities"/.test(adminHtml) && /'activities'\]/.test(adminJs) && /activities: renderActivities/.test(adminJs), true);
+    eq('관리자 화면에 「활동」 탭과 화면이 있다', /data-tab="activities"/.test(adminHtml) && /id="screen-activities"/.test(adminHtml) && /'activities'(?:, '[a-z]+')*\]/.test(adminJs) && /activities: renderActivities/.test(adminJs), true);
     eq('  종류 두 가지는 vendor/activity-kind.mjs 에서 (베끼지 않는다)', /from '\.\/vendor\/activity-kind\.mjs'/.test(adminJs) && /cp collector\/activity-kind\.mjs/.test(readText(new URL('../_admin/build.sh', import.meta.url))), true);
     const ay = strip(readText(new URL('../.github/workflows/admin-apply.yml', import.meta.url)));
     eq('  관리자 워크플로가 파일 셋을 저장한다', /git add data\/activities\.json collector\/activity-sources\.json collector\/activity-config\.json/.test(ay), true);
@@ -1743,6 +1743,148 @@ console.log('\n■ 재단·지자체 게시판 (2026-09-26 · 노션 F-13 · 교
   eq('카드는 한 벌 · 주최를 윗줄에 (마감을 읽은 글은 D-day 도)', /noticeCardHtml\(n, \{ org: `\$\{n\.host\} 공고`, dday: n\.deadline \?/.test(app) && !/function externalCardHtml/.test(app), true);
   eq('등록된 주소는 뺀다 — 학교 구역과 같은 잣대(registeredUrlMatcher)', (app.match(/registeredUrlMatcher\(\)/g) || []).length >= 2, true);
   eq('글이 없으면 구역이 비어 있다 (빈 문구를 둘 만들지 않는다)', /if \(!mine\.length\) return '';/.test(app.slice(app.indexOf('function externalNoticesHtml'))), true);
+}
+
+console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 학교에 맞춘 교내 뉴스" · 로봇 신설)');
+{
+  /* 왜 있나 — 앱 홈에 「우리 학교 소식」 구역이 생겼다. 데이터는 장학 피드·활동 탭과 **다른 파일**(data/news/<학교키>.json · 학교별)이고
+     로봇도 따로다(collect-news.mjs · 장학 수집기의 8분 예산이 이미 꽉 차 있어 거기 얹지 않았다). 판정은 news-kind.mjs 한 곳.
+     되돌아가면 안 되는 것: ① 장학·활동 글이 소식에 섞이는 것(그쪽 피드 몫) ② 로봇이 예산·시한·회전 없이 도는 것 ③ 로봇 파일이 저장 목록·병합 규칙·배포 감시에서 빠지는 것
+     ④ 로봇이 쓴 파일 이름과 앱이 받는 이름이 갈라지는 것(404 는 조용하다) ⑤ 화면 배선 한 곳이 빠져 구역이 영영 안 뜨는 것 ⑥ 출처에 근거 없는 주소가 들어오는 것. */
+  const NK = await import('../collector/news-kind.mjs');
+  const FN = await import('../collector/find-news-boards.mjs');
+  const root = new URL('../', import.meta.url);
+  const cm = readText(new URL('collector/collect.mjs', root));
+  const K = new RegExp((cm.match(/const KEYWORDS = \/(.+?)\/;/) || [])[1]);
+  const opts = { scholarship: K, activityKind, isAttachmentEntry: (r) => /\.(pdf|hwp)$/i.test(r.url || '') };
+  /* ① 판정 — 갈래는 꼬리표 · 실을지 말지는 isNewsRow */
+  eq('갈래 — 학사', ['2026학년도 2학기 수강신청 안내', '2026-2학기 기말고사 일정 및 성적처리 안내', '휴학·복학 신청 안내'].map(NK.newsKind), ['학사', '학사', '학사']);
+  eq('  행사', ['2026 가을 축제 개최 안내', '취업 특강 「면접의 기술」 안내', '채용 설명회 안내'].map(NK.newsKind), ['행사', '행사', '행사']);
+  eq('  채용', ['[채용] 학생지원팀 조교 모집 공고', '2026학년도 2학기 근로학생 모집', '교원 초빙 공고'].map(NK.newsKind), ['채용', '채용', '채용']);
+  eq('  생활', ['도서관 열람실 운영시간 변경', '기숙사 하계방학 입사 안내', '셔틀버스 노선 변경 안내'].map(NK.newsKind), ['생활', '생활', '생활']);
+  eq('  못 가르면 null — 「기타」를 지어내지 않는다', NK.newsKind('총장 담화문'), null);
+  eq('  갈래 목록은 넷', NK.NEWS_KINDS, ['학사', '행사', '채용', '생활']);
+  eq('싣는다 — 학사·행사·생활 글', ['2026학년도 2학기 수강신청 안내', '도서관 열람실 운영시간 변경', '총장 담화문'].map((t) => NK.isNewsRow({ title: t, url: 'https://u.ac.kr/1' }, opts)), [true, true, true]);
+  eq('  장학 글은 안 싣는다 (장학 피드 몫)', NK.isNewsRow({ title: '2026-2학기 국가장학금 2차 신청 안내', url: 'u' }, opts), false);
+  eq('  공모전·대외활동은 안 싣는다 (대외활동 탭 몫)', ['2026 아이디어 공모전 모집', '대학생 서포터즈 모집'].map((t) => NK.isNewsRow({ title: t, url: 'u' }, opts)), [false, false]);
+  eq('  결과 발표·입찰·정정공고는 안 싣는다', ['합격자 발표 안내', '시설공사 입찰 공고', '정정공고 - 물품 구매'].map((t) => NK.isNewsRow({ title: t, url: 'u' }, opts)), [false, false, false]);
+  eq('  옆 메뉴·파일 링크·너무 짧은 제목·신호 없는 짧은 글자는 안 싣는다', [NK.isNewsRow({ title: '공지사항', url: 'u' }, opts), NK.isNewsRow({ title: '안내문 2026학년도', url: 'https://u.ac.kr/a.pdf' }, opts), NK.isNewsRow({ title: '안내', url: 'u' }, opts), NK.isNewsRow({ title: '오시는 길 안내도', url: 'u' }, opts)], [false, false, false, false]);
+  /* 🔴 clean-title 의 isMenuEntry 를 쓰면 안 된다 — 날짜 없는 공지 제목(「열람실 운영시간 변경 안내」)을 옆 메뉴로 보아 소식이 통째로 빠진다(2026-09-30 관문에서 잡았다) */
+  eq('  날짜 없는 공지 제목도 싣는다 (clean-title 의 메뉴 판정을 쓰지 않는다)', ['기말고사 일정 변경 공지', '도서관 열람실 운영시간 변경 안내'].map((t) => NK.isNewsRow({ title: t, url: 'https://u.ac.kr/1' }, opts)), [true, true]);
+  /* ② 찾기 로봇 — 순수 함수 */
+  const L = (t, u) => ({ title: t, url: u });
+  const board = 'https://www.khu.ac.kr/kor/notice/list.do';
+  const rows = [L('2026학년도 2학기 수강신청 안내', 'https://www.khu.ac.kr/n/1'), L('기말고사 일정 변경 공지', 'https://www.khu.ac.kr/n/2'), L('도서관 열람실 운영시간 변경 안내', 'https://www.khu.ac.kr/n/3'), L('2026 가을축제 개최 안내', 'https://www.khu.ac.kr/n/4'), L('셔틀버스 노선 변경 안내 (9/30~)', 'https://www.khu.ac.kr/n/5')];
+  eq('찾기 — 학교 안 글 5행이면 게시판', FN.scoreNewsPage(rows, board).rows >= FN.MIN_ROWS, true);
+  eq('  다른 사이트 링크·메뉴·파일은 글로 세지 않는다', FN.scoreNewsPage([L('2026학년도 수강신청 안내', 'https://blog.naver.com/x'), L('공지사항', board), L('공지문.pdf', 'https://www.khu.ac.kr/a.pdf')], board).rows, 0);
+  eq('  장학 글도 게시판 판정에는 센다 (무엇을 실을지는 수집기가 가른다)', FN.isNewsLike(L('2026-2학기 장학금 신청 안내', 'https://www.khu.ac.kr/n/9'), board), true);
+  const menu = [L('공지사항', 'https://www.khu.ac.kr/kor/notice/list.do'), L('장학공지', 'https://www.khu.ac.kr/kor/schol'), L('학사공지', 'https://www.khu.ac.kr/kor/acad'), L('오시는 길', 'https://www.khu.ac.kr/map'), L('뉴스', 'https://other.com/news'), L('입찰공고', 'https://www.khu.ac.kr/bid'), L('대학원 공지', 'https://www.khu.ac.kr/grad-notice')];
+  eq('메뉴 고르기 — 같은 사이트의 공지·학사만 (장학·입찰·대학원·외부 제외) · 공지사항이 앞', FN.pickNewsMenuLinks(menu, 'https://www.khu.ac.kr/').map((x) => x.url), ['https://www.khu.ac.kr/kor/notice/list.do', 'https://www.khu.ac.kr/kor/acad']);
+  eq('  홈 주소가 깨져 있으면 빈 목록', FN.pickNewsMenuLinks(menu, 'not a url'), []);
+  /* ③ 출처 파일 — 44개교 · 근거 */
+  const src = JSON.parse(readText(new URL('collector/news-sources.json', root)));
+  const schoolsCfg = JSON.parse(readText(new URL('collector/schools.json', root)));
+  eq('출처는 수집망 학교 전부와 같다 (schools.json)', src.sources.map((s) => s.school).sort(), schoolsCfg.schools.map((s) => s.school).sort());
+  eq('  후보마다 근거(웹 검색 결과 URL)가 있다 — 주소를 지어내지 않았다', src.sources.every((s) => (s.candidates || []).every((c) => /^https?:\/\//.test(c.url) && typeof c.evidence === 'string' && c.evidence.length >= 10)), true);
+  eq('  boardUrl 이 있으면 로봇 확인(autoFound) 또는 사람의 근거(evidence)가 붙어 있다', src.sources.filter((s) => s.boardUrl).every((s) => (s.autoFound && s.autoFound.rows >= FN.MIN_ROWS && Array.isArray(s.autoFound.sample)) || (typeof s.evidence === 'string' && s.evidence.length > 10)), true);
+  eq('  보관 칸과 되돌리는 법', Array.isArray(src.parked) && /되돌리려면/.test(src._parked || ''), true);
+  /* ④ 로봇 배선 */
+  const rn = readText(new URL('collector/collect-news.mjs', root));
+  eq('로봇은 news-kind·fetch-board·harvest-budget·publish-notices 를 불러 쓴다 (베끼지 않는다)', /from '\.\/news-kind\.mjs'/.test(rn) && /from '\.\/fetch-board\.mjs'/.test(rn) && /import \{ makeBudget, rotateOrder, nextCursor, withDeadline, TIMED_OUT \} from '\.\/harvest-budget\.mjs'/.test(rn) && /import \{ publishBySchool, dropUnserved \} from '\.\/publish-notices\.mjs'/.test(rn), true);
+  eq('  장학 수집기도 fetch-board 를 불러 쓴다 (한 벌)', /from '\.\/fetch-board\.mjs'/.test(cm) && !/^async function fetchBoard/m.test(cm), true);
+  eq('  isNewsRow 에 장학 그물·활동 판정을 넘긴다', /isNewsRow\(i, \{ scholarship: KEYWORDS, activityKind, isAttachmentEntry \}\)/.test(rn) && !/isMenuEntry/.test(rn), true);
+  eq('  상세를 읽지 않는다 (fetchDetail 없음 · 제목+링크+수집일만)', /fetchDetail/.test(rn), false);
+  eq('  예산·시한·회전 — hasRoom · withDeadline · 커서 저장 · 스스로 끝낸다', /if \(!budget\.hasRoom\(MIN_ROOM_MS\)\) \{/.test(rn) && /await withDeadline\(harvestBoard\(s, ctx\), BOARD_HARD_MS\)/.test(rn) && /fs\.writeFileSync\(cursorPath/.test(rn) && /\nprocess\.exit\(0\);\s*$/.test(rn), true);
+  eq('  학교별 파일로만 발행한다 (notices.json·activities.json 에 쓰지 않는다)', /publishBySchool\(all, \{\s*\n?\s*dir: NEWS_DIR/.test(rn) && !/notices\.json|activities\.json/.test(rn.replace(/\/\*[\s\S]*?\*\//g, '')), true);
+  eq('  발행 규칙 — 보관 기한·중복·서비스 학교·숨김 표식', /NEWS_KEEP_DAYS/.test(rn) && /all = dedupeNotices\(all\)/.test(rn) && /all = dropUnserved\(all\)/.test(rn) && /hideSet\.has\(canonUrl\(n\.url\)\)/.test(rn), true);
+  const hardMs = Number((rn.match(/NEWS_BOARD_HARD_MS \|\| (\d+)\)/) || [])[1]);
+  const minRoom = Number((rn.match(/NEWS_MIN_ROOM_MS \|\| (\d+)\)/) || [])[1]);
+  /* ⑤ 워크플로 — 제 대기줄·제 상한·저장 목록·배포 감시·병합 규칙·실시간 점검 */
+  const strip = (t) => t.split('\n').filter((l) => !/^\s*#/.test(l)).join('\n');
+  const wf = strip(readText(new URL('.github/workflows/collect-news.yml', root)));
+  eq('워크플로 — 이름·수집 앞의 찾기 단계(보강 규칙)', /^name: 교내 소식 수집 로봇/m.test(wf) && wf.indexOf('node collector/find-news-boards.mjs') > 0 && wf.indexOf('node collector/find-news-boards.mjs') < wf.indexOf('node collector/collect-news.mjs'), true);
+  eq('  제 대기줄 (collector 와 합치지 않는다) · push 는 기본 브랜치의 run-news.txt 만', /group: collector-news/.test(wf) && /branches: \['claude\/nice-heisenberg-WESq5'\]/.test(wf) && /collector\/run-news\.txt/.test(wf), true);
+  const limit = Number((wf.match(/^ {4}timeout-minutes:\s*(\d+)/m) || [])[1]);
+  const stepCaps = [...wf.matchAll(/^ {8}timeout-minutes:\s*(\d+)/gm)].map((m) => Number(m[1]));
+  const budgetMs = Number((wf.match(/NEWS_BUDGET_MS:\s*'(\d+)'/) || [])[1]);
+  const step = wf.slice(wf.indexOf('name: 소식 수집'), wf.indexOf('run: node collector/collect-news.mjs'));
+  const stepCap = Number((step.match(/timeout-minutes:\s*(\d+)/) || [])[1]);
+  eq('  수집 단계에 자체 상한 + continue-on-error', Number.isFinite(stepCap) && /continue-on-error: true/.test(step), true);
+  eq('  게시판 시한이 예산보다 훨씬 짧고 최소 여유는 시한보다 짧다', hardMs > 0 && hardMs * 2 < budgetMs && minRoom > 0 && minRoom < hardMs, true);
+  eq('  수집 단계 상한이 「예산 + 시한 − 최소 여유 + 30초」보다 크다', stepCap * 60000 > budgetMs + hardMs - minRoom + 30000, true);
+  eq('  작업 상한이 단계 상한의 합 + 여유보다 크다', limit > stepCaps.reduce((a, b) => a + b, 0) + 3, true);
+  eq('  수집 단계가 실패해도 알린다 · 저장은 pushed 표식 · 맨몸 rebase 없음', /if: steps\.run\.outcome != 'success'/.test(wf) && /pushed" != "1"/.test(wf) && !/git pull --rebase(?! --autostash)/.test(wf), true);
+  const saved = ['data/news', 'collector/seen-news.json', 'collector/news-cursor.json', 'collector/news-health.json', 'collector/news-sources.json', 'collector/news-report.md', 'collector/find-news-boards-report.md'];
+  eq('  로봇이 쓰는 파일 전부를 저장한다', saved.filter((f) => !wf.includes('git add ' + f)), []);
+  eq('  관문(test-collector + audit-data)이 저장 앞에 있고 실패하면 되돌린다', wf.indexOf('node verify/audit-data.js') < wf.indexOf('git commit') && /if: steps\.audit\.outcome == 'failure'/.test(wf), true);
+  const sync = readText(new URL('.github/workflows/deploy-sync.yml', root));
+  eq('  배포 동기화가 이 로봇을 안다', /'교내 소식 수집 로봇'/.test(sync), true);
+  const ga = readText(new URL('.gitattributes', root));
+  eq('  병합 규칙 — 학교별 파일·장부는 합집합, 색인·커서·리포트는 내 것', /data\/news\/\*\.json\s+merge=jsonunion/.test(ga) && /data\/news\/index\.json\s+merge=ours/.test(ga) && /collector\/seen-news\.json\s+merge=jsonunion/.test(ga) && /collector\/news-cursor\.json\s+merge=ours/.test(ga) && /collector\/news-report\.md\s+merge=ours/.test(ga), true);
+  const mu = readText(new URL('tools/merge-json-union.mjs', root));
+  eq('  병합기가 소식 파일·장부를 안다', /data\\\/news\\\/\[\^\/\]\+\\\.json\$\/, merge: mergeSchoolNotices/.test(mu) && /seen-news\\\.json\$\/, merge: mergeSeen/.test(mu) && /news-health\\\.json\$\/, merge: mergeHealth/.test(mu), true);
+  const live = readText(new URL('.github/workflows/check-live.yml', root));
+  eq('  실시간 앱 점검이 소식 색인·학교별 파일을 본다 (check-live)', /data\/news\/index\.json/.test(live) && /newsFilesForProfile/.test(live), true);
+  /* ⑥ 로봇이 쓴 파일 이름 = 앱이 받는 이름 — 실제로 발행해 본다 */
+  const ME = createRequire(import.meta.url)('../match-engine.js');
+  const tmp = new URL('../.tmp-news-test/', root);
+  fs.rmSync(tmp, { recursive: true, force: true });
+  publishBySchool([{ school: '경희대학교', campus: '', title: '수강신청 안내', url: 'https://k.kr/1', foundAt: '2026-09-30', kind: '학사' }], { dir: tmp, note: '검사용 색인' });
+  const idx = JSON.parse(readText(new URL('index.json', tmp)));
+  eq('앱이 받는 파일 이름 = 로봇이 쓴 파일 이름 (newsFileFor ↔ publishBySchool)', ME.newsFileFor('경희대학교').split('/').pop(), idx.files['경희대학교'].file);
+  eq('  색인 설명은 제 것 (opts.note)', idx.note, '검사용 색인');
+  eq('  소식 파일은 data/news/ 아래, 공고 파일과 같은 열쇠', ME.newsFileFor('경희대학교'), 'data/news/' + ME.noticeFileKey('경희대학교') + '.json');
+  eq('  분교는 본교 파일도 받는다 (공고와 같은 규칙)', ME.newsFilesForProfile({ school: '한양대학교 ERICA캠퍼스' }).length, ME.noticeFilesForProfile({ school: '한양대학교 ERICA캠퍼스' }).length);
+  eq('  프로필이 없으면 받을 파일이 없다', ME.newsFilesForProfile(null), []);
+  fs.rmSync(tmp, { recursive: true, force: true });
+  /* ⑦ 화면 */
+  const html = readText(new URL('index.html', root));
+  const app = readText(new URL('app.js', root));
+  const homeSlice = html.slice(html.indexOf('id="screen-home"'), html.indexOf('id="screen-explore"'));
+  eq('홈에 구역이 있다 — 학교 게시판 구역 아래 · 재단·지자체 위', homeSlice.indexOf('id="live-notices"') > 0 && homeSlice.indexOf('id="live-notices"') < homeSlice.indexOf('id="school-news"') && homeSlice.indexOf('id="school-news"') < homeSlice.indexOf('id="external-notices"'), true);
+  eq('renderHome 이 그린다', /\$\('#school-news'\)\.innerHTML = schoolNewsHtml\(\);/.test(app), true);
+  eq('당겨서 새로고침·첫 실행이 받는다', /const jobs = \[loadNotices\(\), loadNews\(\),/.test(app) && /^loadNews\(\);$/m.test(app), true);
+  eq('학교가 정해지거나 바뀔 때 공고와 **같은 자리에서** 받는다', (app.match(/loadNewsIfSchoolChanged\(\);/g) || []).length, (app.match(/loadNoticesIfSchoolChanged\(\);/g) || []).length);
+  eq('못 받아 왔어도 빈 문서 (뼈대가 굳지 않게)', /liveNews = d \|\| liveNews \|\| \{ items: \[\], updatedAt: null \}/.test(app), true);
+  eq('옛 통짜 파일로 물러나는 길이 없다', /data\/news\.json/.test(app), false);
+  eq('학교 범위는 엔진의 noticeForProfile 한 곳 · 숨긴 글 제외', /\.filter\(\(n\) => n && n\.url && n\.title && !n\.hidden && noticeForProfile\(n, p\)\)/.test(app), true);
+  eq('카드는 한 벌 — 윗줄만 「학교 공지 · 갈래」', /noticeCardHtml\(n, \{ org: `\$\{n\.school\} 공지\$\{n\.kind \? ' · ' \+ n\.kind : ''\}` \}\)/.test(app) && !/function newsCardHtml/.test(app), true);
+  eq('더보기 — 장 수는 상수 하나 · 그릇에 위임', /const NEWS_HOME_TOP = \d+;/.test(app) && /newsBox\.addEventListener\('click'/.test(app) && /data-news-more/.test(app), true);
+  const ui = strip(readText(new URL('.github/workflows/verify-ui.yml', root)));
+  eq('브라우저 드라이버가 관문에 걸려 있다', /verify-news\.js/.test(ui), true);
+  /* ⑧ 관리자 — 저장소를 실제로 돌려 본다 */
+  {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-news-'));
+    fs.mkdirSync(path.join(dir, 'data/news'), { recursive: true });
+    fs.mkdirSync(path.join(dir, 'collector'), { recursive: true });
+    const key = ME.noticeFileKey('경희대학교');
+    fs.writeFileSync(path.join(dir, 'data/news/' + key + '.json'), JSON.stringify({ school: '경희대학교', updatedAt: '2026-09-30', items: [{ title: '검사용 수강신청 안내', url: 'https://k.ac.kr/n/1', kind: '학사', school: '경희대학교', campus: '', foundAt: '2026-09-30' }] }, null, 1));
+    fs.writeFileSync(path.join(dir, 'collector/news-sources.json'), JSON.stringify({ sources: [{ school: '경희대학교', campus: '공통', boardUrl: 'https://k.ac.kr/notice', evidence: '검사용' }, { school: '서울대학교', campus: '', boardUrl: null, candidates: [], probe: { checkedAt: '2026-09-30', tried: [] } }], parked: [] }, null, 1));
+    fs.writeFileSync(path.join(dir, 'data/admin-log.json'), '{"items":[]}');
+    fs.writeFileSync(path.join(dir, 'data/registered.json'), JSON.stringify({ items: [] }));   // admin-apply 는 시작하며 이 둘을 읽는다 (활동 관문과 같은 씨앗)
+    fs.writeFileSync(path.join(dir, 'data/forms.json'), JSON.stringify({ forms: {}, templates: {} }));
+    const run = (action, payload) => spawnSync(process.execPath, [fileURLToPath(new URL('../tools/admin-apply.mjs', import.meta.url))], { cwd: dir, env: { ...process.env, ACTION: action, ACTOR: 'test', PAYLOAD: JSON.stringify(payload) }, encoding: 'utf8' });
+    const readT = (p) => JSON.parse(readText(path.join(dir, p)));
+    const newsFile = 'data/news/' + key + '.json';
+    eq('관리자 — 갈래 바꾸기', run('newsKind', { url: 'https://k.ac.kr/n/1', kind: '행사' }).status === 0 && readT(newsFile).items[0].kind, '행사');
+    eq('  갈래 없음으로도 (kind 를 지운다)', run('newsKind', { url: 'https://k.ac.kr/n/1', kind: '' }).status === 0 && !('kind' in readT(newsFile).items[0]), true);
+    eq('  모르는 갈래는 거절', run('newsKind', { url: 'https://k.ac.kr/n/1', kind: '기타' }).status !== 0, true);
+    eq('  숨기기 — 표식 + 설정 파일', run('newsHide', { urls: ['https://k.ac.kr/n/1'] }).status === 0 && readT(newsFile).items[0].hidden === true && readT('collector/news-config.json').hideUrls.length, 1);
+    eq('  되살리기', run('newsUnhide', { urls: ['https://k.ac.kr/n/1'] }).status === 0 && !readT(newsFile).items[0].hidden && readT('collector/news-config.json').hideUrls.length, 0);
+    eq('  출처 추가 — 빈 줄이 있는 학교는 그 줄에 채운다', run('newsSource', { op: 'add', source: { school: '서울대학교', boardUrl: 'https://s.ac.kr/notice', evidence: '검사용 근거' } }).status === 0 && readT('collector/news-sources.json').sources.find((s) => s.school === '서울대학교').boardUrl, 'https://s.ac.kr/notice');
+    eq('  서비스 밖 학교·학교 없는 출처는 거절', run('newsSource', { op: 'add', source: { school: '없는대학교', boardUrl: 'https://x.ac.kr/n' } }).status !== 0 && run('newsSource', { op: 'add', source: { school: '', boardUrl: 'https://x.ac.kr/n' } }).status !== 0, true);
+    eq('  보관 → 되살리기', run('newsSource', { op: 'park', boardUrl: 'https://k.ac.kr/notice' }).status === 0 && readT('collector/news-sources.json').parked.length === 1 && run('newsSource', { op: 'unpark', boardUrl: 'https://k.ac.kr/notice' }).status === 0 && readT('collector/news-sources.json').parked.length, 0);
+    fs.rmSync(dir, { recursive: true, force: true });
+    const adminJs = readText(new URL('_admin/admin.js', root));
+    const adminHtml = readText(new URL('_admin/index.html', root));
+    eq('  관리자 화면에 「소식」 탭·화면·그리기·위임이 있다', /data-tab="news"/.test(adminHtml) && /id="screen-news"/.test(adminHtml) && /news: renderNews/.test(adminJs) && /handleNewsClick\(e\)/.test(adminJs) && /'activities', 'news'\]/.test(adminJs), true);
+    eq('  갈래 네 가지는 vendor/news-kind.mjs 에서 (베끼지 않는다)', /from '\.\/vendor\/news-kind\.mjs'/.test(adminJs) && /cp collector\/news-kind\.mjs/.test(readText(new URL('_admin/build.sh', root))), true);
+    const apply = readText(new URL('tools/admin-apply.mjs', root));
+    const kinds = (apply.match(/const NEWS_KINDS = \[([^\]]+)\]/) || [])[1] || '';
+    eq('  저장소의 갈래 목록이 news-kind 와 같다', kinds.match(/'([^']+)'/g).map((x) => x.slice(1, -1)), NK.NEWS_KINDS);
+    const ay = readText(new URL('.github/workflows/admin-apply.yml', root));
+    eq('  관리자 워크플로가 소식 파일을 저장한다', /git add data\/news/.test(ay) && /git add collector\/news-sources\.json/.test(ay), true);
+  }
 }
 
 console.log('\n■ 「또는」 줄의 처지 판정 (2026-09-18 개발자 결정)');
@@ -5772,6 +5914,8 @@ console.log('\n■ 만들어 놓고 안 돌리는 로봇이 없는가 (2026-09-1
     ['collector/extract-amounts.mjs', '금액·이중수혜를 원문에서 읽어 registered.json 에 넣는다'],
     ['collector/extract-excerpts.mjs', '원문 발췌·마감일을 registered.json 에 넣는다'],
     ['collector/find-boards.mjs', '재단·지자체 장학 게시판을 찾아 external-sources.json 에 적는다 (교외 확대 · 2026-09-26)'],
+    ['collector/find-news-boards.mjs', '학교 공지 게시판을 찾아 news-sources.json 에 적는다 (교내 소식 · 2026-09-30)'],
+    ['collector/collect-news.mjs', '학교 공지 게시판을 읽어 data/news/ 학교별 파일로 싣는다 (교내 소식 · 2026-09-30)'],
   ];
   /* 🔴 **주석을 걷고 본다** — 안 걷으면 "이 로봇이 안 걸려 있었다" 고 적어 둔 **설명 주석**의
      글자를 읽고 통과한다. 만들면서 실제로 그랬다: 단계를 통째로 지웠는데도 초록불이었다.
@@ -8288,7 +8432,7 @@ console.log('\n■ 관리자 쓰기 — 되돌릴 수 없는 일 앞의 안전�
      목록이 바뀌면 사람이 '이 동작도 공고 목록을 고치는가'를 한 번 본다. */
   eq('공고 목록을 안 고치는 동작 목록이 그대로다',
     cases.filter((c) => !writes.includes(c)).sort(),
-    ['activityHide', 'activityKind', 'activitySource', 'activityUnhide', 'addBoard', 'autoRegister', 'formQueue', 'unblock']);
+    ['activityHide', 'activityKind', 'activitySource', 'activityUnhide', 'addBoard', 'autoRegister', 'formQueue', 'newsHide', 'newsKind', 'newsSource', 'newsUnhide', 'unblock']);
 }
 
 console.log('\n■ 못 읽은 파일의 숫자를 화면이 단정하지 않는다');

@@ -156,6 +156,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 | `data/notices.json` | 실시간 공고 피드 |
 | `data/activities.json` | 대외활동·공모전 피드(제목+링크 · 장학 피드와 **섞지 않는다**) — `docs/designs/activities-tab.md` |
 | `data/external.json` | 재단·지자체 게시판 공고(교외 확대 · 학교 없는 전국 글 · 주최는 `host`) — `docs/designs/external-sources.md` |
+| `data/news/` | 교내 소식(학교 공지 게시판 · 제목+링크+수집일 · **학교별 파일뿐** · 옛 통짜 파일 없음) — `docs/designs/news-feed.md` |
 | `data/kosaf-open.json` `data/kosaf-files/` | 층2 — 한국장학재단이 아는 재단 장학금(마감 전만) · 선발공고문 사본. 층1과 섞지 않는다 |
 | `data/tuition.json` | 등록금(학교·계열) |
 
@@ -164,6 +165,8 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 |---|---|
 | `collector/collect.mjs` `browser-collect.mjs` | 게시판 수집(일반·진짜 Chromium) — 일반 수집기가 같은 행에서 대외활동·공모전도 갈라 담는다(`activity-kind.mjs` · 출처 `activity-sources.json`) |
 | `collector/auto-register.mjs` | 자동 정식 등록(원칙 2) |
+| `collector/collect-news.mjs` `find-news-boards.mjs` `news-kind.mjs` | 교내 소식 로봇(따로 돈다) · 공지 게시판 찾기(출처 `news-sources.json` · 후보는 웹 검색 + `evidence`) · 실을지·갈래 판정 한 곳 |
+| `collector/fetch-board.mjs` | 게시판 받기·실패 이유 펴기 — 일반 수집기와 소식 로봇이 같이 쓴다(베끼지 말 것) |
 | `collector/extract-excerpts.mjs` | 원문 발췌 · 마감일 · 메일 접수 주소(`apply-email.mjs`) |
 | `collector/deepfetch.mjs` `rescue-bodies.mjs` | 본문·첨부 원본 받기 · 옛 공고 본문 메우기 |
 | `collector/schematize-forms.mjs` `schema-from-text.mjs` | 양식 스키마화(무료 우선, 못 하는 것만 API) |
@@ -237,6 +240,10 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 - **재단·지자체 게시판(교외 확대)** (2026-09-26 · 노션 F-13): 링커리어류는 크롤링이 아니라 **주최사 직접 등록**이라 긁지 않는다 — 우리는 주최의 제 게시판을 읽는다.
   출처 `collector/external-sources.json` 은 `kosaf-open.json` 의 재단 홈페이지에서 왔고, `collector/find-boards.mjs` 가 게시판을 찾아 `autoFound` 로 적는다(잘못 찾으면 `parked`).
   글은 `data/external.json`(학교 피드와 따로) → 홈 「재단·지자체 새 공고」(`externalNoticesHtml` · 등록된 주소는 `registeredUrlMatcher` 로 뺀다). 링크 읽는 눈은 `collector/board-links.mjs` 한 곳. 관문 「재단·지자체 게시판」.
+- **교내 소식** (2026-09-30 · 개발자 지시 "학교에 맞춘 교내 뉴스" · *"로봇 신설"*): 학교 **공지** 게시판에서 제목+링크+수집일만(상세 안 읽음 · 발췌·마감 없음) →
+  `data/news/<학교키>.json`(`newsFileFor` · 공고와 같은 열쇠 · 옛 통짜 파일 없음) → 홈 「우리 학교 소식」(`schoolNewsHtml` · 다섯 장 + 더보기 `NEWS_HOME_TOP`).
+  로봇은 **따로**(`collect-news.mjs` · 장학 수집기 예산이 이미 꽉 차서) · 판정은 `news-kind.mjs` 한 곳(장학·활동 글은 그쪽 피드 몫) · 학교 범위는 `noticeForProfile` ·
+  출처는 웹 검색 후보를 찾기 로봇이 열어 확인해 `boardUrl` 로 올린다(못 찾으면 리포트 「개발자에게 요청」) · 알림 없음. 관문 「교내 소식」 · `verify-news.js`.
 - **학자금대출**은 정식 등록 제외(대출 원금·이자를 지원하는 장학금은 제외 대상 아님 — `LOAN_EXCEPT`) · 피드에선 빼지 않고 장학 공고 뒤로 보낸다(`boardNoticesForMe`).
 - **인스타**: 🔴 게시는 사람만 누른다 · 토큰은 워크플로에만 · 한 실행 최대 6건 · 수정은 다시 그려 **보여 주고 메일 보낼지 물은 뒤** push-to-run(스킬 `insta-revise`).
   관문 `verify-insta.js` · `docs/designs/instagram-pipeline.md`.

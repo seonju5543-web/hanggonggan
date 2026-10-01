@@ -1924,6 +1924,22 @@ function serve() {
     ok(false, '상세에 마감일 칸이 없어 막힘 검사를 못 했다');
   }
 
+  /* ══ 교내 소식 「소식」 탭 (2026-09-30) ═══════════════════════════════════════
+     학교 공지 게시판 출처와 앱 홈 「우리 학교 소식」 글을 다루는 화면. 출처 줄 수는 news-sources.json 과, 배지는
+     '게시판 주소가 없는 학교 수'와 대조한다(사람 손이 필요한 것을 세는 배지). 글 목록은 첫 수집 전엔 파일이 없어 여기서 안 잰다. */
+  {
+    await page.click('.tab[data-tab="news"]');
+    await page.waitForSelector('#screen-news:not([hidden])');
+    const nsrc = JSON.parse(fs.readFileSync(path.join(ROOT, 'collector/news-sources.json'), 'utf8'));
+    const nsN = await page.locator('#screen-news [data-news-src-rows] [data-row]').count();
+    ok(nsN === (nsrc.sources || []).length, '「소식」 탭 — 출처 줄 수가 news-sources.json 과 같다', `${nsN} / ${(nsrc.sources || []).length}`);
+    const nBadge = await page.$eval('#n-news', (e) => e.textContent.trim());
+    const nMissing = (nsrc.sources || []).filter((x) => !x.boardUrl).length;
+    ok(nBadge === String(nMissing), '  탭 배지 = 게시판 주소가 없는 학교 수', `${nBadge} / ${nMissing}`);
+    ok(await page.locator('#screen-news [data-news-add] [data-news-src-add]').count() === 1, '  출처 추가 칸이 있다');
+    await page.click('.tab[data-tab="todo"]');
+  }
+
   /* ══ 대외활동·공모전 「활동」 탭 (2026-09-29) ═══════════════════════════════
      앱 「대외활동」 탭의 글과 출처를 다루는 화면. 건수는 화면이 실제로 받은 목록(ACT_ITEMS)과 대조하고,
      '숨기기'는 진짜로 admin-apply 를 깨우는지(보내는 동작 이름·주소)까지 본다. */

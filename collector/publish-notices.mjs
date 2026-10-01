@@ -165,7 +165,8 @@ export function publishBySchool(items, opts = {}) {
         다시 받기 시작한다 — 관문 「학교별 공고 파일 · 옛 파일로 물러나는 길」이 이 로봇의
         출력을 실제로 만들어 앱의 판정 함수에 먹여 본다. 사람용 설명도 그대로 둔다. */
   fs.writeFileSync(new URL('index.json', dir), JSON.stringify({
-    note: '학교별 실시간 공고 파일 색인. 앱은 noticeFileKey 로 자기 파일을 바로 찾아가고, 그 파일이 없을 때 옛 data/notices.json 을 받을지 말지를 이 색인으로 판단한다(match-engine.js noticeFallbackNeeded). 사람이 어느 파일이 어느 학교인지 보는 데도 쓴다.',
+    /* 교내 소식(data/news/)도 같은 발행기를 쓴다 — 색인 설명만 제 것으로 바꾼다(opts.note · 2026-09-30). 모양(files)은 같다. */
+    note: opts.note || '학교별 실시간 공고 파일 색인. 앱은 noticeFileKey 로 자기 파일을 바로 찾아가고, 그 파일이 없을 때 옛 data/notices.json 을 받을지 말지를 이 색인으로 판단한다(match-engine.js noticeFallbackNeeded). 사람이 어느 파일이 어느 학교인지 보는 데도 쓴다.',
     updatedAt,
     schools: Object.keys(index).length,
     files: index,

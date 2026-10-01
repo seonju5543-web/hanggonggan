@@ -1456,6 +1456,21 @@ function majorsFileFor(schoolKey) {
   return `data/majors/${noticeFileKey(schoolKey)}.json`;
 }
 
+/* 학교별 **교내 소식** 파일 (2026-09-30 · 개발자 지시 "사용자들 학교에 맞춘 교내 뉴스"). 공고·학과와 같은 이름 규칙
+   (`noticeFileKey`)을 **불러 쓴다** — 로봇(collect-news.mjs → publish-notices.mjs)이 쓴 파일을 앱이 이 이름으로 받는다.
+   ⚠️ 옛 통짜 파일로 물러나는 길이 **없다** — 소식은 처음부터 학교별 파일뿐이다(색인 data/news/index.json 은 사람·check-live 용).
+   분교가 본교 게시판을 함께 쓰는 학교는 공고와 같은 규칙으로 본교 파일도 받는다(어느 글이 내 것인지는 noticeForProfile 이 가른다). */
+function newsFileFor(school) {
+  return `data/news/${noticeFileKey(school)}.json`;
+}
+function newsFilesForProfile(p) {
+  if (!p || !p.school) return [];
+  const list = [newsFileFor(p.school)];
+  const parent = SHARED_BOARD_BRANCH[p.school];
+  if (parent) list.push(newsFileFor(parent));
+  return list;
+}
+
 /* 이 학생이 받아야 할 공고 파일들.
    분교가 본교 게시판을 함께 쓰는 경우(한양 ERICA·건국 글로컬·홍익 세종)에는 본교 파일도
    받아야 한다 — 공고가 본교 이름으로 저장되기 때문. 어느 것이 내 공고인지는 그다음에
@@ -1534,5 +1549,5 @@ if (typeof module !== 'undefined' && module.exports) {
                      noticeForProfile, activityForProfile, taggedSchool, SHARED_BOARD_BRANCH, SERVED_SCHOOLS,
                      noticeKind, NOTICE_CAMPUS_MARK, OWN_PROGRAMS,
                      noticeFileKey, noticeFileFor, noticeFilesForProfile,
-                     noticeFallbackNeeded, majorsFileFor };
+                     noticeFallbackNeeded, majorsFileFor, newsFileFor, newsFilesForProfile };
 }

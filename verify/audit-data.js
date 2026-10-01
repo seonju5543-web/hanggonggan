@@ -149,6 +149,34 @@ try {
   if (badUrl.length) warns.push(`activities — 첨부 내려받기 주소가 글로 들어온 것 ${badUrl.length}건`);
 } catch { /* 파일이 없으면 건너뜀 */ }
 
+/* 교내 소식 감사 (2026-09-30) — 학교별 파일(data/news/*.json)마다: 중복 없음 · 갈래는 news-kind.mjs 의 넷 또는 없음 ·
+   글의 학교 = 파일의 학교 = 서비스 학교 · 첨부 주소 아님 · 수집일 형식. 어기면 로봇이 저장 전에 되돌린다(활동 피드와 같은 규칙). */
+try {
+  const dir = path.join(ROOT, 'data/news');
+  const served = require('../match-engine.js').SERVED_SCHOOLS || [];
+  const NEWS_KINDS = ['학사', '행사', '채용', '생활'];   // collector/news-kind.mjs NEWS_KINDS 와 같다 (관문 「교내 소식」이 관리자 사본과 대조한다)
+  const files = fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => /\.json$/.test(f) && f !== 'index.json') : [];
+  let dup = 0; let badKind = 0; let badSchool = 0; let badDate = 0; let badUrl = 0;
+  for (const f of files) {
+    const doc = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
+    const seenU = new Set();
+    for (const n of doc.items || []) {
+      const uk = urlKey(n.url);
+      if (seenU.has(uk)) dup++;
+      seenU.add(uk);
+      if (n.kind && !NEWS_KINDS.includes(n.kind)) badKind++;
+      if (n.school !== doc.school || served.indexOf(n.school) < 0) badSchool++;
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(n.foundAt || '')) badDate++;
+      if (/mode=download|attachNo=|fileDown/i.test(n.url || '')) badUrl++;
+    }
+  }
+  if (dup) errors.push(`news — 교내 소식 파일 안에 중복 ${dup}건 (수집기 중복 제거가 동작하지 않았습니다)`);
+  if (badKind) errors.push(`news — 갈래가 ${NEWS_KINDS.join('·')} 밖인 글 ${badKind}건 (판정은 collector/news-kind.mjs 한 곳)`);
+  if (badSchool) errors.push(`news — 파일의 학교와 다르거나 서비스하지 않는 학교의 글 ${badSchool}건 (match-engine.js SERVED_SCHOOLS)`);
+  if (badDate) errors.push(`news — 수집일(foundAt) 형식이 아닌 글 ${badDate}건`);
+  if (badUrl) warns.push(`news — 첨부 내려받기 주소가 글로 들어온 것 ${badUrl}건`);
+} catch (e) { errors.push(`news — 소식 파일을 읽지 못했습니다: ${e.message}`); }
+
 /* 양식 원본 큐: '원본 확보됨(fetched)'이라고 표시됐는데 실제 파일이 없으면,
    다음 세션이 양식을 만들 수 없다 (2026-07-30 도레이·염곡 원본이 이렇게 사라졌다) */
 try {

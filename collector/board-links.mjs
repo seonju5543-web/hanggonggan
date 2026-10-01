@@ -30,3 +30,19 @@ export function extractLinks(html, base) {
   out.forEach((i) => { if (!uniq.has(i.url)) uniq.set(i.url, i); });
   return [...uniq.values()];
 }
+
+/* 같은 사이트인가 — 게시판 글 링크가 그 학교 도메인 안에 있는지 본다 (2026-09-30 · 교내 소식).
+   공지 게시판 바닥에는 SNS·포털·외부 사이트 링크가 함께 놓여 있어, 제목만 보고 걸러도 '네이버 블로그' 같은 것이
+   남는다. 학교 도메인(ac.kr 는 세 토막 · 그 밖은 두 토막)이 같으면 같은 사이트로 본다(www-3.kw.ac.kr ↔ www.kw.ac.kr).
+   찾기 로봇(find-news-boards.mjs)과 수집기(collect-news.mjs)가 같은 눈을 쓴다. */
+export function siteKey(url) {
+  let h;
+  try { h = new URL(url).hostname.toLowerCase(); } catch { return ''; }
+  const parts = h.split('.');
+  const n = /\.(ac|co|or|go|re|ne|pe)\.kr$/.test(h) ? 3 : 2;
+  return parts.slice(-n).join('.');
+}
+export function sameSite(url, base) {
+  const a = siteKey(url); const b = siteKey(base);
+  return !!a && !!b && a === b;
+}
