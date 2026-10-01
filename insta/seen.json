@@ -1928,6 +1928,78 @@
    "cards": 5,
    "dir": "insta/pub/0626004",
    "at": "2026-10-01"
+  },
+  {
+   "status": "prepared",
+   "code": "2000446016",
+   "org": "재단법인 전남인재평생교육진흥원",
+   "name": "긴급지원장학생",
+   "due": "2026-10-23",
+   "school": null,
+   "tplNo": 1,
+   "cards": 5,
+   "dir": "insta/pub/2000446016",
+   "at": "2026-10-01"
+  },
+  {
+   "status": "prepared",
+   "code": "2000446019",
+   "org": "재단법인 전남인재평생교육진흥원",
+   "name": "중소기업근로자자녀장학금",
+   "due": "2026-10-23",
+   "school": null,
+   "tplNo": 1,
+   "cards": 5,
+   "dir": "insta/pub/2000446019",
+   "at": "2026-10-01"
+  },
+  {
+   "status": "prepared",
+   "code": "2000253007",
+   "org": "(재)고창군장학재단",
+   "name": "대학 등록금 지원사업",
+   "due": "2026-10-28",
+   "school": null,
+   "tplNo": 2,
+   "cards": 4,
+   "dir": "insta/pub/2000253007",
+   "at": "2026-10-01"
+  },
+  {
+   "status": "prepared",
+   "code": "0568005",
+   "org": "광주남구장학회",
+   "name": "봉사선행효행장학생",
+   "due": "2026-10-02",
+   "school": null,
+   "tplNo": 3,
+   "cards": 5,
+   "dir": "insta/pub/0568005",
+   "at": "2026-10-01"
+  },
+  {
+   "status": "prepared",
+   "code": "0568004",
+   "org": "광주남구장학회",
+   "name": "특기장학생",
+   "due": "2026-10-02",
+   "school": null,
+   "tplNo": 1,
+   "cards": 5,
+   "dir": "insta/pub/0568004",
+   "at": "2026-10-01"
+  },
+  {
+   "status": "prepared",
+   "code": "2700582004",
+   "org": "재단법인 무주군교육발전장학재단",
+   "name": "반디장학생",
+   "due": "2026-10-02",
+   "school": null,
+   "tplNo": 3,
+   "cards": 5,
+   "dir": "insta/pub/2700582004",
+   "at": "2026-10-01"
   }
  ]
 }
