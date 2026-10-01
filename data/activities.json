@@ -2,6 +2,128 @@
  "updatedAt": "2026-10-01",
  "items": [
   {
+   "title": "제15회 한국어능력시험(TOPIK) 쓰기 채점자 양성 워크숍 참가자 모집 공고",
+   "url": "https://www.niied.go.kr/web/main/nid/niied_board/5871",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": null,
+   "field": "교육·캠프",
+   "excerptsAt": "2026-10-01",
+   "school": "",
+   "campus": "",
+   "host": "국립국제교육원 공지",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "2026년 경기 스타트업 아카데미 딥테크 세미나 참여자 모집 / Future AI Technology - AI 메모리 반도체의 발전과 미래",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179384",
+   "kind": "대외활동",
+   "attachments": [
+    {
+     "name": "다운로드",
+     "url": "https://www.k-startup.go.kr/afile/fileDownload/Vw1Ln"
+    },
+    {
+     "name": "다운로드",
+     "url": "https://www.k-startup.go.kr/afile/fileDownload/Qw1Ln"
+    },
+    {
+     "name": "(붙임) 창조경제혁신센터 청년창업 활성화 프로그램일정(21년 08월 2주차).hwp",
+     "url": "javascript:alert("
+    }
+   ],
+   "deadlineHint": "접수기간 2026-09-29 ~ 2026-10-14&nbsp;23:59 주관기관명 (재)경기도경제과학진흥원 대상 전체 창업업력 전체 연락처 03",
+   "excerpts": [
+    {
+     "label": "주최",
+     "text": "경기도"
+    }
+   ],
+   "field": "교육·캠프",
+   "excerptsAt": "2026-10-01",
+   "school": "",
+   "campus": "",
+   "host": "창업진흥원 K-Startup",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "[감사원] 2026년 국민제안 감사 아이디어 공모 기간 : 2026.10.01 ~ 2026.10.31",
+   "url": "https://www.bai.go.kr/bai/etc/popupzone/detail?ppId=120",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": null,
+   "field": "기획·아이디어",
+   "excerptsAt": "2026-10-01",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "[행정안전부] 2026 재난안전 분야 논문 공모전 기간 : 2026.09.01 ~ 2026.11.10",
+   "url": "https://blog.naver.com/mopaspr/224399694473?trackingCode=blog_bloghome_searchlist",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": null,
+   "field": "글쓰기·논문",
+   "excerptsAt": "2026-10-01",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "[기획예산처 복권위원회] 복권기금 아이디어 공모전 기간 : 2026.01.06 ~ 2026.12.31",
+   "url": "http://www.bokgwon.go.kr/civil/contestInfo.jsp",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "상시 접수"
+    },
+    {
+     "label": "대상",
+     "text": "대한민국 국민이면 누구나"
+    }
+   ],
+   "field": "기획·아이디어",
+   "excerptsAt": "2026-10-01",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "「청년여성재직자와 함께하는 내:일(JOB) ON캠프」 참여자 모집",
+   "url": "https://youth.gyeongnam.go.kr/youth/board.es?mid=a10501010000&bid=0005&list_no=6899&act=view",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": "모집기간 : 2026. 9. 7.(월) ~ 10. 14.(수) ○ 모집인원 : 30명 ○ 참가대상 : 경남도 내 청년여성(만 19세~39세) 근",
+   "deadline": "2026-10-14",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026. 9. 7.(월) ~ 10. 14.(수)"
+    },
+    {
+     "label": "대상",
+     "text": "경남도 내 청년여성(만 19세~39세) 근로자"
+    },
+    {
+     "label": "모집인원",
+     "text": "30명"
+    }
+   ],
+   "field": "교육·캠프",
+   "excerptsAt": "2026-10-01",
+   "school": "",
+   "campus": "",
+   "host": "경남청년정보플랫폼",
+   "foundAt": "2026-10-01"
+  },
+  {
    "title": "아산시청소년 문학공모전 2026.08.04",
    "url": "https://asanmirae.or.kr:449/main/index.php?m_cd=17&b_id=20260804102775189",
    "kind": "공모전",
@@ -347,6 +469,96 @@
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "[스포츠재활 연구실] 만성 발목 불안정성 대상 감각-인지 기반 발목 재활운동 연구 참여자 모집",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140267&article.offset=0&articleLimit=10",
+   "kind": "대외활동",
+   "attachments": [
+    {
+     "name": "부속기관",
+     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+    }
+   ],
+   "deadlineHint": null,
+   "excerptsAt": "2026-10-01",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "[일반] [HUSS-글로벌공생] 2026 인문사회 학생을 위한 AI 인사이트 특강 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53413&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "kind": "대외활동",
+   "attachments": [
+    {
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "부설연구기관",
+     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    }
+   ],
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "대상",
+     "text": "광운대학교 HUSS 참여학과 재학생"
+    }
+   ],
+   "field": "해외·교류",
+   "excerptsAt": "2026-10-01",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "2026학년도 대학생 청소년교육지원사업 3차 멘토 선발 안내",
+   "url": "https://www3.chosun.ac.kr/bbs/scho/332/281694/artclView.do",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": "신청기간 : 2026. 10. 6.( 화 ) 10 시 &nbsp;~ 10. 12.( 월 ) 17 시 &nbsp; &nbsp; &nbsp; ※ &",
+   "deadline": "2026-10-12",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026. 10. 6.( 화 ) 10 시 ~ 10. 12.( 월 ) 17 시"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026. 11. 2.( 월 ) ~ 2027. 2. 26.( 금 )"
+    },
+    {
+     "label": "대상",
+     "text": "본교 정규학기 학부 재학생"
+    },
+    {
+     "label": "모집인원",
+     "text": "30 명 이내"
+    }
+   ],
+   "field": "교육·캠프",
+   "excerptsAt": "2026-10-01",
+   "school": "조선대학교",
+   "campus": "",
    "foundAt": "2026-10-01"
   },
   {
@@ -2002,22 +2214,6 @@
    ],
    "deadlineHint": null,
    "field": "교육·캠프",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-09-30",
-   "excerptsAt": "2026-09-30"
-  },
-  {
-   "title": "[스포츠재활 연구실] 만성 발목 불안정성 대상 감각-인지 기반 발목 재활운동 연구 참여자 모집",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=139838&article.offset=0&articleLimit=10",
-   "kind": "대외활동",
-   "attachments": [
-    {
-     "name": "부속기관",
-     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
-    }
-   ],
-   "deadlineHint": null,
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-09-30",

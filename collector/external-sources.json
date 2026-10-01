@@ -742,50 +742,102 @@
    "host": "재단법인 석성장학회",
    "home": "http://www.seoksung.co.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-10-01",
+    "why": "홈페이지 못 엶 (HTTP 403)",
+    "best": null
+   }
   },
   {
    "host": "(재)인제군장학회",
    "home": "https://www.inje.go.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-10-01",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "https://www.inje.go.kr/",
+     "signals": 0
+    }
+   }
   },
   {
    "host": "강원도 원주시청",
    "home": "https://www.wonju.go.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-10-01",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "https://www.wonju.go.kr/",
+     "signals": 0
+    }
+   }
   },
   {
    "host": "경상북도 영주시청",
    "home": "https://www.yeongju.go.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-10-01",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "https://www.yeongju.go.kr/",
+     "signals": 0
+    }
+   }
   },
   {
    "host": "춘향장학재단",
    "home": "https://www.namwon.go.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-10-01",
+    "why": "홈페이지 못 엶 (HTTP 400)",
+    "best": null
+   }
   },
   {
    "host": "영천시장학회",
    "home": "http://www.ycsf.or.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-10-01",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "https://www.ycsf.or.kr/",
+     "signals": 0
+    }
+   }
   },
   {
    "host": "화물복지재단",
    "home": "https://www.fordrivers.or.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-10-01",
+    "why": "홈페이지 못 엶 (fetch failed)",
+    "best": null
+   }
   },
   {
    "host": "서울장학재단",
    "home": "https://www.hissf.or.kr/",
    "boardUrl": null,
    "seed": "web-search",
-   "evidence": "웹 검색 2026-09-29: \"서울장학재단 — hissf.or.kr\" · 서울희망 대학진로장학금(800명·연 400만원)·서울해외교환학생장학금 · 공지 글 주소 programs/user/news/ssfnews/read.asp"
+   "evidence": "웹 검색 2026-09-29: \"서울장학재단 — hissf.or.kr\" · 서울희망 대학진로장학금(800명·연 400만원)·서울해외교환학생장학금 · 공지 글 주소 programs/user/news/ssfnews/read.asp",
+   "probe": {
+    "checkedAt": "2026-10-01",
+    "why": "홈페이지 못 엶 (fetch failed)",
+    "best": null
+   }
   },
   {
    "host": "삼성꿈장학재단",
