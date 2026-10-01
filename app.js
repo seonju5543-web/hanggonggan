@@ -2865,6 +2865,9 @@ function openActivityDetail(url) {
   const benefit = unent(activityBenefit(n));
   const rows = (n.excerpts || []).filter((x) => x.label !== '혜택');
   const listLink = isBoardListLink(n.url);
+  /* 주소의 HTML 기호(&amp;)는 되돌려 연다 — 찾기(data-activity)는 저장된 n.url 그대로 · 안전하지 않은 주소면 단추를 안 그린다(href="" 는 앱 자신을 연다) */
+  const href = safeUrl(unent(n.url));
+  sheetBack = null;   // 이 시트에는 돌아갈 곳이 없다 — 내리면 닫힌다
   $('#detail-sheet').innerHTML = `
     <div class="sheet-handle"></div>
     <div class="sheet-body">
@@ -2887,8 +2890,8 @@ function openActivityDetail(url) {
       <ul class="doc-list">${n.attachments.map((a) => `<li class="att"><a href="${esc(safeUrl(a.url))}" target="_blank" rel="noopener" style="color:var(--primary)">${esc(a.name || '첨부 파일')}</a></li>`).join('')}</ul>` : ''}
       <p class="sheet-deadline">마감일 ${esc(n.deadline || '원문 공고 확인')}</p>
       ${listLink ? `<p class="doc-legend">이 게시판은 목록에서 글을 눌러야 열리는 방식이라 글 하나로 바로 가는 주소를 확인하지 못했습니다. 열리는 목록에서 <strong>${esc(unent(n.title))}</strong>을(를) 찾아 눌러 주세요.</p>` : ''}
-      <a class="btn btn-primary btn-lg" href="${esc(safeUrl(n.url))}" target="_blank" rel="noopener">${listLink ? '게시판 목록에서 보기 ↗' : '원문에서 신청하기 ↗'}</a>
-      <p class="dp-note">신청은 주최 측 원문 페이지에서 진행돼요.</p>
+      ${href ? `<a class="btn btn-primary btn-lg" href="${esc(href)}" target="_blank" rel="noopener">${listLink ? '게시판 목록에서 보기 ↗' : '원문에서 신청하기 ↗'}</a>
+      <p class="dp-note">신청은 주최 측 원문 페이지에서 진행돼요.</p>` : ''}
     </div>`;
   openSheetShell();
 }
