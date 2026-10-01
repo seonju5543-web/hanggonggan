@@ -55,7 +55,7 @@ const PROFILE = {
   onboarded: true, common: { studentId: '', birth: '', phone: '', email: '', bank: '', account: '' },
 };
 
-async function fresh(browser, mode) {
+async function fresh(browser, mode, ext = EXT_FIXTURE) {
   /* 🔴 서비스워커를 막는다 — 새로고침 뒤에는 워커가 data/*.json 을 받아 오므로 page.route 의 가짜
      응답이 **닿지 않는다**(실측: 픽스처 대신 저장소의 빈 파일이 왔다). 이 검사는 탭의 규칙을 재는
      것이지 워커를 재는 것이 아니다(워커는 verify-resume 등이 잰다). 프로필은 초기 스크립트로
@@ -73,7 +73,7 @@ async function fresh(browser, mode) {
   /* 재단·지자체 새 공고 (2026-09-26 · 교외 확대) — 같은 검사에서 홈 구역도 잰다 */
   await page.route('**/data/external.json*', (route) => (mode === 'fail'
     ? route.abort()
-    : route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(EXT_FIXTURE) })));
+    : route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(ext) })));
   await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(1200);
   await dismissNotify(page);
@@ -97,6 +97,7 @@ const cards = (page) => page.$$eval('#activities-list .notice-card', (els) => el
       await page.$eval('#external-notices', (e) => e.querySelector('h3') && e.querySelector('h3').textContent.trim()), '재단·지자체 새 공고');
     eq('홈 — 카드 윗줄이 주최를 말한다 · 최근 수집 순',
       await page.$$eval('#external-notices .notice-card .sch-org', (els) => els.map((e) => e.textContent.trim())), ['울진군장학재단 공고', '국가보훈부 공고']);
+    eq('홈 — 재단 글이 석 장 이하면 더보기 단추가 없다', await page.$('#external-more'), null);
     eq('홈 — 기간 한 줄은 원문 그대로',
       await page.$eval('#external-notices .notice-card .sch-provider', (e) => e.textContent.trim()), '신청기간 : 2026. 10. 2. ~ 10. 20.');
     const navs = await page.$$eval('#bottom-nav .nav-item', (b) => b.map((x) => x.dataset.nav));
@@ -177,6 +178,33 @@ const cards = (page) => page.$$eval('#activities-list .notice-card', (els) => el
   }
 
   /* ── 받아오기 실패 ── */
+  /* ── 홈: 재단·지자체 새 공고가 많을 때 — 석 장만 보이고 '더보기'로 편다 (2026-10-01 개발자 지시
+        "나에게 맞는 장학금 부분처럼") · 실데이터가 156건이라 홈이 끝없이 길어졌다 ── */
+  {
+    const many = { updatedAt: '2026-10-01', items: Array.from({ length: 25 }, (_, i) => ({
+      title: `재단 공고 ${i + 1}`, url: `https://example.org/f/${i + 1}`, host: `재단${i + 1}`, school: '',
+      foundAt: `2026-09-${String(30 - i).padStart(2, '0')}`, attachments: [] })) };
+    const { page, errors } = await fresh(browser, 'ok', many);
+    const n = () => page.$$eval('#external-notices .notice-card', (e) => e.length);
+    const btn = () => page.$eval('#external-more', (e) => (e.hidden ? '' : e.textContent.trim())).catch(() => null);
+    eq('홈 — 재단 공고가 많아도 처음엔 석 장만 보인다 ("나에게 맞는 장학금"과 같은 수)', await n(), 3);
+    eq('  아래에 더보기 단추가 있다', await btn(), '더보기');
+    eq('  최근 수집 순 그대로 (앞 석 장)', await page.$$eval('#external-notices .notice-card .sch-org', (e) => e.map((x) => x.textContent.trim())),
+      ['재단1 공고', '재단2 공고', '재단3 공고']);
+    await page.click('#external-more'); await page.waitForTimeout(200);
+    eq('  한 번 누르면 열 장까지 편다', await n(), 10);
+    await page.click('#external-more'); await page.waitForTimeout(200);
+    eq('  또 누르면 열 장 더', await n(), 20);
+    await page.click('#external-more'); await page.waitForTimeout(200);
+    eq('  🔴 끝까지 편다 — 따로 볼 화면이 없으니 열 장에서 멈추면 글이 사라진다', await n(), 25);
+    eq('  다 펴면 단추가 접기로 바뀐다', await btn(), '접기');
+    await page.click('#external-more'); await page.waitForTimeout(200);
+    eq('  접으면 석 장으로 돌아간다', await n(), 3);
+    eq('  페이지 오류 없음', errors, []);
+    await page.context().close();
+  }
+  /* 글이 석 장 이하면 단추가 없다 — 위 정상 응답(2건)에서 잰다 */
+
   {
     const { page, errors } = await fresh(browser, 'fail');
     await page.click('.nav-item[data-nav="activities"]');

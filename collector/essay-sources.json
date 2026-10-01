@@ -103,13 +103,13 @@
       "url": "https://news.incruit.com/news/newsview.asp?newsno=436538",
       "kind": "value",
       "note": "자기소개서 가치관 작성 포인트 (2026-09-05 추가)",
-      "strike": 4
+      "strike": 5
     },
     {
       "url": "https://news.incruit.com/news/newsview.asp?newsno=436729",
       "kind": "value",
       "note": "자소서 인생관 단계별 작성 포인트 (2026-09-05 추가)",
-      "strike": 4
+      "strike": 5
     },
     {
       "url": "https://brunch.co.kr/@designmydesign/11",
@@ -240,6 +240,13 @@
       "note": "로봇이 스스로 찾음 — 학업계획서 vs. 자기소개서: 입학사정위원회가 실제로 의미하는 바는 무엇일까요?",
       "addedAt": "2026-09-21",
       "strike": 0
+    },
+    {
+      "url": "https://linkareer.com/activity/281528",
+      "kind": "*",
+      "note": "로봇이 스스로 찾음 — 2026 시안장학회 장학생",
+      "addedAt": "2026-10-01",
+      "strike": 0
     }
   ],
   "_큐": "규칙이 모자란 종류. 로봇이 스스로 채우고, 개발자가 그 종류의 주소를 seeds 에 넣어 주면 비워진다.",
@@ -262,7 +269,7 @@
     },
     {
       "url": "https://community.linkareer.com/written_test",
-      "seenAt": "2026-08-24",
+      "seenAt": "2026-10-01",
       "why": "규칙 0종"
     },
     {
@@ -272,22 +279,17 @@
     },
     {
       "url": "https://community.linkareer.com/employment_data/4227270?page=1",
-      "seenAt": "2026-08-24",
+      "seenAt": "2026-10-01",
       "why": "규칙 0종"
     },
     {
       "url": "https://pf.kakao.com/_MGgexb",
-      "seenAt": "2026-08-24",
+      "seenAt": "2026-10-01",
       "why": "규칙 0종"
     },
     {
       "url": "https://linkareer.com/activity/283454",
-      "seenAt": "2026-08-24",
-      "why": "규칙 0종"
-    },
-    {
-      "url": "https://linkareer.com/activity/281528",
-      "seenAt": "2026-08-24",
+      "seenAt": "2026-10-01",
       "why": "규칙 0종"
     },
     {
@@ -337,7 +339,7 @@
     },
     {
       "url": "https://community.linkareer.com/final_review",
-      "seenAt": "2026-09-01",
+      "seenAt": "2026-10-01",
       "why": "규칙 0종"
     },
     {
