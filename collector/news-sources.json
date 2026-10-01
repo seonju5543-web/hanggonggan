@@ -24,7 +24,7 @@
    "school": "한국외국어대학교",
    "campus": "공통",
    "home": "https://www.hufs.ac.kr/",
-   "boardUrl": "https://www.hufs.ac.kr/hufs/11281/subview.do",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://www.hufs.ac.kr/hufs/11281/subview.do",
@@ -37,25 +37,13 @@
      "evidence": "같은 검색 → 결과 URL https://www.hufs.ac.kr/hufs/11282/subview.do (제목: 학사) · 요약: 계절학기 수강신청·기말고사·폐강 공지"
     }
    ],
-   "note": "subview.do 는 감싸는 페이지 · 실제 목록 /bbs/hufs/<번호>/artclList.do 번호는 검색에 안 나옴.",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "공지사항",
-    "rows": 12,
-    "sample": [
-     "RSS 2.0",
-     "2026학년도 서울캠퍼스 재학생 대상 법정의무교육 이수 안내",
-     "2027학년도 전기 글로벌미디어커뮤니케이션대학원 신입생 모집(특별/일반)"
-    ],
-    "evidence": "웹 검색 2026-09-30 'site:hufs.ac.kr 공지사항 일반공지 학사공지 hufsmain' → 결과 URL https://www.hufs.ac.kr/hufs/11281/subview.do (제목: 공지)"
-   }
+   "note": "subview.do 는 감싸는 페이지 · 실제 목록 /bbs/hufs/<번호>/artclList.do 번호는 검색에 안 나옴."
   },
   {
    "school": "서울대학교",
    "campus": "",
    "home": "https://www.snu.ac.kr/",
-   "boardUrl": "https://www.snu.ac.kr/snunow/notice/genernal",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://www.snu.ac.kr/snunow/notice/genernal",
@@ -63,25 +51,13 @@
      "evidence": "웹 검색 2026-09-30 '서울대학교 공지사항 snu.ac.kr notice' → 결과 URL https://www.snu.ac.kr/snunow/notice/genernal (제목: 일반공지 - 공지사항 - 서울대 소식 - 서울대학교) · 상세는 ?md=v&bbsidx=173756 꼴"
     }
    ],
-   "note": "경로 철자가 실제로 'genernal'(오타 그대로). 학사 성격 글은 학부대학 snuc.snu.ac.kr 에 있음.",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "일반공지",
-    "rows": 6,
-    "sample": [
-     "2027년 서울대 대학원생 전기 SSBT 장학생 모집(~ 2026.09.27.) 첨부파일 있음",
-     "서울대학교 「최고경영자과정 AMP USA」 2027년 1월 개강 잠정 보류",
-     "개인정보 처리방침 개정 고지(2026년 8월 20일자) 첨부파일 있음"
-    ],
-    "evidence": "웹 검색 2026-09-30 '서울대학교 공지사항 snu.ac.kr notice' → 결과 URL https://www.snu.ac.kr/snunow/notice/genernal (제목: 일반공지 - 공지사항 - 서울대 소식 - 서울대학교) · 상세는 ?md=v&bbsidx=173756 꼴"
-   }
+   "note": "경로 철자가 실제로 'genernal'(오타 그대로). 학사 성격 글은 학부대학 snuc.snu.ac.kr 에 있음."
   },
   {
    "school": "연세대학교",
    "campus": "",
    "home": "https://www.yonsei.ac.kr/sc/",
-   "boardUrl": "https://www.yonsei.ac.kr/sc/254/subview.do",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://www.yonsei.ac.kr/sc/254/subview.do",
@@ -94,25 +70,13 @@
      "evidence": "위 결과의 enc 파라미터(base64: /bbs/sc/58/artclList.do?findClSeq=257)에서 유도 — 이미 아는 장학 주소(findClSeq=257)에서 분류를 뗀 것"
     }
    ],
-   "note": "254 번 공지사항 안에 일반/학사 분류(findClSeq)가 있는 것으로 보이나 분류 번호는 미확인.",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "공지사항",
-    "rows": 15,
-    "sample": [
-     "RSS 2.0",
-     "일반공지 10/2(금) 교외장학재단 제출용 총장 직인 날인 불가 안내 신촌/국제",
-     "일반공지 2026학년도 2학기 학부 수강과목 철회 안내 신촌/국제"
-    ],
-    "evidence": "웹 검색 2026-09-30 'site:www.yonsei.ac.kr sc 일반공지 학사공지 subview.do' → 결과 URL https://www.yonsei.ac.kr/sc/254/subview.do (제목: 연세대학교 · 요약: General notices) · 상세 enc 에 /bbs/sc/58/artclView.do"
-   }
+   "note": "254 번 공지사항 안에 일반/학사 분류(findClSeq)가 있는 것으로 보이나 분류 번호는 미확인."
   },
   {
    "school": "연세대학교 미래캠퍼스",
    "campus": "",
    "home": "https://www.yonsei.ac.kr/wj/",
-   "boardUrl": "https://www.yonsei.ac.kr/wj/1415/subview.do",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://www.yonsei.ac.kr/wj/1415/subview.do",
@@ -125,19 +89,7 @@
      "evidence": "위 결과의 enc 파라미터(base64: /bbs/wj/104/940596/artclView.do)에서 게시판 번호 104 를 유도"
     }
    ],
-   "note": "한 게시판(1415) 안에 학사/장학/모집/일반 분류가 있는 통합 공지.",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "공지사항",
-    "rows": 25,
-    "sample": [
-     "RSS 2.0",
-     "일반공지 2026년도 후반기 육군 학군사관 후보생 67,68기 모집안내 신촌/국제",
-     "일반공지 2027학년도 1학기 재입학(일반, 특별) 전형 요강(미래캠퍼스) 신촌/국제"
-    ],
-    "evidence": "웹 검색 2026-09-30 '연세대학교 미래캠퍼스 공지사항 yonsei.ac.kr/wj' → 결과 URL https://www0.yonsei.ac.kr/wj/1415/subview.do (제목: 공지사항) · 요약: 6,373건 · 분류 학사/장학/모집/일반"
-   }
+   "note": "한 게시판(1415) 안에 학사/장학/모집/일반 분류가 있는 통합 공지."
   },
   {
    "school": "고려대학교",
@@ -162,7 +114,7 @@
    "school": "고려대학교 세종캠퍼스",
    "campus": "",
    "home": "https://sejong.korea.ac.kr/",
-   "boardUrl": "https://sejong.korea.ac.kr/koreaSejong/7913/subview.do",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://sejong.korea.ac.kr/koreaSejong/7913/subview.do",
@@ -180,19 +132,7 @@
      "evidence": "같은 검색 → 결과 URL https://sejong.korea.ac.kr/koreaSejong/7904/subview.do (제목: 교내행사공지)"
     }
    ],
-   "note": "장학공지는 7906.",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "일반공지",
-    "rows": 6,
-    "sample": [
-     "RSS 2.0",
-     "[공지] 고려대학교 세종캠퍼스 구매 담당자 사칭 피싱(사기) 피해 주의 안내",
-     "[세종] 휘트니스센터 10월 종일 회원권 2차 온라인 접수 안내"
-    ],
-    "evidence": "웹 검색 2026-09-30 'site:sejong.korea.ac.kr 공지사항 koreaSejong subview.do' → 결과 URL https://sejong.korea.ac.kr/koreaSejong/7913/subview.do (제목: 일반공지 · 요약: 66건)"
-   }
+   "note": "장학공지는 7906."
   },
   {
    "school": "서강대학교",
@@ -283,7 +223,7 @@
    "school": "건국대학교",
    "campus": "",
    "home": "https://www.konkuk.ac.kr/",
-   "boardUrl": "https://www.konkuk.ac.kr/konkuk/2238/subview.do",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://www.konkuk.ac.kr/konkuk/2238/subview.do",
@@ -296,19 +236,7 @@
      "evidence": "웹 검색 2026-09-30 'site:www.konkuk.ac.kr 공지사항 일반공지 학사공지 subview.do' → 결과 URL https://www.konkuk.ac.kr/konkuk/37696/subview.do (제목: 공고문) — 일반공지가 아닐 수 있음"
     }
    ],
-   "note": "대표 사이트의 '일반공지' 목록 URL 은 검색에 안 나옴. 2239 가 장학(이미 아는 것)이라 2238 은 그 옆 탭.",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "학사공지",
-    "rows": 39,
-    "sample": [
-     "2027년 3월 1일자 교수채용",
-     "2026년 9월 1일자 교수채용",
-     "2026년 9월 1일자 강사 2차"
-    ],
-    "evidence": "웹 검색 2026-09-30 '건국대학교 공지사항 konkuk.ac.kr 학사공지 게시판' → 결과 URL https://www.konkuk.ac.kr/konkuk/2238/subview.do (제목: 학사 · 요약: 타교 학점교류 신청 안내, 학사팀) · 분류 학사/장학/국제교류/취창업/입찰/일반"
-   }
+   "note": "대표 사이트의 '일반공지' 목록 URL 은 검색에 안 나옴. 2239 가 장학(이미 아는 것)이라 2238 은 그 옆 탭."
   },
   {
    "school": "동국대학교",
@@ -352,7 +280,7 @@
    "school": "홍익대학교",
    "campus": "",
    "home": "https://www.hongik.ac.kr/",
-   "boardUrl": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=list",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=list",
@@ -365,25 +293,13 @@
      "evidence": "웹 검색 2026-09-30 '홍익대학교 공지사항 srCategoryId 학사' → 결과 URL https://www.hongik.ac.kr/kr/education/notice-undergrad.do?mode=list&article.offset=0 (제목: 홍익대학교 | 대학공지 게시판목록)"
     }
    ],
-   "note": "schools.json 의 장학 주소(newscenter/notice.do)와 같은 게시판이다 — 장학 로봇이 이미 읽는 행에서 갈라 담을 수도 있지만 로봇이 따로라 두 번 두드린다(하루 2회 · 감내).",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "공지사항",
-    "rows": 10,
-    "sample": [
-     "[제26-41호] 세종캠퍼스 26-1차 교육환경개선 전산관리팀 컴퓨터 80대 구입",
-     "[제26-40호] 세종캠퍼스 26-1차 교육환경개선 게임그래픽디자인전공 태블릿컴퓨터 27대 구입",
-     "[제26-39호] 세종캠퍼스 26-1차 교육환경개선 교양교육원 컴퓨터 22대 구입"
-    ],
-    "evidence": "웹 검색 2026-09-30 '홍익대학교 공지사항 학사 newscenter notice' → 결과 URL https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=list&article.offset=0 (제목: 홍익대학교 | 공지사항 게시판목록) · 수강신청·휴복학·성적조회 글이 이 게시판에"
-   }
+   "note": "schools.json 의 장학 주소(newscenter/notice.do)와 같은 게시판이다 — 장학 로봇이 이미 읽는 행에서 갈라 담을 수도 있지만 로봇이 따로라 두 번 두드린다(하루 2회 · 감내)."
   },
   {
    "school": "숙명여자대학교",
    "campus": "",
    "home": "https://www.sookmyung.ac.kr/kr/index.do",
-   "boardUrl": "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=list",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=list",
@@ -391,25 +307,13 @@
      "evidence": "웹 검색 2026-09-30 '숙명여자대학교 주요공지 important-notice 학사' → 결과 URL https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=list&article.offset=0 (제목: 주요공지 게시판목록 | 숙명여자대학교(국문)) · 수강신청·졸업·학번 안내 글"
     }
    ],
-   "note": "분류 없이 mode=list 를 쓰면 학사 포함 전체(장학=46 은 이미 아는 것).",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "공지사항",
-    "rows": 11,
-    "sample": [
-     "[졸업] 2026-2 (2027년 2월) 주요 졸업 일정 안내(8학기 이상 재학생 필독)",
-     "2027학년도 전기 일반대학원 신·편입생 모집 안내",
-     "[학부] 2026-2 중간시험 시행 안내"
-    ],
-    "evidence": "웹 검색 2026-09-30 '숙명여자대학교 주요공지 important-notice 학사' → 결과 URL https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=list&article.offset=0 (제목: 주요공지 게시판목록 | 숙명여자대학교(국문)) · 수강신청·졸업·학번 안내 글"
-   }
+   "note": "분류 없이 mode=list 를 쓰면 학사 포함 전체(장학=46 은 이미 아는 것)."
   },
   {
    "school": "광운대학교",
    "campus": "",
    "home": "https://www.kw.ac.kr/",
-   "boardUrl": "https://www.kw.ac.kr/ko/life/notice.jsp",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://www.kw.ac.kr/ko/life/notice.jsp",
@@ -422,25 +326,13 @@
      "evidence": "같은 검색 → 결과 URL https://www-3.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=45114&srCategoryId=1 (제목: 광운대학교 공지사항 - 학사 - 상세보기) — 상세의 srCategoryId=1 을 목록에 붙여 유도"
     }
    ],
-   "note": "schools.json 의 장학 주소와 같은 게시판(전체). 분류 id: 0=일반, 1=학사, 2=학생.",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "공지사항",
-    "rows": 57,
-    "sample": [
-     "[일반] [HUSS-글로벌공생] 글로벌지속가능융합학과 2026 전공설명회 신청 안내",
-     "[일반] [HUSS-글로벌공생] 2026 인문사회 학생을 위한 AI 인사이트 특강 안내",
-     "[일반] [HUSS-글로벌공생] 2026학년도 「HUSS 인문사회 취업 페스티벌」 안내"
-    ],
-    "evidence": "웹 검색 2026-09-30 '광운대학교 공지사항 notice.jsp' → 결과 URL https://www.kw.ac.kr/ko/life/notice.jsp (제목: 광운대학교 공지사항 - 전체)"
-   }
+   "note": "schools.json 의 장학 주소와 같은 게시판(전체). 분류 id: 0=일반, 1=학사, 2=학생."
   },
   {
    "school": "명지대학교",
    "campus": "공통",
    "home": "https://www.mju.ac.kr/",
-   "boardUrl": "https://www.mju.ac.kr/mjukr/255/subview.do",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://www.mju.ac.kr/mjukr/255/subview.do",
@@ -453,19 +345,7 @@
      "evidence": "같은 검색 → 결과 URL https://www.mju.ac.kr/mjukr/257/subview.do (제목: 학사공지)"
     }
    ],
-   "note": "259 = 장학/학자금공지(이미 아는 것).",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "일반공지",
-    "rows": 34,
-    "sample": [
-     "개인정보처리 방침(시행일자 : 2026.03.13)",
-     "개인정보처리 방침(시행일자 : 2025.07.16)",
-     "개인정보처리 방침(시행일자 : 2025.05.16)"
-    ],
-    "evidence": "웹 검색 2026-09-30 '명지대학교 일반공지 subview.do' → 결과 URL https://www.mju.ac.kr/mjukr/255/subview.do (제목: 일반공지 - [명지대학교 생활관] 2026년-2학기 재학생 1차 …)"
-   }
+   "note": "259 = 장학/학자금공지(이미 아는 것)."
   },
   {
    "school": "상명대학교",
@@ -485,7 +365,7 @@
    "school": "가천대학교",
    "campus": "",
    "home": "https://www.gachon.ac.kr/",
-   "boardUrl": "https://www.gachon.ac.kr/kor/3104/subview.do",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://www.gachon.ac.kr/kor/7986/subview.do",
@@ -498,25 +378,13 @@
      "evidence": "같은 검색 → 결과 URL https://www.gachon.ac.kr/kor/3104/subview.do (제목: 학사공지)"
     }
    ],
-   "note": "1146 = 장학(이미 아는 것).",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "학사공지",
-    "rows": 12,
-    "sample": [
-     "RSS 2.0",
-     "2026학년도 동계 계절학기 예비수강신청 및 일정 안내",
-     "2026-2학기 휴학 및 휴학연장 안내"
-    ],
-    "evidence": "같은 검색 → 결과 URL https://www.gachon.ac.kr/kor/3104/subview.do (제목: 학사공지)"
-   }
+   "note": "1146 = 장학(이미 아는 것)."
   },
   {
    "school": "아주대학교",
    "campus": "",
    "home": "https://www.ajou.ac.kr/kr/index.do",
-   "boardUrl": "https://www.ajou.ac.kr/kr/ajou/notice.do",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://www.ajou.ac.kr/kr/ajou/notice.do",
@@ -524,25 +392,13 @@
      "evidence": "웹 검색 2026-09-30 '아주대학교 공지사항 notice.do' → 결과 URL https://www.ajou.ac.kr/kr/ajou/notice.do (제목: 공지사항 게시판목록 | 아주대학교) · 학사·비교과·장학·입학·취업 분류가 있는 전체 게시판"
     }
    ],
-   "note": "notice_scholarship.do 는 장학(이미 아는 것).",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "공지사항",
-    "rows": 15,
-    "sample": [
-     "[공지] [학부] 어학졸업인증(2027년 2월 졸업)을 위한 공인어학 성적 등록 및 제출 안내 (~2027.1.22)",
-     "[공지] [학군단]26년도 후반기 학군사관 ROTC 후보생 67,68기 모집안내(8.31~10.13)",
-     "[공지] [학부/학사과정] ★필독★ 출석(전자출결, 공결, 취업계 등) 관련 안내"
-    ],
-    "evidence": "웹 검색 2026-09-30 '아주대학교 공지사항 notice.do' → 결과 URL https://www.ajou.ac.kr/kr/ajou/notice.do (제목: 공지사항 게시판목록 | 아주대학교) · 학사·비교과·장학·입학·취업 분류가 있는 전체 게시판"
-   }
+   "note": "notice_scholarship.do 는 장학(이미 아는 것)."
   },
   {
    "school": "국민대학교",
    "campus": "",
    "home": "https://www.kookmin.ac.kr/",
-   "boardUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/4/index.do",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/1/index.do",
@@ -555,25 +411,13 @@
      "evidence": "같은 검색 → 결과 URL https://www.kookmin.ac.kr/user/kmuNews/notice/4/9499/view.do (제목: 학사공지:국민대학교) — 4 = 학사공지"
     }
    ],
-   "note": "번호: 1=전체, 4=학사공지, 5=행정공지, 7=장학공지(이미 아는 것), 9=공모∙행사, 17=교원채용.",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "학사공지",
-    "rows": 15,
-    "sample": [
-     "[현장실습지원센터] 2026학년도 동계 한국항공우주산업(KAI) 현장실습 기계공학부 학생 모집(~10/15) 2026.10.01 현장실습지원센터 장지수",
-     "2026학년도 2학기 학부 중간시험 보조감독 모집 2026.09.23 교무팀 김선아",
-     "[교수학습개발센터] 기초학습(수학,물리,화학,생명) 역량 강화 동영상 특강 안내 2026.09.10 교수학습개발센터 강현주"
-    ],
-    "evidence": "같은 검색 → 결과 URL https://www.kookmin.ac.kr/user/kmuNews/notice/4/9499/view.do (제목: 학사공지:국민대학교) — 4 = 학사공지"
-   }
+   "note": "번호: 1=전체, 4=학사공지, 5=행정공지, 7=장학공지(이미 아는 것), 9=공모∙행사, 17=교원채용."
   },
   {
    "school": "숭실대학교",
    "campus": "",
    "home": "https://scatch.ssu.ac.kr/",
-   "boardUrl": "https://scatch.ssu.ac.kr/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://scatch.ssu.ac.kr/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/",
@@ -586,25 +430,13 @@
      "evidence": "같은 검색 → 결과 URL …/page/116/?f&category=%ED%95%99%EC%82%AC&keyword (제목: 공지사항 – 페이지 116 - SSU:catch) — category=학사 가 분류 열쇠"
     }
    ],
-   "note": "schools.json 의 장학 주소는 같은 게시판의 category=장학 필터.",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "공지사항",
-    "rows": 15,
-    "sample": [
-     "장학 2026년 우양재단 동행 장학생 모집 안내(~10.18.일)",
-     "국제교류 [겨울 단기] 미국 Temple University American Culture at Temple (ACT) Winter 2027 참가자 모집 안내",
-     "장학 [한국장학재단] 희망사다리Ⅰ유형 장학생 대상 대전 일자리박람회 안내"
-    ],
-    "evidence": "웹 검색 2026-09-30 '숭실대학교 공지사항 학사 scatch' → 결과 URL https://scatch.ssu.ac.kr/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/ (제목: 공지사항 - SSU:catch - 숭실대학교) — 분류 없는 전체 목록"
-   }
+   "note": "schools.json 의 장학 주소는 같은 게시판의 category=장학 필터."
   },
   {
    "school": "세종대학교",
    "campus": "",
    "home": "https://www.sejong.ac.kr/",
-   "boardUrl": "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=list",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=list",
@@ -617,25 +449,13 @@
      "evidence": "같은 검색 → 결과 URL https://www.sejong.ac.kr/kor/intro/notice3.do?mode=list&article.offset=0 (제목: 학사공지 게시판목록 | 세종대학교)"
     }
    ],
-   "note": "notice7=장학(이미 아는 것).",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "일반공지",
-    "rows": 16,
-    "sample": [
-     "학술정보원 이용자 만족도 조사",
-     "세종대학교 애지헌복합관 신축공사 안내",
-     "2027-1학기 교수초빙(9월공고_정년제 전임교원) 안내"
-    ],
-    "evidence": "웹 검색 2026-09-30 '세종대학교 공지사항 notice 학사' → 결과 URL https://www.sejong.ac.kr/kor/intro/notice1.do?mode=list&article.offset=0 (제목: 공지사항 > 일반공지 게시판목록 | 세종대학교)"
-   }
+   "note": "notice7=장학(이미 아는 것)."
   },
   {
    "school": "이화여자대학교",
    "campus": "",
    "home": "https://www.ewha.ac.kr/ewha/index.do",
-   "boardUrl": "https://www.ewha.ac.kr/ewha/news/notice.do",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://www.ewha.ac.kr/ewha/news/notice.do",
@@ -643,25 +463,13 @@
      "evidence": "웹 검색 2026-09-30 '이화여자대학교 공지사항 게시판' → 결과 URL https://www.ewha.ac.kr/ewha/news/notice.do (제목: 이화여자대학교 | 뉴스센터 | 공지사항) · 일반·학사·장학·경력·입학·등록금·입찰 분류가 있는 전체 게시판"
     }
    ],
-   "note": "bachelor/scholarship-notice.do 는 장학(이미 아는 것).",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "공지사항",
-    "rows": 17,
-    "sample": [
-     "[학부] 2026학년도 제2학기 영어 및 정보인증제 신청 안내",
-     "[학부] 2027학년도 제1학기 학부 재입학, 학부 졸업논문등제출자격재부여 신청안내",
-     "2027학년도 전기 일반대학원 입학전형 원서접수 안내"
-    ],
-    "evidence": "웹 검색 2026-09-30 '이화여자대학교 공지사항 게시판' → 결과 URL https://www.ewha.ac.kr/ewha/news/notice.do (제목: 이화여자대학교 | 뉴스센터 | 공지사항) · 일반·학사·장학·경력·입학·등록금·입찰 분류가 있는 전체 게시판"
-   }
+   "note": "bachelor/scholarship-notice.do 는 장학(이미 아는 것)."
   },
   {
    "school": "인하대학교",
    "campus": "",
    "home": "https://www.inha.ac.kr/",
-   "boardUrl": "https://www.inha.ac.kr/bbs/kr/8/artclList.do",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://www.inha.ac.kr/bbs/kr/8/artclList.do",
@@ -669,25 +477,13 @@
      "evidence": "웹 검색 2026-09-30 '인하대학교 공지사항 bbs/kr/8/artclList.do 전체 학사' → 상세 https://www.inha.ac.kr/bbs/kr/8/39740/artclView.do (제목: 공지사항 - [학사관리팀] 2025-1학기 (본)수강신청 안내) — bbs 8 이 통합 공지사항, bbsClSeq 를 뗀 목록으로 유도"
     }
    ],
-   "note": "bbsClSeq=215 가 장학(이미 아는 것) · 77 은 이름 미확인.",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "공지사항",
-    "rows": 19,
-    "sample": [
-     "[IPP] 2027년도 상반기 일학습병행 학생 모집 기업 초청 설명회 사전 신청 안내",
-     "[대학일자리플러스센터] 'SK하이닉스+삼성전자 면접대비 특강' 모집중!",
-     "[대학혁신지원사업] \"나도 학생 강사\" : 학생 주도 학습 프로그램(SDC) 강사 모집"
-    ],
-    "evidence": "웹 검색 2026-09-30 '인하대학교 공지사항 bbs/kr/8/artclList.do 전체 학사' → 상세 https://www.inha.ac.kr/bbs/kr/8/39740/artclView.do (제목: 공지사항 - [학사관리팀] 2025-1학기 (본)수강신청 안내) — bbs 8 이 통합 공지사항, bbsClSeq 를 뗀 목록으로 유도"
-   }
+   "note": "bbsClSeq=215 가 장학(이미 아는 것) · 77 은 이름 미확인."
   },
   {
    "school": "부산대학교",
    "campus": "",
    "home": "https://www.pusan.ac.kr/kor/Main.do",
-   "boardUrl": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095",
@@ -695,25 +491,13 @@
      "evidence": "웹 검색 2026-09-30 '부산대학교 공지사항 게시판' → 결과 URL https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095 (제목: 공지사항 > 공지사항 > 공지/참여 | 부산대학교) · 국가장학금 2차 신청·학위수여식 등"
     }
    ],
-   "note": "상세는 같은 주소 + &mode=view&board_seq=N.",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "공지사항",
-    "rows": 26,
-    "sample": [
-     "메인으로 이동",
-     "대학/대학원",
-     "개교80주년"
-    ],
-    "evidence": "웹 검색 2026-09-30 '부산대학교 공지사항 게시판' → 결과 URL https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095 (제목: 공지사항 > 공지사항 > 공지/참여 | 부산대학교) · 국가장학금 2차 신청·학위수여식 등"
-   }
+   "note": "상세는 같은 주소 + &mode=view&board_seq=N."
   },
   {
    "school": "가톨릭대학교",
    "campus": "",
    "home": "https://www.catholic.ac.kr/ko/index.do",
-   "boardUrl": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=list",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=list",
@@ -726,25 +510,13 @@
      "evidence": "같은 검색 → 결과 URL https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=list&srCategoryId=21 (제목: 학사 | 공지사항 게시판목록 | 가톨릭대학교)"
     }
    ],
-   "note": "분류 id: 21=학사, 22=장학(이미 아는 것).",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "공지사항",
-    "rows": 13,
-    "sample": [
-     "[학부대학운영팀] 제18차 사랑의 연탄나눔 봉사자 모집 안내",
-     "[교수학습개발원] 2026학년도 AI활용 세미나 4차 ‘에이전틱 AI시대, 대학 교수 업무 방식 패러다임 변화’ 신청 안내",
-     "[대외협력팀] 발전기금 홍보대사 <가대사랑> 16기 모집(~10/5(월)까지 연장)"
-    ],
-    "evidence": "웹 검색 2026-09-30 '가톨릭대학교 공지사항 campuslife notice' → 결과 URL https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=list&article.offset=0 (제목: 공지사항 게시판목록 | 가톨릭대학교) — 전체"
-   }
+   "note": "분류 id: 21=학사, 22=장학(이미 아는 것)."
   },
   {
    "school": "한국항공대학교",
    "campus": "",
    "home": "https://www.kau.ac.kr/",
-   "boardUrl": "https://kau.ac.kr/kaulife/notice.php",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://kau.ac.kr/kaulife/notice.php",
@@ -757,25 +529,13 @@
      "evidence": "웹 검색 2026-09-30 '한국항공대학교 kau.ac.kr 일반공지 학사공지 목록' → 결과 URL https://kau.ac.kr/kaulife/acdnoti.php (제목: 한국항공대학교 항대생활 KAU광장 공지사항 학사공지)"
     }
    ],
-   "note": "scholnoti.php 는 장학/대출(이미 아는 것) · event.php 행사.",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "일반공지",
-    "rows": 22,
-    "sample": [
-     "2027학년도 1학기 전임교원 채용 모집대상 : 정년 및 비정년트랙 / 접수기간 : 2026.10.15.(목) 13:30까지",
-     "제 36기 미래에셋 해외교환 장학생 선발 안내 2026.09.01.(화)~2026.10.06.(화)",
-     "test 관리자1 2026-10-01 0"
-    ],
-    "evidence": "웹 검색 2026-09-30 '한국항공대학교 항대생활 KAU광장 공지사항 일반공지 kaulife' → 결과 URL https://kau.ac.kr/kaulife/notice.php (제목: 한국항공대학교 항대생활 KAU광장 공지사항 일반공지)"
-   }
+   "note": "scholnoti.php 는 장학/대출(이미 아는 것) · event.php 행사."
   },
   {
    "school": "경기대학교",
    "campus": "",
    "home": "https://www.kyonggi.ac.kr/www/index.do",
-   "boardUrl": "https://www.kyonggi.ac.kr/www/selectBbsNttList.do?key=7520&bbsNo=1073",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://www.kyonggi.ac.kr/www/selectBbsNttList.do?key=7520&bbsNo=1073",
@@ -783,25 +543,13 @@
      "evidence": "웹 검색 2026-09-30 '경기대학교 공지사항 selectBbsNttList.do bbsNo=1073' → 결과 URL https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=620134 (제목: 통합 공지사항 - 경기대학교); 부서 필터는 sf.dc= (장학지원팀 11D70)"
     }
    ],
-   "note": "key=7520 + bbsNo=1073 에 sf.dc 없이 부르면 전체(무필터) 통합 공지.",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "공지사항",
-    "rows": 15,
-    "sample": [
-     "[공학교육혁신센터]2023년도 2학기 소망가방 및 수강신청 관련 안내",
-     "[입학에서 취업까지] [정치외교학전공] 몽골 관광인력 역량강화 프로젝트 봉사단 9기 모집",
-     "[입학에서 취업까지] (수학과) 2026학년도 사회봉사 장학금 신청 안내"
-    ],
-    "evidence": "웹 검색 2026-09-30 '경기대학교 공지사항 selectBbsNttList.do bbsNo=1073' → 결과 URL https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=620134 (제목: 통합 공지사항 - 경기대학교); 부서 필터는 sf.dc= (장학지원팀 11D70)"
-   }
+   "note": "key=7520 + bbsNo=1073 에 sf.dc 없이 부르면 전체(무필터) 통합 공지."
   },
   {
    "school": "서울과학기술대학교",
    "campus": "",
    "home": "https://www.seoultech.ac.kr/",
-   "boardUrl": "https://www.seoultech.ac.kr/service/info/notice/",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://www.seoultech.ac.kr/service/info/notice/",
@@ -809,25 +557,13 @@
      "evidence": "웹 검색 2026-09-30 '서울과학기술대학교 공지사항 seoultech.ac.kr/service/info/notice' → 결과 URL https://www.seoultech.ac.kr/service/info/notice (제목: 서울과학기술대학교 - 정보·민원서비스 - 공지사항)"
     }
    ],
-   "note": "장학(/service/info/janghak/)과 같은 게시판 엔진(do=commonview).",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "공지사항",
-    "rows": 20,
-    "sample": [
-     "[국제교류처] 2026학년도 제4회 모의 TOEIC Speaking, OPIc 시험접수 안내(2026. 10. 24. 시행)",
-     "[국제교류처] 2026학년도 제7회 모의 TOEIC 시험접수 안내(2026. 10. 24. 시행)",
-     "[국제교류처] 2026학년도 제10회 SeoulTech 한국어말하기대회 개최 안내(참가 신청자 모집, ~2026.10.14.)"
-    ],
-    "evidence": "웹 검색 2026-09-30 '서울과학기술대학교 공지사항 seoultech.ac.kr/service/info/notice' → 결과 URL https://www.seoultech.ac.kr/service/info/notice (제목: 서울과학기술대학교 - 정보·민원서비스 - 공지사항)"
-   }
+   "note": "장학(/service/info/janghak/)과 같은 게시판 엔진(do=commonview)."
   },
   {
    "school": "계명대학교",
    "campus": "",
    "home": "https://www.kmu.ac.kr/",
-   "boardUrl": "https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=143",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=143",
@@ -840,19 +576,7 @@
      "evidence": "같은 검색 → 결과 URL https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=144&cmd=2&parm_bod_uid=232037 (제목: 계명대학교 - 열린마당 > 공지사항 > 학사)"
     }
    ],
-   "note": "공지사항이 일반(143)·학사(144)·장학(145)·입시(146) 탭. 상세는 &cmd=2&parm_bod_uid=<번호>.",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "일반공지",
-    "rows": 16,
-    "sample": [
-     "개인정보처리방침_2018. 04. 30. ~ 2018. 12. 20.",
-     "개인정보처리방침_2018. 12. 21. ~ 2019. 2. 28.",
-     "개인정보처리방침_2019. 03. 1. ~ 2019. 4. 30."
-    ],
-    "evidence": "웹 검색 2026-09-30 '계명대학교 공지사항 kmu.ac.kr' → 결과 URL https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=143 (제목: 계명대학교 - 열린마당 > 공지사항 > 일반)"
-   }
+   "note": "공지사항이 일반(143)·학사(144)·장학(145)·입시(146) 탭. 상세는 &cmd=2&parm_bod_uid=<번호>."
   },
   {
    "school": "서울교육대학교",
@@ -877,7 +601,7 @@
    "school": "한국방송통신대학교",
    "campus": "",
    "home": "https://www.knou.ac.kr/knou/index.do",
-   "boardUrl": "https://www.knou.ac.kr/bbs/knou/51/artclList.do",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://www.knou.ac.kr/bbs/knou/51/artclList.do",
@@ -885,25 +609,13 @@
      "evidence": "웹 검색 2026-09-30 'knou.ac.kr/bbs/knou/51 공지사항 방송대' → 결과 URL https://www.knou.ac.kr/bbs/knou/51/277994/artclView.do ([일반] 우리 대학 무선랜 서비스 안내) · /bbs/knou/51/805073/artclView.do ([수업] 교과목 개설) — [일반]·[수업]·[시험성적] 말머리가 섞인 대학 전체 공지"
     }
    ],
-   "note": "이미 아는 /bbs/knou/51 이 장학 전용이 아니라 대학 공지사항 자체로 보인다. 장학 글은 /bbs/smart/2077/ 쪽.",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "공지사항",
-    "rows": 13,
-    "sample": [
-     "[일반] [국립대학 육성사업] 3주만에 끝내는 AI 취업 치트키 특강",
-     "[전공] 2027학년도 1학기 생활과학부 전공분리 승인 안내",
-     "[시험성적] 2026학년도 2학기 출석수업대체과제물 시행공고"
-    ],
-    "evidence": "웹 검색 2026-09-30 'knou.ac.kr/bbs/knou/51 공지사항 방송대' → 결과 URL https://www.knou.ac.kr/bbs/knou/51/277994/artclView.do ([일반] 우리 대학 무선랜 서비스 안내) · /bbs/knou/51/805073/artclView.do ([수업] 교과목 개설) — [일반]·[수업]·[시험성적] 말머리가 섞인 대학 전체 공지"
-   }
+   "note": "이미 아는 /bbs/knou/51 이 장학 전용이 아니라 대학 공지사항 자체로 보인다. 장학 글은 /bbs/smart/2077/ 쪽."
   },
   {
    "school": "경북대학교",
    "campus": "",
    "home": "https://www.knu.ac.kr/wbbs/wbbs/main/main.action",
-   "boardUrl": "https://www.knu.ac.kr/wbbs/wbbs/main/main.action",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/listBtin.action?bbs_cde=1&menu_idx=67",
@@ -911,25 +623,13 @@
      "evidence": "웹 검색 2026-09-30 'knu.ac.kr wbbs listBtin.action bbs_cde=1 공지사항' → 결과 URL https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/viewBtin.action?btin.bbs_cde=1&btin.doc_no=1325007&btin.appl_no=000000&menu_idx=67 (제목: 경북대학교 > 공지 > 공지사항); 목록 listBtin.action 은 유추"
     }
    ],
-   "note": "검색엔 상세만 잡혔다. 목록 주소는 유추.",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "home-menu",
-    "label": "정부재정지원사업",
-    "rows": 5,
-    "sample": [
-     "포토뉴스 대현119안전센터와 교내 어린이집에서 합동소방훈련 실시 경북대는 9월 30일 교내 어린이집에서 교직원과 원아, 대현119안전센터 소방관 등 300여명이 참여한 가운데 2026년도 합동소방훈련을 실시했다. 2026-10-01",
-     "포토뉴스 수의과대학 김규태 교수, 제자 위해 발전기금 1천만원 전달 수의과대학 김규태 교수가 제자들을 위해 써달라며 발전기금 1천만원을 경북대에 전달했다. 2026-10-01",
-     "포토뉴스 교육부 글로컬랩 2개 연구소 선정… 9년간 총 사업비 377억원 확보 교육부와 한국연구재단이 추진하는 ‘글로컬랩(거점형) 사업’에 지능형건설자동화연구센터와 세포·기질연구소가 각각 최종 선정됐다. 2026-09-29"
-    ],
-    "evidence": "홈페이지 메뉴 「정부재정지원사업」 을 따라 들어가 확인 (2026-10-01)"
-   }
+   "note": "검색엔 상세만 잡혔다. 목록 주소는 유추."
   },
   {
    "school": "영남대학교",
    "campus": "",
    "home": "https://www.yu.ac.kr/main/index.do",
-   "boardUrl": "https://www.yu.ac.kr/main/bachelor/bachelor-guide.do",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://www.yu.ac.kr/main/intro/yu-notice.do?mode=list&article.offset=0",
@@ -947,19 +647,7 @@
      "evidence": "같은 검색 → 결과 URL https://www.yu.ac.kr/main/intro/yu-news.do?mode=list&article.offset=0 (제목: 영대소식 게시판목록)"
     }
    ],
-   "note": "대학 전체 공지사항 목록 주소는 검색에 직접 안 잡혔다.",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "학사공지",
-    "rows": 9,
-    "sample": [
-     "9 2026학년도 2학기 중간시험 실시 및 부정행위자 처리 기준 안내",
-     "8 2026학년도 2학기 교양, 교직, 일반선택 중간시험 시간표 안내(주간, 야간)",
-     "7 2026학년도 전기(27년2월) 조기졸업 신청 안내"
-    ],
-    "evidence": "같은 검색 → 결과 URL https://www.yu.ac.kr/main/bachelor/bachelor-guide.do (제목: 학사안내) — 중간시험 시간표·복학 안내 글"
-   }
+   "note": "대학 전체 공지사항 목록 주소는 검색에 직접 안 잡혔다."
   },
   {
    "school": "전북대학교",
@@ -984,7 +672,7 @@
    "school": "충남대학교",
    "campus": "",
    "home": "https://plus.cnu.ac.kr/",
-   "boardUrl": "https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0701&site_dvs_cd=kr&menu_dvs_cd=0701",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0701&site_dvs_cd=kr&menu_dvs_cd=0701",
@@ -997,25 +685,13 @@
      "evidence": "웹 검색 2026-09-30 '충남대학교 공지사항 plus.cnu.ac.kr _prog/_board' → 결과 URL https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0702&site_dvs_cd=kr&menu_dvs_cd=0702 (제목: 목록 > 학사정보 > 백마광장)"
     }
    ],
-   "note": "백마광장 코드: 0701 새소식 · 0702 학사정보 · 0703 CNU뉴스 · 0705 채용 · 0713 장학.",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "공지사항",
-    "rows": 9,
-    "sample": [
-     "대표홈페이지 일부 게시판 폐쇄 안내(대학문화마당, CNU장터, 구인구직, 분실물 광장, 스터디 및 공모전)",
-     "[RISE] 2026 All-set 기업지원 사업 시행 공고",
-     "2026학년도 2학기 학생생활관 보결 3차 모집 안내"
-    ],
-    "evidence": "웹 검색 2026-09-30 'plus.cnu.ac.kr _prog/_board code=sub07_0701 백마광장' → 결과 URL https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0701&mode=V&no=2512153&site_dvs_cd=kr&menu_dvs_cd=0701 (제목: 상세 > 새소식 > 백마광장); 목록은 mode 를 뗀 주소로 유추"
-   }
+   "note": "백마광장 코드: 0701 새소식 · 0702 학사정보 · 0703 CNU뉴스 · 0705 채용 · 0713 장학."
   },
   {
    "school": "전남대학교",
    "campus": "",
    "home": "https://www.jnu.ac.kr/",
-   "boardUrl": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5",
@@ -1023,25 +699,13 @@
      "evidence": "웹 검색 2026-09-30 '전남대학교 공지사항 jnu.ac.kr board.aspx boardID' → 결과 URL https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5 (제목: 공지사항 < 커뮤니티 < 전남대학교 대표 홈페이지)"
     }
    ],
-   "note": "boardID=5 에 cate 를 빼면 전체.",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "공지사항",
-    "rows": 20,
-    "sample": [
-     "[학사안내] 2026학년도 제2학기 최종 등록 공고",
-     "[학사안내] 2026학년도 2학기 교과구분 정정 실시 안내",
-     "[공모전] 『2026 English Essay Contest』개최 안내"
-    ],
-    "evidence": "웹 검색 2026-09-30 '전남대학교 공지사항 jnu.ac.kr board.aspx boardID' → 결과 URL https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5 (제목: 공지사항 < 커뮤니티 < 전남대학교 대표 홈페이지)"
-   }
+   "note": "boardID=5 에 cate 를 빼면 전체."
   },
   {
    "school": "조선대학교",
    "campus": "",
    "home": "https://www3.chosun.ac.kr/chosun/index.do",
-   "boardUrl": "https://www3.chosun.ac.kr/chosun/217/subview.do",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://www3.chosun.ac.kr/chosun/217/subview.do",
@@ -1054,25 +718,13 @@
      "evidence": "같은 검색 → 결과 URL https://www4.chosun.ac.kr/acguide/9326/subview.do (제목: 공지사항) — 학사종합안내 사이트"
     }
    ],
-   "note": "K2Web(subview.do) 엔진이라 실제 목록은 /bbs/chosun/<bbsNo>/artclList.do 일 수 있음.",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "일반공지",
-    "rows": 14,
-    "sample": [
-     "[G-LAMP사업단] 2026 하반기 블루밍 라운지(Blooming Rounge) 참여교원 모집공고",
-     "[G-LAMP사업단] 2026 LAMP 전임교원 선발공고",
-     "YBM 한국토익위원회 주관 본교 특별 TOEIC 시험 실시 안내(10. 24.(토))"
-    ],
-    "evidence": "웹 검색 2026-09-30 '조선대학교 공지사항 chosun.ac.kr' → 결과 URL https://www3.chosun.ac.kr/chosun/217/subview.do (제목: 교내일반공지)"
-   }
+   "note": "K2Web(subview.do) 엔진이라 실제 목록은 /bbs/chosun/<bbsNo>/artclList.do 일 수 있음."
   },
   {
    "school": "충북대학교",
    "campus": "",
    "home": "https://www.cbnu.ac.kr/www/index.do",
-   "boardUrl": "https://www.cbnu.ac.kr/www/selectBbsNttList.do?bbsNo=8&key=813",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://www.cbnu.ac.kr/www/selectBbsNttList.do?bbsNo=8&key=813",
@@ -1080,25 +732,13 @@
      "evidence": "웹 검색 2026-09-30 '충북대학교 공지사항 cbnu.ac.kr selectBbsNttList.do' → 결과 URL https://www.cbnu.ac.kr/www/selectBbsNttList.do?bbsNo=8&key=813 (제목: 충북대학교 - 전체); 입학/등록 · 학사/장학 · 채용/공모 · 일반 분류가 한 게시판"
     }
    ],
-   "note": "bbsNo=8 에서 searchCtgry 를 빼면 무필터 전체.",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "공지사항",
-    "rows": 16,
-    "sample": [
-     "대학/대학원",
-     "홈페이지 가이드",
-     "함께하는 CBNU"
-    ],
-    "evidence": "웹 검색 2026-09-30 '충북대학교 공지사항 cbnu.ac.kr selectBbsNttList.do' → 결과 URL https://www.cbnu.ac.kr/www/selectBbsNttList.do?bbsNo=8&key=813 (제목: 충북대학교 - 전체); 입학/등록 · 학사/장학 · 채용/공모 · 일반 분류가 한 게시판"
-   }
+   "note": "bbsNo=8 에서 searchCtgry 를 빼면 무필터 전체."
   },
   {
    "school": "부경대학교",
    "campus": "",
    "home": "https://www.pknu.ac.kr/main",
-   "boardUrl": "https://www.pknu.ac.kr/main/163",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://www.pknu.ac.kr/main/163",
@@ -1106,25 +746,13 @@
      "evidence": "웹 검색 2026-09-30 '국립부경대학교 공지사항 www.pknu.ac.kr/main/163' → 결과 URL https://www.pknu.ac.kr/main/163 (제목: 공지사항); 2026-07-16 조교 채용 등 대학 전체 공지"
     }
    ],
-   "note": "cd 없이 /main/163 이 전체.",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "공지사항",
-    "rows": 20,
-    "sample": [
-     "2026학년도 동계 계절수업 개설 희망과목 수요조사 안내",
-     "노션 × AI를 활용한 실전 특강 안내(11/4~11/6 13시~17시)",
-     "10월 심리검사 일정(2026, 학생상담센터)"
-    ],
-    "evidence": "웹 검색 2026-09-30 '국립부경대학교 공지사항 www.pknu.ac.kr/main/163' → 결과 URL https://www.pknu.ac.kr/main/163 (제목: 공지사항); 2026-07-16 조교 채용 등 대학 전체 공지"
-   }
+   "note": "cd 없이 /main/163 이 전체."
   },
   {
    "school": "강원대학교",
    "campus": "",
    "home": "https://www.kangwon.ac.kr/ko/index.do",
-   "boardUrl": "https://www.kangwon.ac.kr/ko/bbs/504/list.do",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://www.kangwon.ac.kr/ko/bbs/504/list.do",
@@ -1137,19 +765,7 @@
      "evidence": "같은 검색 → 결과 URL https://www.kangwon.ac.kr/ko/bbs/718/list.do (제목: 강원대학교); 요약에 '학사공지 = /bbs/718/list.do'"
     }
    ],
-   "note": "715 행사안내·716 채용안내·717 취업정보.",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "candidate",
-    "label": "공지사항",
-    "rows": 54,
-    "sample": [
-     "2026학년도 2학기 「현장체험 프로젝트 패키지(PREX)」 참여 팀 모집 공고",
-     "학생 무료 건강검진 안내",
-     "2026년 학생예비군 11.3. 기본훈련(3차) 안내"
-    ],
-    "evidence": "웹 검색 2026-09-30 '강원대학교 공지사항 kangwon.ac.kr bbs list.do' → 결과 URL https://www.kangwon.ac.kr/ko/bbs/504/list.do (제목: 강원대학교); 요약에 '공지사항 = /bbs/504/list.do, 총 10,224건'"
-   }
+   "note": "715 행사안내·716 채용안내·717 취업정보."
   }
  ],
  "_parked": "쓰지 않게 된 게시판을 보관하는 자리. 되돌리려면 sources 로 옮긴다(관리자 화면 「소식」 탭의 되살리기).",
