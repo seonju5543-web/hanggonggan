@@ -312,9 +312,14 @@ function judgeCond(c, p, ctx) {
     case 'age': {
       if (!p.birthYear) return 'unknown';
       const age = new Date().getFullYear() - Number(p.birthYear);
-      /* 범위의 아래 끝(2026-10-01) — 태어난 해만 알아 만 나이가 한 살 어긋날 수 있다. 경계 한 살 안쪽은 '모름'(틀린 미달 금지) */
-      if (c.min != null && age < c.min) return age === c.min - 1 ? 'unknown' : 'fail';
-      if (age > c.max) return (c.min != null && age === c.max + 1) ? 'unknown' : 'fail';
+      /* 🔴 `age` 는 올해 − 태어난 해 = Y. 진짜 만 나이는 Y 또는 Y−1 이다(생일 전이면 한 살 적다 · 2026-10-01 코드 리뷰로 바로잡음).
+         · 확실히 미달: Y < min(둘 다 모자람) · Y > max+1(둘 다 넘음)
+         · 모름: Y == min(만 나이가 min−1 일 수 있다 — ✓ 를 주면 틀린 안심) · Y == max+1(만 나이가 max 일 수 있다 — ✕ 는 틀린 미달)
+         예전엔 위 끝만 보며 Y > max 를 미달로 쳐서, 생일이 안 지난 학생을 틀린 미달로 떨어뜨렸다. */
+      if (c.min != null && age < c.min) return 'fail';
+      if (c.min != null && age === c.min) return 'unknown';
+      if (age > c.max + 1) return 'fail';
+      if (age === c.max + 1) return 'unknown';
       return 'pass';
     }
     /* 🔴 학교 이름이 걸린 요건 — 우리가 아는 것으로 판정한다 (2026-08-30).

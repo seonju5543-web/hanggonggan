@@ -38,7 +38,7 @@ const FIXTURE = {
     /* 나이가 확실히 안 맞는 글 — 23살 학생에게 '지원 자격 미달' (적합도순에서 맨 아래).
        ⚠️ 지역 줄(`부산 거주`)로 만들지 말 것 — 엔진은 부모 거주지도 보므로 본인 지역만 달라서는 '모름'이다(틀린 미달 금지) */
     { title: '제3회 장학수기 공모전 공고', url: 'https://dep.hufs.ac.kr/bbs/x/2', kind: '공모전', school: '한국외국어대학교', campus: '', foundAt: '2026-09-24', attachments: [],
-      eligibilityLines: ['만 15~19세 청소년'] },
+      eligibilityLines: ['참가자격 : 만 15세 ~ 만 19세'] },   // ⚠️ '청소년'·'아동' 을 붙이지 말 것 — 도움 받는 사람의 나이로 읽혀 판정하지 않는다(parseAge AGE_OF_OTHERS)
     { title: '경희 아이디어 경진대회', url: 'https://news.khu.ac.kr/x/3', kind: '공모전', school: '경희대학교', campus: '', foundAt: '2026-09-25', attachments: [] },
     { title: '전국 청년 서포터즈 모집', url: 'https://example.org/x/4', kind: '대외활동', school: '', host: '청년재단', foundAt: '2026-09-23', attachments: [] },
     /* 관리자가 숨긴 글 — 파일에는 있지만 화면에는 없어야 한다 (2026-09-29) */

@@ -540,11 +540,15 @@ acts.items.forEach((n) => { if (actHide.has(canonUrl(n.url))) n.hidden = true; e
 /* 소급(운영 원칙 7) — 발췌 없이 실린 글은 원문을 다시 읽어 마감·발췌·분야를 채운다 (2026-09-30 첫 실행의 26건이 그렇다 —
    글자를 한 줄로 뭉개 넘긴 사고 · html-text.mjs). 한 실행 최대 ACT_BACKFILL 건 · 예산 안에서만 · 읽은 글은 excerptsAt 을 적어 다시 안 읽는다
    (못 읽었어도 적는다 — 없는 이름표를 매일 다시 찾지 않는다). */
+const todayIso = new Date().toISOString().slice(0, 10);
 const ACT_BACKFILL = 40;   // 2026-10-01 20→40 — 자격 판(detailsV) 소급으로 다시 읽을 글이 130건이다. 예산(budget.hasRoom) 안에서만 돈다
 let actBackfilled = 0;
 for (const it of acts.items) {
   /* 🔴 자격 판(detailsV)이 옛것인 글도 다시 읽는다 (2026-10-01 · 소급 — 원칙 7). API 글은 API 로봇이 채우므로 건너뛴다 */
   if (actBackfilled >= ACT_BACKFILL || it.api || (it.excerptsAt && it.detailsV === ACT_DETAILS_V)) continue;
+  /* 못 받아 온 글은 **이레에 한 번만** 다시 두드린다 (2026-10-01 코드 리뷰) — 안 그러면 죽은 주소가 매 실행 40칸을 먹어
+     앞쪽에 그런 글이 쌓이면 나머지가 영영 소급되지 않고, 같은 학교 게시판을 하루 세 번 두드린다 */
+  if (it.detailsTriedAt && (Date.parse(todayIso) - Date.parse(it.detailsTriedAt)) < 7 * 86400000) continue;
   if (!budget.hasRoom(20000)) break;
   const detail = await fetchDetail(it);
   const ex = activityExcerpts(detail.text);
@@ -553,6 +557,7 @@ for (const it of acts.items) {
   if (!it.field) { const f = activityField(it.title, it.kind); if (f) it.field = f; }
   if (detail.text) putActivityDetails(it, activityDetails(detail.text));
   if (detail.text) it.excerptsAt = new Date().toISOString().slice(0, 10);   // 못 받아 온 날은 적지 않는다 — 잠깐 끊긴 것을 영영 '읽었다'로 굳히지 않게
+  if (detail.text) delete it.detailsTriedAt; else it.detailsTriedAt = todayIso;   // 못 받았으면 이레 뒤에 다시
   actBackfilled += 1;
 }
 acts.updatedAt = notices.updatedAt;

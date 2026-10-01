@@ -78,7 +78,12 @@ export function splitLines(raw, max = 8) {
     .map((l) => (l.length > 240 ? `${l.slice(0, 239)}…` : l));
   return parts.filter((l) => !CONTACT.test(l)).slice(0, max);
 }
-const labeled = (label, raw) => { const l = splitLines(raw, 3); return l.length ? [`${label} : ${l.join(' ')}`.slice(0, 240)] : []; };
+const labeled = (label, raw) => {
+  const l = splitLines(raw, 3);
+  if (!l.length) return [];
+  const t = `${label} : ${l.join(' ')}`;
+  return [t.length > 240 ? `${t.slice(0, 239)}…` : t];   // 자른 곳은 … 로 알린다(splitLines 와 같은 규칙)
+};
 
 /* 같은 모양의 글 하나 — 학교가 빈 전국 글(앱이 모든 학생에게 보인다) */
 function item({ title, url, kind, field, deadline, host, excerpts, api, details }) {
@@ -309,8 +314,13 @@ export function mergeApi(prevItems, results, { today, hideUrls = new Set() }) {
     if (same(n)) return false;                                // 같은 글은 API 쪽이 대신한다
     return true;
   });
+  /* 상세를 못 받은 날(1365 상세 한 건 실패 등)은 **어제 받은 상세를 이어받는다** — 안 그러면 하루 동안 자격·안내 칸이 빈다(2026-10-01 코드 리뷰) */
+  const prevByUrl = new Map(prev.filter((n) => n && n.url).map((n) => [canonUrl(n.url), n]));
+  const DETAIL_KEYS = ['eligibilityLines', 'eligibilityExcludes', 'eligibilityPriority', 'noticeLines'];
   const added = fresh.map((n) => {
     const k = canonUrl(n.url);
+    const old = prevByUrl.get(k);
+    if (old && !DETAIL_KEYS.some((f) => (n[f] || []).length)) for (const f of DETAIL_KEYS) if ((old[f] || []).length) n = { ...n, [f]: old[f] };
     const first = [firstSeen.get(k), firstSeen.get(titleKey(n))].filter(Boolean).sort()[0];
     /* excerptsAt: 수집 로봇의 '원문 다시 읽기'가 건너뛰게 · seenAt: 오늘도 API 가 줬다 —
        수집 로봇의 60일 삭제는 API 글엔 처음 본 날이 아니라 이 날로 잰다(오래 열린 정책이 61일째 '새 글'로 돌아오지 않게 · 리뷰 I3) */

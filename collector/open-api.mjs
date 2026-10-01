@@ -173,9 +173,10 @@ for (const src of Object.keys(API_SOURCES)) {
   try {
     const rows = await FETCHERS[src]();
     const { items, dropped, refs } = mapRows(src, rows, { scholarship: KEYWORDS, today });
-    const detailNote = src === 'vol1365' && items.length ? ` · 상세 내용 ${await vol1365Details(items, refs)}/${items.length}건` : '';
     const why = Object.entries(dropped).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${v}`).join(' · ');
     const bad = sourceVerdict(rows, dropped);
+    /* 상세는 **성공으로 칠 응답일 때만** 받는다 — 실패로 칠 응답에 15번 더 두드리지 않는다(2026-10-01 코드 리뷰) */
+    const detailNote = !bad && src === 'vol1365' && items.length ? ` · 상세 내용 ${await vol1365Details(items, refs)}/${items.length}건` : '';
     if (bad) {   // 🔴 성공으로 치지 않는다 — 치면 지난 글이 조용히 지워진다 (리뷰 C1)
       results[src] = { ok: false };
       lines.push(`- ❌ **${name}** — ${bad} · 지난 글 그대로 둠${why ? ` · 버림: ${why}` : ''}`);

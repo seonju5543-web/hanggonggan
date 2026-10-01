@@ -10332,6 +10332,7 @@ console.log('\n■ 공공 API 로봇 (2026-10-01)');
   eq('  API 글엔 excerptsAt 이 있다(수집 로봇의 원문 다시 읽기가 건너뛴다)', merged.filter((n) => n.api === 'kstartup').every((n) => n.excerptsAt === today), true);
   const m2 = M.mergeApi([board], { kstartup: { ok: true, items: [sameAsBoard] } }, { today, hideUrls: new Set() });
   eq('  같은 주소의 게시판 글은 API 글이 대신하고 처음 본 날을 이어받는다', [m2.length, m2[0].api, m2[0].foundAt], [1, 'kstartup', '2026-09-01']);
+  eq('  상세를 못 받은 날은 어제 상세를 이어받는다(1365 상세 한 건 실패)', M.mergeApi([{ ...k1, eligibilityLines: ['어제 자격'], noticeLines: ['어제 안내'] }], { kstartup: { ok: true, items: [{ ...k1, eligibilityLines: undefined, noticeLines: undefined, eligibilityExcludes: undefined, eligibilityPriority: undefined }] } }, { today })[0].noticeLines, ['어제 안내']);
   eq('  다시 받은 글은 처음 본 날을 이어받는다', M.mergeApi([{ ...k1, foundAt: '2026-09-20' }], { kstartup: { ok: true, items: [k1] } }, { today })[0].foundAt, '2026-09-20');
   eq('  관리자가 숨긴 주소엔 hidden', M.mergeApi([], { kstartup: { ok: true, items: [k1] } }, { today, hideUrls: new Set([canonUrl(k1.url)]) })[0].hidden, true);
   /* 코드 리뷰(2026-10-01)가 찾은 구멍 — 하나씩 못 박는다 */
@@ -10383,8 +10384,12 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
   /* ① 나이 범위 — 위·아래 둘 다 · '세' 없는 범위는 나이가 아니다 · 태어난 해만 알아 경계 한 살은 모름 */
   eq('① 나이 범위 — 만 19세 ~ 만 34세 · 19~39세 · 만 20세 이상 ~ 만 39세 이하',
     [rm('만 19세 ~ 만 34세'), rm('19~39세 청년'), rm('만 20세 이상 ~ 만 39세 이하')], ['ok', 'ok', 'ok']);
-  eq('  아래 끝도 본다(만 25~34세에 22살은 미달 · 24살은 경계라 모름)', [rm('만 25~34세 청년', 22), rm('만 25~34세 청년', 24)], ['no', null]);
-  eq('  위 끝을 넘으면 미달 · 한 살 위는 모름', [rm('만 19~34세 청년', 37), rm('만 19~34세 청년', 35)], ['no', null]);
+  /* 🔴 경계는 '올해 − 태어난 해 = Y, 만 나이는 Y 또는 Y−1' 로 잰다(2026-10-01 코드 리뷰가 거꾸로 된 것을 잡았다):
+     Y < min 은 확실히 미달 · Y == min 은 모름(생일 전이면 min−1) · Y == max+1 은 모름 · Y > max+1 은 미달 */
+  eq('  아래 끝 — 만 25~34세에 Y=24 는 미달 · Y=25 는 모름(✓ 아님) · Y=26 은 맞음', [rm('만 25~34세 청년', 24), rm('만 25~34세 청년', 25), rm('만 25~34세 청년', 26)], ['no', null, 'ok']);
+  eq('  위 끝 — Y=35 는 모름(생일 전이면 34) · Y=37 은 미달 · 만 34세 이하도 같은 잣대', [rm('만 19~34세 청년', 35), rm('만 19~34세 청년', 37), rm('만 34세 이하', 35), rm('만 34세 이하', 36)], [null, 'no', null, 'no']);
+  eq('  도움 받는 사람·자녀의 나이는 신청자 나이가 아니다(틀린 미달 금지)',
+    ['대상 : 지역아동센터 초등학생(만 7~12세)', '멘토링 대상 : 만 13~18세 청소년', '대상: 65~80세 독거 어르신', '만 6세 이하 자녀를 둔 가정'].map((l) => rm(l, 22) !== 'no'), [true, true, true, true]);
   eq('  1~2학년은 나이가 아니다', PRX.parseLine('1~2학년 재학생').conds.some((c) => c.kind === 'age'), false);
   /* ② 요건 낱말 — 활동 글이 쓰는 말이 판정 전에 버려지지 않는다 */
   eq('② 나이 범위·청년·대학(원)생·대한민국 국민 줄이 요건으로 남는다',
@@ -10395,6 +10400,10 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
   eq('③ 시·도의 일부(경기북부)는 시·도 하나로 판정하지 않는다 — 서울 학생에게 ✓ 가 아니라 모름', rm('경기북부 청년(19~39세)'), null);
   /* `인천 청년` 은 지역 요건으로 읽히되 확신이 낮아 서울 학생에게 '모름'이다 — 틀린 미달보다 낫다. 요점은 **✓ 가 아니다** */
   eq('  지역 + 청년 은 지역 요건이다(인천 청년 → 서울 학생에게 ✓ 아님 · 서울 거주 청년 → 맞음)', [rm('인천 청년(19~39세)') !== 'ok', rm('서울 거주 청년')], [true, 'ok']);
+  eq('  프로필로 모르는 처지(창업자·예술인·센터 회원·학생 제외)는 지역이 맞아도 ✓ 아님',
+    ['서울 청년 창업자', '서울 청년 예술인', '서울 청년센터 회원', '서울 청년 (단, 대학생 제외)'].map((l) => rm(l) !== 'ok'), [true, true, true, true]);
+  eq('  `휴학생 제외`·`① 재학생 또는 ② 미취업자` 는 재학생에게 그대로 ✓ (넓힌 낱말이 맞는 줄을 깎지 않는다)',
+    [rm('전국 대학(원)생 (휴학생 제외)'), rm('초·중·고·대학교 재학생(휴학생제외)')], ['ok', 'ok']);
   eq('  경험을 묻는 줄은 나이가 맞아도 모름 (KOICA 사업 참여 경험 … 만 19~34세)', rm('KOICA 사업 참여 경험이 있으며, 사업 참여 당시 청년(만 19~34세) 대한민국 국민'), null);
   /* ④ 발췌기 — 장학 발췌기 그대로 · '대상:' 줄을 함께 · 문의처는 싣지 않는다 */
   const page = ['■ 모집 개요', '○ 참가자격 : 만 19~34세 대한민국 국민', '○ 대상 : KOICA 사업 참여 경험이 있으며, 사업 참여 당시 청년(만 19~34세) 대한민국 국민',
@@ -10406,6 +10415,9 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
     '○ 대상 : KOICA 사업 참여 경험이 있으며, 사업 참여 당시 청년(만 19~34세) 대한민국 국민', '○ 신청기간 : 2026. 10. 1. ~ 10. 20.'].join('\n');
   eq('  자격 절 밖의 \'대상:\' 줄도 자격으로 담는다(자르지 않은 전체 문장)', AX.activityDetails(page2).eligibilityLines.some((l) => /^KOICA 사업 참여 경험이 있으며, 사업 참여 당시 청년\(만 19~34세\) 대한민국 국민$/.test(l)), true);
   eq('  전화·메일·문의 줄은 어느 칸에도 없다', [...d1.eligibilityLines, ...d1.noticeLines].some((l) => AX.CONTACT.test(l)), false);
+  eq('  연락처 꼴 — 휴대전화 붙여 쓰기·☎·대표번호·[at]·담당자 는 거르고, 날짜(20261001 ~ 20261020)·금액은 남긴다',
+    ['02) 123-4567', '010 - 1234 - 5678', '01012345678', '☎ 1234-5678', '대표전화 1588-1234', 'hong[at]korea.kr', '담당자 김철수 주무관', '신청기간 20261001 ~ 20261020', '접수기간 : 2026.10.01.(수) ~ 2026.10.20.(화)', '지원금 1,500,000원'].map((l) => AX.CONTACT.test(l)),
+    [true, true, true, true, true, true, true, false, false, false]);
   const it1 = AX.putActivityDetails({ eligibilityLines: ['옛 줄'] }, { eligibilityLines: [], noticeLines: ['새 안내'] });
   eq('  붙이기 — 빈 칸은 지우고(옛 값 안 남김) 판(detailsV)을 적는다', [it1.eligibilityLines, it1.noticeLines, it1.detailsV], [undefined, ['새 안내'], AX.ACT_DETAILS_V]);
   /* ⑤ API — 칸으로 오는 자격·제외·안내 */
@@ -10420,6 +10432,9 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
   eq('  청년정책 — 나이 줄은 엔진이 읽는 꼴(만 19세 ~ 만 34세) · 참여 제한은 제외 칸', [yp.eligibilityLines[0], MEX.requirementMatch(yp.eligibilityLines[0], P(23), {}), yp.eligibilityExcludes], ['만 19세 ~ 만 34세', 'ok', ['공무원']]);
   /* ⑥ 앱 — 장학과 같은 함수로 판정하고 그린다(베낀 두 번째 판정 없음) */
   const appX = readText(new URL('../app.js', import.meta.url));
+  const cmY = readText(new URL('../collector/collect.mjs', import.meta.url));
+  eq('  소급 — 못 받아 온 글은 이레에 한 번만 다시 두드린다(죽은 주소가 매 실행 칸을 먹지 않게)',
+    /if \(it\.detailsTriedAt && \(Date\.parse\(todayIso\) - Date\.parse\(it\.detailsTriedAt\)\) < 7 \* 86400000\) continue;/.test(cmY) && /if \(detail\.text\) delete it\.detailsTriedAt; else it\.detailsTriedAt = todayIso;/.test(cmY), true);
   eq('⑥ 활동 글을 엔진 모양으로 — 칸 이름이 장학과 같다', /function activityAsSch[\s\S]*?eligibilityLines: n\.eligibilityLines[\s\S]*?eligibilityExcludes: n\.eligibilityExcludes/.test(appX), true);
   eq('  적합도는 getMatches 와 같은 세 함수(evaluateFor · fitScore · fitDetailFor)', /function activityFit[\s\S]*?evaluateFor\(sch, state\.profile\)[\s\S]*?fitScore\(sch, result, state\.profile\)[\s\S]*?fitDetailFor\(sch, state\.profile\)/.test(appX), true);
   eq('  카드 판정은 장학 카드의 cardBadgeHtml', /badge: cardBadgeHtml\(m\.fit, m\.fd, null\)/.test(appX), true);
