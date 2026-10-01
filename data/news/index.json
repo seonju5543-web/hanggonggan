@@ -1,6 +1,135 @@
 {
  "note": "학교별 교내 소식 파일 색인 (data/news/). 앱은 match-engine.js newsFileFor(noticeFileKey) 로 자기 학교 파일을 바로 받는다 — 옛 통짜 파일로 물러나는 길은 없다. check-live.yml 이 이 색인의 학교 전부를 확인한다.",
  "updatedAt": "2026-10-01",
- "schools": 0,
- "files": {}
+ "schools": 32,
+ "files": {
+  "한국외국어대학교": {
+   "file": "n19cz03g.json",
+   "count": 10
+  },
+  "서울대학교": {
+   "file": "nsgh1oi.json",
+   "count": 5
+  },
+  "연세대학교": {
+   "file": "nz3ew5y.json",
+   "count": 7
+  },
+  "연세대학교 미래캠퍼스": {
+   "file": "n1if6uwu.json",
+   "count": 15
+  },
+  "고려대학교 세종캠퍼스": {
+   "file": "n1ch7t87.json",
+   "count": 5
+  },
+  "건국대학교": {
+   "file": "nmpm6i7.json",
+   "count": 30
+  },
+  "홍익대학교": {
+   "file": "nv8pha4.json",
+   "count": 10
+  },
+  "숙명여자대학교": {
+   "file": "n1a4mxa4.json",
+   "count": 9
+  },
+  "광운대학교": {
+   "file": "n6xhy7d.json",
+   "count": 30
+  },
+  "명지대학교": {
+   "file": "ntyl0r5.json",
+   "count": 29
+  },
+  "가천대학교": {
+   "file": "nzzc8bm.json",
+   "count": 12
+  },
+  "아주대학교": {
+   "file": "n16dvfry.json",
+   "count": 10
+  },
+  "국민대학교": {
+   "file": "n1tasrsl.json",
+   "count": 10
+  },
+  "숭실대학교": {
+   "file": "nmljo8t.json",
+   "count": 7
+  },
+  "세종대학교": {
+   "file": "n1mo5fbn.json",
+   "count": 15
+  },
+  "이화여자대학교": {
+   "file": "n1tk2q9m.json",
+   "count": 15
+  },
+  "인하대학교": {
+   "file": "nkeh7pq.json",
+   "count": 11
+  },
+  "부산대학교": {
+   "file": "n13zozby.json",
+   "count": 18
+  },
+  "가톨릭대학교": {
+   "file": "n174lvh5.json",
+   "count": 4
+  },
+  "한국항공대학교": {
+   "file": "n1as48ix.json",
+   "count": 13
+  },
+  "경기대학교": {
+   "file": "ntxxf09.json",
+   "count": 10
+  },
+  "서울과학기술대학교": {
+   "file": "n14kv35j.json",
+   "count": 9
+  },
+  "계명대학교": {
+   "file": "n1nel147.json",
+   "count": 16
+  },
+  "한국방송통신대학교": {
+   "file": "n1uf7bji.json",
+   "count": 11
+  },
+  "경북대학교": {
+   "file": "nf097dk.json",
+   "count": 5
+  },
+  "영남대학교": {
+   "file": "n12kfbyt.json",
+   "count": 9
+  },
+  "충남대학교": {
+   "file": "nl1xm19.json",
+   "count": 8
+  },
+  "전남대학교": {
+   "file": "nwqmwga.json",
+   "count": 14
+  },
+  "조선대학교": {
+   "file": "n1qr99q6.json",
+   "count": 13
+  },
+  "충북대학교": {
+   "file": "n16l2078.json",
+   "count": 12
+  },
+  "부경대학교": {
+   "file": "n1nesasz.json",
+   "count": 15
+  },
+  "강원대학교": {
+   "file": "nlzhvsh.json",
+   "count": 28
+  }
+ }
 }

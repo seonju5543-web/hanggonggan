@@ -1,1048 +1,564 @@
 ## 🗞 교내 소식 수집 리포트 (2026-10-01)
 
-새 글 **906건** → 앱 홈 「우리 학교 소식」 (학교별 파일 data/news/ · 32개교 · 게시판 아는 학교 42/44)
+새 글 **422건** → 앱 홈 「우리 학교 소식」 (학교별 파일 data/news/ · 32개교 · 게시판 아는 학교 32/44)
 
-⏱ 게시판 44곳을 1분 55초에 다 돌았습니다(예산 4분).
+⏱ 게시판 44곳을 1분 23초에 다 돌았습니다(예산 4분).
 
-⚙️ 게시판 주소가 아직 없는 학교 2곳: 서강대학교 · 서울시립대학교 (찾기 로봇 리포트 collector/find-news-boards-report.md)
+⚙️ 게시판 주소가 아직 없는 학교 12곳: 경희대학교 · 고려대학교 · 서강대학교 · 성균관대학교 · 한양대학교 · 중앙대학교 · 서울시립대학교 · 동국대학교 · 동국대학교 WISE캠퍼스 · 상명대학교 · 서울교육대학교 · 전북대학교 (찾기 로봇 리포트 collector/find-news-boards-report.md)
 
 ### 경희대학교
-상태: ✅ 정상 (공지 글 70건 감지 · 새 글 30)
-- [학교법인 경희학원](https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200022)
-- [대학운영기조](https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200370)
-- [부속기관/연구소/기타기관](https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200066)
-- [대학정보공시](https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200070)
-- [대학정보공개](https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200076)
-- [대학자체평가](https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200360)
-- [기부금 모금액 및 활용실적](https://www.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200074)
-- [신규 서울 캠퍼스](https://www.khu.ac.kr/kor/user/mapManager/view.do?menuNo=200356)
-- [신규 국제 캠퍼스](https://www.khu.ac.kr/kor/user/mapManager/view.do?menuNo=200357)
-- [신규 광릉 캠퍼스](https://www.khu.ac.kr/kor/user/mapManager/view.do?menuNo=200358)
-- [Space 21](https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200081)
-- [대학 입학/편입학](https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200013)
-- [대학원 입학](https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200014)
-- [외국인 입학](https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200015)
-- [언어·문화교육](https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200094)
-- [국가지원연구센터](https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200123)
-- [BK21 플러스 사업](https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200135)
-- [BK21 사업](https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200139)
-- [TLO 사업](https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200134)
-- [명예의 전당](https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200121)
-- [경희와 인류평화](https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200296)
-- [World Civic Forum](https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200147)
-- [UNAI-경희 국제회의](https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200148)
-- [UN평화공원](https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200149)
-- [해외 자매대학](https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200153)
-- [21세기 미래대학을 말한다](https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200160)
-- [Peace BAR Festival](https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200161)
-- [매그놀리아 아너스 클럽](https://www.khu.ac.kr/kor/user/bbs/BMSR00056/list.do?menuNo=200291)
-- [커뮤니케이션 21](https://www.khu.ac.kr/kor/user/bbs/BMSR00059/list.do?menuNo=200303)
-- [대학안전관리](https://www.khu.ac.kr/kor/user/contents/view.do?menuNo=200217)
+상태: ⚙️ 게시판 주소 미설정 (찾기 로봇이 못 찾음 — 리포트 참조)
 
 ### 한국외국어대학교
-상태: ⛔ robots.txt 가 막아 둔 주소 — 읽지 않았습니다 (출처를 바꾸거나 보관하세요)
+상태: ✅ 정상 (공지 글 11건 감지 · 새 글 11)
+- [RSS 2.0](https://www.hufs.ac.kr/bbs/hufs/2180/rssList.do?row=50) — 2026-09-28
+- [2026학년도 서울캠퍼스 재학생 대상 법정의무교육 이수 안내](https://www.hufs.ac.kr/bbs/hufs/2180/267820/artclView.do) — 2026-09-28
+- [2027학년도 전기 글로벌미디어커뮤니케이션대학원 신입생 모집(특별/일반)](https://www.hufs.ac.kr/bbs/hufs/2180/266477/artclView.do) — 2026-09-28
+- [(서울) 2026년도 후반기 학생예비군 기본 2차훈련(안내)](https://www.hufs.ac.kr/bbs/hufs/2180/268279/artclView.do) — 2026-09-28
+- [[사업지원처]2026년 의료통역예비과정(인니어.스페인어) 교육안내](https://www.hufs.ac.kr/bbs/hufs/2180/268138/artclView.do) — 2026-09-28
+- [생활] [[서울]보건실 - 10월 심폐소생술 교육일정 안내](https://www.hufs.ac.kr/bbs/hufs/2180/268105/artclView.do) — 2026-09-28
+- [생활] [[글로벌] 보건실 - 10월 심폐소생술 교육일정 안내(2026.10.8(목)10시 - 백년관 207호 강의실)](https://www.hufs.ac.kr/bbs/hufs/2180/268064/artclView.do) — 2026-09-28
+- [[(서울)학생상담센터] 유학생 및 이주배경 대학생을 위한 집단상담 안내](https://www.hufs.ac.kr/bbs/hufs/2180/268060/artclView.do) — 2026-09-28
+- [[G-앵커사업단] 2026 랜선으로 만나는 릴레이 글로벌 취·창업 톡톡톡(talk)](https://www.hufs.ac.kr/bbs/hufs/2180/267648/artclView.do) — 2026-09-28
+- [교원 인사발령](https://www.hufs.ac.kr/bbs/hufs/2180/267596/artclView.do) — 2026-09-28
+- [교원 인사발령](https://www.hufs.ac.kr/bbs/hufs/2180/267583/artclView.do) — 2026-09-28
 
 ### 서울대학교
-상태: ✅ 정상 (공지 글 50건 감지 · 새 글 30)
-- [비교과프로그램](https://extra.snu.ac.kr/)
-- [국제교육프로그램](https://www.snu.ac.kr/academics/programs/international)
-- [외국어교육프로그램](https://www.snu.ac.kr/academics/programs/language)
-- [교수학습지원](https://www.snu.ac.kr/academics/programs/learning_support)
-- [국가지원연구센터](https://www.snu.ac.kr/research/units/government_funded)
-- [4단계 두뇌한국(BK)21사업](https://www.snu.ac.kr/research/units/bk21-groups)
-- [중점연구지원](https://www.snu.ac.kr/research/support/intensive)
-- [학술연구지원](https://www.snu.ac.kr/research/support/academic)
-- [한국학 통일학지원](https://www.snu.ac.kr/research/support/special)
-- [연구기자재지원](https://www.snu.ac.kr/research/support/support)
-- [연구실 안전관리](https://www.snu.ac.kr/research/support/safety)
-- [COVID-19](https://www.snu.ac.kr/coronavirus)
-- [예비 대학원생](https://admission.snu.ac.kr/graduate/prospective)
-- [입학 웹진 아로리](http://snuarori.snu.ac.kr/)
-- [생활] [관악학생생활관](https://www.snu.ac.kr/campuslife/facilities/dorm)
-- [경력개발센터](https://www.snu.ac.kr/campuslife/aid/career)
-- [대학생활문화원](https://www.snu.ac.kr/campuslife/aid/programs)
-- [장애학생지원센터](https://www.snu.ac.kr/campuslife/aid/disabled)
-- [학생지원서비스](https://www.snu.ac.kr/campuslife/aid/administration)
-- [정보화서비스](https://www.snu.ac.kr/campuslife/aid/it)
-- [생활] [의료보건서비스](https://www.snu.ac.kr/campuslife/aid/health/hospital1)
-- [행정서비스헌장](https://adminservice.snu.ac.kr/)
-- [언론 속 서울대](https://www.snu.ac.kr/snunow/focus?sc=y)
-- [SNU 미디어](https://www.snu.ac.kr/snunow/snu_media/online-newsletter)
-- [SNU 캘린더](https://www.snu.ac.kr/snunow/events/today)
-- [SNU Awards](https://www.snu.ac.kr/about/winners/pride)
-- [학술연구교육상(교육부문)](https://www.snu.ac.kr/about/winners/education)
-- [학술연구교육상(연구부문)](https://www.snu.ac.kr/about/winners/research)
-- [재무정보공시](https://www.snu.ac.kr/about/overview/financial_statements)
-- [학칙 및 규정](http://rule.snu.ac.kr/)
+상태: ✅ 정상 (공지 글 5건 감지 · 새 글 5)
+- [학사] [서울대학교 「최고경영자과정 AMP USA」 2027년 1월 개강 잠정 보류](https://www.snu.ac.kr/snunow/notice/genernal?md=v&bbsidx=174365) — 2026-08-20
+- [개인정보 처리방침 개정 고지(2026년 8월 20일자) 첨부파일 있음](https://www.snu.ac.kr/snunow/notice/genernal?md=v&bbsidx=174248) — 2026-08-20
+- [학사] [2026학년도 2학기 등록금 납부 안내 첨부파일 있음](https://www.snu.ac.kr/snunow/notice/genernal?md=v&bbsidx=173756) — 2026-08-07
+- [[규장각] 2026년도 홍재 한국학 펠로십 프로그램 신청 안내 첨부파일 있음](https://www.snu.ac.kr/snunow/notice/genernal?md=v&bbsidx=172538) — 2026-07-06
+- [[규장각] 2026년도 신진학자 초청 연구 교류 사업 신청 안내 첨부파일 있음](https://www.snu.ac.kr/snunow/notice/genernal?md=v&bbsidx=172535) — 2026-07-06
 
 ### 연세대학교
-상태: ✅ 정상 (공지 글 69건 감지 · 새 글 30)
-- [ENG website (for foreigners).](https://www.yonsei.ac.kr/sites/en_sc/index.do)
-- [140주년 기념백서](https://ibook.yonsei.ac.kr/Viewer/yonsei140)
-- [건학정신,연세이념](https://www.yonsei.ac.kr/sc/221/subview.do)
-- [연세의 발자취](https://www.yonsei.ac.kr/sc/314/subview.do)
-- [대학평의원회](https://www.yonsei.ac.kr/sc/327/subview.do)
-- [생활] [안전·보건 목표 및 경영방침](https://www.yonsei.ac.kr/sc/234/subview.do)
-- [리스크 매니지먼트](https://www.yonsei.ac.kr/sc/4241/subview.do)
-- [UI 연대기](https://www.yonsei.ac.kr/sc/237/subview.do)
-- [캠퍼스 견학/신청](https://www.yonsei.ac.kr/sc/351/subview.do)
-- [단체 견학 안내 및 신청](https://www.yonsei.ac.kr/sc/2305/subview.do)
-- [정기 견학 안내 및 신청](https://www.yonsei.ac.kr/sc/353/subview.do)
-- [특별 견학 안내 및 신청](https://www.yonsei.ac.kr/sc/2341/subview.do)
-- [생활] [캠퍼스 안내](https://www.yonsei.ac.kr/sc/662/subview.do)
-- [캠퍼스 가이드](https://www.yonsei.ac.kr/sc/242/subview.do)
-- [연구성과 통계](https://www.yonsei.ac.kr/sc/249/subview.do)
-- [연구과제 공고](https://www.yonsei.ac.kr/sc/2345/subview.do)
-- [연세리서치매거진](https://www.yonsei.ac.kr/sc/250/subview.do)
-- [대학원생 연구정보](https://yscholarhub.yonsei.ac.kr/)
-- [개별연구자 성과](https://www.yonsei.ac.kr/sc/182/subview.do)
-- [명예의 전당](https://www.yonsei.ac.kr/sc/183/subview.do)
-- [대학원 입학](https://www.yonsei.ac.kr/sc/2348/subview.do)
-- [행정부서/기관](https://www.yonsei.ac.kr/sc/359/subview.do)
-- [대학·대학원소속부속기관](https://www.yonsei.ac.kr/sc/259/subview.do)
-- [부속교육기관](https://www.yonsei.ac.kr/sc/260/subview.do)
-- [서비스 이용안내](https://www.yonsei.ac.kr/sc/361/subview.do)
-- [대관 및 예약안내](https://www.yonsei.ac.kr/sc/267/subview.do)
-- [생활] [교내 분실물 게시판](https://www.yonsei.ac.kr/sc/297/subview.do)
-- [학부교육과정](https://www.yonsei.ac.kr/sc/275/subview.do)
-- [학사] [성적에 따른 상벌](https://www.yonsei.ac.kr/sc/278/subview.do)
-- [전공신청/승인](https://www.yonsei.ac.kr/sc/386/subview.do)
+상태: ✅ 정상 (공지 글 7건 감지 · 새 글 7)
+- [RSS 2.0](https://www.yonsei.ac.kr/bbs/sc/58/rssList.do?row=50) — 2026-09-30
+- [일반공지 2026학년도 2학기 학부 수강과목 철회 안내 신촌/국제](https://www.yonsei.ac.kr/bbs/sc/58/944222/artclView.do) — 2026-09-30
+- [일반공지 2026-2학기 졸업앨범 촬영 일정 안내 신촌/국제](https://www.yonsei.ac.kr/bbs/sc/58/944135/artclView.do) — 2026-09-30
+- [생활] [일반공지 <2026학년도 2학기 신촌 교내·경복궁역 셔틀버스 운행 시간표> 신촌/국제](https://www.yonsei.ac.kr/bbs/sc/58/943966/artclView.do) — 2026-09-30
+- [학사] [일반공지 2027년 2월 졸업신청 안내 [학사학위수료자 대상] (Notices for February 2027 Graduation Application) 신촌/국제](https://www.yonsei.ac.kr/bbs/sc/58/943876/artclView.do) — 2026-09-30
+- [학사] [일반공지 2026학년도 2학기 학부 휴학 및 복학 신청 안내 / Notice for Fall 2026 Semester Leave&Return 신촌/국제](https://www.yonsei.ac.kr/bbs/sc/58/943527/artclView.do) — 2026-09-30
+- [실험실 창업 컨퍼런스 2026 「Lab to Market을 선도하다 & 연세 Tech Fair」 개최 (10.01.목. 14시)](https://www.yonsei.ac.kr/bbs/sc/58/944158/artclView.do) — 2026-09-30
 
 ### 연세대학교 미래캠퍼스
-상태: ✅ 정상 (공지 글 60건 감지 · 새 글 30)
-- [ENG website (for foreigners).](https://www.yonsei.ac.kr/sites/en_wj/index.do)
-- [신촌·국제캠퍼스](https://www.yonsei.ac.kr/)
-- [중장기 발전계획](https://www.yonsei.ac.kr/wj/4234/subview.do)
-- [건학정신, 연세이념](https://www.yonsei.ac.kr/wj/1387/subview.do)
-- [원주캠퍼스 설립과 의의](https://www.yonsei.ac.kr/wj/1388/subview.do)
-- [연세의 발자취](https://www.yonsei.ac.kr/wj/1481/subview.do)
-- [생활] [안전·보건 경영방침](https://www.yonsei.ac.kr/wj/1391/subview.do)
-- [교육수요 및 교육만족도 조사](https://www.yonsei.ac.kr/wj/1399/subview.do)
-- [SDGs Empowering](https://www.yonsei.ac.kr/wj/4248/subview.do)
-- [캠퍼스가이드](https://www.yonsei.ac.kr/wj/1406/subview.do)
-- [캠퍼스 견학/신청](https://www.yonsei.ac.kr/wj/1509/subview.do)
-- [연구과제공고](https://www.yonsei.ac.kr/wj/2346/subview.do)
-- [대표연구자(팀)](https://www.yonsei.ac.kr/wj/1343/subview.do)
-- [2021학년도 이후 신입생](https://www.yonsei.ac.kr/wj/1413/subview.do)
-- [2021학년도 이전 학부/졸업생](https://www.yonsei.ac.kr/wj/1414/subview.do)
-- [외부기관공고](https://www.yonsei.ac.kr/wj/1416/subview.do)
-- [생활] [통학버스공지사항](https://www.yonsei.ac.kr/wj/1417/subview.do)
-- [대학안전관리](https://www.yonsei.ac.kr/wj/1418/subview.do)
-- [서비스 이용안내](https://www.yonsei.ac.kr/wj/1419/subview.do)
-- [복지/체육시설](https://www.yonsei.ac.kr/wj/1420/subview.do)
-- [대관 및 예약안내](https://www.yonsei.ac.kr/wj/1423/subview.do)
-- [시설 수리/접수](https://repair.yonsei.ac.kr/)
-- [행정부서/기관](https://www.yonsei.ac.kr/wj/1424/subview.do)
-- [부속교육기관](https://www.yonsei.ac.kr/wj/1427/subview.do)
-- [국내대학 교환프로그램](https://www.yonsei.ac.kr/wj/1548/subview.do)
-- [등록금명세표](https://www.yonsei.ac.kr/wj/1550/subview.do)
-- [학사] [등록금납부/반환](https://www.yonsei.ac.kr/wj/1553/subview.do)
-- [학사] [대상별 등록금 납부](https://www.yonsei.ac.kr/wj/1557/subview.do)
-- [교직이수안내](https://www.yonsei.ac.kr/wj/1443/subview.do)
-- [학부·대학원 증명 발급](https://www.yonsei.ac.kr/wj/1565/subview.do)
+상태: ✅ 정상 (공지 글 15건 감지 · 새 글 15)
+- [RSS 2.0](https://www.yonsei.ac.kr/bbs/wj/104/rssList.do?row=50) — 2026-10-01
+- [일반공지 2026년도 후반기 육군 학군사관 후보생 67,68기 모집안내 신촌/국제](https://www.yonsei.ac.kr/bbs/wj/104/944257/artclView.do) — 2026-10-01
+- [일반공지 2027학년도 1학기 재입학(일반, 특별) 전형 요강(미래캠퍼스) 신촌/국제](https://www.yonsei.ac.kr/bbs/wj/104/944253/artclView.do) — 2026-10-01
+- [일반공지 2026학년도 2학기 학부 수강과목 철회 안내 신촌/국제](https://www.yonsei.ac.kr/bbs/wj/104/944229/artclView.do) — 2026-10-01
+- [학사] [일반공지 [미래생활관] 2026-2 미래생활관 중간입사 입사신청 및 등록 안내 신촌/국제](https://www.yonsei.ac.kr/bbs/wj/104/944221/artclView.do) — 2026-10-01
+- [학사] [일반공지 [미래생활관] 2026-2 미래생활관 중간고사 단기 입사신청 및 등록 안내 신촌/국제](https://www.yonsei.ac.kr/bbs/wj/104/944219/artclView.do) — 2026-10-01
+- [일반공지 2026년 겨울 계절제수업 수강 희망 교과목 수요조사 실시 안내(미래캠퍼스) 신촌/국제](https://www.yonsei.ac.kr/bbs/wj/104/944155/artclView.do) — 2026-10-01
+- [학사] [일반공지 편입생 학점 및 과목 인정원 제출 관련 안내 신촌/국제](https://www.yonsei.ac.kr/bbs/wj/104/944079/artclView.do) — 2026-10-01
+- [일반공지 2026-2학기 Adobe CC ID 회수 및 신청 안내 신촌/국제](https://www.yonsei.ac.kr/bbs/wj/104/943934/artclView.do) — 2026-10-01
+- [학사] [일반공지 2026학년도 2학기 학부 휴학 및 복학 신청 안내(일반휴학 안내문 유의사항 수정) 신촌/국제](https://www.yonsei.ac.kr/bbs/wj/104/943544/artclView.do) — 2026-10-01
+- [일반공지 2027-1학기 1전공 배정에 관한 실행지침 안내(2021학번~2026학번) 신촌/국제](https://www.yonsei.ac.kr/bbs/wj/104/942426/artclView.do) — 2026-10-01
+- [학사] [일반공지 RC 교과목 수강 신청 안내(RC리더십개발, RC문화체육활동)(2026학번~) 신촌/국제](https://www.yonsei.ac.kr/bbs/wj/104/942278/artclView.do) — 2026-10-01
+- [일반공지 RC 교과목 변경 안내(리더십개발, 리더십실습)(~2025학번) 신촌/국제](https://www.yonsei.ac.kr/bbs/wj/104/942271/artclView.do) — 2026-10-01
+- [[교외] 2026년 2학기 원주시 주소 이전 대학생 지원사업(~11/13)](https://www.yonsei.ac.kr/bbs/wj/104/944249/artclView.do) — 2026-10-01
+- [2026-2학기 졸업앨범 촬영 일정 안내](https://www.yonsei.ac.kr/bbs/wj/104/944232/artclView.do) — 2026-10-01
 
 ### 고려대학교
-상태: ⛔ robots.txt 가 막아 둔 주소 — 읽지 않았습니다 (출처를 바꾸거나 보관하세요)
+상태: ⚙️ 게시판 주소 미설정 (찾기 로봇이 못 찾음 — 리포트 참조)
 
 ### 고려대학교 세종캠퍼스
-상태: ✅ 정상 (공지 글 82건 감지 · 새 글 30)
-- [Vision](https://sejong.korea.ac.kr/koreaSejong/12900/subview.do)
-- [KUS Impact](https://sejong.korea.ac.kr/koreaSejong/9082/subview.do)
-- [캠퍼스변천사](https://sejong.korea.ac.kr/koreaSejong/8073/subview.do)
-- [사진으로 보는 역사](https://sejong.korea.ac.kr/koreaSejong/7769/subview.do)
-- [세종부총장 약력](https://sejong.korea.ac.kr/koreaSejong/12845/subview.do)
-- [세종부총장에게 말하고 듣는다](https://sejong.korea.ac.kr/koreaSejong/7782/subview.do)
-- [역대 세종부총장](https://sejong.korea.ac.kr/koreaSejong/7783/subview.do)
-- [고려대학교 UI](https://sejong.korea.ac.kr/koreaSejong/7784/subview.do)
-- [세종캠퍼스 UI](https://sejong.korea.ac.kr/koreaSejong/7786/subview.do)
-- [단과대학/대학원 상징](https://sejong.korea.ac.kr/koreaSejong/9116/subview.do)
-- [고대의 상징물](https://sejong.korea.ac.kr/koreaSejong/7789/subview.do)
-- [마스코트/캐릭터](https://sejong.korea.ac.kr/koreaSejong/9122/subview.do)
-- [고려대학교 노래](https://sejong.korea.ac.kr/koreaSejong/7790/subview.do)
-- [고려대학교 서체](https://sejong.korea.ac.kr/koreaSejong/7791/subview.do)
-- [개교 120주년 엠블럼](https://sejong.korea.ac.kr/koreaSejong/9087/subview.do)
-- [캠퍼스 위치 및 견학안내](https://sejong.korea.ac.kr/koreaSejong/7803/subview.do)
-- [캠퍼스 견학신청](https://sejong.korea.ac.kr/koreaSejong/7802/subview.do)
-- [대학정보공개/윤리헌장](https://sejong.korea.ac.kr/koreaSejong/7806/subview.do)
-- [사전정보공개](https://sejong.korea.ac.kr/koreaSejong/7811/subview.do)
-- [정보 청구 공개](https://sejong.korea.ac.kr/koreaSejong/7808/subview.do)
-- [청구 정보 공개 목록](https://sejong.korea.ac.kr/koreaSejong/7809/subview.do)
-- [과학기술대학](https://sejong.korea.ac.kr/koreaSejong/7849/subview.do)
-- [글로벌비즈니스대학](https://sejong.korea.ac.kr/koreaSejong/7852/subview.do)
-- [공공정책대학](https://sejong.korea.ac.kr/koreaSejong/7853/subview.do)
-- [문화스포츠대학](https://sejong.korea.ac.kr/koreaSejong/7851/subview.do)
-- [스마트도시학부](https://sejong.korea.ac.kr/koreaSejong/7854/subview.do)
-- [생활] [행정전문대학원](https://sejong.korea.ac.kr/koreaSejong/7845/subview.do)
-- [창업경영대학원](https://sejong.korea.ac.kr/koreaSejong/7848/subview.do)
-- [문화스포츠대학원](https://sejong.korea.ac.kr/koreaSejong/7846/subview.do)
-- [융합과학대학원](https://sejong.korea.ac.kr/koreaSejong/7847/subview.do)
+상태: ✅ 정상 (공지 글 5건 감지 · 새 글 5)
+- [RSS 2.0](https://sejong.korea.ac.kr/bbs/koreaSejong/664/rssList.do?row=50) — 2026-06-17
+- [[공지] 고려대학교 세종캠퍼스 구매 담당자 사칭 피싱(사기) 피해 주의 안내](https://sejong.korea.ac.kr/bbs/koreaSejong/664/270373/artclView.do) — 2026-06-17
+- [[세종] 휘트니스센터 10월 종일 회원권 2차 온라인 접수 안내](https://sejong.korea.ac.kr/bbs/koreaSejong/664/273087/artclView.do) — 2026-06-17
+- [생활] [2026학년도 2학기 학생 셔틀버스 운행 시간 변경 안내](https://sejong.korea.ac.kr/bbs/koreaSejong/664/272847/artclView.do) — 2026-06-17
+- [[세종] 휘트니스센터 10월 종일 회원권 온라인 접수 안내](https://sejong.korea.ac.kr/bbs/koreaSejong/664/272785/artclView.do) — 2026-06-17
 
 ### 서강대학교
 상태: ⚙️ 게시판 주소 미설정 (찾기 로봇이 못 찾음 — 리포트 참조)
 
 ### 성균관대학교
-상태: ✅ 정상 (공지 글 123건 감지 · 새 글 30)
-- [KingoGPT](https://www.skku.edu/skku/kingoGPT.do)
-- [VISION 2030+](https://www.skku.edu/skku/about/vision/vision01.do)
-- [1 학생성공 교육](https://www.skku.edu/skku/about/vision/vision02.do)
-- [2 가치창출 연구](https://www.skku.edu/skku/about/vision/vision03.do)
-- [3 상생공유 파트너십](https://www.skku.edu/skku/about/vision/vision05.do)
-- [성대역사 / 상징](https://www.skku.edu/skku/about/s620/sub01.do)
-- [교시 /건학이념](https://www.skku.edu/skku/about/symbol/sy_tree_song_01.do)
-- [등록금심의위원회 회의록](https://www.skku.edu/skku/about/status/tuition_2018.do)
-- [대학평의원회](https://www.skku.edu/skku/about/status/tuition02_intro.do)
-- [ESG위원회](https://www.skku.edu/skku/about/status/esg.do)
-- [업무추진비 사용 내역](https://www.skku.edu/skku/campus/skk_comm/prs6.do)
-- [기부금 내역](https://www.skku.edu/skku/campus/skk_comm/prs7.do)
-- [적립금 내역](https://www.skku.edu/skku/prs8.do)
-- [대학기관 / 규정](https://www.skku.edu/skku/about/organ/organization.do)
-- [SKKU 미디어](https://www.skku.edu/skku/campus/skk_comm/news.do)
-- [S-Gallery](http://sgallery.skku.edu/)
-- [생활] [캠퍼스 안내](https://roblox.skku.edu/)
-- [VR 캠퍼스 투어](https://admission.skku.edu/admission/html/high/vr.html)
-- [외국인 입학](https://admission-global.skku.edu/chn/)
-- [성균어학원(한국어학당)](https://www.skku.edu/skku/edu/international/schooling_01.do)
-- [한국사서교육원](https://www.skku.edu/skku/edu/international/schooling_02.do)
-- [학사] [인재교육원(공개강좌)](https://www.skku.edu/skku/edu/international/schooling_04.do)
-- [학사] [성균융합원(융합연구학점제)](https://urp3.skku.edu/urp3/index.do)
-- [정규교과(혁신융합수업)](https://www.skku.edu/skku/edu/challenge/challenge_03.do)
-- [비교과프로그램](https://www.skku.edu/skku/edu/challenge/challenge_04.do)
-- [학생성공역량](https://www.skku.edu/skku/edu/challenge/challenge_07.do)
-- [학과/교과목 검색](https://www.skku.edu/skku/edu/bachelor/curriculum.do)
-- [Research Stories](https://www.skku.edu/skku/research/industry/researchStory.do)
-- [연구자 검색](https://professor.skku.edu/)
-- [연구성과 포털(Pure)](https://pure.skku.edu/)
+상태: ⚙️ 게시판 주소 미설정 (찾기 로봇이 못 찾음 — 리포트 참조)
 
 ### 한양대학교
-상태: ✅ 정상 (공지 글 173건 감지 · 새 글 30)
-- [English website](https://www.hanyang.ac.kr/web/eng)
-- [상징과 UI](https://www.hanyang.ac.kr/symbol-emblem-ui)
-- [동문/발전기금](https://www.hanyang.ac.kr/alumni-external-relations)
-- [한양대학교는](https://www.hanyang.ac.kr/welcome-to-hanyang)
-- [대학 규정 (학칙)](https://portal.hanyang.ac.kr/huas/iycy/ruleBook.do)
-- [Vision 2030](https://www.hanyang.ac.kr/vision)
-- [브랜드 아카이브](https://www.hanyang.ac.kr/web/www/archive)
-- [대학평의원회](http://hyucouncil.hanyang.ac.kr/)
-- [약력과 경력](https://www.hanyang.ac.kr/career-highlights)
-- [중기발전계획](https://www.hanyang.ac.kr/2026-plan)
-- [총장에게 바란다](https://www.hanyang.ac.kr/p-h)
-- [부총장/처장단](https://www.hanyang.ac.kr/vice)
-- [한양의 상징](https://www.hanyang.ac.kr/hanyang-s-symbol)
-- [색상 및 서체](https://www.hanyang.ac.kr/colors-fonts)
-- [한양 캐릭터](https://www.hanyang.ac.kr/mascot)
-- [설립자 메시지+연보](https://www.hanyang.ac.kr/a-message-from-the-founder_chronology)
-- [한양의 역사](https://www.hanyang.ac.kr/hanyang-s-history)
-- [대학 역사관](https://www.hanyang.ac.kr/university-history-museum)
-- [한눈에 보는 한양](https://www.hanyang.ac.kr/at-a-glance)
-- [해외 자매결연 대학](https://www.hanyang.ac.kr/international-exchanges)
-- [한양 지속가능경영](https://www.hanyang.ac.kr/esg)
-- [한양 SDGs](https://www.hanyang.ac.kr/2024sdgs)
-- [대학정보공시](https://www.hanyang.ac.kr/information_disclosure)
-- [발전기금 리포트](http://hyfund.hanyang.ac.kr/story/report.php)
-- [발전기금 뉴스레터](http://hyfund.hanyang.ac.kr/story/newsletter.php)
-- [캠퍼스 소개](https://www.hanyang.ac.kr/seoul_campus_info)
-- [행정 지원 안내](https://www.hanyang.ac.kr/s_administration-support)
-- [대학/학과 소개](https://www.hanyang.ac.kr/s_college_department-info)
-- [캠퍼스 지도+찾아오는길](https://www.hanyang.ac.kr/map_seoul)
-- [한양둘레길(8경)](https://www.hanyang.ac.kr/hanyang-trail-doollehgil-8-scenic-points-)
+상태: ⚙️ 게시판 주소 미설정 (찾기 로봇이 못 찾음 — 리포트 참조)
 
 ### 중앙대학교
-상태: ✅ 정상 (공지 글 134건 감지 · 새 글 30)
-- [CAU 중앙대학교 CHUNG-ANG UNIVERSITY](https://www.cau.ac.kr/index.do)
-- [역대 이사장](https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=600)
-- [CAU2030+](https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=2780)
-- [이념 및 역사](https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=190)
-- [창학정신과 교훈](https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=1620)
-- [교육이념 및 목적](https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=1630)
-- [중앙대 역사](https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=200)
-- [생활] [안전·보건목표 및 방침](https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=2610)
-- [대학규정/학칙](https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=30)
-- [대학자체평가 결과](https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=690)
-- [등록금 심의위원회](https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=1690)
-- [기능형 부총장](https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=240)
-- [대학평의원회](https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=770)
-- [교수노동조합](https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=2720)
-- [캠퍼스VR투어](https://www.cau.ac.kr/vr2020/seoul/)
-- [통합상황실 안내](https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=1760)
-- [캠퍼스투어 신청](https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=2710)
-- [전문대학원입학](https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=540)
-- [첨단영상대학원](http://gsaim.cau.ac.kr/)
-- [경영전문대학원](https://mba.cau.ac.kr/)
-- [법학전문대학원](http://lawschool.cau.ac.kr/)
-- [특수대학원입학](https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=370)
-- [사회복지대학원](http://causd.cau.ac.kr/)
-- [커뮤니케이션대학원](http://shinbang.cau.ac.kr/index/)
-- [첨단광고PR대학원](https://cauadpr.cau.ac.kr/)
-- [창업경영대학원](http://iem.cau.ac.kr/)
-- [국악교육대학원](http://gugak.cau.ac.kr/)
-- [글로벌인적자원개발대학원](http://ghrd.cau.ac.kr/)
-- [건강간호대학원](http://gsn.cau.ac.kr/)
-- [심리서비스대학원](http://gsps.cau.ac.kr/20141001/main/main.php)
+상태: ⚙️ 게시판 주소 미설정 (찾기 로봇이 못 찾음 — 리포트 참조)
 
 ### 서울시립대학교
 상태: ⚙️ 게시판 주소 미설정 (찾기 로봇이 못 찾음 — 리포트 참조)
 
 ### 건국대학교
-상태: ⛔ robots.txt 가 막아 둔 주소 — 읽지 않았습니다 (출처를 바꾸거나 보관하세요)
+상태: ✅ 정상 (공지 글 38건 감지 · 새 글 30)
+- [채용] [2027년 3월 1일자 교수채용](https://www.konkuk.ac.kr/konkuk/37948/subview.do) — 2027-03-01
+- [채용] [2026년 9월 1일자 교수채용](https://www.konkuk.ac.kr/konkuk/37696/subview.do) — 2026-09-01
+- [2026년 9월 1일자 강사 2차](https://www.konkuk.ac.kr/konkuk/38042/subview.do) — 2026-09-01
+- [2026년 9월 1일자 비전임교원 2차](https://www.konkuk.ac.kr/konkuk/38044/subview.do) — 2026-09-01
+- [2026년 9월 1일자 강사 1차](https://www.konkuk.ac.kr/konkuk/37936/subview.do) — 2026-09-01
+- [2026년 9월 1일자 비전임교원 1차](https://www.konkuk.ac.kr/konkuk/37941/subview.do) — 2026-09-01
+- [2026년 3월 1일자 강사 2차](https://www.konkuk.ac.kr/konkuk/37600/subview.do) — 2026-03-01
+- [2026년 3월 1일자 비전임교원 2차](https://www.konkuk.ac.kr/konkuk/37602/subview.do) — 2026-03-01
+- [2026년 3월 1일자 강사 1차](https://www.konkuk.ac.kr/konkuk/37444/subview.do) — 2026-03-01
+- [2026년 3월 1일자 비전임교원 1차](https://www.konkuk.ac.kr/konkuk/37446/subview.do) — 2026-03-01
+- [2025년 9월 1일자 강사 2차](https://www.konkuk.ac.kr/konkuk/35910/subview.do) — 2025-09-01
+- [2025년 9월 1일자 비전임교원 2차](https://www.konkuk.ac.kr/konkuk/35914/subview.do) — 2025-09-01
+- [2025년 9월 1일자 강사 1차](https://www.konkuk.ac.kr/konkuk/35734/subview.do) — 2025-09-01
+- [2025년 9월 1일자 비전임교원 1차](https://www.konkuk.ac.kr/konkuk/35736/subview.do) — 2025-09-01
+- [2025년 3월 1일자 강사 2차](https://www.konkuk.ac.kr/konkuk/29336/subview.do) — 2025-03-01
+- [2025년 3월 1일자 비전임교원 2차](https://www.konkuk.ac.kr/konkuk/29338/subview.do) — 2025-03-01
+- [2025년 3월 1일자 강사 1차](https://www.konkuk.ac.kr/konkuk/29001/subview.do) — 2025-03-01
+- [2025년 3월 1일자 비전임교원 1차](https://www.konkuk.ac.kr/konkuk/29004/subview.do) — 2025-03-01
+- [RSS 2.0](https://www.konkuk.ac.kr/bbs/konkuk/234/rssList.do?row=50) — 2026-09-04
+- [2026-2 기초교양 이수의무 면제 신청 안내(9.14.~10.11.)](https://www.konkuk.ac.kr/bbs/konkuk/234/1205594/artclView.do) — 2026-09-04
+- [학사] [전공 이수구분 신설에 따른 이수원칙(학점 취득 인정) 안내](https://www.konkuk.ac.kr/bbs/konkuk/234/1204662/artclView.do) — 2026-09-04
+- [학사] [졸업요건 관리를 위한 필수확인 사항 안내(2024학년도 재공지)](https://www.konkuk.ac.kr/bbs/konkuk/234/1132173/artclView.do) — 2026-09-04
+- [2026학년도 2학기 1차 교직 응급처치 및 심폐소생술 실습 안내](https://www.konkuk.ac.kr/bbs/konkuk/234/1208422/artclView.do) — 2026-09-04
+- [학사] [2026학년도 2학기 최종마감등록 안내](https://www.konkuk.ac.kr/bbs/konkuk/234/1208081/artclView.do) — 2026-09-04
+- [학사] [2026학년도 2학기 2차(최종) 폐강 교과목 수강신청자의 수강신청 방법 안내](https://www.konkuk.ac.kr/bbs/konkuk/234/1206236/artclView.do) — 2026-09-04
+- [2026학년도 2학기 1차 교직 적‧인성 정기검사 실시 안내](https://www.konkuk.ac.kr/bbs/konkuk/234/1206002/artclView.do) — 2026-09-04
+- [2026학년도 교직과정 추가선발 신청 안내](https://www.konkuk.ac.kr/bbs/konkuk/234/1206001/artclView.do) — 2026-09-04
+- [학사] [[학부] 2026학년도 2학기 학부 수강정정 및 초과과목 신청 방법 안내](https://www.konkuk.ac.kr/bbs/konkuk/234/1205160/artclView.do) — 2026-09-04
+- [학사] [2026학년도 2학기 학점교류생(타교→건국대) 학번 조회 및 본교 수강신청 안내](https://www.konkuk.ac.kr/bbs/konkuk/234/1203616/artclView.do) — 2026-09-04
+- [학사] [2026년도 제140회 학위수여식 관련 졸업가능여부 조회 및 행사, 학위복 대여 안내](https://www.konkuk.ac.kr/bbs/konkuk/234/1203451/artclView.do) — 2026-09-04
 
 ### 동국대학교
-상태: ✅ 정상 (공지 글 57건 감지 · 새 글 30)
-- [' + v. + '](https://www.dongguk.edu/)
-- [디지털 역사관 홈페이지 바로가기](https://legacy.dongguk.edu/)
-- [학사] [# 수강신청](https://search.dongguk.edu/search.do?kwd=%EC%88%98%EA%B0%95%EC%8B%A0%EC%B2%AD&lang=ko)
-- [# 학과소개](https://search.dongguk.edu/search.do?kwd=%ED%95%99%EA%B3%BC%EC%86%8C%EA%B0%9C&lang=ko)
-- [e-class](https://eclass.dongguk.edu/)
-- [MPP 학습](https://mpp.dongguk.edu/)
-- [교수학습혁신센터](https://ctl.dongguk.edu/)
-- [nDRIMS](https://ndrims.dongguk.edu/)
-- [Portal](https://nportal.dongguk.edu/)
-- [Groupware](https://gw.dongguk.edu/)
-- [교직원 경조사](https://www.dongguk.edu/article/FACULTYEVENT/list)
-- [DEIS(학부모포탈)](https://support.dongguk.edu/unis/index.do?t=4E3074435255565057474677553256784E304673517A4D354D6D70565A7A3039)
-- [학사] [시험 및 성적](https://www.dongguk.edu/page/153)
-- [학사] [전과/전공결정](https://www.dongguk.edu/page/164)
-- [Dream PATH](https://ddp.dongguk.edu/login.jsp)
-- [groupware](https://gw.dongguk.edu/Login.aspx)
-- [GMAIL/M365](https://cloud.dongguk.edu/)
-- [webmail](https://mail.dongguk.edu/)
-- [sitemap](https://www.dongguk.edu/sitemap/detail)
-- [대학/대학원](https://www.dongguk.edu/page/853)
-- [취업/창업/역량/봉사](https://www.dongguk.edu/page/123)
-- [CS광장/시설대관](https://www.dongguk.edu/page/210)
-- [개인정보 목적외 이용·제공대장](https://www.dongguk.edu/article/privacyNotice/list)
-- [IT융합교육센터](https://itcec.dongguk.edu/)
-- [건강증진센터](https://health.dongguk.edu/)
-- [경기앵커사업단](https://dgugrise.dongguk.edu/)
-- [공학교육혁신센터](https://iceed.dongguk.edu/)
-- [과학영재교육원](https://gifted.dongguk.edu/)
-- [다르마칼리지](https://dharma.dongguk.edu/)
-- [대학혁신지원사업단](http://dui.dongguk.edu/)
+상태: ⚙️ 게시판 주소 미설정 (찾기 로봇이 못 찾음 — 리포트 참조)
 
 ### 동국대학교 WISE캠퍼스
-상태: ✅ 정상 (공지 글 26건 감지 · 새 글 26)
-- [PORTAL](https://nportal.dongguk.ac.kr/)
-- [nDRIMS](https://ndrims.dongguk.ac.kr/)
-- [E-CLASS](https://eclass.dongguk.ac.kr/index.jsp)
-- [Wisian-road](https://wisian-road.dongguk.ac.kr/login)
-- [학생경력관리시스템](https://job1.dongguk.ac.kr/)
-- [E-CLASS](https://eclass.dongguk.ac.kr/)
-- [Wisian-road](https://wisian-road.dongguk.ac.kr/)
-- [학적정보정정](https://wise.dongguk.ac.kr/page/352)
-- [전자출결시스템](https://smart.dongguk.ac.kr/service/login?targetUrl=%2Fservice%2Fpage%2Findex)
-- [SITEMAP](https://wise.dongguk.ac.kr/sitemap/detail)
-- [캠퍼스투어신청](https://wise.dongguk.ac.kr/page/62)
-- [대학/대학원](https://wise.dongguk.ac.kr/page/961)
-- [아이디어 제안](https://wise.dongguk.ac.kr/article/ideanotice/list)
-- [취업프로그램](https://wise.dongguk.ac.kr/article/empprg/list)
-- [개인정보목적외이용제공대장](https://wise.dongguk.ac.kr/article/privacyNotice/list)
-- [취업지원센터](https://career.dongguk.ac.kr/)
-- [교수학습개발센터](https://dkctl.dongguk.ac.kr/)
-- [교양융합교육원](https://lad.dongguk.ac.kr/)
-- [대학혁신사업단](https://oei.dongguk.ac.kr/)
-- [생활] [금장생활관(기숙사)](https://dorm.dongguk.ac.kr/)
-- [발전기금/후원의집](http://ilove.dongguk.ac.kr/ilove/)
-- [생활] [보건진료센터](https://health.dongguk.ac.kr/)
-- [참사람사회공헌센터](https://volunteers.dongguk.ac.kr/)
-- [학생군사교육단](https://rotc.dongguk.ac.kr/)
-- [학생상담센터](https://scc.dongguk.ac.kr/)
-- [생활] [학술정보원(도서관)](https://libk.dongguk.ac.kr/)
+상태: ⚙️ 게시판 주소 미설정 (찾기 로봇이 못 찾음 — 리포트 참조)
 
 ### 홍익대학교
-상태: ✅ 정상 (공지 글 66건 감지 · 새 글 30)
-- [MY HONGIK](https://www.hongik.ac.kr/my/)
-- [학사] [대학학사안내](https://www.hongik.ac.kr/kr/education/academic-schedule001.do)
-- [학사] [대학원학사안내](https://www.hongik.ac.kr/kr/education/academic-schedule-grad.do)
-- [대학원학과공지](https://www.hongik.ac.kr/kr/education/notice-grad-department.do)
-- [편입학(연계)](https://www.hongik.ac.kr/kr/admission/recruitment-job-linked.do)
-- [International Students](https://www.hongik.ac.kr/kr/admission/recruitment-is.do)
-- [일반전형(군위탁전형포함)](https://www.hongik.ac.kr/kr/admission/notice-military.do)
-- [International Students](https://www.hongik.ac.kr/en/admissions/apply.do)
-- [인터넷증명발급](https://www.hongik.ac.kr/kr/life/certificate-issuance.do)
-- [생활] [Hongik WIFI](https://www.hongik.ac.kr/kr/life/hongik-wifi.do)
-- [생활] [Eduroam WIFI](https://www.hongik.ac.kr/kr/life/eduroam-wifi.do)
-- [공용컴퓨터실](https://www.hongik.ac.kr/kr/life/seoul-public-computer-room.do)
-- [Siemens소프트웨어](https://www.hongik.ac.kr/kr/life/siemens-software.do)
-- [학생용 Office365](https://www.hongik.ac.kr/kr/life/office365-info.do)
-- [교수·교목·교화](https://www.hongik.ac.kr/kr/introduction/animal.do)
-- [부설·병설학교](https://www.hongik.ac.kr/kr/introduction/affiliated-school.do)
-- [교직원 검색](https://www.hongik.ac.kr/kr/introduction/search-for-faculty.do)
-- [대학로캠퍼스](https://www.hongik.ac.kr/kr/introduction/directions-daehakro.do)
-- [직원복무관리](https://hrm.hongik.ac.kr/new/)
-- [신/편입생 학번조회](https://cn.hongik.ac.kr/app/class/hakbun.jsp)
-- [학사] [등록금고지서/납부확인서](https://cn.hongik.ac.kr/app/class/gojiseo.jsp)
-- [실시간납부내역조회](https://cn.hongik.ac.kr/app/class/realtime.jsp)
-- [교수학습지원](https://www.hongik.ac.kr/kr/education/notice-undergrad.do?mode=list&srCategoryId=534&srStartDt=&srEndDt=&srSearchKey=article_title&srSearchVal=)
-- [대학혁신지원사업](https://www.hongik.ac.kr/kr/education/notice-undergrad.do?mode=list&srCategoryId=536&srStartDt=&srEndDt=&srSearchKey=article_title&srSearchVal=)
-- [홍익발전기금](https://www.hongik.ac.kr/kr/introduction/greetings.do)
-- [생활] [안전보건관리](https://snh.hongik.ac.kr/)
-- [청탁금지법 교육자료](https://apps.hongik.ac.kr/help/youngran.php)
-- [IR 대학성과관리시스템](https://ir.hongik.ac.kr/)
-- [입학관리본부](https://www.hongik.ac.kr/kr/admission/undergraduate-admission.do)
-- [국제협력본부](https://oia.hongik.ac.kr/oia)
+상태: ✅ 정상 (공지 글 10건 감지 · 새 글 10)
+- [[제26-41호] 세종캠퍼스 26-1차 교육환경개선 전산관리팀 컴퓨터 80대 구입](https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158669&article.offset=0&articleLimit=10&noCat=36) — 2026-10-01
+- [[제26-40호] 세종캠퍼스 26-1차 교육환경개선 게임그래픽디자인전공 태블릿컴퓨터 27대 구입](https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158667&article.offset=0&articleLimit=10&noCat=36) — 2026-10-01
+- [[제26-39호] 세종캠퍼스 26-1차 교육환경개선 교양교육원 컴퓨터 22대 구입](https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158666&article.offset=0&articleLimit=10&noCat=36) — 2026-10-01
+- [[제26-38호] 세종캠퍼스 26-1차 교육환경개선 2개학과 워크스테이션 14대 구입](https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158665&article.offset=0&articleLimit=10&noCat=36) — 2026-10-01
+- [[제26-37호] 세종캠퍼스 26-1차 교육환경개선 건축디자인전공(5년제) 실험실용 배기기 3종 구입](https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158664&article.offset=0&articleLimit=10&noCat=36) — 2026-10-01
+- [[제26-36호] 세종캠퍼스 26-1차 교육환경개선 3개학과 컴퓨터 30대 구입](https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158663&article.offset=0&articleLimit=10&noCat=36) — 2026-10-01
+- [생활] [[중앙도서관] 도서관 자료열람실 10월 휴실 안내](https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158658&article.offset=0&articleLimit=10&noCat=29) — 2026-10-01
+- [2026년 든든 학업지원금 공고문](https://www.hongik.ac.kr/kr/education/notice-undergrad.do?mode=view&articleNo=158640&noCat=24) — 2026-10-01
+- [[취업진로지원센터] [모집기간 연장] 삼성 청년희망배움터 후반기 모집(~10/11(일) 23:59까지)](https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158602&article.offset=0&articleLimit=10&noCat=396) — 2026-10-01
+- [학사] [[기초과학과] 2026-2학기 대학화학(2) 중간고사 시험감독 보조요원 모집](https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158584&article.offset=0&articleLimit=10&noCat=35) — 2026-09-30
 
 ### 숙명여자대학교
-상태: ⛔ robots.txt 가 막아 둔 주소 — 읽지 않았습니다 (출처를 바꾸거나 보관하세요)
+상태: ✅ 정상 (공지 글 9건 감지 · 새 글 9)
+- [[졸업] 2026-2 (2027년 2월) 주요 졸업 일정 안내(8학기 이상 재학생 필독)](https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=94905&article.offset=0&articleLimit=10) — 2026-09-03
+- [2027학년도 전기 일반대학원 신·편입생 모집 안내](https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=95279&article.offset=0&articleLimit=10) — 2026-09-30
+- [학사] [[학부] 2026-2 중간시험 시행 안내](https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=95278&article.offset=0&articleLimit=10) — 2026-09-30
+- [[졸업] 2026학년도 전기(2027년 2월 졸업) 졸업 논문제 신청 안내](https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=95274&article.offset=0&articleLimit=10) — 2026-09-30
+- [학사] [2026-겨울계절학기 개설희망과목 수요조사 실시 (10. 2. 10:00 ~ 10. 8. 24:00)](https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=95179&article.offset=0&articleLimit=10) — 2026-09-21
+- [학사] [[졸업] 2026-2 재학생 졸업학점 이수현황 확인 및 과목 정리 실시](https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=95086&article.offset=0&articleLimit=10) — 2026-09-16
+- [학사] [2026-2 소멸과목 성적포기 시행 (9/22 10:00 ~ 9/28 24:00)](https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=95037&article.offset=0&articleLimit=10) — 2026-09-14
+- [대표 국·영문 및 단위별 홈페이지 서비스 일시중단 안내](https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=94998&article.offset=0&articleLimit=10) — 2026-09-09
+- [2026-2 논리적사고와소프트웨어 교과목 이수면제 신청 안내](https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=94988&article.offset=0&articleLimit=10) — 2026-09-08
 
 ### 광운대학교
-상태: ✅ 정상 (공지 글 205건 감지 · 새 글 30)
-- [KLAS 종합정보서비스](https://klas.kw.ac.kr/)
-- [WEB-MAIL](https://wmail.kw.ac.kr/)
-- [SITEMAP](https://www.kw.ac.kr/ko/info/sitemap.jsp)
-- [Search](https://www.kw.ac.kr/ko/info/search.jsp)
-- [창학정신 및 교육이념](https://www.kw.ac.kr/ko/life/ideology03.jsp)
-- [대학발전계획](https://www.kw.ac.kr/ko/vision/vision01.jsp)
-- [조직 및 기구표](https://www.kw.ac.kr/ko/status/orchart.jsp)
-- [자매결연대학](https://www.kw.ac.kr/ko/status/partner_univ.jsp)
-- [등록금심의위원회](https://www.kw.ac.kr/ko/status/status03.jsp)
-- [기금운용심의회](https://www.kw.ac.kr/ko/status/status07.jsp)
-- [대학평의원회](https://www.kw.ac.kr/ko/status/status04.jsp)
-- [연간기부금 모금액 및 활용실적 명세서](https://www.kw.ac.kr/ko/status/status06.jsp)
-- [적립금 적립 및 사용 현황](https://www.kw.ac.kr/ko/status/status08.jsp)
-- [생활] [광운캠퍼스안내](https://www.kw.ac.kr/ko/tour/tour01.jsp)
-- [위치 및 교통안내](https://www.kw.ac.kr/ko/tour/directions.jsp)
-- [총장 직속 기구](https://www.kw.ac.kr/ko/department/admin01.jsp)
-- [교무행정부총장 직속 기구](https://www.kw.ac.kr/ko/department/admin51.jsp)
-- [대외부총장 직속 기구](https://www.kw.ac.kr/ko/department/admin61.jsp)
-- [부속교육기관](https://www.kw.ac.kr/ko/department/affiliated_edu01.jsp)
-- [부설연구기관](https://www.kw.ac.kr/ko/department/research_attach.jsp)
-- [스마트융합대학원](http://compro.kw.ac.kr/)
-- [상담복지정책대학원](http://isw.kw.ac.kr/)
-- [건설법무대학원](https://kwcl.kw.ac.kr/)
-- [정보과학교육원](http://iit.kw.ac.kr/servlet/controller.home.main.MainServlet?p_process=main&OV_REFFER=http://www.kw.ac.kr/sub/univ/natclass2_3NP.jsp)
-- [한눈에 보는 대학](https://www.kw.ac.kr/ko/univ/glance.jsp)
-- [전자정보공과대학](https://www.kw.ac.kr/ko/univ/college_view.jsp?hpage=college_001)
-- [소프트웨어융합대학](https://www.kw.ac.kr/ko/univ/college_view.jsp?hpage=college_002)
-- [인공지능융합대학](https://www.kw.ac.kr/ko/univ/college_view.jsp?hpage=college_011)
-- [자연과학대학](https://www.kw.ac.kr/ko/univ/college_view.jsp?hpage=college_004)
-- [인문사회과학대학](https://www.kw.ac.kr/ko/univ/college_view.jsp?hpage=college_005)
+상태: ✅ 정상 (공지 글 42건 감지 · 새 글 30)
+- [행사] [[일반] [HUSS-글로벌공생] 글로벌지속가능융합학과 2026 전공설명회 신청 안내](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53414&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-10-01
+- [행사] [[일반] [HUSS-글로벌공생] 2026학년도 「HUSS 인문사회 취업 페스티벌」 안내](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53405&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-10-01
+- [[일반] [체육지원팀] 광운대학교 아이스하키부 「2026 KUSF 대학 U-리그」 홈경기 개최 일정 및 결과안내](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53342&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-10-01
+- [[일반] [체육지원팀] 아이스하키부 「2026 LG 코리아 아이스하키리그」 경기 일정 및 결과 안내](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53406&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-10-01
+- [채용] [[일반] 기간제 계약직원 채용 공고(대학원 교학팀)](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53410&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-10-01
+- [[일반] 2026-2 참빛핵심역량 비교과인증제 안내(참빛포인트 받고 총장직인 인증서 받아서 졸업하자!)](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53201&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-10-01
+- [[학생] 광운대학교 2026학년도 참빛핵심역량 진단 참여 안내(2학년/3학년/4학년 대상)](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53378&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-10-01
+- [채용] [[일반] 기간제 계약직원 채용 공고(정보통신처 통신운영팀)](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53400&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-10-01
+- [학사] [[학사] 2026년도 2학기 국제학생증 ISIC발급 지원행사 안내](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53397&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-10-01
+- [채용] [[일반] [채용공고] 광운대학교 산학협력단 직원 채용 공고](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53392&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-10-01
+- [[학생] [재학생 법정의무교육] 2026 폭력예방교육 수강 안내 (모든 재학생 필수 이수 항목)](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52442&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-10-01
+- [채용] [[일반] 기간제 계약직원 채용 공고(정보과학교육원 교학팀)](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53391&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-10-01
+- [[일반] [프로젝트 플라즈마] .HACK 2027 Call for Papers 연사 모집 안내](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53388&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-10-01
+- [[병무] 2026년 10월 각 군 현역병 모집 계획 안내](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53383&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-10-01
+- [[국제학생] 2027학년도 전기 대학원 외국인 학생 모집 안내 / 2027 Spring Graduate Admission Guide for International Students](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53381&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-10-01
+- [[일반] [체육지원팀]광운대학교 축구부 2026 대학축구 스플릿라운드 경기 일정 및 결과 안내](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53341&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-10-01
+- [[일반] 2026 베스트티처와 함께하는 신임교원 티칭 토크](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53374&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-10-01
+- [[국제학생] 2027학년도 1학기 학부 외국인 신·편입생 모집 안내](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53370&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-10-01
+- [[국제학생] 2026 IFWY 은평 컨퍼런스 참여 안내](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53355&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-10-01
+- [[일반] 2026-2 AI 수업 활용 사례 공모(마감 2027.1.11)](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53354&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-10-01
+- [[국제학생] 2026 외국인 유학생 취업컨설팅 참여 안내(취업·비자 match-up day)](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53343&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-10-01
+- [행사] [[학생] 2027학년도 일학습병행 학생 설명회](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53328&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-10-01
+- [[학사] 2026학년도 2학기 학부 수강과목 포기 안내](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53320&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-10-01
+- [[일반] [정보통신처]불법 소프트웨어, 이미지, 폰트 사용 및 배포 방지를 위한 협조 안내](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53314&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-10-01
+- [[일반] [정보통신처]내PC지키미를 이용한 PC보안 및 알약 점검 협조 요청](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53313&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-10-01
+- [학사] [[학사] 2026학년도 2학기 폐강 교과목 안내](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53312&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-10-01
+- [행사] [[국제학생] 제8회 ISF 외국인 유학생 커리어페어(취업·창업·대학진학)](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53311&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-10-01
+- [[국제학생] 2026학년도 2학기 K 컬쳐 프로그램 외국인 유학생 모집](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53253&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-10-01
+- [[일반] 2026학년도 2학기 수학클리닉 안내](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53269&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-10-01
+- [[국제교류] [대학혁신사업] 2026학년도 2학기 어울림: 멘토링 프로그램 활동 서류 및 유의사항 안내](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53265&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-10-01
 
 ### 명지대학교
-상태: ✅ 정상 (공지 글 139건 감지 · 새 글 30)
-- [CHINESE](https://www.mju.ac.kr/cn/index..do)
-- [2020~현재](https://www.mju.ac.kr/mjukr/9418/subview.do)
-- [2010~2019](https://www.mju.ac.kr/mjukr/160/subview.do)
-- [2000~2009](https://www.mju.ac.kr/mjukr/161/subview.do)
-- [1980~1999](https://www.mju.ac.kr/mjukr/162/subview.do)
-- [1963~1983](https://www.mju.ac.kr/mjukr/163/subview.do)
-- [1948~1963](https://www.mju.ac.kr/mjukr/164/subview.do)
-- [교가/응원가](https://www.mju.ac.kr/mjukr/334/subview.do)
-- [대학발전계획](https://www.mju.ac.kr/mjukr/7772/subview.do)
-- [비전/슬로건](https://www.mju.ac.kr/mjukr/171/subview.do)
-- [인재상/핵심역량](https://www.mju.ac.kr/mjukr/172/subview.do)
-- [발전목표/추진전략](https://www.mju.ac.kr/mjukr/173/subview.do)
-- [17대 핵심과제](https://www.mju.ac.kr/mjukr/174/subview.do)
-- [업무추진비 사용내역](https://www.mju.ac.kr/mjukr/182/subview.do)
-- [대학자체평가](https://www.mju.ac.kr/mjukr/184/subview.do)
-- [대학평의원회](https://www.mju.ac.kr/mjukr/186/subview.do)
-- [대학평의원회 현황](https://www.mju.ac.kr/mjukr/187/subview.do)
-- [공개자료(회의록)](https://www.mju.ac.kr/mjukr/188/subview.do)
-- [회의 목적 사전공개](https://www.mju.ac.kr/mjukr/189/subview.do)
-- [통합추진위원회](https://mju.ac.kr/sites/mj/index.do)
-- [캠퍼스 마스터플랜](http://ibook.mju.ac.kr/Viewer/31QXV4PC1YUO)
-- [대학구성안내](https://www.mju.ac.kr/mjukr/2700/subview.do)
-- [취창업지원처](https://www.mju.ac.kr/mjukr/201/subview.do)
-- [사회과학대학](https://www.mju.ac.kr/mjukr/205/subview.do)
-- [미디어·휴먼라이프대학](https://www.mju.ac.kr/mjukr/10198/subview.do)
-- [인공지능·소프트웨어융합대학](https://www.mju.ac.kr/mjukr/208/subview.do)
-- [미래융합대학](https://www.mju.ac.kr/mjukr/209/subview.do)
-- [아너칼리지(전공자유대학)](https://honour.mju.ac.kr/)
-- [화학·생명과학대학](https://www.mju.ac.kr/mjukr/210/subview.do)
-- [스마트시스템공과대학](https://www.mju.ac.kr/mjukr/211/subview.do)
+상태: ✅ 정상 (공지 글 29건 감지 · 새 글 29)
+- [개인정보처리 방침(시행일자 : 2026.03.13)](https://www.mju.ac.kr/mjukr/12056/subview.do) — 2026-03-13
+- [개인정보처리 방침(시행일자 : 2025.07.16)](https://www.mju.ac.kr/mjukr/12020/subview.do) — 2025-07-16
+- [개인정보처리 방침(시행일자 : 2025.05.16)](https://www.mju.ac.kr/mjukr/10884/subview.do) — 2025-05-16
+- [개인정보처리 방침(시행일자 : 2024.05.20)](https://www.mju.ac.kr/mjukr/10803/subview.do) — 2024-05-20
+- [개인정보처리 방침(시행일자 : 2023.05.04)](https://www.mju.ac.kr/mjukr/9641/subview.do) — 2023-05-04
+- [개인정보처리 방침(시행일자 : 2022.05.24)](https://www.mju.ac.kr/mjukr/8966/subview.do) — 2022-05-24
+- [개인정보처리 방침(시행일자 : 2022.03.10)](https://www.mju.ac.kr/mjukr/8116/subview.do) — 2022-03-10
+- [개인정보처리 방침(시행일자 : 2021.04.11)](https://www.mju.ac.kr/mjukr/7847/subview.do) — 2021-04-11
+- [개인정보처리 방침(시행일자 : 2019.05.03)](https://www.mju.ac.kr/mjukr/5202/subview.do) — 2019-05-03
+- [개인정보처리 방침(시행일자 : 2017.03.31)](https://www.mju.ac.kr/mjukr/2586/subview.do) — 2017-03-31
+- [개인정보처리 방침(시행일자 : 2014.03.10)](https://www.mju.ac.kr/mjukr/2587/subview.do) — 2014-03-10
+- [RSS 2.0](https://www.mju.ac.kr/bbs/mjukr/141/rssList.do?row=50) — 2026-08-31
+- [생활] [[ 일반공지 ] 2026학년도 2학기 자연캠퍼스 학기 중 통학·셔틀버스 운행 안내](https://www.mju.ac.kr/bbs/mjukr/141/234852/artclView.do) — 2026-08-31
+- [생활] [[ 일반공지 ] [보건의료센터] 교내 자동심장충격기(AED) 위치 안내](https://www.mju.ac.kr/bbs/mjukr/141/219450/artclView.do) — 2026-08-31
+- [채용] [[아너칼리지인문교학팀] 2026-2학기 교육조교 1종 모집 공고](https://www.mju.ac.kr/bbs/mjukr/141/235924/artclView.do) — 2026-08-31
+- [생활] [[자연보건의료] 결핵예방 OX퀴즈 참여 안내](https://www.mju.ac.kr/bbs/mjukr/141/235914/artclView.do) — 2026-08-31
+- [생활] [[자연캠퍼스] 2026학년도 하반기 셔틀버스 시범운행 종료 안내](https://www.mju.ac.kr/bbs/mjukr/141/235890/artclView.do) — 2026-08-31
+- [[MYiCap+] 「신기술·(첨단)산업분야 포트폴리오 제작하기 튜토리얼 영상」안내](https://www.mju.ac.kr/bbs/mjukr/141/235872/artclView.do) — 2026-08-31
+- [[인문학생지원팀] 2026-2학기『천원의 아침밥』럭키모닝 행사 당첨자 안내](https://www.mju.ac.kr/bbs/mjukr/141/235870/artclView.do) — 2026-08-31
+- [[대학교육혁신원] 2026학년도 2학기 제1기 학생 서포터즈 「MJ IN:US(이너스)」 최종 합격자 안내](https://www.mju.ac.kr/bbs/mjukr/141/235868/artclView.do) — 2026-08-31
+- [채용] [[한국어교육센터] 인문(서울)캠퍼스 한국어강사 모집 공고](https://www.mju.ac.kr/bbs/mjukr/141/235866/artclView.do) — 2026-08-31
+- [채용] [[계약학과운영관리팀] 기간제 전담직원(계약직) 채용 공고](https://www.mju.ac.kr/bbs/mjukr/141/235865/artclView.do) — 2026-08-31
+- [채용] [[계약학과운영관리팀] 교육조교(1종) 모집 공고](https://www.mju.ac.kr/bbs/mjukr/141/235864/artclView.do) — 2026-08-31
+- [채용] [[인공지능·소프트웨어융합대학 교학팀] 계약직원(인턴사무원) 채용 공고](https://www.mju.ac.kr/bbs/mjukr/141/235862/artclView.do) — 2026-08-31
+- [채용] [[대학교육혁신원] 전임연구원 채용 공고](https://www.mju.ac.kr/bbs/mjukr/141/235833/artclView.do) — 2026-08-31
+- [학사] [[제약바이오융합 특성화사업단] 2026학년도 융합전공 학생설명회 참여 신청 안내](https://www.mju.ac.kr/bbs/mjukr/141/235832/artclView.do) — 2026-08-31
+- [행사] [[인문캠퍼스] 2026-2학기 『천원의 아침밥』 행사 안내](https://www.mju.ac.kr/bbs/mjukr/141/235827/artclView.do) — 2026-08-31
+- [채용] [[사회과학대학 교학팀] 계약직(인턴사무원)채용 공고](https://www.mju.ac.kr/bbs/mjukr/141/235806/artclView.do) — 2026-08-31
+- [2026학년도 2학기 대학 재학생 등록금 구제 납부 안내](https://www.mju.ac.kr/bbs/mjukr/141/235757/artclView.do) — 2026-08-31
 
 ### 상명대학교
-상태: ✅ 정상 (공지 글 45건 감지 · 새 글 30)
-- [상명 2027](https://www.smu.ac.kr/kor/intro/visionStrategy.do)
-- [교가 및 학원가](https://www.smu.ac.kr/kor/intro/schoolSong1.do)
-- [일반현황 및 주요지표](https://www.smu.ac.kr/kor/intro/collegeStatus.do)
-- [대학자체평가](https://www.smu.ac.kr/kor/intro/universitySelfAssessment.do)
-- [생활] [캠퍼스 안내](https://www.smu.ac.kr/kor/intro/gallery.do)
-- [캠퍼스투어 신청](https://www.smu.ac.kr/kor/campustour.do)
-- [캠퍼스 VR TOUR](https://www.smu.ac.kr/kor/intro/vrtour.do)
-- [시설 대관 안내](https://www.smu.ac.kr/kor/intro/rent_c.do)
-- [정보공개제도 안내](https://www.smu.ac.kr/kor/intro/Information1.do)
-- [정보공개청구](https://www.smu.ac.kr/kor/intro/Information3.do)
-- [WHY 상명](https://www.smu.ac.kr/kor/intro/whySangmyung.do)
-- [대학원 입학](https://www.smu.ac.kr/kor/edu/grad_entrance.do)
-- [International Student](https://www.smu.ac.kr/kor/edu/international.do)
-- [대학원 입학](https://www.smu.ac.kr/kor/edu/entrance.do)
-- [대학 · 대학원](https://www.smu.ac.kr/kor/edu/seoul01.do)
-- [미래교육원(서울)](https://www.smu.ac.kr/lifelong/index.do)
-- [미래교육원(천안)](https://www.smu.ac.kr/futureedu/index.do)
-- [연구 · 산학](https://www.smu.ac.kr/kor/research/status.do)
-- [우수 연구자](https://www.smu.ac.kr/kor/research/result2.do)
-- [부설연구기관](https://www.smu.ac.kr/kor/research/affiliateLab01.do)
-- [학사] [학사제도 및 강의시간표](https://www.smu.ac.kr/kor/life/onlineGuide.do)
-- [학사] [수업 및 수강신청](https://www.smu.ac.kr/kor/life/sugang.do)
-- [상명 Q&A](https://www.smu.ac.kr/kor/life/faq.do)
-- [상명 SNS](https://www.smu.ac.kr/kor/life/sns.do)
-- [행사] [신입생 오리엔테이션](https://www.smu.ac.kr/kor/life/freshorientation.do)
-- [학생자치기구](https://www.smu.ac.kr/kor/life/autonomousOrganization.do)
-- [IT 서비스](https://www.smu.ac.kr/kor/life/attendance.do)
-- [SM-EDU 서비스](https://www.smu.ac.kr/kor/life/smedu.do)
-- [모바일 서비스](https://www.smu.ac.kr/kor/life/mobileStudentIdentification.do)
-- [통합보안프로그램](https://www.smu.ac.kr/kor/life/secure.do)
+상태: ⚙️ 게시판 주소 미설정 (찾기 로봇이 못 찾음 — 리포트 참조)
 
 ### 가천대학교
-상태: ⛔ robots.txt 가 막아 둔 주소 — 읽지 않았습니다 (출처를 바꾸거나 보관하세요)
+상태: ✅ 정상 (공지 글 12건 감지 · 새 글 12)
+- [RSS 2.0](https://www.gachon.ac.kr/bbs/kor/475/rssList.do?row=50) — 2026-09-30
+- [학사] [2026학년도 동계 계절학기 예비수강신청 및 일정 안내](https://www.gachon.ac.kr/bbs/kor/475/125778/artclView.do) — 2026-09-30
+- [학사] [2026-2학기 휴학 및 휴학연장 안내](https://www.gachon.ac.kr/bbs/kor/475/120491/artclView.do) — 2026-09-30
+- [2026학년도 2학기 수강포기 안내](https://www.gachon.ac.kr/bbs/kor/475/125271/artclView.do) — 2026-09-30
+- [학사] [졸업예정증명서 발급 안내](https://www.gachon.ac.kr/bbs/kor/475/124028/artclView.do) — 2026-09-30
+- [학사] [2026-2학기 수강정정 및 수강대기제 안내](https://www.gachon.ac.kr/bbs/kor/475/123708/artclView.do) — 2026-09-30
+- [2026-2학기 사회봉사2 교과목 정원 초과 안내(수정)](https://www.gachon.ac.kr/bbs/kor/475/123205/artclView.do) — 2026-09-30
+- [2026-2학기 재학중 취업자 출석인정(취업계) 관련서류 제출 안내](https://www.gachon.ac.kr/bbs/kor/475/123073/artclView.do) — 2026-09-30
+- [2026-2학기 사회봉사2 교과목 개편 안내](https://www.gachon.ac.kr/bbs/kor/475/122814/artclView.do) — 2026-09-30
+- [학사] [2026-2학기 군 복무 중 대학 원격강좌 학점취득제도 안내](https://www.gachon.ac.kr/bbs/kor/475/122733/artclView.do) — 2026-09-30
+- [학사] [2026-2학기 코드쉐어 교과목 수강신청 안내(추가)](https://www.gachon.ac.kr/bbs/kor/475/122724/artclView.do) — 2026-09-30
+- [학사] [2026-2학기 수강신청 안내](https://www.gachon.ac.kr/bbs/kor/475/122723/artclView.do) — 2026-09-30
 
 ### 아주대학교
-상태: ✅ 정상 (공지 글 62건 감지 · 새 글 30)
-- [PORTAL](https://mportal.ajou.ac.kr/main.do)
-- [CHINESE](https://www.ajou.ac.kr/cn/index.do)
-- [교육목표/인재상](https://www.ajou.ac.kr/kr/intro/objective.do)
-- [개교 50주년](https://www.ajou.ac.kr/kr/intro/ajou50th_01.do)
-- [아주비전 5.0](https://www.ajou.ac.kr/kr/intro/ajouvision50_01.do)
-- [50주년 엠블럼/슬로건](https://www.ajou.ac.kr/kr/intro/50th_graphic.do)
-- [대학 상징 아카이브](https://www.ajou.ac.kr/kr/intro/brand-archive.do)
-- [대학정보공개](https://www.ajou.ac.kr/kr/intro/budget.do)
-- [생활] [캠퍼스 안내](https://www.ajou.ac.kr/kr/intro/way01.do)
-- [외국인 입학↗](https://www.ajou.ac.kr/iadmissions/index.do)
-- [진행중인 모집요강](https://www.ajou.ac.kr/kr/admission/grad-board.do)
-- [AI Hub↗](https://edux.ajou.ac.kr/)
-- [Open Source Education↗](https://moca.ajou.ac.kr/)
-- [AUT Introduction](https://www.ajou.ac.kr/kr/ajou/aut.do)
-- [AUT Activities](https://www.ajou.ac.kr/kr/ajou/aut_activities.do)
-- [주요 연구성과](https://www.ajou.ac.kr/kr/research/news.do)
-- [연구자검색↗](https://aurora.ajou.ac.kr/browse-researcher?tab=all&offset=0&rpp=12)
-- [연구뉴스레터](https://www.ajou.ac.kr/kr/research/newsletter.do)
-- [연구업적물 AURORA↗](https://aurora.ajou.ac.kr/)
-- [산학협력단/연구정보처↗](http://iacf.ajou.ac.kr/)
-- [앵커사업단↗](https://anchor.ajou.ac.kr/)
-- [창업지원단↗](http://changup.ajou.ac.kr/)
-- [4단계 BK21사업](https://www.ajou.ac.kr/kr/research/bk21.do)
-- [혁신융합원↗](https://thecoss.ajou.ac.kr/)
-- [G-램프(LAMP) 사업단↗](https://glamp.ajou.ac.kr/)
-- [기관생명윤리위원회](https://www.ajou.ac.kr/kr/research/institutional-bioethics-committee.do)
-- [비교과프로그램](https://www.ajou.ac.kr/kr/bachelor/saveprogram01.do)
-- [전공자율선택제](https://www.ajou.ac.kr/kr/bachelor/freeprogram.do)
-- [다시듣고 싶은 명강의](https://www.ajou.ac.kr/kr/bachelor/bamedia-03.do)
-- [함께하고 싶은 나의 교수님](https://www.ajou.ac.kr/kr/bachelor/bamedia-04.do)
+상태: ✅ 정상 (공지 글 10건 감지 · 새 글 10)
+- [학사] [[공지] [학부] 어학졸업인증(2027년 2월 졸업)을 위한 공인어학 성적 등록 및 제출 안내 (~2027.1.22)](https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=374473&article.offset=0&articleLimit=10) — 2027-01-22
+- [[공지] [학군단]26년도 후반기 학군사관 ROTC 후보생 67,68기 모집안내(8.31~10.13)](https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=373952&article.offset=0&articleLimit=10) — 2026-08-20
+- [[공지] [학부/학사과정] ★필독★ 출석(전자출결, 공결, 취업계 등) 관련 안내](https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=373746&article.offset=0&articleLimit=10) — 2026-08-14
+- [[공지] [학부] 2026-2학기 등록/환불 안내(8.24.~8.28.) (26.07.28. 수정)](https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=372607&article.offset=0&articleLimit=10) — 2026-07-28
+- [학사] [[공지] [학사] 2026-2학기 휴학/복학 신청 안내 (07.28. 수정)](https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=370302&article.offset=0&articleLimit=10) — 2026-06-15
+- [[일자리+센터] [캠리] 아스트라콥코_당일 커피트럭 운영(10/12)](https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=376872&article.offset=0&articleLimit=10) — 2026-10-01
+- [아주대학보사 수습기자 정기모집 (~10/10까지)](https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=376855&article.offset=0&articleLimit=10) — 2026-10-01
+- [행사] [「2026 제2회 Google-아주대학교 AI융합캡스톤디자인 대회」 최종 성과발표회 개최 안내(2026.10.07)](https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=376835&article.offset=0&articleLimit=10) — 2026-10-07
+- [[교육혁신팀] 🍂아주대와 함께하는 문화산책(10월)🍂](https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=376831&article.offset=0&articleLimit=10) — 2026-10-01
+- [💡 U-Chance 10월 퀴즈대회 OPEN!💡](https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=376830&article.offset=0&articleLimit=10) — 2026-10-01
 
 ### 국민대학교
-상태: ✅ 정상 (공지 글 149건 감지 · 새 글 30)
-- [Make the Rule, Break the Rule](https://80.kookmin.ac.kr/vision/rule)
-- [교육이념ㆍ비전](https://www.kookmin.ac.kr/comm/menu/user/dcc49bd0de0a82d918456e893d7bb02e/content/index.do)
-- [인재상 및 교육목표](https://www.kookmin.ac.kr/comm/menu/user/f4bf28bb9ab0519299e17737ade33d63/content/index.do)
-- [KMU Vision 2035: EDGE](https://2030.kookmin.ac.kr/)
-- [국민 인공지능 윤리강령](https://www.kookmin.ac.kr/comm/menu/user/89bdc36e40697dd8ad9e6cb0d423bc9c/content/index.do)
-- [KMU 두들 서비스](https://www.kookmin.ac.kr/comm/menu/user/3c712c56104b1d9dd9476f450097bd33/content/index.do)
-- [총장 프로필](https://www.kookmin.ac.kr/comm/menu/user/c3c31a547b9f7a618364f1ee2645b04d/content/index.do)
-- [대학자체평가 결과](https://www.kookmin.ac.kr/user/unIntr/unSttu/pdfCmmn/evaluation/index.do)
-- [등록금심의위원회](https://www.kookmin.ac.kr/user/unIntr/unSttu/pdfCmmn/review/index.do)
-- [대학평의원회](https://www.kookmin.ac.kr/comm/menu/user/12d90b58773a42084bb14efb890c0107/content/index.do)
-- [요람/규정집](https://www.kookmin.ac.kr/user/unIntr/unSttu/pdfCmmn/cradle/index.do)
-- [개교 80주년](https://80.kookmin.ac.kr/)
-- [사이버역사관](https://kmuhistory.kookmin.ac.kr/)
-- [사진으로 보는 국민역사](https://www.kookmin.ac.kr/comm/board/user/5aebb357061791311cdd4953e2bfb35a/index.do)
-- [사진 아카이브](https://archive.kookmin.ac.kr/)
-- [생활] [북악 캠퍼스 안내](https://www.kookmin.ac.kr/user/unIntr/campusGuide/bukakCampusGuide/index.do)
-- [캠퍼스투어 신청하기](https://admission.kookmin.ac.kr/solution/campustour.php)
-- [찾아오는 길](https://www.kookmin.ac.kr/comm/menu/user/35245dd3a78f1096bf7b4a9b33adc463/content/index.do)
-- [K*힐링코스 안내](https://www.kookmin.ac.kr/comm/menu/user/3b9b6ead1eac4cd299540e3c822cec35/content/index.do)
-- [대학입학안내](http://admission.kookmin.ac.kr/)
-- [대학원 입학 안내](https://www.kookmin.ac.kr/comm/menu/user/37767a7be9ab0d26b5a5c5a90916dda7/content/index.do)
-- [대학원 입학](https://www.kookmin.ac.kr/user/enGuid/3/index.do)
-- [외국인 입학](https://iat.kookmin.ac.kr/admission)
-- [글로벌인문∙지역대학](https://humanities.kookmin.ac.kr/)
-- [사회과학대학](https://social.kookmin.ac.kr/)
-- [과학기술대학](https://cst.kookmin.ac.kr/)
-- [소프트웨어융합대학](https://cs.kookmin.ac.kr/)
-- [자동차모빌리티대학](https://auto.kookmin.ac.kr/)
-- [미래융합대학](https://kmu-cts.kookmin.ac.kr/)
-- [KMU International Business School](https://kibs.kookmin.ac.kr/)
+상태: ✅ 정상 (공지 글 10건 감지 · 새 글 10)
+- [학사] [2026학년도 2학기 학부 중간시험 보조감독 모집 2026.09.23 교무팀 김선아](https://www.kookmin.ac.kr/user/kmuNews/notice/4/12413/view.do?currentPageNo=1) — 2026-09-23
+- [학사] [2026학년도 2학기 2차폐강 안내 2026.09.09 교무팀 하현명](https://www.kookmin.ac.kr/user/kmuNews/notice/4/12356/view.do?currentPageNo=1) — 2026-09-09
+- [학사] [ISIC 국제학생증 발급비 지원행사 안내 2026.09.04 종합서비스센터 차은혜](https://www.kookmin.ac.kr/user/kmuNews/notice/4/12340/view.do?currentPageNo=1) — 2026-09-04
+- [학사] [2027-1학기 자기설계연계·융합전공 신설 신청 안내 2026.09.03 미래융합대학 교학팀 김영숙](https://www.kookmin.ac.kr/user/kmuNews/notice/4/12333/view.do?currentPageNo=1) — 2026-09-03
+- [학사] [2026학년도 2학기 조기졸업 신청 안내 2026.09.02 교무팀 양수지](https://www.kookmin.ac.kr/user/kmuNews/notice/4/12329/view.do?currentPageNo=1) — 2026-09-02
+- [학사] [2026학년도 2학기 다,부전공 변경 및 포기 신청 안내 2026.08.31 교무팀 박성구](https://www.kookmin.ac.kr/user/kmuNews/notice/4/12306/view.do?currentPageNo=1) — 2026-08-31
+- [학사] [2026학년도 2학기 부전공 신청 안내 2026.08.31 교무팀 박성구](https://www.kookmin.ac.kr/user/kmuNews/notice/4/12305/view.do?currentPageNo=1) — 2026-08-31
+- [학사] [2026학년도 2학기 1차 폐강 안내 2026.08.28 교무팀 하현명](https://www.kookmin.ac.kr/user/kmuNews/notice/4/12294/view.do?currentPageNo=1) — 2026-08-28
+- [학사] [2026-2학기 연계·융합전공 교육과정 편성내역(08.20. 기준) 2026.08.20 미래융합대학 교학팀 오지희](https://www.kookmin.ac.kr/user/kmuNews/notice/4/12247/view.do?currentPageNo=1) — 2026-08-20
+- [[TEAM교육인증센터] 2026학년도 제1회 온라인 코딩역량인증시험(PCCE, PCCP, PCSQL) 안내 2026.08.14 TEAM교육인증센터 차예림](https://www.kookmin.ac.kr/user/kmuNews/notice/4/12232/view.do?currentPageNo=1) — 2026-08-14
 
 ### 숭실대학교
-상태: ✅ 정상 (공지 글 18건 감지 · 새 글 18)
-- [u-SAINT](http://saint.ssu.ac.kr/irj/portal)
-- [SSU:catch](https://scatch.ssu.ac.kr/)
-- [언론 속 숭실](https://scatch.ssu.ac.kr/%ec%96%b8%eb%a1%a0-%ec%86%8d-%ec%88%ad%ec%8b%a4/)
-- [숭실人Live](https://scatch.ssu.ac.kr/%ec%88%ad%ec%8b%a4%e4%ba%balive/)
-- [숭실in미디어](https://scatch.ssu.ac.kr/%ec%88%ad%ec%8b%a4%e4%ba%balive/%ec%88%ad%ec%8b%a4in%eb%af%b8%eb%94%94%ec%96%b4/)
-- [숭실스토리텔러](https://scatch.ssu.ac.kr/%ec%88%ad%ec%8b%a4%e4%ba%balive/%ec%88%ad%ec%8b%a4%ec%8a%a4%ed%86%a0%eb%a6%ac%ed%85%94%eb%9f%ac/)
-- [캠퍼스갤러리](https://scatch.ssu.ac.kr/%ec%ba%a0%ed%8d%bc%ec%8a%a4%ea%b0%a4%eb%9f%ac%eb%a6%ac/)
-- [숭실 SNS](https://scatch.ssu.ac.kr/%ed%94%84%eb%a0%88%ec%8a%88/)
-- [외국인유학생](https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%99%B8%EA%B5%AD%EC%9D%B8%EC%9C%A0%ED%95%99%EC%83%9D&keyword)
-- [비교과·행사](https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EB%B9%84%EA%B5%90%EA%B3%BC%C2%B7%ED%96%89%EC%82%AC&keyword)
-- [학사 2026년 학생 예비군 동원 보충대대 훈련 계획 및 유고 결석 신청 절차(안내)](https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2026%EB%85%84-%ED%95%99%EC%83%9D-%EC%98%88%EB%B9%84%EA%B5%B0-%EB%8F%99%EC%9B%90-%EB%B3%B4%EC%B6%A9%EB%8C%80%EB%8C%80-%ED%9B%88%EB%A0%A8-%EA%B3%84%ED%9A%8D-%EB%B0%8F-%EC%9C%A0%EA%B3%A0-%EA%B2%B0&keyword)
-- [학사 2026년 학생 예비군 기본훈련 2차 훈련 계획 및 유고 결석 신청 방법(안내)](https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2026%EB%85%84-%ED%95%99%EC%83%9D-%EC%98%88%EB%B9%84%EA%B5%B0-%EA%B8%B0%EB%B3%B8%ED%9B%88%EB%A0%A8-2%EC%B0%A8-%ED%9B%88%EB%A0%A8-%EA%B3%84%ED%9A%8D-%EB%B0%8F-%EC%9C%A0%EA%B3%A0-%EA%B2%B0%EC%84%9D&keyword)
-- [채용] [채용 숭실대학교 공과대학 학사조교 (산업정보시스템공학과) 채용 공고](https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EA%B3%B5%EA%B3%BC%EB%8C%80%ED%95%99-%ED%95%99%EC%82%AC%EC%A1%B0%EA%B5%90-%EC%82%B0%EC%97%85%EC%A0%95%EB%B3%B4%EC%8B%9C%EC%8A%A4%ED%85%9C%EA%B3%B5&keyword)
-- [생활] [기타 [안내] 중앙도서관 이용자 만족도 조사 (추첨 경품 제공)](https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EC%95%88%EB%82%B4-%EC%A4%91%EC%95%99%EB%8F%84%EC%84%9C%EA%B4%80-%EC%9D%B4%EC%9A%A9%EC%9E%90-%EB%A7%8C%EC%A1%B1%EB%8F%84-%EC%A1%B0%EC%82%AC-%EC%B6%94%EC%B2%A8-%EA%B2%BD%ED%92%88-%EC%A0%9C%EA%B3%B5&keyword)
-- [채용] [채용 2026년 숭실대학교 복지경영학과(계약학과) 계약직 직원 모집](https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2026%EB%85%84-%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EB%B3%B5%EC%A7%80%EA%B2%BD%EC%98%81%ED%95%99%EA%B3%BC%EA%B3%84%EC%95%BD%ED%95%99%EA%B3%BC-%EA%B3%84%EC%95%BD%EC%A7%81-%EC%A7%81%EC%9B%90&keyword)
-- [채용] [채용 숭실대학교 산학협력단 앵커사업 변리사 채용 공고](https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EC%82%B0%ED%95%99%ED%98%91%EB%A0%A5%EB%8B%A8-%EC%95%B5%EC%BB%A4%EC%82%AC%EC%97%85-%EB%B3%80%EB%A6%AC%EC%82%AC-%EC%B1%84%EC%9A%A9-%EA%B3%B5%EA%B3%A0&keyword)
-- [채용] [채용 숭실대학교 산학협력단 계약직 직원 채용 공고(반도체산학기술센터)](https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EC%82%B0%ED%95%99%ED%98%91%EB%A0%A5%EB%8B%A8-%EA%B3%84%EC%95%BD%EC%A7%81-%EC%A7%81%EC%9B%90-%EC%B1%84%EC%9A%A9-%EA%B3%B5%EA%B3%A0%EB%B0%98%EB%8F%84-6&keyword)
-- [채용] [채용 2026년 숭실대학교 경영학부 군위탁과정(안보공익) 계약직 직원 모집](https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2026%EB%85%84-%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EA%B2%BD%EC%98%81%ED%95%99%EB%B6%80-%EA%B5%B0%EC%9C%84%ED%83%81%EA%B3%BC%EC%A0%95%EC%95%88%EB%B3%B4%EA%B3%B5%EC%9D%B5-%EA%B3%84%EC%95%BD&keyword)
+상태: ✅ 정상 (공지 글 7건 감지 · 새 글 7)
+- [학사 2026년 학생 예비군 동원 보충대대 훈련 계획 및 유고 결석 신청 절차(안내)](https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2026%EB%85%84-%ED%95%99%EC%83%9D-%EC%98%88%EB%B9%84%EA%B5%B0-%EB%8F%99%EC%9B%90-%EB%B3%B4%EC%B6%A9%EB%8C%80%EB%8C%80-%ED%9B%88%EB%A0%A8-%EA%B3%84%ED%9A%8D-%EB%B0%8F-%EC%9C%A0%EA%B3%A0-%EA%B2%B0&keyword) — 2026-10-01
+- [학사 2026년 학생 예비군 기본훈련 2차 훈련 계획 및 유고 결석 신청 방법(안내)](https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2026%EB%85%84-%ED%95%99%EC%83%9D-%EC%98%88%EB%B9%84%EA%B5%B0-%EA%B8%B0%EB%B3%B8%ED%9B%88%EB%A0%A8-2%EC%B0%A8-%ED%9B%88%EB%A0%A8-%EA%B3%84%ED%9A%8D-%EB%B0%8F-%EC%9C%A0%EA%B3%A0-%EA%B2%B0%EC%84%9D&keyword) — 2026-10-01
+- [채용] [채용 숭실대학교 공과대학 학사조교 (산업정보시스템공학과) 채용 공고](https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EA%B3%B5%EA%B3%BC%EB%8C%80%ED%95%99-%ED%95%99%EC%82%AC%EC%A1%B0%EA%B5%90-%EC%82%B0%EC%97%85%EC%A0%95%EB%B3%B4%EC%8B%9C%EC%8A%A4%ED%85%9C%EA%B3%B5&keyword) — 2026-09-29
+- [생활] [기타 [안내] 중앙도서관 이용자 만족도 조사 (추첨 경품 제공)](https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EC%95%88%EB%82%B4-%EC%A4%91%EC%95%99%EB%8F%84%EC%84%9C%EA%B4%80-%EC%9D%B4%EC%9A%A9%EC%9E%90-%EB%A7%8C%EC%A1%B1%EB%8F%84-%EC%A1%B0%EC%82%AC-%EC%B6%94%EC%B2%A8-%EA%B2%BD%ED%92%88-%EC%A0%9C%EA%B3%B5&keyword) — 2026-09-29
+- [채용] [채용 2026년 숭실대학교 복지경영학과(계약학과) 계약직 직원 모집](https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2026%EB%85%84-%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EB%B3%B5%EC%A7%80%EA%B2%BD%EC%98%81%ED%95%99%EA%B3%BC%EA%B3%84%EC%95%BD%ED%95%99%EA%B3%BC-%EA%B3%84%EC%95%BD%EC%A7%81-%EC%A7%81%EC%9B%90&keyword) — 2026-09-29
+- [채용] [채용 숭실대학교 산학협력단 앵커사업 변리사 채용 공고](https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EC%82%B0%ED%95%99%ED%98%91%EB%A0%A5%EB%8B%A8-%EC%95%B5%EC%BB%A4%EC%82%AC%EC%97%85-%EB%B3%80%EB%A6%AC%EC%82%AC-%EC%B1%84%EC%9A%A9-%EA%B3%B5%EA%B3%A0&keyword) — 2026-09-29
+- [채용] [채용 숭실대학교 산학협력단 계약직 직원 채용 공고(반도체산학기술센터)](https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EC%82%B0%ED%95%99%ED%98%91%EB%A0%A5%EB%8B%A8-%EA%B3%84%EC%95%BD%EC%A7%81-%EC%A7%81%EC%9B%90-%EC%B1%84%EC%9A%A9-%EA%B3%B5%EA%B3%A0%EB%B0%98%EB%8F%84-6&keyword) — 2026-09-29
 
 ### 세종대학교
-상태: ⛔ robots.txt 가 막아 둔 주소 — 읽지 않았습니다 (출처를 바꾸거나 보관하세요)
+상태: ✅ 정상 (공지 글 15건 감지 · 새 글 15)
+- [학술정보원 이용자 만족도 조사](https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=894138&article.offset=0&articleLimit=10) — 2026-10-01
+- [생활] [세종대학교 애지헌복합관 신축공사 안내](https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=893803&article.offset=0&articleLimit=10) — 2026-09-22
+- [채용] [2027-1학기 교수초빙(9월공고_정년제 전임교원) 안내](https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=893444&article.offset=0&articleLimit=10) — 2026-09-16
+- [[학생생활상담소] 2026-2학기 온라인 자살예방교육 안내](https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=892971&article.offset=0&articleLimit=10) — 2026-09-08
+- [2026학년도 학부교육실태조사(K-NSSE) 참여 안내(10월 7일까지 연장 / 기프티콘 지급 인원 확대)](https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=892640&article.offset=0&articleLimit=10) — 2026-09-02
+- [2026학년도 필수 폭력예방교육 이수 안내 (학부·대학원 공통)](https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=892340&article.offset=0&articleLimit=10) — 2026-08-27
+- [[신청 기간 연장] 26-2 기초학력증진 프로그램 3차 (9/14~10/5)](https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=893493&article.offset=0&articleLimit=10) — 2026-09-17
+- [[교양영어실] 2026 영어말하기 & 발표대회 안내](https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=893393&article.offset=0&articleLimit=10) — 2026-09-15
+- [[교양영어실]2026 영어학습공동체 안내](https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=893392&article.offset=0&articleLimit=10) — 2026-09-15
+- [[신청] 26-2 대면/온라인셀프 학습 컨설팅 프로그램 (1학년) (9/7~9/27)](https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=893265&article.offset=0&articleLimit=10) — 2026-09-14
+- [2026학년도 세종핵심역량 진단평가 참여 안내(두드림 마일리지 및 기프티콘 지급)](https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=892635&article.offset=0&articleLimit=10) — 2026-09-02
+- [[학생생활상담소] 2026-2 세종인의 자아찾기_세종 시그널(연애 및 관계) 집단상담 안내](https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=892568&article.offset=0&articleLimit=10) — 2026-09-01
+- [[학생생활상담소] 2026-2 세종인의 자아찾기_타로 야-호(자기 이해) 집단상담 안내](https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=892567&article.offset=0&articleLimit=10) — 2026-09-01
+- [[신청] 2026-2 전공심화학습공동체 (8/26~9/16)](https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=892270&article.offset=0&articleLimit=10) — 2026-08-25
+- [[학생생활상담소] 세종이의 마음지킴이 학생생활상담소 이용 안내](https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=892265&article.offset=0&articleLimit=10) — 2026-08-25
 
 ### 이화여자대학교
-상태: ✅ 정상 (공지 글 120건 감지 · 새 글 30)
-- [CHINESE](https://www.ewha.ac.kr/ewhacn)
-- [학교법인 이화학당](https://www.ewha.ac.kr/ewha/intro/foundation.do)
-- [산하 교육기관](https://www.ewha.ac.kr/ewha/intro/institution.do)
-- [생활] [안전보건 목표 및 경영방침](https://www.ewha.ac.kr/ewha/intro/institution-safety.do)
-- [이화정신 / 비전](https://www.ewha.ac.kr/ewha/intro/object.do)
-- [인재상 및 핵심역량](https://www.ewha.ac.kr/ewha/intro/talent.do)
-- [5대 전략목표](https://www.ewha.ac.kr/ewha/intro/strategic-goal01.do)
-- [이화역사 / 상징](https://www.ewha.ac.kr/ewha/intro/history01-1.do)
-- [교가 / 노래](https://www.ewha.ac.kr/ewha/intro/song.do)
-- [UI / SI](https://www.ewha.ac.kr/ewha/intro/ui-si01.do)
-- [적립금 운용현황](https://www.ewha.ac.kr/ewha/intro/savingannounce.do)
-- [등록금심의위원회](https://www.ewha.ac.kr/ewha/intro/tuition-review-committee.do)
-- [기관장업무추진비](https://www.ewha.ac.kr/ewha/intro/promotion-fee.do)
-- [기부금 공시](https://www.ewha.ac.kr/ewha/intro/donation.do)
-- [대학평의원회](https://www.ewha.ac.kr/ewha/intro/council.do)
-- [대학자체평가](https://www.ewha.ac.kr/ewha/intro/self-assessment.do)
-- [ESG/Sustainability](https://sustainability.ewha.ac.kr/sustainability/index.do)
-- [성평등계획(GEP)](https://www.ewha.ac.kr/ewha/intro/gep.do)
-- [중앙행정기관](https://www.ewha.ac.kr/ewha/intro/organ02.do)
-- [직·부속기관](https://www.ewha.ac.kr/ewha/intro/organ03.do)
-- [일반대학원 입학](https://www.ewha.ac.kr/ewha/admission/admission.do#ad02)
-- [전문·특수대학원 입학](https://www.ewha.ac.kr/ewha/admission/admission.do#ad03)
-- [학사] [공개강좌(비학위과정)](https://www.ewha.ac.kr/ewha/admission/open_lecture.do)
-- [대학·대학원](https://www.ewha.ac.kr/ewha/academics/college.do)
-- [인문과학대학](https://www.ewha.ac.kr/ewha/academics/liberal-arts.do)
-- [사회과학대학](https://www.ewha.ac.kr/ewha/academics/social-sciences.do)
-- [자연과학대학](https://www.ewha.ac.kr/ewha/academics/natural-sciences.do)
-- [조형예술대학](https://www.ewha.ac.kr/ewha/academics/art-design.do)
-- [신산업융합대학](https://www.ewha.ac.kr/ewha/academics/convergence.do)
-- [스크랜튼대학](https://www.ewha.ac.kr/ewha/academics/scranton.do)
+상태: ✅ 정상 (공지 글 15건 감지 · 새 글 15)
+- [[학부] 2026학년도 제2학기 영어 및 정보인증제 신청 안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367207&article.offset=0&articleLimit=10&no=394) — 2026-10-01
+- [[학부] 2027학년도 제1학기 학부 재입학, 학부 졸업논문등제출자격재부여 신청안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367199&article.offset=0&articleLimit=10&no=394) — 2026-10-01
+- [2027학년도 전기 일반대학원 입학전형 원서접수 안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367186&article.offset=0&articleLimit=10&no=394) — 2026-09-30
+- [행사] [[교목실] 2026-2학기 이화감사페스티벌 참가 안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367125&article.offset=0&articleLimit=10&no=394) — 2026-09-28
+- [학사] [2026학년도 제2학기 교양과목 중간시험 시간표 안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367123&article.offset=0&articleLimit=10&no=394) — 2026-09-28
+- [[학생군사교육단] '26년 후반기 이화여자대학교 ROTC(학군단) 모집](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=366640&article.offset=0&articleLimit=10&no=394) — 2026-09-01
+- [[TELOS트랙] 2026학년도 2학기 TELOS트랙 신청 안내(~10/2)](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=366626&article.offset=0&articleLimit=10&no=394) — 2026-09-01
+- [[공사/일반경쟁]E-House 204동 냉난방기(EHP) 교체 공사](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367217&article.offset=0&articleLimit=10&no=393) — 2026-10-01
+- [[일반대학원] 2027학년도 제1학기 일반대학원 재입학 및 논문제출자격재부여 신청안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367215&article.offset=0&articleLimit=10&no=392) — 2026-10-01
+- [[기계/일반경쟁]문회리 교수/서버(2) 1식 구입](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367214&article.offset=0&articleLimit=10&no=391) — 2026-10-01
+- [[기계/일반경쟁]문회리 교수/서버(1) 1식 구입](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367213&article.offset=0&articleLimit=10&no=390) — 2026-10-01
+- [[기계/일반경쟁]이수지 교수/서버 1EA 구입](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367212&article.offset=0&articleLimit=10&no=389) — 2026-10-01
+- [학사] [이화 창립 140주년 기념 명예박사학위 수여식 참석 신청 안내(~ 10. 14.(수))](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367209&article.offset=0&articleLimit=10&no=388) — 2026-10-01
+- [채용] [[대학원혁신연구실]2026-2학기 조교 모집](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367208&article.offset=0&articleLimit=10&no=387) — 2026-10-01
+- [이화여대 해저드 리터러시 국제학술대회 (ICLH 2026) - 등록 무료 (10월 19일까지 마감)](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367193&article.offset=0&articleLimit=10&no=384) — 2026-10-01
 
 ### 인하대학교
 상태: ✅ 정상 (공지 글 11건 감지 · 새 글 11)
-- [행사] [[IPP] 2027년도 상반기 일학습병행 학생 모집 기업 초청 설명회 사전 신청 안내](https://www.inha.ac.kr/bbs/kr/8/45649/artclView.do)
-- [채용] [[대학혁신지원사업] "나도 학생 강사" : 학생 주도 학습 프로그램(SDC) 강사 모집](https://www.inha.ac.kr/bbs/kr/8/45523/artclView.do)
-- [[학생군사교육단] '26년 후반기 67, 68기 학군사관후보생 모집 공고](https://www.inha.ac.kr/bbs/kr/8/45267/artclView.do)
-- [[교육효과성센터] 26-2학기 핵심역량 및 전공능력 진단 시행 안내(기프트콘 총 740명 추첨 증정)](https://www.inha.ac.kr/bbs/kr/8/45260/artclView.do)
-- [채용] [[ABBI융합연구단] 사무원 채용 공고](https://www.inha.ac.kr/bbs/kr/8/45688/artclView.do)
-- [2026년 예비군 기본(이월)훈련 안내문(1차)](https://www.inha.ac.kr/bbs/kr/8/45686/artclView.do)
-- [[대학일자리플러스센터] 2026 하반기 원익그룹 및 신세계그룹 자기소개서 클리닉](https://www.inha.ac.kr/bbs/kr/8/45685/artclView.do)
-- [채용] [[문과대학 행정실] 사무원(행정조교) 모집 공고](https://www.inha.ac.kr/bbs/kr/8/45683/artclView.do)
-- [채용] [[정치외교학과] 사무원(행정조교) 채용 공고](https://www.inha.ac.kr/bbs/kr/8/45680/artclView.do)
-- [채용] [[디지털혁신전략센터] 연구원 채용 공고](https://www.inha.ac.kr/bbs/kr/8/45674/artclView.do)
-- [생활] [토요일 통학버스 운행일 변경 안내(10/3 미운행, 10/10 운행)](https://www.inha.ac.kr/bbs/kr/8/45660/artclView.do)
+- [행사] [[IPP] 2027년도 상반기 일학습병행 학생 모집 기업 초청 설명회 사전 신청 안내](https://www.inha.ac.kr/bbs/kr/8/45649/artclView.do) — 2026-09-29
+- [채용] [[대학혁신지원사업] "나도 학생 강사" : 학생 주도 학습 프로그램(SDC) 강사 모집](https://www.inha.ac.kr/bbs/kr/8/45523/artclView.do) — 2026-09-15
+- [[학생군사교육단] '26년 후반기 67, 68기 학군사관후보생 모집 공고](https://www.inha.ac.kr/bbs/kr/8/45267/artclView.do) — 2026-09-01
+- [[교육효과성센터] 26-2학기 핵심역량 및 전공능력 진단 시행 안내(기프트콘 총 740명 추첨 증정)](https://www.inha.ac.kr/bbs/kr/8/45260/artclView.do) — 2026-09-01
+- [채용] [[ABBI융합연구단] 사무원 채용 공고](https://www.inha.ac.kr/bbs/kr/8/45688/artclView.do) — 2026-10-01
+- [2026년 예비군 기본(이월)훈련 안내문(1차)](https://www.inha.ac.kr/bbs/kr/8/45686/artclView.do) — 2026-10-01
+- [[대학일자리플러스센터] 2026 하반기 원익그룹 및 신세계그룹 자기소개서 클리닉](https://www.inha.ac.kr/bbs/kr/8/45685/artclView.do) — 2026-10-01
+- [채용] [[문과대학 행정실] 사무원(행정조교) 모집 공고](https://www.inha.ac.kr/bbs/kr/8/45683/artclView.do) — 2026-10-01
+- [채용] [[정치외교학과] 사무원(행정조교) 채용 공고](https://www.inha.ac.kr/bbs/kr/8/45680/artclView.do) — 2026-10-01
+- [채용] [[디지털혁신전략센터] 연구원 채용 공고](https://www.inha.ac.kr/bbs/kr/8/45674/artclView.do) — 2026-09-30
+- [생활] [토요일 통학버스 운행일 변경 안내(10/3 미운행, 10/10 운행)](https://www.inha.ac.kr/bbs/kr/8/45660/artclView.do) — 2026-09-29
 
 ### 부산대학교
-상태: ✅ 정상 (공지 글 119건 감지 · 새 글 30)
-- [대학/대학원](http://www.pusan.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN003)
-- [사회과학대학](http://www.pusan.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN004)
-- [자연과학대학](http://www.pusan.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN005)
-- [경제통상대학](http://www.pusan.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN009)
-- [생활과학대학](http://www.pusan.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN012)
-- [나노과학기술대학](http://www.pusan.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN015)
-- [생명자원과학대학](http://www.pusan.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN016)
-- [정보의생명공학대학](http://www.pusan.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN265)
-- [인문사회계열](http://www.pusan.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN019)
-- [자연과학계열](http://www.pusan.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN020)
-- [예·체능계열](http://www.pusan.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN023)
-- [학과 간 협동과정](http://www.pusan.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN024)
-- [학·연 협동과정](http://www.pusan.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN026)
-- [국제전문대학원](http://www.pusan.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN029)
-- [치의학전문대학원](http://www.pusan.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN031)
-- [한의학전문대학원](http://www.pusan.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN032)
-- [법학전문대학원](http://www.pusan.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN033)
-- [데이터사이언스전문대학원](http://www.pusan.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN289)
-- [경제통상대학원](http://www.pusan.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN036)
-- [기술창업대학원](http://www.pusan.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN041)
-- [융합의생명과학대학원](http://www.pusan.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN290)
-- [간호과학대학원](http://www.pusan.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN295)
-- [학생성공개발원(진로,취업)](https://job.pusan.ac.kr/)
-- [진로ㆍ취업상담](https://job.pusan.ac.kr/ko/counsel/job_info)
-- [PNU 리서치](http://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN270)
-- [연구성과분석플랫폼(PNU Scholar)](https://scholar.pusan.ac.kr/)
-- [평판도 조사 참여](http://www.pusan.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN314)
-- [산학협력DB](https://sanhakdb.pusan.ac.kr/)
-- [학생지원기관](http://www.pusan.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN081)
-- [부산대언론사](http://www.pusan.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN280)
+상태: ✅ 정상 (공지 글 18건 감지 · 새 글 18)
+- [메인으로 이동](https://www.pusan.ac.kr/kor/Main.do) — 2026-09-30
+- [대학/대학원](http://www.pusan.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN003) — 2026-09-30
+- [개교80주년](http://www.pusan.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN300) — 2026-09-30
+- [PNU 건의함](https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN097) — 2026-09-30
+- [시민정책제안](http://www.pusan.ac.kr/kor/CMS/Suggestion/information.do?mCode=MN267) — 2026-09-30
+- [채용] [교수초빙/직원채용](https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN103) — 2026-09-30
+- [2027학년도 전기 데이터사이언스전문대학원 신입생 모집](https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511276) — 2026-09-30
+- [(+신청기간연장)[기술사업부] 2026년 도전! 지식재산권(IP) 골든벨 참가자...](https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511269) — 2026-09-30
+- [[부산대학교기술지주(주)] PNU Tech Biz Week 2026(Togeth...](https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511261) — 2026-09-30
+- [생활] [[도서관] 딱1~2분! 2026 대학도서관 이용자 만족도 조사(~10/6)](https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511063) — 2026-09-30
+- [[교육인증원]📢(모집 기간 연장) '2026학년도 학생포트폴리오 경진대...](https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1510131) — 2026-09-30
+- [학사] [외국인 유학생을 위한 해외결제플랫폼(Alipay, PayPal 등) 등록금 납부...](https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1509643) — 2026-09-30
+- [고등교육 규제특례 신청 관련 의견수렴 안내](https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511370) — 2026-09-30
+- [[부산대소식 10월호] 넥센그룹 강병중 회장, 개교 80주년 부산대 100억 원...](https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511356) — 2026-09-30
+- [학사] [[학생과] 2026학년도 동계 해외도전과 체험 파견팀 모집](https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511351) — 2026-09-30
+- [[AX·정보화혁신본부] 인터넷회선 증속 및 방화벽 고도화 작업에 따른 인터넷 서...](https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511339) — 2026-09-30
+- [[대한무역투자진흥공사] K Connect AI 2026 컨퍼런스(M.AX CON...](https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511307) — 2026-09-30
+- [행사] [[부산광역시 금정구] 「2026 금정사랑 걷기대회」 개최 안내](https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511287) — 2026-09-30
 
 ### 가톨릭대학교
-상태: ✅ 정상 (공지 글 167건 감지 · 새 글 30)
-- [사이버캠퍼스](https://e-cyber.catholic.ac.kr/ilos/main/main_form.acl)
-- [가톨릭교육브랜드](https://www.catholic.ac.kr/ko/about/educational_brand.do)
-- [CUK SDGs](https://www.catholic.ac.kr/ko/about/cuk_sdgs1-1.do)
-- [가톨릭대학교회문헌](https://www.catholic.ac.kr/ko/about/church_literature1.do)
-- [한국 가톨릭 대학교 규정](https://www.catholic.ac.kr/ko/about/church_literature2.do)
-- [한국 가톨릭학교 교육헌장](https://www.catholic.ac.kr/ko/about/church_literature3.do)
-- [대학원 입학](https://www.catholic.ac.kr/ko/academics/adm_general_graduate.do)
-- [외국인 입학](https://www.catholic.ac.kr/ko/academics/adm_foreigner.do)
-- [바이오헬스융합대학](https://www.catholic.ac.kr/ko/academics/edu_undergraduate14.do)
-- [AI전자정보융합대학](https://www.catholic.ac.kr/ko/academics/edu_undergraduate15.do)
-- [인문사회계열](https://www.catholic.ac.kr/ko/academics/edu_undergraduate1.do)
-- [자연공학계열](https://www.catholic.ac.kr/ko/academics/edu_undergraduate3.do)
-- [주요연구성과](https://www.catholic.ac.kr/ko/research/result.do)
-- [산학협력단ㆍ연구처](https://www.catholic.ac.kr/ko/research/cukrnd.do)
-- [부설연구소ㆍ센터](https://www.catholic.ac.kr/ko/research/institute.do)
-- [IRB사무국](https://irb.catholic.ac.kr/irb/index.do)
-- [개설과목조회](https://www.catholic.ac.kr/ko/support/subject.do)
-- [외국어강의 의무이수 요건](https://www.catholic.ac.kr/ko/support/completion_requirements_for_foreign_language_2026.do)
-- [성의교정 의과대학](https://songeui.catholic.ac.kr/medicine/info/curriculum1.do)
-- [성의교정 간호대학](https://songeui.catholic.ac.kr/nursing/sutdent-life/curriculum.do)
-- [성신교정 신학과](https://songsin.catholic.ac.kr/ko/academics/program_degree.do)
-- [학사] [성적ㆍ학점인정](https://www.catholic.ac.kr/ko/support/grade_evaluation_system.do)
-- [성의교정 의과대학](https://songeui.catholic.ac.kr/medicine/info/medical-school.do)
-- [성의교정 간호대학](https://songeui.catholic.ac.kr/nursing/sutdent-life/calendar.do)
-- [성신교정 신학과](https://songsin.catholic.ac.kr/ko/academics/register_for_class.do)
-- [국내교류지원](https://www.catholic.ac.kr/ko/support/exchange_domestic1.do)
-- [외부기관공지](https://www.catholic.ac.kr/ko/campuslife/notice_outside.do)
-- [학생군사교육단](https://www.catholic.ac.kr/ko/campuslife/rotc.do)
-- [성의교정 의과대학](https://songeui.catholic.ac.kr/medicine/info/student_council.do)
-- [성의교정 간호대학](https://songeui.catholic.ac.kr/nursing/sutdent-life/student_council.do)
+상태: ✅ 정상 (공지 글 4건 감지 · 새 글 4)
+- [[IR센터] 2026학년도 2학기 CUK-COCOA 대학생 역량 자가진단 평가 이벤트 안내](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276119&article.offset=0&articleLimit=10) — 2026-09-22
+- [[학생지원팀] 2026학년도 2학기 직무인턴 3차 신청 안내(10/1~10/7)](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276345&article.offset=0&articleLimit=10) — 2026-10-01
+- [행사] [[앵커사업행정팀] 「2026 경기스타트업 서밋」 개최 안내](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276349&article.offset=0&articleLimit=10) — 2026-10-01
+- [[취업지원팀] 전국 지역인재 7급 수습직원 선발시험 변경사항 안내](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276268&article.offset=0&articleLimit=10) — 2026-09-30
 
 ### 한국항공대학교
-상태: ✅ 정상 (공지 글 75건 감지 · 새 글 30)
-- [채용] [2027학년도 1학기 전임교원 채용 모집대상 : 정년 및 비정년트랙 / 접수기간 : 2026.10.15.(목) 13:30까지](https://kau.ac.kr/kaulife/recruitment.php?mode=read&seq=11225)
-- [초지능 AI의 위협과 ‘유엔 AI 허브’ 구상 총장메시지-82](https://kau.ac.kr/kaulife/main/speech_82.html)
-- [KAU 한국항공대학교](https://kau.ac.kr/index/main.php)
-- [캠퍼스스토리](https://kaunews.kau.ac.kr/pages/event.php)
-- [언론에서 본 항대](https://kaunews.kau.ac.kr/pages/press.php)
-- [항공ㆍ경영대학원](http://gradbus.kau.ac.kr/admission/guide.php)
-- [항공우주정책대학원](http://college.kau.ac.kr/web/pages/gc91317h.do)
-- [항공정비사과정](https://amtc.kau.ac.kr/theme/namiCompany_03/company/menu02_01.php)
-- [AI융합대학](http://aisw.kau.ac.kr/pages/main.php)
-- [항공·경영대학](http://college.kau.ac.kr/web/index.do?siteFlag=avimanagement_col)
-- [자유전공학부](http://college.kau.ac.kr/web/index.do?siteFlag=free_www)
-- [인문자연학부](http://college.kau.ac.kr/web/index.do?siteFlag=ct_www)
-- [드림디자인칼리지](http://college.kau.ac.kr/web/index.do?siteFlag=mat_www)
-- [항공·경영대학원](https://gradbus.kau.ac.kr/)
-- [항공우주정책대학원](http://college.kau.ac.kr/web/index.do?siteFlag=lawpolicy_www)
-- [항공기술교육원](http://amtc.kau.ac.kr/)
-- [항공교통관제교육원](http://college.kau.ac.kr/web/index.do?siteFlag=atci)
-- [생활] [한국항공안전교육원](http://college.kau.ac.kr/web/index.do?siteFlag=kasi_www)
-- [학생군사교육단](http://college.kau.ac.kr/web/index.do?siteFlag=kaurotc_WWW)
-- [대학핵심역량](https://kau.ac.kr/kaulife/space.php)
-- [학사] [다전공 및 전과](https://kau.ac.kr/kaulife/multimajor.php)
-- [교과목체계도](https://kau.ac.kr/kaulife/curri.php)
-- [학ㆍ석사 연계과정](https://kau.ac.kr/kaulife/linkage.php)
-- [수강지도 상담](https://kau.ac.kr/kaulife/consulting.php)
-- [교양과정 이수](https://kau.ac.kr/kaulife/liberal.php)
-- [사회봉사 과목이수안내](https://kau.ac.kr/kaulife/volunteer.php)
-- [학습관리시스템](https://lxp.kau.ac.kr/login/index.php)
-- [학사] [재입학 및 제적](https://kau.ac.kr/kaulife/readmission.php)
-- [학사] [재학생 및 연구등록 안내](https://kau.ac.kr/kaulife/regresearch.php)
-- [학사] [학기초과자 등록 안내](https://kau.ac.kr/kaulife/oversemester.php)
+상태: ✅ 정상 (공지 글 13건 감지 · 새 글 13)
+- [채용] [2027학년도 1학기 전임교원 채용 모집대상 : 정년 및 비정년트랙 / 접수기간 : 2026.10.15.(목) 13:30까지](https://kau.ac.kr/kaulife/recruitment.php?mode=read&seq=11225) — 2026-10-15
+- [[학생지원팀] 2026학년도 2학기 KAU 사회봉사단 선발 결과 안내 학생지원팀 2026-10-01 4](https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11278) — 2026-10-01
+- [​대학 캠퍼스 방송 촬영 안내 총무팀 2026-09-30 124](https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11243) — 2026-09-30
+- [2026학년도 비교과 프로그램 통합 사전 요구조사 실시 안내 미래교육혁신원 2026-09-30 111](https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11242) — 2026-09-30
+- [2026년 K-하이테크 플랫폼 Microsoft AI 온라인 교육 과정 안내 학생지원팀 2026-09-30 78](https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11241) — 2026-09-30
+- [행사] [서울 AI 평생학습 러닝 그라운드 개최 안내 학생지원팀 2026-09-28 208](https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11229) — 2026-09-28
+- [[교육성과관리센터] 2026학년도 학부교육실태조사(K-NSSE) 참여 안내 미래교육혁신원 2026-09-01 624](https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11108) — 2026-09-01
+- [생활] [2026-2 전공페스타 한마당행사 운영 안내 드림디자인칼리지 2026-09-22 2,065](https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11213) — 2026-09-22
+- [우주발사체(한빛-나노) 실물모형 유지보수 실시 안내 총무팀 2026-09-22 414](https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11212) — 2026-09-22
+- [[의료지원실]2026.09.23.(수) 「사랑의 헌혈」 실시 안내 학생지원팀 2026-09-22 208](https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11211) — 2026-09-23
+- [생활] [2026학년도 2학기 교내 푸드트럭 운영 안내 총무팀 2026-09-22 559](https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11208) — 2026-09-22
+- [[의료지원실]단과별 대항전, '헌혈대전' 참여 안내 학생지원팀 2026-09-03 733](https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11131) — 2026-09-03
+- [[의료지원실]2026학년도 2학기 온라인 교육 프로그램 안내(심폐소생술/건전음주/마약예방) 학생지원팀 2026-09-15 258](https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11182) — 2026-09-15
 
 ### 경기대학교
-상태: ⛔ robots.txt 가 막아 둔 주소 — 읽지 않았습니다 (출처를 바꾸거나 보관하세요)
+상태: ✅ 정상 (공지 글 12건 감지 · 새 글 12)
+- [학사] [[공학교육혁신센터]2023년도 2학기 소망가방 및 수강신청 관련 안내](https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=6815&bbsNo=1073&nttNo=603664&pageUnit=10&searchCnd=all) — 2023-07-25
+- [[입학에서 취업까지] 2026학년도 문헌정보학과 졸업시험](https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626336&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888) — 2023-07-25
+- [[일반] [경기대 인재개발처 재맞고] 서울캠퍼스 공기업 NCS·대기업 직무적성검사 과정 홍보](https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626334&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888) — 2023-07-25
+- [[일반] 2026년도 대학원 제 56호 논문집 안내](https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626331&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888) — 2023-07-25
+- [[대학생활/업무안내] 융합컨텐츠디자인연구소 명칭 변경 안내](https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626329&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888) — 2023-07-25
+- [학사] [[수강에서 성적까지] 2026학년도 2학기 「인권과 성평등교육」 필수 이수 안내](https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626324&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888) — 2023-07-25
+- [학사] [[수강에서 성적까지] [창의공학부] 6주차 현직자와 함께하는 직무 Festival 안내](https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626310&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888) — 2023-07-25
+- [학사] [[수강에서 성적까지] (수학과) 2026-2학기 브릿지 프로젝트 강연 안내](https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626307&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888) — 2023-07-25
+- [처음 페이지](https://www.kyonggi.ac.kr/www/selectBbsNttList.do?key=7520&bbsNo=1073&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888&pageIndex=1) — 2023-07-25
+- [다음 페이지](https://www.kyonggi.ac.kr/www/selectBbsNttList.do?key=7520&bbsNo=1073&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888&pageIndex=2) — 2023-07-25
+- [다음 10 페이지](https://www.kyonggi.ac.kr/www/selectBbsNttList.do?key=7520&bbsNo=1073&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888&pageIndex=11) — 2023-07-25
+- [#통합자료실](https://www.kyonggi.ac.kr/www/sub.do?key=5143) — 2023-07-25
 
 ### 서울과학기술대학교
-상태: ✅ 정상 (공지 글 69건 감지 · 새 글 30)
-- [서울과기대 소개](https://www.seoultech.ac.kr/intro/univ)
-- [생활] [캠퍼스 안내](https://www.seoultech.ac.kr/intro/campinfo)
-- [학칙 및 규정](http://www.seoultech.ac.kr/intro/uvstat/rules/)
-- [International 입학](https://global.seoultech.ac.kr/apply/undergraduate)
-- [ST나눔공헌단](http://serve.seoultech.ac.kr/)
-- [병무·예비군](https://www.seoultech.ac.kr/life/military)
-- [학생활동 통합캘린더](https://www.seoultech.ac.kr/intro/calendar)
-- [연구처·산학협력단](https://iac.seoultech.ac.kr/)
-- [연구자포털(PURE)](https://pure.seoultech.ac.kr/)
-- [Research Spotlight](https://en.seoultech.ac.kr/news/res_spotlight)
-- [Research Newsletter](https://www.seoultech.ac.kr/research_news)
-- [취업진로본부](http://job.seoultech.ac.kr/)
-- [대학정보알림](https://www.seoultech.ac.kr/service/info)
-- [정보서비스안내](https://www.seoultech.ac.kr/service/is)
-- [온라인민원센터](https://www.seoultech.ac.kr/service/sccenter)
-- [갑질신고센터](https://www.seoultech.ac.kr/service/report)
-- [유실물 센터](https://www.seoultech.ac.kr/service/lostproperty)
-- [SEOULTECH광장](https://www.seoultech.ac.kr/service/board)
-- [eClass](https://eclass.seoultech.ac.kr/)
-- [EPiC folio](https://epic.seoultech.ac.kr/)
-- [통합정보(SUIS)](https://suis.seoultech.ac.kr/)
-- [학사] [학부수강신청](https://for-s.seoultech.ac.kr/)
-- [캠퍼스 지도](https://www.seoultech.ac.kr/intro/map/)
-- [통합정보(SUIS)](https://for-a.seoultech.ac.kr/index-s.html)
-- [학칙 및 규정](https://www.seoultech.ac.kr/intro/uvstat/rules/)
-- [search](https://www.seoultech.ac.kr/site/www/search/index.jsp)
-- [서울과학기술대학교 바로가기](https://www.seoultech.ac.kr/)
-- [sitemap](https://www.seoultech.ac.kr/sinfo/sitemap)
-- [대학·대학원](https://www.seoultech.ac.kr/univ)
-- [정보·민원서비스](https://www.seoultech.ac.kr/service)
+상태: ✅ 정상 (공지 글 9건 감지 · 새 글 9)
+- [행사] [2026년 산학연협력 EXPO 개최 안내](https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896018&qidx=4691&cate=10&allboard=false&nowpage=1) — 2026-09-29
+- [[홍보실]2026학년도 2학기 학생 홍보대사(영상·디자인) 최종 합격자 알림](https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896152&qidx=4691&cate=10&allboard=false&nowpage=1) — 2026-10-01
+- [행사] [SLW(서울라이프위크) 2026 개최 안내](https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896138&qidx=4691&cate=10&allboard=false&nowpage=1) — 2026-10-01
+- [[메이커장비교육] 3D프린터 장비교육](https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896123&qidx=4691&cate=10&allboard=false&nowpage=1) — 2026-10-01
+- [글로벌 플레이그라운드 오픈 알림(개소식 26. 10. 1. 16시)](https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896097&qidx=4691&cate=10&allboard=false&nowpage=1) — 2026-09-30
+- [생활] [[총무과]주차게이트 네트워크 카메라(CCTV) 신규 설치에 따른 의견 수렴 안내](https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896093&qidx=4691&cate=10&allboard=false&nowpage=1) — 2026-09-30
+- [★서울과학기술대학교 영재교육원(구리/남양주) 2027학년도 심화과정 신입생 모집★](https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896087&qidx=4691&cate=10&allboard=false&nowpage=1) — 2026-09-30
+- [행사] [[보건진료소] 대학가 마약류 등 오남용 예방 캠페인 행사 안내](https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896079&qidx=4691&cate=10&allboard=false&nowpage=1) — 2026-09-30
+- [생활] [[앵커사업단] 2026학년도 확장형 캡스톤디자인(MINI, PRE, JOINT) 지원사업 운영 안내](https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=895981&qidx=4691&cate=10&allboard=false&nowpage=1) — 2026-09-29
 
 ### 계명대학교
-상태: ✅ 정상 (공지 글 125건 감지 · 새 글 30)
-- [교육희년기념](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3238&)
-- [대학자체평가](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3294&)
-- [대학평의원회](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3295&)
-- [등록금심의위원회](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3296&)
-- [적립기금 투자관리 지침](https://www.kmu.ac.kr/programs/common/com_fileViewer.jsp?parm_file_uid=120730)
-- [적립금 운용 현황](https://www.kmu.ac.kr/programs/common/com_fileViewer.jsp?parm_file_uid=125168)
-- [로고마크 자료실](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=371&)
-- [교목·교화·교석·교조](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3310&)
-- [계명의 한 모습](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3312&)
-- [계명 브로슈어](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3313&)
-- [건축물의 역사](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3314&)
-- [캠퍼스의 나무 이야기](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3315&)
-- [창립 125주년 기념](https://www.kmu.ac.kr/uni/125th/main.jsp)
-- [통합경비시스템안내](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=4937&)
-- [고정형영상정보처리기기 설치현황](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3328&)
-- [대학/대학원](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3215&)
-- [인문국제학대학](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3329&)
-- [사회과학대학](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3332&)
-- [자연과학대학](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3333&)
-- [행사] [음악공연예술대학](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3337&)
-- [Keimyung Adams College](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3341&)
-- [Tabula Rasa College](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3342&)
-- [K-Cloud College](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3974&)
-- [특수대학원안내](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3232&)
-- [학사] [강의시간표 조회](https://edward.kmu.ac.kr/nx/index_external.html?bWVudUlkPU01MDU3MDQ=)
-- [EDWARD 시스템](https://portal.kmu.ac.kr/)
-- [학사] [증명서 발급안내](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3894&)
-- [학생활동안전](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=4355&)
-- [장애학생지원](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3387&)
-- [진로취업지원](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3391&)
+상태: ✅ 정상 (공지 글 16건 감지 · 새 글 16)
+- [개인정보처리방침_2018. 04. 30. ~ 2018. 12. 20.](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3855&) — 2018-04-30
+- [개인정보처리방침_2018. 12. 21. ~ 2019. 2. 28.](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3914&) — 2018-12-21
+- [개인정보처리방침_2019. 03. 1. ~ 2019. 4. 30.](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3934&) — 2019-03-01
+- [개인정보처리방침_2019. 05. 1. ~ 2020. 4. 30.](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=4174&) — 2019-05-01
+- [개인정보처리방침_2020. 05. 1. ~ 2020. 7. 15.](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=4254&) — 2020-05-01
+- [개인정보처리방침_2020. 07. 18. ~ 2021. 01. 31.](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=4374&) — 2020-07-18
+- [개인정보처리방침_2021. 02. 1. ~ 2021. 05. 25.](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=4414&) — 2021-02-01
+- [개인정보처리방침_2021. 05. 26. ~ 2021. 07. 31.](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=4434&) — 2021-05-26
+- [개인정보처리방침_2021. 08. 01. ~ 2022. 01. 31.](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=4595&) — 2021-08-01
+- [개인정보처리방침_2022. 02. 01. ~ 2023. 02. 28.](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=4674&) — 2022-02-01
+- [개인정보처리방침_2023. 03. 01. ~ 2023. 07. 07.](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=4714&) — 2023-03-01
+- [개인정보처리방침_2023. 08. 28. ~ 2023. 10. 29.](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=4774&) — 2023-08-28
+- [개인정보처리방침_2023. 10. 30. ~ 2024. 9. 22.](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=4917&) — 2023-10-30
+- [개인정보처리방침_2024. 9. 23. ~ 2025. 6. 17.](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=4957&) — 2024-09-23
+- [개인정보처리방침_2025. 6. 18. ~ 2026. 2. 22.](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=4977&) — 2025-06-18
+- [개인정보처리방침_2026. 2. 23. ~ 2026. 4. 5.](https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=4997&) — 2026-02-23
 
 ### 서울교육대학교
-상태: ✅ 정상 (공지 글 48건 감지 · 새 글 30)
-- [MY-PORTAL](https://portal.snue.ac.kr/portal/lo/login/loginPage.do)
-- [학사] [수강신청 및 재이수](https://www.snue.ac.kr/snue/cm/cntnts/cntntsView.do?mi=1289&cntntsId=1191)
-- [교원자격무시험검정](https://www.snue.ac.kr/snue/cm/cntnts/cntntsView.do?mi=3037&cntntsId=3020)
-- [미래교육센터](https://www.snue.ac.kr/snue/cm/cntnts/cntntsView.do?mi=3049&cntntsId=3036)
-- [주간식단안내](https://www.snue.ac.kr/snue/mm/menu/userMenuList.do?mi=1275)
-- [학교생활지원](https://www.snue.ac.kr/snue/cm/cntnts/cntntsView.do?mi=1421&cntntsId=3014)
-- [장애학생지원센터](https://with.snue.ac.kr/)
-- [학생성장지원팀](http://life.snue.ac.kr/)
-- [학생서비스센터](https://www.snue.ac.kr/snue/cm/cntnts/cntntsView.do?mi=1304&cntntsId=1207)
-- [생활] [분실물습득신고](https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=1308&bbsId=3010)
-- [PPT 템플릿](https://www.snue.ac.kr/snue/cm/cntnts/cntntsView.do?mi=3621&cntntsId=3412)
-- [SNUE 뉴스](https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=1310&bbsId=3006)
-- [교육·연구 및 학생지도비](https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=1130&bbsId=4107)
-- [재무정보공시](https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3555&bbsId=3005)
-- [학칙 및 규정](https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=1278&bbsId=3049)
-- [국내기관 교류현황](https://www.snue.ac.kr/snue/cm/cntnts/cntntsView.do?mi=3039&cntntsId=3023)
-- [국외기관 교류현황](https://www.snue.ac.kr/snue/cm/cntnts/cntntsView.do?mi=1403&cntntsId=1174)
-- [캠퍼스 투어 신청](https://www.snue.ac.kr/snue/am/apl/goDeerDream.do?mi=3497)
-- [개교 80주년](https://www.snue.ac.kr/snue/cm/cntnts/cntntsView.do?mi=3652&cntntsId=3428)
-- [엠블럼 및 슬로건](https://www.snue.ac.kr/snue/cm/cntnts/cntntsView.do?mi=3653&cntntsId=3427)
-- [서울교대 80년의 역사](https://www.snue.ac.kr/snue/cm/cntnts/cntntsView.do?mi=3654&cntntsId=3429)
-- [발전기금 기부 안내](https://fund.snue.ac.kr/fund/un/univFund/univFundWrite.do?mi=3478)
-- [e-CLASS](https://lms.snue.ac.kr/)
-- [교육전문대학원](https://grad.snue.ac.kr/grad/main.do)
-- [SNUE평생교육](https://www.snue.ac.kr/snue/main.do#section5)
-- [웹메일시스템](https://mail.snue.ac.kr/)
-- [SMS서비스](https://sms.snue.ac.kr/)
-- [인터넷디스크](https://idisk.snue.ac.kr/)
-- [학사] [스마트학생증(교직원증)](https://smartcard.snue.ac.kr/)
-- [원격지원서비스](http://help.snue.ac.kr/)
+상태: ⚙️ 게시판 주소 미설정 (찾기 로봇이 못 찾음 — 리포트 참조)
 
 ### 한국방송통신대학교
 상태: ✅ 정상 (공지 글 11건 감지 · 새 글 11)
-- [[전공] 2027학년도 1학기 생활과학부 전공분리 승인 안내](https://www.knou.ac.kr/bbs/knou/51/816368/artclView.do)
-- [학사] [[시험성적] 2026학년도 2학기 출석수업대체과제물 시행공고](https://www.knou.ac.kr/bbs/knou/51/816097/artclView.do)
-- [[학적] 2027학년도 1학기 국내와 해외 간 소속지역 변경 공지(신청: 2027. 1. 1.~7.](https://www.knou.ac.kr/bbs/knou/51/815838/artclView.do)
-- [[학적] 2026년도 4차 평생교육사 자격증 신규발급 신청 안내](https://www.knou.ac.kr/bbs/knou/51/815526/artclView.do)
-- [[일반] MS 오피스 365 웹 버전 사용 안내](https://www.knou.ac.kr/bbs/knou/51/816464/artclView.do)
-- [[일반] 모두의 AI 실험실 온라인 플랫폼 활용 안내](https://www.knou.ac.kr/bbs/knou/51/816452/artclView.do)
-- [[일반] 전국 지역인재 7급 수습직원 선발시험 향후 변경사항 안내](https://www.knou.ac.kr/bbs/knou/51/816451/artclView.do)
-- [학사] [[시험성적] 2026학년도 2학기 출석수업대체과제물 과제명 등 변경(수정) 내용 공지(1차, 10. 1](https://www.knou.ac.kr/bbs/knou/51/816443/artclView.do)
-- [[일반] (10월) 재학생 대사증후군 검사 실시 안내](https://www.knou.ac.kr/bbs/knou/51/816399/artclView.do)
-- [[일반] 재학생 건강프로그램 [건강체력 측정] 참여 안내](https://www.knou.ac.kr/bbs/knou/51/816352/artclView.do)
-- [[일반] 방송대학TV 교양프로그램 조연출(AD) 모집](https://www.knou.ac.kr/bbs/knou/51/816262/artclView.do)
+- [[전공] 2027학년도 1학기 생활과학부 전공분리 승인 안내](https://www.knou.ac.kr/bbs/knou/51/816368/artclView.do) — 2026-09-30
+- [학사] [[시험성적] 2026학년도 2학기 출석수업대체과제물 시행공고](https://www.knou.ac.kr/bbs/knou/51/816097/artclView.do) — 2026-09-28
+- [[학적] 2027학년도 1학기 국내와 해외 간 소속지역 변경 공지(신청: 2027. 1. 1.~7.](https://www.knou.ac.kr/bbs/knou/51/815838/artclView.do) — 2027-01-01
+- [[학적] 2026년도 4차 평생교육사 자격증 신규발급 신청 안내](https://www.knou.ac.kr/bbs/knou/51/815526/artclView.do) — 2026-09-21
+- [[일반] MS 오피스 365 웹 버전 사용 안내](https://www.knou.ac.kr/bbs/knou/51/816464/artclView.do) — 2026-10-01
+- [[일반] 모두의 AI 실험실 온라인 플랫폼 활용 안내](https://www.knou.ac.kr/bbs/knou/51/816452/artclView.do) — 2026-10-01
+- [[일반] 전국 지역인재 7급 수습직원 선발시험 향후 변경사항 안내](https://www.knou.ac.kr/bbs/knou/51/816451/artclView.do) — 2026-10-01
+- [학사] [[시험성적] 2026학년도 2학기 출석수업대체과제물 과제명 등 변경(수정) 내용 공지(1차, 10. 1](https://www.knou.ac.kr/bbs/knou/51/816443/artclView.do) — 2026-10-01
+- [[일반] (10월) 재학생 대사증후군 검사 실시 안내](https://www.knou.ac.kr/bbs/knou/51/816399/artclView.do) — 2026-09-30
+- [[일반] 재학생 건강프로그램 [건강체력 측정] 참여 안내](https://www.knou.ac.kr/bbs/knou/51/816352/artclView.do) — 2026-09-30
+- [[일반] 방송대학TV 교양프로그램 조연출(AD) 모집](https://www.knou.ac.kr/bbs/knou/51/816262/artclView.do) — 2026-09-29
 
 ### 경북대학교
-상태: ✅ 정상 (공지 글 106건 감지 · 새 글 30)
-- [대학생활/취업](https://www.knu.ac.kr/wbbs/wbbs/contents/index.action?menu_url=board/community02&menu_idx=80)
-- [생활] [등교 및 셔틀버스 운행](https://www.knu.ac.kr/wbbs/wbbs/contents/index.action?menu_url=intro/map03&menu_idx=27)
-- [로고 및 UI](https://www.knu.ac.kr/wbbs/wbbs/contents/index.action?menu_url=intro/about04&menu_idx=194)
-- [PPT템플릿](https://www.knu.ac.kr/wbbs/wbbs/contents/index.action?menu_url=intro/about04_08&menu_idx=199)
-- [교내 사이트 안내](https://www.knu.ac.kr/wbbs/wbbs/contents/index.action?menu_url=intro/search03&menu_idx=32)
-- [규정집/예규집](https://knuin.knu.ac.kr/public/gnrdm/estrl.knu)
-- [International Admissions](https://home.knu.ac.kr/HOME/global/sub.htm?nav_code=glo1549935033)
-- [사회과학대학](https://social.knu.ac.kr/)
-- [자연과학대학](https://cns.knu.ac.kr/)
-- [농업생명과학대학](http://cals.knu.ac.kr/)
-- [생활과학대학](http://cohe.knu.ac.kr/)
-- [첨단기술융합대학](https://aist.knu.ac.kr/)
-- [생태환경대학](https://cee.knu.ac.kr/)
-- [과학기술대학](http://cst.knu.ac.kr/)
-- [자율전공학부](https://udm.knu.ac.kr/)
-- [공과대학/농업생명과학대학](https://home.knu.ac.kr/HOME/engineer/sub.htm?nav_code=eng1741133224)
-- [자율미래인재학부](https://sofi.knu.ac.kr/)
-- [인문사회계열](https://home.knu.ac.kr/HOME/grad/sub.htm?nav_code=gra1626678009)
-- [자연과학계열](https://home.knu.ac.kr/HOME/grad/sub.htm?nav_code=gra1626678024)
-- [학과간 협동과정](https://home.knu.ac.kr/HOME/grad/sub.htm?nav_code=gra1626678065)
-- [법학전문대학원](https://lawschool.knu.ac.kr/)
-- [데이터사이언스대학원](https://data.knu.ac.kr/)
-- [스마트농생명식품융합대학원](https://home.knu.ac.kr/HOME/cals/sub.htm?nav_code=cal1624535110)
-- [식물방역대학원](https://home.knu.ac.kr/HOME/cals/sub.htm?nav_code=cal1636956129)
-- [사회정책대학원](https://social.knu.ac.kr/HOME/coss/sub.htm?nav_code=cos1623232582)
-- [수사과학대학원](https://www.knu.ac.kr/wbbs/wbbs/contents/index.action?menu_url=edu/school04_02&menu_idx=265)
-- [임상간호대학원](https://home.knu.ac.kr/HOME/nurse/sub.htm?nav_code=nur1677833062)
-- [과학기술대학원](https://seoksa.knu.ac.kr/)
-- [ABB대학원](https://abb.knu.ac.kr/)
-- [교육과정편람](https://knuin.knu.ac.kr/public/stddm/edu.knu)
+상태: ✅ 정상 (공지 글 5건 감지 · 새 글 5)
+- [포토뉴스 대현119안전센터와 교내 어린이집에서 합동소방훈련 실시 경북대는 9월 30일 교내 어린이집에서 교직원과 원아, 대현119안전센터 소방관 등 300여명이 참여한 가운데 2026년도 합동소방훈련을 실시했다. 2026-10-01](https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/viewBtin.action?bbs_cde=28&btin.bbs_cde=28&btin.doc_no=1338474&btin.appl_no=000000&btin.page=1&btin.search_type=&btin.search_text=&popupDeco=&btin.note_div=row&menu_idx=214) — 2026-10-01
+- [포토뉴스 수의과대학 김규태 교수, 제자 위해 발전기금 1천만원 전달 수의과대학 김규태 교수가 제자들을 위해 써달라며 발전기금 1천만원을 경북대에 전달했다. 2026-10-01](https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/viewBtin.action?bbs_cde=28&btin.bbs_cde=28&btin.doc_no=1338469&btin.appl_no=000000&btin.page=1&btin.search_type=&btin.search_text=&popupDeco=&btin.note_div=row&menu_idx=214) — 2026-10-01
+- [포토뉴스 교육부 글로컬랩 2개 연구소 선정… 9년간 총 사업비 377억원 확보 교육부와 한국연구재단이 추진하는 ‘글로컬랩(거점형) 사업’에 지능형건설자동화연구센터와 세포·기질연구소가 각각 최종 선정됐다. 2026-09-29](https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/viewBtin.action?bbs_cde=28&btin.bbs_cde=28&btin.doc_no=1338438&btin.appl_no=000000&btin.page=1&btin.search_type=&btin.search_text=&popupDeco=&btin.note_div=row&menu_idx=214) — 2026-09-29
+- [포토뉴스 통계학과 고규형 교수, 국제통계기구(ISI) 선출회원 선정 통계학과 고규형 교수가 국제통계기구(International Statistical Institute, ISI)의 선출회원(Elected Member)으로 선정됐다. 2026-09-29](https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/viewBtin.action?bbs_cde=28&btin.bbs_cde=28&btin.doc_no=1338436&btin.appl_no=000000&btin.page=1&btin.search_type=&btin.search_text=&popupDeco=&btin.note_div=row&menu_idx=214) — 2026-09-29
+- [행사] [포토뉴스 지역민 대상 특별강연 ‘겸재와 그의 시대’ 개최 사학과와 박물관은 대구·경북 지역민과 함께하는 특별강연 ‘겸재와 그의 시대’를 개최한다. 2026-09-28](https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/viewBtin.action?bbs_cde=28&btin.bbs_cde=28&btin.doc_no=1338432&btin.appl_no=000000&btin.page=1&btin.search_type=&btin.search_text=&popupDeco=&btin.note_div=row&menu_idx=214) — 2026-09-28
 
 ### 영남대학교
-상태: ✅ 정상 (공지 글 217건 감지 · 새 글 30)
-- [ENG website](https://www.yu.ac.kr/english/)
-- [총장 프로필](https://www.yu.ac.kr/main/intro/profile.do)
-- [연설 및 기고문](https://www.yu.ac.kr/main/intro/speeches-and-contributions.do)
-- [대담 및 인터뷰](https://www.yu.ac.kr/main/intro/talks-and-interviews.do)
-- [총장과의 대화](https://www.yu.ac.kr/main/intro/conversation-with-the-president.do)
-- [업무추진비 사용내역](https://www.yu.ac.kr/main/academics/details-of-use-of-business-promotion-expenses.do)
-- [학사] [비전과 전략](https://www.yu.ac.kr/main/intro/yu-vision.do)
-- [생활] [안전보건 경영방침](https://www.yu.ac.kr/main/intro/safety-and-health-management-policy.do)
-- [대학브로슈어](https://pr.yu.ac.kr/pr/archive/promotional-booklet.do)
-- [사이버홍보실](https://pr.yu.ac.kr/)
-- [행사] [학술·공연·행사](https://www.yu.ac.kr/main/intro/academic-performance-and-event.do)
-- [Y형인재교육](http://portal.yu.ac.kr/sso/login.jsp?type=linc&cReturn_Url=https%3A%2F%2Fjoin.yu.ac.kr%2Fyuedu%2Ffront%2Findex.php%3Fg_page%3Dprogram%26m_page%3Dprogram01)
-- [청탁금지법 바로알기](https://www.yu.ac.kr/main/intro/know-the-anti-graft-law-right-away.do)
-- [부설연구기관](https://www.yu.ac.kr/main/intro/associated.do)
-- [부설교육기관](https://www.yu.ac.kr/main/intro/yulife.do)
-- [대학평의원회](https://www.yu.ac.kr/main/intro/institution.do)
-- [법인사무조직](https://www.yu.ac.kr/main/intro/corporate-office-organization.do)
-- [정관및제규정](https://www.yu.ac.kr/main/intro/articles-of-incorporation-and-regulations.do)
-- [학교법인공지사항](https://www.yu.ac.kr/main/intro/notice-related-to-coronavirus-20.do)
-- [생활] [캠퍼스 안내](https://www.yu.ac.kr/main/intro/direction.do)
-- [캠퍼스 VR](https://www.yu.ac.kr/_vr_new/ko/index.html)
-- [자동심장충격기(AED) 위치](https://www.yu.ac.kr/main/intro/aed-position.do)
-- [학칙 사전공고/주요 규정 변경 안내](https://www.yu.ac.kr/main/intro/rules.do)
-- [목적외 이용·제공대장](https://www.yu.ac.kr/main/intro/purpose.do)
-- [정보공개제도](https://www.yu.ac.kr/main/intro/information-disclosure-system.do)
-- [정보공개제도 안내](https://www.yu.ac.kr/main/intro/information-disclosure-system-guide.do)
-- [정보공개청구 및 비공개대상 정보](https://www.yu.ac.kr/main/intro/non-disclosure.do)
-- [정보공개청구 수수료](https://www.yu.ac.kr/main/intro/fee.do)
-- [대학자체평가보고서](https://www.yu.ac.kr/main/intro/report.do)
-- [영남대학교 75년사](http://ecat.yu.ac.kr/Viewer/YEQM4WM52XEO)
+상태: ✅ 정상 (공지 글 9건 감지 · 새 글 9)
+- [학사] [9 2026학년도 2학기 중간시험 실시 및 부정행위자 처리 기준 안내](https://www.yu.ac.kr/main/bachelor/bachelor-guide.do?mode=view&articleNo=231893401&article.offset=0&articleLimit=10&srYearMonth=2026-10&ref=calendar) — 2026-10-01
+- [학사] [8 2026학년도 2학기 교양, 교직, 일반선택 중간시험 시간표 안내(주간, 야간)](https://www.yu.ac.kr/main/bachelor/bachelor-guide.do?mode=view&articleNo=231865021&article.offset=0&articleLimit=10&srYearMonth=2026-10&ref=calendar) — 2026-09-29
+- [학사] [7 2026학년도 전기(27년2월) 조기졸업 신청 안내](https://www.yu.ac.kr/main/bachelor/bachelor-guide.do?mode=view&articleNo=231752307&article.offset=0&articleLimit=10&srYearMonth=2026-10&ref=calendar) — 2026-09-21
+- [6 2026-2학기 정보전산원 수업 강의실 변경 안내 및 협조 요청 (9월28일부터)](https://www.yu.ac.kr/main/bachelor/bachelor-guide.do?mode=view&articleNo=231766391&article.offset=0&articleLimit=10&srYearMonth=2026-10&ref=calendar) — 2026-09-22
+- [학사] [5 2026학년도 2학기 중간강의평가 실시 안내](https://www.yu.ac.kr/main/bachelor/bachelor-guide.do?mode=view&articleNo=231752304&article.offset=0&articleLimit=10&srYearMonth=2026-10&ref=calendar) — 2026-09-21
+- [학사] [4 2026학년도 2학기 졸업예정자(최종학기) 조기취업 공인출석 안내](https://www.yu.ac.kr/main/bachelor/bachelor-guide.do?mode=view&articleNo=231160615&article.offset=0&articleLimit=10&srYearMonth=2026-10&ref=calendar) — 2026-08-10
+- [학사] [3 2026학년도 하반기 해외MOOC 수강 신청 안내](https://www.yu.ac.kr/main/bachelor/bachelor-guide.do?mode=view&articleNo=230626584&article.offset=0&articleLimit=10&srYearMonth=2026-10&ref=calendar) — 2026-07-03
+- [학사] [2 타대학 학점교류 신청 양식 모음](https://www.yu.ac.kr/main/bachelor/bachelor-guide.do?mode=view&articleNo=6207761&article.offset=0&articleLimit=10&srYearMonth=2026-10&ref=calendar) — 2023-05-25
+- [1 수업내용 및 강의자료 관련 수강생 준수 사항 안내](https://www.yu.ac.kr/main/bachelor/bachelor-guide.do?mode=view&articleNo=4318593&article.offset=0&articleLimit=10&srYearMonth=2026-10&ref=calendar) — 2022-10-13
 
 ### 전북대학교
-상태: ✅ 정상 (공지 글 137건 감지 · 새 글 30)
-- [Global Top-Tier JBNU 2030](https://www.jbnu.ac.kr/web/intro/university/sub07.do)
-- [글로컬대학30 VISION](https://www.jbnu.ac.kr/web/intro/university/sub01.do)
-- [교육연구 학생지도비](https://www.jbnu.ac.kr/web/intro/situation/sub04.do)
-- [대학자체평가결과](https://www.jbnu.ac.kr/web/intro/situation/result.do)
-- [성과정보공개시스템](http://ir.jbnu.ac.kr/)
-- [규정 및 지침](https://www.jbnu.ac.kr/web/intro/situation/rule.do)
-- [캠퍼스 소개](https://www.jbnu.ac.kr/web/intro/campus/sub01.do)
-- [캠퍼스 지도](https://www.jbnu.ac.kr/web/intro/campus/sub02.do)
-- [캠퍼스 투어](https://www.jbnu.ac.kr/web/intro/campus/sub03.do)
-- [시간제 등록생](https://enter.jbnu.ac.kr/submenu.do?menuurl=shTyaGgSAy79vI5n2yB/hA==&)
-- [고교-대학 연계 프로그램](https://enter.jbnu.ac.kr/submenu.do?menuurl=Qz8tS528RQQrNKvw%2fhODmw%3d%3d&)
-- [International Student](https://ioffice.jbnu.ac.kr/)
-- [Exchange Students](https://ioffice.jbnu.ac.kr/ioffice/22295/subview.do)
-- [The Feeling Korea Program](https://ioffice.jbnu.ac.kr/ioffice/22297/subview.do)
-- [Courses Taught in Non-Korean Languages](https://ioffice.jbnu.ac.kr/ioffice/30873/subview.do)
-- [Student Support](https://ioffice.jbnu.ac.kr/ioffice/29586/subview.do)
-- [농업생명과학대학](https://www.jbnu.ac.kr/web/unvr/university.do?unq=189)
-- [사회과학대학](https://www.jbnu.ac.kr/web/unvr/university.do?unq=239)
-- [생활과학대학](https://www.jbnu.ac.kr/web/unvr/university.do?unq=219)
-- [자연과학대학](https://www.jbnu.ac.kr/web/unvr/university.do?unq=212)
-- [환경생명자원대학](https://www.jbnu.ac.kr/web/unvr/university.do?unq=223)
-- [AI융합대학원](https://www.jbnu.ac.kr/web/unvr/graduate.do?unq=1097)
-- [인문사회계열](https://www.jbnu.ac.kr/web/unvr/graduate.do?unq=1)
-- [자연과학계열](https://www.jbnu.ac.kr/web/unvr/graduate.do?unq=268)
-- [학과간협동과정](https://www.jbnu.ac.kr/web/unvr/graduate.do?unq=273)
-- [학연간협동과정](https://www.jbnu.ac.kr/web/unvr/graduate.do?unq=274)
-- [법학전문대학원](https://www.jbnu.ac.kr/web/unvr/professional.do?unq=13)
-- [유연인쇄전자전문대학원](https://www.jbnu.ac.kr/web/unvr/professional.do?unq=439)
-- [의학전문대학원](https://www.jbnu.ac.kr/web/unvr/professional.do?unq=11)
-- [치의학전문대학원](https://www.jbnu.ac.kr/web/unvr/professional.do?unq=12)
+상태: ⚙️ 게시판 주소 미설정 (찾기 로봇이 못 찾음 — 리포트 참조)
 
 ### 충남대학교
-상태: ⛔ robots.txt 가 막아 둔 주소 — 읽지 않았습니다 (출처를 바꾸거나 보관하세요)
+상태: ✅ 정상 (공지 글 8건 감지 · 새 글 8)
+- [채용] [대표홈페이지 일부 게시판 폐쇄 안내(대학문화마당, CNU장터, 구인구직, 분실물 광장, 스터디 및 공모전)](https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515373&code=sub07_0701&site_dvs_cd=kr&menu_dvs_cd=0701&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=) — 2026-09-15
+- [[RISE] 2026 All-set 기업지원 사업 시행 공고](https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515555&code=sub07_0701&site_dvs_cd=kr&menu_dvs_cd=0701&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=) — 2026-10-01
+- [생활] [2026학년도 2학기 학생생활관 보결 3차 모집 안내](https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515485&code=sub07_0701&site_dvs_cd=kr&menu_dvs_cd=0701&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=) — 2026-09-23
+- [행사] [2026년 한미약품 하반기 채용설명회 안내](https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515481&code=sub07_0701&site_dvs_cd=kr&menu_dvs_cd=0701&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=) — 2026-09-23
+- [생활] [2026학년도 2학기 학교셔틀버스 임시 노선 변경 및 임시 휴차 알림](https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515463&code=sub07_0701&site_dvs_cd=kr&menu_dvs_cd=0701&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=) — 2026-09-22
+- [생활] [2026학년도 하반기 빛가람 에너지밸리 공동캠퍼스 안내](https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515447&code=sub07_0701&site_dvs_cd=kr&menu_dvs_cd=0701&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=) — 2026-09-21
+- [2026년 9월 방역소독 일정 안내](https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515423&code=sub07_0701&site_dvs_cd=kr&menu_dvs_cd=0701&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=) — 2026-09-18
+- [추석 명절 청렴주의보 발령(2026년 제2호)](https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515405&code=sub07_0701&site_dvs_cd=kr&menu_dvs_cd=0701&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=) — 2026-09-16
 
 ### 전남대학교
-상태: ⛔ robots.txt 가 막아 둔 주소 — 읽지 않았습니다 (출처를 바꾸거나 보관하세요)
+상태: ✅ 정상 (공지 글 14건 감지 · 새 글 14)
+- [학사] [[학사안내] 2026학년도 제2학기 최종 등록 공고](https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70363) — 2026-09-14
+- [학사] [[학사안내] 2026학년도 2학기 교과구분 정정 실시 안내](https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70353) — 2026-09-11
+- [[대학생활] 2026학년도 2학기 신문방송사 수습기자(국원) 모집 안내](https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70130) — 2026-08-26
+- [학사] [[학사안내] 2026학년도 2학기 교양교과목 편성 목록](https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=69874) — 2026-07-29
+- [학사] [[학사안내] 2026학년도 제2학기 휴학·복학 신청 안내](https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=69388) — 2026-06-12
+- [학사] [[대학생활] 국제학생증 ISIC 체크카드 무료 발급 행사 안내](https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=69090) — 2026-05-08
+- [생활] [[대학생활] [광주광역시] 광주전세피해지원센터 운영 안내](https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=68122) — 2026-02-03
+- [[대학생활] <징검다리 상담교수> 상담 신청 안내](https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=67905) — 2026-01-12
+- [[대학생활] 대학생 해외 취업 피해 예방을 위한 안내](https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=67327) — 2025-10-24
+- [[대학생활] 전남대 사칭 보이스피싱 '노쇼(No Show)&#03...](https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=66348) — 2025-07-01
+- [[대학생활] 유사종교 포교 활동 주의 안내](https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=35053) — 2020-09-04
+- [[대학생활] [성평등가족부] 제2차 청년세대 성별균형 공개형 공론장 청년 ...](https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70547) — 2026-10-01
+- [[대학생활] [대한적십자사/인도법연구소] 2026년 하반기 국제인도법 시네...](https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70546) — 2026-10-01
+- [[취업정보] [비알코리아x파리크라상x삼립] 2026년 하반기 대졸 신입사원...](https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70543) — 2026-10-01
 
 ### 조선대학교
-상태: ✅ 정상 (공지 글 195건 감지 · 새 글 30)
-- [역대총장 -->](https://www3.chosun.ac.kr/chosun/141/subview.do)
-- [총장에게 바란다 -->](https://www3.chosun.ac.kr/chosun/142/subview.do)
-- [역사와비전 -->](https://www3.chosun.ac.kr/chosun/143/subview.do)
-- [사진으로 보는 발자취 -->](https://www3.chosun.ac.kr/chosun/616/subview.do)
-- [설립정신 및 건학이념 -->](https://www3.chosun.ac.kr/chosun/280/subview.do)
-- [교육목적 및 교육목표 -->](https://www3.chosun.ac.kr/chosun/282/subview.do)
-- [인재상과 핵심역량 -->](https://www3.chosun.ac.kr/chosun/2288/subview.do)
-- [발전계획 -->](https://www3.chosun.ac.kr/chosun/3092/subview.do)
-- [ESG 경영선언문 -->](https://www3.chosun.ac.kr/chosun/2664/subview.do)
-- [주요국책사업 -->](https://www3.chosun.ac.kr/chosun/590/subview.do)
-- [상징 -->](https://www3.chosun.ac.kr/chosun/285/subview.do)
-- [80주년 엠블럼/슬로건 -->](https://www3.chosun.ac.kr/chosun/3016/subview.do)
-- [상징물 -->](https://www3.chosun.ac.kr/chosun/148/subview.do)
-- [캐릭터 -->](https://www3.chosun.ac.kr/chosun/2686/subview.do)
-- [교가 -->](https://www3.chosun.ac.kr/chosun/149/subview.do)
-- [현황/규정 -->](https://www3.chosun.ac.kr/chosun/101/subview.do)
-- [예결산 공고 -->](https://www3.chosun.ac.kr/chosun/154/subview.do)
-- [적립금 운용현황 -->](https://www3.chosun.ac.kr/chosun/3108/subview.do)
-- [정보 공개 -->](https://www3.chosun.ac.kr/chosun/2002/subview.do)
-- [규정집 -->](https://www3.chosun.ac.kr/chosun/155/subview.do)
-- [청렴행정 -->](https://www3.chosun.ac.kr/chosun/222/subview.do)
-- [조선대 소식 -->](https://www3.chosun.ac.kr/chosun/2607/subview.do)
-- [언론 속 조선대 -->](https://www3.chosun.ac.kr/chosun/169/subview.do)
-- [소식지 -->](https://www3.chosun.ac.kr/chosun/612/subview.do)
-- [홍보동영상 -->](https://www3.chosun.ac.kr/chosun/761/subview.do)
-- [전경사진 -->](https://www3.chosun.ac.kr/chosun/173/subview.do)
-- [브로슈어 -->](https://www3.chosun.ac.kr/chosun/175/subview.do)
-- [CSU Monthly -->](https://www3.chosun.ac.kr/chosun/2809/subview.do)
-- [소셜미디어 -->](https://www3.chosun.ac.kr/chosun/629/subview.do)
-- [포토뉴스 -->](https://www3.chosun.ac.kr/chosun/591/subview.do)
+상태: ✅ 정상 (공지 글 13건 감지 · 새 글 13)
+- [채용] [[G-LAMP사업단] 2026 하반기 블루밍 라운지(Blooming Rounge) 참여교원 모집공고](https://www3.chosun.ac.kr/bbs/chosun/117/281563/artclView.do) — 2026-09-23
+- [채용] [[G-LAMP사업단] 2026 LAMP 전임교원 선발공고](https://www3.chosun.ac.kr/bbs/chosun/117/281562/artclView.do) — 2026-09-23
+- [YBM 한국토익위원회 주관 본교 특별 TOEIC 시험 실시 안내(10. 24.(토))](https://www3.chosun.ac.kr/bbs/chosun/117/281464/artclView.do) — 2026-09-21
+- [[교육과정관리팀] THE조아 설문 이벤트 안내 (경품 추첨)](https://www3.chosun.ac.kr/bbs/chosun/117/281401/artclView.do) — 2026-09-17
+- [생활] [[보건진료소] 2026년도 교내헌혈 안내 (10.06)](https://www3.chosun.ac.kr/bbs/chosun/117/281700/artclView.do) — 2026-10-01
+- [생활] [[ 보건진료소 ] 2026년 독감 예방접종 안내](https://www3.chosun.ac.kr/bbs/chosun/117/281699/artclView.do) — 2026-10-01
+- [[대학일자리플러스센터] 상담신청안내(취업진로에 대한 고민 및 궁금증 모두 해결해 드려요!!)](https://www3.chosun.ac.kr/bbs/chosun/117/281688/artclView.do) — 2026-10-01
+- [[대학일자리플러스센터] 10월 교내 진로 및 취창업 비교과 프로그램 일정 안내](https://www3.chosun.ac.kr/bbs/chosun/117/281687/artclView.do) — 2026-10-01
+- [[창업성장지원팀] 2026학년도 앵커 창업동아리 4차 모집](https://www3.chosun.ac.kr/bbs/chosun/117/281686/artclView.do) — 2026-10-01
+- [불법복제 인식개선 및 근절을 위한 홍보](https://www3.chosun.ac.kr/bbs/chosun/117/281645/artclView.do) — 2026-09-30
+- [[졸업생특화프로그램] 2026년 10월 프로그램 메뉴판](https://www3.chosun.ac.kr/bbs/chosun/117/281642/artclView.do) — 2026-09-30
+- [대학생이 반드시 지켜야 할 저작권 상식](https://www3.chosun.ac.kr/bbs/chosun/117/281641/artclView.do) — 2026-09-30
+- [행사] [[취업전략팀] 전주페이퍼 2026 하반기 대졸 신입사원 채용설명회](https://www3.chosun.ac.kr/bbs/chosun/117/281609/artclView.do) — 2026-09-28
 
 ### 충북대학교
-상태: ✅ 정상 (공지 글 190건 감지 · 새 글 30)
-- [대학/대학원](https://www.cbnu.ac.kr/www/contents.do?key=391)
-- [사회과학대학 College of Social Sciences](https://www.cbnu.ac.kr/www/contents.do?key=392)
-- [자연과학대학 College of Natural Sciences](https://www.cbnu.ac.kr/www/contents.do?key=393)
-- [경영대학 College of Business](https://www.cbnu.ac.kr/www/contents.do?key=394)
-- [공과대학 College of Engineering](https://www.cbnu.ac.kr/www/contents.do?key=395)
-- [전자정보대학 College of Electrical & Computer Engineering](https://www.cbnu.ac.kr/www/contents.do?key=396)
-- [농업생명환경대학 College of Agriculture, Life & Environment Sciences](https://www.cbnu.ac.kr/www/contents.do?key=397)
-- [사범대학 College of Education](https://www.cbnu.ac.kr/www/contents.do?key=398)
-- [생활과학대학 College of Human Ecology](https://www.cbnu.ac.kr/www/contents.do?key=399)
-- [수의과대학 College of Veterinary Medicine](https://www.cbnu.ac.kr/www/contents.do?key=400)
-- [약학대학 College of Pharmacy](https://www.cbnu.ac.kr/www/contents.do?key=401)
-- [의과대학 College of Medicine](https://www.cbnu.ac.kr/www/contents.do?key=402)
-- [간호대학 College of Nursing](https://www.cbnu.ac.kr/www/contents.do?key=1294)
-- [창의융합대학 College of Creativity and Convergence](https://www.cbnu.ac.kr/www/contents.do?key=404)
-- [충북PRIDE공유대학 College of Chungbuk PRIDE University System](https://www.cbnu.ac.kr/www/contents.do?key=403)
-- [예술학과군 Department of Art and Design](https://www.cbnu.ac.kr/www/contents.do?key=405)
-- [국제학부 School of International Studies](https://www.cbnu.ac.kr/www/contents.do?key=1329)
-- [일반대학원 Graduate School](https://www.cbnu.ac.kr/www/contents.do?key=408)
-- [법학전문대학원 Law School](https://www.cbnu.ac.kr/www/contents.do?key=410)
-- [교육대학원 Graduate School of Education](https://www.cbnu.ac.kr/www/contents.do?key=412)
-- [세종 국가정책대학원 Sejong Graduate School of National Policy](https://www.cbnu.ac.kr/www/contents.do?key=413)
-- [산업대학원 Graduate School of Industry](https://www.cbnu.ac.kr/www/contents.do?key=414)
-- [경영대학원 Graduate School of Business](https://www.cbnu.ac.kr/www/contents.do?key=415)
-- [법무대학원 Graduate School of Legal Affairs](https://www.cbnu.ac.kr/www/contents.do?key=416)
-- [수의방역대학원 Graduate School of Veterinary Biosecurity and Protection](https://www.cbnu.ac.kr/www/contents.do?key=417)
-- [북방농업대학원 Graduate School of Northern Agriculture](https://www.cbnu.ac.kr/www/contents.do?key=418)
-- [Gap-Zero 플랫폼](https://jobadream.cbnu.ac.kr/mento/index.do)
-- [공동실험실습관](https://gloria.cbnu.ac.kr/default.asp)
-- [연구 서식 자료실](https://www.cbnu.ac.kr/www/selectBbsNttList.do?bbsNo=3&key=432)
-- [연구윤리센터](https://www.cbnu.ac.kr/www/contents.do?key=720)
+상태: ✅ 정상 (공지 글 14건 감지 · 새 글 14)
+- [대학/대학원](https://www.cbnu.ac.kr/www/contents.do?key=391) — 2026-10-01
+- [홈페이지 가이드](https://www.cbnu.ac.kr/www/contents.do?key=668) — 2026-10-01
+- [함께하는 CBNU](https://www.cbnu.ac.kr/www/contents.do?key=527) — 2026-10-01
+- [2027학년도 전기 대학원(일반대학원) 신입생 모집요강 공지(안내)](https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170378&pageUnit=10&searchCnd=all&pageIndex=1) — 2026-10-01
+- [충북대학교 학칙 일부개정학칙(안) 행정예고 및 의견수렴](https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170369&pageUnit=10&searchCnd=all&pageIndex=1) — 2026-10-01
+- [학사] [2026년도 하반기 하나트래블로그 국제학생증 ISIC 체크카드 무료 발급 행사 안내](https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170355&pageUnit=10&searchCnd=all&pageIndex=1) — 2026-10-01
+- [채용] [충북대학교 창업지원단 기간제 계약직 채용 공고](https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170354&pageUnit=10&searchCnd=all&pageIndex=1) — 2026-10-01
+- [채용] [충북대학교 2027학년도 1학기(제91회) 전임교원 초빙 공고](https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170331&pageUnit=10&searchCnd=all&pageIndex=1) — 2026-10-01
+- [채용] [(2026-8차) 충북대학교 국제교류본부 대학회계 공무직(전문요원, 자체) 공개경쟁채용시험 공고](https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170300&pageUnit=10&searchCnd=all&pageIndex=1) — 2026-10-01
+- [채용] [충북대학교 국가공무원(농업9급) 전입(지방공무원 경력경쟁채용) 시험 공고](https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170293&pageUnit=10&searchCnd=all&pageIndex=1) — 2026-10-01
+- [채용] [충북대학교 오송역 홍보관 행정인턴 채용 공고](https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170288&pageUnit=10&searchCnd=all&pageIndex=1) — 2026-10-01
+- [처음 페이지](https://www.cbnu.ac.kr/www/selectBbsNttList.do?key=813&bbsNo=8&pageUnit=10&searchCnd=all&pageIndex=1) — 2026-10-01
+- [다음 페이지](https://www.cbnu.ac.kr/www/selectBbsNttList.do?key=813&bbsNo=8&pageUnit=10&searchCnd=all&pageIndex=2) — 2026-10-01
+- [다음 10 페이지](https://www.cbnu.ac.kr/www/selectBbsNttList.do?key=813&bbsNo=8&pageUnit=10&searchCnd=all&pageIndex=11) — 2026-10-01
 
 ### 부경대학교
-상태: ✅ 정상 (공지 글 122건 감지 · 새 글 30)
-- [' + item.mnuNm + '](https://www.pknu.ac.kr/main)
-- [' + item.mnuNm + '](https://www.pknu.ac.kr/main/)
-- [대학(학부)](https://www.pknu.ac.kr/main/23)
-- [인문사회과학대학](https://www.pknu.ac.kr/main/47)
-- [자연과학대학](https://www.pknu.ac.kr/main/61)
-- [수산과학대학](https://www.pknu.ac.kr/main/64)
-- [환경·해양대학](https://www.pknu.ac.kr/main/65)
-- [정보융합대학](https://www.pknu.ac.kr/main/378)
-- [AX혁신대학(2027. 3. 신설)](https://www.pknu.ac.kr/main/531)
-- [글로벌자율전공학부](https://www.pknu.ac.kr/main/60)
-- [미래융합학부](https://www.pknu.ac.kr/main/66)
-- [자유전공학부](https://www.pknu.ac.kr/main/463)
-- [글로벌혁신대학(2027. 3. 신설)](https://www.pknu.ac.kr/main/532)
-- [기술경영전문대학원](https://www.pknu.ac.kr/main/68)
-- [인문사회과학연구원](https://www.pknu.ac.kr/main/50)
-- [기초과학연구원](https://www.pknu.ac.kr/main/76)
-- [수산과학연구원](https://www.pknu.ac.kr/main/79)
-- [환경·해양과학기술연구원](https://www.pknu.ac.kr/main/80)
-- [정보융합연구원](https://www.pknu.ac.kr/main/425)
-- [공동실험실습관](https://www.pknu.ac.kr/main/81)
-- [연구비 수혜 현황](https://www.pknu.ac.kr/main/82)
-- [산학협력 추진 실적](https://www.pknu.ac.kr/main/83)
-- [PKNU Research 1000](https://www.pknu.ac.kr/main/32)
-- [학사] [학점인정안내](https://www.pknu.ac.kr/main/95)
-- [학사] [강의평가 및 성적확인](https://www.pknu.ac.kr/main/97)
-- [학·석사연계과정](https://www.pknu.ac.kr/main/98)
-- [대학생활 E-하나로](https://www.pknu.ac.kr/main/440)
-- [학적부기재사항정정](https://www.pknu.ac.kr/main/99)
-- [교직 및 평생교육사과정](https://www.pknu.ac.kr/main/100)
-- [교육과정 안내](https://www.pknu.ac.kr/main/106)
+상태: ✅ 정상 (공지 글 15건 감지 · 새 글 15)
+- [학사] [2026학년도 동계 계절수업 개설 희망과목 수요조사 안내](https://www.pknu.ac.kr/main/163?action=view&no=726492) — 2026-10-01
+- [10월 심리검사 일정(2026, 학생상담센터)](https://www.pknu.ac.kr/main/163?action=view&no=726442) — 2026-09-28
+- [★2026-2학기 재(복)학생 등록금 분할납부(3차) 안내★](https://www.pknu.ac.kr/main/163?action=view&no=726372) — 2026-09-17
+- [학사] [★2026-2학기 재(복)학생 등록금 납부 안내★](https://www.pknu.ac.kr/main/163?action=view&no=725625) — 2026-07-14
+- [[학생성공지원과] 2026년 온라인 취업지원 콘텐츠 취업토탈솔루션 이용 안내](https://www.pknu.ac.kr/main/163?action=view&no=725285) — 2026-06-22
+- [#### PKNU 취준생의 면접대비 실전연습 [모의면접] 안내(~'27.1월) ####](https://www.pknu.ac.kr/main/163?action=view&no=724647) — 2026-04-30
+- [학사] [[소프트웨어융합혁신원] 소프트웨어융합혁신원 인공지능·소프트웨어융합전공 설명회 개최 안내](https://www.pknu.ac.kr/main/163?action=view&no=726495) — 2026-10-01
+- [[26년 10월]개교 80주년 기념 대학 캐릭터(백경이&뿌공이) 디지털 캘린더 배포](https://www.pknu.ac.kr/main/163?action=view&no=726491) — 2026-10-01
+- [생활] [[보건진료소] 인바디 예약검사 안내-9회차](https://www.pknu.ac.kr/main/163?action=view&no=726487) — 2026-10-01
+- [2026년 10월 모의토익 시험 안내](https://www.pknu.ac.kr/main/163?action=view&no=726452) — 2026-09-30
+- [학사] [★2027-1학기 학부생 파견 해외복수학위 지원자 모집(가나자와대학)★](https://www.pknu.ac.kr/main/163?action=view&no=726449) — 2026-09-29
+- [♥ 비교과 교육과정 수요조사 ♥ 참여 안내](https://www.pknu.ac.kr/main/163?action=view&no=726445) — 2026-09-28
+- [채용] [[채용공고] 국립부경대학교 정보융합대학 미디어ICT공학전공 조교 채용 공고](https://www.pknu.ac.kr/main/163?action=view&no=726444) — 2026-09-28
+- [★ 2026학년도 글로벌 언어집중강좌(GLIP) 세션3 등록자 안내사항](https://www.pknu.ac.kr/main/163?action=view&no=726436) — 2026-09-23
+- [채용] [[채용공고] 국립부경대학교 앵커본부 계약직원(사무원) 채용 공고](https://www.pknu.ac.kr/main/163?action=view&no=726426) — 2026-09-23
 
 ### 강원대학교
-상태: ⛔ robots.txt 가 막아 둔 주소 — 읽지 않았습니다 (출처를 바꾸거나 보관하세요)
+상태: ✅ 정상 (공지 글 34건 감지 · 새 글 30)
+- [2026학년도 2학기 「현장체험 프로젝트 패키지(PREX)」 참여 팀 모집 공고](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11498&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-10-01
+- [생활] [학생 무료 건강검진 안내](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11497&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-10-01
+- [2026년 학생예비군 11.3. 기본훈련(3차) 안내](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11496&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-10-01
+- [2026년 『제대군인 주간』 홍보](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11492&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-09-30
+- [생활] [[정강희망프로젝트] 음악이 흐르는 화요도서관 참가 안내](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11488&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-09-30
+- [평생교육원 2026 산림기술자 전문교육 모집 안내](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11481&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-09-23
+- [2026학년도 2학기 학습클리닉 학생튜터 모집 연장 안내(~10.2.)](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11480&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-09-23
+- [2026학년도 스포츠산업 찾아가는 일자리센터 [찾아가는 취업토크쇼]](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11472&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-09-22
+- [춘천시 시내버스 일부노선 개편 안내](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11468&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-09-21
+- [행사] [2026학년도 KNU 교양교육 혁신포럼 개최](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11466&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-09-21
+- [[일반대학원 입학] 2027학년도 전기 강원대학교 춘천캠퍼스 일반대학원 신입생 모집](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11461&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-09-17
+- [[학군단] '26년 후반기 ROTC 학군사관 후보생 67·68기(1,2학년 대상) 모집 공고](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11460&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-09-17
+- [강원대학교 재학생 대상 무료 온라인 모의 토익/모의 토익스피킹/모의 오픽 시험 안내](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11458&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-09-17
+- [행사] [[강연] 영문학자가 본 "오디세이" 집으로 가는 여러가지 길](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11457&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-09-17
+- [2027학년도 교수·학습지원을 위한 학습 프로그램 요구조사 안내(기간연장)](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11449&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-09-15
+- [2027학년도 교수·학습지원을 위한 학습 프로그램 요구조사 안내(기간연장)](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11448&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-09-15
+- [2027학년도 교수·학습 지원을 위한 학습 프로그램 요구조사 안내(기간연장)](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11447&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-09-15
+- [(춘천) 2026년 하반기 학생예비군훈련 안내](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11445&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-09-15
+- [행사] [[2026-2학기] 「현장체험 프로젝트 패키지(PREX)」 사업설명회 자료 안내](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11436&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-09-14
+- [[과학영재교육원] 2027 영재교육대상자 모집 안내](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11428&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-09-11
+- [2026년 학생예비군 동원Ⅱ형훈련(이월) 안내](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11422&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-09-10
+- [생활] [2026학년도 2학기 학습클리닉(1:1 지도) 운영 안내](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11404&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-09-07
+- [[강원국제개발협력센터] KOICA 귀국인재 리크루터 4기 1:N 컨설팅](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11390&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-09-04
+- [행사] [[이벤트/비교과] 2026-3차 북큐레이션 기획전시회 및 서평 이벤트 안내](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11358&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-09-01
+- [[강릉,원주]2026학년도 2학기 분할납부 안내(2차납부)](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11351&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-09-01
+- [생활] [2026학년도 2학기 통학버스 운행노선 시간표 안내（삼척캠퍼스）](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11310&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-08-24
+- [[학군단]'26년 후반기 육군 학군사관후보생 67기 68기 선발계획 공고](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11309&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-08-21
+- [토익(TOEIC) 및 토익 스피킹(TOEIC Speaking) 응시료 할인 혜택 안내](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11217&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-07-14
+- [생활] [중앙도서관 리모델링에 따른 실별 이용제한 및 휴관 안내](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11204&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-07-09
+- [생활] ["도서관 스크린 속 예술의전당" 2026년 'SAC on MIRAE' 연간 상영 일정 안내](https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11017&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0) — 2026-05-18
 
 ---
 ⚙️ 설정: `collector/news-sources.json` · 발행: `data/news/<학교키>.json` · 로봇: `collector/collect-news.mjs` · 판정: `collector/news-kind.mjs`

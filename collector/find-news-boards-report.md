@@ -1,56 +1,113 @@
-## 🗞 교내 소식 게시판 찾기 (2026-10-01) — 게시판 아는 학교 42/44
+## 🗞 교내 소식 게시판 찾기 (2026-10-01) — 게시판 아는 학교 32/44
 
-### ✅ 이번에 찾은 게시판 42곳
-- **경희대학교** → https://www.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200316 (공지사항 · 검색 후보 · 글 76행 · 예: 「학교법인 경희학원」 「대학운영기조」 「부속기관/연구소/기타기관」)
-- **한국외국어대학교** → https://www.hufs.ac.kr/hufs/11281/subview.do (공지사항 · 검색 후보 · 글 172행 · 예: 「MyPage」 「이사회 회의록」 「이사회 개최」)
-- **서울대학교** → https://www.snu.ac.kr/snunow/notice/genernal (일반공지 · 검색 후보 · 글 52행 · 예: 「비교과프로그램」 「국제교육프로그램」 「외국어교육프로그램」)
-- **연세대학교** → https://www.yonsei.ac.kr/sc/254/subview.do (공지사항 · 검색 후보 · 글 81행 · 예: 「ENG website (for foreigners).」 「140주년 기념백서」 「건학정신,연세이념」)
-- **연세대학교 미래캠퍼스** → https://www.yonsei.ac.kr/wj/1415/subview.do (공지사항 · 검색 후보 · 글 71행 · 예: 「ENG website (for foreigners).」 「신촌·국제캠퍼스」 「중장기 발전계획」)
-- **고려대학교** → https://www.korea.ac.kr/ko/566/subview.do (일반공지 · 검색 후보 · 글 74행 · 예: 「성평등계획(KU GEP)」 「Speeches」 「단과대학/대학원 상징」)
-- **고려대학교 세종캠퍼스** → https://sejong.korea.ac.kr/koreaSejong/7913/subview.do (일반공지 · 검색 후보 · 글 86행 · 예: 「Vision」 「KUS Impact」 「캠퍼스변천사」)
-- **성균관대학교** → https://www.skku.edu/skku/campus/skk_comm/notice01.do (공지사항 · 검색 후보 · 글 138행 · 예: 「KingoGPT」 「VISION 2030+」 「1 학생성공 교육」)
-- **한양대학교** → https://www.hanyang.ac.kr/web/www/notice_all (공지사항 · 검색 후보 · 글 190행 · 예: 「English website」 「상징과 UI」 「동문/발전기금」)
-- **중앙대학교** → https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100 (공지사항 · 검색 후보 · 글 138행 · 예: 「CAU 중앙대학교 CHUNG-ANG UNIVERSITY」 「역대 이사장」 「CAU2030+」)
-- **건국대학교** → https://www.konkuk.ac.kr/konkuk/2238/subview.do (학사공지 · 검색 후보 · 글 140행 · 예: 「MyPage」 「KU Portal」 「KU 행정정보시스템」)
-- **동국대학교** → https://www.dongguk.edu/article/GENERALNOTICES/list (일반공지 · 검색 후보 · 글 65행 · 예: 「' + v. + '」 「디지털 역사관 홈페이지 바로가기」 「# 수강신청」)
-- **동국대학교 WISE캠퍼스** → https://wise.dongguk.ac.kr/article/generalnotice/list (일반공지 · 검색 후보 · 글 26행 · 예: 「PORTAL」 「nDRIMS」 「E-CLASS」)
-- **홍익대학교** → https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=list (공지사항 · 검색 후보 · 글 71행 · 예: 「MY HONGIK」 「대학학사안내」 「대학원학사안내」)
-- **숙명여자대학교** → https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=list (공지사항 · 검색 후보 · 글 60행 · 예: 「숙명 창학 120주년」 「역대총장소개」 「인재상 및 핵심역량」)
-- **광운대학교** → https://www.kw.ac.kr/ko/life/notice.jsp (공지사항 · 검색 후보 · 글 227행 · 예: 「KLAS 종합정보서비스」 「WEB-MAIL」 「SITEMAP」)
-- **명지대학교** → https://www.mju.ac.kr/mjukr/255/subview.do (일반공지 · 검색 후보 · 글 147행 · 예: 「CHINESE」 「2020~현재」 「2010~2019」)
-- **상명대학교** → https://www.smu.ac.kr/kor/life/notice.do (공지사항 · 검색 후보 · 글 49행 · 예: 「상명 2027」 「교가 및 학원가」 「일반현황 및 주요지표」)
-- **가천대학교** → https://www.gachon.ac.kr/kor/7986/subview.do (공지사항 · 검색 후보 · 글 132행 · 예: 「2027년 전자자료 구독을 위한 설문조사 실시 ○ 조사 기간 : 10월14일(수)까지」 「가천대학교 교직원 사칭 허위구매 사기피해 예방 안내 ※ 명함, 신분증, 공문서 위조로 허위계약·구매·배송 유도, 반드시 확인하세요」 「2026-2학기 등록금 고지서 출력 바로가기 2026-2학기 등록금 고지서 출력하시어 등록금 납부하여 주시기 바랍니다.」)
-- **아주대학교** → https://www.ajou.ac.kr/kr/ajou/notice.do (공지사항 · 검색 후보 · 글 70행 · 예: 「PORTAL」 「CHINESE」 「교육목표/인재상」)
-- **국민대학교** → https://www.kookmin.ac.kr/user/kmuNews/notice/1/index.do (공지사항 · 검색 후보 · 글 155행 · 예: 「Make the Rule, Break the Rule」 「교육이념ㆍ비전」 「인재상 및 교육목표」)
-- **숭실대학교** → https://scatch.ssu.ac.kr/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/ (공지사항 · 검색 후보 · 글 25행 · 예: 「u-SAINT」 「SSU:catch」 「언론 속 숭실」)
-- **세종대학교** → https://www.sejong.ac.kr/kor/intro/notice1.do?mode=list (일반공지 · 검색 후보 · 글 178행 · 예: 「세종대학교 애지헌복합관 신축공사 안내」 「세종상징ㆍ역사」 「이사회 회의록」)
-- **이화여자대학교** → https://www.ewha.ac.kr/ewha/news/notice.do (공지사항 · 검색 후보 · 글 125행 · 예: 「CHINESE」 「학교법인 이화학당」 「산하 교육기관」)
+### ✅ 이번에 찾은 게시판 32곳
+- **한국외국어대학교** → https://www.hufs.ac.kr/hufs/11281/subview.do (공지사항 · 검색 후보 · 글 12행 · 예: 「RSS 2.0」 「2026학년도 서울캠퍼스 재학생 대상 법정의무교육 이수 안내」 「2027학년도 전기 글로벌미디어커뮤니케이션대학원 신입생 모집(특별/일반)」)
+- **서울대학교** → https://www.snu.ac.kr/snunow/notice/genernal (일반공지 · 검색 후보 · 글 6행 · 예: 「2027년 서울대 대학원생 전기 SSBT 장학생 모집(~ 2026.09.27.) 첨부파일 있음」 「서울대학교 「최고경영자과정 AMP USA」 2027년 1월 개강 잠정 보류」 「개인정보 처리방침 개정 고지(2026년 8월 20일자) 첨부파일 있음」)
+- **연세대학교** → https://www.yonsei.ac.kr/sc/254/subview.do (공지사항 · 검색 후보 · 글 15행 · 예: 「RSS 2.0」 「일반공지 10/2(금) 교외장학재단 제출용 총장 직인 날인 불가 안내 신촌/국제」 「일반공지 2026학년도 2학기 학부 수강과목 철회 안내 신촌/국제」)
+- **연세대학교 미래캠퍼스** → https://www.yonsei.ac.kr/wj/1415/subview.do (공지사항 · 검색 후보 · 글 25행 · 예: 「RSS 2.0」 「일반공지 2026년도 후반기 육군 학군사관 후보생 67,68기 모집안내 신촌/국제」 「일반공지 2027학년도 1학기 재입학(일반, 특별) 전형 요강(미래캠퍼스) 신촌/국제」)
+- **고려대학교 세종캠퍼스** → https://sejong.korea.ac.kr/koreaSejong/7913/subview.do (일반공지 · 검색 후보 · 글 6행 · 예: 「RSS 2.0」 「[공지] 고려대학교 세종캠퍼스 구매 담당자 사칭 피싱(사기) 피해 주의 안내」 「[세종] 휘트니스센터 10월 종일 회원권 2차 온라인 접수 안내」)
+- **건국대학교** → https://www.konkuk.ac.kr/konkuk/2238/subview.do (학사공지 · 검색 후보 · 글 39행 · 예: 「2027년 3월 1일자 교수채용」 「2026년 9월 1일자 교수채용」 「2026년 9월 1일자 강사 2차」)
+- **홍익대학교** → https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=list (공지사항 · 검색 후보 · 글 10행 · 예: 「[제26-41호] 세종캠퍼스 26-1차 교육환경개선 전산관리팀 컴퓨터 80대 구입」 「[제26-40호] 세종캠퍼스 26-1차 교육환경개선 게임그래픽디자인전공 태블릿컴퓨터 27대 구입」 「[제26-39호] 세종캠퍼스 26-1차 교육환경개선 교양교육원 컴퓨터 22대 구입」)
+- **숙명여자대학교** → https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=list (공지사항 · 검색 후보 · 글 11행 · 예: 「[졸업] 2026-2 (2027년 2월) 주요 졸업 일정 안내(8학기 이상 재학생 필독)」 「2027학년도 전기 일반대학원 신·편입생 모집 안내」 「[학부] 2026-2 중간시험 시행 안내」)
+- **광운대학교** → https://www.kw.ac.kr/ko/life/notice.jsp (공지사항 · 검색 후보 · 글 57행 · 예: 「[일반] [HUSS-글로벌공생] 글로벌지속가능융합학과 2026 전공설명회 신청 안내」 「[일반] [HUSS-글로벌공생] 2026 인문사회 학생을 위한 AI 인사이트 특강 안내」 「[일반] [HUSS-글로벌공생] 2026학년도 「HUSS 인문사회 취업 페스티벌」 안내」)
+- **명지대학교** → https://www.mju.ac.kr/mjukr/255/subview.do (일반공지 · 검색 후보 · 글 34행 · 예: 「개인정보처리 방침(시행일자 : 2026.03.13)」 「개인정보처리 방침(시행일자 : 2025.07.16)」 「개인정보처리 방침(시행일자 : 2025.05.16)」)
+- **가천대학교** → https://www.gachon.ac.kr/kor/3104/subview.do (학사공지 · 검색 후보 · 글 12행 · 예: 「RSS 2.0」 「2026학년도 동계 계절학기 예비수강신청 및 일정 안내」 「2026-2학기 휴학 및 휴학연장 안내」)
+- **아주대학교** → https://www.ajou.ac.kr/kr/ajou/notice.do (공지사항 · 검색 후보 · 글 15행 · 예: 「[공지] [학부] 어학졸업인증(2027년 2월 졸업)을 위한 공인어학 성적 등록 및 제출 안내 (~2027.1.22)」 「[공지] [학군단]26년도 후반기 학군사관 ROTC 후보생 67,68기 모집안내(8.31~10.13)」 「[공지] [학부/학사과정] ★필독★ 출석(전자출결, 공결, 취업계 등) 관련 안내」)
+- **국민대학교** → https://www.kookmin.ac.kr/user/kmuNews/notice/4/index.do (학사공지 · 검색 후보 · 글 15행 · 예: 「[현장실습지원센터] 2026학년도 동계 한국항공우주산업(KAI) 현장실습 기계공학부 학생 모집(~10/15) 2026.10.01 현장실습지원센터 장지수」 「2026학년도 2학기 학부 중간시험 보조감독 모집 2026.09.23 교무팀 김선아」 「[교수학습개발센터] 기초학습(수학,물리,화학,생명) 역량 강화 동영상 특강 안내 2026.09.10 교수학습개발센터 강현주」)
+- **숭실대학교** → https://scatch.ssu.ac.kr/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/ (공지사항 · 검색 후보 · 글 15행 · 예: 「장학 2026년 우양재단 동행 장학생 모집 안내(~10.18.일)」 「국제교류 [겨울 단기] 미국 Temple University American Culture at Temple (ACT) Winter 2027 참가자 모집 안내」 「장학 [한국장학재단] 희망사다리Ⅰ유형 장학생 대상 대전 일자리박람회 안내」)
+- **세종대학교** → https://www.sejong.ac.kr/kor/intro/notice1.do?mode=list (일반공지 · 검색 후보 · 글 16행 · 예: 「학술정보원 이용자 만족도 조사」 「세종대학교 애지헌복합관 신축공사 안내」 「2027-1학기 교수초빙(9월공고_정년제 전임교원) 안내」)
+- **이화여자대학교** → https://www.ewha.ac.kr/ewha/news/notice.do (공지사항 · 검색 후보 · 글 17행 · 예: 「[학부] 2026학년도 제2학기 영어 및 정보인증제 신청 안내」 「[학부] 2027학년도 제1학기 학부 재입학, 학부 졸업논문등제출자격재부여 신청안내」 「2027학년도 전기 일반대학원 입학전형 원서접수 안내」)
 - **인하대학교** → https://www.inha.ac.kr/bbs/kr/8/artclList.do (공지사항 · 검색 후보 · 글 19행 · 예: 「[IPP] 2027년도 상반기 일학습병행 학생 모집 기업 초청 설명회 사전 신청 안내」 「[대학일자리플러스센터] 'SK하이닉스+삼성전자 면접대비 특강' 모집중!」 「[대학혁신지원사업] "나도 학생 강사" : 학생 주도 학습 프로그램(SDC) 강사 모집」)
-- **부산대학교** → https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095 (공지사항 · 검색 후보 · 글 129행 · 예: 「대학/대학원」 「사회과학대학」 「자연과학대학」)
-- **가톨릭대학교** → https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=list (공지사항 · 검색 후보 · 글 180행 · 예: 「사이버캠퍼스」 「가톨릭교육브랜드」 「CUK SDGs」)
-- **한국항공대학교** → https://kau.ac.kr/kaulife/notice.php (일반공지 · 검색 후보 · 글 87행 · 예: 「2027학년도 1학기 전임교원 채용 모집대상 : 정년 및 비정년트랙 / 접수기간 : 2026.10.15.(목) 13:30까지」 「동계 어학연수 (Advanced Language Program)모집 안내 자세히 보기」 「초지능 AI의 위협과 ‘유엔 AI 허브’ 구상 총장메시지-82」)
-- **경기대학교** → https://www.kyonggi.ac.kr/www/selectBbsNttList.do?key=7520&bbsNo=1073 (공지사항 · 검색 후보 · 글 66행 · 예: 「Language」 「경기비전 2036」 「세부실행과제」)
-- **서울과학기술대학교** → https://www.seoultech.ac.kr/service/info/notice/ (공지사항 · 검색 후보 · 글 81행 · 예: 「서울과기대 소개」 「캠퍼스 안내」 「학칙 및 규정」)
-- **계명대학교** → https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=143 (일반공지 · 검색 후보 · 글 137행 · 예: 「교육희년기념」 「대학자체평가」 「대학평의원회」)
-- **서울교육대학교** → https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=1309&bbsId=1082 (공지사항 · 검색 후보 · 글 49행 · 예: 「MY-PORTAL」 「수강신청 및 재이수」 「교원자격무시험검정」)
+- **부산대학교** → https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095 (공지사항 · 검색 후보 · 글 26행 · 예: 「메인으로 이동」 「대학/대학원」 「개교80주년」)
+- **가톨릭대학교** → https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=list (공지사항 · 검색 후보 · 글 13행 · 예: 「[학부대학운영팀] 제18차 사랑의 연탄나눔 봉사자 모집 안내」 「[교수학습개발원] 2026학년도 AI활용 세미나 4차 ‘에이전틱 AI시대, 대학 교수 업무 방식 패러다임 변화’ 신청 안내」 「[대외협력팀] 발전기금 홍보대사 <가대사랑> 16기 모집(~10/5(월)까지 연장)」)
+- **한국항공대학교** → https://kau.ac.kr/kaulife/notice.php (일반공지 · 검색 후보 · 글 22행 · 예: 「2027학년도 1학기 전임교원 채용 모집대상 : 정년 및 비정년트랙 / 접수기간 : 2026.10.15.(목) 13:30까지」 「제 36기 미래에셋 해외교환 장학생 선발 안내 2026.09.01.(화)~2026.10.06.(화)」 「test 관리자1 2026-10-01 0」)
+- **경기대학교** → https://www.kyonggi.ac.kr/www/selectBbsNttList.do?key=7520&bbsNo=1073 (공지사항 · 검색 후보 · 글 15행 · 예: 「[공학교육혁신센터]2023년도 2학기 소망가방 및 수강신청 관련 안내」 「[입학에서 취업까지] [정치외교학전공] 몽골 관광인력 역량강화 프로젝트 봉사단 9기 모집」 「[입학에서 취업까지] (수학과) 2026학년도 사회봉사 장학금 신청 안내」)
+- **서울과학기술대학교** → https://www.seoultech.ac.kr/service/info/notice/ (공지사항 · 검색 후보 · 글 20행 · 예: 「[국제교류처] 2026학년도 제4회 모의 TOEIC Speaking, OPIc 시험접수 안내(2026. 10. 24. 시행)」 「[국제교류처] 2026학년도 제7회 모의 TOEIC 시험접수 안내(2026. 10. 24. 시행)」 「[국제교류처] 2026학년도 제10회 SeoulTech 한국어말하기대회 개최 안내(참가 신청자 모집, ~2026.10.14.)」)
+- **계명대학교** → https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=143 (일반공지 · 검색 후보 · 글 16행 · 예: 「개인정보처리방침_2018. 04. 30. ~ 2018. 12. 20.」 「개인정보처리방침_2018. 12. 21. ~ 2019. 2. 28.」 「개인정보처리방침_2019. 03. 1. ~ 2019. 4. 30.」)
 - **한국방송통신대학교** → https://www.knou.ac.kr/bbs/knou/51/artclList.do (공지사항 · 검색 후보 · 글 13행 · 예: 「[일반] [국립대학 육성사업] 3주만에 끝내는 AI 취업 치트키 특강」 「[전공] 2027학년도 1학기 생활과학부 전공분리 승인 안내」 「[시험성적] 2026학년도 2학기 출석수업대체과제물 시행공고」)
-- **경북대학교** → https://www.knu.ac.kr/wbbs/wbbs/contents/index.action?menu_url=board/community02&menu_idx=80 (대학생활/취업 · 홈 메뉴 · 글 108행 · 예: 「대학생활/취업」 「등교 및 셔틀버스 운행」 「로고 및 UI」)
-- **영남대학교** → https://www.yu.ac.kr/main/bachelor/bachelor-guide.do (학사공지 · 검색 후보 · 글 220행 · 예: 「ENG website」 「총장 프로필」 「연설 및 기고문」)
-- **전북대학교** → https://www.jbnu.ac.kr/web/news/notice/sub01.do (공지사항 · 검색 후보 · 글 140행 · 예: 「Global Top-Tier JBNU 2030」 「글로컬대학30 VISION」 「교육연구 학생지도비」)
-- **충남대학교** → https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0701&site_dvs_cd=kr&menu_dvs_cd=0701 (공지사항 · 검색 후보 · 글 147행 · 예: 「충남대학교 로고」 「교육연구현황」 「교기·교시·교가」)
-- **전남대학교** → https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5 (공지사항 · 검색 후보 · 글 145행 · 예: 「원클릭서비스」 「캠퍼스투어신청」 「시설물바로고치미」)
-- **조선대학교** → https://www3.chosun.ac.kr/chosun/217/subview.do (일반공지 · 검색 후보 · 글 204행 · 예: 「역대총장 -->」 「총장에게 바란다 -->」 「역사와비전 -->」)
-- **충북대학교** → https://www.cbnu.ac.kr/www/selectBbsNttList.do?bbsNo=8&key=813 (공지사항 · 검색 후보 · 글 198행 · 예: 「대학/대학원」 「사회과학대학 College of Social Sciences」 「자연과학대학 College of Natural Sciences」)
-- **부경대학교** → https://www.pknu.ac.kr/main/163 (공지사항 · 검색 후보 · 글 132행 · 예: 「' + item.mnuNm + '」 「' + item.mnuNm + '」 「대학(학부)」)
-- **강원대학교** → https://www.kangwon.ac.kr/ko/bbs/504/list.do (공지사항 · 검색 후보 · 글 166행 · 예: 「GLOBAL」 「교훈/교기/교가」 「연설문 및 인터뷰」)
+- **경북대학교** → https://www.knu.ac.kr/wbbs/wbbs/main/main.action (정부재정지원사업 · 홈 메뉴 · 글 5행 · 예: 「포토뉴스 대현119안전센터와 교내 어린이집에서 합동소방훈련 실시 경북대는 9월 30일 교내 어린이집에서 교직원과 원아, 대현119안전센터 소방관 등 300여명이 참여한 가운데 2026년도 합동소방훈련을 실시했다. 2026-10-01」 「포토뉴스 수의과대학 김규태 교수, 제자 위해 발전기금 1천만원 전달 수의과대학 김규태 교수가 제자들을 위해 써달라며 발전기금 1천만원을 경북대에 전달했다. 2026-10-01」 「포토뉴스 교육부 글로컬랩 2개 연구소 선정… 9년간 총 사업비 377억원 확보 교육부와 한국연구재단이 추진하는 ‘글로컬랩(거점형) 사업’에 지능형건설자동화연구센터와 세포·기질연구소가 각각 최종 선정됐다. 2026-09-29」)
+- **영남대학교** → https://www.yu.ac.kr/main/bachelor/bachelor-guide.do (학사공지 · 검색 후보 · 글 9행 · 예: 「9 2026학년도 2학기 중간시험 실시 및 부정행위자 처리 기준 안내」 「8 2026학년도 2학기 교양, 교직, 일반선택 중간시험 시간표 안내(주간, 야간)」 「7 2026학년도 전기(27년2월) 조기졸업 신청 안내」)
+- **충남대학교** → https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0701&site_dvs_cd=kr&menu_dvs_cd=0701 (공지사항 · 검색 후보 · 글 9행 · 예: 「대표홈페이지 일부 게시판 폐쇄 안내(대학문화마당, CNU장터, 구인구직, 분실물 광장, 스터디 및 공모전)」 「[RISE] 2026 All-set 기업지원 사업 시행 공고」 「2026학년도 2학기 학생생활관 보결 3차 모집 안내」)
+- **전남대학교** → https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5 (공지사항 · 검색 후보 · 글 20행 · 예: 「[학사안내] 2026학년도 제2학기 최종 등록 공고」 「[학사안내] 2026학년도 2학기 교과구분 정정 실시 안내」 「[공모전] 『2026 English Essay Contest』개최 안내」)
+- **조선대학교** → https://www3.chosun.ac.kr/chosun/217/subview.do (일반공지 · 검색 후보 · 글 14행 · 예: 「[G-LAMP사업단] 2026 하반기 블루밍 라운지(Blooming Rounge) 참여교원 모집공고」 「[G-LAMP사업단] 2026 LAMP 전임교원 선발공고」 「YBM 한국토익위원회 주관 본교 특별 TOEIC 시험 실시 안내(10. 24.(토))」)
+- **충북대학교** → https://www.cbnu.ac.kr/www/selectBbsNttList.do?bbsNo=8&key=813 (공지사항 · 검색 후보 · 글 16행 · 예: 「대학/대학원」 「홈페이지 가이드」 「함께하는 CBNU」)
+- **부경대학교** → https://www.pknu.ac.kr/main/163 (공지사항 · 검색 후보 · 글 20행 · 예: 「2026학년도 동계 계절수업 개설 희망과목 수요조사 안내」 「노션 × AI를 활용한 실전 특강 안내(11/4~11/6 13시~17시)」 「10월 심리검사 일정(2026, 학생상담센터)」)
+- **강원대학교** → https://www.kangwon.ac.kr/ko/bbs/504/list.do (공지사항 · 검색 후보 · 글 54행 · 예: 「2026학년도 2학기 「현장체험 프로젝트 패키지(PREX)」 참여 팀 모집 공고」 「학생 무료 건강검진 안내」 「2026년 학생예비군 11.3. 기본훈련(3차) 안내」)
 
-### 🙋 개발자에게 출처를 요청할 학교 2곳 — 후보와 홈 메뉴를 다 열어 봤지만 공지 글 목록(5행 이상)을 못 찾았습니다
+### 🙋 개발자에게 출처를 요청할 학교 12곳 — 후보와 홈 메뉴를 다 열어 봤지만 날짜가 붙은 공지 글 줄(5행 이상)을 못 찾았습니다
+- **경희대학교**
+  - https://www.khu.ac.kr/kor/notice/list.do?page=1&condition=all&category=GENERAL — HTTP 404
+  - https://www.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200316 — 열림 · 글처럼 보이는 행 0
+  - https://www.khu.ac.kr/kor/main/index.do — HTTP 404
+- **고려대학교**
+  - https://www.korea.ac.kr/ko/566/subview.do — 열림 · 글처럼 보이는 행 0
+  - https://www.korea.ac.kr/ko/567/subview.do — 열림 · 글처럼 보이는 행 0
+  - https://www.korea.ac.kr/ko/461/subview.do — 열림 · 글처럼 보이는 행 0
+  - https://registrar.korea.ac.kr/eduinfo/board/contact_under.do — 열림 · 글처럼 보이는 행 0
 - **서강대학교**
   - https://www.sogang.ac.kr/ko/announcement — TypeError: UNABLE_TO_VERIFY_LEAF_SIGNATURE
   - https://www.sogang.ac.kr/ko/campus/student-support/notice — TypeError: UNABLE_TO_VERIFY_LEAF_SIGNATURE
   - https://www.sogang.ac.kr/ko/home — TypeError: UNABLE_TO_VERIFY_LEAF_SIGNATURE
+- **성균관대학교**
+  - https://www.skku.edu/skku/campus/skk_comm/notice01.do — 열림 · 글처럼 보이는 행 0
+  - https://www.skku.edu/skku/campus/skk_comm/notice02.do — 열림 · 글처럼 보이는 행 0
+  - https://www.skku.edu/skku/campus/skk_comm/skku_history_notice.do — 열림 · 글처럼 보이는 행 0
+  - https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=139864 — 열림 · 글처럼 보이는 행 0
+  - https://www.skku.edu/skku/edu/bachelor/ca_de_schedule01.do — 열림 · 글처럼 보이는 행 0
+  - https://www.skku.edu/skku/campus/skk_comm/news02.do — 열림 · 글처럼 보이는 행 0
+  - https://www.skku.edu/skku/campus/skk_comm/news.do — 열림 · 글처럼 보이는 행 0
+  - https://www.skku.edu/skku/about/organ/admin_organ_02.do — 열림 · 글처럼 보이는 행 0
+- **한양대학교**
+  - https://www.hanyang.ac.kr/web/www/notice_all — 열림 · 글처럼 보이는 행 0
+  - https://www.hanyang.ac.kr/notice/url/4a4/1d332 — 열림 · 글처럼 보이는 행 0
+  - https://www.hanyang.ac.kr/notice/url/4a4/1b3f1 — 열림 · 글처럼 보이는 행 0
+  - https://www.hanyang.ac.kr/notice_all?p_p_id=kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet&p_p_lifecycle=0&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_action=view_message&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_entryId=112503&redirect=%2Fhome — 열림 · 글처럼 보이는 행 0
+  - http://hyfund.hanyang.ac.kr/story/newsletter.php — 열림 · 글처럼 보이는 행 0
+  - https://www.hanyang.ac.kr/bbsseoul — 열림 · 글처럼 보이는 행 0
+  - https://www.hanyang.ac.kr/bbserica — 열림 · 글처럼 보이는 행 0
+- **중앙대학교**
+  - https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100 — 열림 · 글처럼 보이는 행 0
+  - https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100 — 열림 · 글처럼 보이는 행 0
+  - http://news.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=10 — 열림 · 글처럼 보이는 행 0
+  - https://news.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100 — 열림 · 글처럼 보이는 행 0
+  - https://news.cau.ac.kr/ — 열림 · 글처럼 보이는 행 0
+  - https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=29848&pageNo=1&P_TAB_NO=1 — 열림 · 글처럼 보이는 행 4
+  - https://mportal.cau.ac.kr/std/pis/sPisApp001/index.do — 열림 · 글처럼 보이는 행 0
 - **서울시립대학교**
   - https://www.uos.ac.kr/korNotice/list.do?list_id=FA1 — 열림 · 글처럼 보이는 행 0
   - https://www.uos.ac.kr/korNotice/list.do?list_id=FA2 — 열림 · 글처럼 보이는 행 0
+- **동국대학교**
+  - https://www.dongguk.edu/article/GENERALNOTICES/list — 열림 · 글처럼 보이는 행 0
+  - https://www.dongguk.edu/article/HAKSANOTICE/list — 열림 · 글처럼 보이는 행 0
+  - https://www.dongguk.edu/article/GENERALNOTICES/list — 열림 · 글처럼 보이는 행 0
+  - https://www.dongguk.edu/article/HAKSANOTICE/list — 열림 · 글처럼 보이는 행 0
+  - https://www.dongguk.edu/article/HAKSANOTICE/detail/26766252 — 열림 · 글처럼 보이는 행 0
+  - https://www.dongguk.edu/article/GENERALNOTICES/detail/26763074 — 열림 · 글처럼 보이는 행 1
+  - https://www.dongguk.edu/article/GENERALNOTICES/detail/26765901 — 열림 · 글처럼 보이는 행 0
+  - https://www.dongguk.edu/article/GENERALNOTICES/detail/26766449 — 열림 · 글처럼 보이는 행 0
+- **동국대학교 WISE캠퍼스**
+  - https://wise.dongguk.ac.kr/article/generalnotice/list — 열림 · 글처럼 보이는 행 0
+  - https://wise.dongguk.ac.kr/article/acdnotice/list — 열림 · 글처럼 보이는 행 0
+  - https://wise.dongguk.ac.kr/article/generalnotice/detail/520707 — 열림 · 글처럼 보이는 행 0
+  - https://wise.dongguk.ac.kr/article/generalnotice/detail/520699 — 열림 · 글처럼 보이는 행 0
+  - https://wise.dongguk.ac.kr/article/generalnotice/detail/520695 — 열림 · 글처럼 보이는 행 0
+  - https://wise.dongguk.ac.kr/article/generalnotice/detail/520687 — 열림 · 글처럼 보이는 행 0
+  - https://wise.dongguk.ac.kr/article/generalnotice/detail/520686 — 열림 · 글처럼 보이는 행 0
+  - https://wise.dongguk.ac.kr/article/generalnotice/detail/520677 — 열림 · 글처럼 보이는 행 0
+- **상명대학교**
+  - https://www.smu.ac.kr/kor/life/notice.do — 열림 · 글처럼 보이는 행 0
+  - https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=769217 — 열림 · 글처럼 보이는 행 0
+  - https://www.smu.ac.kr/kor/life/onlineGuide.do — 열림 · 글처럼 보이는 행 0
+  - https://www.smu.ac.kr/kor/life/academicCalendar.do?mode=view&articleNo=766722&boardNo=85 — 열림 · 글처럼 보이는 행 0
+  - https://www.smu.ac.kr/webzine/today.do — 열림 · 글처럼 보이는 행 0
+  - https://www.smu.ac.kr/board/policy/cctv.do — 열림 · 글처럼 보이는 행 0
+  - https://www.smu.ac.kr/board/policy/email.do — 열림 · 글처럼 보이는 행 0
+- **서울교육대학교**
+  - https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=1309&bbsId=1082 — 열림 · 글처럼 보이는 행 0
+  - https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=1280&bbsId=1081 — 열림 · 글처럼 보이는 행 0
+- **전북대학교**
+  - https://www.jbnu.ac.kr/web/news/notice/sub01.do — 열림 · 글처럼 보이는 행 0
+  - https://www.jbnu.ac.kr/web/news/notice/sub02.do — TypeError: UND_ERR_CONNECT_TIMEOUT
+  - https://www.jbnu.ac.kr/web/index.do — TypeError: UND_ERR_CONNECT_TIMEOUT
 
 > 목록이 스크립트로만 그려지는 게시판(SPA·클릭형)은 이 로봇이 못 읽습니다 — 그런 학교는 `collector/collect-news.mjs` 의 `NEWS_BOARD_RULES` 에 규칙(json·dataId·onclick)이 필요합니다. 학생이 보는 공지 목록 주소를 알려 주시면 그 자리에 적습니다.
