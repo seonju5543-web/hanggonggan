@@ -7695,6 +7695,8 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
       && h2.indexOf('id="hero-tiles"') < h2.indexOf('id="btn-apply-all"'), true);
     eq('  .hero-tiles 가 세로 여백을 갖는다 (파일 끝 블록에서)',
       /\.hero-tiles \{[^}]*margin: var\(--sp-3\)/.test(tail), true);
+    eq('  그림 칸 위아래에 구분선이 없다 (2026-10-01 CTO 지시)',
+      /\.hero-tiles \{[^}]*border/.test(tail), false);
   }
 
   /* 🔴 홈 히어로 그림 4칸 (2026-10-01 CTO 결정 · 시안 I4). */

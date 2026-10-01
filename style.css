@@ -4825,10 +4825,8 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 .hero-tiles {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  margin: var(--sp-3) 0 var(--sp-2);
-  padding: var(--sp-2) 0;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  margin: var(--sp-3) 0 var(--sp-3);
+  /* 위아래 구분선 없음 (2026-10-01 CTO 지시) — 칸 사이는 여백만으로 가른다 */
 }
 .hero-tile {
   display: flex;
