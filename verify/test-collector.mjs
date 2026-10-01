@@ -7687,8 +7687,33 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
        style.css 는 뒤 블록이 앞을 덮으므로 파일 끝 '히어로' 절에 있어야 먹는다. */
     const css = readText(new URL('../style.css', import.meta.url));
     const tail = css.slice(css.lastIndexOf('홈 히어로 (2026-09-17'));
-    eq('  금액 아래 여백을 .hero-amount 가 물려받는다 (파일 끝 블록에서)',
-      /\.hero-amount \{ margin-bottom: 20px; \}/.test(tail), true);
+    /* 🔴 2026-10-01 CTO 결정(시안 I4)으로 금액 아래에 한 줄(#hero-sub)이 다시 생겼다 — 그래서
+       금액 자신의 아래 여백은 다시 좁아지고, 간격은 그 줄과 그림 칸이 만든다. 지키는 것은 같다:
+       금액과 버튼이 붙지 않는다. */
+    eq('  금액 바로 아래에 한 줄(#hero-sub)과 그림 칸(#hero-tiles)이 있다 — 금액과 버튼이 붙지 않는다',
+      /id="hero-sub"/.test(h2) && /id="hero-tiles"/.test(h2)
+      && h2.indexOf('id="hero-tiles"') < h2.indexOf('id="btn-apply-all"'), true);
+    eq('  .hero-tiles 가 세로 여백을 갖는다 (파일 끝 블록에서)',
+      /\.hero-tiles \{[^}]*margin: var\(--sp-3\)/.test(tail), true);
+  }
+
+  /* 🔴 홈 히어로 그림 4칸 (2026-10-01 CTO 결정 · 시안 I4). */
+  {
+    const tiles = appSrc2.slice(appSrc2.indexOf('const HERO_TILES = ['), appSrc2.indexOf('];', appSrc2.indexOf('const HERO_TILES = [')));
+    const gos = [...tiles.matchAll(/go: '([^']+)'/g)].map((m) => m[1]);
+    eq('히어로 그림 칸은 넷 — 마감 임박 · 교내 · 교외 · 신청 내역', gos, ['deadline', '교내', '교외', 'applications']);
+    eq('  그림은 SVG 다 (이모지 아님 — 폰마다 그림이 달라지지 않게)',
+      (tiles.match(/svg: '<svg /g) || []).length, 4);
+    /* 지구본 = 원 + 가로 적도선 + 경선 두 곡선. 교외 칸은 CTO 지시로 지구가 아니라 재단 건물이다 */
+    const outer = tiles.slice(tiles.indexOf("go: '교외'"), tiles.indexOf("go: 'applications'"));
+    eq("  교외 칸은 지구 그림이 아니다 (CTO 지시 — 재단 건물)",
+      /<circle[^>]*r="(8\.5|9|10)"/.test(outer) || /globe/i.test(outer), false);
+    const home = appSrc2.slice(appSrc2.indexOf('function renderHome('), appSrc2.indexOf('function renderExplore('));
+    eq('  칸 숫자는 히어로 금액과 같은 applyable 하나에서 센다 (판정을 새로 만들지 않는다)',
+      /deadline: soon/.test(home) && /'교내': applyable\.filter/.test(home) && /'교외': applyable\.filter/.test(home)
+      && /const soon = applyable\.filter/.test(home), true);
+    eq('  칸을 누르면 간다 (장식으로 두지 않는다)',
+      /\$\('#hero-tiles'\)\.addEventListener\('click'/.test(appSrc2), true);
   }
 }
 

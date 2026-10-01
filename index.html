@@ -361,10 +361,15 @@
         </div>
       </header>
 
+      <!-- 🔴 홈 히어로 — 2026-10-01 CTO 결정(시안 I4): 흰 바탕 · 큰 금액 · 빨간 한 줄 · 그림 4칸 · 버튼.
+           그림은 이모지가 아니라 직접 그린 SVG 다(ui-tone 관문 · 폰마다 그림이 달라지지 않게).
+           칸 숫자·그림은 app.js renderHome() 이 채운다(HERO_TILES). -->
       <div class="hero-card">
         <p class="hero-label" id="hero-label">지금 신청할 수 있는 장학금</p>
         <p class="hero-amount tappable" id="hero-amount" role="button" tabindex="0" aria-label="금액 상세 보기">0원</p>
-        <button class="btn btn-white btn-lg" id="btn-apply-all">신청 준비</button>
+        <p class="hero-sub" id="hero-sub"></p>
+        <div class="hero-tiles" id="hero-tiles"></div>
+        <button class="btn btn-primary btn-lg" id="btn-apply-all">신청 준비</button>
       </div>
 
       <!-- 쓰던 신청서 — 창(4시간)을 넘겨 들어와도 진행분은 안 버린다는 자리.

@@ -51,6 +51,7 @@ on:
       - 'collector/page-boilerplate.mjs'   #   그 파일이 부르는 이웃
       - 'tools/edit-diff.mjs'             # 관리자 수정 전후 대조 규칙 (화면·저장소 공용)
       - 'collector/activity-kind.mjs'     # 대외활동·공모전 종류 (관리자 「활동」 탭이 vendor 로 쓴다 · 2026-09-29)
+      - 'collector/news-kind.mjs'         # 교내 소식 갈래 (build.sh 가 vendor 로 옮긴다 · 2026-10-01)
       # 🔴 관리자 화면이 누르는 **쓰기 경로**. 아래 '수집기 규칙 관문' 이 이 파일을
       #    진짜로 돌려 본다(많이 지우기 확인·필수 칸 빈칸 금지·재등록 차단 주소).
       #    여기 없으면 그 안전장치를 떼는 커밋에서 이 검사가 한 번도 안 돈다.

@@ -3,7 +3,7 @@
    앱이 자동으로 양식 작성 플로우를 제공하는지 확인한다.
    사전 준비: 더미 양식(test-dummy)이 주입된 앱 복사본이 PORT에서 서빙 중이어야 함. */
 const { chromium } = require('playwright-core');
-const { nextUntil, assertOwnServer } = require('./onboard-helper.js');
+const { nextUntil, assertOwnServer, dismissNotify } = require('./onboard-helper.js');
 const PORT = process.env.PORT || 8124;
 
 (async () => {
@@ -59,6 +59,9 @@ const PORT = process.env.PORT || 8124;
   await page.click('#btn-finish-onboard');
   await page.waitForSelector('#screen-home:not([hidden])');
   await page.waitForTimeout(1300);
+  /* 🔴 온보딩 직후 뜨는 알림 동의 시트(2.9초 뒤)를 먼저 닫는다 — 안 닫으면 탐색 카드 클릭을
+     시트가 가로채 30초를 기다리다 죽는다(2026-10-01 실측 · 다른 드라이버와 같은 도우미). */
+  await dismissNotify(page);
 
   // 1) forms.json 의 양식이 FORM_TEMPLATES 에 병합됐는지 (위에서 주입한 픽스처로 확인)
   const merged = await page.evaluate(() => typeof FORM_TEMPLATES !== 'undefined' && !!FORM_TEMPLATES['test-dummy']);

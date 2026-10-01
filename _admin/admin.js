@@ -2697,7 +2697,7 @@ async function loadNewsStatus() {
     const h = lines[i].match(/^### (.+)$/); const st = lines[i + 1].match(/^상태: (.+)$/);
     if (h && st) map.set(h[1].trim(), st[1]);
   }
-  $('[data-news-status]').forEach((el) => {
+  $$('[data-news-status]').forEach((el) => {
     if (!el.dataset.base) el.dataset.base = el.textContent;   // 두 번 불려도 같은 글자 (겹쳐 붙지 않게)
     const st = map.get(el.dataset.newsStatus);
     if (st) el.textContent = `${el.dataset.base} · 최근 수집: ${st.slice(0, 60)}`;

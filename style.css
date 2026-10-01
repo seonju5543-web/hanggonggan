@@ -4802,7 +4802,84 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
       실측 57px → 2px 로 붙는다(`.hero-amount` 자신의 margin-bottom 은 2px 뿐이다).
    🔴 이 파일은 **뒤 블록이 앞을 덮으므로** 값은 여기 적어야 실제로 먹는다
       (CLAUDE.md '파일 끝 카드 블록이 앞의 규칙을 전부 덮는다' 와 같은 이유). */
-.hero-amount { margin-bottom: 20px; }
+.hero-amount { margin-bottom: 4px; }
+
+/* ══ 홈 히어로 — 시안 I4 (2026-10-01 CTO 결정) ═════════════════════════════════
+   남색 카드를 걷고 **흰 바탕 위 큰 금액**으로 바꿨다(카드가 아니어도 되니 강조는 높게 —
+   개발자 지시). 금액 아래 한 줄(빨간 '이번 주 마감') · 그림 4칸(오른쪽 위 숫자 배지) · 버튼.
+   🔴 그림은 app.js `HERO_TILES` 의 SVG 다 — 이모지를 쓰지 않는다(ui-tone 관문).
+   🔴 그림자를 붙이지 않는다(ui-tone FLAT 관문 — 면 위에 놓인 것). */
+.hero-card {
+  background: none;
+  overflow: visible;   /* 앞 규칙의 hidden 이 버튼 그림자를 네모로 잘랐다 */
+  border-radius: 0;
+  padding: 0;
+  color: var(--text);
+  margin-bottom: var(--sp-3);
+}
+.hero-card::after { display: none; }
+.hero-card .hero-label { color: var(--text-sub); font-weight: 700; letter-spacing: 0; }
+.hero-card .hero-amount { color: var(--text); }
+.hero-sub { font-size: var(--t-xs); color: var(--text-weak); font-weight: 500; }
+.hero-sub b { color: var(--red); font-weight: 700; }
+.hero-tiles {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin: var(--sp-3) 0 var(--sp-2);
+  padding: var(--sp-2) 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.hero-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-1);
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  color: var(--text);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.hero-tile:active .hero-ico { transform: scale(0.94); }
+.hero-ico {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.12s ease;
+}
+.hero-ico svg { width: 30px; height: 30px; }
+.hero-ico.red   { background: var(--red-weak); }
+.hero-ico.green { background: var(--green-weak); }
+.hero-ico.navy  { background: var(--surface-2); }
+.hero-ico.gold  { background: var(--accent-soft); }
+.hero-badge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 var(--sp-1);
+  border-radius: var(--radius-pill);
+  background: var(--red);
+  color: #fff;
+  font-size: var(--t-2xs);
+  font-weight: 800;
+  line-height: 18px;
+  text-align: center;
+  border: 2px solid var(--bg);
+  font-variant-numeric: tabular-nums;
+}
+.hero-badge.zero { background: var(--text-weak); }
+.hero-card #btn-apply-all { width: 100%; }
 
 /* 처지 예/아니요 — 프로필에 칸이 없던 개인 사정 (2026-09-18 · 노션 AI-1) */
 .elig-ask-yn { align-items: flex-start; flex-wrap: wrap; gap: var(--space-8); }

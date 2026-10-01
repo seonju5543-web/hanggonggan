@@ -1598,7 +1598,25 @@ function renderHome() {
      🔴 `#hero-count` 요소도 index.html 에서 뺐다 — 채우는 곳이 없는 빈 칸을 남겨 두면
         다음 세션이 '왜 안 채우지'를 뒤진다. 그 칸이 주던 아래 여백은 style.css 파일 끝
         '히어로' 절에서 `.hero-amount` 가 물려받는다(실측 57px → 같은 자리 유지). */
-  $('#hero-label').textContent = `지금 신청할 수 있는 장학금 ${applyable.length}건`;
+  $('#hero-label').textContent = '지금 신청할 수 있는 장학금';
+  /* 🔴 히어로 2026-10-01 CTO 결정(시안 I4) — 금액 아래 한 줄 + 그림 4칸.
+     9/17 에 걷었던 아랫줄 자리지만 CTO 가 이 시안을 골라 다시 둔다. 숫자는 **전부 위
+     `applyable` 하나에서 센다** — 판정을 새로 만들면 히어로와 목록이 다른 말을 한다.
+     '이번 주 마감' = 남은 날 7일 이하(기한을 못 읽은 공고는 dday 가 14일을 주므로 안 들어간다). */
+  const soon = applyable.filter((m) => m.sch.deadline && dday(m.sch.deadline).days <= 7).length;
+  $('#hero-sub').innerHTML = (soon ? `<b>이번 주 마감 ${soon}건</b><span> · </span>` : '')
+    + `<span>신청 가능 ${applyable.length}건</span>`;
+  const tileN = {
+    deadline: soon,
+    '교내': applyable.filter((m) => m.sch.type === '교내').length,
+    '교외': applyable.filter((m) => m.sch.type === '교외').length,
+    applications: state.applications.length,
+  };
+  $('#hero-tiles').innerHTML = HERO_TILES.map((t) => `
+    <button type="button" class="hero-tile" data-hero-go="${t.go}" aria-label="${t.name} ${tileN[t.go]}건">
+      <span class="hero-ico ${t.tone}">${t.svg}<span class="hero-badge${tileN[t.go] ? '' : ' zero'}">${tileN[t.go]}</span></span>
+      <span class="hero-tile-name">${t.name}</span>
+    </button>`).join('');
 
   const btn = $('#btn-apply-all');
   btn.disabled = notApplied.length === 0;
@@ -2391,6 +2409,22 @@ let tuitionTable = {};
 /* 홈 합계를 마지막으로 계산한 내역 — '금액 상세' 시트가 이걸 그대로 보여 준다.
    시트가 따로 다시 계산하면 화면과 시트가 다른 말을 하게 된다. */
 let lastBill = null;
+
+/* 홈 히어로 그림 4칸 (2026-10-01 CTO 결정 · 시안 I4).
+   🔴 **이모지가 아니라 직접 그린 SVG** 다 — 화면 이모지는 ui-tone 관문이 0개로 막고 있고
+      (공동개발자·전문가 지적 "AI 가 만든 티"), 이모지는 폰마다 그림이 달라진다.
+   🔴 교외는 지구가 아니라 **기둥 있는 재단 건물**이다(CTO 지시 — 교외 = 재단·지자체).
+   `go` 는 누르면 갈 곳: 장학금 탭의 필터 칸 이름 · 'deadline'(마감 임박순) · 'applications'. */
+const HERO_TILES = [
+  { go: 'deadline', name: '마감 임박', tone: 'red',
+    svg: '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="7.5" cy="7.5" r="4" fill="#c9503f"/><circle cx="24.5" cy="7.5" r="4" fill="#c9503f"/><path d="M9.5 27.5l-2 2.5M22.5 27.5l2 2.5" stroke="#5a2a22" stroke-width="2.2" stroke-linecap="round"/><circle cx="16" cy="17.5" r="11" fill="#dd5d4b"/><circle cx="16" cy="17.5" r="8" fill="#fff"/><path d="M16 12.5v5.2l3.4 2.1" fill="none" stroke="#33231f" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="17.5" r="1.3" fill="#33231f"/><ellipse cx="11.5" cy="10.5" rx="3" ry="1.3" fill="#fff" opacity=".35"/></svg>' },
+  { go: '교내', name: '교내', tone: 'green',
+    svg: '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2.5v6" stroke="#6b5a3a" stroke-width="1.6"/><path d="M16 2.5h6.5l-1.6 2 1.6 2H16z" fill="#dd5d4b"/><rect x="4" y="15" width="24" height="14" rx="1.5" fill="#f1c56c"/><path d="M2 16.5L16 8.5l14 8z" fill="#c4553f"/><rect x="13" y="20" width="6" height="9" rx="1" fill="#8a5a2b"/><rect x="6.5" y="19" width="4" height="4" rx=".8" fill="#7cbfe6"/><rect x="21.5" y="19" width="4" height="4" rx=".8" fill="#7cbfe6"/><circle cx="16" cy="14.3" r="2" fill="#fff"/></svg>' },
+  { go: '교외', name: '교외', tone: 'navy',
+    svg: '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 11.5L16 3.5l13 8z" fill="#6f87ba"/><circle cx="16" cy="8.4" r="1.7" fill="#f1c56c"/><rect x="3" y="11.5" width="26" height="3" rx="1" fill="#55709f"/><rect x="6" y="15" width="3.4" height="10" fill="#e9eef7"/><rect x="11.6" y="15" width="3.4" height="10" fill="#e9eef7"/><rect x="17" y="15" width="3.4" height="10" fill="#e9eef7"/><rect x="22.6" y="15" width="3.4" height="10" fill="#e9eef7"/><path d="M8.4 15v10M14 15v10M19.4 15v10M25 15v10" stroke="#c3cde0" stroke-width="1"/><rect x="3" y="25" width="26" height="2.5" rx="1" fill="#55709f"/><rect x="1.5" y="27.5" width="29" height="2.6" rx="1" fill="#3f5788"/></svg>' },
+  { go: 'applications', name: '신청 내역', tone: 'gold',
+    svg: '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="3" width="19" height="25" rx="2.5" fill="#fff" stroke="#cfc6b6" stroke-width="1.2"/><path d="M9 9h11M9 13.5h11M9 18h7" stroke="#9db2d8" stroke-width="2" stroke-linecap="round"/><g transform="rotate(38 22 19)"><rect x="19.5" y="7" width="5" height="17" rx="1" fill="#f1b03b"/><rect x="19.5" y="7" width="5" height="3" fill="#e98c9b"/><path d="M19.5 24h5L22 28.5z" fill="#f2d7ae"/><path d="M21.3 27.1h1.4L22 28.5z" fill="#33231f"/></g></svg>' },
+];
 function loadTuition() {
   fetch('data/tuition.json', { cache: 'no-store' })
     .then((r) => (r.ok ? r.json() : null))
@@ -5990,6 +6024,20 @@ function bindEvents() {
   $$('[data-goto]').forEach((btn) =>
     btn.addEventListener('click', () => showScreen(btn.dataset.goto))
   );
+
+  /* 홈 히어로 그림 칸 — 누르면 그 목록으로 간다(장식으로 두지 않는다).
+     교내·교외는 장학금 탭의 같은 필터 칸을 켜고, 마감 임박은 전체 칸 + 마감 임박순으로 연다.
+     ⚠️ 칩을 직접 .click() 하지 않는다 — 탭을 옮기기 전에 목록을 한 번 더 그리게 된다. */
+  $('#hero-tiles').addEventListener('click', (e) => {
+    const t = e.target.closest('[data-hero-go]');
+    if (!t) return;
+    const go = t.dataset.heroGo;
+    if (go === 'applications') { showScreen('applications'); return; }
+    exploreFilter = go === 'deadline' ? 'all' : go;
+    $$('#explore-filters .filter-chip').forEach((c) => c.classList.toggle('active', c.dataset.filter === exploreFilter));
+    if (go === 'deadline') { $(SORT_MENUS.explore.label).textContent = EXPLORE_SORTS.deadline.label; exploreSort = 'deadline'; }
+    showScreen('explore');
+  });
 
   /* 검색 (2026-08-30) — 치는 대로 거른다.
      ⚠️ 디바운스를 두지 않았다. 등록이 190건대라 한 번 거르는 데 밀리초 단위고,
