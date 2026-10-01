@@ -1686,7 +1686,12 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
   eq('첫 실행에 받는다', /^loadActivities\(\);$/m.test(app), true);
   eq('못 받아 왔어도 빈 문서로 내려앉는다 (뼈대가 굳지 않게)', /liveActivities = d \|\| liveActivities \|\| \{ items: \[\], updatedAt: null \}/.test(app), true);
   eq('학교 범위는 엔진의 activityForProfile 한 곳', /activityForProfile\(n, p\)/.test(app) && !/function activityForProfile/.test(app), true);
-  eq('카드는 한 벌 — noticeCardHtml 을 다시 쓴다 (두 번째 카드 함수 없음)', /noticeCardHtml\(n, \{/.test(app) && !/function activityCardHtml/.test(app), true);
+  /* 2026-10-01 개발자 지시("장학금 탭이랑 똑같은 흐름") — 활동 카드는 게시판 글 카드가 아니라 **장학 카드와 같은 그림**이다.
+     그림은 여전히 한 벌: 장학 카드(schCard)와 활동 카드가 cardShellHtml 하나를 부른다(베낀 두 번째 그림 없음) */
+  eq('카드는 한 벌 — 장학 카드와 활동 카드가 cardShellHtml 을 같이 쓴다',
+    [/function schCard[\s\S]*?return cardShellHtml\(\{/.test(app), /function activityCardHtml[\s\S]*?return cardShellHtml\(\{/.test(app),
+     /box\.innerHTML = list\.map\(activityCardHtml\)/.test(app)], [true, true, true]);
+  eq('  누르면 장학과 같은 상세 시트(#detail-sheet)를 연다', /closest\('\[data-activity\]'\)/.test(app) && /function openActivityDetail[\s\S]*?\$\('#detail-sheet'\)\.innerHTML[\s\S]*?openSheetShell\(\)/.test(app), true);
   eq('칩 켜고 끄기는 제 줄 안에서만 (다른 화면 칩을 건드리지 않는다)', /\$\$\('\.filter-chip'\)\.forEach/.test(app), false);
   const eng = createRequire(import.meta.url)('../match-engine.js');
   const P = { school: '한국외국어대학교', campus: '' };
@@ -7033,7 +7038,9 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
     /new Date\(|Date\.now\(\)\s*[-/]/.test(inter.slice(0, inter.indexOf('function haptic'))), false);
   eq('카드의 빨강 문턱은 dday 의 urgent 문턱(7일) 그대로다',
     /d <= 7\) return \{ label: `D-\$\{d\}`, cls: 'urgent'/.test(appJs)
-    && /d\.days >= 0 && d\.days <= 7\) \? ' urgent'/.test(appJs), true);
+    /* 2026-10-01 — 카드 그림이 cardShellHtml 한 벌로 옮겨 갔다: 장학 카드는 문턱을 urgent 로 넘기고 그림이 그 값으로 칠한다 */
+    && /urgent: !sch\.program && d\.days >= 0 && d\.days <= 7,/.test(appJs)
+    && /\$\{urgent \? ' urgent' : ''\}/.test(appJs), true);
   /* 카드의 마감 글자 = dday().label — 앱의 진짜 함수를 떼어 내 돌린다(사본을 검사하면 원본이 바뀌어도 통과한다) */
   {
     const src = appJs.match(/function ddayWords\(d\) \{[\s\S]*?\n\}/)[0];
@@ -7126,8 +7133,9 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
 
   /* 🔴 카드가 **그 함수를 실제로 부르는가** — 함수만 두고 안 부르면 아무 일도 안 일어난다
      (2026-09-19~20에 같은 자리에서 두 번 속았다: 함수만 보는 관문은 호출을 지워도 초록이다) */
-  eq('카드가 cardOrgLine 을 쓴다', /<span class="sch-org">\$\{esc\(cardOrgLine\(sch\)\)\}<\/span>/.test(appJs), true);
-  eq('  제목 자리는 cardTitle 그대로', /<p class="sch-name">\$\{esc\(cardTitle\(sch\)\)\}<\/p>/.test(appJs), true);
+  /* 2026-10-01 — 그림은 cardShellHtml 한 벌(장학·활동 공용). 장학 카드가 그 자리에 무엇을 넘기는지를 본다 */
+  eq('카드가 cardOrgLine 을 쓴다', /org: cardOrgLine\(sch\),/.test(appJs) && /<span class="sch-org">\$\{esc\(org\)\}<\/span>/.test(appJs), true);
+  eq('  제목 자리는 cardTitle 그대로', /name: cardTitle\(sch\),/.test(appJs) && /<p class="sch-name">\$\{esc\(name\)\}<\/p>/.test(appJs), true);
 }
 
 /* ══ 프로필 사진 (2026-09-11 개발자 지시) ═══════════════════════════════════

@@ -80,7 +80,8 @@ async function fresh(browser, mode, ext = EXT_FIXTURE) {
   return { page, errors };
 }
 
-const cards = (page) => page.$$eval('#activities-list .notice-card', (els) => els.map((e) => ({
+/* 🔴 2026-10-01 — 카드는 장학 카드와 같은 그림(cardShellHtml · button.sch-card[data-activity])이고 누르면 같은 시트가 열린다 */
+const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) => els.map((e) => ({
   name: e.querySelector('.sch-name').textContent.trim(),
   org: e.querySelector('.sch-org').textContent.trim(),
 })));
@@ -111,9 +112,24 @@ const cards = (page) => page.$$eval('#activities-list .notice-card', (els) => el
     let seen = await cards(page);
     eq('② 내 학교 글 + 전국 글만 (경희대 글은 안 보인다) · 최근 수집 순', seen.map((c) => c.name),
       ['2026 대학생 해외봉사단 모집', '제3회 장학수기 공모전 공고', '전국 청년 서포터즈 모집']);
-    eq('④ 윗줄은 종류 · 분야 · 학교 게시판', seen[0].org, '대외활동 · 봉사 · 한국외국어대학교 게시판');
-    eq('④ 마감을 읽은 글은 D-5 (dday 와 같은 글자)', await page.$eval('#activities-list .notice-card .sch-due', (e) => e.textContent.trim()), 'D-5');
-    eq('④ 발췌 줄 — 이름표 · 원문 그대로', await page.$$eval('#activities-list .notice-card:first-child .sch-provider', (els) => els.slice(0, 2).map((e) => e.textContent.trim())), ['모집기간 · 2026. 10. 1. ~ 10. 15.', '혜택 · 항공료 전액 지원']);
+    eq('④ 윗줄은 종류 · 학교 게시판 (장학 카드의 기관 자리)', seen[0].org, '대외활동 · 한국외국어대학교 게시판');
+    eq('④ 마감을 읽은 글은 아랫줄 오른쪽 D-5 (장학 카드와 같은 자리·같은 글자)', await page.$eval('#activities-list [data-activity] .sch-foot .sch-due', (e) => e.textContent.trim()), 'D-5');
+    eq('④ 아랫줄 왼쪽(장학 카드의 금액 자리)은 짧은 혜택', await page.$eval('#activities-list [data-activity] .sch-foot .sch-amount', (e) => e.textContent.trim()), '항공료 전액 지원');
+    eq('④ 혜택이 없으면 분야를 옅게 — 없으면 빈칸(지어내지 않는다)', await page.$$eval('#activities-list [data-activity] .sch-amount', (e) => e.map((x) => [x.textContent.trim(), x.classList.contains('unknown')])), [['항공료 전액 지원', false], ['', true], ['', true]]);
+    eq('④ 카드에 발췌 줄을 쌓지 않는다 (장학 카드처럼 석 줄)', await page.$$eval('#activities-list .sch-provider', (e) => e.length), 0);
+    eq('④ 장학 카드와 같은 그릇 (.sch-card-wrap > button.sch-card)', await page.$$eval('#activities-list .sch-card-wrap > button.sch-card[data-activity]', (e) => e.length), 3);
+    /* 누르면 앱을 떠나지 않고 장학과 같은 상세 시트(#detail-sheet)가 열린다 */
+    await page.click('#activities-list [data-activity]'); await page.waitForTimeout(500);
+    eq('⑤ 누르면 상세 시트가 열린다(앱을 떠나지 않는다)', await page.$eval('#detail-sheet', (e) => !e.hidden && e.classList.contains('show')), true);
+    eq('⑤ 시트 — 제목 · 혜택 · 주최/분야 · D-day · 종류', await page.$eval('#detail-sheet', (e) => [
+      e.querySelector('.sheet-title').textContent.trim(), e.querySelector('.sheet-amount').textContent.trim(),
+      e.querySelector('.sheet-provider').textContent.trim(), e.querySelector('.badge-dday').textContent.trim(), e.querySelector('.badge-kind').textContent.trim()]),
+      ['2026 대학생 해외봉사단 모집', '항공료 전액 지원', '한국외국어대학교 게시판 · 봉사', 'D-5', '대외활동']);
+    eq('⑤ 모집 안내는 원문 발췌 그대로 (혜택은 위에 한 번만)', await page.$$eval('#detail-sheet .doc-list li', (e) => e.map((x) => x.textContent.trim())), ['모집기간 · 2026. 10. 1. ~ 10. 15.']);
+    eq('⑤ 원문 단추는 그 글 주소를 새 탭으로', await page.$eval('#detail-sheet a.btn-primary', (a) => [a.getAttribute('href'), a.target, a.textContent.trim()]), ['https://dep.hufs.ac.kr/bbs/x/1', '_blank', '원문에서 신청하기 ↗']);
+    eq('⑤ 단추 글자에 밑줄이 없다', await page.$eval('#detail-sheet a.btn-primary', (a) => getComputedStyle(a).textDecorationLine), 'none');
+    await page.keyboard.press('Escape'); await page.waitForTimeout(500);
+    eq('⑤ ESC 로 닫힌다 (장학 시트와 같은 그릇)', await page.$eval('#detail-sheet', (e) => e.hidden || !e.classList.contains('show')), true);
     eq('④ 마감 지난 글은 보이지 않는다', seen.some((c) => /지난 공모전/.test(c.name)), false);
     eq('④ 전국 글은 주최를 말한다', seen[2].org, '대외활동 · 청년재단');
     /* 정렬 — 마감 임박순은 마감을 읽은 글이 앞, 못 읽은 글은 뒤 */
@@ -135,7 +151,8 @@ const cards = (page) => page.$$eval('#activities-list .notice-card', (els) => el
     await page.click('#activities-sort-menu [data-sort="recent"]'); await page.waitForTimeout(200);
     eq('③ 다시 골라 최근 수집순', await page.$eval('#activities-sort-label', (e) => e.textContent.trim()), '최근 수집순');
     await page.click('#activities-sort-btn'); await page.waitForTimeout(200);
-    await page.click('#activities-list'); await page.waitForTimeout(150);
+    /* '바깥'은 화면 제목 — 목록 한가운데를 누르면 이제 카드가 눌려 상세 시트가 열린다(2026-10-01 카드가 시트를 연다) */
+    await page.click('#screen-activities h2'); await page.waitForTimeout(150);
     eq('③   바깥을 누르면 목록이 닫힌다', await menuShown(), false);
     eq('③ 갱신 날짜를 보이지 않는다 (머리줄 셋째 칸이 단추를 가운데로 밀었다)',
       await page.$('#activities-updated'), null);

@@ -1429,26 +1429,43 @@ function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
      그래서 **짧고 숫자가 있는 것만** 굵게 쓴다. 나머지는 지우지 않고 옅게 남긴다(원칙 8-1). */
   const amountText = String(sch.amount || '');
   const known = /\d/.test(amountText) && amountText.length <= 20;
+  return cardShellHtml({
+    save: saveBtnHtml(sch.id),
+    attrs: `data-detail="${sch.id}"`,
+    org: cardOrgLine(sch),
+    badge,
+    name: cardTitle(sch),
+    foot: sch.amount,
+    footKnown: known,
+    due,
+    urgent: !sch.program && d.days >= 0 && d.days <= 7,
+  });
+}
+
+/* 카드 한 장의 그림 — **장학 카드와 대외활동·공모전 카드가 이 한 벌을 쓴다** (2026-10-01 개발자 지시:
+   *"장학금 탭이랑 똑같은 흐름으로 갈거야"*). 🔴 그림을 베끼지 말 것 — 2026-09-11 카드 두 벌 사고(한쪽에만
+   배지 무더기가 남았다). 무엇을 넣을지는 부르는 쪽이 정하고, 모양은 여기 하나다.
+   · 맨 윗줄은 **기관명 + 판정 하나**다 (2026-09-10 페이스리프트). 교내·교외는 배지를 빼고 기관명 앞에 글로 붙인다 —
+     배지 줄이 카드를 지배하던 것을 끝내면서도 학생이 알아야 할 구분은 남긴다.
+   · 🔴 마감(D-DAY 카운트)의 자리는 **맨 아랫줄 오른쪽**이다 (2026-09-11 개발자 지시).
+     맨 윗줄은 적합도가 쓰는 자리라 거기 두면 안 된다("적합도와 같은 곳에 있으면 안됨").
+     금액(왼쪽)과 마감(오른쪽)이 한 줄에 나란히 — 학생이 카드에서 마지막으로 읽는 두 숫자다.
+     2026-09-09 에 카드 밑에 두었던 빨간 막대는 같은 지시로 **뺐다**(interactions.js 에서도
+     지웠다 — 남겨 두면 다음 사람이 다시 붙인다). 7일 안쪽은 글자를 빨갛게(urgent) 한다.
+   · 북마크 단추는 카드 **바깥**(save) — `.sch-card` 가 `<button>` 이라 안에 넣으면 단추 안의 단추가 된다. */
+function cardShellHtml({ save = '', attrs, org, badge = '', name, foot = '', footKnown = true, due = '', urgent = false }) {
   return `
     <div class="sch-card-wrap">
-    ${saveBtnHtml(sch.id)}
-    <button class="sch-card" data-detail="${sch.id}">
-      ${/* 🔴 맨 윗줄은 **기관명 + 판정 하나**다 (2026-09-10 페이스리프트).
-           교내·교외는 배지를 빼고 기관명 앞에 글로 붙인다 — 배지 줄이 카드를 지배하던 것을
-           끝내면서도 학생이 알아야 할 구분은 남긴다. */ ''}
+    ${save}
+    <button class="sch-card" ${attrs}>
       <div class="sch-top">
-        <span class="sch-org">${esc(cardOrgLine(sch))}</span>
+        <span class="sch-org">${esc(org)}</span>
         ${badge}
       </div>
-      <p class="sch-name">${esc(cardTitle(sch))}</p>
-      ${/* 🔴 마감(D-DAY 카운트)의 자리는 **맨 아랫줄 오른쪽**이다 (2026-09-11 개발자 지시).
-           맨 윗줄은 적합도가 쓰는 자리라 거기 두면 안 된다("적합도와 같은 곳에 있으면 안됨").
-           금액(왼쪽)과 마감(오른쪽)이 한 줄에 나란히 — 학생이 카드에서 마지막으로 읽는 두 숫자다.
-           2026-09-09 에 카드 밑에 두었던 빨간 막대는 같은 지시로 **뺐다**(interactions.js 에서도
-           지웠다 — 남겨 두면 다음 사람이 다시 붙인다). 7일 안쪽은 글자를 빨갛게(urgent) 한다. */ ''}
+      <p class="sch-name">${esc(name)}</p>
       <div class="sch-foot">
-        <span class="sch-amount${known ? '' : ' unknown'}">${esc(sch.amount)}</span>
-        ${due ? `<span class="sch-due${(!sch.program && d.days >= 0 && d.days <= 7) ? ' urgent' : ''}">${esc(due)}</span>` : ''}
+        <span class="sch-amount${footKnown ? '' : ' unknown'}">${esc(foot)}</span>
+        ${due ? `<span class="sch-due${urgent ? ' urgent' : ''}">${esc(due)}</span>` : ''}
       </div>
     </button>
     </div>`;
@@ -2813,11 +2830,67 @@ function renderActivities() {
       : `아직 ${esc(p.school)} 게시판에서 모은 ${activitiesFilter === 'all' ? '대외활동·공모전' : esc(activitiesFilter)} 글이 없어요<br /><span class="empty-sub">게시판이 연결되면 새 글이 여기에 자동으로 떠요</span>`}</p>`;
     return;
   }
-  box.innerHTML = list.map((n) => noticeCardHtml(n, {
-    org: `${n.kind || '대외활동'}${n.field ? ' · ' + n.field : ''} · ${n.school ? `${n.school}${n.campus ? ' ' + n.campus : ''} 게시판` : (n.host || '전국')}`,
-    dday: n.deadline ? { label: ddayWords(dday(n.deadline)), urgent: dday(n.deadline).days >= 0 && dday(n.deadline).days <= 7 } : null,
-    excerpts: n.excerpts,
-  })).join('');
+  box.innerHTML = list.map(activityCardHtml).join('');
+}
+
+/* ── 대외활동·공모전 카드와 상세 시트 (2026-10-01 개발자 지시: *"장학금처럼 깔끔하게 · 공고도 카드 형식으로 열리게 ·
+   장학금 탭이랑 똑같은 흐름"*) ──
+   그전에는 게시판 글 카드(noticeCardHtml)에 발췌 대여섯 줄을 쌓아 카드 한 장이 화면 반을 먹었고, 누르면 앱을 떠나
+   원문 사이트로 바로 나갔다. 이제 장학 카드와 **같은 그림**(cardShellHtml)으로 석 줄만 보이고, 누르면 장학과 **같은
+   시트**(#detail-sheet)가 열려 발췌·첨부·원문 단추를 보여 준다. 신청은 원문에서 한다(우리가 접수하지 않는다 · 원칙 1).
+   🔴 자격·적합도·양식은 붙이지 않는다 — 원문을 읽어 판정한 것이 아니다(원칙 8-1). 발췌는 원문 문장 그대로다. */
+const activityWhere = (n) => (n.school ? `${n.school}${n.campus ? ' ' + n.campus : ''} 게시판` : (n.host || '전국'));
+/* 혜택 줄이 짧으면 카드 아랫줄 왼쪽(장학 카드의 금액 자리)에 굵게 — 길거나 없으면 분야를 옅게 */
+const activityBenefit = (n) => ((n.excerpts || []).find((x) => x.label === '혜택') || {}).text || '';
+
+function activityCardHtml(n) {
+  const d = n.deadline ? dday(n.deadline) : null;
+  const benefit = unent(activityBenefit(n));
+  const shortBenefit = benefit && benefit.length <= 20;
+  return cardShellHtml({
+    attrs: `data-activity="${esc(n.url)}"`,
+    org: `${n.kind || '대외활동'} · ${activityWhere(n)}`,
+    name: unent(n.title),
+    foot: shortBenefit ? benefit : (n.field || ''),
+    footKnown: !!shortBenefit,
+    due: d ? ddayWords(d) : '',
+    urgent: !!d && d.days >= 0 && d.days <= 7,
+  });
+}
+
+function openActivityDetail(url) {
+  const n = (liveActivities && liveActivities.items || []).find((x) => x && x.url === url);
+  if (!n) return;
+  const d = n.deadline ? dday(n.deadline) : null;
+  const benefit = unent(activityBenefit(n));
+  const rows = (n.excerpts || []).filter((x) => x.label !== '혜택');
+  const listLink = isBoardListLink(n.url);
+  $('#detail-sheet').innerHTML = `
+    <div class="sheet-handle"></div>
+    <div class="sheet-body">
+      <div class="sch-top sheet-top">
+        ${d ? `<span class="badge badge-dday ${d.cls}">${esc(d.label)}</span>` : ''}
+        <span class="badge badge-kind">${esc(n.kind || '대외활동')}</span>
+      </div>
+      <h3 class="sheet-title">${esc(unent(n.title))}</h3>
+      ${benefit ? `<p class="sheet-amount">${esc(benefit)}</p>` : ''}
+      <p class="sheet-provider">${esc(activityWhere(n))}${n.field ? ` · ${esc(n.field)}` : ''}</p>
+
+      <h4>모집 안내 <span class="channel-tag">원문 그대로</span></h4>
+      ${rows.length
+        ? `<ul class="doc-list">${rows.map((x) => `<li>${esc(x.label)} · ${esc(unent(x.text))}</li>`).join('')}</ul>`
+        : (n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint)
+          ? `<ul class="doc-list"><li>${esc(unent(n.deadlineHint))}</li></ul>`
+          : '<p class="doc-legend">모집 기간·대상은 공고 원문에서 확인해 주세요.</p>')}
+      ${(n.attachments || []).length ? `
+      <h4>공고 원본 첨부</h4>
+      <ul class="doc-list">${n.attachments.map((a) => `<li class="att"><a href="${esc(safeUrl(a.url))}" target="_blank" rel="noopener" style="color:var(--primary)">${esc(a.name || '첨부 파일')}</a></li>`).join('')}</ul>` : ''}
+      <p class="sheet-deadline">마감일 ${esc(n.deadline || '원문 공고 확인')}</p>
+      ${listLink ? `<p class="doc-legend">이 게시판은 목록에서 글을 눌러야 열리는 방식이라 글 하나로 바로 가는 주소를 확인하지 못했습니다. 열리는 목록에서 <strong>${esc(unent(n.title))}</strong>을(를) 찾아 눌러 주세요.</p>` : ''}
+      <a class="btn btn-primary btn-lg" href="${esc(safeUrl(n.url))}" target="_blank" rel="noopener">${listLink ? '게시판 목록에서 보기 ↗' : '원문에서 신청하기 ↗'}</a>
+      <p class="dp-note">신청은 주최 측 원문 페이지에서 진행돼요.</p>
+    </div>`;
+  openSheetShell();
 }
 
 /* ---------------- 재단·지자체 새 공고 (2026-09-26 · 노션 F-13 · 교외 확대) ----------------
@@ -6179,6 +6252,12 @@ function bindEvents() {
     const go = e.target.closest('[data-go]');
     if (!go) return;
     showScreen(go.dataset.go);
+  });
+
+  /* 대외활동·공모전 카드 → 장학과 같은 상세 시트 (2026-10-01) */
+  document.addEventListener('click', (e) => {
+    const card = e.target.closest('[data-activity]');
+    if (card) openActivityDetail(card.dataset.activity);
   });
 
   document.addEventListener('click', (e) => {

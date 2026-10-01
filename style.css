@@ -217,6 +217,8 @@ input::placeholder { color: var(--text-weak); }
   /* 전환은 '③ 상호작용' 묶음 한 곳에서 준다 — 여기 있던 줄은 그 묶음에 덮여 죽어 있었다 */
 }
 .btn:active { transform: scale(0.98); }
+/* 링크로 만든 단추(대외활동 상세의 '원문에서 신청하기' — 앱 밖으로 나가는 주소라 <a>) 에 밑줄이 붙지 않게 · 2026-10-01 */
+a.btn { text-decoration: none; }
 .btn-lg { padding: 17px; font-size: var(--t-lg); }
 .btn-primary {
   background: var(--primary);

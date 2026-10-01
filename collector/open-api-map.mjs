@@ -101,11 +101,12 @@ export function mapKstartup(r, { scholarship } = {}) {
   return { item: item({
     title, url, kind,
     deadline: ymd(r.pbanc_rcpt_end_dt),
-    host: r.pbanc_ntrp_nm || r.sprv_inst || '창업진흥원 K-Startup',
+    host: r.pbanc_ntrp_nm || '창업진흥원 K-Startup',
     excerpts: [
       excerpt('모집기간', range(r.pbanc_rcpt_bgng_dt, r.pbanc_rcpt_end_dt)),
       excerpt('대상', r.aply_trgt_ctnt || r.aply_trgt),
-      excerpt('주최', r.sprv_inst),
+      /* 🔴 sprv_inst(명세 '주관 기관')는 실제로 '공공기관'·'민간' 같은 **갈래**가 온다(2026-10-01 첫 실행 실측) —
+         '주최 · 민간'은 기관 이름이 아니라 주최로 적지 않는다. 기관 이름은 pbanc_ntrp_nm(카드 윗줄 host) */
       excerpt('활동지역', r.supt_regin),
     ],
     api: 'kstartup',
