@@ -1,0 +1,2 @@
+공공 API 로봇 push-to-run — 이 파일을 고쳐 기본 브랜치에 push 하면 .github/workflows/open-api.yml 이 바로 돈다.
+2026-10-01 신설

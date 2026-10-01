@@ -2048,6 +2048,7 @@ const ROBOTS = [
   { f: 'collect-scholarships.yml', n: '일반 수집 로봇', d: () => `게시판 ${D.schools.length}곳을 훑어 새 공고를 담습니다`, when: '매일 07:41·11:41' },
   { f: 'browser-collect.yml', n: '브라우저형 수집 로봇', d: () => `봇차단·동적 게시판 ${D.targets.length}곳을 진짜 브라우저로 봅니다`, when: '매일 08:07·12:07' },
   { f: 'collect-news.yml', n: '교내 소식 로봇', d: () => `학교 공지 게시판 ${D.newsSources.sources.filter((s) => s.boardUrl).length}곳에서 제목+링크를 담습니다 (게시판 찾기 포함)`, when: '매일 07:19·13:19' },
+  { f: 'open-api.yml', n: '공공 API 로봇', d: 'K-Startup·1365 봉사·온통청년에서 대외활동·공모전을 마감일·대상까지 받아 「대외활동」 탭에 싣습니다 (열쇠 없는 곳은 건너뜀)', when: '매일 07:17' },
   { f: 'link-hunter.yml', n: '링크 사냥꾼', d: '원문 주소를 못 찾은 공고를 계속 다시 찾습니다', when: '매일 06:37' },
   { f: 'resolve-detail-urls.yml', n: '원문 링크 복구', d: '목록 주소로 남은 공고를 게시판에서 찾아 고칩니다', when: '주 1회' },
   /* 🔴 **지금 보는 공고가 아니라 `form_targets` 에 적힌 공고**의 첨부를 받아 온다.

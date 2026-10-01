@@ -775,7 +775,7 @@ console.log('\n■ 누락 감사 (감사가 수집기의 맹점을 물려받지 
   /* 원인을 가를 때 쓰는 수집기 그물은 수집기의 것과 **같아야** 한다.
      갈라지면 '키워드 밖'이라는 진단 자체가 거짓이 된다. */
   const audited = (src.match(/HARVEST_KEYWORDS = (\/[^\n]+\/);/) || [])[1];
-  for (const f of ['collector/collect.mjs', 'collector/browser-collect.mjs', 'collector/collect-news.mjs']) {
+  for (const f of ['collector/collect.mjs', 'collector/browser-collect.mjs', 'collector/collect-news.mjs', 'collector/open-api.mjs']) {
     const k = (readText(new URL(f, root)).match(/KEYWORDS = (\/[^\n]+\/);/) || [])[1];
     eq(`감사의 수집기 그물 사본이 ${f}와 같다`, audited === k, true);
   }
@@ -10239,6 +10239,76 @@ console.log('\n■ 여러 대학만 받는 공고 · 분야 이름 학과 판정
   const byName = { id: 'n', eligibility: {}, eligibilityLines: ['국제학부 재학생'] };
   eq('  학과 이름 요건은 부분 일치로 잇지 않는다',
     ME.fitDetail(byName, { ...base, major: '국제통상학과' }).met, 0);
+}
+
+console.log('\n■ 공공 API 로봇 (2026-10-01)');
+{
+  /* 왜 있나 — collector/open-api.mjs 가 K-Startup·1365·온통청년 둘을 읽어 data/activities.json 에 싣는다.
+     열쇠·인터넷 없이 명세대로 만든 가짜 응답으로 바꾸는 규칙(open-api-map.mjs)을 그대로 돌려 본다.
+     심장은 둘: ① 못 받아 온 출처의 지난 글을 지우지 않는다 ② 판정 못 한 행·주소 없는 행·마감 지난 행은 싣지 않는다. */
+  const M = await import('../collector/open-api-map.mjs');
+  const today = '2026-10-01';
+  const opt = { scholarship: /장학|학자금|등록금 감면|학업장려|근로장학/, today };
+  /* 명세(공공데이터포털 swagger · 온통청년 OPEN API 문서)의 칸 이름 그대로 */
+  const ks = { biz_pbanc_nm: '2026 대학생 창업 아이디어 경진대회 참가팀 모집', pbanc_rcpt_bgng_dt: '20260920', pbanc_rcpt_end_dt: '20261020',
+    detl_pg_url: 'https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=1', aply_trgt_ctnt: '대학생', sprv_inst: '창업진흥원', pbanc_ntrp_nm: '창업진흥원' };
+  const k1 = M.mapKstartup(ks, opt).item;
+  eq('K-Startup — 경진대회는 공모전 · 마감은 접수 종료일', [k1.kind, k1.deadline, k1.field, k1.school, k1.api], ['공모전', '2026-10-20', activityField(ks.biz_pbanc_nm, '공모전'), '', 'kstartup']);
+  eq('  발췌는 {label,text} 이고 이름표는 앱이 아는 것', k1.excerpts.every((x) => x.label && x.text) && k1.excerpts.map((x) => x.label).includes('모집기간'), true);
+  eq('  지원사업(공모전·대외활동 아님)은 싣지 않는다', !!M.mapKstartup({ ...ks, biz_pbanc_nm: '2026년 예비창업패키지 지원사업 공고' }, opt).drop, true);
+  eq('  원문 주소가 없으면 싣지 않는다(짐작해 만들지 않는다)', M.mapKstartup({ ...ks, detl_pg_url: '', biz_aply_url: '-', biz_gdnc_url: null }, opt).drop, '원문 주소 없음');
+  eq('  장학 제도는 활동 글이 아니다(장학 낱말 규칙을 넘긴다)', !!M.mapKstartup({ ...ks, biz_pbanc_nm: '창업 봉사장학생 모집' }, opt).drop, true);
+  const v = { progrmSj: '대학생 교육봉사단 모집', url: 'https://www.1365.go.kr/vols/1572247904127/partcptn/timeCptn.do?type=show&progrmRegistNo=1', noticeBgnde: '20260901', noticeEndde: '20261015', progrmBgnde: '20261020', progrmEndde: '20261220', nanmmbyNm: '서울특별시자원봉사센터', adultPosblAt: 'Y', actPlace: '서울' };
+  eq('1365 — 대외활동·봉사 · 마감은 모집 종료일', (({ kind, field, deadline, host }) => [kind, field, deadline, host])(M.map1365(v).item), ['대외활동', '봉사', '2026-10-15', '서울특별시자원봉사센터']);
+  eq('  대학생·청년을 부르지 않은 동네 일감은 싣지 않는다', M.map1365({ ...v, progrmSj: '어르신 말벗 도우미' }).drop, '대학생·청년 대상 아님');
+  eq('  성인 불가는 싣지 않는다', M.map1365({ ...v, adultPosblAt: 'N' }).drop, '성인 참여 불가');
+  const p = { plcyNm: '청년 정책 서포터즈 모집', aplyUrlAddr: 'https://example.go.kr/apply', aplyYmd: '20260101 ~ 20260331\\N20260901 ~ 20261130', aplyPrdSeCd: '0057001', sprvsnInstCdNm: '국무조정실', sprtTrgtMinAge: '19', sprtTrgtMaxAge: '34', sprtTrgtAgeLmtYn: 'Y' };
+  const p1 = M.mapYouthPolicy(p, opt).item;
+  eq('청년정책 — 여러 신청 구간이면 가장 늦은 끝 날짜', [p1.kind, p1.deadline, p1.host], ['대외활동', '2026-11-30', '국무조정실']);
+  eq('  상시 정책은 마감을 비운다(가짜 마감 금지)', M.mapYouthPolicy({ ...p, aplyPrdSeCd: '0057002' }, opt).item.deadline, undefined);
+  eq('  주거·금융 정책은 싣지 않는다', !!M.mapYouthPolicy({ ...p, plcyNm: '청년 월세 한시 특별지원' }, opt).drop, true);
+  const c = { pstTtl: '2026 청년 기자단 모집', pstUrlAddr: 'https://www.youthcenter.go.kr/bbs03View/48/1', frstRegDt: '2026-09-25 10:00:00', pstSeNm: '청년참여 프로그램',
+    pstWholCn: '<p>모집기간 : 2026. 9. 25. ~ 2026. 10. 12.</p><p>모집대상 : 만 19~34세 청년</p>' };
+  const c1 = M.mapYouthContent(c, opt).item;
+  eq('청년콘텐츠 — 본문 HTML 에서 장학과 같은 발췌 규칙으로 마감', [c1.kind, c1.deadline, c1.host], ['대외활동', '2026-10-12', '온통청년 청년참여 프로그램']);
+  eq('  60일 지난 글은 싣지 않는다', M.mapYouthContent({ ...c, frstRegDt: '2026-06-01' }, opt).drop, '60일 지난 글');
+  /* 응답 껍데기 */
+  eq('findRows — 껍데기 이름을 몰라도 행 배열을 찾는다', M.findRows({ resultCode: 200, result: { pagging: {}, youthPolicyList: [{ plcyNm: 'a' }, { plcyNm: 'b' }] } }, 'plcyNm').length, 2);
+  eq('  모양을 모르면 null(0건과 다르다)', M.findRows({ errorCode: 'e001' }, 'plcyNm'), null);
+  eq('xmlItems — 1365 XML 의 item 을 읽고 HTML 기호를 되돌린다', M.xmlItems('<items><item><progrmSj>A &amp; B</progrmSj><url>https://x/1</url></item><item><progrmSj>C</progrmSj></item></items>').map((o) => o.progrmSj), ['A & B', 'C']);
+  /* 묶음: 마감 지남·같은 글·상한 */
+  const rows = [ks, { ...ks, pbanc_rcpt_end_dt: '20260930', detl_pg_url: 'https://k/2' }, { ...ks }];
+  const mr = M.mapRows('kstartup', rows, opt);
+  eq('mapRows — 마감 지난 글·같은 글은 빠지고 이유가 세어진다', [mr.items.length, mr.dropped['마감 지남'], mr.dropped['같은 글']], [1, 1, 1]);
+  const many = Array.from({ length: 30 }, (_, i) => ({ ...ks, detl_pg_url: `https://k/${i}` }));
+  eq('  출처 상한을 넘기지 않는다', M.mapRows('kstartup', many, opt).items.length, M.API_SOURCES.kstartup.cap);
+  /* 합치기 — 이 로봇의 심장 */
+  const board = { title: '게시판 글', url: 'https://board/1', kind: '대외활동', school: '', foundAt: '2026-09-01' };
+  const oldK = { ...k1, url: 'https://k/old', foundAt: '2026-09-10', api: 'kstartup' };
+  const oldV = { ...M.map1365(v).item, foundAt: '2026-09-11' };
+  const sameAsBoard = { ...k1, url: 'https://board/1' };
+  const merged = M.mergeApi([board, oldK, oldV], { kstartup: { ok: true, items: [k1] }, vol1365: { ok: false } }, { today });
+  eq('mergeApi — 못 받은 출처(1365)의 지난 글은 그대로 남는다', merged.some((n) => n.url === oldV.url && n.foundAt === '2026-09-11'), true);
+  eq('  받아 온 출처(K-Startup)의 닫힌 지난 글은 빠진다', merged.some((n) => n.url === 'https://k/old'), false);
+  eq('  게시판 글은 건드리지 않는다', merged.some((n) => n.url === 'https://board/1' && !n.api), true);
+  eq('  API 글엔 excerptsAt 이 있다(수집 로봇의 원문 다시 읽기가 건너뛴다)', merged.filter((n) => n.api === 'kstartup').every((n) => n.excerptsAt === today), true);
+  const m2 = M.mergeApi([board], { kstartup: { ok: true, items: [sameAsBoard] } }, { today, hideUrls: new Set() });
+  eq('  같은 주소의 게시판 글은 API 글이 대신하고 처음 본 날을 이어받는다', [m2.length, m2[0].api, m2[0].foundAt], [1, 'kstartup', '2026-09-01']);
+  eq('  다시 받은 글은 처음 본 날을 이어받는다', M.mergeApi([{ ...k1, foundAt: '2026-09-20' }], { kstartup: { ok: true, items: [k1] } }, { today })[0].foundAt, '2026-09-20');
+  eq('  관리자가 숨긴 주소엔 hidden', M.mergeApi([], { kstartup: { ok: true, items: [k1] } }, { today, hideUrls: new Set([canonUrl(k1.url)]) })[0].hidden, true);
+  /* 로봇·워크플로 배선 */
+  const robot = readText(new URL('../collector/open-api.mjs', import.meta.url));
+  const yml = readText(new URL('../.github/workflows/open-api.yml', import.meta.url));
+  const sync = readText(new URL('../.github/workflows/deploy-sync.yml', import.meta.url));
+  eq('로봇은 규칙 파일을 부른다(베끼지 않는다)', /from '\.\/open-api-map\.mjs'/.test(robot) && /mergeApi\(/.test(robot) && /mapRows\(/.test(robot), true);
+  eq('  열쇠가 없으면 건너뛴다 · 열쇠는 리포트에 안 찍힌다', /HAS_KEY\[src\]/.test(robot) && /hideKeys\(/.test(robot), true);
+  eq('워크플로 — 시한 · 수집 로봇과 같은 대기줄 · 감사 뒤 저장 · 실패(취소 포함)와 ❌ 알림',
+    [/timeout-minutes:/.test(yml), /group: collector/.test(yml), /audit-data\.js/.test(yml), /git add data\/activities\.json/.test(yml), /if: success\(\) \|\| failure\(\) \|\| cancelled\(\)/.test(yml) && /grep -q '❌'/.test(yml)],
+    [true, true, true, true, true]);
+  eq('  로컬 겉옷(robot-run.sh)으로 감싸지 않는다(클라우드에서 자기 자신을 보고 멈춘다)', /^\s*run:.*robot-run\.sh/m.test(yml), false);
+  eq('  열쇠 셋을 시크릿에서 넘긴다', ['DATA_GO_KR_KEY', 'YOUTHCENTER_KEY', 'YOUTHCENTER_CONTENT_KEY'].every((k) => yml.includes(`secrets.${k}`)), true);
+  eq('  예약은 홀수 분', ((yml.match(/cron: '(\d+) /) || [])[1] | 0) % 2, 1);
+  eq('deploy-sync 가 이 로봇 뒤에도 main 으로 옮긴다', sync.includes(`'${(yml.match(/^name: (.+)$/m) || [])[1]}'`), true);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
