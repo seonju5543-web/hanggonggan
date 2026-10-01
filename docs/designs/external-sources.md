@@ -202,17 +202,17 @@
 ## 10. 2026-10-01 — 공공 API 로봇을 붙였다 (개발자 지시 "로봇 만들어줘")
 
 개발자가 공공데이터포털에서 K-Startup(15125364)·1365 봉사참여정보_GW(15157582 — 옛 번호 15000221 은 404)를 **등록금과 같은 계정**으로 승인받았고,
-온통청년에서 청년정책·청년콘텐츠 열쇠를 신청했다(심사 중). 로봇은 `collector/open-api.mjs`, 바꾸는 규칙은 `collector/open-api-map.mjs`, 워크플로 `open-api.yml`(매일 07:17).
+온통청년에서 청년정책·청년콘텐츠 열쇠를 신청했다(심사 중). 로봇은 `collector/open-api.mjs`, 바꾸는 규칙은 `collector/open-api-map.mjs`, 워크플로 `open-api.yml`(매일 04:17 — 같은 대기줄의 수집 로봇과 겹치지 않는 새벽).
 
 | 출처 | 부르는 곳 (명세에서 확인) | 열쇠 | 싣는 것 |
 |---|---|---|---|
 | K-Startup | `apis.data.go.kr/B552735/kisedKstartupService01/getAnnouncementInformation01` · `cond[rcrt_prgs_yn::EQ]=Y` · `cond[aply_trgt::LIKE]=대학생` · JSON | `DATA_GO_KR_KEY` | `activityKind` 가 공모전·대외활동으로 읽는 공고만(창업 지원사업은 버린다) |
 | 1365 | `apis.data.go.kr/1741000/volunteerPartcptnService/getVltrSearchWordList` · `keyword=대학생` · XML 뿐 | `DATA_GO_KR_KEY` | 제목에 대학생·청년·서포터즈·봉사단이 있는 글만(동네 일감이 탭을 덮지 않게) · 종류 대외활동 · 분야 봉사 |
 | 온통청년 청년정책 | `youthcenter.go.kr/go/ythip/getPlcy` · `apiKeyNm` · `rtnType=json` · 3천여 건 전부 | `YOUTHCENTER_KEY` | `activityKind` 로 읽히는 정책만(주거·금융은 버린다) · 신청기간 여러 구간이면 가장 늦은 끝 · 상시(`0057002`)면 마감 비움 |
-| 온통청년 청년콘텐츠 | `youthcenter.go.kr/go/ythip/getContent` · 최근 300건 | `YOUTHCENTER_CONTENT_KEY`(없으면 위 열쇠) | 판정되는 글 · 60일 안 · 마감·발췌는 본문 HTML 에서 장학과 같은 발췌 규칙 |
+| 온통청년 청년콘텐츠 | `youthcenter.go.kr/go/ythip/getContent` · 최근 300건 | `YOUTHCENTER_CONTENT_KEY`(정책 열쇠와 같아도 따로 넣는다) | 판정되는 글 · 60일 안 · 마감·발췌는 본문 HTML 에서 장학과 같은 발췌 규칙 |
 
 **넘어지지 않게 한 것** — 열쇠 없는 출처는 건너뛴다 · 요청마다 20초 × 3회 · 전체 4분 · 한 출처가 실패해도 다른 출처는 저장 ·
-**실패한 출처의 지난 글은 지우지 않는다** · 출처마다 상한(20·20·20·15) · 처음 본 날은 이어받는다 · 게시판에서 주운 같은 글은 API 글이 대신한다 ·
+**실패한 출처의 지난 글은 지우지 않는다** · 출처마다 상한(15·15·15·10) · 처음 본 날은 이어받는다 · 같은 글(주소 또는 학교·제목)은 출처끼리도 게시판 글과도 하나 · **0행·칸 이름이 바뀐 응답은 실패로 친다**(지난 글 보존) · 수집 로봇의 60일 삭제는 API 글엔 `seenAt` 으로 잰다 · 기관 홈 첫 화면 주소는 버린다 ·
 `excerptsAt` 을 적어 수집 로봇의 '원문 다시 읽기'가 건너뛴다 · 오류 응답의 사유(포털 `returnAuthMsg` · 온통청년 `errorMsg`)를 리포트에 옮긴다(열쇠는 가린다).
 **고치기 쉽게 한 것** — 리포트(`collector/open-api-report.md`)에 출처마다 받은 행·실은 글·버린 이유·**첫 행의 칸 이름**을 적는다(명세와 실제가 다르면 여기서 보인다) ·
 ❌ 가 있으면 워크플로가 「🛰 공공 API 로봇 알림」 이슈에 적는다 · `collector/run-open-api.txt` 를 고쳐 push 하면 바로 돈다.

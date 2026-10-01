@@ -526,7 +526,9 @@ fs.writeFileSync(noticesPath, JSON.stringify(notices, null, 1));
    장학 피드와 같은 규칙: 60일 지나면 지운다 · 첨부 링크 걷어낸다 · 같은 글은 하나 · 상한.
    학교 글은 서비스 학교(dropUnserved)만, 학교가 빈 전국 글은 그대로 둔다(모든 학생에게 보인다). */
 acts.items = freshActs.concat(acts.items || []);
-acts.items = acts.items.filter((n) => (n.foundAt || '9999') >= cutoff);
+/* 공공 API 글(n.api)은 처음 본 날이 아니라 **API 가 마지막으로 준 날(seenAt)**로 잰다 — 몇 달 열린 정책이 61일째 지워졌다가
+   다음 날 '새 글'로 맨 위에 돌아오지 않게. 닫힌 글은 API 로봇이 뺀다(collector/open-api-map.mjs mergeApi). */
+acts.items = acts.items.filter((n) => ((n.api && n.seenAt) || n.foundAt || '9999') >= cutoff);
 acts.items = acts.items.filter((n) => !isAttachmentEntry(n));
 acts.items = dedupeNotices(acts.items);
 acts.items = acts.items.filter((n) => !n.school).concat(dropUnserved(acts.items.filter((n) => n.school)));

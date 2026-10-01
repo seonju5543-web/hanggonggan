@@ -1642,7 +1642,8 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
   eq('제 장부에 적는다 (seen-activities.json)', /'seen-activities\.json'/.test(cm) && /fs\.writeFileSync\(seenActPath/.test(cm), true);
   eq('활동 글을 장학 피드(freshAll)에 넣지 않는다', /freshActs\.push\(it\)/.test(cm) && !/freshAll\.push\(it\);\s*\n\s*\}\s*\n\s*if \(isAct\)/.test(cm), true);
   eq('활동 파일도 60일·중복·서비스 학교·상한 규칙을 지킨다',
-    /acts\.items = acts\.items\.filter\(\(n\) => \(n\.foundAt \|\| '9999'\) >= cutoff\)/.test(cm)
+    /* 2026-10-01 — 공공 API 글만 seenAt(API 가 마지막으로 준 날)으로 잰다 · 게시판 글은 그대로 foundAt (「공공 API 로봇」 I3) */
+    /acts\.items = acts\.items\.filter\(\(n\) => \(\(n\.api && n\.seenAt\) \|\| n\.foundAt \|\| '9999'\) >= cutoff\)/.test(cm)
     && /acts\.items = dedupeNotices\(acts\.items\)/.test(cm)
     && /dropUnserved\(acts\.items\.filter\(\(n\) => n\.school\)\)/.test(cm)
     && /acts\.items = acts\.items\.slice\(0, ACT_CAP\)/.test(cm), true);
@@ -10280,7 +10281,7 @@ console.log('\n■ 공공 API 로봇 (2026-10-01)');
   const rows = [ks, { ...ks, pbanc_rcpt_end_dt: '20260930', detl_pg_url: 'https://k/2' }, { ...ks }];
   const mr = M.mapRows('kstartup', rows, opt);
   eq('mapRows — 마감 지난 글·같은 글은 빠지고 이유가 세어진다', [mr.items.length, mr.dropped['마감 지남'], mr.dropped['같은 글']], [1, 1, 1]);
-  const many = Array.from({ length: 30 }, (_, i) => ({ ...ks, detl_pg_url: `https://k/${i}` }));
+  const many = Array.from({ length: 30 }, (_, i) => ({ ...ks, biz_pbanc_nm: `${ks.biz_pbanc_nm} ${i}차`, detl_pg_url: `https://k/${i}` }));
   eq('  출처 상한을 넘기지 않는다', M.mapRows('kstartup', many, opt).items.length, M.API_SOURCES.kstartup.cap);
   /* 합치기 — 이 로봇의 심장 */
   const board = { title: '게시판 글', url: 'https://board/1', kind: '대외활동', school: '', foundAt: '2026-09-01' };
@@ -10296,6 +10297,22 @@ console.log('\n■ 공공 API 로봇 (2026-10-01)');
   eq('  같은 주소의 게시판 글은 API 글이 대신하고 처음 본 날을 이어받는다', [m2.length, m2[0].api, m2[0].foundAt], [1, 'kstartup', '2026-09-01']);
   eq('  다시 받은 글은 처음 본 날을 이어받는다', M.mergeApi([{ ...k1, foundAt: '2026-09-20' }], { kstartup: { ok: true, items: [k1] } }, { today })[0].foundAt, '2026-09-20');
   eq('  관리자가 숨긴 주소엔 hidden', M.mergeApi([], { kstartup: { ok: true, items: [k1] } }, { today, hideUrls: new Set([canonUrl(k1.url)]) })[0].hidden, true);
+  /* 코드 리뷰(2026-10-01)가 찾은 구멍 — 하나씩 못 박는다 */
+  eq('C1 받은 행 0건은 성공이 아니다(성공으로 치면 지난 글이 조용히 지워진다)', !!M.sourceVerdict([], {}), true);
+  eq('C1 칸 이름이 바뀌어 대부분 「제목 없음」이면 성공이 아니다', !!M.sourceVerdict([{}, {}, {}], { '제목 없음': 3 }), true);
+  eq('  정상 응답은 성공', M.sourceVerdict([ks, ks], { '공모전·대외활동 아님(지원사업 등)': 1 }), null);
+  const pv = { ...p1, url: 'https://k/x', api: 'youthPolicy' };
+  const cross = M.mergeApi([], { kstartup: { ok: true, items: [{ ...k1, url: 'https://k/x' }] }, youthPolicy: { ok: true, items: [pv] } }, { today });
+  eq('I1 출처끼리 같은 주소는 하나(감사가 중복으로 그날 결과를 버리지 않게)', cross.length, 1);
+  eq('I1 기관 홈 첫 화면 주소는 그 공고가 아니라 버린다', M.mapYouthPolicy({ ...p, aplyUrlAddr: 'https://www.mois.go.kr/', refUrlAddr1: 'https://www.mois.go.kr' }, opt).drop, '원문 주소 없음');
+  const twin = [v, { ...v, url: 'https://www.1365.go.kr/v?no=2', nanmmbyNm: '부산광역시자원봉사센터' }];
+  eq('I2 같은 제목(학교·캠퍼스·제목)은 한 번만 — 수집 로봇의 dedupeNotices 와 같은 잣대', M.mapRows('vol1365', twin, opt).items.length, 1);
+  eq('I2 같은 제목의 게시판 글도 API 글이 대신한다', M.mergeApi([{ ...board, title: k1.title, url: 'https://board/9' }], { kstartup: { ok: true, items: [k1] } }, { today }).length, 1);
+  const cmSrc = readText(new URL('../collector/collect.mjs', import.meta.url));
+  eq('I3 API 글엔 seenAt 이 붙고, 수집 로봇의 60일 삭제는 API 글을 seenAt 으로 잰다',
+    [M.mergeApi([], { kstartup: { ok: true, items: [k1] } }, { today })[0].seenAt, /\(\(n\.api && n\.seenAt\) \|\| n\.foundAt \|\| '9999'\) >= cutoff/.test(cmSrc)], [today, true]);
+  eq('M3 신청기간 여러 구간은 날짜 모양으로 잇는다(\\N 이 카드에 안 보인다)', p1.excerpts.find((x) => x.label === '모집기간').text, '2026-01-01 ~ 2026-03-31 · 2026-09-01 ~ 2026-11-30');
+  eq('M4 주최가 카드 윗줄(host)과 같으면 발췌로 또 적지 않는다', k1.excerpts.some((x) => x.label === '주최'), false);
   /* 로봇·워크플로 배선 */
   const robot = readText(new URL('../collector/open-api.mjs', import.meta.url));
   const yml = readText(new URL('../.github/workflows/open-api.yml', import.meta.url));
@@ -10308,6 +10325,9 @@ console.log('\n■ 공공 API 로봇 (2026-10-01)');
   eq('  로컬 겉옷(robot-run.sh)으로 감싸지 않는다(클라우드에서 자기 자신을 보고 멈춘다)', /^\s*run:.*robot-run\.sh/m.test(yml), false);
   eq('  열쇠 셋을 시크릿에서 넘긴다', ['DATA_GO_KR_KEY', 'YOUTHCENTER_KEY', 'YOUTHCENTER_CONTENT_KEY'].every((k) => yml.includes(`secrets.${k}`)), true);
   eq('  예약은 홀수 분', ((yml.match(/cron: '(\d+) /) || [])[1] | 0) % 2, 1);
+  eq('I4 예약은 같은 대기줄 로봇이 없는 새벽(KST 04시 = UTC 19시)', (yml.match(/cron: '\d+ (\d+) /) || [])[1], '19');
+  eq('C2 알림 본문은 리포트가 없어도 죽지 않는다(첫 실패에 리포트가 없다)', /open-api-report\.md 2>\/dev\/null \|\| true\)/.test(yml), true);
+  eq('M5 기본 브랜치에서만 돈다', /if: github\.ref_name == 'claude\/nice-heisenberg-WESq5'/.test(yml), true);
   eq('deploy-sync 가 이 로봇 뒤에도 main 으로 옮긴다', sync.includes(`'${(yml.match(/^name: (.+)$/m) || [])[1]}'`), true);
 }
 

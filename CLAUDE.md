@@ -260,7 +260,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   출처 `activity-sources.json` 은 주소마다 `evidence`(확인한 곳)를 적는다 · 집계 사이트(링커리어류)는 출처가 아니다 · 첫 리포트의 상태 줄로 확인. 관문 「대외활동·공모전」 · `verify-activities.js`(서비스워커를 막고 잰다).
   관리자 「활동」 탭(`#activities`): 종류 바꾸기·숨기기(지우지 않고 `hidden` + `activity-config.json`)·출처 추가/보관 — `activityKind`·`activityHide`·`activitySource`. 관문 같은 절 ⑤ · `verify-admin.js`.
   활동 글의 마감·발췌는 `collector/activity-excerpts.mjs` 한 곳(마감 규칙은 장학과 같은 `extractDeadline` · 나머지는 원문 문장 그대로 · 분야는 `activityField`) · 공공·재단 게시판은 `collector/robots.mjs` 로 robots.txt 를 묻고 읽는다 · 카드 D-day 는 `dday()` 한 곳. 관문 같은 절 ⑥.
-  **공공 API 로봇**(2026-10-01 · `collector/open-api.mjs` · 규칙 `collector/open-api-map.mjs`): K-Startup·1365(`DATA_GO_KR_KEY`)·온통청년 정책·콘텐츠(`YOUTHCENTER_KEY` — 🔴 포털 열쇠로 안 열린다) → 같은 `data/activities.json`(`api` 칸) · 못 받은 출처의 지난 글은 지우지 않는다 · 실패는 로봇 리포트(첫 실행에 생긴다)의 ❌ → 이슈. 관문 「공공 API 로봇」.
+  **공공 API 로봇**(2026-10-01 · `collector/open-api.mjs` · 규칙 `collector/open-api-map.mjs`): K-Startup·1365(`DATA_GO_KR_KEY`)·온통청년 정책·콘텐츠(`YOUTHCENTER_KEY`·`YOUTHCENTER_CONTENT_KEY` — 🔴 포털 열쇠로 안 열린다) → 같은 `data/activities.json`(`api` 칸) · 못 받은 출처(0행·칸 바뀜 포함)의 지난 글은 지우지 않는다 · 수집 로봇의 60일 삭제는 API 글엔 `seenAt` · 실패는 로봇 리포트(첫 실행에 생긴다)의 ❌ → 이슈. 관문 「공공 API 로봇」.
   🔴 발췌기에 넘기는 상세 글자는 **줄을 살린 것**(`collector/html-text.mjs` `htmlToLines` — deepfetch·rescue 도 같은 것) — 한 줄로 뭉개면 200자 규칙에 걸려 **전부 0건**이 된다(2026-09-30 첫 실행 실측). 발췌 없이 실린 글은 다음 실행이 다시 읽는다(`ACT_BACKFILL` · `excerptsAt`).
 - **재단·지자체 게시판(교외 확대)** (2026-09-26 · 노션 F-13): 링커리어류는 크롤링이 아니라 **주최사 직접 등록**이라 긁지 않는다 — 우리는 주최의 제 게시판을 읽는다.
   출처 `collector/external-sources.json` 은 `kosaf-open.json` 의 재단 홈페이지에서 왔고, `collector/find-boards.mjs` 가 게시판을 찾아 `autoFound` 로 적는다(잘못 찾으면 `parked`).

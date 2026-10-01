@@ -20,13 +20,15 @@ import { activityExcerpts } from './activity-excerpts.mjs';
 import { htmlToLines } from './html-text.mjs';
 import { decodeEntities } from './clean-title.mjs';
 import { canonUrl } from './canon-url.mjs';
+import { titleKey } from './url-key.mjs';
 
-/* 출처마다 싣는 최대 글 수 — 넷 합쳐 75. 활동 파일 상한(collect.mjs ACT_CAP 200)을 API 글이 다 먹지 않게 */
+/* 출처마다 싣는 최대 글 수 — 넷 합쳐 55. 활동 파일 상한(collect.mjs ACT_CAP 200)을 API 글이 먹어
+   게시판 글이 밀려나지 않게(밀려난 게시판 글은 장부 때문에 다시 안 온다 · 리뷰 M1) */
 export const API_SOURCES = {
-  kstartup: { name: 'K-Startup 사업공고', cap: 20 },
-  vol1365: { name: '1365 봉사참여정보', cap: 20 },
-  youthPolicy: { name: '온통청년 청년정책', cap: 20 },
-  youthContent: { name: '온통청년 청년콘텐츠', cap: 15 },
+  kstartup: { name: 'K-Startup 사업공고', cap: 15 },
+  vol1365: { name: '1365 봉사참여정보', cap: 15 },
+  youthPolicy: { name: '온통청년 청년정책', cap: 15 },
+  youthContent: { name: '온통청년 청년콘텐츠', cap: 10 },
 };
 
 const MAX_LEN = 160;
@@ -34,7 +36,10 @@ const clip = (v) => {
   const s = decodeEntities(String(v ?? '')).replace(/\s+/g, ' ').trim();
   return s.length > MAX_LEN ? `${s.slice(0, MAX_LEN - 1)}…` : s;
 };
-const httpUrl = (...cands) => cands.map((u) => String(u ?? '').trim()).find((u) => /^https?:\/\/\S+$/i.test(u)) || null;
+/* API 가 준 주소 가운데 '그 공고 하나'를 가리키는 첫 주소. 기관 홈 첫 화면(경로·물음 없음)은 그 공고가 아니라 버린다
+   (청년정책의 신청 주소 칸에 기관 홈이 흔하다 · CLAUDE.md 「원문 링크는 그 공고 하나로」 · 리뷰 I1) */
+const specific = (u) => { try { const x = new URL(u); return (x.pathname.replace(/\/+$/, '') !== '' || x.search !== ''); } catch { return false; } };
+const httpUrl = (...cands) => cands.map((u) => String(u ?? '').trim()).find((u) => /^https?:\/\/\S+$/i.test(u) && specific(u)) || null;
 
 /* 'yyyyMMdd'·'yyyy-MM-dd'·'yyyy.MM.dd' 의 첫 날짜 → 'YYYY-MM-DD' (아니면 null) */
 export function ymd(raw) {
@@ -55,11 +60,19 @@ const range = (a, b) => {
   const s = ymd(a), e = ymd(b);
   return s && e ? `${s} ~ ${e}` : (e ? `~ ${e}` : null);
 };
+/* 온통청년 신청기간 원문('20260101 ~ 20260331\\N20260901 ~ …')을 날짜 모양으로 — 구간은 ' · ' 로 잇는다 (리뷰 M3) */
+const periods = (raw) => String(raw ?? '').split(/\\N|\n|,/).map((p) => {
+  const d = [...p.matchAll(/20\d{2}[-.]?\d{2}[-.]?\d{2}/g)].map((m) => ymd(m[0])).filter(Boolean);
+  return d.length >= 2 ? `${d[0]} ~ ${d[1]}` : (d[0] || '');
+}).filter(Boolean).join(' · ') || null;
 
 const excerpt = (label, text) => (text ? { label, text: clip(text) } : null);
 
 /* 같은 모양의 글 하나 — 학교가 빈 전국 글(앱이 모든 학생에게 보인다) */
 function item({ title, url, kind, field, deadline, host, excerpts, api }) {
+  /* 카드 윗줄에 주최가 이미 나온다 — 같은 이름을 발췌 '주최'로 또 적지 않는다 (리뷰 M4) */
+  const h = clip(host);
+  excerpts = (excerpts || []).filter((x) => x && !(x.label === '주최' && x.text === h));
   return {
     title: clip(title),
     url,
@@ -67,11 +80,11 @@ function item({ title, url, kind, field, deadline, host, excerpts, api }) {
     field: field || activityField(title, kind) || undefined,
     deadline: deadline || undefined,
     deadlineHint: null,
-    excerpts: (excerpts || []).filter(Boolean),
+    excerpts,
     attachments: [],
     school: '',
     campus: '',
-    host: clip(host),
+    host: h,
     api,
   };
 }
@@ -136,7 +149,7 @@ export function mapYouthPolicy(r, { scholarship } = {}) {
     deadline: always ? null : lastDate(r.aplyYmd),
     host: r.sprvsnInstCdNm || r.operInstCdNm || '온통청년',
     excerpts: [
-      excerpt('모집기간', always ? '상시' : String(r.aplyYmd || '').trim()),
+      excerpt('모집기간', always ? '상시' : periods(r.aplyYmd)),
       excerpt('대상', age),
       excerpt('혜택', r.plcySprtCn),
       excerpt('주최', r.operInstCdNm && r.operInstCdNm !== r.sprvsnInstCdNm ? r.operInstCdNm : null),
@@ -207,15 +220,27 @@ export function mapRows(source, rows, { scholarship, today }) {
     const { item: it, drop } = MAPPERS[source](r, { scholarship, today });
     if (drop) { dropped[drop] = (dropped[drop] || 0) + 1; continue; }
     if (it.deadline && it.deadline < today) { dropped['마감 지남'] = (dropped['마감 지남'] || 0) + 1; continue; }
-    const k = canonUrl(it.url);
-    if (seen.has(k)) { dropped['같은 글'] = (dropped['같은 글'] || 0) + 1; continue; }
-    seen.add(k);
+    /* 같은 글 — 주소로도, 제목으로도(수집 로봇의 dedupeNotices 가 학교·캠퍼스·제목으로 합친다 ·
+       1365 엔 센터마다 같은 제목이 흔해 여기서 안 합치면 매일 늘었다 줄었다 한다 · 리뷰 I2) */
+    const k = canonUrl(it.url), tk = titleKey(it);
+    if (seen.has(k) || (tk && seen.has(tk))) { dropped['같은 글'] = (dropped['같은 글'] || 0) + 1; continue; }
+    seen.add(k); if (tk) seen.add(tk);
     items.push(it);
   }
   items.sort((a, b) => String(a.deadline || '9999').localeCompare(String(b.deadline || '9999')));
   const cap = API_SOURCES[source].cap;
   if (items.length > cap) dropped[`상한 ${cap}건 초과`] = items.length - cap;
   return { items: items.slice(0, cap), dropped };
+}
+
+/* 받아 온 결과를 '성공'으로 쳐도 되는가 — 아니면 이유(문자열). 🔴 성공으로 치면 그 출처의 지난 글이 이번 글로 **바뀐다**.
+   그래서 0행 응답이나 칸 이름이 바뀐 응답(거의 전부 '제목 없음')을 성공으로 치면 지난 글이 조용히 다 지워진다 (리뷰 C1).
+   마감 지난 글은 앱이 이미 숨기므로(activitiesForMe) 지난 글을 남겨 두는 쪽이 안전하다. */
+export function sourceVerdict(rows, dropped) {
+  if (!rows.length) return '받은 행 0건 — 조건이 바뀌었거나 서버가 빈 응답을 줬다';
+  const blank = (dropped['제목 없음'] || 0);
+  if (blank * 2 > rows.length) return `${rows.length}행 중 ${blank}행이 '제목 없음' — 응답 칸 이름이 명세와 달라졌다(리포트의 첫 행 칸을 보고 open-api-map.mjs 를 고친다)`;
+  return null;
 }
 
 /* 지난 활동 글 + 이번에 받은 출처별 결과 → 새 활동 글 목록.
@@ -226,20 +251,34 @@ export function mapRows(source, rows, { scholarship, today }) {
    · 관리자가 숨긴 주소는 hidden 표식(collect.mjs 와 같은 규칙). */
 export function mergeApi(prevItems, results, { today, hideUrls = new Set() }) {
   const prev = Array.isArray(prevItems) ? prevItems : [];
+  /* 출처끼리도 같은 글은 하나 — 먼저 온 출처가 이긴다(안 합치면 감사가 '중복'으로 그날 결과를 통째로 버린다 · 리뷰 I1) */
   const fresh = [];
-  for (const [src, r] of Object.entries(results)) if (r && r.ok) fresh.push(...r.items);
-  const freshKeys = new Set(fresh.map((n) => canonUrl(n.url)));
+  const freshKeys = new Set();
+  for (const [, r] of Object.entries(results)) {
+    if (!r || !r.ok) continue;
+    for (const n of r.items) {
+      const k = canonUrl(n.url), tk = titleKey(n);
+      if (freshKeys.has(k) || (tk && freshKeys.has(tk))) continue;
+      freshKeys.add(k); if (tk) freshKeys.add(tk);
+      fresh.push(n);
+    }
+  }
+  const same = (n) => freshKeys.has(canonUrl(n.url)) || (titleKey(n) && freshKeys.has(titleKey(n)));
   const firstSeen = new Map();
-  for (const n of prev) { const k = canonUrl(n.url); if (n.foundAt && (!firstSeen.has(k) || n.foundAt < firstSeen.get(k))) firstSeen.set(k, n.foundAt); }
+  const note = (k, d) => { if (k && d && (!firstSeen.has(k) || d < firstSeen.get(k))) firstSeen.set(k, d); };
+  for (const n of prev) { note(canonUrl(n.url), n.foundAt); note(titleKey(n), n.foundAt); }
   const replaced = new Set(Object.entries(results).filter(([, r]) => r && r.ok).map(([s]) => s));
   const kept = prev.filter((n) => {
     if (n.api && replaced.has(n.api)) return false;          // 받아 온 출처의 지난 글은 이번 글로 바뀐다
-    if (freshKeys.has(canonUrl(n.url))) return false;         // 같은 글은 API 쪽이 대신한다
+    if (same(n)) return false;                                // 같은 글은 API 쪽이 대신한다
     return true;
   });
   const added = fresh.map((n) => {
     const k = canonUrl(n.url);
-    const out = { ...n, foundAt: firstSeen.get(k) || today, excerptsAt: today };   // excerptsAt: 수집 로봇의 '원문 다시 읽기'가 건너뛰게
+    const first = [firstSeen.get(k), firstSeen.get(titleKey(n))].filter(Boolean).sort()[0];
+    /* excerptsAt: 수집 로봇의 '원문 다시 읽기'가 건너뛰게 · seenAt: 오늘도 API 가 줬다 —
+       수집 로봇의 60일 삭제는 API 글엔 처음 본 날이 아니라 이 날로 잰다(오래 열린 정책이 61일째 '새 글'로 돌아오지 않게 · 리뷰 I3) */
+    const out = { ...n, foundAt: first || today, seenAt: today, excerptsAt: today };
     if (hideUrls.has(k)) out.hidden = true;
     for (const f of Object.keys(out)) if (out[f] === undefined) delete out[f];
     return out;

@@ -5,7 +5,7 @@
      ① K-Startup 사업공고      apis.data.go.kr/B552735/kisedKstartupService01   열쇠 DATA_GO_KR_KEY (등록금 로봇과 같은 열쇠)
      ② 1365 봉사참여정보(_GW)   apis.data.go.kr/1741000/volunteerPartcptnService 열쇠 DATA_GO_KR_KEY
      ③ 온통청년 청년정책        youthcenter.go.kr/go/ythip/getPlcy               열쇠 YOUTHCENTER_KEY
-     ④ 온통청년 청년콘텐츠      youthcenter.go.kr/go/ythip/getContent            열쇠 YOUTHCENTER_CONTENT_KEY (없으면 YOUTHCENTER_KEY)
+     ④ 온통청년 청년콘텐츠      youthcenter.go.kr/go/ythip/getContent            열쇠 YOUTHCENTER_CONTENT_KEY (정책 열쇠와 같아도 이 칸에 따로 넣는다)
      🔴 온통청년은 공공데이터포털에서 'LINK' 유형이라 **포털 열쇠로 안 열린다** — 온통청년 마이페이지에서 따로 받는다.
    쓰는 곳
      data/activities.json (수집 로봇 collect.mjs 와 같은 파일 · 같은 대기줄 collector 라 동시에 안 쓴다)
@@ -19,7 +19,7 @@
          node collector/open-api.mjs --dry-run  (받아서 리포트만 · 파일 안 바꿈)
    ============================================================ */
 import fs from 'node:fs';
-import { API_SOURCES, findRows, xmlItems, xmlTag, mapRows, mergeApi } from './open-api-map.mjs';
+import { API_SOURCES, findRows, xmlItems, xmlTag, mapRows, mergeApi, sourceVerdict } from './open-api-map.mjs';
 import { canonUrl } from './canon-url.mjs';
 
 /* 장학 낱말 — collect.mjs 의 KEYWORDS 사본(관문이 같은지 잰다 · test-collector 「감사의 수집기 그물 사본」).
@@ -38,7 +38,8 @@ const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
 /* 공공데이터포털 열쇠는 Decoding 값을 쓴다 — Encoding 값(%2B…)을 넣었어도 한 번 풀어서 이중 인코딩을 막는다 */
 const portalKey = (() => { const k = (process.env.DATA_GO_KR_KEY || '').trim(); try { return k.includes('%') ? decodeURIComponent(k) : k; } catch { return k; } })();
 const youthKey = (process.env.YOUTHCENTER_KEY || '').trim();
-const youthContentKey = (process.env.YOUTHCENTER_CONTENT_KEY || '').trim() || youthKey;
+/* 콘텐츠 열쇠가 정책 열쇠와 같은지 아직 모른다 — 대신 쓰지 않는다(다르면 매일 ❌ 가 뜬다 · 리뷰 M2). 같다면 시크릿 두 칸에 같은 값을 넣는다 */
+const youthContentKey = (process.env.YOUTHCENTER_CONTENT_KEY || '').trim();
 
 class ApiError extends Error {}
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -118,7 +119,7 @@ const FETCHERS = {
       if (r.status !== 200) throw new ApiError(reasonOf(r));
       const j = parseJson(r);
       const got = findRows(j, 'plcyNm');
-      if (!got) { if (pageNum > 1) break; throw new ApiError(`응답 모양이 명세와 다르다 — ${reasonOf(r)}`); }
+      if (!got) { if (pageNum > 1 && /\[\s*\]/.test(r.text)) break; throw new ApiError(`${pageNum}쪽 응답 모양이 명세와 다르다 — ${reasonOf(r)}`); }   // 빈 목록만 '끝'이다(리뷰 M6)
       rows.push(...got);
       if (got.length < 100) break;
     }
@@ -131,7 +132,7 @@ const FETCHERS = {
       if (r.status !== 200) throw new ApiError(reasonOf(r));
       const j = parseJson(r);
       const got = findRows(j, 'pstTtl');
-      if (!got) { if (pageNum > 1) break; throw new ApiError(`응답 모양이 명세와 다르다 — ${reasonOf(r)}`); }
+      if (!got) { if (pageNum > 1 && /\[\s*\]/.test(r.text)) break; throw new ApiError(`${pageNum}쪽 응답 모양이 명세와 다르다 — ${reasonOf(r)}`); }
       rows.push(...got);
       if (got.length < 100) break;
     }
@@ -139,7 +140,7 @@ const FETCHERS = {
   },
 };
 const HAS_KEY = { kstartup: !!portalKey, vol1365: !!portalKey, youthPolicy: !!youthKey, youthContent: !!youthContentKey };
-const KEY_NAME = { kstartup: 'DATA_GO_KR_KEY', vol1365: 'DATA_GO_KR_KEY', youthPolicy: 'YOUTHCENTER_KEY', youthContent: 'YOUTHCENTER_CONTENT_KEY 또는 YOUTHCENTER_KEY' };
+const KEY_NAME = { kstartup: 'DATA_GO_KR_KEY', vol1365: 'DATA_GO_KR_KEY', youthPolicy: 'YOUTHCENTER_KEY', youthContent: 'YOUTHCENTER_CONTENT_KEY' };
 
 /* ── 돌리기 ── */
 const results = {};
@@ -150,10 +151,15 @@ for (const src of Object.keys(API_SOURCES)) {
   try {
     const rows = await FETCHERS[src]();
     const { items, dropped } = mapRows(src, rows, { scholarship: KEYWORDS, today });
-    results[src] = { ok: true, items };
     const why = Object.entries(dropped).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${v}`).join(' · ');
-    lines.push(`- ✅ **${name}** — 받은 행 ${rows.length} · 실은 글 **${items.length}**${why ? ` · 버림: ${why}` : ''}`);
-    if (rows.length === 0) lines.push('  - ⚠️ 받은 행이 0건 — 조건이 너무 좁거나 응답 모양이 바뀌었을 수 있다(조용한 0건은 의심한다)');
+    const bad = sourceVerdict(rows, dropped);
+    if (bad) {   // 🔴 성공으로 치지 않는다 — 치면 지난 글이 조용히 지워진다 (리뷰 C1)
+      results[src] = { ok: false };
+      lines.push(`- ❌ **${name}** — ${bad} · 지난 글 그대로 둠${why ? ` · 버림: ${why}` : ''}`);
+    } else {
+      results[src] = { ok: true, items };
+      lines.push(`- ✅ **${name}** — 받은 행 ${rows.length} · 실은 글 **${items.length}**${why ? ` · 버림: ${why}` : ''}`);
+    }
     /* 첫 행의 칸 이름 — 명세와 실제가 다르면 여기서 바로 보인다(값은 안 적는다 · 담당자 연락처 등이 섞여 있다) */
     if (rows[0]) lines.push(`  - 첫 행 칸: \`${Object.keys(rows[0]).slice(0, 40).join(', ')}\``);
     items.slice(0, 3).forEach((n) => lines.push(`  - ${n.kind} · ${n.title}${n.deadline ? ` (~${n.deadline})` : ''} — ${n.url}`));

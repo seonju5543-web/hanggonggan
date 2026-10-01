@@ -8,7 +8,9 @@ name: 공공 API 로봇
 on:
   schedule:
     # 홀수 분 · UTC 정각/자정 피함 · 07:41 수집 로봇보다 먼저(같은 파일을 쓰지만 대기줄이 같아 겹치지 않는다)
-    - cron: '17 22 * * *'   # 매일 07:17 KST
+    # 🔴 같은 대기줄은 기다리는 실행을 하나만 남긴다 — 수집 로봇(07:41·11:41·15:41)·브라우저 수집(08:07·12:07)과 시간이 겹치면
+    #    기다리던 예약 수집이 소리 없이 취소될 수 있어 아무도 안 도는 새벽에 둔다(리뷰 I4)
+    - cron: '17 19 * * *'   # 매일 04:17 KST
   workflow_dispatch:
   push:
     branches: ['claude/nice-heisenberg-WESq5']
@@ -27,6 +29,8 @@ concurrency:
 jobs:
   fetch:
     runs-on: ubuntu-latest
+    # 다른 브랜치에서 수동 실행하면 그 브랜치 커밋이 기본 브랜치로 rebase 되어 올라간다 — 기본 브랜치에서만 돈다(리뷰 M5)
+    if: github.ref_name == 'claude/nice-heisenberg-WESq5'
     # 로봇 자체 예산 4분(요청 20초 × 3회) + 준비·감사·저장 여유
     timeout-minutes: 12
     steps:
@@ -77,7 +81,7 @@ jobs:
           if [ -f collector/open-api-report.md ] && grep -q '❌' collector/open-api-report.md; then failed="$failed 받아 오지 못한 출처가 있어요."; fi
           [ -z "$failed" ] && exit 0
           body="🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **공공 API 로봇** — $failed
-          $( [ -f collector/open-api-report.md ] && grep -E '❌|⏸|✅' collector/open-api-report.md )
+          $(grep -E '❌|⏸|✅' collector/open-api-report.md 2>/dev/null || true)
 
           실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           지난 글은 그대로 남아 있습니다. 고치려면 Claude 세션에 '공공 API 로봇 실패 확인해줘'라고 지시하세요."
