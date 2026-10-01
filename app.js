@@ -259,17 +259,9 @@ function refreshSaveViews(id) {
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 
-/* 금액을 '숫자'와 '단위' 두 조각으로 — 홈 히어로가 숫자만 크게 그리려고 나눴다(2026-09-30).
-   🔴 won() 이 이 함수로 만들어지므로 두 곳이 다른 말을 할 수 없다.
-   `unit` 을 주면 그 단위로 강제한다 — 숫자가 0에서 굴러 올라오는 동안(countUp) 단위가
-   '원'↔'만원' 사이에서 깜빡이지 않게 목표 금액의 단위를 미리 준다. */
-function wonParts(n, unit) {
-  const u = unit || (n >= 10000 ? '만원' : '원');
-  return { num: (u === '만원' ? Math.round(n / 10000) : n).toLocaleString(), unit: u };
-}
 function won(n) {
-  const p = wonParts(n);
-  return p.num + p.unit;
+  if (n >= 10000) return `${Math.round(n / 10000).toLocaleString()}만원`;
+  return `${n.toLocaleString()}원`;
 }
 
 function deadlineTs(sch) {
@@ -1524,39 +1516,6 @@ function agoLabel(ts) {
    ⚠️ 이름의 DEADLINE 과 `#home-deadline-list` 표식은 **일부러 그대로 둔다** — 구획 이름이
       '마감 임박'이던 시절의 이름이지만, 여기에 붙은 style.css 규칙과 검사 드라이버가 이미
       있어 이름을 바꾸면 통째로 떨어져 나간다(설정 화면의 `#my-account` 와 같은 이유). */
-/* 홈 히어로의 '그 금액을 이루는 공고' 줄 수 (2026-09-30 · 도미노 '총 자산' 꼴). CSS 가 셋째 줄부터 흐린다. */
-const HERO_ROWS = 3;
-
-/* 히어로 금액 — '최대' · 숫자 · 단위 세 조각. 숫자만 굴러 오르고 단위는 목표 금액의 것으로 고정한다.
-   🔴 '약' 을 붙이지 않는다 (2026-09-17 개발자 지시 · 관문 「홈 히어로」). */
-function heroAmount(total) {
-  const unit = wonParts(total).unit;
-  $('#hero-unit').textContent = unit;
-  countUp($('#hero-num'), total, (v) => wonParts(v, unit).num);
-}
-
-/* 히어로 한 줄 — 머리글자 원 · 이름 · 금액 · 마감(상시 제도면 그 배지 글자).
-   이름은 카드와 같은 규칙(cardTitle) · 머리글자는 주는 곳(provider)의 첫 글자, 없으면 이름의 첫 글자.
-   앞의 (재)·[서울] 같은 표식은 뗀다 — '('가 머리글자가 되면 안 된다. 누르면 그 공고 상세(data-goto). */
-function heroInitial(sch) {
-  /* 로봇이 기관을 못 읽으면 provider 에 '주관 기관 원문 확인'(auto-register PROVIDER_UNKNOWN)이 든다 —
-     그 첫 글자 '주'를 머리글자로 쓰면 안 된다(실측). '원문 확인' 꼴이면 이름으로 물러난다. */
-  const prov = String(sch.provider || '').trim();
-  const base = prov && !/원문 확인/.test(prov) ? prov : cardTitle(sch);
-  /* 앞의 괄호 표식([서울]·(재)) 과 연도·날짜 조각(2026-2 …)을 뗀다 — '('·'2' 가 머리글자가 되면 안 된다 */
-  const src = String(base || '').replace(/^\s*[\[(（【][^\])）】]*[\])）】]\s*/g, '').replace(/^[\d\-.\/~\s]+/, '').trim();
-  return src.charAt(0) || '장';
-}
-function heroRowHtml(m) {
-  const sch = m.ref;
-  const due = sch.program ? '상시 제도' : dday(sch.deadline).label;
-  return `<li class="hero-row tappable" data-goto="${esc(sch.id)}" role="button" tabindex="0">
-      <span class="hero-ini" aria-hidden="true">${esc(heroInitial(sch))}</span>
-      <span class="hero-row-name">${esc(cardTitle(sch))}</span>
-      <span class="hero-row-right"><b>${esc(won(m.won))}</b><small>${esc(due)}</small></span>
-    </li>`;
-}
-
 const HOME_DEADLINE_TOP = 3;
 const HOME_DEADLINE_MORE = 10;
 let homeDeadlineOpen = false;
@@ -1632,21 +1591,10 @@ function renderHome() {
      🔴 그래도 내역은 남아 있다 — 금액을 누르면 열리는 **금액 상세**가 '금액을 못 읽은 n건은
         어림잡아 더함' 과 한 건당 얼마로 쳤는지를 그대로 적는다(renderAmountDetail).
      ⚠️ 되돌려 '약' 을 다시 붙이지 말 것 — 관문이 막는다. */
-  heroAmount(total);
-  /* 그 금액을 이루는 공고 3줄 — 합계에 실제로 든 것(합산·중복 중 고른 것)만, 금액 큰 순.
-     어림잡은 것(assumed)과 등록금 비율 추정(estimated)은 넣지 않는다 — 확인된 금액만 줄로 세운다.
-     ⚠️ 0건이면 목록을 비운다(빈 문구를 지어내지 않는다 · 승인 화면에 없는 경우). */
-  const heroTop = [...bill.added, ...bill.onlyOne]
-    .filter((m) => m.won > 0)
-    .sort((a, b) => b.won - a.won)
-    .slice(0, HERO_ROWS);
-  $('#hero-rows').innerHTML = heroTop.map(heroRowHtml).join('');
-  $('#hero-rows').hidden = !heroTop.length;
+  countUp($('#hero-amount'), total, (v) => `최대 ${won(v)}`);
   /* 🔴 히어로 아랫줄을 **통째로 없앴다** (2026-09-17 개발자 지시 2차: "금액 밑에 있는
      '그중 N건은 바로 신청할 수 있어요' 안내도 삭제해줘"). 앞서 같은 자리에서 금액 회계
-     두 줄을 걷어냈고, 이 줄이 마지막 하나였다. 히어로는 **건수 · 금액 · 버튼** 셋이 뼈대다.
-     (2026-09-30 개발자 승인으로 그 사이에 '그 금액을 이루는 공고 3줄'이 들어왔다 — 해명이 아니라
-      합계의 **근거**다. 도미노 '총 자산' 꼴 · docs/designs/mockups/hero-domino.md)
+     두 줄을 걷어냈고, 이 줄이 마지막 하나였다. 이제 히어로는 **건수 · 금액 · 버튼** 셋뿐이다.
      🔴 `#hero-count` 요소도 index.html 에서 뺐다 — 채우는 곳이 없는 빈 칸을 남겨 두면
         다음 세션이 '왜 안 채우지'를 뒤진다. 그 칸이 주던 아래 여백은 style.css 파일 끝
         '히어로' 절에서 `.hero-amount` 가 물려받는다(실측 57px → 같은 자리 유지). */
