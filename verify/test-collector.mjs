@@ -1950,7 +1950,12 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
   eq('글 줄 뽑기 — 날짜가 붙은 줄의 링크만 (메뉴 6개는 0)', dated.map((r) => r.url.split('seq=')[1]), ['1', '2', '3', '4', '5']);
   /* 2차 실행 실측(부산대·충북대): 날짜가 든 <li> 하나에 메뉴 링크 수십 개 — 링크가 많거나 긴 블록은 글 줄이 아니다 */
   const navDated = '<li><span>2026.09.30</span><a href="/a">메인으로 이동</a><a href="/b">대학/대학원 안내</a><a href="/c">개교80주년 기념 안내</a><a href="/d">사회과학대학 소개</a><a href="/e">자연과학대학 소개</a></li>';
-  eq('  날짜가 든 메뉴 덩어리(링크 5개 이상)는 글 줄이 아니다', BL.extractDatedRows(navDated, board).length, 0);
+  eq('  날짜가 든 메뉴 덩어리는 글 줄이 아니다 (주소 꼴이 되풀이되지 않는다)', BL.extractDatedRows(navDated + rowsHtml, board).map((r) => r.title).some((t) => /메인으로|대학원 안내/.test(t)), false);
+  /* 3차 실행 실측: 링크 수로 거르면 첨부가 여럿 달린 글 줄(K2Web)이 통째로 떨어진다 — 꼴로 거르면 산다 */
+  const k2 = ['재학생 법정의무교육 이수 안내', '대학원 신입생 모집 안내', '학생예비군 기본훈련 안내'].map((t, i) => `<tr><td>${i + 1}</td><td><a href="/bbs/hufs/2181/${100 + i}/artclView.do">${t}</a><a href="/bbs/hufs/2181/${100 + i}/artclView.do"><span>새글</span></a></td><td><a href="/bbs/hufs/2181/${100 + i}/download.do?f=1">a.pdf</a><a href="/bbs/hufs/2181/${100 + i}/download.do?f=2">b.hwp</a><a href="/bbs/hufs/2181/${100 + i}/download.do?f=3">c.pdf</a></td><td>2026.09.2${i}</td></tr>`).join('');
+  eq('  첨부 여럿 달린 글 줄도 제목 하나로 산다 (블록당 한 글 · 파일 링크 제외)', BL.extractDatedRows('<table>' + k2 + '</table>', 'https://www.hufs.ac.kr/hufs/11281/subview.do').map((r) => r.title), ['재학생 법정의무교육 이수 안내', '대학원 신입생 모집 안내', '학생예비군 기본훈련 안내']);
+  eq('  꼴이 셋 미만이면 글 줄이 없다 (한두 줄짜리 날짜 블록은 메뉴·바닥글)', BL.extractDatedRows('<li><a href="/x/1">개인정보처리 방침 안내문</a> 2026.03.13</li><li><a href="/y/2">이용약관 변경 안내문</a> 2026.04.01</li>', board).length, 0);
+  eq('  주소 꼴 — 숫자는 #, 물음표 뒤는 열쇠만', BL.urlShape('https://www.khu.ac.kr/kor/notice/view.do?seq=12&page=3'), 'www.khu.ac.kr/kor/notice/view.do?page,seq');
   eq('  바닥글 방침·RSS·구매 공고 번호는 안 싣는다', ['개인정보처리 방침(시행일자 : 2026.03.13)', 'RSS 2.0', '[제26-41호] 세종캠퍼스 전산관리팀 컴퓨터 80대 구입'].map((t) => NK.isNewsRow({ title: t, url: 'https://u.ac.kr/1' }, opts)), [false, false, false]);
   eq('  발행 때 실린 글도 같은 잣대로 다시 거른다 (소급 · 원칙 7)', /all = all\.filter\(\(n\) => isNewsRow\(n, \{ scholarship: KEYWORDS, activityKind, isAttachmentEntry \}\)\)/.test(readText(new URL('collector/collect-news.mjs', root))), true);
   eq('  0행인 후보에는 생김새 진단을 남긴다 (짐작 대신 재료)', /t\.diag = pageDiag\(page\.html\)/.test(readText(new URL('collector/find-news-boards.mjs', root))) && typeof FN.pageDiag === 'function' && FN.pageDiag(navHtml + rowsHtml).datedBlocks === 5, true);

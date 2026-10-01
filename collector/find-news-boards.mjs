@@ -28,7 +28,7 @@ const REPORT = new URL('find-news-boards-report.md', HERE);
 const MAX = Number(process.env.FIND_NEWS_MAX || 50);
 const BUDGET_MS = Number(process.env.FIND_NEWS_MS || 360000);
 const PER_SCHOOL_MS = Number(process.env.FIND_NEWS_SCHOOL_MS || 75000);
-const RETRY_DAYS = 14;
+const RETRY_DAYS = Number(process.env.FIND_NEWS_RETRY_DAYS || 3);   // 후보는 싸고 게시판은 바뀐다 — 사흘마다 다시 본다 (14 → 3 · 2026-10-01)
 export const MIN_ROWS = 5;
 
 /* 공지 글처럼 보이는 행 — 학교 사이트 안의 링크이고, 수집기와 **같은 눈**(news-kind.mjs isNewsRow · 옆 메뉴·파일·잡음 제외)으로 글이다.
