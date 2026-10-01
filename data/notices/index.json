@@ -3,6 +3,10 @@
  "updatedAt": "2026-10-01",
  "schools": 34,
  "files": {
+  "숭실대학교": {
+   "file": "nmljo8t.json",
+   "count": 16
+  },
   "명지대학교": {
    "file": "ntyl0r5.json",
    "count": 1
@@ -122,10 +126,6 @@
   "숙명여자대학교": {
    "file": "n1a4mxa4.json",
    "count": 2
-  },
-  "숭실대학교": {
-   "file": "nmljo8t.json",
-   "count": 15
   },
   "세종대학교": {
    "file": "n1mo5fbn.json",
