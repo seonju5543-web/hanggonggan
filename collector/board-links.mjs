@@ -76,35 +76,44 @@ export function urlShape(url) {
    그 토막의 글 링크(파일·짧은 제목 제외) 가운데 **여러 토막에서 되풀이되는 주소 꼴**(MIN_SHAPE 이상)만 글이다 — 날짜가 든 메뉴 덩어리는
    꼴이 한 번씩이라 떨어지고, 첨부가 여럿 달린 글 줄도 제목 링크의 꼴은 하나라 산다. 토막 하나에 같은 꼴이 둘이면 제목이 긴 쪽 하나. */
 const MIN_SHAPE = 3;
-const SEG_MAX = 1500;
+const SEG_MAX = 3000;
 const DATE_G = /(20\d{2})\s*[.\-/년]\s*(\d{1,2})\s*[.\-/월]\s*(\d{1,2})(?!\d)|(?<!\d)(\d{2})\.(\d{2})\.(\d{2})(?!\d)/g;
+const inScript = (seg) => /<script\b(?:(?!<\/script>)[\s\S])*$/i.test(seg) || /<style\b(?:(?!<\/style>)[\s\S])*$/i.test(seg);
+const rowLinks = (seg, base, postedAt) => extractLinks(seg, base).filter((l) => l.title.length >= 4 && !isAttachmentEntry(l)).map((l) => ({ ...l, postedAt, shape: urlShape(l.url) })).filter((l) => l.shape);
+/* 두 눈을 합친다 (5차 실행 실측 · 2026-10-01): ① 블록 눈(<tr>·<li>·<dl>·<dd>·<article> 안에 날짜) — 표 게시판에 강하다(서울대·연세·국민·인하·방송대…)
+   ② 토막 눈(날짜 토큰 앞 SEG_MAX 자) — div·dt/dd 로 그린 목록에 강하다(성균관·광운·한양·명지). 한쪽만 쓰면 다른 쪽 학교가 0행이 된다.
+   후보 묶음마다 주소 꼴을 세고, 되풀이되는 꼴(MIN_SHAPE 이상)만 글 — 메뉴 덩어리는 꼴이 한 번씩이라 떨어진다. */
 export function extractDatedRows(html, base) {
   const src = String(html || '');
-  const segs = [];
-  let prev = 0; let m;
+  const groups = [];
+  const blockRe = /<(tr|li|dl|dd|article)\b[^>]*>((?:(?!<\1\b)[\s\S])*?)<\/\1>/gi;
+  let m;
+  while ((m = blockRe.exec(src)) !== null) {
+    const postedAt = rowDate(m[2]);
+    if (!postedAt) continue;
+    const links = rowLinks(m[2], base, postedAt);
+    if (links.length) groups.push({ links, pick: 'longest' });
+  }
+  let prev = 0;
   DATE_G.lastIndex = 0;
   while ((m = DATE_G.exec(src)) !== null) {
-    /* 스크립트·스타일 안의 날짜는 글 줄이 아니다 — 토막 끝이 <script> 안이면 건너뛴다 */
     const postedAt = rowDate(m[0]);
-    const from = Math.max(prev, m.index - SEG_MAX);
-    const seg = src.slice(from, m.index);
+    const seg = src.slice(Math.max(prev, m.index - SEG_MAX), m.index);
     prev = DATE_G.lastIndex;
-    if (!postedAt) continue;
-    if (/<script\b(?:(?!<\/script>)[\s\S])*$/i.test(seg) || /<style\b(?:(?!<\/style>)[\s\S])*$/i.test(seg)) continue;
-    const links = extractLinks(seg, base).filter((l) => l.title.length >= 4 && !isAttachmentEntry(l)).map((l) => ({ ...l, postedAt, shape: urlShape(l.url) })).filter((l) => l.shape);
-    if (links.length) segs.push(links);
+    if (!postedAt || inScript(seg)) continue;
+    const links = rowLinks(seg, base, postedAt);
+    if (links.length) groups.push({ links, pick: 'last' });   // 토막에선 날짜에 가장 가까운 링크가 제 줄의 제목
   }
   const count = new Map();
-  for (const links of segs) for (const sh of new Set(links.map((l) => l.shape))) count.set(sh, (count.get(sh) || 0) + 1);
+  for (const g of groups) for (const sh of new Set(g.links.map((l) => l.shape))) count.set(sh, (count.get(sh) || 0) + 1);
   const top = [...count.entries()].filter(([, n]) => n >= MIN_SHAPE).sort((a, c) => c[1] - a[1])[0];
   if (!top) return [];
   const out = new Map();
-  for (const links of segs) {
-    const same = links.filter((l) => l.shape === top[0]);
+  for (const g of groups) {
+    const same = g.links.filter((l) => l.shape === top[0]);
     if (!same.length) continue;
-    /* 토막 안에서 **날짜에 가장 가까운** 같은 꼴 링크가 이 줄의 제목이다(앞 줄의 꼬리가 섞여도 뒤의 것이 제 것) — 같은 주소가 둘이면 제목 긴 쪽 */
-    const last = same[same.length - 1];
-    const best = same.filter((l) => l.url === last.url).sort((a, c) => c.title.length - a.title.length)[0];
+    const anchor = g.pick === 'last' ? same[same.length - 1] : same.slice().sort((a, c) => c.title.length - a.title.length)[0];
+    const best = same.filter((l) => l.url === anchor.url).sort((a, c) => c.title.length - a.title.length)[0];
     if (!out.has(best.url)) out.set(best.url, { title: best.title, url: best.url, postedAt: best.postedAt });
   }
   return [...out.values()];
