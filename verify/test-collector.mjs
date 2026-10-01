@@ -1550,8 +1550,14 @@ console.log('\n■ 장학금 판정 자동화 · 범위 승격 (2026-09-30)');
   /* 합치기 — 관리자와 로봇이 같은 함수 */
   const RM = await import(new URL('collector/registered-merge.mjs', root));
   const keep = { id: 'a', eligibility: { schoolOnly: '아주대학교' }, sourceUrl: 'https://a' };
-  const r = RM.mergeInto(keep, { id: 'b', eligibility: { schoolOnly: '연세대학교' }, sourceUrl: 'https://b', deadline: '2026-10-30' }, { reason: '시험' });
+  const r = RM.mergeInto(keep, { id: 'b', eligibility: { schoolOnly: '연세대학교' }, sourceUrl: 'https://b', deadline: '2026-10-30', period: '접수 ~2026-10-30', deadlineFrom: '공고 원문' }, { reason: '시험' });
   eq('다른 학교끼리 합치면 전국으로 승격하고 근거를 남긴다', r.promoted && !keep.eligibility.schoolOnly && /연세대학교/.test(keep.scopeFrom) && keep.deadline === '2026-10-30', true);
+  /* 2026-10-01 실측 — 마감은 근거 문구와 함께만 옮긴다(아니면 마감일 감사가 빨간불 → 그날 자동 등록이 통째로 되돌려진다) */
+  eq('  옮긴 마감은 출처 표식에 날짜를 내는 문구를 단다 (감사가 읽는 자리)', /·\s*접수 ~2026-10-30$/.test(keep.deadlineFrom || '') && keep.period === '접수 ~2026-10-30', true);
+  const keepNoEv = { id: 'k2', eligibility: { schoolOnly: '아주대학교' } };
+  RM.mergeInto(keepNoEv, { id: 'd2', eligibility: { schoolOnly: '연세대학교' }, deadline: '2026-10-30', period: '접수 기간 원문 확인', deadlineFrom: '공고 원문' }, { reason: '시험' });
+  eq('  날짜를 내는 문구가 없는 마감은 옮기지 않는다 (못 믿으면 비운다)', keepNoEv.deadline, undefined);
+  eq('  발췌 줄의 날짜(9. 23.)도 근거다', RM.deadlineQuote({ deadline: '2026-09-23', period: '원문 확인', excerpts: ['신청기간: 2026. 9. 1. ~ 9. 23.(화)'] }), '신청기간: 2026. 9. 1. ~ 9. 23.(화)');
   /* 리뷰 3차 — 이미 전국인 등록분은 세 번째 학교 글을 흡수한다(범위 그대로 · 게시 학교만 근거에) · 같은 글은 두 번 더하지 않는다 */
   const r2 = RM.mergeInto(keep, { id: 'c', eligibility: { schoolOnly: '건국대학교' }, sourceUrl: 'https://c' }, { reason: '시험' });
   RM.mergeInto(keep, { id: 'c', eligibility: { schoolOnly: '건국대학교' }, sourceUrl: 'https://c' }, { reason: '시험' });
@@ -4557,10 +4563,13 @@ console.log('■ 학교가 늘면 「정식 등록도 나눌 때」라고 말하
   const DW = createRequire(import.meta.url)('./data-weight.cjs');
   const reg = JSON.parse(readText(new URL('../data/registered.json', import.meta.url)));
 
-  /* ① 지금은 조용해야 한다 (실측 21KB · 선 150KB) */
+  /* ① 실데이터는 **재기만 하고 빨간불로 두지 않는다** (2026-10-01 실측 — 44개교 복원 뒤 선을 넘나들며 run 196 에서 이 줄이 빨간불이 돼
+        그날 자동 등록 8건이 되돌려졌다. 이 조언은 경고다 — CLAUDE.md 「학교가 늘면 정식 등록도 나누라고 데이터가 스스로 말한다」.
+        넘었는지는 수집 리포트 → GitHub 이슈에 뜬다 · 여기선 숫자만 보인다). */
   const now = DW.registeredSplitAdvice(reg);
-  eq('  지금은 아직 말하지 않는다 (선을 안 넘었다)', { over: now.over, line: now.line }, { over: false, line: null });
-  eq('  그래도 재기는 했다 (전국분과 학교 수를 읽어냈다)', now.nation > 0 && now.schools > 0, true);
+  console.log(`  ℹ 지금 남의 학교 몫 ${Math.round(now.wasted / 1024)}KB · 선 ${Math.round(DW.SPLIT_WARN_BYTES / 1024)}KB · ${now.over ? '🔴 선을 넘었다 — 리포트에 조언이 뜬다(개발자에게 말할 때)' : '선 아래'}`);
+  eq('  재기는 했다 (전국분과 학교 수를 읽어냈다)', now.nation > 0 && now.schools > 0, true);
+  eq('  넘었을 때만 말한다 (over 와 line 이 같이 움직인다)', now.over === !!now.line, true);
 
   /* ② 학교가 늘어난 미래 — **실데이터 크기에 기대지 않는다.** 처음에 실제 공고를 스무 번
      복제해 봤는데 그 공고가 작아서 선을 못 넘었고, 검사가 '말하지 않는다'로 초록불이었다.

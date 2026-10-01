@@ -49,6 +49,8 @@
   지역 이름은 data.js `REGION_CITIES` 에서 읽는다) · 교내 high 는 '학교가 준다'는 본문 또는 약한 신호 둘 ② **이미 전국인 등록분은 세 번째 학교 글을 흡수**한다
   (`absorbed` · `isNationalAbsorber` · 여러 학교만 받는 공고는 그 학교가 `schoolsAny` 에 있을 때만) · 승격은 로봇 등록·교외·사람 미지정·마감 전만
   ③ 관리자가 구분·범위를 고치면 `kindFrom`·`scopeFrom` 에 '관리자' 표식(없으면 로봇이 다음 실행에 되돌린다) ④ 판정 로봇 셋은 리포트 파일을 인자로 받는다(브라우저 수집은 `browser-report.md`).
+- 🔴 **합칠 때 마감은 날짜를 내는 문구와 함께만 옮긴다**(`deadlineQuote` · 2026-10-01 첫 클라우드 실행에서 근거 없는 마감이 4건이 되어 데이터 관문이 빨간불 → 그날 자동 등록 8건이 되돌려졌다).
+  **실데이터에 기댄 고정 검사를 관문에 두지 말 것** — 「정식 등록도 나눌 때」의 '지금은 선 아래' 줄이 44개교 복원 뒤 선을 넘나들며 같은 날 같은 사고를 냈다(지금은 숫자만 보인다).
 - 그 밖(같은 지시): 브라우저 담당 게시판은 `schools.json` `collector:"browser"` 로 일반 로봇이 건너뛴다 · 못 읽는 학교는 `run-probe.txt` 정찰 · 주소 없는 분교는
   `school-board-seeds.json` 씨앗을 `find-boards.mjs` 가 훑어 후보만 리포트(자동으로 넣지 않는다) · 포털 표 후보 `collector/portal-candidates.mjs` · 정문 사진은 44개교(`fetch-gate-photos.mjs`).
   관문 「장학금 판정 자동화 · 범위 승격」.
