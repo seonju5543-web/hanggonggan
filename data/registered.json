@@ -3459,8 +3459,6 @@
    ],
    "eligibilityFrom": "AI(원문 줄 그대로)",
    "eligibilityReviewed": false,
-   "sameAs": "하나금융나눔재단",
-   "sameAsFrom": "자동",
    "applyPortal": "인포21",
    "applyPortalSource": "신청방법: 인포21을 통한 신청",
    "applyPortalFrom": "공고 원문",
@@ -4906,8 +4904,6 @@
     "raw": "라. 지원금액: 150만원 마 . 지원방법 : 대전청년포털 회원가입 후 온라인 신청 , 자세한 사항은 반드시 공고문 확인"
    },
    "amountFrom": "공고 원문",
-   "sameAs": "대전청년내일재단",
-   "sameAsFrom": "자동",
    "alsoPostedAt": [
     {
      "school": "가톨릭대학교",
@@ -7439,6 +7435,373 @@
    ],
    "kindConfidence": "low",
    "kindFrom": "로봇(원문) 2026-10-01"
+  },
+  {
+   "id": "auto-bsid1083mi3004nttid55323",
+   "name": "[우양재단] 2026년 동행 장학생 모집 (가족 돌봄 청년 대상, ~10/18)",
+   "boardTitle": "[우양재단] 2026년 동행 장학생 모집 (가족 돌봄 청년 대상, ~10/18)",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「재단」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(제목)",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-10-18",
+   "deadlineFrom": "게시판 요약 · ~10/18",
+   "period": "접수 ~2026-10-18",
+   "summary": "서울교육대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서울교육대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-01 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083&nttId=55323",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-oardid323225menuno200318",
+   "name": "공통 [공통] 2026학년도 2학기 경희목련장학 신청 안내_10.02(금)~10.25(일)",
+   "boardTitle": "공통 [공통] 2026학년도 2학기 경희목련장학 신청 안내_10.02(금)~10.25(일)",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 학교 이름표 「경희」"
+   ],
+   "kindConfidence": "mid",
+   "kindFrom": "로봇(제목)",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-10-25",
+   "deadlineFrom": "게시판 요약 · ~10.25",
+   "period": "접수 ~2026-10-25",
+   "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경희대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-01 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323225",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-7986subviewdonttid125837",
+   "name": "[장학공지] (생활비)2026년 hy사회복지재단 든든 학업지원금 선발 공고",
+   "boardTitle": "[장학공지] (생활비)2026년 hy사회복지재단 든든 학업지원금 선발 공고",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「재단」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-01",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-10-01",
+   "period": "접수 기간 원문 확인",
+   "summary": "가천대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "가천대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-01 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026년든든학업지원금연장공고문.pdf",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/156311/download.do"
+    },
+    {
+     "name": "든든학업지원금_개인정보수집이용제공동의서.hwp",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/156312/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.gachon.ac.kr/kor/7986/subview.do?nttId=125837",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-enoticedoarticleno769228",
+   "name": "2026년 우양재단 동행장학생 모집 안내",
+   "boardTitle": "2026년 우양재단 동행장학생 모집 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「재단」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-01",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-10-01",
+   "period": "접수 기간 원문 확인",
+   "summary": "상명대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "상명대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-01 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "[붙임2] 2026년 우양재단 동행장학 신청서 서식.hwp",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=769228&attachNo=562610"
+    }
+   ],
+   "sourceUrl": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=769228&article.offset=0&articleLimit=10",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-onttid000100000000003863",
+   "name": "[교외-10/12]2026학년도 2학기 송화재단 장학생 선발 안내(학교지원)",
+   "boardTitle": "[교외-10/12]2026학년도 2학기 송화재단 장학생 선발 안내(학교지원)",
+   "type": "교외",
+   "kindEvidence": [
+    "제목 표식 「[교외」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(제목)",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-10-01",
+   "period": "접수 기간 원문 확인",
+   "summary": "고려대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "고려대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-01 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.korea.ac.kr/ko/568/subview.do?nttId=000100000000003863",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-ent2431268301artclviewdo",
+   "name": "(글로벌)(교외) 2026-2학기 송화재단 장학생 모집 공고(~10/13)",
+   "boardTitle": "(글로벌)(교외) 2026-2학기 송화재단 장학생 모집 공고(~10/13)",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「재단」",
+    "본문 「등기우편」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-01",
+   "provider": "주관 기관 원문 확인",
+   "amount": "300만원",
+   "amountValue": 3000000,
+   "deadline": "2026-10-13",
+   "deadlineFrom": "게시판 요약 · ~ 2026. 10. 13",
+   "period": "접수 ~2026-10-13",
+   "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-01 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "첨부2. 장학생 신상카드 양식_송화재단.xls",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/151507/download.do"
+    },
+    {
+     "name": "첨부3. 장학생 추천서 양식_송화재단.xlsx",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/151508/download.do"
+    }
+   ],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/268301/artclView.do",
+   "sourceKind": "auto",
+   "openDate": "2026-10-02",
+   "eligibilityLines": [
+    "1. 지원자격",
+    "가 . 2026-2 학기 현재 4 학기 이상 수료자 ( 3, 4 학년 재학생 )",
+    "나 . 직전학기 평점 및 총 평점평균 3.5 이상 ( 총 평점 , 직전학기 모두 충족 )",
+    "다 . 한국장학재단 이중지원 심사가 중복지원 상태가 아닌 학생",
+    "* 학자금대출과 기수혜장학금 , 송화재단 장학금을 포함한 총액이 등록금액을 초과하지 않아야 함"
+   ],
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 3000000,
+    "ratio": 0,
+    "min": 3000000,
+    "max": 3000000,
+    "raw": "2. 장학금 지급액 등 지원사항 2026-2 학기 등록금성 장학금 300 만원 ( ※ 장학금 지급식 참석 필수 _ 불참 시 선정 취소 )"
+   },
+   "amountFrom": "공고 원문",
+   "sameAs": "송화재단",
+   "sameAsFrom": "자동",
+   "scopeFrom": "로봇 2026-10-01 · 원문 증거로 전국 — 본문 「등기우편」 (게시: 한국외국어대학교)"
+  },
+  {
+   "id": "auto-bbssc58944254artclviewdo",
+   "name": "2026년도 하반기 송화재단 장학생 선발 안내(~10/16까지)",
+   "boardTitle": "2026년도 하반기 송화재단 장학생 선발 안내(~10/16까지)",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「재단」",
+    "접수 이메일 도메인 cosmax.com (학교 밖)"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-01",
+   "provider": "주관 기관 원문 확인",
+   "amount": "300만원",
+   "amountValue": 3000000,
+   "deadline": "2026-10-16",
+   "deadlineFrom": "게시판 요약 · ~10/16",
+   "period": "접수 ~2026-10-16",
+   "summary": "연세대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-01 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "첨부3. 장학생 추천서 양식_송화재단.xlsx",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1014869/download.do"
+    },
+    {
+     "name": "첨부2. 장학생 신상카드 양식_송화재단.xls",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1014870/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.yonsei.ac.kr/bbs/sc/58/944254/artclView.do",
+   "sourceKind": "auto",
+   "applyEmail": "ga@cosmax.com",
+   "applyEmailSource": "5. 접수 : 2026. 10. 16.(금) 오후 5시까지 ga@cosmax.com 으로 제출",
+   "applyEmailFrom": "공고 원문",
+   "eligibilityLines": [
+    "1. 지원자격",
+    "가. 4학기 이상 이수한 3~4학년 재학생",
+    "나. 전체 학점 평균이 3.5/4.5 이상인 자",
+    "다. 한국장학재단 이중지원심사 구분이 '지원 가능'인 학생",
+    "라. 타 외부재단의 장학금을 수혜하지 않는 학생"
+   ],
+   "excerpts": [
+    "장학금액: 등록금성 장학금 300만원"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 3000000,
+    "ratio": 0,
+    "min": 3000000,
+    "max": 3000000,
+    "raw": "2. 장학금액: 등록금성 장학금 300만원"
+   },
+   "amountFrom": "공고 원문",
+   "sameAs": "송화재단",
+   "sameAsFrom": "자동",
+   "scopeFrom": "로봇 2026-10-01 · 원문 증거로 전국 — 접수 이메일 도메인 cosmax.com (학교 밖) (게시: 연세대학교)"
+  },
+  {
+   "id": "auto-otice06doarticleno140281",
+   "name": "2026년 우양재단 동행 장학생 선발안내",
+   "boardTitle": "2026년 우양재단 동행 장학생 선발안내",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「재단」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-01",
+   "provider": "주관 기관 원문 확인",
+   "amount": "100만원",
+   "amountValue": 1000000,
+   "deadline": "2026-10-18",
+   "listedAt": "2026-10-01",
+   "period": "접수 기간 ~2026-10-18",
+   "summary": "성균관대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "성균관대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-01 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "[붙임2] 2026년 우양재단 동행장학 신청서 서식.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140281&attachNo=118001"
+    }
+   ],
+   "sourceUrl": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140281&article.offset=0&articleLimit=10",
+   "sourceKind": "auto",
+   "deadlineFrom": "공고 원문",
+   "eligibilityLines": [
+    "□ 지원자격 → (아래 조건을 모두 만족해야 함)",
+    "[공통]",
+    "- 국내 정규 4년제 대학에 재학 중인 학생",
+    "- 학자금지원구간 2구간 이하",
+    "- 가족돌봄청년(하단 상세 범위 확인)",
+    "※ 휴학생, 졸업생, 초과학기생, 학점은행제, 사이버대학생 등은 제외",
+    "※ 한 가정에 1명만 신청 가능",
+    "※ 현재 우양재단 장학금을 받고 있는 경우, 신청 불가",
+    "※ 과거 우양재단 장학금 수혜자(현재 수혜 중이 아닌 경우) 신청 가능",
+    "※ 동일 조건일 경우 신규 신청자 우선 선발"
+   ],
+   "excerpts": [
+    "□ 신청기간 : ~ 10월 18일 (일) 까지",
+    "□ 지원자격 → (아래 조건을 모두 만족해야 함)",
+    "□ 문의 : 우양재단 장학담당자 (02-333-1287)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 1000000,
+    "ratio": 0,
+    "min": 1000000,
+    "max": 1000000,
+    "raw": "□ 지원인원 및 금액 : 가족 돌봄 청년 11명 / 인당 100만원"
+   },
+   "amountFrom": "공고 원문"
   }
  ]
 }

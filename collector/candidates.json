@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-10-01",
- "count": 2266,
+ "count": 2267,
  "items": [
   {
    "title": "[공통][교외]2026년도 하반기 재단법인 논산시장학회 장학생 선발 공고(~10/30)",
@@ -444,6 +444,15 @@
    "attachments": [],
    "deadlineHint": null,
    "school": "고려대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "[한국장학재단] 희망사다리 장학생 대상 대전 일자리 박람회 개최",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/145/235926/artclView.do",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "명지대학교",
    "campus": "",
    "foundAt": "2026-10-01"
   },
