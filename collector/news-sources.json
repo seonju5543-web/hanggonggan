@@ -562,7 +562,7 @@
    "school": "동국대학교",
    "campus": "",
    "home": "https://www.dongguk.edu/main",
-   "boardUrl": null,
+   "boardUrl": "https://www.dongguk.edu/article/GENERALNOTICES/list",
    "candidates": [
     {
      "url": "https://www.dongguk.edu/article/GENERALNOTICES/list",
@@ -575,13 +575,25 @@
      "evidence": "웹 검색 2026-09-30 '동국대학교 공지사항 dongguk.edu 일반공지 학사공지' → 결과 URL https://www.dongguk.edu/article/HAKSANOTICE/list (제목: 동국대학교 - 대학안내 - 공지사항 - 학사공지)"
     }
    ],
-   "note": "장학 JANGHAKNOTICE(이미 아는 것). 상세는 /article/<코드>/detail/<번호>. 2026-10-01 클릭형 규칙(news-board-rules.mjs)을 적고 probe 를 비웠다 — 다음 실행이 규칙으로 다시 보고 첫 상세를 열어 확인한다."
+   "note": "장학 JANGHAKNOTICE(이미 아는 것). 상세는 /article/<코드>/detail/<번호>. 2026-10-01 클릭형 규칙(news-board-rules.mjs)을 적고 probe 를 비웠다 — 다음 실행이 규칙으로 다시 보고 첫 상세를 열어 확인한다.",
+   "autoFound": {
+    "date": "2026-10-01",
+    "via": "candidate",
+    "label": "일반공지",
+    "rows": 10,
+    "sample": [
+     "[서울앵커사업단 캠퍼스타운센터] AI리터러시_뤼튼과 함께하는 예비 IPO 협업 프로젝트 모집 공고(~10/14)",
+     "10월 6일(화)과 10월 8일(목) 헌혈 버스 시행 안내",
+     "[중앙도서관] 2026년 대학도서관 이용자 만족도 조사 참여 안내 (~10/6)"
+    ],
+    "evidence": "웹 검색 2026-09-30 'site:dongguk.edu GENERALNOTICES list 일반공지' → 결과 URL https://www.dongguk.edu/article/GENERALNOTICES/list (제목: 동국대학교 - 대학안내 - 공지사항 - 일반공지) · 페이지 ?pageIndex=N · 상세를 열어 제목 확인 (https://www.dongguk.edu/article/GENERALNOTICES/detail/26766449)"
+   }
   },
   {
    "school": "동국대학교 WISE캠퍼스",
    "campus": "",
    "home": "https://wise.dongguk.ac.kr/main",
-   "boardUrl": null,
+   "boardUrl": "https://wise.dongguk.ac.kr/article/generalnotice/list",
    "candidates": [
     {
      "url": "https://wise.dongguk.ac.kr/article/generalnotice/list",
@@ -594,7 +606,19 @@
      "evidence": "웹 검색 2026-09-30 'site:wise.dongguk.ac.kr article haksanotice list 학사공지' → 결과 URL https://wise.dongguk.ac.kr/article/acdnotice/list (제목: 동국대학교 WISE캠퍼스 - 커뮤니티 - 공지사항 - 학사)"
     }
    ],
-   "note": "채용 jobnotice · 입학 entrynotice 도 같은 꼴. 2026-10-01 클릭형 규칙(news-board-rules.mjs)을 적고 probe 를 비웠다 — 다음 실행이 규칙으로 다시 보고 첫 상세를 열어 확인한다."
+   "note": "채용 jobnotice · 입학 entrynotice 도 같은 꼴. 2026-10-01 클릭형 규칙(news-board-rules.mjs)을 적고 probe 를 비웠다 — 다음 실행이 규칙으로 다시 보고 첫 상세를 열어 확인한다.",
+   "autoFound": {
+    "date": "2026-10-01",
+    "via": "candidate",
+    "label": "일반공지",
+    "rows": 11,
+    "sample": [
+     "양산지역 학생통학버스 운행 시간표 변경 안내 2026.09.17. 임준택",
+     "2026-2학기 비교과 교육과정 안내 2026.09.02. 한정",
+     "[혁신] 교수학습개발센터 2026-2학기 학습법 LXP 시행 안내 2026.10.01. 오제인"
+    ],
+    "evidence": "웹 검색 2026-09-30 '동국대학교 WISE캠퍼스 공지사항 wise.dongguk.ac.kr' → 결과 URL https://wise.dongguk.ac.kr/article/generalnotice/list (제목: 동국대학교 WISE캠퍼스 - 커뮤니티 - 공지사항 - 일반) · 상세를 열어 제목 확인 (https://wise.dongguk.ac.kr/article/generalnotice/detail/520586)"
+   }
   },
   {
    "school": "홍익대학교",
@@ -921,7 +945,7 @@
    "school": "인하대학교",
    "campus": "",
    "home": "https://www.inha.ac.kr/",
-   "boardUrl": null,
+   "boardUrl": "https://www.inha.ac.kr/bbs/kr/8/artclList.do",
    "candidates": [
     {
      "url": "https://www.inha.ac.kr/bbs/kr/8/artclList.do",
@@ -929,7 +953,19 @@
      "evidence": "웹 검색 2026-09-30 '인하대학교 공지사항 bbs/kr/8/artclList.do 전체 학사' → 상세 https://www.inha.ac.kr/bbs/kr/8/39740/artclView.do (제목: 공지사항 - [학사관리팀] 2025-1학기 (본)수강신청 안내) — bbs 8 이 통합 공지사항, bbsClSeq 를 뗀 목록으로 유도"
     }
    ],
-   "note": "bbsClSeq=215 가 장학(이미 아는 것) · 77 은 이름 미확인. 2026-10-01 찾기 로봇이 ENOTFOUND/시간초과(일시적 — 같은 날 장학 수집기는 정상) → probe 를 비워 다음 실행이 바로 다시 본다."
+   "note": "bbsClSeq=215 가 장학(이미 아는 것) · 77 은 이름 미확인. 2026-10-01 찾기 로봇이 ENOTFOUND/시간초과(일시적 — 같은 날 장학 수집기는 정상) → probe 를 비워 다음 실행이 바로 다시 본다.",
+   "autoFound": {
+    "date": "2026-10-01",
+    "via": "candidate",
+    "label": "공지사항",
+    "rows": 19,
+    "sample": [
+     "[IPP] 2027년도 상반기 일학습병행 학생 모집 기업 초청 설명회 사전 신청 안내",
+     "[대학일자리플러스센터] 'SK하이닉스+삼성전자 면접대비 특강' 모집중!",
+     "[대학혁신지원사업] \"나도 학생 강사\" : 학생 주도 학습 프로그램(SDC) 강사 모집"
+    ],
+    "evidence": "웹 검색 2026-09-30 '인하대학교 공지사항 bbs/kr/8/artclList.do 전체 학사' → 상세 https://www.inha.ac.kr/bbs/kr/8/39740/artclView.do (제목: 공지사항 - [학사관리팀] 2025-1학기 (본)수강신청 안내) — bbs 8 이 통합 공지사항, bbsClSeq 를 뗀 목록으로 유도"
+   }
   },
   {
    "school": "부산대학교",
@@ -1165,7 +1201,7 @@
    "school": "서울교육대학교",
    "campus": "",
    "home": "https://www.snue.ac.kr/",
-   "boardUrl": null,
+   "boardUrl": "https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=1309&bbsId=1082",
    "candidates": [
     {
      "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=1309&bbsId=1082",
@@ -1178,7 +1214,19 @@
      "evidence": "같은 검색 → 결과 URL https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=1280&bbsId=1081 (제목: 서울교육대학교- 교육지원-학사정보-학사공지)"
     }
    ],
-   "note": "bbsId 1082 = 대학소식 공지사항, 1081 = 학사공지, 1083 = 장학. 2026-10-01 클릭형 규칙(news-board-rules.mjs)을 적고 probe 를 비웠다 — 다음 실행이 규칙으로 다시 보고 첫 상세를 열어 확인한다."
+   "note": "bbsId 1082 = 대학소식 공지사항, 1081 = 학사공지, 1083 = 장학. 2026-10-01 클릭형 규칙(news-board-rules.mjs)을 적고 probe 를 비웠다 — 다음 실행이 규칙으로 다시 보고 첫 상세를 열어 확인한다.",
+   "autoFound": {
+    "date": "2026-10-01",
+    "via": "candidate",
+    "label": "공지사항",
+    "rows": 15,
+    "sample": [
+     "[통일부] 제25기 평화통일민주교육위원 추가 위촉 신청 안내(10월 05일까지 날···",
+     "2026학년도 창의융복합 교육연구 프로젝트 팀 모집",
+     "학생증 발급 및 사진 등록 안내"
+    ],
+    "evidence": "웹 검색 2026-09-30 '서울교육대학교 공지사항 snue.ac.kr selectNttList.do' → 결과 URL https://snue.ac.kr/snue/na/ntt/selectNttList.do?mi=1309&bbsId=1082 (제목: 서울교육대학교- 사향광장-대학소식-공지사항) · 상세를 열어 제목 확인 (https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=1309&bbsId=1082&nttSn=55101)"
+   }
   },
   {
    "school": "한국방송통신대학교",
@@ -1210,7 +1258,7 @@
    "school": "경북대학교",
    "campus": "",
    "home": "https://www.knu.ac.kr/wbbs/wbbs/main/main.action",
-   "boardUrl": null,
+   "boardUrl": "https://www.knu.ac.kr/wbbs/wbbs/main/main.action",
    "candidates": [
     {
      "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/listBtin.action?bbs_cde=1&menu_idx=67",
@@ -1218,7 +1266,19 @@
      "evidence": "웹 검색 2026-09-30 'knu.ac.kr wbbs listBtin.action bbs_cde=1 공지사항' → 결과 URL https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/viewBtin.action?btin.bbs_cde=1&btin.doc_no=1325007&btin.appl_no=000000&menu_idx=67 (제목: 경북대학교 > 공지 > 공지사항); 목록 listBtin.action 은 유추"
     }
    ],
-   "note": "검색엔 상세만 잡혔다. 목록 주소는 유추. 2026-10-01 찾기 로봇이 홈 메뉴 「정부재정지원사업」의 포토뉴스(홍보 기사) 5행을 공지로 잘못 올려 비웠다 — 공지 게시판이 아니다. 후보 listBtin 은 정찰(run-probe.txt)로 실제 화면을 본 뒤 정한다."
+   "note": "검색엔 상세만 잡혔다. 목록 주소는 유추. 2026-10-01 찾기 로봇이 홈 메뉴 「정부재정지원사업」의 포토뉴스(홍보 기사) 5행을 공지로 잘못 올려 비웠다 — 공지 게시판이 아니다. 후보 listBtin 은 정찰(run-probe.txt)로 실제 화면을 본 뒤 정한다.",
+   "autoFound": {
+    "date": "2026-10-01",
+    "via": "home-menu",
+    "label": "정부재정지원사업",
+    "rows": 5,
+    "sample": [
+     "포토뉴스 대현119안전센터와 교내 어린이집에서 합동소방훈련 실시 경북대는 9월 30일 교내 어린이집에서 교직원과 원아, 대현119안전센터 소방관 등 300여명이 참여한 가운데 2026년도 합동소방훈련을 실시했다. 2026-10-01",
+     "포토뉴스 수의과대학 김규태 교수, 제자 위해 발전기금 1천만원 전달 수의과대학 김규태 교수가 제자들을 위해 써달라며 발전기금 1천만원을 경북대에 전달했다. 2026-10-01",
+     "포토뉴스 교육부 글로컬랩 2개 연구소 선정… 9년간 총 사업비 377억원 확보 교육부와 한국연구재단이 추진하는 ‘글로컬랩(거점형) 사업’에 지능형건설자동화연구센터와 세포·기질연구소가 각각 최종 선정됐다. 2026-09-29"
+    ],
+    "evidence": "홈페이지 메뉴 「정부재정지원사업」 을 따라 들어가 확인 (2026-10-01)"
+   }
   },
   {
    "school": "영남대학교",
@@ -1260,7 +1320,7 @@
    "school": "전북대학교",
    "campus": "",
    "home": "https://www.jbnu.ac.kr/web/index.do",
-   "boardUrl": null,
+   "boardUrl": "https://www.jbnu.ac.kr/web/news/notice/sub01.do",
    "candidates": [
     {
      "url": "https://www.jbnu.ac.kr/web/news/notice/sub01.do",
@@ -1273,7 +1333,19 @@
      "evidence": "같은 검색 → 결과 URL https://www.jbnu.ac.kr/web/news/notice/sub02.do (제목: 학생공지)"
     }
    ],
-   "note": "sub01 교내공지(전체) · sub02 학생공지 · sub03 교내채용. 행이 onclick 형(pf_DetailMove)이라 규칙 필요. 2026-10-01 클릭형 규칙(news-board-rules.mjs)을 적고 probe 를 비웠다 — 다음 실행이 규칙으로 다시 보고 첫 상세를 열어 확인한다."
+   "note": "sub01 교내공지(전체) · sub02 학생공지 · sub03 교내채용. 행이 onclick 형(pf_DetailMove)이라 규칙 필요. 2026-10-01 클릭형 규칙(news-board-rules.mjs)을 적고 probe 를 비웠다 — 다음 실행이 규칙으로 다시 보고 첫 상세를 열어 확인한다.",
+   "autoFound": {
+    "date": "2026-10-01",
+    "via": "candidate",
+    "label": "공지사항",
+    "rows": 11,
+    "sample": [
+     "2026학년도 전공배정 제도 설명회 개최 안내",
+     "제2차「청년세대 성별균형 공개형 공론장」청년 참여자 모집 홍보 협조 요청",
+     "[전북국제개발협력센터] 국제개발협력 전문가 특강 참여자 모집 - 국제개발협력과 글쓰기 이해 (큰사람 포인트 10점 지급!)"
+    ],
+    "evidence": "웹 검색 2026-09-30 '전북대학교 공지사항 jbnu.ac.kr web/news/notice' → 결과 URL https://www.jbnu.ac.kr/web/news/notice/sub01.do (제목: 교내공지) — category 없이 전체 · 상세를 열어 제목 확인 (https://www.jbnu.ac.kr/web/Board/217819/detailView.do)"
+   }
   },
   {
    "school": "충남대학교",
