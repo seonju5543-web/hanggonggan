@@ -1,3 +1,4 @@
 공공 API 로봇 push-to-run — 이 파일을 고쳐 기본 브랜치에 push 하면 .github/workflows/open-api.yml 이 바로 돈다.
 2026-10-01 신설
 2026-10-01 재실행 — K-Startup 주최 칸(갈래 값) 제거를 데이터에 반영
+2026-10-01 재실행 — 자격·제외·원문 안내 칸(detailsV 2) · 1365 상세 내용
