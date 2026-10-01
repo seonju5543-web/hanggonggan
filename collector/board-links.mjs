@@ -92,12 +92,14 @@ export function cutRowTail(title) {
   if (tail.length > 40 || /~|까지|마감|부터|신청|접수|\(|\)/.test(tail)) return t.trim();
   return t.slice(0, m.index).trim();
 }
+/* 줄 전체를 감싼 링크의 앞머리 분류 꼬리표(경희 「공통 [추천채용] …」·「국제 [(주)…」 8차 실측) — 대괄호 앞의 짧은 분류 낱말만 뗀다 */
+const ROW_BADGE = /^(?:공통|국제|일반|학사|장학|행사|채용|공지|중요공지|새글)\s+(?=\[)/;
 function resolvedLinks(seg, resolve) {
   const out = [];
   const re = /<a\b([^>]*)>([\s\S]*?)<\/a>/gi;
   let m;
   while ((m = re.exec(seg)) !== null) {
-    const title = cutRowTail(cleanTitle(m[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()));
+    const title = cutRowTail(cleanTitle(m[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim())).replace(ROW_BADGE, '');
     if (title.length < 6 || title.length > 140) continue;
     const url = resolve(m[1], title);
     if (!url) continue;

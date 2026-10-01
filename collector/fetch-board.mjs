@@ -27,7 +27,10 @@ export async function fetchBoard(url, opts = {}) {
   let lastErr;
   for (let i = 0; i < tries; i += 1) {
     try {
-      return await fetch(url, { redirect: 'follow', headers, signal: AbortSignal.timeout(i === 0 ? (opts.firstMs ?? 20000) : (opts.retryMs ?? 45000)) });
+      /* POST 목록 API(중앙대 BBSViewList2.do · 2026-10-01 정찰) — 본문이 있으면 폼 전송으로 보낸다. 머리말은 같다(학생 브라우저와 같은 UA). */
+      const init = { method: opts.method || (opts.body ? 'POST' : 'GET'), redirect: 'follow', headers: opts.body ? { ...headers, 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } : headers, signal: AbortSignal.timeout(i === 0 ? (opts.firstMs ?? 20000) : (opts.retryMs ?? 45000)) };
+      if (opts.body) init.body = opts.body;
+      return await fetch(url, init);
     } catch (e) {
       lastErr = e;
       if (!TRANSIENT.test(netReason(e)) || i === tries - 1) break;   // 주소가 없는 것(ENOTFOUND)은 다시 해도 같다

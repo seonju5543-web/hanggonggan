@@ -14,7 +14,7 @@
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { sameSite } from './board-links.mjs';
-import { NEWS_BOARD_RULES, datedRowsFor, verifyRuleDetail, needsDetailCheck } from './news-board-rules.mjs';   // 클릭형 게시판 규칙 한 곳 (찾기 로봇과 같은 것)
+import { NEWS_BOARD_RULES, rowsForBoard, verifyRuleDetail, needsDetailCheck, fetchesOwnList } from './news-board-rules.mjs';   // 클릭형 게시판 규칙 한 곳 (찾기 로봇과 같은 것)
 import { urlKey, dedupeNotices } from './url-key.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { activityKind } from './activity-kind.mjs';
@@ -96,13 +96,17 @@ async function harvestBoard(s, ctx = { dead: false }) {
      첫 실행에서 물었더니 10개교가 ⛔ 로 빠졌다(2026-10-01). */
   try {
     const rule = NEWS_BOARD_RULES[s.school];
-    const res = await fetchBoard(s.boardUrl);
-    if (ctx.dead) return;
-    if (!res.ok) { results.push({ name, status: `⚠️ 접속 실패 (HTTP ${res.status}) — 주소 수정 필요`, items: [] }); return; }
-    const html = await res.text();
+    let html = '';
+    if (!fetchesOwnList(rule)) {   // json·post 규칙은 목록 HTML 이 아니라 API 를 읽는다 (rowsForBoard)
+      const res = await fetchBoard(s.boardUrl);
+      if (ctx.dead) return;
+      if (!res.ok) { results.push({ name, status: `⚠️ 접속 실패 (HTTP ${res.status}) — 주소 수정 필요`, items: [] }); return; }
+      html = await res.text();
+    }
     /* 🔴 글 줄만 — 페이지의 <a> 전부(extractLinks)를 쓰면 사이트 메뉴가 글로 담긴다(첫 실행 906건 사고 · 2026-10-01).
        날짜가 붙은 줄(<tr>·<li>…)의 링크만 글이고, 그 날짜가 게시일(postedAt)이다. 클릭형 게시판은 같은 눈에 규칙의 링크 풀이만 얹는다. */
-    const rawLinks = datedRowsFor(s.school, html, s.boardUrl);
+    const rawLinks = await rowsForBoard(s.school, s.boardUrl, html);
+    if (ctx.dead) return;
     /* 무엇을 싣나 — 학교 사이트 안의 글 가운데 장학·활동·잡음을 뺀 것 (판정은 news-kind.mjs 한 곳) */
     const items = rawLinks
       .filter((i) => sameSite(i.url, s.boardUrl))
@@ -111,7 +115,7 @@ async function harvestBoard(s, ctx = { dead: false }) {
     const fresh = items.filter((i) => !seen[urlKey(i.url)]).slice(0, NEWS_FRESH_MAX);
     /* 🔴 규칙으로 만든 상세 주소는 매번 첫 글 하나를 실제로 열어 제목을 확인한다 — 안 맞으면 이 게시판은 싣지 않는다(틀린 링크보다 0건). */
     if (needsDetailCheck(rule) && fresh.length) {
-      const v = await verifyRuleDetail(fresh[0], { boardUrl: s.boardUrl, others: items.map((i) => i.title) });
+      const v = await verifyRuleDetail(fresh[0], { rule, boardUrl: s.boardUrl, others: items.map((i) => i.title) });
       if (ctx.dead) return;
       if (!v.ok) { results.push({ name, status: `⚠️ 클릭형 규칙(news-board-rules.mjs)의 상세 주소 확인 실패 — ${v.reason} · 이 게시판은 싣지 않음`, items: [] }); return; }
     }

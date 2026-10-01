@@ -124,13 +124,14 @@ async function checkUrl(url) {
       }
     } else {
       report.push('- 날짜 줄의 제목 링크: 없음 (날짜가 든 줄에 링크가 없거나 목록이 안 그려짐)');
-      /* 왜 없는가 — 목록처럼 보이는 첫 요소의 HTML 앞부분을 그대로 적는다(짐작 대신 재료 · 계명·상명·서강 7차) */
-      const frag = await page.evaluate(() => {
-        const el = document.querySelector('table, [class*="board"], [class*="bbs"], [class*="list"], [id*="board"], [id*="list"]');
-        return el ? el.outerHTML.replace(/\s+/g, ' ').slice(0, 1500) : '';
-      }).catch(() => '');
-      if (frag) report.push(`- 목록처럼 보이는 첫 요소의 HTML (앞 1500자): \`${frag.replace(/`/g, "'")}\``);
     }
+    /* 목록처럼 보이는 요소의 HTML 앞부분을 늘 적는다(짐작 대신 재료) — 날짜 줄이 바닥글(계명 방침 이력)뿐일 때도 진짜 목록의 생김새가 필요하다(2차 정찰 실측) */
+    const frag = await page.evaluate(() => {
+      const els = [...document.querySelectorAll('table, [class*="board"], [class*="bbs"], [class*="list"], [id*="board"], [id*="list"]')];
+      const el = els.find((e) => /제목|작성자|등록일|작성일|조회/.test(e.textContent || '')) || els[0];
+      return el ? el.outerHTML.replace(/\s+/g, ' ').slice(0, 1800) : '';
+    }).catch(() => '');
+    if (frag) report.push(`- 목록처럼 보이는 요소의 HTML (앞 1800자): \`${frag.replace(/`/g, "'")}\``);
     if (reqs.length) { report.push(`- 화면이 부른 요청 ${reqs.length}개 (목록 API·폼 전송 후보):`); reqs.forEach((l) => report.push(`    · ${l}`)); }
     report.push('');
   } catch (e) {

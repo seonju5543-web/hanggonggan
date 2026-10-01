@@ -41,3 +41,5 @@ checkUrl: https://www.uos.ac.kr/korNotice/list.do?list_id=FA1
 checkUrl: https://www.smu.ac.kr/kor/life/notice.do
 checkUrl: https://www.korea.ac.kr/ko/566/subview.do
 checkUrl: https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100
+# 서강 공지사항 API(열쇠 3)의 응답에서 글 번호(pkId)를 받아 적는다 — 다음에 /ko/detail/<pkId>?bbsConfigFk=3 이 실제로 열리는지 눌러 본 뒤 글 주소 규칙을 적는다
+checkUrl: https://www.sogang.ac.kr/api/api/v1/mainKo/BbsData/boardList?pageNum=1&pageSize=5&bbsConfigFk=3

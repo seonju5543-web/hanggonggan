@@ -14,6 +14,9 @@
    꼴
      kind 'onclick' — <a onclick="goDetail(123)"> 에서 fn 으로 번호를 꺼내 detail(번호, 게시판 주소)로 상세 주소를 만든다.
      kind 'dataId'  — <a data-id="123"> 의 번호로 같은 일을 한다.
+     kind 'json'    — 목록을 화면이 아니라 API 로 받는 게시판(서강 SPA · 정찰 2026-10-01 이 화면이 부른 요청에서 열쇠를 읽었다). link:'list' 면 글 주소 대신 목록 표식.
+     kind 'post'    — 목록을 POST API 로 받는 게시판(중앙 · 정찰이 본문까지 적었다). 응답 HTML 을 같은 눈(날짜 줄)으로 읽고 onclick 번호로 상세를 만든다.
+                      상세 본문도 스크립트가 POST 로 받으므로 확인(verifyPost)도 그 API 로 한다.
      kind 'listOnly' — 글 하나의 GET 주소가 **없는** 게시판(경희: 누르면 POST 로 view.do · 정찰 2026-10-01). 제목+게시일은 싣되 링크는
                        목록 주소 + `#n-제목` 표식으로 둔다 — 앱이 「게시판 목록 ↗」 로 정직하게 적는다(app.js isBoardListLink · 장학 공고와 같은 관례).
                        상세가 없으니 verifyRuleDetail 은 건너뛴다(목록 자체를 방금 읽었다).
@@ -41,6 +44,38 @@ export const NEWS_BOARD_RULES = {
     fn: /\bview\(\s*['"](\d+)['"]/,
     detail: (id, boardUrl, title) => `${String(boardUrl).split('#')[0]}#n-${encodeURIComponent(String(title || '').slice(0, 80))}`,
     evidence: '정찰 2026-10-01: 행은 href="javascript:view(번호)" · 첫 줄을 누르면 POST 로 /kor/user/bbs/BMSR00040/view.do (주소에 번호 없음) → 글 하나의 주소가 없어 목록 표식(#n-)으로만',
+  },
+  /* 서울시립대: 목록은 SSO 익명 확인을 거쳐야 글이 온다(정찰 2026-10-01: list.do → sso_index → … → list.do?…&identified=anonymous& 가 최종 주소 · 로봇은 그 최종 주소를 후보로 둔다).
+     행은 <a href="javascript:fnView('1', '31583')"> 이고 첫 줄을 누르면 아래 주소(seq 만 다름)가 열렸다 — 그 주소를 그대로 옮긴다. */
+  '서울시립대학교': {
+    kind: 'onclick',
+    fn: /fnView\(\s*['"]\d+['"]\s*,\s*['"](\d+)['"]/,
+    detail: (id, boardUrl) => {
+      let lid = 'FA1'; try { lid = new URL(boardUrl).searchParams.get('list_id') || lid; } catch { /* 목록 주소가 없으면 일반공지 */ }
+      return `https://www.uos.ac.kr/korNotice/view.do?list_id=${lid}&seq=${id}&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&`;
+    },
+    evidence: '정찰 2026-10-01 2차: 행 href="javascript:fnView(\'1\', \'31583\')" · 첫 줄 클릭 → korNotice/view.do?list_id=FA1&seq=31583&…&identified=anonymous& (seq 만 바뀜) · 목록은 identified=anonymous 가 붙은 최종 주소',
+  },
+  /* 서강대: SPA 라 목록 HTML 에 글이 없고 화면이 API 를 부른다 — 정찰 2차가 적은 요청: GET /api/api/v1/mainKo/BbsData/boardList?pageNum=1&pageSize=16&bbsConfigFk=3&…
+     (3 = 공지사항 · 장학은 141). 글 하나의 주소는 아직 실제로 열어 보지 못해(장학은 /ko/detail/<pkId>?bbsConfigFk=141 이었지만 공지는 안 눌러 봤다) 목록 표식으로만 싣는다. */
+  '서강대학교': {
+    kind: 'json',
+    link: 'list',
+    api: 'https://www.sogang.ac.kr/api/api/v1/mainKo/BbsData/boardList?pageNum=1&pageSize=30&bbsConfigFk=3',
+    detail: (id, boardUrl, title) => `${String(boardUrl).split('#')[0]}#n-${encodeURIComponent(String(title || '').slice(0, 80))}`,
+    evidence: '정찰 2026-10-01 2차: /ko/announcement 가 부른 요청 GET …/BbsData/boardList?…&bbsConfigFk=3 (화면이 부른 요청 기록) · 글 주소는 안 눌러 봐서 목록 표식(#n-)',
+  },
+  /* 중앙대: 목록·상세 모두 스크립트가 POST 로 받는다(정찰 2차가 본문까지 적었다). 행은 href="javascript:fn_goDetail('30220','N','','N')" ·
+     첫 줄 클릭 → BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30220&pageNo=1 (BBS_SEQ 만 바뀜).
+     그 화면의 본문은 POST ajax/FR_SVC/BoardViewData.do 가 채우므로 제목 확인도 그 API 로 한다. */
+  '중앙대학교': {
+    kind: 'post',
+    api: 'https://www.cau.ac.kr/ajax/FR_SVC/BBSViewList2.do',
+    body: 'pageNo=1&pagePerCnt=15&MENU_ID=100&SITE_NO=2&BOARD_SEQ=4&S_CATE_SEQ=&BOARD_TYPE=C0301&BOARD_CATEGORY_NO=&P_TAB_NO=&TAB_NO=&P_CATE_SEQ=&CATE_SEQ=&SEARCH_FLD=SUBJECT&SEARCH=',
+    fn: /fn_goDetail\(\s*['"](\d+)['"]/,
+    detail: (id) => `https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=${id}&pageNo=1`,
+    verifyPost: { idFrom: (url) => (String(url).match(/BBS_SEQ=(\d+)/) || [])[1], api: 'https://www.cau.ac.kr/ajax/FR_SVC/BoardViewData.do', body: (id) => `MENU_ID=100&SITE_NO=2&BOARD_SEQ=4&BBS_SEQ=${id}&P_TAB_NO=&CONTENTS_NO=1&BOARD_CATEGORY_NO=&P_TAB_NO=&TAB_NO=&pageNo=1` },
+    evidence: '정찰 2026-10-01 2차: 화면이 부른 요청 POST ajax/FR_SVC/BBSViewList2.do(본문 기록) · 첫 줄 클릭 → BoardView.do?…&BBS_SEQ=30220&pageNo=1 · 상세 본문은 POST BoardViewData.do',
   },
   '동국대학교': dongguk,
   '동국대학교 WISE캠퍼스': dongguk,
@@ -73,7 +108,7 @@ export function ruleResolver(rule, boardUrl) {
   if (!rule) return null;
   return (attrs, title) => {
     let id = null;
-    if (rule.kind === 'onclick' || rule.kind === 'listOnly') {
+    if (rule.kind === 'onclick' || rule.kind === 'listOnly' || rule.kind === 'post') {
       /* onclick="goDetail(1)" 도, href="javascript:view('1','')" 도 — 두 속성의 값을 모두 본다 */
       for (const m of attrs.matchAll(/\b(?:onclick|href)\s*=\s*(["'])((?:(?!\1)[\s\S])*)\1/gi)) {
         id = (m[2].match(rule.fn) || [])[1];
@@ -87,8 +122,42 @@ export function ruleResolver(rule, boardUrl) {
   };
 }
 
-/* 이 규칙의 글에 상세 확인이 필요한가 — 목록 표식(listOnly)은 상세가 없다 */
-export const needsDetailCheck = (rule) => !!rule && rule.kind !== 'listOnly';
+/* 이 규칙의 글에 상세 확인이 필요한가 — 목록 표식(listOnly · link:'list')은 상세가 없다 */
+export const needsDetailCheck = (rule) => !!rule && rule.kind !== 'listOnly' && rule.link !== 'list';
+
+/* API 로 받는 목록(json·post) 인가 — 두 로봇이 이때는 목록 HTML 대신 이 모듈에 글 줄을 묻는다 */
+export const fetchesOwnList = (rule) => !!rule && (rule.kind === 'json' || rule.kind === 'post');
+
+const ymd = (v) => { const m = String(v || '').match(/^(20\d{2})[-.]?(\d{2})[-.]?(\d{2})/); return m ? `${m[1]}-${m[2]}-${m[3]}` : ''; };
+
+/* 🔴 두 로봇이 부르는 한 곳 — 학교의 규칙에 따라 글 줄을 돌려준다.
+   html 게시판(규칙 없음·onclick·dataId·listOnly)은 넘겨받은 목록 HTML 을 읽고, json·post 는 API 를 직접 받는다.
+   @returns Promise<Array<{title,url,postedAt}>> */
+export async function rowsForBoard(school, boardUrl, html, fetchFn = fetchBoard) {
+  const rule = NEWS_BOARD_RULES[school];
+  if (!fetchesOwnList(rule)) return datedRowsFor(school, html, boardUrl);
+  if (rule.kind === 'json') {
+    const r = await fetchFn(rule.api, { tries: 2, firstMs: 15000, retryMs: 20000 });
+    if (!r || !r.ok) throw new Error(`API HTTP ${r ? r.status : '?'}`);
+    const j = await r.json();
+    const dig = (o, d = 0) => { if (Array.isArray(o)) return o; if (!o || typeof o !== 'object' || d > 2) return null; for (const k of ['list', 'data', 'content', 'result', 'items', 'rows']) { const hit = dig(o[k], d + 1); if (hit) return hit; } return null; };
+    const out = []; const seen = new Set();
+    for (const x of dig(j) || []) {
+      const title = String(x.title || x.subject || '').replace(/\s+/g, ' ').trim();
+      const id = x.pkId ?? x.id ?? x.seq;
+      if (!title || title.length < 6 || id == null) continue;
+      let url; try { url = rule.detail(String(id), boardUrl, title); } catch { url = null; }
+      if (!url || seen.has(url)) continue;
+      seen.add(url);
+      out.push({ title, url, postedAt: ymd(x.regDate || x.regDt || x.createdAt || x.date) });
+    }
+    return out;
+  }
+  /* post — 응답은 목록 조각(HTML). 같은 눈(날짜 줄 + onclick 번호)으로 읽는다. */
+  const r = await fetchFn(rule.api, { body: rule.body, tries: 2, firstMs: 15000, retryMs: 20000 });
+  if (!r || !r.ok) throw new Error(`API HTTP ${r ? r.status : '?'}`);
+  return extractDatedRows(await r.text(), boardUrl, { resolve: ruleResolver(rule, boardUrl) });
+}
 
 /* 학교 이름으로 규칙을 골라 글 줄을 뽑는다 — 규칙 없는 학교는 보통 눈(href) 그대로. 두 로봇이 이 함수 하나를 부른다. */
 export function datedRowsFor(school, html, boardUrl) {
@@ -107,11 +176,15 @@ export async function verifyRuleDetail(row, opts = {}) {
   const fetchFn = opts.fetch || fetchBoard;
   if (!row || !row.url) return { ok: false, reason: '확인할 글이 없음' };
   let res;
+  /* 상세 본문을 스크립트가 POST 로 받는 사이트(중앙)는 그 API 에 묻는다 — 화면 주소를 GET 하면 껍데기뿐이다 */
+  const vp = opts.rule && opts.rule.verifyPost;
+  const id = vp ? vp.idFrom(row.url) : null;   // 번호를 꺼내는 법도 규칙의 것 (공용 함수에 학교 이름표를 박지 않는다)
+  if (vp && !id) return { ok: false, reason: '상세 주소에 번호가 없음' };
   /* 같은 학교를 방금 두드린 뒤라 한 번은 끊길 수 있다(전북 7차 실측 fetch failed) → 두 번 시도 */
-  try { res = await fetchFn(row.url, { tries: 2, firstMs: 15000, retryMs: 20000 }); } catch (e) { return { ok: false, reason: `상세 열기 실패 (${(e && e.message) || e})` }; }
+  try { res = vp ? await fetchFn(vp.api, { body: vp.body(id), tries: 2, firstMs: 15000, retryMs: 20000 }) : await fetchFn(row.url, { tries: 2, firstMs: 15000, retryMs: 20000 }); } catch (e) { return { ok: false, reason: `상세 열기 실패 (${(e && e.message) || e})` }; }
   if (!res || !res.ok) return { ok: false, reason: `상세 HTTP ${res ? res.status : '?'}` };
   const sameUrl = (a, b) => { try { const x = new URL(a); const y = new URL(b); return x.origin + x.pathname === y.origin + y.pathname; } catch { return false; } };
-  if (opts.boardUrl && res.url && sameUrl(res.url, opts.boardUrl)) return { ok: false, reason: '상세 주소가 목록으로 되돌아옴 (규칙이 이 게시판에 안 맞음)' };
+  if (!vp && opts.boardUrl && res.url && sameUrl(res.url, opts.boardUrl)) return { ok: false, reason: '상세 주소가 목록으로 되돌아옴 (규칙이 이 게시판에 안 맞음)' };
   const text = (await res.text()).replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' ');
   const norm = (s) => String(s || '').replace(/&[a-z#0-9]+;/gi, ' ').replace(/[\s\p{P}\p{S}]+/gu, '');
   const page = norm(text);
