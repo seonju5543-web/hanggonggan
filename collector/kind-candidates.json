@@ -1,5 +1,16 @@
 {
- "updatedAt": null,
- "note": "교내·교외 원문 판정 후보 — 확신 mid 인 것(collector/kind-classify.mjs 가 매 실행 새로 쓴다). 관리자가 구분을 바꿔 확정한다.",
- "items": []
+ "updatedAt": "2026-10-01",
+ "items": [
+  {
+   "id": "auto-oardid323225menuno200318",
+   "school": "경희대학교",
+   "name": "공통 [공통] 2026학년도 2학기 경희목련장학 신청 안내_10.02(금)~10.25(일)",
+   "now": "교외",
+   "suggest": "교내",
+   "evidence": [
+    "제목의 학교 이름표 「경희」"
+   ],
+   "at": "2026-10-01"
+  }
+ ]
 }
