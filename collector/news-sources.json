@@ -575,178 +575,7 @@
      "evidence": "웹 검색 2026-09-30 '동국대학교 공지사항 dongguk.edu 일반공지 학사공지' → 결과 URL https://www.dongguk.edu/article/HAKSANOTICE/list (제목: 동국대학교 - 대학안내 - 공지사항 - 학사공지)"
     }
    ],
-   "note": "장학 JANGHAKNOTICE(이미 아는 것). 상세는 /article/<코드>/detail/<번호>.",
-   "probe": {
-    "checkedAt": "2026-10-01",
-    "tried": [
-     {
-      "url": "https://www.dongguk.edu/article/GENERALNOTICES/list",
-      "label": "일반공지",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 87534,
-       "links": 283,
-       "scripts": 19,
-       "dates": 18,
-       "blocks": 227,
-       "datedBlocks": 16,
-       "sample": [
-        "<li> 공지 공지 [서울앵커사업단 캠퍼스타운센터] AI리터러시_뤼튼과 함께하는 예비 IPO 협업 프로젝트 모집 공고(~10/14) 2026.10.01. 조회 81",
-        "<li> 공지 공지 10월 6일(화)과 10월 8일(목) 헌혈 버스 시행 안내 2026.10.01. 조회 38"
-       ],
-       "anchors": [
-        "<a href=\"#none\" onclick=\"goDetail(26766449);\">",
-        "<a href=\"#none\" onclick=\"goDetail(26766446);\">"
-       ]
-      }
-     },
-     {
-      "url": "https://www.dongguk.edu/article/HAKSANOTICE/list",
-      "label": "학사공지",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 88254,
-       "links": 292,
-       "scripts": 19,
-       "dates": 18,
-       "blocks": 237,
-       "datedBlocks": 16,
-       "sample": [
-        "<li> 공지 프로그램 및 특강 공지 2027학년도 상반기 현장실습(학기/계절) 설명회 참석 학생 모집 안내 2026.09.30. 조회 464",
-        "<li> 공지 프로그램 및 특강 공지 [취업] 실전 모의면접 컨설팅 - 나의 유형별 면접 완벽 마스터(마이성공스피치) [신청 ~ 10/2(금) 17시] 2026.09.28. 조회 302"
-       ],
-       "anchors": [
-        "<a href=\"#none\" onclick=\"goDetail(26766431);\">",
-        "<a href=\"#none\" onclick=\"goDetail(26766399);\">"
-       ]
-      }
-     },
-     {
-      "url": "https://www.dongguk.edu/article/GENERALNOTICES/list",
-      "label": "일반공지 더보기",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 87534,
-       "links": 283,
-       "scripts": 19,
-       "dates": 18,
-       "blocks": 227,
-       "datedBlocks": 16,
-       "sample": [
-        "<li> 공지 공지 [서울앵커사업단 캠퍼스타운센터] AI리터러시_뤼튼과 함께하는 예비 IPO 협업 프로젝트 모집 공고(~10/14) 2026.10.01. 조회 81",
-        "<li> 공지 공지 10월 6일(화)과 10월 8일(목) 헌혈 버스 시행 안내 2026.10.01. 조회 38"
-       ],
-       "anchors": [
-        "<a href=\"#none\" onclick=\"goDetail(26766449);\">",
-        "<a href=\"#none\" onclick=\"goDetail(26766446);\">"
-       ]
-      }
-     },
-     {
-      "url": "https://www.dongguk.edu/article/HAKSANOTICE/list",
-      "label": "학사공지 더보기",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 88254,
-       "links": 292,
-       "scripts": 19,
-       "dates": 18,
-       "blocks": 237,
-       "datedBlocks": 16,
-       "sample": [
-        "<li> 공지 프로그램 및 특강 공지 2027학년도 상반기 현장실습(학기/계절) 설명회 참석 학생 모집 안내 2026.09.30. 조회 464",
-        "<li> 공지 프로그램 및 특강 공지 [취업] 실전 모의면접 컨설팅 - 나의 유형별 면접 완벽 마스터(마이성공스피치) [신청 ~ 10/2(금) 17시] 2026.09.28. 조회 302"
-       ],
-       "anchors": [
-        "<a href=\"#none\" onclick=\"goDetail(26766431);\">",
-        "<a href=\"#none\" onclick=\"goDetail(26766399);\">"
-       ]
-      }
-     },
-     {
-      "url": "https://www.dongguk.edu/article/HAKSANOTICE/detail/26766252",
-      "label": "2027학년도 상반기 일학습병행 설명회 참석학생모집",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 96117,
-       "links": 260,
-       "scripts": 20,
-       "dates": 4,
-       "blocks": 213,
-       "datedBlocks": 0,
-       "sample": [],
-       "anchors": [
-        "<a href=\"/resources/files/2025-1575 정보통신접근성 품질인증서-동국대학교.pdf\" target=\"_blank\" title=\"새 창 열림\" >",
-        "<a href=\"/resources/files/2025-1575 정보통신접근성 품질인증서-동국대학교.pdf\" target=\"_blank\" title=\"새 창 열림\" >"
-       ]
-      }
-     },
-     {
-      "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26763074",
-      "label": "교직원 사칭 범죄 주의 안내",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 93930,
-       "links": 260,
-       "scripts": 20,
-       "dates": 4,
-       "blocks": 213,
-       "datedBlocks": 1,
-       "sample": [
-        "<li> 이전글 [서울RISE사업단] Microsoft AI-900 국제공인자격증 취득과정 참여자 모집(~2026.01.11.(일)까지)"
-       ],
-       "anchors": [
-        "<a href=\"/article/GENERALNOTICES/detail/26763073\">",
-        "<a href=\"/resources/files/2025-1575 정보통신접근성 품질인증서-동국대학교.pdf\" target=\"_blank\" title=\"새 창 열림\" >"
-       ]
-      }
-     },
-     {
-      "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26765901",
-      "label": "온라인 심리검사 프로그램 참여 안내",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 88842,
-       "links": 262,
-       "scripts": 20,
-       "dates": 3,
-       "blocks": 213,
-       "datedBlocks": 0,
-       "sample": [],
-       "anchors": [
-        "<a href=\"/resources/files/2025-1575 정보통신접근성 품질인증서-동국대학교.pdf\" target=\"_blank\" title=\"새 창 열림\" >",
-        "<a href=\"/resources/files/2025-1575 정보통신접근성 품질인증서-동국대학교.pdf\" target=\"_blank\" title=\"새 창 열림\" >"
-       ]
-      }
-     },
-     {
-      "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766449",
-      "label": "[서울앵커사업단 캠퍼스타운센터] AI리터러시_뤼튼과 함께하는 예비 IPO 협업 프로젝트 모집 공고(~10/14) 2026.10.01.",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 102340,
-       "links": 262,
-       "scripts": 21,
-       "dates": 5,
-       "blocks": 218,
-       "datedBlocks": 0,
-       "sample": [],
-       "anchors": [
-        "<a href=\"/resources/files/2025-1575 정보통신접근성 품질인증서-동국대학교.pdf\" target=\"_blank\" title=\"새 창 열림\" >",
-        "<a href=\"/resources/files/2025-1575 정보통신접근성 품질인증서-동국대학교.pdf\" target=\"_blank\" title=\"새 창 열림\" >"
-       ]
-      }
-     }
-    ]
-   }
+   "note": "장학 JANGHAKNOTICE(이미 아는 것). 상세는 /article/<코드>/detail/<번호>. 2026-10-01 클릭형 규칙(news-board-rules.mjs)을 적고 probe 를 비웠다 — 다음 실행이 규칙으로 다시 보고 첫 상세를 열어 확인한다."
   },
   {
    "school": "동국대학교 WISE캠퍼스",
@@ -765,152 +594,7 @@
      "evidence": "웹 검색 2026-09-30 'site:wise.dongguk.ac.kr article haksanotice list 학사공지' → 결과 URL https://wise.dongguk.ac.kr/article/acdnotice/list (제목: 동국대학교 WISE캠퍼스 - 커뮤니티 - 공지사항 - 학사)"
     }
    ],
-   "note": "채용 jobnotice · 입학 entrynotice 도 같은 꼴.",
-   "probe": {
-    "checkedAt": "2026-10-01",
-    "tried": [
-     {
-      "url": "https://wise.dongguk.ac.kr/article/generalnotice/list",
-      "label": "일반공지",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 80723,
-       "links": 242,
-       "scripts": 18,
-       "dates": 12,
-       "blocks": 199,
-       "datedBlocks": 12,
-       "sample": [
-        "<li> 공지 공지 양산지역 학생통학버스 운행 시간표 변경 안내 2026.09.17. 임준택 조회 278",
-        "<li> 공지 공지 2026-2학기 비교과 교육과정 안내 2026.09.02. 한정 조회 1128"
-       ],
-       "anchors": [
-        "<a href=\"#none\" onclick=\"goDetail(520586);\">",
-        "<a href=\"#none\" onclick=\"goDetail(520420);\">"
-       ]
-      }
-     },
-     {
-      "url": "https://wise.dongguk.ac.kr/article/acdnotice/list",
-      "label": "학사공지",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 81986,
-       "links": 253,
-       "scripts": 18,
-       "dates": 12,
-       "blocks": 210,
-       "datedBlocks": 12,
-       "sample": [
-        "<li> 공지 수업/성적 공지 2026-2학기 학부 수강신청 안내 2026.07.23. 김형욱 조회 24260",
-        "<li> 공지 학적 공지 2026학년도 2학기 복학 신청 안내(~8.28까지 신청기간 연장) 2026.06.02. 이영찬 조회 3355"
-       ],
-       "anchors": [
-        "<a href=\"#none\" onclick=\"goDetail(520116);\">",
-        "<a href=\"#none\" onclick=\"goDetail(519659);\">"
-       ]
-      }
-     },
-     {
-      "url": "https://wise.dongguk.ac.kr/article/generalnotice/detail/520707",
-      "label": "[혁신] 교수학습개발센터 2026-2학기 학습법 LXP 시행 안내 2026.10.01.",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 82565,
-       "links": 223,
-       "scripts": 19,
-       "dates": 1,
-       "blocks": 189,
-       "datedBlocks": 0,
-       "sample": [],
-       "anchors": []
-      }
-     },
-     {
-      "url": "https://wise.dongguk.ac.kr/article/generalnotice/detail/520699",
-      "label": "(신청기한 연장) 2026 「힙(Hip)한 분황, 청년의 바이브(Vibe)」 사찰 문화제 연계 공모전 안내 2026.09.30.",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 84903,
-       "links": 225,
-       "scripts": 20,
-       "dates": 2,
-       "blocks": 190,
-       "datedBlocks": 0,
-       "sample": [],
-       "anchors": []
-      }
-     },
-     {
-      "url": "https://wise.dongguk.ac.kr/article/generalnotice/detail/520695",
-      "label": "2026-2학기 동국미디어센터 신문기자/방송국원 최종 합격자 공고 2026.09.30.",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 89047,
-       "links": 224,
-       "scripts": 19,
-       "dates": 1,
-       "blocks": 189,
-       "datedBlocks": 0,
-       "sample": [],
-       "anchors": []
-      }
-     },
-     {
-      "url": "https://wise.dongguk.ac.kr/article/generalnotice/detail/520687",
-      "label": "[혁신] 2026-2학기 수면 성공 꿀잠테라피 참여자 모집 2026.09.30.",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 82810,
-       "links": 225,
-       "scripts": 19,
-       "dates": 2,
-       "blocks": 189,
-       "datedBlocks": 0,
-       "sample": [],
-       "anchors": []
-      }
-     },
-     {
-      "url": "https://wise.dongguk.ac.kr/article/generalnotice/detail/520686",
-      "label": "[혁신] 2026학년도 2학기 학습법 콜로키움 개최 안내 2026.09.30.",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 83259,
-       "links": 225,
-       "scripts": 19,
-       "dates": 2,
-       "blocks": 189,
-       "datedBlocks": 0,
-       "sample": [],
-       "anchors": []
-      }
-     },
-     {
-      "url": "https://wise.dongguk.ac.kr/article/generalnotice/detail/520677",
-      "label": "[탄소중립지원센터] 2026 경주시 탄소중립 시민참여 사진 공모전 재공고 2026.09.28.",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 92090,
-       "links": 226,
-       "scripts": 20,
-       "dates": 6,
-       "blocks": 191,
-       "datedBlocks": 0,
-       "sample": [],
-       "anchors": []
-      }
-     }
-    ]
-   }
+   "note": "채용 jobnotice · 입학 entrynotice 도 같은 꼴. 2026-10-01 클릭형 규칙(news-board-rules.mjs)을 적고 probe 를 비웠다 — 다음 실행이 규칙으로 다시 보고 첫 상세를 열어 확인한다."
   },
   {
    "school": "홍익대학교",
@@ -1043,7 +727,7 @@
      "evidence": "웹 검색 2026-09-30 '상명대학교 공지사항 notice.do' → 결과 URL https://www.smu.ac.kr/kor/life/notice.do (제목: 상명대학교 국문 | 통합공지 게시판목록)"
     }
    ],
-   "note": "schools.json 의 장학 주소와 같은 게시판(통합공지).",
+   "note": "schools.json 의 장학 주소와 같은 게시판(통합공지). 2026-10-01: 찾은 webzine/today.do 는 홍보팀 새소식(보도자료)이다 — 통합공지 notice.do 는 클릭형(장학 수집기도 브라우저 담당)이라 정찰로 상세 여는 방식을 확인한 뒤 규칙을 적는다. 그때까지 새소식으로 싣는다.",
    "autoFound": {
     "date": "2026-10-01",
     "via": "home-menu",
@@ -1245,24 +929,7 @@
      "evidence": "웹 검색 2026-09-30 '인하대학교 공지사항 bbs/kr/8/artclList.do 전체 학사' → 상세 https://www.inha.ac.kr/bbs/kr/8/39740/artclView.do (제목: 공지사항 - [학사관리팀] 2025-1학기 (본)수강신청 안내) — bbs 8 이 통합 공지사항, bbsClSeq 를 뗀 목록으로 유도"
     }
    ],
-   "note": "bbsClSeq=215 가 장학(이미 아는 것) · 77 은 이름 미확인.",
-   "probe": {
-    "checkedAt": "2026-10-01",
-    "tried": [
-     {
-      "url": "https://www.inha.ac.kr/bbs/kr/8/artclList.do",
-      "label": "공지사항",
-      "rows": 0,
-      "status": "TypeError: ENOTFOUND"
-     },
-     {
-      "url": "https://www.inha.ac.kr/",
-      "label": "홈",
-      "rows": 0,
-      "status": "TypeError: UND_ERR_CONNECT_TIMEOUT"
-     }
-    ]
-   }
+   "note": "bbsClSeq=215 가 장학(이미 아는 것) · 77 은 이름 미확인. 2026-10-01 찾기 로봇이 ENOTFOUND/시간초과(일시적 — 같은 날 장학 수집기는 정상) → probe 를 비워 다음 실행이 바로 다시 본다."
   },
   {
    "school": "부산대학교",
@@ -1511,56 +1178,7 @@
      "evidence": "같은 검색 → 결과 URL https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=1280&bbsId=1081 (제목: 서울교육대학교- 교육지원-학사정보-학사공지)"
     }
    ],
-   "note": "bbsId 1082 = 대학소식 공지사항, 1081 = 학사공지, 1083 = 장학.",
-   "probe": {
-    "checkedAt": "2026-10-01",
-    "tried": [
-     {
-      "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=1309&bbsId=1082",
-      "label": "공지사항",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 81369,
-       "links": 276,
-       "scripts": 25,
-       "dates": 19,
-       "blocks": 208,
-       "datedBlocks": 15,
-       "sample": [
-        "<tr> 공지 [통일부] 제25기 평화통일민주교육위원 추가 위촉 신청 안내(10월 05일까지 날··· 학생처 2026.09.16 571",
-        "<tr> 공지 2026학년도 창의융복합 교육연구 프로젝트 팀 모집 교수학습지원센터 2026.09.15 704"
-       ],
-       "anchors": [
-        "<a href=\"javascript:\" data-id=\"55101\" class=\"nttInfoBtn\">",
-        "<a href=\"javascript:\" data-id=\"55080\" class=\"nttInfoBtn\">"
-       ]
-      }
-     },
-     {
-      "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=1280&bbsId=1081",
-      "label": "학사공지",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 109225,
-       "links": 289,
-       "scripts": 25,
-       "dates": 23,
-       "blocks": 221,
-       "datedBlocks": 19,
-       "sample": [
-        "<tr> 공지 중요공지 [경기도교육청] 2027학년도 경기도 유치원·초등학교·특수학교(유치원·초등)교사 ··· 임용진로센터 2026.09.30 261",
-        "<tr> 공지 중요공지 [서울시교육청] 2027학년도 서울특별시교육청 공립(국·사립) 유치원·초등·특수학··· 임용진로센터 2026.09.30 310"
-       ],
-       "anchors": [
-        "<a href=\"javascript:\" data-id=\"55226\" class=\"nttInfoBtn\">",
-        "<a href=\"javascript:\" data-id=\"55207\" class=\"nttInfoBtn\">"
-       ]
-      }
-     }
-    ]
-   }
+   "note": "bbsId 1082 = 대학소식 공지사항, 1081 = 학사공지, 1083 = 장학. 2026-10-01 클릭형 규칙(news-board-rules.mjs)을 적고 probe 를 비웠다 — 다음 실행이 규칙으로 다시 보고 첫 상세를 열어 확인한다."
   },
   {
    "school": "한국방송통신대학교",
@@ -1592,7 +1210,7 @@
    "school": "경북대학교",
    "campus": "",
    "home": "https://www.knu.ac.kr/wbbs/wbbs/main/main.action",
-   "boardUrl": "https://www.knu.ac.kr/wbbs/wbbs/main/main.action",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/listBtin.action?bbs_cde=1&menu_idx=67",
@@ -1600,19 +1218,7 @@
      "evidence": "웹 검색 2026-09-30 'knu.ac.kr wbbs listBtin.action bbs_cde=1 공지사항' → 결과 URL https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/viewBtin.action?btin.bbs_cde=1&btin.doc_no=1325007&btin.appl_no=000000&menu_idx=67 (제목: 경북대학교 > 공지 > 공지사항); 목록 listBtin.action 은 유추"
     }
    ],
-   "note": "검색엔 상세만 잡혔다. 목록 주소는 유추.",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "home-menu",
-    "label": "정부재정지원사업",
-    "rows": 5,
-    "sample": [
-     "포토뉴스 대현119안전센터와 교내 어린이집에서 합동소방훈련 실시 경북대는 9월 30일 교내 어린이집에서 교직원과 원아, 대현119안전센터 소방관 등 300여명이 참여한 가운데 2026년도 합동소방훈련을 실시했다. 2026-10-01",
-     "포토뉴스 수의과대학 김규태 교수, 제자 위해 발전기금 1천만원 전달 수의과대학 김규태 교수가 제자들을 위해 써달라며 발전기금 1천만원을 경북대에 전달했다. 2026-10-01",
-     "포토뉴스 교육부 글로컬랩 2개 연구소 선정… 9년간 총 사업비 377억원 확보 교육부와 한국연구재단이 추진하는 ‘글로컬랩(거점형) 사업’에 지능형건설자동화연구센터와 세포·기질연구소가 각각 최종 선정됐다. 2026-09-29"
-    ],
-    "evidence": "홈페이지 메뉴 「정부재정지원사업」 을 따라 들어가 확인 (2026-10-01)"
-   }
+   "note": "검색엔 상세만 잡혔다. 목록 주소는 유추. 2026-10-01 찾기 로봇이 홈 메뉴 「정부재정지원사업」의 포토뉴스(홍보 기사) 5행을 공지로 잘못 올려 비웠다 — 공지 게시판이 아니다. 후보 listBtin 은 정찰(run-probe.txt)로 실제 화면을 본 뒤 정한다."
   },
   {
    "school": "영남대학교",
@@ -1667,174 +1273,7 @@
      "evidence": "같은 검색 → 결과 URL https://www.jbnu.ac.kr/web/news/notice/sub02.do (제목: 학생공지)"
     }
    ],
-   "note": "sub01 교내공지(전체) · sub02 학생공지 · sub03 교내채용. 행이 onclick 형(pf_DetailMove)이라 규칙 필요.",
-   "probe": {
-    "checkedAt": "2026-10-01",
-    "tried": [
-     {
-      "url": "https://www.jbnu.ac.kr/web/news/notice/sub01.do",
-      "label": "공지사항",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 222631,
-       "links": 742,
-       "scripts": 34,
-       "dates": 12,
-       "blocks": 687,
-       "datedBlocks": 12,
-       "sample": [
-        "<tr> 교육 2026학년도 전공배정 제도 설명회 개최 안내 2026-09-22 조회수 1802 교무처 교무과",
-        "<tr> 6185 기타 제2차「청년세대 성별균형 공개형 공론장」청년 참여자 모집 홍보 협조 요청 2026-10-01 조회수 45 사무국 총무과"
-       ],
-       "anchors": [
-        "<a href=\"javascript:;\" class=\"title\" onclick=\"pf_DetailMove('217819')\">",
-        "<a href=\"javascript:;\" class=\"title\" onclick=\"pf_DetailMove('218031')\">"
-       ]
-      }
-     },
-     {
-      "url": "https://www.jbnu.ac.kr/web/news/notice/sub02.do",
-      "label": "공지사항",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 224539,
-       "links": 730,
-       "scripts": 34,
-       "dates": 11,
-       "blocks": 675,
-       "datedBlocks": 11,
-       "sample": [
-        "<tr> 846 [전북인문사회연구원] 2026년 전북인문사회연구원 신진연구자 지원 과제 지원사업 공고 2026-10-01 조회수 76 전북인문사회연구원",
-        "<tr> 845 [전북인문사회연구원] 2026년 전북인문사회연구원 지역연계 과제 지원사업 공고 2026-10-01 조회수 59 전북인문사회연구원"
-       ],
-       "anchors": [
-        "<a href=\"javascript:;\" class=\"title\" onclick=\"pf_DetailMove('218035')\">",
-        "<a href=\"javascript:;\" class=\"title\" onclick=\"pf_DetailMove('218034')\">"
-       ]
-      }
-     },
-     {
-      "url": "https://www.jbnu.ac.kr/web/news/notice/sub05.do",
-      "label": "특강&세미나",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 221919,
-       "links": 730,
-       "scripts": 34,
-       "dates": 31,
-       "blocks": 675,
-       "datedBlocks": 11,
-       "sample": [
-        "<tr> 129 예정 [프랑스·아프리카연구소] 2026년도 국내학술대회 ｜ 아프리카 대중문화와 권력: 재구성되는 목소리와 공간 2026-09-30 조회수 30 특강기간 2026-10-02 ~ 2026-10-02 프랑스·아프리",
-        "<tr> 128 마감 2026학년도 과학교육학부 (주관 지구과학교육전공) 외부강사초청 2026-09-14 조회수 178 특강기간 2026-09-14 ~ 2026-09-21 과학교육학부"
-       ],
-       "anchors": [
-        "<a href=\"javascript:;\" class=\"title\" onclick=\"pf_DetailMove('217970')\">",
-        "<a href=\"javascript:;\" class=\"title\" onclick=\"pf_DetailMove('217970')\">"
-       ]
-      }
-     },
-     {
-      "url": "https://www.jbnu.ac.kr/web/academic/schedule.do",
-      "label": "학사일정안내",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 196106,
-       "links": 749,
-       "scripts": 33,
-       "dates": 1,
-       "blocks": 684,
-       "datedBlocks": 1,
-       "sample": [
-        "<dd> 2024-03-28"
-       ],
-       "anchors": []
-      }
-     },
-     {
-      "url": "https://www.jbnu.ac.kr/web/unvrslife/newstudent/sub01.do",
-      "label": "신입생 안내",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 201302,
-       "links": 749,
-       "scripts": 32,
-       "dates": 1,
-       "blocks": 703,
-       "datedBlocks": 1,
-       "sample": [
-        "<dd> 2026-02-10"
-       ],
-       "anchors": []
-      }
-     },
-     {
-      "url": "https://www.jbnu.ac.kr/web/news/plaza/sub01.do",
-      "label": "JBNU News",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 229452,
-       "links": 730,
-       "scripts": 34,
-       "dates": 11,
-       "blocks": 694,
-       "datedBlocks": 11,
-       "sample": [
-        "<li> 2026-09-30",
-        "<li> 2026-09-30"
-       ],
-       "anchors": []
-      }
-     },
-     {
-      "url": "https://www.jbnu.ac.kr/web/news/plaza/sub02.do",
-      "label": "JBNU Newsplus",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 224398,
-       "links": 732,
-       "scripts": 34,
-       "dates": 13,
-       "blocks": 676,
-       "datedBlocks": 13,
-       "sample": [
-        "<li> NEWS Plus 제957호 2026-07-07",
-        "<li> NEWS Plus 제956호 2026-07-07"
-       ],
-       "anchors": []
-      }
-     },
-     {
-      "url": "https://www.jbnu.ac.kr/web/news/plaza/sub03.do",
-      "label": "교육정책/주요대학소식",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 215926,
-       "links": 730,
-       "scripts": 35,
-       "dates": 11,
-       "blocks": 675,
-       "datedBlocks": 11,
-       "sample": [
-        "<tr> 4203 선심성 현금지원 8개 교육청에 페널티…최대 100억 교부금 삭감 2026-09-23 조회수 14 전북대학교",
-        "<tr> 4202 수험생 83% &#034;2028학년도 대입 개편, 수시 지원에 영향&#034; 2026-09-23 조회수 27 전북대학교"
-       ],
-       "anchors": [
-        "<a href=\"javascript:;\" class=\"title\" onclick=\"pf_moveLink('https://www.yna.co.kr/view/AKR20260922186800530')\">",
-        "<a href=\"javascript:;\" class=\"title\" onclick=\"pf_moveLink('https://www.yna.co.kr/view/AKR20260923052500530')\">"
-       ]
-      }
-     }
-    ]
-   }
+   "note": "sub01 교내공지(전체) · sub02 학생공지 · sub03 교내채용. 행이 onclick 형(pf_DetailMove)이라 규칙 필요. 2026-10-01 클릭형 규칙(news-board-rules.mjs)을 적고 probe 를 비웠다 — 다음 실행이 규칙으로 다시 보고 첫 상세를 열어 확인한다."
   },
   {
    "school": "충남대학교",

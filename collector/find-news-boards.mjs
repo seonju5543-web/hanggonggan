@@ -16,7 +16,8 @@
    실행: node collector/find-news-boards.mjs   (FIND_NEWS_MAX=50 FIND_NEWS_MS=360000)
    ============================================================ */
 import fs from 'node:fs';
-import { extractLinks, extractDatedRows, sameSite } from './board-links.mjs';
+import { extractLinks, sameSite } from './board-links.mjs';
+import { NEWS_BOARD_RULES, datedRowsFor, verifyRuleDetail } from './news-board-rules.mjs';   // 클릭형 게시판 규칙 한 곳 (수집 로봇과 같은 것)
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { isNewsRow } from './news-kind.mjs';
 import { fetchBoard, netReason } from './fetch-board.mjs';
@@ -101,9 +102,17 @@ async function findOne(s) {
     try {
       const page = await get(url);
       if (page.error) { tried.push({ url, label, rows: 0, status: page.error }); return null; }
-      const score = scoreNewsPage(extractDatedRows(page.html, page.url), page.url);
+      const rows = datedRowsFor(s.school, page.html, page.url);   // 클릭형(동국·서울교대·전북…)은 규칙의 링크 풀이를 얹은 같은 눈
+      const score = scoreNewsPage(rows, page.url);
       const t = { url, label, rows: score.rows, status: 'ok' };
       if (score.rows < MIN_ROWS) t.diag = pageDiag(page.html);   // 왜 0행인가 — 다음 수리의 재료 (짐작하지 않는다)
+      /* 🔴 규칙 학교는 첫 글의 상세를 실제로 열어 제목이 있는지 본 뒤에만 '찾음' — 규칙이 이 게시판에 안 맞으면 못 찾은 것이다 */
+      if (score.rows >= MIN_ROWS && NEWS_BOARD_RULES[s.school]) {
+        const first = rows.find((r) => sameSite(r.url, page.url)) || rows[0];
+        const v = await verifyRuleDetail(first, { boardUrl: page.url, others: rows.map((r) => r.title) });
+        if (!v.ok) { t.status = `규칙 상세 확인 실패 — ${v.reason}`; tried.push(t); return null; }
+        evidence = `${evidence} · ${v.reason}`;
+      }
       tried.push(t);
       if (score.rows >= MIN_ROWS) return { url: page.url, label, via, evidence, rows: score.rows, sample: score.sample };
     } catch (e) {

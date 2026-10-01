@@ -29,6 +29,14 @@ jobs:
       - run: npm init -y >/dev/null && npm i playwright@1 --no-audit --no-fund
       - run: npx playwright install --with-deps chromium
       - run: node collector/probe-links.mjs
+      # 인증서 사슬 정찰 (2026-10-01) — run-probe.txt 의 `certHost: <호스트>` 줄마다 서버가 보내는 사슬을 보고, 잎사귀만 보내면
+      # 그 인증서의 AIA(CA Issuers) 주소에서 중간 인증서를 받아 **시스템 뿌리로 검증이 되는지** 확인한 뒤 PEM 을 로그에 그대로 적는다.
+      # (서강대 2026-09-30 UNABLE_TO_VERIFY_LEAF_SIGNATURE — 계명대와 같은 '빠뜨린 사슬' 증상 · collector/certs/README.md)
+      # 저장소에 쓰지 않는다(이 워크플로는 contents: read) — 사람이 로그의 PEM 을 certs/ 에 넣고 README 표에 적는다. 검증을 끄는 것이 아니다.
+      - name: 인증서 사슬 정찰 (certHost 줄)
+        if: always()
+        timeout-minutes: 3
+        run: bash collector/certs/probe-chain.sh collector/run-probe.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
