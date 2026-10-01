@@ -631,49 +631,112 @@
    "host": "파주돈재갑진장학회",
    "home": "https://pjdjkjscholarship.or.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-10-01",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "https://pjdjkjscholarship.or.kr/",
+     "signals": 0
+    }
+   }
   },
   {
    "host": "(재)수림재단",
    "home": "http://www.surim.or.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-10-01",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "http://www.surim.or.kr/",
+     "signals": 0
+    }
+   }
   },
   {
    "host": "재단법인 전남인재평생교육진흥원",
    "home": "https://www.jntle.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-10-01",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "https://www.jntle.kr/",
+     "signals": 0
+    }
+   }
   },
   {
    "host": "한국선원복지고용센터",
    "home": "https://www.koswec.or.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-10-01",
+    "why": "최고 1건 ((홈))",
+    "best": {
+     "url": "https://www.koswec.or.kr/",
+     "signals": 1
+    }
+   }
   },
   {
    "host": "중외학술복지재단",
    "home": "http://www.jw-foundation.or.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-10-01",
+    "why": "최고 1건 ((홈))",
+    "best": {
+     "url": "https://www.jw-foundation.or.kr/",
+     "signals": 1
+    }
+   }
   },
   {
    "host": "이천시청",
    "home": "https://www.icheon.go.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-10-01",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "https://www.icheon.go.kr/main.do",
+     "signals": 0
+    }
+   }
   },
   {
    "host": "아산시미래장학회",
    "home": "http://asanmirae.or.kr/",
-   "boardUrl": null,
-   "seed": "kosaf-open"
+   "boardUrl": "https://asanmirae.or.kr:449/main/",
+   "seed": "kosaf-open",
+   "autoFound": {
+    "date": "2026-10-01",
+    "signals": 9,
+    "menu": "(홈)",
+    "sample": [
+     "2026년 4차산업 인재육성 장학생 최종 합격자 발표 2026.05.26",
+     "2025년 재단법인 아산시미래장학회 공익법인 결산서류 등의 공시 2026.05.19",
+     "(재)아산시미래장학회 민간사무국 임기제 직원(사무국장) 경력경쟁 채용 공고 2025.12.09"
+    ]
+   }
   },
   {
    "host": "경상남도 고성군청",
    "home": "http://www.goseong.go.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-10-01",
+    "why": "홈페이지 못 엶 (HTTP 400)",
+    "best": null
+   }
   },
   {
    "host": "재단법인 석성장학회",

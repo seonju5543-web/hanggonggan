@@ -1,6 +1,371 @@
 {
- "updatedAt": "2026-09-30",
+ "updatedAt": "2026-10-01",
  "items": [
+  {
+   "title": "아산시청소년 문학공모전 2026.08.04",
+   "url": "https://asanmirae.or.kr:449/main/index.php?m_cd=17&b_id=20260804102775189",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": null,
+   "field": "글쓰기·논문",
+   "excerptsAt": "2026-10-01",
+   "school": "",
+   "campus": "",
+   "host": "아산시미래장학회",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "[과학기술정보통신부] 생활 속 전자파 바로 알기 동영상 및 포스터 공모전 기간 : 2026.06.15 ~ 2026.10.12",
+   "url": "https://www.msit.go.kr/bbs/view.do?sCode=user&mId=307&mPid=208&bbsSeqNo=94&nttSeqNo=3187433",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": null,
+   "field": "영상·사진",
+   "excerptsAt": "2026-10-01",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "[교육부] 2026 똑똑! 수학탐험대 활용 숏폼 공모전 기간 : 2026.09.07 ~ 2026.10.12",
+   "url": "https://www.toctocmath.kr/event/shortform",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": "접수기간 2026. 9. 7.(월) 09:00 ~ 10. 12.(월) 18:00 참가자격 초등교원(현직) · 교육대학교 재학생(예비교원) 개인",
+   "deadline": "2026-10-12",
+   "field": "영상·사진",
+   "excerptsAt": "2026-10-01",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "[국토교통부] 2026 건설 추락사고 예방 콘텐츠 공모전 높은 곳에선, 더 높은 안전으로 기간 : 2026.09.14 ~ 2026.10.13",
+   "url": "https://www.safecontest.kr/summary",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": "접수기간 : 2026. 9. 14.(월) ~ 2026. 10. 13.(화) 18:00 까지 수상후보작 검증 : 2026. 11. 10.(화) ~",
+   "deadline": "2026-10-13",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026. 9. 14.(월) ~ 2026. 10. 13.(화) 18:00 까지"
+    }
+   ],
+   "excerptsAt": "2026-10-01",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "[고용노동부] 2026 고용24 국민참여 AI 고용서비스 발굴 온라인 해커톤 기간 : 2026.09.21 ~ 2026.10.13",
+   "url": "https://www.xn--299alkwa683hrtfsfp2mn8g3zd53kbtag2cdzeds0aqoj3nl9jq.com/",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": "접수기간 2026. 9. 21. — 10. 13. 18:00 접수하기 요강 다운로드 ↓ 2026 고용24 국민참여 AI 고용서비스 발굴 온라인",
+   "field": "IT·소프트웨어",
+   "excerptsAt": "2026-10-01",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "[농촌진흥청] 2026 농업·농촌 스토리텔링콘텐츠 공모전 기간 : 2026.08.25 ~ 2026.10.14",
+   "url": "https://www.rda.go.kr/board/board.do?mode=view&prgId=nei_ancmttEntry&dataNo=100000812622",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": null,
+   "excerptsAt": "2026-10-01",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "[농림축산식품부] 대국민 농촌관광 홍보영상 경진대회 기간 : 2026.07.15 ~ 2026.10.18",
+   "url": "https://www.welchon.com/web/lay1/program/S1T31C447/eventNewView.do?menuIdx=&cIdx=evpr&bbsIdx=2214028",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": null,
+   "field": "광고·마케팅",
+   "excerptsAt": "2026-10-01",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "[질병관리청] 생명을 그리는 손, 당신의 심폐소생술 스토리 캐릭터 공모전 기간 : 2026.09.01 ~ 2026.10.18",
+   "url": "https://www.kdca.go.kr/kdca/2769/subview.do?enc=Zm5jdDF8QEB8JTJGYmJzJTJGa2RjYSUyRjUwJTJGMzEyNDY1JTJGYXJ0Y2xWaWV3LmRvJTNG",
+   "kind": "공모전",
+   "attachments": [
+    {
+     "name": "다운받기",
+     "url": "https://www.kdca.go.kr/bbs/kdca/50/309423/download.do"
+    },
+    {
+     "name": "다운받기",
+     "url": "https://www.kdca.go.kr/bbs/kdca/50/309424/download.do"
+    }
+   ],
+   "deadlineHint": "접수기간 : 2026. 9. 1.( 화 ) ~ 10. 18.( 일 ) &nbsp;&nbsp; - 결과발표 : 2026. 11. 19.( 목 )",
+   "deadline": "2026-10-18",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026. 9. 1.( 화 ) ~ 10. 18.( 일 )"
+    }
+   ],
+   "field": "디자인·미술",
+   "excerptsAt": "2026-10-01",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "[해양수산부] 2026 해양안전 콘텐츠 공모전 기간 : 2026.08.24 ~ 2026.10.22",
+   "url": "https://www.xn--ob0bv3xdjilia71ica881v.com/",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": null,
+   "excerptsAt": "2026-10-01",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "[과학기술정보통신부] 2026 데이터+AI 혁신챌린지 데이터안심구역 경진대회 기간 : 2026.09.01 ~ 2026.10.22",
+   "url": "https://dsz.kdata.or.kr/contest/introduce/main.do",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": null,
+   "field": "IT·소프트웨어",
+   "excerptsAt": "2026-10-01",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "[행정중심복합도시건설청] 국가상징구역 숏폼 영상 공모전 기간 : 2026.09.18 ~ 2026.10.22",
+   "url": "https://naacc.go.kr/WEB/contents/N3010000000.do?schM=view&id=79861&schBcid=naacc_normal13",
+   "kind": "공모전",
+   "attachments": [
+    {
+     "name": "국가상징구역 홍보 영상 공모전 공고문.hwpx",
+     "url": "https://naacc.go.kr/afile/fileDownload/DLqmn"
+    },
+    {
+     "name": "국가상징구역 숏폼 영상 공모전 포스터.png",
+     "url": "https://naacc.go.kr/afile/fileDownload/MLqmn"
+    }
+   ],
+   "deadlineHint": null,
+   "deadline": "2026-10-22",
+   "field": "영상·사진",
+   "excerptsAt": "2026-10-01",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "[해양수산부] 제1회 대한민국 국가어항·어촌 사진공모전 기간 : 2026.07.31 ~ 2026.10.23",
+   "url": "https://naraport.mof.go.kr/info/contest/contestIntroduce.do?subMenu1Nm=%EA%B3%B5%EB%AA%A8%EC%A0%84",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": "접수기간 2026년 7월 31일(금)~10월 23일(금) 대국민 심사 2026년 11월 16일(월)~11월 20일(금) &nbsp; 수상자 발표",
+   "field": "영상·사진",
+   "excerptsAt": "2026-10-01",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "[국방부] 2026년 20회 국방홍보 영상공모전 기간 : 2026.08.03 ~ 2026.10.23",
+   "url": "https://www.dema.mil.kr/web/dema/info/notice/4/1012194/view.do",
+   "kind": "공모전",
+   "attachments": [
+    {
+     "name": "'+ attach.real_file_name +'",
+     "url": "https://www.dema.mil.kr/web/articleDownload.do?board_id="
+    }
+   ],
+   "deadlineHint": null,
+   "field": "광고·마케팅",
+   "excerptsAt": "2026-10-01",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "[행정안전부] 공공 웹사이트 불법광고 탐지 도구 개발 공모전 기간 : 2026.09.14 ~ 2026.10.23",
+   "url": "https://mois.go.kr/frt/bbs/type013/commonSelectBoardArticle.do?bbsId=BBSMSTR_000000000006&nttId=129458",
+   "kind": "공모전",
+   "attachments": [
+    {
+     "name": "공공 웹사이트 불법광고 탐지 도구 개발 공모전 모집요강.hwpx &nbsp;[ 101.7 KB ]",
+     "url": "https://mois.go.kr/cmm/fms/FileDown.do?atchFileId=FILE_00148935YF51LUC&fileSn=0"
+    },
+    {
+     "name": "공공 웹사이트 불법광고 탐지 도구 개발 공모전 모집요강.pdf &nbsp;[ 304.4 KB ]",
+     "url": "https://mois.go.kr/cmm/fms/FileDown.do?atchFileId=FILE_00148935YF51LUC&fileSn=1"
+    },
+    {
+     "name": "공공 웹사이트 불법광고 탐지 도구 개발 공모전 포스터.png &nbsp;[ 1.8 MB ]",
+     "url": "https://mois.go.kr/cmm/fms/FileDown.do?atchFileId=FILE_00148935YF51LUC&fileSn=2"
+    }
+   ],
+   "deadlineHint": null,
+   "field": "광고·마케팅",
+   "excerptsAt": "2026-10-01",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "[외교부] 제2회 KOREAZ 콘텐츠 공모전 기간 : 2026.06.01 ~ 2026.10.25",
+   "url": "https://www.mofa.go.kr/www/brd/m_4075/view.do?seq=369399&page=1&pitem=10",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": "접수기간：2026.6.1.(월)-2026.10.25.(일) - 수상작 발표：2026.11월 중 ※ 외교부 홈페이지 및 KOREAZ SNS 채널에",
+   "deadline": "2026-10-25",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026.6.1.(월)-2026.10.25.(일)"
+    }
+   ],
+   "excerptsAt": "2026-10-01",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "[기후에너지환경부] 제13회 대학생 물환경 정책·기술 공모전 기간 : 2026.09.28 ~ 2026.10.25",
+   "url": "https://answer.moaform.com/answers/M1GLjZ",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": null,
+   "excerptsAt": "2026-10-01",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "[식품의약품안전처] 2026년 마약 예방활동 우수사례 공모전 기간 : 2026.09.30 ~ 2026.10.30",
+   "url": "https://www.schoolkeepa.or.kr/cop/bbs/selectArticleDetail.do?nttId=1711&bbsId=BBSMSTR_000000000001",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": null,
+   "excerptsAt": "2026-10-01",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "[행정안전부] 2026 모바일신분증 아이디어 공모전 기간 : 2026.09.30 ~ 2026.10.30",
+   "url": "https://www.mois.go.kr/frt/bbs/type010/commonSelectBoardArticle.do?bbsId=BBSMSTR_000000000008&nttId=129837",
+   "kind": "공모전",
+   "attachments": [
+    {
+     "name": "261001 (조간) “모바일신분증으로 여는 새로운 일상” 행안부 모바일신분증 아이디어 공모(국민맞춤서비스과).hwpx &nbsp;[ 3.7 MB ]",
+     "url": "https://www.mois.go.kr/cmm/fms/FileDown.do?atchFileId=FILE_001493605Mk6Fv3&fileSn=0"
+    },
+    {
+     "name": "261001 (조간) “모바일신분증으로 여는 새로운 일상” 행안부 모바일신분증 아이디어 공모(국민맞춤서비스과).pdf &nbsp;[ 537.0 KB ]",
+     "url": "https://www.mois.go.kr/cmm/fms/FileDown.do?atchFileId=FILE_001493605Mk6Fv3&fileSn=1"
+    }
+   ],
+   "deadlineHint": "접수 기간은 10 월 1 일 ( 목 ) 9 시부터 10 월 30 일 ( 금 ) 18 시까지이며 , 참가 방법 , 제출 자료 , 심사 기준 등 자",
+   "field": "기획·아이디어",
+   "excerptsAt": "2026-10-01",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "[교육부] 마음동행 숏폼 공모전 함께 100초 챌린지 기간 : 2026.09.30 ~ 2026.10.31",
+   "url": "https://www.instagram.com/p/DcxwHT5AYap/?hl=en&img_index=1",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": null,
+   "field": "영상·사진",
+   "excerptsAt": "2026-10-01",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "[우주항공청] 2026 스페이스 해커톤 기간 : 2026.09.14 ~ 2026.11.05",
+   "url": "https://www.space-hackathon.kr/",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": null,
+   "field": "IT·소프트웨어",
+   "excerptsAt": "2026-10-01",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "[과학기술정보통신부] 2026 제3회 국가지식정보 통합플랫폼 활용 우수사례 공모전 기간 : 2026.09.07 ~ 2026.11.06",
+   "url": "https://k-knowledge.kr/ekp/pub/pn/pub.read.jsp?id=102",
+   "kind": "공모전",
+   "attachments": [
+    {
+     "name": "[개인정보 처리방침 전·후 대비표 다운로드]",
+     "url": "https://k-knowledge.kr/ekp/pub/temp/%EA%B0%9C%EC%9D%B8%EC%A0%95%EB%B3%B4%20%EC%B2%98%EB%A6%AC%EB%B0%A9%EC%B9%A8%20%EC%A0%84%C2%B7%ED%9B%84%20%EB%8C%80%EB%B9%84%ED%91%9C.hwp"
+    },
+    {
+     "name": "[개인정보 처리 방침에 관한 고시(제2020-7호) 별지 제8호] 개인정보 열람 요구서",
+     "url": "https://k-knowledge.kr/ekp/pub/temp/[%EA%B0%9C%EC%9D%B8%EC%A0%95%EB%B3%B4%20%EC%B2%98%EB%A6%AC%20%EB%B0%A9%EC%B9%A8%EC%97%90%20%EA%B4%80%ED%95%9C%20%EA%B3%A0%EC%8B%9C(%EC%A0%9C2020-7%ED%98%B8)%20%EB%B3%84%EC%A7%80%20%EC%A0%9C8%ED%98%B8]%20%EA%B0%9C%EC%9D%B8%EC%A0%95%EB%B3%B4%20%EC%97%B4%EB%9E%8C%20%EC%9A%94%EA%B5%AC%EC%84%9C.hwp"
+    },
+    {
+     "name": "[개인정보 처리 방침에 관한 고시(제2020-7호) 별지 제11호] 위임장",
+     "url": "https://k-knowledge.kr/ekp/pub/temp/[%EA%B0%9C%EC%9D%B8%EC%A0%95%EB%B3%B4%20%EC%B2%98%EB%A6%AC%20%EB%B0%A9%EC%B9%A8%EC%97%90%20%EA%B4%80%ED%95%9C%20%EA%B3%A0%EC%8B%9C(%EC%A0%9C2020-7%ED%98%B8)%20%EB%B3%84%EC%A7%80%20%EC%A0%9C11%ED%98%B8]%20%EC%9C%84%EC%9E%84%EC%9E%A5.hwp"
+    }
+   ],
+   "deadlineHint": null,
+   "field": "과학·공학",
+   "excerptsAt": "2026-10-01",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-10-01"
+  },
+  {
+   "title": "[일반] [국립대학 육성사업] 3주만에 끝내는 AI 취업 치트키 특강",
+   "url": "https://www.knou.ac.kr/bbs/knou/51/816423/artclView.do",
+   "kind": "대외활동",
+   "attachments": [
+    {
+     "name": "취업특강 포스터.png",
+     "url": "https://www.knou.ac.kr/bbs/knou/51/278351/download.do"
+    }
+   ],
+   "deadlineHint": "신청 기간 특강 제목 1 차 2026.10.19.( 월 ) 10:00~12:00 2026.10.1.( 목 ) 10:00 ~ 2026.10.14.",
+   "field": "교육·캠프",
+   "excerptsAt": "2026-10-01",
+   "school": "한국방송통신대학교",
+   "campus": "",
+   "foundAt": "2026-10-01"
+  },
   {
    "title": "[문화체육관광부] 내가 알리는 모두의 「희망사다리」 영상공모전 기간 : 2026.07.30 ~ 2026.10.04",
    "url": "https://xn--ob0bn6i2qgtft1b56vemnk53a.kr/",

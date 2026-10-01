@@ -925,6 +925,30 @@
    "added": "2026-09-30",
    "fetched": true,
    "schematized": false
+  },
+  {
+   "id": "auto-notiphpcodes1301seq11207",
+   "name": "2026학년도 2학기 화전중앙교회 장학금 신청 안내 학생지원팀 2026-09-21 344",
+   "target": "2026학년도 2학기 화전중앙교회 장학금 신청 안내 학",
+   "added": "2026-10-01",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-notiphpcodes1301seq10660",
+   "name": "2026학년도 산학협동재단 장학생 선발 안내 학생지원팀 2026-05-19 738",
+   "target": "2026학년도 산학협동재단 장학생 선발 안내 학생지원팀",
+   "added": "2026-10-01",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-notiphpcodes1301seq10610",
+   "name": "세종연구원 2026년도 세종이도인재장학금 장학생 선발 안내 학생지원팀 2026-05-11 1,664",
+   "target": "세종연구원 2026년도 세종이도인재장학금 장학생 선발 ",
+   "added": "2026-10-01",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }
