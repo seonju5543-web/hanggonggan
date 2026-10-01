@@ -13,7 +13,8 @@
    ============================================================ */
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
-import { extractDatedRows, sameSite } from './board-links.mjs';
+import { sameSite } from './board-links.mjs';
+import { NEWS_BOARD_RULES, datedRowsFor, verifyRuleDetail } from './news-board-rules.mjs';   // 클릭형 게시판 규칙 한 곳 (찾기 로봇과 같은 것)
 import { urlKey, dedupeNotices } from './url-key.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { activityKind } from './activity-kind.mjs';
@@ -73,9 +74,8 @@ function loadPublished() {
   return out;
 }
 
-/* 목록 행이 진짜 링크가 아닌 게시판 — collect.mjs 의 BOARD_RULES 와 같은 꼴(kind json·dataId·onclick).
-   지금은 비어 있다: 찾기 로봇이 못 읽은 학교(SPA·클릭형)가 리포트에 뜨면 그때 **실제로 열어 확인한 것만** 적는다. 주소를 유추하지 않는다. */
-export const NEWS_BOARD_RULES = {};
+/* 목록 행이 진짜 링크가 아닌 게시판(동국·WISE·서울교대·전북)의 규칙은 news-board-rules.mjs **한 곳**에 있다 — 여기 베끼지 않는다.
+   규칙 글은 첫 상세를 실제로 열어 제목을 확인한 뒤에만 싣는다(verifyRuleDetail). 주소를 유추하지 않는다. */
 
 const results = [];
 const freshAll = [];
@@ -94,33 +94,24 @@ async function harvestBoard(s, ctx = { dead: false }) {
      첫 실행에서 물었더니 10개교가 ⛔ 로 빠졌다(2026-10-01). */
   try {
     const rule = NEWS_BOARD_RULES[s.school];
-    let rawLinks;
-    if (rule && rule.kind === 'json') {
-      const r = await fetchBoard(rule.api);
-      if (!r.ok) throw new Error(`API HTTP ${r.status}`);
-      const j = await r.json();
-      const dig = (o, d = 0) => { if (Array.isArray(o)) return o; if (!o || typeof o !== 'object' || d > 2) return null; for (const k of ['list', 'data', 'content', 'result', 'items', 'rows']) { const hit = dig(o[k], d + 1); if (hit) return hit; } return null; };
-      rawLinks = (dig(j) || []).map((x) => ({ title: String(x.title || x.subject || '').replace(/\s+/g, ' ').trim(), url: rule.detail(x.pkId ?? x.id ?? x.seq) })).filter((x) => x.title && !/undefined|null/.test(x.url));
-    } else {
-      const res = await fetchBoard(s.boardUrl);
-      if (ctx.dead) return;
-      if (!res.ok) { results.push({ name, status: `⚠️ 접속 실패 (HTTP ${res.status}) — 주소 수정 필요`, items: [] }); return; }
-      const html = await res.text();
-      if (rule && rule.kind === 'onclick') {
-        rawLinks = [...html.matchAll(/<a\b[^>]*onclick\s*=\s*(["'])((?:(?!\1)[\s\S])*)\1[^>]*>([\s\S]*?)<\/a>/gi)].map((m) => { const id = (m[2].match(rule.fn) || [])[1]; return id ? { title: m[3].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(), url: rule.detail(id) } : null; }).filter((x) => x && x.title);
-      } else if (rule && rule.kind === 'dataId') {
-        rawLinks = [...html.matchAll(/data-id=["'](\d+)["'][^>]*>([\s\S]{0,300}?)<\/a>/g)].map((m) => ({ title: m[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(), url: rule.detail(m[1]) })).filter((x) => x.title);
-      } else {
-        /* 🔴 글 줄만 — 페이지의 <a> 전부(extractLinks)를 쓰면 사이트 메뉴가 글로 담긴다(첫 실행 906건 사고 · 2026-10-01).
-           날짜가 붙은 줄(<tr>·<li>…)의 링크만 글이고, 그 날짜가 게시일(postedAt)이다. */
-        rawLinks = extractDatedRows(html, s.boardUrl);
-      }
-    }
+    const res = await fetchBoard(s.boardUrl);
+    if (ctx.dead) return;
+    if (!res.ok) { results.push({ name, status: `⚠️ 접속 실패 (HTTP ${res.status}) — 주소 수정 필요`, items: [] }); return; }
+    const html = await res.text();
+    /* 🔴 글 줄만 — 페이지의 <a> 전부(extractLinks)를 쓰면 사이트 메뉴가 글로 담긴다(첫 실행 906건 사고 · 2026-10-01).
+       날짜가 붙은 줄(<tr>·<li>…)의 링크만 글이고, 그 날짜가 게시일(postedAt)이다. 클릭형 게시판은 같은 눈에 규칙의 링크 풀이만 얹는다. */
+    const rawLinks = datedRowsFor(s.school, html, s.boardUrl);
     /* 무엇을 싣나 — 학교 사이트 안의 글 가운데 장학·활동·잡음을 뺀 것 (판정은 news-kind.mjs 한 곳) */
     const items = rawLinks
-      .filter((i) => !rule ? sameSite(i.url, s.boardUrl) : true)
+      .filter((i) => sameSite(i.url, s.boardUrl))
       .filter((i) => isNewsRow(i, { scholarship: KEYWORDS, activityKind, isAttachmentEntry }));
     const fresh = items.filter((i) => !seen[urlKey(i.url)]).slice(0, NEWS_FRESH_MAX);
+    /* 🔴 규칙으로 만든 상세 주소는 매번 첫 글 하나를 실제로 열어 제목을 확인한다 — 안 맞으면 이 게시판은 싣지 않는다(틀린 링크보다 0건). */
+    if (rule && fresh.length) {
+      const v = await verifyRuleDetail(fresh[0], { boardUrl: s.boardUrl, others: items.map((i) => i.title) });
+      if (ctx.dead) return;
+      if (!v.ok) { results.push({ name, status: `⚠️ 클릭형 규칙(news-board-rules.mjs)의 상세 주소 확인 실패 — ${v.reason} · 이 게시판은 싣지 않음`, items: [] }); return; }
+    }
     for (const it of fresh) {
       if (ctx.dead) return;
       const kind = newsKind(it.title);

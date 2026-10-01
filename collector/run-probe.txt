@@ -30,3 +30,18 @@ checkUrl: https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%
 checkUrl: https://www.dongguk.edu/article/JANGHAKNOTICE/list
 checkUrl: https://www.smu.ac.kr/kor/life/notice.do?srCategoryId=8
 checkUrl: https://www.smu.ac.kr/kor/life/scholarship.do
+
+# 2026-10-01 — 교내 소식 로봇(collect-news.mjs)이 6차 실행까지 못 읽은 학교 (개발자 지시 "실패한 작업 전부 해결책 설계 후 착수").
+#   날짜 줄의 제목 링크가 **무엇으로 상세를 여는지**(href·onclick·data-*)와 첫 줄을 눌렀을 때 **어디로 가는지**를 받아 적는다 —
+#   그 결과만으로 news-board-rules.mjs 에 규칙을 적는다(주소를 유추하지 않는다). 서강은 인증서 사슬(certHost)도 본다.
+checkUrl: https://www.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200316
+checkUrl: https://www.korea.ac.kr/ko/566/subview.do
+checkUrl: https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100
+checkUrl: https://www.uos.ac.kr/korNotice/list.do?list_id=FA1
+checkUrl: https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=143
+checkUrl: https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/listBtin.action?bbs_cde=1&menu_idx=67
+checkUrl: https://www.yu.ac.kr/main/intro/yu-notice.do?mode=list&article.offset=0
+checkUrl: https://www.smu.ac.kr/kor/life/notice.do
+checkUrl: https://www.sogang.ac.kr/ko/announcement
+checkUrl: https://www.inha.ac.kr/bbs/kr/8/artclList.do
+certHost: www.sogang.ac.kr

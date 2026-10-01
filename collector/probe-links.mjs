@@ -62,6 +62,55 @@ async function checkUrl(url) {
     report.push(`- 큰 제목: ${String(info.h).replace(/\s+/g, ' ').trim().slice(0, 90)}`);
     report.push(`- **로그인 요구: ${wall ? '⛔ 예 — 학생이 못 봅니다' : '✅ 아니오'}**${info.pw ? ' (비밀번호 입력칸 있음)' : ''}`);
     report.push(`- 화면 글자: ${info.text.slice(0, 300)}`);
+    /* ③ 날짜 줄의 링크 (2026-10-01 · 교내 소식 클릭형 게시판) — 글 줄(날짜가 든 <tr>·<li>·div)에서 제목 링크가 **무엇으로** 상세를 여는지
+       (href · onclick · data-*) 그대로 받아 적고, 첫 줄을 실제로 눌러 **어디로 가는지**(최종 주소·제목)를 적는다.
+       수집 로봇의 규칙(news-board-rules.mjs)은 여기 적힌 것만으로 쓴다 — 주소를 유추하지 않는다(동국대 선례). */
+    const rows = await page.evaluate(() => {
+      const DATE = /(20\d{2})\s*[.\-/년]\s*(\d{1,2})\s*[.\-/월]\s*(\d{1,2})(?!\d)|(?<!\d)\d{2}\.\d{2}\.\d{2}(?!\d)/;
+      const out = []; const seen = new Set();
+      for (const el of document.querySelectorAll('tr, li, dd, article, div')) {
+        if (out.length >= 6) break;
+        const text = (el.innerText || '').replace(/\s+/g, ' ').trim();
+        if (!text || text.length > 400 || !DATE.test(text)) continue;
+        if (el.querySelector('tr, li, dd, article')) continue;   // 가장 안쪽 줄만
+        const a = [...el.querySelectorAll('a')].sort((x, y) => (y.textContent || '').trim().length - (x.textContent || '').trim().length)[0];
+        if (!a) continue;
+        const title = (a.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 60);
+        if (title.length < 6 || seen.has(title)) continue;
+        seen.add(title);
+        const attrs = [...a.attributes].filter((x) => /^(href|onclick|data-[\w-]+|class)$/i.test(x.name)).map((x) => `${x.name}="${String(x.value).slice(0, 160)}"`).join(' ');
+        const rowAttrs = [...el.attributes].filter((x) => /^(onclick|data-[\w-]+)$/i.test(x.name)).map((x) => `${x.name}="${String(x.value).slice(0, 160)}"`).join(' ');
+        out.push({ title, attrs, rowAttrs, date: (text.match(DATE) || [''])[0] });
+      }
+      return out;
+    }).catch(() => []);
+    if (rows.length) {
+      report.push(`- 날짜 줄의 제목 링크 ${rows.length}개 (상세를 여는 방식):`);
+      rows.forEach((r) => report.push(`    · 「${r.title}」 ${r.date} → <a ${r.attrs}>${r.rowAttrs ? ` · 줄: <${r.rowAttrs}>` : ''}`));
+      /* 첫 줄을 실제로 눌러 본다 — 새 탭으로 열리면 그 탭, 아니면 같은 탭의 최종 주소 */
+      try {
+        const before = page.url();
+        const popup = page.waitForEvent('popup', { timeout: 6000 }).catch(() => null);
+        /* 폼 전송·같은 탭 이동(전북 pf_DetailMove 꼴)은 evaluate 가 "Execution context was destroyed" 로 거절된다 —
+           그건 실패가 아니라 **이동이 일어난 것**이므로 이동 대기와 함께 걸고 거절은 삼킨다 (리뷰 2026-10-01). */
+        const nav = page.waitForNavigation({ timeout: 8000, waitUntil: 'domcontentloaded' }).catch(() => null);
+        await page.evaluate((t) => { const a = [...document.querySelectorAll('a')].find((x) => (x.textContent || '').replace(/\s+/g, ' ').trim().startsWith(t)); if (a) a.click(); }, rows[0].title.slice(0, 20)).catch(() => null);
+        const pop = await popup;
+        if (!pop) await nav;
+        const target = pop || page;
+        await target.waitForLoadState('domcontentloaded', { timeout: 15000 }).catch(() => {});
+        await target.waitForTimeout(2000);
+        const landed = await target.evaluate(() => ({ title: document.title || '', h: ((document.querySelector('h1,h2,h3,.title,.subject,.view-title') || {}).textContent || '').replace(/\s+/g, ' ').trim().slice(0, 90), text: (document.body.innerText || '').replace(/\s+/g, ' ').slice(0, 200) })).catch(() => ({ title: '', h: '', text: '' }));
+        const url = target.url();
+        report.push(`- 첫 줄 「${rows[0].title.slice(0, 30)}」 을 눌렀더니 → ${url === before ? '(주소 그대로 — 스크립트가 같은 화면에 그림)' : url}${pop ? ' (새 탭)' : ''}`);
+        report.push(`    · 그 화면 제목: ${landed.title.trim().slice(0, 80)} · 큰 제목: ${landed.h} · 글자: ${landed.text.slice(0, 160)}`);
+        if (pop) await pop.close().catch(() => {});
+      } catch (e) {
+        report.push(`- 첫 줄 누르기 실패: ${(e.message || '').split('\n')[0].slice(0, 90)}`);
+      }
+    } else {
+      report.push('- 날짜 줄의 제목 링크: 없음 (날짜가 든 줄에 링크가 없거나 목록이 안 그려짐)');
+    }
     report.push('');
   } catch (e) {
     report.push(`### 🔗 ${url}`);

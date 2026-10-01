@@ -79,19 +79,35 @@ const MIN_SHAPE = 3;
 const SEG_MAX = 3000;
 const DATE_G = /(20\d{2})\s*[.\-/년]\s*(\d{1,2})\s*[.\-/월]\s*(\d{1,2})(?!\d)|(?<!\d)(\d{2})\.(\d{2})\.(\d{2})(?!\d)/g;
 const inScript = (seg) => /<script\b(?:(?!<\/script>)[\s\S])*$/i.test(seg) || /<style\b(?:(?!<\/style>)[\s\S])*$/i.test(seg);
-const rowLinks = (seg, base, postedAt) => extractLinks(seg, base).filter((l) => l.title.length >= 4 && !isAttachmentEntry(l)).map((l) => ({ ...l, postedAt, shape: urlShape(l.url) })).filter((l) => l.shape);
+/* 클릭형 게시판(news-board-rules.mjs) — <a onclick=…>·<a data-id=…> 는 href 가 없어 extractLinks 가 못 본다.
+   resolve(속성 글자) 가 상세 주소를 돌려주면 그 링크도 글 줄의 링크로 센다(제목 정리·길이 규칙은 href 링크와 같다). */
+function resolvedLinks(seg, resolve) {
+  const out = [];
+  const re = /<a\b([^>]*)>([\s\S]*?)<\/a>/gi;
+  let m;
+  while ((m = re.exec(seg)) !== null) {
+    const url = resolve(m[1]);
+    if (!url) continue;
+    const title = cleanTitle(m[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim());
+    if (title.length < 6 || title.length > 140) continue;
+    out.push({ title, url });
+  }
+  return out;
+}
+const rowLinks = (seg, base, postedAt, resolve) => extractLinks(seg, base).concat(resolve ? resolvedLinks(seg, resolve) : []).filter((l) => l.title.length >= 4 && !isAttachmentEntry(l)).map((l) => ({ ...l, postedAt, shape: urlShape(l.url) })).filter((l) => l.shape);
 /* 두 눈을 합친다 (5차 실행 실측 · 2026-10-01): ① 블록 눈(<tr>·<li>·<dl>·<dd>·<article> 안에 날짜) — 표 게시판에 강하다(서울대·연세·국민·인하·방송대…)
    ② 토막 눈(날짜 토큰 앞 SEG_MAX 자) — div·dt/dd 로 그린 목록에 강하다(성균관·광운·한양·명지). 한쪽만 쓰면 다른 쪽 학교가 0행이 된다.
    후보 묶음마다 주소 꼴을 세고, 되풀이되는 꼴(MIN_SHAPE 이상)만 글 — 메뉴 덩어리는 꼴이 한 번씩이라 떨어진다. */
-export function extractDatedRows(html, base) {
+export function extractDatedRows(html, base, opts = {}) {
   const src = String(html || '');
+  const resolve = typeof opts.resolve === 'function' ? opts.resolve : null;   // 클릭형 게시판의 링크 눈 (news-board-rules.mjs)
   const groups = [];
   const blockRe = /<(tr|li|dl|dd|article)\b[^>]*>((?:(?!<\1\b)[\s\S])*?)<\/\1>/gi;
   let m;
   while ((m = blockRe.exec(src)) !== null) {
     const postedAt = rowDate(m[2]);
     if (!postedAt) continue;
-    const links = rowLinks(m[2], base, postedAt);
+    const links = rowLinks(m[2], base, postedAt, resolve);
     if (links.length) groups.push({ links, pick: 'longest' });
   }
   let prev = 0;
@@ -101,7 +117,7 @@ export function extractDatedRows(html, base) {
     const seg = src.slice(Math.max(prev, m.index - SEG_MAX), m.index);
     prev = DATE_G.lastIndex;
     if (!postedAt || inScript(seg)) continue;
-    const links = rowLinks(seg, base, postedAt);
+    const links = rowLinks(seg, base, postedAt, resolve);
     if (links.length) groups.push({ links, pick: 'last' });   // 토막에선 날짜에 가장 가까운 링크가 제 줄의 제목
   }
   const count = new Map();

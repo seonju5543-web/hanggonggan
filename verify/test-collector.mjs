@@ -1647,7 +1647,8 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
     && /acts\.items = dedupeNotices\(acts\.items\)/.test(cm)
     && /dropUnserved\(acts\.items\.filter\(\(n\) => n\.school\)\)/.test(cm)
     && /acts\.items = acts\.items\.slice\(0, ACT_CAP\)/.test(cm), true);
-  eq('전용 게시판은 장학 피드에 담지 않는다', /if \(isAct\) \{[\s\S]*?continue;/.test(cm), true);
+  /* 🔴 블록 안에서 끝나야 한다 — 예전 [\s\S]*?continue; 는 파일 어디의 continue 에나 맞아 관문이 빈 채였다(2026-10-01 수리 · 코드는 return 으로 게시판을 마친다) */
+  eq('전용 게시판은 장학 피드에 담지 않는다 (actResults 에 담고 return)', /if \(isAct\) \{\s*actResults\.push\(\{\s*name,[\s\S]{0,400}?items: freshA,\s*\}\);\s*return;/.test(cm), true);
   const strip = (t) => t.split('\n').filter((l) => !/^\s*#/.test(l)).join('\n');
   const wf = strip(readText(new URL('../.github/workflows/collect-scholarships.yml', import.meta.url)));
   eq('워크플로가 활동 파일 한 쌍을 저장한다', /git add data\/activities\.json/.test(wf) && /git add collector\/seen-activities\.json/.test(wf), true);
@@ -1895,7 +1896,7 @@ console.log('\n■ 재단·지자체 게시판 (2026-09-26 · 노션 F-13 · 교
   /* 로봇 배선 */
   const cm = readText(new URL('../collector/collect.mjs', import.meta.url));
   eq('수집기가 찾은 게시판만 읽는다 (boardUrl 있는 것 · role external)', /filter\(\(s\) => s\.boardUrl\)\.map\(\(s\) => \(\{ \.\.\.s, role: 'external' \}\)\)/.test(cm), true);
-  eq('재단 글은 학교 피드에 담지 않는다 (continue)', /if \(isExt\) \{[\s\S]*?freshExt\.push\(it\);[\s\S]*?continue;/.test(cm), true);
+  eq('재단 글은 학교 피드에 담지 않는다 (extResults 에 담고 return)', /if \(isExt\) \{[\s\S]{0,3000}?freshExt\.push\(it\);\s*\}\s*if \(ctx\.dead\) return;\s*extResults\.push\(\{\s*name,[\s\S]{0,400}?items: freshE,\s*\}\);\s*return;/.test(cm), true);
   eq('제 파일·제 장부에 쓴다', /fs\.writeFileSync\(extPath/.test(cm) && /fs\.writeFileSync\(seenExtPath/.test(cm), true);
   eq('발행 규칙 — 60일·중복·주최 없는 글 제외·상한', /ext\.items = ext\.items\.filter\(\(n\) => \(n\.foundAt \|\| '9999'\) >= cutoff\)/.test(cm) && /ext\.items = dedupeNotices\(ext\.items\)/.test(cm) && /filter\(\(n\) => !n\.school && n\.host\)/.test(cm) && /ext\.items\.slice\(0, EXT_CAP\)/.test(cm), true);
   eq('링크 읽는 눈은 board-links.mjs 한 곳 (수집기·찾기 로봇이 같은 것)', /from '\.\/board-links\.mjs'/.test(cm) && /from '\.\/board-links\.mjs'/.test(readText(new URL('../collector/find-boards.mjs', import.meta.url))) && !/^function extractLinks/m.test(cm), true);
@@ -1989,7 +1990,34 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
   eq('  장학 수집기도 fetch-board 를 불러 쓴다 (한 벌)', /from '\.\/fetch-board\.mjs'/.test(cm) && !/^async function fetchBoard/m.test(cm), true);
   eq('  isNewsRow 에 장학 그물·활동 판정을 넘긴다', /isNewsRow\(i, \{ scholarship: KEYWORDS, activityKind, isAttachmentEntry \}\)/.test(rn) && !/isMenuEntry/.test(rn), true);
   eq('  상세를 읽지 않는다 (fetchDetail 없음 · 제목+링크+수집일만)', /fetchDetail/.test(rn), false);
-  eq('  글 줄만 읽는다 — extractDatedRows (페이지 링크 전부 extractLinks 가 아니다)', /rawLinks = extractDatedRows\(html, s\.boardUrl\)/.test(rn) && !/\bextractLinks\(/.test(rn) && /extractDatedRows\(page\.html, page\.url\)/.test(readText(new URL('collector/find-news-boards.mjs', root))), true);
+  const fn = readText(new URL('collector/find-news-boards.mjs', root));
+  eq('  글 줄만 읽는다 — datedRowsFor(=extractDatedRows + 클릭형 링크 풀이) · 페이지 링크 전부 extractLinks 가 아니다', /rawLinks = datedRowsFor\(s\.school, html, s\.boardUrl\)/.test(rn) && !/\bextractLinks\(/.test(rn) && /datedRowsFor\(s\.school, page\.html, page\.url\)/.test(fn), true);
+  /* 🔴 클릭형 게시판 규칙(2026-10-01 · 6차 실행까지 0행이던 동국·WISE·서울교대·전북) — 규칙은 news-board-rules.mjs 한 곳, 상세는 매번 실제로 열어 확인 */
+  const RB = await import('../collector/news-board-rules.mjs');
+  const rb = readText(new URL('collector/news-board-rules.mjs', root));
+  eq('  클릭형 규칙은 news-board-rules.mjs 한 곳 — 두 로봇이 불러 쓴다 (베끼지 않는다)', /from '\.\/news-board-rules\.mjs'/.test(rn) && /from '\.\/news-board-rules\.mjs'/.test(fn) && !/NEWS_BOARD_RULES = \{/.test(rn) && !/NEWS_BOARD_RULES = \{/.test(fn), true);
+  eq('  규칙마다 근거(실제로 열어 확인한 경위)가 있다 · kind 는 onclick/dataId', Object.values(RB.NEWS_BOARD_RULES).every((r) => typeof r.evidence === 'string' && r.evidence.length >= 20 && /^(onclick|dataId)$/.test(r.kind) && typeof r.detail === 'function'), true);
+  eq('  규칙 학교는 전부 수집망 학교', Object.keys(RB.NEWS_BOARD_RULES).filter((n) => !schoolsCfg.schools.some((x) => x.school === n)), []);
+  const dgHtml = '<ul>' + ['헌혈 버스 시행 안내 (10월 6일·8일)', '2026-2학기 비교과 교육과정 안내', '학생통학버스 운행 시간표 변경 안내', '도서관 열람실 운영시간 변경 안내', '법정의무교육 이수 안내'].map((t, i) => `<li><span>공지</span><a href="#none" onclick="goDetail(2676644${i});">${t}</a><span>2026.10.0${i + 1}.</span> 조회 81</li>`).join('') + '</ul>';
+  const dgRows = RB.datedRowsFor('동국대학교', dgHtml, 'https://www.dongguk.edu/article/GENERALNOTICES/list');
+  eq('  동국 onclick 행 — 목록 주소의 /list 를 /detail/<번호> 로 (사이트가 적어 둔 꼴) · 게시일 유지', [dgRows.length, dgRows[0] && dgRows[0].url, dgRows[0] && dgRows[0].postedAt], [5, 'https://www.dongguk.edu/article/GENERALNOTICES/detail/26766440', '2026-10-01']);
+  eq('  규칙 없는 학교는 같은 글이 0행 (href 없는 링크는 글이 아니다)', RB.datedRowsFor('서울대학교', dgHtml, 'https://www.dongguk.edu/article/GENERALNOTICES/list').length, 0);
+  const snRows = RB.datedRowsFor('서울교육대학교', '<table>' + ['창의융복합 교육연구 프로젝트 팀 모집', '평화통일민주교육위원 추가 위촉 신청 안내', '2026학년도 2학기 수강신청 안내', '도서관 열람실 운영시간 변경 안내', '법정의무교육 이수 안내'].map((t, i) => `<tr><td>공지</td><td><a href="javascript:" data-id="5510${i}" class="nttInfoBtn">${t}</a></td><td>학생처</td><td>2026.09.1${i}</td></tr>`).join('') + '</table>', 'https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=1309&bbsId=1082');
+  eq('  서울교대 data-id 행 — mi·bbsId 는 목록 주소에서, nttSn 은 data-id (짐작한 번호 없음)', snRows[0] && snRows[0].url, 'https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=1309&bbsId=1082&nttSn=55100');
+  eq('  mi·bbsId 가 없는 목록 주소면 상세 주소를 만들지 않는다', RB.datedRowsFor('서울교육대학교', '<tr><a href="javascript:" data-id="1">x</a> 2026.09.10</tr>', 'https://www.snue.ac.kr/snue/na/ntt/selectNttList.do').length, 0);
+  const okFetch = (body, url) => async (u) => ({ ok: true, status: 200, url: url || u, text: async () => body });
+  const dgList = 'https://www.dongguk.edu/article/GENERALNOTICES/list';
+  const vo = { boardUrl: dgList, others: dgRows.map((r) => r.title) };
+  eq('  규칙 상세는 실제로 열어 그 글의 제목이 있을 때만 통과', (await RB.verifyRuleDetail(dgRows[0], { ...vo, fetch: okFetch('<h3>헌혈 버스 시행 안내 (10월 6일·8일)</h3><p>이전글 2026-2학기 비교과 교육과정 안내</p>') })).ok, true);
+  eq('    제목이 없으면(다른 글·틀린 규칙) 실패', (await RB.verifyRuleDetail(dgRows[0], { ...vo, fetch: okFetch('<h3>엉뚱한 글</h3>') })).ok, false);
+  eq('    안 열리면 실패', (await RB.verifyRuleDetail(dgRows[0], { ...vo, fetch: async () => ({ ok: false, status: 404 }) })).ok, false);
+  eq('    목록으로 되돌아오면 실패 (틀린 주소를 목록으로 돌려보내는 사이트)', (await RB.verifyRuleDetail(dgRows[0], { ...vo, fetch: okFetch('<h3>헌혈 버스 시행 안내 (10월 6일·8일)</h3>', dgList + '?page=1') })).ok, false);
+  eq('    다른 글 제목이 절반 넘게 함께 보이면 목록 화면이라 실패', (await RB.verifyRuleDetail(dgRows[0], { ...vo, fetch: okFetch(dgRows.map((r) => `<li>${r.title}</li>`).join('')) })).ok, false);
+  const jb = RB.datedRowsFor('전북대학교', '<table>' + ['전공배정 제도 설명회 개최 안내', '청년 참여자 모집 홍보 협조 요청', '2026학년도 2학기 수강신청 안내', '도서관 열람실 운영시간 변경 안내', '법정의무교육 이수 안내'].map((t, i) => `<tr><td>교육</td><td><a href="javascript:;" class="title" onclick="pf_DetailMove('21781${i}')">${t}</a></td><td>2026-09-2${i}</td></tr>`).join('') + '</table>', 'https://www.jbnu.ac.kr/web/news/notice/sub01.do');
+  eq('  전북 onclick 행 — 함수가 보내는 길 그대로 · 꼬리는 목록 주소의 것만 (공지 전체는 꼬리 없음)', jb[0] && jb[0].url, 'https://www.jbnu.ac.kr/web/Board/217810/detailView.do');
+  eq('  수집기는 규칙 글의 첫 상세를 목록 주소·다른 제목과 함께 확인하고 실패면 그 게시판을 싣지 않는다', /if \(rule && fresh\.length\) \{\s*const v = await verifyRuleDetail\(fresh\[0\], \{ boardUrl: s\.boardUrl, others: items\.map\([^\n]*\);[\s\S]{0,400}?if \(!v\.ok\) \{ results\.push\([^\n]*items: \[\] \}\); return; \}/.test(rn), true);
+  eq('  찾기 로봇도 규칙 학교는 상세 확인 뒤에만 찾음으로 올린다', /if \(score\.rows >= MIN_ROWS && NEWS_BOARD_RULES\[s\.school\]\) \{[\s\S]{0,200}?const v = await verifyRuleDetail\(first, \{ boardUrl: page\.url, others: [\s\S]{0,200}?if \(!v\.ok\) \{[^\n]*return null; \}/.test(fn), true);
+  eq('  resolve 눈은 extractDatedRows 의 선택 인자 (href 게시판은 그대로)', /export function extractDatedRows\(html, base, opts = \{\}\)/.test(readText(new URL('collector/board-links.mjs', root))), true);
   eq('  학교 게시판은 robots.txt 를 묻지 않는다 (장학 수집기와 같은 정책 · 첫 실행에서 10개교가 ⛔ 로 빠졌다)', /robotsAllows/.test(rn), false);
   eq('  예산·시한·회전 — hasRoom · withDeadline · 커서 저장 · 스스로 끝낸다', /if \(!budget\.hasRoom\(MIN_ROOM_MS\)\) \{/.test(rn) && /await withDeadline\(harvestBoard\(s, ctx\), BOARD_HARD_MS\)/.test(rn) && /fs\.writeFileSync\(cursorPath/.test(rn) && /\nprocess\.exit\(0\);\s*$/.test(rn), true);
   eq('  학교별 파일로만 발행한다 (notices.json·activities.json 에 쓰지 않는다)', /publishBySchool\(all, \{\s*\n?\s*dir: NEWS_DIR/.test(rn) && !/notices\.json|activities\.json/.test(rn.replace(/\/\*[\s\S]*?\*\//g, '')), true);
