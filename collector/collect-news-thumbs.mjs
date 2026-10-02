@@ -82,7 +82,7 @@ async function shrink(buf) {
   if (out.length > T.THUMB_MAX_BYTES) return null;
   const rgb = await sharp(buf, { animated: false, limitInputPixels: 60e6 }).rotate().resize(160, 160, { fit: 'inside', kernel: 'nearest' }).removeAlpha().toColourspace('srgb').raw().toBuffer();
   const mono = T.monoParts(rgb);
-  return { buf: out, mono, qr: T.looksLikeQr(mono) };
+  return { buf: out, mono, qr: T.looksLikeQr(mono), textPage: T.looksLikeTextPage(mono) };
 }
 
 /* 글 하나 — { file, src, from } · { none } · { err } 를 돌려준다. ctx.dead 면 파일을 쓰지 않는다(시한 뒤 늦게 끝난 일) */
@@ -92,7 +92,10 @@ async function thumbFor(n, ctx) {
   let res;
   try { res = await fetchBoard(req.url, { ...req.opts, tries: 1, firstMs: 12000 }); } catch (e) { return { err: `글 열기 실패 (${netReason(e)})` }; }
   if (!res.ok) return { err: `글 HTTP ${res.status}` };
-  const text = await res.text();
+  let text = await res.text();
+  /* 본문 API 가 JSON 이면 글자를 풀어서 대조한다(\uXXXX 로 적힌 제목) */
+  try { if (/^\s*[{[]/.test(text)) text = JSON.stringify(JSON.parse(text)); } catch { /* JSON 아님 */ }
+  if (!T.pageHasTitle(text, n.title)) return { err: '글 화면에 그 글의 제목이 없음 — 오류·로그인·다른 화면일 수 있어 다음에 다시' };
   let cands;
   const ct = res.headers && res.headers.get ? (res.headers.get('content-type') || '') : '';
   if (/json/i.test(ct) || /^\s*[{[]/.test(text)) { try { cands = T.jsonImageCandidates(JSON.parse(text), req.base); } catch { cands = T.imageCandidates(text, req.base); } }
@@ -117,6 +120,7 @@ async function thumbFor(n, ctx) {
     try { out = await shrink(got.buf); } catch (e) { notes.push(`${c.from}: 줄이기 실패 (${String(e.message).slice(0, 60)})`); continue; }
     if (!out) { notes.push(`${c.from}: 줄여도 너무 큼`); continue; }
     if (out.qr) { notes.push(`${c.from}: QR 코드로 보임 (검정 ${Math.round(out.mono.black * 100)}% · 흰색 ${Math.round(out.mono.white * 100)}%)`); continue; }
+    if (out.textPage) { notes.push(`${c.from}: 글자뿐인 문서 그림 (흰 바탕 ${Math.round(out.mono.white * 100)}% · 색 ${Math.round(out.mono.colour * 100)}%)`); continue; }
     const rel = T.thumbName(out.buf);
     /* 같은 학교의 다른 글이 **똑같은 그림 파일**을 쓰면 공통 그림이다 — 주소가 달라도(세션 꼬리·CDN) 바이트가 같다 (리뷰 12차) */
     if (T.isCommonFile(ledger, n.school, rel)) { notes.push(`${c.from}: 여러 글에 같은 그림(같은 파일)`); continue; }
@@ -134,8 +138,10 @@ async function thumbFor(n, ctx) {
   return { none: cands.length ? `사진으로 쓸 그림 없음 (${why})` : '글에 그림이 없음' };
 }
 
-/* 대표 이미지(og)로 받았던 썸네일은 버리고 다시 찾는다 — og 는 이제 후보가 아니다(첫 실행 16/16 이 학교 로고·공통 사진 · news-thumb.mjs) */
-for (const [k, e] of Object.entries(ledger.posts)) if (e.from === 'og') delete ledger.posts[k];
+/* 고르는 규칙이 바뀌면(RULES_V) 옛 규칙으로 받은 사진은 버리고 다시 찾는다 — 소급(운영 원칙 7).
+   v2(2026-10-03 두 번째 실제 실행 84장을 눈으로 본 뒤): 대표 이미지(og) 제외 · 글자뿐인 문서 그림 제외 · QR 기준 · 글 화면에 제목이 있어야 함(서버 오류 화면 그림) */
+const RULES_V = 2;
+for (const [k, e] of Object.entries(ledger.posts)) if (e.file && (e.v || 1) < RULES_V) delete ledger.posts[k];
 
 /* ①~③ — **학교 여럿을 동시에**(LANES), 한 학교 안에서는 하나씩 틈을 두고 (첫 실제 실행: 하나씩 돌면 2.5분에 45건 — 쌓인 515건에 6일).
    한 학교를 몰아치지 않는 규칙은 그대로다(같은 학교 요청은 늘 차례로 · 글 사이 GAP_MS). */
@@ -169,7 +175,7 @@ if (sharp && MODE !== 'off') {
     if (r === TIMED_OUT) ctx.dead = true;
     const out = r === TIMED_OUT ? { err: `${Math.round(ITEM_HARD_MS / 1000)}초 안에 못 끝냄` } : r;
     const prev = ledger.posts[key];
-    ledger.posts[key] = out.file ? { at: today, school: n.school, file: out.file, src: out.src, from: out.from }
+    ledger.posts[key] = out.file ? { at: today, school: n.school, file: out.file, src: out.src, from: out.from, v: RULES_V }
       : out.none ? { at: today, school: n.school, none: out.none }
       : { at: today, school: n.school, err: out.err, tries: ((prev && prev.err && prev.tries) || 0) + 1 };
     runLog.push({ school: n.school, title: n.title, result: out.file ? `✅ ${out.from}` : out.none ? '— 없음' : '⚠️ 실패', note: out.file ? `${out.note} · ${out.file} ← ${String(out.src).slice(0, 120)}` : (out.none || out.err) });
