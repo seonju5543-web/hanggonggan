@@ -22,8 +22,9 @@ import * as canon from '../collector/canon-url.mjs';
 import { indexTexts, sourceFor, hasText } from '../collector/notice-source.mjs';
 import { attachmentText, readable } from '../collector/attachment-text.mjs';
 import { periodAfterDeadline, amountAfterValue } from './edit-diff.mjs';
-import { newsPostKey } from '../collector/news-board-rules.mjs';
-import { thumbKey, isThumbPath } from '../collector/news-thumb.mjs';   // 소식 썸네일 열쇠·꼴 한 곳 (썸네일 로봇과 같다)   // 소식 숨김 열쇠 한 곳 (수집 로봇의 newsHidden 과 같다)
+import { newsPostKey } from '../collector/news-board-rules.mjs';   // 소식 숨김 열쇠 한 곳 (수집 로봇의 newsHidden 과 같다)
+import { thumbKey, isThumbPath } from '../collector/news-thumb.mjs';   // 소식 썸네일 열쇠·꼴 한 곳 (썸네일 로봇과 같다)
+import { urlKey } from '../collector/url-key.mjs';
 
 /* 저장소 뿌리. 데이터 파일은 지금까지처럼 **작업 폴더 기준**으로 읽고 쓰지만(워크플로가
    저장소 안에서 돈다), 아래 '저장된 공고 원문'은 이 파일 기준으로 읽는다 — 검사도 같은 원문을
@@ -960,7 +961,8 @@ switch (action) {
           if (!cfg.noThumb.includes(k)) cfg.noThumb.push(k);
           delete it.thumb; it.thumbOffBy = `관리자 ${kstNow().slice(0, 10)}`;
         } else {
-          cfg.noThumb = cfg.noThumb.filter((x) => x !== k);
+          const alias = it.postId && !/#n-/.test(String(it.url || '')) ? `url:${urlKey(it.url)}` : '';   // 글 번호가 붙기 전에 뺀 사진(주소 열쇠)도 같이 푼다 · optedOut 과 같은 규칙
+          cfg.noThumb = cfg.noThumb.filter((x) => x !== k && x !== alias);
           delete it.thumbOffBy;
           const e = ledger.posts && ledger.posts[k];
           if (e && e.file && isThumbPath(e.file) && fs.existsSync(e.file)) it.thumb = e.file;

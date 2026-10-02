@@ -2319,7 +2319,18 @@ console.log('\n■ 교내 소식 썸네일 (2026-10-03 개발자 지시 "실제 
   const cands = TH.imageCandidates(page, base);
   eq('  후보 차례 — 대표 이미지 → 본문 사진(늦게 싣기는 data-src) → 첨부 그림 · 머리·메뉴·바닥·로고·아이콘·벡터·작은 그림 제외', cands.map((c) => `${c.from}:${c.src.replace('https://www.x.ac.kr', '')}`),
     ['og:/upload/og/2026/a.jpg', 'body:/upload/editor/2026/real.jpg', 'body:/upload/editor/2026/second.png', 'attach:/cmmn/fileDown.do?id=7']);
-  eq('    진짜 사진이 사는 폴더(/upload/file/·/_attach/)는 장식으로 보지 않는다 · 파일 이름의 로고·아이콘·단추·배너는 장식', ['https://x.ac.kr/upload/file/2026/a.jpg', 'https://x.ac.kr/_attach/image/a.png', 'https://x.ac.kr/img/common/logo.png', 'https://x.ac.kr/images/btn_top.png', 'https://x.ac.kr/images/main_banner01.jpg', 'https://x.ac.kr/sns/kakao.png'].map((u) => TH.looksChrome(u)), [false, false, true, true, true, true]);
+  eq('    진짜 사진이 사는 폴더(/upload/file/·/_attach/)는 장식으로 보지 않는다 · 파일 이름의 로고·아이콘·단추와 sns 폴더는 장식', ['https://x.ac.kr/upload/file/2026/a.jpg', 'https://x.ac.kr/_attach/image/a.png', 'https://x.ac.kr/img/common/logo.png', 'https://x.ac.kr/images/btn_top.png', 'https://x.ac.kr/sns/kakao.png'].map((u) => TH.looksChrome(u)), [false, false, true, true, true]);
+  /* 리뷰 12차 — 낱말 하나로 진짜 사진을 막았다(카톡으로 받은 사진·행사 배너 포스터·기본 방 사진). SNS 는 단추·아이콘 꼴일 때만 장식 */
+  eq('    카톡 사진·행사 배너·설치식·기본 방 사진은 진짜 사진 · sns_kakao·kakao_icon·ico_new 는 장식', ['KakaoTalk_20261002_153012345.jpg', 'KakaoTalk_Photo_2026-10-02-15-30-12-001.jpeg', '2026_festival_banner.jpg', 'installation_ceremony.jpg', 'default_room.jpg', 'insta_cardnews_01.jpg', 'sns_kakao.png', 'kakao_icon.png', 'ico_new.gif', 'og_default.jpg'].map((f) => TH.looksChrome(`https://x.ac.kr/wp-content/uploads/2026/10/${f}`)), [false, false, false, false, false, false, true, true, true, true]);
+  /* 리뷰 12차 — 날것의 '%'·EUC-KR 바이트 이름·범위 밖 엔티티 하나가 글 하나의 후보를 통째로 날렸다(그 글은 영영 사진 없음) */
+  eq('    이상한 이름(날것 %·EUC-KR 바이트·큰 엔티티)이 있어도 던지지 않고 나머지 후보가 산다', (() => { try { return TH.imageCandidates('<meta property="og:image" content="/upload/og/50%할인.png"><div class="view"><img src="/upload/editor/2026/참여율 100% 달성.jpg"><img src="/upload/editor/%C2%FC%BF%A9.jpg" alt="&#99999999;"><img src="/upload/editor/2026/real.jpg"></div>', base).length; } catch (e) { return `던짐: ${e.message}`; } })(), 4);
+  eq('    JSON 쪽도 던지지 않는다', (() => { try { return TH.jsonImageCandidates({ content: '<img src="/upload/100% 장학.jpg"><img src="/upload/ok.jpg">' }, base).length; } catch (e) { return `던짐: ${e.message}`; } })(), 2);
+  /* 리뷰 12차 — 정규식 하나로는 안에 같은 태그가 든 머리(<div id="header"><div class="inner">)를 못 지워 머리 그림이 후보를 다 썼다 → 짝을 세어 지운다 */
+  eq('    겹친 머리·서브 비주얼 상자도 통째로 걷는다 · has-header 처럼 낱말로 시작하지 않는 본문 상자는 안 걷는다', TH.imageCandidates('<div id="wrap" class="has-header"><div id="header"><div class="inner"><img src="/upload/top/ci_mark.jpg"><div class="gnb"><img src="/upload/top/event.jpg"></div></div></div><div class="sub-visual"><img src="/upload/top/sub_visual04.jpg"></div><div class="board-view"><img src="/upload/editor/p1.jpg"></div></div>', base).map((c) => c.src.replace('https://www.x.ac.kr', '')), ['/upload/editor/p1.jpg']);
+  eq('    href="#" 인 첨부 글자(포스터.jpg)는 글 화면 자신이라 후보가 아니다', TH.imageCandidates('<div class="view"><a href="#">포스터.jpg</a></div>', base), []);
+  /* 리뷰 12차 — 쿠키 없는 로봇에게 JSP 가 요청마다 다른 ;jsessionid 를 붙여, 같은 기본 그림이 글마다 다른 주소로 보였다 */
+  eq('    ;jsessionid 꼬리를 떼어 같은 그림을 같은 주소로 본다', [TH.absImg('/images/egovframework/og_img.png;jsessionid=ABC123', base), TH.absImg('/images/egovframework/og_img.png;jsessionid=XYZ999?v=1', base)], ['https://www.x.ac.kr/images/egovframework/og_img.png', 'https://www.x.ac.kr/images/egovframework/og_img.png?v=1']);
+  eq('    JSON 의 파일 이름만 든 칸은 주소를 지어 부르지 않는다 (주소 유추 금지) · 이미 주소인 값만', TH.jsonImageCandidates({ data: { content: '<p>본문</p>', fileList: [{ orignlFileNm: '포스터.jpg', streFileNm: 'BBS_202610031234567.jpg', fileUrl: '/upload/bbs/2026/a.jpg' }] } }, base).map((c) => c.src.replace('https://www.x.ac.kr', '')), ['/upload/bbs/2026/a.jpg']);
   eq('    본문이 JSON 인 규칙 — HTML 조각의 그림 · 그림 칸의 주소', TH.jsonImageCandidates({ data: { content: '<p>글</p><img src="/upload/ed/p.jpg">', thumbImg: '/upload/th/t.png', title: '제목.jpg 아님' } }, base).map((c) => c.src.replace('https://www.x.ac.kr', '')), ['/upload/ed/p.jpg', '/upload/th/t.png']);
   /* ② 받은 바이트가 그림인지 · 크기 — 파일 머리만 읽는다 */
   const png = Buffer.alloc(32); Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]).copy(png); png.write('IHDR', 12, 'latin1'); png.writeUInt32BE(640, 16); png.writeUInt32BE(480, 20);
@@ -2339,6 +2350,33 @@ console.log('\n■ 교내 소식 썸네일 (2026-10-03 개발자 지시 "실제 
     TH.recordPage(L, '가대학교', 'post:가대학교:2', ['https://x/og.jpg', 'https://x/p2.jpg']);
     eq('    두 글에서 본 그림은 공통 그림으로 막는다 · 다른 학교엔 번지지 않는다', [[...TH.blockedFor(L, '가대학교')], [...TH.blockedFor(L, '나대학교')]], [['https://x/og.jpg'], []]);
     eq('    공통 그림을 썸네일로 받았던 글은 장부에서 지워 다시 찾는다', [TH.revokeRepeated(L, '가대학교'), 'post:가대학교:1' in L.posts], [['post:가대학교:1'], false]);
+  }
+  /* 리뷰 12차 — 주소가 달라도 **줄인 그림이 같은 파일**이면 공통 그림이다(세션 꼬리·CDN) — 그 파일을 쓰던 글을 되돌리고 소급에서도 안 붙인다 */
+  {
+    const L = TH.emptyLedger(); const f = 'data/news/img/0123456789abcdef.webp';
+    L.posts['post:가대학교:1'] = { at: '2026-10-03', school: '가대학교', file: f, src: 'https://x/a;1' };
+    eq('    같은 학교의 다른 글이 같은 파일을 쓰나 (fileTwins)', TH.fileTwins(L, '가대학교', f, 'post:가대학교:2'), ['post:가대학교:1']);
+    TH.markCommonFile(L, '가대학교', f);
+    const docs = [{ doc: { items: [{ school: '가대학교', postId: '1', url: 'u1', thumb: f }] } }];
+    const before = TH.applyThumbs(docs, L, { fileExists: () => true });
+    eq('    공통 파일 — 소급에서 칸을 지우고 · 그 파일을 쓰던 글은 되돌려 다시 찾는다', [before, docs[0].doc.items[0].thumb || '-', TH.revokeRepeated(L, '가대학교')], [1, '-', ['post:가대학교:1']]);
+  }
+  {
+    /* QR 코드·검은 글자뿐인 그림 — 색 없고 거의 모든 점이 검정/흰색. 단색 디자인 포스터(색이 있다)·사진은 산다 (정보량으로 가르면 포스터가 먼저 떨어졌다 — 실측) */
+    const px = (fn, n = 400) => { const b = []; for (let i = 0; i < n; i += 1) b.push(...fn(i)); return b; };
+    const qr = px((i) => (((i * 7919) % 13) < 6 ? [0, 0, 0] : [255, 255, 255]));
+    const qrJpeg = px((i) => (((i * 7919) % 13) < 6 ? [18, 18, 20] : [240, 241, 239]));
+    const poster = px((i) => (i % 5 === 0 ? [255, 255, 255] : i % 3 === 0 ? [245, 197, 66] : [42, 77, 143]));
+    const photo = px((i) => [(i * 37) % 256, (i * 91) % 256, (i * 53) % 256]);
+    const night = px((i) => (i % 5 === 0 ? [250, 250, 250] : [10, 10, 12]));   // 밤 사진 — 검정 80% · 흰색 20% 지만 사이 빛(색)이 섞인다
+    const nightReal = night.map((v, i) => (i % 9 === 0 ? 120 : v));
+    const bwPhoto = px((i) => (i % 5 < 2 ? [12, 12, 12] : i % 5 < 4 ? [245, 245, 245] : [128, 128, 128]));   // 흑백 사진 — 검정 40% · 흰색 40% · 회색 20% (합 80%)
+    eq('  QR 은 사진이 아니다(검정·흰색이 둘 다 넉넉하고 거의 전부) · 단색 디자인 포스터·사진·밤 사진·흑백 사진은 산다', [qr, qrJpeg, poster, photo, nightReal, bwPhoto].map((b) => TH.looksLikeQr(TH.monoParts(b))), [true, true, false, false, false, false]);
+  }
+  eq('  관리자가 사진을 뺀 뒤 글 번호가 붙어도(열쇠가 바뀌어도) 뺀 그대로 · 목록 표식 주소는 다른 글과 같아 주소 열쇠로 보지 않는다', [TH.optedOut({ school: '가', postId: '9', url: 'https://g/v/9' }, new Set(['url:' + urlKey('https://g/v/9')])), TH.optedOut({ school: '가', postId: '9', url: 'https://g/l#n-x' }, new Set(['url:' + urlKey('https://g/l#n-x')]))], [true, false]);
+  {
+    const rr = readText(new URL('collector/collect-news-thumbs.mjs', root));
+    eq('  잠깐의 실패(받기 실패·5xx·429)와 후보를 다 못 연 것은 \'없음\'으로 굳히지 않고 다시 본다 · QR·같은 파일은 건너뛴다', /if \(transient\) return \{ err:/.test(rr) && /if \(leftOver\) return \{ err:/.test(rr) && /transient: res\.status >= 500 \|\| res\.status === 429/.test(rr) && /catch \(e\) \{ transient = true;/.test(rr) && /if \(out\.qr\)/.test(rr) && /T\.isCommonFile\(ledger, n\.school, rel\)/.test(rr) && /const twins = T\.fileTwins\(/.test(rr), true);
   }
   /* ④ 이번에 열어 볼 글 — 숨김·사진 뺌·이미 받음·없음은 건너뛰고 · 실패는 하루 뒤 · 파일이 사라진 것은 다시 · 새 글부터 학교마다 돌아가며 · 학교당 상한 */
   {
@@ -2435,7 +2473,7 @@ console.log('\n■ 교내 소식 썸네일 (2026-10-03 개발자 지시 "실제 
   }
   /* ⑪ 감사 — 썸네일 꼴·파일·크기 · 같은 글 판정은 글 번호로(같은 제목의 다른 글을 중복으로 잡지 않는다) · 라이브 점검이 사진도 본다 */
   const au = readText(new URL('verify/audit-data.js', root));
-  eq('  감사 — 썸네일 꼴·파일 있음·크기 · 같은 글은 글 번호로', /if \(!THUMB_RE\.test\(String\(n\.thumb\)\)\) badThumb\+\+;/.test(au) && /missThumb\+\+/.test(au) && /bigThumb\+\+/.test(au) && /const uk = n\.postId \? `p\|\$\{n\.school\}\|\$\{n\.postId\}` : urlKey\(n\.url\);/.test(au), true);
+  eq('  감사 — 썸네일 꼴·파일 있음·크기 · 같은 글은 글 번호로', /if \(!THUMB_RE\.test\(String\(n\.thumb\)\)\) badThumb\+\+;/.test(au) && /missThumb\+\+/.test(au) && /if \(missThumb\) warns\.push\(/.test(au) && /bigThumb\+\+/.test(au) && /const uk = n\.postId \? `p\|\$\{n\.school\}\|\$\{n\.postId\}` : urlKey\(n\.url\);/.test(au), true);
   const live = readText(new URL('.github/workflows/check-live.yml', root));
   eq('  라이브 점검이 소식 사진을 바이트로 대조한다 (404 HTML 은 읽기실패)', /out\.push\(t\.thumb\)/.test(live) && /const measure = f\.endsWith\('\.webp'\) \? bytes : count;/.test(live) && /'WEBP'/.test(live), true);
   /* ⑫ 관리자 — 사진 빼기·되살리기 (글 번호로 고른다 · 로봇이 다시 붙이지 않게 noThumb) */
@@ -2459,6 +2497,9 @@ console.log('\n■ 교내 소식 썸네일 (2026-10-03 개발자 지시 "실제 
     eq('  관리자 사진 빼기 — 그 글(글 번호)만 · 표식 · 로봇이 다시 안 붙이게 noThumb', [st, readT('data/news/nk.json').items.map((n) => `${n.postId}:${n.thumb ? '사진' : '-'}:${n.thumbOffBy ? '뺌' : ''}`), readT('collector/news-config.json').noThumb], [0, ['41:-:뺌', '42:사진:'], ['post:경희대학교:41']]);
     const st2 = run('newsThumbOn', { url: mk, postId: '41' }).status;
     eq('    되살리기 — 장부의 사진을 바로 다시 붙이고 noThumb 에서 뺀다', [st2, readT('data/news/nk.json').items[0].thumb, readT('data/news/nk.json').items[0].thumbOffBy || '', readT('collector/news-config.json').noThumb], [0, img, '', []]);
+    /* 리뷰 12차 — 단추가 **활동 탭 줄**(actItemRowHtml)에 들어가 소식 탭에서는 사진을 뺄 수 없었다. 함수 몸을 잘라 그 안에서 잰다 */
+    const body = (name) => { const i = adm.indexOf(`function ${name}(`); return i < 0 ? '' : adm.slice(i, adm.indexOf('\nfunction ', i + 10)); };
+    eq('    사진·빼기·되살리기는 소식 줄(newsItemRowHtml)에 있고 활동 줄에는 없다', [/class="ig-thumb news-thumb"/.test(body('newsItemRowHtml')) && /data-news-thumb-off=/.test(body('newsItemRowHtml')) && /data-news-thumb-on=/.test(body('newsItemRowHtml')), /thumb/.test(body('actItemRowHtml'))], [true, false]);
     eq('    관리자 화면 — 사진·빼기·되살리기 단추가 글 번호를 보낸다', /data-news-thumb-off="\$\{esc\(n\.url\)\}" data-news-post=/.test(adm) && /applyAction\('newsThumbOff', \{ url, postId: pid \}/.test(adm) && /applyAction\('newsThumbOn', \{ url: el\.dataset\.newsThumbOn, postId: el\.dataset\.newsPost \|\| '' \}/.test(adm), true);
   }
 }

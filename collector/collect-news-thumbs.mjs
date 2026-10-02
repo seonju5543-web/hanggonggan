@@ -48,7 +48,7 @@ for (const f of (fs.existsSync(NEWS_DIR) ? fs.readdirSync(NEWS_DIR) : []).filter
 }
 const items = docs.flatMap((d) => d.doc.items);
 const ledger = Object.assign(T.emptyLedger(), readJson(LEDGER_PATH, {}));
-ledger.posts ||= {}; ledger.srcSeen ||= {};
+ledger.posts ||= {}; ledger.srcSeen ||= {}; ledger.commonFiles ||= {};
 const cfg = readJson(CFG_PATH, {});
 const noThumb = new Set(Array.isArray(cfg.noThumb) ? cfg.noThumb : []);
 /* 전체 스위치 news-config.json "thumbs" — on(기본) · dry(받아서 장부·그림만 두고 **카드에는 안 붙인다** — 처음 켤 때 사람이 그림을 먼저 본다) ·
@@ -63,7 +63,7 @@ else try { sharp = (await import('sharp')).default; } catch (e) { sharpErr = Str
 const runLog = [];   // { school, title, result, note }
 async function getImage(src, referer) {
   const res = await fetch(src, { redirect: 'follow', headers: { ...FETCH_HEADERS, Referer: referer, Accept: 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8' }, signal: AbortSignal.timeout(12000) });
-  if (!res.ok) return { problem: `그림 HTTP ${res.status}` };
+  if (!res.ok) return { problem: `그림 HTTP ${res.status}`, transient: res.status >= 500 || res.status === 429 || res.status === 408 };
   const ct = res.headers.get('content-type') || '';
   if (/text\/html|json|xml/i.test(ct)) return { problem: `그림이 아니라 ${ct.split(';')[0]}` };
   const len = Number(res.headers.get('content-length') || 0);
@@ -73,12 +73,16 @@ async function getImage(src, referer) {
   return { buf };
 }
 
+/* 240px 정사각 WebP 로 줄이고, 원래 그림이 QR 코드처럼 생겼는지 함께 잰다 (T.monoParts · T.looksLikeQr — 섞지 않고 160px 로 줄여 잰다) */
 async function shrink(buf) {
-  let out = await sharp(buf, { animated: false, limitInputPixels: 60e6 }).rotate()
-    .resize(T.THUMB_SIDE, T.THUMB_SIDE, { fit: 'cover', position: sharp.strategy.attention }).webp({ quality: 72 }).toBuffer();
-  if (out.length > T.THUMB_MAX_BYTES) out = await sharp(buf, { animated: false, limitInputPixels: 60e6 }).rotate()
-    .resize(T.THUMB_SIDE, T.THUMB_SIDE, { fit: 'cover', position: sharp.strategy.attention }).webp({ quality: 50 }).toBuffer();
-  return out.length <= T.THUMB_MAX_BYTES ? out : null;
+  const make = (q) => sharp(buf, { animated: false, limitInputPixels: 60e6 }).rotate()
+    .resize(T.THUMB_SIDE, T.THUMB_SIDE, { fit: 'cover', position: sharp.strategy.attention }).webp({ quality: q }).toBuffer();
+  let out = await make(72);
+  if (out.length > T.THUMB_MAX_BYTES) out = await make(50);
+  if (out.length > T.THUMB_MAX_BYTES) return null;
+  const rgb = await sharp(buf, { animated: false, limitInputPixels: 60e6 }).rotate().resize(160, 160, { fit: 'inside', kernel: 'nearest' }).removeAlpha().toColourspace('srgb').raw().toBuffer();
+  const mono = T.monoParts(rgb);
+  return { buf: out, mono, qr: T.looksLikeQr(mono) };
 }
 
 /* 글 하나 — { file, src, from } · { none } · { err } 를 돌려준다. ctx.dead 면 파일을 쓰지 않는다(시한 뒤 늦게 끝난 일) */
@@ -97,27 +101,37 @@ async function thumbFor(n, ctx) {
   T.recordPage(ledger, n.school, key, cands.map((c) => c.src));
   const blocked = T.blockedFor(ledger, n.school);
   const notes = [];
-  let tried = 0;
+  let tried = 0; let transient = false; let leftOver = false;
   for (const c of cands) {
     if (blocked.has(c.src)) { notes.push(`${c.from}: 여러 글에 같은 그림(공통 그림)`); continue; }
-    if (tried >= MAX_CANDS || ctx.dead) break;
+    if (tried >= MAX_CANDS || ctx.dead) { leftOver = true; break; }
     tried += 1;
     let got;
-    try { got = await getImage(c.src, req.base); } catch (e) { notes.push(`${c.from}: 받기 실패 (${netReason(e)})`); continue; }
-    if (got.problem) { notes.push(`${c.from}: ${got.problem}`); continue; }
+    /* 받기 실패(연결 끊김·시간 초과)·5xx·429 는 **잠깐의 사정**이다 — '사진 없음'으로 굳히지 않고 하루 뒤 다시 본다 (리뷰 12차) */
+    try { got = await getImage(c.src, req.base); } catch (e) { transient = true; notes.push(`${c.from}: 받기 실패 (${netReason(e)})`); continue; }
+    if (got.problem) { if (got.transient) transient = true; notes.push(`${c.from}: ${got.problem}`); continue; }
     const info = T.sniffImage(got.buf);
     const prob = T.photoProblem(info, got.buf.length);
     if (prob) { notes.push(`${c.from}: ${prob}`); continue; }
     let out;
     try { out = await shrink(got.buf); } catch (e) { notes.push(`${c.from}: 줄이기 실패 (${String(e.message).slice(0, 60)})`); continue; }
     if (!out) { notes.push(`${c.from}: 줄여도 너무 큼`); continue; }
+    if (out.qr) { notes.push(`${c.from}: QR 코드로 보임 (검정 ${Math.round(out.mono.black * 100)}% · 흰색 ${Math.round(out.mono.white * 100)}%)`); continue; }
+    const rel = T.thumbName(out.buf);
+    /* 같은 학교의 다른 글이 **똑같은 그림 파일**을 쓰면 공통 그림이다 — 주소가 달라도(세션 꼬리·CDN) 바이트가 같다 (리뷰 12차) */
+    if (T.isCommonFile(ledger, n.school, rel)) { notes.push(`${c.from}: 여러 글에 같은 그림(같은 파일)`); continue; }
+    const twins = T.fileTwins(ledger, n.school, rel, key);
+    if (twins.length) { T.markCommonFile(ledger, n.school, rel); notes.push(`${c.from}: 여러 글에 같은 그림(같은 파일 · ${twins.length}글)`); continue; }
     if (ctx.dead) return { err: '시한 넘김' };
-    const rel = T.thumbName(out);
     fs.mkdirSync(IMG_DIR, { recursive: true });
-    if (!fileExists(rel)) fs.writeFileSync(path.join(ROOT, rel), out);
-    return { file: rel, src: c.src, from: c.from, note: `${info.width}×${info.height} → ${Math.round(out.length / 1024)}KB` };
+    if (!fileExists(rel)) fs.writeFileSync(path.join(ROOT, rel), out.buf);
+    return { file: rel, src: c.src, from: c.from, note: `${info.width}×${info.height} → ${Math.round(out.buf.length / 1024)}KB` };
   }
-  return { none: cands.length ? `사진으로 쓸 그림 없음 (${notes.slice(0, 3).join(' · ') || '후보 없음'})` : '글에 그림이 없음' };
+  const why = notes.slice(0, 3).join(' · ') || '후보 없음';
+  /* 잠깐의 실패가 있었거나, 공통 그림을 아직 몰라 후보를 다 못 열어 봤으면 '없음'으로 굳히지 않는다 — 다음 날 다시(장부 err · 세 번까지) */
+  if (transient) return { err: `잠깐의 실패로 사진을 못 받음 (${why})` };
+  if (leftOver) return { err: `후보가 많아 다 못 열어 봄 — 공통 그림을 알게 된 뒤 다시 (${why})` };
+  return { none: cands.length ? `사진으로 쓸 그림 없음 (${why})` : '글에 그림이 없음' };
 }
 
 /* ①~③ */
@@ -154,7 +168,7 @@ const changedItems = T.applyThumbs(docs, ledger, { noThumb: shown, fileExists })
 for (const d of docs) if (d.changed) fs.writeFileSync(d.path, JSON.stringify(d.doc, null, 1) + (d.eol ? '\n' : ''));
 /* 남길 그림 — 카드가 쓰는 것. dry 는 사람이 볼 수 있게 장부의 그림(실린 글 것)도 남긴다. off 는 전부 지운다 */
 const referenced = new Set(items.map((n) => n.thumb).filter(Boolean));
-if (MODE === 'dry') for (const n of items) { const e = ledger.posts[T.thumbKey(n)]; if (e && e.file && !noThumb.has(T.thumbKey(n))) referenced.add(e.file); }
+if (MODE === 'dry') for (const n of items) { const e = ledger.posts[T.thumbKey(n)]; if (e && e.file && !T.optedOut(n, noThumb) && !T.isCommonFile(ledger, n.school, e.file)) referenced.add(e.file); }
 let removed = 0;
 for (const f of (fs.existsSync(IMG_DIR) ? fs.readdirSync(IMG_DIR) : [])) {
   const rel = `${T.THUMB_DIR}/${f}`;
@@ -170,7 +184,7 @@ for (const n of live) {
   const s = bySchool.get(n.school) || { total: 0, thumb: 0, none: 0, err: 0, off: 0, wait: 0, reasons: new Map() };
   s.total += 1;
   const e = ledger.posts[T.thumbKey(n)];
-  if (noThumb.has(T.thumbKey(n))) s.off += 1;
+  if (T.optedOut(n, noThumb)) s.off += 1;
   else if (n.thumb || (MODE === 'dry' && e && e.file)) s.thumb += 1;   // dry 는 카드에 안 붙였어도 받은 사진을 센다
   else if (e && e.none) { s.none += 1; const r = e.none.replace(/\s*\(.*$/, ''); s.reasons.set(r, (s.reasons.get(r) || 0) + 1); }
   else if (e && e.err) s.err += 1;

@@ -181,7 +181,9 @@ try {
     }
   }
   if (badThumb) errors.push(`news — 썸네일 값이 로봇 꼴(data/news/img/<해시>.webp)이 아닌 글 ${badThumb}건 (바깥 주소는 앱이 못 그린다 · collector/news-thumb.mjs)`);
-  if (missThumb) errors.push(`news — 썸네일 파일이 없는 글 ${missThumb}건 (collector/collect-news-thumbs.mjs 가 파일과 칸을 같이 맞춘다)`);
+  /* 파일이 없는 썸네일은 **경고**다 (리뷰 12차) — 병합(합집합)이 로봇이 지운 그림의 칸을 되살릴 수 있고, 오류로 두면 그 사이 관리자·로봇 저장이 전부 막힌다.
+     앱은 못 받은 그림을 빼고 글자 카드로 그리고(error 잡이), 다음 썸네일 단계가 칸을 다시 맞춘다. */
+  if (missThumb) warns.push(`news — 썸네일 파일이 없는 글 ${missThumb}건 (다음 썸네일 단계가 칸을 맞춘다 · collector/collect-news-thumbs.mjs)`);
   if (bigThumb) errors.push(`news — ${THUMB_MAX / 1024}KB 를 넘는 썸네일 ${bigThumb}건 (240px WebP 로 줄인 것만 싣는다)`);
   if (dup) errors.push(`news — 교내 소식 파일 안에 중복 ${dup}건 (수집기 중복 제거가 동작하지 않았습니다)`);
   if (badKind) errors.push(`news — 갈래가 ${NEWS_KINDS.join('·')} 밖인 글 ${badKind}건 (판정은 collector/news-kind.mjs 한 곳)`);
