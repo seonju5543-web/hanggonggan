@@ -54,6 +54,7 @@ checkUrl: https://www.smu.ac.kr/kor/life/scholarship.do
 # (답 받음 2026-10-02 · 4차로 대체) checkUrl: https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100
 # (답 받음 2026-10-02 · 4차로 대체) checkUrl: https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/viewBtin.action?btin.bbs_cde=1&btin.doc_no=1325007&btin.appl_no=000000&menu_idx=67
 
+# 2026-10-02 (4차 재실행) — 첫 4차는 정찰 단계가 15분 작업 시한에 잘려 리포트가 0줄이었다 → 주소마다 100초·전체 11분 예산·주소마다 리포트 쓰기를 넣고 다시 돈다.
 # 2026-10-02 (4차) — 3차 정찰로 서강(상세 주소)·고려(enc 상세 주소)·중앙(JSON 칸)·상명(href 목록)의 규칙 재료를 받았다. 남은 것:
 #   고려·상명: 그린 화면엔 목록 줄이 있는데 로봇이 받은 HTML 엔 없었다 → '서버가 보낸 HTML' 과 그린 화면의 날짜 수를 견준다.
 #   계명: 날짜 칸 없는 목록 → 제목 칸 표의 HTML 조각 · 경북: 상세 화면의 '목록' 링크(목록 주소의 유일한 근거) ·

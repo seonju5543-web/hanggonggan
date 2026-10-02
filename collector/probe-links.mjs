@@ -61,6 +61,12 @@ function summarizeJson(j) {
 }
 
 /* ── ① 주소 하나를 학생 눈으로 열어 본다 ── */
+/* 시한 (2026-10-02 · 4차 정찰이 15분 작업 시한에 잘려 리포트가 하나도 안 남았다 — 어느 화면에서 멈췄는지도 몰랐다).
+   측정 하나하나에 시한을 걸고(넘으면 fallback), 주소 하나에도 절대 시한을 건다. 리포트는 주소를 끝낼 때마다 파일·로그에 바로 쓴다. */
+const within = (p, ms, fallback) => Promise.race([Promise.resolve(p).catch(() => fallback), new Promise((r) => setTimeout(() => r(fallback), ms))]);
+const URL_HARD_MS = 100000;
+function flushReport() { try { fs.writeFileSync(new URL('probe-report.md', HERE), report.join('\n')); } catch { /* 쓰기 실패는 다음 주소에서 다시 */ } }
+
 async function checkUrl(url) {
   const { page, ctx } = await freshPage();
   /* 화면이 부르는 요청을 적는다 (2026-10-01) — SPA(서강)·스크립트 목록(고려·중앙·시립)은 목록을 **별도 요청**으로 받아 그린다.
@@ -113,14 +119,14 @@ async function checkUrl(url) {
     /* 서버가 보낸 HTML 과 그린 화면을 견준다 (2026-10-02 · 고려·상명: 화면엔 목록 줄이 있는데 로봇이 받은 HTML 엔 없었다) — 줄이 서버 HTML 에 없으면 스크립트가 그린 것이다 */
     {
       const DATE_G = /(20\d{2})\s*[.\-/년]\s*(\d{1,2})\s*[.\-/월]\s*(\d{1,2})(?!\d)/g;
-      const server = res ? await res.text().catch(() => null) : null;
-      const shown = await page.evaluate(() => document.body.innerText || '').catch(() => '');
+      const server = res ? await within(res.text(), 8000, null) : null;
+      const shown = await within(page.evaluate(() => document.body.innerText || ''), 8000, '');
       const n = (t) => ((t || '').match(DATE_G) || []).length;
       report.push(server == null ? '- 서버가 보낸 HTML: 못 읽음' : `- 서버가 보낸 HTML ${server.length}자 · 날짜 ${n(server.replace(/<[^>]+>/g, ' '))}개 / 그린 화면 날짜 ${n(shown)}개 · <tr> ${(server.match(/<tr\b/gi) || []).length}개 · <script> ${(server.match(/<script\b/gi) || []).length}개`);
     }
     /* ③ 목록 요소의 HTML — **누르기 전에** 뜬다 (리뷰 2026-10-02: 누른 뒤에 뜨면 상세·바닥글 화면의 것이 적혔다 · 계명 2차 정찰).
        날짜가 가장 많이 든 목록 요소(머리·메뉴·바닥 제외)를 고르고, 같은 수면 더 안쪽 것. <script>·<style> 은 빼고 적는다(상명 2차: 조각이 스크립트뿐이었다). */
-    const frag = await page.evaluate(() => {
+    const frag = await within(page.evaluate(() => {
       const DATE = /(20\d{2})\s*[.\-/년]\s*(\d{1,2})\s*[.\-/월]\s*(\d{1,2})(?!\d)|(?<!\d)\d{2}\.\d{2}\.\d{2}(?!\d)/g;
       const els = [...document.querySelectorAll('table, tbody, ul, ol, dl, [class*="board"], [class*="bbs"], [class*="list"], [id*="board"], [id*="list"]')]
         .filter((e) => !e.closest('header, nav, footer, #footer, .footer'));
@@ -138,12 +144,12 @@ async function checkUrl(url) {
       const c = best.cloneNode(true);
       c.querySelectorAll('script, style, noscript').forEach((x) => x.remove());
       return `(날짜 ${bestN}개 · 링크 ${best.querySelectorAll('a').length}개 든 <${best.tagName.toLowerCase()}${best.className ? ` class="${String(best.className).slice(0, 60)}"` : ''}>) ` + c.outerHTML.replace(/\s+/g, ' ').slice(0, 2400);
-    }).catch(() => '');
+    }), 15000, '');
     if (frag) report.push(`- 목록 요소의 HTML (누르기 전 · 앞 2400자): \`${frag.replace(/`/g, "'")}\``);
     /* ④ 날짜 줄 (2026-10-01 · 교내 소식 클릭형 게시판) — 글 줄(날짜가 든 줄)에서 제목 링크가 **무엇으로** 상세를 여는지(href · onclick · data-*)
        그대로 받아 적고, 첫 줄을 실제로 눌러 **어디로 가는지**(최종 주소·제목)를 적는다. 링크가 없는 줄(서강 <tr class="cursor-pointer">)은 줄 자체를 누른다.
        수집 로봇의 규칙(news-board-rules.mjs)은 여기 적힌 것만으로 쓴다 — 주소를 유추하지 않는다(동국대 선례). */
-    const rows = await page.evaluate(() => {
+    const rows = await within(page.evaluate(() => {
       const DATE = /(20\d{2})\s*[.\-/년]\s*(\d{1,2})\s*[.\-/월]\s*(\d{1,2})(?!\d)|(?<!\d)\d{2}\.\d{2}\.\d{2}(?!\d)/;
       const cands = [...document.querySelectorAll('tr, li, dd, article, div')].filter((el) => {
         if (el.closest('header, nav, footer, #footer, .footer')) return false;
@@ -166,7 +172,7 @@ async function checkUrl(url) {
         out.push({ title, attrs: a ? fmt(a) : '', rowTag: el.tagName.toLowerCase(), rowAttrs: fmt(el).replace(/\s*data-probe-row="\d+"/, ''), date: (text.match(DATE) || [''])[0], hasLink: !!a });
       }
       return out;
-    }).catch(() => []);
+    }), 15000, []);
     if (rows.length) {
       report.push(`- 날짜 줄 ${rows.length}개 (상세를 여는 방식):`);
       rows.forEach((r) => report.push(`    · 「${r.title}」 ${r.date} → ${r.hasLink ? `<a ${r.attrs}>` : '(링크 없음)'} · 줄: <${r.rowTag} ${r.rowAttrs}>`));
@@ -197,9 +203,9 @@ async function checkUrl(url) {
       report.push('- 날짜 줄: 없음 (머리·메뉴·바닥 밖에 날짜가 든 줄이 없거나 목록이 안 그려짐)');
     }
     /* 화면이 적어 둔 '목록' 링크 (2026-10-02 · 경북: 검색에 잡힌 상세 주소만 있어 그 화면의 목록 버튼이 목록 주소의 유일한 근거다) */
-    const listLinks = await page.evaluate(() => [...document.querySelectorAll('a, button')]
+    const listLinks = await within(page.evaluate(() => [...document.querySelectorAll('a, button')]
       .filter((a) => /^(목록|목록보기|목록으로|리스트|list)$/i.test((a.textContent || '').replace(/\s+/g, '').trim()))
-      .slice(0, 4).map((a) => [...a.attributes].filter((x) => /^(href|onclick|data-[\w-]+)$/i.test(x.name)).map((x) => `${x.name}="${String(x.value).slice(0, 200)}"`).join(' '))).catch(() => []);
+      .slice(0, 4).map((a) => [...a.attributes].filter((x) => /^(href|onclick|data-[\w-]+)$/i.test(x.name)).map((x) => `${x.name}="${String(x.value).slice(0, 200)}"`).join(' '))), 8000, []);
     if (listLinks.length) report.push(`- 화면의 '목록' 링크: ${listLinks.map((l) => `<a ${l}>`).join(' · ')}`);
     if (reqs.length) { report.push(`- 화면이 부른 요청 ${reqs.length}개 (목록 API·폼 전송 후보):`); reqs.forEach((l) => report.push(`    · ${l}`)); }
     if (resps.length) { report.push(`- 스크립트 요청의 응답 ${resps.length}개 (규칙의 재료 — 칸 이름·HTML/JSON):`); resps.forEach((l) => report.push(`    · ${l.replace(/`/g, "'")}`)); }
@@ -277,8 +283,28 @@ async function findBoard(spec) {
 }
 
 // 같은 학교를 몰아치지 않는다 — 사이를 두고 하나씩 연다
-for (const u of lines('checkUrl')) { await checkUrl(u); await new Promise((r) => setTimeout(r, 2500)); }
-for (const s of lines('findBoard')) await findBoard(s);
+/* 전체 예산 — 작업 시한(probe-links.yml 15분)에서 브라우저 설치·뒷정리 몫을 뺀 11분. 넘으면 남은 주소는 '못 봄'으로 적고 끝낸다(시한을 늘려 때우지 않는다). */
+const PROBE_BUDGET_MS = 11 * 60000;
+const probeStart = Date.now();
+for (const u of lines('checkUrl')) {
+  if (Date.now() - probeStart > PROBE_BUDGET_MS - URL_HARD_MS) { report.push(`### 🔗 ${u}`, `- ⏰ 정찰 예산(${PROBE_BUDGET_MS / 60000}분)이 모자라 이번엔 못 봄 — 다음 정찰에 다시`, ''); flushReport(); continue; }
+  console.log(`▶ ${u}`);
+  const before = report.length;
+  const done = await within(checkUrl(u).then(() => true), URL_HARD_MS, false);
+  if (!done) {
+    report.push(`### 🔗 ${u}`, `- ⛔ ${URL_HARD_MS / 1000}초 안에 끝나지 않아 건너뜀 (화면·측정이 멈춤) — 여기까지 적힌 것만 남긴다`, '');
+    try { if (sharedCtx) await within(sharedCtx.close(), 5000, null); } catch { /* 닫기 실패 */ }
+    sharedCtx = null;   // 멈춘 화면을 버리고 다음 주소는 새 브라우저 칸에서
+  }
+  console.log(report.slice(before).join('\n'));
+  flushReport();
+  await new Promise((r) => setTimeout(r, 2500));
+}
+for (const s of lines('findBoard')) {
+  if (Date.now() - probeStart > PROBE_BUDGET_MS - URL_HARD_MS) { report.push(`### 🧭 ${s}`, '- ⏰ 정찰 예산이 모자라 이번엔 못 봄', ''); continue; }
+  await within(findBoard(s), URL_HARD_MS, null);
+  flushReport();
+}
 
 await browser.close();
 if (report.length <= 2) report.push('_(run-probe.txt에 checkUrl / findBoard 줄이 없어 할 일이 없었습니다)_');

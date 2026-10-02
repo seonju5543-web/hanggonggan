@@ -2101,7 +2101,8 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
   eq('  읽었지만 실을 새 소식이 없는 게시판은 ℹ️ — 🙋 (개발자에게 주소 요청)·이슈에 넣지 않는다', /: rawLinks\.length && onSite\.length \? `ℹ️ 읽힘 · 실을 새 소식 없음/.test(rn) && /const noRows = results\.filter\(\(r\) => \/\^🟡\/\.test\(r\.status\)\);/.test(rn), true);
   eq('  인증서 정찰은 검증마다 그 호스트의 이름도 본다 (-verify_hostname)', (readText(new URL('collector/certs/probe-chain.sh', root)).match(/openssl verify -verify_hostname "\$h"/g) || []).length, 3);
   const pl = readText(new URL('collector/probe-links.mjs', root));
-  eq('  정찰은 목록 요소 HTML 을 **누르기 전에** 뜬다 (누른 뒤면 상세·바닥글 화면의 것이 적힌다)', pl.indexOf('const frag = await page.evaluate(') > 0 && pl.indexOf('const frag = await page.evaluate(') < pl.indexOf('[data-probe-row="0"]'), true);
+  eq('  정찰은 주소마다 절대 시한·측정마다 시한·전체 예산이 있고 주소를 끝낼 때마다 리포트를 쓴다 (4차 정찰이 15분에 잘려 리포트가 0줄이었다)', /const URL_HARD_MS = \d+;/.test(pl) && /await within\(checkUrl\(u\)\.then\(\(\) => true\), URL_HARD_MS, false\)/.test(pl) && /const server = res \? await within\(res\.text\(\), \d+, null\)/.test(pl) && /const PROBE_BUDGET_MS = 11 \* 60000;/.test(pl) && (pl.match(/flushReport\(\);/g) || []).length >= 3 && /timeout-minutes: 15/.test(readText(new URL('.github/workflows/probe-links.yml', root))), true);
+  eq('  정찰은 목록 요소 HTML 을 **누르기 전에** 뜬다 (누른 뒤면 상세·바닥글 화면의 것이 적힌다)', pl.indexOf('const frag = await within(page.evaluate(') > 0 && pl.indexOf('const frag = await within(page.evaluate(') < pl.indexOf('[data-probe-row="0"]'), true);
   eq('    링크 없는 줄은 줄째 누른다 · JSON 응답은 글 칸 요약 · 못 읽은 본문은 0자와 구분', /\(a \|\| row\)\.click\(\)/.test(pl) && /summarizeJson\(JSON\.parse\(raw\)\)/.test(pl) && /본문 못 읽음/.test(pl), true);
   eq('  정찰은 날짜 줄(제목 링크)·첫 줄 클릭 결과·화면이 부른 요청·목록 HTML 조각을 적는다 (규칙의 재료 · 짐작 금지)', /날짜 줄 \$\{rows\.length\}개/.test(pl) && /waitForNavigation\(/.test(pl) && /page\.on\('request'/.test(pl) && /outerHTML/.test(pl), true);
   const certDir = new URL('collector/certs/', root);
