@@ -3843,9 +3843,6 @@ function openDetail(id) {
       <ul class="reason-list">${reasonRows}${missingRows}</ul>
       ${eligAskHtml(sch)}
 
-      ${(sch.sourceKind === 'kosaf' && sch.contact)
-        ? `<p class="doc-legend">문의 ${esc(sch.contact)}</p>` : ''}
-
       <h4>제출 서류</h4>
       ${/* 🔴 doc-badged — 줄마다 '자동'·'직접' 배지가 붙는 목록이라는 표시.
            style.css 가 이 클래스를 보고 **왼쪽 점을 뺀다**(2026-09-17 개발자 지시:
@@ -3853,7 +3850,7 @@ function openDetail(id) {
            하나씩 붙이는 것이 그 전제다 — 배지를 빼면 이 클래스도 같이 빼야 한다. */ ''}
       ${/* 🔴 '원문에서 확인하라'는 안내 줄(DOC_PLACEHOLDER)은 서류가 아니다 (2026-09-23 리뷰) —
            '직접' 배지를 달면 그 문장을 챙겨야 할 서류처럼 읽는다. 목록에서 빼고, 남는 서류가
-           없으면 목록 대신 그 안내를 한 줄로 말한다(아래 srcNote 가 링크를 준다). */ ''}
+           없으면 목록 대신 그 안내를 한 줄로 말한다(맨 아래 sheet-facts 의 srcNote 가 링크를 준다). */ ''}
       ${(() => {
         const docs = sch.documents.filter((doc) => !DOC_PLACEHOLDER.test(doc));
         if (!docs.length) return '<p class="doc-legend">제출 서류는 공고 원문에서 확인해 주세요.</p>';
@@ -3862,12 +3859,10 @@ function openDetail(id) {
           return `<li>${auto ? '<span class="doc-auto">자동</span>' : '<span class="doc-manual">직접</span>'} ${esc(doc)}</li>`;
         }).join('')}</ul>`;
       })()}
-      ${srcNote}
 
       ${(sch.excerpts && sch.excerpts.length) ? `
       <h4>공고 원문 안내 <span class="channel-tag">원문 그대로</span></h4>
-      <ul class="doc-list">${sch.excerpts.map((e) => `<li>${esc(e)}</li>`).join('')}</ul>
-      ${srcNote}` : ''}
+      <ul class="doc-list">${sch.excerpts.map((e) => `<li>${esc(e)}</li>`).join('')}</ul>` : ''}
       ${(sch.attachments && sch.attachments.length) ? `
       ${/* 🔴 머리말이 **그 파일이 실제로 무엇인지**를 말해야 한다 (2026-09-12).
            층1은 학교 게시판에 붙어 있던 신청서 양식이고, 층2는 재단이 KOSAF 에 올린
@@ -3877,8 +3872,16 @@ function openDetail(id) {
       <ul class="doc-list">
         ${sch.attachments.map((a) => `<li class="att"><a href="${esc(safeUrl(a.url))}" target="_blank" rel="noopener" style="color:var(--primary)">${esc(a.name)}</a>${a.bytes ? ` <span class="doc-legend">${Math.max(1, Math.round(a.bytes / 1024))}KB</span>` : ''}</li>`).join('')}
       </ul>` : ''}
-      <p class="sheet-deadline">${sch.program ? '신청 기간: 한국장학재단 공지 확인' : `마감일 ${sch.deadline || '원문 공고 확인'}`} · ${sch.duplicable ? '타 장학금과 중복 수혜 가능' : '중복 수혜 제한 있음'}</p>
-      ${(!sch.program && isBoardListLink(sch.sourceUrl)) ? `<p class="doc-legend">이 학교 게시판은 목록에서 글을 눌러야 열리는 방식이라 공고 하나로 바로 가는 주소를 확인하지 못했습니다. 열리는 목록에서 <strong>${esc(boardListTitle(sch.sourceUrl))}</strong>을(를) 찾아 눌러 주세요.</p>` : ''}
+      ${/* 🔴 마감일·중복 수혜 · 문의 · 원문 링크는 **맨 아래 한 묶음**이다 (2026-10-02 CTO 지시).
+           예전엔 문의는 지원 자격 아래, 링크는 제출 서류 아래(공고 원문 안내 아래에 한 번 더),
+           마감일은 첨부 아래로 흩어져 있었다. srcNote 는 여기서 **한 번만** 쓴다. */ ''}
+      <div class="sheet-facts">
+        <p class="sheet-deadline">${sch.program ? '신청 기간: 한국장학재단 공지 확인' : `마감일 ${sch.deadline || '원문 공고 확인'}`} · ${sch.duplicable ? '타 장학금과 중복 수혜 가능' : '중복 수혜 제한 있음'}</p>
+        ${(sch.sourceKind === 'kosaf' && sch.contact)
+          ? `<p class="doc-legend">문의 ${esc(sch.contact)}</p>` : ''}
+        ${srcNote}
+        ${(!sch.program && isBoardListLink(sch.sourceUrl)) ? `<p class="doc-legend">이 학교 게시판은 목록에서 글을 눌러야 열리는 방식이라 공고 하나로 바로 가는 주소를 확인하지 못했습니다. 열리는 목록에서 <strong>${esc(boardListTitle(sch.sourceUrl))}</strong>을(를) 찾아 눌러 주세요.</p>` : ''}
+      </div>
 
       ${app && !app.pending ? (() => {
         const step = effectiveStep(app, sch);

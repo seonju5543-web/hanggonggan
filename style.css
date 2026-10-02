@@ -4881,6 +4881,11 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 .hero-badge.zero { background: var(--text-weak); }
 .hero-card #btn-apply-all { width: 100%; margin-top: var(--sp-3); }   /* 버튼이 그림 칸 위로 (2026-10-01 CTO) */
 
+/* 상세 시트 맨 아래 묶음 — 마감일·중복 수혜 · 문의 · 원문 링크 (2026-10-02 CTO 지시).
+   마감일 줄이 혼자일 때 갖던 아래 여백은 묶음이 대신 갖는다(줄 사이는 .doc-legend 의 위 여백). */
+.sheet-facts { margin: var(--sp-3) 0; }
+.sheet-facts .sheet-deadline { margin-bottom: 0; }
+
 /* 처지 예/아니요 — 프로필에 칸이 없던 개인 사정 (2026-09-18 · 노션 AI-1) */
 .elig-ask-yn { align-items: flex-start; flex-wrap: wrap; gap: var(--space-8); }
 .elig-ask-yn > span:first-child { flex: 1 1 100%; line-height: 1.5; }

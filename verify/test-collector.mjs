@@ -7789,6 +7789,19 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
     eq('  칸을 누르면 간다 (장식으로 두지 않는다)',
       /\$\('#hero-tiles'\)\.addEventListener\('click'/.test(appSrc2), true);
   }
+
+  /* 🔴 장학금 상세 시트 — 마감일·중복 수혜 · 문의 · 원문 링크는 맨 아래 한 묶음 (2026-10-02 CTO 지시).
+     예전엔 문의는 지원 자격 아래, 링크는 제출 서류 아래와 공고 원문 안내 아래(두 번), 마감일은 첨부 아래였다. */
+  {
+    const od = appSrc2.slice(appSrc2.indexOf('function openDetail('), appSrc2.indexOf('function openDetail(') + 20000);
+    const body = od.slice(0, od.indexOf('\n}\n'));
+    const facts = body.slice(body.indexOf('<div class="sheet-facts">'), body.indexOf('</div>', body.indexOf('<div class="sheet-facts">')));
+    eq('상세 시트: 원문 링크(srcNote)는 한 번만 그린다', (body.match(/\$\{srcNote\}/g) || []).length, 1);
+    eq('  마감일 · 문의 · 원문 링크가 맨 아래 묶음(.sheet-facts) 안에 있다',
+      facts.length > 0 && /class="sheet-deadline"/.test(facts) && /문의 \$\{esc\(sch\.contact\)\}/.test(facts)
+      && /\$\{srcNote\}/.test(facts), true);
+    eq('  묶음 밖에 문의 줄이 남아 있지 않다', (body.match(/문의 \$\{esc\(sch\.contact\)\}/g) || []).length, 1);
+  }
 }
 
 /* ── 🔴 앱 내부 사정은 학생 화면에 적지 않는다 (2026-09-17 개발자 지시) ──
