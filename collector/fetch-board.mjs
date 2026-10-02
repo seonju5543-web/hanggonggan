@@ -21,20 +21,30 @@ export function netReason(e) {
 
 /* 연결이 잠깐 안 되는 것과 주소가 틀린 것은 다르다 — 일시 장애는 한 번 더 두드려 본다. */
 const TRANSIENT = /TIMEOUT|ECONNRESET|ECONNREFUSED|EAI_AGAIN|ETIMEDOUT|UND_ERR/i;
+/* opts.deadlineAt (Date.now() 기준 시각) — 이 시각을 넘겨 기다리지 않는다 (재검증 2026-10-02).
+   교내 소식 로봇은 게시판마다 45초 시한(withDeadline)인데, 시도 셋(20+45+45초)과 쉬는 틈이 그 안에 들지 않아 시한이 끊은 뒤에도
+   요청이 뒤에서 계속 돌며 다음 게시판의 시간을 먹었다. 시도마다 남은 시간만큼만 기다리고, 남은 시간에 못 드는 재시도는 하지 않는다. */
+const MIN_TRY_MS = 1500;
+function outOfTime() { const e = new Error('게시판 시한 안에 받을 시간이 남지 않음'); e.name = 'TimeoutError'; return e; }
 export async function fetchBoard(url, opts = {}) {
   const headers = opts.headers || FETCH_HEADERS;
   const tries = opts.tries ?? 3;
+  const left = () => (opts.deadlineAt ? opts.deadlineAt - Date.now() : Infinity);
   let lastErr;
   for (let i = 0; i < tries; i += 1) {
+    const ms = Math.min(i === 0 ? (opts.firstMs ?? 20000) : (opts.retryMs ?? 45000), left());
+    if (ms < MIN_TRY_MS) { lastErr = lastErr || outOfTime(); break; }
     try {
       /* POST 목록 API(중앙대 BBSViewList2.do · 2026-10-01 정찰) — 본문이 있으면 폼 전송으로 보낸다. 머리말은 같다(학생 브라우저와 같은 UA). */
-      const init = { method: opts.method || (opts.body ? 'POST' : 'GET'), redirect: 'follow', headers: opts.body ? { ...headers, 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } : headers, signal: AbortSignal.timeout(i === 0 ? (opts.firstMs ?? 20000) : (opts.retryMs ?? 45000)) };
+      const init = { method: opts.method || (opts.body ? 'POST' : 'GET'), redirect: 'follow', headers: opts.body ? { ...headers, 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' } : headers, signal: AbortSignal.timeout(ms) };
       if (opts.body) init.body = opts.body;
       return await fetch(url, init);
     } catch (e) {
       lastErr = e;
       if (!TRANSIENT.test(netReason(e)) || i === tries - 1) break;   // 주소가 없는 것(ENOTFOUND)은 다시 해도 같다
-      await new Promise((r) => setTimeout(r, 3000 * (i + 1)));
+      const pause = 3000 * (i + 1);
+      if (left() < pause + MIN_TRY_MS) break;   // 쉬고 나면 시도할 시간이 없다
+      await new Promise((r) => setTimeout(r, pause));
     }
   }
   throw lastErr;

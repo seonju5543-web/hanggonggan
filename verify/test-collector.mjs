@@ -1992,7 +1992,7 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
   eq('  isNewsRow 에 장학 그물·활동 판정을 넘긴다', /isNewsRow\(i, \{ scholarship: KEYWORDS, activityKind, isAttachmentEntry \}\)/.test(rn) && !/isMenuEntry/.test(rn), true);
   eq('  상세를 읽지 않는다 (fetchDetail 없음 · 제목+링크+수집일만)', /fetchDetail/.test(rn), false);
   const fn = readText(new URL('collector/find-news-boards.mjs', root));
-  eq('  글 줄만 읽는다 — rowsForBoard(=extractDatedRows + 클릭형 링크 풀이 · json/post 는 API) · 페이지 링크 전부 extractLinks 가 아니다', /rawLinks = await rowsForBoard\(s\.school, s\.boardUrl, html\)/.test(rn) && !/\bextractLinks\(/.test(rn) && /await rowsForBoard\(s\.school, page\.url, page\.html\)/.test(fn), true);
+  eq('  글 줄만 읽는다 — rowsForBoard(=extractDatedRows + 클릭형 링크 풀이 · json/post 는 API) · 페이지 링크 전부 extractLinks 가 아니다', /rawLinks = await rowsForBoard\(s\.school, s\.boardUrl, html, fb\)/.test(rn) && !/\bextractLinks\(/.test(rn) && /await rowsForBoard\(s\.school, page\.url, page\.html\)/.test(fn), true);
   /* 🔴 클릭형 게시판 규칙(2026-10-01 · 6차 실행까지 0행이던 동국·WISE·서울교대·전북) — 규칙은 news-board-rules.mjs 한 곳, 상세는 매번 실제로 열어 확인 */
   const RB = await import('../collector/news-board-rules.mjs');
   const rb = readText(new URL('collector/news-board-rules.mjs', root));
@@ -2093,7 +2093,24 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
   eq('    옛 사본 합치기도 글 번호가 둘 다 있고 다르면 합치지 않는다', RB.collapseSamePost([mkK('공통 [학생지원] 셔틀 안내', '2026-10-01', { postId: '7' }), mkK('[학생지원] 셔틀 안내', '2026-10-02', { postId: '8' })]).length, 2);
   eq('    10차 전에 본 글에도 글 번호 장부를 채우고 실려 있던 글에 번호를 단다 (제목이 바뀌어도 다시 실리지 않게)', /if \(seen\[urlKey\(i\.url\)\] && !seen\[postKey\(i\)\]\) seen\[postKey\(i\)\] = seen\[urlKey\(i\.url\)\];/.test(rn) && /for \(const n of all\) if \(!n\.postId && postIdByUrl\.has\(urlKey\(n\.url\)\)\) n\.postId = postIdByUrl\.get\(urlKey\(n\.url\)\);[^\n]*\nall = collapseSamePost\(all\);/.test(rn), true);
   eq('    같은 글 번호는 제목이 달라도 하나 (제목 다듬기가 바뀌어도 다시 실리지 않는다)', RB.collapseSamePost([mkK('제목 다듬기 전 공지 안내', '2026-10-01', { postId: '9' }), mkK('제목 다듬은 뒤 공지 안내', '2026-10-02', { postId: '9' })]).map((n) => [n.title, n.foundAt]), [['제목 다듬은 뒤 공지 안내', '2026-10-01']]);
-  eq('    수집기는 발행 때 합치고(dedupeNotices 앞) 이미 본 글을 글 번호로도 알아본다', /all = collapseSamePost\(all\);[^\n]*\nall = dedupeNotices\(all\);/.test(rn) && /!seen\[urlKey\(i\.url\)\] && !\(i\.postId && seen\[postKey\(i\)\]\)/.test(rn) && /if \(it\.postId\) seen\[postKey\(it\)\] = it\.foundAt;/.test(rn), true);
+  eq('    수집기는 발행 때 합치고(dedupeNotices 앞) 이미 본 글을 글 번호로도 알아본다', /all = collapseSamePost\(all\);[^\n]*\nall = dedupeNotices\(all, \{ distinct: \(a, b\) => !!\(a\.postId && b\.postId && a\.postId !== b\.postId\) \}\);/.test(rn) && /\(i\.postId \? !seen\[postKey\(i\)\] : !seen\[urlKey\(i\.url\)\]\)/.test(rn) && /if \(it\.postId\) seen\[postKey\(it\)\] = it\.foundAt;/.test(rn), true);
+  /* 재검증 2026-10-02 ① — 같은 제목의 다른 글(경희가 해마다 다시 올리는 「휴강 안내」)은 목록 표식 주소가 같다. 주소 열쇠로 보면 새 글이 옛 글에 먹혔다 → 글 번호가 있으면 글 번호가 열쇠 */
+  const twin = RB.datedRowsFor('경희대학교', '<table>' + [['2학기 휴강 안내', 41], ['2학기 휴강 안내', 42], ['도서관 열람실 운영시간 변경 안내', 43], ['법정의무교육 이수 안내', 44]].map(([t, id], i) => `<tr><td><a href="javascript:view('${id}','');">${t}</a></td><td>2026-09-2${i}</td></tr>`).join('') + '</table>', khList);
+  eq('  같은 제목의 다른 글(글 번호가 다름)은 글 줄 뽑기에서 둘로 남는다', twin.map((r) => r.postId), ['41', '42', '43', '44']);
+  eq('    같은 글 합치기도 제목·주소가 같아도 글 번호가 다르면 합치지 않는다', RB.collapseSamePost([mkK('2학기 휴강 안내', '2026-09-01', { postId: '41' }), mkK('2학기 휴강 안내', '2026-10-01', { postId: '42' })]).map((n) => n.postId), ['41', '42']);
+  {
+    const UK = await import('../collector/url-key.mjs');
+    const pair = [mkK('2학기 휴강 안내', '2026-09-01', { postId: '41' }), mkK('2학기 휴강 안내', '2026-10-01', { postId: '42' }), mkK('2학기 휴강 안내', '2026-10-01', { postId: '42' })];
+    const distinct = (a, b) => !!(a.postId && b.postId && a.postId !== b.postId);
+    eq('    중복 제거(dedupeNotices)는 distinct 를 받으면 글 번호가 다른 둘을 남기고 같은 번호는 하나로 · 안 받으면 예전과 같다', [UK.dedupeNotices(pair, { distinct }).map((n) => n.postId), UK.dedupeNotices(pair).length], [['41', '42'], 1]);
+  }
+  eq('    수집기는 글 번호가 있으면 글 번호로만 새 글을 가리고 · 옛 주소 장부는 한 주소에 글 번호가 하나일 때만 옮긴다', /\(i\.postId \? !seen\[postKey\(i\)\] : !seen\[urlKey\(i\.url\)\]\)/.test(rn) && /if \(!i\.postId \|\| idsByUrl\.get\(urlKey\(i\.url\)\)\.size !== 1\) continue;/.test(rn), true);
+  /* 재검증 2026-10-02 ④ — 줄을 감싼 링크 옆 첨부 파일 이름의 날짜·링크 밖 「신청기간 A ~ B」 가 게시일이 되어 최근 글이 60일 상한에 빠졌다 */
+  const wiseAtt = RB.datedRowsFor('동국대학교 WISE캠퍼스', '<ul>' + [0, 1, 2, 3].map((i) => `<li><a href="#none" onclick="goDetail(5205${i});"><p class="tit">비교과 프로그램 안내 ${i}번째 공지</p><div class="info"><span>2026.09.20.</span><span>임준택</span><span>조회 27</span></div></a><a href="/cmmn/file/download?f=${i}">붙임_2026.07.01_계획.hwp</a></li>`).join('') + '</ul>', 'https://wise.dongguk.ac.kr/article/generalnotice/list');
+  eq('  게시일은 첨부 파일 이름의 날짜가 아니다 — 줄을 감싼 링크 안의 날짜 · 작성자 꼬리도 그대로 뗀다', wiseAtt.map((r) => `${r.title}|${r.postedAt}`).slice(0, 2), ['비교과 프로그램 안내 0번째 공지|2026-09-20', '비교과 프로그램 안내 1번째 공지|2026-09-20']);
+  const evRows = BL.extractDatedRows('<ul>' + [0, 1, 2].map((i) => `<li><a href="/bbs/event/10/view.do?i=${i}"><p class="tit">학생 리더십 캠프 참가자 모집 ${i}</p><span class="date">2026.09.20</span></a><span class="period">신청기간 2026.07.01 ~ 2026.12.31</span></li>`).join('') + '</ul>', 'https://x.ac.kr/bbs/event/10/list.do');
+  eq('    링크 밖 「신청기간 A ~ B」 는 게시일이 아니다 (기간의 시작일로 60일 상한에 빠지지 않는다)', evRows.map((r) => r.postedAt), ['2026-09-20', '2026-09-20', '2026-09-20']);
+  eq('    띄어 쓴 줄표 기간도 기간 · 날짜 안의 줄표(2026-08-20)는 날짜 그대로', [BL.rowPostedAt('<tr><td><a href="/v/1">휴강 안내</a></td><td>2026-09-01 - 2026-09-30</td><td>2026-08-20</td></tr>'), BL.rowPostedAt('<tr><td><a href="/v/1">휴강 안내</a></td><td>2026-08-20</td></tr>')], ['2026-08-20', '2026-08-20']);
   eq('  목록 표식은 글자 단위로 자른다 (이모지 짝이 갈라져 글이 사라지지 않는다)', (() => { try { return RB.markerUrl(khList, 'ㄱ'.repeat(79) + '😀😀').length > 0; } catch { return false; } })(), true);
   /* 리뷰 2026-10-02: 글자만 보던 관문은 method 를 GET 으로 묶어도 초록이었다 — 진짜 fetch 를 바꿔 끼워 무엇이 나가는지 잰다 */
   {
@@ -2103,14 +2120,41 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
     try { await FB.fetchBoard('https://x.ac.kr/api', { body: 'a=1&b=2', tries: 1 }); await FB.fetchBoard('https://x.ac.kr/list', { tries: 1 }); } finally { globalThis.fetch = realFetch; }
     eq('  fetch-board — 본문이 있으면 폼 POST · 없으면 그대로 GET (기존 호출은 안 바뀐다)', sent.map((x) => [x.method, x.body || '', /x-www-form-urlencoded/.test(x.ct || '')]), [['POST', 'a=1&b=2', true], ['GET', '', false]]);
   }
+  /* 재검증 2026-10-02 ⑤ — 게시판 시한(45초)이 끊어도 요청(20+45+45초·쉬는 틈)은 뒤에서 계속 돌았다. deadlineAt 이 있으면 남은 시간만큼만 기다리고, 못 드는 재시도는 하지 않는다 */
+  {
+    const FB = await import('../collector/fetch-board.mjs');
+    const realFetch = globalThis.fetch; let calls = 0;
+    const hang = (u, init) => { calls += 1; return new Promise((_, rej) => init.signal.addEventListener('abort', () => rej(Object.assign(new Error('timeout'), { name: 'TimeoutError', cause: { code: 'UND_ERR_CONNECT_TIMEOUT' } })))); };
+    const t0 = Date.now(); let err = '';
+    const keep = setInterval(() => {}, 200);   // AbortSignal.timeout 의 시계는 프로세스를 붙잡지 않는다 (진짜 요청은 연결이 붙잡는다)
+    globalThis.fetch = hang;
+    try { await FB.fetchBoard('https://x.ac.kr/list', { deadlineAt: Date.now() + 1800 }); } catch (e) { err = e.name; } finally { globalThis.fetch = realFetch; }
+    const took = Date.now() - t0;
+    eq('  fetch-board — 시한(deadlineAt)이 있으면 그 안에 포기한다 (첫 시도 20초를 다 기다리지 않고 · 남은 시간에 못 드는 재시도는 안 한다)', [err, calls, took < 4000], ['TimeoutError', 1, true]);
+    calls = 0; globalThis.fetch = hang;
+    try { await FB.fetchBoard('https://x.ac.kr/list', { deadlineAt: Date.now() - 1 }); } catch (e) { err = e.name; } finally { globalThis.fetch = realFetch; }
+    clearInterval(keep);
+    eq('    시한이 이미 지났으면 요청을 보내지 않는다', [err, calls], ['TimeoutError', 0]);
+  }
+  eq('    교내 소식 로봇은 게시판의 모든 요청(목록·API·상세 확인)에 게시판 시한을 넘긴다', /const fb = \(url, o = \{\}\) => fetchBoard\(url, \{ \.\.\.o, deadlineAt: ctx\.deadlineAt \}\);/.test(rn) && /const res = await fb\(s\.boardUrl\);/.test(rn) && /rowsForBoard\(s\.school, s\.boardUrl, html, fb\)/.test(rn) && /verifyRuleDetail\(fresh\[0\], \{[^}]*fetch: fb \}\)/.test(rn) && /const ctx = \{ dead: false, deadlineAt: Date\.now\(\) \+ BOARD_HARD_MS - \d+ \};/.test(rn) && !/await fetchBoard\(/.test(rn), true);
   eq('  API 규칙(json/post)의 0행·오류는 주소가 아니라 규칙의 문제로 적는다 (원인을 단정하지 않는다)', /fetchesOwnList\(rule\) \? ['`]🟡 규칙의 API 는 응답했지만/.test(rn) && /fetchesOwnList\(rule\) \? `⚠️ 규칙의 API 오류/.test(rn), true);
   eq('  API 규칙 학교는 정찰이 확인한 화면(rule.page)만 게시판으로 올린다 · API 는 학교당 한 번', [RB.rulePageMatches(RB.NEWS_BOARD_RULES['서강대학교'], 'https://www.sogang.ac.kr/ko/announcement'), RB.rulePageMatches(RB.NEWS_BOARD_RULES['서강대학교'], 'https://www.sogang.ac.kr/ko/news/press'), RB.rulePageMatches(RB.NEWS_BOARD_RULES['중앙대학교'], 'https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100#page1'), RB.rulePageMatches(RB.NEWS_BOARD_RULES['중앙대학교'], 'https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=200')], [true, false, true, false]);
   eq('    찾기 로봇이 그 화면만 보고(후보·홈 메뉴를 돌지 않는다) API 를 한 번만 부른다', /if \(apiRule && !rulePageMatches\(rule, url\)\)/.test(fn) && /if \(apiRule && apiRows === null\) apiRows = await rowsForBoard/.test(fn) && /if \(apiRule && rule\.page\) \{[\s\S]{0,300}?return \{ found: hit, tried \};/.test(fn), true);
-  eq('    목록 표식 학교는 API 가 살아 있어도 학생이 여는 목록 화면이 열리는지 본다', /if \(!fetchesOwnList\(rule\) \|\| rule\.link === 'list'\) \{\s*const res = await fetchBoard\(s\.boardUrl\);/.test(rn), true);
+  eq('    목록 표식 학교는 API 가 살아 있어도 학생이 여는 목록 화면이 열리는지 본다', /if \(!fetchesOwnList\(rule\) \|\| rule\.link === 'list'\) \{\s*const res = await fb\(s\.boardUrl\);/.test(rn), true);
   eq('  읽었지만 실을 새 소식이 없는 게시판은 ℹ️ — 🙋 (개발자에게 주소 요청)·이슈에 넣지 않는다', /: rawLinks\.length && onSite\.length \? `ℹ️ 읽힘 · 실을 새 소식 없음/.test(rn) && /const noRows = results\.filter\(\(r\) => \/\^🟡\/\.test\(r\.status\)\);/.test(rn), true);
   eq('  인증서 정찰은 검증마다 그 호스트의 이름도 본다 (-verify_hostname)', (readText(new URL('collector/certs/probe-chain.sh', root)).match(/openssl verify -verify_hostname "\$h"/g) || []).length, 3);
   const pl = readText(new URL('collector/probe-links.mjs', root));
-  eq('  정찰은 주소마다 절대 시한·측정마다 시한·전체 예산이 있고 주소를 끝낼 때마다 리포트를 쓴다 (4차 정찰이 15분에 잘려 리포트가 0줄이었다)', /const URL_HARD_MS = \d+;/.test(pl) && /await within\(checkUrl\(u\)\.then\(\(\) => true\), URL_HARD_MS, false\)/.test(pl) && /const server = res \? await within\(res\.text\(\), \d+, null\)/.test(pl) && /const PROBE_BUDGET_MS = 11 \* 60000;/.test(pl) && (pl.match(/flushReport\(\);/g) || []).length >= 3 && /timeout-minutes: 15/.test(readText(new URL('.github/workflows/probe-links.yml', root))), true);
+  eq('  정찰은 주소마다 절대 시한·측정마다 시한·전체 예산이 있고 주소를 끝낼 때마다 리포트를 쓴다 (4차 정찰이 15분에 잘려 리포트가 0줄이었다)', /const URL_HARD_MS = \d+;/.test(pl) && /await within\(checkUrl\(u, buf\)\.then\(\(\) => true\), URL_HARD_MS, false\)/.test(pl) && /const server = res \? await within\(res\.text\(\), \d+, null\)/.test(pl) && /const PROBE_BUDGET_MS = 11 \* 60000;/.test(pl) && (pl.match(/flushReport\(\);/g) || []).length >= 3 && /timeout-minutes: 15/.test(readText(new URL('.github/workflows/probe-links.yml', root))), true);
+  /* 재검증 2026-10-02 ⑥⑦ — 시한에 끊긴 측정이 뒤에서 계속 돌며 전역 리포트에 써서 다음 주소의 절 한가운데에 끼어들었다 · 시한 없는 evaluate 하나가 주소 전체를 멈췄다 */
+  {
+    const fnBody = pl.slice(pl.indexOf('async function checkUrl('), pl.indexOf('// 같은 학교를 몰아치지 않는다'));
+    const evals = (pl.match(/\.(?:evaluate|\$\$eval)\(/g) || []).length;
+    eq('  정찰 측정은 부른 쪽의 그릇(out)에만 쓰고 · 끊기면 그때까지 적힌 것만 옮기며 · 화면 읽기는 전부 시한(within) 안에서 한다', [
+      /async function checkUrl\(url, out\)/.test(pl) && /async function findBoard\(spec, out\)/.test(pl) && fnBody.length > 1000 && !/report\.push\(/.test(fnBody) && /await checkUrl\(d\.abs, out\)/.test(fnBody),
+      (pl.match(/const got = buf\.splice\(0\);/g) || []).length === 2 && /within\(findBoard\(s, buf\)\.then\(\(\) => true\), URL_HARD_MS, false\)/.test(pl),
+      evals >= 8 && evals === (pl.match(/within\((?:page|target)\.(?:evaluate|\$\$eval)\(/g) || []).length]
+      , [true, true, true]);
+  }
   eq('  정찰은 목록 요소 HTML 을 **누르기 전에** 뜬다 (누른 뒤면 상세·바닥글 화면의 것이 적힌다)', pl.indexOf('const frag = await within(page.evaluate(') > 0 && pl.indexOf('const frag = await within(page.evaluate(') < pl.indexOf('[data-probe-row="0"]'), true);
   eq('    링크 없는 줄은 줄째 누른다 · JSON 응답은 글 칸 요약 · 못 읽은 본문은 0자와 구분', /\(a \|\| row\)\.click\(\)/.test(pl) && /summarizeJson\(JSON\.parse\(raw\)\)/.test(pl) && /본문 못 읽음/.test(pl), true);
   eq('  정찰은 날짜 줄(제목 링크)·첫 줄 클릭 결과·화면이 부른 요청·목록 HTML 조각을 적는다 (규칙의 재료 · 짐작 금지)', /날짜 줄 \$\{rows\.length\}개/.test(pl) && /waitForNavigation\(/.test(pl) && /page\.on\('request'/.test(pl) && /outerHTML/.test(pl), true);
@@ -2122,7 +2166,7 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
   eq('  학교 게시판은 robots.txt 를 묻지 않는다 (장학 수집기와 같은 정책 · 첫 실행에서 10개교가 ⛔ 로 빠졌다)', /robotsAllows/.test(rn), false);
   eq('  예산·시한·회전 — hasRoom · withDeadline · 커서 저장 · 스스로 끝낸다', /if \(!budget\.hasRoom\(MIN_ROOM_MS\)\) \{/.test(rn) && /await withDeadline\(harvestBoard\(s, ctx\), BOARD_HARD_MS\)/.test(rn) && /fs\.writeFileSync\(cursorPath/.test(rn) && /\nprocess\.exit\(0\);\s*$/.test(rn), true);
   eq('  학교별 파일로만 발행한다 (notices.json·activities.json 에 쓰지 않는다)', /publishBySchool\(all, \{\s*\n?\s*dir: NEWS_DIR/.test(rn) && !/notices\.json|activities\.json/.test(rn.replace(/\/\*[\s\S]*?\*\//g, '')), true);
-  eq('  발행 규칙 — 보관 기한·중복·서비스 학교·숨김 표식', /NEWS_KEEP_DAYS/.test(rn) && /all = dedupeNotices\(all\)/.test(rn) && /all = dropUnserved\(all\)/.test(rn) && /hideSet\.has\(canonUrl\(n\.url\)\)/.test(rn), true);
+  eq('  발행 규칙 — 보관 기한·중복·서비스 학교·숨김 표식', /NEWS_KEEP_DAYS/.test(rn) && /all = dedupeNotices\(all[,)]/.test(rn) && /all = dropUnserved\(all\)/.test(rn) && /hideSet\.has\(canonUrl\(n\.url\)\)/.test(rn), true);
   const hardMs = Number((rn.match(/NEWS_BOARD_HARD_MS \|\| (\d+)\)/) || [])[1]);
   const minRoom = Number((rn.match(/NEWS_MIN_ROOM_MS \|\| (\d+)\)/) || [])[1]);
   /* ⑤ 워크플로 — 제 대기줄·제 상한·저장 목록·배포 감시·병합 규칙·실시간 점검 */

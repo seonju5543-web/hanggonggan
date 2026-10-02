@@ -95,20 +95,22 @@ async function harvestBoard(s, ctx = { dead: false }) {
   }
   /* robots.txt 는 묻지 않는다 — 학교 게시판은 장학 수집기와 같은 정책(collector/robots.mjs 머리말 · 공공·재단 게시판만 묻는다).
      첫 실행에서 물었더니 10개교가 ⛔ 로 빠졌다(2026-10-01). */
+  /* 이 게시판의 모든 요청(목록·API·상세 확인)은 게시판 시한 안에서만 기다린다 (재검증 2026-10-02 — 시한이 끊어도 요청은 뒤에서 계속 돌았다) */
+  const fb = (url, o = {}) => fetchBoard(url, { ...o, deadlineAt: ctx.deadlineAt });
   try {
     const rule = NEWS_BOARD_RULES[s.school];
     let html = '';
     /* json·post 규칙은 목록을 API 로 읽지만(rowsForBoard), 목록 표식(link:'list') 학교는 학생 링크가 그 화면이라 **화면도 열리는지** 본다
        (리뷰 2026-10-02: 화면이 404 가 돼도 API 만 살아 있으면 죽은 「게시판 목록 ↗」 이 계속 실렸다) */
     if (!fetchesOwnList(rule) || rule.link === 'list') {
-      const res = await fetchBoard(s.boardUrl);
+      const res = await fb(s.boardUrl);
       if (ctx.dead) return;
       if (!res.ok) { results.push({ name, status: `⚠️ 접속 실패 (HTTP ${res.status}) — 주소 수정 필요`, items: [] }); return; }
       html = await res.text();
     }
     /* 🔴 글 줄만 — 페이지의 <a> 전부(extractLinks)를 쓰면 사이트 메뉴가 글로 담긴다(첫 실행 906건 사고 · 2026-10-01).
        날짜가 붙은 줄(<tr>·<li>…)의 링크만 글이고, 그 날짜가 게시일(postedAt)이다. 클릭형 게시판은 같은 눈에 규칙의 링크 풀이만 얹는다. */
-    const rawLinks = await rowsForBoard(s.school, s.boardUrl, html);
+    const rawLinks = await rowsForBoard(s.school, s.boardUrl, html, fb);
     if (ctx.dead) return;
     /* 무엇을 싣나 — 학교 사이트 안의 글 가운데 장학·활동·잡음을 뺀 것 (판정은 news-kind.mjs 한 곳) */
     /* 단계마다 수를 남긴다 — 0건일 때 '어디서 다 빠졌는지'를 리포트가 말하게 (서강 9차: 찾기는 30행인데 수집 0건 · 원인을 단정하지 않는다) */
@@ -118,16 +120,20 @@ async function harvestBoard(s, ctx = { dead: false }) {
     /* 이미 본 글 — 주소 열쇠 또는 **게시판의 글 번호**(postId). 목록 표식(#n-제목) 주소는 제목을 다듬는 규칙이 바뀌면 달라져
        같은 글이 새 글로 다시 실렸다(경희 6건 두 번 · 리뷰 2026-10-02). 글 번호가 있으면 그것이 열쇠다. */
     const postKey = (i) => (i.postId ? `post:${s.school}:${i.postId}` : '');
-    /* 이미 본 글에도 글 번호 장부를 채운다 (검증 2026-10-02: 10차 전에 본 글은 번호가 없어, 제목이 바뀌면 다시 두 번 실렸다) */
+    /* 이미 본 글에도 글 번호 장부를 채운다 (검증 2026-10-02: 10차 전에 본 글은 번호가 없어, 제목이 바뀌면 다시 두 번 실렸다).
+       🔴 한 주소에 글 번호가 **하나뿐일 때만** 옮긴다 — 같은 제목의 글 둘(목록 표식 주소가 같다)이면 옛 장부가 어느 글 것인지 모른다(재검증 2026-10-02). */
+    const idsByUrl = new Map();
+    for (const i of items) if (i.postId) idsByUrl.set(urlKey(i.url), (idsByUrl.get(urlKey(i.url)) || new Set()).add(i.postId));
     for (const i of items) {
-      if (!i.postId) continue;
+      if (!i.postId || idsByUrl.get(urlKey(i.url)).size !== 1) continue;
       postIdByUrl.set(urlKey(i.url), i.postId);
       if (seen[urlKey(i.url)] && !seen[postKey(i)]) seen[postKey(i)] = seen[urlKey(i.url)];
     }
-    const fresh = items.filter((i) => !seen[urlKey(i.url)] && !(i.postId && seen[postKey(i)])).slice(0, NEWS_FRESH_MAX);
+    /* 글 번호가 있는 글은 **글 번호로만** 새 글인지 가린다 — 주소로 보면 같은 제목의 새 글이 옛 글로 여겨져 영영 안 실린다(재검증 2026-10-02) */
+    const fresh = items.filter((i) => (i.postId ? !seen[postKey(i)] : !seen[urlKey(i.url)])).slice(0, NEWS_FRESH_MAX);
     /* 🔴 규칙으로 만든 상세 주소는 매번 첫 글 하나를 실제로 열어 제목을 확인한다 — 안 맞으면 이 게시판은 싣지 않는다(틀린 링크보다 0건). */
     if (needsDetailCheck(rule) && fresh.length) {
-      const v = await verifyRuleDetail(fresh[0], { rule, boardUrl: s.boardUrl, others: items.map((i) => i.title) });
+      const v = await verifyRuleDetail(fresh[0], { rule, boardUrl: s.boardUrl, others: items.map((i) => i.title), fetch: fb });
       if (ctx.dead) return;
       if (!v.ok) { results.push({ name, status: `⚠️ 클릭형 규칙(news-board-rules.mjs)의 상세 주소 확인 실패 — ${v.reason} · 이 게시판은 싣지 않음`, items: [] }); return; }
     }
@@ -176,7 +182,7 @@ for (const idx of order) {
   }
   const t0 = Date.now();
   console.log(`[${Math.round(budget.elapsed() / 1000)}s] ▶ ${name}`);
-  const ctx = { dead: false };
+  const ctx = { dead: false, deadlineAt: Date.now() + BOARD_HARD_MS - 1000 };   // 요청은 시한보다 1초 먼저 놓는다
   const r = await withDeadline(harvestBoard(s, ctx), BOARD_HARD_MS);
   if (r === TIMED_OUT) {
     ctx.dead = true;
@@ -200,7 +206,7 @@ all = all.filter((n) => !n.postedAt || n.postedAt >= postedCutoff());   // 소�
 all = all.filter((n) => isNewsRow(n, { scholarship: KEYWORDS, activityKind, isAttachmentEntry }));
 for (const n of all) if (!n.postId && postIdByUrl.has(urlKey(n.url))) n.postId = postIdByUrl.get(urlKey(n.url));   // 실려 있던 글에 이번에 본 글 번호를 단다
 all = collapseSamePost(all);   // 같은 글이 제목 다듬기 차이로 두 번 실린 것을 합친다 (글 번호 · 목록 표식 제목의 분류 꼬리표 · 소급)
-all = dedupeNotices(all);
+all = dedupeNotices(all, { distinct: (a, b) => !!(a.postId && b.postId && a.postId !== b.postId) });   // 글 번호가 다르면 같은 주소(목록 표식)라도 다른 글
 all = dropUnserved(all);
 for (const n of all) { if (hideSet.has(canonUrl(n.url))) { n.hidden = true; } else if (n.hidden && !n.hiddenBy) { delete n.hidden; } }
 all.sort((a, b) => String(b.foundAt || '').localeCompare(String(a.foundAt || '')));

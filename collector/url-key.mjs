@@ -95,18 +95,25 @@ export function preferNotice(a, b) {
 
 /* 발행 직전 중복 정리 — 두 열쇠(정규화 주소 · 학교+제목)로 같은 공고를 하나로 합친다.
    먼저 들어온 순서(최신 수집분이 앞)를 유지하되, 남길 항목은 preferNotice로 고른다. */
-export function dedupeNotices(items) {
+/* opts.distinct(a, b) 가 참이면 열쇠가 같아도 합치지 않는다 (재검증 2026-10-02 · 교내 소식) — 목록 표식(#n-제목) 주소는 같은 제목의
+   다른 글(글 번호가 다름)도 같은 주소가 되어, 주소 열쇠만 보면 새 글이 옛 글에 먹혔다. 넘기지 않으면 예전과 똑같다. */
+export function dedupeNotices(items, opts = {}) {
+  const distinct = typeof opts.distinct === 'function' ? opts.distinct : null;
   const out = [];
-  const idx = new Map(); // 열쇠 → out에서의 위치
+  const idx = new Map(); // 열쇠 → out에서의 위치들 (먼저 온 것이 앞)
   for (const n of items || []) {
     const keys = [`u:${urlKey(n.url)}`, titleKey(n) ? `t:${titleKey(n)}` : null].filter(Boolean);
-    const hit = keys.map((k) => idx.get(k)).find((v) => v !== undefined);
+    let hit;
+    for (const k of keys) {
+      hit = (idx.get(k) || []).find((pos) => !distinct || !distinct(out[pos], n));
+      if (hit !== undefined) break;
+    }
     if (hit === undefined) {
       const pos = out.push(n) - 1;
-      keys.forEach((k) => idx.set(k, pos));
+      keys.forEach((k) => idx.set(k, (idx.get(k) || []).concat(pos)));
     } else {
       out[hit] = preferNotice(out[hit], n);
-      keys.forEach((k) => { if (!idx.has(k)) idx.set(k, hit); });
+      keys.forEach((k) => { const l = idx.get(k) || []; if (!l.includes(hit)) idx.set(k, l.concat(hit)); });
     }
   }
   return out;

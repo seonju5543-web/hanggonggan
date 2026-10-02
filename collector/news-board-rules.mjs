@@ -314,8 +314,9 @@ export function collapseSamePost(items) {
     const keys = [];
     if (n.postId) keys.push(`p|${n.school}|${n.postId}`);
     if (/#n-/.test(String(n.url || ''))) keys.push(`t|${n.school}|${listOf(n)}|${String(n.title || '').replace(/\s+/g, ' ').trim()}`);
-    const hit = keys.map((k) => idx.get(k)).find((v) => v !== undefined);
-    if (hit === undefined) { const pos = out.push(n) - 1; keys.forEach((k) => idx.set(k, pos)); continue; }
+    /* 글 번호가 둘 다 있고 다르면 제목·주소가 같아도 다른 글이다 (재검증 2026-10-02 — 같은 제목의 새 글이 옛 글에 먹혔다) */
+    const hit = keys.map((k) => idx.get(k)).find((v) => v !== undefined && !(n.postId && out[v].postId && n.postId !== out[v].postId));
+    if (hit === undefined) { const pos = out.push(n) - 1; keys.forEach((k) => { if (!idx.has(k)) idx.set(k, pos); }); continue; }
     const a = out[hit];
     const newer = String(n.foundAt || '') > String(a.foundAt || '') || (String(n.foundAt || '') === String(a.foundAt || '') && n.postId && !a.postId) ? n : a;
     out[hit] = merge2(a, n, newer);
