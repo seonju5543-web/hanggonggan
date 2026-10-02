@@ -227,7 +227,10 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
     /* 피드에서 빠져도(60일·마감) 사본으로 남는다 */
     eq('⑥ 피드에서 빠져도 보관함·달력·시트가 사본으로 남는다', await page.evaluate((u) => {
       const keep = liveActivities.items; liveActivities.items = keep.filter((x) => x.url !== u);
-      const out = [savedScholarships().some((x) => x.id === `act:${u}`), calContext().mine.some((x) => x.id === `act:${u}`), (openDetail(`act:${u}`), !document.querySelector('#detail-sheet').hidden)];
+      /* ⚠️ 시트는 닫아도 내용이 남는다 — 비우고 연 뒤 '보이는가 + 제목'을 함께 잰다(앞 시트의 제목으로 헛통과하던 것 · red-green 으로 잡음) */
+      closeSheet(); document.querySelector('#detail-sheet').innerHTML = '';
+      const out = [savedScholarships().some((x) => x.id === `act:${u}`), calContext().mine.some((x) => x.id === `act:${u}`),
+        (openDetail(`act:${u}`), document.querySelector('#detail-sheet').classList.contains('show') && (document.querySelector('#detail-sheet .sheet-title') || {}).textContent === '2026 대학생 해외봉사단 모집')];
       closeSheet(); liveActivities.items = keep; return out; }, ACT1), [true, true, true]);
     /* 빼고 되돌리기 — 피드에서 빠진 활동도 사본째 제자리로 */
     eq('⑥ 빼고 되돌리면 사본째 돌아온다(피드에서 빠졌어도)', await page.evaluate(async (u) => {
@@ -235,7 +238,11 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
       toggleSave(`act:${u}`); const gone = !isSaved(`act:${u}`);
       document.querySelector('#toast .toast-undo').click(); await new Promise((r) => setTimeout(r, 50));
       const s = state.saved.find((x) => x.id === `act:${u}`); liveActivities.items = keep; return [gone, !!(s && s.snap)]; }, ACT1), [true, true]);
-    eq('⑥ 저장은 홈 예상 수혜액에 섞이지 않는다(활동은 금액이 없다 · 저장은 신청이 아니다)', await page.evaluate(() => state.applications.length), 0);
+    /* 달력 날짜를 열었을 때 '내 공고' 줄로 나오는가 — 점만 재면 줄이 깨져도 모른다(리뷰) */
+    eq('⑥ 달력 날짜를 열면 「내 공고」에 활동 줄(종류·주최 둘째 줄)', await page.evaluate((u) => { const d = calContext().mine.find((x) => x.id === `act:${u}`); const box = document.createElement('div'); box.innerHTML = calDayHtml(d.deadline);
+      const row = box.querySelector(`.cal-row[data-detail="act:${u}"]`); return row ? [row.querySelector('.cal-row-name').textContent.trim(), row.querySelector('.cal-row-sub').textContent.trim(), /내 공고/.test(box.textContent)] : null; }, ACT1),
+      ['2026 대학생 해외봉사단 모집', '대외활동 · 한국외국어대학교 게시판', true]);
+    eq('⑥ 피드가 새로 오면 담아 둔 사본도 새 글로(옛 마감을 말하지 않게)', await page.evaluate((u) => { const s = state.saved.find((x) => x.id === `act:${u}`); s.snap = { ...s.snap, deadline: '2000-01-01' }; refreshActivitySnaps(); return s.snap.deadline !== '2000-01-01'; }, ACT1), true);
     eq('페이지 오류 없음', errors, []);
     await page.context().close();
   }

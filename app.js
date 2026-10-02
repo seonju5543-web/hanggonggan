@@ -267,6 +267,21 @@ function activityItem(url) {
   const sv = state.saved.find((x) => x.id === `act:${url}`);
   return (sv && sv.snap) || null;
 }
+/* 담아 둔 활동의 사본을 피드의 새 글로 갈아 둔다 — 피드에서 빠진 뒤에 쓰이는 사본이 담던 날의 옛 마감을 말하지 않게(2026-10-02 리뷰).
+   기기 안 캐시라 saveState({ local: true }) — 학생이 고친 것으로 찍지 않는다(신청 내역 사본과 같은 규칙) */
+function refreshActivitySnaps() {
+  let changed = false;
+  for (const sv of state.saved) {
+    if (!isActivityId(sv.id)) continue;
+    const live = findActivity(sv.id.slice(4));
+    if (!live) continue;
+    const json = JSON.stringify(live);
+    if (sv.snap && JSON.stringify(sv.snap) === json) continue;
+    sv.snap = JSON.parse(json);
+    changed = true;
+  }
+  if (changed) saveState({ local: true });
+}
 function findSaveTarget(id) {
   if (!isActivityId(id)) return findSch(id);
   const n = activityItem(id.slice(4));
@@ -2837,6 +2852,7 @@ function loadActivities() {
     .catch(() => null)
     .then((d) => {
       liveActivities = d || liveActivities || { items: [], updatedAt: null };
+      refreshActivitySnaps();
       rerenderVisible();
     });
 }
