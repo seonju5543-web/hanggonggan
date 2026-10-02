@@ -12,9 +12,9 @@
   - 대외활동 · 2026년 이음터 마을동아리 연합 축제 자원봉사자 모집(장안대학교, 협성대학교) (~2026-10-02) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3520393
   - 대외활동 · 10월(오전) 대전수학문화관 대학생 봉사활동 모집 (~2026-10-02) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3521994
   - 대외활동 · 10월(오후) 대전수학문화관 대학생 봉사활동 모집 (~2026-10-02) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3521995
-- ⏸ **온통청년 청년정책** — 열쇠(YOUTHCENTER_KEY)가 없어 건너뜀 · 지난 글 그대로
-- ⏸ **온통청년 청년콘텐츠** — 열쇠(YOUTHCENTER_CONTENT_KEY)가 없어 건너뜀 · 지난 글 그대로
+- ❌ **온통청년 청년정책** — HTTP 400 · invalid param data. · 지난 글 그대로 둠
+- ❌ **온통청년 청년콘텐츠** — 응답 없음(20초 × 3회) · 지난 글 그대로 둠
 
-data/activities.json — API 글 30 → **30건** (전체 159건)
+data/activities.json — API 글 27 → **30건** (전체 166건)
 
 > 열쇠·출처 설명: `collector/open-api.mjs` 머리말 · 바꾸는 규칙: `collector/open-api-map.mjs` · 설계: `docs/designs/external-sources.md` §10
