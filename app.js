@@ -428,7 +428,9 @@ function recordResult(sch, won) {
   app.result = won ? 'won' : 'lost';
   app.resultAt = nowStamp();
   saveState();
-  toast(won ? '선정 결과를 기록했습니다' : '결과를 기록했습니다');
+  /* 데이터에서 내려간 공고는 결과를 적는 순간 신청 내역에서 빠진다(shownAppRows) — 잘못 누른 것이면 줄째 사라지므로 되돌리기를 준다 */
+  if (!findSch(sch.id)) toast(`${won ? '선정을' : '결과를'} 기록했어요 · 내려간 공고라 신청 내역에서 정리했어요`, { label: '실행 취소', run: () => undoProgress(sch.id) });
+  else toast(won ? '선정 결과를 기록했습니다' : '결과를 기록했습니다');
   refreshProgressViews(sch.id);
 }
 
@@ -464,7 +466,7 @@ function refreshProgressViews(id) {
   else if (name === 'home') renderHome();
   else if (name === 'explore') renderExplore();
   else if (name === 'my') renderMy();
-  if (wasOpen) openDetail(id);
+  if (wasOpen) { if (appSch(id)) openDetail(id); else closeSheet(); }   // 결과를 적어 사라진 줄의 시트는 닫는다
 }
 
 function toast(msg, action) {
@@ -1632,7 +1634,7 @@ function renderHome() {
     '교내': applyable.filter((m) => m.sch.type === '교내').length,
     '교외': applyable.filter((m) => m.sch.type === '교외').length,
     /* 신청 내역 화면과 같은 수(내려간 공고 빼고) — 공고 목록을 받기 전엔 담은 수 그대로(받고 나서 줄어드는 것은 '내려감'이 확정된 뒤다) */
-    applications: appsDataState() === 'ok' ? shownAppRows(state.applications, schResolver()).length : state.applications.length,
+    applications: shownAppCount(),
   };
   $('#hero-tiles').innerHTML = HERO_TILES.map((t) => `
     <button type="button" class="hero-tile" data-hero-go="${t.go}" aria-label="${t.name} ${tileN[t.go]}건">
@@ -3786,7 +3788,7 @@ function eligibilityRowsHtml(sch, result) {
 }
 
 function openDetail(id) {
-  const sch = findSch(id);
+  const sch = appSch(id);   // 데이터에서 내려갔어도 결과를 적기 전이면 떠 둔 사본으로 연다(2026-10-02)
   if (!sch) return;
   const result = evaluateFor(sch, state.profile);   // 카드와 같은 판정을 쓴다(위 주석)
   const fit = fitScore(sch, result, state.profile);
@@ -4992,7 +4994,42 @@ function appRows(applications, resolve) {
      · 목록·요약 카드·홈 '신청내역' 칸 숫자·전체 선택이 **이 함수 하나**를 쓴다 — 갈라 쓰면 숫자가 서로 다른 말을 한다.
    순수 함수라 검사가 그대로 돌린다(test-collector '신청 내역 — 내려간 공고는 보이지 않는다'). */
 function shownAppRows(applications, resolve) {
-  return appRows(applications, resolve).filter((r) => r.sch);
+  /* 🔴 **결과를 적을 때까지는 남긴다** (2026-10-02 개발자 결정: *"일단 결과를 적을 때까지는 남겨두자"*).
+     정식 등록은 마감+30일, 층2는 마감 뒤 데이터에서 빠진다 — 발표가 늦으면 선정 결과를 적기 전에 줄이 사라졌다.
+     그래서 공고가 있을 때 떠 둔 사본(app.snap · snapApplications)으로 그린다. 선정·미선정을 적으면 그때 빠진다. */
+  return appRows(applications, resolve)
+    .map((r) => (r.sch || r.app.result || !r.app.snap ? r : { ...r, sch: r.app.snap }))
+    .filter((r) => r.sch);
+}
+/* 신청 기록이 가리키는 공고 — 데이터에 있으면 그것, 없고 결과를 아직 안 적었으면 떠 둔 사본(위와 같은 규칙).
+   신청 내역 패널의 제출·결과 단추와 상세 시트가 이것으로 찾는다(findSch 만 쓰면 사본이 있는 줄을 눌러도 아무것도 안 열린다) */
+function appSch(id) {
+  const live = findSch(id);
+  if (live) return live;
+  const a = state.applications.find((x) => x.id === id);
+  return a && !a.result && a.snap ? a.snap : null;
+}
+/* 홈 「신청내역」 칸의 숫자 — 신청 내역 화면과 같은 수. 공고 목록을 받기 전엔 담은 수 그대로(받고 나서 줄어드는 것은 '내려감'이 확정된 뒤다).
+   홈은 앱을 켜면 먼저 그려지므로 사본도 여기서 한 번 뜬다(신청 내역을 안 열어 본 학생도 사본이 남는다) */
+function shownAppCount() {
+  if (appsDataState() !== 'ok') return state.applications.length;
+  const r = schResolver();
+  if (snapApplications(r)) saveState();
+  return shownAppRows(state.applications, r).length;
+}
+/* 공고가 데이터에 있는 동안 사본을 떠 둔다 — 바뀌었을 때만 적는다(매번 저장하지 않게). 공고 목록을 다 받았을 때만 돈다 */
+function snapApplications(resolve) {
+  if (appsDataState() !== 'ok') return false;
+  let changed = false;
+  for (const a of state.applications) {
+    const s = resolve(a.id);
+    if (!s) continue;
+    const json = JSON.stringify(s);
+    if (a.snap && JSON.stringify(a.snap) === json) continue;
+    a.snap = JSON.parse(json);
+    changed = true;
+  }
+  return changed;
 }
 /* 공고 찾기를 **한 번에** — findSch 는 부를 때마다 목록 전체(층2 파싱 포함)를 다시 만든다. 신청이 n건이면 n번이라 지도로 한 번만 만든다 */
 function schResolver() {
@@ -5052,6 +5089,7 @@ function renderApplications() {
     return;
   }
   const resolve = schResolver();
+  if (snapApplications(resolve)) saveState();
   const rows = appOrder(shownAppRows(state.applications, resolve));
   /* 공고를 아직 찾을 수 있는 동안 이름을 적어 둔다 — 나중에 목록에서 내려가도 학생이
      무엇이었는지 알아볼 수 있다. 옛 기록을 살리는 길이 이것 하나뿐이라 여기서 한다
@@ -6282,7 +6320,7 @@ function bindEvents() {
     if (!sb && !wb && !lb) return;
     e.stopPropagation();
     const id = (sb || wb || lb).dataset.markSubmit || (wb || lb).dataset.markWon || lb.dataset.markLost;
-    const sch = findSch(id);
+    const sch = appSch(id);   // 사본으로 보이는 줄의 단추도 동작해야 결과를 적을 수 있다
     if (!sch) return;
     if (sb) recordSubmitted(sch); else recordResult(sch, !!wb);
   });

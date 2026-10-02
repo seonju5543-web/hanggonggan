@@ -4653,20 +4653,26 @@ console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08
      ("내려간 공고는 그냥 없어졌으면 좋겠는데 막 목록에서 내려감 이러네") */
   const shownAppRows = new Function(`${grab('appRows')}\n${grab('shownAppRows')}\nreturn shownAppRows;`)();
   const kept = [{ id: 'a' }, { id: 'gone', result: 'won' }, { id: 'c' }];
-  eq('내려간 공고의 줄은 화면에서 빠진다', shownAppRows(kept, (id) => (id === 'gone' ? null : { id })).map((r) => r.app.id), ['c', 'a']);
+  eq('내려간 공고의 줄은 화면에서 빠진다(결과를 적은 것)', shownAppRows(kept, (id) => (id === 'gone' ? null : { id })).map((r) => r.app.id), ['c', 'a']);
+  /* 2026-10-02 개발자 결정 — "결과를 적을 때까지는 남겨두자": 떠 둔 사본이 있고 결과를 안 적었으면 남는다 */
+  const snapRows = shownAppRows([{ id: 'w', snap: { id: 'w', name: '사본' } }, { id: 'x' }, { id: 'y', snap: { id: 'y' }, result: 'lost' }], () => null);
+  eq('  결과를 적기 전엔 사본으로 남는다 · 사본이 없거나 결과를 적었으면 빠진다', snapRows.map((r) => [r.app.id, r.sch.name]), [['w', '사본']]);
   eq('  기록 자체는 지우지 않는다(공고가 다시 올라오면 선정 기록과 함께 돌아온다)', [kept.length, shownAppRows(kept, (id) => ({ id })).length], [3, 3]);
   eq('  목록·홈 신청내역 칸·전체 선택이 같은 함수를 쓴다(숫자가 서로 다른 말을 하지 않게)',
     (() => { const all = readText(new URL('../app.js', import.meta.url)); return [appsSrc.includes('appOrder(shownAppRows(state.applications, resolve))'),
-      /applications: appsDataState\(\) === 'ok' \? shownAppRows\(state\.applications, schResolver\(\)\)\.length/.test(all), /const ids = shownAppRows\(state\.applications, schResolver\(\)\)\.map\(\(r\) => r\.app\.id\)/.test(all)]; })(), [true, true, true]);
+      /applications: shownAppCount\(\),/.test(all) && /function shownAppCount\(\) \{[\s\S]*?return shownAppRows\(state\.applications, r\)\.length;/.test(all), /const ids = shownAppRows\(state\.applications, schResolver\(\)\)\.map\(\(r\) => r\.app\.id\)/.test(all)]; })(), [true, true, true]);
   eq('  화면에서 빼려고 기기 기록을 지우지 않는다(state.applications 를 거르지 않는다)', /state\.applications\s*=\s*state\.applications\.filter\(/.test(codeOnly(appsSrc)), false);
   /* 코드 리뷰(2026-10-02)가 잡은 세 구멍 — '내려갔다'를 잘못 판정하면 진짜 기록이 말없이 사라진다 */
   const allApp = readText(new URL('../app.js', import.meta.url));
   eq('  공고 목록을 받기 전·못 받았을 때는 내려갔다고 가르지 않는다(모두 사라져 「아직 없어요」가 뜨던 것)',
-    /const dataState = appsDataState\(\);\s*if \(dataState !== 'ok' && state\.applications\.length\)/.test(allApp) && /applications: appsDataState\(\) === 'ok' \? shownAppRows/.test(allApp), true);
+    /const dataState = appsDataState\(\);\s*if \(dataState !== 'ok' && state\.applications\.length\)/.test(allApp) && /function shownAppCount\(\) \{\s*if \(appsDataState\(\) !== 'ok'\) return state\.applications\.length;/.test(allApp), true);
   eq('  한 번 받은 뒤 다시 받기 실패는 \'못 받음\'이 아니다', (allApp.match(/if \(appsData\.(registered|kosaf) !== 'ok'\) appsData\.\1 = 'fail'/g) || []).length >= 4, true);
   eq('  한국장학재단 공고는 신청 내역에 담았으면 마감 뒤에도 남는다(마감 이틀 뒤 제출·발표를 적을 때 사라지던 것)',
     /isSaved\(`kosaf-\$\{i\.code\}`\) \|\| state\.applications\.some\(\(a\) => a\.id === `kosaf-\$\{i\.code\}`\)/.test(allApp), true);
   eq('  휴지통에서 되살려도 안 보이는 기록은 \'신청내역으로 되살렸어요\'라고 하지 않는다', /toast\(findSch\(t\.app\.id\) \? '신청내역으로 되살렸어요' : /.test(allApp), true);
+  eq('  사본은 공고 목록을 다 받았을 때만 뜨고, 바뀌었을 때만 적는다', /function snapApplications\(resolve\) \{\s*if \(appsDataState\(\) !== 'ok'\) return false;/.test(allApp) && /if \(a\.snap && JSON\.stringify\(a\.snap\) === json\) continue;/.test(allApp), true);
+  eq('  상세 시트·패널의 제출/결과 단추가 사본으로도 찾는다(appSch)', /function openDetail\(id\) \{\s*const sch = appSch\(id\);/.test(allApp) && /const sch = appSch\(id\);   \/\/ 사본으로 보이는 줄의 단추도/.test(allApp), true);
+  eq('  내려간 공고에 결과를 적으면 줄이 사라지므로 실행 취소를 준다', /if \(!findSch\(sch\.id\)\) toast\([^\n]*\{ label: '실행 취소', run: \(\) => undoProgress\(sch\.id\) \}\)/.test(allApp), true);
   eq("  '목록에서 내려감' 카드는 없다", /appCardGone|badge-gone/.test(readText(new URL('../app.js', import.meta.url))), false);
   /* 되돌리기는 공고를 요구하면 안 된다 — 요구하면 사라진 공고의 기록이 영영 안 지워진다
      (저장 해제 `toggleSave` 가 2026-09-07 코드 리뷰에서 같은 이유로 고쳐졌다) */
