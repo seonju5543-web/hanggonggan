@@ -25,7 +25,8 @@ const TRANSIENT = /TIMEOUT|ECONNRESET|ECONNREFUSED|EAI_AGAIN|ETIMEDOUT|UND_ERR/i
    교내 소식 로봇은 게시판마다 45초 시한(withDeadline)인데, 시도 셋(20+45+45초)과 쉬는 틈이 그 안에 들지 않아 시한이 끊은 뒤에도
    요청이 뒤에서 계속 돌며 다음 게시판의 시간을 먹었다. 시도마다 남은 시간만큼만 기다리고, 남은 시간에 못 드는 재시도는 하지 않는다. */
 const MIN_TRY_MS = 1500;
-function outOfTime() { const e = new Error('게시판 시한 안에 받을 시간이 남지 않음'); e.name = 'TimeoutError'; return e; }
+/* 시한 때문에 놓은 요청은 boardDeadline 표식을 단다 — 부른 쪽이 '주소가 틀렸다'가 아니라 '멈췄다'로 적게 (리뷰 12차) */
+function outOfTime(cause) { const e = new Error('게시판 시한 안에 받을 시간이 남지 않음'); e.name = 'TimeoutError'; e.boardDeadline = true; if (cause) e.cause = cause; return e; }
 export async function fetchBoard(url, opts = {}) {
   const headers = opts.headers || FETCH_HEADERS;
   const tries = opts.tries ?? 3;
@@ -40,10 +41,10 @@ export async function fetchBoard(url, opts = {}) {
       if (opts.body) init.body = opts.body;
       return await fetch(url, init);
     } catch (e) {
-      lastErr = e;
+      lastErr = opts.deadlineAt && left() < 200 ? outOfTime(e) : e;   // 시한에 잘린 시도
       if (!TRANSIENT.test(netReason(e)) || i === tries - 1) break;   // 주소가 없는 것(ENOTFOUND)은 다시 해도 같다
       const pause = 3000 * (i + 1);
-      if (left() < pause + MIN_TRY_MS) break;   // 쉬고 나면 시도할 시간이 없다
+      if (left() < pause + MIN_TRY_MS) { lastErr = outOfTime(lastErr); break; }   // 쉬고 나면 시도할 시간이 없다 — 시한 탓이다
       await new Promise((r) => setTimeout(r, pause));
     }
   }

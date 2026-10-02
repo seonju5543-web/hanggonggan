@@ -22,6 +22,7 @@ import * as canon from '../collector/canon-url.mjs';
 import { indexTexts, sourceFor, hasText } from '../collector/notice-source.mjs';
 import { attachmentText, readable } from '../collector/attachment-text.mjs';
 import { periodAfterDeadline, amountAfterValue } from './edit-diff.mjs';
+import { newsPostKey } from '../collector/news-board-rules.mjs';   // 소식 숨김 열쇠 한 곳 (수집 로봇의 newsHidden 과 같다)
 
 /* 저장소 뿌리. 데이터 파일은 지금까지처럼 **작업 폴더 기준**으로 읽고 쓰지만(워크플로가
    저장소 안에서 돈다), 아래 '저장된 공고 원문'은 이 파일 기준으로 읽는다 — 검사도 같은 원문을
@@ -902,28 +903,36 @@ switch (action) {
   case 'newsUnhide': {
     const urls = (Array.isArray(payload.urls) ? payload.urls : [payload.url]).map((u) => String(u || '').trim()).filter(Boolean);
     if (!urls.length) fail('대상 글의 주소가 없습니다');
+    /* 글 번호(postIds — urls 와 같은 순서)가 오면 그 글만 고른다 (리뷰 12차: 목록 표식 주소는 같은 제목의 다른 글과 같아, 주소로만 고르면 둘 다 숨었다) */
+    const pids = Array.isArray(payload.postIds) ? payload.postIds.map((x) => String(x || '').trim()) : [];
     const hide = action === 'newsHide';
     const cfg = readJson(NEWS_CFG, { hideUrls: [] });
     cfg.hideUrls = Array.isArray(cfg.hideUrls) ? cfg.hideUrls : [];
-    const keys = new Set(urls.map(canonUrl));
+    cfg.hidePosts = Array.isArray(cfg.hidePosts) ? cfg.hidePosts : [];
+    const targets = urls.map((u, i) => ({ key: canonUrl(u), url: u, postId: pids[i] || '' }));
+    const picks = (it) => targets.some((t) => t.key === canonUrl(it.url) && (!t.postId || String(it.postId || '') === t.postId));
     let n = 0;
     for (const f of newsFiles()) {
       let changed = 0;
       for (const it of f.doc.items) {
-        if (!keys.has(canonUrl(it.url))) continue;
-        if (hide) { it.hidden = true; it.hiddenBy = `관리자 ${kstNow().slice(0, 10)}`; } else { delete it.hidden; delete it.hiddenBy; }
+        if (!picks(it)) continue;
+        if (hide) {
+          it.hidden = true; it.hiddenBy = `관리자 ${kstNow().slice(0, 10)}`;
+          if (it.postId) { if (!cfg.hidePosts.includes(newsPostKey(it))) cfg.hidePosts.push(newsPostKey(it)); }
+          else if (!cfg.hideUrls.some((x) => canonUrl(x) === canonUrl(it.url))) cfg.hideUrls.push(it.url);
+        } else {
+          delete it.hidden; delete it.hiddenBy;
+          if (it.postId) cfg.hidePosts = cfg.hidePosts.filter((k) => k !== newsPostKey(it));
+        }
         changed += 1;
       }
       if (changed) { writeJson(f.path, f.doc); n += changed; }
     }
-    if (hide) {
-      for (const u of urls) if (!cfg.hideUrls.some((x) => canonUrl(x) === canonUrl(u))) cfg.hideUrls.push(u);
-    } else {
-      cfg.hideUrls = cfg.hideUrls.filter((x) => !keys.has(canonUrl(x)));
-    }
+    /* 되살리기는 주소 표식도 걷는다 — 다만 그 주소로 아직 숨겨야 할 다른 글(같은 주소 · 번호 없음)이 남으면 둔다 */
+    if (!hide) cfg.hideUrls = cfg.hideUrls.filter((x) => !targets.some((t) => t.key === canonUrl(x) && !t.postId));
     if (!n && hide) fail('그 주소의 글이 소식 파일에 없습니다');
     writeJson(NEWS_CFG, cfg);
-    detail = `${hide ? '숨김' : '되살림'} ${n}건 (숨긴 주소 ${cfg.hideUrls.length}개)`;
+    detail = `${hide ? '숨김' : '되살림'} ${n}건 (숨긴 주소 ${cfg.hideUrls.length}개 · 숨긴 글 번호 ${cfg.hidePosts.length}개)`;
     touched = true;
     break;
   }

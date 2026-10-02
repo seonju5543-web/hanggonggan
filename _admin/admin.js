@@ -2631,10 +2631,10 @@ function newsItemRowHtml(n) {
       <div class="btn-row">
         <a class="btn btn-sm" href="${esc(n.url)}" target="_blank" rel="noreferrer noopener">원문 ↗</a>
         ${hiddenRow
-          ? `<button class="btn btn-sm" data-news-unhide="${esc(n.url)}">되살리기</button>`
+          ? `<button class="btn btn-sm" data-news-unhide="${esc(n.url)}" data-news-post="${esc(n.postId || '')}">되살리기</button>`
           : `<select data-news-kind-sel="${esc(n.url)}"><option value="">갈래 없음</option>${NEWS_KINDS.map((k) => `<option value="${esc(k)}"${n.kind === k ? ' selected' : ''}>${esc(k)}</option>`).join('')}</select>
              <button class="btn btn-sm" data-news-kind="${esc(n.url)}">바꾸기</button>
-             <button class="btn btn-sm danger" data-news-hide="${esc(n.url)}">숨기기</button>`}
+             <button class="btn btn-sm danger" data-news-hide="${esc(n.url)}" data-news-post="${esc(n.postId || '')}">숨기기</button>`}
       </div>
       <div></div>
     </div>`;
@@ -2659,7 +2659,7 @@ function renderNews() {
     <div class="cards">
       <div class="card ${known.length ? 'is-ok' : 'is-warn'}" data-stat><div class="v">${known.length}<span class="muted">/${src.length}</span></div><div class="k">게시판 아는 학교</div><div class="d">색인 기준일 ${esc(D.newsIndex.updatedAt || '아직 수집 전')} · 파일 있는 학교 ${schoolsWithFile.length}</div></div>
       <div class="card ${missing.length ? 'is-warn' : 'is-ok'}" data-stat><div class="v">${missing.length}</div><div class="k">출처 요청 필요</div><div class="d">로봇이 후보·홈 메뉴를 다 열어 봤지만 못 찾은 학교${pending.length ? ` · 아직 안 본 학교 ${pending.length}` : ''}</div></div>
-      <div class="card" data-stat><div class="v">${(D.newsCfg.hideUrls || []).length}</div><div class="k">숨긴 글</div><div class="d">파일에는 남고 앱에는 안 보입니다 · 보관한 출처 ${parked.length}곳</div></div>
+      <div class="card" data-stat><div class="v">${(D.newsCfg.hideUrls || []).length + (D.newsCfg.hidePosts || []).length}</div><div class="k">숨긴 글</div><div class="d">파일에는 남고 앱에는 안 보입니다 · 보관한 출처 ${parked.length}곳</div></div>
     </div>
 
     <div class="sec-head"><h2>글 보기·바로잡기</h2><p>학교를 골라 그 학교 파일만 받습니다. 갈래(학사·행사·채용·생활)는 로봇이 제목만 보고 붙인 꼬리표라 틀리면 바꿉니다.</p></div>
@@ -2732,13 +2732,14 @@ async function handleNewsClick(e) {
   }
   if ((el = q('data-news-hide'))) {
     const url = el.dataset.newsHide;
+    const pid = el.dataset.newsPost || '';
     askSheet({ title: '이 글을 앱에서 숨깁니다', note: '지우지 않습니다 — 표식만 붙어 「숨긴 글」에서 되살릴 수 있습니다. 로봇이 다시 발행해도 숨김이 유지됩니다.',
       lines: [{ t: titleOf(url), m: url }], goLabel: '숨기기', danger: true,
-      run: () => applyAction('newsHide', { urls: [url] }, '숨기기') });
+      run: () => applyAction('newsHide', { urls: [url], postIds: [pid] }, '숨기기') });   // 글 번호 — 같은 제목의 다른 글은 숨기지 않게 (리뷰 12차)
     return true;
   }
   if ((el = q('data-news-unhide'))) {
-    await applyAction('newsUnhide', { urls: [el.dataset.newsUnhide] }, '되살리기');
+    await applyAction('newsUnhide', { urls: [el.dataset.newsUnhide], postIds: [el.dataset.newsPost || ''] }, '되살리기');
     return true;
   }
   if ((el = q('data-news-src-park'))) {

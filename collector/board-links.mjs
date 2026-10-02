@@ -85,11 +85,25 @@ const inScript = (seg) => /<script\b(?:(?!<\/script>)[\s\S])*$/i.test(seg) || /<
    링크가 줄 전체를 감싸 밖에 날짜가 없으면(동국 WISE) 줄의 **마지막** 날짜가 게시일이다(제목 → 날짜 → 작성자 순).
    오늘보다 뒤인 날짜는 게시일이 아니다(지어내지 않는다 — 비운다). */
 const stripAnchors = (html) => String(html || '').replace(/<a\b[\s\S]*?<\/a>/gi, ' ');
-/* 기간(「신청기간 2026.07.01 ~ 2026.12.31」)은 게시일이 아니다 — 지우고 본다 (재검증 2026-10-02: 기간 시작일이 게시일이 되어 최근 글이 60일 상한에 빠졌다).
-   물결표는 늘 기간이고, 줄표(-·–)는 앞뒤가 띄어졌을 때만 기간이다(2026-09-01 의 '-' 는 날짜 안의 글자). */
-const DATE_SRC = '20\\d{2}\\s*[.\\-/년]\\s*\\d{1,2}\\s*[.\\-/월]\\s*\\d{1,2}(?!\\d)|(?<![\\d-])\\d{2}[.\\-]\\d{2}[.\\-]\\d{2}(?![\\d-])';   // DATE_G 와 같은 꼴 (두 번 넣으려고 되짚기 없이)
-const RANGE_RE = new RegExp(`(?:${DATE_SRC})\\.?\\s*(?:[~∼～]|\\s[-–]\\s)\\s*(?:(?:${DATE_SRC})|\\d{1,2}\\s*[./-]\\s*\\d{1,2}(?!\\d))\\.?`, 'g');
-const dropRanges = (text) => String(text || '').replace(/<[^>]+>/g, ' ').replace(RANGE_RE, ' ');
+/* 기간(「신청기간 2026.07.01 ~ 2026.12.31」)의 날짜는 게시일이 아니다 (재검증 2026-10-02: 기간 시작일이 게시일이 되어 최근 글이 60일 상한에 빠졌다).
+   기간인지는 날짜 **토막마다** 앞뒤를 본다 — 뒤에 (요일)·시각이 붙고 물결표·줄표가 오거나, 앞에 물결표·줄표가 있으면 기간의 한쪽이다.
+   「2026.09.01.(월) ~ 2026.09.30.(화)」 · 「2026-09-01 09:00 ~ …」 · 「2026년 9월 1일 ~ 9월 30일」 · 「&nbsp;~&nbsp;」 · 「2026.09.01-2026.09.30」 (리뷰 12차: 한 덩어리 정규식은 이 꼴들을 놓쳤다).
+   날짜 안의 줄표(2026-09-01)는 토막 안이라 해당하지 않는다. */
+const plainText = (html) => String(html || '').replace(/<[^>]+>/g, ' ')
+  .replace(/&nbsp;|&#160;|&#xa0;/gi, ' ').replace(/&#126;|&#x7e;|&tilde;|&sim;|&#8764;|&#x223c;/gi, '~').replace(/&ndash;|&#8211;|&#x2013;/gi, '–');
+const RANGE_AFTER = /^\.?\s*일?\.?\s*(?:\(\s*[월화수목금토일]\s*\)\.?)?\s*(?:\d{1,2}\s*:\s*\d{2}(?:\s*:\s*\d{2})?)?\s*(?:[~∼～〜]|[-–](?=\s*(?:20\d{2}|\d{1,2}\s*[./월])))/;
+const RANGE_BEFORE = /(?:[~∼～〜]|(?:^|[\s\d.)일])[-–])\s*$/;
+const isRangePart = (before, after) => RANGE_AFTER.test(after) || RANGE_BEFORE.test(before);
+/* 글자에서 기간의 날짜 토막을 지운다 (나머지 날짜는 그대로) */
+function dropRanges(html) {
+  const t = plainText(html); const re = new RegExp(DATE_G.source, 'g');
+  let out = ''; let at = 0; let m;
+  while ((m = re.exec(t)) !== null) {
+    const end = m.index + m[0].length;
+    if (isRangePart(t.slice(Math.max(0, m.index - 40), m.index), t.slice(end, end + 40))) { out += t.slice(at, m.index) + ' '; at = end; }
+  }
+  return out + t.slice(at);
+}
 /* 줄 안의 <a> 가운데 **첨부 파일 링크가 아닌 것** (재검증 2026-10-02: 「붙임_2026.07.01_계획.hwp」 의 날짜가 게시일이 되었다) */
 function nonFileAnchors(html) {
   const out = []; const re = /<a\b([^>]*)>([\s\S]*?)<\/a>/gi; let m;
@@ -106,12 +120,14 @@ function lastRowDate(text) {
   while ((m = re.exec(src)) !== null) last = m[0];
   return last ? rowDate(last) : null;
 }
-/* 링크 밖의 날짜 (기간 뺌) — 이것이 있으면 링크는 제목만 감쌌다 */
-const outsideDate = (rowHtml) => rowDate(dropRanges(stripAnchors(rowHtml)));
 const todayKst = () => new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
 export function rowPostedAt(rowHtml) {
-  /* 링크 밖 날짜가 없으면 링크가 줄을 감쌌다 — 그 링크(첨부 링크 말고) 안의 마지막 날짜가 게시일이다. 옆 첨부 링크의 파일 이름 날짜는 보지 않는다. */
-  const d = outsideDate(rowHtml) || nonFileAnchors(rowHtml).map(lastRowDate).filter(Boolean).pop() || null;
+  const outside = stripAnchors(rowHtml);
+  /* 링크 밖에 날짜가 (기간이라도) 있으면 링크는 제목만 감쌌다 — 밖의 기간 아닌 날짜만 게시일이다. 밖에 기간뿐이면 **비운다**
+     (리뷰 12차: 그때 링크 안 날짜로 물러나면 제목 안 행사 날짜 「수여식 2026.09.10」 이 게시일이 되고 제목이 잘렸다). */
+  if (rowDate(plainText(outside))) { const d = rowDate(dropRanges(outside)); return d && d <= todayKst() ? d : null; }
+  /* 밖에 날짜가 없으면 링크가 줄을 감쌌다 — 그 링크(첨부 링크 말고) 안의 마지막 날짜가 게시일이다. 옆 첨부 링크의 파일 이름 날짜는 보지 않는다. */
+  const d = nonFileAnchors(rowHtml).map(lastRowDate).filter(Boolean).pop() || null;
   return d && d <= todayKst() ? d : null;
 }
 /* 클릭형 <a> 가 줄 전체(제목·게시일·작성자·조회수)를 감쌀 때만(동국 WISE 7차 실측 「… 안내 2026.09.17. 임준택」) 제목 뒤 꼬리를 뗀다.
@@ -150,7 +166,7 @@ function resolvedLinks(seg, resolve, row = {}) {
   return out;
 }
 const rowLinks = (seg, base, postedAt, resolve) => {
-  const wraps = !outsideDate(seg);   // 날짜(기간 말고)가 링크 안에만 있다 = 링크가 줄 전체를 감쌌다
+  const wraps = !rowDate(plainText(stripAnchors(seg)));   // 날짜(기간 포함)가 링크 안에만 있다 = 링크가 줄 전체를 감쌌다
   return extractLinks(seg, base).concat(resolve ? resolvedLinks(seg, resolve, { wraps, postedAt }) : []).filter((l) => l.title.length >= 4 && !isAttachmentEntry(l)).map((l) => ({ ...l, postedAt, shape: urlShape(l.url) })).filter((l) => l.shape);
 };
 /* 두 눈을 합친다 (5차 실행 실측 · 2026-10-01): ① 블록 눈(<tr>·<li>·<dl>·<dd>·<article> 안에 날짜) — 표 게시판에 강하다(서울대·연세·국민·인하·방송대…)
@@ -175,8 +191,10 @@ export function extractDatedRows(html, base, opts = {}) {
     const seg = src.slice(Math.max(prev, m.index - SEG_MAX), m.index);
     prev = DATE_G.lastIndex;
     if (!tokenDate || inScript(seg)) continue;
-    if (/^\.?\s*(?:[~∼～]|\s[-–]\s)/.test(src.slice(DATE_G.lastIndex, DATE_G.lastIndex + 4)) || /(?:[~∼～]|\s[-–]\s)\s*$/.test(src.slice(Math.max(0, m.index - 4), m.index))) continue;   // 기간의 날짜는 게시일이 아니다
-    const postedAt = tokenDate <= todayKst() ? tokenDate : null;   // 토막 눈의 날짜는 링크 뒤(밖)의 날짜다 — 앞날만 비운다
+    /* 기간의 날짜는 게시일이 아니다 — 그래도 토막의 링크는 글 줄로 센다(게시일은 비움). 건너뛰면 [제목][기간][게시일]·[게시일][제목][기간] 줄이
+       통째로 사라졌다(리뷰 12차: div 목록 게시판 0행). 같은 글을 다른 토막이 게시일과 함께 보면 그 날짜를 쓴다(아래 out). */
+    const ranged = isRangePart(plainText(src.slice(Math.max(0, m.index - 200), m.index)), plainText(src.slice(DATE_G.lastIndex, DATE_G.lastIndex + 200)));
+    const postedAt = !ranged && tokenDate <= todayKst() ? tokenDate : null;   // 토막 눈의 날짜는 링크 뒤(밖)의 날짜다 — 앞날·기간은 비운다
     const links = rowLinks(seg, base, postedAt, resolve);
     if (links.length) groups.push({ links, pick: 'last' });   // 토막에선 날짜에 가장 가까운 링크가 제 줄의 제목
   }
@@ -187,13 +205,20 @@ export function extractDatedRows(html, base, opts = {}) {
   /* 글 하나의 열쇠는 **글 번호가 있으면 글 번호**다 (재검증 2026-10-02) — 목록 표식(#n-제목) 주소는 제목에서 만들어서,
      같은 제목의 새 글(「휴강 안내」를 해마다 다시 올림)이 주소 열쇠로는 옛 글과 하나로 합쳐져 사라졌다. */
   const keyOf = (l) => (l.postId ? `p|${l.postId}` : `u|${l.url}`);
+  /* 같은 링크를 두 눈이 다르게 볼 수 있다 — href 로 읽은 것(번호 없음)과 규칙으로 푼 것(번호 있음). 주소가 같고 그 주소의 번호가 하나뿐이면
+     번호를 나눠 준다(리뷰 12차: 아니면 한 글이 'u|주소'·'p|번호' 두 열쇠로 두 번 나왔다). 번호가 둘인 주소(같은 제목의 목록 표식)는 건드리지 않는다. */
+  const idsOfUrl = new Map();
+  for (const g of groups) for (const l of g.links) if (l.postId) idsOfUrl.set(l.url, (idsOfUrl.get(l.url) || new Set()).add(l.postId));
+  for (const g of groups) for (const l of g.links) if (!l.postId && idsOfUrl.has(l.url) && idsOfUrl.get(l.url).size === 1) l.postId = [...idsOfUrl.get(l.url)][0];
   const out = new Map();
   for (const g of groups) {
     const same = g.links.filter((l) => l.shape === top[0]);
     if (!same.length) continue;
     const anchor = g.pick === 'last' ? same[same.length - 1] : same.slice().sort((a, c) => c.title.length - a.title.length)[0];
     const best = same.filter((l) => keyOf(l) === keyOf(anchor)).sort((a, c) => c.title.length - a.title.length)[0];
-    if (!out.has(keyOf(best))) out.set(keyOf(best), { title: best.title, url: best.url, postedAt: best.postedAt || undefined, ...(best.postId ? { postId: best.postId } : {}) });
+    const had = out.get(keyOf(best));
+    if (!had) out.set(keyOf(best), { title: best.title, url: best.url, postedAt: best.postedAt || undefined, ...(best.postId ? { postId: best.postId } : {}) });
+    else if (!had.postedAt && best.postedAt) had.postedAt = best.postedAt;   // 기간 토막이 먼저 본 글에 게시일 토막의 날짜를 채운다
   }
   return [...out.values()];
 }

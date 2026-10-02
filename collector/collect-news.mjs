@@ -14,12 +14,11 @@
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { sameSite } from './board-links.mjs';
-import { NEWS_BOARD_RULES, rowsForBoard, verifyRuleDetail, needsDetailCheck, fetchesOwnList, collapseSamePost } from './news-board-rules.mjs';   // 클릭형 게시판 규칙 한 곳 (찾기 로봇과 같은 것)
+import { NEWS_BOARD_RULES, rowsForBoard, verifyRuleDetail, needsDetailCheck, fetchesOwnList, collapseSamePost, newsHidden, newsDistinct } from './news-board-rules.mjs';   // 클릭형 게시판 규칙 한 곳 (찾기 로봇과 같은 것)
 import { urlKey, dedupeNotices } from './url-key.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { activityKind } from './activity-kind.mjs';
 import { newsKind, isNewsRow } from './news-kind.mjs';
-import { canonUrl } from './canon-url.mjs';
 import { fetchBoard, netReason } from './fetch-board.mjs';
 import { publishBySchool, dropUnserved } from './publish-notices.mjs';
 import { makeBudget, rotateOrder, nextCursor, withDeadline, TIMED_OUT } from './harvest-budget.mjs';
@@ -55,9 +54,11 @@ try { seen = JSON.parse(fs.readFileSync(seenPath, 'utf8')); } catch { /* 첫 실
 const healthPath = new URL('news-health.json', HERE);
 let health = {};
 try { health = JSON.parse(fs.readFileSync(healthPath, 'utf8')); } catch { /* 첫 실행 */ }
-/* 관리자가 숨긴 글 (news-config.json hideUrls) — 지우지 않고 hidden 표식을 붙인다(되살리기가 된다 · 활동 탭과 같은 규칙) */
-let hideSet = new Set();
-try { hideSet = new Set((JSON.parse(fs.readFileSync(new URL('news-config.json', HERE), 'utf8')).hideUrls || []).map(canonUrl)); } catch { /* 설정 없음 */ }
+/* 관리자가 숨긴 글 (news-config.json) — 지우지 않고 hidden 표식을 붙인다(되살리기가 된다 · 활동 탭과 같은 규칙).
+   글 번호가 있는 글은 **학교|글 번호**(hidePosts)로 숨긴다 — 목록 표식 주소는 같은 제목의 다른 글과 같아서, 주소로 숨기면 내년의 같은 제목 글까지 숨었다(리뷰 12차).
+   주소(hideUrls)는 글 번호 없는 글과 진짜 상세 주소에만 쓴다. 판정은 news-board-rules.mjs newsHidden 한 곳(관리자 저장 경로와 같은 것). */
+let hideCfg = {};
+try { hideCfg = JSON.parse(fs.readFileSync(new URL('news-config.json', HERE), 'utf8')); } catch { /* 설정 없음 */ }
 
 /* 지금 실려 있는 글 — 통짜 파일이 없다. 학교별 파일 전부를 읽어 합친다(발행도 그 폴더에 다시 쓴다). */
 const NEWS_DIR = new URL('../data/news/', HERE);
@@ -124,18 +125,23 @@ async function harvestBoard(s, ctx = { dead: false }) {
        🔴 한 주소에 글 번호가 **하나뿐일 때만** 옮긴다 — 같은 제목의 글 둘(목록 표식 주소가 같다)이면 옛 장부가 어느 글 것인지 모른다(재검증 2026-10-02). */
     const idsByUrl = new Map();
     for (const i of items) if (i.postId) idsByUrl.set(urlKey(i.url), (idsByUrl.get(urlKey(i.url)) || new Set()).add(i.postId));
+    /* 🔴 목록 표식(#n-제목) 주소의 장부는 **옮기지 않는다** (리뷰 12차) — 제목에서 만든 주소라 글을 가리키지 않는다. 옛 글이 목록에서 내려간 뒤
+       같은 제목의 새 글이 오면 옛 글의 장부가 새 글 번호로 옮겨져 새 글이 영영 안 실렸다. 10차 전 목록 표식 장부는 11차 두 실행이 이미 옮겼다
+       (seen-news.json 의 post:경희대학교 줄). 글 주소가 진짜 상세 주소인 학교는 주소가 곧 그 글이라 옮겨도 안전하다. */
+    const isMarker = (i) => /#n-/.test(String(i.url || ''));
     for (const i of items) {
-      if (!i.postId || idsByUrl.get(urlKey(i.url)).size !== 1) continue;
+      if (!i.postId || isMarker(i) || idsByUrl.get(urlKey(i.url)).size !== 1) continue;
       postIdByUrl.set(urlKey(i.url), i.postId);
       if (seen[urlKey(i.url)] && !seen[postKey(i)]) seen[postKey(i)] = seen[urlKey(i.url)];
     }
-    /* 글 번호가 있는 글은 **글 번호로만** 새 글인지 가린다 — 주소로 보면 같은 제목의 새 글이 옛 글로 여겨져 영영 안 실린다(재검증 2026-10-02) */
-    const fresh = items.filter((i) => (i.postId ? !seen[postKey(i)] : !seen[urlKey(i.url)])).slice(0, NEWS_FRESH_MAX);
+    /* 글 번호가 있는 글은 글 번호로 새 글인지 가린다 — 목록 표식 주소로 보면 같은 제목의 새 글이 옛 글로 여겨져 영영 안 실린다(재검증 2026-10-02).
+       진짜 상세 주소는 그 글 하나를 가리키므로 주소 장부도 같이 본다(옮기기 전에 목록에서 내려간 옛 글이 다시 오는 경우). */
+    const fresh = items.filter((i) => (i.postId ? !seen[postKey(i)] && (isMarker(i) || !seen[urlKey(i.url)]) : !seen[urlKey(i.url)])).slice(0, NEWS_FRESH_MAX);
     /* 🔴 규칙으로 만든 상세 주소는 매번 첫 글 하나를 실제로 열어 제목을 확인한다 — 안 맞으면 이 게시판은 싣지 않는다(틀린 링크보다 0건). */
     if (needsDetailCheck(rule) && fresh.length) {
       const v = await verifyRuleDetail(fresh[0], { rule, boardUrl: s.boardUrl, others: items.map((i) => i.title), fetch: fb });
       if (ctx.dead) return;
-      if (!v.ok) { results.push({ name, status: `⚠️ 클릭형 규칙(news-board-rules.mjs)의 상세 주소 확인 실패 — ${v.reason} · 이 게시판은 싣지 않음`, items: [] }); return; }
+      if (!v.ok) { results.push({ name, status: Date.now() >= ctx.deadlineAt - 200 ? timedOutStatus() : `⚠️ 클릭형 규칙(news-board-rules.mjs)의 상세 주소 확인 실패 — ${v.reason} · 이 게시판은 싣지 않음`, items: [] }); return; }
     }
     for (const it of fresh) {
       if (ctx.dead) return;
@@ -163,12 +169,15 @@ async function harvestBoard(s, ctx = { dead: false }) {
     });
   } catch (e) {
     if (ctx.dead) return;
+    /* 게시판 시한에 걸려 놓은 요청은 주소·규칙 탓이 아니다 — '멈춤' 으로 적는다 (리뷰 12차: 시한을 요청에 넘기자 '주소 확인 필요' 로 잘못 적혔다) */
+    if ((e && e.boardDeadline) || Date.now() >= ctx.deadlineAt - 200) { results.push({ name, status: timedOutStatus(), items: [] }); return; }
     const rule = NEWS_BOARD_RULES[s.school];   // API 규칙의 실패는 주소가 아니라 규칙의 문제다 (리뷰 2026-10-01 · 원인을 단정하지 않는다)
     results.push({ name, status: fetchesOwnList(rule) ? `⚠️ 규칙의 API 오류 (${netReason(e)}) — news-board-rules.mjs 의 api·body 확인` : `⚠️ 오류 (${netReason(e)}) — 주소 확인 필요`, items: [] });
   }
 }
 
 const humanMs = (ms) => { const sec = Math.round(ms / 1000); return sec < 60 ? `${sec}초` : `${Math.floor(sec / 60)}분${sec % 60 ? ` ${sec % 60}초` : ''}`; };
+const timedOutStatus = () => `⛔ 응답이 멈춰 ${humanMs(BOARD_HARD_MS)}에서 강제 중단 — 여기까지 주운 글만 저장합니다`;
 const order = rotateOrder(boards.length, cursor.next || 0);
 let doneCount = 0;
 const skippedByBudget = [];
@@ -186,7 +195,7 @@ for (const idx of order) {
   const r = await withDeadline(harvestBoard(s, ctx), BOARD_HARD_MS);
   if (r === TIMED_OUT) {
     ctx.dead = true;
-    results.push({ name, status: `⛔ 응답이 멈춰 ${humanMs(BOARD_HARD_MS)}에서 강제 중단 — 여기까지 주운 글만 저장합니다`, items: [] });
+    results.push({ name, status: timedOutStatus(), items: [] });
   }
   console.log(`[${Math.round(budget.elapsed() / 1000)}s] ◀ ${name} (${Math.round((Date.now() - t0) / 1000)}초)`);
   doneCount++;
@@ -206,9 +215,9 @@ all = all.filter((n) => !n.postedAt || n.postedAt >= postedCutoff());   // 소�
 all = all.filter((n) => isNewsRow(n, { scholarship: KEYWORDS, activityKind, isAttachmentEntry }));
 for (const n of all) if (!n.postId && postIdByUrl.has(urlKey(n.url))) n.postId = postIdByUrl.get(urlKey(n.url));   // 실려 있던 글에 이번에 본 글 번호를 단다
 all = collapseSamePost(all);   // 같은 글이 제목 다듬기 차이로 두 번 실린 것을 합친다 (글 번호 · 목록 표식 제목의 분류 꼬리표 · 소급)
-all = dedupeNotices(all, { distinct: (a, b) => !!(a.postId && b.postId && a.postId !== b.postId) });   // 글 번호가 다르면 같은 주소(목록 표식)라도 다른 글
+all = dedupeNotices(all, { distinct: newsDistinct });   // 글 번호가 다르면 같은 주소(목록 표식)라도 다른 글
 all = dropUnserved(all);
-for (const n of all) { if (hideSet.has(canonUrl(n.url))) { n.hidden = true; } else if (n.hidden && !n.hiddenBy) { delete n.hidden; } }
+for (const n of all) { if (newsHidden(n, hideCfg)) { n.hidden = true; } else if (n.hidden && !n.hiddenBy) { delete n.hidden; } }
 all.sort((a, b) => String(b.foundAt || '').localeCompare(String(a.foundAt || '')));
 const pub = publishBySchool(all, {
   dir: NEWS_DIR, perSchool: NEWS_PER_SCHOOL,

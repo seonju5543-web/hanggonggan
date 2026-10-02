@@ -242,7 +242,9 @@ async function findBoard(spec, out) {
         if (href && !href.startsWith('javascript') && !href.startsWith('#')) return el.href;
         el.click();
         return 'clicked';
-      }, step), 8000, null);
+      }, step).catch(() => 'clicked'), 8000, '__timeout__');   // 눌러서 화면이 바뀌면 evaluate 가 거절된다 — 그건 이동이 일어난 것(아래 줄이 실제 주소를 적는다)
+      /* 시한에 걸린 것은 '못 찾음'이 아니다 (리뷰 12차) — 화면이 바빠 답을 못 받은 것이고, 뒤늦게 눌려 화면이 바뀔 수 있어 여기서 멈춘다 */
+      if (moved === '__timeout__') { out.push(`- ⏳ '${step}' 메뉴 찾기가 8초 안에 끝나지 않음(화면이 바쁨) — 못 찾은 것과 다름 · 여기서 멈춤 (현재: ${page.url()})`); break; }
       if (!moved) { out.push(`- ⚠️ '${step}' 메뉴를 못 찾음 — 여기서 멈춤 (현재: ${page.url()})`); break; }
       if (moved !== 'clicked') await page.goto(moved, { waitUntil: 'domcontentloaded', timeout: 25000 }).catch(() => {});
       await page.waitForTimeout(3000);

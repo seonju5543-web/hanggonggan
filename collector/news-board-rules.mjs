@@ -25,6 +25,7 @@
    ============================================================ */
 import { extractDatedRows } from './board-links.mjs';
 import { fetchBoard } from './fetch-board.mjs';
+import { canonUrl } from './canon-url.mjs';
 
 /* 동국대 두 캠퍼스: 목록 주소 …/article/<게시판>/list → 상세 …/article/<게시판>/detail/<번호>.
    근거: 찾기 로봇(2026-10-01)이 사이트 안 링크를 따라 /article/GENERALNOTICES/detail/26766449 · wise …/generalnotice/detail/520707 을
@@ -341,4 +342,17 @@ export function collapseSamePost(items) {
     drop.add(i);
   });
   return out.filter((_, i) => !drop.has(i));
+}
+
+/* 관리자가 숨긴 소식인가 — 수집 로봇(발행)과 관리자 저장 경로(tools/admin-apply.mjs)가 같이 쓴다 (리뷰 12차).
+   글 번호가 있으면 **학교|글 번호**(cfg.hidePosts)로 본다. 목록 표식(#n-제목) 주소는 같은 제목의 다른 글과 같아 주소로는 가리지 않는다
+   (주소로 숨기면 내년에 다시 올라온 같은 제목의 글까지 숨었다). 그 밖은 주소(cfg.hideUrls). */
+export const newsPostKey = (n) => `${n.school}|${n.postId}`;
+/* 열쇠(주소·제목)가 같아도 다른 글인가 — 글 번호가 둘 다 있고 다르면 다른 글 (dedupeNotices 의 distinct · 발행과 git 병합기가 같이 쓴다) */
+export const newsDistinct = (a, b) => !!(a.postId && b.postId && a.postId !== b.postId);
+export function newsHidden(n, cfg = {}) {
+  if (n.postId && (cfg.hidePosts || []).includes(newsPostKey(n))) return true;
+  if (n.postId && /#n-/.test(String(n.url || ''))) return false;
+  const u = canonUrl(n.url);
+  return (cfg.hideUrls || []).some((x) => canonUrl(x) === u);
 }

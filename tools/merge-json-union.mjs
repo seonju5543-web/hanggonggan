@@ -41,6 +41,7 @@ import { PER_SCHOOL } from '../collector/publish-notices.mjs';
 /* 검수 후보 장부는 수집기와 같은 합치기 규칙을 쓴다(베끼면 갈라진다 — 60일·주소 열쇠·preferNotice) */
 import { mergeCandidates } from '../collector/candidates.mjs';
 import { urlKey } from '../collector/url-key.mjs';
+import { newsDistinct } from '../collector/news-board-rules.mjs';   // 소식 '다른 글' 잣대 한 곳 (발행과 같다)
 
 const [, , oursBase, oursPath, theirsPath, filePath = ''] = process.argv;
 
@@ -76,11 +77,11 @@ function mergeNotices(ours, theirs) {
    뒤 exit 1 — 사냥 결과가 통째로 날아가는 그 경로다(이슈 #85·#86과 같은 계열).
    ⚠️ 상한은 **전체 200이 아니라 학교당 PER_SCHOOL** 이다. 200을 쓰면 학교별로 나눈 뜻이
    사라진다 — 그래서 publish-notices.mjs 의 값을 가져다 쓴다(베끼면 갈라진다). */
-function mergeSchoolNotices(ours, theirs) {
+function mergeSchoolNotices(ours, theirs, opts = {}) {
   const a = Array.isArray(ours?.items) ? ours.items : [];
   const b = Array.isArray(theirs?.items) ? theirs.items : [];
   const all = a.concat(b).sort((x, y) => String(y.foundAt || '').localeCompare(String(x.foundAt || '')));
-  let items = dedupeNotices(all);
+  let items = dedupeNotices(all, opts);
   if (items.length > PER_SCHOOL) items = items.slice(0, PER_SCHOOL);
   const updatedAt = [ours?.updatedAt, theirs?.updatedAt].filter(Boolean).sort().pop();
   return { ...(ours || {}), ...(theirs || {}), updatedAt, items };
@@ -201,7 +202,9 @@ const RULES = [
      새로 쓰이므로 .gitattributes 에서 merge=ours 로 뺐다(합칠 내용이 없다). */
   { match: /(^|\/)data\/notices\/[^/]+\.json$/, merge: mergeSchoolNotices },
   /* 교내 소식 (2026-09-30) — 학교별 파일·장부·건강 장부는 공고와 같은 모양이라 같은 병합기를 쓴다 */
-  { match: /(^|\/)data\/news\/[^/]+\.json$/, merge: mergeSchoolNotices },
+  /* 글 번호가 다르면 같은 주소(목록 표식 #n-제목)라도 다른 글이다 — 수집 로봇의 발행(collect-news.mjs)과 같은 잣대 (리뷰 12차: 병합이 같은 제목의 옛 글을 지우면
+     장부에 이미 본 글이라 영영 돌아오지 않았다) */
+  { match: /(^|\/)data\/news\/[^/]+\.json$/, merge: (o, t) => mergeSchoolNotices(o, t, { distinct: newsDistinct }) },
   { match: /(^|\/)seen-news\.json$/, merge: mergeSeen },
   { match: /(^|\/)news-health\.json$/, merge: mergeHealth },
   { match: /(^|\/)notices\.json$/, merge: mergeNotices },
