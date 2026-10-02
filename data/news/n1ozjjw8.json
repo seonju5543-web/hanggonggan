@@ -67,7 +67,8 @@
    "kind": "행사",
    "school": "상명대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "thumb": "data/news/img/a9de78ba920b2284.webp"
   },
   {
    "title": "상명대, 천안시에 ‘AI 기반 친환경 식품 포장재 푸드테크 연구지원센터’ 제안",
@@ -84,7 +85,8 @@
    "kind": "행사",
    "school": "상명대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "thumb": "data/news/img/dff8857d25bf8c2a.webp"
   }
  ]
 }

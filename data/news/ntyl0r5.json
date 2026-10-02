@@ -78,8 +78,7 @@
    "postedAt": "2026-09-30",
    "school": "명지대학교",
    "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/9c960f2821db5a81.webp"
+   "foundAt": "2026-10-01"
   },
   {
    "title": "[한국어교육센터] 인문(서울)캠퍼스 한국어강사 모집 공고",
@@ -142,7 +141,8 @@
    "kind": "행사",
    "school": "명지대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "thumb": "data/news/img/7a1a04bbda3dcee6.webp"
   },
   {
    "title": "[사회과학대학 교학팀] 계약직(인턴사무원)채용 공고",

@@ -26,7 +26,8 @@
    "kind": "채용",
    "school": "조선대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "thumb": "data/news/img/f64835415c525201.webp"
   },
   {
    "title": "[G-LAMP사업단] 2026 LAMP 전임교원 선발공고",
@@ -115,7 +116,8 @@
    "postedAt": "2026-09-30",
    "school": "조선대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "thumb": "data/news/img/a20132f0f7d8b565.webp"
   },
   {
    "title": "대학생이 반드시 지켜야 할 저작권 상식",
@@ -123,7 +125,8 @@
    "postedAt": "2026-09-30",
    "school": "조선대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "thumb": "data/news/img/7f39e7710c2313ce.webp"
   },
   {
    "title": "[취업전략팀] 전주페이퍼 2026 하반기 대졸 신입사원 채용설명회",
@@ -132,7 +135,8 @@
    "kind": "행사",
    "school": "조선대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "thumb": "data/news/img/369701f62afa9e19.webp"
   }
  ]
 }

@@ -51,7 +51,8 @@
    "postedAt": "2026-09-28",
    "school": "부산대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "thumb": "data/news/img/b85343472358506c.webp"
   },
   {
    "title": "[도서관] 딱1~2분! 2026 대학도서관 이용자 만족도 조사(~10/6)",
@@ -60,7 +61,8 @@
    "kind": "생활",
    "school": "부산대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "thumb": "data/news/img/49f81a1ac757d2d1.webp"
   },
   {
    "title": "고등교육 규제특례 신청 관련 의견수렴 안내",
@@ -111,7 +113,8 @@
    "kind": "행사",
    "school": "부산대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "thumb": "data/news/img/bc98833a7091d2d4.webp"
   }
  ]
 }
