@@ -15,4 +15,4 @@
 # 데이터 관문(node verify/audit-data.js)을 통과하지 못하면 배포하지 않고 🚨 이슈를 남긴다.
 
 branch: claude/sweet-brown-td5a5o
-메모: 2026-10-03 — 교내 소식 썸네일 v2: 제목 확인·문서 그림 제외·QR 88% (여전히 thumbs: dry)
+메모: 2026-10-03 — 교내 소식 사진 썸네일 켜기 (thumbs: on · 실제 사진 68장 확인 뒤)
