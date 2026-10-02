@@ -6184,11 +6184,19 @@
   },
   "r:auto-7986subviewdonttid125413": {
    "patrolledAt": "2026-10-02",
-   "lastWhy": "제목 불일치(다른 글이 열림)"
+   "lastWhy": "목록에서 못 찾음",
+   "lastTried": "2026-10-02",
+   "attempts": 1,
+   "nextTryAt": "2026-10-03",
+   "status": ""
   },
   "r:auto-onttid000100000000003856": {
    "patrolledAt": "2026-10-02",
-   "lastWhy": "제목 불일치(다른 글이 열림)"
+   "lastWhy": "제목 불일치(다른 글이 열림)",
+   "lastTried": "2026-10-02",
+   "attempts": 1,
+   "nextTryAt": "2026-10-03",
+   "status": ""
   },
   "r:auto-srchenable1srchvotetype1": {
    "patrolledAt": "2026-10-02",
@@ -6199,6 +6207,86 @@
    "lastWhy": ""
   },
   "r:auto-orykeywordpaged1slug2026": {
+   "patrolledAt": "2026-10-02",
+   "lastWhy": ""
+  },
+  "n:https://www.sogang.ac.kr/ko/detail/551451?bbsConfigFk=141&namepage=ScholarshipNotice": {
+   "patrolledAt": "2026-10-02",
+   "lastWhy": ""
+  },
+  "n:https://www.sogang.ac.kr/ko/detail/551379?bbsConfigFk=141&namepage=ScholarshipNotice": {
+   "patrolledAt": "2026-10-02",
+   "lastWhy": ""
+  },
+  "n:https://www.sogang.ac.kr/ko/detail/551306?bbsConfigFk=141&namepage=ScholarshipNotice": {
+   "patrolledAt": "2026-10-02",
+   "lastWhy": ""
+  },
+  "n:https://www.sogang.ac.kr/ko/detail/551305?bbsConfigFk=141&namepage=ScholarshipNotice": {
+   "patrolledAt": "2026-10-02",
+   "lastWhy": ""
+  },
+  "n:https://www.sogang.ac.kr/ko/detail/551303?bbsConfigFk=141&namepage=ScholarshipNotice": {
+   "patrolledAt": "2026-10-02",
+   "lastWhy": ""
+  },
+  "n:https://www.sogang.ac.kr/ko/detail/551302?bbsConfigFk=141&namepage=ScholarshipNotice": {
+   "patrolledAt": "2026-10-02",
+   "lastWhy": ""
+  },
+  "n:https://www.sogang.ac.kr/ko/detail/551301?bbsConfigFk=141&namepage=ScholarshipNotice": {
+   "patrolledAt": "2026-10-02",
+   "lastWhy": ""
+  },
+  "n:https://www.sogang.ac.kr/ko/detail/551299?bbsConfigFk=141&namepage=ScholarshipNotice": {
+   "patrolledAt": "2026-10-02",
+   "lastWhy": ""
+  },
+  "n:https://www.sogang.ac.kr/ko/detail/551280?bbsConfigFk=141&namepage=ScholarshipNotice": {
+   "patrolledAt": "2026-10-02",
+   "lastWhy": ""
+  },
+  "n:https://www.sogang.ac.kr/ko/detail/551273?bbsConfigFk=141&namepage=ScholarshipNotice": {
+   "patrolledAt": "2026-10-02",
+   "lastWhy": ""
+  },
+  "n:https://www.sogang.ac.kr/ko/detail/551215?bbsConfigFk=141&namepage=ScholarshipNotice": {
+   "patrolledAt": "2026-10-02",
+   "lastWhy": ""
+  },
+  "n:https://www.sogang.ac.kr/ko/detail/551199?bbsConfigFk=141&namepage=ScholarshipNotice": {
+   "patrolledAt": "2026-10-02",
+   "lastWhy": ""
+  },
+  "n:https://www.sogang.ac.kr/ko/detail/551198?bbsConfigFk=141&namepage=ScholarshipNotice": {
+   "patrolledAt": "2026-10-02",
+   "lastWhy": ""
+  },
+  "n:https://www.sogang.ac.kr/ko/detail/551038?bbsConfigFk=141&namepage=ScholarshipNotice": {
+   "patrolledAt": "2026-10-02",
+   "lastWhy": ""
+  },
+  "n:https://www.sogang.ac.kr/ko/detail/550981?bbsConfigFk=141&namepage=ScholarshipNotice": {
+   "patrolledAt": "2026-10-02",
+   "lastWhy": ""
+  },
+  "n:https://www.sogang.ac.kr/ko/detail/551197?bbsConfigFk=141&namepage=ScholarshipNotice": {
+   "patrolledAt": "2026-10-02",
+   "lastWhy": ""
+  },
+  "n:https://www.sogang.ac.kr/ko/detail/551195?bbsConfigFk=141&namepage=ScholarshipNotice": {
+   "patrolledAt": "2026-10-02",
+   "lastWhy": ""
+  },
+  "n:https://www.sogang.ac.kr/ko/detail/551193?bbsConfigFk=141&namepage=ScholarshipNotice": {
+   "patrolledAt": "2026-10-02",
+   "lastWhy": ""
+  },
+  "n:https://www.sogang.ac.kr/ko/detail/551074?bbsConfigFk=141&namepage=ScholarshipNotice": {
+   "patrolledAt": "2026-10-02",
+   "lastWhy": ""
+  },
+  "n:https://www.sogang.ac.kr/ko/detail/551072?bbsConfigFk=141&namepage=ScholarshipNotice": {
    "patrolledAt": "2026-10-02",
    "lastWhy": ""
   }
