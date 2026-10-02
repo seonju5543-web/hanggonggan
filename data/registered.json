@@ -2800,6 +2800,11 @@
      "school": "계명대학교",
      "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=2&pagePrvNxt=1&pageRef=271062&pageOrder=0&cmd=2&parm_bod_uid=270056&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
      "id": "notice:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=145&pageorder=0&pageprvnxt=1&pageref=271062&parm_bod_uid=270056&srchbgpuid=-1&srchenable=1&srchvotetype=-1"
+    },
+    {
+     "school": "계명대학교",
+     "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=2&pagePrvNxt=1&pageRef=271152&pageOrder=0&cmd=2&parm_bod_uid=270056&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
+     "id": "notice:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=145&pageorder=0&pageprvnxt=1&pageref=271152&parm_bod_uid=270056&srchbgpuid=-1&srchenable=1&srchvotetype=-1"
     }
    ]
   },
@@ -3176,6 +3181,11 @@
      "school": "계명대학교",
      "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271062&pageOrder=0&cmd=2&parm_bod_uid=270475&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
      "id": "notice:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=145&pageorder=0&pageprvnxt=1&pageref=271062&parm_bod_uid=270475&srchbgpuid=-1&srchenable=1&srchvotetype=-1"
+    },
+    {
+     "school": "계명대학교",
+     "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271152&pageOrder=0&cmd=2&parm_bod_uid=270475&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
+     "id": "notice:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=145&pageorder=0&pageprvnxt=1&pageref=271152&parm_bod_uid=270475&srchbgpuid=-1&srchenable=1&srchvotetype=-1"
     }
    ]
   },
@@ -4026,6 +4036,11 @@
      "school": "서강대학교",
      "url": "https://www.sogang.ac.kr/ko/detail/551199?bbsConfigFk=141&namepage=ScholarshipNotice",
      "id": "notice:https://www.sogang.ac.kr/ko/detail/551199?bbsconfigfk=141&namepage=ScholarshipNotice"
+    },
+    {
+     "school": "계명대학교",
+     "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271152&pageOrder=0&cmd=2&parm_bod_uid=270420&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
+     "id": "notice:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=145&pageorder=0&pageprvnxt=1&pageref=271152&parm_bod_uid=270420&srchbgpuid=-1&srchenable=1&srchvotetype=-1"
     }
    ]
   },
