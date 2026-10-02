@@ -2024,6 +2024,54 @@
    "cards": 5,
    "dir": "insta/pub/0568003",
    "at": "2026-10-01"
+  },
+  {
+   "status": "prepared",
+   "code": "2702905003",
+   "org": "재단법인 춘천인재육성장학재단",
+   "name": "자원봉사 우수 장학금",
+   "due": "2026-10-07",
+   "school": null,
+   "tplNo": 2,
+   "cards": 5,
+   "dir": "insta/pub/2702905003",
+   "at": "2026-10-02"
+  },
+  {
+   "status": "prepared",
+   "code": "0776003",
+   "org": "건설근로자공제회",
+   "name": "건설노동자 대학생 장학금",
+   "due": "2026-10-23",
+   "school": null,
+   "tplNo": 4,
+   "cards": 5,
+   "dir": "insta/pub/0776003",
+   "at": "2026-10-02"
+  },
+  {
+   "status": "prepared",
+   "code": "2704197002",
+   "org": "장애와 사회",
+   "name": "장애학생 장학금 지원사업",
+   "due": "2026-10-09",
+   "school": null,
+   "tplNo": 1,
+   "cards": 4,
+   "dir": "insta/pub/2704197002",
+   "at": "2026-10-02"
+  },
+  {
+   "status": "prepared",
+   "code": "2000315002",
+   "org": "경상북도 의성군청",
+   "name": "다자녀장학금",
+   "due": "2026-11-03",
+   "school": null,
+   "tplNo": 1,
+   "cards": 5,
+   "dir": "insta/pub/2000315002",
+   "at": "2026-10-02"
   }
  ]
 }
