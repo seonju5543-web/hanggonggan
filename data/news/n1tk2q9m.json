@@ -141,7 +141,8 @@
    "kind": "학사",
    "school": "이화여자대학교",
    "campus": "",
-   "foundAt": "2026-10-02"
+   "foundAt": "2026-10-02",
+   "thumb": "data/news/img/222f8e78aeac7a1d.webp"
   },
   {
    "title": "[대학원혁신연구실]2026-2학기 조교 모집",
@@ -158,7 +159,8 @@
    "postedAt": "2026-10-01",
    "school": "이화여자대학교",
    "campus": "",
-   "foundAt": "2026-10-02"
+   "foundAt": "2026-10-02",
+   "thumb": "data/news/img/bee8d2829aa5b198.webp"
   }
  ]
 }
