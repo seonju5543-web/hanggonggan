@@ -10361,6 +10361,13 @@ console.log('\n■ 공공 API 로봇 (2026-10-01)');
   const c1 = M.mapYouthContent(c, opt).item;
   eq('청년콘텐츠 — 본문 HTML 에서 장학과 같은 발췌 규칙으로 마감', [c1.kind, c1.deadline, c1.host], ['대외활동', '2026-10-12', '온통청년 청년참여 프로그램']);
   eq('  60일 지난 글은 싣지 않는다', M.mapYouthContent({ ...c, frstRegDt: '2026-06-01' }, opt).drop, '60일 지난 글');
+  /* 2026-10-02 실측 — pstUrlAddr 는 전부 null. 확인한 게시판(48)만 주소를 만든다 */
+  const cNull = { ...c, pstUrlAddr: null, bbsSn: '48', pstSn: '10811' };
+  eq('  주소 칸이 비면 확인한 게시판(48)만 bbs03View 주소를 만든다 · 다른 게시판은 버린다',
+    [M.mapYouthContent(cNull, opt).item.url, M.mapYouthContent({ ...cNull, bbsSn: '46' }, opt).drop], ['https://www.youthcenter.go.kr/bbs03View/48/10811', '원문 주소 없음']);
+  eq('  제목으로 못 가르면 게시판 분류(대외활동)를 쓴다 · 다른 분류(취업지원)는 아니다',
+    [M.mapYouthContent({ ...cNull, pstTtl: '「2026 보성 두드림 스테이」 추가 모집', pstSeNm: '대외활동' }, opt).item?.kind, M.mapYouthContent({ ...cNull, pstTtl: '「2026 보성 두드림 스테이」 추가 모집', pstSeNm: '취업지원' }, opt).drop],
+    ['대외활동', '공모전·대외활동 아님(소식 글 등)']);
   /* 응답 껍데기 */
   eq('findRows — 껍데기 이름을 몰라도 행 배열을 찾는다', M.findRows({ resultCode: 200, result: { pagging: {}, youthPolicyList: [{ plcyNm: 'a' }, { plcyNm: 'b' }] } }, 'plcyNm').length, 2);
   eq('  모양을 모르면 null(0건과 다르다)', M.findRows({ errorCode: 'e001' }, 'plcyNm'), null);

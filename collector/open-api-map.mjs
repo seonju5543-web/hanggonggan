@@ -200,11 +200,16 @@ export function mapYouthPolicy(r, { scholarship } = {}) {
 export function mapYouthContent(r, { scholarship, today } = {}) {
   const title = r.pstTtl;
   if (!title) return { drop: '제목 없음' };
-  const kind = activityKind(title, { scholarship });
+  /* 종류 — 제목 판정이 먼저, 못 하면 **게시판 스스로 단 분류**(pstSeNm '대외활동')를 쓴다(1365 가 출처 자체로 봉사인 것과 같은 이치 · 2026-10-02) */
+  const kind = activityKind(title, { scholarship }) || (String(r.pstSeNm || '').trim() === '대외활동' && !scholarship?.test(title) ? '대외활동' : null);
   if (!kind) return { drop: '공모전·대외활동 아님(소식 글 등)' };
   const posted = ymd(r.frstRegDt);
   if (posted && today && daysBetween(posted, today) > 60) return { drop: '60일 지난 글' };
-  const url = httpUrl(r.pstUrlAddr);
+  /* 🔴 pstUrlAddr 는 **전부 null** 로 온다(2026-10-02 정찰 실측 10/10). 청년참여 프로그램 게시판(bbsSn 48)의 글 주소는
+     `https://www.youthcenter.go.kr/bbs03View/48/{pstSn}` 이다 — 같은 날 10811·10806 두 글을 실제로 열어 API 제목과 같은 글이 뜨는 것을 확인했다.
+     확인한 게시판(48)만 만든다. 다른 게시판은 확인 전이라 주소를 짓지 않고 버린다(원문 링크는 그 공고 하나로 · 짐작 금지). */
+  const url = httpUrl(r.pstUrlAddr)
+    || (String(r.bbsSn) === '48' && /^\d+$/.test(String(r.pstSn || '')) ? `https://www.youthcenter.go.kr/bbs03View/48/${r.pstSn}` : null);
   if (!url) return { drop: '원문 주소 없음' };
   const ex = activityExcerpts(htmlToLines(r.pstWholCn));
   return { item: item({
