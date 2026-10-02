@@ -17,7 +17,7 @@
    ============================================================ */
 import fs from 'node:fs';
 import { extractLinks, sameSite } from './board-links.mjs';
-import { NEWS_BOARD_RULES, rowsForBoard, verifyRuleDetail, needsDetailCheck } from './news-board-rules.mjs';   // 클릭형 게시판 규칙 한 곳 (수집 로봇과 같은 것)
+import { NEWS_BOARD_RULES, rowsForBoard, verifyRuleDetail, needsDetailCheck, fetchesOwnList, apiSample } from './news-board-rules.mjs';   // 클릭형 게시판 규칙 한 곳 (수집 로봇과 같은 것)
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { isNewsRow } from './news-kind.mjs';
 import { fetchBoard, netReason } from './fetch-board.mjs';
@@ -106,6 +106,8 @@ async function findOne(s) {
       const score = scoreNewsPage(rows, page.url);
       const t = { url, label, rows: score.rows, status: 'ok' };
       if (score.rows < MIN_ROWS) t.diag = pageDiag(page.html);   // 왜 0행인가 — 다음 수리의 재료 (짐작하지 않는다)
+      /* API 규칙(json/post)이 0행이면 페이지 생김새가 아니라 **API 응답의 앞부분**이 재료다 (중앙 9차: 응답을 못 본 채 0행) */
+      if (score.rows < MIN_ROWS && fetchesOwnList(NEWS_BOARD_RULES[s.school])) t.diag = { ...(t.diag || {}), api: await apiSample(s.school).catch((e) => `응답 없음: ${netReason(e)}`) };
       /* 🔴 규칙 학교는 첫 글의 상세를 실제로 열어 제목이 있는지 본 뒤에만 '찾음' — 규칙이 이 게시판에 안 맞으면 못 찾은 것이다 */
       if (score.rows >= MIN_ROWS && needsDetailCheck(NEWS_BOARD_RULES[s.school])) {
         const first = rows.find((r) => sameSite(r.url, page.url)) || rows[0];
@@ -179,6 +181,7 @@ async function main() {
       for (const t of (s.probe.tried || []).slice(0, 8)) {
         lines.push(`  - ${t.url} — ${t.status === 'ok' ? `열림 · 글처럼 보이는 행 ${t.rows}` : t.status}`);
         if (t.diag) lines.push(`    - 생김새: ${Math.round(t.diag.bytes / 1024)}KB · 링크 ${t.diag.links} · 스크립트 ${t.diag.scripts} · 날짜 토큰 ${t.diag.dates} · 줄 블록 ${t.diag.blocks}(날짜 든 것 ${t.diag.datedBlocks})${t.diag.sample.length ? ' · 표본: ' + t.diag.sample.map((x) => `「${x}」`).join(' ') : ''}${(t.diag.anchors || []).length ? ' · 날짜 앞 링크: ' + t.diag.anchors.map((x) => '`' + x + '`').join(' ') : ''}`);
+        if (t.diag && t.diag.api) lines.push(`    - 규칙의 API 응답: ${String(t.diag.api).replace(/`/g, "'")}`);   // json/post 규칙이 0행일 때 (apiSample)
       }
     }
     lines.push('', `> 목록이 스크립트로만 그려지는 게시판(SPA·클릭형)은 이 로봇이 못 읽습니다 — 그런 학교는 \`collector/collect-news.mjs\` 의 \`NEWS_BOARD_RULES\` 에 규칙(json·dataId·onclick)이 필요합니다. 학생이 보는 공지 목록 주소를 알려 주시면 그 자리에 적습니다.`, '');

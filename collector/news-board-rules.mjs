@@ -198,3 +198,12 @@ export async function verifyRuleDetail(row, opts = {}) {
   }
   return { ok: true, reason: `상세를 열어 제목 확인 (${row.url})` };
 }
+
+/* API 규칙의 응답 앞부분(진단용) — 0행일 때 찾기 로봇이 리포트에 적는다. 글을 만들지 않는다. */
+export async function apiSample(school, fetchFn = fetchBoard) {
+  const rule = NEWS_BOARD_RULES[school];
+  if (!fetchesOwnList(rule)) return '';
+  const r = await fetchFn(rule.api, rule.kind === 'post' ? { body: rule.body, tries: 1, firstMs: 15000 } : { tries: 1, firstMs: 15000 });
+  const text = await r.text();
+  return `HTTP ${r.status} · ${text.length}자 · 앞 400자: ${text.replace(/\s+/g, ' ').slice(0, 400)}`;
+}

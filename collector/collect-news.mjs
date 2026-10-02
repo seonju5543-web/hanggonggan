@@ -108,10 +108,10 @@ async function harvestBoard(s, ctx = { dead: false }) {
     const rawLinks = await rowsForBoard(s.school, s.boardUrl, html);
     if (ctx.dead) return;
     /* 무엇을 싣나 — 학교 사이트 안의 글 가운데 장학·활동·잡음을 뺀 것 (판정은 news-kind.mjs 한 곳) */
-    const items = rawLinks
-      .filter((i) => sameSite(i.url, s.boardUrl))
-      .filter((i) => !i.postedAt || i.postedAt >= postedCutoff())   // 오래된 고정 공지 제외 (게시일을 아는 글만 잰다)
-      .filter((i) => isNewsRow(i, { scholarship: KEYWORDS, activityKind, isAttachmentEntry }));
+    /* 단계마다 수를 남긴다 — 0건일 때 '어디서 다 빠졌는지'를 리포트가 말하게 (서강 9차: 찾기는 30행인데 수집 0건 · 원인을 단정하지 않는다) */
+    const onSite = rawLinks.filter((i) => sameSite(i.url, s.boardUrl));
+    const recent = onSite.filter((i) => !i.postedAt || i.postedAt >= postedCutoff());   // 오래된 고정 공지 제외 (게시일을 아는 글만 잰다)
+    const items = recent.filter((i) => isNewsRow(i, { scholarship: KEYWORDS, activityKind, isAttachmentEntry }));
     const fresh = items.filter((i) => !seen[urlKey(i.url)]).slice(0, NEWS_FRESH_MAX);
     /* 🔴 규칙으로 만든 상세 주소는 매번 첫 글 하나를 실제로 열어 제목을 확인한다 — 안 맞으면 이 게시판은 싣지 않는다(틀린 링크보다 0건). */
     if (needsDetailCheck(rule) && fresh.length) {
@@ -132,12 +132,17 @@ async function harvestBoard(s, ctx = { dead: false }) {
     if (ctx.dead) return;
     results.push({
       name,
-      status: items.length ? `✅ 정상 (공지 글 ${items.length}건 감지 · 새 글 ${fresh.length})` : '🟡 접속은 되지만 날짜가 붙은 글 줄을 찾지 못함 — 목록이 스크립트로만 그려지거나 줄에 날짜가 없는 게시판이면 NEWS_BOARD_RULES 가 필요합니다',
+      status: items.length ? `✅ 정상 (공지 글 ${items.length}건 감지 · 새 글 ${fresh.length})`
+        : rawLinks.length ? `🟡 글 줄 ${rawLinks.length} · 학교 사이트 ${onSite.length} · ${NEWS_POSTED_MAX_DAYS}일 안 ${recent.length} · 실을 글 0 — ${
+          !onSite.length ? '글 링크가 모두 다른 사이트' : !recent.length ? `게시일이 모두 ${NEWS_POSTED_MAX_DAYS}일보다 오래됨 (고정 공지만 보이거나 글이 드문 게시판)` : '모두 장학·활동·잡음 글이라 소식으로 싣지 않음'}`
+        : (fetchesOwnList(rule) ? '🟡 규칙의 API 는 응답했지만 글을 못 읽음 — 응답 칸 이름(list·title·pkId)이 바뀌었는지 news-board-rules.mjs 를 확인'
+          : '🟡 접속은 되지만 날짜가 붙은 글 줄을 찾지 못함 — 목록이 스크립트로만 그려지거나 줄에 날짜가 없는 게시판이면 NEWS_BOARD_RULES 가 필요합니다'),
       items: fresh,
     });
   } catch (e) {
     if (ctx.dead) return;
-    results.push({ name, status: `⚠️ 오류 (${netReason(e)}) — 주소 확인 필요`, items: [] });
+    const rule = NEWS_BOARD_RULES[s.school];   // API 규칙의 실패는 주소가 아니라 규칙의 문제다 (리뷰 2026-10-01 · 원인을 단정하지 않는다)
+    results.push({ name, status: fetchesOwnList(rule) ? `⚠️ 규칙의 API 오류 (${netReason(e)}) — news-board-rules.mjs 의 api·body 확인` : `⚠️ 오류 (${netReason(e)}) — 주소 확인 필요`, items: [] });
   }
 }
 

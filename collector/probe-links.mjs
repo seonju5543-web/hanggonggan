@@ -49,15 +49,28 @@ async function checkUrl(url) {
   /* 화면이 부르는 요청을 적는다 (2026-10-01) — SPA(서강)·스크립트 목록(고려·중앙·시립)은 목록을 **별도 요청**으로 받아 그린다.
      그 주소(bbsConfigFk 같은 열쇠)와 폼 전송의 본문(경희 view.do)이 규칙의 재료다. 그림·글꼴·스크립트 파일은 뺀다. */
   const reqs = [];
+  const NOISE = /google-analytics|googletagmanager|analytics\.google|doubleclick|facebook|vstLog|getSearchKeywords|imageSlide/i;   // 목록과 무관한 추적·장식 요청
   page.on('request', (r) => {
     try {
       const u = r.url(); const t = r.resourceType();
       if (!/^(xhr|fetch|document)$/.test(t)) return;
+      if (NOISE.test(u)) return;
       if (/\.(css|js|png|jpe?g|gif|svg|webp|ico|woff2?|ttf|map)(\?|$)/i.test(u)) return;
       const pd = r.postData();
       const line = `${r.method()} ${u.slice(0, 220)}${pd ? ` · 본문: ${String(pd).slice(0, 220)}` : ''}`;
       if (!reqs.includes(line) && reqs.length < 14) reqs.push(line);
     } catch { /* 요청 객체가 이미 닫힘 */ }
+  });
+  /* 스크립트 요청(xhr·fetch)의 **응답 앞부분**도 적는다 (2026-10-02) — 중앙 POST 목록 API 가 HTML 조각인지 JSON 인지, 서강 API 의 칸 이름이 무엇인지는
+     요청만으로는 모른다(9차: 중앙을 HTML 로 가정했다가 0행). 규칙은 이 응답을 보고 적는다. */
+  const resps = [];
+  page.on('response', async (r) => {
+    try {
+      const q = r.request(); const t = q.resourceType(); const u = r.url();
+      if (!/^(xhr|fetch)$/.test(t) || NOISE.test(u) || resps.length >= 8) return;
+      const body = (await r.text().catch(() => '')).replace(/\s+/g, ' ');
+      resps.push(`${q.method()} ${u.slice(0, 160)} → ${r.status()} · ${r.headers()['content-type'] || '?'} · ${body.length}자 · 앞 360자: ${body.slice(0, 360)}`);
+    } catch { /* 응답이 이미 닫힘 */ }
   });
   try {
     const res = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 25000 });
@@ -133,6 +146,7 @@ async function checkUrl(url) {
     }).catch(() => '');
     if (frag) report.push(`- 목록처럼 보이는 요소의 HTML (앞 1800자): \`${frag.replace(/`/g, "'")}\``);
     if (reqs.length) { report.push(`- 화면이 부른 요청 ${reqs.length}개 (목록 API·폼 전송 후보):`); reqs.forEach((l) => report.push(`    · ${l}`)); }
+    if (resps.length) { report.push(`- 스크립트 요청의 응답 ${resps.length}개 (규칙의 재료 — 칸 이름·HTML/JSON):`); resps.forEach((l) => report.push(`    · ${l.replace(/`/g, "'")}`)); }
     report.push('');
   } catch (e) {
     report.push(`### 🔗 ${url}`);
