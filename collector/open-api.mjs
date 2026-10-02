@@ -12,7 +12,7 @@
      collector/open-api-report.md (출처마다 상태·받은 수·실은 수·버린 이유 · 첫 행의 칸 이름 — 명세와 다르면 여기서 보인다)
    넘어지지 않게
      · 열쇠가 없는 출처는 조용히 건너뛴다(지난 글 그대로).
-     · 요청마다 20초 시한 · 두 번 더 시도 · 전체 4분 예산.
+     · 요청마다 20초 시한(청년콘텐츠 45초) · 두 번 더 시도 · 전체 6분 예산.
      · 한 출처가 실패해도 다른 출처는 저장한다. 실패한 출처의 지난 글은 지우지 않는다.
      · 실패는 리포트에 ❌ 로 적는다 → 워크플로가 이슈로 알린다(로그를 안 봐도 안다).
    실행: node collector/open-api.mjs            (저장)
@@ -33,7 +33,7 @@ const ACTS = new URL('../data/activities.json', HERE);
 const REPORT = new URL('open-api-report.md', HERE);
 const DRY = process.argv.includes('--dry-run');
 const REQ_MS = 20000;
-const BUDGET_MS = 4 * 60 * 1000;
+const BUDGET_MS = 6 * 60 * 1000;   // 2026-10-02 4→6분 — 청년콘텐츠 한 쪽이 10초(본문에 그림) · 워크플로 시한(12분) 안
 const started = Date.now();
 const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);   // KST
 
@@ -49,13 +49,13 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const hideKeys = (s) => [portalKey, youthKey, youthContentKey, encodeURIComponent(portalKey)].filter((k) => k && k.length > 6)
   .reduce((t, k) => t.split(k).join('***'), String(s));
 
-async function getText(base, params) {
+async function getText(base, params, reqMs = REQ_MS) {
   const url = `${base}?${new URLSearchParams(params)}`;
   let last;
   for (let i = 0; i < 3; i += 1) {
-    if (Date.now() - started > BUDGET_MS) throw new ApiError('전체 시간 예산(4분) 초과');
+    if (Date.now() - started > BUDGET_MS) throw new ApiError(`전체 시간 예산(${BUDGET_MS / 60000}분) 초과`);
     try {
-      const res = await fetch(url, { signal: AbortSignal.timeout(REQ_MS), headers: { Accept: 'application/json, application/xml;q=0.9, */*;q=0.8' } });
+      const res = await fetch(url, { signal: AbortSignal.timeout(reqMs), headers: { Accept: 'application/json, application/xml;q=0.9, */*;q=0.8' } });
       const text = await res.text();
       if (res.status >= 500) throw new ApiError(`서버 오류 HTTP ${res.status}`);   // 다시 시도할 만하다
       if (!res.ok) return { status: res.status, text };                            // 401·403 등은 다시 해도 같다
@@ -65,7 +65,7 @@ async function getText(base, params) {
       if (i < 2) await sleep(3000 * (i + 1));
     }
   }
-  throw new ApiError(last?.name === 'TimeoutError' ? `응답 없음(${REQ_MS / 1000}초 × 3회)` : `요청 실패: ${last?.message || last}`);
+  throw new ApiError(last?.name === 'TimeoutError' ? `응답 없음(${reqMs / 1000}초 × 3회)` : `요청 실패: ${last?.message || last}`);
 }
 
 /* 오류 응답에서 사람이 읽을 이유를 뽑는다(공공데이터포털은 JSON 을 달라 해도 오류는 XML 로 준다) */
@@ -118,7 +118,8 @@ const FETCHERS = {
     const rows = [];
     for (let pageNum = 1; pageNum <= 50; pageNum += 1) {   // 정책 3천여 건 전부 — 종류 판정은 제목으로 하므로 걸러 받을 수가 없다
       const r = await getText('https://www.youthcenter.go.kr/go/ythip/getPlcy', { apiKeyNm: youthKey, pageNum, pageSize: 100, rtnType: 'json' });
-      if (r.status !== 200) throw new ApiError(reasonOf(r));
+      /* 쪽 번호를 같이 적는다 — 2026-10-02 첫 실행의 'HTTP 400 invalid param data' 가 몇 쪽에서 났는지 몰라 원인을 못 가렸다(정찰에선 1~33쪽 전부 200) */
+      if (r.status !== 200) throw new ApiError(`${pageNum}쪽 · ${reasonOf(r)}`);
       const j = parseJson(r);
       const got = findRows(j, 'plcyNm');
       if (!got) { if (pageNum > 1 && /\[\s*\]/.test(r.text)) break; throw new ApiError(`${pageNum}쪽 응답 모양이 명세와 다르다 — ${reasonOf(r)}`); }   // 빈 목록만 '끝'이다(리뷰 M6)
@@ -129,14 +130,16 @@ const FETCHERS = {
   },
   async youthContent() {
     const rows = [];
-    for (let pageNum = 1; pageNum <= 3; pageNum += 1) {   // 최근 글만(60일 넘은 글은 어차피 버린다)
-      const r = await getText('https://www.youthcenter.go.kr/go/ythip/getContent', { apiKeyNm: youthContentKey, pageNum, pageSize: 100, rtnType: 'json' });
-      if (r.status !== 200) throw new ApiError(reasonOf(r));
+    /* 🔴 **한 쪽에 10건** (2026-10-02 정찰 실측) — 본문 HTML 에 그림이 통째로 들어 있어 10건이 8.1MB · 10초다.
+       100건이면 80MB 라 20초 시한에 세 번 다 걸렸다. 최근 30건(3쪽)만 받는다 — 60일 넘은 글은 어차피 버린다 */
+    for (let pageNum = 1; pageNum <= 3; pageNum += 1) {
+      const r = await getText('https://www.youthcenter.go.kr/go/ythip/getContent', { apiKeyNm: youthContentKey, pageNum, pageSize: 10, rtnType: 'json' }, 45000);
+      if (r.status !== 200) throw new ApiError(`${pageNum}쪽 · ${reasonOf(r)}`);
       const j = parseJson(r);
       const got = findRows(j, 'pstTtl');
       if (!got) { if (pageNum > 1 && /\[\s*\]/.test(r.text)) break; throw new ApiError(`${pageNum}쪽 응답 모양이 명세와 다르다 — ${reasonOf(r)}`); }
       rows.push(...got);
-      if (got.length < 100) break;
+      if (got.length < 10) break;
     }
     return rows;
   },
