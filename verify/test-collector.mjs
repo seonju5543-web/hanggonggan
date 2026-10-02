@@ -4670,6 +4670,32 @@ console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08
   eq('  한국장학재단 공고는 신청 내역에 담았으면 마감 뒤에도 남는다(마감 이틀 뒤 제출·발표를 적을 때 사라지던 것)',
     /isSaved\(`kosaf-\$\{i\.code\}`\) \|\| state\.applications\.some\(\(a\) => a\.id === `kosaf-\$\{i\.code\}`\)/.test(allApp), true);
   eq('  휴지통에서 되살려도 안 보이는 기록은 \'신청내역으로 되살렸어요\'라고 하지 않는다', /toast\(findSch\(t\.app\.id\) \? '신청내역으로 되살렸어요' : /.test(allApp), true);
+  /* 진짜 길을 돌려 본다(2026-10-02 리뷰): 공고가 있을 때 사본을 뜨고 → 공고가 빠져도 줄이 남는다 */
+  {
+    const st = { applications: [{ id: 'p' }] };
+    const snapFn = new Function('state', 'appsDataState', `${grab('snapApplications')}\nreturn snapApplications;`)(st, () => 'ok');
+    const post = { id: 'p', name: '진짜 공고', deadline: '2026-09-01' };
+    eq('  공고가 있을 때 사본을 뜬다 · 같으면 다시 안 적는다', [snapFn(() => post), st.applications[0].snap && st.applications[0].snap.name, snapFn(() => post)], [true, '진짜 공고', false]);
+    eq('  그 뒤 공고가 빠져도 줄이 남는다(결과 전)', shownAppRows(st.applications, () => null).map((r) => r.sch.name), ['진짜 공고']);
+    const notReady = new Function('state', 'appsDataState', `${grab('snapApplications')}\nreturn snapApplications;`)({ applications: [{ id: 'q' }] }, () => 'wait');
+    eq('  공고 목록을 받기 전엔 사본을 안 뜬다', notReady(() => post), false);
+  }
+  /* 🔴 치명(리뷰): 사본 저장을 '학생이 고친 것'으로 찍으면 로봇 데이터만 받은 폰이 다른 폰의 진짜 기록을 서버에서 덮는다 */
+  {
+    const st = { updatedAt: 'T0' };
+    let pushed = 0;
+    const save = new Function('state', 'localStorage', 'STORAGE_KEY', 'notifySyncContext', 'syncSchedulePush', `${grab('saveState')}\nreturn saveState;`)(
+      st, { setItem() {} }, 'k', () => {}, () => { pushed += 1; });
+    save({ local: true });
+    eq('  사본 저장(local)은 시각을 안 찍고 서버로 안 올린다', [st.updatedAt, pushed], ['T0', 0]);
+    save();
+    eq('    (보통 저장은 그대로 찍고 올린다 — 검사가 헛돌지 않는다)', [st.updatedAt !== 'T0', pushed], [true, 1]);
+    eq('  두 자리 모두 local 로 적는다', (allApp.match(/if \(snapApplications\((resolve|r)\)\) saveState\(\{ local: true \}\)/g) || []).length, 2);
+    const sc = readText(new URL('../supabase-client.js', import.meta.url));
+    eq('  사본은 서버로 안 간다(SYNC_OMIT_APP) · 내려받을 때 기기 사본을 되살린다(같이 움직이는 두 목록)',
+      [/const SYNC_OMIT_APP = \[[^\]]*'snap'/.test(sc), /for \(const k of \['formAns', 'docs', 'snap'\]\)/.test(allApp)], [true, true]);
+  }
+  eq('  사본으로 연 시트에서는 신청을 시작·이어가지 않는다(양식 흐름이 넘어진다)', /const gone = !findSch\(id\);\s*const canApply = lock\.canApply && !gone;/.test(allApp), true);
   eq('  사본은 공고 목록을 다 받았을 때만 뜨고, 바뀌었을 때만 적는다', /function snapApplications\(resolve\) \{\s*if \(appsDataState\(\) !== 'ok'\) return false;/.test(allApp) && /if \(a\.snap && JSON\.stringify\(a\.snap\) === json\) continue;/.test(allApp), true);
   eq('  상세 시트·패널의 제출/결과 단추가 사본으로도 찾는다(appSch)', /function openDetail\(id\) \{\s*const sch = appSch\(id\);/.test(allApp) && /const sch = appSch\(id\);   \/\/ 사본으로 보이는 줄의 단추도/.test(allApp), true);
   eq('  내려간 공고에 결과를 적으면 줄이 사라지므로 실행 취소를 준다', /if \(!findSch\(sch\.id\)\) toast\([^\n]*\{ label: '실행 취소', run: \(\) => undoProgress\(sch\.id\) \}\)/.test(allApp), true);

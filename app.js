@@ -124,8 +124,12 @@ function loadState() {
 /* opts.fromServer = 서버에서 받아 온 것을 그대로 적는 중이라는 뜻.
    그때는 시각을 새로 찍지 않고(서버 시각을 그대로 쓴다) 되돌려 올리지도 않는다 —
    안 그러면 받은 것을 곧바로 다시 올리는 헛돌기가 생긴다. */
+/* opts.local = 학생이 고친 것이 아니라 **기기 안 캐시**를 적는 중(신청 내역의 공고 사본 · 2026-10-02 코드 리뷰 · 치명).
+   시각을 찍으면 '방금 고쳤다'가 되어, 로봇 데이터만 새로 받은 폰이 다른 폰의 진짜 기록(제출·선정)을 서버에서 덮는다
+   (CLAUDE.md 「기기 사이 덮어쓰기」). 그래서 시각도 안 찍고 올리지도 않는다 — fromServer 와 같은 길. */
 function saveState(opts) {
   const o = opts || {};
+  if (o.local) o.fromServer = true;
   if (!o.fromServer) state.updatedAt = new Date().toISOString();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   // 알림 판단에 쓰는 프로필·신청내역 사본을 갱신한다 (서비스워커는 localStorage를 못 읽는다)
@@ -3796,7 +3800,12 @@ function openDetail(id) {
   const meta = STATUS_META[result.status];
   const d = dday(sch.deadline);
   const app = state.applications.find((a) => a.id === id);
-  const { canApply, caution: applyCaution } = applyLock(result, app, d);
+  const lock = applyLock(result, app, d);
+  /* 데이터에서 내려간 공고(사본으로 연 시트)에서는 신청을 시작·이어가지 않는다 — 양식 흐름이 findSch 로 공고를 다시 찾다 넘어진다(2026-10-02 리뷰).
+     기록(제출·결과)은 신청 내역 패널에서 그대로 적을 수 있다 */
+  const gone = !findSch(id);
+  const canApply = lock.canApply && !gone;
+  const applyCaution = lock.caution;
   const ch = officialChannel(sch);
 
   /* 지원 자격 줄 — 대외활동 시트도 **같은 함수**를 부른다(2026-10-01 · 베끼지 않는다) */
@@ -3816,6 +3825,7 @@ function openDetail(id) {
 
   let btnLabel = '신청 준비 시작';
   if (app && !app.pending) btnLabel = '신청 준비 완료됨';
+  else if (app && app.pending && gone) btnLabel = '이어서 작성할 수 없는 공고';   // 데이터에서 빠진 공고 — 왜 빠졌는지는 단정하지 않는다(원칙 8-1)
   else if (app && app.pending) btnLabel = '서류 작성 이어서 하기';
   else if (d.days < 0) btnLabel = '마감된 장학금';
   /* 🔴 여기에 '요건 미충족 — 신청할 수 없음' 문구를 **되살리지 말 것** (2026-09-13).
@@ -3838,7 +3848,7 @@ function openDetail(id) {
         ${/* 🔴 '· 검수 전' 을 뗐다 (2026-09-17 개발자 지시). 남는 것은 교내/교외처럼
              **학생이 쓰는 갈래**뿐이다. 검수 상태는 관리자 화면이 센다. */ ''}
         <span class="badge badge-kind">${esc(sch.type || '장학금')}</span>
-        ${saveBtnHtml(sch.id)}
+        ${gone ? '' : saveBtnHtml(sch.id)}
       </div>
       ${/* 🔴 순서: 이름 → **금액** → 주관·접수 (2026-09-02 개발자 지시).
            학생이 카드를 열고 가장 먼저 찾는 것은 얼마를 받느냐다. 주관 기관은 제목에
@@ -5014,7 +5024,7 @@ function appSch(id) {
 function shownAppCount() {
   if (appsDataState() !== 'ok') return state.applications.length;
   const r = schResolver();
-  if (snapApplications(r)) saveState();
+  if (snapApplications(r)) saveState({ local: true });   // 캐시 — 시각을 안 찍고 서버로 안 올린다
   return shownAppRows(state.applications, r).length;
 }
 /* 공고가 데이터에 있는 동안 사본을 떠 둔다 — 바뀌었을 때만 적는다(매번 저장하지 않게). 공고 목록을 다 받았을 때만 돈다 */
@@ -5089,7 +5099,7 @@ function renderApplications() {
     return;
   }
   const resolve = schResolver();
-  if (snapApplications(resolve)) saveState();
+  if (snapApplications(resolve)) saveState({ local: true });   // 캐시 — 시각을 안 찍고 서버로 안 올린다
   const rows = appOrder(shownAppRows(state.applications, resolve));
   /* 공고를 아직 찾을 수 있는 동안 이름을 적어 둔다 — 나중에 목록에서 내려가도 학생이
      무엇이었는지 알아볼 수 있다. 옛 기록을 살리는 길이 이것 하나뿐이라 여기서 한다
@@ -6777,7 +6787,7 @@ function syncApplyRemote(remote, opts) {
       const local = mineByIdx.get(a.id);
       if (!local) return a;
       const merged = Object.assign({}, a);
-      for (const k of ['formAns', 'docs']) if (merged[k] == null && local[k] != null) merged[k] = local[k];
+      for (const k of ['formAns', 'docs', 'snap']) if (merged[k] == null && local[k] != null) merged[k] = local[k];   // snap: 기기 안 공고 사본(서버로 안 감 · SYNC_OMIT_APP)
       return merged;
     });
     /* 🔴 **서버가 아직 모르는 신청서도 살린다** (2026-09-11 코드 리뷰에서 잡았다).

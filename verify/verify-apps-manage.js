@@ -84,7 +84,7 @@ const eq = (label, got, want) => {
   eq('  요약 카드도 안 센다(선정 0건 — 내려간 공고의 선정은 안 보인다)', await page.$eval('#apps-summary', (e) => /선정 \d+건/.test(e.textContent)), false);
   eq('  홈 「신청내역」 칸 숫자도 화면과 같다(4)', await page.$eval('.hero-tile[data-hero-go="applications"] .hero-badge', (e) => e.textContent.trim()), '4');
   /* 사본 줄에서 결과를 적으면 사라지고, 실행 취소로 돌아온다 */
-  await page.click('#apps-list [data-row="reg-gone-kept"] [data-log-toggle]').catch(() => {});
+  await page.click('#apps-list [data-row="reg-gone-kept"] [data-log-toggle]');   // 없으면 여기서 넘어진다(조용히 넘기지 않는다 · 리뷰)
   await page.waitForTimeout(300);
   const wonBtn = await page.$('#apps-list [data-row="reg-gone-kept"] [data-mark-won]');
   eq('  사본 줄에도 결과 기록 단추가 있다', !!wonBtn, true);
