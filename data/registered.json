@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-01",
+ "updatedAt": "2026-10-02",
  "items": [
   {
    "id": "reg-hi-jeju",
@@ -3669,6 +3669,11 @@
      "school": "가톨릭대학교",
      "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276061&article.offset=0&articleLimit=10&srCategoryId=22",
      "id": "notice:https://www.catholic.ac.kr/ko/campuslife/notice.do?articleno=276061&srcategoryid=22"
+    },
+    {
+     "school": "서강대학교",
+     "url": "https://www.sogang.ac.kr/ko/detail/551299?bbsConfigFk=141&namepage=ScholarshipNotice",
+     "id": "notice:https://www.sogang.ac.kr/ko/detail/551299?bbsconfigfk=141&namepage=ScholarshipNotice"
     }
    ]
   },
@@ -4016,6 +4021,11 @@
      "school": "인하대학교",
      "url": "https://www.inha.ac.kr/bbs/kr/8/45319/artclView.do",
      "id": "notice:https://www.inha.ac.kr/bbs/kr/8/45319/artclView.do"
+    },
+    {
+     "school": "서강대학교",
+     "url": "https://www.sogang.ac.kr/ko/detail/551199?bbsConfigFk=141&namepage=ScholarshipNotice",
+     "id": "notice:https://www.sogang.ac.kr/ko/detail/551199?bbsconfigfk=141&namepage=ScholarshipNotice"
     }
    ]
   },
@@ -5135,8 +5145,7 @@
    "period": "접수 ~2026-10-07",
    "summary": "건국대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "건국대학교"
+    "selective": true
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -5180,7 +5189,15 @@
     "제목 표식 「[교외」"
    ],
    "kindConfidence": "high",
-   "kindFrom": "로봇(원문) 2026-10-01"
+   "kindFrom": "로봇(원문) 2026-10-01",
+   "alsoPostedAt": [
+    {
+     "school": "서강대학교",
+     "url": "https://www.sogang.ac.kr/ko/detail/551280?bbsConfigFk=141&namepage=ScholarshipNotice",
+     "id": "notice:https://www.sogang.ac.kr/ko/detail/551280?bbsconfigfk=141&namepage=ScholarshipNotice"
+    }
+   ],
+   "scopeFrom": "같은 사업이 서강대학교 게시판에도 올라옴(자동) — 서강대학교 게시판 https://www.sogang.ac.kr/ko/detail/551280?bbsConfigFk=141&namepage=ScholarshipNotice"
   },
   {
    "id": "auto-larshipdoarticleno375940",

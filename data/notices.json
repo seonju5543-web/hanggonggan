@@ -1,6 +1,424 @@
 {
- "updatedAt": "2026-10-01",
+ "updatedAt": "2026-10-02",
  "items": [
+  {
+   "title": "[교외] 논산시장학회 장학생 선발 안내(10/30 마감, 생활비 150만원)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551451?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": "신청기간: 2026년 9월 28일(월) 9:00 ~ 10월 30일(금) 18:00 4. 신청방법: 방문 또는 등기우편 접수 접수처: 충남 논산시",
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[교외] 서초구 문주장학재단 주관 AI, ICT 분야 장학생 모집 안내(10/8 마감, 등록금 전액)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551379?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[발전기금] 2026-2학기 발전기금 장학생 선발 안내(10/5 마감)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551306?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": "신청기간 및 방법 1) 신청기간: 2026년 9월 18일(금)~10월 5일(월) 2) 신청방법: 발전기금 장학금 신청 매뉴얼(첨부) 참조하여 S",
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[발전기금] 박성욱 장학금 장학생 선발 안내(10/5 마감, 인문학부, 등록금 250만원)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551305?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": "지원기간: 2026년 9월 18일(금)~10월 5일(월) 오후 11시(마감시한 준수) 5. 지원방법: 장학금 신청서(첨부)를 작성하여 학생지원팀",
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[발전기금] 최응호 장학금 장학생 선발 안내(9/30 마감, 1학년, 등록금 전액)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551303?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": "지원기간: 2026년 9월 18일(금)~9월 30일(수) 오후 11시(마감시한 준수) 5. 지원방법: 장학금 신청서(첨부)를 A4 2페이지 내외",
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[발전기금] 서강영문교수 장학생 선발 안내(10/5 마감, 학업보조비 100만원)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551302?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": "지원기간: 2026년 9월 18일(금)~10월 5일(월) 오후 11시(마감시한 준수) 5. 지원방법: 장학금 신청서(첨부)를 작성하여 학생지원팀",
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[발전기금] 故장영희교수 장학금 장학생 선발 안내(10/5 마감, 영문 및 인문사회계열, 등록금 2/3)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551301?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": "지원기간: 2026년 9월 18일(금)~10월 5일(월) 오후 11시(마감시한 준수) 5. 지원방법: 장학금 신청서(첨부)를 작성하여 학생지원팀",
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[교외] 춘천인재육성장학재단 봄내장학생 선발 안내(10/7 마감, 등록금 최대 100만원)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551299?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": "신청기간: 2026년 9월 28일(월) ~ 10월 7일(수) 4. 신청방법: 온라인신청 필수 &amp; 방문 또는 우편(등기) 접수 온라인신청",
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[교외] 마포인재육성장학재단 장학생 선발 안내(10/7 마감, 등록금 최대 300만원)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551280?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": "지원기간: 2026년 9월 30일(수)~10월 7일(수) 4. 제출서류: 첨부의 공고문 반드시 참조 장학생 신청서, 추천서, 개인정보 동의서(첨",
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[교외] 인송문화재단 장학생 선발 안내(10/9 마감, 생활비 200만원)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551273?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": "신청기간: 2026년 10월 9일(금) 17시까지 5. 신청방법: 학생지원팀으로 원본서류 직접 또는 등기우편 제출 주소: 서울특별시 마포구 백범",
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[교외] 고속도로장학재단 장학생 선발 안내(10/11 마감, 생활비 500만원)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551215?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[교외] 인천인재평생교육진흥원 장학생 선발 안내(10/8 마감, 생활비 100만원)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551199?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[교외] *기간연장*대전청년내일재단 인재육성장학생 선발 안내(10/8 마감, 생활비 150만원)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551198?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[교외] 2027년 봄학기 미래에셋 해외교환 장학생 선발 안내(10/6 마감, 교환학생 생활비)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551038?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": "지원기간: 2027년 봄학기(한 학기 지원) 중복수혜 가능 및 불가능 장학금에 대해서는 첨부 선발요강 참조 3. 지원자격 대한민국 국적으로 4년",
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[교외] 한국선원복지고용센터 선원가족 장학생 선발 안내(10/23 마감, 등록금 최대 350만원)",
+   "url": "https://www.sogang.ac.kr/ko/detail/550981?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[교외] 포항시장학회 장학생 선발 안내(9/22 마감, 등록금 최대 200만원)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551197?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": "지원기간: 2026년 8월 24일(월)~9월 22일(목) 18시 5. 접수방법: 포항시장학회 홈페이지에서 온라인 신청 http://www.phs",
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[발전기금] 경영대학 최운열 교수 장학생 선발 안내(9/21 마감, 등록금 전액)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551195?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": "신청기간: 2026년 9월 7일(월)~9월 21일(월) 오후 11시 59분(마감기한 준수) 5. 신청방법: 모든 서류를 하나의 PDF 파일로 통",
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[발전기금] [법인] 경영대학 인본장학금 장학생 선발 안내(9/21 마감, 등록금 전액)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551193?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": "신청기간: 2026년 9월 7일(월) ~ 9월 21일(월) 오후 11시 59분까지(마감기한 준수) 5. 신청방법: 모든 서류를 하나의 PDF 파",
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[발전기금] 가톨릭 우수 인재 장학금 장학생 선발 안내(9/18 마감, 학업보조비 200만원)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551074?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": "지원기간: 2026년 9월 9일(수)~9월 18일(금) 오후 11시(마감시한 준수) 5. 지원방법: 장학금 신청서(첨부)를 A4 2페이지 내외",
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[학자금대출] 2026년 상반기분 통영시 대학생 학자금 이자 지원 공고 (9/23 마감)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551072?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": "신청기간 : 2026. 9. 2.(수) ~ 9. 23.(수) 17:00 나. 신청방법 : 전자 우편, 방문, 우편 접수 (팩스 불가) 1) 전자",
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[등록/장학] 2026년 든든 학업지원금 선발 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53420&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [
+    {
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "부설연구기관",
+     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[등록/장학] 2026년 우양재단 동행 장학생 모집 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53419&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [
+    {
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "부설연구기관",
+     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[등록/장학] 2027년도 대산장학생 선발 공고",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53418&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [
+    {
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "부설연구기관",
+     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[공통] (긴급-생활비)2026-2학기 (재)효림장학재단 장학생 추가 선발 안내(화공생명, 바이오, 식품생명, 생명과 N",
+   "url": "https://www.gachon.ac.kr/bbs/kor/478/125845/artclView.do",
+   "attachments": [
+    {
+     "name": "효림장학재단추천서.hwp",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/156322/download.do"
+    },
+    {
+     "name": "효림장학재단-개인정보수집이용동의서.hwp",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/156323/download.do"
+    }
+   ],
+   "deadlineHint": "신청 기한 및 방법 : 2026.10.6(화).12시까지&nbsp;장학복지팀 또는 학생복지팀에 직접 제출(메일제출 불가) 6. 기타사항 :&nb",
+   "school": "가천대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[공통] 2026년 우양재단 동행 장학생 모집 안내(가족 돌봄 청년 대상) N",
+   "url": "https://www.gachon.ac.kr/bbs/kor/478/125843/artclView.do",
+   "attachments": [
+    {
+     "name": "우양재단2026-2동행장학생-장학모집공문.pdf",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/156319/download.do"
+    },
+    {
+     "name": "우양재단2026-2동행장학생-신청서식.hwp",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/156320/download.do"
+    },
+    {
+     "name": "우양재단2026-2동행장학생-포스터.jpg",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/156321/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026. 10. 1.(목) ~ 10. 18.(일) 2. 대상 : 국내 4년제 대학 또는 2~3년제 전문대학 재학생 중 학자금지원구",
+   "school": "가천대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[공통] 2027년도 대산농촌재단 장학생 선발 안내 N",
+   "url": "https://www.gachon.ac.kr/bbs/kor/478/125842/artclView.do",
+   "attachments": [
+    {
+     "name": "붙임12027대산장학생선발공지.jpg",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/156317/download.do"
+    },
+    {
+     "name": "붙임22027대산장학생선발요강.pdf",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/156318/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "가천대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "2026-2학기 인송문화재단 일반장학생 선발 안내",
+   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12449/view.do?currentPageNo=1",
+   "attachments": [
+    {
+     "name": "' + fileItem.fileNm + '",
+     "url": "https://kep.kookmin.ac.kr/com/cmsv/FileCtr/fileDefaultDownload.do?fileNo="
+    }
+   ],
+   "deadlineHint": "마감 : 2026 년 &nbsp;10 월 &nbsp;11 일 (22:59 까지 ) ㅇ 신청방법 : ON 국민 &nbsp;-&nbsp; 포털 &n",
+   "school": "국민대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[한국장학재단] 희망사다리 장학생 대상 대전 일자리박람회 개최",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/45693/artclView.do",
+   "attachments": [
+    {
+     "name": "(IBK ver)- 2026 대전 일자리박람회.png",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41443/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "2026학년도 우양재단 동행 장학생 모집 안내",
+   "url": "https://home.knu.ac.kr/HOME/knussw/sub.htm?nav_code=knu1619416593&mode=view&mv_data=aWR4PTIxNTEmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZjb2RlPU11NlN4bjZQMUlRYyZzZWFyY2hfaXRlbT0mc2VhcmNoX29yZGVyPSZvcmRlcl9saXN0PSZsaXN0X3NjYWxlPSZ2aWV3X2xldmVsPSZ2aWV3X2NhdGU9JnZpZXdfY2F0ZTI9JnNpdGVfY29kZT1rbnVzc3c=",
+   "attachments": [
+    {
+     "name": "[붙임2] 2026년 우양재단 동행장학 신청서 서식.hwp",
+     "url": "https://home.knu.ac.kr/HOME/bbs/bbs_download.php?mv_data=aWR4PTIxNTEmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZuYXZfY29kZT1rbnUxNjE5NDE2NTkzJnNpdGVfY29kZT1rbnVzc3cmY29kZT1NdTZTeG42UDFJUWMmc2VhcmNoX2l0ZW09JnNlYXJjaF9vcmRlcj0mb3JkZXJfbGlzdD0mbGlzdF9zY2FsZT0=&download=h&seq=1"
+    }
+   ],
+   "deadlineHint": "신청 기한: ~2026. 10. 18.(일)까지 2. 지급 금액: 학업장려금 100만원 3. 접수 방법: 우양재단 홈페이지 모집 공고문을 통한",
+   "school": "경북대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "2027학년도 해동과학문화재단 장학생 모집 안내",
+   "url": "https://home.knu.ac.kr/HOME/knussw/sub.htm?nav_code=knu1619416593&mode=view&mv_data=aWR4PTIxNTAmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZjb2RlPU11NlN4bjZQMUlRYyZzZWFyY2hfaXRlbT0mc2VhcmNoX29yZGVyPSZvcmRlcl9saXN0PSZsaXN0X3NjYWxlPSZ2aWV3X2xldmVsPSZ2aWV3X2NhdGU9JnZpZXdfY2F0ZTI9JnNpdGVfY29kZT1rbnVzc3c=",
+   "attachments": [
+    {
+     "name": "2027 해동장학생 모집요강.pdf",
+     "url": "https://home.knu.ac.kr/HOME/bbs/bbs_download.php?mv_data=aWR4PTIxNTAmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZuYXZfY29kZT1rbnUxNjE5NDE2NTkzJnNpdGVfY29kZT1rbnVzc3cmY29kZT1NdTZTeG42UDFJUWMmc2VhcmNoX2l0ZW09JnNlYXJjaF9vcmRlcj0mb3JkZXJfbGlzdD0mbGlzdF9zY2FsZT0=&download=h&seq=0"
+    },
+    {
+     "name": "2027 해동장학금 운영규정.pdf",
+     "url": "https://home.knu.ac.kr/HOME/bbs/bbs_download.php?mv_data=aWR4PTIxNTAmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZuYXZfY29kZT1rbnUxNjE5NDE2NTkzJnNpdGVfY29kZT1rbnVzc3cmY29kZT1NdTZTeG42UDFJUWMmc2VhcmNoX2l0ZW09JnNlYXJjaF9vcmRlcj0mb3JkZXJfbGlzdD0mbGlzdF9zY2FsZT0=&download=h&seq=1"
+    },
+    {
+     "name": "2027 해동장학생 신규지원(ㅇㅇ대;;ㅇ학년;;이름).hwp",
+     "url": "https://home.knu.ac.kr/HOME/bbs/bbs_download.php?mv_data=aWR4PTIxNTAmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZuYXZfY29kZT1rbnUxNjE5NDE2NTkzJnNpdGVfY29kZT1rbnVzc3cmY29kZT1NdTZTeG42UDFJUWMmc2VhcmNoX2l0ZW09JnNlYXJjaF9vcmRlcj0mb3JkZXJfbGlzdD0mbGlzdF9zY2FsZT0=&download=h&seq=2"
+    }
+   ],
+   "deadlineHint": "제출기한 및 제출처: 2026. 10. 27.(화) 오후 3시까지 / ricjtls@knu.ac.kr&nbsp; &nbsp;&nbsp; ※ 기한",
+   "school": "경북대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "2026학년도 2학기 중소기업 취업연계 장학금 선발계획 알림 및 심사서류 제출 요청",
+   "url": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2510&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "attachments": [
+    {
+     "name": "붙임 1 - 2026학년도 2학기 중소기업취업연계장학사업 신규장학생 선발 계획(안).hwp chevron_forward",
+     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261002101840868.hwp&path=/bbs/34&fn=%EB%B6%99%EC%9E%84%201%20-%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EC%A4%91%EC%86%8C%EA%B8%B0%EC%97%85%EC%B7%A8%EC%97%85%EC%97%B0%EA%B3%84%EC%9E%A5%ED%95%99%EC%82%AC%EC%97%85%20%EC%8B%A0%EA%B7%9C%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EA%B3%84%ED%9A%8D(%EC%95%88).hwp"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "강원대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
   {
    "title": "장학 2026년 우양재단 동행 장학생 모집 안내(~10.18.일)",
    "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=2026%EB%85%84-%EC%9A%B0%EC%96%91%EC%9E%AC%EB%8B%A8-%EB%8F%99%ED%96%89-%EC%9E%A5%ED%95%99%EC%83%9D-%EB%AA%A8%EC%A7%91-%EC%95%88%EB%82%B410-18-%EC%9D%BC&keyword=%EC%9E%A5%ED%95%99",

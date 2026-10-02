@@ -5,17 +5,56 @@
    "title": "2026년 초기창업패키지 로켓십 IR 경진대회 참가기업 모집 (2회차: 콘텐츠·플랫폼)",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179246",
    "kind": "공모전",
+   "attachments": [
+    {
+     "name": "다운로드",
+     "url": "https://www.k-startup.go.kr/afile/fileDownload/vbXLn"
+    },
+    {
+     "name": "다운로드",
+     "url": "https://www.k-startup.go.kr/afile/fileDownload/IbXLn"
+    },
+    {
+     "name": "다운로드",
+     "url": "https://www.k-startup.go.kr/afile/fileDownload/dkXLn"
+    },
+    {
+     "name": "다운로드",
+     "url": "https://www.k-startup.go.kr/afile/fileDownload/YkXLn"
+    },
+    {
+     "name": "다운로드",
+     "url": "https://www.k-startup.go.kr/afile/fileDownload/ZkXLn"
+    },
+    {
+     "name": "(붙임) 창조경제혁신센터 청년창업 활성화 프로그램일정(21년 08월 2주차).hwp",
+     "url": "javascript:alert("
+    }
+   ],
+   "deadlineHint": "접수기간 2026-09-14 ~ 2026-10-02&nbsp;18:00 주관기관명 씨엔티테크(주) 대상 전체 창업업력 7년미만 연락처 02-31",
+   "detailsV": 2,
    "field": "창업",
-   "deadline": "2026-10-02",
+   "excerptsAt": "2026-10-02",
+   "school": "",
+   "campus": "",
+   "host": "창업진흥원 K-Startup",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "2026년 SaaS 전환지원센터xAWS SaaS 현대화 교육 4회차 참가자 모집 공고",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179371",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-10-11",
    "deadlineHint": null,
    "excerpts": [
     {
      "label": "모집기간",
-     "text": "2026-09-14 ~ 2026-10-02"
+     "text": "2026-09-28 ~ 2026-10-11"
     },
     {
      "label": "대상",
-     "text": "씨엔티테크 초기창업패키지 운영사무국은 스타트업의 투자유치와 네트워크 확장을 지원하기 위해, 산업별 특화 투자사를 초청한 IR 경진대회를 개최합니다."
+     "text": "SaaS 운영 중인 기업 DevOps/인프라 담당자 등"
     },
     {
      "label": "활동지역",
@@ -25,18 +64,197 @@
    "attachments": [],
    "school": "",
    "campus": "",
-   "host": "씨엔티테크(주)",
+   "host": "정보통신산업진흥원, SaaS 전환지원센터",
    "api": "kstartup",
-   "eligibilityLines": [
-    "씨엔티테크 초기창업패키지 운영사무국은 스타트업의 투자유치와 네트워크 확장을 지원하기 위해, 산업별 특화 투자사를 초청한 IR 경진대회를 개최합니다."
-   ],
    "noticeLines": [
-    "씨엔티테크 초기창업패키지 운영사무국은 스타트업의 투자유치와 네트워크 확장을 지원하기 위해, 산업별 특화 투자사를 초청한 IR 경진대회를 개최합니다. 투자유치를 희망하는 콘텐츠·플랫폼 분야 초기창업패키지 선정기업 및 졸업기업 여러분의 많은 관심과 적극적인 참여를 바랍니다."
+    "정보통신산업진흥원 SaaS 전환지원센터는 AWS와 함께 「클라우드 기반 SaaS 현대화 기술 특강 및 실습 교육」을 운영합니다.",
+    "본 교육은 SaaS 현대화를 위한 핵심 사용 사례와 최신 클라우드 기술 트렌드를 중심으로, SaaS 전환 및 서비스 고도화에 필요한 핵심 개념과 실무 방향을 공유하기 위해 마련되었습니다.",
+    "관련한 정보나 교육을 받아보고 싶으신 분들은, 신청 링크를 통한 구글폼 신청서 작성 후 제출해 주시길 바랍니다.",
+    "온라인 접수 : https://forms.gle/rRoB8LPMjHKwkK46A"
    ],
    "detailsV": 2,
-   "foundAt": "2026-10-01",
+   "foundAt": "2026-10-02",
    "seenAt": "2026-10-02",
    "excerptsAt": "2026-10-02"
+  },
+  {
+   "title": "(대학생만: 월 5회/1일 4시간까지) (주말10~14시) 10월 송도국제도서관 자원봉사 모집",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3520993",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-10-03",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-15 ~ 2026-10-03"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-10-04 ~ 2026-10-30"
+    },
+    {
+     "label": "활동지역",
+     "text": "송도국제도서관 지하 1층"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "송도국제도서관",
+   "api": "vol1365",
+   "detailsV": 2,
+   "eligibilityLines": [
+    "▣ 신청자격 : 대학생(2007년까지)만 신청하세요."
+   ],
+   "noticeLines": [
+    "★ 하루 최대 4시간 / 월 5회(총 10시간) 까지만 실적이 인정됩니다.",
+    "오전, 오후 동시 신청 불가능",
+    "★ 당일 봉사활동 익일 봉사실적 승인 불가능하니 해당 부분 참고하여 주시기 바랍니다.",
+    "(▶ 5회이상 신청시 모두 반려 처리됩니다 ◀)",
+    "▣ 봉사활동 관리를 위해 [봉사활동 3진 아웃제]를 운영하고 있습니다.",
+    "▣ [3진아웃제 경고관리대장]에 등록 후 차후 봉사 신청은 자동으로 거절됩니다."
+   ],
+   "foundAt": "2026-10-02",
+   "seenAt": "2026-10-02",
+   "excerptsAt": "2026-10-02"
+  },
+  {
+   "title": "[10월10일(토)/10-18시] 2026 부산팻스타 행사보조 봉사자 모집(대학생 이상)",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3526615",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-10-07",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-28 ~ 2026-10-07"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-10-10 ~ 2026-10-10"
+    },
+    {
+     "label": "활동지역",
+     "text": "정관 중앙공원"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "부산광역시 기장군",
+   "api": "vol1365",
+   "detailsV": 2,
+   "eligibilityLines": [
+    "5. 모집 대상 : 대학생 이상 성인"
+   ],
+   "noticeLines": [
+    "★ 봉사활동은 8시간 참여하셔야 합니다.(특별한 사유없이 중도 귀가 불가)",
+    "★ 건강이상시(독감, 코로나 등) 참석을 자제해주시기바랍니다.",
+    "★ 점심식사는 제공되지 않습니다.",
+    "★ 점심식사는 제공되지 않습니다.",
+    "1. 활동 일시 : 2026.10.10.(토) 10:00-18:00",
+    "2. 활동 내용 : 2026 부산팻스타 행사보조(체험부스 안내 및 안전 등)"
+   ],
+   "foundAt": "2026-10-02",
+   "seenAt": "2026-10-02",
+   "excerptsAt": "2026-10-02"
+  },
+  {
+   "title": "간호사, 간호조무사, 간호대학생들 등 간호업무 보조 가능하신 자원봉사자 선생님을 모집합니다",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3486470",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-10-08",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-07-09 ~ 2026-10-08"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-07-09 ~ 2026-10-08"
+    },
+    {
+     "label": "활동지역",
+     "text": "호수마을 요양원"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "호수마을요양원",
+   "api": "vol1365",
+   "detailsV": 2,
+   "noticeLines": [
+    "간호사, 간호조무사, 간호대학생들 등 간호업무 보조 가능하신 자원봉사자 선생님을 모집합니다.(호수마을요양원)",
+    "(주 1회 이상, 월 4회 이상 가능하신 분이시면 더 좋겠습니다.)",
+    "업무 : 간호업무 보조, 어르신 식사수발, 프로그램 보조",
+    "봉사활동 일정 : 09시~18시까지 (12시~13시 점심시간, 중식제공X) 시간인증 : 8시간",
+    "* 1365 자원봉사 포털 신청 전 전화 문의 부탁드립니다.",
+    "모집인원 : 2명"
+   ],
+   "foundAt": "2026-10-02",
+   "seenAt": "2026-10-02",
+   "excerptsAt": "2026-10-02"
+  },
+  {
+   "title": "[외부] [서울특별시] 2026 서울영상공모전 '서울밤로그' 참여 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53417&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "kind": "공모전",
+   "attachments": [
+    {
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "부설연구기관",
+     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    }
+   ],
+   "deadlineHint": null,
+   "detailsV": 2,
+   "field": "영상·사진",
+   "excerptsAt": "2026-10-02",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[일반] [국립대학 육성사업] 감정 및 스트레스 관리 심리특강",
+   "url": "https://www.knou.ac.kr/bbs/knou/51/816545/artclView.do",
+   "kind": "대외활동",
+   "attachments": [
+    {
+     "name": "4. 감정 및 스트레스 관리(26년 10월) 포스터.jpg",
+     "url": "https://www.knou.ac.kr/bbs/knou/51/278426/download.do"
+    }
+   ],
+   "deadlineHint": "신청 기간 특강 제목 1 차 2026.10.23.( 금 ) 13:00~15:30 2026.10.02.( 금 ) 10:00 ~ 2026.10.22",
+   "detailsV": 2,
+   "field": "교육·캠프",
+   "excerptsAt": "2026-10-02",
+   "school": "한국방송통신대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
   },
   {
    "title": "2026년 영등포 청년 창업 도약 아카데미",
@@ -478,43 +696,6 @@
    "excerptsAt": "2026-10-02"
   },
   {
-   "title": "2026년 SaaS 전환지원센터xAWS SaaS 현대화 교육 4회차 참가자 모집 공고",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179371",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-10-11",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-09-28 ~ 2026-10-11"
-    },
-    {
-     "label": "대상",
-     "text": "SaaS 운영 중인 기업 DevOps/인프라 담당자 등"
-    },
-    {
-     "label": "활동지역",
-     "text": "전국"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "정보통신산업진흥원, SaaS 전환지원센터",
-   "api": "kstartup",
-   "noticeLines": [
-    "정보통신산업진흥원 SaaS 전환지원센터는 AWS와 함께 「클라우드 기반 SaaS 현대화 기술 특강 및 실습 교육」을 운영합니다.",
-    "본 교육은 SaaS 현대화를 위한 핵심 사용 사례와 최신 클라우드 기술 트렌드를 중심으로, SaaS 전환 및 서비스 고도화에 필요한 핵심 개념과 실무 방향을 공유하기 위해 마련되었습니다.",
-    "관련한 정보나 교육을 받아보고 싶으신 분들은, 신청 링크를 통한 구글폼 신청서 작성 후 제출해 주시길 바랍니다.",
-    "온라인 접수 : https://forms.gle/rRoB8LPMjHKwkK46A"
-   ],
-   "detailsV": 2,
-   "foundAt": "2026-10-02",
-   "seenAt": "2026-10-02",
-   "excerptsAt": "2026-10-02"
-  },
-  {
    "title": "2026년 서울창업센터 관악 X SK에코플랜트 오픈이노베이션 프로그램 참여기업 모집",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179347",
    "kind": "대외활동",
@@ -766,48 +947,6 @@
     "준비물 : 모자와 장갑"
    ],
    "foundAt": "2026-10-01",
-   "seenAt": "2026-10-02",
-   "excerptsAt": "2026-10-02"
-  },
-  {
-   "title": "(대학생만: 월 5회/1일 4시간까지) (주말10~14시) 10월 송도국제도서관 자원봉사 모집",
-   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3520993",
-   "kind": "대외활동",
-   "field": "봉사",
-   "deadline": "2026-10-03",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-09-15 ~ 2026-10-03"
-    },
-    {
-     "label": "활동기간",
-     "text": "2026-10-04 ~ 2026-10-30"
-    },
-    {
-     "label": "활동지역",
-     "text": "송도국제도서관 지하 1층"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "송도국제도서관",
-   "api": "vol1365",
-   "detailsV": 2,
-   "eligibilityLines": [
-    "▣ 신청자격 : 대학생(2007년까지)만 신청하세요."
-   ],
-   "noticeLines": [
-    "★ 하루 최대 4시간 / 월 5회(총 10시간) 까지만 실적이 인정됩니다.",
-    "오전, 오후 동시 신청 불가능",
-    "★ 당일 봉사활동 익일 봉사실적 승인 불가능하니 해당 부분 참고하여 주시기 바랍니다.",
-    "(▶ 5회이상 신청시 모두 반려 처리됩니다 ◀)",
-    "▣ 봉사활동 관리를 위해 [봉사활동 3진 아웃제]를 운영하고 있습니다.",
-    "▣ [3진아웃제 경고관리대장]에 등록 후 차후 봉사 신청은 자동으로 거절됩니다."
-   ],
-   "foundAt": "2026-10-02",
    "seenAt": "2026-10-02",
    "excerptsAt": "2026-10-02"
   },
@@ -1151,87 +1290,6 @@
    "excerptsAt": "2026-10-02"
   },
   {
-   "title": "[10월10일(토)/10-18시] 2026 부산팻스타 행사보조 봉사자 모집(대학생 이상)",
-   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3526615",
-   "kind": "대외활동",
-   "field": "봉사",
-   "deadline": "2026-10-07",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-09-28 ~ 2026-10-07"
-    },
-    {
-     "label": "활동기간",
-     "text": "2026-10-10 ~ 2026-10-10"
-    },
-    {
-     "label": "활동지역",
-     "text": "정관 중앙공원"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "부산광역시 기장군",
-   "api": "vol1365",
-   "detailsV": 2,
-   "eligibilityLines": [
-    "5. 모집 대상 : 대학생 이상 성인"
-   ],
-   "noticeLines": [
-    "★ 봉사활동은 8시간 참여하셔야 합니다.(특별한 사유없이 중도 귀가 불가)",
-    "★ 건강이상시(독감, 코로나 등) 참석을 자제해주시기바랍니다.",
-    "★ 점심식사는 제공되지 않습니다.",
-    "★ 점심식사는 제공되지 않습니다.",
-    "1. 활동 일시 : 2026.10.10.(토) 10:00-18:00",
-    "2. 활동 내용 : 2026 부산팻스타 행사보조(체험부스 안내 및 안전 등)"
-   ],
-   "foundAt": "2026-10-02",
-   "seenAt": "2026-10-02",
-   "excerptsAt": "2026-10-02"
-  },
-  {
-   "title": "간호사, 간호조무사, 간호대학생들 등 간호업무 보조 가능하신 자원봉사자 선생님을 모집합니다",
-   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3486470",
-   "kind": "대외활동",
-   "field": "봉사",
-   "deadline": "2026-10-08",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-07-09 ~ 2026-10-08"
-    },
-    {
-     "label": "활동기간",
-     "text": "2026-07-09 ~ 2026-10-08"
-    },
-    {
-     "label": "활동지역",
-     "text": "호수마을 요양원"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "호수마을요양원",
-   "api": "vol1365",
-   "detailsV": 2,
-   "noticeLines": [
-    "간호사, 간호조무사, 간호대학생들 등 간호업무 보조 가능하신 자원봉사자 선생님을 모집합니다.(호수마을요양원)",
-    "(주 1회 이상, 월 4회 이상 가능하신 분이시면 더 좋겠습니다.)",
-    "업무 : 간호업무 보조, 어르신 식사수발, 프로그램 보조",
-    "봉사활동 일정 : 09시~18시까지 (12시~13시 점심시간, 중식제공X) 시간인증 : 8시간",
-    "* 1365 자원봉사 포털 신청 전 전화 문의 부탁드립니다.",
-    "모집인원 : 2명"
-   ],
-   "foundAt": "2026-10-02",
-   "seenAt": "2026-10-02",
-   "excerptsAt": "2026-10-02"
-  },
-  {
    "title": "숲의 기록이 정책 데이터로... - 국립산림과학원, 가명정보 활용 경진대회 대상·최우수상 동시 석권",
    "url": "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156784059&pWise=sub&pWiseSub=C1",
    "kind": "공모전",
@@ -1251,11 +1309,12 @@
    ],
    "deadlineHint": null,
    "field": "IT·소프트웨어",
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "detailsV": 2
   },
   {
    "title": "2026.06.15 두산연강재단, '제20회 과학교사 학술시찰' 진행 두산연강재단은 초·중·고 과학교사들을 대상으로 국내외 과학 관련 산업 현장과 교육 현장을 탐방하는 &lsquo;과학교사 학술시찰&rsquo;을 6월 15일부터 22일까지 진행한다.",
@@ -1264,11 +1323,12 @@
    "attachments": [],
    "deadlineHint": null,
    "field": "해외·교류",
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "두산연강재단",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "detailsV": 2
   },
   {
    "title": "2018년 사회복지 협력기관 워크숍",
@@ -1277,11 +1337,12 @@
    "attachments": [],
    "deadlineHint": null,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "아산사회복지재단",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "detailsV": 2
   },
   {
    "title": "제15회 한국어능력시험(TOPIK) 쓰기 채점자 양성 워크숍 참가자 모집 공고",
@@ -1290,11 +1351,12 @@
    "attachments": [],
    "deadlineHint": null,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "국립국제교육원 공지",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "detailsV": 2
   },
   {
    "title": "2026년 경기 스타트업 아카데미 딥테크 세미나 참여자 모집 / Future AI Technology - AI 메모리 반도체의 발전과 미래",
@@ -1322,11 +1384,12 @@
     }
    ],
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "창업진흥원 K-Startup",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "detailsV": 2
   },
   {
    "title": "[감사원] 2026년 국민제안 감사 아이디어 공모 기간 : 2026.10.01 ~ 2026.10.31",
@@ -1335,11 +1398,12 @@
    "attachments": [],
    "deadlineHint": null,
    "field": "기획·아이디어",
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "detailsV": 2
   },
   {
    "title": "[행정안전부] 2026 재난안전 분야 논문 공모전 기간 : 2026.09.01 ~ 2026.11.10",
@@ -1348,11 +1412,12 @@
    "attachments": [],
    "deadlineHint": null,
    "field": "글쓰기·논문",
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "detailsV": 2
   },
   {
    "title": "[기획예산처 복권위원회] 복권기금 아이디어 공모전 기간 : 2026.01.06 ~ 2026.12.31",
@@ -1371,11 +1436,15 @@
     }
    ],
    "field": "기획·아이디어",
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "eligibilityLines": [
+    "□ 응모자격 : 대한민국 국민이면 누구나"
+   ],
+   "detailsV": 2
   },
   {
    "title": "「청년여성재직자와 함께하는 내:일(JOB) ON캠프」 참여자 모집",
@@ -1399,11 +1468,18 @@
     }
    ],
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "경남청년정보플랫폼",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "eligibilityLines": [
+    "○ 참가대상 : 경남도 내 청년여성(만 19세~39세) 근로자",
+    "※ 공공기관, 공기업, 대기업 재직자 제외 및 2025년, 2026년 「내일ON캠프」 중복 참여 불가",
+    "○ 참가비 : 전액 무료",
+    "○ 주요내용 : 직무역량강화 특강, 금융교육, 체험·힐링 프로그램 등"
+   ],
+   "detailsV": 2
   },
   {
    "title": "아산시청소년 문학공모전 2026.08.04",
@@ -1412,11 +1488,12 @@
    "attachments": [],
    "deadlineHint": null,
    "field": "글쓰기·논문",
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "아산시미래장학회",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "detailsV": 2
   },
   {
    "title": "[과학기술정보통신부] 생활 속 전자파 바로 알기 동영상 및 포스터 공모전 기간 : 2026.06.15 ~ 2026.10.12",
@@ -1425,11 +1502,12 @@
    "attachments": [],
    "deadlineHint": null,
    "field": "영상·사진",
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "detailsV": 2
   },
   {
    "title": "[교육부] 2026 똑똑! 수학탐험대 활용 숏폼 공모전 기간 : 2026.09.07 ~ 2026.10.12",
@@ -1439,11 +1517,16 @@
    "deadlineHint": "접수기간 2026. 9. 7.(월) 09:00 ~ 10. 12.(월) 18:00 참가자격 초등교원(현직) · 교육대학교 재학생(예비교원) 개인",
    "deadline": "2026-10-12",
    "field": "영상·사진",
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "eligibilityLines": [
+    "참가자격",
+    "초등교원(현직) · 교육대학교 재학생(예비교원) 개인 또는 팀(최대 3인) / 최대 1건"
+   ],
+   "detailsV": 2
   },
   {
    "title": "[국토교통부] 2026 건설 추락사고 예방 콘텐츠 공모전 높은 곳에선, 더 높은 안전으로 기간 : 2026.09.14 ~ 2026.10.13",
@@ -1458,11 +1541,12 @@
      "text": "2026. 9. 14.(월) ~ 2026. 10. 13.(화) 18:00 까지"
     }
    ],
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "detailsV": 2
   },
   {
    "title": "[고용노동부] 2026 고용24 국민참여 AI 고용서비스 발굴 온라인 해커톤 기간 : 2026.09.21 ~ 2026.10.13",
@@ -1471,11 +1555,12 @@
    "attachments": [],
    "deadlineHint": "접수기간 2026. 9. 21. — 10. 13. 18:00 접수하기 요강 다운로드 ↓ 2026 고용24 국민참여 AI 고용서비스 발굴 온라인",
    "field": "IT·소프트웨어",
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "detailsV": 2
   },
   {
    "title": "[농촌진흥청] 2026 농업·농촌 스토리텔링콘텐츠 공모전 기간 : 2026.08.25 ~ 2026.10.14",
@@ -1483,11 +1568,12 @@
    "kind": "공모전",
    "attachments": [],
    "deadlineHint": null,
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "detailsV": 2
   },
   {
    "title": "[농림축산식품부] 대국민 농촌관광 홍보영상 경진대회 기간 : 2026.07.15 ~ 2026.10.18",
@@ -1496,11 +1582,12 @@
    "attachments": [],
    "deadlineHint": null,
    "field": "광고·마케팅",
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "detailsV": 2
   },
   {
    "title": "[질병관리청] 생명을 그리는 손, 당신의 심폐소생술 스토리 캐릭터 공모전 기간 : 2026.09.01 ~ 2026.10.18",
@@ -1525,11 +1612,12 @@
     }
    ],
    "field": "디자인·미술",
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "detailsV": 2
   },
   {
    "title": "[해양수산부] 2026 해양안전 콘텐츠 공모전 기간 : 2026.08.24 ~ 2026.10.22",
@@ -1541,7 +1629,8 @@
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "detailsTriedAt": "2026-10-02"
   },
   {
    "title": "[과학기술정보통신부] 2026 데이터+AI 혁신챌린지 데이터안심구역 경진대회 기간 : 2026.09.01 ~ 2026.10.22",
@@ -1554,7 +1643,8 @@
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "detailsTriedAt": "2026-10-02"
   },
   {
    "title": "[행정중심복합도시건설청] 국가상징구역 숏폼 영상 공모전 기간 : 2026.09.18 ~ 2026.10.22",
@@ -1573,11 +1663,12 @@
    "deadlineHint": null,
    "deadline": "2026-10-22",
    "field": "영상·사진",
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "detailsV": 2
   },
   {
    "title": "[해양수산부] 제1회 대한민국 국가어항·어촌 사진공모전 기간 : 2026.07.31 ~ 2026.10.23",
@@ -1586,11 +1677,12 @@
    "attachments": [],
    "deadlineHint": "접수기간 2026년 7월 31일(금)~10월 23일(금) 대국민 심사 2026년 11월 16일(월)~11월 20일(금) &nbsp; 수상자 발표",
    "field": "영상·사진",
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "detailsV": 2
   },
   {
    "title": "[국방부] 2026년 20회 국방홍보 영상공모전 기간 : 2026.08.03 ~ 2026.10.23",
@@ -1604,11 +1696,12 @@
    ],
    "deadlineHint": null,
    "field": "광고·마케팅",
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "detailsV": 2
   },
   {
    "title": "[행정안전부] 공공 웹사이트 불법광고 탐지 도구 개발 공모전 기간 : 2026.09.14 ~ 2026.10.23",
@@ -1630,11 +1723,12 @@
    ],
    "deadlineHint": null,
    "field": "광고·마케팅",
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "detailsV": 2
   },
   {
    "title": "[외교부] 제2회 KOREAZ 콘텐츠 공모전 기간 : 2026.06.01 ~ 2026.10.25",
@@ -1649,11 +1743,15 @@
      "text": "2026.6.1.(월)-2026.10.25.(일)"
     }
    ],
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "noticeLines": [
+    "- 접수기간：2026.6.1.(월)-2026.10.25.(일)"
+   ],
+   "detailsV": 2
   },
   {
    "title": "[기후에너지환경부] 제13회 대학생 물환경 정책·기술 공모전 기간 : 2026.09.28 ~ 2026.10.25",
@@ -1661,11 +1759,12 @@
    "kind": "공모전",
    "attachments": [],
    "deadlineHint": null,
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "detailsV": 2
   },
   {
    "title": "[식품의약품안전처] 2026년 마약 예방활동 우수사례 공모전 기간 : 2026.09.30 ~ 2026.10.30",
@@ -1673,11 +1772,12 @@
    "kind": "공모전",
    "attachments": [],
    "deadlineHint": null,
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "detailsV": 2
   },
   {
    "title": "[행정안전부] 2026 모바일신분증 아이디어 공모전 기간 : 2026.09.30 ~ 2026.10.30",
@@ -1695,11 +1795,16 @@
    ],
    "deadlineHint": "접수 기간은 10 월 1 일 ( 목 ) 9 시부터 10 월 30 일 ( 금 ) 18 시까지이며 , 참가 방법 , 제출 자료 , 심사 기준 등 자",
    "field": "기획·아이디어",
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "noticeLines": [
+    "접수 기간은 10 월 1 일 ( 목 ) 9 시부터 10 월 30 일 ( 금 ) 18 시까지이며 , 참가 방법 , 제출 자료 , 심사 기준 등 자세한 사항은 모바일신분증 누리집 (mobileid.go.kr) 과 소통 24 (sotong.go.kr) 에 게시된 공고문에서 확인할 수 있다",
+    "접수 기간은 10 월 1 일 ( 목 ) 9 시부터 10 월 30 일 ( 금 ) 18 시까지이며 , 참가 방법 , 제출 자료 , 심사 기준 등 자세한 사항은 모바일신분증 누리집 (mobileid.go.kr) 과 소통 24 (sotong.go.kr) 에 게시된 공고문에서 확인할 수 있다"
+   ],
+   "detailsV": 2
   },
   {
    "title": "[교육부] 마음동행 숏폼 공모전 함께 100초 챌린지 기간 : 2026.09.30 ~ 2026.10.31",
@@ -1708,11 +1813,12 @@
    "attachments": [],
    "deadlineHint": null,
    "field": "영상·사진",
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "detailsV": 2
   },
   {
    "title": "[우주항공청] 2026 스페이스 해커톤 기간 : 2026.09.14 ~ 2026.11.05",
@@ -1721,11 +1827,12 @@
    "attachments": [],
    "deadlineHint": null,
    "field": "IT·소프트웨어",
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "detailsV": 2
   },
   {
    "title": "[과학기술정보통신부] 2026 제3회 국가지식정보 통합플랫폼 활용 우수사례 공모전 기간 : 2026.09.07 ~ 2026.11.06",
@@ -1747,11 +1854,12 @@
    ],
    "deadlineHint": null,
    "field": "과학·공학",
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "detailsV": 2
   },
   {
    "title": "[스포츠재활 연구실] 만성 발목 불안정성 대상 감각-인지 기반 발목 재활운동 연구 참여자 모집",
@@ -1764,10 +1872,11 @@
     }
    ],
    "deadlineHint": null,
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "성균관대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "detailsV": 2
   },
   {
    "title": "[일반] [HUSS-글로벌공생] 2026 인문사회 학생을 위한 AI 인사이트 특강 안내",
@@ -1807,10 +1916,15 @@
     }
    ],
    "field": "해외·교류",
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "광운대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "eligibilityLines": [
+    "3. 대상 : 광운대학교 HUSS 참여학과 재학생",
+    "(국어국문학과, 국제학부, 국제통상학부, 영어산업학과, 미디어커뮤니케이션학부, 행정학과, 법학부, 정보융합학부)"
+   ],
+   "detailsV": 2
   },
   {
    "title": "2026학년도 대학생 청소년교육지원사업 3차 멘토 선발 안내",
@@ -1838,10 +1952,21 @@
     }
    ],
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "조선대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "eligibilityLines": [
+    "1. 신청대상 및 자격",
+    "가 . 신청대상 : 본교 정규학기 학부 재학생",
+    "※ 조기취업자 , 휴학생 , 제적생 , 학사학위취득유예생 , 졸업생 , 학기초과자 , 2026-2 학기 국가근로장학생은 선발 불가",
+    "※ 활동기간 중 학적변동 ( 휴학 , 자퇴 , 졸업 , 제적 등 ) 발생 시 해당 일자 전일까지만 근로 가능",
+    "나 . 신청자격 : 직전학기 성적기준 C0(70 점 / 100 점 ) 수준 이상 , 경제적 수준 무관"
+   ],
+   "noticeLines": [
+    "장학금액 : ( 시간당 ) 12,790 원"
+   ],
+   "detailsV": 2
   },
   {
    "title": "[일반] [국립대학 육성사업] 3주만에 끝내는 AI 취업 치트키 특강",
@@ -1855,10 +1980,11 @@
    ],
    "deadlineHint": "신청 기간 특강 제목 1 차 2026.10.19.( 월 ) 10:00~12:00 2026.10.1.( 목 ) 10:00 ~ 2026.10.14.",
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-01",
+   "excerptsAt": "2026-10-02",
    "school": "한국방송통신대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "detailsV": 2
   },
   {
    "title": "[문화체육관광부] 내가 알리는 모두의 「희망사다리」 영상공모전 기간 : 2026.07.30 ~ 2026.10.04",
@@ -1872,11 +1998,12 @@
    ],
    "deadlineHint": null,
    "field": "영상·사진",
-   "excerptsAt": "2026-09-30",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-09-30"
+   "foundAt": "2026-09-30",
+   "detailsV": 2
   },
   {
    "title": "[농촌진흥청] 2026 농업인 안전365 캠페인 공모전 기간 : 2026.07.16 ~ 2026.09.30",
@@ -1884,11 +2011,12 @@
    "kind": "공모전",
    "attachments": [],
    "deadlineHint": null,
-   "excerptsAt": "2026-09-30",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-09-30"
+   "foundAt": "2026-09-30",
+   "detailsV": 2
   },
   {
    "title": "[문화체육관광부] 2026년 제7회 공공저작물 활용 사례 공모전 기간 : 2026.08.07 ~ 2026.09.30",
@@ -1896,11 +2024,12 @@
    "kind": "공모전",
    "attachments": [],
    "deadlineHint": null,
-   "excerptsAt": "2026-09-30",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-09-30"
+   "foundAt": "2026-09-30",
+   "detailsV": 2
   },
   {
    "title": "[국토교통부] 제6회 그린리모델링 챌린지 공모전 기간 : 2026.08.12 ~ 2026.09.30",
@@ -1908,11 +2037,12 @@
    "kind": "공모전",
    "attachments": [],
    "deadlineHint": null,
-   "excerptsAt": "2026-09-30",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-09-30"
+   "foundAt": "2026-09-30",
+   "detailsV": 2
   },
   {
    "title": "[외교부] 2026년 국제개발협력 청년공모전 기간 : 2026.08.27 ~ 2026.09.30",
@@ -1935,11 +2065,18 @@
      "text": "KOICA 사업 참여 경험이 있으며, 사업 참여 당시 청년(만 19~34세) 대한민국 국민"
     }
    ],
-   "excerptsAt": "2026-09-30",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-09-30"
+   "foundAt": "2026-09-30",
+   "eligibilityLines": [
+    "참가자격 : 만 19~34세 대한민국 국민",
+    "작품 형식 : A4용지 10페이지 내 작성하여 PDF 파일로 제출",
+    "*세부 작성 내용은 공모전 홈페이지 내 양식에 따라 작성 후 제출",
+    "KOICA 사업 참여 경험이 있으며, 사업 참여 당시 청년(만 19~34세) 대한민국 국민"
+   ],
+   "detailsV": 2
   },
   {
    "title": "[산림청] 2026 국가산림문화자산 AI 숏폼 영상 공모전 기간 : 2026.09.01 ~ 2026.09.30",
@@ -1953,11 +2090,12 @@
    ],
    "deadlineHint": "접수기간 2026. 9. 1.(화) – 9. 30.(수) 산림청 복권위원회 한국산림복지진흥원 ✦ ✧ ✦ CONTEST AT A GLANCE 꼭",
    "field": "영상·사진",
-   "excerptsAt": "2026-09-30",
+   "excerptsAt": "2026-10-02",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-09-30"
+   "foundAt": "2026-09-30",
+   "detailsV": 2
   },
   {
    "title": "[국가데이터처] 제8회 통계지리정보서비스(SGIS) 활용 우수사례 공모전 기간 : 2026.09.01 ~ 2026.09.30",

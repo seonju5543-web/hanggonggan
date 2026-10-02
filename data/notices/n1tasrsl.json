@@ -1,7 +1,21 @@
 {
  "school": "국민대학교",
- "updatedAt": "2026-10-01",
+ "updatedAt": "2026-10-02",
  "items": [
+  {
+   "title": "2026-2학기 인송문화재단 일반장학생 선발 안내",
+   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12449/view.do?currentPageNo=1",
+   "attachments": [
+    {
+     "name": "' + fileItem.fileNm + '",
+     "url": "https://kep.kookmin.ac.kr/com/cmsv/FileCtr/fileDefaultDownload.do?fileNo="
+    }
+   ],
+   "deadlineHint": "마감 : 2026 년 &nbsp;10 월 &nbsp;11 일 (22:59 까지 ) ㅇ 신청방법 : ON 국민 &nbsp;-&nbsp; 포털 &n",
+   "school": "국민대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
   {
    "title": "2026학년도 국민대학교 교수회 제자사랑장학금 신청 안내",
    "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12445/view.do?currentPageNo=1",
