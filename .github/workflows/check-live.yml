@@ -57,6 +57,15 @@ jobs:
               out.push('data/news/index.json');
               for (const k of Object.keys(nx.files)) out.push(M.newsFilesForProfile({school:k})[0]);
             } catch {}
+            // 소식 사진 (2026-10-03): 실린 글의 썸네일 세 장 — 앱이 받는 그림이므로 여기서도 본다(아래에서 바이트로 비교)
+            try {
+              let k = 0;
+              for (const f of fs.readdirSync('data/news')) {
+                if (!/\.json$/.test(f) || f === 'index.json') continue;
+                const t = (JSON.parse(fs.readFileSync('data/news/' + f, 'utf8')).items || []).find((n) => n.thumb);
+                if (t) { out.push(t.thumb); if (++k >= 3) break; }
+              }
+            } catch {}
             console.log([...new Set(out)].join(' '));
           ")
 
@@ -84,6 +93,8 @@ jobs:
               return '읽기실패';
             } catch { return '읽기실패'; }
           };
+          /* 그림은 개수가 아니라 **바이트 수**로 — 404 쪽(HTML)·빈 파일은 WebP 서명이 없어 '읽기실패'라 같다고 세지 않는다 */
+          const bytes = (p) => { try { const b = fs.readFileSync(p); return b.length > 12 && b.toString('latin1', 8, 12) === 'WEBP' ? b.length : '읽기실패'; } catch { return '읽기실패'; } };
           const cache = (p) => { try { return (fs.readFileSync(p, 'utf8').match(/const CACHE = '([^']+)'/) || [,'?'])[1]; } catch { return '?'; } };
           const rows = [
             ['서비스워커 버전', cache('sw.js'), cache('live/sw.js')],
@@ -97,9 +108,11 @@ jobs:
           const extra = (process.env.EXTRA_FILES || '').split(/\s+/).filter(Boolean);
           for (const f of extra) {
             const label = f.startsWith('data/majors/') ? '학과(학교별)'
+              : f.startsWith('data/news/img/') ? '소식 사진'
               : f.startsWith('data/news/') ? (f.endsWith('index.json') ? '소식 색인' : '소식(학교별)')
               : f.endsWith('index.json') ? '공고 색인' : '공고(학교별)';
-            rows.push([`${label} ${f.split('/').pop()}`, count(f), count('live/' + f)]);
+            const measure = f.endsWith('.webp') ? bytes : count;
+            rows.push([`${label} ${f.split('/').pop()}`, measure(f), measure('live/' + f)]);
           }
           let bad = 0;
           console.log('\n항목             저장소(main)   실제 앱   결과');

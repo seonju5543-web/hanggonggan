@@ -87,7 +87,7 @@ main → 사람이 직접 고치면 main-guard.yml 이 기본 브랜치로 되�
 ```
 앱 실행
   ├ boot.js            첫 화면을 세운다 (다른 스크립트보다 먼저)
-  ├ sw.js              데이터·코드 모두 **네트워크 우선** + no-cache 재확인 + 3.5초 폴백
+  ├ sw.js              데이터·코드 모두 **네트워크 우선** + no-cache 재확인 + 3.5초 폴백 (그림만 캐시 우선 — 교내 소식 썸네일은 해시 이름이라 다시 쓰이지 않는다)
   │                     → 재설치 없이 자동 반영 / 오프라인도 보장
   ├ data/*.json 읽기   registered · notices · kosaf-open · forms · tuition
   ├ match-engine.js    매칭·적합도  ← 🔴 화면과 알림이 **같은 파일**

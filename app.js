@@ -2788,10 +2788,13 @@ function liveNoticesHtml() {
 /* 게시판 글 카드 한 장 — 홈과 '교내' 칸이 **같은 그림**을 쓴다 (2026-09-18 분리).
    ⚠️ 베끼지 말 것: 2026-09-11 에 카드 그림이 두 벌이라 한쪽에만 배지 무더기가 남아 있었다
       (실측 147장 중 9장). */
+/* 소식 썸네일 경로 — 로봇이 만든 해시 이름만 그린다(collector/news-thumb.mjs THUMB_RE 와 같은 꼴 · 관문이 대조). 그 밖의 값(바깥 주소 등)은 그리지 않는다 */
+const NEWS_THUMB_RE = /^data\/news\/img\/[0-9a-f]{16}\.webp$/;
 function noticeCardHtml(n, opts) {
   const o = opts || {};
+  const thumb = o.thumb && NEWS_THUMB_RE.test(o.thumb) ? o.thumb : '';
   return `
-    <a class="sch-card notice-card" href="${esc(safeUrl(n.url))}" target="_blank" rel="noopener">
+    <a class="sch-card notice-card${thumb ? ' has-thumb' : ''}" href="${esc(safeUrl(n.url))}" target="_blank" rel="noopener">
       ${/* 🔴 맨 윗줄은 매칭 카드와 **같은 말투**다 — 기관 글 + 판정 하나 (2026-09-11).
            예전엔 배지 셋(`교내 공고`·`마감 임박`·`양식 2`)이 한 줄을 채워, 페이스리프트로
            걷어낸 배지 무더기가 이 경로에만 그대로 남아 있었다(실측 147장 중 9장).
@@ -2830,6 +2833,9 @@ function noticeCardHtml(n, opts) {
       ${(o.excerpts || []).map((x) => `<p class="sch-provider">${esc(x.label)} · ${esc(unent(x.text))}</p>`).join('')}
       ${!(o.excerpts || []).length && n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? `<p class="sch-provider">${esc(unent(n.deadlineHint))}</p>` : ''}
       <p class="sch-provider">${(n.attachments || []).length ? `첨부 ${(n.attachments || []).length}개 · ` : ''}${esc(n.foundAt || '')} 수집 · ${isBoardListLink(n.url) ? '게시판 목록에서 보기 ↗' : '원문 보기 ↗'}</p>
+      ${/* 그 글의 사진 썸네일 (2026-10-03 개발자 지시 — 학교 글의 실제 사진). 소식 카드만 opts.thumb 로 넘긴다 · 제목이 이미 글자로 있어 alt 는 비운다(읽기 도구가 두 번 읽지 않게).
+           못 받으면(404·오프라인) 그림을 빼고 글자 카드로 돌아간다 — bindEvents 의 error 잡이 · CSP 가 onerror= 를 막는다 */ ''}
+      ${thumb ? `<img class="notice-thumb" src="${esc(thumb)}" alt="" loading="lazy" decoding="async" width="72" height="72" />` : ''}
     </a>`;
 }
 
@@ -3116,7 +3122,7 @@ function schoolNewsHtml() {
   const shown = newsOpen ? mine : mine.slice(0, NEWS_HOME_TOP);
   const more = mine.length > NEWS_HOME_TOP;
   return head + `<div class="card-list" style="margin-bottom:${more ? 6 : 18}px">`
-    + shown.map((n) => noticeCardHtml(n, { org: `${n.school} 공지${n.kind ? ' · ' + n.kind : ''}`, excerpts: n.postedAt ? [{ label: '게시', text: n.postedAt }] : [] })).join('')
+    + shown.map((n) => noticeCardHtml(n, { org: `${n.school} 공지${n.kind ? ' · ' + n.kind : ''}`, excerpts: n.postedAt ? [{ label: '게시', text: n.postedAt }] : [], thumb: n.thumb })).join('')
     + `</div>`
     + (more ? `<button type="button" class="link-btn home-more" data-news-more aria-expanded="${newsOpen ? 'true' : 'false'}" style="margin-bottom:18px">${newsOpen ? '접기' : `더보기 (${mine.length - NEWS_HOME_TOP})`}</button>` : '');
 }
@@ -6137,6 +6143,15 @@ function renderWallet() {
 
 /* ---------------- 이벤트 바인딩 ---------------- */
 function bindEvents() {
+  /* 소식 썸네일을 못 받으면(아직 배포 전·오프라인·지워짐) 그림만 빼고 글자 카드로 (2026-10-03).
+     error 는 거품이 일지 않아 잡는 단계(capture)로 문서에서 받는다 — CSP(script-src 'self')가 onerror= 를 막는다. */
+  document.addEventListener('error', (e) => {
+    const img = e.target;
+    if (!img || !img.classList || !img.classList.contains('notice-thumb')) return;
+    const card = img.closest('.has-thumb');
+    img.remove();
+    if (card) card.classList.remove('has-thumb');
+  }, true);
   /* 교내 소식 더보기 (2026-09-30) — 구역은 통째로 다시 그려지므로 그릇(#school-news)에 위임한다. 히어로는 안 건드린다. */
   const newsBox = $('#school-news');
   if (newsBox) newsBox.addEventListener('click', (e) => {

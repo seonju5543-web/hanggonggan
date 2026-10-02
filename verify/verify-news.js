@@ -5,11 +5,15 @@
      ③ 카드 윗줄이 「학교 공지 · 갈래」를 말한다 · 갈래 없는 글은 「학교 공지」만 · 메타 줄은 수집일 + 원문 보기
      ④ 앞 다섯 장 + 더보기(남은 수) → 누르면 전부 → 접기
      ⑤ 받아오기가 실패해도 뼈대가 아니라 '없어요' 로 내려앉는다 · 페이지 오류 없음
+     ⑥ 썸네일 (2026-10-03) — 사진이 있는 글만 오른쪽에 72px 정사각 사진 · 제목과 겹치지 않는다 · 못 받은 사진은 빼고 글자 카드로 ·
+        로봇 이름 꼴이 아닌 값(바깥 주소)은 그리지 않는다 · 사진 없는 카드는 예전 그대로(그림 없음)
    데이터는 **가짜 응답**으로 준다(page.route) — 실제 data/news/ 는 첫 수집 전 비어 있을 수 있고, 화면 규칙은 데이터가 있을 때 재야 한다.
    파일 이름은 app.js 가 쓰는 규칙(match-engine newsFilesForProfile)으로 만든다(베끼지 않는다).
 
    🔴 **PORT= 를 반드시 준다** (8123 은 남의 워크트리일 수 있다 — CLAUDE.md 매 세션 2).
    실행: python3 -m http.server <포트> 를 띄운 뒤  CHROME_PATH=... PORT=<포트> node verify/verify-news.js */
+const fs = require('fs');
+const path = require('path');
 const { chromium } = require('playwright-core');
 const { assertOwnServer, dismissNotify } = require('./onboard-helper');
 const ME = require('../match-engine.js');
@@ -33,9 +37,11 @@ const S = '한국외국어대학교';
 const FIXTURE = {
   school: S, updatedAt: '2026-09-30',
   items: [
-    { title: '2026학년도 2학기 수강정정 안내', url: 'https://www.hufs.ac.kr/n/1', kind: '학사', school: S, campus: '', foundAt: '2026-09-30' },
-    { title: '도서관 열람실 운영시간 변경', url: 'https://www.hufs.ac.kr/n/2', kind: '생활', school: S, campus: '', foundAt: '2026-09-30' },
-    { title: '총장 담화문', url: 'https://www.hufs.ac.kr/n/3', school: S, campus: '', foundAt: '2026-09-29' },
+    { title: '2026학년도 2학기 수강정정 안내', url: 'https://www.hufs.ac.kr/n/1', kind: '학사', school: S, campus: '', foundAt: '2026-09-30', thumb: 'data/news/img/aaaaaaaaaaaaaaaa.webp' },
+    /* 사진 파일을 못 받는 글(404) — 그림을 빼고 글자 카드로 돌아가야 한다 */
+    { title: '도서관 열람실 운영시간 변경', url: 'https://www.hufs.ac.kr/n/2', kind: '생활', school: S, campus: '', foundAt: '2026-09-30', thumb: 'data/news/img/bbbbbbbbbbbbbbbb.webp' },
+    /* 로봇 이름 꼴이 아닌 값 — 그리지 않는다 */
+    { title: '총장 담화문', url: 'https://www.hufs.ac.kr/n/3', school: S, campus: '', foundAt: '2026-09-29', thumb: 'https://evil.example/x.jpg' },
     { title: '2026 외대 가을 축제 안내', url: 'https://www.hufs.ac.kr/n/4', kind: '행사', school: S, campus: '', foundAt: '2026-09-29' },
     { title: '학생지원팀 조교 모집', url: 'https://www.hufs.ac.kr/n/5', kind: '채용', school: S, campus: '', foundAt: '2026-09-28' },
     { title: '기숙사 동계 입사 안내', url: 'https://www.hufs.ac.kr/n/6', kind: '생활', school: S, campus: '', foundAt: '2026-09-28' },
@@ -59,6 +65,9 @@ async function fresh(browser, mode) {
   await page.route(`**/${MY_FILE}*`, (route) => (mode === 'fail'
     ? route.abort()
     : route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(FIXTURE) })));
+  /* 썸네일 — 하나는 진짜 사진 바이트(정문 사진)로, 하나는 404 로 */
+  await page.route('**/data/news/img/aaaaaaaaaaaaaaaa.webp', (route) => route.fulfill({ status: 200, contentType: 'image/jpeg', body: fs.readFileSync(path.join(__dirname, '..', 'assets/gates/hanyang-1.jpg')) }));
+  await page.route('**/data/news/img/bbbbbbbbbbbbbbbb.webp', (route) => route.fulfill({ status: 404, body: 'no' }));
   await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(1200);
   await dismissNotify(page);
@@ -94,6 +103,20 @@ const cards = (page) => page.$$eval('#school-news .notice-card', (els) => els.ma
     eq('④ 단추는 「접기」', await page.$eval('#school-news [data-news-more]', (b) => b.textContent.trim()), '접기');
     await page.click('#school-news [data-news-more]'); await page.waitForTimeout(200);
     eq('④ 접으면 다시 다섯', (await cards(page)).length, 5);
+    /* ⑥ 썸네일 — 구역을 화면에 들인 뒤(늦게 싣기 loading=lazy) 잰다 */
+    await page.$eval('#school-news', (e) => e.scrollIntoView());
+    await page.waitForTimeout(1200);
+    const shot = await page.$$eval('#school-news .notice-card', (els) => els.slice(0, 5).map((e) => {
+      const img = e.querySelector('img.notice-thumb'); const name = e.querySelector('.sch-name').getBoundingClientRect();
+      const r = img && img.getBoundingClientRect();
+      return { has: e.classList.contains('has-thumb'), img: !!img, loaded: !!(img && img.complete && img.naturalWidth > 0), w: r ? Math.round(r.width) : 0, h: r ? Math.round(r.height) : 0,
+        right: !!(r && r.left >= name.right - 1), alt: img ? img.getAttribute('alt') : null };
+    }));
+    eq('⑥ 사진 있는 글 — 오른쪽 72px 정사각 · 실제로 그려짐 · 제목과 안 겹침 · alt 비움', shot[0], { has: true, img: true, loaded: true, w: 72, h: 72, right: true, alt: '' });
+    eq('⑥ 사진 파일을 못 받은 글은 그림을 빼고 글자 카드로', shot[1], { has: false, img: false, loaded: false, w: 0, h: 0, right: false, alt: null });
+    eq('⑥ 로봇 이름 꼴이 아닌 값(바깥 주소)은 그리지 않는다 · 사진 없는 글은 그림 없음', shot.slice(2).map((c) => c.img || c.has), [false, false, false]);
+    eq('⑥ 바깥 주소로 그림을 부르지 않았다', await page.evaluate(() => performance.getEntriesByType('resource').some((r) => /evil\.example/.test(r.name))), false);
+    if (process.env.SHOT) await page.$eval('#school-news', (e) => e.scrollIntoView()).then(() => page.locator('#school-news').screenshot({ path: process.env.SHOT }));
     eq('⑤ 페이지 오류 없음', errors, []);
     await page.context().close();
   }

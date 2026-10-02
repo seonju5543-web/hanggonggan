@@ -2200,7 +2200,7 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
   eq('  수집 단계 상한이 「예산 + 시한 − 최소 여유 + 30초」보다 크다', stepCap * 60000 > budgetMs + hardMs - minRoom + 30000, true);
   eq('  작업 상한이 단계 상한의 합 + 여유보다 크다', limit > stepCaps.reduce((a, b) => a + b, 0) + 3, true);
   eq('  수집 단계가 실패해도 알린다 · 저장은 pushed 표식 · 맨몸 rebase 없음', /if: steps\.run\.outcome != 'success'/.test(wf) && /pushed" != "1"/.test(wf) && !/git pull --rebase(?! --autostash)/.test(wf), true);
-  const saved = ['data/news', 'collector/seen-news.json', 'collector/news-cursor.json', 'collector/news-health.json', 'collector/news-sources.json', 'collector/news-report.md', 'collector/find-news-boards-report.md'];
+  const saved = ['data/news', 'collector/seen-news.json', 'collector/news-cursor.json', 'collector/news-health.json', 'collector/news-sources.json', 'collector/news-report.md', 'collector/find-news-boards-report.md', 'collector/news-thumbs.json', 'collector/news-thumbs-report.md'];
   eq('  로봇이 쓰는 파일 전부를 저장한다', saved.filter((f) => !wf.includes('git add ' + f)), []);
   eq('  관문(test-collector + audit-data)이 저장 앞에 있고 실패하면 되돌린다', wf.indexOf('node verify/audit-data.js') < wf.indexOf('git commit') && /if: steps\.audit\.outcome == 'failure'/.test(wf), true);
   eq('  감사 실패를 조용히 넘기지 않는다 (이슈 생성 단계)', /교내 소식 데이터 감사 실패/.test(wf) && (wf.match(/if: steps\.audit\.outcome == 'failure'/g) || []).length >= 2, true);
@@ -2247,7 +2247,7 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
   eq('못 받아 왔어도 빈 문서 (뼈대가 굳지 않게)', /liveNews = d \|\| liveNews \|\| \{ items: \[\], updatedAt: null \}/.test(app), true);
   eq('옛 통짜 파일로 물러나는 길이 없다', /data\/news\.json/.test(app), false);
   eq('학교 범위는 엔진의 noticeForProfile 한 곳 · 숨긴 글 제외', /\.filter\(\(n\) => n && n\.url && n\.title && !n\.hidden && noticeForProfile\(n, p\)\)/.test(app), true);
-  eq('카드는 한 벌 — 윗줄만 「학교 공지 · 갈래」 · 게시일은 줄에서 읽은 것만 한 줄', /noticeCardHtml\(n, \{ org: `\$\{n\.school\} 공지\$\{n\.kind \? ' · ' \+ n\.kind : ''\}`, excerpts: n\.postedAt \? \[\{ label: '게시', text: n\.postedAt \}\] : \[\] \}\)/.test(app) && !/function newsCardHtml/.test(app), true);
+  eq('카드는 한 벌 — 윗줄만 「학교 공지 · 갈래」 · 게시일은 줄에서 읽은 것만 한 줄', /noticeCardHtml\(n, \{ org: `\$\{n\.school\} 공지\$\{n\.kind \? ' · ' \+ n\.kind : ''\}`, excerpts: n\.postedAt \? \[\{ label: '게시', text: n\.postedAt \}\] : \[\], thumb: n\.thumb \}\)/.test(app) && !/function newsCardHtml/.test(app), true);
   eq('더보기 — 장 수는 상수 하나 · 그릇에 위임', /const NEWS_HOME_TOP = \d+;/.test(app) && /newsBox\.addEventListener\('click'/.test(app) && /data-news-more/.test(app), true);
   const ui = strip(readText(new URL('.github/workflows/verify-ui.yml', root)));
   eq('브라우저 드라이버가 관문에 걸려 있다', /verify-news\.js/.test(ui), true);
@@ -2300,6 +2300,207 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
     eq('  감사의 갈래 사본도 news-kind 와 같다', auditKinds.match(/'([^']+)'/g).map((x) => x.slice(1, -1)), NK.NEWS_KINDS);
     const ay = readText(new URL('.github/workflows/admin-apply.yml', root));
     eq('  관리자 워크플로가 소식 파일을 저장한다', /git add data\/news/.test(ay) && /git add collector\/news-sources\.json/.test(ay), true);
+  }
+}
+
+console.log('\n■ 교내 소식 썸네일 (2026-10-03 개발자 지시 "실제 뉴스의 사진을 첨부해와서 해당 사진을 썸네일로")');
+{
+  const TH = await import('../collector/news-thumb.mjs');
+  const root = new URL('../', import.meta.url);
+  const RB = await import('../collector/news-board-rules.mjs');
+  const base = 'https://www.x.ac.kr/bbs/n/9/view.do';
+  /* ① 후보 — 대표 이미지 → 본문 사진 → 첨부 그림 차례 · 머리·메뉴·바닥 그림과 로고·아이콘 이름·벡터·적힌 크기가 작은 그림은 뺀다 · 늦게 싣는 그림은 data-src 가 진짜 */
+  const page = `<html><head><meta property="og:image" content="/upload/og/2026/a.jpg"><meta property="og:image" content="/img/og_default.png"></head><body>
+    <header><img src="/upload/top/header-photo.jpg"></header><nav><img src="/upload/menu/m.jpg"></nav>
+    <div class="view"><img src="/img/ico_new.gif"><img src="/upload/x/s.png" width="16" height="16"><img src="/upload/editor/2026/diagram.svg">
+      <img data-src="/upload/editor/2026/real.jpg" src="/img/blank.gif" alt="행사 사진"><img src="/upload/editor/2026/second.png">
+      <a href="/cmmn/fileDown.do?id=7">포스터.jpg</a><a href="/cmmn/fileDown.do?id=8">신청서.hwp</a></div>
+    <footer><img src="/upload/foot/f.jpg"></footer></body></html>`;
+  const cands = TH.imageCandidates(page, base);
+  eq('  후보 차례 — 대표 이미지 → 본문 사진(늦게 싣기는 data-src) → 첨부 그림 · 머리·메뉴·바닥·로고·아이콘·벡터·작은 그림 제외', cands.map((c) => `${c.from}:${c.src.replace('https://www.x.ac.kr', '')}`),
+    ['og:/upload/og/2026/a.jpg', 'body:/upload/editor/2026/real.jpg', 'body:/upload/editor/2026/second.png', 'attach:/cmmn/fileDown.do?id=7']);
+  eq('    진짜 사진이 사는 폴더(/upload/file/·/_attach/)는 장식으로 보지 않는다 · 파일 이름의 로고·아이콘·단추와 sns 폴더는 장식', ['https://x.ac.kr/upload/file/2026/a.jpg', 'https://x.ac.kr/_attach/image/a.png', 'https://x.ac.kr/img/common/logo.png', 'https://x.ac.kr/images/btn_top.png', 'https://x.ac.kr/sns/kakao.png'].map((u) => TH.looksChrome(u)), [false, false, true, true, true]);
+  /* 리뷰 12차 — 낱말 하나로 진짜 사진을 막았다(카톡으로 받은 사진·행사 배너 포스터·기본 방 사진). SNS 는 단추·아이콘 꼴일 때만 장식 */
+  eq('    카톡 사진·행사 배너·설치식·기본 방 사진은 진짜 사진 · sns_kakao·kakao_icon·ico_new 는 장식', ['KakaoTalk_20261002_153012345.jpg', 'KakaoTalk_Photo_2026-10-02-15-30-12-001.jpeg', '2026_festival_banner.jpg', 'installation_ceremony.jpg', 'default_room.jpg', 'insta_cardnews_01.jpg', 'sns_kakao.png', 'kakao_icon.png', 'ico_new.gif', 'og_default.jpg'].map((f) => TH.looksChrome(`https://x.ac.kr/wp-content/uploads/2026/10/${f}`)), [false, false, false, false, false, false, true, true, true, true]);
+  /* 리뷰 12차 — 날것의 '%'·EUC-KR 바이트 이름·범위 밖 엔티티 하나가 글 하나의 후보를 통째로 날렸다(그 글은 영영 사진 없음) */
+  eq('    이상한 이름(날것 %·EUC-KR 바이트·큰 엔티티)이 있어도 던지지 않고 나머지 후보가 산다', (() => { try { return TH.imageCandidates('<meta property="og:image" content="/upload/og/50%할인.png"><div class="view"><img src="/upload/editor/2026/참여율 100% 달성.jpg"><img src="/upload/editor/%C2%FC%BF%A9.jpg" alt="&#99999999;"><img src="/upload/editor/2026/real.jpg"></div>', base).length; } catch (e) { return `던짐: ${e.message}`; } })(), 4);
+  eq('    JSON 쪽도 던지지 않는다', (() => { try { return TH.jsonImageCandidates({ content: '<img src="/upload/100% 장학.jpg"><img src="/upload/ok.jpg">' }, base).length; } catch (e) { return `던짐: ${e.message}`; } })(), 2);
+  /* 리뷰 12차 — 정규식 하나로는 안에 같은 태그가 든 머리(<div id="header"><div class="inner">)를 못 지워 머리 그림이 후보를 다 썼다 → 짝을 세어 지운다 */
+  eq('    겹친 머리·서브 비주얼 상자도 통째로 걷는다 · has-header 처럼 낱말로 시작하지 않는 본문 상자는 안 걷는다', TH.imageCandidates('<div id="wrap" class="has-header"><div id="header"><div class="inner"><img src="/upload/top/ci_mark.jpg"><div class="gnb"><img src="/upload/top/event.jpg"></div></div></div><div class="sub-visual"><img src="/upload/top/sub_visual04.jpg"></div><div class="board-view"><img src="/upload/editor/p1.jpg"></div></div>', base).map((c) => c.src.replace('https://www.x.ac.kr', '')), ['/upload/editor/p1.jpg']);
+  eq('    href="#" 인 첨부 글자(포스터.jpg)는 글 화면 자신이라 후보가 아니다', TH.imageCandidates('<div class="view"><a href="#">포스터.jpg</a></div>', base), []);
+  /* 리뷰 12차 — 쿠키 없는 로봇에게 JSP 가 요청마다 다른 ;jsessionid 를 붙여, 같은 기본 그림이 글마다 다른 주소로 보였다 */
+  eq('    ;jsessionid 꼬리를 떼어 같은 그림을 같은 주소로 본다', [TH.absImg('/images/egovframework/og_img.png;jsessionid=ABC123', base), TH.absImg('/images/egovframework/og_img.png;jsessionid=XYZ999?v=1', base)], ['https://www.x.ac.kr/images/egovframework/og_img.png', 'https://www.x.ac.kr/images/egovframework/og_img.png?v=1']);
+  eq('    JSON 의 파일 이름만 든 칸은 주소를 지어 부르지 않는다 (주소 유추 금지) · 이미 주소인 값만', TH.jsonImageCandidates({ data: { content: '<p>본문</p>', fileList: [{ orignlFileNm: '포스터.jpg', streFileNm: 'BBS_202610031234567.jpg', fileUrl: '/upload/bbs/2026/a.jpg' }] } }, base).map((c) => c.src.replace('https://www.x.ac.kr', '')), ['/upload/bbs/2026/a.jpg']);
+  eq('    본문이 JSON 인 규칙 — HTML 조각의 그림 · 그림 칸의 주소', TH.jsonImageCandidates({ data: { content: '<p>글</p><img src="/upload/ed/p.jpg">', thumbImg: '/upload/th/t.png', title: '제목.jpg 아님' } }, base).map((c) => c.src.replace('https://www.x.ac.kr', '')), ['/upload/ed/p.jpg', '/upload/th/t.png']);
+  /* ② 받은 바이트가 그림인지 · 크기 — 파일 머리만 읽는다 */
+  const png = Buffer.alloc(32); Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]).copy(png); png.write('IHDR', 12, 'latin1'); png.writeUInt32BE(640, 16); png.writeUInt32BE(480, 20);
+  const gif = Buffer.alloc(32); gif.write('GIF89a', 0, 'latin1'); gif.writeUInt16LE(16, 6); gif.writeUInt16LE(16, 8);
+  const webp = Buffer.alloc(32); webp.write('RIFF', 0, 'latin1'); webp.write('WEBPVP8X', 8, 'latin1'); webp.writeUIntLE(1199, 24, 3); webp.writeUIntLE(299, 27, 3);
+  const jpg = Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10]), Buffer.alloc(14), Buffer.from([0xff, 0xc0, 0x00, 0x11, 0x08, 0x01, 0x2c, 0x01, 0x90, 0x03]), Buffer.alloc(20)]);
+  const html = Buffer.from('<!doctype html><html><body>404 Not Found</body></html>');
+  eq('  그림 머리 읽기 — PNG·GIF·WebP·JPEG 의 가로·세로 · HTML 은 그림이 아니다', [png, gif, webp, jpg, html].map((b) => { const i = TH.sniffImage(b); return i ? `${i.type} ${i.width}x${i.height}` : null; }), ['png 640x480', 'gif 16x16', 'webp 1200x300', 'jpeg 400x300', null]);
+  eq('    실제 사진 파일도 읽는다 (정문 사진)', (TH.sniffImage((() => { const fd = fs.openSync(new URL('assets/gates/hanyang-1.jpg', root), 'r'); const b = Buffer.alloc(262144); const n = fs.readSync(fd, b, 0, b.length, 0); fs.closeSync(fd); return b.subarray(0, n); })()) || {}).type, 'jpeg');
+  eq('  사진으로 쓸 만한가 — 아이콘(작음)·띠 배너(가로세로 3배 넘음)·작은 파일·그림 아님은 떨어진다', [TH.photoProblem({ width: 640, height: 480 }, 50000), TH.photoProblem({ width: 16, height: 16 }, 50000) !== '', TH.photoProblem({ width: 1200, height: 300 }, 50000) !== '', TH.photoProblem({ width: 640, height: 480 }, 900) !== '', TH.photoProblem(null, 50000) !== ''], ['', true, true, true, true]);
+  /* ③ 여러 글에 같은 그림 = 그 학교의 공통 그림(로고·기본 공유 그림) — 막고, 이미 받은 글은 되돌려 다시 찾는다 */
+  {
+    const L = TH.emptyLedger();
+    TH.recordPage(L, '가대학교', 'post:가대학교:1', ['https://x/og.jpg', 'https://x/p1.jpg']);
+    L.posts['post:가대학교:1'] = { at: '2026-10-03', school: '가대학교', file: 'data/news/img/0123456789abcdef.webp', src: 'https://x/og.jpg', from: 'og' };
+    eq('    한 글에서만 본 그림은 막지 않는다', [...TH.blockedFor(L, '가대학교')], []);
+    TH.recordPage(L, '가대학교', 'post:가대학교:2', ['https://x/og.jpg', 'https://x/p2.jpg']);
+    eq('    두 글에서 본 그림은 공통 그림으로 막는다 · 다른 학교엔 번지지 않는다', [[...TH.blockedFor(L, '가대학교')], [...TH.blockedFor(L, '나대학교')]], [['https://x/og.jpg'], []]);
+    eq('    공통 그림을 썸네일로 받았던 글은 장부에서 지워 다시 찾는다', [TH.revokeRepeated(L, '가대학교'), 'post:가대학교:1' in L.posts], [['post:가대학교:1'], false]);
+  }
+  /* 리뷰 12차 — 주소가 달라도 **줄인 그림이 같은 파일**이면 공통 그림이다(세션 꼬리·CDN) — 그 파일을 쓰던 글을 되돌리고 소급에서도 안 붙인다 */
+  {
+    const L = TH.emptyLedger(); const f = 'data/news/img/0123456789abcdef.webp';
+    L.posts['post:가대학교:1'] = { at: '2026-10-03', school: '가대학교', file: f, src: 'https://x/a;1' };
+    eq('    같은 학교의 다른 글이 같은 파일을 쓰나 (fileTwins)', TH.fileTwins(L, '가대학교', f, 'post:가대학교:2'), ['post:가대학교:1']);
+    TH.markCommonFile(L, '가대학교', f);
+    const docs = [{ doc: { items: [{ school: '가대학교', postId: '1', url: 'u1', thumb: f }] } }];
+    const before = TH.applyThumbs(docs, L, { fileExists: () => true });
+    eq('    공통 파일 — 소급에서 칸을 지우고 · 그 파일을 쓰던 글은 되돌려 다시 찾는다', [before, docs[0].doc.items[0].thumb || '-', TH.revokeRepeated(L, '가대학교')], [1, '-', ['post:가대학교:1']]);
+  }
+  {
+    /* QR 코드·검은 글자뿐인 그림 — 색 없고 거의 모든 점이 검정/흰색. 단색 디자인 포스터(색이 있다)·사진은 산다 (정보량으로 가르면 포스터가 먼저 떨어졌다 — 실측) */
+    const px = (fn, n = 400) => { const b = []; for (let i = 0; i < n; i += 1) b.push(...fn(i)); return b; };
+    const qr = px((i) => (((i * 7919) % 13) < 6 ? [0, 0, 0] : [255, 255, 255]));
+    const qrJpeg = px((i) => (((i * 7919) % 13) < 6 ? [18, 18, 20] : [240, 241, 239]));
+    const poster = px((i) => (i % 5 === 0 ? [255, 255, 255] : i % 3 === 0 ? [245, 197, 66] : [42, 77, 143]));
+    const photo = px((i) => [(i * 37) % 256, (i * 91) % 256, (i * 53) % 256]);
+    const night = px((i) => (i % 5 === 0 ? [250, 250, 250] : [10, 10, 12]));   // 밤 사진 — 검정 80% · 흰색 20% 지만 사이 빛(색)이 섞인다
+    const nightReal = night.map((v, i) => (i % 9 === 0 ? 120 : v));
+    const bwPhoto = px((i) => (i % 5 < 2 ? [12, 12, 12] : i % 5 < 4 ? [245, 245, 245] : [128, 128, 128]));   // 흑백 사진 — 검정 40% · 흰색 40% · 회색 20% (합 80%)
+    eq('  QR 은 사진이 아니다(검정·흰색이 둘 다 넉넉하고 거의 전부) · 단색 디자인 포스터·사진·밤 사진·흑백 사진은 산다', [qr, qrJpeg, poster, photo, nightReal, bwPhoto].map((b) => TH.looksLikeQr(TH.monoParts(b))), [true, true, false, false, false, false]);
+  }
+  eq('  관리자가 사진을 뺀 뒤 글 번호가 붙어도(열쇠가 바뀌어도) 뺀 그대로 · 목록 표식 주소는 다른 글과 같아 주소 열쇠로 보지 않는다', [TH.optedOut({ school: '가', postId: '9', url: 'https://g/v/9' }, new Set(['url:' + urlKey('https://g/v/9')])), TH.optedOut({ school: '가', postId: '9', url: 'https://g/l#n-x' }, new Set(['url:' + urlKey('https://g/l#n-x')]))], [true, false]);
+  {
+    const rr = readText(new URL('collector/collect-news-thumbs.mjs', root));
+    eq('  잠깐의 실패(받기 실패·5xx·429)와 후보를 다 못 연 것은 \'없음\'으로 굳히지 않고 다시 본다 · QR·같은 파일은 건너뛴다', /if \(transient\) return \{ err:/.test(rr) && /if \(leftOver\) return \{ err:/.test(rr) && /transient: res\.status >= 500 \|\| res\.status === 429/.test(rr) && /catch \(e\) \{ transient = true;/.test(rr) && /if \(out\.qr\)/.test(rr) && /T\.isCommonFile\(ledger, n\.school, rel\)/.test(rr) && /const twins = T\.fileTwins\(/.test(rr), true);
+  }
+  /* ④ 이번에 열어 볼 글 — 숨김·사진 뺌·이미 받음·없음은 건너뛰고 · 실패는 하루 뒤 · 파일이 사라진 것은 다시 · 새 글부터 학교마다 돌아가며 · 학교당 상한 */
+  {
+    const it = (school, id, f, x = {}) => ({ title: `${school} 글 ${id}`, url: `https://${id}.ac.kr/v`, school, postId: String(id), foundAt: f, ...x });
+    const items = [it('가대학교', 1, '2026-10-01'), it('가대학교', 2, '2026-10-03'), it('가대학교', 3, '2026-10-02'), it('나대학교', 4, '2026-10-02'), it('나대학교', 5, '2026-10-03', { hidden: true }),
+      it('가대학교', 6, '2026-10-03'), it('나대학교', 7, '2026-10-01'), it('나대학교', 8, '2026-10-01'), it('나대학교', 9, '2026-10-01'), it('나대학교', 10, '2026-10-01')];
+    const L = TH.emptyLedger();
+    L.posts['post:가대학교:6'] = { at: '2026-10-03', school: '가대학교', file: 'data/news/img/0123456789abcdef.webp' };   // 받았는데 파일이 없다 → 다시
+    L.posts['post:나대학교:7'] = { at: '2026-10-01', school: '나대학교', none: '글에 그림이 없음' };
+    L.posts['post:나대학교:8'] = { at: '2026-10-03', school: '나대학교', err: '글 HTTP 500', tries: 1 };   // 오늘 실패 → 내일
+    L.posts['post:나대학교:9'] = { at: '2026-10-01', school: '나대학교', err: '글 HTTP 500', tries: 1 };   // 이틀 전 실패 → 다시
+    L.posts['post:나대학교:10'] = { at: '2026-10-01', school: '나대학교', err: '글 HTTP 500', tries: 3 };  // 세 번 실패 → 그만
+    const q = TH.planQueue(items, L, { today: '2026-10-03', perSchool: 2, noThumb: new Set(['post:가대학교:3']), fileExists: () => false });
+    eq('    순서·거르기 — 새 글부터 · 가·나 학교를 번갈아 · 학교당 2건 · 숨김/사진 뺌/없음/오늘 실패/세 번 실패 제외 · 파일 사라진 것은 다시', q.map((n) => n.postId), ['2', '4', '6', '9']);
+  }
+  /* ⑤ 소급 — 장부를 실린 글 전부에 다시 입힌다(병합이 칸을 떨어뜨려도 되살린다) · 사진 뺌·파일 없음·꼴이 아닌 값은 지운다 */
+  {
+    const L = TH.emptyLedger();
+    const ok = 'data/news/img/0123456789abcdef.webp';
+    L.posts['post:가대학교:1'] = { at: '2026-10-03', school: '가대학교', file: ok };
+    L.posts['post:가대학교:2'] = { at: '2026-10-03', school: '가대학교', file: ok };
+    L.posts['post:가대학교:3'] = { at: '2026-10-03', school: '가대학교', file: 'https://evil.example/x.jpg' };
+    const docs = [{ doc: { items: [{ school: '가대학교', postId: '1', url: 'u1' }, { school: '가대학교', postId: '2', url: 'u2', thumb: ok }, { school: '가대학교', postId: '3', url: 'u3' }, { school: '가대학교', postId: '4', url: 'u4', thumb: ok }] } }];
+    const changed = TH.applyThumbs(docs, L, { noThumb: new Set(['post:가대학교:2']), fileExists: () => true });
+    eq('    입히기 — 장부의 사진은 붙이고 · 사진 뺀 글·장부에 없는 글·바깥 주소는 칸을 지운다', [changed, docs[0].doc.items.map((n) => n.thumb || '-'), docs[0].changed], [3, [ok, '-', '-', '-'], true]);
+  }
+  /* ⑥ 장부 다듬기 — 피드에서 빠진 글은 60일 뒤 · 그림 주소 셈은 실린 글 것만 · 공통 그림은 막는 목록으로 남긴다 */
+  {
+    const L = TH.emptyLedger();
+    L.posts.a = { at: '2026-07-01', school: '가' }; L.posts.b = { at: '2026-10-01', school: '가' }; L.posts.c = { at: '2026-07-01', school: '가' };
+    L.srcSeen['가'] = { 'https://x/og.jpg': ['a', 'b'], 'https://x/old.jpg': ['a'], 'https://x/live.jpg': ['c'] };
+    TH.pruneLedger(L, new Set(['c']), '2026-10-03');
+    eq('    다듬기 결과', [Object.keys(L.posts), L.srcSeen['가']], [['b', 'c'], { 'https://x/og.jpg': ['a', 'b'], 'https://x/live.jpg': ['c'] }]);
+  }
+  eq('  장부 열쇠 = 새 글 판정 열쇠 (글 번호가 있으면 글 번호 · 같은 제목의 다른 글이 사진을 나눠 갖지 않는다)', [TH.thumbKey({ school: '경희대학교', postId: '41', url: 'https://k/list#n-x' }), TH.thumbKey({ school: '경희대학교', postId: '42', url: 'https://k/list#n-x' })], ['post:경희대학교:41', 'post:경희대학교:42']);
+  eq('  본문 요청 — 목록 표식은 글 화면이 없어 없음(주소를 짓지 않는다) · 본문 API 규칙은 그 API · 나머지는 글 주소', [RB.postContentRequest(undefined, { url: 'https://k/list#n-x' }), RB.postContentRequest(RB.NEWS_BOARD_RULES['서강대학교'], { url: 'https://www.sogang.ac.kr/ko/detail/550598?bbsConfigFk=3' }).url, RB.postContentRequest(undefined, { url: base }).url], [null, 'https://www.sogang.ac.kr/api/api/v1/mainKo/BbsData?pkId=550598', base]);
+  /* ⑦ 썸네일 경로 꼴은 한 곳 — 앱·감사·관리자 사본이 로봇의 꼴과 같다 (다르면 로봇이 만든 그림을 앱이 안 그리거나, 감사가 막는다) */
+  const app = readText(new URL('app.js', root));
+  const appRe = (app.match(/const NEWS_THUMB_RE = \/(.+)\/;/) || [])[1];
+  const auditRe = (readText(new URL('verify/audit-data.js', root)).match(/const THUMB_RE = \/(.+)\/;/) || [])[1];
+  const adm = readText(new URL('_admin/admin.js', root));
+  eq('  썸네일 꼴 사본 — 앱·감사·관리자가 로봇의 THUMB_RE 와 같다', [appRe, auditRe, adm.includes(`/${TH.THUMB_RE.source}/.test(n.thumb`)], [TH.THUMB_RE.source, TH.THUMB_RE.source, true]);
+  eq('  썸네일 이름은 줄인 그림 바이트의 해시 (같은 이름에 다른 그림을 쓰지 않는다 — 서비스워커가 그림을 캐시 우선으로 영영 든다)', [TH.thumbName(Buffer.from('a')) === TH.thumbName(Buffer.from('a')), TH.thumbName(Buffer.from('a')) !== TH.thumbName(Buffer.from('b')), TH.isThumbPath(TH.thumbName(Buffer.from('a')))], [true, true, true]);
+  /* ⑧ 카드 — 소식만 opts.thumb 로 · 다른 카드(실시간 공고·재단)는 그림을 안 넘긴다 · 못 받으면 그림을 빼는 error 잡이(CSP 가 onerror= 를 막는다) */
+  eq('  카드 — 로봇 꼴일 때만 그림 · 소식 카드만 넘긴다 · 못 받은 그림은 빼고 글자 카드로', /const thumb = o\.thumb && NEWS_THUMB_RE\.test\(o\.thumb\) \? o\.thumb : '';/.test(app) && (app.match(/thumb: n\.thumb/g) || []).length === 1
+    && /document\.addEventListener\('error', \(e\) => \{[\s\S]{0,200}?notice-thumb[\s\S]{0,200}?\}, true\);/.test(app) && /class="notice-thumb" src="\$\{esc\(thumb\)\}" alt="" loading="lazy"/.test(app), true);
+  eq('    브라우저 드라이버가 썸네일을 잰다 (그려짐·72px·겹침 없음·못 받으면 뺌·바깥 주소 안 부름)', /⑥ 사진 있는 글/.test(readText(new URL('verify/verify-news.js', root))) && /⑥ 바깥 주소로 그림을 부르지 않았다/.test(readText(new URL('verify/verify-news.js', root))), true);
+  /* ⑨ 워크플로 — 수집 다음·감사 앞 보강 단계 · sharp 설치를 삼키지 않는다 · 장부 되돌리기를 따로 · 저장 */
+  const wf = readText(new URL('.github/workflows/collect-news.yml', root));
+  const iRun = wf.indexOf('node collector/collect-news.mjs'); const iThumb = wf.indexOf('node collector/collect-news-thumbs.mjs'); const iAudit = wf.indexOf('node verify/audit-data.js');
+  const thumbStep = wf.slice(wf.lastIndexOf('- name:', iThumb), iThumb + 60);
+  eq('  워크플로 — 수집 다음·감사 앞 · 단계 시한·continue-on-error · sharp 설치 실패를 삼키지 않는다', [iRun > 0 && iRun < iThumb && iThumb < iAudit, /timeout-minutes: \d+/.test(thumbStep) && /continue-on-error: true/.test(thumbStep), /npm i sharp[^\n|]*\n/.test(thumbStep) && !/npm i sharp[^\n]*\|\| true/.test(thumbStep)], [true, true, true]);
+  eq('    감사 실패 되돌리기 — 장부는 따로 한 줄(장부가 아직 없는 첫 실행에 소식 되돌리기까지 실패하지 않게)', /git checkout -- data\/news collector\/seen-news\.json 2>\/dev\/null \|\| true\n\s*#[^\n]*\n\s*git checkout -- collector\/news-thumbs\.json 2>\/dev\/null \|\| rm -f collector\/news-thumbs\.json/.test(wf), true);
+  const ga = readText(new URL('.gitattributes', root));
+  eq('  병합 규칙 — 그림은 -diff · 장부는 합집합 · 리포트는 ours', /^data\/news\/img\/\*\*\s+-diff$/m.test(ga) && /^collector\/news-thumbs\.json\s+merge=jsonunion$/m.test(ga) && /^collector\/news-thumbs-report\.md\s+merge=ours$/m.test(ga), true);
+  {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-thumbmerge-'));
+    const w = (n, o) => { fs.writeFileSync(path.join(dir, n), JSON.stringify(o, null, 1)); return path.join(dir, n); };
+    const ours = w('o.json', { posts: { a: { at: '2026-10-01', school: '가', file: 'data/news/img/0123456789abcdef.webp' }, b: { at: '2026-10-01', school: '가', none: 'x' } }, srcSeen: { '가': { s: ['a'] } } });
+    const theirs = w('t.json', { posts: { a: { at: '2026-10-03', school: '가', err: 'y', tries: 1 }, b: { at: '2026-10-03', school: '가', none: 'z' } }, srcSeen: { '가': { s: ['b'] } } });
+    const r = spawnSync(process.execPath, [fileURLToPath(new URL('../tools/merge-json-union.mjs', import.meta.url)), w('base.json', {}), ours, theirs, 'collector/news-thumbs.json'], { encoding: 'utf8' });
+    const m = JSON.parse(readText(ours));
+    eq('    장부 병합 — 사진 있는 쪽 → 늦은 쪽 · 그림 주소를 본 글은 합집합 (공통 그림을 잊지 않는다)', [r.status, m.posts.a.file || '', m.posts.b.none, m.srcSeen['가'].s.sort()], [0, 'data/news/img/0123456789abcdef.webp', 'z', ['a', 'b']]);
+  }
+  /* ⑩ 로봇 — 임시 폴더에서 받기 없이(관문용) 소급·정리만: 장부의 사진 입히기 · 사진 뺀 글 칸 지우기 · 안 쓰는 그림 지우기 · 리포트 */
+  {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-thumbrun-'));
+    fs.mkdirSync(path.join(dir, 'data/news/img'), { recursive: true }); fs.mkdirSync(path.join(dir, 'collector'), { recursive: true });
+    const keep = 'data/news/img/0123456789abcdef.webp'; const off = 'data/news/img/fedcba9876543210.webp'; const orphan = 'data/news/img/aaaaaaaaaaaaaaaa.webp';
+    for (const f of [keep, off, orphan]) fs.writeFileSync(path.join(dir, f), 'x');
+    fs.writeFileSync(path.join(dir, 'data/news/nx.json'), JSON.stringify({ school: '가대학교', updatedAt: '2026-10-03', items: [
+      { title: '사진 붙을 글', url: 'https://g/1', school: '가대학교', postId: '1', foundAt: '2026-10-03' },
+      { title: '사진 뺀 글', url: 'https://g/2', school: '가대학교', postId: '2', foundAt: '2026-10-03', thumb: off }] }, null, 1));
+    fs.writeFileSync(path.join(dir, 'collector/news-thumbs.json'), JSON.stringify({ posts: { 'post:가대학교:1': { at: '2026-10-03', school: '가대학교', file: keep }, 'post:가대학교:2': { at: '2026-10-03', school: '가대학교', file: off } }, srcSeen: {} }));
+    fs.writeFileSync(path.join(dir, 'collector/news-config.json'), JSON.stringify({ hideUrls: [], noThumb: ['post:가대학교:2'] }));
+    const r = spawnSync(process.execPath, [fileURLToPath(new URL('../collector/collect-news-thumbs.mjs', import.meta.url))], { env: { ...process.env, NEWS_THUMB_ROOT: dir, NEWS_THUMB_OFFLINE: '1' }, encoding: 'utf8' });
+    const doc = JSON.parse(readText(path.join(dir, 'data/news/nx.json')));
+    eq('  로봇(받기 없이) — 장부 사진 입힘 · 사진 뺀 글 칸 지움 · 안 쓰는 그림 지움 · 리포트에 학교별 수', [r.status, doc.items.map((n) => n.thumb || '-'), fs.readdirSync(path.join(dir, 'data/news/img')).sort(), /\| 가대학교 \| 2 \| 1 \|/.test(readText(path.join(dir, 'collector/news-thumbs-report.md')))],
+      [0, [keep, '-'], ['0123456789abcdef.webp'], true]);
+  }
+  /* ⑩-2 전체 스위치 — dry 는 받아 두기만(카드엔 안 붙이고 그림은 남김 · 사람이 먼저 본다) · off 는 카드의 사진을 모두 떼고 그림도 지운다 */
+  {
+    const mkRoot = (mode) => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-thumbmode-'));
+      fs.mkdirSync(path.join(dir, 'data/news/img'), { recursive: true }); fs.mkdirSync(path.join(dir, 'collector'), { recursive: true });
+      const img = 'data/news/img/0123456789abcdef.webp'; fs.writeFileSync(path.join(dir, img), 'x');
+      fs.writeFileSync(path.join(dir, 'data/news/nx.json'), JSON.stringify({ school: '가대학교', updatedAt: '2026-10-03', items: [{ title: '사진 글', url: 'https://g/1', school: '가대학교', postId: '1', foundAt: '2026-10-03', thumb: img }] }, null, 1));
+      fs.writeFileSync(path.join(dir, 'collector/news-thumbs.json'), JSON.stringify({ posts: { 'post:가대학교:1': { at: '2026-10-03', school: '가대학교', file: img } }, srcSeen: {} }));
+      fs.writeFileSync(path.join(dir, 'collector/news-config.json'), JSON.stringify({ hideUrls: [], thumbs: mode }));
+      spawnSync(process.execPath, [fileURLToPath(new URL('../collector/collect-news-thumbs.mjs', import.meta.url))], { env: { ...process.env, NEWS_THUMB_ROOT: dir, NEWS_THUMB_OFFLINE: '1' }, encoding: 'utf8' });
+      return [JSON.parse(readText(path.join(dir, 'data/news/nx.json'))).items[0].thumb || '-', fs.readdirSync(path.join(dir, 'data/news/img')).length];
+    };
+    eq('  전체 스위치 — on 은 붙임 · dry 는 카드엔 안 붙이고 그림은 남김 · off 는 떼고 그림도 지움', [mkRoot('on'), mkRoot('dry'), mkRoot('off')], [['data/news/img/0123456789abcdef.webp', 1], ['-', 1], ['-', 0]]);
+  }
+  /* ⑪ 감사 — 썸네일 꼴·파일·크기 · 같은 글 판정은 글 번호로(같은 제목의 다른 글을 중복으로 잡지 않는다) · 라이브 점검이 사진도 본다 */
+  const au = readText(new URL('verify/audit-data.js', root));
+  eq('  감사 — 썸네일 꼴·파일 있음·크기 · 같은 글은 글 번호로', /if \(!THUMB_RE\.test\(String\(n\.thumb\)\)\) badThumb\+\+;/.test(au) && /missThumb\+\+/.test(au) && /if \(missThumb\) warns\.push\(/.test(au) && /bigThumb\+\+/.test(au) && /const uk = n\.postId \? `p\|\$\{n\.school\}\|\$\{n\.postId\}` : urlKey\(n\.url\);/.test(au), true);
+  const live = readText(new URL('.github/workflows/check-live.yml', root));
+  eq('  라이브 점검이 소식 사진을 바이트로 대조한다 (404 HTML 은 읽기실패)', /out\.push\(t\.thumb\)/.test(live) && /const measure = f\.endsWith\('\.webp'\) \? bytes : count;/.test(live) && /'WEBP'/.test(live), true);
+  /* ⑫ 관리자 — 사진 빼기·되살리기 (글 번호로 고른다 · 로봇이 다시 붙이지 않게 noThumb) */
+  {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-thumbadm-'));
+    fs.mkdirSync(path.join(dir, 'data/news/img'), { recursive: true }); fs.mkdirSync(path.join(dir, 'collector'), { recursive: true });
+    const img = 'data/news/img/0123456789abcdef.webp'; fs.writeFileSync(path.join(dir, img), 'x');
+    const mk = 'https://k.ac.kr/notice#n-' + encodeURIComponent('2학기 휴강 안내');
+    fs.writeFileSync(path.join(dir, 'data/news/nk.json'), JSON.stringify({ school: '경희대학교', updatedAt: '2026-10-03', items: [
+      { title: '2학기 휴강 안내', url: mk, postId: '41', school: '경희대학교', campus: '', foundAt: '2026-10-01', thumb: img },
+      { title: '2학기 휴강 안내', url: mk, postId: '42', school: '경희대학교', campus: '', foundAt: '2026-10-03', thumb: img }] }, null, 1));
+    fs.writeFileSync(path.join(dir, 'collector/news-thumbs.json'), JSON.stringify({ posts: { 'post:경희대학교:41': { at: '2026-10-01', school: '경희대학교', file: img } }, srcSeen: {} }));
+    fs.writeFileSync(path.join(dir, 'collector/news-config.json'), JSON.stringify({ hideUrls: [] }));
+    fs.writeFileSync(path.join(dir, 'collector/news-sources.json'), JSON.stringify({ sources: [], parked: [] }));
+    fs.writeFileSync(path.join(dir, 'data/admin-log.json'), '{"items":[]}');
+    fs.writeFileSync(path.join(dir, 'data/registered.json'), JSON.stringify({ items: [] }));
+    fs.writeFileSync(path.join(dir, 'data/forms.json'), JSON.stringify({ forms: {}, templates: {} }));
+    const run = (action, payload) => spawnSync(process.execPath, [fileURLToPath(new URL('../tools/admin-apply.mjs', import.meta.url))], { cwd: dir, env: { ...process.env, ACTION: action, ACTOR: 'test', PAYLOAD: JSON.stringify(payload) }, encoding: 'utf8' });
+    const readT = (p) => JSON.parse(readText(path.join(dir, p)));
+    const st = run('newsThumbOff', { url: mk, postId: '41' }).status;
+    eq('  관리자 사진 빼기 — 그 글(글 번호)만 · 표식 · 로봇이 다시 안 붙이게 noThumb', [st, readT('data/news/nk.json').items.map((n) => `${n.postId}:${n.thumb ? '사진' : '-'}:${n.thumbOffBy ? '뺌' : ''}`), readT('collector/news-config.json').noThumb], [0, ['41:-:뺌', '42:사진:'], ['post:경희대학교:41']]);
+    const st2 = run('newsThumbOn', { url: mk, postId: '41' }).status;
+    eq('    되살리기 — 장부의 사진을 바로 다시 붙이고 noThumb 에서 뺀다', [st2, readT('data/news/nk.json').items[0].thumb, readT('data/news/nk.json').items[0].thumbOffBy || '', readT('collector/news-config.json').noThumb], [0, img, '', []]);
+    /* 리뷰 12차 — 단추가 **활동 탭 줄**(actItemRowHtml)에 들어가 소식 탭에서는 사진을 뺄 수 없었다. 함수 몸을 잘라 그 안에서 잰다 */
+    const body = (name) => { const i = adm.indexOf(`function ${name}(`); return i < 0 ? '' : adm.slice(i, adm.indexOf('\nfunction ', i + 10)); };
+    eq('    사진·빼기·되살리기는 소식 줄(newsItemRowHtml)에 있고 활동 줄에는 없다', [/class="ig-thumb news-thumb"/.test(body('newsItemRowHtml')) && /data-news-thumb-off=/.test(body('newsItemRowHtml')) && /data-news-thumb-on=/.test(body('newsItemRowHtml')), /thumb/.test(body('actItemRowHtml'))], [true, false]);
+    eq('    관리자 화면 — 사진·빼기·되살리기 단추가 글 번호를 보낸다', /data-news-thumb-off="\$\{esc\(n\.url\)\}" data-news-post=/.test(adm) && /applyAction\('newsThumbOff', \{ url, postId: pid \}/.test(adm) && /applyAction\('newsThumbOn', \{ url: el\.dataset\.newsThumbOn, postId: el\.dataset\.newsPost \|\| '' \}/.test(adm), true);
   }
 }
 
@@ -8942,7 +9143,7 @@ console.log('\n■ 관리자 쓰기 — 되돌릴 수 없는 일 앞의 안전�
      목록이 바뀌면 사람이 '이 동작도 공고 목록을 고치는가'를 한 번 본다. */
   eq('공고 목록을 안 고치는 동작 목록이 그대로다',
     cases.filter((c) => !writes.includes(c)).sort(),
-    ['activityHide', 'activityKind', 'activitySource', 'activityUnhide', 'addBoard', 'autoRegister', 'formQueue', 'newsHide', 'newsKind', 'newsSource', 'newsUnhide', 'unblock']);
+    ['activityHide', 'activityKind', 'activitySource', 'activityUnhide', 'addBoard', 'autoRegister', 'formQueue', 'newsHide', 'newsKind', 'newsSource', 'newsThumbOff', 'newsThumbOn', 'newsUnhide', 'unblock']);
 }
 
 console.log('\n■ 못 읽은 파일의 숫자를 화면이 단정하지 않는다');

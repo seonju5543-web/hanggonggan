@@ -156,20 +156,35 @@ try {
   const served = require('../match-engine.js').SERVED_SCHOOLS || [];
   const NEWS_KINDS = ['학사', '행사', '채용', '생활'];   // collector/news-kind.mjs NEWS_KINDS 와 같다 (이 파일은 CJS 라 못 불러온다 · 관문 「교내 소식」이 이 사본도 대조한다)
   const files = fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => /\.json$/.test(f) && f !== 'index.json') : [];
-  let dup = 0; let badKind = 0; let badSchool = 0; let badDate = 0; let badUrl = 0;
+  /* 썸네일 (2026-10-03) — 로봇이 만든 해시 이름(collector/news-thumb.mjs THUMB_RE 사본 · 관문 대조) · 파일이 있다 · 크기 상한 */
+  const THUMB_RE = /^data\/news\/img\/[0-9a-f]{16}\.webp$/;
+  const THUMB_MAX = 60 * 1024;
+  let dup = 0; let badKind = 0; let badSchool = 0; let badDate = 0; let badUrl = 0; let badThumb = 0; let missThumb = 0; let bigThumb = 0;
   for (const f of files) {
     const doc = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
     const seenU = new Set();
     for (const n of doc.items || []) {
-      const uk = urlKey(n.url);
+      /* 같은 글인가는 **글 번호가 있으면 글 번호**로 (2026-10-03 · 12차 리뷰 뒤 발견) — 같은 제목의 다른 글은 목록 표식 주소가 같다.
+         주소로만 세면 수집기가 일부러 둘로 남긴 글이 '중복'으로 걸려 그 실행의 소식 발행이 통째로 되돌려진다. */
+      const uk = n.postId ? `p|${n.school}|${n.postId}` : urlKey(n.url);
       if (seenU.has(uk)) dup++;
       seenU.add(uk);
       if (n.kind && !NEWS_KINDS.includes(n.kind)) badKind++;
       if (n.school !== doc.school || served.indexOf(n.school) < 0) badSchool++;
       if (!/^\d{4}-\d{2}-\d{2}$/.test(n.foundAt || '')) badDate++;
       if (/mode=download|attachNo=|fileDown/i.test(n.url || '')) badUrl++;
+      if (n.thumb !== undefined) {
+        if (!THUMB_RE.test(String(n.thumb))) badThumb++;
+        else if (!fs.existsSync(path.join(ROOT, n.thumb))) missThumb++;
+        else if (fs.statSync(path.join(ROOT, n.thumb)).size > THUMB_MAX) bigThumb++;
+      }
     }
   }
+  if (badThumb) errors.push(`news — 썸네일 값이 로봇 꼴(data/news/img/<해시>.webp)이 아닌 글 ${badThumb}건 (바깥 주소는 앱이 못 그린다 · collector/news-thumb.mjs)`);
+  /* 파일이 없는 썸네일은 **경고**다 (리뷰 12차) — 병합(합집합)이 로봇이 지운 그림의 칸을 되살릴 수 있고, 오류로 두면 그 사이 관리자·로봇 저장이 전부 막힌다.
+     앱은 못 받은 그림을 빼고 글자 카드로 그리고(error 잡이), 다음 썸네일 단계가 칸을 다시 맞춘다. */
+  if (missThumb) warns.push(`news — 썸네일 파일이 없는 글 ${missThumb}건 (다음 썸네일 단계가 칸을 맞춘다 · collector/collect-news-thumbs.mjs)`);
+  if (bigThumb) errors.push(`news — ${THUMB_MAX / 1024}KB 를 넘는 썸네일 ${bigThumb}건 (240px WebP 로 줄인 것만 싣는다)`);
   if (dup) errors.push(`news — 교내 소식 파일 안에 중복 ${dup}건 (수집기 중복 제거가 동작하지 않았습니다)`);
   if (badKind) errors.push(`news — 갈래가 ${NEWS_KINDS.join('·')} 밖인 글 ${badKind}건 (판정은 collector/news-kind.mjs 한 곳)`);
   if (badSchool) errors.push(`news — 파일의 학교와 다르거나 서비스하지 않는 학교의 글 ${badSchool}건 (match-engine.js SERVED_SCHOOLS)`);

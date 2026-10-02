@@ -79,3 +79,7 @@ collector/news-health.json   merge=jsonunion
 collector/news-cursor.json   merge=ours
 collector/news-report.md     merge=ours
 collector/find-news-boards-report.md merge=ours
+# 교내 소식 썸네일 (2026-10-03) — 그림은 이름이 바이트 해시라 같은 이름 = 같은 그림(병합 충돌이 없다) · 장부는 합집합 · 리포트는 매번 새로 쓴다
+data/news/img/**             -diff
+collector/news-thumbs.json   merge=jsonunion
+collector/news-thumbs-report.md merge=ours
