@@ -4667,6 +4667,11 @@
      "school": "가톨릭대학교",
      "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276187&article.offset=0&articleLimit=10&srCategoryId=22",
      "id": "notice:https://www.catholic.ac.kr/ko/campuslife/notice.do?articleno=276187&srcategoryid=22"
+    },
+    {
+     "school": "이화여자대학교",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367231&article.offset=0&articleLimit=10",
+     "id": "notice:https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?articleno=367231"
     }
    ],
    "scopeFrom": "같은 사업이 전북대학교 게시판에도 올라옴(자동) — 전북대학교 게시판 https://www.jbnu.ac.kr/web/news/notice/sub01.do?category=6#n-2026%EB%85%84%EB%8F%84%20%ED%95%98%EB%B0%98%EA%B8%B0%20(%EC%9E%AC)%EB%85%BC%EC%82%B0%EC%8B%9C%EC%9E%A5%ED%95%99%ED%9A%8C%20%ED%95%99%EC%97%85%EC%9E%A5%EB%A0%A4%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4"
@@ -7614,7 +7619,7 @@
     "제목의 바깥 기관 낱말 「재단」"
    ],
    "kindConfidence": "high",
-   "kindFrom": "로봇(제목)",
+   "kindFrom": "로봇(원문) 2026-10-02",
    "provider": "주관 기관 원문 확인",
    "amount": "금액 원문 확인",
    "amountValue": 0,
@@ -7713,6 +7718,11 @@
      "school": "인하대학교",
      "url": "https://www.inha.ac.kr/bbs/kr/8/45691/artclView.do",
      "id": "notice:https://www.inha.ac.kr/bbs/kr/8/45691/artclView.do"
+    },
+    {
+     "school": "아주대학교",
+     "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=376957&article.offset=0&articleLimit=10",
+     "id": "notice:https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?articleno=376957"
     }
    ],
    "scopeFrom": "같은 사업이 인하대학교 게시판에도 올라옴(자동) — 인하대학교 게시판 https://www.inha.ac.kr/bbs/kr/8/45691/artclView.do"
@@ -8028,14 +8038,14 @@
     "조회수 992",
     "2026년도 2학기 논산시장학회 학업장려 장학생 선발 안내",
     "No.3127",
-    "성균관대학교 장학담당",
     "2026-09-29",
     "조회수 3043",
     "2026학년도 벽송회장학금 장학생 선발안내( ~ 2026년 10월 9일(금) 오후 5시까지)",
     "No.3126",
     "2026-09-29",
     "조회수 21721",
-    "북경대 Yenching Academy 2-Year Master's Program in China Studies 모집 안내"
+    "북경대 Yenching Academy 2-Year Master's Program in China Studies 모집 안내",
+    "No.3125"
    ]
   },
   {

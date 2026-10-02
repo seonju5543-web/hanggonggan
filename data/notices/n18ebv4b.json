@@ -4,12 +4,29 @@
  "items": [
   {
    "title": "[우양재단] 2026년 동행 장학생 모집 (가족 돌봄 청년 대상, ~10/18)",
-   "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083&nttId=55323",
-   "attachments": [],
-   "deadlineHint": null,
+   "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=55323",
+   "attachments": [
+    {
+     "name": "[공문] 2026년 우양재단 동행 장학 모집 협조 요청.hwp&nbsp; &nbsp;(다운로드 : 6회) 바로보기",
+     "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=0c6797a234b08b8ba908c89f3f55b111&bbsId=1083"
+    },
+    {
+     "name": "[붙임1] 2026년 동행장학 홍보 포스터.jpg&nbsp; &nbsp;(다운로드 : 5회)",
+     "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=29df0f5abb5a9a6114328315d3bcc08b&bbsId=1083"
+    },
+    {
+     "name": "[붙임2] 2026년 우양재단 동행장학 신청서 서식.hwp&nbsp; &nbsp;(다운로드 : 6회) 바로보기",
+     "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=ca127512499eb0e0ba00b24b184d8221&bbsId=1083"
+    },
+    {
+     "name": "정부혁신",
+     "url": "https://www.snue.ac.kr/common/nttFileDownload.do?fileKey=664d7a4b00c31659ba3878e5e722a3d4&bbsId=3011"
+    }
+   ],
+   "deadlineHint": "신청 기간: 2026. 10. 1.(목) ~ 10. 18.(일) 합격자 발표: 2026. 10. 30.(금) 예정 (우양재단 홈페이지 공지) 접",
    "school": "서울교육대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-02"
   },
   {
    "title": "[(재)대전청년내일재단] 2026년 하반기 인재육성(성취) 장학생 선발 안내",
