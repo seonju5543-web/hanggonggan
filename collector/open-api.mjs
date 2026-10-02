@@ -167,15 +167,9 @@ const KEY_NAME = { kstartup: 'DATA_GO_KR_KEY', vol1365: 'DATA_GO_KR_KEY', youthP
 /* ── 정찰(--probe) — 진짜 열쇠는 Actions 에만 있어 여기서 못 불러 본다. 출처가 ❌ 일 때 **매개변수를 바꿔 가며** 상태와 응답 머리만 찍는다.
    저장하지 않는다 · 열쇠는 가린다 · 워크플로 수동 실행의 probe 입력으로 켠다(2026-10-02 · 온통청년 'invalid param data' 진단) ── */
 if (process.argv.includes('--probe')) {
-  const tries = [
-    ['청년정책 pageSize=10', 'https://www.youthcenter.go.kr/go/ythip/getPlcy', { apiKeyNm: youthKey, pageNum: 1, pageSize: 10, rtnType: 'json' }],
-    ['청년정책 pageSize=50', 'https://www.youthcenter.go.kr/go/ythip/getPlcy', { apiKeyNm: youthKey, pageNum: 1, pageSize: 50, rtnType: 'json' }],
-    ['청년정책 pageSize=100', 'https://www.youthcenter.go.kr/go/ythip/getPlcy', { apiKeyNm: youthKey, pageNum: 1, pageSize: 100, rtnType: 'json' }],
-    ['청년정책 pageType=1', 'https://www.youthcenter.go.kr/go/ythip/getPlcy', { apiKeyNm: youthKey, pageNum: 1, pageSize: 10, pageType: 1, rtnType: 'json' }],
-    ['청년정책 rtnType 없음', 'https://www.youthcenter.go.kr/go/ythip/getPlcy', { apiKeyNm: youthKey, pageNum: 1, pageSize: 10 }],
-    ['청년콘텐츠 pageSize=10', 'https://www.youthcenter.go.kr/go/ythip/getContent', { apiKeyNm: youthContentKey, pageNum: 1, pageSize: 10, rtnType: 'json' }],
-    ['청년콘텐츠 pageSize=10 · 정책 열쇠', 'https://www.youthcenter.go.kr/go/ythip/getContent', { apiKeyNm: youthKey, pageNum: 1, pageSize: 10, rtnType: 'json' }],
-  ];
+  const P = (n, size = 100) => [`청년정책 pageNum=${n} pageSize=${size}`, 'https://www.youthcenter.go.kr/go/ythip/getPlcy', { apiKeyNm: youthKey, pageNum: n, pageSize: size, rtnType: 'json' }];
+  const tries = [P(2), P(5), P(10), P(11), P(20), P(31), P(32), P(33), P(101, 10), P(316, 10), P(317, 10),
+    ['청년콘텐츠 pageNum=2 pageSize=10', 'https://www.youthcenter.go.kr/go/ythip/getContent', { apiKeyNm: youthContentKey, pageNum: 2, pageSize: 10, rtnType: 'json' }]];
   for (const [label, base, params] of tries) {
     const t0 = Date.now();
     try {
