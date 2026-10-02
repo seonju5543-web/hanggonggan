@@ -123,6 +123,8 @@ async function checkUrl(url) {
       const shown = await within(page.evaluate(() => document.body.innerText || ''), 8000, '');
       const n = (t) => ((t || '').match(DATE_G) || []).length;
       report.push(server == null ? '- 서버가 보낸 HTML: 못 읽음' : `- 서버가 보낸 HTML ${server.length}자 · 날짜 ${n(server.replace(/<[^>]+>/g, ' '))}개 / 그린 화면 날짜 ${n(shown)}개 · <tr> ${(server.match(/<tr\b/gi) || []).length}개 · <script> ${(server.match(/<script\b/gi) || []).length}개`);
+      /* 서버 HTML 의 첫 글 줄 근처 (상명 4차: 서버 HTML 에 날짜 43개인데 그린 화면의 표와 생김새가 달랐다) — 본문(<body>) 안 첫 날짜 앞 900자 */
+      if (server) { const b = server.slice(Math.max(0, server.search(/<body\b/i))); const k = b.search(/(20\d{2})\s*[.\-/]\s*\d{1,2}\s*[.\-/]\s*\d{1,2}/); if (k > 0) report.push(`- 서버 HTML 의 첫 날짜 앞 900자: \`${b.slice(Math.max(0, k - 900), k + 40).replace(/\s+/g, ' ').replace(/`/g, "'")}\``); }
     }
     /* ③ 목록 요소의 HTML — **누르기 전에** 뜬다 (리뷰 2026-10-02: 누른 뒤에 뜨면 상세·바닥글 화면의 것이 적혔다 · 계명 2차 정찰).
        날짜가 가장 많이 든 목록 요소(머리·메뉴·바닥 제외)를 고르고, 같은 수면 더 안쪽 것. <script>·<style> 은 빼고 적는다(상명 2차: 조각이 스크립트뿐이었다). */

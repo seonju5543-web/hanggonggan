@@ -59,8 +59,11 @@ checkUrl: https://www.smu.ac.kr/kor/life/scholarship.do
 #   고려·상명: 그린 화면엔 목록 줄이 있는데 로봇이 받은 HTML 엔 없었다 → '서버가 보낸 HTML' 과 그린 화면의 날짜 수를 견준다.
 #   계명: 날짜 칸 없는 목록 → 제목 칸 표의 HTML 조각 · 경북: 상세 화면의 '목록' 링크(목록 주소의 유일한 근거) ·
 #   서강: 공지사항은 6월 30일 뒤 새 글이 없다 → 학생지원 공지 화면이 부르는 API 열쇠와 글 날짜.
-checkUrl: https://www.korea.ac.kr/ko/566/subview.do
+# (답 받음 2026-10-03 · 5차로 대체) checkUrl: https://www.korea.ac.kr/ko/566/subview.do
+# (답 받음 2026-10-03 · 5차로 대체) checkUrl: https://www.smu.ac.kr/kor/life/notice.do
+# (답 받음 2026-10-03 · 5차로 대체) checkUrl: https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=143
+# (답 받음 2026-10-03 · 5차로 대체) checkUrl: https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/viewBtin.action?btin.bbs_cde=1&btin.doc_no=1325007&btin.appl_no=000000&menu_idx=67
+# (답 받음 2026-10-03 · 5차로 대체) checkUrl: https://www.sogang.ac.kr/ko/campus/student-support/notice
+
+# 2026-10-03 (5차) — 4차로 계명(26-09-30 날짜 꼴)·고려(로봇 HTML 에 줄 있음 · 본문 POST)는 풀었다. 상명만 남았다: 서버 HTML 에 날짜 43개인데 그린 화면의 표와 생김새가 다르다 → 서버 HTML 의 첫 날짜 앞 조각.
 checkUrl: https://www.smu.ac.kr/kor/life/notice.do
-checkUrl: https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=143
-checkUrl: https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/viewBtin.action?btin.bbs_cde=1&btin.doc_no=1325007&btin.appl_no=000000&menu_idx=67
-checkUrl: https://www.sogang.ac.kr/ko/campus/student-support/notice

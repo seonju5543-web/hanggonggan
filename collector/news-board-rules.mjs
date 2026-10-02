@@ -86,6 +86,12 @@ export const NEWS_BOARD_RULES = {
       const inner = `/portalBoard/ko/1/${id}/portalBoardView.do?siteId=ko&type=&id=&articleId=&page=&startDate=&endDate=&findType=&findWord=&`;
       return `https://www.korea.ac.kr/ko/566/subview.do?enc=${encodeURIComponent(Buffer.from(`fnct1|@@|${encodeURIComponent(inner)}`).toString('base64'))}`;
     },
+    /* 상세 본문은 화면이 POST /portalBoard/ko/1/<번호>/portalBoardView.do 로 받는다(정찰 3·4차가 본문까지 적었다) — 확인도 그 요청 그대로 */
+    verifyApi: {
+      idFrom: (url) => { try { return (decodeURIComponent(Buffer.from(decodeURIComponent(new URL(url).searchParams.get('enc') || ''), 'base64').toString()).match(/\/portalBoard\/ko\/1\/(\d+)\//) || [])[1]; } catch { return undefined; } },
+      api: (id) => `https://www.korea.ac.kr/portalBoard/ko/1/${id}/portalBoardView.do`,
+      body: () => 'siteId=ko&type=&id=&articleId=&page=&layout=6b6f40403536364040666e637431&startDate=&endDate=&findType=&findWord=',
+    },
     evidence: '정찰 3차 2026-10-02: 첫 줄 jf_view(\'000060000000061451\',\'1\',\'ko\') 을 누르니 /ko/566/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjElMkYwMDAwNjAwMDAwMDAwNjE0NTElMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0Z…%3D%3D (번호만 바뀌는 꼴)',
   },
   /* 중앙대: 목록·상세 모두 스크립트가 POST 로 받는다(정찰 2차가 본문까지 적었다). 행은 href="javascript:fn_goDetail('30220','N','','N')" ·
@@ -248,7 +254,10 @@ export async function verifyRuleDetail(row, opts = {}) {
   try { res = vp ? await fetchFn(vp.api(id), { ...(vp.body ? { body: vp.body(id) } : {}), tries: 2, firstMs: 10000, retryMs: 12000 }) : await fetchFn(row.url, { tries: 2, firstMs: 10000, retryMs: 12000 }); } catch (e) { return { ok: false, reason: `상세 열기 실패 (${(e && e.message) || e})` }; }
   if (!res || !res.ok) return { ok: false, reason: `상세 HTTP ${res ? res.status : '?'}` };
   const samePath = (a, b) => { try { const x = new URL(a); const y = new URL(b); return x.origin + x.pathname === y.origin + y.pathname; } catch { return false; } };
-  if (!vp && opts.boardUrl && res.url && samePath(res.url, opts.boardUrl)) return { ok: false, reason: '상세 주소가 목록으로 되돌아옴 (규칙이 이 게시판에 안 맞음)' };
+  /* '목록으로 되돌아옴' = 요청한 주소에서 **다른 주소로 넘어갔고** 그곳이 목록 길이다. 고려처럼 상세와 목록이 같은 길(subview.do)이고 뒤 조건(?enc=)만 다른 사이트는
+     넘어가지 않았으면 되돌아온 것이 아니다 (11차 실측: 고려가 이 판정에 잘못 걸려 0건 · 2026-10-03) */
+  const noHash = (u) => String(u || '').split('#')[0];
+  if (!vp && opts.boardUrl && res.url && noHash(res.url) !== noHash(row.url) && samePath(res.url, opts.boardUrl)) return { ok: false, reason: '상세 주소가 목록으로 되돌아옴 (규칙이 이 게시판에 안 맞음)' };
   /* 만든 상세 주소와 다른 곳(첫 화면·다른 메뉴)으로 넘어가면 그 글의 화면이 아니다 — 같은 길로 돌아오는 SSO 왕복(시립)은 괜찮다 */
   if (!vp && res.url && !samePath(res.url, row.url)) return { ok: false, reason: `상세 주소가 다른 화면으로 넘어감 (${String(res.url).slice(0, 120)})` };
   const raw = await res.text();

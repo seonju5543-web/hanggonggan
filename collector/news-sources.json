@@ -168,52 +168,7 @@
      "evidence": "같은 검색 → 결과 URL https://www.korea.ac.kr/ko/567/subview.do (제목: 학사공지)"
     }
    ],
-   "note": "일반공지 566 — 행은 jf_view 클릭형, 상세는 subview.do?enc=… (정찰 3차 · news-board-rules.mjs). 화면엔 목록 줄이 있는데 로봇이 받은 HTML 엔 없었다(9차 찾기 진단 datedBlocks 1) — 정찰 4차가 서버 HTML 을 잰다.",
-   "probe": {
-    "checkedAt": "2026-10-03",
-    "tried": [
-     {
-      "url": "https://www.korea.ac.kr/ko/566/subview.do",
-      "label": "일반공지",
-      "rows": 10,
-      "status": "규칙 상세 확인 실패 — 상세 주소가 목록으로 되돌아옴 (규칙이 이 게시판에 안 맞음)"
-     },
-     {
-      "url": "https://www.korea.ac.kr/ko/567/subview.do",
-      "label": "학사공지",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 90196,
-       "links": 352,
-       "scripts": 31,
-       "dates": 10,
-       "blocks": 261,
-       "datedBlocks": 1,
-       "sample": [
-        "<article> fnctId=portalBoard,fnctNo=2 게시판 검색 시작일 ~ 종료일 게시물 검색 제목 작성자 번호, 제목, 작성자, 등록일자, 조회수 정보를 제공 번호 제목 작성자 Department --> 등록일자 조"
-       ],
-       "anchors": []
-      }
-     },
-     {
-      "url": "https://www.korea.ac.kr/ko/461/subview.do",
-      "label": "학부 학사일정",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 115062,
-       "links": 355,
-       "scripts": 31,
-       "dates": 4,
-       "blocks": 258,
-       "datedBlocks": 0,
-       "sample": [],
-       "anchors": []
-      }
-     }
-    ]
-   }
+   "note": "일반공지 566 — 행은 jf_view 클릭형, 상세는 subview.do?enc=… (정찰 3차 · news-board-rules.mjs). 화면엔 목록 줄이 있는데 로봇이 받은 HTML 엔 없었다(9차 찾기 진단 datedBlocks 1) — 정찰 4차가 서버 HTML 을 잰다."
   },
   {
    "school": "고려대학교 세종캠퍼스",
@@ -1003,78 +958,7 @@
      "evidence": "같은 검색 → 결과 URL https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=144&cmd=2&parm_bod_uid=232037 (제목: 계명대학교 - 열린마당 > 공지사항 > 학사)"
     }
    ],
-   "note": "공지사항이 일반(143)·학사(144)·장학(145)·입시(146) 탭. 상세는 &cmd=2&parm_bod_uid=<번호>.",
-   "probe": {
-    "checkedAt": "2026-10-02",
-    "tried": [
-     {
-      "url": "https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=143",
-      "label": "일반공지",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 76953,
-       "links": 523,
-       "scripts": 16,
-       "dates": 35,
-       "blocks": 351,
-       "datedBlocks": 17,
-       "sample": [
-        "<li> 개인정보처리방침_2018. 04. 30. ~ 2018. 12. 20.",
-        "<li> 개인정보처리방침_2018. 12. 21. ~ 2019. 2. 28."
-       ],
-       "anchors": [
-        "<a href=\"https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3855&amp;\" target=\"_self\">",
-        "<a href=\"https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3855&amp;\" target=\"_self\">"
-       ]
-      }
-     },
-     {
-      "url": "https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=144",
-      "label": "학사공지",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 80244,
-       "links": 530,
-       "scripts": 16,
-       "dates": 37,
-       "blocks": 354,
-       "datedBlocks": 18,
-       "sample": [
-        "<li> 개인정보처리방침_2018. 04. 30. ~ 2018. 12. 20.",
-        "<li> 개인정보처리방침_2018. 12. 21. ~ 2019. 2. 28."
-       ],
-       "anchors": [
-        "<a href=\"https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3855&amp;\" target=\"_self\">",
-        "<a href=\"https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3855&amp;\" target=\"_self\">"
-       ]
-      }
-     },
-     {
-      "url": "https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=143&cmd=2&parm_bod_uid=271134",
-      "label": "여성학연구소 뉴스레터 계명여성학 제11호 여성학연구소",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 56856,
-       "links": 489,
-       "scripts": 18,
-       "dates": 33,
-       "blocks": 320,
-       "datedBlocks": 16,
-       "sample": [
-        "<li> 개인정보처리방침_2018. 04. 30. ~ 2018. 12. 20.",
-        "<li> 개인정보처리방침_2018. 12. 21. ~ 2019. 2. 28."
-       ],
-       "anchors": [
-        "<a href=\"https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3855&amp;\" target=\"_self\">",
-        "<a href=\"https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=3855&amp;\" target=\"_self\">"
-       ]
-      }
-     }
-    ]
-   }
+   "note": "공지사항 일반(143) — 정찰 4차(2026-10-02): 로봇이 받는 HTML 에 목록이 그대로 있고 보통 링크(page.jsp?…cmd=2&parm_bod_uid=<번호>…)인데, 작성일이 26-09-30(두 자리 연도·줄표)이라 날짜 눈이 못 읽어 0행이었다 → board-links.mjs rowDate 가 이 꼴을 읽는다."
   },
   {
    "school": "서울교육대학교",
