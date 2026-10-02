@@ -2317,13 +2317,14 @@ console.log('\n■ 교내 소식 썸네일 (2026-10-03 개발자 지시 "실제 
       <a href="/cmmn/fileDown.do?id=7">포스터.jpg</a><a href="/cmmn/fileDown.do?id=8">신청서.hwp</a></div>
     <footer><img src="/upload/foot/f.jpg"></footer></body></html>`;
   const cands = TH.imageCandidates(page, base);
-  eq('  후보 차례 — 대표 이미지 → 본문 사진(늦게 싣기는 data-src) → 첨부 그림 · 머리·메뉴·바닥·로고·아이콘·벡터·작은 그림 제외', cands.map((c) => `${c.from}:${c.src.replace('https://www.x.ac.kr', '')}`),
-    ['og:/upload/og/2026/a.jpg', 'body:/upload/editor/2026/real.jpg', 'body:/upload/editor/2026/second.png', 'attach:/cmmn/fileDown.do?id=7']);
+  /* 2026-10-03 첫 실제 실행(dry) — 대표 이미지(og)로 고른 16건이 16건 모두 학교 로고·공통 캠퍼스 사진이었다 → og 는 후보가 아니다 */
+  eq('  후보 차례 — 본문 사진(늦게 싣기는 data-src) → 첨부 그림 · 대표 이미지(og)는 후보가 아니다 · 머리·메뉴·바닥·로고·아이콘·벡터·작은 그림 제외', cands.map((c) => `${c.from}:${c.src.replace('https://www.x.ac.kr', '')}`),
+    ['body:/upload/editor/2026/real.jpg', 'body:/upload/editor/2026/second.png', 'attach:/cmmn/fileDown.do?id=7']);
   eq('    진짜 사진이 사는 폴더(/upload/file/·/_attach/)는 장식으로 보지 않는다 · 파일 이름의 로고·아이콘·단추와 sns 폴더는 장식', ['https://x.ac.kr/upload/file/2026/a.jpg', 'https://x.ac.kr/_attach/image/a.png', 'https://x.ac.kr/img/common/logo.png', 'https://x.ac.kr/images/btn_top.png', 'https://x.ac.kr/sns/kakao.png'].map((u) => TH.looksChrome(u)), [false, false, true, true, true]);
   /* 리뷰 12차 — 낱말 하나로 진짜 사진을 막았다(카톡으로 받은 사진·행사 배너 포스터·기본 방 사진). SNS 는 단추·아이콘 꼴일 때만 장식 */
   eq('    카톡 사진·행사 배너·설치식·기본 방 사진은 진짜 사진 · sns_kakao·kakao_icon·ico_new 는 장식', ['KakaoTalk_20261002_153012345.jpg', 'KakaoTalk_Photo_2026-10-02-15-30-12-001.jpeg', '2026_festival_banner.jpg', 'installation_ceremony.jpg', 'default_room.jpg', 'insta_cardnews_01.jpg', 'sns_kakao.png', 'kakao_icon.png', 'ico_new.gif', 'og_default.jpg'].map((f) => TH.looksChrome(`https://x.ac.kr/wp-content/uploads/2026/10/${f}`)), [false, false, false, false, false, false, true, true, true, true]);
   /* 리뷰 12차 — 날것의 '%'·EUC-KR 바이트 이름·범위 밖 엔티티 하나가 글 하나의 후보를 통째로 날렸다(그 글은 영영 사진 없음) */
-  eq('    이상한 이름(날것 %·EUC-KR 바이트·큰 엔티티)이 있어도 던지지 않고 나머지 후보가 산다', (() => { try { return TH.imageCandidates('<meta property="og:image" content="/upload/og/50%할인.png"><div class="view"><img src="/upload/editor/2026/참여율 100% 달성.jpg"><img src="/upload/editor/%C2%FC%BF%A9.jpg" alt="&#99999999;"><img src="/upload/editor/2026/real.jpg"></div>', base).length; } catch (e) { return `던짐: ${e.message}`; } })(), 4);
+  eq('    이상한 이름(날것 %·EUC-KR 바이트·큰 엔티티)이 있어도 던지지 않고 나머지 후보가 산다', (() => { try { return TH.imageCandidates('<div class="view"><img src="/upload/og/50%할인.png"><img src="/upload/editor/2026/참여율 100% 달성.jpg"><img src="/upload/editor/%C2%FC%BF%A9.jpg" alt="&#99999999;"><img src="/upload/editor/2026/real.jpg"></div>', base).length; } catch (e) { return `던짐: ${e.message}`; } })(), 4);
   eq('    JSON 쪽도 던지지 않는다', (() => { try { return TH.jsonImageCandidates({ content: '<img src="/upload/100% 장학.jpg"><img src="/upload/ok.jpg">' }, base).length; } catch (e) { return `던짐: ${e.message}`; } })(), 2);
   /* 리뷰 12차 — 정규식 하나로는 안에 같은 태그가 든 머리(<div id="header"><div class="inner">)를 못 지워 머리 그림이 후보를 다 썼다 → 짝을 세어 지운다 */
   eq('    겹친 머리·서브 비주얼 상자도 통째로 걷는다 · has-header 처럼 낱말로 시작하지 않는 본문 상자는 안 걷는다', TH.imageCandidates('<div id="wrap" class="has-header"><div id="header"><div class="inner"><img src="/upload/top/ci_mark.jpg"><div class="gnb"><img src="/upload/top/event.jpg"></div></div></div><div class="sub-visual"><img src="/upload/top/sub_visual04.jpg"></div><div class="board-view"><img src="/upload/editor/p1.jpg"></div></div>', base).map((c) => c.src.replace('https://www.x.ac.kr', '')), ['/upload/editor/p1.jpg']);
@@ -2450,12 +2451,16 @@ console.log('\n■ 교내 소식 썸네일 (2026-10-03 개발자 지시 "실제 
     fs.writeFileSync(path.join(dir, 'data/news/nx.json'), JSON.stringify({ school: '가대학교', updatedAt: '2026-10-03', items: [
       { title: '사진 붙을 글', url: 'https://g/1', school: '가대학교', postId: '1', foundAt: '2026-10-03' },
       { title: '사진 뺀 글', url: 'https://g/2', school: '가대학교', postId: '2', foundAt: '2026-10-03', thumb: off }] }, null, 1));
-    fs.writeFileSync(path.join(dir, 'collector/news-thumbs.json'), JSON.stringify({ posts: { 'post:가대학교:1': { at: '2026-10-03', school: '가대학교', file: keep }, 'post:가대학교:2': { at: '2026-10-03', school: '가대학교', file: off } }, srcSeen: {} }));
+    const ogImg = 'data/news/img/bbbbbbbbbbbbbbbb.webp'; fs.writeFileSync(path.join(dir, ogImg), 'x');
+    const nx = JSON.parse(readText(path.join(dir, 'data/news/nx.json'))); nx.items.push({ title: '대표 이미지로 받았던 글', url: 'https://g/3', school: '가대학교', postId: '3', foundAt: '2026-10-03', thumb: ogImg }); fs.writeFileSync(path.join(dir, 'data/news/nx.json'), JSON.stringify(nx, null, 1));
+    fs.writeFileSync(path.join(dir, 'collector/news-thumbs.json'), JSON.stringify({ posts: { 'post:가대학교:1': { at: '2026-10-03', school: '가대학교', file: keep, from: 'body' }, 'post:가대학교:2': { at: '2026-10-03', school: '가대학교', file: off }, 'post:가대학교:3': { at: '2026-10-03', school: '가대학교', file: ogImg, from: 'og' } }, srcSeen: {} }));
     fs.writeFileSync(path.join(dir, 'collector/news-config.json'), JSON.stringify({ hideUrls: [], noThumb: ['post:가대학교:2'] }));
     const r = spawnSync(process.execPath, [fileURLToPath(new URL('../collector/collect-news-thumbs.mjs', import.meta.url))], { env: { ...process.env, NEWS_THUMB_ROOT: dir, NEWS_THUMB_OFFLINE: '1' }, encoding: 'utf8' });
     const doc = JSON.parse(readText(path.join(dir, 'data/news/nx.json')));
-    eq('  로봇(받기 없이) — 장부 사진 입힘 · 사진 뺀 글 칸 지움 · 안 쓰는 그림 지움 · 리포트에 학교별 수', [r.status, doc.items.map((n) => n.thumb || '-'), fs.readdirSync(path.join(dir, 'data/news/img')).sort(), /\| 가대학교 \| 2 \| 1 \|/.test(readText(path.join(dir, 'collector/news-thumbs-report.md')))],
-      [0, [keep, '-'], ['0123456789abcdef.webp'], true]);
+    eq('  로봇(받기 없이) — 장부 사진 입힘 · 사진 뺀 글 칸 지움 · 대표 이미지(og)로 받았던 것은 버리고 다시 · 안 쓰는 그림 지움 · 리포트에 학교별 수', [r.status, doc.items.map((n) => n.thumb || '-'), fs.readdirSync(path.join(dir, 'data/news/img')).sort(), /\| 가대학교 \| 3 \| 1 \|/.test(readText(path.join(dir, 'collector/news-thumbs-report.md'))), 'post:가대학교:3' in JSON.parse(readText(path.join(dir, 'collector/news-thumbs.json'))).posts],
+      [0, [keep, '-', '-'], ['0123456789abcdef.webp'], true, false]);
+    const rr2 = readText(new URL('collector/collect-news-thumbs.mjs', root));
+    eq('    학교 여럿을 동시에 · 돌아가며 한 건씩(한 학교는 한 일꾼만 · 뒤쪽 학교가 매번 0건이 되지 않게)', /const LANES = Number\(process\.env\.NEWS_THUMB_LANES \|\| \d+\);/.test(rr2) && /const school = ready\.shift\(\);[\s\S]{0,200}?const n = list\.shift\(\);[\s\S]{0,200}?if \(list\.length\) ready\.push\(school\);/.test(rr2) && /await Promise\.all\(Array\.from\(\{ length: Math\.max\(1, LANES\) \}, worker\)\);/.test(rr2), true);
   }
   /* ⑩-2 전체 스위치 — dry 는 받아 두기만(카드엔 안 붙이고 그림은 남김 · 사람이 먼저 본다) · off 는 카드의 사진을 모두 떼고 그림도 지운다 */
   {

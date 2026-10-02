@@ -5,7 +5,7 @@
    이 파일은 **순수 함수만** 둔다(받기·줄이기·쓰기는 collect-news-thumbs.mjs). 관문이 인터넷 없이 부를 수 있게.
 
    어디서 사진을 찾나 — 글의 상세 화면(또는 규칙의 본문 API)에서 차례로:
-     ① 대표 이미지(og:image · twitter:image) — 학교 CMS 가 글마다 정하는 사진. 단 **사이트 공통 그림**(로고·공유용 기본 그림)은 뺀다
+     (① 대표 이미지 og:image 는 쓰지 않는다 — 첫 실제 실행에서 그것으로 고른 16건이 모두 학교 로고·공통 사진이었다 · imageCandidates 안의 설명)
      ② 본문 사진(<img>) — 머리·메뉴·바닥(header·nav·footer·aside)을 걷어 낸 본문의 그림만
      ③ 첨부 그림(포스터.jpg 같은 링크) — 본문에 안 넣고 파일로만 붙인 포스터
    🔴 고른 그림이 진짜 사진인지는 **받아서** 본다(sniffImage): 그림 파일 서명 · 가로 160 · 세로 100 이상 · 가로세로 3배 이내.
@@ -115,12 +115,9 @@ export function imageCandidates(html, base) {
       out.push({ src: a, from, alt: String(alt || '').slice(0, 80) });
     } catch { /* 후보 하나가 이상해도 나머지 후보는 산다 */ }
   };
-  /* ① 대표 이미지 */
-  for (const m of src.matchAll(/<meta\b[^>]*>/gi)) {
-    const k = (attr(m[0], 'property') || attr(m[0], 'name') || attr(m[0], 'itemprop')).toLowerCase();
-    if (/^(?:og:image(?::url|:secure_url)?|twitter:image(?::src)?|image)$/.test(k)) push(attr(m[0], 'content'), 'og');
-  }
-  for (const m of src.matchAll(/<link\b[^>]*>/gi)) if (/^image_src$/i.test(attr(m[0], 'rel'))) push(attr(m[0], 'href'), 'og');
+  /* 🔴 대표 이미지(og:image · twitter:image)는 **후보가 아니다** (2026-10-03 첫 실제 실행 · dry) — 그것으로 고른 16건이 **16건 모두** 학교 로고·공통 캠퍼스 사진이었다
+     (계명 main_thumb · 서울과기대 meta_img · 가톨릭 thumbnail · 세종·홍익 img-meta · 성균관 skku_s · 국민 sns-seo …). 학교 CMS 는 글마다 대표 이미지를 정하지 않는다.
+     글마다 정하는 CMS(워드프레스류)는 그 그림이 본문에도 있어 ② 가 잡는다. 본문·첨부로 고른 13건은 모두 그 글의 포스터·사진이었다. */
   /* ② 본문 사진 — 늦게 싣는 그림(data-src·data-original)은 그 주소가 진짜다 */
   const body = stripChrome(src);
   for (const m of body.matchAll(/<img\b[^>]*>/gi)) {
