@@ -117,7 +117,14 @@ const FETCHERS = {
   async youthPolicy() {
     const rows = [];
     for (let pageNum = 1; pageNum <= 50; pageNum += 1) {   // 정책 3천여 건 전부 — 종류 판정은 제목으로 하므로 걸러 받을 수가 없다
-      const r = await getText('https://www.youthcenter.go.kr/go/ythip/getPlcy', { apiKeyNm: youthKey, pageNum, pageSize: 100, rtnType: 'json' });
+      /* 🔴 **천천히 넘긴다** (2026-10-02 실측) — 쪽을 쉬지 않고 넘기면 몇 쪽 만에 'HTTP 403 invalid api key' 가 온다(같은 열쇠가 6분 뒤 다시 200).
+         하루 한도가 아니라 짧은 시간 속도 제한이다. 쪽 사이 2.5초 · 1쪽을 넘긴 뒤의 403 은 한 번 30초 쉬고 다시 묻는다(열쇠는 1쪽에서 이미 증명됐다) */
+      if (pageNum > 1) await sleep(2500);
+      let r = await getText('https://www.youthcenter.go.kr/go/ythip/getPlcy', { apiKeyNm: youthKey, pageNum, pageSize: 100, rtnType: 'json' });
+      if (r.status === 403 && pageNum > 1) {
+        await sleep(30000);
+        r = await getText('https://www.youthcenter.go.kr/go/ythip/getPlcy', { apiKeyNm: youthKey, pageNum, pageSize: 100, rtnType: 'json' });
+      }
       /* 쪽 번호를 같이 적는다 — 2026-10-02 첫 실행의 'HTTP 400 invalid param data' 가 몇 쪽에서 났는지 몰라 원인을 못 가렸다(정찰에선 1~33쪽 전부 200) */
       if (r.status !== 200) throw new ApiError(`${pageNum}쪽 · ${reasonOf(r)}`);
       const j = parseJson(r);
@@ -133,6 +140,7 @@ const FETCHERS = {
     /* 🔴 **한 쪽에 10건** (2026-10-02 정찰 실측) — 본문 HTML 에 그림이 통째로 들어 있어 10건이 8.1MB · 10초다.
        100건이면 80MB 라 20초 시한에 세 번 다 걸렸다. 최근 30건(3쪽)만 받는다 — 60일 넘은 글은 어차피 버린다 */
     for (let pageNum = 1; pageNum <= 3; pageNum += 1) {
+      if (pageNum > 1) await sleep(2500);   // 청년정책과 같은 속도 제한
       const r = await getText('https://www.youthcenter.go.kr/go/ythip/getContent', { apiKeyNm: youthContentKey, pageNum, pageSize: 10, rtnType: 'json' }, 45000);
       if (r.status !== 200) throw new ApiError(`${pageNum}쪽 · ${reasonOf(r)}`);
       const j = parseJson(r);
@@ -171,8 +179,13 @@ const KEY_NAME = { kstartup: 'DATA_GO_KR_KEY', vol1365: 'DATA_GO_KR_KEY', youthP
    저장하지 않는다 · 열쇠는 가린다 · 워크플로 수동 실행의 probe 입력으로 켠다(2026-10-02 · 온통청년 'invalid param data' 진단) ── */
 if (process.argv.includes('--probe')) {
   const P = (n, size = 100) => [`청년정책 pageNum=${n} pageSize=${size}`, 'https://www.youthcenter.go.kr/go/ythip/getPlcy', { apiKeyNm: youthKey, pageNum: n, pageSize: size, rtnType: 'json' }];
-  /* 하루 한도인가 속도 제한인가 — 1쪽 하나로 지금 열쇠가 살아 있는지부터 본다(2026-10-02 · 3쪽에서 'invalid api key') */
-  const tries = [P(1, 10)];
+  /* 청년콘텐츠 원문 주소 — 주소가 빈 글 7건(2026-10-02)을 살릴 근거가 있는가: 주소가 있는 글의 주소가 bbsSn·pstSn 과 같은 꼴인지 본다 */
+  const tries = [];
+  try {
+    const r = await fetch(`https://www.youthcenter.go.kr/go/ythip/getContent?${new URLSearchParams({ apiKeyNm: youthContentKey, pageNum: 1, pageSize: 10, rtnType: 'json' })}`, { signal: AbortSignal.timeout(60000) });
+    const rows = findRows(JSON.parse(await r.text()), 'pstTtl') || [];
+    for (const x of rows) console.log(`[정찰] 콘텐츠 bbsSn=${x.bbsSn} pstSn=${x.pstSn} pstSeNm=${x.pstSeNm} url=${JSON.stringify(x.pstUrlAddr)} · ${String(x.pstTtl).slice(0, 30)}`);
+  } catch (e) { console.log(`[정찰] 콘텐츠 실패 ${e.name}`); }
   for (const [label, base, params] of tries) {
     const t0 = Date.now();
     try {
