@@ -110,6 +110,14 @@ async function checkUrl(url) {
     report.push(`- 큰 제목: ${String(info.h).replace(/\s+/g, ' ').trim().slice(0, 90)}`);
     report.push(`- **로그인 요구: ${wall ? '⛔ 예 — 학생이 못 봅니다' : '✅ 아니오'}**${info.pw ? ' (비밀번호 입력칸 있음)' : ''}`);
     report.push(`- 화면 글자: ${info.text.slice(0, 300)}`);
+    /* 서버가 보낸 HTML 과 그린 화면을 견준다 (2026-10-02 · 고려·상명: 화면엔 목록 줄이 있는데 로봇이 받은 HTML 엔 없었다) — 줄이 서버 HTML 에 없으면 스크립트가 그린 것이다 */
+    {
+      const DATE_G = /(20\d{2})\s*[.\-/년]\s*(\d{1,2})\s*[.\-/월]\s*(\d{1,2})(?!\d)/g;
+      const server = res ? await res.text().catch(() => null) : null;
+      const shown = await page.evaluate(() => document.body.innerText || '').catch(() => '');
+      const n = (t) => ((t || '').match(DATE_G) || []).length;
+      report.push(server == null ? '- 서버가 보낸 HTML: 못 읽음' : `- 서버가 보낸 HTML ${server.length}자 · 날짜 ${n(server.replace(/<[^>]+>/g, ' '))}개 / 그린 화면 날짜 ${n(shown)}개 · <tr> ${(server.match(/<tr\b/gi) || []).length}개 · <script> ${(server.match(/<script\b/gi) || []).length}개`);
+    }
     /* ③ 목록 요소의 HTML — **누르기 전에** 뜬다 (리뷰 2026-10-02: 누른 뒤에 뜨면 상세·바닥글 화면의 것이 적혔다 · 계명 2차 정찰).
        날짜가 가장 많이 든 목록 요소(머리·메뉴·바닥 제외)를 고르고, 같은 수면 더 안쪽 것. <script>·<style> 은 빼고 적는다(상명 2차: 조각이 스크립트뿐이었다). */
     const frag = await page.evaluate(() => {
@@ -121,10 +129,15 @@ async function checkUrl(url) {
         const n = ((e.innerText || '').match(DATE) || []).length;
         if (n > bestN || (n === bestN && n > 0 && best && best.contains(e))) { best = e; bestN = n; }
       }
-      if (!best) return '';
+      /* 날짜가 든 목록이 없으면(계명 3차: 날짜 칸 없는 목록) 제목 칸이 있는 표 → 링크가 가장 많은 목록 순으로 고른다 */
+      if (!best) {
+        best = els.find((e) => e.tagName.toLowerCase() === 'table' && /제목/.test((e.querySelector('caption, thead, th') || {}).textContent || ''))
+          || els.filter((e) => /^(table|ul|ol|tbody)$/i.test(e.tagName)).sort((a, b) => b.querySelectorAll('a').length - a.querySelectorAll('a').length)[0] || null;
+        if (!best || best.querySelectorAll('a').length < 3) return '';
+      }
       const c = best.cloneNode(true);
       c.querySelectorAll('script, style, noscript').forEach((x) => x.remove());
-      return `(날짜 ${bestN}개 든 <${best.tagName.toLowerCase()}${best.className ? ` class="${String(best.className).slice(0, 60)}"` : ''}>) ` + c.outerHTML.replace(/\s+/g, ' ').slice(0, 2400);
+      return `(날짜 ${bestN}개 · 링크 ${best.querySelectorAll('a').length}개 든 <${best.tagName.toLowerCase()}${best.className ? ` class="${String(best.className).slice(0, 60)}"` : ''}>) ` + c.outerHTML.replace(/\s+/g, ' ').slice(0, 2400);
     }).catch(() => '');
     if (frag) report.push(`- 목록 요소의 HTML (누르기 전 · 앞 2400자): \`${frag.replace(/`/g, "'")}\``);
     /* ④ 날짜 줄 (2026-10-01 · 교내 소식 클릭형 게시판) — 글 줄(날짜가 든 줄)에서 제목 링크가 **무엇으로** 상세를 여는지(href · onclick · data-*)
@@ -183,6 +196,11 @@ async function checkUrl(url) {
     } else {
       report.push('- 날짜 줄: 없음 (머리·메뉴·바닥 밖에 날짜가 든 줄이 없거나 목록이 안 그려짐)');
     }
+    /* 화면이 적어 둔 '목록' 링크 (2026-10-02 · 경북: 검색에 잡힌 상세 주소만 있어 그 화면의 목록 버튼이 목록 주소의 유일한 근거다) */
+    const listLinks = await page.evaluate(() => [...document.querySelectorAll('a, button')]
+      .filter((a) => /^(목록|목록보기|목록으로|리스트|list)$/i.test((a.textContent || '').replace(/\s+/g, '').trim()))
+      .slice(0, 4).map((a) => [...a.attributes].filter((x) => /^(href|onclick|data-[\w-]+)$/i.test(x.name)).map((x) => `${x.name}="${String(x.value).slice(0, 200)}"`).join(' '))).catch(() => []);
+    if (listLinks.length) report.push(`- 화면의 '목록' 링크: ${listLinks.map((l) => `<a ${l}>`).join(' · ')}`);
     if (reqs.length) { report.push(`- 화면이 부른 요청 ${reqs.length}개 (목록 API·폼 전송 후보):`); reqs.forEach((l) => report.push(`    · ${l}`)); }
     if (resps.length) { report.push(`- 스크립트 요청의 응답 ${resps.length}개 (규칙의 재료 — 칸 이름·HTML/JSON):`); resps.forEach((l) => report.push(`    · ${l.replace(/`/g, "'")}`)); }
     report.push('');

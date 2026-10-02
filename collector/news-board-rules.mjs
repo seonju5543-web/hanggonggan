@@ -16,7 +16,7 @@
      kind 'dataId'  — <a data-id="123"> 의 번호로 같은 일을 한다.
      kind 'json'    — 목록을 화면이 아니라 API 로 받는 게시판(서강 SPA · 정찰 2026-10-01 이 화면이 부른 요청에서 열쇠를 읽었다). link:'list' 면 글 주소 대신 목록 표식.
      kind 'post'    — 목록을 POST API 로 받는 게시판(중앙 · 정찰이 본문까지 적었다). 응답 HTML 을 같은 눈(날짜 줄)으로 읽고 onclick 번호로 상세를 만든다.
-                      상세 본문도 스크립트가 POST 로 받으므로 확인(verifyPost)도 그 API 로 한다.
+                      상세 본문도 스크립트가 API 로 받는 곳(중앙·서강)은 확인(verifyApi)도 그 API 로 한다.
      kind 'listOnly' — 글 하나의 GET 주소가 **없는** 게시판(경희: 누르면 POST 로 view.do · 정찰 2026-10-01). 제목+게시일은 싣되 링크는
                        목록 주소 + `#n-제목` 표식으로 둔다 — 앱이 「게시판 목록 ↗」 로 정직하게 적는다(app.js isBoardListLink · 장학 공고와 같은 관례).
                        상세가 없으니 verifyRuleDetail 은 건너뛴다(목록 자체를 방금 읽었다).
@@ -63,15 +63,30 @@ export const NEWS_BOARD_RULES = {
     },
     evidence: '정찰 2026-10-01 2차: 행 href="javascript:fnView(\'1\', \'31583\')" · 첫 줄 클릭 → korNotice/view.do?list_id=FA1&seq=31583&…&identified=anonymous& (seq 만 바뀜) · 목록은 identified=anonymous 가 붙은 최종 주소',
   },
-  /* 서강대: SPA 라 목록 HTML 에 글이 없고 화면이 API 를 부른다 — 정찰 2차가 적은 요청: GET /api/api/v1/mainKo/BbsData/boardList?pageNum=1&pageSize=16&bbsConfigFk=3&…
-     (3 = 공지사항 · 장학은 141). 글 하나의 주소는 아직 실제로 열어 보지 못해(장학은 /ko/detail/<pkId>?bbsConfigFk=141 이었지만 공지는 안 눌러 봤다) 목록 표식으로만 싣는다. */
+  /* 서강대: SPA 라 목록 HTML 에 글이 없고 화면이 API 를 부른다 — 정찰 2차: GET /api/api/v1/mainKo/BbsData/boardList?pageNum=1&pageSize=16&bbsConfigFk=3&… (3 = 공지사항 · 장학은 141).
+     정찰 3차(2026-10-02): 줄(<tr class="cursor-pointer"> · 링크 없음)을 누르니 /ko/detail/550598?bbsConfigFk=3&namepage=announcement&text=…&redirect=/ko/announcement 로 갔다
+     (550598 = API 의 pkId) — 그 주소를 번호만 바꿔 쓴다. 그 화면은 SPA 라 본문을 GET …/BbsData?pkId=<번호> 로 받는다 → 상세 확인도 그 API 로 한다. */
   '서강대학교': {
     kind: 'json',
-    link: 'list',
-    page: 'https://www.sogang.ac.kr/ko/announcement',   // 정찰 2차: 이 화면이 아래 API 를 불렀다 — 학생의 「게시판 목록 ↗」 이 여는 곳 (찾기 로봇은 이 화면만 받는다)
+    page: 'https://www.sogang.ac.kr/ko/announcement',   // 정찰 2차: 이 화면이 아래 API 를 불렀다 (찾기 로봇은 이 화면만 받는다)
     api: 'https://www.sogang.ac.kr/api/api/v1/mainKo/BbsData/boardList?pageNum=1&pageSize=30&bbsConfigFk=3',
-    detail: (id, boardUrl, title) => markerUrl(boardUrl, title),
-    evidence: '정찰 2026-10-01 2차: /ko/announcement 가 부른 요청 GET …/BbsData/boardList?…&bbsConfigFk=3 (화면이 부른 요청 기록) · 글 주소는 안 눌러 봐서 목록 표식(#n-)',
+    detail: (id) => `https://www.sogang.ac.kr/ko/detail/${id}?bbsConfigFk=3&namepage=announcement&text=%ED%95%99%EC%82%AC+%EC%A7%80%EC%9B%90&data=%255B%255D&title=%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD&redirect=/ko/announcement`,
+    verifyApi: { idFrom: (url) => (String(url).match(/\/ko\/detail\/(\d+)/) || [])[1], api: (id) => `https://www.sogang.ac.kr/api/api/v1/mainKo/BbsData?pkId=${id}` },
+    evidence: '정찰 3차 2026-10-02: 공지 줄을 누르니 /ko/detail/550598?bbsConfigFk=3&namepage=announcement&text=%ED%95%99%EC%82%AC+%EC%A7%80%EC%9B%90&data=%255B%255D&title=%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD&redirect=/ko/announcement (550598 = 목록 API 의 pkId) · 그 화면이 GET …/BbsData?pkId=550598 로 본문을 받았다',
+  },
+  /* 고려대: 행은 <a href="#1" onclick="jf_view('000060000000061451','1','ko');">. 정찰 3차(2026-10-02)에서 누르니
+     /ko/566/subview.do?enc=<base64("fnct1|@@|" + encodeURIComponent("/portalBoard/ko/1/<번호>/portalBoardView.do?siteId=ko&type=&…&findWord=&"))> 로 갔다 —
+     그 주소를 번호만 바꿔 똑같이 만든다(관문이 정찰이 받아 온 주소와 글자 하나까지 대조한다). 목록 566(일반공지 · fnctNo=1)에서 본 꼴이라 다른 목록 주소면 만들지 않는다.
+     ⚠️ 로봇이 받는 HTML 에 목록 줄이 없었던 이유(화면은 줄이 있다)는 아직 모른다 — 정찰 4차가 '서버가 보낸 HTML' 을 잰다. 줄이 없으면 이 규칙은 아무것도 만들지 않는다. */
+  '고려대학교': {
+    kind: 'onclick',
+    fn: /jf_view\(\s*['"](\d+)['"]\s*,\s*['"]1['"]/,
+    detail: (id, boardUrl) => {
+      if (!/^https:\/\/www\.korea\.ac\.kr\/ko\/566\/subview\.do/.test(String(boardUrl))) return null;
+      const inner = `/portalBoard/ko/1/${id}/portalBoardView.do?siteId=ko&type=&id=&articleId=&page=&startDate=&endDate=&findType=&findWord=&`;
+      return `https://www.korea.ac.kr/ko/566/subview.do?enc=${encodeURIComponent(Buffer.from(`fnct1|@@|${encodeURIComponent(inner)}`).toString('base64'))}`;
+    },
+    evidence: '정찰 3차 2026-10-02: 첫 줄 jf_view(\'000060000000061451\',\'1\',\'ko\') 을 누르니 /ko/566/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjElMkYwMDAwNjAwMDAwMDAwNjE0NTElMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0Z…%3D%3D (번호만 바뀌는 꼴)',
   },
   /* 중앙대: 목록·상세 모두 스크립트가 POST 로 받는다(정찰 2차가 본문까지 적었다). 행은 href="javascript:fn_goDetail('30220','N','','N')" ·
      첫 줄 클릭 → BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30220&pageNo=1 (BBS_SEQ 만 바뀜).
@@ -86,7 +101,7 @@ export const NEWS_BOARD_RULES = {
     body: 'pageNo=1&pagePerCnt=15&MENU_ID=100&SITE_NO=2&BOARD_SEQ=4&S_CATE_SEQ=&BOARD_TYPE=C0301&BOARD_CATEGORY_NO=&P_TAB_NO=&TAB_NO=&P_CATE_SEQ=&CATE_SEQ=&SEARCH_FLD=SUBJECT&SEARCH=',
     fn: /fn_goDetail\(\s*['"](\d+)['"]/,
     detail: (id) => `https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=${id}&pageNo=1`,
-    verifyPost: { idFrom: (url) => (String(url).match(/BBS_SEQ=(\d+)/) || [])[1], api: 'https://www.cau.ac.kr/ajax/FR_SVC/BoardViewData.do', body: (id) => `MENU_ID=100&SITE_NO=2&BOARD_SEQ=4&BBS_SEQ=${id}&P_TAB_NO=&CONTENTS_NO=1&BOARD_CATEGORY_NO=&P_TAB_NO=&TAB_NO=&pageNo=1` },
+    verifyApi: { idFrom: (url) => (String(url).match(/BBS_SEQ=(\d+)/) || [])[1], api: () => 'https://www.cau.ac.kr/ajax/FR_SVC/BoardViewData.do', body: (id) => `MENU_ID=100&SITE_NO=2&BOARD_SEQ=4&BBS_SEQ=${id}&P_TAB_NO=&CONTENTS_NO=1&BOARD_CATEGORY_NO=&P_TAB_NO=&TAB_NO=&pageNo=1` },
     evidence: '정찰 2026-10-01 2차: 화면이 부른 요청 POST ajax/FR_SVC/BBSViewList2.do(본문 기록) · 첫 줄 클릭 → BoardView.do?…&BBS_SEQ=30220&pageNo=1 · 상세 본문은 POST BoardViewData.do',
   },
   '동국대학교': dongguk,
@@ -152,6 +167,8 @@ const DATE_KEYS = ['regDate', 'regDt', 'createdAt', 'date', 'REG_DATE', 'REGDATE
 const ID_KEYS = ['pkId', 'id', 'seq'];
 const TITLE_KEYS = ['title', 'subject'];
 const pick = (x, keys) => { for (const k of keys) if (x && x[k] != null && x[k] !== '') return x[k]; return undefined; };
+/* 날짜 칸 — 흔한 이름 다음엔 이름에 date·_DT·DTTM 이 든 칸 가운데 날짜로 읽히는 첫 값 (중앙 응답의 날짜 칸 이름은 아직 정찰 기록에 없다) */
+const pickDate = (x) => { const v = pick(x, DATE_KEYS); if (v != null && ymd(v)) return v; for (const [k, val] of Object.entries(x || {})) if (/date|_dt$|dttm/i.test(k) && ymd(val)) return val; return undefined; };
 /* 응답 안에서 글 목록 배열을 찾는다 — 칸 이름(list·data·…)이 학교마다 달라 **글처럼 생긴 객체의 배열**(번호·제목 칸이 있는 것)을 깊이 3까지 찾는다. */
 function findRows(j, idKeys, titleKeys, d = 0) {
   if (Array.isArray(j)) return j.some((x) => pick(x, idKeys) != null && pick(x, titleKeys) != null) ? j : null;
@@ -170,7 +187,7 @@ function rowsFromJson(j, rule, boardUrl) {
     let url; try { url = rule.detail(String(id), boardUrl, title); } catch { url = null; }
     if (!url || seen.has(String(id))) continue;
     seen.add(String(id));
-    const postedAt = ymd(pick(x, DATE_KEYS));
+    const postedAt = ymd(pickDate(x));
     out.push({ title, url, postId: String(id), ...(postedAt ? { postedAt } : {}) });
   }
   return out;
@@ -222,13 +239,13 @@ export async function verifyRuleDetail(row, opts = {}) {
   const fetchFn = opts.fetch || fetchBoard;
   if (!row || !row.url) return { ok: false, reason: '확인할 글이 없음' };
   let res;
-  /* 상세 본문을 스크립트가 POST 로 받는 사이트(중앙)는 그 API 에 묻는다 — 화면 주소를 GET 하면 껍데기뿐이다 */
-  const vp = opts.rule && opts.rule.verifyPost;
+  /* 상세 본문을 스크립트가 API 로 받는 사이트(중앙 POST BoardViewData.do · 서강 GET BbsData?pkId=)는 그 API 에 묻는다 — 화면 주소를 GET 하면 껍데기뿐이다 */
+  const vp = opts.rule && opts.rule.verifyApi;
   const id = vp ? vp.idFrom(row.url) : null;   // 번호를 꺼내는 법도 규칙의 것 (공용 함수에 학교 이름표를 박지 않는다)
   if (vp && !id) return { ok: false, reason: '상세 주소에 번호가 없음' };
   /* 같은 학교를 방금 두드린 뒤라 한 번은 끊길 수 있다(전북 7차 실측 fetch failed) → 두 번 시도.
      시한은 게시판 하나의 절대 시한(45초) 안에 들도록 짧게 — 10초 + 쉼 3초 + 12초 (리뷰 2026-10-02) */
-  try { res = vp ? await fetchFn(vp.api, { body: vp.body(id), tries: 2, firstMs: 10000, retryMs: 12000 }) : await fetchFn(row.url, { tries: 2, firstMs: 10000, retryMs: 12000 }); } catch (e) { return { ok: false, reason: `상세 열기 실패 (${(e && e.message) || e})` }; }
+  try { res = vp ? await fetchFn(vp.api(id), { ...(vp.body ? { body: vp.body(id) } : {}), tries: 2, firstMs: 10000, retryMs: 12000 }) : await fetchFn(row.url, { tries: 2, firstMs: 10000, retryMs: 12000 }); } catch (e) { return { ok: false, reason: `상세 열기 실패 (${(e && e.message) || e})` }; }
   if (!res || !res.ok) return { ok: false, reason: `상세 HTTP ${res ? res.status : '?'}` };
   const samePath = (a, b) => { try { const x = new URL(a); const y = new URL(b); return x.origin + x.pathname === y.origin + y.pathname; } catch { return false; } };
   if (!vp && opts.boardUrl && res.url && samePath(res.url, opts.boardUrl)) return { ok: false, reason: '상세 주소가 목록으로 되돌아옴 (규칙이 이 게시판에 안 맞음)' };

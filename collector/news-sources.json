@@ -168,64 +168,7 @@
      "evidence": "같은 검색 → 결과 URL https://www.korea.ac.kr/ko/567/subview.do (제목: 학사공지)"
     }
    ],
-   "note": "subview.do 는 감싸는 페이지 · 실제 목록 /bbs/ko/<번호>/artclList.do 번호는 미확인.",
-   "probe": {
-    "checkedAt": "2026-10-02",
-    "tried": [
-     {
-      "url": "https://www.korea.ac.kr/ko/566/subview.do",
-      "label": "일반공지",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 95768,
-       "links": 367,
-       "scripts": 31,
-       "dates": 14,
-       "blocks": 261,
-       "datedBlocks": 1,
-       "sample": [
-        "<article> fnctId=portalBoard,fnctNo=1 게시판 검색 시작일 ~ 종료일 게시물 검색 제목 작성자 번호, 제목, 작성자, 등록일자, 조회수 정보를 제공 번호 제목 작성자 Department --> 등록일자 조"
-       ],
-       "anchors": []
-      }
-     },
-     {
-      "url": "https://www.korea.ac.kr/ko/567/subview.do",
-      "label": "학사공지",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 87834,
-       "links": 350,
-       "scripts": 31,
-       "dates": 8,
-       "blocks": 261,
-       "datedBlocks": 1,
-       "sample": [
-        "<article> fnctId=portalBoard,fnctNo=2 게시판 검색 시작일 ~ 종료일 게시물 검색 제목 작성자 번호, 제목, 작성자, 등록일자, 조회수 정보를 제공 번호 제목 작성자 Department --> 등록일자 조"
-       ],
-       "anchors": []
-      }
-     },
-     {
-      "url": "https://www.korea.ac.kr/ko/461/subview.do",
-      "label": "학부 학사일정",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 115068,
-       "links": 355,
-       "scripts": 31,
-       "dates": 4,
-       "blocks": 258,
-       "datedBlocks": 0,
-       "sample": [],
-       "anchors": []
-      }
-     }
-    ]
-   }
+   "note": "일반공지 566 — 행은 jf_view 클릭형, 상세는 subview.do?enc=… (정찰 3차 · news-board-rules.mjs). 화면엔 목록 줄이 있는데 로봇이 받은 HTML 엔 없었다(9차 찾기 진단 datedBlocks 1) — 정찰 4차가 서버 HTML 을 잰다."
   },
   {
    "school": "고려대학교 세종캠퍼스",
@@ -280,7 +223,7 @@
      "evidence": "웹 검색 2026-09-30 'site:www.sogang.ac.kr announcement 공지사항 학사공지 sogang' → 결과 URL https://www.sogang.ac.kr/ko/campus/student-support/notice (제목: 학생 일반공지 · 학생지원팀)"
     }
    ],
-   "note": "SPA — 목록은 API(news-board-rules.mjs json · bbsConfigFk=3 · 정찰 2차가 화면이 부른 요청에서 읽음). 글 주소는 안 눌러 봐 목록 표식(#n-)으로. 인증서 사슬은 certs/sectigo-server-auth-ov-r36.pem(묶음 bundle.pem).",
+   "note": "SPA — 목록은 API(bbsConfigFk=3), 글 주소는 정찰 3차가 줄을 눌러 받은 /ko/detail/<pkId>?… (news-board-rules.mjs). 🔴 이 게시판(공지사항 · 종합봉사실)은 고정 글을 빼면 최신 글이 2026-06-30 이라 60일 안 새 글이 없다(ℹ️) — 학생이 더 자주 보는 공지 게시판이 있는지 정찰 4차가 /ko/campus/student-support/notice 를 본다.",
    "autoFound": {
     "date": "2026-10-02",
     "via": "candidate",
@@ -617,27 +560,20 @@
    "school": "상명대학교",
    "campus": "",
    "home": "https://www.smu.ac.kr/kor/index.do",
-   "boardUrl": "https://www.smu.ac.kr/webzine/today.do",
+   "boardUrl": null,
    "candidates": [
     {
      "url": "https://www.smu.ac.kr/kor/life/notice.do",
      "label": "공지사항",
-     "evidence": "웹 검색 2026-09-30 '상명대학교 공지사항 notice.do' → 결과 URL https://www.smu.ac.kr/kor/life/notice.do (제목: 상명대학교 국문 | 통합공지 게시판목록)"
+     "evidence": "웹 검색 2026-09-30 '상명대학교 공지사항 notice.do' → 결과 URL https://www.smu.ac.kr/kor/life/notice.do (제목: 상명대학교 국문 | 통합공지 게시판목록) · 정찰 3차 2026-10-02: 그린 화면의 목록 줄은 보통 링크 <a href=\"?mode=view&articleNo=769262&…\"> + 작성일 2026-10-02 (클릭형이 아니다)"
+    },
+    {
+     "url": "https://www.smu.ac.kr/webzine/today.do",
+     "label": "상명 새소식(보도자료)",
+     "evidence": "찾기 로봇이 2026-10-01 홈 메뉴 「상명 새소식 더보기」를 따라 열어 글 10행을 확인(autoFound) — 통합공지가 로봇에게 안 읽힐 때의 대체 출처"
     }
    ],
-   "note": "schools.json 의 장학 주소와 같은 게시판(통합공지). 2026-10-01: 찾은 webzine/today.do 는 홍보팀 새소식(보도자료)이다 — 통합공지 notice.do 는 클릭형(장학 수집기도 브라우저 담당)이라 정찰로 상세 여는 방식을 확인한 뒤 규칙을 적는다. 그때까지 새소식으로 싣는다.",
-   "autoFound": {
-    "date": "2026-10-01",
-    "via": "home-menu",
-    "label": "상명 새소식 더보기",
-    "rows": 10,
-    "sample": [
-     "우리 대학서 ‘파키스탄 영양 정책 관리자 초청 연수’ 개최... 서울시 식생활종합지원센터 운영 사례 소개",
-     "경영대학원 피트니스 MBA, 중국 차이나핏 대표단과 간담회 시행",
-     "「2026 천안 유니브시티 페스티벌」 참여… 대학생 주도 문화예술 콘텐츠 선보여"
-    ],
-    "evidence": "홈페이지 메뉴 「상명 새소식 더보기」 을 따라 들어가 확인 (2026-10-01)"
-   }
+   "note": "통합공지(notice.do)가 먼저 — 9차 메모의 \"클릭형\"은 틀렸다(정찰 3차: 보통 href 링크 + 날짜). 로봇이 받는 HTML 에 줄이 있는지는 정찰 4차가 잰다(서버 HTML vs 그린 화면). 안 읽히면 찾기 로봇이 새소식(보도자료)으로 물러난다. 장학 수집은 브라우저 담당(schools.json)."
   },
   {
    "school": "가천대학교",
