@@ -51,6 +51,9 @@ const ledger = Object.assign(T.emptyLedger(), readJson(LEDGER_PATH, {}));
 ledger.posts ||= {}; ledger.srcSeen ||= {};
 const cfg = readJson(CFG_PATH, {});
 const noThumb = new Set(Array.isArray(cfg.noThumb) ? cfg.noThumb : []);
+/* 전체 스위치 news-config.json "thumbs" — on(기본) · dry(받아서 장부·그림만 두고 **카드에는 안 붙인다** — 처음 켤 때 사람이 그림을 먼저 본다) ·
+   off(받지 않고 카드의 사진을 모두 뗀다 · 그림 파일도 지운다 — 틀린 사진이 쏟아질 때 한 번에 끄는 길) */
+const MODE = ['on', 'dry', 'off'].includes(cfg.thumbs) ? cfg.thumbs : 'on';
 
 /* sharp 는 이 단계에서만 설치된다(collect-news.yml). 없으면 받지 않고 ④⑤만 한다 — 실린 글의 사진 칸·파일 정리는 늘 맞춘다 */
 let sharp = null; let sharpErr = '';
@@ -119,7 +122,7 @@ async function thumbFor(n, ctx) {
 
 /* ①~③ */
 let done = 0;
-if (sharp) {
+if (sharp && MODE !== 'off') {
   const queue = T.planQueue(items, ledger, { today, perSchool: PER_SCHOOL, noThumb, fileExists });
   const requeued = new Set();
   for (let i = 0; i < queue.length; i += 1) {
@@ -133,7 +136,7 @@ if (sharp) {
     ledger.posts[key] = out.file ? { at: today, school: n.school, file: out.file, src: out.src, from: out.from }
       : out.none ? { at: today, school: n.school, none: out.none }
       : { at: today, school: n.school, err: out.err, tries: ((prev && prev.err && prev.tries) || 0) + 1 };
-    runLog.push({ school: n.school, title: n.title, result: out.file ? `✅ ${out.from}` : out.none ? '— 없음' : '⚠️ 실패', note: out.file ? out.note : (out.none || out.err) });
+    runLog.push({ school: n.school, title: n.title, result: out.file ? `✅ ${out.from}` : out.none ? '— 없음' : '⚠️ 실패', note: out.file ? `${out.note} · ${out.file} ← ${String(out.src).slice(0, 120)}` : (out.none || out.err) });
     done += 1;
     /* 이 글로 공통 그림이 드러났으면 그 그림을 썸네일로 받은 다른 글을 되돌려 다시 찾는다(같은 실행 안에서 한 번) */
     for (const k of T.revokeRepeated(ledger, n.school)) {
@@ -146,9 +149,12 @@ if (sharp) {
 }
 
 /* ④ 소급 입히기 · 고아 파일 지우기 · 장부 다듬기 */
-const changedItems = T.applyThumbs(docs, ledger, { noThumb, fileExists });
+const shown = MODE === 'on' ? noThumb : new Set(items.map(T.thumbKey));   // dry·off 는 카드에 하나도 안 붙인다
+const changedItems = T.applyThumbs(docs, ledger, { noThumb: shown, fileExists });
 for (const d of docs) if (d.changed) fs.writeFileSync(d.path, JSON.stringify(d.doc, null, 1) + (d.eol ? '\n' : ''));
+/* 남길 그림 — 카드가 쓰는 것. dry 는 사람이 볼 수 있게 장부의 그림(실린 글 것)도 남긴다. off 는 전부 지운다 */
 const referenced = new Set(items.map((n) => n.thumb).filter(Boolean));
+if (MODE === 'dry') for (const n of items) { const e = ledger.posts[T.thumbKey(n)]; if (e && e.file && !noThumb.has(T.thumbKey(n))) referenced.add(e.file); }
 let removed = 0;
 for (const f of (fs.existsSync(IMG_DIR) ? fs.readdirSync(IMG_DIR) : [])) {
   const rel = `${T.THUMB_DIR}/${f}`;
@@ -165,7 +171,7 @@ for (const n of live) {
   s.total += 1;
   const e = ledger.posts[T.thumbKey(n)];
   if (noThumb.has(T.thumbKey(n))) s.off += 1;
-  else if (n.thumb) s.thumb += 1;
+  else if (n.thumb || (MODE === 'dry' && e && e.file)) s.thumb += 1;   // dry 는 카드에 안 붙였어도 받은 사진을 센다
   else if (e && e.none) { s.none += 1; const r = e.none.replace(/\s*\(.*$/, ''); s.reasons.set(r, (s.reasons.get(r) || 0) + 1); }
   else if (e && e.err) s.err += 1;
   else s.wait += 1;
@@ -175,6 +181,7 @@ const tot = [...bySchool.values()].reduce((a, s) => ({ total: a.total + s.total,
 const looked = tot.thumb + tot.none;
 const lines = [
   `## 🖼 교내 소식 썸네일 리포트 (${today})`, '',
+  MODE !== 'on' ? `🔧 스위치 thumbs: ${MODE} (collector/news-config.json) — ${MODE === 'dry' ? '사진을 받아 두기만 하고 카드에는 안 붙입니다(사람이 먼저 봄)' : '사진을 받지 않고 카드의 사진을 모두 뗐습니다'}` : '',
   sharp ? `이번 실행: 글 ${done}건을 열어 봤습니다 (${Math.round((Date.now() - t0) / 1000)}초 · 예산 ${Math.round(BUDGET_MS / 1000)}초 · 학교당 ${PER_SCHOOL}건)` : `⚠️ 그림 도구(sharp)를 못 불러 이번엔 사진을 받지 않았습니다 (${sharpErr}) — 실린 글의 사진 칸·파일 정리만 했습니다`,
   '',
   `**실린 글 ${tot.total}건 중 사진 ${tot.thumb}건** · 사진 없음 ${tot.none}건 · 실패(다시 시도) ${tot.err}건 · 아직 안 봄 ${tot.wait}건${tot.off ? ` · 관리자가 뺀 사진 ${tot.off}건` : ''}${looked ? ` — 열어 본 글 가운데 사진이 있던 비율 **${Math.round((tot.thumb / looked) * 100)}%**` : ''}`,

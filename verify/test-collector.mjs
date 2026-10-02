@@ -2419,6 +2419,20 @@ console.log('\n■ 교내 소식 썸네일 (2026-10-03 개발자 지시 "실제 
     eq('  로봇(받기 없이) — 장부 사진 입힘 · 사진 뺀 글 칸 지움 · 안 쓰는 그림 지움 · 리포트에 학교별 수', [r.status, doc.items.map((n) => n.thumb || '-'), fs.readdirSync(path.join(dir, 'data/news/img')).sort(), /\| 가대학교 \| 2 \| 1 \|/.test(readText(path.join(dir, 'collector/news-thumbs-report.md')))],
       [0, [keep, '-'], ['0123456789abcdef.webp'], true]);
   }
+  /* ⑩-2 전체 스위치 — dry 는 받아 두기만(카드엔 안 붙이고 그림은 남김 · 사람이 먼저 본다) · off 는 카드의 사진을 모두 떼고 그림도 지운다 */
+  {
+    const mkRoot = (mode) => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-thumbmode-'));
+      fs.mkdirSync(path.join(dir, 'data/news/img'), { recursive: true }); fs.mkdirSync(path.join(dir, 'collector'), { recursive: true });
+      const img = 'data/news/img/0123456789abcdef.webp'; fs.writeFileSync(path.join(dir, img), 'x');
+      fs.writeFileSync(path.join(dir, 'data/news/nx.json'), JSON.stringify({ school: '가대학교', updatedAt: '2026-10-03', items: [{ title: '사진 글', url: 'https://g/1', school: '가대학교', postId: '1', foundAt: '2026-10-03', thumb: img }] }, null, 1));
+      fs.writeFileSync(path.join(dir, 'collector/news-thumbs.json'), JSON.stringify({ posts: { 'post:가대학교:1': { at: '2026-10-03', school: '가대학교', file: img } }, srcSeen: {} }));
+      fs.writeFileSync(path.join(dir, 'collector/news-config.json'), JSON.stringify({ hideUrls: [], thumbs: mode }));
+      spawnSync(process.execPath, [fileURLToPath(new URL('../collector/collect-news-thumbs.mjs', import.meta.url))], { env: { ...process.env, NEWS_THUMB_ROOT: dir, NEWS_THUMB_OFFLINE: '1' }, encoding: 'utf8' });
+      return [JSON.parse(readText(path.join(dir, 'data/news/nx.json'))).items[0].thumb || '-', fs.readdirSync(path.join(dir, 'data/news/img')).length];
+    };
+    eq('  전체 스위치 — on 은 붙임 · dry 는 카드엔 안 붙이고 그림은 남김 · off 는 떼고 그림도 지움', [mkRoot('on'), mkRoot('dry'), mkRoot('off')], [['data/news/img/0123456789abcdef.webp', 1], ['-', 1], ['-', 0]]);
+  }
   /* ⑪ 감사 — 썸네일 꼴·파일·크기 · 같은 글 판정은 글 번호로(같은 제목의 다른 글을 중복으로 잡지 않는다) · 라이브 점검이 사진도 본다 */
   const au = readText(new URL('verify/audit-data.js', root));
   eq('  감사 — 썸네일 꼴·파일 있음·크기 · 같은 글은 글 번호로', /if \(!THUMB_RE\.test\(String\(n\.thumb\)\)\) badThumb\+\+;/.test(au) && /missThumb\+\+/.test(au) && /bigThumb\+\+/.test(au) && /const uk = n\.postId \? `p\|\$\{n\.school\}\|\$\{n\.postId\}` : urlKey\(n\.url\);/.test(au), true);
