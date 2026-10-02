@@ -129,12 +129,14 @@ const eq = (label, got, want) => {
   await page.click('#apps-delete-selected');
   await page.waitForTimeout(400);
   eq('전부 지워진다', await page.$$eval('#apps-list .swipe-row', (e) => e.length), 0);
+  /* 🔴 되돌리기 **전에** 잰다 — 되돌리기는 지운 것을 다시 넣으므로 뒤에서 재면 지워졌어도 통과한다(2026-10-02 리뷰) */
+  eq('  전체 선택·삭제는 보이지 않는 기록을 건드리지 않는다(기기에 그대로 · 공고가 돌아오면 선정 기록과 함께)',
+    await page.evaluate(() => (state.applications || []).map((a) => a.id)), ['reg-gone-for-test']);
   eq('비면 선택 버튼이 사라진다', await page.$eval('#apps-select-toggle', (e) => e.hidden), true);
   await page.click('#toast .toast-undo');
   await page.waitForTimeout(400);
   eq('일괄 삭제도 되돌아온다', await page.$$eval('#apps-list .swipe-row', (e) => e.length), 3);
-  eq('  전체 선택·삭제는 보이지 않는 기록을 건드리지 않는다(기기에 그대로 · 공고가 돌아오면 선정 기록과 함께)',
-    await page.evaluate(() => (state.applications || []).some((a) => a.id === 'reg-gone-for-test' && a.result === 'won')), true);
+
 
   /* ══ 신청 현황은 홈이 아니라 여기다 (2026-09-12 · 노션 UI-15) ═══════════════
      개발자 지시: "홈의 신청 현황을 지우고 신청 내역 칸에 반영한다."

@@ -140,6 +140,10 @@ let registeredList = []; // data/registered.json — 수집 로봇이 확보한 
       KOSAF 에 적어 둔 칸이라, 자격 진단도 양식 작성도 붙이지 않는다 — 그대로 보여 주고
       "자격은 재단 홈페이지에서 확인"이라고 밝힌다(설계: docs/designs/kosaf-and-narrowing.md ②). */
 let kosafList = [];
+/* 두 공고 목록을 **실제로 받아 왔는가** (2026-10-02 리뷰) — 신청 내역은 '공고가 내려갔다'를 이것으로만 말한다.
+   받기 전·못 받았을 때 모든 신청이 '내려간 것'처럼 보여 「아직 준비한 장학금이 없어요」가 뜨는 것을 막는다.
+   'wait' 받는 중 · 'ok' 받음 · 'fail' 못 받음 */
+const appsData = { registered: 'wait', kosaf: 'wait' };
 let kosafUpdatedAt = '';
 
 function registeredFor(p) {
@@ -1627,7 +1631,8 @@ function renderHome() {
     deadline: soon,
     '교내': applyable.filter((m) => m.sch.type === '교내').length,
     '교외': applyable.filter((m) => m.sch.type === '교외').length,
-    applications: shownAppRows(state.applications, findSch).length,   // 신청 내역 화면과 같은 수(내려간 공고 빼고)
+    /* 신청 내역 화면과 같은 수(내려간 공고 빼고) — 공고 목록을 받기 전엔 담은 수 그대로(받고 나서 줄어드는 것은 '내려감'이 확정된 뒤다) */
+    applications: appsDataState() === 'ok' ? shownAppRows(state.applications, schResolver()).length : state.applications.length,
   };
   $('#hero-tiles').innerHTML = HERO_TILES.map((t) => `
     <button type="button" class="hero-tile" data-hero-go="${t.go}" aria-label="${t.name} ${tileN[t.go]}건">
@@ -2481,13 +2486,14 @@ function loadRegistered() {
   return fetch('data/registered.json', { cache: 'no-store' })
     .then((r) => (r.ok ? r.json() : null))
     .then((d) => {
-      if (!d) return;
+      if (!d) { if (appsData.registered !== 'ok') appsData.registered = 'fail'; return; }   // 한 번 받았으면 다시 받기 실패에도 'ok'(목록은 메모리에 그대로)
+      appsData.registered = 'ok';
       registeredList = d.items || [];
       regUpdatedAt = d.updatedAt || '';
       dataFetchedAt = new Date();
       attachPrepTemplates(registeredList);
     })
-    .catch(() => { /* 오프라인 등 — 조용히 무시 */ })
+    .catch(() => { if (appsData.registered !== 'ok') appsData.registered = 'fail'; /* 오프라인 등 — 신청 내역이 '못 받음'으로 말한다 */ })
     /* 🔴 **성공이든 실패든 여기를 지난다** — 못 받아 왔을 때도 화면을 한 번 다시 그려야
        늦게 온 다른 데이터(층2·실시간 공고)와 함께 제자리를 잡는다. */
     .then(() => { rerenderVisible(); });
@@ -2497,11 +2503,13 @@ function loadKosaf() {
   return fetch('data/kosaf-open.json', { cache: 'no-store' })
     .then((r) => (r.ok ? r.json() : null))
     .then((d) => {
-      kosafList = (d && d.items) || [];
-      kosafUpdatedAt = (d && d.updatedAt) || '';
+      if (!d) { if (appsData.kosaf !== 'ok') appsData.kosaf = 'fail'; rerenderVisible(); return; }   // 다시 받기 실패에 받아 둔 목록을 비우지 않는다
+      appsData.kosaf = 'ok';
+      kosafList = d.items || [];
+      kosafUpdatedAt = d.updatedAt || '';
       rerenderVisible();
     })
-    .catch(() => { /* 오프라인 등 — 조용히 무시. 층2가 없어도 앱은 그대로 돈다 */ });
+    .catch(() => { if (appsData.kosaf !== 'ok') appsData.kosaf = 'fail'; rerenderVisible(); /* 층2가 없어도 앱은 그대로 돈다 */ });
 }
 
 /* 데이터를 한꺼번에 다시 받는다 — 당겨서 새로고침과 화면 복귀가 **같은 함수**를 쓴다
@@ -2577,7 +2585,9 @@ function kosafAsScholarships() {
        findSch 가 그 공고를 못 찾아 **보관함에서 통째로 사라지고** 상세도 안 열린다.
        층1(registeredList)은 이 걸러내기가 없어 원래 남으므로, 층2만 맞춰 주는 것이다.
        ⚠️ 목록에 되살아나지는 않는다 — 탐색·홈은 각자 dday 로 한 번 더 거른다. */
-    .filter((i) => !i.due || dday(i.due).days >= -CLOSED_KEEP_DAYS || isSaved(`kosaf-${i.code}`))
+    /* 🔴 **신청 내역에 담은 공고도 남긴다** (2026-10-02 리뷰) — 내려간 공고를 신청 내역에서 안 보이게 하면서, 마감 이틀 뒤
+       이 걸러내기 때문에 제출·발표를 적을 바로 그 때 줄이 사라졌다(공고는 데이터에 그대로 있는데). 목록에는 안 되살아난다(탐색·홈이 dday 로 거른다). */
+    .filter((i) => !i.due || dday(i.due).days >= -CLOSED_KEEP_DAYS || isSaved(`kosaf-${i.code}`) || state.applications.some((a) => a.id === `kosaf-${i.code}`))
     .map((i) => {
       const f = i.fields || {};
       /* 한 칸에 여러 항목이 `○` 로 붙어 있다 — 재단이 쓴 대로 줄만 나눈다 */
@@ -4984,6 +4994,13 @@ function appRows(applications, resolve) {
 function shownAppRows(applications, resolve) {
   return appRows(applications, resolve).filter((r) => r.sch);
 }
+/* 공고 찾기를 **한 번에** — findSch 는 부를 때마다 목록 전체(층2 파싱 포함)를 다시 만든다. 신청이 n건이면 n번이라 지도로 한 번만 만든다 */
+function schResolver() {
+  const byId = new Map(allScholarships().map((s) => [s.id, s]));
+  return (id) => byId.get(id) || null;
+}
+/* 두 목록을 다 받았는가 — 하나라도 '받는 중'이면 아직 '내려갔다'고 말하지 않는다 */
+const appsDataState = () => (Object.values(appsData).includes('wait') ? 'wait' : Object.values(appsData).includes('fail') ? 'fail' : 'ok');
 
 /* 차례 — **지금 할 일이 있는 것부터** (2026-09-20 개발자 지적).
 
@@ -4998,7 +5015,7 @@ function shownAppRows(applications, resolve) {
    묶음 안에서는 **마감 전이 먼저**(임박한 것부터), 마감이 지난 것은 뒤로 돌리되
    최근에 마감된 것부터 둔다. 마감을 모르는 것은 맨 뒤다.
 
-   🔴 **거르지 않는다 — 차례만 바꾼다.** 줄 수는 그대로여야 한다(바로 위 `appRows` 머리말과
+   🔴 **거르지 않는다 — 차례만 바꾼다.** (내려간 공고를 빼는 일은 앞 단계 shownAppRows 몫이다 · 2026-10-02) 줄 수는 그대로여야 한다(바로 위 `appRows` 머리말과
       '신청 내역은 마감으로 거르지 않는다' 관문이 지키는 것이 그것이다).
    🔴 `dday()` 를 쓰지 않는다 — 그 함수는 마감을 모르는 공고에 '남은 날 14일'이라는 가짜
       값을 준다(CLAUDE.md). 여기서는 날짜 글자를 그대로 견준다.
@@ -5023,8 +5040,19 @@ function appOrder(rows, today) {
 }
 
 function renderApplications() {
-  /* 잇고(버리지 않는다) → 차례를 정한다(거르지 않는다). 둘 다 순수 함수라 검사가 직접 돌린다. */
-  const rows = appOrder(shownAppRows(state.applications, findSch));
+  /* 잇고 → 내려간 공고는 화면에서 뺀다(기록은 그대로 · shownAppRows) → 차례를 정한다. 셋 다 순수 함수라 검사가 직접 돌린다. */
+  /* 🔴 공고 목록을 아직 못 받았으면 '내려간 공고'를 가르지 않는다 — 가르면 모든 신청이 사라져 「아직 준비한 장학금이 없어요」가 뜬다(2026-10-02 리뷰) */
+  const dataState = appsDataState();
+  if (dataState !== 'ok' && state.applications.length) {
+    $('#apps-summary').innerHTML = '';
+    $('#apps-list').innerHTML = dataState === 'wait'
+      ? (typeof skeletonRows === 'function' ? skeletonRows(3) : '')
+      : '<p class="empty">공고 목록을 받아오지 못했어요<br /><span class="empty-sub">연결되면 신청 내역이 다시 보여요 · 기록은 그대로 있어요</span></p>';
+    $('#apps-select-toggle').hidden = true;
+    return;
+  }
+  const resolve = schResolver();
+  const rows = appOrder(shownAppRows(state.applications, resolve));
   /* 공고를 아직 찾을 수 있는 동안 이름을 적어 둔다 — 나중에 목록에서 내려가도 학생이
      무엇이었는지 알아볼 수 있다. 옛 기록을 살리는 길이 이것 하나뿐이라 여기서 한다
      (loadState 는 registered.json 이 오기 전에 돌아 아직 아무것도 못 찾는다). */
@@ -5038,11 +5066,11 @@ function renderApplications() {
   const pending = apps.filter((a) => a.pending);
   const submitted = prepared.filter((a) => a.submittedAt && !a.result);
   const wonApps = prepared.filter((a) => a.result === 'won');
-  /* 🔴 공고를 못 찾는 기록은 **금액을 모른다** — 0 으로 두고 그 건수를 따로 센다.
+  /* 🔴 금액을 못 읽은 공고는 **금액을 모른다** — 0 으로 두고 그 건수를 따로 센다(내려간 공고는 2026-10-02 부터 여기 오지 않는다).
      예전엔 `findSch(a.id).amountValue` 라 못 찾는 순간 여기서 죽었다(그래서 위 filter 가
      있었던 것이기도 하다). 모르는 금액을 지어내 더하지 않는 것은 홈 히어로·일괄 준비와
      같은 규칙이고, 말하는 법도 그쪽과 같다 — '금액 미확인 n건 제외'. */
-  const amountOf = (a) => { const s = findSch(a.id); return (s && s.amountValue) || 0; };
+  const amountOf = (a) => { const s = resolve(a.id); return (s && s.amountValue) || 0; };
   const totalExpected = apps.reduce((sum, a) => sum + amountOf(a), 0);
   const wonAmount = wonApps.reduce((sum, a) => sum + amountOf(a), 0);
   const counted = wonApps.length ? wonApps : apps;
@@ -5138,7 +5166,7 @@ function wireAppsManage() {
 
   $('#apps-check-all').addEventListener('change', (e) => {
     /* 화면에 있는 줄만 고른다 — 내려간 공고는 보이지 않으므로 '전체 선택'이 보이지 않는 기록까지 지우면 안 된다(2026-10-02) */
-    const ids = shownAppRows(state.applications, findSch).map((r) => r.app.id);
+    const ids = shownAppRows(state.applications, schResolver()).map((r) => r.app.id);
     appsSelected.clear();
     if (e.target.checked) ids.forEach((id) => appsSelected.add(id));
     renderApplications();
@@ -5883,7 +5911,8 @@ async function trashRestore(key) {
     saveState();
     renderApplications();
     renderHome();
-    toast('신청내역으로 되살렸어요');
+    /* 내려간 공고의 기록은 되살려도 신청 내역에 안 보인다(2026-10-02) — 보인다고 말하지 않는다 */
+    toast(findSch(t.app.id) ? '신청내역으로 되살렸어요' : '되살렸어요 · 공고가 목록에 다시 올라오면 신청내역에 보여요');
   } else {
     let rec;
     try { rec = await trashTx('readonly', (st) => st.get(rest)); } catch (e) { rec = null; }
@@ -6246,7 +6275,7 @@ function bindEvents() {
     if (ub) {
       /* 잘못 누른 결과 되돌리기 — 기록만 지운다. 상세 시트의 '결과 기록 취소'와 같은 함수다 */
       e.stopPropagation();
-      /* id 로 넘긴다 — 목록에서 내려간 공고의 기록도 되돌릴 수 있어야 한다 */
+      /* id 로 넘긴다 — undoProgress 는 공고 없이도 기록을 되돌린다(공고를 요구하면 내려간 공고의 기록이 영영 안 지워진다) */
       undoProgress(ub.dataset.undoResult);
       return;
     }
