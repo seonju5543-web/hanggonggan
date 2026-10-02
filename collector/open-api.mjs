@@ -12,7 +12,7 @@
      collector/open-api-report.md (출처마다 상태·받은 수·실은 수·버린 이유 · 첫 행의 칸 이름 — 명세와 다르면 여기서 보인다)
    넘어지지 않게
      · 열쇠가 없는 출처는 조용히 건너뛴다(지난 글 그대로).
-     · 요청마다 20초 시한 · 두 번 더 시도 · 전체 4분 예산.
+     · 요청마다 20초 시한(청년콘텐츠 45초) · 두 번 더 시도 · 전체 6분 예산.
      · 한 출처가 실패해도 다른 출처는 저장한다. 실패한 출처의 지난 글은 지우지 않는다.
      · 실패는 리포트에 ❌ 로 적는다 → 워크플로가 이슈로 알린다(로그를 안 봐도 안다).
    실행: node collector/open-api.mjs            (저장)
@@ -33,7 +33,7 @@ const ACTS = new URL('../data/activities.json', HERE);
 const REPORT = new URL('open-api-report.md', HERE);
 const DRY = process.argv.includes('--dry-run');
 const REQ_MS = 20000;
-const BUDGET_MS = 4 * 60 * 1000;
+const BUDGET_MS = 6 * 60 * 1000;   // 2026-10-02 4→6분 — 청년콘텐츠 한 쪽이 10초(본문에 그림) · 워크플로 시한(12분) 안
 const started = Date.now();
 const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);   // KST
 
@@ -46,16 +46,16 @@ const youthContentKey = (process.env.YOUTHCENTER_CONTENT_KEY || '').trim();
 class ApiError extends Error {}
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 /* 열쇠가 오류 문구·주소에 섞여 리포트에 찍히지 않게 */
-const hideKeys = (s) => [portalKey, youthKey, youthContentKey, encodeURIComponent(portalKey)].filter((k) => k && k.length > 6)
+const hideKeys = (s) => [portalKey, youthKey, youthContentKey, encodeURIComponent(portalKey), encodeURIComponent(youthKey), encodeURIComponent(youthContentKey)].filter((k) => k && k.length > 6)
   .reduce((t, k) => t.split(k).join('***'), String(s));
 
-async function getText(base, params) {
+async function getText(base, params, reqMs = REQ_MS) {
   const url = `${base}?${new URLSearchParams(params)}`;
   let last;
   for (let i = 0; i < 3; i += 1) {
-    if (Date.now() - started > BUDGET_MS) throw new ApiError('전체 시간 예산(4분) 초과');
+    if (Date.now() - started > BUDGET_MS) throw new ApiError(`전체 시간 예산(${BUDGET_MS / 60000}분) 초과`);
     try {
-      const res = await fetch(url, { signal: AbortSignal.timeout(REQ_MS), headers: { Accept: 'application/json, application/xml;q=0.9, */*;q=0.8' } });
+      const res = await fetch(url, { signal: AbortSignal.timeout(reqMs), headers: { Accept: 'application/json, application/xml;q=0.9, */*;q=0.8' } });
       const text = await res.text();
       if (res.status >= 500) throw new ApiError(`서버 오류 HTTP ${res.status}`);   // 다시 시도할 만하다
       if (!res.ok) return { status: res.status, text };                            // 401·403 등은 다시 해도 같다
@@ -65,7 +65,7 @@ async function getText(base, params) {
       if (i < 2) await sleep(3000 * (i + 1));
     }
   }
-  throw new ApiError(last?.name === 'TimeoutError' ? `응답 없음(${REQ_MS / 1000}초 × 3회)` : `요청 실패: ${last?.message || last}`);
+  throw new ApiError(last?.name === 'TimeoutError' ? `응답 없음(${reqMs / 1000}초 × 3회)` : `요청 실패: ${last?.message || last}`);
 }
 
 /* 오류 응답에서 사람이 읽을 이유를 뽑는다(공공데이터포털은 JSON 을 달라 해도 오류는 XML 로 준다) */
@@ -117,8 +117,18 @@ const FETCHERS = {
   async youthPolicy() {
     const rows = [];
     for (let pageNum = 1; pageNum <= 50; pageNum += 1) {   // 정책 3천여 건 전부 — 종류 판정은 제목으로 하므로 걸러 받을 수가 없다
-      const r = await getText('https://www.youthcenter.go.kr/go/ythip/getPlcy', { apiKeyNm: youthKey, pageNum, pageSize: 100, rtnType: 'json' });
-      if (r.status !== 200) throw new ApiError(reasonOf(r));
+      /* 🔴 **천천히 넘긴다** (2026-10-02 실측) — 쪽을 쉬지 않고 넘기면 몇 쪽 만에 'HTTP 403 invalid api key' 가 온다(같은 열쇠가 6분 뒤 다시 200).
+         하루 한도가 아니라 짧은 시간 속도 제한이다. 쪽 사이 2.5초 · 1쪽을 넘긴 뒤의 403 은 한 번 30초 쉬고 다시 묻는다(열쇠는 1쪽에서 이미 증명됐다) */
+      if (pageNum > 1) await sleep(2500);
+      let r = await getText('https://www.youthcenter.go.kr/go/ythip/getPlcy', { apiKeyNm: youthKey, pageNum, pageSize: 100, rtnType: 'json' });
+      /* 400 도 같은 대접 — 정찰에서 이 매개변수는 1~33쪽 전부 200 이었다. 그래서 뒤쪽 400('invalid param data')도 같은 속도 제한일 가능성이 높다
+         (확정은 아니다 — 오류에 쪽 번호가 붙으니 다시 나면 그 쪽으로 가린다) */
+      if ((r.status === 403 || r.status === 400) && pageNum > 1) {
+        await sleep(30000);
+        r = await getText('https://www.youthcenter.go.kr/go/ythip/getPlcy', { apiKeyNm: youthKey, pageNum, pageSize: 100, rtnType: 'json' });
+      }
+      /* 쪽 번호를 같이 적는다 — 2026-10-02 첫 실행의 'HTTP 400 invalid param data' 가 몇 쪽에서 났는지 몰라 원인을 못 가렸다(정찰에선 1~33쪽 전부 200) */
+      if (r.status !== 200) throw new ApiError(`${pageNum}쪽 · ${reasonOf(r)}`);
       const j = parseJson(r);
       const got = findRows(j, 'plcyNm');
       if (!got) { if (pageNum > 1 && /\[\s*\]/.test(r.text)) break; throw new ApiError(`${pageNum}쪽 응답 모양이 명세와 다르다 — ${reasonOf(r)}`); }   // 빈 목록만 '끝'이다(리뷰 M6)
@@ -129,14 +139,17 @@ const FETCHERS = {
   },
   async youthContent() {
     const rows = [];
-    for (let pageNum = 1; pageNum <= 3; pageNum += 1) {   // 최근 글만(60일 넘은 글은 어차피 버린다)
-      const r = await getText('https://www.youthcenter.go.kr/go/ythip/getContent', { apiKeyNm: youthContentKey, pageNum, pageSize: 100, rtnType: 'json' });
-      if (r.status !== 200) throw new ApiError(reasonOf(r));
+    /* 🔴 **한 쪽에 10건** (2026-10-02 정찰 실측) — 본문 HTML 에 그림이 통째로 들어 있어 10건이 8.1MB · 10초다.
+       100건이면 80MB 라 20초 시한에 세 번 다 걸렸다. 최근 30건(3쪽)만 받는다 — 60일 넘은 글은 어차피 버린다 */
+    for (let pageNum = 1; pageNum <= 3; pageNum += 1) {
+      if (pageNum > 1) await sleep(2500);   // 청년정책과 같은 속도 제한
+      const r = await getText('https://www.youthcenter.go.kr/go/ythip/getContent', { apiKeyNm: youthContentKey, pageNum, pageSize: 10, rtnType: 'json' }, 45000);
+      if (r.status !== 200) throw new ApiError(`${pageNum}쪽 · ${reasonOf(r)}`);
       const j = parseJson(r);
       const got = findRows(j, 'pstTtl');
       if (!got) { if (pageNum > 1 && /\[\s*\]/.test(r.text)) break; throw new ApiError(`${pageNum}쪽 응답 모양이 명세와 다르다 — ${reasonOf(r)}`); }
       rows.push(...got);
-      if (got.length < 100) break;
+      if (got.length < 10) break;
     }
     return rows;
   },
@@ -163,6 +176,28 @@ async function vol1365Details(items, refs) {
 
 const HAS_KEY = { kstartup: !!portalKey, vol1365: !!portalKey, youthPolicy: !!youthKey, youthContent: !!youthContentKey };
 const KEY_NAME = { kstartup: 'DATA_GO_KR_KEY', vol1365: 'DATA_GO_KR_KEY', youthPolicy: 'YOUTHCENTER_KEY', youthContent: 'YOUTHCENTER_CONTENT_KEY' };
+
+/* ── 정찰(--probe) — 진짜 열쇠는 Actions 에만 있어 여기서 못 불러 본다. 출처가 ❌ 일 때 **매개변수를 바꿔 가며** 상태와 응답 머리만 찍는다.
+   저장하지 않는다 · 열쇠는 가린다 · 워크플로 수동 실행의 probe 입력으로 켠다(2026-10-02 · 온통청년 'invalid param data' 진단) ── */
+if (process.argv.includes('--probe')) {
+  const P = (n, size = 100) => [`청년정책 pageNum=${n} pageSize=${size}`, 'https://www.youthcenter.go.kr/go/ythip/getPlcy', { apiKeyNm: youthKey, pageNum: n, pageSize: size, rtnType: 'json' }];
+  /* 쪽 하나씩 — 상태·걸린 시간·응답 머리만(열쇠 가림). 진단할 것이 바뀌면 이 목록만 고친다 */
+  const tries = [
+    ['청년정책 1쪽', 'https://www.youthcenter.go.kr/go/ythip/getPlcy', { apiKeyNm: youthKey, pageNum: 1, pageSize: 10, rtnType: 'json' }],
+    ['청년콘텐츠 1쪽', 'https://www.youthcenter.go.kr/go/ythip/getContent', { apiKeyNm: youthContentKey, pageNum: 1, pageSize: 10, rtnType: 'json' }],
+  ];
+  for (const [label, base, params] of tries) {
+    const t0 = Date.now();
+    try {
+      const res = await fetch(`${base}?${new URLSearchParams(params)}`, { signal: AbortSignal.timeout(60000) });
+      const text = await res.text();
+      console.log(`[정찰] ${label} → HTTP ${res.status} · ${Date.now() - t0}ms · ${text.length}자 · ${hideKeys(text.replace(/\s+/g, ' ').slice(0, 300))}`);
+    } catch (e) {
+      console.log(`[정찰] ${label} → 실패 ${e.name} · ${Date.now() - t0}ms`);
+    }
+  }
+  process.exit(0);
+}
 
 /* ── 돌리기 ── */
 const results = {};

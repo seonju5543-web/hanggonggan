@@ -210,6 +210,39 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
     await page.click('.nav-item[data-nav="explore"]'); await page.waitForTimeout(200);
     await page.click('.nav-item[data-nav="activities"]'); await page.waitForTimeout(300);
     eq('돌아와도 목록이 있다', (await cards(page)).length, 3);
+
+    /* ── ⑥ 북마크 · 보관함 · 달력 (2026-10-02 개발자 지시 "대외활동도 북마크랑 달력 연결해줘") ── */
+    const ACT1 = 'https://dep.hufs.ac.kr/bbs/x/1';   // 마감 D-5 픽스처
+    eq('⑥ 활동 카드에 장학 카드와 같은 북마크(카드 바깥)', await page.$$eval('#activities-list .sch-card-wrap > .save-btn', (e) => e.length), 3);
+    await page.click(`#activities-list .save-btn[data-save="act:${ACT1}"]`); await page.waitForTimeout(300);
+    eq('⑥ 누르면 담긴다 · 글 사본도 함께(피드에서 빠져도 남게)', await page.evaluate((u) => { const s = state.saved.find((x) => x.id === `act:${u}`); return [!!s, !!(s && s.snap && s.snap.title)]; }, ACT1), [true, true]);
+    eq('⑥ 단추가 켜진다', await page.$eval(`#activities-list .save-btn[data-save="act:${ACT1}"]`, (b) => b.classList.contains('on')), true);
+    eq('⑥ 보관함에 장학과 같은 줄로(둘째 줄은 종류·주최)', await page.evaluate(() => { showScreen('my'); return [...document.querySelectorAll('#my-saved .cal-row')].map((r) => [r.querySelector('.cal-row-name').textContent.trim(), r.querySelector('.cal-row-sub').textContent.trim()]); }),
+      [['2026 대학생 해외봉사단 모집', '대외활동 · 한국외국어대학교 게시판']]);
+    eq('⑥ 달력에 마감 점(파랑) — 내 공고로 센다', await page.evaluate((u) => { const ctx = calContext(); const d = ctx.mine.find((x) => x.id === `act:${u}`); if (!d) return null;
+      const [y, m] = d.deadline.split('-').map(Number); const mk = calMarks(new Date(y, m - 1, 1), ctx.mine)[d.deadline] || []; return mk.filter((k) => k.id === `act:${u}`).map((k) => k.kind); }, ACT1), ['mine']);
+    await page.evaluate(() => document.querySelector('#my-saved .cal-row').click()); await page.waitForTimeout(500);
+    eq('⑥ 보관함 줄을 누르면 활동 시트가 열린다', await page.$eval('#detail-sheet .sheet-title', (e) => e.textContent.trim()), '2026 대학생 해외봉사단 모집');
+    await page.keyboard.press('Escape'); await page.waitForTimeout(400);
+    /* 피드에서 빠져도(60일·마감) 사본으로 남는다 */
+    eq('⑥ 피드에서 빠져도 보관함·달력·시트가 사본으로 남는다', await page.evaluate((u) => {
+      const keep = liveActivities.items; liveActivities.items = keep.filter((x) => x.url !== u);
+      /* ⚠️ 시트는 닫아도 내용이 남는다 — 비우고 연 뒤 '보이는가 + 제목'을 함께 잰다(앞 시트의 제목으로 헛통과하던 것 · red-green 으로 잡음) */
+      closeSheet(); document.querySelector('#detail-sheet').innerHTML = '';
+      const out = [savedScholarships().some((x) => x.id === `act:${u}`), calContext().mine.some((x) => x.id === `act:${u}`),
+        (openDetail(`act:${u}`), document.querySelector('#detail-sheet').classList.contains('show') && (document.querySelector('#detail-sheet .sheet-title') || {}).textContent === '2026 대학생 해외봉사단 모집')];
+      closeSheet(); liveActivities.items = keep; return out; }, ACT1), [true, true, true]);
+    /* 빼고 되돌리기 — 피드에서 빠진 활동도 사본째 제자리로 */
+    eq('⑥ 빼고 되돌리면 사본째 돌아온다(피드에서 빠졌어도)', await page.evaluate(async (u) => {
+      const keep = liveActivities.items; liveActivities.items = keep.filter((x) => x.url !== u);
+      toggleSave(`act:${u}`); const gone = !isSaved(`act:${u}`);
+      document.querySelector('#toast .toast-undo').click(); await new Promise((r) => setTimeout(r, 50));
+      const s = state.saved.find((x) => x.id === `act:${u}`); liveActivities.items = keep; return [gone, !!(s && s.snap)]; }, ACT1), [true, true]);
+    /* 달력 날짜를 열었을 때 '내 공고' 줄로 나오는가 — 점만 재면 줄이 깨져도 모른다(리뷰) */
+    eq('⑥ 달력 날짜를 열면 「내 공고」에 활동 줄(종류·주최 둘째 줄)', await page.evaluate((u) => { const d = calContext().mine.find((x) => x.id === `act:${u}`); const box = document.createElement('div'); box.innerHTML = calDayHtml(d.deadline);
+      const row = box.querySelector(`.cal-row[data-detail="act:${u}"]`); return row ? [row.querySelector('.cal-row-name').textContent.trim(), row.querySelector('.cal-row-sub').textContent.trim(), /내 공고/.test(box.textContent)] : null; }, ACT1),
+      ['2026 대학생 해외봉사단 모집', '대외활동 · 한국외국어대학교 게시판', true]);
+    eq('⑥ 피드가 새로 오면 담아 둔 사본도 새 글로(옛 마감을 말하지 않게)', await page.evaluate((u) => { const s = state.saved.find((x) => x.id === `act:${u}`); s.snap = { ...s.snap, deadline: '2000-01-01' }; refreshActivitySnaps(); return s.snap.deadline !== '2000-01-01'; }, ACT1), true);
     eq('페이지 오류 없음', errors, []);
     await page.context().close();
   }

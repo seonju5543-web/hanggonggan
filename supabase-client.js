@@ -510,7 +510,9 @@ function syncSafeProfile(profile, sensitiveOk) {
       id·신청일·단계·제출기록·결과. 학생이 쓴 글은 폰에 그대로 남으므로 쓰던 신청서는 그대로다.
    🔴 이 함수와 syncApplyRemote 의 되살리기는 **한 세트**다. 보내지 않은 칸을 내려받기가
       덮어쓰면 학생의 신청서가 기기에서 지워진다(프로필의 rrn·account 를 되살리는 것과 같은 이유). */
-const SYNC_OMIT_APP = ['formAns', 'docs'];
+/* snap — 신청 내역의 공고 사본(기기 안 캐시 · 2026-10-02). 공개 공고 데이터라 민감하진 않지만 로봇 데이터가 바뀔 때마다 달라져
+   올리면 '고쳤다'가 되고 한 건에 수 KB 씩 부푼다. 내려받을 때 기기 것을 되살리는 목록(app.js syncApplyRemote)과 **같이** 움직인다 */
+const SYNC_OMIT_APP = ['formAns', 'docs', 'snap'];
 function syncSafeApplications(apps) {
   if (!Array.isArray(apps)) return [];
   return apps.map((a) => {

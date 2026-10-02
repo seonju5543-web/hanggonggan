@@ -56,6 +56,12 @@ const eq = (label, got, want) => {
         { id: 'reg-hufs-myeonhak', appliedAt: '2026-08-01', step: 0 },
         { id: 'reg-hufs-alumni', appliedAt: '2026-08-02', step: 0 },
         { id: 'reg-hufs-yuheungsu', appliedAt: '2026-08-03', step: 0 },
+        /* 목록에서 내려간 공고의 기록(선정까지 적어 둔 것) — 화면엔 안 보이고, 기기에서는 지워지지 않아야 한다(2026-10-02) */
+        { id: 'reg-gone-for-test', name: '내려간 공고', appliedAt: '2026-07-01', step: 0, result: 'won' },
+        /* 내려갔지만 결과를 아직 안 적은 기록 — 공고가 있을 때 떠 둔 사본으로 **남는다**(2026-10-02 개발자 결정 "결과를 적을 때까지는 남겨두자") */
+        { id: 'reg-gone-kept', name: '사본으로 남은 공고', appliedAt: '2026-06-01', step: 0, submittedAt: '2026-06-10',
+          snap: { id: 'reg-gone-kept', name: '사본으로 남은 공고', provider: '테스트 재단', type: '교외', deadline: '2026-06-20', amount: '100만원', amountValue: 1000000,
+            documents: [], eligibility: {}, eligibilityLines: [], sourceUrl: 'https://example.org/n/1' } },
       ],
     }));
   });
@@ -71,7 +77,24 @@ const eq = (label, got, want) => {
 
   await page.click('.nav-item[data-nav="applications"]');
   await page.waitForTimeout(500);
-  eq('신청 3건이 보인다', await page.$$eval('#apps-list .swipe-row', (e) => e.length), 3);
+  eq('신청 4건이 보인다(결과를 안 적은 내려간 공고 1건 포함)', await page.$$eval('#apps-list .swipe-row', (e) => e.length), 4);
+  eq('  결과를 안 적은 내려간 공고는 사본으로 남는다', await page.$eval('#apps-list [data-row="reg-gone-kept"] .sch-name', (e) => e.textContent.trim()), '사본으로 남은 공고');
+  /* 🔴 2026-10-02 개발자 지시 — 내려간 공고는 '목록에서 내려감' 줄로 남기지 않고 아예 안 보인다 */
+  eq('내려간 공고는 줄로 안 보인다', [await page.$('#apps-list [data-row="reg-gone-for-test"]'), await page.$$eval('#apps-list', (e) => e[0].textContent.includes('내려감'))], [null, false]);
+  eq('  요약 카드도 안 센다(선정 0건 — 내려간 공고의 선정은 안 보인다)', await page.$eval('#apps-summary', (e) => /선정 \d+건/.test(e.textContent)), false);
+  eq('  홈 「신청내역」 칸 숫자도 화면과 같다(4)', await page.$eval('.hero-tile[data-hero-go="applications"] .hero-badge', (e) => e.textContent.trim()), '4');
+  /* 사본 줄에서 결과를 적으면 사라지고, 실행 취소로 돌아온다 */
+  await page.click('#apps-list [data-row="reg-gone-kept"] [data-log-toggle]');   // 없으면 여기서 넘어진다(조용히 넘기지 않는다 · 리뷰)
+  await page.waitForTimeout(300);
+  const wonBtn = await page.$('#apps-list [data-row="reg-gone-kept"] [data-mark-won]');
+  eq('  사본 줄에도 결과 기록 단추가 있다', !!wonBtn, true);
+  if (wonBtn) {
+    await wonBtn.click(); await page.waitForTimeout(400);
+    eq('  선정을 적으면 줄이 정리된다(3건)', await page.$$eval('#apps-list .swipe-row', (e) => e.length), 3);
+    eq('  사라지는 줄이라 실행 취소를 준다', await page.$eval('#toast .toast-undo', (e) => e.textContent.trim()), '실행 취소');
+    await page.click('#toast .toast-undo'); await page.waitForTimeout(400);
+    eq('  실행 취소하면 돌아온다(4건)', await page.$$eval('#apps-list .swipe-row', (e) => e.length), 4);
+  }
   /* 🔴 클래스의 display가 [hidden]을 이겨 선택 막대가 늘 떠 있었다 — 눈으로 봐야 잡히는 유형이라
      화면에서 실제로 안 보이는지(offsetParent)까지 확인한다 (CLAUDE.md CSS 함정). */
   eq('선택 모드가 아니면 선택 막대가 안 보인다',
@@ -94,14 +117,14 @@ const eq = (label, got, want) => {
   await page.waitForTimeout(200);
   await page.click('#apps-delete-selected');
   await page.waitForTimeout(400);
-  eq('한 건이 지워진다', await page.$$eval('#apps-list .swipe-row', (e) => e.length), 2);
+  eq('한 건이 지워진다', await page.$$eval('#apps-list .swipe-row', (e) => e.length), 3);
   /* 🔴 문구를 바꿀 때는 이 줄도 같이 바꾼다 — 2026-08-30 에 '되돌리기' → '실행 취소' 로
      바뀌었는데 여기가 안 따라와 main 이 빨간불이었다.
      ⚠️ 진짜 증명은 바로 아래 '되돌리면 3건' 이다 — 글자만 맞고 동작이 안 되면 소용없다. */
   eq('되돌리기 단추가 뜬다', await page.$eval('#toast .toast-undo', (e) => e.textContent.trim()), '실행 취소');
   await page.click('#toast .toast-undo');
   await page.waitForTimeout(400);
-  eq('되돌리면 3건으로 돌아온다', await page.$$eval('#apps-list .swipe-row', (e) => e.length), 3);
+  eq('되돌리면 4건으로 돌아온다', await page.$$eval('#apps-list .swipe-row', (e) => e.length), 4);
   eq('되돌린 항목이 원래 자리에 있다',
     await page.$eval('#apps-list .swipe-row:first-child', (e) => e.dataset.row), 'reg-hufs-yuheungsu');
 
@@ -113,7 +136,7 @@ const eq = (label, got, want) => {
   eq('삭제 뒤 다시 선택 모드로 들어갈 수 있다', await page.$eval('#apps-bulkbar', (e) => e.hidden), false);
   await page.click('#apps-check-all');
   await page.waitForTimeout(300);
-  eq('전체 선택하면 3건', await page.$eval('#apps-delete-selected', (e) => e.textContent.trim()), '삭제 3건');
+  eq('전체 선택하면 4건', await page.$eval('#apps-delete-selected', (e) => e.textContent.trim()), '삭제 4건');
   /* 🔴 전역 appearance:none 때문에 체크박스가 빈 원으로만 보였다 — 체크 그림이 실제로
      그려지는지 본다. 그리고 체크박스가 카드 글자를 덮지 않는지도(들여쓰기) 함께 본다. */
   eq('체크 표시가 그려진다',
@@ -123,10 +146,14 @@ const eq = (label, got, want) => {
   await page.click('#apps-delete-selected');
   await page.waitForTimeout(400);
   eq('전부 지워진다', await page.$$eval('#apps-list .swipe-row', (e) => e.length), 0);
+  /* 🔴 되돌리기 **전에** 잰다 — 되돌리기는 지운 것을 다시 넣으므로 뒤에서 재면 지워졌어도 통과한다(2026-10-02 리뷰) */
+  eq('  전체 선택·삭제는 보이지 않는 기록을 건드리지 않는다(기기에 그대로 · 공고가 돌아오면 선정 기록과 함께)',
+    await page.evaluate(() => (state.applications || []).map((a) => a.id)), ['reg-gone-for-test']);
   eq('비면 선택 버튼이 사라진다', await page.$eval('#apps-select-toggle', (e) => e.hidden), true);
   await page.click('#toast .toast-undo');
   await page.waitForTimeout(400);
-  eq('일괄 삭제도 되돌아온다', await page.$$eval('#apps-list .swipe-row', (e) => e.length), 3);
+  eq('일괄 삭제도 되돌아온다', await page.$$eval('#apps-list .swipe-row', (e) => e.length), 4);
+
 
   /* ══ 신청 현황은 홈이 아니라 여기다 (2026-09-12 · 노션 UI-15) ═══════════════
      개발자 지시: "홈의 신청 현황을 지우고 신청 내역 칸에 반영한다."
@@ -146,7 +173,8 @@ const eq = (label, got, want) => {
         .filter((e) => e.offsetParent !== null).length,
       요약있음: (() => { const el = document.querySelector('#apps-summary');
         return !!(el && el.offsetParent !== null && el.textContent.trim()); })(),
-      담은건수: (typeof state !== 'undefined' && state.applications || []).length,
+      /* 화면에 보일 기록 = 공고가 아직 있는 기록(2026-10-02 · shownAppRows) */
+      담은건수: shownAppRows(state.applications, findSch).length,
     };
   });
   eq('담은 신청이 있다 (검사가 헛돌지 않는다)', moved.담은건수 > 0, true);

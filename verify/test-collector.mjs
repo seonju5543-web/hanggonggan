@@ -4686,7 +4686,8 @@ console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08
   console.log('■ 신청 기록을 버리지 않는다 (2026-09-20)');
   eq('공고를 못 찾는다고 기록을 거르지 않는다',
     /filter\(\s*\(a\)\s*=>\s*findSch\(/.test(appsSrc), false);
-  eq('기록↔공고 잇기를 appRows 로 한다', appsSrc.includes('appRows(state.applications, findSch)'), true);
+  /* 2026-10-02 — 잇기는 appRows, 화면에 보일 줄은 그 위의 shownAppRows(내려간 공고 뺌 · 기록은 그대로) */
+  eq('기록↔공고 잇기를 appRows 로 한다', appsSrc.includes('shownAppRows(state.applications, resolve)') && grab('shownAppRows').includes('appRows(applications, resolve)'), true);
   /* 금액은 못 찾으면 0 이어야 한다 — 옛 코드는 공고를 못 찾는 그 자리에서 죽었다
      (그래서 위 filter 가 있었던 것이기도 하다). 되돌아오면 여기서 잡는다.
      🔴 **주석을 빼고 잰다** — 걷어낸 옛 코드를 인용한 주석에 걸려 빨간불이 된다
@@ -4704,16 +4705,57 @@ console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08
   eq('차례는 최근 담은 것부터', rows.map((r) => r.app.id), ['c', 'gone', 'a']);
   eq('기록이 없으면 빈 목록', appRows(null, () => null).length, 0);
 
-  /* 사라진 공고 카드가 **모르는 것을 말하지 않는가** (원칙 8-1) */
-  const goneSrc = grab('appCardGone');
-  eq('이름을 지어내지 않는다 (적어 둔 name 만 쓴다)',
-    goneSrc.includes("app.name || '(목록에서 내려간 공고)'"), true);
-  eq('마감을 말하지 않는다', goneSrc.includes('dday('), false);
-  eq('금액을 말하지 않는다', goneSrc.includes('amountValue'), false);
-  eq('진행 단계(n/4)를 말하지 않는다', goneSrc.includes('APP_STEPS'), false);
-  /* 학생이 적어 둔 것은 학생의 기록이라 그대로 남는다 */
-  eq('학생이 기록한 결과는 남긴다', /app\.result/.test(goneSrc), true);
-  eq('잘못 누른 기록을 되돌릴 길이 있다', goneSrc.includes('data-undo-result'), true);
+  /* ── 🔴 2026-10-02 개발자 지시로 바뀐 것: 내려간 공고는 신청 내역에 **보이지 않는다** — 그러나 기록은 지우지 않는다 ──
+     ("내려간 공고는 그냥 없어졌으면 좋겠는데 막 목록에서 내려감 이러네") */
+  const shownAppRows = new Function(`${grab('appRows')}\n${grab('shownAppRows')}\nreturn shownAppRows;`)();
+  const kept = [{ id: 'a' }, { id: 'gone', result: 'won' }, { id: 'c' }];
+  eq('내려간 공고의 줄은 화면에서 빠진다(결과를 적은 것)', shownAppRows(kept, (id) => (id === 'gone' ? null : { id })).map((r) => r.app.id), ['c', 'a']);
+  /* 2026-10-02 개발자 결정 — "결과를 적을 때까지는 남겨두자": 떠 둔 사본이 있고 결과를 안 적었으면 남는다 */
+  const snapRows = shownAppRows([{ id: 'w', snap: { id: 'w', name: '사본' } }, { id: 'x' }, { id: 'y', snap: { id: 'y' }, result: 'lost' }], () => null);
+  eq('  결과를 적기 전엔 사본으로 남는다 · 사본이 없거나 결과를 적었으면 빠진다', snapRows.map((r) => [r.app.id, r.sch.name]), [['w', '사본']]);
+  eq('  기록 자체는 지우지 않는다(공고가 다시 올라오면 선정 기록과 함께 돌아온다)', [kept.length, shownAppRows(kept, (id) => ({ id })).length], [3, 3]);
+  eq('  목록·홈 신청내역 칸·전체 선택이 같은 함수를 쓴다(숫자가 서로 다른 말을 하지 않게)',
+    (() => { const all = readText(new URL('../app.js', import.meta.url)); return [appsSrc.includes('appOrder(shownAppRows(state.applications, resolve))'),
+      /applications: shownAppCount\(\),/.test(all) && /function shownAppCount\(\) \{[\s\S]*?return shownAppRows\(state\.applications, r\)\.length;/.test(all), /const ids = shownAppRows\(state\.applications, schResolver\(\)\)\.map\(\(r\) => r\.app\.id\)/.test(all)]; })(), [true, true, true]);
+  eq('  화면에서 빼려고 기기 기록을 지우지 않는다(state.applications 를 거르지 않는다)', /state\.applications\s*=\s*state\.applications\.filter\(/.test(codeOnly(appsSrc)), false);
+  /* 코드 리뷰(2026-10-02)가 잡은 세 구멍 — '내려갔다'를 잘못 판정하면 진짜 기록이 말없이 사라진다 */
+  const allApp = readText(new URL('../app.js', import.meta.url));
+  eq('  공고 목록을 받기 전·못 받았을 때는 내려갔다고 가르지 않는다(모두 사라져 「아직 없어요」가 뜨던 것)',
+    /const dataState = appsDataState\(\);\s*if \(dataState !== 'ok' && state\.applications\.length\)/.test(allApp) && /function shownAppCount\(\) \{\s*if \(appsDataState\(\) !== 'ok'\) return state\.applications\.length;/.test(allApp), true);
+  eq('  한 번 받은 뒤 다시 받기 실패는 \'못 받음\'이 아니다', (allApp.match(/if \(appsData\.(registered|kosaf) !== 'ok'\) appsData\.\1 = 'fail'/g) || []).length >= 4, true);
+  eq('  한국장학재단 공고는 신청 내역에 담았으면 마감 뒤에도 남는다(마감 이틀 뒤 제출·발표를 적을 때 사라지던 것)',
+    /isSaved\(`kosaf-\$\{i\.code\}`\) \|\| state\.applications\.some\(\(a\) => a\.id === `kosaf-\$\{i\.code\}`\)/.test(allApp), true);
+  eq('  휴지통에서 되살려도 안 보이는 기록은 \'신청내역으로 되살렸어요\'라고 하지 않는다', /toast\(findSch\(t\.app\.id\) \? '신청내역으로 되살렸어요' : /.test(allApp), true);
+  /* 진짜 길을 돌려 본다(2026-10-02 리뷰): 공고가 있을 때 사본을 뜨고 → 공고가 빠져도 줄이 남는다 */
+  {
+    const st = { applications: [{ id: 'p' }] };
+    const snapFn = new Function('state', 'appsDataState', `${grab('snapApplications')}\nreturn snapApplications;`)(st, () => 'ok');
+    const post = { id: 'p', name: '진짜 공고', deadline: '2026-09-01' };
+    eq('  공고가 있을 때 사본을 뜬다 · 같으면 다시 안 적는다', [snapFn(() => post), st.applications[0].snap && st.applications[0].snap.name, snapFn(() => post)], [true, '진짜 공고', false]);
+    eq('  그 뒤 공고가 빠져도 줄이 남는다(결과 전)', shownAppRows(st.applications, () => null).map((r) => r.sch.name), ['진짜 공고']);
+    const notReady = new Function('state', 'appsDataState', `${grab('snapApplications')}\nreturn snapApplications;`)({ applications: [{ id: 'q' }] }, () => 'wait');
+    eq('  공고 목록을 받기 전엔 사본을 안 뜬다', notReady(() => post), false);
+  }
+  /* 🔴 치명(리뷰): 사본 저장을 '학생이 고친 것'으로 찍으면 로봇 데이터만 받은 폰이 다른 폰의 진짜 기록을 서버에서 덮는다 */
+  {
+    const st = { updatedAt: 'T0' };
+    let pushed = 0;
+    const save = new Function('state', 'localStorage', 'STORAGE_KEY', 'notifySyncContext', 'syncSchedulePush', `${grab('saveState')}\nreturn saveState;`)(
+      st, { setItem() {} }, 'k', () => {}, () => { pushed += 1; });
+    save({ local: true });
+    eq('  사본 저장(local)은 시각을 안 찍고 서버로 안 올린다', [st.updatedAt, pushed], ['T0', 0]);
+    save();
+    eq('    (보통 저장은 그대로 찍고 올린다 — 검사가 헛돌지 않는다)', [st.updatedAt !== 'T0', pushed], [true, 1]);
+    eq('  두 자리 모두 local 로 적는다', (allApp.match(/if \(snapApplications\((resolve|r)\)\) saveState\(\{ local: true \}\)/g) || []).length, 2);
+    const sc = readText(new URL('../supabase-client.js', import.meta.url));
+    eq('  사본은 서버로 안 간다(SYNC_OMIT_APP) · 내려받을 때 기기 사본을 되살린다(같이 움직이는 두 목록)',
+      [/const SYNC_OMIT_APP = \[[^\]]*'snap'/.test(sc), /for \(const k of \['formAns', 'docs', 'snap'\]\)/.test(allApp)], [true, true]);
+  }
+  eq('  사본으로 연 시트에서는 신청을 시작·이어가지 않는다(양식 흐름이 넘어진다)', /const gone = !findSch\(id\);\s*const canApply = lock\.canApply && !gone;/.test(allApp), true);
+  eq('  사본은 공고 목록을 다 받았을 때만 뜨고, 바뀌었을 때만 적는다', /function snapApplications\(resolve\) \{\s*if \(appsDataState\(\) !== 'ok'\) return false;/.test(allApp) && /if \(a\.snap && JSON\.stringify\(a\.snap\) === json\) continue;/.test(allApp), true);
+  eq('  상세 시트·패널의 제출/결과 단추가 사본으로도 찾는다(appSch)', /function openDetail\(id\) \{[\s\S]{0,200}?const sch = appSch\(id\);/.test(allApp) && /const sch = appSch\(id\);   \/\/ 사본으로 보이는 줄의 단추도/.test(allApp), true);
+  eq('  내려간 공고에 결과를 적으면 줄이 사라지므로 실행 취소를 준다', /if \(!findSch\(sch\.id\)\) toast\([^\n]*\{ label: '실행 취소', run: \(\) => undoProgress\(sch\.id\) \}\)/.test(allApp), true);
+  eq("  '목록에서 내려감' 카드는 없다", /appCardGone|badge-gone/.test(readText(new URL('../app.js', import.meta.url))), false);
   /* 되돌리기는 공고를 요구하면 안 된다 — 요구하면 사라진 공고의 기록이 영영 안 지워진다
      (저장 해제 `toggleSave` 가 2026-09-07 코드 리뷰에서 같은 이유로 고쳐졌다) */
   eq('되돌리기가 공고를 요구하지 않는다', grab('undoProgress').includes('typeof schOrId'), true);
@@ -10417,6 +10459,15 @@ console.log('\n■ 공공 API 로봇 (2026-10-01)');
   const c1 = M.mapYouthContent(c, opt).item;
   eq('청년콘텐츠 — 본문 HTML 에서 장학과 같은 발췌 규칙으로 마감', [c1.kind, c1.deadline, c1.host], ['대외활동', '2026-10-12', '온통청년 청년참여 프로그램']);
   eq('  60일 지난 글은 싣지 않는다', M.mapYouthContent({ ...c, frstRegDt: '2026-06-01' }, opt).drop, '60일 지난 글');
+  /* 2026-10-02 실측 — pstUrlAddr 는 전부 null. 확인한 게시판(48)만 주소를 만든다 */
+  const cNull = { ...c, pstUrlAddr: null, bbsSn: '48', pstSn: '10811' };
+  eq('  주소 칸이 비면 확인한 게시판(48)만 bbs03View 주소를 만든다 · 다른 게시판은 버린다',
+    [M.mapYouthContent(cNull, opt).item.url, M.mapYouthContent({ ...cNull, bbsSn: '46' }, opt).drop], ['https://www.youthcenter.go.kr/bbs03View/48/10811', '원문 주소 없음']);
+  eq('  제목으로 못 가르면 게시판 분류(대외활동)를 쓴다 · 다른 분류(취업지원)는 아니다',
+    [M.mapYouthContent({ ...cNull, pstTtl: '「2026 보성 두드림 스테이」 추가 모집', pstSeNm: '대외활동' }, opt).item?.kind, M.mapYouthContent({ ...cNull, pstTtl: '「2026 보성 두드림 스테이」 추가 모집', pstSeNm: '취업지원' }, opt).drop],
+    ['대외활동', '공모전·대외활동 아님(소식 글 등)']);
+  eq('  게시판 분류가 대외활동이어도 장학 제목은 활동 글이 아니다', !!M.mapYouthContent({ ...cNull, pstTtl: '2026 ○○재단 장학생 모집', pstSeNm: '대외활동' }, opt).drop, true);
+  eq('  받는 순서 — 청년콘텐츠가 청년정책보다 먼저(예산을 청년정책이 다 쓰지 않게)', Object.keys(M.API_SOURCES).indexOf('youthContent') < Object.keys(M.API_SOURCES).indexOf('youthPolicy'), true);
   /* 응답 껍데기 */
   eq('findRows — 껍데기 이름을 몰라도 행 배열을 찾는다', M.findRows({ resultCode: 200, result: { pagging: {}, youthPolicyList: [{ plcyNm: 'a' }, { plcyNm: 'b' }] } }, 'plcyNm').length, 2);
   eq('  모양을 모르면 null(0건과 다르다)', M.findRows({ errorCode: 'e001' }, 'plcyNm'), null);
@@ -10550,6 +10601,12 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
   eq('  시트 판정 머리 · 묻기 상자(다시 그릴 때 이 시트로)', /function openActivityDetail[\s\S]*?fitBadgeHtml\(fit, fd, \{ full: true \}\)[\s\S]*?eligAskHtml\(sch\)[\s\S]*?eligAskWire\(sch, \(\) => openActivityDetail\(url\)\)/.test(appX), true);
   eq('  묻기 상자는 다시 그리는 길을 받는다(기본은 장학 openDetail 그대로)', /function eligAskWire\(sch, reopen = \(\) => openDetail\(sch\.id\)\)/.test(appX) && /function eligAskSave\(sch, reopen = \(\) => openDetail\(sch\.id\)\)/.test(appX), true);
   eq('  적합도순 — 장학 탐색과 같은 잣대(fitRank 먼저)', /fit: \{ label: '적합도순' \}/.test(appX) && /fitRank\(fa\) - fitRank\(fb\) \|\| fb\.fit - fa\.fit/.test(appX), true);
+  /* ⑦ 북마크·달력 (2026-10-02) — 장학과 같은 저장 목록(state.saved) · 찾는 길은 findSaveTarget 한 곳 */
+  eq('⑦ 저장·보관함·달력이 같은 찾기(findSaveTarget)를 쓴다', [/if \(at < 0 && !findSaveTarget\(id\)\) return;/.test(appX), /\.map\(\(s\) => findSaveTarget\(s\.id\)\)/.test(appX), /byId\.get\(id\) \|\| \(isActivityId\(id\) \? findSaveTarget\(id\) : null\)/.test(appX)], [true, true, true]);
+  eq('  활동은 담을 때 글 사본을 함께(60일·마감 뒤 피드에서 빠져도 남게)', /snap: JSON\.parse\(JSON\.stringify\(act\)\)/.test(appX), true);
+  eq('  달력·보관함 줄(data-detail)이 활동이면 활동 시트로', /if \(isActivityId\(id\)\) \{ openActivityDetail\(id\.slice\(4\)\); return; \}/.test(appX), true);
+  eq('  카드·시트에 장학과 같은 북마크(saveBtnHtml)', /save: saveBtnHtml\(`act:\$\{n\.url\}`\)/.test(appX) && /\$\{saveBtnHtml\(`act:\$\{n\.url\}`\)\}/.test(appX), true);
+  eq('  저장 해제의 되돌리기는 뺀 줄을 그대로 돌려놓는다(다시 담기는 빠진 공고에 막힌다)', /const removed = state\.saved\.splice\(at, 1\)\[0\];[\s\S]{0,400}state\.saved\.splice\(Math\.min\(at, state\.saved\.length\), 0, removed\)/.test(appX), true);
   eq('  지원 가능 알약(STATUS_META)은 활동 시트에 없다 — 구조화 조건이 없어 늘 가능이라 거짓 안심', /STATUS_META\[/.test((() => { const a = appX.indexOf('function openActivityDetail'); return appX.slice(a, appX.indexOf('\nfunction ', a + 10)); })()), false);
 }
 

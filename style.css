@@ -2927,10 +2927,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 .app-step-lost .mini-progress div { background: var(--text-weak); }
 .app-step-lost .app-step-head span { color: var(--text-weak); }
 
-/* 목록에서 내려간 공고의 신청 기록 (2026-09-20) — 기록을 버리지 않고 줄을 남긴다.
-   🔴 흐리게 죽이지 않는다. 학생이 적어 둔 제출·선정 기록이 들어 있는 줄이라
-      '읽지 않아도 되는 글'이 아니다 — 그래서 --text-weak(3.7:1) 이 아니라
-      --text-sub(7.4:1) 를 쓴다. 배지만 회색으로 사정을 알린다. */
 /* 마감됐는데 제출 기록이 없는 건 — 막대를 '진행 중' 색으로 칠하지 않는다 (2026-09-20).
    🔴 글자 색은 건드리지 않는다. 학생이 읽어야 할 줄이라 흐리게 만들면 안 된다
       (미선정 줄이 --text-weak 3.66:1 인 것과 같은 실수를 여기서 되풀이하지 않는다).
@@ -2943,9 +2939,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 .summary-label { font-size: var(--t-xs); color: #fff; opacity: 0.78; margin-top: var(--space-12); }
 .summary-label + .summary-amount { margin-top: var(--space-2); }
 
-.badge-gone { background: rgba(18, 22, 31, 0.07); color: var(--text-sub); }
-.app-gone-note { font-size: var(--t-xs); color: var(--text-sub); margin-top: var(--space-6); }
-.app-gone-rec  { font-size: var(--t-sm); color: var(--text); font-weight: 650; margin-top: var(--space-4); }
 
 /* 홈의 '신청 현황'도 이미 담은 것들이다 — 신청 내역과 같이 체크 동그라미를 뺀다.
    (빈 동그라미가 '아직 안 했다'로 읽히던 것과 같은 이유) */

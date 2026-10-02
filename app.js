@@ -124,8 +124,12 @@ function loadState() {
 /* opts.fromServer = 서버에서 받아 온 것을 그대로 적는 중이라는 뜻.
    그때는 시각을 새로 찍지 않고(서버 시각을 그대로 쓴다) 되돌려 올리지도 않는다 —
    안 그러면 받은 것을 곧바로 다시 올리는 헛돌기가 생긴다. */
+/* opts.local = 학생이 고친 것이 아니라 **기기 안 캐시**를 적는 중(신청 내역의 공고 사본 · 2026-10-02 코드 리뷰 · 치명).
+   시각을 찍으면 '방금 고쳤다'가 되어, 로봇 데이터만 새로 받은 폰이 다른 폰의 진짜 기록(제출·선정)을 서버에서 덮는다
+   (CLAUDE.md 「기기 사이 덮어쓰기」). 그래서 시각도 안 찍고 올리지도 않는다 — fromServer 와 같은 길. */
 function saveState(opts) {
   const o = opts || {};
+  if (o.local) o.fromServer = true;
   if (!o.fromServer) state.updatedAt = new Date().toISOString();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   // 알림 판단에 쓰는 프로필·신청내역 사본을 갱신한다 (서비스워커는 localStorage를 못 읽는다)
@@ -140,6 +144,10 @@ let registeredList = []; // data/registered.json — 수집 로봇이 확보한 
       KOSAF 에 적어 둔 칸이라, 자격 진단도 양식 작성도 붙이지 않는다 — 그대로 보여 주고
       "자격은 재단 홈페이지에서 확인"이라고 밝힌다(설계: docs/designs/kosaf-and-narrowing.md ②). */
 let kosafList = [];
+/* 두 공고 목록을 **실제로 받아 왔는가** (2026-10-02 리뷰) — 신청 내역은 '공고가 내려갔다'를 이것으로만 말한다.
+   받기 전·못 받았을 때 모든 신청이 '내려간 것'처럼 보여 「아직 준비한 장학금이 없어요」가 뜨는 것을 막는다.
+   'wait' 받는 중 · 'ok' 받음 · 'fail' 못 받음 */
+const appsData = { registered: 'wait', kosaf: 'wait' };
 let kosafUpdatedAt = '';
 
 function registeredFor(p) {
@@ -215,23 +223,69 @@ function toggleSave(id) {
   /* 🔴 **해제는 findSch 를 요구하지 않는다** (2026-09-07 코드 리뷰).
      데이터에서 내려간 공고를 저장해 둔 학생은, 그것을 찾을 수 없다는 이유로
      영영 지우지 못하게 된다. 없는 것을 새로 담는 것만 막으면 된다. */
-  if (at < 0 && !findSch(id)) return;
+  if (at < 0 && !findSaveTarget(id)) return;
   if (at >= 0) {
-    state.saved.splice(at, 1);
+    /* 되돌리기는 **뺀 줄을 그대로** 제자리에 돌려놓는다(2026-10-02) — 다시 담기(toggleSave)로 되돌리면 데이터에서 빠진 공고·활동은
+       '없는 것을 담지 않는다'에 막혀 영영 못 돌아오고, 활동은 떠 둔 사본까지 잃는다 */
+    const removed = state.saved.splice(at, 1)[0];
     saveState();
-    toast('저장을 해제했어요', { label: '되돌리기', run: () => toggleSave(id) });
+    toast('저장을 해제했어요', { label: '되돌리기', run: () => {
+      if (isSaved(id)) return;
+      state.saved.splice(Math.min(at, state.saved.length), 0, removed);
+      saveState();
+      refreshSaveViews(id);
+    } });
   } else {
-    state.saved.push({ id, savedAt: nowStamp() });
+    /* 대외활동·공모전은 **글 사본을 함께** 담는다(2026-10-02) — 활동 글은 60일·마감 뒤 데이터에서 빠지는데,
+       빠져도 보관함·달력에서 사라지지 않게. 저장 목록은 이 기기에만 있어(서버로 안 감) 동기화와 무관하다 */
+    const act = isActivityId(id) ? findActivity(id.slice(4)) : null;
+    state.saved.push(act ? { id, savedAt: nowStamp(), snap: JSON.parse(JSON.stringify(act)) } : { id, savedAt: nowStamp() });
     saveState();
     toast('보관함에 저장했어요', { label: '보관함', run: () => showScreen('my') });
   }
   refreshSaveViews(id);
 }
-/** 저장한 공고를 **최근 저장 순**으로. 못 찾는 것(데이터에서 내려간 공고)은 조용히 뺀다. */
+/** 저장한 공고를 **최근 저장 순**으로. 못 찾는 것(데이터에서 내려간 공고)은 조용히 뺀다.
+    대외활동·공모전도 같은 목록에 온다(2026-10-02) — 활동은 엔진 모양(activityAsSch)으로 바꿔 장학과 같은 줄로 그린다. */
 function savedScholarships() {
   return state.saved.slice().reverse()
-    .map((s) => findSch(s.id))
+    .map((s) => findSaveTarget(s.id))
     .filter(Boolean);
+}
+
+/* ── 대외활동·공모전 저장·달력 (2026-10-02 개발자 지시: "대외활동도 북마크랑 달력 연결해줘") ──
+   id 는 'act:' + 글 주소(activityAsSch 와 같다 · 장학 id 와 섞이지 않는다). 찾는 길은 **한 곳**(findSaveTarget):
+   장학 id 는 findSch, 활동 id 는 지금 피드의 글 → 없으면 담을 때 떠 둔 사본. 보관함·달력·상세가 이것만 쓴다. */
+const isActivityId = (id) => String(id || '').startsWith('act:');
+function findActivity(url) {
+  return ((liveActivities && liveActivities.items) || []).find((x) => x && x.url === url) || null;
+}
+/* 활동 글 원본(피드 모양) — 피드에 있으면 그것, 없으면 저장할 때 떠 둔 사본 */
+function activityItem(url) {
+  const live = findActivity(url);
+  if (live) return live;
+  const sv = state.saved.find((x) => x.id === `act:${url}`);
+  return (sv && sv.snap) || null;
+}
+/* 담아 둔 활동의 사본을 피드의 새 글로 갈아 둔다 — 피드에서 빠진 뒤에 쓰이는 사본이 담던 날의 옛 마감을 말하지 않게(2026-10-02 리뷰).
+   기기 안 캐시라 saveState({ local: true }) — 학생이 고친 것으로 찍지 않는다(신청 내역 사본과 같은 규칙) */
+function refreshActivitySnaps() {
+  let changed = false;
+  for (const sv of state.saved) {
+    if (!isActivityId(sv.id)) continue;
+    const live = findActivity(sv.id.slice(4));
+    if (!live) continue;
+    const json = JSON.stringify(live);
+    if (sv.snap && JSON.stringify(sv.snap) === json) continue;
+    sv.snap = JSON.parse(json);
+    changed = true;
+  }
+  if (changed) saveState({ local: true });
+}
+function findSaveTarget(id) {
+  if (!isActivityId(id)) return findSch(id);
+  const n = activityItem(id.slice(4));
+  return n ? activityAsSch(n) : null;
 }
 /* 저장 상태가 바뀌면 지금 떠 있는 것만 다시 그린다 — 화면을 통째로 새로 그리면
    스크롤이 맨 위로 튄다(일괄 준비 목록에서 겪은 것과 같은 유형). */
@@ -424,7 +478,9 @@ function recordResult(sch, won) {
   app.result = won ? 'won' : 'lost';
   app.resultAt = nowStamp();
   saveState();
-  toast(won ? '선정 결과를 기록했습니다' : '결과를 기록했습니다');
+  /* 데이터에서 내려간 공고는 결과를 적는 순간 신청 내역에서 빠진다(shownAppRows) — 잘못 누른 것이면 줄째 사라지므로 되돌리기를 준다 */
+  if (!findSch(sch.id)) toast(`${won ? '선정을' : '결과를'} 기록했어요 · 내려간 공고라 신청 내역에서 정리했어요`, { label: '실행 취소', run: () => undoProgress(sch.id) });
+  else toast(won ? '선정 결과를 기록했습니다' : '결과를 기록했습니다');
   refreshProgressViews(sch.id);
 }
 
@@ -460,7 +516,7 @@ function refreshProgressViews(id) {
   else if (name === 'home') renderHome();
   else if (name === 'explore') renderExplore();
   else if (name === 'my') renderMy();
-  if (wasOpen) openDetail(id);
+  if (wasOpen) { if (appSch(id)) openDetail(id); else closeSheet(); }   // 결과를 적어 사라진 줄의 시트는 닫는다
 }
 
 function toast(msg, action) {
@@ -1627,7 +1683,8 @@ function renderHome() {
     deadline: soon,
     '교내': applyable.filter((m) => m.sch.type === '교내').length,
     '교외': applyable.filter((m) => m.sch.type === '교외').length,
-    applications: state.applications.length,
+    /* 신청 내역 화면과 같은 수(내려간 공고 빼고) — 공고 목록을 받기 전엔 담은 수 그대로(받고 나서 줄어드는 것은 '내려감'이 확정된 뒤다) */
+    applications: shownAppCount(),
   };
   $('#hero-tiles').innerHTML = HERO_TILES.map((t) => `
     <button type="button" class="hero-tile" data-hero-go="${t.go}" aria-label="${t.name} ${tileN[t.go]}건">
@@ -2481,13 +2538,14 @@ function loadRegistered() {
   return fetch('data/registered.json', { cache: 'no-store' })
     .then((r) => (r.ok ? r.json() : null))
     .then((d) => {
-      if (!d) return;
+      if (!d) { if (appsData.registered !== 'ok') appsData.registered = 'fail'; return; }   // 한 번 받았으면 다시 받기 실패에도 'ok'(목록은 메모리에 그대로)
+      appsData.registered = 'ok';
       registeredList = d.items || [];
       regUpdatedAt = d.updatedAt || '';
       dataFetchedAt = new Date();
       attachPrepTemplates(registeredList);
     })
-    .catch(() => { /* 오프라인 등 — 조용히 무시 */ })
+    .catch(() => { if (appsData.registered !== 'ok') appsData.registered = 'fail'; /* 오프라인 등 — 신청 내역이 '못 받음'으로 말한다 */ })
     /* 🔴 **성공이든 실패든 여기를 지난다** — 못 받아 왔을 때도 화면을 한 번 다시 그려야
        늦게 온 다른 데이터(층2·실시간 공고)와 함께 제자리를 잡는다. */
     .then(() => { rerenderVisible(); });
@@ -2497,11 +2555,13 @@ function loadKosaf() {
   return fetch('data/kosaf-open.json', { cache: 'no-store' })
     .then((r) => (r.ok ? r.json() : null))
     .then((d) => {
-      kosafList = (d && d.items) || [];
-      kosafUpdatedAt = (d && d.updatedAt) || '';
+      if (!d) { if (appsData.kosaf !== 'ok') appsData.kosaf = 'fail'; rerenderVisible(); return; }   // 다시 받기 실패에 받아 둔 목록을 비우지 않는다
+      appsData.kosaf = 'ok';
+      kosafList = d.items || [];
+      kosafUpdatedAt = d.updatedAt || '';
       rerenderVisible();
     })
-    .catch(() => { /* 오프라인 등 — 조용히 무시. 층2가 없어도 앱은 그대로 돈다 */ });
+    .catch(() => { if (appsData.kosaf !== 'ok') appsData.kosaf = 'fail'; rerenderVisible(); /* 층2가 없어도 앱은 그대로 돈다 */ });
 }
 
 /* 데이터를 한꺼번에 다시 받는다 — 당겨서 새로고침과 화면 복귀가 **같은 함수**를 쓴다
@@ -2577,7 +2637,9 @@ function kosafAsScholarships() {
        findSch 가 그 공고를 못 찾아 **보관함에서 통째로 사라지고** 상세도 안 열린다.
        층1(registeredList)은 이 걸러내기가 없어 원래 남으므로, 층2만 맞춰 주는 것이다.
        ⚠️ 목록에 되살아나지는 않는다 — 탐색·홈은 각자 dday 로 한 번 더 거른다. */
-    .filter((i) => !i.due || dday(i.due).days >= -CLOSED_KEEP_DAYS || isSaved(`kosaf-${i.code}`))
+    /* 🔴 **신청 내역에 담은 공고도 남긴다** (2026-10-02 리뷰) — 내려간 공고를 신청 내역에서 안 보이게 하면서, 마감 이틀 뒤
+       이 걸러내기 때문에 제출·발표를 적을 바로 그 때 줄이 사라졌다(공고는 데이터에 그대로 있는데). 목록에는 안 되살아난다(탐색·홈이 dday 로 거른다). */
+    .filter((i) => !i.due || dday(i.due).days >= -CLOSED_KEEP_DAYS || isSaved(`kosaf-${i.code}`) || state.applications.some((a) => a.id === `kosaf-${i.code}`))
     .map((i) => {
       const f = i.fields || {};
       /* 한 칸에 여러 항목이 `○` 로 붙어 있다 — 재단이 쓴 대로 줄만 나눈다 */
@@ -2790,6 +2852,7 @@ function loadActivities() {
     .catch(() => null)
     .then((d) => {
       liveActivities = d || liveActivities || { items: [], updatedAt: null };
+      refreshActivitySnaps();
       rerenderVisible();
     });
 }
@@ -2856,6 +2919,7 @@ function activityAsSch(n) {
     id: `act:${n.url}`, name: unent(n.title), type: n.kind || '대외활동', eligibility: {},
     eligibilityLines: n.eligibilityLines || [], eligibilityExcludes: n.eligibilityExcludes || [], eligibilityPriority: n.eligibilityPriority || [],
     excerpts: n.noticeLines || [], documents: [], deadline: n.deadline || null,
+    activity: true, amount: `${n.kind || '대외활동'} · ${activityWhere(n)}`,   // 달력·보관함 줄의 둘째 줄(장학은 금액 자리) — 지어낸 값이 아니라 종류·주최
   };
 }
 /* 카드·정렬·시트가 **같은 값**을 쓴다 — getMatches 와 같은 세 함수(evaluateFor · fitScore · fitDetailFor) */
@@ -2871,6 +2935,7 @@ function activityCardHtml(n) {
   const benefit = unent(activityBenefit(n));
   const shortBenefit = benefit && benefit.length <= 20;
   return cardShellHtml({
+    save: saveBtnHtml(`act:${n.url}`),   // 장학 카드와 같은 북마크(카드 바깥 · 2026-10-02)
     attrs: `data-activity="${esc(n.url)}"`,
     org: `${n.kind || '대외활동'} · ${activityWhere(n)}`,
     badge: cardBadgeHtml(m.fit, m.fd, null),   // 장학 카드와 같은 판정 하나(적합도 % · 자격 미확인 · 지원 자격 미달)
@@ -2883,7 +2948,7 @@ function activityCardHtml(n) {
 }
 
 function openActivityDetail(url) {
-  const n = (liveActivities && liveActivities.items || []).find((x) => x && x.url === url);
+  const n = activityItem(url);   // 피드에서 빠졌어도 저장해 둔 글이면 사본으로 연다
   if (!n) return;
   const { sch, result, fit, fd } = activityFit(n);
   const d = n.deadline ? dday(n.deadline) : null;
@@ -2903,6 +2968,7 @@ function openActivityDetail(url) {
       <div class="sch-top sheet-top">
         ${d ? `<span class="badge badge-dday ${d.cls}">${esc(d.label)}</span>` : ''}
         <span class="badge badge-kind">${esc(n.kind || '대외활동')}</span>
+        ${saveBtnHtml(`act:${n.url}`)}
       </div>
       <h3 class="sheet-title">${esc(unent(n.title))}</h3>
       ${benefit ? `<p class="sheet-amount">${esc(benefit)}</p>` : ''}
@@ -3776,7 +3842,9 @@ function eligibilityRowsHtml(sch, result) {
 }
 
 function openDetail(id) {
-  const sch = findSch(id);
+  /* 대외활동 줄(달력·보관함)은 활동 시트로 — 같은 [data-detail] 길로 들어온다(2026-10-02) */
+  if (isActivityId(id)) { openActivityDetail(id.slice(4)); return; }
+  const sch = appSch(id);   // 데이터에서 내려갔어도 결과를 적기 전이면 떠 둔 사본으로 연다(2026-10-02)
   if (!sch) return;
   const result = evaluateFor(sch, state.profile);   // 카드와 같은 판정을 쓴다(위 주석)
   const fit = fitScore(sch, result, state.profile);
@@ -3784,7 +3852,12 @@ function openDetail(id) {
   const meta = STATUS_META[result.status];
   const d = dday(sch.deadline);
   const app = state.applications.find((a) => a.id === id);
-  const { canApply, caution: applyCaution } = applyLock(result, app, d);
+  const lock = applyLock(result, app, d);
+  /* 데이터에서 내려간 공고(사본으로 연 시트)에서는 신청을 시작·이어가지 않는다 — 양식 흐름이 findSch 로 공고를 다시 찾다 넘어진다(2026-10-02 리뷰).
+     기록(제출·결과)은 신청 내역 패널에서 그대로 적을 수 있다 */
+  const gone = !findSch(id);
+  const canApply = lock.canApply && !gone;
+  const applyCaution = lock.caution;
   const ch = officialChannel(sch);
 
   /* 지원 자격 줄 — 대외활동 시트도 **같은 함수**를 부른다(2026-10-01 · 베끼지 않는다) */
@@ -3804,6 +3877,7 @@ function openDetail(id) {
 
   let btnLabel = '신청 준비 시작';
   if (app && !app.pending) btnLabel = '신청 준비 완료됨';
+  else if (app && app.pending && gone) btnLabel = '이어서 작성할 수 없는 공고';   // 데이터에서 빠진 공고 — 왜 빠졌는지는 단정하지 않는다(원칙 8-1)
   else if (app && app.pending) btnLabel = '서류 작성 이어서 하기';
   else if (d.days < 0) btnLabel = '마감된 장학금';
   /* 🔴 여기에 '요건 미충족 — 신청할 수 없음' 문구를 **되살리지 말 것** (2026-09-13).
@@ -3826,7 +3900,7 @@ function openDetail(id) {
         ${/* 🔴 '· 검수 전' 을 뗐다 (2026-09-17 개발자 지시). 남는 것은 교내/교외처럼
              **학생이 쓰는 갈래**뿐이다. 검수 상태는 관리자 화면이 센다. */ ''}
         <span class="badge badge-kind">${esc(sch.type || '장학금')}</span>
-        ${saveBtnHtml(sch.id)}
+        ${gone ? '' : saveBtnHtml(sch.id)}
       </div>
       ${/* 🔴 순서: 이름 → **금액** → 주관·접수 (2026-09-02 개발자 지시).
            학생이 카드를 열고 가장 먼저 찾는 것은 얼마를 받느냐다. 주관 기관은 제목에
@@ -4448,40 +4522,7 @@ const appsSelected = new Set();
 const appsLogOpen = new Set();   // 펼쳐 둔 진행 기록 — 다시 그려도 닫히지 않게
 let undoBuffer = null;          // 되돌리기용 — 지운 항목과 원래 자리
 
-/* 공고를 못 찾는 신청 기록 — **줄을 남기고 사정을 그대로 적는다** (2026-09-20).
-   왜 못 찾는지는 `appRows` 머리말에 있다. 여기서 지키는 것은 셋이다:
-     ① 이름을 지어내지 않는다 — 신청할 때 적어 둔 `name` 만 쓰고, 없으면 그렇게 말한다.
-     ② 앱이 모르는 것을 말하지 않는다 — 마감·금액·자격·진행 단계(n/4)를 적지 않는다.
-        '심사'는 마감 경과로 정하는데 그 마감을 모르므로 단계 막대를 그릴 수 없다.
-     ③ 학생이 적어 둔 것(제출·선정·미선정)은 **학생의 기록이라 그대로 남는다.**
-   🔴 왜 내려갔는지는 단정하지 않는다 — 학교를 바꿨을 수도, 접수가 끝났을 수도 있고
-      앱은 둘을 구분할 수 없다(원칙 8-1). */
-function appCardGone(app) {
-  const checked = appsSelected.has(app.id) ? 'checked' : '';
-  const name = app.name || '(목록에서 내려간 공고)';
-  const recorded = app.result
-    ? `${app.result === 'won' ? '선정으로 기록함' : '미선정으로 기록함'}${app.resultAt ? ` · ${esc(app.resultAt)}` : ''}`
-    : app.submittedAt ? `제출했다고 기록함 · ${esc(app.submittedAt)}`
-    : app.pending ? '서류를 쓰던 중이었어요'
-    : '신청 준비까지 기록함';
-  return `
-    <div class="swipe-row app-gone" data-row="${esc(app.id)}">
-      ${appsSelectMode ? `<input type="checkbox" class="row-check" data-pick="${esc(app.id)}" ${checked}
-         aria-label="${esc(name)} 선택" />` : ''}
-      <div class="sch-card app-gone-card">
-        <div class="sch-top"><span class="badge badge-gone">목록에서 내려감</span></div>
-        <p class="sch-name">${esc(name)}</p>
-        <p class="app-gone-note">공고가 목록에서 내려갔어요 · 기록은 그대로 있어요</p>
-        <p class="app-gone-rec">${recorded}</p>
-      </div>
-      ${app.result
-        ? `<button class="app-toggle" data-undo-result="${esc(app.id)}">기록 취소</button>`
-        : ''}
-    </div>`;
-}
-
 function appCard(app, sch) {
-  if (!sch) return appCardGone(app);
   const step = effectiveStep(app, sch);
   const stepLabel = step === 3 ? (app.result === 'won' ? '선정' : '결과 확인') : APP_STEPS[step];
   const checked = appsSelected.has(app.id) ? 'checked' : '';
@@ -4745,7 +4786,7 @@ function calContext() {
   const ids = new Set();
   state.applications.forEach((a) => ids.add(a.id));
   state.saved.forEach((s) => ids.add(s.id));
-  const mine = [...ids].map((id) => byId.get(id)).filter(Boolean);
+  const mine = [...ids].map((id) => byId.get(id) || (isActivityId(id) ? findSaveTarget(id) : null)).filter(Boolean);   // 저장한 대외활동도 '내 공고'(2026-10-02)
   return { all, byId, mine };
 }
 /** 내 공고 = 신청한 것 + 저장한 것. 달력에 상시로 찍히는 것은 이것뿐이다. */
@@ -4983,6 +5024,8 @@ function renderSaved() {
 }
 
 /* 신청 기록 ↔ 공고 잇기 — **기록을 버리지 않는다** (2026-09-20 개발자 지시로 신설).
+   ⚠️ 2026-10-02 개발자 지시로 **화면은** 바뀌었다 — 내려간 공고의 줄은 이제 안 보인다(아래 shownAppRows).
+      이 함수는 그대로 '모든 기록을 잇는' 일을 하고, 기록 자체는 여전히 지우지 않는다. 아래는 그 전 경위다.
 
    🔴 예전엔 `.filter((a) => findSch(a.id))` 였다. 공고를 못 찾으면 그 신청 기록을 화면에서
       통째로 빼고 **아무 말도 하지 않았다.** 실측: 저장 3건 → 화면 1장, 선정으로 기록해 둔
@@ -5005,6 +5048,59 @@ function appRows(applications, resolve) {
     .map((a) => ({ app: a, sch: resolve(a.id) || null }));
 }
 
+/* 🔴 **목록에서 내려간 공고는 신청 내역에 보이지 않는다** (2026-10-02 개발자 지시 — 2026-09-20 결정을 바꿈:
+   *"내려간 공고는 그냥 없어졌으면 좋겠는데 막 목록에서 내려감 이러네"*).
+   그때는 '줄을 남기고 사정을 적는다'였다(선정 기록까지 말없이 사라지던 사고). 지금 규칙:
+     · **화면에서만 뺀다 — 기기 안 기록(state.applications)은 지우지 않는다.** 공고가 다시 올라오면
+       (학교를 되돌렸거나 재단 공고가 다시 열리면) 적어 둔 제출·선정 기록과 함께 그대로 돌아온다.
+     · 목록·요약 카드·홈 '신청내역' 칸 숫자·전체 선택이 **이 함수 하나**를 쓴다 — 갈라 쓰면 숫자가 서로 다른 말을 한다.
+   순수 함수라 검사가 그대로 돌린다(test-collector '신청 내역 — 내려간 공고는 보이지 않는다'). */
+function shownAppRows(applications, resolve) {
+  /* 🔴 **결과를 적을 때까지는 남긴다** (2026-10-02 개발자 결정: *"일단 결과를 적을 때까지는 남겨두자"*).
+     정식 등록은 마감+30일, 층2는 마감 뒤 데이터에서 빠진다 — 발표가 늦으면 선정 결과를 적기 전에 줄이 사라졌다.
+     그래서 공고가 있을 때 떠 둔 사본(app.snap · snapApplications)으로 그린다. 선정·미선정을 적으면 그때 빠진다. */
+  return appRows(applications, resolve)
+    .map((r) => (r.sch || r.app.result || !r.app.snap ? r : { ...r, sch: r.app.snap }))
+    .filter((r) => r.sch);
+}
+/* 신청 기록이 가리키는 공고 — 데이터에 있으면 그것, 없고 결과를 아직 안 적었으면 떠 둔 사본(위와 같은 규칙).
+   신청 내역 패널의 제출·결과 단추와 상세 시트가 이것으로 찾는다(findSch 만 쓰면 사본이 있는 줄을 눌러도 아무것도 안 열린다) */
+function appSch(id) {
+  const live = findSch(id);
+  if (live) return live;
+  const a = state.applications.find((x) => x.id === id);
+  return a && !a.result && a.snap ? a.snap : null;
+}
+/* 홈 「신청내역」 칸의 숫자 — 신청 내역 화면과 같은 수. 공고 목록을 받기 전엔 담은 수 그대로(받고 나서 줄어드는 것은 '내려감'이 확정된 뒤다).
+   홈은 앱을 켜면 먼저 그려지므로 사본도 여기서 한 번 뜬다(신청 내역을 안 열어 본 학생도 사본이 남는다) */
+function shownAppCount() {
+  if (appsDataState() !== 'ok') return state.applications.length;
+  const r = schResolver();
+  if (snapApplications(r)) saveState({ local: true });   // 캐시 — 시각을 안 찍고 서버로 안 올린다
+  return shownAppRows(state.applications, r).length;
+}
+/* 공고가 데이터에 있는 동안 사본을 떠 둔다 — 바뀌었을 때만 적는다(매번 저장하지 않게). 공고 목록을 다 받았을 때만 돈다 */
+function snapApplications(resolve) {
+  if (appsDataState() !== 'ok') return false;
+  let changed = false;
+  for (const a of state.applications) {
+    const s = resolve(a.id);
+    if (!s) continue;
+    const json = JSON.stringify(s);
+    if (a.snap && JSON.stringify(a.snap) === json) continue;
+    a.snap = JSON.parse(json);
+    changed = true;
+  }
+  return changed;
+}
+/* 공고 찾기를 **한 번에** — findSch 는 부를 때마다 목록 전체(층2 파싱 포함)를 다시 만든다. 신청이 n건이면 n번이라 지도로 한 번만 만든다 */
+function schResolver() {
+  const byId = new Map(allScholarships().map((s) => [s.id, s]));
+  return (id) => byId.get(id) || null;
+}
+/* 두 목록을 다 받았는가 — 하나라도 '받는 중'이면 아직 '내려갔다'고 말하지 않는다 */
+const appsDataState = () => (Object.values(appsData).includes('wait') ? 'wait' : Object.values(appsData).includes('fail') ? 'fail' : 'ok');
+
 /* 차례 — **지금 할 일이 있는 것부터** (2026-09-20 개발자 지적).
 
    🔴 예전엔 담은 순서를 뒤집기만 했다(`.slice().reverse()`). 그래서 실측으로 위 세 장이
@@ -5018,7 +5114,7 @@ function appRows(applications, resolve) {
    묶음 안에서는 **마감 전이 먼저**(임박한 것부터), 마감이 지난 것은 뒤로 돌리되
    최근에 마감된 것부터 둔다. 마감을 모르는 것은 맨 뒤다.
 
-   🔴 **거르지 않는다 — 차례만 바꾼다.** 줄 수는 그대로여야 한다(바로 위 `appRows` 머리말과
+   🔴 **거르지 않는다 — 차례만 바꾼다.** (내려간 공고를 빼는 일은 앞 단계 shownAppRows 몫이다 · 2026-10-02) 줄 수는 그대로여야 한다(바로 위 `appRows` 머리말과
       '신청 내역은 마감으로 거르지 않는다' 관문이 지키는 것이 그것이다).
    🔴 `dday()` 를 쓰지 않는다 — 그 함수는 마감을 모르는 공고에 '남은 날 14일'이라는 가짜
       값을 준다(CLAUDE.md). 여기서는 날짜 글자를 그대로 견준다.
@@ -5043,8 +5139,20 @@ function appOrder(rows, today) {
 }
 
 function renderApplications() {
-  /* 잇고(버리지 않는다) → 차례를 정한다(거르지 않는다). 둘 다 순수 함수라 검사가 직접 돌린다. */
-  const rows = appOrder(appRows(state.applications, findSch));
+  /* 잇고 → 내려간 공고는 화면에서 뺀다(기록은 그대로 · shownAppRows) → 차례를 정한다. 셋 다 순수 함수라 검사가 직접 돌린다. */
+  /* 🔴 공고 목록을 아직 못 받았으면 '내려간 공고'를 가르지 않는다 — 가르면 모든 신청이 사라져 「아직 준비한 장학금이 없어요」가 뜬다(2026-10-02 리뷰) */
+  const dataState = appsDataState();
+  if (dataState !== 'ok' && state.applications.length) {
+    $('#apps-summary').innerHTML = '';
+    $('#apps-list').innerHTML = dataState === 'wait'
+      ? (typeof skeletonRows === 'function' ? skeletonRows(3) : '')
+      : '<p class="empty">공고 목록을 받아오지 못했어요<br /><span class="empty-sub">연결되면 신청 내역이 다시 보여요 · 기록은 그대로 있어요</span></p>';
+    $('#apps-select-toggle').hidden = true;
+    return;
+  }
+  const resolve = schResolver();
+  if (snapApplications(resolve)) saveState({ local: true });   // 캐시 — 시각을 안 찍고 서버로 안 올린다
+  const rows = appOrder(shownAppRows(state.applications, resolve));
   /* 공고를 아직 찾을 수 있는 동안 이름을 적어 둔다 — 나중에 목록에서 내려가도 학생이
      무엇이었는지 알아볼 수 있다. 옛 기록을 살리는 길이 이것 하나뿐이라 여기서 한다
      (loadState 는 registered.json 이 오기 전에 돌아 아직 아무것도 못 찾는다). */
@@ -5058,11 +5166,11 @@ function renderApplications() {
   const pending = apps.filter((a) => a.pending);
   const submitted = prepared.filter((a) => a.submittedAt && !a.result);
   const wonApps = prepared.filter((a) => a.result === 'won');
-  /* 🔴 공고를 못 찾는 기록은 **금액을 모른다** — 0 으로 두고 그 건수를 따로 센다.
+  /* 🔴 금액을 못 읽은 공고는 **금액을 모른다** — 0 으로 두고 그 건수를 따로 센다(내려간 공고는 2026-10-02 부터 여기 오지 않는다).
      예전엔 `findSch(a.id).amountValue` 라 못 찾는 순간 여기서 죽었다(그래서 위 filter 가
      있었던 것이기도 하다). 모르는 금액을 지어내 더하지 않는 것은 홈 히어로·일괄 준비와
      같은 규칙이고, 말하는 법도 그쪽과 같다 — '금액 미확인 n건 제외'. */
-  const amountOf = (a) => { const s = findSch(a.id); return (s && s.amountValue) || 0; };
+  const amountOf = (a) => { const s = resolve(a.id); return (s && s.amountValue) || 0; };
   const totalExpected = apps.reduce((sum, a) => sum + amountOf(a), 0);
   const wonAmount = wonApps.reduce((sum, a) => sum + amountOf(a), 0);
   const counted = wonApps.length ? wonApps : apps;
@@ -5157,9 +5265,8 @@ function wireAppsManage() {
   });
 
   $('#apps-check-all').addEventListener('change', (e) => {
-    /* 🔴 공고를 못 찾는 기록도 화면에 줄이 있으므로 **함께 고른다** — 빼면
-       '전체 선택'인데 일부만 골라져 '삭제 3건'이 2건만 지운다(2026-09-20). */
-    const ids = state.applications.map((a) => a.id);
+    /* 화면에 있는 줄만 고른다 — 내려간 공고는 보이지 않으므로 '전체 선택'이 보이지 않는 기록까지 지우면 안 된다(2026-10-02) */
+    const ids = shownAppRows(state.applications, schResolver()).map((r) => r.app.id);
     appsSelected.clear();
     if (e.target.checked) ids.forEach((id) => appsSelected.add(id));
     renderApplications();
@@ -5904,7 +6011,8 @@ async function trashRestore(key) {
     saveState();
     renderApplications();
     renderHome();
-    toast('신청내역으로 되살렸어요');
+    /* 내려간 공고의 기록은 되살려도 신청 내역에 안 보인다(2026-10-02) — 보인다고 말하지 않는다 */
+    toast(findSch(t.app.id) ? '신청내역으로 되살렸어요' : '되살렸어요 · 공고가 목록에 다시 올라오면 신청내역에 보여요');
   } else {
     let rec;
     try { rec = await trashTx('readonly', (st) => st.get(rest)); } catch (e) { rec = null; }
@@ -6267,14 +6375,14 @@ function bindEvents() {
     if (ub) {
       /* 잘못 누른 결과 되돌리기 — 기록만 지운다. 상세 시트의 '결과 기록 취소'와 같은 함수다 */
       e.stopPropagation();
-      /* id 로 넘긴다 — 목록에서 내려간 공고의 기록도 되돌릴 수 있어야 한다 */
+      /* id 로 넘긴다 — undoProgress 는 공고 없이도 기록을 되돌린다(공고를 요구하면 내려간 공고의 기록이 영영 안 지워진다) */
       undoProgress(ub.dataset.undoResult);
       return;
     }
     if (!sb && !wb && !lb) return;
     e.stopPropagation();
     const id = (sb || wb || lb).dataset.markSubmit || (wb || lb).dataset.markWon || lb.dataset.markLost;
-    const sch = findSch(id);
+    const sch = appSch(id);   // 사본으로 보이는 줄의 단추도 동작해야 결과를 적을 수 있다
     if (!sch) return;
     if (sb) recordSubmitted(sch); else recordResult(sch, !!wb);
   });
@@ -6731,7 +6839,7 @@ function syncApplyRemote(remote, opts) {
       const local = mineByIdx.get(a.id);
       if (!local) return a;
       const merged = Object.assign({}, a);
-      for (const k of ['formAns', 'docs']) if (merged[k] == null && local[k] != null) merged[k] = local[k];
+      for (const k of ['formAns', 'docs', 'snap']) if (merged[k] == null && local[k] != null) merged[k] = local[k];   // snap: 기기 안 공고 사본(서버로 안 감 · SYNC_OMIT_APP)
       return merged;
     });
     /* 🔴 **서버가 아직 모르는 신청서도 살린다** (2026-09-11 코드 리뷰에서 잡았다).

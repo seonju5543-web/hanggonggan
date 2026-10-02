@@ -12,6 +12,11 @@ on:
     #    기다리던 예약 수집이 소리 없이 취소될 수 있어 아무도 안 도는 새벽에 둔다(리뷰 I4)
     - cron: '17 19 * * *'   # 매일 04:17 KST
   workflow_dispatch:
+    inputs:
+      probe:
+        description: '정찰만 — 온통청년 쪽 하나씩 상태·응답 머리만 찍는다(저장·알림 안 함 · 목록은 open-api.mjs --probe)'
+        type: boolean
+        default: false
   push:
     branches: ['claude/nice-heisenberg-WESq5']
     paths:
@@ -31,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     # 다른 브랜치에서 수동 실행하면 그 브랜치 커밋이 기본 브랜치로 rebase 되어 올라간다 — 기본 브랜치에서만 돈다(리뷰 M5)
     if: github.ref_name == 'claude/nice-heisenberg-WESq5'
-    # 로봇 자체 예산 4분(요청 20초 × 3회) + 준비·감사·저장 여유
+    # 로봇 자체 예산 6분(요청 20초 · 청년콘텐츠 45초 × 3회 · 넘겨도 1분 반 안) + 준비·감사·저장 여유
     timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
@@ -48,7 +53,7 @@ jobs:
           YOUTHCENTER_KEY: ${{ secrets.YOUTHCENTER_KEY }}
           YOUTHCENTER_CONTENT_KEY: ${{ secrets.YOUTHCENTER_CONTENT_KEY }}
         # 🔴 tools/robot-run.sh 로 감싸지 말 것 — 그건 로컬용이라 클라우드에서는 '도는 로봇(=자기 자신)'을 보고 멈춘다
-        run: node collector/open-api.mjs
+        run: node collector/open-api.mjs ${{ inputs.probe && '--probe' || '' }}
 
       # 데이터 관문 — 저장 직전. 실패하면 이번 결과는 저장하지 않는다(로봇이 고친 파일을 되돌린다)
       - name: 데이터 감사
@@ -76,6 +81,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          [ "${{ inputs.probe }}" = "true" ] && { echo "정찰 실행 — 알림 안 함"; exit 0; }   # 정찰은 아무것도 안 받아 저장하므로 옛 리포트의 ❌ 로 알리지 않는다
           failed=""
           [ "${{ job.status }}" != "success" ] && failed="로봇 실행이 끝까지 못 갔어요(실패 또는 시간 초과)."
           if [ -f collector/open-api-report.md ] && grep -q '❌' collector/open-api-report.md; then failed="$failed 받아 오지 못한 출처가 있어요."; fi
