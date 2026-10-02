@@ -2372,13 +2372,21 @@ console.log('\n■ 교내 소식 썸네일 (2026-10-03 개발자 지시 "실제 
     const night = px((i) => (i % 5 === 0 ? [250, 250, 250] : [10, 10, 12]));   // 밤 사진 — 검정 80% · 흰색 20% 지만 사이 빛(색)이 섞인다
     const nightReal = night.map((v, i) => (i % 9 === 0 ? 120 : v));
     const bwPhoto = px((i) => (i % 5 < 2 ? [12, 12, 12] : i % 5 < 4 ? [245, 245, 245] : [128, 128, 128]));   // 흑백 사진 — 검정 40% · 흰색 40% · 회색 20% (합 80%)
-    eq('  QR 은 사진이 아니다(검정·흰색이 둘 다 넉넉하고 거의 전부) · 단색 디자인 포스터·사진·밤 사진·흑백 사진은 산다', [qr, qrJpeg, poster, photo, nightReal, bwPhoto].map((b) => TH.looksLikeQr(TH.monoParts(b))), [true, true, false, false, false, false]);
+    const qrMargin = px((i) => (i % 10 < 3 ? [8, 8, 8] : i % 10 < 9 ? [250, 250, 250] : [128, 128, 128]));   // 전남 실측 꼴 — 검정 30% · 흰색 60% · 회색 10% (합 90%)
+    eq('  QR 은 사진이 아니다(검정·흰색이 둘 다 넉넉하고 합 88% 이상) · 단색 디자인 포스터·사진·밤 사진·흑백 사진은 산다', [qr, qrJpeg, qrMargin, poster, photo, nightReal, bwPhoto].map((b) => TH.looksLikeQr(TH.monoParts(b))), [true, true, true, false, false, false, false]);
+    /* 두 번째 실제 실행 84장 실측 — 글자뿐인 문서 그림 14장: 흰 80~96% · 색 0~7% / 연한 행사 포스터: 색 8% 이상 */
+    const doc = px((i) => (i % 20 === 0 ? [20, 20, 20] : i % 50 === 1 ? [40, 80, 160] : [252, 252, 252]));   // 흰 바탕 · 검은 글자 · 파란 제목 한 줄
+    const palePoster = px((i) => (i % 10 === 0 ? [240, 120, 90] : i % 10 === 1 ? [90, 160, 230] : [250, 250, 248]));   // 흰 바탕에 색 20%
+    eq('  글자뿐인 문서 그림(흰 바탕 80% 이상 · 색 8% 미만)은 사진이 아니다 · 연한 포스터·사진·QR 은 이 판정이 아니다', [doc, palePoster, photo, poster].map((b) => TH.looksLikeTextPage(TH.monoParts(b))), [true, false, false, false]);
   }
   eq('  관리자가 사진을 뺀 뒤 글 번호가 붙어도(열쇠가 바뀌어도) 뺀 그대로 · 목록 표식 주소는 다른 글과 같아 주소 열쇠로 보지 않는다', [TH.optedOut({ school: '가', postId: '9', url: 'https://g/v/9' }, new Set(['url:' + urlKey('https://g/v/9')])), TH.optedOut({ school: '가', postId: '9', url: 'https://g/l#n-x' }, new Set(['url:' + urlKey('https://g/l#n-x')]))], [true, false]);
   {
     const rr = readText(new URL('collector/collect-news-thumbs.mjs', root));
-    eq('  잠깐의 실패(받기 실패·5xx·429)와 후보를 다 못 연 것은 \'없음\'으로 굳히지 않고 다시 본다 · QR·같은 파일은 건너뛴다', /if \(transient\) return \{ err:/.test(rr) && /if \(leftOver\) return \{ err:/.test(rr) && /transient: res\.status >= 500 \|\| res\.status === 429/.test(rr) && /catch \(e\) \{ transient = true;/.test(rr) && /if \(out\.qr\)/.test(rr) && /T\.isCommonFile\(ledger, n\.school, rel\)/.test(rr) && /const twins = T\.fileTwins\(/.test(rr), true);
+    eq('  잠깐의 실패(받기 실패·5xx·429)와 후보를 다 못 연 것은 \'없음\'으로 굳히지 않고 다시 본다 · QR·같은 파일은 건너뛴다', /if \(transient\) return \{ err:/.test(rr) && /if \(leftOver\) return \{ err:/.test(rr) && /transient: res\.status >= 500 \|\| res\.status === 429/.test(rr) && /catch \(e\) \{ transient = true;/.test(rr) && /if \(out\.qr\)/.test(rr) && /if \(out\.textPage\)/.test(rr) && /if \(!T\.pageHasTitle\(text, n\.title\)\) return \{ err:/.test(rr) && /if \(e\.file && \(e\.v \|\| 1\) < RULES_V\) delete ledger\.posts\[k\];/.test(rr) && /T\.isCommonFile\(ledger, n\.school, rel\)/.test(rr) && /const twins = T\.fileTwins\(/.test(rr), true);
   }
+  eq('  글 화면에 그 글의 제목이 있어야 한다 (서버 오류 화면 그림이 썸네일이 됐다) · 앞 번호·꼬리표 차이는 견딘다 · 짧은 제목은 대조하지 않는다',
+    [TH.pageHasTitle('<h3>2026학년도 2학기 중간시험 실시 및 부정행위자 처리 기준 안내</h3>', '9 2026학년도 2학기 중간시험 실시 및 부정행위자 처리 기준 안내'), TH.pageHasTitle('<body><img src="/error_kor.png"><p>서버 에러 발생</p></body>', '2026 공릉동 소상공인 스탬프 투어 안내'), TH.pageHasTitle(JSON.stringify({ title: '기숙사 입사 안내 모집', body: '<p>본문</p>' }), '기숙사 입사 안내 모집'), TH.pageHasTitle('', '휴강'), TH.pageHasTitle('<td>기숙사 입사 안내</td>', '12 기숙사 입사 안내')],
+    [true, false, true, true, true]);
   /* ④ 이번에 열어 볼 글 — 숨김·사진 뺌·이미 받음·없음은 건너뛰고 · 실패는 하루 뒤 · 파일이 사라진 것은 다시 · 새 글부터 학교마다 돌아가며 · 학교당 상한 */
   {
     const it = (school, id, f, x = {}) => ({ title: `${school} 글 ${id}`, url: `https://${id}.ac.kr/v`, school, postId: String(id), foundAt: f, ...x });
@@ -2453,11 +2461,11 @@ console.log('\n■ 교내 소식 썸네일 (2026-10-03 개발자 지시 "실제 
       { title: '사진 뺀 글', url: 'https://g/2', school: '가대학교', postId: '2', foundAt: '2026-10-03', thumb: off }] }, null, 1));
     const ogImg = 'data/news/img/bbbbbbbbbbbbbbbb.webp'; fs.writeFileSync(path.join(dir, ogImg), 'x');
     const nx = JSON.parse(readText(path.join(dir, 'data/news/nx.json'))); nx.items.push({ title: '대표 이미지로 받았던 글', url: 'https://g/3', school: '가대학교', postId: '3', foundAt: '2026-10-03', thumb: ogImg }); fs.writeFileSync(path.join(dir, 'data/news/nx.json'), JSON.stringify(nx, null, 1));
-    fs.writeFileSync(path.join(dir, 'collector/news-thumbs.json'), JSON.stringify({ posts: { 'post:가대학교:1': { at: '2026-10-03', school: '가대학교', file: keep, from: 'body' }, 'post:가대학교:2': { at: '2026-10-03', school: '가대학교', file: off }, 'post:가대학교:3': { at: '2026-10-03', school: '가대학교', file: ogImg, from: 'og' } }, srcSeen: {} }));
+    fs.writeFileSync(path.join(dir, 'collector/news-thumbs.json'), JSON.stringify({ posts: { 'post:가대학교:1': { at: '2026-10-03', school: '가대학교', file: keep, from: 'body', v: 2 }, 'post:가대학교:2': { at: '2026-10-03', school: '가대학교', file: off, v: 2 }, 'post:가대학교:3': { at: '2026-10-03', school: '가대학교', file: ogImg, from: 'og' } }, srcSeen: {} }));
     fs.writeFileSync(path.join(dir, 'collector/news-config.json'), JSON.stringify({ hideUrls: [], noThumb: ['post:가대학교:2'] }));
     const r = spawnSync(process.execPath, [fileURLToPath(new URL('../collector/collect-news-thumbs.mjs', import.meta.url))], { env: { ...process.env, NEWS_THUMB_ROOT: dir, NEWS_THUMB_OFFLINE: '1' }, encoding: 'utf8' });
     const doc = JSON.parse(readText(path.join(dir, 'data/news/nx.json')));
-    eq('  로봇(받기 없이) — 장부 사진 입힘 · 사진 뺀 글 칸 지움 · 대표 이미지(og)로 받았던 것은 버리고 다시 · 안 쓰는 그림 지움 · 리포트에 학교별 수', [r.status, doc.items.map((n) => n.thumb || '-'), fs.readdirSync(path.join(dir, 'data/news/img')).sort(), /\| 가대학교 \| 3 \| 1 \|/.test(readText(path.join(dir, 'collector/news-thumbs-report.md'))), 'post:가대학교:3' in JSON.parse(readText(path.join(dir, 'collector/news-thumbs.json'))).posts],
+    eq('  로봇(받기 없이) — 장부 사진 입힘 · 사진 뺀 글 칸 지움 · 옛 규칙(대표 이미지 og · 규칙판 v 없음)으로 받았던 것은 버리고 다시 · 안 쓰는 그림 지움 · 리포트에 학교별 수', [r.status, doc.items.map((n) => n.thumb || '-'), fs.readdirSync(path.join(dir, 'data/news/img')).sort(), /\| 가대학교 \| 3 \| 1 \|/.test(readText(path.join(dir, 'collector/news-thumbs-report.md'))), 'post:가대학교:3' in JSON.parse(readText(path.join(dir, 'collector/news-thumbs.json'))).posts],
       [0, [keep, '-', '-'], ['0123456789abcdef.webp'], true, false]);
     const rr2 = readText(new URL('collector/collect-news-thumbs.mjs', root));
     eq('    학교 여럿을 동시에 · 돌아가며 한 건씩(한 학교는 한 일꾼만 · 뒤쪽 학교가 매번 0건이 되지 않게)', /const LANES = Number\(process\.env\.NEWS_THUMB_LANES \|\| \d+\);/.test(rr2) && /const school = ready\.shift\(\);[\s\S]{0,200}?const n = list\.shift\(\);[\s\S]{0,200}?if \(list\.length\) ready\.push\(school\);/.test(rr2) && /await Promise\.all\(Array\.from\(\{ length: Math\.max\(1, LANES\) \}, worker\)\);/.test(rr2), true);
@@ -2469,7 +2477,7 @@ console.log('\n■ 교내 소식 썸네일 (2026-10-03 개발자 지시 "실제 
       fs.mkdirSync(path.join(dir, 'data/news/img'), { recursive: true }); fs.mkdirSync(path.join(dir, 'collector'), { recursive: true });
       const img = 'data/news/img/0123456789abcdef.webp'; fs.writeFileSync(path.join(dir, img), 'x');
       fs.writeFileSync(path.join(dir, 'data/news/nx.json'), JSON.stringify({ school: '가대학교', updatedAt: '2026-10-03', items: [{ title: '사진 글', url: 'https://g/1', school: '가대학교', postId: '1', foundAt: '2026-10-03', thumb: img }] }, null, 1));
-      fs.writeFileSync(path.join(dir, 'collector/news-thumbs.json'), JSON.stringify({ posts: { 'post:가대학교:1': { at: '2026-10-03', school: '가대학교', file: img } }, srcSeen: {} }));
+      fs.writeFileSync(path.join(dir, 'collector/news-thumbs.json'), JSON.stringify({ posts: { 'post:가대학교:1': { at: '2026-10-03', school: '가대학교', file: img, v: 2 } }, srcSeen: {} }));
       fs.writeFileSync(path.join(dir, 'collector/news-config.json'), JSON.stringify({ hideUrls: [], thumbs: mode }));
       spawnSync(process.execPath, [fileURLToPath(new URL('../collector/collect-news-thumbs.mjs', import.meta.url))], { env: { ...process.env, NEWS_THUMB_ROOT: dir, NEWS_THUMB_OFFLINE: '1' }, encoding: 'utf8' });
       return [JSON.parse(readText(path.join(dir, 'data/news/nx.json'))).items[0].thumb || '-', fs.readdirSync(path.join(dir, 'data/news/img')).length];

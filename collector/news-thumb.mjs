@@ -225,23 +225,38 @@ export function optedOut(n, noThumb) {
   return !!(n && n.postId && !/#n-/.test(String(n.url || '')) && noThumb.has(`url:${urlKey(n.url)}`));
 }
 
-/* QR 코드 — 색이 없고 **검정과 흰색이 둘 다 넉넉하며 그 둘이 거의 전부**인 그림 (리뷰 12차).
+/* 그림의 색 몫 — QR 코드·글자뿐인 문서 그림 가르기 (리뷰 12차 · 2026-10-03 두 번째 실제 실행 84장을 눈으로 보고 정했다).
    🔴 정보량(엔트로피)으로 가르지 않는다 — 실측: 단색 디자인 행사 포스터(1.5)가 JPEG 로 저장한 QR(1.6~2.6)보다 낮아 포스터가 먼저 떨어졌다.
-   🔴 작게 줄일 때 섞지 않는다(가장 가까운 점 · 160px) — 섞으면 QR 의 칸이 회색이 된다. 실측(정문 사진 15장 · QR 두 장):
-      QR 검정 36~52% · 흰색 48~64% · 합 100% / 사진 합 7~79%(밤 사진은 검정만 77%) / 흰 바탕 글자 포스터는 검정이 거의 안 잡혀 사는 쪽.
-   rgb: 줄인 그림의 RGB 바이트(3바이트씩) → { black, white } 몫 */
+   🔴 작게 줄일 때 섞지 않는다(가장 가까운 점 · 160px) — 섞으면 QR 의 칸이 회색이 된다.
+   rgb: 줄인 그림의 RGB 바이트(3바이트씩) → { black, white, colour } 몫(색 있음 = 채널 차 24 이상 · 그 밖에서 어두움 70 미만 / 밝음 190 넘음) */
 export function monoParts(rgb) {
-  const b = rgb || []; let bk = 0; let wh = 0; let n = 0;
+  const b = rgb || []; let bk = 0; let wh = 0; let col = 0; let n = 0;
   for (let i = 0; i + 2 < b.length; i += 3) {
     n += 1;
     const r = b[i]; const g = b[i + 1]; const bl = b[i + 2];
-    if (Math.max(r, g, bl) - Math.min(r, g, bl) >= 24) continue;   // 색이 있는 점
+    if (Math.max(r, g, bl) - Math.min(r, g, bl) >= 24) { col += 1; continue; }
     const l = (r + g + bl) / 3;
     if (l < 70) bk += 1; else if (l > 190) wh += 1;
   }
-  return n ? { black: bk / n, white: wh / n } : { black: 0, white: 0 };
+  return n ? { black: bk / n, white: wh / n, colour: col / n } : { black: 0, white: 0, colour: 0 };
 }
-export const looksLikeQr = (p) => !!(p && p.black >= 0.15 && p.white >= 0.15 && p.black + p.white >= 0.95);
+/* QR — 검정·흰색이 둘 다 넉넉하고 그 둘이 거의 전부. 실측: QR 합 90~100% / 사진 합 7~79%(밤 사진 검정 77%) — 첫 기준 95% 는 전남 QR(검정 29·흰 61)을 놓쳤다 */
+export const looksLikeQr = (p) => !!(p && p.black >= 0.15 && p.white >= 0.15 && p.black + p.white >= 0.88);
+/* 글자뿐인 문서 그림(공문·표를 그림으로 붙인 것) — 흰 바탕 80% 이상 · 색 8% 미만. 카드 72px 에서 회색 얼룩일 뿐 사진이 아니다.
+   실측 84장: 문서 14장이 흰 80~96% · 색 0~7% / 연한 행사 포스터(동국 학습상담·헌혈버스)는 색 8% 이상이라 산다 */
+export const looksLikeTextPage = (p) => !!(p && p.white >= 0.8 && p.colour < 0.08);
+
+/* 글 화면이 정말 그 글인가 — 제목의 한 토막(앞·가운데·뒤 10자 중 하나)이 화면 글자에 있어야 한다 (두 번째 실제 실행: 서버 오류 화면의 「서버 에러 발생」 그림이 썸네일이 됐다).
+   제목 앞 번호(「9 2026학년도…」)·꼬리표 차이를 견디려고 토막 셋 중 하나만 맞으면 된다. 짧은 제목(6자 미만)은 대조하지 않는다. */
+export function pageHasTitle(text, title) {
+  const norm = (s) => String(s || '').replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/&[a-z#0-9]+;/gi, ' ').replace(/[\s\p{P}\p{S}]+/gu, '');
+  const core = norm(title).replace(/^\d+/, '');
+  if (core.length < 6) return true;
+  const page = norm(text);
+  const w = Math.min(10, core.length);
+  const mid = Math.max(0, Math.floor(core.length / 2) - Math.floor(w / 2));
+  return [core.slice(0, w), core.slice(mid, mid + w), core.slice(-w)].some((x) => page.includes(x));
+}
 const dayDiff = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 86400000);
 
 /* 이번 실행에 사진을 찾아볼 글 — 숨김·사진 빼기(noThumb)는 건너뛰고, 새 글부터, 학교마다 돌아가며(한 학교를 몰아치지 않게) perSchool 까지 */
