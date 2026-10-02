@@ -12,6 +12,11 @@ on:
     #    기다리던 예약 수집이 소리 없이 취소될 수 있어 아무도 안 도는 새벽에 둔다(리뷰 I4)
     - cron: '17 19 * * *'   # 매일 04:17 KST
   workflow_dispatch:
+    inputs:
+      probe:
+        description: '정찰만 — 온통청년 매개변수를 바꿔 가며 응답 머리만 찍는다(저장 안 함)'
+        type: boolean
+        default: false
   push:
     branches: ['claude/nice-heisenberg-WESq5']
     paths:
@@ -48,7 +53,7 @@ jobs:
           YOUTHCENTER_KEY: ${{ secrets.YOUTHCENTER_KEY }}
           YOUTHCENTER_CONTENT_KEY: ${{ secrets.YOUTHCENTER_CONTENT_KEY }}
         # 🔴 tools/robot-run.sh 로 감싸지 말 것 — 그건 로컬용이라 클라우드에서는 '도는 로봇(=자기 자신)'을 보고 멈춘다
-        run: node collector/open-api.mjs
+        run: node collector/open-api.mjs ${{ inputs.probe && '--probe' || '' }}
 
       # 데이터 관문 — 저장 직전. 실패하면 이번 결과는 저장하지 않는다(로봇이 고친 파일을 되돌린다)
       - name: 데이터 감사
@@ -76,6 +81,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          [ "${{ inputs.probe }}" = "true" ] && { echo "정찰 실행 — 알림 안 함"; exit 0; }   # 정찰은 아무것도 안 받아 저장하므로 옛 리포트의 ❌ 로 알리지 않는다
           failed=""
           [ "${{ job.status }}" != "success" ] && failed="로봇 실행이 끝까지 못 갔어요(실패 또는 시간 초과)."
           if [ -f collector/open-api-report.md ] && grep -q '❌' collector/open-api-report.md; then failed="$failed 받아 오지 못한 출처가 있어요."; fi
