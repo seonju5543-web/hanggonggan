@@ -56,6 +56,8 @@ const eq = (label, got, want) => {
         { id: 'reg-hufs-myeonhak', appliedAt: '2026-08-01', step: 0 },
         { id: 'reg-hufs-alumni', appliedAt: '2026-08-02', step: 0 },
         { id: 'reg-hufs-yuheungsu', appliedAt: '2026-08-03', step: 0 },
+        /* 목록에서 내려간 공고의 기록(선정까지 적어 둔 것) — 화면엔 안 보이고, 기기에서는 지워지지 않아야 한다(2026-10-02) */
+        { id: 'reg-gone-for-test', name: '내려간 공고', appliedAt: '2026-07-01', step: 0, result: 'won' },
       ],
     }));
   });
@@ -72,6 +74,10 @@ const eq = (label, got, want) => {
   await page.click('.nav-item[data-nav="applications"]');
   await page.waitForTimeout(500);
   eq('신청 3건이 보인다', await page.$$eval('#apps-list .swipe-row', (e) => e.length), 3);
+  /* 🔴 2026-10-02 개발자 지시 — 내려간 공고는 '목록에서 내려감' 줄로 남기지 않고 아예 안 보인다 */
+  eq('내려간 공고는 줄로 안 보인다', [await page.$('#apps-list [data-row="reg-gone-for-test"]'), await page.$$eval('#apps-list', (e) => e[0].textContent.includes('내려감'))], [null, false]);
+  eq('  요약 카드도 안 센다(선정 0건 — 내려간 공고의 선정은 안 보인다)', await page.$eval('#apps-summary', (e) => /선정 \d+건/.test(e.textContent)), false);
+  eq('  홈 「신청내역」 칸 숫자도 화면과 같다(3)', await page.$eval('.hero-tile[data-hero-go="applications"] .hero-badge', (e) => e.textContent.trim()), '3');
   /* 🔴 클래스의 display가 [hidden]을 이겨 선택 막대가 늘 떠 있었다 — 눈으로 봐야 잡히는 유형이라
      화면에서 실제로 안 보이는지(offsetParent)까지 확인한다 (CLAUDE.md CSS 함정). */
   eq('선택 모드가 아니면 선택 막대가 안 보인다',
@@ -127,6 +133,8 @@ const eq = (label, got, want) => {
   await page.click('#toast .toast-undo');
   await page.waitForTimeout(400);
   eq('일괄 삭제도 되돌아온다', await page.$$eval('#apps-list .swipe-row', (e) => e.length), 3);
+  eq('  전체 선택·삭제는 보이지 않는 기록을 건드리지 않는다(기기에 그대로 · 공고가 돌아오면 선정 기록과 함께)',
+    await page.evaluate(() => (state.applications || []).some((a) => a.id === 'reg-gone-for-test' && a.result === 'won')), true);
 
   /* ══ 신청 현황은 홈이 아니라 여기다 (2026-09-12 · 노션 UI-15) ═══════════════
      개발자 지시: "홈의 신청 현황을 지우고 신청 내역 칸에 반영한다."
@@ -146,7 +154,8 @@ const eq = (label, got, want) => {
         .filter((e) => e.offsetParent !== null).length,
       요약있음: (() => { const el = document.querySelector('#apps-summary');
         return !!(el && el.offsetParent !== null && el.textContent.trim()); })(),
-      담은건수: (typeof state !== 'undefined' && state.applications || []).length,
+      /* 화면에 보일 기록 = 공고가 아직 있는 기록(2026-10-02 · shownAppRows) */
+      담은건수: shownAppRows(state.applications, findSch).length,
     };
   });
   eq('담은 신청이 있다 (검사가 헛돌지 않는다)', moved.담은건수 > 0, true);

@@ -4630,7 +4630,8 @@ console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08
   console.log('■ 신청 기록을 버리지 않는다 (2026-09-20)');
   eq('공고를 못 찾는다고 기록을 거르지 않는다',
     /filter\(\s*\(a\)\s*=>\s*findSch\(/.test(appsSrc), false);
-  eq('기록↔공고 잇기를 appRows 로 한다', appsSrc.includes('appRows(state.applications, findSch)'), true);
+  /* 2026-10-02 — 잇기는 appRows, 화면에 보일 줄은 그 위의 shownAppRows(내려간 공고 뺌 · 기록은 그대로) */
+  eq('기록↔공고 잇기를 appRows 로 한다', appsSrc.includes('shownAppRows(state.applications, findSch)') && grab('shownAppRows').includes('appRows(applications, resolve)'), true);
   /* 금액은 못 찾으면 0 이어야 한다 — 옛 코드는 공고를 못 찾는 그 자리에서 죽었다
      (그래서 위 filter 가 있었던 것이기도 하다). 되돌아오면 여기서 잡는다.
      🔴 **주석을 빼고 잰다** — 걷어낸 옛 코드를 인용한 주석에 걸려 빨간불이 된다
@@ -4648,16 +4649,17 @@ console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08
   eq('차례는 최근 담은 것부터', rows.map((r) => r.app.id), ['c', 'gone', 'a']);
   eq('기록이 없으면 빈 목록', appRows(null, () => null).length, 0);
 
-  /* 사라진 공고 카드가 **모르는 것을 말하지 않는가** (원칙 8-1) */
-  const goneSrc = grab('appCardGone');
-  eq('이름을 지어내지 않는다 (적어 둔 name 만 쓴다)',
-    goneSrc.includes("app.name || '(목록에서 내려간 공고)'"), true);
-  eq('마감을 말하지 않는다', goneSrc.includes('dday('), false);
-  eq('금액을 말하지 않는다', goneSrc.includes('amountValue'), false);
-  eq('진행 단계(n/4)를 말하지 않는다', goneSrc.includes('APP_STEPS'), false);
-  /* 학생이 적어 둔 것은 학생의 기록이라 그대로 남는다 */
-  eq('학생이 기록한 결과는 남긴다', /app\.result/.test(goneSrc), true);
-  eq('잘못 누른 기록을 되돌릴 길이 있다', goneSrc.includes('data-undo-result'), true);
+  /* ── 🔴 2026-10-02 개발자 지시로 바뀐 것: 내려간 공고는 신청 내역에 **보이지 않는다** — 그러나 기록은 지우지 않는다 ──
+     ("내려간 공고는 그냥 없어졌으면 좋겠는데 막 목록에서 내려감 이러네") */
+  const shownAppRows = new Function(`${grab('appRows')}\n${grab('shownAppRows')}\nreturn shownAppRows;`)();
+  const kept = [{ id: 'a' }, { id: 'gone', result: 'won' }, { id: 'c' }];
+  eq('내려간 공고의 줄은 화면에서 빠진다', shownAppRows(kept, (id) => (id === 'gone' ? null : { id })).map((r) => r.app.id), ['c', 'a']);
+  eq('  기록 자체는 지우지 않는다(공고가 다시 올라오면 선정 기록과 함께 돌아온다)', [kept.length, shownAppRows(kept, (id) => ({ id })).length], [3, 3]);
+  eq('  목록·홈 신청내역 칸·전체 선택이 같은 함수를 쓴다(숫자가 서로 다른 말을 하지 않게)',
+    (() => { const all = readText(new URL('../app.js', import.meta.url)); return [appsSrc.includes('appOrder(shownAppRows(state.applications, findSch))'),
+      /applications: shownAppRows\(state\.applications, findSch\)\.length/.test(all), /const ids = shownAppRows\(state\.applications, findSch\)\.map\(\(r\) => r\.app\.id\)/.test(all)]; })(), [true, true, true]);
+  eq('  화면에서 빼려고 기기 기록을 지우지 않는다(state.applications 를 거르지 않는다)', /state\.applications\s*=\s*state\.applications\.filter\(/.test(codeOnly(appsSrc)), false);
+  eq("  '목록에서 내려감' 카드는 없다", /appCardGone|badge-gone/.test(readText(new URL('../app.js', import.meta.url))), false);
   /* 되돌리기는 공고를 요구하면 안 된다 — 요구하면 사라진 공고의 기록이 영영 안 지워진다
      (저장 해제 `toggleSave` 가 2026-09-07 코드 리뷰에서 같은 이유로 고쳐졌다) */
   eq('되돌리기가 공고를 요구하지 않는다', grab('undoProgress').includes('typeof schOrId'), true);

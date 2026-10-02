@@ -1627,7 +1627,7 @@ function renderHome() {
     deadline: soon,
     '교내': applyable.filter((m) => m.sch.type === '교내').length,
     '교외': applyable.filter((m) => m.sch.type === '교외').length,
-    applications: state.applications.length,
+    applications: shownAppRows(state.applications, findSch).length,   // 신청 내역 화면과 같은 수(내려간 공고 빼고)
   };
   $('#hero-tiles').innerHTML = HERO_TILES.map((t) => `
     <button type="button" class="hero-tile" data-hero-go="${t.go}" aria-label="${t.name} ${tileN[t.go]}건">
@@ -4448,40 +4448,7 @@ const appsSelected = new Set();
 const appsLogOpen = new Set();   // 펼쳐 둔 진행 기록 — 다시 그려도 닫히지 않게
 let undoBuffer = null;          // 되돌리기용 — 지운 항목과 원래 자리
 
-/* 공고를 못 찾는 신청 기록 — **줄을 남기고 사정을 그대로 적는다** (2026-09-20).
-   왜 못 찾는지는 `appRows` 머리말에 있다. 여기서 지키는 것은 셋이다:
-     ① 이름을 지어내지 않는다 — 신청할 때 적어 둔 `name` 만 쓰고, 없으면 그렇게 말한다.
-     ② 앱이 모르는 것을 말하지 않는다 — 마감·금액·자격·진행 단계(n/4)를 적지 않는다.
-        '심사'는 마감 경과로 정하는데 그 마감을 모르므로 단계 막대를 그릴 수 없다.
-     ③ 학생이 적어 둔 것(제출·선정·미선정)은 **학생의 기록이라 그대로 남는다.**
-   🔴 왜 내려갔는지는 단정하지 않는다 — 학교를 바꿨을 수도, 접수가 끝났을 수도 있고
-      앱은 둘을 구분할 수 없다(원칙 8-1). */
-function appCardGone(app) {
-  const checked = appsSelected.has(app.id) ? 'checked' : '';
-  const name = app.name || '(목록에서 내려간 공고)';
-  const recorded = app.result
-    ? `${app.result === 'won' ? '선정으로 기록함' : '미선정으로 기록함'}${app.resultAt ? ` · ${esc(app.resultAt)}` : ''}`
-    : app.submittedAt ? `제출했다고 기록함 · ${esc(app.submittedAt)}`
-    : app.pending ? '서류를 쓰던 중이었어요'
-    : '신청 준비까지 기록함';
-  return `
-    <div class="swipe-row app-gone" data-row="${esc(app.id)}">
-      ${appsSelectMode ? `<input type="checkbox" class="row-check" data-pick="${esc(app.id)}" ${checked}
-         aria-label="${esc(name)} 선택" />` : ''}
-      <div class="sch-card app-gone-card">
-        <div class="sch-top"><span class="badge badge-gone">목록에서 내려감</span></div>
-        <p class="sch-name">${esc(name)}</p>
-        <p class="app-gone-note">공고가 목록에서 내려갔어요 · 기록은 그대로 있어요</p>
-        <p class="app-gone-rec">${recorded}</p>
-      </div>
-      ${app.result
-        ? `<button class="app-toggle" data-undo-result="${esc(app.id)}">기록 취소</button>`
-        : ''}
-    </div>`;
-}
-
 function appCard(app, sch) {
-  if (!sch) return appCardGone(app);
   const step = effectiveStep(app, sch);
   const stepLabel = step === 3 ? (app.result === 'won' ? '선정' : '결과 확인') : APP_STEPS[step];
   const checked = appsSelected.has(app.id) ? 'checked' : '';
@@ -4983,6 +4950,8 @@ function renderSaved() {
 }
 
 /* 신청 기록 ↔ 공고 잇기 — **기록을 버리지 않는다** (2026-09-20 개발자 지시로 신설).
+   ⚠️ 2026-10-02 개발자 지시로 **화면은** 바뀌었다 — 내려간 공고의 줄은 이제 안 보인다(아래 shownAppRows).
+      이 함수는 그대로 '모든 기록을 잇는' 일을 하고, 기록 자체는 여전히 지우지 않는다. 아래는 그 전 경위다.
 
    🔴 예전엔 `.filter((a) => findSch(a.id))` 였다. 공고를 못 찾으면 그 신청 기록을 화면에서
       통째로 빼고 **아무 말도 하지 않았다.** 실측: 저장 3건 → 화면 1장, 선정으로 기록해 둔
@@ -5003,6 +4972,17 @@ function renderSaved() {
 function appRows(applications, resolve) {
   return (applications || []).slice().reverse()
     .map((a) => ({ app: a, sch: resolve(a.id) || null }));
+}
+
+/* 🔴 **목록에서 내려간 공고는 신청 내역에 보이지 않는다** (2026-10-02 개발자 지시 — 2026-09-20 결정을 바꿈:
+   *"내려간 공고는 그냥 없어졌으면 좋겠는데 막 목록에서 내려감 이러네"*).
+   그때는 '줄을 남기고 사정을 적는다'였다(선정 기록까지 말없이 사라지던 사고). 지금 규칙:
+     · **화면에서만 뺀다 — 기기 안 기록(state.applications)은 지우지 않는다.** 공고가 다시 올라오면
+       (학교를 되돌렸거나 재단 공고가 다시 열리면) 적어 둔 제출·선정 기록과 함께 그대로 돌아온다.
+     · 목록·요약 카드·홈 '신청내역' 칸 숫자·전체 선택이 **이 함수 하나**를 쓴다 — 갈라 쓰면 숫자가 서로 다른 말을 한다.
+   순수 함수라 검사가 그대로 돌린다(test-collector '신청 내역 — 내려간 공고는 보이지 않는다'). */
+function shownAppRows(applications, resolve) {
+  return appRows(applications, resolve).filter((r) => r.sch);
 }
 
 /* 차례 — **지금 할 일이 있는 것부터** (2026-09-20 개발자 지적).
@@ -5044,7 +5024,7 @@ function appOrder(rows, today) {
 
 function renderApplications() {
   /* 잇고(버리지 않는다) → 차례를 정한다(거르지 않는다). 둘 다 순수 함수라 검사가 직접 돌린다. */
-  const rows = appOrder(appRows(state.applications, findSch));
+  const rows = appOrder(shownAppRows(state.applications, findSch));
   /* 공고를 아직 찾을 수 있는 동안 이름을 적어 둔다 — 나중에 목록에서 내려가도 학생이
      무엇이었는지 알아볼 수 있다. 옛 기록을 살리는 길이 이것 하나뿐이라 여기서 한다
      (loadState 는 registered.json 이 오기 전에 돌아 아직 아무것도 못 찾는다). */
@@ -5157,9 +5137,8 @@ function wireAppsManage() {
   });
 
   $('#apps-check-all').addEventListener('change', (e) => {
-    /* 🔴 공고를 못 찾는 기록도 화면에 줄이 있으므로 **함께 고른다** — 빼면
-       '전체 선택'인데 일부만 골라져 '삭제 3건'이 2건만 지운다(2026-09-20). */
-    const ids = state.applications.map((a) => a.id);
+    /* 화면에 있는 줄만 고른다 — 내려간 공고는 보이지 않으므로 '전체 선택'이 보이지 않는 기록까지 지우면 안 된다(2026-10-02) */
+    const ids = shownAppRows(state.applications, findSch).map((r) => r.app.id);
     appsSelected.clear();
     if (e.target.checked) ids.forEach((id) => appsSelected.add(id));
     renderApplications();
