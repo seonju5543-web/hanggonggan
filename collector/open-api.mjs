@@ -46,7 +46,7 @@ const youthContentKey = (process.env.YOUTHCENTER_CONTENT_KEY || '').trim();
 class ApiError extends Error {}
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 /* 열쇠가 오류 문구·주소에 섞여 리포트에 찍히지 않게 */
-const hideKeys = (s) => [portalKey, youthKey, youthContentKey, encodeURIComponent(portalKey)].filter((k) => k && k.length > 6)
+const hideKeys = (s) => [portalKey, youthKey, youthContentKey, encodeURIComponent(portalKey), encodeURIComponent(youthKey), encodeURIComponent(youthContentKey)].filter((k) => k && k.length > 6)
   .reduce((t, k) => t.split(k).join('***'), String(s));
 
 async function getText(base, params, reqMs = REQ_MS) {
@@ -121,7 +121,9 @@ const FETCHERS = {
          하루 한도가 아니라 짧은 시간 속도 제한이다. 쪽 사이 2.5초 · 1쪽을 넘긴 뒤의 403 은 한 번 30초 쉬고 다시 묻는다(열쇠는 1쪽에서 이미 증명됐다) */
       if (pageNum > 1) await sleep(2500);
       let r = await getText('https://www.youthcenter.go.kr/go/ythip/getPlcy', { apiKeyNm: youthKey, pageNum, pageSize: 100, rtnType: 'json' });
-      if (r.status === 403 && pageNum > 1) {
+      /* 400 도 같은 대접 — 정찰에서 이 매개변수는 1~33쪽 전부 200 이었다. 그래서 뒤쪽 400('invalid param data')도 같은 속도 제한일 가능성이 높다
+         (확정은 아니다 — 오류에 쪽 번호가 붙으니 다시 나면 그 쪽으로 가린다) */
+      if ((r.status === 403 || r.status === 400) && pageNum > 1) {
         await sleep(30000);
         r = await getText('https://www.youthcenter.go.kr/go/ythip/getPlcy', { apiKeyNm: youthKey, pageNum, pageSize: 100, rtnType: 'json' });
       }
@@ -179,13 +181,11 @@ const KEY_NAME = { kstartup: 'DATA_GO_KR_KEY', vol1365: 'DATA_GO_KR_KEY', youthP
    저장하지 않는다 · 열쇠는 가린다 · 워크플로 수동 실행의 probe 입력으로 켠다(2026-10-02 · 온통청년 'invalid param data' 진단) ── */
 if (process.argv.includes('--probe')) {
   const P = (n, size = 100) => [`청년정책 pageNum=${n} pageSize=${size}`, 'https://www.youthcenter.go.kr/go/ythip/getPlcy', { apiKeyNm: youthKey, pageNum: n, pageSize: size, rtnType: 'json' }];
-  /* 청년콘텐츠 원문 주소 — 주소가 빈 글 7건(2026-10-02)을 살릴 근거가 있는가: 주소가 있는 글의 주소가 bbsSn·pstSn 과 같은 꼴인지 본다 */
-  const tries = [];
-  try {
-    const r = await fetch(`https://www.youthcenter.go.kr/go/ythip/getContent?${new URLSearchParams({ apiKeyNm: youthContentKey, pageNum: 1, pageSize: 10, rtnType: 'json' })}`, { signal: AbortSignal.timeout(60000) });
-    const rows = findRows(JSON.parse(await r.text()), 'pstTtl') || [];
-    for (const x of rows) console.log(`[정찰] 콘텐츠 bbsSn=${x.bbsSn} pstSn=${x.pstSn} pstSeNm=${x.pstSeNm} url=${JSON.stringify(x.pstUrlAddr)} · ${String(x.pstTtl).slice(0, 30)}`);
-  } catch (e) { console.log(`[정찰] 콘텐츠 실패 ${e.name}`); }
+  /* 쪽 하나씩 — 상태·걸린 시간·응답 머리만(열쇠 가림). 진단할 것이 바뀌면 이 목록만 고친다 */
+  const tries = [
+    ['청년정책 1쪽', 'https://www.youthcenter.go.kr/go/ythip/getPlcy', { apiKeyNm: youthKey, pageNum: 1, pageSize: 10, rtnType: 'json' }],
+    ['청년콘텐츠 1쪽', 'https://www.youthcenter.go.kr/go/ythip/getContent', { apiKeyNm: youthContentKey, pageNum: 1, pageSize: 10, rtnType: 'json' }],
+  ];
   for (const [label, base, params] of tries) {
     const t0 = Date.now();
     try {

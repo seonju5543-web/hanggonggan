@@ -10368,6 +10368,8 @@ console.log('\n■ 공공 API 로봇 (2026-10-01)');
   eq('  제목으로 못 가르면 게시판 분류(대외활동)를 쓴다 · 다른 분류(취업지원)는 아니다',
     [M.mapYouthContent({ ...cNull, pstTtl: '「2026 보성 두드림 스테이」 추가 모집', pstSeNm: '대외활동' }, opt).item?.kind, M.mapYouthContent({ ...cNull, pstTtl: '「2026 보성 두드림 스테이」 추가 모집', pstSeNm: '취업지원' }, opt).drop],
     ['대외활동', '공모전·대외활동 아님(소식 글 등)']);
+  eq('  게시판 분류가 대외활동이어도 장학 제목은 활동 글이 아니다', !!M.mapYouthContent({ ...cNull, pstTtl: '2026 ○○재단 장학생 모집', pstSeNm: '대외활동' }, opt).drop, true);
+  eq('  받는 순서 — 청년콘텐츠가 청년정책보다 먼저(예산을 청년정책이 다 쓰지 않게)', Object.keys(M.API_SOURCES).indexOf('youthContent') < Object.keys(M.API_SOURCES).indexOf('youthPolicy'), true);
   /* 응답 껍데기 */
   eq('findRows — 껍데기 이름을 몰라도 행 배열을 찾는다', M.findRows({ resultCode: 200, result: { pagging: {}, youthPolicyList: [{ plcyNm: 'a' }, { plcyNm: 'b' }] } }, 'plcyNm').length, 2);
   eq('  모양을 모르면 null(0건과 다르다)', M.findRows({ errorCode: 'e001' }, 'plcyNm'), null);

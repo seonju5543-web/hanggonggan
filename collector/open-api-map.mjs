@@ -27,8 +27,9 @@ import { titleKey } from './url-key.mjs';
 export const API_SOURCES = {
   kstartup: { name: 'K-Startup 사업공고', cap: 15 },
   vol1365: { name: '1365 봉사참여정보', cap: 15 },
-  youthPolicy: { name: '온통청년 청년정책', cap: 15 },
+  /* 순서 = 받는 순서. 청년콘텐츠(작은 3쪽)를 청년정책(33쪽 · 쪽 사이 2.5초)보다 **먼저** — 6분 예산을 청년정책이 다 쓰면 멀쩡한 콘텐츠가 매일 ❌ 가 된다(2026-10-02 리뷰) */
   youthContent: { name: '온통청년 청년콘텐츠', cap: 10 },
+  youthPolicy: { name: '온통청년 청년정책', cap: 15 },
 };
 
 const MAX_LEN = 160;

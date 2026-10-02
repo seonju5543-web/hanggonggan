@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
     inputs:
       probe:
-        description: '정찰만 — 온통청년 매개변수를 바꿔 가며 응답 머리만 찍는다(저장 안 함)'
+        description: '정찰만 — 온통청년 쪽 하나씩 상태·응답 머리만 찍는다(저장·알림 안 함 · 목록은 open-api.mjs --probe)'
         type: boolean
         default: false
   push:
@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     # 다른 브랜치에서 수동 실행하면 그 브랜치 커밋이 기본 브랜치로 rebase 되어 올라간다 — 기본 브랜치에서만 돈다(리뷰 M5)
     if: github.ref_name == 'claude/nice-heisenberg-WESq5'
-    # 로봇 자체 예산 4분(요청 20초 × 3회) + 준비·감사·저장 여유
+    # 로봇 자체 예산 6분(요청 20초 · 청년콘텐츠 45초 × 3회 · 넘겨도 1분 반 안) + 준비·감사·저장 여유
     timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
