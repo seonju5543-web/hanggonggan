@@ -12,9 +12,11 @@
   - 대외활동 · 2026년 이음터 마을동아리 연합 축제 자원봉사자 모집(장안대학교, 협성대학교) (~2026-10-02) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3520393
   - 대외활동 · 10월(오전) 대전수학문화관 대학생 봉사활동 모집 (~2026-10-02) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3521994
   - 대외활동 · 10월(오후) 대전수학문화관 대학생 봉사활동 모집 (~2026-10-02) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3521995
-- ❌ **온통청년 청년정책** — HTTP 400 · invalid param data. · 지난 글 그대로 둠
-- ❌ **온통청년 청년콘텐츠** — 응답 없음(20초 × 3회) · 지난 글 그대로 둠
+- ❌ **온통청년 청년정책** — 3쪽 · HTTP 403 · invalid api key. — 열쇠가 아직 활성화 전일 수 있다(승인 뒤 1~2시간) · 계속되면 활용신청 현황과 시크릿 값을 확인 · 지난 글 그대로 둠
+- ✅ **온통청년 청년콘텐츠** — 받은 행 30 · 실은 글 **0** · 버림: 공모전·대외활동 아님(소식 글 등) 23 · 원문 주소 없음 7
+  - 자격 줄 있는 글 0/0 · 원문 안내 있는 글 0/0
+  - 첫 행 칸: `bbsSn, pstSn, pstSeSn, pstSeNm, pstTtl, pstWholCn, pstInqCnt, pstUrlAddr, atchFile, frstRgtrNm, frstRegDt, lastMdfrNm, lastMdfcnDt`
 
-data/activities.json — API 글 27 → **30건** (전체 166건)
+data/activities.json — API 글 30 → **30건** (전체 166건)
 
 > 열쇠·출처 설명: `collector/open-api.mjs` 머리말 · 바꾸는 규칙: `collector/open-api-map.mjs` · 설계: `docs/designs/external-sources.md` §10
