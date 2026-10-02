@@ -223,23 +223,54 @@ function toggleSave(id) {
   /* 🔴 **해제는 findSch 를 요구하지 않는다** (2026-09-07 코드 리뷰).
      데이터에서 내려간 공고를 저장해 둔 학생은, 그것을 찾을 수 없다는 이유로
      영영 지우지 못하게 된다. 없는 것을 새로 담는 것만 막으면 된다. */
-  if (at < 0 && !findSch(id)) return;
+  if (at < 0 && !findSaveTarget(id)) return;
   if (at >= 0) {
-    state.saved.splice(at, 1);
+    /* 되돌리기는 **뺀 줄을 그대로** 제자리에 돌려놓는다(2026-10-02) — 다시 담기(toggleSave)로 되돌리면 데이터에서 빠진 공고·활동은
+       '없는 것을 담지 않는다'에 막혀 영영 못 돌아오고, 활동은 떠 둔 사본까지 잃는다 */
+    const removed = state.saved.splice(at, 1)[0];
     saveState();
-    toast('저장을 해제했어요', { label: '되돌리기', run: () => toggleSave(id) });
+    toast('저장을 해제했어요', { label: '되돌리기', run: () => {
+      if (isSaved(id)) return;
+      state.saved.splice(Math.min(at, state.saved.length), 0, removed);
+      saveState();
+      refreshSaveViews(id);
+    } });
   } else {
-    state.saved.push({ id, savedAt: nowStamp() });
+    /* 대외활동·공모전은 **글 사본을 함께** 담는다(2026-10-02) — 활동 글은 60일·마감 뒤 데이터에서 빠지는데,
+       빠져도 보관함·달력에서 사라지지 않게. 저장 목록은 이 기기에만 있어(서버로 안 감) 동기화와 무관하다 */
+    const act = isActivityId(id) ? findActivity(id.slice(4)) : null;
+    state.saved.push(act ? { id, savedAt: nowStamp(), snap: JSON.parse(JSON.stringify(act)) } : { id, savedAt: nowStamp() });
     saveState();
     toast('보관함에 저장했어요', { label: '보관함', run: () => showScreen('my') });
   }
   refreshSaveViews(id);
 }
-/** 저장한 공고를 **최근 저장 순**으로. 못 찾는 것(데이터에서 내려간 공고)은 조용히 뺀다. */
+/** 저장한 공고를 **최근 저장 순**으로. 못 찾는 것(데이터에서 내려간 공고)은 조용히 뺀다.
+    대외활동·공모전도 같은 목록에 온다(2026-10-02) — 활동은 엔진 모양(activityAsSch)으로 바꿔 장학과 같은 줄로 그린다. */
 function savedScholarships() {
   return state.saved.slice().reverse()
-    .map((s) => findSch(s.id))
+    .map((s) => findSaveTarget(s.id))
     .filter(Boolean);
+}
+
+/* ── 대외활동·공모전 저장·달력 (2026-10-02 개발자 지시: "대외활동도 북마크랑 달력 연결해줘") ──
+   id 는 'act:' + 글 주소(activityAsSch 와 같다 · 장학 id 와 섞이지 않는다). 찾는 길은 **한 곳**(findSaveTarget):
+   장학 id 는 findSch, 활동 id 는 지금 피드의 글 → 없으면 담을 때 떠 둔 사본. 보관함·달력·상세가 이것만 쓴다. */
+const isActivityId = (id) => String(id || '').startsWith('act:');
+function findActivity(url) {
+  return ((liveActivities && liveActivities.items) || []).find((x) => x && x.url === url) || null;
+}
+/* 활동 글 원본(피드 모양) — 피드에 있으면 그것, 없으면 저장할 때 떠 둔 사본 */
+function activityItem(url) {
+  const live = findActivity(url);
+  if (live) return live;
+  const sv = state.saved.find((x) => x.id === `act:${url}`);
+  return (sv && sv.snap) || null;
+}
+function findSaveTarget(id) {
+  if (!isActivityId(id)) return findSch(id);
+  const n = activityItem(id.slice(4));
+  return n ? activityAsSch(n) : null;
 }
 /* 저장 상태가 바뀌면 지금 떠 있는 것만 다시 그린다 — 화면을 통째로 새로 그리면
    스크롤이 맨 위로 튄다(일괄 준비 목록에서 겪은 것과 같은 유형). */
@@ -2872,6 +2903,7 @@ function activityAsSch(n) {
     id: `act:${n.url}`, name: unent(n.title), type: n.kind || '대외활동', eligibility: {},
     eligibilityLines: n.eligibilityLines || [], eligibilityExcludes: n.eligibilityExcludes || [], eligibilityPriority: n.eligibilityPriority || [],
     excerpts: n.noticeLines || [], documents: [], deadline: n.deadline || null,
+    activity: true, amount: `${n.kind || '대외활동'} · ${activityWhere(n)}`,   // 달력·보관함 줄의 둘째 줄(장학은 금액 자리) — 지어낸 값이 아니라 종류·주최
   };
 }
 /* 카드·정렬·시트가 **같은 값**을 쓴다 — getMatches 와 같은 세 함수(evaluateFor · fitScore · fitDetailFor) */
@@ -2887,6 +2919,7 @@ function activityCardHtml(n) {
   const benefit = unent(activityBenefit(n));
   const shortBenefit = benefit && benefit.length <= 20;
   return cardShellHtml({
+    save: saveBtnHtml(`act:${n.url}`),   // 장학 카드와 같은 북마크(카드 바깥 · 2026-10-02)
     attrs: `data-activity="${esc(n.url)}"`,
     org: `${n.kind || '대외활동'} · ${activityWhere(n)}`,
     badge: cardBadgeHtml(m.fit, m.fd, null),   // 장학 카드와 같은 판정 하나(적합도 % · 자격 미확인 · 지원 자격 미달)
@@ -2899,7 +2932,7 @@ function activityCardHtml(n) {
 }
 
 function openActivityDetail(url) {
-  const n = (liveActivities && liveActivities.items || []).find((x) => x && x.url === url);
+  const n = activityItem(url);   // 피드에서 빠졌어도 저장해 둔 글이면 사본으로 연다
   if (!n) return;
   const { sch, result, fit, fd } = activityFit(n);
   const d = n.deadline ? dday(n.deadline) : null;
@@ -2919,6 +2952,7 @@ function openActivityDetail(url) {
       <div class="sch-top sheet-top">
         ${d ? `<span class="badge badge-dday ${d.cls}">${esc(d.label)}</span>` : ''}
         <span class="badge badge-kind">${esc(n.kind || '대외활동')}</span>
+        ${saveBtnHtml(`act:${n.url}`)}
       </div>
       <h3 class="sheet-title">${esc(unent(n.title))}</h3>
       ${benefit ? `<p class="sheet-amount">${esc(benefit)}</p>` : ''}
@@ -3792,6 +3826,8 @@ function eligibilityRowsHtml(sch, result) {
 }
 
 function openDetail(id) {
+  /* 대외활동 줄(달력·보관함)은 활동 시트로 — 같은 [data-detail] 길로 들어온다(2026-10-02) */
+  if (isActivityId(id)) { openActivityDetail(id.slice(4)); return; }
   const sch = appSch(id);   // 데이터에서 내려갔어도 결과를 적기 전이면 떠 둔 사본으로 연다(2026-10-02)
   if (!sch) return;
   const result = evaluateFor(sch, state.profile);   // 카드와 같은 판정을 쓴다(위 주석)
@@ -4734,7 +4770,7 @@ function calContext() {
   const ids = new Set();
   state.applications.forEach((a) => ids.add(a.id));
   state.saved.forEach((s) => ids.add(s.id));
-  const mine = [...ids].map((id) => byId.get(id)).filter(Boolean);
+  const mine = [...ids].map((id) => byId.get(id) || (isActivityId(id) ? findSaveTarget(id) : null)).filter(Boolean);   // 저장한 대외활동도 '내 공고'(2026-10-02)
   return { all, byId, mine };
 }
 /** 내 공고 = 신청한 것 + 저장한 것. 달력에 상시로 찍히는 것은 이것뿐이다. */

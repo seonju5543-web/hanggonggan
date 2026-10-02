@@ -4697,7 +4697,7 @@ console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08
   }
   eq('  사본으로 연 시트에서는 신청을 시작·이어가지 않는다(양식 흐름이 넘어진다)', /const gone = !findSch\(id\);\s*const canApply = lock\.canApply && !gone;/.test(allApp), true);
   eq('  사본은 공고 목록을 다 받았을 때만 뜨고, 바뀌었을 때만 적는다', /function snapApplications\(resolve\) \{\s*if \(appsDataState\(\) !== 'ok'\) return false;/.test(allApp) && /if \(a\.snap && JSON\.stringify\(a\.snap\) === json\) continue;/.test(allApp), true);
-  eq('  상세 시트·패널의 제출/결과 단추가 사본으로도 찾는다(appSch)', /function openDetail\(id\) \{\s*const sch = appSch\(id\);/.test(allApp) && /const sch = appSch\(id\);   \/\/ 사본으로 보이는 줄의 단추도/.test(allApp), true);
+  eq('  상세 시트·패널의 제출/결과 단추가 사본으로도 찾는다(appSch)', /function openDetail\(id\) \{[\s\S]{0,200}?const sch = appSch\(id\);/.test(allApp) && /const sch = appSch\(id\);   \/\/ 사본으로 보이는 줄의 단추도/.test(allApp), true);
   eq('  내려간 공고에 결과를 적으면 줄이 사라지므로 실행 취소를 준다', /if \(!findSch\(sch\.id\)\) toast\([^\n]*\{ label: '실행 취소', run: \(\) => undoProgress\(sch\.id\) \}\)/.test(allApp), true);
   eq("  '목록에서 내려감' 카드는 없다", /appCardGone|badge-gone/.test(readText(new URL('../app.js', import.meta.url))), false);
   /* 되돌리기는 공고를 요구하면 안 된다 — 요구하면 사라진 공고의 기록이 영영 안 지워진다
@@ -10545,6 +10545,12 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
   eq('  시트 판정 머리 · 묻기 상자(다시 그릴 때 이 시트로)', /function openActivityDetail[\s\S]*?fitBadgeHtml\(fit, fd, \{ full: true \}\)[\s\S]*?eligAskHtml\(sch\)[\s\S]*?eligAskWire\(sch, \(\) => openActivityDetail\(url\)\)/.test(appX), true);
   eq('  묻기 상자는 다시 그리는 길을 받는다(기본은 장학 openDetail 그대로)', /function eligAskWire\(sch, reopen = \(\) => openDetail\(sch\.id\)\)/.test(appX) && /function eligAskSave\(sch, reopen = \(\) => openDetail\(sch\.id\)\)/.test(appX), true);
   eq('  적합도순 — 장학 탐색과 같은 잣대(fitRank 먼저)', /fit: \{ label: '적합도순' \}/.test(appX) && /fitRank\(fa\) - fitRank\(fb\) \|\| fb\.fit - fa\.fit/.test(appX), true);
+  /* ⑦ 북마크·달력 (2026-10-02) — 장학과 같은 저장 목록(state.saved) · 찾는 길은 findSaveTarget 한 곳 */
+  eq('⑦ 저장·보관함·달력이 같은 찾기(findSaveTarget)를 쓴다', [/if \(at < 0 && !findSaveTarget\(id\)\) return;/.test(appX), /\.map\(\(s\) => findSaveTarget\(s\.id\)\)/.test(appX), /byId\.get\(id\) \|\| \(isActivityId\(id\) \? findSaveTarget\(id\) : null\)/.test(appX)], [true, true, true]);
+  eq('  활동은 담을 때 글 사본을 함께(60일·마감 뒤 피드에서 빠져도 남게)', /snap: JSON\.parse\(JSON\.stringify\(act\)\)/.test(appX), true);
+  eq('  달력·보관함 줄(data-detail)이 활동이면 활동 시트로', /if \(isActivityId\(id\)\) \{ openActivityDetail\(id\.slice\(4\)\); return; \}/.test(appX), true);
+  eq('  카드·시트에 장학과 같은 북마크(saveBtnHtml)', /save: saveBtnHtml\(`act:\$\{n\.url\}`\)/.test(appX) && /\$\{saveBtnHtml\(`act:\$\{n\.url\}`\)\}/.test(appX), true);
+  eq('  저장 해제의 되돌리기는 뺀 줄을 그대로 돌려놓는다(다시 담기는 빠진 공고에 막힌다)', /const removed = state\.saved\.splice\(at, 1\)\[0\];[\s\S]{0,400}state\.saved\.splice\(Math\.min\(at, state\.saved\.length\), 0, removed\)/.test(appX), true);
   eq('  지원 가능 알약(STATUS_META)은 활동 시트에 없다 — 구조화 조건이 없어 늘 가능이라 거짓 안심', /STATUS_META\[/.test((() => { const a = appX.indexOf('function openActivityDetail'); return appX.slice(a, appX.indexOf('\nfunction ', a + 10)); })()), false);
 }
 
