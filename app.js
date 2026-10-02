@@ -3626,12 +3626,20 @@ function schoolPortalNote(sch) {
    🔴 링크 이름은 그 주소가 **실제로 여는 화면**을 말한다(아래 openDetail 의 두 문단 참조).
       시트마다 따로 적으면 한쪽만 '원문 공고'라고 거짓말하게 된다. */
 function sourceNoteHtml(sch) {
+  return sch.sourceUrl
+    ? `<p class="doc-legend">자세한 내용은 ${sourceLinkHtml(sch)}에서 확인</p>`
+    : '<p class="doc-legend">자세한 내용은 원문 공고에서 확인</p>';
+}
+
+/* 원문 링크 하나(`원문 공고 ↗`) — 이름 규칙은 여기 한 곳. 상세 시트 맨 아래 한 줄도 이것을 쓴다.
+   주소가 없으면 링크 없이 '원문 공고 확인' 글자만 돌려준다. */
+function sourceLinkHtml(sch) {
   const srcLabel = sch.program ? '한국장학재단 ↗'
     : sch.sourceKind === 'kosaf' ? '재단 홈페이지 ↗'
     : isBoardListLink(sch.sourceUrl) ? '게시판 목록 ↗' : '원문 공고 ↗';
   return sch.sourceUrl
-    ? `<p class="doc-legend">자세한 내용은 <a href="${esc(safeUrl(sch.sourceUrl))}" target="_blank" rel="noopener">${srcLabel}</a>에서 확인</p>`
-    : '<p class="doc-legend">자세한 내용은 원문 공고에서 확인</p>';
+    ? `<a href="${esc(safeUrl(sch.sourceUrl))}" target="_blank" rel="noopener">${srcLabel}</a>`
+    : '원문 공고 확인';
 }
 
 /* 상세 시트의 '지원 자격' 줄들 — 장학(openDetail)과 대외활동·공모전(openActivityDetail)이 **한 함수**를 쓴다 (2026-10-01 개발자 지시:
@@ -3792,7 +3800,7 @@ function openDetail(id) {
      '한국장학재단 ↗'이라 적어 두면 눌러 본 학생에게 거짓말이 된다 — 이 규칙(링크 이름은
      그 주소가 **실제로 여는 화면**을 말한다)은 바로 윗 문단이 이미 적어 둔 것이다.
      KOSAF 를 가리키는 것은 `program`(data.js 의 상시 제도)뿐이다. */
-  const srcNote = sourceNoteHtml(sch);
+  const srcLink = sourceLinkHtml(sch);
 
   let btnLabel = '신청 준비 시작';
   if (app && !app.pending) btnLabel = '신청 준비 완료됨';
@@ -3850,7 +3858,7 @@ function openDetail(id) {
            하나씩 붙이는 것이 그 전제다 — 배지를 빼면 이 클래스도 같이 빼야 한다. */ ''}
       ${/* 🔴 '원문에서 확인하라'는 안내 줄(DOC_PLACEHOLDER)은 서류가 아니다 (2026-09-23 리뷰) —
            '직접' 배지를 달면 그 문장을 챙겨야 할 서류처럼 읽는다. 목록에서 빼고, 남는 서류가
-           없으면 목록 대신 그 안내를 한 줄로 말한다(맨 아래 sheet-facts 의 srcNote 가 링크를 준다). */ ''}
+           없으면 목록 대신 그 안내를 한 줄로 말한다(맨 아래 sheet-facts 의 srcLink 가 링크를 준다). */ ''}
       ${(() => {
         const docs = sch.documents.filter((doc) => !DOC_PLACEHOLDER.test(doc));
         if (!docs.length) return '<p class="doc-legend">제출 서류는 공고 원문에서 확인해 주세요.</p>';
@@ -3874,13 +3882,18 @@ function openDetail(id) {
       </ul>` : ''}
       ${/* 🔴 마감일·중복 수혜 · 문의 · 원문 링크는 **맨 아래 한 묶음**이다 (2026-10-02 CTO 지시).
            예전엔 문의는 지원 자격 아래, 링크는 제출 서류 아래(공고 원문 안내 아래에 한 번 더),
-           마감일은 첨부 아래로 흩어져 있었다. srcNote 는 여기서 **한 번만** 쓴다. */ ''}
+           마감일은 첨부 아래로 흩어져 있었다. 원문 링크(srcLink)는 여기서 **한 번만** 쓴다.
+           🔴 **한 줄(한 문단)** 이다 — 같은 날 CTO 지시 "한 문단으로, 반복 지우고 간결하게".
+              '자세한 내용은 … 에서 확인' 같은 군말 없이 `마감 · 중복 수혜 · 문의 · 링크` 를 점으로 잇는다.
+              링크는 `.doc-legend a` 그대로 둔다(verify-source-links 가 그 선택자로 읽는다). */ ''}
       <div class="sheet-facts">
-        <p class="sheet-deadline">${sch.program ? '신청 기간: 한국장학재단 공지 확인' : `마감일 ${sch.deadline || '원문 공고 확인'}`} · ${sch.duplicable ? '타 장학금과 중복 수혜 가능' : '중복 수혜 제한 있음'}</p>
-        ${(sch.sourceKind === 'kosaf' && sch.contact)
-          ? `<p class="doc-legend">문의 ${esc(sch.contact)}</p>` : ''}
-        ${srcNote}
-        ${(!sch.program && isBoardListLink(sch.sourceUrl)) ? `<p class="doc-legend">이 학교 게시판은 목록에서 글을 눌러야 열리는 방식이라 공고 하나로 바로 가는 주소를 확인하지 못했습니다. 열리는 목록에서 <strong>${esc(boardListTitle(sch.sourceUrl))}</strong>을(를) 찾아 눌러 주세요.</p>` : ''}
+        <p class="doc-legend sheet-deadline">${[
+          sch.program ? '신청 기간은 한국장학재단 공지 확인' : `마감 ${sch.deadline || '원문 확인'}`,
+          sch.duplicable ? '중복 수혜 가능' : '중복 수혜 제한',
+          (sch.sourceKind === 'kosaf' && sch.contact) ? `문의 ${esc(sch.contact)}` : '',
+          srcLink,
+        ].filter(Boolean).join(' · ')}${(!sch.program && isBoardListLink(sch.sourceUrl))
+          ? `<br />목록에서 <strong>${esc(boardListTitle(sch.sourceUrl))}</strong>을(를) 찾아 눌러 주세요.` : ''}</p>
       </div>
 
       ${app && !app.pending ? (() => {

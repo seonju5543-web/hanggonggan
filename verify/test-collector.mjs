@@ -7796,11 +7796,15 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
     const od = appSrc2.slice(appSrc2.indexOf('function openDetail('), appSrc2.indexOf('function openDetail(') + 20000);
     const body = od.slice(0, od.indexOf('\n}\n'));
     const facts = body.slice(body.indexOf('<div class="sheet-facts">'), body.indexOf('</div>', body.indexOf('<div class="sheet-facts">')));
-    eq('상세 시트: 원문 링크(srcNote)는 한 번만 그린다', (body.match(/\$\{srcNote\}/g) || []).length, 1);
+    eq('상세 시트: 원문 링크는 한 번만 그린다', (body.match(/srcNote|srcLink,|\$\{srcLink\}/g) || []).length, 1);
     eq('  마감일 · 문의 · 원문 링크가 맨 아래 묶음(.sheet-facts) 안에 있다',
-      facts.length > 0 && /class="sheet-deadline"/.test(facts) && /문의 \$\{esc\(sch\.contact\)\}/.test(facts)
-      && /\$\{srcNote\}/.test(facts), true);
+      facts.length > 0 && /sheet-deadline/.test(facts) && /`문의 \$\{esc\(sch\.contact\)\}`/.test(facts)
+      && /srcLink,/.test(facts), true);
     eq('  묶음 밖에 문의 줄이 남아 있지 않다', (body.match(/문의 \$\{esc\(sch\.contact\)\}/g) || []).length, 1);
+    /* 같은 날 2차 지시: 세 줄을 **한 문단**으로 — 묶음 안에 <p> 가 하나뿐이고 군말('자세한 내용은')이 없다 */
+    eq('  묶음은 한 문단이다 (<p> 하나 · 점으로 잇는다)',
+      (facts.match(/<p[\s>]/g) || []).length === 1 && /\.join\(' · '\)/.test(facts), true);
+    eq("  군말 '자세한 내용은 … 에서 확인' 이 없다", /자세한 내용은/.test(facts), false);
   }
 }
 
