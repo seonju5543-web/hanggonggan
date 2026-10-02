@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-10-02",
- "count": 2170,
+ "count": 2175,
  "items": [
   {
    "title": "2027학년도 해동과학문화재단 장학생 모집 안내",
@@ -112,6 +112,15 @@
    "foundAt": "2026-10-02"
   },
   {
+   "title": "2026학년도 AX미래장학금 장학생 선발 결과 공고",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5#n-2026%ED%95%99%EB%85%84%EB%8F%84%20AX%EB%AF%B8%EB%9E%98%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EA%B2%B0%EA%B3%BC%20%EA%B3%B5%EA%B3%A0",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "중앙대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
    "title": "[학부] 2026년 2학기 선원가족장학금 신청 안내",
    "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367225&article.offset=0&articleLimit=10",
    "attachments": [
@@ -207,6 +216,64 @@
     }
    ],
    "deadlineHint": "신청 기한 및 방법 : 2026.10.6(화).12시까지&nbsp;장학복지팀 또는 학생복지팀에 직접 제출(메일제출 불가) 6. 기타사항 :&nb",
+   "school": "가천대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[장학공지] RE:(생활비)2027학년도 (재)미래인재육성재단 신규장학생 선발결과 안내",
+   "url": "https://www.gachon.ac.kr/kor/7986/subview.do?nttId=125809",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "가천대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[장학공지] RE:(생활비)2026-2학기 (주)아이오알코리아 장학생 선발결과 안내",
+   "url": "https://www.gachon.ac.kr/kor/7986/subview.do?nttId=125811",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "가천대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[장학공지] 2027년도 대산농촌재단 장학생 선발 안내",
+   "url": "https://www.gachon.ac.kr/kor/7986/subview.do?nttId=125842",
+   "attachments": [
+    {
+     "name": "붙임12027대산장학생선발공지.jpg",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/156317/download.do"
+    },
+    {
+     "name": "붙임22027대산장학생선발요강.pdf",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/156318/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "가천대학교",
+   "campus": "",
+   "foundAt": "2026-10-02"
+  },
+  {
+   "title": "[장학공지] 2026년 우양재단 동행 장학생 모집 안내(가족 돌봄 청년 대상)",
+   "url": "https://www.gachon.ac.kr/kor/7986/subview.do?nttId=125843",
+   "attachments": [
+    {
+     "name": "우양재단2026-2동행장학생-장학모집공문.pdf",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/156319/download.do"
+    },
+    {
+     "name": "우양재단2026-2동행장학생-신청서식.hwp",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/156320/download.do"
+    },
+    {
+     "name": "우양재단2026-2동행장학생-포스터.jpg",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/156321/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026. 10. 1.(목) ~ 10. 18.(일) 2. 대상 : 국내 4년제 대학 또는 2~3년제 전문대학 재학생 중 학자금지원구",
    "school": "가천대학교",
    "campus": "",
    "foundAt": "2026-10-02"
