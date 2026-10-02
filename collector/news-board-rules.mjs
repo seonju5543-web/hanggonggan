@@ -326,6 +326,7 @@ export function collapseSamePost(items) {
     if (!/#n-/.test(String(n.url || '')) || !/^\[/.test(String(n.title || ''))) return;
     const c = badged.get(`${n.school}|${listOf(n)}|${String(n.title).trim()}`) || [];
     if (c.length !== 1) return;
+    if (n.postId && out[c[0]].postId && n.postId !== out[c[0]].postId) return;   // 글 번호가 둘 다 있고 다르면 다른 글이다 (검증 2026-10-02)
     out[c[0]] = merge2(out[c[0]], n, out[c[0]]);
     drop.add(i);
   });

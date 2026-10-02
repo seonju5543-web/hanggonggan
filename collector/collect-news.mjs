@@ -81,6 +81,7 @@ function loadPublished() {
 
 const results = [];
 const freshAll = [];
+const postIdByUrl = new Map();   // 이번에 본 글의 주소 열쇠 → 글 번호 (10차 전에 실린 글에도 번호를 달아 준다 · 발행 때 씀)
 const boards = (cfg.sources || []).map((s) => ({ ...s }));
 const boardLabel = (s) => (s.campus && s.campus !== '공통' ? `${s.school} ${s.campus}` : s.school);
 const todayStr = () => new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);   // KST — 발행 색인·찾기 로봇·관리자와 같은 시계 (07:19 KST 실행이 어제 날짜를 찍지 않게)
@@ -117,6 +118,12 @@ async function harvestBoard(s, ctx = { dead: false }) {
     /* 이미 본 글 — 주소 열쇠 또는 **게시판의 글 번호**(postId). 목록 표식(#n-제목) 주소는 제목을 다듬는 규칙이 바뀌면 달라져
        같은 글이 새 글로 다시 실렸다(경희 6건 두 번 · 리뷰 2026-10-02). 글 번호가 있으면 그것이 열쇠다. */
     const postKey = (i) => (i.postId ? `post:${s.school}:${i.postId}` : '');
+    /* 이미 본 글에도 글 번호 장부를 채운다 (검증 2026-10-02: 10차 전에 본 글은 번호가 없어, 제목이 바뀌면 다시 두 번 실렸다) */
+    for (const i of items) {
+      if (!i.postId) continue;
+      postIdByUrl.set(urlKey(i.url), i.postId);
+      if (seen[urlKey(i.url)] && !seen[postKey(i)]) seen[postKey(i)] = seen[urlKey(i.url)];
+    }
     const fresh = items.filter((i) => !seen[urlKey(i.url)] && !(i.postId && seen[postKey(i)])).slice(0, NEWS_FRESH_MAX);
     /* 🔴 규칙으로 만든 상세 주소는 매번 첫 글 하나를 실제로 열어 제목을 확인한다 — 안 맞으면 이 게시판은 싣지 않는다(틀린 링크보다 0건). */
     if (needsDetailCheck(rule) && fresh.length) {
@@ -191,6 +198,7 @@ all = all.filter((n) => !isAttachmentEntry(n));
 all = all.filter((n) => !n.postedAt || n.postedAt >= postedCutoff());   // 소급 — 게시일 상한 (규칙이 바뀌면 실린 글도 같은 잣대)
 /* 소급(원칙 7) — 실을지 규칙(news-kind)이 바뀌면 이미 실린 글도 같은 잣대로 다시 거른다. 2차 실행 뒤 메뉴·바닥글 잡음을 이것으로 걷었다. */
 all = all.filter((n) => isNewsRow(n, { scholarship: KEYWORDS, activityKind, isAttachmentEntry }));
+for (const n of all) if (!n.postId && postIdByUrl.has(urlKey(n.url))) n.postId = postIdByUrl.get(urlKey(n.url));   // 실려 있던 글에 이번에 본 글 번호를 단다
 all = collapseSamePost(all);   // 같은 글이 제목 다듬기 차이로 두 번 실린 것을 합친다 (글 번호 · 목록 표식 제목의 분류 꼬리표 · 소급)
 all = dedupeNotices(all);
 all = dropUnserved(all);
