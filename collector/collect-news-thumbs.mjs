@@ -134,14 +134,36 @@ async function thumbFor(n, ctx) {
   return { none: cands.length ? `사진으로 쓸 그림 없음 (${why})` : '글에 그림이 없음' };
 }
 
-/* ①~③ */
+/* 대표 이미지(og)로 받았던 썸네일은 버리고 다시 찾는다 — og 는 이제 후보가 아니다(첫 실행 16/16 이 학교 로고·공통 사진 · news-thumb.mjs) */
+for (const [k, e] of Object.entries(ledger.posts)) if (e.from === 'og') delete ledger.posts[k];
+
+/* ①~③ — **학교 여럿을 동시에**(LANES), 한 학교 안에서는 하나씩 틈을 두고 (첫 실제 실행: 하나씩 돌면 2.5분에 45건 — 쌓인 515건에 6일).
+   한 학교를 몰아치지 않는 규칙은 그대로다(같은 학교 요청은 늘 차례로 · 글 사이 GAP_MS). */
+const LANES = Number(process.env.NEWS_THUMB_LANES || 4);
 let done = 0;
 if (sharp && MODE !== 'off') {
   const queue = T.planQueue(items, ledger, { today, perSchool: PER_SCHOOL, noThumb, fileExists });
   const requeued = new Set();
-  for (let i = 0; i < queue.length; i += 1) {
-    if (Date.now() - t0 > BUDGET_MS) { runLog.push({ school: '—', title: `⏰ 예산(${Math.round(BUDGET_MS / 1000)}초) 소진 — 남은 ${queue.length - i}건은 다음 실행에`, result: '' }); break; }
-    const n = queue[i]; const key = T.thumbKey(n);
+  const lanes = new Map();
+  for (const n of queue) { if (!lanes.has(n.school)) lanes.set(n.school, []); lanes.get(n.school).push(n); }
+  /* 돌아가며 — 학교 줄에서 한 건씩 꺼내 처리하고 그 학교를 줄 끝으로 보낸다. 한 학교는 한 번에 한 일꾼만 잡는다(꺼낸 동안 줄에 없다).
+     학교마다 한 줄씩 다 비우는 식이면 예산이 끝날 때 뒤쪽 학교가 매번 0건이었다. */
+  const ready = [...lanes.keys()];
+  let budgetNoted = false;
+  const worker = async () => {
+    for (;;) {
+      if (Date.now() - t0 > BUDGET_MS) { if (!budgetNoted) { budgetNoted = true; runLog.push({ school: '—', title: `⏰ 예산(${Math.round(BUDGET_MS / 1000)}초) 소진 — 남은 ${[...lanes.values()].reduce((a, l) => a + l.length, 0)}건은 다음 실행에`, result: '' }); } return; }
+      const school = ready.shift();
+      if (!school) return;
+      const list = lanes.get(school);
+      const n = list.shift();
+      if (n) { await one(n, list); await new Promise((res) => setTimeout(res, GAP_MS)); }
+      if (list.length) ready.push(school);
+    }
+  };
+  /* 글 하나 — 결과를 장부에 적고, 공통 그림이 드러났으면 그 그림을 받은 같은 학교 글을 되돌려 그 학교 줄 끝에 다시 넣는다 */
+  const one = async (n, list) => {
+    const key = T.thumbKey(n);
     const ctx = { dead: false };
     const r = await withDeadline(thumbFor(n, ctx).catch((e) => ({ err: `오류 (${String(e && e.message || e).slice(0, 80)})` })), ITEM_HARD_MS);
     if (r === TIMED_OUT) ctx.dead = true;
@@ -152,14 +174,14 @@ if (sharp && MODE !== 'off') {
       : { at: today, school: n.school, err: out.err, tries: ((prev && prev.err && prev.tries) || 0) + 1 };
     runLog.push({ school: n.school, title: n.title, result: out.file ? `✅ ${out.from}` : out.none ? '— 없음' : '⚠️ 실패', note: out.file ? `${out.note} · ${out.file} ← ${String(out.src).slice(0, 120)}` : (out.none || out.err) });
     done += 1;
-    /* 이 글로 공통 그림이 드러났으면 그 그림을 썸네일로 받은 다른 글을 되돌려 다시 찾는다(같은 실행 안에서 한 번) */
+    /* 이 글로 공통 그림이 드러났으면 그 그림을 썸네일로 받은 다른 글을 되돌려 다시 찾는다(같은 실행 안에서 한 번 · 같은 학교 줄 끝에) */
     for (const k of T.revokeRepeated(ledger, n.school)) {
       const back = items.find((x) => T.thumbKey(x) === k);
       runLog.push({ school: n.school, title: back ? back.title : k, result: '↩️ 되돌림', note: '썸네일이 여러 글의 공통 그림이었음 — 다시 찾음' });
-      if (back && !requeued.has(k)) { requeued.add(k); queue.push(back); }
+      if (back && !requeued.has(k)) { requeued.add(k); list.push(back); }
     }
-    await new Promise((res) => setTimeout(res, GAP_MS));
-  }
+  };
+  await Promise.all(Array.from({ length: Math.max(1, LANES) }, worker));
 }
 
 /* ④ 소급 입히기 · 고아 파일 지우기 · 장부 다듬기 */
