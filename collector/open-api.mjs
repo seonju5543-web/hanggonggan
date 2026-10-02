@@ -171,8 +171,8 @@ const KEY_NAME = { kstartup: 'DATA_GO_KR_KEY', vol1365: 'DATA_GO_KR_KEY', youthP
    저장하지 않는다 · 열쇠는 가린다 · 워크플로 수동 실행의 probe 입력으로 켠다(2026-10-02 · 온통청년 'invalid param data' 진단) ── */
 if (process.argv.includes('--probe')) {
   const P = (n, size = 100) => [`청년정책 pageNum=${n} pageSize=${size}`, 'https://www.youthcenter.go.kr/go/ythip/getPlcy', { apiKeyNm: youthKey, pageNum: n, pageSize: size, rtnType: 'json' }];
-  const tries = [P(2), P(5), P(10), P(11), P(20), P(31), P(32), P(33), P(101, 10), P(316, 10), P(317, 10),
-    ['청년콘텐츠 pageNum=2 pageSize=10', 'https://www.youthcenter.go.kr/go/ythip/getContent', { apiKeyNm: youthContentKey, pageNum: 2, pageSize: 10, rtnType: 'json' }]];
+  /* 하루 한도인가 속도 제한인가 — 1쪽 하나로 지금 열쇠가 살아 있는지부터 본다(2026-10-02 · 3쪽에서 'invalid api key') */
+  const tries = [P(1, 10)];
   for (const [label, base, params] of tries) {
     const t0 = Date.now();
     try {
