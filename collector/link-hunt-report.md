@@ -1,40 +1,44 @@
-## 🎯 링크 사냥꾼 리포트 (2026-10-02 18:10 KST)
+## 🎯 링크 사냥꾼 리포트 (2026-10-02 18:50 KST)
 
-사냥 대상 **0건** (게시판 0곳) · 포기 처리된 건 24건
+사냥 대상 **4건** (게시판 3곳) · 포기 처리된 건 24건
 
 ## 1단계 · 사냥 (원문 공고가 안 열리는 링크 고치기 — 본업)
+### https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5
+  - ✅ 2026학년도 AX미래장학금 장학생 선발 결과 공고 → https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOA
+
+### https://www.kyonggi.ac.kr/www/selectBbsNttList.do?key=7520&bbsNo=1073&pageUnit=10&sf.pnos=1073&sf.pnos=888&searchCnd=WRTER&searchKrwd=%EC%9E%A5%ED%95%99
+    · 탈락(제목 불일치(다른 글이 열림)) https://www.kyonggi.ac.kr/www/selectBbsNttList.do?key=7520&bbsNo=1073&pageUnit=10&sf.pnos=888&se
+    · 탈락(제목 불일치(다른 글이 열림)) https://www.kyonggi.ac.kr/www/selectBbsNttList.do?key=7520&bbsNo=1073&pageUnit=10&sf.pnos=888&se
+    · 탈락(제목 불일치(다른 글이 열림)) https://www.kyonggi.ac.kr/www/selectBbsNttList.do?key=7520&bbsNo=1073&pageUnit=10&sf.pnos=888&se
+    · 탈락(제목 불일치(다른 글이 열림)) https://www.kyonggi.ac.kr/www/selectBbsNttList.do?key=7520&bbsNo=1073&pageUnit=10&sf.pnos=888&se
+  - ⚠️ 실패(제목 불일치(다른 글이 열림)): [입학에서 취업까지] [대산농촌재단] 2027년도 대산농촌재단 장학생 선발 
+    · 탈락(제목 불일치(다른 글이 열림)) https://www.kyonggi.ac.kr/www/selectBbsNttList.do?key=7520&bbsNo=1073&pageUnit=10&sf.pnos=888&se
+    · 탈락(제목 불일치(다른 글이 열림)) https://www.kyonggi.ac.kr/www/selectBbsNttList.do?key=7520&bbsNo=1073&pageUnit=10&sf.pnos=888&se
+    · 탈락(제목 불일치(다른 글이 열림)) https://www.kyonggi.ac.kr/www/selectBbsNttList.do?key=7520&bbsNo=1073&pageUnit=10&sf.pnos=888&se
+    · 탈락(제목 불일치(다른 글이 열림)) https://www.kyonggi.ac.kr/www/selectBbsNttList.do?key=7520&bbsNo=1073&pageUnit=10&sf.pnos=888&se
+  - ⚠️ 실패(제목 불일치(다른 글이 열림)): [입학에서 취업까지] [우양재단] 2026년 우양재단 동행 장학생 모집 안내
+
+### https://www.jbnu.ac.kr/web/news/notice/sub01.do?category=6
+    · 탈락(로그인 요구(학생이 못 봄)) https://www.jbnu.ac.kr/web/Board/218051/detailView.do?pageIndex=1&category=6&menu=2377
+    · 탈락(로그인 요구(학생이 못 봄)) https://www.jbnu.ac.kr/web/news/notice/sub01.do?category=6&nttId=218051
+  - ⚠️ 실패(로그인 요구(학생이 못 봄)): (재)hy사회복재단 2026년 든든 학업지원 장학생 선발 안내
+
+## 3단계 · 끈질기게 (다른 게시판 · 학교 사이트 검색)
+- 아직 못 찾은 3건에 대해 다른 방법을 시도합니다
+  - ⚠️ 다른 경로에서도 못 찾음 (1곳 시도): [입학에서 취업까지] [대산농촌재단] 2027년도 대산농촌재단 장학생 선
+  - ⚠️ 다른 경로에서도 못 찾음 (1곳 시도): [입학에서 취업까지] [우양재단] 2026년 우양재단 동행 장학생 모집 
+  - ⚠️ 다른 경로에서도 못 찾음 (1곳 시도): (재)hy사회복재단 2026년 든든 학업지원 장학생 선발 안내
+- 3단계 추가 확보: 0건
+
 
 ## 덤 · 순찰 (멀쩡해 보이는 링크가 정말 그 공고로 가는가)
-### https://www.sogang.ac.kr
-- 순찰 2건 · 통과 2 · 못 읽음 0 · **학생이 못 보는 링크 0**
-### https://www.skku.edu
-- 순찰 1건 · 통과 1 · 못 읽음 0 · **학생이 못 보는 링크 0**
-### https://www.ajou.ac.kr
-- 순찰 1건 · 통과 1 · 못 읽음 0 · **학생이 못 보는 링크 0**
-### https://www.sejong.ac.kr
-- 순찰 1건 · 통과 1 · 못 읽음 0 · **학생이 못 보는 링크 0**
-### https://www.ewha.ac.kr
-- 순찰 3건 · 통과 3 · 못 읽음 0 · **학생이 못 보는 링크 0**
-### https://www.catholic.ac.kr
-- 순찰 2건 · 통과 2 · 못 읽음 0 · **학생이 못 보는 링크 0**
-### https://www.kyonggi.ac.kr
-- 순찰 2건 · 통과 0 · 못 읽음 0 · **학생이 못 보는 링크 2**
-  - ↩️ 표식으로 되돌림(제목 불일치(다른 글이 열림)): [입학에서 취업까지] [대산농촌재단] 2027년도 대산농촌재단 장학생 선발 안내
-  - ↩️ 표식으로 되돌림(제목 불일치(다른 글이 열림)): [입학에서 취업까지] [우양재단] 2026년 우양재단 동행 장학생 모집 안내(~
-### https://www.snue.ac.kr
-- 순찰 1건 · 통과 1 · 못 읽음 0 · **학생이 못 보는 링크 0**
-### https://www.yu.ac.kr
-- 순찰 1건 · 통과 1 · 못 읽음 0 · **학생이 못 보는 링크 0**
-### https://www.jbnu.ac.kr
-- 순찰 1건 · 통과 0 · 못 읽음 0 · **학생이 못 보는 링크 1**
-  - ↩️ 표식으로 되돌림(로그인 요구(학생이 못 봄)): (재)hy사회복재단 2026년 든든 학업지원 장학생 선발 안내
-### https://news.khu.ac.kr
-- 순찰 1건 · 통과 1 · 못 읽음 0 · **학생이 못 보는 링크 0**
-### https://www.kmu.ac.kr
+### https://www.gachon.ac.kr
 - 순찰 4건 · 통과 4 · 못 읽음 0 · **학생이 못 보는 링크 0**
-- 순찰 합계: 20건 확인 · 3건을 사냥 대상으로 넘김
+### https://www.kmu.ac.kr
+- 순찰 16건 · 통과 16 · 못 읽음 0 · **학생이 못 보는 링크 0**
+- 순찰 합계: 20건 확인 · 0건을 사냥 대상으로 넘김
 
-_(학교별 공고 파일 2개에서 주소 3건을 함께 고쳤습니다 — 앱이 읽는 것은 이쪽입니다)_
+_(학교별 공고 파일 1개에서 주소 1건을 함께 고쳤습니다 — 앱이 읽는 것은 이쪽입니다)_
 
 ### 이번 회차는 쉬는 건 (간격을 두고 다시 시도합니다)
 - ⏳ 2026-10-03 에 다시 시도 (2회 실패) — 2726 [홍보] 2027년도 대산농촌재단 장학생 선발 안내 2026.10.01 (HTTP 404)
@@ -63,7 +67,7 @@ _(학교별 공고 파일 2개에서 주소 3건을 함께 고쳤습니다 — �
 - ⏳ 2026-10-03 에 다시 시도 (2회 실패) — 2026년 2학기 송화재단 장학생 선발 안내(~2026.10.07 오후 1시까지 (제목 불일치(다른 글이 열림))
 
 ---
-원문 주소 확보 **0건** · 아직 못 찾음 0건 · 사람에게 알릴 건 0건
+원문 주소 확보 **1건** · 아직 못 찾음 3건 · 사람에게 알릴 건 0건
 
 **포기하는 건 없습니다** — 못 찾은 공고는 간격을 늘려 가며(1일→3일→7일→14일→30일) 계속 다시 찾습니다.
 
