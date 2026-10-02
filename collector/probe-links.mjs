@@ -43,6 +43,23 @@ async function freshPage() {
   return { page: await sharedCtx.newPage(), ctx: null };
 }
 
+/* JSON 응답 요약 — 글처럼 생긴 객체 배열(깊이 4까지)을 찾아 칸 이름과 앞 30개 글의 번호·제목·날짜·고정 표시 칸만 적는다.
+   서강(정찰 2차: 화면 글자 300자에서 잘려 1번 글만 보였다)·중앙(응답 칸 이름 미확인)의 규칙 재료. 값은 응답 그대로다. */
+function summarizeJson(j) {
+  const find = (o, d = 0) => {
+    if (Array.isArray(o)) return o.length && typeof o[0] === 'object' && o[0] ? o : null;
+    if (!o || typeof o !== 'object' || d > 4) return null;
+    for (const v of Object.values(o)) { const hit = find(v, d + 1); if (hit) return hit; }
+    return null;
+  };
+  const arr = find(j);
+  if (!arr) return `JSON (글 배열 없음) · 칸: ${Object.keys(j || {}).slice(0, 12).join(',')}`;
+  const keys = Object.keys(arr[0]);
+  const pickKeys = keys.filter((k) => /title|subject|id$|seq|^no$|date|_dt$|top|notice|fix/i.test(k)).slice(0, 8);
+  const items = arr.slice(0, 30).map((x) => '{' + pickKeys.map((k) => `${k}:${String(x[k] ?? '').replace(/\s+/g, ' ').slice(0, 28)}`).join(',') + '}');
+  return `JSON 글 배열 ${arr.length}개 · 칸 ${keys.length}개: ${keys.slice(0, 24).join(',')} · 앞 ${items.length}개: ${items.join(' ')}`.slice(0, 3200);
+}
+
 /* ── ① 주소 하나를 학생 눈으로 열어 본다 ── */
 async function checkUrl(url) {
   const { page, ctx } = await freshPage();
@@ -68,8 +85,12 @@ async function checkUrl(url) {
     try {
       const q = r.request(); const t = q.resourceType(); const u = r.url();
       if (!/^(xhr|fetch)$/.test(t) || NOISE.test(u) || resps.length >= 8) return;
-      const body = (await r.text().catch(() => '')).replace(/\s+/g, ' ');
-      resps.push(`${q.method()} ${u.slice(0, 160)} → ${r.status()} · ${r.headers()['content-type'] || '?'} · ${body.length}자 · 앞 360자: ${body.slice(0, 360)}`);
+      const head = `${q.method()} ${u.slice(0, 160)} → ${r.status()} · ${r.headers()['content-type'] || '?'}`;
+      const raw = await r.text().catch(() => null);
+      if (raw === null) { resps.push(`${head} · 본문 못 읽음 (빈 응답과 다르다)`); return; }   // 리뷰 2026-10-02: 못 읽은 것을 '0자'로 적으면 0KB 응답과 헷갈린다
+      let sum = '';
+      try { sum = summarizeJson(JSON.parse(raw)); } catch { sum = ''; }
+      resps.push(`${head} · ${raw.length}자 · ${sum || `앞 360자: ${raw.replace(/\s+/g, ' ').slice(0, 360)}`}`);
     } catch { /* 응답이 이미 닫힘 */ }
   });
   try {
@@ -89,31 +110,53 @@ async function checkUrl(url) {
     report.push(`- 큰 제목: ${String(info.h).replace(/\s+/g, ' ').trim().slice(0, 90)}`);
     report.push(`- **로그인 요구: ${wall ? '⛔ 예 — 학생이 못 봅니다' : '✅ 아니오'}**${info.pw ? ' (비밀번호 입력칸 있음)' : ''}`);
     report.push(`- 화면 글자: ${info.text.slice(0, 300)}`);
-    /* ③ 날짜 줄의 링크 (2026-10-01 · 교내 소식 클릭형 게시판) — 글 줄(날짜가 든 <tr>·<li>·div)에서 제목 링크가 **무엇으로** 상세를 여는지
-       (href · onclick · data-*) 그대로 받아 적고, 첫 줄을 실제로 눌러 **어디로 가는지**(최종 주소·제목)를 적는다.
+    /* ③ 목록 요소의 HTML — **누르기 전에** 뜬다 (리뷰 2026-10-02: 누른 뒤에 뜨면 상세·바닥글 화면의 것이 적혔다 · 계명 2차 정찰).
+       날짜가 가장 많이 든 목록 요소(머리·메뉴·바닥 제외)를 고르고, 같은 수면 더 안쪽 것. <script>·<style> 은 빼고 적는다(상명 2차: 조각이 스크립트뿐이었다). */
+    const frag = await page.evaluate(() => {
+      const DATE = /(20\d{2})\s*[.\-/년]\s*(\d{1,2})\s*[.\-/월]\s*(\d{1,2})(?!\d)|(?<!\d)\d{2}\.\d{2}\.\d{2}(?!\d)/g;
+      const els = [...document.querySelectorAll('table, tbody, ul, ol, dl, [class*="board"], [class*="bbs"], [class*="list"], [id*="board"], [id*="list"]')]
+        .filter((e) => !e.closest('header, nav, footer, #footer, .footer'));
+      let best = null; let bestN = 0;
+      for (const e of els) {
+        const n = ((e.innerText || '').match(DATE) || []).length;
+        if (n > bestN || (n === bestN && n > 0 && best && best.contains(e))) { best = e; bestN = n; }
+      }
+      if (!best) return '';
+      const c = best.cloneNode(true);
+      c.querySelectorAll('script, style, noscript').forEach((x) => x.remove());
+      return `(날짜 ${bestN}개 든 <${best.tagName.toLowerCase()}${best.className ? ` class="${String(best.className).slice(0, 60)}"` : ''}>) ` + c.outerHTML.replace(/\s+/g, ' ').slice(0, 2400);
+    }).catch(() => '');
+    if (frag) report.push(`- 목록 요소의 HTML (누르기 전 · 앞 2400자): \`${frag.replace(/`/g, "'")}\``);
+    /* ④ 날짜 줄 (2026-10-01 · 교내 소식 클릭형 게시판) — 글 줄(날짜가 든 줄)에서 제목 링크가 **무엇으로** 상세를 여는지(href · onclick · data-*)
+       그대로 받아 적고, 첫 줄을 실제로 눌러 **어디로 가는지**(최종 주소·제목)를 적는다. 링크가 없는 줄(서강 <tr class="cursor-pointer">)은 줄 자체를 누른다.
        수집 로봇의 규칙(news-board-rules.mjs)은 여기 적힌 것만으로 쓴다 — 주소를 유추하지 않는다(동국대 선례). */
     const rows = await page.evaluate(() => {
       const DATE = /(20\d{2})\s*[.\-/년]\s*(\d{1,2})\s*[.\-/월]\s*(\d{1,2})(?!\d)|(?<!\d)\d{2}\.\d{2}\.\d{2}(?!\d)/;
+      const cands = [...document.querySelectorAll('tr, li, dd, article, div')].filter((el) => {
+        if (el.closest('header, nav, footer, #footer, .footer')) return false;
+        const text = (el.innerText || '').replace(/\s+/g, ' ').trim();
+        return text && text.length <= 400 && DATE.test(text);
+      });
+      const set = new Set(cands);
+      /* 가장 안쪽 줄만 — 날짜 든 다른 후보(div 포함)를 품은 것은 뺀다 (리뷰 2026-10-02: div 를 빼고 보면 한 글의 제목과 다른 글의 날짜가 짝지어졌다) */
+      const inner = cands.filter((el) => ![...el.querySelectorAll('*')].some((d) => set.has(d)));
       const out = []; const seen = new Set();
-      for (const el of document.querySelectorAll('tr, li, dd, article, div')) {
+      for (const el of inner) {
         if (out.length >= 6) break;
         const text = (el.innerText || '').replace(/\s+/g, ' ').trim();
-        if (!text || text.length > 400 || !DATE.test(text)) continue;
-        if (el.querySelector('tr, li, dd, article')) continue;   // 가장 안쪽 줄만
         const a = [...el.querySelectorAll('a')].sort((x, y) => (y.textContent || '').trim().length - (x.textContent || '').trim().length)[0];
-        if (!a) continue;
-        const title = (a.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 60);
+        const title = ((a ? a.textContent : text.replace(DATE, ' ')) || '').replace(/\s+/g, ' ').trim().slice(0, 60);
         if (title.length < 6 || seen.has(title)) continue;
         seen.add(title);
-        const attrs = [...a.attributes].filter((x) => /^(href|onclick|data-[\w-]+|class)$/i.test(x.name)).map((x) => `${x.name}="${String(x.value).slice(0, 160)}"`).join(' ');
-        const rowAttrs = [...el.attributes].filter((x) => /^(onclick|data-[\w-]+)$/i.test(x.name)).map((x) => `${x.name}="${String(x.value).slice(0, 160)}"`).join(' ');
-        out.push({ title, attrs, rowAttrs, date: (text.match(DATE) || [''])[0] });
+        const fmt = (node) => [...node.attributes].filter((x) => /^(href|onclick|data-[\w-]+|class|id)$/i.test(x.name)).map((x) => `${x.name}="${String(x.value).slice(0, 160)}"`).join(' ');
+        el.setAttribute('data-probe-row', String(out.length));
+        out.push({ title, attrs: a ? fmt(a) : '', rowTag: el.tagName.toLowerCase(), rowAttrs: fmt(el).replace(/\s*data-probe-row="\d+"/, ''), date: (text.match(DATE) || [''])[0], hasLink: !!a });
       }
       return out;
     }).catch(() => []);
     if (rows.length) {
-      report.push(`- 날짜 줄의 제목 링크 ${rows.length}개 (상세를 여는 방식):`);
-      rows.forEach((r) => report.push(`    · 「${r.title}」 ${r.date} → <a ${r.attrs}>${r.rowAttrs ? ` · 줄: <${r.rowAttrs}>` : ''}`));
+      report.push(`- 날짜 줄 ${rows.length}개 (상세를 여는 방식):`);
+      rows.forEach((r) => report.push(`    · 「${r.title}」 ${r.date} → ${r.hasLink ? `<a ${r.attrs}>` : '(링크 없음)'} · 줄: <${r.rowTag} ${r.rowAttrs}>`));
       /* 첫 줄을 실제로 눌러 본다 — 새 탭으로 열리면 그 탭, 아니면 같은 탭의 최종 주소 */
       try {
         const before = page.url();
@@ -121,30 +164,25 @@ async function checkUrl(url) {
         /* 폼 전송·같은 탭 이동(전북 pf_DetailMove 꼴)은 evaluate 가 "Execution context was destroyed" 로 거절된다 —
            그건 실패가 아니라 **이동이 일어난 것**이므로 이동 대기와 함께 걸고 거절은 삼킨다 (리뷰 2026-10-01). */
         const nav = page.waitForNavigation({ timeout: 8000, waitUntil: 'domcontentloaded' }).catch(() => null);
-        await page.evaluate((t) => { const a = [...document.querySelectorAll('a')].find((x) => (x.textContent || '').replace(/\s+/g, ' ').trim().startsWith(t)); if (a) a.click(); }, rows[0].title.slice(0, 20)).catch(() => null);
+        await page.evaluate(() => { const row = document.querySelector('[data-probe-row="0"]'); if (!row) return; const a = [...row.querySelectorAll('a')].sort((x, y) => (y.textContent || '').trim().length - (x.textContent || '').trim().length)[0]; (a || row).click(); }).catch(() => null);
         const pop = await popup;
-        if (!pop) await nav;
+        const navd = pop ? null : await nav;
         const target = pop || page;
         await target.waitForLoadState('domcontentloaded', { timeout: 15000 }).catch(() => {});
         await target.waitForTimeout(2000);
         const landed = await target.evaluate(() => ({ title: document.title || '', h: ((document.querySelector('h1,h2,h3,.title,.subject,.view-title') || {}).textContent || '').replace(/\s+/g, ' ').trim().slice(0, 90), text: (document.body.innerText || '').replace(/\s+/g, ' ').slice(0, 200) })).catch(() => ({ title: '', h: '', text: '' }));
         const url = target.url();
-        report.push(`- 첫 줄 「${rows[0].title.slice(0, 30)}」 을 눌렀더니 → ${url === before ? '(주소 그대로 — 스크립트가 같은 화면에 그림)' : url}${pop ? ' (새 탭)' : ''}`);
+        /* 주소가 그대로면 둘 중 하나다 — 같은 주소로 다시 열렸거나(POST 이동) 스크립트가 같은 화면에 그렸거나/아무 일도 없었다 (단정하지 않는다 · 리뷰 2026-10-02) */
+        const verdict = url !== before ? url : (navd ? '(주소 그대로 — 같은 주소로 다시 열림 · POST 이동일 수 있음)' : '(주소 그대로 — 이동 없음 · 스크립트가 같은 화면에 그렸거나 아무 일도 없었음)');
+        report.push(`- 첫 줄 「${rows[0].title.slice(0, 30)}」 을 ${rows[0].hasLink ? '링크로' : '줄째'} 눌렀더니 → ${verdict}${pop ? ' (새 탭)' : ''}`);
         report.push(`    · 그 화면 제목: ${landed.title.trim().slice(0, 80)} · 큰 제목: ${landed.h} · 글자: ${landed.text.slice(0, 160)}`);
         if (pop) await pop.close().catch(() => {});
       } catch (e) {
         report.push(`- 첫 줄 누르기 실패: ${(e.message || '').split('\n')[0].slice(0, 90)}`);
       }
     } else {
-      report.push('- 날짜 줄의 제목 링크: 없음 (날짜가 든 줄에 링크가 없거나 목록이 안 그려짐)');
+      report.push('- 날짜 줄: 없음 (머리·메뉴·바닥 밖에 날짜가 든 줄이 없거나 목록이 안 그려짐)');
     }
-    /* 목록처럼 보이는 요소의 HTML 앞부분을 늘 적는다(짐작 대신 재료) — 날짜 줄이 바닥글(계명 방침 이력)뿐일 때도 진짜 목록의 생김새가 필요하다(2차 정찰 실측) */
-    const frag = await page.evaluate(() => {
-      const els = [...document.querySelectorAll('table, [class*="board"], [class*="bbs"], [class*="list"], [id*="board"], [id*="list"]')];
-      const el = els.find((e) => /제목|작성자|등록일|작성일|조회/.test(e.textContent || '')) || els[0];
-      return el ? el.outerHTML.replace(/\s+/g, ' ').slice(0, 1800) : '';
-    }).catch(() => '');
-    if (frag) report.push(`- 목록처럼 보이는 요소의 HTML (앞 1800자): \`${frag.replace(/`/g, "'")}\``);
     if (reqs.length) { report.push(`- 화면이 부른 요청 ${reqs.length}개 (목록 API·폼 전송 후보):`); reqs.forEach((l) => report.push(`    · ${l}`)); }
     if (resps.length) { report.push(`- 스크립트 요청의 응답 ${resps.length}개 (규칙의 재료 — 칸 이름·HTML/JSON):`); resps.forEach((l) => report.push(`    · ${l.replace(/`/g, "'")}`)); }
     report.push('');

@@ -36,13 +36,20 @@ const dongguk = {
   evidence: '찾기 로봇이 2026-10-01 사이트 안 링크로 /article/<게시판>/detail/<번호> 를 실제로 열었다 (find-news-boards-report.md) · 장학 수집기 browser-targets 와 같은 꼴',
 };
 
+/* 목록 표식 주소(#n-제목) — 글 하나의 GET 주소가 없는 게시판의 링크. 앱이 「게시판 목록 ↗」 로 정직하게 적는다(app.js isBoardListLink).
+   제목은 글자 단위로 80자까지(🔴 UTF-16 으로 자르면 이모지 짝이 갈라져 encodeURIComponent 가 던지고 글이 조용히 사라진다 · 리뷰 2026-10-02).
+   이 주소는 **글의 열쇠가 아니다** — 같은 글인지는 게시판의 글 번호(postId)로 가린다(제목을 다듬는 규칙이 바뀌면 주소도 바뀐다). */
+export function markerUrl(boardUrl, title) {
+  return `${String(boardUrl).split('#')[0]}#n-${encodeURIComponent(Array.from(String(title || '')).slice(0, 80).join(''))}`;
+}
+
 export const NEWS_BOARD_RULES = {
   /* 경희대: 행이 <a href="javascript:view('323229','')">. 정찰(2026-10-01 probe-links)에서 눌러 보니 POST 로 …/BMSR00040/view.do 가 열리고
      주소에 번호가 없다 — 글 하나로 가는 GET 주소를 만들 수 없다(짐작하지 않는다). 목록 주소 + #n-제목 표식만 둔다. */
   '경희대학교': {
     kind: 'listOnly',
     fn: /\bview\(\s*['"](\d+)['"]/,
-    detail: (id, boardUrl, title) => `${String(boardUrl).split('#')[0]}#n-${encodeURIComponent(String(title || '').slice(0, 80))}`,
+    detail: (id, boardUrl, title) => markerUrl(boardUrl, title),
     evidence: '정찰 2026-10-01: 행은 href="javascript:view(번호)" · 첫 줄을 누르면 POST 로 /kor/user/bbs/BMSR00040/view.do (주소에 번호 없음) → 글 하나의 주소가 없어 목록 표식(#n-)으로만',
   },
   /* 서울시립대: 목록은 SSO 익명 확인을 거쳐야 글이 온다(정찰 2026-10-01: list.do → sso_index → … → list.do?…&identified=anonymous& 가 최종 주소 · 로봇은 그 최종 주소를 후보로 둔다).
@@ -61,8 +68,9 @@ export const NEWS_BOARD_RULES = {
   '서강대학교': {
     kind: 'json',
     link: 'list',
+    page: 'https://www.sogang.ac.kr/ko/announcement',   // 정찰 2차: 이 화면이 아래 API 를 불렀다 — 학생의 「게시판 목록 ↗」 이 여는 곳 (찾기 로봇은 이 화면만 받는다)
     api: 'https://www.sogang.ac.kr/api/api/v1/mainKo/BbsData/boardList?pageNum=1&pageSize=30&bbsConfigFk=3',
-    detail: (id, boardUrl, title) => `${String(boardUrl).split('#')[0]}#n-${encodeURIComponent(String(title || '').slice(0, 80))}`,
+    detail: (id, boardUrl, title) => markerUrl(boardUrl, title),
     evidence: '정찰 2026-10-01 2차: /ko/announcement 가 부른 요청 GET …/BbsData/boardList?…&bbsConfigFk=3 (화면이 부른 요청 기록) · 글 주소는 안 눌러 봐서 목록 표식(#n-)',
   },
   /* 중앙대: 목록·상세 모두 스크립트가 POST 로 받는다(정찰 2차가 본문까지 적었다). 행은 href="javascript:fn_goDetail('30220','N','','N')" ·
@@ -70,7 +78,11 @@ export const NEWS_BOARD_RULES = {
      그 화면의 본문은 POST ajax/FR_SVC/BoardViewData.do 가 채우므로 제목 확인도 그 API 로 한다. */
   '중앙대학교': {
     kind: 'post',
+    page: 'https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100',   // 정찰 2차: 이 화면이 아래 API 를 불렀다 (찾기 로봇은 이 화면만 받는다)
     api: 'https://www.cau.ac.kr/ajax/FR_SVC/BBSViewList2.do',
+    /* 응답은 JSON(`BBS_SEQ`·`SUBJECT`) — SESSIONS.md 「중앙대 게시판 사실(재조사 금지)」. 9차는 HTML 로 읽어 0행이었다(리뷰 2026-10-02).
+       날짜 칸 이름은 기록에 없다 — 아래 DATE_KEYS 중 있는 것을 쓰고 없으면 게시일을 비운다(지어내지 않는다 · 정찰이 응답을 적게 해 두었다). */
+    jsonFields: { id: ['BBS_SEQ'], title: ['SUBJECT'] },
     body: 'pageNo=1&pagePerCnt=15&MENU_ID=100&SITE_NO=2&BOARD_SEQ=4&S_CATE_SEQ=&BOARD_TYPE=C0301&BOARD_CATEGORY_NO=&P_TAB_NO=&TAB_NO=&P_CATE_SEQ=&CATE_SEQ=&SEARCH_FLD=SUBJECT&SEARCH=',
     fn: /fn_goDetail\(\s*['"](\d+)['"]/,
     detail: (id) => `https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=${id}&pageNo=1`,
@@ -103,7 +115,7 @@ export const NEWS_BOARD_RULES = {
   },
 };
 
-/* 규칙 하나 → <a …> 의 속성 글자를 받아 상세 주소를 돌려주는 함수(못 풀면 null). extractDatedRows 의 resolve 옵션에 넘긴다. */
+/* 규칙 하나 → <a …> 의 속성 글자를 받아 { url, id }(못 풀면 null)를 돌려주는 함수. extractDatedRows 의 resolve 옵션에 넘긴다. */
 export function ruleResolver(rule, boardUrl) {
   if (!rule) return null;
   return (attrs, title) => {
@@ -118,7 +130,9 @@ export function ruleResolver(rule, boardUrl) {
       id = (attrs.match(/data-id\s*=\s*["'](\d+)["']/i) || [])[1];
     }
     if (!id) return null;
-    try { return rule.detail(id, boardUrl, title) || null; } catch { return null; }
+    let url = null;
+    try { url = rule.detail(id, boardUrl, title) || null; } catch { url = null; }
+    return url ? { url, id } : null;   // id = 게시판의 글 번호 (postId — 같은 글 알아보기)
   };
 }
 
@@ -128,35 +142,66 @@ export const needsDetailCheck = (rule) => !!rule && rule.kind !== 'listOnly' && 
 /* API 로 받는 목록(json·post) 인가 — 두 로봇이 이때는 목록 HTML 대신 이 모듈에 글 줄을 묻는다 */
 export const fetchesOwnList = (rule) => !!rule && (rule.kind === 'json' || rule.kind === 'post');
 
-const ymd = (v) => { const m = String(v || '').match(/^(20\d{2})[-.]?(\d{2})[-.]?(\d{2})/); return m ? `${m[1]}-${m[2]}-${m[3]}` : ''; };
+const ymd = (v) => {
+  const m = String(v || '').match(/^(20\d{2})[-./]?\s*(\d{1,2})[-./]?\s*(\d{1,2})/);
+  if (!m) return '';
+  const d = `${m[1]}-${String(m[2]).padStart(2, '0')}-${String(m[3]).padStart(2, '0')}`;
+  return d <= new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10) ? d : '';   // 앞날은 게시일이 아니다
+};
+const DATE_KEYS = ['regDate', 'regDt', 'createdAt', 'date', 'REG_DATE', 'REGDATE', 'WRITE_DATE', 'WRITEDATE', 'INS_DATE', 'INSERT_DATE', 'REG_DT', 'WRITE_DT'];
+const ID_KEYS = ['pkId', 'id', 'seq'];
+const TITLE_KEYS = ['title', 'subject'];
+const pick = (x, keys) => { for (const k of keys) if (x && x[k] != null && x[k] !== '') return x[k]; return undefined; };
+/* 응답 안에서 글 목록 배열을 찾는다 — 칸 이름(list·data·…)이 학교마다 달라 **글처럼 생긴 객체의 배열**(번호·제목 칸이 있는 것)을 깊이 3까지 찾는다. */
+function findRows(j, idKeys, titleKeys, d = 0) {
+  if (Array.isArray(j)) return j.some((x) => pick(x, idKeys) != null && pick(x, titleKeys) != null) ? j : null;
+  if (!j || typeof j !== 'object' || d > 3) return null;
+  for (const v of Object.values(j)) { const hit = findRows(v, idKeys, titleKeys, d + 1); if (hit) return hit; }
+  return null;
+}
+function rowsFromJson(j, rule, boardUrl) {
+  const idKeys = (rule.jsonFields && rule.jsonFields.id) || ID_KEYS;
+  const titleKeys = (rule.jsonFields && rule.jsonFields.title) || TITLE_KEYS;
+  const out = []; const seen = new Set();
+  for (const x of findRows(j, idKeys, titleKeys) || []) {
+    const title = String(pick(x, titleKeys) || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    const id = pick(x, idKeys);
+    if (!title || title.length < 6 || id == null) continue;
+    let url; try { url = rule.detail(String(id), boardUrl, title); } catch { url = null; }
+    if (!url || seen.has(String(id))) continue;
+    seen.add(String(id));
+    const postedAt = ymd(pick(x, DATE_KEYS));
+    out.push({ title, url, postId: String(id), ...(postedAt ? { postedAt } : {}) });
+  }
+  return out;
+}
 
 /* 🔴 두 로봇이 부르는 한 곳 — 학교의 규칙에 따라 글 줄을 돌려준다.
    html 게시판(규칙 없음·onclick·dataId·listOnly)은 넘겨받은 목록 HTML 을 읽고, json·post 는 API 를 직접 받는다.
-   @returns Promise<Array<{title,url,postedAt}>> */
+   post 응답은 JSON 이면 칸으로, 아니면 HTML 조각으로(같은 눈) 읽는다.
+   @returns Promise<Array<{title,url,postedAt?,postId?}>> */
 export async function rowsForBoard(school, boardUrl, html, fetchFn = fetchBoard) {
   const rule = NEWS_BOARD_RULES[school];
   if (!fetchesOwnList(rule)) return datedRowsFor(school, html, boardUrl);
-  if (rule.kind === 'json') {
-    const r = await fetchFn(rule.api, { tries: 2, firstMs: 15000, retryMs: 20000 });
-    if (!r || !r.ok) throw new Error(`API HTTP ${r ? r.status : '?'}`);
-    const j = await r.json();
-    const dig = (o, d = 0) => { if (Array.isArray(o)) return o; if (!o || typeof o !== 'object' || d > 2) return null; for (const k of ['list', 'data', 'content', 'result', 'items', 'rows']) { const hit = dig(o[k], d + 1); if (hit) return hit; } return null; };
-    const out = []; const seen = new Set();
-    for (const x of dig(j) || []) {
-      const title = String(x.title || x.subject || '').replace(/\s+/g, ' ').trim();
-      const id = x.pkId ?? x.id ?? x.seq;
-      if (!title || title.length < 6 || id == null) continue;
-      let url; try { url = rule.detail(String(id), boardUrl, title); } catch { url = null; }
-      if (!url || seen.has(url)) continue;
-      seen.add(url);
-      out.push({ title, url, postedAt: ymd(x.regDate || x.regDt || x.createdAt || x.date) });
-    }
-    return out;
-  }
-  /* post — 응답은 목록 조각(HTML). 같은 눈(날짜 줄 + onclick 번호)으로 읽는다. */
-  const r = await fetchFn(rule.api, { body: rule.body, tries: 2, firstMs: 15000, retryMs: 20000 });
+  const r = await fetchFn(rule.api, rule.kind === 'post' ? { body: rule.body, tries: 2, firstMs: 15000, retryMs: 20000 } : { tries: 2, firstMs: 15000, retryMs: 20000 });
   if (!r || !r.ok) throw new Error(`API HTTP ${r ? r.status : '?'}`);
-  return extractDatedRows(await r.text(), boardUrl, { resolve: ruleResolver(rule, boardUrl) });
+  const text = await r.text();
+  let j = null;
+  try { j = JSON.parse(text); } catch { j = null; }
+  if (j) return rowsFromJson(j, rule, boardUrl);
+  if (rule.kind === 'json') throw new Error(`API 응답이 JSON 이 아님 (${text.length}자 · 앞 120자: ${text.replace(/\s+/g, ' ').slice(0, 120)})`);
+  return extractDatedRows(text, boardUrl, { resolve: ruleResolver(rule, boardUrl) });
+}
+
+/* API 규칙이 받는 화면 — 찾기 로봇은 이 화면만 게시판으로 올린다(아무 화면이나 열리면 「게시판 목록 ↗」 이 엉뚱한 곳을 가리킨다 · 리뷰 2026-10-02) */
+export function rulePageMatches(rule, url) {
+  if (!rule || !rule.page) return true;
+  try {
+    const want = new URL(rule.page); const got = new URL(url);
+    if (want.origin + want.pathname !== got.origin + got.pathname) return false;
+    for (const [k, v] of want.searchParams) if (got.searchParams.get(k) !== v) return false;
+    return true;
+  } catch { return false; }
 }
 
 /* 학교 이름으로 규칙을 골라 글 줄을 뽑는다 — 규칙 없는 학교는 보통 눈(href) 그대로. 두 로봇이 이 함수 하나를 부른다. */
@@ -170,6 +215,7 @@ export function datedRowsFor(school, html, boardUrl) {
    ③ 화면에 그 글의 제목이 있다 ④ 목록의 **다른** 글 제목이 절반 넘게 같이 있지 않다(그건 목록 화면이다 · 이전글/다음글 한둘은 괜찮다).
    어느 하나라도 아니면 규칙이 그 게시판에 안 맞는 것이므로 **싣지 않는다**(틀린 링크 40건보다 0건이 낫다).
    비교는 공백·기호를 뺀 제목 앞 12자로(게시판 제목은 「…」 말줄임·공백 차이가 흔하다).
+   ⑤ 만든 상세 주소와 다른 화면으로 넘어가지 않았다 ⑥ 다른 글 제목이 셋 이상 보이면 그 글 제목이 제목 자리에 있다(최근 글 띠가 붙은 다른 글 화면 배제).
    @param row   확인할 글 { title, url }
    @param opts  { fetch: fetchBoard 대신 쓸 함수(관문용), boardUrl: 목록 주소, others: 목록의 다른 글 제목들 } */
 export async function verifyRuleDetail(row, opts = {}) {
@@ -180,23 +226,39 @@ export async function verifyRuleDetail(row, opts = {}) {
   const vp = opts.rule && opts.rule.verifyPost;
   const id = vp ? vp.idFrom(row.url) : null;   // 번호를 꺼내는 법도 규칙의 것 (공용 함수에 학교 이름표를 박지 않는다)
   if (vp && !id) return { ok: false, reason: '상세 주소에 번호가 없음' };
-  /* 같은 학교를 방금 두드린 뒤라 한 번은 끊길 수 있다(전북 7차 실측 fetch failed) → 두 번 시도 */
-  try { res = vp ? await fetchFn(vp.api, { body: vp.body(id), tries: 2, firstMs: 15000, retryMs: 20000 }) : await fetchFn(row.url, { tries: 2, firstMs: 15000, retryMs: 20000 }); } catch (e) { return { ok: false, reason: `상세 열기 실패 (${(e && e.message) || e})` }; }
+  /* 같은 학교를 방금 두드린 뒤라 한 번은 끊길 수 있다(전북 7차 실측 fetch failed) → 두 번 시도.
+     시한은 게시판 하나의 절대 시한(45초) 안에 들도록 짧게 — 10초 + 쉼 3초 + 12초 (리뷰 2026-10-02) */
+  try { res = vp ? await fetchFn(vp.api, { body: vp.body(id), tries: 2, firstMs: 10000, retryMs: 12000 }) : await fetchFn(row.url, { tries: 2, firstMs: 10000, retryMs: 12000 }); } catch (e) { return { ok: false, reason: `상세 열기 실패 (${(e && e.message) || e})` }; }
   if (!res || !res.ok) return { ok: false, reason: `상세 HTTP ${res ? res.status : '?'}` };
-  const sameUrl = (a, b) => { try { const x = new URL(a); const y = new URL(b); return x.origin + x.pathname === y.origin + y.pathname; } catch { return false; } };
-  if (!vp && opts.boardUrl && res.url && sameUrl(res.url, opts.boardUrl)) return { ok: false, reason: '상세 주소가 목록으로 되돌아옴 (규칙이 이 게시판에 안 맞음)' };
-  const text = (await res.text()).replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' ');
+  const samePath = (a, b) => { try { const x = new URL(a); const y = new URL(b); return x.origin + x.pathname === y.origin + y.pathname; } catch { return false; } };
+  if (!vp && opts.boardUrl && res.url && samePath(res.url, opts.boardUrl)) return { ok: false, reason: '상세 주소가 목록으로 되돌아옴 (규칙이 이 게시판에 안 맞음)' };
+  /* 만든 상세 주소와 다른 곳(첫 화면·다른 메뉴)으로 넘어가면 그 글의 화면이 아니다 — 같은 길로 돌아오는 SSO 왕복(시립)은 괜찮다 */
+  if (!vp && res.url && !samePath(res.url, row.url)) return { ok: false, reason: `상세 주소가 다른 화면으로 넘어감 (${String(res.url).slice(0, 120)})` };
+  const raw = await res.text();
+  const text = raw.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' ');
   const norm = (s) => String(s || '').replace(/&[a-z#0-9]+;/gi, ' ').replace(/[\s\p{P}\p{S}]+/gu, '');
   const page = norm(text);
   const head = norm(row.title).slice(0, 12);
   if (head.length < 4) return { ok: false, reason: '제목이 너무 짧아 대조 불가' };
   if (!page.includes(head)) return { ok: false, reason: '상세 화면에 제목이 없음 (규칙이 이 게시판에 안 맞음)' };
   const others = (opts.others || []).map((t) => norm(t).slice(0, 12)).filter((h) => h.length >= 4 && h !== head);
-  if (others.length >= 3) {
-    const hit = others.filter((h) => page.includes(h)).length;
-    if (hit > others.length / 2) return { ok: false, reason: `상세가 아니라 목록 화면 (다른 글 제목 ${hit}/${others.length} 이 함께 보임)` };
-  }
+  const hit = others.filter((h) => page.includes(h)).length;
+  if (others.length >= 3 && hit > others.length / 2) return { ok: false, reason: `상세가 아니라 목록 화면 (다른 글 제목 ${hit}/${others.length} 이 함께 보임)` };
+  /* '최근 글' 띠·옆 목록이 붙은 **다른 글**의 화면이면 제목이 본문 제목 자리에 없다 — 다른 글 제목이 셋 이상 보이면
+     그 글의 제목이 제목 자리(<title>·h1~h6·og:title·tit/subject 칸)에 있을 때만 통과 (이전글/다음글 둘은 괜찮다 · 리뷰 2026-10-02) */
+  if (hit >= 3 && !titleZone(raw).some((z) => norm(z).includes(head))) return { ok: false, reason: `제목이 제목 자리에 없고 다른 글 제목 ${hit}개가 함께 보임 (최근 글 띠가 붙은 다른 화면으로 보임)` };
   return { ok: true, reason: `상세를 열어 제목 확인 (${row.url})` };
+}
+
+/* 화면의 '제목 자리' 글자들 — <title> · h1~h6 · og:title · class/id 에 tit·subject·view_tit 가 든 칸 */
+function titleZone(html) {
+  const src = String(html || '');
+  const out = [];
+  for (const m of src.matchAll(/<title\b[^>]*>([\s\S]*?)<\/title>/gi)) out.push(m[1]);
+  for (const m of src.matchAll(/<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1>/gi)) out.push(m[2].replace(/<[^>]+>/g, ' '));
+  for (const m of src.matchAll(/<meta\b[^>]*property=["']og:title["'][^>]*content=["']([^"']*)["']/gi)) out.push(m[1]);
+  for (const m of src.matchAll(/<(div|p|span|strong|td|th|dt|dd|em|li)\b[^>]*(?:class|id)=["'][^"']*(?:tit|subject|view_?head|artcl)[^"']*["'][^>]*>([\s\S]{0,600}?)<\/\1>/gi)) out.push(m[2].replace(/<[^>]+>/g, ' '));
+  return out;
 }
 
 /* API 규칙의 응답 앞부분(진단용) — 0행일 때 찾기 로봇이 리포트에 적는다. 글을 만들지 않는다. */
@@ -205,5 +267,50 @@ export async function apiSample(school, fetchFn = fetchBoard) {
   if (!fetchesOwnList(rule)) return '';
   const r = await fetchFn(rule.api, rule.kind === 'post' ? { body: rule.body, tries: 1, firstMs: 15000 } : { tries: 1, firstMs: 15000 });
   const text = await r.text();
-  return `HTTP ${r.status} · ${text.length}자 · 앞 400자: ${text.replace(/\s+/g, ' ').slice(0, 400)}`;
+  return `HTTP ${r.status} · ${r.headers && r.headers.get ? (r.headers.get('content-type') || '?') : '?'} · ${text.length}자 · 앞 400자: ${text.replace(/\s+/g, ' ').slice(0, 400)}`;
+}
+
+/* 같은 글 합치기 (2026-10-02 · 리뷰: 경희 6건이 두 번씩 실렸다) — dedupeNotices(주소·제목 열쇠) 앞에 둔다.
+   ① 게시판의 글 번호(postId)가 같으면 같은 글. ② 목록 표식(#n-) 글은 「목록 주소 + 제목」이 같으면 같은 글.
+   ③ 옛 중복 정리(소급): 9차가 분류 꼬리표를 떼고 실은 「[X]」 는, 같은 목록에 꼬리표 붙은 「공통 [X]」·「국제 [X]」 가 **딱 하나**일 때만 그 글이다
+      (둘 이상이면 서울·국제 캠퍼스의 다른 글일 수 있어 합치지 않는다 — 다른 글을 지우는 것보다 겹쳐 보이는 것이 낫다).
+   남기는 모습은 가장 최근 수집분(③은 꼬리표 붙은 쪽), 수집일은 처음 본 날, 관리자 숨김은 지킨다. */
+const merge2 = (a, n, keep) => {
+  const first = [a.foundAt, n.foundAt].filter(Boolean).sort()[0];
+  const hid = [a, n].find((x) => x.hidden);
+  const pid = keep.postId || a.postId || n.postId;
+  return { ...keep, ...(first ? { foundAt: first } : {}), ...(pid ? { postId: pid } : {}), ...(hid ? { hidden: hid.hidden, ...(hid.hiddenBy ? { hiddenBy: hid.hiddenBy } : {}) } : {}) };
+};
+export function collapseSamePost(items) {
+  const out = []; const idx = new Map();
+  const listOf = (n) => String(n.url || '').split('#')[0];
+  for (const n of items) {
+    const keys = [];
+    if (n.postId) keys.push(`p|${n.school}|${n.postId}`);
+    if (/#n-/.test(String(n.url || ''))) keys.push(`t|${n.school}|${listOf(n)}|${String(n.title || '').replace(/\s+/g, ' ').trim()}`);
+    const hit = keys.map((k) => idx.get(k)).find((v) => v !== undefined);
+    if (hit === undefined) { const pos = out.push(n) - 1; keys.forEach((k) => idx.set(k, pos)); continue; }
+    const a = out[hit];
+    const newer = String(n.foundAt || '') > String(a.foundAt || '') || (String(n.foundAt || '') === String(a.foundAt || '') && n.postId && !a.postId) ? n : a;
+    out[hit] = merge2(a, n, newer);
+    keys.forEach((k) => { if (!idx.has(k)) idx.set(k, hit); });
+  }
+  /* ③ 꼬리표를 뗀 옛 사본 */
+  const badged = new Map();
+  out.forEach((n, i) => {
+    if (!/#n-/.test(String(n.url || ''))) return;
+    const m = String(n.title || '').match(/^([가-힣]{2,4})\s+(\[[\s\S]*)$/);
+    if (!m) return;
+    const k = `${n.school}|${listOf(n)}|${m[2].trim()}`;
+    badged.set(k, (badged.get(k) || []).concat(i));
+  });
+  const drop = new Set();
+  out.forEach((n, i) => {
+    if (!/#n-/.test(String(n.url || '')) || !/^\[/.test(String(n.title || ''))) return;
+    const c = badged.get(`${n.school}|${listOf(n)}|${String(n.title).trim()}`) || [];
+    if (c.length !== 1) return;
+    out[c[0]] = merge2(out[c[0]], n, out[c[0]]);
+    drop.add(i);
+  });
+  return out.filter((_, i) => !drop.has(i));
 }

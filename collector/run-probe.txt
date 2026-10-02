@@ -35,11 +35,21 @@ checkUrl: https://www.smu.ac.kr/kor/life/scholarship.do
 #   이번엔 정찰이 **화면이 부른 요청**(목록 API·폼 전송 본문)과 **목록 요소의 HTML 조각**까지 적는다 — 그 결과만으로 규칙을 적는다(주소를 유추하지 않는다).
 #   계명: 목록 행에 날짜 링크가 안 잡힌다(바닥글 방침만) → HTML 조각 · 서강: SPA 공지사항의 API 열쇠(bbsConfigFk) · 시립: 스크립트가 그린 뒤의 행 ·
 #   상명: 통합공지 행의 제목 링크 · 고려·중앙: 목록을 받아 오는 요청이 GET 인가.
+# (답 받음 2026-10-01 · 3차로 대체) checkUrl: https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=143
+# (답 받음 2026-10-01 · 3차로 대체) checkUrl: https://www.sogang.ac.kr/ko/announcement
+# (답 받음 2026-10-01 · 3차로 대체) checkUrl: https://www.uos.ac.kr/korNotice/list.do?list_id=FA1
+# (답 받음 2026-10-01 · 3차로 대체) checkUrl: https://www.smu.ac.kr/kor/life/notice.do
+# (답 받음 2026-10-01 · 3차로 대체) checkUrl: https://www.korea.ac.kr/ko/566/subview.do
+# (답 받음 2026-10-01 · 3차로 대체) checkUrl: https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100
+# 서강 공지사항 API(열쇠 3)의 응답에서 글 번호(pkId)를 받아 적는다 — 다음에 /ko/detail/<pkId>?bbsConfigFk=3 이 실제로 열리는지 눌러 본 뒤 글 주소 규칙을 적는다
+# (답 받음 2026-10-01 · 3차로 대체) checkUrl: https://www.sogang.ac.kr/api/api/v1/mainKo/BbsData/boardList?pageNum=1&pageSize=5&bbsConfigFk=3
+
+# 2026-10-02 (3차) — 리뷰가 밝힌 정찰 도구 결함(목록 조각을 누른 뒤에 떠 상세·바닥글 것이 적힘 · 링크 없는 줄은 안 누름 · JSON 은 300자에서 잘림)을 고친 뒤 다시 본다.
+#   계명·상명: 진짜 목록 줄의 생김새(누르기 전 조각) · 서강: <tr class="cursor-pointer"> 줄을 눌렀을 때의 주소 + API 의 글 30개 날짜(왜 0건인가) ·
+#   고려: 목록을 받아 오는 요청과 응답 · 중앙: BBSViewList2.do 응답의 칸 이름 · 경북: 검색에 실제로 잡힌 상세 주소가 로그인 없이 열리는지와 그 화면이 적어 둔 목록 링크.
 checkUrl: https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=143
-checkUrl: https://www.sogang.ac.kr/ko/announcement
-checkUrl: https://www.uos.ac.kr/korNotice/list.do?list_id=FA1
 checkUrl: https://www.smu.ac.kr/kor/life/notice.do
+checkUrl: https://www.sogang.ac.kr/ko/announcement
 checkUrl: https://www.korea.ac.kr/ko/566/subview.do
 checkUrl: https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100
-# 서강 공지사항 API(열쇠 3)의 응답에서 글 번호(pkId)를 받아 적는다 — 다음에 /ko/detail/<pkId>?bbsConfigFk=3 이 실제로 열리는지 눌러 본 뒤 글 주소 규칙을 적는다
-checkUrl: https://www.sogang.ac.kr/api/api/v1/mainKo/BbsData/boardList?pageNum=1&pageSize=5&bbsConfigFk=3
+checkUrl: https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/viewBtin.action?btin.bbs_cde=1&btin.doc_no=1325007&btin.appl_no=000000&menu_idx=67

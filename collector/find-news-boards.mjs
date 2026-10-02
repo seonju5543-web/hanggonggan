@@ -17,7 +17,7 @@
    ============================================================ */
 import fs from 'node:fs';
 import { extractLinks, sameSite } from './board-links.mjs';
-import { NEWS_BOARD_RULES, rowsForBoard, verifyRuleDetail, needsDetailCheck, fetchesOwnList, apiSample } from './news-board-rules.mjs';   // 클릭형 게시판 규칙 한 곳 (수집 로봇과 같은 것)
+import { NEWS_BOARD_RULES, rowsForBoard, verifyRuleDetail, needsDetailCheck, fetchesOwnList, apiSample, rulePageMatches } from './news-board-rules.mjs';   // 클릭형 게시판 규칙 한 곳 (수집 로봇과 같은 것)
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { isNewsRow } from './news-kind.mjs';
 import { fetchBoard, netReason } from './fetch-board.mjs';
@@ -98,11 +98,17 @@ const daysAgo = (d) => (d ? Math.floor((Date.now() - new Date(d).getTime()) / 86
 /* 학교 하나 — 후보부터, 그다음 홈 메뉴. 결과는 {found, tried[]} */
 async function findOne(s) {
   const tried = [];
+  const rule = NEWS_BOARD_RULES[s.school];
+  const apiRule = fetchesOwnList(rule);
+  let apiRows = null;   // API 규칙 학교는 API 를 **학교당 한 번만** 부른다 (화면마다 다시 부르지 않는다 · 리뷰 2026-10-02)
   const tryUrl = async (url, label, via, evidence) => {
     try {
+      /* API 규칙 학교는 정찰이 그 API 를 부르는 것을 본 화면(rule.page)만 게시판이다 — 아무 화면이나 열리면 「게시판 목록 ↗」 이 엉뚱한 곳을 가리킨다 */
+      if (apiRule && !rulePageMatches(rule, url)) { tried.push({ url, label, rows: 0, status: `규칙의 화면(${rule.page})이 아니라 건너뜀` }); return null; }
       const page = await get(url);
       if (page.error) { tried.push({ url, label, rows: 0, status: page.error }); return null; }
-      const rows = await rowsForBoard(s.school, page.url, page.html);   // 클릭형(동국·서울교대·전북…)은 규칙의 링크 풀이를 얹은 같은 눈 · json/post 는 API
+      if (apiRule && apiRows === null) apiRows = await rowsForBoard(s.school, page.url, page.html);
+      const rows = apiRule ? apiRows : await rowsForBoard(s.school, page.url, page.html);   // 클릭형(동국·서울교대·전북…)은 규칙의 링크 풀이를 얹은 같은 눈 · json/post 는 API
       const score = scoreNewsPage(rows, page.url);
       const t = { url, label, rows: score.rows, status: 'ok' };
       if (score.rows < MIN_ROWS) t.diag = pageDiag(page.html);   // 왜 0행인가 — 다음 수리의 재료 (짐작하지 않는다)
@@ -118,10 +124,17 @@ async function findOne(s) {
       tried.push(t);
       if (score.rows >= MIN_ROWS) return { url: page.url, label, via, evidence, rows: score.rows, sample: score.sample };
     } catch (e) {
-      tried.push({ url, label, rows: 0, status: netReason(e) });
+      const t = { url, label, rows: 0, status: netReason(e) };
+      /* API 규칙의 응답이 JSON 이 아니거나 HTTP 오류여도 응답 앞부분을 남긴다 (리뷰 2026-10-02: 'SyntaxError' 한 낱말만 남았다) */
+      if (apiRule) { t.status = `규칙의 API 오류: ${(e && e.message) || netReason(e)}`.slice(0, 300); t.diag = { api: await apiSample(s.school).catch((x) => `응답 없음: ${netReason(x)}`) }; }
+      tried.push(t);
     }
     return null;
   };
+  if (apiRule && rule.page) {   // 규칙의 화면 하나만 본다 (후보·홈 메뉴를 돌지 않는다)
+    const hit = await tryUrl(rule.page, '규칙의 화면', 'rule-page', `정찰이 이 화면이 규칙의 API 를 부르는 것을 확인 (news-board-rules.mjs · ${today})`);
+    return { found: hit, tried };
+  }
   for (const c of s.candidates || []) {
     const hit = await tryUrl(c.url, c.label, 'candidate', c.evidence);
     if (hit) return { found: hit, tried };
@@ -180,11 +193,11 @@ async function main() {
       lines.push(`- **${s.school}**`);
       for (const t of (s.probe.tried || []).slice(0, 8)) {
         lines.push(`  - ${t.url} — ${t.status === 'ok' ? `열림 · 글처럼 보이는 행 ${t.rows}` : t.status}`);
-        if (t.diag) lines.push(`    - 생김새: ${Math.round(t.diag.bytes / 1024)}KB · 링크 ${t.diag.links} · 스크립트 ${t.diag.scripts} · 날짜 토큰 ${t.diag.dates} · 줄 블록 ${t.diag.blocks}(날짜 든 것 ${t.diag.datedBlocks})${t.diag.sample.length ? ' · 표본: ' + t.diag.sample.map((x) => `「${x}」`).join(' ') : ''}${(t.diag.anchors || []).length ? ' · 날짜 앞 링크: ' + t.diag.anchors.map((x) => '`' + x + '`').join(' ') : ''}`);
+        if (t.diag && t.diag.bytes != null) lines.push(`    - 생김새: ${Math.round(t.diag.bytes / 1024)}KB · 링크 ${t.diag.links} · 스크립트 ${t.diag.scripts} · 날짜 토큰 ${t.diag.dates} · 줄 블록 ${t.diag.blocks}(날짜 든 것 ${t.diag.datedBlocks})${t.diag.sample.length ? ' · 표본: ' + t.diag.sample.map((x) => `「${x}」`).join(' ') : ''}${(t.diag.anchors || []).length ? ' · 날짜 앞 링크: ' + t.diag.anchors.map((x) => '`' + x + '`').join(' ') : ''}`);
         if (t.diag && t.diag.api) lines.push(`    - 규칙의 API 응답: ${String(t.diag.api).replace(/`/g, "'")}`);   // json/post 규칙이 0행일 때 (apiSample)
       }
     }
-    lines.push('', `> 목록이 스크립트로만 그려지는 게시판(SPA·클릭형)은 이 로봇이 못 읽습니다 — 그런 학교는 \`collector/collect-news.mjs\` 의 \`NEWS_BOARD_RULES\` 에 규칙(json·dataId·onclick)이 필요합니다. 학생이 보는 공지 목록 주소를 알려 주시면 그 자리에 적습니다.`, '');
+    lines.push('', `> 목록이 스크립트로만 그려지는 게시판(SPA·클릭형)은 이 로봇이 못 읽습니다 — 그런 학교는 \`collector/news-board-rules.mjs\` 의 \`NEWS_BOARD_RULES\` 에 규칙(onclick·dataId·listOnly·json·post)이 필요합니다 — 정찰(\`collector/run-probe.txt\` checkUrl:)이 적어 온 것만으로 적습니다. 학생이 보는 공지 목록 주소를 알려 주시면 그 자리에 적습니다.`, '');
   }
   if (skipped.length) lines.push(`⏰ 예산(${Math.round(BUDGET_MS / 60000)}분)에 걸려 못 본 학교 ${skipped.length}곳: ${skipped.join(' · ')} — 다음 실행이 봅니다`, '');
   if (!todo.length) lines.push('_(찾을 학교가 없습니다 — 모두 boardUrl 이 있거나 14일 안에 이미 본 곳입니다)_', '');

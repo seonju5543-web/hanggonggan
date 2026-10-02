@@ -363,76 +363,7 @@
      "evidence": "웹 검색 2026-09-30 'site:www.cau.ac.kr 공지사항 학사 cms FR_CON MENU_ID' → 결과 URL https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100 (제목: CAU Notice · 요약: 전체/학사/학점교류/모집/장학/행사/일반 탭)"
     }
    ],
-   "note": "목록·상세 모두 POST API(정찰 2차 기록) — news-board-rules.mjs post 규칙. 상세 주소는 첫 줄을 실제로 눌러 받은 BoardView.do?…&BBS_SEQ=<번호> 꼴.",
-   "probe": {
-    "checkedAt": "2026-10-02",
-    "tried": [
-     {
-      "url": "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100",
-      "label": "공지사항",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 1032969,
-       "links": 578,
-       "scripts": 26,
-       "dates": 4,
-       "blocks": 432,
-       "datedBlocks": 1,
-       "sample": [
-        "<li> "
-       ],
-       "anchors": [
-        "<a href=\"http://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110\" target=\"_blank\" title=\"새창\">",
-        "<a href=\"http://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110\" target=\"_blank\" title=\"새창\">"
-       ]
-      }
-     },
-     {
-      "url": "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100",
-      "label": "CAU Notice",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 1032969,
-       "links": 578,
-       "scripts": 26,
-       "dates": 4,
-       "blocks": 432,
-       "datedBlocks": 1,
-       "sample": [
-        "<li> "
-       ],
-       "anchors": [
-        "<a href=\"http://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110\" target=\"_blank\" title=\"새창\">",
-        "<a href=\"http://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110\" target=\"_blank\" title=\"새창\">"
-       ]
-      }
-     },
-     {
-      "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=29848&pageNo=1&P_TAB_NO=1",
-      "label": "참여 안내\" class=\"\">미래AX공학관 건립기금 참여 안내",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 1045076,
-       "links": 582,
-       "scripts": 24,
-       "dates": 5,
-       "blocks": 432,
-       "datedBlocks": 2,
-       "sample": [
-        "<article> 통합 미래 AX 공학관 건립기금 모금 참여 안내 관리자 2026-05-15 조회 12862 (위 이미지를 클릭하시면 미래 AX 공학관 소개페이지로 이동합니다.) AI 시대를 이끌 중앙의 신형 엔진, 205관 미래 A",
-        "<li> "
-       ],
-       "anchors": [
-        "<a href=\"http://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110\" target=\"_blank\" title=\"새창\">",
-        "<a href=\"http://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110\" target=\"_blank\" title=\"새창\">"
-       ]
-      }
-     }
-    ]
-   }
+   "note": "목록·상세 모두 POST API(정찰 2차 기록) — news-board-rules.mjs post 규칙. 응답은 JSON(BBS_SEQ·SUBJECT · SESSIONS.md 「중앙대 게시판 사실」) — 9차는 HTML 로 읽어 0행이었다(2026-10-02 수리 · probe 를 비워 다음 실행이 바로 다시 본다). 상세 주소는 첫 줄을 실제로 눌러 받은 BoardView.do?…&BBS_SEQ=<번호> 꼴."
   },
   {
    "school": "서울시립대학교",
@@ -1202,35 +1133,8 @@
    "campus": "",
    "home": null,
    "boardUrl": null,
-   "candidates": [
-    {
-     "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/listBtin.action?bbs_cde=1&menu_idx=67",
-     "label": "공지사항",
-     "evidence": "웹 검색 2026-09-30 'knu.ac.kr wbbs listBtin.action bbs_cde=1 공지사항' → 결과 URL https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/viewBtin.action?btin.bbs_cde=1&btin.doc_no=1325007&btin.appl_no=000000&menu_idx=67 (제목: 경북대학교 > 공지 > 공지사항); 목록 listBtin.action 은 유추"
-    }
-   ],
-   "note": "🙋 개발자 요청: 공지 게시판 주소를 못 찾았다. 홈 메뉴를 따라가면 포토뉴스(홍보 기사)만 공지로 잘못 잡혀(7차까지 두 번) 홈 추적을 껐다(home null). 후보 listBtin.action 은 정찰(2026-10-01 probe-links)에서 로봇·브라우저 모두 「메인페이지로 이동 · 로그인페이지로 이동」 글자만 보이고 글이 없다. 학생이 로그인 없이 보는 경북대 공지 목록 주소가 필요하다.",
-   "probe": {
-    "checkedAt": "2026-10-02",
-    "tried": [
-     {
-      "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/listBtin.action?bbs_cde=1&menu_idx=67",
-      "label": "공지사항",
-      "rows": 0,
-      "status": "ok",
-      "diag": {
-       "bytes": 3390,
-       "links": 0,
-       "scripts": 9,
-       "dates": 0,
-       "blocks": 0,
-       "datedBlocks": 0,
-       "sample": [],
-       "anchors": []
-      }
-     }
-    ]
-   }
+   "candidates": [],
+   "note": "🙋 개발자 요청: 학생이 로그인 없이 보는 경북대 공지 목록 주소가 필요하다. 2026-10-02 리뷰: 남아 있던 후보 listBtin.action 은 검색 결과의 상세 주소(viewBtin.action)에서 **유추**한 것이라 저장소 규칙(주소를 유추하지 않는다)에 어긋나 뺐다(뺀 주소: https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/listBtin.action?bbs_cde=1&menu_idx=67). 검색에 실제로 잡힌 상세 주소는 정찰(run-probe.txt)로 열어 그 화면이 적어 둔 목록 링크를 받아 온다. 홈 메뉴 추적은 포토뉴스를 공지로 두 번 잡아 꺼 두었다(home null)."
   },
   {
    "school": "영남대학교",

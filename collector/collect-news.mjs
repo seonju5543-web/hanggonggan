@@ -14,7 +14,7 @@
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { sameSite } from './board-links.mjs';
-import { NEWS_BOARD_RULES, rowsForBoard, verifyRuleDetail, needsDetailCheck, fetchesOwnList } from './news-board-rules.mjs';   // 클릭형 게시판 규칙 한 곳 (찾기 로봇과 같은 것)
+import { NEWS_BOARD_RULES, rowsForBoard, verifyRuleDetail, needsDetailCheck, fetchesOwnList, collapseSamePost } from './news-board-rules.mjs';   // 클릭형 게시판 규칙 한 곳 (찾기 로봇과 같은 것)
 import { urlKey, dedupeNotices } from './url-key.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { activityKind } from './activity-kind.mjs';
@@ -97,7 +97,9 @@ async function harvestBoard(s, ctx = { dead: false }) {
   try {
     const rule = NEWS_BOARD_RULES[s.school];
     let html = '';
-    if (!fetchesOwnList(rule)) {   // json·post 규칙은 목록 HTML 이 아니라 API 를 읽는다 (rowsForBoard)
+    /* json·post 규칙은 목록을 API 로 읽지만(rowsForBoard), 목록 표식(link:'list') 학교는 학생 링크가 그 화면이라 **화면도 열리는지** 본다
+       (리뷰 2026-10-02: 화면이 404 가 돼도 API 만 살아 있으면 죽은 「게시판 목록 ↗」 이 계속 실렸다) */
+    if (!fetchesOwnList(rule) || rule.link === 'list') {
       const res = await fetchBoard(s.boardUrl);
       if (ctx.dead) return;
       if (!res.ok) { results.push({ name, status: `⚠️ 접속 실패 (HTTP ${res.status}) — 주소 수정 필요`, items: [] }); return; }
@@ -112,7 +114,10 @@ async function harvestBoard(s, ctx = { dead: false }) {
     const onSite = rawLinks.filter((i) => sameSite(i.url, s.boardUrl));
     const recent = onSite.filter((i) => !i.postedAt || i.postedAt >= postedCutoff());   // 오래된 고정 공지 제외 (게시일을 아는 글만 잰다)
     const items = recent.filter((i) => isNewsRow(i, { scholarship: KEYWORDS, activityKind, isAttachmentEntry }));
-    const fresh = items.filter((i) => !seen[urlKey(i.url)]).slice(0, NEWS_FRESH_MAX);
+    /* 이미 본 글 — 주소 열쇠 또는 **게시판의 글 번호**(postId). 목록 표식(#n-제목) 주소는 제목을 다듬는 규칙이 바뀌면 달라져
+       같은 글이 새 글로 다시 실렸다(경희 6건 두 번 · 리뷰 2026-10-02). 글 번호가 있으면 그것이 열쇠다. */
+    const postKey = (i) => (i.postId ? `post:${s.school}:${i.postId}` : '');
+    const fresh = items.filter((i) => !seen[urlKey(i.url)] && !(i.postId && seen[postKey(i)])).slice(0, NEWS_FRESH_MAX);
     /* 🔴 규칙으로 만든 상세 주소는 매번 첫 글 하나를 실제로 열어 제목을 확인한다 — 안 맞으면 이 게시판은 싣지 않는다(틀린 링크보다 0건). */
     if (needsDetailCheck(rule) && fresh.length) {
       const v = await verifyRuleDetail(fresh[0], { rule, boardUrl: s.boardUrl, others: items.map((i) => i.title) });
@@ -127,15 +132,19 @@ async function harvestBoard(s, ctx = { dead: false }) {
       it.campus = s.campus === '공통' ? '' : (s.campus || '');
       it.foundAt = todayStr();
       seen[urlKey(it.url)] = it.foundAt;
+      if (it.postId) seen[postKey(it)] = it.foundAt;
       freshAll.push(it);
     }
     if (ctx.dead) return;
     results.push({
       name,
       status: items.length ? `✅ 정상 (공지 글 ${items.length}건 감지 · 새 글 ${fresh.length})`
-        : rawLinks.length ? `🟡 글 줄 ${rawLinks.length} · 학교 사이트 ${onSite.length} · ${NEWS_POSTED_MAX_DAYS}일 안 ${recent.length} · 실을 글 0 — ${
-          !onSite.length ? '글 링크가 모두 다른 사이트' : !recent.length ? `게시일이 모두 ${NEWS_POSTED_MAX_DAYS}일보다 오래됨 (고정 공지만 보이거나 글이 드문 게시판)` : '모두 장학·활동·잡음 글이라 소식으로 싣지 않음'}`
-        : (fetchesOwnList(rule) ? '🟡 규칙의 API 는 응답했지만 글을 못 읽음 — 응답 칸 이름(list·title·pkId)이 바뀌었는지 news-board-rules.mjs 를 확인'
+        /* 읽기는 했는데 실을 새 소식이 없는 것(오래된 글뿐·장학/활동 글뿐)은 개발자에게 주소를 달라고 할 일이 아니다 — ℹ️ (🙋·이슈 없음 · 리뷰 2026-10-02).
+           글 링크가 모두 다른 사이트면 게시판을 잘못 잡았을 수 있어 🟡 로 남긴다. */
+        : rawLinks.length && onSite.length ? `ℹ️ 읽힘 · 실을 새 소식 없음 (글 줄 ${rawLinks.length} · 학교 사이트 ${onSite.length} · ${NEWS_POSTED_MAX_DAYS}일 안 ${recent.length}) — ${
+          !recent.length ? `게시일이 모두 ${NEWS_POSTED_MAX_DAYS}일보다 오래됨 (고정 공지만 보이거나 글이 드문 게시판)` : '모두 장학·활동·잡음 글이라 소식으로 싣지 않음'}`
+        : rawLinks.length ? `🟡 글 줄 ${rawLinks.length} · 학교 사이트 0 — 글 링크가 모두 다른 사이트 (게시판을 잘못 잡았을 수 있음)`
+        : (fetchesOwnList(rule) ? `🟡 규칙의 API 는 응답했지만 글을 못 읽음 — 응답의 글 칸(${rule.kind === 'post' ? 'JSON 의 번호·제목 칸 또는 HTML 행' : '번호·제목 칸'})이 바뀌었는지 news-board-rules.mjs 를 확인`
           : '🟡 접속은 되지만 날짜가 붙은 글 줄을 찾지 못함 — 목록이 스크립트로만 그려지거나 줄에 날짜가 없는 게시판이면 NEWS_BOARD_RULES 가 필요합니다'),
       items: fresh,
     });
@@ -182,6 +191,7 @@ all = all.filter((n) => !isAttachmentEntry(n));
 all = all.filter((n) => !n.postedAt || n.postedAt >= postedCutoff());   // 소급 — 게시일 상한 (규칙이 바뀌면 실린 글도 같은 잣대)
 /* 소급(원칙 7) — 실을지 규칙(news-kind)이 바뀌면 이미 실린 글도 같은 잣대로 다시 거른다. 2차 실행 뒤 메뉴·바닥글 잡음을 이것으로 걷었다. */
 all = all.filter((n) => isNewsRow(n, { scholarship: KEYWORDS, activityKind, isAttachmentEntry }));
+all = collapseSamePost(all);   // 같은 글이 제목 다듬기 차이로 두 번 실린 것을 합친다 (글 번호 · 목록 표식 제목의 분류 꼬리표 · 소급)
 all = dedupeNotices(all);
 all = dropUnserved(all);
 for (const n of all) { if (hideSet.has(canonUrl(n.url))) { n.hidden = true; } else if (n.hidden && !n.hiddenBy) { delete n.hidden; } }

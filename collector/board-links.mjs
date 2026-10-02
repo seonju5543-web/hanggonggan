@@ -79,36 +79,61 @@ const MIN_SHAPE = 3;
 const SEG_MAX = 3000;
 const DATE_G = /(20\d{2})\s*[.\-/년]\s*(\d{1,2})\s*[.\-/월]\s*(\d{1,2})(?!\d)|(?<!\d)(\d{2})\.(\d{2})\.(\d{2})(?!\d)/g;
 const inScript = (seg) => /<script\b(?:(?!<\/script>)[\s\S])*$/i.test(seg) || /<style\b(?:(?!<\/style>)[\s\S])*$/i.test(seg);
-/* 클릭형 게시판(news-board-rules.mjs) — <a onclick=…>·<a data-id=…> 는 href 가 없어 extractLinks 가 못 본다.
-   resolve(속성 글자) 가 상세 주소를 돌려주면 그 링크도 글 줄의 링크로 센다(제목 정리·길이 규칙은 href 링크와 같다). */
-/* 클릭형 <a> 는 줄 전체(제목·게시일·작성자·조회수)를 감싸는 일이 흔하다(동국 WISE 7차 실측 「… 안내 2026.09.17. 임준택」).
-   제목 뒤에 오는 첫 날짜부터 끝까지 잘라낸다 — 날짜가 제목 앞머리에 있는 글(「2026.10.2 셔틀 변경」)은 건드리지 않는다. */
-export function cutRowTail(title) {
-  const t = String(title || '');
-  const m = t.match(/\s+(?:20\d{2}\s*[.\-/년]\s*\d{1,2}\s*[.\-/월]\s*\d{1,2}\.?|(?<!\d)\d{2}\.\d{2}\.\d{2})(?!\d)[\s\S]*$/);
-  if (!m || m.index < 6) return t.trim();
-  /* 제목 **안**의 날짜(「학생식당 운영 2026.10.1 휴무 안내」·「신청 기간 2026.10.1 ~ 10.5」)는 꼬리가 아니다 — 꼬리는 날짜 뒤에
-     **작성자 한 낱말·조회수**만 온다(리뷰 2026-10-01: 낱말 수로 가르지 않으면 제목 가운데 날짜 뒤를 잘라 먹는다). */
-  const after = m[0].replace(/^\s+(?:20\d{2}\s*[.\-/년]\s*\d{1,2}\s*[.\-/월]\s*\d{1,2}\.?|\d{2}\.\d{2}\.\d{2})/, '').trim();
-  if (!/^(?:(?!까지|마감|부터|이후|이전|예정|안내|휴무)[가-힣A-Za-z]{2,6})?\s*(?:조회\s*\d+)?$/.test(after)) return t.trim();   // 날짜 뒤 한 낱말이 기간·안내 낱말이면 제목의 일부
-  return t.slice(0, m.index).trim();
+/* 줄의 게시일 (2026-10-02 · 리뷰) — **제목 링크 밖의 날짜**가 게시일이다. 예전엔 줄의 첫 날짜를 썼더니 「2025.12.1 공고 정정 안내」·
+   「2026.11.20 축제 개최」처럼 제목 안 날짜가 게시일이 되어 60일 상한에 최근 글이 빠지고 앞날이 '게시'로 보였다.
+   링크가 줄 전체를 감싸 밖에 날짜가 없으면(동국 WISE) 줄의 **마지막** 날짜가 게시일이다(제목 → 날짜 → 작성자 순).
+   오늘보다 뒤인 날짜는 게시일이 아니다(지어내지 않는다 — 비운다). */
+const stripAnchors = (html) => String(html || '').replace(/<a\b[\s\S]*?<\/a>/gi, ' ');
+function lastRowDate(text) {
+  const re = new RegExp(DATE_G.source, 'g'); const src = String(text || '').replace(/<[^>]+>/g, ' ');
+  let m; let last = null;
+  while ((m = re.exec(src)) !== null) last = m[0];
+  return last ? rowDate(last) : null;
 }
-/* 줄 전체를 감싼 링크의 앞머리 분류 꼬리표(경희 「공통 [추천채용] …」·「국제 [(주)…」 8차 실측) — 대괄호 앞의 짧은 분류 낱말만 뗀다 */
-const ROW_BADGE = /^(?:공통|국제|일반|학사|장학|행사|채용|공지|중요공지|새글)\s+(?=\[)/;
-function resolvedLinks(seg, resolve) {
+const todayKst = () => new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
+export function rowPostedAt(rowHtml) {
+  const d = rowDate(stripAnchors(rowHtml)) || lastRowDate(rowHtml);
+  return d && d <= todayKst() ? d : null;
+}
+/* 클릭형 <a> 가 줄 전체(제목·게시일·작성자·조회수)를 감쌀 때만(동국 WISE 7차 실측 「… 안내 2026.09.17. 임준택」) 제목 뒤 꼬리를 뗀다.
+   🔴 자르는 자리는 **그 줄의 게시일과 같은 날짜**의 마지막 자리이고, 그 뒤에는 작성자 한 낱말·조회수만 와야 한다 — 그 밖엔 손대지 않는다.
+   (리뷰 2026-10-02: 날짜 뒤 낱말 목록으로 가르면 「셔틀 운행 2026.10.5 중단」처럼 목록에 없는 낱말이 올 때 제목이 잘렸다.) */
+export function cutRowTail(title, postedAt) {
+  const t = String(title || '').trim();
+  if (!postedAt) return t;
+  const re = new RegExp(DATE_G.source, 'g');
+  let m; let last = null;
+  while ((m = re.exec(t)) !== null) if (rowDate(m[0]) === postedAt) last = m;
+  if (!last || last.index < 6) return t;
+  const after = t.slice(last.index + last[0].length).replace(/^\./, '').trim();
+  /* 날짜 뒤에 남는 것이 작성자 한 낱말·조회수일 때만 꼬리다. 기간·안내 낱말(「까지」·「휴무」)은 이름이 아니다 — 제목의 일부로 둔다 */
+  if (after && (!/^(?:[가-힣A-Za-z]{2,10})?\s*(?:조회(?:수)?\s*[\d,]+)?$/.test(after) || /^(?:까지|부터|마감|이후|이전|예정|안내|휴무|중단|시행|개최|접수|신청|모집|변경|연기|취소)/.test(after))) return t;
+  return t.slice(0, last.index).trim();
+}
+/* 앞머리 분류 꼬리표(경희 「공통 [추천채용] …」)는 **떼지 않는다** (2026-10-02 · 리뷰) — 9차에 뗐더니 ① 같은 글이 새 제목으로 다시 실렸고
+   ② 「국제」(이원화 학교의 캠퍼스 표시)까지 지워졌다. 사이트가 적은 그대로 두고, 같은 글인지는 글 번호(postId)로 가린다. */
+/* 클릭형 게시판(news-board-rules.mjs) — <a onclick=…>·<a data-id=…> 는 href 가 없어 extractLinks 가 못 본다.
+   resolve(속성 글자, 제목) 가 상세 주소(문자열) 또는 { url, id } 를 돌려주면 그 링크도 글 줄의 링크로 센다.
+   id 는 **게시판이 붙인 글 번호**다 — 제목을 다듬는 규칙이 바뀌어도 같은 글로 알아보는 열쇠(postId · 리뷰 2026-10-02: 경희 6건이 두 번씩 실렸다). */
+function resolvedLinks(seg, resolve, row = {}) {
   const out = [];
   const re = /<a\b([^>]*)>([\s\S]*?)<\/a>/gi;
   let m;
   while ((m = re.exec(seg)) !== null) {
-    const title = cutRowTail(cleanTitle(m[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim())).replace(ROW_BADGE, '');
+    let title = cleanTitle(m[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim());
+    if (row.wraps) title = cutRowTail(title, row.postedAt);
     if (title.length < 6 || title.length > 140) continue;
-    const url = resolve(m[1], title);
+    const r = resolve(m[1], title);
+    const url = typeof r === 'string' ? r : (r && r.url);
     if (!url) continue;
-    out.push({ title, url });
+    out.push(r && r.id != null ? { title, url, postId: String(r.id) } : { title, url });
   }
   return out;
 }
-const rowLinks = (seg, base, postedAt, resolve) => extractLinks(seg, base).concat(resolve ? resolvedLinks(seg, resolve) : []).filter((l) => l.title.length >= 4 && !isAttachmentEntry(l)).map((l) => ({ ...l, postedAt, shape: urlShape(l.url) })).filter((l) => l.shape);
+const rowLinks = (seg, base, postedAt, resolve) => {
+  const wraps = !rowDate(stripAnchors(seg));   // 날짜가 링크 안에만 있다 = 링크가 줄 전체를 감쌌다
+  return extractLinks(seg, base).concat(resolve ? resolvedLinks(seg, resolve, { wraps, postedAt }) : []).filter((l) => l.title.length >= 4 && !isAttachmentEntry(l)).map((l) => ({ ...l, postedAt, shape: urlShape(l.url) })).filter((l) => l.shape);
+};
 /* 두 눈을 합친다 (5차 실행 실측 · 2026-10-01): ① 블록 눈(<tr>·<li>·<dl>·<dd>·<article> 안에 날짜) — 표 게시판에 강하다(서울대·연세·국민·인하·방송대…)
    ② 토막 눈(날짜 토큰 앞 SEG_MAX 자) — div·dt/dd 로 그린 목록에 강하다(성균관·광운·한양·명지). 한쪽만 쓰면 다른 쪽 학교가 0행이 된다.
    후보 묶음마다 주소 꼴을 세고, 되풀이되는 꼴(MIN_SHAPE 이상)만 글 — 메뉴 덩어리는 꼴이 한 번씩이라 떨어진다. */
@@ -119,18 +144,19 @@ export function extractDatedRows(html, base, opts = {}) {
   const blockRe = /<(tr|li|dl|dd|article)\b[^>]*>((?:(?!<\1\b)[\s\S])*?)<\/\1>/gi;
   let m;
   while ((m = blockRe.exec(src)) !== null) {
-    const postedAt = rowDate(m[2]);
-    if (!postedAt) continue;
+    if (!rowDate(m[2])) continue;                 // 날짜가 붙은 줄만 글 줄이다
+    const postedAt = rowPostedAt(m[2]);           // 게시일은 제목 밖 날짜 (없거나 앞날이면 비운다)
     const links = rowLinks(m[2], base, postedAt, resolve);
     if (links.length) groups.push({ links, pick: 'longest' });
   }
   let prev = 0;
   DATE_G.lastIndex = 0;
   while ((m = DATE_G.exec(src)) !== null) {
-    const postedAt = rowDate(m[0]);
+    const tokenDate = rowDate(m[0]);
     const seg = src.slice(Math.max(prev, m.index - SEG_MAX), m.index);
     prev = DATE_G.lastIndex;
-    if (!postedAt || inScript(seg)) continue;
+    if (!tokenDate || inScript(seg)) continue;
+    const postedAt = tokenDate <= todayKst() ? tokenDate : null;   // 토막 눈의 날짜는 링크 뒤(밖)의 날짜다 — 앞날만 비운다
     const links = rowLinks(seg, base, postedAt, resolve);
     if (links.length) groups.push({ links, pick: 'last' });   // 토막에선 날짜에 가장 가까운 링크가 제 줄의 제목
   }
@@ -144,7 +170,7 @@ export function extractDatedRows(html, base, opts = {}) {
     if (!same.length) continue;
     const anchor = g.pick === 'last' ? same[same.length - 1] : same.slice().sort((a, c) => c.title.length - a.title.length)[0];
     const best = same.filter((l) => l.url === anchor.url).sort((a, c) => c.title.length - a.title.length)[0];
-    if (!out.has(best.url)) out.set(best.url, { title: best.title, url: best.url, postedAt: best.postedAt });
+    if (!out.has(best.url)) out.set(best.url, { title: best.title, url: best.url, postedAt: best.postedAt || undefined, ...(best.postId ? { postId: best.postId } : {}) });
   }
   return [...out.values()];
 }
