@@ -168,7 +168,52 @@
      "evidence": "같은 검색 → 결과 URL https://www.korea.ac.kr/ko/567/subview.do (제목: 학사공지)"
     }
    ],
-   "note": "일반공지 566 — 행은 jf_view 클릭형, 상세는 subview.do?enc=… (정찰 3차 · news-board-rules.mjs). 화면엔 목록 줄이 있는데 로봇이 받은 HTML 엔 없었다(9차 찾기 진단 datedBlocks 1) — 정찰 4차가 서버 HTML 을 잰다."
+   "note": "일반공지 566 — 행은 jf_view 클릭형, 상세는 subview.do?enc=… (정찰 3차 · news-board-rules.mjs). 화면엔 목록 줄이 있는데 로봇이 받은 HTML 엔 없었다(9차 찾기 진단 datedBlocks 1) — 정찰 4차가 서버 HTML 을 잰다.",
+   "probe": {
+    "checkedAt": "2026-10-03",
+    "tried": [
+     {
+      "url": "https://www.korea.ac.kr/ko/566/subview.do",
+      "label": "일반공지",
+      "rows": 10,
+      "status": "규칙 상세 확인 실패 — 상세 주소가 목록으로 되돌아옴 (규칙이 이 게시판에 안 맞음)"
+     },
+     {
+      "url": "https://www.korea.ac.kr/ko/567/subview.do",
+      "label": "학사공지",
+      "rows": 0,
+      "status": "ok",
+      "diag": {
+       "bytes": 90196,
+       "links": 352,
+       "scripts": 31,
+       "dates": 10,
+       "blocks": 261,
+       "datedBlocks": 1,
+       "sample": [
+        "<article> fnctId=portalBoard,fnctNo=2 게시판 검색 시작일 ~ 종료일 게시물 검색 제목 작성자 번호, 제목, 작성자, 등록일자, 조회수 정보를 제공 번호 제목 작성자 Department --> 등록일자 조"
+       ],
+       "anchors": []
+      }
+     },
+     {
+      "url": "https://www.korea.ac.kr/ko/461/subview.do",
+      "label": "학부 학사일정",
+      "rows": 0,
+      "status": "ok",
+      "diag": {
+       "bytes": 115062,
+       "links": 355,
+       "scripts": 31,
+       "dates": 4,
+       "blocks": 258,
+       "datedBlocks": 0,
+       "sample": [],
+       "anchors": []
+      }
+     }
+    ]
+   }
   },
   {
    "school": "고려대학교 세종캠퍼스",
@@ -298,7 +343,7 @@
    "school": "중앙대학교",
    "campus": "공통",
    "home": "https://www.cau.ac.kr/",
-   "boardUrl": null,
+   "boardUrl": "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100",
    "candidates": [
     {
      "url": "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100",
@@ -306,7 +351,19 @@
      "evidence": "웹 검색 2026-09-30 'site:www.cau.ac.kr 공지사항 학사 cms FR_CON MENU_ID' → 결과 URL https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100 (제목: CAU Notice · 요약: 전체/학사/학점교류/모집/장학/행사/일반 탭)"
     }
    ],
-   "note": "목록·상세 모두 POST API(정찰 2차 기록) — news-board-rules.mjs post 규칙. 응답은 JSON(BBS_SEQ·SUBJECT · SESSIONS.md 「중앙대 게시판 사실」) — 9차는 HTML 로 읽어 0행이었다(2026-10-02 수리 · probe 를 비워 다음 실행이 바로 다시 본다). 상세 주소는 첫 줄을 실제로 눌러 받은 BoardView.do?…&BBS_SEQ=<번호> 꼴."
+   "note": "목록·상세 모두 POST API(정찰 2차 기록) — news-board-rules.mjs post 규칙. 응답은 JSON(BBS_SEQ·SUBJECT · SESSIONS.md 「중앙대 게시판 사실」) — 9차는 HTML 로 읽어 0행이었다(2026-10-02 수리 · probe 를 비워 다음 실행이 바로 다시 본다). 상세 주소는 첫 줄을 실제로 눌러 받은 BoardView.do?…&BBS_SEQ=<번호> 꼴.",
+   "autoFound": {
+    "date": "2026-10-03",
+    "via": "rule-page",
+    "label": "규칙의 화면",
+    "rows": 15,
+    "sample": [
+     "2026학년도 AX미래장학금 장학생 선발 결과 공고",
+     "[중앙대 캠퍼스타운] 2026 제13회 중앙대학교 캠퍼스타운 입주기업 선발 경진대회",
+     "2027학년도 수시 논술고사 관련 캠퍼스 출입 통제 안내(10월 10일~11일)"
+    ],
+    "evidence": "정찰이 이 화면이 규칙의 API 를 부르는 것을 확인 (news-board-rules.mjs · 2026-10-03) · 상세를 열어 제목 확인 (https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30223&pageNo=1)"
+   }
   },
   {
    "school": "서울시립대학교",
@@ -560,7 +617,7 @@
    "school": "상명대학교",
    "campus": "",
    "home": "https://www.smu.ac.kr/kor/index.do",
-   "boardUrl": null,
+   "boardUrl": "https://www.smu.ac.kr/webzine/today.do",
    "candidates": [
     {
      "url": "https://www.smu.ac.kr/kor/life/notice.do",
@@ -573,7 +630,19 @@
      "evidence": "찾기 로봇이 2026-10-01 홈 메뉴 「상명 새소식 더보기」를 따라 열어 글 10행을 확인(autoFound) — 통합공지가 로봇에게 안 읽힐 때의 대체 출처"
     }
    ],
-   "note": "통합공지(notice.do)가 먼저 — 9차 메모의 \"클릭형\"은 틀렸다(정찰 3차: 보통 href 링크 + 날짜). 로봇이 받는 HTML 에 줄이 있는지는 정찰 4차가 잰다(서버 HTML vs 그린 화면). 안 읽히면 찾기 로봇이 새소식(보도자료)으로 물러난다. 장학 수집은 브라우저 담당(schools.json)."
+   "note": "통합공지(notice.do)가 먼저 — 9차 메모의 \"클릭형\"은 틀렸다(정찰 3차: 보통 href 링크 + 날짜). 로봇이 받는 HTML 에 줄이 있는지는 정찰 4차가 잰다(서버 HTML vs 그린 화면). 안 읽히면 찾기 로봇이 새소식(보도자료)으로 물러난다. 장학 수집은 브라우저 담당(schools.json).",
+   "autoFound": {
+    "date": "2026-10-03",
+    "via": "candidate",
+    "label": "상명 새소식(보도자료)",
+    "rows": 10,
+    "sample": [
+     "서울시여성가족재단과 MOU 체결... 안전한 대학문화 조성 위해 ‘맞손’",
+     "우리 대학서 ‘파키스탄 영양 정책 관리자 초청 연수’ 개최... 서울시 식생활종합지원센터 운영 사례 소개",
+     "경영대학원 피트니스 MBA, 중국 차이나핏 대표단과 간담회 시행"
+    ],
+    "evidence": "찾기 로봇이 2026-10-01 홈 메뉴 「상명 새소식 더보기」를 따라 열어 글 10행을 확인(autoFound) — 통합공지가 로봇에게 안 읽힐 때의 대체 출처"
+   }
   },
   {
    "school": "가천대학교",

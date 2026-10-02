@@ -1,7 +1,16 @@
 {
  "school": "인하대학교",
- "updatedAt": "2026-10-02",
+ "updatedAt": "2026-10-03",
  "items": [
+  {
+   "title": "[인하대학교] 2026-2학기 직원 채용 공고",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/45700/artclView.do",
+   "postedAt": "2026-10-02",
+   "kind": "채용",
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-10-03"
+  },
   {
    "title": "[인재개발팀] 전국 지역인재 7급 수습직원 선발시험 향후 변경사항 안내",
    "url": "https://www.inha.ac.kr/bbs/kr/8/45704/artclView.do",
