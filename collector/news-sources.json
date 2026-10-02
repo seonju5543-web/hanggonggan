@@ -155,7 +155,7 @@
    "school": "고려대학교",
    "campus": "",
    "home": "https://www.korea.ac.kr/sites/ko/index.do",
-   "boardUrl": null,
+   "boardUrl": "https://www.korea.ac.kr/ko/566/subview.do",
    "candidates": [
     {
      "url": "https://www.korea.ac.kr/ko/566/subview.do",
@@ -168,7 +168,19 @@
      "evidence": "같은 검색 → 결과 URL https://www.korea.ac.kr/ko/567/subview.do (제목: 학사공지)"
     }
    ],
-   "note": "일반공지 566 — 행은 jf_view 클릭형, 상세는 subview.do?enc=… (정찰 3차 · news-board-rules.mjs). 화면엔 목록 줄이 있는데 로봇이 받은 HTML 엔 없었다(9차 찾기 진단 datedBlocks 1) — 정찰 4차가 서버 HTML 을 잰다."
+   "note": "일반공지 566 — 행은 jf_view 클릭형, 상세는 subview.do?enc=… (정찰 3차 · news-board-rules.mjs). 화면엔 목록 줄이 있는데 로봇이 받은 HTML 엔 없었다(9차 찾기 진단 datedBlocks 1) — 정찰 4차가 서버 HTML 을 잰다.",
+   "autoFound": {
+    "date": "2026-10-03",
+    "via": "candidate",
+    "label": "일반공지",
+    "rows": 10,
+    "sample": [
+     "[원격교육센터] AI튜터(AI조교) 교수자 교육 안내 및 2026-2학기 시범운영 추가 참여 교과목 모집",
+     "[임상간호대학원] 2027학년도 전기 신입생(석사) 모집",
+     "★ Talk To Me In Korean 선현우 대표 토크 콘서트에 초청합니다 ★"
+    ],
+    "evidence": "웹 검색 2026-09-30 'site:www.korea.ac.kr 일반공지 학사공지 subview.do' → 결과 URL https://www.korea.ac.kr/ko/566/subview.do (제목: 일반공지) · 상세를 열어 제목 확인 (https://www.korea.ac.kr/ko/566/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjElMkYwMDAwNjAwMDAwMDAwNjE0MzUlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D)"
+   }
   },
   {
    "school": "고려대학교 세종캠퍼스",
@@ -945,7 +957,7 @@
    "school": "계명대학교",
    "campus": "",
    "home": "https://www.kmu.ac.kr/",
-   "boardUrl": null,
+   "boardUrl": "https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=143",
    "candidates": [
     {
      "url": "https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=143",
@@ -958,7 +970,19 @@
      "evidence": "같은 검색 → 결과 URL https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=144&cmd=2&parm_bod_uid=232037 (제목: 계명대학교 - 열린마당 > 공지사항 > 학사)"
     }
    ],
-   "note": "공지사항 일반(143) — 정찰 4차(2026-10-02): 로봇이 받는 HTML 에 목록이 그대로 있고 보통 링크(page.jsp?…cmd=2&parm_bod_uid=<번호>…)인데, 작성일이 26-09-30(두 자리 연도·줄표)이라 날짜 눈이 못 읽어 0행이었다 → board-links.mjs rowDate 가 이 꼴을 읽는다."
+   "note": "공지사항 일반(143) — 정찰 4차(2026-10-02): 로봇이 받는 HTML 에 목록이 그대로 있고 보통 링크(page.jsp?…cmd=2&parm_bod_uid=<번호>…)인데, 작성일이 26-09-30(두 자리 연도·줄표)이라 날짜 눈이 못 읽어 0행이었다 → board-links.mjs rowDate 가 이 꼴을 읽는다.",
+   "autoFound": {
+    "date": "2026-10-03",
+    "via": "candidate",
+    "label": "일반공지",
+    "rows": 25,
+    "sample": [
+     "2027학년도 1학기 CAMPUS Asia-AIMS 파견 교환학생 후보 2차 추가 선발시험 안내",
+     "[K-Cloud] 2026학년도 2학기 K-Cloud 융합 성장 인증제 신청 안내",
+     "[학생상담센터] 2026학년도 2학기 학기제 집단상담 안내"
+    ],
+    "evidence": "웹 검색 2026-09-30 '계명대학교 공지사항 kmu.ac.kr' → 결과 URL https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=143 (제목: 계명대학교 - 열린마당 > 공지사항 > 일반)"
+   }
   },
   {
    "school": "서울교육대학교",

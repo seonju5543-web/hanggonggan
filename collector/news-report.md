@@ -1,15 +1,13 @@
 ## 🗞 교내 소식 수집 리포트 (2026-10-03)
 
-새 글 **14건** → 앱 홈 「우리 학교 소식」 (학교별 파일 data/news/ · 41개교 · 게시판 아는 학교 41/44)
+새 글 **30건** → 앱 홈 「우리 학교 소식」 (학교별 파일 data/news/ · 43개교 · 게시판 아는 학교 43/44)
 
-⏱ 게시판 44곳을 1분 27초에 다 돌았습니다(예산 4분).
+⏱ 게시판 44곳을 1분 55초에 다 돌았습니다(예산 4분).
 
-⚙️ 게시판 주소가 아직 없는 학교 3곳: 고려대학교 · 계명대학교 · 경북대학교 (찾기 로봇 리포트 collector/find-news-boards-report.md)
+⚙️ 게시판 주소가 아직 없는 학교 1곳: 경북대학교 (찾기 로봇 리포트 collector/find-news-boards-report.md)
 
 ### 경희대학교
-상태: ✅ 정상 (공지 글 6건 감지 · 새 글 2)
-- [국제 [교수학습개발원] 국제C 학부생을 위한 학습컨설팅 신청 안내(10월)](https://www.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200316#n-%EA%B5%AD%EC%A0%9C%20%5B%EA%B5%90%EC%88%98%ED%95%99%EC%8A%B5%EA%B0%9C%EB%B0%9C%EC%9B%90%5D%20%EA%B5%AD%EC%A0%9CC%20%ED%95%99%EB%B6%80%EC%83%9D%EC%9D%84%20%EC%9C%84%ED%95%9C%20%ED%95%99%EC%8A%B5%EC%BB%A8%EC%84%A4%ED%8C%85%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4(10%EC%9B%94)) — 2026-10-02
-- [공통 [교수학습개발원] AI시대 대학생의 학습 경험과 인식 설문조사 참여 안내](https://www.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200316#n-%EA%B3%B5%ED%86%B5%20%5B%EA%B5%90%EC%88%98%ED%95%99%EC%8A%B5%EA%B0%9C%EB%B0%9C%EC%9B%90%5D%20AI%EC%8B%9C%EB%8C%80%20%EB%8C%80%ED%95%99%EC%83%9D%EC%9D%98%20%ED%95%99%EC%8A%B5%20%EA%B2%BD%ED%97%98%EA%B3%BC%20%EC%9D%B8%EC%8B%9D%20%EC%84%A4%EB%AC%B8%EC%A1%B0%EC%82%AC%20%EC%B0%B8%EC%97%AC%20%EC%95%88%EB%82%B4) — 2026-10-02
+상태: ✅ 정상 (공지 글 6건 감지 · 새 글 0)
 
 ### 한국외국어대학교
 상태: ✅ 정상 (공지 글 10건 감지 · 새 글 0)
@@ -24,7 +22,17 @@
 상태: ✅ 정상 (공지 글 9건 감지 · 새 글 0)
 
 ### 고려대학교
-상태: ⚙️ 게시판 주소 미설정 (찾기 로봇이 못 찾음 — 리포트 참조)
+상태: ✅ 정상 (공지 글 10건 감지 · 새 글 10)
+- [채용] [[원격교육센터] AI튜터(AI조교) 교수자 교육 안내 및 2026-2학기 시범운영 추가 참여 교과목 모집](https://www.korea.ac.kr/ko/566/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjElMkYwMDAwNjAwMDAwMDAwNjE0MzUlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D) — 2026-10-02
+- [[임상간호대학원] 2027학년도 전기 신입생(석사) 모집](https://www.korea.ac.kr/ko/566/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjElMkYwMDAwNjAwMDAwMDAwNjE0NTElMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D) — 2026-10-02
+- [행사] [★ Talk To Me In Korean 선현우 대표 토크 콘서트에 초청합니다 ★](https://www.korea.ac.kr/ko/566/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjElMkYwMDAwNjAwMDAwMDAwNjE0NDklMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D) — 2026-10-01
+- [[에너지환경대학원(그린스쿨)] 2027학년도 전기 신입생 모집 안내](https://www.korea.ac.kr/ko/566/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjElMkYwMDAwNjAwMDAwMDAwNjExODYlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D) — 2026-10-01
+- [[고대빵] 2027 수능 선물세트 안내](https://www.korea.ac.kr/ko/566/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjElMkYwMDAwNjAwMDAwMDAwNjE0NDUlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D) — 2026-10-01
+- [[안암학사] 2026학년도 2학기 학생동(직영) 잔여석 모집 안내(3차)](https://www.korea.ac.kr/ko/566/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjElMkYwMDAwNjAwMDAwMDAwNjE0NDMlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D) — 2026-10-01
+- [[법인본부] 고려대학교 제22대 총장 공모 공고](https://www.korea.ac.kr/ko/566/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjElMkYwMDAwNjAwMDAwMDAwNjE0MjclMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D) — 2026-09-30
+- [생활] [정기 고연전 행사로 인한 셔틀버스 미운행 안내(10/2)](https://www.korea.ac.kr/ko/566/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjElMkYwMDAwNjAwMDAwMDAwNjE0MzQlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D) — 2026-09-30
+- [[🍀비교과는쿠카이브] 2026학년도 비교과 수요조사 안내 (🎁이벤트)](https://www.korea.ac.kr/ko/566/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjElMkYwMDAwNjAwMDAwMDAwNjEzMDklMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D) — 2026-09-30
+- [[정보보호대학원] 2027학년도 전기 정보보호학과 신입생 (석사,박사,석박사통합과정) 모집](https://www.korea.ac.kr/ko/566/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjElMkYwMDAwNjAwMDAwMDAwNjE0MDAlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D) — 2026-09-29
 
 ### 고려대학교 세종캠퍼스
 상태: ✅ 정상 (공지 글 3건 감지 · 새 글 0)
@@ -39,16 +47,7 @@
 상태: ✅ 정상 (공지 글 12건 감지 · 새 글 0)
 
 ### 중앙대학교
-상태: ✅ 정상 (공지 글 9건 감지 · 새 글 9)
-- [2027학년도 수시 논술고사 관련 캠퍼스 출입 통제 안내(10월 10일~11일)](https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30221&pageNo=1) — 2026-10-02
-- [2학기 취업지원 프로그램 / ACP 그래픽 자격증 취득 과정](https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=28391&pageNo=1) — 2026-10-02
-- [HY사회복지재단 취약계층 학비보조 지원사업 2026년 든든 학업지원금 선발 공고](https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30220&pageNo=1) — 2026-10-01
-- [교섭 요구 사실의 공고](https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30219&pageNo=1) — 2026-10-01
-- [행사] [2026학년도 10월 건강센터 (다빈치) 행사 안내 캘린더](https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30217&pageNo=1) — 2026-10-01
-- [행사] [2026학년도 10월 건강센터 (서울) 행사 안내 캘린더](https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30216&pageNo=1) — 2026-10-01
-- [2026년 동작구 금연지도원(자원봉사자) 모집안내](https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30212&pageNo=1) — 2026-09-30
-- [2026 랜선으로 만나는 릴레이 글로벌 취·창업 톡톡톡](https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30211&pageNo=1) — 2026-09-29
-- [2026학년도 2학기 직무적성검사 대비 프로그램:10/1(목)~10/6(화)](https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30208&pageNo=1) — 2026-09-29
+상태: ✅ 정상 (공지 글 9건 감지 · 새 글 0)
 
 ### 서울시립대학교
 상태: ✅ 정상 (공지 글 9건 감지 · 새 글 0)
@@ -96,13 +95,10 @@
 상태: ✅ 정상 (공지 글 12건 감지 · 새 글 0)
 
 ### 인하대학교
-상태: ✅ 정상 (공지 글 13건 감지 · 새 글 1)
-- [채용] [[인하대학교] 2026-2학기 직원 채용 공고](https://www.inha.ac.kr/bbs/kr/8/45700/artclView.do) — 2026-10-02
+상태: ✅ 정상 (공지 글 13건 감지 · 새 글 0)
 
 ### 부산대학교
-상태: ✅ 정상 (공지 글 11건 감지 · 새 글 2)
-- [[부산대자율상권조합] 청년연구팀 모집...](https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511281) — 2026-09-29
-- [[언어교육원] 2026학년도 2차 BK21 한국어역량강화 지원 프로그램 수강생 ...](https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511275) — 2026-09-29
+상태: ✅ 정상 (공지 글 11건 감지 · 새 글 0)
 
 ### 가톨릭대학교
 상태: ✅ 정상 (공지 글 4건 감지 · 새 글 0)
@@ -117,7 +113,27 @@
 상태: ✅ 정상 (공지 글 10건 감지 · 새 글 0)
 
 ### 계명대학교
-상태: ⚙️ 게시판 주소 미설정 (찾기 로봇이 못 찾음 — 리포트 참조)
+상태: ✅ 정상 (공지 글 20건 감지 · 새 글 20)
+- [[K-Cloud] 2026학년도 2학기 K-Cloud 융합 성장 인증제 신청 안내](https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=0&pageOrder=0&cmd=2&parm_bod_uid=271043&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&) — 2026-09-28
+- [[학생상담센터] 2026학년도 2학기 학기제 집단상담 안내](https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=0&pageOrder=0&cmd=2&parm_bod_uid=270667&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&) — 2026-09-15
+- [2026학년도 2학기 K-STAR 단계별 선발 일정 안내](https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=0&pageOrder=0&cmd=2&parm_bod_uid=270269&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&) — 2026-09-02
+- [[필수(법정)교육] 2026학년도 2학기 학생 대상 온라인 폭력예방교육 수강 안내](https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=0&pageOrder=0&cmd=2&parm_bod_uid=270267&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&) — 2026-09-02
+- [2026학년도 2학기 COMpass K 실적 입력 및 승인 마감 안내](https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=0&pageOrder=0&cmd=2&parm_bod_uid=270265&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&) — 2026-09-02
+- [뮤지컬 <광화문 연가>, <캣츠> 계명가족 특별할인 안내 ​](https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271163&pageOrder=0&cmd=2&parm_bod_uid=271163&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&) — 2026-10-02
+- [행사] [[K-Cloud] 2026학년도 2학기 K-Cloud 융합 성장 인증제 설명회 안내](https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271163&pageOrder=0&cmd=2&parm_bod_uid=271157&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&) — 2026-10-02
+- [여성학연구소 뉴스레터 계명여성학 제11호](https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271163&pageOrder=0&cmd=2&parm_bod_uid=271134&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&) — 2026-10-01
+- [대학 중심 딥테크 창업 활성화 기반 조성 사업 (예비)창업자 모집](https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271163&pageOrder=0&cmd=2&parm_bod_uid=270973&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&) — 2026-09-23
+- [10월 대명캠퍼스 계명모의토익 안내](https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271163&pageOrder=0&cmd=2&parm_bod_uid=270971&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&) — 2026-09-23
+- [10월 성서캠퍼스 계명모의토익 안내](https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271163&pageOrder=0&cmd=2&parm_bod_uid=270970&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&) — 2026-09-23
+- [[교수학습개발센터] 학습자 참여형 수업 길잡이 프로그램 안내](https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271163&pageOrder=0&cmd=2&parm_bod_uid=270938&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&) — 2026-09-22
+- [AI 코스웨어(풀리캠퍼스) 기반 수학 기초역량 강화 프로그램 안내](https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271163&pageOrder=0&cmd=2&parm_bod_uid=270922&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&) — 2026-09-21
+- [[학생성공센터] 생성형 AI 및 프로그래밍 실습 교육 학생 모집(선착순/온라인)](https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271163&pageOrder=0&cmd=2&parm_bod_uid=270812&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&) — 2026-09-18
+- [[학생성공센터] 휴먼-AI 협업 실습 프로그램 학생 모집](https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271163&pageOrder=0&cmd=2&parm_bod_uid=270737&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&) — 2026-09-17
+- [제122회 <대학원생 콜로키움>에 초대합니다. ​](https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271163&pageOrder=0&cmd=2&parm_bod_uid=270732&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&) — 2026-09-17
+- [[학생성공센터] MOS 365 교육 학생 모집(온라인)](https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271163&pageOrder=0&cmd=2&parm_bod_uid=270665&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&) — 2026-09-15
+- [26학년도 2학기 일대일 컨설팅 프로그램 안내](https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271163&pageOrder=0&cmd=2&parm_bod_uid=270606&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&) — 2026-09-14
+- [[전산개발팀] EDWARD 시스템의 네트워크 장비 교체에 따른 통합 로그인(SSO) 서비스 중지 안내](https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271163&pageOrder=0&cmd=2&parm_bod_uid=270511&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&) — 2026-09-10
+- [[학생상담센터] 2026년 2학기 통합스트레스 검사 실시 안내(추첨 기프티콘 지급/COM K1점)](https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271163&pageOrder=0&cmd=2&parm_bod_uid=270448&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&) — 2026-09-08
 
 ### 서울교육대학교
 상태: ✅ 정상 (공지 글 9건 감지 · 새 글 0)
