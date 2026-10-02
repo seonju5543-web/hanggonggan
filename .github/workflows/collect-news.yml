@@ -30,8 +30,8 @@ jobs:
     env:
       NODE_EXTRA_CA_CERTS: collector/certs/bundle.pem   # 계명대처럼 중간 인증서를 안 보내는 학교 (collector/certs/README.md)
     # 상한 = 단계 상한의 합 + 여유 3 (관문 test-collector 「교내 소식」이 대소관계를 잰다 · 상한을 키워 때우지 말 것).
-    # 찾기 7 + 수집 6 + 알림 1 + 관문 5 + 되돌리기 1 + 감사 알림 1 + 저장 3 + 리포트 1 + 알림 1 = 26 → 30
-    timeout-minutes: 30
+    # 찾기 7 + 수집 6 + 썸네일 5 + 알림 1 + 관문 5 + 되돌리기 1 + 감사 알림 1 + 저장 3 + 리포트 1 + 알림 1 = 31 → 35
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
         with:
@@ -64,6 +64,19 @@ jobs:
           NEWS_BUDGET_MS: '240000'
         run: node collector/collect-news.mjs
 
+      # 썸네일 (보강 — 실패해도 소식은 나간다 · 2026-10-03 개발자 지시 "실제 뉴스의 사진을 썸네일로").
+      # 새 글부터 상세 화면을 열어 그 글의 사진을 240px WebP 로 줄여 data/news/img/ 에 둔다(collector/collect-news-thumbs.mjs 머리말).
+      # 그림 도구 sharp 는 이 단계에서만 설치한다(설치 실패는 삼키지 않는다 — 단계가 실패로 남고 소식 저장은 그대로 간다).
+      # 상한 5 = 자체 예산 2.5분 + 글 하나 시한 30초 + 설치·정리 여유.
+      - name: 교내 소식 썸네일 (보강 — 실패해도 수집분은 나간다)
+        timeout-minutes: 5
+        continue-on-error: true
+        env:
+          NEWS_THUMB_BUDGET_MS: '150000'
+        run: |
+          npm i sharp --no-audit --no-fund --silent
+          node collector/collect-news-thumbs.mjs
+
       - name: 🚨 수집 단계 실패 알림 (최근 리포트 이슈에 코멘트)
         if: steps.run.outcome != 'success'
         timeout-minutes: 1
@@ -92,6 +105,8 @@ jobs:
         timeout-minutes: 1
         run: |
           git checkout -- data/news collector/seen-news.json 2>/dev/null || true
+          # 썸네일 장부는 따로 — 한 줄에 묶으면 장부가 아직 없는 첫 실행에 git checkout 이 통째로 실패해 소식 파일도 안 돌아간다
+          git checkout -- collector/news-thumbs.json 2>/dev/null || rm -f collector/news-thumbs.json
           git clean -fdq data/news || true
 
       # 감사 실패는 조용히 넘어가지 않는다 — 되돌리기만 하고 끝나면 홈 구역이 **소리 없이 멈춘다**(리뷰 2026-10-01). 이슈를 새로 연다(첫 실행엔 댓글 달 이슈가 없다).
@@ -119,6 +134,8 @@ jobs:
           [ -f collector/news-sources.json ] && git add collector/news-sources.json
           [ -f collector/news-report.md ] && git add collector/news-report.md
           [ -f collector/find-news-boards-report.md ] && git add collector/find-news-boards-report.md
+          [ -f collector/news-thumbs.json ] && git add collector/news-thumbs.json
+          [ -f collector/news-thumbs-report.md ] && git add collector/news-thumbs-report.md
           true
           if ! git diff --cached --quiet; then
             git commit -m "news: 교내 소식 수집"

@@ -22,7 +22,8 @@ import * as canon from '../collector/canon-url.mjs';
 import { indexTexts, sourceFor, hasText } from '../collector/notice-source.mjs';
 import { attachmentText, readable } from '../collector/attachment-text.mjs';
 import { periodAfterDeadline, amountAfterValue } from './edit-diff.mjs';
-import { newsPostKey } from '../collector/news-board-rules.mjs';   // 소식 숨김 열쇠 한 곳 (수집 로봇의 newsHidden 과 같다)
+import { newsPostKey } from '../collector/news-board-rules.mjs';
+import { thumbKey, isThumbPath } from '../collector/news-thumb.mjs';   // 소식 썸네일 열쇠·꼴 한 곳 (썸네일 로봇과 같다)   // 소식 숨김 열쇠 한 곳 (수집 로봇의 newsHidden 과 같다)
 
 /* 저장소 뿌리. 데이터 파일은 지금까지처럼 **작업 폴더 기준**으로 읽고 쓰지만(워크플로가
    저장소 안에서 돈다), 아래 '저장된 공고 원문'은 이 파일 기준으로 읽는다 — 검사도 같은 원문을
@@ -933,6 +934,44 @@ switch (action) {
     if (!n && hide) fail('그 주소의 글이 소식 파일에 없습니다');
     writeJson(NEWS_CFG, cfg);
     detail = `${hide ? '숨김' : '되살림'} ${n}건 (숨긴 주소 ${cfg.hideUrls.length}개 · 숨긴 글 번호 ${cfg.hidePosts.length}개)`;
+    touched = true;
+    break;
+  }
+
+  /* ── 교내 소식 — 사진 빼기 / 되살리기 (2026-10-03) ─────────────────────────────
+     로봇이 고른 썸네일이 틀렸을 때(로고·엉뚱한 그림). news-config.json noThumb 에 글 열쇠(thumbKey)를 적으면 썸네일 로봇이 다시 붙이지 않고
+     다음 실행에 안 쓰는 그림 파일을 지운다. 되살리기는 장부(collector/news-thumbs.json)의 그림을 바로 다시 붙인다. 글 번호로 고른다(같은 제목의 다른 글은 그대로). */
+  case 'newsThumbOff':
+  case 'newsThumbOn': {
+    const url = String(payload.url || '').trim();
+    if (!url) fail('대상 글의 주소가 없습니다');
+    const pid = String(payload.postId || '').trim();
+    const off = action === 'newsThumbOff';
+    const cfg = readJson(NEWS_CFG, { hideUrls: [] });
+    cfg.noThumb = Array.isArray(cfg.noThumb) ? cfg.noThumb : [];
+    const ledger = readJson('collector/news-thumbs.json', { posts: {} });
+    let n = 0;
+    for (const f of newsFiles()) {
+      let changed = 0;
+      for (const it of f.doc.items) {
+        if (canonUrl(it.url) !== canonUrl(url) || (pid && String(it.postId || '') !== pid)) continue;
+        const k = thumbKey(it);
+        if (off) {
+          if (!cfg.noThumb.includes(k)) cfg.noThumb.push(k);
+          delete it.thumb; it.thumbOffBy = `관리자 ${kstNow().slice(0, 10)}`;
+        } else {
+          cfg.noThumb = cfg.noThumb.filter((x) => x !== k);
+          delete it.thumbOffBy;
+          const e = ledger.posts && ledger.posts[k];
+          if (e && e.file && isThumbPath(e.file) && fs.existsSync(e.file)) it.thumb = e.file;
+        }
+        changed += 1;
+      }
+      if (changed) { writeJson(f.path, f.doc); n += changed; }
+    }
+    if (!n) fail('그 주소의 글이 소식 파일에 없습니다');
+    writeJson(NEWS_CFG, cfg);
+    detail = `사진 ${off ? '빼기' : '되살리기'} ${n}건 (사진 뺀 글 ${cfg.noThumb.length}개)`;
     touched = true;
     break;
   }

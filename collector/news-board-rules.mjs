@@ -277,6 +277,20 @@ export async function verifyRuleDetail(row, opts = {}) {
   return { ok: true, reason: `상세를 열어 제목 확인 (${row.url})` };
 }
 
+/* 글 본문을 받을 요청 — 썸네일 로봇(collect-news-thumbs.mjs)이 쓴다 (2026-10-03).
+   규칙이 본문 API 를 적어 두었으면(verifyApi — 고려 POST 조각 · 서강 BbsData · 중앙 BoardViewData) 그것, 아니면 글 주소 그대로.
+   목록 표식(#n-제목 · 경희)은 글 화면이 없어 null — 주소를 지어 만들지 않는다. base 는 그림의 상대 주소를 펼 기준(글 주소). */
+export function postContentRequest(rule, row) {
+  if (!row || !row.url || /#n-/.test(String(row.url))) return null;
+  const vp = rule && rule.verifyApi;
+  if (vp) {
+    const id = vp.idFrom(row.url);
+    if (!id) return null;
+    return { url: vp.api(id), opts: vp.body ? { body: vp.body(id) } : {}, base: row.url };
+  }
+  return { url: row.url, opts: {}, base: row.url };
+}
+
 /* 화면의 '제목 자리' 글자들 — <title> · h1~h6 · og:title · class/id 에 tit·subject·view_tit 가 든 칸 */
 function titleZone(html) {
   const src = String(html || '');

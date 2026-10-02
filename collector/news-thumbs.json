@@ -1,0 +1,5 @@
+{
+ "note": "교내 소식 썸네일 장부 — collector/collect-news-thumbs.mjs 가 쓴다. posts: 글 열쇠별 결과(file·none·err) · srcSeen: 학교별 그림 주소를 본 글(두 글 이상이면 공통 그림이라 막는다).",
+ "posts": {},
+ "srcSeen": {}
+}

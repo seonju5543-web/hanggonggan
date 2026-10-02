@@ -179,7 +179,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 | `data/notices.json` | 실시간 공고 피드 |
 | `data/activities.json` | 대외활동·공모전 피드(제목+링크 · 장학 피드와 **섞지 않는다**) — `docs/designs/activities-tab.md` |
 | `data/external.json` | 재단·지자체 게시판 공고(교외 확대 · 학교 없는 전국 글 · 주최는 `host`) — `docs/designs/external-sources.md` |
-| `data/news/` | 교내 소식(학교 공지 게시판 · 제목+링크+수집일 · **학교별 파일뿐** · 옛 통짜 파일 없음) — `docs/designs/news-feed.md` |
+| `data/news/` | 교내 소식(학교 공지 게시판 · 제목+링크+수집일 + 그 글의 사진 썸네일 `data/news/img/<해시>.webp` · **학교별 파일뿐** · 옛 통짜 파일 없음) — `docs/designs/news-feed.md` |
 | `data/kosaf-open.json` `data/kosaf-files/` | 층2 — 한국장학재단이 아는 재단 장학금(마감 전만) · 선발공고문 사본. 층1과 섞지 않는다 |
 | `data/tuition.json` | 등록금(학교·계열) |
 
@@ -189,7 +189,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 | `collector/collect.mjs` `browser-collect.mjs` | 게시판 수집(일반·진짜 Chromium) — 일반 수집기가 같은 행에서 대외활동·공모전도 갈라 담는다(`activity-kind.mjs` · 출처 `activity-sources.json`) |
 | `collector/auto-register.mjs` | 자동 정식 등록(원칙 2) — 다른 학교의 같은 사업은 새로 등록하지 않고 기존 등록을 전국으로 승격 |
 | `collector/kind-evidence.mjs` `kind-classify.mjs` `scope-promote.mjs` `registered-merge.mjs` | 교내·교외 증거 판정 · 원문 도착 뒤 소급 판정(학습 표 `own-programs.json`) · 학교 한정 → 전국 승격 · 합치기 한 곳 |
-| `collector/collect-news.mjs` `find-news-boards.mjs` `news-kind.mjs` | 교내 소식 로봇(따로 돈다) · 공지 게시판 찾기(출처 `news-sources.json` · 후보는 웹 검색 + `evidence`) · 실을지·갈래 판정 한 곳 |
+| `collector/collect-news.mjs` `find-news-boards.mjs` `news-kind.mjs` `collect-news-thumbs.mjs` `news-thumb.mjs` | 교내 소식 로봇(따로 돈다) · 공지 게시판 찾기(출처 `news-sources.json` · 후보는 웹 검색 + `evidence`) · 실을지·갈래 판정 한 곳 · 사진 썸네일 단계·고르기 한 곳 |
 | `collector/fetch-board.mjs` | 게시판 받기·실패 이유 펴기 — 일반 수집기와 소식 로봇이 같이 쓴다(베끼지 말 것) |
 | `collector/extract-excerpts.mjs` | 원문 발췌 · 마감일 · 메일 접수 주소(`apply-email.mjs`) |
 | `collector/deepfetch.mjs` `rescue-bodies.mjs` | 본문·첨부 원본 받기 · 옛 공고 본문 메우기 |
@@ -265,7 +265,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 - **재단·지자체 게시판(교외 확대)** (2026-09-26 · 노션 F-13): 링커리어류는 크롤링이 아니라 **주최사 직접 등록**이라 긁지 않는다 — 우리는 주최의 제 게시판을 읽는다.
   출처 `collector/external-sources.json` 은 `kosaf-open.json` 의 재단 홈페이지에서 왔고, `collector/find-boards.mjs` 가 게시판을 찾아 `autoFound` 로 적는다(잘못 찾으면 `parked`).
   글은 `data/external.json`(학교 피드와 따로) → 홈 「재단·지자체 새 공고」(`externalNoticesHtml` · 등록된 주소는 `registeredUrlMatcher` 로 뺀다). 링크 읽는 눈은 `collector/board-links.mjs` 한 곳. 관문 「재단·지자체 게시판」.
-- **교내 소식** (2026-09-30 · 개발자 지시 "학교에 맞춘 교내 뉴스" · *"로봇 신설"*): 학교 **공지** 게시판에서 제목+링크+수집일만(상세 안 읽음 · 발췌·마감 없음) →
+- **교내 소식** (2026-09-30 · 개발자 지시 "학교에 맞춘 교내 뉴스" · *"로봇 신설"*): 학교 **공지** 게시판에서 제목+링크+수집일(발췌·마감 없음) →
   `data/news/<학교키>.json`(`newsFileFor` · 공고와 같은 열쇠 · 옛 통짜 파일 없음) → 홈 「우리 학교 소식」(`schoolNewsHtml` · 다섯 장 + 더보기 `NEWS_HOME_TOP`).
   로봇은 **따로**(`collect-news.mjs` · 장학 수집기 예산이 이미 꽉 차서) · 판정은 `news-kind.mjs` 한 곳(장학·활동 글은 그쪽 피드 몫) · 학교 범위는 `noticeForProfile` ·
   출처는 웹 검색 후보를 찾기 로봇이 열어 확인해 `boardUrl` 로 올린다(못 찾으면 리포트 「개발자에게 요청」) · 알림 없음. 관문 「교내 소식」 · `verify-news.js`.
@@ -274,6 +274,9 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   상세 주소는 유추하지 않고, 상세가 있는 규칙은 **매번 첫 글의 상세를 열어** 그 글의 화면인지 본다(`verifyRuleDetail` · 목록 표식은 상세가 없어 건너뜀) · API 규칙은 정찰이 본 화면(`page`)만 게시판으로 올린다.
   같은 글은 **게시판의 글 번호**(`postId`)로 알아본다 — 목록 표식 주소(#n-제목)는 제목 다듬기가 바뀌면 달라져 두 번 실렸다(`collapseSamePost` · 발행 때 소급 · 숨김·git 병합도 글 번호 `newsHidden`·`newsDistinct`). 분류·캠퍼스 꼬리표는 떼지 않는다.
   못 읽는 학교는 정찰(`run-probe.txt` `checkUrl:` — 누르기 전 목록 HTML · 날짜 줄이 상세를 여는 방식과 눌렀을 때의 주소 · 스크립트 요청과 응답 · 인증서 사슬은 `certHost:`) 결과만으로 규칙을 적는다.
+  **사진 썸네일**(2026-10-03 개발자 지시): 수집 다음 단계(`collect-news-thumbs.mjs` · 보강)가 새 글부터 상세(또는 규칙의 본문 API `postContentRequest`)를 열어 대표 이미지 → 본문 사진 → 첨부 그림 순으로 고르고(`news-thumb.mjs` 한 곳)
+  받아서 진짜 사진인지(크기·가로세로) 본 뒤 240px WebP 로 `data/news/img/<바이트 해시>.webp` 에 둔다(서비스워커가 그림을 캐시 우선으로 들어 이름을 다시 쓰지 않는다). 🔴 **두 글 이상에 같은 그림 = 학교 공통 그림**(로고·기본 공유 그림)이라 막는다 —
+  이름 낱말은 거들 뿐. 장부 `news-thumbs.json` 을 매 실행 실린 글 전부에 다시 입히고(`applyThumbs`) 안 쓰는 그림은 지운다 · 관리자 「사진 빼기」는 `noThumb`. 카드는 `opts.thumb` 를 받은 소식 카드만 그린다(꼴 사본은 관문이 대조).
 - **학자금대출**은 정식 등록 제외(대출 원금·이자를 지원하는 장학금은 제외 대상 아님 — `LOAN_EXCEPT`) · 피드에선 빼지 않고 장학 공고 뒤로 보낸다(`boardNoticesForMe`).
 - **인스타**: 🔴 게시는 사람만 누른다 · 토큰은 워크플로에만 · 한 실행 최대 6건 · 수정은 다시 그려 **보여 주고 메일 보낼지 물은 뒤** push-to-run(스킬 `insta-revise`).
   관문 `verify-insta.js` · `docs/designs/instagram-pipeline.md`.

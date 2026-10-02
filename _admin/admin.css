@@ -675,6 +675,7 @@ td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space
    게시물 행은 표지 한 장(54×68)을 왼쪽에 둔다 — 글자만으로는 어느 카드인지 못 알아본다. */
 .ig-main { display: flex; gap: var(--space-12); align-items: flex-start; min-width: 0; }
 .ig-thumb { width: 54px; height: 68px; object-fit: cover; border-radius: var(--radius-xs); border: 1px solid var(--line); background: var(--surface-2); flex: 0 0 54px; }
+.ig-thumb.news-thumb { height: 54px; }   /* 교내 소식 썸네일은 정사각 (앱 카드와 같은 모양) */
 .ig-acts { display: flex; flex-wrap: wrap; gap: var(--space-6); align-items: center; margin-top: var(--space-8); }
 .ig-tpl { font: inherit; font-size: var(--t-sm); padding: var(--space-4) var(--space-6); border: 1px solid var(--rule); border-radius: var(--radius-sm); background: var(--bg); color: var(--text); }
 .dd.past { color: var(--text-weak); }

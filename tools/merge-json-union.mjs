@@ -97,6 +97,22 @@ function mergeSeen(ours, theirs) {
   return out;
 }
 
+/* 교내 소식 썸네일 장부 (2026-10-03) — 글마다 결과는 사진(file)이 있는 쪽 → 날짜가 늦은 쪽, 그림 주소를 본 글은 합집합(공통 그림을 잊지 않게) */
+function mergeThumbLedger(ours, theirs) {
+  const o = ours || {}; const t = theirs || {};
+  const posts = { ...(t.posts || {}) };
+  for (const [k, e] of Object.entries(o.posts || {})) {
+    const x = posts[k];
+    posts[k] = !x ? e : (!!e.file !== !!x.file ? (e.file ? e : x) : (String(e.at || '') >= String(x.at || '') ? e : x));
+  }
+  const srcSeen = {};
+  for (const side of [t.srcSeen || {}, o.srcSeen || {}]) for (const [school, m] of Object.entries(side)) {
+    const d = (srcSeen[school] ||= {});
+    for (const [src, keys] of Object.entries(m)) d[src] = [...new Set([...(d[src] || []), ...keys])].slice(0, 3);
+  }
+  return { ...t, ...o, posts, srcSeen };
+}
+
 /* 양식 원본 대기 큐: id로 합치고, **더 많이 진행된 쪽**을 남긴다.
    (한쪽에서 원본을 받아 fetched:true가 됐는데 상대의 옛 false로 덮이면 다시 받게 된다) */
 function mergePendingForms(ours, theirs) {
@@ -206,6 +222,7 @@ const RULES = [
      장부에 이미 본 글이라 영영 돌아오지 않았다) */
   { match: /(^|\/)data\/news\/[^/]+\.json$/, merge: (o, t) => mergeSchoolNotices(o, t, { distinct: newsDistinct }) },
   { match: /(^|\/)seen-news\.json$/, merge: mergeSeen },
+  { match: /(^|\/)news-thumbs\.json$/, merge: mergeThumbLedger },
   { match: /(^|\/)news-health\.json$/, merge: mergeHealth },
   { match: /(^|\/)notices\.json$/, merge: mergeNotices },
   { match: /(^|\/)link-hunt\.json$/, merge: mergeLinkHunt },

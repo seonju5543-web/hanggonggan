@@ -2459,7 +2459,11 @@ function actItemRowHtml(n, hiddenRow) {
         <div class="m"><span>${esc(n.school ? `${n.school} 게시판` : (n.host || '전국'))}</span>${n.field ? `<span>${esc(n.field)}</span>` : ''}${n.deadline ? `<span>마감 ${esc(n.deadline)}</span>` : (n.deadlineHint ? `<span>${esc(n.deadlineHint)}</span>` : '')}<span>${esc(n.foundAt || '')} 수집</span></div>
         <div class="badges"><span class="pill ${n.kind === '공모전' ? 'info' : 'good'}">${esc(n.kind || '?')}</span>${n.kindFrom ? `<span class="pill">${esc(n.kindFrom)}</span>` : ''}${n.hiddenBy ? `<span class="pill warn">${esc(n.hiddenBy)} 숨김</span>` : ''}</div></div>
       <div class="btn-row">
+        ${/* 썸네일 (2026-10-03) — 로봇이 고른 사진을 사람이 보고, 틀렸으면(로고·엉뚱한 그림) 뺀다. 빼면 로봇이 다시 붙이지 않는다(news-config.json noThumb) */ ''}
+        ${/^data\/news\/img\/[0-9a-f]{16}\.webp$/.test(n.thumb || "") ? `<img class="ig-thumb news-thumb" src="${raw(n.thumb)}" alt="" loading="lazy" width="54" height="54">` : ''}
         <a class="btn btn-sm" href="${esc(n.url)}" target="_blank" rel="noreferrer noopener">원문 ↗</a>
+        ${n.thumb ? `<button class="btn btn-sm" data-news-thumb-off="${esc(n.url)}" data-news-post="${esc(n.postId || '')}">사진 빼기</button>` : ''}
+        ${n.thumbOffBy ? `<button class="btn btn-sm" data-news-thumb-on="${esc(n.url)}" data-news-post="${esc(n.postId || '')}">사진 되살리기</button>` : ''}
         ${hiddenRow
           ? `<button class="btn btn-sm" data-act-unhide="${esc(n.url)}">되살리기</button>`
           : `<button class="btn btn-sm" data-act-kind="${esc(n.url)}" data-kind="${esc(other)}">${esc(other)}(으)로</button>
@@ -2627,7 +2631,7 @@ function newsItemRowHtml(n) {
     <div class="row" data-row data-noclick data-news-item="${esc(n.url)}" style="cursor:default${hiddenRow ? ';opacity:.55' : ''}">
       <div><div class="t" data-row-title>${esc(n.title)}</div>
         <div class="m"><span>${esc(n.school)} 공지</span><span>${esc(n.foundAt || '')} 수집</span></div>
-        <div class="badges">${n.kind ? `<span class="pill info">${esc(n.kind)}</span>` : '<span class="pill">갈래 없음</span>'}${n.kindFrom ? `<span class="pill">${esc(n.kindFrom)}</span>` : ''}${n.hiddenBy ? `<span class="pill warn">${esc(n.hiddenBy)} 숨김</span>` : ''}</div></div>
+        <div class="badges">${n.kind ? `<span class="pill info">${esc(n.kind)}</span>` : '<span class="pill">갈래 없음</span>'}${n.kindFrom ? `<span class="pill">${esc(n.kindFrom)}</span>` : ''}${n.hiddenBy ? `<span class="pill warn">${esc(n.hiddenBy)} 숨김</span>` : ''}${n.thumbOffBy ? `<span class="pill">${esc(n.thumbOffBy)} 사진 뺌</span>` : ''}</div></div>
       <div class="btn-row">
         <a class="btn btn-sm" href="${esc(n.url)}" target="_blank" rel="noreferrer noopener">원문 ↗</a>
         ${hiddenRow
@@ -2736,6 +2740,18 @@ async function handleNewsClick(e) {
     askSheet({ title: '이 글을 앱에서 숨깁니다', note: '지우지 않습니다 — 표식만 붙어 「숨긴 글」에서 되살릴 수 있습니다. 로봇이 다시 발행해도 숨김이 유지됩니다.',
       lines: [{ t: titleOf(url), m: url }], goLabel: '숨기기', danger: true,
       run: () => applyAction('newsHide', { urls: [url], postIds: [pid] }, '숨기기') });   // 글 번호 — 같은 제목의 다른 글은 숨기지 않게 (리뷰 12차)
+    return true;
+  }
+  if ((el = q('data-news-thumb-off'))) {
+    const url = el.dataset.newsThumbOff;
+    const pid = el.dataset.newsPost || '';
+    askSheet({ title: '이 글의 사진을 뺍니다', note: '앱 카드에서 사진만 빠지고 글은 그대로입니다. 로봇이 다시 붙이지 않습니다 — 「사진 되살리기」로 되돌릴 수 있습니다.',
+      lines: [{ t: titleOf(url), m: url }], goLabel: '사진 빼기', danger: true,
+      run: () => applyAction('newsThumbOff', { url, postId: pid }, '사진 빼기') });
+    return true;
+  }
+  if ((el = q('data-news-thumb-on'))) {
+    await applyAction('newsThumbOn', { url: el.dataset.newsThumbOn, postId: el.dataset.newsPost || '' }, '사진 되살리기');
     return true;
   }
   if ((el = q('data-news-unhide'))) {
