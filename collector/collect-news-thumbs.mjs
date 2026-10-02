@@ -92,12 +92,16 @@ async function thumbFor(n, ctx) {
   let res;
   try { res = await fetchBoard(req.url, { ...req.opts, tries: 1, firstMs: 12000 }); } catch (e) { return { err: `글 열기 실패 (${netReason(e)})` }; }
   if (!res.ok) return { err: `글 HTTP ${res.status}` };
+  const ct = res.headers && res.headers.get ? (res.headers.get('content-type') || '') : '';
   let text = await res.text();
   /* 본문 API 가 JSON 이면 글자를 풀어서 대조한다(\uXXXX 로 적힌 제목) */
   try { if (/^\s*[{[]/.test(text)) text = JSON.stringify(JSON.parse(text)); } catch { /* JSON 아님 */ }
-  if (!T.pageHasTitle(text, n.title)) return { err: '글 화면에 그 글의 제목이 없음 — 오류·로그인·다른 화면일 수 있어 다음에 다시' };
+  if (!T.pageHasTitle(text, n.title)) {
+    /* 원인을 단정하지 않는다 — 다음 사람이 볼 수 있게 받은 화면의 제목·길이·글자표(charset)를 적는다 (세 번째 실제 실행: 계명 4건 · 서울대 1건) */
+    const pt = ((text.match(/<title\b[^>]*>([\s\S]{0,120}?)<\/title>/i) || [])[1] || '').replace(/\s+/g, ' ').trim();
+    return { err: `글 화면에 그 글의 제목이 없음 — 다음에 다시 (받은 화면: 「${pt.slice(0, 50) || '제목 없음'}」 · ${text.length}자 · ${(ct.match(/charset=([\w-]+)/i) || [])[1] || '글자표 안 적힘'} · ${String(res.url || '').slice(0, 90)})` };
+  }
   let cands;
-  const ct = res.headers && res.headers.get ? (res.headers.get('content-type') || '') : '';
   if (/json/i.test(ct) || /^\s*[{[]/.test(text)) { try { cands = T.jsonImageCandidates(JSON.parse(text), req.base); } catch { cands = T.imageCandidates(text, req.base); } }
   else cands = T.imageCandidates(text, res.url || req.base);
   const key = T.thumbKey(n);
