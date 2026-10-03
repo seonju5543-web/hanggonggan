@@ -448,35 +448,13 @@ a.btn { text-decoration: none; }
 .home-greet { font-size: var(--t-xl); font-weight: 800; letter-spacing: -0.02em; }
 .home-school { font-size: var(--t-sm); color: var(--text-weak); font-weight: 500; }
 
-.hero-card {
-  position: relative;
-  overflow: hidden;
-  background:
-    radial-gradient(120% 140% at 85% -20%, rgba(184, 145, 47, 0.55) 0%, rgba(184, 145, 47, 0) 55%),
-    radial-gradient(90% 90% at -10% 110%, rgba(138, 106, 31, 0.35) 0%, rgba(138, 106, 31, 0) 60%),
-    var(--grad-navy);
-  border-radius: var(--radius-lg);
-  padding: 28px 24px 24px;
-  color: #fff;
-  margin-bottom: 30px;
-}
-.hero-card::after {
-  content: '';
-  position: absolute;
-  top: -40%;
-  right: -18%;
-  width: 220px;
-  height: 220px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  pointer-events: none;
-}
-.hero-label {
-  font-size: var(--t-sm);
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: rgba(232, 239, 254, 0.75);
-}
+/* 🔴 히어로의 **모양은 여기 없다** — 파일 끝 「홈 히어로 — 시안 I4」 한 곳에 있다 (2026-10-03).
+   10-01 에 남색 카드를 흰 바탕으로 바꿀 때, 옛 규칙(남색 그라데이션·28px 안여백·둥근 모서리·
+   220px 원형 장식)이 여기 그대로 남고 파일 끝에서 `background:none`·`padding:0`·
+   `::after{display:none}` 로 **하나씩 되돌리고** 있었다. 그래서 이 자리를 고치면 아무 일도
+   일어나지 않았다. 죽은 54줄을 걷고 선언을 한 곳으로 모았다.
+   ⚠️ 히어로 값을 여기에 다시 적지 말 것 — 뒤 블록이 앞을 덮으므로 먹지 않는다. */
+.hero-label { font-size: var(--t-sm); }
 .hero-amount {
   font-size: var(--t-hero);
   font-weight: 800;
@@ -492,6 +470,15 @@ a.btn { text-decoration: none; }
   margin: 26px 0 13px;
 }
 .section-head h3 { font-size: var(--t-lg); font-weight: 800; letter-spacing: -0.02em; }
+/* 구획 제목 아래 한 줄 설명 (2026-10-03) — 홈 아래쪽 목록 셋이 생김새가 같아
+   무엇이 다른지 안 읽히던 자리. `.section-head` 밖에 두는 이유는 app.js 주석 참조
+   (머리말 두 토막이 한 줄에 들어가야 한다). 위 여백을 당겨 제목과 한 덩어리로 묶는다. */
+.section-sub {
+  margin: calc(var(--space-8) * -1) 0 var(--sp-2);
+  font-size: var(--t-xs);
+  color: var(--text-weak);
+  line-height: 1.5;
+}
 
 /* ---------------- 카드 ---------------- */
 .card-list { display: grid; gap: 12px; }
@@ -1735,7 +1722,12 @@ textarea.essay-drafted { border-color: var(--primary); background: #fffefc; line
 .essay-rules-banner ul { margin: 6px 0 0; padding-left: 18px; }
 .essay-rules-banner li { font-size: var(--t-xs); line-height: 1.5; margin: 2px 0; }
 .essay-rule-danger { color: #c0392b; font-weight: 600; }
-:root[data-theme="dark"] .essay-rule-danger, :root:not([data-theme="light"]) .essay-rule-danger { color: #ff8a7a; }
+/* 🔴 `:root:not([data-theme="light"])` 짝을 뗐다 (2026-10-03). `data-theme` 은 index.html ·
+   app.js · essay.js · sw.js 어디에서도 **설정되지 않는다**(전부 0건) — 그래서 저 선택자가
+   늘 참이었고, 밝은 화면에 다크용 색이 그대로 떴다. DESIGN.md 「아직 없는 것」이 "다크 모드가
+   없다"고 적어 둔 것과 어긋나 있던 자리다. `[data-theme="dark"]` 쪽은 남긴다 — 나중에
+   다크 한 벌을 만들 때 그대로 쓴다. ⚠️ `:not([data-theme="light"])` 를 다시 붙이지 말 것. */
+:root[data-theme="dark"] .essay-rule-danger { color: #ff8a7a; }
 
 /* 적합도 배지 — 숫자 옆 근거(요건 n개 중 m개)를 작게 붙인다 (2026-08-24) */
 .badge-fit em { font-style: normal; opacity: .75; font-size: .92em; margin-left: 4px; }
@@ -1774,7 +1766,7 @@ textarea.essay-drafted { border-color: var(--primary); background: #fffefc; line
   color: var(--text-sub); margin-top: 6px;
 }
 mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radius-hair); padding: 0 1px; }
-:root[data-theme="dark"] mark.essay-add, :root:not([data-theme="light"]) mark.essay-add { background: #1f4a2e; color: #a6e6bb; }
+:root[data-theme="dark"] mark.essay-add { background: #1f4a2e; color: #a6e6bb; }   /* 위 '다크 짝을 뗐다' 주석 참조 */
 
 /* ── 재료 충분도 게이지 (2026-08-29 · 2순위) ──
    초안을 만들기 전에 '재료가 얼마나 모였나'를 보여 준다. 품질이 아니라 재료다. */
@@ -1814,10 +1806,11 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
 .esc-body > b { display: block; font-size: var(--t-xs); color: var(--text); font-weight: 600; }
 .esc-block .esc-body > b { color: #c0392b; }
 .esc-detail { display: block; font-size: var(--t-2xs); color: var(--text-weak); line-height: 1.5; margin-top: 1px; }
-:root[data-theme="dark"] .esc-badge.esc-ok, :root:not([data-theme="light"]) .esc-badge.esc-ok { background: #1f4a2e; color: #a6e6bb; }
-:root[data-theme="dark"] .esc-badge.esc-block, :root:not([data-theme="light"]) .esc-badge.esc-block { background: #4a1f1f; color: #ff9a8c; }
-:root[data-theme="dark"] .esc-block .esc-mark, :root:not([data-theme="light"]) .esc-block .esc-mark,
-:root[data-theme="dark"] .esc-block .esc-body > b, :root:not([data-theme="light"]) .esc-block .esc-body > b { color: #ff9a8c; }
+/* 다크 짝을 뗐다 — 위 `.essay-rule-danger` 주석과 같은 이유 (2026-10-03) */
+:root[data-theme="dark"] .esc-badge.esc-ok { background: #1f4a2e; color: #a6e6bb; }
+:root[data-theme="dark"] .esc-badge.esc-block { background: #4a1f1f; color: #ff9a8c; }
+:root[data-theme="dark"] .esc-block .esc-mark,
+:root[data-theme="dark"] .esc-block .esc-body > b { color: #ff9a8c; }
 
 /* ── 신청 내역 관리 — 왼쪽으로 밀어 삭제 · 선택 모드 (2026-08-24) ──
    장학 공고가 아니라 **학생이 기록한 신청 진행 상황**을 지우는 자리다.
@@ -4202,6 +4195,7 @@ body,
 .sch-org,
 .empty,
 .empty-sub,
+.section-sub,
 .hero-label {
   word-break: keep-all;
   overflow-wrap: break-word;
@@ -4803,20 +4797,22 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
    남색 카드를 걷고 **흰 바탕 위 큰 금액**으로 바꿨다(카드가 아니어도 되니 강조는 높게 —
    개발자 지시). 금액 아래 한 줄(빨간 '이번 주 마감') · 그림 4칸(오른쪽 위 숫자 배지) · 버튼.
    🔴 그림은 app.js `HERO_TILES` 의 SVG 다 — 이모지를 쓰지 않는다(ui-tone 관문).
-   🔴 그림자를 붙이지 않는다(ui-tone FLAT 관문 — 면 위에 놓인 것). */
+   🔴 그림자를 붙이지 않는다(ui-tone FLAT 관문 — 면 위에 놓인 것).
+   🔴 **히어로 선언은 여기 하나다** (2026-10-03). 앞쪽(홈 절)에 남아 있던 옛 남색 카드
+      54줄을 걷었다 — 그래서 여기도 `background:none`·`padding:0`·`::after{display:none}`
+      처럼 **되돌리는 줄이 필요 없어졌다**(바탕·안여백·모서리는 이제 그냥 기본값이다). */
 .hero-card {
-  background: none;
-  overflow: visible;   /* 앞 규칙의 hidden 이 버튼 그림자를 네모로 잘랐다 */
-  border-radius: 0;
-  padding: 0;
   color: var(--text);
   margin-bottom: var(--sp-3);
 }
-.hero-card::after { display: none; }
 .hero-card .hero-label { color: var(--text-sub); font-weight: 700; letter-spacing: 0; }
-.hero-card .hero-amount { color: var(--text); }
+/* 🔴 작은 폰에서 금액이 두 줄로 깨지던 것 (2026-10-03 · DESIGN.md 「충돌」 21번).
+   `--t-hero` 38px 고정이라 360px 폰에서 '최대 1,690만원' 이 두 줄이 됐다. 새 숫자를
+   만들지 않고 **있는 척도에서 한 단** 내린다(문서가 적어 둔 해법 그대로). */
+@media (max-width: 375px) { .hero-card .hero-amount { font-size: var(--t-3xl); } }
 .hero-sub { font-size: var(--t-xs); color: var(--text-weak); font-weight: 500; }
 .hero-sub b { color: var(--red); font-weight: 700; }
+.hero-sub:empty { display: none; }   /* 이번 주 마감이 0건이면 빈 줄을 남기지 않는다 (2026-10-03) */
 .hero-tiles {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
