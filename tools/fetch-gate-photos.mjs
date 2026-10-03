@@ -62,6 +62,27 @@ const SCHOOLS = [
    must = 정식 이름 또는 '대학교'를 뗀 짧은 이름(한글) · not = 분교·역·병원·로고 공통 목록 · 검색어는 한글만(영문 이름표는 학교마다 달라 짐작하지 않는다).
    id 는 학교별 공고 파일과 같은 규칙(noticeFileKey)이라 파일 이름이 학교마다 유일하다. 사진이 한 장도 없으면 그 학교는 리포트에 '없음'으로 남는다(조용히 넘어가지 않는다). */
 const ME = createRequire(import.meta.url)('../match-engine.js');
+/* 2026-10-03 — 한글 이름만으로는 한 장도 못 찾은 8곳(10-01 실행 로그 ⚠️)에 영문 이름표·검색어를 손으로 단다.
+   분교는 본교 이름만 맞으면 본교 사진이 들어오므로 must 에 분교 낱말(Mirae·Sejong·Gyeongju…)까지 요구한다.
+   이름이 겹치는 다른 학교(명지전문대·숭실사이버대·조선이공대·조선간호대)와 병원은 not 으로 뺀다. id 는 이름에서 만든 학교와 같은 규칙(noticeFileKey). */
+for (const s of [
+  { name: '연세대학교 미래캠퍼스', must: /Yonsei.*(?:Mirae|Wonju)|(?:Mirae|Wonju).*Yonsei|연세대.*(?:미래|원주)/i, not: /Hospital|병원|Severance|세브란스|Station|역|logo|로고/i,
+    q: ['Yonsei University Mirae Campus', 'Yonsei University Wonju Campus', '연세대학교 미래캠퍼스', '연세대학교 원주캠퍼스'] },
+  { name: '고려대학교 세종캠퍼스', must: /Korea University.*Sejong|Sejong.*Korea University|고려대.*세종/i, not: /Hospital|병원|Station|역|logo|로고/i,
+    q: ['Korea University Sejong Campus', '고려대학교 세종캠퍼스'] },
+  { name: '동국대학교 WISE캠퍼스', must: /Dongguk.*(?:Gyeongju|WISE)|(?:Gyeongju|WISE).*Dongguk|동국대.*(?:경주|WISE)/i, not: /Hospital|병원|Station|역|logo|로고/i,
+    q: ['Dongguk University Gyeongju Campus', 'Dongguk University WISE', '동국대학교 경주캠퍼스', '동국대학교 WISE캠퍼스'] },
+  { name: '명지대학교', must: /Myong ?ji|명지대/i, not: /College|전문대|High School|고등학교|중학교|초등|Hospital|병원|Station|역|logo|로고/i,
+    q: ['Myongji University', 'Myongji University Seoul campus', 'Myongji University Yongin', '명지대학교'] },
+  { name: '국민대학교', must: /Kookmin|국민대/i, not: /Station|역|logo|로고|Bank|은행/i,
+    q: ['Kookmin University', 'Kookmin University campus', '국민대학교'] },
+  { name: '숭실대학교', must: /Soong ?sil|숭실대/i, not: /Cyber|사이버|Station|역|logo|로고|High School|고등학교|중학교/i,
+    q: ['Soongsil University', 'Soongsil University campus', '숭실대학교'] },
+  { name: '경북대학교', must: /Kyungpook|경북대/i, not: /Hospital|병원|Station|역|logo|로고|Sangju|상주/i,
+    q: ['Kyungpook National University', 'Kyungpook National University campus', 'Kyungpook National University main gate', '경북대학교'] },
+  { name: '조선대학교', must: /Chosun University|조선대/i, not: /Hospital|병원|Station|역|logo|로고|이공대|Science and Technology|간호대|Nursing/i,
+    q: ['Chosun University', 'Chosun University main building', 'Chosun University Gwangju', '조선대학교 본관'] },
+]) SCHOOLS.push({ id: ME.noticeFileKey(s.name), ...s });
 const GENERIC_NOT = /Station|역|병원|Hospital|logo|로고|모형|miniature|세종캠|Sejong|ERICA|글로컬|미래캠|원주|WISE|경주|안성|수원|용인|천안|Global Campus/i;
 const esc = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 for (const name of ME.SERVED_SCHOOLS) {
@@ -133,6 +154,8 @@ if (process.env.FRESH === '1') for (const f of fs.readdirSync(OUT)) if (/\.(jpe?
 const prevPath = path.join(OUT, 'manifest.json');
 const prev = fs.existsSync(prevPath) ? JSON.parse(fs.readFileSync(prevPath, 'utf8')) : null;
 const manifest = { fetchedAt: new Date().toISOString(), source: 'Wikimedia Commons (API search, namespace 6)', rule: 'CC0 · CC BY · CC BY-SA · PD 만 · NC/ND 제외 · 폭 900px 이상', schools: [] };
+/* 사람이 고른 기록(picks — 시작 화면 14장 · build-app-gates.mjs 가 읽는다)과 걸러 낸 기록(pruned)은 다시 받아도 잇는다 — 안 이으면 다음 빌드가 사진 0장이 된다 */
+for (const k of ['pruned', 'picks']) if (prev && prev[k] !== undefined) manifest[k] = prev[k];
 let total = 0;
 for (const s of SCHOOLS) {
   if (!targets.includes(s)) { const kept = prev?.schools?.find((p) => p.id === s.id); if (kept) manifest.schools.push(kept); continue; }
