@@ -35,7 +35,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { dedupeNotices } from '../collector/url-key.mjs';
+import { dedupeNotices, capNotices } from '../collector/url-key.mjs';
 /* 학교당 상한은 발행기 것을 그대로 쓴다 — 베끼면 병합이 발행과 다른 크기를 만든다 */
 import { PER_SCHOOL } from '../collector/publish-notices.mjs';
 /* 검수 후보 장부는 수집기와 같은 합치기 규칙을 쓴다(베끼면 갈라진다 — 60일·주소 열쇠·preferNotice) */
@@ -62,9 +62,11 @@ function mergeNotices(ours, theirs) {
   const b = Array.isArray(theirs?.items) ? theirs.items : [];
   // 최신 수집분이 앞에 오도록 정렬한 뒤 중복 제거 — 남길 항목 선택은 preferNotice가 한다
   const all = a.concat(b).sort((x, y) => String(y.foundAt || '').localeCompare(String(x.foundAt || '')));
-  let items = dedupeNotices(all);
-  // 수집기와 같은 상한(전체 200건) — 합치느라 목록이 무한정 늘지 않게
-  if (items.length > 200) items = items.slice(0, 200);
+  /* 🔴 상한은 **수집기와 같은 capNotices** 다 (2026-10-03 사고). 예전엔 여기만 '전체 200건'을 박아 두었는데, 수집기는 44개교
+     복원 뒤 학교 수 × 15(지금 540)까지 담는다. 링크 사냥꾼과 원문 링크 복구가 같은 때 저장하며 이 병합기를 거치자 실시간 공고
+     장부가 339 → 200건으로 잘렸고(13개교 139건), 다음 발행이 학교별 파일까지 그 장부로 다시 만들어 학생 화면에서 사라질 뻔했다.
+     베끼지 않고 수집기 함수를 그대로 부른다 — 숫자가 다시 갈라지지 않게. */
+  const items = capNotices(dedupeNotices(all));
   const updatedAt = [ours?.updatedAt, theirs?.updatedAt].filter(Boolean).sort().pop();
   return { ...(ours || {}), ...(theirs || {}), updatedAt, items };
 }

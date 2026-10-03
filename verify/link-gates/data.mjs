@@ -37,4 +37,28 @@ export default async function gate(eq, ctx) {
     [true, true, false]);
   eq('  앱이 보여 주는 다섯 묶음을 모두 훑는다(학교별 공고 파일 · 소식 파일 포함)',
     ['registered', 'notices(학교별)', 'external', 'activities', 'news'].every((ds) => audit.includes(`ds: '${ds}'`)), true);
+
+  /* ③ 합집합 병합기가 실시간 공고 장부를 수집기보다 작게 자르지 않는다 (2026-10-03 사고: 사냥꾼·복구 로봇이 같은 때 저장하며
+     병합기를 거치자 '전체 200건' 박힌 상한에 339 → 200건 · 13개교 139건이 장부에서 빠졌다 — 수집기 상한은 학교 수 × 15) */
+  {
+    const os = await import('node:os');
+    const path = await import('node:path');
+    const { spawnSync } = await import('node:child_process');
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'merge-cap-'));
+    const mk = (from, to) => ({ updatedAt: '2026-10-03', items: Array.from({ length: to - from }, (_, k) => {
+      const i = from + k;
+      return { school: `학교${i % 30}`, title: `2026 표본 장학금 ${i}번 선발 안내`, url: `https://s${i % 30}.ac.kr/view.do?id=${i}`, foundAt: '2026-10-01' };
+    }) });
+    const base = path.join(dir, 'base.json'); const ours = path.join(dir, 'ours.json'); const theirs = path.join(dir, 'theirs.json');
+    fs.writeFileSync(base, JSON.stringify(mk(0, 280), null, 1));
+    fs.writeFileSync(ours, JSON.stringify(mk(0, 300), null, 1));
+    fs.writeFileSync(theirs, JSON.stringify(mk(0, 290), null, 1));
+    const r = spawnSync(process.execPath, [new URL('tools/merge-json-union.mjs', ctx.root).pathname, base, ours, theirs, 'data/notices.json'], { encoding: 'utf8' });
+    let n = -1;
+    try { n = JSON.parse(fs.readFileSync(ours, 'utf8')).items.length; } catch { /* 깨짐 */ }
+    fs.rmSync(dir, { recursive: true, force: true });
+    eq('③ 병합기 — 30개교 300건을 합쳐도 300건(수집기 capNotices 와 같은 상한 · 예전 박힌 200 아님)', [r.status, n], [0, 300]);
+    const mj = fs.readFileSync(new URL('tools/merge-json-union.mjs', ctx.root), 'utf8');
+    eq('  병합기는 상한을 수집기 함수(capNotices)로 — 숫자를 박아 두지 않는다', [/capNotices\(dedupeNotices\(all\)\)/.test(mj), /items\.slice\(0, 200\)/.test(mj)], [true, false]);
+  }
 }
