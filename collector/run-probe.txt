@@ -67,3 +67,21 @@ checkUrl: https://www.smu.ac.kr/kor/life/scholarship.do
 
 # 2026-10-03 (5차) — 4차로 계명(26-09-30 날짜 꼴)·고려(로봇 HTML 에 줄 있음 · 본문 POST)는 풀었다. 상명만 남았다: 서버 HTML 에 날짜 43개인데 그린 화면의 표와 생김새가 다르다 → 서버 HTML 의 첫 날짜 앞 조각.
 checkUrl: https://www.smu.ac.kr/kor/life/notice.do
+
+# 2026-10-03 — 원문 링크 확인 로봇(collector/link-check.mjs) 첫 실행이 '문제'로 본 13건 중 **오판 의심** 셋.
+#   ① 서울과기대 상세(do=commonview)가 '목록'으로 판정됐다 — 그 공고 제목은 본문에 보이는데 다른 공고 제목도 여럿 보이고
+#      '이전글·다음글' 표지가 없었다. 상세 화면 아래에 목록이 같이 그려지는 게시판이면 오판이다(확정 전에 화면을 본다 — 내일 두 번째로 보면 확정된다).
+#   ② 국민대 정식 등록 3건이 '다른 글(제목 불일치)' — 열리는 글의 제목이 무엇인지 본다.
+#   (답 받음 2026-10-03 · 둘 다 그 글 화면 → 확인 로봇 판정 수리 · 관문 core ⑩)
+# checkUrl: https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=57138&bidx=894195&qidx=57138&cate=0&allboard=true&nowpage=3
+# checkUrl: https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=57138&bidx=894075&qidx=57138&cate=0&allboard=true&nowpage=3
+# checkUrl: https://www.kookmin.ac.kr/user/kmuNews/notice/7/12349/view.do?currentPageNo=1
+
+# 2026-10-03 (2차) — 같은 첫 실행이 '다른 글(제목 불일치)'로 본 대외활동·재단 글 다섯. 기대 제목이 정책 이름(온통청년 API)이라
+#   게시판 글 제목과 글자가 다를 수 있다 — 열리는 글의 제목을 보고, 오판이면 확정 전에 판정을 고친다.
+#   (답 받음 2026-10-03 · 아르코는 정말 다른 공지 · 울산·충남·영동은 그 글 → 판정 수리(관문 core ⑩·⑪) · 평택은 정찰 글자에 제목이 안 잡혀 미정)
+# checkUrl: https://arko.or.kr/board/view/4053?cid=1811182
+# checkUrl: https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000
+# checkUrl: https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.do?bbsId=BBS_0000000000000316&mId=008001001000000000&dataId=56147
+# checkUrl: https://youth.chungnam.go.kr/web/main/customSupp/M050-08/view?bizId=A20260309CT000000000003017
+# checkUrl: https://ydjh.yd21.go.kr/zboard/read.do?lmCode=notice&pd_pkid=240

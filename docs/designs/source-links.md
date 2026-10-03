@@ -60,6 +60,8 @@
 - **data** — 데이터 감사의 원문 링크 경고(`verify/link-audit.cjs` — 다섯 묶음 전부 · 경고만).
 - **병합 순위** — 진짜 주소 > 목록 표식 > 목록 주소+번호(`collector/url-key.mjs preferNotice`). 사람이 고친 표식이 병합 때마다 되돌아가지 않게.
 - **병합 상한** — 합집합 병합기는 수집기의 `capNotices` 를 부른다(박힌 200 때문에 339 → 200 으로 잘린 사고 · data ③).
+- **학교별 파일 베끼기** — `patchUrlsBySchool` 은 링크 순위(`noticeUrlRank`)를 낮추는 쪽으로는 고치지 않는다(배포 직후 항공대 2건 사고 · producers ⑨).
+- **로봇 깨우기** — 저장하는 push-to-run 로봇은 push 트리거에 브랜치를 건다(main 에서 뜬 사고 · robot ⓩ).
 - **알림** — 주소가 고쳐진 옛 공고가 '새 공고'로 다시 울리지 않는다(알림 장부에 학교·제목 열쇠 + 수집일 규칙 · core ⑨).
 - **화면 확인 도구** — `verify/what-shows.mjs` 가 카드의 한 줄 const 를 빠짐없이 떼어 온다(core ⑧).
 

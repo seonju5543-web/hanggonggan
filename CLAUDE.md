@@ -286,7 +286,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   **사진 썸네일**(2026-10-03 개발자 지시): 수집 다음 단계(`collect-news-thumbs.mjs` · 보강)가 새 글부터 상세(또는 규칙의 본문 API `postContentRequest`)를 열어 본문 사진 → 첨부 그림 순으로 고르고(`news-thumb.mjs` 한 곳 · 대표 이미지 og:image 는 첫 실제 실행에서 16/16 학교 로고라 안 쓴다)
   글 화면에 제목이 있는지(`pageHasTitle`)·받아서 진짜 사진인지(크기·가로세로·QR·글자뿐인 문서 그림 `looksLikeTextPage`) 본 뒤 240px WebP 로 `data/news/img/<바이트 해시>.webp` 에 둔다(서비스워커가 그림을 캐시 우선으로 들어 이름을 다시 쓰지 않는다). 🔴 **두 글 이상에 같은 그림 = 학교 공통 그림**(로고·기본 공유 그림)이라 막는다 —
   이름 낱말은 거들 뿐. 장부 `news-thumbs.json` 을 매 실행 실린 글 전부에 다시 입히고(`applyThumbs`) 안 쓰는 그림은 지운다 · 관리자 「사진 빼기」는 `noThumb` · 전체 스위치 `news-config.json` 의 `thumbs`(on · dry=받아만 두고 카드엔 안 붙임 · off=모두 뗌). 카드는 `opts.thumb` 를 받은 소식 카드만 그린다(꼴 사본은 관문이 대조).
-  **학교 대표 사진**(10-03 지시): 글의 사진이 없는 카드만 같은 자리에 학교 사진 + 🔴 늘 「학교 사진」 표시 + 구역 아래 출처 줄(BY·BY-SA 표기 의무) · 위키미디어 열린 라이선스만 · 눈으로 고른 기록 `docs/designs/assets/gates/school-photo-picks.json` → `tools/build-school-photos.mjs` → `assets/schools/photos.json`(해시 이름). 관문 「학교 대표 사진」 · `verify-news.js` ⑦.
+  **학교 대표 사진**(10-03 지시): 글의 사진이 없는 카드만 같은 자리에 학교 사진(사진 위 「학교 사진」 표시는 개발자 지시로 뺐다 — 다시 붙이지 말 것) + 구역 아래 출처 줄(BY·BY-SA 표기 의무) · 위키미디어 열린 라이선스만 · 눈으로 고른 기록 `docs/designs/assets/gates/school-photo-picks.json` → `tools/build-school-photos.mjs` → `assets/schools/photos.json`(해시 이름). 관문 「학교 대표 사진」 · `verify-news.js` ⑦.
 - **학자금대출**은 정식 등록 제외(대출 원금·이자를 지원하는 장학금은 제외 대상 아님 — `LOAN_EXCEPT`) · 피드에선 빼지 않고 장학 공고 뒤로 보낸다(`boardNoticesForMe`).
 - **인스타**: 🔴 게시는 사람만 누른다 · 토큰은 워크플로에만 · 한 실행 최대 6건 · 수정은 다시 그려 **보여 주고 메일 보낼지 물은 뒤** push-to-run(스킬 `insta-revise`).
   관문 `verify-insta.js` · `docs/designs/instagram-pipeline.md`.

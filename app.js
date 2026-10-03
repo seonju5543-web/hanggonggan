@@ -2927,9 +2927,10 @@ function noticeCardHtml(n, opts) {
       ${/* 그 글의 사진 썸네일 (2026-10-03 개발자 지시 — 학교 글의 실제 사진). 소식 카드만 opts.thumb 로 넘긴다 · 제목이 이미 글자로 있어 alt 는 비운다(읽기 도구가 두 번 읽지 않게).
            못 받으면(404·오프라인) 그림을 빼고 글자 카드로 돌아간다 — bindEvents 의 error 잡이 · CSP 가 onerror= 를 막는다 */ ''}
       ${thumb ? `<img class="notice-thumb" src="${esc(thumb)}" alt="" loading="lazy" decoding="async" width="72" height="72" />` : ''}
-      ${/* 글에 사진이 없으면 학교 대표 사진 (2026-10-03 개발자 지시) — 🔴 그 글의 사진이 아니라는 표시(「학교 사진」)를 늘 붙인다.
-           안 붙이면 학생이 정문 사진을 그 공지의 사진으로 읽는다. 출처 줄은 구역 아래 한 번(schoolNewsHtml). */ ''}
-      ${sp ? `<span class="notice-thumb notice-thumb-school"><img src="${esc(sp.src)}" alt="" loading="lazy" decoding="async" width="72" height="72"${PHOTO_FOCUS_RE.test(sp.focus || '') ? ` style="object-position:${esc(sp.focus)}"` : ''} /><span class="thumb-tag">학교 사진</span></span>` : ''}
+      ${/* 글에 사진이 없으면 학교 대표 사진 (2026-10-03 개발자 지시) — 글의 사진과 같은 자리·같은 모양(같은 img 한 장).
+           🔴 사진 위 「학교 사진」 표시는 **개발자 지시로 뺐다**(같은 날 *"학교사진에 '학교사진' 이라는 디스크립션 빼"*) — 다시 붙이지 말 것(관문이 잠근다).
+           출처 줄(작가·라이선스 — 열린 라이선스의 표기 의무)은 구역 아래 한 번(schoolNewsHtml) · 학교 사진인지는 클래스(notice-thumb-school)로만 안다 */ ''}
+      ${sp ? `<img class="notice-thumb notice-thumb-school" src="${esc(sp.src)}" alt="" loading="lazy" decoding="async" width="72" height="72"${PHOTO_FOCUS_RE.test(sp.focus || '') ? ` style="object-position:${esc(sp.focus)}"` : ''} />` : ''}
     </a>`;
 }
 
@@ -6387,13 +6388,11 @@ function bindEvents() {
      error 는 거품이 일지 않아 잡는 단계(capture)로 문서에서 받는다 — CSP(script-src 'self')가 onerror= 를 막는다. */
   document.addEventListener('error', (e) => {
     const img = e.target;
-    if (!img || !img.classList || !img.closest) return;
-    /* 글의 사진은 img 자신이, 학교 사진은 감싼 칸(.notice-thumb-school)이 썸네일 자리다 — 칸째 뺀다(「학교 사진」 표시만 남지 않게) */
-    const box = img.classList.contains('notice-thumb') ? img : img.parentElement && img.parentElement.classList.contains('notice-thumb') ? img.parentElement : null;
-    if (!box) return;
-    const card = box.closest('.has-thumb');
-    const section = box.closest('#school-news');
-    box.remove();
+    /* 글의 사진·학교 사진 모두 img.notice-thumb 한 장이 썸네일 자리다 */
+    if (!img || !img.classList || !img.classList.contains('notice-thumb')) return;
+    const card = img.closest('.has-thumb');
+    const section = img.closest('#school-news');
+    img.remove();
     if (card) card.classList.remove('has-thumb');
     /* 학교 사진이 하나도 안 남으면 출처 줄도 뺀다 — 안 보이는 사진의 출처만 덩그러니 남지 않게(리뷰 10-03) */
     if (section && !section.querySelector('.notice-thumb-school')) { const c = section.querySelector('.news-photo-credit'); if (c) c.remove(); }
