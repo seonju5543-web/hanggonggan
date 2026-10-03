@@ -110,7 +110,7 @@ export default async function gate(eq, ctx) {
   const lastHit = new Map([['h1.kr', 1000], ['h2.kr', 1000]]);
   eq('  같은 사이트는 간격을 두고 연다 — 막힌 사이트를 건너 다음 사이트를 고른다 · 다 막혔으면 기다린다',
     [P.pickNext(tg, lastHit, 2000, 1500).index, P.pickNext(tg.slice(0, 4), lastHit, 2000, 1500)], [4, { index: -1, wait: 500 }]);
-  const others = P.otherTitlesFor(tg[0], tg.concat([T('https://h1.kr/v?id=9', 'news', '공고 하나 2026 장학생 선발 안내')]), [{ origin: 'https://h1.kr', title: '표식으로 남은 다른 글 2026 장학 안내' }]);
+  const others = P.otherTitlesFor(tg[0], tg.concat([T('https://h1.kr/v?id=9', 'news', '공고 하나 2026 장학생 선발 안내')]), [{ origin: 'https://h1.kr', dir: '/', title: '표식으로 남은 다른 글 2026 장학 안내' }, { origin: 'https://h2.kr', dir: '/', title: '다른 사이트 후보 글 2026 장학 안내' }]);
   eq('  같은 사이트의 다른 글 제목만 · 같은 제목은 빼고 · 표식 글 제목도 재료로 — 빈 목록이면 목록을 못 알아본다(순찰 41건)',
     others.sort(), ['공고 둘 2026 장학생 선발 안내', '표식으로 남은 다른 글 2026 장학 안내'].sort());
 
@@ -125,9 +125,14 @@ export default async function gate(eq, ctx) {
     const E = 'https://b.test.kr/notice/view?seq=7&page=1';
     const C = 'https://c.test.kr/event/42';
     const N = 'https://d.test.kr/news/view?id=5';
+    /* 앱에 실린 글이 하나뿐인 사이트(서울대 4건 같은 곳) — 다른 글 제목은 수집 검수 후보에서 온다 */
+    const F = 'https://e.test.kr/board/list.do?articleNo=9';
+    const fTitle = '2026 이재단 장학생 선발 공고';
+    const fOthers = ['2026학년도 2학기 국가근로장학생 모집 안내', '2026 해외교환 장학생 추가 모집 공고', '2026 동문회 장학금 신청 안내 공고'];
     const Z = [1, 2, 3, 4].map((i) => `https://z.test.kr/view?id=${i}`);
     W('data/registered.json', { updatedAt: 'x', items: [
       { id: 'reg-a', name: aTitle, sourceUrl: A, sourceKind: 'auto' },
+      { id: 'reg-f', name: fTitle, sourceUrl: F, sourceKind: 'auto' },
       { id: 'reg-marker', name: '표식 글 2026 장학생 선발', sourceUrl: 'https://a.test.kr/bbs/list.do#n-%ED%91%9C%EC%8B%9D', sourceKind: 'auto' },
     ] });
     W('data/notices/index.json', { files: {} });
@@ -146,6 +151,7 @@ export default async function gate(eq, ctx) {
     W('data/news/img/x.webp', 'not-json');
     W('data/kosaf-open.json', { items: [{ code: '1', name: '재단 장학', home: 'https://kosaf-home.test.kr', files: [{ path: 'data/kosaf-files/1.pdf' }] }, { code: '2', name: '재단 둘', home: 'https://kosaf-home2.test.kr' }] });
     W('data/forms.json', { templates: [] });
+    W('collector/candidates.json', { items: fOthers.map((t, i) => ({ title: t, url: `https://e.test.kr/board/view.do?articleNo=${i + 1}` })) });
     W('data/link-check.json', { updatedAt: null, v: 1, bad: {} });
     W('collector/link-check-state.json', {});
 
@@ -155,6 +161,7 @@ export default async function gate(eq, ctx) {
         : { status: 200, finalUrl: A, docTitle: '전체공지', headings: [], text: listText },
       ...Object.fromEntries(aOthers.map((t, i) => [`https://a.test.kr/bbs/view.do?id=1${i + 1}`, { status: 200, docTitle: t, headings: [t], text: `${t} 작성일 ${'y'.repeat(400)}` }])),
       [E]: { status: 404 },
+      [F]: { status: 200, finalUrl: F, docTitle: '장학공지', headings: ['장학공지'], text: `${fOthers.join('\n')}\n${fTitle}\n${'v'.repeat(500)}` },
       [C]: { status: 200, finalUrl: 'https://c.test.kr/', docTitle: '씨씨재단', text: 'z'.repeat(800) },
       ...Object.fromEntries(Z.map((u) => [u, { status: 200, docTitle: '제트대학교', text: `작성일 다른 글 ${'w'.repeat(2000)}` }])),
     });
@@ -183,26 +190,27 @@ export default async function gate(eq, ctx) {
     const s1 = state();
     eq('  장부에는 「한 번 봄」으로 남는다 · 열쇠는 되돌린 주소(&amp; → &)', [s1[A] && [s1[A].v, s1[A].n, s1[A].confirmed], s1[E] && s1[E].v, s1[C] && s1[C].v, Object.keys(s1).some((k) => ENT.test(k))], [['list', 1, false], 'gone', 'home', false]);
     eq('  한 사이트에서 제목 없는 화면이 절반을 넘으면 막힘 의심 — 「다른 화면」으로 세지 않는다', Z.map((u) => [s1[u] && s1[u].lastV, s1[u] && s1[u].v]), Z.map(() => ['unread', undefined]));
+    eq('  앱에 글이 하나뿐인 사이트도 목록을 알아본다 — 다른 글 제목을 수집 검수 후보에서 가져온다', s1[F] && s1[F].v, 'list');
     eq('  관측이 없으면(망 오류) 판정 못 함 — 문제로 세지 않는다', [s1[N] && s1[N].lastV, s1[N] && s1[N].v], ['unread', undefined]);
-    eq('  표식·숨긴 글·주소 없는 글·층2는 장부에 없다', Object.keys(s1).filter((k) => /#n-|event\/43|javascript|kosaf-home/.test(k)), []);
+    eq('  표식·숨긴 글·주소 없는 글·층2·검수 후보(제목 재료일 뿐)는 열지 않는다', Object.keys(s1).filter((k) => /#n-|event\/43|javascript|kosaf-home|board\/view\.do/.test(k)), []);
 
     const again = run('2026-10-04', false);
     eq('  같은 날 다시 돌려도 확정되지 않는다(오늘 본 것은 다시 열지 않는다)', [again.code, again.out.checked, ledger().bad], [0, '0', {}]);
 
     const d2 = run('2026-10-05', false);
     eq('  둘째 날 같은 것을 보면 확정 → 앱이 받는 파일에 적힌다(열쇠 = 되돌린 주소 · 날짜 = 확정한 날)', [d2.code, ledger().bad],
-      [0, Object.fromEntries([[A, { v: 'list', at: '2026-10-05' }], [C, { v: 'home', at: '2026-10-05' }], [E, { v: 'gone', at: '2026-10-05' }]].sort(([a], [b]) => (a < b ? -1 : 1)))]);
-    eq('  워크플로가 읽는 숫자 — 새로 확정 3 · 확정 3', [d2.out.new_bad, d2.out.confirmed], ['3', '3']);
+      [0, Object.fromEntries([[A, { v: 'list', at: '2026-10-05' }], [C, { v: 'home', at: '2026-10-05' }], [E, { v: 'gone', at: '2026-10-05' }], [F, { v: 'list', at: '2026-10-05' }]].sort(([a], [b]) => (a < b ? -1 : 1)))]);
+    eq('  워크플로가 읽는 숫자 — 새로 확정 4 · 확정 4', [d2.out.new_bad, d2.out.confirmed], ['4', '4']);
     eq('  앱 파일은 로봇과 같은 모양으로 저장한다(JSON.stringify(x, null, 1))', ledgerRaw(), JSON.stringify(ledger(), null, 1));
     const rep = fs.readFileSync(path.join(tmp, 'collector/link-check-report.md'), 'utf8');
-    eq('  리포트 — 새로 확정된 것을 먼저, 건너뛴 표식·층2를 센다', [/새로 확정된 문제 링크[^\n]*3건/.test(rep), rep.indexOf('새로 확정된 문제') < rep.indexOf('전체 현황'), /층2[^\n]*2건[^\n]*사본이 있는 것 1건/.test(rep), /목록 표식[^\n]*정식 등록 1/.test(rep)], [true, true, true, true]);
+    eq('  리포트 — 새로 확정된 것을 먼저, 건너뛴 표식·층2를 센다', [/새로 확정된 문제 링크[^\n]*4건/.test(rep), rep.indexOf('새로 확정된 문제') < rep.indexOf('전체 현황'), /층2[^\n]*2건[^\n]*사본이 있는 것 1건/.test(rep), /목록 표식[^\n]*정식 등록 1/.test(rep)], [true, true, true, true]);
 
     const snapDry = hashTree(tmp, (rel) => rel === 'fake.json' || rel === 'gh-output.txt');
     const dry = run('2026-10-06', true, ['--dry']);
     eq('  --dry 는 아무 파일도 쓰지 않는다', [dry.code, changed(snapDry, hashTree(tmp, (rel) => rel === 'fake.json' || rel === 'gh-output.txt'))], [0, []]);
 
     const d3 = run('2026-10-06', true);
-    eq('  공고가 뜨면 풀린다 — 앱 파일에서 빠진다(나머지는 그대로)', [d3.code, Object.keys(ledger().bad)], [0, [C, E].sort()]);
+    eq('  공고가 뜨면 풀린다 — 앱 파일에서 빠진다(나머지는 그대로)', [d3.code, Object.keys(ledger().bad)], [0, [C, E, F].sort()]);
     eq('🔴 세 출력(data/link-check.json · 로봇 장부 · 리포트) 말고는 한 바이트도 안 바뀐다 — 이 로봇은 주소를 고치지 않는다', changed(before, hashTree(tmp, notOutputs)), []);
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });

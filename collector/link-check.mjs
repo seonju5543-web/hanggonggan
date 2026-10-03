@@ -84,7 +84,7 @@ function save(file, text) {
 }
 
 /* ── 대상 · 장부 · 순서 ───────────────────────────────────────────── */
-const { targets, skipped, markerTitles } = gatherTargets(ROOT);
+const { targets, skipped, siteTitles } = gatherTargets(ROOT);
 let state = readJson(STATE_FILE, {});
 if (!state || typeof state !== 'object' || Array.isArray(state)) state = {};
 const wasConfirmed = new Set(Object.entries(state).filter(([, s]) => s && s.confirmed && BAD.includes(s.v)).map(([u, s]) => `${u}\n${s.v}`));
@@ -177,7 +177,10 @@ async function observe(t) {
     return o ? { ...o } : { error: '가짜 관측 없음' };
   }
   const holder = {};
-  const got = await withDeadline(observeLive(t, holder), URL_HARD_MS);
+  /* 🔴 실패를 여기서 받아 둔다 — 시한에 걸려 버려진 작업이 **나중에** 실패하면 받을 사람이 없어
+     unhandledRejection 으로 로봇 전체가 넘어진다(주소 하나 때문에 그날 실행이 빨간불). */
+  const work = observeLive(t, holder).catch((e) => ({ error: String((e && e.message) || e) }));
+  const got = await withDeadline(work, URL_HARD_MS);
   if (got === TIMED_OUT) {
     if (holder.page) holder.page.close().catch(() => {});
     return { error: `시한 ${URL_HARD_MS / 1000}초 초과` };
@@ -322,10 +325,12 @@ while (remaining.length) {
   if (!budget.hasRoom(URL_HARD_MS)) { stopNote = `⏰ 예산(${Math.round(BUDGET_MS / 60000)}분)이 다 돼 여기서 멈췄습니다 — 남은 ${remaining.length}건은 다음 실행이 이어서 봅니다.`; break; }
   const pick = pickNext(remaining, lastHit, Date.now(), SPACING_MS);
   if (pick.index < 0) { await sleep(Math.min(Math.max(pick.wait, 50), 5000)); continue; }
+  /* 브라우저가 죽었으면 남은 것을 '판정 못 함'으로 채우지 않고 멈춘다 — 다음 실행이 이어서 본다 */
+  if (browser && !browser.isConnected()) { stopNote = `🚨 브라우저가 도중에 꺼져 여기서 멈췄습니다 — 남은 ${remaining.length}건은 다음 실행이 이어서 봅니다.`; break; }
   const t = remaining.splice(pick.index, 1)[0];
   const obs = await observe(t);
   lastHit.set(t.host, Date.now());
-  const verdict = judgeLanding({ ...obs, requestedUrl: t.url, titles: t.titles, otherTitles: otherTitlesFor(t, targets, markerTitles) });
+  const verdict = judgeLanding({ ...obs, requestedUrl: t.url, titles: t.titles, otherTitles: otherTitlesFor(t, targets, siteTitles) });
   const final = obs.finalUrl && obs.finalUrl !== t.url ? obs.finalUrl : undefined;
   results.push({ url: t.url, host: t.host, v: verdict.v, why: verdict.why, final });
   console.log(`  ${verdict.v.padEnd(6)} ${t.host} · ${short(t.title, 40)} (${short(verdict.why, 50)})`);

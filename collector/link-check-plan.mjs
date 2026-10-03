@@ -52,19 +52,23 @@ function perSchoolFiles(dir) {
   return names.filter((f) => f.endsWith('.json') && f !== 'index.json').sort().map((f) => path.join(dir, f));
 }
 function hostOf(u) { try { return new URL(u).host; } catch { return ''; } }
+function dirOf(u) { try { const p = new URL(u).pathname; return p.slice(0, p.lastIndexOf('/') + 1); } catch { return ''; } }
 function originOf(u) { try { return new URL(u).origin; } catch { return ''; } }
 const bump = (o, k, n = 1) => { o[k] = (o[k] || 0) + n; return o; };
 
 /* 앱이 받는 파일 전부에서 열어 볼 링크를 모은다.
-   돌려주는 것: { targets, skipped, markerTitles }
+   돌려주는 것: { targets, skipped, siteTitles }
      targets  — [{ url(되돌린 주소 = 장부 열쇠), raw, ds:[…], id, title, titles:[…], host, origin, refs:[{ds,id,title,where}] }]
      skipped  — { marker:{ds:n}, noUrl:{ds:n}, noTitle:{ds:n}, hidden:{ds:n}, kosaf:{ items, withFiles, registered } }
-     markerTitles — [{ origin, title }] 목록 표식 글의 제목(같은 사이트의 다른 글 제목으로만 쓴다 — 목록 판정 재료) */
+     siteTitles — [{ origin, dir, title }] 열지 않는 글의 제목 — **목록 판정 재료로만** 쓴다(같은 사이트의 다른 글 제목):
+                  목록 표식 글 + 수집 검수 후보(collector/candidates.json — 앱이 안 받는 전량 기록).
+                  🔴 앱에 실린 글만으로는 한 사이트에 제목이 서넛뿐인 곳이 많아(서울대 4건) 목록 화면을 못 알아본다
+                     (looksLikeList 는 다른 글 제목 셋이 보여야 목록이라 한다). */
 export function gatherTargets(root) {
   const dir = rootDir(root);
   const D = (rel) => path.join(dir, rel);
   const skipped = { marker: {}, noUrl: {}, noTitle: {}, hidden: {}, kosaf: { items: 0, withFiles: 0, registered: 0 } };
-  const markerTitles = [];
+  const siteTitles = [];
   const byUrl = new Map();
 
   const take = (ds, raw, item, ref) => {
@@ -74,8 +78,8 @@ export function gatherTargets(root) {
     const titles = expectTitles(item);
     if (shape === 'marker') {
       bump(skipped.marker, ds);
-      const o = originOf(decodeUrlEntities(raw));
-      titles.forEach((t) => markerTitles.push({ origin: o, title: t }));
+      const u = decodeUrlEntities(raw);
+      titles.forEach((t) => siteTitles.push({ origin: originOf(u), dir: dirOf(u), title: t }));
       return;
     }
     if (!titles.length) { bump(skipped.noTitle, ds); return; }
@@ -115,14 +119,20 @@ export function gatherTargets(root) {
     skipped.kosaf.items += 1;
     if ((it.files || []).length) skipped.kosaf.withFiles += 1;
   }
-  return { targets: [...byUrl.values()], skipped, markerTitles };
+  /* 수집 검수 후보 — 열지 않는다. 같은 사이트의 다른 글 제목으로만 쓴다(목록 판정 재료) */
+  for (const it of (readJson(D('collector/candidates.json'), {}).items || [])) {
+    const u = decodeUrlEntities(it.url);
+    const t = expectTitles({ title: it.title })[0];
+    if (t && /^https?:\/\//i.test(u)) siteTitles.push({ origin: originOf(u), dir: dirOf(u), title: t });
+  }
+  return { targets: [...byUrl.values()], skipped, siteTitles };
 }
 
 /* 같은 사이트의 다른 글 제목 — 목록 판정(looksLikeList)의 재료.
    같은 게시판(경로 앞부분이 같은 것)을 먼저, 그다음 같은 사이트의 나머지. 이 글과 같은 제목은 뺀다
-   (같은 글이 두 데이터에 실린 경우 '다른 글'로 세면 멀쩡한 상세를 목록이라 한다). */
-const dirOf = (u) => { try { const p = new URL(u).pathname; return p.slice(0, p.lastIndexOf('/') + 1); } catch { return ''; } };
-export function otherTitlesFor(target, targets, markerTitles = [], cap = 80) {
+   (같은 글이 두 데이터에 실린 경우 '다른 글'로 세면 멀쩡한 상세를 목록이라 한다).
+   siteTitles(열지 않는 글의 제목 — gatherTargets)도 같은 규칙으로 섞는다. */
+export function otherTitlesFor(target, targets, siteTitles = [], cap = 80) {
   const mine = target.titles || [target.title];
   const near = []; const far = [];
   const seen = new Set();
@@ -138,7 +148,7 @@ export function otherTitlesFor(target, targets, markerTitles = [], cap = 80) {
     const bucket = dirOf(o.url) === d ? near : far;
     for (const t of o.titles || [o.title]) push(t, bucket);
   }
-  for (const m of markerTitles) if (m.origin === target.origin) push(m.title, near);
+  for (const m of siteTitles) if (m.origin === target.origin) push(m.title, (m.dir || '') === d ? near : far);
   return near.concat(far).slice(0, cap);
 }
 
