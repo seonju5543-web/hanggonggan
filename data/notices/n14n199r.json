@@ -1,7 +1,16 @@
 {
  "school": "서강대학교",
- "updatedAt": "2026-10-02",
+ "updatedAt": "2026-10-03",
  "items": [
+  {
+   "title": "[교내/국가] *접수처변경*2026-2 북한이탈주민 생활비 장학금 신청 안내(9/22 마감)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551052?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": "신청기간 : 2026년 9월 2일(수) ~ 9월 22일(화) &nbsp; 2. 신청방법 : 1) 장학금 신청서, 2) 개인정보제공동의서 작성 후",
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-03"
+  },
   {
    "title": "[교외] 해동과학문화재단 장학생 선발 안내(10/26 마감, 공학계열, 생활비 연 1200만원)",
    "url": "https://www.sogang.ac.kr/ko/detail/551490?bbsConfigFk=141&namepage=ScholarshipNotice",
