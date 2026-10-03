@@ -27,3 +27,6 @@ insta/ref/
 # 기술 고문 요청서 렌더용 한글 폰트 (40MB) — render.js 가 받아 온다
 docs/advisor/fonts/
 .superpowers/
+
+# 대외활동 첨부·포스터 — 한 실행 안에서 받고 읽고 버린다(커밋하면 글 15건에 8MB · collector/activity-docs.mjs)
+collector/act-files/

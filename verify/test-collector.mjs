@@ -11006,5 +11006,51 @@ console.log('\n■ 대외활동·공모전 — 활동 글의 자격 읽기 (2026
     [AX.ACT_DETAILS_V >= 3, (readText(new URL('../collector/collect.mjs', import.meta.url)).match(/activityDetails\(detail\.text, it\.title\)/g) || []).length], [true, 2]);
 }
 
+console.log('\n■ 대외활동·공모전 — 첨부·포스터 읽기 (2026-10-03 · 개발자 "api 잔액 채우고 딸깍 · 무료로 최대한 땜빵")');
+{
+  /* 왜 있나 — 본문에 자격이 없는 활동 글은 포스터·첨부에만 자격이 있다. 무료(HWP·OCR)는 수집 때 자동으로, 유료 AI 는 버튼에서만.
+     심장 셋: ① 사이트 공통 그림(인증서·광고 배너)을 포스터로 받지 않는다(첫 실측에서 그것만 받혔다) ② 꺼진 AI 는 절대 안 부른다
+     ③ 첨부에서 읽은 자격을 본문 재수집이 지우지 않는다. */
+  process.env.ACTIVITY_DOCS_AS_LIB = '1';
+  const AD = await import('../collector/activity-docs.mjs');
+  const AX = await import('../collector/activity-excerpts.mjs');
+  const n = { title: '[공고] 2026 청년 영상 공모전 참가자 모집', attachments: [
+    { name: '참가신청서 양식.hwp', url: 'https://x.go.kr/f1' }, { name: '공모전 포스터.jpg', url: 'https://x.go.kr/f2' }, { name: '공고문.hwp', url: 'https://x.go.kr/f3' }] };
+  const html = '<img src="/top_banner.png"><img src="/promo.jpg"><h3>2026 청년 영상 공모전 참가자 모집</h3><div><img src="/upload/poster1.jpg"><img src="/images/icon_print.png"></div>';
+  const c = AD.candidateFiles(n, html, 'https://x.go.kr/view').map((f) => f.url.replace('https://x.go.kr', ''));
+  eq('① 후보 — 서식(신청서)은 빼고 포스터·공고문 · 본문 그림은 글 제목 뒤만(앞의 promo.jpg 는 사이트 그림) · 아이콘 뺌', c, ['/f2', '/f3', '/upload/poster1.jpg']);
+  const png = (w, h) => { const b = Buffer.alloc(32); b.writeUInt32BE(0x89504e47, 0); b.writeUInt32BE(w, 16); b.writeUInt32BE(h, 20); return b; };
+  eq('  그림 꼴 — 가로로 넓은 배너(846×510)는 포스터가 아니다 · 세로 포스터(1693×2166)는 맞다', [AD.posterShaped(AD.imageSize(png(846, 510))), AD.posterShaped(AD.imageSize(png(1693, 2166)))], [false, true]);
+  const e = AD.eligFromFiles(n, ['a-0.hwp'], () => ['■ 참가자격', '대한민국 국민 누구나(개인 또는 팀)', '■ 접수기간 : 2026. 10. 1. ~ 10. 20.'].join('\n'), '/tmp');
+  eq('② 받은 파일 글자 → 본문과 같은 규칙(activityDetails)으로 자격 · 출처 표식', [e && e.eligibilityLines.some((l) => /누구나/.test(l)), e && e.from], [true, '공고문 첨부']);
+  const it = AX.putActivityDetails({ eligibilityLines: ['대한민국 국민 누구나'], eligibilityFrom: '공고문 첨부' }, { eligibilityLines: [], noticeLines: ['안내'] });
+  const it2 = AX.putActivityDetails({ eligibilityLines: ['옛 줄'], eligibilityFrom: '공고문 첨부' }, { eligibilityLines: ['만 19~34세 청년'], noticeLines: [] });
+  eq('③ 본문을 다시 읽어도 첨부에서 읽은 자격은 남는다 · 본문에서 자격이 나오면 본문이 이긴다(표식도 뗀다)',
+    [it.eligibilityLines, it.eligibilityFrom, it2.eligibilityLines, it2.eligibilityFrom], [['대한민국 국민 누구나'], '공고문 첨부', ['만 19~34세 청년'], undefined]);
+  eq('  `③ 국민 누구나 찾고 머물며 … 공간`(공모 소재 예시)은 자격이 아니다 — 누구나가 말의 끝일 때만',
+    AX.activityDetails(['<소재 예시>', '③ 국민 누구나 찾고 머물며 대한민국의 가치와 정체성을 경험할 수 있는 공간'].join('\n')).eligibilityLines, []);
+  eq('  AI 가 고른 글 제목 줄은 자격이 아니다(관문의 \'청년\' 신호를 제목이 통과한다)', [AD.isTitleLine('용산 청년지음 <진로 고민 워크숍> 참여자 모집', '용산 청년지음 <진로 고민 워크숍> 참여자 모집'), AD.isTitleLine('만 19~34세 청년', '용산 청년지음 <진로 고민 워크숍> 참여자 모집')], [true, false]);
+  eq('  무료 재시도는 두 번까지 · 이레 간격', [AD.dueFree(undefined, '2026-10-03'), AD.dueFree({ at: '2026-10-01', tries: 1 }, '2026-10-03'), AD.dueFree({ at: '2026-09-20', tries: 1 }, '2026-10-03'), AD.dueFree({ at: '2026-09-01', tries: 2 }, '2026-10-03')], [true, false, true, false]);
+  /* ④ 유료 — 꺼져 있으면 부르지 않는다(설정 enabled 와 버튼의 ELIG_AI_ENABLE 둘 다 없을 때). 실제로 돌려 본다 */
+  const env = { ...process.env }; delete env.ELIG_AI_ENABLE; delete env.ANTHROPIC_API_KEY; delete env.ELIG_AI_FAKE; delete env.ACTIVITY_DOCS_AS_LIB;
+  const before = readText(new URL('../data/activities.json', import.meta.url));
+  const run = spawnSync(process.execPath, [fileURLToPath(new URL('../collector/activity-docs.mjs', import.meta.url)), '--ai', '--write'], { env, encoding: 'utf8' });
+  const after = readText(new URL('../data/activities.json', import.meta.url));
+  const cfgOn = JSON.parse(readText(new URL('../collector/eligibility-ai-config.json', import.meta.url))).enabled === true;
+  eq('④ 유료 AI — 설정이 꺼져 있고 버튼 스위치가 없으면 부르지 않고 아무것도 안 바꾼다', cfgOn || (/꺼져 있음/.test(run.stdout) && before === after), true);
+  /* ⑤ 워크플로 — 무료는 수집 때(감사 앞 · 상한 · continue-on-error · 받은 파일은 커밋 안 함) · 유료는 버튼에서만 */
+  const wc = readText(new URL('../.github/workflows/collect-scholarships.yml', import.meta.url));
+  const we = readText(new URL('../.github/workflows/eligibility-fill.yml', import.meta.url));
+  const step = (wc.match(/- name: 대외활동 첨부·포스터 자격 읽기[\s\S]*?(?=\n      - name:)/) || [''])[0];
+  eq('⑤ 수집 워크플로 — 받기 → HWP → OCR(act-files) → 읽기 · 감사 앞 · 단계 상한 · continue-on-error · 장부만 커밋',
+    [/--fetch[\s\S]*hwp-bodytext\.py collector\/act-files[\s\S]*ocr-text\.py[^\n]*collector\/act-files[\s\S]*--apply/.test(step), /timeout-minutes: \d+/.test(step) && /continue-on-error: true/.test(step),
+      wc.indexOf('대외활동 첨부·포스터 자격 읽기') > 0 && wc.indexOf('대외활동 첨부·포스터 자격 읽기') < wc.indexOf('- name: 데이터 관문'), /git add collector\/act-docs\.json/.test(wc),
+      /^collector\/act-files\/$/m.test(readText(new URL('../.gitignore', import.meta.url))), /activity-docs\.mjs --ai/.test(wc)],
+    [true, true, true, true, true, false]);
+  eq('  버튼 워크플로 — 대외활동 AI 는 스위치(ELIG_AI_ENABLE)를 그 단계에서만 · 결과를 저장 · 감사에 걸리면 되돌린다',
+    [/- name: 대외활동 — 포스터·첨부·본문 AI 읽기[\s\S]*?ELIG_AI_ENABLE: '1'[\s\S]*?activity-docs\.mjs --ai --write/.test(we), /git add data\/activities\.json/.test(we), /git checkout -- data\/registered\.json data\/activities\.json/.test(we)],
+    [true, true, true]);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);
