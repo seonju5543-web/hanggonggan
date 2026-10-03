@@ -90,14 +90,14 @@ const cards = (page) => page.$$eval('#school-news .notice-card', (els) => els.ma
   meta: [...e.querySelectorAll('.sch-provider')].pop().textContent.trim(),
 })));
 
-/* 카드마다 썸네일 자리 — 글의 사진은 img.notice-thumb, 학교 사진은 감싼 칸(.notice-thumb-school) 안의 img */
+/* 카드마다 썸네일 자리 — 글의 사진·학교 사진 모두 img.notice-thumb 한 장(학교 사진은 notice-thumb-school 클래스).
+   label = 카드 안 어디에든 「학교 사진」 글자가 있는가 — 2026-10-03 개발자 지시로 뺐다("학교사진에 '학교사진' 이라는 디스크립션 빼") */
 const thumbs = (page) => page.$$eval('#school-news .notice-card', (els) => els.slice(0, 5).map((e) => {
-  const box = e.querySelector('.notice-thumb'); const img = box && (box.tagName === 'IMG' ? box : box.querySelector('img'));
+  const img = e.querySelector('img.notice-thumb');
   const name = e.querySelector('.sch-name').getBoundingClientRect();
-  const r = box && box.getBoundingClientRect();
-  const tag = e.querySelector('.thumb-tag');
-  return { has: e.classList.contains('has-thumb'), img: !!img, loaded: !!(img && img.complete && img.naturalWidth > 0), w: r ? Math.round(r.width) : 0, h: r ? Math.round(r.height) : 0,
-    right: !!(r && r.left >= name.right - 1), alt: img ? img.getAttribute('alt') : null, tag: tag ? tag.textContent.trim() : '' };
+  const r = img && img.getBoundingClientRect();
+  return { has: e.classList.contains('has-thumb'), img: !!img, school: !!(img && img.classList.contains('notice-thumb-school')), loaded: !!(img && img.complete && img.naturalWidth > 0), w: r ? Math.round(r.width) : 0, h: r ? Math.round(r.height) : 0,
+    right: !!(r && r.left >= name.right - 1), alt: img ? img.getAttribute('alt') : null, label: e.textContent.includes('학교 사진') };
 }));
 const settle = async (page) => { await page.$eval('#school-news', (e) => e.scrollIntoView()); await page.waitForTimeout(1200); };
 
@@ -128,10 +128,10 @@ const settle = async (page) => { await page.$eval('#school-news', (e) => e.scrol
     await page.$eval('#school-news', (e) => e.scrollIntoView());
     await page.waitForTimeout(1200);
     const shot = await thumbs(page);
-    eq('⑥ 사진 있는 글 — 오른쪽 72px 정사각 · 실제로 그려짐 · 제목과 안 겹침 · alt 비움 · 「학교 사진」 아님', shot[0], { has: true, img: true, loaded: true, w: 72, h: 72, right: true, alt: '', tag: '' });
-    eq('⑥ 사진 파일을 못 받은 글은 그림을 빼고 글자 카드로', shot[1], { has: false, img: false, loaded: false, w: 0, h: 0, right: false, alt: null, tag: '' });
-    /* ⑦ 학교 대표 사진 — 글의 사진이 없는 글(바깥 주소였던 글 포함)은 학교 사진 · 같은 자리·같은 크기 · 「학교 사진」 표시 */
-    eq('⑦ 사진 없는 글 — 학교 사진이 같은 자리에 72px · 실제로 그려짐 · 「학교 사진」 표시', shot.slice(2), Array(3).fill({ has: true, img: true, loaded: true, w: 72, h: 72, right: true, alt: '', tag: '학교 사진' }));
+    eq('⑥ 사진 있는 글 — 오른쪽 72px 정사각 · 실제로 그려짐 · 제목과 안 겹침 · alt 비움 · 학교 사진 아님', shot[0], { has: true, img: true, school: false, loaded: true, w: 72, h: 72, right: true, alt: '', label: false });
+    eq('⑥ 사진 파일을 못 받은 글은 그림을 빼고 글자 카드로', shot[1], { has: false, img: false, school: false, loaded: false, w: 0, h: 0, right: false, alt: null, label: false });
+    /* ⑦ 학교 대표 사진 — 글의 사진이 없는 글(바깥 주소였던 글 포함)은 학교 사진 · 같은 자리·같은 크기 · 사진 위 「학교 사진」 글자는 없다(10-03 개발자 지시) */
+    eq('⑦ 사진 없는 글 — 학교 사진이 같은 자리에 72px · 실제로 그려짐 · 「학교 사진」 글자 없음', shot.slice(2), Array(3).fill({ has: true, img: true, school: true, loaded: true, w: 72, h: 72, right: true, alt: '', label: false }));
     eq('⑦ 구역 아래 출처 한 줄 (공용 페이지 링크)', await page.$eval('#school-news .news-photo-credit', (e) => [e.textContent.trim(), e.querySelector('a') && e.querySelector('a').href]), ['학교 사진 · 테스트 작가 · CC BY 3.0 · 위키미디어 공용', 'https://commons.wikimedia.org/wiki/File:Test.jpg']);
     eq('⑥ 바깥 주소로 그림을 부르지 않았다', await page.evaluate(() => performance.getEntriesByType('resource').some((r) => /evil\.example/.test(r.name))), false);
     if (process.env.SHOT) await page.$eval('#school-news', (e) => e.scrollIntoView()).then(() => page.locator('#school-news').screenshot({ path: process.env.SHOT }));
@@ -139,12 +139,12 @@ const settle = async (page) => { await page.$eval('#school-news', (e) => e.scrol
     await page.context().close();
   }
 
-  /* ── 학교 사진 목록을 못 받음 / 그림을 못 받음 — 글자 카드로 돌아가고 「학교 사진」 표시·출처 줄이 홀로 남지 않는다 ── */
+  /* ── 학교 사진 목록을 못 받음 / 그림을 못 받음 — 글자 카드로 돌아가고 출처 줄이 홀로 남지 않는다 ── */
   for (const mode of ['nophotos', 'photo404']) {
     const { page, errors } = await fresh(browser, mode);
     await settle(page);
     const shot = await thumbs(page);
-    eq(`⑦ ${mode === 'nophotos' ? '목록을 못 받으면' : '그림을 못 받으면'} 사진 없는 글은 글자 카드 (표시만 남지 않는다)`, shot.slice(2).map((c) => [c.has, c.img, c.tag]), Array(3).fill([false, false, '']));
+    eq(`⑦ ${mode === 'nophotos' ? '목록을 못 받으면' : '그림을 못 받으면'} 사진 없는 글은 글자 카드`, shot.slice(2).map((c) => [c.has, c.img]), Array(3).fill([false, false]));
     eq(`⑦ ${mode} — 글의 사진은 그대로`, [shot[0].img, shot[0].loaded], [true, true]);
     eq(`⑦ ${mode} — 보이는 학교 사진이 없으면 출처 줄도 없다`, await page.$('#school-news .news-photo-credit'), null);
     eq(`⑦ ${mode} — 페이지 오류 없음`, errors, []);

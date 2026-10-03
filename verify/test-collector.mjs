@@ -2584,7 +2584,8 @@ console.log('\n■ 학교 대표 사진 (2026-10-03 개발자 지시 "썸네일�
   const n = { title: '휴강 안내', url: 'https://k.ac.kr/n/1', school: '경희대학교', foundAt: '2026-10-03' };
   const good = { src: 'assets/schools/n1w4hprp-0123abcd.webp', focus: '50% 40%', credit: 'x · CC BY 3.0', page: 'https://commons.wikimedia.org/wiki/File:x.jpg' };
   const h1 = A.noticeCardHtml(n, { schoolPhoto: good });
-  eq('  사진 없는 글 — 학교 사진이 썸네일 자리에 · 「학교 사진」 표시 · 자를 자리', [/class="sch-card notice-card has-thumb"/.test(h1), /<span class="notice-thumb notice-thumb-school"><img src="assets\/schools\/n1w4hprp-0123abcd\.webp"/.test(h1), />학교 사진<\/span>/.test(h1), /object-position:50% 40%/.test(h1)], [true, true, true, true]);
+  /* 🔴 사진 위 「학교 사진」 표시는 개발자 지시로 뺐다(10-03 *"학교사진에 '학교사진' 이라는 디스크립션 빼"*) — 되돌아오면 빨간불 */
+  eq('  사진 없는 글 — 학교 사진이 글의 사진과 같은 img 한 장으로 썸네일 자리에 · 자를 자리 · 사진 위 「학교 사진」 표시 없음', [/class="sch-card notice-card has-thumb"/.test(h1), /<img class="notice-thumb notice-thumb-school" src="assets\/schools\/n1w4hprp-0123abcd\.webp"/.test(h1), /학교 사진|thumb-tag/.test(h1), /object-position:50% 40%/.test(h1)], [true, true, false, true]);
   const h2 = A.noticeCardHtml({ ...n, thumb: 'data/news/img/0123456789abcdef.webp' }, { thumb: 'data/news/img/0123456789abcdef.webp', schoolPhoto: good });
   eq('    글의 사진이 있으면 그 사진만 (학교 사진·표시 없음)', [/notice-thumb-school|학교 사진/.test(h2), /data\/news\/img\/0123456789abcdef\.webp/.test(h2)], [false, true]);
   const h3 = A.noticeCardHtml(n, { schoolPhoto: { ...good, src: 'https://evil.example/x.webp', focus: '1;background:red' } });
@@ -2598,13 +2599,13 @@ console.log('\n■ 학교 대표 사진 (2026-10-03 개발자 지시 "썸네일�
   const sec = cut('schoolNewsHtml');
   eq('  구역 — 글의 사진이 없을 때만 학교 사진 · 쓴 사진마다 출처 줄(공용 페이지 링크) · 위키미디어 공용', [/const sp = n\.thumb && NEWS_THUMB_RE\.test\(n\.thumb\) \? null : schoolPhotoFor\(n, turn\[n\.school\] = \(turn\[n\.school\] \?\? -1\) \+ 1\);/.test(sec), /class="news-photo-credit">학교 사진 · /.test(sec), /· 위키미디어 공용<\/p>/.test(sec), /commons\\\.wikimedia\\\.org/.test(sec)], [true, true, true, true]);
   eq('    목록은 소식을 받을 때 같이 받는다(한 번) · 늦게 와도 다시 그린다', /get\('assets\/schools\/photos\.json'\)\.then\(\(d\) => \{ if \(d && d\.schools && !schoolPhotos\) \{ schoolPhotos = d; if \(liveNews\) rerenderVisible\(\); \} \}\);/.test(app), true);
-  eq('    못 받은 그림은 감싼 칸째 뺀다(「학교 사진」 표시만 남지 않게)', /img\.parentElement && img\.parentElement\.classList\.contains\('notice-thumb'\) \? img\.parentElement : null/.test(app) && /box\.remove\(\);/.test(app), true);
+  eq('    못 받은 그림(글의 사진·학교 사진 모두 img.notice-thumb)은 빼고 글자 카드로', /if \(!img \|\| !img\.classList \|\| !img\.classList\.contains\('notice-thumb'\)\) return;[\s\S]{0,200}?img\.remove\(\);\s*if \(card\) card\.classList\.remove\('has-thumb'\);/.test(app), true);
   eq('    학교 사진이 하나도 안 남으면 출처 줄도 뺀다(리뷰 10-03)', /if \(section && !section\.querySelector\('\.notice-thumb-school'\)\) \{ const c = section\.querySelector\('\.news-photo-credit'\); if \(c\) c\.remove\(\); \}/.test(app), true);
   /* 리뷰(10-03) — 시작 화면 사진 셋에 번호판·택시·행인이 컸다. 72px 에선 안 보여도 640px 파일은 공개 주소 → 고른 기록의 crop 으로 파일에서 덜어 낸다 */
   eq('    잘라 낼 자리(crop 비율 → 픽셀 상자) · 틀린 값은 자르지 않음(null)', [SP.cropBox(1000, 750, [0, 0, 1, 0.78]), SP.cropBox(1000, 666, [0.23, 0, 0.77, 1]), SP.cropBox(1000, 750, [0.5, 0, 0.6, 1]), SP.cropBox(1000, 750, [0, 0, 1]), SP.cropBox(1000, 750, [0, 0, -1, 1])],
     [{ left: 0, top: 0, width: 1000, height: 585 }, { left: 230, top: 0, width: 770, height: 666 }, null, null, null]);
   eq('    만드는 도구가 crop 을 쓴다 · 틀리면 문제로 알린다', /if \(p\.crop\) \{[\s\S]{0,200}?cropBox\(width, height, p\.crop\)[\s\S]{0,200}?problems\.push/.test(readText(new URL('tools/build-school-photos.mjs', root))), true);
-  eq('    「학교 사진」 표시와 출처 줄의 모양이 있다', /\.notice-thumb-school \.thumb-tag \{/.test(css) && /\.news-photo-credit \{/.test(css), true);
+  eq('    출처 줄의 모양이 있다 · 「학교 사진」 표시 모양(thumb-tag)은 없다', [/\.news-photo-credit \{/.test(css), /thumb-tag/.test(css + app)], [true, false]);
   /* ④ 만드는 도구 — 바이트 해시 이름 · 쓰지 않는 그림 정리 · 라이선스 거름 */
   const tool = readText(new URL('tools/build-school-photos.mjs', root));
   eq('  만드는 도구 — 바이트 해시 이름(서비스워커 캐시 우선) · 안 쓰는 그림 지움 · 라이선스 거름 · 학교당 3장', [/const name = `\$\{key\}-\$\{crypto\.createHash\('sha1'\)\.update\(buf\)\.digest\('hex'\)\.slice\(0, 8\)\}\.webp`;/.test(tool), /if \(!keep\.has\(f\)\) fs\.unlinkSync/.test(tool), /!OK_LICENSE\.test\(meta\.license \|\| ''\) \|\| \/NC\|ND\/\.test\(meta\.license\)/.test(tool), /list\.slice\(0, 3\)/.test(tool)], [true, true, true, true]);

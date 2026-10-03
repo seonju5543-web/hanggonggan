@@ -5050,23 +5050,8 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
   border-radius: var(--radius-xs);
   background: var(--surface-2);
 }
-/* 학교 대표 사진 (2026-10-03 개발자 지시 — 글에 사진이 없을 때) — 같은 자리·같은 크기. 감싼 칸이 썸네일 자리이고 그림은 칸을 채운다.
-   🔴 「학교 사진」 표시를 지우지 말 것 — 그 공지의 사진이 아니라는 말이다(정문 사진을 공지 사진으로 읽게 하지 않는다). */
-.notice-card.has-thumb > .notice-thumb-school { position: relative; overflow: hidden; }
-.notice-thumb-school img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.notice-thumb-school .thumb-tag {
-  position: absolute;
-  left: var(--space-4);
-  bottom: var(--space-4);
-  padding: var(--space-2) var(--space-6);
-  border-radius: var(--radius-pill);
-  background: rgba(25, 23, 19, 0.66);
-  color: #fff;
-  font-size: var(--t-2xs);
-  line-height: 1.2;
-  font-weight: 600;
-  white-space: nowrap;
-}
+/* 학교 대표 사진 (2026-10-03 개발자 지시 — 글에 사진이 없을 때) — 글의 사진과 같은 img.notice-thumb 한 장이라 위 규칙(72px · cover)을 그대로 쓴다.
+   사진 위 「학교 사진」 표시는 같은 날 개발자 지시로 뺐다("학교사진에 '학교사진' 이라는 디스크립션 빼"). */
 /* 출처 한 줄 — 위키미디어 열린 라이선스(CC BY · BY-SA)의 표기 의무. 구역 맨 아래 작게, 누르면 사진의 공용 페이지 */
 .news-photo-credit { margin: 0 0 var(--space-12); font-size: var(--t-2xs); line-height: 1.5; color: var(--text-sub); }
 .news-photo-credit a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
