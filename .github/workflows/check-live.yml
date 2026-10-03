@@ -66,6 +66,13 @@ jobs:
                 if (t) { out.push(t.thumb); if (++k >= 3) break; }
               }
             } catch {}
+            // 학교 대표 사진 (2026-10-03): 글에 사진이 없을 때 앱이 받는 목록 + 그 첫 그림 하나 (바이트로 비교)
+            try {
+              const sp = JSON.parse(fs.readFileSync('assets/schools/photos.json', 'utf8'));
+              out.push('assets/schools/photos.json');
+              const first = Object.values(sp.schools || {})[0];
+              if (first && first[0]) out.push(first[0].src);
+            } catch {}
             console.log([...new Set(out)].join(' '));
           ")
 
@@ -87,7 +94,7 @@ jobs:
               const j = JSON.parse(fs.readFileSync(p, 'utf8'));
               /* ⚠️ `majors` 도 안다 — 모르면 학과 파일에서 **칸 수 3**(school·updatedAt·majors)을
                  세어, 내용이 달라도 3 대 3 으로 통과한다(404 만 겨우 잡힌다). */
-              const box = j.items || j.templates || j.majors || j;
+              const box = j.items || j.templates || j.majors || (/assets\/schools\/photos\.json$/.test(p) ? j.schools : null) || j;   // schools 는 학교 사진 목록에서만 — 색인 파일의 schools 는 숫자라 '읽기실패' 끼리 같다고 세면 404 도 통과한다(리뷰 10-03)
               if (Array.isArray(box)) return box.length;
               if (box && typeof box === 'object') return Object.keys(box).length;
               return '읽기실패';
@@ -109,6 +116,7 @@ jobs:
           for (const f of extra) {
             const label = f.startsWith('data/majors/') ? '학과(학교별)'
               : f.startsWith('data/news/img/') ? '소식 사진'
+              : f.startsWith('assets/schools/') ? (f.endsWith('.json') ? '학교 사진 목록' : '학교 사진')
               : f.startsWith('data/news/') ? (f.endsWith('index.json') ? '소식 색인' : '소식(학교별)')
               : f.endsWith('index.json') ? '공고 색인' : '공고(학교별)';
             const measure = f.endsWith('.webp') ? bytes : count;

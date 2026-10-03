@@ -1,0 +1,369 @@
+{
+ "note": "소식 카드에 그 글의 사진이 없을 때 대신 보이는 학교 대표 사진 (2026-10-03). 만드는 곳 tools/build-school-photos.mjs · 고른 기록 docs/designs/assets/gates/school-photo-picks.json · 사진은 위키미디어 공용의 열린 라이선스 — credit 을 구역 아래에 적는다.",
+ "schools": {
+  "숭실대학교": [
+   {
+    "src": "assets/schools/nmljo8t-32d62b57.webp",
+    "focus": "65% 50%",
+    "credit": "Benlikeshotchocolate · CC BY-SA 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3ASoongsil_University.jpg",
+    "what": "숭실대 정문의 물결 모양 지붕 아치 아래로 계단, 노랗고 붉은 단풍, 파란 하늘이 보이고, 오른쪽 뒤에 '숭실대학교' 글자가 달린 고층 건물이 서 있음"
+   }
+  ],
+  "조선대학교": [
+   {
+    "src": "assets/schools/n1qr99q6-e7cfdaa4.webp",
+    "focus": "50% 45%",
+    "credit": "Pioneerhj · CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AChosun_University_Main_Building_2.jpg",
+    "what": "흰 벽에 뾰족한 삼각 지붕과 고딕풍 창이 줄지어 있는 조선대 본관 정면, 양옆에 짙은 나무 실루엣, 파란 하늘과 구름, 가운데 국기·학교 깃발"
+   }
+  ],
+  "상명대학교": [
+   {
+    "src": "assets/schools/n1ozjjw8-1567f51a.webp",
+    "focus": "75% 50%",
+    "credit": "Donghae minari · CC BY-SA 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3A%EC%83%81%EB%AA%85%EB%8C%80_%ED%95%99%EC%88%A0%EC%A0%95%EB%B3%B4%EA%B4%80.jpg",
+    "what": "파란 하늘과 흰 구름 아래 '상명대학교 SANGMYUNG UNIVERSITY' 글자가 걸린 학술정보관(L동)과 소나무 정원, 왼쪽으로 H·A동이 이어지는 교정 전경"
+   },
+   {
+    "src": "assets/schools/n1ozjjw8-97e4998e.webp",
+    "focus": "60% 45%",
+    "credit": "박리브 · CC BY-SA 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3A%EC%83%81%EB%AA%85%EB%8C%80%ED%95%99%EA%B5%90_%ED%95%99%EC%88%A0%EC%A0%95%EB%B3%B4%EA%B4%80_%EC%99%B8%EA%B4%80.jpg",
+    "what": "신록과 철쭉 꽃 너머로 '상명대학교' 간판이 달린 학술정보관(L동)과 뒤쪽 R동이 보이는 언덕 위 캠퍼스 입구 풍경"
+   }
+  ],
+  "가천대학교": [
+   {
+    "src": "assets/schools/nzzc8bm-aa7aeb08.webp",
+    "focus": "52% 50%",
+    "credit": "Jocelyndurrey · CC BY-SA 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3A%EA%B0%80%EC%B2%9C%EB%8C%80%ED%95%99%EA%B5%90(2).jpg",
+    "what": "해 질 녘 불 켜진 유리 피라미드형 건물과 '가천대학교' 글자 조명, 앞쪽에 '아름다운 인재의 샘 가천대학교' 초록 표지판과 노을빛 나무"
+   }
+  ],
+  "아주대학교": [
+   {
+    "src": "assets/schools/n16dvfry-815d2f84.webp",
+    "focus": "40% 50%",
+    "credit": "Pde00 · CC BY-SA 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3A%EC%95%84%EC%A3%BC%EB%8C%80%ED%95%99%EA%B5%90_%EC%82%B0%ED%95%99%ED%98%91%EB%A0%A5%EC%9B%90.jpg",
+    "what": "맑은 파란 하늘 아래 흰색·벽돌색 6층 캠퍼스 건물(산학협력원)을 붉고 노란 단풍나무들이 둘러싼 가을 교정 풍경. 아래쪽 끝에 주차된 차 몇 대와 오른쪽 아래 구석에 사람 한 명이 작게 보이지만 주인공은 아님"
+   }
+  ],
+  "이화여자대학교": [
+   {
+    "src": "assets/schools/n1tk2q9m-cb3d5c36.webp",
+    "focus": "50% 85%",
+    "credit": "Iamin22 · CC BY-SA 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3A%EC%9D%B4%ED%99%94%EC%97%AC%EC%9E%90%EB%8C%80%ED%95%99%EA%B5%90_%EB%8C%80%EA%B0%95%EB%8B%B9.jpg",
+    "what": "맑은 파란 하늘 아래 초록 나무 사이로 솟은 고딕 양식 석조 대강당 정면과 긴 돌계단, 앞으로 휘어 오르는 길"
+   }
+  ],
+  "인하대학교": [
+   {
+    "src": "assets/schools/nkeh7pq-8da615be.webp",
+    "focus": "50% 60%",
+    "credit": "Ifflies · CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3A%EC%9D%B8%ED%95%98%EB%8C%80%ED%95%99%EA%B5%90_%EB%B3%B8%EA%B4%80.jpg",
+    "what": "맑은 파란 하늘 아래 흰 열주식 본관 정면, 앞에 긴 수조(연못)와 둥글게 다듬은 나무들, 맨 앞에 인하대 휘장 돌 받침"
+   },
+   {
+    "src": "assets/schools/nkeh7pq-dc17ebed.webp",
+    "focus": "48% 50%",
+    "credit": "Ifflies · CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3A%EC%9D%B8%ED%95%98%EB%8C%80%ED%95%99%EA%B5%90_%EC%A0%95%EC%84%9D%ED%95%99%EC%88%A0%EC%A0%95%EB%B3%B4%EA%B4%80.jpg",
+    "what": "파란 하늘 아래 넓은 처마 지붕과 초록 유리 외벽의 정석학술정보관, 앞에 겨울 잔디밭과 나무들"
+   }
+  ],
+  "부산대학교": [
+   {
+    "src": "assets/schools/n13zozby-070f2a11.webp",
+    "focus": "50% 62%",
+    "credit": "Hyowonian · CC BY-SA 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3A%EB%B6%80%EC%82%B0%EB%8C%80(%EB%B3%B8%EA%B4%80).jpg",
+    "what": "맑은 파란 하늘 아래 부산대 대학본부(205동) 건물과 고층 타워, 앞쪽 붉은 벽돌 광장과 나무들, 멀리 작은 보행자 몇 명"
+   }
+  ],
+  "서울과학기술대학교": [
+   {
+    "src": "assets/schools/n14kv35j-f13e3ada.webp",
+    "focus": "55% 62%",
+    "credit": "HeungSoon (Pixabay) · CC0",
+    "page": "https://commons.wikimedia.org/wiki/File%3A%EC%84%9C%EC%9A%B8%EA%B3%BC%ED%95%99%EA%B8%B0%EC%88%A0%EB%8C%80%ED%95%99%EA%B5%90_Seoul_National_University_of_Technology.jpg",
+    "what": "맑은 하늘과 흰 구름 아래, 높은 곳에서 내려다본 교정. 앞쪽에 붉은 트랙과 초록 인조잔디 운동장, 오른쪽에 붉은 지붕의 둥근 건물, 가운데와 오른쪽에 강의동·고층 건물이 있고, 멀리 수락산·불암산 쪽 산줄기가 보인다"
+   }
+  ],
+  "계명대학교": [
+   {
+    "src": "assets/schools/n1nel147-86174f0f.webp",
+    "focus": "48% 50%",
+    "credit": "Lsj1997 · CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3A%EA%B3%84%EB%AA%85%EB%8C%80%ED%95%99%EA%B5%90_%ED%95%9C%ED%95%99%EC%B4%8C.jpg",
+    "what": "기와지붕을 얹은 2층 한옥 누각(계명서당), 앞에 돌계단과 '啓明書堂' 새긴 바위, 양옆 나무와 관목"
+   }
+  ],
+  "충남대학교": [
+   {
+    "src": "assets/schools/nl1xm19-7d1e608d.webp",
+    "focus": "25% 50%",
+    "credit": "김보영 · CC0",
+    "page": "https://commons.wikimedia.org/wiki/File%3A%EC%B6%A9%EB%82%A8%EB%8C%80%ED%95%99%EA%B5%90_%EC%A0%95%EB%AC%B8(%EA%B9%80%EB%B3%B4%EC%98%81).jpg",
+    "what": "높은 곳에서 내려다본 충남대 정문(흰 아치형 문)과 그 뒤로 곧게 뻗은 중앙 도로, 양옆의 벚꽃·교정 건물, 맑은 파란 하늘"
+   }
+  ],
+  "충북대학교": [
+   {
+    "src": "assets/schools/n16l2078-ed7ba4aa.webp",
+    "focus": "95% 50%",
+    "credit": "Daeya79 · CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3A%EC%B6%A9%EB%B6%81%EB%8C%80%ED%95%99%EA%B5%90_%EC%A0%95%EB%AC%B8.jpg",
+    "what": "맑은 하늘 아래 충북대학교 정문: 오른쪽은 빨간 방패 교표와 '충북대학교 CHUNGBUK NATIONAL UNIVERSITY'가 새겨진 돌벽 표지, 왼쪽은 높은 돌기둥 문주와 소나무, 그 뒤로 흰 건물"
+   }
+  ],
+  "전북대학교": [
+   {
+    "src": "assets/schools/ncuyr4z-0f20a4f4.webp",
+    "focus": "28% 50%",
+    "credit": "강동원0 · CC0",
+    "page": "https://commons.wikimedia.org/wiki/File%3A%EC%A0%84%EB%B6%81%EB%8C%80%ED%95%99%EA%B5%90_%EB%B0%B0%EB%A1%B1%EB%82%98%EB%AC%B4%EC%97%B0%EB%AA%BB.jpg",
+    "what": "배롱나무 연못과 한옥 정자, 파란 하늘"
+   },
+   {
+    "src": "assets/schools/ncuyr4z-5dee5f18.webp",
+    "focus": "47% 50%",
+    "credit": "강동원0 · CC0",
+    "page": "https://commons.wikimedia.org/wiki/File%3A%EC%A0%84%EB%B6%81%EB%8C%80%ED%95%99%EA%B5%90_%EC%9E%90%EC%97%B0%EC%82%AC%EB%B0%95%EB%AC%BC%EA%B4%80.jpg",
+    "what": "넓은 잔디밭 너머 옛 석조 건물(자연사박물관)"
+   }
+  ],
+  "경북대학교": [
+   {
+    "src": "assets/schools/nf097dk-23b1320b.webp",
+    "focus": "20% 45%",
+    "credit": "Choi2451 · CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AIlChungDam_in_Kyungpook_National_University.jpg",
+    "what": "일청담 분수와 왼쪽 돔 지붕 도서관"
+   }
+  ],
+  "영남대학교": [
+   {
+    "src": "assets/schools/n12kfbyt-467d1d9f.webp",
+    "focus": "60% 55%",
+    "credit": "엔샷 · CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3A%EC%98%81%EB%82%A8%EB%8C%80%ED%95%99%EA%B5%90_%EC%A0%95%EB%AC%B8.jpg",
+    "what": "정문 회랑과 피라미드 지붕, 파란 하늘"
+   }
+  ],
+  "세종대학교": [
+   {
+    "src": "assets/schools/n1mo5fbn-aacf9b03.webp",
+    "focus": "45% 60%",
+    "credit": "Crimsonmaster · CC0",
+    "page": "https://commons.wikimedia.org/wiki/File%3ASejong_University_Gate.jpg",
+    "what": "한옥 지붕 정문과 소나무, 파란 하늘"
+   },
+   {
+    "src": "assets/schools/n1mo5fbn-609de713.webp",
+    "focus": "55% 50%",
+    "credit": "Yohan Lee 이요한 · CC BY-SA 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3ASejong_University_Front_Gate.jpg",
+    "what": "한옥 정문 너머 유리 건물"
+   },
+   {
+    "src": "assets/schools/n1mo5fbn-8f3179fe.webp",
+    "focus": "20% 50%",
+    "credit": "Sejong university · CC BY-SA 2.5",
+    "page": "https://commons.wikimedia.org/wiki/File%3ASejong_University_Campus.jpg",
+    "what": "시계탑과 교정 건물, 산과 하늘"
+   }
+  ],
+  "동국대학교 WISE캠퍼스": [
+   {
+    "src": "assets/schools/n2we95k-99e336f4.webp",
+    "focus": "48% 40%",
+    "credit": "Yerbol Nisanbayev · CC BY 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3ADormitory_Dongguk_University_Gyeongju.JPG",
+    "what": "잔디밭 너머 붉은 지붕 건물과 숲"
+   }
+  ],
+  "광운대학교": [
+   {
+    "src": "assets/schools/n6xhy7d-bad3cd5e.webp",
+    "focus": "35% 40%",
+    "credit": "Altostratus · CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AKwangwoon_University.jpg",
+    "what": "학교 이름이 붙은 붉은 벽돌 건물과 나무"
+   }
+  ],
+  "한국방송통신대학교": [
+   {
+    "src": "assets/schools/n1uf7bji-dc886138.webp",
+    "focus": "55% 50%",
+    "credit": "Bigsmile20 · CC BY-SA 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AKorea_National_Open_University.jpg",
+    "what": "KNOU 표지가 붙은 붉은 벽돌 본교 건물"
+   }
+  ],
+  "전남대학교": [
+   {
+    "src": "assets/schools/nwqmwga-f2c7fd97.webp",
+    "focus": "45% 50%",
+    "credit": "Saigen Jiro · CC0",
+    "page": "https://commons.wikimedia.org/wiki/File%3A518memorial_hall_in_Chonnam_National_University.JPG",
+    "what": "시계탑이 있는 옛 본관(용봉관)과 소나무"
+   },
+   {
+    "src": "assets/schools/nwqmwga-95fb4fcf.webp",
+    "focus": "50% 40%",
+    "credit": "박엘리샤 · CC BY-SA 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AChonnam_national_university2.png",
+    "what": "본관 앞 잔디밭과 화분, 파란 하늘"
+   }
+  ],
+  "부경대학교": [
+   {
+    "src": "assets/schools/n1nesasz-763fab82.webp",
+    "focus": "70% 35%",
+    "credit": "Hansol Jeong · Public domain",
+    "page": "https://commons.wikimedia.org/wiki/File%3APukyong_Natl_Univ_by_Ficell_006.jpg",
+    "what": "한옥 정자가 있는 연못 정원"
+   },
+   {
+    "src": "assets/schools/n1nesasz-01b56165.webp",
+    "focus": "58% 40%",
+    "credit": "Hansol Jeong · Public domain",
+    "page": "https://commons.wikimedia.org/wiki/File%3APukyong_Natl_Univ_by_Ficell_003.jpg",
+    "what": "본관 건물과 소나무"
+   }
+  ],
+  "서강대학교": [
+   {
+    "src": "assets/schools/n14n199r-58477144.webp",
+    "focus": "50% 60%",
+    "credit": "알로스 · CC0",
+    "page": "https://commons.wikimedia.org/wiki/File%3ASogang-1641741169692_04.jpg",
+    "what": "눈 덮인 교정과 노을 하늘 — 시작 화면 사진에서 아래 주차된 차(번호판)를 잘라 냄"
+   }
+  ],
+  "경희대학교": [
+   {
+    "src": "assets/schools/n1w4hprp-636d792e.webp",
+    "focus": "55% 50%",
+    "credit": "Pectus Solentis · CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3A%EA%B2%BD%ED%9D%AC%EB%8C%80_%EC%84%A4%EC%BA%A0_%EC%A0%95%EB%AC%B8.jpg",
+    "what": "성 모양 석조 정문과 나무 — 시작 화면 사진에서 왼쪽 아래 택시(번호판)를 잘라 냄"
+   }
+  ],
+  "한양대학교": [
+   {
+    "src": "assets/schools/n1b3og5n-ed95fe67.webp",
+    "focus": "60% 50%",
+    "credit": "Piotrus · CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AHanyang_University_008.JPG",
+    "what": "초록 지붕 본관과 파란 하늘 — 시작 화면 사진에서 앞쪽 행인들을 잘라 냄"
+   }
+  ],
+  "서울대학교": [
+   {
+    "src": "assets/schools/nsgh1oi-845ff74a.webp",
+    "focus": "58% 62%",
+    "credit": "Deuterium 001 · CC BY 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3ASeoulNatlUnivMainGateAtNight.jpg",
+    "what": "시작 화면 사진(승인)"
+   }
+  ],
+  "고려대학교": [
+   {
+    "src": "assets/schools/n1lw6ycq-3ddc3280.webp",
+    "focus": "50% 50%",
+    "credit": "Mannaa mohamed · CC BY-SA 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AKorea_University_Anam_camps%2C_main_gate.jpg",
+    "what": "시작 화면 사진(승인)"
+   }
+  ],
+  "연세대학교": [
+   {
+    "src": "assets/schools/nz3ew5y-79d3f862.webp",
+    "focus": "50% 50%",
+    "credit": "Christian Bolz · CC BY-SA 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AYonsei_University_campus.jpg",
+    "what": "시작 화면 사진(승인)"
+   }
+  ],
+  "성균관대학교": [
+   {
+    "src": "assets/schools/n1x6ubj9-5fa36ec4.webp",
+    "focus": "50% 50%",
+    "credit": "hyolee2 · CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3ASungkyunkwan_University_2.JPG",
+    "what": "시작 화면 사진(승인)"
+   }
+  ],
+  "중앙대학교": [
+   {
+    "src": "assets/schools/n1iz3lr8-58c9fd71.webp",
+    "focus": "50% 50%",
+    "credit": "Hutanis · CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AChung-ang_Univ.Maingate.jpg",
+    "what": "시작 화면 사진(승인)"
+   }
+  ],
+  "한국외국어대학교": [
+   {
+    "src": "assets/schools/n19cz03g-265e4863.webp",
+    "focus": "50% 42%",
+    "credit": "LERK · CC BY-SA 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AHankuk_University_of_Foreign_Studies_Seoul_campus_20180914_090938.jpg",
+    "what": "시작 화면 사진(승인)"
+   }
+  ],
+  "서울시립대학교": [
+   {
+    "src": "assets/schools/n1au199v-bde15bbe.webp",
+    "focus": "50% 50%",
+    "credit": "Younghopark7 · CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3A%EC%84%9C%EC%9A%B8%EC%8B%9C%EB%A6%BD%EB%8C%80%ED%95%99%EA%B5%90_%EB%8F%99%EB%AC%B8%ED%83%91.jpg",
+    "what": "시작 화면 사진(승인)"
+   }
+  ],
+  "건국대학교": [
+   {
+    "src": "assets/schools/nmpm6i7-4ad2bcae.webp",
+    "focus": "50% 50%",
+    "credit": "Crossmr · CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AKonkukuniversitylake.JPG",
+    "what": "시작 화면 사진(승인)"
+   }
+  ],
+  "동국대학교": [
+   {
+    "src": "assets/schools/n1or8oiw-9d27c3a6.webp",
+    "focus": "30% 48%",
+    "credit": "Yerbol Nisanbayev · CC BY 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3ADongguk_University_at_Night.jpg",
+    "what": "시작 화면 사진(승인)"
+   }
+  ],
+  "홍익대학교": [
+   {
+    "src": "assets/schools/nv8pha4-60684bf1.webp",
+    "focus": "50% 50%",
+    "credit": "Michaela den · CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AHongik_University_entrance_2012.JPG",
+    "what": "시작 화면 사진(승인)"
+   }
+  ],
+  "숙명여자대학교": [
+   {
+    "src": "assets/schools/n1a4mxa4-d225a0ae.webp",
+    "focus": "36% 52%",
+    "credit": "revi · CC BY 2.0 kr",
+    "page": "https://commons.wikimedia.org/wiki/File%3A%EC%88%99%EB%AA%85%EC%97%AC%EC%9E%90%EB%8C%80%ED%95%99%EA%B5%90_001.jpg",
+    "what": "시작 화면 사진(승인)"
+   }
+  ]
+ }
+}
