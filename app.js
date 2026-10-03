@@ -1677,8 +1677,16 @@ function renderHome() {
      `applyable` 하나에서 센다** — 판정을 새로 만들면 히어로와 목록이 다른 말을 한다.
      '이번 주 마감' = 남은 날 7일 이하(기한을 못 읽은 공고는 dday 가 14일을 주므로 안 들어간다). */
   const soon = applyable.filter((m) => m.sch.deadline && dday(m.sch.deadline).days <= 7).length;
-  $('#hero-sub').innerHTML = (soon ? `<b>이번 주 마감 ${soon}건</b><span> · </span>` : '')
-    + `<span>신청 가능 ${applyable.length}건</span>`;
+  /* 🔴 이 줄에서 '신청 가능 n건' 을 뺐다 (2026-10-03). **바로 아래 버튼이 같은 수를 말한다** —
+     아직 아무것도 담지 않은 학생(= 새 사용자 전부)에게는 `applyable` 과 `notApplied` 가 같은
+     값이라, 화면에 `신청 가능 28건` 과 `28건 신청 준비` 가 8px 사이로 나란히 떴다(실측).
+     남긴 것은 CTO 시안 I4 가 적어 둔 그대로의 **빨간 한 줄**이다.
+     ⚠️ `soon` 은 지우지 말 것 — 바로 아래 `tileN.deadline` 이 쓴다.
+     🔴 남은 겹침 — 이 줄의 `이번 주 마감 n건` 과 그림 첫 칸('마감 임박') 배지가 **같은 수**다.
+        그림 4칸이 생기면서 이 윗줄이 말할 수 있는 숫자가 전부 칸이나 버튼에 이미 있다
+        (마감·교내·교외·신청내역 = 칸 / 신청 가능 = 버튼). 즉 줄 자체가 남는 자리다 —
+        **지울지는 CTO 결정**이라 여기서는 겹치는 쪽 하나만 뺐다. */
+  $('#hero-sub').innerHTML = soon ? `<b>이번 주 마감 ${soon}건</b>` : '';
   const tileN = {
     deadline: soon,
     '교내': applyable.filter((m) => m.sch.type === '교내').length,
@@ -2713,8 +2721,15 @@ function kosafAsScholarships() {
 function liveNoticesHead(updatedAt) {
   /* ⚠️ 두 토막이 한 줄에 들어가야 한다 — 그려 놓고 재 보니 제목이 한 글자 길어지고 오른쪽
      글이 길어서 **둘 다 두 줄로 꺾였다**(390px). 제목은 옛 길이(11자)로, 오른쪽은 날짜만. */
+  /* 🔴 한 줄 설명을 붙였다 (2026-10-03). 홈 아래쪽에 **생김새가 똑같은 목록 셋**이 잇따라
+     쌓여 있다(학교 게시판 공고 · 우리 학교 소식 · 재단·지자체 새 공고 — 셋 다 같은
+     `noticeCardHtml`). 제목만으로는 무엇이 다른지 읽히지 않았다. 그리고 이 카드들은 원문을
+     읽은 적이 없어 적합도·마감·금액이 없는데, 지금껏 그 사실을 **아무 데서도 말하지 않았다**
+     (원칙 8-1 — 모르는 것은 모른다고 말한다).
+     ⚠️ 설명은 `.section-head` **밖**에 둔다 — 안에 넣으면 위 주석의 '한 줄' 이 깨진다. */
   return `<div class="section-head" style="margin-top:4px"><h3>우리 학교 게시판 공고</h3>
-    <span class="link-btn">${updatedAt ? esc(updatedAt) + ' 갱신' : '매일 아침 갱신'}</span></div>`;
+    <span class="link-btn">${updatedAt ? esc(updatedAt) + ' 갱신' : '매일 아침 갱신'}</span></div>
+    <p class="section-sub">학교 게시판 제목 그대로예요 · 자격·금액은 아직 못 읽었어요</p>`;
 }
 
 /* ⚠️ 검색 인자를 걷었다 (2026-09-18) — 이 목록이 탐색 화면에 있던 시절에는 그 화면의
@@ -3053,8 +3068,10 @@ function externalNoticesHtml() {
     ? `<button type="button" class="link-btn home-more" id="external-more" data-external-more
          aria-expanded="${shown >= mine.length ? 'true' : 'false'}">${shown >= mine.length ? '접기' : '더보기'}</button>`
     : '';
+  /* 한 줄 설명 — 위 `liveNoticesHead` 주석 참조(목록 셋이 같아 보이던 것 · 2026-10-03) */
   return `<div class="section-head" style="margin-top:4px"><h3>재단·지자체 새 공고</h3>
-    <span class="link-btn">${liveExternal.updatedAt ? esc(liveExternal.updatedAt) + ' 갱신' : ''}</span></div>`
+    <span class="link-btn">${liveExternal.updatedAt ? esc(liveExternal.updatedAt) + ' 갱신' : ''}</span></div>
+    <p class="section-sub">학교 밖 재단·지자체 게시판에서 주운 글이에요</p>`
     + `<div class="card-list" id="external-list">`
     + mine.slice(0, shown).map((n) => noticeCardHtml(n, { org: `${n.host} 공고`, dday: n.deadline ? { label: ddayWords(dday(n.deadline)), urgent: dday(n.deadline).days >= 0 && dday(n.deadline).days <= 7 } : null })).join('')
     + `</div>${more}<div style="margin-bottom:18px"></div>`;
@@ -3112,8 +3129,10 @@ function schoolNewsForMe() {
 function schoolNewsHtml() {
   const p = state.profile;
   if (!p) return '';
+  /* 한 줄 설명 — 위 `liveNoticesHead` 주석 참조(목록 셋이 같아 보이던 것 · 2026-10-03) */
   const head = `<div class="section-head" style="margin-top:4px"><h3>우리 학교 소식</h3>
-    <span class="link-btn">${liveNews && liveNews.updatedAt ? esc(liveNews.updatedAt) + ' 갱신' : '매일 갱신'}</span></div>`;
+    <span class="link-btn">${liveNews && liveNews.updatedAt ? esc(liveNews.updatedAt) + ' 갱신' : '매일 갱신'}</span></div>
+    <p class="section-sub">장학금이 아닌 학교 공지예요</p>`;
   if (!liveNews) return head + (typeof skeletonRows === 'function' ? skeletonRows(2) : '');
   const mine = schoolNewsForMe();
   if (!mine.length) {
