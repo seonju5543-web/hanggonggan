@@ -3060,13 +3060,48 @@ const activityWhere = (n) => (n.school ? `${n.school}${n.campus ? ' ' + n.campus
 /* 혜택 줄이 짧으면 카드 아랫줄 왼쪽(장학 카드의 금액 자리)에 굵게 — 길거나 없으면 분야를 옅게 */
 const activityBenefit = (n) => ((n.excerpts || []).find((x) => x.label === '혜택') || {}).text || '';
 
+/* ── 대외활동 제목·혜택을 깔끔하게 (2026-10-04 개발자 지적 — *"제목도 날짜나 이모티콘이 들어가 있는 등 깔끔하지가 않고 …
+   파란 글씨 … 원문 그대로 들어가서 진짜 개못생겼어 … 공고 카드에 넣어 주든가 깔끔하게 정리해서"*) ──
+   🔴 지우고 나누기만 한다 — 글자를 지어내지 않는다(원칙 8-1). 원제목은 데이터에 그대로 있고 '원문에서 신청하기'가 원문으로 간다.
+   🔴 주최를 적은 대괄호(`[감사원]`·`[KOICA…]`)는 남긴다 — 정책브리핑 글은 그것이 유일한 주최 정보다. 게시판 분류표(`[일반]`·`[공고]`)만 뗀다 */
+const ACT_TAG = /^(?:일반|공통|외부|공고|공지|모집|안내|홍보|국제학생|학사|봉사|행사|교내|교외|마감|모집중|접수중|진행중|이벤트)$/;
+function activityTitle(n) {
+  let t = unent(String((n && n.title) || '')).replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu, '').replace(/\s+/g, ' ').trim();
+  const before = t;
+  t = t.replace(/\s*기간\s*:\s*\d{4}[\d.\s~\-]*$/, '');                                   // 정책브리핑 `… 기간 : 2026.09.14 ~ 2026.10.13`
+  t = t.replace(/\s+\S*(?:팀|과|처|센터)\s+\d{4}-\d{2}-\d{2}.*$/, '');                     // 게시판 행 찌꺼기 `학생지원팀 2026-05-18 1,0…`
+  t = t.replace(/\s+\d{4}\s?[.\-]\s?\d{1,2}(?:\s?[.\-]\s?\d{1,2})?\.?\s*$/, '');         // 꼬리 날짜 `2026.09 . 28` · `2026.08.04`
+  t = t.replace(/^(?:마감|모집중|접수중)\s+/, '');
+  t = t.replace(/^(?:[[【]\s*[^\]】]{1,14}\s*[\]】]\s*)+/, (run) => run.replace(/[[【]\s*([^\]】]{1,14})\s*[\]】]\s*/g, (m, tag) => (ACT_TAG.test(tag.trim()) ? '' : m)));
+  t = t.replace(/\s*[(（]\s*~[^()（）]*(?:[(（][^()（）]*[)）][^()（）]*)*[)）]\s*$/, '');      // `(~10/22)` · `(~9/30(금)까지)`
+  t = t.replace(/\s*(?:자세히|더보기)\s*$/, '').replace(/[\s·\-–—:,]+$/, '').trim();
+  return t.length >= 4 ? t : before;
+}
+/* 혜택 원문은 `○ 맞춤형 정책상담 · 일자리 … ○ 참여혜택 · 대면 …` 처럼 한 줄에 여럿이 붙어 온다 — 항목으로 **나누기만** 한다 */
+function benefitItems(text) {
+  const t = unent(String(text || '')).replace(/\s+/g, ' ').trim();
+  const parts = t.split(/\s*[○◯●■□\u25AA\u25B6•]\s*/).map((x) => x.trim()).filter((x) => x.length >= 2);   // 네모·세모 기호는 번호로 적는다(화면 말투 관문 ui-tone)
+  return parts.length ? parts : (t ? [t] : []);
+}
+/* 카드 아랫줄 — 짧은 혜택은 그대로, 긴 혜택은 첫 항목의 이름(원문 글자)만 + '외 n' */
+function benefitShort(text) {
+  const t = unent(String(text || '')).trim();
+  if (t && t.length <= 20) return t;
+  const items = benefitItems(t);
+  const label = (items[0] || '').split(/\s*[·:：]\s*/)[0].trim();
+  if (!label || label.length > 16) return '';
+  return items.length > 1 ? `${label} 외 ${items.length - 1}` : label;
+}
+/* 제목 괄호 속 대상(`(기존 전라남도 22개 시·군 대상)`)은 자격이다 — 본문·API 칸에 없고 제목에만 있어 서울 학생에게 95% 가 떴다(2026-10-04) */
+const titleTargetLines = (title) => [...String(unent(title || '')).matchAll(/[(（]([^()（）]{4,40}대상)[)）]/g)].map((m) => m[1].trim());
+
 /* 활동 글 → 판정 엔진이 읽는 모양 (2026-10-01). 칸 이름이 장학과 같아(eligibilityLines·Excludes·Priority) **엔진을 그대로** 부른다.
    🔴 eligibility(구조화 조건)는 비워 둔다 — 활동 글에는 사람이 확인한 성적·소득 조건이 없다. 판정 근거는 원문에서 뽑은 줄뿐이다(원칙 8-1).
    id 는 'act:' + 주소 — 장학 id 와 섞이지 않는다(묻기 상자 eligAsk 가 이 id 로 '어느 시트의 상자인가'를 가린다). */
 function activityAsSch(n) {
   return {
-    id: `act:${n.url}`, name: unent(n.title), type: n.kind || '대외활동', eligibility: {},
-    eligibilityLines: n.eligibilityLines || [], eligibilityExcludes: n.eligibilityExcludes || [], eligibilityPriority: n.eligibilityPriority || [],
+    id: `act:${n.url}`, name: activityTitle(n), type: n.kind || '대외활동', eligibility: {},
+    eligibilityLines: [...(n.eligibilityLines || []), ...titleTargetLines(n.title).filter((l) => !(n.eligibilityLines || []).some((x) => String(x).includes(l)))], eligibilityExcludes: n.eligibilityExcludes || [], eligibilityPriority: n.eligibilityPriority || [],
     excerpts: n.noticeLines || [], documents: [], deadline: n.deadline || null,
     activity: true, amount: `${n.kind || '대외활동'} · ${activityWhere(n)}`,   // 달력·보관함 줄의 둘째 줄(장학은 금액 자리) — 지어낸 값이 아니라 종류·주최
   };
@@ -3081,8 +3116,7 @@ function activityFit(n) {
 function activityCardHtml(n) {
   const m = activityFit(n);
   const d = n.deadline ? dday(n.deadline) : null;
-  const benefit = unent(activityBenefit(n));
-  const shortBenefit = benefit && benefit.length <= 20;
+  const foot = benefitShort(activityBenefit(n));
   return cardShellHtml({
     save: saveBtnHtml(`act:${n.url}`),   // 장학 카드와 같은 북마크(카드 바깥 · 2026-10-02)
     attrs: `data-activity="${esc(n.url)}"`,
@@ -3091,9 +3125,9 @@ function activityCardHtml(n) {
        "왜 대외활동 공모전은 자격 미확인이야 죄다"). 활동 글은 자격이 포스터·첨부에만 있는 것이 많아 대부분의 카드에 같은 회색 배지가 붙어
        아무 말도 안 하는 배지가 됐다. 모른다는 사실은 시트가 말한다(자격 원문·'원문 보기'). 장학 카드의 '자격 미확인'은 그대로다. */
     badge: fitVerdict(m.fit, m.fd) === 'unread' ? '' : cardBadgeHtml(m.fit, m.fd, null),
-    name: unent(n.title),
-    foot: shortBenefit ? benefit : (n.field || ''),
-    footKnown: !!shortBenefit,
+    name: activityTitle(n),
+    foot: foot || (n.field || ''),
+    footKnown: !!foot,
     due: d ? ddayWords(d) : '',
     urgent: !!d && d.days >= 0 && d.days <= 7,
   });
@@ -3140,8 +3174,9 @@ function openActivityDetail(url) {
         <span class="badge badge-kind">${esc(n.kind || '대외활동')}</span>
         ${saveBtnHtml(`act:${n.url}`)}
       </div>
-      <h3 class="sheet-title">${esc(unent(n.title))}</h3>
-      ${benefit ? `<p class="sheet-amount">${esc(benefit)}</p>` : ''}
+      <h3 class="sheet-title">${esc(activityTitle(n))}</h3>
+      ${/* 짧은 혜택만 위에 한 줄(파란 글씨) — 긴 혜택은 아래 「혜택」 칸에 항목별로(원문 글자 그대로 · 2026-10-04 개발자 지적) */ ''}
+      ${benefit && benefit.length <= 40 ? `<p class="sheet-amount">${esc(benefit)}</p>` : ''}
       <p class="sheet-provider">${esc(activityWhere(n))}${n.field ? ` · ${esc(n.field)}` : ''}</p>
 
       ${/* 지원 자격 — 장학 시트와 **같은 함수·같은 모양**(eligibilityRowsHtml · fitBadgeHtml full · 묻기 상자).
@@ -3153,6 +3188,9 @@ function openActivityDetail(url) {
       <ul class="reason-list">${eligibilityRowsHtml(sch, result)}</ul>
       ${eligAskHtml(sch)}
 
+      ${benefit && benefit.length > 40 ? `
+      <h4>혜택 <span class="channel-tag">원문 그대로</span></h4>
+      <ul class="doc-list">${benefitItems(benefit).map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
       <h4>모집 안내 <span class="channel-tag">원문 그대로</span></h4>
       ${rows.length
         ? `<ul class="doc-list">${rows.map((x) => `<li>${esc(x.label)} · ${esc(unent(x.text))}</li>`).join('')}</ul>`

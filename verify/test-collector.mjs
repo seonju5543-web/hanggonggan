@@ -11090,7 +11090,21 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
   const cmY = readText(new URL('../collector/collect.mjs', import.meta.url));
   eq('  소급 — 못 받아 온 글은 이레에 한 번만 다시 두드린다(죽은 주소가 매 실행 칸을 먹지 않게)',
     /if \(it\.detailsTriedAt && \(Date\.parse\(todayIso\) - Date\.parse\(it\.detailsTriedAt\)\) < 7 \* 86400000\) continue;/.test(cmY) && /if \(detail\.text\) delete it\.detailsTriedAt; else it\.detailsTriedAt = todayIso;/.test(cmY), true);
-  eq('⑥ 활동 글을 엔진 모양으로 — 칸 이름이 장학과 같다', /function activityAsSch[\s\S]*?eligibilityLines: n\.eligibilityLines[\s\S]*?eligibilityExcludes: n\.eligibilityExcludes/.test(appX), true);
+  eq('⑥ 활동 글을 엔진 모양으로 — 칸 이름이 장학과 같다', /function activityAsSch[\s\S]*?eligibilityLines: \[\.\.\.\(n\.eligibilityLines[\s\S]*?titleTargetLines\(n\.title\)[\s\S]*?eligibilityExcludes: n\.eligibilityExcludes/.test(appX), true);
+  eq('  제목·혜택 정리(2026-10-04 개발자 지적) — 카드·시트·보관함이 같은 activityTitle · 긴 혜택은 카드엔 benefitShort, 시트엔 「혜택」 목록',
+    [(appX.match(/activityTitle\(n\)/g) || []).length >= 3, /foot = benefitShort\(activityBenefit\(n\)\)/.test(appX), /benefitItems\(benefit\)\.map/.test(appX), /benefit && benefit\.length <= 40 \? `<p class="sheet-amount">/.test(appX)], [true, true, true, true]);
+  {
+    const grab = (a, b) => appX.slice(appX.indexOf(a), appX.indexOf(b, appX.indexOf(a)));
+    const fn = new Function('unent', `${grab('const ACT_TAG', '/* 제목 괄호 속 대상')}; return { activityTitle, benefitShort, benefitItems };`)((x) => String(x));
+    eq('  제목 — 정책브리핑 `기간 : …` 꼬리 · 꼬리 날짜 · 이모티콘 · `[일반]` 분류표 · `(~10/22)` · `마감` 머리를 뗀다 · 주최 대괄호는 남긴다',
+      ['[감사원] 2026년 국민제안 감사 아이디어 공모 기간 : 2026.10.01 ~ 2026.10.31', '[공고] 2026년 청춘두두두 10월 프로그램 참가자 모집 공고 2026.09 . 28', '📢 「2026 보성 두드림 스테이」 추가 모집 🌿',
+        '[일반] [강북청년창업마루] 2026년 창업 교육 참가자 모집(~10/22)', '마감 [울산창조경제혁신센터] 학생 창업동아리 모집', '[동국대BMC창업보육센터] 패키지지원 프로그램 모집(~9/30(금)까지)'].map((t) => fn.activityTitle({ title: t })),
+      ['[감사원] 2026년 국민제안 감사 아이디어 공모', '2026년 청춘두두두 10월 프로그램 참가자 모집 공고', '「2026 보성 두드림 스테이」 추가 모집',
+        '[강북청년창업마루] 2026년 창업 교육 참가자 모집', '[울산창조경제혁신센터] 학생 창업동아리 모집', '[동국대BMC창업보육센터] 패키지지원 프로그램 모집']);
+    const b = '○ 맞춤형 정책상담 · 일자리, 주거 등 1시간 내외의 상담 제공 ○ 참여혜택 · 선착순 50명 기념품 제공';
+    eq('  혜택 — 긴 원문은 카드에 첫 항목 이름 + 외 n · 시트엔 항목별(글자 그대로) · 짧은 혜택은 그대로',
+      [fn.benefitShort(b), fn.benefitItems(b), fn.benefitShort('항공료 전액 지원')], ['맞춤형 정책상담 외 1', ['맞춤형 정책상담 · 일자리, 주거 등 1시간 내외의 상담 제공', '참여혜택 · 선착순 50명 기념품 제공'], '항공료 전액 지원']);
+  }
   eq('  적합도는 getMatches 와 같은 세 함수(evaluateFor · fitScore · fitDetailFor)', /function activityFit[\s\S]*?evaluateFor\(sch, state\.profile\)[\s\S]*?fitScore\(sch, result, state\.profile\)[\s\S]*?fitDetailFor\(sch, state\.profile\)/.test(appX), true);
   eq('  카드 판정은 장학 카드의 cardBadgeHtml · 단 \'자격 미확인\'은 활동 카드에 안 단다(2026-10-03 개발자 결정)', /badge: fitVerdict\(m\.fit, m\.fd\) === 'unread' \? '' : cardBadgeHtml\(m\.fit, m\.fd, null\)/.test(appX), true);
   eq('  지원 자격 줄은 장학 시트와 한 함수(eligibilityRowsHtml) — 장학 시트도 그것을 부른다',
@@ -11158,6 +11172,10 @@ console.log('\n■ 대외활동·공모전 — 활동 글의 자격 읽기 (2026
   const seoul = { ...P, region: '서울', parentRegion: '서울' };
   eq('⑦ 시·도 거주 — 서울 학생(부모도 서울)에게 `대전시 거주 청년` 은 미달 · 대전 학생은 충족 · 부모가 대전이면 충족',
     [rm('대전시 거주 청년 ( 만 18~39 세 )', seoul), rm('대전시 거주 청년 ( 만 18~39 세 )', { ...seoul, region: '대전', parentRegion: '대전' }), rm('본인 또는 부모가 대전시에 주민등록이 되어 있는 청년', { ...seoul, parentRegion: '대전' })], ['no', 'ok', 'ok']);
+  eq('  🔴 정식 이름과 짧은 이름을 같은 곳으로 — 전남 학생에게 `전라남도에 주소를 둔 학생` 은 충족(시·도 미달을 켠 날 생긴 틀린 미달) · 충북·경남도',
+    [rm('전라남도에 주소를 둔 학생', { ...P, region: '전남', parentRegion: '전남' }), rm('충청북도에 거주하는 청년', { ...P, region: '충북', parentRegion: '충북' }), rm('경상남도에 주소를 둔 학생', { ...P, region: '경남', parentRegion: '경남' }), rm('전라남도에 주소를 둔 학생', { ...P, region: '전북', parentRegion: '전북' })],
+    ['ok', 'ok', 'ok', 'no']);
+  eq('  `기존 전라남도 22개 시·군 대상` 은 사는 곳 조건 — 서울 학생 미달 · 전남 학생 충족', [rm('기존 전라남도 22개 시·군 대상', seoul), rm('기존 전라남도 22개 시·군 대상', { ...seoul, region: '전남', parentRegion: '전남' })], ['no', 'ok']);
   eq('  🔴 다른 연고로도 되는 줄은 미달이 아니다(틀린 미달 금지) — 생활권 · ○○ 소재 대학 또는 주민등록자',
     [rm('경기도에 거주하거나 생활권을 두고 있는 청년', seoul), rm('부산시 소재 대학졸업(예정)자 또는 주민등록자', seoul)].map((v) => v !== 'no'), [true, true]);
   eq('  `39세 이하 청년 (부산시 청년 기준)` 은 나이 세는 법이지 사는 곳이 아니다', PRX0.parseLine('39세 이하 청년 (부산시 청년 기준)').conds.some((c) => c.kind === 'residence'), false);
