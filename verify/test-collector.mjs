@@ -8164,14 +8164,21 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
        style.css 는 뒤 블록이 앞을 덮으므로 파일 끝 '히어로' 절에 있어야 먹는다. */
     const css = readText(new URL('../style.css', import.meta.url));
     const tail = css.slice(css.lastIndexOf('홈 히어로 (2026-09-17'));
-    /* 🔴 2026-10-01 CTO 결정(시안 I4)으로 금액 아래에 한 줄(#hero-sub)이 다시 생겼다 — 그래서
-       금액 자신의 아래 여백은 다시 좁아지고, 간격은 그 줄과 그림 칸이 만든다. 지키는 것은 같다:
-       금액과 버튼이 붙지 않는다. */
-    /* 차례: 금액 → 한 줄 → 버튼 → 그림 칸 (버튼을 그림 위로 — 2026-10-01 CTO 지시) */
-    eq('  금액 아래 한 줄(#hero-sub) → 버튼 → 그림 칸(#hero-tiles) 차례다 — 금액과 버튼이 붙지 않는다',
-      /id="hero-sub"/.test(h2) && /id="hero-tiles"/.test(h2)
-      && h2.indexOf('id="hero-sub"') < h2.indexOf('id="btn-apply-all"')
+    /* 🔴 2026-10-03 개발자 지시로 금액 아래 한 줄(#hero-sub)을 **다시 없앴다** — 10-01 에 그림
+       4칸이 생기면서 그 줄이 말할 숫자가 전부 칸 배지나 버튼에 이미 있게 됐다(실측:
+       '신청 가능 n건' 은 버튼의 수와 같고 '이번 주 마감 n건' 은 첫 칸 배지와 같다).
+       🔴 지키는 것은 9/17 과 같다 — **금액과 버튼이 붙지 않는다.** 사이에 있던 줄이 없어졌으니
+          그 간격은 이제 버튼 자신의 위 여백이 만든다. 이 확인을 지우면 다음에 누가 그 여백을
+          건드려도 아무도 모른다(실측 57px → 2px 로 붙었던 자리다). */
+    /* 차례: 금액 → 버튼 → 그림 칸 (버튼을 그림 위로 — 2026-10-01 CTO 지시) */
+    eq('  #hero-sub 요소 자체가 없다 (채우는 곳 없는 빈 칸을 남기지 않는다)',
+      /id="hero-sub"/.test(h2), false);
+    eq('  금액 → 버튼 → 그림 칸(#hero-tiles) 차례다',
+      /id="hero-amount"/.test(h2) && /id="hero-tiles"/.test(h2)
+      && h2.indexOf('id="hero-amount"') < h2.indexOf('id="btn-apply-all"')
       && h2.indexOf('id="btn-apply-all"') < h2.indexOf('id="hero-tiles"'), true);
+    eq('  금액과 버튼이 붙지 않는다 — 버튼이 위 여백을 갖는다 (파일 끝 블록에서)',
+      /#btn-apply-all \{[^}]*margin-top: var\(--sp-\d\)/.test(tail), true);
     eq('  .hero-tiles 가 세로 여백을 갖는다 (파일 끝 블록에서)',
       /\.hero-tiles \{[^}]*margin: var\(--sp-3\)/.test(tail), true);
     eq('  그림 칸 위아래에 구분선이 없다 (2026-10-01 CTO 지시)',

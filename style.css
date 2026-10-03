@@ -470,15 +470,8 @@ a.btn { text-decoration: none; }
   margin: 26px 0 13px;
 }
 .section-head h3 { font-size: var(--t-lg); font-weight: 800; letter-spacing: -0.02em; }
-/* 구획 제목 아래 한 줄 설명 (2026-10-03) — 홈 아래쪽 목록 셋이 생김새가 같아
-   무엇이 다른지 안 읽히던 자리. `.section-head` 밖에 두는 이유는 app.js 주석 참조
-   (머리말 두 토막이 한 줄에 들어가야 한다). 위 여백을 당겨 제목과 한 덩어리로 묶는다. */
-.section-sub {
-  margin: calc(var(--space-8) * -1) 0 var(--sp-2);
-  font-size: var(--t-xs);
-  color: var(--text-weak);
-  line-height: 1.5;
-}
+/* ⚠️ 구획 제목 아래 설명 한 줄(`.section-sub`)을 2026-10-03 에 넣었다가 **같은 날 개발자
+   지시로 걷었다**(홈 아래 세 구역). 다시 만들지 말 것 — 경위는 app.js liveNoticesHead 주석. */
 
 /* ---------------- 카드 ---------------- */
 .card-list { display: grid; gap: 12px; }
@@ -4195,7 +4188,6 @@ body,
 .sch-org,
 .empty,
 .empty-sub,
-.section-sub,
 .hero-label {
   word-break: keep-all;
   overflow-wrap: break-word;
@@ -4810,9 +4802,8 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
    `--t-hero` 38px 고정이라 360px 폰에서 '최대 1,690만원' 이 두 줄이 됐다. 새 숫자를
    만들지 않고 **있는 척도에서 한 단** 내린다(문서가 적어 둔 해법 그대로). */
 @media (max-width: 375px) { .hero-card .hero-amount { font-size: var(--t-3xl); } }
-.hero-sub { font-size: var(--t-xs); color: var(--text-weak); font-weight: 500; }
-.hero-sub b { color: var(--red); font-weight: 700; }
-.hero-sub:empty { display: none; }   /* 이번 주 마감이 0건이면 빈 줄을 남기지 않는다 (2026-10-03) */
+/* `.hero-sub`(금액과 버튼 사이 빨간 한 줄) 규칙은 그 줄을 뺀 2026-10-03 에 같이 걷었다 —
+   요소도 index.html 에서 뺐다(app.js renderHome 주석에 경위). */
 .hero-tiles {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
