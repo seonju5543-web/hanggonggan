@@ -176,8 +176,10 @@ export default async function gate(eq, ctx = {}) {
       && /canonUrl\(decodeUrlEntities\(i\.sourceUrl/.test(ar), true);
 
   /* ── ⑤ 공공 API 의 '원문' 주소 — 기관 첫 화면은 그 공고가 아니다 ───────────────────────────── */
-  eq('⑤ specific() — 첫 화면 파일(제주 index.htm · 송파 main.jsp)·뿌리는 원문이 아니고, 그 공고 주소는 원문',
-    ['https://www.jeju.go.kr/index.htm', 'http://janghak.songpa.go.kr/main.jsp', 'https://www.mois.go.kr/',
+  /* ⚠️ 뿌리 주소(`https://x.kr/`)는 여기 표본으로 쓰지 않는다 — 같은 날 core 갈래에서 '뿌리 = 첫 화면'을 꼴만으로 단정하지 않게
+     바뀌는 중이다(학교 게시판이 그렇게 내보내는 멀쩡한 글이 있다). 뿌리의 뜻은 core 갈래가 잰다. */
+  eq('⑤ specific() — 첫 화면 파일(제주 index.htm · 송파 main.jsp · 행안부 main.do)은 원문이 아니고, 그 공고 주소는 원문',
+    ['https://www.jeju.go.kr/index.htm', 'http://janghak.songpa.go.kr/main.jsp', 'https://www.mois.go.kr/main.do',
       'https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179246', 'https://www.youthcenter.go.kr/bbs03View/48/10811'].map(O.specific),
     [false, false, false, true, true]);
 

@@ -216,7 +216,8 @@ export default async function gate(eq, ctx) {
       ...Object.fromEntries(aOthers.map((t, i) => [`https://a.test.kr/bbs/view.do?id=1${i + 1}`, { status: 200, docTitle: t, headings: [t], text: `${t} 작성일 ${'y'.repeat(400)}` }])),
       [E]: { status: 404 },
       [F]: { status: 200, finalUrl: F, docTitle: '장학공지', headings: ['장학공지'], text: `${fOthers.join('\n')}\n${fTitle}\n${'v'.repeat(500)}` },
-      [C]: { status: 200, finalUrl: 'https://c.test.kr/', docTitle: '씨씨재단', text: 'z'.repeat(800) },
+      /* 첫 화면으로 돌려보내짐 — 첫 화면 파일(index.do)로 둔다. 뿌리 주소(`/`)는 같은 날 core 갈래에서 꼴만으로 '첫 화면'이라 하지 않게 바뀐다 */
+      [C]: { status: 200, finalUrl: 'https://c.test.kr/index.do', docTitle: '씨씨재단', text: 'z'.repeat(800) },
       ...Object.fromEntries(Z.map((u) => [u, { status: 200, docTitle: '제트대학교', text: `작성일 다른 글 ${'w'.repeat(2000)}` }])),
     });
     const run = (day, aIsPost, extra = []) => runRobot(tmp, obsDay(aIsPost), day, { args: extra });
