@@ -18,7 +18,7 @@
      · 한 출처를 **못 받아 온 날은 그 출처의 지난 글을 그대로 둔다** — 네트워크가 잠깐 끊겼다고 글이 사라지지 않게.
    ============================================================ */
 import { activityKind, activityField } from './activity-kind.mjs';
-import { activityExcerpts, activityDetails, putActivityDetails, CONTACT } from './activity-excerpts.mjs';
+import { activityExcerpts, activityDetails, putActivityDetails, CONTACT, splitBenefit } from './activity-excerpts.mjs';
 import { htmlToLines } from './html-text.mjs';
 import { decodeEntities } from './clean-title.mjs';
 import { canonUrl } from './canon-url.mjs';
@@ -192,6 +192,7 @@ export function mapYouthPolicy(r, { scholarship } = {}) {
   const age = String(r.sprtTrgtAgeLmtYn || '').toUpperCase() !== 'N' && (min || max) ? `만 ${min || ''}~${max || ''}세` : null;
   /* 판정 엔진이 읽는 나이 줄 — 범위면 '만 19세 ~ 만 34세', 위만 있으면 '만 34세 이하'(parse-requirements parseAge) */
   const ageLine = age ? (min && max ? `만 ${min}세 ~ 만 ${max}세` : (max ? `만 ${max}세 이하` : null)) : null;
+  const benefitPart = splitBenefit(r.plcySprtCn);   // 잘리기 전 원문 전체로 가른다
   return { item: item({
     title, url, kind,
     deadline: always ? null : lastDate(r.aplyYmd),
@@ -199,11 +200,11 @@ export function mapYouthPolicy(r, { scholarship } = {}) {
     excerpts: [
       excerpt('모집기간', always ? '상시' : periods(r.aplyYmd)),
       excerpt('대상', age),
-      excerpt('혜택', r.plcySprtCn),
+      excerpt('혜택', benefitPart.benefit),   // 조건은 떼어 자격 줄로(splitBenefit · 2026-10-04 — `지원조건은 … 채용조건은 만 39세 이하` 가 혜택에 앉았다)
       excerpt('주최', r.operInstCdNm && r.operInstCdNm !== r.sprvsnInstCdNm ? r.operInstCdNm : null),
     ],
     details: {
-      eligibilityLines: [...(ageLine ? [ageLine] : []), ...splitLines(r.addAplyQlfcCndCn, 6), ...splitLines(r.earnEtcCn, 2)],
+      eligibilityLines: [...(ageLine ? [ageLine] : []), ...splitLines(r.addAplyQlfcCndCn, 6), ...splitLines(r.earnEtcCn, 2), ...benefitPart.conditions, ...splitBenefit(r.plcyExplnCn).conditions],
       eligibilityExcludes: splitLines(r.ptcpPrpTrgtCn),
       noticeLines: [...splitLines(r.plcyExplnCn, 3), ...labeled('신청 방법', r.plcyAplyMthdCn), ...labeled('심사 방법', r.srngMthdCn),
         ...labeled('제출 서류', r.sbmsnDcmntCn), ...labeled('기타', r.etcMttrCn)].slice(0, 8),

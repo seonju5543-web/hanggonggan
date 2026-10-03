@@ -11299,6 +11299,32 @@ console.log('\n■ 대외활동 — 남은 글 표본에서 찾은 것 (2026-10-
     AD.candidateFiles({ title: '감사 아이디어 공모', attachments: [] }, '<h1>감사 아이디어 공모</h1><img src="data:image/png;base64,iVBORw0KGgo="><img src="data:text/html;base64,PGI+">', 'https://bai.go.kr/x').map((f) => f.url.slice(0, 22)), ['data:image/png;base64,']);
 }
 
+console.log('\n■ 대외활동 — 「혜택」에 섞인 조건은 자격으로 (2026-10-04 개발자 "이것도 혜택이 아니라 조건이잖아 … 다 조치하고 재발방지해")');
+{
+  /* 온통청년 정책 API 의 `정책 지원 내용` 칸이 조건과 혜택을 한 칸에 담아 온다 — 그걸 통째로 「혜택」에 앉히고 자격은 '확인 못 함'이었다(무대기술인턴십).
+     재발방지: 규칙 한 곳(splitBenefit) · API 로봇은 잘리기 전 원문 전체로 · 수집 로봇은 발행 때 모든 글에 매번(sanitizeBenefit) */
+  const AX = await import('../collector/activity-excerpts.mjs');
+  const MAPX = await import('../collector/open-api-map.mjs');
+  const rq = createRequire(import.meta.url);
+  const MEX = rq('../match-engine.js');
+  const arko = '무대기술 인턴십 사업은 민간 및 공립 공연단체를 대상으로 운영하는 사업입니다. 지원조건은 공연장 소유 및 임차 운영 공연단체에 한하며 무대예술전문인자격증(3급 이상) 보유 또는 무대예술 3년 이상 경력의 단체 소속 근로자가 상근으로 근무하고 있어야 합니다. 채용조건은 만 39세 이하 청년';
+  const r1 = AX.splitBenefit(arko);
+  eq('① 줄글 — `…를 대상으로 운영` · `지원조건은 …에 한하며` · `채용조건은 만 39세 이하` 는 전부 조건 · 혜택은 없다', [r1.benefit, r1.conditions.length], ['', 3]);
+  const r2 = AX.splitBenefit('1. 사업기간: 동계 4주간 2. 사업대상: 대전에 거주하는 만 18세 이상 39세 이하 청년 3. 사업내용: 행정체험형 연수');
+  eq('  번호 목록 — 대상은 자격 · 기간은 버림 · 내용은 혜택', [r2.conditions, r2.benefit], [['사업대상: 대전에 거주하는 만 18세 이상 39세 이하 청년'], '사업내용: 행정체험형 연수']);
+  const r3 = AX.splitBenefit('○ 지원대상 : 대학생봉사단 ○ 지원방법 : 사업비 지원 ○ 지원내용 : 교육 제공');
+  eq('  기호 목록 — 지원대상은 자격 · `지원방법` 같은 다른 이름표는 혜택도 조건도 아니다 · 지원내용만 혜택', [r3.conditions, r3.benefit], [['지원대상 : 대학생봉사단'], '지원내용 : 교육 제공']);
+  eq('  🔴 `청년 자격증 응시료 지원` 의 \'자격증\' 은 조건이 아니다(낱말 하나로 가르지 않는다)', AX.splitBenefit('○ 1인 연 1회, 최대 10만원 범위 자격증시험 응시료 지원 ※ 그 중 1건만 지원 가능').conditions, []);
+  const it = { excerpts: [{ label: '모집기간', text: '상시' }, { label: '혜택', text: arko.slice(0, 159) + '…' }], eligibilityLines: [] };
+  eq('② 이미 실린 글 — 혜택 칸을 떼고 조건을 자격 줄로(잘린 `…` 꼬리는 지운다)', [AX.sanitizeBenefit(it), it.excerpts.map((x) => x.label), it.eligibilityLines.length >= 2], [true, ['모집기간'], true]);
+  const yp = MAPX.mapYouthPolicy({ plcyNm: '무대기술인턴십 지원', aplyUrlAddr: 'https://arko.or.kr/board/view/4053?cid=1', aplyYmd: '20270101 ~ 20270630', sprtTrgtAgeLmtYn: 'N', plcySprtCn: arko }, { scholarship: /장학/ }).item;
+  eq('  API 로봇 — 잘리기 전 원문 전체로 가른다(`채용조건은 만 39세 이하 청년` 이 `…` 로 잘리지 않는다) · 혜택 칸 없음',
+    [yp.excerpts.some((x) => x.label === '혜택'), yp.eligibilityLines.includes('채용조건은 만 39세 이하 청년')], [false, true]);
+  eq('  수집 로봇이 발행 때 모든 글에 매번', /acts\.items\.forEach\(sanitizeBenefit\)/.test(readText(new URL('../collector/collect.mjs', import.meta.url))), true);
+  const fd = MEX.fitDetail({ eligibilityLines: r1.conditions, eligibility: {} }, { birthYear: new Date().getFullYear() - 22, status: '재학' });
+  eq('③ 🔴 틀린 안심 금지 — `공연단체에 한하며`·`공연단체를 대상으로` 줄도 요건으로 센다(학생 개인에게 95% 가 떴다)', [fd.total, fd.met, fd.unknown >= 2], [3, 1, true]);   // 퍼센트가 아니라 met/total 로 잰다(관문 「적합도 상수」)
+}
+
 console.log('\n■ 자격요건 로봇 (진짜 브라우저) — 장학·대외활동 (2026-10-04 개발자 "진짜 브라우저로 열어야 되는 공고는 다 이걸로 · 시간초과 등 오류 안 나게")');
 {
   /* 왜 있나 — 진짜 크롬으로 자격을 찾는 로봇은 하나(rescue-bodies.yml)다. 수집 로봇과 겹치지 않게: 대기줄·시간대·쓰는 파일이 따로이고,

@@ -168,6 +168,53 @@ export function activityDetails(text, title) {
   };
 }
 
+/* ── 「혜택」에 섞여 들어온 **조건**을 자격으로 (2026-10-04 개발자 지적 — *"이것도 혜택이 아니라 조건이잖아 정작 자격요건은 확인 못한다더니
+   다 있었네 … 이러한 문제를 가진 공고가 많을텐데 다 조치하고 재발방지해"*) ──
+   온통청년 정책 API 의 `정책 지원 내용` 칸이 `지원조건은 … 공연단체에 한하며 … 채용조건은 만 39세 이하` 처럼 **조건과 혜택을 한 칸에** 담아 온다
+   (실측 4건: `1. 사업기간 … 2. 사업대상 : … 거주하는 만 18세 이상 39세 이하 청년` · `○ 지원대상 : … ○ 지원내용 : …`).
+   규칙 한 곳(splitBenefit): ① 이름표가 있으면 이름표로 — 대상·자격·조건 → 자격 · 기간 → 버림 · 내용·혜택 → 혜택 ② 없으면 문장마다 조건 표지로.
+   🔴 `청년 자격증 응시료 지원` 의 '자격증' 은 조건이 아니다 — 낱말 하나로 가르지 않고 `…조건은`·`…에 한하며`·`…를 대상으로`·`보유 또는` 같은 꼴로 본다.
+   쓰는 곳: API 로봇(잘리기 전 원문 전체) · 수집 로봇 발행(모든 활동 글에 매번 — 소급 · sanitizeBenefit). 글자는 원문 그대로, 나누기만 한다 */
+const COND_LABEL = /^(?:(?:사업|지원|모집|신청|참가|참여|교육|채용|선발|응모)\s?)?(?:대상|자격|조건|요건)(?:자)?$/;
+const PERIOD_ITEM = /(?:기간|일정|일시|시기)$/;
+const BENEFIT_LABEL = /(?:내용|혜택|특전|사항|금액|규모)$/;
+const COND_SENT = /(?:지원|채용|참여|신청|응모|참가|선발|사업)\s?(?:조건|자격|요건|대상)(?:은|는|:|：)|에\s?한하며|에\s?한함|에\s?한해|[를을]\s?대상으로|보유\s?(?:또는|하고|한|자)|\d+\s?년\s?이상\s?경력|거주하는|이하인?\s?(?:자|분|청년)|이상인?\s?(?:자|분)/;
+export function splitBenefit(text) {
+  const t = String(text || '').replace(/\s*…\s*$/, '').replace(/\s+/g, ' ').trim();
+  if (!t) return { benefit: '', conditions: [] };
+  const items = t.split(/\s*(?:[○◯●■□\u25AA\u25B6•※]|(?:^|\s)\d{1,2}\.(?=\s|[가-힣]))\s*/).map((x) => x.trim()).filter(Boolean);
+  const benefit = [], conditions = [];
+  for (const it of items) {
+    const m = it.match(/^([가-힣\s]{2,12})\s*[:：]\s*(.+)$/);
+    if (m) {
+      const lab = m[1].replace(/\s/g, '');
+      if (COND_LABEL.test(lab)) { conditions.push(it); continue; }
+      if (PERIOD_ITEM.test(lab)) continue;
+      if (BENEFIT_LABEL.test(lab)) { benefit.push(it); continue; }
+      continue;   // `운영방법 :`·`수행기관 :` 같은 다른 이름표는 혜택도 조건도 아니다
+    }
+    for (const sen of it.split(/(?<=다\.)\s+|(?<=[.。])\s+(?=[가-힣])/)) {
+      const x = sen.trim();
+      if (x.length < 2) continue;
+      (COND_SENT.test(x) ? conditions : benefit).push(x);
+    }
+  }
+  return { benefit: benefit.join(' '), conditions: conditions.filter((x) => x.length >= 4) };
+}
+/** 활동 글 하나의 「혜택」에서 조건을 떼어 자격 줄로 — 바뀌었으면 true (수집 로봇 발행 때 모든 글에) */
+export function sanitizeBenefit(it) {
+  const ex = it.excerpts || [];
+  const i = ex.findIndex((x) => x.label === '혜택');
+  if (i < 0) return false;
+  const { benefit, conditions } = splitBenefit(ex[i].text);
+  if (!conditions.length) return false;
+  if (benefit) ex[i] = { label: '혜택', text: benefit.length > 160 ? `${benefit.slice(0, 159)}…` : benefit }; else ex.splice(i, 1);
+  const lines = it.eligibilityLines || [];
+  for (const c of conditions) if (!lines.some((l) => String(l).includes(c.slice(0, 20)) || c.includes(String(l)))) lines.push(c);
+  it.eligibilityLines = lines;
+  return true;
+}
+
 /* 글 하나에 위 결과를 붙인다 — 수집 로봇의 세 길(새 글 · 재단 글 · 소급)과 API 로봇이 **같은 함수**를 쓴다.
    빈 칸은 지운다(읽었는데 없으면 옛 값을 남기지 않는다 · 장학 로봇과 같은 규칙). */
 export const ACT_DETAILS_V = 3;   // 이 판으로 읽은 글은 detailsV 가 같다 — 다르면 수집 로봇이 원문을 다시 읽는다(소급 · 원칙 7) · 3 = 2026-10-03 활동 자격 읽기(제목부터·괄호 이름표·누구나)
