@@ -137,6 +137,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 - 브라우저 드라이버(`verify/verify-*.js`)는 `.github/workflows/verify-ui.yml` 이 관문으로 돌린다(기본 브랜치·main). 로컬은 앱을 띄우고 `PORT=`.
   Mac 에선 `CHROME_PATH` 를 `ls ~/Library/Caches/ms-playwright/` 로 찾는다(버전 번호를 박지 말 것 · README 경로는 Linux용).
 - push-to-run(GitHub 연결 없는 세션): `collector/run-*.txt`·`tools/run-gate-photos.txt`·`insta/run-notify.txt`·`deploy/run-deploy.txt` 를 고쳐 기본 브랜치에 push.
+  🔴 그 파일을 고친 **작업 브랜치**를 push 해도 로봇이 그 브랜치에서 돈다(`paths:` 에 브랜치 거르기 없음 · 2026-10-03 두 로봇 동시 저장 → 장부 잘림).
 - 라이브 앱 확인은 샌드박스에서 github.io 가 막혀 `.github/workflows/check-live.yml` 로그로만 한다.
   🔴 그 점검은 **앱이 실제로 받는 파일**을 봐야 한다 — 2026-09-29까지 옛 통짜 파일만 보고 학교별 공고·학과 파일은 **아무도 안 보고 있었다**(404 여도 조용히 물러난다).
   파일 이름은 `match-engine.js` 규칙으로 뽑는다(박아 두지 말 것). 새 데이터 파일을 앱이 받게 하면 이 점검에도 넣는다.
