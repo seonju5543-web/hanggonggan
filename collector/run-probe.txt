@@ -79,8 +79,9 @@ checkUrl: https://www.smu.ac.kr/kor/life/notice.do
 
 # 2026-10-03 (2차) — 같은 첫 실행이 '다른 글(제목 불일치)'로 본 대외활동·재단 글 다섯. 기대 제목이 정책 이름(온통청년 API)이라
 #   게시판 글 제목과 글자가 다를 수 있다 — 열리는 글의 제목을 보고, 오판이면 확정 전에 판정을 고친다.
-checkUrl: https://arko.or.kr/board/view/4053?cid=1811182
-checkUrl: https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000
-checkUrl: https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.do?bbsId=BBS_0000000000000316&mId=008001001000000000&dataId=56147
-checkUrl: https://youth.chungnam.go.kr/web/main/customSupp/M050-08/view?bizId=A20260309CT000000000003017
-checkUrl: https://ydjh.yd21.go.kr/zboard/read.do?lmCode=notice&pd_pkid=240
+#   (답 받음 2026-10-03 · 아르코는 정말 다른 공지 · 울산·충남·영동은 그 글 → 판정 수리(관문 core ⑩·⑪) · 평택은 정찰 글자에 제목이 안 잡혀 미정)
+# checkUrl: https://arko.or.kr/board/view/4053?cid=1811182
+# checkUrl: https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000
+# checkUrl: https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.do?bbsId=BBS_0000000000000316&mId=008001001000000000&dataId=56147
+# checkUrl: https://youth.chungnam.go.kr/web/main/customSupp/M050-08/view?bizId=A20260309CT000000000003017
+# checkUrl: https://ydjh.yd21.go.kr/zboard/read.do?lmCode=notice&pd_pkid=240

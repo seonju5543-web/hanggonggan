@@ -73,10 +73,10 @@ export function headMatches(title, head) {
 /* 화면의 「제목」 이름표 바로 뒤가 그 공고 제목인가 — 상세 화면이 제목을 머리글이 아니라 표 칸(`<th>제목</th><td>…</td>`)에 두는 게시판
    (서울과기대 commonview — 확인 로봇 첫 실행에서 아래에 다른 글 제목이 보여 '목록'으로 오판). 목록 화면의 「제목」은 머리 칸이라
    뒤에 「작성자·날짜」가 온다 — 그래서 이름표 뒤 첫머리가 그 제목일 때만 센다. */
-const TITLE_LABEL = /(?:^|\s)(?:글\s?)?제\s?목\s*[:：]?\s*/g;
+const TITLE_LABEL = /(?:^|\s)(?:(?:글\s?)?제\s?목|정책\s?명|사업\s?명|공고\s?명)\s*[:：]?\s*/g;   // 청년 포털은 「정책명」(충남 — 정찰 2차)
 export function labeledTitle(text, title) {
   const k = titleFingerprint(title);
-  if (k.length < 8) return false;
+  if (k.length < 6) return false;   // 이름표 바로 뒤라는 자리가 증거라 짧은 정책 이름(`창업어가 멘토링` 7자)도 센다
   const src = String(text || '');
   const head = k.slice(0, Math.min(k.length, 24));
   for (const m of src.matchAll(TITLE_LABEL)) {
@@ -106,6 +106,8 @@ export function titleEvidence({ titles, docTitle, headings, text }) {
     const k = titleFingerprint(t);
     if (k.length >= 8 && [body, bodyT].some((b) => b.includes(k) || (k.length >= 24 && b.includes(k.slice(0, 24))))) weak = true;
     if (!weak && k.length >= 12 && longRunIn(bodyT, k)) weak = true;
+    /* 짧은 이름(6~7자)은 한 번 보인 것으로는 모자라다(메뉴·다른 글에 우연히) — 상세 화면은 길잡이·머리·본문에 이름을 거듭 쓴다(충남 3번) */
+    if (!weak && k.length >= 6 && k.length < 8 && bodyT.split(k).length - 1 >= 2) weak = true;
     const core = titleCore(t);
     if (!weak && core.length >= 6 && body.includes(fp(core))) weak = true;
   }
