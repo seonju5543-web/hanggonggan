@@ -10,7 +10,9 @@ import { publishBySchool, dropUnserved } from './publish-notices.mjs';
 import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { isMenuEntry } from './clean-title.mjs';
-import { isDetailUrl, detailCandidates, sameTitle, idsFromSource } from './detail-url.mjs';
+import { isDetailUrl, detailCandidates, sameTitle, idsFromSource, observeLanding } from './detail-url.mjs';
+/* 원문 주소 확인은 공용 판정 한 곳(link-landing.mjs judgeLanding) — 링크 사냥꾼·원문 링크 복구와 같은 것 (2026-10-03) */
+import { judgeLanding, stripRowTail } from './link-landing.mjs';
 import { makeBudget, rotateOrder, nextCursor, withDeadline, TIMED_OUT } from './harvest-budget.mjs';
 
 const HERE = new URL('.', import.meta.url);
@@ -111,26 +113,40 @@ async function gotoWithRetry(page, url, attempts) {
 /* 공고 원문 주소가 '세션 없이도 열리는지' 한 번 확인한다.
    앱 사용자는 로그인도 리퍼러도 없이 링크를 누르므로, 그 조건 그대로 열어 봐야 한다.
    게시판마다 처음 한 번만 확인하고(주소 만드는 규칙은 게시판 안에서 같다) 결과를 재사용해,
-   매일 수집이 느려지지 않게 한다. */
-const patternOk = new Map(); // 게시판 목록 주소 → true/false
-async function verifyDetailUrl(candidate, title) {
+   매일 수집이 느려지지 않게 한다.
+
+   🔴 2026-10-03 — 확인이 **목록 화면을 원문으로 통과시켰다.** 예전 판정은 '제목이 화면 어딘가에 있으면 통과'였는데
+      **게시판 목록에도 그 제목이 있다.** 그래서 목록에 번호만 붙인 주소(가천·고려 `subview.do?nttId=`, 서울교대
+      `selectNttList.do?…&nttId=`)가 첫 행에서 통과했고, 그 한 번으로 게시판이 '증명됨'이 되어 **그 뒤 모든 행이
+      확인 없이 목록 주소로 저장됐다**(저장된 본문: 가천 18건이 2가지뿐 — 15건이 글자 하나 안 다른 목록).
+      이제 판정은 공용 한 곳(judgeLanding)이고, **그 게시판의 다른 행 제목**을 넘겨 목록을 알아본다.
+   돌려주는 것: judgeLanding 의 { v, why } — post 만 통과다. */
+const patternOk = new Map(); // 게시판 목록 주소 → 'post'(증명됨 — 확인 없이 같은 규칙을 믿는다) | 'bad'(확인이 분명히 틀렸다)
+const unreadCount = new Map(); // 게시판 목록 주소 → '판정 불가'(망 오류·5xx·껍데기) 횟수 — 이번 실행 안에서만
+/* 판정 불가가 이만큼 쌓인 게시판은 이번 실행에서 더 두드리지 않는다 — 막힌 서버를 계속 두드리면 더 막힌다(동국대 사례) */
+const MAX_UNREAD_PER_BOARD = 2;
+async function verifyDetailUrl(candidate, title, otherTitles) {
   const fresh = await browser.newContext({
     userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36',
     locale: 'ko-KR',
   });
   const p = await fresh.newPage();
+  const want = [stripRowTail(title)].filter(Boolean);
   try {
-    const res = await p.goto(candidate, { waitUntil: 'domcontentloaded', timeout: 25000 });
-    if (res && res.status() >= 400) return false;
-    await p.waitForTimeout(1200);
-    const docTitle = await p.title().catch(() => '');
-    const text = await p.evaluate(() => (document.body.innerText || '').slice(0, 6000)).catch(() => '');
-    if (sameTitle(title, docTitle)) return true;
-    const fp = (s) => String(s).replace(/[\s .,·ㆍ~〜'"“”‘’!?()[\]{}<>:;|/\\_+\-*&#%]/g, '').toLowerCase();
-    const t = fp(String(title).replace(/^\s*\d{1,5}\s+/, '').replace(/^\s*(공통|서울|글로벌|국제|공지)\s+/, ''));
-    return t.length >= 8 && fp(text).includes(t);
-  } catch {
-    return false;
+    let res = null;
+    try {
+      res = await p.goto(candidate, { waitUntil: 'domcontentloaded', timeout: 25000 });
+    } catch (e) {
+      return { v: 'unread', why: `열기 실패: ${String((e && e.message) || e).split('\n')[0].slice(0, 60)}` };
+    }
+    const probe = String(want[0] || '').replace(/^\s*\d{1,5}\s+/, '').replace(/\[[^\]]{0,20}\]/g, '').trim().slice(0, 12).trim();
+    if (probe.length >= 4 && res && res.status() < 400) {
+      await p.waitForFunction((n) => ((document.body && document.body.innerText) || '').includes(n), probe, { timeout: 5000 }).catch(() => {});
+    }
+    await p.waitForTimeout(800);
+    return judgeLanding({ ...(await observeLanding(p, res)), requestedUrl: candidate, titles: want, otherTitles: otherTitles || [] });
+  } catch (e) {
+    return { v: 'unread', why: `확인 중 오류: ${String((e && e.message) || e).split('\n')[0].slice(0, 60)}` };
   } finally {
     await p.close().catch(() => {});
     await fresh.close().catch(() => {});
@@ -204,6 +220,13 @@ async function loadPage(url, { attempts = 3, lines = report, retryClosed = 1 } =
          새 공고에는 닿지 못한 채 끊겼다.** 2026-08-17 실행에서 중앙대가 정확히 그랬다
          ("클릭 예산 초과 — 11/15건까지 채집" — 나머지 4건은 열어 보지도 못함).
          행에는 주소가 없으므로 **게시판+제목**으로 장부를 만든다(clickRowKey). */
+      /* 이 게시판 목록의 공고 행 제목 — 원문 확인에서 '이 화면이 목록인가'를 가리는 재료 (2026-10-03).
+         메뉴는 뺀다(사이트 머리·옆 메뉴는 상세 화면에도 그대로 있어, 세면 멀쩡한 상세가 목록이 된다). */
+      const boardRowTitles = [...new Set(rawRows.map(([, t]) => t)
+        .concat(links.filter((l) => KEYWORDS.test(l.title)).map((l) => l.title))
+        .filter((t) => !isMenuEntry(t))
+        .map((t) => stripRowTail(t)))]
+        .filter((t) => t.length >= 10 && t.length <= 140);
       const clickRows = rawRows.filter(([, t]) => !seen[clickRowKey(url, t)]).slice(0, 40);
       clickSkipped = rawRows.length - clickRows.length;
       let ci = 0;
@@ -264,17 +287,36 @@ async function loadPage(url, { attempts = 3, lines = report, retryClosed = 1 } =
           const cands = detailCandidates({ ...dom, url: detailPage.url(), listUrl: url, rowIds: idsFromSource(rowSrc) })
             .filter((c) => isDetailUrl(c, url) && !usedUrls.has(c));
           let recUrl = null;
-          if (cands.length) {
-            if (!patternOk.has(url)) {
-              // 이 게시판에서 처음 만든 주소 — 실제로 열어 그 공고가 맞는지 확인한다.
-              // 통과하면 같은 게시판의 나머지 공고는 같은 규칙으로 만들어지므로 다시 확인하지 않는다.
-              for (const c of cands.slice(0, 2)) {
-                if (await verifyDetailUrl(c, title)) { patternOk.set(url, true); recUrl = c; break; }
+          const proof = patternOk.get(url);
+          if (cands.length && proof === 'post') {
+            [recUrl] = cands;     // 이 게시판에서 '그 공고 화면'이 확인된 규칙 — 같은 규칙의 주소를 믿는다
+          } else if (cands.length && proof !== 'bad' && (unreadCount.get(url) || 0) < MAX_UNREAD_PER_BOARD) {
+            /* 실제로 열어 그 공고가 맞는지 확인한다 — 'post'(그 공고 화면)일 때만 통과하고 그때만 게시판을 '증명됨'으로 둔다.
+               🔴 목록 판정 재료로 **이 게시판의 다른 행 제목**을 넘긴다(목록에도 그 제목이 있다 — 위 verifyDetailUrl 머리말).
+               판정이 셋으로 갈린다:
+                 · post            → 채택 · 게시판 증명됨(이후 행은 같은 규칙을 믿는다)
+                 · list·other·login·gone·home(분명히 틀림) → 다음 후보 · 둘 다 틀리면 게시판 'bad'(이번 실행의 나머지 행은 표식)
+                 · unread(망 오류·5xx·껍데기 — 판정 불가) → 더 두드리지 않고 **이 행만** 표식으로 두고, 다음 행에서 다시 확인한다.
+               🔴 예전엔 첫 확인이 망 오류로 실패해도 게시판을 통째로 false 로 찍어 **그날 그 게시판 전체가 목록 표식**이 됐다.
+                  판정 불가는 '틀렸다'가 아니다. 다만 같은 게시판에서 판정 불가가 MAX_UNREAD_PER_BOARD 번 쌓이면 막힌 것으로 보고
+                  이번 실행에서는 더 두드리지 않는다(행은 표식으로 — 링크 사냥꾼이 다음에 행을 눌러 확인해 고친다).
+               판정 불가인 행을 확인 없이 원문 주소로 저장하지 않는 이유: 이번 사고가 바로 '확인 안 된 주소를 원문이라 부른 것'이다.
+               표식은 앱이 '게시판 목록 ↗'으로 정직하게 안내하고 사냥꾼이 고치지만, 틀린 원문 주소는 확인 로봇이 이틀 뒤에야 알아본다. */
+            const others = boardRowTitles.filter((x) => !sameTitle(title, x)).slice(0, 60);
+            let affirmed = 0; let unread = false;
+            for (const c of cands.slice(0, 2)) {
+              const j = await verifyDetailUrl(c, title, others);
+              if (j.v === 'post') { patternOk.set(url, 'post'); recUrl = c; break; }
+              if (j.v === 'unread') {   // 판정 불가 — 같은 서버를 더 두드리지 않는다
+                unread = true;
+                lines.push(`  - (원문 확인 판정 불가 — ${j.why} · 이 행만 게시판 목록 표식) ${c.slice(0, 80)}`);
+                break;
               }
-              if (!patternOk.has(url)) patternOk.set(url, false);
-            } else if (patternOk.get(url)) {
-              [recUrl] = cands;
+              affirmed += 1;
+              lines.push(`  - (원문 확인 탈락 · ${j.v} — ${j.why}) ${c.slice(0, 90)}`);
             }
+            if (!recUrl && unread) unreadCount.set(url, (unreadCount.get(url) || 0) + 1);
+            else if (!recUrl && affirmed && affirmed === Math.min(2, cands.length)) patternOk.set(url, 'bad');
           }
           if (!recUrl) {
             // 원문으로 바로 가는 주소를 못 찾았을 때만 목록 주소 + 표식 (앱이 정직하게 안내한다)
