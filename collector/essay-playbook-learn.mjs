@@ -20,10 +20,13 @@
    ============================================================ */
 import fs from 'node:fs';
 import path from 'node:path';
+/* 🔴 윈도우에서 `.pathname` 은 `/C:/…` 를 내서 fs 가 못 읽는다(오류 없이 조용히 '' — 2026-10-03).
+   file:// → 파일 경로는 반드시 fileURLToPath. 경위는 collector/extract-excerpts.mjs 첫머리. */
+import { fileURLToPath } from 'node:url';
 import { isCandidate, linkCandidates, matchRule, parseRobots, robotsBlocks, toLines, naverMobile } from './essay-rule-line.mjs';
 import ASK from '../essay-ask.js';
 
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const rd = (p) => JSON.parse(fs.readFileSync(path.join(ROOT, p), 'utf8'));
 const WRITE = process.argv.includes('--write');
 const LIMIT = Number((process.argv.find((a) => a.startsWith('--limit=')) || '').slice(8)) || 20;

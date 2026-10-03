@@ -15,8 +15,11 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+/* 🔴 윈도우에서 `.pathname` 은 `/C:/…` 를 내서 fs 가 못 읽는다(오류 없이 조용히 '' — 2026-10-03).
+   file:// → 파일 경로는 반드시 fileURLToPath. 경위는 collector/extract-excerpts.mjs 첫머리. */
+import { fileURLToPath } from 'node:url';
 
-const ROOT = path.join(path.dirname(new URL(import.meta.url).pathname), '..');
+const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2).filter((a) => a !== '--fragment');
 const FRAGMENT = process.argv.includes('--fragment');
 const OUT = args[0] || path.join(ROOT, '_admin', 'preview.html');

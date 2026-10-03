@@ -24,6 +24,9 @@
          node collector/eligibility-ai.mjs --write    (반영)
    ============================================================ */
 import fs from 'node:fs';
+/* 🔴 윈도우에서 `.pathname` 은 `/C:/…` 를 내서 fs 가 못 읽는다(오류 없이 조용히 '' — 2026-10-03).
+   file:// → 파일 경로는 반드시 fileURLToPath. 경위는 collector/extract-excerpts.mjs 첫머리. */
+import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { indexTexts, sourceFor, hasText } from './notice-source.mjs';
 import { makeStripper } from './page-boilerplate.mjs';
@@ -314,7 +317,7 @@ export function pickPdfTargets(items) {
        PDF 가 있으면 PDF 가 먼저다(글자층이 남아 있을 수 있어 더 정확하다). */
     /* 크기는 **파일 무게**로 잰다 — 저장할 때 이름이 `elig-슬러그-번호.확장자`로 바뀌어
        원래 이름에 있던 가로×세로가 남지 않는다. 머리말 배너 39KB vs 포스터 2MB라 확실히 갈린다. */
-    const bytes = (f) => { try { return fs.statSync(new URL(`extracted/${f}`, HERE).pathname).size; } catch { return 0; } };
+    const bytes = (f) => { try { return fs.statSync(fileURLToPath(new URL(`extracted/${f}`, HERE))).size; } catch { return 0; } };
     const files = [...((index[it.id] || {}).files || [])]
       .sort((a, b) => (/\.pdf$/i.test(b) ? 1 : 0) - (/\.pdf$/i.test(a) ? 1 : 0) || bytes(b) - bytes(a));
     for (const f of files) {
@@ -322,7 +325,7 @@ export function pickPdfTargets(items) {
          그건 '본문이 없는 것'이 아니라 '눈으로 읽어야 하는 것'이다(2026-08-23). */
       const m = f.match(/\.(pdf|png|jpe?g|gif|webp)$/i);
       if (!m) continue;
-      const path = new URL(`extracted/${f}`, HERE).pathname;
+      const path = fileURLToPath(new URL(`extracted/${f}`, HERE));
       if (!fs.existsSync(path)) continue;
       /* 무료로 글자가 나오면 이 경로에 올 이유가 없다 — 발췌기가 이미 읽었거나 읽을 것이다.
          그림은 애초에 글자가 안 나오므로 이 검사를 건너뛴다. */

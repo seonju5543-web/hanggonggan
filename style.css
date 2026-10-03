@@ -4847,7 +4847,11 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
   right: -7px;
   min-width: 20px;
   height: 20px;
-  padding: 0 var(--sp-1);
+  /* 🔴 좌우 여백을 8px → 4px (2026-10-03 개발자 지시 "너비가 너무 넓다").
+     실측: 한 자리 숫자인데 26.7×20 짜리 **옆으로 늘어난 타원**이었다(여백 8+8 과 테두리 2+2 가
+     최소 너비 20 을 넘겨 버려서다). 4px 로 줄이면 한 자리는 20×20 **동그라미**가 되고,
+     두 자리('26')는 34.1 → 25.2 로 준다. 숫자가 잘리지는 않는다(tabular-nums 라 폭이 일정). */
+  padding: 0 var(--space-4);
   border-radius: var(--radius-pill);
   background: var(--red);
   color: #fff;
@@ -4860,6 +4864,17 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 }
 .hero-badge.zero { background: var(--text-weak); }
 .hero-card #btn-apply-all { width: 100%; margin-top: var(--sp-3); }   /* 버튼이 그림 칸 위로 (2026-10-01 CTO) */
+
+/* 🔴 홈의 **구역 제목 위 가로선을 걷는다** (2026-10-03 개발자 지시 "불필요한 구분선 없애줘").
+   홈에는 그 선이 넷 있었다 — 나에게 맞는 장학금 · 우리 학교 게시판 공고 · 우리 학교 소식 ·
+   재단·지자체 새 공고. 구역은 이제 **제목 글씨와 여백(34+16=50px)**으로만 갈린다.
+   · 공고와 공고 사이의 선(`.sch-card` 아래 선 열 개)은 **그대로 둔다** — 같은 날 개발자가
+     그 둘을 갈라 고른 것이다(줄끼리는 붙어 보이면 안 된다).
+   · 홈에서만 걷는다. 탐색·MY 등 다른 화면의 `.section-head` 선은 건드리지 않는다.
+   · 안쪽 여백(padding-top)은 남긴다 — 같이 지우면 구역 사이가 50 → 34px 로 좁아져
+     선을 뺀 자리를 여백이 못 메운다(여백이 이제 유일한 경계다).
+   ⚠️ DESIGN.md 「충돌」 23번(절 가르기 = 얇은 선 + 34px)은 **홈에 한해 예외**가 됐다. */
+#screen-home .section-head { border-top: 0; }
 
 /* 상세 시트 맨 아래 묶음 — 마감일·중복 수혜 · 문의 · 원문 링크 (2026-10-02 CTO 지시).
    마감일 줄이 혼자일 때 갖던 아래 여백은 묶음이 대신 갖는다(줄 사이는 .doc-legend 의 위 여백). */

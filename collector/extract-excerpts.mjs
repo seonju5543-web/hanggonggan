@@ -10,6 +10,15 @@
          node collector/extract-excerpts.mjs --write (registered.json 반영)
    ============================================================ */
 import fs from 'node:fs';
+/* 🔴 file:// 주소를 **파일 경로로 바꿀 때는 `.pathname` 을 쓰면 안 된다** (2026-10-03 규명).
+   윈도우에서 `.pathname` 은 `/C:/…` 처럼 드라이브 글자 앞에 빗금이 하나 더 붙은 값을 내서
+   `fs` 가 그 파일을 못 읽는다 — 그런데 **아무 오류도 안 난다.** 첨부 글자가 조용히 ''가 되고
+   마감·금액·자격이 "못 읽었다"로 바뀐다(실측: 저장된 첨부 5건이 전부 null 이 됐고, 그게
+   test-collector 의 '첨부에서 읽었다고 적힌 공고가 다시 읽힌다' 빨간불의 정체였다).
+   리눅스(클라우드 로봇)에서는 멀쩡해서 **로컬 윈도우 실행에서만** 터진다 —
+   `tools/robot-run.sh` 로 로봇을 여기서 돌리면 첨부를 하나도 못 읽고 데이터를 비울 수 있다.
+   ⚠️ `.pathname` 으로 되돌리지 말 것. 회귀는 test-collector '파일 경로' 절이 막는다. */
+import { fileURLToPath } from 'node:url';
 /* 원문 찾기 규칙은 notice-source.mjs 한 곳에 있다 — 수집기·재채점 도구와 같은 방법을
    써야 "발췌기는 찾았는데 수집기는 못 찾는" 어긋남이 안 생긴다 (2026-08-03 분리). */
 import { indexTexts, sourceFor, hasText } from './notice-source.mjs';
@@ -727,7 +736,7 @@ function docTexts(it) {
   const out = [];
   out.files = [];                       // 글자와 같은 차례의 파일 이름 — 어느 첨부에서 읽었는지 표식에 쓴다
   for (const f of docOrder((eligDocs[it.id] || {}).files)) {   // 원문 글자(HWP)가 OCR 보다 먼저
-    const t = attachmentText(new URL(`extracted/${f}`, HERE).pathname);
+    const t = attachmentText(fileURLToPath(new URL(`extracted/${f}`, HERE)));
     if (readable(t)) { out.push(t); out.files.push(f); }
   }
   return out;
@@ -735,7 +744,7 @@ function docTexts(it) {
 
 /* OCR 로 읽은 첨부는 출처에 그렇게 적는다(`공고문 첨부(OCR)`) — 관리자·감사가 오독 가능성을
    알아보게. 같은 이름표를 읽는 곳(아래 923행 · 감사)은 앞머리 `공고문 첨부` 로 맞춘다. */
-const docLabel = (file) => (file && isOcrSource(new URL(`extracted/${file}`, HERE).pathname) ? '공고문 첨부(OCR)' : '공고문 첨부');
+const docLabel = (file) => (file && isOcrSource(fileURLToPath(new URL(`extracted/${file}`, HERE))) ? '공고문 첨부(OCR)' : '공고문 첨부');
 
 /** 첨부들에서 하나를 읽는 공통 골격 — 마감·접수 시작·발표가 **같은 자르기**를 거친다.
     `texts` 를 주면 파일 대신 그것을 읽는다(관문이 합성 글로 빨간불을 확인하는 자리).
@@ -829,7 +838,7 @@ function qualFromDocs(it) {
      분야별 요건을 제대로 다루려면 절이 아니라 **분야를 갈라 담는 구조**가 먼저 필요하다. */
   qualFromDocs.lastFile = null;
   for (const f of docOrder((eligDocs[it.id] || {}).files)) {   // 원문 글자(HWP)가 OCR 보다 먼저
-    const t = attachmentText(new URL(`extracted/${f}`, HERE).pathname);
+    const t = attachmentText(fileURLToPath(new URL(`extracted/${f}`, HERE)));
     if (!readable(t)) continue;
     const got = extractQualifyLines(t);
     if (got.length) { qualFromDocs.lastFile = f; return got; }

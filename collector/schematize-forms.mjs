@@ -13,6 +13,9 @@
    실행: node collector/schematize-forms.mjs [리포트파일]   (deepfetch 직후)
    ============================================================ */
 import fs from 'node:fs';
+/* 🔴 윈도우에서 `.pathname` 은 `/C:/…` 를 내서 fs 가 못 읽는다(오류 없이 조용히 '' — 2026-10-03).
+   file:// → 파일 경로는 반드시 fileURLToPath. 경위는 collector/extract-excerpts.mjs 첫머리. */
+import { fileURLToPath } from 'node:url';
 import { pdfText } from './pdf-text.mjs';
 import { schemaFromText } from './schema-from-text.mjs';
 /* docx·hwpx 글자 읽기는 attachment-text.mjs 한 곳에 있다 (2026-08-20 합침).
@@ -96,7 +99,7 @@ function extractText(file) {
   }
   if (lower.endsWith('.txt')) return fs.readFileSync(url, 'utf8');
   /* 문단 단위로 이어 붙여 읽는다 — 규칙은 attachment-text.mjs 한 곳 (위 주석 참조) */
-  if (lower.endsWith('.docx') || lower.endsWith('.hwpx')) return attachmentText(url.pathname);
+  if (lower.endsWith('.docx') || lower.endsWith('.hwpx')) return attachmentText(fileURLToPath(url));
   if (lower.endsWith('.pdf')) {
     /* 글자층이 있는 PDF는 여기서 공짜로 읽힌다. 스캔 PDF면 ''가 나와 API 경로로 간다. */
     try { return pdfText(fs.readFileSync(url)); } catch { return ''; }

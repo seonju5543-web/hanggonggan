@@ -6964,24 +6964,48 @@ console.log('\n■ 검사가 개발자 컴퓨터에서만 실패하지 않는다
      ③ 파일을 읽고 LF(`\n`)를 글자 그대로 찾음 → 디스크에는 CRLF 다 (검사 4건, 2026-09-06 수리)
    🔴 늘 켜져 있는 빨간불은 신호가 아니다. 진짜 실패가 5건째로 섞여도 눈에 안 띈다. */
 {
-  const vDir = new URL('../verify/', import.meta.url);
-  const files = fs.readdirSync(vDir).filter((n) => /\.(mjs|cjs|js)$/.test(n));
+  /* 🔴 **보는 곳을 넓혔다 — verify/ 만 보고 있었다** (2026-10-03, ① 이 네 번째로 재발해서).
+     로봇 쪽(`collector/`)에 `.pathname` 이 일곱 자리 살아 있었고 아무도 못 봤다. 거기서는
+     조용하다 — `attachmentText` 가 ''를 돌려줄 뿐이라 오류가 안 난다. 그 바람에 첨부에서
+     읽은 마감 5건이 전부 null 이 됐고, 그게 test-collector 빨간불의 정체였다(실측).
+     ⚠️ 로컬 윈도우에서 `tools/robot-run.sh` 로 로봇을 돌리면 **첨부를 하나도 못 읽는다** —
+        그 상태로 저장하면 마감·금액·자격이 비워진다. 검사 빨간불보다 이쪽이 더 무섭다. */
+  const root = new URL('../', import.meta.url);
   const badImport = [], badPath = [];
-  for (const f of files) {
-    const src = readText(new URL(f, vDir));
-    /* import(…) 에 경로를 그대로 넘기면 윈도우에서 죽는다 — pathToFileURL 로 감싸야 한다 */
-    for (const m of src.matchAll(/import\(([^)]*)\)/g)) {
-      const arg = m[1];
-      if (/path\.join|__dirname|ROOT/.test(arg) && !/pathToFileURL/.test(arg)) badImport.push(f);
+  for (const d of ['verify/', 'collector/', 'tools/']) {
+    const dir = new URL(d, root);
+    for (const f of fs.readdirSync(dir).filter((n) => /\.(mjs|cjs|js)$/.test(n))) {
+      const src = readText(new URL(f, dir));
+      /* import(…) 에 경로를 그대로 넘기면 윈도우에서 죽는다 — pathToFileURL 로 감싸야 한다 */
+      for (const m of src.matchAll(/import\(([^)]*)\)/g)) {
+        const arg = m[1];
+        if (/path\.join|__dirname|ROOT/.test(arg) && !/pathToFileURL/.test(arg)) badImport.push(d + f);
+      }
+      /* .pathname 을 파일 경로로 쓰면 윈도우에서 `/C:/…` 가 된다.
+         🔴 **줄 단위로 본다** (2026-10-03). 예전엔 파일 전체를 보고 `/* 윈도우` 주석 한 줄이
+            있으면 그 **파일을 통째로 면제**했다 — 경고를 적어 두는 것이 검사를 끄는 셈이었다.
+            지금은 주석 줄만 건너뛴다. 그리고 웹 주소의 `.pathname` 은 멀쩡하므로(canon-url·
+            detail-url 이 늘 쓴다) 같은 줄이 **file:// 를 만들고 있을 때만** 잡는다. */
+      src.split('\n').forEach((l, i) => {
+        const t = l.trim();
+        if (/^(\/\/|\/\*|\*)/.test(t)) return;
+        if (/\)\.pathname/.test(l) && /(import\.meta\.url|HERE\)|, root\)|, OUT\))/.test(l)) badPath.push(`${d}${f}:${i + 1}`);
+      });
     }
-    /* .pathname 을 파일 경로로 쓰면 윈도우에서 `/C:/…` 가 된다 */
-    if (/\)\.pathname/.test(src) && !/\/\* *윈도우/.test(src)) badPath.push(f);
   }
   eq('import() 에 경로를 그대로 넘기지 않는다 (pathToFileURL)', [...new Set(badImport)], []);
   eq('URL.pathname 을 파일 경로로 쓰지 않는다 (fileURLToPath)', [...new Set(badPath)], []);
+  /* 자가 검사 — 잣대가 살아 있나. 없으면 위 항목이 영영 초록이라 아무 일도 안 한다.
+     ⚠️ 바늘을 쪼개 넣는다(아래 readText 검사와 같은 수법) — 통째로 적으면 **이 줄 자신이**
+        위 훑기에 걸려 영영 빨간불이다(실제로 그랬다). */
+  const 의심 = (l) => /\)\.pathname/.test(l) && /(import\.meta\.url|HERE\)|, root\)|, OUT\))/.test(l);
+  const 나쁜꼴 = 'attachmentText(new URL(`x/${f}`, HERE)' + '.pathname)';
+  eq('  잣대가 되돌린 꼴을 실제로 잡는다', 의심(나쁜꼴), true);
+  eq('  웹 주소의 .pathname 은 잡지 않는다 (오탐으로 관문을 끄게 하지 않는다)',
+    의심('return u.origin + u' + '.pathname + rest;'), false);
 
   /* 이 파일 자신도 우회하지 않는다 — 읽는 자리는 readText 하나여야 한다 */
-  const self = readText(new URL('test-collector.mjs', vDir));
+  const self = readText(new URL('verify/test-collector.mjs', root));
   eq('이 검사는 파일을 readText 로만 읽는다 (줄바꿈 통일)',
     // 바늘을 쪼개 넣는다 — 통째로 적으면 이 줄 자신이 걸려 영영 2가 된다
     self.split("fs.read" + "FileSync(").length - 1, 1);   // readText 정의 안의 1회뿐
@@ -9766,10 +9790,24 @@ console.log('\n■ OCR — 그림·스캔 첨부 글자 읽기 (2026-09-17)');
   eq('  장부는 훑는 폴더 안에 둔다 (git add <폴더> 가 담는다 — 이슈 #79 유형)', /os\.path\.join\(root, LEDGER\)/.test(ocrSrc), true);
   eq('  tesseract 가 없으면 경고를 남긴다 (조용히 0개 금지)', /::warning::tesseract/.test(ocrSrc), true);
   /* 자가 검사 — 실제 OCR 출력 두 조각으로 관문이 살아 있는지(좋은 스캔은 남기고 포스터는 버리고
-     글머리 기호 오독(`ㅁ`·`(2`)을 되돌린다). python3 은 워크플로 러너와 개발 컴퓨터에 다 있다. */
-  const st = spawnSync('python3', ['collector/ocr-text.py', '--self-test'],
-    { cwd: fileURLToPath(new URL('..', import.meta.url)), encoding: 'utf8' });
-  eq('  자가 검사 통과', st.status === 0 && /"ok": true/.test(st.stdout || ''), true);
+     글머리 기호 오독(`ㅁ`·`(2`)을 되돌린다).
+     🔴 **파이썬이 없는 컴퓨터가 있다** (2026-10-03). 윈도우는 `python3` 라는 이름의 **마이크로소프트
+        스토어 껍데기**를 기본으로 깔아 두는데, 그건 `Python` 한 줄만 찍고 **종료 코드 0으로** 끝난다.
+        그래서 '없다'가 '자가 검사 실패'로 보여 빨간불이 떴다 — 코드는 멀쩡한데.
+        관문이 환경 탓으로 빨개지면 다음 사람이 관문을 끈다(이 저장소가 경계하는 바로 그것).
+     🔴 그렇다고 조용히 건너뛰면 진짜 고장을 놓친다. 그래서 **파이썬이 실제로 도는지 먼저 재고**,
+        돌면 자가 검사는 반드시 통과해야 한다. 안 돌 때만 건너뛴다고 **소리 내어 적는다**.
+        (tesseract 가 없으면 경고를 남기는 위 항목과 같은 계열이다 — 조용한 0 금지.) */
+  const ROOT = fileURLToPath(new URL('..', import.meta.url));
+  const probe = spawnSync('python3', ['-c', 'print("PYOK")'], { cwd: ROOT, encoding: 'utf8' });
+  const 파이썬있음 = probe.status === 0 && /PYOK/.test(probe.stdout || '');
+  if (파이썬있음) {
+    const st = spawnSync('python3', ['collector/ocr-text.py', '--self-test'], { cwd: ROOT, encoding: 'utf8' });
+    eq('  자가 검사 통과', st.status === 0 && /"ok": true/.test(st.stdout || ''), true);
+  } else {
+    console.log('  … 자가 검사 건너뜀 — 이 컴퓨터에 파이썬이 없다(윈도우의 python3 는 스토어 껍데기라'
+      + ' 아무것도 안 하고 끝난다). 클라우드 로봇은 파이썬이 있어 거기서는 실제로 돈다.');
+  }
   /* 코드 리뷰(2026-09-17)가 잡은 자리 셋 — 반쪽 굳힘 · 장부 유실 · 관문 상수 변경 뒤 영영 건너뜀 */
   eq('  예산이 문서 중간에 바닥나면 반쪽을 굳히지 않는다 (Budget 예외)', /raise Budget\(/.test(ocrSrc) && /except Budget/.test(ocrSrc), true);
   eq('  파일마다 장부를 저장한다 (단계가 죽어도 남게)', (ocrSrc.match(/save_ledger\(root, ledger\)/g) || []).length >= 2, true);

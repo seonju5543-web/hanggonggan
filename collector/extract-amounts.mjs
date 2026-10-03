@@ -18,6 +18,9 @@
           node collector/extract-amounts.mjs --write  (registered.json 반영)
    ============================================================ */
 import fs from 'node:fs';
+/* 🔴 윈도우에서 `.pathname` 은 `/C:/…` 를 내서 fs 가 못 읽는다(오류 없이 조용히 '' — 2026-10-03).
+   file:// → 파일 경로는 반드시 fileURLToPath. 경위는 collector/extract-excerpts.mjs 첫머리. */
+import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { indexTexts, sourceFor, hasText } from './notice-source.mjs';
 import { attachmentText, readable, docOrder } from './attachment-text.mjs';
@@ -52,7 +55,7 @@ let eligDocs = {};
 try { eligDocs = JSON.parse(fs.readFileSync(new URL('extracted/elig-docs.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
 function amountFromDocs(it) {
   for (const f of docOrder((eligDocs[it.id] || {}).files)) {   // 원문 글자(HWP)가 OCR 보다 먼저
-    const t = attachmentText(new URL(`extracted/${f}`, HERE).pathname);
+    const t = attachmentText(fileURLToPath(new URL(`extracted/${f}`, HERE)));
     if (!readable(t)) continue;
     const got = PA.amountFrom(t.split('\n').map((s) => s.trim()).filter(Boolean));
     if (got.kind !== 'unknown') return got;
