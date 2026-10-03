@@ -241,7 +241,14 @@ export function guideLinks(html, pageUrl) {
   let m;
   while ((m = re.exec(String(html || ''))) !== null) {
     const label = m[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-    if (!label || label.length > 30 || !GUIDE.test(label)) continue;
+    /* 첨부 `미리보기`(게시판이 HWP·PDF 를 웹 페이지로 바꿔 보여 주는 주소) — 다운로드가 자바스크립트 버튼이라 첨부로 안 잡히는 게시판이 있다
+       (국립국제교육원 TOPIK 워크숍 · 2026-10-04 표본). 🔴 바로 앞 파일 이름이 **공고문**일 때만 — 신청서·서식의 미리보기는 열지 않는다 */
+    if (/^(?:미리\s?보기|바로\s?보기|문서\s?보기)$/.test(label)) {
+      const before = String(html).slice(Math.max(0, m.index - 600), m.index).replace(/<[^>]+>/g, ' ');
+      const files = before.match(/[^\s|]{0,60}?[^\s|]+\.(?:hwpx?|pdf|docx?)\b/gi) || [];
+      const name = files[files.length - 1] || '';
+      if (!name || FORMISH.test(name) || !/공고|요강|안내|모집/.test(name)) continue;
+    } else if (!label || label.length > 30 || !GUIDE.test(label)) continue;
     let u;
     try { u = new URL(m[1].replace(/&amp;/g, '&'), pageUrl); } catch { continue; }
     if (u.host !== host || /^javascript:/i.test(m[1]) || DOC_EXT.test(u.pathname) || u.href === pageUrl) continue;
