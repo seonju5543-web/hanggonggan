@@ -13,6 +13,8 @@
      · 마감은 API 의 날짜 칸만 쓴다(청년콘텐츠는 날짜 칸이 없어 장학과 같은 발췌 규칙 · activity-excerpts.mjs).
        못 읽으면 비운다 — 가짜 마감을 만들지 않는다(원칙 8-1).
      · 원문 주소는 API 가 준 주소만 — 없으면 그 행을 버린다(주소를 짐작해 만들지 않는다).
+       기관 첫 화면(index·main 파일 포함)은 '그 공고'가 아니다 — 다른 칸의 주소를 먼저 쓰고, 청년정책만 그것뿐이면
+       첫 화면 주소로 싣고 사유(note)를 남긴다(앱이 '주최 측 홈페이지'로 부른다 · 2026-10-03).
      · 한 출처를 **못 받아 온 날은 그 출처의 지난 글을 그대로 둔다** — 네트워크가 잠깐 끊겼다고 글이 사라지지 않게.
    ============================================================ */
 import { activityKind, activityField } from './activity-kind.mjs';
@@ -21,6 +23,9 @@ import { htmlToLines } from './html-text.mjs';
 import { decodeEntities } from './clean-title.mjs';
 import { canonUrl } from './canon-url.mjs';
 import { titleKey } from './url-key.mjs';
+import { createRequire } from 'node:module';
+/* 주소 꼴(홈페이지인가)은 앱과 같은 파일 하나(source-link.js linkShape)로 본다 (2026-10-03 · 원문 링크 정직성) */
+const { linkShape } = createRequire(import.meta.url)('../source-link.js');
 
 /* 출처마다 싣는 최대 글 수 — 넷 합쳐 55. 활동 파일 상한(collect.mjs ACT_CAP 200)을 API 글이 먹어
    게시판 글이 밀려나지 않게(밀려난 게시판 글은 장부 때문에 다시 안 온다 · 리뷰 M1) */
@@ -37,10 +42,14 @@ const clip = (v) => {
   const s = decodeEntities(String(v ?? '')).replace(/\s+/g, ' ').trim();
   return s.length > MAX_LEN ? `${s.slice(0, MAX_LEN - 1)}…` : s;
 };
-/* API 가 준 주소 가운데 '그 공고 하나'를 가리키는 첫 주소. 기관 홈 첫 화면(경로·물음 없음)은 그 공고가 아니라 버린다
-   (청년정책의 신청 주소 칸에 기관 홈이 흔하다 · CLAUDE.md 「원문 링크는 그 공고 하나로」 · 리뷰 I1) */
-const specific = (u) => { try { const x = new URL(u); return (x.pathname.replace(/\/+$/, '') !== '' || x.search !== ''); } catch { return false; } };
-const httpUrl = (...cands) => cands.map((u) => String(u ?? '').trim()).find((u) => /^https?:\/\/\S+$/i.test(u) && specific(u)) || null;
+/* API 가 준 주소 가운데 '그 공고 하나'를 가리키는 첫 주소. 기관 홈 첫 화면은 그 공고가 아니라 버린다
+   (청년정책의 신청 주소 칸에 기관 홈이 흔하다 · CLAUDE.md 「원문 링크는 그 공고 하나로」 · 리뷰 I1)
+   🔴 2026-10-03 — 예전 검사는 **맨 뿌리(`/`)만** 홈으로 봐서 `https://www.jeju.go.kr/index.htm`·`http://janghak.songpa.go.kr/main.jsp`
+      같은 첫 화면 파일이 '원문'으로 실렸고, 활동 시트가 그걸 '원문에서 신청하기 ↗' 라 불렀다(실측 — 누르면 기관 첫 화면).
+      이제 앱과 같은 판정(linkShape — 뿌리 · 물음표 없는 index/main/default/home 파일 = 'home')을 쓴다. */
+export const specific = (u) => linkShape(u) === 'page';
+const httpOf = (...cands) => cands.map((u) => String(u ?? '').trim()).filter((u) => /^https?:\/\/\S+$/i.test(u));
+const httpUrl = (...cands) => httpOf(...cands).find(specific) || null;
 
 /* 'yyyyMMdd'·'yyyy-MM-dd'·'yyyy.MM.dd' 의 첫 날짜 → 'YYYY-MM-DD' (아니면 null) */
 export function ymd(raw) {
@@ -170,8 +179,14 @@ export function mapYouthPolicy(r, { scholarship } = {}) {
   if (!title) return { drop: '제목 없음' };
   const kind = activityKind(title, { scholarship });
   if (!kind) return { drop: '공모전·대외활동 아님(주거·금융 등 정책)' };
-  const url = httpUrl(r.aplyUrlAddr, r.refUrlAddr1, r.refUrlAddr2);
+  /* 신청 주소 → 참고 주소1 → 참고 주소2 중 **그 정책 하나를 가리키는 첫 주소**.
+     🔴 셋 다 기관 첫 화면뿐이면(2026-10-03 · 리뷰 I1 을 고쳐 씀) 버리지 않고 **첫 주소를 그대로 싣고 사유를 남긴다(note)**.
+        I1 때는 앱이 모든 주소를 '원문에서 신청하기 ↗' 라 불러서 버리는 것만이 정직했다. 이제 앱은 주소 꼴을 보고
+        기관 첫 화면을 '주최 측 홈페이지 ↗' 로 부른다(source-link.js) — 정책 내용(대상·혜택·기간)은 API 원문이라 살릴 값이 있다.
+        주소를 비워 싣지는 않는다: 감사·합치기가 주소로 같은 글을 가려(빈 주소끼리는 전부 '중복') 그날 결과가 통째로 되돌려진다. */
+  const url = httpUrl(r.aplyUrlAddr, r.refUrlAddr1, r.refUrlAddr2) || httpOf(r.aplyUrlAddr, r.refUrlAddr1, r.refUrlAddr2)[0] || null;
   if (!url) return { drop: '원문 주소 없음' };
+  const note = specific(url) ? undefined : '원문 주소 없음 — 기관 홈페이지로 실음(앱은 「주최 측 홈페이지」로 안내)';
   const always = String(r.aplyPrdSeCd || '') === '0057002';   // 신청기간 구분: 상시
   const min = Number(r.sprtTrgtMinAge) || 0, max = Number(r.sprtTrgtMaxAge) || 0;
   const age = String(r.sprtTrgtAgeLmtYn || '').toUpperCase() !== 'N' && (min || max) ? `만 ${min || ''}~${max || ''}세` : null;
@@ -194,7 +209,7 @@ export function mapYouthPolicy(r, { scholarship } = {}) {
         ...labeled('제출 서류', r.sbmsnDcmntCn), ...labeled('기타', r.etcMttrCn)].slice(0, 8),
     },
     api: 'youthPolicy',
-  }) };
+  }), ...(note ? { note } : {}) };
 }
 
 /* 청년콘텐츠는 소식 글이 섞여 있다 — 판정되는 글만, 60일 안에 올라온 것만(옛 글이 '새 글'로 뜨지 않게) */
@@ -259,25 +274,32 @@ export const xmlTag = (xml, tag) => (String(xml || '').match(new RegExp(`<${tag}
 /* 한 출처의 행들 → 실을 글 + 버린 이유 집계. 마감 지난 글은 싣지 않는다. 마감 가까운 순으로 상한까지. */
 export function mapRows(source, rows, { scholarship, today }) {
   const dropped = {};
+  const noted = {};         // 싣긴 했지만 알릴 사유 — 지금은 '원문 주소가 기관 홈페이지뿐'(청년정책 · 2026-10-03)
   const items = [];
   const seen = new Set();
   const refs = new Map();   // 글 주소 → 상세를 따로 받을 번호(1365) — 글에는 싣지 않는다
   for (const r of rows) {
-    const { item: it, drop, ref } = MAPPERS[source](r, { scholarship, today });
+    const { item: it, drop, ref, note } = MAPPERS[source](r, { scholarship, today });
     if (drop) { dropped[drop] = (dropped[drop] || 0) + 1; continue; }
     if (it.deadline && it.deadline < today) { dropped['마감 지남'] = (dropped['마감 지남'] || 0) + 1; continue; }
     /* 같은 글 — 주소로도, 제목으로도(수집 로봇의 dedupeNotices 가 학교·캠퍼스·제목으로 합친다 ·
-       1365 엔 센터마다 같은 제목이 흔해 여기서 안 합치면 매일 늘었다 줄었다 한다 · 리뷰 I2) */
+       1365 엔 센터마다 같은 제목이 흔해 여기서 안 합치면 매일 늘었다 줄었다 한다 · 리뷰 I2).
+       기관 홈페이지 주소가 겹친 것은 같은 글이 아니라 **같은 기관의 다른 정책**이다 — 이유를 따로 센다(감사가 주소로 중복을 보므로 하나만 싣는다) */
     const k = canonUrl(it.url), tk = titleKey(it);
-    if (seen.has(k) || (tk && seen.has(tk))) { dropped['같은 글'] = (dropped['같은 글'] || 0) + 1; continue; }
+    if (seen.has(k) || (tk && seen.has(tk))) {
+      const why = !specific(it.url) && seen.has(k) ? '같은 기관 홈페이지(원문 주소 없음)' : '같은 글';
+      dropped[why] = (dropped[why] || 0) + 1;
+      continue;
+    }
     seen.add(k); if (tk) seen.add(tk);
     if (ref) refs.set(it.url, ref);
+    if (note) noted[note] = (noted[note] || 0) + 1;
     items.push(it);
   }
   items.sort((a, b) => String(a.deadline || '9999').localeCompare(String(b.deadline || '9999')));
   const cap = API_SOURCES[source].cap;
   if (items.length > cap) dropped[`상한 ${cap}건 초과`] = items.length - cap;
-  return { items: items.slice(0, cap), dropped, refs };
+  return { items: items.slice(0, cap), dropped, refs, noted };
 }
 
 /* 받아 온 결과를 '성공'으로 쳐도 되는가 — 아니면 이유(문자열). 🔴 성공으로 치면 그 출처의 지난 글이 이번 글로 **바뀐다**.

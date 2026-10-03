@@ -4,8 +4,20 @@
    (find-boards.mjs)도 같은 눈으로 읽어야 '찾을 때는 글로 보였는데 수집할 때는 안 보이는'
    어긋남이 없다. ⚠️ collect.mjs 는 불러오는 순간 실행되는 파일이라 거기서 import 할 수 없다.
    ============================================================ */
-import { cleanTitle } from './clean-title.mjs';
+import { createRequire } from 'node:module';
+import { cleanTitle, decodeEntities } from './clean-title.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';   // 글 줄 뽑기(extractDatedRows)가 파일 링크를 뺀다 (2026-10-01)
+
+/* 주소 속성(href) 글자 → 주소 (2026-10-03 · 원문 링크 정직성)
+   🔴 HTML 은 속성 안의 `&` 를 `&amp;` 뿐 아니라 숫자로도 적는다 — 워드프레스·KBoard 는 `&#038;` 이다(서울대 학생처).
+      예전엔 `&amp;` 만 풀어서 `?mod=document&#038;category1=…&#038;uid=392` 가 그대로 저장됐고, 브라우저는 `#038;…` 을
+      **조각(fragment)** 으로 읽어 서버에 `?mod=document&` 만 보냈다 — 글 번호(uid)가 사라져 공고가 아니라 메뉴 화면이 열렸다.
+   푸는 규칙은 새로 만들지 않고 둘을 잇는다: 제목에 쓰는 decodeEntities(clean-title.mjs — 숫자·이름 기호 전부) →
+   앱과 같은 decodeUrlEntities(source-link.js — 두 겹 `&amp;#038;` 까지). 수집기의 첨부 주소도 이 함수를 쓴다(collect.mjs). */
+const { decodeUrlEntities } = createRequire(import.meta.url)('../source-link.js');
+export function hrefText(raw) {
+  return decodeUrlEntities(decodeEntities(String(raw == null ? '' : raw)));
+}
 
 /* 세션 표식(;jsessionid=…)을 뗀다 — 접속할 때마다 값이 달라서 그대로 두면 **매일 같은 공고를
    새 공고로 다시 담고**(이슈 #75와 같은 병), 남의 세션이 박힌 주소를 학생에게 보여 주게 된다.
@@ -23,7 +35,7 @@ export function extractLinks(html, base) {
     const title = cleanTitle(m[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim());
     if (title.length < 6 || title.length > 140) continue;
     let url;
-    try { url = new URL(m[1].replace(/&amp;/g, '&'), base).href; } catch { continue; }
+    try { url = new URL(hrefText(m[1]), base).href; } catch { continue; }   // `&#038;`·`&amp;` 를 **주소로 풀기 전에** 되돌린다
     if (!/^https?:/.test(url)) continue;
     out.push({ title, url: stripSessionId(url) });
   }

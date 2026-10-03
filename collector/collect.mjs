@@ -20,7 +20,7 @@ import { activityKind, activityField } from './activity-kind.mjs';
 import { activityExcerpts, activityDetails, putActivityDetails, ACT_DETAILS_V } from './activity-excerpts.mjs';
 import { htmlToLines } from './html-text.mjs';
 import { robotsAllows } from './robots.mjs';
-import { extractLinks, stripSessionId } from './board-links.mjs';
+import { extractLinks, stripSessionId, hrefText } from './board-links.mjs';
 import { tidyExternal, dropReason as externalDropReason } from './external-clean.mjs';
 import { canonUrl } from './canon-url.mjs';
 import { fetchBoard, netReason } from './fetch-board.mjs';
@@ -127,7 +127,8 @@ async function fetchDetail(item) {
     while ((m = re.exec(html)) !== null) {
       const name = m[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
       let url;
-      try { url = new URL(m[1].replace(/&amp;/g, '&'), item.url).href; } catch { continue; }
+      // `&#038;`·`&amp;` 를 주소로 풀기 전에 되돌린다 — 안 하면 `#038;…` 이 조각이 되어 첨부 번호가 사라진다 (board-links.mjs hrefText · 2026-10-03)
+      try { url = new URL(hrefText(m[1]), item.url).href; } catch { continue; }
       const isFile = ATTACH_RE.test(url) || ATTACH_RE.test(name) || /mode=download|download\.do|fileDown|attach/i.test(url);
       if (isFile && name && name.length >= 4 && name.length <= 120) {
         attachments.push({ name: name.slice(0, 100), url });

@@ -8,6 +8,7 @@
      ② 표식(#n-)이 붙은 것만 대상  → '주소는 멀쩡해 보이는데 눌러 보면 로그인 벽/다른 글'인
         경우는 표식이 없어 눈에 안 띄었다(그런 사각지대가 229건 있었다).
         → **순찰 단계**를 앞에 둬서 기존 링크도 돌아가며 다시 열어 본다.
+        ⚠️ 2026-10-03 부터 이 일은 원문 링크 확인 로봇(link-check.mjs)이 **기록만** 하며 맡는다 — 아래 [덤 · 순찰].
 
    왜 따로 두나
    ─────────────────────────────────────────────────────────────────
@@ -37,10 +38,17 @@
    ④ 만든 주소를 **로그인도 리퍼러도 없는 새 탭**에서 다시 열어 그 공고가 맞는지 확인한다.
       (사용자는 그 조건으로 링크를 누르므로 그 조건으로 확인해야 한다.)
    ⑤ 통과한 것만 데이터에 반영한다. 못 찾은 것은 지어내지 않고 표식을 그대로 둔다.
-   [덤 · 순찰] 시간이 남으면, 이미 주소가 있는 링크를 오래 안 본 것부터 조금 열어 본다.
-      학생이 그 공고를 못 보는 링크(로그인 벽·다른 글·목록)면 표식으로 되돌려
-      **다음 실행의 사냥 대상**으로 넘긴다. 이게 필요한 이유는 그런 링크가 겉보기엔
-      멀쩡해서 표식이 없고, 열어 보기 전엔 아무도 모르기 때문이다(경희대 7건이 그랬다).
+   [덤 · 순찰] 🔴 **2026-10-03 부터 주소를 고치지 않는다 — 기본은 꺼짐(patrol: 0).**
+      예전 순찰은 멀쩡한 원문 주소를 다시 열어 보고 '제목 불일치'면 게시판 목록 표식(#n-)으로
+      **덮어썼다**(사본도 안 남겼다). 그런데 대조한 제목이 게시판 행 꼬리(`학생지원팀 2026-09-02 1,076`)나
+      사람이 다듬은 앱 이름이라 멀쩡한 링크가 떨어졌다 — 그날 하루에 항공대 3건(scholnoti.php?…seq=)·건국대
+      (artclView.do)·부경대(2432?action=view&no=) 원문 5건이 목록 표식으로 바뀌어 커밋됐다(aa195bf8 · 02ee20a3 ·
+      e5f6de7b, 제목은 하나같이 '원문 주소 0건 확보'). 같은 날 고려대 3건도 바뀌었는데 그쪽은 원래도
+      목록에 번호만 붙인 주소(subview.do?nttId=)였다 — 이렇게 덮어쓰기는 맞든 틀리든 흔적을 안 남긴다.
+      게다가 목록 판정에 다른 글 제목을 안 넘겨(`verify(url, title, [])`) 진짜 목록 41건은 통과시켰다.
+      판정하는 쪽이 고치기까지 하면 오판 한 번이 곧 데이터 손상이다 — 그래서 '앱의 모든 링크를 새 탭으로
+      열어 보는 일'은 원문 링크 확인 로봇(collector/link-check.mjs)이 맡고, **주소를 고치지 않고 기록만** 한다.
+      이 로봇의 순찰은 켜더라도(patrol: N) link-hunt.json 에 판정만 적는다.
 
    같은 것을 영원히 다시 두드리지 않기
    ─────────────────────────────────────────────────────────────────
@@ -56,7 +64,12 @@
 import fs from 'node:fs';
 import { chromium } from 'playwright';
 import { cleanTitle } from './clean-title.mjs';
-import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, rowByCore, titleFingerprint, detailCandidates, idsFromSource, looksLikeLoginWall, rowDetailCandidates, looksLikeList } from './detail-url.mjs';
+import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, rowByCore, rowDetailCandidates, observeLanding, otherTitlesOnSite } from './detail-url.mjs';
+/* 🔴 '이 주소를 열면 그 공고가 뜨는가'는 **공용 판정 한 곳**(link-landing.mjs judgeLanding)으로 본다 (2026-10-03).
+   예전 verify() 는 제 규칙을 따로 들고 있다가 ① 로그인 벽을 제목보다 먼저 봐서 머리의 회원 로그인 상자 때문에
+   멀쩡한 전북·부경 공고를 떨어뜨렸고 ② 목록 판정에 빈 목록을 받아 진짜 목록을 통과시켰다.
+   제목 후보(expectTitles)·행 꼬리 떼기(stripRowTail)도 같은 파일 것을 쓴다 — 베끼면 다시 갈라진다. */
+import { judgeLanding, expectTitles, stripRowTail } from './link-landing.mjs';
 /* 🔴 발행 직전 중복 정리는 **수집기와 같은 규칙**을 쓴다 (2026-09-04 신설).
    사냥꾼은 표식(#n-)을 진짜 주소로 바꾸는 로봇이라, 같은 공고가 서로 다른 표식으로
    두 번 담겨 있으면 **둘 다 같은 주소로 풀려 중복이 된다.** 그 중복 하나 때문에
@@ -177,22 +190,42 @@ for (const r of registered.items || []) {
    앱에 보여주는 이름(r.name)은 사람이 다듬은 것이라("전문자격장학 (2026-2학기)")
    게시판 행("공지 공지 2026-2학기 전문자격장학 신청안내 …")과 안 맞아 못 찾는다.
    표식(#n-)에 든 제목이 원래 제목이고, boardTitle 필드가 있으면 그게 더 정확하다. */
-function huntTitle(t) {
+function huntTitleOf(t) {
   /* 🔴 **부스러기를 떼고 쓴다** (2026-08-23). 게시판 행 글자를 그대로 담아 둔 값에는
      앞머리에 `공지 공지`·`2651` 같은 행 번호·분류 배지가 붙어 있다. 대조는 제목 **앞부분**을
      맞춰 보므로(아래 fingerprint의 `slice(0, 24)`), 앞머리가 어긋나면 뒤가 아무리 같아도
      통째로 빗나간다. 청소 규칙은 수집기와 **같은 모듈**을 쓴다 — 여기에 한 벌 더 두면
-     "수집기는 같다는데 사냥꾼은 다르다"가 된다(clean-title.mjs 첫머리 참조). */
-  const stored = cleanTitle((t.ref.boardTitle || '').trim());
-  if (stored) return stored;
-  const fromMarker = cleanTitle(markerTitle(t.ref[t.field]) || '');
-  if (fromMarker) return fromMarker;
+     "수집기는 같다는데 사냥꾼은 다르다"가 된다(clean-title.mjs 첫머리 참조).
+     🔴 **뒤꼬리도 뗀다** (2026-10-03) — 게시판 행이 통째로 링크인 곳(항공대)은 제목 뒤에
+     `학생지원팀 2026-09-02 1,076`(작성 부서·날짜·조회수)이 붙어 왔고, 그 꼬리 달린 제목으로 대조해
+     멀쩡한 원문 3건이 '제목 불일치'로 목록 표식이 됐다. 떼는 규칙은 link-landing.mjs stripRowTail 한 곳. */
+  const stored = stripRowTail(cleanTitle((t.ref.boardTitle || '').trim()));
+  if (stored) return { title: stored, from: 'board' };
+  const fromMarker = stripRowTail(cleanTitle(markerTitle(t.ref[t.field]) || ''));
+  if (fromMarker) return { title: fromMarker, from: 'marker' };
   /* 🔴 마지막 폴백도 청소해서 돌려준다 (2026-08-29 코드 리뷰 지적).
-     이 값은 대조에만 쓰이는 게 아니라 **저장되기도 한다**(아래 세 곳에서
-     `t.ref.boardTitle = want|back`). 앞 두 갈래만 청소돼 있어서, 폴백을 탄 경우에만
-     부스러기가 그대로 저장됐다 — 한 곳은 `cleanTitle(want)` 로 감싸고 한 곳은 안 감싸
-     서로 달랐다. 여기서 한 번 청소하면 세 자리가 같이 낫는다(베끼지 않는다). */
-  return cleanTitle(String(t.title));
+     🔴 그리고 **어디서 왔는지 함께 돌려준다** (2026-10-03) — 정식 등록의 t.title 은 사람이 다듬은 앱 이름(r.name)이다.
+     대조에는 써도 되지만 **게시판 원제목(boardTitle)으로 저장하면 안 된다**: 다음 실행이 그 이름으로 게시판 행을
+     찾다가 영영 못 찾고(2026-08-01 미아 8건), 순찰 시절엔 그 이름과 상세 화면이 안 맞는다며 멀쩡한 링크를 덮어썼다.
+     저장은 rememberBoardTitle 한 곳이 하고, 'name' 이면 게시판에서 실제로 본 행 글자를 대신 적는다. */
+  return { title: stripRowTail(cleanTitle(String(t.title))), from: t.field === 'sourceUrl' ? 'name' : 'feed' };
+}
+function huntTitle(t) { return huntTitleOf(t).title; }
+
+/* 게시판 원제목을 적어 둔다 — 비어 있을 때만, **게시판에서 온 글자만**.
+   boardText = 게시판 목록·검색 결과에서 실제로 맞춘 행 글자(앱 이름이 아니다). */
+function rememberBoardTitle(t, boardText) {
+  if ((t.ref.boardTitle || '').trim()) return;
+  const h = huntTitleOf(t);
+  const text = h.from === 'name' ? (boardText || '') : h.title;
+  const clean = cleanTitle(stripRowTail(text));
+  if (clean) t.ref.boardTitle = clean;
+}
+
+/* 같은 사이트의 **다른 공고 제목** — '이 화면이 목록인가'를 가리는 재료 (2026-10-03 · 규칙은 detail-url.mjs 한 곳).
+   🔴 빈 목록을 넘기면 목록 화면을 영영 못 알아본다(link-landing.mjs 원칙 ②) — 순찰이 그래서 목록 41건을 통과시켰다. */
+function sameOriginTitles(url, exclude = []) {
+  return otherTitlesOnSite(url, [...(notices.items || []), ...(registered.items || [])], { exclude, clean: stripRowTail });
 }
 
 const report0 = [];
@@ -241,7 +274,8 @@ function backfillBoardTitles() {
     if (t.field !== 'sourceUrl' || (t.ref.boardTitle || '').trim()) continue;
     const list = listUrlOf(t.ref[t.field]);
     const mate = (notices.items || []).find((x) => listUrlOf(x.url) === list && sameTitle(markerTitle(t.ref[t.field]) || t.title, x.title));
-    if (mate) { t.ref.boardTitle = cleanTitle(mate.title); n += 1; }
+    /* 행 꼬리(작성 부서·날짜·조회수)는 떼고 담는다 (2026-10-03 — 꼬리 달린 원제목이 대조를 망쳤다) */
+    if (mate) { t.ref.boardTitle = cleanTitle(stripRowTail(mate.title)); n += 1; }
   }
   return n;
 }
@@ -269,8 +303,8 @@ if (orphans.length) {
    고치는 것**이다. 그런데 표식(#n-)이 붙은 것만 집어 들고 있었다. 경희대처럼
    '주소는 멀쩡해 보이는데 눌러 보면 로그인 벽'인 경우는 표식이 없어 로봇 눈에 안 띄었다
    — 229건이 그렇게 사각지대에 있었다.
-   그래서 순찰 단계를 앞에 둔다: 기존 링크를 돌아가며 열어 보고, 학생이 그 공고를 못 보는
-   링크(로그인 벽·다른 글·목록)면 표식으로 되돌려 사냥 대상으로 넘긴다. */
+   그래서 순찰 단계를 앞에 뒀었다.
+   🔴 2026-10-03 부터 순찰은 **판정만 적는다**(표식으로 되돌리지 않는다 — 아래 runPatrol 머리말). */
 const patrol = [];
 for (const n of notices.items || []) {
   if (n.url && !isMarkerUrl(n.url)) patrol.push({ ref: n, field: 'url', title: n.title, key: `n:${n.url}` });
@@ -328,67 +362,49 @@ async function freshPage() {
   return verifyCtx.newPage();
 }
 
-const fp = (s) => String(s || '').replace(/[\s .,·ㆍ~〜'"“”‘’!?()[\]{}<>:;|/\\_+\-*&#%]/g, '').toLowerCase();
-/* 제목 정규화는 **공용 규칙(titleFingerprint)을 그대로 쓴다.**
-   여기에 복사본을 두었다가 규칙이 갈라져 크게 손해를 봤다 (2026-08-01):
-   복사본은 날짜·조회수를 안 떼서 '…안내 2026.07.30. 조회 104'가 지문에 그대로 남았고,
-   상세 화면 본문엔 그런 글자가 없으니 **멀쩡한 주소가 전부 '제목 불일치'로 떨어졌다.**
+/* 제목 정규화·목록 판정·로그인 벽은 **공용 판정 한 곳**(link-landing.mjs judgeLanding)을 그대로 쓴다.
+   여기에 복사본을 두었다가 규칙이 갈라져 크게 손해를 봤다 (2026-08-01 날짜·조회수 지문 · 2026-10-03 로그인 상자·빈 목록).
    규칙은 한 곳에만 둔다 — 이 저장소가 entry-rules·url-key에서 이미 지키는 원칙이다. */
-const coreTitle = titleFingerprint;
 
-/* looksLikeList는 detail-url.mjs 한 곳에 있다 — 복사본을 두면 한쪽만 고쳐져
-   "사냥꾼은 통과시키는데 복구 로봇은 버리는" 어긋남이 생긴다 (2026-08-20 합침). */
+/* 화면에 제목이 그려질 때까지 기다릴 때 쓰는 조각.
+   말머리([홍보]·공지)와 앞머리 번호를 떼야 상세 화면 본문과 맞는다 —
+   안 떼면 매번 7초를 헛되이 기다린 뒤 판정으로 넘어간다. */
+const probeOf = (title) => String(title || '')
+  .replace(/^\s*\d{1,5}\s+/, '')
+  .replace(/\[[^\]]{0,20}\]/g, '')
+  .replace(/^\s*(공통|서울|글로벌|국제|공지|홍보|일반)\s+/g, '')
+  .trim().slice(0, 12).trim();
 
-async function verify(url, title, others) {
+/* 한 주소를 학생처럼(로그인·리퍼러 없는 새 탭) 열어 판정한다.
+   titles = 이 공고의 제목 후보(게시판 원제목·행 글자·앱 이름) · others = 같은 게시판·사이트의 **다른** 공고 제목(목록 판정 재료).
+   돌려주는 것: { ok(post 일 때만), v(판정), why, net(판정 불가 — 횟수에 안 센다) } */
+async function verify(url, titles, others) {
+  const want = [...new Set((Array.isArray(titles) ? titles : [titles]).map((x) => stripRowTail(x || '')).filter(Boolean))];
   const p = await freshPage();
+  const out = (j) => ({ ok: j.v === 'post', v: j.v, why: j.why, net: j.v === 'unread' });
   try {
-    const res = await p.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 });
-    if (res && res.status() >= 400) return { ok: false, why: `HTTP ${res.status()}`, net: true };
-    /* 화면에 제목이 그려질 때까지 기다릴 때 쓰는 조각.
-       말머리([홍보]·공지)와 앞머리 번호를 떼야 상세 화면 본문과 맞는다 —
-       안 떼면 매번 7초를 헛되이 기다린 뒤 판정으로 넘어간다. */
-    const probe = String(title)
-      .replace(/^\s*\d{1,5}\s+/, '')
-      .replace(/\[[^\]]{0,20}\]/g, '')
-      .replace(/^\s*(공통|서울|글로벌|국제|공지|홍보|일반)\s+/g, '')
-      .trim().slice(0, 12).trim();
-    if (probe.length >= 4) {
-      await p.waitForFunction((n) => (document.body && document.body.innerText || '').includes(n), probe, { timeout: 7000 }).catch(() => {});
+    let res = null;
+    try {
+      res = await p.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 });
+    } catch (e) {
+      return out({ v: 'unread', why: `열기 실패: ${(e.message || String(e)).split('\n')[0].slice(0, 56)}` });
+    }
+    const status = res ? res.status() : 0;
+    const probes = want.map(probeOf).filter((x) => x.length >= 4);
+    if (probes.length && status && status < 400) {
+      await p.waitForFunction((ns) => { const b = (document.body && document.body.innerText) || ''; return ns.some((n) => b.includes(n)); }, probes, { timeout: 7000 }).catch(() => {});
     }
     await p.waitForTimeout(700);
-    const text = await p.evaluate(() => (document.body.innerText || '').slice(0, 14000)).catch(() => '');
-    /* 로그인 벽이면 제목이 보여도 떨어뜨린다 — 학생은 로그인 없이 링크를 누르므로
-       로그인을 요구하는 주소는 그 학생에게 '안 열리는 링크'다 (2026-08-01 개발자 지적) */
-    const hasPw = await p.evaluate(() => !!document.querySelector('input[type=password]')).catch(() => false);
-    if (looksLikeLoginWall(text, hasPw)) return { ok: false, why: '로그인 요구(학생이 못 봄)' };
-    const docTitle = await p.title().catch(() => '');
-    const t = coreTitle(title);
-    const hit = sameTitle(title, docTitle) || (t.length >= 8 && (fp(text).includes(t) || (t.length >= 24 && fp(text).includes(t.slice(0, 24)))));
-    /* ⭐ '못 읽은 것'을 '다른 글'이라고 부르지 않는다 (2026-08-01 정찰로 확인).
-       동국대 12건이 전부 '제목 불일치(다른 글이 열림)'로 떨어졌는데, 정찰로 그 주소들을
-       직접 열어 보니 **전부 맞는 공고**였다(가송재단·서울인재대학장학금 등 200 응답,
-       로그인도 필요 없음). 무슨 일이 있었나: 동국대는 우리가 짧은 시간에 여러 번
-       두드리면 응답을 막는다(정찰에서도 주소 3개 뒤 4번째가 연결 끊김). 그때 오는 것은
-       404가 아니라 **본문이 안 그려진 껍데기 화면**이고, 로봇은 그걸 보고 '다른 글'이라
-       단정해 멀쩡한 주소를 버렸다.
-       화면에 글이 거의 없으면 '판정 불가'다 — 판정하지 말고 다음에 다시 본다.
-       (저장소가 이미 지키는 원칙: '못 읽음'과 '읽었는데 다른 화면'을 뭉뚱그리지 말 것) */
-    if (!hit) {
-      // 한 번 더 기다렸다 다시 본다 — 늦게 그려지는 화면을 성급히 '다른 글'로 몰지 않는다
+    const judge = async () => judgeLanding({ ...(await observeLanding(p, res)), requestedUrl: url, titles: want, otherTitles: others || [] });
+    let j = await judge();
+    /* ⭐ '못 읽은 것'을 '다른 글'이라고 부르지 않는다 (2026-08-01 동국대 12건 — 막혔을 때 오는 껍데기 화면을
+       '다른 글'로 단정해 멀쩡한 주소를 버렸다). 늦게 그려지는 화면일 수 있으니 한 번 더 기다렸다 다시 본다.
+       껍데기는 judgeLanding 이 'unread'(판정 불가)로 돌려준다 — 횟수에 세지 않는다. */
+    if (j.v !== 'post' && j.v !== 'gone' && !(status >= 400)) {
       await p.waitForTimeout(4000);
-      const text2 = await p.evaluate(() => (document.body.innerText || '').slice(0, 14000)).catch(() => '');
-      const hit2 = t.length >= 8 && (fp(text2).includes(t) || (t.length >= 24 && fp(text2).includes(t.slice(0, 24))));
-      if (hit2) return { ok: true };
-      // 메뉴만 있고 본문이 없는 화면(막혔을 때 오는 껍데기)이면 판정하지 않는다
-      if (!/등록일|작성일|조회수|첨부|담당|이전글|다음글/.test(text2)) {
-        return { ok: false, why: '본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)', net: true };
-      }
-      return { ok: false, why: '제목 불일치(다른 글이 열림)' };
+      j = await judge();
     }
-    if (looksLikeList(text, others)) return { ok: false, why: '목록 화면(다른 공고 제목이 여럿 보임)' };
-    return { ok: true };
-  } catch (e) {
-    return { ok: false, why: (e.message || String(e)).split('\n')[0].slice(0, 56), net: true };
+    return out(j);
   } finally {
     await p.close().catch(() => {});
   }
@@ -421,38 +437,44 @@ async function gotoPage(page, n) {
 }
 
 
-/* ── 1단계: 순찰 ─────────────────────────────────────────────────
-   기존 링크를 돌아가며 열어 보고, 학생이 그 공고를 못 보는 링크를 찾아낸다.
-   한 번에 다 보지 않고 **오래 안 본 것부터 조금씩** 돈다(학교 서버를 몰아치지 않게).
-
-   되돌리기는 조심스럽게 — 예전에 안전장치가 없어 멀쩡한 링크 17건을 되돌릴 뻔했다:
-   · 게시판 목록조차 안 열리면(카나리아) 그 게시판은 통째로 건너뛴다.
-   · '못 읽음'(404·시간초과)은 판정할 수 없으니 되돌리지 않는다.
-     되돌리는 건 '읽었는데 그 공고가 아니었던 것'(로그인 벽·다른 글·목록)뿐이다.
-   · 한 게시판에서 절반 넘게 실패하면 우리 쪽 문제로 보고 아무것도 되돌리지 않는다. */
-/* 순찰은 **덤이다** (2026-08-01 개발자 지시로 순서를 바꿈)
-   이 로봇의 본업은 '앱에서 원문 공고를 눌렀을 때 그 공고가 안 열리는 링크'를 고치는 것이다.
-   멀쩡히 열리는 링크까지 매번 다시 둘러보느라 본업이 밀리면 안 된다.
-   그래서 **사냥(2·3단계)을 먼저 끝내고, 시간이 남을 때만** 순찰한다.
-
-   순찰을 아주 없애지는 않았다. '주소는 멀쩡해 보이는데 눌러 보면 로그인 벽/다른 글'인
-   링크는 표식이 없어 눈에 띄지 않는데(경희대 7건이 실제로 그랬다 — 개발자가 직접
-   "로그인하라고 뜬다"고 알려 주기 전까지 아무도 몰랐다), 그런 건 열어 봐야만 안다.
-   0으로 두면 순찰을 완전히 끈다: collector/run-link-hunt.txt 의 `patrol: 0`.
-
-   되돌리기는 조심스럽게 — 예전에 안전장치가 없어 멀쩡한 링크 17건을 되돌릴 뻔했다:
-   · 게시판 목록조차 안 열리면(카나리아) 그 게시판은 통째로 건너뛴다.
-   · '못 읽음'(404·시간초과)은 판정할 수 없으니 되돌리지 않는다.
-   · 한 게시판에서 절반 넘게 실패하면 우리 쪽 문제로 보고 아무것도 되돌리지 않는다. */
-const PATROL_PER_RUN = Number(process.env.HUNT_PATROL || runSetting('patrol') || 20);
-let patrolled = 0; let demoted = 0;
+/* ── 덤 · 순찰 — 🔴 **기록만 한다. 주소를 고치지 않는다** (2026-10-03) ─────────────────────────
+   예전 순찰은 멀쩡해 보이는 링크를 다시 열어 '학생이 못 보는 링크'면 게시판 목록 표식(#n-)으로 **덮어썼다**.
+   2026-10-03 하루에 그게 멀쩡한 원문 5건을 목록으로 바꿨다(항공대 scholnoti.php?…seq= 3건 · 건국대 artclView.do ·
+   부경대 2432?action=view — 커밋 제목은 '원문 주소 0건 확보'). 원인 셋:
+     ① 대조한 제목이 행 꼬리 달린 원제목이거나 사람이 다듬은 앱 이름이었다(그래서 '제목 불일치')
+     ② 로그인 벽을 제목보다 먼저 봐서, 머리의 회원 로그인 상자 하나로 멀쩡한 공고가 '로그인 요구'가 됐다
+     ③ 목록 판정에 다른 글 제목을 안 넘겨(`verify(url, title, [])`) 진짜 목록 41건은 오히려 통과시켰다
+   판정하는 쪽이 고치기까지 하면 오판 한 번이 곧 데이터 손상이다(사본도 안 남겼다).
+   그래서 '앱의 모든 링크를 새 탭으로 열어 보는 일'은 원문 링크 확인 로봇(collector/link-check.mjs)이 매일 하고,
+   그 로봇도 **판정을 장부에만 적는다**(다른 날 두 번 같은 문제를 봐야 앱 글자가 바뀐다).
+   이 순찰은 기본이 꺼짐이다. run-link-hunt.txt 의 `patrol: N` 으로 켜도 link-hunt.json 에 판정만 남긴다. */
+const PATROL_PER_RUN = Number(process.env.HUNT_PATROL || runSetting('patrol') || 0);
+const PATROL_OFF_NOTE = '순찰은 원문 링크 확인 로봇(link-check)이 맡는다 — 이 로봇은 주소를 고치지 않는다';
+let patrolled = 0;
+/* 순찰의 목록 판정 재료 — 그 게시판 목록을 한 번 열어 행 제목을 받아 둔다(게시판마다 한 번).
+   우리 데이터의 같은 사이트 제목만으로는 목록 화면에 겹치는 것이 적어 목록을 '그 공고'로 기록한다
+   (2026-10-03 로컬 게시판 시험: 아는 형제 제목 1개뿐이라 번호를 무시하고 목록을 주는 주소가 post 로 기록됐다). */
+const liveRowsCache = new Map();
+async function liveRowTitles(listUrl) {
+  if (!listUrl) return [];
+  if (liveRowsCache.has(listUrl)) return liveRowsCache.get(listUrl);
+  const p = await freshPage();
+  let titles = [];
+  try {
+    await p.goto(listUrl, { waitUntil: 'domcontentloaded', timeout: 25000 });
+    await p.waitForTimeout(2500);
+    titles = (await scrapeRows(p)).map((r) => stripRowTail(r.t)).filter((x) => x.length >= 8);
+  } catch { /* 목록을 못 열면 데이터의 제목만 쓴다 */ } finally { await p.close().catch(() => {}); }
+  liveRowsCache.set(listUrl, titles);
+  return titles;
+}
 async function runPatrol() {
   if (!(PATROL_PER_RUN > 0) || outOfTime()) {
-    report.push(`_(순찰 생략 — ${outOfTime() ? '사냥에 시간을 다 썼습니다' : '이번 실행은 순찰 끔'})_`);
+    report.push(`_(${PATROL_PER_RUN > 0 ? '순찰 생략 — 사냥에 시간을 다 썼습니다' : PATROL_OFF_NOTE})_`);
     report.push('');
     return;
   }
-  report.push('## 덤 · 순찰 (멀쩡해 보이는 링크가 정말 그 공고로 가는가)');
+  report.push(`## 덤 · 순찰 (기록만 — ${PATROL_OFF_NOTE})`);
   const due = patrol
     .filter((t) => !ONLY || String(t.ref[t.field]).includes(ONLY))
     .sort((a, b) => {
@@ -461,63 +483,22 @@ async function runPatrol() {
       return A < B ? -1 : A > B ? 1 : 0;          // 오래 안 본 것 먼저
     })
     .slice(0, PATROL_PER_RUN);
-
-  const byBoard = new Map();
+  const tally = {};
   for (const t of due) {
-    const host = (() => { try { return new URL(t.ref[t.field]).origin; } catch { return '?'; } })();
-    if (!byBoard.has(host)) byBoard.set(host, []);
-    byBoard.get(host).push(t);
-  }
-
-  for (const [host, group] of byBoard) {
     if (outOfTime()) { report.push('- (시간 상한 — 순찰 나머지는 다음 실행)'); break; }
-    const verdicts = [];
-    for (const t of group) {
-      if (outOfTime()) break;
-      patrolled += 1;
-      const v = await verify(t.ref[t.field], huntTitle(t), []);
-      const st = state.items[t.key] || {};
-      st.patrolledAt = today; st.lastWhy = v.ok ? '' : v.why;
-      state.items[t.key] = st;
-      verdicts.push({ t, v });
-      await new Promise((r) => setTimeout(r, 700));
-    }
-    const fails = verdicts.filter((x) => !x.v.ok);
-    const netFails = fails.filter((x) => x.v.net);
-    const realFails = fails.filter((x) => !x.v.net);   // 읽었는데 그 공고가 아니었던 것
-
-    // 카나리아 — 이 학교 서버가 지금 우리를 받아 주는가
-    let canaryOk = true;
-    if (realFails.length) {
-      const p = await freshPage();
-      try {
-        const res = await p.goto(host, { waitUntil: 'domcontentloaded', timeout: 20000 });
-        if (!res || res.status() >= 400) canaryOk = false;
-      } catch { canaryOk = false; } finally { await p.close().catch(() => {}); }
-    }
-    const tooMany = verdicts.length >= 4 && fails.length / verdicts.length > 0.5;
-    report.push(`### ${host}`);
-    report.push(`- 순찰 ${verdicts.length}건 · 통과 ${verdicts.length - fails.length} · 못 읽음 ${netFails.length} · **학생이 못 보는 링크 ${realFails.length}**`);
-
-    if (!canaryOk || tooMany) {
-      report.push(`- ⏸ 되돌리기 취소 — ${!canaryOk ? '학교 서버가 지금 응답하지 않습니다' : '실패가 너무 많아 우리 쪽 문제로 보입니다'}. 다음 실행에서 다시 봅니다.`);
-      continue;
-    }
-    for (const { t, v } of realFails) {
-      const list = boardListFor(t);
-      if (!list) { report.push(`  - ⚠️ ${t.id || String(t.title).slice(0, 30)} (${v.why}) — 되돌릴 게시판 주소를 몰라 그대로 둡니다`); continue; }
-      const back = cleanTitle((t.ref.boardTitle || '').trim()) || String(t.title);
-      if (!t.ref.boardTitle) t.ref.boardTitle = back;      // 게시판 원래 제목을 잃지 않게
-      if (!DRY) t.ref[t.field] = `${list}#n-${encodeURIComponent(back.slice(0, 40))}`;
-      demoted += 1;
-      report.push(`  - ↩️ 표식으로 되돌림(${v.why}): ${String(t.title).slice(0, 44)}`);
-      // 되돌린 것은 이번 실행의 사냥 대상에 바로 넣는다
-      const listKey = list;
-      if (!boards.has(listKey)) boards.set(listKey, []);
-      boards.get(listKey).push({ ref: t.ref, field: t.field, title: t.title, key: t.key, id: t.id });
-    }
+    patrolled += 1;
+    const titles = expectTitles(t.ref);
+    const live = (await liveRowTitles(boardListFor(t))).filter((x) => !titles.some((w) => sameTitle(w, x))).slice(0, 60);
+    const v = await verify(t.ref[t.field], titles, live.concat(sameOriginTitles(t.ref[t.field], titles)));
+    const st = state.items[t.key] || {};
+    st.patrolledAt = today;
+    st.patrol = { v: v.v, why: v.why, at: today };   // 판정만 적는다 — t.ref 는 건드리지 않는다
+    state.items[t.key] = st;
+    tally[v.v] = (tally[v.v] || 0) + 1;
+    if (!v.ok && !v.net) report.push(`  - (기록) ${v.v} · ${v.why}: ${String(t.title).slice(0, 44)}`);
+    await new Promise((r) => setTimeout(r, 700));
   }
-  report.push(`- 순찰 합계: ${patrolled}건 확인 · ${demoted}건을 사냥 대상으로 넘김`);
+  report.push(`- 순찰 합계: ${patrolled}건 확인 · 판정 ${Object.entries(tally).map(([k, n]) => `${k} ${n}`).join(' · ') || '없음'} · **주소는 하나도 바꾸지 않았습니다**`);
   report.push('');
 }
 
@@ -570,7 +551,9 @@ for (const [listUrl, group] of boards) {
     for (const t of [...remaining.values()]) {
       if (outOfTime()) break;
       const want = huntTitle(t);
-      const others = rows.map((r) => r.t).filter((x) => !sameTitle(want, x)).slice(0, 40);
+      /* '이 화면이 목록인가'의 재료 — 이 게시판 목록의 다른 행 + 같은 사이트의 다른 공고 제목 (2026-10-03 · 빈 목록 금지) */
+      const others = rows.map((r) => stripRowTail(r.t)).filter((x) => x && !sameTitle(want, x)).slice(0, 40)
+        .concat(sameOriginTitles(listUrl, [want]));
       let idx = rows.findIndex((r) => sameTitle(want, r.t));
       /* 🔴 지문 대조가 빗나가면 **알맹이 낱말로 한 번 더** 본다 (2026-09-18).
          앱 이름은 사람이 다듬은 것이라 게시판 행과 글자가 달라 지문이 애초에 안 맞는다 —
@@ -586,8 +569,11 @@ for (const [listUrl, group] of boards) {
       }
       if (idx < 0) continue;                       // 이 페이지엔 없다 — 다음 페이지에서 찾는다
       remaining.delete(t.key);
+      /* 게시판이 보여 준 그 행의 글자 — 제목 후보이자, 앱 이름밖에 없을 때 원제목으로 적을 글자(행 꼬리는 뗀다) */
+      const rowText = stripRowTail(rows[idx].t);
+      const titles = [want, rowText, ...expectTitles(t.ref)];
 
-      let url = null; let lastWhy = '';
+      let url = null; let lastWhy = ''; let lastV = '';
       /* ⭐ 1순위: 행을 실제로 눌러 브라우저가 간 주소를 받아 적는다 (짐작하지 않는다) */
       try {
         const els = await page.$$(ROW_SEL);
@@ -631,9 +617,9 @@ for (const [listUrl, group] of boards) {
              그래서 동국대 12건이 전부 떨어졌다 — 규칙이 두 벌이면 반드시 갈라진다. */
           const cands = rowDetailCandidates({ row: rows[idx], listUrl, forms, landed, dom });
           for (const c of cands) {
-            const v = await verify(c, want, others);
+            const v = await verify(c, titles, others);
             if (v.ok) { url = c; break; }
-            lastWhy = v.why;
+            lastWhy = v.why; lastV = v.v;
             report.push(`    · 탈락(${v.why}) ${c.slice(0, 96)}`);
             /* 404는 '이 주소가 틀렸다'는 뜻이므로 **다음 후보를 시도해야 한다**.
                멈춰야 하는 건 시간초과·연결끊김처럼 '학교 서버에 닿지 못하는' 상황뿐이다.
@@ -652,7 +638,7 @@ for (const [listUrl, group] of boards) {
       rows = await scrapeRows(page);
 
       if (url) {
-        if (!DRY) { t.ref[t.field] = url; if (!t.ref.boardTitle) t.ref.boardTitle = cleanTitle(want); }
+        if (!DRY) { t.ref[t.field] = url; rememberBoardTitle(t, rowText); }
         found += 1;
         record(t, 'ok');
         report.push(`  - ✅ ${want.slice(0, 42)} → ${url.slice(0, 104)}`);
@@ -662,7 +648,8 @@ for (const [listUrl, group] of boards) {
            HTTP 404는 닿았는데 그 주소가 없다는 뜻이라 판정이 난 것이므로 횟수에 센다.
            안 그러면 404만 나는 공고는 시도 횟수가 영영 안 올라가 escalate가 되지 않고,
            매일 조용히 같은 실패를 반복한다 — '조용한 방치 불가' 설계가 무력해진다. */
-        const unreachable = /Timeout|ERR_|net::|클릭 실패/i.test(lastWhy);
+        /* 판정 불가(unread — 망 오류·5xx·껍데기)도 횟수에 안 센다 — 공용 판정의 약속(link-landing.mjs) */
+        const unreachable = lastV === 'unread' || /Timeout|ERR_|net::|클릭 실패/i.test(lastWhy);
         record(t, unreachable ? 'net' : 'bad', lastWhy || '주소를 못 만듦');
         report.push(`  - ⚠️ 실패(${lastWhy || '주소를 못 만듦'}): ${want.slice(0, 42)}`);
       }
@@ -730,7 +717,8 @@ if (stillLost.length && !outOfTime()) {
         t: (a.textContent || '').replace(/\s+/g, ' ').trim(), u: a.href,
       })).filter((x) => x.t.length >= 8), []).catch(() => []);
       const match = (hit || []).find((x) => sameTitle(title, x.t) && /^https?:/.test(x.u));
-      return match ? match.u : null;
+      /* 결과 화면의 다른 글 제목도 돌려준다 — 고른 주소가 목록·검색 화면인지 가리는 재료(빈 목록 금지 · 2026-10-03) */
+      return match ? { u: match.u, t: match.t, others: hit.map((x) => stripRowTail(x.t)).filter((x) => x && !sameTitle(title, x)).slice(0, 40) } : null;
     } catch { return null; } finally { await p.close().catch(() => {}); }
   }
 
@@ -744,7 +732,8 @@ if (stillLost.length && !outOfTime()) {
     for (const h of BOARD_HINTS) {
       try { if (new URL(h).origin === origin && listUrlOf(t.ref[t.field]) !== h) others.push(h); } catch { /* skip */ }
     }
-    let got = null; const tried = [];
+    let got = null; let gotText = ''; const tried = [];
+    const siteOthers = sameOriginTitles(t.ref[t.field], [want]);   // 같은 사이트의 다른 공고 제목 — 목록 판정 재료
     for (const board of others.slice(0, 3)) {
       if (outOfTime()) break;
       tried.push(board);
@@ -756,18 +745,26 @@ if (stillLost.length && !outOfTime()) {
           t: (e.textContent || '').replace(/\s+/g, ' ').trim(), u: e.href,
         })).filter((x) => x.t.length >= 8)).catch(() => []);
         const row = rows.find((r) => sameTitle(want, r.t) && isDetailUrl(r.u, board));
-        if (row) { const v = await verify(row.u, want, []); if (v.ok) got = row.u; }
+        if (row) {
+          /* 🔴 다른 글 제목을 넘긴다 — 예전엔 `verify(row.u, want, [])` 라 목록 화면도 통과했다 (2026-10-03) */
+          const boardOthers = rows.map((r) => stripRowTail(r.t)).filter((x) => x && !sameTitle(want, x)).slice(0, 40);
+          const v = await verify(row.u, [want, row.t, ...expectTitles(t.ref)], boardOthers.concat(siteOthers));
+          if (v.ok) { got = row.u; gotText = row.t; }
+        }
       } catch { /* 다음 후보 */ } finally { await p.close().catch(() => {}); }
       if (got) break;
     }
     // ② 학교 사이트 검색
     if (!got && origin && !outOfTime()) {
       tried.push(`${origin} (사이트 검색)`);
-      const u = await siteSearch(origin, want);
-      if (u) { const v = await verify(u, want, []); if (v.ok) got = u; }
+      const hit = await siteSearch(origin, want);
+      if (hit) {
+        const v = await verify(hit.u, [want, hit.t, ...expectTitles(t.ref)], hit.others.concat(siteOthers));
+        if (v.ok) { got = hit.u; gotText = hit.t; }
+      }
     }
     if (got) {
-      if (!DRY) { t.ref[t.field] = got; if (!t.ref.boardTitle) t.ref.boardTitle = want; }
+      if (!DRY) { t.ref[t.field] = got; rememberBoardTitle(t, gotText); }
       extraFound += 1; found += 1;
       record(t, 'ok');
       report.push(`  - ✅ 다른 경로에서 찾음: ${want.slice(0, 40)} → ${got.slice(0, 100)}`);
@@ -785,11 +782,9 @@ if (stillLost.length && !outOfTime()) {
 function saveAll(crashNote) {
   state.updatedAt = today;
   if (!DRY) {
-    /* ⚠️ `found` 만 보면 **순찰이 되돌린 것(demoted)이 통째로 버려진다** — demoted 는
-       found 를 올리지 않는다. 그러면 다음 실행이 같은 링크를 또 순찰한다.
-       짝인 resolve-detail-urls 는 `(fixed || reverted)` 로 처음부터 맞게 돼 있었다
-       (2026-09-05 코드 리뷰가 이 비대칭을 잡았다). */
-    if (found || demoted) {
+    /* 데이터를 바꾸는 것은 **사냥이 찾아 확인한 주소(found)뿐**이다 (2026-10-03).
+       예전엔 순찰이 되돌린 것(demoted)도 여기서 저장했다 — 순찰이 더는 주소를 고치지 않으므로 그 갈래는 없다. */
+    if (found) {
       /* 🔴 사냥 결과를 저장하기 전에 중복을 합친다 — 안 하면 감사가 이 실행의 결과를
          통째로 되돌린다(위 import 주석의 2026-09-03 사고). 표식이 진짜 주소로 풀리면서
          비로소 같은 글이 되는 것이라, 수집 때는 없던 중복이 여기서 처음 생긴다. */
@@ -834,8 +829,7 @@ function saveAll(crashNote) {
   }
 }
 
-/* 본업(사냥)이 끝났다. 시간이 남으면 그때 순찰한다 — 순찰에서 새로 드러난 건은
-   이번 실행에서 고치지 않고 **다음 실행의 사냥 대상**이 된다(표식으로 되돌려 놓는다). */
+/* 본업(사냥)이 끝났다. 순찰은 기본이 꺼짐이고, 켜도 판정만 link-hunt.json 에 적는다(주소를 고치지 않는다 · 2026-10-03). */
 report.push('');
 await runPatrol();
 
