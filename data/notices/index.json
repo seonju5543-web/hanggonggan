@@ -3,13 +3,13 @@
  "updatedAt": "2026-10-03",
  "schools": 36,
  "files": {
-  "서강대학교": {
-   "file": "n14n199r.json",
-   "count": 23
-  },
   "중앙대학교": {
    "file": "n1iz3lr8.json",
    "count": 17
+  },
+  "서강대학교": {
+   "file": "n14n199r.json",
+   "count": 23
   },
   "가천대학교": {
    "file": "nzzc8bm.json",
