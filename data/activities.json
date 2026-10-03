@@ -1019,9 +1019,9 @@
    "eligibilityExcludes": [
     "신청 시 요청하는 정보(개인정보포함)는 사업운영기관에서 관리되오니 이점 반드시 유의하여 주시기 바랍니다."
    ],
-   "detailsV": 2,
+   "detailsV": 3,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "창업진흥원 K-Startup",
@@ -1071,8 +1071,8 @@
     "제외 업종: 중소기업창업지원법 시행령 제4조 외",
     "신청 시 요청하는 정보(개인정보포함)는 사업운영기관에서 관리되오니 이점 반드시 유의하여 주시기 바랍니다."
    ],
-   "detailsV": 2,
-   "excerptsAt": "2026-10-02",
+   "detailsV": 3,
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "창업진흥원 K-Startup",
@@ -1115,12 +1115,15 @@
      "text": "10.26(월) ~ 10.30(금)"
     }
    ],
-   "detailsV": 2,
+   "detailsV": 3,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "광운대학교",
    "campus": "",
-   "foundAt": "2026-10-02"
+   "foundAt": "2026-10-02",
+   "eligibilityLines": [
+    "AI에 관심 있는 누구나 25인"
+   ]
   },
   {
    "title": "[국제학생] 2026학년도 2학기 광운대 한국어 연수과정 이수자 학부 학점 인정 안내(2차)",
@@ -1165,9 +1168,9 @@
     "1) 광운대학교 국제교육원 한국어 정규과정 4 급 이상 이수자",
     "2) 2026 학년도 2 학기 학부 외국인 신편입학 입학자"
    ],
-   "detailsV": 2,
+   "detailsV": 3,
    "field": "해외·교류",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-02"
@@ -1223,9 +1226,9 @@
     "× -->",
     "수정요청게시판 -->"
    ],
-   "detailsV": 2,
+   "detailsV": 3,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-02"
@@ -1261,9 +1264,9 @@
     }
    ],
    "deadlineHint": null,
-   "detailsV": 2,
+   "detailsV": 3,
    "field": "영상·사진",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-02"
@@ -1279,9 +1282,9 @@
     }
    ],
    "deadlineHint": "신청 기간 특강 제목 1 차 2026.10.23.( 금 ) 13:00~15:30 2026.10.02.( 금 ) 10:00 ~ 2026.10.22",
-   "detailsV": 2,
+   "detailsV": 3,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "한국방송통신대학교",
    "campus": "",
    "foundAt": "2026-10-02"
@@ -2260,12 +2263,12 @@
    ],
    "deadlineHint": null,
    "field": "IT·소프트웨어",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
    "foundAt": "2026-10-01",
-   "detailsV": 2
+   "detailsV": 3
   },
   {
    "title": "2026.06.15 두산연강재단, '제20회 과학교사 학술시찰' 진행 두산연강재단은 초·중·고 과학교사들을 대상으로 국내외 과학 관련 산업 현장과 교육 현장을 탐방하는 &lsquo;과학교사 학술시찰&rsquo;을 6월 15일부터 22일까지 진행한다.",
@@ -2274,12 +2277,12 @@
    "attachments": [],
    "deadlineHint": null,
    "field": "해외·교류",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "두산연강재단",
    "foundAt": "2026-10-01",
-   "detailsV": 2
+   "detailsV": 3
   },
   {
    "title": "2018년 사회복지 협력기관 워크숍",
@@ -2288,12 +2291,12 @@
    "attachments": [],
    "deadlineHint": null,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "아산사회복지재단",
    "foundAt": "2026-10-01",
-   "detailsV": 2
+   "detailsV": 3
   },
   {
    "title": "제15회 한국어능력시험(TOPIK) 쓰기 채점자 양성 워크숍 참가자 모집 공고",
@@ -2302,12 +2305,12 @@
    "attachments": [],
    "deadlineHint": null,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "국립국제교육원 공지",
    "foundAt": "2026-10-01",
-   "detailsV": 2
+   "detailsV": 3
   },
   {
    "title": "2026년 경기 스타트업 아카데미 딥테크 세미나 참여자 모집 / Future AI Technology - AI 메모리 반도체의 발전과 미래",
@@ -2335,12 +2338,15 @@
     }
    ],
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "창업진흥원 K-Startup",
    "foundAt": "2026-10-01",
-   "detailsV": 2
+   "detailsV": 3,
+   "eligibilityLines": [
+    "딥테크 분야에 관심있는 누구나"
+   ]
   },
   {
    "title": "[감사원] 2026년 국민제안 감사 아이디어 공모 기간 : 2026.10.01 ~ 2026.10.31",
@@ -2349,12 +2355,12 @@
    "attachments": [],
    "deadlineHint": null,
    "field": "기획·아이디어",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
    "foundAt": "2026-10-01",
-   "detailsV": 2
+   "detailsV": 3
   },
   {
    "title": "[행정안전부] 2026 재난안전 분야 논문 공모전 기간 : 2026.09.01 ~ 2026.11.10",
@@ -2363,12 +2369,12 @@
    "attachments": [],
    "deadlineHint": null,
    "field": "글쓰기·논문",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
    "foundAt": "2026-10-01",
-   "detailsV": 2
+   "detailsV": 3
   },
   {
    "title": "[기획예산처 복권위원회] 복권기금 아이디어 공모전 기간 : 2026.01.06 ~ 2026.12.31",
@@ -2387,7 +2393,7 @@
     }
    ],
    "field": "기획·아이디어",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
@@ -2395,7 +2401,7 @@
    "eligibilityLines": [
     "□ 응모자격 : 대한민국 국민이면 누구나"
    ],
-   "detailsV": 2
+   "detailsV": 3
   },
   {
    "title": "「청년여성재직자와 함께하는 내:일(JOB) ON캠프」 참여자 모집",
@@ -2419,7 +2425,7 @@
     }
    ],
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "경남청년정보플랫폼",
@@ -2430,7 +2436,7 @@
     "○ 참가비 : 전액 무료",
     "○ 주요내용 : 직무역량강화 특강, 금융교육, 체험·힐링 프로그램 등"
    ],
-   "detailsV": 2
+   "detailsV": 3
   },
   {
    "title": "아산시청소년 문학공모전 2026.08.04",
@@ -2439,12 +2445,12 @@
    "attachments": [],
    "deadlineHint": null,
    "field": "글쓰기·논문",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "아산시미래장학회",
    "foundAt": "2026-10-01",
-   "detailsV": 2
+   "detailsV": 3
   },
   {
    "title": "[과학기술정보통신부] 생활 속 전자파 바로 알기 동영상 및 포스터 공모전 기간 : 2026.06.15 ~ 2026.10.12",
@@ -2453,12 +2459,12 @@
    "attachments": [],
    "deadlineHint": null,
    "field": "영상·사진",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
    "foundAt": "2026-10-01",
-   "detailsV": 2
+   "detailsV": 3
   },
   {
    "title": "[교육부] 2026 똑똑! 수학탐험대 활용 숏폼 공모전 기간 : 2026.09.07 ~ 2026.10.12",
@@ -2468,7 +2474,7 @@
    "deadlineHint": "접수기간 2026. 9. 7.(월) 09:00 ~ 10. 12.(월) 18:00 참가자격 초등교원(현직) · 교육대학교 재학생(예비교원) 개인",
    "deadline": "2026-10-12",
    "field": "영상·사진",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
@@ -2477,7 +2483,7 @@
     "참가자격",
     "초등교원(현직) · 교육대학교 재학생(예비교원) 개인 또는 팀(최대 3인) / 최대 1건"
    ],
-   "detailsV": 2
+   "detailsV": 3
   },
   {
    "title": "[국토교통부] 2026 건설 추락사고 예방 콘텐츠 공모전 높은 곳에선, 더 높은 안전으로 기간 : 2026.09.14 ~ 2026.10.13",
@@ -2492,12 +2498,15 @@
      "text": "2026. 9. 14.(월) ~ 2026. 10. 13.(화) 18:00 까지"
     }
    ],
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
    "foundAt": "2026-10-01",
-   "detailsV": 2
+   "detailsV": 3,
+   "eligibilityLines": [
+    "건설현장 안전에 관심 있는 대한민국 국민 누구나"
+   ]
   },
   {
    "title": "[고용노동부] 2026 고용24 국민참여 AI 고용서비스 발굴 온라인 해커톤 기간 : 2026.09.21 ~ 2026.10.13",
@@ -2506,12 +2515,12 @@
    "attachments": [],
    "deadlineHint": "접수기간 2026. 9. 21. — 10. 13. 18:00 접수하기 요강 다운로드 ↓ 2026 고용24 국민참여 AI 고용서비스 발굴 온라인",
    "field": "IT·소프트웨어",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
    "foundAt": "2026-10-01",
-   "detailsV": 2
+   "detailsV": 3
   },
   {
    "title": "[농촌진흥청] 2026 농업·농촌 스토리텔링콘텐츠 공모전 기간 : 2026.08.25 ~ 2026.10.14",
@@ -2519,12 +2528,12 @@
    "kind": "공모전",
    "attachments": [],
    "deadlineHint": null,
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
    "foundAt": "2026-10-01",
-   "detailsV": 2
+   "detailsV": 3
   },
   {
    "title": "[농림축산식품부] 대국민 농촌관광 홍보영상 경진대회 기간 : 2026.07.15 ~ 2026.10.18",
@@ -2533,12 +2542,12 @@
    "attachments": [],
    "deadlineHint": null,
    "field": "광고·마케팅",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
    "foundAt": "2026-10-01",
-   "detailsV": 2
+   "detailsV": 3
   },
   {
    "title": "[질병관리청] 생명을 그리는 손, 당신의 심폐소생술 스토리 캐릭터 공모전 기간 : 2026.09.01 ~ 2026.10.18",
@@ -2563,12 +2572,15 @@
     }
    ],
    "field": "디자인·미술",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
    "foundAt": "2026-10-01",
-   "detailsV": 2
+   "detailsV": 3,
+   "eligibilityLines": [
+    "- 개인에 한하여 누구나 참여 가능"
+   ]
   },
   {
    "title": "[해양수산부] 2026 해양안전 콘텐츠 공모전 기간 : 2026.08.24 ~ 2026.10.22",
@@ -2614,12 +2626,15 @@
    "deadlineHint": null,
    "deadline": "2026-10-22",
    "field": "영상·사진",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
    "foundAt": "2026-10-01",
-   "detailsV": 2
+   "detailsV": 3,
+   "eligibilityLines": [
+    "4. 공모자격 : 대한민국 국민 누구나"
+   ]
   },
   {
    "title": "[해양수산부] 제1회 대한민국 국가어항·어촌 사진공모전 기간 : 2026.07.31 ~ 2026.10.23",
@@ -2628,12 +2643,15 @@
    "attachments": [],
    "deadlineHint": "접수기간 2026년 7월 31일(금)~10월 23일(금) 대국민 심사 2026년 11월 16일(월)~11월 20일(금) &nbsp; 수상자 발표",
    "field": "영상·사진",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
    "foundAt": "2026-10-01",
-   "detailsV": 2
+   "detailsV": 3,
+   "eligibilityLines": [
+    "바다를 사랑하는 대한민국 국민 누구나"
+   ]
   },
   {
    "title": "[국방부] 2026년 20회 국방홍보 영상공모전 기간 : 2026.08.03 ~ 2026.10.23",
@@ -2647,12 +2665,12 @@
    ],
    "deadlineHint": null,
    "field": "광고·마케팅",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
    "foundAt": "2026-10-01",
-   "detailsV": 2
+   "detailsV": 3
   },
   {
    "title": "[행정안전부] 공공 웹사이트 불법광고 탐지 도구 개발 공모전 기간 : 2026.09.14 ~ 2026.10.23",
@@ -2674,12 +2692,15 @@
    ],
    "deadlineHint": null,
    "field": "광고·마케팅",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
    "foundAt": "2026-10-01",
-   "detailsV": 2
+   "detailsV": 3,
+   "eligibilityLines": [
+    "○ 참가자격 : 전 국민 누구나(개인 또는 최대 5명으로 구성된 팀)"
+   ]
   },
   {
    "title": "[외교부] 제2회 KOREAZ 콘텐츠 공모전 기간 : 2026.06.01 ~ 2026.10.25",
@@ -2694,7 +2715,7 @@
      "text": "2026.6.1.(월)-2026.10.25.(일)"
     }
    ],
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
@@ -2702,7 +2723,10 @@
    "noticeLines": [
     "- 접수기간：2026.6.1.(월)-2026.10.25.(일)"
    ],
-   "detailsV": 2
+   "detailsV": 3,
+   "eligibilityLines": [
+    "ㅇ 전 세계인 누구나"
+   ]
   },
   {
    "title": "[기후에너지환경부] 제13회 대학생 물환경 정책·기술 공모전 기간 : 2026.09.28 ~ 2026.10.25",
@@ -2710,12 +2734,12 @@
    "kind": "공모전",
    "attachments": [],
    "deadlineHint": null,
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
    "foundAt": "2026-10-01",
-   "detailsV": 2
+   "detailsV": 3
   },
   {
    "title": "[식품의약품안전처] 2026년 마약 예방활동 우수사례 공모전 기간 : 2026.09.30 ~ 2026.10.30",
@@ -2723,12 +2747,12 @@
    "kind": "공모전",
    "attachments": [],
    "deadlineHint": null,
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
    "foundAt": "2026-10-01",
-   "detailsV": 2
+   "detailsV": 3
   },
   {
    "title": "[행정안전부] 2026 모바일신분증 아이디어 공모전 기간 : 2026.09.30 ~ 2026.10.30",
@@ -2746,7 +2770,7 @@
    ],
    "deadlineHint": "접수 기간은 10 월 1 일 ( 목 ) 9 시부터 10 월 30 일 ( 금 ) 18 시까지이며 , 참가 방법 , 제출 자료 , 심사 기준 등 자",
    "field": "기획·아이디어",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
@@ -2755,7 +2779,7 @@
     "접수 기간은 10 월 1 일 ( 목 ) 9 시부터 10 월 30 일 ( 금 ) 18 시까지이며 , 참가 방법 , 제출 자료 , 심사 기준 등 자세한 사항은 모바일신분증 누리집 (mobileid.go.kr) 과 소통 24 (sotong.go.kr) 에 게시된 공고문에서 확인할 수 있다",
     "접수 기간은 10 월 1 일 ( 목 ) 9 시부터 10 월 30 일 ( 금 ) 18 시까지이며 , 참가 방법 , 제출 자료 , 심사 기준 등 자세한 사항은 모바일신분증 누리집 (mobileid.go.kr) 과 소통 24 (sotong.go.kr) 에 게시된 공고문에서 확인할 수 있다"
    ],
-   "detailsV": 2
+   "detailsV": 3
   },
   {
    "title": "[교육부] 마음동행 숏폼 공모전 함께 100초 챌린지 기간 : 2026.09.30 ~ 2026.10.31",
@@ -2764,12 +2788,12 @@
    "attachments": [],
    "deadlineHint": null,
    "field": "영상·사진",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
    "foundAt": "2026-10-01",
-   "detailsV": 2
+   "detailsV": 3
   },
   {
    "title": "[우주항공청] 2026 스페이스 해커톤 기간 : 2026.09.14 ~ 2026.11.05",
@@ -2778,12 +2802,12 @@
    "attachments": [],
    "deadlineHint": null,
    "field": "IT·소프트웨어",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
    "foundAt": "2026-10-01",
-   "detailsV": 2
+   "detailsV": 3
   },
   {
    "title": "[과학기술정보통신부] 2026 제3회 국가지식정보 통합플랫폼 활용 우수사례 공모전 기간 : 2026.09.07 ~ 2026.11.06",
@@ -2805,12 +2829,12 @@
    ],
    "deadlineHint": null,
    "field": "과학·공학",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
    "foundAt": "2026-10-01",
-   "detailsV": 2
+   "detailsV": 3
   },
   {
    "title": "[스포츠재활 연구실] 만성 발목 불안정성 대상 감각-인지 기반 발목 재활운동 연구 참여자 모집",
@@ -2823,11 +2847,11 @@
     }
    ],
    "deadlineHint": null,
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "detailsV": 2
+   "detailsV": 3
   },
   {
    "title": "[일반] [HUSS-글로벌공생] 2026 인문사회 학생을 위한 AI 인사이트 특강 안내",
@@ -2867,7 +2891,7 @@
     }
    ],
    "field": "해외·교류",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-01",
@@ -2875,7 +2899,7 @@
     "3. 대상 : 광운대학교 HUSS 참여학과 재학생",
     "(국어국문학과, 국제학부, 국제통상학부, 영어산업학과, 미디어커뮤니케이션학부, 행정학과, 법학부, 정보융합학부)"
    ],
-   "detailsV": 2
+   "detailsV": 3
   },
   {
    "title": "2026학년도 대학생 청소년교육지원사업 3차 멘토 선발 안내",
@@ -2903,7 +2927,7 @@
     }
    ],
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "조선대학교",
    "campus": "",
    "foundAt": "2026-10-01",
@@ -2917,7 +2941,7 @@
    "noticeLines": [
     "장학금액 : ( 시간당 ) 12,790 원"
    ],
-   "detailsV": 2
+   "detailsV": 3
   },
   {
    "title": "[일반] [국립대학 육성사업] 3주만에 끝내는 AI 취업 치트키 특강",
@@ -2931,11 +2955,11 @@
    ],
    "deadlineHint": "신청 기간 특강 제목 1 차 2026.10.19.( 월 ) 10:00~12:00 2026.10.1.( 목 ) 10:00 ~ 2026.10.14.",
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "한국방송통신대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "detailsV": 2
+   "detailsV": 3
   },
   {
    "title": "[문화체육관광부] 내가 알리는 모두의 「희망사다리」 영상공모전 기간 : 2026.07.30 ~ 2026.10.04",
@@ -2949,12 +2973,15 @@
    ],
    "deadlineHint": null,
    "field": "영상·사진",
-   "excerptsAt": "2026-10-02",
+   "excerptsAt": "2026-10-03",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
    "foundAt": "2026-09-30",
-   "detailsV": 2
+   "detailsV": 3,
+   "eligibilityLines": [
+    "대한민국 국민 누구나"
+   ]
   },
   {
    "title": "[농촌진흥청] 2026 농업인 안전365 캠페인 공모전 기간 : 2026.07.16 ~ 2026.09.30",
