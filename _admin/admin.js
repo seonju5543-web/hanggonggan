@@ -2051,6 +2051,7 @@ const ROBOTS = [
   { f: 'open-api.yml', n: '공공 API 로봇', d: 'K-Startup·1365 봉사·온통청년에서 대외활동·공모전을 마감일·대상까지 받아 「대외활동」 탭에 싣습니다 (열쇠 없는 곳은 건너뜀)', when: '매일 04:17' },
   { f: 'link-hunter.yml', n: '링크 사냥꾼', d: '원문 주소를 못 찾은 공고를 계속 다시 찾습니다', when: '매일 06:37' },
   { f: 'resolve-detail-urls.yml', n: '원문 링크 복구', d: '목록 주소로 남은 공고를 게시판에서 찾아 고칩니다', when: '주 1회' },
+  { f: 'link-check.yml', n: '원문 링크 확인', d: '앱의 원문 링크를 학생처럼 새 탭으로 열어 그 공고가 뜨는지 봅니다 (주소는 고치지 않고, 다른 날 두 번 본 문제만 앱에 알립니다)', when: '매일 18:47' },
   /* 🔴 **지금 보는 공고가 아니라 `form_targets` 에 적힌 공고**의 첨부를 받아 온다.
      값을 안 보내면 워크플로 기본값('조병두')이 이겨 엉뚱한 공고를 받아 온다(실측). */
   {
@@ -2162,6 +2163,7 @@ const REPORTS = [
   ['collector/browser-report.md', '브라우저 수집'],
   ['collector/link-hunt-report.md', '링크 사냥꾼'],
   ['collector/resolve-report.md', '원문 링크 복구'],
+  ['collector/link-check-report.md', '원문 링크 확인'],
   ['collector/news-report.md', '교내 소식 수집'],
   ['collector/find-news-boards-report.md', '소식 게시판 찾기'],
 ];
