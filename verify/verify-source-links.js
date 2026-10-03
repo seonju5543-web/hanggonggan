@@ -251,6 +251,47 @@ const SCHOOL = process.env.LINKCHECK_SCHOOL || '경희';
   if (!(seenCls.list || 0) || !(seenCls.trouble || 0)) bad(`목록·문제 갈래를 각각 한 장 이상 재지 못했습니다 — 잰 갈래: ${clsLine || '없음'}`);
   else ok(`잰 갈래: ${clsLine}`);
 
+  /* ── ④ 캐시 엇갈림 — 옛 index.html(source-link.js 태그 없음) + 새 app.js (2026-10-03 리뷰 APP-1) ─────────
+     서비스워커는 첫 요청이 3.5초를 넘기면 캐시의 옛 index.html 을 내준다. 그 판에는 source-link.js 태그가 없어
+     sourceLink 가 없고 상세 시트가 통째로 죽었다(리뷰가 실제 서비스워커로 재현). app.js 는 그때 파일을 직접 불러 다시 그린다.
+     같은 프로필(같은 context)로 새 탭을 열고 HTML 에서 그 태그만 빼서 준다 → 카드를 열면 진짜 이름이 나와야 하고 오류가 없어야 한다.
+     red-green: app.js 의 대비 블록을 끄면 sourceLink 가 없어 시트를 못 연다(2026-10-03 실측). */
+  console.log('■ 캐시 엇갈림 — 옛 index.html(source-link.js 태그 없음)과 새 app.js 가 만나도 상세 시트가 산다');
+  {
+    const p2 = await context.newPage();
+    p2.setDefaultTimeout(8000);
+    const skewErr = [];
+    p2.on('pageerror', (e) => skewErr.push(e.message));
+    p2.on('dialog', async (d) => { await d.accept(); });
+    const stripTag = async (route) => {
+      const res = await route.fetch();
+      const body = (await res.text()).replace(/<script src="source-link\.js"><\/script>/, '');
+      await route.fulfill({ response: res, body });
+    };
+    await p2.route(`http://localhost:${PORT}/`, stripTag);
+    await p2.route('**/index.html', stripTag);
+    await p2.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
+    await p2.waitForSelector('#screen-home:not([hidden]), #screen-explore:not([hidden])').catch(() => {});
+    await dismissNotify(p2);
+    await p2.click('.nav-item[data-nav="explore"]').catch(() => {});
+    const id = (checked[0] || {}).id;
+    let label = '';
+    if (id) {
+      await p2.waitForSelector(`#explore-list [data-detail="${id}"]`).catch(() => {});
+      await p2.click(`#explore-list [data-detail="${id}"]`).catch((e) => skewErr.push('카드 열기: ' + e.message));
+      await p2.waitForSelector('#detail-sheet.show').catch(() => {});
+      label = await p2.$$eval('#detail-sheet .doc-legend a', (els) => (els.length ? els[els.length - 1].textContent.trim() : '')).catch(() => '');
+    }
+    const want = id ? SL.sourceLink(reg.find((r) => r.id === id), 'detail').label : '';   // judge 는 갈래를 세므로 부르지 않는다
+    const injected = await p2.evaluate(() => ({ tag: !!document.querySelector('script[src="source-link.js"]'), fn: typeof sourceLink })).catch(() => ({}));
+    await p2.close();
+    if (!id) bad('엇갈림 시험에 쓸 카드가 없습니다(②에서 연 카드 0건)');
+    else if (injected.fn !== 'function' || !injected.tag) bad(`source-link.js 를 스스로 불러오지 못했습니다 — ${JSON.stringify(injected)}`);
+    else if (skewErr.length) bad('엇갈림에서 오류: ' + skewErr.slice(0, 2).join(' | '));
+    else if (!label || label !== want) bad(`엇갈림에서 상세 시트 이름이 「${label || '(없음)'}」 — 「${want}」 이어야 합니다`);
+    else ok(`태그 없는 옛 화면에서도 파일을 스스로 불러 상세 시트가 「${label}」 로 열린다 · 오류 없음`);
+  }
+
   if (errors.length) bad('콘솔 오류: ' + errors.slice(0, 3).join(' | '));
   else ok('콘솔 오류 없음');
   await browser.close();
