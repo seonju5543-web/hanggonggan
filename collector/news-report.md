@@ -1,8 +1,8 @@
 ## 🗞 교내 소식 수집 리포트 (2026-10-03)
 
-새 글 **0건** → 앱 홈 「우리 학교 소식」 (학교별 파일 data/news/ · 43개교 · 게시판 아는 학교 43/44)
+새 글 **5건** → 앱 홈 「우리 학교 소식」 (학교별 파일 data/news/ · 43개교 · 게시판 아는 학교 43/44)
 
-⏱ 게시판 44곳을 2분 4초에 다 돌았습니다(예산 4분).
+⏱ 게시판 44곳을 2분 20초에 다 돌았습니다(예산 4분).
 
 ⚙️ 게시판 주소가 아직 없는 학교 1곳: 경북대학교 (찾기 로봇 리포트 collector/find-news-boards-report.md)
 
@@ -22,7 +22,8 @@
 상태: ✅ 정상 (공지 글 9건 감지 · 새 글 0)
 
 ### 고려대학교
-상태: ✅ 정상 (공지 글 10건 감지 · 새 글 0)
+상태: ✅ 정상 (공지 글 10건 감지 · 새 글 1)
+- [★ 한국어센터 '한국어 주간' Festival에 초대합니다! ★](https://www.korea.ac.kr/ko/566/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjElMkYwMDAwNjAwMDAwMDAwNjE0MTYlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D) — 2026-10-03
 
 ### 고려대학교 세종캠퍼스
 상태: ✅ 정상 (공지 글 3건 감지 · 새 글 0)
@@ -67,13 +68,17 @@
 상태: ✅ 정상 (공지 글 8건 감지 · 새 글 0)
 
 ### 가천대학교
-상태: ✅ 정상 (공지 글 10건 감지 · 새 글 0)
+상태: ✅ 정상 (공지 글 8건 감지 · 새 글 0)
 
 ### 아주대학교
-상태: ✅ 정상 (공지 글 11건 감지 · 새 글 0)
+상태: ✅ 정상 (공지 글 12건 감지 · 새 글 1)
+- [학사] [[공지] [학부/학사과정] 2026학년도 전기(2027년 2월) 조기졸업 신청 안내](https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=374471&article.offset=0&articleLimit=10) — 2026-08-28
 
 ### 국민대학교
-상태: ✅ 정상 (공지 글 9건 감지 · 새 글 0)
+상태: ✅ 정상 (공지 글 12건 감지 · 새 글 3)
+- [2026학년도 2학기 제1전공 변경신청 안내 2026.10.03 교무팀 박성구](https://www.kookmin.ac.kr/user/kmuNews/notice/4/12465/view.do?currentPageNo=1) — 2026-10-03
+- [2026학년도 2학기 제1전공 신청 안내 2026.10.03 교무팀 박성구](https://www.kookmin.ac.kr/user/kmuNews/notice/4/12464/view.do?currentPageNo=1) — 2026-10-03
+- [2026학년도 2학기 다전공 신청 2026.10.03 교무팀 박성구](https://www.kookmin.ac.kr/user/kmuNews/notice/4/12463/view.do?currentPageNo=1) — 2026-10-03
 
 ### 숭실대학교
 상태: ✅ 정상 (공지 글 6건 감지 · 새 글 0)
