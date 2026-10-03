@@ -1107,7 +1107,7 @@ function renderSrcScan() {
   const eligHtml = `
     <div class="sec-head"><h2>지원 자격을 아직 못 읽은 ${elig.length}건</h2>
       <p>원문이 저장된 ${have.length}건만 AI 자격 읽기가 읽습니다 ·
-         원문이 없는 ${none.length}건은 먼저 「공고 본문 재수집」이 필요합니다.</p></div>
+         원문이 없는 ${none.length}건은 먼저 「자격요건 로봇」이 필요합니다.</p></div>
     <div class="pgroup" data-pgroup data-elig-split>
       <div class="pgroup-head">
         <span class="pill">원문 있음 ${have.length}건</span>
@@ -1121,8 +1121,8 @@ function renderSrcScan() {
       <div class="pgroup-head">
         <span class="pill warn">원문 없음 ${none.length}건</span>
         <span class="pgroup-msg">먼저 본문을 받아 와야 합니다</span>
-        <button class="btn btn-sm" data-run="rescue-bodies.yml" data-run-name="공고 본문 재수집">
-          공고 본문 재수집 — 지금 실행</button>
+        <button class="btn btn-sm" data-run="rescue-bodies.yml" data-run-name="자격요건 로봇">
+          자격요건 로봇 — 지금 실행</button>
       </div>
       <div class="rows" data-rows>${none.slice(0, 20).map((it) => rowHtml(it)).join('')}</div>` : ''}
     </div>`;
@@ -1153,8 +1153,8 @@ function renderSrcScan() {
         <div class="scope-count" data-scope-count>${esc(countLine(c, school))}</div>
         ${c.line ? `<div class="excerpt">${esc(c.line)}</div>` : ''}
         ${c.state === 'nosrc' ? `<div class="btn-row">
-          <button class="btn btn-sm" data-run="rescue-bodies.yml" data-run-name="공고 본문 재수집">
-            공고 본문 재수집 — 지금 실행</button>
+          <button class="btn btn-sm" data-run="rescue-bodies.yml" data-run-name="자격요건 로봇">
+            자격요건 로봇 — 지금 실행</button>
           <button class="btn btn-sm" data-run="link-hunter.yml" data-run-name="링크 사냥꾼">
             링크 사냥꾼 — 지금 실행</button></div>` : ''}
       </div>
@@ -2062,9 +2062,9 @@ const ROBOTS = [
   },
   {
     f: 'rescue-bodies.yml',
-    n: '공고 본문 재수집',
-    d: '원문을 못 받은 공고의 본문을 진짜 브라우저로 다시 받습니다',
-    when: '매일 05:23',
+    n: '자격요건 로봇',
+    d: '진짜 브라우저로 자격을 찾습니다 — 장학 공고 본문 재수집 · 대외활동·공모전(첨부·포스터·PDF 포함)',
+    when: '매일 05:23 · 18:23',
     inputs: [{ name: 'cap', kind: 'num', label: '이번에 최대 몇 건', def: '25', min: 1, max: 200 }],
   },
   /* 돈이 나가는 로봇 — `def` 는 가장 싼 쪽이다 */

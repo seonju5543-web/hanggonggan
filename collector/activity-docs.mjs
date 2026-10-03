@@ -19,6 +19,11 @@
    🔴 받은 파일은 **커밋하지 않는다**(act-files 는 .gitignore) — 포스터가 글 15건에 8MB 였다(첫 실측). ①②는 한 실행 안에서 끝나고,
       ③은 필요한 파일을 그 자리에서 다시 받는다. 커밋하는 것은 '이미 해 봤다' 장부(act-docs.json)뿐이다.
    🔴 본문에서 자격이 나오면 본문이 이긴다 — 수집 로봇이 다시 읽을 때 putActivityDetails 가 정한다.
+   ④ --browser (2026-10-04 개발자 지시 "진짜 브라우저로 열어야 되는 공고는 다 자격요건 로봇으로") — ①②를 **진짜 크롬으로 그린 페이지**로.
+      자격요건 로봇(rescue-bodies.yml)만 이 모드로 돌린다(수집 로봇과 따로 · 겹치지 않게). 무료 모드로 이미 해 보고도 못 읽은 글만 맡는다.
+      🔴 data/activities.json 은 **쓰지 않는다** — 수집 로봇·공공 API 로봇이 이미 쓰는 파일이라 셋이 쓰면 push 가 부딪힌다.
+         결과는 자기 장부(collector/act-browser.json)에만 적고, 수집 로봇의 --apply 가 다음 실행에 합친다.
+      규칙(고르기·남의 글 막기·첨부·요강 페이지)은 무료 모드와 **한 벌** — 페이지를 받는 방법(getHtml)만 바꿔 끼운다.
    🔴 학생 화면에는 출처 표식을 안 낸다(2026-09-17 결정 — 공정 이야기는 관리자 몫). 데이터에만 남긴다.
    관문: verify/test-collector.mjs 「대외활동·공모전 — 첨부·포스터 읽기」
    ============================================================ */
@@ -35,14 +40,17 @@ const HERE = new URL('.', import.meta.url);
 const ACTS = fileURLToPath(new URL('../data/activities.json', HERE));
 const DIR = fileURLToPath(new URL('act-files/', HERE));          // 일회용 — .gitignore
 const MANIFEST = path.join(DIR, 'manifest.json');                // 이번 실행이 받은 파일 { 주소: [파일] }
-const LEDGER = fileURLToPath(new URL('act-docs.json', HERE));    // 커밋 — { 주소: { at, tries } }
+const BROWSER = process.argv.includes('--browser');
+const PLAIN_LEDGER = fileURLToPath(new URL('act-docs.json', HERE));       // 수집 로봇(무료 모드)의 장부 — { 주소: { at, tries } }
+const BROWSER_LEDGER = fileURLToPath(new URL('act-browser.json', HERE));  // 자격요건 로봇(브라우저 모드)의 장부 + 결과
+const LEDGER = BROWSER ? BROWSER_LEDGER : PLAIN_LEDGER;                   // 커밋 — 모드마다 제 장부만 쓴다(두 로봇이 같은 파일을 안 쓴다)
 const log = (m) => console.log(`[activity-docs] ${m}`);
 
-const POSTS_PER_RUN = 15;          // 한 실행에 받는 글
+const POSTS_PER_RUN = Number(process.env.ACT_DOCS_POSTS || 15);   // 한 실행에 받는 글
 const FILES_PER_POST = 3;          // 글 하나에서 받는 파일
 const MAX_BYTES = 8 * 1024 * 1024; // 파일 하나 (AI 그림 한계 10MB 아래)
 const MIN_IMG_BYTES = 40 * 1024;   // 이보다 작은 그림은 아이콘·버튼이다(포스터는 수백 KB)
-const BUDGET_MS = 80000;           // 이 단계 스스로의 예산(워크플로 단계 상한 아래)
+const BUDGET_MS = Number(process.env.ACT_DOCS_BUDGET_MS || 80000);   // 이 단계 스스로의 예산(워크플로 단계 상한 아래)
 const MAX_TRIES = 2;               // 무료로 해 볼 횟수 — 이레 간격(OCR 이 시간에 밀렸을 수 있다)
 const RETRY_DAYS = 7;
 
@@ -132,16 +140,52 @@ async function download(f, referer) {
   return { buf, ext, hash: crypto.createHash('sha1').update(buf).digest('hex').slice(0, 16) };
 }
 
+/* ── 페이지 받는 방법 — 여기만 갈아 끼운다(무료: fetch · 브라우저: 진짜 크롬) ── */
+async function plainHtml(url, referer) {
+  try {
+    const r = await fetch(url, { redirect: 'follow', headers: referer ? { ...FETCH_HEADERS, Referer: referer } : FETCH_HEADERS, signal: AbortSignal.timeout(15000) });
+    if (!r.ok || /pdf|image\/|octet-stream|zip|hwp/i.test(r.headers.get('content-type') || '')) return '';
+    return await r.text();
+  } catch { return ''; }
+}
+let getHtml = plainHtml;
+
+/* 진짜 크롬 — 자격요건 로봇 전용. 🔴 시간 초과 대비(collector/rescue-bodies.mjs 에서 배운 것을 그대로):
+   ① 한 페이지에 절대 시한(PAGE_MS) — goto 가 돌아와도 프레임 읽기가 멈출 수 있다 ② 팝업을 치운다(동국대: 팝업이 본문을 가렸다)
+   ③ 프레임 안까지 읽는다 ④ 브라우저가 죽으면 한 번 다시 띄운다 ⑤ 페이지는 반드시 닫는다 */
+const PAGE_MS = 45000;
+let browser = null, bctx = null;
+async function openBrowser() {
+  const { chromium } = await import('playwright');
+  browser = await chromium.launch({ args: ['--no-sandbox'] });
+  bctx = await browser.newContext({ userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36', locale: 'ko-KR' });
+}
+async function browserHtml(url) {
+  if (!browser || !browser.isConnected()) { try { await openBrowser(); } catch (e) { log(`브라우저를 못 띄움: ${String(e.message).slice(0, 120)}`); return ''; } }
+  const page = await bctx.newPage();
+  const work = (async () => {
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await page.waitForTimeout(5000);                      // 자바스크립트가 본문을 그릴 시간
+    for (const label of ['오늘 하루 보지 않기', '오늘하루 열지 않기', '오늘 하루 열지 않기', '팝업 닫기', '닫기']) {
+      try { const el = page.locator(`text=${label}`).first(); if (await el.count()) await el.evaluate((e) => e.click()); } catch { /* 없으면 그만 */ }
+    }
+    const parts = [];
+    for (const f of page.frames()) { try { parts.push(await f.content()); } catch { /* 죽은 프레임은 건너뛴다 */ } }
+    return parts.join('\n');
+  })();
+  try {
+    return await Promise.race([work, new Promise((res) => setTimeout(() => res(''), PAGE_MS))]);
+  } catch { return ''; } finally { page.close().catch(() => {}); }
+}
+
 /** 글 하나의 파일을 받는다 → act-files 안의 파일 이름들 */
 async function fetchPost(n, until, common = new Set(), owners = new Map()) {
-  let html = '';
-  try {
-    const r = await fetch(n.url, { redirect: 'follow', headers: FETCH_HEADERS, signal: AbortSignal.timeout(15000) });
-    if (r.ok) html = await r.text();
-  } catch { /* 못 받으면 null */ }
+  const html = await getHtml(n.url);
   if (!html) return null;
   const got = [];
   const key = keyOf(n.url);
+  /* 브라우저로 그린 본문은 `-B.txt` 로 — 일반 받기로는 글자 0 이던 자바스크립트 페이지의 본문이다 */
+  if (BROWSER) { fs.writeFileSync(path.join(DIR, `${key}-B.txt`), htmlToLines(html)); got.push(`${key}-B.txt`); }
   /* 파일 이름 끝의 `i` = 페이지에서 주운 그림(그 글의 것인지 제목 낱말로 확인해야 한다) · 없으면 글에 붙은 첨부 */
   const save = async (list, referer) => {
     for (const f of list) {
@@ -165,9 +209,8 @@ async function fetchPost(n, until, common = new Set(), owners = new Map()) {
   for (const [j, link] of guideLinks(html, n.url).slice(0, 2).entries()) {
     if (Date.now() > until) break;
     try {
-      const r = await fetch(link, { redirect: 'follow', headers: { ...FETCH_HEADERS, Referer: n.url }, signal: AbortSignal.timeout(15000) });
-      if (!r.ok || !/text\/html/.test(r.headers.get('content-type') || '')) continue;
-      const h = await r.text();
+      const h = await getHtml(link, n.url);
+      if (!h) continue;
       const name = `${key}-L${j}.txt`;
       fs.writeFileSync(path.join(DIR, name), htmlToLines(h));
       got.push(name);
@@ -209,6 +252,7 @@ async function fetchPhase(acts) {
   fs.mkdirSync(DIR, { recursive: true });
   const ledger = readJson(LEDGER, {});
   const manifest = readJson(MANIFEST, {});
+  const plainTried = BROWSER ? readJson(PLAIN_LEDGER, {}) : {};
   const today = new Date().toISOString().slice(0, 10);
   const until = Date.now() + BUDGET_MS;
   const common = new Set(ledger._common || []);   // 공통 그림 서명 — 장부에 남겨 다음 실행도 안 받는다
@@ -217,11 +261,14 @@ async function fetchPhase(acts) {
   for (const n of acts.items) {
     if (posts >= POSTS_PER_RUN || Date.now() > until) break;
     if (!needsElig(n) || !dueFree(ledger[n.url], today)) continue;
+    if (BROWSER && !plainTried[n.url]) continue;           // 무료 모드가 먼저 — 그래도 못 읽은 글만 브라우저로
+    if (BROWSER && ledger[n.url] && ledger[n.url].lines) continue;   // 이미 찾아 장부에 적었다 — 수집 로봇이 합치기 전까지 다시 열지 않는다
     posts += 1;
     const got = await fetchPost(n, until, common, owners);
     if (got === null) continue;                              // 글을 못 받았다 — 장부에 안 적는다(잠깐 끊긴 것을 굳히지 않게)
     manifest[n.url] = got;
-    ledger[n.url] = { at: today, tries: ((ledger[n.url] || {}).tries || 0) + 1 };
+    ledger[n.url] = { ...(ledger[n.url] || {}), at: today, tries: ((ledger[n.url] || {}).tries || 0) + 1 };
+    if (BROWSER) fs.writeFileSync(LEDGER, JSON.stringify({ ...ledger, _common: [...common].slice(-200) }, null, 1) + '\n');   // 글마다 저장 — 시간 초과로 끊겨도 해 본 것은 남는다
     files += got.length;
   }
   /* 피드에서 빠진 글은 장부에서도 뺀다 */
@@ -246,7 +293,7 @@ export const titleWords = (title) => [...new Set(String(title || '').replace(/�
 export const ownsImageText = (text, title) => { const t = String(text || '').replace(/\s/g, ''); return titleWords(title).some((w) => t.includes(w)); };
 
 /* 읽는 순서 — 요강 페이지 글자 → 원문 글자(HWP·HWPX·DOCX) → OCR(PDF·그림). 사람이 쓴 글자가 기계가 읽은 글자보다 먼저다 */
-const RANK = (f) => (/\.txt$/.test(f) ? 0 : /\.(hwpx?|docx)$/i.test(f) ? 1 : 2);
+const RANK = (f) => (/-B\.txt$/.test(f) ? 0 : /\.txt$/.test(f) ? 1 : /\.(hwpx?|docx)$/i.test(f) ? 2 : 3);   // 브라우저 본문 → 요강 페이지 → HWP·DOCX → OCR
 export const fileOrder = (files) => [...(files || [])].sort((a, b) => RANK(a) - RANK(b));
 /** 받은 파일 글자에서 자격을 고른다 — 규칙은 본문과 같은 activityDetails 하나 */
 export function eligFromFiles(n, files, readText = (p) => (/\.txt$/.test(p) ? fs.readFileSync(p, 'utf8') : attachmentText(p)), dir = DIR, isOcr = isOcrSource) {
@@ -258,9 +305,10 @@ export function eligFromFiles(n, files, readText = (p) => (/\.txt$/.test(p) ? fs
     const ocr = !/\.txt$/.test(f) && isOcr(p);
     /* 페이지에서 주운 그림(이름 끝 `i`)과 따라간 요강 페이지(`-L0.txt`)는 그 글의 것인지 본다 — 글에 붙은 첨부는 그 글의 것이다.
        🔴 따라간 페이지가 재단의 다른 장학금 안내였던 적이 있다(장학수기 공모전 심사 결과 → 「성적우수 장학금 (대학교 2학년 이상)」) */
-    if ((/-L\d+\.txt$/.test(f) || (ocr && /\di\.\w+$/.test(f))) && !ownsImageText(text, n.title)) continue;
+    /* 브라우저 본문(`-B.txt`)도 같다 — 글 주소가 포털 첫 화면으로 가서 1,409줄에 제목이 한 번도 없었다(제주도청 · 메뉴 `장애인 복지정책` 이 자격으로 뽑혔다) */
+    if ((/-[LB]\d*\.txt$/.test(f) || (ocr && /\di\.\w+$/.test(f))) && !ownsImageText(text, n.title)) continue;
     const d = activityDetails(text, n.title);
-    if (d.eligibilityLines.length) return { ...d, from: /\.txt$/.test(f) ? '요강 페이지' : ocr ? '공고문 첨부(OCR)' : '공고문 첨부' };
+    if (d.eligibilityLines.length) return { ...d, from: /-B\.txt$/.test(f) ? '브라우저 본문' : /\.txt$/.test(f) ? '요강 페이지' : ocr ? '공고문 첨부(OCR)' : '공고문 첨부' };
   }
   return null;
 }
@@ -269,17 +317,36 @@ export function eligFromFiles(n, files, readText = (p) => (/\.txt$/.test(p) ? fs
 function applyPhase(acts) {
   const manifest = readJson(MANIFEST, {});
   let got = 0;
+  /* 브라우저 모드는 결과를 제 장부에만 — data/activities.json 은 수집 로봇 몫(위 ④) */
+  const bled = BROWSER ? readJson(BROWSER_LEDGER, {}) : null;
   for (const n of acts.items) {
     const files = manifest[n.url];
     if (!files || !files.length || !needsElig(n)) continue;
     const d = eligFromFiles(n, files);
     if (!d) continue;
+    if (BROWSER) { bled[n.url] = { ...(bled[n.url] || {}), lines: d.eligibilityLines, excludes: d.eligibilityExcludes, from: d.from }; got += 1; continue; }
     n.eligibilityLines = d.eligibilityLines;
     if (d.eligibilityExcludes.length) n.eligibilityExcludes = d.eligibilityExcludes;
     n.eligibilityFrom = d.from;
     got += 1;
   }
-  log(`읽기 — 첨부·포스터에서 자격 ${got}건`);
+  if (BROWSER) fs.writeFileSync(BROWSER_LEDGER, JSON.stringify(bled, null, 1) + '\n');
+  else got += mergeBrowserResults(acts);
+  log(`읽기 — ${BROWSER ? '브라우저로 ' : '첨부·포스터에서 '}자격 ${got}건`);
+  return got;
+}
+
+/** 자격요건 로봇이 장부에 적어 둔 결과를 활동 글에 합친다 — 수집 로봇(무료 모드 --apply)만 부른다. 아직 자격이 없는 글에만 */
+export function mergeBrowserResults(acts, bled = readJson(BROWSER_LEDGER, {})) {
+  let got = 0;
+  for (const n of acts.items) {
+    const r = bled[n.url];
+    if (!r || !r.lines || !r.lines.length || !needsElig(n)) continue;
+    n.eligibilityLines = r.lines;
+    if (r.excludes && r.excludes.length) n.eligibilityExcludes = r.excludes;
+    n.eligibilityFrom = r.from;
+    got += 1;
+  }
   return got;
 }
 
@@ -343,10 +410,18 @@ if (!process.env.ACTIVITY_DOCS_AS_LIB) {
   if (!acts || !Array.isArray(acts.items)) { log('data/activities.json 없음 — 건너뜀'); process.exit(0); }
   const arg = (a) => process.argv.includes(a);
   let changed = false;
+  if (BROWSER) {
+    getHtml = browserHtml;
+    /* 넘어져도 장부는 남긴다(글마다 이미 저장) · 브라우저는 반드시 닫는다 */
+    const bye = () => { try { if (browser) browser.close(); } catch { /* 이미 닫힘 */ } };
+    process.on('uncaughtException', (e) => { log(`넘어짐: ${String(e && e.message || e).slice(0, 200)}`); bye(); process.exit(1); });
+  }
   if (arg('--fetch')) await fetchPhase(acts);
+  if (browser) await browser.close().catch(() => {});
   if (arg('--apply')) changed = applyPhase(acts) > 0 || changed;
   if (arg('--ai')) changed = (await aiPhase(acts, arg('--write'))) > 0 || changed;
-  /* 저장 형식은 수집 로봇과 같다(collect.mjs — JSON.stringify(x, null, 1)) — 다르면 파일 전체가 바뀐 것으로 보인다 */
-  if (changed) fs.writeFileSync(ACTS, JSON.stringify(acts, null, 1));
+  /* 저장 형식은 수집 로봇과 같다(collect.mjs — JSON.stringify(x, null, 1)) — 다르면 파일 전체가 바뀐 것으로 보인다.
+     🔴 브라우저 모드는 activities.json 을 쓰지 않는다(위 ④) */
+  if (changed && !BROWSER) fs.writeFileSync(ACTS, JSON.stringify(acts, null, 1));
   log(`자격 0줄인 활동 글 ${acts.items.filter(needsElig).length}건 남음 (전체 ${acts.items.length})`);
 }

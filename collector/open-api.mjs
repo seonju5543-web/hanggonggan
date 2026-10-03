@@ -62,10 +62,14 @@ async function getText(base, params, reqMs = REQ_MS) {
       return { status: res.status, text };
     } catch (e) {
       last = e;
-      if (i < 2) await sleep(3000 * (i + 1));
+      /* 🔴 간격을 길게 — 3초·6초로는 잠깐 끊긴 공공데이터포털을 못 넘겼다(2026-10-01 13:50 · 10-02 23:06 예약 실행 'fetch failed' ·
+         같은 날 낮 수동 실행은 성공). 하루 한 번 실행이 그렇게 지면 그날 새 글이 통째로 빠진다. 10초 · 40초 쉬고 다시 묻는다 */
+      if (i < 2) await sleep([10000, 40000][i]);
     }
   }
-  throw new ApiError(last?.name === 'TimeoutError' ? `응답 없음(${reqMs / 1000}초 × 3회)` : `요청 실패: ${last?.message || last}`);
+  /* 'fetch failed' 만으로는 원인을 모른다 — 연결 거부·이름 못 찾음·인증서·시간 초과를 함께 적는다(다음엔 짐작하지 않게) */
+  const cause = last?.cause ? ` (${last.cause.code || last.cause.name || ''}${last.cause.message ? ` ${String(last.cause.message).slice(0, 80)}` : ''})` : '';
+  throw new ApiError(last?.name === 'TimeoutError' ? `응답 없음(${reqMs / 1000}초 × 3회)` : `요청 실패: ${last?.message || last}${cause}`);
 }
 
 /* 오류 응답에서 사람이 읽을 이유를 뽑는다(공공데이터포털은 JSON 을 달라 해도 오류는 XML 로 준다) */
@@ -222,7 +226,9 @@ for (const src of Object.keys(API_SOURCES)) {
       lines.push(`  - 자격 줄 있는 글 ${items.filter((n) => (n.eligibilityLines || []).length).length}/${items.length} · 원문 안내 있는 글 ${items.filter((n) => (n.noticeLines || []).length).length}/${items.length}`);
     }
     /* 첫 행의 칸 이름 — 명세와 실제가 다르면 여기서 바로 보인다(값은 안 적는다 · 담당자 연락처 등이 섞여 있다) */
-    if (rows[0]) lines.push(`  - 첫 행 칸: \`${Object.keys(rows[0]).slice(0, 40).join(', ')}\``);
+    if (rows[0]) lines.push(`  - 첫 행 칸: \`${Object.keys(rows[0]).join(', ')}\``);
+    /* 코드 칸(…Cd)의 실제 값 — 온통청년 정책의 결혼·소득·지역·학력 조건이 코드로 온다. 명세로 뜻을 확인하기 전엔 자격으로 안 쓴다(짐작 금지 · 2026-10-04) */
+    if (rows[0]) { const cds = Object.keys(rows[0]).filter((k) => /Cd$/.test(k)); if (cds.length) lines.push(`  - 코드 칸 값(첫 세 행): ${cds.map((k) => `${k}=${rows.slice(0, 3).map((r) => String(r[k] ?? '').slice(0, 40)).join('|')}`).join(' · ')}`); }
     items.slice(0, 3).forEach((n) => lines.push(`  - ${n.kind} · ${n.title}${n.deadline ? ` (~${n.deadline})` : ''} — ${n.url}`));
   } catch (e) {
     results[src] = { ok: false };
