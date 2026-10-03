@@ -11085,9 +11085,17 @@ console.log('\n■ 대외활동·공모전 — 활동 글의 자격 읽기 (2026
   eq('  (리뷰) 제목 머리말 `[서울문화재단] …` 은 이름표로 바꾸지 않는다 · 맨 제목 줄 `지원자격` 아래 내용은 자격이다',
     [AX.activityDetails('[서울문화재단] 2026 청년예술인 모집').noticeLines.concat(el('[서울문화재단] 2026 청년예술인 모집')).some((l) => /서울문화재단 :/.test(l)), el(['지원자격', '대학 재학생으로서 평점 3.0 이상인 자', '신청기간 : 2026. 10. 1. ~ 10. 20.'].join('\n'))],
     [false, ['대학 재학생으로서 평점 3.0 이상인 자']]);
+  const PRX0 = rq('../parse-requirements.js');
   const natOf = (l) => (rq('../parse-requirements.js').parseLine(l).conds.find((c) => c.kind === 'nationality') || {}).eq;
   eq('  (리뷰) `대한민국 국적자로 결격사유가 없는 자` 는 한국 국적 요건 · `대한민국 국적이 없는 자` 는 외국 국적', [natOf('대한민국 국적자로 결격사유가 없는 자'), natOf('대한민국 국적이 없는 자')], ['korean', 'foreign']);
   eq('  (리뷰) `전남 누구나` 의 \'전\' 은 지우지 않는다(누구나 축이 지역을 덮지 않는다)', rm('전남 누구나') !== 'ok', true);
+  /* ⑦ 사는 곳 (2026-10-03 개발자 지적 "대전 거주 청년 이런거는 알 수 있잖아 … 주소 넣잖아") — 시·도도 시·군처럼 판정한다 */
+  const seoul = { ...P, region: '서울', parentRegion: '서울' };
+  eq('⑦ 시·도 거주 — 서울 학생(부모도 서울)에게 `대전시 거주 청년` 은 미달 · 대전 학생은 충족 · 부모가 대전이면 충족',
+    [rm('대전시 거주 청년 ( 만 18~39 세 )', seoul), rm('대전시 거주 청년 ( 만 18~39 세 )', { ...seoul, region: '대전', parentRegion: '대전' }), rm('본인 또는 부모가 대전시에 주민등록이 되어 있는 청년', { ...seoul, parentRegion: '대전' })], ['no', 'ok', 'ok']);
+  eq('  🔴 다른 연고로도 되는 줄은 미달이 아니다(틀린 미달 금지) — 생활권 · ○○ 소재 대학 또는 주민등록자',
+    [rm('경기도에 거주하거나 생활권을 두고 있는 청년', seoul), rm('부산시 소재 대학졸업(예정)자 또는 주민등록자', seoul)].map((v) => v !== 'no'), [true, true]);
+  eq('  `39세 이하 청년 (부산시 청년 기준)` 은 나이 세는 법이지 사는 곳이 아니다', PRX0.parseLine('39세 이하 청년 (부산시 청년 기준)').conds.some((c) => c.kind === 'residence'), false);
   eq('⑥ 소급 — 판(detailsV)을 올려 옛 글도 다시 읽는다 · 수집 로봇은 제목을 넘긴다',
     [AX.ACT_DETAILS_V >= 3, (readText(new URL('../collector/collect.mjs', import.meta.url)).match(/activityDetails\(detail\.text, it\.title\)/g) || []).length], [true, 2]);
 }

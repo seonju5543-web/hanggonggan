@@ -420,7 +420,11 @@ function judgeCond(c, p, ctx) {
       if (c.inArea) return 'unknown';                           // 관할을 못 알아냈다
       const mine = [p.region, p.parentRegion].filter(Boolean);
       if (!mine.length || !c.anyOf.length) return 'unknown';
-      return c.anyOf.some((r) => mine.some((x) => x.includes(r) || r.includes(x))) ? 'pass' : 'unknown';
+      /* 🔴 시·도도 시·군과 같은 규칙 — 학생이 고른 시·도(본인·부모 둘 다)와 다르면 미달이다 (2026-10-03 개발자 지적:
+         *"대전 거주 청년 이런거는 알 수 있잖아 우리 처음에 학적정보 넣을 때 주소 넣잖아"*). 예전엔 여기만 'unknown' 이라
+         서울 학생에게 `대전시 거주 청년` 이 '모름'이었다. 예외 문구(`관외 거주 인정`·`생활권`·`소재`)가 있는 줄은 conf 가 LOW 라
+         lineVerdict 가 ✕ 로 만들지 않는다 — 시·군 규칙과 같은 안전장치다. */
+      return c.anyOf.some((r) => mine.some((x) => x.includes(r) || r.includes(x))) ? 'pass' : 'fail';
     }
     default: return 'unknown';
   }
