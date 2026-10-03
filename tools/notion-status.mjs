@@ -76,7 +76,7 @@ const PEOPLE = {
       없으므로 붙이지 않는다(그건 지어내는 것이다). 무엇을 했는지는 바로 옆 '최근 커밋' 칸이
       원문 그대로 말한다. */
 const AREAS = [
-  [/^collector\/(link-hunter|resolve-detail-urls|probe-links|detail-url|canon-url)/, '원문 링크 찾기'],
+  [/^collector\/(link-hunter|resolve-detail-urls|probe-links|detail-url|canon-url|link-check|link-landing)|^source-link\.js$/, '원문 링크 찾기'],
   [/^collector\/kosaf|^data\/kosaf/, '한국장학재단 목록'],
   [/^collector\/(schematize|schema-from-text)/, '양식 스키마화'],
   [/^collector\/(extract-excerpts|rescue-bodies|notice-source|deepfetch)/, '공고 원문 확보'],
