@@ -136,6 +136,15 @@ export default async function gate(eq, ctx) {
   const ukSrc = fs.readFileSync(new URL('collector/url-key.mjs', ctx.root), 'utf8');
   eq('⑥ url-key.mjs 의 「목록 주소+번호」 정규식은 source-link.js 원본과 글자까지 같다(관리자 화면 때문에 둔 사본) · url-key.mjs 는 source-link.js 를 import 하지 않는다',
     [reOf(ukSrc).length > 20 && reOf(ukSrc) === reOf(slSrc), /from '\.\.\/source-link\.js'/.test(ukSrc)], [true, false]);
+  const ent = { url: 'https://student.snu.ac.kr/x/?mod=document&#038;uid=361' };
+  const dec = { url: 'https://student.snu.ac.kr/x/?mod=document&uid=361' };
+  eq('  (리뷰 F4) 기호가 남은 주소는 되돌린 같은 주소에 진다(어느 쪽이 먼저 와도) — ESM·CJS', [U.preferNotice(ent, dec) === dec, U.preferNotice(dec, ent) === dec, UC.preferNotice(ent, dec) === dec], [true, true, true]);
+  const twinA = { school: '가천대학교', title: '[장학공지] 2026년 우양재단 동행 장학생 모집', url: 'https://www.gachon.ac.kr/kor/7986/subview.do?nttId=125843', foundAt: '2026-10-01' };
+  const twinB = { school: '가천대학교', title: '[공통] 2026년 우양재단 동행 장학생 모집 N', url: 'https://www.gachon.ac.kr/bbs/kor/478/125843/artclView.do', foundAt: '2026-10-01' };
+  eq('  (리뷰 F4) 제목 머리말이 다른 쌍둥이(목록+번호 ↔ 같은 글 번호의 진짜 주소)는 한 장으로 합쳐지고 진짜 주소가 남는다 · 다른 글은 안 합친다',
+    [U.dedupeNotices([twinA, twinB]).map((n) => n.url), UC.dedupeNotices([twinB, twinA]).map((n) => n.url),
+      U.dedupeNotices([{ ...twinB, url: 'https://www.gachon.ac.kr/bbs/kor/478/1/artclView.do' }, { ...twinB, title: '다른 공고 2026 장학', url: 'https://www.gachon.ac.kr/bbs/kor/478/2/artclView.do' }]).length],
+    [[twinB.url], [twinB.url], 2]);
   eq('  진짜 주소 > 목록 표식 > 목록 주소+번호 — ESM(수집기·병합기)과 CJS 다리(감사)가 같은 답',
     [order(U.preferNotice), order(UC.preferNotice)], [[true, true, true, true, true], [true, true, true, true, true]]);
 }
