@@ -156,6 +156,8 @@ export function otherTitlesFor(target, targets, siteTitles = [], cap = 80) {
    tier 0 — 처음 보는 정식 등록(학생이 신청하러 누르는 곳)  1 — 처음 보는 나머지
         2 — 한 번 본 문제(앞선 날 · 오늘 다시 보면 '다른 날 두 번'이 되어 확정)
         3 — 확정된 문제(풀렸는지 — 오래 안 본 것부터)  4 — 나머지(오래 안 본 것부터)
+   🔴 여는 순서는 **2 → 0 → 1 → 3 → 4** (2026-10-03 리뷰 LC-4) — 한 번 본 문제를 다시 여는 것이 앱 글자를 바꾸는 일이다.
+      처음 보는 링크 뒤에 두면 사이트 상한(8)에 밀려 링크가 많은 학교(광운 63건)는 확정까지 여드레가 걸렸다.
    오늘 이미 본 것은 다시 열지 않는다(같은 날 두 번은 한 번으로 센다 — nextState).
    opts: { perHost(기본 8), max(기본 400) } — 한 사이트를 몰아치지 않게 사이트마다 상한. */
 export function tierOf(t, state, today) {
@@ -177,7 +179,8 @@ export function planQueue(targets, state, today, opts = {}) {
     if (r.tier >= 3) return `${r.s.lastAt || ''}${r.s.v ? 1 : 0}`;   // 오래 안 본 것 · 판정이 아직 없는 것(모름) 먼저
     return '';
   };
-  rows.sort((a, b) => (a.tier - b.tier) || (key(a) < key(b) ? -1 : key(a) > key(b) ? 1 : 0) || (a.i - b.i));
+  const ORDER = { 2: 0, 0: 1, 1: 2, 3: 3, 4: 4 };
+  rows.sort((a, b) => (ORDER[a.tier] - ORDER[b.tier]) || (key(a) < key(b) ? -1 : key(a) > key(b) ? 1 : 0) || (a.i - b.i));
   const perCount = new Map();
   const out = [];
   for (const r of rows) {

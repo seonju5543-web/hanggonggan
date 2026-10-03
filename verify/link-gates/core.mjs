@@ -1,13 +1,14 @@
 /* 「원문 링크 정직성」 — core 갈래: 앱이 쓰는 규칙(source-link.js)과 로봇이 쓰는 판정(collector/link-landing.mjs)
    (2026-10-03 · 원문 대신 재단 홈페이지·게시판 목록이 열리던 사고)
    🔴 여기 기대 값은 **실측 사례**다 — 서울대 `&#038;` · 층2 재단 홈페이지 · 가천 목록+번호 · 전북 로그인 상자 · 동국 껍데기. */
+import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import * as J from '../../collector/link-landing.mjs';
 
 const require = createRequire(import.meta.url);
 const L = require('../../source-link.js');
 
-export default async function gate(eq) {
+export default async function gate(eq, ctx) {
   /* ① 주소에 박힌 HTML 기호 — 서울대 학생처 실측 주소 */
   const snu = 'https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d/?mod=document&#038;category1=%EC%9E%A5%ED%95%99&#038;uid=392';
   eq('① `&#038;` 을 되돌린다 — 안 하면 `#` 뒤가 조각이 돼 글 번호(uid)가 서버에 안 간다',
@@ -91,6 +92,37 @@ export default async function gate(eq) {
     J.publishBad({ 'https://a/x?a=1&b=2': { v: 'list', at: 'd', confirmed: true }, 'https://a/y': { v: 'list', at: 'd', confirmed: false }, 'https://a/z': { v: 'list', at: 'd', confirmed: true } }, ['https://a/x?a=1&amp;b=2']),
     { 'https://a/x?a=1&b=2': { v: 'list', at: 'd' } });
   eq('  앱과 로봇의 문제 종류는 한 벌', J.BAD, L.LINK_BAD);
+
+  /* ⑦ 2026-10-03 리뷰(로봇 갈래) 여섯 — 실측 재현 사례 그대로 */
+  const fdn = '관정이종환교육재단';
+  const ftitle = [`2026학년도 ${fdn} 장학생 선발 공고`];
+  eq('⑦ LC-2 머리글이 공고 제목 **안에 든 짧은 이름**(재단 이름)이면 제목 자리가 아니다 · 잘린 제목·제목을 품은 머리글은 맞다',
+    [J.headMatches(ftitle[0], fdn), J.headMatches(ftitle[0], `${ftitle[0]} | 공지사항`), J.headMatches(ftitle[0], `2026학년도 ${fdn} 장학생 선발`)], [false, true, true]);
+  eq('  LC-2 첫 화면으로 돌려보내지면 첫 화면 띠에 그 제목이 있어도 home · 재단 이름이 창 제목인 없는 글(soft-404)은 post 가 아니다',
+    [J.judgeLanding({ status: 200, requestedUrl: 'https://www.ikjf.or.kr/board/view?id=1', finalUrl: 'https://www.ikjf.or.kr/', docTitle: fdn, headings: [`공지 ${ftitle[0]}`], text: `${ftitle[0]} ${'z'.repeat(800)}`, titles: ftitle }).v,
+      J.judgeLanding({ status: 200, requestedUrl: 'https://www.ikjf.or.kr/board/view?id=11', docTitle: fdn, headings: [fdn], text: `요청하신 게시물이 존재하지 않습니다 ${'z'.repeat(1600)}`, titles: ftitle }).v !== 'post'],
+    ['home', true]);
+  eq('  LC-5 짧은 로그인 화면(비밀번호 칸)은 판정 불가가 아니라 login · HTTP 401 은 gone 이 아니라 login',
+    [J.judgeLanding({ status: 200, requestedUrl: 'https://s.kr/view?id=5', finalUrl: 'https://s.kr/sso/login', text: '통합 로그인 아이디 비밀번호', hasPassword: true, titles: ftitle }).v,
+      J.judgeLanding({ status: 401, requestedUrl: 'https://s.kr/view?id=5', titles: ftitle }).v], ['login', 'login']);
+  const g404 = J.hostGuard([1, 2, 3, 4, 5].map((i) => ({ host: 'big', v: 'gone', why: 'HTTP 404', decisive: true, wasBad: true }))
+    .concat([1, 2, 3].map(() => ({ host: 'big', v: 'post', why: '' }))));
+  const gPend = J.hostGuard([1, 2, 3, 4, 5].map(() => ({ host: 'b2', v: 'other', why: '다른 글', wasBad: true }))
+    .concat([1, 2, 3].map(() => ({ host: 'b2', v: 'post', why: '' }))));
+  const gHome = J.hostGuard([1, 2, 3, 4].map(() => ({ host: 'b3', v: 'home', why: '사이트 첫 화면으로 돌려보내짐', decisive: true })));
+  const gBlock = J.hostGuard([1, 2, 3, 4, 5, 6, 7, 8].map(() => ({ host: 'b4', v: 'other', why: '다른 글' })));
+  eq('  LC-1 막힘 의심은 처음 보는 제목 없는 문제로만 잰다 — 404·첫 화면 돌려보냄은 결정적 · 다시 연 문제 다섯 + 공고 셋은 막힘 아님 · 처음 보는 여덟이 다 제목 없으면 막힘',
+    [g404.filter((r) => r.v === 'gone').length, gPend.filter((r) => r.v === 'other').length, gHome.filter((r) => r.v === 'home').length, gBlock.every((r) => r.v === 'unread')],
+    [5, 5, 4, true]);
+  let s6 = J.nextState(undefined, { v: 'list', why: 'a' }, '2026-10-04');
+  s6 = J.nextState(s6, { v: 'other', why: 'b' }, '2026-10-05');
+  const c1 = [s6.v, s6.n, s6.confirmed];
+  s6 = J.nextState(s6, { v: 'list', why: 'a' }, '2026-10-06');
+  eq('  LC-6 문제의 종류가 날마다 바뀌어도(목록 ↔ 다른 화면) 다른 날 두 번이면 확정 · 확정은 공고가 뜰 때까지 유지', [c1, [s6.v, s6.confirmed]], [['other', 2, true], ['list', true]]);
+  const lcSrc = fs.readFileSync(new URL('collector/link-check.mjs', ctx.root), 'utf8');
+  eq('  LC-3 확인 로봇은 판정 재료를 observeLanding 한 벌로 읽는다(h1~h3 를 전부 제목 자리로 세는 사본 없음)',
+    [/import \{ observeLanding \} from '\.\/detail-url\.mjs'/.test(lcSrc), /querySelectorAll\('h1,h2,h3'\)/.test(lcSrc), /await observeLanding\(page, res\)/.test(lcSrc)], [true, false, true]);
+  eq('  LC-1 확인 로봇은 hostGuard 에 decisive·wasBad 를 넘긴다', /decisive: !!verdict\.decisive, wasBad/.test(lcSrc), true);
 
   /* ⑥ 병합 순위 — 합집합 병합기·발행 중복 정리가 고르는 쪽 (2026-10-03 · 사람이 고친 표식이 병합 때마다 되돌려지던 길) */
   const U = await import('../../collector/url-key.mjs');

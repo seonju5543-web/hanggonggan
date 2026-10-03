@@ -513,12 +513,15 @@ export function otherTitlesOnSite(url, items, { exclude = [], clean = (s) => Str
       그걸 제목 자리로 세면 목록이 '제목 자리에 그 공고 제목'(post)이 된다. */
 const HEAD_SELECTORS = ['h1', 'h2', 'h3', '.view-title', '.view_title', '.viewTitle', '.bbs-title', '.board-view-title',
   '.artclViewTitle', '.tit_view', '.title_view', '.subject', '.board_view .title', '.bbs_view .title'];
-export async function observeLanding(page, res, { maxText = 20000 } = {}) {
+/* 🔴 틀(iframe) 안도 본다 (2026-10-03 · 리뷰 LC-3) — 공고 본문을 틀에 담는 게시판이 있다. 원문 링크 확인 로봇이 따로
+   읽던 사본(h1~h3 를 **전부** 제목 자리로 세어 행마다 h3 인 목록을 'post' 로 판정)을 걷고 이 한 벌을 같이 쓴다.
+   틀마다 '하나뿐인 꼬리표'만 센다 · 글자는 바깥 화면 먼저 이어 붙인다(최대 maxText). */
+export async function observeLanding(page, res, { maxText = 20000, maxFrames = 6 } = {}) {
   const status = res && typeof res.status === 'function' ? res.status() : 0;
   let finalUrl = '';
   try { finalUrl = page.url(); } catch { /* 닫힌 화면 */ }
   const docTitle = await page.title().catch(() => '');
-  const got = await page.evaluate(({ sels, max }) => {
+  const read = (fr) => fr.evaluate(({ sels, max }) => {
     const one = (sel) => {
       const els = document.querySelectorAll(sel);
       return els.length === 1 ? (els[0].textContent || '').replace(/\s+/g, ' ').trim().slice(0, 300) : '';
@@ -530,6 +533,19 @@ export async function observeLanding(page, res, { maxText = 20000 } = {}) {
       text: ((document.body && document.body.innerText) || '').slice(0, max),
       hasPassword: !!document.querySelector('input[type=password]'),
     };
-  }, { sels: HEAD_SELECTORS, max: maxText }).catch(() => ({ headings: [], text: '', hasPassword: false }));
+  }, { sels: HEAD_SELECTORS, max: maxText }).catch(() => null);
+  let frames = [];
+  try { frames = page.frames().slice(0, maxFrames); } catch { frames = []; }
+  if (!frames.length) frames = [page];
+  const got = { headings: [], text: '', hasPassword: false };
+  for (const fr of frames) {
+    const one = await read(fr);
+    if (!one) continue;
+    got.headings.push(...one.headings);
+    if (got.text.length < maxText) got.text += (got.text ? '\n' : '') + one.text;
+    got.hasPassword = got.hasPassword || one.hasPassword;
+  }
+  got.headings = got.headings.slice(0, 32);
+  got.text = got.text.slice(0, maxText);
   return { status, finalUrl, docTitle, ...got };
 }

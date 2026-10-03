@@ -103,7 +103,7 @@ export default async function gate(eq, ctx) {
     'https://h3.kr/v?id=6': { v: 'other', at: today, n: 1, confirmed: false, lastAt: today, lastV: 'other' },
   };
   const q = P.planQueue(tg, st, today, {}).map((t) => t.url.split('=')[1]);
-  eq('ⓑ 처음 보는 정식 등록 → 처음 보는 나머지 → 한 번 본 문제(앞선 날) → 확정 문제 → 나머지 · 오늘 이미 본 것은 다시 안 연다', q, ['5', '1', '3', '4', '2']);
+  eq('ⓑ 한 번 본 문제(앞선 날 — 다시 보면 확정) → 처음 보는 정식 등록 → 처음 보는 나머지 → 확정 문제 → 나머지 · 오늘 이미 본 것은 다시 안 연다(리뷰 LC-4)', q, ['3', '5', '1', '4', '2']);
   eq('  한 번 본 문제를 다른 날 다시 열어야 확정된다 — 같은 날 본 것(id=6)은 오늘 순서에 없다', [q.includes('3'), q.includes('6')], [true, false]);
   const many = Array.from({ length: 12 }, (_, i) => T(`https://same.kr/v?id=${i}`, 'news', `같은 사이트 글 ${i}번 안내 공고`));
   eq('  사이트마다 상한(기본 8 · 학교 서버를 몰아치지 않는다) · 전체 상한', [P.planQueue(many, {}, today, {}).length, P.planQueue(many, {}, today, { perHost: 3 }).length, P.planQueue(tg, {}, today, { max: 2 }).length], [8, 3, 2]);

@@ -34,6 +34,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { judgeLanding, hostGuard, nextState, publishBad, BAD } from './link-landing.mjs';
+import { observeLanding } from './detail-url.mjs';
 import { gatherTargets, otherTitlesFor, planQueue, pickNext, summarize, kstToday, DATASETS, DS_LABEL, STATUS_COLS } from './link-check-plan.mjs';
 import { makeBudget, withDeadline, TIMED_OUT } from './harvest-budget.mjs';
 
@@ -132,26 +133,8 @@ async function openBrowser() {
   ctx = await browser.newContext({ userAgent: UA, locale: 'ko-KR' });
 }
 
-/* 본 것 그대로 — 창 제목 · 머리글(h1~h3·og:title) · 본문 글자(틀 안 포함 · 2만 자) · 비밀번호 칸 */
-async function readPage(page) {
-  const docTitle = await page.title().catch(() => '');
-  const headings = []; let text = ''; let hasPassword = false;
-  for (const fr of page.frames().slice(0, 6)) {
-    const one = await fr.evaluate(() => {
-      const clip = (s) => String(s || '').replace(/\s+/g, ' ').trim().slice(0, 200);
-      const heads = [...document.querySelectorAll('h1,h2,h3')].map((e) => clip(e.innerText || e.textContent)).filter(Boolean).slice(0, 30);
-      const og = document.querySelector('meta[property="og:title"]');
-      if (og && og.getAttribute('content')) heads.push(clip(og.getAttribute('content')));
-      return { heads, text: (document.body && document.body.innerText) || '', pw: !!document.querySelector('input[type=password]') };
-    }).catch(() => null);
-    if (!one) continue;
-    headings.push(...one.heads);
-    if (text.length < 20000) text += (text ? '\n' : '') + one.text;
-    hasPassword = hasPassword || one.pw;
-  }
-  return { docTitle, headings: headings.slice(0, 60), text: text.slice(0, 20000), hasPassword };
-}
-
+/* 본 것 그대로 — 판정 재료는 detail-url.mjs observeLanding **한 벌**(하나뿐인 제목 자리만 · 틀 안 포함 · 2만 자 · 비밀번호 칸).
+   🔴 (2026-10-03 리뷰 LC-3) 여기 따로 두었던 사본은 h1~h3 를 **전부** 제목 자리로 세어, 행마다 h3 를 다는 목록을 'post' 로 판정했다. */
 async function observeLive(t, holder) {
   await ctx.clearCookies().catch(() => {});
   const page = await ctx.newPage();
@@ -164,8 +147,7 @@ async function observeLive(t, holder) {
       await page.waitForFunction((ps) => { const s = (document.body && document.body.innerText) || ''; return ps.some((p) => s.includes(p)); }, probes, { timeout: TITLE_WAIT_MS }).catch(() => {});
     }
     await page.waitForTimeout(600).catch(() => {});
-    const seen = await readPage(page);
-    return { status: res ? res.status() : 0, finalUrl: page.url(), ...seen };
+    return await observeLanding(page, res);
   } finally {
     await page.close().catch(() => {});
   }
@@ -332,7 +314,9 @@ while (remaining.length) {
   lastHit.set(t.host, Date.now());
   const verdict = judgeLanding({ ...obs, requestedUrl: t.url, titles: t.titles, otherTitles: otherTitlesFor(t, targets, siteTitles) });
   const final = obs.finalUrl && obs.finalUrl !== t.url ? obs.finalUrl : undefined;
-  results.push({ url: t.url, host: t.host, v: verdict.v, why: verdict.why, final });
+  /* decisive(404·401·첫 화면으로 돌려보냄)·wasBad(앞선 날 이미 문제)는 hostGuard 가 막힘을 잴 때 쓴다(리뷰 LC-1) */
+  const wasBad = !!(state[t.url] && BAD.includes(state[t.url].v));
+  results.push({ url: t.url, host: t.host, v: verdict.v, why: verdict.why, final, decisive: !!verdict.decisive, wasBad });
   console.log(`  ${verdict.v.padEnd(6)} ${t.host} · ${short(t.title, 40)} (${short(verdict.why, 50)})`);
 }
 finalize(null);
