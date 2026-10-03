@@ -10964,5 +10964,13 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
   eq('  지원 가능 알약(STATUS_META)은 활동 시트에 없다 — 구조화 조건이 없어 늘 가능이라 거짓 안심', /STATUS_META\[/.test((() => { const a = appX.indexOf('function openActivityDetail'); return appX.slice(a, appX.indexOf('\nfunction ', a + 10)); })()), false);
 }
 
+console.log('\n■ 원문 링크 정직성 (2026-10-03 · 원문 대신 재단 홈페이지·게시판 목록이 열리던 사고)');
+/* 🔴 화면은 링크 이름을 source-link.js 한 곳에서만 받고, 로봇은 collector/link-landing.mjs 한 곳으로 판정한다.
+   갈래별 검사는 verify/link-gates/*.mjs (core · app · robot · producers · data) — verify/link-gates.mjs 가 차례로 부른다. */
+{
+  const { runLinkGates } = await import('./link-gates.mjs');
+  await runLinkGates(eq);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);
