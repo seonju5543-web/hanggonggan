@@ -50,7 +50,9 @@ jobs:
         run: |
           # 표식 파일에 `only: snu,cau` 줄이 있으면 그 학교만 다시 받는다 (나머지는 그대로)
           ONLY=$(grep -oE '^only:[[:space:]]*[a-z0-9,]+' tools/run-gate-photos.txt | sed -E 's/^only:[[:space:]]*//' || true)
-          ONLY="$ONLY" node tools/fetch-gate-photos.mjs docs/designs/assets/gates
+          # `per: 10` 줄이 있으면 학교당 후보 수 (기본 5 · 1차에 다섯 장이 한 작가 한 날 사진뿐인 학교가 있었다)
+          PER=$(grep -oE '^per:[[:space:]]*[0-9]+' tools/run-gate-photos.txt | sed -E 's/^per:[[:space:]]*//' || true)
+          ONLY="$ONLY" PER_SCHOOL="${PER:-5}" node tools/fetch-gate-photos.mjs docs/designs/assets/gates
       - name: 결과 커밋
         if: steps.mark.outputs.run == 'yes'
         run: |
