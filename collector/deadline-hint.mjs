@@ -42,11 +42,19 @@ const HINT_JUNK = /(슬라이드|목록|조회수|개인정보처리방침|챗�
 /* 날짜가 없으면 기간을 말한 것이 아니다(`신청기간 중 화면에서 확인이 가능함` 류) */
 const HINT_DATE = /\d{4}\s*[.\-년]|\d{1,2}\s*[.월]\s*\d{1,2}/;
 
+/* HTML 기호(&nbsp; 등)를 글자로 — 본문 글자에 `&nbsp;` 가 날것으로 남아 있으면 80자 자르기가 그 한가운데를 잘라
+   학생 화면에 `16:00 &n` 이 떴다(2026-10-03 실측 20건 · 고려대·서울과기대). 두 번 싼 것(&amp;nbsp;)도 있어 두 번 푼다. */
+const HINT_ENT = { nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', '#39': "'", apos: "'" };
+const unentHint = (s) => s.replace(/&(nbsp|amp|lt|gt|quot|#39|apos);/gi, (m, k) => HINT_ENT[k.toLowerCase()]);
+/* 그래도 끝에 반쯤 잘린 기호(`&n`·`&nbs`·`&#3`)가 남으면 뗀다 — 기호의 앞부분 꼴만(소문자). `R&D` 같은 글자는 안 건드린다 */
+export const PARTIAL_ENTITY_END = /&(?:n(?:b(?:s(?:p)?)?)?|a(?:m(?:p)?)?|lt?|gt?|q(?:u(?:o(?:t)?)?)?|#\d{0,3})?$/;
+const cutPartialEntity = (s) => s.replace(PARTIAL_ENTITY_END, '').trim();
+
 /** 본문에서 접수 기간 한 줄. 못 찾으면 null — **지어내지 않는다**. */
 export function deadlineHintFrom(text) {
-  const t = String(text || '').replace(/\s+/g, ' ');
+  const t = unentHint(unentHint(String(text || ''))).replace(/\s+/g, ' ');
   for (const m of t.matchAll(HINT_LABEL)) {
-    const hint = t.slice(m.index, m.index + 80).trim();
+    const hint = cutPartialEntity(t.slice(m.index, m.index + 80).trim());
     /* 🔴 날짜는 **이름표 가까이**에 있어야 한다 — 멀리 있으면 다른 문장의 날짜다.
        (`신청기간을 안내합니다. 궁금한 사항은 … 2026년 2학기 푸른등대…` 가 그렇게 남았다) */
     if (!HINT_JUNK.test(hint) && HINT_DATE.test(hint.slice(0, 34))) return hint;
@@ -58,5 +66,6 @@ export function deadlineHintFrom(text) {
 export function looksLikeHint(hint) {
   const t = String(hint || '').trim();
   if (!t) return false;
-  return deadlineHintFrom(t) === t.slice(0, 80);
+  const plain = cutPartialEntity(unentHint(unentHint(t)).replace(/\s+/g, ' ').slice(0, 80).trim());   // 기호를 푼 옛 힌트도 같은 힌트로 본다
+  return deadlineHintFrom(t) === plain;
 }

@@ -2247,7 +2247,7 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
   eq('못 받아 왔어도 빈 문서 (뼈대가 굳지 않게)', /liveNews = d \|\| liveNews \|\| \{ items: \[\], updatedAt: null \}/.test(app), true);
   eq('옛 통짜 파일로 물러나는 길이 없다', /data\/news\.json/.test(app), false);
   eq('학교 범위는 엔진의 noticeForProfile 한 곳 · 숨긴 글 제외', /\.filter\(\(n\) => n && n\.url && n\.title && !n\.hidden && noticeForProfile\(n, p\)\)/.test(app), true);
-  eq('카드는 한 벌 — 윗줄만 「학교 공지 · 갈래」 · 게시일은 줄에서 읽은 것만 한 줄', /noticeCardHtml\(n, \{ org: `\$\{n\.school\} 공지\$\{n\.kind \? ' · ' \+ n\.kind : ''\}`, excerpts: n\.postedAt \? \[\{ label: '게시', text: n\.postedAt \}\] : \[\], thumb: n\.thumb \}\)/.test(app) && !/function newsCardHtml/.test(app), true);
+  eq('카드는 한 벌 — 윗줄만 「학교 공지 · 갈래」 · 게시일은 줄에서 읽은 것만 한 줄', /noticeCardHtml\(n, \{ org: `\$\{n\.school\} 공지\$\{n\.kind \? ' · ' \+ n\.kind : ''\}`, excerpts: n\.postedAt \? \[\{ label: '게시', text: n\.postedAt \}\] : \[\], thumb: n\.thumb, schoolPhoto: sp \}\)/.test(app) && !/function newsCardHtml/.test(app), true);
   eq('더보기 — 장 수는 상수 하나 · 그릇에 위임', /const NEWS_HOME_TOP = \d+;/.test(app) && /newsBox\.addEventListener\('click'/.test(app) && /data-news-more/.test(app), true);
   const ui = strip(readText(new URL('.github/workflows/verify-ui.yml', root)));
   eq('브라우저 드라이버가 관문에 걸려 있다', /verify-news\.js/.test(ui), true);
@@ -2431,7 +2431,7 @@ console.log('\n■ 교내 소식 썸네일 (2026-10-03 개발자 지시 "실제 
   eq('  썸네일 이름은 줄인 그림 바이트의 해시 (같은 이름에 다른 그림을 쓰지 않는다 — 서비스워커가 그림을 캐시 우선으로 영영 든다)', [TH.thumbName(Buffer.from('a')) === TH.thumbName(Buffer.from('a')), TH.thumbName(Buffer.from('a')) !== TH.thumbName(Buffer.from('b')), TH.isThumbPath(TH.thumbName(Buffer.from('a')))], [true, true, true]);
   /* ⑧ 카드 — 소식만 opts.thumb 로 · 다른 카드(실시간 공고·재단)는 그림을 안 넘긴다 · 못 받으면 그림을 빼는 error 잡이(CSP 가 onerror= 를 막는다) */
   eq('  카드 — 로봇 꼴일 때만 그림 · 소식 카드만 넘긴다 · 못 받은 그림은 빼고 글자 카드로', /const thumb = o\.thumb && NEWS_THUMB_RE\.test\(o\.thumb\) \? o\.thumb : '';/.test(app) && (app.match(/thumb: n\.thumb/g) || []).length === 1
-    && /document\.addEventListener\('error', \(e\) => \{[\s\S]{0,200}?notice-thumb[\s\S]{0,200}?\}, true\);/.test(app) && /class="notice-thumb" src="\$\{esc\(thumb\)\}" alt="" loading="lazy"/.test(app), true);
+    && /document\.addEventListener\('error', \(e\) => \{[\s\S]{0,600}?notice-thumb[\s\S]{0,600}?\}, true\);/.test(app) && /class="notice-thumb" src="\$\{esc\(thumb\)\}" alt="" loading="lazy"/.test(app), true);
   eq('    브라우저 드라이버가 썸네일을 잰다 (그려짐·72px·겹침 없음·못 받으면 뺌·바깥 주소 안 부름)', /⑥ 사진 있는 글/.test(readText(new URL('verify/verify-news.js', root))) && /⑥ 바깥 주소로 그림을 부르지 않았다/.test(readText(new URL('verify/verify-news.js', root))), true);
   /* ⑨ 워크플로 — 수집 다음·감사 앞 보강 단계 · sharp 설치를 삼키지 않는다 · 장부 되돌리기를 따로 · 저장 */
   const wf = readText(new URL('.github/workflows/collect-news.yml', root));
@@ -2515,6 +2515,59 @@ console.log('\n■ 교내 소식 썸네일 (2026-10-03 개발자 지시 "실제 
     eq('    사진·빼기·되살리기는 소식 줄(newsItemRowHtml)에 있고 활동 줄에는 없다', [/class="ig-thumb news-thumb"/.test(body('newsItemRowHtml')) && /data-news-thumb-off=/.test(body('newsItemRowHtml')) && /data-news-thumb-on=/.test(body('newsItemRowHtml')), /thumb/.test(body('actItemRowHtml'))], [true, false]);
     eq('    관리자 화면 — 사진·빼기·되살리기 단추가 글 번호를 보낸다', /data-news-thumb-off="\$\{esc\(n\.url\)\}" data-news-post=/.test(adm) && /applyAction\('newsThumbOff', \{ url, postId: pid \}/.test(adm) && /applyAction\('newsThumbOn', \{ url: el\.dataset\.newsThumbOn, postId: el\.dataset\.newsPost \|\| '' \}/.test(adm), true);
   }
+}
+
+console.log('\n■ 학교 대표 사진 (2026-10-03 개발자 지시 "썸네일이 없는 공고들은 각 학교의 가장 예쁜 사진으로 대체")');
+{
+  const root = new URL('../', import.meta.url);
+  const app = readText(new URL('app.js', root));
+  const css = readText(new URL('style.css', root));
+  const ME = createRequire(import.meta.url)('../match-engine.js');
+  const SP = await import('../tools/build-school-photos.mjs');
+  const cut = (name) => { const at = app.indexOf(`function ${name}(`); if (at < 0) return ''; let d = 0; for (let j = app.indexOf('{', at); j < app.length; j++) { if (app[j] === '{') d++; else if (app[j] === '}' && --d === 0) return app.slice(at, j + 1); } return ''; };
+  const re = (name) => { const m = app.match(new RegExp(`const ${name} = (/.+/);`)); return m ? m[1] : ''; };
+  /* ① 앱이 받는 목록 — 서비스 학교만 · 파일이 실제로 있고 · 이름 꼴(바이트 해시) · 라이선스는 열린 것만 · 출처 줄이 있다 */
+  const photos = JSON.parse(readText(new URL('assets/schools/photos.json', root)));
+  const rows = Object.entries(photos.schools || {}).flatMap(([school, list]) => list.map((x) => ({ school, ...x })));
+  const PHOTO_RE = new RegExp(re('SCHOOL_PHOTO_RE').slice(1, -1));
+  eq('  photos.json — 서비스 학교만 · 학교마다 1~3장', Object.entries(photos.schools || {}).filter(([s, l]) => !ME.SERVED_SCHOOLS.includes(s) || !l.length || l.length > 3).map(([s]) => s), []);
+  eq('    사진 파일이 있고 앱이 그리는 이름 꼴(assets/schools/<학교키>-<해시 8자>.webp)이며 학교키가 그 학교 것', rows.filter((x) => !PHOTO_RE.test(x.src) || !fs.existsSync(new URL(x.src, root)) || !x.src.startsWith(`assets/schools/${ME.noticeFileKey(x.school)}-`)).map((x) => x.src), []);
+  eq('    라이선스는 CC0 · CC BY · CC BY-SA · 퍼블릭 도메인만 (NC·ND 없음) · 출처 줄 = 작가 · 라이선스', rows.filter((x) => { const lic = String(x.credit || '').split(' · ').pop(); return !SP.OK_LICENSE.test(lic) || /NC|ND/.test(lic) || !/^.+ · .+$/.test(x.credit || ''); }).map((x) => `${x.school}:${x.credit}`), []);
+  eq('    사진의 공용 페이지 주소가 위키미디어 · 자를 자리 꼴', rows.filter((x) => !/^https:\/\/commons\.wikimedia\.org\/wiki\//.test(x.page || '') || !SP.FOCUS_RE.test(x.focus || '')).map((x) => x.src), []);
+  eq('    폴더에 안 쓰는 그림이 남지 않는다', fs.readdirSync(new URL('assets/schools/', root)).filter((f) => f !== 'photos.json' && !rows.some((x) => x.src === `assets/schools/${f}`)), []);
+  eq('    출처 줄 다듬기 — 위키미디어의 HTML 조각(Pixabay 문장)에서 이름만', SP.cleanAuthor('&lt;a href="https://pixabay.com/ko/"&gt;Pixabay&lt;/a&gt;로부터 입수된 &lt;a href="https://pixabay.com/ko/users/x/"&gt;HeungSoon&lt;/a&gt;님의 이미지 입니다.'), 'HeungSoon (Pixabay)');
+  /* ② 앱 — 카드를 실제로 그려 본다 (함수를 떼어 실행) */
+  const env = `const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const safeUrl = (u) => u; const unent = (s) => s; const isBoardListLink = () => false;
+    const NEWS_THUMB_RE = ${re('NEWS_THUMB_RE')}; const SCHOOL_PHOTO_RE = ${re('SCHOOL_PHOTO_RE')}; const PHOTO_FOCUS_RE = ${re('PHOTO_FOCUS_RE')};
+    let schoolPhotos = null;
+    ${cut('noticeCardHtml')}
+    ${cut('schoolPhotoFor')}
+    return { noticeCardHtml, schoolPhotoFor, set: (d) => { schoolPhotos = d; } };`;
+  const A = new Function(env)();
+  const n = { title: '휴강 안내', url: 'https://k.ac.kr/n/1', school: '경희대학교', foundAt: '2026-10-03' };
+  const good = { src: 'assets/schools/n1w4hprp-0123abcd.webp', focus: '50% 40%', credit: 'x · CC BY 3.0', page: 'https://commons.wikimedia.org/wiki/File:x.jpg' };
+  const h1 = A.noticeCardHtml(n, { schoolPhoto: good });
+  eq('  사진 없는 글 — 학교 사진이 썸네일 자리에 · 「학교 사진」 표시 · 자를 자리', [/class="sch-card notice-card has-thumb"/.test(h1), /<span class="notice-thumb notice-thumb-school"><img src="assets\/schools\/n1w4hprp-0123abcd\.webp"/.test(h1), />학교 사진<\/span>/.test(h1), /object-position:50% 40%/.test(h1)], [true, true, true, true]);
+  const h2 = A.noticeCardHtml({ ...n, thumb: 'data/news/img/0123456789abcdef.webp' }, { thumb: 'data/news/img/0123456789abcdef.webp', schoolPhoto: good });
+  eq('    글의 사진이 있으면 그 사진만 (학교 사진·표시 없음)', [/notice-thumb-school|학교 사진/.test(h2), /data\/news\/img\/0123456789abcdef\.webp/.test(h2)], [false, true]);
+  const h3 = A.noticeCardHtml(n, { schoolPhoto: { ...good, src: 'https://evil.example/x.webp', focus: '1;background:red' } });
+  const h4 = A.noticeCardHtml(n, { schoolPhoto: { ...good, focus: '0 0;background:url(x)' } });
+  eq('    바깥 주소·이상한 자를 자리는 그리지 않는다', [/has-thumb/.test(h3), /background/.test(h4), /object-position/.test(h4)], [false, false, false]);
+  A.set({ schools: { 경희대학교: [good, { ...good, src: 'assets/schools/n1w4hprp-89abcdef.webp' }, { ...good, src: 'https://evil.example/y.webp' }] } });
+  const picks = Array.from({ length: 40 }, (_, i) => A.schoolPhotoFor({ ...n, url: `https://k.ac.kr/n/${i}` }));
+  eq('    학교에 여러 장이면 글마다 고정된 한 장 · 두 장 다 쓰인다 · 이상한 항목은 안 고른다 · 다른 학교는 없음', [A.schoolPhotoFor(n) === A.schoolPhotoFor({ ...n }), new Set(picks.map((x) => x.src)).size, picks.every((x) => PHOTO_RE.test(x.src)), A.schoolPhotoFor({ ...n, school: '서울대학교' })], [true, 2, true, null]);
+  /* ③ 구역 — 글의 사진이 없을 때만 넘기고, 쓴 사진의 출처를 구역 아래에 (라이선스 표기 의무) */
+  const sec = cut('schoolNewsHtml');
+  eq('  구역 — 글의 사진이 없을 때만 학교 사진 · 쓴 사진마다 출처 줄(공용 페이지 링크) · 위키미디어 공용', [/const sp = n\.thumb && NEWS_THUMB_RE\.test\(n\.thumb\) \? null : schoolPhotoFor\(n\);/.test(sec), /class="news-photo-credit">학교 사진 · /.test(sec), /· 위키미디어 공용<\/p>/.test(sec), /commons\\\.wikimedia\\\.org/.test(sec)], [true, true, true, true]);
+  eq('    목록은 소식을 받을 때 같이 받는다(한 번) · 늦게 와도 다시 그린다', /get\('assets\/schools\/photos\.json'\)\.then\(\(d\) => \{ if \(d && d\.schools && !schoolPhotos\) \{ schoolPhotos = d; if \(liveNews\) rerenderVisible\(\); \} \}\);/.test(app), true);
+  eq('    못 받은 그림은 감싼 칸째 뺀다(「학교 사진」 표시만 남지 않게)', /img\.parentElement && img\.parentElement\.classList\.contains\('notice-thumb'\) \? img\.parentElement : null/.test(app) && /box\.remove\(\);/.test(app), true);
+  eq('    「학교 사진」 표시와 출처 줄의 모양이 있다', /\.notice-thumb-school \.thumb-tag \{/.test(css) && /\.news-photo-credit \{/.test(css), true);
+  /* ④ 만드는 도구 — 바이트 해시 이름 · 쓰지 않는 그림 정리 · 라이선스 거름 */
+  const tool = readText(new URL('tools/build-school-photos.mjs', root));
+  eq('  만드는 도구 — 바이트 해시 이름(서비스워커 캐시 우선) · 안 쓰는 그림 지움 · 라이선스 거름 · 학교당 3장', [/const name = `\$\{key\}-\$\{crypto\.createHash\('sha1'\)\.update\(buf\)\.digest\('hex'\)\.slice\(0, 8\)\}\.webp`;/.test(tool), /if \(!keep\.has\(f\)\) fs\.unlinkSync/.test(tool), /!OK_LICENSE\.test\(meta\.license \|\| ''\) \|\| \/NC\|ND\/\.test\(meta\.license\)/.test(tool), /list\.slice\(0, 3\)/.test(tool)], [true, true, true, true]);
+  const live = readText(new URL('.github/workflows/check-live.yml', root));
+  eq('  라이브 점검이 학교 사진 목록과 그림 하나를 본다', /assets\/schools\/photos\.json/.test(live), true);
 }
 
 console.log('\n■ 「또는」 줄의 처지 판정 (2026-09-18 개발자 결정)');
@@ -2918,6 +2971,18 @@ console.log('\n■ 접수 기간 한 줄 (2026-09-12)');
 {
   const { deadlineHintFrom, looksLikeHint } = await import('../collector/deadline-hint.mjs');
   const H = (t) => deadlineHintFrom(t);
+  /* 2026-10-03 — 본문 글자에 &nbsp; 가 날것으로 남아 80자 자르기가 기호 한가운데를 잘랐다(학생 화면 `16:00 &n` · 실측 20건) */
+  eq('HTML 기호는 풀고 자른다 · 반쯤 잘린 기호는 뗀다 · R&D 같은 글자는 그대로',
+    [H('신청기간:&nbsp;2026. 10. 1.(목) 10:00 ~ 2026. 10. 30.(금) 16:00&nbsp; &nbsp; &nbsp; &nbsp; 다음 문장이 길게 이어지고 있습니다 계속 계속 계속 계속'), H('접수기간: 2026. 9. 1. ~ 9. 30. R&D 연구실 &amp;nbsp; 제출')],
+    ['신청기간: 2026. 10. 1.(목) 10:00 ~ 2026. 10. 30.(금) 16:00 다음 문장이 길게 이어지고 있습니다 계속 계속 계', '접수기간: 2026. 9. 1. ~ 9. 30. R&D 연구실 제출']);
+  {
+    const appSrc = readText(new URL('../app.js', import.meta.url));
+    const dh = readText(new URL('../collector/deadline-hint.mjs', import.meta.url));
+    const reOf = (src) => (src.match(/const PARTIAL_ENTITY_END = (\/.+\/);/) || [])[1];
+    eq('  앱이 이미 실린 힌트 끝의 반쪽 기호를 떼고 보인다(같은 꼴 · 두 자리 모두)', [reOf(appSrc) === reOf(dh) && !!reOf(dh), (appSrc.match(/esc\(hintText\(n\.deadlineHint\)\)/g) || []).length, /esc\(unent\(n\.deadlineHint\)\)/.test(appSrc)], [true, 2, false]);
+    const hintText = new Function(`const unent = (s) => String(s); const PARTIAL_ENTITY_END = ${reOf(appSrc)}; return (s) => unent(s).replace(PARTIAL_ENTITY_END, '').trim();`)();
+    eq('    `16:00 &n` → `16:00` · `&#3` 도 · `R&D` 는 그대로', [hintText('2026. 10. 30.(금) 16:00 &n'), hintText('마감 9. 30. &#3'), hintText('R&D')], ['2026. 10. 30.(금) 16:00', '마감 9. 30.', 'R&D']);
+  }
 
   eq('이름표에서 시작한다',
     H('1. 신청기간 : 2026. 9. 11(금) ~ 9. 18(금) 15:00 까지 나. 선발 : 10월'),

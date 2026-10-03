@@ -599,6 +599,9 @@ const ENTITY_RE = new RegExp('&(' + Object.keys(ENTITIES).join('|') + ');', 'g')
 function unent(s) {
   return String(s == null ? '' : s).replace(ENTITY_RE, (m, k) => ENTITIES[k]);
 }
+/* 이미 저장된 기간 한 줄의 끝에 반쯤 잘린 기호(`16:00 &n`)가 남은 것 — 로봇은 이제 기호를 풀고 자르지만(collector/deadline-hint.mjs) 실린 글에 남아 있다(소급 · 관문이 같은 꼴을 대조) */
+const PARTIAL_ENTITY_END = /&(?:n(?:b(?:s(?:p)?)?)?|a(?:m(?:p)?)?|lt?|gt?|q(?:u(?:o(?:t)?)?)?|#\d{0,3})?$/;
+const hintText = (s) => unent(s).replace(PARTIAL_ENTITY_END, '').trim();
 
 /* 외부 링크 안전화 — http(s)·mailto만 허용한다. 수집 로봇이 받아 온 데이터가 오염되거나
    정식 등록에 오타가 있어도 javascript:·data: 같은 위험한 스킴이 href나 window.open으로
@@ -2799,11 +2802,15 @@ function liveNoticesHtml() {
       (실측 147장 중 9장). */
 /* 소식 썸네일 경로 — 로봇이 만든 해시 이름만 그린다(collector/news-thumb.mjs THUMB_RE 와 같은 꼴 · 관문이 대조). 그 밖의 값(바깥 주소 등)은 그리지 않는다 */
 const NEWS_THUMB_RE = /^data\/news\/img\/[0-9a-f]{16}\.webp$/;
+/* 학교 대표 사진 — 글에 사진이 없을 때 대신 (2026-10-03 · tools/build-school-photos.mjs 가 만든 이름 꼴만 · 자를 자리도 꼴을 본다) */
+const SCHOOL_PHOTO_RE = /^assets\/schools\/[a-z0-9]+-[0-9a-f]{8}\.webp$/;
+const PHOTO_FOCUS_RE = /^\d{1,3}% \d{1,3}%$/;
 function noticeCardHtml(n, opts) {
   const o = opts || {};
   const thumb = o.thumb && NEWS_THUMB_RE.test(o.thumb) ? o.thumb : '';
+  const sp = !thumb && o.schoolPhoto && SCHOOL_PHOTO_RE.test(o.schoolPhoto.src || '') ? o.schoolPhoto : null;
   return `
-    <a class="sch-card notice-card${thumb ? ' has-thumb' : ''}" href="${esc(safeUrl(n.url))}" target="_blank" rel="noopener">
+    <a class="sch-card notice-card${thumb || sp ? ' has-thumb' : ''}" href="${esc(safeUrl(n.url))}" target="_blank" rel="noopener">
       ${/* 🔴 맨 윗줄은 매칭 카드와 **같은 말투**다 — 기관 글 + 판정 하나 (2026-09-11).
            예전엔 배지 셋(`교내 공고`·`마감 임박`·`양식 2`)이 한 줄을 채워, 페이스리프트로
            걷어낸 배지 무더기가 이 경로에만 그대로 남아 있었다(실측 147장 중 9장).
@@ -2840,12 +2847,27 @@ function noticeCardHtml(n, opts) {
       <p class="sch-name">${esc(unent(n.title))}</p>
       ${/* 원문 발췌 줄 (2026-09-29 · 활동 글) — 이름표 : 원문 문장. 발췌가 있으면 기간 한 줄은 겹쳐 적지 않는다 */ ''}
       ${(o.excerpts || []).map((x) => `<p class="sch-provider">${esc(x.label)} · ${esc(unent(x.text))}</p>`).join('')}
-      ${!(o.excerpts || []).length && n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? `<p class="sch-provider">${esc(unent(n.deadlineHint))}</p>` : ''}
+      ${!(o.excerpts || []).length && n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? `<p class="sch-provider">${esc(hintText(n.deadlineHint))}</p>` : ''}
       <p class="sch-provider">${(n.attachments || []).length ? `첨부 ${(n.attachments || []).length}개 · ` : ''}${esc(n.foundAt || '')} 수집 · ${isBoardListLink(n.url) ? '게시판 목록에서 보기 ↗' : '원문 보기 ↗'}</p>
       ${/* 그 글의 사진 썸네일 (2026-10-03 개발자 지시 — 학교 글의 실제 사진). 소식 카드만 opts.thumb 로 넘긴다 · 제목이 이미 글자로 있어 alt 는 비운다(읽기 도구가 두 번 읽지 않게).
            못 받으면(404·오프라인) 그림을 빼고 글자 카드로 돌아간다 — bindEvents 의 error 잡이 · CSP 가 onerror= 를 막는다 */ ''}
       ${thumb ? `<img class="notice-thumb" src="${esc(thumb)}" alt="" loading="lazy" decoding="async" width="72" height="72" />` : ''}
+      ${/* 글에 사진이 없으면 학교 대표 사진 (2026-10-03 개발자 지시) — 🔴 그 글의 사진이 아니라는 표시(「학교 사진」)를 늘 붙인다.
+           안 붙이면 학생이 정문 사진을 그 공지의 사진으로 읽는다. 출처 줄은 구역 아래 한 번(schoolNewsHtml). */ ''}
+      ${sp ? `<span class="notice-thumb notice-thumb-school"><img src="${esc(sp.src)}" alt="" loading="lazy" decoding="async" width="72" height="72"${PHOTO_FOCUS_RE.test(sp.focus || '') ? ` style="object-position:${esc(sp.focus)}"` : ''} /><span class="thumb-tag">학교 사진</span></span>` : ''}
     </a>`;
+}
+
+/* 학교 사진 고르기 — 학교에 여러 장이면 글마다 고정된 한 장(글 번호·주소의 해시)이라 다시 그려도 바뀌지 않고, 이웃 카드끼리 겹치지 않게 돈다 */
+let schoolPhotos = null;   // assets/schools/photos.json — 못 받으면 null(그대로 글자 카드)
+function schoolPhotoFor(n) {
+  const list = ((schoolPhotos && schoolPhotos.schools && schoolPhotos.schools[n.school]) || [])
+    .filter((x) => x && SCHOOL_PHOTO_RE.test(x.src || ''));
+  if (!list.length) return null;
+  const k = String(n.postId || n.url || n.title || '');
+  let h = 0;
+  for (let i = 0; i < k.length; i++) h = (h * 31 + k.charCodeAt(i)) >>> 0;
+  return list[h % list.length];
 }
 
 /* ---------------- 대외활동·공모전 (2026-09-25 · 노션 UI-34) ----------------
@@ -3005,7 +3027,7 @@ function openActivityDetail(url) {
       ${rows.length
         ? `<ul class="doc-list">${rows.map((x) => `<li>${esc(x.label)} · ${esc(unent(x.text))}</li>`).join('')}</ul>`
         : (n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint)
-          ? `<ul class="doc-list"><li>${esc(unent(n.deadlineHint))}</li></ul>`
+          ? `<ul class="doc-list"><li>${esc(hintText(n.deadlineHint))}</li></ul>`
           : '<p class="doc-legend">모집 기간·대상은 공고 원문에서 확인해 주세요.</p>')}
       ${notice.length ? `
       <h4>공고 원문 안내 <span class="channel-tag">원문 그대로</span></h4>
@@ -3090,6 +3112,8 @@ function loadNews() {
   const wanted = files.join(',');
   newsFilesWanted = wanted;
   const get = (u) => fetch(u, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  /* 학교 대표 사진 목록 — 소식을 받을 때 한 번(작은 파일 · 실패하면 다음 받기 때 다시). 소식보다 늦게 와도 다시 그린다 */
+  if (files.length && !schoolPhotos) get('assets/schools/photos.json').then((d) => { if (d && d.schools && !schoolPhotos) { schoolPhotos = d; if (liveNews) rerenderVisible(); } });
   const job = files.length
     ? Promise.all(files.map(get)).then((docs) => {
       const ok = docs.filter(Boolean);
@@ -3133,9 +3157,21 @@ function schoolNewsHtml() {
   }
   const shown = newsOpen ? mine : mine.slice(0, NEWS_HOME_TOP);
   const more = mine.length > NEWS_HOME_TOP;
-  return head + `<div class="card-list" style="margin-bottom:${more ? 6 : 18}px">`
-    + shown.map((n) => noticeCardHtml(n, { org: `${n.school} 공지${n.kind ? ' · ' + n.kind : ''}`, excerpts: n.postedAt ? [{ label: '게시', text: n.postedAt }] : [], thumb: n.thumb })).join('')
+  /* 글의 사진이 없는 카드는 학교 대표 사진으로 (2026-10-03) — 쓴 사진의 출처를 구역 아래에 한 번씩(위키미디어 열린 라이선스의 표기 의무) */
+  const used = [];
+  const cards = shown.map((n) => {
+    const sp = n.thumb && NEWS_THUMB_RE.test(n.thumb) ? null : schoolPhotoFor(n);
+    if (sp && !used.includes(sp)) used.push(sp);
+    return noticeCardHtml(n, { org: `${n.school} 공지${n.kind ? ' · ' + n.kind : ''}`, excerpts: n.postedAt ? [{ label: '게시', text: n.postedAt }] : [], thumb: n.thumb, schoolPhoto: sp });
+  }).join('');
+  const credit = used.length
+    ? `<p class="news-photo-credit">학교 사진 · ${used.map((x) => (/^https:\/\/commons\.wikimedia\.org\//.test(x.page || '')
+      ? `<a href="${esc(x.page)}" target="_blank" rel="noopener">${esc(x.credit)}</a>` : esc(x.credit))).join(' · ')} · 위키미디어 공용</p>`
+    : '';
+  return head + `<div class="card-list" style="margin-bottom:${more || credit ? 6 : 18}px">`
+    + cards
     + `</div>`
+    + credit
     + (more ? `<button type="button" class="link-btn home-more" data-news-more aria-expanded="${newsOpen ? 'true' : 'false'}" style="margin-bottom:18px">${newsOpen ? '접기' : `더보기 (${mine.length - NEWS_HOME_TOP})`}</button>` : '');
 }
 
@@ -6159,9 +6195,12 @@ function bindEvents() {
      error 는 거품이 일지 않아 잡는 단계(capture)로 문서에서 받는다 — CSP(script-src 'self')가 onerror= 를 막는다. */
   document.addEventListener('error', (e) => {
     const img = e.target;
-    if (!img || !img.classList || !img.classList.contains('notice-thumb')) return;
-    const card = img.closest('.has-thumb');
-    img.remove();
+    if (!img || !img.classList || !img.closest) return;
+    /* 글의 사진은 img 자신이, 학교 사진은 감싼 칸(.notice-thumb-school)이 썸네일 자리다 — 칸째 뺀다(「학교 사진」 표시만 남지 않게) */
+    const box = img.classList.contains('notice-thumb') ? img : img.parentElement && img.parentElement.classList.contains('notice-thumb') ? img.parentElement : null;
+    if (!box) return;
+    const card = box.closest('.has-thumb');
+    box.remove();
     if (card) card.classList.remove('has-thumb');
   }, true);
   /* 교내 소식 더보기 (2026-09-30) — 구역은 통째로 다시 그려지므로 그릇(#school-news)에 위임한다. 히어로는 안 건드린다. */

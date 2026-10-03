@@ -53,6 +53,8 @@ const FIXTURE = {
   ],
 };
 
+const SCHOOL_PHOTOS = { schools: { [S]: [{ src: 'assets/schools/n19cz03g-0123abcd.webp', focus: '50% 40%', credit: '테스트 작가 · CC BY 3.0', page: 'https://commons.wikimedia.org/wiki/File:Test.jpg' }] } };
+
 async function fresh(browser, mode) {
   /* 서비스워커를 막는다 — 워커가 data/*.json 을 받아 오면 page.route 의 가짜 응답이 닿지 않는다(verify-activities 와 같은 이유) */
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, serviceWorkers: 'block' });
@@ -68,6 +70,14 @@ async function fresh(browser, mode) {
   /* 썸네일 — 하나는 진짜 사진 바이트(정문 사진)로, 하나는 404 로 */
   await page.route('**/data/news/img/aaaaaaaaaaaaaaaa.webp', (route) => route.fulfill({ status: 200, contentType: 'image/jpeg', body: fs.readFileSync(path.join(__dirname, '..', 'assets/gates/hanyang-1.jpg')) }));
   await page.route('**/data/news/img/bbbbbbbbbbbbbbbb.webp', (route) => route.fulfill({ status: 404, body: 'no' }));
+  /* 학교 대표 사진 (2026-10-03) — 목록은 가짜로(진짜 목록이 바뀌어도 검사가 흔들리지 않게), 그림은 진짜 사진 바이트로.
+     mode 'nophotos' = 목록을 못 받음 · 'photo404' = 목록은 받았는데 그림을 못 받음 */
+  await page.route('**/assets/schools/photos.json*', (route) => (mode === 'nophotos'
+    ? route.fulfill({ status: 404, body: 'no' })
+    : route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(SCHOOL_PHOTOS) })));
+  await page.route('**/assets/schools/n19cz03g-0123abcd.webp', (route) => (mode === 'photo404'
+    ? route.fulfill({ status: 404, body: 'no' })
+    : route.fulfill({ status: 200, contentType: 'image/jpeg', body: fs.readFileSync(path.join(__dirname, '..', 'assets/gates/hufs-3.jpg')) })));
   await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(1200);
   await dismissNotify(page);
@@ -79,6 +89,17 @@ const cards = (page) => page.$$eval('#school-news .notice-card', (els) => els.ma
   org: e.querySelector('.sch-org').textContent.trim(),
   meta: [...e.querySelectorAll('.sch-provider')].pop().textContent.trim(),
 })));
+
+/* 카드마다 썸네일 자리 — 글의 사진은 img.notice-thumb, 학교 사진은 감싼 칸(.notice-thumb-school) 안의 img */
+const thumbs = (page) => page.$$eval('#school-news .notice-card', (els) => els.slice(0, 5).map((e) => {
+  const box = e.querySelector('.notice-thumb'); const img = box && (box.tagName === 'IMG' ? box : box.querySelector('img'));
+  const name = e.querySelector('.sch-name').getBoundingClientRect();
+  const r = box && box.getBoundingClientRect();
+  const tag = e.querySelector('.thumb-tag');
+  return { has: e.classList.contains('has-thumb'), img: !!img, loaded: !!(img && img.complete && img.naturalWidth > 0), w: r ? Math.round(r.width) : 0, h: r ? Math.round(r.height) : 0,
+    right: !!(r && r.left >= name.right - 1), alt: img ? img.getAttribute('alt') : null, tag: tag ? tag.textContent.trim() : '' };
+}));
+const settle = async (page) => { await page.$eval('#school-news', (e) => e.scrollIntoView()); await page.waitForTimeout(1200); };
 
 (async () => {
   await assertOwnServer(PORT);
@@ -106,18 +127,27 @@ const cards = (page) => page.$$eval('#school-news .notice-card', (els) => els.ma
     /* ⑥ 썸네일 — 구역을 화면에 들인 뒤(늦게 싣기 loading=lazy) 잰다 */
     await page.$eval('#school-news', (e) => e.scrollIntoView());
     await page.waitForTimeout(1200);
-    const shot = await page.$$eval('#school-news .notice-card', (els) => els.slice(0, 5).map((e) => {
-      const img = e.querySelector('img.notice-thumb'); const name = e.querySelector('.sch-name').getBoundingClientRect();
-      const r = img && img.getBoundingClientRect();
-      return { has: e.classList.contains('has-thumb'), img: !!img, loaded: !!(img && img.complete && img.naturalWidth > 0), w: r ? Math.round(r.width) : 0, h: r ? Math.round(r.height) : 0,
-        right: !!(r && r.left >= name.right - 1), alt: img ? img.getAttribute('alt') : null };
-    }));
-    eq('⑥ 사진 있는 글 — 오른쪽 72px 정사각 · 실제로 그려짐 · 제목과 안 겹침 · alt 비움', shot[0], { has: true, img: true, loaded: true, w: 72, h: 72, right: true, alt: '' });
-    eq('⑥ 사진 파일을 못 받은 글은 그림을 빼고 글자 카드로', shot[1], { has: false, img: false, loaded: false, w: 0, h: 0, right: false, alt: null });
-    eq('⑥ 로봇 이름 꼴이 아닌 값(바깥 주소)은 그리지 않는다 · 사진 없는 글은 그림 없음', shot.slice(2).map((c) => c.img || c.has), [false, false, false]);
+    const shot = await thumbs(page);
+    eq('⑥ 사진 있는 글 — 오른쪽 72px 정사각 · 실제로 그려짐 · 제목과 안 겹침 · alt 비움 · 「학교 사진」 아님', shot[0], { has: true, img: true, loaded: true, w: 72, h: 72, right: true, alt: '', tag: '' });
+    eq('⑥ 사진 파일을 못 받은 글은 그림을 빼고 글자 카드로', shot[1], { has: false, img: false, loaded: false, w: 0, h: 0, right: false, alt: null, tag: '' });
+    /* ⑦ 학교 대표 사진 — 글의 사진이 없는 글(바깥 주소였던 글 포함)은 학교 사진 · 같은 자리·같은 크기 · 「학교 사진」 표시 */
+    eq('⑦ 사진 없는 글 — 학교 사진이 같은 자리에 72px · 실제로 그려짐 · 「학교 사진」 표시', shot.slice(2), Array(3).fill({ has: true, img: true, loaded: true, w: 72, h: 72, right: true, alt: '', tag: '학교 사진' }));
+    eq('⑦ 구역 아래 출처 한 줄 (공용 페이지 링크)', await page.$eval('#school-news .news-photo-credit', (e) => [e.textContent.trim(), e.querySelector('a') && e.querySelector('a').href]), ['학교 사진 · 테스트 작가 · CC BY 3.0 · 위키미디어 공용', 'https://commons.wikimedia.org/wiki/File:Test.jpg']);
     eq('⑥ 바깥 주소로 그림을 부르지 않았다', await page.evaluate(() => performance.getEntriesByType('resource').some((r) => /evil\.example/.test(r.name))), false);
     if (process.env.SHOT) await page.$eval('#school-news', (e) => e.scrollIntoView()).then(() => page.locator('#school-news').screenshot({ path: process.env.SHOT }));
     eq('⑤ 페이지 오류 없음', errors, []);
+    await page.context().close();
+  }
+
+  /* ── 학교 사진 목록을 못 받음 / 그림을 못 받음 — 글자 카드로 돌아가고 「학교 사진」 표시·출처 줄이 홀로 남지 않는다 ── */
+  for (const mode of ['nophotos', 'photo404']) {
+    const { page, errors } = await fresh(browser, mode);
+    await settle(page);
+    const shot = await thumbs(page);
+    eq(`⑦ ${mode === 'nophotos' ? '목록을 못 받으면' : '그림을 못 받으면'} 사진 없는 글은 글자 카드 (표시만 남지 않는다)`, shot.slice(2).map((c) => [c.has, c.img, c.tag]), Array(3).fill([false, false, '']));
+    eq(`⑦ ${mode} — 글의 사진은 그대로`, [shot[0].img, shot[0].loaded], [true, true]);
+    if (mode === 'nophotos') eq('⑦ 목록이 없으면 출처 줄도 없다', await page.$('#school-news .news-photo-credit'), null);
+    eq(`⑦ ${mode} — 페이지 오류 없음`, errors, []);
     await page.context().close();
   }
 
