@@ -4882,6 +4882,30 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
    항목이라 손대지 않는다 — `.filter-row`·`.filter-chip` 을 그대로 쓴다(가로 스크롤도 그대로).
    ⚠️ 분야 줄은 글이 없으면 app.js 가 `hidden` 을 건다 — 그때 윗줄 아래 여백은 제 값으로 돌아간다. */
 #activities-filters:has(+ #activities-field-filters:not([hidden])) { margin-bottom: var(--space-8); }
+/* 🔴 아랫줄은 **윗줄보다 훨씬 작다** (2026-10-03 개발자 지시). 둘이 같은 크기라 어느 쪽이
+   큰 갈래인지 안 읽혔다 — 종류가 먼저고 분야가 그 안이라는 것을 크기로 말한다.
+   글자 14.5 → 12.5(--t-xs) · 안쪽 여백 7.5/10 → 4/8 · 선 2 → 1.5px.
+   ⚠️ `.filter-chip` 원본은 손대지 않는다 — 알약 모양·선 2px·선택 색은 2026-09-11 승인 항목이고
+      탐색 화면 칩이 그대로 써야 한다. 여기서는 **이 줄 안에서만** 줄인다.
+   🔴 선이 얇아져도 고를 때 칩이 안 커지게 **선택해도 1.5px 그대로** 둔다(원본이 2px 를 미리
+      두껍게 해 둔 것과 같은 이유 — 선만 굵어지면 옆 칩이 밀린다). 선택은 색으로만 말한다. */
+#activities-field-filters .filter-chip {
+  padding: var(--space-4) var(--space-8);
+  font-size: var(--t-xs);
+  border-width: 1.5px;
+}
+/* 손가락 표적은 작아지지 않는다 — 보이는 알약만 줄이고 **닿는 넓이는 안 보이는 덧판**으로 넓힌다
+   (DESIGN.md 9번이 정한 방법 · `.icon-btn::after` 가 그 선례). 여백을 키우면 알약이 같이 커진다. */
+#activities-field-filters .filter-chip { position: relative; }
+#activities-field-filters .filter-chip::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 44px;
+  transform: translateY(-50%);
+}
 
 /* 상세 시트 맨 아래 묶음 — 마감일·중복 수혜 · 문의 · 원문 링크 (2026-10-02 CTO 지시).
    마감일 줄이 혼자일 때 갖던 아래 여백은 묶음이 대신 갖는다(줄 사이는 .doc-legend 의 위 여백). */

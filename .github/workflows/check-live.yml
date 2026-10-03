@@ -94,7 +94,11 @@ jobs:
               const j = JSON.parse(fs.readFileSync(p, 'utf8'));
               /* ⚠️ `majors` 도 안다 — 모르면 학과 파일에서 **칸 수 3**(school·updatedAt·majors)을
                  세어, 내용이 달라도 3 대 3 으로 통과한다(404 만 겨우 잡힌다). */
-              const box = j.items || j.templates || j.majors || (/assets\/schools\/photos\.json$/.test(p) ? j.schools : null) || j;   // schools 는 학교 사진 목록에서만 — 색인 파일의 schools 는 숫자라 '읽기실패' 끼리 같다고 세면 404 도 통과한다(리뷰 10-03)
+              const box = j.items || j.templates || j.majors || (/assets[\/\\]schools[\/\\]photos\.json$/.test(p) ? j.schools : null) || j;   // schools 는 학교 사진 목록에서만 — 색인 파일의 schools 는 숫자라 '읽기실패' 끼리 같다고 세면 404 도 통과한다(리뷰 10-03)
+                 /* 🔴 빗금은 두 가지를 다 받는다 (2026-10-03). 로봇은 리눅스라 `/` 지만, 개발자 컴퓨터(윈도우)에서
+                    관문이 이 함수를 떼어 **진짜 파일 경로**로 돌리면 `C:\…\assets\schools\photos.json` 이라
+                    `/` 만 보는 정규식이 안 걸렸다. 그러면 j 통째(칸 2개)를 세어 35 대신 2 가 나오고,
+                    관문이 개발자 화면에서만 빨간불이 된다 — 이 저장소가 네 번 겪은 그 유형이다. */
               if (Array.isArray(box)) return box.length;
               if (box && typeof box === 'object') return Object.keys(box).length;
               return '읽기실패';
