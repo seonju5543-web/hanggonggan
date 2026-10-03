@@ -4876,6 +4876,13 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
    ⚠️ DESIGN.md 「충돌」 23번(절 가르기 = 얇은 선 + 34px)은 **홈에 한해 예외**가 됐다. */
 #screen-home .section-head { border-top: 0; }
 
+/* 대외활동 — 칩이 두 줄이다 (2026-10-03 개발자 지시): 윗줄 종류(전체/대외활동/공모전) ·
+   아랫줄 분야(교육·캠프 · 봉사 …). 사이를 한 덩어리로 묶으려고 윗줄 아래 여백만 줄인다.
+   칩 모양 자체(알약 · 7.5px 10px · 선 2px · 선택은 흰 바탕 + accent 2px)는 2026-09-11 승인
+   항목이라 손대지 않는다 — `.filter-row`·`.filter-chip` 을 그대로 쓴다(가로 스크롤도 그대로).
+   ⚠️ 분야 줄은 글이 없으면 app.js 가 `hidden` 을 건다 — 그때 윗줄 아래 여백은 제 값으로 돌아간다. */
+#activities-filters:has(+ #activities-field-filters:not([hidden])) { margin-bottom: var(--space-8); }
+
 /* 상세 시트 맨 아래 묶음 — 마감일·중복 수혜 · 문의 · 원문 링크 (2026-10-02 CTO 지시).
    마감일 줄이 혼자일 때 갖던 아래 여백은 묶음이 대신 갖는다(줄 사이는 .doc-legend 의 위 여백). */
 .sheet-facts { margin: var(--sp-3) 0; }

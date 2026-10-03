@@ -195,7 +195,32 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
     await page.click('#activities-filters .filter-chip[data-filter="대외활동"]');
     await page.waitForTimeout(200);
     eq('③ 대외활동 칩', (await cards(page)).map((c) => c.name), ['2026 대학생 해외봉사단 모집', '전국 청년 서포터즈 모집']);
+    /* ── 분야 칩 줄 (2026-10-03 개발자 지시 "제목 아래 회색 분류를 위에 버튼으로") ──
+       픽스처에서 field 가 있는 글은 '봉사' 하나뿐 — 나머지는 비어 있어 '기타'로 모인다.
+       🔴 칩은 **데이터에서** 만들므로, 칩 목록 자체가 '세는 길이 살아 있는가'를 말해 준다. */
     await page.click('#activities-filters .filter-chip[data-filter="all"]');
+    await page.waitForTimeout(200);
+    const fchips = () => page.$$eval('#activities-field-filters .filter-chip', (els) => els.map((e) => e.dataset.filter));
+    eq('③ 분야 칩은 데이터에서 만든다 (있는 분야 + 기타)', await fchips(), ['all', '봉사', '기타']);
+    await page.click('#activities-field-filters .filter-chip[data-filter="봉사"]');
+    await page.waitForTimeout(200);
+    eq('③   봉사 칩', (await cards(page)).map((c) => c.name), ['2026 대학생 해외봉사단 모집']);
+    eq('③   칩 켜짐은 제 줄에서만 — 종류 칩의 전체는 그대로',
+      await page.$eval('#activities-filters .filter-chip[data-filter="all"]', (c) => c.classList.contains('active')), true);
+    await page.click('#activities-field-filters .filter-chip[data-filter="기타"]');
+    await page.waitForTimeout(200);
+    eq('③   기타 칩 — 분야를 못 읽은 글만 (데이터는 그대로 비어 있다 · 기타는 화면 이름일 뿐)',
+      (await cards(page)).map((c) => c.name), ['제3회 장학수기 공모전 공고', '전국 청년 서포터즈 모집']);
+    /* 🔴 종류를 바꾸면 분야가 풀린다 — 안 풀면 '봉사'를 고른 채 공모전으로 가서 0건 화면이 된다 */
+    await page.click('#activities-field-filters .filter-chip[data-filter="봉사"]');
+    await page.waitForTimeout(200);
+    await page.click('#activities-filters .filter-chip[data-filter="공모전"]');
+    await page.waitForTimeout(200);
+    eq('③   종류를 바꾸면 분야가 풀린다', await page.$eval('#activities-field-filters .filter-chip.active', (c) => c.dataset.filter), 'all');
+    eq('③   그 종류에 있는 분야만 뜬다 (공모전 글엔 field 가 없다)', await fchips(), ['all', '기타']);
+    eq('③   그래서 목록이 비지 않는다', (await cards(page)).length > 0, true);
+    await page.click('#activities-filters .filter-chip[data-filter="all"]');
+    await page.waitForTimeout(200);
     await page.fill('#activities-search', '서포터즈');
     await page.waitForTimeout(200);
     eq('③ 검색은 제목 글자로', (await cards(page)).map((c) => c.name), ['전국 청년 서포터즈 모집']);

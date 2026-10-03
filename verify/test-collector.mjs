@@ -1694,6 +1694,40 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
      /box\.innerHTML = list\.map\(activityCardHtml\)/.test(app)], [true, true, true]);
   eq('  누르면 장학과 같은 상세 시트(#detail-sheet)를 연다', /closest\('\[data-activity\]'\)/.test(app) && /function openActivityDetail[\s\S]*?\$\('#detail-sheet'\)\.innerHTML[\s\S]*?openSheetShell\(\)/.test(app), true);
   eq('칩 켜고 끄기는 제 줄 안에서만 (다른 화면 칩을 건드리지 않는다)', /\$\$\('\.filter-chip'\)\.forEach/.test(app), false);
+
+  /* 작은 거들기 — 홑따옴표와 같은 글자를 이 파일 안에서 만들어 쓴다(정규식 이스케이프를 줄이려고) */
+  const Q39 = String.fromCharCode(39);
+  /* 🔴 거르는 줄만 집는다 — 그냥 `activitiesField !== 'all'` 로 찾으면 **칩 줄을 만드는 함수**의
+     '고른 칩이 사라졌다' 줄(파일에서 더 앞)을 집어 차례 검사가 거꾸로 읽힌다(실측). */
+  const FIELD_GUARD = 'activitiesField !== ' + Q39 + 'all' + Q39 + ') {';
+  /* ── 분야 칩 줄 (2026-10-03 개발자 지시 "제목 아래 회색 분류를 위에 버튼으로") ──────────────
+     종류 칩 아래에 한 줄 더. 🔴 이 절이 지키는 넷:
+       ① 분야 이름을 app.js 에 **베껴 적지 않았다** — 원본은 activity-kind.mjs 의 ACTIVITY_FIELDS
+          한 곳이고 앱은 빌드가 없어 못 들여온다. 베끼면 수집기가 갈래를 늘려도 화면은 모른다.
+       ② 거르는 차례 — 종류 뒤 · **검색 앞**(검색을 앞으로 옮기면 마감·숨김이 검색에 안 걸린다).
+       ③ 칩 줄은 **분야로 거르기 전** 목록에서 센다(거른 뒤 세면 누르는 순간 나머지 칩이 사라진다).
+       ④ 종류를 바꾸면 분야를 푼다(공모전에만 있는 분야를 고른 채 대외활동으로 가면 0건 화면). */
+  eq('분야 칩 줄이 index.html 에 있다 (빈 그릇 — 칩은 데이터에서 만든다)',
+    html.includes('<div class="filter-row" id="activities-field-filters"></div>'), true);
+  eq('  🔴 분야 이름을 app.js 에 베껴 적지 않았다 (목록 원본은 activity-kind.mjs 한 곳)',
+    (() => {
+      const i = app.indexOf('function renderActivityFieldChips');
+      const body = i < 0 ? '' : app.slice(i, app.indexOf(String.fromCharCode(10) + 'function ', i + 10));
+      return [...ACTIVITY_FIELDS['공모전'], ...ACTIVITY_FIELDS['대외활동']].filter((fd) => body.includes(fd));
+    })(), []);
+  eq('  분야 거르기가 종류 뒤 · 검색 앞이다',
+    app.indexOf('n.kind === activitiesFilter') < app.indexOf(FIELD_GUARD)
+    && app.indexOf(FIELD_GUARD) < app.indexOf('const q = activitiesQuery.trim()'), true);
+  eq('  칩 줄은 분야로 거르기 **전**에 만든다',
+    app.indexOf('renderActivityFieldChips(list)') < app.indexOf(FIELD_GUARD), true);
+  eq('  종류를 바꾸면 분야를 푼다', (() => {
+    const i = app.indexOf('activitiesFilter = chip.dataset.filter;');
+    return i > 0 && app.slice(i, i + 600).includes('activitiesField = ' + Q39 + 'all' + Q39 + ';');
+  })(), true);
+  eq('  분야 칩 배선도 제 그릇으로 좁혀져 있다',
+    app.includes("$(" + Q39 + "#activities-field-filters" + Q39 + ").addEventListener"), true);
+  eq('  기타는 화면 이름일 뿐 — field 가 빈 글을 모은다',
+    app.includes('activitiesField === ACT_FIELD_ETC ? !n.field : n.field === activitiesField'), true);
   const eng = createRequire(import.meta.url)('../match-engine.js');
   const P = { school: '한국외국어대학교', campus: '' };
   eq('엔진: 학교가 빈 글은 누구에게나', eng.activityForProfile({ school: '', url: 'u' }, P), true);
