@@ -11123,7 +11123,7 @@ console.log('\n■ 대외활동·공모전 — 활동 글의 자격 읽기 (2026
     [fx('⑤ 대한민국 국적을 보유하지 않은 사람', P), fx('⑤ 대한민국 국적을 보유하지 않은 사람', { ...P, nationality: 'foreign' })], [0, 1]);
   eq('  (리뷰) 제목 머리말 `[서울문화재단] …` 은 이름표로 바꾸지 않는다 · 맨 제목 줄 `지원자격` 아래 내용은 자격이다',
     [AX.activityDetails('[서울문화재단] 2026 청년예술인 모집').noticeLines.concat(el('[서울문화재단] 2026 청년예술인 모집')).some((l) => /서울문화재단 :/.test(l)), el(['지원자격', '대학 재학생으로서 평점 3.0 이상인 자', '신청기간 : 2026. 10. 1. ~ 10. 20.'].join('\n'))],
-    [false, ['대학 재학생으로서 평점 3.0 이상인 자']]);
+    [false, ['지원자격 : 대학 재학생으로서 평점 3.0 이상인 자']]);   // 2026-10-04 납작한 표 잇기 — 같은 내용에 이름표가 붙는다
   const PRX0 = rq('../parse-requirements.js');
   const natOf = (l) => (rq('../parse-requirements.js').parseLine(l).conds.find((c) => c.kind === 'nationality') || {}).eq;
   eq('  (리뷰) `대한민국 국적자로 결격사유가 없는 자` 는 한국 국적 요건 · `대한민국 국적이 없는 자` 는 외국 국적', [natOf('대한민국 국적자로 결격사유가 없는 자'), natOf('대한민국 국적이 없는 자')], ['korean', 'foreign']);
@@ -11215,6 +11215,38 @@ console.log('\n■ 대외활동·공모전 — 첨부·포스터 읽기 (2026-10
   eq('  버튼 워크플로 — 대외활동 AI 는 스위치(ELIG_AI_ENABLE)를 그 단계에서만 · 결과를 저장 · 감사에 걸리면 되돌린다',
     [/- name: 대외활동 — 포스터·첨부·본문 AI 읽기[\s\S]*?ELIG_AI_ENABLE: '1'[\s\S]*?activity-docs\.mjs --ai --write/.test(we), /git add data\/activities\.json/.test(we), /git checkout -- data\/registered\.json data\/activities\.json/.test(we)],
     [true, true, true]);
+}
+
+console.log('\n■ 대외활동 — 남은 글 표본에서 찾은 것 (2026-10-04 개발자 "글에 자격 문장 자체가 없을 수가 없어 · 샘플 뽑아서 찾아봐")');
+{
+  /* 표본 24건을 진짜 크롬으로 열어 보니 자격은 거의 다 화면에 있었다. 못 찾던 꼴과 막은 오독을 여기 묶는다 */
+  const AX = await import('../collector/activity-excerpts.mjs');
+  const AK = await import('../collector/activity-kind.mjs');
+  process.env.ACTIVITY_DOCS_AS_LIB = '1';
+  const AD = await import('../collector/activity-docs.mjs');
+  const rq = createRequire(import.meta.url);
+  const MEX = rq('../match-engine.js');
+  const PRX = rq('../parse-requirements.js');
+  const el = (t, ti = '') => AX.activityDetails(t, ti).eligibilityLines;
+  eq('① 납작해진 표 — `대상` ↵ `대학생, 일반인 …` · `대상연령` ↵ `만 20세 이상 …` 을 이름표 줄로 잇고 둘 다 자격 줄',
+    el('대상연령\nmanual\n'.replace('manual', '만 20세 이상 ~ 만 39세 이하') + '대상\n대학생, 일반인, 대학, 연구기관', 'SaaS'), ['대상연령 : 만 20세 이상 ~ 만 39세 이하', '대상 : 대학생, 일반인, 대학, 연구기관']);
+  eq('  🔴 시상표의 `대상` ↵ `교육부장관상` · `대상` ↵ `1` 은 1등 상이지 자격이 아니다 · `봉사대상` ↵ `어르신` 은 봉사 받는 사람',
+    [el('시상내역\n대상\n교육부장관상\n최우수상\n원장상'), el('대상\n1\n최우수\n2'), el('봉사대상\n어르신')], [[], [], []]);
+  eq('② `1. 모집대상` 아래 줄은 장학 신호 낱말이 없어도 대상이다(활동만 · 성균관대 발목 연구)',
+    el('1. 모집대상\n- 만 19세 이상 성인으로 최소 1회 이상 발목 부상 병력이 있는 경우\n2. 모집기간 : 상시', '발목').length, 2);
+  const X2 = await import('../collector/extract-excerpts.mjs');
+  eq('  장학 발췌기는 그대로(trustHead 를 넘기지 않으면 예전처럼 비운다)', X2.extractQualifyLines('1. 모집대상\n- 발목 부상 병력이 있는 경우\n2. 모집기간 : 상시').length, 0);
+  eq('③ 🔴 `만 14세 미만의 경우 … 보호자 동의서 필요` 는 경우 안내지 나이 조건이 아니다(KOREAZ — 22살 학생 틀린 미달) · `만 14세 미만` 만 있으면 조건',
+    [PRX.parseLine('ㅇ 만 14세 미만의 경우 개인정보 수집 및 활용에 대한 보호자 동의서 필요').conds.some((c) => c.kind === 'age'), PRX.parseLine('만 34세 이하 청년').conds.some((c) => c.kind === 'age')], [false, true]);
+  eq('  자격 문장이 화면에서 걸러지지 않는다 — `서울시민(성인)` · `18세 이상 성인`',
+    ['참가자격: 서울시민(성인)', '18세 이상 성인'].map((l) => MEX.requirementLines({ eligibilityLines: [l] }, null, { all: true }).length), [1, 1]);
+  eq('④ 모집 글이 아닌 것 — 결과·보도·지난 해 글은 대외활동이 아니다 · 모집 글은 그대로',
+    [AK.notActivity('2026년 제3회 장학수기 공모전 심사 결과...'), AK.notActivity('가명정보 활용 경진대회 대상·최우수상 동시 석권'), AK.notActivity('2018년 사회복지 협력기관 워크숍', new Date('2026-10-04')), AK.notActivity('2026년 경기 스타트업 아카데미 참여자 모집', new Date('2026-10-04')), AK.notActivity('2025학년도 겨울 해외탐방 모집', new Date('2026-10-04'))],
+    [true, true, true, false, false]);
+  eq('  수집 로봇이 이미 실린 글에도 소급한다', /acts\.items = acts\.items\.filter\(\(n\) => !notActivity\(n\.title\)\)/.test(readText(new URL('../collector/collect.mjs', import.meta.url))), true);
+  eq('⑤ 그림 — 큰 카드뉴스(1920×1080)는 받는다 · 광고 배너(846×510)는 아니다', [AD.posterShaped({ w: 1920, h: 1080 }), AD.posterShaped({ w: 846, h: 510 })], [true, false]);
+  eq('  페이지에 직접 박힌 그림(data:image/png;base64)도 후보 · 다른 data: 는 아니다(감사원 팝업)',
+    AD.candidateFiles({ title: '감사 아이디어 공모', attachments: [] }, '<h1>감사 아이디어 공모</h1><img src="data:image/png;base64,iVBORw0KGgo="><img src="data:text/html;base64,PGI+">', 'https://bai.go.kr/x').map((f) => f.url.slice(0, 22)), ['data:image/png;base64,']);
 }
 
 console.log('\n■ 자격요건 로봇 (진짜 브라우저) — 장학·대외활동 (2026-10-04 개발자 "진짜 브라우저로 열어야 되는 공고는 다 이걸로 · 시간초과 등 오류 안 나게")');
