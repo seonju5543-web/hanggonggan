@@ -97,7 +97,7 @@ const thumbs = (page) => page.$$eval('#school-news .notice-card', (els) => els.s
   const name = e.querySelector('.sch-name').getBoundingClientRect();
   const r = img && img.getBoundingClientRect();
   return { has: e.classList.contains('has-thumb'), img: !!img, school: !!(img && img.classList.contains('notice-thumb-school')), loaded: !!(img && img.complete && img.naturalWidth > 0), w: r ? Math.round(r.width) : 0, h: r ? Math.round(r.height) : 0,
-    right: !!(r && r.left >= name.right - 1), alt: img ? img.getAttribute('alt') : null, label: e.textContent.includes('학교 사진') };
+    right: !!(r && r.left >= name.right - 1), alt: img ? img.getAttribute('alt') : null, label: /학교\s*사진/.test(e.textContent) };
 }));
 const settle = async (page) => { await page.$eval('#school-news', (e) => e.scrollIntoView()); await page.waitForTimeout(1200); };
 

@@ -2585,7 +2585,7 @@ console.log('\n■ 학교 대표 사진 (2026-10-03 개발자 지시 "썸네일�
   const good = { src: 'assets/schools/n1w4hprp-0123abcd.webp', focus: '50% 40%', credit: 'x · CC BY 3.0', page: 'https://commons.wikimedia.org/wiki/File:x.jpg' };
   const h1 = A.noticeCardHtml(n, { schoolPhoto: good });
   /* 🔴 사진 위 「학교 사진」 표시는 개발자 지시로 뺐다(10-03 *"학교사진에 '학교사진' 이라는 디스크립션 빼"*) — 되돌아오면 빨간불 */
-  eq('  사진 없는 글 — 학교 사진이 글의 사진과 같은 img 한 장으로 썸네일 자리에 · 자를 자리 · 사진 위 「학교 사진」 표시 없음', [/class="sch-card notice-card has-thumb"/.test(h1), /<img class="notice-thumb notice-thumb-school" src="assets\/schools\/n1w4hprp-0123abcd\.webp"/.test(h1), /학교 사진|thumb-tag/.test(h1), /object-position:50% 40%/.test(h1)], [true, true, false, true]);
+  eq('  사진 없는 글 — 학교 사진이 글의 사진과 같은 img 한 장으로 썸네일 자리에 · 자를 자리 · 사진 위 「학교 사진」 표시 없음', [/class="sch-card notice-card has-thumb"/.test(h1), /<img class="notice-thumb notice-thumb-school" src="assets\/schools\/n1w4hprp-0123abcd\.webp"/.test(h1), /학교\s*사진|thumb-tag/.test(h1), /object-position:50% 40%/.test(h1)], [true, true, false, true]);
   const h2 = A.noticeCardHtml({ ...n, thumb: 'data/news/img/0123456789abcdef.webp' }, { thumb: 'data/news/img/0123456789abcdef.webp', schoolPhoto: good });
   eq('    글의 사진이 있으면 그 사진만 (학교 사진·표시 없음)', [/notice-thumb-school|학교 사진/.test(h2), /data\/news\/img\/0123456789abcdef\.webp/.test(h2)], [false, true]);
   const h3 = A.noticeCardHtml(n, { schoolPhoto: { ...good, src: 'https://evil.example/x.webp', focus: '1;background:red' } });
