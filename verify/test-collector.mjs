@@ -2573,7 +2573,8 @@ console.log('\n■ 학교 대표 사진 (2026-10-03 개발자 지시 "썸네일�
   eq('    이름 뒤 괄호 설명은 떼고 이름만 (긴 이름은 낱말 경계에서)', [SP.cleanAuthor('Yohan Lee(Sejong University student of class 25) 이요한(세종대학교 학번 25)'), SP.cleanAuthor('최광모 (Choe Kwangmo)'), SP.cleanAuthor('Saigen Jiro'), SP.cleanAuthor('myself (User:Piotrus)')], ['Yohan Lee 이요한', '최광모', 'Saigen Jiro', 'Piotrus']);
   /* ② 앱 — 카드를 실제로 그려 본다 (함수를 떼어 실행) */
   const env = `const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-    const safeUrl = (u) => u; const unent = (s) => s; const isBoardListLink = () => false;
+    const safeUrl = (u) => u; const unent = (s) => s;
+    ${/* 카드의 링크 이름은 source-link.js 한 곳(2026-10-03 원문 링크 정직성) — 흉내 내지 않고 진짜 파일을 싣는다 */ readText(new URL('source-link.js', root))}
     const NEWS_THUMB_RE = ${re('NEWS_THUMB_RE')}; const SCHOOL_PHOTO_RE = ${re('SCHOOL_PHOTO_RE')}; const PHOTO_FOCUS_RE = ${re('PHOTO_FOCUS_RE')};
     let schoolPhotos = null;
     ${cut('noticeCardHtml')}
@@ -4110,7 +4111,9 @@ console.log('\n■ 링크 사냥꾼의 제목 대조 (2026-08-23)');
   const lh = readText(new URL('../collector/link-hunter.mjs', import.meta.url));
   eq('사냥꾼은 수집기와 같은 제목 청소 규칙을 쓴다', /from '\.\/clean-title\.mjs'/.test(lh), true);
   eq('  대조할 제목에서 부스러기를 뗀다', /cleanTitle\(\(t\.ref\.boardTitle/.test(lh), true);
-  eq('  받아 적을 때도 떼고 담는다', /boardTitle = cleanTitle\(mate\.title\)/.test(lh), true);
+  /* 2026-10-03 — 행 꼬리(`학생지원팀 2026-09-02 1,076`)까지 떼고 담는다(link-landing.mjs stripRowTail) — 꼬리 달린 원제목으로
+     대조해 멀쩡한 원문이 '제목 불일치'로 떨어졌다. cleanTitle 로 감싸 두는 것은 그대로(저장된 값이 청소 규칙과 어긋나지 않게). */
+  eq('  받아 적을 때도 떼고 담는다', /boardTitle = cleanTitle\(stripRowTail\(mate\.title\)\)/.test(lh), true);
   const CT = await import(new URL('../collector/clean-title.mjs', import.meta.url));
   eq('  분류 배지를 뗀다', /^공지/.test(CT.cleanTitle('공지 공지 2026-2학기 복지장학1(본인장애) 신청안내')), false);
   eq('  행 번호를 뗀다', /^2651/.test(CT.cleanTitle('2651 2026-2학기 부남장학생 선발 안내')), false);
@@ -4296,11 +4299,14 @@ console.log('\n■ 목록 화면인가 상세 화면인가 (2026-08-20)');
     D.looksLikeList('찾는 공고 제목\n신청 자격 …\n이전글 다음글\n' + others.join('\n'), others), false);
   eq('  다른 제목이 적으면 애초에 목록이 아니다', D.looksLikeList(others[0], others), false);
   // ③ 규칙은 한 곳에만 — 복사본이 살아나면 두 로봇이 갈라진다
+  /* 2026-10-03 — 두 로봇은 이제 looksLikeList 를 직접 부르지 않고 **공용 착지 판정**(link-landing.mjs judgeLanding)을 부른다.
+     judgeLanding 이 안에서 이 looksLikeList 를 쓴다(목록 판정은 여전히 한 곳). 그래서 '어느 쪽이든 공용 것을 가져다 쓰는가'를 본다. */
   for (const f of ['collector/link-hunter.mjs', 'collector/resolve-detail-urls.mjs']) {
     const src = readText(new URL('../' + f, import.meta.url));
-    eq(`  ${f.split('/').pop()} 는 공용 규칙을 쓴다`, /looksLikeList[^\n]*detail-url|looksLikeList\s*\}/.test(src), true);
+    eq(`  ${f.split('/').pop()} 는 공용 규칙을 쓴다`, /looksLikeList[^\n]*detail-url|looksLikeList\s*\}|import \{[^}]*\bjudgeLanding\b[^}]*\} from '\.\/link-landing\.mjs'/.test(src), true);
     eq(`  ${f.split('/').pop()} 에 복사본이 없다`, /function looksLikeList/.test(src), false);
   }
+  eq('  공용 착지 판정이 그 looksLikeList 를 쓴다(목록 판정이 정말 한 곳)', /import \{[^}]*\blooksLikeList\b[^}]*\} from '\.\/detail-url\.mjs'/.test(readText(new URL('../collector/link-landing.mjs', import.meta.url))), true);
 }
 
 /* 2026-08-20 — 중간 인증서를 안 보내는 학교(계명대) 때문에 Node만 연결이 막히던 문제 */
@@ -8607,7 +8613,11 @@ console.log('\n■ 층2 첨부 — 앱이 그 파일을 실제로 열 수 있게
   eq('  그 줄이 navigate 분기보다 위에 있다',
     swjs.indexOf(guard) >= 0 && swjs.indexOf(guard) < swjs.indexOf("e.request.mode === 'navigate'"), true);
   /* 🔴 층2 의 sourceUrl 은 KOSAF 가 아니라 그 재단 홈페이지다 — 이름을 틀리면 거짓말이 된다 */
-  eq('층2 원문 링크를 재단 홈페이지라고 부른다', /sourceKind === 'kosaf' \? '재단 홈페이지 ↗'/.test(appjs), true);
+  /* 2026-10-03 — 이름은 이제 source-link.js 한 곳이 정한다(app.js 에는 이름 글자가 없다 — 자리마다 다시 정하던 것이
+     이번 사고의 절반이었다). 그래서 app.js 글자가 아니라 **그 규칙이 층2를 무엇이라 부르는지**를 잰다.
+     모든 화면 자리가 그 규칙을 쓰는지는 「원문 링크 정직성」 app 갈래(verify/link-gates/app.mjs)가 잰다. */
+  eq('층2 원문 링크를 재단 홈페이지라고 부른다',
+    createRequire(import.meta.url)('../source-link.js').sourceLink({ sourceKind: 'kosaf', sourceUrl: 'http://example.or.kr/' }, 'detail').label, '재단 홈페이지 ↗');
   eq('층2 사본을 첨부로 넘긴다', /attachments: i\.files\.map/.test(appjs), true);
 }
 
@@ -10979,7 +10989,15 @@ console.log('\n■ 공공 API 로봇 (2026-10-01)');
   const pv = { ...p1, url: 'https://k/x', api: 'youthPolicy' };
   const cross = M.mergeApi([], { kstartup: { ok: true, items: [{ ...k1, url: 'https://k/x' }] }, youthPolicy: { ok: true, items: [pv] } }, { today });
   eq('I1 출처끼리 같은 주소는 하나(감사가 중복으로 그날 결과를 버리지 않게)', cross.length, 1);
-  eq('I1 기관 홈 첫 화면 주소는 그 공고가 아니라 버린다', M.mapYouthPolicy({ ...p, aplyUrlAddr: 'https://www.mois.go.kr/', refUrlAddr1: 'https://www.mois.go.kr' }, opt).drop, '원문 주소 없음');
+  /* I1 을 2026-10-03 에 고쳐 썼다 — I1 때는 앱이 모든 주소를 '원문에서 신청하기 ↗' 라 불러 버리는 것만이 정직했다.
+     이제 앱이 주소 꼴로 기관 첫 화면을 '주최 측 홈페이지 ↗' 라 부르므로(source-link.js · 관문 「원문 링크 정직성」 core),
+     청년정책은 ① 그 정책 하나를 가리키는 주소가 다른 칸에 있으면 그것을 고르고 ② 셋 다 첫 화면뿐이면 첫 주소로 싣되 사유(note)를 남긴다.
+     다른 출처(K-Startup·1365·청년콘텐츠)는 예전대로 버린다. 첫 화면 판정 자체는 관문 「원문 링크 정직성」 producers 가 잰다. */
+  eq('I1 기관 홈 첫 화면 주소뿐인 청년정책 — 버리지 않고 첫 주소로 싣고 사유를 남긴다',
+    (({ item, note }) => [item && item.url, !!note])(M.mapYouthPolicy({ ...p, aplyUrlAddr: 'https://www.mois.go.kr/', refUrlAddr1: 'https://www.mois.go.kr' }, opt)), ['https://www.mois.go.kr/', true]);
+  eq('I1   첫 칸이 첫 화면이고 다음 칸에 그 정책 주소가 있으면 그 주소를 고른다',
+    M.mapYouthPolicy({ ...p, aplyUrlAddr: 'https://www.jeju.go.kr/index.htm', refUrlAddr1: 'https://www.jeju.go.kr/policy/view.htm?id=3' }, opt).item.url, 'https://www.jeju.go.kr/policy/view.htm?id=3');
+  eq('I1   K-Startup 은 첫 화면뿐이면 예전대로 버린다', M.mapKstartup({ ...ks, detl_pg_url: 'https://www.k-startup.go.kr/index.do', biz_aply_url: '', biz_gdnc_url: null }, opt).drop, '원문 주소 없음');
   const twin = [v, { ...v, url: 'https://www.1365.go.kr/v?no=2', nanmmbyNm: '부산광역시자원봉사센터' }];
   eq('I2 같은 제목(학교·캠퍼스·제목)은 한 번만 — 수집 로봇의 dedupeNotices 와 같은 잣대', M.mapRows('vol1365', twin, opt).items.length, 1);
   eq('I2 같은 제목의 게시판 글도 API 글이 대신한다', M.mergeApi([{ ...board, title: k1.title, url: 'https://board/9' }], { kstartup: { ok: true, items: [k1] } }, { today }).length, 1);
@@ -11087,6 +11105,14 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
   eq('  카드·시트에 장학과 같은 북마크(saveBtnHtml)', /save: saveBtnHtml\(`act:\$\{n\.url\}`\)/.test(appX) && /\$\{saveBtnHtml\(`act:\$\{n\.url\}`\)\}/.test(appX), true);
   eq('  저장 해제의 되돌리기는 뺀 줄을 그대로 돌려놓는다(다시 담기는 빠진 공고에 막힌다)', /const removed = state\.saved\.splice\(at, 1\)\[0\];[\s\S]{0,400}state\.saved\.splice\(Math\.min\(at, state\.saved\.length\), 0, removed\)/.test(appX), true);
   eq('  지원 가능 알약(STATUS_META)은 활동 시트에 없다 — 구조화 조건이 없어 늘 가능이라 거짓 안심', /STATUS_META\[/.test((() => { const a = appX.indexOf('function openActivityDetail'); return appX.slice(a, appX.indexOf('\nfunction ', a + 10)); })()), false);
+}
+
+console.log('\n■ 원문 링크 정직성 (2026-10-03 · 원문 대신 재단 홈페이지·게시판 목록이 열리던 사고)');
+/* 🔴 화면은 링크 이름을 source-link.js 한 곳에서만 받고, 로봇은 collector/link-landing.mjs 한 곳으로 판정한다.
+   갈래별 검사는 verify/link-gates/*.mjs (core · app · robot · producers · data) — verify/link-gates.mjs 가 차례로 부른다. */
+{
+  const { runLinkGates } = await import('./link-gates.mjs');
+  await runLinkGates(eq);
 }
 
 console.log('\n■ 대외활동·공모전 — 활동 글의 자격 읽기 (2026-10-03 · 개발자 "왜 대외활동 공모전은 자격 미확인이야 죄다")');

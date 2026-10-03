@@ -30,7 +30,8 @@ on:
       '양식 자동작성 · 작성 규칙 학습',      # data/essay-playbook.json — 양식 작성 규칙
       '대학별·계열별 등록금 갱신',            # data/tuition.json — `수업료 100%` 를 원으로 바꾼다
       '교내 소식 수집 로봇',                  # data/news/ — 홈 「우리 학교 소식」 (2026-09-30 신설 · 학교별 파일)
-      '공공 API 로봇']                        # data/activities.json — K-Startup·1365·온통청년 (2026-10-01 신설)
+      '공공 API 로봇',                        # data/activities.json — K-Startup·1365·온통청년 (2026-10-01 신설)
+      '원문 링크 확인 로봇']                  # data/link-check.json — 확정된 문제 링크(앱이 링크 이름을 정직하게 바꾼다 · 2026-10-03 신설)
     types: [completed]
   push:
     branches: ['claude/nice-heisenberg-WESq5']

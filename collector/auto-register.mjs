@@ -60,6 +60,12 @@ const TODAY = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
    이 파일은 불러오는 즉시 실행되므로 남이 여기서 가져갈 수 없어 따로 뺐다. */
 export { canonUrl } from './canon-url.mjs';
 import { canonUrl, idFromUrl } from './canon-url.mjs';
+/* 🔴 원문 주소는 **HTML 기호를 되돌려** 담는다 (2026-10-03 · 원문 링크 정직성) — 게시판이 `&#038;` 로 내보낸 주소를
+   그대로 담으면 브라우저가 `#038;…` 을 조각으로 읽어 글 번호가 사라진다(서울대 학생처 3건 실측: 공고 대신 메뉴 화면).
+   되돌리는 규칙은 앱과 같은 파일(source-link.js) 하나다. '이미 등록됐나'를 묻는 열쇠도 되돌린 주소로 만든다 —
+   안 그러면 옛 등록분(기호 박힌 주소)과 새 공고(되돌린 주소)가 다른 글로 보여 같은 공고가 두 번 등록된다.
+   (기호 박힌 서울대 주소 셋은 canonUrl 로 전부 `…/?mod=document` 하나가 되어 서로를 '이미 등록'으로 가리고 있었다.) */
+const { decodeUrlEntities } = createRequire(import.meta.url)('../source-link.js');
 
 /* 제목 청소는 공용 모듈에 있다 (수집기와 같은 규칙을 써야 중복 판정이 어긋나지 않는다) */
 export { cleanTitle } from './clean-title.mjs';
@@ -150,7 +156,7 @@ function parseDeadline(n) {
 
 function classify(n, regUrlSet, regItems, batchSeen) {
   const t = n.title || '';
-  const cu = canonUrl(n.url);
+  const cu = canonUrl(decodeUrlEntities(n.url));
   const nt = normTitle(t);
   if (regUrlSet.has(cu)) return { verdict: 'skip', why: '이미 등록(원문 동일)' };
   if (batchSeen.has(cu) || batchSeen.has(n.school + '|' + nt)) return { verdict: 'skip', why: '이번 실행 내 중복' };
@@ -235,7 +241,7 @@ const report = [];
 if (!cfg.enabled) {
   report.push('', '### 🤝 자동 등록: 꺼짐 (auto-register-config.json enabled=false)');
 } else {
-  const regUrlSet = new Set(registered.items.map((i) => canonUrl(i.sourceUrl || '')).filter(Boolean));
+  const regUrlSet = new Set(registered.items.map((i) => canonUrl(decodeUrlEntities(i.sourceUrl || ''))).filter(Boolean));
   const batchSeen = new Set();
   const added = [];
   const held = [];
@@ -268,14 +274,15 @@ if (!cfg.enabled) {
     if (added.length >= (cfg.maxPerRun || 8)) { unseen += 1; continue; }
     if (onlySchools.size && n.school && !onlySchools.has(n.school)) { outOfScope += 1; continue; }
     const r = classify(n, regUrlSet, registered.items, batchSeen);
+    const nUrl = decodeUrlEntities(n.url);   // 담는 원문 주소 — `&#038;` 를 되돌린 것 (위 import 주석)
     if (r.verdict === 'promote' || r.verdict === 'absorb') {
       /* 기존 등록분을 전국으로(promote) 또는 이미 전국인 등록분에 게시 학교만 더한다(absorb) — 합치는 규칙은 registered-merge.mjs 한 곳
          (관리자 merge 와 같다). 새 공고는 등록하지 않는다(같은 사업이다). */
-      const { promoted: did } = mergeInto(r.twin, { id: `notice:${canonUrl(n.url)}`, eligibility: { schoolOnly: n.school }, sourceUrl: n.url, attachments: n.attachments || [] },
+      const { promoted: did } = mergeInto(r.twin, { id: `notice:${canonUrl(nUrl)}`, eligibility: { schoolOnly: n.school }, sourceUrl: nUrl, attachments: n.attachments || [] },
         { reason: `같은 사업이 ${n.school} 게시판에도 올라옴(자동)` });
       if (did) promoted.push({ keep: r.twin, n });
       else skipped.set('이미 전국(동일 사업)', (skipped.get('이미 전국(동일 사업)') || 0) + 1);
-      regUrlSet.add(canonUrl(n.url));
+      regUrlSet.add(canonUrl(nUrl));
       continue;
     }
     if (r.verdict === 'hold') { held.push({ n, why: r.why }); continue; }
@@ -286,7 +293,7 @@ if (!cfg.enabled) {
       skipped.set(key, (skipped.get(key) || 0) + 1);
       continue;
     }
-    const cu = canonUrl(n.url);
+    const cu = canonUrl(nUrl);
     batchSeen.add(cu);
     batchSeen.add(n.school + '|' + normTitle(n.title));
     // 첨부는 신청서·공고문류만 (게시판 메뉴 링크 오염 방지)
@@ -296,7 +303,7 @@ if (!cfg.enabled) {
       .filter((a) => /신청서|지원서|신청양식|원서|서식|양식|동의서|서약서|추천서|공고/.test(a.name) && /\.(hwp|hwpx|doc|docx|pdf|zip|xlsx?)(\?|$)?/i.test(a.name + a.url))
       .slice(0, 6);
     // 🔴 공식은 canon-url.mjs 하나 — 베끼면 관리자 화면의 register 와 갈라진다(2026-08-14 부경대 유형)
-    const id = idFromUrl('auto-', n.url);
+    const id = idFromUrl('auto-', nUrl);
     // 아래 두 갈래도 집계에 넣는다 — 여기서 빠져나가면 다시 '조용한 탈락'이 된다
     if (registered.items.some((i) => i.id === id)) { skipped.set('이미 등록(같은 id)', (skipped.get('이미 등록(같은 id)') || 0) + 1); continue; }
     /* 사람이 한 번 '이건 아니다'라고 뺀 공고는 다시 등록하지 않는다.
@@ -361,7 +368,7 @@ if (!cfg.enabled) {
       noForm: `자동 등록(검수 전) ${TODAY} — 양식 스키마화는 검수 후 진행`,
       auto: true,
       attachments: atts,
-      sourceUrl: n.url,
+      sourceUrl: nUrl,
       sourceKind: 'auto'
     };
     /* 마지막 관문: 감사 도구와 '똑같은 규칙'으로 자기 결과를 스스로 검사한다.

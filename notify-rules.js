@@ -59,7 +59,7 @@ var NOTIFY_RULES = (function () {
       enabled: false,       // 앱 안의 알림 사용 스위치 (OS 권한과 별개)
       prefs: Object.assign({}, DEFAULT_PREFS),
       seenSch: [],          // 이미 인지한 정식 등록 공고 id
-      seenNotice: [],       // 이미 인지한 실시간 공고 주소
+      seenNotice: [],       // 이미 인지한 실시간 공고 — 주소와 't:학교|제목' 열쇠(주소가 고쳐져도 다시 울리지 않게)
       sent: {},             // 보낸 알림 키 → 시각 (같은 알림 두 번 안 보내기)
       inbox: [],            // 앱 안 알림함 (최근 60건)
       baseline: false,      // 첫 동기화(기존 공고를 '이미 본 것'으로 정리)를 마쳤는지
@@ -270,14 +270,29 @@ var NOTIFY_RULES = (function () {
     }
 
     /* ── 4. 우리 학교 실시간 공고 (묶음 1건) ──────────────────── */
+    /* 🔴 '본 공고'는 주소 하나로 알아보지 않는다 (2026-10-03 · 원문 링크 정직성 리뷰 F3).
+       링크 사냥꾼·복구 로봇이 목록 표식(#n-)을 진짜 글 주소로 고치면 **같은 공고의 주소가 바뀐다** —
+       주소만 보면 며칠 전 공고가 '새 공고 n건'으로 다시 운다. 그래서 ① 학교+제목 열쇠도 같이 적고
+       ② 지난 확인보다 이틀 이상 앞서 수집된 글(foundAt)은 그때 이미 피드에 있었으므로 본 것으로 친다
+       (발행 지연 최대 반나절 + 날짜 경계 하루 여유 · 열쇠가 없던 옛 장부도 이 줄로 한 번에 넘어간다). */
+    var titleSeenKey = function (n) {
+      return 't:' + (n.school || '') + '|' + String(n.title || '').replace(/\s+/g, '');
+    };
+    var foundBeforeLastCheck = function (n) {
+      var t = n.foundAt ? Date.parse(String(n.foundAt).slice(0, 10)) : NaN;
+      return !!ledger.lastCheck && !isNaN(t) && t + 2 * 864e5 <= ledger.lastCheck;
+    };
     var freshNotices = [];
     notices.forEach(function (n) {
       if (!n || !n.url) return;
       // 내 학교 공고인지는 match-engine이 정한다 — 화면(app.js)과 같은 판정이어야
       // 화면에 없는 공고를 알림으로 알리는 일이 없다. 분교(한양 ERICA 등)도 여기서 처리된다.
       if (!noticeMine(n, profile)) return;
-      if (seenNotice[n.url]) return;
+      var tk = titleSeenKey(n);
+      var seen = seenNotice[n.url] || seenNotice[tk] || foundBeforeLastCheck(n);
       seenNotice[n.url] = 1;
+      seenNotice[tk] = 1;
+      if (seen) return;
       if (isLoan(n.title)) return;                    // 대출·융자는 장학금이 아니다
       freshNotices.push(n);
     });
@@ -312,7 +327,7 @@ var NOTIFY_RULES = (function () {
 
     /* ── 장부 정리 ─────────────────────────────────────────── */
     ledger.seenSch = Object.keys(seenSch);
-    ledger.seenNotice = Object.keys(seenNotice).slice(-800);
+    ledger.seenNotice = Object.keys(seenNotice).slice(-1600);   // 공고 하나에 열쇠 둘(주소·제목)이라 예전 800의 두 배
     Object.keys(ledger.sent).forEach(function (k) {
       if (now - ledger.sent[k] > SENT_TTL) delete ledger.sent[k];
     });

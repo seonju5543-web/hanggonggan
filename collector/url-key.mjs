@@ -15,6 +15,29 @@
    정식 등록 중복 판정처럼 더 세게 뭉쳐야 하는 곳에 쓰고, 여기 urlKey는 '군더더기만 떼는'
    방식이라 수집 단계에서 서로 다른 글이 잘못 합쳐지지 않아야 하는 곳에 쓴다. 역할이 달라 둘 다 둔다. */
 import { looksLikeHint } from './deadline-hint.mjs';
+/* 앱과 같은 '목록 주소+번호' 규칙 — 병합 때 그런 주소가 정직한 표식을 이기지 않게 (2026-10-03).
+   🔴 **사본이다** — 원본은 source-link.js 의 LIST_PLUS_ID_RE. 이 파일은 관리자 화면이 브라우저 모듈로 싣는데(_admin/build.sh → vendor/),
+      source-link.js 는 앱의 고전 스크립트라 브라우저 모듈이 가져올 수 없다(가져오면 관리자 화면이 통째로 죽는다 — 2026-10-03 verify-admin 이 잡음).
+      그래서 정규식 한 줄만 옮겨 두고, 관문 「원문 링크 정직성」 core ⑥ 이 두 줄이 **글자까지 같은지** 대조한다. */
+const LIST_PLUS_ID_RE = /\/subview\.do\?(?:[^#]*&)?nttId=|\/selectNttList\.do\?[^#]*nttId=/i;
+const URL_AMP_ANY = /&(?:amp|#0*38|#x0*26);/i;   // source-link.js decodeUrlEntities 가 되돌리는 기호(사본 — 관리자 화면 때문)
+const isListPlusId = (u) => LIST_PLUS_ID_RE.test(String(u || '').replace(/&(?:amp|#0*38|#x0*26);/gi, '&'));
+/* 같은 게시판 글 번호 (2026-10-03 리뷰 F4) — 목록+번호 꼴(가천 subview.do?nttId=125843 · 서울교대 selectNttList?nttId=)과
+   그 글의 진짜 주소(가천 /bbs/kor/478/125843/artclView.do · 서울교대 selectNttInfo?nttSn=)는 제목 머리말이 달라([장학공지]/[공통])
+   주소 열쇠·제목 열쇠 어느 쪽으로도 안 합쳐져 같은 공고가 두 장 떴다. 이 세 꼴만 '호스트+글 번호'로 묶는다. */
+function postIdKey(raw) {
+  let x;
+  try { x = new URL(String(raw || '').replace(/&(?:amp|#0*38|#x0*26);/gi, '&')); } catch { return ''; }
+  const host = x.host.replace(/^www\./, '');
+  const m = x.pathname.match(/\/bbs\/[^/]+\/\d+\/(\d+)\/artclView\.do$/);
+  if (m) return `pid:${host}:${m[1]}`;
+  if (/\/subview\.do$/.test(x.pathname) && x.searchParams.get('nttId')) return `pid:${host}:${x.searchParams.get('nttId')}`;
+  if (/\/selectNtt(List|Info)\.do$/.test(x.pathname)) {
+    const id = x.searchParams.get('nttSn') || x.searchParams.get('nttId');
+    if (id) return `pid:${host}:${id}`;
+  }
+  return '';
+}
 
 // 글을 가리키지 않는(휘발성) 값들 — 정렬·페이지·검색어·권한·표시 개수 등
 const VOLATILE = new Set([
@@ -81,11 +104,26 @@ export function clickRowKey(listUrl, title) {
   return `click:${urlKey(listUrl)}|${t.slice(0, 80)}`;
 }
 
+/* 주소 하나의 순위(작을수록 낫다) — 진짜 주소 0 · HTML 기호가 남은 주소 1 · 목록 표식 2 · 목록 주소+번호 3.
+   병합(preferNotice)과 학교별 파일 고치기(publish-notices.mjs patchUrlsBySchool)가 같이 쓴다 — 🔴 순위를 낮추는 쪽으로는 고치지 않는다. */
+export function noticeUrlRank(url) {
+  const u = String(url || '');
+  if (u.includes('#n-')) return 2;
+  if (isListPlusId(u)) return 3;
+  return URL_AMP_ANY.test(u) ? 1 : 0;
+}
+
 /* 두 항목 중 사용자에게 더 나은 쪽 — 공고로 바로 가는 진짜 주소를 남긴다
    (클릭형 표식은 게시판 목록까지만 열린다) */
 export function preferNotice(a, b) {
-  const marker = (n) => (n.url || '').includes('#n-');
-  if (marker(a) !== marker(b)) return marker(a) ? b : a;
+  /* 순위: 진짜 주소(0) > 목록 표식(1) > 목록 주소에 번호만 붙인 것(2).
+     🔴 (2026-10-03) 예전엔 '표식이 아니면 진짜'였다 — 그래서 목록 주소에 번호만 붙인 주소(서버가 번호를 무시하고
+        목록을 준다)가 사람이 고친 정직한 표식을 병합 때마다 이겼다(합집합 병합기가 이 함수로 고른다).
+        표식이 그보다 앞서는 이유: 표식은 앱이 '게시판 목록'이라 부르고 링크 사냥꾼이 진짜 주소를 찾아 나서는 대상이다. */
+  /* (2026-10-03 리뷰 F4) HTML 기호(&#038;)가 남은 주소는 같은 주소의 되돌린 판보다 뒤 — 동점이면 '먼저 온 쪽'(병합의 우리 쪽)을
+     남겨, 기본 브랜치의 깨진 판이 고친 판을 되돌리고 있었다. 앱은 되돌려 열지만 감사·장부가 다시 깨진다. */
+  const rank = (n) => noticeUrlRank(n.url);
+  if (rank(a) !== rank(b)) return rank(a) < rank(b) ? a : b;
   /* 🔴 힌트는 **있기만 하면** 점수를 주고 있었다 (2026-09-12 코드 리뷰). 그래서 청소한 판과
      옛 판이 합쳐지면 **버린 쓰레기 힌트가 이긴다** — 병합기가 `까지 나 . 선발 : 10 월…` 을
      되살리는 것을 실측으로 확인했다. 지금은 **읽을 수 있는 힌트**에만 점수를 준다. */
@@ -102,7 +140,8 @@ export function dedupeNotices(items, opts = {}) {
   const out = [];
   const idx = new Map(); // 열쇠 → out에서의 위치들 (먼저 온 것이 앞)
   for (const n of items || []) {
-    const keys = [`u:${urlKey(n.url)}`, titleKey(n) ? `t:${titleKey(n)}` : null].filter(Boolean);
+    const pid = postIdKey(n.url);
+    const keys = [`u:${urlKey(n.url)}`, titleKey(n) ? `t:${titleKey(n)}` : null, pid || null].filter(Boolean);
     let hit;
     for (const k of keys) {
       hit = (idx.get(k) || []).find((pos) => !distinct || !distinct(out[pos], n));

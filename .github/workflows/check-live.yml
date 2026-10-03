@@ -66,6 +66,9 @@ jobs:
                 if (t) { out.push(t.thumb); if (++k >= 3) break; }
               }
             } catch {}
+            // 원문 링크 확인 (2026-10-03): 로봇이 확정한 문제 링크 — 앱이 이것을 받아 링크 이름을 정직하게 바꾼다.
+            //   안 나가면 앱은 확정된 목록·404 링크를 그대로 '원문 공고'라 부른다(404 여도 조용히 물러난다).
+            out.push('data/link-check.json');
             // 학교 대표 사진 (2026-10-03): 글에 사진이 없을 때 앱이 받는 목록 + 그 첫 그림 하나 (바이트로 비교)
             try {
               const sp = JSON.parse(fs.readFileSync('assets/schools/photos.json', 'utf8'));
@@ -107,6 +110,9 @@ jobs:
           /* 그림은 개수가 아니라 **바이트 수**로 — 404 쪽(HTML)·빈 파일은 WebP 서명이 없어 '읽기실패'라 같다고 세지 않는다 */
           const bytes = (p) => { try { const b = fs.readFileSync(p); return b.length > 12 && b.toString('latin1', 8, 12) === 'WEBP' ? b.length : '읽기실패'; } catch { return '읽기실패'; } };
           const cache = (p) => { try { return (fs.readFileSync(p, 'utf8').match(/const CACHE = '([^']+)'/) || [,'?'])[1]; } catch { return '?'; } };
+          /* 원문 링크 확인 장부는 칸이 셋(updatedAt·v·bad)뿐이라 `count` 로 세면 늘 3 대 3 이다 —
+             문제 건수 + 확인 시각으로 잰다(시각이 다르면 어제 결과가 안 나간 것이다). bad 칸이 없으면 '읽기실패'. */
+          const linkCheck = (p) => { try { const j = JSON.parse(fs.readFileSync(p, 'utf8')); return j && j.bad && typeof j.bad === 'object' ? `${Object.keys(j.bad).length}건@${String(j.updatedAt || '-').slice(0, 16)}` : '읽기실패'; } catch { return '읽기실패'; } };
           const rows = [
             ['서비스워커 버전', cache('sw.js'), cache('live/sw.js')],
             ['실시간 공고(옛)', count('data/notices.json'), count('live/data/notices.json')],
@@ -119,12 +125,14 @@ jobs:
           const extra = (process.env.EXTRA_FILES || '').split(/\s+/).filter(Boolean);
           for (const f of extra) {
             const label = f.startsWith('data/majors/') ? '학과(학교별)'
+              : f === 'data/link-check.json' ? '원문 링크 확인'
               : f.startsWith('data/news/img/') ? '소식 사진'
               : f.startsWith('assets/schools/') ? (f.endsWith('.json') ? '학교 사진 목록' : '학교 사진')
               : f.startsWith('data/news/') ? (f.endsWith('index.json') ? '소식 색인' : '소식(학교별)')
               : f.endsWith('index.json') ? '공고 색인' : '공고(학교별)';
             const measure = f.endsWith('.webp') ? bytes : count;
-            rows.push([`${label} ${f.split('/').pop()}`, measure(f), measure('live/' + f)]);
+            const m = f === 'data/link-check.json' ? linkCheck : measure;   // 원문 링크 확인은 건수·시각으로(위 linkCheck)
+            rows.push([`${label} ${f.split('/').pop()}`, m(f), m('live/' + f)]);
           }
           let bad = 0;
           console.log('\n항목             저장소(main)   실제 앱   결과');

@@ -3,7 +3,8 @@
    두 벌로 베껴 쓰면 언젠가 서로 달라지기 때문.
    🔴 url-key.mjs 가 **다른 모듈을 import 하면** 여기서 터진다(`new Function` 은 import 를 모른다).
       2026-09-12 에 `deadline-hint.mjs` 를 들여오면서 실제로 `audit-data.js` 가 통째로 죽었다.
-      그래서 **딸린 모듈도 함께 읽어 앞에 붙인다** — 새 import 를 더하면 여기 목록에도 더할 것. */
+      그래서 **딸린 모듈도 함께 읽어 앞에 붙인다** — 새 import 를 더하면 여기 목록에도 더할 것.
+      (2026-10-03 — 병합 순위의 '목록 주소+번호' 규칙은 source-link.js 를 부르지 않고 url-key.mjs 안의 사본을 쓴다 — 관리자 화면이 브라우저 모듈로 싣기 때문) */
 const fs = require('fs');
 const path = require('path');
 const read = (f) => fs.readFileSync(path.join(__dirname, f), 'utf8')

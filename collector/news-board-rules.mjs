@@ -18,7 +18,7 @@
      kind 'post'    — 목록을 POST API 로 받는 게시판(중앙 · 정찰이 본문까지 적었다). 응답 HTML 을 같은 눈(날짜 줄)으로 읽고 onclick 번호로 상세를 만든다.
                       상세 본문도 스크립트가 API 로 받는 곳(중앙·서강)은 확인(verifyApi)도 그 API 로 한다.
      kind 'listOnly' — 글 하나의 GET 주소가 **없는** 게시판(경희: 누르면 POST 로 view.do · 정찰 2026-10-01). 제목+게시일은 싣되 링크는
-                       목록 주소 + `#n-제목` 표식으로 둔다 — 앱이 「게시판 목록 ↗」 로 정직하게 적는다(app.js isBoardListLink · 장학 공고와 같은 관례).
+                       목록 주소 + `#n-제목` 표식으로 둔다 — 앱이 「게시판 목록 ↗」 로 정직하게 적는다(source-link.js — 앱의 링크 이름 규칙 한 곳 · 장학 공고와 같은 관례).
                        상세가 없으니 verifyRuleDetail 은 건너뛴다(목록 자체를 방금 읽었다).
    글 줄 뽑기는 board-links.mjs extractDatedRows 그대로(날짜 붙은 줄 · 되풀이되는 주소 꼴)이고, 링크를 푸는 눈만 바꾼다(resolve).
    그래서 게시일(postedAt)·메뉴 거르기·첨부 제외가 href 게시판과 똑같이 적용된다.
@@ -37,7 +37,7 @@ const dongguk = {
   evidence: '찾기 로봇이 2026-10-01 사이트 안 링크로 /article/<게시판>/detail/<번호> 를 실제로 열었다 (find-news-boards-report.md) · 장학 수집기 browser-targets 와 같은 꼴',
 };
 
-/* 목록 표식 주소(#n-제목) — 글 하나의 GET 주소가 없는 게시판의 링크. 앱이 「게시판 목록 ↗」 로 정직하게 적는다(app.js isBoardListLink).
+/* 목록 표식 주소(#n-제목) — 글 하나의 GET 주소가 없는 게시판의 링크. 앱이 「게시판 목록 ↗」 로 정직하게 적는다(source-link.js linkShape 'marker').
    제목은 글자 단위로 80자까지(🔴 UTF-16 으로 자르면 이모지 짝이 갈라져 encodeURIComponent 가 던지고 글이 조용히 사라진다 · 리뷰 2026-10-02).
    이 주소는 **글의 열쇠가 아니다** — 같은 글인지는 게시판의 글 번호(postId)로 가린다(제목을 다듬는 규칙이 바뀌면 주소도 바뀐다). */
 export function markerUrl(boardUrl, title) {

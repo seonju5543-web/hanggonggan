@@ -6,6 +6,10 @@ name: 정문 사진 수집 (디자인 참고)
 
 on:
   push:
+    # 🔴 기본 브랜치에서만 (2026-10-03) — 거르지 않으면 이 파일을 고친 커밋이 main·작업 브랜치에 올라갈 때마다
+    #    로봇이 **그 브랜치에서** 돌아 거기에 저장했다(배포 push 한 번에 기본·main 두 벌이 떠 대기줄이 기본 쪽을 취소함).
+    #    관문 「원문 링크 정직성」 robot 갈래가 저장하는 push-to-run 로봇 전부를 본다.
+    branches: ['claude/nice-heisenberg-WESq5']
     paths:
       - 'tools/run-gate-photos.txt'
 

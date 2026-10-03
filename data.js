@@ -543,14 +543,27 @@ function officialChannel(sch) {
      학교 게시판 공고와 같은 `campus` 안내를 주면 "학교 포털 장학 메뉴에서 접수 방법 확인"이 떠
      재단 장학금을 학교에서 찾게 만든다 — 층2 공고 68건이 신청 준비 시트에서 그렇게 보였다. */
   const guide = sch.sourceKind === 'kosaf' ? SUBMIT_GUIDES.foundation : SUBMIT_GUIDES.campus;
-  /* 층2 이름표도 재단 쪽으로 — 그 주소는 공고 원문이 아니라 **재단 홈페이지**다(리뷰 L3) */
+  /* 층2 이름표도 재단 쪽으로 — 그 주소는 공고 원문이 아니라 **재단 홈페이지**다(리뷰 L3).
+     🔴 2026-10-03 — '재단 공고의 접수 방법' 도 뺐다. 이 이름은 '최종 제출처: <a>이름</a>' 처럼 **링크 글자**로 쓰이는데,
+        누르면 재단 공고가 아니라 재단 홈페이지 첫 화면이 열린다(개발자 보고 P0 *"원문 공고를 누르면 재단 페이지 전체가"*).
+        링크가 여는 화면을 그대로 말한다. 주소가 없으면 재단 이름만(지어낸 길을 말하지 않는다). */
   if (sch.sourceKind === 'kosaf') {
-    return { label: knownProvider ? `${sch.provider} (재단 공고의 접수 방법)` : '재단 공고의 접수 방법',
-      ...(sch.sourceUrl ? { url: sch.sourceUrl } : {}), guide };
+    if (!sch.sourceUrl) return { label: knownProvider ? sch.provider : '재단', guide };
+    return { label: knownProvider ? `${sch.provider} (재단 홈페이지)` : '재단 홈페이지', url: sch.sourceUrl, guide };
   }
   if (sch.sourceUrl) {
-    return { label: knownProvider ? `${sch.provider} (원문 공고의 접수 방법)` : '원문 공고의 접수 방법',
-      url: sch.sourceUrl, guide };
+    /* 🔴 링크 종류는 source-link.js 의 sourceLink 한 곳에서 받는다(2026-10-03) — 주소 글자로 여기서 다시 판정하지 않는다.
+       보통 주소(post)는 예전 글자 그대로 · 게시판 목록은 목록이라고 · 홈페이지는 홈페이지라고 · 로봇이 '그 공고가 아니었다'를
+       확정한 주소는 (확인 필요). ⚠️ source-link.js 를 못 실은 곳(이 파일만 싣는 Node 검사)에서는 예전처럼 보통 주소로 본다. */
+    const cls = typeof sourceLink === 'function' ? sourceLink(sch, 'detail').cls : 'post';
+    const name = (what) => (knownProvider ? `${sch.provider} (${what})` : what);
+    /* 🔴 이름은 **명사**로 — 'OO에서 공식 제출을 마치셨나요?'·'최종 제출처: OO' 처럼 문장 안에 들어간다(리뷰 APP-3 ·
+       '…찾기에서 공식 제출을' 이 됐다). 할 일(제목으로 찾기)은 링크 옆 안내 문장(sourceLink hint)이 말한다. */
+    const label = cls === 'list' ? name('게시판 목록')
+      : cls === 'home' ? name('홈페이지')
+      : cls === 'trouble' ? name('원문 공고의 접수 방법 · 주소 확인 필요')   // 괄호를 쓰지 않는다 — '최종 제출처(…)가 표시됩니다' 안에서 괄호가 겹친다(화면 실측)
+      : name('원문 공고의 접수 방법');
+    return { label, url: sch.sourceUrl, guide };
   }
   return { label: knownProvider ? `${sch.provider} 장학공지 (학교 포털)` : '원문 공고의 접수 방법',
     guide: SUBMIT_GUIDES.campus };

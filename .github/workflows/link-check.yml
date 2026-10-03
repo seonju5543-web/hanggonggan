@@ -1,0 +1,168 @@
+name: 원문 링크 확인 로봇
+
+# 앱이 보여 주는 원문 링크(정식 등록·실시간 공고·재단·지자체·대외활동·공모전·교내 소식)를
+# **학생처럼**(로그인·리퍼러 없는 새 탭) 열어, 그 공고가 실제로 뜨는지 본다 (2026-10-03 신설).
+#
+# 왜 생겼나: 개발자 보고(P0) — *"원문 공고를 누르면 그 공고가 아니라 재단·장학금 페이지 전체가 열린다."*
+#   링크를 만드는 로봇은 많았지만 학생처럼 열어 보고 결과를 남기는 곳이 없었다. 목록 주소에 글 번호만
+#   붙인 것(서버가 번호를 무시하고 목록을 준다)·재단 홈페이지·`&#038;` 로 글 번호가 잘린 주소가 전부
+#   '원문 공고 ↗' 로 나가고 있었다.
+#
+# 🔴 이 로봇은 **주소를 고치지 않는다** — 다른 날 두 번 같은 문제를 보면 data/link-check.json 에만 적고,
+#    앱(source-link.js)이 그 링크 이름을 정직하게 바꿔 보여 준다. 쓰는 파일은 셋뿐이다(아래 저장 단계).
+#    (2026-10-03 사고: 링크 사냥꾼 순찰이 잡티 섞인 제목으로 멀쩡한 링크 8건을 목록 표식으로 덮어썼다.)
+#
+# 실행 방법
+#   · collector/run-link-check.txt 를 고쳐 기본 브랜치에 push (push-to-run — only:/max: 는 그 실행에만)
+#   · Actions 화면에서 수동 실행 (dry: 저장 안 함 · only: 사이트 하나)
+#   · 매일 18:47 KST — 수집 로봇들(07:19~15:41)이 학교를 두드리는 시간을 피해 저녁에
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry:
+        description: '모의 실행(저장하지 않고 결과만 로그로)'
+        type: boolean
+        default: false
+      only:
+        description: '사이트 하나만 (주소 조각 — 예: gachon.ac.kr)'
+        type: string
+        default: ''
+  push:
+    branches: ['claude/nice-heisenberg-WESq5']
+    paths:
+      - 'collector/run-link-check.txt'
+  schedule:
+    # 18:47 KST — 홀수 분 · UTC 정각/자정 피함 · 다른 커밋 로봇과 같은 분이 아니다(관문 「예약 겹침」).
+    # 매일 도는 이유: 문제는 '다른 날 두 번' 봐야 확정된다(collector/link-landing.mjs nextState).
+    - cron: '47 9 * * *'
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  # 제 대기줄 — 수집(collector) 줄에 끼면 기다리던 예약 수집이 취소될 수 있다.
+  # 쓰는 파일(data/link-check.json · 로봇 장부)은 이 로봇만 쓰므로 다른 로봇과 겹쳐도 부딪히지 않는다.
+  group: link-check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    # 다른 브랜치에서 수동 실행하면 그 브랜치 장부가 기본 브랜치로 올라간다 — 기본 브랜치에서만 돈다(공공 API 로봇과 같은 규칙)
+    if: github.ref_name == 'claude/nice-heisenberg-WESq5'
+    # 🔴 학교가 중간 인증서를 빠뜨려 Node 만 막히는 곳이 있다(collector/certs/README.md) — 검증을 끄는 것이 아니다
+    env:
+      NODE_EXTRA_CA_CERTS: collector/certs/bundle.pem
+    # 로봇 예산 20분 + 매달렸을 때의 워치독 1분 반 + 브라우저 설치·감사·저장
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - name: 협업 병합기 등록 (충돌 자동 해소 — COLLAB.md)
+        run: bash tools/setup-collab.sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm init -y >/dev/null && npm i playwright@1 --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+
+      - id: check
+        name: 원문 링크 열어 보기
+        env:
+          LINK_CHECK_BUDGET_MS: '1200000'      # 20분 — 못 본 것은 다음 실행이 이어서 본다(오래 안 본 것부터)
+          LINK_CHECK_ONLY: ${{ inputs.only }}
+          # push-to-run 파일의 only:/max: 는 그 파일을 고쳐 push 한 실행에만 — 매일 예약은 늘 전부를 본다
+          LINK_CHECK_TXT: ${{ github.event_name == 'push' && '1' || '' }}
+        run: node collector/link-check.mjs ${{ inputs.dry && '--dry' || '' }}
+
+      # 데이터 관문 — 저장 직전. always() 인 이유: 로봇이 도중에 넘어져도 그때까지 본 것은 저장한다
+      # (link-hunter 2026-08-01 — 찾아 놓은 것을 저장 단계 건너뜀으로 통째로 버린 사고). 실행은 빨간불로 남는다.
+      - name: 데이터 감사
+        id: audit
+        if: always() && !inputs.dry
+        continue-on-error: true
+        run: node verify/audit-data.js
+
+      - name: 감사 실패 시 되돌리기
+        if: always() && steps.audit.outcome == 'failure'
+        run: |
+          git checkout -- data/link-check.json collector/link-check-state.json 2>/dev/null || true
+          # 되돌렸으면 반드시 말한다 — continue-on-error 라 초록불로 묻힌다(link-hunter 2026-09-05)
+          echo "::error::데이터 감사에 걸려 이번 원문 링크 확인 결과를 저장하지 않았습니다."
+
+      - name: 결과 저장 (기본 브랜치 → deploy-sync 가 main 으로)
+        if: always() && steps.audit.outcome == 'success'
+        run: |
+          git config user.name "handaejang-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # 🔴 로봇이 쓰는 파일은 이 셋뿐이고 전부 여기 있다(이슈 #79 규칙) — 데이터 파일의 주소는 건드리지 않는다
+          [ -f data/link-check.json ] && git add data/link-check.json
+          [ -f collector/link-check-state.json ] && git add collector/link-check-state.json
+          [ -f collector/link-check-report.md ] && git add collector/link-check-report.md
+          if ! git diff --cached --quiet; then
+            git commit -m "원문 링크 확인 — 문제 확정 ${{ steps.check.outputs.confirmed || '?' }}건"
+            pushed=0
+            for i in 1 2 3; do
+              if git push origin HEAD:${{ github.ref_name }}; then pushed=1; break; fi
+              # --autostash: 저장 목록 밖의 파일이 남아 있어도 재시도가 죽지 않게 (2026-08-02)
+              git pull --rebase --autostash origin "${{ github.ref_name }}"
+            done
+            if [ "$pushed" != "1" ]; then
+              echo "::error::원문 링크 확인 결과 push 실패 — 3회 재시도 모두 실패."
+              exit 1
+            fi
+          fi
+
+      - name: 리포트 출력
+        if: always()
+        run: cat collector/link-check-report.md 2>/dev/null || true
+
+      # 새로 확정된 문제 링크를 사람에게 알린다 — 라벨로 이슈 하나에 모은다(제목 검색은 이모지·한글에서 놓친다)
+      - name: 🔗 새로 확정된 문제 링크 알림
+        if: always() && steps.audit.outcome == 'success' && steps.check.outputs.new_bad != '' && steps.check.outputs.new_bad != '0'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          {
+            echo "🔗 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST — 학생이 누르면 그 공고가 아니라 다른 화면이 열리는 링크 **${{ steps.check.outputs.new_bad }}건**이 새로 확정됐습니다."
+            echo "앱은 이미 그 링크 이름을 바꿔 보여 줍니다(예: '게시판 목록에서 보기'). 원문 주소를 찾는 일은 링크 사냥꾼·사람 몫입니다."
+            echo
+            head -c 60000 collector/link-check-report.md
+            echo
+            echo "실행 기록: $RUN_URL"
+          } > /tmp/link-check-issue.md
+          gh label create link-check --repo "$REPO" --color 1D76DB \
+            --description "원문 링크 확인 로봇 — 공고가 아닌 화면이 열리는 링크" 2>/dev/null || true
+          n=$(gh issue list --repo "$REPO" --label link-check --state open --limit 1 --json number --jq '.[0].number' 2>/dev/null || true)
+          if [ -n "$n" ] && [ "$n" != "null" ]; then
+            gh issue comment "$n" --repo "$REPO" --body-file /tmp/link-check-issue.md
+          else
+            gh issue create --repo "$REPO" --label link-check \
+              --title "🔗 원문 링크 — 공고가 아닌 화면이 열리는 링크 (원문 링크 확인 로봇)" \
+              --body-file /tmp/link-check-issue.md
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: link-check-report
+          path: |
+            collector/link-check-report.md
+            collector/link-check-state.json
+          retention-days: 7
+          if-no-files-found: ignore
+
+      # 실행 알림 — 결과 알림("가 봤더니 이상하더라")과 다른 것("가다가 내가 넘어졌다").
+      # cancelled() 도 본다 — 시간 초과는 '실패'가 아니라 '취소'다(2026-08-04 수집 로봇 사고).
+      - name: 🚨 로봇이 넘어졌다
+        if: failure() || cancelled()
+        uses: ./.github/actions/robot-down
+        with:
+          robot: 원문 링크 확인 로봇
+          token: ${{ github.token }}

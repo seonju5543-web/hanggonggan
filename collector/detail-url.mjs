@@ -14,6 +14,11 @@
 
    그래서 '어떤 주소가 공고 원문인가'를 여기 한 곳에 모았다. 수집기(browser-collect)와
    복구 로봇(resolve-detail-urls), 등록 관문(verify/entry-rules)이 **같은 규칙**을 쓴다. */
+import { createRequire } from 'node:module';
+
+/* 주소에 박힌 HTML 기호(`&#038;`·`&amp;`)를 되돌리는 규칙은 앱과 같은 파일 하나다(source-link.js · 2026-10-03).
+   안 되돌리면 `#038;…uid=392` 가 조각(fragment)이 되어 글 번호가 사라진다 — 서울대 학생처 3건 실측. */
+const { decodeUrlEntities } = createRequire(import.meta.url)('../source-link.js');
 
 /* 목록 주소 + 제목 표식(#n-…) — 이 형태는 '원문으로 못 간다'는 뜻이다 */
 export function isMarkerUrl(raw) {
@@ -54,19 +59,53 @@ function looksLikeId(v) {
 /* 목록 화면임을 드러내는 경로 조각 */
 const LIST_PATH = /(^|\/)(list|artclList|notice|board|bbs|index)(\.do|\.jsp|\.php|\.asp[x]?)?\/?$/i;
 
+/* ── 목록 파일 · 글 화면 꼴 (2026-10-03 · 원문 대신 목록이 열리던 사고) ─────────────────────
+   🔴 **목록 파일에 글 번호를 덧붙인 주소는 원문이 아니다.** 서버가 번호를 무시하고 목록을 준다 —
+      저장된 본문으로 확인(collector/extracted): 가천 `…/kor/7986/subview.do?nttId=…` 18건의 본문이 2가지뿐(15건이 글자 하나 안 다름) ·
+      고려 `…/ko/568/subview.do?nttId=…` 9건이 전부 같은 글자 · 서울교대 `selectNttList.do?…&nttId=…` 14건 중 10건이 같은 글자.
+      그런데 파라미터 이름이 nttId 라는 이유로 ① 이 '원문'이라 불렀고, 수집기 확인이 '목록에도 그 제목이 있다'는
+      이유로 통과시켜 그 게시판 전체가 목록 주소로 저장됐다. 목록 파일은 '보기' 표시(mode=view 등)가 함께 있을 때만 글이다.
+   🔴 반대로 **진짜 글 꼴을 버리고 있었다** — 물음표 없는 K2Web `/bbs/<사이트>/<게시판>/<글>/artclView.do`(외대·인하·연세·조선·건국·
+      가천·명지·방송대 — 저장된 본문 104건이 104가지로 글마다 다르고 99건에 제목이 보인다), eGov `selectBbsNttView.do?…nttNo=`(충북·경기),
+      계명 `page.jsp?…parm_bod_uid=`(본문 116건이 전부 다르고 전부 제목이 보인다), K2Web 프레임 `subview.do?enc=<글 주소를 감싼 base64>`(고려·질병청),
+      경북 `sub.htm?mode=view&mv_data=<base64>`, 부산 `Board.do?mode=view&board_seq=`, 서울대 `?mod=document&…&uid=`.
+      그래서 이 꼴들이 원문 후보에서 빠지고 표식(#n-)이 영영 남았다. */
+const LIST_FILE = /^(?:[\w-]*list|subview)(?:\.(?:do|jsp|php|aspx?|action))?$/i;
+const VIEW_FILE = /^(?:artclView|view|detailView|detail|read|boardView|articleView)\.(?:do|jsp|php|aspx?|action)$/i;
+const VIEWISH_FILE = /(?:view|detail|read|info)[\w-]*\.(?:do|jsp|php|aspx?|action)$/i;
+/* '지금 글 하나를 본다'는 표시 — 이름과 값을 **둘 다** 본다(값만 보면 type=show 같은 우연이 걸린다) */
+const VIEW_MODE_KEY = /^(?:mode|md|bbsmode|boardmode|p_p_mode|action|act|amode|schm|viewmode|do|mod|type)$/i;
+const VIEW_MODE_VAL = /^(?:v|view|read|detail|show|commonview|document)$/i;
+/* 글 번호 이름 — ID_PARAMS(조립에도 쓰는 목록)와 따로 둔다: 여기 더한 이름으로 주소를 **만들지는** 않는다 */
+const POST_ID = /^(?:nttNo|parm_bod_uid|document_srl|board_seq|bbsidx|pstSn|articleId|(?:[\w-]*_)?entryId)$/i;
+const SESSION_IN_PATH = /;jsessionid=[^/?#]*/i;
+/* 글 번호처럼 생긴 값 — 숫자 셋 이상(페이지 번호 1·2 와 가른다) */
+const idValue = (v) => /^\d{3,20}$/.test(String(v || '').trim()) || (looksLikeId(v) && (String(v).match(/\d/g) || []).length >= 3);
+/* base64 로 감싼 글 주소·글 번호 (K2Web enc · 경북 mv_data) — 풀어서 글 화면 경로나 글 번호가 있으면 글이다 */
+export function encodedPost(v) {
+  const s = String(v || '').trim();
+  if (s.length < 12 || !/^[A-Za-z0-9+/=_-]+$/.test(s)) return false;
+  let d = '';
+  try { d = Buffer.from(s.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8'); } catch { return false; }
+  try { d = decodeURIComponent(d); } catch { /* 반쯤 인코딩된 것은 그대로 본다 */ }
+  return /(?:artclView|[Vv]iew)\.(?:do|jsp|php)/.test(d)
+    || /(?:^|[?&|/])(?:idx|nttId|nttSn|nttNo|seq|articleNo|no|bbsidx|board_seq|wr_id)=\d{2,}/.test(d);
+}
+
 /* 주소 하나가 '공고 원문(상세)'을 가리키는지 판정한다.
    listUrl을 주면 '목록과 같은 주소'인지도 함께 본다.
 
    판정 근거 (하나라도 만족하면 상세로 본다):
    ① 글 식별자 파라미터가 값과 함께 있다      (…/view.do?nttId=12345)
    ② 목록 경로보다 더 깊은 경로 조각이 있다   (…/JANGHAKNOTICE/detail/2666)
-   ③ 경로 자체가 상세를 뜻한다(view/detail/read/artclView) + 어떤 식별자든 있다 */
+   ③ 경로 자체가 상세를 뜻한다(view/detail/read/artclView) + 어떤 식별자든 있다
+   ⓪ (2026-10-03) 목록 파일 + 덧붙인 번호는 아니다 · 실측으로 확인한 글 꼴은 맞다 — 위 LIST_FILE 주석 */
 export function isDetailUrl(raw, listUrl) {
-  const s = String(raw || '');
+  const s = decodeUrlEntities(raw);
   if (!s || !/^https?:/i.test(s)) return false;
   if (isMarkerUrl(s)) return false;
   let u;
-  try { u = new URL(s); } catch { return false; }
+  try { u = new URL(s.replace(SESSION_IN_PATH, '')); } catch { return false; }
 
   // 목록 주소와 사실상 같으면 상세가 아니다 (해시·빈 쿼리 차이는 무시)
   if (listUrl) {
@@ -77,6 +116,23 @@ export function isDetailUrl(raw, listUrl) {
     } catch { /* listUrl이 이상하면 그냥 넘어간다 */ }
   }
 
+  const segs = u.pathname.split('/').filter(Boolean);
+  const last = segs[segs.length - 1] || '';
+  const prev = segs[segs.length - 2] || '';
+  const params = [...u.searchParams];
+  const viewMode = params.some(([k, v]) => VIEW_MODE_KEY.test(k) && VIEW_MODE_VAL.test(String(v).trim()));
+
+  // ⓪-1 K2Web 프레임(subview.do) — 글 주소를 감싼 enc 가 있을 때만 글이다. nttId 만 덧붙인 것은 목록(가천·고려 실측)
+  if (/^subview\.do$/i.test(last)) return encodedPost(u.searchParams.get('enc'));
+  // ⓪-2 목록 파일에 번호만 덧붙인 것 — 보기 표시가 없으면 목록이다(서울교대 selectNttList.do?…&nttId= 실측)
+  if (LIST_FILE.test(last) && !viewMode) return false;
+  // ⓪-3 실측으로 확인한 글 꼴
+  if (VIEW_FILE.test(last) && /^\d{2,}$/.test(prev)) return true;   // /bbs/<사이트>/<게시판>/<글>/artclView.do · /Board/<글>/detailView.do
+  for (const [k, v] of params) if (POST_ID.test(k) && idValue(v)) return true;   // nttNo · parm_bod_uid · board_seq · bbsidx …
+  if (String(u.searchParams.get('slug') || '').length >= 6) return true;   // 숭실 scatch `?f&category=장학&slug=<글 이름>` (본문 17건이 글마다 다르고 제목이 보인다)
+  if (viewMode && params.some(([k, v]) => !VIEW_MODE_KEY.test(k) && (idValue(v) || encodedPost(v)))) return true;   // mode=view&mv_data= · mod=document&uid=
+  if (VIEWISH_FILE.test(last) && params.some(([k, v]) => idValue(v) && !/page|offset|limit|unit|size|cnt|count/i.test(k))) return true;   // selectBbsNttView.do?…
+
   // ① 값이 있는 글 식별자 파라미터
   for (const [k, v] of u.searchParams) {
     if (ID_PARAMS.test(k) && String(v).trim() !== '') return true;
@@ -84,10 +140,6 @@ export function isDetailUrl(raw, listUrl) {
 
   // 목록으로 보이는 경로는 (식별자 파라미터가 없는 한) 상세가 아니다 — /page/533 같은 안내 페이지 포함
   if (/(^|\/)page\/\d+\/?$/i.test(u.pathname)) return false;
-
-  const segs = u.pathname.split('/').filter(Boolean);
-  const last = segs[segs.length - 1] || '';
-  const prev = segs[segs.length - 2] || '';
 
   // ③ 상세를 뜻하는 경로 + 식별자
   if (/^(view|detail|read|artclView|selectBoardArticle)(\.do|\.jsp|\.php|\.asp[x]?)?$/i.test(prev)
@@ -206,10 +258,23 @@ function campusOf(raw) {
 
 /* 행 목록에서 알맹이로 딱 하나를 고른다. 못 고르면 null — 지어내지 않는다.
    rows: [{ t, ... }] (t = 행에 보이는 글자) */
+/* 게시판 행이 그 공고의 행인가 (2026-10-03) — sameTitle 에 '행이 제목의 대부분을 담는다'를 더한다.
+   🔴 sameTitle 은 '짧은 쪽이 긴 쪽에 들어 있으면 같다'라서, 사이트 메뉴 링크 `지역미래불자육성장학`(10자)이
+      공고 제목 `(은평)삼천사 지역미래불자육성장학 장학생 선발 안내` 의 **행으로** 뽑혔다 — 원문 링크 복구 로봇이
+      그 메뉴의 번호(/page/533)로 `…/detail/533` 을 만들어 실었다(같은 날 재검사가 '목록'으로 잡음 · 동국 진담거사 사고와 같은 길).
+      행은 보통 제목 + 날짜·조회수라 제목을 **품거나**, 잘려도 제목의 60% 이상이다. 메뉴 조각은 둘 다 아니다. */
+export function rowMatchesTitle(want, rowText) {
+  if (!sameTitle(want, rowText)) return false;
+  const x = titleFingerprint(want);
+  const y = titleFingerprint(rowText);
+  return y.includes(x) || y.length >= Math.ceil(x.length * 0.6);
+}
+
 export function rowByCore(want, rows) {
   const core = titleCore(want);
   if (core.length < 4) return null;                   // 짧으면 우연히 겹친다
-  const hit = (rows || []).filter((r) => String(r.t || '').includes(core));
+  /* 🔴 알맹이 낱말 **그것뿐인** 행(사이트 메뉴 `지역미래불자육성장학`)은 행이 아니다 — 알맹이 말고 두 글자 이상('안내'·'신청' 등)이 더 있어야 한다 (2026-10-03) */
+  const hit = (rows || []).filter((r) => String(r.t || '').includes(core) && titleFingerprint(r.t).length >= titleFingerprint(core).length + 2);
   if (hit.length !== 1) return null;                  // 여럿이면 판단하지 않는다
   const wantCampus = campusOf(want);
   if (wantCampus.length) {
@@ -277,6 +342,10 @@ export function detailCandidates(dom) {
           const l = new URL(dom.listUrl);
           const v = new URL(l.origin + l.pathname.replace(/\/(list|artclList|index)(\.do|\.jsp|\.php)?$/i,
             (m) => m.replace(/(list|artclList|index)/i, 'view')));
+          /* 🔴 목록 경로가 view 로 **안 바뀌었으면** 만들지 않는다 (2026-10-03) — `subview.do`·`selectNttList.do`·`scholnoti.php`
+             처럼 고쳐 쓸 이름이 없는 목록에 번호만 붙이면 서버가 번호를 무시하고 **목록을 준다**(가천·고려·서울교대 실측:
+             번호만 다른 주소들의 본문이 거의 전부 같은 목록 화면 — 위 LIST_FILE 주석). 짐작으로 만든 주소가 '원문'으로 저장되던 길이다. */
+          if (v.pathname === l.pathname) continue;
           for (const [k, val] of l.searchParams) v.searchParams.set(k, val);   // menuNo 등 그대로 유지
           v.searchParams.set(nm, idVal);
           out2.push(v.href);
@@ -364,7 +433,8 @@ export function detailCandidates(dom) {
          조립형은 마지막 수단으로만 남긴다. */
       const listPath = l.pathname.replace(/\/(list|artclList|index)(\.do|\.jsp|\.php)?\/?$/i, '');
       if (listPath && listPath !== l.pathname) push(`${l.origin}${listPath}/detail/${idVal}`);
-      push(v.href);
+      /* 목록 경로 그대로에 번호만 붙인 것은 만들지 않는다 — 위 mkQuery 와 같은 이유(2026-10-03) */
+      if (v.pathname !== l.pathname) push(v.href);
     } catch { /* 조립 실패는 그냥 건너뛴다 */ }
   }
   return out;
@@ -396,7 +466,7 @@ export function rowDetailCandidates({ row, listUrl, forms, landed, dom }) {
   return out;
 }
 
-export default { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, titleFingerprint, sameTitle, detailCandidates, idsFromSource, looksLikeLoginWall, rowDetailCandidates };
+export default { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, titleFingerprint, sameTitle, rowMatchesTitle, detailCandidates, idsFromSource, looksLikeLoginWall, rowDetailCandidates };
 
 /* ── 이 화면이 '목록'인가 '상세'인가 (2026-08-20 — 두 로봇에 있던 복사본을 여기로 합쳤다) ──
    제목이 화면에 보인다는 것만으로는 부족하다: **게시판 목록에도 그 제목이 있다.**
@@ -426,4 +496,80 @@ export function looksLikeList(text, otherTitles) {
     if (hits >= 3) return true;
   }
   return false;
+}
+
+/* 같은 사이트의 **다른 공고 제목** — '이 화면이 목록인가'를 가리는 재료 (2026-10-03).
+   🔴 빈 목록을 넘기면 목록 화면을 영영 못 알아본다(link-landing.mjs 원칙 ②) — 순찰이 `verify(url, title, [])` 로 불러
+   목록 41건을 통과시켰다. 우리가 가진 같은 사이트 공고(실시간 공고·정식 등록)의 제목을 쓴다 — 목록 화면은 최근 글 여럿을 함께 그린다.
+   items = [{ url|sourceUrl, boardTitle|title|name }] · clean = 제목 다듬기(로봇은 link-landing.mjs stripRowTail 을 넘긴다 —
+   여기서 불러오면 link-landing ↔ detail-url 이 서로를 부르는 고리가 된다) */
+export function otherTitlesOnSite(url, items, { exclude = [], clean = (s) => String(s || '').trim(), max = 60 } = {}) {
+  let origin = '';
+  try { origin = new URL(decodeUrlEntities(url)).origin; } catch { return []; }
+  const out = [];
+  for (const x of items || []) {
+    const u = (x && (x.url || x.sourceUrl)) || '';
+    if (!u.startsWith(origin)) continue;
+    const t = clean(x.boardTitle || x.title || x.name || '');
+    if (t.length < 8 || exclude.some((w) => w && sameTitle(w, t)) || out.some((o) => sameTitle(o, t))) continue;
+    out.push(t);
+    if (out.length >= max) break;
+  }
+  return out;
+}
+
+/* ── 열린 화면에서 판정 재료 걷기 (2026-10-03) ───────────────────────────────────────────
+   판정은 collector/link-landing.mjs 의 judgeLanding **한 곳**이다 — 세 로봇(링크 사냥꾼·원문 링크 복구·브라우저 수집)이
+   제각각 '제목이 보이면 통과'를 들고 있다가 목록 화면을 원문으로 통과시켰다(가천·고려·서울교대 · 순찰이 목록 41건 통과).
+   여기는 그 판정에 넘길 **재료만** 걷는다(Playwright 화면 하나 → obs).
+   🔴 제목 자리(headings)는 **그 꼬리표가 화면에 하나뿐일 때만** 센다 — 목록 화면은 행마다 h3·.subject 를 달아 두는 곳이 있어,
+      그걸 제목 자리로 세면 목록이 '제목 자리에 그 공고 제목'(post)이 된다. */
+const HEAD_SELECTORS = ['h1', 'h2', 'h3', '.view-title', '.view_title', '.viewTitle', '.bbs-title', '.board-view-title',
+  '.artclViewTitle', '.tit_view', '.title_view', '.subject', '.board_view .title', '.bbs_view .title'];
+/* 🔴 틀(iframe) 안도 본다 (2026-10-03 · 리뷰 LC-3) — 공고 본문을 틀에 담는 게시판이 있다. 원문 링크 확인 로봇이 따로
+   읽던 사본(h1~h3 를 **전부** 제목 자리로 세어 행마다 h3 인 목록을 'post' 로 판정)을 걷고 이 한 벌을 같이 쓴다.
+   틀마다 '하나뿐인 꼬리표'만 센다 · 글자는 바깥 화면 먼저 이어 붙인다(최대 maxText). */
+export async function observeLanding(page, res, { maxText = 20000, maxFrames = 6 } = {}) {
+  const status = res && typeof res.status === 'function' ? res.status() : 0;
+  let finalUrl = '';
+  try { finalUrl = page.url(); } catch { /* 닫힌 화면 */ }
+  const docTitle = await page.title().catch(() => '');
+  const read = (fr) => fr.evaluate(({ sels, max }) => {
+    const one = (sel) => {
+      const els = document.querySelectorAll(sel);
+      return els.length === 1 ? (els[0].textContent || '').replace(/\s+/g, ' ').trim().slice(0, 300) : '';
+    };
+    const og = document.querySelector('meta[property="og:title"]');
+    /* 🔴 이름이 정해진 꼬리표 밖의 제목 자리도 본다 (2026-10-03 · 원문 링크 복구 로봇 첫 실행에서 국민대·고려 상세 화면이 '목록'으로
+       재검사됨 — 제목이 h4·.view_tit 같은 곳에 있으면 '본문 어딘가'(weak)로만 잡히고, 옆의 최근 글 목록 때문에 목록이 됐다).
+       같은 (태그+class) 꼴이 **화면에 하나뿐인** 요소만 센다 — 목록 행은 같은 꼴이 줄마다 되풀이되므로 여기 안 들어온다. */
+    const groups = new Map();
+    for (const el of document.querySelectorAll('h4, h5, [class*="tit"], [class*="Tit"], [class*="subject"], [class*="Subject"], [id*="title"], [id*="subject"]')) {
+      const k = `${el.tagName}.${el.className || ''}#${el.id ? 'id' : ''}`;
+      groups.set(k, (groups.get(k) || []).concat(el));
+    }
+    const lone = [...groups.values()].filter((g) => g.length === 1)
+      .map((g) => (g[0].textContent || '').replace(/\s+/g, ' ').trim())
+      .filter((t) => t.length >= 4 && t.length <= 200).slice(0, 24);
+    const heads = [og ? (og.getAttribute('content') || '').trim() : '', ...sels.map(one), ...lone].filter(Boolean);
+    return {
+      headings: heads.slice(0, 40),
+      text: ((document.body && document.body.innerText) || '').slice(0, max),
+      hasPassword: !!document.querySelector('input[type=password]'),
+    };
+  }, { sels: HEAD_SELECTORS, max: maxText }).catch(() => null);
+  let frames = [];
+  try { frames = page.frames().slice(0, maxFrames); } catch { frames = []; }
+  if (!frames.length) frames = [page];
+  const got = { headings: [], text: '', hasPassword: false };
+  for (const fr of frames) {
+    const one = await read(fr);
+    if (!one) continue;
+    got.headings.push(...one.headings);
+    if (got.text.length < maxText) got.text += (got.text ? '\n' : '') + one.text;
+    got.hasPassword = got.hasPassword || one.hasPassword;
+  }
+  got.headings = got.headings.slice(0, 60);
+  got.text = got.text.slice(0, maxText);
+  return { status, finalUrl, docTitle, ...got };
 }

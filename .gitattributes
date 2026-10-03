@@ -83,3 +83,9 @@ collector/find-news-boards-report.md merge=ours
 data/news/img/**             -diff
 collector/news-thumbs.json   merge=jsonunion
 collector/news-thumbs-report.md merge=ours
+
+# ── 원문 링크 확인 로봇 (2026-10-03) — 매 실행 통째로 새로 쓴다(장부·앱 파일·리포트 모두) → 내 쪽을 남긴다 ──
+# 장부(state)는 이 로봇 하나만 쓴다 · 앱 파일(data/link-check.json)은 장부에서 다시 만들어진다(합칠 내용이 없다).
+collector/link-check-report.md  merge=ours
+collector/link-check-state.json merge=ours
+data/link-check.json            merge=ours
