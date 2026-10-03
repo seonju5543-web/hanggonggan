@@ -20,7 +20,7 @@
    실행: node collector/resolve-detail-urls.mjs [--dry]  (워크플로 resolve-detail-urls.yml) */
 import fs from 'node:fs';
 import { chromium } from 'playwright';
-import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, detailCandidates, idsFromSource, rowDetailCandidates, observeLanding, otherTitlesOnSite } from './detail-url.mjs';
+import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, rowMatchesTitle, detailCandidates, idsFromSource, rowDetailCandidates, observeLanding, otherTitlesOnSite } from './detail-url.mjs';
 /* '이 주소를 열면 그 공고가 뜨는가'는 공용 판정 한 곳(link-landing.mjs) — 링크 사냥꾼·브라우저 수집과 같은 것 (2026-10-03).
    예전 verifyCandidate 는 로그인 벽을 제목보다 먼저 봐서 머리의 회원 로그인 상자 하나로 멀쩡한 공고를 떨어뜨렸다. */
 import { judgeLanding, expectTitles, stripRowTail } from './link-landing.mjs';
@@ -311,7 +311,7 @@ for (const [listUrl, group] of boards) {
     if (outOfTime()) { report.push('  - (시간 상한 도달 — 나머지는 다음 실행에서 이어서 고칩니다)'); break; }
     /* 게시판 행을 찾는 제목 — 원제목이 있으면 그것, 없으면 표식 속 제목. 행 꼬리(작성 부서·날짜·조회수)는 뗀다 (2026-10-03) */
     const want = stripRowTail(t.ref.boardTitle || markerTitle(t.url));
-    const row = rows.find((r) => sameTitle(want, r.t));
+    const row = rows.find((r) => rowMatchesTitle(want, r.t));   // 메뉴 조각을 행으로 뽑지 않는다(동국 detail/533 · 2026-10-03)
     if (!row) { report.push(`  - ⚠️ 목록에서 못 찾음(내려갔거나 제목 변경): ${want.slice(0, 50)}`); failed += 1; continue; }
     const titles = [want, row.t, ...expectTitles(t.ref)];
 

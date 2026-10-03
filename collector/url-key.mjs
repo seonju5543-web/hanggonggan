@@ -15,8 +15,12 @@
    정식 등록 중복 판정처럼 더 세게 뭉쳐야 하는 곳에 쓰고, 여기 urlKey는 '군더더기만 떼는'
    방식이라 수집 단계에서 서로 다른 글이 잘못 합쳐지지 않아야 하는 곳에 쓴다. 역할이 달라 둘 다 둔다. */
 import { looksLikeHint } from './deadline-hint.mjs';
-/* 앱과 같은 '목록 주소+번호' 규칙(source-link.js 한 곳) — 병합 때 그런 주소가 정직한 표식을 이기지 않게 (2026-10-03) */
-import { isListPlusId } from '../source-link.js';
+/* 앱과 같은 '목록 주소+번호' 규칙 — 병합 때 그런 주소가 정직한 표식을 이기지 않게 (2026-10-03).
+   🔴 **사본이다** — 원본은 source-link.js 의 LIST_PLUS_ID_RE. 이 파일은 관리자 화면이 브라우저 모듈로 싣는데(_admin/build.sh → vendor/),
+      source-link.js 는 앱의 고전 스크립트라 브라우저 모듈이 가져올 수 없다(가져오면 관리자 화면이 통째로 죽는다 — 2026-10-03 verify-admin 이 잡음).
+      그래서 정규식 한 줄만 옮겨 두고, 관문 「원문 링크 정직성」 core ⑥ 이 두 줄이 **글자까지 같은지** 대조한다. */
+const LIST_PLUS_ID_RE = /\/subview\.do\?(?:[^#]*&)?nttId=|\/selectNttList\.do\?[^#]*nttId=/i;
+const isListPlusId = (u) => LIST_PLUS_ID_RE.test(String(u || '').replace(/&(?:amp|#0*38|#x0*26);/gi, '&'));
 
 // 글을 가리키지 않는(휘발성) 값들 — 정렬·페이지·검색어·권한·표시 개수 등
 const VOLATILE = new Set([

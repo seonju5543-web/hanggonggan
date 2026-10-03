@@ -258,10 +258,23 @@ function campusOf(raw) {
 
 /* 행 목록에서 알맹이로 딱 하나를 고른다. 못 고르면 null — 지어내지 않는다.
    rows: [{ t, ... }] (t = 행에 보이는 글자) */
+/* 게시판 행이 그 공고의 행인가 (2026-10-03) — sameTitle 에 '행이 제목의 대부분을 담는다'를 더한다.
+   🔴 sameTitle 은 '짧은 쪽이 긴 쪽에 들어 있으면 같다'라서, 사이트 메뉴 링크 `지역미래불자육성장학`(10자)이
+      공고 제목 `(은평)삼천사 지역미래불자육성장학 장학생 선발 안내` 의 **행으로** 뽑혔다 — 원문 링크 복구 로봇이
+      그 메뉴의 번호(/page/533)로 `…/detail/533` 을 만들어 실었다(같은 날 재검사가 '목록'으로 잡음 · 동국 진담거사 사고와 같은 길).
+      행은 보통 제목 + 날짜·조회수라 제목을 **품거나**, 잘려도 제목의 60% 이상이다. 메뉴 조각은 둘 다 아니다. */
+export function rowMatchesTitle(want, rowText) {
+  if (!sameTitle(want, rowText)) return false;
+  const x = titleFingerprint(want);
+  const y = titleFingerprint(rowText);
+  return y.includes(x) || y.length >= Math.ceil(x.length * 0.6);
+}
+
 export function rowByCore(want, rows) {
   const core = titleCore(want);
   if (core.length < 4) return null;                   // 짧으면 우연히 겹친다
-  const hit = (rows || []).filter((r) => String(r.t || '').includes(core));
+  /* 🔴 알맹이 낱말 **그것뿐인** 행(사이트 메뉴 `지역미래불자육성장학`)은 행이 아니다 — 알맹이 말고 두 글자 이상('안내'·'신청' 등)이 더 있어야 한다 (2026-10-03) */
+  const hit = (rows || []).filter((r) => String(r.t || '').includes(core) && titleFingerprint(r.t).length >= titleFingerprint(core).length + 2);
   if (hit.length !== 1) return null;                  // 여럿이면 판단하지 않는다
   const wantCampus = campusOf(want);
   if (wantCampus.length) {
@@ -453,7 +466,7 @@ export function rowDetailCandidates({ row, listUrl, forms, landed, dom }) {
   return out;
 }
 
-export default { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, titleFingerprint, sameTitle, detailCandidates, idsFromSource, looksLikeLoginWall, rowDetailCandidates };
+export default { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, titleFingerprint, sameTitle, rowMatchesTitle, detailCandidates, idsFromSource, looksLikeLoginWall, rowDetailCandidates };
 
 /* ── 이 화면이 '목록'인가 '상세'인가 (2026-08-20 — 두 로봇에 있던 복사본을 여기로 합쳤다) ──
    제목이 화면에 보인다는 것만으로는 부족하다: **게시판 목록에도 그 제목이 있다.**
@@ -527,9 +540,20 @@ export async function observeLanding(page, res, { maxText = 20000, maxFrames = 6
       return els.length === 1 ? (els[0].textContent || '').replace(/\s+/g, ' ').trim().slice(0, 300) : '';
     };
     const og = document.querySelector('meta[property="og:title"]');
-    const heads = [og ? (og.getAttribute('content') || '').trim() : '', ...sels.map(one)].filter(Boolean);
+    /* 🔴 이름이 정해진 꼬리표 밖의 제목 자리도 본다 (2026-10-03 · 원문 링크 복구 로봇 첫 실행에서 국민대·고려 상세 화면이 '목록'으로
+       재검사됨 — 제목이 h4·.view_tit 같은 곳에 있으면 '본문 어딘가'(weak)로만 잡히고, 옆의 최근 글 목록 때문에 목록이 됐다).
+       같은 (태그+class) 꼴이 **화면에 하나뿐인** 요소만 센다 — 목록 행은 같은 꼴이 줄마다 되풀이되므로 여기 안 들어온다. */
+    const groups = new Map();
+    for (const el of document.querySelectorAll('h4, h5, [class*="tit"], [class*="Tit"], [class*="subject"], [class*="Subject"], [id*="title"], [id*="subject"]')) {
+      const k = `${el.tagName}.${el.className || ''}#${el.id ? 'id' : ''}`;
+      groups.set(k, (groups.get(k) || []).concat(el));
+    }
+    const lone = [...groups.values()].filter((g) => g.length === 1)
+      .map((g) => (g[0].textContent || '').replace(/\s+/g, ' ').trim())
+      .filter((t) => t.length >= 4 && t.length <= 200).slice(0, 24);
+    const heads = [og ? (og.getAttribute('content') || '').trim() : '', ...sels.map(one), ...lone].filter(Boolean);
     return {
-      headings: heads.slice(0, 16),
+      headings: heads.slice(0, 40),
       text: ((document.body && document.body.innerText) || '').slice(0, max),
       hasPassword: !!document.querySelector('input[type=password]'),
     };
@@ -545,7 +569,7 @@ export async function observeLanding(page, res, { maxText = 20000, maxFrames = 6
     if (got.text.length < maxText) got.text += (got.text ? '\n' : '') + one.text;
     got.hasPassword = got.hasPassword || one.hasPassword;
   }
-  got.headings = got.headings.slice(0, 32);
+  got.headings = got.headings.slice(0, 60);
   got.text = got.text.slice(0, maxText);
   return { status, finalUrl, docTitle, ...got };
 }

@@ -64,7 +64,7 @@
 import fs from 'node:fs';
 import { chromium } from 'playwright';
 import { cleanTitle } from './clean-title.mjs';
-import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, rowByCore, rowDetailCandidates, observeLanding, otherTitlesOnSite } from './detail-url.mjs';
+import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, rowMatchesTitle, rowByCore, rowDetailCandidates, observeLanding, otherTitlesOnSite } from './detail-url.mjs';
 /* 🔴 '이 주소를 열면 그 공고가 뜨는가'는 **공용 판정 한 곳**(link-landing.mjs judgeLanding)으로 본다 (2026-10-03).
    예전 verify() 는 제 규칙을 따로 들고 있다가 ① 로그인 벽을 제목보다 먼저 봐서 머리의 회원 로그인 상자 때문에
    멀쩡한 전북·부경 공고를 떨어뜨렸고 ② 목록 판정에 빈 목록을 받아 진짜 목록을 통과시켰다.
@@ -554,7 +554,7 @@ for (const [listUrl, group] of boards) {
       /* '이 화면이 목록인가'의 재료 — 이 게시판 목록의 다른 행 + 같은 사이트의 다른 공고 제목 (2026-10-03 · 빈 목록 금지) */
       const others = rows.map((r) => stripRowTail(r.t)).filter((x) => x && !sameTitle(want, x)).slice(0, 40)
         .concat(sameOriginTitles(listUrl, [want]));
-      let idx = rows.findIndex((r) => sameTitle(want, r.t));
+      let idx = rows.findIndex((r) => rowMatchesTitle(want, r.t));   // 메뉴 조각을 행으로 뽑지 않는다(2026-10-03)
       /* 🔴 지문 대조가 빗나가면 **알맹이 낱말로 한 번 더** 본다 (2026-09-18).
          앱 이름은 사람이 다듬은 것이라 게시판 행과 글자가 달라 지문이 애초에 안 맞는다 —
          한국외대 6건이 이 이유로 4회 연속 '목록에서 못 찾음' 이 되어 likelyGone 처리됐다.
@@ -716,7 +716,7 @@ if (stillLost.length && !outOfTime()) {
       const hit = await p.evaluate(() => [...document.querySelectorAll('a[href]')].map((a) => ({
         t: (a.textContent || '').replace(/\s+/g, ' ').trim(), u: a.href,
       })).filter((x) => x.t.length >= 8), []).catch(() => []);
-      const match = (hit || []).find((x) => sameTitle(title, x.t) && /^https?:/.test(x.u));
+      const match = (hit || []).find((x) => rowMatchesTitle(title, x.t) && /^https?:/.test(x.u));
       /* 결과 화면의 다른 글 제목도 돌려준다 — 고른 주소가 목록·검색 화면인지 가리는 재료(빈 목록 금지 · 2026-10-03) */
       return match ? { u: match.u, t: match.t, others: hit.map((x) => stripRowTail(x.t)).filter((x) => x && !sameTitle(title, x)).slice(0, 40) } : null;
     } catch { return null; } finally { await p.close().catch(() => {}); }
@@ -744,7 +744,7 @@ if (stillLost.length && !outOfTime()) {
         const rows = await p.$$eval('a[href]', (els) => els.map((e) => ({
           t: (e.textContent || '').replace(/\s+/g, ' ').trim(), u: e.href,
         })).filter((x) => x.t.length >= 8)).catch(() => []);
-        const row = rows.find((r) => sameTitle(want, r.t) && isDetailUrl(r.u, board));
+        const row = rows.find((r) => rowMatchesTitle(want, r.t) && isDetailUrl(r.u, board));
         if (row) {
           /* 🔴 다른 글 제목을 넘긴다 — 예전엔 `verify(row.u, want, [])` 라 목록 화면도 통과했다 (2026-10-03) */
           const boardOthers = rows.map((r) => stripRowTail(r.t)).filter((x) => x && !sameTitle(want, x)).slice(0, 40);

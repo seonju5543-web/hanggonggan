@@ -131,6 +131,11 @@ export default async function gate(eq, ctx) {
   const mk = { url: 'https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-x' };
   const li = { url: 'https://www.gachon.ac.kr/kor/7986/subview.do?nttId=125842' };
   const order = (P) => [P(li, mk) === mk, P(mk, li) === mk, P(li, real) === real, P(mk, real) === real, P(real, mk) === real];
-  eq('⑥ 진짜 주소 > 목록 표식 > 목록 주소+번호 — ESM(수집기·병합기)과 CJS 다리(감사)가 같은 답',
+  const reOf = (src) => (src.match(/const LIST_PLUS_ID_RE = (\/.*\/i);/) || [])[1] || '';
+  const slSrc = fs.readFileSync(new URL('source-link.js', ctx.root), 'utf8');
+  const ukSrc = fs.readFileSync(new URL('collector/url-key.mjs', ctx.root), 'utf8');
+  eq('⑥ url-key.mjs 의 「목록 주소+번호」 정규식은 source-link.js 원본과 글자까지 같다(관리자 화면 때문에 둔 사본) · url-key.mjs 는 source-link.js 를 import 하지 않는다',
+    [reOf(ukSrc).length > 20 && reOf(ukSrc) === reOf(slSrc), /from '\.\.\/source-link\.js'/.test(ukSrc)], [true, false]);
+  eq('  진짜 주소 > 목록 표식 > 목록 주소+번호 — ESM(수집기·병합기)과 CJS 다리(감사)가 같은 답',
     [order(U.preferNotice), order(UC.preferNotice)], [[true, true, true, true, true], [true, true, true, true, true]]);
 }

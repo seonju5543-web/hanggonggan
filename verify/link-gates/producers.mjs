@@ -182,4 +182,19 @@ export default async function gate(eq, ctx = {}) {
   eq('  검사가 그 사고를 잡는다 — 옛 줄 `onlyBoard: cau.ac.kr`', pinProblems('onlyBoard: cau.ac.kr\nrecheckOnly: false', markers.filter((u) => !/cau\.ac\.kr/.test(u))).length, 1);
   eq('  표식이 있는 곳에 묶은 것은 통과(사람이 일부러 한 학교만 돌릴 때)', pinProblems('onlyBoard: kau.ac.kr', ['https://kau.ac.kr/kaulife/scholnoti.php#n-x']), []);
   eq('  주석 줄(# onlyBoard: …)은 묶음이 아니다', pinProblems('# onlyBoard:   게시판 하나만', []), []);
+
+  /* 2026-10-03 실측(원문 링크 복구 로봇 첫 실행) — 사이트 메뉴 링크가 공고의 행으로 뽑혀 `…/detail/533` 이 실렸다 */
+  {
+    const DU = await import('../../collector/detail-url.mjs');
+    const want = '(은평)삼천사 지역미래불자육성장학 장학생 선발 안내';
+    eq('행 대조 — 메뉴 조각(`지역미래불자육성장학`)은 그 공고의 행이 아니다 · 제목+날짜 행 · 잘린 행은 맞다 · sameTitle 만으로는 메뉴를 행으로 뽑던 것(무력화 증거)',
+      [DU.rowMatchesTitle(want, '지역미래불자육성장학'), DU.rowMatchesTitle(want, `${want} 2026.09.02 조회 2614`), DU.rowMatchesTitle(want, '(은평)삼천사 지역미래불자육성장학 장학생 선발'), DU.sameTitle(want, '지역미래불자육성장학')],
+      [false, true, true, true]);
+    eq('  알맹이 낱말 그것뿐인 행(메뉴)은 rowByCore 도 고르지 않는다', DU.rowByCore('지역미래불자육성장학 장학생 선발', [{ t: '지역미래불자육성장학' }]), null);
+    const rz = fs.readFileSync(new URL('collector/resolve-detail-urls.mjs', ctx.root), 'utf8');
+    const lh = fs.readFileSync(new URL('collector/link-hunter.mjs', ctx.root), 'utf8');
+    eq('  두 복구 로봇이 행을 rowMatchesTitle 로 찾는다(sameTitle 로 행을 찾는 자리가 남지 않는다)',
+      [/rows\.find\(\(r\) => rowMatchesTitle\(want, r\.t\)\)/.test(rz), /rows\.findIndex\(\(r\) => rowMatchesTitle\(want, r\.t\)\)/.test(lh), /rows\.(find|findIndex)\(\(r\) => sameTitle\(want, r\.t\)/.test(rz + lh)],
+      [true, true, false]);
+  }
 }
