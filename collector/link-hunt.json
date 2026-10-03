@@ -2983,7 +2983,7 @@
    "lastWhy": ""
   },
   "r:auto-5menuid100ptabno5siteno2": {
-   "patrolledAt": "2026-08-23",
+   "patrolledAt": "2026-10-03",
    "lastWhy": ""
   },
   "n:https://dep.hufs.ac.kr/student/12767/subview.do#n-%5B%EA%B3%B5%ED%86%B5%5D%5B%EA%B5%AD%EA%B0%80%5D%20%EC%9E%A5%ED%95%99%EA%B8%88%20%EB%B6%80%EC%A0%95%EC%B2%AD%EA%B5%AC%20%EC%9E%90%EC%A7%84%EC%8B%A0%EA%B3%A0%20%EC%95%88%EB%82%B4%20%EC%83%88%EA%B8%80": {
@@ -3671,8 +3671,8 @@
    "lastWhy": ""
   },
   "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322953": {
-   "patrolledAt": "2026-09-11",
-   "lastWhy": "제목 불일치(다른 글이 열림)"
+   "patrolledAt": "2026-10-03",
+   "lastWhy": ""
   },
   "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322949": {
    "patrolledAt": "2026-09-29",
@@ -6673,7 +6673,11 @@
   },
   "r:auto-o2432actionviewno9994682": {
    "patrolledAt": "2026-10-03",
-   "lastWhy": "로그인 요구(학생이 못 봄)"
+   "lastWhy": "로그인 요구(학생이 못 봄)",
+   "lastTried": "2026-10-03",
+   "attempts": 1,
+   "nextTryAt": "2026-10-04",
+   "status": ""
   },
   "r:auto-pnoticedoarticleno367130": {
    "patrolledAt": "2026-10-03",
@@ -6709,15 +6713,27 @@
   },
   "r:auto-onttid000100000000003862": {
    "patrolledAt": "2026-10-03",
-   "lastWhy": "제목 불일치(다른 글이 열림)"
+   "lastWhy": "제목 불일치(다른 글이 열림)",
+   "lastTried": "2026-10-03",
+   "attempts": 1,
+   "nextTryAt": "2026-10-04",
+   "status": ""
   },
   "r:auto-onttid000100000000003682": {
    "patrolledAt": "2026-10-03",
-   "lastWhy": "제목 불일치(다른 글이 열림)"
+   "lastWhy": "제목 불일치(다른 글이 열림)",
+   "lastTried": "2026-10-03",
+   "attempts": 1,
+   "nextTryAt": "2026-10-04",
+   "status": ""
   },
   "r:auto-onttid000100000000003861": {
    "patrolledAt": "2026-10-03",
-   "lastWhy": "제목 불일치(다른 글이 열림)"
+   "lastWhy": "제목 불일치(다른 글이 열림)",
+   "lastTried": "2026-10-03",
+   "attempts": 1,
+   "nextTryAt": "2026-10-04",
+   "status": ""
   },
   "r:auto-larshipdoarticleno376795": {
    "patrolledAt": "2026-10-03",
@@ -6736,6 +6752,78 @@
    "lastWhy": ""
   },
   "r:auto-leno275925srcategoryid22": {
+   "patrolledAt": "2026-10-03",
+   "lastWhy": ""
+  },
+  "n:https://www.sogang.ac.kr/ko/detail/551052?bbsConfigFk=141&namepage=ScholarshipNotice": {
+   "patrolledAt": "2026-10-03",
+   "lastWhy": ""
+  },
+  "r:auto-notiphpcodes1301seq11120": {
+   "patrolledAt": "2026-10-03",
+   "lastWhy": "제목 불일치(다른 글이 열림)"
+  },
+  "r:auto-notiphpcodes1301seq11234": {
+   "patrolledAt": "2026-10-03",
+   "lastWhy": "제목 불일치(다른 글이 열림)"
+  },
+  "r:auto-notiphpcodes1301seq11207": {
+   "patrolledAt": "2026-10-03",
+   "lastWhy": "제목 불일치(다른 글이 열림)"
+  },
+  "r:auto-bsid1083mi3004nttid55323": {
+   "patrolledAt": "2026-10-03",
+   "lastWhy": ""
+  },
+  "r:auto-oardid323225menuno200318": {
+   "patrolledAt": "2026-10-03",
+   "lastWhy": ""
+  },
+  "r:auto-7986subviewdonttid125837": {
+   "patrolledAt": "2026-10-03",
+   "lastWhy": ""
+  },
+  "r:auto-enoticedoarticleno769228": {
+   "patrolledAt": "2026-10-03",
+   "lastWhy": ""
+  },
+  "r:auto-onttid000100000000003863": {
+   "patrolledAt": "2026-10-03",
+   "lastWhy": ""
+  },
+  "r:auto-ent2431268301artclviewdo": {
+   "patrolledAt": "2026-10-03",
+   "lastWhy": ""
+  },
+  "r:auto-bbssc58944254artclviewdo": {
+   "patrolledAt": "2026-10-03",
+   "lastWhy": ""
+  },
+  "r:auto-otice06doarticleno140281": {
+   "patrolledAt": "2026-10-03",
+   "lastWhy": ""
+  },
+  "r:auto-otice06doarticleno140261": {
+   "patrolledAt": "2026-10-03",
+   "lastWhy": ""
+  },
+  "r:auto-2445viewdocurrentpageno1": {
+   "patrolledAt": "2026-10-03",
+   "lastWhy": ""
+  },
+  "r:auto-krbbskr845690artclviewdo": {
+   "patrolledAt": "2026-10-03",
+   "lastWhy": ""
+  },
+  "r:auto-0005009002000000seq31569": {
+   "patrolledAt": "2026-10-03",
+   "lastWhy": ""
+  },
+  "r:auto-pnoticedoarticleno367194": {
+   "patrolledAt": "2026-10-03",
+   "lastWhy": ""
+  },
+  "r:auto-dmodeviewduid53299tpage1": {
    "patrolledAt": "2026-10-03",
    "lastWhy": ""
   }
