@@ -286,12 +286,6 @@ components:
     typography: "{typography.body}"
     rounded: "{rounded.hair}"
     padding: 32px 20px
-  section-sub:
-    backgroundColor: "{colors.canvas}"
-    textColor: "{colors.ink-subtle}"
-    typography: "{typography.caption}"
-    rounded: "{rounded.hair}"
-    padding: 0px 0px
 ---
 
 ## 이 문서가 하는 일
