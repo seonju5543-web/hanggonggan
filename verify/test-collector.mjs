@@ -2993,8 +2993,11 @@ console.log('\n■ 접수 기간 한 줄 (2026-09-12)');
     const dh = readText(new URL('../collector/deadline-hint.mjs', import.meta.url));
     const reOf = (src) => (src.match(/const PARTIAL_ENTITY_END = (\/.+\/);/) || [])[1];
     eq('  앱이 이미 실린 힌트 끝의 반쪽 기호를 떼고 보인다(같은 꼴 · 두 자리 모두)', [reOf(appSrc) === reOf(dh) && !!reOf(dh), (appSrc.match(/esc\(hintText\(n\.deadlineHint\)\)/g) || []).length, /esc\(unent\(n\.deadlineHint\)\)/.test(appSrc)], [true, 2, false]);
-    const hintText = new Function(`const unent = (s) => String(s); const PARTIAL_ENTITY_END = ${reOf(appSrc)}; return (s) => unent(s).replace(PARTIAL_ENTITY_END, '').trim();`)();
-    eq('    `16:00 &n` → `16:00` · `&#3`·`&middo` 도 · `R&D` 는 그대로', [hintText('2026. 10. 30.(금) 16:00 &n'), hintText('마감 9. 30. &#3'), hintText('접수 및 이메일 접&middo'), hintText('R&D')], ['2026. 10. 30.(금) 16:00', '마감 9. 30.', '접수 및 이메일 접', 'R&D']);
+    /* 리뷰(10-03) — 여기서 hintText 를 따로 지어 재면 앱의 것이 바뀌어도 모른다 → 앱 소스의 그 줄들(ENTITIES·ENTITY_RE·unent·PARTIAL_ENTITY_END·hintText)을 떼어 실행한다 */
+    const line = (re) => (appSrc.match(re) || [''])[0];
+    const unentSrc = (() => { const at = appSrc.indexOf('function unent('); return at < 0 ? '' : appSrc.slice(at, appSrc.indexOf('\n}', at) + 2); })();
+    const hintText = new Function(`${line(/const ENTITIES = \{[^\n]+\};/)}\n${line(/const ENTITY_RE = [^\n]+;/)}\n${unentSrc}\n${line(/const PARTIAL_ENTITY_END = [^\n]+;/)}\n${line(/const hintText = [^\n]+;/)}\nreturn hintText;`)();
+    eq('    (앱의 hintText 그대로) `16:00 &n` → `16:00` · `&#3`·`&middo` 도 · 온전한 기호는 글자로 · `R&D` 는 그대로', [hintText('2026. 10. 30.(금) 16:00 &n'), hintText('마감 9. 30. &#3'), hintText('접수 및 이메일 접&middo'), hintText('가&middot;나 &amp; 다'), hintText('R&D')], ['2026. 10. 30.(금) 16:00', '마감 9. 30.', '접수 및 이메일 접', '가·나 & 다', 'R&D']);
     /* 리뷰(10-03) — 로봇이 푸는 기호가 일곱뿐이라 &middot;·&lsquo; 는 여전히 반쪽이 됐다 → 앱이 아는 이름 기호는 로봇도 전부 안다(숫자 기호는 모두) */
     const appNames = Object.keys(new Function(`${(appSrc.match(/const ENTITIES = \{[^\n]+\};/) || ['const ENTITIES = {};'])[0]} return ENTITIES;`)()).filter((k) => !k.startsWith('#'));
     const { HINT_ENT } = await import('../collector/deadline-hint.mjs');
