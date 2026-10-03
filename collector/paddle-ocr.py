@@ -15,13 +15,16 @@
 #   한글이 통째로 빠졌다(「17일(토) 10시」→「17()10-」 · 첫 실측).
 # 예산 안에서 스스로 끝낸다(--budget-sec) · 이미 읽은 그림(.ocr.txt 있음)은 건너뛴다.
 #
+# PDF 공고문도 읽는다 — 쪽을 그림으로 바꿔(pdftoppm · poppler-utils) 같은 모델로(2026-10-03 · 서울문화포털 글은 자격이 「[공고문] ….pdf」 에만 있다).
 # 실행: python3 collector/paddle-ocr.py collector/act-files --budget-sec=150
 import os
 import sys
 import time
 import tempfile
+import subprocess
 
 IMAGE_EXT = ('.png', '.jpg', '.jpeg', '.webp')
+PDF_PAGES = 4   # 공고문 PDF 는 앞 네 쪽만 — 자격은 대개 첫 장에 있고, 뒤는 서식이다
 MIN_SCORE = 0.8
 MAX_SIDE = 2000
 
@@ -57,7 +60,7 @@ def main():
         print(f'{folder} 없음 — 건너뜁니다')
         return
     todo = sorted(f for f in os.listdir(folder)
-                  if f.lower().endswith(IMAGE_EXT) and not os.path.exists(os.path.join(folder, f + '.ocr.txt')))
+                  if f.lower().endswith(IMAGE_EXT + ('.pdf',)) and not os.path.exists(os.path.join(folder, f + '.ocr.txt')))
     if not todo:
         print('읽을 그림 없음')
         return
@@ -74,11 +77,21 @@ def main():
             break
         path = os.path.join(folder, f)
         try:
-            im = Image.open(path).convert('RGB')
-            im.thumbnail((MAX_SIDE, MAX_SIDE))
-            tmp = os.path.join(tempfile.gettempdir(), 'paddle-' + f + '.jpg')
-            im.save(tmp, quality=92)
-            lines = lines_of(ocr.predict(tmp))
+            pages = [path]
+            if f.lower().endswith('.pdf'):
+                # PDF 는 쪽 그림으로 바꿔 같은 눈으로 읽는다(poppler pdftoppm) — 글자층을 쓰지 않는다:
+                # 글자층은 숫자가 빠진 채 나온 적이 있다(attachment-text.mjs 2026-08-20 결정 · `3년 이상` → `년이상`)
+                stem = os.path.join(tempfile.gettempdir(), 'paddle-' + f)
+                subprocess.run(['pdftoppm', '-r', '150', '-l', str(PDF_PAGES), '-png', path, stem], check=True, timeout=60)
+                pages = sorted(os.path.join(tempfile.gettempdir(), n) for n in os.listdir(tempfile.gettempdir())
+                               if n.startswith('paddle-' + f + '-') and n.endswith('.png'))
+            lines = []
+            for pg in pages:
+                im = Image.open(pg).convert('RGB')
+                im.thumbnail((MAX_SIDE, MAX_SIDE))
+                tmp = os.path.join(tempfile.gettempdir(), 'paddle-x-' + os.path.basename(pg) + '.jpg')
+                im.save(tmp, quality=92)
+                lines += lines_of(ocr.predict(tmp))
         except Exception as e:  # 그림 하나가 깨져도 나머지는 읽는다
             print(f'✕ {f} — {str(e)[:120]}')
             continue

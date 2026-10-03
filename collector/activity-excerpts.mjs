@@ -68,6 +68,8 @@ const ACT_HEAD = /공모\s?(?:자격|대상)|교육\s?대상|참가\s?범위|응
    뒤에 붙어도 되는 것: 참여·신청 가능 · 괄호 부연(개인 또는 팀) · 인원(25인) */
 const OPEN_LINE = /(?:(?:국민|세계인|시민|청년|학생|대학생|개인|팀|관심\s?(?:있는|있으신)\s?(?:분|사람)?)\s*(?:이면\s*)?(?:누구나|모두)|누구나)\s*(?:참여|참가|신청|응모|지원)?\s*(?:가능)?\s*(?:\d+\s?(?:인|명))?\s*(?:[(（].*[)）])?\s*[.!]?\s*$|(?:대상|자격|연령|나이)\s*[:：]?\s*제한\s?없음/;
 const NOT_OPEN = /심사|수상|시상|제외|이해|쉽게|볼\s?수|이용|열람|니다/;
+/* 누가 낼 수 있나를 말하는 줄글 — `…누구나 참가할 수 있으며` · `…재학생을 대상으로 …를 모집` · `…이면 신청할 수 있다` */
+const WHO_SENTENCE = /누구나\s*(?:참가|참여|신청|응모|지원)\s*(?:할\s*수\s*있|이?\s*가능)|(?:재학생|대학생|청년|주민|시민|도민|구민|학생|국민)[^.]{0,20}(?:을|를)\s*대상으로|(?:이면|라면|인\s*경우)\s*(?:누구나\s*)?(?:참가|참여|신청|응모|지원)\s*(?:할\s*수\s*있|가능)/;
 /* 🔴 `[ \t]` 이지 `\s` 가 아니다 — `\s` 는 줄바꿈까지 먹어 `<응모자격>` 아래 줄이 이름표 줄에 붙었다(첫 실측) */
 /* 🔴 칸 이름으로 끝나는 이름표만 — `[서울문화재단] 2026년 …` 같은 제목 머리말을 `서울문화재단 : …` 으로 바꾸지 않는다(리뷰) */
 const labelColon = (t) => t.replace(/^([ \t]*(?:[ㅇ○●■□▣◆◇▶·•\-*✅✔]|\d+[ \t]*[.)])?[ \t]*)[(<\[【〈][ \t]*([가-힣 ]{0,10}(?:자격|대상|기간|방법|일정|일시|내용|혜택|인원|장소|요건|조건|범위|접수|신청|제한|주최|주관|분야|주제|시상|상금|발표))[ \t]*[)>\]】〉][ \t]*/gm, (m, pre, label) => `${pre}${label.trim()} : `);
@@ -83,8 +85,17 @@ function atTitle(t, title) {
    `… 심사 기준 등 자세한 사항은 누리집에서` 같은 보도자료 문장이 '심사 기준' 으로 절 제목이 되어 줄글 4줄이 자격 자리에 앉았다(첫 실측). */
 const HEAD_LIKE = (l) => {
   const t = String(l || '').replace(/^[\s\-–—•▪▶▷◆◇○●■□▣★♦⇒‡◦∙❍◎￭·ㆍ*ㅇ✅✔]+/, '').replace(/^(?:[가-힣]\s*[.)]|\d+\s*[.)])\s*/, '').slice(0, 14);
-  return /자격|대상|요건|조건|범위|기준/.test(t);
+  /* 🔴 **짧은 이름표**여야 한다 — `참가 자격부터 제출 형식, 심사와 시상까지 확인하세요.` 는 안내 문장이다(요강 페이지 실측) */
+  const whole = String(l || '').replace(/^[\s\-–—•▪▶▷◆◇○●■□▣★♦⇒‡◦∙❍◎￭·ㆍ*ㅇ✅✔]+/, '').replace(/^(?:[가-힣]\s*[.)]|\d+\s*[.)])\s*/, '');
+  const labelOnly = whole.replace(/\s*[(（][^)）]*[)）]\s*/g, '').length <= 20 || /^[^:：]{2,14}[:：]/.test(whole)   // 괄호 부연(`( 아래 2 개 조건 모두 만족해야 함 )`)은 빼고 잰다
+    /* 콜론 없이 이름표와 내용이 한 줄 — OCR 포스터의 `모집대상 구리시 거주 또는 생활권 청년`. 이름표 낱말 뒤가 **빈칸**이면 이름표다(`자격부터` 처럼 조사가 붙으면 문장) */
+    || /^[가-힣·#]{0,6}\s?(?:대상|자격|요건)(?:\s|$)/.test(whole);
+  return labelOnly && /자격|대상|요건|조건|범위|기준/.test(t);
 };
+/* 줄글 — `모바일신분증에 관심 있는 국민이면 누구나 참가할 수 있으며 , …`(보도자료 꼴 · 2026-10-03 실측 20건이 이 꼴이었다).
+   '누가 낼 수 있나'를 말하는 문장만 원문 그대로. **이름표 줄이 하나도 없을 때만** 쓴다(activityDetails 맨 끝).
+   판정은 parseOpen 이 남는 글자 0일 때만 ✓ 라 이런 긴 문장은 '모름'으로 남는다(틀린 안심 없음) */
+const proseLines = (t) => [...new Set(t.split('\n').map((l) => l.trim()).filter((l) => l.length >= 8 && l.length <= 200 && WHO_SENTENCE.test(l) && !NOT_OPEN.test(l.replace(/니다\s*\.?$/, ''))))].slice(0, 2);
 function qualifyLines(t) {
   let q = extractQualifyLines(t, { head: ACT_HEAD });
   /* 맨 제목 줄(`지원자격`)은 장학 발췌기가 표 머리글로 보고 빼므로 첫 줄이 내용일 수 있다 — 그 바로 윗줄이 제목이면 맞다(리뷰) */
@@ -108,6 +119,8 @@ export function activityDetails(text, title) {
   const who = eachLabeledValue(t, (label) => EXCERPT_LABELS[2][1].test(label.replace(/\s/g, '')), (v) => (cleanValue(v).length >= 4 ? cleanValue(v) : null));
   const flat = (x) => String(x).replace(/[\s:：·]/g, '');
   if (who && !qual.some((q) => flat(q).includes(flat(who)) || flat(who).includes(flat(q).replace(/^.*?(?:대상|자격)/, '')))) qual = [...qual, who];
+  if (!qual.length) qual = proseLines(body);
+  if (!qual.length && body !== t) qual = proseLines(t);
   return {
     eligibilityLines: noContact(qual),
     eligibilityExcludes: noContact(extractExcludeLines(t)),

@@ -28,7 +28,7 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { FETCH_HEADERS } from './http-headers.mjs';
 import { htmlToLines } from './html-text.mjs';
-import { attachmentText, isOcrSource, docOrder, isNoticeDoc } from './attachment-text.mjs';
+import { attachmentText, isOcrSource, isNoticeDoc } from './attachment-text.mjs';
 import { activityDetails } from './activity-excerpts.mjs';
 
 const HERE = new URL('.', import.meta.url);
@@ -141,21 +141,60 @@ async function fetchPost(n, until, common = new Set(), owners = new Map()) {
   } catch { /* 못 받으면 null */ }
   if (!html) return null;
   const got = [];
-  for (const f of candidateFiles(n, html, n.url)) {
-    if (got.length >= FILES_PER_POST || Date.now() > until) break;
+  const key = keyOf(n.url);
+  /* 파일 이름 끝의 `i` = 페이지에서 주운 그림(그 글의 것인지 제목 낱말로 확인해야 한다) · 없으면 글에 붙은 첨부 */
+  const save = async (list, referer) => {
+    for (const f of list) {
+      if (got.length >= FILES_PER_POST * 2 || Date.now() > until) break;
+      try {
+        const d = await download(f, referer);
+        if (!d || common.has(d.hash)) continue;
+        /* 🔴 **두 글 이상에 같은 그림 = 사이트 공통 그림**(인증서·로고) — 교내 소식 썸네일과 같은 규칙(news-thumb.mjs) */
+        const owner = owners.get(d.hash);
+        if (owner && owner !== n.url) { common.add(d.hash); continue; }
+        owners.set(d.hash, n.url);
+        const name = `${key}-${got.length}${f.from === 'img' ? 'i' : ''}.${d.ext}`;
+        fs.writeFileSync(path.join(DIR, name), d.buf);
+        got.push(name);
+      } catch { /* 이 파일만 건너뛴다 */ }
+    }
+  };
+  await save(candidateFiles(n, html, n.url).slice(0, FILES_PER_POST), n.url);
+  /* ② 한 번 더 들어가기 — 공모전 홈페이지·팝업은 자격이 「대회 요강」·「모집 요강」 페이지에 있다(2026-10-03 실측 · 정책브리핑 글 22건).
+     같은 사이트 안의, 이름이 요강·공고문·참가 안내인 링크만 두 개까지. 그 페이지 글자는 `-L0.txt` 로 남겨 같은 규칙으로 읽는다 */
+  for (const [j, link] of guideLinks(html, n.url).slice(0, 2).entries()) {
+    if (Date.now() > until) break;
     try {
-      const d = await download(f, n.url);
-      if (!d || common.has(d.hash)) continue;
-      /* 🔴 **두 글 이상에 같은 그림 = 사이트 공통 그림**(인증서·로고) — 교내 소식 썸네일과 같은 규칙(news-thumb.mjs) */
-      const owner = owners.get(d.hash);
-      if (owner && owner !== n.url) { common.add(d.hash); continue; }
-      owners.set(d.hash, n.url);
-      const name = `${keyOf(n.url)}-${got.length}.${d.ext}`;
-      fs.writeFileSync(path.join(DIR, name), d.buf);
+      const r = await fetch(link, { redirect: 'follow', headers: { ...FETCH_HEADERS, Referer: n.url }, signal: AbortSignal.timeout(15000) });
+      if (!r.ok || !/text\/html/.test(r.headers.get('content-type') || '')) continue;
+      const h = await r.text();
+      const name = `${key}-L${j}.txt`;
+      fs.writeFileSync(path.join(DIR, name), htmlToLines(h));
       got.push(name);
-    } catch { /* 이 파일만 건너뛴다 */ }
+      await save(candidateFiles({ title: n.title, attachments: [] }, h, link).slice(0, 2), link);
+    } catch { /* 이 링크만 건너뛴다 */ }
   }
   return got;
+}
+
+/* 요강으로 가는 링크 — 이름으로 고른다. 같은 사이트(호스트)만 · 파일·자바스크립트 링크는 뺀다 */
+/* 🔴 이름이 분명한 것만 — `자세히 보기`·`모집 안내` 는 옆 목록의 **다른 사업**으로 갔다(스파로스 아카데미 → 「부산에 방문하는 청년」 · 2026-10-03 실측) */
+const GUIDE = /요강|공고문|참가\s?안내|참여\s?안내|대회\s?개요|공모\s?개요/;
+export function guideLinks(html, pageUrl) {
+  let host = '';
+  try { host = new URL(pageUrl).host; } catch { return []; }
+  const out = [];
+  const re = /<a\b[^>]*href\s*=\s*["']([^"'#][^"']*)["'][^>]*>([\s\S]*?)<\/a>/gi;
+  let m;
+  while ((m = re.exec(String(html || ''))) !== null) {
+    const label = m[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!label || label.length > 30 || !GUIDE.test(label)) continue;
+    let u;
+    try { u = new URL(m[1].replace(/&amp;/g, '&'), pageUrl); } catch { continue; }
+    if (u.host !== host || /^javascript:/i.test(m[1]) || DOC_EXT.test(u.pathname) || u.href === pageUrl) continue;
+    if (!out.includes(u.href)) out.push(u.href);
+  }
+  return out;
 }
 
 /** 무료로 다시 해 볼 차례인가 — 두 번까지, 이레 간격 */
@@ -197,23 +236,31 @@ async function fetchPhase(acts) {
 }
 
 /* 글 제목의 낱말 — 흔한 말(모집·안내·청년·공모전…)은 뺀다. 그림이 **그 글의 포스터인지** 가리는 데 쓴다 */
-const GENERIC_WORD = /^(?:모집|안내|공고|참가자|참여자|선발|신청|운영|프로그램|개최|지원|대상|기간|마감|일반|공통|추가|하반기|상반기|공모전|참가|참여|교육|특강|청년|대학생|학생|사업|활동|행사)$/;
-export const titleWords = (title) => [...new Set(String(title || '').replace(/\[[^\]]*\]|\([^)]*\)|기간\s*:.*$/g, ' ')
+const GENERIC_WORD = /^(?:모집|안내|공고|참가자|참여자|선발|신청|운영|프로그램|개최|지원|대상|기간|마감|일반|공통|공지|외부|학사|봉사|모집중|추가|하반기|상반기|공모전|참가|참여|교육|특강|청년|대학생|학생|사업|활동|행사|홍보|국제교류|10월|11월|12월)$/;
+/* 🔴 대괄호 안도 낱말이다 — `[구리시 청년성장프로젝트] 10월 …` 의 고유한 이름이 거기 있다(통째로 버렸더니 그 포스터를 놓쳤다).
+   `[일반]`·`[공통]` 같은 꼬리표는 GENERIC_WORD 가 거른다 */
+export const titleWords = (title) => [...new Set(String(title || '').replace(/기간\s*:.*$/g, ' ')
   .split(/[^가-힣A-Za-z0-9]+/).filter((w) => w.length >= 2 && !/^\d+$/.test(w) && !GENERIC_WORD.test(w)))];
 /** OCR 로 읽은 그림이 이 글의 것인가 — 글 제목 낱말이 하나라도 그림 글자에 있어야 한다.
     🔴 사이트 옆 홍보물(「제주도 내 공공임대주택에 입주한 가구」)이 「청년 체인지메이커 아카데미」의 자격으로 붙을 뻔했다(2026-10-03 실측) */
 export const ownsImageText = (text, title) => { const t = String(text || '').replace(/\s/g, ''); return titleWords(title).some((w) => t.includes(w)); };
 
-/** 받은 파일 글자에서 자격을 고른다 — 원문 글자(HWP·HWPX·DOCX)가 OCR 보다 먼저(docOrder) */
-export function eligFromFiles(n, files, readText = (p) => attachmentText(p), dir = DIR, isOcr = isOcrSource) {
-  for (const f of docOrder(files)) {
+/* 읽는 순서 — 요강 페이지 글자 → 원문 글자(HWP·HWPX·DOCX) → OCR(PDF·그림). 사람이 쓴 글자가 기계가 읽은 글자보다 먼저다 */
+const RANK = (f) => (/\.txt$/.test(f) ? 0 : /\.(hwpx?|docx)$/i.test(f) ? 1 : 2);
+export const fileOrder = (files) => [...(files || [])].sort((a, b) => RANK(a) - RANK(b));
+/** 받은 파일 글자에서 자격을 고른다 — 규칙은 본문과 같은 activityDetails 하나 */
+export function eligFromFiles(n, files, readText = (p) => (/\.txt$/.test(p) ? fs.readFileSync(p, 'utf8') : attachmentText(p)), dir = DIR, isOcr = isOcrSource) {
+  for (const f of fileOrder(files)) {
     const p = path.join(dir, f);
-    const text = readText(p);
+    let text = '';
+    try { text = readText(p); } catch { continue; }
     if (!text || !text.trim()) continue;
-    const ocr = isOcr(p);
-    if (ocr && !ownsImageText(text, n.title)) continue;
+    const ocr = !/\.txt$/.test(f) && isOcr(p);
+    /* 페이지에서 주운 그림(이름 끝 `i`)과 따라간 요강 페이지(`-L0.txt`)는 그 글의 것인지 본다 — 글에 붙은 첨부는 그 글의 것이다.
+       🔴 따라간 페이지가 재단의 다른 장학금 안내였던 적이 있다(장학수기 공모전 심사 결과 → 「성적우수 장학금 (대학교 2학년 이상)」) */
+    if ((/-L\d+\.txt$/.test(f) || (ocr && /\di\.\w+$/.test(f))) && !ownsImageText(text, n.title)) continue;
     const d = activityDetails(text, n.title);
-    if (d.eligibilityLines.length) return { ...d, from: ocr ? '공고문 첨부(OCR)' : '공고문 첨부' };
+    if (d.eligibilityLines.length) return { ...d, from: /\.txt$/.test(f) ? '요강 페이지' : ocr ? '공고문 첨부(OCR)' : '공고문 첨부' };
   }
   return null;
 }

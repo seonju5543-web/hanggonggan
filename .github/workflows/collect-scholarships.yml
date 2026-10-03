@@ -225,6 +225,7 @@ jobs:
           node collector/activity-docs.mjs --fetch
           pip install olefile --quiet
           python3 collector/hwp-bodytext.py collector/act-files || true   # 실패해도 아래 읽기는 돈다(그 글의 무료 기회 두 번 중 하나를 날리지 않게)
+          sudo apt-get install -y -qq poppler-utils   # PDF 공고문을 쪽 그림으로(pdftoppm) — 서울문화포털 글은 자격이 PDF 에만 있다
           pip install --quiet paddlepaddle paddleocr
           python3 collector/paddle-ocr.py collector/act-files --budget-sec=180 || true
           node collector/activity-docs.mjs --apply
