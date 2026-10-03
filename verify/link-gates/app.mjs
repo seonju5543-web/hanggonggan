@@ -219,18 +219,37 @@ export default async function gate(eq, ctx) {
   /* 층1·피드·활동·소식 — 앱이 실제로 받는 파일들(소식·공고는 학교별 파일) */
   const items = (p) => { try { return JSON.parse(read(p)).items || []; } catch (e) { return []; } };
   const dirItems = (dir) => fs.readdirSync(new URL(dir, root)).filter((f) => /\.json$/.test(f) && f !== 'index.json').flatMap((f) => items(`${dir}${f}`));
-  /* 표본: 서울대 학생처 `&#038;` 주소(실측) · 기관 첫 화면(청년정책 API 실측 jeju index.htm) · 내려받기 스크립트 첨부(실측 50건 꼴) */
+  /* 표본: 서울대 학생처 `&#038;` 주소(실측) · 기관 첫 화면(청년정책 API 실측 jeju index.htm) · 내려받기 스크립트 첨부(실측 50건 꼴)
+     🔴 (2026-10-03 리뷰 G1) 갈래(목록·첫 화면 × 카드·상세·활동)는 **표본만으로** 다 그려져야 한다. 예전엔 '카드·상세의 목록'을
+        실데이터의 표식(#n-)에 기댔는데, 표식을 0건으로 만드는 것이 이 작업의 목표다 — 목표에 닿는 날 관문이 빨간불이 되고
+        수집 로봇이 그날 결과를 되돌린다(CLAUDE.md 「합칠 때 마감은…」 2026-10-01 사고). 그래서 목록 표식 표본을 상세·카드에 하나씩 둔다.
+     ⚠️ 첫 화면 표본은 **파일 이름이 있는 주소**(index.htm)로 — 뿌리 주소(`https://x.kr/`)는 학교 게시판이 그렇게 내보내는
+        멀쩡한 글도 있어 꼴만으로 '첫 화면'이라 하지 않게 바뀐다(같은 날 core 갈래). */
   const SNU = 'https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d/?mod=document&#038;category1=%EC%9E%A5%ED%95%99&#038;uid=392';
-  const regs = items('data/registered.json').concat([
+  const MARKER = 'https://a.kr/bbs/list.do#n-%ED%91%9C%EB%B3%B8';   // 「표본」 — 사냥꾼이 못 찾은 글의 목록 표식 꼴
+  const SAMPLES = new Set();   // 표본 글 — 갈래가 그려졌는지는 이것들로만 잰다(실데이터의 있고 없음에 기대지 않는다)
+  const asSample = (...xs) => { xs.forEach((x) => SAMPLES.add(x)); return xs; };
+  const regs = items('data/registered.json').concat(asSample(
     { id: 'gate-snu', name: '표본 서울대', provider: '서울대학교', sourceUrl: SNU, attachments: [{ name: '신청서.hwp', url: "javascript:downloadfile('/x')" }] },
     { id: 'gate-home', name: '표본 기관 첫 화면', provider: '제주특별자치도', sourceUrl: 'https://www.jeju.go.kr/index.htm' },
-  ]);
+    { id: 'gate-list', name: '표본 목록', provider: '가대학교', sourceUrl: MARKER },
+    /* 장부(data/link-check.json) 시험용 보통 주소 — 실제 등록 글을 쓰면 그 글의 제출처 표(OFFICIAL_CHANNELS)·주소에 따라 기대 글자가 바뀐다 */
+    { id: 'gate-page', name: '표본 보통 주소', provider: '건국대학교', sourceUrl: 'https://www.konkuk.ac.kr/bbs/konkuk/235/1202780/artclView.do' },
+  ));
   const feeds = {
     notices: dirItems('data/notices/'), external: items('data/external.json'), news: dirItems('data/news/'),
   };
-  feeds.notices.push({ title: '표본 서울대', url: SNU, school: '서울대학교', foundAt: '2026-10-03' });
-  feeds.external.push({ title: '표본 재단 공지', url: 'https://www.example-foundation.or.kr/', host: '표본재단', foundAt: '2026-10-03' });
-  const acts = items('data/activities.json').concat([{ title: '청년 체인지메이커 아카데미 운영', url: 'https://www.jeju.go.kr/index.htm', kind: '대외활동' }]);
+  /* 🔴 (리뷰 G7) 주소가 없는 글(`javascript:void(0)` · 빈 글자 — 소식 게시판 실측 꼴)도 카드가 된다. 이 표본이 없으면
+     아래 「빈 href 없음」은 noticeCardHtml 의 href 막이를 한 번도 지나지 않고 통과한다(실데이터에 그런 글이 없는 날). */
+  const noUrl = (school) => [
+    { title: '표본 주소 없는 글(스크립트)', url: 'javascript:void(0)', school, foundAt: '2026-10-03' },
+    { title: '표본 주소 없는 글(빈칸)', url: '', school, foundAt: '2026-10-03' },
+  ];
+  feeds.notices.push(...asSample({ title: '표본 서울대', url: SNU, school: '서울대학교', foundAt: '2026-10-03' },
+    { title: '표본 목록 공고', url: MARKER, school: '가대학교', foundAt: '2026-10-03' }, ...noUrl('서울대학교')));
+  feeds.external.push(...asSample({ title: '표본 재단 공지', url: 'https://www.example-foundation.or.kr/index.htm', host: '표본재단', foundAt: '2026-10-03' }));
+  feeds.news.push(...asSample(...noUrl('라대학교')));
+  const acts = items('data/activities.json').concat(asSample({ title: '청년 체인지메이커 아카데미 운영', url: 'https://www.jeju.go.kr/index.htm', kind: '대외활동' }));
 
   const shown = [];   // [어디, id, 이름 글자, html, 데이터 글]
   for (const s of regs) {
@@ -255,9 +274,9 @@ export default async function gate(eq, ctx) {
      ⚠️ 종류는 source-link.js 로 잰다(장부 없이 — 꼴만). 'page'·'trouble' 만 원문이라 부를 수 있다. */
   const NOT_POST = ['list', 'home', 'foundation-home', 'program'];
   const homeBad = shown.filter(([, , say, , it]) => it && NOT_POST.includes(L.linkKind(it)) && /원문/.test(say));
-  eq('  그 갈래가 실제로 그려졌다 (헛돌지 않는다 — 목록·첫 화면을 카드·상세·활동에서 각각)',
+  eq('  그 갈래가 실제로 그려졌다 (헛돌지 않는다 — 목록·첫 화면을 카드·상세·활동에서 각각 · 표본만으로 센다)',
     [['카드', 'list'], ['카드', 'home'], ['상세', 'list'], ['상세', 'home'], ['활동', 'home']]
-      .map(([w, kd]) => shown.some(([x, , , , it]) => x.startsWith(w) && it && L.linkKind(it) === kd)), [true, true, true, true, true]);
+      .map(([w, kd]) => shown.some(([x, , , , it]) => x.startsWith(w) && SAMPLES.has(it) && L.linkKind(it) === kd)), [true, true, true, true, true]);
   eq('(c) 🔴 게시판 목록·기관 첫 화면 주소는 상세·금액·신청 내역·제출처·카드·활동 어디서도 「원문」이 아니다 (실데이터 + 표본)',
     homeBad.slice(0, 3).map(([w, id, say]) => `${w} ${String(id).slice(0, 60)} 「${say}」`), []);
   eq('  표본 jeju index.htm — 활동 단추는 「주최 측 홈페이지」 · 「신청은 주최 측 원문 페이지에서」 안내가 없다',
@@ -268,6 +287,9 @@ export default async function gate(eq, ctx) {
   eq('(c) 🔴 그려진 href 전부에 HTML 기호(`&#038;`·`&amp;`)가 없다 — 있으면 글 번호가 조각이 돼 메뉴 화면이 열린다',
     allHrefs.filter(([, , u]) => ENT_RE.test(u)).slice(0, 3).map(([w, id, u]) => `${w} ${String(id).slice(0, 40)} ${u.slice(0, 80)}`), []);
   eq('  빈 href(`href=""` — 앱 자신을 연다)가 하나도 없다', allHrefs.filter(([, , u]) => !u).slice(0, 3).map(([w, id]) => `${w} ${id}`), []);
+  const noUrlCards = shown.filter(([w, , , , it]) => /^카드\((notices|news)\)$/.test(w) && SAMPLES.has(it) && /^표본 주소 없는 글/.test(it.title));
+  eq('  표본 주소 없는 글(`javascript:void(0)`·빈칸) — 공고·소식 카드 넷 모두 그려졌고 href 를 아예 달지 않는다',
+    [noUrlCards.length, noUrlCards.filter(([, , , h]) => /\shref=/.test(h)).map(([w, id]) => `${w} ${JSON.stringify(id)}`)], [4, []]);
   eq('  표본 서울대 — 상세 링크가 글 번호(uid=392)를 그대로 서버에 보낸다',
     new URL(hrefsOf(F('sourceLinkHtml')(regs.find((r) => r.id === 'gate-snu')))[0]).searchParams.get('uid'), '392');
   eq('  표본 내려받기 스크립트 첨부 — 링크 없이 이름 + 「원문 게시판에서 내려받기」',
@@ -277,16 +299,19 @@ export default async function gate(eq, ctx) {
 
   /* 목록·문제 주소 — 안내 줄이 따라온다(상세 시트 맨 아래 · 신청 준비 시트) */
   const listRegs = regs.filter((s) => L.linkKind(s) === 'list');
-  eq('(c) 목록 주소 정식 등록은 신청 준비 시트에도 「목록에서 ○○을(를) 찾아 눌러 주세요」가 붙는다 (표식 주소 전부)',
-    listRegs.filter((s) => !/목록에서 .+을\(를\) 찾아 눌러 주세요/.test(textOf(F('sourceNoteHtml')(s)))).map((s) => s.id).slice(0, 3), []);
-  const real = regs.find((s) => L.linkKind(s) === 'page' && !/^gate-/.test(s.id)) || regs[regs.length - 2];
-  F('setLinkChecks')({ updatedAt: 't', bad: { [L.decodeUrlEntities(real.sourceUrl)]: { v: 'list', at: '2026-10-04' }, [L.decodeUrlEntities(SNU)]: { v: 'gone', at: '2026-10-04' } } });
-  const listNow = [textOf(F('sourceLinkHtml')(real)), /목록에서 .+을\(를\) 찾아 눌러 주세요/.test(textOf(F('sourceNoteHtml')(real))), F('officialChannel')(real).label.includes('게시판 목록')];
+  eq('(c) 목록 주소 정식 등록은 신청 준비 시트에도 「목록에서 ○○을(를) 찾아 눌러 주세요」가 붙는다 (표식 주소 전부 · 표본 gate-list 포함 — 빈 목록으로 통과하지 않는다)',
+    [listRegs.some((s) => s.id === 'gate-list'), listRegs.filter((s) => !/목록에서 .+을\(를\) 찾아 눌러 주세요/.test(textOf(F('sourceNoteHtml')(s)))).map((s) => s.id).slice(0, 3)], [true, []]);
+  /* 🔴 (2026-10-03 리뷰 G1) 장부 시험은 표본 보통 주소(gate-page)로 한다. 예전엔 '실데이터의 첫 보통 주소'를 골랐는데,
+     ① 그 글이 제출처 표(OFFICIAL_CHANNELS)에 있으면 제출처 이름이 달라 빨간불이 되고 ② 보통 주소가 하나도 없는 날엔
+     gate-snu 로 물러나 「목록」과 「열리지 않음」이 한 주소에 겹쳤다 — 둘 다 데이터가 바뀌는 날 뒤집힌다. */
+  const pageReg = regs.find((r) => r.id === 'gate-page');
+  F('setLinkChecks')({ updatedAt: 't', bad: { [L.decodeUrlEntities(pageReg.sourceUrl)]: { v: 'list', at: '2026-10-04' }, [L.decodeUrlEntities(SNU)]: { v: 'gone', at: '2026-10-04' } } });
+  const listNow = [textOf(F('sourceLinkHtml')(pageReg)), /목록에서 .+을\(를\) 찾아 눌러 주세요/.test(textOf(F('sourceNoteHtml')(pageReg))), F('officialChannel')(pageReg).label.includes('게시판 목록')];
   const snuReg = regs.find((r) => r.id === 'gate-snu');
   const goneNow = [textOf(F('sourceLinkHtml')(snuReg)), textOf(F('sourceNoteHtml')(snuReg)).includes('이 주소가 열리지 않았어요 (2026-10-04 확인)'), textOf(F('appLogLinkHtml')(snuReg))];
   F('setLinkChecks')(null);
-  eq('(c) 장부가 「목록」을 확정한 실제 등록 주소 — 이름·찾기 안내·제출처 이름이 함께 바뀐다(표식이 없어도)',
+  eq('(c) 장부가 「목록」을 확정한 보통 주소(표본) — 이름·찾기 안내·제출처 이름이 함께 바뀐다(표식이 없어도)',
     listNow, ['게시판 목록 ↗', true, true]);
   eq('  장부가 「열리지 않음」을 확정한 주소 — (확인 필요) + 로봇이 본 것 한 줄', goneNow, ['원문 공고(확인 필요) ↗', true, '공고 원문 보기(확인 필요) ↗']);
-  eq('  장부를 비우면 예전 글자 그대로 (승인된 화면 — 보통 주소는 「원문 공고 ↗」)', textOf(F('sourceLinkHtml')(real)), '원문 공고 ↗');
+  eq('  장부를 비우면 예전 글자 그대로 (승인된 화면 — 보통 주소는 「원문 공고 ↗」)', textOf(F('sourceLinkHtml')(pageReg)), '원문 공고 ↗');
 }

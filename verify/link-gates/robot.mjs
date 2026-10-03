@@ -5,6 +5,7 @@
      ⓑ 순서 — 처음 보는 것 먼저 · 한 번 본 문제는 다른 날 다시 · 사이트마다 상한 · 같은 사이트 간격
      ⓒ 끝에서 끝까지 — 가짜 관측으로 로봇을 **실제로 돌려** 첫날은 안 알리고 둘째 날 확정되며, 공고가 뜨면 풀리고,
         세 출력 말고는 **한 바이트도 안 바뀌는지**(이 로봇은 주소를 고치지 않는다 — 2026-10-03 순찰 사고)
+        · ⓒ-2 한 사이트에 한 번 본 문제가 넷 이상이어도 둘째 날 확정되는지(막힘 판정이 그것들을 지우지 않는다 · 리뷰 G6)
      ⓓ 걸려 있는가 — 워크플로(시한·홀수 분 예약·세 파일 저장·넘어짐 알림) · 배포 동기화 · 라이브 점검 · 쓰기 자리
    🔴 실데이터 숫자를 박지 않는다(CLAUDE.md — 2026-10-01 관문이 선을 넘나들며 자동 등록을 되돌린 사고).
       ⓐ는 '데이터에 글이 있는 묶음은 대상에도 있다'를 **같은 파일을 따로 읽어** 대조한다. */
@@ -18,12 +19,22 @@ import * as P from '../../collector/link-check-plan.mjs';
 
 const ENT = /&(?:amp|#0*38|#x0*26);/i;
 
-/* 같은 파일을 로봇과 **다른 길로** 읽어 묶음별 '열어 볼 주소'를 센다 — 로봇의 눈으로 로봇을 채점하지 않게 */
+/* 같은 파일을 로봇과 **다른 길로** 읽어 묶음별 '열어 볼 주소'를 센다 — 로봇의 눈으로 로봇을 채점하지 않게.
+   🔴 (2026-10-03 리뷰 G4) **뜻은 로봇과 같아야** 한다 — 다르게 읽으면 데이터에 그런 글이 하나 들어오는 날 ⓐ가 거짓 빨간불이 되고,
+      수집 로봇이 이 관문을 돌리므로 그날 결과가 되돌려진다. 예전 되풀기는 두 번만 풀어 `&amp;#038;`(서울대 워드프레스 실측 꼴)이
+      `&#038;` 로 남았고, `http://` 처럼 주소로 못 푸는 글자를 '주소'로 셌다(로봇은 둘 다 다르게 본다).
+      그래서 로봇(source-link.js decodeUrlEntities·linkShape)과 같은 약속을 **따로 적는다**: 기호가 안 남을 때까지 세 번까지 풀고,
+      new URL 이 못 읽는 글자는 '주소 없음'. 함수를 불러 쓰지 않는 것이 이 함수의 존재 이유다. */
 function independentCount(root) {
   const R = (rel) => path.join(root, rel);
   const j = (f) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return {}; } };
   const dirFiles = (d) => { try { return fs.readdirSync(R(d)).filter((f) => f.endsWith('.json') && f !== 'index.json').map((f) => path.join(R(d), f)); } catch { return []; } };
-  const dec = (u) => String(u || '').replace(/&amp;amp;/gi, '&').replace(/&(?:amp|#0*38|#x0*26);/gi, '&').trim();
+  const dec = (u) => {
+    let s = String(u == null ? '' : u).trim();
+    for (let i = 0; i < 3 && ENT.test(s); i += 1) s = s.replace(/&(?:amp|#0*38|#x0*26);/gi, '&');
+    return s;
+  };
+  const parses = (u) => { try { return !!new URL(u); } catch { return false; } };
   const out = {}; const markers = {};
   const add = (ds, list, urlKey) => {
     const s = new Set();
@@ -32,6 +43,7 @@ function independentCount(root) {
       const u = dec(it[urlKey]);
       if (!/^https?:\/\//i.test(u)) continue;
       if (/#n-/.test(u)) { markers[ds] = (markers[ds] || 0) + 1; continue; }
+      if (!parses(u)) continue;
       s.add(u);
     }
     out[ds] = s;
@@ -67,16 +79,43 @@ export default async function gate(eq, ctx) {
   const ROOT = fileURLToPath(root);
 
   /* ── ⓐ 모으기 — 진짜 저장소 ─────────────────────────────────────── */
+  const mineOf = (gt) => Object.fromEntries(P.DATASETS.map((d) => [d, new Set(gt.targets.filter((t) => t.ds.includes(d)).map((t) => t.url))]));
+  /* 따로 읽은 주소 중 로봇이 안 연 것은 「제목이 없어 못 여는 것」뿐이어야 한다(그 수만큼만 빈다) */
+  const gapOf = (gt, id) => {
+    const m = mineOf(gt);
+    return P.DATASETS.filter((d) => {
+      const missing = [...id.out[d]].filter((u) => !m[d].has(u)).length;
+      const extra = [...m[d]].filter((u) => !id.out[d].has(u)).length;
+      return extra > 0 || missing > (gt.skipped.noTitle[d] || 0);
+    });
+  };
   const g = P.gatherTargets(root);
   const ind = independentCount(ROOT);
-  const mine = Object.fromEntries(P.DATASETS.map((d) => [d, new Set(g.targets.filter((t) => t.ds.includes(d)).map((t) => t.url))]));
-  /* 따로 읽은 주소 중 로봇이 안 연 것은 「제목이 없어 못 여는 것」뿐이어야 한다(그 수만큼만 빈다) */
-  const gap = P.DATASETS.filter((d) => {
-    const missing = [...ind.out[d]].filter((u) => !mine[d].has(u)).length;
-    const extra = [...mine[d]].filter((u) => !ind.out[d].has(u)).length;
-    return extra > 0 || missing > (g.skipped.noTitle[d] || 0);
-  });
-  eq('ⓐ 앱이 받는 다섯 묶음(정식 등록·학교별 공고·재단·활동·학교별 소식)을 따로 읽은 주소를 로봇이 전부 연다(제목 없는 것만 뺀다)', gap, []);
+  const mine = mineOf(g);
+  eq('ⓐ 앱이 받는 다섯 묶음(정식 등록·학교별 공고·재단·활동·학교별 소식)을 따로 읽은 주소를 로봇이 전부 연다(제목 없는 것만 뺀다)', gapOf(g, ind), []);
+  /* 따로 읽기가 로봇과 같은 뜻인지 — 까다로운 꼴을 가짜 자료로 (리뷰 G4 · 실데이터에 그런 글이 들어오는 날을 미리) */
+  {
+    const tmpA = fs.mkdtempSync(path.join(os.tmpdir(), 'link-check-gather-'));
+    try {
+      fs.mkdirSync(path.join(tmpA, 'data'), { recursive: true });
+      fs.writeFileSync(path.join(tmpA, 'data/registered.json'), JSON.stringify({ items: [
+        { id: 'r1', name: '한 겹 기호 표본 2026 장학생 선발', sourceUrl: 'https://x.test.kr/kb/?mod=document&#038;uid=79' },
+      ] }));
+      fs.writeFileSync(path.join(tmpA, 'data/external.json'), JSON.stringify({ items: [
+        { title: '두 겹 기호 표본 2026 장학생 선발 안내', url: 'https://x.test.kr/kb/?mod=document&amp;#038;uid=77' },   // 워드프레스 두 겹(실측 꼴)
+        { title: '세 겹 기호 표본 2026 장학생 선발 안내', url: 'https://x.test.kr/kb/?mod=document&amp;amp;amp;uid=78' },
+        { title: '못 푸는 주소 표본 2026 장학 안내', url: 'http://' },
+        { title: '빈칸 든 주소 표본 2026 장학 안내', url: 'https://exa mple.kr/x' },
+      ] }));
+      const gA = P.gatherTargets(tmpA);
+      const iA = independentCount(tmpA);
+      eq('  따로 읽기와 로봇 읽기가 까다로운 주소에서도 같은 뜻 — 두·세 겹 기호(`&amp;#038;`·`&amp;amp;amp;`)는 끝까지 풀고 · 못 푸는 주소는 「주소 없음」',
+        [gapOf(gA, iA), [...iA.out.external].sort(), gA.skipped.noUrl.external || 0, [...iA.out.registered]],
+        [[], ['https://x.test.kr/kb/?mod=document&uid=77', 'https://x.test.kr/kb/?mod=document&uid=78'], 2, ['https://x.test.kr/kb/?mod=document&uid=79']]);
+    } finally {
+      fs.rmSync(tmpA, { recursive: true, force: true });
+    }
+  }
   eq('  다섯 묶음 모두 지금 열어 볼 링크가 있다 — 글이 있는 묶음은 하나도 빠지지 않는다(개수를 박지 않고 「모두 본다」를 잰다)',
     P.DATASETS.filter((d) => ind.out[d].size > 0 && !(mine[d].size > 0)), []);
   eq('  목록 표식(#n-)은 열지 않고 센다 — 앱이 이미 「게시판 목록」이라 부른다', [g.targets.filter((t) => /#n-/.test(t.raw)).length, P.DATASETS.map((d) => g.skipped.marker[d] || 0)], [0, P.DATASETS.map((d) => ind.markers[d] || 0)]);
@@ -115,6 +154,20 @@ export default async function gate(eq, ctx) {
     others.sort(), ['공고 둘 2026 장학생 선발 안내', '표식으로 남은 다른 글 2026 장학 안내'].sort());
 
   /* ── ⓒ 끝에서 끝까지 — 가짜 관측으로 로봇을 실제로 돌린다 ───────────── */
+  /* 로봇 한 번 — dir 을 저장소로 · obs 를 그날 본 화면으로 · day 를 오늘로. env 로 사이트 상한 등을 그 실행에만 준다 */
+  const runRobot = (dir, obs, day, { args = [], env = {} } = {}) => {
+    const fakeFile = path.join(dir, 'fake.json');
+    const outFile = path.join(dir, 'gh-output.txt');
+    fs.writeFileSync(fakeFile, JSON.stringify(obs));
+    fs.writeFileSync(outFile, '');
+    const r = spawnSync(process.execPath, [path.join(ROOT, 'collector/link-check.mjs'), ...args], {
+      encoding: 'utf8',
+      env: { ...process.env, LINK_CHECK_ROOT: dir, LINK_CHECK_FAKE: fakeFile, LINK_CHECK_TODAY: day, GITHUB_OUTPUT: outFile,
+        LINK_CHECK_TXT: '', LINK_CHECK_ONLY: '', LINK_CHECK_MAX: '', LINK_CHECK_PER_HOST: '', LINK_CHECK_BUDGET_MS: '', LINK_CHECK_SPACING_MS: '', ...env },
+    });
+    const out = Object.fromEntries(fs.readFileSync(outFile, 'utf8').split('\n').filter(Boolean).map((l) => l.split('=')));
+    return { code: r.status, out, err: (r.stderr || '').slice(0, 300) };
+  };
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'link-check-'));
   try {
     const W = (rel, obj) => { fs.mkdirSync(path.dirname(path.join(tmp, rel)), { recursive: true }); fs.writeFileSync(path.join(tmp, rel), typeof obj === 'string' ? obj : JSON.stringify(obj, null, 1)); };
@@ -163,22 +216,11 @@ export default async function gate(eq, ctx) {
       ...Object.fromEntries(aOthers.map((t, i) => [`https://a.test.kr/bbs/view.do?id=1${i + 1}`, { status: 200, docTitle: t, headings: [t], text: `${t} 작성일 ${'y'.repeat(400)}` }])),
       [E]: { status: 404 },
       [F]: { status: 200, finalUrl: F, docTitle: '장학공지', headings: ['장학공지'], text: `${fOthers.join('\n')}\n${fTitle}\n${'v'.repeat(500)}` },
-      [C]: { status: 200, finalUrl: 'https://c.test.kr/', docTitle: '씨씨재단', text: 'z'.repeat(800) },
+      /* 첫 화면으로 돌려보내짐 — 첫 화면 파일(index.do)로 둔다. 뿌리 주소(`/`)는 같은 날 core 갈래에서 꼴만으로 '첫 화면'이라 하지 않게 바뀐다 */
+      [C]: { status: 200, finalUrl: 'https://c.test.kr/index.do', docTitle: '씨씨재단', text: 'z'.repeat(800) },
       ...Object.fromEntries(Z.map((u) => [u, { status: 200, docTitle: '제트대학교', text: `작성일 다른 글 ${'w'.repeat(2000)}` }])),
     });
-    const fakeFile = path.join(tmp, 'fake.json');
-    const outFile = path.join(tmp, 'gh-output.txt');
-    const run = (day, aIsPost, extra = []) => {
-      fs.writeFileSync(fakeFile, JSON.stringify(obsDay(aIsPost)));
-      fs.writeFileSync(outFile, '');
-      const r = spawnSync(process.execPath, [path.join(ROOT, 'collector/link-check.mjs'), ...extra], {
-        encoding: 'utf8',
-        env: { ...process.env, LINK_CHECK_ROOT: tmp, LINK_CHECK_FAKE: fakeFile, LINK_CHECK_TODAY: day, GITHUB_OUTPUT: outFile,
-          LINK_CHECK_TXT: '', LINK_CHECK_ONLY: '', LINK_CHECK_MAX: '', LINK_CHECK_PER_HOST: '', LINK_CHECK_BUDGET_MS: '', LINK_CHECK_SPACING_MS: '' },
-      });
-      const out = Object.fromEntries(fs.readFileSync(outFile, 'utf8').split('\n').filter(Boolean).map((l) => l.split('=')));
-      return { code: r.status, out, err: (r.stderr || '').slice(0, 300) };
-    };
+    const run = (day, aIsPost, extra = []) => runRobot(tmp, obsDay(aIsPost), day, { args: extra });
     const ledger = () => JSON.parse(fs.readFileSync(path.join(tmp, 'data/link-check.json'), 'utf8'));
     const ledgerRaw = () => fs.readFileSync(path.join(tmp, 'data/link-check.json'), 'utf8');
     const state = () => JSON.parse(fs.readFileSync(path.join(tmp, 'collector/link-check-state.json'), 'utf8'));
@@ -215,6 +257,46 @@ export default async function gate(eq, ctx) {
     eq('🔴 세 출력(data/link-check.json · 로봇 장부 · 리포트) 말고는 한 바이트도 안 바뀐다 — 이 로봇은 주소를 고치지 않는다', changed(before, hashTree(tmp, notOutputs)), []);
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
+  }
+
+  /* ⓒ-2 (2026-10-03 리뷰 G6) 한 사이트에 '제목 없는 다른 화면'이 넷 — 둘째 날 다시 열면 **확정**된다(막힘으로 지워지지 않는다).
+     순서(planQueue)는 한 번 본 문제를 일부러 맨 앞에 모아 다시 연다. 그날 막힘 판정(hostGuard)이 그것들까지 '처음 보는 문제'로 세면
+     그 사이트의 거의 전부가 제목 없는 문제라 '막힘 의심'이 되고, 진짜 문제 넷이 날마다 「판정 못 함」으로 지워져 영영 확정되지 않는다
+     (리뷰 LC-1 — 로봇이 넘기는 wasBad 표시). 순수 함수(hostGuard)만 재면 로봇이 그 표시를 안 넘기는 사고를 못 본다 — 그래서 로봇을 돌린다.
+     첫날은 같은 사이트에 공고 여섯이 함께 열려 제목 없는 것이 절반 미만(4/10)이라 막힘이 아니고 「한 번 봄」으로 남는다.
+     둘째 날은 사이트 상한 6 — 한 번 본 문제 넷이 먼저, 공고는 둘만 다시 열린다(표시가 없으면 4/6 로 막힘이 되는 꼴). */
+  const tmpH = fs.mkdtempSync(path.join(os.tmpdir(), 'link-check-host-'));
+  try {
+    const Y = (i) => `https://y.test.kr/bbs/view.do?id=${i}`;
+    const blindU = [1, 2, 3, 4].map(Y);
+    const postU = [11, 12, 13, 14, 15, 16].map(Y);
+    const blindT = (i) => `와이대학교 2026학년도 장학 공고 ${i}번 선발 안내`;
+    const postT = (i) => `와이대학교 2026학년도 학사 공지 ${i}번 안내`;
+    fs.mkdirSync(path.join(tmpH, 'data/notices'), { recursive: true });
+    fs.writeFileSync(path.join(tmpH, 'data/notices/yfake.json'), JSON.stringify({ school: '와이대학교', items: [
+      ...blindU.map((u, i) => ({ title: blindT(i + 1), url: u, school: '와이대학교' })),
+      ...postU.map((u, i) => ({ title: postT(i + 1), url: u, school: '와이대학교' })),
+    ] }, null, 1));
+    const obsH = {
+      ...Object.fromEntries(blindU.map((u) => [u, { status: 200, docTitle: '와이대학교', text: `작성일 다른 글 ${'w'.repeat(2000)}` }])),
+      ...Object.fromEntries(postU.map((u, i) => [u, { status: 200, docTitle: postT(i + 1), headings: [postT(i + 1)], text: `${postT(i + 1)} 작성일 ${'y'.repeat(400)}` }])),
+    };
+    const ledgerH = () => { try { return JSON.parse(fs.readFileSync(path.join(tmpH, 'data/link-check.json'), 'utf8')).bad; } catch { return null; } };
+    const stateH = () => JSON.parse(fs.readFileSync(path.join(tmpH, 'collector/link-check-state.json'), 'utf8'));
+    const h1 = runRobot(tmpH, obsH, '2026-10-04', { env: { LINK_CHECK_PER_HOST: '10' } });
+    const sh1 = stateH();
+    eq('ⓒ-2 첫날 — 한 사이트에 제목 없는 다른 화면 넷 + 공고 여섯: 막힘이 아니라 넷 다 「한 번 봄」(other · 1회 · 미확정) · 앱엔 아직 안 알린다',
+      [h1.code, h1.err, h1.out.checked, blindU.map((u) => sh1[u] && [sh1[u].v, sh1[u].n, sh1[u].confirmed]), ledgerH()],
+      [0, '', '10', blindU.map(() => ['other', 1, false]), {}]);
+    const h2 = runRobot(tmpH, obsH, '2026-10-05', { env: { LINK_CHECK_PER_HOST: '6' } });
+    const sh2 = stateH();
+    eq('  둘째 날 — 한 번 본 문제 넷이 공고 둘과 함께 다시 열린다(사이트 상한 6)',
+      [h2.code, h2.err, h2.out.checked, blindU.every((u) => sh2[u].lastAt === '2026-10-05'), postU.filter((u) => sh2[u].lastAt === '2026-10-05').length], [0, '', '6', true, 2]);
+    eq('  🔴 그 넷이 확정돼 data/link-check.json 에 실린다 — 막힘 의심(판정 못 함)으로 지워지지 않는다(앞선 날 이미 문제였다는 표시를 로봇이 넘긴다)',
+      [ledgerH(), h2.out.new_bad, blindU.map((u) => sh2[u].lastV)],
+      [Object.fromEntries(blindU.map((u) => [u, { v: 'other', at: '2026-10-05' }])), '4', blindU.map(() => 'other')]);
+  } finally {
+    fs.rmSync(tmpH, { recursive: true, force: true });
   }
 
   /* ── ⓓ 걸려 있는가 ────────────────────────────────────────────── */
