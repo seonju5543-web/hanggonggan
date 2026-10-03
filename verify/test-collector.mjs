@@ -10949,7 +10949,7 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
     /if \(it\.detailsTriedAt && \(Date\.parse\(todayIso\) - Date\.parse\(it\.detailsTriedAt\)\) < 7 \* 86400000\) continue;/.test(cmY) && /if \(detail\.text\) delete it\.detailsTriedAt; else it\.detailsTriedAt = todayIso;/.test(cmY), true);
   eq('⑥ 활동 글을 엔진 모양으로 — 칸 이름이 장학과 같다', /function activityAsSch[\s\S]*?eligibilityLines: n\.eligibilityLines[\s\S]*?eligibilityExcludes: n\.eligibilityExcludes/.test(appX), true);
   eq('  적합도는 getMatches 와 같은 세 함수(evaluateFor · fitScore · fitDetailFor)', /function activityFit[\s\S]*?evaluateFor\(sch, state\.profile\)[\s\S]*?fitScore\(sch, result, state\.profile\)[\s\S]*?fitDetailFor\(sch, state\.profile\)/.test(appX), true);
-  eq('  카드 판정은 장학 카드의 cardBadgeHtml', /badge: cardBadgeHtml\(m\.fit, m\.fd, null\)/.test(appX), true);
+  eq('  카드 판정은 장학 카드의 cardBadgeHtml · 단 \'자격 미확인\'은 활동 카드에 안 단다(2026-10-03 개발자 결정)', /badge: fitVerdict\(m\.fit, m\.fd\) === 'unread' \? '' : cardBadgeHtml\(m\.fit, m\.fd, null\)/.test(appX), true);
   eq('  지원 자격 줄은 장학 시트와 한 함수(eligibilityRowsHtml) — 장학 시트도 그것을 부른다',
     (appX.match(/eligibilityRowsHtml\(sch, result\)/g) || []).length >= 2 && /const reasonRows = eligibilityRowsHtml\(sch, result\);/.test(appX), true);
   eq('  시트 판정 머리 · 묻기 상자(다시 그릴 때 이 시트로)', /function openActivityDetail[\s\S]*?fitBadgeHtml\(fit, fd, \{ full: true \}\)[\s\S]*?eligAskHtml\(sch\)[\s\S]*?eligAskWire\(sch, \(\) => openActivityDetail\(url\)\)/.test(appX), true);
@@ -10962,6 +10962,48 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
   eq('  카드·시트에 장학과 같은 북마크(saveBtnHtml)', /save: saveBtnHtml\(`act:\$\{n\.url\}`\)/.test(appX) && /\$\{saveBtnHtml\(`act:\$\{n\.url\}`\)\}/.test(appX), true);
   eq('  저장 해제의 되돌리기는 뺀 줄을 그대로 돌려놓는다(다시 담기는 빠진 공고에 막힌다)', /const removed = state\.saved\.splice\(at, 1\)\[0\];[\s\S]{0,400}state\.saved\.splice\(Math\.min\(at, state\.saved\.length\), 0, removed\)/.test(appX), true);
   eq('  지원 가능 알약(STATUS_META)은 활동 시트에 없다 — 구조화 조건이 없어 늘 가능이라 거짓 안심', /STATUS_META\[/.test((() => { const a = appX.indexOf('function openActivityDetail'); return appX.slice(a, appX.indexOf('\nfunction ', a + 10)); })()), false);
+}
+
+console.log('\n■ 대외활동·공모전 — 활동 글의 자격 읽기 (2026-10-03 · 개발자 "왜 대외활동 공모전은 자격 미확인이야 죄다")');
+{
+  /* 왜 있나 — 활동 188건 중 122건이 자격 0줄이었다(실측). 원문엔 있었다: 활동만 쓰는 절 제목(공모자격·교육대상) ·
+     콜론 없는 이름표(`ㅇ ( 신청자격 ) …`) · 사이트 메뉴가 자격 절로 뽑힘 · `국민 누구나` 를 엔진이 못 읽음.
+     심장은 장학과 같다: 지어내지 않는다(원문 줄 그대로) · 틀린 안심 금지(`서울시민 누구나` 는 ✓ 아님) · 틀린 미달 금지. */
+  const AX = await import('../collector/activity-excerpts.mjs');
+  const X = await import('../collector/extract-excerpts.mjs');
+  const rq = createRequire(import.meta.url);
+  const MEX = rq('../match-engine.js');
+  const yr = new Date().getFullYear();
+  const P = { school: '한국외국어대학교', year: 3, status: '재학', flags: [], nationality: 'korean', birthYear: yr - 22, region: '서울' };
+  const el = (page, title) => AX.activityDetails(page, title).eligibilityLines;
+  eq('① 괄호 이름표 — `ㅇ ( 신청자격 ) 대전시 거주 청년` 을 읽고, 다음 이름표(접수기간)에서 끊는다',
+    el(['ㅇ ( 신청자격 ) 대전시 거주 청년 ( 만 18~39 세 )', 'ㅇ ( 접수기간 ) 프로그램별 상이', 'ㅇ ( 신청방법 ) 네이버 폼'].join('\n')), ['ㅇ 신청자격 : 대전시 거주 청년 ( 만 18~39 세 )']);
+  eq('  홀로 선 `<응모자격>` 은 다음 줄을 끌어오지 않는다(줄바꿈을 먹지 않는다)', el(['<응모자격>', 'ㅇ 전 세계인 누구나'].join('\n')).some((l) => /응모자격 : ㅇ/.test(l)), false);
+  eq('② 활동 절 제목 — 공모자격·공모대상·교육대상', [el('4. 공모자격 : 대한민국 국민 누구나').length > 0, el('□ 공모대상 : 대한민국 국민 누구나(개인, 팀 모두 가능)').length > 0, el(['□ 교육대상', 'AI에 관심 있는 누구나 25인', '□ 신청기간'].join('\n')).some((l) => /누구나/.test(l))], [true, true, true]);
+  eq('  장학 발췌기는 그 제목을 안 받는다(장학 결과는 그대로)', X.extractQualifyLines('4. 공모자격 : 대한민국 국민 누구나').length, 0);
+  eq('③ 사이트 메뉴의 `신청자격` 이 아니라 글 제목 뒤 본문의 자격을 읽는다',
+    el(['장학금 신청자격', '지원대상', '청년 공모전 참가자 모집 공고', '○ 참가자격 : 만 19~34세 대한민국 국민'].join('\n'), '[공고] 청년 공모전 참가자 모집 공고'), ['○ 참가자격 : 만 19~34세 대한민국 국민']);
+  eq('  보도자료 문장(`… 심사 기준 등 자세한 사항은`)을 자격 절 제목으로 쓰지 않는다',
+    el(['참가 방법 , 제출 자료 , 심사 기준 등 자세한 사항은 누리집에 게시된 공고문에서 확인할 수 있다 .', '※ 아이디어 검토 대상 : 모바일 주민등록증'].join('\n')).some((l) => /자세한 사항/.test(l)), false);
+  eq('④ 이름표가 없으면 `국민 누구나` 줄만 원문 그대로 · 장비 `제한 없음`·안내 문장은 아니다',
+    [el('바다를 사랑하는 대한민국 국민 누구나'), el('• 촬영 장비 : 디지털카메라, 드론 등 제한 없음'), el('국민 누구나 다시 일어설 기회를 얻도록 정부가 마련한 지원 정책입니다.')], [['바다를 사랑하는 대한민국 국민 누구나'], [], []]);
+  const rm = (l, p = P) => MEX.requirementMatch(l, p, {});
+  eq('⑤ 판정 — `국민 누구나`·`관심 있는 누구나`·`참가자격 : 전 국민 누구나(개인 또는 팀)` 은 충족',
+    [rm('대한민국 국민 누구나'), rm('AI에 관심 있는 누구나 25인'), rm('○ 참가자격 : 전 국민 누구나(개인 또는 최대 5명으로 구성된 팀)')], ['ok', 'ok', 'ok']);
+  /* 서울 학생에게 `서울시민 누구나` 는 ✓ 가 맞다(거주 요건이 판정한다 — 처음 이 검사를 그렇게 잘못 적었다). 누구나 축은 지역을 지우지 않는다 */
+  eq('  🔴 다른 요구가 남으면 누구나로 ✓ 하지 않는다(틀린 안심 금지) — 서울 학생에게 부산시민 누구나 · 창업자 누구나', [rm('부산시민 누구나') !== 'ok', rm('예비창업자 누구나') !== 'ok'], [true, true]);
+  eq('  `○ 활동자격 : 대학생` — 이름표는 요구가 아니다(학부생 ✓)', rm('○ 활동자격 : 대학생'), 'ok');
+  const fx = (ex, p) => MEX.fitDetail({ eligibilityLines: ['만 15세 이상 34세 이하 청년'], eligibilityExcludes: [ex], eligibility: {} }, p).fails.length;
+  eq('  🔴 제외 `대한민국 국적을 보유하지 않은 사람` 은 한국 학생을 떨어뜨리지 않는다(틀린 미달 · K-뉴딜 실측) · 외국 학생은 걸린다',
+    [fx('⑤ 대한민국 국적을 보유하지 않은 사람', P), fx('⑤ 대한민국 국적을 보유하지 않은 사람', { ...P, nationality: 'foreign' })], [0, 1]);
+  eq('  (리뷰) 제목 머리말 `[서울문화재단] …` 은 이름표로 바꾸지 않는다 · 맨 제목 줄 `지원자격` 아래 내용은 자격이다',
+    [AX.activityDetails('[서울문화재단] 2026 청년예술인 모집').noticeLines.concat(el('[서울문화재단] 2026 청년예술인 모집')).some((l) => /서울문화재단 :/.test(l)), el(['지원자격', '대학 재학생으로서 평점 3.0 이상인 자', '신청기간 : 2026. 10. 1. ~ 10. 20.'].join('\n'))],
+    [false, ['대학 재학생으로서 평점 3.0 이상인 자']]);
+  const natOf = (l) => (rq('../parse-requirements.js').parseLine(l).conds.find((c) => c.kind === 'nationality') || {}).eq;
+  eq('  (리뷰) `대한민국 국적자로 결격사유가 없는 자` 는 한국 국적 요건 · `대한민국 국적이 없는 자` 는 외국 국적', [natOf('대한민국 국적자로 결격사유가 없는 자'), natOf('대한민국 국적이 없는 자')], ['korean', 'foreign']);
+  eq('  (리뷰) `전남 누구나` 의 \'전\' 은 지우지 않는다(누구나 축이 지역을 덮지 않는다)', rm('전남 누구나') !== 'ok', true);
+  eq('⑥ 소급 — 판(detailsV)을 올려 옛 글도 다시 읽는다 · 수집 로봇은 제목을 넘긴다',
+    [AX.ACT_DETAILS_V >= 3, (readText(new URL('../collector/collect.mjs', import.meta.url)).match(/activityDetails\(detail\.text, it\.title\)/g) || []).length], [true, 2]);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');

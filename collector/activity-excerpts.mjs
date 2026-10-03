@@ -56,11 +56,51 @@ export function activityExcerpts(text) {
 /* 2026-10-01 코드 리뷰로 넓힘(앞뒤가 숫자면 전화가 아니다 — `20261001 ~ 20261020` 이 지워지던 것 막음) — `02) 123-4567`·`010 - 1234 - 5678`·`01012345678`(1365 담당자 휴대전화)·`☎ 1588-1234`·`hong[at]korea.kr`·`담당자 김철수` */
 export const CONTACT = /(?<!\d)0\d{1,2}\D{0,3}\d{3,4}\D{0,3}\d{4}(?!\d)|(?<!\d)1\d{3}\D{0,2}\d{4}(?!\d)|(?<!\d)01\d{8,9}(?!\d)|\d{2,4}[-.)\s]\d{3,4}[-.\s]\d{4}|@[a-z0-9.-]+\.[a-z]{2,}|\[at\]|문의\s*[:：]|담당자?|연락처|☎|☏/i;
 const noContact = (lines) => lines.filter((l) => !CONTACT.test(l));
-export function activityDetails(text) {
-  const t = String(text || '');
+/* ── 활동 글에서 자격을 못 뽑던 이유 셋 (2026-10-03 실측 · 활동 188건 중 122건이 자격 0줄) ──
+   ① 활동 공고만 쓰는 절 제목 — `공모자격`·`공모대상`·`교육대상`. 장학 목록엔 없어 절을 못 찾았다(ACT_HEAD).
+   ② 콜론 없는 이름표 — `ㅇ ( 신청자격 ) 대전시 거주 청년`·`○ (참가자격) 전 국민 누구나`·`<응모자격>`.
+      장학 발췌기는 `이름표 :` 꼴만 이름표로 읽는다 → 괄호만 콜론으로 바꿔 넘긴다(labelColon · 글자는 그대로).
+   ③ 사이트 메뉴의 `지원대상`·`신청자격` 같은 짧은 줄이 자격 절 제목으로 뽑혔다(본문보다 위에 있다).
+      → 글 제목이 본문에 다시 나오는 **마지막 자리부터** 읽고, 거기서 못 찾으면 전체를 읽는다(atTitle).
+   그래도 이름표가 없으면 `대한민국 국민 누구나`·`AI에 관심 있는 누구나` 처럼 **누가 낼 수 있나만 말하는 줄**을 원문 그대로 쓴다(OPEN_LINE). */
+const ACT_HEAD = /공모\s?(?:자격|대상)|교육\s?대상|참가\s?범위|응모\s?범위|지원\s?범위/;
+const OPEN_LINE = /(?:국민|세계인|시민|청년|학생|대학생|개인|팀|관심\s?(?:있는|있으신)\s?(?:분|사람)?)\s*(?:이면\s*)?(?:누구나|모두)|누구나\s*(?:참여|참가|신청|응모|지원|가능)|(?:대상|자격|연령|나이)\s*[:：]?\s*제한\s?없음/;
+const NOT_OPEN = /심사|수상|시상|제외|이해|쉽게|볼\s?수|이용|열람|니다/;
+/* 🔴 `[ \t]` 이지 `\s` 가 아니다 — `\s` 는 줄바꿈까지 먹어 `<응모자격>` 아래 줄이 이름표 줄에 붙었다(첫 실측) */
+/* 🔴 칸 이름으로 끝나는 이름표만 — `[서울문화재단] 2026년 …` 같은 제목 머리말을 `서울문화재단 : …` 으로 바꾸지 않는다(리뷰) */
+const labelColon = (t) => t.replace(/^([ \t]*(?:[ㅇ○●■□▣◆◇▶·•\-*✅✔]|\d+[ \t]*[.)])?[ \t]*)[(<\[【〈][ \t]*([가-힣 ]{0,10}(?:자격|대상|기간|방법|일정|일시|내용|혜택|인원|장소|요건|조건|범위|접수|신청|제한|주최|주관|분야|주제|시상|상금|발표))[ \t]*[)>\]】〉][ \t]*/gm, (m, pre, label) => `${pre}${label.trim()} : `);
+function atTitle(t, title) {
+  const key = String(title || '').replace(/\[[^\]]*\]|\([^)]*\)/g, '').replace(/[^가-힣A-Za-z0-9]/g, '').slice(0, 12);
+  if (key.length < 6) return t;
+  const lines = t.split('\n');
+  let at = -1;
+  lines.forEach((l, i) => { if (l.length <= 200 && l.replace(/[^가-힣A-Za-z0-9]/g, '').includes(key)) at = i; });
+  return at < 0 ? t : lines.slice(at).join('\n');
+}
+/* 절 제목으로 짚은 줄이 **정말 이름표인가** — 앞머리(기호·번호 뗀 12자 안)에 그 낱말이 있어야 한다.
+   `… 심사 기준 등 자세한 사항은 누리집에서` 같은 보도자료 문장이 '심사 기준' 으로 절 제목이 되어 줄글 4줄이 자격 자리에 앉았다(첫 실측). */
+const HEAD_LIKE = (l) => {
+  const t = String(l || '').replace(/^[\s\-–—•▪▶▷◆◇○●■□▣★♦⇒‡◦∙❍◎￭·ㆍ*ㅇ✅✔]+/, '').replace(/^(?:[가-힣]\s*[.)]|\d+\s*[.)])\s*/, '').slice(0, 14);
+  return /자격|대상|요건|조건|범위|기준/.test(t);
+};
+function qualifyLines(t) {
+  let q = extractQualifyLines(t, { head: ACT_HEAD });
+  /* 맨 제목 줄(`지원자격`)은 장학 발췌기가 표 머리글로 보고 빼므로 첫 줄이 내용일 수 있다 — 그 바로 윗줄이 제목이면 맞다(리뷰) */
+  if (q.length && !HEAD_LIKE(q[0])) {
+    const ls = t.split('\n').map((l) => l.trim()).filter(Boolean);
+    const at = ls.indexOf(q[0]);
+    if (!(at > 0 && HEAD_LIKE(ls[at - 1]))) q = [];
+  }
+  if (!q.length) q = scoopQualifyLines(t);
+  if (!q.length) q = [...new Set(t.split('\n').map((l) => l.trim()).filter((l) => l.length >= 4 && l.length <= 60 && OPEN_LINE.test(l) && !NOT_OPEN.test(l)))].slice(0, 2);
+  return q;
+}
+export function activityDetails(text, title) {
+  const t = labelColon(String(text || ''));
   if (!t.trim()) return { eligibilityLines: [], eligibilityExcludes: [], eligibilityPriority: [], noticeLines: [] };
-  let qual = extractQualifyLines(t);
-  if (!qual.length) qual = scoopQualifyLines(t);
+  const body = atTitle(t, title);
+  let qual = qualifyLines(body);
+  if (!qual.length && body !== t) qual = qualifyLines(t);
   /* '대상:' 이름표 줄도 **함께** 본다 (2026-10-01) — 자격 절이 짧은 한 줄(`참가자격 : 만 19~34세 대한민국 국민`)만 주고
      진짜 조건은 '대상:' 줄(`KOICA 사업 참여 경험이 있으며 …`)에 있던 공고가 **95% ✓** 로 떴다(틀린 안심). 한쪽이 다른 쪽을 품으면 하나만 둔다. */
   const who = eachLabeledValue(t, (label) => EXCERPT_LABELS[2][1].test(label.replace(/\s/g, '')), (v) => (cleanValue(v).length >= 4 ? cleanValue(v) : null));
@@ -76,7 +116,7 @@ export function activityDetails(text) {
 
 /* 글 하나에 위 결과를 붙인다 — 수집 로봇의 세 길(새 글 · 재단 글 · 소급)과 API 로봇이 **같은 함수**를 쓴다.
    빈 칸은 지운다(읽었는데 없으면 옛 값을 남기지 않는다 · 장학 로봇과 같은 규칙). */
-export const ACT_DETAILS_V = 2;   // 이 판으로 읽은 글은 detailsV 가 같다 — 다르면 수집 로봇이 원문을 다시 읽는다(소급 · 원칙 7)
+export const ACT_DETAILS_V = 3;   // 이 판으로 읽은 글은 detailsV 가 같다 — 다르면 수집 로봇이 원문을 다시 읽는다(소급 · 원칙 7) · 3 = 2026-10-03 활동 자격 읽기(제목부터·괄호 이름표·누구나)
 export function putActivityDetails(it, details) {
   for (const k of ['eligibilityLines', 'eligibilityExcludes', 'eligibilityPriority', 'noticeLines']) {
     if (details[k] && details[k].length) it[k] = details[k]; else delete it[k];
