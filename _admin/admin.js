@@ -2075,7 +2075,7 @@ const ROBOTS = [
     when: '수동',
     inputs: [
       { name: 'mode', kind: 'choice', label: '무엇을 할까요', def: '미리보기만',
-        options: ['전부', '미리보기만', '시범 3건만', '공고 하나만', '첨부만'] },
+        options: ['전부', '미리보기만', '시범 3건만', '공고 하나만', '첨부만', '대외활동만'] },
       { name: 'only', kind: 'text', label: "'공고 하나만' 일 때 그 공고 id", ph: 'reg-hufs-gasong' },
     ],
   },

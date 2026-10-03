@@ -300,6 +300,10 @@ function parseNationality(t) {
        '어디에 다니느냐'가 조건이다. 국적만 보고 떨어뜨리면 국내 재학생이 0%가 된다
        (시립대 활동도우미로 실증 — 2026-08-24). */
     if (/외국\s?대학|해외\s?대학|국외\s?대학/.test(t)) return null;
+    /* 🔴 `대한민국 국적을 보유하지 않은 사람`(제외 줄)은 뜻이 반대다 (2026-10-03 · K-뉴딜 아카데미 실측).
+       '한국 국적이어야 한다'로 읽어 한국 학생이 제외 조항에 걸려 **틀린 미달**이 났다 → 외국 국적 조건으로 뒤집는다. */
+    /* ⚠️ 부정은 **국적에 붙은 것만** — `대한민국 국적자로 결격사유가 없는 자` 의 '없는' 은 국적이 아니다(리뷰) */
+    if (/국적\S{0,2}\s?(?:(?:보유|소지|취득|가지)\s?하?지\s?(?:않|못)|아닌|없는)/.test(t)) return { kind: 'nationality', eq: 'foreign', conf: HIGH };
     return { kind: 'nationality', eq: 'korean', conf: /포함/.test(t) ? LOW : HIGH };
   }
   return null;
@@ -522,6 +526,8 @@ function parseResidence(t) {
      `…정읍시에 주소를 두고 있는 국내 대학의 재학생` 은 `있는 … 대학` 때문에 ②(학교 위치)로
      떨어져, 원래 **✕ 미달**이던 것이 '모른다'가 됐다 — 정읍 사람이 아닌 학생이 자기가 된다고
      읽게 되는 후퇴다. 갈래를 정하기 전에 이 문턱을 먼저 본다. */
+  /* `39세 이하 청년 (부산시 청년 기준)` — **나이를 어느 법으로 세나**를 말하는 것이지 사는 곳이 아니다(2026-10-03 · 시·도 미달을 켜자 드러난 틀린 미달) */
+  if (/(?:시|도|군|구)\s?청년\s?기준/.test(t)) return null;
   const homeWord = /거주|주소|주민등록|시민|도민|군민|구민|관내|관할/.test(t);
   const about = homeWord ? 'home'
     : ORIGIN_SCHOOL.test(t) ? 'origin'
@@ -566,7 +572,9 @@ function parseResidence(t) {
      `6개월 이상(관내 대학교 학생)/1년 이상(관외 대학교 학생) 익산시에 연속하여 두고 있는 자`
      처럼 **거주 기간을 가르는 말**로 쓴다. 요건이 면제되는 게 아니다.
      면제의 표지는 `인정`·`예외` 쪽이다(백운장학회: `대학생의 경우 본인에 한하여 관외 거주 인정`). */
-  const RES_EXCEPT = /관외[^,.]{0,12}인정|거주\s?(요건)?\s?(을|를)?\s?(면제|제외|미적용)|예외|다만|단\s|무관|해당\s?없/;
+  /* `거주하거나 생활권을 두고`·`부산시 소재 대학 졸업자 또는 주민등록자` — **다른 연고로도 된다**는 줄이다(2026-10-03 · 대외활동 실측).
+     시·도가 달라도 미달로 판정하면서(아래 judgeCond) 이 꼴을 예외로 넣었다 — 경기도 학교에 다니는 서울 학생이 틀린 미달이 되지 않게. */
+  const RES_EXCEPT = /관외[^,.]{0,12}인정|거주\s?(요건)?\s?(을|를)?\s?(면제|제외|미적용)|예외|다만|단\s|무관|해당\s?없|생활권|하거나|소재/;
   /* 🔴 공용 HAS_EXCEPTION 을 쓰지 않는다 — 거기엔 `포함` 이 들어 있어서
      `공고일 **포함**하여 1년 이상 계속하여 용산구에 주민등록` 이 예외로 오인됐고,
      그래서 다른 구 학생에게도 미달이 안 떴다(2026-08-30 전수 대조에서 잡았다).
@@ -672,7 +680,11 @@ function parseDegree(t, isExclude) {
      ⚠️ 대학원 쪽(위)에는 이 잣대를 쓰지 않는다 — 그쪽은 미달을 내는 자리이고, 실측에서
         166건 × 프로필 8종에 틀린 미달이 0건이었다. 잣대를 넓히면 `대학원 석/박사과정 재학
         중인 자로서 직전학기 성적이 80점 이상인 자` 같은 진짜 대학원 전용 줄을 놓친다. */
+  /* 앞머리 이름표(`활동자격 :`)와 `…에 관심 있는` 은 요구가 아니다 (2026-10-03 · 대외활동 `○ 활동자격 : 대학생`·
+     `대상: 교육봉사활동에 관심 있는 대학생` 이 남는 글자로 걸려 판정을 못 받았다) */
   const rest = x
+    .replace(/^[^:：]{1,14}[:：]/, ' ')
+    .replace(/[가-힣A-Za-z0-9·]+(?:\s[가-힣A-Za-z0-9·]+)?에\s?관심\s?(?:있는|있으신|이\s?있는)/g, ' ')
     .replace(/[(（][^)）]*[)）]/g, ' ')
     .replace(/학부생?|학사\s?과정|전문대(학교)?|대학생|대학원생?|정규|재학생?|재학\s?중|신입생|\d+\s?년제|\d+\s?학기|\d+\s?학년|대학교?/g, ' ')
     .replace(/[^가-힣]/g, '');
@@ -895,6 +907,24 @@ function unaskedAttr(text, conds, p) {
 }
 
 /* 한 줄에서 조건을 전부 뽑는다. `isExclude`면 '이러면 안 된다'로 읽는다. */
+/* ── 누구나 (2026-10-03 · 대외활동 자격) ──
+   `대한민국 국민 누구나`·`AI에 관심 있는 누구나 25인`·`참가자격 : 전 국민 누구나(개인 또는 팀)` —
+   누가 낼 수 있나만 말하고 **다른 요구가 없는** 줄은 충족이다. 이걸 못 읽어 공모전 카드가 전부 '자격 미확인'이었다.
+   🔴 다른 요구가 남으면 판정하지 않는다 — `서울시민 누구나` 는 '서울시민'이 남는다(parseDegree 의 '남는 글자' 잣대 · 여기는 0자).
+   제외 줄에서는 안 읽는다. */
+const OPEN_ANY = /누구나|제한\s?없음/;
+function parseOpen(t, isExclude) {
+  if (isExclude || !OPEN_ANY.test(t)) return null;
+  const rest = t
+    .replace(/^[^:：]{1,14}[:：]/, ' ')                    // 앞머리 이름표(`4. 공모자격 :`)는 요구가 아니다
+    .replace(/[가-힣A-Za-z0-9·]+(?:\s[가-힣A-Za-z0-9·]+)?에\s?관심\s?(?:있는|있으신)/g, ' ')
+    .replace(/이면\s*(?=누구나)/g, ' ')
+    .replace(/누구나|제한\s?없음|대한민국|국민|세계인|개인|팀|또는|최대|이내|구성된|으로|모두|에\s?한하여|참여|참가|신청|응모|가능|대상|자격|전\s?(?=국민|세계인)|\d+\s?(?:인|명)/g, ' ')
+    .replace(/[^가-힣]/g, '');
+  /* 🔴 남는 글자가 **하나도** 없어야 한다 — 두 자를 봐주면 `전남 누구나` 가 지역 요건을 지우고 ✓ 가 됐다(리뷰가 잡았다) */
+  return rest.length ? null : { kind: 'open', conf: HIGH };
+}
+
 function parseLine(line, isExclude) {
   const t = String(line || '');
   if (!t.trim()) return { conds: [], multiProgram: false };
@@ -903,7 +933,7 @@ function parseLine(line, isExclude) {
   push(parseGrade(t)); push(parseBracket(t)); push(parseCredits(t)); push(parseYear(t));
   push(parseStatus(t, isExclude)); push(parseFlags(t)); push(parseTrait(t, isExclude)); push(parseNationality(t));
   push(parseAge(t)); push(parseResidence(t)); push(parseSchool(t)); push(parseMajor(t));
-  push(parseDegree(t, isExclude));
+  push(parseDegree(t, isExclude)); push(parseOpen(t, isExclude));
   if (isExclude) conds.forEach((c) => { c.exclude = true; });
   return { conds, multiProgram: MULTI_PROGRAM.test(t) };
 }

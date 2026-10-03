@@ -122,9 +122,10 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
     eq('④ 마감을 읽은 글은 아랫줄 오른쪽 D-5 (장학 카드와 같은 자리·같은 글자)', await page.$eval('#activities-list [data-activity] .sch-foot .sch-due', (e) => e.textContent.trim()), 'D-5');
     eq('④ 아랫줄 왼쪽(장학 카드의 금액 자리)은 짧은 혜택', await page.$eval('#activities-list [data-activity] .sch-foot .sch-amount', (e) => e.textContent.trim()), '항공료 전액 지원');
     /* 판정 하나 — 장학 카드와 같은 cardBadgeHtml (2026-10-01) */
-    eq('④ 카드 맨 윗줄 판정 — 나이 맞음 → 적합도 % · 나이 넘음 → 미달 · 자격 줄 없음 → 자격 미확인',
+    /* 자격 줄 없음 → 배지 없음 (2026-10-03 개발자 결정 — 활동 카드에 '자격 미확인' 을 안 단다 · 장학 카드는 그대로) */
+    eq('④ 카드 맨 윗줄 판정 — 나이 맞음 → 적합도 % · 나이 넘음 → 미달 · 자격 줄 없음 → 배지 없음',
       await page.$$eval('#activities-list .sch-card .sch-top', (e) => e.map((x) => (x.querySelector('.sch-fit, .badge') || {}).textContent || '').map((t) => t.trim().replace(/\d+%/, 'N%'))),
-      ['적합도 N%', '지원 자격 미달', '자격 미확인']);
+      ['적합도 N%', '지원 자격 미달', '']);
     eq('④ 혜택이 없으면 분야를 옅게 — 없으면 빈칸(지어내지 않는다)', await page.$$eval('#activities-list [data-activity] .sch-amount', (e) => e.map((x) => [x.textContent.trim(), x.classList.contains('unknown')])), [['항공료 전액 지원', false], ['', true], ['', true]]);
     eq('④ 카드에 발췌 줄을 쌓지 않는다 (장학 카드처럼 석 줄)', await page.$$eval('#activities-list .sch-provider', (e) => e.length), 0);
     eq('④ 장학 카드와 같은 그릇 (.sch-card-wrap > button.sch-card)', await page.$$eval('#activities-list .sch-card-wrap > button.sch-card[data-activity]', (e) => e.length), 3);

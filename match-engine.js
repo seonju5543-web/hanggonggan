@@ -209,6 +209,7 @@ function degreeOf(p) {
 function judgeCond(c, p, ctx) {
   const S = PR.GRADE_SCALE;
   switch (c.kind) {
+    case 'open': return 'pass';          // `국민 누구나` — 다른 요구가 없는 줄만 이 조건이 된다(parse-requirements parseOpen)
     case 'degree': {
       const mine = degreeOf(p);
       if (c.want === 'both') return 'pass';
@@ -419,7 +420,11 @@ function judgeCond(c, p, ctx) {
       if (c.inArea) return 'unknown';                           // 관할을 못 알아냈다
       const mine = [p.region, p.parentRegion].filter(Boolean);
       if (!mine.length || !c.anyOf.length) return 'unknown';
-      return c.anyOf.some((r) => mine.some((x) => x.includes(r) || r.includes(x))) ? 'pass' : 'unknown';
+      /* 🔴 시·도도 시·군과 같은 규칙 — 학생이 고른 시·도(본인·부모 둘 다)와 다르면 미달이다 (2026-10-03 개발자 지적:
+         *"대전 거주 청년 이런거는 알 수 있잖아 우리 처음에 학적정보 넣을 때 주소 넣잖아"*). 예전엔 여기만 'unknown' 이라
+         서울 학생에게 `대전시 거주 청년` 이 '모름'이었다. 예외 문구(`관외 거주 인정`·`생활권`·`소재`)가 있는 줄은 conf 가 LOW 라
+         lineVerdict 가 ✕ 로 만들지 않는다 — 시·군 규칙과 같은 안전장치다. */
+      return c.anyOf.some((r) => mine.some((x) => x.includes(r) || r.includes(x))) ? 'pass' : 'fail';
     }
     default: return 'unknown';
   }
@@ -931,6 +936,8 @@ const REQ_SIGNAL = new RegExp([
   /* 대외활동·공모전·청년정책 공고가 대상을 쓰는 말 (2026-10-01) — 나이 범위(`만 19~34세`·`19~39세`) · 청년 · 대학(원)생 · 국민.
      이것이 없어 `참가자격 : 만 19~34세 대한민국 국민` 같은 줄이 판정 전에 통째로 버려졌다(실측: 활동 글 자격 줄 41건 중 판정 3건). */
   '\\d{1,2}\\s?세?\\s?[~∼～\\-]\\s?(?:만\\s?)?\\d{2}\\s?세|청년|대학\\(원\\)생|대한민국\\s?국민',
+  /* `누구나`·`대상 제한없음` (2026-10-03) — 공모전 대상은 대개 이 말뿐이다. 판정은 parse-requirements parseOpen 이 **다른 요구가 없을 때만** 충족으로 한다 */
+  '누구나|(?:대상|자격|연령|나이)\\s*[:：]?\\s*제한\\s?없음',
   /* ② 한국어 공고가 '누가 받는가'를 쓰는 **일반형**. ①만으로는 좁아서
         `전남 목포 소재 고등 및 중등 과정을 마친 자`·`수여식에 참석할 수 있는 학생`처럼
         낱말이 안 걸리는 진짜 요건이 잘려 나갔다(회귀가 잡았다).
