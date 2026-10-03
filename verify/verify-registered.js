@@ -50,6 +50,30 @@ async function driveAnyLiveForm(page) {
     await page.keyboard.press('Escape').catch(() => {});
     await page.waitForTimeout(400);   /* 시트 퇴장 0.22s — 같은 파일의 다른 자리와 맞춘다 */
   }
+  /* 🔴 **실제 후보가 전부 마감이면 표본을 심는다** (2026-10-03 · 이슈 #383).
+     이 학생(성균관대)에게 보이는 양식 공고가 그날 마감된 것뿐이면(실측: reg-dongsan 10-02 마감 · 30일은 목록에 남아 버튼만 잠김)
+     검사가 '데이터 탓'으로 빨간불이 되고, verify-ui 는 set -e 라 **뒤의 드라이버 전부가 안 돌았다**(CLAUDE.md: 실데이터에 기댄 고정 검사 금지).
+     잰 것은 '질문 → 문서 생성' 길이므로, 화면에 있는 진짜 양식 공고 하나를 그대로 복사해 마감만 20일 뒤로 바꾼 표본을 같은 목록에 넣고
+     같은 손(driveOneForm)으로 몬다. 실제 후보가 하나라도 열려 있으면 여기까지 오지 않는다. 잠김 말고 다른 이유로 실패했으면 표본을 쓰지 않는다. */
+  if (ids.length && tried.every((t) => /\(신청 버튼 잠김\)$/.test(t))) {
+    const fx = await page.evaluate((srcIds) => {
+      const src = registeredList.find((x) => srcIds.includes(x.id));
+      if (!src) return null;
+      const copy = JSON.parse(JSON.stringify(src));
+      copy.id = 'gate-open-form';
+      copy.deadline = new Date(Date.now() + 20 * 864e5).toISOString().slice(0, 10);
+      registeredList.push(copy);
+      renderExplore();
+      return src.id;
+    }, ids);
+    if (fx) {
+      await page.waitForTimeout(400);
+      const r = await driveOneForm(page, 'gate-open-form').catch((e) => ({ id: 'gate-open-form', ok: false, why: String(e.message || e).split('\n')[0].slice(0, 80) }));
+      console.log(`  (실제 후보 ${tried.join(', ')} 가 모두 마감 — ${fx} 의 양식을 그대로 쓴 마감 전 표본으로 구동)`);
+      if (r.ok) return { id: `gate-open-form(←${fx})`, ok: true };
+      tried.push(`gate-open-form←${fx}(${r.why})`);
+    }
+  }
   return { id: tried.join(', '), ok: false };
 }
 
