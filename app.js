@@ -2953,7 +2953,10 @@ function activityCardHtml(n) {
     save: saveBtnHtml(`act:${n.url}`),   // 장학 카드와 같은 북마크(카드 바깥 · 2026-10-02)
     attrs: `data-activity="${esc(n.url)}"`,
     org: `${n.kind || '대외활동'} · ${activityWhere(n)}`,
-    badge: cardBadgeHtml(m.fit, m.fd, null),   // 장학 카드와 같은 판정 하나(적합도 % · 자격 미확인 · 지원 자격 미달)
+    /* 장학 카드와 같은 판정 하나(적합도 % · 지원 자격 미달). 🔴 **'자격 미확인' 배지는 활동 카드에 안 단다** (2026-10-03 개발자 결정 —
+       "왜 대외활동 공모전은 자격 미확인이야 죄다"). 활동 글은 자격이 포스터·첨부에만 있는 것이 많아 대부분의 카드에 같은 회색 배지가 붙어
+       아무 말도 안 하는 배지가 됐다. 모른다는 사실은 시트가 말한다(자격 원문·'원문 보기'). 장학 카드의 '자격 미확인'은 그대로다. */
+    badge: fitVerdict(m.fit, m.fd) === 'unread' ? '' : cardBadgeHtml(m.fit, m.fd, null),
     name: unent(n.title),
     foot: shortBenefit ? benefit : (n.field || ''),
     footKnown: !!shortBenefit,
