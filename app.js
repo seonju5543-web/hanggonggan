@@ -605,6 +605,11 @@ function unent(s) {
    들어가지 못하게 막는 2차 방어선(CSP가 뚫리거나 완화돼도 안전). 허용 안 되면 빈 문자열. */
 function safeUrl(u) {
   if (!u) return '';
+  /* 🔴 주소에 박힌 HTML 기호(`&#038;`·`&amp;`)를 **먼저** 되돌린다 (2026-10-03 · 원문 링크 정직성).
+     안 되돌리면 브라우저가 `#038;uid=392` 를 조각(fragment)으로 읽어 글 번호가 서버에 안 가고
+     공고 대신 메뉴 화면이 열린다(서울대 학생처 실측). 규칙은 source-link.js 의 decodeUrlEntities
+     한 곳 — 이 자리에서 풀어 두면 원문 링크·첨부·제출처 바로가기가 **전부 한 번에** 고쳐진다. */
+  u = decodeUrlEntities(u);
   try {
     /* 🔴 기준은 `location.origin` 이 아니라 **앱이 놓인 자리**(`document.baseURI`) 다
        (2026-09-12). 앱은 `…github.io/hanggonggan/` 에 있는데 origin 을 기준으로 풀면
@@ -617,20 +622,32 @@ function safeUrl(u) {
   return '';
 }
 
-/* 원문 링크의 정직한 표기 (2026-07-31)
-   수집 로봇이 공고 원문 주소를 끝내 못 찾은 경우에만, 주소가 '게시판 목록 + 제목 표식'
-   (…/list.do#n-제목) 형태로 남는다. 이 링크를 누르면 그 장학금 공고가 아니라 학교
-   장학 공지 목록이 열리므로, '원문 공고 ↗'라고 적으면 거짓말이 된다.
-   그래서 이럴 때만 라벨을 '게시판 목록 ↗'으로 바꾸고, 목록에서 찾을 제목을 함께 알려준다.
-   (대부분의 공고는 복구 로봇 resolve-detail-urls가 진짜 원문 주소로 바꿔 둔다.) */
-function isBoardListLink(u) {
-  return /#n-/.test(String(u || ''));
+/* 원문 링크의 정직한 표기 (2026-07-31 → 2026-10-03 한 곳으로)
+   링크 이름(원문 공고 · 게시판 목록 · 재단 홈페이지 · 확인 필요)은 **source-link.js 의 sourceLink 한 곳**이 정한다.
+   🔴 여기에 isBoardListLink 같은 판정을 다시 두지 말 것 (2026-10-03 개발자 보고 · P0 —
+      *"원문 공고를 누르면 그 공고가 아니라 재단·장학금 페이지 전체가 열린다"*).
+      예전엔 화면 일곱 곳이 각자 주소 글자(`#n-`)만 보고 '원문'이라 불렀다 — 층2 재단 홈페이지를
+      아는 곳은 상세 시트 하나뿐이라, 같은 재단 홈페이지를 금액 상세는 '원문 공고 ↗',
+      신청 내역은 '공고 원문 보기 ↗' 라고 불렀다. 지금은 아래 작은 함수들이 모두 sourceLink 를 부른다. */
+
+/* 목록 링크면 '목록에서 ○○을(를) 찾아 눌러 주세요', 로봇이 '그 공고가 아니었다'를 확정한 링크면
+   본 것을 그대로 한 줄 — 상세 시트(맨 아래 한 문단)와 활동 시트가 같이 쓴다. 글자는 sourceLink 가 준다. */
+function sourceLinkHintHtml(link) {
+  if (!link) return '';
+  if (link.cls === 'list' && link.hint) return `목록에서 <strong>${esc(unent(link.hint))}</strong>을(를) 찾아 눌러 주세요.`;
+  if (link.cls === 'trouble' && link.caution) return esc(link.caution);
+  return '';
 }
-function boardListTitle(u) {
-  const s = String(u || '');
-  const i = s.indexOf('#n-');
-  if (i < 0) return '';
-  try { return decodeURIComponent(s.slice(i + 3)); } catch (e) { return s.slice(i + 3); }
+
+/* 첨부 한 줄 — 주소가 안전하지 않으면(`javascript:downloadfile(…)` 같은 게시판 내려받기 스크립트) 이름만 쓴다.
+   🔴 `<a href="">` 로 그리지 말 것 (2026-10-03) — 빈 href 는 **앱 자신**을 다시 연다(첨부를 눌렀는데 앱이 또 뜬다).
+   실측: 정식 등록·활동 첨부 50건이 이 꼴이다. 받을 길은 원문 게시판뿐이라 그렇게 말한다(지어내지 않는다). */
+function attachmentLinkHtml(a, style) {
+  const href = safeUrl(a && a.url);
+  const name = esc((a && a.name) || '첨부 파일');
+  return href
+    ? `<a href="${esc(href)}" target="_blank" rel="noopener"${style ? ` style="${style}"` : ''}>${name}</a>`
+    : `${name} <span class="doc-legend">(원문 게시판에서 내려받기)</span>`;
 }
 
 /* ---------------- 서류 보관함 (기기 내 저장 · 브라우저 내장 금고) ----------------
@@ -2540,10 +2557,40 @@ function renderHomeUpdated() {
     + (regUpdatedAt ? `<span>공고 갱신 ${esc(regUpdatedAt)}</span>` : '');
 }
 
-function loadRegistered() {
-  return fetch('data/registered.json', { cache: 'no-store' })
-    .then((r) => (r.ok ? r.json() : null))
+/* 원문 링크 확인 장부 (2026-10-03 · 원문 링크 정직성 — 개발자 보고 P0 *"원문 공고를 누르면 재단·장학금 페이지 전체가 열린다"*).
+   로봇이 학생처럼 새 탭으로 열어 보고 '그 공고가 아니었다'(목록·홈·로그인·404·다른 화면)를 **확정한** 주소만
+   data/link-check.json 의 bad 에 담는다. 링크 이름은 source-link.js 의 sourceLink 가 이 장부로 정한다(setLinkChecks).
+   🔴 못 받아도(404·오프라인·파일 없음·깨진 JSON) **조용히** 넘어간다 — 장부가 없으면 예전 이름 그대로다(주소 꼴만 본다).
+      네트워크가 끊긴 것뿐이면 받아 둔 장부를 지킨다(비우면 확인된 문제 링크가 다시 '원문'이 된다).
+   🔴 정식 등록과 **나란히** 받는다 — 목록이 먼저 와도 장부를 잠깐(LINK_CHECK_WAIT_MS) 기다려 첫 그림부터 맞는 이름을 단다.
+      장부는 작아서 보통 먼저 온다. 더 늦으면 기다리지 않고 그리고, 장부가 오면 다시 그린다(바뀐 것이 있을 때만). */
+let linkChecksDoc = null;
+let linkChecksJob = null;
+const LINK_CHECK_WAIT_MS = 800;
+function loadLinkChecks() {
+  linkChecksJob = fetch('data/link-check.json', { cache: 'no-store' })
+    .then((r) => (r.ok ? r.json() : null), () => undefined)   // undefined = 네트워크 실패(받아 둔 것을 지킨다)
+    .catch(() => null)                                           // 깨진 JSON — 장부 없음으로
     .then((d) => {
+      const before = JSON.stringify(linkChecksDoc);
+      if (d !== undefined) linkChecksDoc = d && d.bad && typeof d.bad === 'object' ? d : null;
+      setLinkChecks(linkChecksDoc);
+      if (JSON.stringify(linkChecksDoc) !== before) rerenderVisible();
+    });
+  return linkChecksJob;
+}
+/* 장부를 기다리되 오래 붙잡지 않는다 — 정식 등록 목록 그리기가 이것 때문에 LINK_CHECK_WAIT_MS 넘게 늦지 않는다 */
+function linkChecksWait() {
+  if (!linkChecksJob) return Promise.resolve();
+  return Promise.race([linkChecksJob.catch(() => {}), new Promise((res) => setTimeout(res, LINK_CHECK_WAIT_MS))]);
+}
+
+function loadRegistered() {
+  return Promise.all([
+    fetch('data/registered.json', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)),
+    linkChecksWait(),
+  ])
+    .then(([d]) => {
       if (!d) { if (appsData.registered !== 'ok') appsData.registered = 'fail'; return; }   // 한 번 받았으면 다시 받기 실패에도 'ok'(목록은 메모리에 그대로)
       appsData.registered = 'ok';
       registeredList = d.items || [];
@@ -2574,7 +2621,9 @@ function loadKosaf() {
    (2026-09-09). 갈라 두면 한쪽에만 새 로더를 붙이는 일이 반드시 생긴다
    (rerenderVisible 주석이 말하는 것과 같은 유형의 사고다). */
 function refreshAllData() {
+  const ledger = loadLinkChecks();   // 원문 링크 확인 장부 먼저 — 정식 등록 그리기가 이것을 잠깐 기다린다(2026-10-03)
   const jobs = [loadNotices(), loadNews(), loadRegistered(), loadKosaf(), loadActivities(), loadExternal()];
+  jobs.push(ledger);
   if (typeof loadFormTemplates === 'function') jobs.push(loadFormTemplates());
   /* 🔴 `swReg` 는 이 파일 한참 아래(서비스워커 등록 자리)에서 `let` 으로 선언된다.
      그 줄이 아직 실행되기 전에 여기를 부르면 `typeof` 로 물어봐도 예외가 난다(TDZ).
@@ -2802,8 +2851,11 @@ const NEWS_THUMB_RE = /^data\/news\/img\/[0-9a-f]{16}\.webp$/;
 function noticeCardHtml(n, opts) {
   const o = opts || {};
   const thumb = o.thumb && NEWS_THUMB_RE.test(o.thumb) ? o.thumb : '';
+  const link = sourceLink(n, 'card');
+  /* 안전하지 않은 주소면 href 를 아예 안 단다 — `href=""` 는 앱 자신을 다시 연다(첨부와 같은 사고 · 2026-10-03) */
+  const href = safeUrl(n.url);
   return `
-    <a class="sch-card notice-card${thumb ? ' has-thumb' : ''}" href="${esc(safeUrl(n.url))}" target="_blank" rel="noopener">
+    <a class="sch-card notice-card${thumb ? ' has-thumb' : ''}"${href ? ` href="${esc(href)}" target="_blank" rel="noopener"` : ''}>
       ${/* 🔴 맨 윗줄은 매칭 카드와 **같은 말투**다 — 기관 글 + 판정 하나 (2026-09-11).
            예전엔 배지 셋(`교내 공고`·`마감 임박`·`양식 2`)이 한 줄을 채워, 페이스리프트로
            걷어낸 배지 무더기가 이 경로에만 그대로 남아 있었다(실측 147장 중 9장).
@@ -2841,7 +2893,8 @@ function noticeCardHtml(n, opts) {
       ${/* 원문 발췌 줄 (2026-09-29 · 활동 글) — 이름표 : 원문 문장. 발췌가 있으면 기간 한 줄은 겹쳐 적지 않는다 */ ''}
       ${(o.excerpts || []).map((x) => `<p class="sch-provider">${esc(x.label)} · ${esc(unent(x.text))}</p>`).join('')}
       ${!(o.excerpts || []).length && n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? `<p class="sch-provider">${esc(unent(n.deadlineHint))}</p>` : ''}
-      <p class="sch-provider">${(n.attachments || []).length ? `첨부 ${(n.attachments || []).length}개 · ` : ''}${esc(n.foundAt || '')} 수집 · ${isBoardListLink(n.url) ? '게시판 목록에서 보기 ↗' : '원문 보기 ↗'}</p>
+      ${/* 링크 이름은 sourceLink 한 곳(card) — 목록·홈페이지·로봇이 확인한 문제 주소는 '원문'이라 부르지 않는다 (2026-10-03) */ ''}
+      <p class="sch-provider">${(n.attachments || []).length ? `첨부 ${(n.attachments || []).length}개 · ` : ''}${esc(n.foundAt || '')} 수집${link.label ? ` · ${esc(link.label)}` : ''}</p>
       ${/* 그 글의 사진 썸네일 (2026-10-03 개발자 지시 — 학교 글의 실제 사진). 소식 카드만 opts.thumb 로 넘긴다 · 제목이 이미 글자로 있어 alt 는 비운다(읽기 도구가 두 번 읽지 않게).
            못 받으면(404·오프라인) 그림을 빼고 글자 카드로 돌아간다 — bindEvents 의 error 잡이 · CSP 가 onerror= 를 막는다 */ ''}
       ${thumb ? `<img class="notice-thumb" src="${esc(thumb)}" alt="" loading="lazy" decoding="async" width="72" height="72" />` : ''}
@@ -2962,6 +3015,27 @@ function activityCardHtml(n) {
   });
 }
 
+/* 활동 시트 맨 아래 — 안내 한 줄 + 원문 단추 (2026-10-03 · 원문 링크 정직성).
+   🔴 이름은 sourceLink(n, 'activity') 한 곳이다. 예전엔 `#n-` 표식만 보고 나머지를 전부 '원문에서 신청하기 ↗' 라 불러,
+      청년정책 API 가 준 기관 **첫 화면**(`www.jeju.go.kr/index.htm`)까지 '신청하기' 단추가 됐다(실측 10건).
+   🔴 '신청은 주최 측 원문 페이지에서 진행돼요' 는 **글 하나로 가는 주소(post)일 때만** — 목록·홈페이지·문제 주소에 붙이면
+      열리는 화면과 다른 말을 한다.
+   찾기(data-activity)는 저장된 n.url 그대로 · 안전하지 않은 주소면 단추를 안 그린다(href="" 는 앱 자신을 연다) */
+function activityLinkHtml(n) {
+  const link = sourceLink(n, 'activity');
+  const href = safeUrl(link.href);
+  /* 목록 표식(#n-)의 안내 문장은 예전 그대로(승인된 글자) — 로봇이 '목록이 열린다'를 확정한 주소는 그 사실만 말한다 */
+  const why = link.cls === 'list'
+    ? (linkShape(n.url) === 'marker'
+      ? '이 게시판은 목록에서 글을 눌러야 열리는 방식이라 글 하나로 바로 가는 주소를 확인하지 못했습니다. 열리는 '
+      : '이 주소를 열면 게시판 목록이 떠요. ') + sourceLinkHintHtml(link)
+    : link.cls === 'home' ? '주최 측 홈페이지 첫 화면이 열려요 — 이 글은 그 사이트에서 제목으로 찾아 주세요.'
+    : sourceLinkHintHtml(link);
+  return `${why ? `<p class="doc-legend">${why}</p>` : ''}
+      ${href ? `<a class="btn btn-primary btn-lg" href="${esc(href)}" target="_blank" rel="noopener">${esc(link.label)}</a>
+      ${link.cls === 'post' ? '<p class="dp-note">신청은 주최 측 원문 페이지에서 진행돼요.</p>' : ''}` : ''}`;
+}
+
 function openActivityDetail(url) {
   const n = activityItem(url);   // 피드에서 빠졌어도 저장해 둔 글이면 사본으로 연다
   if (!n) return;
@@ -2973,9 +3047,6 @@ function openActivityDetail(url) {
   const flat = (x) => String(unent(x || '')).replace(/[\s:：·\-–]/g, '');
   const seenText = [...(n.excerpts || []).map((x) => flat(x.text)), ...(n.eligibilityLines || []).map(flat)].filter((x) => x.length >= 6);
   const notice = (n.noticeLines || []).filter((l) => !seenText.some((e) => flat(l).includes(e)));
-  const listLink = isBoardListLink(n.url);
-  /* 주소의 HTML 기호(&amp;)는 되돌려 연다 — 찾기(data-activity)는 저장된 n.url 그대로 · 안전하지 않은 주소면 단추를 안 그린다(href="" 는 앱 자신을 연다) */
-  const href = safeUrl(unent(n.url));
   sheetBack = null;   // 이 시트에는 돌아갈 곳이 없다 — 내리면 닫힌다
   $('#detail-sheet').innerHTML = `
     <div class="sheet-handle"></div>
@@ -3009,11 +3080,9 @@ function openActivityDetail(url) {
       <ul class="doc-list">${notice.map((l) => `<li>${esc(unent(l))}</li>`).join('')}</ul>` : ''}
       ${(n.attachments || []).length ? `
       <h4>공고 원본 첨부</h4>
-      <ul class="doc-list">${n.attachments.map((a) => `<li class="att"><a href="${esc(safeUrl(a.url))}" target="_blank" rel="noopener" style="color:var(--primary)">${esc(a.name || '첨부 파일')}</a></li>`).join('')}</ul>` : ''}
+      <ul class="doc-list">${n.attachments.map((a) => `<li class="att">${attachmentLinkHtml(a, 'color:var(--primary)')}</li>`).join('')}</ul>` : ''}
       <p class="sheet-deadline">마감일 ${esc(n.deadline || '원문 공고 확인')}</p>
-      ${listLink ? `<p class="doc-legend">이 게시판은 목록에서 글을 눌러야 열리는 방식이라 글 하나로 바로 가는 주소를 확인하지 못했습니다. 열리는 목록에서 <strong>${esc(unent(n.title))}</strong>을(를) 찾아 눌러 주세요.</p>` : ''}
-      ${href ? `<a class="btn btn-primary btn-lg" href="${esc(href)}" target="_blank" rel="noopener">${listLink ? '게시판 목록에서 보기 ↗' : '원문에서 신청하기 ↗'}</a>
-      <p class="dp-note">신청은 주최 측 원문 페이지에서 진행돼요.</p>` : ''}
+      ${activityLinkHtml(n)}
     </div>`;
   openSheetShell();
   eligAskWire(sch, () => openActivityDetail(url));   // 묻기 상자 배선 — 다시 그릴 때 이 시트로 돌아온다
@@ -3238,7 +3307,7 @@ function renderApplyPrep(sch) {
   const formAtts = kosaf ? [] : atts.filter(isApplicationForm);
   /* 본문 사진(bodyImage)은 공고 원문 그 자체다 — '첨부 파일'로 늘어놓지 않는다(원문 링크가 준다) */
   const otherAtts = atts.filter((a) => !formAtts.includes(a) && !a.bodyImage);
-  const attList = (list) => `<ul class="doc-list">${list.map((a) => `<li class="att"><a href="${esc(safeUrl(a.url))}" target="_blank" rel="noopener">${esc(a.name)}</a>${a.bytes ? ` <span class="doc-legend">${Math.max(1, Math.round(a.bytes / 1024))}KB</span>` : ''}</li>`).join('')}</ul>`;
+  const attList = (list) => `<ul class="doc-list">${list.map((a) => `<li class="att">${attachmentLinkHtml(a)}${a.bytes ? ` <span class="doc-legend">${Math.max(1, Math.round(a.bytes / 1024))}KB</span>` : ''}</li>`).join('')}</ul>`;
   const excerpts = sch.excerpts || [];
   const certHtml = certStatusListHtml(sch);
   $('#detail-sheet').innerHTML = `
@@ -3480,23 +3549,31 @@ function amountDetailRow(m, opt) {
     ${merged ? `<details><summary>${esc(schoolOfNotice(m.mergedFrom[0]) || '다른 학교')} 외 ${merged}건</summary>
       <div class="ad-list"><span>같은 재단이 여러 학교에서 접수하는 공고. 1건으로 합산.</span>
       ${[sch, ...m.mergedFrom].map((x) => `<span>${esc(x.provider || x.name || '')}</span>`).join('')}</div></details>` : ''}
-    ${raw || exRaw ? `<details><summary>원문 보기</summary>
+    ${/* 층2는 우리가 읽은 공고 원문이 아니라 재단이 한국장학재단에 적어 둔 칸이다 — '원문'이라 부르지 않는다 (2026-10-03) */ ''}
+    ${raw || exRaw ? `<details><summary>${sch.sourceKind === 'kosaf' ? '재단이 적어 둔 글' : '원문 보기'}</summary>
       <p class="ad-src">"${esc(raw || exRaw)}"<em>${esc(noticeSourceLabel(sch))}</em></p></details>`
     /* 🔴 발췌가 없으면 지어내지 않고 **원문으로 가는 길**을 준다 (원칙 8-1).
        금액이 첨부파일이나 제목에만 있어 사람이 손으로 넣은 공고가 있다 — 화면에 금액이
        뜨는데 근거를 하나도 못 보여 주는 상태로 두면 안 된다(개발자 지적 2026-08-27).
        게시판 목록 주소인 공고는 '원문 공고'라고 쓰면 거짓말이라 라벨을 바꾼다. */
-    : (o.text || m.won ? (sch.sourceUrl
-      ? `<p class="ad-link"><a href="${esc(safeUrl(sch.sourceUrl))}" target="_blank" rel="noopener">${
-          sch.program ? '한국장학재단 ↗' : (isBoardListLink(sch.sourceUrl) ? '게시판 목록 ↗' : '원문 공고 ↗')}</a></p>`
-      : '') : '')}
+    : (o.text || m.won ? amountSourceLinkHtml(sch) : '')}
   </div>`;
+}
+
+/* 금액 상세 한 줄의 출처 링크 — 이름은 sourceLink(sch, 'amount') 한 곳 (2026-10-03 · 원문 링크 정직성).
+   🔴 층2(재단 홈페이지)를 '원문 공고'라 부르던 자리다 — 상세 시트는 '재단 홈페이지'라 하는데 여기만
+      `program`·`#n-` 둘만 보고 나머지를 전부 원문이라 불렀다(같은 재단 홈페이지가 화면마다 다른 이름). */
+function amountSourceLinkHtml(sch) {
+  const link = sourceLink(sch, 'amount');
+  const href = safeUrl(link.href);
+  return href ? `<p class="ad-link"><a href="${esc(href)}" target="_blank" rel="noopener">${esc(link.label)}</a></p>` : '';
 }
 
 /* 원문 발췌 밑에 붙는 출처 한 줄 — `광운대학교 게시 원문`.
    🔴 학교 이름을 줄이지 않는다(기관명 축약 금지) — provider 의 `(광운대 접수)` 대신
       eligibility.schoolOnly 의 정식 명칭을 쓴다. 둘 다 없으면 출처를 지어내지 않고 비운다. */
 const noticeSourceLabel = (sch) => {
+  if (sch && sch.sourceKind === 'kosaf') return '한국장학재단 등록 정보';   // 층2 — 공고 원문이 아니다(2026-10-03)
   const school = (sch && sch.eligibility && sch.eligibility.schoolOnly) || '';
   return school ? `${school} 게시 원문` : '공고 원문';
 };
@@ -3707,20 +3784,25 @@ function schoolPortalNote(sch) {
    🔴 링크 이름은 그 주소가 **실제로 여는 화면**을 말한다(아래 openDetail 의 두 문단 참조).
       시트마다 따로 적으면 한쪽만 '원문 공고'라고 거짓말하게 된다. */
 function sourceNoteHtml(sch) {
-  return sch.sourceUrl
-    ? `<p class="doc-legend">자세한 내용은 ${sourceLinkHtml(sch)}에서 확인</p>`
+  const a = sourceLinkHtml(sch);
+  /* 목록이면 찾을 제목, 로봇이 문제를 확정한 주소면 본 것 한 줄 — 상세 시트 맨 아래와 같은 안내(2026-10-03) */
+  const hint = sourceLinkHintHtml(sourceLink(sch, 'detail'));
+  if (/<a /.test(a)) return `<p class="doc-legend">자세한 내용은 ${a}에서 확인${hint ? `<br />${hint}` : ''}</p>`;
+  return sch.sourceKind === 'kosaf'   // 층2는 우리가 읽은 원문이 없다 — 주소가 없으면 재단을 가리킨다
+    ? '<p class="doc-legend">자세한 내용은 재단에 확인해 주세요</p>'
     : '<p class="doc-legend">자세한 내용은 원문 공고에서 확인</p>';
 }
 
-/* 원문 링크 하나(`원문 공고 ↗`) — 이름 규칙은 여기 한 곳. 상세 시트 맨 아래 한 줄도 이것을 쓴다.
-   주소가 없으면 링크 없이 '원문 공고 확인' 글자만 돌려준다. */
+/* 원문 링크 하나 — **이름은 source-link.js 의 sourceLink(sch, 'detail') 한 곳**이다 (2026-10-03).
+   상세 시트 맨 아래 한 줄과 신청 준비 시트(sourceNoteHtml)가 이것을 쓴다.
+   보통 주소는 예전 그대로 '원문 공고', 목록 표식·로봇이 목록으로 확정한 주소는 '게시판 목록',
+   층2는 '재단 홈페이지', 상시 제도는 '한국장학재단', 로봇이 '그 공고가 아니었다'를 확정한 주소는 '(확인 필요)'.
+   주소가 없으면 링크 없이 '원문 공고 확인' 글자만 — 층2는 원문이 없으니 아무것도 안 돌려준다(문의 줄이 따로 있다). */
 function sourceLinkHtml(sch) {
-  const srcLabel = sch.program ? '한국장학재단 ↗'
-    : sch.sourceKind === 'kosaf' ? '재단 홈페이지 ↗'
-    : isBoardListLink(sch.sourceUrl) ? '게시판 목록 ↗' : '원문 공고 ↗';
-  return sch.sourceUrl
-    ? `<a href="${esc(safeUrl(sch.sourceUrl))}" target="_blank" rel="noopener">${srcLabel}</a>`
-    : '원문 공고 확인';
+  const link = sourceLink(sch, 'detail');
+  const href = safeUrl(link.href);
+  if (href) return `<a href="${esc(href)}" target="_blank" rel="noopener">${esc(link.label)}</a>`;
+  return sch.sourceKind === 'kosaf' ? '' : '원문 공고 확인';
 }
 
 /* 상세 시트의 '지원 자격' 줄들 — 장학(openDetail)과 대외활동·공모전(openActivityDetail)이 **한 함수**를 쓴다 (2026-10-01 개발자 지시:
@@ -3849,9 +3931,12 @@ function eligibilityRowsHtml(sch, result) {
   if (!reasonRows) {
     /* 원문 요건도 못 읽었고 판정할 조건도 없는 경우 — '제한이 없다'가 아니라 **모른다**는 뜻이다.
        원문에서 '제한 없음'을 확인한 공고만 eligibilityVerified로 확신 문구를 낸다. */
+    /* '아래 공고 원문'은 아래 링크가 **그 공고로 갈 때만** (2026-10-03 · 원문 링크 정직성) — 재단 홈페이지(층2)·게시판 목록·
+       기관 첫 화면이면 '아래 링크'라고만 한다. 종류는 sourceLink 한 곳(활동 시트는 id 의 'act:' 뒤가 그 글 주소다 · activityAsSch). */
+    const below = sourceLink(sch.activity ? { url: String(sch.id || '').replace(/^act:/, '') } : sch, 'detail').cls === 'post' ? '아래 공고 원문' : '아래 링크';
     reasonRows = sch.eligibilityVerified
       ? `<li class="r-ok">✓ 별도 자격 제한이 없는 공고입니다${result.status === 'selective' ? ' — 지원자 중 선발 심사로 결정됩니다' : ''}</li>`
-      : `<li class="r-unk">? 지원 자격은 아래 공고 원문에서 확인해 주세요${result.status === 'selective' ? ' (지원자 중 선발 심사로 결정됩니다)' : ''}</li>`;
+      : `<li class="r-unk">? 지원 자격은 ${below}에서 확인해 주세요${result.status === 'selective' ? ' (지원자 중 선발 심사로 결정됩니다)' : ''}</li>`;
   }
   return reasonRows;
 }
@@ -3888,7 +3973,10 @@ function openDetail(id) {
      '한국장학재단 ↗'이라 적어 두면 눌러 본 학생에게 거짓말이 된다 — 이 규칙(링크 이름은
      그 주소가 **실제로 여는 화면**을 말한다)은 바로 윗 문단이 이미 적어 둔 것이다.
      KOSAF 를 가리키는 것은 `program`(data.js 의 상시 제도)뿐이다. */
+  /* 🔴 2026-10-03 — 이름·안내 둘 다 source-link.js 의 sourceLink 한 곳에서 받는다. 목록이면 '목록에서 ○○을(를)
+     찾아 눌러 주세요'(표식 주소든 로봇이 목록으로 확정한 주소든), 로봇이 '그 공고가 아니었다'를 확정했으면 본 것 한 줄. */
   const srcLink = sourceLinkHtml(sch);
+  const srcHint = sourceLinkHintHtml(sourceLink(sch, 'detail'));
 
   let btnLabel = '신청 준비 시작';
   if (app && !app.pending) btnLabel = '신청 준비 완료됨';
@@ -3967,7 +4055,7 @@ function openDetail(id) {
            신청서인 줄 알고 그 안에서 빈칸을 찾는다(원칙 8-1 — 확인 안 한 것을 말하지 않는다). */ ''}
       <h4>${sch.sourceKind === 'kosaf' ? '선발 공고문 <span class="channel-tag">재단 원문</span>' : '공고 원본 첨부 양식'}</h4>
       <ul class="doc-list">
-        ${sch.attachments.map((a) => `<li class="att"><a href="${esc(safeUrl(a.url))}" target="_blank" rel="noopener" style="color:var(--primary)">${esc(a.name)}</a>${a.bytes ? ` <span class="doc-legend">${Math.max(1, Math.round(a.bytes / 1024))}KB</span>` : ''}</li>`).join('')}
+        ${sch.attachments.map((a) => `<li class="att">${attachmentLinkHtml(a, 'color:var(--primary)')}${a.bytes ? ` <span class="doc-legend">${Math.max(1, Math.round(a.bytes / 1024))}KB</span>` : ''}</li>`).join('')}
       </ul>` : ''}
       ${/* 🔴 마감일·중복 수혜 · 문의 · 원문 링크는 **맨 아래 한 묶음**이다 (2026-10-02 CTO 지시).
            예전엔 문의는 지원 자격 아래, 링크는 제출 서류 아래(공고 원문 안내 아래에 한 번 더),
@@ -3981,8 +4069,7 @@ function openDetail(id) {
           sch.duplicable ? '중복 수혜 가능' : '중복 수혜 제한',
           (sch.sourceKind === 'kosaf' && sch.contact) ? `문의 ${esc(sch.contact)}` : '',
           srcLink,
-        ].filter(Boolean).join(' · ')}${(!sch.program && isBoardListLink(sch.sourceUrl))
-          ? `<br />목록에서 <strong>${esc(boardListTitle(sch.sourceUrl))}</strong>을(를) 찾아 눌러 주세요.` : ''}</p>
+        ].filter(Boolean).join(' · ')}${srcHint ? `<br />${srcHint}` : ''}</p>
       </div>
 
       ${app && !app.pending ? (() => {
@@ -4003,7 +4090,7 @@ function openDetail(id) {
           <p class="progress-note">${app.submittedAt} 공식 제출 기록됨${sch.deadline ? ` · 접수 마감(${sch.deadline}) 후 자동으로 심사 단계로 표시됩니다` : ''}</p>
           <button class="link-btn" id="btn-undo-progress" style="margin-bottom:10px">제출 기록 취소</button>` : ''}
         ${step === 2 ? `
-          <p class="progress-note">접수가 마감되어 심사가 진행 중입니다. 발표 결과가 나오면 아래에 기록해 주세요 — 발표 확인은 ${esc(ch.label)}${sch.sourceUrl ? ' 또는 원문 공고' : ''}에서 할 수 있습니다.</p>
+          <p class="progress-note">접수가 마감되어 심사가 진행 중입니다. 발표 결과가 나오면 아래에 기록해 주세요 — 발표 확인은 ${esc(ch.label)}${/* '원문 공고'는 그 공고로 가는 주소(post)일 때만 — 재단 홈페이지·목록을 원문이라 부르지 않는다 (2026-10-03) */ ''}${sch.sourceUrl && sourceLink(sch, 'detail').cls === 'post' ? ' 또는 원문 공고' : ''}에서 할 수 있습니다.</p>
           <div class="submit-actions" style="margin-bottom:12px">
             <button class="btn btn-outline" id="btn-result-won">선정됨</button>
             <button class="btn btn-outline" id="btn-result-lost">아쉽게 미선정</button>
@@ -4702,14 +4789,21 @@ function appLogHtml(app, sch, step) {
             : `<button class="app-log-btn" data-mark-won="${esc(app.id)}">선정</button>
                <button class="app-log-btn" data-mark-lost="${esc(app.id)}">미선정</button>`)}
       </ul>
-      ${sch.sourceUrl
-        /* 🔴 목록 주소밖에 못 찾은 공고는 '원문'이라고 말하지 않는다 — 눌러 보면
-           게시판 목록이 열리는데 원문이라고 적어 두면 거짓말이 된다(원칙 8-1). */
-        ? `<a class="app-log-more" href="${esc(safeUrl(sch.sourceUrl))}" target="_blank" rel="noopener">${
-            sch.program ? '한국장학재단에서 보기 ↗'
-            : isBoardListLink(sch.sourceUrl) ? '게시판 목록 열기 ↗' : '공고 원문 보기 ↗'}</a>`
-        : `<button class="app-log-more" data-detail="${esc(sch.id)}">공고 상세 보기</button>`}
+      ${appLogLinkHtml(sch)}
     </div>`;
+}
+
+/* 신청 내역 줄의 맨 아래 단추 — 이름은 sourceLink(sch, 'applog') 한 곳 (2026-10-03 · 원문 링크 정직성).
+   🔴 목록 주소밖에 못 찾은 공고는 '원문'이라고 말하지 않는다 — 눌러 보면 게시판 목록이 열리는데
+      원문이라고 적어 두면 거짓말이 된다(원칙 8-1). 층2(재단 홈페이지)도 같다 — 예전엔 여기만
+      `program`·`#n-` 둘만 보고 재단 홈페이지를 '공고 원문 보기'라 불렀다(상세 시트는 '재단 홈페이지').
+   열 주소가 없으면(또는 안전하지 않으면) 앱 안의 공고 상세를 연다. */
+function appLogLinkHtml(sch) {
+  const link = sourceLink(sch, 'applog');
+  const href = safeUrl(link.href);
+  return href
+    ? `<a class="app-log-more" href="${esc(href)}" target="_blank" rel="noopener">${esc(link.label)}</a>`
+    : `<button class="app-log-more" data-detail="${esc(sch.id)}">공고 상세 보기</button>`;
 }
 
 /* 지우기 — 여러 건을 한 번에 받는다(스와이프 1건도 같은 길로 지나간다). */
@@ -7141,6 +7235,7 @@ async function authSubmit() {
 loadState();
 bindEvents();
 initOnboarding();
+loadLinkChecks();   // 원문 링크 확인 장부 — 링크를 그리는 목록들보다 먼저 띄운다(작다 · 없어도 조용하다)
 loadNotices();
 loadNews();
 loadActivities();

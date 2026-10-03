@@ -334,7 +334,8 @@ function chatAnswerDeadline() {
     return {
       text: '마감일이 확인된 공고가 지금은 없어요.',
       note: noDate
-        ? `지원할 수 있는 공고 ${noDate}건은 마감일이 공고 원문에만 적혀 있어서, 앱이 날짜를 말씀드릴 수 없어요. 각 공고의 '원문 공고 ↗'에서 확인해 주세요.`
+        /* 링크 이름은 공고마다 다르다(원문 공고·게시판 목록·재단 홈페이지 — source-link.js · 2026-10-03) — 한 이름으로 부르지 않는다 */
+        ? `지원할 수 있는 공고 ${noDate}건은 마감일이 공고 원문에만 적혀 있어서, 앱이 날짜를 말씀드릴 수 없어요. 각 공고를 열어 맨 아래 링크에서 확인해 주세요.`
         : '',
     };
   }
@@ -357,7 +358,7 @@ function chatAnswerAmount() {
   if (!known.length) {
     return {
       text: '금액을 숫자로 확인한 공고가 아직 없어요.',
-      note: `지원할 수 있는 공고 ${list.length}건은 금액이 공고 원문에만 적혀 있어요. 앱이 임의로 계산하면 실제와 달라질 수 있어서, 합계에 넣지 않고 있어요. 각 공고의 '원문 공고 ↗'에서 확인해 주세요.`,
+      note: `지원할 수 있는 공고 ${list.length}건은 금액이 공고 원문에만 적혀 있어요. 앱이 임의로 계산하면 실제와 달라질 수 있어서, 합계에 넣지 않고 있어요. 각 공고를 열어 맨 아래 링크에서 확인해 주세요.`,
     };
   }
   return {
@@ -785,8 +786,11 @@ function chatAnswerHtml(a) {
     parts.push(`<ul class="chat-notices">${a.notices.map((n) => {
       const url = chatSafe(() => safeUrl(n.url), '');
       const title = chatEsc(n.title);
+      /* 링크 꼬리는 source-link.js 한 곳(chat · 2026-10-03) — 보통 주소는 예전처럼 '↗' 하나,
+         게시판 목록·홈페이지·로봇이 문제를 확정한 주소는 무엇이 열리는지 괄호로 말한다 */
+      const tail = chatSafe(() => sourceLink(n, 'chat').label, '↗') || '↗';
       return url
-        ? `<li><a href="${url}" target="_blank" rel="noopener noreferrer">${title} ↗</a></li>`
+        ? `<li><a href="${chatEsc(url)}" target="_blank" rel="noopener noreferrer">${title} ${chatEsc(tail)}</a></li>`
         : `<li>${title}</li>`;
     }).join('')}</ul>`);
   }
