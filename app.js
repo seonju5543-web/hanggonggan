@@ -2877,6 +2877,13 @@ function schoolPhotoFor(n, k) {
    🔴 새 데이터가 오면 rerenderVisible 을 부른다 — 갈라 두면 한 화면만 굳는다(2026-09-01 규칙). */
 let liveActivities = null;
 let activitiesFilter = 'all';
+/* 분야 칩 (2026-10-03 개발자 지시 "제목 아래 회색 분류를 위에 버튼으로") — 종류와 **다른 축**이다.
+   종류 칩과 같이 **저장하지 않는다**(탐색의 exploreFilter 와 같은 성격 — 새로고침하면 전체). */
+let activitiesField = 'all';
+/* 🔴 '기타'는 **화면의 이름일 뿐**이다 — 데이터는 지금처럼 비워 둔다(activityField 가 null 을 낸다).
+   수집기 관문(verify/test-collector 「못 가르면 null — 억지로 기타라고 적지 않는다」)이 그걸 지킨다.
+   즉 학생에게 "분야를 아직 못 읽은 글"을 부르는 이름이 기타이고, 데이터가 기타라고 말하는 게 아니다. */
+const ACT_FIELD_ETC = '기타';
 let activitiesQuery = '';
 /* 정렬 둘 — 최근 수집순(기본) · 마감 임박순(마감을 읽은 글이 앞, 못 읽은 글은 뒤에 최근순) (2026-09-29 · 4차 리서치: 경쟁 앱의 기본 축) */
 let activitiesSort = 'recent';
@@ -2903,6 +2910,31 @@ function activitiesForMe() {
     && (!n.deadline || dday(n.deadline).days >= -CLOSED_KEEP_DAYS));
 }
 
+/* 분야 칩 줄을 **데이터에서 만든다** (2026-10-03).
+   🔴 분야 이름을 여기 적지 않는다 — 원본 목록은 collector/activity-kind.mjs 의 ACTIVITY_FIELDS
+      한 곳이고, 앱은 빌드가 없어 그 .mjs 를 못 들여온다. 적으면 두 벌이 되어 수집기가 갈래를
+      늘려도 화면은 모른다(관리자 화면은 _admin/build.sh 의 vendor 복사로 같은 문제를 푼다).
+      그래서 **지금 보이는 글들의 field 를 세어** 많은 순으로 늘어놓는다. 덤으로:
+        · 실제 0건인 갈래(체험단·네이밍·슬로건)는 애초에 안 뜬다 — 눌러도 빈 목록인 칩이 없다.
+        · 종류를 바꾸면 그 종류에 있는 분야만 뜬다.
+   🔴 고른 칩이 **사라지면 그 자리에서 푼다** — 종류를 바꾸면 그 분야가 없을 수 있다(공모전에만 있는
+      '영상·사진'을 고른 채 대외활동으로 옮기는 길). 안 풀면 칩은 켜져 있는데 목록이 0건이 된다. */
+function renderActivityFieldChips(list) {
+  const row = $('#activities-field-filters');
+  if (!row) return;
+  const n = new Map();
+  let etc = 0;
+  for (const it of list) { if (it.field) n.set(it.field, (n.get(it.field) || 0) + 1); else etc += 1; }
+  const fields = [...n.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([f]) => f);
+  if (etc) fields.push(ACT_FIELD_ETC);                              // 못 읽은 글은 늘 맨 뒤
+  if (activitiesField !== 'all' && !fields.includes(activitiesField)) activitiesField = 'all';   // 고른 칩이 사라졌다
+  /* 칩이 하나도 없으면(분야가 다 비었다) 줄 자체를 감춘다 — 「전체」만 덩그러니 두지 않는다 */
+  /* 🔴 첫 칩을 그냥 '전체'라 하지 않는다 — 윗줄(종류) 첫 칩도 '전체'라 두 개가 위아래로 겹쳐
+     어느 쪽을 끄는 단추인지 안 읽힌다(화면으로 확인). */
+  row.hidden = !fields.length;
+  row.innerHTML = ['all', ...fields].map((f) => `<button class="filter-chip${f === activitiesField ? ' active' : ''}" data-filter="${esc(f)}">${esc(f === 'all' ? '분야 전체' : f)}</button>`).join('');
+}
+
 function renderActivities() {
   const p = state.profile;
   if (!p) return;
@@ -2914,6 +2946,13 @@ function renderActivities() {
   }
   let list = activitiesForMe();
   if (activitiesFilter !== 'all') list = list.filter((n) => n.kind === activitiesFilter);
+  /* 🔴 분야 칩은 **종류로 거른 뒤 · 분야로 거르기 전**에 만든다 (2026-10-03).
+     분야로 거른 목록에서 세면 칩 하나를 누르는 순간 나머지 칩이 사라진다. */
+  renderActivityFieldChips(list);
+  /* 분야 거르기 — 종류 뒤 · **검색 앞**. '기타'는 field 가 비어 있는 글이다. */
+  if (activitiesField !== 'all') {
+    list = list.filter((n) => (activitiesField === ACT_FIELD_ETC ? !n.field : n.field === activitiesField));
+  }
   /* 검색은 카드에 **보이는 글자**(제목)로만 — 탐색 화면과 같은 규칙(2026-08-30) */
   const q = activitiesQuery.trim().toLowerCase();
   /* 검색은 카드에 보이는 글자로 — 제목 · 분야 · 발췌 줄 */
@@ -2930,7 +2969,7 @@ function renderActivities() {
   if (!list.length) {
     box.innerHTML = `<p class="empty">${q
       ? `'${esc(activitiesQuery.trim())}'와 맞는 글이 없어요`
-      : `아직 ${esc(p.school)} 게시판에서 모은 ${activitiesFilter === 'all' ? '대외활동·공모전' : esc(activitiesFilter)} 글이 없어요<br /><span class="empty-sub">게시판이 연결되면 새 글이 여기에 자동으로 떠요</span>`}</p>`;
+      : `아직 ${esc(p.school)} 게시판에서 모은 ${activitiesField === 'all' ? '' : esc(activitiesField) + ' '}${activitiesFilter === 'all' ? '대외활동·공모전' : esc(activitiesFilter)} 글이 없어요<br /><span class="empty-sub">게시판이 연결되면 새 글이 여기에 자동으로 떠요</span>`}</p>`;
     return;
   }
   box.innerHTML = list.map(activityCardHtml).join('');
@@ -6389,7 +6428,21 @@ function bindEvents() {
     const chip = e.target.closest('.filter-chip');
     if (!chip) return;
     activitiesFilter = chip.dataset.filter;
+    /* 🔴 종류를 바꾸면 **분야를 푼다** (2026-10-03) — 공모전에만 있는 분야를 고른 채 대외활동으로
+       옮기면 칩은 켜져 있는데 목록이 0건이 된다. 칩 줄을 다시 그릴 때도 한 번 더 지킨다
+       (renderActivityFieldChips) — 거기서 푸는 것은 데이터가 바뀌어 분야가 사라지는 길이다. */
+    activitiesField = 'all';
     $$('#activities-filters .filter-chip').forEach((c) => c.classList.toggle('active', c === chip));
+    renderActivities();
+  });
+
+  /* 분야 칩 — 같은 손짓. ⚠️ 여기서도 선택자를 **제 그릇 안으로** 좁힌다(관문이 전역 $$('.filter-chip') 를 막는다).
+     켜짐 표시는 손으로 토글하지 않는다 — 칩 줄 자체를 renderActivityFieldChips 가 다시 그리면서 붙인다
+     (칩이 데이터에서 만들어지므로, 토글해 두어도 다시 그리는 순간 날아간다). */
+  $('#activities-field-filters').addEventListener('click', (e) => {
+    const chip = e.target.closest('.filter-chip');
+    if (!chip) return;
+    activitiesField = chip.dataset.filter;
     renderActivities();
   });
   /* 정렬 버튼은 탐색 화면과 한 벌로 묶었다 — 아래 '정렬 버튼' 블록(SORT_MENUS) 이 둘 다 배선한다 */
