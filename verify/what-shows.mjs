@@ -53,7 +53,8 @@ const p = {
 };
 
 let hits = reg.items.filter((x) => x.id === q || (x.name || '').includes(q));
-if (!hits.length) { console.log(`'${q}' 로 찾은 공고가 없습니다.`); process.exit(1); }
+/* 정식 등록에 없으면 실시간 공고·재단·지자체·대외활동·소식·층2에서 찾아 **원문 링크만** 보여 준다 (2026-10-03 · 맨 아래 showFeedLinks) */
+const feedMode = !hits.length;
 /* 넓게 찾으면 수백 줄이 쏟아져 정작 볼 것을 못 본다 — 세어 주고 앞쪽만 보여 준다 */
 const CAP = 8;
 if (hits.length > CAP) {
@@ -95,6 +96,80 @@ vm.runInContext([...['bareOrg', 'orgBase'].map(takeConst), ...NEED.map(takeFn)].
   ctx, { filename: 'app.js(발췌)' });
 const appFn = (n) => vm.runInContext(n, ctx);
 const stripTags = (h) => String(h).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+
+/* ── 원문 링크 — 누르면 무엇이 열리고, 화면은 그것을 뭐라고 부르는가 (2026-10-03) ─────────────
+   🔴 원문 링크 이야기도 **이 도구로** 한다(CLAUDE.md 「매 세션 이것만은」 1번). 개발자 보고(P0)
+      *"원문 공고를 누르면 그 공고가 아니라 재단·장학금 페이지 전체가 열린다"* 를 조사할 때 화면 일곱 곳이
+      제각각 이름을 정하고 있었다 — 그 자리에서 짠 스크립트로 재면 어느 자리를 쟀는지부터 갈린다.
+   여기서도 베끼지 않는다: source-link.js·data.js 를 파일째 싣고 app.js 의 링크 자리 함수를 이름으로 떼어 온다.
+   로봇의 확인 장부(data/link-check.json)가 있으면 앱과 똑같이 넘긴다(없으면 앱처럼 조용히 주소 꼴만 본다). */
+const PA = require('../parse-amount.js');
+const linkCtx = vm.createContext({
+  console, URL, Math, Date, JSON, Object, Array, String, Number, RegExp, encodeURIComponent, decodeURIComponent,
+  document: { baseURI: 'https://seonju5543-web.github.io/hanggonggan/' }, module: undefined,
+  amountFrom: PA.amountFrom, exclusivityFrom: PA.exclusivityFrom,
+});
+vm.runInContext(fs.readFileSync(new URL('../source-link.js', import.meta.url), 'utf8'), linkCtx, { filename: 'source-link.js' });
+vm.runInContext(fs.readFileSync(new URL('../data.js', import.meta.url), 'utf8'), linkCtx, { filename: 'data.js' });
+vm.runInContext([
+  ...['ENTITIES', 'ENTITY_RE', 'NEWS_THUMB_RE', 'CLOSED_KEEP_DAYS', 'KOSAF_ELIG', 'kosafClean', 'KOSAF_AMOUNT_UNKNOWN'].map(takeConst),
+  ...['esc', 'unent', 'safeUrl', 'won', 'todayStart', 'dday', 'kosafAmountLabel', 'kosafAsScholarships', 'sourceLinkHintHtml',
+    'attachmentLinkHtml', 'sourceLinkHtml', 'sourceNoteHtml', 'amountSourceLinkHtml', 'appLogLinkHtml', 'noticeCardHtml', 'activityLinkHtml'].map(takeFn),
+  /* 층2 바꾸기가 읽는 앱 상태 — 이 도구는 저장·신청 내역을 모른다(없음) */
+  'var kosafList = []; var kosafUpdatedAt = ""; var state = { applications: [] }; function isSaved() { return false; }',
+].join('\n\n'), linkCtx, { filename: 'app.js(링크 자리)' });
+const linkFn = (n) => vm.runInContext(n, linkCtx);
+const LEDGER = new URL('../data/link-check.json', import.meta.url);
+const ledger = fs.existsSync(LEDGER) ? JSON.parse(fs.readFileSync(LEDGER, 'utf8')) : null;
+linkFn('setLinkChecks')(ledger);
+const htmlText = (h) => stripTags(h).replace(/&amp;/g, '&');
+const hrefIn = (h) => ((String(h).match(/\shref="([^"]*)"/) || [])[1] || '').replace(/&amp;/g, '&');
+const CLS_WORD = { post: '그 공고 하나로 가는 주소', list: '게시판 목록이 열린다', home: '사이트 첫 화면이 열린다', trouble: '로봇이 「그 공고가 아니었다」를 확정', none: '열 주소가 없다' };
+/* 화면 자리마다 실제로 찍히는 이름 — 정식 등록·층2(sch) · 게시판 글 카드(card) · 활동 시트(activity) */
+function linkLines(it, where) {
+  const L = linkFn('sourceLink')(it, 'detail');
+  const out = [`   ─ 원문 링크 — ${L.kind} (${CLS_WORD[L.cls] || L.cls})${ledger ? '' : ' · 확인 장부 없음(주소 꼴만 봄)'}`];
+  if (where === 'sch') {
+    const d = linkFn('sourceLinkHtml')(it);
+    out.push(`       상세 시트 「${htmlText(d) || '(없음)'}」 · 금액 상세 「${htmlText(linkFn('amountSourceLinkHtml')(it)) || '(없음)'}」 · 신청 내역 「${htmlText(linkFn('appLogLinkHtml')(it))}」`);
+    out.push(`       제출처 「${linkFn('officialChannel')(it).label}」 · 신청 준비 시트 「${htmlText(linkFn('sourceNoteHtml')(it))}」`);
+    out.push(`       누르면 → ${hrefIn(d) || '(링크 없음)'}`);
+  } else if (where === 'card') {
+    const h = linkFn('noticeCardHtml')(it, {});
+    out.push(`       카드 아랫줄 「${htmlText((h.match(/<p class="sch-provider">([^<]*수집[^<]*)<\/p>/) || [])[1] || '')}」 · 도우미 「${it.title || ''} ${linkFn('sourceLink')(it, 'chat').label}」`);
+    out.push(`       누르면 → ${hrefIn(h) || '(링크 없음)'}`);
+  } else if (where === 'activity') {
+    const h = linkFn('activityLinkHtml')(it);
+    out.push(`       활동 시트 단추·안내 「${htmlText(h) || '(없음)'}」`);
+    out.push(`       누르면 → ${hrefIn(h) || '(링크 없음)'}`);
+  }
+  return out;
+}
+
+/* 정식 등록에 없는 이름 — 앱이 실제로 받는 파일에서 찾는다(공고·소식은 학교별 파일 · 층2는 앱 함수로 바꾼 모양) */
+function showFeedLinks(query) {
+  const read = (p) => { try { return JSON.parse(fs.readFileSync(new URL(p, import.meta.url), 'utf8')).items || []; } catch (e) { return []; } };
+  const dir = (p) => fs.readdirSync(new URL(p, import.meta.url)).filter((f) => /\.json$/.test(f) && f !== 'index.json').flatMap((f) => read(`${p}${f}`));
+  linkCtx.kosafList = read('../data/kosaf-open.json');
+  const sets = [
+    ['층2(한국장학재단 등록 재단)', linkFn('kosafAsScholarships')(), 'sch', (x) => x.name],
+    ['학교 게시판 새 공고', dir('../data/notices/'), 'card', (x) => x.title],
+    ['재단·지자체 새 공고', read('../data/external.json'), 'card', (x) => x.title],
+    ['대외활동·공모전', read('../data/activities.json'), 'activity', (x) => x.title],
+    ['우리 학교 소식', dir('../data/news/'), 'card', (x) => x.title],
+  ];
+  let shown = 0;
+  for (const [label, list, where, nameOf] of sets) {
+    const found = list.filter((x) => x.id === query || x.url === query || String(nameOf(x) || '').includes(query));
+    for (const it of found.slice(0, CAP)) {
+      console.log(`\n■ [${label}] ${String(nameOf(it) || '').slice(0, 80)}`);
+      for (const l of linkLines(it, where)) console.log(l);
+      shown += 1;
+    }
+    if (found.length > CAP) console.log(`   … ${label}에서 ${found.length}건이 걸렸습니다 — 앞 ${CAP}건만 보여 줍니다.`);
+  }
+  return shown;
+}
 
 /* ── 신청 버튼을 **누르면** 무엇이 뜨는가 (2026-09-23) ─────────────────────────────
    개발자 지적 *"신청 준비 시작 버튼을 눌렀을때 바로 신청내역으로 이동"* — 이 도구는 '버튼이
@@ -185,6 +260,12 @@ for (const sch of hits) {
   for (const l of exLines) console.log(`       ✗ ${String(l).slice(0, 84)}`);
   const why = (result.reasons || []).filter((r) => /미달|없어|불가/.test(r));
   if (why.length) console.log(`   ─ 미달 사유\n       ${why.map((w) => w.slice(0, 90)).join('\n       ')}`);
+  for (const l of linkLines(sch, 'sch')) console.log(l);
+}
+
+if (feedMode && !showFeedLinks(q)) {
+  console.log(`'${q}' 로 찾은 공고가 없습니다 (정식 등록·실시간 공고·재단·지자체·대외활동·소식·층2 모두).`);
+  process.exit(1);
 }
 
 /* 버튼 위 안내 문구를 **app.js 에서 그대로** 읽어 온다 (2026-09-17).

@@ -8482,7 +8482,11 @@ console.log('\n■ 층2 첨부 — 앱이 그 파일을 실제로 열 수 있게
   eq('  그 줄이 navigate 분기보다 위에 있다',
     swjs.indexOf(guard) >= 0 && swjs.indexOf(guard) < swjs.indexOf("e.request.mode === 'navigate'"), true);
   /* 🔴 층2 의 sourceUrl 은 KOSAF 가 아니라 그 재단 홈페이지다 — 이름을 틀리면 거짓말이 된다 */
-  eq('층2 원문 링크를 재단 홈페이지라고 부른다', /sourceKind === 'kosaf' \? '재단 홈페이지 ↗'/.test(appjs), true);
+  /* 2026-10-03 — 이름은 이제 source-link.js 한 곳이 정한다(app.js 에는 이름 글자가 없다 — 자리마다 다시 정하던 것이
+     이번 사고의 절반이었다). 그래서 app.js 글자가 아니라 **그 규칙이 층2를 무엇이라 부르는지**를 잰다.
+     모든 화면 자리가 그 규칙을 쓰는지는 「원문 링크 정직성」 app 갈래(verify/link-gates/app.mjs)가 잰다. */
+  eq('층2 원문 링크를 재단 홈페이지라고 부른다',
+    createRequire(import.meta.url)('../source-link.js').sourceLink({ sourceKind: 'kosaf', sourceUrl: 'http://example.or.kr/' }, 'detail').label, '재단 홈페이지 ↗');
   eq('층2 사본을 첨부로 넘긴다', /attachments: i\.files\.map/.test(appjs), true);
 }
 

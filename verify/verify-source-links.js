@@ -9,16 +9,27 @@
    ② 브라우저 — 경희대 학생으로 온보딩해 실제 카드를 열고 링크 href와 라벨을 읽는다
    ③ 정직성 — 아직 원문 주소를 못 찾은 공고는 '게시판 목록 ↗'으로 표기되고 안내가 붙는가
 
+   🔴 2026-10-03 (원문 링크 정직성 · 개발자 보고 P0): 라벨 기대 값을 `#n-` 글자로 정하지 않는다 — 앱이 쓰는
+      규칙 그대로(source-link.js 의 sourceLink + 로봇 확인 장부 data/link-check.json)로 정한다. 그리고 게시판 글 카드는
+      2026-09-18 에 홈으로 옮겼는데 이 검사는 탐색 목록에서 읽고 있어 **늘 0건으로 통과**했다 — 이제 홈에서 읽고, 0건이면 실패다.
+
    실행: (python3 -m http.server 8123 &) 후 node verify/verify-source-links.js */
 const { chromium } = require('playwright-core');
 const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
 const { nextUntil, assertOwnServer, dismissNotify } = require('./onboard-helper.js');
 const fs = require('fs');
 const path = require('path');
+/* 라벨 규칙은 앱과 **같은 파일** — 여기서 다시 적으면 검사와 앱이 갈라진다 */
+const SL = require('../source-link.js');
 
 const ROOT = path.join(__dirname, '..');
 const SHOT = (n) => `${__dirname}/shot-${n}.png`;
-const isMarker = (u) => /#n-/.test(String(u || ''));
+const isMarker = (u) => SL.linkShape(u) === 'marker';
+/* 앱이 받는 확인 장부를 그대로 넘긴다(없으면 앱처럼 주소 꼴만 본다) */
+const LEDGER = path.join(ROOT, 'data/link-check.json');
+SL.setLinkChecks(fs.existsSync(LEDGER) ? JSON.parse(fs.readFileSync(LEDGER, 'utf8')) : null);
+/* 화면의 href(브라우저가 푼 주소)와 데이터 주소를 같은 꼴로 맞춘다 */
+const normUrl = (u) => { try { return new URL(SL.decodeUrlEntities(u)).href; } catch (e) { return String(u || ''); } };
 // 검사할 학교 — 기본 경희대(문제가 처음 보고된 학교). LINKCHECK_SCHOOL로 바꿀 수 있다.
 const SCHOOL = process.env.LINKCHECK_SCHOOL || '경희';
 
@@ -113,7 +124,7 @@ const SCHOOL = process.env.LINKCHECK_SCHOOL || '경희';
     opened += 1;
     if (link.length) {
       const l = link[link.length - 1];
-      checked.push({ id, href: l.href, label: l.text, hasGuide: legend.some((t) => /목록에서/.test(t)) });
+      checked.push({ id, href: l.href, label: l.text, legend: legend.join('\n') });
     }
     // 상세 시트는 Escape 또는 배경 클릭으로 닫힌다 (닫기 버튼 요소는 없다 — app.js closeSheet)
     await page.keyboard.press('Escape');
@@ -125,24 +136,45 @@ const SCHOOL = process.env.LINKCHECK_SCHOOL || '경희';
      읽으므로 애초에 집히지 않는다(실측 0건). 그 규칙은 `verify-kosaf` 가 갖고 있다 —
      두 곳에 같은 규칙을 두면 한쪽만 고쳐져 갈라진다. */
   for (const c of checked) {
-    const marker = isMarker(c.href);
-    const labelOk = marker ? /게시판 목록/.test(c.label) : /원문 공고/.test(c.label);
+    const item = reg.find((r) => r.id === c.id);
+    const want = SL.sourceLink(item, 'detail');
     const line = `${c.id} · ${c.label} · ${c.href.slice(0, 92)}`;
-    if (!labelOk) bad(`라벨이 실제 링크와 다릅니다 — ${line}`);
-    else if (marker && !c.hasGuide) bad(`목록 링크인데 '목록에서 찾으세요' 안내가 없습니다 — ${line}`);
+    if (c.label !== want.label) bad(`라벨이 규칙(${want.kind})과 다릅니다 — 기대 「${want.label}」 — ${line}`);
+    else if (c.href !== normUrl(want.href)) bad(`href 가 데이터 주소(HTML 기호를 푼 것)와 다릅니다 — 기대 ${normUrl(want.href).slice(0, 92)} — ${line}`);
+    else if (want.cls === 'list' && !/목록에서 .+을\(를\) 찾아 눌러 주세요/.test(c.legend)) bad(`목록 링크인데 '목록에서 찾으세요' 안내가 없습니다 — ${line}`);
+    else if (want.cls === 'trouble' && !c.legend.includes(want.caution)) bad(`확인 필요 링크인데 로봇이 본 것 한 줄(${want.caution})이 없습니다 — ${line}`);
     else ok(line);
   }
   /* ⚠️ '연 카드'와 '링크를 읽은 카드'를 구분해 말한다 — 뭉뚱그리면 원인을 엉뚱한 데서 찾는다 */
   if (!opened) bad(`${SCHOOL} 카드를 한 건도 열지 못했습니다 (온보딩·매칭 확인 필요)`);
   else if (!checked.length) bad(`${SCHOOL} 카드 ${opened}건을 열었지만 원문 링크를 한 건도 못 읽었습니다 (.doc-legend a 위치 확인)`);
 
-  /* 실시간 공고 피드의 라벨도 같은 규칙인지 */
-  const feed = await page.$$eval('#explore-list .notice-card', (els) => els.map((e) => ({
-    href: e.href, tail: (e.querySelector('.sch-provider:last-of-type') || {}).textContent || '',
+  /* 게시판 글 카드(학교 게시판 새 공고 · 재단·지자체 · 우리 학교 소식)의 라벨도 같은 규칙인지.
+     🔴 이 카드들은 2026-09-18 에 **홈으로** 옮겼다 — 예전처럼 `#explore-list .notice-card` 를 읽으면 늘 0건이고,
+        0건이면 '불일치 0건'이라 **조용히 통과**했다(2026-10-03 에 발견). 홈에서 읽고, 0건이면 실패로 센다. */
+  await page.click('.nav-item[data-nav="home"]');
+  await page.waitForSelector('#screen-home .notice-card', { timeout: 8000 }).catch(() => {});
+  await page.waitForTimeout(400);
+  const feed = await page.$$eval('#screen-home .notice-card', (els) => els.map((e) => ({
+    href: e.href || '', title: (e.querySelector('.sch-name') || {}).textContent || '',
+    tail: [...e.querySelectorAll('.sch-provider')].map((p) => p.textContent.trim()).find((t) => / 수집/.test(t)) || '',
   }))).catch(() => []);
-  const feedWrong = feed.filter((f) => /#n-/.test(f.href) !== /게시판 목록에서 보기/.test(f.tail));
-  if (feed.length && feedWrong.length) bad(`실시간 공고 피드 라벨 불일치 ${feedWrong.length}건`);
-  else ok(`실시간 공고 피드 라벨 일치 (${feed.length}건 검사)`);
+  /* 카드 → 데이터 글 (앱이 받는 파일들 · 주소로 맞춘다) */
+  const readItems = (p) => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, p), 'utf8')).items || []; } catch (e) { return []; } };
+  const dirItems = (d) => fs.readdirSync(path.join(ROOT, d)).filter((f) => /\.json$/.test(f) && f !== 'index.json').flatMap((f) => readItems(`${d}/${f}`));
+  const byUrl = new Map();
+  for (const n of [...dirItems('data/notices'), ...readItems('data/external.json'), ...dirItems('data/news')]) if (n && n.url) byUrl.set(normUrl(n.url), n);
+  let feedChecked = 0;
+  let feedWrong = 0;
+  for (const f of feed) {
+    const n = byUrl.get(f.href);
+    if (!n) { feedWrong += 1; bad(`홈 카드의 글을 데이터에서 못 찾았습니다 — ${f.title.slice(0, 40)} · ${f.href.slice(0, 80)}`); continue; }
+    const want = SL.sourceLink(n, 'card').label;
+    feedChecked += 1;
+    if (!(want ? f.tail.endsWith(` · ${want}`) : !/↗/.test(f.tail))) { feedWrong += 1; bad(`게시판 글 카드 라벨이 규칙과 다릅니다 — 기대 「${want}」 · 화면 「${f.tail}」 · ${f.href.slice(0, 80)}`); }
+  }
+  if (!feed.length) bad(`홈에 게시판 글 카드가 한 장도 없습니다 — 0건 통과는 통과가 아닙니다(${SCHOOL} 학교 파일·홈 구역 확인)`);
+  else if (!feedWrong) ok(`홈 게시판 글 카드 라벨이 규칙(source-link.js)과 같다 (${feedChecked}/${feed.length}장 검사)`);
 
   await page.screenshot({ path: SHOT('60-source-links'), fullPage: false });
   if (errors.length) bad('콘솔 오류: ' + errors.slice(0, 3).join(' | '));
