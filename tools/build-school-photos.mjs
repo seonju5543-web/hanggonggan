@@ -34,7 +34,14 @@ export function cleanAuthor(s) {
     .replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
   const pix = t.match(/Pixabay로부터 입수된\s*(.+?)님의 이미지/);
   if (pix) return `${pix[1].trim()} (Pixabay)`;
-  return t.slice(0, 60);
+  /* 이름 뒤 괄호 설명(소속·학번 등)은 뗀다 — 60자에서 자르면 괄호 한가운데가 잘려 출처 줄에 남았다(세종대 사진 실측) */
+  let bare = t.replace(/\s*[(（][^)）]*(?:[)）]|$)/g, ' ').replace(/\s+/g, ' ').trim();
+  /* 'myself (User:Piotrus)' 처럼 이름 칸에 '나'만 적고 계정을 괄호에 둔 것 — 괄호 속 계정 이름이 작가다 */
+  if (!bare || /^(myself|self|me|own work|본인|나)$/i.test(bare)) {
+    const inner = (t.match(/[(（]([^)）]+)[)）]/) || [])[1] || bare;
+    bare = inner.replace(/^\s*User\s*:\s*/i, '').trim();
+  }
+  return bare.length <= 40 ? bare : bare.slice(0, 40).replace(/\s+\S*$/, '');
 }
 
 export function creditLine(f) {

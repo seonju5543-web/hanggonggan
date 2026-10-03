@@ -95,7 +95,7 @@ for (const s of [
     q: ['Kyonggi University', 'Kyonggi University campus', '경기대학교', 'Kyonggi University Suwon', '경기대학교 수원캠퍼스'] },
   { name: '서울교육대학교', must: /Seoul National University of Education|서울교육대|서울교대/i, not: /Station|역|logo|로고|부설|초등학교/i,
     q: ['Seoul National University of Education', '서울교육대학교', '서울교육대학교 정문', 'Seoul National University of Education campus'] },
-  { name: '한국방송통신대학교', must: /Korea National Open University|방송통신대|방송대|KNOU/i, not: /Station|역|logo|로고|소방|응급처치|지역대학|Regional/i,
+  { name: '한국방송통신대학교', must: /Korea National Open University|방송통신대|방송대|\bKNOU\b/i, not: /Station|역|logo|로고|소방|응급처치|지역대학|Regional/i,
     q: ['Korea National Open University', '한국방송통신대학교', '한국방송통신대학교 본부', 'Korea National Open University Daehangno', '방송통신대학교 대학로'] },
   { name: '전남대학교', must: /Chonnam National University|전남대/i, not: /Hospital|병원|Yeosu|여수|Hwasun|화순|Station|역|logo|로고|미술학과|졸업작품/i,
     q: ['Chonnam National University', 'Chonnam National University campus', '전남대학교', '전남대학교 정문', 'Chonnam National University Gwangju', '전남대학교 용봉'] },

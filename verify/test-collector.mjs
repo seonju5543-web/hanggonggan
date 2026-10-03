@@ -2536,6 +2536,7 @@ console.log('\n■ 학교 대표 사진 (2026-10-03 개발자 지시 "썸네일�
   eq('    사진의 공용 페이지 주소가 위키미디어 · 자를 자리 꼴', rows.filter((x) => !/^https:\/\/commons\.wikimedia\.org\/wiki\//.test(x.page || '') || !SP.FOCUS_RE.test(x.focus || '')).map((x) => x.src), []);
   eq('    폴더에 안 쓰는 그림이 남지 않는다', fs.readdirSync(new URL('assets/schools/', root)).filter((f) => f !== 'photos.json' && !rows.some((x) => x.src === `assets/schools/${f}`)), []);
   eq('    출처 줄 다듬기 — 위키미디어의 HTML 조각(Pixabay 문장)에서 이름만', SP.cleanAuthor('&lt;a href="https://pixabay.com/ko/"&gt;Pixabay&lt;/a&gt;로부터 입수된 &lt;a href="https://pixabay.com/ko/users/x/"&gt;HeungSoon&lt;/a&gt;님의 이미지 입니다.'), 'HeungSoon (Pixabay)');
+  eq('    이름 뒤 괄호 설명은 떼고 이름만 (긴 이름은 낱말 경계에서)', [SP.cleanAuthor('Yohan Lee(Sejong University student of class 25) 이요한(세종대학교 학번 25)'), SP.cleanAuthor('최광모 (Choe Kwangmo)'), SP.cleanAuthor('Saigen Jiro'), SP.cleanAuthor('myself (User:Piotrus)')], ['Yohan Lee 이요한', '최광모', 'Saigen Jiro', 'Piotrus']);
   /* ② 앱 — 카드를 실제로 그려 본다 (함수를 떼어 실행) */
   const env = `const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const safeUrl = (u) => u; const unent = (s) => s; const isBoardListLink = () => false;

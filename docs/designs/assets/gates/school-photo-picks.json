@@ -1,5 +1,5 @@
 {
- "note": "학교 대표 사진 — 눈으로 고른 기록 (2026-10-03). 학교마다 위키미디어 후보(docs/designs/assets/gates/manifest.json)를 열어 보고 최대 3장. by: 'review' = 고른 뒤 두 관점(정체·대표성 / 권리·안전)으로 반박해 봐도 남은 것 · 'rescue' = 그 반박이 '예쁘지 않다·작게 줄이면 흐리다'뿐이라 자를 자리를 고쳐 살린 것(사람·번호판·다른 캠퍼스 반박은 살리지 않는다). 시작 화면 14곳은 여기 없어도 승인받은 그 사진(manifest.picks)을 쓴다. 빌드: node tools/build-school-photos.mjs",
+ "note": "학교 대표 사진 — 눈으로 고른 기록 (2026-10-03 · 1차 + 2차 영문 검색어 후보). 학교마다 위키미디어 후보(docs/designs/assets/gates/manifest.json)를 열어 보고 최대 3장. by: 'review' = 고른 뒤 두 관점(정체·대표성 / 권리·안전)으로 반박해 봐도 남은 것 · 'rescue' = 그 반박이 '예쁘지 않다·작게 줄이면 흐리다'뿐이라 자를 자리를 고쳐 살린 것(사람·번호판·다른 캠퍼스 반박은 살리지 않는다). 시작 화면 14곳은 여기 없어도 승인받은 그 사진(manifest.picks)을 쓴다. 빌드: node tools/build-school-photos.mjs",
  "schools": {
   "숭실대학교": [
    {
@@ -137,6 +137,78 @@
     "focusSquare": "60% 55%",
     "what": "정문 회랑과 피라미드 지붕, 파란 하늘",
     "by": "rescue"
+   }
+  ],
+  "세종대학교": [
+   {
+    "file": "n1mo5fbn-2.jpg",
+    "focusSquare": "45% 60%",
+    "what": "한옥 지붕 정문과 소나무, 파란 하늘",
+    "by": "review"
+   },
+   {
+    "file": "n1mo5fbn-4.jpg",
+    "focusSquare": "55% 50%",
+    "what": "한옥 정문 너머 유리 건물",
+    "by": "review"
+   },
+   {
+    "file": "n1mo5fbn-3.jpg",
+    "focusSquare": "20% 50%",
+    "what": "시계탑과 교정 건물, 산과 하늘",
+    "by": "review"
+   }
+  ],
+  "동국대학교 WISE캠퍼스": [
+   {
+    "file": "n2we95k-2.jpg",
+    "focusSquare": "48% 40%",
+    "what": "잔디밭 너머 붉은 지붕 건물과 숲",
+    "by": "review"
+   }
+  ],
+  "광운대학교": [
+   {
+    "file": "n6xhy7d-2.jpg",
+    "focusSquare": "35% 40%",
+    "what": "학교 이름이 붙은 붉은 벽돌 건물과 나무",
+    "by": "review"
+   }
+  ],
+  "한국방송통신대학교": [
+   {
+    "file": "n1uf7bji-2.jpg",
+    "focusSquare": "55% 50%",
+    "what": "KNOU 표지가 붙은 붉은 벽돌 본교 건물",
+    "by": "review"
+   }
+  ],
+  "전남대학교": [
+   {
+    "file": "nwqmwga-1.jpg",
+    "focusSquare": "45% 50%",
+    "what": "시계탑이 있는 옛 본관(용봉관)과 소나무",
+    "by": "review"
+   },
+   {
+    "file": "nwqmwga-4.png",
+    "focusSquare": "50% 40%",
+    "what": "본관 앞 잔디밭과 화분, 파란 하늘",
+    "by": "review"
+   }
+  ],
+  "부경대학교": [
+   {
+    "file": "n1nesasz-6.jpg",
+    "focusSquare": "70% 35%",
+    "what": "한옥 정자가 있는 연못 정원",
+    "by": "review"
+   },
+   {
+    "file": "n1nesasz-3.jpg",
+    "focusSquare": "58% 40%",
+    "what": "본관 건물과 소나무",
+    "by": "review"
    }
   ]
  }

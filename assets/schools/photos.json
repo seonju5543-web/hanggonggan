@@ -157,6 +157,88 @@
     "what": "정문 회랑과 피라미드 지붕, 파란 하늘"
    }
   ],
+  "세종대학교": [
+   {
+    "src": "assets/schools/n1mo5fbn-aacf9b03.webp",
+    "focus": "45% 60%",
+    "credit": "Crimsonmaster · CC0",
+    "page": "https://commons.wikimedia.org/wiki/File%3ASejong_University_Gate.jpg",
+    "what": "한옥 지붕 정문과 소나무, 파란 하늘"
+   },
+   {
+    "src": "assets/schools/n1mo5fbn-609de713.webp",
+    "focus": "55% 50%",
+    "credit": "Yohan Lee 이요한 · CC BY-SA 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3ASejong_University_Front_Gate.jpg",
+    "what": "한옥 정문 너머 유리 건물"
+   },
+   {
+    "src": "assets/schools/n1mo5fbn-8f3179fe.webp",
+    "focus": "20% 50%",
+    "credit": "Sejong university · CC BY-SA 2.5",
+    "page": "https://commons.wikimedia.org/wiki/File%3ASejong_University_Campus.jpg",
+    "what": "시계탑과 교정 건물, 산과 하늘"
+   }
+  ],
+  "동국대학교 WISE캠퍼스": [
+   {
+    "src": "assets/schools/n2we95k-99e336f4.webp",
+    "focus": "48% 40%",
+    "credit": "Yerbol Nisanbayev · CC BY 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3ADormitory_Dongguk_University_Gyeongju.JPG",
+    "what": "잔디밭 너머 붉은 지붕 건물과 숲"
+   }
+  ],
+  "광운대학교": [
+   {
+    "src": "assets/schools/n6xhy7d-bad3cd5e.webp",
+    "focus": "35% 40%",
+    "credit": "Altostratus · CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AKwangwoon_University.jpg",
+    "what": "학교 이름이 붙은 붉은 벽돌 건물과 나무"
+   }
+  ],
+  "한국방송통신대학교": [
+   {
+    "src": "assets/schools/n1uf7bji-dc886138.webp",
+    "focus": "55% 50%",
+    "credit": "Bigsmile20 · CC BY-SA 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AKorea_National_Open_University.jpg",
+    "what": "KNOU 표지가 붙은 붉은 벽돌 본교 건물"
+   }
+  ],
+  "전남대학교": [
+   {
+    "src": "assets/schools/nwqmwga-f2c7fd97.webp",
+    "focus": "45% 50%",
+    "credit": "Saigen Jiro · CC0",
+    "page": "https://commons.wikimedia.org/wiki/File%3A518memorial_hall_in_Chonnam_National_University.JPG",
+    "what": "시계탑이 있는 옛 본관(용봉관)과 소나무"
+   },
+   {
+    "src": "assets/schools/nwqmwga-95fb4fcf.webp",
+    "focus": "50% 40%",
+    "credit": "박엘리샤 · CC BY-SA 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AChonnam_national_university2.png",
+    "what": "본관 앞 잔디밭과 화분, 파란 하늘"
+   }
+  ],
+  "부경대학교": [
+   {
+    "src": "assets/schools/n1nesasz-763fab82.webp",
+    "focus": "70% 35%",
+    "credit": "Hansol Jeong · Public domain",
+    "page": "https://commons.wikimedia.org/wiki/File%3APukyong_Natl_Univ_by_Ficell_006.jpg",
+    "what": "한옥 정자가 있는 연못 정원"
+   },
+   {
+    "src": "assets/schools/n1nesasz-01b56165.webp",
+    "focus": "58% 40%",
+    "credit": "Hansol Jeong · Public domain",
+    "page": "https://commons.wikimedia.org/wiki/File%3APukyong_Natl_Univ_by_Ficell_003.jpg",
+    "what": "본관 건물과 소나무"
+   }
+  ],
   "서울대학교": [
    {
     "src": "assets/schools/nsgh1oi-845ff74a.webp",
@@ -206,7 +288,7 @@
    {
     "src": "assets/schools/n1b3og5n-fd3ebd03.webp",
     "focus": "50% 50%",
-    "credit": "myself (User:Piotrus) · CC BY-SA 3.0",
+    "credit": "Piotrus · CC BY-SA 3.0",
     "page": "https://commons.wikimedia.org/wiki/File%3AHanyang_University_008.JPG",
     "what": "시작 화면 사진(승인)"
    }
