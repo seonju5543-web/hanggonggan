@@ -199,4 +199,27 @@ export default async function gate(eq, ctx) {
       [feedN(r1).length, feedN(r2), feedN(legacy), feedN(r3)],
       [1, [], [], ['가천대학교 새 공고 1건']]);
   }
+  /* ⑩ 확인 로봇 첫 실행(2026-10-04 02:55)의 오판 둘 — 정찰(run-probe 2026-10-03 · run 37142940191)이 연 진짜 화면 글자로 잰다.
+     ⓐ 서울과기대 상세(do=commonview): 제목이 머리글이 아니라 표의 「제목」 칸에 있고 화면에 다른 글 제목이 여럿 → 'list' 로 오판했다.
+        「제목」 이름표 바로 뒤가 그 공고 제목이면 그 글 화면이다(목록의 「제목」은 머리 칸이라 뒤에 「작성자」가 온다).
+     ⓑ 국민대: 게시판 줄 통째(분류 「등록금외지원」 + 제목 + 날짜·부서·담당자)가 기대 제목이라 'other' 로 오판했다 —
+        줄 꼬리(날짜 뒤 이름 몇 개)를 떼고, 제목의 대부분(60% · 12자 이상)이 이어서 보이면 본문 증거로 본다. */
+  {
+    const others = ['2026학년도 2학기 국가장학금 2차 신청 안내', '2026년 하반기 인천인재평생교육진흥원 장학생 선발 안내', '2026학년도 2학기 교내장학금 신청 안내'];
+    const ST = '장학공지 대학공지사항 학사공지 장학공지 대학원공지 장학금 신청 주요 일정 장학제도안내 바로가기 제목 [보건진료소] 2026학년도 2학기 국가근로장학생 모집 안내 작성자 학생지원과 조회수 1588 날짜 2026-08-20 첨부파일 모집공고.hwp 본문 근로장학생을 모집합니다 '
+      + others.join(' 학생지원과 2026-08-19 ') + ' '.repeat(10) + '가'.repeat(400);
+    const st = J.judgeLanding({ status: 200, requestedUrl: 'https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&bidx=894195', docTitle: '서울과학기술대학교 - 정보·민원서비스 - 대학정보알림 - 장학공지 - 상세내용', headings: [], text: ST,
+      titles: ['[보건진료소] 2026학년도 2학기 국가근로장학생 모집 안내'], otherTitles: others });
+    const LIST = '번호 제목 작성자 날짜 조회수 1 [보건진료소] 2026학년도 2학기 국가근로장학생 모집 안내 학생지원과 2026-08-20 1588 ' + others.map((t, i) => `${i + 2} ${t} 학생지원과 2026-08-1${i} 99`).join(' ') + '가'.repeat(400);
+    const lst = J.judgeLanding({ status: 200, requestedUrl: 'https://www.seoultech.ac.kr/service/info/janghak/?do=list', docTitle: '장학공지', headings: [], text: LIST,
+      titles: ['[보건진료소] 2026학년도 2학기 국가근로장학생 모집 안내'], otherTitles: others });
+    const KM = '국민대학교 대학소개 입학안내 KMU 소식 공지사항 장학공지 장학공지 2026년 하반기 인재육성 장학생 선발 계획 공고 작성일 2026.09.08 담당부서 대전청년내일재단 담당자 대전청년내일재단 ☎ 0427198451 조회수 12285 첨부파일 2026년 성취(대) 장학생 선발계획 공고.hwpx ' + '나'.repeat(1600);
+    const row = '등록금외지원 2026년 하반기 인재육성 장학생 선발 계획 공고 2026.09.08 대전청년내일재단 황새롬';
+    const km = J.judgeLanding({ status: 200, requestedUrl: 'https://www.kookmin.ac.kr/user/kmuNews/notice/7/12349/view.do?currentPageNo=1', docTitle: '장학공지:국민대학교', headings: ['국민대학교'], text: KM,
+      titles: J.expectTitles({ boardTitle: row, name: row }), otherTitles: [] });
+    const kmOther = J.judgeLanding({ status: 200, requestedUrl: 'https://www.kookmin.ac.kr/user/kmuNews/notice/7/12350/view.do', docTitle: '장학공지:국민대학교', headings: ['국민대학교'],
+      text: KM.replace('2026년 하반기 인재육성 장학생 선발 계획 공고', '2026학년도 2학기 국가근로장학생 모집 안내'), titles: J.expectTitles({ boardTitle: row, name: row }), otherTitles: [] });
+    eq('⑩ 정찰 실화면 — 서울과기대 「제목」 칸의 상세는 post · 같은 학교 목록 화면은 그대로 list · 국민대 줄 통째 제목도 post · 다른 글은 그대로 other',
+      [st.v, lst.v, km.v, kmOther.v, J.stripRowTail(row)], ['post', 'list', 'post', 'other', '등록금외지원 2026년 하반기 인재육성 장학생 선발 계획 공고']);
+  }
 }

@@ -36,6 +36,8 @@ export const BAD = SL.LINK_BAD;   // ['list','home','login','gone','other'] — 
 /* 게시판 행에서 제목에 딸려 온 꼬리 — `… 안내 학생지원팀 2026-09-02 1,076` · `… 2026.09.02 조회 12` · `… N` */
 export function stripRowTail(t) {
   return cleanTitle(t)
+    /* 날짜 뒤에 부서·담당자 이름이 붙은 줄 꼬리(국민대 `… 공고 2026.09.08 대전청년내일재단 황새롬` — 확인 로봇 첫 실행에서 '다른 글' 오판) */
+    .replace(/\s+20\d{2}[-./]\d{1,2}[-./]\d{1,2}\.?(?:\s+[가-힣A-Za-z]{2,12}){1,3}\s*$/, '')
     .replace(/\s+[가-힣A-Za-z]{2,12}\s+20\d{2}[-./]\d{1,2}[-./]\d{1,2}\.?(\s+[\d,]+)?\s*$/, '')
     .replace(/\s+20\d{2}[-./]\d{1,2}[-./]\d{1,2}\.?(\s+[\d,]+)?\s*$/, '')
     .replace(/\s+N\s*$/, '')
@@ -68,6 +70,29 @@ export function headMatches(title, head) {
   if (y.includes(x)) return true;                                       // 머리글이 제목을 통째로 품는다
   return x.includes(y) && y.length >= Math.max(8, Math.ceil(x.length * 0.7));   // 머리글이 제목의 거의 전부(잘린 제목)
 }
+/* 화면의 「제목」 이름표 바로 뒤가 그 공고 제목인가 — 상세 화면이 제목을 머리글이 아니라 표 칸(`<th>제목</th><td>…</td>`)에 두는 게시판
+   (서울과기대 commonview — 확인 로봇 첫 실행에서 아래에 다른 글 제목이 보여 '목록'으로 오판). 목록 화면의 「제목」은 머리 칸이라
+   뒤에 「작성자·날짜」가 온다 — 그래서 이름표 뒤 첫머리가 그 제목일 때만 센다. */
+const TITLE_LABEL = /(?:^|\s)(?:글\s?)?제\s?목\s*[:：]?\s*/g;
+export function labeledTitle(text, title) {
+  const k = titleFingerprint(title);
+  if (k.length < 8) return false;
+  const src = String(text || '');
+  const head = k.slice(0, Math.min(k.length, 24));
+  for (const m of src.matchAll(TITLE_LABEL)) {
+    const after = titleFingerprint(src.slice(m.index + m[0].length, m.index + m[0].length + 200));
+    if (after.startsWith(head)) return true;
+  }
+  return false;
+}
+/* 제목의 대부분이 본문에 이어서 보이는가 — 게시판 줄 앞머리 분류(국민대 「등록금외지원」)처럼 화면 제목에는 없는 글자가 기대 제목에
+   붙어 있을 때. 60% 이상 · 12자 이상이 끊김 없이 같아야 한다(다른 공고의 비슷한 이름이 걸리지 않게). */
+function longRunIn(body, k) {
+  const need = Math.max(12, Math.ceil(k.length * 0.6));
+  if (k.length < need) return false;
+  for (let i = 0; i + need <= k.length; i += 1) if (body.includes(k.slice(i, i + need))) return true;
+  return false;
+}
 export function titleEvidence({ titles, docTitle, headings, text }) {
   const heads = [docTitle || '', ...(headings || [])].filter(Boolean);
   const body = fp(text);
@@ -77,8 +102,10 @@ export function titleEvidence({ titles, docTitle, headings, text }) {
   let weak = false;
   for (const t of titles || []) {
     if (heads.some((h) => headMatches(t, h))) return 'strong';
+    if (labeledTitle(text, t)) return 'strong';
     const k = titleFingerprint(t);
     if (k.length >= 8 && [body, bodyT].some((b) => b.includes(k) || (k.length >= 24 && b.includes(k.slice(0, 24))))) weak = true;
+    if (!weak && k.length >= 12 && longRunIn(bodyT, k)) weak = true;
     const core = titleCore(t);
     if (!weak && core.length >= 6 && body.includes(fp(core))) weak = true;
   }
