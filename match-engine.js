@@ -19,7 +19,7 @@ const PR = (typeof module !== 'undefined' && module.exports)
   /* 🔴 브라우저에서는 **전역 함수**로 쓴다 — 여기에 이름을 빠뜨리면 Node 검사는 전부
      통과하는데 앱은 첫 카드에서 죽는다. `headRest`(section-head)에 이어 `caseBranch`도
      같은 실수를 했다(2026-08-24). 아래 회귀가 브라우저 순서로 실어 실제로 불러 본다. */
-  : { parseLine, parseDegree, gradOnly, gradTarget, mentionsUndergrad, caseBranch, unaskedAttr, hasTopLevelOr, orBranches, REGIONS, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM, TRAIT_PAT };
+  : { parseLine, parseDegree, gradOnly, gradTarget, mentionsUndergrad, caseBranch, unaskedAttr, hasTopLevelOr, orBranches, REGIONS, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM, TRAIT_PAT, provincesOfCity };
 const PR2 = PR;   // requirementLines가 쓰는 별칭 (선언 순서 때문에 이름만 따로 둔다)
 /* 시·도 이름은 parse-requirements 가 갖고 있다 — 여기 베끼면 두 벌이 된다 */
 const PR_REGIONS = PR.REGIONS || [];
@@ -408,7 +408,16 @@ function judgeCond(c, p, ctx) {
       const cities = (c.cities || []).concat(c.inArea && ctx && ctx.homeCity ? [ctx.homeCity] : []);
       const myCities = [p.regionCity, p.parentRegionCity].filter(Boolean);
       if (cities.length) {
-        if (!myCities.length) return 'unknown';                 // 아직 안 고른 학생
+        if (!myCities.length) {
+          /* 🔴 시·군을 안 고른 학생도 **시·도가 다르면** 미달이다 (2026-10-03 개발자 지시 "완벽하게") — 서울 학생에게 `구리시 거주` 는
+             구리시가 경기라 받을 수 없다. 표는 parse-requirements 의 REGION_CITIES 하나(provincesOfCity).
+             ⚠️ 같은 이름이 여러 시·도에 있으면(`강서구` 서울·부산) 그중 하나라도 학생 시·도면 '모름' — 어느 쪽인지 모른다.
+             ⚠️ 표에 없는 이름(`경기북부`)은 시·도를 몰라 '모름' 이다. 학생 시·도와 같으면 시·군을 몰라 '모름' 이다. */
+          const mineProv = [p.region, p.parentRegion].filter(Boolean);
+          const provs = cities.map((x) => PR.provincesOfCity(x));
+          if (!mineProv.length || provs.some((ps) => !ps.length)) return 'unknown';
+          return provs.some((ps) => ps.some((r) => mineProv.includes(r))) ? 'unknown' : 'fail';
+        }
         if (cities.some((r) => myCities.includes(r))) return 'pass';
         /* 🔴 학생이 **직접 고른** 시·군과 다르면 미달이다 — 안양시 학생에게 광양시 장학금은
            받을 수 없는 것이다. 예전에는 여기서도 'unknown' 을 내서, 시·군을 받아 놓고도
@@ -1286,7 +1295,8 @@ function requirementLines(sch, lines, opts) {
        `학업성적(50) + 취창업준비계획(20) + 면접(30)` 은 괄호를 떼면 `학업성적 + …` 가 되어
        배점표 규칙이 무력해진다 — 배점표가 지원 자격으로 새는 것이 개발자가 네 번 지적한 그 잡음이다.
        아래의 '괄호는 부연' 규칙과 반대 방향이라, 순서로 갈라 둔다. */
-    const STRUCT_NOISE = /\(\d{1,3}\)\s*\+.*\(\d{1,3}\)|\(\d+\s?%\)\s*$|\(\d{1,3}\s?점\)/;
+    /* `성적 35% + 생활정도 50% + 경주시 거주기간 15%` — 퍼센트를 더하는 배점표도 같은 부류다(2026-10-03 · 사는 곳 판정이 이 줄을 '미달 이유'로 띄웠다) */
+    const STRUCT_NOISE = /\(\d{1,3}\)\s*\+.*\(\d{1,3}\)|\(\d+\s?%\)\s*$|\(\d{1,3}\s?점\)|\d{1,3}\s?%\s*\+.*\d{1,3}\s?%/;
     if (!loose && STRUCT_NOISE.test(t)) continue;
     /* 잡음 판정은 **원문 줄에서 괄호 부연만 뗀 것**으로 본다.
        · 원문으로 봐야 하는 이유 — `^배점`·`^총점` 처럼 **줄 앞**을 보는 규칙이 있는데,

@@ -2,6 +2,7 @@
    data.js 는 브라우저 스크립트라 require 할 수 없다. 표를 새로 만들지 않고 앱의 것을 그대로 쓴다 —
    publish-majors.mjs 에 있던 것을 2026-09-30 여기로 옮겼다(교내·교외 증거 판정기가 같은 것을 써야 해서 · 베끼지 않는다). */
 import fs from 'node:fs';
+import { createRequire } from 'node:module';
 
 export function loadSchoolNames(dataJsUrl) {
   const src = fs.readFileSync(dataJsUrl, 'utf8');
@@ -16,7 +17,8 @@ export function loadSchoolNames(dataJsUrl) {
     alias.set(m[1], m[2]);
   }
   /* 지역 이름(REGION_CITIES 의 열쇠 — 서울·부산·경기·세종…) — 학교 짧은 이름과 겹치는 것을 가려내는 데 쓴다 */
-  const regions = new Set([...block('const REGION_CITIES = {').matchAll(/^\s*"([가-힣]+)"\s*:/gm)].map((m) => m[1]));
+  /* 표는 parse-requirements.js 에 있다(2026-10-03 data.js 에서 옮김 — 판정·알림과 한 벌) */
+  const regions = new Set(Object.keys(createRequire(import.meta.url)('../parse-requirements.js').REGION_CITIES));
   if (!unis.size) throw new Error('data.js 에서 UNIVERSITIES 를 못 읽었습니다 — 파일 모양이 바뀐 것 같습니다');
   return { unis, alias, regions };
 }
