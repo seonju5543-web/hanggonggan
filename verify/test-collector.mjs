@@ -11174,13 +11174,26 @@ console.log('\n■ 대외활동·공모전 — 첨부·포스터 읽기 (2026-10
   eq('  AI 가 고른 글 제목 줄은 자격이 아니다(관문의 \'청년\' 신호를 제목이 통과한다)', [AD.isTitleLine('용산 청년지음 <진로 고민 워크숍> 참여자 모집', '용산 청년지음 <진로 고민 워크숍> 참여자 모집'), AD.isTitleLine('만 19~34세 청년', '용산 청년지음 <진로 고민 워크숍> 참여자 모집')], [true, false]);
   eq('  무료 재시도는 두 번까지 · 이레 간격', [AD.dueFree(undefined, '2026-10-03'), AD.dueFree({ at: '2026-10-01', tries: 1 }, '2026-10-03'), AD.dueFree({ at: '2026-09-20', tries: 1 }, '2026-10-03'), AD.dueFree({ at: '2026-09-01', tries: 2 }, '2026-10-03')], [true, false, true, false]);
   /* 포스터 OCR 은 그 글의 그림일 때만 — 글 제목 낱말이 그림 글자에 있어야 한다(사이트 옆 홍보물이 남의 자격으로 붙을 뻔했다) */
-  const ocrRead = (txt) => AD.eligFromFiles({ title: '청년 체인지메이커 아카데미 운영' }, ['x-0.jpg'], () => txt, '/tmp', () => true);
+  const ocrRead = (txt) => AD.eligFromFiles({ title: '청년 체인지메이커 아카데미 운영' }, ['x-0i.jpg'], () => txt, '/tmp', () => true);   // 이름 끝 i = 페이지에서 주운 그림
   eq('  🔴 OCR 글자에 글 제목 낱말이 없으면 그 글의 자격이 아니다(제주 공공임대 홍보물) · 있으면 읽는다',
     [ocrRead('제주 행복주택 입주자 모집\n○ 지원대상 : 대한민국 국민 누구나'), (ocrRead('청년 체인지메이커 아카데미\n모집대상 : 도내 거주 청년 누구나') || {}).from], [null, '공고문 첨부(OCR)']);
   eq('  제목 낱말은 흔한 말(모집·안내·청년·공모전)을 빼고 센다', AD.titleWords('[공고] 2026 청년 체인지메이커 아카데미 운영 모집'), ['체인지메이커', '아카데미']);
   const py = readText(new URL('../collector/paddle-ocr.py', import.meta.url));
   eq('  PaddleOCR — 한국어 인식 모델을 이름으로(안 그러면 중국어 모델이 붙어 한글이 빠졌다) · 확신도 0.8 · 긴 변 2000px · 예산',
     [/text_recognition_model_name='korean_PP-OCRv5_mobile_rec'/.test(py), /MIN_SCORE = 0\.8/.test(py), /MAX_SIDE = 2000/.test(py), /--budget-sec=/.test(py)], [true, true, true, true]);
+  /* ⑥ 더 찾기 (2026-10-04 개발자 지시 "100퍼센트로 자격을 뽑을 순 없는거야 … 나중에 꼬이지 않게") — 출처만 늘리고 규칙은 activityDetails 하나 */
+  const guideHtml = '<a href="/guide/rule.do">대회 요강</a><a href="/notice/2">자세히 보기</a><a href="/apply">모집 안내</a><a href="https://other.go.kr/x">공고문</a><a href="/files/a.pdf">공고문</a>';
+  eq('⑥ 따라갈 링크 — 이름이 분명한 것(요강·공고문)만 · 같은 사이트만 · 파일 링크는 첨부 몫 · `자세히 보기`·`모집 안내` 는 안 간다(다른 사업으로 갔다)',
+    AD.guideLinks(guideHtml, 'https://hack.kr/main'), ['https://hack.kr/guide/rule.do']);
+  const linkRead = (txt) => AD.eligFromFiles({ title: '2026 스페이스 해커톤' }, ['k-L0.txt'], () => txt, '/tmp', () => false);
+  eq('  🔴 따라간 요강 페이지도 글 제목 낱말이 있어야 그 글의 것 — 재단의 다른 장학금 안내가 붙을 뻔했다',
+    [linkRead('장학금 안내\n참가자격 : 대학교 2학년 이상'), (linkRead('2026 스페이스 해커톤 대회 요강\n참가자격 : 위성정보에 관심있는 대학생·대학원생 및 일반인') || {}).from], [null, '요강 페이지']);
+  eq('  제목 낱말은 대괄호 안도 센다(`[구리시 청년성장프로젝트]`) · 꼬리표(`[일반]`)는 아니다', AD.titleWords('[일반] [구리시 청년성장프로젝트] 10월 청년역량강화 참가자 모집').slice(0, 2), ['구리시', '청년성장프로젝트']);
+  eq('  읽는 순서 — 요강 페이지 글자 → HWP·DOCX → OCR', AD.fileOrder(['a-0i.jpg', 'a-1.hwp', 'a-L0.txt', 'a-2.pdf']), ['a-L0.txt', 'a-1.hwp', 'a-0i.jpg', 'a-2.pdf']);
+  eq('  자격 칸 제목 — `모집대상 구리시 거주 …`(콜론 없는 OCR 줄)은 이름표 · `참가 자격부터 … 확인하세요` 는 안내 문장',
+    [AX.activityDetails('모집대상 구리시 거주 또는 생활권 청년\n*15세 이상~39세 이하', '구리시').eligibilityLines.length > 0, AX.activityDetails('참가 자격부터 제출 형식, 심사와 시상까지 확인하세요.\n1. 대회소개 고용 해커톤', '해커톤').eligibilityLines], [true, []]);
+  eq('  줄글 — `관심 있는 국민이면 누구나 참가할 수 있으며` · `재학생을 대상으로` 는 이름표 줄이 없을 때만 원문 그대로',
+    [AX.activityDetails('모바일신분증에 관심 있는 국민이면 누구나 참가할 수 있으며 , 아이디어를 제출하면 된다 .').eligibilityLines.length, AX.activityDetails('심리상담실에서는 재학생을 대상으로 특강을 연다\n○ 신청자격 : 본교 재학생').eligibilityLines], [1, ['○ 신청자격 : 본교 재학생']]);
   /* ④ 유료 — 꺼져 있으면 부르지 않는다(설정 enabled 와 버튼의 ELIG_AI_ENABLE 둘 다 없을 때). 실제로 돌려 본다 */
   const env = { ...process.env }; delete env.ELIG_AI_ENABLE; delete env.ANTHROPIC_API_KEY; delete env.ELIG_AI_FAKE; delete env.ACTIVITY_DOCS_AS_LIB;
   const before = readText(new URL('../data/activities.json', import.meta.url));
@@ -11197,6 +11210,8 @@ console.log('\n■ 대외활동·공모전 — 첨부·포스터 읽기 (2026-10
       wc.indexOf('대외활동 첨부·포스터 자격 읽기') > 0 && wc.indexOf('대외활동 첨부·포스터 자격 읽기') < wc.indexOf('- name: 데이터 관문'), /git add collector\/act-docs\.json/.test(wc),
       /^collector\/act-files\/$/m.test(readText(new URL('../.gitignore', import.meta.url))), /activity-docs\.mjs --ai/.test(wc)],
     [true, true, true, true, true, false]);
+  eq('  PaddleOCR — PDF 공고문은 쪽 그림으로(pdftoppm) 같은 눈으로 · 수집 워크플로가 poppler-utils 를 깐다',
+    [/pdftoppm/.test(py) && /PDF_PAGES = \d/.test(py), /apt-get install -y -qq poppler-utils[\s\S]*paddle-ocr\.py/.test(step)], [true, true]);
   eq('  버튼 워크플로 — 대외활동 AI 는 스위치(ELIG_AI_ENABLE)를 그 단계에서만 · 결과를 저장 · 감사에 걸리면 되돌린다',
     [/- name: 대외활동 — 포스터·첨부·본문 AI 읽기[\s\S]*?ELIG_AI_ENABLE: '1'[\s\S]*?activity-docs\.mjs --ai --write/.test(we), /git add data\/activities\.json/.test(we), /git checkout -- data\/registered\.json data\/activities\.json/.test(we)],
     [true, true, true]);
