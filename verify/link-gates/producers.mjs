@@ -233,4 +233,26 @@ export default async function gate(eq, ctx = {}) {
       [/rows\.find\(\(r\) => rowMatchesTitle\(want, r\.t\)\)/.test(rz), /rows\.findIndex\(\(r\) => rowMatchesTitle\(want, r\.t\)\)/.test(lh), /rows\.(find|findIndex)\(\(r\) => sameTitle\(want, r\.t\)/.test(rz + lh)],
       [true, true, false]);
   }
+  /* ⑨ 학교별 파일 고치기(patchUrlsBySchool)는 순위를 낮추지 않는다 (2026-10-03 배포 직후 실측 — 사냥꾼이 이 함수로
+     복구 로봇이 학교별 파일에만 찾아 둔 항공대 진짜 주소 2건을 notices.json 의 옛 목록 표식으로 덮었다) */
+  {
+    const os = await import('node:os');
+    const path = await import('node:path');
+    const { patchUrlsBySchool } = await import('../../collector/publish-notices.mjs');
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'patch-rank-'));
+    const REAL = 'https://kau.ac.kr/kaulife/scholnoti.php?code=s1301&page=3&mode=read&seq=10681';
+    const MARK = 'https://kau.ac.kr/kaulife/scholnoti.php#n-%EC%B2%AD%EB%85%84';
+    const REAL2 = 'https://kau.ac.kr/kaulife/scholnoti.php?code=s1301&mode=read&seq=10900';
+    fs.writeFileSync(path.join(dir, 'k.json'), JSON.stringify({ school: '한국항공대학교', items: [
+      { school: '한국항공대학교', title: '2026년 2학기 청년창업농장학금 신청 안내', url: REAL },
+      { school: '한국항공대학교', title: '2026학년도 산학협동재단 장학생 선발 안내', url: MARK },
+    ] }, null, 1));
+    const r = patchUrlsBySchool([
+      { school: '한국항공대학교', title: '2026년 2학기 청년창업농장학금 신청 안내', url: MARK },
+      { school: '한국항공대학교', title: '2026학년도 산학협동재단 장학생 선발 안내', url: REAL2 },
+    ], { dir: new URL(`file://${dir}/`) });
+    const got = JSON.parse(fs.readFileSync(path.join(dir, 'k.json'), 'utf8')).items.map((n) => n.url);
+    fs.rmSync(dir, { recursive: true, force: true });
+    eq('⑨ 학교별 파일 고치기는 진짜 주소를 목록 표식으로 덮지 않고(항공대 실측 꼴) · 표식은 진짜 주소로 고친다', [r.fixed, got], [1, [REAL, REAL2]]);
+  }
 }

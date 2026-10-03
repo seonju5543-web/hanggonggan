@@ -104,6 +104,15 @@ export function clickRowKey(listUrl, title) {
   return `click:${urlKey(listUrl)}|${t.slice(0, 80)}`;
 }
 
+/* 주소 하나의 순위(작을수록 낫다) — 진짜 주소 0 · HTML 기호가 남은 주소 1 · 목록 표식 2 · 목록 주소+번호 3.
+   병합(preferNotice)과 학교별 파일 고치기(publish-notices.mjs patchUrlsBySchool)가 같이 쓴다 — 🔴 순위를 낮추는 쪽으로는 고치지 않는다. */
+export function noticeUrlRank(url) {
+  const u = String(url || '');
+  if (u.includes('#n-')) return 2;
+  if (isListPlusId(u)) return 3;
+  return URL_AMP_ANY.test(u) ? 1 : 0;
+}
+
 /* 두 항목 중 사용자에게 더 나은 쪽 — 공고로 바로 가는 진짜 주소를 남긴다
    (클릭형 표식은 게시판 목록까지만 열린다) */
 export function preferNotice(a, b) {
@@ -113,12 +122,7 @@ export function preferNotice(a, b) {
         표식이 그보다 앞서는 이유: 표식은 앱이 '게시판 목록'이라 부르고 링크 사냥꾼이 진짜 주소를 찾아 나서는 대상이다. */
   /* (2026-10-03 리뷰 F4) HTML 기호(&#038;)가 남은 주소는 같은 주소의 되돌린 판보다 뒤 — 동점이면 '먼저 온 쪽'(병합의 우리 쪽)을
      남겨, 기본 브랜치의 깨진 판이 고친 판을 되돌리고 있었다. 앱은 되돌려 열지만 감사·장부가 다시 깨진다. */
-  const rank = (n) => {
-    const u = n.url || '';
-    if (u.includes('#n-')) return 2;
-    if (isListPlusId(u)) return 3;
-    return URL_AMP_ANY.test(u) ? 1 : 0;
-  };
+  const rank = (n) => noticeUrlRank(n.url);
   if (rank(a) !== rank(b)) return rank(a) < rank(b) ? a : b;
   /* 🔴 힌트는 **있기만 하면** 점수를 주고 있었다 (2026-09-12 코드 리뷰). 그래서 청소한 판과
      옛 판이 합쳐지면 **버린 쓰레기 힌트가 이긴다** — 병합기가 `까지 나 . 선발 : 10 월…` 을

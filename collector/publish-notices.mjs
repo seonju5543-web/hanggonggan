@@ -37,7 +37,7 @@ const { noticeFileKey } = require('../match-engine.js');
    그 검사가 잡으려는 것(옛 이름이 문자열 안에 남는 사고)은 계속 잡혀야 한다. */
 const SERVED_SCHOOLS = require('../match-engine.js').SERVED_SCHOOLS;
 /* 제목 열쇠는 수집기·중복 판정과 같은 규칙을 쓴다 — 베끼면 갈라진다 */
-import { titleKey } from './url-key.mjs';
+import { titleKey, noticeUrlRank } from './url-key.mjs';
 
 /* 학교 하나가 가질 수 있는 공고 수. 전체 상한(capNotices)과 달리 **다른 학교에 밀려
    줄어들지 않는다** — 학생은 자기 파일만 받으므로 옆 학교가 바쁘든 말든 상관없다. */
@@ -131,7 +131,9 @@ export function patchUrlsBySchool(items, opts = {}) {
     let changed = 0;
     for (const n of doc.items || []) {
       const url = want.get(titleKey(n));
-      if (url && url !== n.url) { n.url = url; changed += 1; }
+      /* 🔴 순위를 낮추는 쪽으로는 고치지 않는다 (2026-10-03 실측) — 복구 로봇이 학교별 파일에만 찾아 둔 항공대 진짜 주소 2건을
+         사냥꾼이 이 함수로 notices.json 의 옛 목록 표식으로 덮었다(notices.json 은 그 글을 아직 표식으로 들고 있었다). */
+      if (url && url !== n.url && noticeUrlRank(url) <= noticeUrlRank(n.url)) { n.url = url; changed += 1; }
     }
     if (changed) {
       fs.writeFileSync(path, JSON.stringify(doc, null, 1));
