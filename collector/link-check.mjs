@@ -312,7 +312,7 @@ while (remaining.length) {
   const t = remaining.splice(pick.index, 1)[0];
   const obs = await observe(t);
   lastHit.set(t.host, Date.now());
-  const verdict = judgeLanding({ ...obs, requestedUrl: t.url, titles: t.titles, otherTitles: otherTitlesFor(t, targets, siteTitles) });
+  const verdict = judgeLanding({ ...obs, requestedUrl: t.url, titles: t.titles, titlesFromNameOnly: !!t.nameOnly, otherTitles: otherTitlesFor(t, targets, siteTitles) });
   const final = obs.finalUrl && obs.finalUrl !== t.url ? obs.finalUrl : undefined;
   /* decisive(404·401·첫 화면으로 돌려보냄)·wasBad(앞선 날 이미 문제)는 hostGuard 가 막힘을 잴 때 쓴다(리뷰 LC-1) */
   const wasBad = !!(state[t.url] && BAD.includes(state[t.url].v));

@@ -603,6 +603,28 @@ function unent(s) {
 const PARTIAL_ENTITY_END = /&(?:[a-z]{1,7}|#\d{0,6}|#x[0-9a-f]{0,5})?$/;
 const hintText = (s) => unent(s).replace(PARTIAL_ENTITY_END, '').trim();
 
+/* 🔴 서비스워커 엇갈림 대비 — source-link.js 가 안 실려 있을 때 (2026-10-03 리뷰 APP-1 · 실제 서비스워커로 재현).
+   새 app.js 가 **옛 index.html**(캐시 — 첫 요청이 3.5초를 넘기면 서비스워커가 캐시를 내준다)과 만나면 source-link.js 태그가 없어
+   sourceLink 가 없다 → 상세 시트가 통째로 죽고 홈이 '불러오는 중'에 굳었다. 옛 match-engine.js 에 대한 같은 대비가 loadNotices 에 있다.
+   그 한 번은 **글자 없는 자리표**로 버티고(이름 글자는 source-link.js 한 곳에만 — 여기 베끼지 않는다), 파일을 직접 불러
+   다 실리면 장부를 다시 넘기고 화면을 다시 그린다. 보통 수십 ms 다. */
+if (typeof sourceLink !== 'function') {
+  const g = (typeof window !== 'undefined') ? window : globalThis;
+  g.decodeUrlEntities = g.decodeUrlEntities || ((u) => String(u == null ? '' : u).trim());
+  g.linkShape = g.linkShape || (() => 'page');   // 자리표의 갈래는 늘 글(post)이라 목록 꼴을 물을 일이 없다 — 꼴 규칙은 source-link.js 한 곳
+  g.setLinkChecks = g.setLinkChecks || (() => {});
+  g.sourceLink = (item) => ({ href: String((item && (item.sourceUrl || item.url)) || ''), kind: 'page', cls: 'post', label: '', hint: '', caution: '' });
+  if (typeof document !== 'undefined' && document.createElement) {
+    const s = document.createElement('script');
+    s.src = 'source-link.js';
+    s.onload = () => {
+      try { if (typeof linkChecksDoc !== 'undefined') setLinkChecks(linkChecksDoc); } catch (e) { /* 장부 없음 */ }
+      try { rerenderVisible(); } catch (e) { /* 아직 첫 그림 전 — 첫 그림이 진짜 이름을 쓴다 */ }
+    };
+    (document.head || document.documentElement).appendChild(s);
+  }
+}
+
 /* 외부 링크 안전화 — http(s)·mailto만 허용한다. 수집 로봇이 받아 온 데이터가 오염되거나
    정식 등록에 오타가 있어도 javascript:·data: 같은 위험한 스킴이 href나 window.open으로
    들어가지 못하게 막는 2차 방어선(CSP가 뚫리거나 완화돼도 안전). 허용 안 되면 빈 문자열. */
@@ -612,7 +634,7 @@ function safeUrl(u) {
      안 되돌리면 브라우저가 `#038;uid=392` 를 조각(fragment)으로 읽어 글 번호가 서버에 안 가고
      공고 대신 메뉴 화면이 열린다(서울대 학생처 실측). 규칙은 source-link.js 의 decodeUrlEntities
      한 곳 — 이 자리에서 풀어 두면 원문 링크·첨부·제출처 바로가기가 **전부 한 번에** 고쳐진다. */
-  u = decodeUrlEntities(u);
+  u = decodeUrlEntities(u);   // (자리표가 있을 때는 그대로 돌려준다 — 위 엇갈림 대비)
   try {
     /* 🔴 기준은 `location.origin` 이 아니라 **앱이 놓인 자리**(`document.baseURI`) 다
        (2026-09-12). 앱은 `…github.io/hanggonggan/` 에 있는데 origin 을 기준으로 풀면

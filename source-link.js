@@ -15,7 +15,7 @@
 
    이 파일이 하는 일 — 화면은 링크 이름을 **여기서만** 받는다:
      · decodeUrlEntities — `&#038;`·`&amp;` 가 박힌 주소를 되돌린다(안 하면 `#` 뒤가 조각이 돼 글 번호가 사라진다)
-     · linkShape         — 주소 꼴: 'none' · 'marker'(#n- 게시판 목록 표식) · 'listid'(목록 주소+번호 — 목록이 열린다) · 'home'(사이트 첫 화면) · 'page'
+     · linkShape         — 주소 꼴: 'none' · 'marker'(#n- 게시판 목록 표식) · 'listid'(목록 주소+번호 — 목록이 열린다) · 'home'(index·main 파일) · 'root'(맨 도메인 — 화면에선 page) · 'page'
      · setLinkChecks     — 원문 링크 확인 로봇(collector/link-check.mjs)이 **새 탭으로 열어 본 결과** 중
                            '그 공고가 아니었다'가 확정된 것(data/link-check.json 의 bad)을 받는다
      · linkKind          — 종류 하나: post 계열('page') · 목록('list') · 홈페이지('home'·'foundation-home'·'program')
@@ -65,7 +65,10 @@ function linkShape(u) {
   try { x = new URL(s); } catch (e) { return 'none'; }
   if (x.search && x.search !== '?') return 'page';
   const segs = x.pathname.split('/').filter(Boolean);
-  if (!segs.length) return 'home';
+  /* 🔴 맨 도메인('/')은 'root' — 화면에서는 보통 주소와 같다 (2026-10-03 리뷰 APP-2). 정책브리핑 공모전은 `maicon.kr/`·
+     `112contest2026.com/` 처럼 **공모전 전용 사이트의 첫 화면이 곧 그 공모전**이라, 꼴만 보고 '주최 측 홈페이지 — 제목으로 찾아 주세요'라
+     하면 없는 글을 찾게 만든다. 진짜 기관 첫 화면인지는 원문 링크 확인 로봇이 열어 보고 'home' 으로 확정한다(층2는 sourceKind 로 따로). */
+  if (!segs.length) return 'root';
   if (segs.length <= 2 && HOME_FILE_RE.test(segs[segs.length - 1])) return 'home';
   return 'page';
 }

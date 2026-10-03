@@ -557,9 +557,11 @@ function officialChannel(sch) {
        확정한 주소는 (확인 필요). ⚠️ source-link.js 를 못 실은 곳(이 파일만 싣는 Node 검사)에서는 예전처럼 보통 주소로 본다. */
     const cls = typeof sourceLink === 'function' ? sourceLink(sch, 'detail').cls : 'post';
     const name = (what) => (knownProvider ? `${sch.provider} (${what})` : what);
-    const label = cls === 'list' ? name('게시판 목록에서 이 공고 찾기')
+    /* 🔴 이름은 **명사**로 — 'OO에서 공식 제출을 마치셨나요?'·'최종 제출처: OO' 처럼 문장 안에 들어간다(리뷰 APP-3 ·
+       '…찾기에서 공식 제출을' 이 됐다). 할 일(제목으로 찾기)은 링크 옆 안내 문장(sourceLink hint)이 말한다. */
+    const label = cls === 'list' ? name('게시판 목록')
       : cls === 'home' ? name('홈페이지')
-      : cls === 'trouble' ? name('원문 공고의 접수 방법 · 주소 확인 필요')
+      : cls === 'trouble' ? name('원문 공고의 접수 방법(주소 확인 필요)')
       : name('원문 공고의 접수 방법');
     return { label, url: sch.sourceUrl, guide };
   }

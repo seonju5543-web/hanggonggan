@@ -71,11 +71,14 @@ export function headMatches(title, head) {
 export function titleEvidence({ titles, docTitle, headings, text }) {
   const heads = [docTitle || '', ...(headings || [])].filter(Boolean);
   const body = fp(text);
+  /* (리뷰 F2) 제목 쪽은 titleFingerprint 로 날짜·[머리말]·조회수를 떼는데 본문은 fp 로만 다듬어, 제목에 날짜가 든 공고
+     (`… 봄내장학생 선발 안내 (2026.09.28.(월) ~ 2026.10.07.(수))`)는 본문에 그대로 있어도 못 찾았다 → 같은 손질로도 본다. */
+  const bodyT = titleFingerprint(text);
   let weak = false;
   for (const t of titles || []) {
     if (heads.some((h) => headMatches(t, h))) return 'strong';
     const k = titleFingerprint(t);
-    if (k.length >= 8 && (body.includes(k) || (k.length >= 24 && body.includes(k.slice(0, 24))))) weak = true;
+    if (k.length >= 8 && [body, bodyT].some((b) => b.includes(k) || (k.length >= 24 && b.includes(k.slice(0, 24))))) weak = true;
     const core = titleCore(t);
     if (!weak && core.length >= 6 && body.includes(fp(core))) weak = true;
   }
@@ -100,12 +103,15 @@ export function judgeLanding(obs) {
   const compact = text.replace(/\s/g, '');
   const ev = titleEvidence({ titles: o.titles, docTitle: o.docTitle, headings: o.headings, text });
   const listy = looksLikeList(text, o.otherTitles || []);
+  /* 첫 화면 꼴 — index·main 파일('home')과 맨 도메인('root') 둘 다. 화면 이름은 root 를 보통 주소로 두지만(공모전 전용 사이트),
+     판정에서는 '첫 화면으로 돌려보내짐'·'첫 화면인데 제목이 없음'의 근거로 쓴다. */
+  const homeish = (s) => s === 'home' || s === 'root';
   const reqShape = linkShape(o.requestedUrl);
   const finShape = o.finalUrl ? linkShape(o.finalUrl) : reqShape;
 
   /* 🔴 돌려보내진 증거가 제목보다 먼저다 (리뷰 LC-2) — 지워진 글·만료된 링크가 첫 화면으로 돌려보내지면 첫 화면의
      '최근 공지' 띠에 그 제목이 보여도 학생이 보는 것은 첫 화면이다. */
-  if (finShape === 'home' && reqShape !== 'home') return { v: 'home', why: '사이트 첫 화면으로 돌려보내짐', decisive: true };
+  if (homeish(finShape) && !homeish(reqShape)) return { v: 'home', why: '사이트 첫 화면으로 돌려보내짐', decisive: true };
   if (ev === 'strong') return { v: 'post', why: '제목 자리에 그 공고 제목' };
   if (ev === 'weak') return listy ? { v: 'list', why: '제목은 보이나 다른 공고 제목이 여럿 함께 보임(목록)' } : { v: 'post', why: '본문에 그 공고 제목' };
 
@@ -115,12 +121,15 @@ export function judgeLanding(obs) {
   if (compact.length < 300) return { v: 'unread', why: `본문이 안 그려짐(${compact.length}자 — 판정 불가)` };
   if (looksLikeLoginWall(text, o.hasPassword)) return { v: 'login', why: '로그인 요구(제목이 안 보임)' };
   if (listy) return { v: 'list', why: '다른 공고 제목만 여럿 보임(목록)' };
-  if (reqShape === 'home') return { v: 'home', why: '사이트 첫 화면(제목이 안 보임)' };
+  if (homeish(reqShape)) return { v: 'home', why: '사이트 첫 화면(제목이 안 보임)' };
   if (!POST_MARK.test(text)) {
     return compact.length >= 1500
       ? { v: 'other', why: '공고 화면이 아님(작성일·조회·첨부 표지가 없음)' }
       : { v: 'unread', why: '글 표지도 제목도 없음(판정 불가)' };
   }
+  /* (리뷰 F2) 기대 제목이 **앱 이름뿐**(사람이 다듬은 `동산장학회 장학생 (이공계 새터민 대상)`)이면 게시판 제목과 글자가 달라
+     '다른 글'을 단정할 근거가 없다 — 순찰이 같은 이유로 멀쩡한 주소를 덮던 사고를 확인 로봇이 되풀이하지 않게 판정 보류. */
+  if (o.titlesFromNameOnly) return { v: 'unread', why: '다른 글로 보이나 기대 제목이 앱 이름뿐(판정 보류)' };
   return { v: 'other', why: '다른 글이 열림(제목 불일치)' };
 }
 

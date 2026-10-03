@@ -85,11 +85,14 @@ export function gatherTargets(root) {
     if (!titles.length) { bump(skipped.noTitle, ds); return; }
     const url = decodeUrlEntities(raw);
     const r = { ds, id: ref.id || '', title: titles[0], where: ref.where || '' };
+    /* (리뷰 F2) 기대 제목이 정식 등록의 앱 이름(name)뿐인가 — 게시판 원제목(boardTitle)도 피드 제목도 없으면 판정기가 '다른 글'을 보류한다 */
+    const nameOnly = ds === 'registered' && !(item && item.boardTitle);
     const had = byUrl.get(url);
     if (!had) {
-      byUrl.set(url, { url, raw: String(raw), ds: [ds], id: r.id, title: titles[0], titles: [...titles], host: hostOf(url), origin: originOf(url), refs: [r] });
+      byUrl.set(url, { url, raw: String(raw), ds: [ds], id: r.id, title: titles[0], titles: [...titles], nameOnly, host: hostOf(url), origin: originOf(url), refs: [r] });
       return;
     }
+    if (!nameOnly) had.nameOnly = false;                 // 같은 주소의 피드 글·게시판 원제목이 있으면 근거가 생긴다
     if (!had.ds.includes(ds)) had.ds.push(ds);
     if (!had.id && r.id) had.id = r.id;
     for (const t of titles) if (!had.titles.some((x) => titleFingerprint(x) === titleFingerprint(t))) had.titles.push(t);

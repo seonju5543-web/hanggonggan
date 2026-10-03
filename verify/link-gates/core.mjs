@@ -18,9 +18,19 @@ export default async function gate(eq, ctx) {
     ['https://a.kr/v?a=1&b=2', 'https://a.kr/v?a=1&b=2', 'https://a.kr/v?a=1&b=2']);
 
   /* ② 주소 꼴 — 확실한 홈페이지만 'home' (행사 전용 폴더는 로봇이 열어 보고 정한다) */
-  eq('② 꼴: 뿌리·index·main 은 홈페이지 · 한 칸 폴더는 단정하지 않음 · 표식·스크립트',
+  eq('② 꼴: index·main 은 홈페이지 · 맨 도메인은 root(화면에선 보통 주소 — 공모전 전용 사이트 · 리뷰 APP-2) · 한 칸 폴더는 단정하지 않음 · 표식·스크립트',
     ['https://namgu.gwangju.kr', 'https://www.jeju.go.kr/index.htm', 'http://janghak.songpa.go.kr/main.jsp', 'https://nysc.or.kr/nysc/', 'https://a.kr/list.do#n-%EC%A0%9C', 'javascript:void(0)', '', 'https://a.kr/view.do?id=3'].map(L.linkShape),
-    ['home', 'home', 'home', 'page', 'marker', 'none', 'none', 'page']);
+    ['root', 'home', 'home', 'page', 'marker', 'none', 'none', 'page']);
+  eq('  맨 도메인 공모전 사이트(maicon.kr)는 활동 시트에서 그대로 「원문에서 신청하기」 · 로봇이 첫 화면으로 확정하면 그때 홈페이지',
+    [L.sourceLink({ url: 'https://maicon.kr/' }, 'activity').label, (() => { L.setLinkChecks({ bad: { 'https://maicon.kr/': { v: 'home', at: '2026-10-05' } } }); const x = L.sourceLink({ url: 'https://maicon.kr/' }, 'activity').label; L.setLinkChecks(null); return x; })()],
+    ['원문에서 신청하기 ↗', '주최 측 홈페이지 ↗']);
+  eq('  판정기는 맨 도메인도 첫 화면으로 본다 — 돌려보내짐 · 제목 없는 뿌리 주소',
+    [J.judgeLanding({ status: 200, requestedUrl: 'https://d.kr/v?id=1', finalUrl: 'https://d.kr/', text: 'z'.repeat(800), titles: ['어떤 공고 제목 테스트 2026'] }).v,
+      J.judgeLanding({ status: 200, requestedUrl: 'https://namgu.gwangju.kr/', text: `남구청 ${'z'.repeat(2000)}`, titles: ['행복나눔 장학생 선발 2026'] }).v], ['home', 'home']);
+  eq('  (리뷰 F2) 제목에 날짜가 든 공고도 본문에서 찾는다 · 기대 제목이 앱 이름뿐이면 「다른 글」을 단정하지 않는다',
+    [J.judgeLanding({ status: 200, requestedUrl: 'https://k.kr/v?id=1', docTitle: '통합 공지사항', text: `공지 [춘천인재육성장학재단] 2026년 하반기 봄내장학생 선발 안내 (2026.09.28.(월) ~ 2026.10.07.(수)) 작성일 첨부 ${'z'.repeat(400)}`, titles: ['[춘천인재육성장학재단] 2026년 하반기 봄내장학생 선발 안내 (2026.09.28.(월) ~ 2026.10.07.(수))'] }).v,
+      J.judgeLanding({ status: 200, requestedUrl: 'https://g.kr/bbs/kor/478/122594/artclView.do', docTitle: '가천대', headings: ['[공통] 2026년도 하반기 동산장학회 장학생 선발 안내(이공계 전공 새터민 대상) N'], text: `작성일 2026.09.01 첨부 ${'z'.repeat(600)}`, titles: ['동산장학회 장학생 (이공계 새터민 대상)'], titlesFromNameOnly: true }).v],
+    ['post', 'unread']);
 
   eq('  목록 주소에 글 번호만 붙인 꼴(가천·고려 subview.do?nttId · 서울교대 selectNttList?nttId · 오프셋 붙은 꼴)은 listid — 진짜 상세는 아님',
     ['https://www.gachon.ac.kr/kor/7986/subview.do?nttId=125659', 'https://www.gachon.ac.kr/kor/7986/subview.do?article.offset=10&nttId=125311',
@@ -147,4 +157,46 @@ export default async function gate(eq, ctx) {
     [[twinB.url], [twinB.url], 2]);
   eq('  진짜 주소 > 목록 표식 > 목록 주소+번호 — ESM(수집기·병합기)과 CJS 다리(감사)가 같은 답',
     [order(U.preferNotice), order(UC.preferNotice)], [[true, true, true, true, true], [true, true, true, true, true]]);
+  /* ⑧ 화면 확인 도구(what-shows.mjs)가 떼어 오는 앱 함수가 쓰는 한 줄 const 를 전부 같이 떼어 온다 (리뷰 G3 —
+     기간 한 줄이 달린 게시판 글에서 `hintText is not defined` 로 넘어졌다 · 그 꼴의 글이 없는 날엔 조용하다).
+     실데이터 없이 글자로만 잰다: 떼어 오는 함수 몸에 나오는 app.js 최상위 const 이름이 목록에 없으면 실패. */
+  {
+    const appSrc = fs.readFileSync(new URL('app.js', ctx.root), 'utf8');
+    const ws = fs.readFileSync(new URL('verify/what-shows.mjs', ctx.root), 'utf8');
+    const linkBlock = ws.slice(ws.indexOf('vm.runInContext([', ws.indexOf('const linkCtx')), ws.indexOf("'app.js(링크 자리)'"));
+    const listOf = (re) => [...linkBlock.matchAll(re)].flatMap((m) => [...m[1].matchAll(/'([A-Za-z_$][\w$]*)'/g)].map((x) => x[1]));
+    const consts = listOf(/\.\.\.\[([^\]]*)\]\.map\(takeConst\)/g);
+    const fns = listOf(/\.\.\.\[([^\]]*)\]\.map\(takeFn\)/g);
+    const topConst = [...appSrc.matchAll(/^const ([A-Za-z_$][\w$]*) = .*$/gm)].map((m) => m[1]);
+    const body = (n) => (appSrc.match(new RegExp(`^function ${n}\\([\\s\\S]*?^\\}`, 'm')) || [''])[0];
+    const constLine = (n) => (appSrc.match(new RegExp(`^const ${n} = .*$`, 'm')) || [''])[0];
+    const used = new Set();
+    for (const src of [...fns.map(body), ...consts.map(constLine)]) {
+      for (const c of topConst) if (new RegExp(`\\b${c.replace(/\$/g, '\\$')}\\b`).test(src)) used.add(c);
+    }
+    const missing = [...used].filter((c) => !consts.includes(c));
+    eq('⑧ what-shows.mjs 링크 자리 — 떼어 오는 앱 함수가 쓰는 한 줄 const 가 빠짐없이 같이 온다(빠지면 그 꼴의 글에서만 넘어진다)',
+      [fns.length > 10, consts.includes('hintText'), missing], [true, true, []]);
+  }
+  /* ⑨ 주소가 고쳐진 옛 공고가 '새 공고'로 다시 울리지 않는다 (리뷰 F3 — 사냥꾼이 표식을 진짜 주소로 고치면 같은 공고의 주소가 바뀐다) */
+  {
+    const NR = require('../../notify-rules.js');
+    const day = 864e5;
+    const t0 = Date.parse('2026-10-03T03:00:00Z');
+    const profile = { school: '가천대학교' };
+    const mine = () => true;
+    const base = { profile, scholarships: [], applications: [], noticeForProfile: mine, notStale: () => true };
+    /* 날짜를 하루씩 넘긴다 — 같은 날 같은 건수의 알림은 원래 한 번만이라(sent 열쇠) 같은 날로 재면 되돌려도 통과한다(헛돈다) */
+    const old = { school: '가천대학교', title: '[장학공지] 2026 동행 장학생 모집', url: 'https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-x', foundAt: '2026-10-03' };
+    const r1 = NR.evaluate({ ...base, now: t0, notices: [old], ledger: { baseline: true, enabled: true, lastCheck: t0 - day, prefs: { feed: true } } });
+    const fixed = { ...old, url: 'https://www.gachon.ac.kr/bbs/kor/478/125843/artclView.do' };
+    const r2 = NR.evaluate({ ...base, now: t0 + day * 1.25, notices: [fixed], ledger: r1.ledger });   // 수집일이 가까워 제목 열쇠만 막는다
+    const legacy = NR.evaluate({ ...base, now: t0 + 3 * day, notices: [{ ...fixed, foundAt: '2026-10-01' }], ledger: { baseline: true, enabled: true, lastCheck: t0 + 2 * day, seenNotice: [old.url], prefs: { feed: true } } });
+    const fresh = { school: '가천대학교', title: '2026 새 재단 장학생 모집', url: 'https://www.gachon.ac.kr/bbs/kor/478/125900/artclView.do', foundAt: '2026-10-03' };
+    const r3 = NR.evaluate({ ...base, now: t0 + day * 1.25, notices: [fixed, fresh], ledger: r1.ledger });   // 다음 날 — 같은 날 같은 건수 알림은 원래 한 번만(sent 열쇠)
+    const feedN = (r) => r.events.filter((e) => e.type === 'feed').map((e) => e.title);
+    eq('⑨ 같은 공고의 주소가 고쳐져도 새 공고로 다시 울리지 않는다(제목 열쇠) · 열쇠 없던 옛 장부도(수집일이 지난 확인보다 이틀 앞) · 진짜 새 공고는 운다',
+      [feedN(r1).length, feedN(r2), feedN(legacy), feedN(r3)],
+      [1, [], [], ['가천대학교 새 공고 1건']]);
+  }
 }
