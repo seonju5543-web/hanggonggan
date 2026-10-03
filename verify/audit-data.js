@@ -363,6 +363,32 @@ try {
   warns.push(`폰이 받는 양을 재지 못했습니다: ${e.message.slice(0, 80)}`);
 }
 
+/* ── 원문 링크 (2026-10-03 · 원문 대신 재단 홈페이지·게시판 목록이 열리던 사고) ──────────
+   앱이 보여 주는 링크 **전부**(정식 등록·실시간 공고 학교별 파일·재단·지자체·대외활동·소식)를 한 규칙으로 훑는다 —
+   그전엔 정식 등록의 `#n-` 만 봤고 나머지 피드는 아무도 안 봤다. 규칙은 verify/link-audit.cjs 한 곳.
+   🔴 경고다(오류 아님) — 실데이터로 로봇 저장을 막지 않는다. 확정은 data/link-check.json(원문 링크 확인 로봇). */
+try {
+  const { auditLinks } = require('./link-audit.cjs');
+  const readJson = (rel) => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, rel), 'utf8')); } catch { return null; } };
+  const dirItems = (rel) => {
+    const dir = path.join(ROOT, rel);
+    if (!fs.existsSync(dir)) return [];
+    return fs.readdirSync(dir).filter((f) => /\.json$/.test(f) && f !== 'index.json')
+      .flatMap((f) => { const d = readJson(`${rel}/${f}`); return (d && d.items) || []; });
+  };
+  const byTitle = (n) => String(n.title || '').slice(0, 24);
+  const sets = [
+    { ds: 'registered', items: reg.items || [], urlOf: (x) => x.sourceUrl, idOf: (x) => x.id },
+    { ds: 'notices(학교별)', items: dirItems('data/notices'), urlOf: (x) => x.url, idOf: byTitle },
+    { ds: 'external', items: ((readJson('data/external.json') || {}).items) || [], urlOf: (x) => x.url, idOf: byTitle },
+    { ds: 'activities', items: (((readJson('data/activities.json') || {}).items) || []).filter((x) => !x.hidden), urlOf: (x) => x.url, idOf: byTitle },
+    { ds: 'news', items: dirItems('data/news'), urlOf: (x) => x.url, idOf: byTitle },
+  ];
+  auditLinks(sets, readJson('data/link-check.json')).warns.forEach((w) => warns.push(w));
+} catch (e) {
+  warns.push(`원문 링크를 훑지 못했습니다: ${e.message.slice(0, 80)}`);
+}
+
 if (errors.length) { console.log('\n[오류 — 반드시 수정]'); errors.forEach((e) => console.log(' ✕', e)); }
 if (warns.length) { console.log('\n[경고 — 소급 적용 필요 항목]'); warns.forEach((w) => console.log(' ⚠', w)); }
 if (!errors.length && !warns.length) console.log('✓ 모든 데이터가 현재 엔진 기준을 충족합니다');
