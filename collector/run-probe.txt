@@ -66,7 +66,7 @@ checkUrl: https://www.smu.ac.kr/kor/life/scholarship.do
 # (답 받음 2026-10-03 · 5차로 대체) checkUrl: https://www.sogang.ac.kr/ko/campus/student-support/notice
 
 # 2026-10-03 (5차) — 4차로 계명(26-09-30 날짜 꼴)·고려(로봇 HTML 에 줄 있음 · 본문 POST)는 풀었다. 상명만 남았다: 서버 HTML 에 날짜 43개인데 그린 화면의 표와 생김새가 다르다 → 서버 HTML 의 첫 날짜 앞 조각.
-checkUrl: https://www.smu.ac.kr/kor/life/notice.do
+# (답 받음 2026-10-03 · 6차로 대체) checkUrl: https://www.smu.ac.kr/kor/life/notice.do
 
 # 2026-10-03 — 원문 링크 확인 로봇(collector/link-check.mjs) 첫 실행이 '문제'로 본 13건 중 **오판 의심** 셋.
 #   ① 서울과기대 상세(do=commonview)가 '목록'으로 판정됐다 — 그 공고 제목은 본문에 보이는데 다른 공고 제목도 여럿 보이고
@@ -85,3 +85,14 @@ checkUrl: https://www.smu.ac.kr/kor/life/notice.do
 # checkUrl: https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.do?bbsId=BBS_0000000000000316&mId=008001001000000000&dataId=56147
 # checkUrl: https://youth.chungnam.go.kr/web/main/customSupp/M050-08/view?bizId=A20260309CT000000000003017
 # checkUrl: https://ydjh.yd21.go.kr/zboard/read.do?lmCode=notice&pd_pkid=240
+
+# 2026-10-03 (6차) — 개발자 지시 "소식이 0건인 학교가 없도록 어떻게든 그 출처를 찾아". 홈 첫 화면 소식 띠(카드 4장)를 채울 출처.
+#   서강: 공지사항(열쇠 3)·학생 일반공지는 6월 30일 뒤 새 글이 드물다(4·5차) → 웹 검색에 9월 글(스팸 메일 주의 9.07·직원 채용 9.22)이 잡힌
+#         「서강 Story > 공지/행사」 화면이 부르는 목록 API 열쇠·글 날짜·첫 줄을 눌렀을 때의 주소를 받아 적는다.
+#   경북: 웹 검색 결과에 그대로 잡힌 학사공지 목록 주소(stdList.action?menu_idx=42)가 로그인 없이 날짜 줄을 보이는지.
+#   서울대: 일반공지는 장학 글이 많아 소식이 2건뿐 → 웹 검색에 잡힌 학부대학 공지사항 화면의 날짜 줄.
+#   고려 세종: 일반공지 3건 → 웹 검색에 잡힌 학사공지(7903 · 글 5,934개) 화면의 날짜 줄.
+checkUrl: https://www.sogang.ac.kr/ko/story/notification-event
+checkUrl: https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdList.action?menu_idx=42
+checkUrl: https://snuc.snu.ac.kr/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/
+checkUrl: https://sejong.korea.ac.kr/koreaSejong/7903/subview.do

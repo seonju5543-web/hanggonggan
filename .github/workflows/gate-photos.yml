@@ -56,7 +56,10 @@ jobs:
           ONLY=$(grep -oE '^only:[[:space:]]*[a-z0-9,]+' tools/run-gate-photos.txt | sed -E 's/^only:[[:space:]]*//' || true)
           # `per: 10` 줄이 있으면 학교당 후보 수 (기본 5 · 1차에 다섯 장이 한 작가 한 날 사진뿐인 학교가 있었다)
           PER=$(grep -oE '^per:[[:space:]]*[0-9]+' tools/run-gate-photos.txt | sed -E 's/^per:[[:space:]]*//' || true)
-          ONLY="$ONLY" PER_SCHOOL="${PER:-5}" node tools/fetch-gate-photos.mjs docs/designs/assets/gates
+          # `sources: wikidata,openverse` 줄이 있으면 검색 말고도 위키데이터(대표 사진·학교 분류)와 Openverse(플리커 등 CC 사진)에서 후보를 더한다 (2026-10-03)
+          SRC=$(grep -oE '^sources:[[:space:]]*[a-z,]+' tools/run-gate-photos.txt | sed -E 's/^sources:[[:space:]]*//' || true)
+          if [ -n "$SRC" ]; then npm i --no-save --no-audit --no-fund sharp@0.33 >/dev/null 2>&1 || echo "sharp 설치 실패 — 큰 원본은 건너뜀"; fi
+          ONLY="$ONLY" PER_SCHOOL="${PER:-5}" SOURCES="$SRC" node tools/fetch-gate-photos.mjs docs/designs/assets/gates
       - name: 결과 커밋
         if: steps.mark.outputs.run == 'yes'
         run: |

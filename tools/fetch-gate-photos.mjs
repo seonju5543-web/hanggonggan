@@ -137,14 +137,15 @@ async function search(q) {
   return Object.values(data.query?.pages || {});
 }
 
-function pick(pages, school) {
+function pick(pages, school, opts = {}) {
   const out = [];
   for (const p of pages) {
     const ii = p.imageinfo?.[0]; if (!ii) continue;
     if (!/^image\/(jpeg|png)$/.test(ii.mime)) continue;
     if ((ii.width || 0) < MIN_WIDTH) continue;
     /* 제목에 학교 이름이 없으면 낱말 대조가 우연히 맞은 것이다 — 버린다 */
-    if (school && (!school.must.test(p.title) || (school.not && school.not.test(p.title)))) continue;
+    /* 학교의 위키미디어 분류·위키데이터 대표 사진에서 온 파일은 분류 자체가 근거라 제목 이름표를 묻지 않는다(not 은 그대로 — 로고·역·병원 거름) */
+    if (school && ((!opts.skipMust && !school.must.test(p.title)) || (school.not && school.not.test(p.title)))) continue;
     const md = ii.extmetadata || {};
     const lic = (md.LicenseShortName?.value || '').trim();
     if (!OK_LICENSE.test(lic) || BAD_LICENSE.test(lic)) continue;
@@ -160,10 +161,75 @@ function pick(pages, school) {
   return out;
 }
 
+/* ── 2026-10-03 3차 출처 (개발자 지시 "사진이 없는 학교도 없어. 어떻게든 해당 학교의 사진을 찾고") ──
+   검색 낱말 대조로 못 찾은 학교를 위해 ① 위키데이터의 학교 항목(이름이 정확히 같은 항목만)이 적어 둔 대표 사진(P18)·파노라마(P4291)·야경(P3451)·항공(P8592)
+   ② 그 항목의 위키미디어 분류(P373) 안 파일(+ 하위 분류 한 단계) ③ Openverse(플리커 등의 CC 사진 모음 · 열린 라이선스만 · 제목/꼬리표에 학교 이름이 있어야)
+   🔴 라이선스 거름(OK_LICENSE·BAD_LICENSE)은 똑같이 · 사람이 눈으로 고른다(이 파일은 고르지 않는다). SOURCES=wikidata,openverse 일 때만. */
+const SOURCES = (process.env.SOURCES || '').split(',').map((x) => x.trim()).filter(Boolean);
+async function getJson(url) {
+  const res = await fetch(url, { headers: { 'User-Agent': UA, Accept: 'application/json' } });
+  if (!res.ok) throw new Error(`${res.status} ${url}`);
+  return res.json();
+}
+async function commonsFiles(titles) {
+  const out = [];
+  for (let i = 0; i < titles.length; i += 40) {
+    const data = await api({ action: 'query', titles: titles.slice(i, i + 40).join('|'), prop: 'imageinfo', iiprop: 'url|extmetadata|size|mime', iiurlwidth: THUMB_WIDTH });
+    out.push(...Object.values(data.query?.pages || {}));
+  }
+  return out;
+}
+async function categoryFiles(cat, depth = 1) {
+  const files = [];
+  const members = async (type, title) => {
+    const data = await api({ action: 'query', list: 'categorymembers', cmtitle: title, cmtype: type, cmlimit: '60' });
+    return (data.query?.categorymembers || []).map((m) => m.title);
+  };
+  files.push(...await members('file', `Category:${cat}`));
+  if (depth > 0) for (const sub of (await members('subcat', `Category:${cat}`)).slice(0, 12)) files.push(...(await members('file', sub)).slice(0, 25));
+  return [...new Set(files)];
+}
+async function wikidataCandidates(s) {
+  const found = await getJson(`https://www.wikidata.org/w/api.php?action=wbsearchentities&format=json&language=ko&uselang=ko&type=item&limit=5&search=${encodeURIComponent(s.name)}`);
+  const hit = (found.search || []).find((x) => x.label === s.name);   // 이름이 정확히 같은 항목만 — 비슷한 이름(분교·전문대)을 데려오지 않는다
+  if (!hit) return { files: [], note: '위키데이터에 같은 이름 항목 없음' };
+  const ent = (await getJson(`https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&props=claims&ids=${hit.id}`)).entities[hit.id];
+  const vals = (pid) => ((ent.claims || {})[pid] || []).map((c) => c.mainsnak?.datavalue?.value).filter((v) => typeof v === 'string');
+  const direct = ['P18', 'P4291', 'P3451', 'P8592'].flatMap(vals).map((f) => `File:${f}`);
+  const cats = vals('P373');
+  const inCat = [];
+  for (const c of cats) inCat.push(...await categoryFiles(c));
+  return { files: [...new Set([...direct, ...inCat])], note: `${hit.id} · 대표 ${direct.length} · 분류 ${cats.join(',') || '없음'} ${inCat.length}` };
+}
+const OV_LIC = { by: 'CC BY', 'by-sa': 'CC BY-SA', cc0: 'CC0', pdm: 'Public domain' };
+async function openverseCandidates(s) {
+  const q = s.q.find((x) => /^[A-Za-z]/.test(x)) || s.name;
+  const data = await getJson(`https://api.openverse.org/v1/images/?q=${encodeURIComponent(q)}&license=by,by-sa,cc0,pdm&page_size=30&mature=false`);
+  const out = [];
+  for (const r of data.results || []) {
+    const text = `${r.title || ''} ${(r.tags || []).map((t) => t.name).join(' ')}`;
+    if (!s.must.test(text) || (s.not && s.not.test(r.title || ''))) continue;
+    if ((r.width || 0) && r.width < MIN_WIDTH) continue;
+    const lic = r.license === 'cc0' || r.license === 'pdm' ? OV_LIC[r.license] : `${OV_LIC[r.license]} ${r.license_version || ''}`.trim();
+    if (!OV_LIC[r.license] || !OK_LICENSE.test(lic) || BAD_LICENSE.test(lic)) continue;
+    out.push({ title: r.title || '(제목 없음)', pageUrl: r.foreign_landing_url || r.url, thumb: r.url, width: r.width, height: r.height,
+      license: lic, licenseUrl: r.license_url || '', shareAlike: /SA/.test(lic), author: r.creator || '', credit: r.attribution || '', description: '', date: '', source: r.source || r.provider || '' });
+  }
+  return out;
+}
+
+/* 큰 원본(플리커 등)은 가로 1000px 로 줄여 둔다 — sharp 가 있을 때만(워크플로가 설치) · 없으면 6MB 넘는 원본은 받지 않는다 */
+let sharpLib = null;
+try { sharpLib = (await import('sharp')).default; } catch { /* 없으면 줄이지 않는다 */ }
 async function download(url, file) {
   const res = await fetch(url, { headers: { 'User-Agent': UA } });
   if (!res.ok) throw new Error(`download ${res.status} ${url}`);
-  fs.writeFileSync(file, Buffer.from(await res.arrayBuffer()));
+  let buf = Buffer.from(await res.arrayBuffer());
+  if (sharpLib) {
+    const meta = await sharpLib(buf).metadata();
+    if ((meta.width || 0) > 1000) buf = await sharpLib(buf).rotate().resize({ width: 1000 }).jpeg({ quality: 86 }).toBuffer();
+  } else if (buf.length > 6e6) throw new Error(`원본이 너무 큼 (${Math.round(buf.length / 1e6)}MB · sharp 없음)`);
+  fs.writeFileSync(file, buf);
 }
 
 fs.mkdirSync(OUT, { recursive: true });
@@ -187,6 +253,20 @@ for (const s of SCHOOLS) {
     } catch (e) { console.log(`  ! ${s.name} "${q}": ${e.message}`); }
     if (cands.length >= PER_SCHOOL * 2) break;
   }
+  for (const c of cands) c.via = c.via || 'search';
+  /* 3차 출처 — 검색 후보 뒤에 붙인다(같은 파일은 한 번) */
+  if (SOURCES.includes('wikidata')) {
+    try {
+      const wd = await wikidataCandidates(s);
+      console.log(`  · ${s.name} 위키데이터: ${wd.note}`);
+      if (wd.files.length) for (const c of pick(await commonsFiles(wd.files), s, { skipMust: true })) if (!seen.has(c.title)) { seen.add(c.title); cands.push({ ...c, via: 'wikidata' }); }
+    } catch (e) { console.log(`  ! ${s.name} 위키데이터: ${e.message}`); }
+  }
+  if (SOURCES.includes('openverse')) {
+    try {
+      for (const c of await openverseCandidates(s)) if (!seen.has(c.pageUrl)) { seen.add(c.pageUrl); cands.push({ ...c, via: 'openverse' }); }
+    } catch (e) { console.log(`  ! ${s.name} Openverse: ${e.message}`); }
+  }
   const chosen = cands.slice(0, PER_SCHOOL);
   const files = [];
   for (let i = 0; i < chosen.length; i++) {
@@ -197,7 +277,7 @@ for (const s of SCHOOLS) {
     catch (e) { console.log(`  ! ${s.name} ${c.title}: ${e.message}`); }
   }
   manifest.schools.push({ id: s.id, name: s.name, candidates: cands.length, files });
-  console.log(`${s.name}: 후보 ${cands.length} · 받음 ${files.length}` + files.map((f) => `\n   · ${f.file}  ${f.license}${f.shareAlike ? ' (SA)' : ''}  ${f.title}`).join(''));
+  console.log(`${s.name}: 후보 ${cands.length} · 받음 ${files.length}` + files.map((f) => `\n   · ${f.file}  ${f.license}${f.shareAlike ? ' (SA)' : ''}  [${f.via}] ${f.title}`).join(''));
 }
 const empty = manifest.schools.filter((m) => !(m.files || []).length).map((m) => m.name);
 if (empty.length) console.log(`\n⚠️ 사진이 한 장도 없는 학교 ${empty.length}곳 — ${empty.join(' · ')} (위키미디어에 열린 라이선스 사진이 없거나 이름표가 파일 제목에 없다)`);
