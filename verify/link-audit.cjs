@@ -9,9 +9,7 @@
    ───────────────────────────────────────────────────────────────────────────── */
 const L = require('../source-link.js');
 
-/* 목록 주소에 글 번호만 붙인 꼴 — 서버가 번호를 무시하고 목록을 준다(2026-10-03 실측: 가천 18·고려 9·서울교대 10건이
-   번호만 다른데 글자 하나 안 다른 같은 목록 화면). 학교 게시판 엔진 두 가지(K2Web subview.do · eGov selectNttList.do). */
-const LIST_PLUS_ID = /\/subview\.do\?(?:[^#]*&)?nttId=|\/selectNttList\.do\?[^#]*nttId=/i;
+/* 목록 주소에 글 번호만 붙인 꼴은 source-link.js 의 isListPlusId 한 곳(앱·병합 순위와 같은 규칙 — 베끼지 않는다) */
 const URL_ENTITY = /&(?:amp|#0*38|#x0*26);/i;
 
 /* sets: [{ ds, items, urlOf(item), idOf(item) }] · checks: data/link-check.json 문서(없으면 null)
@@ -31,7 +29,7 @@ function auditLinks(sets, checks) {
       if (shape === 'marker') c.marker += 1;
       if (shape === 'home' && it.sourceKind !== 'kosaf') { c.home += 1; ex.home.push(s.idOf(it)); }
       if (URL_ENTITY.test(raw)) { c.entity += 1; ex.entity.push(s.idOf(it)); }
-      if (shape !== 'marker' && LIST_PLUS_ID.test(L.decodeUrlEntities(raw))) { c.listPlusId += 1; ex.listPlusId.push(s.idOf(it)); }
+      if (shape === 'listid') { c.listPlusId += 1; ex.listPlusId.push(s.idOf(it)); }
       for (const a of it.attachments || []) {
         if (a && a.url && /^\s*javascript:/i.test(a.url)) { c.scriptAttach += 1; ex.scriptAttach.push(s.idOf(it)); break; }
       }
@@ -49,4 +47,4 @@ function auditLinks(sets, checks) {
   return { warns, counts };
 }
 
-module.exports = { auditLinks, LIST_PLUS_ID, URL_ENTITY };
+module.exports = { auditLinks, URL_ENTITY };

@@ -21,6 +21,15 @@ export default async function gate(eq) {
     ['https://namgu.gwangju.kr', 'https://www.jeju.go.kr/index.htm', 'http://janghak.songpa.go.kr/main.jsp', 'https://nysc.or.kr/nysc/', 'https://a.kr/list.do#n-%EC%A0%9C', 'javascript:void(0)', '', 'https://a.kr/view.do?id=3'].map(L.linkShape),
     ['home', 'home', 'home', 'page', 'marker', 'none', 'none', 'page']);
 
+  eq('  목록 주소에 글 번호만 붙인 꼴(가천·고려 subview.do?nttId · 서울교대 selectNttList?nttId · 오프셋 붙은 꼴)은 listid — 진짜 상세는 아님',
+    ['https://www.gachon.ac.kr/kor/7986/subview.do?nttId=125659', 'https://www.gachon.ac.kr/kor/7986/subview.do?article.offset=10&nttId=125311',
+      'https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083&pageNo=2&nttId=54977', 'https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=55323',
+      'https://www.gachon.ac.kr/bbs/kor/478/125842/artclView.do'].map(L.linkShape),
+    ['listid', 'listid', 'listid', 'page', 'page']);
+  eq('  listid 는 화면에서 「게시판 목록」 — 병합으로 데이터가 되돌아와도 「원문」이라 하지 않는다',
+    L.sourceLink({ url: 'https://www.korea.ac.kr/ko/568/subview.do?nttId=000100000000003863', title: '[교외-10/12] 송화재단' }, 'card'),
+    { href: 'https://www.korea.ac.kr/ko/568/subview.do?nttId=000100000000003863', kind: 'list', cls: 'list', label: '게시판 목록에서 보기 ↗', hint: '[교외-10/12] 송화재단', caution: '' });
+
   /* ③ 종류와 이름 — 층2(재단 홈페이지)를 **모든 화면**이 같은 이름으로 부른다 */
   const kosaf = { sourceUrl: 'https://namgu.gwangju.kr', sourceKind: 'kosaf' };
   eq('③ 층2 재단 홈페이지 — 상세·금액·신청 내역·활동 어디서도 「원문」이라 부르지 않는다',
@@ -82,4 +91,14 @@ export default async function gate(eq) {
     J.publishBad({ 'https://a/x?a=1&b=2': { v: 'list', at: 'd', confirmed: true }, 'https://a/y': { v: 'list', at: 'd', confirmed: false }, 'https://a/z': { v: 'list', at: 'd', confirmed: true } }, ['https://a/x?a=1&amp;b=2']),
     { 'https://a/x?a=1&b=2': { v: 'list', at: 'd' } });
   eq('  앱과 로봇의 문제 종류는 한 벌', J.BAD, L.LINK_BAD);
+
+  /* ⑥ 병합 순위 — 합집합 병합기·발행 중복 정리가 고르는 쪽 (2026-10-03 · 사람이 고친 표식이 병합 때마다 되돌려지던 길) */
+  const U = await import('../../collector/url-key.mjs');
+  const UC = require('../../collector/url-key.cjs');
+  const real = { url: 'https://www.gachon.ac.kr/bbs/kor/478/125842/artclView.do' };
+  const mk = { url: 'https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-x' };
+  const li = { url: 'https://www.gachon.ac.kr/kor/7986/subview.do?nttId=125842' };
+  const order = (P) => [P(li, mk) === mk, P(mk, li) === mk, P(li, real) === real, P(mk, real) === real, P(real, mk) === real];
+  eq('⑥ 진짜 주소 > 목록 표식 > 목록 주소+번호 — ESM(수집기·병합기)과 CJS 다리(감사)가 같은 답',
+    [order(U.preferNotice), order(UC.preferNotice)], [[true, true, true, true, true], [true, true, true, true, true]]);
 }

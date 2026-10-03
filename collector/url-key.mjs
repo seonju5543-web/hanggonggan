@@ -15,6 +15,8 @@
    정식 등록 중복 판정처럼 더 세게 뭉쳐야 하는 곳에 쓰고, 여기 urlKey는 '군더더기만 떼는'
    방식이라 수집 단계에서 서로 다른 글이 잘못 합쳐지지 않아야 하는 곳에 쓴다. 역할이 달라 둘 다 둔다. */
 import { looksLikeHint } from './deadline-hint.mjs';
+/* 앱과 같은 '목록 주소+번호' 규칙(source-link.js 한 곳) — 병합 때 그런 주소가 정직한 표식을 이기지 않게 (2026-10-03) */
+import { isListPlusId } from '../source-link.js';
 
 // 글을 가리키지 않는(휘발성) 값들 — 정렬·페이지·검색어·권한·표시 개수 등
 const VOLATILE = new Set([
@@ -84,8 +86,12 @@ export function clickRowKey(listUrl, title) {
 /* 두 항목 중 사용자에게 더 나은 쪽 — 공고로 바로 가는 진짜 주소를 남긴다
    (클릭형 표식은 게시판 목록까지만 열린다) */
 export function preferNotice(a, b) {
-  const marker = (n) => (n.url || '').includes('#n-');
-  if (marker(a) !== marker(b)) return marker(a) ? b : a;
+  /* 순위: 진짜 주소(0) > 목록 표식(1) > 목록 주소에 번호만 붙인 것(2).
+     🔴 (2026-10-03) 예전엔 '표식이 아니면 진짜'였다 — 그래서 목록 주소에 번호만 붙인 주소(서버가 번호를 무시하고
+        목록을 준다)가 사람이 고친 정직한 표식을 병합 때마다 이겼다(합집합 병합기가 이 함수로 고른다).
+        표식이 그보다 앞서는 이유: 표식은 앱이 '게시판 목록'이라 부르고 링크 사냥꾼이 진짜 주소를 찾아 나서는 대상이다. */
+  const rank = (n) => ((n.url || '').includes('#n-') ? 1 : (isListPlusId(n.url) ? 2 : 0));
+  if (rank(a) !== rank(b)) return rank(a) < rank(b) ? a : b;
   /* 🔴 힌트는 **있기만 하면** 점수를 주고 있었다 (2026-09-12 코드 리뷰). 그래서 청소한 판과
      옛 판이 합쳐지면 **버린 쓰레기 힌트가 이긴다** — 병합기가 `까지 나 . 선발 : 10 월…` 을
      되살리는 것을 실측으로 확인했다. 지금은 **읽을 수 있는 힌트**에만 점수를 준다. */

@@ -15,7 +15,7 @@
 
    이 파일이 하는 일 — 화면은 링크 이름을 **여기서만** 받는다:
      · decodeUrlEntities — `&#038;`·`&amp;` 가 박힌 주소를 되돌린다(안 하면 `#` 뒤가 조각이 돼 글 번호가 사라진다)
-     · linkShape         — 주소 꼴: 'none' · 'marker'(#n- 게시판 목록 표식) · 'home'(사이트 첫 화면) · 'page'
+     · linkShape         — 주소 꼴: 'none' · 'marker'(#n- 게시판 목록 표식) · 'listid'(목록 주소+번호 — 목록이 열린다) · 'home'(사이트 첫 화면) · 'page'
      · setLinkChecks     — 원문 링크 확인 로봇(collector/link-check.mjs)이 **새 탭으로 열어 본 결과** 중
                            '그 공고가 아니었다'가 확정된 것(data/link-check.json 의 bad)을 받는다
      · linkKind          — 종류 하나: post 계열('page') · 목록('list') · 홈페이지('home'·'foundation-home'·'program')
@@ -46,10 +46,21 @@ function decodeUrlEntities(u) {
    물음표가 없을 때. `/nysc/` 같은 한 칸짜리 폴더는 행사 전용 페이지일 수도 있어 여기서 단정하지 않는다
    (그런 것은 로봇이 열어 보고 'home' 으로 확정한다 — 꼴만 보고 틀리게 말하지 않는다). */
 const HOME_FILE_RE = /^(index|main|default|home)(\.[a-z]{2,5})?$/i;
+/* 목록 주소에 글 번호만 붙인 꼴 — 'listid' (2026-10-03 실측).
+   K2Web `…/subview.do?nttId=` · eGov `selectNttList.do?…nttId=` 는 게시판이 내보내는 글 주소가 아니라
+   **우리 로봇이 목록 주소에 번호를 덧붙여 만든 것**이었고, 서버는 그 번호를 무시하고 목록을 준다
+   (가천 18·고려 9·서울교대 10건 — 번호만 다른 주소들이 글자 하나 안 다른 같은 목록 화면).
+   🔴 꼴만으로 '목록'이라 부르는 유일한 경우다 — 데이터가 병합으로 되돌아와도(합집합 병합기는 '진짜 주소'를 표식보다
+      앞세운다) 화면이 다시 '원문'이라 거짓말하지 않게. 같은 규칙을 수집 쪽 병합(collector/url-key.mjs preferNotice)이 쓴다. */
+const LIST_PLUS_ID_RE = /\/subview\.do\?(?:[^#]*&)?nttId=|\/selectNttList\.do\?[^#]*nttId=/i;
+function isListPlusId(u) {
+  return LIST_PLUS_ID_RE.test(decodeUrlEntities(u));
+}
 function linkShape(u) {
   const s = decodeUrlEntities(u);
   if (!/^https?:\/\//i.test(s)) return 'none';
   if (/#n-/.test(s)) return 'marker';
+  if (LIST_PLUS_ID_RE.test(s)) return 'listid';
   let x;
   try { x = new URL(s); } catch (e) { return 'none'; }
   if (x.search && x.search !== '?') return 'page';
@@ -97,7 +108,7 @@ function linkKind(item) {
   if (it.sourceKind === 'kosaf') return linkShape(url) === 'none' ? 'none' : 'foundation-home';
   const shape = linkShape(url);
   if (shape === 'none') return 'none';
-  if (shape === 'marker') return 'list';
+  if (shape === 'marker' || shape === 'listid') return 'list';
   const c = linkCheckFor(url);
   if (c) return c.v;
   if (shape === 'home') return 'home';
@@ -169,7 +180,7 @@ function sourceLink(item, surface) {
 /* Node(관문·감사·로봇)에서도 같은 판정을 쓰게 — 브라우저·서비스워커에는 영향 없음(section-head.js 와 같은 겸용) */
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
-    decodeUrlEntities, linkShape, setLinkChecks, linkCheckFor, linkKind, linkClass, sourceLink,
+    decodeUrlEntities, linkShape, isListPlusId, setLinkChecks, linkCheckFor, linkKind, linkClass, sourceLink,
     markerTitleOf, SURFACE_LABELS, LINK_BAD, TROUBLE_CAUTION,
   };
 }
