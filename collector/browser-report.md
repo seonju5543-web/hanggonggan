@@ -1,4 +1,4 @@
-## 🖥 브라우저형 수집 리포트 (2026-10-03 10:53 KST)
+## 🖥 브라우저형 수집 리포트 (2026-10-03 18:03 KST)
 
 ### 한국외국어대학교
   - 📄 2페이지에서 장학 공고 16건 더 읽음
@@ -54,8 +54,7 @@
 
 ### 중앙대학교
 - ⚪ 링크 654 · 장학 공고 0 · 이미 아는 공고 13건은 다시 열지 않음 · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5
-- ✅ 링크 650 · 장학 공고 1 · 이미 아는 공고 2건은 다시 열지 않음 · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100
-  - [수집] 2026학년도 AX미래장학금 장학생 선발 결과 공고
+- ⚪ 링크 649 · 장학 공고 0 · 이미 아는 공고 3건은 다시 열지 않음 · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100
 
 ### 숙명여자대학교
 - ⚪ 링크 2 · 장학 공고 0 · https://www.sookmyung.ac.kr/kr/life/scholarship-notice.do
@@ -105,7 +104,7 @@
 - ✅ 링크 92 · 장학 공고 2 · 이미 아는 공고 8건은 다시 열지 않음 · https://onestop.pusan.ac.kr/page?menuCD=000000000000062
 
 ### 서울교육대학교
-- ⚪ 링크 371 · 장학 공고 0 · 이미 아는 공고 14건은 다시 열지 않음 · https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083
+- ⚪ 링크 374 · 장학 공고 0 · 이미 아는 공고 14건은 다시 열지 않음 · https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083
 
 ### 홍익대학교
 - ⚪ 링크 0 · 장학 공고 0 · https://www.hongik.ac.kr/kr/newscenter/notice.do
@@ -122,7 +121,7 @@
 - ✅ 링크 417 · 장학 공고 10 · https://www.mju.ac.kr/mjukr/259/subview.do
 
 ---
-이번 실행 신규 수집: **1건** · 브라우저로도 수집 실패한 학교는 게시판 주소 확인이 필요합니다.
+이번 실행 신규 수집: **0건** · 브라우저로도 수집 실패한 학교는 게시판 주소 확인이 필요합니다.
 ⏱ 소요 8분 / 예산 22분 · 학교 19/19곳 처리
 ⛔ **응답이 멈춰 강제로 끊은 학교 1곳**: 서울대학교 — 학교 서버가 연결만 열어 두고 답을 주지 않아 7분 30초에서 끊었어요. 끊지 않으면 로봇이 그 자리에 멈춰 서고, 강제 종료되면서 **그날 수집분 전체가 버려집니다**(2026-08-15~17에 3회 연속 그렇게 됐어요). 다음 실행(약 12시간 뒤)에 다시 시도합니다.
 
