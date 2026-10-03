@@ -7,6 +7,9 @@ name: 링크 정찰
 on:
   workflow_dispatch:
   push:
+    # 기본 브랜치에서만 (2026-10-03) — 저장은 안 하지만, 거르지 않으면 같은 커밋을 작업 브랜치·main 에 올릴 때마다 다시 떠
+    #    같은 학교 서버를 한 번에 여러 번 두드린다(관례: 세 브랜치에 같은 내용 push).
+    branches: ['claude/nice-heisenberg-WESq5']
     paths:
       - 'collector/run-probe.txt'
 
