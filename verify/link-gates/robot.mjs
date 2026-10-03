@@ -80,7 +80,7 @@ export default async function gate(eq, ctx) {
   eq('  다섯 묶음 모두 지금 열어 볼 링크가 있다 — 글이 있는 묶음은 하나도 빠지지 않는다(개수를 박지 않고 「모두 본다」를 잰다)',
     P.DATASETS.filter((d) => ind.out[d].size > 0 && !(mine[d].size > 0)), []);
   eq('  목록 표식(#n-)은 열지 않고 센다 — 앱이 이미 「게시판 목록」이라 부른다', [g.targets.filter((t) => /#n-/.test(t.raw)).length, P.DATASETS.map((d) => g.skipped.marker[d] || 0)], [0, P.DATASETS.map((d) => ind.markers[d] || 0)]);
-  eq('  층2 재단 홈페이지는 열지 않고 센다(공고문 사본 수와 함께) — 대상에 들 길이 없다', [g.skipped.kosaf.items, g.skipped.kosaf.withFiles, g.targets.some((t) => t.ds.some((d) => !P.DATASETS.includes(d)))], [...ind.kosaf, false]);
+  eq('  층2 재단 홈페이지는 열지 않고 센다(공고문 사본 수와 함께 · 열지 않는 것은 ⓒ가 잰다)', [g.skipped.kosaf.items, g.skipped.kosaf.withFiles], ind.kosaf);
   eq('  대상 주소에 HTML 기호(&amp;·&#038;)가 남아 있지 않다 — 장부 열쇠 = 앱이 찾는 열쇠', g.targets.filter((t) => ENT.test(t.url)).map((t) => t.url), []);
   eq('  대상마다 찾을 제목이 하나 이상 — 제목 없이 열면 「다른 화면」으로 몰린다', g.targets.filter((t) => !t.titles.length || !t.titles[0]).map((t) => t.url), []);
   eq('  같은 주소는 한 번만 연다(묶음만 합친다)', g.targets.length, new Set(g.targets.map((t) => t.url)).size);
@@ -147,6 +147,7 @@ export default async function gate(eq, ctx) {
     W('data/news/nfake.json', { school: '라대학교', items: [
       { title: '2026학년도 2학기 중간시험 실시 안내', url: N, school: '라대학교' },
       { title: '주소 없는 소식 2026 안내', url: 'javascript:void(0)', school: '라대학교' },
+      { title: '', url: 'https://d.test.kr/news/view?id=6', school: '라대학교' },   // 제목 없음 — 판정 재료가 없어 열지 않는다
     ] });
     W('data/news/img/x.webp', 'not-json');
     W('data/kosaf-open.json', { items: [{ code: '1', name: '재단 장학', home: 'https://kosaf-home.test.kr', files: [{ path: 'data/kosaf-files/1.pdf' }] }, { code: '2', name: '재단 둘', home: 'https://kosaf-home2.test.kr' }] });
@@ -192,7 +193,7 @@ export default async function gate(eq, ctx) {
     eq('  한 사이트에서 제목 없는 화면이 절반을 넘으면 막힘 의심 — 「다른 화면」으로 세지 않는다', Z.map((u) => [s1[u] && s1[u].lastV, s1[u] && s1[u].v]), Z.map(() => ['unread', undefined]));
     eq('  앱에 글이 하나뿐인 사이트도 목록을 알아본다 — 다른 글 제목을 수집 검수 후보에서 가져온다', s1[F] && s1[F].v, 'list');
     eq('  관측이 없으면(망 오류) 판정 못 함 — 문제로 세지 않는다', [s1[N] && s1[N].lastV, s1[N] && s1[N].v], ['unread', undefined]);
-    eq('  표식·숨긴 글·주소 없는 글·층2·검수 후보(제목 재료일 뿐)는 열지 않는다', Object.keys(s1).filter((k) => /#n-|event\/43|javascript|kosaf-home|board\/view\.do/.test(k)), []);
+    eq('  표식·숨긴 글·주소 없는 글·제목 없는 글·층2·검수 후보(제목 재료일 뿐)는 열지 않는다', Object.keys(s1).filter((k) => /#n-|event\/43|javascript|news\/view\?id=6|kosaf-home|board\/view\.do/.test(k)), []);
 
     const again = run('2026-10-04', false);
     eq('  같은 날 다시 돌려도 확정되지 않는다(오늘 본 것은 다시 열지 않는다)', [again.code, again.out.checked, ledger().bad], [0, '0', {}]);
