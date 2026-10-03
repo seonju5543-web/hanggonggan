@@ -349,7 +349,7 @@ async function harvestBoard(s, ctx = { dead: false }) {
         if (ex.deadline) it.deadline = ex.deadline;
         if (ex.excerpts.length) it.excerpts = ex.excerpts;
         /* 자격·제외·우선 선발·원문 안내 (2026-10-01) — 장학 발췌기 규칙 그대로(activityDetails). 앱이 장학과 같은 엔진으로 적합도를 낸다 */
-        if (detail.text) putActivityDetails(it, activityDetails(detail.text));
+        if (detail.text) putActivityDetails(it, activityDetails(detail.text, it.title));
         const field = activityField(it.title, it.kind);
         if (field) it.field = field;
         it.excerptsAt = new Date().toISOString().slice(0, 10);   // 원문을 읽은 날 — 아래 소급 보강이 다시 읽지 않게
@@ -556,7 +556,7 @@ for (const it of acts.items) {
   if (ex.deadline) it.deadline = ex.deadline;
   if (ex.excerpts.length) it.excerpts = ex.excerpts;
   if (!it.field) { const f = activityField(it.title, it.kind); if (f) it.field = f; }
-  if (detail.text) putActivityDetails(it, activityDetails(detail.text));
+  if (detail.text) putActivityDetails(it, activityDetails(detail.text, it.title));
   if (detail.text) it.excerptsAt = new Date().toISOString().slice(0, 10);   // 못 받아 온 날은 적지 않는다 — 잠깐 끊긴 것을 영영 '읽었다'로 굳히지 않게
   if (detail.text) delete it.detailsTriedAt; else it.detailsTriedAt = todayIso;   // 못 받았으면 이레 뒤에 다시
   actBackfilled += 1;

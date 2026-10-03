@@ -122,9 +122,10 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
     eq('④ 마감을 읽은 글은 아랫줄 오른쪽 D-5 (장학 카드와 같은 자리·같은 글자)', await page.$eval('#activities-list [data-activity] .sch-foot .sch-due', (e) => e.textContent.trim()), 'D-5');
     eq('④ 아랫줄 왼쪽(장학 카드의 금액 자리)은 짧은 혜택', await page.$eval('#activities-list [data-activity] .sch-foot .sch-amount', (e) => e.textContent.trim()), '항공료 전액 지원');
     /* 판정 하나 — 장학 카드와 같은 cardBadgeHtml (2026-10-01) */
-    eq('④ 카드 맨 윗줄 판정 — 나이 맞음 → 적합도 % · 나이 넘음 → 미달 · 자격 줄 없음 → 자격 미확인',
+    /* 자격 줄 없음 → 배지 없음 (2026-10-03 개발자 결정 — 활동 카드에 '자격 미확인' 을 안 단다 · 장학 카드는 그대로) */
+    eq('④ 카드 맨 윗줄 판정 — 나이 맞음 → 적합도 % · 나이 넘음 → 미달 · 자격 줄 없음 → 배지 없음',
       await page.$$eval('#activities-list .sch-card .sch-top', (e) => e.map((x) => (x.querySelector('.sch-fit, .badge') || {}).textContent || '').map((t) => t.trim().replace(/\d+%/, 'N%'))),
-      ['적합도 N%', '지원 자격 미달', '자격 미확인']);
+      ['적합도 N%', '지원 자격 미달', '']);
     eq('④ 혜택이 없으면 분야를 옅게 — 없으면 빈칸(지어내지 않는다)', await page.$$eval('#activities-list [data-activity] .sch-amount', (e) => e.map((x) => [x.textContent.trim(), x.classList.contains('unknown')])), [['항공료 전액 지원', false], ['', true], ['', true]]);
     eq('④ 카드에 발췌 줄을 쌓지 않는다 (장학 카드처럼 석 줄)', await page.$$eval('#activities-list .sch-provider', (e) => e.length), 0);
     eq('④ 장학 카드와 같은 그릇 (.sch-card-wrap > button.sch-card)', await page.$$eval('#activities-list .sch-card-wrap > button.sch-card[data-activity]', (e) => e.length), 3);
@@ -195,7 +196,51 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
     await page.click('#activities-filters .filter-chip[data-filter="대외활동"]');
     await page.waitForTimeout(200);
     eq('③ 대외활동 칩', (await cards(page)).map((c) => c.name), ['2026 대학생 해외봉사단 모집', '전국 청년 서포터즈 모집']);
+    /* ── 분야 칩 줄 (2026-10-03 개발자 지시 "제목 아래 회색 분류를 위에 버튼으로") ──
+       픽스처에서 field 가 있는 글은 '봉사' 하나뿐 — 나머지는 비어 있어 '기타'로 모인다.
+       🔴 칩은 **데이터에서** 만들므로, 칩 목록 자체가 '세는 길이 살아 있는가'를 말해 준다. */
     await page.click('#activities-filters .filter-chip[data-filter="all"]');
+    await page.waitForTimeout(200);
+    const fchips = () => page.$$eval('#activities-field-filters .filter-chip', (els) => els.map((e) => e.dataset.filter));
+    eq('③ 분야 칩은 데이터에서 만든다 (있는 분야 + 기타)', await fchips(), ['all', '봉사', '기타']);
+    await page.click('#activities-field-filters .filter-chip[data-filter="봉사"]');
+    await page.waitForTimeout(200);
+    eq('③   봉사 칩', (await cards(page)).map((c) => c.name), ['2026 대학생 해외봉사단 모집']);
+    eq('③   칩 켜짐은 제 줄에서만 — 종류 칩의 전체는 그대로',
+      await page.$eval('#activities-filters .filter-chip[data-filter="all"]', (c) => c.classList.contains('active')), true);
+    await page.click('#activities-field-filters .filter-chip[data-filter="기타"]');
+    await page.waitForTimeout(200);
+    eq('③   기타 칩 — 분야를 못 읽은 글만 (데이터는 그대로 비어 있다 · 기타는 화면 이름일 뿐)',
+      (await cards(page)).map((c) => c.name), ['제3회 장학수기 공모전 공고', '전국 청년 서포터즈 모집']);
+    /* 🔴 종류를 바꾸면 분야가 풀린다 — 안 풀면 '봉사'를 고른 채 공모전으로 가서 0건 화면이 된다 */
+    await page.click('#activities-field-filters .filter-chip[data-filter="봉사"]');
+    await page.waitForTimeout(200);
+    await page.click('#activities-filters .filter-chip[data-filter="공모전"]');
+    await page.waitForTimeout(200);
+    eq('③   종류를 바꾸면 분야가 풀린다', await page.$eval('#activities-field-filters .filter-chip.active', (c) => c.dataset.filter), 'all');
+    eq('③   그 종류에 있는 분야만 뜬다 (공모전 글엔 field 가 없다)', await fchips(), ['all', '기타']);
+    eq('③   그래서 목록이 비지 않는다', (await cards(page)).length > 0, true);
+    /* 🔴 **분야 줄이 세로로 스크롤되면 안 된다** (2026-10-03 개발자 신고: "오른쪽으로 넘길 때
+       위아래 칸이 넘어간다"). `.filter-row` 는 `overflow-x: auto` 인데 CSS 규칙상 다른 축도
+       auto 가 되어, 29px 알약에 얹은 44px 손가락 덧판이 줄 밖으로 나가자 줄이 세로로 3px
+       스크롤됐다 — 옆으로 미는 손짓에 위아래로도 밀렸다. 안쪽 여백으로 자리를 만들어 고쳤다.
+       ⚠️ 덧판을 키우거나 여백을 줄이면 **바로 되살아난다.** 가로 넘침은 그대로 있어야 한다. */
+    const rowBox = await page.$eval('#activities-field-filters', (e) => ({
+      세로: e.scrollHeight - e.clientHeight, 가로축: getComputedStyle(e).overflowX }));
+    eq('③   분야 줄은 세로로 안 넘친다 (옆으로 밀 때 위아래로 안 밀린다)', rowBox.세로, 0);
+    /* ⚠️ '가로로 실제로 넘치는가'로 재지 말 것 — 픽스처는 칩이 둘셋뿐이라 안 넘친다.
+       재는 것은 **옆으로 미는 줄이라는 성질**이고, 세로 넘침 0 은 그 성질과 함께여야 뜻이 있다. */
+    eq('③   가로로 미는 줄은 그대로다 (세로만 막혔다)', rowBox.가로축, 'auto');
+    /* 알약은 작아도 **손가락 표적은 그대로** — 알약 위아래 바깥을 짚어도 그 칩이 잡혀야 한다 */
+    eq('③   알약은 작지만 손가락 표적은 작아지지 않았다 (안 보이는 덧판)',
+      await page.$eval('#activities-field-filters', (row) => {
+        const chip = row.querySelectorAll('.filter-chip')[1];
+        const r = chip.getBoundingClientRect();
+        const hit = (dy) => { const el = document.elementFromPoint(Math.round(r.left + r.width / 2), Math.round(r.top + r.height / 2 + dy)); return !!(el && el.closest('.filter-chip') === chip); };
+        return [Math.round(r.height) < 34, hit(-7), hit(7)];
+      }), [true, true, true]);
+    await page.click('#activities-filters .filter-chip[data-filter="all"]');
+    await page.waitForTimeout(200);
     await page.fill('#activities-search', '서포터즈');
     await page.waitForTimeout(200);
     eq('③ 검색은 제목 글자로', (await cards(page)).map((c) => c.name), ['전국 청년 서포터즈 모집']);

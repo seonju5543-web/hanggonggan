@@ -1521,7 +1521,7 @@ console.log('\n■ 장학금 판정 자동화 · 범위 승격 (2026-09-30)');
     eq('  `부산대` 꼴은 있다', busan.includes('부산대'), true);
     eq('  지역이 아닌 밑동은 두 글자여도 남는다(동국 — 동국리더장학이 이 꼴로 붙는다) · 세 글자(성균관)도', SN.schoolTokens('동국대학교', names).includes('동국') && SN.schoolTokens('성균관대학교', names).includes('성균관'), true);
     eq('  신문·중앙회는 바깥 기관 낱말 (조선일보 ≠ 조선대 · 농협중앙회 ≠ 중앙대)', KE.ORG_RE.test('조선일보 장학생') && KE.ORG_RE.test('농협중앙회 장학'), true);
-    eq('  지역 이름표(REGION_CITIES)를 data.js 에서 읽었다', !!names.regions && names.regions.has('부산') && names.regions.has('경기'), true);
+    eq('  지역 이름표(REGION_CITIES — parse-requirements.js 한 벌)를 읽었다', !!names.regions && names.regions.has('부산') && names.regions.has('경기'), true);
     const r = KE.classifyKind({ ...base, school: '부산대학교', tokens: busan, domain: 'pusan.ac.kr', title: '2026 부산광역시 대학생 학자금 지원 장학생 모집', text: '신청서를 장학팀에 제출' });
     eq('「부산광역시 대학생 … 장학팀에 제출」@부산대 ≠ 교내 high', r.kind === '교내' && r.confidence === 'high', false);
     eq('  지자체 이름이 붙은 꼴은 바깥 기관 낱말이다', KE.ORG_RE.test('서울시 청년 장학') && KE.ORG_RE.test('충청남도 인재육성 장학'), true);
@@ -1694,6 +1694,40 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
      /box\.innerHTML = list\.map\(activityCardHtml\)/.test(app)], [true, true, true]);
   eq('  누르면 장학과 같은 상세 시트(#detail-sheet)를 연다', /closest\('\[data-activity\]'\)/.test(app) && /function openActivityDetail[\s\S]*?\$\('#detail-sheet'\)\.innerHTML[\s\S]*?openSheetShell\(\)/.test(app), true);
   eq('칩 켜고 끄기는 제 줄 안에서만 (다른 화면 칩을 건드리지 않는다)', /\$\$\('\.filter-chip'\)\.forEach/.test(app), false);
+
+  /* 작은 거들기 — 홑따옴표와 같은 글자를 이 파일 안에서 만들어 쓴다(정규식 이스케이프를 줄이려고) */
+  const Q39 = String.fromCharCode(39);
+  /* 🔴 거르는 줄만 집는다 — 그냥 `activitiesField !== 'all'` 로 찾으면 **칩 줄을 만드는 함수**의
+     '고른 칩이 사라졌다' 줄(파일에서 더 앞)을 집어 차례 검사가 거꾸로 읽힌다(실측). */
+  const FIELD_GUARD = 'activitiesField !== ' + Q39 + 'all' + Q39 + ') {';
+  /* ── 분야 칩 줄 (2026-10-03 개발자 지시 "제목 아래 회색 분류를 위에 버튼으로") ──────────────
+     종류 칩 아래에 한 줄 더. 🔴 이 절이 지키는 넷:
+       ① 분야 이름을 app.js 에 **베껴 적지 않았다** — 원본은 activity-kind.mjs 의 ACTIVITY_FIELDS
+          한 곳이고 앱은 빌드가 없어 못 들여온다. 베끼면 수집기가 갈래를 늘려도 화면은 모른다.
+       ② 거르는 차례 — 종류 뒤 · **검색 앞**(검색을 앞으로 옮기면 마감·숨김이 검색에 안 걸린다).
+       ③ 칩 줄은 **분야로 거르기 전** 목록에서 센다(거른 뒤 세면 누르는 순간 나머지 칩이 사라진다).
+       ④ 종류를 바꾸면 분야를 푼다(공모전에만 있는 분야를 고른 채 대외활동으로 가면 0건 화면). */
+  eq('분야 칩 줄이 index.html 에 있다 (빈 그릇 — 칩은 데이터에서 만든다)',
+    html.includes('<div class="filter-row" id="activities-field-filters"></div>'), true);
+  eq('  🔴 분야 이름을 app.js 에 베껴 적지 않았다 (목록 원본은 activity-kind.mjs 한 곳)',
+    (() => {
+      const i = app.indexOf('function renderActivityFieldChips');
+      const body = i < 0 ? '' : app.slice(i, app.indexOf(String.fromCharCode(10) + 'function ', i + 10));
+      return [...ACTIVITY_FIELDS['공모전'], ...ACTIVITY_FIELDS['대외활동']].filter((fd) => body.includes(fd));
+    })(), []);
+  eq('  분야 거르기가 종류 뒤 · 검색 앞이다',
+    app.indexOf('n.kind === activitiesFilter') < app.indexOf(FIELD_GUARD)
+    && app.indexOf(FIELD_GUARD) < app.indexOf('const q = activitiesQuery.trim()'), true);
+  eq('  칩 줄은 분야로 거르기 **전**에 만든다',
+    app.indexOf('renderActivityFieldChips(list)') < app.indexOf(FIELD_GUARD), true);
+  eq('  종류를 바꾸면 분야를 푼다', (() => {
+    const i = app.indexOf('activitiesFilter = chip.dataset.filter;');
+    return i > 0 && app.slice(i, i + 600).includes('activitiesField = ' + Q39 + 'all' + Q39 + ';');
+  })(), true);
+  eq('  분야 칩 배선도 제 그릇으로 좁혀져 있다',
+    app.includes("$(" + Q39 + "#activities-field-filters" + Q39 + ").addEventListener"), true);
+  eq('  기타는 화면 이름일 뿐 — field 가 빈 글을 모은다',
+    app.includes('activitiesField === ACT_FIELD_ETC ? !n.field : n.field === activitiesField'), true);
   const eng = createRequire(import.meta.url)('../match-engine.js');
   const P = { school: '한국외국어대학교', campus: '' };
   eq('엔진: 학교가 빈 글은 누구에게나', eng.activityForProfile({ school: '', url: 'u' }, P), true);
@@ -2247,7 +2281,7 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
   eq('못 받아 왔어도 빈 문서 (뼈대가 굳지 않게)', /liveNews = d \|\| liveNews \|\| \{ items: \[\], updatedAt: null \}/.test(app), true);
   eq('옛 통짜 파일로 물러나는 길이 없다', /data\/news\.json/.test(app), false);
   eq('학교 범위는 엔진의 noticeForProfile 한 곳 · 숨긴 글 제외', /\.filter\(\(n\) => n && n\.url && n\.title && !n\.hidden && noticeForProfile\(n, p\)\)/.test(app), true);
-  eq('카드는 한 벌 — 윗줄만 「학교 공지 · 갈래」 · 게시일은 줄에서 읽은 것만 한 줄', /noticeCardHtml\(n, \{ org: `\$\{n\.school\} 공지\$\{n\.kind \? ' · ' \+ n\.kind : ''\}`, excerpts: n\.postedAt \? \[\{ label: '게시', text: n\.postedAt \}\] : \[\], thumb: n\.thumb \}\)/.test(app) && !/function newsCardHtml/.test(app), true);
+  eq('카드는 한 벌 — 윗줄만 「학교 공지 · 갈래」 · 게시일은 줄에서 읽은 것만 한 줄', /noticeCardHtml\(n, \{ org: `\$\{n\.school\} 공지\$\{n\.kind \? ' · ' \+ n\.kind : ''\}`, excerpts: n\.postedAt \? \[\{ label: '게시', text: n\.postedAt \}\] : \[\], thumb: n\.thumb, schoolPhoto: sp \}\)/.test(app) && !/function newsCardHtml/.test(app), true);
   eq('더보기 — 장 수는 상수 하나 · 그릇에 위임', /const NEWS_HOME_TOP = \d+;/.test(app) && /newsBox\.addEventListener\('click'/.test(app) && /data-news-more/.test(app), true);
   const ui = strip(readText(new URL('.github/workflows/verify-ui.yml', root)));
   eq('브라우저 드라이버가 관문에 걸려 있다', /verify-news\.js/.test(ui), true);
@@ -2431,7 +2465,7 @@ console.log('\n■ 교내 소식 썸네일 (2026-10-03 개발자 지시 "실제 
   eq('  썸네일 이름은 줄인 그림 바이트의 해시 (같은 이름에 다른 그림을 쓰지 않는다 — 서비스워커가 그림을 캐시 우선으로 영영 든다)', [TH.thumbName(Buffer.from('a')) === TH.thumbName(Buffer.from('a')), TH.thumbName(Buffer.from('a')) !== TH.thumbName(Buffer.from('b')), TH.isThumbPath(TH.thumbName(Buffer.from('a')))], [true, true, true]);
   /* ⑧ 카드 — 소식만 opts.thumb 로 · 다른 카드(실시간 공고·재단)는 그림을 안 넘긴다 · 못 받으면 그림을 빼는 error 잡이(CSP 가 onerror= 를 막는다) */
   eq('  카드 — 로봇 꼴일 때만 그림 · 소식 카드만 넘긴다 · 못 받은 그림은 빼고 글자 카드로', /const thumb = o\.thumb && NEWS_THUMB_RE\.test\(o\.thumb\) \? o\.thumb : '';/.test(app) && (app.match(/thumb: n\.thumb/g) || []).length === 1
-    && /document\.addEventListener\('error', \(e\) => \{[\s\S]{0,200}?notice-thumb[\s\S]{0,200}?\}, true\);/.test(app) && /class="notice-thumb" src="\$\{esc\(thumb\)\}" alt="" loading="lazy"/.test(app), true);
+    && /document\.addEventListener\('error', \(e\) => \{[\s\S]{0,600}?notice-thumb[\s\S]{0,600}?\}, true\);/.test(app) && /class="notice-thumb" src="\$\{esc\(thumb\)\}" alt="" loading="lazy"/.test(app), true);
   eq('    브라우저 드라이버가 썸네일을 잰다 (그려짐·72px·겹침 없음·못 받으면 뺌·바깥 주소 안 부름)', /⑥ 사진 있는 글/.test(readText(new URL('verify/verify-news.js', root))) && /⑥ 바깥 주소로 그림을 부르지 않았다/.test(readText(new URL('verify/verify-news.js', root))), true);
   /* ⑨ 워크플로 — 수집 다음·감사 앞 보강 단계 · sharp 설치를 삼키지 않는다 · 장부 되돌리기를 따로 · 저장 */
   const wf = readText(new URL('.github/workflows/collect-news.yml', root));
@@ -2514,6 +2548,73 @@ console.log('\n■ 교내 소식 썸네일 (2026-10-03 개발자 지시 "실제 
     const body = (name) => { const i = adm.indexOf(`function ${name}(`); return i < 0 ? '' : adm.slice(i, adm.indexOf('\nfunction ', i + 10)); };
     eq('    사진·빼기·되살리기는 소식 줄(newsItemRowHtml)에 있고 활동 줄에는 없다', [/class="ig-thumb news-thumb"/.test(body('newsItemRowHtml')) && /data-news-thumb-off=/.test(body('newsItemRowHtml')) && /data-news-thumb-on=/.test(body('newsItemRowHtml')), /thumb/.test(body('actItemRowHtml'))], [true, false]);
     eq('    관리자 화면 — 사진·빼기·되살리기 단추가 글 번호를 보낸다', /data-news-thumb-off="\$\{esc\(n\.url\)\}" data-news-post=/.test(adm) && /applyAction\('newsThumbOff', \{ url, postId: pid \}/.test(adm) && /applyAction\('newsThumbOn', \{ url: el\.dataset\.newsThumbOn, postId: el\.dataset\.newsPost \|\| '' \}/.test(adm), true);
+  }
+}
+
+console.log('\n■ 학교 대표 사진 (2026-10-03 개발자 지시 "썸네일이 없는 공고들은 각 학교의 가장 예쁜 사진으로 대체")');
+{
+  const root = new URL('../', import.meta.url);
+  const app = readText(new URL('app.js', root));
+  const css = readText(new URL('style.css', root));
+  const ME = createRequire(import.meta.url)('../match-engine.js');
+  const SP = await import('../tools/build-school-photos.mjs');
+  const cut = (name) => { const at = app.indexOf(`function ${name}(`); if (at < 0) return ''; let d = 0; for (let j = app.indexOf('{', at); j < app.length; j++) { if (app[j] === '{') d++; else if (app[j] === '}' && --d === 0) return app.slice(at, j + 1); } return ''; };
+  const re = (name) => { const m = app.match(new RegExp(`const ${name} = (/.+/);`)); return m ? m[1] : ''; };
+  /* ① 앱이 받는 목록 — 서비스 학교만 · 파일이 실제로 있고 · 이름 꼴(바이트 해시) · 라이선스는 열린 것만 · 출처 줄이 있다 */
+  const photos = JSON.parse(readText(new URL('assets/schools/photos.json', root)));
+  const rows = Object.entries(photos.schools || {}).flatMap(([school, list]) => list.map((x) => ({ school, ...x })));
+  const PHOTO_RE = new RegExp(re('SCHOOL_PHOTO_RE').slice(1, -1));
+  eq('  photos.json — 서비스 학교만 · 학교마다 1~3장', Object.entries(photos.schools || {}).filter(([s, l]) => !ME.SERVED_SCHOOLS.includes(s) || !l.length || l.length > 3).map(([s]) => s), []);
+  eq('    사진 파일이 있고 앱이 그리는 이름 꼴(assets/schools/<학교키>-<해시 8자>.webp)이며 학교키가 그 학교 것', rows.filter((x) => !PHOTO_RE.test(x.src) || !fs.existsSync(new URL(x.src, root)) || !x.src.startsWith(`assets/schools/${ME.noticeFileKey(x.school)}-`)).map((x) => x.src), []);
+  eq('    라이선스는 CC0 · CC BY · CC BY-SA · 퍼블릭 도메인만 (NC·ND 없음) · 출처 줄 = 작가 · 라이선스', rows.filter((x) => { const lic = String(x.credit || '').split(' · ').pop(); return !SP.OK_LICENSE.test(lic) || /NC|ND/.test(lic) || !/^.+ · .+$/.test(x.credit || ''); }).map((x) => `${x.school}:${x.credit}`), []);
+  eq('    사진의 공용 페이지 주소가 위키미디어 · 자를 자리 꼴', rows.filter((x) => !/^https:\/\/commons\.wikimedia\.org\/wiki\//.test(x.page || '') || !SP.FOCUS_RE.test(x.focus || '')).map((x) => x.src), []);
+  eq('    폴더에 안 쓰는 그림이 남지 않는다', fs.readdirSync(new URL('assets/schools/', root)).filter((f) => f !== 'photos.json' && !rows.some((x) => x.src === `assets/schools/${f}`)), []);
+  eq('    출처 줄 다듬기 — 위키미디어의 HTML 조각(Pixabay 문장)에서 이름만', SP.cleanAuthor('&lt;a href="https://pixabay.com/ko/"&gt;Pixabay&lt;/a&gt;로부터 입수된 &lt;a href="https://pixabay.com/ko/users/x/"&gt;HeungSoon&lt;/a&gt;님의 이미지 입니다.'), 'HeungSoon (Pixabay)');
+  eq('    이름 뒤 괄호 설명은 떼고 이름만 (긴 이름은 낱말 경계에서)', [SP.cleanAuthor('Yohan Lee(Sejong University student of class 25) 이요한(세종대학교 학번 25)'), SP.cleanAuthor('최광모 (Choe Kwangmo)'), SP.cleanAuthor('Saigen Jiro'), SP.cleanAuthor('myself (User:Piotrus)')], ['Yohan Lee 이요한', '최광모', 'Saigen Jiro', 'Piotrus']);
+  /* ② 앱 — 카드를 실제로 그려 본다 (함수를 떼어 실행) */
+  const env = `const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const safeUrl = (u) => u; const unent = (s) => s;
+    ${/* 카드의 링크 이름은 source-link.js 한 곳(2026-10-03 원문 링크 정직성) — 흉내 내지 않고 진짜 파일을 싣는다 */ readText(new URL('source-link.js', root))}
+    const NEWS_THUMB_RE = ${re('NEWS_THUMB_RE')}; const SCHOOL_PHOTO_RE = ${re('SCHOOL_PHOTO_RE')}; const PHOTO_FOCUS_RE = ${re('PHOTO_FOCUS_RE')};
+    let schoolPhotos = null;
+    ${cut('noticeCardHtml')}
+    ${cut('schoolPhotoFor')}
+    return { noticeCardHtml, schoolPhotoFor, set: (d) => { schoolPhotos = d; } };`;
+  const A = new Function(env)();
+  const n = { title: '휴강 안내', url: 'https://k.ac.kr/n/1', school: '경희대학교', foundAt: '2026-10-03' };
+  const good = { src: 'assets/schools/n1w4hprp-0123abcd.webp', focus: '50% 40%', credit: 'x · CC BY 3.0', page: 'https://commons.wikimedia.org/wiki/File:x.jpg' };
+  const h1 = A.noticeCardHtml(n, { schoolPhoto: good });
+  eq('  사진 없는 글 — 학교 사진이 썸네일 자리에 · 「학교 사진」 표시 · 자를 자리', [/class="sch-card notice-card has-thumb"/.test(h1), /<span class="notice-thumb notice-thumb-school"><img src="assets\/schools\/n1w4hprp-0123abcd\.webp"/.test(h1), />학교 사진<\/span>/.test(h1), /object-position:50% 40%/.test(h1)], [true, true, true, true]);
+  const h2 = A.noticeCardHtml({ ...n, thumb: 'data/news/img/0123456789abcdef.webp' }, { thumb: 'data/news/img/0123456789abcdef.webp', schoolPhoto: good });
+  eq('    글의 사진이 있으면 그 사진만 (학교 사진·표시 없음)', [/notice-thumb-school|학교 사진/.test(h2), /data\/news\/img\/0123456789abcdef\.webp/.test(h2)], [false, true]);
+  const h3 = A.noticeCardHtml(n, { schoolPhoto: { ...good, src: 'https://evil.example/x.webp', focus: '1;background:red' } });
+  const h4 = A.noticeCardHtml(n, { schoolPhoto: { ...good, focus: '0 0;background:url(x)' } });
+  eq('    바깥 주소·이상한 자를 자리는 그리지 않는다', [/has-thumb/.test(h3), /background/.test(h4), /object-position/.test(h4)], [false, false, false]);
+  A.set({ schools: { 경희대학교: [good, { ...good, src: 'assets/schools/n1w4hprp-89abcdef.webp' }, { ...good, src: 'https://evil.example/y.webp' }] } });
+  /* 리뷰(10-03) — 글마다 해시로 고르니 이웃 카드가 같은 사진을 셋 연속으로 받았다(전북대 실측) → 사진 없는 카드의 차례로 돌린다 */
+  const seq = [0, 1, 2, 3].map((k) => A.schoolPhotoFor({ ...n, url: `https://k.ac.kr/n/${k}` }, k).src);
+  eq('    학교에 여러 장이면 차례대로 돌아 이웃이 겹치지 않는다 · 이상한 항목은 안 고른다 · 차례 없으면 첫 장 · 다른 학교는 없음', [seq, A.schoolPhotoFor(n).src, A.schoolPhotoFor({ ...n, school: '서울대학교' }, 1)], [['assets/schools/n1w4hprp-0123abcd.webp', 'assets/schools/n1w4hprp-89abcdef.webp', 'assets/schools/n1w4hprp-0123abcd.webp', 'assets/schools/n1w4hprp-89abcdef.webp'], 'assets/schools/n1w4hprp-0123abcd.webp', null]);
+  /* ③ 구역 — 글의 사진이 없을 때만 넘기고, 쓴 사진의 출처를 구역 아래에 (라이선스 표기 의무) */
+  const sec = cut('schoolNewsHtml');
+  eq('  구역 — 글의 사진이 없을 때만 학교 사진 · 쓴 사진마다 출처 줄(공용 페이지 링크) · 위키미디어 공용', [/const sp = n\.thumb && NEWS_THUMB_RE\.test\(n\.thumb\) \? null : schoolPhotoFor\(n, turn\[n\.school\] = \(turn\[n\.school\] \?\? -1\) \+ 1\);/.test(sec), /class="news-photo-credit">학교 사진 · /.test(sec), /· 위키미디어 공용<\/p>/.test(sec), /commons\\\.wikimedia\\\.org/.test(sec)], [true, true, true, true]);
+  eq('    목록은 소식을 받을 때 같이 받는다(한 번) · 늦게 와도 다시 그린다', /get\('assets\/schools\/photos\.json'\)\.then\(\(d\) => \{ if \(d && d\.schools && !schoolPhotos\) \{ schoolPhotos = d; if \(liveNews\) rerenderVisible\(\); \} \}\);/.test(app), true);
+  eq('    못 받은 그림은 감싼 칸째 뺀다(「학교 사진」 표시만 남지 않게)', /img\.parentElement && img\.parentElement\.classList\.contains\('notice-thumb'\) \? img\.parentElement : null/.test(app) && /box\.remove\(\);/.test(app), true);
+  eq('    학교 사진이 하나도 안 남으면 출처 줄도 뺀다(리뷰 10-03)', /if \(section && !section\.querySelector\('\.notice-thumb-school'\)\) \{ const c = section\.querySelector\('\.news-photo-credit'\); if \(c\) c\.remove\(\); \}/.test(app), true);
+  /* 리뷰(10-03) — 시작 화면 사진 셋에 번호판·택시·행인이 컸다. 72px 에선 안 보여도 640px 파일은 공개 주소 → 고른 기록의 crop 으로 파일에서 덜어 낸다 */
+  eq('    잘라 낼 자리(crop 비율 → 픽셀 상자) · 틀린 값은 자르지 않음(null)', [SP.cropBox(1000, 750, [0, 0, 1, 0.78]), SP.cropBox(1000, 666, [0.23, 0, 0.77, 1]), SP.cropBox(1000, 750, [0.5, 0, 0.6, 1]), SP.cropBox(1000, 750, [0, 0, 1]), SP.cropBox(1000, 750, [0, 0, -1, 1])],
+    [{ left: 0, top: 0, width: 1000, height: 585 }, { left: 230, top: 0, width: 770, height: 666 }, null, null, null]);
+  eq('    만드는 도구가 crop 을 쓴다 · 틀리면 문제로 알린다', /if \(p\.crop\) \{[\s\S]{0,200}?cropBox\(width, height, p\.crop\)[\s\S]{0,200}?problems\.push/.test(readText(new URL('tools/build-school-photos.mjs', root))), true);
+  eq('    「학교 사진」 표시와 출처 줄의 모양이 있다', /\.notice-thumb-school \.thumb-tag \{/.test(css) && /\.news-photo-credit \{/.test(css), true);
+  /* ④ 만드는 도구 — 바이트 해시 이름 · 쓰지 않는 그림 정리 · 라이선스 거름 */
+  const tool = readText(new URL('tools/build-school-photos.mjs', root));
+  eq('  만드는 도구 — 바이트 해시 이름(서비스워커 캐시 우선) · 안 쓰는 그림 지움 · 라이선스 거름 · 학교당 3장', [/const name = `\$\{key\}-\$\{crypto\.createHash\('sha1'\)\.update\(buf\)\.digest\('hex'\)\.slice\(0, 8\)\}\.webp`;/.test(tool), /if \(!keep\.has\(f\)\) fs\.unlinkSync/.test(tool), /!OK_LICENSE\.test\(meta\.license \|\| ''\) \|\| \/NC\|ND\/\.test\(meta\.license\)/.test(tool), /list\.slice\(0, 3\)/.test(tool)], [true, true, true, true]);
+  const live = readText(new URL('.github/workflows/check-live.yml', root));
+  eq('  라이브 점검이 학교 사진 목록과 그림 하나를 본다', /assets\/schools\/photos\.json/.test(live), true);
+  /* 리뷰(10-03) — 개수 세기에 j.schools 를 그냥 더했더니 색인 파일(schools 가 숫자)이 양쪽 다 '읽기실패'가 되어 404 도 '같음'이 됐다 → 점검의 count 를 떼어 실제 파일로 잰다 */
+  {
+    const cm = live.match(/const count = \(p\) => \{[\s\S]*?\n\s*\};/);
+    const count = cm ? new Function('fs', `${cm[0]}\nreturn count;`)(fs) : null;
+    eq('    색인 파일은 칸 수로 · 학교 사진 목록은 학교 수로 · 404(HTML)는 읽기실패', count ? [count(fileURLToPath(new URL('data/news/index.json', root))), count(fileURLToPath(new URL('assets/schools/photos.json', root))) === Object.keys(photos.schools).length, count(fileURLToPath(new URL('index.html', root)))] : 'count 를 못 찾음', [Object.keys(JSON.parse(readText(new URL('data/news/index.json', root)))).length, true, '읽기실패']);
   }
 }
 
@@ -2918,6 +3019,26 @@ console.log('\n■ 접수 기간 한 줄 (2026-09-12)');
 {
   const { deadlineHintFrom, looksLikeHint } = await import('../collector/deadline-hint.mjs');
   const H = (t) => deadlineHintFrom(t);
+  /* 2026-10-03 — 본문 글자에 &nbsp; 가 날것으로 남아 80자 자르기가 기호 한가운데를 잘랐다(학생 화면 `16:00 &n` · 실측 20건) */
+  eq('HTML 기호는 풀고 자른다 · 반쯤 잘린 기호는 뗀다 · R&D 같은 글자는 그대로',
+    [H('신청기간:&nbsp;2026. 10. 1.(목) 10:00 ~ 2026. 10. 30.(금) 16:00&nbsp; &nbsp; &nbsp; &nbsp; 다음 문장이 길게 이어지고 있습니다 계속 계속 계속 계속'), H('접수기간: 2026. 9. 1. ~ 9. 30. R&D 연구실 &amp;nbsp; 제출')],
+    ['신청기간: 2026. 10. 1.(목) 10:00 ~ 2026. 10. 30.(금) 16:00 다음 문장이 길게 이어지고 있습니다 계속 계속 계', '접수기간: 2026. 9. 1. ~ 9. 30. R&D 연구실 제출']);
+  {
+    const appSrc = readText(new URL('../app.js', import.meta.url));
+    const dh = readText(new URL('../collector/deadline-hint.mjs', import.meta.url));
+    const reOf = (src) => (src.match(/const PARTIAL_ENTITY_END = (\/.+\/);/) || [])[1];
+    eq('  앱이 이미 실린 힌트 끝의 반쪽 기호를 떼고 보인다(같은 꼴 · 두 자리 모두)', [reOf(appSrc) === reOf(dh) && !!reOf(dh), (appSrc.match(/esc\(hintText\(n\.deadlineHint\)\)/g) || []).length, /esc\(unent\(n\.deadlineHint\)\)/.test(appSrc)], [true, 2, false]);
+    /* 리뷰(10-03) — 여기서 hintText 를 따로 지어 재면 앱의 것이 바뀌어도 모른다 → 앱 소스의 그 줄들(ENTITIES·ENTITY_RE·unent·PARTIAL_ENTITY_END·hintText)을 떼어 실행한다 */
+    const line = (re) => (appSrc.match(re) || [''])[0];
+    const unentSrc = (() => { const at = appSrc.indexOf('function unent('); return at < 0 ? '' : appSrc.slice(at, appSrc.indexOf('\n}', at) + 2); })();
+    const hintText = new Function(`${line(/const ENTITIES = \{[^\n]+\};/)}\n${line(/const ENTITY_RE = [^\n]+;/)}\n${unentSrc}\n${line(/const PARTIAL_ENTITY_END = [^\n]+;/)}\n${line(/const hintText = [^\n]+;/)}\nreturn hintText;`)();
+    eq('    (앱의 hintText 그대로) `16:00 &n` → `16:00` · `&#3`·`&middo` 도 · 온전한 기호는 글자로 · `R&D` 는 그대로', [hintText('2026. 10. 30.(금) 16:00 &n'), hintText('마감 9. 30. &#3'), hintText('접수 및 이메일 접&middo'), hintText('가&middot;나 &amp; 다'), hintText('R&D')], ['2026. 10. 30.(금) 16:00', '마감 9. 30.', '접수 및 이메일 접', '가·나 & 다', 'R&D']);
+    /* 리뷰(10-03) — 로봇이 푸는 기호가 일곱뿐이라 &middot;·&lsquo; 는 여전히 반쪽이 됐다 → 앱이 아는 이름 기호는 로봇도 전부 안다(숫자 기호는 모두) */
+    const appNames = Object.keys(new Function(`${(appSrc.match(/const ENTITIES = \{[^\n]+\};/) || ['const ENTITIES = {};'])[0]} return ENTITIES;`)()).filter((k) => !k.startsWith('#'));
+    const { HINT_ENT } = await import('../collector/deadline-hint.mjs');
+    eq('    앱이 아는 이름 기호를 로봇도 다 푼다', appNames.filter((k) => !(k in HINT_ENT)), []);
+    eq('    &middot;·&#183; 은 글자로 풀고 자른다', [H('신청기간: 2026. 10. 1.(목) 10:00 ~ 2026. 10. 30.(금) 16:00 제출처 장학팀 방문 접수 및 이메일 접&middot; 다음 문장').endsWith('접· 다음 문'), H('접수기간: 2026. 9. 1. ~ 9. 30. 가&#183;나 제출')], [true, '접수기간: 2026. 9. 1. ~ 9. 30. 가·나 제출']);
+  }
 
   eq('이름표에서 시작한다',
     H('1. 신청기간 : 2026. 9. 11(금) ~ 9. 18(금) 15:00 까지 나. 선발 : 10월'),
@@ -3085,8 +3206,12 @@ console.log('\n■ 지역 요건 — 시·군까지 (2026-08-30)');
   eq('  다르면 미달 (안양시 학생 · 광양시 장학금)',
     verdict(mk('백운장학회(광양)', '광양시에 주소를 두고 재학 중인 학생'), anyang), '미달');
   /* 🔴 안 고른 학생에게 ✕ 를 치면 안 된다 — 모르는 것과 안 맞는 것은 다르다 */
-  eq('  시·군을 안 골랐으면 미달이 아니라 미확인',
-    verdict(mk('백운장학회(광양)', '광양시에 주소를 두고 재학 중인 학생'), {}), '미확인');
+  /* 2026-10-03 개발자 지시("완벽하게") — 시·도가 다르면 시·군을 몰라도 안 맞는 것을 **안다**(경기 학생 · 광양시=전남 → 미달).
+     모르는 것은 **같은 시·도 안에서 시·군을 안 고른 경우**뿐이다 — 이 검사가 지키던 뜻은 그쪽으로 옮긴다. */
+  eq('  시·군을 안 골랐어도 시·도가 다르면 미달 (경기 학생 · 광양시 장학금)',
+    verdict(mk('백운장학회(광양)', '광양시에 주소를 두고 재학 중인 학생'), {}), '미달');
+  eq('  같은 시·도인데 시·군을 안 골랐으면 미달이 아니라 미확인 (전남 학생 · 광양시)',
+    verdict(mk('백운장학회(광양)', '광양시에 주소를 두고 재학 중인 학생'), { region: '전남', parentRegion: '전남' }), '미확인');
   /* 🔴 예외 문구가 있으면 ✕ 를 치지 않는다 — `대학생은 관외 거주 인정` 이 실제로 있다 */
   eq('  예외 문구가 있으면 미달로 단정하지 않는다',
     verdict(mk('백운장학회(광양)', '광양시에 주소를 둔 자 대학생의 경우 본인에 한하여 관외 거주 인정'), anyang) !== '미달', true);
@@ -3117,7 +3242,8 @@ console.log('\n■ 자격 판정의 정직함 (2026-08-30)');
   /* ① 한 조건만 맞았다고 줄 전체에 ✓ 를 치면, **묻지도 않은 처지**를 확인했다고 말하는 셈이다 */
   eq('묻지 않은 처지에는 ✓ 를 치지 않는다 (손자녀)',
     mark('취약계층 국민연금수급자 또는 그 자녀(손자녀)로서 대학교 4년제·전문대에 재학 중인 자'), null);
-  eq('  둘째아 이상 자녀', mark('보호자가 6개월 이상 원주시에 주민등록을 두고 거주하는 만 24세 이하의 둘째아 이상 자녀'), null);
+  /* 강원 학생으로 잰다 — 서울 학생이면 원주시(강원) 거주 요건 때문에 미달이 되어(2026-10-03 시·군 → 시·도 판정) 이 검사의 뜻(묻지 않은 처지에 ✓ 금지)을 못 잰다 */
+  eq('  둘째아 이상 자녀', mark('보호자가 6개월 이상 원주시에 주민등록을 두고 거주하는 만 24세 이하의 둘째아 이상 자녀', { region: '강원', parentRegion: '강원' }), null);
   eq('  세대주 나이', mark('세대주가 만 65세 이하'), null);
   eq('  산업체 근로자', mark('산업체근로자 - 상주시 기업체에 근무하는 근로자 중 2년제 이상 대학에 재학 중인 자'), null);
   /* 🔴 반대쪽 — 우리가 **묻는** 처지까지 막으면 진짜 판정이 사라진다 */
@@ -10966,7 +11092,7 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
     /if \(it\.detailsTriedAt && \(Date\.parse\(todayIso\) - Date\.parse\(it\.detailsTriedAt\)\) < 7 \* 86400000\) continue;/.test(cmY) && /if \(detail\.text\) delete it\.detailsTriedAt; else it\.detailsTriedAt = todayIso;/.test(cmY), true);
   eq('⑥ 활동 글을 엔진 모양으로 — 칸 이름이 장학과 같다', /function activityAsSch[\s\S]*?eligibilityLines: n\.eligibilityLines[\s\S]*?eligibilityExcludes: n\.eligibilityExcludes/.test(appX), true);
   eq('  적합도는 getMatches 와 같은 세 함수(evaluateFor · fitScore · fitDetailFor)', /function activityFit[\s\S]*?evaluateFor\(sch, state\.profile\)[\s\S]*?fitScore\(sch, result, state\.profile\)[\s\S]*?fitDetailFor\(sch, state\.profile\)/.test(appX), true);
-  eq('  카드 판정은 장학 카드의 cardBadgeHtml', /badge: cardBadgeHtml\(m\.fit, m\.fd, null\)/.test(appX), true);
+  eq('  카드 판정은 장학 카드의 cardBadgeHtml · 단 \'자격 미확인\'은 활동 카드에 안 단다(2026-10-03 개발자 결정)', /badge: fitVerdict\(m\.fit, m\.fd\) === 'unread' \? '' : cardBadgeHtml\(m\.fit, m\.fd, null\)/.test(appX), true);
   eq('  지원 자격 줄은 장학 시트와 한 함수(eligibilityRowsHtml) — 장학 시트도 그것을 부른다',
     (appX.match(/eligibilityRowsHtml\(sch, result\)/g) || []).length >= 2 && /const reasonRows = eligibilityRowsHtml\(sch, result\);/.test(appX), true);
   eq('  시트 판정 머리 · 묻기 상자(다시 그릴 때 이 시트로)', /function openActivityDetail[\s\S]*?fitBadgeHtml\(fit, fd, \{ full: true \}\)[\s\S]*?eligAskHtml\(sch\)[\s\S]*?eligAskWire\(sch, \(\) => openActivityDetail\(url\)\)/.test(appX), true);
@@ -10987,6 +11113,119 @@ console.log('\n■ 원문 링크 정직성 (2026-10-03 · 원문 대신 재단 �
 {
   const { runLinkGates } = await import('./link-gates.mjs');
   await runLinkGates(eq);
+}
+
+console.log('\n■ 대외활동·공모전 — 활동 글의 자격 읽기 (2026-10-03 · 개발자 "왜 대외활동 공모전은 자격 미확인이야 죄다")');
+{
+  /* 왜 있나 — 활동 188건 중 122건이 자격 0줄이었다(실측). 원문엔 있었다: 활동만 쓰는 절 제목(공모자격·교육대상) ·
+     콜론 없는 이름표(`ㅇ ( 신청자격 ) …`) · 사이트 메뉴가 자격 절로 뽑힘 · `국민 누구나` 를 엔진이 못 읽음.
+     심장은 장학과 같다: 지어내지 않는다(원문 줄 그대로) · 틀린 안심 금지(`서울시민 누구나` 는 ✓ 아님) · 틀린 미달 금지. */
+  const AX = await import('../collector/activity-excerpts.mjs');
+  const X = await import('../collector/extract-excerpts.mjs');
+  const rq = createRequire(import.meta.url);
+  const MEX = rq('../match-engine.js');
+  const yr = new Date().getFullYear();
+  const P = { school: '한국외국어대학교', year: 3, status: '재학', flags: [], nationality: 'korean', birthYear: yr - 22, region: '서울' };
+  const el = (page, title) => AX.activityDetails(page, title).eligibilityLines;
+  eq('① 괄호 이름표 — `ㅇ ( 신청자격 ) 대전시 거주 청년` 을 읽고, 다음 이름표(접수기간)에서 끊는다',
+    el(['ㅇ ( 신청자격 ) 대전시 거주 청년 ( 만 18~39 세 )', 'ㅇ ( 접수기간 ) 프로그램별 상이', 'ㅇ ( 신청방법 ) 네이버 폼'].join('\n')), ['ㅇ 신청자격 : 대전시 거주 청년 ( 만 18~39 세 )']);
+  eq('  홀로 선 `<응모자격>` 은 다음 줄을 끌어오지 않는다(줄바꿈을 먹지 않는다)', el(['<응모자격>', 'ㅇ 전 세계인 누구나'].join('\n')).some((l) => /응모자격 : ㅇ/.test(l)), false);
+  eq('② 활동 절 제목 — 공모자격·공모대상·교육대상', [el('4. 공모자격 : 대한민국 국민 누구나').length > 0, el('□ 공모대상 : 대한민국 국민 누구나(개인, 팀 모두 가능)').length > 0, el(['□ 교육대상', 'AI에 관심 있는 누구나 25인', '□ 신청기간'].join('\n')).some((l) => /누구나/.test(l))], [true, true, true]);
+  eq('  장학 발췌기는 그 제목을 안 받는다(장학 결과는 그대로)', X.extractQualifyLines('4. 공모자격 : 대한민국 국민 누구나').length, 0);
+  eq('③ 사이트 메뉴의 `신청자격` 이 아니라 글 제목 뒤 본문의 자격을 읽는다',
+    el(['장학금 신청자격', '지원대상', '청년 공모전 참가자 모집 공고', '○ 참가자격 : 만 19~34세 대한민국 국민'].join('\n'), '[공고] 청년 공모전 참가자 모집 공고'), ['○ 참가자격 : 만 19~34세 대한민국 국민']);
+  eq('  보도자료 문장(`… 심사 기준 등 자세한 사항은`)을 자격 절 제목으로 쓰지 않는다',
+    el(['참가 방법 , 제출 자료 , 심사 기준 등 자세한 사항은 누리집에 게시된 공고문에서 확인할 수 있다 .', '※ 아이디어 검토 대상 : 모바일 주민등록증'].join('\n')).some((l) => /자세한 사항/.test(l)), false);
+  eq('④ 이름표가 없으면 `국민 누구나` 줄만 원문 그대로 · 장비 `제한 없음`·안내 문장은 아니다',
+    [el('바다를 사랑하는 대한민국 국민 누구나'), el('• 촬영 장비 : 디지털카메라, 드론 등 제한 없음'), el('국민 누구나 다시 일어설 기회를 얻도록 정부가 마련한 지원 정책입니다.')], [['바다를 사랑하는 대한민국 국민 누구나'], [], []]);
+  const rm = (l, p = P) => MEX.requirementMatch(l, p, {});
+  eq('⑤ 판정 — `국민 누구나`·`관심 있는 누구나`·`참가자격 : 전 국민 누구나(개인 또는 팀)` 은 충족',
+    [rm('대한민국 국민 누구나'), rm('AI에 관심 있는 누구나 25인'), rm('○ 참가자격 : 전 국민 누구나(개인 또는 최대 5명으로 구성된 팀)')], ['ok', 'ok', 'ok']);
+  /* 서울 학생에게 `서울시민 누구나` 는 ✓ 가 맞다(거주 요건이 판정한다 — 처음 이 검사를 그렇게 잘못 적었다). 누구나 축은 지역을 지우지 않는다 */
+  eq('  🔴 다른 요구가 남으면 누구나로 ✓ 하지 않는다(틀린 안심 금지) — 서울 학생에게 부산시민 누구나 · 창업자 누구나', [rm('부산시민 누구나') !== 'ok', rm('예비창업자 누구나') !== 'ok'], [true, true]);
+  eq('  `○ 활동자격 : 대학생` — 이름표는 요구가 아니다(학부생 ✓)', rm('○ 활동자격 : 대학생'), 'ok');
+  const fx = (ex, p) => MEX.fitDetail({ eligibilityLines: ['만 15세 이상 34세 이하 청년'], eligibilityExcludes: [ex], eligibility: {} }, p).fails.length;
+  eq('  🔴 제외 `대한민국 국적을 보유하지 않은 사람` 은 한국 학생을 떨어뜨리지 않는다(틀린 미달 · K-뉴딜 실측) · 외국 학생은 걸린다',
+    [fx('⑤ 대한민국 국적을 보유하지 않은 사람', P), fx('⑤ 대한민국 국적을 보유하지 않은 사람', { ...P, nationality: 'foreign' })], [0, 1]);
+  eq('  (리뷰) 제목 머리말 `[서울문화재단] …` 은 이름표로 바꾸지 않는다 · 맨 제목 줄 `지원자격` 아래 내용은 자격이다',
+    [AX.activityDetails('[서울문화재단] 2026 청년예술인 모집').noticeLines.concat(el('[서울문화재단] 2026 청년예술인 모집')).some((l) => /서울문화재단 :/.test(l)), el(['지원자격', '대학 재학생으로서 평점 3.0 이상인 자', '신청기간 : 2026. 10. 1. ~ 10. 20.'].join('\n'))],
+    [false, ['대학 재학생으로서 평점 3.0 이상인 자']]);
+  const PRX0 = rq('../parse-requirements.js');
+  const natOf = (l) => (rq('../parse-requirements.js').parseLine(l).conds.find((c) => c.kind === 'nationality') || {}).eq;
+  eq('  (리뷰) `대한민국 국적자로 결격사유가 없는 자` 는 한국 국적 요건 · `대한민국 국적이 없는 자` 는 외국 국적', [natOf('대한민국 국적자로 결격사유가 없는 자'), natOf('대한민국 국적이 없는 자')], ['korean', 'foreign']);
+  eq('  (리뷰) `전남 누구나` 의 \'전\' 은 지우지 않는다(누구나 축이 지역을 덮지 않는다)', rm('전남 누구나') !== 'ok', true);
+  /* ⑦ 사는 곳 (2026-10-03 개발자 지적 "대전 거주 청년 이런거는 알 수 있잖아 … 주소 넣잖아") — 시·도도 시·군처럼 판정한다 */
+  const seoul = { ...P, region: '서울', parentRegion: '서울' };
+  eq('⑦ 시·도 거주 — 서울 학생(부모도 서울)에게 `대전시 거주 청년` 은 미달 · 대전 학생은 충족 · 부모가 대전이면 충족',
+    [rm('대전시 거주 청년 ( 만 18~39 세 )', seoul), rm('대전시 거주 청년 ( 만 18~39 세 )', { ...seoul, region: '대전', parentRegion: '대전' }), rm('본인 또는 부모가 대전시에 주민등록이 되어 있는 청년', { ...seoul, parentRegion: '대전' })], ['no', 'ok', 'ok']);
+  eq('  🔴 다른 연고로도 되는 줄은 미달이 아니다(틀린 미달 금지) — 생활권 · ○○ 소재 대학 또는 주민등록자',
+    [rm('경기도에 거주하거나 생활권을 두고 있는 청년', seoul), rm('부산시 소재 대학졸업(예정)자 또는 주민등록자', seoul)].map((v) => v !== 'no'), [true, true]);
+  eq('  `39세 이하 청년 (부산시 청년 기준)` 은 나이 세는 법이지 사는 곳이 아니다', PRX0.parseLine('39세 이하 청년 (부산시 청년 기준)').conds.some((c) => c.kind === 'residence'), false);
+  /* ⑧ 시·군 → 시·도 (2026-10-03 개발자 지시 "완벽하게") — 시·군을 안 고른 학생도 시·도가 다르면 미달. 표는 parse-requirements 하나 */
+  const noCity = { ...seoul, regionCity: '', parentRegionCity: '' };
+  eq('⑧ 시·군 거주 — 시·군 안 고른 서울 학생에게 `구리시 거주 청년` 은 미달 · 경기 학생은 모름(시·군 모름) · 구리시 학생은 충족',
+    [rm('구리시 거주 청년', noCity), rm('구리시 거주 청년', { ...noCity, region: '경기' }), rm('구리시 거주 청년', { ...noCity, region: '경기', regionCity: '구리시' })], ['no', null, 'ok']);
+  eq('  같은 이름이 둘인 구(강서구 — 서울·부산)는 그중 한 곳 학생이면 모름 · 둘 다 아니면 미달', [rm('강서구에 주소를 둔 학생', noCity), rm('강서구에 주소를 둔 학생', { ...noCity, region: '대전', parentRegion: '대전' })], [null, 'no']);
+  eq('  표는 한 벌 — parse-requirements 가 내보내고 data.js 엔 없다 · 엔진의 브라우저 목록에 provincesOfCity',
+    [PRX0.provincesOfCity('구리시'), /const REGION_CITIES/.test(readText(new URL('../data.js', import.meta.url))), /: \{ parseLine,[^}]*provincesOfCity/.test(readText(new URL('../match-engine.js', import.meta.url)))], [['경기'], false, true]);
+  eq('  🔴 `관내 고등학교를 졸업하고 …` 는 출신 고교지 사는 곳이 아니다 · `관내 주소` 는 사는 곳', [(PRX0.parseLine('관내 고등학교를 졸업하고 전국 의과대학에 재학 중인 자').conds.find((c) => c.kind === 'residence') || {}).about !== 'home', (PRX0.parseLine('관내에 주소를 둔 자').conds.find((c) => c.kind === 'residence') || {}).about], [true, 'home']);
+  eq('  배점표(`성적 35% + 생활정도 50% + 경주시 거주기간 15%`)는 자격 줄이 아니다', MEX.requirementLines({ eligibilityLines: ['□ 성적 35% + 생활정도 50% + 경주시 거주기간 15%'] }, null, { all: true }).length, 0);
+  eq('⑥ 소급 — 판(detailsV)을 올려 옛 글도 다시 읽는다 · 수집 로봇은 제목을 넘긴다',
+    [AX.ACT_DETAILS_V >= 3, (readText(new URL('../collector/collect.mjs', import.meta.url)).match(/activityDetails\(detail\.text, it\.title\)/g) || []).length], [true, 2]);
+}
+
+console.log('\n■ 대외활동·공모전 — 첨부·포스터 읽기 (2026-10-03 · 개발자 "api 잔액 채우고 딸깍 · 무료로 최대한 땜빵")');
+{
+  /* 왜 있나 — 본문에 자격이 없는 활동 글은 포스터·첨부에만 자격이 있다. 무료(HWP·OCR)는 수집 때 자동으로, 유료 AI 는 버튼에서만.
+     심장 셋: ① 사이트 공통 그림(인증서·광고 배너)을 포스터로 받지 않는다(첫 실측에서 그것만 받혔다) ② 꺼진 AI 는 절대 안 부른다
+     ③ 첨부에서 읽은 자격을 본문 재수집이 지우지 않는다. */
+  process.env.ACTIVITY_DOCS_AS_LIB = '1';
+  const AD = await import('../collector/activity-docs.mjs');
+  const AX = await import('../collector/activity-excerpts.mjs');
+  const n = { title: '[공고] 2026 청년 영상 공모전 참가자 모집', attachments: [
+    { name: '참가신청서 양식.hwp', url: 'https://x.go.kr/f1' }, { name: '공모전 포스터.jpg', url: 'https://x.go.kr/f2' }, { name: '공고문.hwp', url: 'https://x.go.kr/f3' }] };
+  const html = '<img src="/top_banner.png"><img src="/promo.jpg"><h3>2026 청년 영상 공모전 참가자 모집</h3><div><img src="/upload/poster1.jpg"><img src="/images/icon_print.png"></div>';
+  const c = AD.candidateFiles(n, html, 'https://x.go.kr/view').map((f) => f.url.replace('https://x.go.kr', ''));
+  eq('① 후보 — 서식(신청서)은 빼고 포스터·공고문 · 본문 그림은 글 제목 뒤만(앞의 promo.jpg 는 사이트 그림) · 아이콘 뺌', c, ['/f2', '/f3', '/upload/poster1.jpg']);
+  const png = (w, h) => { const b = Buffer.alloc(32); b.writeUInt32BE(0x89504e47, 0); b.writeUInt32BE(w, 16); b.writeUInt32BE(h, 20); return b; };
+  eq('  그림 꼴 — 가로로 넓은 배너(846×510)는 포스터가 아니다 · 세로 포스터(1693×2166)는 맞다', [AD.posterShaped(AD.imageSize(png(846, 510))), AD.posterShaped(AD.imageSize(png(1693, 2166)))], [false, true]);
+  const e = AD.eligFromFiles(n, ['a-0.hwp'], () => ['■ 참가자격', '대한민국 국민 누구나(개인 또는 팀)', '■ 접수기간 : 2026. 10. 1. ~ 10. 20.'].join('\n'), '/tmp');
+  eq('② 받은 파일 글자 → 본문과 같은 규칙(activityDetails)으로 자격 · 출처 표식', [e && e.eligibilityLines.some((l) => /누구나/.test(l)), e && e.from], [true, '공고문 첨부']);
+  const it = AX.putActivityDetails({ eligibilityLines: ['대한민국 국민 누구나'], eligibilityFrom: '공고문 첨부' }, { eligibilityLines: [], noticeLines: ['안내'] });
+  const it2 = AX.putActivityDetails({ eligibilityLines: ['옛 줄'], eligibilityFrom: '공고문 첨부' }, { eligibilityLines: ['만 19~34세 청년'], noticeLines: [] });
+  eq('③ 본문을 다시 읽어도 첨부에서 읽은 자격은 남는다 · 본문에서 자격이 나오면 본문이 이긴다(표식도 뗀다)',
+    [it.eligibilityLines, it.eligibilityFrom, it2.eligibilityLines, it2.eligibilityFrom], [['대한민국 국민 누구나'], '공고문 첨부', ['만 19~34세 청년'], undefined]);
+  eq('  `③ 국민 누구나 찾고 머물며 … 공간`(공모 소재 예시)은 자격이 아니다 — 누구나가 말의 끝일 때만',
+    AX.activityDetails(['<소재 예시>', '③ 국민 누구나 찾고 머물며 대한민국의 가치와 정체성을 경험할 수 있는 공간'].join('\n')).eligibilityLines, []);
+  eq('  AI 가 고른 글 제목 줄은 자격이 아니다(관문의 \'청년\' 신호를 제목이 통과한다)', [AD.isTitleLine('용산 청년지음 <진로 고민 워크숍> 참여자 모집', '용산 청년지음 <진로 고민 워크숍> 참여자 모집'), AD.isTitleLine('만 19~34세 청년', '용산 청년지음 <진로 고민 워크숍> 참여자 모집')], [true, false]);
+  eq('  무료 재시도는 두 번까지 · 이레 간격', [AD.dueFree(undefined, '2026-10-03'), AD.dueFree({ at: '2026-10-01', tries: 1 }, '2026-10-03'), AD.dueFree({ at: '2026-09-20', tries: 1 }, '2026-10-03'), AD.dueFree({ at: '2026-09-01', tries: 2 }, '2026-10-03')], [true, false, true, false]);
+  /* 포스터 OCR 은 그 글의 그림일 때만 — 글 제목 낱말이 그림 글자에 있어야 한다(사이트 옆 홍보물이 남의 자격으로 붙을 뻔했다) */
+  const ocrRead = (txt) => AD.eligFromFiles({ title: '청년 체인지메이커 아카데미 운영' }, ['x-0.jpg'], () => txt, '/tmp', () => true);
+  eq('  🔴 OCR 글자에 글 제목 낱말이 없으면 그 글의 자격이 아니다(제주 공공임대 홍보물) · 있으면 읽는다',
+    [ocrRead('제주 행복주택 입주자 모집\n○ 지원대상 : 대한민국 국민 누구나'), (ocrRead('청년 체인지메이커 아카데미\n모집대상 : 도내 거주 청년 누구나') || {}).from], [null, '공고문 첨부(OCR)']);
+  eq('  제목 낱말은 흔한 말(모집·안내·청년·공모전)을 빼고 센다', AD.titleWords('[공고] 2026 청년 체인지메이커 아카데미 운영 모집'), ['체인지메이커', '아카데미']);
+  const py = readText(new URL('../collector/paddle-ocr.py', import.meta.url));
+  eq('  PaddleOCR — 한국어 인식 모델을 이름으로(안 그러면 중국어 모델이 붙어 한글이 빠졌다) · 확신도 0.8 · 긴 변 2000px · 예산',
+    [/text_recognition_model_name='korean_PP-OCRv5_mobile_rec'/.test(py), /MIN_SCORE = 0\.8/.test(py), /MAX_SIDE = 2000/.test(py), /--budget-sec=/.test(py)], [true, true, true, true]);
+  /* ④ 유료 — 꺼져 있으면 부르지 않는다(설정 enabled 와 버튼의 ELIG_AI_ENABLE 둘 다 없을 때). 실제로 돌려 본다 */
+  const env = { ...process.env }; delete env.ELIG_AI_ENABLE; delete env.ANTHROPIC_API_KEY; delete env.ELIG_AI_FAKE; delete env.ACTIVITY_DOCS_AS_LIB;
+  const before = readText(new URL('../data/activities.json', import.meta.url));
+  const run = spawnSync(process.execPath, [fileURLToPath(new URL('../collector/activity-docs.mjs', import.meta.url)), '--ai', '--write'], { env, encoding: 'utf8' });
+  const after = readText(new URL('../data/activities.json', import.meta.url));
+  const cfgOn = JSON.parse(readText(new URL('../collector/eligibility-ai-config.json', import.meta.url))).enabled === true;
+  eq('④ 유료 AI — 설정이 꺼져 있고 버튼 스위치가 없으면 부르지 않고 아무것도 안 바꾼다', cfgOn || (/꺼져 있음/.test(run.stdout) && before === after), true);
+  /* ⑤ 워크플로 — 무료는 수집 때(감사 앞 · 상한 · continue-on-error · 받은 파일은 커밋 안 함) · 유료는 버튼에서만 */
+  const wc = readText(new URL('../.github/workflows/collect-scholarships.yml', import.meta.url));
+  const we = readText(new URL('../.github/workflows/eligibility-fill.yml', import.meta.url));
+  const step = (wc.match(/- name: 대외활동 첨부·포스터 자격 읽기[\s\S]*?(?=\n      - name:)/) || [''])[0];
+  eq('⑤ 수집 워크플로 — 받기 → HWP → 포스터 OCR(PaddleOCR · act-files) → 읽기 · 감사 앞 · 단계 상한 · continue-on-error · 장부만 커밋',
+    [/--fetch[\s\S]*hwp-bodytext\.py collector\/act-files[\s\S]*pip install[^\n]*paddleocr[\s\S]*paddle-ocr\.py collector\/act-files[\s\S]*--apply/.test(step), /timeout-minutes: \d+/.test(step) && /continue-on-error: true/.test(step),
+      wc.indexOf('대외활동 첨부·포스터 자격 읽기') > 0 && wc.indexOf('대외활동 첨부·포스터 자격 읽기') < wc.indexOf('- name: 데이터 관문'), /git add collector\/act-docs\.json/.test(wc),
+      /^collector\/act-files\/$/m.test(readText(new URL('../.gitignore', import.meta.url))), /activity-docs\.mjs --ai/.test(wc)],
+    [true, true, true, true, true, false]);
+  eq('  버튼 워크플로 — 대외활동 AI 는 스위치(ELIG_AI_ENABLE)를 그 단계에서만 · 결과를 저장 · 감사에 걸리면 되돌린다',
+    [/- name: 대외활동 — 포스터·첨부·본문 AI 읽기[\s\S]*?ELIG_AI_ENABLE: '1'[\s\S]*?activity-docs\.mjs --ai --write/.test(we), /git add data\/activities\.json/.test(we), /git checkout -- data\/registered\.json data\/activities\.json/.test(we)],
+    [true, true, true]);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');

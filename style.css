@@ -4876,6 +4876,49 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
    ⚠️ DESIGN.md 「충돌」 23번(절 가르기 = 얇은 선 + 34px)은 **홈에 한해 예외**가 됐다. */
 #screen-home .section-head { border-top: 0; }
 
+/* 대외활동 — 칩이 두 줄이다 (2026-10-03 개발자 지시): 윗줄 종류(전체/대외활동/공모전) ·
+   아랫줄 분야(교육·캠프 · 봉사 …). 사이를 한 덩어리로 묶으려고 윗줄 아래 여백만 줄인다.
+   칩 모양 자체(알약 · 7.5px 10px · 선 2px · 선택은 흰 바탕 + accent 2px)는 2026-09-11 승인
+   항목이라 손대지 않는다 — `.filter-row`·`.filter-chip` 을 그대로 쓴다(가로 스크롤도 그대로).
+   ⚠️ 분야 줄은 글이 없으면 app.js 가 `hidden` 을 건다 — 그때 윗줄 아래 여백은 제 값으로 돌아간다. */
+#activities-filters:has(+ #activities-field-filters:not([hidden])) { margin-bottom: var(--space-8); }
+/* 🔴 아랫줄은 **윗줄보다 훨씬 작다** (2026-10-03 개발자 지시). 둘이 같은 크기라 어느 쪽이
+   큰 갈래인지 안 읽혔다 — 종류가 먼저고 분야가 그 안이라는 것을 크기로 말한다.
+   글자 14.5 → 12.5(--t-xs) · 안쪽 여백 7.5/10 → 4/8 · 선 2 → 1.5px.
+   ⚠️ `.filter-chip` 원본은 손대지 않는다 — 알약 모양·선 2px·선택 색은 2026-09-11 승인 항목이고
+      탐색 화면 칩이 그대로 써야 한다. 여기서는 **이 줄 안에서만** 줄인다.
+   🔴 선이 얇아져도 고를 때 칩이 안 커지게 **선택해도 1.5px 그대로** 둔다(원본이 2px 를 미리
+      두껍게 해 둔 것과 같은 이유 — 선만 굵어지면 옆 칩이 밀린다). 선택은 색으로만 말한다. */
+#activities-field-filters .filter-chip {
+  padding: var(--space-4) var(--space-8);
+  font-size: var(--t-xs);
+  border-width: 1.5px;
+}
+/* 손가락 표적은 작아지지 않는다 — 보이는 알약만 줄이고 **닿는 넓이는 안 보이는 덧판**으로 넓힌다
+   (DESIGN.md 9번이 정한 방법 · `.icon-btn::after` 가 그 선례). 여백을 키우면 알약이 같이 커진다.
+   🔴 **그 덧판이 들어갈 자리를 줄에 마련해 둔다** (2026-10-03 개발자 신고 "오른쪽으로 넘길 때
+      위아래 칸이 넘어간다"). `.filter-row` 는 `overflow-x: auto` 인데, CSS 규칙상 한 축이 auto 면
+      **다른 축도 visible 이 아니라 auto 가 된다** — 그래서 29px 칩 위에 얹은 44px 덧판이 줄 밖으로
+      삐져나오자 줄이 **세로로 3px 스크롤되는 상자**가 됐고, 옆으로 미는 손짓에 위아래로도 밀렸다.
+      안쪽 여백으로 44px 자리를 만들어 넘침을 0 으로 만든다(늘어난 만큼 아래 바깥 여백에서 뺀다 —
+      화면에서 칸 사이는 그대로다). ⚠️ 덧판 높이를 키우려면 이 여백도 같이 키울 것. */
+#activities-field-filters {
+  padding-top: var(--space-8);
+  padding-bottom: var(--space-8);
+  margin-bottom: var(--space-8);
+}
+#activities-filters:has(+ #activities-field-filters:not([hidden])) { margin-bottom: 0; }
+#activities-field-filters .filter-chip { position: relative; }
+#activities-field-filters .filter-chip::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 44px;
+  transform: translateY(-50%);
+}
+
 /* 상세 시트 맨 아래 묶음 — 마감일·중복 수혜 · 문의 · 원문 링크 (2026-10-02 CTO 지시).
    마감일 줄이 혼자일 때 갖던 아래 여백은 묶음이 대신 갖는다(줄 사이는 .doc-legend 의 위 여백). */
 .sheet-facts { margin: var(--sp-3) 0; }
@@ -5007,3 +5050,23 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
   border-radius: var(--radius-xs);
   background: var(--surface-2);
 }
+/* 학교 대표 사진 (2026-10-03 개발자 지시 — 글에 사진이 없을 때) — 같은 자리·같은 크기. 감싼 칸이 썸네일 자리이고 그림은 칸을 채운다.
+   🔴 「학교 사진」 표시를 지우지 말 것 — 그 공지의 사진이 아니라는 말이다(정문 사진을 공지 사진으로 읽게 하지 않는다). */
+.notice-card.has-thumb > .notice-thumb-school { position: relative; overflow: hidden; }
+.notice-thumb-school img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.notice-thumb-school .thumb-tag {
+  position: absolute;
+  left: var(--space-4);
+  bottom: var(--space-4);
+  padding: var(--space-2) var(--space-6);
+  border-radius: var(--radius-pill);
+  background: rgba(25, 23, 19, 0.66);
+  color: #fff;
+  font-size: var(--t-2xs);
+  line-height: 1.2;
+  font-weight: 600;
+  white-space: nowrap;
+}
+/* 출처 한 줄 — 위키미디어 열린 라이선스(CC BY · BY-SA)의 표기 의무. 구역 맨 아래 작게, 누르면 사진의 공용 페이지 */
+.news-photo-credit { margin: 0 0 var(--space-12); font-size: var(--t-2xs); line-height: 1.5; color: var(--text-sub); }
+.news-photo-credit a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }

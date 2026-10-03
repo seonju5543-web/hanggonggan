@@ -184,7 +184,7 @@ export default async function gate(eq, ctx) {
   vm.runInContext(dataSrc, box, { filename: 'data.js' });
   /* app.js 발췌 — 링크를 그리는 자리 + 층2를 학생 화면 모양으로 바꾸는 함수(kosafAsScholarships) 그대로 */
   vm.runInContext([
-    T.one('ENTITIES'), T.one('ENTITY_RE'), T.one('NEWS_THUMB_RE'), T.one('CLOSED_KEEP_DAYS'),
+    T.one('ENTITIES'), T.one('ENTITY_RE'), T.one('PARTIAL_ENTITY_END'), T.one('hintText'), T.one('NEWS_THUMB_RE'), T.one('SCHOOL_PHOTO_RE'), T.one('PHOTO_FOCUS_RE'), T.one('CLOSED_KEEP_DAYS'),
     T.one('KOSAF_ELIG'), T.one('kosafClean'), T.one('KOSAF_AMOUNT_UNKNOWN'),
     ...['esc', 'unent', 'safeUrl', 'won', 'todayStart', 'dday', 'kosafAmountLabel', 'kosafAsScholarships',
       'sourceLinkHintHtml', 'attachmentLinkHtml', 'sourceLinkHtml', 'sourceNoteHtml', 'amountSourceLinkHtml',

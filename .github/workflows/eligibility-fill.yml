@@ -31,6 +31,7 @@ on:
           - '시범 3건만'
           - '공고 하나만'    # 아래 only 칸에 공고 id 를 적는다
           - '첨부만'          # 공고문 PDF·포스터 그림만 읽는다 (본문이 '붙임 참조'뿐인 공고)
+          - '대외활동만'      # 대외활동·공모전 글 중 무료로 자격을 못 읽은 것 (포스터·첨부·본문 — collector/activity-docs.mjs)
       only:
         description: "공고 하나만 돌릴 때 그 공고의 id (예: reg-dg-jongdan). 위에서 '공고 하나만'을 골랐을 때만 씁니다."
         type: string
@@ -59,7 +60,7 @@ jobs:
     env:
       NODE_EXTRA_CA_CERTS: collector/certs/bundle.pem
     # 전수 169건 × 약 5초 = 15분. 준비·감사·저장까지 담는 그릇으로 30분.
-    timeout-minutes: 34   # OCR 단계 4분 추가 (2026-09-17)
+    timeout-minutes: 44   # 대외활동 AI 단계 10분 추가 (2026-10-03) · OCR 단계 4분 추가 (2026-09-17)
     steps:
       - uses: actions/checkout@v4
         with:
@@ -80,6 +81,7 @@ jobs:
         id: preview
         run: |
           node collector/eligibility-ai.mjs --all | tee /tmp/preview.txt
+          node collector/activity-docs.mjs --ai | tee -a /tmp/preview.txt   # 대외활동 대상 수 (꺼진 채 세기만 — 돈 0)
           n=$(sed -n 's/.*대상 \([0-9]*\)건.*/\1/p' /tmp/preview.txt | head -1)
           echo "count=${n:-0}" >> "$GITHUB_OUTPUT"
 
@@ -190,6 +192,17 @@ jobs:
 
       # 데이터 관문은 **저장 직전**에 둔다 (이슈 #79의 교훈 — 앞에 두면 그 실행에서 안 잡히고
       # 다음 날 터진다).
+      # 대외활동·공모전 (2026-10-03 개발자 지시 "api 잔액 채우고 딸깍 하면 실행") — 무료로 못 읽은 글의 포스터·PDF·본문을 AI 에게.
+      # 지어냄을 막는 관문은 장학과 같다(eligibility-ai.mjs verifyPdfLines·verifyPick). 한 실행 최대 40건(ACT_AI_MAX).
+      - name: 대외활동 — 포스터·첨부·본문 AI 읽기
+        if: inputs.mode == '전부' || inputs.mode == '대외활동만'
+        continue-on-error: true
+        timeout-minutes: 10
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ELIG_AI_ENABLE: '1'
+        run: node collector/activity-docs.mjs --ai --write | tee /tmp/act.txt
+
       - name: 데이터 관문 (저장 직전)
         id: audit2
         continue-on-error: true
@@ -199,7 +212,7 @@ jobs:
       - name: 관문에 걸리면 통째로 되돌린다
         if: steps.audit2.outcome == 'failure'
         run: |
-          git checkout -- data/registered.json
+          git checkout -- data/registered.json data/activities.json
           echo "::error::전수 결과가 감사를 통과하지 못했습니다. 통째로 되돌렸습니다 — 앱은 그대로입니다."
           exit 1
 
@@ -216,6 +229,7 @@ jobs:
           # 로봇이 고치는 파일은 전부 넣는다 (이슈 #79 — 빠뜨리면 조용히 버려진다).
           # 공고문 첨부 원본과 그 색인이 안 저장되면 발췌가 다음 실행에 되살아나지 않는다.
           git add data/registered.json
+          [ -f data/activities.json ] && git add data/activities.json   # 대외활동 AI 읽기 (2026-10-03)
           [ -d collector/extracted ] && git add collector/extracted
           true
           if ! git diff --cached --quiet; then
@@ -254,5 +268,6 @@ jobs:
                 '', '## 확보 현황', '```', read('/tmp/report.txt'), '```',
                 '', '## 전수 로그', '```', read('/tmp/all.txt'), '```',
                 '', '## 시범 로그', '```', read('/tmp/trial.txt'), '```',
+                '', '## 대외활동 로그', '```', read('/tmp/act.txt'), '```',
               ].join('\n'),
             });

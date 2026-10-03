@@ -105,7 +105,9 @@ const SCHEMA = {
 
 /* 무료 경로와 **같은 관문**을 쓴다 — 여기만 느슨하면 AI 경로로 쓰레기가 들어온다.
    (extract-excerpts.mjs / eligibility-report.mjs의 REQ_SIGNAL과 같은 낱말) */
-const REQ_SIGNAL = /(재학|휴학|복학|신입|편입|졸업|\d\s?학년|학부생|대학생|성적|평점|학점|분위|수급|차상위|기초생활|한부모|다자녀|자녀|유공|보훈|장애|다문화|북한이탈|거주|출신|이상인?\s?자|이하의?\s?(해당\s?)?학생|해당하는\s?자|자격을\s?갖춘|결격\s?사유|결격사유)/;
+/* 대외활동 글의 대상 말(청년·나이 범위·국민·누구나)도 신호다 (2026-10-03 · collector/activity-docs.mjs 가 같은 관문을 쓴다 —
+   match-engine REQ_SIGNAL 이 2026-10-01·10-03 에 넓힌 것과 같은 낱말) */
+const REQ_SIGNAL = /(재학|휴학|복학|신입|편입|졸업|\d\s?학년|학부생|대학생|성적|평점|학점|분위|수급|차상위|기초생활|한부모|다자녀|자녀|유공|보훈|장애|다문화|북한이탈|거주|출신|이상인?\s?자|이하의?\s?(해당\s?)?학생|해당하는\s?자|자격을\s?갖춘|결격\s?사유|결격사유|청년|대한민국\s?국민|누구나|만\s?\d+\s?세|\d{1,2}\s?세?\s?[~∼～\-]\s?(?:만\s?)?\d{2}\s?세)/;
 const NOT_REQ = /(신청\s?기간|접수\s?기간|제출\s?서류|구비\s?서류|문의|담당자|@|\d{2,4}-\d{3,4}-\d{4}|선발\s?인원|모집\s?인원|장학\s?금액|지급\s?방법|증명서\s*\d*\s*부|에서\s?발급|사본\s*\d*\s*부)/;
 /* ⚠️ '증명서 1부'는 제출서류인데 '성적'이라는 낱말 때문에 요건 신호를 통과한다 —
    가짜 응답 시험에서 실제로 새어 나와 이 낱말들을 넣었다(채점기의 '증명서 발급 안내가
@@ -340,7 +342,7 @@ export function pickPdfTargets(items) {
 
 const MEDIA = { pdf: 'application/pdf', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', webp: 'image/webp' };
 
-async function askPdf(item, path, kind) {
+export async function askPdf(item, path, kind) {
   if (process.env.ELIG_AI_FAKE) return JSON.parse(fs.readFileSync(process.env.ELIG_AI_FAKE, 'utf8'));
   const { default: Anthropic } = await import('@anthropic-ai/sdk');
   const client = new Anthropic();
@@ -395,7 +397,7 @@ async function askPdf(item, path, kind) {
 /* ── 모델 부르기 (가짜 응답으로 시험할 수 있게 갈라 둔다) ──
    ELIG_AI_FAKE에 파일 경로를 주면 그 JSON을 응답으로 쓴다 — **잔액 없이도 안전장치를 검증**한다
    (챗봇 AI 안전장치를 가짜 서버로 검증한 것과 같은 방식). */
-async function ask(item, lines) {
+export async function ask(item, lines) {
   if (process.env.ELIG_AI_FAKE) return JSON.parse(fs.readFileSync(process.env.ELIG_AI_FAKE, 'utf8'));
   const { default: Anthropic } = await import('@anthropic-ai/sdk');
   const client = new Anthropic();

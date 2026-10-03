@@ -599,6 +599,9 @@ const ENTITY_RE = new RegExp('&(' + Object.keys(ENTITIES).join('|') + ');', 'g')
 function unent(s) {
   return String(s == null ? '' : s).replace(ENTITY_RE, (m, k) => ENTITIES[k]);
 }
+/* 이미 저장된 기간 한 줄의 끝에 반쯤 잘린 기호(`16:00 &n`)가 남은 것 — 로봇은 이제 기호를 풀고 자르지만(collector/deadline-hint.mjs) 실린 글에 남아 있다(소급 · 관문이 같은 꼴을 대조) */
+const PARTIAL_ENTITY_END = /&(?:[a-z]{1,7}|#\d{0,6}|#x[0-9a-f]{0,5})?$/;
+const hintText = (s) => unent(s).replace(PARTIAL_ENTITY_END, '').trim();
 
 /* 외부 링크 안전화 — http(s)·mailto만 허용한다. 수집 로봇이 받아 온 데이터가 오염되거나
    정식 등록에 오타가 있어도 javascript:·data: 같은 위험한 스킴이 href나 window.open으로
@@ -2848,14 +2851,18 @@ function liveNoticesHtml() {
       (실측 147장 중 9장). */
 /* 소식 썸네일 경로 — 로봇이 만든 해시 이름만 그린다(collector/news-thumb.mjs THUMB_RE 와 같은 꼴 · 관문이 대조). 그 밖의 값(바깥 주소 등)은 그리지 않는다 */
 const NEWS_THUMB_RE = /^data\/news\/img\/[0-9a-f]{16}\.webp$/;
+/* 학교 대표 사진 — 글에 사진이 없을 때 대신 (2026-10-03 · tools/build-school-photos.mjs 가 만든 이름 꼴만 · 자를 자리도 꼴을 본다) */
+const SCHOOL_PHOTO_RE = /^assets\/schools\/[a-z0-9]+-[0-9a-f]{8}\.webp$/;
+const PHOTO_FOCUS_RE = /^\d{1,3}% \d{1,3}%$/;
 function noticeCardHtml(n, opts) {
   const o = opts || {};
   const thumb = o.thumb && NEWS_THUMB_RE.test(o.thumb) ? o.thumb : '';
   const link = sourceLink(n, 'card');
   /* 안전하지 않은 주소면 href 를 아예 안 단다 — `href=""` 는 앱 자신을 다시 연다(첨부와 같은 사고 · 2026-10-03) */
   const href = safeUrl(n.url);
+  const sp = !thumb && o.schoolPhoto && SCHOOL_PHOTO_RE.test(o.schoolPhoto.src || '') ? o.schoolPhoto : null;
   return `
-    <a class="sch-card notice-card${thumb ? ' has-thumb' : ''}"${href ? ` href="${esc(href)}" target="_blank" rel="noopener"` : ''}>
+    <a class="sch-card notice-card${thumb || sp ? ' has-thumb' : ''}"${href ? ` href="${esc(href)}" target="_blank" rel="noopener"` : ''}>
       ${/* 🔴 맨 윗줄은 매칭 카드와 **같은 말투**다 — 기관 글 + 판정 하나 (2026-09-11).
            예전엔 배지 셋(`교내 공고`·`마감 임박`·`양식 2`)이 한 줄을 채워, 페이스리프트로
            걷어낸 배지 무더기가 이 경로에만 그대로 남아 있었다(실측 147장 중 9장).
@@ -2892,13 +2899,26 @@ function noticeCardHtml(n, opts) {
       <p class="sch-name">${esc(unent(n.title))}</p>
       ${/* 원문 발췌 줄 (2026-09-29 · 활동 글) — 이름표 : 원문 문장. 발췌가 있으면 기간 한 줄은 겹쳐 적지 않는다 */ ''}
       ${(o.excerpts || []).map((x) => `<p class="sch-provider">${esc(x.label)} · ${esc(unent(x.text))}</p>`).join('')}
-      ${!(o.excerpts || []).length && n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? `<p class="sch-provider">${esc(unent(n.deadlineHint))}</p>` : ''}
+      ${!(o.excerpts || []).length && n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? `<p class="sch-provider">${esc(hintText(n.deadlineHint))}</p>` : ''}
       ${/* 링크 이름은 sourceLink 한 곳(card) — 목록·홈페이지·로봇이 확인한 문제 주소는 '원문'이라 부르지 않는다 (2026-10-03) */ ''}
       <p class="sch-provider">${(n.attachments || []).length ? `첨부 ${(n.attachments || []).length}개 · ` : ''}${esc(n.foundAt || '')} 수집${link.label ? ` · ${esc(link.label)}` : ''}</p>
       ${/* 그 글의 사진 썸네일 (2026-10-03 개발자 지시 — 학교 글의 실제 사진). 소식 카드만 opts.thumb 로 넘긴다 · 제목이 이미 글자로 있어 alt 는 비운다(읽기 도구가 두 번 읽지 않게).
            못 받으면(404·오프라인) 그림을 빼고 글자 카드로 돌아간다 — bindEvents 의 error 잡이 · CSP 가 onerror= 를 막는다 */ ''}
       ${thumb ? `<img class="notice-thumb" src="${esc(thumb)}" alt="" loading="lazy" decoding="async" width="72" height="72" />` : ''}
+      ${/* 글에 사진이 없으면 학교 대표 사진 (2026-10-03 개발자 지시) — 🔴 그 글의 사진이 아니라는 표시(「학교 사진」)를 늘 붙인다.
+           안 붙이면 학생이 정문 사진을 그 공지의 사진으로 읽는다. 출처 줄은 구역 아래 한 번(schoolNewsHtml). */ ''}
+      ${sp ? `<span class="notice-thumb notice-thumb-school"><img src="${esc(sp.src)}" alt="" loading="lazy" decoding="async" width="72" height="72"${PHOTO_FOCUS_RE.test(sp.focus || '') ? ` style="object-position:${esc(sp.focus)}"` : ''} /><span class="thumb-tag">학교 사진</span></span>` : ''}
     </a>`;
+}
+
+/* 학교 사진 고르기 — 학교에 여러 장이면 구역에서 사진 없는 카드의 차례(k)대로 돌아가며 쓴다(이웃 카드끼리 같은 사진이 이어지지 않게).
+   🔴 글마다 해시로 고르면 이웃이 겹친다 — 실측: 전북대 앞 다섯 장이 같은 사진 셋 연속(리뷰 10-03). 차례를 모르면(k 없음) 첫 장 */
+let schoolPhotos = null;   // assets/schools/photos.json — 못 받으면 null(그대로 글자 카드)
+function schoolPhotoFor(n, k) {
+  const list = ((schoolPhotos && schoolPhotos.schools && schoolPhotos.schools[n.school]) || [])
+    .filter((x) => x && SCHOOL_PHOTO_RE.test(x.src || ''));
+  if (!list.length) return null;
+  return list[(Number.isInteger(k) && k >= 0 ? k : 0) % list.length];
 }
 
 /* ---------------- 대외활동·공모전 (2026-09-25 · 노션 UI-34) ----------------
@@ -2910,6 +2930,13 @@ function noticeCardHtml(n, opts) {
    🔴 새 데이터가 오면 rerenderVisible 을 부른다 — 갈라 두면 한 화면만 굳는다(2026-09-01 규칙). */
 let liveActivities = null;
 let activitiesFilter = 'all';
+/* 분야 칩 (2026-10-03 개발자 지시 "제목 아래 회색 분류를 위에 버튼으로") — 종류와 **다른 축**이다.
+   종류 칩과 같이 **저장하지 않는다**(탐색의 exploreFilter 와 같은 성격 — 새로고침하면 전체). */
+let activitiesField = 'all';
+/* 🔴 '기타'는 **화면의 이름일 뿐**이다 — 데이터는 지금처럼 비워 둔다(activityField 가 null 을 낸다).
+   수집기 관문(verify/test-collector 「못 가르면 null — 억지로 기타라고 적지 않는다」)이 그걸 지킨다.
+   즉 학생에게 "분야를 아직 못 읽은 글"을 부르는 이름이 기타이고, 데이터가 기타라고 말하는 게 아니다. */
+const ACT_FIELD_ETC = '기타';
 let activitiesQuery = '';
 /* 정렬 둘 — 최근 수집순(기본) · 마감 임박순(마감을 읽은 글이 앞, 못 읽은 글은 뒤에 최근순) (2026-09-29 · 4차 리서치: 경쟁 앱의 기본 축) */
 let activitiesSort = 'recent';
@@ -2936,6 +2963,31 @@ function activitiesForMe() {
     && (!n.deadline || dday(n.deadline).days >= -CLOSED_KEEP_DAYS));
 }
 
+/* 분야 칩 줄을 **데이터에서 만든다** (2026-10-03).
+   🔴 분야 이름을 여기 적지 않는다 — 원본 목록은 collector/activity-kind.mjs 의 ACTIVITY_FIELDS
+      한 곳이고, 앱은 빌드가 없어 그 .mjs 를 못 들여온다. 적으면 두 벌이 되어 수집기가 갈래를
+      늘려도 화면은 모른다(관리자 화면은 _admin/build.sh 의 vendor 복사로 같은 문제를 푼다).
+      그래서 **지금 보이는 글들의 field 를 세어** 많은 순으로 늘어놓는다. 덤으로:
+        · 실제 0건인 갈래(체험단·네이밍·슬로건)는 애초에 안 뜬다 — 눌러도 빈 목록인 칩이 없다.
+        · 종류를 바꾸면 그 종류에 있는 분야만 뜬다.
+   🔴 고른 칩이 **사라지면 그 자리에서 푼다** — 종류를 바꾸면 그 분야가 없을 수 있다(공모전에만 있는
+      '영상·사진'을 고른 채 대외활동으로 옮기는 길). 안 풀면 칩은 켜져 있는데 목록이 0건이 된다. */
+function renderActivityFieldChips(list) {
+  const row = $('#activities-field-filters');
+  if (!row) return;
+  const n = new Map();
+  let etc = 0;
+  for (const it of list) { if (it.field) n.set(it.field, (n.get(it.field) || 0) + 1); else etc += 1; }
+  const fields = [...n.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([f]) => f);
+  if (etc) fields.push(ACT_FIELD_ETC);                              // 못 읽은 글은 늘 맨 뒤
+  if (activitiesField !== 'all' && !fields.includes(activitiesField)) activitiesField = 'all';   // 고른 칩이 사라졌다
+  /* 칩이 하나도 없으면(분야가 다 비었다) 줄 자체를 감춘다 — 「전체」만 덩그러니 두지 않는다 */
+  /* 🔴 첫 칩을 그냥 '전체'라 하지 않는다 — 윗줄(종류) 첫 칩도 '전체'라 두 개가 위아래로 겹쳐
+     어느 쪽을 끄는 단추인지 안 읽힌다(화면으로 확인). */
+  row.hidden = !fields.length;
+  row.innerHTML = ['all', ...fields].map((f) => `<button class="filter-chip${f === activitiesField ? ' active' : ''}" data-filter="${esc(f)}">${esc(f === 'all' ? '분야 전체' : f)}</button>`).join('');
+}
+
 function renderActivities() {
   const p = state.profile;
   if (!p) return;
@@ -2947,6 +2999,13 @@ function renderActivities() {
   }
   let list = activitiesForMe();
   if (activitiesFilter !== 'all') list = list.filter((n) => n.kind === activitiesFilter);
+  /* 🔴 분야 칩은 **종류로 거른 뒤 · 분야로 거르기 전**에 만든다 (2026-10-03).
+     분야로 거른 목록에서 세면 칩 하나를 누르는 순간 나머지 칩이 사라진다. */
+  renderActivityFieldChips(list);
+  /* 분야 거르기 — 종류 뒤 · **검색 앞**. '기타'는 field 가 비어 있는 글이다. */
+  if (activitiesField !== 'all') {
+    list = list.filter((n) => (activitiesField === ACT_FIELD_ETC ? !n.field : n.field === activitiesField));
+  }
   /* 검색은 카드에 **보이는 글자**(제목)로만 — 탐색 화면과 같은 규칙(2026-08-30) */
   const q = activitiesQuery.trim().toLowerCase();
   /* 검색은 카드에 보이는 글자로 — 제목 · 분야 · 발췌 줄 */
@@ -2963,7 +3022,7 @@ function renderActivities() {
   if (!list.length) {
     box.innerHTML = `<p class="empty">${q
       ? `'${esc(activitiesQuery.trim())}'와 맞는 글이 없어요`
-      : `아직 ${esc(p.school)} 게시판에서 모은 ${activitiesFilter === 'all' ? '대외활동·공모전' : esc(activitiesFilter)} 글이 없어요<br /><span class="empty-sub">게시판이 연결되면 새 글이 여기에 자동으로 떠요</span>`}</p>`;
+      : `아직 ${esc(p.school)} 게시판에서 모은 ${activitiesField === 'all' ? '' : esc(activitiesField) + ' '}${activitiesFilter === 'all' ? '대외활동·공모전' : esc(activitiesFilter)} 글이 없어요<br /><span class="empty-sub">게시판이 연결되면 새 글이 여기에 자동으로 떠요</span>`}</p>`;
     return;
   }
   box.innerHTML = list.map(activityCardHtml).join('');
@@ -3006,7 +3065,10 @@ function activityCardHtml(n) {
     save: saveBtnHtml(`act:${n.url}`),   // 장학 카드와 같은 북마크(카드 바깥 · 2026-10-02)
     attrs: `data-activity="${esc(n.url)}"`,
     org: `${n.kind || '대외활동'} · ${activityWhere(n)}`,
-    badge: cardBadgeHtml(m.fit, m.fd, null),   // 장학 카드와 같은 판정 하나(적합도 % · 자격 미확인 · 지원 자격 미달)
+    /* 장학 카드와 같은 판정 하나(적합도 % · 지원 자격 미달). 🔴 **'자격 미확인' 배지는 활동 카드에 안 단다** (2026-10-03 개발자 결정 —
+       "왜 대외활동 공모전은 자격 미확인이야 죄다"). 활동 글은 자격이 포스터·첨부에만 있는 것이 많아 대부분의 카드에 같은 회색 배지가 붙어
+       아무 말도 안 하는 배지가 됐다. 모른다는 사실은 시트가 말한다(자격 원문·'원문 보기'). 장학 카드의 '자격 미확인'은 그대로다. */
+    badge: fitVerdict(m.fit, m.fd) === 'unread' ? '' : cardBadgeHtml(m.fit, m.fd, null),
     name: unent(n.title),
     foot: shortBenefit ? benefit : (n.field || ''),
     footKnown: !!shortBenefit,
@@ -3073,7 +3135,7 @@ function openActivityDetail(url) {
       ${rows.length
         ? `<ul class="doc-list">${rows.map((x) => `<li>${esc(x.label)} · ${esc(unent(x.text))}</li>`).join('')}</ul>`
         : (n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint)
-          ? `<ul class="doc-list"><li>${esc(unent(n.deadlineHint))}</li></ul>`
+          ? `<ul class="doc-list"><li>${esc(hintText(n.deadlineHint))}</li></ul>`
           : '<p class="doc-legend">모집 기간·대상은 공고 원문에서 확인해 주세요.</p>')}
       ${notice.length ? `
       <h4>공고 원문 안내 <span class="channel-tag">원문 그대로</span></h4>
@@ -3156,6 +3218,8 @@ function loadNews() {
   const wanted = files.join(',');
   newsFilesWanted = wanted;
   const get = (u) => fetch(u, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  /* 학교 대표 사진 목록 — 소식을 받을 때 한 번(작은 파일 · 실패하면 다음 받기 때 다시). 소식보다 늦게 와도 다시 그린다 */
+  if (files.length && !schoolPhotos) get('assets/schools/photos.json').then((d) => { if (d && d.schools && !schoolPhotos) { schoolPhotos = d; if (liveNews) rerenderVisible(); } });
   const job = files.length
     ? Promise.all(files.map(get)).then((docs) => {
       const ok = docs.filter(Boolean);
@@ -3199,9 +3263,22 @@ function schoolNewsHtml() {
   }
   const shown = newsOpen ? mine : mine.slice(0, NEWS_HOME_TOP);
   const more = mine.length > NEWS_HOME_TOP;
-  return head + `<div class="card-list" style="margin-bottom:${more ? 6 : 18}px">`
-    + shown.map((n) => noticeCardHtml(n, { org: `${n.school} 공지${n.kind ? ' · ' + n.kind : ''}`, excerpts: n.postedAt ? [{ label: '게시', text: n.postedAt }] : [], thumb: n.thumb })).join('')
+  /* 글의 사진이 없는 카드는 학교 대표 사진으로 (2026-10-03) — 쓴 사진의 출처를 구역 아래에 한 번씩(위키미디어 열린 라이선스의 표기 의무) */
+  const used = [];
+  const turn = {};   // 학교마다 사진 없는 카드의 차례 — 이웃 카드끼리 다른 사진
+  const cards = shown.map((n) => {
+    const sp = n.thumb && NEWS_THUMB_RE.test(n.thumb) ? null : schoolPhotoFor(n, turn[n.school] = (turn[n.school] ?? -1) + 1);
+    if (sp && !used.includes(sp)) used.push(sp);
+    return noticeCardHtml(n, { org: `${n.school} 공지${n.kind ? ' · ' + n.kind : ''}`, excerpts: n.postedAt ? [{ label: '게시', text: n.postedAt }] : [], thumb: n.thumb, schoolPhoto: sp });
+  }).join('');
+  const credit = used.length
+    ? `<p class="news-photo-credit">학교 사진 · ${used.map((x) => (/^https:\/\/commons\.wikimedia\.org\//.test(x.page || '')
+      ? `<a href="${esc(x.page)}" target="_blank" rel="noopener">${esc(x.credit)}</a>` : esc(x.credit))).join(' · ')} · 위키미디어 공용</p>`
+    : '';
+  return head + `<div class="card-list" style="margin-bottom:${more || credit ? 6 : 18}px">`
+    + cards
     + `</div>`
+    + credit
     + (more ? `<button type="button" class="link-btn home-more" data-news-more aria-expanded="${newsOpen ? 'true' : 'false'}" style="margin-bottom:18px">${newsOpen ? '접기' : `더보기 (${mine.length - NEWS_HOME_TOP})`}</button>` : '');
 }
 
@@ -6250,10 +6327,16 @@ function bindEvents() {
      error 는 거품이 일지 않아 잡는 단계(capture)로 문서에서 받는다 — CSP(script-src 'self')가 onerror= 를 막는다. */
   document.addEventListener('error', (e) => {
     const img = e.target;
-    if (!img || !img.classList || !img.classList.contains('notice-thumb')) return;
-    const card = img.closest('.has-thumb');
-    img.remove();
+    if (!img || !img.classList || !img.closest) return;
+    /* 글의 사진은 img 자신이, 학교 사진은 감싼 칸(.notice-thumb-school)이 썸네일 자리다 — 칸째 뺀다(「학교 사진」 표시만 남지 않게) */
+    const box = img.classList.contains('notice-thumb') ? img : img.parentElement && img.parentElement.classList.contains('notice-thumb') ? img.parentElement : null;
+    if (!box) return;
+    const card = box.closest('.has-thumb');
+    const section = box.closest('#school-news');
+    box.remove();
     if (card) card.classList.remove('has-thumb');
+    /* 학교 사진이 하나도 안 남으면 출처 줄도 뺀다 — 안 보이는 사진의 출처만 덩그러니 남지 않게(리뷰 10-03) */
+    if (section && !section.querySelector('.notice-thumb-school')) { const c = section.querySelector('.news-photo-credit'); if (c) c.remove(); }
   }, true);
   /* 교내 소식 더보기 (2026-09-30) — 구역은 통째로 다시 그려지므로 그릇(#school-news)에 위임한다. 히어로는 안 건드린다. */
   const newsBox = $('#school-news');
@@ -6439,7 +6522,21 @@ function bindEvents() {
     const chip = e.target.closest('.filter-chip');
     if (!chip) return;
     activitiesFilter = chip.dataset.filter;
+    /* 🔴 종류를 바꾸면 **분야를 푼다** (2026-10-03) — 공모전에만 있는 분야를 고른 채 대외활동으로
+       옮기면 칩은 켜져 있는데 목록이 0건이 된다. 칩 줄을 다시 그릴 때도 한 번 더 지킨다
+       (renderActivityFieldChips) — 거기서 푸는 것은 데이터가 바뀌어 분야가 사라지는 길이다. */
+    activitiesField = 'all';
     $$('#activities-filters .filter-chip').forEach((c) => c.classList.toggle('active', c === chip));
+    renderActivities();
+  });
+
+  /* 분야 칩 — 같은 손짓. ⚠️ 여기서도 선택자를 **제 그릇 안으로** 좁힌다(관문이 전역 $$('.filter-chip') 를 막는다).
+     켜짐 표시는 손으로 토글하지 않는다 — 칩 줄 자체를 renderActivityFieldChips 가 다시 그리면서 붙인다
+     (칩이 데이터에서 만들어지므로, 토글해 두어도 다시 그리는 순간 날아간다). */
+  $('#activities-field-filters').addEventListener('click', (e) => {
+    const chip = e.target.closest('.filter-chip');
+    if (!chip) return;
+    activitiesField = chip.dataset.filter;
     renderActivities();
   });
   /* 정렬 버튼은 탐색 화면과 한 벌로 묶었다 — 아래 '정렬 버튼' 블록(SORT_MENUS) 이 둘 다 배선한다 */

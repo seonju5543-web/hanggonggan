@@ -1,0 +1,305 @@
+/* ============================================================
+   대외활동·공모전 — 본문에 자격이 없는 글의 첨부·포스터 읽기 (2026-10-03 개발자 지시)
+   *"자격 읽기 파이프라인을 만들되 실행되는건 나중에 api 잔액 채우고 딸깍 하면 실행하는걸로.
+     그리고 자동화 무료로 최대한 땜빵쳐보자"*
+
+   왜 — 본문에 자격이 없는 활동 글은 대개 **포스터 그림 한 장**이거나 **첨부 공고문(HWP·PDF)** 에만 자격이 있다
+   (2026-10-03 실측: 자격 0줄 103건 중 본문 그림 있는 것 ~60 · 공고문 첨부 13).
+   새 규칙을 만들지 않는다 — 장학 쪽에 이미 있는 것을 그대로 부른다:
+     · 글자 뽑기  attachment-text.mjs attachmentText (HWPX·DOCX 는 여기서, HWP 는 hwp-bodytext.py, 포스터 그림은 paddle-ocr.py 의 .ocr.txt)
+     · 자격 고르기 activity-excerpts.mjs activityDetails (본문과 같은 규칙)
+     · AI         eligibility-ai.mjs askPdf·ask + verifyPdfLines·verifyPick (지어냄을 막는 같은 관문)
+
+   세 단계:
+     ① --fetch  (무료) 자격 0줄인 글의 첨부·본문 그림을 collector/act-files/ 에 받는다
+                뒤이어 워크플로가 hwp-bodytext.py · paddle-ocr.py(포스터 — tesseract 보다 디자인 글씨를 잘 읽는다)를 **그 폴더에** 돌린다
+     ② --apply  (무료) 받은 파일의 글자로 자격을 고른다. 출처 eligibilityFrom '공고문 첨부'·'공고문 첨부(OCR)'
+     ③ --ai     (유료 · 기본 꺼짐) ①②로도 못 읽은 글을 AI 에게 — eligibility-ai-config.json enabled 또는 ELIG_AI_ENABLE=1
+                일 때만 돌고 --write 를 붙여야 저장한다. 버튼: 「자격요건 매칭 · AI 자격 읽기」(전부·대외활동만).
+   🔴 받은 파일은 **커밋하지 않는다**(act-files 는 .gitignore) — 포스터가 글 15건에 8MB 였다(첫 실측). ①②는 한 실행 안에서 끝나고,
+      ③은 필요한 파일을 그 자리에서 다시 받는다. 커밋하는 것은 '이미 해 봤다' 장부(act-docs.json)뿐이다.
+   🔴 본문에서 자격이 나오면 본문이 이긴다 — 수집 로봇이 다시 읽을 때 putActivityDetails 가 정한다.
+   🔴 학생 화면에는 출처 표식을 안 낸다(2026-09-17 결정 — 공정 이야기는 관리자 몫). 데이터에만 남긴다.
+   관문: verify/test-collector.mjs 「대외활동·공모전 — 첨부·포스터 읽기」
+   ============================================================ */
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import { fileURLToPath } from 'node:url';
+import { FETCH_HEADERS } from './http-headers.mjs';
+import { htmlToLines } from './html-text.mjs';
+import { attachmentText, isOcrSource, docOrder, isNoticeDoc } from './attachment-text.mjs';
+import { activityDetails } from './activity-excerpts.mjs';
+
+const HERE = new URL('.', import.meta.url);
+const ACTS = fileURLToPath(new URL('../data/activities.json', HERE));
+const DIR = fileURLToPath(new URL('act-files/', HERE));          // 일회용 — .gitignore
+const MANIFEST = path.join(DIR, 'manifest.json');                // 이번 실행이 받은 파일 { 주소: [파일] }
+const LEDGER = fileURLToPath(new URL('act-docs.json', HERE));    // 커밋 — { 주소: { at, tries } }
+const log = (m) => console.log(`[activity-docs] ${m}`);
+
+const POSTS_PER_RUN = 15;          // 한 실행에 받는 글
+const FILES_PER_POST = 3;          // 글 하나에서 받는 파일
+const MAX_BYTES = 8 * 1024 * 1024; // 파일 하나 (AI 그림 한계 10MB 아래)
+const MIN_IMG_BYTES = 40 * 1024;   // 이보다 작은 그림은 아이콘·버튼이다(포스터는 수백 KB)
+const BUDGET_MS = 80000;           // 이 단계 스스로의 예산(워크플로 단계 상한 아래)
+const MAX_TRIES = 2;               // 무료로 해 볼 횟수 — 이레 간격(OCR 이 시간에 밀렸을 수 있다)
+const RETRY_DAYS = 7;
+
+const DOC_EXT = /\.(hwpx?|docx|pdf|png|jpe?g|webp)(?:[?#]|$)/i;
+const IMG_EXT = /\.(png|jpe?g|webp)(?:[?#]|$)/i;
+const AI_FILE = /\.(pdf|png|jpe?g|webp)$/i;
+/* 학생이 채우는 서식은 자격이 아니다(attachment-text.mjs 첫머리 — 동의서 문구가 자격 자리에 앉은 사고) */
+const FORMISH = /서식|양식|신청서|지원서|동의서|서약서|추천서|계획서|이력서|확인서/;
+/* 사이트 꾸밈 그림 — 이름으로 거르고 크기(MIN_IMG_BYTES)로 한 번 더 거른다 */
+const CHROME_IMG = /logo|icon|ico_|btn|button|banner|bnr|common|header|footer|gnb|lnb|sns|share|blank|spacer|arrow|bullet|top_|quick|kakao|facebook|insta|youtube|naver|qr/i;
+
+export const keyOf = (url) => crypto.createHash('sha1').update(String(url)).digest('hex').slice(0, 12);
+const fileHash = (p) => { try { return crypto.createHash('sha1').update(fs.readFileSync(p)).digest('hex').slice(0, 16); } catch { return ''; } };
+const readJson = (p, d) => { try { return JSON.parse(fs.readFileSync(p, 'utf8')); } catch { return d; } };
+const flatK = (x) => String(x || '').replace(/\[[^\]]*\]|\([^)]*\)/g, '').replace(/[^가-힣A-Za-z0-9]/g, '');
+/** 이 줄이 글 제목(또는 제목을 품은 머리줄)인가 */
+export const isTitleLine = (line, title) => { const k = flatK(title).slice(0, 12); return k.length >= 6 && flatK(line).includes(k); };
+export const needsElig = (n) => !n.hidden && !(n.eligibilityLines && n.eligibilityLines.length);
+
+/** 받을 후보 — 첨부(공고문·포스터) 먼저, 그다음 본문 그림. 서식·꾸밈 그림은 뺀다. */
+/** 글 제목이 HTML 에 마지막으로 나온 자리부터 (없으면 전체) — activity-excerpts.mjs atTitle 과 같은 생각 */
+export function afterTitle(html, title) {
+  const key = String(title || '').replace(/\[[^\]]*\]|\([^)]*\)/g, '').trim().slice(0, 10);
+  if (key.length < 5) return html;
+  const at = html.lastIndexOf(key);
+  return at < 0 ? html : html.slice(at);
+}
+
+/** 그림의 가로·세로 (PNG·JPEG 머리만 읽는다 — 다른 꼴은 null) */
+export function imageSize(buf) {
+  if (buf.length > 24 && buf.readUInt32BE(0) === 0x89504e47) return { w: buf.readUInt32BE(16), h: buf.readUInt32BE(20) };
+  if (buf[0] === 0xff && buf[1] === 0xd8) {
+    let i = 2;
+    while (i + 9 < buf.length) {
+      if (buf[i] !== 0xff) { i += 1; continue; }
+      const mk = buf[i + 1];
+      if (mk >= 0xc0 && mk <= 0xcf && mk !== 0xc4 && mk !== 0xc8 && mk !== 0xcc) return { h: buf.readUInt16BE(i + 5), w: buf.readUInt16BE(i + 7) };
+      i += 2 + buf.readUInt16BE(i + 2);
+    }
+  }
+  return null;
+}
+/* 포스터·공고문 캡처는 세로로 길거나 정사각에 가깝다. 가로로 넓은 그림은 배너다(첫 실측: 846×510 체육대회 광고) */
+export const posterShaped = (sz) => !sz || sz.h >= sz.w * 0.9;
+
+export function candidateFiles(n, html, pageUrl) {
+  const out = [];
+  for (const a of n.attachments || []) {
+    const name = String(a.name || '');
+    if (FORMISH.test(name)) continue;
+    if (!(DOC_EXT.test(name) || DOC_EXT.test(a.url || ''))) continue;
+    if (!(isNoticeDoc(name) || IMG_EXT.test(name) || /포스터|요강|안내문|공고문|리플렛|홍보물/.test(name))) continue;
+    out.push({ url: a.url, name, from: 'attach' });
+  }
+  /* 🔴 본문 그림은 **글 제목 뒤**에서만 — 앞쪽은 사이트 머리·메뉴 그림이다(첫 실측: 인증서·광고 배너가 받아졌다) */
+  const body = afterTitle(String(html || ''), n.title);
+  const re = /<img\b[^>]*\bsrc\s*=\s*["']([^"']+)["'][^>]*>/gi;
+  let m;
+  while ((m = re.exec(body)) !== null) {
+    if (CHROME_IMG.test(m[0])) continue;
+    let u;
+    try { u = new URL(m[1].replace(/&amp;/g, '&'), pageUrl).href; } catch { continue; }
+    if (/^data:/.test(u) || CHROME_IMG.test(u)) continue;
+    out.push({ url: u, name: '', from: 'img' });
+  }
+  const seen = new Set();
+  return out.filter((f) => f.url && !seen.has(f.url) && seen.add(f.url));
+}
+
+const extOf = (f, type) => {
+  const m = (f.name.match(DOC_EXT) || f.url.match(DOC_EXT) || [])[1];
+  if (m) return m.toLowerCase().replace('jpeg', 'jpg');
+  for (const [re, e] of [[/pdf/, 'pdf'], [/png/, 'png'], [/jpe?g/, 'jpg'], [/webp/, 'webp'], [/hwp/, 'hwp']]) if (re.test(type)) return e;
+  return null;
+};
+
+async function download(f, referer) {
+  const res = await fetch(f.url, { redirect: 'follow', headers: { ...FETCH_HEADERS, Referer: referer }, signal: AbortSignal.timeout(20000) });
+  if (!res.ok) return null;
+  if (Number(res.headers.get('content-length') || 0) > MAX_BYTES) return null;
+  const type = res.headers.get('content-type') || '';
+  if (/text\/html/.test(type)) return null;                 // 로그인 화면·오류 화면
+  const buf = Buffer.from(await res.arrayBuffer());
+  const ext = extOf(f, type);
+  if (!ext || buf.length > MAX_BYTES) return null;
+  if (f.from === 'img' && (buf.length < MIN_IMG_BYTES || !posterShaped(imageSize(buf)))) return null;
+  return { buf, ext, hash: crypto.createHash('sha1').update(buf).digest('hex').slice(0, 16) };
+}
+
+/** 글 하나의 파일을 받는다 → act-files 안의 파일 이름들 */
+async function fetchPost(n, until, common = new Set(), owners = new Map()) {
+  let html = '';
+  try {
+    const r = await fetch(n.url, { redirect: 'follow', headers: FETCH_HEADERS, signal: AbortSignal.timeout(15000) });
+    if (r.ok) html = await r.text();
+  } catch { /* 못 받으면 null */ }
+  if (!html) return null;
+  const got = [];
+  for (const f of candidateFiles(n, html, n.url)) {
+    if (got.length >= FILES_PER_POST || Date.now() > until) break;
+    try {
+      const d = await download(f, n.url);
+      if (!d || common.has(d.hash)) continue;
+      /* 🔴 **두 글 이상에 같은 그림 = 사이트 공통 그림**(인증서·로고) — 교내 소식 썸네일과 같은 규칙(news-thumb.mjs) */
+      const owner = owners.get(d.hash);
+      if (owner && owner !== n.url) { common.add(d.hash); continue; }
+      owners.set(d.hash, n.url);
+      const name = `${keyOf(n.url)}-${got.length}.${d.ext}`;
+      fs.writeFileSync(path.join(DIR, name), d.buf);
+      got.push(name);
+    } catch { /* 이 파일만 건너뛴다 */ }
+  }
+  return got;
+}
+
+/** 무료로 다시 해 볼 차례인가 — 두 번까지, 이레 간격 */
+export function dueFree(entry, today) {
+  if (!entry) return true;
+  if ((entry.tries || 0) >= MAX_TRIES) return false;
+  return (Date.parse(today) - Date.parse(entry.at)) >= RETRY_DAYS * 86400000;
+}
+
+/* ── ① 받기 ── */
+async function fetchPhase(acts) {
+  fs.mkdirSync(DIR, { recursive: true });
+  const ledger = readJson(LEDGER, {});
+  const manifest = readJson(MANIFEST, {});
+  const today = new Date().toISOString().slice(0, 10);
+  const until = Date.now() + BUDGET_MS;
+  const common = new Set(ledger._common || []);   // 공통 그림 서명 — 장부에 남겨 다음 실행도 안 받는다
+  const owners = new Map();
+  let posts = 0, files = 0;
+  for (const n of acts.items) {
+    if (posts >= POSTS_PER_RUN || Date.now() > until) break;
+    if (!needsElig(n) || !dueFree(ledger[n.url], today)) continue;
+    posts += 1;
+    const got = await fetchPost(n, until, common, owners);
+    if (got === null) continue;                              // 글을 못 받았다 — 장부에 안 적는다(잠깐 끊긴 것을 굳히지 않게)
+    manifest[n.url] = got;
+    ledger[n.url] = { at: today, tries: ((ledger[n.url] || {}).tries || 0) + 1 };
+    files += got.length;
+  }
+  /* 피드에서 빠진 글은 장부에서도 뺀다 */
+  const live = new Set(acts.items.map((n) => n.url));
+  for (const u of Object.keys(ledger)) if (u !== '_common' && !live.has(u)) delete ledger[u];
+  /* 이번 실행에서 공통으로 드러난 그림은 먼저 받아 둔 글에서도 지운다 */
+  for (const [h, u] of owners) if (common.has(h) && manifest[u]) manifest[u] = manifest[u].filter((f) => !f.startsWith(`${keyOf(u)}-`) || fileHash(path.join(DIR, f)) !== h);
+  ledger._common = [...common].slice(-200);
+  fs.writeFileSync(MANIFEST, JSON.stringify(manifest, null, 1));
+  fs.writeFileSync(LEDGER, JSON.stringify(ledger, null, 1) + '\n');
+  log(`받기 — 글 ${posts}건 · 파일 ${files}개`);
+}
+
+/* 글 제목의 낱말 — 흔한 말(모집·안내·청년·공모전…)은 뺀다. 그림이 **그 글의 포스터인지** 가리는 데 쓴다 */
+const GENERIC_WORD = /^(?:모집|안내|공고|참가자|참여자|선발|신청|운영|프로그램|개최|지원|대상|기간|마감|일반|공통|추가|하반기|상반기|공모전|참가|참여|교육|특강|청년|대학생|학생|사업|활동|행사)$/;
+export const titleWords = (title) => [...new Set(String(title || '').replace(/\[[^\]]*\]|\([^)]*\)|기간\s*:.*$/g, ' ')
+  .split(/[^가-힣A-Za-z0-9]+/).filter((w) => w.length >= 2 && !/^\d+$/.test(w) && !GENERIC_WORD.test(w)))];
+/** OCR 로 읽은 그림이 이 글의 것인가 — 글 제목 낱말이 하나라도 그림 글자에 있어야 한다.
+    🔴 사이트 옆 홍보물(「제주도 내 공공임대주택에 입주한 가구」)이 「청년 체인지메이커 아카데미」의 자격으로 붙을 뻔했다(2026-10-03 실측) */
+export const ownsImageText = (text, title) => { const t = String(text || '').replace(/\s/g, ''); return titleWords(title).some((w) => t.includes(w)); };
+
+/** 받은 파일 글자에서 자격을 고른다 — 원문 글자(HWP·HWPX·DOCX)가 OCR 보다 먼저(docOrder) */
+export function eligFromFiles(n, files, readText = (p) => attachmentText(p), dir = DIR, isOcr = isOcrSource) {
+  for (const f of docOrder(files)) {
+    const p = path.join(dir, f);
+    const text = readText(p);
+    if (!text || !text.trim()) continue;
+    const ocr = isOcr(p);
+    if (ocr && !ownsImageText(text, n.title)) continue;
+    const d = activityDetails(text, n.title);
+    if (d.eligibilityLines.length) return { ...d, from: ocr ? '공고문 첨부(OCR)' : '공고문 첨부' };
+  }
+  return null;
+}
+
+/* ── ② 읽기 ── */
+function applyPhase(acts) {
+  const manifest = readJson(MANIFEST, {});
+  let got = 0;
+  for (const n of acts.items) {
+    const files = manifest[n.url];
+    if (!files || !files.length || !needsElig(n)) continue;
+    const d = eligFromFiles(n, files);
+    if (!d) continue;
+    n.eligibilityLines = d.eligibilityLines;
+    if (d.eligibilityExcludes.length) n.eligibilityExcludes = d.eligibilityExcludes;
+    n.eligibilityFrom = d.from;
+    got += 1;
+  }
+  log(`읽기 — 첨부·포스터에서 자격 ${got}건`);
+  return got;
+}
+
+/* ── ③ AI (유료 · 기본 꺼짐) ── */
+async function aiPhase(acts, write) {
+  process.env.ELIG_AI_AS_LIB = '1';      // 본편(장학 등록분 처리)은 건너뛰고 함수만 쓴다
+  const AI = await import('./eligibility-ai.mjs');
+  const cfg = readJson(fileURLToPath(new URL('eligibility-ai-config.json', HERE)), {});
+  const targets = acts.items.filter((n) => needsElig(n) && (n.aiTries || 0) < (cfg.giveUpAfter ?? 3));
+  log(`AI 대상 ${targets.length}건 (자격 0줄 · 무료로 못 읽은 것)`);
+  const on = cfg.enabled || process.env.ELIG_AI_ENABLE === '1';
+  if (!on) { log('꺼져 있음 (eligibility-ai-config.json enabled · 버튼은 ELIG_AI_ENABLE=1) — 부르지 않는다'); return 0; }
+  if (!process.env.ANTHROPIC_API_KEY && !process.env.ELIG_AI_FAKE) { log('API 열쇠 없음 — 부르지 않는다'); return 0; }
+  if (!write) { log('미리보기 — --write 를 붙여야 부르고 저장한다'); return 0; }
+
+  fs.mkdirSync(DIR, { recursive: true });
+  /* 공통 그림(인증서·로고)은 AI 에도 안 보낸다 — 무료 단계가 장부에 남긴 서명 + 이 실행에서 드러난 것(돈이 나가는 자리) */
+  const common = new Set(readJson(LEDGER, {})._common || []);
+  const owners = new Map();
+  const cap = Number(process.env.ACT_AI_MAX || 40);
+  let calls = 0, got = 0;
+  for (const n of targets) {
+    if (calls >= cap) { log(`이번 실행 한도(${cap}건) — 나머지는 다음에`); break; }
+    const item = { name: n.title };
+    let v = null, from = '';
+    try {
+      const files = (await fetchPost(n, Date.now() + 60000, common, owners)) || [];
+      const file = files.find((f) => AI_FILE.test(f));
+      if (file) {
+        const kind = /\.pdf$/i.test(file) ? 'pdf' : 'image';
+        calls += 1;
+        v = AI.verifyPdfLines(await AI.askPdf(item, path.join(DIR, file), kind));
+        from = kind === 'image' ? 'AI(공고 포스터 그림)' : 'AI(공고문 PDF)';
+      } else {
+        const r = await fetch(n.url, { redirect: 'follow', headers: FETCH_HEADERS, signal: AbortSignal.timeout(15000) });
+        const lines = r.ok ? htmlToLines(await r.text()).split('\n').map((l) => l.trim()).filter((l) => l.length >= 2 && l.length <= 200) : [];
+        if (!lines.length) continue;
+        calls += 1;
+        v = AI.verifyPick(await AI.ask(item, lines), lines);
+        from = 'AI(원문 줄 그대로)';
+      }
+    } catch (e) { log(`✕ ${n.title.slice(0, 30)} — 호출 실패(글 탓 아님): ${String(e && e.message || e).slice(0, 300)}`); continue; }
+    /* 🔴 글 제목 줄은 자격이 아니다 — 관문의 '청년' 신호를 제목(`용산 청년지음 … 참여자 모집`)이 통과했다(가짜 응답 시험) */
+    if (v && v.ok) { v.lines = v.lines.filter((l) => !isTitleLine(l, n.title)); if (!v.lines.length) v = { ok: false, why: '고른 줄이 글 제목뿐' }; }
+    if (!v || !v.ok) { n.aiTries = (n.aiTries || 0) + 1; log(`· ${n.title.slice(0, 30)} — ${v ? v.why : '응답 없음'}`); continue; }
+    n.eligibilityLines = v.lines;
+    if (v.excludes && v.excludes.length) n.eligibilityExcludes = v.excludes;
+    n.eligibilityFrom = from;
+    n.eligibilityReviewed = false;
+    delete n.aiTries;
+    got += 1;
+    log(`✓ ${n.title.slice(0, 30)} — ${from} ${v.lines.length}줄`);
+  }
+  log(`AI 끝 — 호출 ${calls}회 · 확보 ${got}건`);
+  return got + targets.filter((n) => n.aiTries).length;   // aiTries 가 바뀐 것도 저장한다
+}
+
+/* ── 본편 ── */
+if (!process.env.ACTIVITY_DOCS_AS_LIB) {
+  const acts = readJson(ACTS, null);
+  if (!acts || !Array.isArray(acts.items)) { log('data/activities.json 없음 — 건너뜀'); process.exit(0); }
+  const arg = (a) => process.argv.includes(a);
+  let changed = false;
+  if (arg('--fetch')) await fetchPhase(acts);
+  if (arg('--apply')) changed = applyPhase(acts) > 0 || changed;
+  if (arg('--ai')) changed = (await aiPhase(acts, arg('--write'))) > 0 || changed;
+  /* 저장 형식은 수집 로봇과 같다(collect.mjs — JSON.stringify(x, null, 1)) — 다르면 파일 전체가 바뀐 것으로 보인다 */
+  if (changed) fs.writeFileSync(ACTS, JSON.stringify(acts, null, 1));
+  log(`자격 0줄인 활동 글 ${acts.items.filter(needsElig).length}건 남음 (전체 ${acts.items.length})`);
+}

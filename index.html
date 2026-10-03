@@ -501,6 +501,12 @@
         <button class="filter-chip" data-filter="대외활동">대외활동</button>
         <button class="filter-chip" data-filter="공모전">공모전</button>
       </div>
+      <!-- 분야 칩 (2026-10-03 개발자 지시 "제목 아래 회색 분류를 위에 버튼으로") — 종류 칩 아래 한 줄 더.
+           🔴 **빈 그릇이다.** 칩을 여기 적지 않는 이유: 분야 목록의 원본은 collector/activity-kind.mjs
+              ACTIVITY_FIELDS 한 곳인데 앱은 빌드가 없어 그 .mjs 를 못 들여온다. 여기 적으면 두 벌이 된다.
+              그래서 app.js renderActivities 가 **지금 보이는 글들의 field 를 세어** 만든다 —
+              실제 0건인 갈래(체험단·네이밍·슬로건)는 안 뜨고, 분야가 늘면 칩도 저절로 따라온다. -->
+      <div class="filter-row" id="activities-field-filters"></div>
       <div id="activities-list" class="card-list"></div>
       <!-- 단추 이름은 글마다 다르다(source-link.js · 2026-10-03) — 기관 첫 화면을 '원문'이라 부르지 않는다 -->
       <p class="data-note">※ 학교 게시판에서 자동으로 모은 제목과 링크입니다. 참가 자격·마감·혜택은 각 글을 열어 맨 아래 단추로 주최 측 페이지에서 최종 확인하세요.</p>

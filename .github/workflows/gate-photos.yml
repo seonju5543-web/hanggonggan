@@ -49,8 +49,10 @@ jobs:
           FRESH: '1'   # 지난 실행의 사진을 비우고 다시 받는다 (걸러 낸 사진이 남지 않게)
         run: |
           # 표식 파일에 `only: snu,cau` 줄이 있으면 그 학교만 다시 받는다 (나머지는 그대로)
-          ONLY=$(grep -oE '^only:[[:space:]]*[a-z,]+' tools/run-gate-photos.txt | sed -E 's/^only:[[:space:]]*//' || true)
-          ONLY="$ONLY" node tools/fetch-gate-photos.mjs docs/designs/assets/gates
+          ONLY=$(grep -oE '^only:[[:space:]]*[a-z0-9,]+' tools/run-gate-photos.txt | sed -E 's/^only:[[:space:]]*//' || true)
+          # `per: 10` 줄이 있으면 학교당 후보 수 (기본 5 · 1차에 다섯 장이 한 작가 한 날 사진뿐인 학교가 있었다)
+          PER=$(grep -oE '^per:[[:space:]]*[0-9]+' tools/run-gate-photos.txt | sed -E 's/^per:[[:space:]]*//' || true)
+          ONLY="$ONLY" PER_SCHOOL="${PER:-5}" node tools/fetch-gate-photos.mjs docs/designs/assets/gates
       - name: 결과 커밋
         if: steps.mark.outputs.run == 'yes'
         run: |
@@ -59,4 +61,10 @@ jobs:
           git add docs/designs/assets/gates
           if git diff --cached --quiet; then echo "받은 사진 없음 — 커밋 생략"; exit 0; fi
           git commit -m "정문 사진 수집 (위키미디어 공용 · 열린 라이선스만) [bot]"
-          git push
+          # 2026-10-01 실행은 115장을 받고도 여기서 거절됐다(fetch first — 같은 때 다른 로봇이 기본 브랜치에 저장) → 받아서 다시 (수집 로봇들과 같은 규칙)
+          pushed=0
+          for i in 1 2 3; do
+            if git push; then pushed=1; break; fi
+            git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
+          done
+          if [ "$pushed" != "1" ]; then echo "::error::사진 push 실패 — 3회 재시도 모두 실패"; exit 1; fi

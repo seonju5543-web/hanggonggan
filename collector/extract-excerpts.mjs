@@ -490,8 +490,11 @@ function splitMerged(line) {
     .map((p2) => p2.trim()).filter((p2) => p2.length >= 4);
 }
 
-function extractQualifyLines(text) {
+/* `opts.head` — 자격 절 제목 낱말을 **더 받는** 정규식(대외활동 `공모자격`·`교육대상` 등 · activity-excerpts.mjs).
+   장학 로봇은 넘기지 않는다 — 장학 결과는 한 글자도 안 바뀐다. */
+function extractQualifyLines(text, opts = {}) {
   if (!text) return [];
+  const HEAD = opts.head ? new RegExp(`${QUALIFY_HEAD.source}|${opts.head.source}`) : QUALIFY_HEAD;
   const lines = text.split(/\n+/).map((l) => unent(l).replace(/[ \t　]+/g, ' ').trim())
     .filter(Boolean).flatMap(splitMerged);
   /* 자격처럼 보이는 곳이 여러 군데일 수 있다. **첫 번째를 잡으면 안 된다** —
@@ -499,12 +502,12 @@ function extractQualifyLines(text) {
      거기서 시작해 엉뚱한 '변경내용' 표를 자격으로 읽었다(2026-08-03 개발자 지적).
      그래서 **제목처럼 생긴 줄**(짧고, 그 낱말로 시작하거나 콜론이 붙은 줄)을 고른다. */
   const cands = [];
-  lines.forEach((l, i) => { if (QUALIFY_HEAD.test(l)) cands.push(i); });
+  lines.forEach((l, i) => { if (HEAD.test(l)) cands.push(i); });
   if (!cands.length) return [];
   const headScore = (l) => {
     const t = l.replace(/^[\s\-–—•▪▶▷◆◇○●■□▣★♦⇒‡◦∙❍◎￭·ㆍ*]+/, '').replace(/^(?:[가-힣]\s*[.)]|\d+\s*[.)])\s*/, '');
     let s = 0;
-    if (QUALIFY_HEAD.test(t.slice(0, 12))) s += 3;      // 낱말이 앞머리에 있다
+    if (HEAD.test(t.slice(0, 12))) s += 3;      // 낱말이 앞머리에 있다
     if (t.length <= 12) s += 3;                          // 제목처럼 짧다
     else if (t.length <= 30) s += 1;
     if (/[:：]/.test(t.slice(0, 16))) s += 2;            // "신청자격 : …"
@@ -609,7 +612,7 @@ function extractQualifyLines(text) {
   const head = out[0].replace(/^[\s\-–—•▪▶▷◆◇○●■□▣★♦⇒‡◦∙❍◎￭·ㆍ*]+/, '')
     .replace(/^(?:[가-힣]\s*[.)]|\d+\s*[.)])\s*/, '');
   const m = head.match(/^([^:：]{2,14})[:：]\s*\S/);
-  return m && QUALIFY_HEAD.test(m[1]) && !/인원|금액|지급액|배정/.test(m[1]) ? out : [];
+  return m && HEAD.test(m[1]) && !/인원|금액|지급액|배정/.test(m[1]) ? out : [];
   }
 }
 

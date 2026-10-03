@@ -69,6 +69,13 @@ jobs:
             // 원문 링크 확인 (2026-10-03): 로봇이 확정한 문제 링크 — 앱이 이것을 받아 링크 이름을 정직하게 바꾼다.
             //   안 나가면 앱은 확정된 목록·404 링크를 그대로 '원문 공고'라 부른다(404 여도 조용히 물러난다).
             out.push('data/link-check.json');
+            // 학교 대표 사진 (2026-10-03): 글에 사진이 없을 때 앱이 받는 목록 + 그 첫 그림 하나 (바이트로 비교)
+            try {
+              const sp = JSON.parse(fs.readFileSync('assets/schools/photos.json', 'utf8'));
+              out.push('assets/schools/photos.json');
+              const first = Object.values(sp.schools || {})[0];
+              if (first && first[0]) out.push(first[0].src);
+            } catch {}
             console.log([...new Set(out)].join(' '));
           ")
 
@@ -90,7 +97,11 @@ jobs:
               const j = JSON.parse(fs.readFileSync(p, 'utf8'));
               /* ⚠️ `majors` 도 안다 — 모르면 학과 파일에서 **칸 수 3**(school·updatedAt·majors)을
                  세어, 내용이 달라도 3 대 3 으로 통과한다(404 만 겨우 잡힌다). */
-              const box = j.items || j.templates || j.majors || j;
+              const box = j.items || j.templates || j.majors || (/assets[\/\\]schools[\/\\]photos\.json$/.test(p) ? j.schools : null) || j;   // schools 는 학교 사진 목록에서만 — 색인 파일의 schools 는 숫자라 '읽기실패' 끼리 같다고 세면 404 도 통과한다(리뷰 10-03)
+                 /* 🔴 빗금은 두 가지를 다 받는다 (2026-10-03). 로봇은 리눅스라 `/` 지만, 개발자 컴퓨터(윈도우)에서
+                    관문이 이 함수를 떼어 **진짜 파일 경로**로 돌리면 `C:\…\assets\schools\photos.json` 이라
+                    `/` 만 보는 정규식이 안 걸렸다. 그러면 j 통째(칸 2개)를 세어 35 대신 2 가 나오고,
+                    관문이 개발자 화면에서만 빨간불이 된다 — 이 저장소가 네 번 겪은 그 유형이다. */
               if (Array.isArray(box)) return box.length;
               if (box && typeof box === 'object') return Object.keys(box).length;
               return '읽기실패';
@@ -116,6 +127,7 @@ jobs:
             const label = f.startsWith('data/majors/') ? '학과(학교별)'
               : f === 'data/link-check.json' ? '원문 링크 확인'
               : f.startsWith('data/news/img/') ? '소식 사진'
+              : f.startsWith('assets/schools/') ? (f.endsWith('.json') ? '학교 사진 목록' : '학교 사진')
               : f.startsWith('data/news/') ? (f.endsWith('index.json') ? '소식 색인' : '소식(학교별)')
               : f.endsWith('index.json') ? '공고 색인' : '공고(학교별)';
             const measure = f.endsWith('.webp') ? bytes : count;
