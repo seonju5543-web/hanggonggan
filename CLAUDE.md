@@ -55,6 +55,13 @@
   `school-board-seeds.json` 씨앗을 `find-boards.mjs` 가 훑어 후보만 리포트(자동으로 넣지 않는다) · 포털 표 후보 `collector/portal-candidates.mjs` · 정문 사진은 44개교(`fetch-gate-photos.mjs`).
   관문 「장학금 판정 자동화 · 범위 승격」.
 
+## 🔴 원문 링크 정직성 (2026-10-03 P0 — *"원문공고를 클릭했을 때 … 재단이나 장학금 페이지 전체가 표시"* · 장학·활동·소식 전반)
+
+- **링크 이름은 `source-link.js` 한 곳**(`sourceLink` — 상세·금액·신청 내역·카드·활동·도우미·제출처). 주소 글자로 '원문'을 정하지 말 것 — 목록 표식·목록+번호(`isListPlusId`)·홈페이지 꼴·로봇 확정만 이름을 바꾸고, 보통 주소의 글자는 승인된 그대로다.
+- **원문 링크 확인 로봇** `collector/link-check.mjs`(매일 · 판정은 `collector/link-landing.mjs` 한 곳 · 학생처럼 새 탭) — 🔴 **주소를 고치지 않는다.** 다른 날 두 번 같은 문제여야 `data/link-check.json` 에 싣는다(앱이 받는다). 제목 먼저·로그인 벽은 나중 · 다른 글 제목을 반드시 넘긴다.
+- 🔴 **고치는 로봇은 멀쩡한 주소를 표식으로 덮어쓰지 않는다**(2026-10-03 순찰이 잡티 제목으로 5건을 덮었다 → 순찰 끔). 병합 순위 `preferNotice`: 진짜 주소 > 목록 표식 > 목록+번호.
+- 데이터 감사는 다섯 묶음의 링크를 **경고만**(`verify/link-audit.cjs`) · 화면의 링크는 `verify/what-shows.mjs` 링크 줄로 말한다. 관문 「원문 링크 정직성」 · 설계 `docs/designs/source-links.md`.
+
 ## 관리자 업무 = 노션 백로그 (정본은 노션 하나)
 
 - 노션 Hangonggan › 프로젝트 › 한대장 › 「개발 업무」. 백로그 `data_source 60ac025f-edbd-4284-bb57-5e077bab1c3d` · 작업 현황 `2b015aa3-b2ed-444e-ae5b-bb30a8e14a23`.
