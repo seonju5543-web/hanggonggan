@@ -561,7 +561,7 @@ function officialChannel(sch) {
        '…찾기에서 공식 제출을' 이 됐다). 할 일(제목으로 찾기)은 링크 옆 안내 문장(sourceLink hint)이 말한다. */
     const label = cls === 'list' ? name('게시판 목록')
       : cls === 'home' ? name('홈페이지')
-      : cls === 'trouble' ? name('원문 공고의 접수 방법(주소 확인 필요)')
+      : cls === 'trouble' ? name('원문 공고의 접수 방법 · 주소 확인 필요')   // 괄호를 쓰지 않는다 — '최종 제출처(…)가 표시됩니다' 안에서 괄호가 겹친다(화면 실측)
       : name('원문 공고의 접수 방법');
     return { label, url: sch.sourceUrl, guide };
   }
