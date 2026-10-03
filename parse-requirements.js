@@ -370,6 +370,8 @@ function mentionsUndergrad(t) { return UNDERGRAD_TOO.test(String(t || '')); }
 const AGE_OF_OTHERS = /아동|어린이|유아|영유아|자녀|초등|중학생|고등학생|청소년|어르신|노인|환자|멘티|수혜자|가정|가구|학부모|장애아|독거/;
 function parseAge(t) {
   if (AGE_OF_OTHERS.test(t)) return null;
+  /* `만 14세 미만의 경우 개인정보 … 보호자 동의서 필요` — **경우 안내**지 나이 조건이 아니다(2026-10-04 · KOREAZ 공모전이 22살 학생에게 틀린 미달) */
+  if (/세\s?(?:미만|이하|이상|초과)(?:인|의)?\s?(?:경우|자는|분은)[^.]{0,40}(?:동의|서류|제출|필요|첨부|보호자|법정대리인)/.test(t)) return null;
   const r = t.match(/(?:만\s?)?(\d{1,2})\s*세?\s*(?:이상)?\s*[~∼～\-]\s*(?:만\s?)?(\d{2})\s*세/);
   if (r) {
     const lo = num(r[1]), hi = num(r[2]);

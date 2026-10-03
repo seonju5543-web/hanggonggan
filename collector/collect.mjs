@@ -16,7 +16,7 @@ import { publishBySchool, dropUnserved } from './publish-notices.mjs';
 import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { cleanTitle, isMenuEntry } from './clean-title.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
-import { activityKind, activityField } from './activity-kind.mjs';
+import { activityKind, activityField, notActivity } from './activity-kind.mjs';
 import { activityExcerpts, activityDetails, putActivityDetails, ACT_DETAILS_V } from './activity-excerpts.mjs';
 import { htmlToLines } from './html-text.mjs';
 import { robotsAllows } from './robots.mjs';
@@ -533,6 +533,7 @@ acts.items = freshActs.concat(acts.items || []);
    다음 날 '새 글'로 맨 위에 돌아오지 않게. 닫힌 글은 API 로봇이 뺀다(collector/open-api-map.mjs mergeApi). */
 acts.items = acts.items.filter((n) => ((n.api && n.seenAt) || n.foundAt || '9999') >= cutoff);
 acts.items = acts.items.filter((n) => !isAttachmentEntry(n));
+acts.items = acts.items.filter((n) => !notActivity(n.title));   // 결과·보도·지난 해 글은 모집 글이 아니다 — 이미 실린 글에도 소급(2026-10-04 · activity-kind.mjs)
 acts.items = dedupeNotices(acts.items);
 acts.items = acts.items.filter((n) => !n.school).concat(dropUnserved(acts.items.filter((n) => n.school)));
 acts.items.sort((a, b) => String(b.foundAt || '').localeCompare(String(a.foundAt || '')));

@@ -27,16 +27,26 @@ const ACTIVITY = /서포터즈|서포터스|\bsupporters?\b|기자단|홍보대�
 
 /* 둘 다 아니다 — 이미 뽑힌 사람에게 보내는 행정 안내, 결과 발표, 채용·대출.
    '멘토링 출근부 마감 안내' 같은 글은 활동 낱말이 있어도 모집이 아니다(실측 · 경희대 게시판). */
-const NOT = /출근부|유의사항|교육\s*자료|결과\s*(?:발표|안내|공지)|합격자|선정\s*(?:결과|자)\s*(?:발표|안내|공지)|최종\s*발표|수료증|증명서|채용|구인|아르바이트|알바|대출|융자|취소\s*안내|변경\s*안내|일정\s*변경/;
+const NOT = /심사\s*결과|결과\s*공고|석권|성료|시상식|수상\s*(?:작|자)\s*(?:발표|안내|공고)|출근부|유의사항|교육\s*자료|결과\s*(?:발표|안내|공지)|합격자|선정\s*(?:결과|자)\s*(?:발표|안내|공지)|최종\s*발표|수료증|증명서|채용|구인|아르바이트|알바|대출|융자|취소\s*안내|변경\s*안내|일정\s*변경/;
 
 /* @param title  게시판 글 제목(정리된 것)
    @param opts.scholarship  장학 공고 판정 정규식 — collect.mjs 의 KEYWORDS 를 그대로 넘긴다
                             (여기에 베껴 두면 두 벌이 된다). 안 주면 장학 낱말을 안 본다.
    @returns '공모전' | '대외활동' | null */
+/* 모집 글이 아닌 것 — 결과·보도·지난 해 글 (2026-10-04 개발자 "글에 자격 문장 자체가 없을 수가 없어" → 표본을 열어 보니
+   자격이 없던 글은 `가명정보 활용 경진대회 대상·최우수상 석권`(보도자료) · `제3회 장학수기 공모전 심사 결과` · `2018년 사회복지 협력기관 워크숍` 이었다).
+   🔴 수집 로봇이 이미 실린 글에도 소급한다(collect.mjs 발행) — 판정은 이 한 곳 */
+export function notActivity(title, now = new Date()) {
+  const t = String(title || '');
+  if (NOT.test(t)) return true;
+  const ys = [...t.matchAll(/(20\d{2})\s*(?:년|학년도)/g)].map((m) => Number(m[1]));
+  return ys.length > 0 && Math.max(...ys) < now.getFullYear() - 1;   // 제목의 해가 모두 재작년 이전 — 지난 행사 글
+}
+
 export function activityKind(title, opts = {}) {
   const t = String(title || '').trim();
   if (!t) return null;
-  if (NOT.test(t)) return null;
+  if (notActivity(t)) return null;
   if (CONTEST.test(t)) return '공모전';
   if (opts.scholarship && opts.scholarship.test(t)) return null;
   if (ACTIVITY.test(t)) return '대외활동';

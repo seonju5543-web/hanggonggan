@@ -72,14 +72,37 @@ const NOT_OPEN = /심사|수상|시상|제외|이해|쉽게|볼\s?수|이용|열
 const WHO_SENTENCE = /누구나\s*(?:참가|참여|신청|응모|지원)\s*(?:할\s*수\s*있|이?\s*가능)|(?:재학생|대학생|청년|주민|시민|도민|구민|학생|국민)[^.]{0,20}(?:을|를)\s*대상으로|(?:이면|라면|인\s*경우)\s*(?:누구나\s*)?(?:참가|참여|신청|응모|지원)\s*(?:할\s*수\s*있|가능)/;
 /* 🔴 `[ \t]` 이지 `\s` 가 아니다 — `\s` 는 줄바꿈까지 먹어 `<응모자격>` 아래 줄이 이름표 줄에 붙었다(첫 실측) */
 /* 🔴 칸 이름으로 끝나는 이름표만 — `[서울문화재단] 2026년 …` 같은 제목 머리말을 `서울문화재단 : …` 으로 바꾸지 않는다(리뷰) */
+/* 납작해진 표 — 이름표가 한 줄에 혼자, 값이 다음 줄(`대상` ↵ `대학생, 일반인 …` · `대상연령` ↵ `만 20세 이상 …` — K-Startup·대전청년포털 실측).
+   이름표가 **그것뿐인 줄**일 때만 다음 줄과 `이름표 : 값` 으로 잇는다(글자는 그대로 · 콜론만). 🔴 `봉사대상` 은 봉사를 **받는** 사람이라 넣지 않는다 */
+const TABLE_LABEL = /^(?:(?:모집|신청|참가|참여|지원|응모|교육|공모|활동)\s?(?:대상|자격)|대상\s?연령|대상자?|자격\s?요건|연령)$/;
+const joinTablePairs = (t) => {
+  const ls = t.split('\n');
+  for (let i = 0; i < ls.length - 1; i += 1) {
+    const a = ls[i].trim(), b = (ls[i + 1] || '').trim();
+    /* 🔴 맨 `대상` 은 공모전 **1등 상 이름**이기도 하다 — 시상표의 `대상` ↵ `교육부장관상`·`1`·`300만 원` 을 잇지 않는다(2026-10-04 실측) */
+    const award = /^대상$/.test(a) && /상(?:\s|\(|$)|^\d+\s*(?:명|점|건)?$|원$|만\s?원/.test(b);
+    if (TABLE_LABEL.test(a) && b && b.length <= 150 && !TABLE_LABEL.test(b) && !/[:：]/.test(a) && !award) { ls[i] = `${a} : ${b}`; ls[i + 1] = ''; }
+  }
+  return ls.join('\n');
+};
 const labelColon = (t) => t.replace(/^([ \t]*(?:[ㅇ○●■□▣◆◇▶·•\-*✅✔]|\d+[ \t]*[.)])?[ \t]*)[(<\[【〈][ \t]*([가-힣 ]{0,10}(?:자격|대상|기간|방법|일정|일시|내용|혜택|인원|장소|요건|조건|범위|접수|신청|제한|주최|주관|분야|주제|시상|상금|발표))[ \t]*[)>\]】〉][ \t]*/gm, (m, pre, label) => `${pre}${label.trim()} : `);
-function atTitle(t, title) {
+/** 글 제목이 나오는 줄 번호들 (없으면 빈 배열) */
+function titleStarts(t, title) {
   const key = String(title || '').replace(/\[[^\]]*\]|\([^)]*\)/g, '').replace(/[^가-힣A-Za-z0-9]/g, '').slice(0, 12);
-  if (key.length < 6) return t;
-  const lines = t.split('\n');
-  let at = -1;
-  lines.forEach((l, i) => { if (l.length <= 200 && l.replace(/[^가-힣A-Za-z0-9]/g, '').includes(key)) at = i; });
-  return at < 0 ? t : lines.slice(at).join('\n');
+  if (key.length < 6) return [];
+  const out = [];
+  t.split('\n').forEach((l, i) => { if (l.length <= 200 && l.replace(/[^가-힣A-Za-z0-9]/g, '').includes(key)) out.push(i); });
+  return out;
+}
+const flatQ = (x) => String(x).replace(/[\s:：·]/g, '');
+/** 본문 하나에서 자격 줄 — 절(qualifyLines) + 납작한 표에서 이은 이름표 줄 전부(`대상연령 : 만 20세 이상 …`) */
+function bodyQual(body) {
+  const q = qualifyLines(body);
+  for (const l of body.split('\n').map((x) => x.trim())) {
+    const m = l.match(/^([^:：]{1,10})\s:\s(.+)$/);
+    if (m && TABLE_LABEL.test(m[1].trim()) && !q.some((x) => flatQ(x).includes(flatQ(m[2])))) q.push(l);
+  }
+  return q;
 }
 /* 절 제목으로 짚은 줄이 **정말 이름표인가** — 앞머리(기호·번호 뗀 12자 안)에 그 낱말이 있어야 한다.
    `… 심사 기준 등 자세한 사항은 누리집에서` 같은 보도자료 문장이 '심사 기준' 으로 절 제목이 되어 줄글 4줄이 자격 자리에 앉았다(첫 실측). */
@@ -97,7 +120,7 @@ const HEAD_LIKE = (l) => {
    판정은 parseOpen 이 남는 글자 0일 때만 ✓ 라 이런 긴 문장은 '모름'으로 남는다(틀린 안심 없음) */
 const proseLines = (t) => [...new Set(t.split('\n').map((l) => l.trim()).filter((l) => l.length >= 8 && l.length <= 200 && WHO_SENTENCE.test(l) && !NOT_OPEN.test(l.replace(/니다\s*\.?$/, ''))))].slice(0, 2);
 function qualifyLines(t) {
-  let q = extractQualifyLines(t, { head: ACT_HEAD });
+  let q = extractQualifyLines(t, { head: ACT_HEAD, trustHead: true });
   /* 맨 제목 줄(`지원자격`)은 장학 발췌기가 표 머리글로 보고 빼므로 첫 줄이 내용일 수 있다 — 그 바로 윗줄이 제목이면 맞다(리뷰) */
   if (q.length && !HEAD_LIKE(q[0])) {
     const ls = t.split('\n').map((l) => l.trim()).filter(Boolean);
@@ -111,14 +134,27 @@ function qualifyLines(t) {
 export function activityDetails(text, title) {
   const t = labelColon(String(text || ''));
   if (!t.trim()) return { eligibilityLines: [], eligibilityExcludes: [], eligibilityPriority: [], noticeLines: [] };
-  const body = atTitle(t, title);
-  let qual = qualifyLines(body);
-  if (!qual.length && body !== t) qual = qualifyLines(t);
+  /* 어디서부터 읽나 — 글 제목이 나오는 **자리마다** 읽어 보고 자격이 가장 많이 나오는 자리(같으면 뒤쪽).
+     🔴 마지막 자리만 보면 두 번 나오는 제목 **사이**의 자격 표를 놓쳤다(K-Startup DMC 캠프 · 제목 191·214줄, 표 195~208줄 · 2026-10-04).
+     맨 앞 세 줄(브라우저 제목줄 · 그 아래는 사이트 메뉴)은 제목이 한 번뿐일 때만 시작점으로 쓴다.
+     표 잇기는 **본문을 자른 뒤에** — 먼저 이으면 메뉴의 `지원대상` 이 바로 아래 글 제목과 붙어 본문 첫 줄이 됐다(관문) */
+  const tl = t.split('\n');
+  const starts = titleStarts(t, title);
+  const cands = starts.filter((i) => i > 2 || starts.length === 1);
+  let body = t, qual = [];
+  for (const i of cands) {
+    const b = joinTablePairs(tl.slice(i).join('\n'));
+    const q = bodyQual(b);
+    if (body === t || q.length >= qual.length) { body = b; qual = q; }
+  }
+  if (!qual.length) qual = bodyQual(joinTablePairs(t));
   /* '대상:' 이름표 줄도 **함께** 본다 (2026-10-01) — 자격 절이 짧은 한 줄(`참가자격 : 만 19~34세 대한민국 국민`)만 주고
      진짜 조건은 '대상:' 줄(`KOICA 사업 참여 경험이 있으며 …`)에 있던 공고가 **95% ✓** 로 떴다(틀린 안심). 한쪽이 다른 쪽을 품으면 하나만 둔다. */
   const who = eachLabeledValue(t, (label) => EXCERPT_LABELS[2][1].test(label.replace(/\s/g, '')), (v) => (cleanValue(v).length >= 4 ? cleanValue(v) : null));
   const flat = (x) => String(x).replace(/[\s:：·]/g, '');
-  if (who && !qual.some((q) => flat(q).includes(flat(who)) || flat(who).includes(flat(q).replace(/^.*?(?:대상|자격)/, '')))) qual = [...qual, who];
+  /* 🔴 이름표를 뗀 앞 줄이 **빈 글자**면 비교하지 않는다 — 빈 글자는 어디에나 '들어 있어서' 대상 줄이 빠졌다(`■ 참가자격` 제목 줄 · 2026-10-04 관문) */
+  const core = (q) => flat(q).replace(/^.*?(?:대상|자격)/, '');
+  if (who && !qual.some((q) => flat(q).includes(flat(who)) || (core(q).length >= 4 && flat(who).includes(core(q))))) qual = [...qual, who];
   if (!qual.length) qual = proseLines(body);
   if (!qual.length && body !== t) qual = proseLines(t);
   return {

@@ -94,7 +94,8 @@ export function imageSize(buf) {
   return null;
 }
 /* 포스터·공고문 캡처는 세로로 길거나 정사각에 가깝다. 가로로 넓은 그림은 배너다(첫 실측: 846×510 체육대회 광고) */
-export const posterShaped = (sz) => !sz || sz.h >= sz.w * 0.9;
+/* 🔴 큰 그림(가로 1200px 이상)은 가로로 넓어도 받는다 — 예술위 카드뉴스가 1920×1080 슬라이드였다(2026-10-04 표본). 광고 배너는 그보다 작다(846×510) */
+export const posterShaped = (sz) => !sz || sz.h >= sz.w * 0.9 || sz.w >= 1200;
 
 export function candidateFiles(n, html, pageUrl) {
   const out = [];
@@ -113,7 +114,9 @@ export function candidateFiles(n, html, pageUrl) {
     if (CHROME_IMG.test(m[0])) continue;
     let u;
     try { u = new URL(m[1].replace(/&amp;/g, '&'), pageUrl).href; } catch { continue; }
-    if (/^data:/.test(u) || CHROME_IMG.test(u)) continue;
+    if (CHROME_IMG.test(u)) continue;
+    /* 페이지에 직접 박힌 그림(`data:image/png;base64,…`)도 받는다 — 감사원 공모 팝업의 포스터가 그 꼴이었다(2026-10-04 표본) */
+    if (/^data:/.test(u) && !/^data:image\/(?:png|jpe?g|webp);base64,/i.test(u)) continue;
     out.push({ url: u, name: '', from: 'img' });
   }
   const seen = new Set();
@@ -128,6 +131,13 @@ const extOf = (f, type) => {
 };
 
 async function download(f, referer) {
+  if (/^data:image\//i.test(f.url)) {
+    const m = f.url.match(/^data:image\/(png|jpe?g|webp);base64,(.+)$/i);
+    if (!m) return null;
+    const buf = Buffer.from(m[2], 'base64');
+    if (buf.length < MIN_IMG_BYTES || buf.length > MAX_BYTES || !posterShaped(imageSize(buf))) return null;
+    return { buf, ext: m[1].toLowerCase().replace('jpeg', 'jpg'), hash: crypto.createHash('sha1').update(buf).digest('hex').slice(0, 16) };
+  }
   const res = await fetch(f.url, { redirect: 'follow', headers: { ...FETCH_HEADERS, Referer: referer }, signal: AbortSignal.timeout(20000) });
   if (!res.ok) return null;
   if (Number(res.headers.get('content-length') || 0) > MAX_BYTES) return null;
