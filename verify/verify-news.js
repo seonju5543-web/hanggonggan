@@ -146,7 +146,7 @@ const settle = async (page) => { await page.$eval('#school-news', (e) => e.scrol
     const shot = await thumbs(page);
     eq(`⑦ ${mode === 'nophotos' ? '목록을 못 받으면' : '그림을 못 받으면'} 사진 없는 글은 글자 카드 (표시만 남지 않는다)`, shot.slice(2).map((c) => [c.has, c.img, c.tag]), Array(3).fill([false, false, '']));
     eq(`⑦ ${mode} — 글의 사진은 그대로`, [shot[0].img, shot[0].loaded], [true, true]);
-    if (mode === 'nophotos') eq('⑦ 목록이 없으면 출처 줄도 없다', await page.$('#school-news .news-photo-credit'), null);
+    eq(`⑦ ${mode} — 보이는 학교 사진이 없으면 출처 줄도 없다`, await page.$('#school-news .news-photo-credit'), null);
     eq(`⑦ ${mode} — 페이지 오류 없음`, errors, []);
     await page.context().close();
   }

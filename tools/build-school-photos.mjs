@@ -44,6 +44,16 @@ export function cleanAuthor(s) {
   return bare.length <= 40 ? bare : bare.slice(0, 40).replace(/\s+\S*$/, '');
 }
 
+/* 잘라 낼 자리 — 고른 기록의 crop [x, y, w, h](0~1 비율)를 그림 픽셀 상자로. 사람·번호판이 찍힌 쪽을 **파일에서** 덜어 낸다
+   (72px 카드에선 안 보여도 640px 파일은 누구나 받을 수 있는 주소다 · 리뷰 10-03: 서강 번호판·경희 택시·한양 행인). 틀린 값이면 null(자르지 않음 → 빌드가 알린다) */
+export function cropBox(width, height, crop) {
+  if (!Array.isArray(crop) || crop.length !== 4 || !crop.every((v) => typeof v === 'number' && v >= 0 && v <= 1)) return null;
+  const [x, y, w, h] = crop;
+  if (w <= 0 || h <= 0 || x + w > 1.0001 || y + h > 1.0001) return null;
+  const left = Math.round(width * x), top = Math.round(height * y);
+  return { left, top, width: Math.min(width - left, Math.round(width * w)), height: Math.min(height - top, Math.round(height * h)) };
+}
+
 export function creditLine(f) {
   return `${cleanAuthor(f.author) || '작가 미상'} · ${f.license}`;
 }
@@ -78,7 +88,14 @@ async function main() {
       if (!OK_LICENSE.test(meta.license || '') || /NC|ND/.test(meta.license)) { problems.push(`${school}: ${p.file} 라이선스 ${meta.license}`); continue; }
       const src = path.join(SRC, p.file);
       if (!fs.existsSync(src)) { problems.push(`${school}: ${p.file} 파일 없음`); continue; }
-      const buf = await sharp(src).rotate().resize({ width: WIDTH, withoutEnlargement: true }).webp({ quality: QUALITY }).toBuffer();
+      let img = sharp(src).rotate();
+      if (p.crop) {
+        const { width, height } = await sharp(await img.toBuffer()).metadata();
+        const box = cropBox(width, height, p.crop);
+        if (!box) { problems.push(`${school}: ${p.file} 의 crop 값이 틀렸다 ${JSON.stringify(p.crop)}`); continue; }
+        img = sharp(await img.extract(box).toBuffer());
+      }
+      const buf = await img.resize({ width: WIDTH, withoutEnlargement: true }).webp({ quality: QUALITY }).toBuffer();
       const name = `${key}-${crypto.createHash('sha1').update(buf).digest('hex').slice(0, 8)}.webp`;
       fs.writeFileSync(path.join(OUT, name), buf);
       keep.add(name);

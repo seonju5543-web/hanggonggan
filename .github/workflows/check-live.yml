@@ -94,7 +94,7 @@ jobs:
               const j = JSON.parse(fs.readFileSync(p, 'utf8'));
               /* ⚠️ `majors` 도 안다 — 모르면 학과 파일에서 **칸 수 3**(school·updatedAt·majors)을
                  세어, 내용이 달라도 3 대 3 으로 통과한다(404 만 겨우 잡힌다). */
-              const box = j.items || j.templates || j.majors || j.schools || j;   // schools = 학교 사진 목록(학교 수)
+              const box = j.items || j.templates || j.majors || (/assets\/schools\/photos\.json$/.test(p) ? j.schools : null) || j;   // schools 는 학교 사진 목록에서만 — 색인 파일의 schools 는 숫자라 '읽기실패' 끼리 같다고 세면 404 도 통과한다(리뷰 10-03)
               if (Array.isArray(box)) return box.length;
               if (box && typeof box === 'object') return Object.keys(box).length;
               return '읽기실패';

@@ -239,6 +239,33 @@
     "what": "본관 건물과 소나무"
    }
   ],
+  "서강대학교": [
+   {
+    "src": "assets/schools/n14n199r-58477144.webp",
+    "focus": "50% 60%",
+    "credit": "알로스 · CC0",
+    "page": "https://commons.wikimedia.org/wiki/File%3ASogang-1641741169692_04.jpg",
+    "what": "눈 덮인 교정과 노을 하늘 — 시작 화면 사진에서 아래 주차된 차(번호판)를 잘라 냄"
+   }
+  ],
+  "경희대학교": [
+   {
+    "src": "assets/schools/n1w4hprp-636d792e.webp",
+    "focus": "55% 50%",
+    "credit": "Pectus Solentis · CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3A%EA%B2%BD%ED%9D%AC%EB%8C%80_%EC%84%A4%EC%BA%A0_%EC%A0%95%EB%AC%B8.jpg",
+    "what": "성 모양 석조 정문과 나무 — 시작 화면 사진에서 왼쪽 아래 택시(번호판)를 잘라 냄"
+   }
+  ],
+  "한양대학교": [
+   {
+    "src": "assets/schools/n1b3og5n-ed95fe67.webp",
+    "focus": "60% 50%",
+    "credit": "Piotrus · CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AHanyang_University_008.JPG",
+    "what": "초록 지붕 본관과 파란 하늘 — 시작 화면 사진에서 앞쪽 행인들을 잘라 냄"
+   }
+  ],
   "서울대학교": [
    {
     "src": "assets/schools/nsgh1oi-845ff74a.webp",
@@ -266,15 +293,6 @@
     "what": "시작 화면 사진(승인)"
    }
   ],
-  "서강대학교": [
-   {
-    "src": "assets/schools/n14n199r-bd0f76fa.webp",
-    "focus": "32% 48%",
-    "credit": "알로스 · CC0",
-    "page": "https://commons.wikimedia.org/wiki/File%3ASogang-1641741169692_04.jpg",
-    "what": "시작 화면 사진(승인)"
-   }
-  ],
   "성균관대학교": [
    {
     "src": "assets/schools/n1x6ubj9-5fa36ec4.webp",
@@ -284,30 +302,12 @@
     "what": "시작 화면 사진(승인)"
    }
   ],
-  "한양대학교": [
-   {
-    "src": "assets/schools/n1b3og5n-fd3ebd03.webp",
-    "focus": "50% 50%",
-    "credit": "Piotrus · CC BY-SA 3.0",
-    "page": "https://commons.wikimedia.org/wiki/File%3AHanyang_University_008.JPG",
-    "what": "시작 화면 사진(승인)"
-   }
-  ],
   "중앙대학교": [
    {
     "src": "assets/schools/n1iz3lr8-58c9fd71.webp",
     "focus": "50% 50%",
     "credit": "Hutanis · CC BY-SA 3.0",
     "page": "https://commons.wikimedia.org/wiki/File%3AChung-ang_Univ.Maingate.jpg",
-    "what": "시작 화면 사진(승인)"
-   }
-  ],
-  "경희대학교": [
-   {
-    "src": "assets/schools/n1w4hprp-25c68523.webp",
-    "focus": "62% 78%",
-    "credit": "Pectus Solentis · CC BY-SA 3.0",
-    "page": "https://commons.wikimedia.org/wiki/File%3A%EA%B2%BD%ED%9D%AC%EB%8C%80_%EC%84%A4%EC%BA%A0_%EC%A0%95%EB%AC%B8.jpg",
     "what": "시작 화면 사진(승인)"
    }
   ],

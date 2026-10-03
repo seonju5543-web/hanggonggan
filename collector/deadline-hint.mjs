@@ -44,10 +44,14 @@ const HINT_DATE = /\d{4}\s*[.\-년]|\d{1,2}\s*[.월]\s*\d{1,2}/;
 
 /* HTML 기호(&nbsp; 등)를 글자로 — 본문 글자에 `&nbsp;` 가 날것으로 남아 있으면 80자 자르기가 그 한가운데를 잘라
    학생 화면에 `16:00 &n` 이 떴다(2026-10-03 실측 20건 · 고려대·서울과기대). 두 번 싼 것(&amp;nbsp;)도 있어 두 번 푼다. */
-const HINT_ENT = { nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', '#39': "'", apos: "'" };
-const unentHint = (s) => s.replace(/&(nbsp|amp|lt|gt|quot|#39|apos);/gi, (m, k) => HINT_ENT[k.toLowerCase()]);
-/* 그래도 끝에 반쯤 잘린 기호(`&n`·`&nbs`·`&#3`)가 남으면 뗀다 — 기호의 앞부분 꼴만(소문자). `R&D` 같은 글자는 안 건드린다 */
-export const PARTIAL_ENTITY_END = /&(?:n(?:b(?:s(?:p)?)?)?|a(?:m(?:p)?)?|lt?|gt?|q(?:u(?:o(?:t)?)?)?|#\d{0,3})?$/;
+/* 이름 기호는 앱(app.js ENTITIES)이 아는 것 전부 — 관문이 두 목록을 대조한다(리뷰 10-03: &middot;·&lsquo; 가 같은 자리에서 `접&middo` 로 잘렸다) · 숫자 기호(&#183; &#xB7;)는 모두 */
+export const HINT_ENT = { nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", middot: '·', lsquo: '‘', rsquo: '’', bull: '•', sim: '∼', rarr: '→' };
+const unentHint = (s) => s
+  .replace(/&([a-z]+);/gi, (m, k) => (HINT_ENT[k.toLowerCase()] ?? m))
+  .replace(/&#(\d{1,6});/g, (m, d) => String.fromCodePoint(Number(d) === 160 ? 32 : Number(d)))
+  .replace(/&#x([0-9a-f]{1,5});/gi, (m, h) => String.fromCodePoint(parseInt(h, 16) === 160 ? 32 : parseInt(h, 16)));
+/* 그래도 끝에 반쯤 잘린 기호(`&n`·`&middo`·`&#3`·`&#x`)가 남으면 뗀다 — 기호 꼴(소문자·숫자)만. `R&D` 같은 글자는 안 건드린다 */
+export const PARTIAL_ENTITY_END = /&(?:[a-z]{1,7}|#\d{0,6}|#x[0-9a-f]{0,5})?$/;
 const cutPartialEntity = (s) => s.replace(PARTIAL_ENTITY_END, '').trim();
 
 /** 본문에서 접수 기간 한 줄. 못 찾으면 null — **지어내지 않는다**. */

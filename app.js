@@ -600,7 +600,7 @@ function unent(s) {
   return String(s == null ? '' : s).replace(ENTITY_RE, (m, k) => ENTITIES[k]);
 }
 /* 이미 저장된 기간 한 줄의 끝에 반쯤 잘린 기호(`16:00 &n`)가 남은 것 — 로봇은 이제 기호를 풀고 자르지만(collector/deadline-hint.mjs) 실린 글에 남아 있다(소급 · 관문이 같은 꼴을 대조) */
-const PARTIAL_ENTITY_END = /&(?:n(?:b(?:s(?:p)?)?)?|a(?:m(?:p)?)?|lt?|gt?|q(?:u(?:o(?:t)?)?)?|#\d{0,3})?$/;
+const PARTIAL_ENTITY_END = /&(?:[a-z]{1,7}|#\d{0,6}|#x[0-9a-f]{0,5})?$/;
 const hintText = (s) => unent(s).replace(PARTIAL_ENTITY_END, '').trim();
 
 /* 외부 링크 안전화 — http(s)·mailto만 허용한다. 수집 로봇이 받아 온 데이터가 오염되거나
@@ -2858,16 +2858,14 @@ function noticeCardHtml(n, opts) {
     </a>`;
 }
 
-/* 학교 사진 고르기 — 학교에 여러 장이면 글마다 고정된 한 장(글 번호·주소의 해시)이라 다시 그려도 바뀌지 않고, 이웃 카드끼리 겹치지 않게 돈다 */
+/* 학교 사진 고르기 — 학교에 여러 장이면 구역에서 사진 없는 카드의 차례(k)대로 돌아가며 쓴다(이웃 카드끼리 같은 사진이 이어지지 않게).
+   🔴 글마다 해시로 고르면 이웃이 겹친다 — 실측: 전북대 앞 다섯 장이 같은 사진 셋 연속(리뷰 10-03). 차례를 모르면(k 없음) 첫 장 */
 let schoolPhotos = null;   // assets/schools/photos.json — 못 받으면 null(그대로 글자 카드)
-function schoolPhotoFor(n) {
+function schoolPhotoFor(n, k) {
   const list = ((schoolPhotos && schoolPhotos.schools && schoolPhotos.schools[n.school]) || [])
     .filter((x) => x && SCHOOL_PHOTO_RE.test(x.src || ''));
   if (!list.length) return null;
-  const k = String(n.postId || n.url || n.title || '');
-  let h = 0;
-  for (let i = 0; i < k.length; i++) h = (h * 31 + k.charCodeAt(i)) >>> 0;
-  return list[h % list.length];
+  return list[(Number.isInteger(k) && k >= 0 ? k : 0) % list.length];
 }
 
 /* ---------------- 대외활동·공모전 (2026-09-25 · 노션 UI-34) ----------------
@@ -3159,8 +3157,9 @@ function schoolNewsHtml() {
   const more = mine.length > NEWS_HOME_TOP;
   /* 글의 사진이 없는 카드는 학교 대표 사진으로 (2026-10-03) — 쓴 사진의 출처를 구역 아래에 한 번씩(위키미디어 열린 라이선스의 표기 의무) */
   const used = [];
+  const turn = {};   // 학교마다 사진 없는 카드의 차례 — 이웃 카드끼리 다른 사진
   const cards = shown.map((n) => {
-    const sp = n.thumb && NEWS_THUMB_RE.test(n.thumb) ? null : schoolPhotoFor(n);
+    const sp = n.thumb && NEWS_THUMB_RE.test(n.thumb) ? null : schoolPhotoFor(n, turn[n.school] = (turn[n.school] ?? -1) + 1);
     if (sp && !used.includes(sp)) used.push(sp);
     return noticeCardHtml(n, { org: `${n.school} 공지${n.kind ? ' · ' + n.kind : ''}`, excerpts: n.postedAt ? [{ label: '게시', text: n.postedAt }] : [], thumb: n.thumb, schoolPhoto: sp });
   }).join('');
@@ -6200,8 +6199,11 @@ function bindEvents() {
     const box = img.classList.contains('notice-thumb') ? img : img.parentElement && img.parentElement.classList.contains('notice-thumb') ? img.parentElement : null;
     if (!box) return;
     const card = box.closest('.has-thumb');
+    const section = box.closest('#school-news');
     box.remove();
     if (card) card.classList.remove('has-thumb');
+    /* 학교 사진이 하나도 안 남으면 출처 줄도 뺀다 — 안 보이는 사진의 출처만 덩그러니 남지 않게(리뷰 10-03) */
+    if (section && !section.querySelector('.notice-thumb-school')) { const c = section.querySelector('.news-photo-credit'); if (c) c.remove(); }
   }, true);
   /* 교내 소식 더보기 (2026-09-30) — 구역은 통째로 다시 그려지므로 그릇(#school-news)에 위임한다. 히어로는 안 건드린다. */
   const newsBox = $('#school-news');
