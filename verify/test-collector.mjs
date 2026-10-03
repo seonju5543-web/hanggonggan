@@ -1521,7 +1521,7 @@ console.log('\n■ 장학금 판정 자동화 · 범위 승격 (2026-09-30)');
     eq('  `부산대` 꼴은 있다', busan.includes('부산대'), true);
     eq('  지역이 아닌 밑동은 두 글자여도 남는다(동국 — 동국리더장학이 이 꼴로 붙는다) · 세 글자(성균관)도', SN.schoolTokens('동국대학교', names).includes('동국') && SN.schoolTokens('성균관대학교', names).includes('성균관'), true);
     eq('  신문·중앙회는 바깥 기관 낱말 (조선일보 ≠ 조선대 · 농협중앙회 ≠ 중앙대)', KE.ORG_RE.test('조선일보 장학생') && KE.ORG_RE.test('농협중앙회 장학'), true);
-    eq('  지역 이름표(REGION_CITIES)를 data.js 에서 읽었다', !!names.regions && names.regions.has('부산') && names.regions.has('경기'), true);
+    eq('  지역 이름표(REGION_CITIES — parse-requirements.js 한 벌)를 읽었다', !!names.regions && names.regions.has('부산') && names.regions.has('경기'), true);
     const r = KE.classifyKind({ ...base, school: '부산대학교', tokens: busan, domain: 'pusan.ac.kr', title: '2026 부산광역시 대학생 학자금 지원 장학생 모집', text: '신청서를 장학팀에 제출' });
     eq('「부산광역시 대학생 … 장학팀에 제출」@부산대 ≠ 교내 high', r.kind === '교내' && r.confidence === 'high', false);
     eq('  지자체 이름이 붙은 꼴은 바깥 기관 낱말이다', KE.ORG_RE.test('서울시 청년 장학') && KE.ORG_RE.test('충청남도 인재육성 장학'), true);
@@ -3205,8 +3205,12 @@ console.log('\n■ 지역 요건 — 시·군까지 (2026-08-30)');
   eq('  다르면 미달 (안양시 학생 · 광양시 장학금)',
     verdict(mk('백운장학회(광양)', '광양시에 주소를 두고 재학 중인 학생'), anyang), '미달');
   /* 🔴 안 고른 학생에게 ✕ 를 치면 안 된다 — 모르는 것과 안 맞는 것은 다르다 */
-  eq('  시·군을 안 골랐으면 미달이 아니라 미확인',
-    verdict(mk('백운장학회(광양)', '광양시에 주소를 두고 재학 중인 학생'), {}), '미확인');
+  /* 2026-10-03 개발자 지시("완벽하게") — 시·도가 다르면 시·군을 몰라도 안 맞는 것을 **안다**(경기 학생 · 광양시=전남 → 미달).
+     모르는 것은 **같은 시·도 안에서 시·군을 안 고른 경우**뿐이다 — 이 검사가 지키던 뜻은 그쪽으로 옮긴다. */
+  eq('  시·군을 안 골랐어도 시·도가 다르면 미달 (경기 학생 · 광양시 장학금)',
+    verdict(mk('백운장학회(광양)', '광양시에 주소를 두고 재학 중인 학생'), {}), '미달');
+  eq('  같은 시·도인데 시·군을 안 골랐으면 미달이 아니라 미확인 (전남 학생 · 광양시)',
+    verdict(mk('백운장학회(광양)', '광양시에 주소를 두고 재학 중인 학생'), { region: '전남', parentRegion: '전남' }), '미확인');
   /* 🔴 예외 문구가 있으면 ✕ 를 치지 않는다 — `대학생은 관외 거주 인정` 이 실제로 있다 */
   eq('  예외 문구가 있으면 미달로 단정하지 않는다',
     verdict(mk('백운장학회(광양)', '광양시에 주소를 둔 자 대학생의 경우 본인에 한하여 관외 거주 인정'), anyang) !== '미달', true);
@@ -3237,7 +3241,8 @@ console.log('\n■ 자격 판정의 정직함 (2026-08-30)');
   /* ① 한 조건만 맞았다고 줄 전체에 ✓ 를 치면, **묻지도 않은 처지**를 확인했다고 말하는 셈이다 */
   eq('묻지 않은 처지에는 ✓ 를 치지 않는다 (손자녀)',
     mark('취약계층 국민연금수급자 또는 그 자녀(손자녀)로서 대학교 4년제·전문대에 재학 중인 자'), null);
-  eq('  둘째아 이상 자녀', mark('보호자가 6개월 이상 원주시에 주민등록을 두고 거주하는 만 24세 이하의 둘째아 이상 자녀'), null);
+  /* 강원 학생으로 잰다 — 서울 학생이면 원주시(강원) 거주 요건 때문에 미달이 되어(2026-10-03 시·군 → 시·도 판정) 이 검사의 뜻(묻지 않은 처지에 ✓ 금지)을 못 잰다 */
+  eq('  둘째아 이상 자녀', mark('보호자가 6개월 이상 원주시에 주민등록을 두고 거주하는 만 24세 이하의 둘째아 이상 자녀', { region: '강원', parentRegion: '강원' }), null);
   eq('  세대주 나이', mark('세대주가 만 65세 이하'), null);
   eq('  산업체 근로자', mark('산업체근로자 - 상주시 기업체에 근무하는 근로자 중 2년제 이상 대학에 재학 중인 자'), null);
   /* 🔴 반대쪽 — 우리가 **묻는** 처지까지 막으면 진짜 판정이 사라진다 */
@@ -11130,6 +11135,15 @@ console.log('\n■ 대외활동·공모전 — 활동 글의 자격 읽기 (2026
   eq('  🔴 다른 연고로도 되는 줄은 미달이 아니다(틀린 미달 금지) — 생활권 · ○○ 소재 대학 또는 주민등록자',
     [rm('경기도에 거주하거나 생활권을 두고 있는 청년', seoul), rm('부산시 소재 대학졸업(예정)자 또는 주민등록자', seoul)].map((v) => v !== 'no'), [true, true]);
   eq('  `39세 이하 청년 (부산시 청년 기준)` 은 나이 세는 법이지 사는 곳이 아니다', PRX0.parseLine('39세 이하 청년 (부산시 청년 기준)').conds.some((c) => c.kind === 'residence'), false);
+  /* ⑧ 시·군 → 시·도 (2026-10-03 개발자 지시 "완벽하게") — 시·군을 안 고른 학생도 시·도가 다르면 미달. 표는 parse-requirements 하나 */
+  const noCity = { ...seoul, regionCity: '', parentRegionCity: '' };
+  eq('⑧ 시·군 거주 — 시·군 안 고른 서울 학생에게 `구리시 거주 청년` 은 미달 · 경기 학생은 모름(시·군 모름) · 구리시 학생은 충족',
+    [rm('구리시 거주 청년', noCity), rm('구리시 거주 청년', { ...noCity, region: '경기' }), rm('구리시 거주 청년', { ...noCity, region: '경기', regionCity: '구리시' })], ['no', null, 'ok']);
+  eq('  같은 이름이 둘인 구(강서구 — 서울·부산)는 그중 한 곳 학생이면 모름 · 둘 다 아니면 미달', [rm('강서구에 주소를 둔 학생', noCity), rm('강서구에 주소를 둔 학생', { ...noCity, region: '대전', parentRegion: '대전' })], [null, 'no']);
+  eq('  표는 한 벌 — parse-requirements 가 내보내고 data.js 엔 없다 · 엔진의 브라우저 목록에 provincesOfCity',
+    [PRX0.provincesOfCity('구리시'), /const REGION_CITIES/.test(readText(new URL('../data.js', import.meta.url))), /: \{ parseLine,[^}]*provincesOfCity/.test(readText(new URL('../match-engine.js', import.meta.url)))], [['경기'], false, true]);
+  eq('  🔴 `관내 고등학교를 졸업하고 …` 는 출신 고교지 사는 곳이 아니다 · `관내 주소` 는 사는 곳', [(PRX0.parseLine('관내 고등학교를 졸업하고 전국 의과대학에 재학 중인 자').conds.find((c) => c.kind === 'residence') || {}).about !== 'home', (PRX0.parseLine('관내에 주소를 둔 자').conds.find((c) => c.kind === 'residence') || {}).about], [true, 'home']);
+  eq('  배점표(`성적 35% + 생활정도 50% + 경주시 거주기간 15%`)는 자격 줄이 아니다', MEX.requirementLines({ eligibilityLines: ['□ 성적 35% + 생활정도 50% + 경주시 거주기간 15%'] }, null, { all: true }).length, 0);
   eq('⑥ 소급 — 판(detailsV)을 올려 옛 글도 다시 읽는다 · 수집 로봇은 제목을 넘긴다',
     [AX.ACT_DETAILS_V >= 3, (readText(new URL('../collector/collect.mjs', import.meta.url)).match(/activityDetails\(detail\.text, it\.title\)/g) || []).length], [true, 2]);
 }
