@@ -201,7 +201,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 | `collector/activity-docs.mjs` | 대외활동 자격 **출처만** 늘리는 곳 — 순서: 본문 → 요강 페이지(이름이 분명한 같은 사이트 링크) → HWP·DOCX → 그림·PDF(PaddleOCR `collector/paddle-ocr.py`) → 유료 AI(「AI 자격 읽기」 버튼 · 꺼짐). 🔴 자격 줄 고르기는 늘 `activityDetails` 하나(새 판독기를 만들지 말 것) · 남의 글 막기는 제목 낱말(`ownsImageText`) · 받은 파일은 커밋 안 함 · 관문 「대외활동·공모전 — 첨부·포스터 읽기」 |
 | `collector/fetch-board.mjs` | 게시판 받기·실패 이유 펴기 — 일반 수집기와 소식 로봇이 같이 쓴다(베끼지 말 것) |
 | `collector/extract-excerpts.mjs` | 원문 발췌 · 마감일 · 메일 접수 주소(`apply-email.mjs`) |
-| `collector/deepfetch.mjs` `rescue-bodies.mjs` | 본문·첨부 원본 받기 · 옛 공고 본문 메우기 |
+| `collector/deepfetch.mjs` `rescue-bodies.mjs` | 본문·첨부 원본 받기 · **자격요건 로봇**(`.github/workflows/rescue-bodies.yml` · 진짜 크롬 · 하루 두 번) — 장학 본문 재수집 + 대외활동 `activity-docs.mjs --browser`. 🔴 진짜 브라우저로 자격을 찾는 로봇은 이것 하나(하나 더 만들면 같은 공고를 두 번 두드린다) · `data/activities.json` 은 안 쓰고 장부 act-browser.json 에만(수집 로봇이 합친다) |
 | `collector/schematize-forms.mjs` `schema-from-text.mjs` | 양식 스키마화(무료 우선, 못 하는 것만 API) |
 | `collector/link-hunter.mjs` `probe-links.mjs` `resolve-detail-urls.mjs` `detail-url.mjs` | 원문 주소 찾기 · 정찰 · 주소 규칙 |
 | `collector/notice-source.mjs` `canon-url.mjs` `url-key.mjs` `clean-title.mjs` | '같은 공고인가'·'원문이 무엇인가' 규칙 한 곳 |

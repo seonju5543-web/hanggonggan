@@ -11243,5 +11243,42 @@ console.log('\n■ 대외활동·공모전 — 첨부·포스터 읽기 (2026-10
     [true, true, true]);
 }
 
+console.log('\n■ 자격요건 로봇 (진짜 브라우저) — 장학·대외활동 (2026-10-04 개발자 "진짜 브라우저로 열어야 되는 공고는 다 이걸로 · 시간초과 등 오류 안 나게")');
+{
+  /* 왜 있나 — 진짜 크롬으로 자격을 찾는 로봇은 하나(rescue-bodies.yml)다. 수집 로봇과 겹치지 않게: 대기줄·시간대·쓰는 파일이 따로이고,
+     data/activities.json 은 브라우저 로봇이 쓰지 않는다(수집 로봇·공공 API 로봇이 이미 쓴다 — 셋이 쓰면 push 가 부딪힌다). */
+  process.env.ACTIVITY_DOCS_AS_LIB = '1';
+  const AD = await import('../collector/activity-docs.mjs');
+  const src = readText(new URL('../collector/activity-docs.mjs', import.meta.url));
+  const acts = { items: [{ url: 'u1', title: 'a' }, { url: 'u2', title: 'b', eligibilityLines: ['본문 자격'] }, { url: 'u3', title: 'c' }] };
+  const n = AD.mergeBrowserResults(acts, { u1: { lines: ['참가자격 : 대학생'], from: '브라우저 본문' }, u2: { lines: ['덮으면 안 됨'], from: '브라우저 본문' }, u3: { at: '2026-10-04', tries: 1 } });
+  eq('① 수집 로봇이 브라우저 장부를 합친다 — 아직 자격이 없는 글에만 · 결과 없는 장부 줄은 무시',
+    [n, acts.items[0].eligibilityLines, acts.items[0].eligibilityFrom, acts.items[1].eligibilityLines, acts.items[2].eligibilityLines], [1, ['참가자격 : 대학생'], '브라우저 본문', ['본문 자격'], undefined]);
+  eq('  🔴 브라우저 모드는 data/activities.json 을 쓰지 않는다 · 장부는 모드마다 따로(act-docs.json / act-browser.json)',
+    [/if \(changed && !BROWSER\) fs\.writeFileSync\(ACTS/.test(src), /const LEDGER = BROWSER \? BROWSER_LEDGER : PLAIN_LEDGER;/.test(src)], [true, true]);
+  eq('  브라우저는 무료 모드가 이미 해 본 글만 · 이미 찾은 글은 다시 안 연다', [/if \(BROWSER && !plainTried\[n\.url\]\) continue;/.test(src), /if \(BROWSER && ledger\[n\.url\] && ledger\[n\.url\]\.lines\) continue;/.test(src)], [true, true]);
+  eq('  시간 초과 대비 — 한 페이지 절대 시한 · 페이지는 반드시 닫는다 · 글마다 장부 저장 · 브라우저가 죽으면 다시 띄운다',
+    [/Promise\.race\(\[work, new Promise\(\(res\) => setTimeout\(\(\) => res\(''\), PAGE_MS\)\)\]\)/.test(src), /finally \{ page\.close\(\)/.test(src), /if \(BROWSER\) fs\.writeFileSync\(LEDGER/.test(src), /!browser\.isConnected\(\)/.test(src)], [true, true, true, true]);
+  const bRead = (txt) => AD.eligFromFiles({ title: '청년 체인지메이커 아카데미 운영' }, ['k-B.txt'], () => txt, '/tmp', () => false);
+  eq('  🔴 브라우저 본문도 글 제목 낱말이 있어야 그 글의 것(포털 첫 화면 메뉴 `장애인 복지정책` 이 자격으로 뽑혔다) · 있으면 「브라우저 본문」',
+    [bRead('도청 메뉴\n○ 지원대상 : 장애인 복지정책'), (bRead('청년 체인지메이커 아카데미 운영\n○ 지원대상 : 도내 거주 청년') || {}).from], [null, '브라우저 본문']);
+  /* 워크플로 */
+  const wf = readText(new URL('../.github/workflows/rescue-bodies.yml', import.meta.url));
+  const caps = [...wf.matchAll(/^ {8}timeout-minutes: (\d+)/gm)].map((m) => Number(m[1]));
+  const job = Number((wf.match(/^ {4}timeout-minutes: (\d+)/m) || [])[1]);
+  const ia = wf.indexOf('activity-docs.mjs --fetch --browser'), io = wf.indexOf('paddle-ocr.py collector/act-files'), ip = wf.indexOf('activity-docs.mjs --apply --browser'), ig = wf.indexOf('- name: 데이터 관문');
+  eq('② 워크플로 — 이름 · 장학 → 활동 받기 → 글자 읽기 → 고르기 → 관문 순 · 단계마다 시한 · 작업 시한 > 단계 합 + 3 · 장부 저장 · 하루 두 번',
+    [/^name: 자격요건 로봇 \(진짜 브라우저\)$/m.test(wf), wf.indexOf('rescue-bodies.mjs --write') < ia && ia < io && io < ip && ip < ig, caps.length >= 6, job > caps.reduce((a, b) => a + b, 0) + 3,
+      /git add collector\/act-browser\.json/.test(wf), (wf.match(/- cron:/g) || []).length, /git add data\/activities\.json/.test(wf)],
+    [true, true, true, true, true, 2, false]);
+  eq('  수집 로봇과 다른 대기줄 · 배포 동기화가 새 이름을 본다 · 관리자 버튼 이름',
+    [/group: rescue-bodies/.test(wf), /'자격요건 로봇 \(진짜 브라우저\)'/.test(readText(new URL('../.github/workflows/deploy-sync.yml', import.meta.url))), /n: '자격요건 로봇'/.test(readText(new URL('../_admin/admin.js', import.meta.url)))], [true, true, true]);
+  /* 공공 API — 간헐 장애에 그날 글이 빠지지 않게 */
+  const oa = readText(new URL('../collector/open-api.mjs', import.meta.url));
+  const ow = readText(new URL('../.github/workflows/open-api.yml', import.meta.url));
+  eq('③ 공공 API — 다시 묻기 전 10초·40초 쉰다 · 실패 원인 코드를 적는다 · 하루 두 번(백업)',
+    [/await sleep\(\[10000, 40000\]\[i\]\)/.test(oa), /last\?\.cause/.test(oa), (ow.match(/- cron:/g) || []).length], [true, true, 2]);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);
