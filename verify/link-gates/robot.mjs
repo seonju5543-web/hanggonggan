@@ -332,4 +332,19 @@ export default async function gate(eq, ctx) {
     [1, true, true, false, false]);
   eq('  모으기·순서 파일은 불러와도 아무것도 쓰지 않는다(관문이 불러 잰다)', /writeFileSync|appendFileSync|renameSync|unlinkSync|rmSync|mkdirSync/.test(plan), false);
   eq('  브라우저는 진짜로 열 때만 들여온다 — 가짜 관측·관문은 playwright 없이 돈다', [/await import\('playwright'\)/.test(runner), /from 'playwright'/.test(runner)], [true, false]);
+  /* ⓩ push-to-run 로봇은 기본 브랜치에서만 깬다 (2026-10-03 배포 실측) — 트리거 파일을 고친 커밋을 main 에 올리자
+     링크 사냥꾼·복구 로봇이 **main 에서도** 떠 거기에 저장하려 했다(같은 대기줄이라 기본 브랜치 쪽 실행은 취소됨).
+     저장하는(git push) 워크플로의 push 트리거에 paths 가 있으면 branches 로 브랜치를 이름으로 걸어야 한다(대개 기본 브랜치).
+     예외: device-deploy(어느 브랜치든 받는 것이 일 — run-deploy.txt 의 branch: 대조가 안전장치). */
+  {
+    const dir = new URL('.github/workflows/', ctx.root);
+    const PUSH_ANY_BRANCH_OK = new Set(['device-deploy.yml']);
+    const loose = fs.readdirSync(dir).filter((f) => /\.ya?ml$/.test(f) && !PUSH_ANY_BRANCH_OK.has(f)).filter((f) => {
+      const src = fs.readFileSync(new URL(f, dir), 'utf8');
+      const m = src.match(/^ {2}push:\n((?: {4}.*\n|\s*#.*\n)+)/m);
+      if (!m || !/git push/.test(src)) return false;
+      return /paths:/.test(m[1]) && !/branches:\s*\[\s*'[^']+'/.test(m[1]);   // 브랜치 하나를 이름으로 건다(기본 · 또는 일부러 정한 작업 브랜치 — two-school-scan)
+    });
+    eq('ⓩ 저장하는 push-to-run 로봇은 push 트리거에 브랜치를 이름으로 건다(아니면 main·작업 브랜치에 올릴 때 그 브랜치에서 돌아 저장한다)', loose, []);
+  }
 }
