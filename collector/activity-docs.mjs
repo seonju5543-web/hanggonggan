@@ -6,13 +6,13 @@
    왜 — 본문에 자격이 없는 활동 글은 대개 **포스터 그림 한 장**이거나 **첨부 공고문(HWP·PDF)** 에만 자격이 있다
    (2026-10-03 실측: 자격 0줄 103건 중 본문 그림 있는 것 ~60 · 공고문 첨부 13).
    새 규칙을 만들지 않는다 — 장학 쪽에 이미 있는 것을 그대로 부른다:
-     · 글자 뽑기  attachment-text.mjs attachmentText (HWPX·DOCX 는 여기서, HWP 는 hwp-bodytext.py, PDF·그림은 ocr-text.py 의 .ocr.txt)
+     · 글자 뽑기  attachment-text.mjs attachmentText (HWPX·DOCX 는 여기서, HWP 는 hwp-bodytext.py, 포스터 그림은 paddle-ocr.py 의 .ocr.txt)
      · 자격 고르기 activity-excerpts.mjs activityDetails (본문과 같은 규칙)
      · AI         eligibility-ai.mjs askPdf·ask + verifyPdfLines·verifyPick (지어냄을 막는 같은 관문)
 
    세 단계:
      ① --fetch  (무료) 자격 0줄인 글의 첨부·본문 그림을 collector/act-files/ 에 받는다
-                뒤이어 워크플로가 hwp-bodytext.py · ocr-text.py 를 **그 폴더에** 돌린다
+                뒤이어 워크플로가 hwp-bodytext.py · paddle-ocr.py(포스터 — tesseract 보다 디자인 글씨를 잘 읽는다)를 **그 폴더에** 돌린다
      ② --apply  (무료) 받은 파일의 글자로 자격을 고른다. 출처 eligibilityFrom '공고문 첨부'·'공고문 첨부(OCR)'
      ③ --ai     (유료 · 기본 꺼짐) ①②로도 못 읽은 글을 AI 에게 — eligibility-ai-config.json enabled 또는 ELIG_AI_ENABLE=1
                 일 때만 돌고 --write 를 붙여야 저장한다. 버튼: 「자격요건 매칭 · AI 자격 읽기」(전부·대외활동만).
@@ -196,14 +196,24 @@ async function fetchPhase(acts) {
   log(`받기 — 글 ${posts}건 · 파일 ${files}개`);
 }
 
+/* 글 제목의 낱말 — 흔한 말(모집·안내·청년·공모전…)은 뺀다. 그림이 **그 글의 포스터인지** 가리는 데 쓴다 */
+const GENERIC_WORD = /^(?:모집|안내|공고|참가자|참여자|선발|신청|운영|프로그램|개최|지원|대상|기간|마감|일반|공통|추가|하반기|상반기|공모전|참가|참여|교육|특강|청년|대학생|학생|사업|활동|행사)$/;
+export const titleWords = (title) => [...new Set(String(title || '').replace(/\[[^\]]*\]|\([^)]*\)|기간\s*:.*$/g, ' ')
+  .split(/[^가-힣A-Za-z0-9]+/).filter((w) => w.length >= 2 && !/^\d+$/.test(w) && !GENERIC_WORD.test(w)))];
+/** OCR 로 읽은 그림이 이 글의 것인가 — 글 제목 낱말이 하나라도 그림 글자에 있어야 한다.
+    🔴 사이트 옆 홍보물(「제주도 내 공공임대주택에 입주한 가구」)이 「청년 체인지메이커 아카데미」의 자격으로 붙을 뻔했다(2026-10-03 실측) */
+export const ownsImageText = (text, title) => { const t = String(text || '').replace(/\s/g, ''); return titleWords(title).some((w) => t.includes(w)); };
+
 /** 받은 파일 글자에서 자격을 고른다 — 원문 글자(HWP·HWPX·DOCX)가 OCR 보다 먼저(docOrder) */
-export function eligFromFiles(n, files, readText = (p) => attachmentText(p), dir = DIR) {
+export function eligFromFiles(n, files, readText = (p) => attachmentText(p), dir = DIR, isOcr = isOcrSource) {
   for (const f of docOrder(files)) {
     const p = path.join(dir, f);
     const text = readText(p);
     if (!text || !text.trim()) continue;
+    const ocr = isOcr(p);
+    if (ocr && !ownsImageText(text, n.title)) continue;
     const d = activityDetails(text, n.title);
-    if (d.eligibilityLines.length) return { ...d, from: isOcrSource(p) ? '공고문 첨부(OCR)' : '공고문 첨부' };
+    if (d.eligibilityLines.length) return { ...d, from: ocr ? '공고문 첨부(OCR)' : '공고문 첨부' };
   }
   return null;
 }

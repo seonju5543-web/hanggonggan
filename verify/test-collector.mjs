@@ -11139,6 +11139,14 @@ console.log('\n■ 대외활동·공모전 — 첨부·포스터 읽기 (2026-10
     AX.activityDetails(['<소재 예시>', '③ 국민 누구나 찾고 머물며 대한민국의 가치와 정체성을 경험할 수 있는 공간'].join('\n')).eligibilityLines, []);
   eq('  AI 가 고른 글 제목 줄은 자격이 아니다(관문의 \'청년\' 신호를 제목이 통과한다)', [AD.isTitleLine('용산 청년지음 <진로 고민 워크숍> 참여자 모집', '용산 청년지음 <진로 고민 워크숍> 참여자 모집'), AD.isTitleLine('만 19~34세 청년', '용산 청년지음 <진로 고민 워크숍> 참여자 모집')], [true, false]);
   eq('  무료 재시도는 두 번까지 · 이레 간격', [AD.dueFree(undefined, '2026-10-03'), AD.dueFree({ at: '2026-10-01', tries: 1 }, '2026-10-03'), AD.dueFree({ at: '2026-09-20', tries: 1 }, '2026-10-03'), AD.dueFree({ at: '2026-09-01', tries: 2 }, '2026-10-03')], [true, false, true, false]);
+  /* 포스터 OCR 은 그 글의 그림일 때만 — 글 제목 낱말이 그림 글자에 있어야 한다(사이트 옆 홍보물이 남의 자격으로 붙을 뻔했다) */
+  const ocrRead = (txt) => AD.eligFromFiles({ title: '청년 체인지메이커 아카데미 운영' }, ['x-0.jpg'], () => txt, '/tmp', () => true);
+  eq('  🔴 OCR 글자에 글 제목 낱말이 없으면 그 글의 자격이 아니다(제주 공공임대 홍보물) · 있으면 읽는다',
+    [ocrRead('제주 행복주택 입주자 모집\n○ 지원대상 : 대한민국 국민 누구나'), (ocrRead('청년 체인지메이커 아카데미\n모집대상 : 도내 거주 청년 누구나') || {}).from], [null, '공고문 첨부(OCR)']);
+  eq('  제목 낱말은 흔한 말(모집·안내·청년·공모전)을 빼고 센다', AD.titleWords('[공고] 2026 청년 체인지메이커 아카데미 운영 모집'), ['체인지메이커', '아카데미']);
+  const py = readText(new URL('../collector/paddle-ocr.py', import.meta.url));
+  eq('  PaddleOCR — 한국어 인식 모델을 이름으로(안 그러면 중국어 모델이 붙어 한글이 빠졌다) · 확신도 0.8 · 긴 변 2000px · 예산',
+    [/text_recognition_model_name='korean_PP-OCRv5_mobile_rec'/.test(py), /MIN_SCORE = 0\.8/.test(py), /MAX_SIDE = 2000/.test(py), /--budget-sec=/.test(py)], [true, true, true, true]);
   /* ④ 유료 — 꺼져 있으면 부르지 않는다(설정 enabled 와 버튼의 ELIG_AI_ENABLE 둘 다 없을 때). 실제로 돌려 본다 */
   const env = { ...process.env }; delete env.ELIG_AI_ENABLE; delete env.ANTHROPIC_API_KEY; delete env.ELIG_AI_FAKE; delete env.ACTIVITY_DOCS_AS_LIB;
   const before = readText(new URL('../data/activities.json', import.meta.url));
@@ -11150,8 +11158,8 @@ console.log('\n■ 대외활동·공모전 — 첨부·포스터 읽기 (2026-10
   const wc = readText(new URL('../.github/workflows/collect-scholarships.yml', import.meta.url));
   const we = readText(new URL('../.github/workflows/eligibility-fill.yml', import.meta.url));
   const step = (wc.match(/- name: 대외활동 첨부·포스터 자격 읽기[\s\S]*?(?=\n      - name:)/) || [''])[0];
-  eq('⑤ 수집 워크플로 — 받기 → HWP → OCR(act-files) → 읽기 · 감사 앞 · 단계 상한 · continue-on-error · 장부만 커밋',
-    [/--fetch[\s\S]*hwp-bodytext\.py collector\/act-files[\s\S]*ocr-text\.py[^\n]*collector\/act-files[\s\S]*--apply/.test(step), /timeout-minutes: \d+/.test(step) && /continue-on-error: true/.test(step),
+  eq('⑤ 수집 워크플로 — 받기 → HWP → 포스터 OCR(PaddleOCR · act-files) → 읽기 · 감사 앞 · 단계 상한 · continue-on-error · 장부만 커밋',
+    [/--fetch[\s\S]*hwp-bodytext\.py collector\/act-files[\s\S]*pip install[^\n]*paddleocr[\s\S]*paddle-ocr\.py collector\/act-files[\s\S]*--apply/.test(step), /timeout-minutes: \d+/.test(step) && /continue-on-error: true/.test(step),
       wc.indexOf('대외활동 첨부·포스터 자격 읽기') > 0 && wc.indexOf('대외활동 첨부·포스터 자격 읽기') < wc.indexOf('- name: 데이터 관문'), /git add collector\/act-docs\.json/.test(wc),
       /^collector\/act-files\/$/m.test(readText(new URL('../.gitignore', import.meta.url))), /activity-docs\.mjs --ai/.test(wc)],
     [true, true, true, true, true, false]);

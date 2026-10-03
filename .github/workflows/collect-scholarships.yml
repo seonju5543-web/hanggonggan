@@ -41,7 +41,7 @@ jobs:
     # 2026-09-29 수집망 2 → 44개교 복원: 「게시판 수집」 단계에 자체 상한 10분(예산 8분 + 마무리 2분)이 생겨
     # 단계 합 4+10+6+5+1+4+3+3+4 = 40 → 상한 44. ⚠️ 상한을 키우는 것으로 때우지 말 것 — 단계가 오래 걸리면
     # 그 단계의 예산(HARVEST_BUDGET_MS)을 줄이고, 상한은 그 합을 담는 그릇으로만 쓴다(8/2~3 사고의 교훈).
-    timeout-minutes: 52   # 2026-10-03 대외활동 첨부·포스터 단계 5분 추가 → 단계 합 47 + 여유 5 (2026-09-30 판정 로봇 2분 → 42+3)
+    timeout-minutes: 56   # 2026-10-03 대외활동 첨부·포스터 단계 9분(PaddleOCR 설치 포함) → 단계 합 51 + 여유 5 (2026-09-30 판정 로봇 2분 → 42+3)
     steps:
       - uses: actions/checkout@v4
         with:
@@ -217,15 +217,16 @@ jobs:
       # 대외활동·공모전 — 본문에 자격이 없는 글의 첨부·포스터를 무료로 읽는다 (2026-10-03 개발자 지시 "무료로 최대한 땜빵").
       # 받은 파일은 collector/act-files/(.gitignore) — 한 단계 안에서 받고(①) HWP·OCR 글자를 뽑고 자격을 고른다(②). 커밋은 장부 act-docs.json 만.
       # 유료 AI(③)는 여기서 안 돈다 — 「자격요건 매칭 · AI 자격 읽기」 버튼에서만. 보강 단계 규칙: 자기 상한 + continue-on-error.
+      # 포스터는 PaddleOCR(무료) — tesseract 는 디자인 포스터를 거의 못 읽는다(24건 중 0 → PaddleOCR 11 · 2026-10-03 실측 · collector/paddle-ocr.py).
       - name: 대외활동 첨부·포스터 자격 읽기 (무료 · 보강)
-        timeout-minutes: 5
+        timeout-minutes: 9
         continue-on-error: true
         run: |
           node collector/activity-docs.mjs --fetch
           pip install olefile --quiet
           python3 collector/hwp-bodytext.py collector/act-files || true   # 실패해도 아래 읽기는 돈다(그 글의 무료 기회 두 번 중 하나를 날리지 않게)
-          sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-kor poppler-utils
-          python3 collector/ocr-text.py --budget-sec=90 collector/act-files || true
+          pip install --quiet paddlepaddle paddleocr
+          python3 collector/paddle-ocr.py collector/act-files --budget-sec=180 || true
           node collector/activity-docs.mjs --apply
       - name: 데이터 관문 (수집기 규칙 테스트 + 데이터 감사)
         id: audit

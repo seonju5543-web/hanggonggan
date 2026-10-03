@@ -190,7 +190,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 | `collector/auto-register.mjs` | 자동 정식 등록(원칙 2) — 다른 학교의 같은 사업은 새로 등록하지 않고 기존 등록을 전국으로 승격 |
 | `collector/kind-evidence.mjs` `kind-classify.mjs` `scope-promote.mjs` `registered-merge.mjs` | 교내·교외 증거 판정 · 원문 도착 뒤 소급 판정(학습 표 `own-programs.json`) · 학교 한정 → 전국 승격 · 합치기 한 곳 |
 | `collector/collect-news.mjs` `find-news-boards.mjs` `news-kind.mjs` `collect-news-thumbs.mjs` `news-thumb.mjs` | 교내 소식 로봇(따로 돈다) · 공지 게시판 찾기(출처 `news-sources.json` · 후보는 웹 검색 + `evidence`) · 실을지·갈래 판정 한 곳 · 사진 썸네일 단계·고르기 한 곳 |
-| `collector/activity-docs.mjs` | 대외활동 글의 첨부·포스터 자격 — 무료(HWP·OCR)는 수집 때 · 유료 AI 는 「AI 자격 읽기」 버튼(전부·대외활동만)에서만 · 받은 파일은 커밋 안 함(장부 act-docs.json 만 — 첫 실행에 생긴다) · 관문 「대외활동·공모전 — 첨부·포스터 읽기」 |
+| `collector/activity-docs.mjs` | 대외활동 글의 첨부·포스터 자격 — 무료(HWP·포스터는 PaddleOCR `collector/paddle-ocr.py`)는 수집 때 · 유료 AI 는 「AI 자격 읽기」 버튼(전부·대외활동만)에서만 · 받은 파일은 커밋 안 함(장부 act-docs.json 만 — 첫 실행에 생긴다) · 관문 「대외활동·공모전 — 첨부·포스터 읽기」 |
 | `collector/fetch-board.mjs` | 게시판 받기·실패 이유 펴기 — 일반 수집기와 소식 로봇이 같이 쓴다(베끼지 말 것) |
 | `collector/extract-excerpts.mjs` | 원문 발췌 · 마감일 · 메일 접수 주소(`apply-email.mjs`) |
 | `collector/deepfetch.mjs` `rescue-bodies.mjs` | 본문·첨부 원본 받기 · 옛 공고 본문 메우기 |
