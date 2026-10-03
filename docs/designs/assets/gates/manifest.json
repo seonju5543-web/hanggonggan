@@ -1,5 +1,5 @@
 {
- "fetchedAt": "2026-10-03T10:39:25.207Z",
+ "fetchedAt": "2026-10-03T19:04:21.745Z",
  "source": "Wikimedia Commons (API search, namespace 6)",
  "rule": "CC0 · CC BY · CC BY-SA · PD 만 · NC/ND 제외 · 폭 900px 이상",
  "schools": [
@@ -342,7 +342,7 @@
   {
    "id": "n1if6uwu",
    "name": "연세대학교 미래캠퍼스",
-   "candidates": 4,
+   "candidates": 9,
    "files": [
     {
      "file": "n1if6uwu-1.jpg",
@@ -358,7 +358,8 @@
      "credit": "Own work",
      "description": "연세대학교 원주캠퍼스",
      "date": "2023-12-06 11:13:55",
-     "query": "Yonsei University Mirae Campus"
+     "query": "Yonsei University Mirae Campus",
+     "via": "search"
     },
     {
      "file": "n1if6uwu-2.jpg",
@@ -374,7 +375,8 @@
      "credit": "Own work",
      "description": "연세대학교 원주캠퍼스",
      "date": "2023-12-06 11:13:03",
-     "query": "Yonsei University Mirae Campus"
+     "query": "Yonsei University Mirae Campus",
+     "via": "search"
     },
     {
      "file": "n1if6uwu-3.jpg",
@@ -390,7 +392,8 @@
      "credit": "Own work",
      "description": "연세대학교 원주캠퍼스 정문",
      "date": "2023-12-06 11:12:20",
-     "query": "Yonsei University Mirae Campus"
+     "query": "Yonsei University Mirae Campus",
+     "via": "search"
     },
     {
      "file": "n1if6uwu-4.jpg",
@@ -406,7 +409,88 @@
      "credit": "Own work",
      "description": "연세대학교 원주캠퍼스 청송관",
      "date": "2023-12-06 11:23:49",
-     "query": "Yonsei University Mirae Campus"
+     "query": "Yonsei University Mirae Campus",
+     "via": "search"
+    },
+    {
+     "file": "n1if6uwu-5.jpg",
+     "title": "File:2020-07-06 things places in south korea IMG 2715.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A2020-07-06_things_places_in_south_korea_IMG_2715.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6c/2020-07-06_things_places_in_south_korea_IMG_2715.jpg/1280px-2020-07-06_things_places_in_south_korea_IMG_2715.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 4032,
+     "height": 3024,
+     "license": "CC0",
+     "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+     "shareAlike": false,
+     "author": "Choi Kwang-mo",
+     "credit": "Own work",
+     "description": "Unidentified places in South Korea",
+     "date": "2020-07-06 15:34:44",
+     "via": "wikidata"
+    },
+    {
+     "file": "n1if6uwu-6.jpg",
+     "title": "File:2020-07-06 things places in south korea IMG 2714.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A2020-07-06_things_places_in_south_korea_IMG_2714.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/2020-07-06_things_places_in_south_korea_IMG_2714.jpg/1280px-2020-07-06_things_places_in_south_korea_IMG_2714.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 3024,
+     "height": 4032,
+     "license": "CC0",
+     "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+     "shareAlike": false,
+     "author": "Choi Kwang-mo",
+     "credit": "Own work",
+     "description": "Unidentified places in South Korea",
+     "date": "2020-07-06 15:34:32",
+     "via": "wikidata"
+    },
+    {
+     "file": "n1if6uwu-7.jpg",
+     "title": "File:2020-07-06 things places in south korea IMG 2716.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A2020-07-06_things_places_in_south_korea_IMG_2716.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/ba/2020-07-06_things_places_in_south_korea_IMG_2716.jpg/1280px-2020-07-06_things_places_in_south_korea_IMG_2716.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 4032,
+     "height": 3024,
+     "license": "CC0",
+     "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+     "shareAlike": false,
+     "author": "Choi Kwang-mo",
+     "credit": "Own work",
+     "description": "Unidentified places in South Korea",
+     "date": "2020-07-06 15:34:47",
+     "via": "wikidata"
+    },
+    {
+     "file": "n1if6uwu-8.jpg",
+     "title": "File:2020-07-06 things places in south korea IMG 2717.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A2020-07-06_things_places_in_south_korea_IMG_2717.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/63/2020-07-06_things_places_in_south_korea_IMG_2717.jpg/1280px-2020-07-06_things_places_in_south_korea_IMG_2717.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 4032,
+     "height": 3024,
+     "license": "CC0",
+     "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+     "shareAlike": false,
+     "author": "Choi Kwang-mo",
+     "credit": "Own work",
+     "description": "Unidentified places in South Korea",
+     "date": "2020-07-06 15:34:56",
+     "via": "wikidata"
+    },
+    {
+     "file": "n1if6uwu-9.jpg",
+     "title": "File:2020-08-16 things places in south korea IMG 0137.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A2020-08-16_things_places_in_south_korea_IMG_0137.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b7/2020-08-16_things_places_in_south_korea_IMG_0137.jpg/1280px-2020-08-16_things_places_in_south_korea_IMG_0137.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 4032,
+     "height": 3024,
+     "license": "CC0",
+     "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+     "shareAlike": false,
+     "author": "Choi Kwang-mo",
+     "credit": "Own work",
+     "description": "Unidentified places in South Korea",
+     "date": "2020-08-12 18:10:16",
+     "via": "wikidata"
     }
    ]
   },
@@ -458,7 +542,7 @@
   {
    "id": "ntyl0r5",
    "name": "명지대학교",
-   "candidates": 2,
+   "candidates": 3,
    "files": [
     {
      "file": "ntyl0r5-1.jpg",
@@ -474,7 +558,8 @@
      "credit": "Own work",
      "description": "Myongji University in Seoul, Korea",
      "date": "2009-10-29",
-     "query": "Myongji University"
+     "query": "Myongji University",
+     "via": "search"
     },
     {
      "file": "ntyl0r5-2.jpg",
@@ -490,14 +575,31 @@
      "credit": "Own work",
      "description": "Myongji University",
      "date": "",
-     "query": "Myongji University"
+     "query": "Myongji University",
+     "via": "search"
+    },
+    {
+     "file": "ntyl0r5-3.jpg",
+     "title": "File:Kang Kyeong-Dae Memorial.JPG",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3AKang_Kyeong-Dae_Memorial.JPG",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/61/Kang_Kyeong-Dae_Memorial.JPG/1280px-Kang_Kyeong-Dae_Memorial.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 4000,
+     "height": 3000,
+     "license": "CC BY-SA 3.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+     "shareAlike": true,
+     "author": "Dalgial",
+     "credit": "Own work",
+     "description": "Kang Kyeong-Dae Memorial",
+     "date": "2009-10-29",
+     "via": "wikidata"
     }
    ]
   },
   {
    "id": "n1tasrsl",
    "name": "국민대학교",
-   "candidates": 5,
+   "candidates": 21,
    "files": [
     {
      "file": "n1tasrsl-1.jpg",
@@ -513,7 +615,8 @@
      "credit": "Own work",
      "description": "서울특별시 성북구에 있는 국민대학교 정문",
      "date": "",
-     "query": "Kookmin University"
+     "query": "Kookmin University",
+     "via": "search"
     },
     {
      "file": "n1tasrsl-2.jpg",
@@ -529,7 +632,8 @@
      "credit": "Own work",
      "description": "Naebu Beltway Kookmin University Entrance Interchange(Seongsan Interchange Direction)",
      "date": "2018-08-08 14:39:32",
-     "query": "Kookmin Univ"
+     "query": "Kookmin Univ",
+     "via": "search"
     },
     {
      "file": "n1tasrsl-3.jpg",
@@ -545,7 +649,8 @@
      "credit": "Own work",
      "description": "Naebu Beltway Hawolgok Junction-Kookmin University Entrance Interchange(Seongsan Interchange Direction)",
      "date": "2018-08-08 14:34:04",
-     "query": "Kookmin Univ"
+     "query": "Kookmin Univ",
+     "via": "search"
     },
     {
      "file": "n1tasrsl-4.jpg",
@@ -561,7 +666,8 @@
      "credit": "Own work",
      "description": "Naebu Beltway Kookmin University Entrance Interchange(Seongsan Interchange Direction)",
      "date": "2018-08-08 14:39:33",
-     "query": "Kookmin Univ"
+     "query": "Kookmin Univ",
+     "via": "search"
     },
     {
      "file": "n1tasrsl-5.jpg",
@@ -577,7 +683,152 @@
      "credit": "Own work",
      "description": "Naebu Beltway Kookmin University Entrance Interchange(Seongsan Interchange Direction)",
      "date": "2018-08-08 14:39:36",
-     "query": "Kookmin Univ"
+     "query": "Kookmin Univ",
+     "via": "search"
+    },
+    {
+     "file": "n1tasrsl-6.jpg",
+     "title": "File:국민대 두부1.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A%EA%B5%AD%EB%AF%BC%EB%8C%80_%EB%91%90%EB%B6%801.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/19/%EA%B5%AD%EB%AF%BC%EB%8C%80_%EB%91%90%EB%B6%801.jpg/1280px-%EA%B5%AD%EB%AF%BC%EB%8C%80_%EB%91%90%EB%B6%801.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 1920,
+     "height": 1080,
+     "license": "CC BY-SA 4.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+     "shareAlike": true,
+     "author": "Sj9401h",
+     "credit": "Own work",
+     "description": "국민대_두부1",
+     "date": "2016-11-22",
+     "via": "wikidata"
+    },
+    {
+     "file": "n1tasrsl-7.jpg",
+     "title": "File:국민대 경상댁1.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A%EA%B5%AD%EB%AF%BC%EB%8C%80_%EA%B2%BD%EC%83%81%EB%8C%811.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/14/%EA%B5%AD%EB%AF%BC%EB%8C%80_%EA%B2%BD%EC%83%81%EB%8C%811.jpg/1280px-%EA%B5%AD%EB%AF%BC%EB%8C%80_%EA%B2%BD%EC%83%81%EB%8C%811.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 1888,
+     "height": 1062,
+     "license": "CC BY-SA 4.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+     "shareAlike": true,
+     "author": "Sj9401h",
+     "credit": "Own work",
+     "description": "국민대_경상댁1",
+     "date": "2016-11-22",
+     "via": "wikidata"
+    },
+    {
+     "file": "n1tasrsl-8.jpg",
+     "title": "File:국민대 생강이2.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A%EA%B5%AD%EB%AF%BC%EB%8C%80_%EC%83%9D%EA%B0%95%EC%9D%B42.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a5/%EA%B5%AD%EB%AF%BC%EB%8C%80_%EC%83%9D%EA%B0%95%EC%9D%B42.jpg/1280px-%EA%B5%AD%EB%AF%BC%EB%8C%80_%EC%83%9D%EA%B0%95%EC%9D%B42.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 1888,
+     "height": 1062,
+     "license": "CC BY-SA 4.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+     "shareAlike": true,
+     "author": "Sj9401h",
+     "credit": "Own work",
+     "description": "국민대_생강이2",
+     "date": "2016-11-22",
+     "via": "wikidata"
+    },
+    {
+     "file": "n1tasrsl-9.jpg",
+     "title": "File:국민대 리코타1.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A%EA%B5%AD%EB%AF%BC%EB%8C%80_%EB%A6%AC%EC%BD%94%ED%83%801.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d6/%EA%B5%AD%EB%AF%BC%EB%8C%80_%EB%A6%AC%EC%BD%94%ED%83%801.jpg/1280px-%EA%B5%AD%EB%AF%BC%EB%8C%80_%EB%A6%AC%EC%BD%94%ED%83%801.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 1440,
+     "height": 810,
+     "license": "CC BY-SA 4.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+     "shareAlike": true,
+     "author": "Sj9401h",
+     "credit": "Own work",
+     "description": "국민대_리코타1",
+     "date": "2016-11-22",
+     "via": "wikidata"
+    },
+    {
+     "file": "n1tasrsl-10.jpg",
+     "title": "File:국민대 치즈1.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A%EA%B5%AD%EB%AF%BC%EB%8C%80_%EC%B9%98%EC%A6%881.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1c/%EA%B5%AD%EB%AF%BC%EB%8C%80_%EC%B9%98%EC%A6%881.jpg/1280px-%EA%B5%AD%EB%AF%BC%EB%8C%80_%EC%B9%98%EC%A6%881.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 1920,
+     "height": 1080,
+     "license": "CC BY-SA 4.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+     "shareAlike": true,
+     "author": "Sj9401h",
+     "credit": "Own work",
+     "description": "국민대_치즈1",
+     "date": "2016-11-22",
+     "via": "wikidata"
+    },
+    {
+     "file": "n1tasrsl-11.jpg",
+     "title": "File:국민대 샐러드1.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A%EA%B5%AD%EB%AF%BC%EB%8C%80_%EC%83%90%EB%9F%AC%EB%93%9C1.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/47/%EA%B5%AD%EB%AF%BC%EB%8C%80_%EC%83%90%EB%9F%AC%EB%93%9C1.jpg/1280px-%EA%B5%AD%EB%AF%BC%EB%8C%80_%EC%83%90%EB%9F%AC%EB%93%9C1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 1440,
+     "height": 810,
+     "license": "CC BY-SA 4.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+     "shareAlike": true,
+     "author": "Sj9401h",
+     "credit": "Own work",
+     "description": "국민대_샐러드1",
+     "date": "2016-11-22",
+     "via": "wikidata"
+    },
+    {
+     "file": "n1tasrsl-12.jpg",
+     "title": "File:국민대 샐러드&깨비.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A%EA%B5%AD%EB%AF%BC%EB%8C%80_%EC%83%90%EB%9F%AC%EB%93%9C%26%EA%B9%A8%EB%B9%84.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/74/%EA%B5%AD%EB%AF%BC%EB%8C%80_%EC%83%90%EB%9F%AC%EB%93%9C%26%EA%B9%A8%EB%B9%84.jpg/1280px-%EA%B5%AD%EB%AF%BC%EB%8C%80_%EC%83%90%EB%9F%AC%EB%93%9C%26%EA%B9%A8%EB%B9%84.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 1888,
+     "height": 1062,
+     "license": "CC BY-SA 4.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+     "shareAlike": true,
+     "author": "Sj9401h",
+     "credit": "Own work",
+     "description": "국민대_샐러드&amp;깨비",
+     "date": "2016-11-22",
+     "via": "wikidata"
+    },
+    {
+     "file": "n1tasrsl-13.jpg",
+     "title": "File:국민대 금공이1.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A%EA%B5%AD%EB%AF%BC%EB%8C%80_%EA%B8%88%EA%B3%B5%EC%9D%B41.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8a/%EA%B5%AD%EB%AF%BC%EB%8C%80_%EA%B8%88%EA%B3%B5%EC%9D%B41.jpg/1280px-%EA%B5%AD%EB%AF%BC%EB%8C%80_%EA%B8%88%EA%B3%B5%EC%9D%B41.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 1888,
+     "height": 1062,
+     "license": "CC BY-SA 4.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+     "shareAlike": true,
+     "author": "Sj9401h",
+     "credit": "Own work",
+     "description": "국민대_금공이1",
+     "date": "2016-11-22",
+     "via": "wikidata"
+    },
+    {
+     "file": "n1tasrsl-14.jpg",
+     "title": "File:국민대 금공이2.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A%EA%B5%AD%EB%AF%BC%EB%8C%80_%EA%B8%88%EA%B3%B5%EC%9D%B42.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9a/%EA%B5%AD%EB%AF%BC%EB%8C%80_%EA%B8%88%EA%B3%B5%EC%9D%B42.jpg/1280px-%EA%B5%AD%EB%AF%BC%EB%8C%80_%EA%B8%88%EA%B3%B5%EC%9D%B42.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 1888,
+     "height": 1062,
+     "license": "CC BY-SA 4.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+     "shareAlike": true,
+     "author": "Sj9401h",
+     "credit": "Own work",
+     "description": "국민대_금공이2",
+     "date": "2016-11-22",
+     "via": "wikidata"
     }
    ]
   },
@@ -987,7 +1238,7 @@
   {
    "id": "n174lvh5",
    "name": "가톨릭대학교",
-   "candidates": 4,
+   "candidates": 6,
    "files": [
     {
      "file": "n174lvh5-1.jpg",
@@ -1003,7 +1254,8 @@
      "credit": "Own work",
      "description": "서울특별시 서초구에 있는 가톨릭대학교의과대학우체국",
      "date": "2014-06-30",
-     "query": "Catholic University of Korea"
+     "query": "Catholic University of Korea",
+     "via": "search"
     },
     {
      "file": "n174lvh5-2.jpg",
@@ -1019,7 +1271,8 @@
      "credit": "Own work",
      "description": "서울특별시 서초구에 있는 카톨릭대학교 의과대학 및 간호대학",
      "date": "2014-06-30",
-     "query": "Catholic University of Korea"
+     "query": "Catholic University of Korea",
+     "via": "search"
     },
     {
      "file": "n174lvh5-3.jpg",
@@ -1035,7 +1288,8 @@
      "credit": "Own work",
      "description": "가톨릭대학교 교회음악대학원 최양업홀 정면",
      "date": "2014-03-24",
-     "query": "Catholic University of Korea"
+     "query": "Catholic University of Korea",
+     "via": "search"
     },
     {
      "file": "n174lvh5-4.jpg",
@@ -1051,151 +1305,105 @@
      "credit": "Own work",
      "description": "가톨릭대학교 성의교정 內의 의생명산업연구원(左), 성의회관(右,대학본부 및 대학원본부 기능)",
      "date": "2019-01-05 14:08:02",
-     "query": "Catholic University of Korea"
+     "query": "Catholic University of Korea",
+     "via": "search"
+    },
+    {
+     "file": "n174lvh5-5.jpg",
+     "title": "File:김수환추기경국제관.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A%EA%B9%80%EC%88%98%ED%99%98%EC%B6%94%EA%B8%B0%EA%B2%BD%EA%B5%AD%EC%A0%9C%EA%B4%80.jpg",
+     "thumb": "https://upload.wikimedia.org/wikipedia/commons/6/64/%EA%B9%80%EC%88%98%ED%99%98%EC%B6%94%EA%B8%B0%EA%B2%BD%EA%B5%AD%EC%A0%9C%EA%B4%80.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+     "width": 1200,
+     "height": 1200,
+     "license": "CC BY-SA 3.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+     "shareAlike": true,
+     "author": "가톨릭대학교",
+     "credit": "가톨릭대학교",
+     "description": "International Hub",
+     "date": "2011-09-21 12:19:05",
+     "via": "wikidata"
+    },
+    {
+     "file": "n174lvh5-6.jpg",
+     "title": "File:Footbridge Sapyeong-daero.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3AFootbridge_Sapyeong-daero.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f7/Footbridge_Sapyeong-daero.jpg/1280px-Footbridge_Sapyeong-daero.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 5020,
+     "height": 3370,
+     "license": "CC BY-SA 4.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+     "shareAlike": true,
+     "author": "kallerna",
+     "credit": "Own work",
+     "description": "서리풀공원 입구",
+     "date": "2022-12-02 11:39:38",
+     "via": "wikidata"
     }
    ]
   },
   {
    "id": "n1as48ix",
    "name": "한국항공대학교",
-   "candidates": 0,
-   "files": []
+   "candidates": 3,
+   "files": [
+    {
+     "file": "n1as48ix-1.jpg",
+     "title": "File:KAU main building.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3AKAU_main_building.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8f/KAU_main_building.jpg/1280px-KAU_main_building.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 2016,
+     "height": 1465,
+     "license": "CC BY-SA 3.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+     "shareAlike": true,
+     "author": "Kaupr",
+     "credit": "Own work",
+     "description": "main building",
+     "date": "2010-12-06 20:35:33",
+     "via": "wikidata"
+    },
+    {
+     "file": "n1as48ix-2.jpg",
+     "title": "File:KAU 60th anniversary.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3AKAU_60th_anniversary.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/78/KAU_60th_anniversary.jpg/1280px-KAU_60th_anniversary.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 5616,
+     "height": 3744,
+     "license": "CC BY-SA 3.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+     "shareAlike": true,
+     "author": "Kaupr",
+     "credit": "Own work",
+     "description": "60th anniversary",
+     "date": "2012-04-06 15:00:03",
+     "via": "wikidata"
+    },
+    {
+     "file": "n1as48ix-3.jpg",
+     "title": "File:KAU International Summer Program.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3AKAU_International_Summer_Program.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/78/KAU_International_Summer_Program.jpg/1280px-KAU_International_Summer_Program.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 5616,
+     "height": 3744,
+     "license": "CC BY-SA 3.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+     "shareAlike": true,
+     "author": "Kaupr",
+     "credit": "Own work",
+     "description": "International Summer Program",
+     "date": "2012-07-02 14:49:20",
+     "via": "wikidata"
+    }
+   ]
   },
   {
    "id": "ntxxf09",
    "name": "경기대학교",
-   "candidates": 10,
+   "candidates": 35,
    "files": [
     {
      "file": "ntxxf09-1.jpg",
-     "title": "File:경기대학교 수원캠퍼스 1강의동 (진리관).jpg",
-     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_1%EA%B0%95%EC%9D%98%EB%8F%99_(%EC%A7%84%EB%A6%AC%EA%B4%80).jpg",
-     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/58/%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_1%EA%B0%95%EC%9D%98%EB%8F%99_%28%EC%A7%84%EB%A6%AC%EA%B4%80%29.jpg/1280px-%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_1%EA%B0%95%EC%9D%98%EB%8F%99_%28%EC%A7%84%EB%A6%AC%EA%B4%80%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-     "width": 2091,
-     "height": 1411,
-     "license": "CC BY-SA 4.0",
-     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-     "shareAlike": true,
-     "author": "경기대예술",
-     "credit": "Own work",
-     "description": "ⓒ NAVER 지도",
-     "date": "2020-11-09",
-     "query": "Kyonggi University"
-    },
-    {
-     "file": "ntxxf09-2.jpg",
-     "title": "File:경기대학교 야경.jpg",
-     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%95%BC%EA%B2%BD.jpg",
-     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/66/%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%95%BC%EA%B2%BD.jpg/1280px-%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%95%BC%EA%B2%BD.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-     "width": 4896,
-     "height": 3264,
-     "license": "CC0",
-     "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
-     "shareAlike": false,
-     "author": "Motoko C. K.",
-     "credit": "Own work",
-     "description": "경기대학교 야경",
-     "date": "2018-11-22 19:13:59",
-     "query": "경기대학교"
-    },
-    {
-     "file": "ntxxf09-3.jpg",
-     "title": "File:160928 경기대학교 수원캠퍼스 축제 크러쉬 3.jpg",
-     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_3.jpg",
-     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ae/160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_3.jpg/1280px-160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_3.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-     "width": 2225,
-     "height": 3548,
-     "license": "CC BY 4.0",
-     "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
-     "shareAlike": false,
-     "author": "Skywalker&amp;LoonaWalker",
-     "credit": "Tistory",
-     "description": "Crush performing at the Kyonggi University Festival in Suwon on September 28, 2016.",
-     "date": "Taken on 28 September 2016",
-     "query": "경기대학교"
-    },
-    {
-     "file": "ntxxf09-4.jpg",
-     "title": "File:160928 경기대학교 수원캠퍼스 축제 크러쉬 1.jpg",
-     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_1.jpg",
-     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/98/160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_1.jpg/1280px-160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-     "width": 1996,
-     "height": 3179,
-     "license": "CC BY 4.0",
-     "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
-     "shareAlike": false,
-     "author": "Skywalker&amp;LoonaWalker",
-     "credit": "Tistory",
-     "description": "Crush performing at the Kyonggi University Festival in Suwon on September 28, 2016.",
-     "date": "Taken on 28 September 2016",
-     "query": "경기대학교"
-    },
-    {
-     "file": "ntxxf09-5.jpg",
-     "title": "File:160928 경기대학교 수원캠퍼스 축제 크러쉬 2.jpg",
-     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_2.jpg",
-     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ae/160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_2.jpg/1280px-160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-     "width": 2225,
-     "height": 3548,
-     "license": "CC BY 4.0",
-     "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
-     "shareAlike": false,
-     "author": "Skywalker&amp;LoonaWalker",
-     "credit": "Tistory",
-     "description": "Crush performing at the Kyonggi University Festival in Suwon on September 28, 2016.",
-     "date": "Taken on 28 September 2016",
-     "query": "경기대학교"
-    },
-    {
-     "file": "ntxxf09-6.jpg",
-     "title": "File:160928 경기대학교 수원캠퍼스 축제 크러쉬 4.jpg",
-     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_4.jpg",
-     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/28/160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_4.jpg/1280px-160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_4.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-     "width": 2225,
-     "height": 3550,
-     "license": "CC BY 4.0",
-     "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
-     "shareAlike": false,
-     "author": "Skywalker&amp;LoonaWalker",
-     "credit": "Tistory",
-     "description": "Crush performing at the Kyonggi University Festival in Suwon on September 28, 2016.",
-     "date": "Taken on 28 September 2016",
-     "query": "경기대학교"
-    },
-    {
-     "file": "ntxxf09-7.jpg",
-     "title": "File:160928 경기대학교 수원캠퍼스 축제 크러쉬 5.jpg",
-     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_5.jpg",
-     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a9/160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_5.jpg/1280px-160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_5.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-     "width": 2034,
-     "height": 3238,
-     "license": "CC BY 4.0",
-     "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
-     "shareAlike": false,
-     "author": "Skywalker&amp;LoonaWalker",
-     "credit": "Tistory",
-     "description": "Crush performing at the Kyonggi University Festival in Suwon on September 28, 2016.",
-     "date": "Taken on 28 September 2016",
-     "query": "경기대학교"
-    },
-    {
-     "file": "ntxxf09-8.jpg",
-     "title": "File:160928 경기대학교 수원캠퍼스 축제 크러쉬 6.jpg",
-     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_6.jpg",
-     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8b/160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_6.jpg/1280px-160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_6.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
-     "width": 2760,
-     "height": 1725,
-     "license": "CC BY 4.0",
-     "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
-     "shareAlike": false,
-     "author": "Skywalker&amp;LoonaWalker",
-     "credit": "Tistory",
-     "description": "Crush performing at the Kyonggi University Festival in Suwon on September 28, 2016.",
-     "date": "Taken on 28 September 2016",
-     "query": "경기대학교"
-    },
-    {
-     "file": "ntxxf09-9.jpg",
      "title": "File:경기대학교 수원캠퍼스 정문 (서문).jpg",
      "pageUrl": "https://commons.wikimedia.org/wiki/File%3A%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%A0%95%EB%AC%B8_(%EC%84%9C%EB%AC%B8).jpg",
      "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/35/%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%A0%95%EB%AC%B8_%28%EC%84%9C%EB%AC%B8%29.jpg/1280px-%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%A0%95%EB%AC%B8_%28%EC%84%9C%EB%AC%B8%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
@@ -1208,7 +1416,144 @@
      "credit": "Own work",
      "description": "ⓒ 네이버 지도",
      "date": "2020-11-09",
-     "query": "경기대학교"
+     "query": "Kyonggi University",
+     "via": "search"
+    },
+    {
+     "file": "ntxxf09-2.jpg",
+     "title": "File:경기대학교 수원캠퍼스 1강의동 (진리관).jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_1%EA%B0%95%EC%9D%98%EB%8F%99_(%EC%A7%84%EB%A6%AC%EA%B4%80).jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/58/%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_1%EA%B0%95%EC%9D%98%EB%8F%99_%28%EC%A7%84%EB%A6%AC%EA%B4%80%29.jpg/1280px-%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_1%EA%B0%95%EC%9D%98%EB%8F%99_%28%EC%A7%84%EB%A6%AC%EA%B4%80%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 2091,
+     "height": 1411,
+     "license": "CC BY-SA 4.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+     "shareAlike": true,
+     "author": "경기대예술",
+     "credit": "Own work",
+     "description": "ⓒ NAVER 지도",
+     "date": "2020-11-09",
+     "query": "Kyonggi University",
+     "via": "search"
+    },
+    {
+     "file": "ntxxf09-3.jpg",
+     "title": "File:경기대학교 야경.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%95%BC%EA%B2%BD.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/66/%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%95%BC%EA%B2%BD.jpg/1280px-%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%95%BC%EA%B2%BD.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 4896,
+     "height": 3264,
+     "license": "CC0",
+     "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+     "shareAlike": false,
+     "author": "Motoko C. K.",
+     "credit": "Own work",
+     "description": "경기대학교 야경",
+     "date": "2018-11-22 19:13:59",
+     "query": "경기대학교",
+     "via": "search"
+    },
+    {
+     "file": "ntxxf09-4.jpg",
+     "title": "File:160928 경기대학교 수원캠퍼스 축제 크러쉬 3.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_3.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ae/160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_3.jpg/1280px-160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_3.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 2225,
+     "height": 3548,
+     "license": "CC BY 4.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+     "shareAlike": false,
+     "author": "Skywalker&amp;LoonaWalker",
+     "credit": "Tistory",
+     "description": "Crush performing at the Kyonggi University Festival in Suwon on September 28, 2016.",
+     "date": "Taken on 28 September 2016",
+     "query": "경기대학교",
+     "via": "search"
+    },
+    {
+     "file": "ntxxf09-5.jpg",
+     "title": "File:160928 경기대학교 수원캠퍼스 축제 크러쉬 1.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_1.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/98/160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_1.jpg/1280px-160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 1996,
+     "height": 3179,
+     "license": "CC BY 4.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+     "shareAlike": false,
+     "author": "Skywalker&amp;LoonaWalker",
+     "credit": "Tistory",
+     "description": "Crush performing at the Kyonggi University Festival in Suwon on September 28, 2016.",
+     "date": "Taken on 28 September 2016",
+     "query": "경기대학교",
+     "via": "search"
+    },
+    {
+     "file": "ntxxf09-6.jpg",
+     "title": "File:160928 경기대학교 수원캠퍼스 축제 크러쉬 2.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_2.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ae/160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_2.jpg/1280px-160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 2225,
+     "height": 3548,
+     "license": "CC BY 4.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+     "shareAlike": false,
+     "author": "Skywalker&amp;LoonaWalker",
+     "credit": "Tistory",
+     "description": "Crush performing at the Kyonggi University Festival in Suwon on September 28, 2016.",
+     "date": "Taken on 28 September 2016",
+     "query": "경기대학교",
+     "via": "search"
+    },
+    {
+     "file": "ntxxf09-7.jpg",
+     "title": "File:160928 경기대학교 수원캠퍼스 축제 크러쉬 4.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_4.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/28/160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_4.jpg/1280px-160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_4.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 2225,
+     "height": 3550,
+     "license": "CC BY 4.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+     "shareAlike": false,
+     "author": "Skywalker&amp;LoonaWalker",
+     "credit": "Tistory",
+     "description": "Crush performing at the Kyonggi University Festival in Suwon on September 28, 2016.",
+     "date": "Taken on 28 September 2016",
+     "query": "경기대학교",
+     "via": "search"
+    },
+    {
+     "file": "ntxxf09-8.jpg",
+     "title": "File:160928 경기대학교 수원캠퍼스 축제 크러쉬 5.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_5.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a9/160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_5.jpg/1280px-160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_5.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 2034,
+     "height": 3238,
+     "license": "CC BY 4.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+     "shareAlike": false,
+     "author": "Skywalker&amp;LoonaWalker",
+     "credit": "Tistory",
+     "description": "Crush performing at the Kyonggi University Festival in Suwon on September 28, 2016.",
+     "date": "Taken on 28 September 2016",
+     "query": "경기대학교",
+     "via": "search"
+    },
+    {
+     "file": "ntxxf09-9.jpg",
+     "title": "File:160928 경기대학교 수원캠퍼스 축제 크러쉬 6.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_6.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8b/160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_6.jpg/1280px-160928_%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%B6%95%EC%A0%9C_%ED%81%AC%EB%9F%AC%EC%89%AC_6.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 2760,
+     "height": 1725,
+     "license": "CC BY 4.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+     "shareAlike": false,
+     "author": "Skywalker&amp;LoonaWalker",
+     "credit": "Tistory",
+     "description": "Crush performing at the Kyonggi University Festival in Suwon on September 28, 2016.",
+     "date": "Taken on 28 September 2016",
+     "query": "경기대학교",
+     "via": "search"
     },
     {
      "file": "ntxxf09-10.jpg",
@@ -1224,14 +1569,79 @@
      "credit": "Own work",
      "description": "ⓒ 네이버 지도",
      "date": "2020-11-09",
-     "query": "경기대학교"
+     "query": "경기대학교",
+     "via": "search"
+    },
+    {
+     "file": "ntxxf09-11.jpg",
+     "title": "File:2강의동.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A2%EA%B0%95%EC%9D%98%EB%8F%99.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2f/2%EA%B0%95%EC%9D%98%EB%8F%99.jpg/1280px-2%EA%B0%95%EC%9D%98%EB%8F%99.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 2135,
+     "height": 1357,
+     "license": "CC BY-SA 4.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+     "shareAlike": true,
+     "author": "경기대예술",
+     "credit": "Own work",
+     "description": "ⓒ 네이버 지도",
+     "date": "2020-11-09",
+     "via": "wikidata"
+    },
+    {
+     "file": "ntxxf09-12.jpg",
+     "title": "File:3강의동.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A3%EA%B0%95%EC%9D%98%EB%8F%99.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/90/3%EA%B0%95%EC%9D%98%EB%8F%99.jpg/1280px-3%EA%B0%95%EC%9D%98%EB%8F%99.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 2381,
+     "height": 1649,
+     "license": "CC BY-SA 4.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+     "shareAlike": true,
+     "author": "경기대예술",
+     "credit": "Own work",
+     "description": "ⓒ 네이버 지도",
+     "date": "2020-11-09",
+     "via": "wikidata"
+    },
+    {
+     "file": "ntxxf09-13.jpg",
+     "title": "File:1진리.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A1%EC%A7%84%EB%A6%AC.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3c/1%EC%A7%84%EB%A6%AC.jpg/1280px-1%EC%A7%84%EB%A6%AC.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 1920,
+     "height": 1080,
+     "license": "CC BY-SA 4.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+     "shareAlike": true,
+     "author": "경기대예술",
+     "credit": "Own work",
+     "description": "ⓒ 경기대학교 공식 홈페이지",
+     "date": "2020-11-09",
+     "via": "wikidata"
+    },
+    {
+     "file": "ntxxf09-14.jpg",
+     "title": "File:4강의동.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A4%EA%B0%95%EC%9D%98%EB%8F%99.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0a/4%EA%B0%95%EC%9D%98%EB%8F%99.jpg/1280px-4%EA%B0%95%EC%9D%98%EB%8F%99.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 1920,
+     "height": 1080,
+     "license": "CC BY-SA 4.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+     "shareAlike": true,
+     "author": "경기대예술",
+     "credit": "Own work",
+     "description": "ⓒ 경기대학교 공식 홈페이지",
+     "date": "2020-11-09",
+     "via": "wikidata"
     }
    ]
   },
   {
    "id": "n18ebv4b",
    "name": "서울교육대학교",
-   "candidates": 2,
+   "candidates": 4,
    "files": [
     {
      "file": "n18ebv4b-1.jpg",
@@ -1247,7 +1657,8 @@
      "credit": "Own work",
      "description": "서울교육대학교 후문",
      "date": "2014-12-03 16:32:15",
-     "query": "Seoul National University of Education"
+     "query": "Seoul National University of Education",
+     "via": "search"
     },
     {
      "file": "n18ebv4b-2.jpg",
@@ -1263,7 +1674,40 @@
      "credit": "Own work",
      "description": "서울교육대학교 전산관",
      "date": "2015-10-23 12:48:26",
-     "query": "서울교육대학교"
+     "query": "서울교육대학교",
+     "via": "search"
+    },
+    {
+     "file": "n18ebv4b-3.jpg",
+     "title": "File:서울교대운동장.JPG",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A%EC%84%9C%EC%9A%B8%EA%B5%90%EB%8C%80%EC%9A%B4%EB%8F%99%EC%9E%A5.JPG",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e2/%EC%84%9C%EC%9A%B8%EA%B5%90%EB%8C%80%EC%9A%B4%EB%8F%99%EC%9E%A5.JPG/1280px-%EC%84%9C%EC%9A%B8%EA%B5%90%EB%8C%80%EC%9A%B4%EB%8F%99%EC%9E%A5.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 3264,
+     "height": 2448,
+     "license": "CC BY-SA 4.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+     "shareAlike": true,
+     "author": "Nanunnuri",
+     "credit": "Own work",
+     "description": "서울교육대학교 운동장",
+     "date": "2015-10-23 13:29:16",
+     "via": "wikidata"
+    },
+    {
+     "file": "n18ebv4b-4.jpg",
+     "title": "File:연구강의동.jpg",
+     "pageUrl": "https://commons.wikimedia.org/wiki/File%3A%EC%97%B0%EA%B5%AC%EA%B0%95%EC%9D%98%EB%8F%99.jpg",
+     "thumb": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a2/%EC%97%B0%EA%B5%AC%EA%B0%95%EC%9D%98%EB%8F%99.jpg/1280px-%EC%97%B0%EA%B5%AC%EA%B0%95%EC%9D%98%EB%8F%99.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+     "width": 5312,
+     "height": 2988,
+     "license": "CC BY-SA 4.0",
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+     "shareAlike": true,
+     "author": "Yeji",
+     "credit": "from a friend 'Yeji'",
+     "description": "연구강의동",
+     "date": "2016-11-01 15:23:31",
+     "via": "wikidata"
     }
    ]
   },
@@ -1643,7 +2087,8 @@
      "credit": "Own work",
      "description": "강원대학교 60주년 기념관",
      "date": "2023-12-08 16:48:39",
-     "query": "강원대학교"
+     "query": "강원대학교",
+     "via": "search"
     }
    ]
   },
