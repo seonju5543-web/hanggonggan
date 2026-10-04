@@ -14,11 +14,11 @@
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { sameSite } from './board-links.mjs';
-import { NEWS_BOARD_RULES, rowsForBoard, verifyRuleDetail, needsDetailCheck, fetchesOwnList, collapseSamePost, newsHidden, newsDistinct } from './news-board-rules.mjs';   // 클릭형 게시판 규칙 한 곳 (찾기 로봇과 같은 것)
+import { NEWS_BOARD_RULES, newsRuleKey, rowsForBoard, verifyRuleDetail, needsDetailCheck, fetchesOwnList, collapseSamePost, newsHidden, newsDistinct } from './news-board-rules.mjs';   // 클릭형 게시판 규칙 한 곳 (찾기 로봇과 같은 것)
 import { urlKey, dedupeNotices } from './url-key.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { activityKind } from './activity-kind.mjs';
-import { newsKind, isNewsRow } from './news-kind.mjs';
+import { newsKind, isNewsRow, newsFloor } from './news-kind.mjs';
 import { fetchBoard, netReason } from './fetch-board.mjs';
 import { publishBySchool, dropUnserved } from './publish-notices.mjs';
 import { makeBudget, rotateOrder, nextCursor, withDeadline, TIMED_OUT } from './harvest-budget.mjs';
@@ -41,6 +41,7 @@ const MIN_ROOM_MS = Number(process.env.NEWS_MIN_ROOM_MS || 15000);
 const NEWS_FRESH_MAX = Number(process.env.NEWS_FRESH_MAX || 30);     // 게시판 하나에서 한 실행에 담는 새 글 상한
 const NEWS_KEEP_DAYS = Number(process.env.NEWS_KEEP_DAYS || 30);      // 수집일로부터 이만큼 지나면 뺀다 (공지는 장학 공고보다 빨리 낡는다)
 const NEWS_PER_SCHOOL = Number(process.env.NEWS_PER_SCHOOL || 40);    // 학교별 파일 한 장의 상한 (폰이 받는 크기)
+const NEWS_MIN_KEEP = Number(process.env.NEWS_MIN_KEEP || 4);      // 학교마다 최근 이만큼은 기한이 지나도 남긴다 (홈 첫 화면 띠 카드 4장 · newsFloor)
 const NEWS_POSTED_MAX_DAYS = Number(process.env.NEWS_POSTED_MAX_DAYS || 60);   // 게시일이 이보다 오래된 글은 싣지 않는다 — 상단 고정 공지가 2025년 글을 '소식'으로 올렸다(서울교대 7차 실측)
 const postedCutoff = () => new Date(Date.now() - NEWS_POSTED_MAX_DAYS * 86400000).toISOString().slice(0, 10);
 const budget = makeBudget(BUDGET_MS);
@@ -83,8 +84,15 @@ function loadPublished() {
 const results = [];
 const freshAll = [];
 const postIdByUrl = new Map();   // 이번에 본 글의 주소 열쇠 → 글 번호 (10차 전에 실린 글에도 번호를 달아 준다 · 발행 때 씀)
-const boards = (cfg.sources || []).map((s) => ({ ...s }));
-const boardLabel = (s) => (s.campus && s.campus !== '공통' ? `${s.school} ${s.campus}` : s.school);
+/* 학교 하나에 게시판이 둘일 수 있다 (2026-10-03 · 서울대 일반공지는 장학 글이 많아 소식 2건 · 고려 세종 3건 → 학사공지를 더한다).
+   둘째 게시판은 출처 줄의 extraBoards[{ boardUrl, label, evidence }] — 학교 규칙(NEWS_BOARD_RULES[학교])은 **첫 게시판에만** 맞는다.
+   둘째 게시판의 규칙 열쇠는 '학교#이름'(newsRuleKey · 서강 행사특강) · 규칙이 없으면 보통 날짜 줄로 읽는다. 그 게시판 글에는 board(이름)를 달아
+   썸네일 로봇이 같은 열쇠로 본문 API 를 찾는다. 같은 글이 두 게시판에 있어도 발행 때 주소·글 번호로 하나가 된다. */
+const boards = (cfg.sources || []).flatMap((s) => [{ ...s }, ...(s.boardUrl ? (s.extraBoards || []) : [])
+  .filter((e) => e && e.boardUrl)
+  .map((e) => ({ school: s.school, campus: s.campus, boardUrl: e.boardUrl, label: e.label || '둘째 게시판', board: e.label || '둘째 게시판', extra: true }))]);
+const ruleKey = newsRuleKey;   // 게시판 줄 { school, board } → 'school' 또는 'school#board'
+const boardLabel = (s) => `${s.campus && s.campus !== '공통' ? `${s.school} ${s.campus}` : s.school}${s.extra ? ` · ${s.label}` : ''}`;
 const todayStr = () => new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);   // KST — 발행 색인·찾기 로봇·관리자와 같은 시계 (07:19 KST 실행이 어제 날짜를 찍지 않게)
 
 /* 게시판 하나를 읽는다. `return` 은 이 게시판을 마치고 다음으로 간다는 뜻. */
@@ -99,7 +107,7 @@ async function harvestBoard(s, ctx = { dead: false }) {
   /* 이 게시판의 모든 요청(목록·API·상세 확인)은 게시판 시한 안에서만 기다린다 (재검증 2026-10-02 — 시한이 끊어도 요청은 뒤에서 계속 돌았다) */
   const fb = (url, o = {}) => fetchBoard(url, { ...o, deadlineAt: ctx.deadlineAt });
   try {
-    const rule = NEWS_BOARD_RULES[s.school];
+    const rule = NEWS_BOARD_RULES[ruleKey(s)];
     let html = '';
     /* json·post 규칙은 목록을 API 로 읽지만(rowsForBoard), 목록 표식(link:'list') 학교는 학생 링크가 그 화면이라 **화면도 열리는지** 본다
        (리뷰 2026-10-02: 화면이 404 가 돼도 API 만 살아 있으면 죽은 「게시판 목록 ↗」 이 계속 실렸다) */
@@ -111,7 +119,7 @@ async function harvestBoard(s, ctx = { dead: false }) {
     }
     /* 🔴 글 줄만 — 페이지의 <a> 전부(extractLinks)를 쓰면 사이트 메뉴가 글로 담긴다(첫 실행 906건 사고 · 2026-10-01).
        날짜가 붙은 줄(<tr>·<li>…)의 링크만 글이고, 그 날짜가 게시일(postedAt)이다. 클릭형 게시판은 같은 눈에 규칙의 링크 풀이만 얹는다. */
-    const rawLinks = await rowsForBoard(s.school, s.boardUrl, html, fb);
+    const rawLinks = await rowsForBoard(ruleKey(s), s.boardUrl, html, fb);
     if (ctx.dead) return;
     /* 무엇을 싣나 — 학교 사이트 안의 글 가운데 장학·활동·잡음을 뺀 것 (판정은 news-kind.mjs 한 곳) */
     /* 단계마다 수를 남긴다 — 0건일 때 '어디서 다 빠졌는지'를 리포트가 말하게 (서강 9차: 찾기는 30행인데 수집 0건 · 원인을 단정하지 않는다) */
@@ -142,6 +150,13 @@ async function harvestBoard(s, ctx = { dead: false }) {
       const v = await verifyRuleDetail(fresh[0], { rule, boardUrl: s.boardUrl, others: items.map((i) => i.title), fetch: fb });
       if (ctx.dead) return;
       if (!v.ok) { results.push({ name, status: Date.now() >= ctx.deadlineAt - 200 ? timedOutStatus() : `⚠️ 클릭형 규칙(news-board-rules.mjs)의 상세 주소 확인 실패 — ${v.reason} · 이 게시판은 싣지 않음`, items: [] }); return; }
+      /* verifyLast — 정찰이 상단 고정 줄만 눌러 본 규칙(경북)은 **마지막 글**(보통 줄)도 연다. 고정 줄과 보통 줄의 상세 주소 꼴이 다를 수 있다 */
+      const last = fresh[fresh.length - 1];
+      if (rule.verifyLast && fresh.length > 1 && last.url !== fresh[0].url) {
+        const v2 = await verifyRuleDetail(last, { rule, boardUrl: s.boardUrl, others: items.map((i) => i.title), fetch: fb });
+        if (ctx.dead) return;
+        if (!v2.ok) { results.push({ name, status: Date.now() >= ctx.deadlineAt - 200 ? timedOutStatus() : `⚠️ 클릭형 규칙(news-board-rules.mjs)의 상세 주소 확인 실패(마지막 글 · 보통 줄) — ${v2.reason} · 이 게시판은 싣지 않음`, items: [] }); return; }
+      }
     }
     for (const it of fresh) {
       if (ctx.dead) return;
@@ -149,6 +164,7 @@ async function harvestBoard(s, ctx = { dead: false }) {
       if (kind) it.kind = kind;
       it.school = s.school;
       it.campus = s.campus === '공통' ? '' : (s.campus || '');
+      if (s.board) it.board = s.board;   // 둘째 게시판 글 — 썸네일 로봇이 newsRuleKey 로 같은 규칙을 찾는다
       it.foundAt = todayStr();
       seen[urlKey(it.url)] = it.foundAt;
       if (it.postId) seen[postKey(it)] = it.foundAt;
@@ -171,7 +187,7 @@ async function harvestBoard(s, ctx = { dead: false }) {
     if (ctx.dead) return;
     /* 게시판 시한에 걸려 놓은 요청은 주소·규칙 탓이 아니다 — '멈춤' 으로 적는다 (리뷰 12차: 시한을 요청에 넘기자 '주소 확인 필요' 로 잘못 적혔다) */
     if ((e && e.boardDeadline) || Date.now() >= ctx.deadlineAt - 200) { results.push({ name, status: timedOutStatus(), items: [] }); return; }
-    const rule = NEWS_BOARD_RULES[s.school];   // API 규칙의 실패는 주소가 아니라 규칙의 문제다 (리뷰 2026-10-01 · 원인을 단정하지 않는다)
+    const rule = NEWS_BOARD_RULES[ruleKey(s)];   // API 규칙의 실패는 주소가 아니라 규칙의 문제다 (리뷰 2026-10-01 · 원인을 단정하지 않는다)
     results.push({ name, status: fetchesOwnList(rule) ? `⚠️ 규칙의 API 오류 (${netReason(e)}) — news-board-rules.mjs 의 api·body 확인` : `⚠️ 오류 (${netReason(e)}) — 주소 확인 필요`, items: [] });
   }
 }
@@ -208,9 +224,8 @@ fs.writeFileSync(seenPath, JSON.stringify(seen, null, 1));
 /* 발행 — 새 글 + 실려 있던 글 → 보관 기한 → 중복 → 서비스 학교 → 숨김 표식 → 최근 수집 순 → 학교별 파일 */
 const cutoff = new Date(Date.now() - NEWS_KEEP_DAYS * 86400000).toISOString().slice(0, 10);
 let all = freshAll.concat(loadPublished());
-all = all.filter((n) => n && n.url && n.school && (n.foundAt || '9999') >= cutoff);
+all = all.filter((n) => n && n.url && n.school);
 all = all.filter((n) => !isAttachmentEntry(n));
-all = all.filter((n) => !n.postedAt || n.postedAt >= postedCutoff());   // 소급 — 게시일 상한 (규칙이 바뀌면 실린 글도 같은 잣대)
 /* 소급(원칙 7) — 실을지 규칙(news-kind)이 바뀌면 이미 실린 글도 같은 잣대로 다시 거른다. 2차 실행 뒤 메뉴·바닥글 잡음을 이것으로 걷었다. */
 all = all.filter((n) => isNewsRow(n, { scholarship: KEYWORDS, activityKind, isAttachmentEntry }));
 for (const n of all) if (!n.postId && postIdByUrl.has(urlKey(n.url))) n.postId = postIdByUrl.get(urlKey(n.url));   // 실려 있던 글에 이번에 본 글 번호를 단다
@@ -218,6 +233,9 @@ all = collapseSamePost(all);   // 같은 글이 제목 다듬기 차이로 두 �
 all = dedupeNotices(all, { distinct: newsDistinct });   // 글 번호가 다르면 같은 주소(목록 표식)라도 다른 글
 all = dropUnserved(all);
 for (const n of all) { if (newsHidden(n, hideCfg)) { n.hidden = true; } else if (n.hidden && !n.hiddenBy) { delete n.hidden; } }
+/* 보관 기한 — 수집일 30일 · 게시일 60일(소급 — 규칙이 바뀌면 실린 글도 같은 잣대). 단 학교마다 최근 NEWS_MIN_KEEP 건은 남긴다(newsFloor · 소식 0건 학교가 생기지 않게) */
+const floor = newsFloor(all, NEWS_MIN_KEEP);
+all = all.filter((n) => floor.has(n) || ((n.foundAt || '9999') >= cutoff && (!n.postedAt || n.postedAt >= postedCutoff())));
 all.sort((a, b) => String(b.foundAt || '').localeCompare(String(a.foundAt || '')));
 const pub = publishBySchool(all, {
   dir: NEWS_DIR, perSchool: NEWS_PER_SCHOOL,
@@ -245,11 +263,17 @@ for (const r of results) {
 fs.writeFileSync(healthPath, JSON.stringify(health, null, 1));
 
 /* 리포트 — 컨펌 대상이 아니다(제목+링크만 싣는다). 상태와 새 글, 사람 손이 필요한 것만 적는다. */
-const known = boards.filter((s) => s.boardUrl).length;
+const mains = boards.filter((s) => !s.extra);
+const known = mains.filter((s) => s.boardUrl).length;
+/* 🔴 소식 0건 학교 (2026-10-03 개발자 지시 "소식이 0건인 학교는 없어") — 서비스 학교인데 발행된 글(숨김 빼고)이 하나도 없으면 사람 손이 필요하다(이슈) */
+const liveBySchool = new Map();
+for (const n of all) if (!n.hidden) liveBySchool.set(n.school, (liveBySchool.get(n.school) || 0) + 1);
+const zeroSchools = [...new Set(mains.map((s) => s.school))].filter((name) => !liveBySchool.get(name));
 const lines = [
   `## 🗞 교내 소식 수집 리포트 (${todayStr()})`, '',
-  `새 글 **${freshAll.length}건** → 앱 홈 「우리 학교 소식」 (학교별 파일 data/news/ · ${pub.schools}개교 · 게시판 아는 학교 ${known}/${boards.length})`, '',
+  `새 글 **${freshAll.length}건** → 앱 홈 「우리 학교 소식」 (학교별 파일 data/news/ · ${pub.schools}개교 · 게시판 아는 학교 ${known}/${mains.length}${boards.length > mains.length ? ` · 둘째 게시판 ${boards.length - mains.length}곳` : ''})`, '',
 ];
+if (zeroSchools.length) lines.push(`### 🙋 소식이 0건인 학교 ${zeroSchools.length}곳 — 출처를 찾아야 합니다 (모든 학교는 소식이 있다)`, ...zeroSchools.map((n) => `- ${n}`), '');
 if (skippedByBudget.length) {
   lines.push(`⏰ **시간 예산(${humanMs(BUDGET_MS)})에 걸려 게시판 ${skippedByBudget.length}곳을 이번 실행에서 못 봤습니다** — ${skippedByBudget.slice(0, 8).join(' · ')}${skippedByBudget.length > 8 ? ' …' : ''}`);
   lines.push(`  → 이번에 본 게시판 ${doneCount}/${boards.length}곳 · 다음 실행은 **${boards[cursor.next] ? boardLabel(boards[cursor.next]) : '처음'}**부터 시작합니다.`, '');
@@ -278,6 +302,6 @@ lines.push('---', '⚙️ 설정: `collector/news-sources.json` · 발행: `data
 fs.writeFileSync(new URL('news-report.md', HERE), lines.join('\n'));
 
 console.log(`news: ${freshAll.length} new; published ${all.length} items to ${pub.schools} school files`);
-if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT, `new_count=${freshAll.length}\nneeds_human=${(chronic.length + noRows.length) ? '1' : '0'}\n`);
+if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT, `new_count=${freshAll.length}\nneeds_human=${(chronic.length + noRows.length + zeroSchools.length) ? '1' : '0'}\n`);
 /* 저장을 마쳤으면 스스로 끝낸다 — 시한에 걸려 버려진 게시판의 소켓이 프로세스를 붙잡지 않게 (collect.mjs 와 같은 이유) */
 process.exit(0);

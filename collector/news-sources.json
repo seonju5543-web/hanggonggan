@@ -87,7 +87,14 @@
      "2026학년도 2학기 등록금 납부 안내 첨부파일 있음"
     ],
     "evidence": "웹 검색 2026-09-30 '서울대학교 공지사항 snu.ac.kr notice' → 결과 URL https://www.snu.ac.kr/snunow/notice/genernal (제목: 일반공지 - 공지사항 - 서울대 소식 - 서울대학교) · 상세는 ?md=v&bbsidx=173756 꼴"
-   }
+   },
+   "extraBoards": [
+    {
+     "boardUrl": "https://snuc.snu.ac.kr/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/",
+     "label": "학부대학 공지",
+     "evidence": "웹 검색 2026-10-03 '서울대학교 학부대학 학사공지 snuc.snu.ac.kr 공지사항' → 결과 URL https://snuc.snu.ac.kr/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/ (제목: 공지사항 - 서울대학교 학부대학) · 정찰 6차 2026-10-03: 로그인 요구 없음 · 전체 781건 · 날짜 줄 44개(2026-10-02 …) · 줄은 보통 링크 /공지사항/?mod=document&uid=901 이고 누르니 그 글 화면(제목 「샤묵 캐릭터 공모전 선정 결과 발표 – 서울대학교 학부대학」)"
+    }
+   ]
   },
   {
    "school": "연세대학교",
@@ -216,7 +223,14 @@
      "2026학년도 2학기 학생 셔틀버스 운행 시간 변경 안내"
     ],
     "evidence": "웹 검색 2026-09-30 'site:sejong.korea.ac.kr 공지사항 koreaSejong subview.do' → 결과 URL https://sejong.korea.ac.kr/koreaSejong/7913/subview.do (제목: 일반공지 · 요약: 66건)"
-   }
+   },
+   "extraBoards": [
+    {
+     "boardUrl": "https://sejong.korea.ac.kr/koreaSejong/7903/subview.do",
+     "label": "학사공지",
+     "evidence": "웹 검색 2026-10-03 '고려대학교 세종캠퍼스 학사공지 sejong.korea.ac.kr subview.do' → 결과 URL https://sejong.korea.ac.kr/koreaSejong/7903/subview.do (제목: 학사공지 - 고려대학교 세종캠퍼스) · 정찰 6차 2026-10-03: 로그인 요구 없음 · 총 6009개 · 날짜 줄 11개(2026.09.29 · 09.23 · 09.21 …) · 줄은 보통 링크 /bbs/koreaSejong/656/<번호>/artclView.do · 첫 줄을 누르니 그 글 화면"
+    }
+   ]
   },
   {
    "school": "서강대학교",
@@ -235,7 +249,7 @@
      "evidence": "웹 검색 2026-09-30 'site:www.sogang.ac.kr announcement 공지사항 학사공지 sogang' → 결과 URL https://www.sogang.ac.kr/ko/campus/student-support/notice (제목: 학생 일반공지 · 학생지원팀)"
     }
    ],
-   "note": "SPA — 목록은 API(bbsConfigFk=3), 글 주소는 정찰 3차가 줄을 눌러 받은 /ko/detail/<pkId>?… (news-board-rules.mjs). 🔴 이 게시판(공지사항 · 종합봉사실)은 고정 글을 빼면 최신 글이 2026-06-30 이라 60일 안 새 글이 없다(ℹ️) — 학생이 더 자주 보는 공지 게시판이 있는지 정찰 4차가 /ko/campus/student-support/notice 를 본다.",
+   "note": "SPA — 목록은 API(bbsConfigFk=3), 글 주소는 정찰 3차가 줄을 눌러 받은 /ko/detail/<pkId>?… (news-board-rules.mjs). 🔴 이 게시판(공지사항 · 종합봉사실)은 고정 글을 빼면 최신 글이 2026-06-30 이라 60일 안 새 글이 없다(ℹ️) — 학생이 더 자주 보는 공지 게시판이 있는지 정찰 4차가 /ko/campus/student-support/notice 를 본다. → 2026-10-03 둘째 게시판 「행사특강」(extraBoards · 9월 글이 꾸준하다)을 더했다.",
    "autoFound": {
     "date": "2026-10-02",
     "via": "candidate",
@@ -247,7 +261,14 @@
      "★종합봉사실 근로장학생 모집(~26.06.07)★"
     ],
     "evidence": "웹 검색 2026-09-30 '서강대학교 공지사항 sogang.ac.kr 학사공지' → 결과 URL https://www.sogang.ac.kr/ko/announcement (제목: 학사 지원 > Onestop Sogang > 공지사항 · 요약: 302건 · 휴학·근로장학 등)"
-   }
+   },
+   "extraBoards": [
+    {
+     "boardUrl": "https://www.sogang.ac.kr/ko/story/notification-event",
+     "label": "행사특강",
+     "evidence": "웹 검색 2026-10-03 'site:sogang.ac.kr/ko 공지 2026.09' → 결과 URL https://www.sogang.ac.kr/ko/story/notification-event (제목: 서강대학교) · 정찰 6차 2026-10-03: 로그인 요구 없음 · 큰 제목 「행사특강」 · 글 1,378개(2026.10.01 글까지) · 화면이 목록 API(bbsConfigFk=142)를 불렀고 첫 줄을 누르니 /ko/detail/551482?bbsConfigFk=142&… 로 갔다 — 규칙 news-board-rules.mjs 「서강대학교#행사특강」"
+    }
+   ]
   },
   {
    "school": "성균관대학교",
@@ -1045,9 +1066,16 @@
    "school": "경북대학교",
    "campus": "",
    "home": null,
-   "boardUrl": null,
-   "candidates": [],
-   "note": "🙋 개발자 요청: 학생이 로그인 없이 보는 경북대 공지 목록 주소가 필요하다. 2026-10-02 리뷰: 남아 있던 후보 listBtin.action 은 검색 결과의 상세 주소(viewBtin.action)에서 **유추**한 것이라 저장소 규칙(주소를 유추하지 않는다)에 어긋나 뺐다(뺀 주소: https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/listBtin.action?bbs_cde=1&menu_idx=67). 검색에 실제로 잡힌 상세 주소는 정찰(run-probe.txt)로 열어 그 화면이 적어 둔 목록 링크를 받아 온다. 홈 메뉴 추적은 포토뉴스를 공지로 두 번 잡아 꺼 두었다(home null)."
+   "boardUrl": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdList.action?menu_idx=42",
+   "candidates": [
+    {
+     "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdList.action?menu_idx=42",
+     "label": "학사공지",
+     "evidence": "웹 검색 2026-10-03 '경북대학교 공지사항 knu.ac.kr 학사공지 목록' → 결과 URL https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdList.action?menu_idx=42 (제목: 경북대학교)"
+    }
+   ],
+   "note": "학사공지(웹 검색에 잡힌 목록 주소 그대로 · 정찰 6차 확인). 2026-10-02 에 뺀 listBtin.action 후보는 상세 주소에서 유추한 것이라 다시 넣지 않는다. 홈 메뉴 추적은 포토뉴스를 공지로 잡아 꺼 둔 그대로(home null).",
+   "evidence": "정찰 6차 2026-10-03 (collector/run-probe.txt checkUrl): 로그인 요구 없음 · 표 「학사 공지사항 게시판」 날짜 줄 22개(2026/10/02 · 09/30 · 09/29 …) · 행은 doRead('stu_812','top','번호') → 첫 줄을 누르니 stdViewBtin.action?…&bltn_no=…&menu_idx=42&bbs_cde=stu_812 (그 글 화면) · 상세 규칙은 news-board-rules.mjs 「경북대학교」"
   },
   {
    "school": "영남대학교",
