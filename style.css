@@ -3678,16 +3678,9 @@ button, input, select, textarea { letter-spacing: inherit; }
   justify-content: center;
   gap: 18px;
   opacity: 1;
-  /* 걷힘 두 단계의 길이 — boot.js 가 **이 두 값을 읽어** 단계를 넘긴다.
+  /* 걷힘(페이드)의 길이 — boot.js 가 **이 값을 읽어** 덮개를 거둔다.
      숫자를 JS 에도 적으면 한쪽만 고쳐져 조용히 어긋난다(아래 '걷힘 움직임' 절). */
-  --boot-fold: 260ms;
-  --boot-hold: 60ms;    /* 접힌 막대에서 쉬는 한 박자 — 참고 영상도 막대에서 쉰다 */
-  --boot-open: 420ms;
-  /* 접힌 막대의 중심. boot.js 가 걷기 직전 로고의 실제 위치를 재어 px 로 채운다 —
-     로고는 화면 한가운데가 아니다(밑에 글자가 있어 28px 위). 안 재면 막대와 열리는
-     자리가 어긋나 '막대가 창이 된다'가 아니라 '옆에서 구멍이 난다'로 보인다. */
-  --boot-hx: 50%;
-  --boot-hy: 50%;
+  --boot-fade: 400ms;
 }
 #boot[hidden] { display: none !important; }
 .boot-logo {
@@ -3725,6 +3718,10 @@ button, input, select, textarea { letter-spacing: inherit; }
       레이아웃을 다시 계산하지 않는다(B-3 모션 점검 규칙). */
 .boot-logo { animation: boot-in-logo 0.44s cubic-bezier(0.22, 0.61, 0.36, 1) 0.02s both; }
 .boot-word { animation: boot-in-word 0.40s cubic-bezier(0.22, 0.61, 0.36, 1) 0.16s both; }
+/* boot.js 가 인트로냐 평소냐를 정하기 전(첫 그림이 스크립트보다 먼저 나오는 기기)에는 등장을 멈춰 둔다 —
+   안 멈추면 인트로 날 평소 등장이 몇 프레임 시작됐다가 사라져 로고가 깜빡인다. `both` 라 멈춘 동안은 첫 장면(투명)이다. */
+html:not([data-boot]) .boot-logo,
+html:not([data-boot]) .boot-word { animation-play-state: paused; }
 @keyframes boot-in-logo {
   from { opacity: 0; transform: scale(0.94) translateY(6px); }
   to   { opacity: 1; transform: none; }
@@ -3734,70 +3731,70 @@ button, input, select, textarea { letter-spacing: inherit; }
   to   { opacity: 1; transform: none; }
 }
 
-/* ── 걷힘 움직임 (2026-09-11 개발자 지시 — 카카오웹툰 환영 화면을 보여 주며
-   "한대장 또한 스플래시에서 다음과 같은 인터랙션이 있었으면 좋겠어") ──────────
-   참고 영상(1.18초·60fps 전 프레임 실측): 로고가 **세로 막대 하나로 접히고**, 그 막대가
-   창이 되어 그 자리에서 홈 화면이 열린다. 페이드가 아니라 **로고가 앱이 되는** 움직임이다.
-   두 단계 · 등장 규칙 ①②③(한 번만·바닥값 안·튀지 않음)은 그대로 지킨다.
-
-   ① 접힘(`.boot-fold`, --boot-fold): 글자가 내려앉으며 사라지고, 로고 사각형이 **가로로만**
-      눌려 12px 막대가 된다(88 × 0.136). 안의 학사모는 눌리기 전에 먼저 걷는다 —
-      찌그러진 그림이 잠깐 보이면 그게 제일 싸 보인다.
-      🔴 `animation: none` 이 꼭 필요하다 — 등장 애니메이션이 `both` 라 끝난 뒤에도
-         transform 을 쥐고 있어서, 안 풀면 아래 transform 이 **적용조차 안 된다.**
-   ② 열림(`.boot-open`, --boot-open): 덮개(#boot)에 막대 자리의 **폭 0 구멍**을 뚫고
-      화면 전체까지 키운다(`clip-path` polygon evenodd — 바깥 사각형 + 안쪽 구멍).
-      구멍이 막대 폭(12px)을 넘는 순간 막대가 그대로 창이 된다. 앱 화면은 그 밑에
-      이미 그려져 있다(app.js 가 화면을 정한 뒤에야 bootDone 을 부른다).
-      곡선은 ease-in-out — 처음은 천천히(창이 열리는 느낌), 끝은 빠르게 사라진다.
-   🔴 접힘+쉼+열림 합이 0.74초다. 늘리지 말 것 — 바닥값 1초 뒤에 붙는 시간이라 그대로 앱이
-      느려 보인다(설계 문서 ① 절의 "페이드 120ms — 길면 앱이 느려 보인다"와 같은 이유).
-      쉼(--boot-hold)도 여기 CSS 에 있어야 관문이 셋을 합쳐 잰다(JS 에 숫자로 두면 빠진다).
+/* ── 걷힘 움직임 (2026-10-04 개발자 결정 — "둘 다 페이드로") ─────────────────
+   인트로든 평소 부팅이든 끝은 하나다: 로고·글자가 살짝 커지며(1.04) 흐려지고, 덮개가 투명해지는
+   동안 밑에 이미 그려진 앱 화면이 드러난다(app.js 가 화면을 정한 뒤에야 bootDone 을 부른다).
+   (2026-09-11 의 '세로 막대로 접혔다가 구멍이 열리는' 걷힘을 대신한다 — 경위는 설계 문서.)
+   🔴 0.4초를 늘리지 말 것 — 바닥값 뒤에 붙는 시간이라 그대로 앱이 느려 보인다.
+   🔴 로고·글자는 transition 이 아니라 **keyframes** 로 움직인다 — 등장 애니메이션(`both`)이 쥔
+      transform 은 브라우저가 transition 으로 이어 주지 않는다(2026-09-11 녹화로 확인한 성질).
    🔴 시안 `docs/designs/mockups/first-run/Boot.dc.html` 과 값이 같아야 한다 —
       관문 `test-collector.mjs` '첫 실행 화면' 절 ⑩. */
-/* 🔴 접힘은 transition 이 아니라 **keyframes 애니메이션**이다 — 등장 애니메이션(`both`)이
-   쥐고 있던 transform·opacity 는 브라우저가 transition 으로 이어 주지 않는다. 실제로
-   transition 으로 짰더니 260ms 가 **한 프레임에 툭** 바뀌었다(녹화로 확인). 새 애니메이션이
-   등장 애니메이션을 덮어쓰면(같은 속성) 그 순간의 값에서 이어서 움직인다. */
-#boot.boot-fold .boot-word { animation: boot-fold-word 0.18s ease both; }
-#boot.boot-fold .boot-logo { animation: boot-fold-logo var(--boot-fold) cubic-bezier(0.5, 0, 0.2, 1) both; }
-#boot.boot-fold .boot-logo svg { animation: boot-fold-glyph 0.1s ease both; }
-@keyframes boot-fold-logo { from { transform: none; } to { transform: scaleX(0.136); } }
-@keyframes boot-fold-word {
-  from { opacity: 1; transform: none; }
-  to   { opacity: 0; transform: translateY(6px); }
+#boot.boot-fade {
+  opacity: 0;
+  transition: opacity var(--boot-fade) cubic-bezier(0.4, 0, 0.2, 1);
+  /* ⚠️ 투명해지는 동안 덮개가 터치를 먹지 않게 — 앱 화면은 이미 밑에 그려져 있다 */
+  pointer-events: none;
 }
-@keyframes boot-fold-glyph { to { opacity: 0; } }
-/* 🔴 걷히기 시작하면 도는 표시는 끈다. 걷힘이 0.68초라 바닥값(1초)+걷힘 동안 1.2초를 넘기는데,
-   그때 표시가 스며 나오면 '앱이 제때 왔는데도 기다리는 표시가 보이는' 모순이 된다(실측으로 봤다). */
-#boot.boot-fold .boot-spin { animation: none; opacity: 0; }
-#boot.boot-fold {
-  /* 바깥 사각형 + 막대 자리의 폭 0 구멍(꼭짓점 수는 아래와 같아야 이어서 움직인다) */
-  clip-path: polygon(evenodd,
-    0 0, 100% 0, 100% 100%, 0 100%, 0 0,
-    var(--boot-hx) calc(var(--boot-hy) - 44px),
-    var(--boot-hx) calc(var(--boot-hy) - 44px),
-    var(--boot-hx) calc(var(--boot-hy) + 44px),
-    var(--boot-hx) calc(var(--boot-hy) + 44px),
-    var(--boot-hx) calc(var(--boot-hy) - 44px));
+#boot.boot-fade .boot-logo,
+#boot.boot-fade .boot-word { animation: boot-fade-out var(--boot-fade) cubic-bezier(0.4, 0, 0.2, 1) both; }
+@keyframes boot-fade-out { to { transform: scale(1.04); filter: blur(6px); } }
+/* 🔴 걷히기 시작하면 도는 표시는 끈다 — 앱이 제때 왔는데도 기다리는 표시가 스며 나오는 모순을 막는다 */
+#boot.boot-fade .boot-spin { animation: none; opacity: 0; }
+
+/* ── 인트로 (2026-10-04 개발자 승인 — 소개 영상 1:05~1:09 의 엔딩, 시안 A안) ─────────
+   **오늘 처음 열었거나 4시간 넘게 쉬었을 때만** boot.js 가 `.boot-intro` 를 단다(평소엔 위의 조용한 등장).
+   학사모 선이 그려지고(0.25~0.95초) → 금색 점이 맺히고(0.95~1.15초) → '한대장' 이 흐릿했다가
+   선명해진다(1.0~1.35초). 그 뒤 0.35초 정지하고 위의 페이드로 걷힌다(boot.js `BOOT_INTRO_SHOW_MS`).
+   - `.boot-intro` 만 달린 동안은 **아무것도 안 보인다** — 글꼴을 기다리는 중이다. 준비되면(또는
+     0.7초 천장) `.boot-intro-run` 이 붙고 그때부터 시간이 흐른다. 글꼴을 안 기다리면 '한대장' 이
+     보이지 않는 채로 움직임이 끝난다(2026-10-04 시안에서 실제로 그랬다).
+   - 태그라인은 없다(매일 보는 화면의 광고가 된다 · 2026-10-04 개발자 확인).
+   - 점의 작은 되튐(1.25배)은 승인받은 시안 그대로다 — 위 등장 규칙 ③의 예외로 개발자가 골랐다.
+   🔴 시간은 시안 `docs/designs/mockups/first-run/Intro.dc.html` 과 같아야 한다 — 관문이 대조한다. */
+.boot-dot { fill: #d9b56a; opacity: 0; transform-box: fill-box; transform-origin: 50% 50%; }
+#boot.boot-intro .boot-logo,
+#boot.boot-intro .boot-word { animation: none; opacity: 0; }
+#boot.boot-intro.boot-intro-run .boot-logo { animation: boot-intro-logo 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s both; }
+#boot.boot-intro .boot-logo path { stroke-dasharray: 1; stroke-dashoffset: 1; }
+#boot.boot-intro.boot-intro-run .boot-logo path:nth-of-type(1) { animation: boot-intro-draw 0.5s ease-in-out 0.25s both; }
+#boot.boot-intro.boot-intro-run .boot-logo path:nth-of-type(2) { animation: boot-intro-draw 0.5s ease-in-out 0.4s both; }
+#boot.boot-intro.boot-intro-run .boot-logo path:nth-of-type(3) { animation: boot-intro-draw 0.4s ease-in-out 0.55s both; }
+#boot.boot-intro.boot-intro-run .boot-dot { animation: boot-intro-dot 0.2s ease-out 0.95s both; }
+#boot.boot-intro.boot-intro-run .boot-word { animation: boot-intro-word 0.35s ease-out 1s both; }
+@keyframes boot-intro-logo {
+  from { opacity: 0; transform: scale(0.82); filter: blur(8px); }
+  to   { opacity: 1; transform: none; filter: none; }
 }
-#boot.boot-open {
-  /* ⚠️ `pointer-events: none` 을 두지 말 것 — 구멍 밖(아직 덮인 곳)을 누르면 밑의 보이지 않는
-     버튼이 눌린다. clip-path 는 잘라낸 영역의 터치도 같이 통과시키므로, 그냥 두면 덮인 곳은
-     덮개가 받고 열린 곳은 앱이 받는다(맞는 동작). */
-  /* 구멍이 화면을 조금 넘게(-5%~105%) 커져야 끝에 테두리가 안 남는다 */
-  clip-path: polygon(evenodd,
-    0 0, 100% 0, 100% 100%, 0 100%, 0 0,
-    -5% -5%, 105% -5%, 105% 105%, -5% 105%, -5% -5%);
-  transition: clip-path var(--boot-open) cubic-bezier(0.5, 0, 0.2, 1);
+@keyframes boot-intro-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes boot-intro-dot {
+  0%   { opacity: 1; transform: scale(0); }
+  60%  { opacity: 1; transform: scale(1.25); }
+  100% { opacity: 1; transform: scale(1); }
 }
-/* ⚠️ 여기서 막대(.boot-logo)를 따로 흐리게 하지 말 것 — 덮개의 구멍이 막대까지 같이
-   잘라내므로 구멍이 막대 폭을 넘는 순간 막대가 **그대로 창이 된다.** 따로 흐리면 구멍이
-   아직 좁을 때 막대가 먼저 사라져 '막대가 없어졌다가 옆에서 구멍이 난다'로 보인다(실측). */
+@keyframes boot-intro-word {
+  from { opacity: 0; transform: translateY(6px); filter: blur(10px); }
+  to   { opacity: 1; transform: none; filter: none; }
+}
+/* 인트로 중에 걷히면(누르거나 시간이 다 됐을 때) 페이드가 이긴다 — 위 `.boot-fade` 규칙보다 뒤에 둔다 */
+#boot.boot-intro.boot-fade .boot-logo,
+#boot.boot-intro.boot-fade .boot-word { opacity: 1; animation: boot-fade-out var(--boot-fade) cubic-bezier(0.4, 0, 0.2, 1) both; }
+#boot.boot-intro.boot-fade .boot-logo path { stroke-dashoffset: 0; animation: none; }
+#boot.boot-intro.boot-fade .boot-dot { opacity: 1; animation: none; }
 
 /* 오래 걸릴 때만 나오는 표시.
    🔴 **바닥값(1초)이 지난 뒤에 나타난다**(1.2초). 앱이 제때 오면 1초에 걷히기 시작하고 그
-      순간 `.boot-fold` 가 이 표시를 끄므로 학생은 이걸 아예 못 본다 — 그게 맞다. 이게 보인다는
+      순간 `.boot-fade` 가 이 표시를 끄므로 학생은 이걸 아예 못 본다 — 그게 맞다. 이게 보인다는
       것은 '평소보다 오래 걸린다'는 뜻이고, 그 말이 사실일 때만 해야 한다. 처음부터 띄우면
       빠른 기기에서도 매번 '기다리는 화면'이 된다. */
 .boot-spin {
@@ -3810,6 +3807,9 @@ button, input, select, textarea { letter-spacing: inherit; }
   animation: boot-spin 0.8s linear infinite, boot-spin-in 0.3s ease 1.2s forwards;
 }
 .boot-spin[hidden] { display: none !important; }
+/* 🔴 인트로 날에는 도는 표시를 늦춘다 — 인트로(글꼴 천장 0.7초 + 노출 1.7초)가 평소 지연(1.2초)보다 길어서,
+   안 늦추면 **앱이 제때 와도 매번 '기다리는 표시'가 보인다**(2026-10-04 브라우저 확인). 그 말이 사실일 때만 보인다. */
+#boot.boot-intro .boot-spin { animation: boot-spin 0.8s linear infinite, boot-spin-in 0.3s ease 3.2s forwards; }
 @keyframes boot-spin { to { transform: rotate(360deg); } }
 @keyframes boot-spin-in { to { opacity: 1; } }
 /* 시한이 지났을 때 — 무슨 일인지 말하고 다시 시도하게 한다 */
@@ -3829,11 +3829,15 @@ button, input, select, textarea { letter-spacing: inherit; }
 @media (prefers-reduced-motion: reduce) {
   .boot-logo, .boot-word { animation: none; }
   .boot-spin { animation: none; opacity: 1; }
-  /* 걷힘도 접지 않고 열지 않는다 — 그냥 사라진다. 셋 다 0 이면 boot.js 도 곧바로 넘긴다 */
-  #boot { --boot-fold: 0ms; --boot-hold: 0ms; --boot-open: 0ms; }
-  #boot.boot-fold .boot-logo, #boot.boot-fold .boot-word, #boot.boot-fold .boot-logo svg { animation: none; }
-  #boot.boot-fold, #boot.boot-open { clip-path: none; transition: none; }
-  #boot.boot-open { opacity: 0; }
+  /* 걷힘도 흐리지 않는다 — 그냥 사라진다. 0 이면 boot.js 도 곧바로 넘긴다 */
+  #boot { --boot-fade: 0ms; }
+  #boot.boot-fade { transition: none; }
+  #boot.boot-fade .boot-logo, #boot.boot-fade .boot-word { animation: none; }
+  /* 인트로는 다 그려진 로고 한 장으로 — 선을 그리지도, 글자를 흐리지도 않는다 */
+  #boot.boot-intro .boot-logo, #boot.boot-intro .boot-word,
+  #boot.boot-intro.boot-intro-run .boot-logo, #boot.boot-intro.boot-intro-run .boot-word { animation: none; opacity: 1; }
+  #boot.boot-intro .boot-logo path, #boot.boot-intro.boot-intro-run .boot-logo path { animation: none; stroke-dashoffset: 0; }
+  #boot.boot-intro .boot-dot, #boot.boot-intro.boot-intro-run .boot-dot { animation: none; opacity: 1; }
 }
 
 /* ── 홈 '이어서 쓰기' 줄 (2026-09-09) ────────────────────────────────────

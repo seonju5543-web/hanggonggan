@@ -1192,11 +1192,11 @@ function startMontage() {
     });
 }
 
-/* 부팅 덮개에 구멍이 뚫리기 시작하는 순간(boot.js 가 'boot:open' 을 보낸다)에 부른다.
+/* 부팅 덮개가 걷히기 시작하는 순간(boot.js 가 페이드를 켜며 'boot:open' 을 보낸다)에 부른다.
    덮개가 없거나(검사 픽스처) 이미 걷혔으면 곧바로 부른다. */
 function whenBootOpen(fn) {
   const boot = document.getElementById('boot');
-  if (!boot || boot.hidden || boot.classList.contains('boot-open')) { fn(); return; }
+  if (!boot || boot.hidden || boot.classList.contains('boot-fade')) { fn(); return; }
   window.addEventListener('boot:open', fn, { once: true });
 }
 

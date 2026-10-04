@@ -34,7 +34,9 @@
        걷는 것은 boot.js 의 window.bootDone(). 설계: docs/designs/first-run-and-resume.md -->
   <div id="boot">
     <div class="boot-logo">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/><path d="M22 10v6"/></svg>
+      <!-- pathLength="1" — 인트로가 선을 그려 나가는 길이(stroke-dashoffset 1→0)의 기준. 평소 부팅에는 영향 없다.
+           금색 점은 인트로에서만 맺힌다(앱 아이콘의 술 · icons/icon.svg). -->
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path pathLength="1" d="M22 10L12 5 2 10l10 5 10-5z"/><path pathLength="1" d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/><path pathLength="1" d="M22 10v6"/><circle class="boot-dot" cx="22" cy="16.9" r="1.1" stroke="none"/></svg>
     </div>
     <p class="boot-word">한대장</p>
     <div id="boot-spin" class="boot-spin" aria-hidden="true"></div>

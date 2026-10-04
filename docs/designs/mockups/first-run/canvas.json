@@ -7,7 +7,8 @@
     { "file": "Main.dc.html", "page": "page-1", "x": 0, "y": 0, "w": 940, "h": 940, "title": "앱을 껐다 켜 보세요", "is_interactive": true },
     { "file": "Before.dc.html", "page": "page-1", "x": 1030, "y": 0, "w": 900, "h": 800, "title": "지금은 반대로 돌아간다 (실측)" },
 
-    { "file": "Boot.dc.html", "page": "page-2", "x": 0, "y": 0, "w": 390, "h": 844, "title": "① 부팅 화면 — 켤 때마다" },
+    { "file": "Boot.dc.html", "page": "page-2", "x": 0, "y": 0, "w": 390, "h": 844, "title": "① 부팅 화면 — 평소 (4시간 안에 다시 열 때)" },
+    { "file": "Intro.dc.html", "page": "page-2", "x": 0, "y": 964, "w": 390, "h": 844, "title": "①-1 인트로 — 오늘 처음 · 4시간 넘게 쉬었을 때" },
     { "file": "Welcome.dc.html", "page": "page-2", "x": 480, "y": 0, "w": 390, "h": 844, "title": "② 환영 화면 — 최초 1회" },
     { "file": "Resume1.dc.html", "page": "page-2", "x": 960, "y": 0, "w": 390, "h": 844, "title": "③ 이어보기 1겹 — 탭·스크롤" },
     { "file": "Resume2.dc.html", "page": "page-2", "x": 1440, "y": 0, "w": 390, "h": 844, "title": "④ 이어보기 2겹 — 공고 상세" },
