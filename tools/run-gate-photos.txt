@@ -2,7 +2,7 @@
 결과: docs/designs/assets/gates/ 에 사진 + manifest.json
 🔴 branch 줄이 지금 push 하는 브랜치와 같을 때만 돈다 (deploy/run-deploy.txt 와 같은 안전장치 · 강제 push 에는 안 돈다).
 branch: claude/nice-heisenberg-WESq5
-run: 2026-10-03 #8 — 학교 사진이 아직 없는 9곳 (개발자 지시 "사진이 없는 학교도 없어") · 위키데이터 대표 사진·학교 분류 + Openverse 까지
-only: n1if6uwu,n1ch7t87,ntyl0r5,n1tasrsl,n174lvh5,n1as48ix,ntxxf09,n18ebv4b,nlzhvsh
+run: 2026-10-04 #9 — 고려대 세종만 (8차 후보 0장) · 웹 검색으로 찾은 위키미디어 분류 「Korea University Sejong Campus」를 직접 읽는다
+only: n1ch7t87
 per: 14
 sources: wikidata,openverse

@@ -2026,13 +2026,13 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
   eq('  isNewsRow 에 장학 그물·활동 판정을 넘긴다', /isNewsRow\(i, \{ scholarship: KEYWORDS, activityKind, isAttachmentEntry \}\)/.test(rn) && !/isMenuEntry/.test(rn), true);
   eq('  상세를 읽지 않는다 (fetchDetail 없음 · 제목+링크+수집일만)', /fetchDetail/.test(rn), false);
   const fn = readText(new URL('collector/find-news-boards.mjs', root));
-  eq('  글 줄만 읽는다 — rowsForBoard(=extractDatedRows + 클릭형 링크 풀이 · json/post 는 API) · 페이지 링크 전부 extractLinks 가 아니다', /rawLinks = await rowsForBoard\(s\.school, s\.boardUrl, html, fb\)/.test(rn) && !/\bextractLinks\(/.test(rn) && /await rowsForBoard\(s\.school, page\.url, page\.html\)/.test(fn), true);
+  eq('  글 줄만 읽는다 — rowsForBoard(=extractDatedRows + 클릭형 링크 풀이 · json/post 는 API) · 페이지 링크 전부 extractLinks 가 아니다', /rawLinks = await rowsForBoard\(ruleKey\(s\), s\.boardUrl, html, fb\)/.test(rn) && /const ruleKey = newsRuleKey;/.test(rn) && !/\bextractLinks\(/.test(rn) && /await rowsForBoard\(s\.school, page\.url, page\.html\)/.test(fn), true);
   /* 🔴 클릭형 게시판 규칙(2026-10-01 · 6차 실행까지 0행이던 동국·WISE·서울교대·전북) — 규칙은 news-board-rules.mjs 한 곳, 상세는 매번 실제로 열어 확인 */
   const RB = await import('../collector/news-board-rules.mjs');
   const rb = readText(new URL('collector/news-board-rules.mjs', root));
   eq('  클릭형 규칙은 news-board-rules.mjs 한 곳 — 두 로봇이 불러 쓴다 (베끼지 않는다)', /from '\.\/news-board-rules\.mjs'/.test(rn) && /from '\.\/news-board-rules\.mjs'/.test(fn) && !/NEWS_BOARD_RULES = \{/.test(rn) && !/NEWS_BOARD_RULES = \{/.test(fn), true);
   eq('  규칙마다 근거(실제로 열어 확인한 경위)가 있다 · kind 는 onclick/dataId/listOnly/json/post', Object.values(RB.NEWS_BOARD_RULES).every((r) => typeof r.evidence === 'string' && r.evidence.length >= 20 && /^(onclick|dataId|listOnly|json|post)$/.test(r.kind) && typeof r.detail === 'function'), true);
-  eq('  규칙 학교는 전부 수집망 학교', Object.keys(RB.NEWS_BOARD_RULES).filter((n) => !schoolsCfg.schools.some((x) => x.school === n)), []);
+  eq('  규칙 학교는 전부 수집망 학교 (둘째 게시판 규칙 「학교#이름」은 학교 부분으로)', Object.keys(RB.NEWS_BOARD_RULES).map((n) => n.split('#')[0]).filter((n) => !schoolsCfg.schools.some((x) => x.school === n)), []);
   const dgHtml = '<ul>' + ['헌혈 버스 시행 안내 (10월 6일·8일)', '2026-2학기 비교과 교육과정 안내', '학생통학버스 운행 시간표 변경 안내', '도서관 열람실 운영시간 변경 안내', '법정의무교육 이수 안내'].map((t, i) => `<li><span>공지</span><a href="#none" onclick="goDetail(2676644${i});">${t}</a><span>2026.10.0${i + 1}.</span> 조회 81</li>`).join('') + '</ul>';
   const dgRows = RB.datedRowsFor('동국대학교', dgHtml, 'https://www.dongguk.edu/article/GENERALNOTICES/list');
   eq('  동국 onclick 행 — 목록 주소의 /list 를 /detail/<번호> 로 (사이트가 적어 둔 꼴) · 게시일 유지', [dgRows.length, dgRows[0] && dgRows[0].url, dgRows[0] && dgRows[0].postedAt], [5, 'https://www.dongguk.edu/article/GENERALNOTICES/detail/26766440', '2026-10-01']);
@@ -2077,7 +2077,38 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
   eq('    링크가 제목만 감싸고 게시일 칸이 따로 있으면 제목 안 날짜 뒤를 자르지 않는다', RB.datedRowsFor('동국대학교', '<table>' + ['가을 축제 2026.10.01 개막', '도서관 2026.10.01 정상', '셔틀 2026.10.01 증편', '헌혈 버스 2026.10.01 운영'].map((t, i) => `<tr><td><a href="#none" onclick="goDetail(2676650${i});">${t}</a></td><td>2026.10.01.</td></tr>`).join('') + '</table>', 'https://www.dongguk.edu/article/GENERALNOTICES/list').map((r) => r.title), ['가을 축제 2026.10.01 개막', '도서관 2026.10.01 정상', '셔틀 2026.10.01 증편', '헌혈 버스 2026.10.01 운영']);
   eq('    클릭형 글 줄의 제목에 그 규칙이 적용된다', RB.datedRowsFor('동국대학교 WISE캠퍼스', '<ul>' + ['양산지역 학생통학버스 운행 시간표 변경 안내', '비교과 교육과정 안내 (2학기)', '학습법 LXP 시행 안내', '학습법 콜로키움 개최 안내', '도서관 열람실 운영시간 변경 안내'].map((t, i) => `<li><a href="#none" onclick="goDetail(52058${i});">${t} 2026.09.1${i}. 임준택 조회 278</a></li>`).join('') + '</ul>', 'https://wise.dongguk.ac.kr/article/generalnotice/list')[0].title, '양산지역 학생통학버스 운행 시간표 변경 안내');
   eq('  합격자 공고·발표는 소식이 아니다', ['2026-2학기 동국미디어센터 신문기자 최종 합격자 공고', '근로장학생 합격자 발표'].map((t) => NK.isNewsRow({ title: t, url: 'u' }, opts)), [false, false]);
-  eq('  게시일이 오래된 고정 공지는 싣지 않는다 — 수집 때와 발행 때 같은 상한(NEWS_POSTED_MAX_DAYS)', /const NEWS_POSTED_MAX_DAYS = Number\(process\.env\.NEWS_POSTED_MAX_DAYS \|\| 60\)/.test(rn) && /\.filter\(\(i\) => !i\.postedAt \|\| i\.postedAt >= postedCutoff\(\)\)/.test(rn) && /all = all\.filter\(\(n\) => !n\.postedAt \|\| n\.postedAt >= postedCutoff\(\)\)/.test(rn), true);
+  eq('  게시일이 오래된 고정 공지는 싣지 않는다 — 수집 때와 발행 때 같은 상한(NEWS_POSTED_MAX_DAYS)', /const NEWS_POSTED_MAX_DAYS = Number\(process\.env\.NEWS_POSTED_MAX_DAYS \|\| 60\)/.test(rn) && /\.filter\(\(i\) => !i\.postedAt \|\| i\.postedAt >= postedCutoff\(\)\)/.test(rn) && /all = all\.filter\(\(n\) => floor\.has\(n\) \|\| \(\(n\.foundAt \|\| '9999'\) >= cutoff && \(!n\.postedAt \|\| n\.postedAt >= postedCutoff\(\)\)\)\);/.test(rn), true);
+  /* 🔴 소식 0건 학교 없애기 (2026-10-03 개발자 지시 "소식이 0건인 학교는 없어 … 어떻게든 그 출처를 찾아") */
+  {
+    const NKf = NK.newsFloor;
+    const fl = [
+      { school: '가대학교', title: 'a1', postedAt: '2026-06-01' }, { school: '가대학교', title: 'a2', postedAt: '2026-06-03' },
+      { school: '가대학교', title: 'a3', foundAt: '2026-06-05' }, { school: '가대학교', title: 'a4', postedAt: '2026-05-01' },
+      { school: '가대학교', title: 'a5', postedAt: '2026-04-01' }, { school: '가대학교', title: 'a6', postedAt: '2026-07-01', hidden: true },
+      { school: '나대학교', title: 'b1', postedAt: '2026-01-01' },
+    ];
+    const kept = NKf(fl, 4);
+    eq('  학교마다 최근 4건은 기한이 지나도 남긴다 — 게시일(없으면 수집일) 최근 순 · 숨긴 글은 세지 않는다 (newsFloor)', fl.filter((x) => kept.has(x)).map((x) => x.title).sort(), ['a1', 'a2', 'a3', 'a4', 'b1']);
+    eq('    로봇은 기한 거르기 전에 newsFloor 를 쓴다 (NEWS_MIN_KEEP 4) · 수집 때 게시일 상한은 그대로 (오래된 고정 공지를 새로 데려오지 않는다)', /const NEWS_MIN_KEEP = Number\(process\.env\.NEWS_MIN_KEEP \|\| 4\);/.test(rn) && /const floor = newsFloor\(all, NEWS_MIN_KEEP\);/.test(rn) && /const recent = onSite\.filter\(\(i\) => !i\.postedAt \|\| i\.postedAt >= postedCutoff\(\)\);/.test(rn), true);
+    eq('    0건 학교는 리포트 🙋 줄 + 이슈(needs_human)', /zeroSchools = \[\.\.\.new Set\(mains\.map\(\(s\) => s\.school\)\)\]\.filter\(\(name\) => !liveBySchool\.get\(name\)\)/.test(rn) && /소식이 0건인 학교/.test(rn) && /needs_human=\$\{\(chronic\.length \+ noRows\.length \+ zeroSchools\.length\)/.test(rn), true);
+    /* 둘째 게시판 (extraBoards) — 근거 · 열쇠 · 글 표식 */
+    const extras = src.sources.flatMap((x) => (x.extraBoards || []).map((e) => ({ ...e, school: x.school, main: x.boardUrl })));
+    eq('  둘째 게시판은 첫 게시판이 있는 학교에만 · 주소와 근거(웹 검색 결과 + 정찰)가 있다 · 이름이 학교 안에서 하나', extras.length >= 3 && extras.every((e) => e.main && /^https:\/\//.test(e.boardUrl) && typeof e.label === 'string' && e.label && /웹 검색/.test(e.evidence || '') && /정찰/.test(e.evidence || '')) && new Set(extras.map((e) => `${e.school}#${e.label}`)).size === extras.length, true);
+    eq('    로봇은 게시판 줄을 첫 게시판 + 둘째 게시판으로 펴고(board 이름) 규칙 열쇠는 newsRuleKey 하나 · 그 글에 board 를 단다', /\.map\(\(e\) => \(\{ school: s\.school, campus: s\.campus, boardUrl: e\.boardUrl, label: e\.label \|\| '둘째 게시판', board: e\.label \|\| '둘째 게시판', extra: true \}\)\)\]\);/.test(rn) && /if \(s\.board\) it\.board = s\.board;/.test(rn) && !/NEWS_BOARD_RULES\[s\.school\]/.test(rn), true);
+    eq('    썸네일 로봇도 글의 규칙을 같은 열쇠로 찾는다', /postContentRequest\(NEWS_BOARD_RULES\[newsRuleKey\(n\)\], n\)/.test(readText(new URL('collector/collect-news-thumbs.mjs', root))), true);
+    eq('    열쇠 — 첫 게시판은 학교, 둘째는 학교#이름', [RB.newsRuleKey({ school: '서강대학교' }), RB.newsRuleKey({ school: '서강대학교', board: '행사특강' })], ['서강대학교', '서강대학교#행사특강']);
+    eq('    「학교#이름」 규칙은 그 이름의 둘째 게시판이 있어야 한다 (안 쓰이는 규칙 금지)', Object.keys(RB.NEWS_BOARD_RULES).filter((k) => k.includes('#') && !extras.some((e) => `${e.school}#${e.label}` === k)), []);
+    /* 서강 행사특강 — 정찰 6차가 누른 주소 그대로 */
+    eq('  서강 행사특강 — 정찰 6차가 첫 줄을 눌러 받은 상세 주소와 글자 하나까지 같다 · 본문 확인은 BbsData?pkId=', [RB.NEWS_BOARD_RULES['서강대학교#행사특강'].detail('551482'), RB.NEWS_BOARD_RULES['서강대학교#행사특강'].verifyApi.api(RB.NEWS_BOARD_RULES['서강대학교#행사특강'].verifyApi.idFrom(RB.NEWS_BOARD_RULES['서강대학교#행사특강'].detail('551482')))], ['https://www.sogang.ac.kr/ko/detail/551482?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event', 'https://www.sogang.ac.kr/api/api/v1/mainKo/BbsData?pkId=551482']);
+    /* 경북 학사공지 — 정찰 6차가 받은 실제 목록 HTML(앞 세 줄) + 보통 줄 하나 */
+    const knuHtml = "<table><tbody> <tr> <td class=\"num notice\">공지</td> <td class=\"subject\"> <a href=\"javascript:doRead(\'stu_812\', \'top\', \'11790921912463\');\"> 2026학년도 2학기 학사학위취득유예자 수강신청에 따른 등록금 추가 납부 안내 </a> </td> <td class=\"file\"> </td> <td class=\"writer\">김수만</td> <td class=\"date\">2026/10/02</td> <td class=\"hit\">115</td> </tr> <tr> <td class=\"num notice\">공지</td> <td class=\"subject\"> <a href=\"javascript:doRead(\'stu_812\', \'top\', \'11790744244900\');\"> 2026학년도 2학기 교직 적성 및 인성검사(1차) 결과 안내 </a> </td> <td class=\"writer\">박지현</td> <td class=\"date\">2026/09/30</td> </tr> <tr> <td class=\"num notice\">공지</td> <td class=\"subject\"> <a href=\"javascript:doRead(\'stu_812\', \'top\', \'11790644315187\');\"> 2026학년도 2학기 강의개선을 위한 중간 설문 실시 안내 </a> </td> <td class=\"writer\">박현정</td> <td class=\"date\">2026/09/29</td> </tr> <tr> <td class=\"num\">6120</td> <td class=\"subject\"> <a href=\"javascript:doRead(\'stu_812\', \'row\', \'11790037102438\');\"> 2026학년도 겨울계절수업 희망과목 수요조사 실시 안내 </a> </td> <td class=\"writer\">박현정</td> <td class=\"date\">2026/09/22</td> </tr></tbody></table>";
+    const knuRows = RB.datedRowsFor('경북대학교', knuHtml, 'https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdList.action?menu_idx=42');
+    eq('  경북 doRead(게시판, 구분, 번호) — 정찰 6차가 첫 줄을 눌러 받은 주소와 같다 · 글 번호가 postId · 게시일', knuRows[0] && [knuRows.length, knuRows[0].url, knuRows[0].postId, knuRows[0].postedAt], [4, 'https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdViewBtin.action?search_type=&search_text=&popupDeco=&note_div=top&bltn_no=11790921912463&menu_idx=42&bbs_cde=stu_812', '11790921912463', '2026-10-02']);
+    eq('    보통 줄은 그 줄의 구분 값을 그대로 옮긴다 (고정 줄의 top 을 박지 않는다)', knuRows[3] && /note_div=row&bltn_no=11790037102438&/.test(knuRows[3].url), true);
+    eq('    다른 목록 주소(menu_idx 없음·다른 길)면 상세를 만들지 않는다', [RB.datedRowsFor('경북대학교', knuHtml, 'https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdList.action').length, RB.datedRowsFor('경북대학교', knuHtml, 'https://www.knu.ac.kr/other/list.action?menu_idx=42').length], [0, 0]);
+    eq('    정찰이 고정 줄만 눌러 봤으니 마지막 글(보통 줄)도 연다 (verifyLast)', RB.NEWS_BOARD_RULES['경북대학교'].verifyLast === true && /if \(rule\.verifyLast && fresh\.length > 1 && last\.url !== fresh\[0\]\.url\) \{\s*const v2 = await verifyRuleDetail\(last, \{ rule, boardUrl: s\.boardUrl, others: items\.map\(\(i\) => i\.title\), fetch: fb \}\);[\s\S]{0,120}?if \(!v2\.ok\) \{[^\n]*return; \}/.test(rn), true);
+    eq('    경북 출처는 그 목록 주소 · 근거가 정찰 6차', (() => { const k = src.sources.find((x) => x.school === '경북대학교'); return [k.boardUrl, /정찰 6차/.test(k.evidence || '')]; })(), ['https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdList.action?menu_idx=42', true]);
+  }
   /* 2차 정찰 반영 (2026-10-01) — 시립 onclick+익명 목록 · 서강 json(목록 표식) · 중앙 post(상세 확인은 POST API) · 분류 꼬리표 */
   const uosRows = RB.datedRowsFor('서울시립대학교', '<table>' + ['[박물관] 2026년 글로벌 시민강좌 및 임시 휴관 안내', '★마지막 추가 모집 - AI 에이전트 양성 과정', '전공설계상담 프로그램 운영 안내', '공학아이디어 경진대회 개최 안내', '토론배틀 참가 모집 안내'].map((t, i) => `<tr><td>공지</td><td><a href="javascript:fnView('${i + 1}', '3158${i}');">${t}</a></td><td>박물관</td><td>2026-10-01</td></tr>`).join('') + '</table>', 'https://www.uos.ac.kr/korNotice/list.do?list_id=FA1&identified=anonymous&');
   eq('  시립 fnView 행 — 둘째 번호가 seq · 정찰이 눌러 받은 주소 그대로 (list_id 는 목록 주소에서)', uosRows[0] && uosRows[0].url, 'https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31580&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&');
@@ -2185,7 +2216,7 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
   }
   eq('    시한에 걸려 놓은 요청은 「주소 확인 필요」·「규칙 확인」이 아니라 「멈춤」(⛔)으로 적는다 (리뷰 12차)', /if \(\(e && e\.boardDeadline\) \|\| Date\.now\(\) >= ctx\.deadlineAt - \d+\) \{ results\.push\(\{ name, status: timedOutStatus\(\), items: \[\] \}\); return; \}/.test(rn)
     && /status: Date\.now\(\) >= ctx\.deadlineAt - \d+ \? timedOutStatus\(\) : `⚠️ 클릭형 규칙/.test(rn) && (rn.match(/timedOutStatus\(\)/g) || []).length >= 3, true);
-  eq('    교내 소식 로봇은 게시판의 모든 요청(목록·API·상세 확인)에 게시판 시한을 넘긴다', /const fb = \(url, o = \{\}\) => fetchBoard\(url, \{ \.\.\.o, deadlineAt: ctx\.deadlineAt \}\);/.test(rn) && /const res = await fb\(s\.boardUrl\);/.test(rn) && /rowsForBoard\(s\.school, s\.boardUrl, html, fb\)/.test(rn) && /verifyRuleDetail\(fresh\[0\], \{[^}]*fetch: fb \}\)/.test(rn) && /const ctx = \{ dead: false, deadlineAt: Date\.now\(\) \+ BOARD_HARD_MS - \d+ \};/.test(rn) && !/await fetchBoard\(/.test(rn), true);
+  eq('    교내 소식 로봇은 게시판의 모든 요청(목록·API·상세 확인)에 게시판 시한을 넘긴다', /const fb = \(url, o = \{\}\) => fetchBoard\(url, \{ \.\.\.o, deadlineAt: ctx\.deadlineAt \}\);/.test(rn) && /const res = await fb\(s\.boardUrl\);/.test(rn) && /rowsForBoard\(ruleKey\(s\), s\.boardUrl, html, fb\)/.test(rn) && /verifyRuleDetail\(fresh\[0\], \{[^}]*fetch: fb \}\)/.test(rn) && /const ctx = \{ dead: false, deadlineAt: Date\.now\(\) \+ BOARD_HARD_MS - \d+ \};/.test(rn) && !/await fetchBoard\(/.test(rn), true);
   eq('  API 규칙(json/post)의 0행·오류는 주소가 아니라 규칙의 문제로 적는다 (원인을 단정하지 않는다)', /fetchesOwnList\(rule\) \? ['`]🟡 규칙의 API 는 응답했지만/.test(rn) && /fetchesOwnList\(rule\) \? `⚠️ 규칙의 API 오류/.test(rn), true);
   eq('  API 규칙 학교는 정찰이 확인한 화면(rule.page)만 게시판으로 올린다 · API 는 학교당 한 번', [RB.rulePageMatches(RB.NEWS_BOARD_RULES['서강대학교'], 'https://www.sogang.ac.kr/ko/announcement'), RB.rulePageMatches(RB.NEWS_BOARD_RULES['서강대학교'], 'https://www.sogang.ac.kr/ko/news/press'), RB.rulePageMatches(RB.NEWS_BOARD_RULES['중앙대학교'], 'https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100#page1'), RB.rulePageMatches(RB.NEWS_BOARD_RULES['중앙대학교'], 'https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=200')], [true, false, true, false]);
   eq('    찾기 로봇이 그 화면만 보고(후보·홈 메뉴를 돌지 않는다) API 를 한 번만 부른다', /if \(apiRule && !rulePageMatches\(rule, url\)\)/.test(fn) && /if \(apiRule && apiRows === null\) apiRows = await rowsForBoard/.test(fn) && /if \(apiRule && rule\.page\) \{[\s\S]{0,300}?return \{ found: hit, tried \};/.test(fn), true);
@@ -2434,6 +2465,16 @@ console.log('\n■ 교내 소식 썸네일 (2026-10-03 개발자 지시 "실제 
     L.posts['post:나대학교:10'] = { at: '2026-10-01', school: '나대학교', err: '글 HTTP 500', tries: 3 };  // 세 번 실패 → 그만
     const q = TH.planQueue(items, L, { today: '2026-10-03', perSchool: 2, noThumb: new Set(['post:가대학교:3']), fileExists: () => false });
     eq('    순서·거르기 — 새 글부터 · 가·나 학교를 번갈아 · 학교당 2건 · 숨김/사진 뺌/없음/오늘 실패/세 번 실패 제외 · 파일 사라진 것은 다시', q.map((n) => n.postId), ['2', '4', '6', '9']);
+    /* 2026-10-03 — 홈 첫 화면 소식 띠(사진 148×104)를 위해 360px 로 키웠다. 옛 240px 사진(side 없음)은 새 글 다음 차례로 다시 받고, 받는 동안·실패하면 옛 사진을 그대로 둔다 */
+    const G = TH.emptyLedger();
+    G.posts['post:다대학교:1'] = { at: '2026-10-01', school: '다대학교', file: 'data/news/img/1111111111111111.webp' };                 // 옛 240 → 키우기
+    G.posts['post:다대학교:2'] = { at: '2026-10-02', school: '다대학교', file: 'data/news/img/2222222222222222.webp', side: TH.THUMB_SIDE };   // 이미 360
+    G.posts['post:다대학교:3'] = { at: '2026-10-01', school: '다대학교', file: 'data/news/img/3333333333333333.webp', growAt: '2026-10-03', growTries: 1 };   // 오늘 키우기 실패 → 내일
+    const gi = [it('다대학교', 1, '2026-10-01'), it('다대학교', 2, '2026-10-02'), it('다대학교', 3, '2026-10-01'), it('다대학교', 4, '2026-10-03')];
+    const gq = TH.planQueue(gi, G, { today: '2026-10-03', perSchool: 6, fileExists: () => true });
+    eq('    키우기 — 옛 240px 사진은 새 글 뒤에 다시 받는다 · 이미 큰 것·오늘 실패한 것은 빼고 · 표시(grow)를 단다 · 크기는 360', [gq.map((n) => `${n.postId}${n.grow ? '+' : ''}`), TH.THUMB_SIDE], [['4', '1+'], 360]);
+    const rr = readText(new URL('collector/collect-news-thumbs.mjs', root));
+    eq('    키우기에 실패하면 옛 사진을 그대로 두고(덮지 않음) 하루 뒤 · 성공하면 장부에 크기(side)를 적는다', /if \(n\.grow && !out\.file && prev && prev\.file\) \{\s*ledger\.posts\[key\] = \{ \.\.\.prev, growAt: today, growTries:/.test(rr) && /v: RULES_V, side: T\.THUMB_SIDE \}/.test(rr), true);
   }
   /* ⑤ 소급 — 장부를 실린 글 전부에 다시 입힌다(병합이 칸을 떨어뜨려도 되살린다) · 사진 뺌·파일 없음·꼴이 아닌 값은 지운다 */
   {
