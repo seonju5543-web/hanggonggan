@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: write
+  issues: write     # 실패를 이슈로 부른다(아래 robot-down · 2026-10-04)
 
 concurrency:
   group: insta-stats
@@ -31,8 +32,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      # 🔴 shell: bash = `bash -eo pipefail` (2026-10-04) — 기본 셸(bash -e)은 pipefail 이 없어 `node … | tee` 에서
+      #    node 가 넘어져도(🚨 수확 실패) tee 가 0 을 돌려 단계가 초록이었다(실측 rc=0). 그러면 실패 알림도 안 돈다.
       - name: 수확
         id: h
+        shell: bash
         env:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
         run: node insta/stats.mjs | tee /tmp/out.txt; grep -q '^state=none' /tmp/out.txt && echo 'state=none' >> "$GITHUB_OUTPUT" || echo 'state=ok' >> "$GITHUB_OUTPUT"
@@ -52,3 +56,11 @@ jobs:
       - name: 실패하면 시끄럽게
         if: ${{ failure() || cancelled() }}
         run: echo '🚨 트랙션 수확이 실패했습니다 — 못 받은 것을 「반응 0」 으로 읽지 마세요.' >> "$GITHUB_STEP_SUMMARY"
+      # 🔴 요약 한 줄은 아무도 안 본다 — 넘어짐 알림 한 벌(robot-down)로 이슈를 연다 (2026-10-04 로봇·도구 점검).
+      #    회복하면 하트비트가 닫는다.
+      - name: 🚨 로봇이 넘어졌다
+        if: ${{ failure() || cancelled() }}
+        uses: ./.github/actions/robot-down
+        with:
+          robot: 인스타 트랙션 수확
+          token: ${{ github.token }}

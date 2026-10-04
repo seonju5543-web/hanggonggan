@@ -1,5 +1,7 @@
 const { chromium } = require('playwright-core');
 const { assertOwnServer } = require('./onboard-helper.js');
+/* 표본을 언제·무엇으로 심는가는 open-form-sample.cjs 한 곳 — 관문(verify/health-gates/ci.mjs)이 같은 함수를 브라우저 없이 잰다 */
+const { shouldPlantSample, openFormSample } = require('./open-form-sample.cjs');
 const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
 const SHOT = (n) => `${__dirname}/shot-${n}.png`;
 
@@ -58,25 +60,23 @@ async function driveAnyLiveForm(page) {
      하나는 다른 학교 한정(외대) · 둘은 마감일이 없어 60일 규칙으로 목록에서 내려가 성균관대 학생에겐 한 장도 안 보였다 —
      데이터 탓 빨간불이 다시 뒤 드라이버 전부를 막았다. 그때는 **등록된 진짜 양식 공고 하나**(어느 학교든)를 복사해 학교 범위를 풀고
      마감만 20일 뒤로 바꾼 표본으로 같은 길을 몬다(잰 것은 여전히 '질문 → 문서 생성' — 양식·질문·문서는 진짜 그대로). */
-  if (!ids.length || tried.every((t) => /\(신청 버튼 잠김\)$/.test(t))) {
-    const fx = await page.evaluate((srcIds) => {
-      const src = registeredList.find((x) => srcIds.includes(x.id))
-        || registeredList.find((x) => x.formId && typeof FORM_TEMPLATES !== 'undefined' && FORM_TEMPLATES[x.formId]);
-      if (!src) return null;
-      const copy = JSON.parse(JSON.stringify(src));
-      copy.id = 'gate-open-form';
-      copy.deadline = new Date(Date.now() + 20 * 864e5).toISOString().slice(0, 10);
-      if (copy.eligibility) { delete copy.eligibility.schoolOnly; delete copy.eligibility.campusOnly; delete copy.eligibility.schoolsAny; }
-      registeredList.push(copy);
-      renderExplore();
-      return src.id;
-    }, ids);
-    if (fx) {
+  /* (2026-10-04 · 이슈 #389·#390 후속) 고르는 규칙을 open-form-sample.cjs 로 옮겼다 — 여기 page.evaluate 안에만 있으면 브라우저 없이는 못 잰다.
+     등록 목록에 양식 공고가 하나도 안 남는 날(마감+30일 정리)에도 앱 내장 양식(forms.js)을 실제 항목에 붙여 같은 길을 몬다. */
+  if (shouldPlantSample(ids, tried)) {
+    const snap = await page.evaluate(() => ({
+      list: typeof registeredList !== 'undefined' ? registeredList : [],
+      tpl: typeof FORM_TEMPLATES !== 'undefined' ? Object.keys(FORM_TEMPLATES) : [],
+    }));
+    const pick = openFormSample(snap.list, snap.tpl, ids, new Date().toISOString().slice(0, 10));
+    if (pick) {
+      await page.evaluate((c) => { registeredList.push(c); renderExplore(); }, pick.copy);
       await page.waitForTimeout(400);
       const r = await driveOneForm(page, 'gate-open-form').catch((e) => ({ id: 'gate-open-form', ok: false, why: String(e.message || e).split('\n')[0].slice(0, 80) }));
-      console.log(`  (${ids.length ? `실제 후보 ${tried.join(', ')} 가 모두 마감` : '이 학생에게 보이는 양식 공고가 없음'} — ${fx} 의 양식을 그대로 쓴 마감 전 표본으로 구동)`);
-      if (r.ok) return { id: `gate-open-form(←${fx})`, ok: true };
-      tried.push(`gate-open-form←${fx}(${r.why})`);
+      console.log(`  (${ids.length ? `실제 후보 ${tried.join(', ')} 가 모두 마감` : '이 학생에게 보이는 마감 전 양식 공고가 없음'} — ${pick.from} 를 복사한 마감 전 표본(양식 ${pick.copy.formId})으로 구동)`);
+      if (r.ok) return { id: `gate-open-form(←${pick.from})`, ok: true };
+      tried.push(`gate-open-form←${pick.from}(${r.why})`);
+    } else {
+      tried.push('표본 없음(등록 목록에도 앱 내장 양식에도 쓸 양식이 없다)');
     }
   }
   return { id: tried.join(', '), ok: false };
